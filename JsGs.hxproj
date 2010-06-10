@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project>
+  <!-- Output SWF options -->
+  <output>
+    <movie disabled="False" />
+    <movie input="" />
+    <movie path="bin\JsGs.js" />
+    <movie fps="0" />
+    <movie width="0" />
+    <movie height="0" />
+    <movie version="11" />
+    <movie background="#FFFFFF" />
+  </output>
+  <!-- Other classes to be compiled into your SWF -->
+  <classpaths>
+    <class path="src" />
+  </classpaths>
+  <!-- Build options -->
+  <build>
+    <option directives="" />
+    <option flashStrict="False" />
+    <option mainClass="net.coderline.jsgs.Main" />
+    <option forcetraces="False" />
+    <option additional="" />
+  </build>
+  <!-- haxelib libraries -->
+  <haxelib>
+    <!-- example: <library name="..." /> -->
+  </haxelib>
+  <!-- Class files to compile (other referenced classes will automatically be included) -->
+  <compileTargets>
+    <compile path="src\net\coderline\jsgs\Main.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsBeat.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsBeatStroke.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsBeatStrokeDirection.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsBeatText.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsChord.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsColor.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsDuration.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsGuitarString.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsLyricLine.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsLyrics.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsMarker.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsMeasure.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsMeasureClef.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsMeasureHeader.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsMidiChannel.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsMixTableChange.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsMixTableItem.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsNote.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsNoteEffect.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsPageSetup.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsSlideType.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsSong.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsSongFactory.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsTempo.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsTimeSignature.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsTrack.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsTriplet.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsTripletFeel.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsVelocities.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsVoice.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsVoiceDirection.hx" />
+    <compile path="src\net\coderline\jsgs\model\effects\GsBendEffect.hx" />
+    <compile path="src\net\coderline\jsgs\model\effects\GsBendPoint.hx" />
+    <compile path="src\net\coderline\jsgs\model\effects\GsBendTypes.hx" />
+    <compile path="src\net\coderline\jsgs\model\effects\GsGraceEffect.hx" />
+    <compile path="src\net\coderline\jsgs\model\effects\GsGraceEffectTransition.hx" />
+    <compile path="src\net\coderline\jsgs\model\effects\GsHarmonicEffect.hx" />
+    <compile path="src\net\coderline\jsgs\model\effects\GsHarmonicType.hx" />
+    <compile path="src\net\coderline\jsgs\model\effects\GsTremoloBarEffect.hx" />
+    <compile path="src\net\coderline\jsgs\model\effects\GsTremoloBarPoint.hx" />
+    <compile path="src\net\coderline\jsgs\model\effects\GsTremoloPickingEffect.hx" />
+    <compile path="src\net\coderline\jsgs\model\effects\GsTrillEffect.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsHeaderFooterElements.hx" />
+    <compile path="src\net\coderline\jsgs\model\Point.hx" />
+    <compile path="src\net\coderline\jsgs\model\Rectangle.hx" />
+    <compile path="src\net\coderline\jsgs\file\SongReader.hx" />
+    <compile path="src\net\coderline\jsgs\file\FileFormatException.hx" />
+    <compile path="src\net\coderline\jsgs\file\SongLoader.hx" />
+    <compile path="src\net\coderline\jsgs\file\guitarpro\GpReaderBase.hx" />
+    <compile path="src\net\coderline\jsgs\model\Padding.hx" />
+    <compile path="src\net\coderline\jsgs\model\Size.hx" />
+    <compile path="C:\Program Files (x86)\Motion-Twin\haxe\lib\jquery\1,01\jquery\JQuery.hx" />
+    <compile path="src\net\coderline\jsgs\JQuery.hx" />
+    <compile path="src\net\coderline\jsgs\file\guitarpro\Gp5Reader.hx" />
+    <compile path="src\net\coderline\jsgs\model\effects\GsBendTypesConverter.hx" />
+    <compile path="src\net\coderline\jsgs\file\guitarpro\Gp4Reader.hx" />
+    <compile path="src\net\coderline\jsgs\file\guitarpro\Gp3Reader.hx" />
+    <compile path="src\net\coderline\jsgs\model\GsMeasureClefConverter.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\model\BeatGroup.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\model\GsBeatImpl.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\model\GsBeatTextImpl.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\model\GsChordImpl.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\model\GsJoinedType.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\model\GsJoinedTypeConverter.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\model\GsLyricsImpl.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\model\GsMeasureHeaderImpl.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\model\GsMeasureImpl.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\model\GsNoteImpl.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\model\GsSongFactoryImpl.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\model\GsTrackImpl.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\model\GsVoiceImpl.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\drawing\SvgPainter.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\drawing\DrawingLayer.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\drawing\DrawingLayers.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\drawing\DrawingLayersConverter.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\drawing\DrawingResources.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\drawing\DrawingContext.hx" />
+    <compile path="src\net\coderline\jsgs\model\SongManager.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\drawing\ClefPainter.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\drawing\KeySignaturePainter.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\drawing\MusicFont.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\drawing\NotePainter.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\drawing\SilencePainter.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\drawing\TripletFeelPainter.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\drawing\TempoPainter.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\PageViewLayout.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\Tablature.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\TrackSpacing.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\TrackSpacingPositionConverter.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\TrackSpacingPositions.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\ViewLayout.hx" />
+    <compile path="src\FileLoader.hx" />
+    <compile path="src\BinaryReader.hx" />
+    <compile path="src\net\coderline\jsgs\model\PointF.hx" />
+    <compile path="C:\Program Files (x86)\Motion-Twin\haxe\lib\hxunicode\0,1,1\unicode\CombiningClassData.hx" />
+    <compile path="C:\Program Files (x86)\Motion-Twin\haxe\lib\hxunicode\0,1,1\unicode\CombiningIter.hx" />
+    <compile path="C:\Program Files (x86)\Motion-Twin\haxe\lib\hxunicode\0,1,1\unicode\CombiningTools.hx" />
+    <compile path="C:\Program Files (x86)\Motion-Twin\haxe\lib\hxunicode\0,1,1\unicode\Unicode.hx" />
+    <compile path="C:\Program Files (x86)\Motion-Twin\haxe\lib\hxunicode\0,1,1\unicode\UnicodeException.hx" />
+    <compile path="C:\Program Files (x86)\Motion-Twin\haxe\lib\hxunicode\0,1,1\unicode\UnicodeIter.hx" />
+    <compile path="C:\Program Files (x86)\Motion-Twin\haxe\lib\hxunicode\0,1,1\unicode\UnicodeTools.hx" />
+    <compile path="src\net\coderline\jsgs\Utf8.hx" />
+  </compileTargets>
+  <!-- Paths to exclude from the Project Explorer tree -->
+  <hiddenPaths>
+    <!-- example: <hidden path="..." /> -->
+  </hiddenPaths>
+  <!-- Executed before build -->
+  <preBuildCommand />
+  <!-- Executed after build -->
+  <postBuildCommand alwaysRun="False" />
+  <!-- Other project options -->
+  <options>
+    <option showHiddenPaths="False" />
+    <option testMovie="OpenDocument" />
+    <option testMovieCommand="bin/index.html" />
+  </options>
+</project>
