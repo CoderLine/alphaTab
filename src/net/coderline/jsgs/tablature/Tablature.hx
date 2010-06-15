@@ -11,57 +11,45 @@ import net.coderline.jsgs.model.GsTrack;
 import net.coderline.jsgs.model.Rectangle;
 import net.coderline.jsgs.model.Size;
 import net.coderline.jsgs.model.SongManager;
+import net.coderline.jsgs.platform.Canvas;
+import net.coderline.jsgs.platform.CanvasProvider;
 import net.coderline.jsgs.tablature.drawing.DrawingResources;
 import net.coderline.jsgs.tablature.model.GsSongFactoryImpl;
 
 
+
 class Tablature 
 {
-	public var Canvas: js.HtmlDom;
-	public var JCanvas:JQuery;
+	public var Canvas : Canvas;
 	public var ErrorMessage:String;
 	public var Width:Int;
 	public var Height:Int;
 	public var ViewLayout:ViewLayout;
 	public var Track:GsTrack;
 	
-	public var Ctx: Dynamic; // Canvas2DRenderingContext
 	private var UpdateDisplay:Bool;
 	private var UpdateSong:Bool;
 	
 	public var SongManager:SongManager;
 	
-	public function new(canvasId:String) 
+	public function new(source:Dynamic, errorMessage:String = "") 
 	{
-		this.JCanvas = JQuery.Qy("#" + canvasId);
-		this.Canvas =  this.JCanvas.GetAt(0);
+		this.Canvas = CanvasProvider.GetCanvas(source);
 		this.Track = null;
 		this.SongManager = new SongManager(new GsSongFactoryImpl());
 		
-		this.UpdateContext();
-		this.ErrorMessage = StringTools.trim(this.JCanvas.Text());
+		this.ErrorMessage = StringTools.trim(errorMessage);
 		
 		if (this.ErrorMessage == "" || this.ErrorMessage == null) 
-		{
+		{ 
 			this.ErrorMessage = "Please set a song's track to display the tablature";
 		}
 		
-		this.Width = this.JCanvas.Width();
-		this.Height = this.JCanvas.Height();
+		this.Width = this.Canvas.Width();
+		this.Height = this.Canvas.Height();
 		this.ViewLayout = new PageViewLayout();
 		this.ViewLayout.SetTablature(this);
 		this.UpdateScale(1.1);	
-	}
-	
-	public function UpdateContext() {
-		untyped
-		{
-			if (this.Canvas.getContext) {
-				this.Ctx = this.Canvas.getContext("2d");
-			} else {
-				throw "The specified tag is no valid HTML5 canvas element";
-			}
-		}	
 	}
 	
 	public function SetTrack(track:GsTrack) : Void 
@@ -93,18 +81,10 @@ class Tablature
 		this.Width = this.ViewLayout.Width;
 		this.Height = this.ViewLayout.Height;
 		
-		// Update graphics
-		untyped
-		{
-			this.Canvas.width = this.Width;
-			this.Canvas.height = this.Height;
-		}
-		
-		// update html element
-		this.JCanvas.SetWidth(this.ViewLayout.Width);
-		this.JCanvas.SetHeight(this.ViewLayout.Height);
-		// update context
-		this.UpdateContext();
+		// update canvas
+		this.Canvas.SetWidth(this.ViewLayout.Width);
+		this.Canvas.SetHeight(this.ViewLayout.Height);
+
 	}
 	
 	public function OnPaint() 
@@ -114,15 +94,15 @@ class Tablature
 		if (this.Track == null) {
 			var text = this.ErrorMessage;
 			
-			this.Ctx.fillStyle = "#4e4e4e";
-			this.Ctx.font = "20px Arial";
-			this.Ctx.textBaseline = "middle";
-			this.Ctx.fillText(text, 20, 30);
+			this.Canvas.fillStyle = "#4e4e4e";
+			this.Canvas.font = "20px Arial";
+			this.Canvas.textBaseline = "middle";
+			this.Canvas.fillText(text, 20, 30);
 		}
 		else 
 		{
 			var displayRect:Rectangle = new Rectangle(0, 0, this.Width, this.Height);
-			this.ViewLayout.PaintCache(this.Ctx, displayRect, 0, 0);
+			this.ViewLayout.PaintCache(this.Canvas, displayRect, 0, 0);
 			this.UpdateDisplay = false;
 		}
 	}
@@ -135,18 +115,18 @@ class Tablature
         this.DoLayout();
         this.UpdateSong = false;
 	}
-	
+	 
 	public function PaintBackground() {
-		this.Ctx.fillStyle = "#eeeedd";
-		this.Ctx.fillRect(0, 0, this.Width - 1, this.Height - 1);
-		this.Ctx.strokeStyle = "#ddddcc";
-		this.Ctx.lineWidth = 20;
-		this.Ctx.strokeRect(0, 0, this.Width - 1, this.Height - 1);
+		this.Canvas.fillStyle = "#eeeedd";
+		this.Canvas.fillRect(0, 0, this.Width - 1, this.Height - 1);
+		this.Canvas.strokeStyle = "#ddddcc";
+		this.Canvas.lineWidth = 20;
+		this.Canvas.strokeRect(0, 0, this.Width - 1, this.Height - 1);
 	}
 	
 	public function Invalidate() 
 	{
-		this.Ctx.clearRect(0, 0, this.Width, this.Height);
+		this.Canvas.clearRect(0, 0, this.Width, this.Height);
 		this.OnPaint();
 	}
 	

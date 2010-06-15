@@ -25,6 +25,7 @@ class SongLoader
 					data.seek(0);
 					reader.Init(data, factory);
 					success(reader.ReadSong());
+					return;
 				}
 				catch (e:FileFormatException) {
 					continue;

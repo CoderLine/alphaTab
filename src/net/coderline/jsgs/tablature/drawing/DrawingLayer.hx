@@ -7,6 +7,7 @@ package net.coderline.jsgs.tablature.drawing;
 import haxe.remoting.FlashJsConnection;
 import net.coderline.jsgs.model.GsColor;
 import net.coderline.jsgs.model.Point;
+import net.coderline.jsgs.platform.Canvas;
 
 class DrawingLayer 
 {
@@ -25,7 +26,7 @@ class DrawingLayer
 		this.CurrentPosition = new Point(0, 0);
 	}
 	
-	public function Draw(graphics:Dynamic /*Canvas2DRenderingContext*/) : Void
+	public function Draw(graphics:Canvas) : Void
 	{
 		graphics.textBaseline = "middle";
         graphics.fillStyle = this.Color.toString();

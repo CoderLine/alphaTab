@@ -262,7 +262,6 @@ class GsNoteImpl extends GsNote
 			{
 				for (note in beat.GetNotes())
 				{
-					note.
 					if(note.Effect.PalmMute)
 					{
 						nextPM = true;

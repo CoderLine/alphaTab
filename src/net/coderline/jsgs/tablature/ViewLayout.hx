@@ -15,6 +15,7 @@ import net.coderline.jsgs.model.GsTrack;
 import net.coderline.jsgs.model.GsVoice;
 import net.coderline.jsgs.model.Rectangle;
 import net.coderline.jsgs.model.Size;
+import net.coderline.jsgs.platform.Canvas;
 import net.coderline.jsgs.tablature.drawing.DrawingContext;
 import net.coderline.jsgs.tablature.drawing.DrawingLayers;
 import net.coderline.jsgs.tablature.drawing.DrawingResources;
@@ -103,7 +104,7 @@ class ViewLayout
         this.EffectSpacing = Math.round(10 * this.Scale);
 	}
 	
-	public function PaintCache(graphics:Dom, area:Rectangle, fromX:Int, fromY:Int) : Void
+	public function PaintCache(graphics:Canvas, area:Rectangle, fromX:Int, fromY:Int) : Void
 	{
 		var context:DrawingContext = new DrawingContext(this.Scale);
         context.Graphics = graphics;
@@ -257,9 +258,9 @@ class ViewLayout
 	
 	public function GetOrientation(x:Int, y:Int, str:String) : Rectangle
 	{
-		this.Tablature.Ctx.font = DrawingResources.NoteFont;
-		var size = this.Tablature.Ctx.measureText(str);
-		return new Rectangle(x,y, size.width, DrawingResources.NoteFontHeight);
+		this.Tablature.Canvas.font = DrawingResources.NoteFont;
+		var size = this.Tablature.Canvas.measureText(str);
+		return new Rectangle(x,y, cast size.width, DrawingResources.NoteFontHeight);
 	}
 	
 	public function CheckDefaultSpacing(ts:TrackSpacing) : Void

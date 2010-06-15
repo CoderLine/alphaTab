@@ -1039,7 +1039,7 @@ class GsMeasureImpl extends GsMeasure
 				{
 					var repetitions:String = ("x" + (RepeatClose() + 1));
                     var numberSize = context.Graphics.measureText(repetitions);
-					fill.AddString(repetitions, DrawingResources.DefaultFont, (x2 - numberSize.Width + Spacing - size),
+					fill.AddString(repetitions, DrawingResources.DefaultFont, (x2 - numberSize.width + Spacing - size),
 					((y1 - DrawingResources.DefaultFontHeight) - Math.round(scale)));
 				}
 			}

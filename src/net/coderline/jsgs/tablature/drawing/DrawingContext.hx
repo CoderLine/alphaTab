@@ -6,11 +6,12 @@
 package net.coderline.jsgs.tablature.drawing;
 import net.coderline.jsgs.model.GsColor;
 import net.coderline.jsgs.model.GsColor;
+import net.coderline.jsgs.platform.Canvas;
 
 class DrawingContext 
 {
 	public var Layers:Array<Dynamic>;
-	public var Graphics:Dynamic; // Canvas2dRenderingContext
+	public var Graphics:Canvas;
 	
 	public function new(scale:Float) 
 	{
