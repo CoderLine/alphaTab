@@ -21,7 +21,7 @@ class GsTempo
 	
 	public function Copy(tempo:GsTempo) : Void
 	{
-		tempo.Value = this.Value;
+		this.Value = tempo.Value;
 	}
 	
 	public static function TempoToUsq(tempo:Int) : Int

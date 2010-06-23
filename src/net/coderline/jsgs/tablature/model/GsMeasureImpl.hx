@@ -30,6 +30,7 @@ import net.coderline.jsgs.tablature.drawing.TripletFeelPainter;
 import net.coderline.jsgs.tablature.TrackSpacing;
 import net.coderline.jsgs.tablature.TrackSpacingPositions;
 import net.coderline.jsgs.tablature.ViewLayout;
+import net.coderline.jsgs.Utils;
 
 class GsMeasureImpl extends GsMeasure
 {
@@ -74,7 +75,6 @@ class GsMeasureImpl extends GsMeasure
 	
 	private var _previousMeasure:GsMeasure;
 
-	private var _compactMode:Bool;
 
 	private var _widthBeats:Int;
 
@@ -118,6 +118,11 @@ class GsMeasureImpl extends GsMeasure
 	{
 		return cast Track;
 	}
+	
+	public function Height() : Int
+	{
+		return Ts.GetSize();
+	}
 
 	public var Ts:TrackSpacing ;
 	public var MaxY:Int ;
@@ -154,23 +159,15 @@ class GsMeasureImpl extends GsMeasure
 	{
 		DivisionLength = SongManager.GetDivisionLength(Header);
 		ResetSpacing();
-		AutoCompleteSilences(layout.SongManager());
-		OrderBeats(layout.SongManager());
-		CheckCompactMode(layout);
 		ClearRegisteredAccidentals();
 		CalculateBeats(layout);
 		CalculateWidth(layout);
-		IsFirstOfLine = (false);
+		IsFirstOfLine = false;
 	}
 
 	public function Update(layout:ViewLayout) : Void
 	{
 		UpdateComponents(layout);
-	}
-
-	private function CheckCompactMode(layout:ViewLayout) : Void
-	{
-		_compactMode = layout.CompactMode;
 	}
 
 	private function ClearRegisteredAccidentals() : Void
@@ -186,21 +183,11 @@ class GsMeasureImpl extends GsMeasure
 	
 	public function CalculateWidth(layout:ViewLayout): Void
 	{
-		if (_compactMode)
-		{
-			Width = _widthBeats;
-		}
-		else
-		{
-			var quartersInSignature:Float = ((1.00 / GetTimeSignature().Denominator.Value) * 4.00)
-										 * GetTimeSignature().Numerator;
-			Width = Math.round(QuarterSpacing * quartersInSignature);
-		}
+		Width = _widthBeats;
 		Width += GetFirstNoteSpacing(layout);
 		Width += (RepeatClose() > 0) ? 20 : 0;
 		Width += HeaderImpl().GetLeftSpacing(layout);
 		Width += HeaderImpl().GetRightSpacing(layout);
-
 		HeaderImpl().NotifyWidth(Width);
 	}
 	
@@ -295,12 +282,6 @@ class GsMeasureImpl extends GsMeasure
 			}
 		}
 
-		if (!_compactMode)
-		{
-			QuarterSpacing = cast ((minDuration != null) ? layout.GetSpacingForQuarter(minDuration) : Math
-				.round(DefaultQuarterSpacing * layout.Scale));
-			HeaderImpl().NotifyQuarterSpacing(QuarterSpacing);
-		}
 	}
 
 	public function CanJoin(manager:SongManager, b1:GsVoiceImpl, b2:GsVoiceImpl) : Bool
@@ -398,11 +379,6 @@ class GsMeasureImpl extends GsMeasure
 		}
 	}
 	
-	private function AutoCompleteSilences(manager:SongManager) : Void
-	{
-		manager.AutoCompleteSilences(this);
-	}
-
 	private function UpdateComponents(layout:ViewLayout) : Void
 	{
 		MaxY = 0;
@@ -412,37 +388,10 @@ class GsMeasureImpl extends GsMeasure
 		var tmpX:Int = spacing;
 		for (i in 0 ... BeatCount())
 		{
-			var beat:GsBeatImpl = cast Beats[i];
-
-			if (_compactMode)
-			{
-				beat.PosX = (tmpX);
-				tmpX += beat.MinimumWidth;
-			}
-			else
-			{
-				var quarterWidth:Int = GetMaxQuarterSpacing();
-				var x1:Int = (spacing + GetStartPosition(this, beat.Start, quarterWidth));
-				var minimumWidth:Int = -1;
-				for (v in 0 ... beat.Voices.length)
-				{
-					var voice:GsVoiceImpl = beat.GetVoiceImpl(v);
-					if (!voice.IsEmpty)
-					{
-						var x2:Int = (spacing + GetStartPosition(this, beat.Start
-							+ voice.Duration.Time(), quarterWidth));
-						var width:Int = (x2 - x1);
-						if (minimumWidth < 0 || width < minimumWidth)
-						{
-							minimumWidth = width;
-						}
-						voice.Width = (width);
-					}
-				}
-				beat.PosX = (x1);
-				beat.MinimumWidth = (minimumWidth);
-			}
-
+			var beat:GsBeatImpl = cast Beats[i];			
+			beat.PosX = (tmpX);
+			tmpX += beat.MinimumWidth;
+		
 			for (v in 0 ... beat.Voices.length)
 			{
 				var voice:GsVoiceImpl = beat.GetVoiceImpl(v);
@@ -665,11 +614,6 @@ class GsMeasureImpl extends GsMeasure
 		}
 	}
 
-	private function OrderBeats(manager:SongManager) : Void
-	{
-		manager.OrderBeats(this);
-	}
-	
 	// Painting
 	public function PaintMeasure(layout:ViewLayout, context:DrawingContext) : Void
 	{
@@ -963,9 +907,9 @@ class GsMeasureImpl extends GsMeasure
 		var fill:DrawingLayer = context.Get(DrawingLayers.MainComponents);
 		var draw:DrawingLayer = context.Get(DrawingLayers.MainComponentsDraw);
 		// Numbers
-		if (addInfo)
+		if (addInfo) 
 		{
-			var number:String = Std.string(Number());
+			var number:String = Utils.string(Number());
 			context.Get(DrawingLayers.Red).AddString(number, DrawingResources.DefaultFont, (PosX + Math.round(scale)),
 				(y1 - DrawingResources.DefaultFontHeight - Math.round(scale)));
 		}
@@ -1067,7 +1011,7 @@ class GsMeasureImpl extends GsMeasure
 			{
 				if ((Header.RepeatAlternative & (1 << i)) != 0)
 				{
-					sText += (sText.length > 0) ? ", " + (i + 1) : Std.string(i + 1);
+					sText += (sText.length > 0) ? ", " + (i + 1) : Utils.string(i + 1);
 				}
 			}
 			var layer:DrawingLayer  = context.Get(DrawingLayers.MainComponentsDraw);

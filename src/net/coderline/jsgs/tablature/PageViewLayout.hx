@@ -4,6 +4,7 @@
  */
 
 package net.coderline.jsgs.tablature;
+import haxe.Log;
 import haxe.Template;
 import js.Boot;
 import js.Lib;
@@ -20,6 +21,7 @@ import net.coderline.jsgs.tablature.drawing.DrawingResources;
 import net.coderline.jsgs.tablature.model.GsLyricsImpl;
 import net.coderline.jsgs.tablature.model.GsMeasureImpl;
 import net.coderline.jsgs.tablature.model.GsTrackImpl;
+import net.coderline.jsgs.Utils;
 
 class PageViewLayout extends ViewLayout
 {
@@ -198,7 +200,6 @@ class PageViewLayout extends ViewLayout
 		var track:GsTrack = this.Tablature.Track;
 		y = Math.round(y + PagePadding.Top);
 		y = Math.round(PaintSongInfo(ctx, clientArea, x, y) + this.FirstMeasureSpacing);
-		
 		for (l in 0 ... this.Lines.length) 
 		{
 			var line:TempLine = this.Lines[l];
@@ -208,6 +209,7 @@ class PageViewLayout extends ViewLayout
 	
 	private function PaintSongInfo(ctx:DrawingContext, clientArea:Rectangle, x:Int, y:Int) : Int
 	{
+		Log.trace("Paint Song info");
 		var song:GsSong = this.Tablature.Track.Song;
 		x += PagePadding.Left;
 		var tX:Float;
@@ -295,7 +297,8 @@ class PageViewLayout extends ViewLayout
 	}
 	
 	public function PaintLine(track:GsTrack, line:TempLine, context:DrawingContext) : Void
-	{
+	{ 
+		Log.trace("Paint Measures " + Utils.string(line.Measures[0]) + " to " + Utils.string(line.Measures[line.Measures.length - 1]));
 		for(i in 0 ... line.Measures.length) {
 			var index:Int = line.Measures[i];
 			var currentMeasure:GsMeasureImpl = cast track.Measures[index];

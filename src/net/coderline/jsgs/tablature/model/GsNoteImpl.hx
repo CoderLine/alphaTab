@@ -32,6 +32,7 @@ import net.coderline.jsgs.tablature.drawing.NotePainter;
 import net.coderline.jsgs.tablature.TrackSpacingPositions;
 import net.coderline.jsgs.tablature.ViewLayout;
 import net.coderline.jsgs.Utf8;
+import net.coderline.jsgs.Utils;
 
 class GsNoteImpl extends GsNote
 {
@@ -53,12 +54,12 @@ class GsNoteImpl extends GsNote
 		return BeatImpl().MeasureImpl();
 	}
 
-	public function BeatImpl() : GsBeatImpl
+	public inline function BeatImpl() : GsBeatImpl
 	{
 		return VoiceImpl().BeatImpl();
 	}
 
-	public function VoiceImpl() : GsVoiceImpl
+	public inline function VoiceImpl() : GsVoiceImpl
 	{
 		return cast Voice;
 	}
@@ -323,7 +324,7 @@ class GsNoteImpl extends GsNote
 		{ // Note itself
 			_noteOrientation = layout.GetNoteOrientation(realX, realY, this);
 
-			var visualNote:String = Effect.DeadNote ? "X" : Std.string(Value);
+			var visualNote:String = Effect.DeadNote ? "X" : Utils.string(Value);
 			visualNote = Effect.GhostNote ? "(" + visualNote + ")" : visualNote;
 
 			fill.AddString(visualNote, DrawingResources.NoteFont, _noteOrientation.X, _noteOrientation.Y);
@@ -459,7 +460,7 @@ class GsNoteImpl extends GsNote
 
 		if (effect.IsGrace())
 		{
-			var value:String = effect.Grace.IsDead ? "X" : Std.string(effect.Grace.Fret);
+			var value:String = effect.Grace.IsDead ? "X" : Utils.string(effect.Grace.Fret);
 			fill.AddString(value, DrawingResources.GraceFont, Math.round(_noteOrientation.X - 7 * scale), _noteOrientation.Y);
 		}
 		if (effect.IsBend())
@@ -490,6 +491,10 @@ class GsNoteImpl extends GsNote
 			{
 				PaintHammer(layout, context, nextNote, realX, realY, nextFromX);
 			}
+		}
+		
+		if (effect.Vibrato)
+		{
 		}
 	}
 	
@@ -559,7 +564,7 @@ class GsNoteImpl extends GsNote
 						s = "full";
 					else if (dV > 1)
 					{
-						s += Std.string(dV) + " ";
+						s += Utils.string(dV) + " ";
 						// Quaters
 						dV -= Math.floor(dV);
 					}
@@ -636,7 +641,7 @@ class GsNoteImpl extends GsNote
 					var dV:Float = (secondPt.Value) * 0.5;
 					var up:Bool = (secondPt.Value - firstPt.Value) >= 0;
 					var s:String = "";
-					s += Std.string(Math.floor(dV)) + " ";
+					s += Utils.string(Math.floor(dV)) + " ";
 					// Quaters
 					dV -= Math.floor(dV);
 
@@ -740,7 +745,7 @@ class GsNoteImpl extends GsNote
 		var realY:Float = y - (5.0 * yScale);
 
 		var width:Float = nextNote != null
-						   ? nextNote.BeatImpl().GetRealPosX(layout) - 2*xScale -  realX
+						   ? nextNote.BeatImpl().GetRealPosX(layout) - 4 * xScale -  realX
 						   : 10.0 * xScale;
 		var fill:DrawingLayer = Voice.Index == 0
 					? context.Get(DrawingLayers.VoiceEffects1)

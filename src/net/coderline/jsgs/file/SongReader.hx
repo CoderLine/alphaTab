@@ -6,6 +6,7 @@
 package net.coderline.jsgs.file;
 import haxe.io.Bytes;
 import haxe.io.Input;
+import net.coderline.jsgs.platform.BinaryReader;
 
 import net.coderline.jsgs.file.guitarpro.Gp3Reader;
 import net.coderline.jsgs.file.guitarpro.Gp4Reader;

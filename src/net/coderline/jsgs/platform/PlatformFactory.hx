@@ -5,8 +5,10 @@
 
 package net.coderline.jsgs.platform;
 import net.coderline.jsgs.platform.js.Html5Canvas;
+import net.coderline.jsgs.platform.js.JsBinaryReader;
+import net.coderline.jsgs.platform.js.JsFileLoader;
 
-class CanvasProvider 
+class PlatformFactory
 {
 	public static function GetCanvas(object:Dynamic) : Canvas
 	{
@@ -18,4 +20,16 @@ class CanvasProvider
 			#error 
 		#end
 	}
+	
+	public static function GetLoader() : FileLoader
+	{
+		#if js
+			return new JsFileLoader();
+		/*#elseif php
+			return new PhpBinaryReader(object);*/
+		#else 
+			#error 
+		#end
+	}
+
 }

@@ -20,6 +20,7 @@ import net.coderline.jsgs.tablature.drawing.NotePainter;
 import net.coderline.jsgs.tablature.drawing.SilencePainter;
 import net.coderline.jsgs.tablature.TrackSpacingPositions;
 import net.coderline.jsgs.tablature.ViewLayout;
+import net.coderline.jsgs.Utils;
 
 class GsVoiceImpl extends GsVoice
 {
@@ -37,12 +38,12 @@ class GsVoiceImpl extends GsVoice
 		return BeatImpl().PosX;
 	}
 
-	public function BeatImpl() : GsBeatImpl
+	public inline function BeatImpl() : GsBeatImpl
 	{
 		return cast Beat;
 	}
 
-	public function MeasureImpl() : GsMeasureImpl
+	public inline function MeasureImpl() : GsMeasureImpl
 	{
 		return cast Beat.Measure;
 	}
@@ -319,8 +320,8 @@ class GsVoiceImpl extends GsVoice
 			}
 		}
 		if (!Duration.Triplet.Equals(GsTriplet.Normal))
-		{ 
-			fill.AddString(Std.string(Duration.Triplet.Enters), DrawingResources.DefaultFont, Math.round(realX), Math.round(y + GetPaintPosition(TrackSpacingPositions.Tupleto)));
+		{  
+			fill.AddString(Utils.string(Duration.Triplet.Enters), DrawingResources.DefaultFont, Math.round(realX), Math.round(y + GetPaintPosition(TrackSpacingPositions.Tupleto)));
 
 		}
 	}
@@ -350,7 +351,7 @@ class GsVoiceImpl extends GsVoice
 		// Tupleto
 		if (!Duration.Triplet.Equals(GsTriplet.Normal))
 		{
-			fill.AddString(Std.string(Duration.Triplet.Enters), DrawingResources.DefaultFont, vX, (y - GetPaintPosition(TrackSpacingPositions.ScoreMiddleLines)) + GetPaintPosition(TrackSpacingPositions.Tupleto));
+			fill.AddString(Utils.string(Duration.Triplet.Enters), DrawingResources.DefaultFont, vX, (y - GetPaintPosition(TrackSpacingPositions.ScoreMiddleLines)) + GetPaintPosition(TrackSpacingPositions.Tupleto));
 		}
 		
 		if (Duration.Value >= GsDuration.Half)
@@ -408,21 +409,21 @@ class GsVoiceImpl extends GsVoice
 						if (joinedType == GsJoinedType.NoneRight)
 						{
 							startX = Math.round(BeatImpl().GetRealPosX(layout) + xMove);
-							endX = Math.round(BeatImpl().GetRealPosX(layout) + 6 + xMove);
+							endX = Math.round(BeatImpl().GetRealPosX(layout) + (6*scale) + xMove);
 							startXforCalculation = PosX() + spacing;
-							endXforCalculation = PosX() + spacing + 6;
+							endXforCalculation = Math.floor(PosX() + spacing + (6*scale));
 						}
 						else if (joinedType == GsJoinedType.NoneLeft)
 						{
-							startX = Math.round(BeatImpl().GetRealPosX(layout) - 6 + xMove);
+							startX = Math.round(BeatImpl().GetRealPosX(layout) - (6*scale) + xMove);
 							endX = Math.round(BeatImpl().GetRealPosX(layout) + xMove);
-							startXforCalculation = PosX() + spacing - 6;
+							startXforCalculation = Math.floor(PosX() + spacing - (6*scale));
 							endXforCalculation = PosX() + spacing;
 						}
 						else
 						{
 							startX = Math.round(Join1.BeatImpl().GetRealPosX(layout) + xMove);
-							endX = Math.round(Join2.BeatImpl().GetRealPosX(layout) + xMove);
+							endX = Math.round(Join2.BeatImpl().GetRealPosX(layout) + xMove + (1*scale));
 							startXforCalculation = Join1.PosX() + Join1.BeatImpl().Spacing();
 							endXforCalculation = Join2.PosX() + Join2.BeatImpl().Spacing();
 						}

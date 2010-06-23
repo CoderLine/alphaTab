@@ -37,6 +37,11 @@ class GsBeat
 		text.Beat = this;
 		this.Text = text;
 	}
+	public function SetChord(chord:GsChord) : Void
+	{
+		chord.Beat = this;
+		this.Chord = chord;
+	}
 	
 	public function GetNotes() : Array<GsNote>
 	{

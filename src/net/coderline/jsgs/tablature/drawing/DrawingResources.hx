@@ -6,6 +6,7 @@
 package net.coderline.jsgs.tablature.drawing;
 import net.coderline.jsgs.model.Size;
 import net.coderline.jsgs.tablature.ViewLayout;
+import net.coderline.jsgs.Utils;
 
 class DrawingResources 
 {
@@ -26,22 +27,22 @@ class DrawingResources
 	public static var WordsFont:String;
 
 	public static function Init(scale:Float) : Void
-	{
+	{ 
 		DefaultFontHeight = Math.round(9*scale);
-		DefaultFont = Std.string(DefaultFontHeight) + "px Arial";
-		ChordFont = Std.string(9*scale) + "px Arial";
-		TimeSignatureFont = Std.string(20*scale) + "px Arial";
-		ClefFont = Std.string(13*scale) + "px Arial";
-		MusicFont = Std.string(13*scale) + "px Arial";
-		TempoFont = Std.string(11*scale) + "px Arial";
+		DefaultFont = Utils.string(DefaultFontHeight) + "px Arial";
+		ChordFont = Utils.string(9*scale) + "px Arial";
+		TimeSignatureFont = Utils.string(20*scale) + "px Arial";
+		ClefFont = Utils.string(13*scale) + "px Arial";
+		MusicFont = Utils.string(13*scale) + "px Arial";
+		TempoFont = Utils.string(11*scale) + "px Arial";
 		GraceFontHeight = Math.round(11*scale);
-		GraceFont = Std.string(GraceFontHeight) + "px Arial";
+		GraceFont = Utils.string(GraceFontHeight) + "px Arial";
 		NoteFontHeight = Math.round(11 * scale);
-		NoteFont = Std.string(NoteFontHeight) + "px Arial";
+		NoteFont = Utils.string(NoteFontHeight) + "px Arial";
 		
-		TitleFont =  Std.string(30*scale) + "px Times New Roman";
-		SubtitleFont = Std.string(19 * scale) + "px Times New Roman";
-		WordsFont =  Std.string(13 * scale) + "px Times New Roman";
+		TitleFont =  Utils.string(30*scale) + "px Times New Roman";
+		SubtitleFont = Utils.string(19 * scale) + "px Times New Roman";
+		WordsFont =  Utils.string(13 * scale) + "px Times New Roman";
 	}
 	
 	public static function GetScoreNoteSize(layout:ViewLayout, full:Bool) : Size

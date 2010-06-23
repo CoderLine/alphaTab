@@ -15,6 +15,8 @@ interface Canvas
 	// state
 	function save() : Void;
 	function restore() : Void;
+	function saveImage() : Void;
+	function restoreImage() : Void;
 	
 	// colors and styles
 	var strokeStyle(getStrokeStyle, setStrokeStyle):String; //(default black);
@@ -50,4 +52,6 @@ interface Canvas
 	function fillText(text:String, x:Float, y:Float, maxWidth:Float = 0):Void;
 	function strokeText(text:String, x:Float, y:Float, maxWidth:Float = 0):Void;
 	function measureText(text:String):TextMetrics;
+	
+	
 }

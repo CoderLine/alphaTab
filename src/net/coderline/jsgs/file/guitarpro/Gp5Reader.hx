@@ -103,6 +103,7 @@ class Gp5Reader extends GpReaderBase
 			for(t in 0 ... song.Tracks.length) {
 				var track:GsTrack = song.Tracks[t];
                 var measure:GsMeasure = Factory.NewMeasure(header);
+				header.Tempo.Copy(tempo);
                 track.AddMeasure(measure);
                 this.ReadMeasure(measure, track);
             }
@@ -145,7 +146,7 @@ class Gp5Reader extends GpReaderBase
             this.ReadBeatEffects(beat, effect);
         }
         if ((flags & 0x10) != 0) {
-            var mixTableChange:GsMixTableChange = this.ReadMixTableChange();
+            var mixTableChange:GsMixTableChange = this.ReadMixTableChange(measure);
             beat.MixTableChange = mixTableChange;
         }
         var stringFlags:Int = ReadUnsignedByte();
@@ -390,7 +391,7 @@ class Gp5Reader extends GpReaderBase
         return -1;
 	}
 	
-	private function ReadMixTableChange() : GsMixTableChange
+	private function ReadMixTableChange(measure:GsMeasure) : GsMixTableChange
 	{
 		var tableChange:GsMixTableChange = Factory.NewMixTableChange();
         tableChange.Instrument.Value = ReadByte();
@@ -433,6 +434,7 @@ class Gp5Reader extends GpReaderBase
             tableChange.Tremolo = null;
         if (tableChange.Tempo.Value >= 0) {
             tableChange.Tempo.Duration = ReadByte();
+			measure.GetTempo().Value = tableChange.Tempo.Value;
             tableChange.HideTempo = this.VersionIndex > 0 && ReadBool();
         }
         else 
@@ -556,7 +558,7 @@ class Gp5Reader extends GpReaderBase
         }
         Skip(32);
         if (chord.NoteCount() > 0) {
-            beat.Chord = (chord);
+            beat.SetChord(chord);
         }
 	}
 	
@@ -680,11 +682,11 @@ class Gp5Reader extends GpReaderBase
 		var timeSignature:GsTimeSignature = Factory.NewTimeSignature();
         for (i in 0 ... measureCount)
 		{
-            song.AddMeasureHeader(this.ReadMeasureHeader(i, timeSignature));
+            song.AddMeasureHeader(this.ReadMeasureHeader(i, timeSignature, song));
         }
 	}
 	
-	private function ReadMeasureHeader(i:Int, timeSignature:GsTimeSignature) : GsMeasureHeader
+	private function ReadMeasureHeader(i:Int, timeSignature:GsTimeSignature, song:GsSong) : GsMeasureHeader
 	{
 		if (i > 0) 
             Skip(1);
@@ -694,7 +696,7 @@ class Gp5Reader extends GpReaderBase
         var header:GsMeasureHeader = Factory.NewMeasureHeader();
         header.Number = i + 1;
         header.Start = 0;
-        header.Tempo.Value = 120;
+        header.Tempo.Value = song.Tempo;
         
         if ((flags & 0x01) != 0) 
             timeSignature.Numerator = ReadByte();

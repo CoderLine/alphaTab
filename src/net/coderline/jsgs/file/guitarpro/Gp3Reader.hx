@@ -103,6 +103,7 @@ class Gp3Reader extends GpReaderBase
 			for(t in 0 ... song.Tracks.length) {
 				var track = song.Tracks[t];
                 var measure = Factory.NewMeasure(header);
+				header.Tempo.Copy(tempo);
                 track.AddMeasure(measure);
                 this.ReadMeasure(measure, track);
             }
@@ -144,7 +145,7 @@ class Gp3Reader extends GpReaderBase
             this.ReadBeatEffects(beat, effect);
         }
         if ((flags & 0x10) != 0) {
-            var mixTableChange:GsMixTableChange = this.ReadMixTableChange();
+            var mixTableChange:GsMixTableChange = this.ReadMixTableChange(measure);
             beat.MixTableChange = mixTableChange;
         }
         var stringFlags:Int = ReadUnsignedByte();
@@ -291,7 +292,7 @@ class Gp3Reader extends GpReaderBase
         return -1;
 	}
 	
-	private function ReadMixTableChange() : GsMixTableChange
+	private function ReadMixTableChange(measure:GsMeasure) : GsMixTableChange
 	{
 		var tableChange:GsMixTableChange = Factory.NewMixTableChange();
         tableChange.Instrument.Value = ReadByte();
@@ -333,6 +334,7 @@ class Gp3Reader extends GpReaderBase
             tableChange.Tremolo = null;
         if (tableChange.Tempo.Value >= 0) {
             tableChange.Tempo.Duration = ReadByte();
+			measure.GetTempo().Value = tableChange.Tempo.Value;
             tableChange.HideTempo = false;
         }
         else 
@@ -472,7 +474,7 @@ class Gp3Reader extends GpReaderBase
             Skip(36);
         }
         if (chord.NoteCount() > 0) {
-            beat.Chord = (chord);
+			beat.SetChord(chord);
         }
 	}
 	
@@ -599,7 +601,7 @@ class Gp3Reader extends GpReaderBase
         var header:GsMeasureHeader = Factory.NewMeasureHeader();
         header.Number = i + 1;
         header.Start = 0;
-        header.Tempo.Value = 120;
+        header.Tempo.Value = song.Tempo;
 		header.TripletFeel = this._tripletFeel;
         
         if ((flags & 0x01) != 0) 

@@ -6,6 +6,7 @@
 package net.coderline.jsgs.tablature.model;
 import net.coderline.jsgs.model.GsMeasureHeader;
 import net.coderline.jsgs.model.GsSongFactory;
+import net.coderline.jsgs.model.GsTrack;
 import net.coderline.jsgs.model.GsTripletFeel;
 import net.coderline.jsgs.tablature.ViewLayout;
 
@@ -43,17 +44,13 @@ class GsMeasureHeaderImpl extends GsMeasureHeader
 		_maxKeySignatureSpacing = 0;
 	}
 
-	public function Update(layout:ViewLayout, index:Int) : Void
+	public function Update(layout:ViewLayout, track:GsTrackImpl) : Void
 	{
 		Reset();
 		CalculateMeasureChanges(layout);
 
-		var trackCount:Int = Song.Tracks.length;
-		for (i in 0 ... trackCount)
-		{
-			var measure:GsMeasureImpl = cast Song.Tracks[i].Measures[index];
-			measure.CalculateMeasureChanges(layout);
-		}
+		var measure:GsMeasureImpl = cast track.Measures[Number - 1];
+		measure.CalculateMeasureChanges(layout);
 	}
 
 	public function CalculateMeasureChanges(layout:ViewLayout) : Void
@@ -104,7 +101,7 @@ class GsMeasureHeaderImpl extends GsMeasureHeader
 
 	public function GetTempoSpacing(layout:ViewLayout):Int
 	{
-		return (ShouldPaintTempo ? Math.round(45 * layout.Scale) : 0);
+		return (ShouldPaintTempo && Number == 1 ? Math.round(45 * layout.Scale) : 0);
 	}
 
 	public function GetTripletFeelSpacing(layout:ViewLayout):Int

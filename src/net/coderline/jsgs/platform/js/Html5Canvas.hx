@@ -5,7 +5,6 @@
 
 package net.coderline.jsgs.platform.js;
 import js.Lib;
-import net.coderline.jsgs.JQuery;
 import net.coderline.jsgs.platform.Canvas;
 import net.coderline.jsgs.platform.TextMetrics;
 
@@ -15,6 +14,8 @@ class Html5Canvas implements Canvas
 	private var canvas:Dynamic;
 	private var jCanvas:JQuery;
 	private var context:Dynamic;
+	
+	private var imageCache:Dynamic;
 	
 	public function new(dom:Dynamic) 
 	{
@@ -53,6 +54,17 @@ class Html5Canvas implements Canvas
 	public function restore() : Void
 	{
 		this.context.restore();
+	} 
+	public function saveImage() : Void
+	{
+		imageCache = this.context.getImageData(0, 0, Width(), Height());
+	}
+	public function restoreImage() : Void
+	{
+		if (imageCache == null) return;
+		
+		clearRect(0, 0, Width(), Height());
+		this.context.putImageData(imageCache, 0, 0);
 	} 
 	
 	

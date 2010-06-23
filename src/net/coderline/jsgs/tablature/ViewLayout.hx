@@ -5,6 +5,7 @@
 
 package net.coderline.jsgs.tablature;
 
+import haxe.Log;
 import js.Dom;
 import net.coderline.jsgs.model.GsChord;
 import net.coderline.jsgs.model.GsDuration;
@@ -23,6 +24,7 @@ import net.coderline.jsgs.tablature.model.GsChordImpl;
 import net.coderline.jsgs.tablature.model.GsMeasureHeaderImpl;
 import net.coderline.jsgs.tablature.model.GsMeasureImpl;
 import net.coderline.jsgs.tablature.model.GsTrackImpl;
+import net.coderline.jsgs.Utils;
 
 class ViewLayout 
 {
@@ -54,6 +56,8 @@ class ViewLayout
 	public var LayoutSize:Size;
 	public var Width:Int;
 	public var Height:Int;
+	
+	private var Cache:DrawingContext;
 	
 	public function SongManager()
 	{
@@ -106,10 +110,22 @@ class ViewLayout
 	
 	public function PaintCache(graphics:Canvas, area:Rectangle, fromX:Int, fromY:Int) : Void
 	{
-		var context:DrawingContext = new DrawingContext(this.Scale);
-        context.Graphics = graphics;
-        this.PaintSong(context, area, fromX, fromY);
-        context.Draw();
+		if (Cache == null)
+		{
+			UpdateCache(graphics, area, fromX, fromY);
+			return;
+		}
+		Log.trace("Painting Cache");
+		Cache.Draw();
+	}
+	
+	public function UpdateCache(graphics:Canvas, area:Rectangle, fromX:Int, fromY:Int) : Void 
+	{
+		Log.trace("Updating Cache");
+		Cache = new DrawingContext(this.Scale);
+        Cache.Graphics = graphics;
+        this.PaintSong(Cache, area, fromX, fromY);
+        PaintCache(graphics, area, fromX, fromY);
 	}
 	
 	public function PaintSong(ctx:DrawingContext, clientArea:Rectangle, x:Int, y:Int)
@@ -126,36 +142,26 @@ class ViewLayout
 	{
 		if (this.Tablature.Track == null) 
             return;
+		Log.trace("Updating Song Data");
         this.UpdateTracks();
+		Log.trace("Updating Song Data finished");
 	}
 	
 	public function UpdateTracks() : Void
 	{
 		var song:GsSong = this.Tablature.Track.Song;
-        var trackCount:Int = song.Tracks.length;
         var measureCount:Int = song.MeasureHeaders.length;
-        
-        for (j in 0 ... trackCount) {
-            var track:GsTrackImpl = cast song.Tracks[j];
-            track.PreviousBeat = null;
-        }
-        
+        var track:GsTrackImpl = cast this.Tablature.Track;
+		track.PreviousBeat = null;
+		track.Update(this);
+				
         for (i in 0 ... measureCount) {
             var header:GsMeasureHeaderImpl = cast song.MeasureHeaders[i];
-            header.Update(this, i);
+            header.Update(this, track);
             
-            for (j in 0 ... trackCount) {
-                var track = song.Tracks[j];
-                var measure:GsMeasureImpl = cast track.Measures[i];
-                measure.Create(this);
-            }
-            
-            for (j in 0 ... trackCount) {
-                var track:GsTrackImpl = cast song.Tracks[j];
-                var measure:GsMeasureImpl = cast track.Measures[i];
-                track.Update(this);
-                measure.Update(this);
-            }
+			var measure:GsMeasureImpl = cast track.Measures[i];
+			measure.Create(this);
+			measure.Update(this);
         }
 	}
 	
@@ -247,10 +253,10 @@ class ViewLayout
 		}
 		else if(note.Effect.DeadNote) {
 			noteAsString = "X";
-		}
+		} 
 		else
 		{
-			noteAsString = Std.string(note.Value);
+			noteAsString = Utils.string(note.Value);
 		}
 		noteAsString = note.Effect.GhostNote ? "(" + noteAsString + ")" : noteAsString;
 		return this.GetOrientation(x,y,noteAsString);

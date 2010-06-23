@@ -299,4 +299,9 @@ class SongManager
 		if (left < j) QuickSort(elements, left, j);
 		if (i < right) QuickSort(elements, i, right);
 	}
+	
+	public function GetFirstMeasure(track:GsTrack):GsMeasure
+	{
+		return track.MeasureCount() > 0 ? track.Measures[0] : null;
+	}
 }

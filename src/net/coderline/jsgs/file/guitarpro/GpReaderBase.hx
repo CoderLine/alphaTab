@@ -11,6 +11,7 @@ import haxe.io.Input;
 import net.coderline.jsgs.file.SongReader;
 import net.coderline.jsgs.model.GsSong;
 import net.coderline.jsgs.model.GsSongFactory;
+import net.coderline.jsgs.platform.BinaryReader;
 
 class GpReaderBase extends SongReader
 {
