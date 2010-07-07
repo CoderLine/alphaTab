@@ -21,7 +21,6 @@ class Html5Canvas implements Canvas
 	{
 		this.canvas = dom;
 		this.jCanvas = JQuery.Elements(dom);
-		
 		this.context = dom.getContext("2d");
 	}
 	

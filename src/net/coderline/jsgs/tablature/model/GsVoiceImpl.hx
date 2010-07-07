@@ -72,6 +72,7 @@ class GsVoiceImpl extends GsVoice
 	public var NextBeat:GsVoiceImpl;
 
 	public var BeatGroup:BeatGroup;
+	public var TripletGroup:TripletGroup;
 	
 	public function GetPaintPosition(iIndex:TrackSpacingPositions) : Int
 	{
@@ -125,6 +126,19 @@ class GsVoiceImpl extends GsVoice
 		MaxY = 0;
 		if (IsRestVoice()) UpdateSilenceSpacing(layout);
 		else UpdateNoteVoice(layout);
+		// try to add on tripletgroup of previous beat or create a new group
+		if (Duration.Triplet != null && !Duration.Triplet.Equals(GsTriplet.Normal))
+		{
+			if (PreviousBeat == null || PreviousBeat.TripletGroup == null || !PreviousBeat.TripletGroup.check(this))
+			{			
+				TripletGroup = new TripletGroup(Index);
+				TripletGroup.check(this);
+			}
+			else
+			{
+				TripletGroup = PreviousBeat.TripletGroup;
+			}
+		}
 	}
 	
 	public function UpdateNoteVoice(layout:ViewLayout) : Void
@@ -319,13 +333,31 @@ class GsVoiceImpl extends GsVoice
 				fill.EllipseTo(1, 1);
 			}
 		}
-		if (!Duration.Triplet.Equals(GsTriplet.Normal))
-		{  
-			fill.AddString(Utils.string(Duration.Triplet.Enters), DrawingResources.DefaultFont, Math.round(realX), Math.round(y + GetPaintPosition(TrackSpacingPositions.Tupleto)));
-
-		}
+		
+		PaintTriplet(layout, context, x, y);
 	}
 	
+	// Triplet
+	public function PaintTriplet(layout:ViewLayout, context:DrawingContext, x:Int, y:Int)
+	{
+		var realX:Int = cast (x + 3 * layout.Scale);
+		var fill:DrawingLayer = Index == 0 ? context.Get(DrawingLayers.Voice1) : context.Get(DrawingLayers.Voice2);
+		
+		if (!Duration.Triplet.Equals(GsTriplet.Normal))
+		{  
+			// paint group if group is full and is first of group
+			//  otherwise only a number
+			if (TripletGroup.isFull() && 
+				(PreviousBeat == null  || PreviousBeat.TripletGroup == null || PreviousBeat.TripletGroup != TripletGroup) )
+			{
+				TripletGroup.paint(layout, context, x, y);
+			}
+			else if(!TripletGroup.isFull())
+			{
+				fill.AddString(Utils.string(Duration.Triplet.Enters), DrawingResources.DefaultFont, Math.round(realX), Math.round(y + GetPaintPosition(TrackSpacingPositions.Tupleto)));
+			}
+		}
+	}
 	// Beat
 	public function PaintBeat(layout:ViewLayout, context:DrawingContext, x:Int, y:Int) : Void
 	{
@@ -349,10 +381,7 @@ class GsVoiceImpl extends GsVoice
 		var fill:DrawingLayer = Index == 0 ? context.Get(DrawingLayers.Voice1) : context.Get(DrawingLayers.Voice2);
 		var draw:DrawingLayer = Index == 0 ? context.Get(DrawingLayers.VoiceDraw1) : context.Get(DrawingLayers.VoiceDraw2);
 		// Tupleto
-		if (!Duration.Triplet.Equals(GsTriplet.Normal))
-		{
-			fill.AddString(Utils.string(Duration.Triplet.Enters), DrawingResources.DefaultFont, vX, (y - GetPaintPosition(TrackSpacingPositions.ScoreMiddleLines)) + GetPaintPosition(TrackSpacingPositions.Tupleto));
-		}
+		PaintTriplet(layout, context, x, (y - GetPaintPosition(TrackSpacingPositions.ScoreMiddleLines)));
 		
 		if (Duration.Value >= GsDuration.Half)
 		{

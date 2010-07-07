@@ -87,6 +87,7 @@ class GsMeasureImpl extends GsMeasure
 	private var _tapping:Bool;
 	private var _palmMute:Bool;
 	private var _vibrato:Bool;
+	private var _beatVibrato:Bool;
 	private var _tupleto:Bool;
 	private var _fadeIn:Bool;
 	private var _bend:Bool;
@@ -533,6 +534,10 @@ class GsMeasureImpl extends GsMeasure
 		{
 			_vibrato = true;
 		}
+		if (effect.BeatVibrato)
+		{
+			_beatVibrato = true;
+		}
 		if (effect.LetRing)
 		{
 			_letRing = true;
@@ -555,6 +560,7 @@ class GsMeasureImpl extends GsMeasure
 		_palmMute = false;
 		_fadeIn = false;
 		_vibrato = false;
+		_beatVibrato = false;
 		_letRing = false;
 	}
 
@@ -603,6 +609,10 @@ class GsMeasureImpl extends GsMeasure
 		if (_vibrato)
 		{
 			spacing.Set(TrackSpacingPositions.VibratoEffect, cast layout.EffectSpacing);
+		}
+		if (_beatVibrato)
+		{
+			spacing.Set(TrackSpacingPositions.BeatVibratoEffect, cast layout.EffectSpacing);
 		}
 		if (_letRing)
 		{

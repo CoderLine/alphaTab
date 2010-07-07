@@ -22,8 +22,8 @@ class DrawingContext
 		this.Layers[DrawingLayersConverter.ToInt(DrawingLayers.MainComponents)] = new DrawingLayer(new GsColor(34,34,17), true, 0);
 		this.Layers[DrawingLayersConverter.ToInt(DrawingLayers.MainComponentsDraw)] = new DrawingLayer(new GsColor(34,34,17), false, 1*scale);
 		this.Layers[DrawingLayersConverter.ToInt(DrawingLayers.Voice2)] = new DrawingLayer(new GsColor(206, 206, 206), true, 1);
-		this.Layers[DrawingLayersConverter.ToInt(DrawingLayers.VoiceEffects2)] = new DrawingLayer(new GsColor(206, 206, 206), true, 0);
-		this.Layers[DrawingLayersConverter.ToInt(DrawingLayers.VoiceEffectsDraw2)] = new DrawingLayer(new GsColor(206, 206, 206), false, 1*scale);
+		this.Layers[DrawingLayersConverter.ToInt(DrawingLayers.VoiceEffects2)] = new DrawingLayer(new GsColor(183,183,183), true, 0);
+		this.Layers[DrawingLayersConverter.ToInt(DrawingLayers.VoiceEffectsDraw2)] = new DrawingLayer(new GsColor(183,183,183), false, 1*scale);
 		this.Layers[DrawingLayersConverter.ToInt(DrawingLayers.VoiceDraw2)] = new DrawingLayer(new GsColor(206, 206, 206), false, 1*scale);
 		this.Layers[DrawingLayersConverter.ToInt(DrawingLayers.Voice1)] = new DrawingLayer(new GsColor(34,34,17), true, 1);
 		this.Layers[DrawingLayersConverter.ToInt(DrawingLayers.VoiceEffects1)] = new DrawingLayer(new GsColor(34,34,17), true, 0);

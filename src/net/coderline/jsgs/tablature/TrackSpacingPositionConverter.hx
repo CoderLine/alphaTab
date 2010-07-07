@@ -27,13 +27,14 @@ class TrackSpacingPositionConverter
 			case TrackSpacingPositions.TapingEffect: return 12;
 			case TrackSpacingPositions.LetRingEffect:return  13;
 			case TrackSpacingPositions.PalmMuteEffect: return 14;
-			case TrackSpacingPositions.VibratoEffect: return 15;
-			case TrackSpacingPositions.FadeIn: return 16;
-			case TrackSpacingPositions.Bend: return 17;
-			case TrackSpacingPositions.TablatureTopSeparator: return 18;
-			case TrackSpacingPositions.Tablature: return 19;
-			case TrackSpacingPositions.Lyric: return 20;
-			case TrackSpacingPositions.Bottom: return 21;
+			case TrackSpacingPositions.BeatVibratoEffect: return 15;
+			case TrackSpacingPositions.VibratoEffect: return 16;
+			case TrackSpacingPositions.FadeIn: return 17;
+			case TrackSpacingPositions.Bend: return 18;
+			case TrackSpacingPositions.TablatureTopSeparator: return 19;
+			case TrackSpacingPositions.Tablature: return 20;
+			case TrackSpacingPositions.Lyric: return 21;
+			case TrackSpacingPositions.Bottom: return 22;
 			default: return 0;
 		}
 		

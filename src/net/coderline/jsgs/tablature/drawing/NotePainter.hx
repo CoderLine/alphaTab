@@ -7,6 +7,7 @@ package net.coderline.jsgs.tablature.drawing;
 import net.coderline.jsgs.model.GsBeatStrokeDirection;
 import net.coderline.jsgs.model.GsDuration;
 import net.coderline.jsgs.model.Point;
+import net.coderline.jsgs.model.PointF;
 import net.coderline.jsgs.tablature.ViewLayout;
 
 class NotePainter 
@@ -36,15 +37,15 @@ class NotePainter
 	}
 	public static function PaintBar(layer:DrawingLayer, x1:Int, y1:Int, x2:Int, y2:Int, count:Int, dir:Int, scale:Float ) : Void
 	{
-		var width = Math.max(1.0, Math.round(3.0 * scale));
+		var width:Float = Math.max(1.0, Math.round(3.0 * scale));
 		for (i in 0 ... count) {
-			var realY1:Int = Math.floor(y1 - ((i * (5.0 * scale)) * dir));
-			var realY2:Int = Math.floor(y2 - ((i * (5.0 * scale)) * dir));
+			var realY1:Float = (y1 - ((i * (5.0 * scale)) * dir));
+			var realY2:Float = (y2 - ((i * (5.0 * scale)) * dir));
 			
 			layer.StartFigure();
-			layer.AddPolygon([new Point(x1, realY1), new Point(x2, realY2), 
-								new Point(x2, Math.round(realY2 + width)), 
-								new Point(x1, Math.round(realY1 + width)), new Point(x1, realY1), ]);
+			layer.AddPolygon([new PointF(x1, realY1), new PointF(x2, realY2), 
+								new PointF(x2, realY2 + width), 
+								new PointF(x1, realY1 + width), new PointF(x1, realY1), ]);
 			layer.CloseFigure();
 		}
 	}

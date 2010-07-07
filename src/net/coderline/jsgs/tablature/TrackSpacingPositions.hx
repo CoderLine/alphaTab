@@ -22,6 +22,7 @@ enum TrackSpacingPositions
 	TapingEffect;
 	LetRingEffect;
 	PalmMuteEffect;
+	BeatVibratoEffect;
 	VibratoEffect;
 	FadeIn;
 	Bend;

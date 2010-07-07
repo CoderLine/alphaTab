@@ -7,6 +7,7 @@ package net.coderline.jsgs.tablature.model;
 import haxe.io.StringInput;
 import net.coderline.jsgs.model.effects.GsBendEffect;
 import net.coderline.jsgs.model.effects.GsBendPoint;
+import net.coderline.jsgs.model.effects.GsGraceEffectTransition;
 import net.coderline.jsgs.model.effects.GsHarmonicType;
 import net.coderline.jsgs.model.effects.GsTremoloBarEffect;
 import net.coderline.jsgs.model.effects.GsTremoloBarPoint;
@@ -192,11 +193,14 @@ class GsNoteImpl extends GsNote
 			var beat:GsBeatImpl = BeatImpl().PreviousBeat;
 			var prevRing:Bool = false;
 			var nextRing:Bool = false;
+			var isPreviousFirst = false;
+			
 			if (beat != null)
 			{
 				for (note in beat.GetNotes())
 				{
-					if (note.Effect.LetRing)
+					var impl:GsNoteImpl = cast note;
+					if (note.Effect.LetRing && impl.BeatImpl().MeasureImpl().Ts == BeatImpl().MeasureImpl().Ts)
 					{
 						prevRing = true;
 						break;
@@ -205,13 +209,20 @@ class GsNoteImpl extends GsNote
 			}
 
 			beat = BeatImpl().NextBeat;
+			var endX:Float = realX + BeatImpl().Width();
+			var nextOnSameLine = false;
 			if (beat != null)
 			{
 				for (note in beat.GetNotes())
 				{
+					var impl:GsNoteImpl = cast note;
 					if (note.Effect.LetRing)
 					{
 						nextRing = true;
+						if (impl.BeatImpl().MeasureImpl().Ts == BeatImpl().MeasureImpl().Ts)
+						{
+							endX = beat.GetRealPosX(layout);
+						}
 						break;
 					}
 				}
@@ -219,87 +230,112 @@ class GsNoteImpl extends GsNote
 
 			var realY = y + GetPaintPosition(TrackSpacingPositions.LetRingEffect);
 			var height = DrawingResources.DefaultFontHeight;
-			var endX = realX + BeatImpl().Width();
+			var startX:Float = realX;
+			
 			if (!nextRing)
 			{
-				endX -= 6;
+				endX -= BeatImpl().Width() / 2;
+				
 			}
 			if (!prevRing)
 			{
-				fill.AddString("Ring", DrawingResources.DefaultFont, realX, realY);
+				fill.AddString("ring", DrawingResources.EffectFont, startX, realY);
+				context.Graphics.font = DrawingResources.EffectFont;
+				startX += context.Graphics.measureText("ring").width + (6*layout.Scale);
 			}
 			else
 			{
-				draw.StartFigure();
-				draw.AddLine(realX - 6, Math.round(realY + height / 2), endX, Math.round(realY + height / 2));
+				startX -= 6 * layout.Scale;
 			}
+
+			if (prevRing || nextRing)
+			{
+				draw.StartFigure();
+				draw.AddLine(startX, Math.round(realY), endX, Math.round(realY));
+			}
+
 
 			if (!nextRing && prevRing)
 			{
-				fill.AddString("|", DrawingResources.DefaultFont, endX, realY);
+				var size:Float = 8 * layout.Scale;
+				draw.AddLine(endX, realY - (size/2), endX, realY + (size/2));
 			}
 		}
 		if (effect.PalmMute)
 		{
 			var beat:GsBeatImpl = BeatImpl().PreviousBeat;
-			var prevPM:Bool = false;
-			var nextPM:Bool = false;
-			if(beat != null)
+			var prevPalm:Bool = false;
+			var nextPalm:Bool = false;
+			
+			if (beat != null)
 			{
 				for (note in beat.GetNotes())
 				{
-					if(note.Effect.PalmMute)
+					var impl:GsNoteImpl = cast note;
+					if (note.Effect.PalmMute && impl.BeatImpl().MeasureImpl().Ts == BeatImpl().MeasureImpl().Ts)
 					{
-						prevPM = true;
+						prevPalm = true;
 						break;
 					}
 				}
 			}
-			
-			
 
 			beat = BeatImpl().NextBeat;
-			if(beat != null)
+			var endX:Float = realX + BeatImpl().Width();
+			if (beat != null)
 			{
 				for (note in beat.GetNotes())
 				{
-					if(note.Effect.PalmMute)
+					var impl:GsNoteImpl = cast note;
+					if (note.Effect.PalmMute)
 					{
-						nextPM = true;
+						nextPalm = true;
+						if (impl.BeatImpl().MeasureImpl().Ts == BeatImpl().MeasureImpl().Ts)
+						{
+							endX = beat.GetRealPosX(layout);
+						}
 						break;
 					}
 				}
 			}
 
-			var realY:Int = y + GetPaintPosition(TrackSpacingPositions.PalmMuteEffect);
-			var height:Int = DrawingResources.DefaultFontHeight;
-			var endX:Int = Math.round(realX + BeatImpl().Width());
-			if(!nextPM)
+			var realY = y + GetPaintPosition(TrackSpacingPositions.PalmMuteEffect);
+			var height = DrawingResources.DefaultFontHeight;
+			var startX:Float = realX;
+			if (!nextPalm)
 			{
-				endX -= 6;
+				endX -= 6*layout.Scale;
 			}
-			if(!prevPM)
+			if (!prevPalm)
 			{
-				fill.AddString("P.M", DrawingResources.DefaultFont, realX, realY);
+				fill.AddString("P.M.", DrawingResources.EffectFont, startX, realY);
+				context.Graphics.font = DrawingResources.EffectFont;
+				startX += context.Graphics.measureText("P.M.").width + (6*layout.Scale);
 			}
 			else
 			{
-				draw.StartFigure();
-				draw.AddLine(realX - 6, Math.round(realY), endX, Math.round(realY));
+				startX -= 6 * layout.Scale;
 			}
+			draw.StartFigure();
+			draw.AddLine(startX, Math.round(realY), endX, Math.round(realY));
 
-			if(!nextPM && prevPM)
+
+			if (!nextPalm && prevPalm)
 			{
-				endX -= Math.floor(2 * layout.Scale);
-				fill.AddString("|", DrawingResources.DefaultFont, endX, realY);
+				var size:Float = 8 * layout.Scale;
+				draw.AddLine(endX, realY - (size/2), endX, realY + (size/2));
 			}
-
 		}
 
+		if (effect.BeatVibrato)
+		{
+			var realY:Int = y + GetPaintPosition(TrackSpacingPositions.BeatVibratoEffect);
+			PaintVibrato(layout, context, realX, realY, 1);
+		}
 		if (effect.Vibrato)
 		{
 			var realY:Int = y + GetPaintPosition(TrackSpacingPositions.VibratoEffect);
-			PaintVibrato(layout, context, realX, realY);
+			PaintVibrato(layout, context, realX, realY, 0.75);
 		}
 		if (effect.IsTrill())
 		{
@@ -373,15 +409,15 @@ class GsNoteImpl extends GsNote
 		var accidentalX:Int = cast (x - 2 * layout.Scale);
 		if (_accidental == GsMeasureImpl.Natural)
 		{ 
-			KeySignaturePainter.PaintSmallNatural(context, accidentalX, cast (realY1 + scoreSpacing / 2), layout);
+			KeySignaturePainter.PaintSmallNatural(fill, accidentalX, cast (realY1 + scoreSpacing / 2), layout);
 		}
 		else if (_accidental == GsMeasureImpl.Sharp)
 		{
-			KeySignaturePainter.PaintSmallSharp(context, accidentalX, cast (realY1 + scoreSpacing / 2), layout);
+			KeySignaturePainter.PaintSmallSharp(fill, accidentalX, cast (realY1 + scoreSpacing / 2), layout);
 		}
 		else if (_accidental == GsMeasureImpl.Flat)
 		{
-			KeySignaturePainter.PaintSmallFlat(context, accidentalX, cast (realY1 + scoreSpacing / 2), layout);
+			KeySignaturePainter.PaintSmallFlat(fill, accidentalX, cast (realY1 + scoreSpacing / 2), layout);
 		}
 
 		if (Effect.IsHarmonic())
@@ -489,7 +525,7 @@ class GsNoteImpl extends GsNote
 			}
 			else if (effect.Hammer)
 			{
-				PaintHammer(layout, context, nextNote, realX, realY, nextFromX);
+				PaintHammer(layout, context, nextNote, realX, realY);
 			}
 		}
 		
@@ -552,11 +588,23 @@ class GsNoteImpl extends GsNote
 				var firstHelper:Point = new Point(firstLoc.X + ((secondLoc.X - firstLoc.X)), cast (iY - dY * firstPt.Value));
 				draw.AddBezier(firstLoc.X, firstLoc.Y, firstHelper.X, firstHelper.Y, secondLoc.X, secondLoc.Y, secondLoc.X, secondLoc.Y);
 
-
+				var arrowSize:Float = 4 * scale;
+				if (secondPt.Value > firstPt.Value)
+				{
+					draw.AddLine(secondLoc.X - 0.5, secondLoc.Y, secondLoc.X - arrowSize - 0.5, secondLoc.Y + arrowSize); 
+					draw.AddLine(secondLoc.X - 0.5, secondLoc.Y, secondLoc.X + arrowSize - 0.5, secondLoc.Y + arrowSize); 
+				}
+				else if (secondPt.Value != firstPt.Value)
+				{
+					draw.AddLine(secondLoc.X - 0.5, secondLoc.Y, secondLoc.X - arrowSize - 0.5, secondLoc.Y - arrowSize); 
+					draw.AddLine(secondLoc.X - 0.5, secondLoc.Y, secondLoc.X + arrowSize - 0.5, secondLoc.Y - arrowSize); 
+				}
+				
+				
 				if (secondPt.Value != 0)
 				{
-					var dV:Float = (secondPt.Value - firstPt.Value) * 0.25; // dv * 1/4  
-					var up:Bool = dV >= 0;
+					var dV:Float = (secondPt.Value - firstPt.Value) * 0.25; // dv * 1/4 
+					var up:Bool = dV > 0;
 					dV = Math.abs(dV);
 					var s:String = "";
 					// Full Steps 
@@ -564,7 +612,7 @@ class GsNoteImpl extends GsNote
 						s = "full";
 					else if (dV > 1)
 					{
-						s += Utils.string(dV) + " ";
+						s += Utils.string(Math.floor(dV)) + " ";
 						// Quaters
 						dV -= Math.floor(dV);
 					}
@@ -579,7 +627,7 @@ class GsNoteImpl extends GsNote
 
 					context.Graphics.font = DrawingResources.DefaultFont;
 					var size:Dynamic = context.Graphics.measureText(s);
-					var y:Float = up ? secondLoc.Y - DrawingResources.DefaultFontHeight - (3 * scale) : secondLoc.Y + (3 * scale);
+					var y:Float = up ? secondLoc.Y - DrawingResources.DefaultFontHeight + (2 * scale) : secondLoc.Y - (2 * scale);
 					var x:Float = secondLoc.X - size.width / 2;
 
 					fill.AddString(s, DrawingResources.DefaultFont, cast x, cast y);
@@ -727,7 +775,7 @@ class GsNoteImpl extends GsNote
 
 			if (Effect.SlideType == GsSlideType.SlowSlideTo)
 			{
-				PaintHammer(layout, context, nextNote, x, y, nextX);
+				PaintHammer(layout, context, nextNote, x, y);
 			}
 		}
 		else
@@ -736,13 +784,13 @@ class GsNoteImpl extends GsNote
 		}
 	}
 
-	private function PaintHammer(layout:ViewLayout, context:DrawingContext, nextNote:GsNoteImpl, x:Int, y:Int, nextX:Int) : Void
+	private function PaintHammer(layout:ViewLayout, context:DrawingContext, nextNote:GsNoteImpl, x:Float, y:Float, forceDown:Bool = false) : Void
 	{
 		var xScale:Float = layout.Scale;
 		var yScale:Float = layout.StringSpacing / 10.0;
 
-		var realX :Float= x + (15.0 * xScale);
-		var realY:Float = y - (5.0 * yScale);
+		var realX :Float= x + (7.0 * xScale);
+		var realY:Float = y - (DrawingResources.NoteFontHeight * layout.Scale);
 
 		var width:Float = nextNote != null
 						   ? nextNote.BeatImpl().GetRealPosX(layout) - 4 * xScale -  realX
@@ -752,9 +800,9 @@ class GsNoteImpl extends GsNote
 					: context.Get(DrawingLayers.VoiceEffects2);
 
 		var wScale:Float = width / 16;
-		var hScale:Float = this.String <= 3 ? 1 : -1;
-		if (this.String > 3)
-			realY += 15 * xScale;
+		var hScale:Float = (this.String > 3 || forceDown) ? -1 : 1;
+		if (this.String > 3 || forceDown)
+			realY += (DrawingResources.NoteFontHeight * layout.Scale) * 2;
 			
 		fill.AddMusicSymbol(MusicFont.HammerPullUp, cast realX, cast realY, layout.Scale * wScale, layout.Scale * hScale);
 	}
@@ -763,14 +811,18 @@ class GsNoteImpl extends GsNote
 	{
 		var scale:Float = layout.ScoreLineSpacing / 2.25;
 		var realX:Float = x - (2 * scale);
-		var realY:Float = y + (scale / 3);
+		var realY:Float = y - (9*layout.Scale);
 		var fill:DrawingLayer = Voice.Index == 0 ? context.Get(DrawingLayers.VoiceEffects1) : context.Get(DrawingLayers.VoiceEffects2);
 
 		var s:String = Effect.DeadNote ? MusicFont.GraceDeadNote : MusicFont.GraceNote;
 		fill.AddMusicSymbol(s, cast (realX - scale * 1.33), cast realY, layout.Scale);
+		if (Effect.Grace.Transition == GsGraceEffectTransition.Hammer || Effect.Grace.Transition == GsGraceEffectTransition.Slide)
+		{
+			PaintHammer(layout, context, null, x - (15*layout.Scale), y + (5*layout.Scale), true);
+		}
 	}
 
-	private function PaintVibrato(layout:ViewLayout, context:DrawingContext, x:Int, y:Int)
+	private function PaintVibrato(layout:ViewLayout, context:DrawingContext, x:Int, y:Int, symbolScale:Float)
 	{
 		var scale:Float = layout.Scale;
 		var realX:Float = x - 2 * scale;
@@ -779,12 +831,12 @@ class GsNoteImpl extends GsNote
 
 		var fill:DrawingLayer = Voice.Index == 0 ? context.Get(DrawingLayers.VoiceEffects1) : context.Get(DrawingLayers.VoiceEffects2);
 		
-		var step:Float = 18 * scale;
-		var loops:Int = Math.round(Math.max(1, (width / step)));
+		var step:Float = 18 * scale * symbolScale;
+		var loops:Int = Math.floor(Math.max(1, (width / step)));
 		var s:String = "";
 		for (i in 0 ... loops)
 		{
-			fill.AddMusicSymbol(MusicFont.VibratoLeftRight, cast realX, cast realY, layout.Scale);
+			fill.AddMusicSymbol(MusicFont.VibratoLeftRight, realX, realY, layout.Scale * symbolScale);
 			realX += step;
 		}
 	}
@@ -792,15 +844,15 @@ class GsNoteImpl extends GsNote
 	private function PaintTrill(layout:ViewLayout, context:DrawingContext, x:Int, y:Int)
 	{
 		var str:String = "Tr";
-		context.Graphics.font = DrawingResources.GraceFont;
+		context.Graphics.font = DrawingResources.EffectFont;
 		var size:Dynamic = context.Graphics.measureText(str);
 		var scale:Float = layout.Scale;
 		var realX:Float = x + size.width - 2 * scale;
-		var realY:Float = y + (DrawingResources.GraceFontHeight - (5.0 * scale)) / 2.0;
+		var realY:Float = y + (DrawingResources.EffectFontHeight - (5.0 * scale)) / 2.0;
 		var width:Float = VoiceImpl().Width - size.Width - (2.0 * scale);
 
 		var fill:DrawingLayer = Voice.Index == 0 ? context.Get(DrawingLayers.VoiceEffects1) : context.Get(DrawingLayers.VoiceEffects2);
-		fill.AddString(str, DrawingResources.GraceFont, x, y);
+		fill.AddString(str, DrawingResources.EffectFont, x, y);
 	}
 
 	private function PaintFadeIn(layout:ViewLayout, context:DrawingContext, x:Int, y:Int) : Void

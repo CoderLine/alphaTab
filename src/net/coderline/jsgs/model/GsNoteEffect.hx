@@ -22,6 +22,7 @@ class GsNoteEffect
 		this.Trill = null;
 		this.TremoloPicking = null;
 		this.Vibrato = false;
+		this.BeatVibrato = false;
 		this.DeadNote = false;
 		this.Slide = false;
 		this.Hammer = false;
@@ -74,6 +75,7 @@ class GsNoteEffect
 	}
 	
 	public var Vibrato: Bool;
+	public var BeatVibrato: Bool;
 	public var DeadNote: Bool;
 	public var SlideType:GsSlideType;
 	public var Slide: Bool;
@@ -93,6 +95,7 @@ class GsNoteEffect
 	{
 		var effect:GsNoteEffect = factory.NewEffect();
 		effect.Vibrato = this.Vibrato;
+		effect.BeatVibrato = this.BeatVibrato;
 		effect.DeadNote = this.DeadNote;
 		effect.Slide = this.Slide;
 		effect.SlideType = this.SlideType;

@@ -7,6 +7,7 @@ package net.coderline.jsgs.tablature.drawing;
 import haxe.remoting.FlashJsConnection;
 import net.coderline.jsgs.model.GsColor;
 import net.coderline.jsgs.model.Point;
+import net.coderline.jsgs.model.PointF;
 import net.coderline.jsgs.platform.Canvas;
 
 class DrawingLayer 
@@ -72,7 +73,7 @@ class DrawingLayer
 						this.Finish(graphics);
 						graphics.beginPath();
 						graphics.moveTo(elm.Points[0].X, elm.Points[0].Y);
-						var pts:Array<Point> = cast elm.Points;
+						var pts:Array<PointF> = cast elm.Points;
 						for (pt in pts) {
 							graphics.lineTo(pt.X, pt.Y);
 						}
@@ -181,8 +182,8 @@ class DrawingLayer
 			Y2: (y2) + 0.5
 		});
 	}
-
-	public function AddPolygon(points:Array<Point>): Void{
+	
+	public function AddPolygon(points:Array<PointF>): Void{
 		this.Path.push({
 			Command: "addPolygon",
 			Points: points

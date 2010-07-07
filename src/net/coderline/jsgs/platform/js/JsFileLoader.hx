@@ -43,7 +43,13 @@ class JsFileLoader implements FileLoader
 		}
 		
 		options.beforeSend = function(xhr:Dynamic) {
-			xhr.overrideMimeType('text/plain; charset=x-user-defined');
+			untyped
+			{
+				if (xhr.overrideMimeType)
+				{
+					xhr.overrideMimeType('text/plain; charset=x-user-defined');
+				}
+			}
 		}
 		
 		JQuery.Ajax(options);

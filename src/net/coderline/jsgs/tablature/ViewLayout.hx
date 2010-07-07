@@ -216,19 +216,19 @@ class ViewLayout
         if (duration != null) {
             switch (duration.Value) {
                 case GsDuration.Whole:
-                    return (30.0 * scale);
+                    return (90.0 * scale);
                 case GsDuration.Half:
-                    return (25.0 * scale);
+                    return (65.0 * scale);
                 case GsDuration.Quarter:
-                    return (21.0 * scale);
+                    return (45.0 * scale);
                 case GsDuration.Eighth:
-                    return (20.0 * scale);
+                    return (30.0 * scale);
                 case GsDuration.Sixteenth:
-                    return (19.0 * scale);
+                    return (20.0 * scale);
                 case GsDuration.ThirtySecond:
-                    return (18.0 * scale);
-                default:
                     return (17.0 * scale);
+                default:
+                    return (15.0 * scale);
             }
         }
 		return 20.0 * scale;

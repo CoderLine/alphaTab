@@ -469,7 +469,7 @@ class Gp5Reader extends GpReaderBase
 		var flags1:Int = ReadUnsignedByte();
         var flags2:Int = ReadUnsignedByte();
         effect.FadeIn = (((flags1 & 0x10) != 0));
-        effect.Vibrato = (((flags1 & 0x02) != 0));
+        effect.BeatVibrato = (((flags1 & 0x02) != 0)) || effect.BeatVibrato;
         if ((flags1 & 0x20) != 0) {
             var slapEffect:Int = ReadUnsignedByte();
             effect.Tapping = (slapEffect == 1);

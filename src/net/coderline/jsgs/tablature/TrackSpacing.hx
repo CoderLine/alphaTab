@@ -11,7 +11,7 @@ class TrackSpacing
 	public function new() 
 	{
 		this.Spacing = new Array<Int>();
-		for (i in 0 ... 22) 
+		for (i in 0 ... 23) 
 		{
 			this.Spacing.push(0);
 		}

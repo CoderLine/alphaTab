@@ -155,6 +155,7 @@ class PageViewLayout extends ViewLayout
 			}
 		}	
 		
+		y += Math.floor(20 * Scale);
 		if (anySongInfo)
 		{
 			y += Math.floor(20 * Scale);

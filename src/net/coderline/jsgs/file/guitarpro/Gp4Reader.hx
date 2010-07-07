@@ -77,8 +77,8 @@ class Gp4Reader extends GpReaderBase
         song.Tempo = ReadInt();
 		song.HideTempo = false;
         
-        song.Key = ReadByte();
-        song.Octave = ReadInt();
+        song.Key = ReadInt();
+        song.Octave = ReadByte();
         
         var channels:Array<GsMidiChannel> = ReadMidiChannels();
         
@@ -177,6 +177,10 @@ class Gp4Reader extends GpReaderBase
             note.IsTiedNote = ((noteType == 0x02));
             note.Effect.DeadNote = ((noteType == 0x03));
         }
+		if ((flags & 0x01) != 0) {
+			note.Duration = ReadByte();
+			note.Triplet = ReadByte();
+		}
         if ((flags & 0x10) != 0) {
             note.Velocity = ((GsVelocities.MinVelocity + (GsVelocities.VelocityIncrement * ReadByte())) -
             GsVelocities.VelocityIncrement);
@@ -315,7 +319,7 @@ class Gp4Reader extends GpReaderBase
 	{
 		var fret:Int = ReadUnsignedByte();
         var dyn:Int = ReadUnsignedByte();
-        var transition:Int = ReadByte();
+        var transition:Int = ReadUnsignedByte();
         var duration:Int = ReadUnsignedByte();
         var grace:GsGraceEffect = Factory.NewGraceEffect();
 		
@@ -396,7 +400,7 @@ class Gp4Reader extends GpReaderBase
         tableChange.Reverb.Value = ReadByte();
         tableChange.Phaser.Value = ReadByte();
         tableChange.Tremolo.Value = ReadByte();
-        tableChange.TempoName = ReadIntSizeCheckByteString();
+        tableChange.TempoName = "";
         tableChange.Tempo.Value = ReadInt();
         
         if (tableChange.Instrument.Value < 0) 
@@ -459,7 +463,7 @@ class Gp4Reader extends GpReaderBase
 		var flags1:Int = ReadUnsignedByte();
         var flags2:Int = ReadUnsignedByte();
         effect.FadeIn = (((flags1 & 0x10) != 0));
-        effect.Vibrato = (((flags1 & 0x02) != 0));
+        effect.BeatVibrato = (((flags1 & 0x02) != 0)) || effect.BeatVibrato;
         if ((flags1 & 0x20) != 0) {
             var slapEffect:Int = ReadUnsignedByte();
             effect.Tapping = (slapEffect == 1);

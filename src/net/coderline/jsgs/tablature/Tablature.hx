@@ -133,8 +133,6 @@ class Tablature
 		Log.trace("Drawing Finished");
 	}
 	
-
-	
 	public function UpdateTablature()
 	{
 		if (this.Track == null) return;
@@ -150,6 +148,13 @@ class Tablature
 		this.Canvas.strokeStyle = "#ddddcc";
 		this.Canvas.lineWidth = 20;
 		this.Canvas.strokeRect(0, 0, this.Width - 1, this.Height - 1);
+		// attention, you are not allowed to remove change this notice within any version of this library without permission
+		var msg = "Rendered using JsGuitarSharp (http://project.coderline.net/jsgs)";
+		this.Canvas.fillStyle = "#4e4e4e";
+		this.Canvas.font = "bold 11px Arial";
+		this.Canvas.textBaseline = "middle";
+		var x:Float = (this.Width - this.Canvas.measureText(msg).width) / 2;
+		this.Canvas.fillText("Rendered using JsGuitarSharp (http://project.coderline.net/jsgs)", x, this.Height - 6);
 	}
 	
 	public function Invalidate() 

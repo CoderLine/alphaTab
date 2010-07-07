@@ -21,6 +21,8 @@ class DrawingResources
 	public static var GraceFont:String;
 	public static var NoteFont:String;
 	public static var NoteFontHeight:Int;
+	public static var EffectFont:String;
+	public static var EffectFontHeight:Int;
 	
 	public static var TitleFont:String;
 	public static var SubtitleFont:String;
@@ -35,10 +37,12 @@ class DrawingResources
 		ClefFont = Utils.string(13*scale) + "px Arial";
 		MusicFont = Utils.string(13*scale) + "px Arial";
 		TempoFont = Utils.string(11*scale) + "px Arial";
-		GraceFontHeight = Math.round(11*scale);
+		GraceFontHeight = Math.round(9*scale);
 		GraceFont = Utils.string(GraceFontHeight) + "px Arial";
 		NoteFontHeight = Math.round(11 * scale);
 		NoteFont = Utils.string(NoteFontHeight) + "px Arial";
+		EffectFontHeight = Math.round(11 * scale);
+		EffectFont = "italic " + Utils.string(EffectFontHeight) + "px Times New Roman";
 		
 		TitleFont =  Utils.string(30*scale) + "px Times New Roman";
 		SubtitleFont = Utils.string(19 * scale) + "px Times New Roman";

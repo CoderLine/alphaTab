@@ -82,7 +82,6 @@
     <compile path="src\net\coderline\jsgs\model\Padding.hx" />
     <compile path="src\net\coderline\jsgs\model\Size.hx" />
     <compile path="C:\Program Files (x86)\Motion-Twin\haxe\lib\jquery\1,01\jquery\JQuery.hx" />
-    <compile path="src\net\coderline\jsgs\JQuery.hx" />
     <compile path="src\net\coderline\jsgs\file\guitarpro\Gp5Reader.hx" />
     <compile path="src\net\coderline\jsgs\model\effects\GsBendTypesConverter.hx" />
     <compile path="src\net\coderline\jsgs\file\guitarpro\Gp4Reader.hx" />
@@ -121,8 +120,6 @@
     <compile path="src\net\coderline\jsgs\tablature\TrackSpacingPositionConverter.hx" />
     <compile path="src\net\coderline\jsgs\tablature\TrackSpacingPositions.hx" />
     <compile path="src\net\coderline\jsgs\tablature\ViewLayout.hx" />
-    <compile path="src\FileLoader.hx" />
-    <compile path="src\BinaryReader.hx" />
     <compile path="src\net\coderline\jsgs\model\PointF.hx" />
     <compile path="C:\Program Files (x86)\Motion-Twin\haxe\lib\hxunicode\0,1,1\unicode\CombiningClassData.hx" />
     <compile path="C:\Program Files (x86)\Motion-Twin\haxe\lib\hxunicode\0,1,1\unicode\CombiningIter.hx" />
@@ -132,6 +129,27 @@
     <compile path="C:\Program Files (x86)\Motion-Twin\haxe\lib\hxunicode\0,1,1\unicode\UnicodeIter.hx" />
     <compile path="C:\Program Files (x86)\Motion-Twin\haxe\lib\hxunicode\0,1,1\unicode\UnicodeTools.hx" />
     <compile path="src\net\coderline\jsgs\Utf8.hx" />
+    <compile path="src\net\coderline\jsgs\platform\js\Html5Canvas.hx" />
+    <compile path="src\net\coderline\jsgs\platform\Canvas.hx" />
+    <compile path="src\net\coderline\jsgs\platform\TextMetrics.hx" />
+    <compile path="src\net\coderline\jsgs\midi\BeatData.hx" />
+    <compile path="src\net\coderline\jsgs\midi\MidiController.hx" />
+    <compile path="src\net\coderline\jsgs\midi\MidiMessageUtils.hx" />
+    <compile path="src\net\coderline\jsgs\midi\MidiSequenceHandler.hx" />
+    <compile path="src\net\coderline\jsgs\midi\MidiSequenceParser.hx" />
+    <compile path="src\net\coderline\jsgs\midi\MidiSequenceParserFlags.hx" />
+    <compile path="src\net\coderline\jsgs\midi\MidiRepeatController.hx" />
+    <compile path="src\net\coderline\jsgs\midi\MidiDataProvider.hx" />
+    <compile path="src\net\coderline\jsgs\platform\js\JQuery.hx" />
+    <compile path="src\net\coderline\jsgs\platform\PlatformFactory.hx" />
+    <compile path="src\net\coderline\jsgs\platform\BinaryReader.hx" />
+    <compile path="src\net\coderline\jsgs\platform\js\JsBinaryReader.hx" />
+    <compile path="src\net\coderline\jsgs\platform\js\JsFileLoader.hx" />
+    <compile path="src\net\coderline\jsgs\platform\FileLoader.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\CaretPosition.hx" />
+    <compile path="src\net\coderline\MyTrace.hx" />
+    <compile path="src\net\coderline\jsgs\Utils.hx" />
+    <compile path="src\net\coderline\jsgs\tablature\model\TripletGroup.hx" />
   </compileTargets>
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>
