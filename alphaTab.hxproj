@@ -1,0 +1,165 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project>
+  <!-- Output SWF options -->
+  <output>
+    <movie disabled="False" />
+    <movie input="" />
+    <movie path="bin\alphaTab.js" />
+    <movie fps="25" />
+    <movie width="800" />
+    <movie height="600" />
+    <movie version="11" />
+    <movie background="#FFFFFF" />
+  </output>
+  <!-- Other classes to be compiled into your SWF -->
+  <classpaths>
+    <class path="src" />
+  </classpaths>
+  <!-- Build options -->
+  <build>
+    <option directives="" />
+    <option flashStrict="False" />
+    <option mainClass="net.alphatab.Main" />
+    <option forcetraces="False" />
+    <option additional="" />
+  </build>
+  <!-- haxelib libraries -->
+  <haxelib>
+    <!-- example: <library name="..." /> -->
+  </haxelib>
+  <!-- Class files to compile (other referenced classes will automatically be included) -->
+  <compileTargets>
+    <compile path="src\net\alphatab\Main.hx" />
+    <compile path="src\net\alphatab\file\alphatab\AlphaTabParser.hx" />
+    <compile path="src\net\alphatab\file\alphatab\AlphaTabSymbols.hx" />
+    <compile path="src\net\alphatab\file\alphatab\AlphaTabWriter.hx" />
+    <compile path="src\net\alphatab\file\guitarpro\Gp3Reader.hx" />
+    <compile path="src\net\alphatab\file\guitarpro\Gp4Reader.hx" />
+    <compile path="src\net\alphatab\file\guitarpro\Gp5Reader.hx" />
+    <compile path="src\net\alphatab\file\guitarpro\GpReaderBase.hx" />
+    <compile path="src\net\alphatab\file\FileFormatException.hx" />
+    <compile path="src\net\alphatab\file\SongLoader.hx" />
+    <compile path="src\net\alphatab\file\SongReader.hx" />
+    <compile path="src\net\alphatab\midi\BeatData.hx" />
+    <compile path="src\net\alphatab\midi\MidiController.hx" />
+    <compile path="src\net\alphatab\midi\MidiDataProvider.hx" />
+    <compile path="src\net\alphatab\midi\MidiMessageUtils.hx" />
+    <compile path="src\net\alphatab\midi\MidiRepeatController.hx" />
+    <compile path="src\net\alphatab\midi\MidiSequenceHandler.hx" />
+    <compile path="src\net\alphatab\midi\MidiSequenceParser.hx" />
+    <compile path="src\net\alphatab\midi\MidiSequenceParserFlags.hx" />
+    <compile path="src\net\alphatab\model\effects\GsBendEffect.hx" />
+    <compile path="src\net\alphatab\model\effects\GsBendPoint.hx" />
+    <compile path="src\net\alphatab\model\effects\GsBendTypes.hx" />
+    <compile path="src\net\alphatab\model\effects\GsBendTypesConverter.hx" />
+    <compile path="src\net\alphatab\model\effects\GsGraceEffect.hx" />
+    <compile path="src\net\alphatab\model\effects\GsGraceEffectTransition.hx" />
+    <compile path="src\net\alphatab\model\effects\GsHarmonicEffect.hx" />
+    <compile path="src\net\alphatab\model\effects\GsHarmonicType.hx" />
+    <compile path="src\net\alphatab\model\effects\GsTremoloBarEffect.hx" />
+    <compile path="src\net\alphatab\model\effects\GsTremoloBarPoint.hx" />
+    <compile path="src\net\alphatab\model\effects\GsTremoloPickingEffect.hx" />
+    <compile path="src\net\alphatab\model\effects\GsTrillEffect.hx" />
+    <compile path="src\net\alphatab\model\GsBeat.hx" />
+    <compile path="src\net\alphatab\model\GsBeatStroke.hx" />
+    <compile path="src\net\alphatab\model\GsBeatStrokeDirection.hx" />
+    <compile path="src\net\alphatab\model\GsBeatText.hx" />
+    <compile path="src\net\alphatab\model\GsChord.hx" />
+    <compile path="src\net\alphatab\model\GsColor.hx" />
+    <compile path="src\net\alphatab\model\GsDuration.hx" />
+    <compile path="src\net\alphatab\model\GsGuitarString.hx" />
+    <compile path="src\net\alphatab\model\GsHeaderFooterElements.hx" />
+    <compile path="src\net\alphatab\model\GsLyricLine.hx" />
+    <compile path="src\net\alphatab\model\GsLyrics.hx" />
+    <compile path="src\net\alphatab\model\GsMarker.hx" />
+    <compile path="src\net\alphatab\model\GsMeasure.hx" />
+    <compile path="src\net\alphatab\model\GsMeasureClef.hx" />
+    <compile path="src\net\alphatab\model\GsMeasureClefConverter.hx" />
+    <compile path="src\net\alphatab\model\GsMeasureHeader.hx" />
+    <compile path="src\net\alphatab\model\GsMidiChannel.hx" />
+    <compile path="src\net\alphatab\model\GsMixTableChange.hx" />
+    <compile path="src\net\alphatab\model\GsMixTableItem.hx" />
+    <compile path="src\net\alphatab\model\GsNote.hx" />
+    <compile path="src\net\alphatab\model\GsNoteEffect.hx" />
+    <compile path="src\net\alphatab\model\GsPageSetup.hx" />
+    <compile path="src\net\alphatab\model\GsSlideType.hx" />
+    <compile path="src\net\alphatab\model\GsSong.hx" />
+    <compile path="src\net\alphatab\model\GsSongFactory.hx" />
+    <compile path="src\net\alphatab\model\GsTempo.hx" />
+    <compile path="src\net\alphatab\model\GsTimeSignature.hx" />
+    <compile path="src\net\alphatab\model\GsTrack.hx" />
+    <compile path="src\net\alphatab\model\GsTriplet.hx" />
+    <compile path="src\net\alphatab\model\GsTripletFeel.hx" />
+    <compile path="src\net\alphatab\model\GsVelocities.hx" />
+    <compile path="src\net\alphatab\model\GsVoice.hx" />
+    <compile path="src\net\alphatab\model\GsVoiceDirection.hx" />
+    <compile path="src\net\alphatab\model\Padding.hx" />
+    <compile path="src\net\alphatab\model\Point.hx" />
+    <compile path="src\net\alphatab\model\PointF.hx" />
+    <compile path="src\net\alphatab\model\Rectangle.hx" />
+    <compile path="src\net\alphatab\model\Size.hx" />
+    <compile path="src\net\alphatab\model\SongManager.hx" />
+    <compile path="src\net\alphatab\platform\js\Html5Canvas.hx" />
+    <compile path="src\net\alphatab\platform\js\JQuery.hx" />
+    <compile path="src\net\alphatab\platform\js\JsFileLoader.hx" />
+    <compile path="src\net\alphatab\platform\php\GdWrapper.hx" />
+    <compile path="src\net\alphatab\platform\php\PhpCanvas.hx" />
+    <compile path="src\net\alphatab\platform\php\PhpFileLoader.hx" />
+    <compile path="src\net\alphatab\platform\BinaryReader.hx" />
+    <compile path="src\net\alphatab\platform\Canvas.hx" />
+    <compile path="src\net\alphatab\platform\FileLoader.hx" />
+    <compile path="src\net\alphatab\platform\PlatformFactory.hx" />
+    <compile path="src\net\alphatab\platform\TextMetrics.hx" />
+    <compile path="src\net\alphatab\tablature\drawing\ClefPainter.hx" />
+    <compile path="src\net\alphatab\tablature\drawing\DrawingContext.hx" />
+    <compile path="src\net\alphatab\tablature\drawing\DrawingLayer.hx" />
+    <compile path="src\net\alphatab\tablature\drawing\DrawingLayers.hx" />
+    <compile path="src\net\alphatab\tablature\drawing\DrawingLayersConverter.hx" />
+    <compile path="src\net\alphatab\tablature\drawing\DrawingResources.hx" />
+    <compile path="src\net\alphatab\tablature\drawing\KeySignaturePainter.hx" />
+    <compile path="src\net\alphatab\tablature\drawing\MusicFont.hx" />
+    <compile path="src\net\alphatab\tablature\drawing\NotePainter.hx" />
+    <compile path="src\net\alphatab\tablature\drawing\SilencePainter.hx" />
+    <compile path="src\net\alphatab\tablature\drawing\SvgPainter.hx" />
+    <compile path="src\net\alphatab\tablature\drawing\TempoPainter.hx" />
+    <compile path="src\net\alphatab\tablature\drawing\TripletFeelPainter.hx" />
+    <compile path="src\net\alphatab\tablature\model\BeatGroup.hx" />
+    <compile path="src\net\alphatab\tablature\model\GsBeatImpl.hx" />
+    <compile path="src\net\alphatab\tablature\model\GsBeatTextImpl.hx" />
+    <compile path="src\net\alphatab\tablature\model\GsChordImpl.hx" />
+    <compile path="src\net\alphatab\tablature\model\GsJoinedType.hx" />
+    <compile path="src\net\alphatab\tablature\model\GsJoinedTypeConverter.hx" />
+    <compile path="src\net\alphatab\tablature\model\GsLyricsImpl.hx" />
+    <compile path="src\net\alphatab\tablature\model\GsMeasureHeaderImpl.hx" />
+    <compile path="src\net\alphatab\tablature\model\GsMeasureImpl.hx" />
+    <compile path="src\net\alphatab\tablature\model\GsNoteImpl.hx" />
+    <compile path="src\net\alphatab\tablature\model\GsSongFactoryImpl.hx" />
+    <compile path="src\net\alphatab\tablature\model\GsTrackImpl.hx" />
+    <compile path="src\net\alphatab\tablature\model\GsVoiceImpl.hx" />
+    <compile path="src\net\alphatab\tablature\model\TripletGroup.hx" />
+    <compile path="src\net\alphatab\tablature\CaretPosition.hx" />
+    <compile path="src\net\alphatab\tablature\PageViewLayout.hx" />
+    <compile path="src\net\alphatab\tablature\Tablature.hx" />
+    <compile path="src\net\alphatab\tablature\TrackSpacing.hx" />
+    <compile path="src\net\alphatab\tablature\TrackSpacingPositionConverter.hx" />
+    <compile path="src\net\alphatab\tablature\TrackSpacingPositions.hx" />
+    <compile path="src\net\alphatab\tablature\ViewLayout.hx" />
+    <compile path="src\net\alphatab\MyTrace.hx" />
+    <compile path="src\net\alphatab\Utf8.hx" />
+    <compile path="src\net\alphatab\Utils.hx" />
+  </compileTargets>
+  <!-- Paths to exclude from the Project Explorer tree -->
+  <hiddenPaths>
+    <!-- example: <hidden path="..." /> -->
+  </hiddenPaths>
+  <!-- Executed before build -->
+  <preBuildCommand />
+  <!-- Executed after build -->
+  <postBuildCommand alwaysRun="False" />
+  <!-- Other project options -->
+  <options>
+    <option showHiddenPaths="False" />
+    <option testMovie="OpenDocument" />
+    <option testMovieCommand="bin/index.html" />
+  </options>
+</project>

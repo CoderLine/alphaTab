@@ -1,0 +1,91 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="Pragma" content="no-cache">
+        <title>alphaTab - Development Showcase</title>
+		<!--[if IE]><script type="text/javascript" src="excanvas.js"></script><![endif]-->
+        <script language="JavaScript" type="text/javascript" src="jquery.js">
+        </script>
+		<script language="JavaScript" type="text/javascript" src="jquery.scrollto.js">
+        </script>
+        <script language="JavaScript" type="text/javascript" src="jquery.alphatab.js">
+        </script>
+        <script language="JavaScript" type="text/javascript" src="alphaTab.min.js">
+        </script>
+        <script language="JavaScript" type="text/javascript" src="alphaTabTesterPlayer.js">
+        </script>
+       
+        <style type="text/css">@import url('style.css');
+        </style>
+    </head>
+    <body>
+		<div id="TopNavWrapper">
+			<div id="TopNav">
+				<a href="http://www.alphatab.net" id="AlphaTabLogo" title="Home"></a>
+				<ul>
+					<li><a href="index.html">Normal</a></li>
+					<li class="active"><a href="indexplayer.html">Player</a></li>
+					<li><a href="indexeditor.html">Editor</a></li>
+					<li><a href="http://project.coderline.net">Blog</a></li>
+				</ul>
+			</div>
+		</div>
+		<div id="Content">
+		<h1>alphaTab - Development Showcase</h1>
+		This file shows up how alphaTab works with GuitarPro files and shows the player feature.<br />
+		The player controls are on the bottom of the page. The player requires Java! <br />
+		<b>Build:</b> 23.07.2010 v0.2preAlpha<br />
+		<br />
+        <select id="TestFile">
+			<option value="samples/FadeToBlack.gp4">Metallica - Fade To Black</option>
+			<option value="samples/Canon.gp5">JerryC - CanonRock</option>
+			<option value="samples/Ring.gp5">Ring</option>
+			<option value="samples/Effects.gp5">Effects</option>
+            <option value="samples/Serenade.gp5">Suidakra - Serenade to a Dream</option>
+            <option value="samples/Demo.gp5">Guitar Pro 5 Demo</option>
+			<option value="samples/Tempo.gp5">Tempo</option>
+            <option value="samples/BendTest.gp5">Bends</option>
+            <option value="samples/Silence.gp5">Silences</option>
+            <option value="samples/Notes.gp5">Notes</option>
+            <option value="samples/TimeSignatureTest.gp5">TimeSignature Test</option>
+            <option value="samples/KeySignatureTest.gp5">KeySignature Test</option>
+            <option value="samples/ComponentTest.gp5">Component Test</option>
+            <option value="samples/test2.gp5">Guitar Pro 5 File</option>
+            <option value="samples/test.gp5">Guitar Pro 5 File</option>
+            <option value="samples/test.gp4">Guitar Pro 4 File</option>
+            <option value="samples/test.gp3">Guitar Pro 3 File</option>
+        </select>
+        <input id="LoadSample" type="button" value="Load Sample" />
+        <input id="Redraw" type="button" value="Redraw" />
+		 
+        <select id="Zoom">
+            <option value="0.5">50%</option>
+            <option value="0.75">75%</option>
+            <option value="1.0">100%</option>
+            <option value="1.1" selected="selected">110%</option>
+            <option value="1.25">125%</option>
+            <option value="1.5">150%</option>
+            <option value="2.0">200%</option>
+        </select>
+        <input id="UpdateZoom" type="button" value="Update Zoom" /><br />
+		<label for="Tracks">Tracks:</label>
+        <select id="Tracks">
+		</select>
+        <input id="UpdateTrack" type="button" value="Show" /><br />
+        <br/>
+        <fieldset>
+            <legend>
+                File Info
+            </legend>
+            <div id="FileInfo">
+                No File loaded
+            </div>
+        </fieldset>
+        <br/>
+		<div id="TablatureContainer"></div>
+		</div>
+    </body>
+</html>

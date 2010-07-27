@@ -1,0 +1,139 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="Pragma" content="no-cache">
+        <title>alphaTab - Development Showcase</title>
+		<!--[if IE]><script type="text/javascript" src="excanvas.js"></script><![endif]-->
+        <script language="JavaScript" type="text/javascript" src="jquery.js">
+        </script>
+		<script language="JavaScript" type="text/javascript" src="jquery.scrollto.js">
+        </script>
+        <script language="JavaScript" type="text/javascript" src="jquery.alphatab.js">
+        </script>
+        <script language="JavaScript" type="text/javascript" src="alphaTab.min.js">
+        </script>
+        <script language="JavaScript" type="text/javascript" src="alphaTabTesterEditor.js">
+        </script>
+       
+        <style type="text/css">@import url('style.css');
+        </style>
+    </head>
+    <body>
+		<div id="TopNavWrapper">
+			<div id="TopNav">
+				<a href="http://www.alphatab.net" id="AlphaTabLogo" title="Home"></a>
+				<ul>
+					<li><a href="index.html">Normal</a></li>
+					<li><a href="indexplayer.html">Player</a></li>
+					<li class="active"><a href="indexeditor.html">Editor</a></li>
+					<li><a href="http://project.coderline.net">Blog</a></li>
+				</ul>
+			</div>
+		</div>
+		<div id="Content">
+		<h1>alphaTab - Development Showcase</h1>
+		This file shows up how to write notation with alphaTab.<br />
+		<b>Build:</b> 23.07.2010 v0.2preAlpha<br />
+        <br />
+        <select id="Zoom">
+            <option value="0.5">50%</option>
+            <option value="0.75">75%</option>
+            <option value="1.0" selected="selected">100%</option>
+            <option value="1.1">110%</option>
+            <option value="1.25">125%</option>
+            <option value="1.5">150%</option>
+            <option value="2.0">200%</option>
+        </select>
+        <input id="UpdateZoom" type="button" value="Update Zoom" />
+			
+		<h2>Introduction</h2>
+		To write tabs with alphaTab is really simple.  <br />
+		<strong>A song is built up like this:</strong>
+<code>MetaData 
+.
+Measures
+</code>
+		It starts with an optional MetaData block which allows you to setup some general song information. The MetaData part is finished with a simple dot. Then a list of measures follows. 
+
+		<h2>MetaData</h2>
+		<strong>The metadata can be specified using a kind of tags using the schema:</strong>
+		<code>\key value</code>
+		The following example shows which tags are available and how to use them. 
+<div class="alphaTab">
+\title "Song Title"
+\subtitle Subtitle
+\artist Artist
+\album 'My Album' 
+\words Daniel
+\music CoderLine
+\copyright Daniel
+\tempo 200
+\capo 2
+\tuning e5 b4 g4 d4 a3 e3 
+.</div>
+		<div class="hint">
+		<strong>Hints:</strong><br />
+		<ul>
+			<li>Titles with multiple words require quotes ("doublequotes" or 'singlequotes'). </li>
+			<li>Tempos are specified in BPM. By default 120 is set.   </li>
+			<li>The Tuning accepts a list of tunings which adds more strings. This allows you to create 4 or 7 instruments. By default the standard 6 string tuning is set. <br />
+				Tunings are specified via a note (c, db, d, eb, e, f, gb, g, ab, a, bb, b) and a number specifying the octave.</li>
+		</ul>
+		</div>
+		
+		<h2>Measures</h2>
+		Now it gets time to write some measures and notes. <br />
+		<strong>Muliple Measures are seperated by a pipe symbol: | </strong>
+		<div class="hint">
+		<strong>Hints:</strong><br />
+		<ul>
+			<li>Spaces, tabs and newlines (whitespaces) are just ignored within the tabs, but they're often needed to separate and format elements.</li>
+		</ul>
+		</div>
+<div class="alphaTab">
+.
+||||
+</div>		
+
+		<strong>Single notes per beat can be added in this format:</strong>
+		<code>fret.string.duration</code>
+		<strong>Rests are written using this format</strong> 
+		<code>r.duration</code>
+		The duration can be specified as number: 1(full), 2(half), 4(fourth), ... 64 (sixtyfourth).
+<div class="alphaTab">
+.
+0.6.2 1.5.4 3.4.4 | 5.3.8 5.3.8 5.3.8 5.3.8 r.2</div>	
+
+		To add multiple notes to one beat, simply use this format
+		<code>( fret.string fret.string ) .duration</code>
+<div class="alphaTab">
+\title "Smoke on the Water"
+\subtitle "famous riff"
+. 
+(0.3 0.4).4 (3.3 3.4).4 (5.3 5.4).4  r.8 (0.3 0.4).8 |
+r.8 (3.3 3.4).8 r.8 (6.3 6.4).8 (5.3 5.4).4 r.4 |
+(0.3 0.4).4 (3.3 3.4).4 (5.3 5.4).4  r.8 (3.3 3.4).8 |
+r.8 (0.3 0.4).8
+</div>			
+        <h2>Measure Annotations</h2>
+		You often need to adjust some data on one measure to another. i.E. to change the timesignature or tempo.
+		For this, measures support a similar type of tags like the metadata section at the beginning of a measure. The following sample shows the available
+		tags:
+<div class="alphaTab">
+. 
+| \ts 3 4 | \ks Eb | \ro | \rc 2 | \clef bass | \tempo 30
+</div>		
+		<h2>Effects</h2>
+		<h3>Dead Notes</h3>
+		To write dead notes, simply replace the fret number with an x. 
+		<div class="alphaTab">.
+x.6.2 x.5.4 x.4.4 </div>
+		<h2>Syntax Grammar</h2>
+		Here a visualization of the implemented grammar.<br />
+		<img src="images/alphaTabSyntax.png" alt="grammar" />
+		</div>
+    </body>
+</html>
