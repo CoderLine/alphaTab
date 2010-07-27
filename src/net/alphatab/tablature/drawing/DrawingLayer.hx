@@ -62,6 +62,8 @@ class DrawingLayer
 						this.CurrentPosition.Y = elm.Y2; 
 					case "rectTo":
 						graphics.rect(this.CurrentPosition.X, this.CurrentPosition.Y, elm.Width, elm.Height);
+					case "circleTo":
+						graphics.arc(CurrentPosition.X + elm.Radius, CurrentPosition.Y + elm.Radius, elm.Radius, 0,Math.PI*2,true);
 					case "addString":
 						graphics.textBaseline = elm.BaseLine;
 						graphics.font = elm.Font;
@@ -86,9 +88,7 @@ class DrawingLayer
 						graphics.moveTo(elm.X1, elm.Y1);
 						graphics.bezierCurveTo(elm.X2, elm.Y2, elm.X3, elm.Y3, elm.X4, elm.Y4);
 					case "addEllipse":
-						this.Finish(graphics);
-						this.DrawEllipse(graphics, elm.X, elm.Y, elm.Width, elm.Height);
-						graphics.beginPath();
+						graphics.arc(elm.X + elm.Radius, elm.Y + elm.Radius, elm.Radius, 0,Math.PI*2,true);
 					case "addRect":
 						graphics.rect(elm.X, elm.Y, elm.Width, elm.Height);
 				}
@@ -146,11 +146,10 @@ class DrawingLayer
 			Y: (y) + 0.5
 		});
 	}
-	public function EllipseTo(w:Float,h:Float): Void{
+	public function CircleTo(diameter:Float): Void{
 		this.Path.push({
-			Command: "ellipseTo",
-			Width: w,
-			Height: h
+			Command: "circleTo",
+			Radius: diameter/2
 		});
 	}
 	public function AddString(str:String, font:String, x:Float,y:Float, baseline:String="middle"): Void{
@@ -216,13 +215,12 @@ class DrawingLayer
 		});
 	}
 
-	public function AddEllipse (x:Int,y:Int,w:Int,h:Int): Void{
+	public function AddCircle (x:Int,y:Int,diameter:Float): Void{
 		this.Path.push({
-			Command: "addEllipse",
+			Command: "addCircle",
 			X: x,
 			Y: y,
-			Width: w,
-			Height: h
+			Radius: diameter/2
 		});
 	}
 
@@ -240,25 +238,6 @@ class DrawingLayer
 		this.Path.push({Command: "rectTo",
 		Width: w,
 		Height: h});
-	}
-
-	public function DrawEllipse(ctx:Dynamic /*Canvas2dRenderingContext*/, x:Int, y:Int, w:Int, h:Int) : Void
-	{
-		var kappa:Float = .5522848;
-		var ox:Float = (w / 2) * kappa, // control point offset horizontal
-		 oy = (h / 2) * kappa, // control point offset vertical
-		 xe = x + w, // x-end
-		 ye = y + h, // y-end
-		 xm = x + w / 2, // x-middle
-		 ym = y + h / 2; // y-middle
-		ctx.beginPath();
-		ctx.moveTo(x, ym);
-		ctx.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
-		ctx.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
-		ctx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
-		ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
-		ctx.closePath();
-		ctx.stroke();
 	}
 	
 	public function Clear(): Void

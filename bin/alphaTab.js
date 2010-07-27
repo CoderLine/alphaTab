@@ -61,10 +61,10 @@ net.alphatab.tablature.drawing.DrawingLayer.prototype.AddBezier = function(x1,y1
 	this.Path.push({ Command : "addBezier", X1 : x1, Y1 : y1, X2 : x2, Y2 : y2, X3 : x3, Y3 : y3, X4 : x4, Y4 : y4});
 	$s.pop();
 }
-net.alphatab.tablature.drawing.DrawingLayer.prototype.AddEllipse = function(x,y,w,h) {
-	$s.push("net.alphatab.tablature.drawing.DrawingLayer::AddEllipse");
+net.alphatab.tablature.drawing.DrawingLayer.prototype.AddCircle = function(x,y,diameter) {
+	$s.push("net.alphatab.tablature.drawing.DrawingLayer::AddCircle");
 	var $spos = $s.length;
-	this.Path.push({ Command : "addEllipse", X : x, Y : y, Width : w, Height : h});
+	this.Path.push({ Command : "addCircle", X : x, Y : y, Radius : diameter / 2});
 	$s.pop();
 }
 net.alphatab.tablature.drawing.DrawingLayer.prototype.AddLine = function(x1,y1,x2,y2) {
@@ -107,6 +107,12 @@ net.alphatab.tablature.drawing.DrawingLayer.prototype.BezierTo = function(x1,y1,
 	$s.push("net.alphatab.tablature.drawing.DrawingLayer::BezierTo");
 	var $spos = $s.length;
 	this.Path.push({ Command : "bezierTo", X1 : x1, Y1 : y1, X2 : x2, Y2 : y2, X3 : x3, Y3 : y3});
+	$s.pop();
+}
+net.alphatab.tablature.drawing.DrawingLayer.prototype.CircleTo = function(diameter) {
+	$s.push("net.alphatab.tablature.drawing.DrawingLayer::CircleTo");
+	var $spos = $s.length;
+	this.Path.push({ Command : "circleTo", Radius : diameter / 2});
 	$s.pop();
 }
 net.alphatab.tablature.drawing.DrawingLayer.prototype.Clear = function() {
@@ -168,6 +174,9 @@ net.alphatab.tablature.drawing.DrawingLayer.prototype.Draw = function(graphics) 
 				case "rectTo":{
 					graphics.rect(this.CurrentPosition.X,this.CurrentPosition.Y,elm.Width,elm.Height);
 				}break;
+				case "circleTo":{
+					graphics.arc(this.CurrentPosition.X + elm.Radius,this.CurrentPosition.Y + elm.Radius,elm.Radius,0,Math.PI * 2,true);
+				}break;
 				case "addString":{
 					graphics.setTextBaseline(elm.BaseLine);
 					graphics.setFont(elm.Font);
@@ -202,9 +211,7 @@ net.alphatab.tablature.drawing.DrawingLayer.prototype.Draw = function(graphics) 
 					graphics.bezierCurveTo(elm.X2,elm.Y2,elm.X3,elm.Y3,elm.X4,elm.Y4);
 				}break;
 				case "addEllipse":{
-					this.Finish(graphics);
-					this.DrawEllipse(graphics,elm.X,elm.Y,elm.Width,elm.Height);
-					graphics.beginPath();
+					graphics.arc(elm.X + elm.Radius,elm.Y + elm.Radius,elm.Radius,0,Math.PI * 2,true);
 				}break;
 				case "addRect":{
 					graphics.rect(elm.X,elm.Y,elm.Width,elm.Height);
@@ -225,27 +232,6 @@ net.alphatab.tablature.drawing.DrawingLayer.prototype.Draw = function(graphics) 
 		}
 	}
 	this.Finish(graphics);
-	$s.pop();
-}
-net.alphatab.tablature.drawing.DrawingLayer.prototype.DrawEllipse = function(ctx,x,y,w,h) {
-	$s.push("net.alphatab.tablature.drawing.DrawingLayer::DrawEllipse");
-	var $spos = $s.length;
-	var kappa = .5522848;
-	var ox = (w / 2) * kappa, oy = (h / 2) * kappa, xe = x + w, ye = y + h, xm = x + w / 2, ym = y + h / 2;
-	ctx.beginPath();
-	ctx.moveTo(x,ym);
-	ctx.bezierCurveTo(x,ym - oy,xm - ox,y,xm,y);
-	ctx.bezierCurveTo(xm + ox,y,xe,ym - oy,xe,ym);
-	ctx.bezierCurveTo(xe,ym + oy,xm + ox,ye,xm,ye);
-	ctx.bezierCurveTo(xm - ox,ye,x,ym + oy,x,ym);
-	ctx.closePath();
-	ctx.stroke();
-	$s.pop();
-}
-net.alphatab.tablature.drawing.DrawingLayer.prototype.EllipseTo = function(w,h) {
-	$s.push("net.alphatab.tablature.drawing.DrawingLayer::EllipseTo");
-	var $spos = $s.length;
-	this.Path.push({ Command : "ellipseTo", Width : w, Height : h});
 	$s.pop();
 }
 net.alphatab.tablature.drawing.DrawingLayer.prototype.Finish = function(graphics) {
@@ -3368,9 +3354,9 @@ net.alphatab.tablature.model.GsVoiceImpl.prototype.PaintDot = function(layout,la
 	$s.push("net.alphatab.tablature.model.GsVoiceImpl::PaintDot");
 	var $spos = $s.length;
 	var dotSize = 3.0 * scale;
-	layer.AddEllipse(Math.round(x - (dotSize / 2.0)),Math.round(y - (dotSize / 2.0)),dotSize,dotSize);
+	layer.AddCircle(Math.round(x - (dotSize / 2.0)),Math.round(y - (dotSize / 2.0)),dotSize);
 	if(this.Duration.IsDoubleDotted) {
-		layer.AddEllipse(Math.round((x + (dotSize + 2.0)) - (dotSize / 2.0)),Math.round(y - (dotSize / 2.0)),dotSize,dotSize);
+		layer.AddCircle(Math.round((x + (dotSize + 2.0)) - (dotSize / 2.0)),Math.round(y - (dotSize / 2.0)),dotSize);
 	}
 	$s.pop();
 }
@@ -3471,10 +3457,10 @@ net.alphatab.tablature.model.GsVoiceImpl.prototype.PaintSilence = function(layou
 	}
 	if(this.Duration.IsDotted || this.Duration.IsDoubleDotted) {
 		fill.MoveTo(realX + 10,realY + 1);
-		fill.EllipseTo(1,1);
+		fill.CircleTo(1);
 		if(this.Duration.IsDoubleDotted) {
 			fill.MoveTo((realX + 13),realY + 1);
-			fill.EllipseTo(1,1);
+			fill.CircleTo(1);
 		}
 	}
 	this.PaintTriplet(layout,context,x,y);
@@ -5275,6 +5261,13 @@ net.alphatab.file.alphatab.AlphaTabParser.prototype.Measure = function(tempo) {
 	this._song.AddMeasureHeader(header);
 	var measure = this.Factory.NewMeasure(header);
 	header.Tempo.Copy(tempo);
+	if(header.Number > 1) {
+		var prevMeasure = this._track.Measures[header.Number - 2];
+		var prevHeader = this._song.MeasureHeaders[header.Number - 2];
+		measure.Clef = prevMeasure.Clef;
+		header.KeySignature = prevHeader.KeySignature;
+		header.KeySignatureType = prevHeader.KeySignatureType;
+	}
 	this.MeasureMeta(header,measure);
 	tempo.Copy(header.Tempo);
 	this._track.AddMeasure(measure);
@@ -5307,7 +5300,7 @@ net.alphatab.file.alphatab.AlphaTabParser.prototype.MeasureMeta = function(heade
 			if(this._sy != net.alphatab.file.alphatab.AlphaTabSymbols.Number) {
 				throw new net.alphatab.file.FileFormatException((("Expected number, found \"" + this._sy) + "\" on position ") + this._curChPos);
 			}
-			header.RepeatClose = this._syData;
+			header.RepeatClose = Std.parseInt(this._syData) - 1;
 		}
 		else if(this._syData == "ks") {
 			this.NewSy();
@@ -10315,7 +10308,7 @@ net.alphatab.tablature.model.GsNoteImpl.prototype.PaintScoreNote = function(layo
 		var Size = 3;
 		var stringX = realX + xMove;
 		var stringY = (realY2 + (4 * (((direction == net.alphatab.model.GsVoiceDirection.Up)?-1:1))));
-		fill.AddEllipse(stringX - (Size / 2),stringY - (Size / 2),Size,Size);
+		fill.AddCircle(stringX - (Size / 2),stringY - (Size / 2),Size);
 	}
 	if(this.Effect.IsTremoloPicking()) {
 		var s = "";
@@ -11502,9 +11495,9 @@ net.alphatab.tablature.model.GsMeasureImpl.prototype.PaintDivisions2 = function(
 			var xMove = (((lineWidthBig + scale) + lineWidthSmall) + (2.0 * scale));
 			var yMove = (((lineWidthBig + scale) + lineWidthSmall) + (2.0 * scale));
 			fill.MoveTo(Math.floor(x1 + xMove),Math.floor((y1 + ((y2 - y1) / 2)) - (yMove + (size / 2))));
-			fill.EllipseTo(size,size);
+			fill.CircleTo(size);
 			fill.MoveTo(Math.floor(x1 + xMove),Math.floor((y1 + ((y2 - y1) / 2)) + (yMove - (size / 2))));
-			fill.EllipseTo(size,size);
+			fill.CircleTo(size);
 		}
 	}
 	else {
@@ -11523,9 +11516,9 @@ net.alphatab.tablature.model.GsMeasureImpl.prototype.PaintDivisions2 = function(
 			var xMove = ((((lineWidthBig + scale) + lineWidthSmall) + (2.0 * scale)) + size);
 			var yMove = (((lineWidthBig + scale) + lineWidthSmall) + (2.0 * scale));
 			fill.MoveTo(Math.round((x2 - xMove) + this.Spacing),Math.round((y1 + ((y2 - y1) / 2)) - (yMove + (size / 2))));
-			fill.EllipseTo(size,size);
+			fill.CircleTo(size);
 			fill.MoveTo(Math.round((x2 - xMove) + this.Spacing),Math.round((y1 + ((y2 - y1) / 2)) + (yMove - (size / 2))));
-			fill.EllipseTo(size,size);
+			fill.CircleTo(size);
 			if(addInfo) {
 				var repetitions = ("x" + (this.RepeatClose() + 1));
 				var numberSize = context.Graphics.measureText(repetitions);
@@ -13352,7 +13345,7 @@ net.alphatab.platform.js.JsFileLoader.prototype.LoadBinary = function(method,fil
 		$s.push("net.alphatab.platform.js.JsFileLoader::LoadBinary@26");
 		var $spos = $s.length;
 		var reader = new net.alphatab.platform.BinaryReader();
-		reader.initialize(net.alphatab.Utf8.Decode(data));
+		reader.initialize(data);
 		success(reader);
 		$s.pop();
 	}
@@ -13383,7 +13376,7 @@ net.alphatab.platform.js.JsFileLoader.prototype.LoadBinary = function(method,fil
 		$s.push("net.alphatab.platform.js.JsFileLoader::LoadBinary@49");
 		var $spos = $s.length;
 		if(xhr.overrideMimeType) {
-			xhr.overrideMimeType("text/plain; charset=utf-8");
+			xhr.overrideMimeType("text/plain; charset=x-user-defined");
 		}
 		else null;
 		$s.pop();

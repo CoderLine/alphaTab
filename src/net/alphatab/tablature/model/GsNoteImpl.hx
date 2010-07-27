@@ -463,7 +463,7 @@ class GsNoteImpl extends GsNote
 			var stringX:Int = realX + xMove;
 			var stringY:Int = (realY2 + (4 * ((direction == GsVoiceDirection.Up) ? -1 : 1)));
 
-			fill.AddEllipse(cast (stringX - (Size / 2)), cast (stringY - (Size / 2)), Size, Size);
+			fill.AddCircle(cast (stringX - (Size / 2)), cast (stringY - (Size / 2)), Size);
 		}
 		// Tremolo Picking
 		if (Effect.IsTremoloPicking())

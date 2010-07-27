@@ -26,7 +26,7 @@ class JsFileLoader implements FileLoader
 		options.success = function(data:String)
 		{
 			var reader:BinaryReader = new BinaryReader();
-			reader.initialize(Utf8.Decode(data));
+			reader.initialize(data);
 			success(reader);
 		}
 		options.error = function(x:Dynamic, e:String)
@@ -51,7 +51,7 @@ class JsFileLoader implements FileLoader
 			{
 				if (xhr.overrideMimeType)
 				{
-					xhr.overrideMimeType('text/plain; charset=utf-8');
+					xhr.overrideMimeType('text/plain; charset=x-user-defined');
 				}
 			}
 		}

@@ -325,12 +325,12 @@ class GsVoiceImpl extends GsVoice
 		if (Duration.IsDotted || Duration.IsDoubleDotted)
 		{
 			fill.MoveTo(realX + 10, realY + 1);
-			fill.EllipseTo(1, 1);
+			fill.CircleTo(1);
 
 			if (Duration.IsDoubleDotted)
 			{
 				fill.MoveTo((realX + 13), realY + 1);
-				fill.EllipseTo(1, 1);
+				fill.CircleTo(1);
 			}
 		}
 		
@@ -472,11 +472,11 @@ class GsVoiceImpl extends GsVoice
 	public function PaintDot(layout:ViewLayout, layer:DrawingLayer, x:Float, y:Float, scale:Float) : Void
 	{
 		var dotSize:Float = 3.0 * scale;
-		layer.AddEllipse(Math.round(x - (dotSize / 2.0)), Math.round(y - (dotSize / 2.0)), cast dotSize, cast dotSize);
+		layer.AddCircle(Math.round(x - (dotSize / 2.0)), Math.round(y - (dotSize / 2.0)), dotSize);
 
 		if (Duration.IsDoubleDotted)
 		{
-			layer.AddEllipse(Math.round((x + (dotSize + 2.0)) - (dotSize / 2.0)), Math.round(y - (dotSize / 2.0)),cast  dotSize,cast  dotSize);
+			layer.AddCircle(Math.round((x + (dotSize + 2.0)) - (dotSize / 2.0)), Math.round(y - (dotSize / 2.0)), dotSize);
 		}
 	}
 }

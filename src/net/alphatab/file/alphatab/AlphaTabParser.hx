@@ -274,6 +274,13 @@ class AlphaTabParser extends SongReader
 		
 		var measure:GsMeasure = Factory.NewMeasure(header);	
 		header.Tempo.Copy(tempo); // takeover current tempo
+		if (header.Number > 1) { // takeover clef and keysignature
+			var prevMeasure:GsMeasure = _track.Measures[header.Number - 2];
+			var prevHeader:GsMeasureHeader = _song.MeasureHeaders[header.Number - 2];
+			measure.Clef = prevMeasure.Clef;
+			header.KeySignature = prevHeader.KeySignature;
+			header.KeySignatureType = prevHeader.KeySignatureType;
+		}
 		MeasureMeta(header, measure);
 		tempo.Copy(header.Tempo); // write new tempo on change
 		_track.AddMeasure(measure);
@@ -312,7 +319,7 @@ class AlphaTabParser extends SongReader
 				{
 					throw new FileFormatException("Expected number, found \"" + _sy + "\" on position " + _curChPos);
 				}
-					header.RepeatClose = _syData;
+					header.RepeatClose = Std.parseInt(_syData) - 1;
 			}
 			else if (_syData == "ks") {
 				NewSy();

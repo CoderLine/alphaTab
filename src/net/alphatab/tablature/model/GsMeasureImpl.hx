@@ -940,13 +940,11 @@ class GsMeasureImpl extends GsMeasure
 				fill.MoveTo(
 					Math.floor(x1 + xMove),
 					Math.floor(y1 + ((y2 - y1) / 2) - (yMove + (size / 2))));
-				fill.EllipseTo(size, size);
+				fill.CircleTo(size);
 				fill.MoveTo(
 					Math.floor(x1 + xMove),
 					Math.floor(y1 + ((y2 - y1) / 2) + (yMove - (size / 2))));
-				fill.EllipseTo(
-					size,
-					size);
+				fill.CircleTo(size);
 			}
 		}
 		else
@@ -974,13 +972,12 @@ class GsMeasureImpl extends GsMeasure
 
 				fill.MoveTo(Math.round((x2 - xMove) + Spacing),
 					Math.round(y1 + ((y2 - y1) / 2) - (yMove + (size / 2))));
-				fill.EllipseTo(size, size);
+				fill.CircleTo(size);
 
 				fill.MoveTo(
 					Math.round((x2 - xMove) + Spacing),
 					Math.round(y1 + ((y2 - y1) / 2) + (yMove - (size / 2))));
-				fill.EllipseTo(size,
-					size);
+				fill.CircleTo(size);
 
 				if (addInfo)
 				{
