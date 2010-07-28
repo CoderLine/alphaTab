@@ -241,6 +241,10 @@ class AlphaTabParser extends SongReader
 					throw new FileFormatException("Expected Number, found \"" + _sy + "\" on " + _curChPos);
 				}
 			}
+			else 
+			{
+				throw new FileFormatException("Unknown Meta Tag, on " + _curChPos);
+			}
 		}
 	}
 	

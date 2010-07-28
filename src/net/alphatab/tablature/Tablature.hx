@@ -145,10 +145,10 @@ class Tablature
 		// attention, you are not allowed to remove change this notice within any version of this library without permission
 		var msg = "Rendered using alphaTab (http://www.alphaTab.net)";
 		this.Canvas.fillStyle = "#4e4e4e";
-		this.Canvas.font = "bold 11px Arial";
-		this.Canvas.textBaseline = "middle";
+		this.Canvas.font = DrawingResources.CopyrightFont;
+		this.Canvas.textBaseline = "top";
 		var x:Float = (Canvas.Width() - this.Canvas.measureText(msg).width) / 2;
-		this.Canvas.fillText(msg, x, this.Canvas.Height() - 20);
+		this.Canvas.fillText(msg, x, this.Canvas.Height() - 15);
 	}
 	
 	public function Invalidate() 

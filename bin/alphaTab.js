@@ -5452,6 +5452,9 @@ net.alphatab.file.alphatab.AlphaTabParser.prototype.MetaData = function() {
 				throw new net.alphatab.file.FileFormatException((("Expected Number, found \"" + this._sy) + "\" on ") + this._curChPos);
 			}
 		}
+		else {
+			throw new net.alphatab.file.FileFormatException("Unknown Meta Tag, on " + this._curChPos);
+		}
 	}
 	$s.pop();
 }
@@ -15123,25 +15126,27 @@ net.alphatab.tablature.drawing.DrawingResources.EffectFontHeight = null;
 net.alphatab.tablature.drawing.DrawingResources.TitleFont = null;
 net.alphatab.tablature.drawing.DrawingResources.SubtitleFont = null;
 net.alphatab.tablature.drawing.DrawingResources.WordsFont = null;
+net.alphatab.tablature.drawing.DrawingResources.CopyrightFont = null;
 net.alphatab.tablature.drawing.DrawingResources.Init = function(scale) {
 	$s.push("net.alphatab.tablature.drawing.DrawingResources::Init");
 	var $spos = $s.length;
 	net.alphatab.tablature.drawing.DrawingResources.DefaultFontHeight = Math.round(9 * scale);
-	net.alphatab.tablature.drawing.DrawingResources.DefaultFont = net.alphatab.Utils.string(net.alphatab.tablature.drawing.DrawingResources.DefaultFontHeight) + "px Arial";
-	net.alphatab.tablature.drawing.DrawingResources.ChordFont = net.alphatab.Utils.string(9 * scale) + "px Arial";
-	net.alphatab.tablature.drawing.DrawingResources.TimeSignatureFont = net.alphatab.Utils.string(20 * scale) + "px Arial";
-	net.alphatab.tablature.drawing.DrawingResources.ClefFont = net.alphatab.Utils.string(13 * scale) + "px Arial";
-	net.alphatab.tablature.drawing.DrawingResources.MusicFont = net.alphatab.Utils.string(13 * scale) + "px Arial";
-	net.alphatab.tablature.drawing.DrawingResources.TempoFont = net.alphatab.Utils.string(11 * scale) + "px Arial";
+	net.alphatab.tablature.drawing.DrawingResources.DefaultFont = net.alphatab.Utils.string(net.alphatab.tablature.drawing.DrawingResources.DefaultFontHeight) + "px 'Arial'";
+	net.alphatab.tablature.drawing.DrawingResources.ChordFont = net.alphatab.Utils.string(9 * scale) + "px 'Arial'";
+	net.alphatab.tablature.drawing.DrawingResources.TimeSignatureFont = net.alphatab.Utils.string(20 * scale) + "px 'Arial'";
+	net.alphatab.tablature.drawing.DrawingResources.ClefFont = net.alphatab.Utils.string(13 * scale) + "px 'Arial'";
+	net.alphatab.tablature.drawing.DrawingResources.MusicFont = net.alphatab.Utils.string(13 * scale) + "px 'Arial'";
+	net.alphatab.tablature.drawing.DrawingResources.TempoFont = net.alphatab.Utils.string(11 * scale) + "px 'Arial'";
 	net.alphatab.tablature.drawing.DrawingResources.GraceFontHeight = Math.round(9 * scale);
-	net.alphatab.tablature.drawing.DrawingResources.GraceFont = net.alphatab.Utils.string(net.alphatab.tablature.drawing.DrawingResources.GraceFontHeight) + "px Arial";
+	net.alphatab.tablature.drawing.DrawingResources.GraceFont = net.alphatab.Utils.string(net.alphatab.tablature.drawing.DrawingResources.GraceFontHeight) + "px 'Arial'";
 	net.alphatab.tablature.drawing.DrawingResources.NoteFontHeight = Math.round(11 * scale);
-	net.alphatab.tablature.drawing.DrawingResources.NoteFont = net.alphatab.Utils.string(net.alphatab.tablature.drawing.DrawingResources.NoteFontHeight) + "px Arial";
+	net.alphatab.tablature.drawing.DrawingResources.NoteFont = net.alphatab.Utils.string(net.alphatab.tablature.drawing.DrawingResources.NoteFontHeight) + "px 'Arial'";
 	net.alphatab.tablature.drawing.DrawingResources.EffectFontHeight = Math.round(11 * scale);
-	net.alphatab.tablature.drawing.DrawingResources.EffectFont = ("italic " + net.alphatab.Utils.string(net.alphatab.tablature.drawing.DrawingResources.EffectFontHeight)) + "px Times New Roman";
-	net.alphatab.tablature.drawing.DrawingResources.TitleFont = net.alphatab.Utils.string(30 * scale) + "px Times New Roman";
-	net.alphatab.tablature.drawing.DrawingResources.SubtitleFont = net.alphatab.Utils.string(19 * scale) + "px Times New Roman";
-	net.alphatab.tablature.drawing.DrawingResources.WordsFont = net.alphatab.Utils.string(13 * scale) + "px Times New Roman";
+	net.alphatab.tablature.drawing.DrawingResources.EffectFont = ("italic " + net.alphatab.Utils.string(net.alphatab.tablature.drawing.DrawingResources.EffectFontHeight)) + "px 'Times New Roman'";
+	net.alphatab.tablature.drawing.DrawingResources.TitleFont = net.alphatab.Utils.string(30 * scale) + "px 'Times New Roman'";
+	net.alphatab.tablature.drawing.DrawingResources.SubtitleFont = net.alphatab.Utils.string(19 * scale) + "px 'Times New Roman'";
+	net.alphatab.tablature.drawing.DrawingResources.WordsFont = net.alphatab.Utils.string(13 * scale) + "px 'Times New Roman'";
+	net.alphatab.tablature.drawing.DrawingResources.CopyrightFont = ("bold" + net.alphatab.Utils.string(11 * scale)) + "px 'Arial'";
 	$s.pop();
 }
 net.alphatab.tablature.drawing.DrawingResources.GetScoreNoteSize = function(layout,full) {
@@ -16631,10 +16636,10 @@ net.alphatab.tablature.Tablature.prototype.PaintBackground = function() {
 	var $spos = $s.length;
 	var msg = "Rendered using alphaTab (http://www.alphaTab.net)";
 	this.Canvas.setFillStyle("#4e4e4e");
-	this.Canvas.setFont("bold 11px Arial");
-	this.Canvas.setTextBaseline("middle");
+	this.Canvas.setFont(net.alphatab.tablature.drawing.DrawingResources.CopyrightFont);
+	this.Canvas.setTextBaseline("top");
 	var x = (this.Canvas.Width() - this.Canvas.measureText(msg).width) / 2;
-	this.Canvas.fillText(msg,x,this.Canvas.Height() - 20);
+	this.Canvas.fillText(msg,x,this.Canvas.Height() - 15);
 	$s.pop();
 }
 net.alphatab.tablature.Tablature.prototype.SetTrack = function(track) {

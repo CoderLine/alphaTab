@@ -152,6 +152,12 @@ fieldset {
 	margin:7px 7px;
 }
 
+.alphaTab {
+	/* this line is required by IE 
+	   it enables to get newline symbols from div */
+	white-space:pre;	
+}
+
 .codeEditor, code {
 	border:4px solid rgb(190,215,190);
 	background:#F5F5F5;

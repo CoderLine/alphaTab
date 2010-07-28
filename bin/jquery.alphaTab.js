@@ -20,7 +20,7 @@
 		 caret: true,
 		 autoscroll: true,
 		 playerPath: 'alphaTab.jar',
-		 playerTickCallback: null,
+		 playerTickCallback: null
 	};
  
 	var options = $.extend(defaults, options); 
@@ -70,6 +70,12 @@
 				if(options.loadCallback)
 					options.loadCallback(song);
 				container.tablature.SetTrack(song.Tracks[0]);
+				
+				if(container.player)  {
+					var songData = net.alphatab.midi.MidiDataProvider.GetSongMidiData(song, options.factory);
+					setPlayerData(songData);
+					container.updateCaret(0);
+				}
 			}
 			catch(e) 
 			{
@@ -102,10 +108,6 @@
 					if(container.player)  {
 						var songData = net.alphatab.midi.MidiDataProvider.GetSongMidiData(song, options.factory);
 						setPlayerData(songData);
-					}
-					
-					if(options.player)
-					{
 						container.updateCaret(0);
 					}
 					
@@ -136,7 +138,7 @@
 			container.append($('<br />'));
 			container.append(editorArea);
 			// size textarea
-			var str = editorArea.val();
+			var str = editorArea.html(); // val() will remove newlines on IE
 			var cols = editorArea[0].cols;
 			var linecount = 0;
 			$( str.split( "\n" ) ).each( function( i, l ) {

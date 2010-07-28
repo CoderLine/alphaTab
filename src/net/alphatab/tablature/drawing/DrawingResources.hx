@@ -27,26 +27,28 @@ class DrawingResources
 	public static var TitleFont:String;
 	public static var SubtitleFont:String;
 	public static var WordsFont:String;
+	public static var CopyrightFont:String;
 
 	public static function Init(scale:Float) : Void
 	{ 
 		DefaultFontHeight = Math.round(9*scale);
-		DefaultFont = Utils.string(DefaultFontHeight) + "px Arial";
-		ChordFont = Utils.string(9*scale) + "px Arial";
-		TimeSignatureFont = Utils.string(20*scale) + "px Arial";
-		ClefFont = Utils.string(13*scale) + "px Arial";
-		MusicFont = Utils.string(13*scale) + "px Arial";
-		TempoFont = Utils.string(11*scale) + "px Arial";
+		DefaultFont = Utils.string(DefaultFontHeight) + "px 'Arial'";
+		ChordFont = Utils.string(9*scale) + "px 'Arial'";
+		TimeSignatureFont = Utils.string(20*scale) + "px 'Arial'";
+		ClefFont = Utils.string(13*scale) + "px 'Arial'";
+		MusicFont = Utils.string(13*scale) + "px 'Arial'";
+		TempoFont = Utils.string(11*scale) + "px 'Arial'";
 		GraceFontHeight = Math.round(9*scale);
-		GraceFont = Utils.string(GraceFontHeight) + "px Arial";
+		GraceFont = Utils.string(GraceFontHeight) + "px 'Arial'";
 		NoteFontHeight = Math.round(11 * scale);
-		NoteFont = Utils.string(NoteFontHeight) + "px Arial";
+		NoteFont = Utils.string(NoteFontHeight) + "px 'Arial'";
 		EffectFontHeight = Math.round(11 * scale);
-		EffectFont = "italic " + Utils.string(EffectFontHeight) + "px Times New Roman";
+		EffectFont = "italic " + Utils.string(EffectFontHeight) + "px 'Times New Roman'";
 		
-		TitleFont =  Utils.string(30*scale) + "px Times New Roman";
-		SubtitleFont = Utils.string(19 * scale) + "px Times New Roman";
-		WordsFont =  Utils.string(13 * scale) + "px Times New Roman";
+		TitleFont =  Utils.string(30*scale) + "px 'Times New Roman'";
+		SubtitleFont = Utils.string(19 * scale) + "px 'Times New Roman'";
+		WordsFont =  Utils.string(13 * scale) + "px 'Times New Roman'";
+		CopyrightFont =  "bold" + Utils.string(11 * scale) + "px 'Arial'";
 	}
 	
 	public static function GetScoreNoteSize(layout:ViewLayout, full:Bool) : Size

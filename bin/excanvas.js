@@ -526,7 +526,7 @@ if (!document.createElement('canvas').getContext) {
     if (fontStyleCache[styleString]) {
       return fontStyleCache[styleString];
     }
-
+	
     var el = document.createElement('div');
     var style = el.style;
     try {
