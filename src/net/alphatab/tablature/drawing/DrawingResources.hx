@@ -48,7 +48,7 @@ class DrawingResources
 		TitleFont =  Utils.string(30*scale) + "px 'Times New Roman'";
 		SubtitleFont = Utils.string(19 * scale) + "px 'Times New Roman'";
 		WordsFont =  Utils.string(13 * scale) + "px 'Times New Roman'";
-		CopyrightFont =  "bold" + Utils.string(11 * scale) + "px 'Arial'";
+		CopyrightFont =  "bold " + Utils.string(11 * scale) + "px 'Arial'";
 	}
 	
 	public static function GetScoreNoteSize(layout:ViewLayout, full:Bool) : Size

@@ -6,132 +6,79 @@ if(!net.alphatab.tablature.drawing) net.alphatab.tablature.drawing = {}
 net.alphatab.tablature.drawing.TripletFeelPainter = function() { }
 net.alphatab.tablature.drawing.TripletFeelPainter.__name__ = ["net","alphatab","tablature","drawing","TripletFeelPainter"];
 net.alphatab.tablature.drawing.TripletFeelPainter.PaintTripletFeel16 = function(context,x,y,scale) {
-	$s.push("net.alphatab.tablature.drawing.TripletFeelPainter::PaintTripletFeel16");
-	var $spos = $s.length;
 	y -= Math.floor(3 * scale);
 	var layer = context.Get(net.alphatab.tablature.drawing.DrawingLayers.MainComponents);
 	layer.AddMusicSymbol(net.alphatab.tablature.drawing.MusicFont.TripletFeel16,x,y,scale);
-	$s.pop();
 }
 net.alphatab.tablature.drawing.TripletFeelPainter.PaintTripletFeel8 = function(context,x,y,scale) {
-	$s.push("net.alphatab.tablature.drawing.TripletFeelPainter::PaintTripletFeel8");
-	var $spos = $s.length;
 	y -= Math.floor(3 * scale);
 	var layer = context.Get(net.alphatab.tablature.drawing.DrawingLayers.MainComponents);
 	layer.AddMusicSymbol(net.alphatab.tablature.drawing.MusicFont.TripletFeel8,x,y,scale);
-	$s.pop();
 }
 net.alphatab.tablature.drawing.TripletFeelPainter.PaintTripletFeelNone16 = function(context,x,y,scale) {
-	$s.push("net.alphatab.tablature.drawing.TripletFeelPainter::PaintTripletFeelNone16");
-	var $spos = $s.length;
 	y -= Math.floor(3 * scale);
 	var layer = context.Get(net.alphatab.tablature.drawing.DrawingLayers.MainComponents);
 	layer.AddMusicSymbol(net.alphatab.tablature.drawing.MusicFont.TripletFeelNone16,x,y,scale);
-	$s.pop();
 }
 net.alphatab.tablature.drawing.TripletFeelPainter.PaintTripletFeelNone8 = function(context,x,y,scale) {
-	$s.push("net.alphatab.tablature.drawing.TripletFeelPainter::PaintTripletFeelNone8");
-	var $spos = $s.length;
 	y -= Math.floor(3 * scale);
 	var layer = context.Get(net.alphatab.tablature.drawing.DrawingLayers.MainComponents);
 	layer.AddMusicSymbol(net.alphatab.tablature.drawing.MusicFont.TripletFeelNone8,x,y,scale);
-	$s.pop();
 }
 net.alphatab.tablature.drawing.TripletFeelPainter.prototype.__class__ = net.alphatab.tablature.drawing.TripletFeelPainter;
 net.alphatab.tablature.drawing.DrawingLayer = function(color,isFilled,penWidth) { if( color === $_ ) return; {
-	$s.push("net.alphatab.tablature.drawing.DrawingLayer::new");
-	var $spos = $s.length;
 	this.Path = new Array();
 	this.Color = color;
 	this.IsFilled = isFilled;
 	this.PenWidth = penWidth;
 	this.CurrentPosition = new net.alphatab.model.Point(0,0);
-	$s.pop();
 }}
 net.alphatab.tablature.drawing.DrawingLayer.__name__ = ["net","alphatab","tablature","drawing","DrawingLayer"];
 net.alphatab.tablature.drawing.DrawingLayer.prototype.AddArc = function(x,y,w,h,startAngle,sweepAngle) {
-	$s.push("net.alphatab.tablature.drawing.DrawingLayer::AddArc");
-	var $spos = $s.length;
 	this.Path.push({ Command : "addArc", X : x, Y : y, Width : w, Height : h, StartAngle : startAngle, SweepAngle : sweepAngle});
-	$s.pop();
 }
 net.alphatab.tablature.drawing.DrawingLayer.prototype.AddBezier = function(x1,y1,x2,y2,x3,y3,x4,y4) {
-	$s.push("net.alphatab.tablature.drawing.DrawingLayer::AddBezier");
-	var $spos = $s.length;
 	this.Path.push({ Command : "addBezier", X1 : x1, Y1 : y1, X2 : x2, Y2 : y2, X3 : x3, Y3 : y3, X4 : x4, Y4 : y4});
-	$s.pop();
 }
 net.alphatab.tablature.drawing.DrawingLayer.prototype.AddCircle = function(x,y,diameter) {
-	$s.push("net.alphatab.tablature.drawing.DrawingLayer::AddCircle");
-	var $spos = $s.length;
 	this.Path.push({ Command : "addCircle", X : x, Y : y, Radius : diameter / 2});
-	$s.pop();
 }
 net.alphatab.tablature.drawing.DrawingLayer.prototype.AddLine = function(x1,y1,x2,y2) {
-	$s.push("net.alphatab.tablature.drawing.DrawingLayer::AddLine");
-	var $spos = $s.length;
 	this.Path.push({ Command : "addLine", X1 : (x1) + 0.5, Y1 : (y1) + 0.5, X2 : (x2) + 0.5, Y2 : (y2) + 0.5});
-	$s.pop();
 }
 net.alphatab.tablature.drawing.DrawingLayer.prototype.AddMusicSymbol = function(symbol,x,y,xScale,yScale) {
-	$s.push("net.alphatab.tablature.drawing.DrawingLayer::AddMusicSymbol");
-	var $spos = $s.length;
 	if(yScale == null) yScale = 0;
 	if(yScale == 0) {
 		yScale = xScale;
 	}
 	var painter = new net.alphatab.tablature.drawing.SvgPainter(this,symbol,x,y,xScale,yScale);
 	painter.Paint();
-	$s.pop();
 }
 net.alphatab.tablature.drawing.DrawingLayer.prototype.AddPolygon = function(points) {
-	$s.push("net.alphatab.tablature.drawing.DrawingLayer::AddPolygon");
-	var $spos = $s.length;
 	this.Path.push({ Command : "addPolygon", Points : points});
-	$s.pop();
 }
 net.alphatab.tablature.drawing.DrawingLayer.prototype.AddRect = function(x,y,w,h) {
-	$s.push("net.alphatab.tablature.drawing.DrawingLayer::AddRect");
-	var $spos = $s.length;
 	this.Path.push({ Command : "addRect", X : x, Y : y, Width : w, Height : h});
-	$s.pop();
 }
 net.alphatab.tablature.drawing.DrawingLayer.prototype.AddString = function(str,font,x,y,baseline) {
-	$s.push("net.alphatab.tablature.drawing.DrawingLayer::AddString");
-	var $spos = $s.length;
 	if(baseline == null) baseline = "middle";
 	this.Path.push({ Command : "addString", Text : str, Font : font, X : (x) + 0.5, Y : (y) + 0.5, BaseLine : baseline});
-	$s.pop();
 }
 net.alphatab.tablature.drawing.DrawingLayer.prototype.BezierTo = function(x1,y1,x2,y2,x3,y3) {
-	$s.push("net.alphatab.tablature.drawing.DrawingLayer::BezierTo");
-	var $spos = $s.length;
 	this.Path.push({ Command : "bezierTo", X1 : x1, Y1 : y1, X2 : x2, Y2 : y2, X3 : x3, Y3 : y3});
-	$s.pop();
 }
 net.alphatab.tablature.drawing.DrawingLayer.prototype.CircleTo = function(diameter) {
-	$s.push("net.alphatab.tablature.drawing.DrawingLayer::CircleTo");
-	var $spos = $s.length;
 	this.Path.push({ Command : "circleTo", Radius : diameter / 2});
-	$s.pop();
 }
 net.alphatab.tablature.drawing.DrawingLayer.prototype.Clear = function() {
-	$s.push("net.alphatab.tablature.drawing.DrawingLayer::Clear");
-	var $spos = $s.length;
 	this.Path = new Array();
-	$s.pop();
 }
 net.alphatab.tablature.drawing.DrawingLayer.prototype.CloseFigure = function() {
-	$s.push("net.alphatab.tablature.drawing.DrawingLayer::CloseFigure");
-	var $spos = $s.length;
 	this.Path.push({ Command : "closeFigure"});
-	$s.pop();
 }
 net.alphatab.tablature.drawing.DrawingLayer.prototype.Color = null;
 net.alphatab.tablature.drawing.DrawingLayer.prototype.CurrentPosition = null;
 net.alphatab.tablature.drawing.DrawingLayer.prototype.Draw = function(graphics) {
-	$s.push("net.alphatab.tablature.drawing.DrawingLayer::Draw");
-	var $spos = $s.length;
 	graphics.setTextBaseline("middle");
 	graphics.setFillStyle(this.Color.toString());
 	graphics.setStrokeStyle(this.Color.toString());
@@ -222,9 +169,6 @@ net.alphatab.tablature.drawing.DrawingLayer.prototype.Draw = function(graphics) 
 				if( js.Boot.__instanceof($e0,String) ) {
 					var err = $e0;
 					{
-						$e = [];
-						while($s.length >= $spos) $e.unshift($s.pop());
-						$s.push($e[0]);
 						throw err;
 					}
 				} else throw($e0);
@@ -232,68 +176,43 @@ net.alphatab.tablature.drawing.DrawingLayer.prototype.Draw = function(graphics) 
 		}
 	}
 	this.Finish(graphics);
-	$s.pop();
 }
 net.alphatab.tablature.drawing.DrawingLayer.prototype.Finish = function(graphics) {
-	$s.push("net.alphatab.tablature.drawing.DrawingLayer::Finish");
-	var $spos = $s.length;
 	if(this.IsFilled) {
 		graphics.fill();
 	}
 	else {
 		graphics.stroke();
 	}
-	$s.pop();
 }
 net.alphatab.tablature.drawing.DrawingLayer.prototype.IsFilled = null;
 net.alphatab.tablature.drawing.DrawingLayer.prototype.LineTo = function(x,y) {
-	$s.push("net.alphatab.tablature.drawing.DrawingLayer::LineTo");
-	var $spos = $s.length;
 	this.Path.push({ Command : "lineTo", X : (x) + 0.5, Y : (y) + 0.5});
-	$s.pop();
 }
 net.alphatab.tablature.drawing.DrawingLayer.prototype.MoveTo = function(x,y) {
-	$s.push("net.alphatab.tablature.drawing.DrawingLayer::MoveTo");
-	var $spos = $s.length;
 	this.Path.push({ Command : "moveTo", X : Math.round(x) + 0.5, Y : Math.round(y) + 0.5});
-	$s.pop();
 }
 net.alphatab.tablature.drawing.DrawingLayer.prototype.Path = null;
 net.alphatab.tablature.drawing.DrawingLayer.prototype.PenWidth = null;
 net.alphatab.tablature.drawing.DrawingLayer.prototype.QuadraticCurveTo = function(x1,y1,x2,y2) {
-	$s.push("net.alphatab.tablature.drawing.DrawingLayer::QuadraticCurveTo");
-	var $spos = $s.length;
 	this.Path.push({ Command : "quadraticCurveTo", X1 : x1, Y1 : y1, X2 : x2, Y2 : y2});
-	$s.pop();
 }
 net.alphatab.tablature.drawing.DrawingLayer.prototype.RectTo = function(w,h) {
-	$s.push("net.alphatab.tablature.drawing.DrawingLayer::RectTo");
-	var $spos = $s.length;
 	this.Path.push({ Command : "rectTo", Width : w, Height : h});
-	$s.pop();
 }
 net.alphatab.tablature.drawing.DrawingLayer.prototype.StartFigure = function() {
-	$s.push("net.alphatab.tablature.drawing.DrawingLayer::StartFigure");
-	var $spos = $s.length;
 	this.Path.push({ Command : "startFigure"});
-	$s.pop();
 }
 net.alphatab.tablature.drawing.DrawingLayer.prototype.__class__ = net.alphatab.tablature.drawing.DrawingLayer;
 if(!net.alphatab.model) net.alphatab.model = {}
 net.alphatab.model.GsTimeSignature = function(factory) { if( factory === $_ ) return; {
-	$s.push("net.alphatab.model.GsTimeSignature::new");
-	var $spos = $s.length;
 	this.Numerator = 4;
 	this.Denominator = factory.NewDuration();
-	$s.pop();
 }}
 net.alphatab.model.GsTimeSignature.__name__ = ["net","alphatab","model","GsTimeSignature"];
 net.alphatab.model.GsTimeSignature.prototype.Copy = function(timeSignature) {
-	$s.push("net.alphatab.model.GsTimeSignature::Copy");
-	var $spos = $s.length;
 	timeSignature.Numerator = this.Numerator;
 	this.Denominator.Copy(timeSignature.Denominator);
-	$s.pop();
 }
 net.alphatab.model.GsTimeSignature.prototype.Denominator = null;
 net.alphatab.model.GsTimeSignature.prototype.Numerator = null;
@@ -311,19 +230,10 @@ net.alphatab.model.GsBeatStrokeDirection.Up.__enum__ = net.alphatab.model.GsBeat
 net.alphatab.Utils = function() { }
 net.alphatab.Utils.__name__ = ["net","alphatab","Utils"];
 net.alphatab.Utils.string = function(data) {
-	$s.push("net.alphatab.Utils::string");
-	var $spos = $s.length;
-	{
-		var $tmp = new String(data);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new String(data);
 }
 net.alphatab.Utils.prototype.__class__ = net.alphatab.Utils;
 net.alphatab.model.GsChord = function(length) { if( length === $_ ) return; {
-	$s.push("net.alphatab.model.GsChord::new");
-	var $spos = $s.length;
 	this.Strings = new Array();
 	{
 		var _g = 0;
@@ -332,15 +242,12 @@ net.alphatab.model.GsChord = function(length) { if( length === $_ ) return; {
 			this.Strings.push(-1);
 		}
 	}
-	$s.pop();
 }}
 net.alphatab.model.GsChord.__name__ = ["net","alphatab","model","GsChord"];
 net.alphatab.model.GsChord.prototype.Beat = null;
 net.alphatab.model.GsChord.prototype.FirstFret = null;
 net.alphatab.model.GsChord.prototype.Name = null;
 net.alphatab.model.GsChord.prototype.NoteCount = function() {
-	$s.push("net.alphatab.model.GsChord::NoteCount");
-	var $spos = $s.length;
 	var count = 0;
 	{
 		var _g1 = 0, _g = this.Strings.length;
@@ -349,31 +256,17 @@ net.alphatab.model.GsChord.prototype.NoteCount = function() {
 			if(this.Strings[i] >= 0) count++;
 		}
 	}
-	{
-		$s.pop();
-		return count;
-	}
-	$s.pop();
+	return count;
 }
 net.alphatab.model.GsChord.prototype.StringCount = function() {
-	$s.push("net.alphatab.model.GsChord::StringCount");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Strings.length;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Strings.length;
 }
 net.alphatab.model.GsChord.prototype.Strings = null;
 net.alphatab.model.GsChord.prototype.__class__ = net.alphatab.model.GsChord;
 net.alphatab.model.GsMixTableItem = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.model.GsMixTableItem::new");
-	var $spos = $s.length;
 	this.Value = 0;
 	this.Duration = 0;
 	this.AllTracks = false;
-	$s.pop();
 }}
 net.alphatab.model.GsMixTableItem.__name__ = ["net","alphatab","model","GsMixTableItem"];
 net.alphatab.model.GsMixTableItem.prototype.AllTracks = null;
@@ -382,39 +275,25 @@ net.alphatab.model.GsMixTableItem.prototype.Value = null;
 net.alphatab.model.GsMixTableItem.prototype.__class__ = net.alphatab.model.GsMixTableItem;
 if(!net.alphatab.model.effects) net.alphatab.model.effects = {}
 net.alphatab.model.effects.GsTremoloPickingEffect = function(factory) { if( factory === $_ ) return; {
-	$s.push("net.alphatab.model.effects.GsTremoloPickingEffect::new");
-	var $spos = $s.length;
 	this.Duration = factory.NewDuration();
-	$s.pop();
 }}
 net.alphatab.model.effects.GsTremoloPickingEffect.__name__ = ["net","alphatab","model","effects","GsTremoloPickingEffect"];
 net.alphatab.model.effects.GsTremoloPickingEffect.prototype.Clone = function(factory) {
-	$s.push("net.alphatab.model.effects.GsTremoloPickingEffect::Clone");
-	var $spos = $s.length;
 	var effect = factory.NewTremoloPickingEffect();
 	effect.Duration.Value = this.Duration.Value;
 	effect.Duration.IsDotted = this.Duration.IsDotted;
 	effect.Duration.IsDoubleDotted = this.Duration.IsDoubleDotted;
 	effect.Duration.Triplet.Enters = this.Duration.Triplet.Enters;
 	effect.Duration.Triplet.Times = this.Duration.Triplet.Times;
-	{
-		$s.pop();
-		return effect;
-	}
-	$s.pop();
+	return effect;
 }
 net.alphatab.model.effects.GsTremoloPickingEffect.prototype.Duration = null;
 net.alphatab.model.effects.GsTremoloPickingEffect.prototype.__class__ = net.alphatab.model.effects.GsTremoloPickingEffect;
 net.alphatab.model.SongManager = function(factory) { if( factory === $_ ) return; {
-	$s.push("net.alphatab.model.SongManager::new");
-	var $spos = $s.length;
 	this.Factory = factory;
-	$s.pop();
 }}
 net.alphatab.model.SongManager.__name__ = ["net","alphatab","model","SongManager"];
 net.alphatab.model.SongManager.GetDivisionLength = function(header) {
-	$s.push("net.alphatab.model.SongManager::GetDivisionLength");
-	var $spos = $s.length;
 	var defaulLenght = 960;
 	var denominator = header.TimeSignature.Denominator.Value;
 	switch(denominator) {
@@ -422,15 +301,9 @@ net.alphatab.model.SongManager.GetDivisionLength = function(header) {
 		if(header.TimeSignature.Numerator % 3 == 0) defaulLenght += Math.floor(960 / 2);
 	}break;
 	}
-	{
-		$s.pop();
-		return defaulLenght;
-	}
-	$s.pop();
+	return defaulLenght;
 }
 net.alphatab.model.SongManager.GetNextBeat2 = function(beats,currentBeat) {
-	$s.push("net.alphatab.model.SongManager::GetNextBeat2");
-	var $spos = $s.length;
 	var oNext = null;
 	{
 		var _g = 0;
@@ -442,15 +315,9 @@ net.alphatab.model.SongManager.GetNextBeat2 = function(beats,currentBeat) {
 			}
 		}
 	}
-	{
-		$s.pop();
-		return oNext;
-	}
-	$s.pop();
+	return oNext;
 }
 net.alphatab.model.SongManager.GetNextVoice = function(beats,beat,index) {
-	$s.push("net.alphatab.model.SongManager::GetNextVoice");
-	var $spos = $s.length;
 	var next = null;
 	{
 		var _g = 0;
@@ -462,15 +329,9 @@ net.alphatab.model.SongManager.GetNextVoice = function(beats,beat,index) {
 			}
 		}
 	}
-	{
-		$s.pop();
-		return next;
-	}
-	$s.pop();
+	return next;
 }
 net.alphatab.model.SongManager.GetFirstVoice = function(beats,index) {
-	$s.push("net.alphatab.model.SongManager::GetFirstVoice");
-	var $spos = $s.length;
 	var first = null;
 	{
 		var _g = 0;
@@ -480,35 +341,20 @@ net.alphatab.model.SongManager.GetFirstVoice = function(beats,index) {
 			if((first == null || current.Start < first.Beat.Start) && !current.Voices[index].IsEmpty) first = current.Voices[index];
 		}
 	}
-	{
-		$s.pop();
-		return first;
-	}
-	$s.pop();
+	return first;
 }
 net.alphatab.model.SongManager.GetBeat = function(measure,start) {
-	$s.push("net.alphatab.model.SongManager::GetBeat");
-	var $spos = $s.length;
 	{
 		var _g = 0, _g1 = measure.Beats;
 		while(_g < _g1.length) {
 			var beat = _g1[_g];
 			++_g;
-			if(beat.Start == start) {
-				$s.pop();
-				return beat;
-			}
+			if(beat.Start == start) return beat;
 		}
 	}
-	{
-		$s.pop();
-		return null;
-	}
-	$s.pop();
+	return null;
 }
 net.alphatab.model.SongManager.QuickSort = function(elements,left,right) {
-	$s.push("net.alphatab.model.SongManager::QuickSort");
-	var $spos = $s.length;
 	var i = left;
 	var j = right;
 	var pivot = elements[Math.floor((left + right) / 2)];
@@ -525,18 +371,12 @@ net.alphatab.model.SongManager.QuickSort = function(elements,left,right) {
 	} while(i <= j);
 	if(left < j) net.alphatab.model.SongManager.QuickSort(elements,left,j);
 	if(i < right) net.alphatab.model.SongManager.QuickSort(elements,i,right);
-	$s.pop();
 }
 net.alphatab.model.SongManager.prototype.AutoCompleteSilences = function(measure) {
-	$s.push("net.alphatab.model.SongManager::AutoCompleteSilences");
-	var $spos = $s.length;
 	var beat = this.GetFirstBeat(measure.Beats);
 	if(beat == null) {
 		this.CreateSilences(measure,measure.Start(),measure.Length(),0);
-		{
-			$s.pop();
-			return;
-		}
+		return;
 	}
 	{
 		var _g = 0;
@@ -589,11 +429,8 @@ net.alphatab.model.SongManager.prototype.AutoCompleteSilences = function(measure
 		}
 		beat = net.alphatab.model.SongManager.GetNextBeat2(measure.Beats,beat);
 	}
-	$s.pop();
 }
 net.alphatab.model.SongManager.prototype.CreateDurations = function(time) {
-	$s.push("net.alphatab.model.SongManager::CreateDurations");
-	var $spos = $s.length;
 	var durations = new Array();
 	var min = this.Factory.NewDuration();
 	min.Value = 64;
@@ -607,15 +444,9 @@ net.alphatab.model.SongManager.prototype.CreateDurations = function(time) {
 		durations.push(oDuration.Clone(this.Factory));
 		missing -= oDuration.Time();
 	}
-	{
-		$s.pop();
-		return durations;
-	}
-	$s.pop();
+	return durations;
 }
 net.alphatab.model.SongManager.prototype.CreateSilences = function(measure,start,length,voiceIndex) {
-	$s.push("net.alphatab.model.SongManager::CreateSilences");
-	var $spos = $s.length;
 	var nextStart = start;
 	var durations = this.CreateDurations(length);
 	{
@@ -638,52 +469,25 @@ net.alphatab.model.SongManager.prototype.CreateSilences = function(measure,start
 			nextStart += duration.Time();
 		}
 	}
-	$s.pop();
 }
 net.alphatab.model.SongManager.prototype.Factory = null;
 net.alphatab.model.SongManager.prototype.GetFirstBeat = function(list) {
-	$s.push("net.alphatab.model.SongManager::GetFirstBeat");
-	var $spos = $s.length;
-	{
-		var $tmp = (list.length > 0?list[0]:null);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (list.length > 0?list[0]:null);
 }
 net.alphatab.model.SongManager.prototype.GetFirstMeasure = function(track) {
-	$s.push("net.alphatab.model.SongManager::GetFirstMeasure");
-	var $spos = $s.length;
-	{
-		var $tmp = (track.MeasureCount() > 0?track.Measures[0]:null);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (track.MeasureCount() > 0?track.Measures[0]:null);
 }
-net.alphatab.model.SongManager.prototype.GetNextBeat = function(beat,voice) {
-	$s.push("net.alphatab.model.SongManager::GetNextBeat");
-	var $spos = $s.length;
+net.alphatab.model.SongManager.prototype.GetNextBeat = function(beat) {
 	var nextBeat = net.alphatab.model.SongManager.GetNextBeat2(beat.Measure.Beats,beat);
 	if(nextBeat == null && beat.Measure.Track.MeasureCount() > beat.Measure.Number()) {
 		var measure = beat.Measure.Track.Measures[beat.Measure.Number()];
 		if(measure.BeatCount() > 0) {
-			{
-				var $tmp = measure.Beats[0];
-				$s.pop();
-				return $tmp;
-			}
+			return measure.Beats[0];
 		}
 	}
-	{
-		$s.pop();
-		return nextBeat;
-	}
-	$s.pop();
+	return nextBeat;
 }
 net.alphatab.model.SongManager.prototype.GetNextNote = function(measure,start,voiceIndex,guitarString) {
-	$s.push("net.alphatab.model.SongManager::GetNextNote");
-	var $spos = $s.length;
 	var beat = net.alphatab.model.SongManager.GetBeat(measure,start);
 	if(beat != null) {
 		var next = net.alphatab.model.SongManager.GetNextBeat2(measure.Beats,beat);
@@ -695,52 +499,26 @@ net.alphatab.model.SongManager.prototype.GetNextNote = function(measure,start,vo
 					while(_g < _g1.length) {
 						var current = _g1[_g];
 						++_g;
-						if(current.String == guitarString || guitarString == -1) {
-							$s.pop();
-							return current;
-						}
+						if(current.String == guitarString || guitarString == -1) return current;
 					}
 				}
 			}
 			next = net.alphatab.model.SongManager.GetNextBeat2(measure.Beats,next);
 		}
 	}
-	{
-		$s.pop();
-		return null;
-	}
-	$s.pop();
+	return null;
 }
 net.alphatab.model.SongManager.prototype.GetPreviousMeasure = function(measure) {
-	$s.push("net.alphatab.model.SongManager::GetPreviousMeasure");
-	var $spos = $s.length;
-	{
-		var $tmp = (measure.Number() > 1?measure.Track.Measures[measure.Number() - 2]:null);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (measure.Number() > 1?measure.Track.Measures[measure.Number() - 2]:null);
 }
 net.alphatab.model.SongManager.prototype.GetPreviousMeasureHeader = function(header) {
-	$s.push("net.alphatab.model.SongManager::GetPreviousMeasureHeader");
-	var $spos = $s.length;
 	var prevIndex = header.Number - 1;
 	if(prevIndex > 0) {
-		{
-			var $tmp = header.Song.MeasureHeaders[prevIndex - 1];
-			$s.pop();
-			return $tmp;
-		}
+		return header.Song.MeasureHeaders[prevIndex - 1];
 	}
-	{
-		$s.pop();
-		return null;
-	}
-	$s.pop();
+	return null;
 }
 net.alphatab.model.SongManager.prototype.GetRealStart = function(measure,currentStart) {
-	$s.push("net.alphatab.model.SongManager::GetRealStart");
-	var $spos = $s.length;
 	var beatLength = net.alphatab.model.SongManager.GetDivisionLength(measure.Header);
 	var start = currentStart;
 	var startBeat = start % beatLength == 0;
@@ -761,47 +539,29 @@ net.alphatab.model.SongManager.prototype.GetRealStart = function(measure,current
 		}
 		if(!startBeat) start = currentStart;
 	}
-	{
-		$s.pop();
-		return start;
-	}
-	$s.pop();
+	return start;
 }
 net.alphatab.model.SongManager.prototype.OrderBeats = function(measure) {
-	$s.push("net.alphatab.model.SongManager::OrderBeats");
-	var $spos = $s.length;
 	net.alphatab.model.SongManager.QuickSort(measure.Beats,0,measure.BeatCount() - 1);
-	$s.pop();
 }
 net.alphatab.model.SongManager.prototype.__class__ = net.alphatab.model.SongManager;
 List = function(p) { if( p === $_ ) return; {
-	$s.push("List::new");
-	var $spos = $s.length;
 	this.length = 0;
-	$s.pop();
 }}
 List.__name__ = ["List"];
 List.prototype.add = function(item) {
-	$s.push("List::add");
-	var $spos = $s.length;
 	var x = [item];
 	if(this.h == null) this.h = x;
 	else this.q[1] = x;
 	this.q = x;
 	this.length++;
-	$s.pop();
 }
 List.prototype.clear = function() {
-	$s.push("List::clear");
-	var $spos = $s.length;
 	this.h = null;
 	this.q = null;
 	this.length = 0;
-	$s.pop();
 }
 List.prototype.filter = function(f) {
-	$s.push("List::filter");
-	var $spos = $s.length;
 	var l2 = new List();
 	var l = this.h;
 	while(l != null) {
@@ -809,69 +569,26 @@ List.prototype.filter = function(f) {
 		l = l[1];
 		if(f(v)) l2.add(v);
 	}
-	{
-		$s.pop();
-		return l2;
-	}
-	$s.pop();
+	return l2;
 }
 List.prototype.first = function() {
-	$s.push("List::first");
-	var $spos = $s.length;
-	{
-		var $tmp = (this.h == null?null:this.h[0]);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (this.h == null?null:this.h[0]);
 }
 List.prototype.h = null;
 List.prototype.isEmpty = function() {
-	$s.push("List::isEmpty");
-	var $spos = $s.length;
-	{
-		var $tmp = (this.h == null);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (this.h == null);
 }
 List.prototype.iterator = function() {
-	$s.push("List::iterator");
-	var $spos = $s.length;
-	{
-		var $tmp = { h : this.h, hasNext : function() {
-			$s.push("List::iterator@196");
-			var $spos = $s.length;
-			{
-				var $tmp = (this.h != null);
-				$s.pop();
-				return $tmp;
-			}
-			$s.pop();
-		}, next : function() {
-			$s.push("List::iterator@199");
-			var $spos = $s.length;
-			if(this.h == null) {
-				$s.pop();
-				return null;
-			}
-			var x = this.h[0];
-			this.h = this.h[1];
-			{
-				$s.pop();
-				return x;
-			}
-			$s.pop();
-		}}
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return { h : this.h, hasNext : function() {
+		return (this.h != null);
+	}, next : function() {
+		if(this.h == null) return null;
+		var x = this.h[0];
+		this.h = this.h[1];
+		return x;
+	}}
 }
 List.prototype.join = function(sep) {
-	$s.push("List::join");
-	var $spos = $s.length;
 	var s = new StringBuf();
 	var first = true;
 	var l = this.h;
@@ -881,27 +598,13 @@ List.prototype.join = function(sep) {
 		s.b[s.b.length] = l[0];
 		l = l[1];
 	}
-	{
-		var $tmp = s.b.join("");
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return s.b.join("");
 }
 List.prototype.last = function() {
-	$s.push("List::last");
-	var $spos = $s.length;
-	{
-		var $tmp = (this.q == null?null:this.q[0]);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (this.q == null?null:this.q[0]);
 }
 List.prototype.length = null;
 List.prototype.map = function(f) {
-	$s.push("List::map");
-	var $spos = $s.length;
 	var b = new List();
 	var l = this.h;
 	while(l != null) {
@@ -909,42 +612,24 @@ List.prototype.map = function(f) {
 		l = l[1];
 		b.add(f(v));
 	}
-	{
-		$s.pop();
-		return b;
-	}
-	$s.pop();
+	return b;
 }
 List.prototype.pop = function() {
-	$s.push("List::pop");
-	var $spos = $s.length;
-	if(this.h == null) {
-		$s.pop();
-		return null;
-	}
+	if(this.h == null) return null;
 	var x = this.h[0];
 	this.h = this.h[1];
 	if(this.h == null) this.q = null;
 	this.length--;
-	{
-		$s.pop();
-		return x;
-	}
-	$s.pop();
+	return x;
 }
 List.prototype.push = function(item) {
-	$s.push("List::push");
-	var $spos = $s.length;
 	var x = [item,this.h];
 	this.h = x;
 	if(this.q == null) this.q = x;
 	this.length++;
-	$s.pop();
 }
 List.prototype.q = null;
 List.prototype.remove = function(v) {
-	$s.push("List::remove");
-	var $spos = $s.length;
 	var prev = null;
 	var l = this.h;
 	while(l != null) {
@@ -953,23 +638,14 @@ List.prototype.remove = function(v) {
 			else prev[1] = l[1];
 			if(this.q == l) this.q = prev;
 			this.length--;
-			{
-				$s.pop();
-				return true;
-			}
+			return true;
 		}
 		prev = l;
 		l = l[1];
 	}
-	{
-		$s.pop();
-		return false;
-	}
-	$s.pop();
+	return false;
 }
 List.prototype.toString = function() {
-	$s.push("List::toString");
-	var $spos = $s.length;
 	var s = new StringBuf();
 	var first = true;
 	var l = this.h;
@@ -981,65 +657,31 @@ List.prototype.toString = function() {
 		l = l[1];
 	}
 	s.b[s.b.length] = "}";
-	{
-		var $tmp = s.b.join("");
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return s.b.join("");
 }
 List.prototype.__class__ = List;
 IntIter = function(min,max) { if( min === $_ ) return; {
-	$s.push("IntIter::new");
-	var $spos = $s.length;
 	this.min = min;
 	this.max = max;
-	$s.pop();
 }}
 IntIter.__name__ = ["IntIter"];
 IntIter.prototype.hasNext = function() {
-	$s.push("IntIter::hasNext");
-	var $spos = $s.length;
-	{
-		var $tmp = this.min < this.max;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.min < this.max;
 }
 IntIter.prototype.max = null;
 IntIter.prototype.min = null;
 IntIter.prototype.next = function() {
-	$s.push("IntIter::next");
-	var $spos = $s.length;
-	{
-		var $tmp = this.min++;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.min++;
 }
 IntIter.prototype.__class__ = IntIter;
 net.alphatab.Utf8 = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.Utf8::new");
-	var $spos = $s.length;
 	null;
-	$s.pop();
 }}
 net.alphatab.Utf8.__name__ = ["net","alphatab","Utf8"];
 net.alphatab.Utf8.ToUnicode = function(chr) {
-	$s.push("net.alphatab.Utf8::ToUnicode");
-	var $spos = $s.length;
-	{
-		var $tmp = String.fromCharCode(chr);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return String.fromCharCode(chr);
 }
 net.alphatab.Utf8.Decode = function(utftext) {
-	$s.push("net.alphatab.Utf8::Decode");
-	var $spos = $s.length;
 	var string = "";
 	var i = 0;
 	var c = 0;
@@ -1064,24 +706,16 @@ net.alphatab.Utf8.Decode = function(utftext) {
 			i += 3;
 		}
 	}
-	{
-		$s.pop();
-		return string;
-	}
-	$s.pop();
+	return string;
 }
 net.alphatab.Utf8.prototype.__class__ = net.alphatab.Utf8;
 if(!net.alphatab.file) net.alphatab.file = {}
 net.alphatab.file.SongLoader = function() { }
 net.alphatab.file.SongLoader.__name__ = ["net","alphatab","file","SongLoader"];
 net.alphatab.file.SongLoader.LoadSong = function(url,factory,success) {
-	$s.push("net.alphatab.file.SongLoader::LoadSong");
-	var $spos = $s.length;
 	var loader = net.alphatab.platform.PlatformFactory.GetLoader();
 	haxe.Log.trace("Load song " + url,{ fileName : "SongLoader.hx", lineNumber : 21, className : "net.alphatab.file.SongLoader", methodName : "LoadSong"});
 	loader.LoadBinary("GET",url,function(data) {
-		$s.push("net.alphatab.file.SongLoader::LoadSong@24");
-		var $spos = $s.length;
 		var readers = net.alphatab.file.SongReader.AvailableReaders();
 		haxe.Log.trace("Song loaded, search for reader",{ fileName : "SongLoader.hx", lineNumber : 26, className : "net.alphatab.file.SongLoader", methodName : "LoadSong"});
 		{
@@ -1096,18 +730,12 @@ net.alphatab.file.SongLoader.LoadSong = function(url,factory,success) {
 					var song = reader.ReadSong();
 					haxe.Log.trace("Reading succeeded",{ fileName : "SongLoader.hx", lineNumber : 35, className : "net.alphatab.file.SongLoader", methodName : "LoadSong"});
 					success(song);
-					{
-						$s.pop();
-						return;
-					}
+					return;
 				}
 				catch( $e1 ) {
 					if( js.Boot.__instanceof($e1,net.alphatab.file.FileFormatException) ) {
 						var e = $e1;
 						{
-							$e = [];
-							while($s.length >= $spos) $e.unshift($s.pop());
-							$s.push($e[0]);
 							haxe.Log.trace("Reading failed",{ fileName : "SongLoader.hx", lineNumber : 40, className : "net.alphatab.file.SongLoader", methodName : "LoadSong"});
 							continue;
 						}
@@ -1116,147 +744,74 @@ net.alphatab.file.SongLoader.LoadSong = function(url,factory,success) {
 			}
 		}
 		throw new net.alphatab.file.FileFormatException("No reader for requested file found");
-		$s.pop();
 	},function(err) {
-		$s.push("net.alphatab.file.SongLoader::LoadSong@47");
-		var $spos = $s.length;
 		haxe.Log.trace("Error loading file " + err,{ fileName : "SongLoader.hx", lineNumber : 49, className : "net.alphatab.file.SongLoader", methodName : "LoadSong"});
 		throw err;
-		$s.pop();
 	});
-	$s.pop();
 }
 net.alphatab.file.SongLoader.prototype.__class__ = net.alphatab.file.SongLoader;
 net.alphatab.Main = function() { }
 net.alphatab.Main.__name__ = ["net","alphatab","Main"];
 net.alphatab.Main.main = function() {
-	$s.push("net.alphatab.Main::main");
-	var $spos = $s.length;
 	null;
-	$s.pop();
 }
 net.alphatab.Main.prototype.__class__ = net.alphatab.Main;
 Hash = function(p) { if( p === $_ ) return; {
-	$s.push("Hash::new");
-	var $spos = $s.length;
 	this.h = {}
 	if(this.h.__proto__ != null) {
 		this.h.__proto__ = null;
 		delete(this.h.__proto__);
 	}
 	else null;
-	$s.pop();
 }}
 Hash.__name__ = ["Hash"];
 Hash.prototype.exists = function(key) {
-	$s.push("Hash::exists");
-	var $spos = $s.length;
 	try {
 		key = "$" + key;
-		{
-			var $tmp = this.hasOwnProperty.call(this.h,key);
-			$s.pop();
-			return $tmp;
-		}
+		return this.hasOwnProperty.call(this.h,key);
 	}
 	catch( $e2 ) {
 		{
 			var e = $e2;
 			{
-				$e = [];
-				while($s.length >= $spos) $e.unshift($s.pop());
-				$s.push($e[0]);
 				
 				for(var i in this.h)
 					if( i == key ) return true;
 			;
-				{
-					$s.pop();
-					return false;
-				}
+				return false;
 			}
 		}
 	}
-	$s.pop();
 }
 Hash.prototype.get = function(key) {
-	$s.push("Hash::get");
-	var $spos = $s.length;
-	{
-		var $tmp = this.h["$" + key];
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.h["$" + key];
 }
 Hash.prototype.h = null;
 Hash.prototype.iterator = function() {
-	$s.push("Hash::iterator");
-	var $spos = $s.length;
-	{
-		var $tmp = { ref : this.h, it : this.keys(), hasNext : function() {
-			$s.push("Hash::iterator@214");
-			var $spos = $s.length;
-			{
-				var $tmp = this.it.hasNext();
-				$s.pop();
-				return $tmp;
-			}
-			$s.pop();
-		}, next : function() {
-			$s.push("Hash::iterator@215");
-			var $spos = $s.length;
-			var i = this.it.next();
-			{
-				var $tmp = this.ref["$" + i];
-				$s.pop();
-				return $tmp;
-			}
-			$s.pop();
-		}}
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return { ref : this.h, it : this.keys(), hasNext : function() {
+		return this.it.hasNext();
+	}, next : function() {
+		var i = this.it.next();
+		return this.ref["$" + i];
+	}}
 }
 Hash.prototype.keys = function() {
-	$s.push("Hash::keys");
-	var $spos = $s.length;
 	var a = new Array();
 	
 			for(var i in this.h)
 				a.push(i.substr(1));
 		;
-	{
-		var $tmp = a.iterator();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return a.iterator();
 }
 Hash.prototype.remove = function(key) {
-	$s.push("Hash::remove");
-	var $spos = $s.length;
-	if(!this.exists(key)) {
-		$s.pop();
-		return false;
-	}
+	if(!this.exists(key)) return false;
 	delete(this.h["$" + key]);
-	{
-		$s.pop();
-		return true;
-	}
-	$s.pop();
+	return true;
 }
 Hash.prototype.set = function(key,value) {
-	$s.push("Hash::set");
-	var $spos = $s.length;
 	this.h["$" + key] = value;
-	$s.pop();
 }
 Hash.prototype.toString = function() {
-	$s.push("Hash::toString");
-	var $spos = $s.length;
 	var s = new StringBuf();
 	s.b[s.b.length] = "{";
 	var it = this.keys();
@@ -1270,17 +825,10 @@ Hash.prototype.toString = function() {
 	}
 	}}
 	s.b[s.b.length] = "}";
-	{
-		var $tmp = s.b.join("");
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return s.b.join("");
 }
 Hash.prototype.__class__ = Hash;
 net.alphatab.model.GsTrack = function(factory) { if( factory === $_ ) return; {
-	$s.push("net.alphatab.model.GsTrack::new");
-	var $spos = $s.length;
 	this.Number = 0;
 	this.Offset = 0;
 	this.IsSolo = false;
@@ -1290,15 +838,11 @@ net.alphatab.model.GsTrack = function(factory) { if( factory === $_ ) return; {
 	this.Strings = new Array();
 	this.Channel = factory.NewMidiChannel();
 	this.Color = new net.alphatab.model.GsColor(255,0,0);
-	$s.pop();
 }}
 net.alphatab.model.GsTrack.__name__ = ["net","alphatab","model","GsTrack"];
 net.alphatab.model.GsTrack.prototype.AddMeasure = function(measure) {
-	$s.push("net.alphatab.model.GsTrack::AddMeasure");
-	var $spos = $s.length;
 	measure.Track = this;
 	this.Measures.push(measure);
-	$s.pop();
 }
 net.alphatab.model.GsTrack.prototype.Channel = null;
 net.alphatab.model.GsTrack.prototype.Color = null;
@@ -1309,14 +853,7 @@ net.alphatab.model.GsTrack.prototype.IsMute = null;
 net.alphatab.model.GsTrack.prototype.IsPercussionTrack = null;
 net.alphatab.model.GsTrack.prototype.IsSolo = null;
 net.alphatab.model.GsTrack.prototype.MeasureCount = function() {
-	$s.push("net.alphatab.model.GsTrack::MeasureCount");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Measures.length;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Measures.length;
 }
 net.alphatab.model.GsTrack.prototype.Measures = null;
 net.alphatab.model.GsTrack.prototype.Name = null;
@@ -1325,117 +862,51 @@ net.alphatab.model.GsTrack.prototype.Offset = null;
 net.alphatab.model.GsTrack.prototype.Port = null;
 net.alphatab.model.GsTrack.prototype.Song = null;
 net.alphatab.model.GsTrack.prototype.StringCount = function() {
-	$s.push("net.alphatab.model.GsTrack::StringCount");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Strings.length;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Strings.length;
 }
 net.alphatab.model.GsTrack.prototype.Strings = null;
 net.alphatab.model.GsTrack.prototype.__class__ = net.alphatab.model.GsTrack;
 IntHash = function(p) { if( p === $_ ) return; {
-	$s.push("IntHash::new");
-	var $spos = $s.length;
 	this.h = {}
 	if(this.h.__proto__ != null) {
 		this.h.__proto__ = null;
 		delete(this.h.__proto__);
 	}
 	else null;
-	$s.pop();
 }}
 IntHash.__name__ = ["IntHash"];
 IntHash.prototype.exists = function(key) {
-	$s.push("IntHash::exists");
-	var $spos = $s.length;
-	{
-		var $tmp = this.h[key] != null;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.h[key] != null;
 }
 IntHash.prototype.get = function(key) {
-	$s.push("IntHash::get");
-	var $spos = $s.length;
-	{
-		var $tmp = this.h[key];
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.h[key];
 }
 IntHash.prototype.h = null;
 IntHash.prototype.iterator = function() {
-	$s.push("IntHash::iterator");
-	var $spos = $s.length;
-	{
-		var $tmp = { ref : this.h, it : this.keys(), hasNext : function() {
-			$s.push("IntHash::iterator@199");
-			var $spos = $s.length;
-			{
-				var $tmp = this.it.hasNext();
-				$s.pop();
-				return $tmp;
-			}
-			$s.pop();
-		}, next : function() {
-			$s.push("IntHash::iterator@200");
-			var $spos = $s.length;
-			var i = this.it.next();
-			{
-				var $tmp = this.ref[i];
-				$s.pop();
-				return $tmp;
-			}
-			$s.pop();
-		}}
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return { ref : this.h, it : this.keys(), hasNext : function() {
+		return this.it.hasNext();
+	}, next : function() {
+		var i = this.it.next();
+		return this.ref[i];
+	}}
 }
 IntHash.prototype.keys = function() {
-	$s.push("IntHash::keys");
-	var $spos = $s.length;
 	var a = new Array();
 	
 			for( x in this.h )
 				a.push(x);
 		;
-	{
-		var $tmp = a.iterator();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return a.iterator();
 }
 IntHash.prototype.remove = function(key) {
-	$s.push("IntHash::remove");
-	var $spos = $s.length;
-	if(this.h[key] == null) {
-		$s.pop();
-		return false;
-	}
+	if(this.h[key] == null) return false;
 	delete(this.h[key]);
-	{
-		$s.pop();
-		return true;
-	}
-	$s.pop();
+	return true;
 }
 IntHash.prototype.set = function(key,value) {
-	$s.push("IntHash::set");
-	var $spos = $s.length;
 	this.h[key] = value;
-	$s.pop();
 }
 IntHash.prototype.toString = function() {
-	$s.push("IntHash::toString");
-	var $spos = $s.length;
 	var s = new StringBuf();
 	s.b[s.b.length] = "{";
 	var it = this.keys();
@@ -1449,144 +920,61 @@ IntHash.prototype.toString = function() {
 	}
 	}}
 	s.b[s.b.length] = "}";
-	{
-		var $tmp = s.b.join("");
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return s.b.join("");
 }
 IntHash.prototype.__class__ = IntHash;
 StringTools = function() { }
 StringTools.__name__ = ["StringTools"];
 StringTools.urlEncode = function(s) {
-	$s.push("StringTools::urlEncode");
-	var $spos = $s.length;
-	{
-		var $tmp = encodeURIComponent(s);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return encodeURIComponent(s);
 }
 StringTools.urlDecode = function(s) {
-	$s.push("StringTools::urlDecode");
-	var $spos = $s.length;
-	{
-		var $tmp = decodeURIComponent(s.split("+").join(" "));
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return decodeURIComponent(s.split("+").join(" "));
 }
 StringTools.htmlEscape = function(s) {
-	$s.push("StringTools::htmlEscape");
-	var $spos = $s.length;
-	{
-		var $tmp = s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
 }
 StringTools.htmlUnescape = function(s) {
-	$s.push("StringTools::htmlUnescape");
-	var $spos = $s.length;
-	{
-		var $tmp = s.split("&gt;").join(">").split("&lt;").join("<").split("&amp;").join("&");
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return s.split("&gt;").join(">").split("&lt;").join("<").split("&amp;").join("&");
 }
 StringTools.startsWith = function(s,start) {
-	$s.push("StringTools::startsWith");
-	var $spos = $s.length;
-	{
-		var $tmp = (s.length >= start.length && s.substr(0,start.length) == start);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (s.length >= start.length && s.substr(0,start.length) == start);
 }
 StringTools.endsWith = function(s,end) {
-	$s.push("StringTools::endsWith");
-	var $spos = $s.length;
 	var elen = end.length;
 	var slen = s.length;
-	{
-		var $tmp = (slen >= elen && s.substr(slen - elen,elen) == end);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (slen >= elen && s.substr(slen - elen,elen) == end);
 }
 StringTools.isSpace = function(s,pos) {
-	$s.push("StringTools::isSpace");
-	var $spos = $s.length;
 	var c = s.charCodeAt(pos);
-	{
-		var $tmp = (c >= 9 && c <= 13) || c == 32;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (c >= 9 && c <= 13) || c == 32;
 }
 StringTools.ltrim = function(s) {
-	$s.push("StringTools::ltrim");
-	var $spos = $s.length;
 	var l = s.length;
 	var r = 0;
 	while(r < l && StringTools.isSpace(s,r)) {
 		r++;
 	}
-	if(r > 0) {
-		var $tmp = s.substr(r,l - r);
-		$s.pop();
-		return $tmp;
-	}
-	else {
-		$s.pop();
-		return s;
-	}
-	$s.pop();
+	if(r > 0) return s.substr(r,l - r);
+	else return s;
 }
 StringTools.rtrim = function(s) {
-	$s.push("StringTools::rtrim");
-	var $spos = $s.length;
 	var l = s.length;
 	var r = 0;
 	while(r < l && StringTools.isSpace(s,(l - r) - 1)) {
 		r++;
 	}
 	if(r > 0) {
-		{
-			var $tmp = s.substr(0,l - r);
-			$s.pop();
-			return $tmp;
-		}
+		return s.substr(0,l - r);
 	}
 	else {
-		{
-			$s.pop();
-			return s;
-		}
+		return s;
 	}
-	$s.pop();
 }
 StringTools.trim = function(s) {
-	$s.push("StringTools::trim");
-	var $spos = $s.length;
-	{
-		var $tmp = StringTools.ltrim(StringTools.rtrim(s));
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return StringTools.ltrim(StringTools.rtrim(s));
 }
 StringTools.rpad = function(s,c,l) {
-	$s.push("StringTools::rpad");
-	var $spos = $s.length;
 	var sl = s.length;
 	var cl = c.length;
 	while(sl < l) {
@@ -1599,21 +987,12 @@ StringTools.rpad = function(s,c,l) {
 			sl += cl;
 		}
 	}
-	{
-		$s.pop();
-		return s;
-	}
-	$s.pop();
+	return s;
 }
 StringTools.lpad = function(s,c,l) {
-	$s.push("StringTools::lpad");
-	var $spos = $s.length;
 	var ns = "";
 	var sl = s.length;
-	if(sl >= l) {
-		$s.pop();
-		return s;
-	}
+	if(sl >= l) return s;
 	var cl = c.length;
 	while(sl < l) {
 		if(l - sl < cl) {
@@ -1625,26 +1004,12 @@ StringTools.lpad = function(s,c,l) {
 			sl += cl;
 		}
 	}
-	{
-		var $tmp = ns + s;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return ns + s;
 }
 StringTools.replace = function(s,sub,by) {
-	$s.push("StringTools::replace");
-	var $spos = $s.length;
-	{
-		var $tmp = s.split(sub).join(by);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return s.split(sub).join(by);
 }
 StringTools.hex = function(n,digits) {
-	$s.push("StringTools::hex");
-	var $spos = $s.length;
 	var neg = false;
 	if(n < 0) {
 		neg = true;
@@ -1654,11 +1019,7 @@ StringTools.hex = function(n,digits) {
 	s = s.toUpperCase();
 	if(digits != null) while(s.length < digits) s = "0" + s;
 	if(neg) s = "-" + s;
-	{
-		$s.pop();
-		return s;
-	}
-	$s.pop();
+	return s;
 }
 StringTools.prototype.__class__ = StringTools;
 if(typeof haxe=='undefined') haxe = {}
@@ -1666,8 +1027,6 @@ if(!haxe.remoting) haxe.remoting = {}
 haxe.remoting.FlashJsConnection = function() { }
 haxe.remoting.FlashJsConnection.__name__ = ["haxe","remoting","FlashJsConnection"];
 haxe.remoting.FlashJsConnection.flashCall = function(flashObj,name,path,params) {
-	$s.push("haxe.remoting.FlashJsConnection::flashCall");
-	var $spos = $s.length;
 	try {
 		var fobj = window.document[flashObj];
 		if(fobj == null) fobj = window.document.getElementById[flashObj];
@@ -1679,52 +1038,31 @@ haxe.remoting.FlashJsConnection.flashCall = function(flashObj,name,path,params) 
 		catch( $e5 ) {
 			{
 				var e = $e5;
-				{
-					$e = [];
-					while($s.length >= $spos) $e.unshift($s.pop());
-					$s.push($e[0]);
-					null;
-				}
+				null;
 			}
 		}
 		if(data == null) throw ("Flash object " + flashObj) + " does not have an active FlashJsConnection";
-		{
-			$s.pop();
-			return data;
-		}
+		return data;
 	}
 	catch( $e6 ) {
 		{
 			var e = $e6;
 			{
-				$e = [];
-				while($s.length >= $spos) $e.unshift($s.pop());
-				$s.push($e[0]);
 				var s = new haxe.Serializer();
 				s.serializeException(e);
-				{
-					var $tmp = s.toString();
-					$s.pop();
-					return $tmp;
-				}
+				return s.toString();
 			}
 		}
 	}
-	$s.pop();
 }
 haxe.remoting.FlashJsConnection.prototype.__class__ = haxe.remoting.FlashJsConnection;
 if(!haxe.io) haxe.io = {}
 haxe.io.Bytes = function(length,b) { if( length === $_ ) return; {
-	$s.push("haxe.io.Bytes::new");
-	var $spos = $s.length;
 	this.length = length;
 	this.b = b;
-	$s.pop();
 }}
 haxe.io.Bytes.__name__ = ["haxe","io","Bytes"];
 haxe.io.Bytes.alloc = function(length) {
-	$s.push("haxe.io.Bytes::alloc");
-	var $spos = $s.length;
 	var a = new Array();
 	{
 		var _g = 0;
@@ -1733,16 +1071,9 @@ haxe.io.Bytes.alloc = function(length) {
 			a.push(0);
 		}
 	}
-	{
-		var $tmp = new haxe.io.Bytes(length,a);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new haxe.io.Bytes(length,a);
 }
 haxe.io.Bytes.ofString = function(s) {
-	$s.push("haxe.io.Bytes::ofString");
-	var $spos = $s.length;
 	var a = new Array();
 	{
 		var _g1 = 0, _g = s.length;
@@ -1767,27 +1098,13 @@ haxe.io.Bytes.ofString = function(s) {
 			}
 		}
 	}
-	{
-		var $tmp = new haxe.io.Bytes(a.length,a);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new haxe.io.Bytes(a.length,a);
 }
 haxe.io.Bytes.ofData = function(b) {
-	$s.push("haxe.io.Bytes::ofData");
-	var $spos = $s.length;
-	{
-		var $tmp = new haxe.io.Bytes(b.length,b);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new haxe.io.Bytes(b.length,b);
 }
 haxe.io.Bytes.prototype.b = null;
 haxe.io.Bytes.prototype.blit = function(pos,src,srcpos,len) {
-	$s.push("haxe.io.Bytes::blit");
-	var $spos = $s.length;
 	if(pos < 0 || srcpos < 0 || len < 0 || pos + len > this.length || srcpos + len > src.length) throw haxe.io.Error.OutsideBounds;
 	var b1 = this.b;
 	var b2 = src.b;
@@ -1797,10 +1114,7 @@ haxe.io.Bytes.prototype.blit = function(pos,src,srcpos,len) {
 			i--;
 			b1[i + pos] = b2[i + srcpos];
 		}
-		{
-			$s.pop();
-			return;
-		}
+		return;
 	}
 	{
 		var _g = 0;
@@ -1809,11 +1123,8 @@ haxe.io.Bytes.prototype.blit = function(pos,src,srcpos,len) {
 			b1[i + pos] = b2[i + srcpos];
 		}
 	}
-	$s.pop();
 }
 haxe.io.Bytes.prototype.compare = function(other) {
-	$s.push("haxe.io.Bytes::compare");
-	var $spos = $s.length;
 	var b1 = this.b;
 	var b2 = other.b;
 	var len = ((this.length < other.length)?this.length:other.length);
@@ -1821,44 +1132,19 @@ haxe.io.Bytes.prototype.compare = function(other) {
 		var _g = 0;
 		while(_g < len) {
 			var i = _g++;
-			if(b1[i] != b2[i]) {
-				var $tmp = b1[i] - b2[i];
-				$s.pop();
-				return $tmp;
-			}
+			if(b1[i] != b2[i]) return b1[i] - b2[i];
 		}
 	}
-	{
-		var $tmp = this.length - other.length;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.length - other.length;
 }
 haxe.io.Bytes.prototype.get = function(pos) {
-	$s.push("haxe.io.Bytes::get");
-	var $spos = $s.length;
-	{
-		var $tmp = this.b[pos];
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.b[pos];
 }
 haxe.io.Bytes.prototype.getData = function() {
-	$s.push("haxe.io.Bytes::getData");
-	var $spos = $s.length;
-	{
-		var $tmp = this.b;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.b;
 }
 haxe.io.Bytes.prototype.length = null;
 haxe.io.Bytes.prototype.readString = function(pos,len) {
-	$s.push("haxe.io.Bytes::readString");
-	var $spos = $s.length;
 	if(pos < 0 || len < 0 || pos + len > this.length) throw haxe.io.Error.OutsideBounds;
 	var s = "";
 	var b = this.b;
@@ -1882,38 +1168,17 @@ haxe.io.Bytes.prototype.readString = function(pos,len) {
 			s += fcc(((((c & 15) << 18) | ((c2 & 127) << 12)) | ((c3 << 6) & 127)) | (b[i++] & 127));
 		}
 	}
-	{
-		$s.pop();
-		return s;
-	}
-	$s.pop();
+	return s;
 }
 haxe.io.Bytes.prototype.set = function(pos,v) {
-	$s.push("haxe.io.Bytes::set");
-	var $spos = $s.length;
 	this.b[pos] = (v & 255);
-	$s.pop();
 }
 haxe.io.Bytes.prototype.sub = function(pos,len) {
-	$s.push("haxe.io.Bytes::sub");
-	var $spos = $s.length;
 	if(pos < 0 || len < 0 || pos + len > this.length) throw haxe.io.Error.OutsideBounds;
-	{
-		var $tmp = new haxe.io.Bytes(len,this.b.slice(pos,pos + len));
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new haxe.io.Bytes(len,this.b.slice(pos,pos + len));
 }
 haxe.io.Bytes.prototype.toString = function() {
-	$s.push("haxe.io.Bytes::toString");
-	var $spos = $s.length;
-	{
-		var $tmp = this.readString(0,this.length);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.readString(0,this.length);
 }
 haxe.io.Bytes.prototype.__class__ = haxe.io.Bytes;
 net.alphatab.model.effects.GsHarmonicType = { __ename__ : ["net","alphatab","model","effects","GsHarmonicType"], __constructs__ : ["Natural","Artificial","Tapped","Pinch","Semi"] }
@@ -1933,196 +1198,85 @@ net.alphatab.model.effects.GsHarmonicType.Tapped = ["Tapped",2];
 net.alphatab.model.effects.GsHarmonicType.Tapped.toString = $estr;
 net.alphatab.model.effects.GsHarmonicType.Tapped.__enum__ = net.alphatab.model.effects.GsHarmonicType;
 net.alphatab.file.SongReader = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.file.SongReader::new");
-	var $spos = $s.length;
 	null;
-	$s.pop();
 }}
 net.alphatab.file.SongReader.__name__ = ["net","alphatab","file","SongReader"];
 net.alphatab.file.SongReader.AvailableReaders = function() {
-	$s.push("net.alphatab.file.SongReader::AvailableReaders");
-	var $spos = $s.length;
 	var d = new Array();
 	d.push(new net.alphatab.file.guitarpro.Gp5Reader());
 	d.push(new net.alphatab.file.guitarpro.Gp4Reader());
 	d.push(new net.alphatab.file.guitarpro.Gp4Reader());
-	{
-		$s.pop();
-		return d;
-	}
-	$s.pop();
+	return d;
 }
 net.alphatab.file.SongReader.prototype.Data = null;
 net.alphatab.file.SongReader.prototype.Factory = null;
 net.alphatab.file.SongReader.prototype.Init = function(data,factory) {
-	$s.push("net.alphatab.file.SongReader::Init");
-	var $spos = $s.length;
 	this.Data = data;
 	this.Factory = factory;
-	$s.pop();
 }
 net.alphatab.file.SongReader.prototype.ReadSong = function() {
-	$s.push("net.alphatab.file.SongReader::ReadSong");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.GsSong();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.GsSong();
 }
 net.alphatab.file.SongReader.prototype.__class__ = net.alphatab.file.SongReader;
 if(!net.alphatab.file.guitarpro) net.alphatab.file.guitarpro = {}
 net.alphatab.file.guitarpro.GpReaderBase = function(supportedVersions) { if( supportedVersions === $_ ) return; {
-	$s.push("net.alphatab.file.guitarpro.GpReaderBase::new");
-	var $spos = $s.length;
 	net.alphatab.file.SongReader.apply(this,[]);
 	this.SupportedVersions = supportedVersions;
-	$s.pop();
 }}
 net.alphatab.file.guitarpro.GpReaderBase.__name__ = ["net","alphatab","file","guitarpro","GpReaderBase"];
 net.alphatab.file.guitarpro.GpReaderBase.__super__ = net.alphatab.file.SongReader;
 for(var k in net.alphatab.file.SongReader.prototype ) net.alphatab.file.guitarpro.GpReaderBase.prototype[k] = net.alphatab.file.SongReader.prototype[k];
 net.alphatab.file.guitarpro.GpReaderBase.NewString = function(bytes,length,charset) {
-	$s.push("net.alphatab.file.guitarpro.GpReaderBase::NewString");
-	var $spos = $s.length;
-	{
-		var $tmp = bytes.toString().substr(0,length);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return bytes.toString().substr(0,length);
 }
 net.alphatab.file.guitarpro.GpReaderBase.ToChannelShort = function(data) {
-	$s.push("net.alphatab.file.guitarpro.GpReaderBase::ToChannelShort");
-	var $spos = $s.length;
 	var value = Math.floor(Math.max(-32768,Math.min(32767,(data * 8) - 1)));
-	{
-		var $tmp = Math.floor(Math.max(value,-1));
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return Math.floor(Math.max(value,-1));
 }
 net.alphatab.file.guitarpro.GpReaderBase.prototype.Init = function(data,factory) {
-	$s.push("net.alphatab.file.guitarpro.GpReaderBase::Init");
-	var $spos = $s.length;
 	net.alphatab.file.SongReader.prototype.Init.apply(this,[data,factory]);
-	$s.pop();
 }
 net.alphatab.file.guitarpro.GpReaderBase.prototype.Read = function() {
-	$s.push("net.alphatab.file.guitarpro.GpReaderBase::Read");
-	var $spos = $s.length;
-	{
-		var $tmp = this.ReadByte();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.ReadByte();
 }
 net.alphatab.file.guitarpro.GpReaderBase.prototype.ReadBool = function() {
-	$s.push("net.alphatab.file.guitarpro.GpReaderBase::ReadBool");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Data.readByte() == 1;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Data.readByte() == 1;
 }
 net.alphatab.file.guitarpro.GpReaderBase.prototype.ReadByte = function() {
-	$s.push("net.alphatab.file.guitarpro.GpReaderBase::ReadByte");
-	var $spos = $s.length;
 	var data = this.Data.readByte() & 255;
-	{
-		var $tmp = (data > 127?-256 + data:data);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (data > 127?-256 + data:data);
 }
 net.alphatab.file.guitarpro.GpReaderBase.prototype.ReadByteSizeCheckByteString = function(charset) {
-	$s.push("net.alphatab.file.guitarpro.GpReaderBase::ReadByteSizeCheckByteString");
-	var $spos = $s.length;
 	if(charset == null) charset = "UTF-8";
-	{
-		var $tmp = this.ReadByteSizeString((this.ReadUnsignedByte() - 1),charset);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.ReadByteSizeString((this.ReadUnsignedByte() - 1),charset);
 }
 net.alphatab.file.guitarpro.GpReaderBase.prototype.ReadByteSizeString = function(size,charset) {
-	$s.push("net.alphatab.file.guitarpro.GpReaderBase::ReadByteSizeString");
-	var $spos = $s.length;
 	if(charset == null) charset = "UTF-8";
-	{
-		var $tmp = this.ReadString(size,this.ReadUnsignedByte(),charset);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.ReadString(size,this.ReadUnsignedByte(),charset);
 }
 net.alphatab.file.guitarpro.GpReaderBase.prototype.ReadDouble = function() {
-	$s.push("net.alphatab.file.guitarpro.GpReaderBase::ReadDouble");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Data.readDouble();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Data.readDouble();
 }
 net.alphatab.file.guitarpro.GpReaderBase.prototype.ReadInt = function() {
-	$s.push("net.alphatab.file.guitarpro.GpReaderBase::ReadInt");
-	var $spos = $s.length;
-	{
-		var $tmp = (this.Data.readInt32());
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (this.Data.readInt32());
 }
 net.alphatab.file.guitarpro.GpReaderBase.prototype.ReadIntSizeCheckByteString = function(charset) {
-	$s.push("net.alphatab.file.guitarpro.GpReaderBase::ReadIntSizeCheckByteString");
-	var $spos = $s.length;
 	if(charset == null) charset = "UTF-8";
-	{
-		var $tmp = this.ReadByteSizeString((this.ReadInt() - 1),charset);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.ReadByteSizeString((this.ReadInt() - 1),charset);
 }
 net.alphatab.file.guitarpro.GpReaderBase.prototype.ReadIntSizeString = function(charset) {
-	$s.push("net.alphatab.file.guitarpro.GpReaderBase::ReadIntSizeString");
-	var $spos = $s.length;
 	if(charset == null) charset = "UTF-8";
-	{
-		var $tmp = this.ReadString(this.ReadInt(),-2,charset);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.ReadString(this.ReadInt(),-2,charset);
 }
 net.alphatab.file.guitarpro.GpReaderBase.prototype.ReadString = function(size,len,charset) {
-	$s.push("net.alphatab.file.guitarpro.GpReaderBase::ReadString");
-	var $spos = $s.length;
 	if(charset == null) charset = "UTF-8";
 	if(len == null) len = -2;
 	if(len == -2) len = size;
 	var count = ((size > 0?size:len));
 	var s = this.ReadStringInternal(count);
-	{
-		var $tmp = s.substr(0,((len >= 0?len:size)));
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return s.substr(0,((len >= 0?len:size)));
 }
 net.alphatab.file.guitarpro.GpReaderBase.prototype.ReadStringInternal = function(length) {
-	$s.push("net.alphatab.file.guitarpro.GpReaderBase::ReadStringInternal");
-	var $spos = $s.length;
 	var text = "";
 	{
 		var _g = 0;
@@ -2131,25 +1285,12 @@ net.alphatab.file.guitarpro.GpReaderBase.prototype.ReadStringInternal = function
 			text += String.fromCharCode(this.ReadByte());
 		}
 	}
-	{
-		$s.pop();
-		return text;
-	}
-	$s.pop();
+	return text;
 }
 net.alphatab.file.guitarpro.GpReaderBase.prototype.ReadUnsignedByte = function() {
-	$s.push("net.alphatab.file.guitarpro.GpReaderBase::ReadUnsignedByte");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Data.readByte();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Data.readByte();
 }
 net.alphatab.file.guitarpro.GpReaderBase.prototype.ReadVersion = function() {
-	$s.push("net.alphatab.file.guitarpro.GpReaderBase::ReadVersion");
-	var $spos = $s.length;
 	try {
 		if(this.Version == null) {
 			this.Version = this.ReadByteSizeString(30,"UTF-8");
@@ -2161,10 +1302,7 @@ net.alphatab.file.guitarpro.GpReaderBase.prototype.ReadVersion = function() {
 				var current = this.SupportedVersions[i];
 				if(this.Version == current) {
 					this.VersionIndex = i;
-					{
-						$s.pop();
-						return true;
-					}
+					return true;
 				}
 			}
 		}
@@ -2173,68 +1311,44 @@ net.alphatab.file.guitarpro.GpReaderBase.prototype.ReadVersion = function() {
 		if( js.Boot.__instanceof($e7,haxe.io.Error) ) {
 			var e = $e7;
 			{
-				$e = [];
-				while($s.length >= $spos) $e.unshift($s.pop());
-				$s.push($e[0]);
 				this.Version = "Not Supported";
 			}
 		} else throw($e7);
 	}
-	{
-		$s.pop();
-		return false;
-	}
-	$s.pop();
+	return false;
 }
 net.alphatab.file.guitarpro.GpReaderBase.prototype.Skip = function(count) {
-	$s.push("net.alphatab.file.guitarpro.GpReaderBase::Skip");
-	var $spos = $s.length;
 	var _g = 0;
 	while(_g < count) {
 		var i = _g++;
 		this.Data.readByte();
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.GpReaderBase.prototype.SupportedVersions = null;
 net.alphatab.file.guitarpro.GpReaderBase.prototype.Version = null;
 net.alphatab.file.guitarpro.GpReaderBase.prototype.VersionIndex = null;
 net.alphatab.file.guitarpro.GpReaderBase.prototype.__class__ = net.alphatab.file.guitarpro.GpReaderBase;
 net.alphatab.file.guitarpro.Gp5Reader = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::new");
-	var $spos = $s.length;
 	net.alphatab.file.guitarpro.GpReaderBase.apply(this,[["FICHIER GUITAR PRO v5.00","FICHIER GUITAR PRO v5.10"]]);
-	$s.pop();
 }}
 net.alphatab.file.guitarpro.Gp5Reader.__name__ = ["net","alphatab","file","guitarpro","Gp5Reader"];
 net.alphatab.file.guitarpro.Gp5Reader.__super__ = net.alphatab.file.guitarpro.GpReaderBase;
 for(var k in net.alphatab.file.guitarpro.GpReaderBase.prototype ) net.alphatab.file.guitarpro.Gp5Reader.prototype[k] = net.alphatab.file.guitarpro.GpReaderBase.prototype[k];
 net.alphatab.file.guitarpro.Gp5Reader.prototype.GetBeat = function(measure,start) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::GetBeat");
-	var $spos = $s.length;
 	{
 		var _g1 = 0, _g = measure.Beats.length;
 		while(_g1 < _g) {
 			var b = _g1++;
 			var beat = measure.Beats[b];
-			if(beat.Start == start) {
-				$s.pop();
-				return beat;
-			}
+			if(beat.Start == start) return beat;
 		}
 	}
 	var newBeat = this.Factory.NewBeat();
 	newBeat.Start = start;
 	measure.AddBeat(newBeat);
-	{
-		$s.pop();
-		return newBeat;
-	}
-	$s.pop();
+	return newBeat;
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.GetTiedNoteValue = function(stringIndex,track) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::GetTiedNoteValue");
-	var $spos = $s.length;
 	var iMeasureCount = track.MeasureCount();
 	if(iMeasureCount > 0) {
 		{
@@ -2261,11 +1375,7 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.GetTiedNoteValue = function(stri
 											var n = _g6++;
 											var note = oVoice.Notes[n];
 											if(note.String == stringIndex) {
-												{
-													var $tmp = note.Value;
-													$s.pop();
-													return $tmp;
-												}
+												return note.Value;
 											}
 										}
 									}
@@ -2277,15 +1387,9 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.GetTiedNoteValue = function(stri
 			}
 		}
 	}
-	{
-		$s.pop();
-		return -1;
-	}
-	$s.pop();
+	return -1;
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadArtificialHarmonic = function(noteEffect) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadArtificialHarmonic");
-	var $spos = $s.length;
 	var type = this.ReadByte();
 	var oHarmonic = this.Factory.NewHarmonicEffect();
 	oHarmonic.Data = 0;
@@ -2313,11 +1417,8 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadArtificialHarmonic = functio
 		noteEffect.Harmonic = (oHarmonic);
 	}break;
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadBeat = function(start,measure,track,voiceIndex) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadBeat");
-	var $spos = $s.length;
 	var flags = this.ReadUnsignedByte();
 	var beat = this.GetBeat(measure,start);
 	var voice = beat.Voices[voiceIndex];
@@ -2326,7 +1427,6 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadBeat = function(start,measur
 		voice.IsEmpty = ((beatType & 2) == 0);
 	}
 	var duration = this.ReadDuration(flags);
-	var effect = new net.alphatab.model.GsNoteEffect();
 	if((flags & 2) != 0) {
 		this.ReadChord(track.StringCount(),beat);
 	}
@@ -2334,11 +1434,11 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadBeat = function(start,measur
 		this.ReadText(beat);
 	}
 	if((flags & 8) != 0) {
-		this.ReadBeatEffects(beat,effect);
+		this.ReadBeatEffects(beat);
 	}
 	if((flags & 16) != 0) {
 		var mixTableChange = this.ReadMixTableChange(measure);
-		beat.MixTableChange = mixTableChange;
+		beat.Effect.MixTableChange = mixTableChange;
 	}
 	var stringFlags = this.ReadUnsignedByte();
 	{
@@ -2348,7 +1448,7 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadBeat = function(start,measur
 			var i = 6 - j;
 			if((stringFlags & (1 << i)) != 0 && (6 - i) < track.StringCount()) {
 				var guitarString = track.Strings[6 - i].Clone(this.Factory);
-				var note = this.ReadNote(guitarString,track,effect.Clone(this.Factory));
+				var note = this.ReadNote(guitarString,track);
 				voice.AddNote(note);
 			}
 			duration.Copy(voice.Duration);
@@ -2359,51 +1459,41 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadBeat = function(start,measur
 	if(read == 8 || read == 10) {
 		this.Skip(1);
 	}
-	{
-		var $tmp = ((!voice.IsEmpty)?duration.Time():0);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return ((!voice.IsEmpty)?duration.Time():0);
 }
-net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadBeatEffects = function(beat,effect) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadBeatEffects");
-	var $spos = $s.length;
+net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadBeatEffects = function(beat) {
 	var flags1 = this.ReadUnsignedByte();
 	var flags2 = this.ReadUnsignedByte();
-	effect.FadeIn = (((flags1 & 16) != 0));
-	effect.BeatVibrato = (((flags1 & 2) != 0)) || effect.BeatVibrato;
+	beat.Effect.FadeIn = (((flags1 & 16) != 0));
+	beat.Effect.Vibrato = (((flags1 & 2) != 0)) || beat.Effect.Vibrato;
 	if((flags1 & 32) != 0) {
 		var slapEffect = this.ReadUnsignedByte();
-		effect.Tapping = (slapEffect == 1);
-		effect.Slapping = (slapEffect == 2);
-		effect.Popping = (slapEffect == 3);
+		beat.Effect.Tapping = (slapEffect == 1);
+		beat.Effect.Slapping = (slapEffect == 2);
+		beat.Effect.Popping = (slapEffect == 3);
 	}
 	if((flags2 & 4) != 0) {
-		this.ReadTremoloBar(effect);
+		this.ReadTremoloBar(beat.Effect);
 	}
 	if((flags1 & 64) != 0) {
 		var strokeUp = this.ReadByte();
 		var strokeDown = this.ReadByte();
 		if(strokeUp > 0) {
-			beat.Stroke.Direction = net.alphatab.model.GsBeatStrokeDirection.Up;
-			beat.Stroke.Value = (this.ToStrokeValue(strokeUp));
+			beat.Effect.Stroke.Direction = net.alphatab.model.GsBeatStrokeDirection.Up;
+			beat.Effect.Stroke.Value = (this.ToStrokeValue(strokeUp));
 		}
 		else if(strokeDown > 0) {
-			beat.Stroke.Direction = net.alphatab.model.GsBeatStrokeDirection.Down;
-			beat.Stroke.Value = (this.ToStrokeValue(strokeDown));
+			beat.Effect.Stroke.Direction = net.alphatab.model.GsBeatStrokeDirection.Down;
+			beat.Effect.Stroke.Value = (this.ToStrokeValue(strokeDown));
 		}
 	}
-	beat.HasRasgueado = (flags2 & 1) != 0;
+	beat.Effect.HasRasgueado = (flags2 & 1) != 0;
 	if((flags2 & 2) != 0) {
-		beat.PickStroke = this.ReadByte();
-		beat.HasPickStroke = true;
+		beat.Effect.PickStroke = this.ReadByte();
+		beat.Effect.HasPickStroke = true;
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadBend = function(noteEffect) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadBend");
-	var $spos = $s.length;
 	var bendEffect = this.Factory.NewBendEffect();
 	bendEffect.Type = net.alphatab.model.effects.GsBendTypesConverter.FromInt(this.ReadByte());
 	bendEffect.Value = this.ReadInt();
@@ -2419,11 +1509,8 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadBend = function(noteEffect) 
 		}
 	}
 	if(pointCount > 0) noteEffect.Bend = bendEffect;
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadChannel = function(midiChannel,channels) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadChannel");
-	var $spos = $s.length;
 	var index = (this.ReadInt() - 1);
 	var effectChannel = (this.ReadInt() - 1);
 	if(index >= 0 && index < channels.length) {
@@ -2435,11 +1522,8 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadChannel = function(midiChann
 			midiChannel.EffectChannel = (effectChannel);
 		}
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadChord = function(stringCount,beat) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadChord");
-	var $spos = $s.length;
 	var chord = this.Factory.NewChord(stringCount);
 	this.Skip(17);
 	chord.Name = (this.ReadByteSizeString(21));
@@ -2459,25 +1543,15 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadChord = function(stringCount
 	if(chord.NoteCount() > 0) {
 		beat.SetChord(chord);
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadColor = function() {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadColor");
-	var $spos = $s.length;
 	var r = (this.ReadUnsignedByte());
 	var g = this.ReadUnsignedByte();
 	var b = (this.ReadUnsignedByte());
 	this.Skip(1);
-	{
-		var $tmp = new net.alphatab.model.GsColor(r,g,b);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.GsColor(r,g,b);
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadDuration = function(flags) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadDuration");
-	var $spos = $s.length;
 	var duration = this.Factory.NewDuration();
 	duration.Value = Math.round(Math.pow(2,(this.ReadByte() + 4)) / 4);
 	duration.IsDotted = (((flags & 1) != 0));
@@ -2518,15 +1592,9 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadDuration = function(flags) {
 		}break;
 		}
 	}
-	{
-		$s.pop();
-		return duration;
-	}
-	$s.pop();
+	return duration;
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadGrace = function(noteEffect) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadGrace");
-	var $spos = $s.length;
 	var fret = this.ReadUnsignedByte();
 	var dyn = this.ReadUnsignedByte();
 	var transition = this.ReadByte();
@@ -2553,11 +1621,8 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadGrace = function(noteEffect)
 	}break;
 	}
 	noteEffect.Grace = (grace);
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadInfo = function(song) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadInfo");
-	var $spos = $s.length;
 	song.Title = (this.ReadIntSizeCheckByteString());
 	song.Subtitle = this.ReadIntSizeCheckByteString();
 	song.Artist = (this.ReadIntSizeCheckByteString());
@@ -2576,11 +1641,8 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadInfo = function(song) {
 			song.Notice += this.ReadIntSizeCheckByteString() + "\n";
 		}
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadLyrics = function(song) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadLyrics");
-	var $spos = $s.length;
 	song.Lyrics = this.Factory.NewLyrics();
 	song.Lyrics.TrackChoice = this.ReadInt();
 	{
@@ -2593,24 +1655,15 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadLyrics = function(song) {
 			song.Lyrics.Lines.push(line);
 		}
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadMarker = function(header) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadMarker");
-	var $spos = $s.length;
 	var marker = this.Factory.NewMarker();
 	marker.MeasureHeader = header;
 	marker.Title = this.ReadIntSizeCheckByteString();
 	marker.Color = this.ReadColor();
-	{
-		$s.pop();
-		return marker;
-	}
-	$s.pop();
+	return marker;
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadMeasure = function(measure,track) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadMeasure");
-	var $spos = $s.length;
 	{
 		var _g = 0;
 		while(_g < 2) {
@@ -2627,11 +1680,8 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadMeasure = function(measure,t
 		}
 	}
 	this.Skip(1);
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadMeasureHeader = function(i,timeSignature,song) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadMeasureHeader");
-	var $spos = $s.length;
 	if(i > 0) this.Skip(1);
 	var flags = this.ReadUnsignedByte();
 	var header = this.Factory.NewMeasureHeader();
@@ -2668,15 +1718,9 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadMeasureHeader = function(i,t
 		header.TripletFeel = net.alphatab.model.GsTripletFeel.None;
 	}break;
 	}
-	{
-		$s.pop();
-		return header;
-	}
-	$s.pop();
+	return header;
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadMeasureHeaders = function(song,measureCount) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadMeasureHeaders");
-	var $spos = $s.length;
 	var timeSignature = this.Factory.NewTimeSignature();
 	{
 		var _g = 0;
@@ -2685,11 +1729,8 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadMeasureHeaders = function(so
 			song.AddMeasureHeader(this.ReadMeasureHeader(i,timeSignature,song));
 		}
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadMeasures = function(song) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadMeasures");
-	var $spos = $s.length;
 	var tempo = this.Factory.NewTempo();
 	tempo.Value = song.Tempo;
 	var start = 960;
@@ -2714,11 +1755,8 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadMeasures = function(song) {
 			start += header.Length();
 		}
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadMidiChannels = function() {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadMidiChannels");
-	var $spos = $s.length;
 	var channels = new Array();
 	{
 		var _g = 0;
@@ -2738,15 +1776,9 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadMidiChannels = function() {
 			this.Skip(2);
 		}
 	}
-	{
-		$s.pop();
-		return channels;
-	}
-	$s.pop();
+	return channels;
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadMixTableChange = function(measure) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadMixTableChange");
-	var $spos = $s.length;
 	var tableChange = this.Factory.NewMixTableChange();
 	tableChange.Instrument.Value = this.ReadByte();
 	this.Skip(16);
@@ -2790,19 +1822,12 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadMixTableChange = function(me
 		this.ReadIntSizeCheckByteString();
 		this.ReadIntSizeCheckByteString();
 	}
-	{
-		$s.pop();
-		return tableChange;
-	}
-	$s.pop();
+	return tableChange;
 }
-net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadNote = function(guitarString,track,effect) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadNote");
-	var $spos = $s.length;
+net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadNote = function(guitarString,track) {
 	var flags = this.ReadUnsignedByte();
 	var note = this.Factory.NewNote();
 	note.String = (guitarString.Number);
-	note.Effect = (effect);
 	note.Effect.AccentuatedNote = (((flags & 64) != 0));
 	note.Effect.HeavyAccentuatedNote = (((flags & 2) != 0));
 	note.Effect.GhostNote = (((flags & 4) != 0));
@@ -2831,15 +1856,9 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadNote = function(guitarString
 	if((flags & 8) != 0) {
 		this.ReadNoteEffects(note.Effect);
 	}
-	{
-		$s.pop();
-		return note;
-	}
-	$s.pop();
+	return note;
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadNoteEffects = function(noteEffect) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadNoteEffects");
-	var $spos = $s.length;
 	var flags1 = this.ReadUnsignedByte();
 	var flags2 = this.ReadUnsignedByte();
 	if((flags1 & 1) != 0) {
@@ -2886,11 +1905,8 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadNoteEffects = function(noteE
 	noteEffect.Vibrato = (((flags2 & 64) != 0) || noteEffect.Vibrato);
 	noteEffect.PalmMute = (((flags2 & 2) != 0));
 	noteEffect.Staccato = (((flags2 & 1) != 0));
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadPageSetup = function(song) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadPageSetup");
-	var $spos = $s.length;
 	var setup = this.Factory.NewPageSetup();
 	if(this.VersionIndex > 0) this.Skip(19);
 	setup.PageSize = new net.alphatab.model.Point(this.ReadInt(),this.ReadInt());
@@ -2913,11 +1929,8 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadPageSetup = function(song) {
 	setup.Copyright = (this.ReadIntSizeCheckByteString() + "\n") + this.ReadIntSizeCheckByteString();
 	setup.PageNumber = this.ReadIntSizeCheckByteString();
 	song.PageSetup = setup;
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadSong = function() {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadSong");
-	var $spos = $s.length;
 	if(!this.ReadVersion()) {
 		throw new net.alphatab.file.FileFormatException("Unsupported Version");
 	}
@@ -2937,23 +1950,14 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadSong = function() {
 	this.ReadMeasureHeaders(song,measureCount);
 	this.ReadTracks(song,trackCount,channels);
 	this.ReadMeasures(song);
-	{
-		$s.pop();
-		return song;
-	}
-	$s.pop();
+	return song;
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadText = function(beat) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadText");
-	var $spos = $s.length;
 	var text = this.Factory.NewText();
 	text.Value = this.ReadIntSizeCheckByteString();
 	beat.SetText(text);
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadTrack = function(number,channels) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadTrack");
-	var $spos = $s.length;
 	var flags = this.ReadUnsignedByte();
 	if(number == 1 || this.VersionIndex == 0) this.Skip(1);
 	var track = this.Factory.NewTrack();
@@ -2986,15 +1990,9 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadTrack = function(number,chan
 		this.ReadIntSizeCheckByteString();
 		this.ReadIntSizeCheckByteString();
 	}
-	{
-		$s.pop();
-		return track;
-	}
-	$s.pop();
+	return track;
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadTracks = function(song,trackCount,channels) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadTracks");
-	var $spos = $s.length;
 	{
 		var _g1 = 1, _g = trackCount + 1;
 		while(_g1 < _g) {
@@ -3003,11 +2001,8 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadTracks = function(song,track
 		}
 	}
 	this.Skip(((this.VersionIndex == 0?2:1)));
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadTremoloBar = function(effect) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadTremoloBar");
-	var $spos = $s.length;
 	var barEffect = this.Factory.NewTremoloBarEffect();
 	barEffect.Type = net.alphatab.model.effects.GsBendTypesConverter.FromInt(this.ReadByte());
 	barEffect.Value = this.ReadInt();
@@ -3023,11 +2018,8 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadTremoloBar = function(effect
 		}
 	}
 	if(pointCount > 0) effect.TremoloBar = barEffect;
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadTremoloPicking = function(noteEffect) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadTremoloPicking");
-	var $spos = $s.length;
 	var value = this.ReadUnsignedByte();
 	var tp = this.Factory.NewTremoloPickingEffect();
 	switch(value) {
@@ -3044,11 +2036,8 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadTremoloPicking = function(no
 		noteEffect.TremoloPicking = (tp);
 	}break;
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadTrill = function(noteEffect) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ReadTrill");
-	var $spos = $s.length;
 	var fret = this.ReadByte();
 	var period = this.ReadByte();
 	var trill = this.Factory.NewTrillEffect();
@@ -3067,78 +2056,41 @@ net.alphatab.file.guitarpro.Gp5Reader.prototype.ReadTrill = function(noteEffect)
 		noteEffect.Trill = (trill);
 	}break;
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ToKeySignature = function(p) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ToKeySignature");
-	var $spos = $s.length;
-	{
-		var $tmp = (p < 0?7 + Math.round(Math.abs(p)):p);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (p < 0?7 + Math.round(Math.abs(p)):p);
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.ToStrokeValue = function(value) {
-	$s.push("net.alphatab.file.guitarpro.Gp5Reader::ToStrokeValue");
-	var $spos = $s.length;
 	switch(value) {
 	case 1:{
-		{
-			$s.pop();
-			return 64;
-		}
+		return 64;
 	}break;
 	case 2:{
-		{
-			$s.pop();
-			return 64;
-		}
+		return 64;
 	}break;
 	case 3:{
-		{
-			$s.pop();
-			return 32;
-		}
+		return 32;
 	}break;
 	case 4:{
-		{
-			$s.pop();
-			return 16;
-		}
+		return 16;
 	}break;
 	case 5:{
-		{
-			$s.pop();
-			return 8;
-		}
+		return 8;
 	}break;
 	case 6:{
-		{
-			$s.pop();
-			return 4;
-		}
+		return 4;
 	}break;
 	default:{
-		{
-			$s.pop();
-			return 64;
-		}
+		return 64;
 	}break;
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp5Reader.prototype.__class__ = net.alphatab.file.guitarpro.Gp5Reader;
 haxe.io.BytesBuffer = function(p) { if( p === $_ ) return; {
-	$s.push("haxe.io.BytesBuffer::new");
-	var $spos = $s.length;
 	this.b = new Array();
-	$s.pop();
 }}
 haxe.io.BytesBuffer.__name__ = ["haxe","io","BytesBuffer"];
 haxe.io.BytesBuffer.prototype.add = function(src) {
-	$s.push("haxe.io.BytesBuffer::add");
-	var $spos = $s.length;
 	var b1 = this.b;
 	var b2 = src.b;
 	{
@@ -3148,17 +2100,11 @@ haxe.io.BytesBuffer.prototype.add = function(src) {
 			this.b.push(b2[i]);
 		}
 	}
-	$s.pop();
 }
 haxe.io.BytesBuffer.prototype.addByte = function($byte) {
-	$s.push("haxe.io.BytesBuffer::addByte");
-	var $spos = $s.length;
 	this.b.push($byte);
-	$s.pop();
 }
 haxe.io.BytesBuffer.prototype.addBytes = function(src,pos,len) {
-	$s.push("haxe.io.BytesBuffer::addBytes");
-	var $spos = $s.length;
 	if(pos < 0 || len < 0 || pos + len > src.length) throw haxe.io.Error.OutsideBounds;
 	var b1 = this.b;
 	var b2 = src.b;
@@ -3169,32 +2115,20 @@ haxe.io.BytesBuffer.prototype.addBytes = function(src,pos,len) {
 			this.b.push(b2[i]);
 		}
 	}
-	$s.pop();
 }
 haxe.io.BytesBuffer.prototype.b = null;
 haxe.io.BytesBuffer.prototype.getBytes = function() {
-	$s.push("haxe.io.BytesBuffer::getBytes");
-	var $spos = $s.length;
 	var bytes = new haxe.io.Bytes(this.b.length,this.b);
 	this.b = null;
-	{
-		$s.pop();
-		return bytes;
-	}
-	$s.pop();
+	return bytes;
 }
 haxe.io.BytesBuffer.prototype.__class__ = haxe.io.BytesBuffer;
 net.alphatab.model.effects.GsTrillEffect = function(factory) { if( factory === $_ ) return; {
-	$s.push("net.alphatab.model.effects.GsTrillEffect::new");
-	var $spos = $s.length;
 	this.Fret = 0;
 	this.Duration = factory.NewDuration();
-	$s.pop();
 }}
 net.alphatab.model.effects.GsTrillEffect.__name__ = ["net","alphatab","model","effects","GsTrillEffect"];
 net.alphatab.model.effects.GsTrillEffect.prototype.Clone = function(factory) {
-	$s.push("net.alphatab.model.effects.GsTrillEffect::Clone");
-	var $spos = $s.length;
 	var effect = factory.NewTrillEffect();
 	effect.Fret = this.Fret;
 	effect.Duration.Value = this.Duration.Value;
@@ -3202,41 +2136,28 @@ net.alphatab.model.effects.GsTrillEffect.prototype.Clone = function(factory) {
 	effect.Duration.IsDoubleDotted = this.Duration.IsDoubleDotted;
 	effect.Duration.Triplet.Enters = this.Duration.Triplet.Enters;
 	effect.Duration.Triplet.Times = this.Duration.Triplet.Times;
-	{
-		$s.pop();
-		return effect;
-	}
-	$s.pop();
+	return effect;
 }
 net.alphatab.model.effects.GsTrillEffect.prototype.Duration = null;
 net.alphatab.model.effects.GsTrillEffect.prototype.Fret = null;
 net.alphatab.model.effects.GsTrillEffect.prototype.__class__ = net.alphatab.model.effects.GsTrillEffect;
 net.alphatab.model.GsHeaderFooterElements = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.model.GsHeaderFooterElements::new");
-	var $spos = $s.length;
 	null;
-	$s.pop();
 }}
 net.alphatab.model.GsHeaderFooterElements.__name__ = ["net","alphatab","model","GsHeaderFooterElements"];
 net.alphatab.model.GsHeaderFooterElements.prototype.__class__ = net.alphatab.model.GsHeaderFooterElements;
 net.alphatab.model.GsVoice = function(factory,index) { if( factory === $_ ) return; {
-	$s.push("net.alphatab.model.GsVoice::new");
-	var $spos = $s.length;
 	this.Duration = factory.NewDuration();
 	this.Notes = new Array();
 	this.Index = index;
 	this.Direction = net.alphatab.model.GsVoiceDirection.None;
 	this.IsEmpty = true;
-	$s.pop();
 }}
 net.alphatab.model.GsVoice.__name__ = ["net","alphatab","model","GsVoice"];
 net.alphatab.model.GsVoice.prototype.AddNote = function(note) {
-	$s.push("net.alphatab.model.GsVoice::AddNote");
-	var $spos = $s.length;
 	note.Voice = this;
 	this.Notes.push(note);
 	this.IsEmpty = false;
-	$s.pop();
 }
 net.alphatab.model.GsVoice.prototype.Beat = null;
 net.alphatab.model.GsVoice.prototype.Direction = null;
@@ -3244,58 +2165,31 @@ net.alphatab.model.GsVoice.prototype.Duration = null;
 net.alphatab.model.GsVoice.prototype.Index = null;
 net.alphatab.model.GsVoice.prototype.IsEmpty = null;
 net.alphatab.model.GsVoice.prototype.IsRestVoice = function() {
-	$s.push("net.alphatab.model.GsVoice::IsRestVoice");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Notes.length == 0;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Notes.length == 0;
 }
 net.alphatab.model.GsVoice.prototype.Notes = null;
 net.alphatab.model.GsVoice.prototype.__class__ = net.alphatab.model.GsVoice;
 if(!net.alphatab.tablature.model) net.alphatab.tablature.model = {}
 net.alphatab.tablature.model.GsVoiceImpl = function(factory,index) { if( factory === $_ ) return; {
-	$s.push("net.alphatab.tablature.model.GsVoiceImpl::new");
-	var $spos = $s.length;
 	net.alphatab.model.GsVoice.apply(this,[factory,index]);
-	$s.pop();
 }}
 net.alphatab.tablature.model.GsVoiceImpl.__name__ = ["net","alphatab","tablature","model","GsVoiceImpl"];
 net.alphatab.tablature.model.GsVoiceImpl.__super__ = net.alphatab.model.GsVoice;
 for(var k in net.alphatab.model.GsVoice.prototype ) net.alphatab.tablature.model.GsVoiceImpl.prototype[k] = net.alphatab.model.GsVoice.prototype[k];
 net.alphatab.tablature.model.GsVoiceImpl.prototype.BeatGroup = null;
 net.alphatab.tablature.model.GsVoiceImpl.prototype.BeatImpl = function() {
-	$s.push("net.alphatab.tablature.model.GsVoiceImpl::BeatImpl");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Beat;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Beat;
 }
 net.alphatab.tablature.model.GsVoiceImpl.prototype.Check = function(note) {
-	$s.push("net.alphatab.tablature.model.GsVoiceImpl::Check");
-	var $spos = $s.length;
 	var value = note.RealValue();
 	if(this.MaxNote == null || value > this.MaxNote.RealValue()) this.MaxNote = note;
 	if(this.MinNote == null || value < this.MinNote.RealValue()) this.MinNote = note;
 	this.UsedStrings()[note.String - 1] = true;
 	if(note.String > this.MaxString) this.MaxString = note.String;
 	if(note.String < this.MinString) this.MinString = note.String;
-	$s.pop();
 }
 net.alphatab.tablature.model.GsVoiceImpl.prototype.GetPaintPosition = function(iIndex) {
-	$s.push("net.alphatab.tablature.model.GsVoiceImpl::GetPaintPosition");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Beat.Measure.Ts.Get(iIndex);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Beat.Measure.Ts.Get(iIndex);
 }
 net.alphatab.tablature.model.GsVoiceImpl.prototype.IsHiddenSilence = null;
 net.alphatab.tablature.model.GsVoiceImpl.prototype.IsJoinedGreaterThanQuarter = null;
@@ -3306,22 +2200,13 @@ net.alphatab.tablature.model.GsVoiceImpl.prototype.MaxNote = null;
 net.alphatab.tablature.model.GsVoiceImpl.prototype.MaxString = null;
 net.alphatab.tablature.model.GsVoiceImpl.prototype.MaxY = null;
 net.alphatab.tablature.model.GsVoiceImpl.prototype.MeasureImpl = function() {
-	$s.push("net.alphatab.tablature.model.GsVoiceImpl::MeasureImpl");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Beat.Measure;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Beat.Measure;
 }
 net.alphatab.tablature.model.GsVoiceImpl.prototype.MinNote = null;
 net.alphatab.tablature.model.GsVoiceImpl.prototype.MinString = null;
 net.alphatab.tablature.model.GsVoiceImpl.prototype.MinY = null;
 net.alphatab.tablature.model.GsVoiceImpl.prototype.NextBeat = null;
 net.alphatab.tablature.model.GsVoiceImpl.prototype.Paint = function(layout,context,x,y) {
-	$s.push("net.alphatab.tablature.model.GsVoiceImpl::Paint");
-	var $spos = $s.length;
 	if(!this.IsEmpty) {
 		if(this.IsRestVoice() && !this.IsHiddenSilence) {
 			this.PaintSilence(layout,context,x,y);
@@ -3339,30 +2224,21 @@ net.alphatab.tablature.model.GsVoiceImpl.prototype.Paint = function(layout,conte
 			this.PaintBeat(layout,context,x,y);
 		}
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsVoiceImpl.prototype.PaintBeat = function(layout,context,x,y) {
-	$s.push("net.alphatab.tablature.model.GsVoiceImpl::PaintBeat");
-	var $spos = $s.length;
 	if(!this.IsRestVoice()) {
 		var spacing = this.Beat.Spacing();
 		this.PaintScoreBeat(layout,context,x,y + this.GetPaintPosition(net.alphatab.tablature.TrackSpacingPositions.ScoreMiddleLines),spacing);
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsVoiceImpl.prototype.PaintDot = function(layout,layer,x,y,scale) {
-	$s.push("net.alphatab.tablature.model.GsVoiceImpl::PaintDot");
-	var $spos = $s.length;
 	var dotSize = 3.0 * scale;
 	layer.AddCircle(Math.round(x - (dotSize / 2.0)),Math.round(y - (dotSize / 2.0)),dotSize);
 	if(this.Duration.IsDoubleDotted) {
 		layer.AddCircle(Math.round((x + (dotSize + 2.0)) - (dotSize / 2.0)),Math.round(y - (dotSize / 2.0)),dotSize);
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsVoiceImpl.prototype.PaintScoreBeat = function(layout,context,x,y,spacing) {
-	$s.push("net.alphatab.tablature.model.GsVoiceImpl::PaintScoreBeat");
-	var $spos = $s.length;
 	var vX = x + 4 * layout.Scale;
 	var fill = (this.Index == 0?context.Get(net.alphatab.tablature.drawing.DrawingLayers.Voice1):context.Get(net.alphatab.tablature.drawing.DrawingLayers.Voice2));
 	var draw = (this.Index == 0?context.Get(net.alphatab.tablature.drawing.DrawingLayers.VoiceDraw1):context.Get(net.alphatab.tablature.drawing.DrawingLayers.VoiceDraw2));
@@ -3422,11 +2298,8 @@ net.alphatab.tablature.model.GsVoiceImpl.prototype.PaintScoreBeat = function(lay
 			}
 		}
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsVoiceImpl.prototype.PaintSilence = function(layout,context,x,y) {
-	$s.push("net.alphatab.tablature.model.GsVoiceImpl::PaintSilence");
-	var $spos = $s.length;
 	var realX = x + 3 * layout.Scale;
 	var realY = y + this.GetPaintPosition(net.alphatab.tablature.TrackSpacingPositions.ScoreMiddleLines);
 	var lineSpacing = layout.ScoreLineSpacing;
@@ -3464,11 +2337,8 @@ net.alphatab.tablature.model.GsVoiceImpl.prototype.PaintSilence = function(layou
 		}
 	}
 	this.PaintTriplet(layout,context,x,y);
-	$s.pop();
 }
 net.alphatab.tablature.model.GsVoiceImpl.prototype.PaintTriplet = function(layout,context,x,y) {
-	$s.push("net.alphatab.tablature.model.GsVoiceImpl::PaintTriplet");
-	var $spos = $s.length;
 	var realX = x + 3 * layout.Scale;
 	var fill = (this.Index == 0?context.Get(net.alphatab.tablature.drawing.DrawingLayers.Voice1):context.Get(net.alphatab.tablature.drawing.DrawingLayers.Voice2));
 	if(!this.Duration.Triplet.Equals(new net.alphatab.model.GsTriplet())) {
@@ -3479,22 +2349,12 @@ net.alphatab.tablature.model.GsVoiceImpl.prototype.PaintTriplet = function(layou
 			fill.AddString(net.alphatab.Utils.string(this.Duration.Triplet.Enters),net.alphatab.tablature.drawing.DrawingResources.DefaultFont,Math.round(realX),Math.round(y + this.GetPaintPosition(net.alphatab.tablature.TrackSpacingPositions.Tupleto)));
 		}
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsVoiceImpl.prototype.PosX = function() {
-	$s.push("net.alphatab.tablature.model.GsVoiceImpl::PosX");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Beat.PosX;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Beat.PosX;
 }
 net.alphatab.tablature.model.GsVoiceImpl.prototype.PreviousBeat = null;
 net.alphatab.tablature.model.GsVoiceImpl.prototype.Reset = function() {
-	$s.push("net.alphatab.tablature.model.GsVoiceImpl::Reset");
-	var $spos = $s.length;
 	this.MaxNote = null;
 	this.MinNote = null;
 	this._hiddenSilence = false;
@@ -3508,12 +2368,9 @@ net.alphatab.tablature.model.GsVoiceImpl.prototype.Reset = function() {
 	}
 	this.MaxString = 1;
 	this.MinString = this.Beat.Measure.Track.StringCount();
-	$s.pop();
 }
 net.alphatab.tablature.model.GsVoiceImpl.prototype.TripletGroup = null;
 net.alphatab.tablature.model.GsVoiceImpl.prototype.Update = function(layout) {
-	$s.push("net.alphatab.tablature.model.GsVoiceImpl::Update");
-	var $spos = $s.length;
 	this.MinY = 0;
 	this.MaxY = 0;
 	if(this.IsRestVoice()) this.UpdateSilenceSpacing(layout);
@@ -3527,11 +2384,8 @@ net.alphatab.tablature.model.GsVoiceImpl.prototype.Update = function(layout) {
 			this.TripletGroup = this.PreviousBeat.TripletGroup;
 		}
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsVoiceImpl.prototype.UpdateNoteVoice = function(layout) {
-	$s.push("net.alphatab.tablature.model.GsVoiceImpl::UpdateNoteVoice");
-	var $spos = $s.length;
 	this.JoinedType = net.alphatab.tablature.model.GsJoinedType.NoneRight;
 	this.IsJoinedGreaterThanQuarter = false;
 	this.Join1 = this;
@@ -3572,11 +2426,8 @@ net.alphatab.tablature.model.GsVoiceImpl.prototype.UpdateNoteVoice = function(la
 	else {
 		this.MinY -= Math.floor((layout.StringSpacing / 2) * 5) + 1;
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsVoiceImpl.prototype.UpdateSilenceSpacing = function(layout) {
-	$s.push("net.alphatab.tablature.model.GsVoiceImpl::UpdateSilenceSpacing");
-	var $spos = $s.length;
 	this._silenceY = 0;
 	this._silenceHeight = 0;
 	if(!this._hiddenSilence) {
@@ -3633,11 +2484,8 @@ net.alphatab.tablature.model.GsVoiceImpl.prototype.UpdateSilenceSpacing = functi
 		this.MinY = this._silenceY;
 		this.MaxY = this._silenceY + this._silenceHeight;
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsVoiceImpl.prototype.UsedStrings = function() {
-	$s.push("net.alphatab.tablature.model.GsVoiceImpl::UsedStrings");
-	var $spos = $s.length;
 	if(this._usedStrings == null) {
 		this._usedStrings = new Array();
 		{
@@ -3648,12 +2496,7 @@ net.alphatab.tablature.model.GsVoiceImpl.prototype.UsedStrings = function() {
 			}
 		}
 	}
-	{
-		var $tmp = this._usedStrings;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this._usedStrings;
 }
 net.alphatab.tablature.model.GsVoiceImpl.prototype.Width = null;
 net.alphatab.tablature.model.GsVoiceImpl.prototype._hiddenSilence = null;
@@ -3696,43 +2539,50 @@ net.alphatab.platform.TextMetrics = function() { }
 net.alphatab.platform.TextMetrics.__name__ = ["net","alphatab","platform","TextMetrics"];
 net.alphatab.platform.TextMetrics.prototype.width = null;
 net.alphatab.platform.TextMetrics.prototype.__class__ = net.alphatab.platform.TextMetrics;
+net.alphatab.model.GsBeatEffect = function(factory) { if( factory === $_ ) return; {
+	this.Tapping = false;
+	this.Slapping = false;
+	this.Popping = false;
+	this.FadeIn = false;
+	this.Stroke = factory.NewStroke();
+}}
+net.alphatab.model.GsBeatEffect.__name__ = ["net","alphatab","model","GsBeatEffect"];
+net.alphatab.model.GsBeatEffect.prototype.Chord = null;
+net.alphatab.model.GsBeatEffect.prototype.FadeIn = null;
+net.alphatab.model.GsBeatEffect.prototype.HasPickStroke = null;
+net.alphatab.model.GsBeatEffect.prototype.HasRasgueado = null;
+net.alphatab.model.GsBeatEffect.prototype.IsTremoloBar = function() {
+	return this.TremoloBar != null;
+}
+net.alphatab.model.GsBeatEffect.prototype.MixTableChange = null;
+net.alphatab.model.GsBeatEffect.prototype.PickStroke = null;
+net.alphatab.model.GsBeatEffect.prototype.Popping = null;
+net.alphatab.model.GsBeatEffect.prototype.Slapping = null;
+net.alphatab.model.GsBeatEffect.prototype.Stroke = null;
+net.alphatab.model.GsBeatEffect.prototype.Tapping = null;
+net.alphatab.model.GsBeatEffect.prototype.TremoloBar = null;
+net.alphatab.model.GsBeatEffect.prototype.Vibrato = null;
+net.alphatab.model.GsBeatEffect.prototype.__class__ = net.alphatab.model.GsBeatEffect;
 net.alphatab.tablature.model.GsJoinedTypeConverter = function() { }
 net.alphatab.tablature.model.GsJoinedTypeConverter.__name__ = ["net","alphatab","tablature","model","GsJoinedTypeConverter"];
 net.alphatab.tablature.model.GsJoinedTypeConverter.ToInt = function(t) {
-	$s.push("net.alphatab.tablature.model.GsJoinedTypeConverter::ToInt");
-	var $spos = $s.length;
 	switch(t) {
 	case net.alphatab.tablature.model.GsJoinedType.NoneLeft:{
-		{
-			$s.pop();
-			return 1;
-		}
+		return 1;
 	}break;
 	case net.alphatab.tablature.model.GsJoinedType.NoneRight:{
-		{
-			$s.pop();
-			return 2;
-		}
+		return 2;
 	}break;
 	case net.alphatab.tablature.model.GsJoinedType.Left:{
-		{
-			$s.pop();
-			return 3;
-		}
+		return 3;
 	}break;
 	case net.alphatab.tablature.model.GsJoinedType.Right:{
-		{
-			$s.pop();
-			return 4;
-		}
+		return 4;
 	}break;
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsJoinedTypeConverter.prototype.__class__ = net.alphatab.tablature.model.GsJoinedTypeConverter;
 net.alphatab.model.GsMixTableChange = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.model.GsMixTableChange::new");
-	var $spos = $s.length;
 	this.Volume = new net.alphatab.model.GsMixTableItem();
 	this.Balance = new net.alphatab.model.GsMixTableItem();
 	this.Chorus = new net.alphatab.model.GsMixTableItem();
@@ -3742,7 +2592,6 @@ net.alphatab.model.GsMixTableChange = function(p) { if( p === $_ ) return; {
 	this.Instrument = new net.alphatab.model.GsMixTableItem();
 	this.Tempo = new net.alphatab.model.GsMixTableItem();
 	this.HideTempo = true;
-	$s.pop();
 }}
 net.alphatab.model.GsMixTableChange.__name__ = ["net","alphatab","model","GsMixTableChange"];
 net.alphatab.model.GsMixTableChange.prototype.Balance = null;
@@ -3757,16 +2606,12 @@ net.alphatab.model.GsMixTableChange.prototype.Tremolo = null;
 net.alphatab.model.GsMixTableChange.prototype.Volume = null;
 net.alphatab.model.GsMixTableChange.prototype.__class__ = net.alphatab.model.GsMixTableChange;
 net.alphatab.model.GsNoteEffect = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.model.GsNoteEffect::new");
-	var $spos = $s.length;
 	this.Bend = null;
-	this.TremoloBar = null;
 	this.Harmonic = null;
 	this.Grace = null;
 	this.Trill = null;
 	this.TremoloPicking = null;
 	this.Vibrato = false;
-	this.BeatVibrato = false;
 	this.DeadNote = false;
 	this.Slide = false;
 	this.Hammer = false;
@@ -3775,23 +2620,14 @@ net.alphatab.model.GsNoteEffect = function(p) { if( p === $_ ) return; {
 	this.HeavyAccentuatedNote = false;
 	this.PalmMute = false;
 	this.Staccato = false;
-	this.Tapping = false;
-	this.Slapping = false;
-	this.Popping = false;
-	this.FadeIn = false;
 	this.LetRing = false;
-	$s.pop();
 }}
 net.alphatab.model.GsNoteEffect.__name__ = ["net","alphatab","model","GsNoteEffect"];
 net.alphatab.model.GsNoteEffect.prototype.AccentuatedNote = null;
-net.alphatab.model.GsNoteEffect.prototype.BeatVibrato = null;
 net.alphatab.model.GsNoteEffect.prototype.Bend = null;
 net.alphatab.model.GsNoteEffect.prototype.Clone = function(factory) {
-	$s.push("net.alphatab.model.GsNoteEffect::Clone");
-	var $spos = $s.length;
-	var effect = factory.NewEffect();
+	var effect = factory.NewNoteEffect();
 	effect.Vibrato = this.Vibrato;
-	effect.BeatVibrato = this.BeatVibrato;
 	effect.DeadNote = this.DeadNote;
 	effect.Slide = this.Slide;
 	effect.SlideType = this.SlideType;
@@ -3801,99 +2637,40 @@ net.alphatab.model.GsNoteEffect.prototype.Clone = function(factory) {
 	effect.HeavyAccentuatedNote = this.HeavyAccentuatedNote;
 	effect.PalmMute = this.PalmMute;
 	effect.Staccato = this.Staccato;
-	effect.Tapping = this.Tapping;
-	effect.Slapping = this.Slapping;
-	effect.Popping = this.Popping;
-	effect.FadeIn = this.FadeIn;
 	effect.LetRing = this.LetRing;
 	effect.Bend = (this.IsBend()?this.Bend.Clone(factory):null);
-	effect.TremoloBar = (this.IsTremoloBar()?this.TremoloBar.Clone(factory):null);
 	effect.Harmonic = (this.IsHarmonic()?this.Harmonic.Clone(factory):null);
 	effect.Grace = (this.IsGrace()?this.Grace.Clone(factory):null);
 	effect.Trill = (this.IsTrill()?this.Trill.Clone(factory):null);
 	effect.TremoloPicking = (this.IsTremoloPicking()?this.TremoloPicking.Clone(factory):null);
-	{
-		$s.pop();
-		return effect;
-	}
-	$s.pop();
+	return effect;
 }
 net.alphatab.model.GsNoteEffect.prototype.DeadNote = null;
-net.alphatab.model.GsNoteEffect.prototype.FadeIn = null;
 net.alphatab.model.GsNoteEffect.prototype.GhostNote = null;
 net.alphatab.model.GsNoteEffect.prototype.Grace = null;
 net.alphatab.model.GsNoteEffect.prototype.Hammer = null;
 net.alphatab.model.GsNoteEffect.prototype.Harmonic = null;
 net.alphatab.model.GsNoteEffect.prototype.HeavyAccentuatedNote = null;
 net.alphatab.model.GsNoteEffect.prototype.IsBend = function() {
-	$s.push("net.alphatab.model.GsNoteEffect::IsBend");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Bend != null && this.Bend.Points.length != 0;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Bend != null && this.Bend.Points.length != 0;
 }
 net.alphatab.model.GsNoteEffect.prototype.IsGrace = function() {
-	$s.push("net.alphatab.model.GsNoteEffect::IsGrace");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Grace != null;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Grace != null;
 }
 net.alphatab.model.GsNoteEffect.prototype.IsHarmonic = function() {
-	$s.push("net.alphatab.model.GsNoteEffect::IsHarmonic");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Harmonic != null;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
-}
-net.alphatab.model.GsNoteEffect.prototype.IsTremoloBar = function() {
-	$s.push("net.alphatab.model.GsNoteEffect::IsTremoloBar");
-	var $spos = $s.length;
-	{
-		var $tmp = this.TremoloBar != null;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Harmonic != null;
 }
 net.alphatab.model.GsNoteEffect.prototype.IsTremoloPicking = function() {
-	$s.push("net.alphatab.model.GsNoteEffect::IsTremoloPicking");
-	var $spos = $s.length;
-	{
-		var $tmp = this.TremoloPicking != null;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.TremoloPicking != null;
 }
 net.alphatab.model.GsNoteEffect.prototype.IsTrill = function() {
-	$s.push("net.alphatab.model.GsNoteEffect::IsTrill");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Trill != null;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Trill != null;
 }
 net.alphatab.model.GsNoteEffect.prototype.LetRing = null;
 net.alphatab.model.GsNoteEffect.prototype.PalmMute = null;
-net.alphatab.model.GsNoteEffect.prototype.Popping = null;
-net.alphatab.model.GsNoteEffect.prototype.Slapping = null;
 net.alphatab.model.GsNoteEffect.prototype.Slide = null;
 net.alphatab.model.GsNoteEffect.prototype.SlideType = null;
 net.alphatab.model.GsNoteEffect.prototype.Staccato = null;
-net.alphatab.model.GsNoteEffect.prototype.Tapping = null;
-net.alphatab.model.GsNoteEffect.prototype.TremoloBar = null;
 net.alphatab.model.GsNoteEffect.prototype.TremoloPicking = null;
 net.alphatab.model.GsNoteEffect.prototype.Trill = null;
 net.alphatab.model.GsNoteEffect.prototype.Vibrato = null;
@@ -3901,183 +2678,87 @@ net.alphatab.model.GsNoteEffect.prototype.__class__ = net.alphatab.model.GsNoteE
 net.alphatab.model.effects.GsBendTypesConverter = function() { }
 net.alphatab.model.effects.GsBendTypesConverter.__name__ = ["net","alphatab","model","effects","GsBendTypesConverter"];
 net.alphatab.model.effects.GsBendTypesConverter.FromInt = function(i) {
-	$s.push("net.alphatab.model.effects.GsBendTypesConverter::FromInt");
-	var $spos = $s.length;
 	switch(i) {
 	case 0:{
-		{
-			var $tmp = net.alphatab.model.effects.GsBendTypes.None;
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.model.effects.GsBendTypes.None;
 	}break;
 	case 1:{
-		{
-			var $tmp = net.alphatab.model.effects.GsBendTypes.Bend;
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.model.effects.GsBendTypes.Bend;
 	}break;
 	case 2:{
-		{
-			var $tmp = net.alphatab.model.effects.GsBendTypes.BendRelease;
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.model.effects.GsBendTypes.BendRelease;
 	}break;
 	case 3:{
-		{
-			var $tmp = net.alphatab.model.effects.GsBendTypes.BendReleaseBend;
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.model.effects.GsBendTypes.BendReleaseBend;
 	}break;
 	case 4:{
-		{
-			var $tmp = net.alphatab.model.effects.GsBendTypes.Prebend;
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.model.effects.GsBendTypes.Prebend;
 	}break;
 	case 5:{
-		{
-			var $tmp = net.alphatab.model.effects.GsBendTypes.PrebendRelease;
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.model.effects.GsBendTypes.PrebendRelease;
 	}break;
 	case 6:{
-		{
-			var $tmp = net.alphatab.model.effects.GsBendTypes.Dip;
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.model.effects.GsBendTypes.Dip;
 	}break;
 	case 7:{
-		{
-			var $tmp = net.alphatab.model.effects.GsBendTypes.Dive;
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.model.effects.GsBendTypes.Dive;
 	}break;
 	case 8:{
-		{
-			var $tmp = net.alphatab.model.effects.GsBendTypes.ReleaseUp;
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.model.effects.GsBendTypes.ReleaseUp;
 	}break;
 	case 9:{
-		{
-			var $tmp = net.alphatab.model.effects.GsBendTypes.InvertedDip;
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.model.effects.GsBendTypes.InvertedDip;
 	}break;
 	case 10:{
-		{
-			var $tmp = net.alphatab.model.effects.GsBendTypes.Return;
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.model.effects.GsBendTypes.Return;
 	}break;
 	case 11:{
-		{
-			var $tmp = net.alphatab.model.effects.GsBendTypes.ReleaseDown;
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.model.effects.GsBendTypes.ReleaseDown;
 	}break;
 	default:{
-		{
-			var $tmp = net.alphatab.model.effects.GsBendTypes.None;
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.model.effects.GsBendTypes.None;
 	}break;
 	}
-	$s.pop();
 }
 net.alphatab.model.effects.GsBendTypesConverter.prototype.__class__ = net.alphatab.model.effects.GsBendTypesConverter;
 if(typeof js=='undefined') js = {}
 js.Boot = function() { }
 js.Boot.__name__ = ["js","Boot"];
 js.Boot.__unhtml = function(s) {
-	$s.push("js.Boot::__unhtml");
-	var $spos = $s.length;
-	{
-		var $tmp = s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
 }
 js.Boot.__trace = function(v,i) {
-	$s.push("js.Boot::__trace");
-	var $spos = $s.length;
 	var msg = (i != null?((i.fileName + ":") + i.lineNumber) + ": ":"");
 	msg += js.Boot.__unhtml(js.Boot.__string_rec(v,"")) + "<br/>";
 	var d = document.getElementById("haxe:trace");
 	if(d == null) alert("No haxe:trace element defined\n" + msg);
 	else d.innerHTML += msg;
-	$s.pop();
 }
 js.Boot.__clear_trace = function() {
-	$s.push("js.Boot::__clear_trace");
-	var $spos = $s.length;
 	var d = document.getElementById("haxe:trace");
 	if(d != null) d.innerHTML = "";
 	else null;
-	$s.pop();
 }
 js.Boot.__closure = function(o,f) {
-	$s.push("js.Boot::__closure");
-	var $spos = $s.length;
 	var m = o[f];
-	if(m == null) {
-		$s.pop();
-		return null;
-	}
+	if(m == null) return null;
 	var f1 = function() {
-		$s.push("js.Boot::__closure@67");
-		var $spos = $s.length;
-		{
-			var $tmp = m.apply(o,arguments);
-			$s.pop();
-			return $tmp;
-		}
-		$s.pop();
+		return m.apply(o,arguments);
 	}
 	f1.scope = o;
 	f1.method = m;
-	{
-		$s.pop();
-		return f1;
-	}
-	$s.pop();
+	return f1;
 }
 js.Boot.__string_rec = function(o,s) {
-	$s.push("js.Boot::__string_rec");
-	var $spos = $s.length;
-	if(o == null) {
-		$s.pop();
-		return "null";
-	}
-	if(s.length >= 5) {
-		$s.pop();
-		return "<...>";
-	}
+	if(o == null) return "null";
+	if(s.length >= 5) return "<...>";
 	var t = typeof(o);
 	if(t == "function" && (o.__name__ != null || o.__ename__ != null)) t = "object";
 	switch(t) {
 	case "object":{
 		if(o instanceof Array) {
 			if(o.__enum__ != null) {
-				if(o.length == 2) {
-					var $tmp = o[0];
-					$s.pop();
-					return $tmp;
-				}
+				if(o.length == 2) return o[0];
 				var str = o[0] + "(";
 				s += "\t";
 				{
@@ -4088,11 +2769,7 @@ js.Boot.__string_rec = function(o,s) {
 						else str += js.Boot.__string_rec(o[i],s);
 					}
 				}
-				{
-					var $tmp = str + ")";
-					$s.pop();
-					return $tmp;
-				}
+				return str + ")";
 			}
 			var l = o.length;
 			var i;
@@ -4106,10 +2783,7 @@ js.Boot.__string_rec = function(o,s) {
 				}
 			}
 			str += "]";
-			{
-				$s.pop();
-				return str;
-			}
+			return str;
 		}
 		var tostr;
 		try {
@@ -4119,22 +2793,13 @@ js.Boot.__string_rec = function(o,s) {
 			{
 				var e = $e8;
 				{
-					$e = [];
-					while($s.length >= $spos) $e.unshift($s.pop());
-					$s.push($e[0]);
-					{
-						$s.pop();
-						return "???";
-					}
+					return "???";
 				}
 			}
 		}
 		if(tostr != null && tostr != Object.toString) {
 			var s2 = o.toString();
-			if(s2 != "[object Object]") {
-				$s.pop();
-				return s2;
-			}
+			if(s2 != "[object Object]") return s2;
 		}
 		var k = null;
 		var str = "{\n";
@@ -4148,245 +2813,112 @@ js.Boot.__string_rec = function(o,s) {
 		}
 		s = s.substring(1);
 		str += ("\n" + s) + "}";
-		{
-			$s.pop();
-			return str;
-		}
+		return str;
 	}break;
 	case "function":{
-		{
-			$s.pop();
-			return "<function>";
-		}
+		return "<function>";
 	}break;
 	case "string":{
-		{
-			$s.pop();
-			return o;
-		}
+		return o;
 	}break;
 	default:{
-		{
-			var $tmp = String(o);
-			$s.pop();
-			return $tmp;
-		}
+		return String(o);
 	}break;
 	}
-	$s.pop();
 }
 js.Boot.__interfLoop = function(cc,cl) {
-	$s.push("js.Boot::__interfLoop");
-	var $spos = $s.length;
-	if(cc == null) {
-		$s.pop();
-		return false;
-	}
-	if(cc == cl) {
-		$s.pop();
-		return true;
-	}
+	if(cc == null) return false;
+	if(cc == cl) return true;
 	var intf = cc.__interfaces__;
 	if(intf != null) {
 		var _g1 = 0, _g = intf.length;
 		while(_g1 < _g) {
 			var i = _g1++;
 			var i1 = intf[i];
-			if(i1 == cl || js.Boot.__interfLoop(i1,cl)) {
-				$s.pop();
-				return true;
-			}
+			if(i1 == cl || js.Boot.__interfLoop(i1,cl)) return true;
 		}
 	}
-	{
-		var $tmp = js.Boot.__interfLoop(cc.__super__,cl);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return js.Boot.__interfLoop(cc.__super__,cl);
 }
 js.Boot.__instanceof = function(o,cl) {
-	$s.push("js.Boot::__instanceof");
-	var $spos = $s.length;
 	try {
 		if(o instanceof cl) {
-			if(cl == Array) {
-				var $tmp = (o.__enum__ == null);
-				$s.pop();
-				return $tmp;
-			}
-			{
-				$s.pop();
-				return true;
-			}
-		}
-		if(js.Boot.__interfLoop(o.__class__,cl)) {
-			$s.pop();
+			if(cl == Array) return (o.__enum__ == null);
 			return true;
 		}
+		if(js.Boot.__interfLoop(o.__class__,cl)) return true;
 	}
 	catch( $e9 ) {
 		{
 			var e = $e9;
 			{
-				$e = [];
-				while($s.length >= $spos) $e.unshift($s.pop());
-				$s.push($e[0]);
-				if(cl == null) {
-					$s.pop();
-					return false;
-				}
+				if(cl == null) return false;
 			}
 		}
 	}
 	switch(cl) {
 	case Int:{
-		{
-			var $tmp = Math.ceil(o%2147483648.0) === o;
-			$s.pop();
-			return $tmp;
-		}
+		return Math.ceil(o%2147483648.0) === o;
 	}break;
 	case Float:{
-		{
-			var $tmp = typeof(o) == "number";
-			$s.pop();
-			return $tmp;
-		}
+		return typeof(o) == "number";
 	}break;
 	case Bool:{
-		{
-			var $tmp = o === true || o === false;
-			$s.pop();
-			return $tmp;
-		}
+		return o === true || o === false;
 	}break;
 	case String:{
-		{
-			var $tmp = typeof(o) == "string";
-			$s.pop();
-			return $tmp;
-		}
+		return typeof(o) == "string";
 	}break;
 	case Dynamic:{
-		{
-			$s.pop();
-			return true;
-		}
+		return true;
 	}break;
 	default:{
-		if(o == null) {
-			$s.pop();
-			return false;
-		}
-		{
-			var $tmp = o.__enum__ == cl || (cl == Class && o.__name__ != null) || (cl == Enum && o.__ename__ != null);
-			$s.pop();
-			return $tmp;
-		}
+		if(o == null) return false;
+		return o.__enum__ == cl || (cl == Class && o.__name__ != null) || (cl == Enum && o.__ename__ != null);
 	}break;
 	}
-	$s.pop();
 }
 js.Boot.__init = function() {
-	$s.push("js.Boot::__init");
-	var $spos = $s.length;
 	js.Lib.isIE = (typeof document!='undefined' && document.all != null && typeof window!='undefined' && window.opera == null);
 	js.Lib.isOpera = (typeof window!='undefined' && window.opera != null);
 	Array.prototype.copy = Array.prototype.slice;
 	Array.prototype.insert = function(i,x) {
-		$s.push("js.Boot::__init@205");
-		var $spos = $s.length;
 		this.splice(i,0,x);
-		$s.pop();
 	}
 	Array.prototype.remove = (Array.prototype.indexOf?function(obj) {
-		$s.push("js.Boot::__init@208");
-		var $spos = $s.length;
 		var idx = this.indexOf(obj);
-		if(idx == -1) {
-			$s.pop();
-			return false;
-		}
+		if(idx == -1) return false;
 		this.splice(idx,1);
-		{
-			$s.pop();
-			return true;
-		}
-		$s.pop();
+		return true;
 	}:function(obj) {
-		$s.push("js.Boot::__init@213");
-		var $spos = $s.length;
 		var i = 0;
 		var l = this.length;
 		while(i < l) {
 			if(this[i] == obj) {
 				this.splice(i,1);
-				{
-					$s.pop();
-					return true;
-				}
+				return true;
 			}
 			i++;
 		}
-		{
-			$s.pop();
-			return false;
-		}
-		$s.pop();
+		return false;
 	});
 	Array.prototype.iterator = function() {
-		$s.push("js.Boot::__init@225");
-		var $spos = $s.length;
-		{
-			var $tmp = { cur : 0, arr : this, hasNext : function() {
-				$s.push("js.Boot::__init@225@229");
-				var $spos = $s.length;
-				{
-					var $tmp = this.cur < this.arr.length;
-					$s.pop();
-					return $tmp;
-				}
-				$s.pop();
-			}, next : function() {
-				$s.push("js.Boot::__init@225@232");
-				var $spos = $s.length;
-				{
-					var $tmp = this.arr[this.cur++];
-					$s.pop();
-					return $tmp;
-				}
-				$s.pop();
-			}}
-			$s.pop();
-			return $tmp;
-		}
-		$s.pop();
+		return { cur : 0, arr : this, hasNext : function() {
+			return this.cur < this.arr.length;
+		}, next : function() {
+			return this.arr[this.cur++];
+		}}
 	}
 	var cca = String.prototype.charCodeAt;
 	String.prototype.cca = cca;
 	String.prototype.charCodeAt = function(i) {
-		$s.push("js.Boot::__init@239");
-		var $spos = $s.length;
 		var x = cca.call(this,i);
-		if(isNaN(x)) {
-			$s.pop();
-			return null;
-		}
-		{
-			$s.pop();
-			return x;
-		}
-		$s.pop();
+		if(isNaN(x)) return null;
+		return x;
 	}
 	var oldsub = String.prototype.substr;
 	String.prototype.substr = function(pos,len) {
-		$s.push("js.Boot::__init@246");
-		var $spos = $s.length;
-		if(pos != null && pos != 0 && len != null && len < 0) {
-			$s.pop();
-			return "";
-		}
+		if(pos != null && pos != 0 && len != null && len < 0) return "";
 		if(len == null) len = this.length;
 		if(pos < 0) {
 			pos = this.length + pos;
@@ -4395,15 +2927,9 @@ js.Boot.__init = function() {
 		else if(len < 0) {
 			len = (this.length + len) - pos;
 		}
-		{
-			var $tmp = oldsub.apply(this,[pos,len]);
-			$s.pop();
-			return $tmp;
-		}
-		$s.pop();
+		return oldsub.apply(this,[pos,len]);
 	}
 	$closure = js.Boot.__closure;
-	$s.pop();
 }
 js.Boot.prototype.__class__ = js.Boot;
 net.alphatab.model.GsTripletFeel = { __ename__ : ["net","alphatab","model","GsTripletFeel"], __constructs__ : ["None","Eighth","Sixteenth"] }
@@ -4430,163 +2956,59 @@ net.alphatab.model.GsMeasureClef.Treble = ["Treble",0];
 net.alphatab.model.GsMeasureClef.Treble.toString = $estr;
 net.alphatab.model.GsMeasureClef.Treble.__enum__ = net.alphatab.model.GsMeasureClef;
 net.alphatab.model.GsMeasure = function(header) { if( header === $_ ) return; {
-	$s.push("net.alphatab.model.GsMeasure::new");
-	var $spos = $s.length;
 	this.Header = header;
 	this.Clef = net.alphatab.model.GsMeasureClef.Treble;
 	this.Beats = new Array();
-	$s.pop();
 }}
 net.alphatab.model.GsMeasure.__name__ = ["net","alphatab","model","GsMeasure"];
 net.alphatab.model.GsMeasure.prototype.AddBeat = function(beat) {
-	$s.push("net.alphatab.model.GsMeasure::AddBeat");
-	var $spos = $s.length;
 	beat.Measure = this;
 	this.Beats.push(beat);
-	$s.pop();
 }
 net.alphatab.model.GsMeasure.prototype.BeatCount = function() {
-	$s.push("net.alphatab.model.GsMeasure::BeatCount");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Beats.length;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Beats.length;
 }
 net.alphatab.model.GsMeasure.prototype.Beats = null;
 net.alphatab.model.GsMeasure.prototype.Clef = null;
 net.alphatab.model.GsMeasure.prototype.End = function() {
-	$s.push("net.alphatab.model.GsMeasure::End");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Start() + this.Length();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Start() + this.Length();
 }
 net.alphatab.model.GsMeasure.prototype.GetKeySignature = function() {
-	$s.push("net.alphatab.model.GsMeasure::GetKeySignature");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Header.KeySignature;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Header.KeySignature;
 }
 net.alphatab.model.GsMeasure.prototype.GetMarker = function() {
-	$s.push("net.alphatab.model.GsMeasure::GetMarker");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Header.Marker;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Header.Marker;
 }
 net.alphatab.model.GsMeasure.prototype.GetTempo = function() {
-	$s.push("net.alphatab.model.GsMeasure::GetTempo");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Header.Tempo;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Header.Tempo;
 }
 net.alphatab.model.GsMeasure.prototype.GetTimeSignature = function() {
-	$s.push("net.alphatab.model.GsMeasure::GetTimeSignature");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Header.TimeSignature;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Header.TimeSignature;
 }
 net.alphatab.model.GsMeasure.prototype.GetTripletFeel = function() {
-	$s.push("net.alphatab.model.GsMeasure::GetTripletFeel");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Header.TripletFeel;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Header.TripletFeel;
 }
 net.alphatab.model.GsMeasure.prototype.HasMarker = function() {
-	$s.push("net.alphatab.model.GsMeasure::HasMarker");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Header.HasMarker();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Header.HasMarker();
 }
 net.alphatab.model.GsMeasure.prototype.Header = null;
 net.alphatab.model.GsMeasure.prototype.IsRepeatOpen = function() {
-	$s.push("net.alphatab.model.GsMeasure::IsRepeatOpen");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Header.IsRepeatOpen;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Header.IsRepeatOpen;
 }
 net.alphatab.model.GsMeasure.prototype.KeySignature = function() {
-	$s.push("net.alphatab.model.GsMeasure::KeySignature");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Header.KeySignature;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Header.KeySignature;
 }
 net.alphatab.model.GsMeasure.prototype.Length = function() {
-	$s.push("net.alphatab.model.GsMeasure::Length");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Header.Length();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Header.Length();
 }
 net.alphatab.model.GsMeasure.prototype.Number = function() {
-	$s.push("net.alphatab.model.GsMeasure::Number");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Header.Number;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Header.Number;
 }
 net.alphatab.model.GsMeasure.prototype.RepeatClose = function() {
-	$s.push("net.alphatab.model.GsMeasure::RepeatClose");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Header.RepeatClose;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Header.RepeatClose;
 }
 net.alphatab.model.GsMeasure.prototype.Start = function() {
-	$s.push("net.alphatab.model.GsMeasure::Start");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Header.Start;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Header.Start;
 }
 net.alphatab.model.GsMeasure.prototype.Track = null;
 net.alphatab.model.GsMeasure.prototype.__class__ = net.alphatab.model.GsMeasure;
@@ -4594,20 +3016,12 @@ if(!net.alphatab.file.alphatab) net.alphatab.file.alphatab = {}
 net.alphatab.file.alphatab.AlphaTabWriter = function() { }
 net.alphatab.file.alphatab.AlphaTabWriter.__name__ = ["net","alphatab","file","alphatab","AlphaTabWriter"];
 net.alphatab.file.alphatab.AlphaTabWriter.GetAsciiTab = function(track) {
-	$s.push("net.alphatab.file.alphatab.AlphaTabWriter::GetAsciiTab");
-	var $spos = $s.length;
 	var str = "";
 	str += net.alphatab.file.alphatab.AlphaTabWriter.WriteMetaData(track);
 	str += net.alphatab.file.alphatab.AlphaTabWriter.WriteMeasures(track);
-	{
-		$s.pop();
-		return str;
-	}
-	$s.pop();
+	return str;
 }
 net.alphatab.file.alphatab.AlphaTabWriter.WriteMetaData = function(track) {
-	$s.push("net.alphatab.file.alphatab.AlphaTabWriter::WriteMetaData");
-	var $spos = $s.length;
 	var str = "";
 	var song = track.Song;
 	if(song.Title != "") {
@@ -4646,15 +3060,9 @@ net.alphatab.file.alphatab.AlphaTabWriter.WriteMetaData = function(track) {
 	str += "\n";
 	str += ("\\tempo " + song.Tempo) + "\n";
 	str += ".\n";
-	{
-		$s.pop();
-		return str;
-	}
-	$s.pop();
+	return str;
 }
 net.alphatab.file.alphatab.AlphaTabWriter.ParseTuning = function(string) {
-	$s.push("net.alphatab.file.alphatab.AlphaTabWriter::ParseTuning");
-	var $spos = $s.length;
 	var tuning = string.Value;
 	var octave = Math.floor(tuning / 12);
 	var note = tuning % 12;
@@ -4695,16 +3103,9 @@ net.alphatab.file.alphatab.AlphaTabWriter.ParseTuning = function(string) {
 	else {
 		base = "b";
 	}
-	{
-		var $tmp = base + Std.string(octave);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return base + Std.string(octave);
 }
 net.alphatab.file.alphatab.AlphaTabWriter.WriteMeasures = function(track) {
-	$s.push("net.alphatab.file.alphatab.AlphaTabWriter::WriteMeasures");
-	var $spos = $s.length;
 	var str = "";
 	{
 		var _g1 = 0, _g = track.MeasureCount();
@@ -4716,15 +3117,9 @@ net.alphatab.file.alphatab.AlphaTabWriter.WriteMeasures = function(track) {
 			if(i < (track.MeasureCount() - 1)) str += "|";
 		}
 	}
-	{
-		$s.pop();
-		return str;
-	}
-	$s.pop();
+	return str;
 }
 net.alphatab.file.alphatab.AlphaTabWriter.WriteMeasureMeta = function(i,track) {
-	$s.push("net.alphatab.file.alphatab.AlphaTabWriter::WriteMeasureMeta");
-	var $spos = $s.length;
 	var measure = track.Measures[i];
 	var str = "";
 	if(i == 0 || measure.GetTimeSignature().Numerator != track.Measures[i - 1].GetTimeSignature().Numerator || measure.GetTimeSignature().Denominator.Value != track.Measures[i - 1].GetTimeSignature().Denominator.Value) {
@@ -4745,15 +3140,9 @@ net.alphatab.file.alphatab.AlphaTabWriter.WriteMeasureMeta = function(i,track) {
 	if(i == 0 || measure.GetTempo().Value != track.Measures[i - 1].GetTempo().Value) {
 		str += ("\\tempo " + measure.GetTempo().Value) + "\n";
 	}
-	{
-		$s.pop();
-		return str;
-	}
-	$s.pop();
+	return str;
 }
 net.alphatab.file.alphatab.AlphaTabWriter.WriteBeats = function(measure) {
-	$s.push("net.alphatab.file.alphatab.AlphaTabWriter::WriteBeats");
-	var $spos = $s.length;
 	var str = "";
 	{
 		var _g1 = 0, _g = measure.BeatCount();
@@ -4780,129 +3169,69 @@ net.alphatab.file.alphatab.AlphaTabWriter.WriteBeats = function(measure) {
 			str += ("." + beat.Voices[0].Duration.Value) + " ";
 		}
 	}
-	{
-		$s.pop();
-		return str;
-	}
-	$s.pop();
+	return str;
 }
 net.alphatab.file.alphatab.AlphaTabWriter.ParseKeySignature = function(sig) {
-	$s.push("net.alphatab.file.alphatab.AlphaTabWriter::ParseKeySignature");
-	var $spos = $s.length;
 	switch(sig) {
 	case -7:{
-		{
-			$s.pop();
-			return "cb";
-		}
+		return "cb";
 	}break;
 	case -6:{
-		{
-			$s.pop();
-			return "gb";
-		}
+		return "gb";
 	}break;
 	case -5:{
-		{
-			$s.pop();
-			return "db";
-		}
+		return "db";
 	}break;
 	case -4:{
-		{
-			$s.pop();
-			return "ab";
-		}
+		return "ab";
 	}break;
 	case -3:{
-		{
-			$s.pop();
-			return "eb";
-		}
+		return "eb";
 	}break;
 	case -2:{
-		{
-			$s.pop();
-			return "bb";
-		}
+		return "bb";
 	}break;
 	case -1:{
-		{
-			$s.pop();
-			return "f";
-		}
+		return "f";
 	}break;
 	case 0:{
-		{
-			$s.pop();
-			return "c";
-		}
+		return "c";
 	}break;
 	case 1:{
-		{
-			$s.pop();
-			return "g";
-		}
+		return "g";
 	}break;
 	case 2:{
-		{
-			$s.pop();
-			return "d";
-		}
+		return "d";
 	}break;
 	case 3:{
-		{
-			$s.pop();
-			return "a";
-		}
+		return "a";
 	}break;
 	case 4:{
-		{
-			$s.pop();
-			return "e";
-		}
+		return "e";
 	}break;
 	case 5:{
-		{
-			$s.pop();
-			return "b";
-		}
+		return "b";
 	}break;
 	case 6:{
-		{
-			$s.pop();
-			return "f#";
-		}
+		return "f#";
 	}break;
 	case 7:{
-		{
-			$s.pop();
-			return "c#";
-		}
+		return "c#";
 	}break;
 	default:{
-		{
-			$s.pop();
-			return "c";
-		}
+		return "c";
 	}break;
 	}
-	$s.pop();
 }
 net.alphatab.file.alphatab.AlphaTabWriter.prototype.__class__ = net.alphatab.file.alphatab.AlphaTabWriter;
 net.alphatab.model.GsLyrics = function(trackChoice) { if( trackChoice === $_ ) return; {
-	$s.push("net.alphatab.model.GsLyrics::new");
-	var $spos = $s.length;
 	if(trackChoice == null) trackChoice = 0;
 	this.TrackChoice = trackChoice;
 	this.Lines = new Array();
-	$s.pop();
 }}
 net.alphatab.model.GsLyrics.__name__ = ["net","alphatab","model","GsLyrics"];
 net.alphatab.model.GsLyrics.prototype.Lines = null;
 net.alphatab.model.GsLyrics.prototype.LyricsBeats = function() {
-	$s.push("net.alphatab.model.GsLyrics::LyricsBeats");
-	var $spos = $s.length;
 	var full = "";
 	{
 		var _g1 = 0, _g = this.Lines.length;
@@ -4915,27 +3244,17 @@ net.alphatab.model.GsLyrics.prototype.LyricsBeats = function() {
 	var ret = StringTools.trim(full);
 	ret = StringTools.replace(ret,"\n"," ");
 	ret = StringTools.replace(ret,"\r"," ");
-	{
-		var $tmp = ret.split(" ");
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return ret.split(" ");
 }
 net.alphatab.model.GsLyrics.prototype.TrackChoice = null;
 net.alphatab.model.GsLyrics.prototype.__class__ = net.alphatab.model.GsLyrics;
 net.alphatab.tablature.model.GsLyricsImpl = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.tablature.model.GsLyricsImpl::new");
-	var $spos = $s.length;
 	net.alphatab.model.GsLyrics.apply(this,[]);
-	$s.pop();
 }}
 net.alphatab.tablature.model.GsLyricsImpl.__name__ = ["net","alphatab","tablature","model","GsLyricsImpl"];
 net.alphatab.tablature.model.GsLyricsImpl.__super__ = net.alphatab.model.GsLyrics;
 for(var k in net.alphatab.model.GsLyrics.prototype ) net.alphatab.tablature.model.GsLyricsImpl.prototype[k] = net.alphatab.model.GsLyrics.prototype[k];
 net.alphatab.tablature.model.GsLyricsImpl.prototype.PaintCurrentNoteBeats = function(context,layout,currentMeasure,x,y) {
-	$s.push("net.alphatab.tablature.model.GsLyricsImpl::PaintCurrentNoteBeats");
-	var $spos = $s.length;
 	var beats = this.LyricsBeats();
 	if(beats != null && beats.length > 0) {
 		var beatIndex = 0;
@@ -4957,114 +3276,63 @@ net.alphatab.tablature.model.GsLyricsImpl.prototype.PaintCurrentNoteBeats = func
 			}
 		}
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsLyricsImpl.prototype.__class__ = net.alphatab.tablature.model.GsLyricsImpl;
 net.alphatab.tablature.drawing.DrawingLayersConverter = function() { }
 net.alphatab.tablature.drawing.DrawingLayersConverter.__name__ = ["net","alphatab","tablature","drawing","DrawingLayersConverter"];
 net.alphatab.tablature.drawing.DrawingLayersConverter.ToInt = function(layer) {
-	$s.push("net.alphatab.tablature.drawing.DrawingLayersConverter::ToInt");
-	var $spos = $s.length;
 	switch(layer) {
 	case net.alphatab.tablature.drawing.DrawingLayers.Background:{
-		{
-			$s.pop();
-			return 0;
-		}
+		return 0;
 	}break;
 	case net.alphatab.tablature.drawing.DrawingLayers.LayoutBackground:{
-		{
-			$s.pop();
-			return 1;
-		}
+		return 1;
 	}break;
 	case net.alphatab.tablature.drawing.DrawingLayers.Lines:{
-		{
-			$s.pop();
-			return 2;
-		}
+		return 2;
 	}break;
 	case net.alphatab.tablature.drawing.DrawingLayers.MainComponents:{
-		{
-			$s.pop();
-			return 3;
-		}
+		return 3;
 	}break;
 	case net.alphatab.tablature.drawing.DrawingLayers.MainComponentsDraw:{
-		{
-			$s.pop();
-			return 4;
-		}
+		return 4;
 	}break;
 	case net.alphatab.tablature.drawing.DrawingLayers.Voice2:{
-		{
-			$s.pop();
-			return 5;
-		}
+		return 5;
 	}break;
 	case net.alphatab.tablature.drawing.DrawingLayers.VoiceEffects2:{
-		{
-			$s.pop();
-			return 6;
-		}
+		return 6;
 	}break;
 	case net.alphatab.tablature.drawing.DrawingLayers.VoiceEffectsDraw2:{
-		{
-			$s.pop();
-			return 7;
-		}
+		return 7;
 	}break;
 	case net.alphatab.tablature.drawing.DrawingLayers.VoiceDraw2:{
-		{
-			$s.pop();
-			return 8;
-		}
+		return 8;
 	}break;
 	case net.alphatab.tablature.drawing.DrawingLayers.Voice1:{
-		{
-			$s.pop();
-			return 9;
-		}
+		return 9;
 	}break;
 	case net.alphatab.tablature.drawing.DrawingLayers.VoiceEffects1:{
-		{
-			$s.pop();
-			return 10;
-		}
+		return 10;
 	}break;
 	case net.alphatab.tablature.drawing.DrawingLayers.VoiceEffectsDraw1:{
-		{
-			$s.pop();
-			return 11;
-		}
+		return 11;
 	}break;
 	case net.alphatab.tablature.drawing.DrawingLayers.VoiceDraw1:{
-		{
-			$s.pop();
-			return 12;
-		}
+		return 12;
 	}break;
 	case net.alphatab.tablature.drawing.DrawingLayers.Red:{
-		{
-			$s.pop();
-			return 13;
-		}
+		return 13;
 	}break;
 	default:{
-		{
-			$s.pop();
-			return 0;
-		}
+		return 0;
 	}break;
 	}
-	$s.pop();
 }
 net.alphatab.tablature.drawing.DrawingLayersConverter.prototype.__class__ = net.alphatab.tablature.drawing.DrawingLayersConverter;
 net.alphatab.tablature.drawing.NotePainter = function() { }
 net.alphatab.tablature.drawing.NotePainter.__name__ = ["net","alphatab","tablature","drawing","NotePainter"];
 net.alphatab.tablature.drawing.NotePainter.PaintFooter = function(layer,x,y,dur,dir,layout) {
-	$s.push("net.alphatab.tablature.drawing.NotePainter::PaintFooter");
-	var $spos = $s.length;
 	var scale = layout.Scale;
 	if(dir == -1) {
 		x += net.alphatab.tablature.drawing.DrawingResources.GetScoreNoteSize(layout,false).Width;
@@ -5085,11 +3353,8 @@ net.alphatab.tablature.drawing.NotePainter.PaintFooter = function(layer,x,y,dur,
 	}break;
 	}
 	if(s != "") layer.AddMusicSymbol(s,x,y,scale);
-	$s.pop();
 }
 net.alphatab.tablature.drawing.NotePainter.PaintBar = function(layer,x1,y1,x2,y2,count,dir,scale) {
-	$s.push("net.alphatab.tablature.drawing.NotePainter::PaintBar");
-	var $spos = $s.length;
 	var width = Math.max(1.0,Math.round(3.0 * scale));
 	{
 		var _g = 0;
@@ -5102,83 +3367,40 @@ net.alphatab.tablature.drawing.NotePainter.PaintBar = function(layer,x1,y1,x2,y2
 			layer.CloseFigure();
 		}
 	}
-	$s.pop();
 }
 net.alphatab.tablature.drawing.NotePainter.PaintHarmonic = function(layer,x,y,scale) {
-	$s.push("net.alphatab.tablature.drawing.NotePainter::PaintHarmonic");
-	var $spos = $s.length;
 	layer.AddMusicSymbol(net.alphatab.tablature.drawing.MusicFont.Harmonic,x,y,scale);
-	$s.pop();
 }
 net.alphatab.tablature.drawing.NotePainter.PaintNote = function(layer,x,y,scale,full,font) {
-	$s.push("net.alphatab.tablature.drawing.NotePainter::PaintNote");
-	var $spos = $s.length;
 	var symbol = (full?net.alphatab.tablature.drawing.MusicFont.NoteQuarter:net.alphatab.tablature.drawing.MusicFont.NoteHalf);
 	layer.AddMusicSymbol(symbol,x,y,scale);
-	$s.pop();
 }
 net.alphatab.tablature.drawing.NotePainter.PaintDeadNote = function(layer,x,y,scale,font) {
-	$s.push("net.alphatab.tablature.drawing.NotePainter::PaintDeadNote");
-	var $spos = $s.length;
 	layer.AddMusicSymbol(net.alphatab.tablature.drawing.MusicFont.DeadNote,x,y,scale);
-	$s.pop();
 }
 net.alphatab.tablature.drawing.NotePainter.prototype.__class__ = net.alphatab.tablature.drawing.NotePainter;
 net.alphatab.file.alphatab.AlphaTabParser = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.file.alphatab.AlphaTabParser::new");
-	var $spos = $s.length;
 	net.alphatab.file.SongReader.apply(this,[]);
-	$s.pop();
 }}
 net.alphatab.file.alphatab.AlphaTabParser.__name__ = ["net","alphatab","file","alphatab","AlphaTabParser"];
 net.alphatab.file.alphatab.AlphaTabParser.__super__ = net.alphatab.file.SongReader;
 for(var k in net.alphatab.file.SongReader.prototype ) net.alphatab.file.alphatab.AlphaTabParser.prototype[k] = net.alphatab.file.SongReader.prototype[k];
 net.alphatab.file.alphatab.AlphaTabParser.IsLetter = function(ch) {
-	$s.push("net.alphatab.file.alphatab.AlphaTabParser::IsLetter");
-	var $spos = $s.length;
 	var code = ch.charCodeAt(0);
-	{
-		var $tmp = (code >= 65 && code <= 90) || (code >= 97 && code <= 122) || (code > 128);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (code >= 65 && code <= 90) || (code >= 97 && code <= 122) || (code > 128);
 }
 net.alphatab.file.alphatab.AlphaTabParser.IsDigit = function(ch) {
-	$s.push("net.alphatab.file.alphatab.AlphaTabParser::IsDigit");
-	var $spos = $s.length;
 	var code = ch.charCodeAt(0);
-	{
-		var $tmp = (code >= 48 && code <= 87);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (code >= 48 && code <= 87);
 }
 net.alphatab.file.alphatab.AlphaTabParser.IsVersion = function(name) {
-	$s.push("net.alphatab.file.alphatab.AlphaTabParser::IsVersion");
-	var $spos = $s.length;
-	{
-		var $tmp = name.toLowerCase() == "alphaTab0.1";
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return name.toLowerCase() == "alphaTab0.1";
 }
 net.alphatab.file.alphatab.AlphaTabParser.IsTuning = function(name) {
-	$s.push("net.alphatab.file.alphatab.AlphaTabParser::IsTuning");
-	var $spos = $s.length;
 	var regex = new EReg("([a-g]b?)([0-9])","i");
-	{
-		var $tmp = regex.match(name);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return regex.match(name);
 }
 net.alphatab.file.alphatab.AlphaTabParser.prototype.Beat = function(measure) {
-	$s.push("net.alphatab.file.alphatab.AlphaTabParser::Beat");
-	var $spos = $s.length;
 	var beat = this.Factory.NewBeat();
 	beat.Start = 0;
 	if(measure.BeatCount() == 0) {
@@ -5188,13 +3410,14 @@ net.alphatab.file.alphatab.AlphaTabParser.prototype.Beat = function(measure) {
 		var index = measure.Beats.length - 1;
 		beat.Start = measure.Beats[index].Start + measure.Beats[index].Voices[0].Duration.Time();
 	}
+	var noteEffect = this.Factory.NewNoteEffect();
 	var voice = beat.Voices[0];
 	voice.IsEmpty = false;
 	if(this._sy == net.alphatab.file.alphatab.AlphaTabSymbols.LParensis) {
 		this.NewSy();
-		voice.AddNote(this.Note());
+		voice.AddNote(this.Note(noteEffect.Clone(this.Factory)));
 		while(this._sy != net.alphatab.file.alphatab.AlphaTabSymbols.RParensis && this._sy != net.alphatab.file.alphatab.AlphaTabSymbols.Eof) {
-			voice.AddNote(this.Note());
+			voice.AddNote(this.Note(noteEffect.Clone(this.Factory)));
 		}
 		if(this._sy != net.alphatab.file.alphatab.AlphaTabSymbols.RParensis) {
 			throw new net.alphatab.file.FileFormatException((("Expected ) found \"" + this._syData) + "\" on position ") + this._curChPos);
@@ -5205,7 +3428,7 @@ net.alphatab.file.alphatab.AlphaTabParser.prototype.Beat = function(measure) {
 		this.NewSy();
 	}
 	else {
-		voice.AddNote(this.Note());
+		voice.AddNote(this.Note(noteEffect.Clone(this.Factory)));
 	}
 	if(this._sy != net.alphatab.file.alphatab.AlphaTabSymbols.Dot) {
 		throw new net.alphatab.file.FileFormatException((("Expected Dot found \"" + this._syData) + "\" on position ") + this._curChPos);
@@ -5221,12 +3444,110 @@ net.alphatab.file.alphatab.AlphaTabParser.prototype.Beat = function(measure) {
 		throw new net.alphatab.file.FileFormatException((("Invalid Beat Duration found \"" + this._syData) + "\" on position ") + this._curChPos);
 	}
 	this.NewSy();
+	this.BeatEffects(beat,noteEffect);
 	measure.AddBeat(beat);
-	$s.pop();
+}
+net.alphatab.file.alphatab.AlphaTabParser.prototype.BeatEffects = function(beat,effect) {
+	if(this._sy != net.alphatab.file.alphatab.AlphaTabSymbols.LBrace) {
+		return;
+	}
+	this.NewSy();
+	while(this._sy == net.alphatab.file.alphatab.AlphaTabSymbols.MetaCommand) {
+		this._syData = Std.string(this._syData).toLowerCase();
+		if(this._syData == "f") {
+			beat.Effect.FadeIn = true;
+			this.NewSy();
+		}
+		else if(this._syData == "v") {
+			beat.Effect.Vibrato = true;
+			this.NewSy();
+		}
+		else if(this._syData == "t") {
+			beat.Effect.Tapping = true;
+			this.NewSy();
+		}
+		else if(this._syData == "s") {
+			beat.Effect.Slapping = true;
+			this.NewSy();
+		}
+		else if(this._syData == "p") {
+			beat.Effect.Popping = true;
+			this.NewSy();
+		}
+		else if(this._syData == "su") {
+			beat.Effect.Stroke.Direction = net.alphatab.model.GsBeatStrokeDirection.Up;
+			this.NewSy();
+			if(this._sy == net.alphatab.file.alphatab.AlphaTabSymbols.Number) {
+				if(this._syData == 4 || this._syData == 8 || this._syData == 16 || this._syData == 32 || this._syData == 64) {
+					beat.Effect.Stroke.Value = this._syData;
+				}
+				else {
+					beat.Effect.Stroke.Value = 8;
+				}
+				this.NewSy();
+			}
+			else {
+				beat.Effect.Stroke.Value = 8;
+			}
+		}
+		else if(this._syData == "sd") {
+			beat.Effect.Stroke.Direction = net.alphatab.model.GsBeatStrokeDirection.Down;
+			this.NewSy();
+			if(this._sy == net.alphatab.file.alphatab.AlphaTabSymbols.Number) {
+				if(this._syData == 4 || this._syData == 8 || this._syData == 16 || this._syData == 32 || this._syData == 64) {
+					beat.Effect.Stroke.Value = this._syData;
+				}
+				else {
+					beat.Effect.Stroke.Value = 8;
+				}
+				this.NewSy();
+			}
+			else {
+				beat.Effect.Stroke.Value = 8;
+			}
+		}
+		else if(this._syData == "tb") {
+			this.NewSy();
+			if(this._sy != net.alphatab.file.alphatab.AlphaTabSymbols.LParensis) {
+				throw new net.alphatab.file.FileFormatException((("Expected ( found  \"" + this._syData) + "\" on position ") + this._curChPos);
+			}
+			this.NewSy();
+			var points = new Array();
+			while(this._sy != net.alphatab.file.alphatab.AlphaTabSymbols.RParensis && this._sy != net.alphatab.file.alphatab.AlphaTabSymbols.Eof) {
+				if(this._sy != net.alphatab.file.alphatab.AlphaTabSymbols.Number) {
+					throw new net.alphatab.file.FileFormatException((("Expected Number found  \"" + this._syData) + "\" on position ") + this._curChPos);
+				}
+				points.push(new net.alphatab.model.effects.GsTremoloBarPoint(0,this._syData,false));
+				this.NewSy();
+			}
+			if(points.length > 12) {
+				points = points.slice(0,12);
+			}
+			var count = points.length;
+			var step = Math.ceil(12 / count);
+			var i = 0;
+			var tremoloBarEffect = this.Factory.NewTremoloBarEffect();
+			while(i < count) {
+				points[i].Position = Math.floor(Math.min(12,(i * step)));
+				tremoloBarEffect.Points.push(points[i]);
+				i++;
+			}
+			beat.Effect.TremoloBar = tremoloBarEffect;
+			if(this._sy != net.alphatab.file.alphatab.AlphaTabSymbols.RParensis) {
+				throw new net.alphatab.file.FileFormatException((("Expected ) found  \"" + this._syData) + "\" on position ") + this._curChPos);
+			}
+			this.NewSy();
+		}
+		else {
+			throw new net.alphatab.file.FileFormatException((("Invalid BeatEffect, found  \"" + this._syData) + "\" on position ") + this._curChPos);
+		}
+	}
+	if(this._sy != net.alphatab.file.alphatab.AlphaTabSymbols.RBrace) {
+		throw new net.alphatab.file.FileFormatException((("Invalid } to Close BeatEffects \"" + this._syData) + "\" on position ") + this._curChPos);
+	}
+	this.NewSy();
 }
 net.alphatab.file.alphatab.AlphaTabParser.prototype.CreateDefaultSong = function() {
-	$s.push("net.alphatab.file.alphatab.AlphaTabParser::CreateDefaultSong");
-	var $spos = $s.length;
 	this._song = this.Factory.NewSong();
 	this._song.Tempo = 120;
 	this._song.TempoName = "";
@@ -5239,22 +3560,16 @@ net.alphatab.file.alphatab.AlphaTabParser.prototype.CreateDefaultSong = function
 	this._track.Channel.EffectChannel = net.alphatab.file.alphatab.AlphaTabParser.TrackChannels[1];
 	this.CreateDefaultStrings(this._track.Strings);
 	this._song.AddTrack(this._track);
-	$s.pop();
 }
 net.alphatab.file.alphatab.AlphaTabParser.prototype.CreateDefaultStrings = function(list) {
-	$s.push("net.alphatab.file.alphatab.AlphaTabParser::CreateDefaultStrings");
-	var $spos = $s.length;
 	list.push(this.NewString(1,64));
 	list.push(this.NewString(2,59));
 	list.push(this.NewString(3,55));
 	list.push(this.NewString(4,50));
 	list.push(this.NewString(5,45));
 	list.push(this.NewString(6,40));
-	$s.pop();
 }
 net.alphatab.file.alphatab.AlphaTabParser.prototype.Measure = function(tempo) {
-	$s.push("net.alphatab.file.alphatab.AlphaTabParser::Measure");
-	var $spos = $s.length;
 	var header = this.Factory.NewMeasureHeader();
 	header.Number = this._song.MeasureHeaders.length + 1;
 	header.Start = (this._song.MeasureHeaders.length == 0?960:this._song.MeasureHeaders[this._song.MeasureHeaders.length - 1].Start + this._song.MeasureHeaders[this._song.MeasureHeaders.length - 1].Length());
@@ -5274,11 +3589,8 @@ net.alphatab.file.alphatab.AlphaTabParser.prototype.Measure = function(tempo) {
 	while(this._sy != net.alphatab.file.alphatab.AlphaTabSymbols.Pipe && this._sy != net.alphatab.file.alphatab.AlphaTabSymbols.Eof) {
 		this.Beat(measure);
 	}
-	$s.pop();
 }
 net.alphatab.file.alphatab.AlphaTabParser.prototype.MeasureMeta = function(header,measure) {
-	$s.push("net.alphatab.file.alphatab.AlphaTabParser::MeasureMeta");
-	var $spos = $s.length;
 	while(this._sy == net.alphatab.file.alphatab.AlphaTabSymbols.MetaCommand) {
 		if(this._syData == "ts") {
 			this.NewSy();
@@ -5328,11 +3640,8 @@ net.alphatab.file.alphatab.AlphaTabParser.prototype.MeasureMeta = function(heade
 		}
 		this.NewSy();
 	}
-	$s.pop();
 }
 net.alphatab.file.alphatab.AlphaTabParser.prototype.Measures = function() {
-	$s.push("net.alphatab.file.alphatab.AlphaTabParser::Measures");
-	var $spos = $s.length;
 	var tempo = this.Factory.NewTempo();
 	tempo.Value = this._song.Tempo;
 	this.Measure(tempo);
@@ -5343,11 +3652,8 @@ net.alphatab.file.alphatab.AlphaTabParser.prototype.Measures = function() {
 		this.NewSy();
 		this.Measure(tempo);
 	}
-	$s.pop();
 }
 net.alphatab.file.alphatab.AlphaTabParser.prototype.MetaData = function() {
-	$s.push("net.alphatab.file.alphatab.AlphaTabParser::MetaData");
-	var $spos = $s.length;
 	while(this._sy == net.alphatab.file.alphatab.AlphaTabSymbols.MetaCommand) {
 		if(this._syData == "title") {
 			this.NewSy();
@@ -5456,23 +3762,14 @@ net.alphatab.file.alphatab.AlphaTabParser.prototype.MetaData = function() {
 			throw new net.alphatab.file.FileFormatException("Unknown Meta Tag, on " + this._curChPos);
 		}
 	}
-	$s.pop();
 }
 net.alphatab.file.alphatab.AlphaTabParser.prototype.NewString = function(number,value) {
-	$s.push("net.alphatab.file.alphatab.AlphaTabParser::NewString");
-	var $spos = $s.length;
 	var str = this.Factory.NewString();
 	str.Number = number;
 	str.Value = value;
-	{
-		$s.pop();
-		return str;
-	}
-	$s.pop();
+	return str;
 }
 net.alphatab.file.alphatab.AlphaTabParser.prototype.NewSy = function() {
-	$s.push("net.alphatab.file.alphatab.AlphaTabParser::NewSy");
-	var $spos = $s.length;
 	this._sy = net.alphatab.file.alphatab.AlphaTabSymbols.No;
 	do {
 		if(this._ch == String.fromCharCode(0)) {
@@ -5490,6 +3787,25 @@ net.alphatab.file.alphatab.AlphaTabParser.prototype.NewSy = function() {
 				this.NextChar();
 			}
 			this.NextChar();
+		}
+		else if(this._ch == "-") {
+			this.NextChar();
+			if(net.alphatab.file.alphatab.AlphaTabParser.IsDigit(this._ch)) {
+				var number = this.ReadNumber();
+				this._sy = net.alphatab.file.alphatab.AlphaTabSymbols.Number;
+				this._syData = -number;
+			}
+			else if(net.alphatab.file.alphatab.AlphaTabParser.IsLetter(this._ch)) {
+				var name = this.ReadName();
+				if(net.alphatab.file.alphatab.AlphaTabParser.IsTuning(name)) {
+					this._sy = net.alphatab.file.alphatab.AlphaTabSymbols.Tuning;
+					this._syData = name.toLowerCase();
+				}
+				else {
+					this._sy = net.alphatab.file.alphatab.AlphaTabSymbols.String;
+					this._syData = name;
+				}
+			}
 		}
 		else if(net.alphatab.file.alphatab.AlphaTabParser.IsLetter(this._ch)) {
 			var name = this.ReadName();
@@ -5525,6 +3841,14 @@ net.alphatab.file.alphatab.AlphaTabParser.prototype.NewSy = function() {
 			this._sy = net.alphatab.file.alphatab.AlphaTabSymbols.RParensis;
 			this.NextChar();
 		}
+		else if(this._ch == "{") {
+			this._sy = net.alphatab.file.alphatab.AlphaTabSymbols.LBrace;
+			this.NextChar();
+		}
+		else if(this._ch == "}") {
+			this._sy = net.alphatab.file.alphatab.AlphaTabSymbols.RBrace;
+			this.NextChar();
+		}
 		else if(this._ch == "|") {
 			this._sy = net.alphatab.file.alphatab.AlphaTabSymbols.Pipe;
 			this.NextChar();
@@ -5533,18 +3857,12 @@ net.alphatab.file.alphatab.AlphaTabParser.prototype.NewSy = function() {
 			throw new net.alphatab.file.FileFormatException((("Illegal element \"" + this._ch) + "\" found on pos ") + this._curChPos);
 		}
 	} while(this._sy == net.alphatab.file.alphatab.AlphaTabSymbols.No);
-	$s.pop();
 }
 net.alphatab.file.alphatab.AlphaTabParser.prototype.NextChar = function() {
-	$s.push("net.alphatab.file.alphatab.AlphaTabParser::NextChar");
-	var $spos = $s.length;
 	this._ch = (this._curChPos < this.Data.getSize()?String.fromCharCode(this.Data.readByte()):String.fromCharCode(0));
 	this._curChPos++;
-	$s.pop();
 }
-net.alphatab.file.alphatab.AlphaTabParser.prototype.Note = function() {
-	$s.push("net.alphatab.file.alphatab.AlphaTabParser::Note");
-	var $spos = $s.length;
+net.alphatab.file.alphatab.AlphaTabParser.prototype.Note = function(effect) {
 	if(this._sy != net.alphatab.file.alphatab.AlphaTabSymbols.Number && !(this._sy == net.alphatab.file.alphatab.AlphaTabSymbols.String && Std.string(this._syData).toLowerCase() == "x")) {
 		throw new net.alphatab.file.FileFormatException((("Expected Number found \"" + this._syData) + "\" on position ") + this._curChPos);
 	}
@@ -5565,156 +3883,83 @@ net.alphatab.file.alphatab.AlphaTabParser.prototype.Note = function() {
 	this.NewSy();
 	var note = this.Factory.NewNote();
 	note.String = string;
-	note.Effect = this.Factory.NewEffect();
+	note.Effect = effect;
 	note.Effect.DeadNote = isDead;
 	note.Value = fret;
-	{
-		$s.pop();
-		return note;
-	}
-	$s.pop();
+	return note;
 }
 net.alphatab.file.alphatab.AlphaTabParser.prototype.ParseClef = function(str) {
-	$s.push("net.alphatab.file.alphatab.AlphaTabParser::ParseClef");
-	var $spos = $s.length;
 	switch(str.toLowerCase()) {
 	case "treble":{
-		{
-			var $tmp = net.alphatab.model.GsMeasureClef.Treble;
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.model.GsMeasureClef.Treble;
 	}break;
 	case "bass":{
-		{
-			var $tmp = net.alphatab.model.GsMeasureClef.Bass;
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.model.GsMeasureClef.Bass;
 	}break;
 	case "tenor":{
-		{
-			var $tmp = net.alphatab.model.GsMeasureClef.Tenor;
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.model.GsMeasureClef.Tenor;
 	}break;
 	case "alto":{
-		{
-			var $tmp = net.alphatab.model.GsMeasureClef.Alto;
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.model.GsMeasureClef.Alto;
 	}break;
 	default:{
 		throw new net.alphatab.file.FileFormatException((("Unknown clef, \"" + this._syData) + "\" on position ") + this._curChPos);
 	}break;
 	}
-	$s.pop();
 }
 net.alphatab.file.alphatab.AlphaTabParser.prototype.ParseKeySignature = function(str) {
-	$s.push("net.alphatab.file.alphatab.AlphaTabParser::ParseKeySignature");
-	var $spos = $s.length;
 	switch(str.toLowerCase()) {
 	case "cb":{
-		{
-			$s.pop();
-			return -7;
-		}
+		return -7;
 	}break;
 	case "gb":{
-		{
-			$s.pop();
-			return -6;
-		}
+		return -6;
 	}break;
 	case "db":{
-		{
-			$s.pop();
-			return -5;
-		}
+		return -5;
 	}break;
 	case "ab":{
-		{
-			$s.pop();
-			return -4;
-		}
+		return -4;
 	}break;
 	case "eb":{
-		{
-			$s.pop();
-			return -3;
-		}
+		return -3;
 	}break;
 	case "bb":{
-		{
-			$s.pop();
-			return -2;
-		}
+		return -2;
 	}break;
 	case "f":{
-		{
-			$s.pop();
-			return -1;
-		}
+		return -1;
 	}break;
 	case "c":{
-		{
-			$s.pop();
-			return 0;
-		}
+		return 0;
 	}break;
 	case "g":{
-		{
-			$s.pop();
-			return 1;
-		}
+		return 1;
 	}break;
 	case "d":{
-		{
-			$s.pop();
-			return 2;
-		}
+		return 2;
 	}break;
 	case "a":{
-		{
-			$s.pop();
-			return 3;
-		}
+		return 3;
 	}break;
 	case "e":{
-		{
-			$s.pop();
-			return 4;
-		}
+		return 4;
 	}break;
 	case "b":{
-		{
-			$s.pop();
-			return 5;
-		}
+		return 5;
 	}break;
 	case "f#":{
-		{
-			$s.pop();
-			return 6;
-		}
+		return 6;
 	}break;
 	case "c#":{
-		{
-			$s.pop();
-			return 7;
-		}
+		return 7;
 	}break;
 	default:{
 		throw new net.alphatab.file.FileFormatException("Unsupported key signature found on position: " + this._curChPos);
 	}break;
 	}
-	$s.pop();
 }
 net.alphatab.file.alphatab.AlphaTabParser.prototype.ParseTuning = function(str) {
-	$s.push("net.alphatab.file.alphatab.AlphaTabParser::ParseTuning");
-	var $spos = $s.length;
 	var base = 0;
 	var regex = new EReg("([a-g]b?)([0-9])","i");
 	if(regex.match(str.toLowerCase())) {
@@ -5764,66 +4009,39 @@ net.alphatab.file.alphatab.AlphaTabParser.prototype.ParseTuning = function(str) 
 	else {
 		throw new net.alphatab.file.FileFormatException((("Invalid Tuning format \"" + str) + "\" on position ") + this._curChPos);
 	}
-	{
-		$s.pop();
-		return base;
-	}
-	$s.pop();
+	return base;
 }
 net.alphatab.file.alphatab.AlphaTabParser.prototype.ReadName = function() {
-	$s.push("net.alphatab.file.alphatab.AlphaTabParser::ReadName");
-	var $spos = $s.length;
 	var str = "";
 	do {
 		str += this._ch;
 		this.NextChar();
 	} while(net.alphatab.file.alphatab.AlphaTabParser.IsLetter(this._ch) || net.alphatab.file.alphatab.AlphaTabParser.IsDigit(this._ch));
-	{
-		$s.pop();
-		return str;
-	}
-	$s.pop();
+	return str;
 }
 net.alphatab.file.alphatab.AlphaTabParser.prototype.ReadNumber = function() {
-	$s.push("net.alphatab.file.alphatab.AlphaTabParser::ReadNumber");
-	var $spos = $s.length;
 	var str = "";
 	do {
 		str += this._ch;
 		this.NextChar();
 	} while(net.alphatab.file.alphatab.AlphaTabParser.IsDigit(this._ch));
-	{
-		var $tmp = Std.parseInt(str);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return Std.parseInt(str);
 }
 net.alphatab.file.alphatab.AlphaTabParser.prototype.ReadSong = function() {
-	$s.push("net.alphatab.file.alphatab.AlphaTabParser::ReadSong");
-	var $spos = $s.length;
 	this.CreateDefaultSong();
 	this._curChPos = 0;
 	this.NextChar();
 	this.NewSy();
 	this.S();
-	{
-		var $tmp = this._song;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this._song;
 }
 net.alphatab.file.alphatab.AlphaTabParser.prototype.S = function() {
-	$s.push("net.alphatab.file.alphatab.AlphaTabParser::S");
-	var $spos = $s.length;
 	this.MetaData();
 	if(this._sy != net.alphatab.file.alphatab.AlphaTabSymbols.Dot) {
 		throw new net.alphatab.file.FileFormatException((("Expected Dot after MetaData, found \"" + this._sy) + "\" on ") + this._curChPos);
 	}
 	this.NewSy();
 	this.Measures();
-	$s.pop();
 }
 net.alphatab.file.alphatab.AlphaTabParser.prototype._ch = null;
 net.alphatab.file.alphatab.AlphaTabParser.prototype._curChPos = null;
@@ -5833,23 +4051,14 @@ net.alphatab.file.alphatab.AlphaTabParser.prototype._syData = null;
 net.alphatab.file.alphatab.AlphaTabParser.prototype._track = null;
 net.alphatab.file.alphatab.AlphaTabParser.prototype.__class__ = net.alphatab.file.alphatab.AlphaTabParser;
 net.alphatab.model.effects.GsHarmonicEffect = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.model.effects.GsHarmonicEffect::new");
-	var $spos = $s.length;
 	null;
-	$s.pop();
 }}
 net.alphatab.model.effects.GsHarmonicEffect.__name__ = ["net","alphatab","model","effects","GsHarmonicEffect"];
 net.alphatab.model.effects.GsHarmonicEffect.prototype.Clone = function(factory) {
-	$s.push("net.alphatab.model.effects.GsHarmonicEffect::Clone");
-	var $spos = $s.length;
 	var effect = factory.NewHarmonicEffect();
 	effect.Type = this.Type;
 	effect.Data = this.Data;
-	{
-		$s.pop();
-		return effect;
-	}
-	$s.pop();
+	return effect;
 }
 net.alphatab.model.effects.GsHarmonicEffect.prototype.Data = null;
 net.alphatab.model.effects.GsHarmonicEffect.prototype.Type = null;
@@ -5858,14 +4067,9 @@ haxe.io.Input = function() { }
 haxe.io.Input.__name__ = ["haxe","io","Input"];
 haxe.io.Input.prototype.bigEndian = null;
 haxe.io.Input.prototype.close = function() {
-	$s.push("haxe.io.Input::close");
-	var $spos = $s.length;
 	null;
-	$s.pop();
 }
 haxe.io.Input.prototype.read = function(nbytes) {
-	$s.push("haxe.io.Input::read");
-	var $spos = $s.length;
 	var s = haxe.io.Bytes.alloc(nbytes);
 	var p = 0;
 	while(nbytes > 0) {
@@ -5874,15 +4078,9 @@ haxe.io.Input.prototype.read = function(nbytes) {
 		p += k;
 		nbytes -= k;
 	}
-	{
-		$s.pop();
-		return s;
-	}
-	$s.pop();
+	return s;
 }
 haxe.io.Input.prototype.readAll = function(bufsize) {
-	$s.push("haxe.io.Input::readAll");
-	var $spos = $s.length;
 	if(bufsize == null) bufsize = 16384;
 	var buf = haxe.io.Bytes.alloc(bufsize);
 	var total = new haxe.io.BytesBuffer();
@@ -5896,38 +4094,19 @@ haxe.io.Input.prototype.readAll = function(bufsize) {
 	catch( $e10 ) {
 		if( js.Boot.__instanceof($e10,haxe.io.Eof) ) {
 			var e = $e10;
-			{
-				$e = [];
-				while($s.length >= $spos) $e.unshift($s.pop());
-				$s.push($e[0]);
-				null;
-			}
+			null;
 		} else throw($e10);
 	}
-	{
-		var $tmp = total.getBytes();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return total.getBytes();
 }
 haxe.io.Input.prototype.readByte = function() {
-	$s.push("haxe.io.Input::readByte");
-	var $spos = $s.length;
-	{
-		var $tmp = (function($this) {
-			var $r;
-			throw "Not implemented";
-			return $r;
-		}(this));
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (function($this) {
+		var $r;
+		throw "Not implemented";
+		return $r;
+	}(this));
 }
 haxe.io.Input.prototype.readBytes = function(s,pos,len) {
-	$s.push("haxe.io.Input::readBytes");
-	var $spos = $s.length;
 	var k = len;
 	var b = s.b;
 	if(pos < 0 || len < 0 || pos + len > s.length) throw haxe.io.Error.OutsideBounds;
@@ -5936,80 +4115,39 @@ haxe.io.Input.prototype.readBytes = function(s,pos,len) {
 		pos++;
 		k--;
 	}
-	{
-		$s.pop();
-		return len;
-	}
-	$s.pop();
+	return len;
 }
 haxe.io.Input.prototype.readDouble = function() {
-	$s.push("haxe.io.Input::readDouble");
-	var $spos = $s.length;
 	throw "Not implemented";
-	{
-		$s.pop();
-		return 0;
-	}
-	$s.pop();
+	return 0;
 }
 haxe.io.Input.prototype.readFloat = function() {
-	$s.push("haxe.io.Input::readFloat");
-	var $spos = $s.length;
 	throw "Not implemented";
-	{
-		$s.pop();
-		return 0;
-	}
-	$s.pop();
+	return 0;
 }
 haxe.io.Input.prototype.readFullBytes = function(s,pos,len) {
-	$s.push("haxe.io.Input::readFullBytes");
-	var $spos = $s.length;
 	while(len > 0) {
 		var k = this.readBytes(s,pos,len);
 		pos += k;
 		len -= k;
 	}
-	$s.pop();
 }
 haxe.io.Input.prototype.readInt16 = function() {
-	$s.push("haxe.io.Input::readInt16");
-	var $spos = $s.length;
 	var ch1 = this.readByte();
 	var ch2 = this.readByte();
 	var n = (this.bigEndian?ch2 | (ch1 << 8):ch1 | (ch2 << 8));
-	if((n & 32768) != 0) {
-		var $tmp = n - 65536;
-		$s.pop();
-		return $tmp;
-	}
-	{
-		$s.pop();
-		return n;
-	}
-	$s.pop();
+	if((n & 32768) != 0) return n - 65536;
+	return n;
 }
 haxe.io.Input.prototype.readInt24 = function() {
-	$s.push("haxe.io.Input::readInt24");
-	var $spos = $s.length;
 	var ch1 = this.readByte();
 	var ch2 = this.readByte();
 	var ch3 = this.readByte();
 	var n = (this.bigEndian?(ch3 | (ch2 << 8)) | (ch1 << 16):(ch1 | (ch2 << 8)) | (ch3 << 16));
-	if((n & 8388608) != 0) {
-		var $tmp = n - 16777216;
-		$s.pop();
-		return $tmp;
-	}
-	{
-		$s.pop();
-		return n;
-	}
-	$s.pop();
+	if((n & 8388608) != 0) return n - 16777216;
+	return n;
 }
 haxe.io.Input.prototype.readInt31 = function() {
-	$s.push("haxe.io.Input::readInt31");
-	var $spos = $s.length;
 	var ch1, ch2, ch3, ch4;
 	if(this.bigEndian) {
 		ch4 = this.readByte();
@@ -6024,45 +4162,21 @@ haxe.io.Input.prototype.readInt31 = function() {
 		ch4 = this.readByte();
 	}
 	if(((ch4 & 128) == 0) != ((ch4 & 64) == 0)) throw haxe.io.Error.Overflow;
-	{
-		var $tmp = ((ch1 | (ch2 << 8)) | (ch3 << 16)) | (ch4 << 24);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return ((ch1 | (ch2 << 8)) | (ch3 << 16)) | (ch4 << 24);
 }
 haxe.io.Input.prototype.readInt32 = function() {
-	$s.push("haxe.io.Input::readInt32");
-	var $spos = $s.length;
 	var ch1 = this.readByte();
 	var ch2 = this.readByte();
 	var ch3 = this.readByte();
 	var ch4 = this.readByte();
-	{
-		var $tmp = (this.bigEndian?(((ch1 << 8) | ch2) << 16) | ((ch3 << 8) | ch4):(((ch4 << 8) | ch3) << 16) | ((ch2 << 8) | ch1));
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (this.bigEndian?(((ch1 << 8) | ch2) << 16) | ((ch3 << 8) | ch4):(((ch4 << 8) | ch3) << 16) | ((ch2 << 8) | ch1));
 }
 haxe.io.Input.prototype.readInt8 = function() {
-	$s.push("haxe.io.Input::readInt8");
-	var $spos = $s.length;
 	var n = this.readByte();
-	if(n >= 128) {
-		var $tmp = n - 256;
-		$s.pop();
-		return $tmp;
-	}
-	{
-		$s.pop();
-		return n;
-	}
-	$s.pop();
+	if(n >= 128) return n - 256;
+	return n;
 }
 haxe.io.Input.prototype.readLine = function() {
-	$s.push("haxe.io.Input::readLine");
-	var $spos = $s.length;
 	var buf = new StringBuf();
 	var last;
 	var s;
@@ -6075,106 +4189,55 @@ haxe.io.Input.prototype.readLine = function() {
 		if( js.Boot.__instanceof($e11,haxe.io.Eof) ) {
 			var e = $e11;
 			{
-				$e = [];
-				while($s.length >= $spos) $e.unshift($s.pop());
-				$s.push($e[0]);
 				s = buf.b.join("");
 				if(s.length == 0) throw (e);
 			}
 		} else throw($e11);
 	}
-	{
-		$s.pop();
-		return s;
-	}
-	$s.pop();
+	return s;
 }
 haxe.io.Input.prototype.readString = function(len) {
-	$s.push("haxe.io.Input::readString");
-	var $spos = $s.length;
 	var b = haxe.io.Bytes.alloc(len);
 	this.readFullBytes(b,0,len);
-	{
-		var $tmp = b.toString();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return b.toString();
 }
 haxe.io.Input.prototype.readUInt16 = function() {
-	$s.push("haxe.io.Input::readUInt16");
-	var $spos = $s.length;
 	var ch1 = this.readByte();
 	var ch2 = this.readByte();
-	{
-		var $tmp = (this.bigEndian?ch2 | (ch1 << 8):ch1 | (ch2 << 8));
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (this.bigEndian?ch2 | (ch1 << 8):ch1 | (ch2 << 8));
 }
 haxe.io.Input.prototype.readUInt24 = function() {
-	$s.push("haxe.io.Input::readUInt24");
-	var $spos = $s.length;
 	var ch1 = this.readByte();
 	var ch2 = this.readByte();
 	var ch3 = this.readByte();
-	{
-		var $tmp = (this.bigEndian?(ch3 | (ch2 << 8)) | (ch1 << 16):(ch1 | (ch2 << 8)) | (ch3 << 16));
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (this.bigEndian?(ch3 | (ch2 << 8)) | (ch1 << 16):(ch1 | (ch2 << 8)) | (ch3 << 16));
 }
 haxe.io.Input.prototype.readUInt30 = function() {
-	$s.push("haxe.io.Input::readUInt30");
-	var $spos = $s.length;
 	var ch1 = this.readByte();
 	var ch2 = this.readByte();
 	var ch3 = this.readByte();
 	var ch4 = this.readByte();
 	if(((this.bigEndian?ch1:ch4)) >= 64) throw haxe.io.Error.Overflow;
-	{
-		var $tmp = (this.bigEndian?((ch4 | (ch3 << 8)) | (ch2 << 16)) | (ch1 << 24):((ch1 | (ch2 << 8)) | (ch3 << 16)) | (ch4 << 24));
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (this.bigEndian?((ch4 | (ch3 << 8)) | (ch2 << 16)) | (ch1 << 24):((ch1 | (ch2 << 8)) | (ch3 << 16)) | (ch4 << 24));
 }
 haxe.io.Input.prototype.readUntil = function(end) {
-	$s.push("haxe.io.Input::readUntil");
-	var $spos = $s.length;
 	var buf = new StringBuf();
 	var last;
 	while((last = this.readByte()) != end) buf.b[buf.b.length] = String.fromCharCode(last);
-	{
-		var $tmp = buf.b.join("");
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return buf.b.join("");
 }
 haxe.io.Input.prototype.setEndian = function(b) {
-	$s.push("haxe.io.Input::setEndian");
-	var $spos = $s.length;
 	this.bigEndian = b;
-	{
-		$s.pop();
-		return b;
-	}
-	$s.pop();
+	return b;
 }
 haxe.io.Input.prototype.__class__ = haxe.io.Input;
 haxe.io.BytesInput = function(b,pos,len) { if( b === $_ ) return; {
-	$s.push("haxe.io.BytesInput::new");
-	var $spos = $s.length;
 	if(pos == null) pos = 0;
 	if(len == null) len = b.length - pos;
 	if(pos < 0 || len < 0 || pos + len > b.length) throw haxe.io.Error.OutsideBounds;
 	this.b = b.b;
 	this.pos = pos;
 	this.len = len;
-	$s.pop();
 }}
 haxe.io.BytesInput.__name__ = ["haxe","io","BytesInput"];
 haxe.io.BytesInput.__super__ = haxe.io.Input;
@@ -6183,20 +4246,11 @@ haxe.io.BytesInput.prototype.b = null;
 haxe.io.BytesInput.prototype.len = null;
 haxe.io.BytesInput.prototype.pos = null;
 haxe.io.BytesInput.prototype.readByte = function() {
-	$s.push("haxe.io.BytesInput::readByte");
-	var $spos = $s.length;
 	if(this.len == 0) throw new haxe.io.Eof();
 	this.len--;
-	{
-		var $tmp = this.b[this.pos++];
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.b[this.pos++];
 }
 haxe.io.BytesInput.prototype.readBytes = function(buf,pos,len) {
-	$s.push("haxe.io.BytesInput::readBytes");
-	var $spos = $s.length;
 	if(pos < 0 || len < 0 || pos + len > buf.length) throw haxe.io.Error.OutsideBounds;
 	if(this.len == 0 && len > 0) throw new haxe.io.Eof();
 	if(this.len < len) len = this.len;
@@ -6211,216 +4265,80 @@ haxe.io.BytesInput.prototype.readBytes = function(buf,pos,len) {
 	}
 	this.pos += len;
 	this.len -= len;
-	{
-		$s.pop();
-		return len;
-	}
-	$s.pop();
+	return len;
 }
 haxe.io.BytesInput.prototype.__class__ = haxe.io.BytesInput;
 haxe.Int32 = function() { }
 haxe.Int32.__name__ = ["haxe","Int32"];
 haxe.Int32.make = function(a,b) {
-	$s.push("haxe.Int32::make");
-	var $spos = $s.length;
-	{
-		var $tmp = (a << 16) | b;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (a << 16) | b;
 }
 haxe.Int32.ofInt = function(x) {
-	$s.push("haxe.Int32::ofInt");
-	var $spos = $s.length;
-	{
-		$s.pop();
-		return x;
-	}
-	$s.pop();
+	return x;
 }
 haxe.Int32.toInt = function(x) {
-	$s.push("haxe.Int32::toInt");
-	var $spos = $s.length;
 	if((((x) >> 30) & 1) != ((x) >>> 31)) throw "Overflow " + x;
-	{
-		var $tmp = (x) & -1;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (x) & -1;
 }
 haxe.Int32.toNativeInt = function(x) {
-	$s.push("haxe.Int32::toNativeInt");
-	var $spos = $s.length;
-	{
-		$s.pop();
-		return x;
-	}
-	$s.pop();
+	return x;
 }
 haxe.Int32.add = function(a,b) {
-	$s.push("haxe.Int32::add");
-	var $spos = $s.length;
-	{
-		var $tmp = (a) + (b);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (a) + (b);
 }
 haxe.Int32.sub = function(a,b) {
-	$s.push("haxe.Int32::sub");
-	var $spos = $s.length;
-	{
-		var $tmp = (a) - (b);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (a) - (b);
 }
 haxe.Int32.mul = function(a,b) {
-	$s.push("haxe.Int32::mul");
-	var $spos = $s.length;
-	{
-		var $tmp = (a) * (b);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (a) * (b);
 }
 haxe.Int32.div = function(a,b) {
-	$s.push("haxe.Int32::div");
-	var $spos = $s.length;
-	{
-		var $tmp = Std["int"]((a) / (b));
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return Std["int"]((a) / (b));
 }
 haxe.Int32.mod = function(a,b) {
-	$s.push("haxe.Int32::mod");
-	var $spos = $s.length;
-	{
-		var $tmp = (a) % (b);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (a) % (b);
 }
 haxe.Int32.shl = function(a,b) {
-	$s.push("haxe.Int32::shl");
-	var $spos = $s.length;
-	{
-		var $tmp = (a) << b;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (a) << b;
 }
 haxe.Int32.shr = function(a,b) {
-	$s.push("haxe.Int32::shr");
-	var $spos = $s.length;
-	{
-		var $tmp = (a) >> b;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (a) >> b;
 }
 haxe.Int32.ushr = function(a,b) {
-	$s.push("haxe.Int32::ushr");
-	var $spos = $s.length;
-	{
-		var $tmp = (a) >>> b;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (a) >>> b;
 }
 haxe.Int32.and = function(a,b) {
-	$s.push("haxe.Int32::and");
-	var $spos = $s.length;
-	{
-		var $tmp = (a) & (b);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (a) & (b);
 }
 haxe.Int32.or = function(a,b) {
-	$s.push("haxe.Int32::or");
-	var $spos = $s.length;
-	{
-		var $tmp = (a) | (b);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (a) | (b);
 }
 haxe.Int32.xor = function(a,b) {
-	$s.push("haxe.Int32::xor");
-	var $spos = $s.length;
-	{
-		var $tmp = (a) ^ (b);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (a) ^ (b);
 }
 haxe.Int32.neg = function(a) {
-	$s.push("haxe.Int32::neg");
-	var $spos = $s.length;
-	{
-		var $tmp = -(a);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return -(a);
 }
 haxe.Int32.complement = function(a) {
-	$s.push("haxe.Int32::complement");
-	var $spos = $s.length;
-	{
-		var $tmp = ~(a);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return ~(a);
 }
 haxe.Int32.compare = function(a,b) {
-	$s.push("haxe.Int32::compare");
-	var $spos = $s.length;
-	{
-		var $tmp = a - b;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return a - b;
 }
 haxe.Int32.prototype.__class__ = haxe.Int32;
 net.alphatab.file.FileFormatException = function(message) { if( message === $_ ) return; {
-	$s.push("net.alphatab.file.FileFormatException::new");
-	var $spos = $s.length;
 	if(message == null) message = "";
 	this.Message = message;
-	$s.pop();
 }}
 net.alphatab.file.FileFormatException.__name__ = ["net","alphatab","file","FileFormatException"];
 net.alphatab.file.FileFormatException.prototype.Message = null;
 net.alphatab.file.FileFormatException.prototype.__class__ = net.alphatab.file.FileFormatException;
 net.alphatab.platform.BinaryReader = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.platform.BinaryReader::new");
-	var $spos = $s.length;
 	null;
-	$s.pop();
 }}
 net.alphatab.platform.BinaryReader.__name__ = ["net","alphatab","platform","BinaryReader"];
 net.alphatab.platform.BinaryReader.prototype._buffer = null;
 net.alphatab.platform.BinaryReader.prototype._decodeFloat = function(precisionBits,exponentBits) {
-	$s.push("net.alphatab.platform.BinaryReader::_decodeFloat");
-	var $spos = $s.length;
 	var length = (precisionBits + exponentBits) + 1;
 	var size = length >> 3;
 	var bias = Math.floor(Math.pow(2,exponentBits - 1) - 1);
@@ -6444,10 +4362,7 @@ net.alphatab.platform.BinaryReader.prototype._decodeFloat = function(precisionBi
 	} while((precisionBits -= startBit) != 0);
 	this._pos += size;
 	if(exponent == (bias << 1) + 1) {
-		{
-			$s.pop();
-			return 0;
-		}
+		return 0;
 	}
 	else {
 		if(exponent != 0 || significand != 0) {
@@ -6458,38 +4373,22 @@ net.alphatab.platform.BinaryReader.prototype._decodeFloat = function(precisionBi
 			else {
 				ret = (Math.pow(2,exponent - bias) * (1 + significand));
 			}
-			{
-				var $tmp = ret * (1 + signal * -2);
-				$s.pop();
-				return $tmp;
-			}
+			return ret * (1 + signal * -2);
 		}
 		else {
-			{
-				$s.pop();
-				return 0;
-			}
+			return 0;
 		}
 	}
-	$s.pop();
 }
 net.alphatab.platform.BinaryReader.prototype._decodeInt = function(bits,signed) {
-	$s.push("net.alphatab.platform.BinaryReader::_decodeInt");
-	var $spos = $s.length;
 	var x = this._readBits(0,bits,Math.floor(bits / 8));
 	var max = Math.floor(Math.pow(2,bits));
 	var result = ((signed && x >= max / 2)?x - max:x);
 	this._pos += Math.floor(bits / 8);
-	{
-		$s.pop();
-		return result;
-	}
-	$s.pop();
+	return result;
 }
 net.alphatab.platform.BinaryReader.prototype._pos = null;
 net.alphatab.platform.BinaryReader.prototype._readBits = function(start,length,size) {
-	$s.push("net.alphatab.platform.BinaryReader::_readBits");
-	var $spos = $s.length;
 	var offsetLeft = (start + length) % 8;
 	var offsetRight = start % 8;
 	var curByte = (size - (start >> 3)) - 1;
@@ -6502,25 +4401,12 @@ net.alphatab.platform.BinaryReader.prototype._readBits = function(start,length,s
 	while(diff != 0) {
 		sum += this._shl(this._readByte(lastByte++,size),(diff-- << 3) - offsetRight);
 	}
-	{
-		$s.pop();
-		return sum;
-	}
-	$s.pop();
+	return sum;
 }
 net.alphatab.platform.BinaryReader.prototype._readByte = function(i,size) {
-	$s.push("net.alphatab.platform.BinaryReader::_readByte");
-	var $spos = $s.length;
-	{
-		var $tmp = this._buffer.charCodeAt(((this._pos + size) - i) - 1) & 255;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this._buffer.charCodeAt(((this._pos + size) - i) - 1) & 255;
 }
 net.alphatab.platform.BinaryReader.prototype._shl = function(a,b) {
-	$s.push("net.alphatab.platform.BinaryReader::_shl");
-	var $spos = $s.length;
 	{
 		var _g = 0;
 		while(_g < b) {
@@ -6528,15 +4414,9 @@ net.alphatab.platform.BinaryReader.prototype._shl = function(a,b) {
 			a = this._shl1(a);
 		}
 	}
-	{
-		$s.pop();
-		return a;
-	}
-	$s.pop();
+	return a;
 }
 net.alphatab.platform.BinaryReader.prototype._shl1 = function(a) {
-	$s.push("net.alphatab.platform.BinaryReader::_shl1");
-	var $spos = $s.length;
 	a = a % -2147483648;
 	if((a & 1073741824) == 1073741824) {
 		a -= 1073741824;
@@ -6544,91 +4424,38 @@ net.alphatab.platform.BinaryReader.prototype._shl1 = function(a) {
 		a += -2147483648;
 	}
 	else a *= 2;
-	{
-		$s.pop();
-		return a;
-	}
-	$s.pop();
+	return a;
 }
 net.alphatab.platform.BinaryReader.prototype.getPosition = function() {
-	$s.push("net.alphatab.platform.BinaryReader::getPosition");
-	var $spos = $s.length;
-	{
-		var $tmp = this._pos;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this._pos;
 }
 net.alphatab.platform.BinaryReader.prototype.getSize = function() {
-	$s.push("net.alphatab.platform.BinaryReader::getSize");
-	var $spos = $s.length;
-	{
-		var $tmp = this._buffer.length;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this._buffer.length;
 }
 net.alphatab.platform.BinaryReader.prototype.initialize = function(data) {
-	$s.push("net.alphatab.platform.BinaryReader::initialize");
-	var $spos = $s.length;
 	this._buffer = data;
 	this._pos = 0;
-	$s.pop();
 }
 net.alphatab.platform.BinaryReader.prototype.readBool = function() {
-	$s.push("net.alphatab.platform.BinaryReader::readBool");
-	var $spos = $s.length;
-	{
-		var $tmp = this.readByte() == 1;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.readByte() == 1;
 }
 net.alphatab.platform.BinaryReader.prototype.readByte = function() {
-	$s.push("net.alphatab.platform.BinaryReader::readByte");
-	var $spos = $s.length;
 	var data = this._buffer.charCodeAt(this._pos);
 	data = (data & 255);
 	this._pos++;
-	{
-		$s.pop();
-		return data;
-	}
-	$s.pop();
+	return data;
 }
 net.alphatab.platform.BinaryReader.prototype.readDouble = function() {
-	$s.push("net.alphatab.platform.BinaryReader::readDouble");
-	var $spos = $s.length;
-	{
-		var $tmp = this._decodeFloat(52,11);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this._decodeFloat(52,11);
 }
 net.alphatab.platform.BinaryReader.prototype.readInt32 = function() {
-	$s.push("net.alphatab.platform.BinaryReader::readInt32");
-	var $spos = $s.length;
-	{
-		var $tmp = this._decodeInt(32,true);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this._decodeInt(32,true);
 }
 net.alphatab.platform.BinaryReader.prototype.seek = function(pos) {
-	$s.push("net.alphatab.platform.BinaryReader::seek");
-	var $spos = $s.length;
 	this._pos = pos;
-	$s.pop();
 }
 net.alphatab.platform.BinaryReader.prototype.__class__ = net.alphatab.platform.BinaryReader;
 net.alphatab.model.GsMeasureHeader = function(factory) { if( factory === $_ ) return; {
-	$s.push("net.alphatab.model.GsMeasureHeader::new");
-	var $spos = $s.length;
 	this.Number = 0;
 	this.Start = 960;
 	this.TimeSignature = factory.NewTimeSignature();
@@ -6639,32 +4466,17 @@ net.alphatab.model.GsMeasureHeader = function(factory) { if( factory === $_ ) re
 	this.IsRepeatOpen = false;
 	this.RepeatClose = 0;
 	this.RepeatAlternative = 0;
-	$s.pop();
 }}
 net.alphatab.model.GsMeasureHeader.__name__ = ["net","alphatab","model","GsMeasureHeader"];
 net.alphatab.model.GsMeasureHeader.prototype.HasDoubleBar = null;
 net.alphatab.model.GsMeasureHeader.prototype.HasMarker = function() {
-	$s.push("net.alphatab.model.GsMeasureHeader::HasMarker");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Marker != null;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Marker != null;
 }
 net.alphatab.model.GsMeasureHeader.prototype.IsRepeatOpen = null;
 net.alphatab.model.GsMeasureHeader.prototype.KeySignature = null;
 net.alphatab.model.GsMeasureHeader.prototype.KeySignatureType = null;
 net.alphatab.model.GsMeasureHeader.prototype.Length = function() {
-	$s.push("net.alphatab.model.GsMeasureHeader::Length");
-	var $spos = $s.length;
-	{
-		var $tmp = this.TimeSignature.Numerator * this.TimeSignature.Denominator.Time();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.TimeSignature.Numerator * this.TimeSignature.Denominator.Time();
 }
 net.alphatab.model.GsMeasureHeader.prototype.Marker = null;
 net.alphatab.model.GsMeasureHeader.prototype.Number = null;
@@ -6677,17 +4489,12 @@ net.alphatab.model.GsMeasureHeader.prototype.TimeSignature = null;
 net.alphatab.model.GsMeasureHeader.prototype.TripletFeel = null;
 net.alphatab.model.GsMeasureHeader.prototype.__class__ = net.alphatab.model.GsMeasureHeader;
 net.alphatab.tablature.model.GsMeasureHeaderImpl = function(factory) { if( factory === $_ ) return; {
-	$s.push("net.alphatab.tablature.model.GsMeasureHeaderImpl::new");
-	var $spos = $s.length;
 	net.alphatab.model.GsMeasureHeader.apply(this,[factory]);
-	$s.pop();
 }}
 net.alphatab.tablature.model.GsMeasureHeaderImpl.__name__ = ["net","alphatab","tablature","model","GsMeasureHeaderImpl"];
 net.alphatab.tablature.model.GsMeasureHeaderImpl.__super__ = net.alphatab.model.GsMeasureHeader;
 for(var k in net.alphatab.model.GsMeasureHeader.prototype ) net.alphatab.tablature.model.GsMeasureHeaderImpl.prototype[k] = net.alphatab.model.GsMeasureHeader.prototype[k];
 net.alphatab.tablature.model.GsMeasureHeaderImpl.prototype.CalculateMeasureChanges = function(layout) {
-	$s.push("net.alphatab.tablature.model.GsMeasureHeaderImpl::CalculateMeasureChanges");
-	var $spos = $s.length;
 	var previous = layout.SongManager().GetPreviousMeasureHeader(this);
 	if(previous == null) {
 		this.ShouldPaintTempo = true;
@@ -6709,119 +4516,48 @@ net.alphatab.tablature.model.GsMeasureHeaderImpl.prototype.CalculateMeasureChang
 			this.ShouldPaintKeySignature = true;
 		}
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureHeaderImpl.prototype.GetClefSpacing = function(layout,measure) {
-	$s.push("net.alphatab.tablature.model.GsMeasureHeaderImpl::GetClefSpacing");
-	var $spos = $s.length;
-	{
-		var $tmp = ((!measure.IsPaintClef)?0:this._maxClefSpacing);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return ((!measure.IsPaintClef)?0:this._maxClefSpacing);
 }
 net.alphatab.tablature.model.GsMeasureHeaderImpl.prototype.GetFirstNoteSpacing = function(layout,measure) {
-	$s.push("net.alphatab.tablature.model.GsMeasureHeaderImpl::GetFirstNoteSpacing");
-	var $spos = $s.length;
 	var iTopSpacing = this.GetTempoSpacing(layout) + this.GetTripletFeelSpacing(layout);
 	var iMiddleSpacing = (this.GetClefSpacing(layout,measure) + this.GetKeySignatureSpacing(layout,measure)) + this.GetTimeSignatureSpacing(layout);
-	{
-		var $tmp = Math.round(Math.max(iTopSpacing,iMiddleSpacing) + (10 * layout.Scale));
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return Math.round(Math.max(iTopSpacing,iMiddleSpacing) + (10 * layout.Scale));
 }
 net.alphatab.tablature.model.GsMeasureHeaderImpl.prototype.GetKeySignatureSpacing = function(layout,measure) {
-	$s.push("net.alphatab.tablature.model.GsMeasureHeaderImpl::GetKeySignatureSpacing");
-	var $spos = $s.length;
-	{
-		var $tmp = ((!this.ShouldPaintKeySignature)?0:this._maxKeySignatureSpacing);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return ((!this.ShouldPaintKeySignature)?0:this._maxKeySignatureSpacing);
 }
 net.alphatab.tablature.model.GsMeasureHeaderImpl.prototype.GetLeftSpacing = function(layout) {
-	$s.push("net.alphatab.tablature.model.GsMeasureHeaderImpl::GetLeftSpacing");
-	var $spos = $s.length;
-	{
-		var $tmp = Math.round(15 * layout.Scale);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return Math.round(15 * layout.Scale);
 }
 net.alphatab.tablature.model.GsMeasureHeaderImpl.prototype.GetRightSpacing = function(layout) {
-	$s.push("net.alphatab.tablature.model.GsMeasureHeaderImpl::GetRightSpacing");
-	var $spos = $s.length;
-	{
-		var $tmp = Math.round(15 * layout.Scale);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return Math.round(15 * layout.Scale);
 }
 net.alphatab.tablature.model.GsMeasureHeaderImpl.prototype.GetTempoSpacing = function(layout) {
-	$s.push("net.alphatab.tablature.model.GsMeasureHeaderImpl::GetTempoSpacing");
-	var $spos = $s.length;
-	{
-		var $tmp = ((this.ShouldPaintTempo && this.Number == 1?Math.round(45 * layout.Scale):0));
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return ((this.ShouldPaintTempo && this.Number == 1?Math.round(45 * layout.Scale):0));
 }
 net.alphatab.tablature.model.GsMeasureHeaderImpl.prototype.GetTimeSignatureSpacing = function(layout) {
-	$s.push("net.alphatab.tablature.model.GsMeasureHeaderImpl::GetTimeSignatureSpacing");
-	var $spos = $s.length;
-	{
-		var $tmp = ((this.ShouldPaintTimeSignature?Math.round(30 * layout.Scale):0));
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return ((this.ShouldPaintTimeSignature?Math.round(30 * layout.Scale):0));
 }
 net.alphatab.tablature.model.GsMeasureHeaderImpl.prototype.GetTripletFeelSpacing = function(layout) {
-	$s.push("net.alphatab.tablature.model.GsMeasureHeaderImpl::GetTripletFeelSpacing");
-	var $spos = $s.length;
-	{
-		var $tmp = ((this.ShouldPaintTripletFeel?Math.round(55 * layout.Scale):0));
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return ((this.ShouldPaintTripletFeel?Math.round(55 * layout.Scale):0));
 }
 net.alphatab.tablature.model.GsMeasureHeaderImpl.prototype.MaxQuarterSpacing = null;
 net.alphatab.tablature.model.GsMeasureHeaderImpl.prototype.MaxWidth = null;
 net.alphatab.tablature.model.GsMeasureHeaderImpl.prototype.NotifyClefSpacing = function(spacing) {
-	$s.push("net.alphatab.tablature.model.GsMeasureHeaderImpl::NotifyClefSpacing");
-	var $spos = $s.length;
 	this._maxClefSpacing = (((spacing > this._maxClefSpacing)?spacing:this._maxClefSpacing));
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureHeaderImpl.prototype.NotifyKeySignatureSpacing = function(spacing) {
-	$s.push("net.alphatab.tablature.model.GsMeasureHeaderImpl::NotifyKeySignatureSpacing");
-	var $spos = $s.length;
 	this._maxKeySignatureSpacing = (((spacing > this._maxKeySignatureSpacing)?spacing:this._maxKeySignatureSpacing));
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureHeaderImpl.prototype.NotifyQuarterSpacing = function(spacing) {
-	$s.push("net.alphatab.tablature.model.GsMeasureHeaderImpl::NotifyQuarterSpacing");
-	var $spos = $s.length;
 	this.MaxQuarterSpacing = (((spacing > this.MaxQuarterSpacing)?spacing:this.MaxQuarterSpacing));
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureHeaderImpl.prototype.NotifyWidth = function(width) {
-	$s.push("net.alphatab.tablature.model.GsMeasureHeaderImpl::NotifyWidth");
-	var $spos = $s.length;
 	this.MaxWidth = (((width > this.MaxWidth)?width:this.MaxWidth));
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureHeaderImpl.prototype.Reset = function() {
-	$s.push("net.alphatab.tablature.model.GsMeasureHeaderImpl::Reset");
-	var $spos = $s.length;
 	this.MaxWidth = 0;
 	this.MaxQuarterSpacing = 0;
 	this.ShouldPaintTempo = false;
@@ -6830,67 +4566,48 @@ net.alphatab.tablature.model.GsMeasureHeaderImpl.prototype.Reset = function() {
 	this.ShouldPaintTripletFeel = false;
 	this._maxClefSpacing = 0;
 	this._maxKeySignatureSpacing = 0;
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureHeaderImpl.prototype.ShouldPaintKeySignature = null;
 net.alphatab.tablature.model.GsMeasureHeaderImpl.prototype.ShouldPaintTempo = null;
 net.alphatab.tablature.model.GsMeasureHeaderImpl.prototype.ShouldPaintTimeSignature = null;
 net.alphatab.tablature.model.GsMeasureHeaderImpl.prototype.ShouldPaintTripletFeel = null;
 net.alphatab.tablature.model.GsMeasureHeaderImpl.prototype.Update = function(layout,track) {
-	$s.push("net.alphatab.tablature.model.GsMeasureHeaderImpl::Update");
-	var $spos = $s.length;
 	this.Reset();
 	this.CalculateMeasureChanges(layout);
 	var measure = track.Measures[this.Number - 1];
 	measure.CalculateMeasureChanges(layout);
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureHeaderImpl.prototype._maxClefSpacing = null;
 net.alphatab.tablature.model.GsMeasureHeaderImpl.prototype._maxKeySignatureSpacing = null;
 net.alphatab.tablature.model.GsMeasureHeaderImpl.prototype.__class__ = net.alphatab.tablature.model.GsMeasureHeaderImpl;
 net.alphatab.model.effects.GsBendPoint = function(position,value,vibrato) { if( position === $_ ) return; {
-	$s.push("net.alphatab.model.effects.GsBendPoint::new");
-	var $spos = $s.length;
 	if(vibrato == null) vibrato = false;
 	if(value == null) value = 0;
 	if(position == null) position = 0;
 	this.Position = position;
 	this.Value = value;
 	this.Vibrato = vibrato;
-	$s.pop();
 }}
 net.alphatab.model.effects.GsBendPoint.__name__ = ["net","alphatab","model","effects","GsBendPoint"];
 net.alphatab.model.effects.GsBendPoint.prototype.GetTime = function(duration) {
-	$s.push("net.alphatab.model.effects.GsBendPoint::GetTime");
-	var $spos = $s.length;
-	{
-		var $tmp = Math.floor((duration * this.Position) / 12);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return Math.floor((duration * this.Position) / 12);
 }
 net.alphatab.model.effects.GsBendPoint.prototype.Position = null;
 net.alphatab.model.effects.GsBendPoint.prototype.Value = null;
 net.alphatab.model.effects.GsBendPoint.prototype.Vibrato = null;
 net.alphatab.model.effects.GsBendPoint.prototype.__class__ = net.alphatab.model.effects.GsBendPoint;
 net.alphatab.tablature.TrackSpacing = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.tablature.TrackSpacing::new");
-	var $spos = $s.length;
 	this.Spacing = new Array();
 	{
 		var _g = 0;
-		while(_g < 23) {
+		while(_g < 24) {
 			var i = _g++;
 			this.Spacing.push(0);
 		}
 	}
-	$s.pop();
 }}
 net.alphatab.tablature.TrackSpacing.__name__ = ["net","alphatab","tablature","TrackSpacing"];
 net.alphatab.tablature.TrackSpacing.prototype.Get = function(index) {
-	$s.push("net.alphatab.tablature.TrackSpacing::Get");
-	var $spos = $s.length;
 	var spacing = 0;
 	var realIndex = net.alphatab.tablature.TrackSpacingPositionConverter.ToInt(index);
 	{
@@ -6900,60 +4617,17 @@ net.alphatab.tablature.TrackSpacing.prototype.Get = function(index) {
 			spacing += this.Spacing[i];
 		}
 	}
-	{
-		$s.pop();
-		return spacing;
-	}
-	$s.pop();
+	return spacing;
 }
 net.alphatab.tablature.TrackSpacing.prototype.GetSize = function() {
-	$s.push("net.alphatab.tablature.TrackSpacing::GetSize");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Get(net.alphatab.tablature.TrackSpacingPositions.Bottom);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Get(net.alphatab.tablature.TrackSpacingPositions.Bottom);
 }
 net.alphatab.tablature.TrackSpacing.prototype.Set = function(index,value) {
-	$s.push("net.alphatab.tablature.TrackSpacing::Set");
-	var $spos = $s.length;
 	var realIndex = net.alphatab.tablature.TrackSpacingPositionConverter.ToInt(index);
 	this.Spacing[realIndex] = value;
-	$s.pop();
 }
 net.alphatab.tablature.TrackSpacing.prototype.Spacing = null;
 net.alphatab.tablature.TrackSpacing.prototype.__class__ = net.alphatab.tablature.TrackSpacing;
-js.Lib = function() { }
-js.Lib.__name__ = ["js","Lib"];
-js.Lib.isIE = null;
-js.Lib.isOpera = null;
-js.Lib.document = null;
-js.Lib.window = null;
-js.Lib.alert = function(v) {
-	$s.push("js.Lib::alert");
-	var $spos = $s.length;
-	alert(js.Boot.__string_rec(v,""));
-	$s.pop();
-}
-js.Lib.eval = function(code) {
-	$s.push("js.Lib::eval");
-	var $spos = $s.length;
-	{
-		var $tmp = eval(code);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
-}
-js.Lib.setErrorHandler = function(f) {
-	$s.push("js.Lib::setErrorHandler");
-	var $spos = $s.length;
-	js.Lib.onerror = f;
-	$s.pop();
-}
-js.Lib.prototype.__class__ = js.Lib;
 ValueType = { __ename__ : ["ValueType"], __constructs__ : ["TNull","TInt","TFloat","TBool","TObject","TFunction","TClass","TEnum","TUnknown"] }
 ValueType.TBool = ["TBool",3];
 ValueType.TBool.toString = $estr;
@@ -6981,76 +4655,27 @@ ValueType.TUnknown.__enum__ = ValueType;
 Type = function() { }
 Type.__name__ = ["Type"];
 Type.getClass = function(o) {
-	$s.push("Type::getClass");
-	var $spos = $s.length;
-	if(o == null) {
-		$s.pop();
-		return null;
-	}
-	if(o.__enum__ != null) {
-		$s.pop();
-		return null;
-	}
-	{
-		var $tmp = o.__class__;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	if(o == null) return null;
+	if(o.__enum__ != null) return null;
+	return o.__class__;
 }
 Type.getEnum = function(o) {
-	$s.push("Type::getEnum");
-	var $spos = $s.length;
-	if(o == null) {
-		$s.pop();
-		return null;
-	}
-	{
-		var $tmp = o.__enum__;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	if(o == null) return null;
+	return o.__enum__;
 }
 Type.getSuperClass = function(c) {
-	$s.push("Type::getSuperClass");
-	var $spos = $s.length;
-	{
-		var $tmp = c.__super__;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return c.__super__;
 }
 Type.getClassName = function(c) {
-	$s.push("Type::getClassName");
-	var $spos = $s.length;
-	if(c == null) {
-		$s.pop();
-		return null;
-	}
+	if(c == null) return null;
 	var a = c.__name__;
-	{
-		var $tmp = a.join(".");
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return a.join(".");
 }
 Type.getEnumName = function(e) {
-	$s.push("Type::getEnumName");
-	var $spos = $s.length;
 	var a = e.__ename__;
-	{
-		var $tmp = a.join(".");
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return a.join(".");
 }
 Type.resolveClass = function(name) {
-	$s.push("Type::resolveClass");
-	var $spos = $s.length;
 	var cl;
 	try {
 		cl = eval(name);
@@ -7059,26 +4684,14 @@ Type.resolveClass = function(name) {
 		{
 			var e = $e12;
 			{
-				$e = [];
-				while($s.length >= $spos) $e.unshift($s.pop());
-				$s.push($e[0]);
 				cl = null;
 			}
 		}
 	}
-	if(cl == null || cl.__name__ == null) {
-		$s.pop();
-		return null;
-	}
-	{
-		$s.pop();
-		return cl;
-	}
-	$s.pop();
+	if(cl == null || cl.__name__ == null) return null;
+	return cl;
 }
 Type.resolveEnum = function(name) {
-	$s.push("Type::resolveEnum");
-	var $spos = $s.length;
 	var e;
 	try {
 		e = eval(name);
@@ -7087,397 +4700,190 @@ Type.resolveEnum = function(name) {
 		{
 			var err = $e13;
 			{
-				$e = [];
-				while($s.length >= $spos) $e.unshift($s.pop());
-				$s.push($e[0]);
 				e = null;
 			}
 		}
 	}
-	if(e == null || e.__ename__ == null) {
-		$s.pop();
-		return null;
-	}
-	{
-		$s.pop();
-		return e;
-	}
-	$s.pop();
+	if(e == null || e.__ename__ == null) return null;
+	return e;
 }
 Type.createInstance = function(cl,args) {
-	$s.push("Type::createInstance");
-	var $spos = $s.length;
-	if(args.length <= 3) {
-		var $tmp = new cl(args[0],args[1],args[2]);
-		$s.pop();
-		return $tmp;
-	}
+	if(args.length <= 3) return new cl(args[0],args[1],args[2]);
 	if(args.length > 8) throw "Too many arguments";
-	{
-		var $tmp = new cl(args[0],args[1],args[2],args[3],args[4],args[5],args[6],args[7]);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new cl(args[0],args[1],args[2],args[3],args[4],args[5],args[6],args[7]);
 }
 Type.createEmptyInstance = function(cl) {
-	$s.push("Type::createEmptyInstance");
-	var $spos = $s.length;
-	{
-		var $tmp = new cl($_);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new cl($_);
 }
 Type.createEnum = function(e,constr,params) {
-	$s.push("Type::createEnum");
-	var $spos = $s.length;
 	var f = Reflect.field(e,constr);
 	if(f == null) throw "No such constructor " + constr;
 	if(Reflect.isFunction(f)) {
 		if(params == null) throw ("Constructor " + constr) + " need parameters";
-		{
-			var $tmp = f.apply(e,params);
-			$s.pop();
-			return $tmp;
-		}
+		return f.apply(e,params);
 	}
 	if(params != null && params.length != 0) throw ("Constructor " + constr) + " does not need parameters";
-	{
-		$s.pop();
-		return f;
-	}
-	$s.pop();
+	return f;
 }
 Type.createEnumIndex = function(e,index,params) {
-	$s.push("Type::createEnumIndex");
-	var $spos = $s.length;
 	var c = Type.getEnumConstructs(e)[index];
 	if(c == null) throw index + " is not a valid enum constructor index";
-	{
-		var $tmp = Type.createEnum(e,c,params);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return Type.createEnum(e,c,params);
 }
 Type.getInstanceFields = function(c) {
-	$s.push("Type::getInstanceFields");
-	var $spos = $s.length;
 	var a = Reflect.fields(c.prototype);
 	a.remove("__class__");
-	{
-		$s.pop();
-		return a;
-	}
-	$s.pop();
+	return a;
 }
 Type.getClassFields = function(c) {
-	$s.push("Type::getClassFields");
-	var $spos = $s.length;
 	var a = Reflect.fields(c);
 	a.remove("__name__");
 	a.remove("__interfaces__");
 	a.remove("__super__");
 	a.remove("prototype");
-	{
-		$s.pop();
-		return a;
-	}
-	$s.pop();
+	return a;
 }
 Type.getEnumConstructs = function(e) {
-	$s.push("Type::getEnumConstructs");
-	var $spos = $s.length;
-	{
-		var $tmp = e.__constructs__;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return e.__constructs__;
 }
 Type["typeof"] = function(v) {
-	$s.push("Type::typeof");
-	var $spos = $s.length;
 	switch(typeof(v)) {
 	case "boolean":{
-		{
-			var $tmp = ValueType.TBool;
-			$s.pop();
-			return $tmp;
-		}
+		return ValueType.TBool;
 	}break;
 	case "string":{
-		{
-			var $tmp = ValueType.TClass(String);
-			$s.pop();
-			return $tmp;
-		}
+		return ValueType.TClass(String);
 	}break;
 	case "number":{
-		if(Math.ceil(v) == v % 2147483648.0) {
-			var $tmp = ValueType.TInt;
-			$s.pop();
-			return $tmp;
-		}
-		{
-			var $tmp = ValueType.TFloat;
-			$s.pop();
-			return $tmp;
-		}
+		if(Math.ceil(v) == v % 2147483648.0) return ValueType.TInt;
+		return ValueType.TFloat;
 	}break;
 	case "object":{
-		if(v == null) {
-			var $tmp = ValueType.TNull;
-			$s.pop();
-			return $tmp;
-		}
+		if(v == null) return ValueType.TNull;
 		var e = v.__enum__;
-		if(e != null) {
-			var $tmp = ValueType.TEnum(e);
-			$s.pop();
-			return $tmp;
-		}
+		if(e != null) return ValueType.TEnum(e);
 		var c = v.__class__;
-		if(c != null) {
-			var $tmp = ValueType.TClass(c);
-			$s.pop();
-			return $tmp;
-		}
-		{
-			var $tmp = ValueType.TObject;
-			$s.pop();
-			return $tmp;
-		}
+		if(c != null) return ValueType.TClass(c);
+		return ValueType.TObject;
 	}break;
 	case "function":{
-		if(v.__name__ != null) {
-			var $tmp = ValueType.TObject;
-			$s.pop();
-			return $tmp;
-		}
-		{
-			var $tmp = ValueType.TFunction;
-			$s.pop();
-			return $tmp;
-		}
+		if(v.__name__ != null) return ValueType.TObject;
+		return ValueType.TFunction;
 	}break;
 	case "undefined":{
-		{
-			var $tmp = ValueType.TNull;
-			$s.pop();
-			return $tmp;
-		}
+		return ValueType.TNull;
 	}break;
 	default:{
-		{
-			var $tmp = ValueType.TUnknown;
-			$s.pop();
-			return $tmp;
-		}
+		return ValueType.TUnknown;
 	}break;
 	}
-	$s.pop();
 }
 Type.enumEq = function(a,b) {
-	$s.push("Type::enumEq");
-	var $spos = $s.length;
-	if(a == b) {
-		$s.pop();
-		return true;
-	}
+	if(a == b) return true;
 	try {
-		if(a[0] != b[0]) {
-			$s.pop();
-			return false;
-		}
+		if(a[0] != b[0]) return false;
 		{
 			var _g1 = 2, _g = a.length;
 			while(_g1 < _g) {
 				var i = _g1++;
-				if(!Type.enumEq(a[i],b[i])) {
-					$s.pop();
-					return false;
-				}
+				if(!Type.enumEq(a[i],b[i])) return false;
 			}
 		}
 		var e = a.__enum__;
-		if(e != b.__enum__ || e == null) {
-			$s.pop();
-			return false;
-		}
+		if(e != b.__enum__ || e == null) return false;
 	}
 	catch( $e14 ) {
 		{
 			var e = $e14;
 			{
-				$e = [];
-				while($s.length >= $spos) $e.unshift($s.pop());
-				$s.push($e[0]);
-				{
-					$s.pop();
-					return false;
-				}
+				return false;
 			}
 		}
 	}
-	{
-		$s.pop();
-		return true;
-	}
-	$s.pop();
+	return true;
 }
 Type.enumConstructor = function(e) {
-	$s.push("Type::enumConstructor");
-	var $spos = $s.length;
-	{
-		var $tmp = e[0];
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return e[0];
 }
 Type.enumParameters = function(e) {
-	$s.push("Type::enumParameters");
-	var $spos = $s.length;
-	{
-		var $tmp = e.slice(2);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return e.slice(2);
 }
 Type.enumIndex = function(e) {
-	$s.push("Type::enumIndex");
-	var $spos = $s.length;
-	{
-		var $tmp = e[1];
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return e[1];
 }
 Type.prototype.__class__ = Type;
+js.Lib = function() { }
+js.Lib.__name__ = ["js","Lib"];
+js.Lib.isIE = null;
+js.Lib.isOpera = null;
+js.Lib.document = null;
+js.Lib.window = null;
+js.Lib.alert = function(v) {
+	alert(js.Boot.__string_rec(v,""));
+}
+js.Lib.eval = function(code) {
+	return eval(code);
+}
+js.Lib.setErrorHandler = function(f) {
+	js.Lib.onerror = f;
+}
+js.Lib.prototype.__class__ = js.Lib;
 if(!net.alphatab.midi) net.alphatab.midi = {}
 net.alphatab.midi.MidiMessageUtils = function() { }
 net.alphatab.midi.MidiMessageUtils.__name__ = ["net","alphatab","midi","MidiMessageUtils"];
 net.alphatab.midi.MidiMessageUtils.fixValue = function(value) {
-	$s.push("net.alphatab.midi.MidiMessageUtils::fixValue");
-	var $spos = $s.length;
 	var fixedValue = value;
 	fixedValue = Math.min(fixedValue,127);
 	fixedValue = Math.max(fixedValue,0);
-	{
-		$s.pop();
-		return fixedValue;
-	}
-	$s.pop();
+	return fixedValue;
 }
 net.alphatab.midi.MidiMessageUtils.fixChannel = function(channel) {
-	$s.push("net.alphatab.midi.MidiMessageUtils::fixChannel");
-	var $spos = $s.length;
 	var fixedChannel = channel;
 	fixedChannel = Math.min(fixedChannel,15);
 	fixedChannel = Math.max(fixedChannel,0);
-	{
-		$s.pop();
-		return fixedChannel;
-	}
-	$s.pop();
+	return fixedChannel;
 }
 net.alphatab.midi.MidiMessageUtils.NoteOn = function(channel,note,velocity) {
-	$s.push("net.alphatab.midi.MidiMessageUtils::NoteOn");
-	var $spos = $s.length;
-	{
-		var $tmp = (((("NoteOn," + Std.string(net.alphatab.midi.MidiMessageUtils.fixChannel(channel))) + ",") + Std.string(net.alphatab.midi.MidiMessageUtils.fixValue(note))) + ",") + Std.string(net.alphatab.midi.MidiMessageUtils.fixValue(velocity));
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (("0" + net.alphatab.midi.MidiMessageUtils.ChannelToString(net.alphatab.midi.MidiMessageUtils.fixChannel(channel))) + net.alphatab.midi.MidiMessageUtils.ValueToString(net.alphatab.midi.MidiMessageUtils.fixValue(note))) + net.alphatab.midi.MidiMessageUtils.ValueToString(net.alphatab.midi.MidiMessageUtils.fixValue(velocity));
 }
 net.alphatab.midi.MidiMessageUtils.NoteOff = function(channel,note,velocity) {
-	$s.push("net.alphatab.midi.MidiMessageUtils::NoteOff");
-	var $spos = $s.length;
-	{
-		var $tmp = (((("NoteOff," + Std.string(net.alphatab.midi.MidiMessageUtils.fixChannel(channel))) + ",") + Std.string(net.alphatab.midi.MidiMessageUtils.fixValue(note))) + ",") + Std.string(net.alphatab.midi.MidiMessageUtils.fixValue(velocity));
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (("1" + net.alphatab.midi.MidiMessageUtils.ChannelToString(net.alphatab.midi.MidiMessageUtils.fixChannel(channel))) + net.alphatab.midi.MidiMessageUtils.ValueToString(net.alphatab.midi.MidiMessageUtils.fixValue(note))) + net.alphatab.midi.MidiMessageUtils.ValueToString(net.alphatab.midi.MidiMessageUtils.fixValue(velocity));
 }
 net.alphatab.midi.MidiMessageUtils.ControlChange = function(channel,controller,value) {
-	$s.push("net.alphatab.midi.MidiMessageUtils::ControlChange");
-	var $spos = $s.length;
-	{
-		var $tmp = (((("ControlChange," + Std.string(net.alphatab.midi.MidiMessageUtils.fixChannel(channel))) + ",") + Std.string(net.alphatab.midi.MidiMessageUtils.fixValue(controller))) + ",") + Std.string(net.alphatab.midi.MidiMessageUtils.fixValue(value));
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (("2" + net.alphatab.midi.MidiMessageUtils.ChannelToString(net.alphatab.midi.MidiMessageUtils.fixChannel(channel))) + net.alphatab.midi.MidiMessageUtils.ValueToString(net.alphatab.midi.MidiMessageUtils.fixValue(controller))) + net.alphatab.midi.MidiMessageUtils.ValueToString(net.alphatab.midi.MidiMessageUtils.fixValue(value));
 }
 net.alphatab.midi.MidiMessageUtils.ProgramChange = function(channel,instrument) {
-	$s.push("net.alphatab.midi.MidiMessageUtils::ProgramChange");
-	var $spos = $s.length;
-	{
-		var $tmp = (("ProgramChange," + Std.string(net.alphatab.midi.MidiMessageUtils.fixChannel(channel))) + ",") + Std.string(net.alphatab.midi.MidiMessageUtils.fixValue(instrument));
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return ("3" + net.alphatab.midi.MidiMessageUtils.ChannelToString(net.alphatab.midi.MidiMessageUtils.fixChannel(channel))) + net.alphatab.midi.MidiMessageUtils.ValueToString(net.alphatab.midi.MidiMessageUtils.fixValue(instrument));
 }
 net.alphatab.midi.MidiMessageUtils.PitchBend = function(channel,value) {
-	$s.push("net.alphatab.midi.MidiMessageUtils::PitchBend");
-	var $spos = $s.length;
-	{
-		var $tmp = (("PitchBend," + Std.string(net.alphatab.midi.MidiMessageUtils.fixChannel(channel))) + ",") + Std.string(net.alphatab.midi.MidiMessageUtils.fixValue(value));
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return ("4" + net.alphatab.midi.MidiMessageUtils.ChannelToString(net.alphatab.midi.MidiMessageUtils.fixChannel(channel))) + net.alphatab.midi.MidiMessageUtils.ValueToString(net.alphatab.midi.MidiMessageUtils.fixValue(value));
 }
 net.alphatab.midi.MidiMessageUtils.SystemReset = function() {
-	$s.push("net.alphatab.midi.MidiMessageUtils::SystemReset");
-	var $spos = $s.length;
-	{
-		$s.pop();
-		return "SystemReset";
-	}
-	$s.pop();
+	return "5";
 }
 net.alphatab.midi.MidiMessageUtils.TempoInUSQ = function(usq) {
-	$s.push("net.alphatab.midi.MidiMessageUtils::TempoInUSQ");
-	var $spos = $s.length;
-	{
-		var $tmp = "TempoInUsq," + Std.string(usq);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return "6" + net.alphatab.midi.MidiMessageUtils.IntToString(usq);
 }
 net.alphatab.midi.MidiMessageUtils.TimeSignature = function(ts) {
-	$s.push("net.alphatab.midi.MidiMessageUtils::TimeSignature");
-	var $spos = $s.length;
-	{
-		var $tmp = (((("TimeSignature," + Std.string(ts.Numerator)) + ",") + Std.string(ts.Denominator.Index())) + ",") + Std.string(ts.Denominator.Value);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (((("7" + net.alphatab.midi.MidiMessageUtils.IntToString(ts.Numerator)) + ",") + net.alphatab.midi.MidiMessageUtils.IntToString(ts.Denominator.Index())) + ",") + net.alphatab.midi.MidiMessageUtils.IntToString(ts.Denominator.Value);
+}
+net.alphatab.midi.MidiMessageUtils.IntToString = function(num) {
+	return StringTools.hex(num);
+}
+net.alphatab.midi.MidiMessageUtils.ChannelToString = function(num) {
+	return StringTools.hex(num,1);
+}
+net.alphatab.midi.MidiMessageUtils.ValueToString = function(num) {
+	return StringTools.hex(num,2);
 }
 net.alphatab.midi.MidiMessageUtils.prototype.__class__ = net.alphatab.midi.MidiMessageUtils;
 net.alphatab.tablature.ViewLayout = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.tablature.ViewLayout::new");
-	var $spos = $s.length;
 	this.Init(1);
 	this.CompactMode = true;
-	$s.pop();
 }}
 net.alphatab.tablature.ViewLayout.__name__ = ["net","alphatab","tablature","ViewLayout"];
 net.alphatab.tablature.ViewLayout.prototype.Cache = null;
 net.alphatab.tablature.ViewLayout.prototype.CheckDefaultSpacing = function(ts) {
-	$s.push("net.alphatab.tablature.ViewLayout::CheckDefaultSpacing");
-	var $spos = $s.length;
 	var minBufferSeparator = this.MinBufferSeparator;
 	var bufferSeparator = ts.Get(net.alphatab.tablature.TrackSpacingPositions.ScoreUpLines) - ts.Get(net.alphatab.tablature.TrackSpacingPositions.BufferSeparator);
 	if(bufferSeparator < minBufferSeparator) {
@@ -7487,7 +4893,6 @@ net.alphatab.tablature.ViewLayout.prototype.CheckDefaultSpacing = function(ts) {
 	if(checkPosition >= 0 && checkPosition < this.MinTopSpacing) {
 		ts.Set(net.alphatab.tablature.TrackSpacingPositions.Top,Math.round(this.MinTopSpacing - checkPosition));
 	}
-	$s.pop();
 }
 net.alphatab.tablature.ViewLayout.prototype.ChordFretIndexSpacing = null;
 net.alphatab.tablature.ViewLayout.prototype.ChordFretSpacing = null;
@@ -7499,64 +4904,32 @@ net.alphatab.tablature.ViewLayout.prototype.FirstMeasureSpacing = null;
 net.alphatab.tablature.ViewLayout.prototype.FirstTrackSpacing = null;
 net.alphatab.tablature.ViewLayout.prototype.FontScale = null;
 net.alphatab.tablature.ViewLayout.prototype.GetDefaultChordSpacing = function() {
-	$s.push("net.alphatab.tablature.ViewLayout::GetDefaultChordSpacing");
-	var $spos = $s.length;
 	var spacing = 0;
 	spacing += (6 * this.ChordFretSpacing) + this.ChordFretSpacing;
 	spacing += Math.round(15.0 * this.Scale);
-	{
-		var $tmp = Math.round(spacing);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return Math.round(spacing);
 }
 net.alphatab.tablature.ViewLayout.prototype.GetMinSpacing = function(duration) {
-	$s.push("net.alphatab.tablature.ViewLayout::GetMinSpacing");
-	var $spos = $s.length;
 	var scale = this.Scale;
 	switch(duration.Value) {
 	case 1:{
-		{
-			var $tmp = 50.0 * scale;
-			$s.pop();
-			return $tmp;
-		}
+		return 50.0 * scale;
 	}break;
 	case 2:{
-		{
-			var $tmp = 30.0 * scale;
-			$s.pop();
-			return $tmp;
-		}
+		return 30.0 * scale;
 	}break;
 	case 4:{
-		{
-			var $tmp = 55.0 * scale;
-			$s.pop();
-			return $tmp;
-		}
+		return 55.0 * scale;
 	}break;
 	case 8:{
-		{
-			var $tmp = 20.0 * scale;
-			$s.pop();
-			return $tmp;
-		}
+		return 20.0 * scale;
 	}break;
 	default:{
-		{
-			var $tmp = 18.0 * this.Scale;
-			$s.pop();
-			return $tmp;
-		}
+		return 18.0 * this.Scale;
 	}break;
 	}
-	$s.pop();
 }
 net.alphatab.tablature.ViewLayout.prototype.GetNoteOrientation = function(x,y,note) {
-	$s.push("net.alphatab.tablature.ViewLayout::GetNoteOrientation");
-	var $spos = $s.length;
 	var noteAsString = "";
 	if(note.IsTiedNote) {
 		noteAsString = "L";
@@ -7568,104 +4941,48 @@ net.alphatab.tablature.ViewLayout.prototype.GetNoteOrientation = function(x,y,no
 		noteAsString = net.alphatab.Utils.string(note.Value);
 	}
 	noteAsString = (note.Effect.GhostNote?("(" + noteAsString) + ")":noteAsString);
-	{
-		var $tmp = this.GetOrientation(x,y,noteAsString);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.GetOrientation(x,y,noteAsString);
 }
 net.alphatab.tablature.ViewLayout.prototype.GetOrientation = function(x,y,str) {
-	$s.push("net.alphatab.tablature.ViewLayout::GetOrientation");
-	var $spos = $s.length;
 	this.Tablature.Canvas.setFont(net.alphatab.tablature.drawing.DrawingResources.NoteFont);
 	var size = this.Tablature.Canvas.measureText(str);
-	{
-		var $tmp = new net.alphatab.model.Rectangle(x,y,size.width,net.alphatab.tablature.drawing.DrawingResources.NoteFontHeight);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.Rectangle(x,y,size.width,net.alphatab.tablature.drawing.DrawingResources.NoteFontHeight);
 }
 net.alphatab.tablature.ViewLayout.prototype.GetSpacingForQuarter = function(duration) {
-	$s.push("net.alphatab.tablature.ViewLayout::GetSpacingForQuarter");
-	var $spos = $s.length;
-	{
-		var $tmp = (960 / duration.Time()) * this.GetMinSpacing(duration);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (960 / duration.Time()) * this.GetMinSpacing(duration);
 }
 net.alphatab.tablature.ViewLayout.prototype.GetVoiceWidth = function(voice) {
-	$s.push("net.alphatab.tablature.ViewLayout::GetVoiceWidth");
-	var $spos = $s.length;
 	var scale = this.Scale;
 	var duration = voice.Duration;
 	if(duration != null) {
 		switch(duration.Value) {
 		case 1:{
-			{
-				var $tmp = (90.0 * scale);
-				$s.pop();
-				return $tmp;
-			}
+			return (90.0 * scale);
 		}break;
 		case 2:{
-			{
-				var $tmp = (65.0 * scale);
-				$s.pop();
-				return $tmp;
-			}
+			return (65.0 * scale);
 		}break;
 		case 4:{
-			{
-				var $tmp = (45.0 * scale);
-				$s.pop();
-				return $tmp;
-			}
+			return (45.0 * scale);
 		}break;
 		case 8:{
-			{
-				var $tmp = (30.0 * scale);
-				$s.pop();
-				return $tmp;
-			}
+			return (30.0 * scale);
 		}break;
 		case 16:{
-			{
-				var $tmp = (20.0 * scale);
-				$s.pop();
-				return $tmp;
-			}
+			return (20.0 * scale);
 		}break;
 		case 32:{
-			{
-				var $tmp = (17.0 * scale);
-				$s.pop();
-				return $tmp;
-			}
+			return (17.0 * scale);
 		}break;
 		default:{
-			{
-				var $tmp = (15.0 * scale);
-				$s.pop();
-				return $tmp;
-			}
+			return (15.0 * scale);
 		}break;
 		}
 	}
-	{
-		var $tmp = 20.0 * scale;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return 20.0 * scale;
 }
 net.alphatab.tablature.ViewLayout.prototype.Height = null;
 net.alphatab.tablature.ViewLayout.prototype.Init = function(scale) {
-	$s.push("net.alphatab.tablature.ViewLayout::Init");
-	var $spos = $s.length;
 	this.StringSpacing = (10 * scale);
 	this.ScoreLineSpacing = (8 * scale);
 	this.Scale = scale;
@@ -7686,27 +5003,12 @@ net.alphatab.tablature.ViewLayout.prototype.Init = function(scale) {
 	this.MarkerSpacing = Math.round(15 * this.Scale);
 	this.TupletoSpacing = Math.round(15 * this.Scale);
 	this.EffectSpacing = Math.round(10 * this.Scale);
-	$s.pop();
 }
 net.alphatab.tablature.ViewLayout.prototype.IsFirstMeasure = function(measure) {
-	$s.push("net.alphatab.tablature.ViewLayout::IsFirstMeasure");
-	var $spos = $s.length;
-	{
-		var $tmp = measure.Number() == 1;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return measure.Number() == 1;
 }
 net.alphatab.tablature.ViewLayout.prototype.IsLastMeasure = function(measure) {
-	$s.push("net.alphatab.tablature.ViewLayout::IsLastMeasure");
-	var $spos = $s.length;
-	{
-		var $tmp = measure.Number() == this.Tablature.Track.Song.MeasureHeaders.length;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return measure.Number() == this.Tablature.Track.Song.MeasureHeaders.length;
 }
 net.alphatab.tablature.ViewLayout.prototype.LayoutSize = null;
 net.alphatab.tablature.ViewLayout.prototype.MarkerSpacing = null;
@@ -7714,22 +5016,14 @@ net.alphatab.tablature.ViewLayout.prototype.MinBufferSeparator = null;
 net.alphatab.tablature.ViewLayout.prototype.MinScoreTabSpacing = null;
 net.alphatab.tablature.ViewLayout.prototype.MinTopSpacing = null;
 net.alphatab.tablature.ViewLayout.prototype.PaintCache = function(graphics,area,fromX,fromY) {
-	$s.push("net.alphatab.tablature.ViewLayout::PaintCache");
-	var $spos = $s.length;
 	if(this.Cache == null) {
 		this.UpdateCache(graphics,area,fromX,fromY);
-		{
-			$s.pop();
-			return;
-		}
+		return;
 	}
 	haxe.Log.trace("Painting Cache",{ fileName : "ViewLayout.hx", lineNumber : 117, className : "net.alphatab.tablature.ViewLayout", methodName : "PaintCache"});
 	this.Cache.Draw();
-	$s.pop();
 }
 net.alphatab.tablature.ViewLayout.prototype.PaintLines = function(track,ts,context,x,y,width) {
-	$s.push("net.alphatab.tablature.ViewLayout::PaintLines");
-	var $spos = $s.length;
 	if(width > 0) {
 		var tempX = Math.max(0,x);
 		var tempY = y;
@@ -7754,39 +5048,22 @@ net.alphatab.tablature.ViewLayout.prototype.PaintLines = function(track,ts,conte
 			}
 		}
 	}
-	$s.pop();
 }
 net.alphatab.tablature.ViewLayout.prototype.PaintSong = function(ctx,clientArea,x,y) {
-	$s.push("net.alphatab.tablature.ViewLayout::PaintSong");
-	var $spos = $s.length;
 	null;
-	$s.pop();
 }
 net.alphatab.tablature.ViewLayout.prototype.PrepareLayout = function(clientArea,x,y) {
-	$s.push("net.alphatab.tablature.ViewLayout::PrepareLayout");
-	var $spos = $s.length;
 	null;
-	$s.pop();
 }
 net.alphatab.tablature.ViewLayout.prototype.RepeatEndingSpacing = null;
 net.alphatab.tablature.ViewLayout.prototype.Scale = null;
 net.alphatab.tablature.ViewLayout.prototype.ScoreLineSpacing = null;
 net.alphatab.tablature.ViewLayout.prototype.ScoreSpacing = null;
 net.alphatab.tablature.ViewLayout.prototype.SetTablature = function(tablature) {
-	$s.push("net.alphatab.tablature.ViewLayout::SetTablature");
-	var $spos = $s.length;
 	this.Tablature = tablature;
-	$s.pop();
 }
 net.alphatab.tablature.ViewLayout.prototype.SongManager = function() {
-	$s.push("net.alphatab.tablature.ViewLayout::SongManager");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Tablature.SongManager;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Tablature.SongManager;
 }
 net.alphatab.tablature.ViewLayout.prototype.StringSpacing = null;
 net.alphatab.tablature.ViewLayout.prototype.Tablature = null;
@@ -7794,30 +5071,19 @@ net.alphatab.tablature.ViewLayout.prototype.TextSpacing = null;
 net.alphatab.tablature.ViewLayout.prototype.TrackSpacing = null;
 net.alphatab.tablature.ViewLayout.prototype.TupletoSpacing = null;
 net.alphatab.tablature.ViewLayout.prototype.UpdateCache = function(graphics,area,fromX,fromY) {
-	$s.push("net.alphatab.tablature.ViewLayout::UpdateCache");
-	var $spos = $s.length;
 	haxe.Log.trace("Updating Cache",{ fileName : "ViewLayout.hx", lineNumber : 123, className : "net.alphatab.tablature.ViewLayout", methodName : "UpdateCache"});
 	this.Cache = new net.alphatab.tablature.drawing.DrawingContext(this.Scale);
 	this.Cache.Graphics = graphics;
 	this.PaintSong(this.Cache,area,fromX,fromY);
 	this.PaintCache(graphics,area,fromX,fromY);
-	$s.pop();
 }
 net.alphatab.tablature.ViewLayout.prototype.UpdateSong = function() {
-	$s.push("net.alphatab.tablature.ViewLayout::UpdateSong");
-	var $spos = $s.length;
-	if(this.Tablature.Track == null) {
-		$s.pop();
-		return;
-	}
+	if(this.Tablature.Track == null) return;
 	haxe.Log.trace("Updating Song Data",{ fileName : "ViewLayout.hx", lineNumber : 144, className : "net.alphatab.tablature.ViewLayout", methodName : "UpdateSong"});
 	this.UpdateTracks();
 	haxe.Log.trace("Updating Song Data finished",{ fileName : "ViewLayout.hx", lineNumber : 146, className : "net.alphatab.tablature.ViewLayout", methodName : "UpdateSong"});
-	$s.pop();
 }
 net.alphatab.tablature.ViewLayout.prototype.UpdateTracks = function() {
-	$s.push("net.alphatab.tablature.ViewLayout::UpdateTracks");
-	var $spos = $s.length;
 	var song = this.Tablature.Track.Song;
 	var measureCount = song.MeasureHeaders.length;
 	var track = this.Tablature.Track;
@@ -7834,7 +5100,6 @@ net.alphatab.tablature.ViewLayout.prototype.UpdateTracks = function() {
 			measure.Update(this);
 		}
 	}
-	$s.pop();
 }
 net.alphatab.tablature.ViewLayout.prototype.Width = null;
 net.alphatab.tablature.ViewLayout.prototype.__class__ = net.alphatab.tablature.ViewLayout;
@@ -7845,8 +5110,6 @@ haxe.remoting.AsyncConnection.prototype.resolve = null;
 haxe.remoting.AsyncConnection.prototype.setErrorHandler = null;
 haxe.remoting.AsyncConnection.prototype.__class__ = haxe.remoting.AsyncConnection;
 net.alphatab.model.GsMidiChannel = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.model.GsMidiChannel::new");
-	var $spos = $s.length;
 	this.Channel = 0;
 	this.EffectChannel = 0;
 	this.Instrument(25);
@@ -7856,15 +5119,12 @@ net.alphatab.model.GsMidiChannel = function(p) { if( p === $_ ) return; {
 	this.Reverb = 0;
 	this.Phaser = 0;
 	this.Tremolo = 0;
-	$s.pop();
 }}
 net.alphatab.model.GsMidiChannel.__name__ = ["net","alphatab","model","GsMidiChannel"];
 net.alphatab.model.GsMidiChannel.prototype.Balance = null;
 net.alphatab.model.GsMidiChannel.prototype.Channel = null;
 net.alphatab.model.GsMidiChannel.prototype.Chorus = null;
 net.alphatab.model.GsMidiChannel.prototype.Copy = function(channel) {
-	$s.push("net.alphatab.model.GsMidiChannel::Copy");
-	var $spos = $s.length;
 	channel.Channel = this.Channel;
 	channel.EffectChannel = this.EffectChannel;
 	channel.Instrument(this.Instrument());
@@ -7874,30 +5134,15 @@ net.alphatab.model.GsMidiChannel.prototype.Copy = function(channel) {
 	channel.Reverb = this.Reverb;
 	channel.Phaser = this.Phaser;
 	channel.Tremolo = this.Tremolo;
-	$s.pop();
 }
 net.alphatab.model.GsMidiChannel.prototype.EffectChannel = null;
 net.alphatab.model.GsMidiChannel.prototype.Instrument = function(newInstrument) {
-	$s.push("net.alphatab.model.GsMidiChannel::Instrument");
-	var $spos = $s.length;
 	if(newInstrument == null) newInstrument = -1;
 	if(newInstrument != -1) this._instrument = newInstrument;
-	{
-		var $tmp = (this.IsPercussionChannel()?0:this._instrument);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (this.IsPercussionChannel()?0:this._instrument);
 }
 net.alphatab.model.GsMidiChannel.prototype.IsPercussionChannel = function() {
-	$s.push("net.alphatab.model.GsMidiChannel::IsPercussionChannel");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Channel == 9;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Channel == 9;
 }
 net.alphatab.model.GsMidiChannel.prototype.Phaser = null;
 net.alphatab.model.GsMidiChannel.prototype.Reverb = null;
@@ -7906,48 +5151,27 @@ net.alphatab.model.GsMidiChannel.prototype.Volume = null;
 net.alphatab.model.GsMidiChannel.prototype._instrument = null;
 net.alphatab.model.GsMidiChannel.prototype.__class__ = net.alphatab.model.GsMidiChannel;
 net.alphatab.tablature.model.TripletGroup = function(voice) { if( voice === $_ ) return; {
-	$s.push("net.alphatab.tablature.model.TripletGroup::new");
-	var $spos = $s.length;
 	this._voiceIndex = voice;
 	this._voices = new Array();
-	$s.pop();
 }}
 net.alphatab.tablature.model.TripletGroup.__name__ = ["net","alphatab","tablature","model","TripletGroup"];
 net.alphatab.tablature.model.TripletGroup.prototype._triplet = null;
 net.alphatab.tablature.model.TripletGroup.prototype._voiceIndex = null;
 net.alphatab.tablature.model.TripletGroup.prototype._voices = null;
 net.alphatab.tablature.model.TripletGroup.prototype.check = function(voice) {
-	$s.push("net.alphatab.tablature.model.TripletGroup::check");
-	var $spos = $s.length;
 	if(this._voices.length == 0) {
 		this._triplet = voice.Duration.Triplet.Enters;
 	}
 	else {
-		if(voice.Index != this._voiceIndex || voice.Duration.Triplet.Enters != this._triplet || this.isFull()) {
-			$s.pop();
-			return false;
-		}
+		if(voice.Index != this._voiceIndex || voice.Duration.Triplet.Enters != this._triplet || this.isFull()) return false;
 	}
 	this._voices.push(voice);
-	{
-		$s.pop();
-		return true;
-	}
-	$s.pop();
+	return true;
 }
 net.alphatab.tablature.model.TripletGroup.prototype.isFull = function() {
-	$s.push("net.alphatab.tablature.model.TripletGroup::isFull");
-	var $spos = $s.length;
-	{
-		var $tmp = this._voices.length == this._triplet;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this._voices.length == this._triplet;
 }
 net.alphatab.tablature.model.TripletGroup.prototype.paint = function(layout,context,x,y) {
-	$s.push("net.alphatab.tablature.model.TripletGroup::paint");
-	var $spos = $s.length;
 	var scale = layout.Scale;
 	var offset = net.alphatab.tablature.drawing.DrawingResources.GetScoreNoteSize(layout,false).Width / 2;
 	var startX = this._voices[0].Beat.GetRealPosX(layout) + offset;
@@ -7966,10 +5190,9 @@ net.alphatab.tablature.model.TripletGroup.prototype.paint = function(layout,cont
 	draw.AddString(s,net.alphatab.tablature.drawing.DrawingResources.EffectFont,startX + ((lineW - w) / 2),realY);
 	draw.AddLine((startX + (lineW / 2)) + w,realY,endX,realY);
 	draw.AddLine(endX,realY + 5 * scale,endX,realY);
-	$s.pop();
 }
 net.alphatab.tablature.model.TripletGroup.prototype.__class__ = net.alphatab.tablature.model.TripletGroup;
-net.alphatab.tablature.TrackSpacingPositions = { __ename__ : ["net","alphatab","tablature","TrackSpacingPositions"], __constructs__ : ["Top","Marker","Text","BufferSeparator","RepeatEnding","Chord","ScoreUpLines","ScoreMiddleLines","ScoreDownLines","Tupleto","AccentuatedEffect","HarmonicEffect","TapingEffect","LetRingEffect","PalmMuteEffect","BeatVibratoEffect","VibratoEffect","FadeIn","Bend","TablatureTopSeparator","Tablature","Lyric","Bottom"] }
+net.alphatab.tablature.TrackSpacingPositions = { __ename__ : ["net","alphatab","tablature","TrackSpacingPositions"], __constructs__ : ["Top","Marker","Text","BufferSeparator","RepeatEnding","Chord","ScoreUpLines","ScoreMiddleLines","ScoreDownLines","Tupleto","AccentuatedEffect","HarmonicEffect","TapingEffect","LetRingEffect","PalmMuteEffect","BeatVibratoEffect","VibratoEffect","FadeIn","Bend","TablatureTopSeparator","Tablature","TremoloBarDown","Lyric","Bottom"] }
 net.alphatab.tablature.TrackSpacingPositions.AccentuatedEffect = ["AccentuatedEffect",10];
 net.alphatab.tablature.TrackSpacingPositions.AccentuatedEffect.toString = $estr;
 net.alphatab.tablature.TrackSpacingPositions.AccentuatedEffect.__enum__ = net.alphatab.tablature.TrackSpacingPositions;
@@ -7979,7 +5202,7 @@ net.alphatab.tablature.TrackSpacingPositions.BeatVibratoEffect.__enum__ = net.al
 net.alphatab.tablature.TrackSpacingPositions.Bend = ["Bend",18];
 net.alphatab.tablature.TrackSpacingPositions.Bend.toString = $estr;
 net.alphatab.tablature.TrackSpacingPositions.Bend.__enum__ = net.alphatab.tablature.TrackSpacingPositions;
-net.alphatab.tablature.TrackSpacingPositions.Bottom = ["Bottom",22];
+net.alphatab.tablature.TrackSpacingPositions.Bottom = ["Bottom",23];
 net.alphatab.tablature.TrackSpacingPositions.Bottom.toString = $estr;
 net.alphatab.tablature.TrackSpacingPositions.Bottom.__enum__ = net.alphatab.tablature.TrackSpacingPositions;
 net.alphatab.tablature.TrackSpacingPositions.BufferSeparator = ["BufferSeparator",3];
@@ -7997,7 +5220,7 @@ net.alphatab.tablature.TrackSpacingPositions.HarmonicEffect.__enum__ = net.alpha
 net.alphatab.tablature.TrackSpacingPositions.LetRingEffect = ["LetRingEffect",13];
 net.alphatab.tablature.TrackSpacingPositions.LetRingEffect.toString = $estr;
 net.alphatab.tablature.TrackSpacingPositions.LetRingEffect.__enum__ = net.alphatab.tablature.TrackSpacingPositions;
-net.alphatab.tablature.TrackSpacingPositions.Lyric = ["Lyric",21];
+net.alphatab.tablature.TrackSpacingPositions.Lyric = ["Lyric",22];
 net.alphatab.tablature.TrackSpacingPositions.Lyric.toString = $estr;
 net.alphatab.tablature.TrackSpacingPositions.Lyric.__enum__ = net.alphatab.tablature.TrackSpacingPositions;
 net.alphatab.tablature.TrackSpacingPositions.Marker = ["Marker",1];
@@ -8033,6 +5256,9 @@ net.alphatab.tablature.TrackSpacingPositions.Text.__enum__ = net.alphatab.tablat
 net.alphatab.tablature.TrackSpacingPositions.Top = ["Top",0];
 net.alphatab.tablature.TrackSpacingPositions.Top.toString = $estr;
 net.alphatab.tablature.TrackSpacingPositions.Top.__enum__ = net.alphatab.tablature.TrackSpacingPositions;
+net.alphatab.tablature.TrackSpacingPositions.TremoloBarDown = ["TremoloBarDown",21];
+net.alphatab.tablature.TrackSpacingPositions.TremoloBarDown.toString = $estr;
+net.alphatab.tablature.TrackSpacingPositions.TremoloBarDown.__enum__ = net.alphatab.tablature.TrackSpacingPositions;
 net.alphatab.tablature.TrackSpacingPositions.Tupleto = ["Tupleto",9];
 net.alphatab.tablature.TrackSpacingPositions.Tupleto.toString = $estr;
 net.alphatab.tablature.TrackSpacingPositions.Tupleto.__enum__ = net.alphatab.tablature.TrackSpacingPositions;
@@ -8042,107 +5268,56 @@ net.alphatab.tablature.TrackSpacingPositions.VibratoEffect.__enum__ = net.alphat
 net.alphatab.model.GsMeasureClefConverter = function() { }
 net.alphatab.model.GsMeasureClefConverter.__name__ = ["net","alphatab","model","GsMeasureClefConverter"];
 net.alphatab.model.GsMeasureClefConverter.ToInt = function(clef) {
-	$s.push("net.alphatab.model.GsMeasureClefConverter::ToInt");
-	var $spos = $s.length;
 	switch(clef) {
 	case net.alphatab.model.GsMeasureClef.Treble:{
-		{
-			$s.pop();
-			return 1;
-		}
+		return 1;
 	}break;
 	case net.alphatab.model.GsMeasureClef.Bass:{
-		{
-			$s.pop();
-			return 2;
-		}
+		return 2;
 	}break;
 	case net.alphatab.model.GsMeasureClef.Tenor:{
-		{
-			$s.pop();
-			return 3;
-		}
+		return 3;
 	}break;
 	case net.alphatab.model.GsMeasureClef.Alto:{
-		{
-			$s.pop();
-			return 4;
-		}
+		return 4;
 	}break;
 	default:{
-		{
-			$s.pop();
-			return 1;
-		}
+		return 1;
 	}break;
 	}
-	$s.pop();
 }
 net.alphatab.model.GsMeasureClefConverter.ToString = function(clef) {
-	$s.push("net.alphatab.model.GsMeasureClefConverter::ToString");
-	var $spos = $s.length;
 	switch(clef) {
 	case net.alphatab.model.GsMeasureClef.Treble:{
-		{
-			$s.pop();
-			return "treble";
-		}
+		return "treble";
 	}break;
 	case net.alphatab.model.GsMeasureClef.Bass:{
-		{
-			$s.pop();
-			return "bass";
-		}
+		return "bass";
 	}break;
 	case net.alphatab.model.GsMeasureClef.Tenor:{
-		{
-			$s.pop();
-			return "tenor";
-		}
+		return "tenor";
 	}break;
 	case net.alphatab.model.GsMeasureClef.Alto:{
-		{
-			$s.pop();
-			return "alto";
-		}
+		return "alto";
 	}break;
 	default:{
-		{
-			$s.pop();
-			return "";
-		}
+		return "";
 	}break;
 	}
-	$s.pop();
 }
 net.alphatab.model.GsMeasureClefConverter.prototype.__class__ = net.alphatab.model.GsMeasureClefConverter;
 Reflect = function() { }
 Reflect.__name__ = ["Reflect"];
 Reflect.hasField = function(o,field) {
-	$s.push("Reflect::hasField");
-	var $spos = $s.length;
-	if(o.hasOwnProperty != null) {
-		var $tmp = o.hasOwnProperty(field);
-		$s.pop();
-		return $tmp;
-	}
+	if(o.hasOwnProperty != null) return o.hasOwnProperty(field);
 	var arr = Reflect.fields(o);
 	{ var $it15 = arr.iterator();
 	while( $it15.hasNext() ) { var t = $it15.next();
-	if(t == field) {
-		$s.pop();
-		return true;
-	}
+	if(t == field) return true;
 	}}
-	{
-		$s.pop();
-		return false;
-	}
-	$s.pop();
+	return false;
 }
 Reflect.field = function(o,field) {
-	$s.push("Reflect::field");
-	var $spos = $s.length;
 	var v = null;
 	try {
 		v = o[field];
@@ -8150,44 +5325,19 @@ Reflect.field = function(o,field) {
 	catch( $e16 ) {
 		{
 			var e = $e16;
-			{
-				$e = [];
-				while($s.length >= $spos) $e.unshift($s.pop());
-				$s.push($e[0]);
-				null;
-			}
+			null;
 		}
 	}
-	{
-		$s.pop();
-		return v;
-	}
-	$s.pop();
+	return v;
 }
 Reflect.setField = function(o,field,value) {
-	$s.push("Reflect::setField");
-	var $spos = $s.length;
 	o[field] = value;
-	$s.pop();
 }
 Reflect.callMethod = function(o,func,args) {
-	$s.push("Reflect::callMethod");
-	var $spos = $s.length;
-	{
-		var $tmp = func.apply(o,args);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return func.apply(o,args);
 }
 Reflect.fields = function(o) {
-	$s.push("Reflect::fields");
-	var $spos = $s.length;
-	if(o == null) {
-		var $tmp = new Array();
-		$s.pop();
-		return $tmp;
-	}
+	if(o == null) return new Array();
 	var a = new Array();
 	if(o.hasOwnProperty) {
 		
@@ -8205,9 +5355,6 @@ Reflect.fields = function(o) {
 			{
 				var e = $e17;
 				{
-					$e = [];
-					while($s.length >= $spos) $e.unshift($s.pop());
-					$s.push($e[0]);
 					t = null;
 				}
 			}
@@ -8220,82 +5367,30 @@ Reflect.fields = function(o) {
 				;
 		if(t != null) o.__proto__ = t;
 	}
-	{
-		$s.pop();
-		return a;
-	}
-	$s.pop();
+	return a;
 }
 Reflect.isFunction = function(f) {
-	$s.push("Reflect::isFunction");
-	var $spos = $s.length;
-	{
-		var $tmp = typeof(f) == "function" && f.__name__ == null;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return typeof(f) == "function" && f.__name__ == null;
 }
 Reflect.compare = function(a,b) {
-	$s.push("Reflect::compare");
-	var $spos = $s.length;
-	{
-		var $tmp = ((a == b)?0:((((a) > (b))?1:-1)));
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return ((a == b)?0:((((a) > (b))?1:-1)));
 }
 Reflect.compareMethods = function(f1,f2) {
-	$s.push("Reflect::compareMethods");
-	var $spos = $s.length;
-	if(f1 == f2) {
-		$s.pop();
-		return true;
-	}
-	if(!Reflect.isFunction(f1) || !Reflect.isFunction(f2)) {
-		$s.pop();
-		return false;
-	}
-	{
-		var $tmp = f1.scope == f2.scope && f1.method == f2.method && f1.method != null;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	if(f1 == f2) return true;
+	if(!Reflect.isFunction(f1) || !Reflect.isFunction(f2)) return false;
+	return f1.scope == f2.scope && f1.method == f2.method && f1.method != null;
 }
 Reflect.isObject = function(v) {
-	$s.push("Reflect::isObject");
-	var $spos = $s.length;
-	if(v == null) {
-		$s.pop();
-		return false;
-	}
+	if(v == null) return false;
 	var t = typeof(v);
-	{
-		var $tmp = (t == "string" || (t == "object" && !v.__enum__) || (t == "function" && v.__name__ != null));
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (t == "string" || (t == "object" && !v.__enum__) || (t == "function" && v.__name__ != null));
 }
 Reflect.deleteField = function(o,f) {
-	$s.push("Reflect::deleteField");
-	var $spos = $s.length;
-	if(!Reflect.hasField(o,f)) {
-		$s.pop();
-		return false;
-	}
+	if(!Reflect.hasField(o,f)) return false;
 	delete(o[f]);
-	{
-		$s.pop();
-		return true;
-	}
-	$s.pop();
+	return true;
 }
 Reflect.copy = function(o) {
-	$s.push("Reflect::copy");
-	var $spos = $s.length;
 	var o2 = { }
 	{
 		var _g = 0, _g1 = Reflect.fields(o);
@@ -8305,56 +5400,30 @@ Reflect.copy = function(o) {
 			o2[f] = Reflect.field(o,f);
 		}
 	}
-	{
-		$s.pop();
-		return o2;
-	}
-	$s.pop();
+	return o2;
 }
 Reflect.makeVarArgs = function(f) {
-	$s.push("Reflect::makeVarArgs");
-	var $spos = $s.length;
-	{
-		var $tmp = function() {
-			$s.push("Reflect::makeVarArgs@378");
-			var $spos = $s.length;
-			var a = new Array();
-			{
-				var _g1 = 0, _g = arguments.length;
-				while(_g1 < _g) {
-					var i = _g1++;
-					a.push(arguments[i]);
-				}
+	return function() {
+		var a = new Array();
+		{
+			var _g1 = 0, _g = arguments.length;
+			while(_g1 < _g) {
+				var i = _g1++;
+				a.push(arguments[i]);
 			}
-			{
-				var $tmp = f(a);
-				$s.pop();
-				return $tmp;
-			}
-			$s.pop();
 		}
-		$s.pop();
-		return $tmp;
+		return f(a);
 	}
-	$s.pop();
 }
 Reflect.prototype.__class__ = Reflect;
 haxe.remoting.DelayedConnection = function(data,path) { if( data === $_ ) return; {
-	$s.push("haxe.remoting.DelayedConnection::new");
-	var $spos = $s.length;
 	this.__data = data;
 	this.__path = path;
-	$s.pop();
 }}
 haxe.remoting.DelayedConnection.__name__ = ["haxe","remoting","DelayedConnection"];
 haxe.remoting.DelayedConnection.process = function(d) {
-	$s.push("haxe.remoting.DelayedConnection::process");
-	var $spos = $s.length;
 	var cnx = d.__data.cnx;
-	if(cnx == null) {
-		$s.pop();
-		return;
-	}
+	if(cnx == null) return;
 	while(true) {
 		var m = d.__data.cache.shift();
 		if(m == null) break;
@@ -8370,92 +5439,47 @@ haxe.remoting.DelayedConnection.process = function(d) {
 		c.setErrorHandler(m.onError);
 		c.call(m.params,m.onResult);
 	}
-	$s.pop();
 }
 haxe.remoting.DelayedConnection.create = function() {
-	$s.push("haxe.remoting.DelayedConnection::create");
-	var $spos = $s.length;
-	{
-		var $tmp = new haxe.remoting.DelayedConnection({ cnx : null, error : function(e) {
-			$s.push("haxe.remoting.DelayedConnection::create@90");
-			var $spos = $s.length;
-			throw e;
-			$s.pop();
-		}, cache : new Array()},[]);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new haxe.remoting.DelayedConnection({ cnx : null, error : function(e) {
+		throw e;
+	}, cache : new Array()},[]);
 }
 haxe.remoting.DelayedConnection.prototype.__data = null;
 haxe.remoting.DelayedConnection.prototype.__path = null;
 haxe.remoting.DelayedConnection.prototype.call = function(params,onResult) {
-	$s.push("haxe.remoting.DelayedConnection::call");
-	var $spos = $s.length;
 	this.__data.cache.push({ path : this.__path, params : params, onResult : onResult, onError : this.__data.error});
 	haxe.remoting.DelayedConnection.process(this);
-	$s.pop();
 }
 haxe.remoting.DelayedConnection.prototype.connection = null;
 haxe.remoting.DelayedConnection.prototype.getConnection = function() {
-	$s.push("haxe.remoting.DelayedConnection::getConnection");
-	var $spos = $s.length;
-	{
-		var $tmp = this.__data.cnx;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.__data.cnx;
 }
 haxe.remoting.DelayedConnection.prototype.resolve = function(name) {
-	$s.push("haxe.remoting.DelayedConnection::resolve");
-	var $spos = $s.length;
 	var d = new haxe.remoting.DelayedConnection(this.__data,this.__path.copy());
 	d.__path.push(name);
-	{
-		$s.pop();
-		return d;
-	}
-	$s.pop();
+	return d;
 }
 haxe.remoting.DelayedConnection.prototype.setConnection = function(cnx) {
-	$s.push("haxe.remoting.DelayedConnection::setConnection");
-	var $spos = $s.length;
 	this.__data.cnx = cnx;
 	haxe.remoting.DelayedConnection.process(this);
-	{
-		$s.pop();
-		return cnx;
-	}
-	$s.pop();
+	return cnx;
 }
 haxe.remoting.DelayedConnection.prototype.setErrorHandler = function(h) {
-	$s.push("haxe.remoting.DelayedConnection::setErrorHandler");
-	var $spos = $s.length;
 	this.__data.error = h;
-	$s.pop();
 }
 haxe.remoting.DelayedConnection.prototype.__class__ = haxe.remoting.DelayedConnection;
 haxe.remoting.DelayedConnection.__interfaces__ = [haxe.remoting.AsyncConnection];
 net.alphatab.model.GsGuitarString = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.model.GsGuitarString::new");
-	var $spos = $s.length;
 	this.Number = 0;
 	this.Value = 0;
-	$s.pop();
 }}
 net.alphatab.model.GsGuitarString.__name__ = ["net","alphatab","model","GsGuitarString"];
 net.alphatab.model.GsGuitarString.prototype.Clone = function(factory) {
-	$s.push("net.alphatab.model.GsGuitarString::Clone");
-	var $spos = $s.length;
 	var newString = factory.NewString();
 	newString.Number = this.Number;
 	newString.Value = this.Value;
-	{
-		$s.pop();
-		return newString;
-	}
-	$s.pop();
+	return newString;
 }
 net.alphatab.model.GsGuitarString.prototype.Number = null;
 net.alphatab.model.GsGuitarString.prototype.Value = null;
@@ -8463,8 +5487,6 @@ net.alphatab.model.GsGuitarString.prototype.__class__ = net.alphatab.model.GsGui
 net.alphatab.tablature.drawing.TempoPainter = function() { }
 net.alphatab.tablature.drawing.TempoPainter.__name__ = ["net","alphatab","tablature","drawing","TempoPainter"];
 net.alphatab.tablature.drawing.TempoPainter.PaintTempo = function(context,x,y,scale) {
-	$s.push("net.alphatab.tablature.drawing.TempoPainter::PaintTempo");
-	var $spos = $s.length;
 	var realScale = scale / 5.0;
 	var layer = context.Get(net.alphatab.tablature.drawing.DrawingLayers.MainComponents);
 	var draw = context.Get(net.alphatab.tablature.drawing.DrawingLayers.MainComponentsDraw);
@@ -8474,352 +5496,137 @@ net.alphatab.tablature.drawing.TempoPainter.PaintTempo = function(context,x,y,sc
 	draw.StartFigure();
 	draw.MoveTo(x + iWidth,y);
 	draw.LineTo(x + iWidth,Math.floor(y + (iHeight - (0.66 * scale))));
-	$s.pop();
 }
 net.alphatab.tablature.drawing.TempoPainter.prototype.__class__ = net.alphatab.tablature.drawing.TempoPainter;
 net.alphatab.model.GsSongFactory = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.model.GsSongFactory::new");
-	var $spos = $s.length;
 	null;
-	$s.pop();
 }}
 net.alphatab.model.GsSongFactory.__name__ = ["net","alphatab","model","GsSongFactory"];
 net.alphatab.model.GsSongFactory.prototype.NewBeat = function() {
-	$s.push("net.alphatab.model.GsSongFactory::NewBeat");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.GsBeat(this);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.GsBeat(this);
+}
+net.alphatab.model.GsSongFactory.prototype.NewBeatEffect = function() {
+	return new net.alphatab.model.GsBeatEffect(this);
 }
 net.alphatab.model.GsSongFactory.prototype.NewBendEffect = function() {
-	$s.push("net.alphatab.model.GsSongFactory::NewBendEffect");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.effects.GsBendEffect();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.effects.GsBendEffect();
 }
 net.alphatab.model.GsSongFactory.prototype.NewChord = function(stringCount) {
-	$s.push("net.alphatab.model.GsSongFactory::NewChord");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.GsChord(stringCount);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.GsChord(stringCount);
 }
 net.alphatab.model.GsSongFactory.prototype.NewDuration = function() {
-	$s.push("net.alphatab.model.GsSongFactory::NewDuration");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.GsDuration(this);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
-}
-net.alphatab.model.GsSongFactory.prototype.NewEffect = function() {
-	$s.push("net.alphatab.model.GsSongFactory::NewEffect");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.GsNoteEffect();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.GsDuration(this);
 }
 net.alphatab.model.GsSongFactory.prototype.NewGraceEffect = function() {
-	$s.push("net.alphatab.model.GsSongFactory::NewGraceEffect");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.effects.GsGraceEffect();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.effects.GsGraceEffect();
 }
 net.alphatab.model.GsSongFactory.prototype.NewHarmonicEffect = function() {
-	$s.push("net.alphatab.model.GsSongFactory::NewHarmonicEffect");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.effects.GsHarmonicEffect();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.effects.GsHarmonicEffect();
 }
 net.alphatab.model.GsSongFactory.prototype.NewLyricLine = function() {
-	$s.push("net.alphatab.model.GsSongFactory::NewLyricLine");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.GsLyricLine();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.GsLyricLine();
 }
 net.alphatab.model.GsSongFactory.prototype.NewLyrics = function() {
-	$s.push("net.alphatab.model.GsSongFactory::NewLyrics");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.GsLyrics();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.GsLyrics();
 }
 net.alphatab.model.GsSongFactory.prototype.NewMarker = function() {
-	$s.push("net.alphatab.model.GsSongFactory::NewMarker");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.GsMarker();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.GsMarker();
 }
 net.alphatab.model.GsSongFactory.prototype.NewMeasure = function(header) {
-	$s.push("net.alphatab.model.GsSongFactory::NewMeasure");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.GsMeasure(header);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.GsMeasure(header);
 }
 net.alphatab.model.GsSongFactory.prototype.NewMeasureHeader = function() {
-	$s.push("net.alphatab.model.GsSongFactory::NewMeasureHeader");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.GsMeasureHeader(this);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.GsMeasureHeader(this);
 }
 net.alphatab.model.GsSongFactory.prototype.NewMidiChannel = function() {
-	$s.push("net.alphatab.model.GsSongFactory::NewMidiChannel");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.GsMidiChannel();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.GsMidiChannel();
 }
 net.alphatab.model.GsSongFactory.prototype.NewMixTableChange = function() {
-	$s.push("net.alphatab.model.GsSongFactory::NewMixTableChange");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.GsMixTableChange();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.GsMixTableChange();
 }
 net.alphatab.model.GsSongFactory.prototype.NewNote = function() {
-	$s.push("net.alphatab.model.GsSongFactory::NewNote");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.GsNote(this);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.GsNote(this);
+}
+net.alphatab.model.GsSongFactory.prototype.NewNoteEffect = function() {
+	return new net.alphatab.model.GsNoteEffect();
 }
 net.alphatab.model.GsSongFactory.prototype.NewPageSetup = function() {
-	$s.push("net.alphatab.model.GsSongFactory::NewPageSetup");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.GsPageSetup();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.GsPageSetup();
 }
 net.alphatab.model.GsSongFactory.prototype.NewSong = function() {
-	$s.push("net.alphatab.model.GsSongFactory::NewSong");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.GsSong();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.GsSong();
 }
 net.alphatab.model.GsSongFactory.prototype.NewString = function() {
-	$s.push("net.alphatab.model.GsSongFactory::NewString");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.GsGuitarString();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.GsGuitarString();
 }
 net.alphatab.model.GsSongFactory.prototype.NewStroke = function() {
-	$s.push("net.alphatab.model.GsSongFactory::NewStroke");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.GsBeatStroke();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.GsBeatStroke();
 }
 net.alphatab.model.GsSongFactory.prototype.NewTempo = function() {
-	$s.push("net.alphatab.model.GsSongFactory::NewTempo");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.GsTempo();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.GsTempo();
 }
 net.alphatab.model.GsSongFactory.prototype.NewText = function() {
-	$s.push("net.alphatab.model.GsSongFactory::NewText");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.GsBeatText();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.GsBeatText();
 }
 net.alphatab.model.GsSongFactory.prototype.NewTimeSignature = function() {
-	$s.push("net.alphatab.model.GsSongFactory::NewTimeSignature");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.GsTimeSignature(this);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.GsTimeSignature(this);
 }
 net.alphatab.model.GsSongFactory.prototype.NewTrack = function() {
-	$s.push("net.alphatab.model.GsSongFactory::NewTrack");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.GsTrack(this);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.GsTrack(this);
 }
 net.alphatab.model.GsSongFactory.prototype.NewTremoloBarEffect = function() {
-	$s.push("net.alphatab.model.GsSongFactory::NewTremoloBarEffect");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.effects.GsTremoloBarEffect();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.effects.GsTremoloBarEffect();
 }
 net.alphatab.model.GsSongFactory.prototype.NewTremoloPickingEffect = function() {
-	$s.push("net.alphatab.model.GsSongFactory::NewTremoloPickingEffect");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.effects.GsTremoloPickingEffect(this);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.effects.GsTremoloPickingEffect(this);
 }
 net.alphatab.model.GsSongFactory.prototype.NewTrillEffect = function() {
-	$s.push("net.alphatab.model.GsSongFactory::NewTrillEffect");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.effects.GsTrillEffect(this);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.effects.GsTrillEffect(this);
 }
 net.alphatab.model.GsSongFactory.prototype.NewTriplet = function() {
-	$s.push("net.alphatab.model.GsSongFactory::NewTriplet");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.GsTriplet();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.GsTriplet();
 }
 net.alphatab.model.GsSongFactory.prototype.NewVoice = function(index) {
-	$s.push("net.alphatab.model.GsSongFactory::NewVoice");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.model.GsVoice(this,index);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.GsVoice(this,index);
 }
 net.alphatab.model.GsSongFactory.prototype.__class__ = net.alphatab.model.GsSongFactory;
 net.alphatab.tablature.drawing.KeySignaturePainter = function() { }
 net.alphatab.tablature.drawing.KeySignaturePainter.__name__ = ["net","alphatab","tablature","drawing","KeySignaturePainter"];
 net.alphatab.tablature.drawing.KeySignaturePainter.PaintFlat = function(context,x,y,layout) {
-	$s.push("net.alphatab.tablature.drawing.KeySignaturePainter::PaintFlat");
-	var $spos = $s.length;
 	var scale = layout.Scale * 1.2;
 	y -= Math.round(2 * layout.ScoreLineSpacing);
 	var layer = context.Get(net.alphatab.tablature.drawing.DrawingLayers.MainComponents);
 	layer.AddMusicSymbol(net.alphatab.tablature.drawing.MusicFont.KeyFlat,x,y,scale);
-	$s.pop();
 }
 net.alphatab.tablature.drawing.KeySignaturePainter.PaintNatural = function(context,x,y,layout) {
-	$s.push("net.alphatab.tablature.drawing.KeySignaturePainter::PaintNatural");
-	var $spos = $s.length;
 	var scale = layout.Scale * 1.2;
 	y -= Math.round(2 * layout.ScoreLineSpacing);
 	var layer = context.Get(net.alphatab.tablature.drawing.DrawingLayers.MainComponents);
 	layer.AddMusicSymbol(net.alphatab.tablature.drawing.MusicFont.KeyNormal,x,y,scale);
-	$s.pop();
 }
 net.alphatab.tablature.drawing.KeySignaturePainter.PaintSharp = function(context,x,y,layout) {
-	$s.push("net.alphatab.tablature.drawing.KeySignaturePainter::PaintSharp");
-	var $spos = $s.length;
 	var scale = layout.Scale * 1.2;
 	y -= Math.round(1.5 * layout.ScoreLineSpacing);
 	var layer = context.Get(net.alphatab.tablature.drawing.DrawingLayers.MainComponents);
 	layer.AddMusicSymbol(net.alphatab.tablature.drawing.MusicFont.KeySharp,x,y,scale);
-	$s.pop();
 }
 net.alphatab.tablature.drawing.KeySignaturePainter.PaintSmallFlat = function(layer,x,y,layout) {
-	$s.push("net.alphatab.tablature.drawing.KeySignaturePainter::PaintSmallFlat");
-	var $spos = $s.length;
+	y -= layout.ScoreLineSpacing;
 	var scale = layout.Scale;
 	layer.AddMusicSymbol(net.alphatab.tablature.drawing.MusicFont.KeyFlat,x,y,scale);
-	$s.pop();
 }
 net.alphatab.tablature.drawing.KeySignaturePainter.PaintSmallNatural = function(layer,x,y,layout) {
-	$s.push("net.alphatab.tablature.drawing.KeySignaturePainter::PaintSmallNatural");
-	var $spos = $s.length;
+	y -= layout.ScoreLineSpacing;
 	var scale = layout.Scale;
 	layer.AddMusicSymbol(net.alphatab.tablature.drawing.MusicFont.KeyNormal,x,y,scale);
-	$s.pop();
 }
 net.alphatab.tablature.drawing.KeySignaturePainter.PaintSmallSharp = function(layer,x,y,layout) {
-	$s.push("net.alphatab.tablature.drawing.KeySignaturePainter::PaintSmallSharp");
-	var $spos = $s.length;
 	var scale = layout.Scale;
 	y -= Math.round(layout.ScoreLineSpacing);
 	layer.AddMusicSymbol(net.alphatab.tablature.drawing.MusicFont.KeySharp,x,y,scale);
-	$s.pop();
 }
 net.alphatab.tablature.drawing.KeySignaturePainter.prototype.__class__ = net.alphatab.tablature.drawing.KeySignaturePainter;
 net.alphatab.model.GsSong = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.model.GsSong::new");
-	var $spos = $s.length;
 	this.MeasureHeaders = new Array();
 	this.Tracks = new Array();
 	this.Title = "";
@@ -8832,22 +5639,15 @@ net.alphatab.model.GsSong = function(p) { if( p === $_ ) return; {
 	this.Tab = "";
 	this.Instructions = "";
 	this.Notice = "";
-	$s.pop();
 }}
 net.alphatab.model.GsSong.__name__ = ["net","alphatab","model","GsSong"];
 net.alphatab.model.GsSong.prototype.AddMeasureHeader = function(header) {
-	$s.push("net.alphatab.model.GsSong::AddMeasureHeader");
-	var $spos = $s.length;
 	header.Song = this;
 	this.MeasureHeaders.push(header);
-	$s.pop();
 }
 net.alphatab.model.GsSong.prototype.AddTrack = function(track) {
-	$s.push("net.alphatab.model.GsSong::AddTrack");
-	var $spos = $s.length;
 	track.Song = this;
 	this.Tracks.push(track);
-	$s.pop();
 }
 net.alphatab.model.GsSong.prototype.Album = null;
 net.alphatab.model.GsSong.prototype.Artist = null;
@@ -8872,36 +5672,16 @@ net.alphatab.model.GsSong.prototype.__class__ = net.alphatab.model.GsSong;
 net.alphatab.MyTrace = function() { }
 net.alphatab.MyTrace.__name__ = ["net","alphatab","MyTrace"];
 net.alphatab.MyTrace.init = function() {
-	$s.push("net.alphatab.MyTrace::init");
-	var $spos = $s.length;
 	haxe.Log.trace = $closure(net.alphatab.MyTrace,"trace");
-	$s.pop();
 }
 net.alphatab.MyTrace.trace = function(v,i) {
-	$s.push("net.alphatab.MyTrace::trace");
-	var $spos = $s.length;
 	null;
-	$s.pop();
 }
 net.alphatab.MyTrace.__unhtml = function(s) {
-	$s.push("net.alphatab.MyTrace::__unhtml");
-	var $spos = $s.length;
-	{
-		var $tmp = s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
 }
 net.alphatab.MyTrace.time = function() {
-	$s.push("net.alphatab.MyTrace::time");
-	var $spos = $s.length;
-	{
-		var $tmp = Std.string(Date.now().getTime());
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return Std.string(Date.now().getTime());
 }
 net.alphatab.MyTrace.prototype.__class__ = net.alphatab.MyTrace;
 net.alphatab.model.GsSlideType = { __ename__ : ["net","alphatab","model","GsSlideType"], __constructs__ : ["FastSlideTo","SlowSlideTo","OutDownWards","OutUpWards","IntoFromBelow","IntoFromAbove"] }
@@ -8967,69 +5747,39 @@ net.alphatab.tablature.drawing.DrawingLayers.VoiceEffectsDraw2 = ["VoiceEffectsD
 net.alphatab.tablature.drawing.DrawingLayers.VoiceEffectsDraw2.toString = $estr;
 net.alphatab.tablature.drawing.DrawingLayers.VoiceEffectsDraw2.__enum__ = net.alphatab.tablature.drawing.DrawingLayers;
 net.alphatab.tablature.model.GsChordImpl = function(length) { if( length === $_ ) return; {
-	$s.push("net.alphatab.tablature.model.GsChordImpl::new");
-	var $spos = $s.length;
 	net.alphatab.model.GsChord.apply(this,[length]);
-	$s.pop();
 }}
 net.alphatab.tablature.model.GsChordImpl.__name__ = ["net","alphatab","tablature","model","GsChordImpl"];
 net.alphatab.tablature.model.GsChordImpl.__super__ = net.alphatab.model.GsChord;
 for(var k in net.alphatab.model.GsChord.prototype ) net.alphatab.tablature.model.GsChordImpl.prototype[k] = net.alphatab.model.GsChord.prototype[k];
 net.alphatab.tablature.model.GsChordImpl.prototype.BeatImpl = function() {
-	$s.push("net.alphatab.tablature.model.GsChordImpl::BeatImpl");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Beat;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Beat;
 }
 net.alphatab.tablature.model.GsChordImpl.prototype.GetPaintPosition = function(iIndex) {
-	$s.push("net.alphatab.tablature.model.GsChordImpl::GetPaintPosition");
-	var $spos = $s.length;
-	{
-		var $tmp = this.BeatImpl().MeasureImpl().Ts.Get(iIndex);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.BeatImpl().MeasureImpl().Ts.Get(iIndex);
 }
 net.alphatab.tablature.model.GsChordImpl.prototype.Paint = function(layout,context,x,y) {
-	$s.push("net.alphatab.tablature.model.GsChordImpl::Paint");
-	var $spos = $s.length;
 	if(this.Name != null && this.Name != "") {
 		var realX = x + Math.round(4 * layout.Scale);
 		var realY = y + this.GetPaintPosition(net.alphatab.tablature.TrackSpacingPositions.Chord);
 		context.Get(net.alphatab.tablature.drawing.DrawingLayers.MainComponents).AddString(this.Name,net.alphatab.tablature.drawing.DrawingResources.ChordFont,realX,realY);
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsChordImpl.prototype.__class__ = net.alphatab.tablature.model.GsChordImpl;
 net.alphatab.midi.MidiDataProvider = function() { }
 net.alphatab.midi.MidiDataProvider.__name__ = ["net","alphatab","midi","MidiDataProvider"];
 net.alphatab.midi.MidiDataProvider.GetSongMidiData = function(song,factory) {
-	$s.push("net.alphatab.midi.MidiDataProvider::GetSongMidiData");
-	var $spos = $s.length;
 	var parser = new net.alphatab.midi.MidiSequenceParser(factory,song,15,100,0);
 	var sequence = new net.alphatab.midi.MidiSequenceHandler(song.Tracks.length + 2);
 	parser.Parse(sequence);
-	{
-		var $tmp = sequence.Commands;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return sequence.Commands;
 }
 net.alphatab.midi.MidiDataProvider.prototype.__class__ = net.alphatab.midi.MidiDataProvider;
 net.alphatab.model.Padding = function(right,top,left,bottom) { if( right === $_ ) return; {
-	$s.push("net.alphatab.model.Padding::new");
-	var $spos = $s.length;
 	this.Right = right;
 	this.Top = top;
 	this.Left = left;
 	this.Bottom = bottom;
-	$s.pop();
 }}
 net.alphatab.model.Padding.__name__ = ["net","alphatab","model","Padding"];
 net.alphatab.model.Padding.prototype.Bottom = null;
@@ -9037,65 +5787,32 @@ net.alphatab.model.Padding.prototype.Left = null;
 net.alphatab.model.Padding.prototype.Right = null;
 net.alphatab.model.Padding.prototype.Top = null;
 net.alphatab.model.Padding.prototype.getHorizontal = function() {
-	$s.push("net.alphatab.model.Padding::getHorizontal");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Left + this.Right;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Left + this.Right;
 }
 net.alphatab.model.Padding.prototype.getVertical = function() {
-	$s.push("net.alphatab.model.Padding::getVertical");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Top + this.Bottom;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Top + this.Bottom;
 }
 net.alphatab.model.Padding.prototype.__class__ = net.alphatab.model.Padding;
 net.alphatab.tablature.PageViewLayout = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.tablature.PageViewLayout::new");
-	var $spos = $s.length;
 	net.alphatab.tablature.ViewLayout.apply(this,[]);
 	this.Lines = new Array();
 	this.MaximumWidth = 0;
 	this.MarginLeft = 0;
 	this.MarginRight = 0;
-	$s.pop();
 }}
 net.alphatab.tablature.PageViewLayout.__name__ = ["net","alphatab","tablature","PageViewLayout"];
 net.alphatab.tablature.PageViewLayout.__super__ = net.alphatab.tablature.ViewLayout;
 for(var k in net.alphatab.tablature.ViewLayout.prototype ) net.alphatab.tablature.PageViewLayout.prototype[k] = net.alphatab.tablature.ViewLayout.prototype[k];
 net.alphatab.tablature.PageViewLayout.prototype.GetMaxWidth = function() {
-	$s.push("net.alphatab.tablature.PageViewLayout::GetMaxWidth");
-	var $spos = $s.length;
 	if(this.MaximumWidth <= 0) {
 		this.MaximumWidth = this.Tablature.Width;
 	}
-	{
-		var $tmp = (this.MaximumWidth - this.MarginLeft) + this.MarginRight;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (this.MaximumWidth - this.MarginLeft) + this.MarginRight;
 }
 net.alphatab.tablature.PageViewLayout.prototype.GetSheetWidth = function() {
-	$s.push("net.alphatab.tablature.PageViewLayout::GetSheetWidth");
-	var $spos = $s.length;
-	{
-		var $tmp = Math.round(795 * this.Scale);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return Math.round(795 * this.Scale);
 }
 net.alphatab.tablature.PageViewLayout.prototype.GetTempLines = function(track,fromIndex,trackSpacing) {
-	$s.push("net.alphatab.tablature.PageViewLayout::GetTempLines");
-	var $spos = $s.length;
 	var line = new net.alphatab.tablature.TempLine();
 	line.MaxY = 0;
 	line.MinY = 0;
@@ -9108,10 +5825,7 @@ net.alphatab.tablature.PageViewLayout.prototype.GetTempLines = function(track,fr
 			var measure = track.Measures[i];
 			if((line.TempWidth + measure.Width) >= this.GetMaxWidth() && line.Measures.length != 0) {
 				line.FullLine = true;
-				{
-					$s.pop();
-					return line;
-				}
+				return line;
 			}
 			line.TempWidth += measure.Width;
 			line.MaxY = (measure.MaxY > line.MaxY?measure.MaxY:line.MaxY);
@@ -9120,22 +5834,13 @@ net.alphatab.tablature.PageViewLayout.prototype.GetTempLines = function(track,fr
 			measure.RegisterSpacing(this,trackSpacing);
 		}
 	}
-	{
-		$s.pop();
-		return line;
-	}
-	$s.pop();
+	return line;
 }
 net.alphatab.tablature.PageViewLayout.prototype.Init = function(scale) {
-	$s.push("net.alphatab.tablature.PageViewLayout::Init");
-	var $spos = $s.length;
 	net.alphatab.tablature.ViewLayout.prototype.Init.apply(this,[scale]);
 	this.LayoutSize = new net.alphatab.model.Size(this.GetSheetWidth() - net.alphatab.tablature.PageViewLayout.PagePadding.getHorizontal(),this.Height);
-	$s.pop();
 }
 net.alphatab.tablature.PageViewLayout.prototype.LayoutSongInfo = function(x,y) {
-	$s.push("net.alphatab.tablature.PageViewLayout::LayoutSongInfo");
-	var $spos = $s.length;
 	var song = this.Tablature.Track.Song;
 	var anySongInfo = false;
 	if(song.Title != "" && ((song.PageSetup.HeaderAndFooter & 1) != 0)) {
@@ -9172,19 +5877,13 @@ net.alphatab.tablature.PageViewLayout.prototype.LayoutSongInfo = function(x,y) {
 	if(anySongInfo) {
 		y += Math.floor(20 * this.Scale);
 	}
-	{
-		$s.pop();
-		return y;
-	}
-	$s.pop();
+	return y;
 }
 net.alphatab.tablature.PageViewLayout.prototype.Lines = null;
 net.alphatab.tablature.PageViewLayout.prototype.MarginLeft = null;
 net.alphatab.tablature.PageViewLayout.prototype.MarginRight = null;
 net.alphatab.tablature.PageViewLayout.prototype.MaximumWidth = null;
 net.alphatab.tablature.PageViewLayout.prototype.MeasureLine = function(track,line,x,y,spacing) {
-	$s.push("net.alphatab.tablature.PageViewLayout::MeasureLine");
-	var $spos = $s.length;
 	var realX = this.MarginLeft + x;
 	var realY = y;
 	var width = this.MarginLeft;
@@ -9212,11 +5911,8 @@ net.alphatab.tablature.PageViewLayout.prototype.MeasureLine = function(track,lin
 		}
 	}
 	this.Width = Math.round(Math.max(this.Width,width));
-	$s.pop();
 }
 net.alphatab.tablature.PageViewLayout.prototype.PaintLine = function(track,line,context) {
-	$s.push("net.alphatab.tablature.PageViewLayout::PaintLine");
-	var $spos = $s.length;
 	haxe.Log.trace((("Paint Measures " + net.alphatab.Utils.string(line.Measures[0])) + " to ") + net.alphatab.Utils.string(line.Measures[line.Measures.length - 1]),{ fileName : "PageViewLayout.hx", lineNumber : 300, className : "net.alphatab.tablature.PageViewLayout", methodName : "PaintLine"});
 	{
 		var _g1 = 0, _g = line.Measures.length;
@@ -9231,11 +5927,8 @@ net.alphatab.tablature.PageViewLayout.prototype.PaintLine = function(track,line,
 			}
 		}
 	}
-	$s.pop();
 }
 net.alphatab.tablature.PageViewLayout.prototype.PaintSong = function(ctx,clientArea,x,y) {
-	$s.push("net.alphatab.tablature.PageViewLayout::PaintSong");
-	var $spos = $s.length;
 	var track = this.Tablature.Track;
 	y = Math.round(y + net.alphatab.tablature.PageViewLayout.PagePadding.Top);
 	y = Math.round(this.PaintSongInfo(ctx,clientArea,x,y) + this.FirstMeasureSpacing);
@@ -9247,11 +5940,8 @@ net.alphatab.tablature.PageViewLayout.prototype.PaintSong = function(ctx,clientA
 			this.PaintLine(track,line,ctx);
 		}
 	}
-	$s.pop();
 }
 net.alphatab.tablature.PageViewLayout.prototype.PaintSongInfo = function(ctx,clientArea,x,y) {
-	$s.push("net.alphatab.tablature.PageViewLayout::PaintSongInfo");
-	var $spos = $s.length;
 	haxe.Log.trace("Paint Song info",{ fileName : "PageViewLayout.hx", lineNumber : 211, className : "net.alphatab.tablature.PageViewLayout", methodName : "PaintSongInfo"});
 	var song = this.Tablature.Track.Song;
 	x += net.alphatab.tablature.PageViewLayout.PagePadding.Left;
@@ -9313,15 +6003,9 @@ net.alphatab.tablature.PageViewLayout.prototype.PaintSongInfo = function(ctx,cli
 		}
 		y += Math.floor(20 * this.Scale);
 	}
-	{
-		$s.pop();
-		return y;
-	}
-	$s.pop();
+	return y;
 }
 net.alphatab.tablature.PageViewLayout.prototype.ParsePageSetupString = function(input) {
-	$s.push("net.alphatab.tablature.PageViewLayout::ParsePageSetupString");
-	var $spos = $s.length;
 	var song = this.Tablature.Track.Song;
 	input = StringTools.replace(input,"%TITLE%",song.Title);
 	input = StringTools.replace(input,"%SUBTITLE%",song.Subtitle);
@@ -9331,15 +6015,9 @@ net.alphatab.tablature.PageViewLayout.prototype.ParsePageSetupString = function(
 	input = StringTools.replace(input,"%MUSIC%",song.Music);
 	input = StringTools.replace(input,"%WORDSMUSIC%",song.Words);
 	input = StringTools.replace(input,"%COPYRIGHT%",song.Copyright);
-	{
-		$s.pop();
-		return input;
-	}
-	$s.pop();
+	return input;
 }
 net.alphatab.tablature.PageViewLayout.prototype.PrepareLayout = function(clientArea,x,y) {
-	$s.push("net.alphatab.tablature.PageViewLayout::PrepareLayout");
-	var $spos = $s.length;
 	this.Lines = new Array();
 	this.MaximumWidth = clientArea.Width;
 	this.MarginLeft = net.alphatab.tablature.PageViewLayout.PagePadding.Left;
@@ -9374,12 +6052,9 @@ net.alphatab.tablature.PageViewLayout.prototype.PrepareLayout = function(clientA
 	}
 	this.Height = height;
 	this.Width = this.GetSheetWidth();
-	$s.pop();
 }
 net.alphatab.tablature.PageViewLayout.prototype.__class__ = net.alphatab.tablature.PageViewLayout;
 net.alphatab.tablature.TempLine = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.tablature.TempLine::new");
-	var $spos = $s.length;
 	this.TrackSpacing = null;
 	this.TempWidth = 0;
 	this.LastIndex = 0;
@@ -9387,15 +6062,11 @@ net.alphatab.tablature.TempLine = function(p) { if( p === $_ ) return; {
 	this.MaxY = 0;
 	this.MinY = 0;
 	this.Measures = new Array();
-	$s.pop();
 }}
 net.alphatab.tablature.TempLine.__name__ = ["net","alphatab","tablature","TempLine"];
 net.alphatab.tablature.TempLine.prototype.AddMeasure = function(index) {
-	$s.push("net.alphatab.tablature.TempLine::AddMeasure");
-	var $spos = $s.length;
 	this.Measures.push(index);
 	this.LastIndex = index;
-	$s.pop();
 }
 net.alphatab.tablature.TempLine.prototype.FullLine = null;
 net.alphatab.tablature.TempLine.prototype.LastIndex = null;
@@ -9406,8 +6077,6 @@ net.alphatab.tablature.TempLine.prototype.TempWidth = null;
 net.alphatab.tablature.TempLine.prototype.TrackSpacing = null;
 net.alphatab.tablature.TempLine.prototype.__class__ = net.alphatab.tablature.TempLine;
 net.alphatab.tablature.model.BeatGroup = function(voice) { if( voice === $_ ) return; {
-	$s.push("net.alphatab.tablature.model.BeatGroup::new");
-	var $spos = $s.length;
 	this._voice = voice;
 	this._voices = new Array();
 	this.Direction = net.alphatab.model.GsVoiceDirection.None;
@@ -9417,32 +6086,15 @@ net.alphatab.tablature.model.BeatGroup = function(voice) { if( voice === $_ ) re
 	this._lastMaxNote = null;
 	this.MaxNote = null;
 	this.MinNote = null;
-	$s.pop();
 }}
 net.alphatab.tablature.model.BeatGroup.__name__ = ["net","alphatab","tablature","model","BeatGroup"];
 net.alphatab.tablature.model.BeatGroup.GetUpOffset = function(layout) {
-	$s.push("net.alphatab.tablature.model.BeatGroup::GetUpOffset");
-	var $spos = $s.length;
-	{
-		var $tmp = 28 * (layout.ScoreLineSpacing / 8.0);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return 28 * (layout.ScoreLineSpacing / 8.0);
 }
 net.alphatab.tablature.model.BeatGroup.GetDownOffset = function(layout) {
-	$s.push("net.alphatab.tablature.model.BeatGroup::GetDownOffset");
-	var $spos = $s.length;
-	{
-		var $tmp = 35 * (layout.ScoreLineSpacing / 8.0);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return 35 * (layout.ScoreLineSpacing / 8.0);
 }
 net.alphatab.tablature.model.BeatGroup.prototype.CheckNote = function(note) {
-	$s.push("net.alphatab.tablature.model.BeatGroup::CheckNote");
-	var $spos = $s.length;
 	var value = note.RealValue();
 	if(this._firstMinNote == null || note.Voice.Beat.Start < this._firstMinNote.Voice.Beat.Start) {
 		this._firstMinNote = note;
@@ -9482,23 +6134,17 @@ net.alphatab.tablature.model.BeatGroup.prototype.CheckNote = function(note) {
 	if(this.MinNote == null || value < this.MinNote.RealValue()) {
 		this.MinNote = note;
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.BeatGroup.prototype.CheckVoice = function(voice) {
-	$s.push("net.alphatab.tablature.model.BeatGroup::CheckVoice");
-	var $spos = $s.length;
 	this.CheckNote(voice.MaxNote);
 	this.CheckNote(voice.MinNote);
 	this._voices.push(voice);
 	if(voice.Direction != net.alphatab.model.GsVoiceDirection.None) {
 		voice.Direction = voice.Direction;
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.BeatGroup.prototype.Direction = null;
 net.alphatab.tablature.model.BeatGroup.prototype.Finish = function(layout,measure) {
-	$s.push("net.alphatab.tablature.model.BeatGroup::Finish");
-	var $spos = $s.length;
 	if(this.Direction == net.alphatab.model.GsVoiceDirection.None) {
 		if(measure.NotEmptyVoices > 1) {
 			this.Direction = (this._voice == 0?net.alphatab.model.GsVoiceDirection.Up:net.alphatab.model.GsVoiceDirection.Down);
@@ -9509,11 +6155,8 @@ net.alphatab.tablature.model.BeatGroup.prototype.Finish = function(layout,measur
 			this.Direction = (max > min?net.alphatab.model.GsVoiceDirection.Up:net.alphatab.model.GsVoiceDirection.Down);
 		}
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.BeatGroup.prototype.GetY1 = function(layout,note,key,clef) {
-	$s.push("net.alphatab.tablature.model.BeatGroup::GetY1");
-	var $spos = $s.length;
 	var scale = (layout.ScoreLineSpacing / 2.00);
 	var noteValue = note.RealValue();
 	var index = noteValue % 12;
@@ -9521,15 +6164,9 @@ net.alphatab.tablature.model.BeatGroup.prototype.GetY1 = function(layout,note,ke
 	var offset = (7 * step) * scale;
 	var scoreLineY = (key <= 7?Math.floor((net.alphatab.tablature.model.BeatGroup.ScoreSharpPositions[index] * scale) - offset):Math.floor((net.alphatab.tablature.model.BeatGroup.ScoreFlatPositions[index] * scale) - offset));
 	scoreLineY += Math.floor(net.alphatab.tablature.model.GsMeasureImpl.ScoreKeyOffsets[clef - 1] * scale);
-	{
-		$s.pop();
-		return scoreLineY;
-	}
-	$s.pop();
+	return scoreLineY;
 }
 net.alphatab.tablature.model.BeatGroup.prototype.GetY2 = function(layout,x,key,clef) {
-	$s.push("net.alphatab.tablature.model.BeatGroup::GetY2");
-	var $spos = $s.length;
 	var MaxDistance = 10;
 	var upOffset = net.alphatab.tablature.model.BeatGroup.GetUpOffset(layout);
 	var downOffset = net.alphatab.tablature.model.BeatGroup.GetDownOffset(layout);
@@ -9540,11 +6177,7 @@ net.alphatab.tablature.model.BeatGroup.prototype.GetY2 = function(layout,x,key,c
 	var y2;
 	if(this.Direction == net.alphatab.model.GsVoiceDirection.Down) {
 		if(this.MinNote != this._firstMinNote && this.MinNote != this._lastMinNote) {
-			{
-				var $tmp = Math.round(this.GetY1(layout,this.MinNote,key,clef) + downOffset);
-				$s.pop();
-				return $tmp;
-			}
+			return Math.round(this.GetY1(layout,this.MinNote,key,clef) + downOffset);
 		}
 		y = 0;
 		x1 = Math.round(this._firstMinNote.PosX() + this._firstMinNote.Voice.Beat.Spacing());
@@ -9556,18 +6189,10 @@ net.alphatab.tablature.model.BeatGroup.prototype.GetY2 = function(layout,x,key,c
 		if((y1 - y2) != 0 && (x1 - x2) != 0 && (x1 - x) != 0) {
 			y = Math.round(((y1 - y2) / (x1 - x2)) * (x1 - x));
 		}
-		{
-			var $tmp = y1 - y;
-			$s.pop();
-			return $tmp;
-		}
+		return y1 - y;
 	}
 	if(this.MaxNote != this._firstMaxNote && this.MaxNote != this._lastMaxNote) {
-		{
-			var $tmp = Math.round(this.GetY1(layout,this.MaxNote,key,clef) - upOffset);
-			$s.pop();
-			return $tmp;
-		}
+		return Math.round(this.GetY1(layout,this.MaxNote,key,clef) - upOffset);
 	}
 	y = 0;
 	x1 = Math.round(this._firstMaxNote.PosX() + this._firstMaxNote.Voice.Beat.Spacing());
@@ -9579,12 +6204,7 @@ net.alphatab.tablature.model.BeatGroup.prototype.GetY2 = function(layout,x,key,c
 	if((y1 - y2) != 0 && (x1 - x2) != 0 && (x1 - x) != 0) {
 		y = Math.round(((y1 - y2) / (x1 - x2)) * (x1 - x));
 	}
-	{
-		var $tmp = y1 - y;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return y1 - y;
 }
 net.alphatab.tablature.model.BeatGroup.prototype.MaxNote = null;
 net.alphatab.tablature.model.BeatGroup.prototype.MinNote = null;
@@ -9609,35 +6229,21 @@ net.alphatab.model.effects.GsGraceEffectTransition.Slide = ["Slide",1];
 net.alphatab.model.effects.GsGraceEffectTransition.Slide.toString = $estr;
 net.alphatab.model.effects.GsGraceEffectTransition.Slide.__enum__ = net.alphatab.model.effects.GsGraceEffectTransition;
 haxe.io.Eof = function(p) { if( p === $_ ) return; {
-	$s.push("haxe.io.Eof::new");
-	var $spos = $s.length;
 	null;
-	$s.pop();
 }}
 haxe.io.Eof.__name__ = ["haxe","io","Eof"];
 haxe.io.Eof.prototype.toString = function() {
-	$s.push("haxe.io.Eof::toString");
-	var $spos = $s.length;
-	{
-		$s.pop();
-		return "Eof";
-	}
-	$s.pop();
+	return "Eof";
 }
 haxe.io.Eof.prototype.__class__ = haxe.io.Eof;
 net.alphatab.model.GsDuration = function(factory) { if( factory === $_ ) return; {
-	$s.push("net.alphatab.model.GsDuration::new");
-	var $spos = $s.length;
 	this.Value = 4;
 	this.IsDotted = false;
 	this.IsDoubleDotted = false;
 	this.Triplet = factory.NewTriplet();
-	$s.pop();
 }}
 net.alphatab.model.GsDuration.__name__ = ["net","alphatab","model","GsDuration"];
 net.alphatab.model.GsDuration.FromTime = function(factory,time,minimum,diff) {
-	$s.push("net.alphatab.model.GsDuration::FromTime");
-	var $spos = $s.length;
 	var duration = minimum.Clone(factory);
 	var tmp = factory.NewDuration();
 	tmp.Value = 1;
@@ -9667,72 +6273,38 @@ net.alphatab.model.GsDuration.FromTime = function(factory,time,minimum,diff) {
 			finish = true;
 		}
 	}
-	{
-		$s.pop();
-		return duration;
-	}
-	$s.pop();
+	return duration;
 }
 net.alphatab.model.GsDuration.prototype.Clone = function(factory) {
-	$s.push("net.alphatab.model.GsDuration::Clone");
-	var $spos = $s.length;
 	var duration = factory.NewDuration();
 	duration.Value = this.Value;
 	duration.IsDotted = this.IsDotted;
 	duration.IsDoubleDotted = this.IsDoubleDotted;
 	duration.Triplet = this.Triplet.Clone(factory);
-	{
-		$s.pop();
-		return duration;
-	}
-	$s.pop();
+	return duration;
 }
 net.alphatab.model.GsDuration.prototype.Copy = function(duration) {
-	$s.push("net.alphatab.model.GsDuration::Copy");
-	var $spos = $s.length;
 	duration.Value = this.Value;
 	duration.IsDotted = this.IsDotted;
 	duration.IsDoubleDotted = this.IsDoubleDotted;
 	this.Triplet.Copy(duration.Triplet);
-	$s.pop();
 }
 net.alphatab.model.GsDuration.prototype.Equals = function(other) {
-	$s.push("net.alphatab.model.GsDuration::Equals");
-	var $spos = $s.length;
-	if(other == null) {
-		$s.pop();
-		return false;
-	}
-	if(this == other) {
-		$s.pop();
-		return true;
-	}
-	{
-		var $tmp = other.Value == this.Value && other.IsDotted == this.IsDotted && other.IsDoubleDotted == this.IsDoubleDotted && other.Triplet.Equals(this.Triplet);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	if(other == null) return false;
+	if(this == other) return true;
+	return other.Value == this.Value && other.IsDotted == this.IsDotted && other.IsDoubleDotted == this.IsDoubleDotted && other.Triplet.Equals(this.Triplet);
 }
 net.alphatab.model.GsDuration.prototype.Index = function() {
-	$s.push("net.alphatab.model.GsDuration::Index");
-	var $spos = $s.length;
 	var index = 0;
 	var value = this.Value;
 	while((value = (value >> 1)) > 0) {
 		index++;
 	}
-	{
-		$s.pop();
-		return index;
-	}
-	$s.pop();
+	return index;
 }
 net.alphatab.model.GsDuration.prototype.IsDotted = null;
 net.alphatab.model.GsDuration.prototype.IsDoubleDotted = null;
 net.alphatab.model.GsDuration.prototype.Time = function() {
-	$s.push("net.alphatab.model.GsDuration::Time");
-	var $spos = $s.length;
 	var time = Math.floor(960 * (4.0 / this.Value));
 	if(this.IsDotted) {
 		time += Math.floor(time / 2);
@@ -9740,25 +6312,17 @@ net.alphatab.model.GsDuration.prototype.Time = function() {
 	else if(this.IsDoubleDotted) {
 		time += Math.floor((time / 4) * 3);
 	}
-	{
-		var $tmp = this.Triplet.ConvertTime(time);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Triplet.ConvertTime(time);
 }
 net.alphatab.model.GsDuration.prototype.Triplet = null;
 net.alphatab.model.GsDuration.prototype.Value = null;
 net.alphatab.model.GsDuration.prototype.__class__ = net.alphatab.model.GsDuration;
 net.alphatab.model.GsNote = function(factory) { if( factory === $_ ) return; {
-	$s.push("net.alphatab.model.GsNote::new");
-	var $spos = $s.length;
 	this.Value = 0;
 	this.Velocity = 95;
 	this.String = 1;
 	this.IsTiedNote = false;
-	this.Effect = factory.NewEffect();
-	$s.pop();
+	this.Effect = factory.NewNoteEffect();
 }}
 net.alphatab.model.GsNote.__name__ = ["net","alphatab","model","GsNote"];
 net.alphatab.model.GsNote.prototype.Duration = null;
@@ -9768,14 +6332,7 @@ net.alphatab.model.GsNote.prototype.IsFingering = null;
 net.alphatab.model.GsNote.prototype.IsTiedNote = null;
 net.alphatab.model.GsNote.prototype.LeftHandFinger = null;
 net.alphatab.model.GsNote.prototype.RealValue = function() {
-	$s.push("net.alphatab.model.GsNote::RealValue");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Value + this.Voice.Beat.Measure.Track.Strings[this.String - 1].Value;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Value + this.Voice.Beat.Measure.Track.Strings[this.String - 1].Value;
 }
 net.alphatab.model.GsNote.prototype.RightHandFinger = null;
 net.alphatab.model.GsNote.prototype.String = null;
@@ -9785,28 +6342,16 @@ net.alphatab.model.GsNote.prototype.Velocity = null;
 net.alphatab.model.GsNote.prototype.Voice = null;
 net.alphatab.model.GsNote.prototype.__class__ = net.alphatab.model.GsNote;
 net.alphatab.tablature.model.GsNoteImpl = function(factory) { if( factory === $_ ) return; {
-	$s.push("net.alphatab.tablature.model.GsNoteImpl::new");
-	var $spos = $s.length;
 	net.alphatab.model.GsNote.apply(this,[factory]);
 	this._noteOrientation = new net.alphatab.model.Rectangle(0,0,0,0);
-	$s.pop();
 }}
 net.alphatab.tablature.model.GsNoteImpl.__name__ = ["net","alphatab","tablature","model","GsNoteImpl"];
 net.alphatab.tablature.model.GsNoteImpl.__super__ = net.alphatab.model.GsNote;
 for(var k in net.alphatab.model.GsNote.prototype ) net.alphatab.tablature.model.GsNoteImpl.prototype[k] = net.alphatab.model.GsNote.prototype[k];
 net.alphatab.tablature.model.GsNoteImpl.prototype.BeatImpl = function() {
-	$s.push("net.alphatab.tablature.model.GsNoteImpl::BeatImpl");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Voice.Beat;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Voice.Beat;
 }
 net.alphatab.tablature.model.GsNoteImpl.prototype.CalculateBendOverflow = function(layout) {
-	$s.push("net.alphatab.tablature.model.GsNoteImpl::CalculateBendOverflow");
-	var $spos = $s.length;
 	var point = null;
 	{
 		var _g = 0, _g1 = this.Effect.Bend.Points;
@@ -9816,42 +6361,18 @@ net.alphatab.tablature.model.GsNoteImpl.prototype.CalculateBendOverflow = functi
 			if(point == null || point.Value < curr.Value) point = curr;
 		}
 	}
-	if(point == null) {
-		$s.pop();
-		return 0;
-	}
+	if(point == null) return 0;
 	var fullHeight = point.Value * (6 * layout.Scale);
 	var heightToTabNote = (this.String - 1) * layout.StringSpacing;
-	{
-		var $tmp = Math.round(fullHeight - heightToTabNote);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return Math.round(fullHeight - heightToTabNote);
 }
 net.alphatab.tablature.model.GsNoteImpl.prototype.GetPaintPosition = function(iIndex) {
-	$s.push("net.alphatab.tablature.model.GsNoteImpl::GetPaintPosition");
-	var $spos = $s.length;
-	{
-		var $tmp = this.MeasureImpl().Ts.Get(iIndex);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.MeasureImpl().Ts.Get(iIndex);
 }
 net.alphatab.tablature.model.GsNoteImpl.prototype.MeasureImpl = function() {
-	$s.push("net.alphatab.tablature.model.GsNoteImpl::MeasureImpl");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Voice.Beat.MeasureImpl();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Voice.Beat.MeasureImpl();
 }
 net.alphatab.tablature.model.GsNoteImpl.prototype.NoteForTie = function() {
-	$s.push("net.alphatab.tablature.model.GsNoteImpl::NoteForTie");
-	var $spos = $s.length;
 	var m = this.MeasureImpl();
 	var nextIndex;
 	do {
@@ -9866,10 +6387,7 @@ net.alphatab.tablature.model.GsNoteImpl.prototype.NoteForTie = function() {
 						var note = _g1[_g];
 						++_g;
 						if(note.String == this.String) {
-							{
-								$s.pop();
-								return note;
-							}
+							return note;
 						}
 					}
 				}
@@ -9879,33 +6397,21 @@ net.alphatab.tablature.model.GsNoteImpl.prototype.NoteForTie = function() {
 		nextIndex = m.Number() - 2;
 		m = (nextIndex >= 0?m.TrackImpl().Measures[nextIndex]:null);
 	} while(m != null && m.Number() >= this.MeasureImpl().Number() - 3 && m.Ts == this.MeasureImpl().Ts);
-	{
-		$s.pop();
-		return null;
-	}
-	$s.pop();
+	return null;
 }
 net.alphatab.tablature.model.GsNoteImpl.prototype.Paint = function(layout,context,x,y) {
-	$s.push("net.alphatab.tablature.model.GsNoteImpl::Paint");
-	var $spos = $s.length;
 	var spacing = this.Voice.Beat.Spacing();
 	this.PaintScoreNote(layout,context,x,y + this.GetPaintPosition(net.alphatab.tablature.TrackSpacingPositions.ScoreMiddleLines),spacing);
 	this.PaintOfflineEffects(layout,context,x,y,spacing);
 	this.PaintTablatureNote(layout,context,x,y + this.GetPaintPosition(net.alphatab.tablature.TrackSpacingPositions.Tablature),spacing);
-	$s.pop();
 }
 net.alphatab.tablature.model.GsNoteImpl.prototype.PaintAccentuated = function(layout,context,x,y) {
-	$s.push("net.alphatab.tablature.model.GsNoteImpl::PaintAccentuated");
-	var $spos = $s.length;
 	var realX = x;
 	var realY = y;
 	var layer = (this.Voice.Index == 0?context.Get(net.alphatab.tablature.drawing.DrawingLayers.Voice1):context.Get(net.alphatab.tablature.drawing.DrawingLayers.Voice2));
 	layer.AddMusicSymbol(net.alphatab.tablature.drawing.MusicFont.AccentuatedNote,realX,realY,layout.Scale);
-	$s.pop();
 }
 net.alphatab.tablature.model.GsNoteImpl.prototype.PaintBend = function(layout,context,nextBeat,fromX,fromY) {
-	$s.push("net.alphatab.tablature.model.GsNoteImpl::PaintBend");
-	var $spos = $s.length;
 	var scale = layout.Scale;
 	var iX = fromX;
 	var iY = fromY - (2.0 * scale);
@@ -9971,11 +6477,8 @@ net.alphatab.tablature.model.GsNoteImpl.prototype.PaintBend = function(layout,co
 			}
 		}
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsNoteImpl.prototype.PaintEffects = function(layout,context,x,y,spacing) {
-	$s.push("net.alphatab.tablature.model.GsNoteImpl::PaintEffects");
-	var $spos = $s.length;
 	var scale = layout.Scale;
 	var realX = x;
 	var realY = y + this.TabPosY;
@@ -9986,14 +6489,9 @@ net.alphatab.tablature.model.GsNoteImpl.prototype.PaintEffects = function(layout
 		fill.AddString(value,net.alphatab.tablature.drawing.DrawingResources.GraceFont,Math.round(this._noteOrientation.X - 7 * scale),this._noteOrientation.Y);
 	}
 	if(effect.IsBend()) {
-		var nextBeat = layout.SongManager().GetNextBeat(this.Voice.Beat,this.Voice.Index);
+		var nextBeat = layout.SongManager().GetNextBeat(this.Voice.Beat);
 		if(nextBeat != null && nextBeat.MeasureImpl().Ts != this.MeasureImpl().Ts) nextBeat = null;
 		this.PaintBend(layout,context,nextBeat,this._noteOrientation.X + this._noteOrientation.Width,realY);
-	}
-	else if(effect.IsTremoloBar()) {
-		var nextBeat = layout.SongManager().GetNextBeat(this.Voice.Beat,this.Voice.Index);
-		if(nextBeat != null && nextBeat.MeasureImpl().Ts != this.MeasureImpl().Ts) nextBeat = null;
-		this.PaintTremoloBar(layout,context,nextBeat,this._noteOrientation.X,realY);
 	}
 	else if(effect.Slide || effect.Hammer) {
 		var nextFromX = x;
@@ -10005,26 +6503,8 @@ net.alphatab.tablature.model.GsNoteImpl.prototype.PaintEffects = function(layout
 			this.PaintHammer(layout,context,nextNote,realX,realY);
 		}
 	}
-	if(effect.Vibrato) null;
-	$s.pop();
-}
-net.alphatab.tablature.model.GsNoteImpl.prototype.PaintFadeIn = function(layout,context,x,y) {
-	$s.push("net.alphatab.tablature.model.GsNoteImpl::PaintFadeIn");
-	var $spos = $s.length;
-	var scale = layout.Scale;
-	var realX = x;
-	var realY = Math.round(y + (4.0 * scale));
-	var fWidth = Math.round(this.Voice.Width);
-	var layer = (this.Voice.Index == 0?context.Get(net.alphatab.tablature.drawing.DrawingLayers.VoiceDraw1):context.Get(net.alphatab.tablature.drawing.DrawingLayers.VoiceDraw2));
-	layer.StartFigure();
-	layer.AddBezier(realX,realY,realX,realY,realX + fWidth,realY,realX + fWidth,Math.round(realY - (4 * scale)));
-	layer.StartFigure();
-	layer.AddBezier(realX,realY,realX,realY,realX + fWidth,realY,realX + fWidth,Math.round(realY + (4 * scale)));
-	$s.pop();
 }
 net.alphatab.tablature.model.GsNoteImpl.prototype.PaintGrace = function(layout,context,x,y) {
-	$s.push("net.alphatab.tablature.model.GsNoteImpl::PaintGrace");
-	var $spos = $s.length;
 	var scale = layout.ScoreLineSpacing / 2.25;
 	var realX = x - (2 * scale);
 	var realY = y - (9 * layout.Scale);
@@ -10034,11 +6514,8 @@ net.alphatab.tablature.model.GsNoteImpl.prototype.PaintGrace = function(layout,c
 	if(this.Effect.Grace.Transition == net.alphatab.model.effects.GsGraceEffectTransition.Hammer || this.Effect.Grace.Transition == net.alphatab.model.effects.GsGraceEffectTransition.Slide) {
 		this.PaintHammer(layout,context,null,x - (15 * layout.Scale),y + (5 * layout.Scale),true);
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsNoteImpl.prototype.PaintHammer = function(layout,context,nextNote,x,y,forceDown) {
-	$s.push("net.alphatab.tablature.model.GsNoteImpl::PaintHammer");
-	var $spos = $s.length;
 	if(forceDown == null) forceDown = false;
 	var xScale = layout.Scale;
 	var yScale = layout.StringSpacing / 10.0;
@@ -10050,20 +6527,14 @@ net.alphatab.tablature.model.GsNoteImpl.prototype.PaintHammer = function(layout,
 	var hScale = ((this.String > 3 || forceDown)?-1:1);
 	if(this.String > 3 || forceDown) realY += (net.alphatab.tablature.drawing.DrawingResources.NoteFontHeight * layout.Scale) * 2;
 	fill.AddMusicSymbol(net.alphatab.tablature.drawing.MusicFont.HammerPullUp,realX,realY,layout.Scale * wScale,layout.Scale * hScale);
-	$s.pop();
 }
 net.alphatab.tablature.model.GsNoteImpl.prototype.PaintHeavyAccentuated = function(layout,context,x,y) {
-	$s.push("net.alphatab.tablature.model.GsNoteImpl::PaintHeavyAccentuated");
-	var $spos = $s.length;
 	var realX = x;
 	var realY = y;
 	var layer = (this.Voice.Index == 0?context.Get(net.alphatab.tablature.drawing.DrawingLayers.Voice1):context.Get(net.alphatab.tablature.drawing.DrawingLayers.Voice2));
 	layer.AddMusicSymbol(net.alphatab.tablature.drawing.MusicFont.HeavyAccentuatedNote,realX,realY,layout.Scale);
-	$s.pop();
 }
 net.alphatab.tablature.model.GsNoteImpl.prototype.PaintOfflineEffects = function(layout,context,x,y,spacing) {
-	$s.push("net.alphatab.tablature.model.GsNoteImpl::PaintOfflineEffects");
-	var $spos = $s.length;
 	var effect = this.Effect;
 	var realX = x + 3 * layout.Scale;
 	var fill = (this.Voice.Index == 0?context.Get(net.alphatab.tablature.drawing.DrawingLayers.VoiceEffects1):context.Get(net.alphatab.tablature.drawing.DrawingLayers.VoiceEffects2));
@@ -10075,10 +6546,6 @@ net.alphatab.tablature.model.GsNoteImpl.prototype.PaintOfflineEffects = function
 	else if(effect.HeavyAccentuatedNote) {
 		var realY = y + this.GetPaintPosition(net.alphatab.tablature.TrackSpacingPositions.AccentuatedEffect);
 		this.PaintHeavyAccentuated(layout,context,realX,realY);
-	}
-	if(effect.FadeIn) {
-		var realY = y + this.GetPaintPosition(net.alphatab.tablature.TrackSpacingPositions.FadeIn);
-		this.PaintFadeIn(layout,context,realX,realY);
 	}
 	if(effect.IsHarmonic()) {
 		var realY = y + this.GetPaintPosition(net.alphatab.tablature.TrackSpacingPositions.HarmonicEffect);
@@ -10101,18 +6568,6 @@ net.alphatab.tablature.model.GsNoteImpl.prototype.PaintOfflineEffects = function
 		}break;
 		}
 		fill.AddString(key,net.alphatab.tablature.drawing.DrawingResources.DefaultFont,realX,realY);
-	}
-	if(effect.Tapping) {
-		var realY = y + this.GetPaintPosition(net.alphatab.tablature.TrackSpacingPositions.TapingEffect);
-		fill.AddString("T",net.alphatab.tablature.drawing.DrawingResources.DefaultFont,realX,realY);
-	}
-	else if(effect.Slapping) {
-		var realY = y + this.GetPaintPosition(net.alphatab.tablature.TrackSpacingPositions.TapingEffect);
-		fill.AddString("S",net.alphatab.tablature.drawing.DrawingResources.DefaultFont,realX,realY);
-	}
-	else if(effect.Popping) {
-		var realY = y + this.GetPaintPosition(net.alphatab.tablature.TrackSpacingPositions.TapingEffect);
-		fill.AddString("P",net.alphatab.tablature.drawing.DrawingResources.DefaultFont,realX,realY);
 	}
 	if(effect.LetRing) {
 		var beat = this.Voice.Beat.PreviousBeat;
@@ -10234,10 +6689,6 @@ net.alphatab.tablature.model.GsNoteImpl.prototype.PaintOfflineEffects = function
 			draw.AddLine(endX,realY - (size / 2),endX,realY + (size / 2));
 		}
 	}
-	if(effect.BeatVibrato) {
-		var realY = y + this.GetPaintPosition(net.alphatab.tablature.TrackSpacingPositions.BeatVibratoEffect);
-		this.PaintVibrato(layout,context,realX,realY,1);
-	}
 	if(effect.Vibrato) {
 		var realY = y + this.GetPaintPosition(net.alphatab.tablature.TrackSpacingPositions.VibratoEffect);
 		this.PaintVibrato(layout,context,realX,realY,0.75);
@@ -10246,11 +6697,8 @@ net.alphatab.tablature.model.GsNoteImpl.prototype.PaintOfflineEffects = function
 		var realY = y + this.GetPaintPosition(net.alphatab.tablature.TrackSpacingPositions.VibratoEffect);
 		this.PaintTrill(layout,context,realX,realY);
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsNoteImpl.prototype.PaintScoreNote = function(layout,context,x,y,spacing) {
-	$s.push("net.alphatab.tablature.model.GsNoteImpl::PaintScoreNote");
-	var $spos = $s.length;
 	var scoreSpacing = layout.ScoreLineSpacing;
 	var direction = this.Voice.BeatGroup.Direction;
 	var key = this.MeasureImpl().GetKeySignature();
@@ -10328,11 +6776,8 @@ net.alphatab.tablature.model.GsNoteImpl.prototype.PaintScoreNote = function(layo
 		}
 		if(s != "") fill.AddMusicSymbol(s,realX,realY1,layout.Scale);
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsNoteImpl.prototype.PaintSlide = function(layout,context,nextNote,x,y,nextX) {
-	$s.push("net.alphatab.tablature.model.GsNoteImpl::PaintSlide");
-	var $spos = $s.length;
 	var xScale = layout.Scale;
 	var yScale = layout.StringSpacing / 10.0;
 	var yMove = 3.0 * yScale;
@@ -10384,11 +6829,8 @@ net.alphatab.tablature.model.GsNoteImpl.prototype.PaintSlide = function(layout,c
 	else {
 		draw.AddLine(realX + (13 * xScale),realY - yMove,realX + (19 * xScale),realY - yMove);
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsNoteImpl.prototype.PaintTablatureNote = function(layout,context,x,y,spacing) {
-	$s.push("net.alphatab.tablature.model.GsNoteImpl::PaintTablatureNote");
-	var $spos = $s.length;
 	var realX = x + Math.round(3 * layout.Scale);
 	var realY = y + this.TabPosY;
 	this._noteOrientation.X = realX;
@@ -10403,61 +6845,8 @@ net.alphatab.tablature.model.GsNoteImpl.prototype.PaintTablatureNote = function(
 		fill.AddString(visualNote,net.alphatab.tablature.drawing.DrawingResources.NoteFont,this._noteOrientation.X,this._noteOrientation.Y);
 	}
 	this.PaintEffects(layout,context,x,y,spacing);
-	$s.pop();
-}
-net.alphatab.tablature.model.GsNoteImpl.prototype.PaintTremoloBar = function(layout,context,nextBeat,x,y) {
-	$s.push("net.alphatab.tablature.model.GsNoteImpl::PaintTremoloBar");
-	var $spos = $s.length;
-	var scale = layout.Scale;
-	var realX = x + (10 * scale);
-	var realY = y - (2.0 * scale);
-	var xTo;
-	var minY = realY - 60 * scale;
-	if(nextBeat == null) {
-		xTo = (this.Voice.Beat.MeasureImpl().PosX + this.Voice.Beat.MeasureImpl().Width) + this.Voice.Beat.MeasureImpl().Spacing;
-	}
-	else {
-		xTo = (((nextBeat.MeasureImpl().PosX + nextBeat.MeasureImpl().HeaderImpl().GetLeftSpacing(layout)) + nextBeat.PosX) + (nextBeat.Spacing() * scale)) + 5 * scale;
-	}
-	var fill = (this.Voice.Index == 0?context.Get(net.alphatab.tablature.drawing.DrawingLayers.VoiceEffects1):context.Get(net.alphatab.tablature.drawing.DrawingLayers.VoiceEffects2));
-	var draw = (this.Voice.Index == 0?context.Get(net.alphatab.tablature.drawing.DrawingLayers.VoiceEffectsDraw1):context.Get(net.alphatab.tablature.drawing.DrawingLayers.VoiceEffectsDraw2));
-	if(this.Effect.TremoloBar.Points.length >= 2) {
-		var dX = (xTo - realX) / 12;
-		var dY = (realY - minY) / 12;
-		draw.StartFigure();
-		{
-			var _g1 = 0, _g = this.Effect.TremoloBar.Points.length - 1;
-			while(_g1 < _g) {
-				var i = _g1++;
-				var firstPt = this.Effect.TremoloBar.Points[i];
-				var secondPt = this.Effect.TremoloBar.Points[i + 1];
-				if(firstPt.Value == secondPt.Value && i == this.Effect.TremoloBar.Points.length - 2) continue;
-				var firstLoc = new net.alphatab.model.Point(Math.floor(realX + (dX * firstPt.Position)),Math.floor(realY - dY * firstPt.Value));
-				var secondLoc = new net.alphatab.model.Point(Math.floor(realX + (dX * secondPt.Position)),Math.floor(realY - dY * secondPt.Value));
-				draw.AddLine(firstLoc.X,firstLoc.Y,secondLoc.X,secondLoc.Y);
-				if(secondPt.Value != 0) {
-					var dV = (secondPt.Value) * 0.5;
-					var up = (secondPt.Value - firstPt.Value) >= 0;
-					var s = "";
-					s += net.alphatab.Utils.string(Math.floor(dV)) + " ";
-					dV -= Math.floor(dV);
-					if(dV == 0.25) s += "1/4";
-					else if(dV == 0.5) s += "1/2";
-					else if(dV == 0.75) s += "3/4";
-					context.Graphics.setFont(net.alphatab.tablature.drawing.DrawingResources.DefaultFont);
-					var size = context.Graphics.measureText(s);
-					var sY = (up?(secondLoc.Y - net.alphatab.tablature.drawing.DrawingResources.DefaultFontHeight) - (3 * scale):secondLoc.Y + (3 * scale));
-					var sX = secondLoc.X - size.width / 2;
-					fill.AddString(s,net.alphatab.tablature.drawing.DrawingResources.DefaultFont,sX,sY);
-				}
-			}
-		}
-	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsNoteImpl.prototype.PaintTrill = function(layout,context,x,y) {
-	$s.push("net.alphatab.tablature.model.GsNoteImpl::PaintTrill");
-	var $spos = $s.length;
 	var str = "Tr";
 	context.Graphics.setFont(net.alphatab.tablature.drawing.DrawingResources.EffectFont);
 	var size = context.Graphics.measureText(str);
@@ -10467,11 +6856,8 @@ net.alphatab.tablature.model.GsNoteImpl.prototype.PaintTrill = function(layout,c
 	var width = (this.Voice.Width - size.Width) - (2.0 * scale);
 	var fill = (this.Voice.Index == 0?context.Get(net.alphatab.tablature.drawing.DrawingLayers.VoiceEffects1):context.Get(net.alphatab.tablature.drawing.DrawingLayers.VoiceEffects2));
 	fill.AddString(str,net.alphatab.tablature.drawing.DrawingResources.EffectFont,x,y);
-	$s.pop();
 }
 net.alphatab.tablature.model.GsNoteImpl.prototype.PaintVibrato = function(layout,context,x,y,symbolScale) {
-	$s.push("net.alphatab.tablature.model.GsNoteImpl::PaintVibrato");
-	var $spos = $s.length;
 	var scale = layout.Scale;
 	var realX = x - 2 * scale;
 	var realY = y + (2.0 * scale);
@@ -10488,37 +6874,19 @@ net.alphatab.tablature.model.GsNoteImpl.prototype.PaintVibrato = function(layout
 			realX += step;
 		}
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsNoteImpl.prototype.PosX = function() {
-	$s.push("net.alphatab.tablature.model.GsNoteImpl::PosX");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Voice.Beat.PosX;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Voice.Beat.PosX;
 }
 net.alphatab.tablature.model.GsNoteImpl.prototype.ScorePosY = null;
 net.alphatab.tablature.model.GsNoteImpl.prototype.TabPosY = null;
 net.alphatab.tablature.model.GsNoteImpl.prototype.Update = function(layout) {
-	$s.push("net.alphatab.tablature.model.GsNoteImpl::Update");
-	var $spos = $s.length;
 	this._accidental = this.MeasureImpl().GetNoteAccidental(this.RealValue());
 	this.TabPosY = Math.round((this.String * layout.StringSpacing) - layout.StringSpacing);
 	this.ScorePosY = this.Voice.BeatGroup.GetY1(layout,this,this.MeasureImpl().GetKeySignature(),net.alphatab.model.GsMeasureClefConverter.ToInt(this.MeasureImpl().Clef));
-	$s.pop();
 }
 net.alphatab.tablature.model.GsNoteImpl.prototype.VoiceImpl = function() {
-	$s.push("net.alphatab.tablature.model.GsNoteImpl::VoiceImpl");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Voice;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Voice;
 }
 net.alphatab.tablature.model.GsNoteImpl.prototype._accidental = null;
 net.alphatab.tablature.model.GsNoteImpl.prototype._noteOrientation = null;
@@ -10526,108 +6894,70 @@ net.alphatab.tablature.model.GsNoteImpl.prototype.__class__ = net.alphatab.tabla
 net.alphatab.tablature.drawing.ClefPainter = function() { }
 net.alphatab.tablature.drawing.ClefPainter.__name__ = ["net","alphatab","tablature","drawing","ClefPainter"];
 net.alphatab.tablature.drawing.ClefPainter.PaintAlto = function(context,x,y,layout) {
-	$s.push("net.alphatab.tablature.drawing.ClefPainter::PaintAlto");
-	var $spos = $s.length;
 	var layer = context.Get(net.alphatab.tablature.drawing.DrawingLayers.MainComponents);
 	layer.AddMusicSymbol(net.alphatab.tablature.drawing.MusicFont.AltoClef,x,y,layout.Scale);
-	$s.pop();
 }
 net.alphatab.tablature.drawing.ClefPainter.PaintBass = function(context,x,y,layout) {
-	$s.push("net.alphatab.tablature.drawing.ClefPainter::PaintBass");
-	var $spos = $s.length;
 	var layer = context.Get(net.alphatab.tablature.drawing.DrawingLayers.MainComponents);
 	layer.AddMusicSymbol(net.alphatab.tablature.drawing.MusicFont.BassClef,x,y,layout.Scale);
-	$s.pop();
 }
 net.alphatab.tablature.drawing.ClefPainter.PaintTenor = function(context,x,y,layout) {
-	$s.push("net.alphatab.tablature.drawing.ClefPainter::PaintTenor");
-	var $spos = $s.length;
 	y -= Math.round(layout.ScoreLineSpacing);
 	var layer = context.Get(net.alphatab.tablature.drawing.DrawingLayers.MainComponents);
 	layer.AddMusicSymbol(net.alphatab.tablature.drawing.MusicFont.TenorClef,x,y,layout.Scale);
-	$s.pop();
 }
 net.alphatab.tablature.drawing.ClefPainter.PaintTreble = function(context,x,y,layout) {
-	$s.push("net.alphatab.tablature.drawing.ClefPainter::PaintTreble");
-	var $spos = $s.length;
 	y -= Math.round(layout.ScoreLineSpacing);
 	var layer = context.Get(net.alphatab.tablature.drawing.DrawingLayers.MainComponents);
 	layer.AddMusicSymbol(net.alphatab.tablature.drawing.MusicFont.TrebleClef,x,y,layout.Scale);
-	$s.pop();
 }
 net.alphatab.tablature.drawing.ClefPainter.prototype.__class__ = net.alphatab.tablature.drawing.ClefPainter;
 net.alphatab.tablature.drawing.SilencePainter = function() { }
 net.alphatab.tablature.drawing.SilencePainter.__name__ = ["net","alphatab","tablature","drawing","SilencePainter"];
 net.alphatab.tablature.drawing.SilencePainter.PaintEighth = function(layer,x,y,layout) {
-	$s.push("net.alphatab.tablature.drawing.SilencePainter::PaintEighth");
-	var $spos = $s.length;
 	var scale = layout.ScoreLineSpacing;
 	y += scale;
 	layer.AddMusicSymbol(net.alphatab.tablature.drawing.MusicFont.SilenceEighth,x,y,layout.Scale);
-	$s.pop();
 }
 net.alphatab.tablature.drawing.SilencePainter.PaintWhole = function(layer,x,y,layout) {
-	$s.push("net.alphatab.tablature.drawing.SilencePainter::PaintWhole");
-	var $spos = $s.length;
 	var scale = layout.ScoreLineSpacing;
 	y += scale;
 	layer.AddMusicSymbol(net.alphatab.tablature.drawing.MusicFont.SilenceHalf,x,y,layout.Scale);
-	$s.pop();
 }
 net.alphatab.tablature.drawing.SilencePainter.PaintHalf = function(layer,x,y,layout) {
-	$s.push("net.alphatab.tablature.drawing.SilencePainter::PaintHalf");
-	var $spos = $s.length;
 	var scale = layout.ScoreLineSpacing;
 	y += scale - (4 * layout.Scale);
 	layer.AddMusicSymbol(net.alphatab.tablature.drawing.MusicFont.SilenceHalf,x,y,layout.Scale);
-	$s.pop();
 }
 net.alphatab.tablature.drawing.SilencePainter.PaintQuarter = function(layer,x,y,layout) {
-	$s.push("net.alphatab.tablature.drawing.SilencePainter::PaintQuarter");
-	var $spos = $s.length;
 	var scale = layout.ScoreLineSpacing;
 	y += scale * 0.5;
 	layer.AddMusicSymbol(net.alphatab.tablature.drawing.MusicFont.SilenceQuarter,x,y,layout.Scale);
-	$s.pop();
 }
 net.alphatab.tablature.drawing.SilencePainter.PaintSixteenth = function(layer,x,y,layout) {
-	$s.push("net.alphatab.tablature.drawing.SilencePainter::PaintSixteenth");
-	var $spos = $s.length;
 	var scale = layout.ScoreLineSpacing;
 	y += scale;
 	layer.AddMusicSymbol(net.alphatab.tablature.drawing.MusicFont.SilenceSixteenth,x,y,layout.Scale);
-	$s.pop();
 }
 net.alphatab.tablature.drawing.SilencePainter.PaintSixtyFourth = function(layer,x,y,layout) {
-	$s.push("net.alphatab.tablature.drawing.SilencePainter::PaintSixtyFourth");
-	var $spos = $s.length;
 	var scale = layout.ScoreLineSpacing;
 	layer.AddMusicSymbol(net.alphatab.tablature.drawing.MusicFont.SilenceSixtyFourth,x,y,layout.Scale);
-	$s.pop();
 }
 net.alphatab.tablature.drawing.SilencePainter.PaintThirtySecond = function(layer,x,y,layout) {
-	$s.push("net.alphatab.tablature.drawing.SilencePainter::PaintThirtySecond");
-	var $spos = $s.length;
 	var scale = layout.ScoreLineSpacing;
 	layer.AddMusicSymbol(net.alphatab.tablature.drawing.MusicFont.SilenceThirtySecond,x,y,layout.Scale);
-	$s.pop();
 }
 net.alphatab.tablature.drawing.SilencePainter.prototype.__class__ = net.alphatab.tablature.drawing.SilencePainter;
 net.alphatab.model.effects.GsGraceEffect = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.model.effects.GsGraceEffect::new");
-	var $spos = $s.length;
 	this.Fret = 0;
 	this.Duration = 1;
 	this.Dynamic = 95;
 	this.Transition = net.alphatab.model.effects.GsGraceEffectTransition.None;
 	this.IsOnBeat = false;
 	this.IsDead = false;
-	$s.pop();
 }}
 net.alphatab.model.effects.GsGraceEffect.__name__ = ["net","alphatab","model","effects","GsGraceEffect"];
 net.alphatab.model.effects.GsGraceEffect.prototype.Clone = function(factory) {
-	$s.push("net.alphatab.model.effects.GsGraceEffect::Clone");
-	var $spos = $s.length;
 	var effect = factory.NewGraceEffect();
 	effect.Fret = this.Fret;
 	effect.Duration = this.Duration;
@@ -10635,22 +6965,11 @@ net.alphatab.model.effects.GsGraceEffect.prototype.Clone = function(factory) {
 	effect.Transition = this.Transition;
 	effect.IsOnBeat = this.IsOnBeat;
 	effect.IsDead = this.IsDead;
-	{
-		$s.pop();
-		return effect;
-	}
-	$s.pop();
+	return effect;
 }
 net.alphatab.model.effects.GsGraceEffect.prototype.Duration = null;
 net.alphatab.model.effects.GsGraceEffect.prototype.DurationTime = function() {
-	$s.push("net.alphatab.model.effects.GsGraceEffect::DurationTime");
-	var $spos = $s.length;
-	{
-		var $tmp = Math.floor((960 / 16.00) * this.Duration);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return Math.floor((960 / 16.00) * this.Duration);
 }
 net.alphatab.model.effects.GsGraceEffect.prototype.Dynamic = null;
 net.alphatab.model.effects.GsGraceEffect.prototype.Fret = null;
@@ -10659,57 +6978,29 @@ net.alphatab.model.effects.GsGraceEffect.prototype.IsOnBeat = null;
 net.alphatab.model.effects.GsGraceEffect.prototype.Transition = null;
 net.alphatab.model.effects.GsGraceEffect.prototype.__class__ = net.alphatab.model.effects.GsGraceEffect;
 net.alphatab.model.GsTriplet = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.model.GsTriplet::new");
-	var $spos = $s.length;
 	this.Enters = 1;
 	this.Times = 1;
-	$s.pop();
 }}
 net.alphatab.model.GsTriplet.__name__ = ["net","alphatab","model","GsTriplet"];
 net.alphatab.model.GsTriplet.prototype.Clone = function(factory) {
-	$s.push("net.alphatab.model.GsTriplet::Clone");
-	var $spos = $s.length;
 	var triplet = factory.NewTriplet();
 	this.Copy(triplet);
-	{
-		$s.pop();
-		return triplet;
-	}
-	$s.pop();
+	return triplet;
 }
 net.alphatab.model.GsTriplet.prototype.ConvertTime = function(time) {
-	$s.push("net.alphatab.model.GsTriplet::ConvertTime");
-	var $spos = $s.length;
-	{
-		var $tmp = Math.floor((time * this.Times) / this.Enters);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return Math.floor((time * this.Times) / this.Enters);
 }
 net.alphatab.model.GsTriplet.prototype.Copy = function(triplet) {
-	$s.push("net.alphatab.model.GsTriplet::Copy");
-	var $spos = $s.length;
 	triplet.Enters = this.Enters;
 	triplet.Times = this.Times;
-	$s.pop();
 }
 net.alphatab.model.GsTriplet.prototype.Enters = null;
 net.alphatab.model.GsTriplet.prototype.Equals = function(triplet) {
-	$s.push("net.alphatab.model.GsTriplet::Equals");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Enters == triplet.Enters && this.Times == triplet.Times;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Enters == triplet.Enters && this.Times == triplet.Times;
 }
 net.alphatab.model.GsTriplet.prototype.Times = null;
 net.alphatab.model.GsTriplet.prototype.__class__ = net.alphatab.model.GsTriplet;
 net.alphatab.midi.MidiRepeatController = function(song) { if( song === $_ ) return; {
-	$s.push("net.alphatab.midi.MidiRepeatController::new");
-	var $spos = $s.length;
 	this._song = song;
 	this._count = song.MeasureHeaders.length;
 	this.Index = 0;
@@ -10722,23 +7013,13 @@ net.alphatab.midi.MidiRepeatController = function(song) { if( song === $_ ) retu
 	this.RepeatMove = 0;
 	this._repeatStartIndex = 0;
 	this._repeatNumber = 0;
-	$s.pop();
 }}
 net.alphatab.midi.MidiRepeatController.__name__ = ["net","alphatab","midi","MidiRepeatController"];
 net.alphatab.midi.MidiRepeatController.prototype.Finished = function() {
-	$s.push("net.alphatab.midi.MidiRepeatController::Finished");
-	var $spos = $s.length;
-	{
-		var $tmp = (this.Index >= this._count);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (this.Index >= this._count);
 }
 net.alphatab.midi.MidiRepeatController.prototype.Index = null;
 net.alphatab.midi.MidiRepeatController.prototype.Process = function() {
-	$s.push("net.alphatab.midi.MidiRepeatController::Process");
-	var $spos = $s.length;
 	var header = this._song.MeasureHeaders[this.Index];
 	this.ShouldPlay = true;
 	if(header.IsRepeatOpen) {
@@ -10761,10 +7042,7 @@ net.alphatab.midi.MidiRepeatController.prototype.Process = function() {
 			}
 			this.ShouldPlay = false;
 			this.Index++;
-			{
-				$s.pop();
-				return;
-			}
+			return;
 		}
 	}
 	this._lastIndex = Math.round(Math.max(this._lastIndex,this.Index));
@@ -10784,7 +7062,6 @@ net.alphatab.midi.MidiRepeatController.prototype.Process = function() {
 		this._repeatAlternative = 0;
 	}
 	this.Index++;
-	$s.pop();
 }
 net.alphatab.midi.MidiRepeatController.prototype.RepeatMove = null;
 net.alphatab.midi.MidiRepeatController.prototype.ShouldPlay = null;
@@ -10799,13 +7076,10 @@ net.alphatab.midi.MidiRepeatController.prototype._repeatStartIndex = null;
 net.alphatab.midi.MidiRepeatController.prototype._song = null;
 net.alphatab.midi.MidiRepeatController.prototype.__class__ = net.alphatab.midi.MidiRepeatController;
 net.alphatab.model.Rectangle = function(x,y,width,height) { if( x === $_ ) return; {
-	$s.push("net.alphatab.model.Rectangle::new");
-	var $spos = $s.length;
 	this.X = x;
 	this.Y = y;
 	this.Width = width;
 	this.Height = height;
-	$s.pop();
 }}
 net.alphatab.model.Rectangle.__name__ = ["net","alphatab","model","Rectangle"];
 net.alphatab.model.Rectangle.prototype.Height = null;
@@ -10824,69 +7098,25 @@ if(!net.alphatab.platform.js) net.alphatab.platform.js = {}
 net.alphatab.platform.js.JQuery = function() { }
 net.alphatab.platform.js.JQuery.__name__ = ["net","alphatab","platform","js","JQuery"];
 net.alphatab.platform.js.JQuery.Elements = function(e) {
-	$s.push("net.alphatab.platform.js.JQuery::Elements");
-	var $spos = $s.length;
-	{
-		var $tmp = (jQuery(e));
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (jQuery(e));
 }
 net.alphatab.platform.js.JQuery.Ajax = function(options) {
-	$s.push("net.alphatab.platform.js.JQuery::Ajax");
-	var $spos = $s.length;
-	{
-		var $tmp = jQuery.ajax(options);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return jQuery.ajax(options);
 }
 net.alphatab.platform.js.JQuery.prototype.Height = function() {
-	$s.push("net.alphatab.platform.js.JQuery::Height");
-	var $spos = $s.length;
-	{
-		var $tmp = this.height();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.height();
 }
 net.alphatab.platform.js.JQuery.prototype.SetHeight = function(value) {
-	$s.push("net.alphatab.platform.js.JQuery::SetHeight");
-	var $spos = $s.length;
-	{
-		var $tmp = this.height(value);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.height(value);
 }
 net.alphatab.platform.js.JQuery.prototype.SetWidth = function(value) {
-	$s.push("net.alphatab.platform.js.JQuery::SetWidth");
-	var $spos = $s.length;
-	{
-		var $tmp = this.width(value);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.width(value);
 }
 net.alphatab.platform.js.JQuery.prototype.Width = function() {
-	$s.push("net.alphatab.platform.js.JQuery::Width");
-	var $spos = $s.length;
-	{
-		var $tmp = this.width();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.width();
 }
 net.alphatab.platform.js.JQuery.prototype.__class__ = net.alphatab.platform.js.JQuery;
 net.alphatab.tablature.model.GsMeasureImpl = function(header) { if( header === $_ ) return; {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::new");
-	var $spos = $s.length;
 	net.alphatab.model.GsMeasure.apply(this,[header]);
 	this._registeredAccidentals = new Array();
 	{
@@ -10912,40 +7142,28 @@ net.alphatab.tablature.model.GsMeasureImpl = function(header) { if( header === $
 			this._voiceGroups.push(new Array());
 		}
 	}
-	$s.pop();
 }}
 net.alphatab.tablature.model.GsMeasureImpl.__name__ = ["net","alphatab","tablature","model","GsMeasureImpl"];
 net.alphatab.tablature.model.GsMeasureImpl.__super__ = net.alphatab.model.GsMeasure;
 for(var k in net.alphatab.model.GsMeasure.prototype ) net.alphatab.tablature.model.GsMeasureImpl.prototype[k] = net.alphatab.model.GsMeasure.prototype[k];
 net.alphatab.tablature.model.GsMeasureImpl.MakeVoice = function(layout,voice,previousVoice,group) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::MakeVoice");
-	var $spos = $s.length;
 	voice.Width = layout.GetVoiceWidth(voice);
 	voice.BeatGroup = (group);
 	if(previousVoice != null) {
 		voice.PreviousBeat = (previousVoice);
 		previousVoice.NextBeat = (voice);
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureImpl.GetStartPosition = function(measure,start,spacing) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::GetStartPosition");
-	var $spos = $s.length;
 	var newStart = start - measure.Start();
 	var displayPosition = 0.0;
 	if(newStart > 0) {
 		var position = (newStart / 960);
 		displayPosition = (position * spacing);
 	}
-	{
-		$s.pop();
-		return displayPosition;
-	}
-	$s.pop();
+	return displayPosition;
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.CalculateBeats = function(layout) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::CalculateBeats");
-	var $spos = $s.length;
 	var minDuration = null;
 	var previousVoices = new Array();
 	var groups = new Array();
@@ -11042,11 +7260,8 @@ net.alphatab.tablature.model.GsMeasureImpl.prototype.CalculateBeats = function(l
 			}
 		}
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.CalculateKeySignatureSpacing = function(layout) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::CalculateKeySignatureSpacing");
-	var $spos = $s.length;
 	var spacing = 0;
 	if(this.HeaderImpl().ShouldPaintKeySignature) {
 		if(this.GetKeySignature() <= 7) {
@@ -11064,66 +7279,40 @@ net.alphatab.tablature.model.GsMeasureImpl.prototype.CalculateKeySignatureSpacin
 			}
 		}
 	}
-	{
-		$s.pop();
-		return spacing;
-	}
-	$s.pop();
+	return spacing;
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.CalculateMeasureChanges = function(layout) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::CalculateMeasureChanges");
-	var $spos = $s.length;
 	this.IsPaintClef = false;
 	this._previousMeasure = ((layout.IsFirstMeasure(this)?null:layout.SongManager().GetPreviousMeasure(this)));
 	if(this._previousMeasure == null || this.Clef != this._previousMeasure.Clef) {
 		this.IsPaintClef = true;
 		this.HeaderImpl().NotifyClefSpacing(Math.round(40 * layout.Scale));
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.CalculateWidth = function(layout) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::CalculateWidth");
-	var $spos = $s.length;
 	this.Width = this._widthBeats;
 	this.Width += this.GetFirstNoteSpacing(layout);
 	this.Width += ((this.RepeatClose() > 0)?20:0);
 	this.Width += this.HeaderImpl().GetLeftSpacing(layout);
 	this.Width += this.HeaderImpl().GetRightSpacing(layout);
 	this.HeaderImpl().NotifyWidth(this.Width);
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.CanJoin = function(manager,b1,b2) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::CanJoin");
-	var $spos = $s.length;
 	if(b1 == null || b2 == null || b1.IsRestVoice() || b2.IsRestVoice()) {
-		{
-			$s.pop();
-			return false;
-		}
+		return false;
 	}
 	var divisionLength = this.DivisionLength;
 	var start = this.Start();
 	var start1 = (manager.GetRealStart(this,b1.Beat.Start) - start);
 	var start2 = (manager.GetRealStart(this,b2.Beat.Start) - start);
 	if(b1.Duration.Value < 8 || b2.Duration.Value < 8) {
-		{
-			var $tmp = (start1 == start2);
-			$s.pop();
-			return $tmp;
-		}
+		return (start1 == start2);
 	}
 	var p1 = Math.floor((divisionLength + start1) / divisionLength);
 	var p2 = Math.floor((divisionLength + start2) / divisionLength);
-	{
-		var $tmp = (p1 == p2);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (p1 == p2);
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.CheckEffects = function(layout,note) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::CheckEffects");
-	var $spos = $s.length;
 	var effect = note.Effect;
 	if(effect.AccentuatedNote || effect.HeavyAccentuatedNote) {
 		this._accentuated = true;
@@ -11131,19 +7320,19 @@ net.alphatab.tablature.model.GsMeasureImpl.prototype.CheckEffects = function(lay
 	if(effect.IsHarmonic()) {
 		this._harmonic = true;
 	}
-	if(effect.Tapping || effect.Slapping || effect.Popping) {
+	if(note.Voice.Beat.Effect.Tapping || note.Voice.Beat.Effect.Slapping || note.Voice.Beat.Effect.Popping) {
 		this._tapping = true;
 	}
 	if(effect.PalmMute) {
 		this._palmMute = true;
 	}
-	if(effect.FadeIn) {
+	if(note.Voice.Beat.Effect.FadeIn) {
 		this._fadeIn = true;
 	}
 	if(effect.Vibrato || effect.IsTrill()) {
 		this._vibrato = true;
 	}
-	if(effect.BeatVibrato) {
+	if(note.Voice.Beat.Effect.Vibrato) {
 		this._beatVibrato = true;
 	}
 	if(effect.LetRing) {
@@ -11153,11 +7342,12 @@ net.alphatab.tablature.model.GsMeasureImpl.prototype.CheckEffects = function(lay
 		this._bend = true;
 		this._bendOverFlow = Math.round(Math.max(this._bendOverFlow,Math.round(note.CalculateBendOverflow(layout))));
 	}
-	$s.pop();
+	if(note.Voice.Beat.Effect.IsTremoloBar()) {
+		this._tremoloBar = true;
+		this._tremoloBarOverFlow = Math.round(note.Voice.Beat.CalculateTremoloBarOverflow(layout));
+	}
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.CheckValue = function(layout,note,direction) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::CheckValue");
-	var $spos = $s.length;
 	var y = note.ScorePosY;
 	var upOffset = net.alphatab.tablature.model.BeatGroup.GetUpOffset(layout);
 	var downOffset = net.alphatab.tablature.model.BeatGroup.GetDownOffset(layout);
@@ -11173,11 +7363,8 @@ net.alphatab.tablature.model.GsMeasureImpl.prototype.CheckValue = function(layou
 	else if(direction == net.alphatab.model.GsVoiceDirection.Down && y < this.MinY) {
 		this.MinY = y;
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.ClearRegisteredAccidentals = function() {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::ClearRegisteredAccidentals");
-	var $spos = $s.length;
 	var _g = 0;
 	while(_g < 11) {
 		var i = _g++;
@@ -11189,73 +7376,32 @@ net.alphatab.tablature.model.GsMeasureImpl.prototype.ClearRegisteredAccidentals 
 			}
 		}
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.Create = function(layout) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::Create");
-	var $spos = $s.length;
 	this.DivisionLength = net.alphatab.model.SongManager.GetDivisionLength(this.Header);
 	this.ResetSpacing();
 	this.ClearRegisteredAccidentals();
 	this.CalculateBeats(layout);
 	this.CalculateWidth(layout);
 	this.IsFirstOfLine = false;
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.DivisionLength = null;
 net.alphatab.tablature.model.GsMeasureImpl.prototype.GetBeatSpacing = function(beat) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::GetBeatSpacing");
-	var $spos = $s.length;
-	{
-		var $tmp = ((beat.Start - this.Start()) * this.Spacing) / this.Length();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return ((beat.Start - this.Start()) * this.Spacing) / this.Length();
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.GetClefSpacing = function(layout) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::GetClefSpacing");
-	var $spos = $s.length;
-	{
-		var $tmp = this.HeaderImpl().GetClefSpacing(layout,this);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.HeaderImpl().GetClefSpacing(layout,this);
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.GetFirstNoteSpacing = function(layout) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::GetFirstNoteSpacing");
-	var $spos = $s.length;
-	{
-		var $tmp = this.HeaderImpl().GetFirstNoteSpacing(layout,this);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.HeaderImpl().GetFirstNoteSpacing(layout,this);
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.GetKeySignatureSpacing = function(layout) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::GetKeySignatureSpacing");
-	var $spos = $s.length;
-	{
-		var $tmp = this.HeaderImpl().GetKeySignatureSpacing(layout,this);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.HeaderImpl().GetKeySignatureSpacing(layout,this);
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.GetMaxQuarterSpacing = function() {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::GetMaxQuarterSpacing");
-	var $spos = $s.length;
-	{
-		var $tmp = this.QuarterSpacing;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.QuarterSpacing;
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.GetNoteAccidental = function(noteValue) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::GetNoteAccidental");
-	var $spos = $s.length;
 	if(noteValue >= 0 && noteValue < 128) {
 		var key = this.KeySignature();
 		var note = (noteValue % 12);
@@ -11266,127 +7412,57 @@ net.alphatab.tablature.model.GsMeasureImpl.prototype.GetNoteAccidental = functio
 		var isAccidentalKey = net.alphatab.tablature.model.GsMeasureImpl.KeySignatures[key][accidentalNotes[note]] == accidentalValue;
 		if(isAccidentalKey != isAccidentalNote && !this._registeredAccidentals[octave][accidentalNotes[note]]) {
 			this._registeredAccidentals[octave][accidentalNotes[note]] = true;
-			{
-				var $tmp = ((isAccidentalNote?accidentalValue:1));
-				$s.pop();
-				return $tmp;
-			}
+			return ((isAccidentalNote?accidentalValue:1));
 		}
 		if(isAccidentalKey == isAccidentalNote && this._registeredAccidentals[octave][accidentalNotes[note]]) {
 			this._registeredAccidentals[octave][accidentalNotes[note]] = false;
-			{
-				var $tmp = ((isAccidentalNote?accidentalValue:1));
-				$s.pop();
-				return $tmp;
-			}
+			return ((isAccidentalNote?accidentalValue:1));
 		}
 	}
-	{
-		$s.pop();
-		return 0;
-	}
-	$s.pop();
+	return 0;
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.GetTimeSignatureSymbol = function(number) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::GetTimeSignatureSymbol");
-	var $spos = $s.length;
 	switch(number) {
 	case 1:{
-		{
-			var $tmp = net.alphatab.tablature.drawing.MusicFont.Num1;
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.tablature.drawing.MusicFont.Num1;
 	}break;
 	case 2:{
-		{
-			var $tmp = net.alphatab.tablature.drawing.MusicFont.Num2;
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.tablature.drawing.MusicFont.Num2;
 	}break;
 	case 3:{
-		{
-			var $tmp = net.alphatab.tablature.drawing.MusicFont.Num3;
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.tablature.drawing.MusicFont.Num3;
 	}break;
 	case 4:{
-		{
-			var $tmp = net.alphatab.tablature.drawing.MusicFont.Num4;
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.tablature.drawing.MusicFont.Num4;
 	}break;
 	case 5:{
-		{
-			var $tmp = net.alphatab.tablature.drawing.MusicFont.Num5;
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.tablature.drawing.MusicFont.Num5;
 	}break;
 	case 6:{
-		{
-			var $tmp = net.alphatab.tablature.drawing.MusicFont.Num6;
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.tablature.drawing.MusicFont.Num6;
 	}break;
 	case 7:{
-		{
-			var $tmp = net.alphatab.tablature.drawing.MusicFont.Num7;
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.tablature.drawing.MusicFont.Num7;
 	}break;
 	case 8:{
-		{
-			var $tmp = net.alphatab.tablature.drawing.MusicFont.Num8;
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.tablature.drawing.MusicFont.Num8;
 	}break;
 	case 9:{
-		{
-			var $tmp = net.alphatab.tablature.drawing.MusicFont.Num9;
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.tablature.drawing.MusicFont.Num9;
 	}break;
 	}
-	{
-		$s.pop();
-		return null;
-	}
-	$s.pop();
+	return null;
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.HeaderImpl = function() {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::HeaderImpl");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Header;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Header;
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.Height = function() {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::Height");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Ts.GetSize();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Ts.GetSize();
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.IsFirstOfLine = null;
 net.alphatab.tablature.model.GsMeasureImpl.prototype.IsPaintClef = null;
 net.alphatab.tablature.model.GsMeasureImpl.prototype.LyricBeatIndex = null;
 net.alphatab.tablature.model.GsMeasureImpl.prototype.MakeBeat = function(layout,beat,previousBeat,chordEnabled) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::MakeBeat");
-	var $spos = $s.length;
 	var minimumWidth = -1;
 	var restBeat = true;
 	{
@@ -11410,7 +7486,7 @@ net.alphatab.tablature.model.GsMeasureImpl.prototype.MakeBeat = function(layout,
 	if(previousBeat != null) {
 		beat.PreviousBeat = (previousBeat);
 		previousBeat.NextBeat = (beat);
-		if(chordEnabled && beat.Chord != null && previousBeat.Chord != null) {
+		if(chordEnabled && beat.Effect.Chord != null && previousBeat.Effect.Chord != null) {
 			var previousWidth = previousBeat.MinimumWidth;
 			var chordWidth = Math.floor((layout.ChordFretIndexSpacing + layout.ChordStringSpacing) + (this.Track.StringCount() * layout.ChordStringSpacing));
 			previousBeat.MinimumWidth = Math.round((Math.max(chordWidth,previousWidth)));
@@ -11418,15 +7494,12 @@ net.alphatab.tablature.model.GsMeasureImpl.prototype.MakeBeat = function(layout,
 			this._widthBeats += previousBeat.MinimumWidth;
 		}
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.MaxY = null;
 net.alphatab.tablature.model.GsMeasureImpl.prototype.MinY = null;
 net.alphatab.tablature.model.GsMeasureImpl.prototype.NotEmptyBeats = null;
 net.alphatab.tablature.model.GsMeasureImpl.prototype.NotEmptyVoices = null;
 net.alphatab.tablature.model.GsMeasureImpl.prototype.PaintClef = function(layout,context,fromX,fromY) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::PaintClef");
-	var $spos = $s.length;
 	if(this.IsPaintClef) {
 		var x = fromX + Math.round(14 * layout.Scale);
 		var y = fromY + this.Ts.Get(net.alphatab.tablature.TrackSpacingPositions.ScoreMiddleLines);
@@ -11443,11 +7516,8 @@ net.alphatab.tablature.model.GsMeasureImpl.prototype.PaintClef = function(layout
 			net.alphatab.tablature.drawing.ClefPainter.PaintAlto(context,x,y,layout);
 		}
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.PaintComponents = function(layout,context,fromX,fromY) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::PaintComponents");
-	var $spos = $s.length;
 	var _g = 0, _g1 = this.Beats;
 	while(_g < _g1.length) {
 		var beat = _g1[_g];
@@ -11455,11 +7525,8 @@ net.alphatab.tablature.model.GsMeasureImpl.prototype.PaintComponents = function(
 		var impl = beat;
 		impl.Paint(layout,context,fromX + this.HeaderImpl().GetLeftSpacing(layout),fromY);
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.PaintDivisions = function(layout,context) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::PaintDivisions");
-	var $spos = $s.length;
 	var x1 = this.PosX;
 	var x2 = this.PosX + this.Width;
 	var offsetY = 0;
@@ -11473,11 +7540,8 @@ net.alphatab.tablature.model.GsMeasureImpl.prototype.PaintDivisions = function(l
 	y2 = Math.floor(y1 + ((this.Track.Strings.length - 1) * layout.StringSpacing));
 	offsetY = 0;
 	this.PaintDivisions2(layout,context,x1,y1,x2,y2,offsetY,false);
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.PaintDivisions2 = function(layout,context,x1,y1,x2,y2,offsetY,addInfo) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::PaintDivisions2");
-	var $spos = $s.length;
 	var scale = layout.Scale;
 	var lineWidthSmall = 1;
 	var lineWidthBig = Math.floor(Math.max(lineWidthSmall,Math.round(3.0 * scale)));
@@ -11534,11 +7598,8 @@ net.alphatab.tablature.model.GsMeasureImpl.prototype.PaintDivisions2 = function(
 		draw.MoveTo(x2 + this.Spacing,y1);
 		draw.LineTo(x2 + this.Spacing,y2);
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.PaintKeySignature = function(layout,context,fromX,fromY) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::PaintKeySignature");
-	var $spos = $s.length;
 	if(this.HeaderImpl().ShouldPaintKeySignature) {
 		var scale = layout.ScoreLineSpacing;
 		var x = (fromX + this.GetClefSpacing(layout)) + 10;
@@ -11608,21 +7669,15 @@ net.alphatab.tablature.model.GsMeasureImpl.prototype.PaintKeySignature = functio
 			}
 		}
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.PaintMarker = function(context,layout) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::PaintMarker");
-	var $spos = $s.length;
 	if(this.HasMarker()) {
 		var x = ((this.PosX + this.HeaderImpl().GetLeftSpacing(layout)) + this.GetFirstNoteSpacing(layout));
 		var y = (this.PosY + this.Ts.Get(net.alphatab.tablature.TrackSpacingPositions.Marker));
 		context.Get(net.alphatab.tablature.drawing.DrawingLayers.Voice1).AddString(this.GetMarker().Title,net.alphatab.tablature.drawing.DrawingResources.DefaultFont,x,y);
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.PaintMeasure = function(layout,context) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::PaintMeasure");
-	var $spos = $s.length;
 	var x = this.PosX;
 	var y = this.PosY;
 	layout.PaintLines(this.TrackImpl(),this.Ts,context,x,y,this.Width + this.Spacing);
@@ -11636,11 +7691,8 @@ net.alphatab.tablature.model.GsMeasureImpl.prototype.PaintMeasure = function(lay
 	this.PaintTripletFeel(context,layout);
 	this.PaintDivisions(layout,context);
 	this.PaintRepeatEnding(layout,context);
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.PaintRepeatEnding = function(layout,context) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::PaintRepeatEnding");
-	var $spos = $s.length;
 	if(this.Header.RepeatAlternative > 0) {
 		var scale = layout.Scale;
 		var x1 = ((this.PosX + this.HeaderImpl().GetLeftSpacing(layout)) + this.GetFirstNoteSpacing(layout));
@@ -11662,13 +7714,10 @@ net.alphatab.tablature.model.GsMeasureImpl.prototype.PaintRepeatEnding = functio
 		layer.MoveTo(x1,y2);
 		layer.LineTo(x1,y1);
 		layer.LineTo(x2,y1);
-		context.Get(net.alphatab.tablature.drawing.DrawingLayers.MainComponents).AddString(sText,net.alphatab.tablature.drawing.DrawingResources.DefaultFont,Math.round(x1 + (5.0 * scale)),Math.round(y1 + (2.0 * scale)));
+		context.Get(net.alphatab.tablature.drawing.DrawingLayers.MainComponents).AddString(sText,net.alphatab.tablature.drawing.DrawingResources.DefaultFont,Math.round(x1 + (5.0 * scale)),Math.round(y1 + net.alphatab.tablature.drawing.DrawingResources.DefaultFontHeight));
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.PaintTempo = function(context,layout) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::PaintTempo");
-	var $spos = $s.length;
 	if(this.HeaderImpl().ShouldPaintTempo) {
 		var scale = 5.0 * layout.Scale;
 		var x = (this.PosX + this.HeaderImpl().GetLeftSpacing(layout));
@@ -11683,11 +7732,8 @@ net.alphatab.tablature.model.GsMeasureImpl.prototype.PaintTempo = function(conte
 		var fontY = Math.round((y - net.alphatab.tablature.drawing.DrawingResources.DefaultFontHeight) - (layout.Scale));
 		context.Get(net.alphatab.tablature.drawing.DrawingLayers.MainComponents).AddString(value,net.alphatab.tablature.drawing.DrawingResources.DefaultFont,fontX,fontY);
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.PaintTexts = function(layout,context) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::PaintTexts");
-	var $spos = $s.length;
 	var _g = 0, _g1 = this.Beats;
 	while(_g < _g1.length) {
 		var beat = _g1[_g];
@@ -11697,11 +7743,8 @@ net.alphatab.tablature.model.GsMeasureImpl.prototype.PaintTexts = function(layou
 			text.Paint(layout,context,(this.PosX + this.HeaderImpl().GetLeftSpacing(layout)),this.PosY);
 		}
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.PaintTimeSignature = function(context,layout,fromX,fromY) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::PaintTimeSignature");
-	var $spos = $s.length;
 	if(this.HeaderImpl().ShouldPaintTimeSignature) {
 		var scale = layout.Scale;
 		var leftSpacing = Math.round(5.0 * scale);
@@ -11720,11 +7763,8 @@ net.alphatab.tablature.model.GsMeasureImpl.prototype.PaintTimeSignature = functi
 			context.Get(net.alphatab.tablature.drawing.DrawingLayers.MainComponents).AddMusicSymbol(symbol,fromX + x,y + y2,scale);
 		}
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.PaintTripletFeel = function(context,layout) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::PaintTripletFeel");
-	var $spos = $s.length;
 	if(this.HeaderImpl().ShouldPaintTripletFeel) {
 		var lineSpacing = Math.floor(Math.max(layout.ScoreLineSpacing,layout.StringSpacing));
 		var scale = (5.0 * layout.Scale);
@@ -11747,14 +7787,11 @@ net.alphatab.tablature.model.GsMeasureImpl.prototype.PaintTripletFeel = function
 			net.alphatab.tablature.drawing.TripletFeelPainter.PaintTripletFeel16(context,x,y1,layout.Scale);
 		}
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.PosX = null;
 net.alphatab.tablature.model.GsMeasureImpl.prototype.PosY = null;
 net.alphatab.tablature.model.GsMeasureImpl.prototype.QuarterSpacing = null;
 net.alphatab.tablature.model.GsMeasureImpl.prototype.RegisterSpacing = function(layout,spacing) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::RegisterSpacing");
-	var $spos = $s.length;
 	if(this.HasMarker()) {
 		spacing.Set(net.alphatab.tablature.TrackSpacingPositions.Marker,layout.MarkerSpacing);
 	}
@@ -11797,11 +7834,13 @@ net.alphatab.tablature.model.GsMeasureImpl.prototype.RegisterSpacing = function(
 	if(this._bend) {
 		spacing.Set(net.alphatab.tablature.TrackSpacingPositions.Bend,this._bendOverFlow);
 	}
-	$s.pop();
+	if(this._tremoloBar) {
+		if(this._tremoloBarOverFlow < 0) {
+			spacing.Set(net.alphatab.tablature.TrackSpacingPositions.TremoloBarDown,Math.round(Math.abs(this._tremoloBarOverFlow)));
+		}
+	}
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.ResetSpacing = function() {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::ResetSpacing");
-	var $spos = $s.length;
 	this._text = false;
 	this._chord = false;
 	this._tupleto = false;
@@ -11813,29 +7852,17 @@ net.alphatab.tablature.model.GsMeasureImpl.prototype.ResetSpacing = function() {
 	this._vibrato = false;
 	this._beatVibrato = false;
 	this._letRing = false;
-	$s.pop();
+	this._tremoloBar = false;
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.Spacing = null;
 net.alphatab.tablature.model.GsMeasureImpl.prototype.TrackImpl = function() {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::TrackImpl");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Track;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Track;
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.Ts = null;
 net.alphatab.tablature.model.GsMeasureImpl.prototype.Update = function(layout) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::Update");
-	var $spos = $s.length;
 	this.UpdateComponents(layout);
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.UpdateComponents = function(layout) {
-	$s.push("net.alphatab.tablature.model.GsMeasureImpl::UpdateComponents");
-	var $spos = $s.length;
 	this.MaxY = 0;
 	this.MinY = 0;
 	var spacing = this.GetFirstNoteSpacing(layout);
@@ -11876,7 +7903,7 @@ net.alphatab.tablature.model.GsMeasureImpl.prototype.UpdateComponents = function
 					}
 				}
 			}
-			if(!this._chord && beat.Chord != null) {
+			if(!this._chord && beat.Effect.Chord != null) {
 				this._chord = true;
 			}
 			if(!this._text && beat.Text != null) {
@@ -11900,7 +7927,6 @@ net.alphatab.tablature.model.GsMeasureImpl.prototype.UpdateComponents = function
 			}
 		}
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsMeasureImpl.prototype.Width = null;
 net.alphatab.tablature.model.GsMeasureImpl.prototype._accentuated = null;
@@ -11916,154 +7942,68 @@ net.alphatab.tablature.model.GsMeasureImpl.prototype._previousMeasure = null;
 net.alphatab.tablature.model.GsMeasureImpl.prototype._registeredAccidentals = null;
 net.alphatab.tablature.model.GsMeasureImpl.prototype._tapping = null;
 net.alphatab.tablature.model.GsMeasureImpl.prototype._text = null;
+net.alphatab.tablature.model.GsMeasureImpl.prototype._tremoloBar = null;
+net.alphatab.tablature.model.GsMeasureImpl.prototype._tremoloBarOverFlow = null;
 net.alphatab.tablature.model.GsMeasureImpl.prototype._tupleto = null;
 net.alphatab.tablature.model.GsMeasureImpl.prototype._vibrato = null;
 net.alphatab.tablature.model.GsMeasureImpl.prototype._voiceGroups = null;
 net.alphatab.tablature.model.GsMeasureImpl.prototype._widthBeats = null;
 net.alphatab.tablature.model.GsMeasureImpl.prototype.__class__ = net.alphatab.tablature.model.GsMeasureImpl;
 net.alphatab.tablature.model.GsSongFactoryImpl = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.tablature.model.GsSongFactoryImpl::new");
-	var $spos = $s.length;
 	net.alphatab.model.GsSongFactory.apply(this,[]);
-	$s.pop();
 }}
 net.alphatab.tablature.model.GsSongFactoryImpl.__name__ = ["net","alphatab","tablature","model","GsSongFactoryImpl"];
 net.alphatab.tablature.model.GsSongFactoryImpl.__super__ = net.alphatab.model.GsSongFactory;
 for(var k in net.alphatab.model.GsSongFactory.prototype ) net.alphatab.tablature.model.GsSongFactoryImpl.prototype[k] = net.alphatab.model.GsSongFactory.prototype[k];
 net.alphatab.tablature.model.GsSongFactoryImpl.prototype.NewBeat = function() {
-	$s.push("net.alphatab.tablature.model.GsSongFactoryImpl::NewBeat");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.tablature.model.GsBeatImpl(this);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.tablature.model.GsBeatImpl(this);
 }
 net.alphatab.tablature.model.GsSongFactoryImpl.prototype.NewChord = function(length) {
-	$s.push("net.alphatab.tablature.model.GsSongFactoryImpl::NewChord");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.tablature.model.GsChordImpl(length);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.tablature.model.GsChordImpl(length);
 }
 net.alphatab.tablature.model.GsSongFactoryImpl.prototype.NewLyrics = function() {
-	$s.push("net.alphatab.tablature.model.GsSongFactoryImpl::NewLyrics");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.tablature.model.GsLyricsImpl();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.tablature.model.GsLyricsImpl();
 }
 net.alphatab.tablature.model.GsSongFactoryImpl.prototype.NewMeasure = function(header) {
-	$s.push("net.alphatab.tablature.model.GsSongFactoryImpl::NewMeasure");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.tablature.model.GsMeasureImpl(header);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.tablature.model.GsMeasureImpl(header);
 }
 net.alphatab.tablature.model.GsSongFactoryImpl.prototype.NewMeasureHeader = function() {
-	$s.push("net.alphatab.tablature.model.GsSongFactoryImpl::NewMeasureHeader");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.tablature.model.GsMeasureHeaderImpl(this);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.tablature.model.GsMeasureHeaderImpl(this);
 }
 net.alphatab.tablature.model.GsSongFactoryImpl.prototype.NewNote = function() {
-	$s.push("net.alphatab.tablature.model.GsSongFactoryImpl::NewNote");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.tablature.model.GsNoteImpl(this);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.tablature.model.GsNoteImpl(this);
 }
 net.alphatab.tablature.model.GsSongFactoryImpl.prototype.NewText = function() {
-	$s.push("net.alphatab.tablature.model.GsSongFactoryImpl::NewText");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.tablature.model.GsBeatTextImpl();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.tablature.model.GsBeatTextImpl();
 }
 net.alphatab.tablature.model.GsSongFactoryImpl.prototype.NewTrack = function() {
-	$s.push("net.alphatab.tablature.model.GsSongFactoryImpl::NewTrack");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.tablature.model.GsTrackImpl(this);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.tablature.model.GsTrackImpl(this);
 }
 net.alphatab.tablature.model.GsSongFactoryImpl.prototype.NewVoice = function(index) {
-	$s.push("net.alphatab.tablature.model.GsSongFactoryImpl::NewVoice");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.tablature.model.GsVoiceImpl(this,index);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.tablature.model.GsVoiceImpl(this,index);
 }
 net.alphatab.tablature.model.GsSongFactoryImpl.prototype.__class__ = net.alphatab.tablature.model.GsSongFactoryImpl;
 StringBuf = function(p) { if( p === $_ ) return; {
-	$s.push("StringBuf::new");
-	var $spos = $s.length;
 	this.b = new Array();
-	$s.pop();
 }}
 StringBuf.__name__ = ["StringBuf"];
 StringBuf.prototype.add = function(x) {
-	$s.push("StringBuf::add");
-	var $spos = $s.length;
 	this.b[this.b.length] = x;
-	$s.pop();
 }
 StringBuf.prototype.addChar = function(c) {
-	$s.push("StringBuf::addChar");
-	var $spos = $s.length;
 	this.b[this.b.length] = String.fromCharCode(c);
-	$s.pop();
 }
 StringBuf.prototype.addSub = function(s,pos,len) {
-	$s.push("StringBuf::addSub");
-	var $spos = $s.length;
 	this.b[this.b.length] = s.substr(pos,len);
-	$s.pop();
 }
 StringBuf.prototype.b = null;
 StringBuf.prototype.toString = function() {
-	$s.push("StringBuf::toString");
-	var $spos = $s.length;
-	{
-		var $tmp = this.b.join("");
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.b.join("");
 }
 StringBuf.prototype.__class__ = StringBuf;
 net.alphatab.midi.BeatData = function(start,duration) { if( start === $_ ) return; {
-	$s.push("net.alphatab.midi.BeatData::new");
-	var $spos = $s.length;
 	this.Start = start;
 	this.Duration = duration;
-	$s.pop();
 }}
 net.alphatab.midi.BeatData.__name__ = ["net","alphatab","midi","BeatData"];
 net.alphatab.midi.BeatData.prototype.Duration = null;
@@ -12072,101 +8012,57 @@ net.alphatab.midi.BeatData.prototype.__class__ = net.alphatab.midi.BeatData;
 haxe.Log = function() { }
 haxe.Log.__name__ = ["haxe","Log"];
 haxe.Log.trace = function(v,infos) {
-	$s.push("haxe.Log::trace");
-	var $spos = $s.length;
 	js.Boot.__trace(v,infos);
-	$s.pop();
 }
 haxe.Log.clear = function() {
-	$s.push("haxe.Log::clear");
-	var $spos = $s.length;
 	js.Boot.__clear_trace();
-	$s.pop();
 }
 haxe.Log.prototype.__class__ = haxe.Log;
 net.alphatab.model.GsBeatText = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.model.GsBeatText::new");
-	var $spos = $s.length;
 	null;
-	$s.pop();
 }}
 net.alphatab.model.GsBeatText.__name__ = ["net","alphatab","model","GsBeatText"];
 net.alphatab.model.GsBeatText.prototype.Beat = null;
 net.alphatab.model.GsBeatText.prototype.Value = null;
 net.alphatab.model.GsBeatText.prototype.__class__ = net.alphatab.model.GsBeatText;
 net.alphatab.model.GsVelocities = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.model.GsVelocities::new");
-	var $spos = $s.length;
 	null;
-	$s.pop();
 }}
 net.alphatab.model.GsVelocities.__name__ = ["net","alphatab","model","GsVelocities"];
 net.alphatab.model.GsVelocities.prototype.__class__ = net.alphatab.model.GsVelocities;
 net.alphatab.model.GsTempo = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.model.GsTempo::new");
-	var $spos = $s.length;
 	this.Value = 120;
-	$s.pop();
 }}
 net.alphatab.model.GsTempo.__name__ = ["net","alphatab","model","GsTempo"];
 net.alphatab.model.GsTempo.TempoToUsq = function(tempo) {
-	$s.push("net.alphatab.model.GsTempo::TempoToUsq");
-	var $spos = $s.length;
-	{
-		var $tmp = Math.floor(((60.00 / tempo) * 1000) * 1000.00);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return Math.floor(((60.00 / tempo) * 1000) * 1000.00);
 }
 net.alphatab.model.GsTempo.prototype.Copy = function(tempo) {
-	$s.push("net.alphatab.model.GsTempo::Copy");
-	var $spos = $s.length;
 	this.Value = tempo.Value;
-	$s.pop();
 }
 net.alphatab.model.GsTempo.prototype.InUsq = function() {
-	$s.push("net.alphatab.model.GsTempo::InUsq");
-	var $spos = $s.length;
-	{
-		var $tmp = net.alphatab.model.GsTempo.TempoToUsq(this.Value);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return net.alphatab.model.GsTempo.TempoToUsq(this.Value);
 }
 net.alphatab.model.GsTempo.prototype.Value = null;
 net.alphatab.model.GsTempo.prototype.__class__ = net.alphatab.model.GsTempo;
 haxe.Serializer = function(p) { if( p === $_ ) return; {
-	$s.push("haxe.Serializer::new");
-	var $spos = $s.length;
 	this.buf = new StringBuf();
 	this.cache = new Array();
 	this.useCache = haxe.Serializer.USE_CACHE;
 	this.useEnumIndex = haxe.Serializer.USE_ENUM_INDEX;
 	this.shash = new Hash();
 	this.scount = 0;
-	$s.pop();
 }}
 haxe.Serializer.__name__ = ["haxe","Serializer"];
 haxe.Serializer.run = function(v) {
-	$s.push("haxe.Serializer::run");
-	var $spos = $s.length;
 	var s = new haxe.Serializer();
 	s.serialize(v);
-	{
-		var $tmp = s.toString();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return s.toString();
 }
 haxe.Serializer.prototype.buf = null;
 haxe.Serializer.prototype.cache = null;
 haxe.Serializer.prototype.scount = null;
 haxe.Serializer.prototype.serialize = function(v) {
-	$s.push("haxe.Serializer::serialize");
-	var $spos = $s.length;
 	var $e = (Type["typeof"](v));
 	switch( $e[1] ) {
 	case 0:
@@ -12177,10 +8073,7 @@ haxe.Serializer.prototype.serialize = function(v) {
 	{
 		if(v == 0) {
 			this.buf.add("z");
-			{
-				$s.pop();
-				return;
-			}
+			return;
 		}
 		this.buf.add("i");
 		this.buf.add(v);
@@ -12203,15 +8096,9 @@ haxe.Serializer.prototype.serialize = function(v) {
 	{
 		if(c == String) {
 			this.serializeString(v);
-			{
-				$s.pop();
-				return;
-			}
-		}
-		if(this.useCache && this.serializeRef(v)) {
-			$s.pop();
 			return;
 		}
+		if(this.useCache && this.serializeRef(v)) return;
 		switch(c) {
 		case Array:{
 			var ucount = 0;
@@ -12320,20 +8207,14 @@ haxe.Serializer.prototype.serialize = function(v) {
 	}break;
 	case 4:
 	{
-		if(this.useCache && this.serializeRef(v)) {
-			$s.pop();
-			return;
-		}
+		if(this.useCache && this.serializeRef(v)) return;
 		this.buf.add("o");
 		this.serializeFields(v);
 	}break;
 	case 7:
 	var e = $e[2];
 	{
-		if(this.useCache && this.serializeRef(v)) {
-			$s.pop();
-			return;
-		}
+		if(this.useCache && this.serializeRef(v)) return;
 		this.cache.pop();
 		this.buf.add((this.useEnumIndex?"j":"w"));
 		this.serializeString(Type.getEnumName(e));
@@ -12362,18 +8243,12 @@ haxe.Serializer.prototype.serialize = function(v) {
 		throw "Cannot serialize " + Std.string(v);
 	}break;
 	}
-	$s.pop();
 }
 haxe.Serializer.prototype.serializeException = function(e) {
-	$s.push("haxe.Serializer::serializeException");
-	var $spos = $s.length;
 	this.buf.add("x");
 	this.serialize(e);
-	$s.pop();
 }
 haxe.Serializer.prototype.serializeFields = function(v) {
-	$s.push("haxe.Serializer::serializeFields");
-	var $spos = $s.length;
 	{
 		var _g = 0, _g1 = Reflect.fields(v);
 		while(_g < _g1.length) {
@@ -12384,11 +8259,8 @@ haxe.Serializer.prototype.serializeFields = function(v) {
 		}
 	}
 	this.buf.add("g");
-	$s.pop();
 }
 haxe.Serializer.prototype.serializeRef = function(v) {
-	$s.push("haxe.Serializer::serializeRef");
-	var $spos = $s.length;
 	var vt = typeof(v);
 	{
 		var _g1 = 0, _g = this.cache.length;
@@ -12398,31 +8270,19 @@ haxe.Serializer.prototype.serializeRef = function(v) {
 			if(typeof(ci) == vt && ci == v) {
 				this.buf.add("r");
 				this.buf.add(i);
-				{
-					$s.pop();
-					return true;
-				}
+				return true;
 			}
 		}
 	}
 	this.cache.push(v);
-	{
-		$s.pop();
-		return false;
-	}
-	$s.pop();
+	return false;
 }
 haxe.Serializer.prototype.serializeString = function(s) {
-	$s.push("haxe.Serializer::serializeString");
-	var $spos = $s.length;
 	var x = this.shash.get(s);
 	if(x != null) {
 		this.buf.add("R");
 		this.buf.add(x);
-		{
-			$s.pop();
-			return;
-		}
+		return;
 	}
 	this.shash.set(s,this.scount++);
 	this.buf.add("y");
@@ -12430,36 +8290,28 @@ haxe.Serializer.prototype.serializeString = function(s) {
 	this.buf.add(s.length);
 	this.buf.add(":");
 	this.buf.add(s);
-	$s.pop();
 }
 haxe.Serializer.prototype.shash = null;
 haxe.Serializer.prototype.toString = function() {
-	$s.push("haxe.Serializer::toString");
-	var $spos = $s.length;
-	{
-		var $tmp = this.buf.b.join("");
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.buf.b.join("");
 }
 haxe.Serializer.prototype.useCache = null;
 haxe.Serializer.prototype.useEnumIndex = null;
 haxe.Serializer.prototype.__class__ = haxe.Serializer;
-net.alphatab.file.alphatab.AlphaTabSymbols = { __ename__ : ["net","alphatab","file","alphatab","AlphaTabSymbols"], __constructs__ : ["No","Eof","Number","Dot","Version","String","Tuning","LParensis","RParensis","Pipe","Backslash","MetaCommand"] }
-net.alphatab.file.alphatab.AlphaTabSymbols.Backslash = ["Backslash",10];
-net.alphatab.file.alphatab.AlphaTabSymbols.Backslash.toString = $estr;
-net.alphatab.file.alphatab.AlphaTabSymbols.Backslash.__enum__ = net.alphatab.file.alphatab.AlphaTabSymbols;
+net.alphatab.file.alphatab.AlphaTabSymbols = { __ename__ : ["net","alphatab","file","alphatab","AlphaTabSymbols"], __constructs__ : ["No","Eof","Number","Dot","Version","String","Tuning","LParensis","RParensis","LBrace","RBrace","Pipe","MetaCommand"] }
 net.alphatab.file.alphatab.AlphaTabSymbols.Dot = ["Dot",3];
 net.alphatab.file.alphatab.AlphaTabSymbols.Dot.toString = $estr;
 net.alphatab.file.alphatab.AlphaTabSymbols.Dot.__enum__ = net.alphatab.file.alphatab.AlphaTabSymbols;
 net.alphatab.file.alphatab.AlphaTabSymbols.Eof = ["Eof",1];
 net.alphatab.file.alphatab.AlphaTabSymbols.Eof.toString = $estr;
 net.alphatab.file.alphatab.AlphaTabSymbols.Eof.__enum__ = net.alphatab.file.alphatab.AlphaTabSymbols;
+net.alphatab.file.alphatab.AlphaTabSymbols.LBrace = ["LBrace",9];
+net.alphatab.file.alphatab.AlphaTabSymbols.LBrace.toString = $estr;
+net.alphatab.file.alphatab.AlphaTabSymbols.LBrace.__enum__ = net.alphatab.file.alphatab.AlphaTabSymbols;
 net.alphatab.file.alphatab.AlphaTabSymbols.LParensis = ["LParensis",7];
 net.alphatab.file.alphatab.AlphaTabSymbols.LParensis.toString = $estr;
 net.alphatab.file.alphatab.AlphaTabSymbols.LParensis.__enum__ = net.alphatab.file.alphatab.AlphaTabSymbols;
-net.alphatab.file.alphatab.AlphaTabSymbols.MetaCommand = ["MetaCommand",11];
+net.alphatab.file.alphatab.AlphaTabSymbols.MetaCommand = ["MetaCommand",12];
 net.alphatab.file.alphatab.AlphaTabSymbols.MetaCommand.toString = $estr;
 net.alphatab.file.alphatab.AlphaTabSymbols.MetaCommand.__enum__ = net.alphatab.file.alphatab.AlphaTabSymbols;
 net.alphatab.file.alphatab.AlphaTabSymbols.No = ["No",0];
@@ -12468,9 +8320,12 @@ net.alphatab.file.alphatab.AlphaTabSymbols.No.__enum__ = net.alphatab.file.alpha
 net.alphatab.file.alphatab.AlphaTabSymbols.Number = ["Number",2];
 net.alphatab.file.alphatab.AlphaTabSymbols.Number.toString = $estr;
 net.alphatab.file.alphatab.AlphaTabSymbols.Number.__enum__ = net.alphatab.file.alphatab.AlphaTabSymbols;
-net.alphatab.file.alphatab.AlphaTabSymbols.Pipe = ["Pipe",9];
+net.alphatab.file.alphatab.AlphaTabSymbols.Pipe = ["Pipe",11];
 net.alphatab.file.alphatab.AlphaTabSymbols.Pipe.toString = $estr;
 net.alphatab.file.alphatab.AlphaTabSymbols.Pipe.__enum__ = net.alphatab.file.alphatab.AlphaTabSymbols;
+net.alphatab.file.alphatab.AlphaTabSymbols.RBrace = ["RBrace",10];
+net.alphatab.file.alphatab.AlphaTabSymbols.RBrace.toString = $estr;
+net.alphatab.file.alphatab.AlphaTabSymbols.RBrace.__enum__ = net.alphatab.file.alphatab.AlphaTabSymbols;
 net.alphatab.file.alphatab.AlphaTabSymbols.RParensis = ["RParensis",8];
 net.alphatab.file.alphatab.AlphaTabSymbols.RParensis.toString = $estr;
 net.alphatab.file.alphatab.AlphaTabSymbols.RParensis.__enum__ = net.alphatab.file.alphatab.AlphaTabSymbols;
@@ -12493,16 +8348,11 @@ haxe._Template.TemplateExpr.OpMacro = function(name,params) { var $x = ["OpMacro
 haxe._Template.TemplateExpr.OpStr = function(str) { var $x = ["OpStr",3,str]; $x.__enum__ = haxe._Template.TemplateExpr; $x.toString = $estr; return $x; }
 haxe._Template.TemplateExpr.OpVar = function(v) { var $x = ["OpVar",0,v]; $x.__enum__ = haxe._Template.TemplateExpr; $x.toString = $estr; return $x; }
 EReg = function(r,opt) { if( r === $_ ) return; {
-	$s.push("EReg::new");
-	var $spos = $s.length;
 	opt = opt.split("u").join("");
 	this.r = new RegExp(r,opt);
-	$s.pop();
 }}
 EReg.__name__ = ["EReg"];
 EReg.prototype.customReplace = function(s,f) {
-	$s.push("EReg::customReplace");
-	var $spos = $s.length;
 	var buf = new StringBuf();
 	while(true) {
 		if(!this.match(s)) break;
@@ -12511,481 +8361,215 @@ EReg.prototype.customReplace = function(s,f) {
 		s = this.matchedRight();
 	}
 	buf.b[buf.b.length] = s;
-	{
-		var $tmp = buf.b.join("");
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return buf.b.join("");
 }
 EReg.prototype.match = function(s) {
-	$s.push("EReg::match");
-	var $spos = $s.length;
 	this.r.m = this.r.exec(s);
 	this.r.s = s;
 	this.r.l = RegExp.leftContext;
 	this.r.r = RegExp.rightContext;
-	{
-		var $tmp = (this.r.m != null);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (this.r.m != null);
 }
 EReg.prototype.matched = function(n) {
-	$s.push("EReg::matched");
-	var $spos = $s.length;
-	{
-		var $tmp = (this.r.m != null && n >= 0 && n < this.r.m.length?this.r.m[n]:(function($this) {
-			var $r;
-			throw "EReg::matched";
-			return $r;
-		}(this)));
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (this.r.m != null && n >= 0 && n < this.r.m.length?this.r.m[n]:(function($this) {
+		var $r;
+		throw "EReg::matched";
+		return $r;
+	}(this)));
 }
 EReg.prototype.matchedLeft = function() {
-	$s.push("EReg::matchedLeft");
-	var $spos = $s.length;
 	if(this.r.m == null) throw "No string matched";
-	if(this.r.l == null) {
-		var $tmp = this.r.s.substr(0,this.r.m.index);
-		$s.pop();
-		return $tmp;
-	}
-	{
-		var $tmp = this.r.l;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	if(this.r.l == null) return this.r.s.substr(0,this.r.m.index);
+	return this.r.l;
 }
 EReg.prototype.matchedPos = function() {
-	$s.push("EReg::matchedPos");
-	var $spos = $s.length;
 	if(this.r.m == null) throw "No string matched";
-	{
-		var $tmp = { pos : this.r.m.index, len : this.r.m[0].length}
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return { pos : this.r.m.index, len : this.r.m[0].length}
 }
 EReg.prototype.matchedRight = function() {
-	$s.push("EReg::matchedRight");
-	var $spos = $s.length;
 	if(this.r.m == null) throw "No string matched";
 	if(this.r.r == null) {
 		var sz = this.r.m.index + this.r.m[0].length;
-		{
-			var $tmp = this.r.s.substr(sz,this.r.s.length - sz);
-			$s.pop();
-			return $tmp;
-		}
+		return this.r.s.substr(sz,this.r.s.length - sz);
 	}
-	{
-		var $tmp = this.r.r;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.r.r;
 }
 EReg.prototype.r = null;
 EReg.prototype.replace = function(s,by) {
-	$s.push("EReg::replace");
-	var $spos = $s.length;
-	{
-		var $tmp = s.replace(this.r,by);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return s.replace(this.r,by);
 }
 EReg.prototype.split = function(s) {
-	$s.push("EReg::split");
-	var $spos = $s.length;
 	var d = "#__delim__#";
-	{
-		var $tmp = s.replace(this.r,d).split(d);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return s.replace(this.r,d).split(d);
 }
 EReg.prototype.__class__ = EReg;
 haxe.Template = function(str) { if( str === $_ ) return; {
-	$s.push("haxe.Template::new");
-	var $spos = $s.length;
 	var tokens = this.parseTokens(str);
 	this.expr = this.parseBlock(tokens);
 	if(!tokens.isEmpty()) throw ("Unexpected '" + tokens.first().s) + "'";
-	$s.pop();
 }}
 haxe.Template.__name__ = ["haxe","Template"];
 haxe.Template.prototype.buf = null;
 haxe.Template.prototype.context = null;
 haxe.Template.prototype.execute = function(context,macros) {
-	$s.push("haxe.Template::execute");
-	var $spos = $s.length;
 	this.macros = (macros == null?{ }:macros);
 	this.context = context;
 	this.stack = new List();
 	this.buf = new StringBuf();
 	this.run(this.expr);
-	{
-		var $tmp = this.buf.b.join("");
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.buf.b.join("");
 }
 haxe.Template.prototype.expr = null;
 haxe.Template.prototype.macros = null;
 haxe.Template.prototype.makeConst = function(v) {
-	$s.push("haxe.Template::makeConst");
-	var $spos = $s.length;
 	haxe.Template.expr_trim.match(v);
 	v = haxe.Template.expr_trim.matched(1);
 	if(v.charCodeAt(0) == 34) {
 		var str = v.substr(1,v.length - 2);
-		{
-			var $tmp = function() {
-				$s.push("haxe.Template::makeConst@228");
-				var $spos = $s.length;
-				{
-					$s.pop();
-					return str;
-				}
-				$s.pop();
-			}
-			$s.pop();
-			return $tmp;
+		return function() {
+			return str;
 		}
 	}
 	if(haxe.Template.expr_int.match(v)) {
 		var i = Std.parseInt(v);
-		{
-			var $tmp = function() {
-				$s.push("haxe.Template::makeConst@232");
-				var $spos = $s.length;
-				{
-					$s.pop();
-					return i;
-				}
-				$s.pop();
-			}
-			$s.pop();
-			return $tmp;
+		return function() {
+			return i;
 		}
 	}
 	if(haxe.Template.expr_float.match(v)) {
 		var f = Std.parseFloat(v);
-		{
-			var $tmp = function() {
-				$s.push("haxe.Template::makeConst@236");
-				var $spos = $s.length;
-				{
-					$s.pop();
-					return f;
-				}
-				$s.pop();
-			}
-			$s.pop();
-			return $tmp;
+		return function() {
+			return f;
 		}
 	}
 	var me = this;
-	{
-		var $tmp = function() {
-			$s.push("haxe.Template::makeConst@239");
-			var $spos = $s.length;
-			{
-				var $tmp = me.resolve(v);
-				$s.pop();
-				return $tmp;
-			}
-			$s.pop();
-		}
-		$s.pop();
-		return $tmp;
+	return function() {
+		return me.resolve(v);
 	}
-	$s.pop();
 }
 haxe.Template.prototype.makeExpr = function(l) {
-	$s.push("haxe.Template::makeExpr");
-	var $spos = $s.length;
-	{
-		var $tmp = this.makePath(this.makeExpr2(l),l);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.makePath(this.makeExpr2(l),l);
 }
 haxe.Template.prototype.makeExpr2 = function(l) {
-	$s.push("haxe.Template::makeExpr2");
-	var $spos = $s.length;
 	var p = l.pop();
 	if(p == null) throw "<eof>";
-	if(p.s) {
-		var $tmp = this.makeConst(p.p);
-		$s.pop();
-		return $tmp;
-	}
+	if(p.s) return this.makeConst(p.p);
 	switch(p.p) {
 	case "(":{
 		var e1 = this.makeExpr(l);
 		var p1 = l.pop();
 		if(p1 == null || p1.s) throw p1.p;
-		if(p1.p == ")") {
-			$s.pop();
-			return e1;
-		}
+		if(p1.p == ")") return e1;
 		var e2 = this.makeExpr(l);
 		var p2 = l.pop();
 		if(p2 == null || p2.p != ")") throw p2.p;
-		{
-			var $tmp = (function($this) {
-				var $r;
-				switch(p1.p) {
-				case "+":{
-					$r = function() {
-						$s.push("haxe.Template::makeExpr2@279");
-						var $spos = $s.length;
-						{
-							var $tmp = e1() + e2();
-							$s.pop();
-							return $tmp;
-						}
-						$s.pop();
-					}
-				}break;
-				case "-":{
-					$r = function() {
-						$s.push("haxe.Template::makeExpr2@280");
-						var $spos = $s.length;
-						{
-							var $tmp = e1() - e2();
-							$s.pop();
-							return $tmp;
-						}
-						$s.pop();
-					}
-				}break;
-				case "*":{
-					$r = function() {
-						$s.push("haxe.Template::makeExpr2@281");
-						var $spos = $s.length;
-						{
-							var $tmp = e1() * e2();
-							$s.pop();
-							return $tmp;
-						}
-						$s.pop();
-					}
-				}break;
-				case "/":{
-					$r = function() {
-						$s.push("haxe.Template::makeExpr2@282");
-						var $spos = $s.length;
-						{
-							var $tmp = e1() / e2();
-							$s.pop();
-							return $tmp;
-						}
-						$s.pop();
-					}
-				}break;
-				case ">":{
-					$r = function() {
-						$s.push("haxe.Template::makeExpr2@283");
-						var $spos = $s.length;
-						{
-							var $tmp = e1() > e2();
-							$s.pop();
-							return $tmp;
-						}
-						$s.pop();
-					}
-				}break;
-				case "<":{
-					$r = function() {
-						$s.push("haxe.Template::makeExpr2@284");
-						var $spos = $s.length;
-						{
-							var $tmp = e1() < e2();
-							$s.pop();
-							return $tmp;
-						}
-						$s.pop();
-					}
-				}break;
-				case ">=":{
-					$r = function() {
-						$s.push("haxe.Template::makeExpr2@285");
-						var $spos = $s.length;
-						{
-							var $tmp = e1() >= e2();
-							$s.pop();
-							return $tmp;
-						}
-						$s.pop();
-					}
-				}break;
-				case "<=":{
-					$r = function() {
-						$s.push("haxe.Template::makeExpr2@286");
-						var $spos = $s.length;
-						{
-							var $tmp = e1() <= e2();
-							$s.pop();
-							return $tmp;
-						}
-						$s.pop();
-					}
-				}break;
-				case "==":{
-					$r = function() {
-						$s.push("haxe.Template::makeExpr2@287");
-						var $spos = $s.length;
-						{
-							var $tmp = e1() == e2();
-							$s.pop();
-							return $tmp;
-						}
-						$s.pop();
-					}
-				}break;
-				case "!=":{
-					$r = function() {
-						$s.push("haxe.Template::makeExpr2@288");
-						var $spos = $s.length;
-						{
-							var $tmp = e1() != e2();
-							$s.pop();
-							return $tmp;
-						}
-						$s.pop();
-					}
-				}break;
-				case "&&":{
-					$r = function() {
-						$s.push("haxe.Template::makeExpr2@289");
-						var $spos = $s.length;
-						{
-							var $tmp = e1() && e2();
-							$s.pop();
-							return $tmp;
-						}
-						$s.pop();
-					}
-				}break;
-				case "||":{
-					$r = function() {
-						$s.push("haxe.Template::makeExpr2@290");
-						var $spos = $s.length;
-						{
-							var $tmp = e1() || e2();
-							$s.pop();
-							return $tmp;
-						}
-						$s.pop();
-					}
-				}break;
-				default:{
-					$r = (function($this) {
-						var $r;
-						throw "Unknown operation " + p1.p;
-						return $r;
-					}($this));
-				}break;
+		return (function($this) {
+			var $r;
+			switch(p1.p) {
+			case "+":{
+				$r = function() {
+					return e1() + e2();
 				}
-				return $r;
-			}(this));
-			$s.pop();
-			return $tmp;
-		}
+			}break;
+			case "-":{
+				$r = function() {
+					return e1() - e2();
+				}
+			}break;
+			case "*":{
+				$r = function() {
+					return e1() * e2();
+				}
+			}break;
+			case "/":{
+				$r = function() {
+					return e1() / e2();
+				}
+			}break;
+			case ">":{
+				$r = function() {
+					return e1() > e2();
+				}
+			}break;
+			case "<":{
+				$r = function() {
+					return e1() < e2();
+				}
+			}break;
+			case ">=":{
+				$r = function() {
+					return e1() >= e2();
+				}
+			}break;
+			case "<=":{
+				$r = function() {
+					return e1() <= e2();
+				}
+			}break;
+			case "==":{
+				$r = function() {
+					return e1() == e2();
+				}
+			}break;
+			case "!=":{
+				$r = function() {
+					return e1() != e2();
+				}
+			}break;
+			case "&&":{
+				$r = function() {
+					return e1() && e2();
+				}
+			}break;
+			case "||":{
+				$r = function() {
+					return e1() || e2();
+				}
+			}break;
+			default:{
+				$r = (function($this) {
+					var $r;
+					throw "Unknown operation " + p1.p;
+					return $r;
+				}($this));
+			}break;
+			}
+			return $r;
+		}(this));
 	}break;
 	case "!":{
 		var e = this.makeExpr(l);
-		{
-			var $tmp = function() {
-				$s.push("haxe.Template::makeExpr2@295");
-				var $spos = $s.length;
-				var v = e();
-				{
-					var $tmp = (v == null || v == false);
-					$s.pop();
-					return $tmp;
-				}
-				$s.pop();
-			}
-			$s.pop();
-			return $tmp;
+		return function() {
+			var v = e();
+			return (v == null || v == false);
 		}
 	}break;
 	case "-":{
 		var e = this.makeExpr(l);
-		{
-			var $tmp = function() {
-				$s.push("haxe.Template::makeExpr2@301");
-				var $spos = $s.length;
-				{
-					var $tmp = -e();
-					$s.pop();
-					return $tmp;
-				}
-				$s.pop();
-			}
-			$s.pop();
-			return $tmp;
+		return function() {
+			return -e();
 		}
 	}break;
 	}
 	throw p.p;
-	$s.pop();
 }
 haxe.Template.prototype.makePath = function(e,l) {
-	$s.push("haxe.Template::makePath");
-	var $spos = $s.length;
 	var p = l.first();
-	if(p == null || p.p != ".") {
-		$s.pop();
-		return e;
-	}
+	if(p == null || p.p != ".") return e;
 	l.pop();
 	var field = l.pop();
 	if(field == null || !field.s) throw field.p;
 	var f = field.p;
 	haxe.Template.expr_trim.match(f);
 	f = haxe.Template.expr_trim.matched(1);
-	{
-		var $tmp = this.makePath(function() {
-			$s.push("haxe.Template::makePath@253");
-			var $spos = $s.length;
-			{
-				var $tmp = Reflect.field(e(),f);
-				$s.pop();
-				return $tmp;
-			}
-			$s.pop();
-		},l);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.makePath(function() {
+		return Reflect.field(e(),f);
+	},l);
 }
 haxe.Template.prototype.parse = function(tokens) {
-	$s.push("haxe.Template::parse");
-	var $spos = $s.length;
 	var t = tokens.pop();
 	var p = t.p;
-	if(t.s) {
-		var $tmp = haxe._Template.TemplateExpr.OpStr(p);
-		$s.pop();
-		return $tmp;
-	}
+	if(t.s) return haxe._Template.TemplateExpr.OpStr(p);
 	if(t.l != null) {
 		var pe = new List();
 		{
@@ -12996,11 +8580,7 @@ haxe.Template.prototype.parse = function(tokens) {
 				pe.add(this.parseBlock(this.parseTokens(p1)));
 			}
 		}
-		{
-			var $tmp = haxe._Template.TemplateExpr.OpMacro(p,pe);
-			$s.pop();
-			return $tmp;
-		}
+		return haxe._Template.TemplateExpr.OpMacro(p,pe);
 	}
 	if(p.substr(0,3) == "if ") {
 		p = p.substr(3,p.length - 3);
@@ -13023,11 +8603,7 @@ haxe.Template.prototype.parse = function(tokens) {
 			t1.p = t1.p.substr(4,t1.p.length - 4);
 			eelse = this.parse(tokens);
 		}
-		{
-			var $tmp = haxe._Template.TemplateExpr.OpIf(e,eif,eelse);
-			$s.pop();
-			return $tmp;
-		}
+		return haxe._Template.TemplateExpr.OpIf(e,eif,eelse);
 	}
 	if(p.substr(0,8) == "foreach ") {
 		p = p.substr(8,p.length - 8);
@@ -13035,27 +8611,12 @@ haxe.Template.prototype.parse = function(tokens) {
 		var efor = this.parseBlock(tokens);
 		var t1 = tokens.pop();
 		if(t1 == null || t1.p != "end") throw "Unclosed 'foreach'";
-		{
-			var $tmp = haxe._Template.TemplateExpr.OpForeach(e,efor);
-			$s.pop();
-			return $tmp;
-		}
+		return haxe._Template.TemplateExpr.OpForeach(e,efor);
 	}
-	if(haxe.Template.expr_splitter.match(p)) {
-		var $tmp = haxe._Template.TemplateExpr.OpExpr(this.parseExpr(p));
-		$s.pop();
-		return $tmp;
-	}
-	{
-		var $tmp = haxe._Template.TemplateExpr.OpVar(p);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	if(haxe.Template.expr_splitter.match(p)) return haxe._Template.TemplateExpr.OpExpr(this.parseExpr(p));
+	return haxe._Template.TemplateExpr.OpVar(p);
 }
 haxe.Template.prototype.parseBlock = function(tokens) {
-	$s.push("haxe.Template::parseBlock");
-	var $spos = $s.length;
 	var l = new List();
 	while(true) {
 		var t = tokens.first();
@@ -13063,21 +8624,10 @@ haxe.Template.prototype.parseBlock = function(tokens) {
 		if(!t.s && (t.p == "end" || t.p == "else" || t.p.substr(0,7) == "elseif ")) break;
 		l.add(this.parse(tokens));
 	}
-	if(l.length == 1) {
-		var $tmp = l.first();
-		$s.pop();
-		return $tmp;
-	}
-	{
-		var $tmp = haxe._Template.TemplateExpr.OpBlock(l);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	if(l.length == 1) return l.first();
+	return haxe._Template.TemplateExpr.OpBlock(l);
 }
 haxe.Template.prototype.parseExpr = function(data) {
-	$s.push("haxe.Template::parseExpr");
-	var $spos = $s.length;
 	var l = new List();
 	var expr = data;
 	while(haxe.Template.expr_splitter.match(data)) {
@@ -13098,45 +8648,25 @@ haxe.Template.prototype.parseExpr = function(data) {
 		if( js.Boot.__instanceof($e21,String) ) {
 			var s = $e21;
 			{
-				$e = [];
-				while($s.length >= $spos) $e.unshift($s.pop());
-				$s.push($e[0]);
 				throw (("Unexpected '" + s) + "' in ") + expr;
 			}
 		} else throw($e21);
 	}
-	{
-		var $tmp = function() {
-			$s.push("haxe.Template::parseExpr@214");
-			var $spos = $s.length;
-			try {
-				{
-					var $tmp = e();
-					$s.pop();
-					return $tmp;
-				}
-			}
-			catch( $e22 ) {
-				{
-					var exc = $e22;
-					{
-						$e = [];
-						while($s.length >= $spos) $e.unshift($s.pop());
-						$s.push($e[0]);
-						throw (("Error : " + Std.string(exc)) + " in ") + expr;
-					}
-				}
-			}
-			$s.pop();
+	return function() {
+		try {
+			return e();
 		}
-		$s.pop();
-		return $tmp;
+		catch( $e22 ) {
+			{
+				var exc = $e22;
+				{
+					throw (("Error : " + Std.string(exc)) + " in ") + expr;
+				}
+			}
+		}
 	}
-	$s.pop();
 }
 haxe.Template.prototype.parseTokens = function(data) {
-	$s.push("haxe.Template::parseTokens");
-	var $spos = $s.length;
 	var tokens = new List();
 	while(haxe.Template.splitter.match(data)) {
 		var p = haxe.Template.splitter.matchedPos();
@@ -13160,43 +8690,18 @@ haxe.Template.prototype.parseTokens = function(data) {
 		data = data.substr(parp,data.length - parp);
 	}
 	if(data.length > 0) tokens.add({ p : data, s : true, l : null});
-	{
-		$s.pop();
-		return tokens;
-	}
-	$s.pop();
+	return tokens;
 }
 haxe.Template.prototype.resolve = function(v) {
-	$s.push("haxe.Template::resolve");
-	var $spos = $s.length;
-	if(Reflect.hasField(this.context,v)) {
-		var $tmp = Reflect.field(this.context,v);
-		$s.pop();
-		return $tmp;
-	}
+	if(Reflect.hasField(this.context,v)) return Reflect.field(this.context,v);
 	{ var $it23 = this.stack.iterator();
 	while( $it23.hasNext() ) { var ctx = $it23.next();
-	if(Reflect.hasField(ctx,v)) {
-		var $tmp = Reflect.field(ctx,v);
-		$s.pop();
-		return $tmp;
-	}
+	if(Reflect.hasField(ctx,v)) return Reflect.field(ctx,v);
 	}}
-	if(v == "__current__") {
-		var $tmp = this.context;
-		$s.pop();
-		return $tmp;
-	}
-	{
-		var $tmp = Reflect.field(haxe.Template.globals,v);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	if(v == "__current__") return this.context;
+	return Reflect.field(haxe.Template.globals,v);
 }
 haxe.Template.prototype.run = function(e) {
-	$s.push("haxe.Template::run");
-	var $spos = $s.length;
 	var $e = (e);
 	switch( $e[1] ) {
 	case 0:
@@ -13246,9 +8751,6 @@ haxe.Template.prototype.run = function(e) {
 			{
 				var e2 = $e25;
 				{
-					$e = [];
-					while($s.length >= $spos) $e.unshift($s.pop());
-					$s.push($e[0]);
 					throw "Cannot iter on " + v;
 				}
 			}
@@ -13297,9 +8799,6 @@ haxe.Template.prototype.run = function(e) {
 			{
 				var e1 = $e28;
 				{
-					$e = [];
-					while($s.length >= $spos) $e.unshift($s.pop());
-					$s.push($e[0]);
 					var plstr = (function($this) {
 						var $r;
 						try {
@@ -13308,14 +8807,7 @@ haxe.Template.prototype.run = function(e) {
 						catch( $e29 ) {
 							{
 								var e2 = $e29;
-								$r = (function($this) {
-									var $r;
-									$e = [];
-									while($s.length >= $spos) $e.unshift($s.pop());
-									$s.push($e[0]);
-									$r = "???";
-									return $r;
-								}($this));
+								$r = "???";
 							}
 						}
 						return $r;
@@ -13327,34 +8819,23 @@ haxe.Template.prototype.run = function(e) {
 		}
 	}break;
 	}
-	$s.pop();
 }
 haxe.Template.prototype.stack = null;
 haxe.Template.prototype.__class__ = haxe.Template;
 net.alphatab.platform.js.JsFileLoader = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.platform.js.JsFileLoader::new");
-	var $spos = $s.length;
 	null;
-	$s.pop();
 }}
 net.alphatab.platform.js.JsFileLoader.__name__ = ["net","alphatab","platform","js","JsFileLoader"];
 net.alphatab.platform.js.JsFileLoader.prototype.LoadBinary = function(method,file,success,error) {
-	$s.push("net.alphatab.platform.js.JsFileLoader::LoadBinary");
-	var $spos = $s.length;
 	var options = { }
 	options.type = method;
 	options.url = file;
 	options.success = function(data) {
-		$s.push("net.alphatab.platform.js.JsFileLoader::LoadBinary@26");
-		var $spos = $s.length;
 		var reader = new net.alphatab.platform.BinaryReader();
 		reader.initialize(data);
 		success(reader);
-		$s.pop();
 	}
 	options.error = function(x,e) {
-		$s.push("net.alphatab.platform.js.JsFileLoader::LoadBinary@32");
-		var $spos = $s.length;
 		if(x.status == 0) {
 			error("You are offline!!\n Please Check Your Network.");
 		}
@@ -13373,28 +8854,20 @@ net.alphatab.platform.js.JsFileLoader.prototype.LoadBinary = function(method,fil
 		else {
 			error("Unknow Error.\n" + x.responseText);
 		}
-		$s.pop();
 	}
 	options.beforeSend = function(xhr) {
-		$s.push("net.alphatab.platform.js.JsFileLoader::LoadBinary@49");
-		var $spos = $s.length;
 		if(xhr.overrideMimeType) {
 			xhr.overrideMimeType("text/plain; charset=x-user-defined");
 		}
 		else null;
-		$s.pop();
 	}
 	jQuery.ajax(options);
-	$s.pop();
 }
 net.alphatab.platform.js.JsFileLoader.prototype.__class__ = net.alphatab.platform.js.JsFileLoader;
 net.alphatab.platform.js.JsFileLoader.__interfaces__ = [net.alphatab.platform.FileLoader];
 net.alphatab.model.PointF = function(x,y) { if( x === $_ ) return; {
-	$s.push("net.alphatab.model.PointF::new");
-	var $spos = $s.length;
 	this.X = x;
 	this.Y = y;
-	$s.pop();
 }}
 net.alphatab.model.PointF.__name__ = ["net","alphatab","model","PointF"];
 net.alphatab.model.PointF.prototype.X = null;
@@ -13411,10 +8884,7 @@ net.alphatab.model.GsVoiceDirection.Up = ["Up",1];
 net.alphatab.model.GsVoiceDirection.Up.toString = $estr;
 net.alphatab.model.GsVoiceDirection.Up.__enum__ = net.alphatab.model.GsVoiceDirection;
 net.alphatab.tablature.model.GsTrackImpl = function(factory) { if( factory === $_ ) return; {
-	$s.push("net.alphatab.tablature.model.GsTrackImpl::new");
-	var $spos = $s.length;
 	net.alphatab.model.GsTrack.apply(this,[factory]);
-	$s.pop();
 }}
 net.alphatab.tablature.model.GsTrackImpl.__name__ = ["net","alphatab","tablature","model","GsTrackImpl"];
 net.alphatab.tablature.model.GsTrackImpl.__super__ = net.alphatab.model.GsTrack;
@@ -13423,18 +8893,12 @@ net.alphatab.tablature.model.GsTrackImpl.prototype.PreviousBeat = null;
 net.alphatab.tablature.model.GsTrackImpl.prototype.ScoreHeight = null;
 net.alphatab.tablature.model.GsTrackImpl.prototype.TabHeight = null;
 net.alphatab.tablature.model.GsTrackImpl.prototype.Update = function(layout) {
-	$s.push("net.alphatab.tablature.model.GsTrackImpl::Update");
-	var $spos = $s.length;
 	this.TabHeight = Math.round((this.StringCount() - 1) * layout.StringSpacing);
 	this.ScoreHeight = Math.round(layout.ScoreLineSpacing * 4);
-	$s.pop();
 }
 net.alphatab.tablature.model.GsTrackImpl.prototype.__class__ = net.alphatab.tablature.model.GsTrackImpl;
 net.alphatab.tablature.CaretPosition = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.tablature.CaretPosition::new");
-	var $spos = $s.length;
 	null;
-	$s.pop();
 }}
 net.alphatab.tablature.CaretPosition.__name__ = ["net","alphatab","tablature","CaretPosition"];
 net.alphatab.tablature.CaretPosition.prototype.BottomY = null;
@@ -13447,41 +8911,22 @@ net.alphatab.tablature.drawing.MusicFont.prototype.__class__ = net.alphatab.tabl
 net.alphatab.platform.PlatformFactory = function() { }
 net.alphatab.platform.PlatformFactory.__name__ = ["net","alphatab","platform","PlatformFactory"];
 net.alphatab.platform.PlatformFactory.GetCanvas = function(object) {
-	$s.push("net.alphatab.platform.PlatformFactory::GetCanvas");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.platform.js.Html5Canvas(object);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.platform.js.Html5Canvas(object);
 }
 net.alphatab.platform.PlatformFactory.GetLoader = function() {
-	$s.push("net.alphatab.platform.PlatformFactory::GetLoader");
-	var $spos = $s.length;
-	{
-		var $tmp = new net.alphatab.platform.js.JsFileLoader();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.platform.js.JsFileLoader();
 }
 net.alphatab.platform.PlatformFactory.prototype.__class__ = net.alphatab.platform.PlatformFactory;
 haxe.io.StringInput = function(s) { if( s === $_ ) return; {
-	$s.push("haxe.io.StringInput::new");
-	var $spos = $s.length;
 	haxe.io.BytesInput.apply(this,[haxe.io.Bytes.ofString(s)]);
-	$s.pop();
 }}
 haxe.io.StringInput.__name__ = ["haxe","io","StringInput"];
 haxe.io.StringInput.__super__ = haxe.io.BytesInput;
 for(var k in haxe.io.BytesInput.prototype ) haxe.io.StringInput.prototype[k] = haxe.io.BytesInput.prototype[k];
 haxe.io.StringInput.prototype.__class__ = haxe.io.StringInput;
 net.alphatab.model.GsBeat = function(factory) { if( factory === $_ ) return; {
-	$s.push("net.alphatab.model.GsBeat::new");
-	var $spos = $s.length;
 	this.Start = 960;
-	this.Stroke = factory.NewStroke();
+	this.Effect = factory.NewBeatEffect();
 	this.Voices = new Array();
 	{
 		var _g = 0;
@@ -13492,13 +8937,10 @@ net.alphatab.model.GsBeat = function(factory) { if( factory === $_ ) return; {
 			this.Voices.push(voice);
 		}
 	}
-	$s.pop();
 }}
 net.alphatab.model.GsBeat.__name__ = ["net","alphatab","model","GsBeat"];
-net.alphatab.model.GsBeat.prototype.Chord = null;
+net.alphatab.model.GsBeat.prototype.Effect = null;
 net.alphatab.model.GsBeat.prototype.GetNotes = function() {
-	$s.push("net.alphatab.model.GsBeat::GetNotes");
-	var $spos = $s.length;
 	var notes = new Array();
 	{
 		var _g1 = 0, _g = this.Voices.length;
@@ -13515,124 +8957,81 @@ net.alphatab.model.GsBeat.prototype.GetNotes = function() {
 			}
 		}
 	}
-	{
-		$s.pop();
-		return notes;
-	}
-	$s.pop();
+	return notes;
 }
-net.alphatab.model.GsBeat.prototype.HasPickStroke = null;
-net.alphatab.model.GsBeat.prototype.HasRasgueado = null;
 net.alphatab.model.GsBeat.prototype.IsRestBeat = function() {
-	$s.push("net.alphatab.model.GsBeat::IsRestBeat");
-	var $spos = $s.length;
 	{
 		var _g1 = 0, _g = this.Voices.length;
 		while(_g1 < _g) {
 			var i = _g1++;
 			var voice = this.Voices[i];
-			if(!voice.IsEmpty && !voice.IsRestVoice()) {
-				$s.pop();
-				return false;
-			}
+			if(!voice.IsEmpty && !voice.IsRestVoice()) return false;
 		}
 	}
-	{
-		$s.pop();
-		return true;
-	}
-	$s.pop();
+	return true;
 }
 net.alphatab.model.GsBeat.prototype.Measure = null;
-net.alphatab.model.GsBeat.prototype.MixTableChange = null;
-net.alphatab.model.GsBeat.prototype.PickStroke = null;
 net.alphatab.model.GsBeat.prototype.SetChord = function(chord) {
-	$s.push("net.alphatab.model.GsBeat::SetChord");
-	var $spos = $s.length;
 	chord.Beat = this;
-	this.Chord = chord;
-	$s.pop();
+	this.Effect.Chord = chord;
 }
 net.alphatab.model.GsBeat.prototype.SetText = function(text) {
-	$s.push("net.alphatab.model.GsBeat::SetText");
-	var $spos = $s.length;
 	text.Beat = this;
 	this.Text = text;
-	$s.pop();
 }
 net.alphatab.model.GsBeat.prototype.Start = null;
-net.alphatab.model.GsBeat.prototype.Stroke = null;
 net.alphatab.model.GsBeat.prototype.TableChange = null;
 net.alphatab.model.GsBeat.prototype.Text = null;
 net.alphatab.model.GsBeat.prototype.Voices = null;
 net.alphatab.model.GsBeat.prototype.__class__ = net.alphatab.model.GsBeat;
 net.alphatab.tablature.model.GsBeatImpl = function(factory) { if( factory === $_ ) return; {
-	$s.push("net.alphatab.tablature.model.GsBeatImpl::new");
-	var $spos = $s.length;
 	net.alphatab.model.GsBeat.apply(this,[factory]);
-	$s.pop();
 }}
 net.alphatab.tablature.model.GsBeatImpl.__name__ = ["net","alphatab","tablature","model","GsBeatImpl"];
 net.alphatab.tablature.model.GsBeatImpl.__super__ = net.alphatab.model.GsBeat;
 for(var k in net.alphatab.model.GsBeat.prototype ) net.alphatab.tablature.model.GsBeatImpl.prototype[k] = net.alphatab.model.GsBeat.prototype[k];
 net.alphatab.tablature.model.GsBeatImpl.prototype.BeatGroup = null;
-net.alphatab.tablature.model.GsBeatImpl.prototype.CaretPosition = function(layout) {
-	$s.push("net.alphatab.tablature.model.GsBeatImpl::CaretPosition");
-	var $spos = $s.length;
+net.alphatab.tablature.model.GsBeatImpl.prototype.CalculateTremoloBarOverflow = function(layout) {
+	var point = null;
 	{
-		var $tmp = Math.round(this.GetRealPosX(layout) + 8 * layout.Scale);
-		$s.pop();
-		return $tmp;
+		var _g = 0, _g1 = this.Effect.TremoloBar.Points;
+		while(_g < _g1.length) {
+			var curr = _g1[_g];
+			++_g;
+			if(point == null || curr.Value < point.Value) point = curr;
+		}
 	}
-	$s.pop();
+	if(point == null) return 0;
+	var fullHeight = point.Value * (6 * layout.Scale);
+	var string = (this.MinNote == null?6:this.MinNote.String);
+	var spaceToBottom = (6 - string) * layout.StringSpacing;
+	if(fullHeight < 0) {
+		var overflow = Math.round(-((Math.abs(fullHeight) + (layout.StringSpacing / 2)) - spaceToBottom));
+		return overflow;
+	}
+	else {
+		return 0;
+	}
+}
+net.alphatab.tablature.model.GsBeatImpl.prototype.CaretPosition = function(layout) {
+	return Math.round(this.GetRealPosX(layout) + 8 * layout.Scale);
 }
 net.alphatab.tablature.model.GsBeatImpl.prototype.Check = function(note) {
-	$s.push("net.alphatab.tablature.model.GsBeatImpl::Check");
-	var $spos = $s.length;
 	var value = note.RealValue();
 	if(this.MaxNote == null || value > this.MaxNote.RealValue()) this.MaxNote = note;
 	if(this.MinNote == null || value < this.MinNote.RealValue()) this.MinNote = note;
-	$s.pop();
 }
 net.alphatab.tablature.model.GsBeatImpl.prototype.GetPaintPosition = function(position) {
-	$s.push("net.alphatab.tablature.model.GsBeatImpl::GetPaintPosition");
-	var $spos = $s.length;
-	{
-		var $tmp = this.MeasureImpl().Ts.Get(position);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.MeasureImpl().Ts.Get(position);
 }
 net.alphatab.tablature.model.GsBeatImpl.prototype.GetRealPosX = function(layout) {
-	$s.push("net.alphatab.tablature.model.GsBeatImpl::GetRealPosX");
-	var $spos = $s.length;
-	{
-		var $tmp = (((this.MeasureImpl().PosX + this.MeasureImpl().HeaderImpl().GetLeftSpacing(layout)) + this.PosX) + this.Spacing()) + (4 * layout.Scale);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (((this.MeasureImpl().PosX + this.MeasureImpl().HeaderImpl().GetLeftSpacing(layout)) + this.PosX) + this.Spacing()) + (4 * layout.Scale);
 }
 net.alphatab.tablature.model.GsBeatImpl.prototype.GetVoiceImpl = function(index) {
-	$s.push("net.alphatab.tablature.model.GsBeatImpl::GetVoiceImpl");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Voices[index];
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Voices[index];
 }
 net.alphatab.tablature.model.GsBeatImpl.prototype.Height = function() {
-	$s.push("net.alphatab.tablature.model.GsBeatImpl::Height");
-	var $spos = $s.length;
-	{
-		var $tmp = this.MeasureImpl().Ts.GetSize();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.MeasureImpl().Ts.GetSize();
 }
 net.alphatab.tablature.model.GsBeatImpl.prototype.Join1 = null;
 net.alphatab.tablature.model.GsBeatImpl.prototype.Join2 = null;
@@ -13641,31 +9040,16 @@ net.alphatab.tablature.model.GsBeatImpl.prototype.JoinedType = null;
 net.alphatab.tablature.model.GsBeatImpl.prototype.LastPaintX = null;
 net.alphatab.tablature.model.GsBeatImpl.prototype.MaxNote = null;
 net.alphatab.tablature.model.GsBeatImpl.prototype.MeasureImpl = function() {
-	$s.push("net.alphatab.tablature.model.GsBeatImpl::MeasureImpl");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Measure;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Measure;
 }
 net.alphatab.tablature.model.GsBeatImpl.prototype.MinNote = null;
 net.alphatab.tablature.model.GsBeatImpl.prototype.MinimumWidth = null;
 net.alphatab.tablature.model.GsBeatImpl.prototype.NextBeat = null;
 net.alphatab.tablature.model.GsBeatImpl.prototype.Paint = function(layout,context,x,y) {
-	$s.push("net.alphatab.tablature.model.GsBeatImpl::Paint");
-	var $spos = $s.length;
 	x += this.PosX + this.Spacing();
 	this.LastPaintX = x;
 	this.PaintExtraLines(context,layout,x,y);
-	if(this.Stroke.Direction != net.alphatab.model.GsBeatStrokeDirection.None) {
-		this.PaintStroke(layout,context,x,y);
-	}
-	if(this.Chord != null) {
-		var chordImpl = this.Chord;
-		chordImpl.Paint(layout,context,x,y);
-	}
+	this.PaintBeatEffects(context,layout,x,y);
 	{
 		var _g = 0;
 		while(_g < 2) {
@@ -13673,21 +9057,53 @@ net.alphatab.tablature.model.GsBeatImpl.prototype.Paint = function(layout,contex
 			this.GetVoiceImpl(v).Paint(layout,context,x,y);
 		}
 	}
-	$s.pop();
+}
+net.alphatab.tablature.model.GsBeatImpl.prototype.PaintBeatEffects = function(context,layout,x,y) {
+	var realX = x + 3 * layout.Scale;
+	var fill = context.Get(net.alphatab.tablature.drawing.DrawingLayers.VoiceEffects1);
+	if(this.Effect.Stroke.Direction != net.alphatab.model.GsBeatStrokeDirection.None) {
+		this.PaintStroke(layout,context,x,y);
+	}
+	if(this.Effect.Chord != null) {
+		var chordImpl = this.Effect.Chord;
+		chordImpl.Paint(layout,context,x,y);
+	}
+	if(this.Effect.FadeIn) {
+		var realY = y + this.GetPaintPosition(net.alphatab.tablature.TrackSpacingPositions.FadeIn);
+		this.PaintFadeIn(layout,context,realX,realY);
+	}
+	if(this.Effect.Tapping) {
+		var realY = y + this.GetPaintPosition(net.alphatab.tablature.TrackSpacingPositions.TapingEffect);
+		fill.AddString("T",net.alphatab.tablature.drawing.DrawingResources.DefaultFont,realX,realY);
+	}
+	else if(this.Effect.Slapping) {
+		var realY = y + this.GetPaintPosition(net.alphatab.tablature.TrackSpacingPositions.TapingEffect);
+		fill.AddString("S",net.alphatab.tablature.drawing.DrawingResources.DefaultFont,realX,realY);
+	}
+	else if(this.Effect.Popping) {
+		var realY = y + this.GetPaintPosition(net.alphatab.tablature.TrackSpacingPositions.TapingEffect);
+		fill.AddString("P",net.alphatab.tablature.drawing.DrawingResources.DefaultFont,realX,realY);
+	}
+	if(this.Effect.Vibrato) {
+		var realY = y + this.GetPaintPosition(net.alphatab.tablature.TrackSpacingPositions.BeatVibratoEffect);
+		this.PaintVibrato(layout,context,realX,realY,1);
+	}
+	if(this.Effect.IsTremoloBar()) {
+		var string = (this.MinNote == null?6:this.MinNote.String);
+		var realY = (y + this.GetPaintPosition(net.alphatab.tablature.TrackSpacingPositions.Tablature)) + Math.round((string - 1) * layout.StringSpacing);
+		var nextBeat = layout.SongManager().GetNextBeat(this);
+		if(nextBeat != null && nextBeat.MeasureImpl().Ts != this.MeasureImpl().Ts) nextBeat = null;
+		this.PaintTremoloBar(layout,context,nextBeat,realX,realY);
+	}
 }
 net.alphatab.tablature.model.GsBeatImpl.prototype.PaintExtraLines = function(context,layout,x,y) {
-	$s.push("net.alphatab.tablature.model.GsBeatImpl::PaintExtraLines");
-	var $spos = $s.length;
 	if(!this.IsRestBeat()) {
 		var iScoreY = y + this.MeasureImpl().Ts.Get(net.alphatab.tablature.TrackSpacingPositions.ScoreMiddleLines);
 		this.PaintExtraLines2(context,layout,this.MinNote,x,iScoreY);
 		this.PaintExtraLines2(context,layout,this.MaxNote,x,iScoreY);
 	}
-	$s.pop();
 }
 net.alphatab.tablature.model.GsBeatImpl.prototype.PaintExtraLines2 = function(context,layout,note,x,y) {
-	$s.push("net.alphatab.tablature.model.GsBeatImpl::PaintExtraLines2");
-	var $spos = $s.length;
 	var realY = y + note.ScorePosY;
 	var x1 = x + 3 * layout.Scale;
 	var x2 = x + 15 * layout.Scale;
@@ -13708,15 +9124,20 @@ net.alphatab.tablature.model.GsBeatImpl.prototype.PaintExtraLines2 = function(co
 			i += scoreLineSpacing;
 		}
 	}
-	$s.pop();
+}
+net.alphatab.tablature.model.GsBeatImpl.prototype.PaintFadeIn = function(layout,context,x,y) {
+	var scale = layout.Scale;
+	var realX = x;
+	var realY = Math.round(y + (4.0 * scale));
+	var fWidth = Math.round(this.Width());
+	var layer = context.Get(net.alphatab.tablature.drawing.DrawingLayers.VoiceDraw1);
+	layer.StartFigure();
+	layer.AddBezier(realX,realY,realX,realY,realX + fWidth,realY,realX + fWidth,Math.round(realY - (4 * scale)));
+	layer.StartFigure();
+	layer.AddBezier(realX,realY,realX,realY,realX + fWidth,realY,realX + fWidth,Math.round(realY + (4 * scale)));
 }
 net.alphatab.tablature.model.GsBeatImpl.prototype.PaintStroke = function(layout,context,x,y) {
-	$s.push("net.alphatab.tablature.model.GsBeatImpl::PaintStroke");
-	var $spos = $s.length;
-	if(this.Stroke.Direction == net.alphatab.model.GsBeatStrokeDirection.None) {
-		$s.pop();
-		return;
-	}
+	if(this.Effect.Stroke.Direction == net.alphatab.model.GsBeatStrokeDirection.None) return;
 	var scale = layout.Scale;
 	var realX = x;
 	var realY = y + this.GetPaintPosition(net.alphatab.tablature.TrackSpacingPositions.Tablature);
@@ -13724,7 +9145,7 @@ net.alphatab.tablature.model.GsBeatImpl.prototype.PaintStroke = function(layout,
 	var y2 = realY + this.MeasureImpl().TrackImpl().TabHeight;
 	var layer = context.Get(net.alphatab.tablature.drawing.DrawingLayers.MainComponentsDraw);
 	layer.StartFigure();
-	if(this.Stroke.Direction == net.alphatab.model.GsBeatStrokeDirection.Up) {
+	if(this.Effect.Stroke.Direction == net.alphatab.model.GsBeatStrokeDirection.Up) {
 		layer.MoveTo(realX,y1);
 		layer.LineTo(realX,y2);
 		layer.LineTo(realX - (2.0 * scale),y2 - (5.0 * scale));
@@ -13738,30 +9159,84 @@ net.alphatab.tablature.model.GsBeatImpl.prototype.PaintStroke = function(layout,
 		layer.MoveTo(realX,y1);
 		layer.LineTo(realX + (2.0 * scale),y1 + (3.0 * scale));
 	}
-	$s.pop();
+}
+net.alphatab.tablature.model.GsBeatImpl.prototype.PaintTremoloBar = function(layout,context,nextBeat,x,y) {
+	var scale = layout.Scale;
+	var realX = x + (5 * scale);
+	var realY = y + ((net.alphatab.tablature.drawing.DrawingResources.NoteFontHeight / 2) * scale);
+	var xTo;
+	var minY = realY - 60 * scale;
+	if(nextBeat == null) {
+		xTo = (this.MeasureImpl().PosX + this.MeasureImpl().Width) + this.MeasureImpl().Spacing;
+	}
+	else {
+		xTo = (((nextBeat.MeasureImpl().PosX + nextBeat.MeasureImpl().HeaderImpl().GetLeftSpacing(layout)) + nextBeat.PosX) + (nextBeat.Spacing() * scale)) + 5 * scale;
+	}
+	var fill = context.Get(net.alphatab.tablature.drawing.DrawingLayers.VoiceEffects1);
+	var draw = context.Get(net.alphatab.tablature.drawing.DrawingLayers.VoiceEffectsDraw1);
+	var tremolo = this.Effect.TremoloBar;
+	if(tremolo.Points.length >= 2) {
+		var dX = (xTo - realX) / 12;
+		var dY = (realY - minY) / 12;
+		draw.StartFigure();
+		{
+			var _g1 = 0, _g = tremolo.Points.length - 1;
+			while(_g1 < _g) {
+				var i = _g1++;
+				var firstPt = tremolo.Points[i];
+				var secondPt = tremolo.Points[i + 1];
+				if(firstPt.Value == secondPt.Value && i == tremolo.Points.length - 2) continue;
+				var firstLoc = new net.alphatab.model.Point(Math.floor(realX + (dX * firstPt.Position)),Math.floor(realY - dY * firstPt.Value));
+				var secondLoc = new net.alphatab.model.Point(Math.floor(realX + (dX * secondPt.Position)),Math.floor(realY - dY * secondPt.Value));
+				draw.AddLine(firstLoc.X,firstLoc.Y,secondLoc.X,secondLoc.Y);
+				if(secondPt.Value != 0) {
+					var dV = (secondPt.Value) * 0.5;
+					var up = (secondPt.Value - firstPt.Value) >= 0;
+					var s = "";
+					if(dV >= 1 || dV <= -1) s += ("-" + net.alphatab.Utils.string(Math.floor(Math.abs(dV)))) + " ";
+					else if(dV < 0) s += "-";
+					dV -= Math.floor(dV);
+					if(dV == 0.25) s += "1/4";
+					else if(dV == 0.5) s += "1/2";
+					else if(dV == 0.75) s += "3/4";
+					context.Graphics.setFont(net.alphatab.tablature.drawing.DrawingResources.DefaultFont);
+					var size = context.Graphics.measureText(s);
+					var sY = (up?(secondLoc.Y - net.alphatab.tablature.drawing.DrawingResources.DefaultFontHeight) - (3 * scale):secondLoc.Y + (3 * scale));
+					var sX = secondLoc.X - size.width / 2;
+					fill.AddString(s,net.alphatab.tablature.drawing.DrawingResources.DefaultFont,sX,sY);
+				}
+			}
+		}
+	}
+}
+net.alphatab.tablature.model.GsBeatImpl.prototype.PaintVibrato = function(layout,context,x,y,symbolScale) {
+	var scale = layout.Scale;
+	var realX = x - 2 * scale;
+	var realY = y + (2.0 * scale);
+	var width = this.Width();
+	var fill = context.Get(net.alphatab.tablature.drawing.DrawingLayers.VoiceEffects1);
+	var step = (18 * scale) * symbolScale;
+	var loops = Math.floor(Math.max(1,(width / step)));
+	var s = "";
+	{
+		var _g = 0;
+		while(_g < loops) {
+			var i = _g++;
+			fill.AddMusicSymbol(net.alphatab.tablature.drawing.MusicFont.VibratoLeftRight,realX,realY,layout.Scale * symbolScale);
+			realX += step;
+		}
+	}
 }
 net.alphatab.tablature.model.GsBeatImpl.prototype.PosX = null;
 net.alphatab.tablature.model.GsBeatImpl.prototype.PreviousBeat = null;
 net.alphatab.tablature.model.GsBeatImpl.prototype.Reset = function() {
-	$s.push("net.alphatab.tablature.model.GsBeatImpl::Reset");
-	var $spos = $s.length;
 	this.MaxNote = null;
 	this.MinNote = null;
-	$s.pop();
 }
 net.alphatab.tablature.model.GsBeatImpl.prototype.Spacing = function() {
-	$s.push("net.alphatab.tablature.model.GsBeatImpl::Spacing");
-	var $spos = $s.length;
-	{
-		var $tmp = this.MeasureImpl().GetBeatSpacing(this);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.MeasureImpl().GetBeatSpacing(this);
 }
 net.alphatab.tablature.model.GsBeatImpl.prototype.Width = function() {
-	$s.push("net.alphatab.tablature.model.GsBeatImpl::Width");
-	var $spos = $s.length;
 	var w = 0;
 	{
 		var _g1 = 0, _g = this.Voices.length;
@@ -13771,16 +9246,10 @@ net.alphatab.tablature.model.GsBeatImpl.prototype.Width = function() {
 			if(cw > w) w = cw;
 		}
 	}
-	{
-		$s.pop();
-		return w;
-	}
-	$s.pop();
+	return w;
 }
 net.alphatab.tablature.model.GsBeatImpl.prototype.__class__ = net.alphatab.tablature.model.GsBeatImpl;
 net.alphatab.tablature.drawing.DrawingContext = function(scale) { if( scale === $_ ) return; {
-	$s.push("net.alphatab.tablature.drawing.DrawingContext::new");
-	var $spos = $s.length;
 	this.Layers = new Array();
 	this.Layers[net.alphatab.tablature.drawing.DrawingLayersConverter.ToInt(net.alphatab.tablature.drawing.DrawingLayers.Background)] = new net.alphatab.tablature.drawing.DrawingLayer(new net.alphatab.model.GsColor(205,205,205),true,0);
 	this.Layers[net.alphatab.tablature.drawing.DrawingLayersConverter.ToInt(net.alphatab.tablature.drawing.DrawingLayers.LayoutBackground)] = new net.alphatab.tablature.drawing.DrawingLayer(new net.alphatab.model.GsColor(34,34,17),true,0);
@@ -13796,66 +9265,44 @@ net.alphatab.tablature.drawing.DrawingContext = function(scale) { if( scale === 
 	this.Layers[net.alphatab.tablature.drawing.DrawingLayersConverter.ToInt(net.alphatab.tablature.drawing.DrawingLayers.VoiceEffectsDraw1)] = new net.alphatab.tablature.drawing.DrawingLayer(new net.alphatab.model.GsColor(34,34,17),false,scale);
 	this.Layers[net.alphatab.tablature.drawing.DrawingLayersConverter.ToInt(net.alphatab.tablature.drawing.DrawingLayers.VoiceDraw1)] = new net.alphatab.tablature.drawing.DrawingLayer(new net.alphatab.model.GsColor(34,34,17),false,scale);
 	this.Layers[net.alphatab.tablature.drawing.DrawingLayersConverter.ToInt(net.alphatab.tablature.drawing.DrawingLayers.Red)] = new net.alphatab.tablature.drawing.DrawingLayer(new net.alphatab.model.GsColor(255,0,0),true,0);
-	$s.pop();
 }}
 net.alphatab.tablature.drawing.DrawingContext.__name__ = ["net","alphatab","tablature","drawing","DrawingContext"];
 net.alphatab.tablature.drawing.DrawingContext.prototype.Clear = function() {
-	$s.push("net.alphatab.tablature.drawing.DrawingContext::Clear");
-	var $spos = $s.length;
 	var _g1 = 0, _g = this.Layers.length;
 	while(_g1 < _g) {
 		var i = _g1++;
 		this.Layers[i].Clear();
 	}
-	$s.pop();
 }
 net.alphatab.tablature.drawing.DrawingContext.prototype.Draw = function() {
-	$s.push("net.alphatab.tablature.drawing.DrawingContext::Draw");
-	var $spos = $s.length;
 	var _g1 = 0, _g = this.Layers.length;
 	while(_g1 < _g) {
 		var i = _g1++;
 		this.Layers[i].Draw(this.Graphics);
 	}
-	$s.pop();
 }
 net.alphatab.tablature.drawing.DrawingContext.prototype.Get = function(layer) {
-	$s.push("net.alphatab.tablature.drawing.DrawingContext::Get");
-	var $spos = $s.length;
 	var index = net.alphatab.tablature.drawing.DrawingLayersConverter.ToInt(layer);
-	{
-		var $tmp = this.Layers[index];
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Layers[index];
 }
 net.alphatab.tablature.drawing.DrawingContext.prototype.Graphics = null;
 net.alphatab.tablature.drawing.DrawingContext.prototype.Layers = null;
 net.alphatab.tablature.drawing.DrawingContext.prototype.__class__ = net.alphatab.tablature.drawing.DrawingContext;
 net.alphatab.tablature.model.GsBeatTextImpl = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.tablature.model.GsBeatTextImpl::new");
-	var $spos = $s.length;
 	net.alphatab.model.GsBeatText.apply(this,[]);
-	$s.pop();
 }}
 net.alphatab.tablature.model.GsBeatTextImpl.__name__ = ["net","alphatab","tablature","model","GsBeatTextImpl"];
 net.alphatab.tablature.model.GsBeatTextImpl.__super__ = net.alphatab.model.GsBeatText;
 for(var k in net.alphatab.model.GsBeatText.prototype ) net.alphatab.tablature.model.GsBeatTextImpl.prototype[k] = net.alphatab.model.GsBeatText.prototype[k];
 net.alphatab.tablature.model.GsBeatTextImpl.prototype.Paint = function(layout,context,x,y) {
-	$s.push("net.alphatab.tablature.model.GsBeatTextImpl::Paint");
-	var $spos = $s.length;
 	var beat = this.Beat;
 	var measure = beat.MeasureImpl();
 	var realX = (x + beat.Spacing()) + beat.PosX;
 	var realY = y + measure.Ts.Get(net.alphatab.tablature.TrackSpacingPositions.Text);
 	context.Get(net.alphatab.tablature.drawing.DrawingLayers.Voice1).AddString(this.Value,net.alphatab.tablature.drawing.DrawingResources.DefaultFont,realX,realY);
-	$s.pop();
 }
 net.alphatab.tablature.model.GsBeatTextImpl.prototype.__class__ = net.alphatab.tablature.model.GsBeatTextImpl;
 net.alphatab.tablature.drawing.SvgPainter = function(layer,svg,x,y,xScale,yScale) { if( layer === $_ ) return; {
-	$s.push("net.alphatab.tablature.drawing.SvgPainter::new");
-	var $spos = $s.length;
 	this.Layer = layer;
 	this.Svg = svg;
 	this.X = x;
@@ -13865,55 +9312,28 @@ net.alphatab.tablature.drawing.SvgPainter = function(layer,svg,x,y,xScale,yScale
 	this.CurrentPosition = new net.alphatab.model.PointF(x,y);
 	this.Token = svg.split(" ");
 	this.CurrentIndex = 0;
-	$s.pop();
 }}
 net.alphatab.tablature.drawing.SvgPainter.__name__ = ["net","alphatab","tablature","drawing","SvgPainter"];
 net.alphatab.tablature.drawing.SvgPainter.prototype.CurrentIndex = null;
 net.alphatab.tablature.drawing.SvgPainter.prototype.CurrentPosition = null;
 net.alphatab.tablature.drawing.SvgPainter.prototype.GetNumber = function() {
-	$s.push("net.alphatab.tablature.drawing.SvgPainter::GetNumber");
-	var $spos = $s.length;
-	{
-		var $tmp = Std.parseFloat(this.Token[this.CurrentIndex++]);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return Std.parseFloat(this.Token[this.CurrentIndex++]);
 }
 net.alphatab.tablature.drawing.SvgPainter.prototype.GetString = function() {
-	$s.push("net.alphatab.tablature.drawing.SvgPainter::GetString");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Token[this.CurrentIndex++];
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Token[this.CurrentIndex++];
 }
 net.alphatab.tablature.drawing.SvgPainter.prototype.IsNextCommand = function() {
-	$s.push("net.alphatab.tablature.drawing.SvgPainter::IsNextCommand");
-	var $spos = $s.length;
 	var command = this.PeekString();
-	{
-		var $tmp = command == "m" || command == "M" || command == "c" || command == "C" || command == "q" || command == "Q" || command == "l" || command == "L" || command == "z" || command == "Z";
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return command == "m" || command == "M" || command == "c" || command == "C" || command == "q" || command == "Q" || command == "l" || command == "L" || command == "z" || command == "Z";
 }
 net.alphatab.tablature.drawing.SvgPainter.prototype.Layer = null;
 net.alphatab.tablature.drawing.SvgPainter.prototype.Paint = function() {
-	$s.push("net.alphatab.tablature.drawing.SvgPainter::Paint");
-	var $spos = $s.length;
 	this.Layer.StartFigure();
 	while(this.CurrentIndex < this.Token.length) {
 		this.ParseCommand();
 	}
-	$s.pop();
 }
 net.alphatab.tablature.drawing.SvgPainter.prototype.ParseCommand = function() {
-	$s.push("net.alphatab.tablature.drawing.SvgPainter::ParseCommand");
-	var $spos = $s.length;
 	var command = this.GetString();
 	switch(command) {
 	case "M":{
@@ -13999,27 +9419,12 @@ net.alphatab.tablature.drawing.SvgPainter.prototype.ParseCommand = function() {
 		} while(isNextNumber && this.CurrentIndex < this.Token.length);
 	}break;
 	}
-	$s.pop();
 }
 net.alphatab.tablature.drawing.SvgPainter.prototype.PeekNumber = function() {
-	$s.push("net.alphatab.tablature.drawing.SvgPainter::PeekNumber");
-	var $spos = $s.length;
-	{
-		var $tmp = Std.parseFloat(this.Token[this.CurrentIndex]);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return Std.parseFloat(this.Token[this.CurrentIndex]);
 }
 net.alphatab.tablature.drawing.SvgPainter.prototype.PeekString = function() {
-	$s.push("net.alphatab.tablature.drawing.SvgPainter::PeekString");
-	var $spos = $s.length;
-	{
-		var $tmp = this.Token[this.CurrentIndex];
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.Token[this.CurrentIndex];
 }
 net.alphatab.tablature.drawing.SvgPainter.prototype.Svg = null;
 net.alphatab.tablature.drawing.SvgPainter.prototype.Token = null;
@@ -14042,13 +9447,10 @@ net.alphatab.tablature.model.GsJoinedType.Right = ["Right",3];
 net.alphatab.tablature.model.GsJoinedType.Right.toString = $estr;
 net.alphatab.tablature.model.GsJoinedType.Right.__enum__ = net.alphatab.tablature.model.GsJoinedType;
 net.alphatab.model.GsLyricLine = function(startingMeasure,lyrics) { if( startingMeasure === $_ ) return; {
-	$s.push("net.alphatab.model.GsLyricLine::new");
-	var $spos = $s.length;
 	if(lyrics == null) lyrics = "";
 	if(startingMeasure == null) startingMeasure = 0;
 	this.StartingMeasure = startingMeasure;
 	this.Lyrics = lyrics;
-	$s.pop();
 }}
 net.alphatab.model.GsLyricLine.__name__ = ["net","alphatab","model","GsLyricLine"];
 net.alphatab.model.GsLyricLine.prototype.Lyrics = null;
@@ -14057,110 +9459,48 @@ net.alphatab.model.GsLyricLine.prototype.__class__ = net.alphatab.model.GsLyricL
 Std = function() { }
 Std.__name__ = ["Std"];
 Std["is"] = function(v,t) {
-	$s.push("Std::is");
-	var $spos = $s.length;
-	{
-		var $tmp = js.Boot.__instanceof(v,t);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return js.Boot.__instanceof(v,t);
 }
 Std.string = function(s) {
-	$s.push("Std::string");
-	var $spos = $s.length;
-	{
-		var $tmp = js.Boot.__string_rec(s,"");
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return js.Boot.__string_rec(s,"");
 }
 Std["int"] = function(x) {
-	$s.push("Std::int");
-	var $spos = $s.length;
-	if(x < 0) {
-		var $tmp = Math.ceil(x);
-		$s.pop();
-		return $tmp;
-	}
-	{
-		var $tmp = Math.floor(x);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	if(x < 0) return Math.ceil(x);
+	return Math.floor(x);
 }
 Std.parseInt = function(x) {
-	$s.push("Std::parseInt");
-	var $spos = $s.length;
 	var v = parseInt(x);
-	if(Math.isNaN(v)) {
-		$s.pop();
-		return null;
-	}
-	{
-		$s.pop();
-		return v;
-	}
-	$s.pop();
+	if(Math.isNaN(v)) return null;
+	return v;
 }
 Std.parseFloat = function(x) {
-	$s.push("Std::parseFloat");
-	var $spos = $s.length;
-	{
-		var $tmp = parseFloat(x);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return parseFloat(x);
 }
 Std.random = function(x) {
-	$s.push("Std::random");
-	var $spos = $s.length;
-	{
-		var $tmp = Math.floor(Math.random() * x);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return Math.floor(Math.random() * x);
 }
 Std.prototype.__class__ = Std;
 net.alphatab.file.guitarpro.Gp3Reader = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::new");
-	var $spos = $s.length;
 	net.alphatab.file.guitarpro.GpReaderBase.apply(this,[["FICHIER GUITAR PRO v3.00"]]);
-	$s.pop();
 }}
 net.alphatab.file.guitarpro.Gp3Reader.__name__ = ["net","alphatab","file","guitarpro","Gp3Reader"];
 net.alphatab.file.guitarpro.Gp3Reader.__super__ = net.alphatab.file.guitarpro.GpReaderBase;
 for(var k in net.alphatab.file.guitarpro.GpReaderBase.prototype ) net.alphatab.file.guitarpro.Gp3Reader.prototype[k] = net.alphatab.file.guitarpro.GpReaderBase.prototype[k];
 net.alphatab.file.guitarpro.Gp3Reader.prototype.GetBeat = function(measure,start) {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::GetBeat");
-	var $spos = $s.length;
 	{
 		var _g1 = 0, _g = measure.Beats.length;
 		while(_g1 < _g) {
 			var b = _g1++;
 			var beat = measure.Beats[b];
-			if(beat.Start == start) {
-				$s.pop();
-				return beat;
-			}
+			if(beat.Start == start) return beat;
 		}
 	}
 	var newBeat = this.Factory.NewBeat();
 	newBeat.Start = start;
 	measure.AddBeat(newBeat);
-	{
-		$s.pop();
-		return newBeat;
-	}
-	$s.pop();
+	return newBeat;
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.GetTiedNoteValue = function(stringIndex,track) {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::GetTiedNoteValue");
-	var $spos = $s.length;
 	var iMeasureCount = track.MeasureCount();
 	if(iMeasureCount > 0) {
 		{
@@ -14187,11 +9527,7 @@ net.alphatab.file.guitarpro.Gp3Reader.prototype.GetTiedNoteValue = function(stri
 											var n = _g6++;
 											var note = oVoice.Notes[n];
 											if(note.String == stringIndex) {
-												{
-													var $tmp = note.Value;
-													$s.pop();
-													return $tmp;
-												}
+												return note.Value;
 											}
 										}
 									}
@@ -14203,15 +9539,9 @@ net.alphatab.file.guitarpro.Gp3Reader.prototype.GetTiedNoteValue = function(stri
 			}
 		}
 	}
-	{
-		$s.pop();
-		return -1;
-	}
-	$s.pop();
+	return -1;
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ParseRepeatAlternative = function(song,measure,value) {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ParseRepeatAlternative");
-	var $spos = $s.length;
 	var repeatAlternative = 0;
 	var existentAlternatives = 0;
 	{
@@ -14233,15 +9563,9 @@ net.alphatab.file.guitarpro.Gp3Reader.prototype.ParseRepeatAlternative = functio
 			}
 		}
 	}
-	{
-		$s.pop();
-		return repeatAlternative;
-	}
-	$s.pop();
+	return repeatAlternative;
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadBeat = function(start,measure,track,voiceIndex) {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ReadBeat");
-	var $spos = $s.length;
 	var flags = this.ReadUnsignedByte();
 	var beat = this.GetBeat(measure,start);
 	var voice = beat.Voices[voiceIndex];
@@ -14250,7 +9574,7 @@ net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadBeat = function(start,measur
 		voice.IsEmpty = ((beatType & 2) == 0);
 	}
 	var duration = this.ReadDuration(flags);
-	var effect = this.Factory.NewEffect();
+	var effect = this.Factory.NewNoteEffect();
 	if((flags & 2) != 0) {
 		this.ReadChord(track.StringCount(),beat);
 	}
@@ -14262,7 +9586,7 @@ net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadBeat = function(start,measur
 	}
 	if((flags & 16) != 0) {
 		var mixTableChange = this.ReadMixTableChange(measure);
-		beat.MixTableChange = mixTableChange;
+		beat.Effect.MixTableChange = mixTableChange;
 	}
 	var stringFlags = this.ReadUnsignedByte();
 	{
@@ -14278,28 +9602,21 @@ net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadBeat = function(start,measur
 			duration.Copy(voice.Duration);
 		}
 	}
-	{
-		var $tmp = ((!voice.IsEmpty)?duration.Time():0);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return ((!voice.IsEmpty)?duration.Time():0);
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadBeatEffects = function(beat,effect) {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ReadBeatEffects");
-	var $spos = $s.length;
 	var flags1 = this.ReadUnsignedByte();
-	effect.FadeIn = (((flags1 & 16) != 0));
-	effect.BeatVibrato = (((flags1 & 2) != 0)) || effect.BeatVibrato;
+	beat.Effect.FadeIn = (((flags1 & 16) != 0));
+	beat.Effect.Vibrato = (((flags1 & 2) != 0)) || beat.Effect.Vibrato;
 	if((flags1 & 32) != 0) {
 		var slapEffect = this.ReadUnsignedByte();
 		if(slapEffect == 0) {
-			this.ReadTremoloBar(effect);
+			this.ReadTremoloBar(beat.Effect);
 		}
 		else {
-			effect.Tapping = (slapEffect == 1);
-			effect.Slapping = (slapEffect == 2);
-			effect.Popping = (slapEffect == 3);
+			beat.Effect.Tapping = (slapEffect == 1);
+			beat.Effect.Slapping = (slapEffect == 2);
+			beat.Effect.Popping = (slapEffect == 3);
 			this.ReadInt();
 		}
 	}
@@ -14307,12 +9624,12 @@ net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadBeatEffects = function(beat,
 		var strokeUp = this.ReadByte();
 		var strokeDown = this.ReadByte();
 		if(strokeUp > 0) {
-			beat.Stroke.Direction = net.alphatab.model.GsBeatStrokeDirection.Up;
-			beat.Stroke.Value = (this.ToStrokeValue(strokeUp));
+			beat.Effect.Stroke.Direction = net.alphatab.model.GsBeatStrokeDirection.Up;
+			beat.Effect.Stroke.Value = (this.ToStrokeValue(strokeUp));
 		}
 		else if(strokeDown > 0) {
-			beat.Stroke.Direction = net.alphatab.model.GsBeatStrokeDirection.Down;
-			beat.Stroke.Value = (this.ToStrokeValue(strokeDown));
+			beat.Effect.Stroke.Direction = net.alphatab.model.GsBeatStrokeDirection.Down;
+			beat.Effect.Stroke.Value = (this.ToStrokeValue(strokeDown));
 		}
 	}
 	if((flags1 & 4) != 0) {
@@ -14326,11 +9643,8 @@ net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadBeatEffects = function(beat,
 		harmonic.Data = 0;
 		effect.Harmonic = (harmonic);
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadBend = function(noteEffect) {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ReadBend");
-	var $spos = $s.length;
 	var bendEffect = this.Factory.NewBendEffect();
 	bendEffect.Type = net.alphatab.model.effects.GsBendTypesConverter.FromInt(this.ReadByte());
 	bendEffect.Value = this.ReadInt();
@@ -14346,11 +9660,8 @@ net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadBend = function(noteEffect) 
 		}
 	}
 	if(pointCount > 0) noteEffect.Bend = bendEffect;
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadChannel = function(midiChannel,channels) {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ReadChannel");
-	var $spos = $s.length;
 	var index = (this.ReadInt() - 1);
 	var effectChannel = (this.ReadInt() - 1);
 	if(index >= 0 && index < channels.length) {
@@ -14362,11 +9673,8 @@ net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadChannel = function(midiChann
 			midiChannel.EffectChannel = (effectChannel);
 		}
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadChord = function(stringCount,beat) {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ReadChord");
-	var $spos = $s.length;
 	var chord = this.Factory.NewChord(stringCount);
 	if((this.ReadUnsignedByte() & 1) == 0) {
 		chord.Name = (this.ReadIntSizeCheckByteString());
@@ -14403,25 +9711,15 @@ net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadChord = function(stringCount
 	if(chord.NoteCount() > 0) {
 		beat.SetChord(chord);
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadColor = function() {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ReadColor");
-	var $spos = $s.length;
 	var r = (this.ReadUnsignedByte());
 	var g = this.ReadUnsignedByte();
 	var b = (this.ReadUnsignedByte());
 	this.Skip(1);
-	{
-		var $tmp = new net.alphatab.model.GsColor(r,g,b);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.GsColor(r,g,b);
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadDuration = function(flags) {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ReadDuration");
-	var $spos = $s.length;
 	var duration = this.Factory.NewDuration();
 	duration.Value = Math.round(Math.pow(2,(this.ReadByte() + 4)) / 4);
 	duration.IsDotted = (((flags & 1) != 0));
@@ -14462,15 +9760,9 @@ net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadDuration = function(flags) {
 		}break;
 		}
 	}
-	{
-		$s.pop();
-		return duration;
-	}
-	$s.pop();
+	return duration;
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadGrace = function(noteEffect) {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ReadGrace");
-	var $spos = $s.length;
 	var fret = this.ReadUnsignedByte();
 	var dyn = this.ReadUnsignedByte();
 	var transition = this.ReadByte();
@@ -14496,11 +9788,8 @@ net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadGrace = function(noteEffect)
 	}break;
 	}
 	noteEffect.Grace = (grace);
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadInfo = function(song) {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ReadInfo");
-	var $spos = $s.length;
 	song.Title = (this.ReadIntSizeCheckByteString());
 	song.Subtitle = this.ReadIntSizeCheckByteString();
 	song.Artist = (this.ReadIntSizeCheckByteString());
@@ -14519,11 +9808,8 @@ net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadInfo = function(song) {
 			song.Notice += this.ReadIntSizeCheckByteString() + "\n";
 		}
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadLyrics = function(song) {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ReadLyrics");
-	var $spos = $s.length;
 	song.Lyrics = this.Factory.NewLyrics();
 	song.Lyrics.TrackChoice = this.ReadInt();
 	{
@@ -14536,24 +9822,15 @@ net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadLyrics = function(song) {
 			song.Lyrics.Lines.push(line);
 		}
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadMarker = function(header) {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ReadMarker");
-	var $spos = $s.length;
 	var marker = this.Factory.NewMarker();
 	marker.MeasureHeader = header;
 	marker.Title = this.ReadIntSizeCheckByteString();
 	marker.Color = this.ReadColor();
-	{
-		$s.pop();
-		return marker;
-	}
-	$s.pop();
+	return marker;
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadMeasure = function(measure,track) {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ReadMeasure");
-	var $spos = $s.length;
 	var start = measure.Start();
 	var beats = this.ReadInt();
 	{
@@ -14563,11 +9840,8 @@ net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadMeasure = function(measure,t
 			start += this.ReadBeat(start,measure,track,0);
 		}
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadMeasureHeader = function(i,timeSignature,song) {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ReadMeasureHeader");
-	var $spos = $s.length;
 	var flags = this.ReadUnsignedByte();
 	var header = this.Factory.NewMeasureHeader();
 	header.Number = i + 1;
@@ -14590,15 +9864,9 @@ net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadMeasureHeader = function(i,t
 		header.KeySignatureType = song.MeasureHeaders[i - 1].KeySignatureType;
 	}
 	header.HasDoubleBar = (flags & 128) != 0;
-	{
-		$s.pop();
-		return header;
-	}
-	$s.pop();
+	return header;
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadMeasureHeaders = function(song,measureCount) {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ReadMeasureHeaders");
-	var $spos = $s.length;
 	var timeSignature = this.Factory.NewTimeSignature();
 	{
 		var _g = 0;
@@ -14607,11 +9875,8 @@ net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadMeasureHeaders = function(so
 			song.AddMeasureHeader(this.ReadMeasureHeader(i,timeSignature,song));
 		}
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadMeasures = function(song) {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ReadMeasures");
-	var $spos = $s.length;
 	var tempo = this.Factory.NewTempo();
 	tempo.Value = song.Tempo;
 	var start = 960;
@@ -14636,11 +9901,8 @@ net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadMeasures = function(song) {
 			start += header.Length();
 		}
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadMidiChannels = function() {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ReadMidiChannels");
-	var $spos = $s.length;
 	var channels = new Array();
 	{
 		var _g = 0;
@@ -14660,15 +9922,9 @@ net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadMidiChannels = function() {
 			this.Skip(2);
 		}
 	}
-	{
-		$s.pop();
-		return channels;
-	}
-	$s.pop();
+	return channels;
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadMixTableChange = function(measure) {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ReadMixTableChange");
-	var $spos = $s.length;
 	var tableChange = this.Factory.NewMixTableChange();
 	tableChange.Instrument.Value = this.ReadByte();
 	tableChange.Volume.Value = this.ReadByte();
@@ -14706,15 +9962,9 @@ net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadMixTableChange = function(me
 	if(tableChange.Phaser != null) tableChange.Phaser.AllTracks = (allTracksFlags & 16) != 0;
 	if(tableChange.Tremolo != null) tableChange.Tremolo.AllTracks = (allTracksFlags & 32) != 0;
 	if(tableChange.Tempo != null) tableChange.Tempo.AllTracks = true;
-	{
-		$s.pop();
-		return tableChange;
-	}
-	$s.pop();
+	return tableChange;
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadNote = function(guitarString,track,effect) {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ReadNote");
-	var $spos = $s.length;
 	var flags = this.ReadUnsignedByte();
 	var note = this.Factory.NewNote();
 	note.String = (guitarString.Number);
@@ -14747,15 +9997,9 @@ net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadNote = function(guitarString
 	if((flags & 8) != 0) {
 		this.ReadNoteEffects(note.Effect);
 	}
-	{
-		$s.pop();
-		return note;
-	}
-	$s.pop();
+	return note;
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadNoteEffects = function(noteEffect) {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ReadNoteEffects");
-	var $spos = $s.length;
 	var flags1 = this.ReadUnsignedByte();
 	noteEffect.Slide = (flags1 & 4) != 0;
 	noteEffect.Hammer = (flags1 & 2) != 0;
@@ -14766,18 +10010,12 @@ net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadNoteEffects = function(noteE
 	if((flags1 & 16) != 0) {
 		this.ReadGrace(noteEffect);
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadPageSetup = function(song) {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ReadPageSetup");
-	var $spos = $s.length;
 	var setup = net.alphatab.model.GsPageSetup.Defaults();
 	song.PageSetup = setup;
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadSong = function() {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ReadSong");
-	var $spos = $s.length;
 	if(!this.ReadVersion()) {
 		throw new net.alphatab.file.FileFormatException("Unsupported Version");
 	}
@@ -14797,23 +10035,14 @@ net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadSong = function() {
 	this.ReadMeasureHeaders(song,measureCount);
 	this.ReadTracks(song,trackCount,channels);
 	this.ReadMeasures(song);
-	{
-		$s.pop();
-		return song;
-	}
-	$s.pop();
+	return song;
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadText = function(beat) {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ReadText");
-	var $spos = $s.length;
 	var text = this.Factory.NewText();
 	text.Value = this.ReadIntSizeCheckByteString();
 	beat.SetText(text);
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadTrack = function(number,channels) {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ReadTrack");
-	var $spos = $s.length;
 	var flags = this.ReadUnsignedByte();
 	var track = this.Factory.NewTrack();
 	track.IsPercussionTrack = (flags & 1) != 0;
@@ -14840,25 +10069,16 @@ net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadTrack = function(number,chan
 	track.FretCount = this.ReadInt();
 	track.Offset = this.ReadInt();
 	track.Color = this.ReadColor();
-	{
-		$s.pop();
-		return track;
-	}
-	$s.pop();
+	return track;
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadTracks = function(song,trackCount,channels) {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ReadTracks");
-	var $spos = $s.length;
 	var _g1 = 1, _g = trackCount + 1;
 	while(_g1 < _g) {
 		var i = _g1++;
 		song.AddTrack(this.ReadTrack(i,channels));
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadTremoloBar = function(effect) {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ReadTremoloBar");
-	var $spos = $s.length;
 	var barEffect = this.Factory.NewTremoloBarEffect();
 	barEffect.Type = net.alphatab.model.effects.GsBendTypesConverter.FromInt(this.ReadByte());
 	barEffect.Value = this.ReadInt();
@@ -14866,79 +10086,76 @@ net.alphatab.file.guitarpro.Gp3Reader.prototype.ReadTremoloBar = function(effect
 	barEffect.Points.push(new net.alphatab.model.effects.GsTremoloBarPoint(Math.round(12 / 2.0),Math.round(barEffect.Value / 50),false));
 	barEffect.Points.push(new net.alphatab.model.effects.GsTremoloBarPoint(12,0,false));
 	effect.TremoloBar = barEffect;
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ToKeySignature = function(p) {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ToKeySignature");
-	var $spos = $s.length;
-	{
-		var $tmp = (p < 0?7 + Math.round(Math.abs(p)):p);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (p < 0?7 + Math.round(Math.abs(p)):p);
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype.ToStrokeValue = function(value) {
-	$s.push("net.alphatab.file.guitarpro.Gp3Reader::ToStrokeValue");
-	var $spos = $s.length;
 	switch(value) {
 	case 1:{
-		{
-			$s.pop();
-			return 64;
-		}
+		return 64;
 	}break;
 	case 2:{
-		{
-			$s.pop();
-			return 64;
-		}
+		return 64;
 	}break;
 	case 3:{
-		{
-			$s.pop();
-			return 32;
-		}
+		return 32;
 	}break;
 	case 4:{
-		{
-			$s.pop();
-			return 16;
-		}
+		return 16;
 	}break;
 	case 5:{
-		{
-			$s.pop();
-			return 8;
-		}
+		return 8;
 	}break;
 	case 6:{
-		{
-			$s.pop();
-			return 4;
-		}
+		return 4;
 	}break;
 	default:{
-		{
-			$s.pop();
-			return 64;
-		}
+		return 64;
 	}break;
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp3Reader.prototype._tripletFeel = null;
 net.alphatab.file.guitarpro.Gp3Reader.prototype.__class__ = net.alphatab.file.guitarpro.Gp3Reader;
+haxe.Timer = function(time_ms) { if( time_ms === $_ ) return; {
+	this.id = haxe.Timer.arr.length;
+	haxe.Timer.arr[this.id] = this;
+	this.timerId = window.setInterval(("haxe.Timer.arr[" + this.id) + "].run();",time_ms);
+}}
+haxe.Timer.__name__ = ["haxe","Timer"];
+haxe.Timer.delay = function(f,time_ms) {
+	var t = new haxe.Timer(time_ms);
+	t.run = function() {
+		t.stop();
+		f();
+	}
+	return t;
+}
+haxe.Timer.stamp = function() {
+	return Date.now().getTime() / 1000;
+}
+haxe.Timer.prototype.id = null;
+haxe.Timer.prototype.run = function() {
+	null;
+}
+haxe.Timer.prototype.stop = function() {
+	if(this.id == null) return;
+	window.clearInterval(this.timerId);
+	haxe.Timer.arr[this.id] = null;
+	if(this.id > 100 && this.id == haxe.Timer.arr.length - 1) {
+		var p = this.id - 1;
+		while(p >= 0 && haxe.Timer.arr[p] == null) p--;
+		haxe.Timer.arr = haxe.Timer.arr.slice(0,p + 1);
+	}
+	this.id = null;
+}
+haxe.Timer.prototype.timerId = null;
+haxe.Timer.prototype.__class__ = haxe.Timer;
 net.alphatab.model.effects.GsTremoloBarEffect = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.model.effects.GsTremoloBarEffect::new");
-	var $spos = $s.length;
 	this.Points = new Array();
-	$s.pop();
 }}
 net.alphatab.model.effects.GsTremoloBarEffect.__name__ = ["net","alphatab","model","effects","GsTremoloBarEffect"];
 net.alphatab.model.effects.GsTremoloBarEffect.prototype.Clone = function(factory) {
-	$s.push("net.alphatab.model.effects.GsTremoloBarEffect::Clone");
-	var $spos = $s.length;
 	var effect = factory.NewTremoloBarEffect();
 	effect.Type = this.Type;
 	effect.Value = this.Value;
@@ -14950,51 +10167,35 @@ net.alphatab.model.effects.GsTremoloBarEffect.prototype.Clone = function(factory
 			effect.Points.push(new net.alphatab.model.effects.GsTremoloBarPoint(point.Position,point.Value,point.Vibrato));
 		}
 	}
-	{
-		$s.pop();
-		return effect;
-	}
-	$s.pop();
+	return effect;
 }
 net.alphatab.model.effects.GsTremoloBarEffect.prototype.Points = null;
 net.alphatab.model.effects.GsTremoloBarEffect.prototype.Type = null;
 net.alphatab.model.effects.GsTremoloBarEffect.prototype.Value = null;
 net.alphatab.model.effects.GsTremoloBarEffect.prototype.__class__ = net.alphatab.model.effects.GsTremoloBarEffect;
 net.alphatab.model.GsColor = function(r,g,b) { if( r === $_ ) return; {
-	$s.push("net.alphatab.model.GsColor::new");
-	var $spos = $s.length;
 	if(b == null) b = 0;
 	if(g == null) g = 0;
 	if(r == null) r = 0;
 	this.R = r;
 	this.G = g;
 	this.B = b;
-	$s.pop();
 }}
 net.alphatab.model.GsColor.__name__ = ["net","alphatab","model","GsColor"];
 net.alphatab.model.GsColor.prototype.B = null;
 net.alphatab.model.GsColor.prototype.G = null;
 net.alphatab.model.GsColor.prototype.R = null;
 net.alphatab.model.GsColor.prototype.toString = function() {
-	$s.push("net.alphatab.model.GsColor::toString");
-	var $spos = $s.length;
 	var s = "rgb(";
 	s += Std.string(this.R) + ",";
 	s += Std.string(this.G) + ",";
 	s += Std.string(this.B) + ")";
-	{
-		$s.pop();
-		return s;
-	}
-	$s.pop();
+	return s;
 }
 net.alphatab.model.GsColor.prototype.__class__ = net.alphatab.model.GsColor;
 net.alphatab.model.GsMarker = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.model.GsMarker::new");
-	var $spos = $s.length;
 	this.Title = "Untitled";
 	this.Color = new net.alphatab.model.GsColor(255,0,0);
-	$s.pop();
 }}
 net.alphatab.model.GsMarker.__name__ = ["net","alphatab","model","GsMarker"];
 net.alphatab.model.GsMarker.prototype.Color = null;
@@ -15002,39 +10203,53 @@ net.alphatab.model.GsMarker.prototype.MeasureHeader = null;
 net.alphatab.model.GsMarker.prototype.Title = null;
 net.alphatab.model.GsMarker.prototype.__class__ = net.alphatab.model.GsMarker;
 net.alphatab.model.Size = function(width,height) { if( width === $_ ) return; {
-	$s.push("net.alphatab.model.Size::new");
-	var $spos = $s.length;
 	this.Width = width;
 	this.Height = height;
-	$s.pop();
 }}
 net.alphatab.model.Size.__name__ = ["net","alphatab","model","Size"];
 net.alphatab.model.Size.prototype.Height = null;
 net.alphatab.model.Size.prototype.Width = null;
 net.alphatab.model.Size.prototype.__class__ = net.alphatab.model.Size;
 net.alphatab.model.Point = function(x,y) { if( x === $_ ) return; {
-	$s.push("net.alphatab.model.Point::new");
-	var $spos = $s.length;
 	this.X = x;
 	this.Y = y;
-	$s.pop();
 }}
 net.alphatab.model.Point.__name__ = ["net","alphatab","model","Point"];
 net.alphatab.model.Point.prototype.X = null;
 net.alphatab.model.Point.prototype.Y = null;
 net.alphatab.model.Point.prototype.__class__ = net.alphatab.model.Point;
+haxe.TimerQueue = function(delay) { if( delay === $_ ) return; {
+	this.delay = (delay == null?1:delay);
+	this.q = new Array();
+}}
+haxe.TimerQueue.__name__ = ["haxe","TimerQueue"];
+haxe.TimerQueue.prototype.add = function(f) {
+	this.q.push(f);
+	if(this.t == null) {
+		this.t = new haxe.Timer(this.delay);
+		this.t.run = $closure(this,"process");
+	}
+}
+haxe.TimerQueue.prototype.delay = null;
+haxe.TimerQueue.prototype.process = function() {
+	var f = this.q.shift();
+	if(f == null) {
+		this.t.stop();
+		this.t = null;
+		return;
+	}
+	f();
+}
+haxe.TimerQueue.prototype.q = null;
+haxe.TimerQueue.prototype.t = null;
+haxe.TimerQueue.prototype.__class__ = haxe.TimerQueue;
 net.alphatab.model.effects.GsBendEffect = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.model.effects.GsBendEffect::new");
-	var $spos = $s.length;
 	this.Type = net.alphatab.model.effects.GsBendTypes.None;
 	this.Value = 0;
 	this.Points = new Array();
-	$s.pop();
 }}
 net.alphatab.model.effects.GsBendEffect.__name__ = ["net","alphatab","model","effects","GsBendEffect"];
 net.alphatab.model.effects.GsBendEffect.prototype.Clone = function(factory) {
-	$s.push("net.alphatab.model.effects.GsBendEffect::Clone");
-	var $spos = $s.length;
 	var effect = factory.NewBendEffect();
 	effect.Value = this.Value;
 	effect.Type = this.Type;
@@ -15046,26 +10261,17 @@ net.alphatab.model.effects.GsBendEffect.prototype.Clone = function(factory) {
 			effect.Points.push(new net.alphatab.model.effects.GsBendPoint(point.Position,point.Value,point.Vibrato));
 		}
 	}
-	{
-		$s.pop();
-		return effect;
-	}
-	$s.pop();
+	return effect;
 }
 net.alphatab.model.effects.GsBendEffect.prototype.Points = null;
 net.alphatab.model.effects.GsBendEffect.prototype.Type = null;
 net.alphatab.model.effects.GsBendEffect.prototype.Value = null;
 net.alphatab.model.effects.GsBendEffect.prototype.__class__ = net.alphatab.model.effects.GsBendEffect;
 net.alphatab.model.GsPageSetup = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.model.GsPageSetup::new");
-	var $spos = $s.length;
 	null;
-	$s.pop();
 }}
 net.alphatab.model.GsPageSetup.__name__ = ["net","alphatab","model","GsPageSetup"];
 net.alphatab.model.GsPageSetup.Defaults = function() {
-	$s.push("net.alphatab.model.GsPageSetup::Defaults");
-	var $spos = $s.length;
 	if(net.alphatab.model.GsPageSetup._defaults == null) {
 		net.alphatab.model.GsPageSetup._defaults = new net.alphatab.model.GsPageSetup();
 		net.alphatab.model.GsPageSetup._defaults.PageSize = new net.alphatab.model.Point(210,297);
@@ -15082,12 +10288,7 @@ net.alphatab.model.GsPageSetup.Defaults = function() {
 		net.alphatab.model.GsPageSetup._defaults.Copyright = "Copyright %COPYRIGHT%\n" + "All Rights Reserved - International Copyright Secured";
 		net.alphatab.model.GsPageSetup._defaults.PageNumber = "Page %N%/%P%";
 	}
-	{
-		var $tmp = net.alphatab.model.GsPageSetup._defaults;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return net.alphatab.model.GsPageSetup._defaults;
 }
 net.alphatab.model.GsPageSetup.prototype.Album = null;
 net.alphatab.model.GsPageSetup.prototype.Artist = null;
@@ -15104,10 +10305,7 @@ net.alphatab.model.GsPageSetup.prototype.Words = null;
 net.alphatab.model.GsPageSetup.prototype.WordsAndMusic = null;
 net.alphatab.model.GsPageSetup.prototype.__class__ = net.alphatab.model.GsPageSetup;
 net.alphatab.tablature.drawing.DrawingResources = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.tablature.drawing.DrawingResources::new");
-	var $spos = $s.length;
 	null;
-	$s.pop();
 }}
 net.alphatab.tablature.drawing.DrawingResources.__name__ = ["net","alphatab","tablature","drawing","DrawingResources"];
 net.alphatab.tablature.drawing.DrawingResources.DefaultFontHeight = null;
@@ -15128,8 +10326,6 @@ net.alphatab.tablature.drawing.DrawingResources.SubtitleFont = null;
 net.alphatab.tablature.drawing.DrawingResources.WordsFont = null;
 net.alphatab.tablature.drawing.DrawingResources.CopyrightFont = null;
 net.alphatab.tablature.drawing.DrawingResources.Init = function(scale) {
-	$s.push("net.alphatab.tablature.drawing.DrawingResources::Init");
-	var $spos = $s.length;
 	net.alphatab.tablature.drawing.DrawingResources.DefaultFontHeight = Math.round(9 * scale);
 	net.alphatab.tablature.drawing.DrawingResources.DefaultFont = net.alphatab.Utils.string(net.alphatab.tablature.drawing.DrawingResources.DefaultFontHeight) + "px 'Arial'";
 	net.alphatab.tablature.drawing.DrawingResources.ChordFont = net.alphatab.Utils.string(9 * scale) + "px 'Arial'";
@@ -15146,42 +10342,24 @@ net.alphatab.tablature.drawing.DrawingResources.Init = function(scale) {
 	net.alphatab.tablature.drawing.DrawingResources.TitleFont = net.alphatab.Utils.string(30 * scale) + "px 'Times New Roman'";
 	net.alphatab.tablature.drawing.DrawingResources.SubtitleFont = net.alphatab.Utils.string(19 * scale) + "px 'Times New Roman'";
 	net.alphatab.tablature.drawing.DrawingResources.WordsFont = net.alphatab.Utils.string(13 * scale) + "px 'Times New Roman'";
-	net.alphatab.tablature.drawing.DrawingResources.CopyrightFont = ("bold" + net.alphatab.Utils.string(11 * scale)) + "px 'Arial'";
-	$s.pop();
+	net.alphatab.tablature.drawing.DrawingResources.CopyrightFont = ("bold " + net.alphatab.Utils.string(11 * scale)) + "px 'Arial'";
 }
 net.alphatab.tablature.drawing.DrawingResources.GetScoreNoteSize = function(layout,full) {
-	$s.push("net.alphatab.tablature.drawing.DrawingResources::GetScoreNoteSize");
-	var $spos = $s.length;
 	var scale = ((full?layout.ScoreLineSpacing + 1:layout.ScoreLineSpacing)) - 2;
-	{
-		var $tmp = new net.alphatab.model.Size(Math.round(scale * 1.3),Math.round(scale));
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.Size(Math.round(scale * 1.3),Math.round(scale));
 }
 net.alphatab.tablature.drawing.DrawingResources.prototype.__class__ = net.alphatab.tablature.drawing.DrawingResources;
 net.alphatab.model.effects.GsTremoloBarPoint = function(position,value,vibrato) { if( position === $_ ) return; {
-	$s.push("net.alphatab.model.effects.GsTremoloBarPoint::new");
-	var $spos = $s.length;
 	if(vibrato == null) vibrato = false;
 	if(value == null) value = 0;
 	if(position == null) position = 0;
 	this.Position = position;
 	this.Value = value;
 	this.Vibrato = vibrato;
-	$s.pop();
 }}
 net.alphatab.model.effects.GsTremoloBarPoint.__name__ = ["net","alphatab","model","effects","GsTremoloBarPoint"];
 net.alphatab.model.effects.GsTremoloBarPoint.prototype.GetTime = function(duration) {
-	$s.push("net.alphatab.model.effects.GsTremoloBarPoint::GetTime");
-	var $spos = $s.length;
-	{
-		var $tmp = Math.floor((duration * this.Position) / 12);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return Math.floor((duration * this.Position) / 12);
 }
 net.alphatab.model.effects.GsTremoloBarPoint.prototype.Position = null;
 net.alphatab.model.effects.GsTremoloBarPoint.prototype.Value = null;
@@ -15238,233 +10416,117 @@ net.alphatab.model.effects.GsBendTypes.Return.__enum__ = net.alphatab.model.effe
 net.alphatab.tablature.TrackSpacingPositionConverter = function() { }
 net.alphatab.tablature.TrackSpacingPositionConverter.__name__ = ["net","alphatab","tablature","TrackSpacingPositionConverter"];
 net.alphatab.tablature.TrackSpacingPositionConverter.ToInt = function(pos) {
-	$s.push("net.alphatab.tablature.TrackSpacingPositionConverter::ToInt");
-	var $spos = $s.length;
 	switch(pos) {
 	case net.alphatab.tablature.TrackSpacingPositions.Top:{
-		{
-			$s.pop();
-			return 0;
-		}
+		return 0;
 	}break;
 	case net.alphatab.tablature.TrackSpacingPositions.Marker:{
-		{
-			$s.pop();
-			return 1;
-		}
+		return 1;
 	}break;
 	case net.alphatab.tablature.TrackSpacingPositions.Text:{
-		{
-			$s.pop();
-			return 2;
-		}
+		return 2;
 	}break;
 	case net.alphatab.tablature.TrackSpacingPositions.BufferSeparator:{
-		{
-			$s.pop();
-			return 3;
-		}
+		return 3;
 	}break;
 	case net.alphatab.tablature.TrackSpacingPositions.RepeatEnding:{
-		{
-			$s.pop();
-			return 4;
-		}
+		return 4;
 	}break;
 	case net.alphatab.tablature.TrackSpacingPositions.Chord:{
-		{
-			$s.pop();
-			return 5;
-		}
+		return 5;
 	}break;
 	case net.alphatab.tablature.TrackSpacingPositions.ScoreUpLines:{
-		{
-			$s.pop();
-			return 6;
-		}
+		return 6;
 	}break;
 	case net.alphatab.tablature.TrackSpacingPositions.ScoreMiddleLines:{
-		{
-			$s.pop();
-			return 7;
-		}
+		return 7;
 	}break;
 	case net.alphatab.tablature.TrackSpacingPositions.ScoreDownLines:{
-		{
-			$s.pop();
-			return 8;
-		}
+		return 8;
 	}break;
 	case net.alphatab.tablature.TrackSpacingPositions.Tupleto:{
-		{
-			$s.pop();
-			return 9;
-		}
+		return 9;
 	}break;
 	case net.alphatab.tablature.TrackSpacingPositions.AccentuatedEffect:{
-		{
-			$s.pop();
-			return 10;
-		}
+		return 10;
 	}break;
 	case net.alphatab.tablature.TrackSpacingPositions.HarmonicEffect:{
-		{
-			$s.pop();
-			return 11;
-		}
+		return 11;
 	}break;
 	case net.alphatab.tablature.TrackSpacingPositions.TapingEffect:{
-		{
-			$s.pop();
-			return 12;
-		}
+		return 12;
 	}break;
 	case net.alphatab.tablature.TrackSpacingPositions.LetRingEffect:{
-		{
-			$s.pop();
-			return 13;
-		}
+		return 13;
 	}break;
 	case net.alphatab.tablature.TrackSpacingPositions.PalmMuteEffect:{
-		{
-			$s.pop();
-			return 14;
-		}
+		return 14;
 	}break;
 	case net.alphatab.tablature.TrackSpacingPositions.BeatVibratoEffect:{
-		{
-			$s.pop();
-			return 15;
-		}
+		return 15;
 	}break;
 	case net.alphatab.tablature.TrackSpacingPositions.VibratoEffect:{
-		{
-			$s.pop();
-			return 16;
-		}
+		return 16;
 	}break;
 	case net.alphatab.tablature.TrackSpacingPositions.FadeIn:{
-		{
-			$s.pop();
-			return 17;
-		}
+		return 17;
 	}break;
 	case net.alphatab.tablature.TrackSpacingPositions.Bend:{
-		{
-			$s.pop();
-			return 18;
-		}
+		return 18;
 	}break;
 	case net.alphatab.tablature.TrackSpacingPositions.TablatureTopSeparator:{
-		{
-			$s.pop();
-			return 19;
-		}
+		return 19;
 	}break;
 	case net.alphatab.tablature.TrackSpacingPositions.Tablature:{
-		{
-			$s.pop();
-			return 20;
-		}
+		return 20;
+	}break;
+	case net.alphatab.tablature.TrackSpacingPositions.TremoloBarDown:{
+		return 21;
 	}break;
 	case net.alphatab.tablature.TrackSpacingPositions.Lyric:{
-		{
-			$s.pop();
-			return 21;
-		}
+		return 22;
 	}break;
 	case net.alphatab.tablature.TrackSpacingPositions.Bottom:{
-		{
-			$s.pop();
-			return 22;
-		}
+		return 23;
 	}break;
 	default:{
-		{
-			$s.pop();
-			return 0;
-		}
+		return 0;
 	}break;
 	}
-	$s.pop();
 }
 net.alphatab.tablature.TrackSpacingPositionConverter.prototype.__class__ = net.alphatab.tablature.TrackSpacingPositionConverter;
 net.alphatab.midi.MidiSequenceParser = function(factory,song,flags,tempoPercent,transpose) { if( factory === $_ ) return; {
-	$s.push("net.alphatab.midi.MidiSequenceParser::new");
-	var $spos = $s.length;
 	this._song = song;
 	this._factory = factory;
 	this._flags = flags;
 	this._transpose = transpose;
 	this._tempoPercent = tempoPercent;
 	this._firstTickMove = (((flags & 8) == 0)?0:960);
-	$s.pop();
 }}
 net.alphatab.midi.MidiSequenceParser.__name__ = ["net","alphatab","midi","MidiSequenceParser"];
 net.alphatab.midi.MidiSequenceParser.ApplyDurationEffects = function(note,tempo,duration) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::ApplyDurationEffects");
-	var $spos = $s.length;
 	if(note.Effect.DeadNote) {
-		{
-			var $tmp = net.alphatab.midi.MidiSequenceParser.ApplyStaticDuration(tempo,30,duration);
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.midi.MidiSequenceParser.ApplyStaticDuration(tempo,30,duration);
 	}
 	if(note.Effect.PalmMute) {
-		{
-			var $tmp = net.alphatab.midi.MidiSequenceParser.ApplyStaticDuration(tempo,80,duration);
-			$s.pop();
-			return $tmp;
-		}
+		return net.alphatab.midi.MidiSequenceParser.ApplyStaticDuration(tempo,80,duration);
 	}
 	if(note.Effect.Staccato) {
-		{
-			var $tmp = Math.floor((duration * 50.0) / 100.0);
-			$s.pop();
-			return $tmp;
-		}
+		return Math.floor((duration * 50.0) / 100.0);
 	}
-	{
-		$s.pop();
-		return duration;
-	}
-	$s.pop();
+	return duration;
 }
 net.alphatab.midi.MidiSequenceParser.ApplyStaticDuration = function(tempo,duration,maximum) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::ApplyStaticDuration");
-	var $spos = $s.length;
 	var value = Math.floor((tempo.Value * duration) / 60);
-	{
-		var $tmp = (((value < maximum)?value:maximum));
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (((value < maximum)?value:maximum));
 }
 net.alphatab.midi.MidiSequenceParser.ApplyStrokeDuration = function(note,duration,stroke) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::ApplyStrokeDuration");
-	var $spos = $s.length;
-	{
-		var $tmp = (duration - stroke[note.String - 1]);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (duration - stroke[note.String - 1]);
 }
 net.alphatab.midi.MidiSequenceParser.ApplyStrokeStart = function(node,start,stroke) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::ApplyStrokeStart");
-	var $spos = $s.length;
-	{
-		var $tmp = (start + stroke[node.String - 1]);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (start + stroke[node.String - 1]);
 }
 net.alphatab.midi.MidiSequenceParser.GetNextBeat = function(voice,beatIndex) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::GetNextBeat");
-	var $spos = $s.length;
 	var next = null;
 	{
 		var _g1 = beatIndex + 1, _g = voice.Beat.Measure.BeatCount();
@@ -15476,15 +10538,9 @@ net.alphatab.midi.MidiSequenceParser.GetNextBeat = function(voice,beatIndex) {
 			}
 		}
 	}
-	{
-		$s.pop();
-		return next;
-	}
-	$s.pop();
+	return next;
 }
 net.alphatab.midi.MidiSequenceParser.GetNextNote = function(note,track,measureIndex,beatIndex) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::GetNextNote");
-	var $spos = $s.length;
 	var nextBeatIndex = beatIndex + 1;
 	var measureCount = track.MeasureCount();
 	{
@@ -15506,31 +10562,19 @@ net.alphatab.midi.MidiSequenceParser.GetNextNote = function(note,track,measureIn
 							var n = _g2++;
 							var currNode = voice.Notes[n];
 							if(currNode.String == note.String) {
-								{
-									$s.pop();
-									return currNode;
-								}
+								return currNode;
 							}
 						}
 					}
-					{
-						$s.pop();
-						return null;
-					}
+					return null;
 				}
 			}
 			nextBeatIndex = 0;
 		}
 	}
-	{
-		$s.pop();
-		return null;
-	}
-	$s.pop();
+	return null;
 }
 net.alphatab.midi.MidiSequenceParser.GetPreviousBeat = function(voice,beatIndex) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::GetPreviousBeat");
-	var $spos = $s.length;
 	var previous = null;
 	var b = beatIndex - 1;
 	while(b >= 0) {
@@ -15540,15 +10584,9 @@ net.alphatab.midi.MidiSequenceParser.GetPreviousBeat = function(voice,beatIndex)
 		}
 		b--;
 	}
-	{
-		$s.pop();
-		return previous;
-	}
-	$s.pop();
+	return previous;
 }
 net.alphatab.midi.MidiSequenceParser.GetPreviousNote = function(note,track,measureIndex,beatIndex) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::GetPreviousNote");
-	var $spos = $s.length;
 	var nextBeatIndex = beatIndex;
 	var m = measureIndex;
 	while(m >= 0) {
@@ -15564,10 +10602,7 @@ net.alphatab.midi.MidiSequenceParser.GetPreviousNote = function(note,track,measu
 					var n = _g++;
 					var current = voice.Notes[n];
 					if(current.String == note.String) {
-						{
-							$s.pop();
-							return current;
-						}
+						return current;
 					}
 				}
 			}
@@ -15576,15 +10611,9 @@ net.alphatab.midi.MidiSequenceParser.GetPreviousNote = function(note,track,measu
 		nextBeatIndex = -1;
 		m--;
 	}
-	{
-		$s.pop();
-		return null;
-	}
-	$s.pop();
+	return null;
 }
 net.alphatab.midi.MidiSequenceParser.GetRealVelocity = function(note,track,measureIndex,beatIndex) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::GetRealVelocity");
-	var $spos = $s.length;
 	var velocity = note.Velocity;
 	if(!track.IsPercussionTrack) {
 		var previousNote = net.alphatab.midi.MidiSequenceParser.GetPreviousNote(note,track,measureIndex,beatIndex);
@@ -15601,18 +10630,11 @@ net.alphatab.midi.MidiSequenceParser.GetRealVelocity = function(note,track,measu
 	else if(note.Effect.HeavyAccentuatedNote) {
 		velocity = Math.floor(Math.max(15,velocity + 32));
 	}
-	{
-		var $tmp = (((velocity > 127)?127:velocity));
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (((velocity > 127)?127:velocity));
 }
 net.alphatab.midi.MidiSequenceParser.GetStroke = function(beat,previous,stroke) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::GetStroke");
-	var $spos = $s.length;
-	var direction = beat.Stroke.Direction;
-	if(((previous == null) || (direction != net.alphatab.model.GsBeatStrokeDirection.None)) || (previous.Stroke.Direction != net.alphatab.model.GsBeatStrokeDirection.None)) {
+	var direction = beat.Effect.Stroke.Direction;
+	if(((previous == null) || (direction != net.alphatab.model.GsBeatStrokeDirection.None)) || (previous.Effect.Stroke.Direction != net.alphatab.model.GsBeatStrokeDirection.None)) {
 		if(direction == net.alphatab.model.GsBeatStrokeDirection.None) {
 			{
 				var _g1 = 0, _g = stroke.length;
@@ -15644,7 +10666,7 @@ net.alphatab.midi.MidiSequenceParser.GetStroke = function(beat,previous,stroke) 
 			}
 			if(stringCount > 0) {
 				var strokeMove = 0;
-				var strokeIncrement = beat.Stroke.GetIncrementTime(beat);
+				var strokeIncrement = beat.Effect.Stroke.GetIncrementTime(beat);
 				{
 					var _g1 = 0, _g = stroke.length;
 					while(_g1 < _g) {
@@ -15659,25 +10681,13 @@ net.alphatab.midi.MidiSequenceParser.GetStroke = function(beat,previous,stroke) 
 			}
 		}
 	}
-	{
-		$s.pop();
-		return stroke;
-	}
-	$s.pop();
+	return stroke;
 }
 net.alphatab.midi.MidiSequenceParser.prototype.AddBend = function(sequence,track,tick,bend,channel) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::AddBend");
-	var $spos = $s.length;
 	sequence.AddPitchBend(this.GetTick(tick),track,channel,bend);
-	$s.pop();
 }
 net.alphatab.midi.MidiSequenceParser.prototype.AddDefaultMessages = function(oSequence) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::AddDefaultMessages");
-	var $spos = $s.length;
-	if((this._flags & 1) == 0) {
-		$s.pop();
-		return;
-	}
+	if((this._flags & 1) == 0) return;
 	{
 		var _g = 0;
 		while(_g < 16) {
@@ -15688,15 +10698,9 @@ net.alphatab.midi.MidiSequenceParser.prototype.AddDefaultMessages = function(oSe
 			oSequence.AddControlChange(this.GetTick(960),this._infoTrack,i,38,0);
 		}
 	}
-	$s.pop();
 }
 net.alphatab.midi.MidiSequenceParser.prototype.AddMetronome = function(sequence,header,startMove) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::AddMetronome");
-	var $spos = $s.length;
-	if((this._flags & 4) == 0) {
-		$s.pop();
-		return;
-	}
+	if((this._flags & 4) == 0) return;
 	var start = startMove + header.Start;
 	var length = header.TimeSignature.Denominator.Time();
 	{
@@ -15707,11 +10711,8 @@ net.alphatab.midi.MidiSequenceParser.prototype.AddMetronome = function(sequence,
 			start += length;
 		}
 	}
-	$s.pop();
 }
 net.alphatab.midi.MidiSequenceParser.prototype.AddTempo = function(sequence,currentMeasure,previousMeasure,startMove) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::AddTempo");
-	var $spos = $s.length;
 	var bAddTempo = false;
 	if(previousMeasure == null) {
 		bAddTempo = true;
@@ -15719,17 +10720,11 @@ net.alphatab.midi.MidiSequenceParser.prototype.AddTempo = function(sequence,curr
 	else if(currentMeasure.GetTempo().InUsq() != previousMeasure.GetTempo().InUsq()) {
 		bAddTempo = true;
 	}
-	if(!bAddTempo) {
-		$s.pop();
-		return;
-	}
+	if(!bAddTempo) return;
 	var usq = Math.floor((currentMeasure.GetTempo().InUsq() * 100.0) / this._tempoPercent);
 	sequence.AddTempoInUSQ(this.GetTick(currentMeasure.Start() + startMove),this._infoTrack,usq);
-	$s.pop();
 }
 net.alphatab.midi.MidiSequenceParser.prototype.AddTimeSignature = function(sequence,currentMeasure,previousMeasure,startMove) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::AddTimeSignature");
-	var $spos = $s.length;
 	var addTimeSignature = false;
 	if(previousMeasure == null) {
 		addTimeSignature = true;
@@ -15746,11 +10741,8 @@ net.alphatab.midi.MidiSequenceParser.prototype.AddTimeSignature = function(seque
 	if(addTimeSignature) {
 		sequence.AddTimeSignature(this.GetTick(currentMeasure.Start() + startMove),this._infoTrack,currentMeasure.GetTimeSignature());
 	}
-	$s.pop();
 }
 net.alphatab.midi.MidiSequenceParser.prototype.CheckTripletFeel = function(voice,beatIndex) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::CheckTripletFeel");
-	var $spos = $s.length;
 	var beatStart = voice.Beat.Start;
 	var beatDuration = voice.Duration.Time();
 	if(voice.Beat.Measure.GetTripletFeel() == net.alphatab.model.GsTripletFeel.Eighth) {
@@ -15797,16 +10789,9 @@ net.alphatab.midi.MidiSequenceParser.prototype.CheckTripletFeel = function(voice
 			}
 		}
 	}
-	{
-		var $tmp = new net.alphatab.midi.BeatData(beatStart,beatDuration);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.midi.BeatData(beatStart,beatDuration);
 }
 net.alphatab.midi.MidiSequenceParser.prototype.CreateTrack = function(sequence,track) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::CreateTrack");
-	var $spos = $s.length;
 	var previous = null;
 	var controller = new net.alphatab.midi.MidiRepeatController(track.Song);
 	this.AddBend(sequence,track.Number,960,64,track.Channel.Channel);
@@ -15826,11 +10811,13 @@ net.alphatab.midi.MidiSequenceParser.prototype.CreateTrack = function(sequence,t
 		}
 		previous = measure;
 	}
-	$s.pop();
+}
+net.alphatab.midi.MidiSequenceParser.prototype.GetMixChangeValue = function(value,signed) {
+	if(signed == null) signed = true;
+	if(signed) value += 8;
+	return Math.round((value * 127) / 16);
 }
 net.alphatab.midi.MidiSequenceParser.prototype.GetRealNoteDuration = function(track,note,tempo,duration,measureIndex,beatIndex) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::GetRealNoteDuration");
-	var $spos = $s.length;
 	var lastEnd = note.Voice.Beat.Start + note.Voice.Duration.Time();
 	var realDuration = duration;
 	var nextBeatIndex = beatIndex + 1;
@@ -15849,11 +10836,7 @@ net.alphatab.midi.MidiSequenceParser.prototype.GetRealNoteDuration = function(tr
 					var beat = measure.Beats[b];
 					var voice = beat.Voices[note.Voice.Index];
 					if(voice.IsRestVoice()) {
-						{
-							var $tmp = net.alphatab.midi.MidiSequenceParser.ApplyDurationEffects(note,tempo,realDuration);
-							$s.pop();
-							return $tmp;
-						}
+						return net.alphatab.midi.MidiSequenceParser.ApplyDurationEffects(note,tempo,realDuration);
 					}
 					var noteCount = voice.Notes.length;
 					var letRing = m == measureIndex && b != beatIndex && note.Effect.LetRing;
@@ -15869,11 +10852,7 @@ net.alphatab.midi.MidiSequenceParser.prototype.GetRealNoteDuration = function(tr
 								letRingSuspend = true;
 							}
 							if(!nextNote.IsTiedNote && !letRing) {
-								{
-									var $tmp = net.alphatab.midi.MidiSequenceParser.ApplyDurationEffects(note,tempo,realDuration);
-									$s.pop();
-									return $tmp;
-								}
+								return net.alphatab.midi.MidiSequenceParser.ApplyDurationEffects(note,tempo,realDuration);
 							}
 							letRingAppliedForBeat = true;
 							realDuration += (beat.Start - lastEnd) + nextNote.Voice.Duration.Time();
@@ -15889,26 +10868,12 @@ net.alphatab.midi.MidiSequenceParser.prototype.GetRealNoteDuration = function(tr
 			nextBeatIndex = 0;
 		}
 	}
-	{
-		var $tmp = net.alphatab.midi.MidiSequenceParser.ApplyDurationEffects(note,tempo,realDuration);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return net.alphatab.midi.MidiSequenceParser.ApplyDurationEffects(note,tempo,realDuration);
 }
 net.alphatab.midi.MidiSequenceParser.prototype.GetTick = function(tick) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::GetTick");
-	var $spos = $s.length;
-	{
-		var $tmp = (tick + this._firstTickMove);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (tick + this._firstTickMove);
 }
 net.alphatab.midi.MidiSequenceParser.prototype.MakeBeats = function(sequence,track,measure,measureIndex,startMove) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::MakeBeats");
-	var $spos = $s.length;
 	var stroke = new Array();
 	{
 		var _g1 = 0, _g = track.StringCount();
@@ -15923,18 +10888,15 @@ net.alphatab.midi.MidiSequenceParser.prototype.MakeBeats = function(sequence,tra
 		while(_g1 < _g) {
 			var beatIndex = _g1++;
 			var beat = measure.Beats[beatIndex];
-			if(beat.MixTableChange != null) {
+			if(beat.Effect.MixTableChange != null) {
 				this.MakeMixChange(sequence,track.Channel,track.Number,beat);
 			}
 			this.MakeNotes(sequence,track,beat,measure.GetTempo(),measureIndex,beatIndex,startMove,net.alphatab.midi.MidiSequenceParser.GetStroke(beat,previous,stroke));
 			previous = beat;
 		}
 	}
-	$s.pop();
 }
 net.alphatab.midi.MidiSequenceParser.prototype.MakeBend = function(sequence,track,start,duration,bend,channel) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::MakeBend");
-	var $spos = $s.length;
 	var points = bend.Points;
 	{
 		var _g1 = 0, _g = points.length;
@@ -15969,24 +10931,15 @@ net.alphatab.midi.MidiSequenceParser.prototype.MakeBend = function(sequence,trac
 		}
 	}
 	this.AddBend(sequence,track,start + duration,64,channel);
-	$s.pop();
 }
 net.alphatab.midi.MidiSequenceParser.prototype.MakeChannel = function(sequence,channel,track) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::MakeChannel");
-	var $spos = $s.length;
-	if((this._flags & 2) == 0) {
-		$s.pop();
-		return;
-	}
+	if((this._flags & 2) == 0) return;
 	this.MakeChannel2(sequence,channel,track,true);
 	if(channel.Channel != channel.EffectChannel) {
 		this.MakeChannel2(sequence,channel,track,false);
 	}
-	$s.pop();
 }
 net.alphatab.midi.MidiSequenceParser.prototype.MakeChannel2 = function(sequence,channel,track,primary) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::MakeChannel2");
-	var $spos = $s.length;
 	var number = ((!primary)?channel.EffectChannel:channel.Channel);
 	sequence.AddControlChange(this.GetTick(960),track,number,7,channel.Volume);
 	sequence.AddControlChange(this.GetTick(960),track,number,10,channel.Balance);
@@ -15996,11 +10949,8 @@ net.alphatab.midi.MidiSequenceParser.prototype.MakeChannel2 = function(sequence,
 	sequence.AddControlChange(this.GetTick(960),track,number,92,channel.Tremolo);
 	sequence.AddControlChange(this.GetTick(960),track,number,11,127);
 	sequence.AddProgramChange(this.GetTick(960),track,number,channel.Instrument());
-	$s.pop();
 }
 net.alphatab.midi.MidiSequenceParser.prototype.MakeFadeIn = function(sequence,track,start,duration,channel) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::MakeFadeIn");
-	var $spos = $s.length;
 	var expression = 31;
 	var expressionIncrement = 1;
 	var tick = start;
@@ -16011,36 +10961,39 @@ net.alphatab.midi.MidiSequenceParser.prototype.MakeFadeIn = function(sequence,tr
 		expression += expressionIncrement;
 	}
 	sequence.AddControlChange(this.GetTick(start + duration),track,channel,11,127);
-	$s.pop();
 }
 net.alphatab.midi.MidiSequenceParser.prototype.MakeMixChange = function(sequence,channel,track,beat) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::MakeMixChange");
-	var $spos = $s.length;
-	var change = beat.MixTableChange;
+	var change = beat.Effect.MixTableChange;
 	var start = this.GetTick(beat.Start);
 	if(change.Volume != null) {
-		sequence.AddControlChange(start,track,channel.Channel,7,change.Volume.Value);
-		sequence.AddControlChange(start,track,channel.EffectChannel,7,change.Volume.Value);
+		var value = this.GetMixChangeValue(change.Volume.Value,false);
+		sequence.AddControlChange(start,track,channel.Channel,7,value);
+		sequence.AddControlChange(start,track,channel.EffectChannel,7,value);
 	}
 	if(change.Balance != null) {
-		sequence.AddControlChange(start,track,channel.Channel,10,change.Balance.Value);
-		sequence.AddControlChange(start,track,channel.EffectChannel,10,change.Balance.Value);
+		var value = this.GetMixChangeValue(change.Balance.Value);
+		sequence.AddControlChange(start,track,channel.Channel,10,value);
+		sequence.AddControlChange(start,track,channel.EffectChannel,10,value);
 	}
 	if(change.Chorus != null) {
-		sequence.AddControlChange(start,track,channel.Channel,93,change.Chorus.Value);
-		sequence.AddControlChange(start,track,channel.EffectChannel,93,change.Chorus.Value);
+		var value = this.GetMixChangeValue(change.Chorus.Value);
+		sequence.AddControlChange(start,track,channel.Channel,93,value);
+		sequence.AddControlChange(start,track,channel.EffectChannel,93,value);
 	}
 	if(change.Reverb != null) {
-		sequence.AddControlChange(start,track,channel.Channel,91,change.Reverb.Value);
-		sequence.AddControlChange(start,track,channel.EffectChannel,91,change.Reverb.Value);
+		var value = this.GetMixChangeValue(change.Reverb.Value);
+		sequence.AddControlChange(start,track,channel.Channel,91,value);
+		sequence.AddControlChange(start,track,channel.EffectChannel,91,value);
 	}
 	if(change.Phaser != null) {
-		sequence.AddControlChange(start,track,channel.Channel,95,change.Phaser.Value);
-		sequence.AddControlChange(start,track,channel.EffectChannel,95,change.Phaser.Value);
+		var value = this.GetMixChangeValue(change.Phaser.Value);
+		sequence.AddControlChange(start,track,channel.Channel,95,value);
+		sequence.AddControlChange(start,track,channel.EffectChannel,95,value);
 	}
 	if(change.Tremolo != null) {
-		sequence.AddControlChange(start,track,channel.Channel,92,change.Tremolo.Value);
-		sequence.AddControlChange(start,track,channel.EffectChannel,92,change.Tremolo.Value);
+		var value = this.GetMixChangeValue(change.Tremolo.Value);
+		sequence.AddControlChange(start,track,channel.Channel,92,value);
+		sequence.AddControlChange(start,track,channel.EffectChannel,92,value);
 	}
 	if(change.Instrument != null) {
 		sequence.AddProgramChange(start,track,channel.Channel,change.Instrument.Value);
@@ -16049,18 +11002,12 @@ net.alphatab.midi.MidiSequenceParser.prototype.MakeMixChange = function(sequence
 	if(change.Tempo != null) {
 		sequence.AddTempoInUSQ(start,this._infoTrack,net.alphatab.model.GsTempo.TempoToUsq(change.Tempo.Value));
 	}
-	$s.pop();
 }
 net.alphatab.midi.MidiSequenceParser.prototype.MakeNote = function(sequence,track,key,start,duration,velocity,channel) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::MakeNote");
-	var $spos = $s.length;
 	sequence.AddNoteOn(this.GetTick(start),track,channel,key,velocity);
 	sequence.AddNoteOff(this.GetTick(start + duration),track,channel,key,velocity);
-	$s.pop();
 }
 net.alphatab.midi.MidiSequenceParser.prototype.MakeNotes = function(sequence,track,beat,tempo,measureIndex,beatIndex,startMove,stroke) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::MakeNotes");
-	var $spos = $s.length;
 	var trackId = track.Number;
 	{
 		var _g1 = 0, _g = beat.Voices.length;
@@ -16081,7 +11028,7 @@ net.alphatab.midi.MidiSequenceParser.prototype.MakeNotes = function(sequence,tra
 					var channel = track.Channel.Channel;
 					var effectChannel = track.Channel.EffectChannel;
 					var percussionTrack = track.IsPercussionTrack;
-					if(note.Effect.FadeIn) {
+					if(beat.Effect.FadeIn) {
 						channel = effectChannel;
 						this.MakeFadeIn(sequence,trackId,start,duration,channel);
 					}
@@ -16128,9 +11075,9 @@ net.alphatab.midi.MidiSequenceParser.prototype.MakeNotes = function(sequence,tra
 						channel = effectChannel;
 						this.MakeBend(sequence,trackId,start,duration,note.Effect.Bend,channel);
 					}
-					else if((note.Effect.IsTremoloBar() && (effectChannel >= 0)) && !percussionTrack) {
+					else if((note.Voice.Beat.Effect.IsTremoloBar() && (effectChannel >= 0)) && !percussionTrack) {
 						channel = effectChannel;
-						this.MakeTremoloBar(sequence,trackId,start,duration,note.Effect.TremoloBar,channel);
+						this.MakeTremoloBar(sequence,trackId,start,duration,note.Voice.Beat.Effect.TremoloBar,channel);
 					}
 					else if((note.Effect.Slide && (effectChannel >= 0)) && !percussionTrack) {
 						channel = effectChannel;
@@ -16171,20 +11118,14 @@ net.alphatab.midi.MidiSequenceParser.prototype.MakeNotes = function(sequence,tra
 			}
 		}
 	}
-	$s.pop();
 }
 net.alphatab.midi.MidiSequenceParser.prototype.MakeSlide = function(sequence,track,note,nextNote,startMove,channel) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::MakeSlide");
-	var $spos = $s.length;
 	if(nextNote != null) {
 		this.MakeSlide2(sequence,track,note.Voice.Beat.Start + startMove,note.Value,nextNote.Voice.Beat.Start + startMove,nextNote.Value,channel);
 		this.AddBend(sequence,track,nextNote.Voice.Beat.Start + startMove,64,channel);
 	}
-	$s.pop();
 }
 net.alphatab.midi.MidiSequenceParser.prototype.MakeSlide2 = function(sequence,track,tick1,value1,tick2,value2,channel) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::MakeSlide2");
-	var $spos = $s.length;
 	var lDistance = value2 - value1;
 	var lLength = tick2 - tick1;
 	var points = Math.floor(lLength / (960 / 8));
@@ -16197,11 +11138,8 @@ net.alphatab.midi.MidiSequenceParser.prototype.MakeSlide2 = function(sequence,tr
 			this.AddBend(sequence,track,Math.round(tick1 + ((lLength / points) * i)),iBend,channel);
 		}
 	}
-	$s.pop();
 }
 net.alphatab.midi.MidiSequenceParser.prototype.MakeTremoloBar = function(sequence,track,start,duration,effect,channel) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::MakeTremoloBar");
-	var $spos = $s.length;
 	var points = effect.Points;
 	{
 		var _g1 = 0, _g = points.length;
@@ -16238,11 +11176,8 @@ net.alphatab.midi.MidiSequenceParser.prototype.MakeTremoloBar = function(sequenc
 		}
 	}
 	this.AddBend(sequence,track,start + duration,64,channel);
-	$s.pop();
 }
 net.alphatab.midi.MidiSequenceParser.prototype.MakeVibrato = function(sequence,track,start,duration,channel) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::MakeVibrato");
-	var $spos = $s.length;
 	var nextStart = start;
 	var end = nextStart + duration;
 	while(nextStart < end) {
@@ -16252,22 +11187,13 @@ net.alphatab.midi.MidiSequenceParser.prototype.MakeVibrato = function(sequence,t
 		this.AddBend(sequence,track,nextStart,Math.round(64 + (2.75 / 2.0)),channel);
 	}
 	this.AddBend(sequence,track,nextStart,64,channel);
-	$s.pop();
 }
 net.alphatab.midi.MidiSequenceParser.prototype.NewDuration = function(value) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::NewDuration");
-	var $spos = $s.length;
 	var duration = this._factory.NewDuration();
 	duration.Value = (value);
-	{
-		$s.pop();
-		return duration;
-	}
-	$s.pop();
+	return duration;
 }
 net.alphatab.midi.MidiSequenceParser.prototype.Parse = function(sequence) {
-	$s.push("net.alphatab.midi.MidiSequenceParser::Parse");
-	var $spos = $s.length;
 	this._infoTrack = sequence.InfoTrack;
 	this._metronomeTrack = sequence.MetronomeTrack;
 	this.AddDefaultMessages(sequence);
@@ -16280,7 +11206,6 @@ net.alphatab.midi.MidiSequenceParser.prototype.Parse = function(sequence) {
 		}
 	}
 	sequence.NotifyFinish();
-	$s.pop();
 }
 net.alphatab.midi.MidiSequenceParser.prototype._factory = null;
 net.alphatab.midi.MidiSequenceParser.prototype._firstTickMove = null;
@@ -16292,74 +11217,43 @@ net.alphatab.midi.MidiSequenceParser.prototype._tempoPercent = null;
 net.alphatab.midi.MidiSequenceParser.prototype._transpose = null;
 net.alphatab.midi.MidiSequenceParser.prototype.__class__ = net.alphatab.midi.MidiSequenceParser;
 haxe.Http = function(url) { if( url === $_ ) return; {
-	$s.push("haxe.Http::new");
-	var $spos = $s.length;
 	this.url = url;
 	this.headers = new Hash();
 	this.params = new Hash();
 	this.async = true;
-	$s.pop();
 }}
 haxe.Http.__name__ = ["haxe","Http"];
 haxe.Http.requestUrl = function(url) {
-	$s.push("haxe.Http::requestUrl");
-	var $spos = $s.length;
 	var h = new haxe.Http(url);
 	h.async = false;
 	var r = null;
 	h.onData = function(d) {
-		$s.push("haxe.Http::requestUrl@621");
-		var $spos = $s.length;
 		r = d;
-		$s.pop();
 	}
 	h.onError = function(e) {
-		$s.push("haxe.Http::requestUrl@624");
-		var $spos = $s.length;
 		throw e;
-		$s.pop();
 	}
 	h.request(false);
-	{
-		$s.pop();
-		return r;
-	}
-	$s.pop();
+	return r;
 }
 haxe.Http.prototype.async = null;
 haxe.Http.prototype.headers = null;
 haxe.Http.prototype.onData = function(data) {
-	$s.push("haxe.Http::onData");
-	var $spos = $s.length;
 	null;
-	$s.pop();
 }
 haxe.Http.prototype.onError = function(msg) {
-	$s.push("haxe.Http::onError");
-	var $spos = $s.length;
 	null;
-	$s.pop();
 }
 haxe.Http.prototype.onStatus = function(status) {
-	$s.push("haxe.Http::onStatus");
-	var $spos = $s.length;
 	null;
-	$s.pop();
 }
 haxe.Http.prototype.params = null;
 haxe.Http.prototype.postData = null;
 haxe.Http.prototype.request = function(post) {
-	$s.push("haxe.Http::request");
-	var $spos = $s.length;
 	var me = this;
 	var r = new js.XMLHttpRequest();
 	var onreadystatechange = function() {
-		$s.push("haxe.Http::request@104");
-		var $spos = $s.length;
-		if(r.readyState != 4) {
-			$s.pop();
-			return;
-		}
+		if(r.readyState != 4) return;
 		var s = (function($this) {
 			var $r;
 			try {
@@ -16368,14 +11262,7 @@ haxe.Http.prototype.request = function(post) {
 			catch( $e30 ) {
 				{
 					var e = $e30;
-					$r = (function($this) {
-						var $r;
-						$e = [];
-						while($s.length >= $spos) $e.unshift($s.pop());
-						$s.push($e[0]);
-						$r = null;
-						return $r;
-					}($this));
+					$r = null;
 				}
 			}
 			return $r;
@@ -16397,7 +11284,6 @@ haxe.Http.prototype.request = function(post) {
 			me.onError("Http Error #" + r.status);
 		}break;
 		}
-		$s.pop();
 	}
 	if(this.async) r.onreadystatechange = onreadystatechange;
 	var uri = this.postData;
@@ -16423,14 +11309,8 @@ haxe.Http.prototype.request = function(post) {
 		{
 			var e = $e32;
 			{
-				$e = [];
-				while($s.length >= $spos) $e.unshift($s.pop());
-				$s.push($e[0]);
 				this.onError(e.toString());
-				{
-					$s.pop();
-					return;
-				}
+				return;
 			}
 		}
 	}
@@ -16441,31 +11321,19 @@ haxe.Http.prototype.request = function(post) {
 	}}
 	r.send(uri);
 	if(!this.async) onreadystatechange();
-	$s.pop();
 }
 haxe.Http.prototype.setHeader = function(header,value) {
-	$s.push("haxe.Http::setHeader");
-	var $spos = $s.length;
 	this.headers.set(header,value);
-	$s.pop();
 }
 haxe.Http.prototype.setParameter = function(param,value) {
-	$s.push("haxe.Http::setParameter");
-	var $spos = $s.length;
 	this.params.set(param,value);
-	$s.pop();
 }
 haxe.Http.prototype.setPostData = function(data) {
-	$s.push("haxe.Http::setPostData");
-	var $spos = $s.length;
 	this.postData = data;
-	$s.pop();
 }
 haxe.Http.prototype.url = null;
 haxe.Http.prototype.__class__ = haxe.Http;
 net.alphatab.tablature.Tablature = function(source,errorMessage) { if( source === $_ ) return; {
-	$s.push("net.alphatab.tablature.Tablature::new");
-	var $spos = $s.length;
 	if(errorMessage == null) errorMessage = "";
 	this.Canvas = net.alphatab.platform.PlatformFactory.GetCanvas(source);
 	this.Track = null;
@@ -16479,17 +11347,11 @@ net.alphatab.tablature.Tablature = function(source,errorMessage) { if( source ==
 	this.ViewLayout = new net.alphatab.tablature.PageViewLayout();
 	this.ViewLayout.SetTablature(this);
 	this.UpdateScale(1.0);
-	$s.pop();
 }}
 net.alphatab.tablature.Tablature.__name__ = ["net","alphatab","tablature","Tablature"];
 net.alphatab.tablature.Tablature.prototype.Canvas = null;
 net.alphatab.tablature.Tablature.prototype.DoLayout = function() {
-	$s.push("net.alphatab.tablature.Tablature::DoLayout");
-	var $spos = $s.length;
-	if(this.Track == null) {
-		$s.pop();
-		return;
-	}
+	if(this.Track == null) return;
 	haxe.Log.trace("Starting layouting",{ fileName : "Tablature.hx", lineNumber : 92, className : "net.alphatab.tablature.Tablature", methodName : "DoLayout"});
 	var size = this.ViewLayout.LayoutSize;
 	this.ViewLayout.PrepareLayout(new net.alphatab.model.Rectangle(0,0,size.Width,size.Height),0,0);
@@ -16498,12 +11360,9 @@ net.alphatab.tablature.Tablature.prototype.DoLayout = function() {
 	this.Canvas.SetWidth(this.ViewLayout.Width);
 	this.Canvas.SetHeight(this.ViewLayout.Height);
 	haxe.Log.trace("Layouting finished",{ fileName : "Tablature.hx", lineNumber : 104, className : "net.alphatab.tablature.Tablature", methodName : "DoLayout"});
-	$s.pop();
 }
 net.alphatab.tablature.Tablature.prototype.ErrorMessage = null;
 net.alphatab.tablature.Tablature.prototype.FindBeat = function(measurePosition,playerPosition,measure) {
-	$s.push("net.alphatab.tablature.Tablature::FindBeat");
-	var $spos = $s.length;
 	if(measure != null) {
 		{
 			var _g = 0, _g1 = measure.Beats;
@@ -16513,41 +11372,22 @@ net.alphatab.tablature.Tablature.prototype.FindBeat = function(measurePosition,p
 				var realBeat = measurePosition + (beat.Start - measure.Start());
 				var voice = beat.Voices[0];
 				if(!voice.IsEmpty && realBeat <= playerPosition && (realBeat + voice.Duration.Time()) > playerPosition) {
-					{
-						$s.pop();
-						return beat;
-					}
+					return beat;
 				}
 			}
 		}
-		{
-			var $tmp = this.SongManager.GetFirstBeat(measure.Beats);
-			$s.pop();
-			return $tmp;
-		}
+		return this.SongManager.GetFirstBeat(measure.Beats);
 	}
-	{
-		$s.pop();
-		return null;
-	}
-	$s.pop();
+	return null;
 }
 net.alphatab.tablature.Tablature.prototype.FindMeasure = function(position) {
-	$s.push("net.alphatab.tablature.Tablature::FindMeasure");
-	var $spos = $s.length;
 	var result = this.GetMeasureAt(position);
 	if(result.measure == null) {
 		result.measure = this.SongManager.GetFirstMeasure(this.Track);
 	}
-	{
-		$s.pop();
-		return result;
-	}
-	$s.pop();
+	return result;
 }
 net.alphatab.tablature.Tablature.prototype.GetMeasureAt = function(tick) {
-	$s.push("net.alphatab.tablature.Tablature::GetMeasureAt");
-	var $spos = $s.length;
 	var start = 960;
 	var result = { measure : null, realPosition : start}
 	var song = this.Track.Song;
@@ -16564,33 +11404,21 @@ net.alphatab.tablature.Tablature.prototype.GetMeasureAt = function(tick) {
 			if(tick >= start && tick < (start + length)) {
 				result.measure = this.Track.Measures[header.Number - 1];
 				result.realPosition = start;
-				{
-					$s.pop();
-					return result;
-				}
+				return result;
 			}
 			start += length;
 		}
 	}
 	result.realPosition = start;
-	{
-		$s.pop();
-		return result;
-	}
-	$s.pop();
+	return result;
 }
 net.alphatab.tablature.Tablature.prototype.Height = null;
 net.alphatab.tablature.Tablature.prototype.Invalidate = function() {
-	$s.push("net.alphatab.tablature.Tablature::Invalidate");
-	var $spos = $s.length;
 	this.Canvas.clearRect(0,0,this.Canvas.Width(),this.Canvas.Height());
 	this.OnPaint();
-	$s.pop();
 }
 net.alphatab.tablature.Tablature.prototype.IsError = null;
 net.alphatab.tablature.Tablature.prototype.NotifyTickPosition = function(position) {
-	$s.push("net.alphatab.tablature.Tablature::NotifyTickPosition");
-	var $spos = $s.length;
 	position -= 960;
 	if(position != this._lastPosition) {
 		this._lastPosition = position;
@@ -16604,12 +11432,9 @@ net.alphatab.tablature.Tablature.prototype.NotifyTickPosition = function(positio
 			if(this.OnCaretChanged != null) this.OnCaretChanged(beat);
 		}
 	}
-	$s.pop();
 }
 net.alphatab.tablature.Tablature.prototype.OnCaretChanged = null;
 net.alphatab.tablature.Tablature.prototype.OnPaint = function() {
-	$s.push("net.alphatab.tablature.Tablature::OnPaint");
-	var $spos = $s.length;
 	this.PaintBackground();
 	if(this.Track == null || this.IsError) {
 		var text = this.ErrorMessage;
@@ -16629,55 +11454,39 @@ net.alphatab.tablature.Tablature.prototype.OnPaint = function() {
 		this.UpdateDisplay = false;
 	}
 	haxe.Log.trace("Drawing Finished",{ fileName : "Tablature.hx", lineNumber : 132, className : "net.alphatab.tablature.Tablature", methodName : "OnPaint"});
-	$s.pop();
 }
 net.alphatab.tablature.Tablature.prototype.PaintBackground = function() {
-	$s.push("net.alphatab.tablature.Tablature::PaintBackground");
-	var $spos = $s.length;
 	var msg = "Rendered using alphaTab (http://www.alphaTab.net)";
 	this.Canvas.setFillStyle("#4e4e4e");
 	this.Canvas.setFont(net.alphatab.tablature.drawing.DrawingResources.CopyrightFont);
 	this.Canvas.setTextBaseline("top");
 	var x = (this.Canvas.Width() - this.Canvas.measureText(msg).width) / 2;
 	this.Canvas.fillText(msg,x,this.Canvas.Height() - 15);
-	$s.pop();
 }
 net.alphatab.tablature.Tablature.prototype.SetTrack = function(track) {
-	$s.push("net.alphatab.tablature.Tablature::SetTrack");
-	var $spos = $s.length;
 	haxe.Log.trace("Updating Track",{ fileName : "Tablature.hx", lineNumber : 71, className : "net.alphatab.tablature.Tablature", methodName : "SetTrack"});
 	this.Track = track;
 	this.UpdateDisplay = true;
 	this.UpdateTablature();
 	this.Invalidate();
-	$s.pop();
 }
 net.alphatab.tablature.Tablature.prototype.SongManager = null;
 net.alphatab.tablature.Tablature.prototype.Track = null;
 net.alphatab.tablature.Tablature.prototype.UpdateDisplay = null;
 net.alphatab.tablature.Tablature.prototype.UpdateScale = function(scale) {
-	$s.push("net.alphatab.tablature.Tablature::UpdateScale");
-	var $spos = $s.length;
 	net.alphatab.tablature.drawing.DrawingResources.Init(scale);
 	this.ViewLayout.Init(scale);
 	this.UpdateSong = true;
 	this.UpdateTablature();
 	this.UpdateDisplay = true;
 	this.Invalidate();
-	$s.pop();
 }
 net.alphatab.tablature.Tablature.prototype.UpdateSong = null;
 net.alphatab.tablature.Tablature.prototype.UpdateTablature = function() {
-	$s.push("net.alphatab.tablature.Tablature::UpdateTablature");
-	var $spos = $s.length;
-	if(this.Track == null) {
-		$s.pop();
-		return;
-	}
+	if(this.Track == null) return;
 	this.ViewLayout.UpdateSong();
 	this.DoLayout();
 	this.UpdateSong = false;
-	$s.pop();
 }
 net.alphatab.tablature.Tablature.prototype.ViewLayout = null;
 net.alphatab.tablature.Tablature.prototype.Width = null;
@@ -16685,115 +11494,71 @@ net.alphatab.tablature.Tablature.prototype._lastPosition = null;
 net.alphatab.tablature.Tablature.prototype._lastRealPosition = null;
 net.alphatab.tablature.Tablature.prototype._selectedBeat = null;
 net.alphatab.tablature.Tablature.prototype.__class__ = net.alphatab.tablature.Tablature;
+net.alphatab.midi.MidiSequenceParserFlags = function() { }
+net.alphatab.midi.MidiSequenceParserFlags.__name__ = ["net","alphatab","midi","MidiSequenceParserFlags"];
+net.alphatab.midi.MidiSequenceParserFlags.prototype.__class__ = net.alphatab.midi.MidiSequenceParserFlags;
 net.alphatab.midi.MidiSequenceHandler = function(tracks) { if( tracks === $_ ) return; {
-	$s.push("net.alphatab.midi.MidiSequenceHandler::new");
-	var $spos = $s.length;
 	this.Tracks = tracks;
 	this.InfoTrack = 0;
 	this.MetronomeTrack = tracks - 1;
 	this._commands = new Array();
-	$s.pop();
 }}
 net.alphatab.midi.MidiSequenceHandler.__name__ = ["net","alphatab","midi","MidiSequenceHandler"];
 net.alphatab.midi.MidiSequenceHandler.prototype.AddControlChange = function(tick,track,channel,controller,value) {
-	$s.push("net.alphatab.midi.MidiSequenceHandler::AddControlChange");
-	var $spos = $s.length;
 	this.AddEvent(track,tick,net.alphatab.midi.MidiMessageUtils.ControlChange(channel,controller,value));
-	$s.pop();
 }
 net.alphatab.midi.MidiSequenceHandler.prototype.AddEvent = function(track,tick,evt) {
-	$s.push("net.alphatab.midi.MidiSequenceHandler::AddEvent");
-	var $spos = $s.length;
-	var command = (((Std.string(track) + "|") + Std.string(tick)) + "|") + evt;
+	var command = (((net.alphatab.midi.MidiMessageUtils.IntToString(track) + "|") + net.alphatab.midi.MidiMessageUtils.IntToString(tick)) + "|") + evt;
 	this._commands.push(command);
-	$s.pop();
 }
 net.alphatab.midi.MidiSequenceHandler.prototype.AddNoteOff = function(tick,track,channel,note,velocity) {
-	$s.push("net.alphatab.midi.MidiSequenceHandler::AddNoteOff");
-	var $spos = $s.length;
 	this.AddEvent(track,tick,net.alphatab.midi.MidiMessageUtils.NoteOff(channel,note,velocity));
-	$s.pop();
 }
 net.alphatab.midi.MidiSequenceHandler.prototype.AddNoteOn = function(tick,track,channel,note,velocity) {
-	$s.push("net.alphatab.midi.MidiSequenceHandler::AddNoteOn");
-	var $spos = $s.length;
 	this.AddEvent(track,tick,net.alphatab.midi.MidiMessageUtils.NoteOn(channel,note,velocity));
-	$s.pop();
 }
 net.alphatab.midi.MidiSequenceHandler.prototype.AddPitchBend = function(tick,track,channel,value) {
-	$s.push("net.alphatab.midi.MidiSequenceHandler::AddPitchBend");
-	var $spos = $s.length;
 	this.AddEvent(track,tick,net.alphatab.midi.MidiMessageUtils.PitchBend(channel,value));
-	$s.pop();
 }
 net.alphatab.midi.MidiSequenceHandler.prototype.AddProgramChange = function(tick,track,channel,instrument) {
-	$s.push("net.alphatab.midi.MidiSequenceHandler::AddProgramChange");
-	var $spos = $s.length;
 	this.AddEvent(track,tick,net.alphatab.midi.MidiMessageUtils.ProgramChange(channel,instrument));
-	$s.pop();
 }
 net.alphatab.midi.MidiSequenceHandler.prototype.AddTempoInUSQ = function(tick,track,usq) {
-	$s.push("net.alphatab.midi.MidiSequenceHandler::AddTempoInUSQ");
-	var $spos = $s.length;
 	this.AddEvent(track,tick,net.alphatab.midi.MidiMessageUtils.TempoInUSQ(usq));
-	$s.pop();
 }
 net.alphatab.midi.MidiSequenceHandler.prototype.AddTimeSignature = function(tick,track,timeSignature) {
-	$s.push("net.alphatab.midi.MidiSequenceHandler::AddTimeSignature");
-	var $spos = $s.length;
 	this.AddEvent(track,tick,net.alphatab.midi.MidiMessageUtils.TimeSignature(timeSignature));
-	$s.pop();
 }
 net.alphatab.midi.MidiSequenceHandler.prototype.Commands = null;
 net.alphatab.midi.MidiSequenceHandler.prototype.InfoTrack = null;
 net.alphatab.midi.MidiSequenceHandler.prototype.MetronomeTrack = null;
 net.alphatab.midi.MidiSequenceHandler.prototype.NotifyFinish = function() {
-	$s.push("net.alphatab.midi.MidiSequenceHandler::NotifyFinish");
-	var $spos = $s.length;
-	this.Commands = (((((this.Tracks + ";") + this.InfoTrack) + ";") + this.MetronomeTrack) + ";") + this._commands.join(";");
-	$s.pop();
+	this.Commands = (net.alphatab.midi.MidiMessageUtils.IntToString(this.MetronomeTrack) + ";") + this._commands.join(";");
 }
 net.alphatab.midi.MidiSequenceHandler.prototype.Tracks = null;
 net.alphatab.midi.MidiSequenceHandler.prototype._commands = null;
 net.alphatab.midi.MidiSequenceHandler.prototype.__class__ = net.alphatab.midi.MidiSequenceHandler;
-net.alphatab.midi.MidiSequenceParserFlags = function() { }
-net.alphatab.midi.MidiSequenceParserFlags.__name__ = ["net","alphatab","midi","MidiSequenceParserFlags"];
-net.alphatab.midi.MidiSequenceParserFlags.prototype.__class__ = net.alphatab.midi.MidiSequenceParserFlags;
 net.alphatab.file.guitarpro.Gp4Reader = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::new");
-	var $spos = $s.length;
 	net.alphatab.file.guitarpro.GpReaderBase.apply(this,[["FICHIER GUITAR PRO v4.00","FICHIER GUITAR PRO v4.06","FICHIER GUITAR PRO L4.06"]]);
-	$s.pop();
 }}
 net.alphatab.file.guitarpro.Gp4Reader.__name__ = ["net","alphatab","file","guitarpro","Gp4Reader"];
 net.alphatab.file.guitarpro.Gp4Reader.__super__ = net.alphatab.file.guitarpro.GpReaderBase;
 for(var k in net.alphatab.file.guitarpro.GpReaderBase.prototype ) net.alphatab.file.guitarpro.Gp4Reader.prototype[k] = net.alphatab.file.guitarpro.GpReaderBase.prototype[k];
 net.alphatab.file.guitarpro.Gp4Reader.prototype.GetBeat = function(measure,start) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::GetBeat");
-	var $spos = $s.length;
 	{
 		var _g1 = 0, _g = measure.Beats.length;
 		while(_g1 < _g) {
 			var b = _g1++;
 			var beat = measure.Beats[b];
-			if(beat.Start == start) {
-				$s.pop();
-				return beat;
-			}
+			if(beat.Start == start) return beat;
 		}
 	}
 	var newBeat = this.Factory.NewBeat();
 	newBeat.Start = start;
 	measure.AddBeat(newBeat);
-	{
-		$s.pop();
-		return newBeat;
-	}
-	$s.pop();
+	return newBeat;
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.GetTiedNoteValue = function(stringIndex,track) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::GetTiedNoteValue");
-	var $spos = $s.length;
 	var iMeasureCount = track.MeasureCount();
 	if(iMeasureCount > 0) {
 		{
@@ -16820,11 +11585,7 @@ net.alphatab.file.guitarpro.Gp4Reader.prototype.GetTiedNoteValue = function(stri
 											var n = _g6++;
 											var note = oVoice.Notes[n];
 											if(note.String == stringIndex) {
-												{
-													var $tmp = note.Value;
-													$s.pop();
-													return $tmp;
-												}
+												return note.Value;
 											}
 										}
 									}
@@ -16836,15 +11597,9 @@ net.alphatab.file.guitarpro.Gp4Reader.prototype.GetTiedNoteValue = function(stri
 			}
 		}
 	}
-	{
-		$s.pop();
-		return -1;
-	}
-	$s.pop();
+	return -1;
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ParseRepeatAlternative = function(song,measure,value) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ParseRepeatAlternative");
-	var $spos = $s.length;
 	var repeatAlternative = 0;
 	var existentAlternatives = 0;
 	{
@@ -16866,15 +11621,9 @@ net.alphatab.file.guitarpro.Gp4Reader.prototype.ParseRepeatAlternative = functio
 			}
 		}
 	}
-	{
-		$s.pop();
-		return repeatAlternative;
-	}
-	$s.pop();
+	return repeatAlternative;
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadArtificialHarmonic = function(noteEffect) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadArtificialHarmonic");
-	var $spos = $s.length;
 	var type = this.ReadByte();
 	var oHarmonic = this.Factory.NewHarmonicEffect();
 	oHarmonic.Data = 0;
@@ -16912,11 +11661,8 @@ net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadArtificialHarmonic = functio
 		noteEffect.Harmonic = (oHarmonic);
 	}break;
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadBeat = function(start,measure,track,voiceIndex) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadBeat");
-	var $spos = $s.length;
 	var flags = this.ReadUnsignedByte();
 	var beat = this.GetBeat(measure,start);
 	var voice = beat.Voices[voiceIndex];
@@ -16925,7 +11671,6 @@ net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadBeat = function(start,measur
 		voice.IsEmpty = ((beatType & 2) == 0);
 	}
 	var duration = this.ReadDuration(flags);
-	var effect = this.Factory.NewEffect();
 	if((flags & 2) != 0) {
 		this.ReadChord(track.StringCount(),beat);
 	}
@@ -16933,11 +11678,11 @@ net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadBeat = function(start,measur
 		this.ReadText(beat);
 	}
 	if((flags & 8) != 0) {
-		this.ReadBeatEffects(beat,effect);
+		this.ReadBeatEffects(beat);
 	}
 	if((flags & 16) != 0) {
 		var mixTableChange = this.ReadMixTableChange(measure);
-		beat.MixTableChange = mixTableChange;
+		beat.Effect.MixTableChange = mixTableChange;
 	}
 	var stringFlags = this.ReadUnsignedByte();
 	{
@@ -16947,57 +11692,47 @@ net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadBeat = function(start,measur
 			var i = 6 - j;
 			if((stringFlags & (1 << i)) != 0 && (6 - i) < track.StringCount()) {
 				var guitarString = track.Strings[6 - i].Clone(this.Factory);
-				var note = this.ReadNote(guitarString,track,effect.Clone(this.Factory));
+				var note = this.ReadNote(guitarString,track);
 				voice.AddNote(note);
 			}
 			duration.Copy(voice.Duration);
 		}
 	}
-	{
-		var $tmp = ((!voice.IsEmpty)?duration.Time():0);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return ((!voice.IsEmpty)?duration.Time():0);
 }
-net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadBeatEffects = function(beat,effect) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadBeatEffects");
-	var $spos = $s.length;
+net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadBeatEffects = function(beat) {
 	var flags1 = this.ReadUnsignedByte();
 	var flags2 = this.ReadUnsignedByte();
-	effect.FadeIn = (((flags1 & 16) != 0));
-	effect.BeatVibrato = (((flags1 & 2) != 0)) || effect.BeatVibrato;
+	beat.Effect.FadeIn = (((flags1 & 16) != 0));
+	beat.Effect.Vibrato = (((flags1 & 2) != 0)) || beat.Effect.Vibrato;
 	if((flags1 & 32) != 0) {
 		var slapEffect = this.ReadUnsignedByte();
-		effect.Tapping = (slapEffect == 1);
-		effect.Slapping = (slapEffect == 2);
-		effect.Popping = (slapEffect == 3);
+		beat.Effect.Tapping = (slapEffect == 1);
+		beat.Effect.Slapping = (slapEffect == 2);
+		beat.Effect.Popping = (slapEffect == 3);
 	}
 	if((flags2 & 4) != 0) {
-		this.ReadTremoloBar(effect);
+		this.ReadTremoloBar(beat.Effect);
 	}
 	if((flags1 & 64) != 0) {
 		var strokeUp = this.ReadByte();
 		var strokeDown = this.ReadByte();
 		if(strokeUp > 0) {
-			beat.Stroke.Direction = net.alphatab.model.GsBeatStrokeDirection.Up;
-			beat.Stroke.Value = (this.ToStrokeValue(strokeUp));
+			beat.Effect.Stroke.Direction = net.alphatab.model.GsBeatStrokeDirection.Up;
+			beat.Effect.Stroke.Value = (this.ToStrokeValue(strokeUp));
 		}
 		else if(strokeDown > 0) {
-			beat.Stroke.Direction = net.alphatab.model.GsBeatStrokeDirection.Down;
-			beat.Stroke.Value = (this.ToStrokeValue(strokeDown));
+			beat.Effect.Stroke.Direction = net.alphatab.model.GsBeatStrokeDirection.Down;
+			beat.Effect.Stroke.Value = (this.ToStrokeValue(strokeDown));
 		}
 	}
-	beat.HasRasgueado = (flags2 & 1) != 0;
+	beat.Effect.HasRasgueado = (flags2 & 1) != 0;
 	if((flags2 & 2) != 0) {
-		beat.PickStroke = this.ReadByte();
-		beat.HasPickStroke = true;
+		beat.Effect.PickStroke = this.ReadByte();
+		beat.Effect.HasPickStroke = true;
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadBend = function(noteEffect) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadBend");
-	var $spos = $s.length;
 	var bendEffect = this.Factory.NewBendEffect();
 	bendEffect.Type = net.alphatab.model.effects.GsBendTypesConverter.FromInt(this.ReadByte());
 	bendEffect.Value = this.ReadInt();
@@ -17013,11 +11748,8 @@ net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadBend = function(noteEffect) 
 		}
 	}
 	if(pointCount > 0) noteEffect.Bend = bendEffect;
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadChannel = function(midiChannel,channels) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadChannel");
-	var $spos = $s.length;
 	var index = (this.ReadInt() - 1);
 	var effectChannel = (this.ReadInt() - 1);
 	if(index >= 0 && index < channels.length) {
@@ -17029,11 +11761,8 @@ net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadChannel = function(midiChann
 			midiChannel.EffectChannel = (effectChannel);
 		}
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadChord = function(stringCount,beat) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadChord");
-	var $spos = $s.length;
 	var chord = this.Factory.NewChord(stringCount);
 	if((this.ReadUnsignedByte() & 1) == 0) {
 		chord.Name = (this.ReadIntSizeCheckByteString());
@@ -17071,25 +11800,15 @@ net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadChord = function(stringCount
 	if(chord.NoteCount() > 0) {
 		beat.SetChord(chord);
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadColor = function() {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadColor");
-	var $spos = $s.length;
 	var r = (this.ReadUnsignedByte());
 	var g = this.ReadUnsignedByte();
 	var b = (this.ReadUnsignedByte());
 	this.Skip(1);
-	{
-		var $tmp = new net.alphatab.model.GsColor(r,g,b);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return new net.alphatab.model.GsColor(r,g,b);
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadDuration = function(flags) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadDuration");
-	var $spos = $s.length;
 	var duration = this.Factory.NewDuration();
 	duration.Value = Math.round(Math.pow(2,(this.ReadByte() + 4)) / 4);
 	duration.IsDotted = (((flags & 1) != 0));
@@ -17130,15 +11849,9 @@ net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadDuration = function(flags) {
 		}break;
 		}
 	}
-	{
-		$s.pop();
-		return duration;
-	}
-	$s.pop();
+	return duration;
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadGrace = function(noteEffect) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadGrace");
-	var $spos = $s.length;
 	var fret = this.ReadUnsignedByte();
 	var dyn = this.ReadUnsignedByte();
 	var transition = this.ReadUnsignedByte();
@@ -17164,11 +11877,8 @@ net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadGrace = function(noteEffect)
 	}break;
 	}
 	noteEffect.Grace = (grace);
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadInfo = function(song) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadInfo");
-	var $spos = $s.length;
 	song.Title = (this.ReadIntSizeCheckByteString());
 	song.Subtitle = this.ReadIntSizeCheckByteString();
 	song.Artist = (this.ReadIntSizeCheckByteString());
@@ -17187,11 +11897,8 @@ net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadInfo = function(song) {
 			song.Notice += this.ReadIntSizeCheckByteString() + "\n";
 		}
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadLyrics = function(song) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadLyrics");
-	var $spos = $s.length;
 	song.Lyrics = this.Factory.NewLyrics();
 	song.Lyrics.TrackChoice = this.ReadInt();
 	{
@@ -17204,24 +11911,15 @@ net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadLyrics = function(song) {
 			song.Lyrics.Lines.push(line);
 		}
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadMarker = function(header) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadMarker");
-	var $spos = $s.length;
 	var marker = this.Factory.NewMarker();
 	marker.MeasureHeader = header;
 	marker.Title = this.ReadIntSizeCheckByteString();
 	marker.Color = this.ReadColor();
-	{
-		$s.pop();
-		return marker;
-	}
-	$s.pop();
+	return marker;
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadMeasure = function(measure,track) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadMeasure");
-	var $spos = $s.length;
 	var start = measure.Start();
 	var beats = this.ReadInt();
 	{
@@ -17231,11 +11929,8 @@ net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadMeasure = function(measure,t
 			start += this.ReadBeat(start,measure,track,0);
 		}
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadMeasureHeader = function(i,timeSignature,song) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadMeasureHeader");
-	var $spos = $s.length;
 	var flags = this.ReadUnsignedByte();
 	var header = this.Factory.NewMeasureHeader();
 	header.Number = i + 1;
@@ -17258,15 +11953,9 @@ net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadMeasureHeader = function(i,t
 		header.KeySignatureType = song.MeasureHeaders[i - 1].KeySignatureType;
 	}
 	header.HasDoubleBar = (flags & 128) != 0;
-	{
-		$s.pop();
-		return header;
-	}
-	$s.pop();
+	return header;
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadMeasureHeaders = function(song,measureCount) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadMeasureHeaders");
-	var $spos = $s.length;
 	var timeSignature = this.Factory.NewTimeSignature();
 	{
 		var _g = 0;
@@ -17275,11 +11964,8 @@ net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadMeasureHeaders = function(so
 			song.AddMeasureHeader(this.ReadMeasureHeader(i,timeSignature,song));
 		}
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadMeasures = function(song) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadMeasures");
-	var $spos = $s.length;
 	var tempo = this.Factory.NewTempo();
 	tempo.Value = song.Tempo;
 	var start = 960;
@@ -17304,11 +11990,8 @@ net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadMeasures = function(song) {
 			start += header.Length();
 		}
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadMidiChannels = function() {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadMidiChannels");
-	var $spos = $s.length;
 	var channels = new Array();
 	{
 		var _g = 0;
@@ -17328,15 +12011,9 @@ net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadMidiChannels = function() {
 			this.Skip(2);
 		}
 	}
-	{
-		$s.pop();
-		return channels;
-	}
-	$s.pop();
+	return channels;
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadMixTableChange = function(measure) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadMixTableChange");
-	var $spos = $s.length;
 	var tableChange = this.Factory.NewMixTableChange();
 	tableChange.Instrument.Value = this.ReadByte();
 	tableChange.Volume.Value = this.ReadByte();
@@ -17374,19 +12051,12 @@ net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadMixTableChange = function(me
 	if(tableChange.Phaser != null) tableChange.Phaser.AllTracks = (allTracksFlags & 16) != 0;
 	if(tableChange.Tremolo != null) tableChange.Tremolo.AllTracks = (allTracksFlags & 32) != 0;
 	if(tableChange.Tempo != null) tableChange.Tempo.AllTracks = true;
-	{
-		$s.pop();
-		return tableChange;
-	}
-	$s.pop();
+	return tableChange;
 }
-net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadNote = function(guitarString,track,effect) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadNote");
-	var $spos = $s.length;
+net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadNote = function(guitarString,track) {
 	var flags = this.ReadUnsignedByte();
 	var note = this.Factory.NewNote();
 	note.String = (guitarString.Number);
-	note.Effect = (effect);
 	note.Effect.AccentuatedNote = (((flags & 64) != 0));
 	note.Effect.HeavyAccentuatedNote = (((flags & 2) != 0));
 	note.Effect.GhostNote = (((flags & 4) != 0));
@@ -17415,15 +12085,9 @@ net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadNote = function(guitarString
 	if((flags & 8) != 0) {
 		this.ReadNoteEffects(note.Effect);
 	}
-	{
-		$s.pop();
-		return note;
-	}
-	$s.pop();
+	return note;
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadNoteEffects = function(noteEffect) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadNoteEffects");
-	var $spos = $s.length;
 	var flags1 = this.ReadUnsignedByte();
 	var flags2 = this.ReadUnsignedByte();
 	if((flags1 & 1) != 0) {
@@ -17470,18 +12134,12 @@ net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadNoteEffects = function(noteE
 	noteEffect.Vibrato = (((flags2 & 64) != 0) || noteEffect.Vibrato);
 	noteEffect.PalmMute = (((flags2 & 2) != 0));
 	noteEffect.Staccato = (((flags2 & 1) != 0));
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadPageSetup = function(song) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadPageSetup");
-	var $spos = $s.length;
 	var setup = net.alphatab.model.GsPageSetup.Defaults();
 	song.PageSetup = setup;
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadSong = function() {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadSong");
-	var $spos = $s.length;
 	if(!this.ReadVersion()) {
 		throw new net.alphatab.file.FileFormatException("Unsupported Version");
 	}
@@ -17501,23 +12159,14 @@ net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadSong = function() {
 	this.ReadMeasureHeaders(song,measureCount);
 	this.ReadTracks(song,trackCount,channels);
 	this.ReadMeasures(song);
-	{
-		$s.pop();
-		return song;
-	}
-	$s.pop();
+	return song;
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadText = function(beat) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadText");
-	var $spos = $s.length;
 	var text = this.Factory.NewText();
 	text.Value = this.ReadIntSizeCheckByteString();
 	beat.SetText(text);
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadTrack = function(number,channels) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadTrack");
-	var $spos = $s.length;
 	var flags = this.ReadUnsignedByte();
 	var track = this.Factory.NewTrack();
 	track.IsPercussionTrack = (flags & 1) != 0;
@@ -17544,25 +12193,16 @@ net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadTrack = function(number,chan
 	track.FretCount = this.ReadInt();
 	track.Offset = this.ReadInt();
 	track.Color = this.ReadColor();
-	{
-		$s.pop();
-		return track;
-	}
-	$s.pop();
+	return track;
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadTracks = function(song,trackCount,channels) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadTracks");
-	var $spos = $s.length;
 	var _g1 = 1, _g = trackCount + 1;
 	while(_g1 < _g) {
 		var i = _g1++;
 		song.AddTrack(this.ReadTrack(i,channels));
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadTremoloBar = function(effect) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadTremoloBar");
-	var $spos = $s.length;
 	var barEffect = this.Factory.NewTremoloBarEffect();
 	barEffect.Type = net.alphatab.model.effects.GsBendTypesConverter.FromInt(this.ReadByte());
 	barEffect.Value = this.ReadInt();
@@ -17578,11 +12218,8 @@ net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadTremoloBar = function(effect
 		}
 	}
 	if(pointCount > 0) effect.TremoloBar = barEffect;
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadTremoloPicking = function(noteEffect) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadTremoloPicking");
-	var $spos = $s.length;
 	var value = this.ReadUnsignedByte();
 	var tp = this.Factory.NewTremoloPickingEffect();
 	switch(value) {
@@ -17599,11 +12236,8 @@ net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadTremoloPicking = function(no
 		noteEffect.TremoloPicking = (tp);
 	}break;
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadTrill = function(noteEffect) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ReadTrill");
-	var $spos = $s.length;
 	var fret = this.ReadByte();
 	var period = this.ReadByte();
 	var trill = this.Factory.NewTrillEffect();
@@ -17622,168 +12256,87 @@ net.alphatab.file.guitarpro.Gp4Reader.prototype.ReadTrill = function(noteEffect)
 		noteEffect.Trill = (trill);
 	}break;
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ToKeySignature = function(p) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ToKeySignature");
-	var $spos = $s.length;
-	{
-		var $tmp = (p < 0?7 + Math.round(Math.abs(p)):p);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return (p < 0?7 + Math.round(Math.abs(p)):p);
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype.ToStrokeValue = function(value) {
-	$s.push("net.alphatab.file.guitarpro.Gp4Reader::ToStrokeValue");
-	var $spos = $s.length;
 	switch(value) {
 	case 1:{
-		{
-			$s.pop();
-			return 64;
-		}
+		return 64;
 	}break;
 	case 2:{
-		{
-			$s.pop();
-			return 64;
-		}
+		return 64;
 	}break;
 	case 3:{
-		{
-			$s.pop();
-			return 32;
-		}
+		return 32;
 	}break;
 	case 4:{
-		{
-			$s.pop();
-			return 16;
-		}
+		return 16;
 	}break;
 	case 5:{
-		{
-			$s.pop();
-			return 8;
-		}
+		return 8;
 	}break;
 	case 6:{
-		{
-			$s.pop();
-			return 4;
-		}
+		return 4;
 	}break;
 	default:{
-		{
-			$s.pop();
-			return 64;
-		}
+		return 64;
 	}break;
 	}
-	$s.pop();
 }
 net.alphatab.file.guitarpro.Gp4Reader.prototype._tripletFeel = null;
 net.alphatab.file.guitarpro.Gp4Reader.prototype.__class__ = net.alphatab.file.guitarpro.Gp4Reader;
 net.alphatab.platform.js.Html5Canvas = function(dom) { if( dom === $_ ) return; {
-	$s.push("net.alphatab.platform.js.Html5Canvas::new");
-	var $spos = $s.length;
 	this.canvas = dom;
 	this.jCanvas = (jQuery(dom));
 	this.context = dom.getContext("2d");
-	$s.pop();
 }}
 net.alphatab.platform.js.Html5Canvas.__name__ = ["net","alphatab","platform","js","Html5Canvas"];
 net.alphatab.platform.js.Html5Canvas.prototype.Height = function() {
-	$s.push("net.alphatab.platform.js.Html5Canvas::Height");
-	var $spos = $s.length;
-	{
-		var $tmp = this.jCanvas.height();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.jCanvas.height();
 }
 net.alphatab.platform.js.Html5Canvas.prototype.SetHeight = function(height) {
-	$s.push("net.alphatab.platform.js.Html5Canvas::SetHeight");
-	var $spos = $s.length;
 	this.jCanvas.height(height);
 	this.canvas.height = height;
 	this.context = this.canvas.getContext("2d");
-	$s.pop();
 }
 net.alphatab.platform.js.Html5Canvas.prototype.SetWidth = function(width) {
-	$s.push("net.alphatab.platform.js.Html5Canvas::SetWidth");
-	var $spos = $s.length;
 	this.jCanvas.width(width);
 	this.canvas.width = width;
 	this.context = this.canvas.getContext("2d");
-	$s.pop();
 }
 net.alphatab.platform.js.Html5Canvas.prototype.Width = function() {
-	$s.push("net.alphatab.platform.js.Html5Canvas::Width");
-	var $spos = $s.length;
-	{
-		var $tmp = this.jCanvas.width();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.jCanvas.width();
 }
 net.alphatab.platform.js.Html5Canvas.prototype.arc = function(x,y,radius,startAngle,endAngle,anticlockwise) {
-	$s.push("net.alphatab.platform.js.Html5Canvas::arc");
-	var $spos = $s.length;
 	this.context.arc(x,y,radius,startAngle,endAngle,anticlockwise);
-	$s.pop();
 }
 net.alphatab.platform.js.Html5Canvas.prototype.arcTo = function(x1,y1,x2,y2,radius) {
-	$s.push("net.alphatab.platform.js.Html5Canvas::arcTo");
-	var $spos = $s.length;
 	this.context.arcTo(x1,y1,x2,y2,radius);
-	$s.pop();
 }
 net.alphatab.platform.js.Html5Canvas.prototype.beginPath = function() {
-	$s.push("net.alphatab.platform.js.Html5Canvas::beginPath");
-	var $spos = $s.length;
 	this.context.beginPath();
-	$s.pop();
 }
 net.alphatab.platform.js.Html5Canvas.prototype.bezierCurveTo = function(cp1x,cp1y,cp2x,cp2y,x,y) {
-	$s.push("net.alphatab.platform.js.Html5Canvas::bezierCurveTo");
-	var $spos = $s.length;
 	this.context.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,x,y);
-	$s.pop();
 }
 net.alphatab.platform.js.Html5Canvas.prototype.canvas = null;
 net.alphatab.platform.js.Html5Canvas.prototype.clearRect = function(x,y,w,h) {
-	$s.push("net.alphatab.platform.js.Html5Canvas::clearRect");
-	var $spos = $s.length;
 	this.context.clearRect(x,y,w,h);
-	$s.pop();
 }
 net.alphatab.platform.js.Html5Canvas.prototype.closePath = function() {
-	$s.push("net.alphatab.platform.js.Html5Canvas::closePath");
-	var $spos = $s.length;
 	this.context.closePath();
-	$s.pop();
 }
 net.alphatab.platform.js.Html5Canvas.prototype.context = null;
 net.alphatab.platform.js.Html5Canvas.prototype.fill = function() {
-	$s.push("net.alphatab.platform.js.Html5Canvas::fill");
-	var $spos = $s.length;
 	this.context.fill();
-	$s.pop();
 }
 net.alphatab.platform.js.Html5Canvas.prototype.fillRect = function(x,y,w,h) {
-	$s.push("net.alphatab.platform.js.Html5Canvas::fillRect");
-	var $spos = $s.length;
 	this.context.fillRect(x,y,w,h);
-	$s.pop();
 }
 net.alphatab.platform.js.Html5Canvas.prototype.fillStyle = null;
 net.alphatab.platform.js.Html5Canvas.prototype.fillText = function(text,x,y,maxWidth) {
-	$s.push("net.alphatab.platform.js.Html5Canvas::fillText");
-	var $spos = $s.length;
 	if(maxWidth == null) maxWidth = 0;
 	if(maxWidth == 0) {
 		this.context.fillText(text,x,y);
@@ -17791,187 +12344,75 @@ net.alphatab.platform.js.Html5Canvas.prototype.fillText = function(text,x,y,maxW
 	else {
 		this.context.fillText(text,x,y,maxWidth);
 	}
-	$s.pop();
 }
 net.alphatab.platform.js.Html5Canvas.prototype.font = null;
 net.alphatab.platform.js.Html5Canvas.prototype.getFillStyle = function() {
-	$s.push("net.alphatab.platform.js.Html5Canvas::getFillStyle");
-	var $spos = $s.length;
-	{
-		var $tmp = this.context.fillStyle;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.context.fillStyle;
 }
 net.alphatab.platform.js.Html5Canvas.prototype.getFont = function() {
-	$s.push("net.alphatab.platform.js.Html5Canvas::getFont");
-	var $spos = $s.length;
-	{
-		var $tmp = this.context.font;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.context.font;
 }
 net.alphatab.platform.js.Html5Canvas.prototype.getLineWidth = function() {
-	$s.push("net.alphatab.platform.js.Html5Canvas::getLineWidth");
-	var $spos = $s.length;
-	{
-		var $tmp = this.context.lineWidth;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.context.lineWidth;
 }
 net.alphatab.platform.js.Html5Canvas.prototype.getStrokeStyle = function() {
-	$s.push("net.alphatab.platform.js.Html5Canvas::getStrokeStyle");
-	var $spos = $s.length;
-	{
-		var $tmp = this.context.strokeStyle;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.context.strokeStyle;
 }
 net.alphatab.platform.js.Html5Canvas.prototype.getTextAlign = function() {
-	$s.push("net.alphatab.platform.js.Html5Canvas::getTextAlign");
-	var $spos = $s.length;
-	{
-		var $tmp = this.context.textAlign;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.context.textAlign;
 }
 net.alphatab.platform.js.Html5Canvas.prototype.getTextBaseline = function() {
-	$s.push("net.alphatab.platform.js.Html5Canvas::getTextBaseline");
-	var $spos = $s.length;
-	{
-		var $tmp = this.context.textBaseline;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.context.textBaseline;
 }
 net.alphatab.platform.js.Html5Canvas.prototype.jCanvas = null;
 net.alphatab.platform.js.Html5Canvas.prototype.lineTo = function(x,y) {
-	$s.push("net.alphatab.platform.js.Html5Canvas::lineTo");
-	var $spos = $s.length;
 	this.context.lineTo(x,y);
-	$s.pop();
 }
 net.alphatab.platform.js.Html5Canvas.prototype.lineWidth = null;
 net.alphatab.platform.js.Html5Canvas.prototype.measureText = function(text) {
-	$s.push("net.alphatab.platform.js.Html5Canvas::measureText");
-	var $spos = $s.length;
-	{
-		var $tmp = this.context.measureText(text);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.context.measureText(text);
 }
 net.alphatab.platform.js.Html5Canvas.prototype.moveTo = function(x,y) {
-	$s.push("net.alphatab.platform.js.Html5Canvas::moveTo");
-	var $spos = $s.length;
 	this.context.moveTo(x,y);
-	$s.pop();
 }
 net.alphatab.platform.js.Html5Canvas.prototype.quadraticCurveTo = function(cpx,cpy,x,y) {
-	$s.push("net.alphatab.platform.js.Html5Canvas::quadraticCurveTo");
-	var $spos = $s.length;
 	this.context.quadraticCurveTo(cpx,cpy,x,y);
-	$s.pop();
 }
 net.alphatab.platform.js.Html5Canvas.prototype.rect = function(x,y,w,h) {
-	$s.push("net.alphatab.platform.js.Html5Canvas::rect");
-	var $spos = $s.length;
 	this.context.rect(x,y,w,h);
-	$s.pop();
 }
 net.alphatab.platform.js.Html5Canvas.prototype.setFillStyle = function(value) {
-	$s.push("net.alphatab.platform.js.Html5Canvas::setFillStyle");
-	var $spos = $s.length;
 	this.context.fillStyle = value;
-	{
-		var $tmp = this.context.fillStyle;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.context.fillStyle;
 }
 net.alphatab.platform.js.Html5Canvas.prototype.setFont = function(value) {
-	$s.push("net.alphatab.platform.js.Html5Canvas::setFont");
-	var $spos = $s.length;
 	this.context.font = value;
-	{
-		var $tmp = this.context.font;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.context.font;
 }
 net.alphatab.platform.js.Html5Canvas.prototype.setLineWidth = function(value) {
-	$s.push("net.alphatab.platform.js.Html5Canvas::setLineWidth");
-	var $spos = $s.length;
 	this.context.lineWidth = value;
-	{
-		var $tmp = this.context.lineWidth;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.context.lineWidth;
 }
 net.alphatab.platform.js.Html5Canvas.prototype.setStrokeStyle = function(value) {
-	$s.push("net.alphatab.platform.js.Html5Canvas::setStrokeStyle");
-	var $spos = $s.length;
 	this.context.strokeStyle = value;
-	{
-		var $tmp = this.context.strokeStyle;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.context.strokeStyle;
 }
 net.alphatab.platform.js.Html5Canvas.prototype.setTextAlign = function(value) {
-	$s.push("net.alphatab.platform.js.Html5Canvas::setTextAlign");
-	var $spos = $s.length;
 	this.context.textAlign = value;
-	{
-		var $tmp = this.context.textAling;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.context.textAling;
 }
 net.alphatab.platform.js.Html5Canvas.prototype.setTextBaseline = function(value) {
-	$s.push("net.alphatab.platform.js.Html5Canvas::setTextBaseline");
-	var $spos = $s.length;
 	this.context.textBaseline = value;
-	{
-		var $tmp = this.context.textBaseLine;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
+	return this.context.textBaseLine;
 }
 net.alphatab.platform.js.Html5Canvas.prototype.stroke = function() {
-	$s.push("net.alphatab.platform.js.Html5Canvas::stroke");
-	var $spos = $s.length;
 	this.context.stroke();
-	$s.pop();
 }
 net.alphatab.platform.js.Html5Canvas.prototype.strokeRect = function(x,y,w,h) {
-	$s.push("net.alphatab.platform.js.Html5Canvas::strokeRect");
-	var $spos = $s.length;
 	this.context.strokeRect(x,y,w,h);
-	$s.pop();
 }
 net.alphatab.platform.js.Html5Canvas.prototype.strokeStyle = null;
 net.alphatab.platform.js.Html5Canvas.prototype.strokeText = function(text,x,y,maxWidth) {
-	$s.push("net.alphatab.platform.js.Html5Canvas::strokeText");
-	var $spos = $s.length;
 	if(maxWidth == null) maxWidth = 0;
 	if(maxWidth == 0) {
 		this.context.strokeText(text,x,y);
@@ -17979,23 +12420,17 @@ net.alphatab.platform.js.Html5Canvas.prototype.strokeText = function(text,x,y,ma
 	else {
 		this.context.strokeText(text,x,y,maxWidth);
 	}
-	$s.pop();
 }
 net.alphatab.platform.js.Html5Canvas.prototype.textAlign = null;
 net.alphatab.platform.js.Html5Canvas.prototype.textBaseline = null;
 net.alphatab.platform.js.Html5Canvas.prototype.__class__ = net.alphatab.platform.js.Html5Canvas;
 net.alphatab.platform.js.Html5Canvas.__interfaces__ = [net.alphatab.platform.Canvas];
 net.alphatab.model.GsBeatStroke = function(p) { if( p === $_ ) return; {
-	$s.push("net.alphatab.model.GsBeatStroke::new");
-	var $spos = $s.length;
 	this.Direction = net.alphatab.model.GsBeatStrokeDirection.None;
-	$s.pop();
 }}
 net.alphatab.model.GsBeatStroke.__name__ = ["net","alphatab","model","GsBeatStroke"];
 net.alphatab.model.GsBeatStroke.prototype.Direction = null;
 net.alphatab.model.GsBeatStroke.prototype.GetIncrementTime = function(beat) {
-	$s.push("net.alphatab.model.GsBeatStroke::GetIncrementTime");
-	var $spos = $s.length;
 	var duration = 0;
 	if(this.Value > 0) {
 		{
@@ -18011,18 +12446,10 @@ net.alphatab.model.GsBeatStroke.prototype.GetIncrementTime = function(beat) {
 			}
 		}
 		if(duration > 0) {
-			{
-				var $tmp = Math.round(((duration / 8.0) * (4.0 / this.Value)));
-				$s.pop();
-				return $tmp;
-			}
+			return Math.round(((duration / 8.0) * (4.0 / this.Value)));
 		}
 	}
-	{
-		$s.pop();
-		return 0;
-	}
-	$s.pop();
+	return 0;
 }
 net.alphatab.model.GsBeatStroke.prototype.Value = null;
 net.alphatab.model.GsBeatStroke.prototype.__class__ = net.alphatab.model.GsBeatStroke;
@@ -18031,52 +12458,27 @@ $Main.__name__ = ["@Main"];
 $Main.prototype.__class__ = $Main;
 $_ = {}
 js.Boot.__res = {}
-$s = [];
-$e = [];
 js.Boot.__init();
 {
 	js.Lib.document = document;
 	js.Lib.window = window;
 	onerror = function(msg,url,line) {
-		var stack = $s.copy();
 		var f = js.Lib.onerror;
-		$s.splice(0,$s.length);
-		if( f == null ) {
-			var i = stack.length;
-			var s = "";
-			while( --i >= 0 )
-				s += "Called from "+stack[i]+"\n";
-			alert(msg+"\n\n"+s);
+		if( f == null )
 			return false;
-		}
-		return f(msg,stack);
+		return f(msg,[url+":"+line]);
 	}
 }
 {
 	Date.now = function() {
-		$s.push("@Main::new@124");
-		var $spos = $s.length;
-		{
-			var $tmp = new Date();
-			$s.pop();
-			return $tmp;
-		}
-		$s.pop();
+		return new Date();
 	}
 	Date.fromTime = function(t) {
-		$s.push("@Main::new@127");
-		var $spos = $s.length;
 		var d = new Date();
 		d["setTime"](t);
-		{
-			$s.pop();
-			return d;
-		}
-		$s.pop();
+		return d;
 	}
 	Date.fromString = function(s) {
-		$s.push("@Main::new@136");
-		var $spos = $s.length;
 		switch(s.length) {
 		case 8:{
 			var k = s.split(":");
@@ -18085,50 +12487,31 @@ js.Boot.__init();
 			d["setUTCHours"](k[0]);
 			d["setUTCMinutes"](k[1]);
 			d["setUTCSeconds"](k[2]);
-			{
-				$s.pop();
-				return d;
-			}
+			return d;
 		}break;
 		case 10:{
 			var k = s.split("-");
-			{
-				var $tmp = new Date(k[0],k[1] - 1,k[2],0,0,0);
-				$s.pop();
-				return $tmp;
-			}
+			return new Date(k[0],k[1] - 1,k[2],0,0,0);
 		}break;
 		case 19:{
 			var k = s.split(" ");
 			var y = k[0].split("-");
 			var t = k[1].split(":");
-			{
-				var $tmp = new Date(y[0],y[1] - 1,y[2],t[0],t[1],t[2]);
-				$s.pop();
-				return $tmp;
-			}
+			return new Date(y[0],y[1] - 1,y[2],t[0],t[1],t[2]);
 		}break;
 		default:{
 			throw "Invalid date format : " + s;
 		}break;
 		}
-		$s.pop();
 	}
 	Date.prototype["toString"] = function() {
-		$s.push("@Main::new@165");
-		var $spos = $s.length;
 		var date = this;
 		var m = date.getMonth() + 1;
 		var d = date.getDate();
 		var h = date.getHours();
 		var mi = date.getMinutes();
 		var s = date.getSeconds();
-		{
-			var $tmp = (((((((((date.getFullYear() + "-") + ((m < 10?"0" + m:"" + m))) + "-") + ((d < 10?"0" + d:"" + d))) + " ") + ((h < 10?"0" + h:"" + h))) + ":") + ((mi < 10?"0" + mi:"" + mi))) + ":") + ((s < 10?"0" + s:"" + s));
-			$s.pop();
-			return $tmp;
-		}
-		$s.pop();
+		return (((((((((date.getFullYear() + "-") + ((m < 10?"0" + m:"" + m))) + "-") + ((d < 10?"0" + d:"" + d))) + " ") + ((h < 10?"0" + h:"" + h))) + ":") + ((mi < 10?"0" + mi:"" + mi))) + ":") + ((s < 10?"0" + s:"" + s));
 	}
 	Date.prototype.__class__ = Date;
 	Date.__name__ = ["Date"];
@@ -18138,59 +12521,29 @@ js.Boot.__init();
 	Math.NEGATIVE_INFINITY = Number["NEGATIVE_INFINITY"];
 	Math.POSITIVE_INFINITY = Number["POSITIVE_INFINITY"];
 	Math.isFinite = function(i) {
-		$s.push("@Main::new@73");
-		var $spos = $s.length;
-		{
-			var $tmp = isFinite(i);
-			$s.pop();
-			return $tmp;
-		}
-		$s.pop();
+		return isFinite(i);
 	}
 	Math.isNaN = function(i) {
-		$s.push("@Main::new@85");
-		var $spos = $s.length;
-		{
-			var $tmp = isNaN(i);
-			$s.pop();
-			return $tmp;
-		}
-		$s.pop();
+		return isNaN(i);
 	}
 	Math.__name__ = ["Math"];
 }
 {
 	js["XMLHttpRequest"] = (window.XMLHttpRequest?XMLHttpRequest:(window.ActiveXObject?function() {
-		$s.push("@Main::new@53");
-		var $spos = $s.length;
 		try {
-			{
-				var $tmp = new ActiveXObject("Msxml2.XMLHTTP");
-				$s.pop();
-				return $tmp;
-			}
+			return new ActiveXObject("Msxml2.XMLHTTP");
 		}
 		catch( $e34 ) {
 			{
 				var e = $e34;
 				{
-					$e = [];
-					while($s.length >= $spos) $e.unshift($s.pop());
-					$s.push($e[0]);
 					try {
-						{
-							var $tmp = new ActiveXObject("Microsoft.XMLHTTP");
-							$s.pop();
-							return $tmp;
-						}
+						return new ActiveXObject("Microsoft.XMLHTTP");
 					}
 					catch( $e35 ) {
 						{
 							var e1 = $e35;
 							{
-								$e = [];
-								while($s.length >= $spos) $e.unshift($s.pop());
-								$s.push($e[0]);
 								throw "Unable to create XMLHttpRequest object.";
 							}
 						}
@@ -18198,7 +12551,6 @@ js.Boot.__init();
 				}
 			}
 		}
-		$s.pop();
 	}:(function($this) {
 		var $r;
 		throw "Unable to create XMLHttpRequest object.";
@@ -18399,6 +12751,7 @@ net.alphatab.tablature.drawing.MusicFont.AccentuatedNote = "";
 net.alphatab.tablature.drawing.MusicFont.HeavyAccentuatedNote = "";
 net.alphatab.tablature.drawing.MusicFont.VibratoLeftRight = "M 11.189664 5.5813955 C 10.10042 6.6529925 9.0866079 7.8051485 7.9314969 8.8066518 7.3487624 9.2967324 6.9841837 8.2593759 6.5479642 7.933765 5.3603051 6.6227434 4.1788808 5.3060572 2.9839103 4.0016785 2.4141734 4.2259972 1.9952232 4.7304065 1.5349527 5.1288 1.0233018 5.6160865 0.51165092 6.103373 0 6.5906595 0.02274972 6.160458 -0.04553929 5.6912893 0.03419799 5.2854802 1.785601 3.626446 3.5133126 1.9409459 5.2808081 0.29990223 5.9337936 -0.41168007 6.3974122 0.74155913 6.9193185 1.1024218 7.9923085 2.214522 8.9943764 3.397406 10.136519 4.4404885 11.34214 3.5295603 12.361477 2.390267 13.467265 1.3582751 13.894892 0.90129843 14.403874 0.54274353 14.87567 0.14014753 c 0.539444 0.2262104 0.808667 0.8228694 1.216989 1.22764897 0.810291 0.9092409 1.559001 1.8768682 2.414167 2.7435845 0.451921 0.7154056 1.076971 0.8743839 1.612628 0.1426133 0.588046 -0.6297642 1.154229 -1.2811423 1.733301 -1.9197948 -0.02227 0.4454016 0.0445 0.9274384 -0.03326 1.3500134 C 20.278271 5.2264473 18.762755 6.7979455 17.205479 8.3219033 16.781477 8.8560595 16.088361 9.2926227 15.653023 8.5089189 14.456919 7.283733 13.392959 5.9331751 12.155046 4.7476565 11.73232 4.8662391 11.53755 5.345741 11.189664 5.5813955 z";
 net.alphatab.model.GsBeat.MaxVoices = 2;
+haxe.Timer.arr = new Array();
 net.alphatab.model.effects.GsTremoloBarEffect.MaxPositionLength = 12;
 net.alphatab.model.effects.GsTremoloBarEffect.MaxValueLength = 12;
 net.alphatab.model.GsColor.Black = new net.alphatab.model.GsColor(0,0,0);

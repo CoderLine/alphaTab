@@ -30,17 +30,19 @@ class KeySignaturePainter
 		layer.AddMusicSymbol(MusicFont.KeySharp, x, y, scale);
 	}	
 	
-	public static function PaintSmallFlat(layer:DrawingLayer, x:Int, y:Int, layout:ViewLayout)
+	public static function PaintSmallFlat(layer:DrawingLayer, x:Float, y:Float, layout:ViewLayout)
 	{
+		y -= layout.ScoreLineSpacing;
 		var scale:Float = layout.Scale;
 		layer.AddMusicSymbol(MusicFont.KeyFlat, x, y, scale);
 	}
-	public static function PaintSmallNatural(layer:DrawingLayer, x:Int, y:Int, layout:ViewLayout)
+	public static function PaintSmallNatural(layer:DrawingLayer, x:Float, y:Float, layout:ViewLayout)
 	{
+		y -= layout.ScoreLineSpacing;
 		var scale:Float = layout.Scale;
 		layer.AddMusicSymbol(MusicFont.KeyNormal, x, y, scale);
 	}
-	public static function PaintSmallSharp(layer:DrawingLayer, x:Int, y:Int, layout:ViewLayout)
+	public static function PaintSmallSharp(layer:DrawingLayer, x:Float, y:Float, layout:ViewLayout)
 	{
 		var scale:Float = layout.Scale;
 		y -= Math.round(1 * layout.ScoreLineSpacing);

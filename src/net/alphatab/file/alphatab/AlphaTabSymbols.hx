@@ -16,7 +16,8 @@ enum AlphaTabSymbols
 	Tuning;
 	LParensis;
 	RParensis;
+	LBrace;
+	RBrace;
 	Pipe;
-	Backslash;
 	MetaCommand;
 }

@@ -9,17 +9,13 @@ class GsBeat
 {
 	public static inline var MaxVoices:Int = 2;
 	
-	public var MixTableChange:GsMixTableChange;
-	public var Chord:GsChord;
 	public var TableChange:GsMixTableChange;
 	public var Voices:Array<GsVoice>;
 	public var Text:GsBeatText;
 	public var Measure:GsMeasure;
 	public var Start:Int;
-	public var Stroke:GsBeatStroke;
-	public var HasRasgueado:Bool;
-	public var PickStroke:Int;
-	public var HasPickStroke:Bool;
+	
+	public var Effect:GsBeatEffect;
 		
 	public function IsRestBeat() : Bool
 	{
@@ -40,7 +36,7 @@ class GsBeat
 	public function SetChord(chord:GsChord) : Void
 	{
 		chord.Beat = this;
-		this.Chord = chord;
+		this.Effect.Chord = chord;
 	}
 	
 	public function GetNotes() : Array<GsNote>
@@ -60,7 +56,7 @@ class GsBeat
 	public function new(factory:GsSongFactory)
 	{
 		this.Start = GsDuration.QuarterTime;
-		this.Stroke = factory.NewStroke();
+		this.Effect = factory.NewBeatEffect();
 		this.Voices = new Array<GsVoice>();
 		for(i in 0 ... GsBeat.MaxVoices)
 		{

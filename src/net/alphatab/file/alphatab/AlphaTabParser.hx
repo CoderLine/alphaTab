@@ -6,13 +6,17 @@
 package net.alphatab.file.alphatab;
 import net.alphatab.file.FileFormatException;
 import net.alphatab.file.SongReader;
+import net.alphatab.model.effects.GsTremoloBarEffect;
+import net.alphatab.model.effects.GsTremoloBarPoint;
 import net.alphatab.model.GsBeat;
+import net.alphatab.model.GsBeatStrokeDirection;
 import net.alphatab.model.GsDuration;
 import net.alphatab.model.GsGuitarString;
 import net.alphatab.model.GsMeasure;
 import net.alphatab.model.GsMeasureClef;
 import net.alphatab.model.GsMeasureHeader;
 import net.alphatab.model.GsNote;
+import net.alphatab.model.GsNoteEffect;
 import net.alphatab.model.GsPageSetup;
 import net.alphatab.model.GsSong;
 import net.alphatab.model.GsTempo;
@@ -369,16 +373,17 @@ class AlphaTabParser extends SongReader
 			var index = measure.Beats.length - 1;
 			beat.Start = measure.Beats[index].Start + measure.Beats[index].Voices[0].Duration.Time();
 		}
+		var noteEffect:GsNoteEffect = Factory.NewNoteEffect();
 		var voice:GsVoice = beat.Voices[0];
 		voice.IsEmpty = false;
-		
+				
 		// notes
 		if (_sy == AlphaTabSymbols.LParensis) {
 			NewSy();
 			
-			voice.AddNote(Note());
+			voice.AddNote(Note(noteEffect.Clone(Factory)));
 			while (_sy != AlphaTabSymbols.RParensis && _sy != AlphaTabSymbols.Eof) {
-				voice.AddNote(Note());
+				voice.AddNote(Note(noteEffect.Clone(Factory)));
 			}		
 			
 			if (_sy != AlphaTabSymbols.RParensis) {
@@ -392,7 +397,7 @@ class AlphaTabParser extends SongReader
 			NewSy();
 		}
 		else {
-			voice.AddNote(Note());
+			voice.AddNote(Note(noteEffect.Clone(Factory)));
 		}
 		
 		// duration
@@ -413,10 +418,131 @@ class AlphaTabParser extends SongReader
 			throw new FileFormatException("Invalid Beat Duration found \"" + _syData + "\" on position " + _curChPos);
 		}		
 		NewSy();
+		
+		BeatEffects(beat, noteEffect);
+				
 		measure.AddBeat(beat);
 	}
 	
-	private function Note() : GsNote {
+	private function BeatEffects(beat:GsBeat, effect:GsNoteEffect) : Void 
+	{
+		if (_sy != AlphaTabSymbols.LBrace) {
+			return;
+		}
+		NewSy();
+		
+		while (_sy == AlphaTabSymbols.MetaCommand)
+		{
+			_syData = Std.string(_syData).toLowerCase();
+			if (_syData == "f") {
+				beat.Effect.FadeIn = true;
+				NewSy();
+			}
+			else if (_syData == "v") {
+				beat.Effect.Vibrato = true;
+				NewSy();
+			}
+			else if (_syData == "t") {
+				beat.Effect.Tapping = true;
+				NewSy();
+			}
+			else if (_syData == "s") {
+				beat.Effect.Slapping = true;
+				NewSy();
+			}
+			else if (_syData == "p") {
+				beat.Effect.Popping = true;
+				NewSy();
+			}
+			else if (_syData == "su") {
+				beat.Effect.Stroke.Direction = GsBeatStrokeDirection.Up;
+				NewSy();
+				if (_sy == AlphaTabSymbols.Number) {
+					if (_syData == 4 || _syData == 8 || _syData == 16 || _syData == 32 || _syData == 64) {
+						beat.Effect.Stroke.Value = _syData;
+					}
+					else
+					{
+						beat.Effect.Stroke.Value = 8;
+					}
+					NewSy();
+				}
+				else
+				{
+					beat.Effect.Stroke.Value = 8;
+				}
+			}
+			else if (_syData == "sd") {
+				beat.Effect.Stroke.Direction = GsBeatStrokeDirection.Down;
+				NewSy();
+				if (_sy == AlphaTabSymbols.Number) {
+					if (_syData == 4 || _syData == 8 || _syData == 16 || _syData == 32 || _syData == 64) {
+						beat.Effect.Stroke.Value = _syData;
+					}
+					else
+					{
+						beat.Effect.Stroke.Value = 8;
+					}
+					NewSy();
+				}
+				else
+				{
+					beat.Effect.Stroke.Value = 8;
+				}
+			}
+			else if (_syData == "tb") {
+				// read points
+				NewSy();
+				if (_sy != AlphaTabSymbols.LParensis) {
+					throw new FileFormatException("Expected ( found  \"" + _syData + "\" on position " + _curChPos);
+				}
+				NewSy();
+			
+				var points:Array<GsTremoloBarPoint> = new Array<GsTremoloBarPoint>();
+				while (_sy != AlphaTabSymbols.RParensis && _sy != AlphaTabSymbols.Eof)
+				{
+					if (_sy != AlphaTabSymbols.Number) {
+						throw new FileFormatException("Expected Number found  \"" + _syData + "\" on position " + _curChPos);
+					}
+					points.push(new GsTremoloBarPoint(0, _syData, false));
+					NewSy();
+				}
+				
+				// only 12 points allowed
+				if(points.length > 12) {
+					points = points.slice(0, 12);
+				}
+								
+				// set positions
+				var count = points.length;
+				var step = Math.ceil(12 / count);
+				var i = 0; 
+				var tremoloBarEffect:GsTremoloBarEffect = Factory.NewTremoloBarEffect();
+				while (i < count) {
+					points[i].Position = Math.floor(Math.min(12, (i * step)));					
+					tremoloBarEffect.Points.push(points[i]);
+					i++;
+				}
+				beat.Effect.TremoloBar = tremoloBarEffect;
+				
+				
+				if (_sy != AlphaTabSymbols.RParensis) {
+					throw new FileFormatException("Expected ) found  \"" + _syData + "\" on position " + _curChPos);
+				}
+				NewSy();
+			}
+			else {
+				throw new FileFormatException("Invalid BeatEffect, found  \"" + _syData + "\" on position " + _curChPos);
+			}
+		}
+		
+		if (_sy != AlphaTabSymbols.RBrace) {
+			throw new FileFormatException("Invalid } to Close BeatEffects \"" + _syData + "\" on position " + _curChPos);
+		}
+		NewSy();
+	}
+	
+	private function Note(effect:GsNoteEffect) : GsNote {
 		// fret.string
 		if (_sy != AlphaTabSymbols.Number && !(_sy == AlphaTabSymbols.String && Std.string(_syData).toLowerCase() == "x")) {
 			throw new FileFormatException("Expected Number found \"" + _syData + "\" on position " + _curChPos);
@@ -444,7 +570,7 @@ class AlphaTabParser extends SongReader
 		// create note
 		var note:GsNote = Factory.NewNote();
 		note.String = string;
-		note.Effect = Factory.NewEffect();
+		note.Effect = effect;
 		note.Effect.DeadNote = isDead;
 		note.Value = fret;
 		
@@ -577,6 +703,29 @@ class AlphaTabParser extends SongReader
 				} 
 				NextChar();
 			}
+			else if (_ch == "-") // negative number
+			{
+				NextChar();
+				// is number?
+				if (IsDigit(_ch)) {
+					var number:Int = ReadNumber();
+					_sy = AlphaTabSymbols.Number;
+					_syData = -number;
+				}
+				else if(IsLetter(_ch)) {
+					var name:String = ReadName();
+					if (IsTuning(name)) 
+					{
+						_sy = AlphaTabSymbols.Tuning;
+						_syData = name.toLowerCase();
+					}
+					else
+					{
+						_sy = AlphaTabSymbols.String;
+						_syData = name;
+					}
+				}
+			}
 			else if (IsLetter(_ch))
 			{
 				var name = ReadName();
@@ -598,7 +747,7 @@ class AlphaTabParser extends SongReader
 			}
 			else if (IsDigit(_ch)) 
 			{
-				var number:Int = ReadNumber();
+				var number:Float = ReadNumber();
 				_sy = AlphaTabSymbols.Number;
 				_syData = number;
 			}
@@ -622,6 +771,16 @@ class AlphaTabParser extends SongReader
 			else if (_ch == ")") 
 			{
 				_sy = AlphaTabSymbols.RParensis;
+				NextChar();
+			}
+			else if (_ch == "{") 
+			{
+				_sy = AlphaTabSymbols.LBrace;
+				NextChar();
+			}
+			else if (_ch == "}") 
+			{
+				_sy = AlphaTabSymbols.RBrace;
 				NextChar();
 			}
 			else if (_ch == "|") 
@@ -673,7 +832,7 @@ class AlphaTabParser extends SongReader
 		return str;
 	}
 	
-	private function ReadNumber() : Int
+	private function ReadNumber() :Int
 	{
 		var str:String = "";
 		do

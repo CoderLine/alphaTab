@@ -29,39 +29,51 @@ class MidiMessageUtils
 	public static function NoteOn(channel:Int, note:Int, velocity:Int):String
 	{
 		// NoteOn,Channel,Note,Velocity
-		return "NoteOn," + Std.string(fixChannel(channel)) + "," + Std.string(fixValue(note)) + "," + Std.string(fixValue(velocity));
+		return "0" + ChannelToString(fixChannel(channel)) + ValueToString(fixValue(note)) + ValueToString(fixValue(velocity));
 	}
 	
 	public static function NoteOff(channel:Int, note:Int, velocity:Int):String {
 		// NoteOff,Channel,Note,Velocity
-		return "NoteOff," + Std.string(fixChannel(channel)) + "," + Std.string(fixValue(note)) + "," + Std.string(fixValue(velocity));
+		return "1" + ChannelToString(fixChannel(channel)) + ValueToString(fixValue(note)) + ValueToString(fixValue(velocity));
 	}
 	
 	public static function ControlChange(channel:Int, controller:Int, value:Int):String {
 		// ControlChange,Channel,Controller,Value
-		return "ControlChange," + Std.string(fixChannel(channel)) + "," + Std.string(fixValue(controller)) + "," + Std.string(fixValue(value));
+		return "2" + ChannelToString(fixChannel(channel)) + ValueToString(fixValue(controller)) + ValueToString(fixValue(value));
 	}
 	
 	public static function ProgramChange(channel:Int, instrument:Int):String {
 		// ProgramChange,Channel,Instrument
-		return "ProgramChange," + Std.string(fixChannel(channel)) + "," + Std.string(fixValue(instrument));
+		return "3" + ChannelToString(fixChannel(channel)) + ValueToString(fixValue(instrument));
 	}
 	
 	public static function PitchBend(channel:Int, value:Int):String {
 		// PitchBend,Channel,Value
-		return "PitchBend," + Std.string(fixChannel(channel)) + "," + Std.string(fixValue(value));
+		return "4" + ChannelToString(fixChannel(channel)) + ValueToString(fixValue(value));
 	}
 	
 	public static function SystemReset() : String {
-		return "SystemReset";
+		return "5";
 	}
 	 
 	public static function TempoInUSQ(usq:Int):String {
-		return "TempoInUsq," + Std.string(usq);
+		return "6" + IntToString(usq);
 	}
 	
 	public static function TimeSignature(ts:GsTimeSignature) : String {
 		// TimeSignature,Numerator,DenominatorIndex,DenominatorValue
-		return "TimeSignature," + Std.string(ts.Numerator) + "," + Std.string(ts.Denominator.Index()) + "," + Std.string(ts.Denominator.Value);
+		return "7" + IntToString(ts.Numerator) + "," + IntToString(ts.Denominator.Index()) + "," + IntToString(ts.Denominator.Value);
+	}
+	
+	public static function IntToString(num:Int) :String {
+		return StringTools.hex(num);
+	}	
+	
+	public static function ChannelToString(num:Int) :String {
+		return StringTools.hex(num, 1);
+	}	
+	
+	public static function ValueToString(num:Int) :String {
+		return StringTools.hex(num, 2);
 	}
 }

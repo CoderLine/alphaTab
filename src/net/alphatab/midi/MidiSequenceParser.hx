@@ -5,6 +5,8 @@
 
 package net.alphatab.midi;
 import haxe.remoting.DelayedConnection;
+import haxe.TimerQueue;
+import js.Lib;
 import net.alphatab.model.effects.GsBendEffect;
 import net.alphatab.model.effects.GsBendPoint;
 import net.alphatab.model.effects.GsHarmonicEffect;
@@ -431,8 +433,8 @@ class MidiSequenceParser
 
 	private static function GetStroke(beat:GsBeat, previous:GsBeat, stroke:Array<Int>) : Array<Int>
 	{
-		var direction:GsBeatStrokeDirection = beat.Stroke.Direction;
-		if (((previous == null) || (direction != GsBeatStrokeDirection.None)) || (previous.Stroke.Direction != GsBeatStrokeDirection.None))
+		var direction:GsBeatStrokeDirection = beat.Effect.Stroke.Direction;
+		if (((previous == null) || (direction != GsBeatStrokeDirection.None)) || (previous.Effect.Stroke.Direction != GsBeatStrokeDirection.None))
 		{
 			if (direction == GsBeatStrokeDirection.None)
 			{
@@ -459,7 +461,7 @@ class MidiSequenceParser
 				if (stringCount > 0)
 				{
 					var strokeMove:Int = 0;
-					var strokeIncrement:Int = beat.Stroke.GetIncrementTime(beat);
+					var strokeIncrement:Int = beat.Effect.Stroke.GetIncrementTime(beat);
 					for (i in 0 ... stroke.length)
 					{
 						var iIndex:Int = (direction != GsBeatStrokeDirection.Down) ? i : ((stroke.length - 1) - i);
@@ -492,7 +494,7 @@ class MidiSequenceParser
 		for (beatIndex in 0 ... measure.BeatCount())
 		{
 			var beat:GsBeat = measure.Beats[beatIndex];
-			if (beat.MixTableChange != null)
+			if (beat.Effect.MixTableChange != null)
 			{
 				MakeMixChange(sequence, track.Channel, track.Number, beat);
 			}
@@ -572,38 +574,44 @@ class MidiSequenceParser
 
 	private function MakeMixChange(sequence:MidiSequenceHandler, channel:GsMidiChannel, track:Int, beat:GsBeat) : Void
 	{
-		var change:GsMixTableChange = beat.MixTableChange;
+		var change:GsMixTableChange = beat.Effect.MixTableChange;
 		var start:Int = GetTick(beat.Start);
 
 		if (change.Volume != null)
-		{
-			sequence.AddControlChange(start, track, channel.Channel, MidiController.Volume, change.Volume.Value);
-			sequence.AddControlChange(start, track, channel.EffectChannel, MidiController.Volume, change.Volume.Value);
+		{			
+			var value:Int = GetMixChangeValue(change.Volume.Value, false);
+			sequence.AddControlChange(start, track, channel.Channel, MidiController.Volume, value);
+			sequence.AddControlChange(start, track, channel.EffectChannel, MidiController.Volume, value);
 		}
 		if (change.Balance != null)
 		{
-			sequence.AddControlChange(start, track, channel.Channel, MidiController.Balance, change.Balance.Value);
-			sequence.AddControlChange(start, track, channel.EffectChannel, MidiController.Balance, change.Balance.Value);
+			var value:Int = GetMixChangeValue(change.Balance.Value);
+			sequence.AddControlChange(start, track, channel.Channel, MidiController.Balance, value);
+			sequence.AddControlChange(start, track, channel.EffectChannel, MidiController.Balance, value);
 		}
 		if (change.Chorus != null)
 		{
-			sequence.AddControlChange(start, track, channel.Channel, MidiController.Chorus, change.Chorus.Value);
-			sequence.AddControlChange(start, track, channel.EffectChannel, MidiController.Chorus, change.Chorus.Value);
+			var value:Int = GetMixChangeValue(change.Chorus.Value);
+			sequence.AddControlChange(start, track, channel.Channel, MidiController.Chorus, value);
+			sequence.AddControlChange(start, track, channel.EffectChannel, MidiController.Chorus, value);
 		}
 		if (change.Reverb != null)
 		{
-			sequence.AddControlChange(start, track, channel.Channel, MidiController.Reverb, change.Reverb.Value);
-			sequence.AddControlChange(start, track, channel.EffectChannel, MidiController.Reverb, change.Reverb.Value);
+			var value:Int = GetMixChangeValue(change.Reverb.Value);
+			sequence.AddControlChange(start, track, channel.Channel, MidiController.Reverb, value);
+			sequence.AddControlChange(start, track, channel.EffectChannel, MidiController.Reverb, value);
 		}
 		if (change.Phaser != null)
 		{
-			sequence.AddControlChange(start, track, channel.Channel, MidiController.Phaser, change.Phaser.Value);
-			sequence.AddControlChange(start, track, channel.EffectChannel, MidiController.Phaser, change.Phaser.Value);
+			var value:Int = GetMixChangeValue(change.Phaser.Value);
+			sequence.AddControlChange(start, track, channel.Channel, MidiController.Phaser, value);
+			sequence.AddControlChange(start, track, channel.EffectChannel, MidiController.Phaser, value);
 		}
 		if (change.Tremolo != null)
 		{
-			sequence.AddControlChange(start, track, channel.Channel, MidiController.Tremolo, change.Tremolo.Value);
-			sequence.AddControlChange(start, track, channel.EffectChannel, MidiController.Tremolo, change.Tremolo.Value);
+			var value:Int = GetMixChangeValue(change.Tremolo.Value);
+			sequence.AddControlChange(start, track, channel.Channel, MidiController.Tremolo, value);
+			sequence.AddControlChange(start, track, channel.EffectChannel, MidiController.Tremolo, value);
 		}
 		if (change.Instrument != null)
 		{
@@ -614,6 +622,13 @@ class MidiSequenceParser
 		{
 			sequence.AddTempoInUSQ(start, _infoTrack, GsTempo.TempoToUsq(change.Tempo.Value));
 		}
+	}
+	
+	private function GetMixChangeValue(value:Int, signed:Bool=true): Int
+	{
+		if (signed) 
+			value += 8;
+		return Math.round((value * 127) / 16);
 	}
 
 	private function MakeFadeIn(sequence:MidiSequenceHandler, track:Int, start:Int, duration:Int, channel:Int) : Void
@@ -660,7 +675,7 @@ class MidiSequenceParser
 				var channel:Int = track.Channel.Channel;
 				var effectChannel:Int = track.Channel.EffectChannel;
 				var percussionTrack:Bool = track.IsPercussionTrack;
-				if (note.Effect.FadeIn)
+				if (beat.Effect.FadeIn)
 				{
 					channel = effectChannel;
 					MakeFadeIn(sequence, trackId, start, duration, channel);
@@ -723,10 +738,10 @@ class MidiSequenceParser
 					channel = effectChannel;
 					MakeBend(sequence, trackId, start, duration, note.Effect.Bend, channel);
 				}
-				else if ((note.Effect.IsTremoloBar() && (effectChannel >= 0)) && !percussionTrack)
+				else if ((note.Voice.Beat.Effect.IsTremoloBar() && (effectChannel >= 0)) && !percussionTrack)
 				{
 					channel = effectChannel;
-					MakeTremoloBar(sequence, trackId, start, duration, note.Effect.TremoloBar, channel);
+					MakeTremoloBar(sequence, trackId, start, duration, note.Voice.Beat.Effect.TremoloBar, channel);
 				}
 				else if ((note.Effect.Slide && (effectChannel >= 0)) && !percussionTrack)
 				{

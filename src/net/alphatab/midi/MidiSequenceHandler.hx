@@ -4,6 +4,7 @@
  */
 
 package net.alphatab.midi;
+import js.Lib;
 import net.alphatab.model.GsDuration;
 import net.alphatab.model.GsTimeSignature;
 
@@ -27,7 +28,7 @@ class MidiSequenceHandler
 	
 	private function AddEvent(track:Int, tick:Int, evt:String) :Void
 	{
-		var command:String = Std.string(track) + "|" + Std.string(tick) + "|" + evt;
+		var command:String = MidiMessageUtils.IntToString(track) + "|" + MidiMessageUtils.IntToString(tick) + "|" + evt;
 		_commands.push(command);
 	}
 
@@ -68,7 +69,7 @@ class MidiSequenceHandler
 	
 	public function NotifyFinish():Void
 	{
-		// Tracks;InfoTrack;MetronomeTrack;
-		Commands = Tracks + ";" + InfoTrack + ";" + MetronomeTrack + ";" + _commands.join(";");
+		// Tracks InfoTrack MetronomeTrack Commands
+		Commands = MidiMessageUtils.IntToString(MetronomeTrack) + ";" + _commands.join(";");
 	}
 }

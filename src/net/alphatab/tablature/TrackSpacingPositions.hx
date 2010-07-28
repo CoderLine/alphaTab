@@ -28,6 +28,7 @@ enum TrackSpacingPositions
 	Bend;
 	TablatureTopSeparator;
 	Tablature;
+	TremoloBarDown;
 	Lyric;
 	Bottom;
 }

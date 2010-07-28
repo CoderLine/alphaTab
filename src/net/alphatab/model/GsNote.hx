@@ -31,7 +31,7 @@ class GsNote
 		this.Velocity = GsVelocities.Default;
 		this.String = 1;
 		this.IsTiedNote = false;
-		this.Effect = factory.NewEffect();
+		this.Effect = factory.NewNoteEffect();
 	}
 
 }

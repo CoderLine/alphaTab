@@ -148,11 +148,6 @@ class GsNoteImpl extends GsNote
 			PaintHeavyAccentuated(layout, context, realX, realY);
 		}
 
-		if (effect.FadeIn)
-		{
-			var realY:Int = y + GetPaintPosition(TrackSpacingPositions.FadeIn);
-			PaintFadeIn(layout, context, realX, realY);
-		}
 		if (effect.IsHarmonic())
 		{
 			var realY:Int = y + GetPaintPosition(TrackSpacingPositions.HarmonicEffect);
@@ -171,21 +166,6 @@ class GsNoteImpl extends GsNote
 					key = "S.H";
 			}
 			fill.AddString(key, DrawingResources.DefaultFont, realX, realY);
-		}
-		if (effect.Tapping)
-		{
-			var realY:Int = y + GetPaintPosition(TrackSpacingPositions.TapingEffect);
-			fill.AddString("T", DrawingResources.DefaultFont, realX, realY);
-		}
-		else if (effect.Slapping)
-		{
-			var realY:Int = y + GetPaintPosition(TrackSpacingPositions.TapingEffect);
-			fill.AddString("S", DrawingResources.DefaultFont, realX, realY);
-		}
-		else if (effect.Popping)
-		{
-			var realY:Int = y + GetPaintPosition(TrackSpacingPositions.TapingEffect);
-			fill.AddString("P", DrawingResources.DefaultFont, realX, realY);
 		}
 
 		if (effect.LetRing)
@@ -327,11 +307,7 @@ class GsNoteImpl extends GsNote
 			}
 		}
 
-		if (effect.BeatVibrato)
-		{
-			var realY:Int = y + GetPaintPosition(TrackSpacingPositions.BeatVibratoEffect);
-			PaintVibrato(layout, context, realX, realY, 1);
-		}
+		
 		if (effect.Vibrato)
 		{
 			var realY:Int = y + GetPaintPosition(TrackSpacingPositions.VibratoEffect);
@@ -501,19 +477,11 @@ class GsNoteImpl extends GsNote
 		}
 		if (effect.IsBend())
 		{
-			var nextBeat:GsBeatImpl = cast layout.SongManager().GetNextBeat(BeatImpl(), Voice.Index);
+			var nextBeat:GsBeatImpl = cast layout.SongManager().GetNextBeat(BeatImpl());
 			// only use beat for bend if it's in the same line
 			if (nextBeat != null && nextBeat.MeasureImpl().Ts != MeasureImpl().Ts)
 				nextBeat = null;
 			PaintBend(layout, context, nextBeat, _noteOrientation.X + _noteOrientation.Width, realY);
-		}
-		else if (effect.IsTremoloBar())
-		{
-			var nextBeat:GsBeatImpl = cast layout.SongManager().GetNextBeat(BeatImpl(), Voice.Index);
-			// only use beat for bend if it's in the same line
-			if (nextBeat != null && nextBeat.MeasureImpl().Ts != MeasureImpl().Ts)
-				nextBeat = null;
-			PaintTremoloBar(layout, context, nextBeat, _noteOrientation.X, realY);
 		}
 		else if (effect.Slide || effect.Hammer)
 		{
@@ -527,10 +495,6 @@ class GsNoteImpl extends GsNote
 			{
 				PaintHammer(layout, context, nextNote, realX, realY);
 			}
-		}
-		
-		if (effect.Vibrato)
-		{
 		}
 	}
 	
@@ -631,82 +595,6 @@ class GsNoteImpl extends GsNote
 					var x:Float = secondLoc.X - size.width / 2;
 
 					fill.AddString(s, DrawingResources.DefaultFont, cast x, cast y);
-				}
-			}
-		}
-	}
-
-	private function PaintTremoloBar(layout:ViewLayout, context:DrawingContext, nextBeat:GsBeatImpl,x:Int, y:Int)
-	{
-		var scale:Float = layout.Scale;
-		var realX:Float = x + (10 * scale);
-		var realY:Float = y - (2.0 * scale);
-
-		var xTo:Float;
-		var minY:Float = realY - 60 * scale;
-		if (nextBeat == null)
-		{// No Next beat -> Till End of Own beat
-			xTo = BeatImpl().MeasureImpl().PosX + BeatImpl().MeasureImpl().Width + BeatImpl().MeasureImpl().Spacing;
-		}
-		else
-		{
-			xTo = nextBeat.MeasureImpl().PosX + nextBeat.MeasureImpl().HeaderImpl().GetLeftSpacing(layout)
-				  + nextBeat.PosX + (nextBeat.Spacing() * scale) + 5 * scale;
-		}
-
-		var fill:DrawingLayer = Voice.Index == 0
-		 ? context.Get(DrawingLayers.VoiceEffects1)
-		 : context.Get(DrawingLayers.VoiceEffects2);
-
-		var draw:DrawingLayer = Voice.Index == 0
-					 ? context.Get(DrawingLayers.VoiceEffectsDraw1)
-					 : context.Get(DrawingLayers.VoiceEffectsDraw2);
-
-
-
-		if (Effect.TremoloBar.Points.length >= 2)
-		{
-			var dX:Float = (xTo - realX) / GsTremoloBarEffect.MaxPositionLength;
-			var dY:Float = (realY - minY) / GsTremoloBarEffect.MaxValueLength;
-
-			draw.StartFigure();
-			for (i in 0 ... Effect.TremoloBar.Points.length - 1)
-			{
-				var firstPt:GsTremoloBarPoint = Effect.TremoloBar.Points[i];
-				var secondPt:GsTremoloBarPoint = Effect.TremoloBar.Points[i + 1];
-
-				if (firstPt.Value == secondPt.Value && i == Effect.TremoloBar.Points.length - 2) continue;
-
-
-				//pen.DashStyle = firstPt.Value != secondPt.Value ? DashStyle.Solid : DashStyle.Dash;
-				var firstLoc:Point = new Point(Math.floor(realX + (dX * firstPt.Position)), Math.floor(realY - dY * firstPt.Value));
-				var secondLoc:Point = new Point(Math.floor(realX + (dX * secondPt.Position)), Math.floor(realY - dY * secondPt.Value));
-				draw.AddLine(firstLoc.X, firstLoc.Y, secondLoc.X, secondLoc.Y);
-
-
-				if (secondPt.Value != 0)
-				{
-					var dV:Float = (secondPt.Value) * 0.5;
-					var up:Bool = (secondPt.Value - firstPt.Value) >= 0;
-					var s:String = "";
-					s += Utils.string(Math.floor(dV)) + " ";
-					// Quaters
-					dV -= Math.floor(dV);
-
-					if (dV == 0.25)
-						s += "1/4";
-					else if (dV == 0.5)
-						s += "1/2";
-					else if (dV == 0.75)
-						s += "3/4";
-
-
-					context.Graphics.font = DrawingResources.DefaultFont;
-					var size:Dynamic = context.Graphics.measureText(s);
-					var sY:Float = up ? secondLoc.Y - DrawingResources.DefaultFontHeight - (3 * scale) : secondLoc.Y + (3 * scale);
-					var sX:Float = secondLoc.X - size.width / 2;
-
-					fill.AddString(s, DrawingResources.DefaultFont, cast sX, cast sY);
 				}
 			}
 		}
@@ -855,21 +743,7 @@ class GsNoteImpl extends GsNote
 		fill.AddString(str, DrawingResources.EffectFont, x, y);
 	}
 
-	private function PaintFadeIn(layout:ViewLayout, context:DrawingContext, x:Int, y:Int) : Void
-	{
-		var scale:Float = layout.Scale;
-		var realX:Int = x;
-		var realY:Int = Math.round(y + (4.0 * scale));
-		var fWidth:Int = Math.round(VoiceImpl().Width);
-		var layer:DrawingLayer = Voice.Index == 0
-					 ? context.Get(DrawingLayers.VoiceDraw1)
-					 : context.Get(DrawingLayers.VoiceDraw2);
 
-		layer.StartFigure();
-		layer.AddBezier(realX, realY, realX, realY, realX + fWidth, realY, realX + fWidth, Math.round(realY - (4 * scale)));
-		layer.StartFigure();
-		layer.AddBezier(realX, realY, realX, realY, realX + fWidth, realY, realX + fWidth, Math.round(realY + (4 * scale)));
-	}
 
 	private function PaintAccentuated(layout:ViewLayout, context:DrawingContext, x:Int, y:Int) : Void
 	{

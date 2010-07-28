@@ -5,6 +5,7 @@
 
 package net.alphatab.tablature.model;
 import haxe.remoting.FlashJsConnection;
+import js.Lib;
 import net.alphatab.model.GsBeat;
 import net.alphatab.model.GsDuration;
 import net.alphatab.model.GsMeasure;
@@ -91,8 +92,10 @@ class GsMeasureImpl extends GsMeasure
 	private var _tupleto:Bool;
 	private var _fadeIn:Bool;
 	private var _bend:Bool;
+	private var _tremoloBar:Bool;
 	private var _letRing:Bool;
 	private var _bendOverFlow:Int;
+	private var _tremoloBarOverFlow:Int;
 
 	private var _registeredAccidentals:Array<Array<Bool>>;
 
@@ -350,7 +353,7 @@ class GsMeasureImpl extends GsMeasure
 			beat.PreviousBeat = (previousBeat);
 			previousBeat.NextBeat = (beat);
 
-			if (chordEnabled && beat.Chord != null && previousBeat.Chord != null)
+			if (chordEnabled && beat.Effect.Chord != null && previousBeat.Effect.Chord != null)
 			{
 				var previousWidth:Int = previousBeat.MinimumWidth;
 				var chordWidth:Int = Math.floor(layout.ChordFretIndexSpacing + layout.ChordStringSpacing + (Track.StringCount()
@@ -414,7 +417,7 @@ class GsMeasureImpl extends GsMeasure
 				}
 			}
 
-			if (!_chord && beat.Chord != null)
+			if (!_chord && beat.Effect.Chord != null)
 			{
 				_chord = true;
 			}
@@ -511,7 +514,7 @@ class GsMeasureImpl extends GsMeasure
 		{
 			_harmonic = true;
 		}
-		if (effect.Tapping || effect.Slapping || effect.Popping)
+		if (note.BeatImpl().Effect.Tapping || note.BeatImpl().Effect.Slapping || note.BeatImpl().Effect.Popping)
 		{
 			_tapping = true;
 		}
@@ -519,7 +522,7 @@ class GsMeasureImpl extends GsMeasure
 		{
 			_palmMute = true;
 		}
-		if (effect.FadeIn)
+		if (note.BeatImpl().Effect.FadeIn)
 		{
 			_fadeIn = true;
 		}
@@ -527,7 +530,7 @@ class GsMeasureImpl extends GsMeasure
 		{
 			_vibrato = true;
 		}
-		if (effect.BeatVibrato)
+		if (note.BeatImpl().Effect.Vibrato)
 		{
 			_beatVibrato = true;
 		}
@@ -539,6 +542,11 @@ class GsMeasureImpl extends GsMeasure
 		{
 			_bend = true;
 			_bendOverFlow = Math.round(Math.max(_bendOverFlow, Math.round(note.CalculateBendOverflow(layout))));
+		}
+		if (note.BeatImpl().Effect.IsTremoloBar()) 
+		{
+			_tremoloBar = true;
+			_tremoloBarOverFlow = Math.round(note.BeatImpl().CalculateTremoloBarOverflow(layout));
 		}
 	}
 
@@ -555,6 +563,7 @@ class GsMeasureImpl extends GsMeasure
 		_vibrato = false;
 		_beatVibrato = false;
 		_letRing = false;
+		_tremoloBar = false;
 	}
 
 	public function RegisterSpacing(layout:ViewLayout, spacing:TrackSpacing)
@@ -614,6 +623,12 @@ class GsMeasureImpl extends GsMeasure
 		if (_bend)
 		{
 			spacing.Set(TrackSpacingPositions.Bend, _bendOverFlow);
+		}
+		if (_tremoloBar) 
+		{
+			if (_tremoloBarOverFlow < 0) {
+				spacing.Set(TrackSpacingPositions.TremoloBarDown, Math.round(Math.abs(_tremoloBarOverFlow)));
+			}
 		}
 	}
 
@@ -1020,7 +1035,7 @@ class GsMeasureImpl extends GsMeasure
 			layer.LineTo(cast x1, cast y1);
 			layer.LineTo(cast x2, cast y1);
 			context.Get(DrawingLayers.MainComponents).AddString(sText, DrawingResources.DefaultFont,
-				Math.round(x1 + (5.0 * scale)), Math.round(y1 + (2.0 * scale)));
+				Math.round(x1 + (5.0 * scale)), Math.round(y1 + DrawingResources.DefaultFontHeight));
 		}
 	}
 	

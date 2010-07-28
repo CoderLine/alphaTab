@@ -165,13 +165,16 @@
 			var playButton = $('<input type="button" class="play" value="'+options.language.play+'" />');
 			var pauseButton = $('<input type="button" class="pause" value="'+options.language.pause+'" />');
 			var stopButton = $('<input type="button" class="stop" value="'+options.language.stop+'" />');
+			var metronomeCheck = $('<input type="checkbox" class="metronome" checked="checked" />');
 			var param = options.playerTickCallback ? '<param name="onTickChanged" value="' + options.playerTickCallback + '" />' : ''; 
-			var applet = $('<applet height="0" width="0"  archive="'+options.playerPath+'" code="net.coderline.jsgs.midi.JsGsPlayer.class">'+param+'</applet>');
+			var applet = $('<applet height="0" width="0"  archive="'+options.playerPath+'" code="net.alphatab.midi.MidiPlayer.class">'+param+'</applet>');
 			container.player = applet[0];
 			container.playerControls = playerControls[0];
 			playerControls.append(playButton);
 			playerControls.append(pauseButton);
 			playerControls.append(stopButton);			
+			playerControls.append(metronomeCheck);			
+			playerControls.append($('<span>Metronome</span>'));			
 			playerControls.append(applet);			
 			container.append(playerControls);
 			$(playerControls).find('input').attr('disabled', true);
@@ -186,6 +189,10 @@
 			});
 			stopButton.click(function() {
 				container.player.stop();
+			});
+			metronomeCheck.change(function() {
+				var enabled = metronomeCheck.attr('checked') ? true : false;
+				container.player.setMetronomeEnabled(enabled);
 			});
 			
 					

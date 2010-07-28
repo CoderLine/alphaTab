@@ -17,6 +17,7 @@ import net.alphatab.model.effects.GsTremoloBarPoint;
 import net.alphatab.model.effects.GsTremoloPickingEffect;
 import net.alphatab.model.effects.GsTrillEffect;
 import net.alphatab.model.GsBeat;
+import net.alphatab.model.GsBeatEffect;
 import net.alphatab.model.GsBeatStrokeDirection;
 import net.alphatab.model.GsBeatText;
 import net.alphatab.model.GsChord;
@@ -134,7 +135,7 @@ class Gp3Reader extends GpReaderBase
         }
 		
         var duration:GsDuration = this.ReadDuration(flags);
-        var effect:GsNoteEffect = Factory.NewEffect();
+        var effect:GsNoteEffect = Factory.NewNoteEffect();
         if ((flags & 0x02) != 0) {
             this.ReadChord(track.StringCount(), beat);
         }
@@ -146,7 +147,7 @@ class Gp3Reader extends GpReaderBase
         }
         if ((flags & 0x10) != 0) {
             var mixTableChange:GsMixTableChange = this.ReadMixTableChange(measure);
-            beat.MixTableChange = mixTableChange;
+            beat.Effect.MixTableChange = mixTableChange;
         }
         var stringFlags:Int = ReadUnsignedByte();
 		for (j in 0 ... 7)
@@ -363,18 +364,18 @@ class Gp3Reader extends GpReaderBase
 	private function ReadBeatEffects(beat:GsBeat, effect:GsNoteEffect)  : Void
 	{
 		var flags1:Int = ReadUnsignedByte();
-        effect.FadeIn = (((flags1 & 0x10) != 0));
-        effect.BeatVibrato = (((flags1 & 0x02) != 0)) || effect.BeatVibrato;
+        beat.Effect.FadeIn = (((flags1 & 0x10) != 0));
+        beat.Effect.Vibrato = (((flags1 & 0x02) != 0)) || beat.Effect.Vibrato;
         
 		if ((flags1 & 0x20) != 0) {
             var slapEffect:Int = ReadUnsignedByte();
 			if (slapEffect == 0) {
-				this.ReadTremoloBar(effect);
+				this.ReadTremoloBar(beat.Effect);
 			}
 			else {
-				effect.Tapping = (slapEffect == 1);
-				effect.Slapping = (slapEffect == 2);
-				effect.Popping = (slapEffect == 3);
+				beat.Effect.Tapping = (slapEffect == 1);
+				beat.Effect.Slapping = (slapEffect == 2);
+				beat.Effect.Popping = (slapEffect == 3);
 				ReadInt();
 			}
         }
@@ -382,13 +383,13 @@ class Gp3Reader extends GpReaderBase
             var strokeUp:Int = ReadByte();
             var strokeDown:Int = ReadByte();
             if (strokeUp > 0) {
-                beat.Stroke.Direction = GsBeatStrokeDirection.Up;
-                beat.Stroke.Value = (ToStrokeValue(strokeUp));
+                beat.Effect.Stroke.Direction = GsBeatStrokeDirection.Up;
+                beat.Effect.Stroke.Value = (ToStrokeValue(strokeUp));
             } 
             else 
                 if (strokeDown > 0) {
-                    beat.Stroke.Direction = GsBeatStrokeDirection.Down;
-                    beat.Stroke.Value = (ToStrokeValue(strokeDown));
+                    beat.Effect.Stroke.Direction = GsBeatStrokeDirection.Down;
+                    beat.Effect.Stroke.Value = (ToStrokeValue(strokeDown));
                 }
         }
         if ((flags1 & 0x04) != 0)
@@ -406,7 +407,7 @@ class Gp3Reader extends GpReaderBase
         }
 	}
 	
-	private function ReadTremoloBar(effect:GsNoteEffect) : Void 
+	private function ReadTremoloBar(effect:GsBeatEffect) : Void 
 	{
 		var barEffect:GsTremoloBarEffect = Factory.NewTremoloBarEffect();
         barEffect.Type = GsBendTypesConverter.FromInt(ReadByte());

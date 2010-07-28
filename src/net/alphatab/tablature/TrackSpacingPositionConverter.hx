@@ -33,8 +33,9 @@ class TrackSpacingPositionConverter
 			case TrackSpacingPositions.Bend: return 18;
 			case TrackSpacingPositions.TablatureTopSeparator: return 19;
 			case TrackSpacingPositions.Tablature: return 20;
-			case TrackSpacingPositions.Lyric: return 21;
-			case TrackSpacingPositions.Bottom: return 22;
+			case TrackSpacingPositions.TremoloBarDown: return 21;
+			case TrackSpacingPositions.Lyric: return 22;
+			case TrackSpacingPositions.Bottom: return 23;
 			default: return 0;
 		}
 		

@@ -238,7 +238,7 @@ class SongManager
 		return null;
 	}
 
-	public function GetNextBeat(beat:GsBeat, voice:Int) : GsBeat
+	public function GetNextBeat(beat:GsBeat) : GsBeat
 	{
 		// Try get next beat uf current measure  
 		var nextBeat:GsBeat = SongManager.GetNextBeat2(beat.Measure.Beats, beat);

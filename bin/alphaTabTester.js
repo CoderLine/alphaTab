@@ -64,6 +64,7 @@ function songLoaded(song){
     $('#FileInfo').html(output);
 	
 	var tracks = $('#Tracks');
+	tracks.find('option').remove();
 	for(var i = 0; i < song.Tracks.length; i++) 
 	{
 		var elm = $('<option value="'+i+'">'+song.Tracks[i].Name+'</option>');

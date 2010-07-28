@@ -77,9 +77,14 @@ class GsSongFactory
 		return new GsVoice(this, index);
 	}
 	
-	public function NewEffect() : GsNoteEffect
+	public function NewNoteEffect() : GsNoteEffect
 	{
 		return new GsNoteEffect();
+	}
+	
+	public function NewBeatEffect() : GsBeatEffect
+	{
+		return new GsBeatEffect(this);
 	}
 	
 	public function NewTrack() : GsTrack

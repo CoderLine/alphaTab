@@ -16,13 +16,11 @@ class GsNoteEffect
 	public function new()
 	{
 		this.Bend = null;
-		this.TremoloBar = null;
 		this.Harmonic = null;
 		this.Grace = null;
 		this.Trill = null;
 		this.TremoloPicking = null;
 		this.Vibrato = false;
-		this.BeatVibrato = false;
 		this.DeadNote = false;
 		this.Slide = false;
 		this.Hammer = false;
@@ -31,10 +29,6 @@ class GsNoteEffect
 		this.HeavyAccentuatedNote = false;
 		this.PalmMute = false;
 		this.Staccato = false;
-		this.Tapping = false;
-		this.Slapping = false;
-		this.Popping = false;
-		this.FadeIn = false;
 		this.LetRing = false;
 	}
 
@@ -43,13 +37,7 @@ class GsNoteEffect
 	{
 		return this.Bend != null && this.Bend.Points.length != 0;
 	}
-	
-	public var TremoloBar:GsTremoloBarEffect;
-	public function IsTremoloBar() : Bool
-	{
-		return this.TremoloBar != null;
-	}
-	
+		
 	public var Harmonic:GsHarmonicEffect;
 	public function IsHarmonic() : Bool
 	{
@@ -75,7 +63,6 @@ class GsNoteEffect
 	}
 	
 	public var Vibrato: Bool;
-	public var BeatVibrato: Bool;
 	public var DeadNote: Bool;
 	public var SlideType:GsSlideType;
 	public var Slide: Bool;
@@ -85,17 +72,12 @@ class GsNoteEffect
 	public var HeavyAccentuatedNote: Bool;
 	public var PalmMute: Bool;
 	public var Staccato: Bool;
-	public var Tapping: Bool;
-	public var Slapping: Bool;
-	public var Popping: Bool;
-	public var FadeIn: Bool;
 	public var LetRing: Bool;
 	
 	public function Clone(factory:GsSongFactory) : GsNoteEffect
 	{
-		var effect:GsNoteEffect = factory.NewEffect();
+		var effect:GsNoteEffect = factory.NewNoteEffect();
 		effect.Vibrato = this.Vibrato;
-		effect.BeatVibrato = this.BeatVibrato;
 		effect.DeadNote = this.DeadNote;
 		effect.Slide = this.Slide;
 		effect.SlideType = this.SlideType;
@@ -105,13 +87,8 @@ class GsNoteEffect
 		effect.HeavyAccentuatedNote = this.HeavyAccentuatedNote;
 		effect.PalmMute = this.PalmMute;
 		effect.Staccato = this.Staccato;
-		effect.Tapping = this.Tapping;
-		effect.Slapping = this.Slapping;
-		effect.Popping = this.Popping;
-		effect.FadeIn = this.FadeIn;
 		effect.LetRing = this.LetRing;
 		effect.Bend = IsBend() ? this.Bend.Clone(factory) : null;
-		effect.TremoloBar = IsTremoloBar() ? this.TremoloBar.Clone(factory) : null;
 		effect.Harmonic = IsHarmonic() ? this.Harmonic.Clone(factory) : null;
 		effect.Grace = IsGrace() ? this.Grace.Clone(factory) : null;
 		effect.Trill = IsTrill() ? this.Trill.Clone(factory) : null;
