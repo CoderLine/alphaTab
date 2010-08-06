@@ -4,6 +4,7 @@
  */
 
 package net.alphatab.file.alphatab;
+import haxe.remoting.ExternalConnection;
 import net.alphatab.model.GsBeat;
 import net.alphatab.model.GsGuitarString;
 import net.alphatab.model.GsMeasure;

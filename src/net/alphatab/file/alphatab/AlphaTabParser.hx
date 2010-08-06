@@ -6,8 +6,14 @@
 package net.alphatab.file.alphatab;
 import net.alphatab.file.FileFormatException;
 import net.alphatab.file.SongReader;
+import net.alphatab.model.effects.GsBendEffect;
+import net.alphatab.model.effects.GsBendPoint;
+import net.alphatab.model.effects.GsHarmonicEffect;
+import net.alphatab.model.effects.GsHarmonicType;
 import net.alphatab.model.effects.GsTremoloBarEffect;
 import net.alphatab.model.effects.GsTremoloBarPoint;
+import net.alphatab.model.effects.GsTremoloPickingEffect;
+import net.alphatab.model.effects.GsTrillEffect;
 import net.alphatab.model.GsBeat;
 import net.alphatab.model.GsBeatStrokeDirection;
 import net.alphatab.model.GsDuration;
@@ -18,6 +24,7 @@ import net.alphatab.model.GsMeasureHeader;
 import net.alphatab.model.GsNote;
 import net.alphatab.model.GsNoteEffect;
 import net.alphatab.model.GsPageSetup;
+import net.alphatab.model.GsSlideType;
 import net.alphatab.model.GsSong;
 import net.alphatab.model.GsTempo;
 import net.alphatab.model.GsTrack;
@@ -34,6 +41,8 @@ class AlphaTabParser extends SongReader
 	
 	private var _sy:AlphaTabSymbols;
 	private var _syData:Dynamic;
+	
+	private var _allowNegatives:Bool;
 	
 	private static var TrackChannels = [0, 1];
 
@@ -497,6 +506,7 @@ class AlphaTabParser extends SongReader
 					throw new FileFormatException("Expected ( found  \"" + _syData + "\" on position " + _curChPos);
 				}
 				NewSy();
+				_allowNegatives = true;
 			
 				var points:Array<GsTremoloBarPoint> = new Array<GsTremoloBarPoint>();
 				while (_sy != AlphaTabSymbols.RParensis && _sy != AlphaTabSymbols.Eof)
@@ -524,7 +534,7 @@ class AlphaTabParser extends SongReader
 					i++;
 				}
 				beat.Effect.TremoloBar = tremoloBarEffect;
-				
+				_allowNegatives = false;
 				
 				if (_sy != AlphaTabSymbols.RParensis) {
 					throw new FileFormatException("Expected ) found  \"" + _syData + "\" on position " + _curChPos);
@@ -544,10 +554,12 @@ class AlphaTabParser extends SongReader
 	
 	private function Note(effect:GsNoteEffect) : GsNote {
 		// fret.string
-		if (_sy != AlphaTabSymbols.Number && !(_sy == AlphaTabSymbols.String && Std.string(_syData).toLowerCase() == "x")) {
+		if (_sy != AlphaTabSymbols.Number && 
+			!(_sy == AlphaTabSymbols.String && (Std.string(_syData).toLowerCase() == "x" || Std.string(_syData).toLowerCase() == "-"))) {
 			throw new FileFormatException("Expected Number found \"" + _syData + "\" on position " + _curChPos);
 		}
 		var isDead:Bool = Std.string(_syData).toLowerCase() == "x";
+		var isTie:Bool = Std.string(_syData).toLowerCase() == "-";
 		var fret:Int = isDead ? 0 : _syData;
 		
 		NewSy(); // Fret done
@@ -567,16 +579,198 @@ class AlphaTabParser extends SongReader
 		}	
 		NewSy(); // string done
 		
+		// read effects
+		NoteEffects(effect);
+		
 		// create note
 		var note:GsNote = Factory.NewNote();
 		note.String = string;
 		note.Effect = effect;
 		note.Effect.DeadNote = isDead;
+		note.IsTiedNote = isTie;
 		note.Value = fret;
 		
-		// todo: effects
-		
 		return note;
+	}
+	
+	private function NoteEffects(effect:GsNoteEffect) :Void {
+		if (_sy != AlphaTabSymbols.LBrace) {
+			return;
+		}
+		NewSy();
+		
+		while (_sy == AlphaTabSymbols.MetaCommand)
+		{
+			_syData = Std.string(_syData).toLowerCase();
+			if (_syData == "b") {
+				// read points
+				NewSy();
+				if (_sy != AlphaTabSymbols.LParensis) {
+					throw new FileFormatException("Expected ( found  \"" + _syData + "\" on position " + _curChPos);
+				}
+				NewSy();
+			
+				var points:Array<GsBendPoint> = new Array<GsBendPoint>();
+				while (_sy != AlphaTabSymbols.RParensis && _sy != AlphaTabSymbols.Eof)
+				{
+					if (_sy != AlphaTabSymbols.Number) {
+						throw new FileFormatException("Expected Number found  \"" + _syData + "\" on position " + _curChPos);
+					}
+					points.push(new GsBendPoint(0, cast Math.abs(cast _syData), false));
+					NewSy();
+				}
+				
+				// only 12 points allowed
+				if(points.length > 12) {
+					points = points.slice(0, 12);
+				}
+								
+				// set positions
+				var count = points.length;
+				var step = Math.ceil(12 / count);
+				var i = 0; 
+				var bendEffect:GsBendEffect = Factory.NewBendEffect();
+				while (i < count) {
+					points[i].Position = Math.floor(Math.min(12, (i * step)));					
+					bendEffect.Points.push(points[i]);
+					i++;
+				}
+				effect.Bend = bendEffect;
+				
+				
+				if (_sy != AlphaTabSymbols.RParensis) {
+					throw new FileFormatException("Expected ) found  \"" + _syData + "\" on position " + _curChPos);
+				}
+				NewSy();
+			}
+			else if (_syData == "nh") {
+				var harmonicEffect:GsHarmonicEffect = Factory.NewHarmonicEffect();
+				harmonicEffect.Type = GsHarmonicType.Natural;
+				effect.Harmonic = harmonicEffect;
+				NewSy();
+			}
+			else if (_syData == "ah") {
+				// todo: store key in data
+				var harmonicEffect:GsHarmonicEffect = Factory.NewHarmonicEffect();
+				harmonicEffect.Type = GsHarmonicType.Artificial;
+				effect.Harmonic = harmonicEffect;
+				NewSy();
+			}	
+			else if (_syData == "th") {
+				// todo: store tapped fret in data
+				var harmonicEffect:GsHarmonicEffect = Factory.NewHarmonicEffect();
+				harmonicEffect.Type = GsHarmonicType.Tapped;
+				effect.Harmonic = harmonicEffect;
+				NewSy();
+			}
+			else if (_syData == "ph") {
+				var harmonicEffect:GsHarmonicEffect = Factory.NewHarmonicEffect();
+				harmonicEffect.Type = GsHarmonicType.Pinch;
+				effect.Harmonic = harmonicEffect;
+				NewSy();
+			}
+			else if (_syData == "sh") {
+				var harmonicEffect:GsHarmonicEffect = Factory.NewHarmonicEffect();
+				harmonicEffect.Type = GsHarmonicType.Semi;
+				effect.Harmonic = harmonicEffect;
+				NewSy();
+			}
+			/*Grace Notes, to complex for now. Find a simple format
+			else if (_syData == "gr") {
+				NewSy();
+				if (_sy != AlphaTabSymbols.Number) {
+					throw new FileFormatException("Expected Number found  \"" + _syData + "\" on position " + _curChPos);
+				}
+				var fret = _syData;
+			}*/
+			else if (_syData == "tr") {
+				NewSy();
+				if (_sy != AlphaTabSymbols.Number) {
+					throw new FileFormatException("Expected Number found  \"" + _syData + "\" on position " + _curChPos);
+				}
+				var fret = _syData;
+				NewSy();
+				
+				if (_sy != AlphaTabSymbols.Number) {
+					throw new FileFormatException("Expected Number found  \"" + _syData + "\" on position " + _curChPos);
+				}
+				var duration = 0;
+				if (_syData != 16 && _syData != 32 && _syData != 64) {
+					_syData = 16;
+				}
+				duration = _syData;
+				NewSy();
+				
+				var trillEffect:GsTrillEffect = Factory.NewTrillEffect();
+				trillEffect.Duration.Value = duration;
+				trillEffect.Fret = fret;
+				effect.Trill = trillEffect;
+			}
+			else if (_syData == "tp") {
+				NewSy();
+				if (_sy != AlphaTabSymbols.Number) {
+					throw new FileFormatException("Expected Number found  \"" + _syData + "\" on position " + _curChPos);
+				}
+				if (_syData != 8 && _syData != 16 && _syData != 32) {
+					_syData = 8;
+				}
+				NewSy();
+				var duration = _syData;
+				var tremoloPicking:GsTremoloPickingEffect = Factory.NewTremoloPickingEffect();
+				tremoloPicking.Duration.Value = duration;
+				effect.TremoloPicking = tremoloPicking;
+			}
+			else if (_syData == "v") {
+				NewSy();
+				effect.Vibrato = true;
+			}
+			else if (_syData == "sl") {
+				NewSy();
+				effect.Slide = true;
+				effect.SlideType = GsSlideType.FastSlideTo;
+			}			
+			else if (_syData == "sf") {
+				NewSy();
+				effect.Slide = true;
+				effect.SlideType = GsSlideType.SlowSlideTo;
+			}
+			else if (_syData == "h") {
+				NewSy();
+				effect.Hammer = true;
+			}
+			else if (_syData == "g") {
+				NewSy();
+				effect.GhostNote = true;
+			}
+			else if (_syData == "ac") {
+				NewSy();
+				effect.AccentuatedNote = true;
+			}
+			else if (_syData == "hac") {
+				NewSy();
+				effect.HeavyAccentuatedNote = true;
+			}
+			else if (_syData == "pm") {
+				NewSy();
+				effect.PalmMute = true;
+			}
+			else if (_syData == "st") {
+				NewSy();
+				effect.Staccato = true;
+			}			
+			else if (_syData == "lr") {
+				NewSy();
+				effect.LetRing = true;
+			}			
+			else {
+				throw new FileFormatException("Invalid NoteEffect, found  \"" + _syData + "\" on position " + _curChPos);
+			}
+		}
+		
+		if (_sy != AlphaTabSymbols.RBrace) {
+			throw new FileFormatException("Expected } to Close NoteEffects \"" + _syData + "\" on position " + _curChPos);
+		}
+		NewSy();
 	}
 	
 	private function ParseClef(str:String): GsMeasureClef {
@@ -707,7 +901,7 @@ class AlphaTabParser extends SongReader
 			{
 				NextChar();
 				// is number?
-				if (IsDigit(_ch)) {
+				if (_allowNegatives && IsDigit(_ch)) {
 					var number:Int = ReadNumber();
 					_sy = AlphaTabSymbols.Number;
 					_syData = -number;

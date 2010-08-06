@@ -87,8 +87,12 @@ class DrawingLayer
 					case "addBezier":
 						graphics.moveTo(elm.X1, elm.Y1);
 						graphics.bezierCurveTo(elm.X2, elm.Y2, elm.X3, elm.Y3, elm.X4, elm.Y4);
-					case "addEllipse":
-						graphics.arc(elm.X + elm.Radius, elm.Y + elm.Radius, elm.Radius, 0,Math.PI*2,true);
+					case "addCircle":
+						this.Finish(graphics);
+						graphics.beginPath();
+						graphics.arc(elm.X + elm.Radius, elm.Y + elm.Radius, elm.Radius, 0, Math.PI * 2, true);
+						this.Finish(graphics);
+						graphics.beginPath();
 					case "addRect":
 						graphics.rect(elm.X, elm.Y, elm.Width, elm.Height);
 				}

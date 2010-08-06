@@ -57,13 +57,23 @@ class SvgPainter
             case "Z": // closePath
                 this.Layer.CloseFigure();
             case "L": // absolute lineTo
-                this.CurrentPosition.X = (this.X + this.GetNumber() * this.XScale);
-                this.CurrentPosition.Y = (this.Y + this.GetNumber() * this.YScale);
-                this.Layer.LineTo(this.CurrentPosition.X, this.CurrentPosition.Y);
+				var isNextNumber = true;
+                do {
+					this.CurrentPosition.X = (this.X + this.GetNumber() * this.XScale);
+					this.CurrentPosition.Y = (this.Y + this.GetNumber() * this.YScale);
+					this.Layer.LineTo(this.CurrentPosition.X, this.CurrentPosition.Y);
+					isNextNumber = !this.IsNextCommand();
+                }
+                while (isNextNumber);
             case "l": // relative lineTo
-                this.CurrentPosition.X += (this.GetNumber() * this.XScale);
-                this.CurrentPosition.Y += (this.GetNumber() * this.YScale);
-                this.Layer.LineTo(this.CurrentPosition.X, this.CurrentPosition.Y);
+				var isNextNumber = true;
+                do {
+					this.CurrentPosition.X += (this.GetNumber() * this.XScale);
+					this.CurrentPosition.Y += (this.GetNumber() * this.YScale);
+					this.Layer.LineTo(this.CurrentPosition.X, this.CurrentPosition.Y);
+					isNextNumber = !this.IsNextCommand();
+                }
+                while (isNextNumber);
             case "C": // absolute bezierTo
                 var isNextNumber = true;
                 do {

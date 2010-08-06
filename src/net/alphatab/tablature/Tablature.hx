@@ -70,6 +70,7 @@ class Tablature
 	{
 		Log.trace("Updating Track");
 		this.Track = track;
+		this.UpdateSong = true;
 		this.UpdateDisplay = true;
 		this.UpdateTablature();
 		this.Invalidate();
@@ -113,7 +114,7 @@ class Tablature
 			var text = this.ErrorMessage;
 			
 			this.Canvas.fillStyle = "#4e4e4e";
-			this.Canvas.font = "20px Arial";
+			this.Canvas.font = "20px 'Arial'";
 			this.Canvas.textBaseline = "middle";
 			this.Canvas.fillText(text, 20, 30);
 		}

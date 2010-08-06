@@ -199,10 +199,11 @@ class PageViewLayout extends ViewLayout
 		var track:GsTrack = this.Tablature.Track;
 		y = Math.round(y + PagePadding.Top);
 		y = Math.round(PaintSongInfo(ctx, clientArea, x, y) + this.FirstMeasureSpacing);
+		var beatCount:Int = 0;
 		for (l in 0 ... this.Lines.length) 
 		{
 			var line:TempLine = this.Lines[l];
-			this.PaintLine(track, line, ctx);
+			beatCount = this.PaintLine(track, line, beatCount, ctx);
 		}
 	}
 	
@@ -295,7 +296,7 @@ class PageViewLayout extends ViewLayout
 		return input;
 	}
 	
-	public function PaintLine(track:GsTrack, line:TempLine, context:DrawingContext) : Void
+	public function PaintLine(track:GsTrack, line:TempLine, beatCount:Int, context:DrawingContext) : Int
 	{ 
 		Log.trace("Paint Measures " + Utils.string(line.Measures[0]) + " to " + Utils.string(line.Measures[line.Measures.length - 1]));
 		for(i in 0 ... line.Measures.length) {
@@ -306,10 +307,11 @@ class PageViewLayout extends ViewLayout
 			if (track.Song.Lyrics != null && track.Song.Lyrics.TrackChoice == track.Number)
 			{
 				var ly:GsLyricsImpl = cast track.Song.Lyrics;
-				ly.PaintCurrentNoteBeats(context, this, currentMeasure,
-																	   currentMeasure.PosX, currentMeasure.PosY);
+				ly.PaintCurrentNoteBeats(context, this, currentMeasure, beatCount, currentMeasure.PosX, currentMeasure.PosY);
 			}
+			beatCount += currentMeasure.BeatCount();
 		}
+		return beatCount;
 	}
 	
 	public function GetTempLines(track:GsTrack, fromIndex:Int, trackSpacing:TrackSpacing) : TempLine

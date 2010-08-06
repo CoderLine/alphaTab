@@ -5,6 +5,7 @@
 
 package net.alphatab.tablature.model;
 import haxe.io.StringInput;
+import js.Lib;
 import net.alphatab.model.effects.GsBendEffect;
 import net.alphatab.model.effects.GsBendPoint;
 import net.alphatab.model.effects.GsGraceEffectTransition;
@@ -378,7 +379,7 @@ class GsNoteImpl extends GsNote
 			if (tieWidth > 0 && tieHeight > 0)
 			{
 				var wScale:Float = tieWidth / 16;
-				fill.AddMusicSymbol(MusicFont.HammerPullUp, cast tieX, cast realY1, layout.Scale); // TODO: Scale to width
+				fill.AddMusicSymbol(MusicFont.HammerPullUp, cast tieX, cast realY1, layout.Scale); 
 			}
 		}
 
@@ -444,18 +445,23 @@ class GsNoteImpl extends GsNote
 		// Tremolo Picking
 		if (Effect.IsTremoloPicking())
 		{
+			var trillY = direction == GsVoiceDirection.Up ? realY1 + Math.floor(8 * layout.Scale) : realY1 - Math.floor(16 * layout.Scale);
 			var s:String = "";
 			switch (Effect.TremoloPicking.Duration.Value)
 			{
 				case GsDuration.Eighth:
-					s = direction == GsVoiceDirection.Up ?  MusicFont.TrillUpEigth : MusicFont.TrillDownEigth;
+					s = MusicFont.TrillUpEigth;
+					if (direction == GsVoiceDirection.Down)
+						trillY += Math.floor(8 * layout.Scale);
 				case GsDuration.Sixteenth:
-					s = direction == GsVoiceDirection.Up ? MusicFont.TrillUpSixteenth : MusicFont.TrillDownSixteenth;
+					s = MusicFont.TrillUpSixteenth;
+					if (direction == GsVoiceDirection.Down)
+						trillY += Math.floor(4 * layout.Scale);
 				case GsDuration.ThirtySecond:
-					s = direction == GsVoiceDirection.Up ? MusicFont.TrillUpThirtySecond : MusicFont.TrillDownThirtySecond;
+					s = MusicFont.TrillUpThirtySecond;
 			}
 			if (s != "")
-				fill.AddMusicSymbol(s, realX, realY1, layout.Scale);
+				fill.AddMusicSymbol(s, realX, trillY, layout.Scale);
 		}
 	}
 	
@@ -495,6 +501,12 @@ class GsNoteImpl extends GsNote
 			{
 				PaintHammer(layout, context, nextNote, realX, realY);
 			}
+		}
+		
+		if (effect.IsTrill())
+		{
+			var str = "(" + effect.Trill.Fret + ")";
+			fill.AddString(str, DrawingResources.GraceFont, Math.round(_noteOrientation.X + _noteOrientation.Width + 3 * scale), _noteOrientation.Y);
 		}
 	}
 	
@@ -747,24 +759,20 @@ class GsNoteImpl extends GsNote
 
 	private function PaintAccentuated(layout:ViewLayout, context:DrawingContext, x:Int, y:Int) : Void
 	{
-		var realX:Float = x;
-		var realY:Float = y;
 		var layer:DrawingLayer = Voice.Index == 0
 								 ? context.Get(DrawingLayers.Voice1)
 								 : context.Get(DrawingLayers.Voice2);
 
-		layer.AddMusicSymbol(MusicFont.AccentuatedNote, cast realX, cast realY, layout.Scale);
+		layer.AddMusicSymbol(MusicFont.AccentuatedNote, x, y, layout.Scale);
 	}
 
 	private function PaintHeavyAccentuated(layout:ViewLayout, context:DrawingContext, x:Int, y:Int) : Void
 	{
-		var realX:Float = x;
-		var realY:Float = y;
 		var layer:DrawingLayer = Voice.Index == 0
 					 ? context.Get(DrawingLayers.Voice1)
 					 : context.Get(DrawingLayers.Voice2);
 
-		layer.AddMusicSymbol(MusicFont.HeavyAccentuatedNote, cast realX, cast realY, layout.Scale);
+		layer.AddMusicSymbol(MusicFont.HeavyAccentuatedNote, x, y, layout.Scale);
 	}
 
 	public function CalculateBendOverflow(layout:ViewLayout) : Int
