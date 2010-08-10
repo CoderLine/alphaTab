@@ -1,28 +1,27 @@
-/**
- * ...
- * @author Daniel Kuschny
- */
-
 package net.alphatab.file;
 import haxe.Http;
 import haxe.io.StringInput;
 import haxe.Log;
-import net.alphatab.model.GsSong;
-import net.alphatab.model.GsSongFactory;
+import net.alphatab.model.Song;
+import net.alphatab.model.SongFactory;
 import net.alphatab.platform.BinaryReader;
 import net.alphatab.platform.FileLoader;
 import net.alphatab.platform.PlatformFactory;
 
+/**
+ * A wrapper for reading songs. 
+ */
 class SongLoader 
 {
-	public static function LoadSong(url:String, factory:GsSongFactory, success:GsSong->Void) 
+	public static function loadSong(url:String, factory:SongFactory, success:Song->Void) 
 	{
-		var loader:FileLoader = PlatformFactory.GetLoader();
+		var loader:FileLoader = PlatformFactory.getLoader();
 		Log.trace("Load song " + url);
-		loader.LoadBinary("GET", url, 
+		loader.loadBinary("GET", url, 
 		// success
-		function(data:BinaryReader) : Void {
-			var readers:Array<SongReader> = SongReader.AvailableReaders();
+		function(data:BinaryReader) : Void 
+		{
+			var readers:Array<SongReader> = SongReader.availableReaders();
 			Log.trace("Song loaded, search for reader");
 			for (reader in readers) 
 			{
@@ -30,13 +29,14 @@ class SongLoader
 				{
 					Log.trace("Try Reader " + Type.getClassName(Type.getClass(reader)));
 					data.seek(0);
-					reader.Init(data, factory);
-					var song:GsSong = reader.ReadSong();
+					reader.init(data, factory);
+					var song:Song = reader.readSong();
 					Log.trace("Reading succeeded");
 					success(song);
 					return;
 				}
-				catch (e:FileFormatException) {
+				catch (e:FileFormatException) 
+				{
 					Log.trace("Reading failed");
 					continue;
 				}

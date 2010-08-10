@@ -1,23 +1,20 @@
-/**
- * ...
- * @author Daniel Kuschny
- */
-
 package net.alphatab.model;
 
+/**
+ * A rectangle construct
+ */
 class Rectangle 
 {
-	public var X:Int;
-	public var Y:Int;
-	public var Width:Int;
-	public var Height:Int;
+	public var x:Int;
+	public var y:Int;
+	public var width:Int;
+	public var height:Int;
 	
 	public function new(x:Int, y:Int, width:Int, height:Int) 
 	{
-		this.X = x;
-		this.Y = y;
-		this.Width = width;
-		this.Height = height;
-	}
-	
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+	}	
 }

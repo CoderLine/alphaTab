@@ -4,115 +4,101 @@
  */
 
 package net.alphatab.midi;
-import haxe.remoting.DelayedConnection;
-import haxe.TimerQueue;
 import js.Lib;
-import net.alphatab.model.effects.GsBendEffect;
-import net.alphatab.model.effects.GsBendPoint;
-import net.alphatab.model.effects.GsHarmonicEffect;
-import net.alphatab.model.effects.GsHarmonicType;
-import net.alphatab.model.effects.GsTremoloBarEffect;
-import net.alphatab.model.effects.GsTremoloBarPoint;
-import net.alphatab.model.GsBeat;
-import net.alphatab.model.GsBeatStrokeDirection;
-import net.alphatab.model.GsDuration;
-import net.alphatab.model.GsMeasure;
-import net.alphatab.model.GsMeasureHeader;
-import net.alphatab.model.GsMidiChannel;
-import net.alphatab.model.GsMixTableChange;
-import net.alphatab.model.GsNote;
-import net.alphatab.model.GsSong;
-import net.alphatab.model.GsSongFactory;
-import net.alphatab.model.GsTempo;
-import net.alphatab.model.GsTrack;
-import net.alphatab.model.GsTripletFeel;
-import net.alphatab.model.GsVelocities;
-import net.alphatab.model.GsVoice;
+import net.alphatab.model.effects.BendEffect;
+import net.alphatab.model.effects.BendPoint;
+import net.alphatab.model.effects.HarmonicEffect;
+import net.alphatab.model.effects.HarmonicType;
+import net.alphatab.model.effects.TremoloBarEffect;
+import net.alphatab.model.Beat;
+import net.alphatab.model.BeatStrokeDirection;
+import net.alphatab.model.Duration;
+import net.alphatab.model.Measure;
+import net.alphatab.model.MeasureHeader;
+import net.alphatab.model.MidiChannel;
+import net.alphatab.model.MixTableChange;
+import net.alphatab.model.Note;
+import net.alphatab.model.Song;
+import net.alphatab.model.SongFactory;
+import net.alphatab.model.Tempo;
+import net.alphatab.model.Track;
+import net.alphatab.model.TripletFeel;
+import net.alphatab.model.Velocities;
+import net.alphatab.model.Voice;
 
 class MidiSequenceParser 
 {
-	private static inline var DefaultBend:Int = 0x40;
-	private static inline var DefaultBendSemiTone:Float = 2.75;
-	private static inline var DefaultDurationDead:Int = 30;
-	private static inline var DefaultDurationPm:Int = 80;
-	private static inline var DefaultMetronomeKey:Int = 0x25;
+	private static inline var DEFAULT_BEND:Int = 0x40;
+	private static inline var DEFAULT_BEND_SEMITONE:Float = 2.75;
+	private static inline var DEFAULT_DURATION_DEAD:Int = 30;
+	private static inline var DEFAULT_DURATION_PM:Int = 80;
+	private static inline var DEFAULT_METRONOME_KEY:Int = 0x25;
 	
 	private var _firstTickMove:Int;
-	private var  _flags:Int;
+	private var _flags:Int;
 	private var _tempoPercent:Int;
 	private var _transpose:Int;
-	private var _factory:GsSongFactory;
+	private var _factory:SongFactory;
 	private var _infoTrack :Int;
 	private var _metronomeTrack :Int;
-	private var _song:GsSong;
+	private var _song:Song;
 
-	public function new(factory:GsSongFactory, song:GsSong,  flags:Int, tempoPercent:Int, transpose:Int) 
+	public function new(factory:SongFactory, song:Song,  flags:Int, tempoPercent:Int, transpose:Int) 
 	{
 		_song = song;
 		_factory = factory;
 		_flags = flags;
 		_transpose = transpose;
 		_tempoPercent = tempoPercent;
-		_firstTickMove = ((flags & MidiSequenceParserFlags.AddFirstTickMove) == 0) ? 0 : GsDuration.QuarterTime;
+		_firstTickMove = ((flags & MidiSequenceParserFlags.ADD_FIRST_TICK_MOVE) == 0) ? 0 : Duration.QUARTER_TIME;
 	}
 	
-	private function AddBend(sequence:MidiSequenceHandler, track:Int, tick:Int, bend:Int, channel:Int) : Void
+	private function addBend(sequence:MidiSequenceHandler, track:Int, tick:Int, bend:Int, channel:Int) : Void
 	{
-		sequence.AddPitchBend(GetTick(tick), track, channel, bend);
+		sequence.addPitchBend(getTick(tick), track, channel, bend);
 	}
-
 	 
-	 
-	 
-	 
-	public function AddDefaultMessages(oSequence:MidiSequenceHandler) : Void
+	public function addDefaultMessages(oSequence:MidiSequenceHandler) : Void
 	{
-		if ((_flags & MidiSequenceParserFlags.AddDefaultControls) == 0) return;
+		if ((_flags & MidiSequenceParserFlags.ADD_DEFAULT_CONTROLS) == 0) return;
 		for (i in 0 ... 16)
 		{
-			oSequence.AddControlChange(GetTick(GsDuration.QuarterTime), _infoTrack, i, MidiController.RpnMsb, 0);
-			oSequence.AddControlChange(GetTick(GsDuration.QuarterTime), _infoTrack, i, MidiController.RpnLsb, 0);
-			oSequence.AddControlChange(GetTick(GsDuration.QuarterTime), _infoTrack, i, MidiController.DataEntryMsb, 12);
-			oSequence.AddControlChange(GetTick(GsDuration.QuarterTime), _infoTrack, i, MidiController.DataEntryLsb, 0);
+			oSequence.addControlChange(getTick(Duration.QUARTER_TIME), _infoTrack, i, MidiController.RPN_MBS, 0);
+			oSequence.addControlChange(getTick(Duration.QUARTER_TIME), _infoTrack, i, MidiController.RPN_LSB, 0);
+			oSequence.addControlChange(getTick(Duration.QUARTER_TIME), _infoTrack, i, MidiController.DATA_ENTRY_MSB, 12);
+			oSequence.addControlChange(getTick(Duration.QUARTER_TIME), _infoTrack, i, MidiController.DATA_ENTRY_LSB, 0);
 		}
 	}	 
 	 
-	public function AddMetronome(sequence:MidiSequenceHandler, header:GsMeasureHeader, startMove:Int) : Void
+	public function addMetronome(sequence:MidiSequenceHandler, header:MeasureHeader, startMove:Int) : Void
 	{
-		if ((_flags & MidiSequenceParserFlags.AddMetronome) == 0) return;
-		var start:Int = startMove + header.Start;
-		var length:Int = header.TimeSignature.Denominator.Time();
-		for (i in  1 ... header.TimeSignature.Numerator + 1)
+		if ((_flags & MidiSequenceParserFlags.ADD_METRONOME) == 0) return;
+		var start:Int = startMove + header.start;
+		var length:Int = header.timeSignature.denominator.time();
+		for (i in  1 ... header.timeSignature.numerator + 1)
 		{
-			MakeNote(sequence, _metronomeTrack, DefaultMetronomeKey, start, length, GsVelocities.Default, 9);
+			makeNote(sequence, _metronomeTrack, DEFAULT_METRONOME_KEY, start, length, Velocities.DEFAULT, 9);
 			start += length;
 		}
 	}
 
-	private function AddTempo(sequence:MidiSequenceHandler, currentMeasure:GsMeasure, previousMeasure:GsMeasure, startMove:Int) : Void
+	private function addTempo(sequence:MidiSequenceHandler, currentMeasure:Measure, previousMeasure:Measure, startMove:Int) : Void
 	{
 		var bAddTempo:Bool = false;
 		if (previousMeasure == null)
 		{
 			bAddTempo = true;
 		}
-		else if (currentMeasure.GetTempo().InUsq() != previousMeasure.GetTempo().InUsq())
+		else if (currentMeasure.tempo().inUsq() != previousMeasure.tempo().inUsq())
 		{
 			bAddTempo = true;
 		}
 		if (!bAddTempo) return;
-		var usq:Int = Math.floor(currentMeasure.GetTempo().InUsq() * 100.0 / _tempoPercent);
-		sequence.AddTempoInUSQ(GetTick(currentMeasure.Start() + startMove), _infoTrack, usq);
+		var usq:Int = Math.floor(currentMeasure.tempo().inUsq() * 100.0 / _tempoPercent);
+		sequence.addTempoInUSQ(getTick(currentMeasure.start() + startMove), _infoTrack, usq);
 	}
-
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	private function AddTimeSignature(sequence:MidiSequenceHandler, currentMeasure:GsMeasure, previousMeasure:GsMeasure, startMove:Int) : Void
+	
+	private function addTimeSignature(sequence:MidiSequenceHandler, currentMeasure:Measure, previousMeasure:Measure, startMove:Int) : Void
 	{
 		var addTimeSignature:Bool = false;
 		if (previousMeasure == null)
@@ -121,10 +107,10 @@ class MidiSequenceParser
 		}
 		else
 		{
-			var currNumerator:Int = currentMeasure.GetTimeSignature().Numerator;
-			var currValue:Int = currentMeasure.GetTimeSignature().Denominator.Value;
-			var prevNumerator:Int = previousMeasure.GetTimeSignature().Numerator;
-			var prevValue:Int = previousMeasure.GetTimeSignature().Denominator.Value;
+			var currNumerator:Int = currentMeasure.timeSignature().numerator;
+			var currValue:Int = currentMeasure.timeSignature().denominator.value;
+			var prevNumerator:Int = previousMeasure.timeSignature().numerator;
+			var prevValue:Int = previousMeasure.timeSignature().denominator.value;
 			if ((currNumerator != prevNumerator) || (currValue != prevValue))
 			{
 				addTimeSignature = true;
@@ -132,168 +118,168 @@ class MidiSequenceParser
 		}
 		if (addTimeSignature)
 		{
-			sequence.AddTimeSignature(GetTick(currentMeasure.Start() + startMove), _infoTrack, currentMeasure.GetTimeSignature());
+			sequence.addTimeSignature(getTick(currentMeasure.start() + startMove), _infoTrack, currentMeasure.timeSignature());
 		}
 	}
 
-	private static function ApplyDurationEffects(note:GsNote, tempo:GsTempo, duration:Int) : Int
+	private static function applyDurationEffects(note:Note, tempo:Tempo, duration:Int) : Int
 	{
-		if (note.Effect.DeadNote)
+		if (note.effect.deadNote)
 		{
-			return ApplyStaticDuration(tempo, DefaultDurationDead, duration);
+			return applyStaticDuration(tempo, DEFAULT_DURATION_DEAD, duration);
 		}
-		if (note.Effect.PalmMute)
+		if (note.effect.palmMute)
 		{
-			return ApplyStaticDuration(tempo, DefaultDurationPm, duration);
+			return applyStaticDuration(tempo, DEFAULT_DURATION_PM, duration);
 		}
-		if (note.Effect.Staccato)
+		if (note.effect.staccato)
 		{
 			return Math.floor((duration * 50.0) / 100.0);
 		}
 		return duration;
 	}
 	 
-	private static function ApplyStaticDuration(tempo:GsTempo, duration:Int, maximum:Int) : Int
+	private static function applyStaticDuration(tempo:Tempo, duration:Int, maximum:Int) : Int
 	{
-		var value:Int = Math.floor((tempo.Value * duration) / 60);
+		var value:Int = Math.floor((tempo.value * duration) / 60);
 		return ((value < maximum) ? value : maximum);
 	}
 
-	private static function ApplyStrokeDuration(note:GsNote, duration:Int, stroke:Array<Int>) : Int
+	private static function applyStrokeDuration(note:Note, duration:Int, stroke:Array<Int>) : Int
 	{
-		return (duration - stroke[note.String - 1]);
+		return (duration - stroke[note.string - 1]);
 	}
 
-	private static function ApplyStrokeStart(node:GsNote, start:Int, stroke:Array<Int>) : Int
+	private static function applyStrokeStart(node:Note, start:Int, stroke:Array<Int>) : Int
 	{
-		return (start + stroke[node.String - 1]);
+		return (start + stroke[node.string - 1]);
 	}
 
-	private function CheckTripletFeel(voice:GsVoice, beatIndex:Int) : BeatData 
+	private function checkTripletFeel(voice:Voice, beatIndex:Int) : BeatData 
 	{
-		var beatStart:Int = voice.Beat.Start;
-		var beatDuration:Int = voice.Duration.Time(); 
-		if (voice.Beat.Measure.GetTripletFeel() == GsTripletFeel.Eighth)
+		var beatStart:Int = voice.beat.start;
+		var beatDuration:Int = voice.duration.time(); 
+		if (voice.beat.measure.tripletFeel() == TripletFeel.Eighth)
 		{
-			if (voice.Duration == NewDuration(GsDuration.Eighth))
+			if (voice.duration == newDuration(Duration.EIGHTH))
 			{
-				if ((beatStart % GsDuration.QuarterTime) == 0)
+				if ((beatStart % Duration.QUARTER_TIME) == 0)
 				{
-					var voice2:GsVoice = GetNextBeat(voice, beatIndex);
-					if (((voice2 == null) || (voice2.Beat.Start > (beatStart + voice2.Duration.Time()))) ||
-						voice2.Duration == NewDuration(GsDuration.Eighth))
+					var voice2:Voice = getNextBeat(voice, beatIndex);
+					if (((voice2 == null) || (voice2.beat.start > (beatStart + voice2.duration.time()))) ||
+						voice2.duration == newDuration(Duration.EIGHTH))
 					{
-						var duration:GsDuration = NewDuration(GsDuration.Eighth);
-						duration.Triplet.Enters = 3;
-						duration.Triplet.Times = 2;
-						beatDuration = duration.Time() * 2;
+						var duration:Duration = newDuration(Duration.EIGHTH);
+						duration.tuplet.enters = 3;
+						duration.tuplet.times = 2;
+						beatDuration = duration.time() * 2;
 					}
 				}
-				else if ((beatStart % (GsDuration.QuarterTime / 2)) == 0)
+				else if ((beatStart % (Duration.QUARTER_TIME / 2)) == 0)
 				{
-					var voice2:GsVoice = GetPreviousBeat(voice, beatIndex);
-					if (((voice2 == null) || (voice2.Beat.Start < (beatStart - voice.Duration.Time()))) ||
-						voice2.Duration == NewDuration(GsDuration.Eighth))
+					var voice2:Voice = getPreviousBeat(voice, beatIndex);
+					if (((voice2 == null) || (voice2.beat.start < (beatStart - voice.duration.time()))) ||
+						voice2.duration == newDuration(Duration.EIGHTH))
 					{
-						var duration:GsDuration = NewDuration(GsDuration.Eighth);
-						duration.Triplet.Enters = 3;
-						duration.Triplet.Times = 2;
-						beatStart = (beatStart - voice.Duration.Time()) + (duration.Time() * 2);
-						beatDuration = duration.Time();
+						var duration:Duration = newDuration(Duration.EIGHTH);
+						duration.tuplet.enters = 3;
+						duration.tuplet.times = 2;
+						beatStart = (beatStart - voice.duration.time()) + (duration.time() * 2);
+						beatDuration = duration.time();
 					}
 				}
 			}
 		}
-		else if (voice.Beat.Measure.GetTripletFeel() == GsTripletFeel.Sixteenth)
+		else if (voice.beat.measure.tripletFeel() == TripletFeel.Sixteenth)
 		{
-			if (voice.Duration == NewDuration(GsDuration.Sixteenth))
-				if ((beatStart % (GsDuration.QuarterTime / 2)) == 0)
+			if (voice.duration == newDuration(Duration.SIXTEENTH))
+				if ((beatStart % (Duration.QUARTER_TIME / 2)) == 0)
 				{
-					var voice2:GsVoice = GetNextBeat(voice, beatIndex);
-					if (voice2 == null || (voice2.Beat.Start > (beatStart + voice.Duration.Time())) ||
-						voice2.Duration == NewDuration(GsDuration.Sixteenth))
+					var voice2:Voice = getNextBeat(voice, beatIndex);
+					if (voice2 == null || (voice2.beat.start > (beatStart + voice.duration.time())) ||
+						voice2.duration == newDuration(Duration.SIXTEENTH))
 					{
-						var duration:GsDuration = NewDuration(GsDuration.Sixteenth);
-						duration.Triplet.Enters = 3;
-						duration.Triplet.Times = 2;
-						beatDuration = duration.Time() * 2;
+						var duration:Duration = newDuration(Duration.SIXTEENTH);
+						duration.tuplet.enters = 3;
+						duration.tuplet.times = 2;
+						beatDuration = duration.time() * 2;
 					}
 				}
-				else if ((beatStart % (GsDuration.QuarterTime / 4)) == 0)
+				else if ((beatStart % (Duration.QUARTER_TIME / 4)) == 0)
 				{
-					var voice2:GsVoice = GetPreviousBeat(voice, beatIndex);
-					if (voice2 == null || (voice2.Beat.Start < (beatStart - voice2.Duration.Time()) ||
-						voice2.Duration == NewDuration(GsDuration.Sixteenth)))
+					var voice2:Voice = getPreviousBeat(voice, beatIndex);
+					if (voice2 == null || (voice2.beat.start < (beatStart - voice2.duration.time()) ||
+						voice2.duration == newDuration(Duration.SIXTEENTH)))
 					{
-						var duration:GsDuration = NewDuration(GsDuration.Sixteenth);
-						duration.Triplet.Enters = 3;
-						duration.Triplet.Times = 2;
-						beatStart = (beatStart - voice.Duration.Time()) + (duration.Time() * 2);
-						beatDuration = duration.Time();
+						var duration:Duration = newDuration(Duration.SIXTEENTH);
+						duration.tuplet.enters = 3;
+						duration.tuplet.times = 2;
+						beatStart = (beatStart - voice.duration.time()) + (duration.time() * 2);
+						beatDuration = duration.time();
 					}
 				}
 		}
 		return new BeatData(beatStart, beatDuration);
 	}
 	
-	private function CreateTrack(sequence:MidiSequenceHandler, track:GsTrack) : Void
+	private function createTrack(sequence:MidiSequenceHandler, track:Track) : Void
 	{
-		var previous:GsMeasure = null;
-		var controller:MidiRepeatController = new MidiRepeatController(track.Song);
-		AddBend(sequence, track.Number, GsDuration.QuarterTime, DefaultBend, track.Channel.Channel);
-		MakeChannel(sequence, track.Channel, track.Number);
-		while (!controller.Finished())
+		var previous:Measure = null;
+		var controller:MidiRepeatController = new MidiRepeatController(track.song);
+		addBend(sequence, track.number, Duration.QUARTER_TIME, DEFAULT_BEND, track.channel.channel);
+		makeChannel(sequence, track.channel, track.number);
+		while (!controller.finished())
 		{
-			var measure:GsMeasure = track.Measures[controller.Index];
-			var index:Int = controller.Index;
-			var move:Int = controller.RepeatMove;
-			controller.Process();
-			if (controller.ShouldPlay)
+			var measure:Measure = track.measures[controller.index];
+			var index:Int = controller.index;
+			var move:Int = controller.repeatMove;
+			controller.process();
+			if (controller.shouldPlay)
 			{
-				if (track.Number == 1)
+				if (track.number == 1)
 				{
-					AddTimeSignature(sequence, measure, previous, move);
-					AddTempo(sequence, measure, previous, move);
-					AddMetronome(sequence, measure.Header, move);
+					addTimeSignature(sequence, measure, previous, move);
+					addTempo(sequence, measure, previous, move);
+					addMetronome(sequence, measure.header, move);
 				}
-				MakeBeats(sequence, track, measure, index, move);
+				makeBeats(sequence, track, measure, index, move);
 			}
 			previous = measure;
 		}
 	}
 
-	private static function GetNextBeat(voice:GsVoice, beatIndex:Int) : GsVoice
+	private static function getNextBeat(voice:Voice, beatIndex:Int) : Voice
 	{
-		var next:GsVoice = null;
-		for (b in beatIndex + 1 ... voice.Beat.Measure.BeatCount())
+		var next:Voice = null;
+		for (b in beatIndex + 1 ... voice.beat.measure.beatCount())
 		{
-			var current:GsBeat = voice.Beat.Measure.Beats[b];
-			if (((current.Start > voice.Beat.Start) && !current.Voices[voice.Index].IsEmpty) &&
-				((next == null) || (current.Start < next.Beat.Start)))
+			var current:Beat = voice.beat.measure.beats[b];
+			if (((current.start > voice.beat.start) && !current.voices[voice.index].isEmpty) &&
+				((next == null) || (current.start < next.beat.start)))
 			{
-				next = current.Voices[voice.Index];
+				next = current.voices[voice.index];
 			}
 		}
 		return next;
 	}
 
-	private static function GetNextNote(note:GsNote, track:GsTrack, measureIndex:Int, beatIndex:Int) : GsNote
+	private static function getNextNote(note:Note, track:Track, measureIndex:Int, beatIndex:Int) : Note
 	{
 		var nextBeatIndex:Int = beatIndex + 1;
-		var measureCount:Int = track.MeasureCount();
+		var measureCount:Int = track.measureCount();
 		for (m in measureIndex ... measureCount)
 		{
-			var measure:GsMeasure = track.Measures[m];
-			var beatCount:Int = measure.BeatCount();
+			var measure:Measure = track.measures[m];
+			var beatCount:Int = measure.beatCount();
 			for (b in nextBeatIndex ... beatCount)
 			{
-				var beat:GsBeat = measure.Beats[b];
-				var voice:GsVoice = beat.Voices[note.Voice.Index];
-				var noteCount:Int = voice.Notes.length;
+				var beat:Beat = measure.beats[b];
+				var voice:Voice = beat.voices[note.voice.index];
+				var noteCount:Int = voice.notes.length;
 				for (n in 0 ... noteCount)
 				{
-					var currNode:GsNote = voice.Notes[n];
-					if (currNode.String == note.String)
+					var currNode:Note = voice.notes[n];
+					if (currNode.string == note.string)
 					{
 						return currNode;
 					}
@@ -305,40 +291,40 @@ class MidiSequenceParser
 		return null;
 	}
 	 
-	private static function GetPreviousBeat(voice:GsVoice, beatIndex:Int) :GsVoice
+	private static function getPreviousBeat(voice:Voice, beatIndex:Int) :Voice
 	{
-		var previous:GsVoice = null;
+		var previous:Voice = null;
 		var b:Int = beatIndex -1;
 		while (b >= 0)
 		{
-			var current:GsBeat = voice.Beat.Measure.Beats[b];
-			if (((current.Start < voice.Beat.Start) && !current.Voices[voice.Index].IsEmpty) &&
-				((previous == null) || (current.Start > previous.Beat.Start)))
+			var current:Beat = voice.beat.measure.beats[b];
+			if (((current.start < voice.beat.start) && !current.voices[voice.index].isEmpty) &&
+				((previous == null) || (current.start > previous.beat.start)))
 			{
-				previous = current.Voices[voice.Index];
+				previous = current.voices[voice.index];
 			}
 			b--;
 		}
 		return previous;
 	}
 	
-	private static function GetPreviousNote(note:GsNote, track:GsTrack, measureIndex:Int, beatIndex:Int) : GsNote
+	private static function getPreviousNote(note:Note, track:Track, measureIndex:Int, beatIndex:Int) : Note
 	{
 		var nextBeatIndex:Int = beatIndex;
 		var m:Int = measureIndex;
 		while(m >= 0)
 		{
-			var measure:GsMeasure = track.Measures[m];
-			nextBeatIndex = (nextBeatIndex < 0) ? measure.BeatCount() : nextBeatIndex;
+			var measure:Measure = track.measures[m];
+			nextBeatIndex = (nextBeatIndex < 0) ? measure.beatCount() : nextBeatIndex;
 			var b:Int = nextBeatIndex -1;
 			while (b >= 0)
 			{
-				var voice:GsVoice = measure.Beats[b].Voices[note.Voice.Index];
-				var noteCount:Int = voice.Notes.length;
+				var voice:Voice = measure.beats[b].voices[note.voice.index];
+				var noteCount:Int = voice.notes.length;
 				for (n in 0 ... noteCount)
 				{
-					var current:GsNote = voice.Notes[n];
-					if (current.String == note.String)
+					var current:Note = voice.notes[n];
+					if (current.string == note.string)
 					{
 						return current;
 					}
@@ -351,92 +337,92 @@ class MidiSequenceParser
 		return null;
 	}
 
-	private function GetRealNoteDuration(track:GsTrack, note:GsNote, tempo:GsTempo, duration:Int, measureIndex:Int, beatIndex:Int) : Int
+	private function getRealNoteDuration(track:Track, note:Note, tempo:Tempo, duration:Int, measureIndex:Int, beatIndex:Int) : Int
 	{
-		var lastEnd:Int = note.Voice.Beat.Start + note.Voice.Duration.Time();
+		var lastEnd:Int = note.voice.beat.start + note.voice.duration.time();
 		var realDuration:Int = duration;
 		var nextBeatIndex:Int = beatIndex + 1;
-		var measureCount:Int = track.MeasureCount();
+		var measureCount:Int = track.measureCount();
 		for (m in measureIndex ... measureCount)
 		{
-			var measure:GsMeasure = track.Measures[m];
-			var  beatCount:Int = measure.BeatCount();
+			var measure:Measure = track.measures[m];
+			var  beatCount:Int = measure.beatCount();
 			var letRingSuspend:Bool = false;
 			for (b in nextBeatIndex ... beatCount)
 			{
-				var beat:GsBeat = measure.Beats[b];
-				var voice:GsVoice = beat.Voices[note.Voice.Index];
-				if (voice.IsRestVoice())
+				var beat:Beat = measure.beats[b];
+				var voice:Voice = beat.voices[note.voice.index];
+				if (voice.isRestVoice())
 				{
-					return ApplyDurationEffects(note, tempo, realDuration);
+					return applyDurationEffects(note, tempo, realDuration);
 				}
-				var noteCount:Int = voice.Notes.length;
+				var noteCount:Int = voice.notes.length;
 
 				var letRing:Bool = m == measureIndex && b != beatIndex &&
-					note.Effect.LetRing;
+					note.effect.letRing;
 				var letRingAppliedForBeat:Bool = false;
 				for (n in 0 ... noteCount)
 				{
-					var nextNote:GsNote = voice.Notes[n];
-					if (nextNote == note || nextNote.String != note.String) continue;
+					var nextNote:Note = voice.notes[n];
+					if (nextNote == note || nextNote.string != note.string) continue;
 					// quit letring?
-					if (nextNote.String == note.String && !nextNote.IsTiedNote)
+					if (nextNote.string == note.string && !nextNote.isTiedNote)
 					{  
 						letRing = false;
 						letRingSuspend = true;
 					}
-					if (!nextNote.IsTiedNote && !letRing)
+					if (!nextNote.isTiedNote && !letRing)
 					{
-						return ApplyDurationEffects(note, tempo, realDuration);
+						return applyDurationEffects(note, tempo, realDuration);
 					}
 					letRingAppliedForBeat = true;
-					realDuration += (beat.Start - lastEnd) + nextNote.Voice.Duration.Time();
-					lastEnd = beat.Start + voice.Duration.Time();
+					realDuration += (beat.start - lastEnd) + nextNote.voice.duration.time();
+					lastEnd = beat.start + voice.duration.time();
 				}
 
 				if (letRing && !letRingAppliedForBeat && !letRingSuspend)
 				{
-					realDuration += (beat.Start - lastEnd) + voice.Duration.Time();
-					lastEnd = beat.Start + voice.Duration.Time();
+					realDuration += (beat.start - lastEnd) + voice.duration.time();
+					lastEnd = beat.start + voice.duration.time();
 				}
 			}
 			nextBeatIndex = 0;
 		}
-		return ApplyDurationEffects(note, tempo, realDuration);
+		return applyDurationEffects(note, tempo, realDuration);
 	}
 
-	private static function GetRealVelocity(note:GsNote, track:GsTrack, measureIndex:Int, beatIndex:Int) : Int
+	private static function getRealVelocity(note:Note, track:Track, measureIndex:Int, beatIndex:Int) : Int
 	{
-		var velocity:Int = note.Velocity;
-		if (!track.IsPercussionTrack)
+		var velocity:Int = note.velocity;
+		if (!track.isPercussionTrack)
 		{
-			var previousNote:GsNote = GetPreviousNote(note, track, measureIndex, beatIndex);
-			if ((previousNote != null) && previousNote.Effect.Hammer)
+			var previousNote:Note = getPreviousNote(note, track, measureIndex, beatIndex);
+			if ((previousNote != null) && previousNote.effect.hammer)
 			{
-				velocity = Math.floor(Math.max(GsVelocities.MinVelocity, velocity - 25));
+				velocity = Math.floor(Math.max(Velocities.MIN_VELOCITY, velocity - 25));
 			}
 		}
-		if (note.Effect.GhostNote)
+		if (note.effect.ghostNote)
 		{
-			velocity = Math.floor(Math.max(GsVelocities.MinVelocity, velocity - GsVelocities.VelocityIncrement));
+			velocity = Math.floor(Math.max(Velocities.MIN_VELOCITY, velocity - Velocities.VELOCITY_INCREMENT));
 		}
-		else if (note.Effect.AccentuatedNote)
+		else if (note.effect.accentuatedNote)
 		{
-			velocity = Math.floor(Math.max(GsVelocities.MinVelocity, velocity + GsVelocities.VelocityIncrement));
+			velocity = Math.floor(Math.max(Velocities.MIN_VELOCITY, velocity + Velocities.VELOCITY_INCREMENT));
 		}
-		else if (note.Effect.HeavyAccentuatedNote)
+		else if (note.effect.heavyAccentuatedNote)
 		{
-			velocity =Math.floor(Math.max(GsVelocities.MinVelocity, velocity + (GsVelocities.VelocityIncrement * 2)));
+			velocity =Math.floor(Math.max(Velocities.MIN_VELOCITY, velocity + (Velocities.VELOCITY_INCREMENT * 2)));
 		}
 		return ((velocity > 127) ? 127 : velocity);
 	}
 
-	private static function GetStroke(beat:GsBeat, previous:GsBeat, stroke:Array<Int>) : Array<Int>
+	private static function getStroke(beat:Beat, previous:Beat, stroke:Array<Int>) : Array<Int>
 	{
-		var direction:GsBeatStrokeDirection = beat.Effect.Stroke.Direction;
-		if (((previous == null) || (direction != GsBeatStrokeDirection.None)) || (previous.Effect.Stroke.Direction != GsBeatStrokeDirection.None))
+		var direction:BeatStrokeDirection = beat.effect.stroke.direction;
+		if (((previous == null) || (direction != BeatStrokeDirection.None)) || (previous.effect.stroke.direction != BeatStrokeDirection.None))
 		{
-			if (direction == GsBeatStrokeDirection.None)
+			if (direction == BeatStrokeDirection.None)
 			{
 				for (i in 0 ... stroke.length)
 				{
@@ -447,24 +433,24 @@ class MidiSequenceParser
 			{
 				var stringUsed:Int = 0;
 				var stringCount:Int = 0;
-				for (vIndex in  0 ... beat.Voices.length)
+				for (vIndex in  0 ... beat.voices.length)
 				{
-					var voice:GsVoice = beat.Voices[vIndex];
-					for (nIndex in 0 ... voice.Notes.length)
+					var voice:Voice = beat.voices[vIndex];
+					for (nIndex in 0 ... voice.notes.length)
 					{
-						var note:GsNote = voice.Notes[nIndex];
-						if (note.IsTiedNote) continue;
-						stringUsed |= 0x01 << (note.String - 1);
+						var note:Note = voice.notes[nIndex];
+						if (note.isTiedNote) continue;
+						stringUsed |= 0x01 << (note.string - 1);
 						stringCount++;
 					}
 				}
 				if (stringCount > 0)
 				{
 					var strokeMove:Int = 0;
-					var strokeIncrement:Int = beat.Effect.Stroke.GetIncrementTime(beat);
+					var strokeIncrement:Int = beat.effect.stroke.getIncrementTime(beat);
 					for (i in 0 ... stroke.length)
 					{
-						var iIndex:Int = (direction != GsBeatStrokeDirection.Down) ? i : ((stroke.length - 1) - i);
+						var iIndex:Int = (direction != BeatStrokeDirection.Down) ? i : ((stroke.length - 1) - i);
 						if ((stringUsed & (0x01 << iIndex)) != 0)
 						{
 							stroke[iIndex] = strokeMove;
@@ -478,50 +464,50 @@ class MidiSequenceParser
 	}
 
 	 
-	private function GetTick(tick:Int) : Int
+	private function getTick(tick:Int) : Int
 	{
 		return (tick + _firstTickMove);
 	}
 
-	private function MakeBeats(sequence:MidiSequenceHandler, track:GsTrack, measure:GsMeasure, measureIndex:Int, startMove:Int) : Void
+	private function makeBeats(sequence:MidiSequenceHandler, track:Track, measure:Measure, measureIndex:Int, startMove:Int) : Void
 	{
 		var stroke:Array<Int> = new Array<Int>();
-		for (i in 0 ... track.StringCount())
+		for (i in 0 ... track.stringCount())
 		{
 			stroke.push(0);
 		}
-		var previous:GsBeat = null;
-		for (beatIndex in 0 ... measure.BeatCount())
+		var previous:Beat = null;
+		for (beatIndex in 0 ... measure.beatCount())
 		{
-			var beat:GsBeat = measure.Beats[beatIndex];
-			if (beat.Effect.MixTableChange != null)
+			var beat:Beat = measure.beats[beatIndex];
+			if (beat.effect.mixTableChange != null)
 			{
-				MakeMixChange(sequence, track.Channel, track.Number, beat);
+				makeMixChange(sequence, track.channel, track.number, beat);
 			}
 
-			MakeNotes(sequence, track, beat, measure.GetTempo(), measureIndex, beatIndex, startMove,
-					  GetStroke(beat, previous, stroke));
+			makeNotes(sequence, track, beat, measure.tempo(), measureIndex, beatIndex, startMove,
+					  getStroke(beat, previous, stroke));
 			previous = beat;
 		}
 	}
 
 	
-	public function MakeBend(sequence:MidiSequenceHandler, track:Int, start:Int, duration:Int,
-								 bend:GsBendEffect, channel:Int) : Void
+	public function makeBend(sequence:MidiSequenceHandler, track:Int, start:Int, duration:Int,
+								 bend:BendEffect, channel:Int) : Void
 	{
-		var points:Array<GsBendPoint> = bend.Points;
+		var points:Array<BendPoint> = bend.points;
 		for (i in 0 ... points.length)
 		{
-			var point:GsBendPoint = points[i];
+			var point:BendPoint = points[i];
 			var bendStart:Int = start + point.GetTime(duration);
-			var value:Int = Math.round(DefaultBend + (point.Value * DefaultBendSemiTone / GsBendEffect.SemitoneLength));
+			var value:Int = Math.round(DEFAULT_BEND + (point.value * DEFAULT_BEND_SEMITONE / BendEffect.SEMITONE_LENGTH));
 			value = (value <= 127) ? value : 127;
 			value = (value >= 0) ? value : 0;
-			AddBend(sequence, track, bendStart, value, channel);
+			addBend(sequence, track, bendStart, value, channel);
 			if (points.length <= (i + 1)) continue;
 
-			var nextPoint:GsBendPoint = points[i + 1];
-			var nextValue:Int = Math.round(DefaultBend + (nextPoint.Value * DefaultBendSemiTone / GsBendEffect.SemitoneLength));
+			var nextPoint:BendPoint = points[i + 1];
+			var nextValue:Int = Math.round(DEFAULT_BEND + (nextPoint.value * DEFAULT_BEND_SEMITONE / BendEffect.SEMITONE_LENGTH));
 			var nextBendStart:Int = Math.round(start + nextPoint.GetTime(duration));
 			if (nextValue == value) continue;
 			var width:Float = (nextBendStart - bendStart) / Math.abs(nextValue - value);
@@ -531,7 +517,7 @@ class MidiSequenceParser
 				{
 					value++;
 					bendStart += Math.round(width);
-					AddBend(sequence, track, bendStart, (value <= 127) ? value : 127, channel);
+					addBend(sequence, track, bendStart, (value <= 127) ? value : 127, channel);
 				}
 			}
 			else if (value > nextValue)
@@ -540,98 +526,98 @@ class MidiSequenceParser
 				{
 					value--;
 					bendStart += Math.round(width);
-					AddBend(sequence, track, bendStart, (value >= 0) ? value : 0, channel);
+					addBend(sequence, track, bendStart, (value >= 0) ? value : 0, channel);
 				}
 			}
 		}
-		AddBend(sequence, track, start + duration, 0x40, channel);
+		addBend(sequence, track, start + duration, 0x40, channel);
 	}
 
 	
-	private function MakeChannel(sequence:MidiSequenceHandler, channel:GsMidiChannel, track:Int) : Void
+	private function makeChannel(sequence:MidiSequenceHandler, channel:MidiChannel, track:Int) : Void
 	{
-		if ((_flags & MidiSequenceParserFlags.AddMixerMessages) == 0) return;
-		MakeChannel2(sequence, channel, track, true);
-		if (channel.Channel != channel.EffectChannel)
+		if ((_flags & MidiSequenceParserFlags.ADD_MIXER_MESSAGES) == 0) return;
+		makeChannel2(sequence, channel, track, true);
+		if (channel.channel != channel.effectChannel)
 		{
-			MakeChannel2(sequence, channel, track, false);
+			makeChannel2(sequence, channel, track, false);
 		}
 	}
 
-	private function MakeChannel2(sequence:MidiSequenceHandler, channel:GsMidiChannel, track:Int, primary:Bool) : Void
+	private function makeChannel2(sequence:MidiSequenceHandler, channel:MidiChannel, track:Int, primary:Bool) : Void
 	{
-		var number:Int = (!primary) ? channel.EffectChannel : channel.Channel;
-		sequence.AddControlChange(GetTick(GsDuration.QuarterTime), track, number, MidiController.Volume, channel.Volume);
-		sequence.AddControlChange(GetTick(GsDuration.QuarterTime), track, number, MidiController.Balance, channel.Balance);
-		sequence.AddControlChange(GetTick(GsDuration.QuarterTime), track, number, MidiController.Chorus, channel.Chorus);
-		sequence.AddControlChange(GetTick(GsDuration.QuarterTime), track, number, MidiController.Reverb, channel.Reverb);
-		sequence.AddControlChange(GetTick(GsDuration.QuarterTime), track, number, MidiController.Phaser, channel.Phaser);
-		sequence.AddControlChange(GetTick(GsDuration.QuarterTime), track, number, MidiController.Tremolo, channel.Tremolo);
-		sequence.AddControlChange(GetTick(GsDuration.QuarterTime), track, number, MidiController.Expression, 127);
-		sequence.AddProgramChange(GetTick(GsDuration.QuarterTime), track, number, channel.Instrument());
+		var number:Int = (!primary) ? channel.effectChannel : channel.channel;
+		sequence.addControlChange(getTick(Duration.QUARTER_TIME), track, number, MidiController.VOLUME, channel.volume);
+		sequence.addControlChange(getTick(Duration.QUARTER_TIME), track, number, MidiController.BALANCE, channel.balance);
+		sequence.addControlChange(getTick(Duration.QUARTER_TIME), track, number, MidiController.CHORUS, channel.chorus);
+		sequence.addControlChange(getTick(Duration.QUARTER_TIME), track, number, MidiController.REVERB, channel.reverb);
+		sequence.addControlChange(getTick(Duration.QUARTER_TIME), track, number, MidiController.PHASER, channel.phaser);
+		sequence.addControlChange(getTick(Duration.QUARTER_TIME), track, number, MidiController.TREMOLO, channel.tremolo);
+		sequence.addControlChange(getTick(Duration.QUARTER_TIME), track, number, MidiController.EXPRESSION, 127);
+		sequence.addProgramChange(getTick(Duration.QUARTER_TIME), track, number, channel.instrument());
 	}
 
 
-	private function MakeMixChange(sequence:MidiSequenceHandler, channel:GsMidiChannel, track:Int, beat:GsBeat) : Void
+	private function makeMixChange(sequence:MidiSequenceHandler, channel:MidiChannel, track:Int, beat:Beat) : Void
 	{
-		var change:GsMixTableChange = beat.Effect.MixTableChange;
-		var start:Int = GetTick(beat.Start);
+		var change:MixTableChange = beat.effect.mixTableChange;
+		var start:Int = getTick(beat.start);
 
-		if (change.Volume != null)
+		if (change.volume != null)
 		{			
-			var value:Int = GetMixChangeValue(change.Volume.Value, false);
-			sequence.AddControlChange(start, track, channel.Channel, MidiController.Volume, value);
-			sequence.AddControlChange(start, track, channel.EffectChannel, MidiController.Volume, value);
+			var value:Int = getMixChangeValue(change.volume.value, false);
+			sequence.addControlChange(start, track, channel.channel, MidiController.VOLUME, value);
+			sequence.addControlChange(start, track, channel.effectChannel, MidiController.VOLUME, value);
 		}
-		if (change.Balance != null)
+		if (change.balance != null)
 		{
-			var value:Int = GetMixChangeValue(change.Balance.Value);
-			sequence.AddControlChange(start, track, channel.Channel, MidiController.Balance, value);
-			sequence.AddControlChange(start, track, channel.EffectChannel, MidiController.Balance, value);
+			var value:Int = getMixChangeValue(change.balance.value);
+			sequence.addControlChange(start, track, channel.channel, MidiController.BALANCE, value);
+			sequence.addControlChange(start, track, channel.effectChannel, MidiController.BALANCE, value);
 		}
-		if (change.Chorus != null)
+		if (change.chorus != null)
 		{
-			var value:Int = GetMixChangeValue(change.Chorus.Value);
-			sequence.AddControlChange(start, track, channel.Channel, MidiController.Chorus, value);
-			sequence.AddControlChange(start, track, channel.EffectChannel, MidiController.Chorus, value);
+			var value:Int = getMixChangeValue(change.chorus.value);
+			sequence.addControlChange(start, track, channel.channel, MidiController.CHORUS, value);
+			sequence.addControlChange(start, track, channel.effectChannel, MidiController.CHORUS, value);
 		}
-		if (change.Reverb != null)
+		if (change.reverb != null)
 		{
-			var value:Int = GetMixChangeValue(change.Reverb.Value);
-			sequence.AddControlChange(start, track, channel.Channel, MidiController.Reverb, value);
-			sequence.AddControlChange(start, track, channel.EffectChannel, MidiController.Reverb, value);
+			var value:Int = getMixChangeValue(change.reverb.value);
+			sequence.addControlChange(start, track, channel.channel, MidiController.REVERB, value);
+			sequence.addControlChange(start, track, channel.effectChannel, MidiController.REVERB, value);
 		}
-		if (change.Phaser != null)
+		if (change.phaser != null)
 		{
-			var value:Int = GetMixChangeValue(change.Phaser.Value);
-			sequence.AddControlChange(start, track, channel.Channel, MidiController.Phaser, value);
-			sequence.AddControlChange(start, track, channel.EffectChannel, MidiController.Phaser, value);
+			var value:Int = getMixChangeValue(change.phaser.value);
+			sequence.addControlChange(start, track, channel.channel, MidiController.PHASER, value);
+			sequence.addControlChange(start, track, channel.effectChannel, MidiController.PHASER, value);
 		}
-		if (change.Tremolo != null)
+		if (change.tremolo != null)
 		{
-			var value:Int = GetMixChangeValue(change.Tremolo.Value);
-			sequence.AddControlChange(start, track, channel.Channel, MidiController.Tremolo, value);
-			sequence.AddControlChange(start, track, channel.EffectChannel, MidiController.Tremolo, value);
+			var value:Int = getMixChangeValue(change.tremolo.value);
+			sequence.addControlChange(start, track, channel.channel, MidiController.TREMOLO, value);
+			sequence.addControlChange(start, track, channel.effectChannel, MidiController.TREMOLO, value);
 		}
-		if (change.Instrument != null)
+		if (change.instrument != null)
 		{
-			sequence.AddProgramChange(start, track, channel.Channel, change.Instrument.Value);
-			sequence.AddProgramChange(start, track, channel.EffectChannel, change.Instrument.Value);
+			sequence.addProgramChange(start, track, channel.channel, change.instrument.value);
+			sequence.addProgramChange(start, track, channel.effectChannel, change.instrument.value);
 		}
-		if(change.Tempo != null)
+		if(change.tempo != null)
 		{
-			sequence.AddTempoInUSQ(start, _infoTrack, GsTempo.TempoToUsq(change.Tempo.Value));
+			sequence.addTempoInUSQ(start, _infoTrack, Tempo.tempoToUsq(change.tempo.value));
 		}
 	}
 	
-	private function GetMixChangeValue(value:Int, signed:Bool=true): Int
+	private function getMixChangeValue(value:Int, signed:Bool=true): Int
 	{
 		if (signed) 
 			value += 8;
 		return Math.round((value * 127) / 16);
 	}
 
-	private function MakeFadeIn(sequence:MidiSequenceHandler, track:Int, start:Int, duration:Int, channel:Int) : Void
+	private function makeFadeIn(sequence:MidiSequenceHandler, track:Int, start:Int, duration:Int, channel:Int) : Void
 	{
 		var expression:Int = 0x1f;
 		var expressionIncrement:Int = 1;
@@ -639,70 +625,70 @@ class MidiSequenceParser
 		var tickIncrement:Int = Math.round(duration / ((0x7f - expression) / expressionIncrement));
 		while ((tick < (start + duration)) && (expression < 0x7f))
 		{
-			sequence.AddControlChange(GetTick(tick), track, channel, MidiController.Expression, expression);
+			sequence.addControlChange(getTick(tick), track, channel, MidiController.EXPRESSION, expression);
 			tick += tickIncrement;
 			expression += expressionIncrement;
 		}
-		sequence.AddControlChange(GetTick(start + duration), track, channel, MidiController.Expression, 0x7f);
+		sequence.addControlChange(getTick(start + duration), track, channel, MidiController.EXPRESSION, 0x7f);
 	}
 	 
-	private function MakeNote(sequence:MidiSequenceHandler, track:Int, key:Int, start:Int, duration:Int, velocity:Int, channel:Int) : Void
+	private function makeNote(sequence:MidiSequenceHandler, track:Int, key:Int, start:Int, duration:Int, velocity:Int, channel:Int) : Void
 	{
-		sequence.AddNoteOn(GetTick(start), track, channel, key, velocity);
-		sequence.AddNoteOff(GetTick(start + duration), track, channel, key, velocity);
+		sequence.addNoteOn(getTick(start), track, channel, key, velocity);
+		sequence.addNoteOff(getTick(start + duration), track, channel, key, velocity);
 	}
 
-	private function MakeNotes(sequence:MidiSequenceHandler, track:GsTrack, beat:GsBeat, tempo:GsTempo, measureIndex:Int, beatIndex:Int, startMove:Int, stroke:Array<Int>) : Void
+	private function makeNotes(sequence:MidiSequenceHandler, track:Track, beat:Beat, tempo:Tempo, measureIndex:Int, beatIndex:Int, startMove:Int, stroke:Array<Int>) : Void
 	{ 
-		var trackId:Int = track.Number;
-		for (vIndex in 0 ... beat.Voices.length)
+		var trackId:Int = track.number;
+		for (vIndex in 0 ... beat.voices.length)
 		{
-			var voice:GsVoice = beat.Voices[vIndex];
-			var data:BeatData = CheckTripletFeel(voice, beatIndex);
-			for (noteIndex in 0 ... voice.Notes.length)
+			var voice:Voice = beat.voices[vIndex];
+			var data:BeatData = checkTripletFeel(voice, beatIndex);
+			for (noteIndex in 0 ... voice.notes.length)
 			{
-				var note:GsNote = voice.Notes[noteIndex];
+				var note:Note = voice.notes[noteIndex];
 
-				if (note.IsTiedNote) continue;
+				if (note.isTiedNote) continue;
 
-				var key:Int = (_transpose + track.Offset + note.Value) +
-						   track.Strings[note.String - 1].Value;
-				var start:Int = ApplyStrokeStart(note, data.Start + startMove, stroke);
-				var duration:Int = ApplyStrokeDuration(note,
-													 GetRealNoteDuration(track, note, tempo, data.Duration,
+				var key:Int = (_transpose + track.offset + note.value) +
+						   track.strings[note.string - 1].value;
+				var start:Int = applyStrokeStart(note, data.start + startMove, stroke);
+				var duration:Int = applyStrokeDuration(note,
+													 getRealNoteDuration(track, note, tempo, data.duration,
 																		 measureIndex, beatIndex), stroke);
-				var velocity:Int = GetRealVelocity(note, track, measureIndex, beatIndex);
-				var channel:Int = track.Channel.Channel;
-				var effectChannel:Int = track.Channel.EffectChannel;
-				var percussionTrack:Bool = track.IsPercussionTrack;
-				if (beat.Effect.FadeIn)
+				var velocity:Int = getRealVelocity(note, track, measureIndex, beatIndex);
+				var channel:Int = track.channel.channel;
+				var effectChannel:Int = track.channel.effectChannel;
+				var percussionTrack:Bool = track.isPercussionTrack;
+				if (beat.effect.fadeIn)
 				{
 					channel = effectChannel;
-					MakeFadeIn(sequence, trackId, start, duration, channel);
+					makeFadeIn(sequence, trackId, start, duration, channel);
 				}
-				if ((note.Effect.IsGrace() && (effectChannel >= 0)) && !percussionTrack)
+				if ((note.effect.isGrace() && (effectChannel >= 0)) && !percussionTrack)
 				{
 					channel = effectChannel;
-					var graceKey:Int = (track.Offset + note.Effect.Grace.Fret) +
-									(track.Strings[note.String - 1].Value);
-					var graceLength:Int = note.Effect.Grace.DurationTime();
-					var graceVelocity:Int = note.Effect.Grace.Dynamic;
-					var graceDuration:Int = (!note.Effect.Grace.IsDead)
+					var graceKey:Int = (track.offset + note.effect.grace.fret) +
+									(track.strings[note.string - 1].value);
+					var graceLength:Int = note.effect.grace.durationTime();
+					var graceVelocity:Int = note.effect.grace.velocity;
+					var graceDuration:Int = (!note.effect.grace.isDead)
 											  ? graceLength
-											  : ApplyStaticDuration(tempo, DefaultDurationDead, graceLength);
-					if (note.Effect.Grace.IsOnBeat || ((start - graceLength) < GsDuration.QuarterTime))
+											  : applyStaticDuration(tempo, DEFAULT_DURATION_DEAD, graceLength);
+					if (note.effect.grace.isOnBeat || ((start - graceLength) < Duration.QUARTER_TIME))
 					{
 						start += graceLength;
 						duration -= graceLength;
 					}
-					MakeNote(sequence, trackId, graceKey, start - graceLength, graceDuration, graceVelocity,
+					makeNote(sequence, trackId, graceKey, start - graceLength, graceDuration, graceVelocity,
 							 channel);
 				}
-				if ((note.Effect.IsTrill() && (effectChannel >= 0)) && !percussionTrack)
+				if ((note.effect.isTrill() && (effectChannel >= 0)) && !percussionTrack)
 				{
-					var trillKey:Int = (track.Offset + note.Effect.Trill.Fret) +
-									(track.Strings[note.String - 1].Value);
-					var trillLength:Int = note.Effect.Trill.Duration.Time();
+					var trillKey:Int = (track.offset + note.effect.trill.fret) +
+									(track.strings[note.string - 1].value);
+					var trillLength:Int = note.effect.trill.duration.time();
 					var realKey:Bool = true;
 					var tick:Int = start;
 					while (tick + 10 < (start + duration))
@@ -711,16 +697,16 @@ class MidiSequenceParser
 						{
 							trillLength = (((start + duration) - tick) - 1);
 						}
-						MakeNote(sequence, trackId, ((realKey) ? key : trillKey), tick, trillLength,
+						makeNote(sequence, trackId, ((realKey) ? key : trillKey), tick, trillLength,
 								 velocity, channel);
 						realKey = !realKey;
 						tick += trillLength;
 					}
 					continue;
 				}
-				if (note.Effect.IsTremoloPicking() && (effectChannel >= 0))
+				if (note.effect.isTremoloPicking() && (effectChannel >= 0))
 				{
-					var tpLength:Int = note.Effect.TremoloPicking.Duration.Time();
+					var tpLength:Int = note.effect.tremoloPicking.duration.time();
 					var tick:Int  = start;
 					while (tick + 10 < (start + duration))
 					{
@@ -728,109 +714,109 @@ class MidiSequenceParser
 						{
 							tpLength = (((start + duration) - tick) - 1);
 						}
-						MakeNote(sequence, trackId, key, start, tpLength, velocity, channel);
+						makeNote(sequence, trackId, key, start, tpLength, velocity, channel);
 						tick += tpLength;
 					}
 					continue;
 				}
-				if ((note.Effect.IsBend() && (effectChannel >= 0)) && !percussionTrack)
+				if ((note.effect.isBend() && (effectChannel >= 0)) && !percussionTrack)
 				{
 					channel = effectChannel;
-					MakeBend(sequence, trackId, start, duration, note.Effect.Bend, channel);
+					makeBend(sequence, trackId, start, duration, note.effect.bend, channel);
 				}
-				else if ((note.Voice.Beat.Effect.IsTremoloBar() && (effectChannel >= 0)) && !percussionTrack)
+				else if ((note.voice.beat.effect.isTremoloBar() && (effectChannel >= 0)) && !percussionTrack)
 				{
 					channel = effectChannel;
-					MakeTremoloBar(sequence, trackId, start, duration, note.Voice.Beat.Effect.TremoloBar, channel);
+					makeTremoloBar(sequence, trackId, start, duration, note.voice.beat.effect.tremoloBar, channel);
 				}
-				else if ((note.Effect.Slide && (effectChannel >= 0)) && !percussionTrack)
+				else if ((note.effect.slide && (effectChannel >= 0)) && !percussionTrack)
 				{
 					channel = effectChannel;
-					var nextNote:GsNote = GetNextNote(note, track, measureIndex, beatIndex);
-					MakeSlide(sequence, trackId, note, nextNote, startMove, channel);
+					var nextNote:Note = getNextNote(note, track, measureIndex, beatIndex);
+					makeSlide(sequence, trackId, note, nextNote, startMove, channel);
 				}
-				else if ((note.Effect.Vibrato && (effectChannel >= 0)) && !percussionTrack)
+				else if ((note.effect.vibrato && (effectChannel >= 0)) && !percussionTrack)
 				{
 					channel = effectChannel;
-					MakeVibrato(sequence, trackId, start, duration, channel);
+					makeVibrato(sequence, trackId, start, duration, channel);
 				}
-				if (note.Effect.IsHarmonic() && !percussionTrack)
+				if (note.effect.isHarmonic() && !percussionTrack)
 				{
 					var orig:Int = key; 
-					if (note.Effect.Harmonic.Type == GsHarmonicType.Natural)
+					if (note.effect.harmonic.type == HarmonicType.Natural)
 					{
-						for (i in 0 ... GsHarmonicEffect.NaturalFrequencies.length)
+						for (i in 0 ... HarmonicEffect.NATURAL_FREQUENCIES.length)
 						{
-							if ((note.Value % 12) == (GsHarmonicEffect.NaturalFrequencies[i][0] % 12))
+							if ((note.value % 12) == (HarmonicEffect.NATURAL_FREQUENCIES[i][0] % 12))
 							{
-								key = (orig + GsHarmonicEffect.NaturalFrequencies[i][1]) - note.Value;
+								key = (orig + HarmonicEffect.NATURAL_FREQUENCIES[i][1]) - note.value;
 								break;
 							}
 						}
 					}
 					else
 					{
-						if (note.Effect.Harmonic.Type == GsHarmonicType.Semi)
+						if (note.effect.harmonic.type == HarmonicType.Semi)
 						{ 
-							MakeNote(sequence, trackId, Math.round(Math.min(127, orig)), start, duration,
-									Math.round(Math.max(GsVelocities.MinVelocity, velocity - (GsVelocities.VelocityIncrement * 3))), channel);
+							makeNote(sequence, trackId, Math.round(Math.min(127, orig)), start, duration,
+									Math.round(Math.max(Velocities.MIN_VELOCITY, velocity - (Velocities.VELOCITY_INCREMENT * 3))), channel);
 						}
-						key = orig + GsHarmonicEffect.NaturalFrequencies[note.Effect.Harmonic.Data][1];
+						key = orig + HarmonicEffect.NATURAL_FREQUENCIES[note.effect.harmonic.data][1];
 					}
 					if ((key - 12) > 0)
 					{
-						var hVelocity:Int = Math.round(Math.max(GsVelocities.MinVelocity, velocity - (GsVelocities.VelocityIncrement * 4)));
-						MakeNote(sequence, trackId, key - 12, start, duration, hVelocity, channel);
+						var hVelocity:Int = Math.round(Math.max(Velocities.MIN_VELOCITY, velocity - (Velocities.VELOCITY_INCREMENT * 4)));
+						makeNote(sequence, trackId, key - 12, start, duration, hVelocity, channel);
 					}
 				}
-				MakeNote(sequence, trackId, Math.round(Math.min(0x7f, key)), start, duration, velocity, channel);
+				makeNote(sequence, trackId, Math.round(Math.min(0x7f, key)), start, duration, velocity, channel);
 			}
 		}
 	}
 
-	public function MakeSlide(sequence:MidiSequenceHandler, track:Int, note:GsNote, nextNote:GsNote ,
+	public function makeSlide(sequence:MidiSequenceHandler, track:Int, note:Note, nextNote:Note ,
 								  startMove:Int, channel:Int) : Void
 	{
 		if (nextNote != null)
 		{
 			// TODO calculate all slide types (zero or -10 to note, from note to zero or -10, from note + 10, +10 to note)
-			MakeSlide2(sequence, track, note.Voice.Beat.Start + startMove, note.Value,
-					  nextNote.Voice.Beat.Start + startMove, nextNote.Value, channel);
-			AddBend(sequence, track, nextNote.Voice.Beat.Start + startMove, DefaultBend, channel);
+			makeSlide2(sequence, track, note.voice.beat.start + startMove, note.value,
+					  nextNote.voice.beat.start + startMove, nextNote.value, channel);
+			addBend(sequence, track, nextNote.voice.beat.start + startMove, DEFAULT_BEND, channel);
 		}
 	}
 
-	public function MakeSlide2(sequence:MidiSequenceHandler, track:Int, tick1:Int, value1:Int, tick2:Int,
+	public function makeSlide2(sequence:MidiSequenceHandler, track:Int, tick1:Int, value1:Int, tick2:Int,
 								  value2:Int, channel:Int) : Void
 	{
 		var lDistance:Int = value2 - value1;
 		var lLength:Int = tick2 - tick1;
-		var points:Int = Math.floor(lLength / (GsDuration.QuarterTime / 8));
+		var points:Int = Math.floor(lLength / (Duration.QUARTER_TIME / 8));
 		for (i in 1 ... points + 1)
 		{
 			var fTone:Float = (((lLength / points) * i) * lDistance) / lLength;
-			var iBend:Int = Math.round(DefaultBend + (fTone * (DefaultBendSemiTone * 2)));
-			AddBend(sequence, track, Math.round(tick1 + ((lLength / points) * i)), iBend, channel);
+			var iBend:Int = Math.round(DEFAULT_BEND + (fTone * (DEFAULT_BEND_SEMITONE * 2)));
+			addBend(sequence, track, Math.round(tick1 + ((lLength / points) * i)), iBend, channel);
 		}
 	}
 	 
-	public function MakeTremoloBar(sequence:MidiSequenceHandler, track:Int, start:Int, duration:Int,
-									   effect:GsTremoloBarEffect, channel:Int) : Void
+	public function makeTremoloBar(sequence:MidiSequenceHandler, track:Int, start:Int, duration:Int,
+									   effect:TremoloBarEffect, channel:Int) : Void
 	{
-		var points:Array<GsTremoloBarPoint> = effect.Points;
+		var points:Array<BendPoint> = effect.points;
 		
 		for (i in 0 ... points.length)
 		{
-			var point:GsTremoloBarPoint = points[i];
+			var point:BendPoint = points[i];
 			var pointStart = start + point.GetTime(duration);
-			var value:Int = Math.round(DefaultBend + (point.Value * (DefaultBendSemiTone * 2)));
+			var value:Int = Math.round(DEFAULT_BEND + (point.value * (DEFAULT_BEND_SEMITONE * 2)));
 			value = (value <= 127) ? value : 127;
 			value = (value >= 0) ? value : 0;
-			AddBend(sequence, track, pointStart, value, channel);
+			addBend(sequence, track, pointStart, value, channel);
 			if (points.length > (i + 1))
 			{
-				var nextPoint:GsTremoloBarPoint = points[i + 1];
-				var nextValue:Int = Math.round(DefaultBend + (nextPoint.Value * (DefaultBendSemiTone * 2)));
+				var nextPoint:BendPoint = points[i + 1];
+				var nextValue:Int = Math.round(DEFAULT_BEND + (nextPoint.value * (DEFAULT_BEND_SEMITONE * 2)));
 				var nextPointStart = start + nextPoint.GetTime(duration);
 				if (nextValue != value)
 				{
@@ -841,7 +827,7 @@ class MidiSequenceParser
 						{
 							value++;
 							pointStart += Math.round(width);
-							AddBend(sequence, track, pointStart, (value <= 127) ? value : 127, channel);
+							addBend(sequence, track, pointStart, (value <= 127) ? value : 127, channel);
 						}
 					}
 					else if (value > nextValue)
@@ -850,46 +836,46 @@ class MidiSequenceParser
 						{
 							value += -1;
 							pointStart += Math.round(pointStart + width);
-							AddBend(sequence, track, pointStart, (value >= 0) ? value : 0, channel);
+							addBend(sequence, track, pointStart, (value >= 0) ? value : 0, channel);
 						}
 					}
 				}
 			}
 		}
-		AddBend(sequence, track, start + duration, 0x40, channel);
+		addBend(sequence, track, start + duration, 0x40, channel);
 	}
 
-	public function MakeVibrato(sequence:MidiSequenceHandler, track:Int, start:Int, duration:Int, channel:Int) : Void
+	public function makeVibrato(sequence:MidiSequenceHandler, track:Int, start:Int, duration:Int, channel:Int) : Void
 	{
 		var nextStart:Int = start;
 		var end:Int = nextStart + duration;
 		while (nextStart < end)
 		{
 			nextStart = ((nextStart + 160) > end) ? end : (nextStart + 160);
-			AddBend(sequence, track, nextStart, DefaultBend, channel);
+			addBend(sequence, track, nextStart, DEFAULT_BEND, channel);
 			nextStart = ((nextStart + 160) > end) ? end : (nextStart + 160);
-			AddBend(sequence, track, nextStart, Math.round(DefaultBend + (DefaultBendSemiTone / 2.0)), channel);
+			addBend(sequence, track, nextStart, Math.round(DEFAULT_BEND + (DEFAULT_BEND_SEMITONE / 2.0)), channel);
 		}
-		AddBend(sequence, track, nextStart, DefaultBend, channel);
+		addBend(sequence, track, nextStart, DEFAULT_BEND, channel);
 	}
 
-	private function NewDuration(value:Int) : GsDuration
+	private function newDuration(value:Int) : Duration
 	{
-		var duration:GsDuration = _factory.NewDuration();
-		duration.Value = (value);
+		var duration:Duration = _factory.newDuration();
+		duration.value = (value);
 		return duration;
 	}
 	
-	public function Parse(sequence:MidiSequenceHandler) : Void
+	public function parse(sequence:MidiSequenceHandler) : Void
 	{		
-		_infoTrack = sequence.InfoTrack;
-		_metronomeTrack = sequence.MetronomeTrack;
-		AddDefaultMessages(sequence);
-		for (i in 0 ... _song.Tracks.length)
+		_infoTrack = sequence.infoTrack;
+		_metronomeTrack = sequence.metronomeTrack;
+		addDefaultMessages(sequence);
+		for (i in 0 ... _song.tracks.length)
 		{
-			var songTrack:GsTrack = _song.Tracks[i];
-			CreateTrack(sequence, songTrack);
+			var songTrack:Track = _song.tracks[i];
+			createTrack(sequence, songTrack);
 		}
-		sequence.NotifyFinish();
+		sequence.notifyFinish();
 	}
 }

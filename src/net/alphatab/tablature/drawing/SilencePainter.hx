@@ -1,54 +1,52 @@
-/**
- * ...
- * @author Daniel Kuschny
- */
-
 package net.alphatab.tablature.drawing;
 import net.alphatab.tablature.ViewLayout;
 
+/**
+ * This painter draws symbols for silences / rests. 
+ */
 class SilencePainter 
 {
-	public static function PaintEighth(layer:DrawingLayer, x:Float, y:Float, layout:ViewLayout)
+	public static function paintEighth(layer:DrawingLayer, x:Float, y:Float, layout:ViewLayout)
 	{
-		var scale:Float = layout.ScoreLineSpacing;
+		var scale:Float = layout.scoreLineSpacing;
 		y += scale;
-		layer.AddMusicSymbol(MusicFont.SilenceEighth, x, y, layout.Scale);
+		layer.addMusicSymbol(MusicFont.SilenceEighth, x, y, layout.scale);
 	}	
 	
-	public static function PaintWhole(layer:DrawingLayer, x:Float, y:Float, layout:ViewLayout)
+	public static function paintWhole(layer:DrawingLayer, x:Float, y:Float, layout:ViewLayout)
 	{
-		var scale:Float = layout.ScoreLineSpacing;
+		var scale:Float = layout.scoreLineSpacing;
 		y += scale;
-		layer.AddMusicSymbol(MusicFont.SilenceHalf, x, y, layout.Scale);
+		layer.addMusicSymbol(MusicFont.SilenceHalf, x, y, layout.scale);
 	}	
 	
-	public static function PaintHalf(layer:DrawingLayer, x:Float, y:Float, layout:ViewLayout)
+	public static function paintHalf(layer:DrawingLayer, x:Float, y:Float, layout:ViewLayout)
 	{
-		var scale:Float = layout.ScoreLineSpacing;
-		y += scale - (4*layout.Scale);
-		layer.AddMusicSymbol(MusicFont.SilenceHalf, x, y, layout.Scale);
+		var scale:Float = layout.scoreLineSpacing;
+		y += scale - (4*layout.scale);
+		layer.addMusicSymbol(MusicFont.SilenceHalf, x, y, layout.scale);
 	}
-	public static function PaintQuarter(layer:DrawingLayer, x:Float, y:Float, layout:ViewLayout)
+	public static function paintQuarter(layer:DrawingLayer, x:Float, y:Float, layout:ViewLayout)
 	{
-		var scale:Float = layout.ScoreLineSpacing;
+		var scale:Float = layout.scoreLineSpacing;
 		y += scale * 0.5;
-		layer.AddMusicSymbol(MusicFont.SilenceQuarter,  x, y, layout.Scale);
+		layer.addMusicSymbol(MusicFont.SilenceQuarter,  x, y, layout.scale);
 	}
-	public static function PaintSixteenth(layer:DrawingLayer, x:Float, y:Float, layout:ViewLayout)
+	public static function paintSixteenth(layer:DrawingLayer, x:Float, y:Float, layout:ViewLayout)
 	{
-		var scale:Float = layout.ScoreLineSpacing;
+		var scale:Float = layout.scoreLineSpacing;
 		y += scale;
-		layer.AddMusicSymbol(MusicFont.SilenceSixteenth, x, y, layout.Scale);
+		layer.addMusicSymbol(MusicFont.SilenceSixteenth, x, y, layout.scale);
 	}
-	public static function PaintSixtyFourth(layer:DrawingLayer, x:Float, y:Float, layout:ViewLayout)
+	public static function paintSixtyFourth(layer:DrawingLayer, x:Float, y:Float, layout:ViewLayout)
 	{
-		var scale:Float = layout.ScoreLineSpacing;
-		layer.AddMusicSymbol(MusicFont.SilenceSixtyFourth, x, y, layout.Scale);
+		var scale:Float = layout.scoreLineSpacing;
+		layer.addMusicSymbol(MusicFont.SilenceSixtyFourth, x, y, layout.scale);
 	}
-	public static function PaintThirtySecond(layer:DrawingLayer, x:Float, y:Float, layout:ViewLayout)
+	public static function paintThirtySecond(layer:DrawingLayer, x:Float, y:Float, layout:ViewLayout)
 	{
-		var scale:Float = layout.ScoreLineSpacing;
-		layer.AddMusicSymbol(MusicFont.SilenceThirtySecond, x, y, layout.Scale);
+		var scale:Float = layout.scoreLineSpacing;
+		layer.addMusicSymbol(MusicFont.SilenceThirtySecond, x, y, layout.scale);
 	}
 
 }

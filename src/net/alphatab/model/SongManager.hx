@@ -1,49 +1,46 @@
-/**
- * ...
- * @author Daniel Kuschny
- */
-
 package net.alphatab.model;
-import haxe.Log;
 import net.alphatab.file.SongLoader;
 import net.alphatab.tablature.model.BeatGroup;
-import net.alphatab.tablature.model.GsSongFactoryImpl;
+import net.alphatab.tablature.model.SongFactoryImpl;
 
+/**
+ * This utility provides methods
+ * for calculation and modifiying of the songmodel.
+ */
 class SongManager 
 {
+	public var factory:SongFactory;
 	
-	public var Factory:GsSongFactory;
-	
-	public function new(factory:GsSongFactory)
+	public function new(factory:SongFactory)
 	{
-		this.Factory = factory;
+		this.factory = factory;
 	}
 	
-	public static function GetDivisionLength(header:GsMeasureHeader) :Int
+	public static function getDivisionLength(header:MeasureHeader) :Int
 	{
-		var defaulLenght:Int = GsDuration.QuarterTime;
-		var denominator:Int = header.TimeSignature.Denominator.Value;
+		var defaulLenght:Int = Duration.QUARTER_TIME;
+		var denominator:Int = header.timeSignature.denominator.value;
 		switch (denominator)
 		{
-			case GsDuration.Eighth:
-				if (header.TimeSignature.Numerator % 3 == 0)
-					defaulLenght += Math.floor(GsDuration.QuarterTime / 2);
+			case Duration.EIGHTH:
+				if (header.timeSignature.numerator % 3 == 0)
+					defaulLenght += Math.floor(Duration.QUARTER_TIME / 2);
 		}
 		return defaulLenght;
 	}
 	
-	public function GetRealStart(measure:GsMeasure, currentStart:Int) : Int
+	public function getRealStart(measure:Measure, currentStart:Int) : Int
 	{
-		var beatLength:Int = GetDivisionLength(measure.Header);
+		var beatLength:Int = getDivisionLength(measure.header);
 		var start:Int = currentStart;
 		var startBeat:Bool = start % beatLength == 0;
 		if (!startBeat)
 		{
-			var minDuration:GsDuration = Factory.NewDuration();
-			minDuration.Value = GsDuration.SixtyFourth;
-			minDuration.Triplet.Enters = 3;
-			minDuration.Triplet.Times = 2;
-			var time : Int = minDuration.Time();
+			var minDuration:Duration = factory.newDuration();
+			minDuration.value = Duration.SIXTY_FOURTH;
+			minDuration.tuplet.enters = 3;
+			minDuration.tuplet.times = 2;
+			var time : Int = minDuration.time();
 			for (i in 0 ... time)
 			{
 				start++;
@@ -57,29 +54,29 @@ class SongManager
 		return start;
 	}
 	
-	public function GetFirstBeat(list:Array<GsBeat>) : GsBeat
+	public function getFirstBeat(list:Array<Beat>) : Beat
 	{
 		return list.length > 0 ? list[0] : null;
 	}
 	
-	public function AutoCompleteSilences(measure:GsMeasure)
+	public function autoCompleteSilences(measure:Measure)
 	{
-		var beat:GsBeat = GetFirstBeat(measure.Beats);
+		var beat:Beat = getFirstBeat(measure.beats);
 		if (beat == null)
 		{
-			CreateSilences(measure, measure.Start(), measure.Length(), 0);
+			createSilences(measure, measure.start(), measure.length(), 0);
 			return;
 		}
-		for (v in 0 ... GsBeat.MaxVoices)
+		for (v in 0 ... Beat.MAX_VOICES)
 		{
-			var voice:GsVoice = GetFirstVoice(measure.Beats, v);
-			if (voice != null && voice.Beat.Start > measure.Start())
-				CreateSilences(measure, measure.Start(), voice.Beat.Start - measure.Start(), v);
+			var voice:Voice = getFirstVoice(measure.beats, v);
+			if (voice != null && voice.beat.start > measure.start())
+				createSilences(measure, measure.start(), voice.beat.start - measure.start(), v);
 		}
 
 		var start:Array<Int> = new Array<Int>();
 		var uncompletedLength:Array<Int> = new Array<Int>();
-		for (i in 0 ... beat.Voices.length)
+		for (i in 0 ... beat.voices.length)
 		{
 			start.push(0);
 			uncompletedLength.push(0);
@@ -87,18 +84,18 @@ class SongManager
 
 		while (beat != null)
 		{
-			for (v  in 0 ... beat.Voices.length)
+			for (v  in 0 ... beat.voices.length)
 			{
-				var voice:GsVoice = beat.Voices[v];
-				if (!voice.IsEmpty)
+				var voice:Voice = beat.voices[v];
+				if (!voice.isEmpty)
 				{
-					var voiceEnd:Int = beat.Start + voice.Duration.Time();
-					var nextPosition:Int = measure.Start() + measure.Length();
+					var voiceEnd:Int = beat.start + voice.duration.time();
+					var nextPosition:Int = measure.start() + measure.length();
 
-					var nextVoice:GsVoice = GetNextVoice(measure.Beats, beat, voice.Index);
+					var nextVoice:Voice = getNextVoice(measure.beats, beat, voice.index);
 					if (nextVoice != null)
 					{
-						nextPosition = nextVoice.Beat.Start;
+						nextPosition = nextVoice.beat.start;
 					}
 					if (voiceEnd < nextPosition)
 					{
@@ -112,196 +109,196 @@ class SongManager
 			{
 				if (uncompletedLength[v] > 0)
 				{
-					CreateSilences(measure, start[v], uncompletedLength[v], v);
+					createSilences(measure, start[v], uncompletedLength[v], v);
 				}
 				start[v] = 0;
 				uncompletedLength[v] = 0;
 			}
-			beat = GetNextBeat2(measure.Beats, beat);
+			beat = getNextBeat2(measure.beats, beat);
 		}
 	}
 	
-	private function CreateSilences(measure:GsMeasure, start:Int, length:Int, voiceIndex:Int) : Void
+	private function createSilences(measure:Measure, start:Int, length:Int, voiceIndex:Int) : Void
 	{
 		var nextStart:Int = start;
-		var durations:Array<GsDuration> = CreateDurations(length);
+		var durations:Array<Duration> = createDurations(length);
 		for (duration in durations)
 		{
 			var isNew:Bool = false;
-			var beatStart:Int = GetRealStart(measure, nextStart);
-			var beat:GsBeat = GetBeat(measure, beatStart);
+			var beatStart:Int = getRealStart(measure, nextStart);
+			var beat:Beat = getBeat(measure, beatStart);
 			if (beat == null)
 			{
-				beat = Factory.NewBeat();
-				beat.Start = GetRealStart(measure, nextStart);
+				beat = factory.newBeat();
+				beat.start = getRealStart(measure, nextStart);
 				isNew = true;
 			}
 
-			var voice:GsVoice = beat.Voices[voiceIndex];
-			voice.IsEmpty = false;
-			duration.Copy(voice.Duration);
+			var voice:Voice = beat.voices[voiceIndex];
+			voice.isEmpty = false;
+			duration.copy(voice.duration);
 
 			if (isNew)
-				measure.AddBeat(beat);
+				measure.addBeat(beat);
 
-			nextStart += duration.Time();
+			nextStart += duration.time();
 		}
 	}
 	
-	private function CreateDurations(time:Int) : Array<GsDuration>
+	private function createDurations(time:Int) : Array<Duration>
 	{
-		var durations:Array<GsDuration> = new Array<GsDuration>();
-		var min:GsDuration = Factory.NewDuration();
-		min.Value = GsDuration.SixtyFourth;
-		min.IsDotted = false;
-		min.IsDoubleDotted = false;
-		min.Triplet.Enters = 3;
-		min.Triplet.Times = 2;
+		var durations:Array<Duration> = new Array<Duration>();
+		var min:Duration = factory.newDuration();
+		min.value = Duration.SIXTY_FOURTH;
+		min.isDotted = false;
+		min.isDoubleDotted = false;
+		min.tuplet.enters = 3;
+		min.tuplet.times = 2;
 
 		var missing:Int = time;
-		while (missing > min.Time())
+		while (missing > min.time())
 		{
-			var oDuration:GsDuration = GsDuration.FromTime(Factory, missing, min, 10);
-			durations.push(oDuration.Clone(Factory));
-			missing -= oDuration.Time();
+			var duration:Duration = Duration.fromTime(factory, missing, min, 10);
+			durations.push(duration.clone(factory));
+			missing -= duration.time();
 		}
 		return durations;
 	}
 	
-	public static function GetNextBeat2(beats:Array<GsBeat>, currentBeat:GsBeat) : GsBeat
+	public static function getNextBeat2(beats:Array<Beat>, currentBeat:Beat) : Beat
 	{
-		var oNext:GsBeat = null;
+		var next:Beat = null;
 		for (checkedBeat in beats)
 		{
-			if (checkedBeat.Start > currentBeat.Start)
+			if (checkedBeat.start > currentBeat.start)
 			{
-				if (oNext == null || checkedBeat.Start < oNext.Start)
-					oNext = checkedBeat;
-			}
-		}
-		return oNext;
-	}
-	
-	
-	private static function GetNextVoice(beats:Array<GsBeat>, beat:GsBeat, index:Int) : GsVoice
-	{
-		var next:GsVoice = null;
-		for(current in beats)
-		{
-			if (current.Start > beat.Start && !current.Voices[index].IsEmpty)
-			{
-				if (next == null || current.Start < next.Beat.Start)
-					next = current.Voices[index];
+				if (next == null || checkedBeat.start < next.start)
+					next = checkedBeat;
 			}
 		}
 		return next;
 	}
 	
-	private static function GetFirstVoice(beats:Array<GsBeat>, index:Int) : GsVoice
+	
+	private static function getNextVoice(beats:Array<Beat>, beat:Beat, index:Int) : Voice
 	{
-		var first:GsVoice = null;
+		var next:Voice = null;
+		for(current in beats)
+		{
+			if (current.start > beat.start && !current.voices[index].isEmpty)
+			{
+				if (next == null || current.start < next.beat.start)
+					next = current.voices[index];
+			}
+		}
+		return next;
+	}
+	
+	private static function getFirstVoice(beats:Array<Beat>, index:Int) : Voice
+	{
+		var first:Voice = null;
 		for (current in beats)
 		{
-			if ((first == null || current.Start < first.Beat.Start) && !current.Voices[index].IsEmpty)
-				first = current.Voices[index];
+			if ((first == null || current.start < first.beat.start) && !current.voices[index].isEmpty)
+				first = current.voices[index];
 		}
 		return first;
 	}
 	
-	private static function GetBeat(measure:GsMeasure, start:Int) : GsBeat
+	private static function getBeat(measure:Measure, start:Int) : Beat
 	{
-		for (beat in measure.Beats)
+		for (beat in measure.beats)
 		{
-			if (beat.Start == start)
+			if (beat.start == start)
 				return beat;
 		}
 		return null;
 	}
 
-	public function OrderBeats(measure:GsMeasure) : Void
+	public function orderBeats(measure:Measure) : Void
 	{
-		QuickSort(measure.Beats, 0, measure.BeatCount() - 1);
+		quickSort(measure.beats, 0, measure.beatCount() - 1);
 	}
 
-	public function GetPreviousMeasure(measure:GsMeasure) : GsMeasure
+	public function getPreviousMeasure(measure:Measure) : Measure
 	{
-		return measure.Number() > 1 ? measure.Track.Measures[measure.Number() - 2] : null;
+		return measure.number() > 1 ? measure.track.measures[measure.number() - 2] : null;
 	}
 	
-	public function GetPreviousMeasureHeader(header:GsMeasureHeader) : GsMeasureHeader
+	public function getPreviousMeasureHeader(header:MeasureHeader) : MeasureHeader
 	{
-		var prevIndex:Int = header.Number - 1;
+		var prevIndex:Int = header.number - 1;
 		if (prevIndex > 0)
 		{
-			return header.Song.MeasureHeaders[prevIndex - 1];
+			return header.song.measureHeaders[prevIndex - 1];
 		}
 		return null;
 	}
 
-	public function GetNextBeat(beat:GsBeat) : GsBeat
+	public function getNextBeat(beat:Beat) : Beat
 	{
 		// Try get next beat uf current measure  
-		var nextBeat:GsBeat = SongManager.GetNextBeat2(beat.Measure.Beats, beat);
+		var nextBeat:Beat = getNextBeat2(beat.measure.beats, beat);
 
-		if (nextBeat == null && beat.Measure.Track.MeasureCount() > beat.Measure.Number())
+		if (nextBeat == null && beat.measure.track.measureCount() > beat.measure.number())
 		{// First beat of next measure if available 
-			var measure:GsMeasure = beat.Measure.Track.Measures[beat.Measure.Number()];
-			if (measure.BeatCount() > 0)
+			var measure:Measure = beat.measure.track.measures[beat.measure.number()];
+			if (measure.beatCount() > 0)
 			{
-				return measure.Beats[0];
+				return measure.beats[0];
 			}
 		}
 		return nextBeat;
 	}
 	
-	public function GetNextNote(measure:GsMeasure, start:Int, voiceIndex:Int, guitarString:Int) : GsNote
+	public function getNextNote(measure:Measure, start:Int, voiceIndex:Int, guitarString:Int) : Note
 	{
-		var beat:GsBeat = GetBeat(measure, start);
+		var beat:Beat = getBeat(measure, start);
 		if (beat != null)
 		{
-			var next:GsBeat = GetNextBeat2(measure.Beats, beat);
+			var next:Beat = getNextBeat2(measure.beats, beat);
 
 			while (next != null)
 			{
-				var voice:GsVoice = next.Voices[voiceIndex];
-				if (!voice.IsEmpty)
+				var voice:Voice = next.voices[voiceIndex];
+				if (!voice.isEmpty)
 				{
-					for (current in voice.Notes)
+					for (current in voice.notes)
 					{
-						if (current.String == guitarString || guitarString == -1) return current;
+						if (current.string == guitarString || guitarString == -1) return current;
 					}
 				}
-				next = GetNextBeat2(measure.Beats, next);
+				next = getNextBeat2(measure.beats, next);
 			}
 		}
 		return null;
 	}
 	
-	private static function QuickSort(elements:Array<GsBeat>, left:Int, right:Int) : Void
+	private static function quickSort(elements:Array<Beat>, left:Int, right:Int) : Void
 	{
 		var i:Int = left;
 		var j:Int = right;
 
-		var pivot:GsBeat = elements[Math.floor((left + right) / 2)];
+		var pivot:Beat = elements[Math.floor((left + right) / 2)];
 		do
 		{
-			while ((elements[i].Start < pivot.Start) && (i < right)) i++;
-			while ((pivot.Start < elements[j].Start) && (j > left)) j--;
+			while ((elements[i].start < pivot.start) && (i < right)) i++;
+			while ((pivot.start < elements[j].start) && (j > left)) j--;
 			if (i <= j)
 			{
-				var temp:GsBeat = elements[i];
+				var temp:Beat = elements[i];
 				elements[i] = elements[j];
 				elements[j] = temp;
 				i++; j--;
 			}
 		} while (i <= j);
 
-		if (left < j) QuickSort(elements, left, j);
-		if (i < right) QuickSort(elements, i, right);
+		if (left < j) quickSort(elements, left, j);
+		if (i < right) quickSort(elements, i, right);
 	}
 	
-	public function GetFirstMeasure(track:GsTrack):GsMeasure
+	public function getFirstMeasure(track:Track):Measure
 	{
-		return track.MeasureCount() > 0 ? track.Measures[0] : null;
+		return track.measureCount() > 0 ? track.measures[0] : null;
 	}
 }

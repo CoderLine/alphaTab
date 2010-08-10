@@ -1,33 +1,31 @@
-/**
- * ...
- * @author Daniel Kuschny
- */
-
 package net.alphatab.model;
 
+/**
+ * A padding construct. 
+ */
 class Padding 
 {
-	public var Right:Int;
-	public var Top:Int;
-	public var Left:Int;
-	public var Bottom:Int;
+	public var right:Int;
+	public var top:Int;
+	public var left:Int;
+	public var bottom:Int;
 
 	public function new(right:Int, top:Int, left:Int, bottom:Int) 
 	{
-		this.Right = right;
-		this.Top = top;
-		this.Left = left;
-		this.Bottom = bottom;
+		this.right = right;
+		this.top = top;
+		this.left = left;
+		this.bottom = bottom;
 	}
 	
 	public function getHorizontal() : Int
 	{
-		return this.Left + this.Right;
+		return left + right;
 	}
 		
 	public function getVertical() : Int
 	{
-		return this.Top + this.Bottom;
+		return top + bottom;
 	}
 	
 }

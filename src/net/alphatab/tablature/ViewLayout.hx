@@ -1,230 +1,229 @@
-/**
- * ...
- * @author Daniel Kuschny
- */
-
 package net.alphatab.tablature;
 
 import haxe.Log;
-import net.alphatab.model.GsChord;
-import net.alphatab.model.GsDuration;
-import net.alphatab.model.GsMeasure;
-import net.alphatab.model.GsNote;
-import net.alphatab.model.GsSong;
-import net.alphatab.model.GsTrack;
-import net.alphatab.model.GsVoice;
+import net.alphatab.model.Chord;
+import net.alphatab.model.Duration;
+import net.alphatab.model.Measure;
+import net.alphatab.model.Note;
+import net.alphatab.model.Song;
+import net.alphatab.model.Track;
+import net.alphatab.model.Voice;
+import net.alphatab.model.Padding;
 import net.alphatab.model.Rectangle;
 import net.alphatab.model.Size;
 import net.alphatab.platform.Canvas;
 import net.alphatab.tablature.drawing.DrawingContext;
 import net.alphatab.tablature.drawing.DrawingLayers;
 import net.alphatab.tablature.drawing.DrawingResources;
-import net.alphatab.tablature.model.GsChordImpl;
-import net.alphatab.tablature.model.GsMeasureHeaderImpl;
-import net.alphatab.tablature.model.GsMeasureImpl;
-import net.alphatab.tablature.model.GsTrackImpl;
-import net.alphatab.Utils;
+import net.alphatab.tablature.model.ChordImpl;
+import net.alphatab.tablature.model.MeasureHeaderImpl;
+import net.alphatab.tablature.model.MeasureImpl;
+import net.alphatab.tablature.model.TrackImpl;
 
+
+/**
+ * This is the base class for creating layouts which arrange measures
+ */
 class ViewLayout 
-{
-	public var Tablature:Tablature;
-	public var CompactMode:Bool;
-	
-	public var StringSpacing :Float;
-	public var ScoreLineSpacing :Float;
-	public var Scale :Float;
-	public var FontScale :Float;
-	public var FirstMeasureSpacing :Float;
-	public var MinBufferSeparator :Float;
-	public var MinTopSpacing :Float;
-	public var MinScoreTabSpacing :Float;
-	public var ScoreSpacing :Float;
-	public var FirstTrackSpacing :Float;
-	public var TrackSpacing :Float;
+{		
+	private var _cache:DrawingContext;
 
-	public var ChordFretIndexSpacing :Float;
-	public var ChordStringSpacing :Float;
-	public var ChordFretSpacing :Float;
-	public var ChordNoteSize :Float;
-	public var RepeatEndingSpacing :Float;
-	public var TextSpacing :Float;
-	public var MarkerSpacing :Float;
-	public var TupletoSpacing :Float;
-	public var EffectSpacing :Float;
+	public var tablature:Tablature;
 	
-	public var LayoutSize:Size;
-	public var Width:Int;
-	public var Height:Int;
+	// Size presets
+	public var stringSpacing :Float;
+	public var scoreLineSpacing :Float;
+	public var scale :Float;
+	public var fontScale :Float;
+	public var firstMeasureSpacing :Float;
+	public var minBufferSeparator :Float;
+	public var minTopSpacing :Float;
+	public var minScoreTabSpacing :Float;
+	public var scoreSpacing :Float;
+	public var firstTrackSpacing :Float;
+	public var trackSpacing :Float;
+
+	public var chordFretIndexSpacing :Float;
+	public var chordStringSpacing :Float;
+	public var chordFretSpacing :Float;
+	public var chordNoteSize :Float;
+	public var repeatEndingSpacing :Float;
+	public var textSpacing :Float;
+	public var markerSpacing :Float;
+	public var tupletoSpacing :Float;
+	public var effectSpacing :Float;
 	
-	private var Cache:DrawingContext;
+	public var layoutSize:Size;
+	public var width:Int;
+	public var height:Int;
+	public var contentPadding:Padding;
 	
-	public function SongManager()
+	public function songManager()
 	{
-		return this.Tablature.SongManager;
+		return tablature.songManager;
 	}
+	
 	
 	public function new() 
 	{
-		this.Init(1);
-		this.CompactMode = true;
+		this.init(1);
+		this.contentPadding = new Padding(0, 0, 0, 0);
 	}
 	
-	public function SetTablature(tablature:Tablature) : Void
+	public function setTablature(tablature:Tablature) : Void
 	{
-		this.Tablature = tablature;
+		this.tablature = tablature;
 	}
 	
-	public function GetDefaultChordSpacing() : Int
+	public function getDefaultChordSpacing() : Int
 	{
 		var spacing:Float = 0;
-		spacing += (GsChordImpl.MaxFrets * this.ChordFretSpacing) + this.ChordFretSpacing;
-		spacing += Math.round(15.0 * this.Scale);
+		spacing += (ChordImpl.MAX_FRETS * chordFretSpacing) + chordFretSpacing;
+		spacing += Math.round(15.0 * scale);
 		return Math.round(spacing);
 	}
 	
-	public function Init(scale:Float)
+	public function init(scale:Float)
 	{
-		this.StringSpacing = (10 * scale);
-        this.ScoreLineSpacing = (8 * scale);
-        this.Scale = scale;
-        this.FontScale = this.Scale;
-        this.FirstMeasureSpacing = Math.round(10 * this.Scale);
-        this.MinBufferSeparator = this.FirstMeasureSpacing;
-        this.MinTopSpacing = Math.round(30 * this.Scale);
-        this.MinScoreTabSpacing = this.FirstMeasureSpacing;
-        this.ScoreSpacing = (this.ScoreLineSpacing * 4) + this.MinScoreTabSpacing;
-        this.FirstTrackSpacing = this.FirstMeasureSpacing;
-        this.TrackSpacing = (10 * this.Scale);
+		stringSpacing = (10 * scale);
+        scoreLineSpacing = (8 * scale);
+        this.scale = scale;
+        fontScale = scale;
+        firstMeasureSpacing = Math.round(10 * scale);
+        minBufferSeparator = this.firstMeasureSpacing;
+        minTopSpacing = Math.round(30 * scale);
+        minScoreTabSpacing = this.firstMeasureSpacing;
+        scoreSpacing = (this.scoreLineSpacing * 4) + this.minScoreTabSpacing;
+        firstTrackSpacing = this.firstMeasureSpacing;
+        trackSpacing = (10 * scale);
         
-        this.ChordFretIndexSpacing = Math.round(8 * this.Scale);
-        this.ChordStringSpacing = Math.round(5 * this.Scale);
-        this.ChordFretSpacing = Math.round(6 * this.Scale);
-        this.ChordNoteSize = Math.round(4 * this.Scale);
-        this.RepeatEndingSpacing = Math.round(20 * this.Scale);
-        this.TextSpacing = Math.round(15 * this.Scale);
-        this.MarkerSpacing = Math.round(15 * this.Scale);
-        this.TupletoSpacing = Math.round(15 * this.Scale);
-        this.EffectSpacing = Math.round(10 * this.Scale);
+        chordFretIndexSpacing = Math.round(8 * scale);
+        chordStringSpacing = Math.round(5 * scale);
+        chordFretSpacing = Math.round(6 * scale);
+        chordNoteSize = Math.round(4 * scale);
+        repeatEndingSpacing = Math.round(20 * scale);
+        textSpacing = Math.round(15 * scale);
+        markerSpacing = Math.round(15 * scale);
+        tupletoSpacing = Math.round(15 * scale);
+        effectSpacing = Math.round(10 * scale);
 	}
 	
-	public function PaintCache(graphics:Canvas, area:Rectangle, fromX:Int, fromY:Int) : Void
+	public function paintCache(graphics:Canvas, area:Rectangle, fromX:Int, fromY:Int) : Void
 	{
-		if (Cache == null)
+		if (_cache == null)
 		{
-			UpdateCache(graphics, area, fromX, fromY);
+			updateCache(graphics, area, fromX, fromY);
 			return;
 		}
-		Log.trace("Painting Cache");
-		Cache.Draw();
+		Log.trace("Painting _cache");
+		_cache.draw();
 	}
 	
-	public function UpdateCache(graphics:Canvas, area:Rectangle, fromX:Int, fromY:Int) : Void 
+	public function updateCache(graphics:Canvas, area:Rectangle, fromX:Int, fromY:Int) : Void 
 	{
-		Log.trace("Updating Cache");
-		Cache = new DrawingContext(this.Scale);
-        Cache.Graphics = graphics;
-        this.PaintSong(Cache, area, fromX, fromY);
-        PaintCache(graphics, area, fromX, fromY);
+		Log.trace("Updating _cache");
+		_cache = new DrawingContext(scale);
+        _cache.graphics = graphics;
+        paintSong(_cache, area, fromX, fromY);
+        paintCache(graphics, area, fromX, fromY);
 	}
 	
-	public function PaintSong(ctx:DrawingContext, clientArea:Rectangle, x:Int, y:Int)
+	public function paintSong(ctx:DrawingContext, clientArea:Rectangle, x:Int, y:Int)
 	{
-		
+		// implemented in subclass
 	}
 	
-	public function PrepareLayout(clientArea:Rectangle, x:Int, y:Int)
+	public function prepareLayout(clientArea:Rectangle, x:Int, y:Int)
 	{
-		
+		// implemented in subclass
 	}
 	
-	public function UpdateSong() : Void
+	public function updateSong() : Void
 	{
-		if (this.Tablature.Track == null) 
+		if (tablature.track == null) 
             return;
 		Log.trace("Updating Song Data");
-        this.UpdateTracks();
+        this.updateTracks();
 		Log.trace("Updating Song Data finished");
 	}
 	
-	public function UpdateTracks() : Void
+	public function updateTracks() : Void
 	{
-		var song:GsSong = this.Tablature.Track.Song;
-        var measureCount:Int = song.MeasureHeaders.length;
-        var track:GsTrackImpl = cast this.Tablature.Track;
-		track.PreviousBeat = null;
-		track.Update(this);
+		var song:Song = tablature.track.song;
+        var measureCount:Int = song.measureHeaders.length;
+        var track:TrackImpl = cast tablature.track;
+		track.previousBeat = null;
+		track.update(this);
 				
         for (i in 0 ... measureCount) {
-            var header:GsMeasureHeaderImpl = cast song.MeasureHeaders[i];
-            header.Update(this, track);
+            var header:MeasureHeaderImpl = cast song.measureHeaders[i];
+            header.update(this, track);
             
-			var measure:GsMeasureImpl = cast track.Measures[i];
-			measure.Create(this);
-			measure.Update(this);
+			var measure:MeasureImpl = cast track.measures[i];
+			measure.create(this);
+			measure.update(this);
         }
 	}
 	
-	public function PaintLines(track:GsTrack, ts:TrackSpacing, context:DrawingContext, x:Int, y:Int, width:Int)  : Void
+	public function paintLines(track:Track, ts:TrackSpacing, context:DrawingContext, x:Int, y:Int, width:Int)  : Void
 	{
 		if (width > 0) {
             var tempX:Float = Math.max(0, x);
             var tempY:Float = y;
             
-            var posY:Float = tempY + ts.Get(TrackSpacingPositions.ScoreMiddleLines);
+            var posY:Float = tempY + ts.get(TrackSpacingPositions.ScoreMiddleLines);
             for (i in 1 ... 6) {
-                context.Get(DrawingLayers.Lines).StartFigure();
-                context.Get(DrawingLayers.Lines).AddLine(Math.round(tempX), Math.round(posY), Math.round(tempX + width), Math.round(posY));
-                posY += (this.ScoreLineSpacing);
+                context.get(DrawingLayers.Lines).startFigure();
+                context.get(DrawingLayers.Lines).addLine(Math.round(tempX), Math.round(posY), Math.round(tempX + width), Math.round(posY));
+                posY += (this.scoreLineSpacing);
             }
             
-            tempY += ts.Get(TrackSpacingPositions.Tablature);
-            for (i in 0 ... track.StringCount()) {
-                context.Get(DrawingLayers.Lines).StartFigure();
-                context.Get(DrawingLayers.Lines).AddLine(Math.round(tempX), Math.round(tempY), Math.round(tempX + width), Math.round(tempY));
-                tempY += cast this.StringSpacing;
+            tempY += ts.get(TrackSpacingPositions.Tablature);
+            for (i in 0 ... track.stringCount()) {
+                context.get(DrawingLayers.Lines).startFigure();
+                context.get(DrawingLayers.Lines).addLine(Math.round(tempX), Math.round(tempY), Math.round(tempX + width), Math.round(tempY));
+                tempY += cast this.stringSpacing;
             }
         }
 	}
 	
-	public function GetSpacingForQuarter(duration:GsDuration) :Float
+	public function getSpacingForQuarter(duration:Duration) :Float
 	{
-		return (GsDuration.QuarterTime / duration.Time()) * this.GetMinSpacing(duration);
+		return (Duration.QUARTER_TIME / duration.time()) * getMinSpacing(duration);
 	}
 	
-	public function GetMinSpacing(duration:GsDuration) :Float
+	public function getMinSpacing(duration:Duration) :Float
 	{
-		var scale = this.Scale;
-        switch (duration.Value) {
-            case GsDuration.Whole:
+        switch (duration.value) {
+            case Duration.WHOLE:
                 return 50.0 * scale;
-            case GsDuration.Half:
+            case Duration.HALF:
                 return 30.0 * scale;
-            case GsDuration.Quarter:
+            case Duration.QUARTER:
                 return 55.0 * scale;
-            case GsDuration.Eighth:
+            case Duration.EIGHTH:
                 return 20.0 * scale;
             default:
-                return 18.0 * this.Scale;
+                return 18.0 * scale;
         }
 	}
 	
-	public function GetVoiceWidth(voice:GsVoice) :Float
+	public function getVoiceWidth(voice:Voice) :Float
 	{
-		var scale = this.Scale;
-        var duration = voice.Duration;
+        var duration = voice.duration;
         if (duration != null) {
-            switch (duration.Value) {
-                case GsDuration.Whole:
+            switch (duration.value) {
+                case Duration.WHOLE:
                     return (90.0 * scale);
-                case GsDuration.Half:
+                case Duration.HALF:
                     return (65.0 * scale);
-                case GsDuration.Quarter:
+                case Duration.QUARTER:
                     return (45.0 * scale);
-                case GsDuration.Eighth:
+                case Duration.EIGHTH:
                     return (30.0 * scale);
-                case GsDuration.Sixteenth:
+                case Duration.SIXTEENTH:
                     return (20.0 * scale);
-                case GsDuration.ThirtySecond:
+                case Duration.THIRTY_SECOND:
                     return (17.0 * scale);
                 default:
                     return (15.0 * scale);
@@ -233,52 +232,50 @@ class ViewLayout
 		return 20.0 * scale;
 	}
 	
-	public function IsFirstMeasure(measure:GsMeasure): Bool
+	public function isFirstMeasure(measure:Measure): Bool
 	{
-		return measure.Number() == 1;
+		return measure.number() == 1;
 	}
 	
-	
-	public function IsLastMeasure(measure:GsMeasure) : Bool
+	public function isLastMeasure(measure:Measure) : Bool
 	{
-		return measure.Number() == this.Tablature.Track.Song.MeasureHeaders.length;
+		return measure.number() == tablature.track.song.measureHeaders.length;
 	}
 	
-	public function GetNoteOrientation(x:Int, y:Int, note:GsNote) : Rectangle
+	public function getNoteOrientation(x:Int, y:Int, note:Note) : Rectangle
 	{
 		var noteAsString:String = "";
-		if(note.IsTiedNote) {
+		if(note.isTiedNote) {
 			noteAsString = "L";
 		}
-		else if(note.Effect.DeadNote) {
+		else if(note.effect.deadNote) {
 			noteAsString = "X";
 		} 
 		else
 		{
-			noteAsString = Utils.string(note.Value);
+			noteAsString = Std.string(note.value);
 		}
-		noteAsString = note.Effect.GhostNote ? "(" + noteAsString + ")" : noteAsString;
-		return this.GetOrientation(x,y,noteAsString);
+		noteAsString = note.effect.ghostNote ? "(" + noteAsString + ")" : noteAsString;
+		return this.getOrientation(x,y,noteAsString);
 	}
 	
-	public function GetOrientation(x:Int, y:Int, str:String) : Rectangle
+	public function getOrientation(x:Int, y:Int, str:String) : Rectangle
 	{
-		this.Tablature.Canvas.font = DrawingResources.NoteFont;
-		var size = this.Tablature.Canvas.measureText(str);
-		return new Rectangle(x,y, cast size.width, DrawingResources.NoteFontHeight);
+		tablature.canvas.font = DrawingResources.noteFont;
+		var size = tablature.canvas.measureText(str);
+		return new Rectangle(x,y, cast size, DrawingResources.noteFontHeight);
 	}
 	
-	public function CheckDefaultSpacing(ts:TrackSpacing) : Void
+	public function checkDefaultSpacing(ts:TrackSpacing) : Void
 	{
-		var minBufferSeparator:Float = this.MinBufferSeparator;
-		var bufferSeparator:Int = ts.Get(TrackSpacingPositions.ScoreUpLines) - ts.Get(TrackSpacingPositions.BufferSeparator);
+		var bufferSeparator:Int = ts.get(TrackSpacingPositions.ScoreUpLines) - ts.get(TrackSpacingPositions.BufferSeparator);
 		if(bufferSeparator < minBufferSeparator) {
-			ts.Set(TrackSpacingPositions.BufferSeparator, Math.round(minBufferSeparator - bufferSeparator));
+			ts.set(TrackSpacingPositions.BufferSeparator, Math.round(minBufferSeparator - bufferSeparator));
 		}
-		var checkPosition:Int = ts.Get(TrackSpacingPositions.ScoreMiddleLines);
+		var checkPosition:Int = ts.get(TrackSpacingPositions.ScoreMiddleLines);
 		
-		if(checkPosition >= 0 && checkPosition < this.MinTopSpacing) {
-			ts.Set(TrackSpacingPositions.Top, Math.round(this.MinTopSpacing - checkPosition));
+		if(checkPosition >= 0 && checkPosition < minTopSpacing) {
+			ts.set(TrackSpacingPositions.Top, Math.round(minTopSpacing - checkPosition));
 		}
 	}
 }

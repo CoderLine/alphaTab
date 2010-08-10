@@ -1,14 +1,11 @@
-/**
- * ...
- * @author Daniel Kuschny
- */
-
 package net.alphatab.tablature.drawing;
 
-
+/**
+ * Converts a drawing layer identifier into it's associated index.
+ */
 class DrawingLayersConverter
 {
-	public static function ToInt(layer:DrawingLayers) : Int
+	public static function toInt(layer:DrawingLayers) : Int
 	{
 		switch(layer)
 		{

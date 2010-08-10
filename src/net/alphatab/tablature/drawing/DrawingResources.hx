@@ -1,65 +1,56 @@
-/**
- * ...
- * @author Daniel Kuschny
- */
-
 package net.alphatab.tablature.drawing;
 import net.alphatab.model.Size;
 import net.alphatab.tablature.ViewLayout;
-import net.alphatab.Utils;
 
+/**
+ * This class contains all font settings for drawing. 
+ */
 class DrawingResources 
 {
-	public static var DefaultFontHeight:Int;
-	public static var DefaultFont:String;
-	public static var ChordFont:String;
-	public static var TimeSignatureFont:String;
-	public static var ClefFont:String;
-	public static var MusicFont:String;
-	public static var TempoFont:String;
-	public static var GraceFontHeight:Int;
-	public static var GraceFont:String;
-	public static var NoteFont:String;
-	public static var NoteFontHeight:Int;
-	public static var EffectFont:String;
-	public static var EffectFontHeight:Int;
+	public static var defaultFontHeight:Int;
+	public static var defaultFont:String;
+	public static var chordFont:String;
+	public static var timeSignatureFont:String;
+	public static var clefFont:String;
+	public static var musicFont:String;
+	public static var tempoFont:String;
+	public static var graceFontHeight:Int;
+	public static var graceFont:String;
+	public static var noteFont:String;
+	public static var noteFontHeight:Int;
+	public static var effectFont:String;
+	public static var effectFontHeight:Int;
 	
-	public static var TitleFont:String;
-	public static var SubtitleFont:String;
-	public static var WordsFont:String;
-	public static var CopyrightFont:String;
+	public static var titleFont:String;
+	public static var subtitleFont:String;
+	public static var wordsFont:String;
+	public static var copyrightFont:String;
 
-	public static function Init(scale:Float) : Void
+	public static function init(scale:Float) : Void
 	{ 
-		DefaultFontHeight = Math.round(9*scale);
-		DefaultFont = Utils.string(DefaultFontHeight) + "px 'Arial'";
-		ChordFont = Utils.string(9*scale) + "px 'Arial'";
-		TimeSignatureFont = Utils.string(20*scale) + "px 'Arial'";
-		ClefFont = Utils.string(13*scale) + "px 'Arial'";
-		MusicFont = Utils.string(13*scale) + "px 'Arial'";
-		TempoFont = Utils.string(11*scale) + "px 'Arial'";
-		GraceFontHeight = Math.round(9*scale);
-		GraceFont = Utils.string(GraceFontHeight) + "px 'Arial'";
-		NoteFontHeight = Math.round(11 * scale);
-		NoteFont = Utils.string(NoteFontHeight) + "px 'Arial'";
-		EffectFontHeight = Math.round(11 * scale);
-		EffectFont = "italic " + Utils.string(EffectFontHeight) + "px 'Times New Roman'";
+		defaultFontHeight = Math.round(9*scale);
+		defaultFont = Std.string(defaultFontHeight) + "px 'Arial'";
+		chordFont = Std.string(9*scale) + "px 'Arial'";
+		timeSignatureFont = Std.string(20*scale) + "px 'Arial'";
+		clefFont = Std.string(13*scale) + "px 'Arial'";
+		musicFont = Std.string(13*scale) + "px 'Arial'";
+		tempoFont = Std.string(11*scale) + "px 'Arial'";
+		graceFontHeight = Math.round(9*scale);
+		graceFont = Std.string(graceFontHeight) + "px 'Arial'";
+		noteFontHeight = Math.round(11 * scale);
+		noteFont = Std.string(noteFontHeight) + "px 'Arial'";
+		effectFontHeight = Math.round(11 * scale);
+		effectFont = "italic " + Std.string(effectFontHeight) + "px 'Times New Roman'";
 		
-		TitleFont =  Utils.string(30*scale) + "px 'Times New Roman'";
-		SubtitleFont = Utils.string(19 * scale) + "px 'Times New Roman'";
-		WordsFont =  Utils.string(13 * scale) + "px 'Times New Roman'";
-		CopyrightFont =  "bold " + Utils.string(11 * scale) + "px 'Arial'";
+		titleFont =  Std.string(30*scale) + "px 'Times New Roman'";
+		subtitleFont = Std.string(19 * scale) + "px 'Times New Roman'";
+		wordsFont =  Std.string(13 * scale) + "px 'Times New Roman'";
+		copyrightFont =  "bold " + Std.string(11 * scale) + "px 'Arial'";
 	}
 	
-	public static function GetScoreNoteSize(layout:ViewLayout, full:Bool) : Size
+	public static function getScoreNoteSize(layout:ViewLayout, full:Bool) : Size
 	{
-		var scale:Float = (full ? layout.ScoreLineSpacing + 1 : layout.ScoreLineSpacing) - 2;
+		var scale:Float = (full ? layout.scoreLineSpacing + 1 : layout.scoreLineSpacing) - 2;
 		return new Size(Math.round(scale * 1.3), Math.round(scale * 1.0));
 	}
-	
-	public function new() 
-	{
-		
-	}
-	
 }

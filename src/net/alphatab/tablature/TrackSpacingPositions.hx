@@ -1,10 +1,8 @@
-/**
- * ...
- * @author Daniel Kuschny
- */
-
 package net.alphatab.tablature;
 
+/**
+ * A list of all spacings within a line. 
+ */
 enum TrackSpacingPositions 
 {
 	Top;

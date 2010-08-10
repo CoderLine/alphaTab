@@ -1,16 +1,14 @@
-/**
- * ...
- * @author Daniel Kuschny
- */
-
 package net.alphatab.file;
-import haxe.io.Error;
 
+/**
+ * This Exception is thrown on file reading errors. 
+ */
 class FileFormatException 
 {
-	public var Message:String;
-	public function new(message:String = "") 
+	public var message:String;
+	
+	public function new(str:String = "") 
 	{
-		this.Message = message;
+		message = str;
 	}	
 }

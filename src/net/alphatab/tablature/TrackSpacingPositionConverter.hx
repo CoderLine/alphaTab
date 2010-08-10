@@ -1,14 +1,11 @@
-/**
- * ...
- * @author Daniel Kuschny
- */
-
 package net.alphatab.tablature;
 
-
+/**
+ * A converter which converts spacings to integer. 
+ */
 class TrackSpacingPositionConverter
 {
-	public static function ToInt(pos:TrackSpacingPositions):Int
+	public static function toInt(pos:TrackSpacingPositions):Int
 	{
 		switch(pos)
 		{

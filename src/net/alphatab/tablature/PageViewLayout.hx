@@ -1,176 +1,167 @@
-/**
- * ...
- * @author Daniel Kuschny
- */
-
 package net.alphatab.tablature;
 import haxe.Log;
 import haxe.Template;
-import net.alphatab.model.GsHeaderFooterElements;
-import net.alphatab.model.GsMeasure;
-import net.alphatab.model.GsSong;
-import net.alphatab.model.GsTrack;
+import net.alphatab.model.HeaderFooterElements;
+import net.alphatab.model.Measure;
+import net.alphatab.model.Song;
+import net.alphatab.model.Track;
 import net.alphatab.model.Padding;
 import net.alphatab.model.Rectangle;
 import net.alphatab.model.Size;
 import net.alphatab.tablature.drawing.DrawingContext;
 import net.alphatab.tablature.drawing.DrawingLayers;
 import net.alphatab.tablature.drawing.DrawingResources;
-import net.alphatab.tablature.model.GsLyricsImpl;
-import net.alphatab.tablature.model.GsMeasureImpl;
-import net.alphatab.tablature.model.GsTrackImpl;
-import net.alphatab.Utils;
+import net.alphatab.tablature.model.LyricsImpl;
+import net.alphatab.tablature.model.MeasureImpl;
+import net.alphatab.tablature.model.TrackImpl;
 
+
+/**
+ * This layout renders measures in form of a page. 
+ */
 class PageViewLayout extends ViewLayout
 {
-	public static var PagePadding:Padding = new Padding(20, 40, 20, 40);
-	public static inline var WidthOn100:Int = 795;
+	public static var PAGE_PADDING:Padding = new Padding(20, 40, 20, 40);
+	public static inline var WIDTH_ON_100:Int = 795;
 	
-	private var Lines:Array<TempLine>;
-	private var MarginLeft:Int;
-	private var MarginRight:Int;
-	private var MaximumWidth:Int;
+	private var _lines:Array<TempLine>;
+	private var _maximumWidth:Int;
 	
 	public function new() 
 	{
 		super();
-		this.Lines = new Array<TempLine>();
-		this.MaximumWidth = 0;
-		this.MarginLeft = 0;
-		this.MarginRight = 0;
+		_lines = new Array<TempLine>();
+		_maximumWidth = 0;
+		contentPadding = PAGE_PADDING;
 	}
 	
-	public function GetMaxWidth() : Int
+	public function getMaxWidth() : Int
 	{
-		if (this.MaximumWidth <= 0) {
-			this.MaximumWidth = this.Tablature.Width;
+		if (_maximumWidth <= 0) {
+			_maximumWidth = tablature.canvas.width();
 		}
-		return this.MaximumWidth - this.MarginLeft + this.MarginRight;
+		return _maximumWidth - contentPadding.getHorizontal();
 	}
 	
-	public function GetSheetWidth() : Int
+	public function getSheetWidth() : Int
 	{
-		return Math.round(PageViewLayout.WidthOn100 * this.Scale);
+		return Math.round(PageViewLayout.WIDTH_ON_100 * scale);
 	}
 	
-	public override function Init(scale:Float) : Void
+	public override function init(scale:Float) : Void
 	{
-		super.Init(scale);
-		this.LayoutSize = new Size(this.GetSheetWidth() - PageViewLayout.PagePadding.getHorizontal(), this.Height);
+		super.init(scale);
+		layoutSize = new Size(this.getSheetWidth() - PAGE_PADDING.getHorizontal(), height);
 	}
 	
-	public override function PrepareLayout(clientArea:Rectangle, x:Int, y:Int) : Void
+	public override function prepareLayout(clientArea:Rectangle, x:Int, y:Int) : Void
 	{
-		this.Lines = new Array<TempLine>();
-		this.MaximumWidth = clientArea.Width;
-		this.MarginLeft = PagePadding.Left;
-		this.MarginRight = PagePadding.Right;
+		_lines = new Array<TempLine>();
+		_maximumWidth = clientArea.width;
 		
-		this.Width = 0;
-		this.Height = 0;
+		width = 0;
+		height = 0;
 		
 		var posY:Int = Math.round(y);
-		var height:Int = Math.round(this.FirstMeasureSpacing);
 		
-		var track:GsTrackImpl = cast this.Tablature.Track;
-		var measureCount:Int = this.Tablature.Track.Measures.length;
+		var track:TrackImpl = cast tablature.track;
+		var measureCount:Int = tablature.track.measures.length;
 		var nextMeasureIndex:Int = 0;
 		
 		
-		posY = Math.floor(LayoutSongInfo(x, posY) + this.FirstMeasureSpacing);
+		posY = Math.floor(LayoutSongInfo(x, posY) + firstMeasureSpacing);
 		height = posY;
 		
 		
 		while (measureCount > nextMeasureIndex) {
 			var spacing:TrackSpacing = new TrackSpacing();
-			spacing.Set(TrackSpacingPositions.ScoreMiddleLines, Math.round(this.ScoreLineSpacing * 5));
+			spacing.set(TrackSpacingPositions.ScoreMiddleLines, Math.round(scoreLineSpacing * 5));
 			
 			var line:TempLine = this.GetTempLines(track, nextMeasureIndex, spacing);
-			this.Lines.push(line);
+			_lines.push(line);
 			
-			spacing.Set(TrackSpacingPositions.ScoreUpLines, Math.round(Math.abs(line.MinY)));
-			if (line.MaxY + this.MinScoreTabSpacing > this.ScoreSpacing) {
-				spacing.Set(TrackSpacingPositions.ScoreDownLines, Math.round(line.MaxY - (this.ScoreLineSpacing * 4)));
+			spacing.set(TrackSpacingPositions.ScoreUpLines, Math.round(Math.abs(line.MinY)));
+			if (line.MaxY + minScoreTabSpacing > scoreSpacing) {
+				spacing.set(TrackSpacingPositions.ScoreDownLines, Math.round(line.MaxY - (scoreLineSpacing * 4)));
 			}
-			spacing.Set(TrackSpacingPositions.TablatureTopSeparator, Math.round(this.MinScoreTabSpacing));
-			spacing.Set(TrackSpacingPositions.Tablature, Math.round(track.TabHeight + this.StringSpacing + 1));
-			spacing.Set(TrackSpacingPositions.Lyric, 10);
-			this.CheckDefaultSpacing(spacing);
+			spacing.set(TrackSpacingPositions.TablatureTopSeparator, Math.round(minScoreTabSpacing));
+			spacing.set(TrackSpacingPositions.Tablature, Math.round(track.tabHeight + stringSpacing + 1));
+			spacing.set(TrackSpacingPositions.Lyric, 10);
+			checkDefaultSpacing(spacing);
 			
-			this.MeasureLine(track, line, x, posY, spacing);
+			measureLine(track, line, x, posY, spacing);
 			
-			var lineHeight = Math.round(spacing.GetSize()); 
-			posY += Math.round(lineHeight + this.TrackSpacing);
-			height += Math.round(lineHeight + this.TrackSpacing);
+			var lineHeight = Math.round(spacing.getSize()); 
+			posY += Math.round(lineHeight + trackSpacing);
+			height += Math.round(lineHeight + trackSpacing);
 			
 			nextMeasureIndex = line.LastIndex + 1;
 		}
 		
-		this.Height = height;
-		this.Width = this.GetSheetWidth();
+		width = getSheetWidth();
 	}
 	
 	private function LayoutSongInfo(x:Int, y:Int): Int
 	{
-		var song:GsSong = this.Tablature.Track.Song;
+		var song:Song = tablature.track.song;
 		var anySongInfo = false;
-		if (song.Title != "" && (song.PageSetup.HeaderAndFooter & GsHeaderFooterElements.Title != 0))
+		if (song.title != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.TITLE != 0))
 		{
-			y += Math.floor(35 * Scale);
+			y += Math.floor(35 * scale);
 			anySongInfo = true;
 		}
-		if (song.Subtitle != "" && (song.PageSetup.HeaderAndFooter & GsHeaderFooterElements.Subtitle != 0))
+		if (song.subtitle != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.SUBTITLE != 0))
 		{
-			y += Math.floor(20 * Scale);
+			y += Math.floor(20 * scale);
 			anySongInfo = true;
 		}
-		if (song.Artist != "" && (song.PageSetup.HeaderAndFooter & GsHeaderFooterElements.Artist != 0))
+		if (song.artist != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.ARTIST != 0))
 		{
-			y += Math.floor(20 * Scale);
+			y += Math.floor(20 * scale);
 			anySongInfo = true;
 		}
-		if (song.Album != "" && (song.PageSetup.HeaderAndFooter & GsHeaderFooterElements.Album != 0))
+		if (song.album != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.ALBUM != 0))
 		{
-			y += Math.floor(20 * Scale);
+			y += Math.floor(20 * scale);
 			anySongInfo = true;
 		}
-		if (song.Music != "" && song.Music == song.Words && (song.PageSetup.HeaderAndFooter & GsHeaderFooterElements.WordsAndMusic != 0))
+		if (song.music != "" && song.music == song.words && (song.pageSetup.headerAndFooter & HeaderFooterElements.WORDS_AND_MUSIC != 0))
 		{
-			y += Math.floor(20 * Scale);
+			y += Math.floor(20 * scale);
 			anySongInfo = true;
 		}
 		else 
 		{
-			if (song.Music != "" && (song.PageSetup.HeaderAndFooter & GsHeaderFooterElements.Music != 0))
+			if (song.music != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.MUSIC != 0))
 			{
-				y += Math.floor(20 * Scale);
+				y += Math.floor(20 * scale);
 				anySongInfo = true;
 			}
-			if (song.Words != "" && (song.PageSetup.HeaderAndFooter & GsHeaderFooterElements.Music != 0))
+			if (song.words != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.WORDS != 0))
 			{
-				y += Math.floor(20 * Scale);
+				y += Math.floor(20 * scale);
 				anySongInfo = true;
 			}
 		}	
 		
-		y += Math.floor(20 * Scale);
+		y += Math.floor(20 * scale);
 		if (anySongInfo)
 		{
-			y += Math.floor(20 * Scale);
+			y += Math.floor(20 * scale);
 		}
 		
 		return y;
 	}
 	
-	public function MeasureLine(track:GsTrack, line:TempLine, x:Int, y:Int, spacing:TrackSpacing) : Void
+	public function measureLine(track:Track, line:TempLine, x:Int, y:Int, spacing:TrackSpacing) : Void
 	{
-		var realX:Int = this.MarginLeft + x;
+		var realX:Int = contentPadding.left + x;
 		var realY:Int = y;
-		var width:Int = this.MarginLeft;
+		var w:Int = contentPadding.left;
 		
 		var measureSpacing:Int = 0;
 		if(line.FullLine) {
-			var diff = this.GetMaxWidth() - line.TempWidth;
+			var diff = getMaxWidth() - line.TempWidth;
 			if(diff != 0 && line.Measures.length > 0) {
 				measureSpacing = Math.round(diff / line.Measures.length);
 			}
@@ -178,31 +169,31 @@ class PageViewLayout extends ViewLayout
 		
 		for(i in 0 ... line.Measures.length) {
 			var index:Int = line.Measures[i];
-			var currMeasure:GsMeasureImpl = cast track.Measures[index];
+			var currMeasure:MeasureImpl = cast track.measures[index];
 			
-			currMeasure.PosX = realX;
-			currMeasure.PosY = realY;
-			currMeasure.Ts = spacing;
-			currMeasure.IsFirstOfLine = i==0;
+			currMeasure.posX = realX;
+			currMeasure.posY = realY;
+			currMeasure.ts = spacing;
+			currMeasure.isFirstOfLine = i==0;
 			
-			var measureWidth:Int = Math.round(currMeasure.Width + measureSpacing);
-			currMeasure.Spacing = measureSpacing;
+			var measureWidth:Int = Math.round(currMeasure.width + measureSpacing);
+			currMeasure.spacing = measureSpacing;
 			
 			realX += measureWidth;
-			width += measureWidth;
+			w += measureWidth;
 		}
-		this.Width = Math.round(Math.max(this.Width, width));
+		width = Math.round(Math.max(width, w));
 	}
 	
-	public override function PaintSong(ctx:DrawingContext, clientArea:Rectangle, x:Int, y:Int) : Void
+	public override function paintSong(ctx:DrawingContext, clientArea:Rectangle, x:Int, y:Int) : Void
 	{
-		var track:GsTrack = this.Tablature.Track;
-		y = Math.round(y + PagePadding.Top);
-		y = Math.round(PaintSongInfo(ctx, clientArea, x, y) + this.FirstMeasureSpacing);
+		var track:Track = tablature.track;
+		y = Math.round(y + contentPadding.top);
+		y = Math.round(PaintSongInfo(ctx, clientArea, x, y) + firstMeasureSpacing);
 		var beatCount:Int = 0;
-		for (l in 0 ... this.Lines.length) 
+		for (l in 0 ... _lines.length) 
 		{
-			var line:TempLine = this.Lines[l];
+			var line:TempLine = _lines[l];
 			beatCount = this.PaintLine(track, line, beatCount, ctx);
 		}
 	}
@@ -210,73 +201,73 @@ class PageViewLayout extends ViewLayout
 	private function PaintSongInfo(ctx:DrawingContext, clientArea:Rectangle, x:Int, y:Int) : Int
 	{
 		Log.trace("Paint Song info");
-		var song:GsSong = this.Tablature.Track.Song;
-		x += PagePadding.Left;
+		var song:Song = tablature.track.song;
+		x += contentPadding.left;
 		var tX:Float;
-		var size:Dynamic;
+		var size:Float;
 		var str:String = "";
-		if (song.Title != "" && (song.PageSetup.HeaderAndFooter & GsHeaderFooterElements.Title != 0))
+		if (song.title != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.TITLE != 0))
 		{
-			str = ParsePageSetupString(song.PageSetup.Title);
-			ctx.Graphics.font = DrawingResources.TitleFont;
-			size = ctx.Graphics.measureText(str);
-			tX = (clientArea.Width - size.width) / 2;
-			ctx.Get(DrawingLayers.LayoutBackground).AddString(str, DrawingResources.TitleFont, tX, y, "top");
-			y += Math.floor(35*Scale); 
+			str = ParsePageSetupString(song.pageSetup.title);
+			ctx.graphics.font = DrawingResources.titleFont;
+			size = ctx.graphics.measureText(str);
+			tX = (clientArea.width - size) / 2;
+			ctx.get(DrawingLayers.LayoutBackground).addString(str, DrawingResources.titleFont, tX, y, "top");
+			y += Math.floor(35*scale); 
 		}		
-		if (song.Subtitle != "" && (song.PageSetup.HeaderAndFooter & GsHeaderFooterElements.Subtitle != 0))
+		if (song.subtitle != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.SUBTITLE != 0))
 		{
-			str = ParsePageSetupString(song.PageSetup.Subtitle);
-			ctx.Graphics.font = DrawingResources.SubtitleFont;
-			size = ctx.Graphics.measureText(str);
-			tX = (clientArea.Width - size.width) / 2;
-			ctx.Get(DrawingLayers.LayoutBackground).AddString(str, DrawingResources.SubtitleFont, tX, y, "top");
-			y += Math.floor(20*Scale);
+			str = ParsePageSetupString(song.pageSetup.subtitle);
+			ctx.graphics.font = DrawingResources.subtitleFont;
+			size = ctx.graphics.measureText(str);
+			tX = (clientArea.width - size) / 2;
+			ctx.get(DrawingLayers.LayoutBackground).addString(str, DrawingResources.subtitleFont, tX, y, "top");
+			y += Math.floor(20*scale);
 		}
-		if (song.Artist != "" && (song.PageSetup.HeaderAndFooter & GsHeaderFooterElements.Artist != 0))
+		if (song.artist != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.ARTIST != 0))
 		{
-			str = ParsePageSetupString(song.PageSetup.Artist);
-			ctx.Graphics.font = DrawingResources.SubtitleFont;
-			size = ctx.Graphics.measureText(str);
-			tX = (clientArea.Width - size.width) / 2;
-			ctx.Get(DrawingLayers.LayoutBackground).AddString(str, DrawingResources.SubtitleFont, tX, y, "top");
-			y += Math.floor(20*Scale);
+			str = ParsePageSetupString(song.pageSetup.artist);
+			ctx.graphics.font = DrawingResources.subtitleFont;
+			size = ctx.graphics.measureText(str);
+			tX = (clientArea.width - size) / 2;
+			ctx.get(DrawingLayers.LayoutBackground).addString(str, DrawingResources.subtitleFont, tX, y, "top");
+			y += Math.floor(20*scale);
 		}
-		if (song.Album != "" && (song.PageSetup.HeaderAndFooter & GsHeaderFooterElements.Album != 0))
+		if (song.album != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.ALBUM != 0))
 		{
-			str = ParsePageSetupString(song.PageSetup.Album);
-			ctx.Graphics.font = DrawingResources.SubtitleFont;
-			size = ctx.Graphics.measureText(str);
-			tX = (clientArea.Width - size.width) / 2;
-			ctx.Get(DrawingLayers.LayoutBackground).AddString(str, DrawingResources.SubtitleFont, tX, y, "top");
-			y += Math.floor(20*Scale);
+			str = ParsePageSetupString(song.pageSetup.album);
+			ctx.graphics.font = DrawingResources.subtitleFont;
+			size = ctx.graphics.measureText(str);
+			tX = (clientArea.width - size) / 2;
+			ctx.get(DrawingLayers.LayoutBackground).addString(str, DrawingResources.subtitleFont, tX, y, "top");
+			y += Math.floor(20*scale);
 		}
-		if (song.Music != "" && song.Music == song.Words && (song.PageSetup.HeaderAndFooter & GsHeaderFooterElements.WordsAndMusic != 0))
+		if (song.music != "" && song.music == song.words && (song.pageSetup.headerAndFooter & HeaderFooterElements.WORDS_AND_MUSIC != 0))
 		{
-			str = ParsePageSetupString(song.PageSetup.WordsAndMusic);
-			ctx.Graphics.font = DrawingResources.WordsFont;
-			size = ctx.Graphics.measureText(str);
-			tX = (clientArea.Width - size.width - PagePadding.Right);
-			ctx.Get(DrawingLayers.LayoutBackground).AddString(str, DrawingResources.WordsFont, x, y, "top");
-			y += Math.floor(20*Scale);
+			str = ParsePageSetupString(song.pageSetup.wordsAndMusic);
+			ctx.graphics.font = DrawingResources.wordsFont;
+			size = ctx.graphics.measureText(str);
+			tX = (clientArea.width - size - contentPadding.right);
+			ctx.get(DrawingLayers.LayoutBackground).addString(str, DrawingResources.wordsFont, x, y, "top");
+			y += Math.floor(20*scale);
 		}
 		else 
 		{
-			if (song.Music != "" && (song.PageSetup.HeaderAndFooter & GsHeaderFooterElements.Music != 0))
+			if (song.music != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.MUSIC != 0))
 			{
-				str = ParsePageSetupString(song.PageSetup.Music);
-				ctx.Graphics.font = DrawingResources.WordsFont;
-				size = ctx.Graphics.measureText(str);
-				tX = (clientArea.Width - size.width - PagePadding.Right);
-				ctx.Get(DrawingLayers.LayoutBackground).AddString(str, DrawingResources.WordsFont, tX, y, "top");
+				str = ParsePageSetupString(song.pageSetup.music);
+				ctx.graphics.font = DrawingResources.wordsFont;
+				size = ctx.graphics.measureText(str);
+				tX = (clientArea.width - size - contentPadding.right);
+				ctx.get(DrawingLayers.LayoutBackground).addString(str, DrawingResources.wordsFont, tX, y, "top");
 			}
-			if (song.Words != "" && (song.PageSetup.HeaderAndFooter & GsHeaderFooterElements.Music != 0))
+			if (song.words != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.WORDS != 0))
 			{
-				str = ParsePageSetupString(song.PageSetup.Words);
-				ctx.Graphics.font = DrawingResources.WordsFont;
-				ctx.Get(DrawingLayers.LayoutBackground).AddString(str, DrawingResources.WordsFont, x, y, "top");
+				str = ParsePageSetupString(song.pageSetup.words);
+				ctx.graphics.font = DrawingResources.wordsFont;
+				ctx.get(DrawingLayers.LayoutBackground).addString(str, DrawingResources.wordsFont, x, y, "top");
 			}
-			y += Math.floor(20*Scale);
+			y += Math.floor(20*scale);
 		}	
 		
 		return y;
@@ -284,57 +275,58 @@ class PageViewLayout extends ViewLayout
 	
 	private function ParsePageSetupString(input:String) : String
 	{
-		var song:GsSong = this.Tablature.Track.Song;
-		input = StringTools.replace(input, "%TITLE%", song.Title);
-		input = StringTools.replace(input, "%SUBTITLE%", song.Subtitle);
-		input = StringTools.replace(input, "%ARTIST%", song.Artist);
-		input = StringTools.replace(input, "%ALBUM%", song.Album);
-		input = StringTools.replace(input, "%WORDS%", song.Words);
-		input = StringTools.replace(input, "%MUSIC%", song.Music);
-		input = StringTools.replace(input, "%WORDSMUSIC%", song.Words);
-		input = StringTools.replace(input, "%COPYRIGHT%", song.Copyright);
+		var song:Song = tablature.track.song;
+		input = StringTools.replace(input, "%TITLE%", song.title);
+		input = StringTools.replace(input, "%SUBTITLE%", song.subtitle);
+		input = StringTools.replace(input, "%ARTIST%", song.artist);
+		input = StringTools.replace(input, "%ALBUM%", song.album);
+		input = StringTools.replace(input, "%WORDS%", song.words);
+		input = StringTools.replace(input, "%MUSIC%", song.music);
+		input = StringTools.replace(input, "%WORDSMUSIC%", song.words);
+		input = StringTools.replace(input, "%COPYRIGHT%", song.copyright);
 		return input;
 	}
 	
-	public function PaintLine(track:GsTrack, line:TempLine, beatCount:Int, context:DrawingContext) : Int
+	public function PaintLine(track:Track, line:TempLine, beatCount:Int, context:DrawingContext) : Int
 	{ 
-		Log.trace("Paint Measures " + Utils.string(line.Measures[0]) + " to " + Utils.string(line.Measures[line.Measures.length - 1]));
+		Log.trace("Paint Measures " + Std.string(line.Measures[0]) + " to " + Std.string(line.Measures[line.Measures.length - 1]));
 		for(i in 0 ... line.Measures.length) {
 			var index:Int = line.Measures[i];
-			var currentMeasure:GsMeasureImpl = cast track.Measures[index];
+			var currentMeasure:MeasureImpl = cast track.measures[index]; 
 			
-			currentMeasure.PaintMeasure(this, context);
-			if (track.Song.Lyrics != null && track.Song.Lyrics.TrackChoice == track.Number)
+			currentMeasure.paintMeasure(this, context);
+			
+			if (track.song.lyrics != null && track.song.lyrics.trackChoice == track.number)
 			{
-				var ly:GsLyricsImpl = cast track.Song.Lyrics;
-				ly.PaintCurrentNoteBeats(context, this, currentMeasure, beatCount, currentMeasure.PosX, currentMeasure.PosY);
+				var ly:LyricsImpl = cast track.song.lyrics;
+				ly.paintCurrentNoteBeats(context, this, currentMeasure, beatCount, currentMeasure.posX, currentMeasure.posY);
 			}
-			beatCount += currentMeasure.BeatCount();
+			beatCount += currentMeasure.beatCount();
 		}
 		return beatCount;
 	}
 	
-	public function GetTempLines(track:GsTrack, fromIndex:Int, trackSpacing:TrackSpacing) : TempLine
+	public function GetTempLines(track:Track, fromIndex:Int, trackSpacing:TrackSpacing) : TempLine
 	{
 		var line:TempLine = new TempLine();
 		line.MaxY = 0;
 		line.MinY = 0;
 		line.TrackSpacing = trackSpacing;
 		
-		var measureCount = track.MeasureCount();
+		var measureCount = track.measureCount();
 		for (i in fromIndex ...  measureCount) {
-			var measure:GsMeasureImpl = cast track.Measures[i];
+			var measure:MeasureImpl = cast track.measures[i];
 			
-			if((line.TempWidth + measure.Width) >= this.GetMaxWidth() && line.Measures.length != 0) {
+			if((line.TempWidth + measure.width) >= getMaxWidth() && line.Measures.length != 0) {
 				line.FullLine = true;
 				return line;
 			}
-			line.TempWidth += measure.Width;
-			line.MaxY = measure.MaxY > line.MaxY ? measure.MaxY : line.MaxY;
-			line.MinY = measure.MinY < line.MinY ? measure.MinY : line.MinY;
+			line.TempWidth += measure.width;
+			line.MaxY = measure.maxY > line.MaxY ? measure.maxY : line.MaxY;
+			line.MinY = measure.minY < line.MinY ? measure.minY : line.MinY;
 			
 			line.AddMeasure(i);
-			measure.RegisterSpacing(this, trackSpacing);
+			measure.registerSpacing(this, trackSpacing);
 		}
 		
 		return line;

@@ -5,14 +5,17 @@
 
 package net.alphatab.platform.js;
 
-#if js
 import haxe.Http;
 import haxe.remoting.Context;
 import js.Lib;
 import net.alphatab.platform.BinaryReader;
 import net.alphatab.platform.FileLoader;
-import net.alphatab.Utf8;
 
+/**
+ * This is a fileloader implementation for JavaScript.
+ * It uses a ajax request in case of modern browsers like Firefox or Chrome. 
+ * For IE a hidden Flash Movie is used to load a binary stream. 
+ */
 class JsFileLoader implements FileLoader
 {
 	public function new()
@@ -20,9 +23,9 @@ class JsFileLoader implements FileLoader
 		
 	}
 	
-	public function LoadBinary(method:String, file:String, success:BinaryReader->Void, error:String->Void) : Void
+	public function loadBinary(method:String, file:String, success:BinaryReader->Void, error:String->Void) : Void
 	{
-		if (JQuery.IsIE())
+		if (JQuery.isIE())
 		{
 			var ctx = new haxe.remoting.Context();
 			ctx.addObject("JsFileLoader",this);
@@ -75,8 +78,7 @@ class JsFileLoader implements FileLoader
 				}
 			}
 			
-			JQuery.Ajax(options);
+			JQuery.ajax(options);
 		}
 	}
 }
-#end

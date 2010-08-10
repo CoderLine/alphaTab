@@ -1,20 +1,18 @@
-/**
- * ...
- * @author Daniel Kuschny
- */
-
 package net.alphatab.midi;
-import net.alphatab.model.GsSong;
-import net.alphatab.model.GsSongFactory;
+import net.alphatab.model.Song;
+import net.alphatab.model.SongFactory;
 
+/**
+ * This wrapper allows easy converting of a song into a midi message list used by the player.
+ */
 class MidiDataProvider 
 {
-	public static function GetSongMidiData(song:GsSong, factory:GsSongFactory):String
+	public static function getSongMidiData(song:Song, factory:SongFactory):String
 	{
-		var parser:MidiSequenceParser = new MidiSequenceParser(factory, song, MidiSequenceParserFlags.DefaultPlayFlags,
+		var parser:MidiSequenceParser = new MidiSequenceParser(factory, song, MidiSequenceParserFlags.DEFAULT_PLAY_FLAGS,
 											   100, 0);
-		var sequence:MidiSequenceHandler = new MidiSequenceHandler(song.Tracks.length + 2);
-		parser.Parse(sequence);
-		return sequence.Commands;
+		var sequence:MidiSequenceHandler = new MidiSequenceHandler(song.tracks.length + 2);
+		parser.parse(sequence);
+		return sequence.commands;
 	}
 }

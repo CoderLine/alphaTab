@@ -1,16 +1,14 @@
-/**
- * ...
- * @author Daniel Kuschny
- */
-
 package net.alphatab.platform;
 
+/**
+ * This is the base interface for canvas implementations on different plattforms.
+ */
 interface Canvas 
 {
-	function Width():Int;
-	function Height():Int;
-	function SetWidth(width:Int):Void;
-	function SetHeight(height:Int):Void;
+	function width():Int;
+	function height():Int;
+	function setWidth(width:Int):Void;
+	function setHeight(height:Int):Void;
 		
 	// colors and styles
 	var strokeStyle(getStrokeStyle, setStrokeStyle):String; //(default black);
@@ -43,5 +41,5 @@ interface Canvas
 	var textBaseline(getTextBaseline, setTextBaseline):String; // "top", "hanging", "middle", "alphabetic", "ideographic", "bottom" (default: "alphabetic")
 	function fillText(text:String, x:Float, y:Float, maxWidth:Float = 0):Void;
 	function strokeText(text:String, x:Float, y:Float, maxWidth:Float = 0):Void;
-	function measureText(text:String):TextMetrics;	
+	function measureText(text:String):Float;	
 }

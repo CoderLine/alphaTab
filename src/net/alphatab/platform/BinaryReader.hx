@@ -1,14 +1,13 @@
-/**
- * ...
- * @author Daniel Kuschny
- */
-
 package net.alphatab.platform;
 import haxe.io.StringInput;
 
+/**
+ * This is a  binary file reader for JavaScript.
+ * It uses an unencoded (raw 1byte for a character) string to handle binary data. 
+ */
 class BinaryReader 
 { 
-private var _buffer:String;
+	private var _buffer:String;
 	private var _pos:Int;
 	
 	public function new() 
@@ -37,15 +36,16 @@ private var _buffer:String;
 
 	public function readInt32() : Int
 	{ 
-		return this._decodeInt(32, true);
+		return this.decodeInt(32, true);
 	}
 
 	public function readDouble(): Float 
 	{ 
-		return this._decodeFloat(52, 11); 
+		return this.decodeFloat(52, 11); 
 	}
 	
-	public function seek(pos:Int) : Void {
+	public function seek(pos:Int) : Void 
+	{
 		this._pos = pos;
 	}
 	
@@ -59,8 +59,9 @@ private var _buffer:String;
 		return this._buffer.length;
 	}	
 	
-	private function _decodeInt(bits:Int, signed:Bool) : Int {
-		var x:Int = this._readBits(0, bits, Math.floor(bits / 8));
+	private function decodeInt(bits:Int, signed:Bool) : Int
+	{
+		var x:Int = this.readBits(0, bits, Math.floor(bits / 8));
 		var max:Int = Math.floor(Math.pow(2, bits));
 		var result:Int = (signed && x >= max / 2) ? x - max : x;
 
@@ -68,31 +69,36 @@ private var _buffer:String;
 		return result;
 	}
 	
-	private function _readBits(start, length, size) :Int{
+	private function readBits(start, length, size) :Int
+	{
 		var offsetLeft:Int = (start + length) % 8;
 		var offsetRight:Int = start % 8;
 		var curByte:Int = size - (start >> 3) - 1;
 		var lastByte:Int = size + (-(start + length) >> 3);
 		var diff:Int = curByte - lastByte;
 
-		var sum:Int = (this._readByte(curByte, size) >> offsetRight) & ((1 << (diff != 0 ? 8 - offsetRight : length)) - 1);
+		var sum:Int = (this.readByteForBits(curByte, size) >> offsetRight) & ((1 << (diff != 0 ? 8 - offsetRight : length)) - 1);
 
-		if (diff != 0 && offsetLeft != 0) {
-			sum += (this._readByte(lastByte++, size) & ((1 << offsetLeft) - 1)) << (diff-- << 3) - offsetRight; 
+		if (diff != 0 && offsetLeft != 0) 
+		{
+			sum += (this.readByteForBits(lastByte++, size) & ((1 << offsetLeft) - 1)) << (diff-- << 3) - offsetRight; 
 		}
 
-		while (diff != 0) {
-			sum += this._shl(this._readByte(lastByte++, size), (diff-- << 3) - offsetRight);
+		while (diff != 0) 
+		{
+			sum += this.shl(this.readByteForBits(lastByte++, size), (diff-- << 3) - offsetRight);
 		}
 
 		return sum;
 	}
 	
-	private function _readByte(i:Int, size:Int) : Int {
+	private function readByteForBits(i:Int, size:Int) : Int 
+	{
 		return this._buffer.charCodeAt(this._pos + size - i - 1) & 0xff;
 	}
 	
-	private function _shl1(a:Int) : Int {
+	private function shl1(a:Int) : Int 
+	{
 		a=a%0x80000000;
 		if (a&0x40000000==0x40000000)
 		{
@@ -104,34 +110,38 @@ private var _buffer:String;
 		return a;
 	}
 
-	private function _shl(a:Int, b:Int)  : Int{
+	private function shl(a:Int, b:Int) : Int
+	{
 		for (i in 0 ... b)
 		{
-			a = _shl1(a);
+			a = shl1(a);
 		}
 		return a;
 	}
 	
-	private function _decodeFloat(precisionBits:Int, exponentBits:Int):Float
+	private function decodeFloat(precisionBits:Int, exponentBits:Int):Float
 	{	
 		var length:Int = precisionBits + exponentBits + 1;
 		var size:Int = length >> 3;
 
 		var bias:Int = Math.floor(Math.pow(2, exponentBits - 1) - 1);
-		var signal:Int = this._readBits(precisionBits + exponentBits, 1, size);
-		var exponent:Int = this._readBits(precisionBits, exponentBits, size);
+		var signal:Int = this.readBits(precisionBits + exponentBits, 1, size);
+		var exponent:Int = this.readBits(precisionBits, exponentBits, size);
 		var significand:Float = 0;
 		var divisor:Int = 2;
 		var curByte:Int = length + ( -precisionBits >> 3) - 1;
 		var startBit:Int;
-		do {
-			var byteValue:Int = this._readByte(++curByte, size);
+		do 
+		{
+			var byteValue:Int = this.readByteForBits(++curByte, size);
 			startBit = precisionBits % 8;
 			if (startBit == 0)
 				startBit = 8;
 			var mask:Int = 1 << startBit;
-			while ((mask >>= 1) != 0) {
-				if ((byteValue & mask) != 0) {
+			while ((mask >>= 1) != 0) 
+			{
+				if ((byteValue & mask) != 0) 
+				{
 					significand += 1 / divisor;
 				}
 				divisor *= 2;

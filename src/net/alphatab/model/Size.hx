@@ -1,19 +1,16 @@
-/**
- * ...
- * @author Daniel Kuschny
- */
-
 package net.alphatab.model;
 
+/**
+ * A size (width/height) construct
+ */
 class Size 
 {
-	public var Width:Int;
-	public var Height:Int;
+	public var width:Int;
+	public var height:Int;
 	
 	public function new(width:Int, height:Int) 
 	{
-		this.Width = width;
-		this.Height = height;
-	}
-	
+		this.width = width;
+		this.height = height;
+	}	
 }

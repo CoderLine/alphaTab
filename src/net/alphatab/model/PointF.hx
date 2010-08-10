@@ -1,19 +1,16 @@
-/**
- * ...
- * @author Daniel Kuschny
- */
-
 package net.alphatab.model;
 
+/**
+ * A point construct using floating point coordinates.
+ */
 class PointF
 {
-	public var X:Float;
-	public var Y:Float;
+	public var x:Float;
+	public var y:Float;
 	
 	public function new(x:Float, y:Float) 
 	{
-		this.X = x;
-		this.Y = y;
-	}
-	
+		this.x = x;
+		this.y = y;
+	}	
 }

@@ -1,10 +1,8 @@
-/**
- * ...
- * @author Daniel Kuschny
- */
-
 package net.alphatab;
 
+/**
+ * A custom trace implementation to customize the output.
+ */
 class MyTrace 
 {
     public static function init() {
@@ -12,6 +10,7 @@ class MyTrace
     }
 
     private static function trace( v : Dynamic, ?i : haxe.PosInfos ) {
+		// uncomment this part to enable logging. 
 		/*untyped {
 			var msg = if ( i != null ) i.fileName + ":" + i.lineNumber + ": " else "";
 			msg += " " + time() + " - ";

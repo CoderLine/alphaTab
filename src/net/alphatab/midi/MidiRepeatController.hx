@@ -1,16 +1,14 @@
-/**
- * ...
- * @author Daniel Kuschny
- */
-
 package net.alphatab.midi;
-import net.alphatab.model.GsMeasureHeader;
-import net.alphatab.model.GsSong;
+import net.alphatab.model.MeasureHeader;
+import net.alphatab.model.Song;
 
+/**
+ * This controller provides correct the measure indexes. (Repeating)
+ */
 class MidiRepeatController 
 {
 	private var _count:Int;
-	private var _song:GsSong;
+	private var _song:Song;
 
 	private var _lastIndex:Int;
 	private var _repeatAlternative:Int;
@@ -19,42 +17,43 @@ class MidiRepeatController
 	private var _repeatOpen:Bool;
 	private var _repeatStart:Int;
 	private var _repeatStartIndex:Int;
+	
+	public var index:Int;
+	public var repeatMove:Int;
+	public var shouldPlay:Bool;
 
-	public function new(song:GsSong)
+	public function new(song:Song)
 	{
 		_song = song;
-		_count = song.MeasureHeaders.length;
-		Index = 0;
+		_count = song.measureHeaders.length;
+		index = 0;
 		_lastIndex = -1;
-		ShouldPlay = true;
+		shouldPlay = true;
 		_repeatOpen = true;
 		_repeatAlternative = 0;
 		_repeatStart = 960;
 		_repeatEnd = 0;
-		RepeatMove = 0;
+		repeatMove = 0;
 		_repeatStartIndex = 0;
 		_repeatNumber = 0;
 	}
-	public function Finished() : Bool
+	
+	public function finished() : Bool
 	{
-		return (Index >= _count); 
+		return (index >= _count); 
 	}
-	public var Index:Int;
 
-	public var RepeatMove:Int;
 
-	public var ShouldPlay:Bool;
-
-	public function Process() : Void
+	public function process() : Void
 	{
-		var header:GsMeasureHeader = _song.MeasureHeaders[Index];
-		ShouldPlay = true;
-		if (header.IsRepeatOpen)
+		var header:MeasureHeader = _song.measureHeaders[index];
+		shouldPlay = true;
+		if (header.isRepeatOpen)
 		{
-			_repeatStartIndex = Index;
-			_repeatStart = header.Start;
+			_repeatStartIndex = index;
+			_repeatStart = header.start;
 			_repeatOpen = true;
-			if (Index > _lastIndex)
+			if (index > _lastIndex)
 			{
 				_repeatNumber = 0;
 				_repeatAlternative = 0;
@@ -64,28 +63,28 @@ class MidiRepeatController
 		{
 			if (_repeatAlternative == 0)
 			{
-				_repeatAlternative = header.RepeatAlternative;
+				_repeatAlternative = header.repeatAlternative;
 			}
 			if ((_repeatOpen && (_repeatAlternative > 0)) && ((_repeatAlternative & (1 << _repeatNumber)) == 0))
 			{
-				RepeatMove -= header.Length();
-				if (header.RepeatClose > 0)
+				repeatMove -= header.length();
+				if (header.repeatClose > 0)
 				{
 					_repeatAlternative = 0;
 				}
-				ShouldPlay = false;
-				Index++;
+				shouldPlay = false;
+				index++;
 				return;
 			}
 		}
-		_lastIndex = Math.round(Math.max(_lastIndex, Index));
-		if (_repeatOpen && (header.RepeatClose > 0))
+		_lastIndex = Math.round(Math.max(_lastIndex, index));
+		if (_repeatOpen && (header.repeatClose > 0))
 		{
-			if ((_repeatNumber < header.RepeatClose) || (_repeatAlternative > 0))
+			if ((_repeatNumber < header.repeatClose) || (_repeatAlternative > 0))
 			{
-				_repeatEnd = header.Start + header.Length();
-				RepeatMove += _repeatEnd - _repeatStart;
-				Index = _repeatStartIndex - 1;
+				_repeatEnd = header.start + header.length();
+				repeatMove += _repeatEnd - _repeatStart;
+				index = _repeatStartIndex - 1;
 				_repeatNumber++;
 			}
 			else
@@ -97,6 +96,6 @@ class MidiRepeatController
 			}
 			_repeatAlternative = 0;
 		}
-		Index++;
+		index++;
 	}
 }

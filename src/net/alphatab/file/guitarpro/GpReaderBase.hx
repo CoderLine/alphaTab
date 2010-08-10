@@ -9,145 +9,137 @@ import haxe.io.Bytes;
 import haxe.io.Error;
 import haxe.io.Input;
 import net.alphatab.file.SongReader;
-import net.alphatab.model.GsSong;
-import net.alphatab.model.GsSongFactory;
+import net.alphatab.model.Song;
+import net.alphatab.model.SongFactory;
 import net.alphatab.platform.BinaryReader;
 
 class GpReaderBase extends SongReader
 {
-	public static inline var DefaultCharset:String = "UTF-8";
-	public static inline var BendPosition = 60;
-	public static inline var BendSemitone = 25;
+	public static inline var DEFAULT_CHARSET:String = "UTF-8";
+	public static inline var BEND_POSITION = 60;
+	public static inline var BEND_SEMITONE = 25;
 
-
-	private var SupportedVersions:Array<String>;
-	public var VersionIndex:Int;
-	public var Version:String;
+	private var _supportedVersions:Array<String>;
+	private var _versionIndex:Int;
+	private var _version:String;
 	
-	public function new(supportedVersions:Array<String>) 
+	public function new() 
 	{
 		super();
-		this.SupportedVersions = supportedVersions;
 	}
 	
-	public override function Init(data:BinaryReader, factory:GsSongFactory) : Void
+	public function initVersions(supportedVersions:Array<String>)
 	{
-		super.Init(data, factory);
+		_supportedVersions = supportedVersions;
 	}
 	
-	public function Skip(count:Int) : Void 
+	public function skip(count:Int) : Void 
 	{
 		for (i in 0 ... count) 
 		{
-			Data.readByte();
+			data.readByte();
 		}
 	}
 
-	public function ReadUnsignedByte() : Int
+	public function readUnsignedByte() : Int
 	{
-		return Data.readByte();
+		return data.readByte();
 	}
 
-	public function ReadBool() : Bool
+	public function readBool() : Bool
 	{
-		return Data.readByte() == 1;
+		return data.readByte() == 1;
 	}
 
-	public function ReadByte() : Int
+	public function readByte() : Int
 	{
 		// convert to signed byte
-		var data = Data.readByte() & 0xFF;
+		var data = data.readByte() & 0xFF;
 		return data > 127 ? -256 + data : data;
 	}
 	
-	public function Read() : Int
+	public function read() : Int
 	{
-		return ReadByte();
+		return readByte();
 	}
 	
-	public function ReadInt() : Int
+	public function readInt() : Int
 	{
-		return (Data.readInt32());
+		return (data.readInt32());
 	}
 	
-	public function ReadDouble() : Float
+	public function readDouble() : Float
 	{
-		return Data.readDouble();
+		return data.readDouble();
 	}
 	
-	public function ReadByteSizeString(size:Int, charset:String=DefaultCharset): String
+	public function readByteSizeString(size:Int, charset:String=DEFAULT_CHARSET): String
 	{
-		return ReadString(size, ReadUnsignedByte(), charset);
+		return readString(size, readUnsignedByte(), charset);
 	}
 
-	public function ReadString(size:Int, len:Int = -2, charset:String=DefaultCharset): String
+	public function readString(size:Int, len:Int = -2, charset:String=DEFAULT_CHARSET): String
 	{
 		if(len == -2)
 			len = size;
 		
-			
 		var count:Int = (size > 0 ? size : len);
-		var s:String = this.ReadStringInternal(count);
+		var s:String = readStringInternal(count);
 		return s.substr(0, (len >= 0 ? len : size));
 	}
 	
-	private function ReadStringInternal(length:Int) : String
+	private function readStringInternal(length:Int) : String
 	{
 		var text:String = "";
 		for (i in 0 ... length)
 		{
-			text += String.fromCharCode(ReadByte());
+			text += String.fromCharCode(readByte());
 		}
 		return text;
 	}
 
-	public function ReadIntSizeCheckByteString(charset:String=DefaultCharset): String
+	public function readIntSizeCheckByteString(charset:String=DEFAULT_CHARSET): String
 	{
-		return ReadByteSizeString((ReadInt() - 1), charset);
+		return readByteSizeString((readInt() - 1), charset);
 	}        
 	
-	public function ReadByteSizeCheckByteString(charset:String=DefaultCharset): String
+	public function readByteSizeCheckByteString(charset:String=DEFAULT_CHARSET): String
 	{
-		return ReadByteSizeString((ReadUnsignedByte() - 1), charset);
+		return readByteSizeString((readUnsignedByte() - 1), charset);
 	}        
 
-	public function ReadIntSizeString(charset:String=DefaultCharset): String
+	public function readIntSizeString(charset:String=DEFAULT_CHARSET): String
 	{
-		return ReadString(ReadInt(), -2, charset);
-	}
-
-	private static function NewString(bytes:Bytes, length:Int, charset:String) : String
-	{
-		return bytes.toString().substr(0, length);
+		return readString(readInt(), -2, charset);
 	}
 	
-	public function ReadVersion() : Bool
+	public function readVersion() : Bool
 	{
 		try
 		{
-			if(Version == null)
+			if(_version == null)
 			{
-				Version = ReadByteSizeString(30, DefaultCharset);
+				_version = readByteSizeString(30, DEFAULT_CHARSET);
 			}
 			// check for compatibility
-			for(i in 0 ... SupportedVersions.length)
+			for(i in 0 ... _supportedVersions.length)
 			{
-				var current:String = SupportedVersions[i];
-				if(Version == current)
+				var current:String = _supportedVersions[i];
+				if(_version == current)
 				{
-					VersionIndex = i;
+					_versionIndex = i;
 					return true;
 				}
 			}
 		}
-		catch(e:Error)
+		catch(e:Dynamic)
 		{
-			Version = "Not Supported";
+			_version = "Not Supported";
 		}
 		return false;
 	}
 	
-	public static function ToChannelShort(data:Int): Int
+	public static function toChannelShort(data:Int): Int
 	{
 		var value:Int = Math.floor(Math.max(-32768, Math.min(32767, (data*8)-1)));
 		return Math.floor(Math.max(value, -1));

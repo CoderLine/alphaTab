@@ -1,221 +1,221 @@
-/**
- * ...
- * @author Daniel Kuschny
- */
-
 package net.alphatab.tablature;
 
 import haxe.Log;
 import net.alphatab.midi.MidiRepeatController;
-import net.alphatab.model.GsBeat;
-import net.alphatab.model.GsDuration;
-import net.alphatab.model.GsMeasure;
-import net.alphatab.model.GsMeasureHeader;
-import net.alphatab.model.GsSong;
-import net.alphatab.model.GsTrack;
-import net.alphatab.model.GsVoice;
+import net.alphatab.model.Beat;
+import net.alphatab.model.Duration;
+import net.alphatab.model.Measure;
+import net.alphatab.model.MeasureHeader;
+import net.alphatab.model.Song;
+import net.alphatab.model.Track;
+import net.alphatab.model.Voice;
 import net.alphatab.model.Rectangle;
 import net.alphatab.model.Size;
 import net.alphatab.model.SongManager;
 import net.alphatab.platform.Canvas;
 import net.alphatab.platform.PlatformFactory;
 import net.alphatab.tablature.drawing.DrawingResources;
-import net.alphatab.tablature.model.GsBeatImpl;
-import net.alphatab.tablature.model.GsMeasureImpl;
-import net.alphatab.tablature.model.GsSongFactoryImpl;
+import net.alphatab.tablature.model.BeatImpl;
+import net.alphatab.tablature.model.MeasureImpl;
+import net.alphatab.tablature.model.SongFactoryImpl;
 
+/**
+ * A helper type used for searching measures. 
+ */
 typedef MeasureSearchResult = {
-    var measure : GsMeasureImpl;
+    var measure : MeasureImpl;
     var realPosition : Int;
 }
 
-
+/**
+ * A control which renders a tablature and music notation into a canvas
+ */
 class Tablature 
 {
-	public var Canvas : Canvas;
-	public var IsError:Bool;
-	public var ErrorMessage:String;
-	public var Width:Int;
-	public var Height:Int;
-	public var ViewLayout:ViewLayout;
-	public var Track:GsTrack;
+	private var _updateDisplay:Bool;
+	private var _updateSong:Bool;
 	
-	private var UpdateDisplay:Bool;
-	private var UpdateSong:Bool;
+	public var canvas : Canvas;
+	public var isError:Bool;
+	public var errorMessage:String;
+	public var viewLayout:ViewLayout;
+	public var track:Track;
+	public var autoSizeWidth:Bool;
+	public var onCaretChanged:BeatImpl->Void;
+	public var songManager:SongManager;
+
 	
-	public var OnCaretChanged:GsBeatImpl->Void;
-	
-	public var SongManager:SongManager;
-	
-	public function new(source:Dynamic, errorMessage:String = "") 
+	public function new(source:Dynamic, msg:String = "") 
 	{
-		this.Canvas = PlatformFactory.GetCanvas(source);
-		this.Track = null;
-		this.SongManager = new SongManager(new GsSongFactoryImpl());
+		canvas = PlatformFactory.getCanvas(source);
+		track = null;
+		songManager = new SongManager(new SongFactoryImpl());
 		
-		this.ErrorMessage = StringTools.trim(errorMessage);
+		errorMessage = StringTools.trim(msg);
 		
-		if (this.ErrorMessage == "" || this.ErrorMessage == null) 
+		if (errorMessage == "" || errorMessage == null) 
 		{ 
-			this.ErrorMessage = "Please set a song's track to display the tablature";
+			errorMessage = "Please set a song's track to display the tablature";
 		}
-		this.Width = this.Canvas.Width();
-		this.Height = this.Canvas.Height();
-		this.ViewLayout = new PageViewLayout();
-		this.ViewLayout.SetTablature(this);
-		this.UpdateScale(1.0);	
+		
+		
+		
+		viewLayout = new PageViewLayout();
+		viewLayout.setTablature(this);
+		updateScale(1.0);	
 	}
 	
-	public function SetTrack(track:GsTrack) : Void 
+	public function setTrack(track:Track) : Void 
 	{
 		Log.trace("Updating Track");
-		this.Track = track;
-		this.UpdateSong = true;
-		this.UpdateDisplay = true;
-		this.UpdateTablature();
-		this.Invalidate();
+		this.track = track;
+		_updateSong = true;
+		_updateDisplay = true;
+		updateTablature();
+		invalidate();
 	}
 	
-	public function UpdateScale(scale:Float) : Void 
+	public function updateScale(scale:Float) : Void 
 	{ 
-		DrawingResources.Init(scale);
-		this.ViewLayout.Init(scale);
-		this.UpdateSong = true;
-		this.UpdateTablature();
-		this.UpdateDisplay = true;
-		this.Invalidate();
+		DrawingResources.init(scale);
+		viewLayout.init(scale);
+		_updateSong = true;
+		_updateDisplay = true;
+		updateTablature();
+		invalidate();
 	}
 	
-	public function DoLayout() : Void 
+	public function doLayout() : Void 
 	{
-		if (this.Track == null)
+		if (track == null)
 			return;
 		Log.trace("Starting layouting");
-		var size:Size = this.ViewLayout.LayoutSize;
-		this.ViewLayout.PrepareLayout(new Rectangle(0, 0, size.Width, size.Height), 0, 0);
-		
-		// store size
-		this.Width = this.ViewLayout.Width;
-		this.Height = this.ViewLayout.Height;
+		var size:Size = viewLayout.layoutSize;
+		if (!autoSizeWidth) 
+		{
+			size.width = canvas.width() - viewLayout.contentPadding.getHorizontal();
+		}
+		viewLayout.prepareLayout(new Rectangle(0, 0, size.width, size.height), 0, 0);
 		
 		// update canvas
-		this.Canvas.SetWidth(this.ViewLayout.Width);
-		this.Canvas.SetHeight(this.ViewLayout.Height);
+		if(autoSizeWidth)
+			canvas.setWidth(viewLayout.width);
+		canvas.setHeight(viewLayout.height);
 
 		Log.trace("Layouting finished");
 	}
 	
-	public function OnPaint() 
+	public function onPaint() 
 	{		
-		this.PaintBackground();
+		this.paintBackground();
 		
-		if (this.Track == null || IsError) 
+		if (track == null || isError) 
 		{
-			var text = this.ErrorMessage;
+			var text = errorMessage;
 			
-			this.Canvas.fillStyle = "#4e4e4e";
-			this.Canvas.font = "20px 'Arial'";
-			this.Canvas.textBaseline = "middle";
-			this.Canvas.fillText(text, 20, 30);
+			canvas.fillStyle = "#4e4e4e";
+			canvas.font = "20px 'Arial'";
+			canvas.textBaseline = "middle";
+			canvas.fillText(text, 20, 30);
 		}
-		else if(UpdateDisplay)
+		else if(_updateDisplay)
 		{
-			var displayRect:Rectangle = new Rectangle(0, 0, this.Width, this.Height);
-			this.ViewLayout.UpdateCache(this.Canvas, displayRect, 0, 0);
-			this.UpdateDisplay = false;
+			var displayRect:Rectangle = new Rectangle(0, 0, canvas.width(), canvas.height());
+			viewLayout.updateCache(canvas, displayRect, 0, 0);
+			_updateDisplay = false;
 		}
 		else
 		{
-			var displayRect:Rectangle = new Rectangle(0, 0, this.Width, this.Height);
-			this.ViewLayout.PaintCache(this.Canvas, displayRect, 0, 0);
-			this.UpdateDisplay = false;
+			var displayRect:Rectangle = new Rectangle(0, 0, canvas.width(), canvas.height());
+			viewLayout.paintCache(canvas, displayRect, 0, 0);
+			_updateDisplay = false;
 		}
 		Log.trace("Drawing Finished");
 	}
 	
-	public function UpdateTablature()
+	public function updateTablature()
 	{
-		if (this.Track == null) return;
+		if (track == null) return;
 		
-		this.ViewLayout.UpdateSong();
-        this.DoLayout();
-        this.UpdateSong = false;
+		viewLayout.updateSong();
+        doLayout();
+        _updateSong = false;
 	}
 	 
-	public function PaintBackground() {
-		// attention, you are not allowed to remove change this notice within any version of this library without permission
+	public function paintBackground() {
+		// attention, you are not allowed to remove change this notice within any version of this library without permission!
 		var msg = "Rendered using alphaTab (http://www.alphaTab.net)";
-		this.Canvas.fillStyle = "#4e4e4e";
-		this.Canvas.font = DrawingResources.CopyrightFont;
-		this.Canvas.textBaseline = "top";
-		var x:Float = (Canvas.Width() - this.Canvas.measureText(msg).width) / 2;
-		this.Canvas.fillText(msg, x, this.Canvas.Height() - 15);
+		canvas.fillStyle = "#4e4e4e";
+		canvas.font = DrawingResources.copyrightFont;
+		canvas.textBaseline = "top";
+		var x:Float = (canvas.width() - canvas.measureText(msg)) / 2;
+		canvas.fillText(msg, x, canvas.height() - 15);
 	}
 	
-	public function Invalidate() 
+	public function invalidate() 
 	{
-		this.Canvas.clearRect(0, 0, this.Canvas.Width(), this.Canvas.Height());
-		this.OnPaint();
+		canvas.clearRect(0, 0, canvas.width(), canvas.height());
+		this.onPaint();
 	}
 	
 	// Caret
 	
 	private var _lastPosition:Int; 
 	private var _lastRealPosition:Int; 
-	private var _selectedBeat:GsBeat; 
+	private var _selectedBeat:Beat; 
 	
-	public function NotifyTickPosition(position:Int)
+	public function notifyTickPosition(position:Int)
 	{
-		position -= GsDuration.QuarterTime; // remove first tick start
+		position -= Duration.QUARTER_TIME; // remove first tick start
 		if (position != _lastPosition)
 		{
 			_lastPosition = position;
-			var result:MeasureSearchResult = FindMeasure(position);
+			var result:MeasureSearchResult = findMeasure(position);
 			var realPosition:Int = result.realPosition;
 			_lastRealPosition = realPosition;
-			var measure:GsMeasureImpl = result.measure;
-			var beat:GsBeatImpl = cast FindBeat(realPosition, position, measure);
+			var measure:MeasureImpl = result.measure;
+			var beat:BeatImpl = cast findBeat(realPosition, position, measure);
 			if (measure != null && beat != null)
 			{
 				_selectedBeat = beat;
-				 if (OnCaretChanged != null)
-					OnCaretChanged(beat);
+				 if (onCaretChanged != null)
+					onCaretChanged(beat);
 			}
 		}
 	}
 	
-	private function FindMeasure(position:Int):MeasureSearchResult
+	private function findMeasure(position:Int):MeasureSearchResult
 	{		
-		var result:MeasureSearchResult = GetMeasureAt(position);
+		var result:MeasureSearchResult = getMeasureAt(position);
 		if (result.measure == null)
 		{
-			result.measure = cast SongManager.GetFirstMeasure(Track);
+			result.measure = cast songManager.getFirstMeasure(track);
 		}
 		return result;
 	}
 	
-	private function GetMeasureAt(tick:Int) : MeasureSearchResult
+	private function getMeasureAt(tick:Int) : MeasureSearchResult
 	{
-		var start:Int = GsDuration.QuarterTime;
+		var start:Int = Duration.QUARTER_TIME;
 		var result:MeasureSearchResult = { measure:null, realPosition: start };
-		var song:GsSong = Track.Song;
+		var song:Song = track.song;
 		var controller:MidiRepeatController = new MidiRepeatController(song);
 		// start at current measure
 		if (_selectedBeat != null && tick > _lastPosition)
 		{		
-			controller.Index = _selectedBeat.Measure.Number() - 1;
+			controller.index = _selectedBeat.measure.number() - 1;
 			start = _lastRealPosition;
 		}
-		while (!controller.Finished())
+		while (!controller.finished())
 		{
-			var header:GsMeasureHeader = song.MeasureHeaders[controller.Index];
-			controller.Process();
-			if (controller.ShouldPlay)
+			var header:MeasureHeader = song.measureHeaders[controller.index];
+			controller.process();
+			if (controller.shouldPlay)
 			{
-				var length:Int = header.Length();
+				var length:Int = header.length();
 				if (tick >= start && tick < (start + length))
 				{
-					result.measure = cast Track.Measures[header.Number - 1];
+					result.measure = cast track.measures[header.number - 1];
 					result.realPosition = start;
 					return result;
 				}
@@ -226,22 +226,22 @@ class Tablature
 		return result;
 	}
 	
-	private function FindBeat(measurePosition:Int, playerPosition:Int, measure:GsMeasure) : GsBeat
+	private function findBeat(measurePosition:Int, playerPosition:Int, measure:Measure) : Beat
 	{
 		if (measure != null)
 		{
-			for (beat in measure.Beats)
+			for (beat in measure.beats)
 			{
-				var realBeat:Int = measurePosition + (beat.Start - measure.Start());
-				var voice:GsVoice = beat.Voices[0];
+				var realBeat:Int = measurePosition + (beat.start - measure.start());
+				var voice:Voice = beat.voices[0];
 				
 				// player position inbetween start and end of beat position
-				if (!voice.IsEmpty && realBeat <= playerPosition && (realBeat + voice.Duration.Time()) > playerPosition)
+				if (!voice.isEmpty && realBeat <= playerPosition && (realBeat + voice.duration.time()) > playerPosition)
 				{
 					return beat;
 				}
 			}
-			return SongManager.GetFirstBeat(measure.Beats);
+			return songManager.getFirstBeat(measure.beats);
 		}
 		return null;
 	}	

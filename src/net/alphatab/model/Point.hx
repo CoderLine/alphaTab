@@ -1,19 +1,16 @@
-/**
- * ...
- * @author Daniel Kuschny
- */
-
 package net.alphatab.model;
 
+/**
+ * A point construct
+ */
 class Point 
 {
-	public var X:Int;
-	public var Y:Int;
+	public var x:Int;
+	public var y:Int;
 	
 	public function new(x:Int, y:Int) 
 	{
-		this.X = x;
-		this.Y = y;
-	}
-	
+		this.x = x;
+		this.y = y;
+	}	
 }

@@ -1,56 +1,54 @@
-/**
- * ...
- * @author Daniel Kuschny
- */
-
 package net.alphatab.tablature.drawing;
-import net.alphatab.model.GsColor;
-import net.alphatab.model.GsColor;
+import net.alphatab.model.Color;
+import net.alphatab.model.Color;
 import net.alphatab.platform.Canvas;
 
+/**
+ * A drawing context is a set of drawing layers. 
+ */
 class DrawingContext 
 {
-	public var Layers:Array<Dynamic>;
-	public var Graphics:Canvas;
+	public var layers:Array<DrawingLayer>;
+	public var graphics:Canvas;
 	
 	public function new(scale:Float) 
 	{
-		this.Layers = new Array<Dynamic>();
-		this.Layers[DrawingLayersConverter.ToInt(DrawingLayers.Background)] = new DrawingLayer(new GsColor(205, 205, 205), true, 0);
-		this.Layers[DrawingLayersConverter.ToInt(DrawingLayers.LayoutBackground)] = new DrawingLayer(new GsColor(34,34,17), true, 0);
-		this.Layers[DrawingLayersConverter.ToInt(DrawingLayers.Lines)] = new DrawingLayer(new GsColor(165, 165, 165), false, 1);
-		this.Layers[DrawingLayersConverter.ToInt(DrawingLayers.MainComponents)] = new DrawingLayer(new GsColor(34,34,17), true, 0);
-		this.Layers[DrawingLayersConverter.ToInt(DrawingLayers.MainComponentsDraw)] = new DrawingLayer(new GsColor(34,34,17), false, 1*scale);
-		this.Layers[DrawingLayersConverter.ToInt(DrawingLayers.Voice2)] = new DrawingLayer(new GsColor(206, 206, 206), true, 1);
-		this.Layers[DrawingLayersConverter.ToInt(DrawingLayers.VoiceEffects2)] = new DrawingLayer(new GsColor(183,183,183), true, 0);
-		this.Layers[DrawingLayersConverter.ToInt(DrawingLayers.VoiceEffectsDraw2)] = new DrawingLayer(new GsColor(183,183,183), false, 1*scale);
-		this.Layers[DrawingLayersConverter.ToInt(DrawingLayers.VoiceDraw2)] = new DrawingLayer(new GsColor(206, 206, 206), false, 1*scale);
-		this.Layers[DrawingLayersConverter.ToInt(DrawingLayers.Voice1)] = new DrawingLayer(new GsColor(34,34,17), true, 1);
-		this.Layers[DrawingLayersConverter.ToInt(DrawingLayers.VoiceEffects1)] = new DrawingLayer(new GsColor(34,34,17), true, 0);
-		this.Layers[DrawingLayersConverter.ToInt(DrawingLayers.VoiceEffectsDraw1)] = new DrawingLayer(new GsColor(34,34,17), false, 1*scale);
-		this.Layers[DrawingLayersConverter.ToInt(DrawingLayers.VoiceDraw1)] = new DrawingLayer(new GsColor(34,34,17), false, 1*scale);
-		this.Layers[DrawingLayersConverter.ToInt(DrawingLayers.Red)] = new DrawingLayer(new GsColor(255,0,0), true, 0);
+		this.layers = new Array<DrawingLayer>();
+		this.layers[DrawingLayersConverter.toInt(DrawingLayers.Background)] = new DrawingLayer(new Color(205, 205, 205), true, 0);
+		this.layers[DrawingLayersConverter.toInt(DrawingLayers.LayoutBackground)] = new DrawingLayer(new Color(34,34,17), true, 0);
+		this.layers[DrawingLayersConverter.toInt(DrawingLayers.Lines)] = new DrawingLayer(new Color(165, 165, 165), false, 1);
+		this.layers[DrawingLayersConverter.toInt(DrawingLayers.MainComponents)] = new DrawingLayer(new Color(34,34,17), true, 0);
+		this.layers[DrawingLayersConverter.toInt(DrawingLayers.MainComponentsDraw)] = new DrawingLayer(new Color(34,34,17), false, 1*scale);
+		this.layers[DrawingLayersConverter.toInt(DrawingLayers.Voice2)] = new DrawingLayer(new Color(206, 206, 206), true, 1);
+		this.layers[DrawingLayersConverter.toInt(DrawingLayers.VoiceEffects2)] = new DrawingLayer(new Color(183,183,183), true, 0);
+		this.layers[DrawingLayersConverter.toInt(DrawingLayers.VoiceEffectsDraw2)] = new DrawingLayer(new Color(183,183,183), false, 1*scale);
+		this.layers[DrawingLayersConverter.toInt(DrawingLayers.VoiceDraw2)] = new DrawingLayer(new Color(206, 206, 206), false, 1*scale);
+		this.layers[DrawingLayersConverter.toInt(DrawingLayers.Voice1)] = new DrawingLayer(new Color(34,34,17), true, 1);
+		this.layers[DrawingLayersConverter.toInt(DrawingLayers.VoiceEffects1)] = new DrawingLayer(new Color(34,34,17), true, 0);
+		this.layers[DrawingLayersConverter.toInt(DrawingLayers.VoiceEffectsDraw1)] = new DrawingLayer(new Color(34,34,17), false, 1*scale);
+		this.layers[DrawingLayersConverter.toInt(DrawingLayers.VoiceDraw1)] = new DrawingLayer(new Color(34,34,17), false, 1*scale);
+		this.layers[DrawingLayersConverter.toInt(DrawingLayers.Red)] = new DrawingLayer(new Color(255,0,0), true, 0);
 	}
 	
-	public function Draw() : Void
+	public function draw() : Void
 	{
-		for (i in 0 ... this.Layers.length) 
+		for (i in 0 ... this.layers.length) 
 		{
-			this.Layers[i].Draw(this.Graphics);
+			this.layers[i].draw(this.graphics);
 		}
 	}
 	
-	public function Clear() : Void
+	public function clear() : Void
 	{
-		for (i in 0 ... this.Layers.length) 
+		for (i in 0 ... this.layers.length) 
 		{
-			this.Layers[i].Clear();
+			this.layers[i].clear();
 		}
 	}	
 	
-	public function Get(layer:DrawingLayers) : DrawingLayer
+	public function get(layer:DrawingLayers) : DrawingLayer
 	{
-		var index:Int = DrawingLayersConverter.ToInt(layer);
-		return this.Layers[index];
+		var index:Int = DrawingLayersConverter.toInt(layer);
+		return this.layers[index];
 	}
 }

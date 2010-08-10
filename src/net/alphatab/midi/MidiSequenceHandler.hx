@@ -1,75 +1,69 @@
-/**
- * ...
- * @author Daniel Kuschny
- */
-
 package net.alphatab.midi;
 import js.Lib;
-import net.alphatab.model.GsDuration;
-import net.alphatab.model.GsTimeSignature;
+import net.alphatab.model.Duration;
+import net.alphatab.model.TimeSignature;
 
+/**
+ * This handler provides creating of a midi commandset.
+ */
 class MidiSequenceHandler 
 {
-	public var InfoTrack:Int;
-	public var MetronomeTrack:Int;
-	public var Tracks:Int;
-	
 	private var _commands:Array<String>;
-	public var Commands:String;
-	
-	
+
+	public var infoTrack:Int;
+	public var metronomeTrack:Int;
+	public var commands:String;
+
 	public function new(tracks:Int)
 	{
-		Tracks = tracks;
-		InfoTrack = 0;
-		MetronomeTrack = tracks - 1;
+		infoTrack = 0;
+		metronomeTrack = tracks - 1;
 		_commands = new Array<String>();
 	}
 	
-	private function AddEvent(track:Int, tick:Int, evt:String) :Void
+	private function addEvent(track:Int, tick:Int, evt:String) :Void
 	{
-		var command:String = MidiMessageUtils.IntToString(track) + "|" + MidiMessageUtils.IntToString(tick) + "|" + evt;
+		var command:String = MidiMessageUtils.intToString(track) + "|" + MidiMessageUtils.intToString(tick) + "|" + evt;
 		_commands.push(command);
 	}
 
-	public function AddControlChange(tick:Int, track:Int, channel:Int, controller:Int, value:Int):Void
+	public function addControlChange(tick:Int, track:Int, channel:Int, controller:Int, value:Int):Void
 	{
-		AddEvent(track, tick, MidiMessageUtils.ControlChange(channel, controller, value));
+		addEvent(track, tick, MidiMessageUtils.controlChange(channel, controller, value));
 	}
 	
-	public function AddNoteOff(tick:Int, track:Int, channel:Int, note:Int, velocity:Int):Void
+	public function addNoteOff(tick:Int, track:Int, channel:Int, note:Int, velocity:Int):Void
 	{
-		AddEvent(track, tick, MidiMessageUtils.NoteOff(channel, note, velocity));
+		addEvent(track, tick, MidiMessageUtils.noteOff(channel, note, velocity));
 	}
 	
-	public function AddNoteOn(tick:Int, track:Int, channel:Int, note:Int, velocity:Int):Void
+	public function addNoteOn(tick:Int, track:Int, channel:Int, note:Int, velocity:Int):Void
 	{
-		AddEvent(track, tick, MidiMessageUtils.NoteOn(channel, note, velocity));
+		addEvent(track, tick, MidiMessageUtils.noteOn(channel, note, velocity));
 	}
 	
-	public function AddPitchBend(tick:Int, track:Int, channel:Int, value:Int):Void
+	public function addPitchBend(tick:Int, track:Int, channel:Int, value:Int):Void
 	{
-        AddEvent(track, tick, MidiMessageUtils.PitchBend(channel, value));
+        addEvent(track, tick, MidiMessageUtils.pitchBend(channel, value));
 	}
 	
-	public function AddProgramChange(tick:Int, track:Int, channel:Int, instrument:Int):Void
+	public function addProgramChange(tick:Int, track:Int, channel:Int, instrument:Int):Void
 	{
-        AddEvent(track, tick, MidiMessageUtils.ProgramChange(channel, instrument));
+        addEvent(track, tick, MidiMessageUtils.programChange(channel, instrument));
 	}
 	
-	public function AddTempoInUSQ(tick:Int, track:Int, usq:Int):Void
+	public function addTempoInUSQ(tick:Int, track:Int, usq:Int):Void
 	{
-		AddEvent(track, tick, MidiMessageUtils.TempoInUSQ(usq));
+		addEvent(track, tick, MidiMessageUtils.tempoInUSQ(usq));
 	}
 	
-	public function AddTimeSignature(tick:Int, track:Int, timeSignature:GsTimeSignature):Void
+	public function addTimeSignature(tick:Int, track:Int, timeSignature:TimeSignature):Void
 	{
-        AddEvent(track, tick, MidiMessageUtils.TimeSignature(timeSignature));
+        addEvent(track, tick, MidiMessageUtils.timeSignature(timeSignature));
 	}
 	
-	public function NotifyFinish():Void
+	public function notifyFinish():Void
 	{
-		// Tracks InfoTrack MetronomeTrack Commands
-		Commands = MidiMessageUtils.IntToString(MetronomeTrack) + ";" + _commands.join(";");
+		commands = MidiMessageUtils.intToString(metronomeTrack) + ";" + _commands.join(";");
 	}
 }
