@@ -5,39 +5,35 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<meta http-equiv="Pragma" content="no-cache">
-        <title>alphaTab - Development Showcase</title>
-		<!--[if IE]><script type="text/javascript" src="excanvas.js"></script><![endif]-->
-        <script language="JavaScript" type="text/javascript" src="jquery.js">
-        </script>
-		<script language="JavaScript" type="text/javascript" src="jquery.scrollto.js">
-        </script>
-        <script language="JavaScript" type="text/javascript" src="jquery.alphatab.js">
-        </script>
-        <script language="JavaScript" type="text/javascript" src="alphaTab.js">
-        </script>
-        <script language="JavaScript" type="text/javascript" src="alphaTabTesterPlayer.js">
-        </script>
-       
-        <style type="text/css">@import url('style.css');
-        </style>
+        <title>alphaTab - Demo</title>
+		<!-- Dependencies -->
+		<!--[if IE]><script language="JavaScript" type="text/javascript" src="../lib/swfobject/swfobject.js"></script><![endif]-->
+		<!--[if IE]><script language="JavaScript" type="text/javascript" src="../lib/excanvas/excanvas.js"></script><![endif]-->
+		<script language="JavaScript" type="text/javascript" src="../lib/jquery/jquery.min.js"></script>
+		
+		<!-- alphaTab -->
+		<script language="JavaScript" type="text/javascript" src="../lib/alphaTab/alphaTab.js"></script>
+		<script language="JavaScript" type="text/javascript" src="../lib/alphaTab/jquery.alphaTab.js"></script>
+		
+		<script language="JavaScript" type="text/javascript" src="lib/player.js"></script>
+		
+        <style type="text/css">@import url('style.css');</style>
     </head>
     <body>
 		<div id="TopNavWrapper">
 			<div id="TopNav">
 				<a href="http://www.alphatab.net" id="AlphaTabLogo" title="Home"></a>
 				<ul>
-					<li><a href="index.html">Normal</a></li>
-					<li class="active"><a href="indexplayer.html">Player</a></li>
-					<li><a href="indexeditor.html">Editor</a></li>
-					<li><a href="http://project.coderline.net">Blog</a></li>
+					<li class="active"><a href="index.html">Normal</a></li>
+					<li><a href="player.html">Player</a></li>
+					<li><a href="alphaTex.html">Editor</a></li>
 				</ul>
 			</div>
 		</div>
 		<div id="Content">
-		<h1>alphaTab - Development Showcase</h1>
+		<h1>alphaTab - Demo</h1>
 		This file shows up how alphaTab works with GuitarPro files and shows the player feature.<br />
 		The player controls are on the bottom of the page. The player requires Java! <br />
-		<b>Build:</b> 23.07.2010 v0.2preAlpha<br />
 		<br />
         <select id="TestFile">
 			<option value="samples/Drums.gp5">Drums</option>

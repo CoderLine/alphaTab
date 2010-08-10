@@ -7,11 +7,12 @@
 		 errorCallback: null,
 		 error: "Load a file to display the tablature",
 		 track: 0,
-		 factory: new net.alphatab.tablature.model.GsSongFactoryImpl(),
+		 factory: new net.alphatab.tablature.model.SongFactoryImpl(),
 		 
 		 zoom: 1.1,
 		 width:600,
 		 height:200,
+		 autoSize: true,
 		 
 		 editor: false,
 		 
@@ -20,6 +21,7 @@
 		 caret: true,
 		 autoscroll: true,
 		 playerPath: 'alphaTab.jar',
+		 flashLoaderPath: 'flashLoader.swf',
 		 playerTickCallback: null
 	};
  
@@ -36,14 +38,38 @@
 		// create tablature
 		var canvas = $('<canvas width="'+options.width+'" height="'+options.height+'" class="alphaTabSurface"></canvas>');
 		container.append(canvas);
+		container.canvas = canvas;
 		
-		// check for excanvas 
+		// check for IE 
 		if($.browser.msie) {
 			canvas = $(G_vmlCanvasManager.fixDynamicElement(canvas[0]));
 		}
 		
+		// create hidden flashloader
+		/*if($('#alphaTabFlashLoaderContainer').length == 0)
+		{
+		var flashLoader = $('<div id="alphaTabFlashLoaderContainer"></div>');
+		container.append(flashLoader);
+		var flashvars = {
+		};
+		var params = {
+		menu: "false",
+		scale: "noScale",
+		allowFullscreen: "false",
+		allowScriptAccess: "always",
+		bgcolor: "#FFFFFF",
+		swliveconnect: "true"
+		};
+		var attributes = {
+		id:"alphaTabFlashLoader"
+		};
+		swfobject.embedSWF(options.flashLoaderPath, "alphaTabFlashLoaderContainer", "50px", "50px", "9.0.0", "expressInstall.swf", flashvars, params, attributes);
+		}*/
+
+		container.options = options;
 		container.tablature = new net.alphatab.tablature.Tablature(canvas[0], options.error);
-		container.tablature.UpdateScale(options.zoom);
+		container.tablature.autoSizeWidth = options.autoSize;
+		container.tablature.updateScale(options.zoom);
 				
 		var setPlayerData = function(data) {
 			if(!options.player)return;
@@ -54,25 +80,26 @@
 			else {
 				// disable buttons within playercontrols
 				$(container.playerControls).find('input').attr('disabled', true);
-				setTimeout(setPlayerData(data), 500);
+				// TODO: this doesn't work.
+				setTimeout("setPlayerData('"+data+"')", 500);
 			}
 		}
 		
 		var loadTablature = function(data) {
 			try
 			{
-				var parser = new net.alphatab.file.alphatab.AlphaTabParser();
+				var parser = new net.alphatab.file.alphatex.AlphaTexParser();
 				var reader = new net.alphatab.platform.BinaryReader();
-				container.tablature.IsError = false;
+				container.tablature.isError = false;
 				reader.initialize(data);
-				parser.Init(reader, options.factory);
-				var song = parser.ReadSong();
+				parser.init(reader, options.factory);
+				var song = parser.readSong();
 				if(options.loadCallback)
 					options.loadCallback(song);
-				container.tablature.SetTrack(song.Tracks[0]);
+				container.tablature.setTrack(song.tracks[0]);
 				
 				if(container.player)  {
-					var songData = net.alphatab.midi.MidiDataProvider.GetSongMidiData(song, options.factory);
+					var songData = net.alphatab.midi.MidiDataProvider.getSongMidiData(song, options.factory);
 					setPlayerData(songData);
 					container.updateCaret(0);
 				}
@@ -82,16 +109,16 @@
 				var err;
 				if(e instanceof net.alphatab.file.FileFormatException)
 				{
-					err = e.Message;
+					err = e.message;
 				}
 				else
 				{
 					err = e;
 				}
-				container.tablature.IsError = true;
-				container.tablature.UpdateDisplay = true;
-				container.tablature.ErrorMessage = err;
-				container.tablature.Invalidate();
+				container.tablature.isError = true;
+				container.tablature.updateDisplay = true;
+				container.tablature.errorMessage = err;
+				container.tablature.invalidate();
 			}
 		}
 		
@@ -100,13 +127,10 @@
 		container.loadFile = function(url) {
 			try
 			{
-				if($.browser.msie) {
-					alert("Warning: Internet Explorer doesn't support GuitarPro file loading. Please use a browser like Firefox or Chrome");
-				}
-				net.alphatab.file.SongLoader.LoadSong(url, options.factory, function(song) {
-					container.tablature.SetTrack(song.Tracks[options.track]);
+				net.alphatab.file.SongLoader.loadSong(url, options.factory, function(song) {
+					container.tablature.setTrack(song.tracks[options.track]);
 					if(container.player)  {
-						var songData = net.alphatab.midi.MidiDataProvider.GetSongMidiData(song, options.factory);
+						var songData = net.alphatab.midi.MidiDataProvider.getSongMidiData(song, options.factory);
 						setPlayerData(songData);
 						container.updateCaret(0);
 					}
@@ -120,7 +144,7 @@
 				var err;
 				if(e instanceof net.alphatab.file.FileFormatException)
 				{
-					err = e.Message;
+					err = e.message;
 				}
 				else
 				{
@@ -205,27 +229,27 @@
 				
 				container.updateCaret = function(tickPos) {
 					setTimeout(function(){
-						container.tablature.NotifyTickPosition(tickPos);
+						container.tablature.notifyTickPosition(tickPos);
 					}, 1);
 				}
 				
-				container.tablature.OnCaretChanged = function(beat)
+				container.tablature.onCaretChanged = function(beat)
 				{
 					var x = canvas.offset().left;
 					var y = canvas.offset().top;
 
-					y += beat.MeasureImpl().PosY;
+					y += beat.measureImpl().posY;
 					
 					
-					measureCaret.offset({ top: y, left: x + beat.MeasureImpl().PosX});
-					measureCaret.width(beat.MeasureImpl().Width + beat.MeasureImpl().Spacing);
-					measureCaret.height(beat.MeasureImpl().Height());
+					measureCaret.offset({ top: y, left: x + beat.measureImpl().posX});
+					measureCaret.width(beat.measureImpl().width + beat.measureImpl().spacing);
+					measureCaret.height(beat.measureImpl().height());
 					
-					beatCaret.offset({top: y, left: x + beat.GetRealPosX(container.tablature.ViewLayout) + 7});
+					beatCaret.offset({top: y, left: x + beat.getRealPosX(container.tablature.viewLayout) + 7});
 					beatCaret.width(3);
 					beatCaret.height(measureCaret.height());
 					
-					if(beat.MeasureImpl().IsFirstOfLine && options.autoscroll)
+					if(beat.measureImpl().isFirstOfLine && options.autoscroll)
 					{
 						window.scrollTo(0, y - 30);
 					}

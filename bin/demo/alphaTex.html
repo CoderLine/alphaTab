@@ -5,38 +5,34 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<meta http-equiv="Pragma" content="no-cache">
-        <title>alphaTab - Development Showcase</title>
-		<!--[if IE]><script type="text/javascript" src="excanvas.js"></script><![endif]-->
-        <script language="JavaScript" type="text/javascript" src="jquery.js">
-        </script>
-		<script language="JavaScript" type="text/javascript" src="jquery.scrollto.js">
-        </script>
-        <script language="JavaScript" type="text/javascript" src="jquery.alphatab.js">
-        </script>
-        <script language="JavaScript" type="text/javascript" src="alphaTab.js">
-        </script>
-        <script language="JavaScript" type="text/javascript" src="alphaTabTesterEditor.js">
-        </script>
-       
-        <style type="text/css">@import url('style.css');
-        </style>
+        <title>alphaTab - Demo</title>
+		<!-- Dependencies -->
+		<!--[if IE]><script language="JavaScript" type="text/javascript" src="../lib/swfobject/swfobject.js"></script><![endif]-->
+		<!--[if IE]><script language="JavaScript" type="text/javascript" src="../lib/excanvas/excanvas.js"></script><![endif]-->
+		<script language="JavaScript" type="text/javascript" src="../lib/jquery/jquery.min.js"></script>
+		
+		<!-- alphaTab -->
+		<script language="JavaScript" type="text/javascript" src="../lib/alphaTab/alphaTab.js"></script>
+		<script language="JavaScript" type="text/javascript" src="../lib/alphaTab/jquery.alphaTab.js"></script>
+		
+		<script language="JavaScript" type="text/javascript" src="lib/editor.js"></script>
+		
+        <style type="text/css">@import url('style.css');</style>
     </head>
     <body>
 		<div id="TopNavWrapper">
 			<div id="TopNav">
 				<a href="http://www.alphatab.net" id="AlphaTabLogo" title="Home"></a>
 				<ul>
-					<li><a href="index.html">Normal</a></li>
-					<li><a href="indexplayer.html">Player</a></li>
-					<li class="active"><a href="indexeditor.html">Editor</a></li>
-					<li><a href="http://project.coderline.net">Blog</a></li>
+					<li class="active"><a href="index.html">Normal</a></li>
+					<li><a href="player.html">Player</a></li>
+					<li><a href="alphaTex.html">Editor</a></li>
 				</ul>
 			</div>
 		</div>
 		<div id="Content">
-		<h1>alphaTab - Development Showcase</h1>
-		This file shows up how to write notation with alphaTab.<br />
-		<b>Build:</b> 23.07.2010 v0.2preAlpha<br />
+		<h1>alphaTab - Demo</h1>
+		This file shows up how to write notation with alphaTab using alphaTex.<br />
         <br />
         <select id="Zoom">
             <option value="0.5">50%</option>
@@ -63,6 +59,9 @@ Measures
 		<code>\key value</code>
 		The following example shows which tags are available and how to use them. 
 <div class="alphaTab">
+.
+0.6.2 1.5.4 3.4.4 | 5.3.8 5.3.8 5.3.8 5.3.8 r.2
+</div><div class="alphaTab">
 \title "Song Title"
 \subtitle Subtitle
 \artist Artist

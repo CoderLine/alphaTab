@@ -185,3 +185,11 @@ code {
 	border:4px solid rgb(190,215,190);
 	padding:4px 4px;
 }
+
+.editorCaret {	
+	position:absolute;
+	z-index:100;
+	width:20px;
+	height:15px;
+	border:1px solid #FF0000;
+}
