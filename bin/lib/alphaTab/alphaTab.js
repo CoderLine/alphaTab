@@ -850,11 +850,11 @@ List.prototype.join = function(sep) {
 	var l = this.h;
 	while(l != null) {
 		if(first) first = false;
-		else s.b[s.b.length] = sep;
-		s.b[s.b.length] = l[0];
+		else s.add(sep);
+		s.add(l[0]);
 		l = l[1];
 	}
-	return s.b.join("");
+	return s.toString();
 }
 List.prototype.last = function() {
 	return (this.q == null?null:this.q[0]);
@@ -905,15 +905,15 @@ List.prototype.toString = function() {
 	var s = new StringBuf();
 	var first = true;
 	var l = this.h;
-	s.b[s.b.length] = "{";
+	s.add("{");
 	while(l != null) {
 		if(first) first = false;
-		else s.b[s.b.length] = ", ";
-		s.b[s.b.length] = Std.string(l[0]);
+		else s.add(", ");
+		s.add(Std.string(l[0]));
 		l = l[1];
 	}
-	s.b[s.b.length] = "}";
-	return s.b.join("");
+	s.add("}");
+	return s.toString();
 }
 List.prototype.__class__ = List;
 IntIter = function(min,max) { if( min === $_ ) return; {
@@ -971,12 +971,6 @@ net.alphatab.file.SongLoader.loadSong = function(url,factory,success) {
 	});
 }
 net.alphatab.file.SongLoader.prototype.__class__ = net.alphatab.file.SongLoader;
-net.alphatab.Main = function() { }
-net.alphatab.Main.__name__ = ["net","alphatab","Main"];
-net.alphatab.Main.main = function() {
-	net.alphatab.MyTrace.init();
-}
-net.alphatab.Main.prototype.__class__ = net.alphatab.Main;
 net.alphatab.file.SongReader = function(p) { if( p === $_ ) return; {
 	null;
 }}
@@ -1048,12 +1042,12 @@ EReg.prototype.customReplace = function(s,f) {
 	var buf = new StringBuf();
 	while(true) {
 		if(!this.match(s)) break;
-		buf.b[buf.b.length] = this.matchedLeft();
-		buf.b[buf.b.length] = f(this);
+		buf.add(this.matchedLeft());
+		buf.add(f(this));
 		s = this.matchedRight();
 	}
-	buf.b[buf.b.length] = s;
-	return buf.b.join("");
+	buf.add(s);
+	return buf.toString();
 }
 EReg.prototype.match = function(s) {
 	this.r.m = this.r.exec(s);
@@ -1313,6 +1307,7 @@ net.alphatab.file.alphatex.AlphaTexParser.prototype.measure = function(tempo) {
 		measure.clef = prevMeasure.clef;
 		header.keySignature = prevHeader.keySignature;
 		header.keySignatureType = prevHeader.keySignatureType;
+		prevHeader.timeSignature.copy(header.timeSignature);
 	}
 	this.measureMeta(measure);
 	tempo.copy(header.tempo);
@@ -1991,21 +1986,27 @@ Hash.prototype.set = function(key,value) {
 }
 Hash.prototype.toString = function() {
 	var s = new StringBuf();
-	s.b[s.b.length] = "{";
+	s.add("{");
 	var it = this.keys();
 	{ var $it3 = it;
 	while( $it3.hasNext() ) { var i = $it3.next();
 	{
-		s.b[s.b.length] = i;
-		s.b[s.b.length] = " => ";
-		s.b[s.b.length] = Std.string(this.get(i));
-		if(it.hasNext()) s.b[s.b.length] = ", ";
+		s.add(i);
+		s.add(" => ");
+		s.add(Std.string(this.get(i)));
+		if(it.hasNext()) s.add(", ");
 	}
 	}}
-	s.b[s.b.length] = "}";
-	return s.b.join("");
+	s.add("}");
+	return s.toString();
 }
 Hash.prototype.__class__ = Hash;
+net.alphatab.Main = function() { }
+net.alphatab.Main.__name__ = ["net","alphatab","Main"];
+net.alphatab.Main.main = function() {
+	net.alphatab.MyTrace.init();
+}
+net.alphatab.Main.prototype.__class__ = net.alphatab.Main;
 IntHash = function(p) { if( p === $_ ) return; {
 	this.h = {}
 	if(this.h.__proto__ != null) {
@@ -2048,19 +2049,19 @@ IntHash.prototype.set = function(key,value) {
 }
 IntHash.prototype.toString = function() {
 	var s = new StringBuf();
-	s.b[s.b.length] = "{";
+	s.add("{");
 	var it = this.keys();
 	{ var $it4 = it;
 	while( $it4.hasNext() ) { var i = $it4.next();
 	{
-		s.b[s.b.length] = i;
-		s.b[s.b.length] = " => ";
-		s.b[s.b.length] = Std.string(this.get(i));
-		if(it.hasNext()) s.b[s.b.length] = ", ";
+		s.add(i);
+		s.add(" => ");
+		s.add(Std.string(this.get(i)));
+		if(it.hasNext()) s.add(", ");
 	}
 	}}
-	s.b[s.b.length] = "}";
-	return s.b.join("");
+	s.add("}");
+	return s.toString();
 }
 IntHash.prototype.__class__ = IntHash;
 net.alphatab.model.MeasureClefConverter = function() { }
@@ -2173,7 +2174,7 @@ haxe.remoting.Context.prototype.call = function(path,params) {
 		}
 	}
 	if(!Reflect.isFunction(m)) throw "No such method " + path.join(".");
-	return m.apply(o,params);
+	return Reflect.callMethod(o,m,params);
 }
 haxe.remoting.Context.prototype.objects = null;
 haxe.remoting.Context.prototype.__class__ = haxe.remoting.Context;
@@ -2328,27 +2329,6 @@ StringTools.hex = function(n,digits) {
 	return s;
 }
 StringTools.prototype.__class__ = StringTools;
-net.alphatab.model.BeatText = function(p) { if( p === $_ ) return; {
-	null;
-}}
-net.alphatab.model.BeatText.__name__ = ["net","alphatab","model","BeatText"];
-net.alphatab.model.BeatText.prototype.beat = null;
-net.alphatab.model.BeatText.prototype.value = null;
-net.alphatab.model.BeatText.prototype.__class__ = net.alphatab.model.BeatText;
-net.alphatab.tablature.model.BeatTextImpl = function(p) { if( p === $_ ) return; {
-	net.alphatab.model.BeatText.apply(this,[]);
-}}
-net.alphatab.tablature.model.BeatTextImpl.__name__ = ["net","alphatab","tablature","model","BeatTextImpl"];
-net.alphatab.tablature.model.BeatTextImpl.__super__ = net.alphatab.model.BeatText;
-for(var k in net.alphatab.model.BeatText.prototype ) net.alphatab.tablature.model.BeatTextImpl.prototype[k] = net.alphatab.model.BeatText.prototype[k];
-net.alphatab.tablature.model.BeatTextImpl.prototype.paint = function(layout,context,x,y) {
-	var beat = this.beat;
-	var measure = beat.measureImpl();
-	var realX = (x + beat.spacing()) + beat.posX;
-	var realY = y + measure.ts.get(net.alphatab.tablature.TrackSpacingPositions.Text);
-	context.get(net.alphatab.tablature.drawing.DrawingLayers.Voice1).addString(this.value,net.alphatab.tablature.drawing.DrawingResources.defaultFont,realX,realY);
-}
-net.alphatab.tablature.model.BeatTextImpl.prototype.__class__ = net.alphatab.tablature.model.BeatTextImpl;
 haxe.remoting.FlashJsConnection = function() { }
 haxe.remoting.FlashJsConnection.__name__ = ["haxe","remoting","FlashJsConnection"];
 haxe.remoting.FlashJsConnection.flashCall = function(flashObj,name,path,params) {
@@ -2519,6 +2499,27 @@ net.alphatab.model.LyricLine.prototype.__class__ = net.alphatab.model.LyricLine;
 net.alphatab.model.Velocities = function() { }
 net.alphatab.model.Velocities.__name__ = ["net","alphatab","model","Velocities"];
 net.alphatab.model.Velocities.prototype.__class__ = net.alphatab.model.Velocities;
+net.alphatab.model.BeatText = function(p) { if( p === $_ ) return; {
+	null;
+}}
+net.alphatab.model.BeatText.__name__ = ["net","alphatab","model","BeatText"];
+net.alphatab.model.BeatText.prototype.beat = null;
+net.alphatab.model.BeatText.prototype.value = null;
+net.alphatab.model.BeatText.prototype.__class__ = net.alphatab.model.BeatText;
+net.alphatab.tablature.model.BeatTextImpl = function(p) { if( p === $_ ) return; {
+	net.alphatab.model.BeatText.apply(this,[]);
+}}
+net.alphatab.tablature.model.BeatTextImpl.__name__ = ["net","alphatab","tablature","model","BeatTextImpl"];
+net.alphatab.tablature.model.BeatTextImpl.__super__ = net.alphatab.model.BeatText;
+for(var k in net.alphatab.model.BeatText.prototype ) net.alphatab.tablature.model.BeatTextImpl.prototype[k] = net.alphatab.model.BeatText.prototype[k];
+net.alphatab.tablature.model.BeatTextImpl.prototype.paint = function(layout,context,x,y) {
+	var beat = this.beat;
+	var measure = beat.measureImpl();
+	var realX = (x + beat.spacing()) + beat.posX;
+	var realY = y + measure.ts.get(net.alphatab.tablature.TrackSpacingPositions.Text);
+	context.get(net.alphatab.tablature.drawing.DrawingLayers.Voice1).addString(this.value,net.alphatab.tablature.drawing.DrawingResources.defaultFont,realX,realY);
+}
+net.alphatab.tablature.model.BeatTextImpl.prototype.__class__ = net.alphatab.tablature.model.BeatTextImpl;
 if(!net.alphatab.file.guitarpro) net.alphatab.file.guitarpro = {}
 net.alphatab.file.guitarpro.GpReaderBase = function(p) { if( p === $_ ) return; {
 	net.alphatab.file.SongReader.apply(this,[]);
@@ -3974,7 +3975,7 @@ haxe.io.BytesBuffer = function(p) { if( p === $_ ) return; {
 haxe.io.BytesBuffer.__name__ = ["haxe","io","BytesBuffer"];
 haxe.io.BytesBuffer.prototype.add = function(src) {
 	var b1 = this.b;
-	var b2 = src.b;
+	var b2 = src.getData();
 	{
 		var _g1 = 0, _g = src.length;
 		while(_g1 < _g) {
@@ -3989,7 +3990,7 @@ haxe.io.BytesBuffer.prototype.addByte = function($byte) {
 haxe.io.BytesBuffer.prototype.addBytes = function(src,pos,len) {
 	if(pos < 0 || len < 0 || pos + len > src.length) throw haxe.io.Error.OutsideBounds;
 	var b1 = this.b;
-	var b2 = src.b;
+	var b2 = src.getData();
 	{
 		var _g1 = pos, _g = pos + len;
 		while(_g1 < _g) {
@@ -4493,7 +4494,7 @@ haxe.io.Input.prototype.readByte = function() {
 }
 haxe.io.Input.prototype.readBytes = function(s,pos,len) {
 	var k = len;
-	var b = s.b;
+	var b = s.getData();
 	if(pos < 0 || len < 0 || pos + len > s.length) throw haxe.io.Error.OutsideBounds;
 	while(k > 0) {
 		b[pos] = this.readByte();
@@ -4554,7 +4555,7 @@ haxe.io.Input.prototype.readInt32 = function() {
 	var ch2 = this.readByte();
 	var ch3 = this.readByte();
 	var ch4 = this.readByte();
-	return (this.bigEndian?(((ch1 << 8) | ch2) << 16) | ((ch3 << 8) | ch4):(((ch4 << 8) | ch3) << 16) | ((ch2 << 8) | ch1));
+	return (this.bigEndian?haxe.Int32.make((ch1 << 8) | ch2,(ch3 << 8) | ch4):haxe.Int32.make((ch4 << 8) | ch3,(ch2 << 8) | ch1));
 }
 haxe.io.Input.prototype.readInt8 = function() {
 	var n = this.readByte();
@@ -4566,15 +4567,15 @@ haxe.io.Input.prototype.readLine = function() {
 	var last;
 	var s;
 	try {
-		while((last = this.readByte()) != 10) buf.b[buf.b.length] = String.fromCharCode(last);
-		s = buf.b.join("");
+		while((last = this.readByte()) != 10) buf.addChar(last);
+		s = buf.toString();
 		if(s.charCodeAt(s.length - 1) == 13) s = s.substr(0,-1);
 	}
 	catch( $e11 ) {
 		if( js.Boot.__instanceof($e11,haxe.io.Eof) ) {
 			var e = $e11;
 			{
-				s = buf.b.join("");
+				s = buf.toString();
 				if(s.length == 0) throw (e);
 			}
 		} else throw($e11);
@@ -4608,8 +4609,8 @@ haxe.io.Input.prototype.readUInt30 = function() {
 haxe.io.Input.prototype.readUntil = function(end) {
 	var buf = new StringBuf();
 	var last;
-	while((last = this.readByte()) != end) buf.b[buf.b.length] = String.fromCharCode(last);
-	return buf.b.join("");
+	while((last = this.readByte()) != end) buf.addChar(last);
+	return buf.toString();
 }
 haxe.io.Input.prototype.setEndian = function(b) {
 	this.bigEndian = b;
@@ -4620,7 +4621,7 @@ haxe.io.BytesInput = function(b,pos,len) { if( b === $_ ) return; {
 	if(pos == null) pos = 0;
 	if(len == null) len = b.length - pos;
 	if(pos < 0 || len < 0 || pos + len > b.length) throw haxe.io.Error.OutsideBounds;
-	this.b = b.b;
+	this.b = b.getData();
 	this.pos = pos;
 	this.len = len;
 }}
@@ -4640,7 +4641,7 @@ haxe.io.BytesInput.prototype.readBytes = function(buf,pos,len) {
 	if(this.len == 0 && len > 0) throw new haxe.io.Eof();
 	if(this.len < len) len = this.len;
 	var b1 = this.b;
-	var b2 = buf.b;
+	var b2 = buf.getData();
 	{
 		var _g = 0;
 		while(_g < len) {
@@ -4653,6 +4654,13 @@ haxe.io.BytesInput.prototype.readBytes = function(buf,pos,len) {
 	return len;
 }
 haxe.io.BytesInput.prototype.__class__ = haxe.io.BytesInput;
+net.alphatab.file.FileFormatException = function(str) { if( str === $_ ) return; {
+	if(str == null) str = "";
+	this.message = str;
+}}
+net.alphatab.file.FileFormatException.__name__ = ["net","alphatab","file","FileFormatException"];
+net.alphatab.file.FileFormatException.prototype.message = null;
+net.alphatab.file.FileFormatException.prototype.__class__ = net.alphatab.file.FileFormatException;
 haxe.Int32 = function() { }
 haxe.Int32.__name__ = ["haxe","Int32"];
 haxe.Int32.make = function(a,b) {
@@ -4734,13 +4742,6 @@ net.alphatab.model.Voice.prototype.isRestVoice = function() {
 }
 net.alphatab.model.Voice.prototype.notes = null;
 net.alphatab.model.Voice.prototype.__class__ = net.alphatab.model.Voice;
-net.alphatab.file.FileFormatException = function(str) { if( str === $_ ) return; {
-	if(str == null) str = "";
-	this.message = str;
-}}
-net.alphatab.file.FileFormatException.__name__ = ["net","alphatab","file","FileFormatException"];
-net.alphatab.file.FileFormatException.prototype.message = null;
-net.alphatab.file.FileFormatException.prototype.__class__ = net.alphatab.file.FileFormatException;
 net.alphatab.platform.BinaryReader = function(p) { if( p === $_ ) return; {
 	null;
 }}
@@ -5069,7 +5070,7 @@ Type.createEnum = function(e,constr,params) {
 	if(f == null) throw "No such constructor " + constr;
 	if(Reflect.isFunction(f)) {
 		if(params == null) throw ("Constructor " + constr) + " need parameters";
-		return f.apply(e,params);
+		return Reflect.callMethod(e,f,params);
 	}
 	if(params != null && params.length != 0) throw ("Constructor " + constr) + " does not need parameters";
 	return f;
@@ -5485,8 +5486,8 @@ net.alphatab.tablature.model.TripletGroup.prototype.isFull = function() {
 net.alphatab.tablature.model.TripletGroup.prototype.paint = function(layout,context,x,y) {
 	var scale = layout.scale;
 	var offset = net.alphatab.tablature.drawing.DrawingResources.getScoreNoteSize(layout,false).width / 2;
-	var startX = this._voices[0].beat.getRealPosX(layout) + offset;
-	var endX = this._voices[this._voices.length - 1].beat.getRealPosX(layout) + offset;
+	var startX = this._voices[0].beatImpl().getRealPosX(layout) + offset;
+	var endX = this._voices[this._voices.length - 1].beatImpl().getRealPosX(layout) + offset;
 	var key = this._voices[0].beat.measure.keySignature();
 	var clef = net.alphatab.model.MeasureClefConverter.toInt(this._voices[0].beat.measure.clef);
 	var realY = y;
@@ -5667,7 +5668,7 @@ Reflect.copy = function(o) {
 		while(_g < _g1.length) {
 			var f = _g1[_g];
 			++_g;
-			o2[f] = Reflect.field(o,f);
+			Reflect.setField(o2,f,Reflect.field(o,f));
 		}
 	}
 	return o2;
@@ -5782,7 +5783,7 @@ for(var k in net.alphatab.model.Note.prototype ) net.alphatab.tablature.model.No
 net.alphatab.tablature.model.NoteImpl.prototype._accidental = null;
 net.alphatab.tablature.model.NoteImpl.prototype._noteOrientation = null;
 net.alphatab.tablature.model.NoteImpl.prototype.beatImpl = function() {
-	return this.voice.beat;
+	return this.voiceImpl().beatImpl();
 }
 net.alphatab.tablature.model.NoteImpl.prototype.calculateBendOverflow = function(layout) {
 	var point = null;
@@ -5803,7 +5804,7 @@ net.alphatab.tablature.model.NoteImpl.prototype.getpaintPosition = function(inde
 	return this.measureImpl().ts.get(index);
 }
 net.alphatab.tablature.model.NoteImpl.prototype.measureImpl = function() {
-	return this.voice.beat.measureImpl();
+	return this.beatImpl().measureImpl();
 }
 net.alphatab.tablature.model.NoteImpl.prototype.noteForTie = function() {
 	var m = this.measureImpl();
@@ -5813,7 +5814,7 @@ net.alphatab.tablature.model.NoteImpl.prototype.noteForTie = function() {
 		while(i >= 0) {
 			var beat = m.beats[i];
 			var voice = beat.voices[this.voice.index];
-			if(beat.start < this.voice.beat.start && !voice.isRestVoice()) {
+			if(beat.start < this.beatImpl().start && !voice.isRestVoice()) {
 				{
 					var _g = 0, _g1 = voice.notes;
 					while(_g < _g1.length) {
@@ -5833,7 +5834,7 @@ net.alphatab.tablature.model.NoteImpl.prototype.noteForTie = function() {
 	return null;
 }
 net.alphatab.tablature.model.NoteImpl.prototype.paint = function(layout,context,x,y) {
-	var spacing = this.voice.beat.spacing();
+	var spacing = this.beatImpl().spacing();
 	this.paintScoreNote(layout,context,x,y + this.getpaintPosition(net.alphatab.tablature.TrackSpacingPositions.ScoreMiddleLines),spacing);
 	this.paintOfflineEffects(layout,context,x,y,spacing);
 	this.paintTablatureNote(layout,context,x,y + this.getpaintPosition(net.alphatab.tablature.TrackSpacingPositions.Tablature),spacing);
@@ -5849,7 +5850,7 @@ net.alphatab.tablature.model.NoteImpl.prototype.paintBend = function(layout,cont
 	var iXTo;
 	var iMinY = iY - 60 * scale;
 	if(nextBeat == null) {
-		iXTo = (this.voice.beat.measureImpl().posX + this.voice.beat.measureImpl().width) + this.voice.beat.measureImpl().spacing;
+		iXTo = (this.beatImpl().measureImpl().posX + this.beatImpl().measureImpl().width) + this.beatImpl().measureImpl().spacing;
 	}
 	else {
 		if(nextBeat.getNotes().length > 0) {
@@ -5919,13 +5920,13 @@ net.alphatab.tablature.model.NoteImpl.prototype.paintEffects = function(layout,c
 		fill.addString(value,net.alphatab.tablature.drawing.DrawingResources.graceFont,Math.round(this._noteOrientation.x - 7 * scale),this._noteOrientation.y);
 	}
 	if(this.effect.isBend()) {
-		var nextBeat = layout.songManager().getNextBeat(this.voice.beat);
+		var nextBeat = layout.songManager().getNextBeat(this.beatImpl());
 		if(nextBeat != null && nextBeat.measureImpl().ts != this.measureImpl().ts) nextBeat = null;
 		this.paintBend(layout,context,nextBeat,this._noteOrientation.x + this._noteOrientation.width,realY);
 	}
 	else if(this.effect.slide || this.effect.hammer) {
 		var nextFromX = x;
-		var nextNote = layout.songManager().getNextNote(this.measureImpl(),this.voice.beat.start,this.voice.index,this.string);
+		var nextNote = layout.songManager().getNextNote(this.measureImpl(),this.beatImpl().start,this.voice.index,this.string);
 		if(this.effect.slide) {
 			this.paintSlide(layout,context,nextNote,realX,realY,nextFromX);
 		}
@@ -5955,7 +5956,7 @@ net.alphatab.tablature.model.NoteImpl.prototype.paintHammer = function(layout,co
 	var yScale = layout.stringSpacing / 10.0;
 	var realX = x + (7.0 * xScale);
 	var realY = y - (net.alphatab.tablature.drawing.DrawingResources.noteFontHeight * layout.scale);
-	var width = (nextNote != null?(nextNote.voice.beat.getRealPosX(layout) - 4 * xScale) - realX:10.0 * xScale);
+	var width = (nextNote != null?(nextNote.beatImpl().getRealPosX(layout) - 4 * xScale) - realX:10.0 * xScale);
 	var fill = (this.voice.index == 0?context.get(net.alphatab.tablature.drawing.DrawingLayers.VoiceEffects1):context.get(net.alphatab.tablature.drawing.DrawingLayers.VoiceEffects2));
 	var wScale = width / 16;
 	var hScale = ((this.string > 3 || forceDown)?-1:1);
@@ -6002,7 +6003,7 @@ net.alphatab.tablature.model.NoteImpl.prototype.paintOfflineEffects = function(l
 		fill.addString(key,net.alphatab.tablature.drawing.DrawingResources.defaultFont,realX,realY);
 	}
 	if(effect.letRing) {
-		var beat = this.voice.beat.previousBeat;
+		var beat = this.beatImpl().previousBeat;
 		var prevRing = false;
 		var nextRing = false;
 		var isPreviousFirst = false;
@@ -6013,15 +6014,15 @@ net.alphatab.tablature.model.NoteImpl.prototype.paintOfflineEffects = function(l
 					var note = _g1[_g];
 					++_g;
 					var impl = note;
-					if(note.effect.letRing && impl.voice.beat.measureImpl().ts == this.voice.beat.measureImpl().ts) {
+					if(note.effect.letRing && impl.beatImpl().measureImpl().ts == this.beatImpl().measureImpl().ts) {
 						prevRing = true;
 						break;
 					}
 				}
 			}
 		}
-		beat = this.voice.beat.nextBeat;
-		var endX = realX + this.voice.beat.width();
+		beat = this.beatImpl().nextBeat;
+		var endX = realX + this.beatImpl().width();
 		var nextOnSameLine = false;
 		if(beat != null) {
 			{
@@ -6032,7 +6033,7 @@ net.alphatab.tablature.model.NoteImpl.prototype.paintOfflineEffects = function(l
 					var impl = note;
 					if(note.effect.letRing) {
 						nextRing = true;
-						if(impl.voice.beat.measureImpl().ts == this.voice.beat.measureImpl().ts) {
+						if(impl.beatImpl().measureImpl().ts == this.beatImpl().measureImpl().ts) {
 							endX = beat.getRealPosX(layout);
 						}
 						break;
@@ -6044,7 +6045,7 @@ net.alphatab.tablature.model.NoteImpl.prototype.paintOfflineEffects = function(l
 		var height = net.alphatab.tablature.drawing.DrawingResources.defaultFontHeight;
 		var startX = realX;
 		if(!nextRing) {
-			endX -= this.voice.beat.width() / 2;
+			endX -= this.beatImpl().width() / 2;
 		}
 		if(!prevRing) {
 			fill.addString("ring",net.alphatab.tablature.drawing.DrawingResources.effectFont,startX,realY);
@@ -6064,7 +6065,7 @@ net.alphatab.tablature.model.NoteImpl.prototype.paintOfflineEffects = function(l
 		}
 	}
 	if(effect.palmMute) {
-		var beat = this.voice.beat.previousBeat;
+		var beat = this.beatImpl().previousBeat;
 		var prevPalm = false;
 		var nextPalm = false;
 		if(beat != null) {
@@ -6074,15 +6075,15 @@ net.alphatab.tablature.model.NoteImpl.prototype.paintOfflineEffects = function(l
 					var note = _g1[_g];
 					++_g;
 					var impl = note;
-					if(note.effect.palmMute && impl.voice.beat.measureImpl().ts == this.voice.beat.measureImpl().ts) {
+					if(note.effect.palmMute && impl.beatImpl().measureImpl().ts == this.beatImpl().measureImpl().ts) {
 						prevPalm = true;
 						break;
 					}
 				}
 			}
 		}
-		beat = this.voice.beat.nextBeat;
-		var endX = realX + this.voice.beat.width();
+		beat = this.beatImpl().nextBeat;
+		var endX = realX + this.beatImpl().width();
 		if(beat != null) {
 			{
 				var _g = 0, _g1 = beat.getNotes();
@@ -6092,7 +6093,7 @@ net.alphatab.tablature.model.NoteImpl.prototype.paintOfflineEffects = function(l
 					var impl = note;
 					if(note.effect.palmMute) {
 						nextPalm = true;
-						if(impl.voice.beat.measureImpl().ts == this.voice.beat.measureImpl().ts) {
+						if(impl.beatImpl().measureImpl().ts == this.beatImpl().measureImpl().ts) {
 							endX = beat.getRealPosX(layout);
 						}
 						break;
@@ -6132,7 +6133,7 @@ net.alphatab.tablature.model.NoteImpl.prototype.paintOfflineEffects = function(l
 }
 net.alphatab.tablature.model.NoteImpl.prototype.paintScoreNote = function(layout,context,x,y,spacing) {
 	var scoreSpacing = layout.scoreLineSpacing;
-	var direction = this.voice.beatGroup.direction;
+	var direction = this.voiceImpl().beatGroup.direction;
 	var key = this.measureImpl().keySignature();
 	var clef = net.alphatab.model.MeasureClefConverter.toInt(this.measureImpl().clef);
 	var realX = x + 4 * layout.scale;
@@ -6147,7 +6148,7 @@ net.alphatab.tablature.model.NoteImpl.prototype.paintScoreNote = function(layout
 		var tieWidth = 20.0 * tieScale;
 		var tieHeight = 30.0 * tieScale;
 		if(noteForTie != null) {
-			tieX = noteForTie.voice.beat.lastPaintX + 15 * layout.scale;
+			tieX = noteForTie.beatImpl().lastPaintX + 15 * layout.scale;
 			tieY = y + this.scorePosY;
 			tieWidth = (realX - tieX);
 			tieHeight = (20.0 * tieScale);
@@ -6183,10 +6184,10 @@ net.alphatab.tablature.model.NoteImpl.prototype.paintScoreNote = function(layout
 		this.paintGrace(layout,context,realX,realY1);
 	}
 	if(this.voice.duration.isDotted || this.voice.duration.isDoubleDotted) {
-		this.voice.paintDot(layout,fill,realX + (12.0 * (scoreSpacing / 8.0)),realY1 + (layout.scoreLineSpacing / 2),scoreSpacing / 10.0);
+		this.voiceImpl().paintDot(layout,fill,realX + (12.0 * (scoreSpacing / 8.0)),realY1 + (layout.scoreLineSpacing / 2),scoreSpacing / 10.0);
 	}
 	var xMove = (direction == net.alphatab.model.VoiceDirection.Up?net.alphatab.tablature.drawing.DrawingResources.getScoreNoteSize(layout,false).width:0);
-	var realY2 = y + this.voice.beatGroup.getY2(layout,this.posX() + spacing,key,clef);
+	var realY2 = y + this.voiceImpl().beatGroup.getY2(layout,this.posX() + spacing,key,clef);
 	if(this.effect.staccato) {
 		var Size = 3;
 		var stringX = realX + xMove;
@@ -6243,7 +6244,7 @@ net.alphatab.tablature.model.NoteImpl.prototype.paintSlide = function(layout,con
 		draw.addLine(realX + (10 * xScale),realY,realX + (18 * xScale),rextY);
 	}
 	else if(nextNote != null) {
-		var fNextX = nextNote.voice.beat.getRealPosX(layout);
+		var fNextX = nextNote.beatImpl().getRealPosX(layout);
 		rextY = realY;
 		if(nextNote.value < this.value) {
 			realY -= yMove;
@@ -6289,7 +6290,7 @@ net.alphatab.tablature.model.NoteImpl.prototype.paintTrill = function(layout,con
 	var scale = layout.scale;
 	var realX = (x + size) - 2 * scale;
 	var realY = y + (net.alphatab.tablature.drawing.DrawingResources.effectFontHeight - (5.0 * scale)) / 2.0;
-	var width = (this.voice.width - size) - (2.0 * scale);
+	var width = (this.voiceImpl().width - size) - (2.0 * scale);
 	var fill = (this.voice.index == 0?context.get(net.alphatab.tablature.drawing.DrawingLayers.VoiceEffects1):context.get(net.alphatab.tablature.drawing.DrawingLayers.VoiceEffects2));
 	fill.addString(str,net.alphatab.tablature.drawing.DrawingResources.effectFont,x,y);
 }
@@ -6297,7 +6298,7 @@ net.alphatab.tablature.model.NoteImpl.prototype.paintVibrato = function(layout,c
 	var scale = layout.scale;
 	var realX = x - 2 * scale;
 	var realY = y + (2.0 * scale);
-	var width = this.voice.width;
+	var width = this.voiceImpl().width;
 	var fill = (this.voice.index == 0?context.get(net.alphatab.tablature.drawing.DrawingLayers.VoiceEffects1):context.get(net.alphatab.tablature.drawing.DrawingLayers.VoiceEffects2));
 	var step = (18 * scale) * symbolScale;
 	var loops = Math.floor(Math.max(1,(width / step)));
@@ -6312,14 +6313,14 @@ net.alphatab.tablature.model.NoteImpl.prototype.paintVibrato = function(layout,c
 	}
 }
 net.alphatab.tablature.model.NoteImpl.prototype.posX = function() {
-	return this.voice.beat.posX;
+	return this.beatImpl().posX;
 }
 net.alphatab.tablature.model.NoteImpl.prototype.scorePosY = null;
 net.alphatab.tablature.model.NoteImpl.prototype.tabPosY = null;
 net.alphatab.tablature.model.NoteImpl.prototype.update = function(layout) {
 	this._accidental = this.measureImpl().getNoteAccidental(this.realValue());
 	this.tabPosY = Math.round((this.string * layout.stringSpacing) - layout.stringSpacing);
-	this.scorePosY = this.voice.beatGroup.getY1(layout,this,this.measureImpl().keySignature(),net.alphatab.model.MeasureClefConverter.toInt(this.measureImpl().clef));
+	this.scorePosY = this.voiceImpl().beatGroup.getY1(layout,this,this.measureImpl().keySignature(),net.alphatab.model.MeasureClefConverter.toInt(this.measureImpl().clef));
 }
 net.alphatab.tablature.model.NoteImpl.prototype.voiceImpl = function() {
 	return this.voice;
@@ -6617,19 +6618,19 @@ net.alphatab.tablature.model.MeasureImpl.prototype.checkEffects = function(layou
 	if(effect.isHarmonic()) {
 		this._harmonic = true;
 	}
-	if(note.voice.beat.effect.tapping || note.voice.beat.effect.slapping || note.voice.beat.effect.popping) {
+	if(note.beatImpl().effect.tapping || note.beatImpl().effect.slapping || note.beatImpl().effect.popping) {
 		this._tapping = true;
 	}
 	if(effect.palmMute) {
 		this._palmMute = true;
 	}
-	if(note.voice.beat.effect.fadeIn) {
+	if(note.beatImpl().effect.fadeIn) {
 		this._fadeIn = true;
 	}
 	if(effect.vibrato || effect.isTrill()) {
 		this._vibrato = true;
 	}
-	if(note.voice.beat.effect.vibrato) {
+	if(note.beatImpl().effect.vibrato) {
 		this._beatVibrato = true;
 	}
 	if(effect.letRing) {
@@ -6639,9 +6640,9 @@ net.alphatab.tablature.model.MeasureImpl.prototype.checkEffects = function(layou
 		this._bend = true;
 		this._bendOverFlow = Math.round(Math.max(this._bendOverFlow,Math.round(note.calculateBendOverflow(layout))));
 	}
-	if(note.voice.beat.effect.isTremoloBar()) {
+	if(note.beatImpl().effect.isTremoloBar()) {
 		this._tremoloBar = true;
-		this._tremoloBarOverFlow = Math.round(note.voice.beat.calculateTremoloBarOverflow(layout));
+		this._tremoloBarOverFlow = Math.round(note.beatImpl().calculateTremoloBarOverflow(layout));
 	}
 }
 net.alphatab.tablature.model.MeasureImpl.prototype.checkValue = function(layout,note,direction) {
@@ -7777,8 +7778,8 @@ net.alphatab.tablature.model.BeatGroup.prototype.getY2 = function(layout,x,key,c
 			return Math.round(this.getY1(layout,this.minNote,key,clef) + downOffset);
 		}
 		y = 0;
-		x1 = Math.round(this._firstMinNote.posX() + this._firstMinNote.voice.beat.spacing());
-		x2 = Math.round(this._lastMinNote.posX() + this._lastMinNote.voice.beat.spacing());
+		x1 = Math.round(this._firstMinNote.posX() + this._firstMinNote.beatImpl().spacing());
+		x2 = Math.round(this._lastMinNote.posX() + this._lastMinNote.beatImpl().spacing());
 		y1 = Math.round(this.getY1(layout,this._firstMinNote,key,clef) + downOffset);
 		y2 = Math.round(this.getY1(layout,this._lastMinNote,key,clef) + downOffset);
 		if(y1 > y2 && (y1 - y2) > MaxDistance) y2 = (y1 - MaxDistance);
@@ -7792,8 +7793,8 @@ net.alphatab.tablature.model.BeatGroup.prototype.getY2 = function(layout,x,key,c
 		return Math.round(this.getY1(layout,this.maxNote,key,clef) - upOffset);
 	}
 	y = 0;
-	x1 = Math.round(this._firstMaxNote.posX() + this._firstMaxNote.voice.beat.spacing());
-	x2 = Math.round(this._lastMaxNote.posX() + this._lastMaxNote.voice.beat.spacing());
+	x1 = Math.round(this._firstMaxNote.posX() + this._firstMaxNote.beatImpl().spacing());
+	x2 = Math.round(this._lastMaxNote.posX() + this._lastMaxNote.beatImpl().spacing());
 	y1 = Math.round(this.getY1(layout,this._firstMaxNote,key,clef) - upOffset);
 	y2 = Math.round(this.getY1(layout,this._lastMaxNote,key,clef) - upOffset);
 	if(y1 < y2 && (y2 - y1) > MaxDistance) y2 = (y1 + MaxDistance);
@@ -8485,18 +8486,18 @@ haxe.Serializer.prototype.serialize = function(v) {
 			var chars = "";
 			var b64 = haxe.Serializer.BASE64;
 			while(i < max) {
-				var b1 = v1.b[i++];
-				var b2 = v1.b[i++];
-				var b3 = v1.b[i++];
+				var b1 = v1.get(i++);
+				var b2 = v1.get(i++);
+				var b3 = v1.get(i++);
 				chars += ((b64.charAt(b1 >> 2) + b64.charAt(((b1 << 4) | (b2 >> 4)) & 63)) + b64.charAt(((b2 << 2) | (b3 >> 6)) & 63)) + b64.charAt(b3 & 63);
 			}
 			if(i == max) {
-				var b1 = v1.b[i++];
-				var b2 = v1.b[i++];
+				var b1 = v1.get(i++);
+				var b2 = v1.get(i++);
 				chars += (b64.charAt(b1 >> 2) + b64.charAt(((b1 << 4) | (b2 >> 4)) & 63)) + b64.charAt((b2 << 2) & 63);
 			}
 			else if(i == max + 1) {
-				var b1 = v1.b[i++];
+				var b1 = v1.get(i++);
 				chars += b64.charAt(b1 >> 2) + b64.charAt((b1 << 4) & 63);
 			}
 			this.buf.add("s");
@@ -8601,7 +8602,7 @@ haxe.Serializer.prototype.serializeString = function(s) {
 }
 haxe.Serializer.prototype.shash = null;
 haxe.Serializer.prototype.toString = function() {
-	return this.buf.b.join("");
+	return this.buf.toString();
 }
 haxe.Serializer.prototype.useCache = null;
 haxe.Serializer.prototype.useEnumIndex = null;
@@ -8611,7 +8612,7 @@ net.alphatab.platform.js.JsFileLoader = function(p) { if( p === $_ ) return; {
 }}
 net.alphatab.platform.js.JsFileLoader.__name__ = ["net","alphatab","platform","js","JsFileLoader"];
 net.alphatab.platform.js.JsFileLoader.prototype.loadBinary = function(method,file,success,error) {
-	if(jQuery.browser.msie) {
+	if(net.alphatab.platform.js.JQuery.isIE()) {
 		var ctx = new haxe.remoting.Context();
 		ctx.addObject("JsFileLoader",this);
 		var cnx = haxe.remoting.ExternalConnection.flashConnect("default","alphaTabFlashLoader",ctx);
@@ -8658,7 +8659,7 @@ net.alphatab.platform.js.JsFileLoader.prototype.loadBinary = function(method,fil
 			}
 			else null;
 		}
-		jQuery.ajax(options);
+		net.alphatab.platform.js.JQuery.ajax(options);
 	}
 }
 net.alphatab.platform.js.JsFileLoader.prototype.__class__ = net.alphatab.platform.js.JsFileLoader;
@@ -8686,7 +8687,7 @@ haxe.Template.prototype.execute = function(context,macros) {
 	this.stack = new List();
 	this.buf = new StringBuf();
 	this.run(this.expr);
-	return this.buf.b.join("");
+	return this.buf.toString();
 }
 haxe.Template.prototype.expr = null;
 haxe.Template.prototype.macros = null;
@@ -9055,14 +9056,14 @@ haxe.Template.prototype.run = function(e) {
 			default:{
 				this.buf = new StringBuf();
 				this.run(p);
-				pl.push(this.buf.b.join(""));
+				pl.push(this.buf.toString());
 			}break;
 			}
 		}
 		}}
 		this.buf = old;
 		try {
-			this.buf.add(Std.string(v.apply(this.macros,pl)));
+			this.buf.add(Std.string(Reflect.callMethod(this.macros,v,pl)));
 		}
 		catch( $e28 ) {
 			{
@@ -9308,7 +9309,7 @@ net.alphatab.tablature.model.VoiceImpl.prototype.check = function(note) {
 	if(note.string < this.minString) this.minString = note.string;
 }
 net.alphatab.tablature.model.VoiceImpl.prototype.getPaintPosition = function(iIndex) {
-	return this.beat.measure.ts.get(iIndex);
+	return this.measureImpl().ts.get(iIndex);
 }
 net.alphatab.tablature.model.VoiceImpl.prototype.isHiddenSilence = null;
 net.alphatab.tablature.model.VoiceImpl.prototype.isJoinedGreaterThanQuarter = null;
@@ -9346,7 +9347,7 @@ net.alphatab.tablature.model.VoiceImpl.prototype.paint = function(layout,context
 }
 net.alphatab.tablature.model.VoiceImpl.prototype.paintBeat = function(layout,context,x,y) {
 	if(!this.isRestVoice()) {
-		var spacing = this.beat.spacing();
+		var spacing = this.beatImpl().spacing();
 		this.paintScoreBeat(layout,context,x,y + this.getPaintPosition(net.alphatab.tablature.TrackSpacingPositions.ScoreMiddleLines),spacing);
 	}
 }
@@ -9390,22 +9391,22 @@ net.alphatab.tablature.model.VoiceImpl.prototype.paintScoreBeat = function(layou
 					var startXforCalculation;
 					var endXforCalculation;
 					if(this.joinedType == net.alphatab.tablature.model.JoinedType.NoneRight) {
-						startX = Math.round(this.beat.getRealPosX(layout) + xMove);
-						endX = Math.round((this.beat.getRealPosX(layout) + (6 * scale)) + xMove);
+						startX = Math.round(this.beatImpl().getRealPosX(layout) + xMove);
+						endX = Math.round((this.beatImpl().getRealPosX(layout) + (6 * scale)) + xMove);
 						startXforCalculation = this.posX() + spacing;
 						endXforCalculation = Math.floor((this.posX() + spacing) + (6 * scale));
 					}
 					else if(this.joinedType == net.alphatab.tablature.model.JoinedType.NoneLeft) {
-						startX = Math.round((this.beat.getRealPosX(layout) - (6 * scale)) + xMove);
-						endX = Math.round(this.beat.getRealPosX(layout) + xMove);
+						startX = Math.round((this.beatImpl().getRealPosX(layout) - (6 * scale)) + xMove);
+						endX = Math.round(this.beatImpl().getRealPosX(layout) + xMove);
 						startXforCalculation = Math.floor((this.posX() + spacing) - (6 * scale));
 						endXforCalculation = this.posX() + spacing;
 					}
 					else {
-						startX = Math.round(this.join1.beat.getRealPosX(layout) + xMove);
-						endX = Math.round((this.join2.beat.getRealPosX(layout) + xMove) + (scale));
-						startXforCalculation = this.join1.posX() + this.join1.beat.spacing();
-						endXforCalculation = this.join2.posX() + this.join2.beat.spacing();
+						startX = Math.round(this.join1.beatImpl().getRealPosX(layout) + xMove);
+						endX = Math.round((this.join2.beatImpl().getRealPosX(layout) + xMove) + (scale));
+						startXforCalculation = this.join1.posX() + this.join1.beatImpl().spacing();
+						endXforCalculation = this.join2.posX() + this.join2.beatImpl().spacing();
 					}
 					var hY1 = y + this.beatGroup.getY2(layout,startXforCalculation,key,clef);
 					var hY2 = y + this.beatGroup.getY2(layout,endXforCalculation,key,clef);
@@ -9469,7 +9470,7 @@ net.alphatab.tablature.model.VoiceImpl.prototype.paintTriplet = function(layout,
 	}
 }
 net.alphatab.tablature.model.VoiceImpl.prototype.posX = function() {
-	return this.beat.posX;
+	return this.beatImpl().posX;
 }
 net.alphatab.tablature.model.VoiceImpl.prototype.previousBeat = null;
 net.alphatab.tablature.model.VoiceImpl.prototype.reset = function() {
@@ -9511,7 +9512,7 @@ net.alphatab.tablature.model.VoiceImpl.prototype.updateNoteVoice = function(layo
 	var noteJoined = false;
 	var withPrev = false;
 	if(this.previousBeat != null && !this.previousBeat.isRestVoice()) {
-		if(this.beat.measure.canJoin(layout.songManager(),this,this.previousBeat)) {
+		if(this.measureImpl().canJoin(layout.songManager(),this,this.previousBeat)) {
 			withPrev = true;
 			if(this.previousBeat.duration.value >= this.duration.value) {
 				this.join1 = this.previousBeat;
@@ -9525,7 +9526,7 @@ net.alphatab.tablature.model.VoiceImpl.prototype.updateNoteVoice = function(layo
 		}
 	}
 	if(this.nextBeat != null && !this.nextBeat.isRestVoice()) {
-		if(this.beat.measure.canJoin(layout.songManager(),this,this.nextBeat)) {
+		if(this.measureImpl().canJoin(layout.songManager(),this,this.nextBeat)) {
 			if(this.nextBeat.duration.value >= this.duration.value) {
 				this.join2 = this.nextBeat;
 				if(this.previousBeat == null || this.previousBeat.isRestVoice() || this.previousBeat.duration.value < this.duration.value) this.join1 = this;
@@ -9537,7 +9538,7 @@ net.alphatab.tablature.model.VoiceImpl.prototype.updateNoteVoice = function(layo
 	}
 	if(!noteJoined && withPrev) this.joinedType = net.alphatab.tablature.model.JoinedType.NoneLeft;
 	this.minY = 0;
-	this.maxY = this.beat.measureImpl().trackImpl().tabHeight;
+	this.maxY = this.beatImpl().measureImpl().trackImpl().tabHeight;
 	if(this.beatGroup.direction == net.alphatab.model.VoiceDirection.Down) {
 		this.maxY += Math.floor((layout.stringSpacing / 2) * 5) + 1;
 	}
@@ -9586,7 +9587,7 @@ net.alphatab.tablature.model.VoiceImpl.prototype.updateSilenceSpacing = function
 			while(_g1 < _g) {
 				var v = _g1++;
 				if(v != this.index) {
-					var voice = this.beat.getVoiceImpl(v);
+					var voice = this.beatImpl().getVoiceImpl(v);
 					if(!voice.isEmpty) {
 						if(voice.isRestVoice()) {
 							if(!voice.isHiddenSilence) {
@@ -9775,25 +9776,6 @@ net.alphatab.model.effects.TrillEffect.prototype.clone = function(factory) {
 net.alphatab.model.effects.TrillEffect.prototype.duration = null;
 net.alphatab.model.effects.TrillEffect.prototype.fret = null;
 net.alphatab.model.effects.TrillEffect.prototype.__class__ = net.alphatab.model.effects.TrillEffect;
-net.alphatab.tablature.model.JoinedTypeConverter = function() { }
-net.alphatab.tablature.model.JoinedTypeConverter.__name__ = ["net","alphatab","tablature","model","JoinedTypeConverter"];
-net.alphatab.tablature.model.JoinedTypeConverter.toInt = function(t) {
-	switch(t) {
-	case net.alphatab.tablature.model.JoinedType.NoneLeft:{
-		return 1;
-	}break;
-	case net.alphatab.tablature.model.JoinedType.NoneRight:{
-		return 2;
-	}break;
-	case net.alphatab.tablature.model.JoinedType.Left:{
-		return 3;
-	}break;
-	case net.alphatab.tablature.model.JoinedType.Right:{
-		return 4;
-	}break;
-	}
-}
-net.alphatab.tablature.model.JoinedTypeConverter.prototype.__class__ = net.alphatab.tablature.model.JoinedTypeConverter;
 Std = function() { }
 Std.__name__ = ["Std"];
 Std["is"] = function(v,t) {
@@ -9818,6 +9800,25 @@ Std.random = function(x) {
 	return Math.floor(Math.random() * x);
 }
 Std.prototype.__class__ = Std;
+net.alphatab.tablature.model.JoinedTypeConverter = function() { }
+net.alphatab.tablature.model.JoinedTypeConverter.__name__ = ["net","alphatab","tablature","model","JoinedTypeConverter"];
+net.alphatab.tablature.model.JoinedTypeConverter.toInt = function(t) {
+	switch(t) {
+	case net.alphatab.tablature.model.JoinedType.NoneLeft:{
+		return 1;
+	}break;
+	case net.alphatab.tablature.model.JoinedType.NoneRight:{
+		return 2;
+	}break;
+	case net.alphatab.tablature.model.JoinedType.Left:{
+		return 3;
+	}break;
+	case net.alphatab.tablature.model.JoinedType.Right:{
+		return 4;
+	}break;
+	}
+}
+net.alphatab.tablature.model.JoinedTypeConverter.prototype.__class__ = net.alphatab.tablature.model.JoinedTypeConverter;
 net.alphatab.model.Size = function(width,height) { if( width === $_ ) return; {
 	this.width = width;
 	this.height = height;
@@ -10140,7 +10141,7 @@ haxe.Unserializer.prototype.readDigits = function() {
 	var s = false;
 	var fpos = this.pos;
 	while(true) {
-		var c = this.buf.cca(this.pos);
+		var c = this.get(this.pos);
 		if(Math.isNaN(c)) break;
 		if(c == 45) {
 			if(this.pos != fpos) break;
@@ -10167,7 +10168,7 @@ haxe.Unserializer.prototype.setResolver = function(r) {
 	else this.resolver = r;
 }
 haxe.Unserializer.prototype.unserialize = function() {
-	switch(this.buf.cca(this.pos++)) {
+	switch(this.get(this.pos++)) {
 	case 110:{
 		return null;
 	}break;
@@ -10186,7 +10187,7 @@ haxe.Unserializer.prototype.unserialize = function() {
 	case 100:{
 		var p1 = this.pos;
 		while(true) {
-			var c = this.buf.cca(this.pos);
+			var c = this.get(this.pos);
 			if((c >= 43 && c < 58) || c == 101 || c == 69) this.pos++;
 			else break;
 		}
@@ -10215,7 +10216,7 @@ haxe.Unserializer.prototype.unserialize = function() {
 		var a = new Array();
 		this.cache.push(a);
 		while(true) {
-			var c = this.buf.cca(this.pos);
+			var c = this.get(this.pos);
 			if(c == 104) {
 				this.pos++;
 				break;
@@ -10277,7 +10278,7 @@ haxe.Unserializer.prototype.unserialize = function() {
 		var l = new List();
 		this.cache.push(l);
 		var buf = this.buf;
-		while(this.buf.cca(this.pos) != 104) l.add(this.unserialize());
+		while(this.get(this.pos) != 104) l.add(this.unserialize());
 		this.pos++;
 		return l;
 	}break;
@@ -10285,7 +10286,7 @@ haxe.Unserializer.prototype.unserialize = function() {
 		var h = new Hash();
 		this.cache.push(h);
 		var buf = this.buf;
-		while(this.buf.cca(this.pos) != 104) {
+		while(this.get(this.pos) != 104) {
 			var s = this.unserialize();
 			h.set(s,this.unserialize());
 		}
@@ -10296,11 +10297,11 @@ haxe.Unserializer.prototype.unserialize = function() {
 		var h = new IntHash();
 		this.cache.push(h);
 		var buf = this.buf;
-		var c = this.buf.cca(this.pos++);
+		var c = this.get(this.pos++);
 		while(c == 58) {
 			var i = this.readDigits();
 			h.set(i,this.unserialize());
-			c = this.buf.cca(this.pos++);
+			c = this.get(this.pos++);
 		}
 		if(c != 104) throw "Invalid IntHash format";
 		return h;
@@ -10329,19 +10330,19 @@ haxe.Unserializer.prototype.unserialize = function() {
 		while(i < max) {
 			var c1 = codes[buf.cca(i++)];
 			var c2 = codes[buf.cca(i++)];
-			bytes.b[bpos++] = (((c1 << 2) | (c2 >> 4)) & 255);
+			bytes.set(bpos++,(c1 << 2) | (c2 >> 4));
 			var c3 = codes[buf.cca(i++)];
-			bytes.b[bpos++] = (((c2 << 4) | (c3 >> 2)) & 255);
+			bytes.set(bpos++,(c2 << 4) | (c3 >> 2));
 			var c4 = codes[buf.cca(i++)];
-			bytes.b[bpos++] = (((c3 << 6) | c4) & 255);
+			bytes.set(bpos++,(c3 << 6) | c4);
 		}
 		if(rest >= 2) {
 			var c1 = codes[buf.cca(i++)];
 			var c2 = codes[buf.cca(i++)];
-			bytes.b[bpos++] = (((c1 << 2) | (c2 >> 4)) & 255);
+			bytes.set(bpos++,(c1 << 2) | (c2 >> 4));
 			if(rest == 3) {
 				var c3 = codes[buf.cca(i++)];
-				bytes.b[bpos++] = (((c2 << 4) | (c3 >> 2)) & 255);
+				bytes.set(bpos++,(c2 << 4) | (c3 >> 2));
 			}
 		}
 		this.pos += len;
@@ -10358,7 +10359,7 @@ haxe.Unserializer.prototype.unserialize = function() {
 haxe.Unserializer.prototype.unserializeEnum = function(edecl,tag) {
 	var constr = Reflect.field(edecl,tag);
 	if(constr == null) throw (("Unknown enum tag " + Type.getEnumName(edecl)) + ".") + tag;
-	if(this.buf.cca(this.pos++) != 58) throw "Invalid enum format";
+	if(this.get(this.pos++) != 58) throw "Invalid enum format";
 	var nargs = this.readDigits();
 	if(nargs == 0) {
 		this.cache.push(constr);
@@ -10369,18 +10370,18 @@ haxe.Unserializer.prototype.unserializeEnum = function(edecl,tag) {
 		args.push(this.unserialize());
 		nargs -= 1;
 	}
-	var e = constr.apply(edecl,args);
+	var e = Reflect.callMethod(edecl,constr,args);
 	this.cache.push(e);
 	return e;
 }
 haxe.Unserializer.prototype.unserializeObject = function(o) {
 	while(true) {
 		if(this.pos >= this.length) throw "Invalid object";
-		if(this.buf.cca(this.pos) == 103) break;
+		if(this.get(this.pos) == 103) break;
 		var k = this.unserialize();
 		if(!Std["is"](k,String)) throw "Invalid object key";
 		var v = this.unserialize();
-		o[k] = v;
+		Reflect.setField(o,k,v);
 	}
 	this.pos++;
 }
@@ -11659,7 +11660,7 @@ haxe.remoting.ExternalConnection.prototype.__path = null;
 haxe.remoting.ExternalConnection.prototype.call = function(params) {
 	var s = new haxe.Serializer();
 	s.serialize(params);
-	var params1 = s.toString();
+	var params1 = haxe.remoting.ExternalConnection.escapeString(s.toString());
 	var data = null;
 	var fobj = window.document[this.__data.flash];
 	if(fobj == null) fobj = window.document.getElementById[this.__data.flash];
@@ -11729,7 +11730,7 @@ net.alphatab.model.MidiChannel.prototype.volume = null;
 net.alphatab.model.MidiChannel.prototype.__class__ = net.alphatab.model.MidiChannel;
 net.alphatab.platform.js.Html5Canvas = function(dom) { if( dom === $_ ) return; {
 	this._canvas = dom;
-	this._jCanvas = (jQuery(dom));
+	this._jCanvas = net.alphatab.platform.js.JQuery.elements(dom);
 	this._context = dom.getContext("2d");
 }}
 net.alphatab.platform.js.Html5Canvas.__name__ = ["net","alphatab","platform","js","Html5Canvas"];
@@ -11790,7 +11791,7 @@ net.alphatab.platform.js.Html5Canvas.prototype.getTextBaseline = function() {
 	return this._context.textBaseline;
 }
 net.alphatab.platform.js.Html5Canvas.prototype.height = function() {
-	return this._jCanvas.height();
+	return this._jCanvas.Height();
 }
 net.alphatab.platform.js.Html5Canvas.prototype.lineTo = function(x,y) {
 	this._context.lineTo(x,y);
@@ -11817,7 +11818,7 @@ net.alphatab.platform.js.Html5Canvas.prototype.setFont = function(value) {
 	return this._context.font;
 }
 net.alphatab.platform.js.Html5Canvas.prototype.setHeight = function(height) {
-	this._jCanvas.height(height);
+	this._jCanvas.setHeight(height);
 	this._canvas.height = height;
 	this._context = this._canvas.getContext("2d");
 }
@@ -11838,7 +11839,7 @@ net.alphatab.platform.js.Html5Canvas.prototype.setTextBaseline = function(value)
 	return this._context.textBaseLine;
 }
 net.alphatab.platform.js.Html5Canvas.prototype.setWidth = function(width) {
-	this._jCanvas.width(width);
+	this._jCanvas.setWidth(width);
 	this._canvas.width = width;
 	this._context = this._canvas.getContext("2d");
 }
@@ -11861,7 +11862,7 @@ net.alphatab.platform.js.Html5Canvas.prototype.strokeText = function(text,x,y,ma
 net.alphatab.platform.js.Html5Canvas.prototype.textAlign = null;
 net.alphatab.platform.js.Html5Canvas.prototype.textBaseline = null;
 net.alphatab.platform.js.Html5Canvas.prototype.width = function() {
-	return this._jCanvas.width();
+	return this._jCanvas.Width();
 }
 net.alphatab.platform.js.Html5Canvas.prototype.__class__ = net.alphatab.platform.js.Html5Canvas;
 net.alphatab.platform.js.Html5Canvas.__interfaces__ = [net.alphatab.platform.Canvas];

@@ -1,0 +1,29 @@
+<project name="alphaTab-midi" default="dist" basedir=".">
+    <description>
+        a buildfile for building the java midi player of alphaTab
+    </description>
+	
+  <property name="src" location="src"/>
+  <property name="build" location="bin"/>
+  <property name="haxebin"  location="../bin"/>
+
+  <target name="init">
+    <!-- Create the time stamp -->
+    <tstamp/>
+    <!-- Create the build directory structure used by compile -->
+    <mkdir dir="${build}"/>
+  </target>
+
+  <target name="compile" depends="init"
+        description="compile the source " >
+    <!-- Compile the java code from ${src} into ${build} -->
+    <javac srcdir="${src}" destdir="${build}" classpath="C:/Program Files/Java/jre6/lib/plugin.jar" />
+  </target>
+
+  <target name="dist" depends="compile"
+        description="generate the distribution" >
+	<delete file="${haxebin}/lib/alphaTab/alphaTab.jar" />
+    <jar jarfile="${haxebin}/lib/alphaTab/alphaTab.jar" basedir="${build}"/>
+  </target>
+  
+</project>

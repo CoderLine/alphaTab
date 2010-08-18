@@ -139,11 +139,16 @@ fieldset {
 } 
 
 .alphaTabSurface {
+	border:7px solid rgb(210,214,215);
 	background:#F5F5F5;
 	/* Shadow */
-	-moz-box-shadow: 0 0 10px #888;
-	-webkit-box-shadow: 0 0 10px #888;
-	box-shadow: 0 0 10px #888;
+	-moz-box-shadow: 0 0 5px #888;
+	-webkit-box-shadow: 0 0 5px #888;
+	box-shadow: 0 0 5px #888;
+	/* Radius */
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
 	margin:7px 7px;
 }
 
@@ -179,12 +184,4 @@ code {
 .hint {
 	border:4px solid rgb(190,215,190);
 	padding:4px 4px;
-}
-
-.editorCaret {	
-	position:absolute;
-	z-index:100;
-	width:20px;
-	height:15px;
-	border:1px solid #FF0000;
 }

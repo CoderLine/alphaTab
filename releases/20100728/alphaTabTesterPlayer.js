@@ -1,11 +1,16 @@
 var api = null;
 
 $(document).ready(function(){
+	net.alphatab.MyTrace.init();
+	
 	api = $('#TablatureContainer').alphaTab({
 		loadCallback : songLoaded,
 		errorCallback: function(err) {
 			alert('Error: ' + err);
-		}});
+		},
+		player:true,
+		playerTickCallback: "onTickChanged"
+	})[0];
 	
 	// hook up ui elements
     $('#LoadSample').click(function(){
@@ -15,7 +20,7 @@ $(document).ready(function(){
     
 	$('#UpdateZoom').click(function(){
 		var zoomlvl = parseFloat($('#Zoom :selected').val());
-		api.tablature.updateScale(zoomlvl);
+		api.tablature.UpdateScale(zoomlvl);
 	});
 });
 
@@ -25,48 +30,47 @@ function onTickChanged(tickPos)
 }
 
 function songLoaded(song){
-    var output = "<b>Title:</b> " + song.title + "<br />" +
+    var output = "<b>Title:</b> " + song.Title + "<br />" +
     "<b>Subtitle:</b> " +
-    song.subtitle +
+    song.Subtitle +
     "<br />" +
     "<b>Album:</b> " +
-    song.album +
+    song.Album +
     "<br />" +
     "<b>Words:</b> " +
-    song.words +
+    song.Words +
     "<br />" +
     "<b>Music:</b> " +
-    song.music +
+    song.Music +
     "<br />" +
     "<b>Copyright:</b> " +
-    song.copyright +
+    song.Copyright +
     "<br />" +
     "<b>Tab:</b> " +
-    song.tab +
+    song.Tab +
     "<br />" +
     "<b>Instructions:</b> " +
-    song.instructions +
+    song.Instructions +
     "<br />" +
     "<b>Notice:</b> <br />" +
-    song.notice.replace("\n", "<br />") +
+    song.Notice.replace("\n", "<br />") +
     "<br />" +
     "<br />" +
     "<b>Tempo:</b> " +
-    song.tempo +
+    song.Tempo +
     "<br />" +
     "<b>Measures:</b> " +
-    song.measureHeaders.length +
+    song.MeasureHeaders.length +
     "<br />" +
     "<b>Tracks:</b> " +
-    song.tracks.length;
+    song.Tracks.length;
     
     $('#FileInfo').html(output);
-	
+		
 	var tracks = $('#Tracks');
-	tracks.find('option').remove();
-	for(var i = 0; i < song.tracks.length; i++) 
+	for(var i = 0; i < song.Tracks.length; i++) 
 	{
-		var elm = $('<option value="'+i+'">'+song.tracks[i].name+'</option>');
+		var elm = $('<option value="'+i+'">'+song.Tracks[i].Name+'</option>');
 		if(i == 0)
 		{
 			elm.attr("selected", "selected");
@@ -75,6 +79,6 @@ function songLoaded(song){
 	}
 	$('#UpdateTrack').click(function() {
 		var index = parseInt($('#Tracks :selected').val());
-		api.tablature.setTrack(song.tracks[index]);
+		api.tablature.SetTrack(song.Tracks[index]);
 	});
 }

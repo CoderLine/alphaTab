@@ -340,7 +340,8 @@ class AlphaTexParser extends SongReader
 			var prevHeader:MeasureHeader = _song.measureHeaders[header.number - 2];
 			measure.clef = prevMeasure.clef;
 			header.keySignature = prevHeader.keySignature;
-			header.keySignatureType = prevHeader.keySignatureType;
+			header.keySignatureType = prevHeader.keySignatureType; 
+            prevHeader.timeSignature.copy(header.timeSignature);
 		}
 		measureMeta(measure);
 		tempo.copy(header.tempo); // write new tempo on change

@@ -10,7 +10,7 @@ $(document).ready(function(){
 		playerPath: '../lib/alphaTab/alphaTab.jar',
 		playerTickCallback: "onTickChanged",
 		autoscroll: false
-	})[0];
+	});
 	
 	// hook up ui elements
     $('#LoadSample').click(function(){
@@ -70,7 +70,7 @@ function songLoaded(song){
 	var tracks = $('#Tracks');
 	for(var i = 0; i < song.tracks.length; i++) 
 	{
-		var elm = $('<option value="'+i+'">'+song.racks[i].Name+'</option>');
+		var elm = $('<option value="'+i+'">'+song.tracks[i].Name+'</option>');
 		if(i == 0)
 		{
 			elm.attr("selected", "selected");
