@@ -55,6 +55,10 @@ class Gp3Reader extends GpReaderBase
 		initVersions(["FICHIER GUITAR PRO v3.00"]);
 	}
 	
+	/**
+	 * Reads the song
+	 * @return The song readen from the given stream using the specified factory
+	 */
 	public override function readSong() : Song
 	{
 		if (!readVersion())

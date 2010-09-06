@@ -1,5 +1,4 @@
 package net.alphatab.file.alphatex;
-import js.Lib;
 import net.alphatab.file.FileFormatException;
 import net.alphatab.file.SongReader;
 import net.alphatab.model.effects.BendEffect;
@@ -9,7 +8,10 @@ import net.alphatab.model.effects.HarmonicType;
 import net.alphatab.model.effects.TremoloBarEffect;
 import net.alphatab.model.effects.TremoloPickingEffect;
 import net.alphatab.model.effects.TrillEffect;
+import net.alphatab.model.effects.GraceEffect;
+import net.alphatab.model.effects.GraceEffectTransition;
 import net.alphatab.model.Beat;
+import net.alphatab.model.Velocities;
 import net.alphatab.model.BeatStrokeDirection;
 import net.alphatab.model.Duration;
 import net.alphatab.model.GuitarString;
@@ -46,6 +48,7 @@ class AlphaTexParser extends SongReader
 	
 	private var _allowNegatives:Bool;
 	
+	private var _currentDuration:Int; 
 	/**
 	 * Constructor.
 	 */
@@ -112,6 +115,7 @@ class AlphaTexParser extends SongReader
 	{
 		createDefaultSong();
 		_curChPos = 0;
+		_currentDuration = 4;
 		nextChar();
 		newSy();
 		song();
@@ -431,6 +435,27 @@ class AlphaTexParser extends SongReader
 	 */
 	private function beat(measure:Measure) : Void
 	{
+		// duration specifier?
+		if(_sy == AlphaTexSymbols.DoubleDot)
+		{
+			newSy();
+			if (_sy != AlphaTexSymbols.Number) 
+			{
+				error("duration", AlphaTexSymbols.Number);
+			}
+			if (_syData == 1 || _syData == 2 || _syData == 4 || _syData == 8 ||
+				_syData == 16 || _syData == 32 || _syData == 64) 
+			{
+				_currentDuration = _syData;
+			}
+			else 
+			{
+				error("duration", AlphaTexSymbols.Number, false);
+			}		
+			newSy();
+			return;
+		}
+		
 		var beat:Beat = factory.newBeat();
 		beat.start = 0;
 		if (measure.beatCount() == 0)
@@ -450,10 +475,10 @@ class AlphaTexParser extends SongReader
 		{
 			newSy();
 			
-			voice.addNote(note());
+			voice.addNote(note(beat));
 			while (_sy != AlphaTexSymbols.RParensis && _sy != AlphaTexSymbols.Eof) 
 			{
-				voice.addNote(note());
+				voice.addNote(note(beat));
 			}		
 			
 			if (_sy != AlphaTexSymbols.RParensis) 
@@ -470,30 +495,34 @@ class AlphaTexParser extends SongReader
 		}
 		else 
 		{
-			voice.addNote(note());
+			voice.addNote(note(beat));
 		}
 		
-		// duration
-		if (_sy != AlphaTexSymbols.Dot) 
+		// new duration
+		if (_sy == AlphaTexSymbols.Dot) 
 		{
-			error("beat", AlphaTexSymbols.Dot);
+			newSy();
+			if (_sy != AlphaTexSymbols.Number) 
+			{
+				error("duration", AlphaTexSymbols.Number);
+			}
+			if (_syData == 1 || _syData == 2 || _syData == 4 || _syData == 8 ||
+				_syData == 16 || _syData == 32 || _syData == 64) 
+			{
+				voice.duration.value = _syData;
+			}
+			else 
+			{
+				error("duration", AlphaTexSymbols.Number, false);
+			}		
+			newSy();
 		}
-		newSy();
+		else
+		{
+			voice.duration.value = _currentDuration;
+		}
 		
-		if (_sy != AlphaTexSymbols.Number) 
-		{
-			error("duration", AlphaTexSymbols.Number);
-		}
-		if (_syData == 1 || _syData == 2 || _syData == 4 || _syData == 8 ||
-			_syData == 16 || _syData == 32 || _syData == 64) 
-		{
-			voice.duration.value = _syData;
-		}
-		else 
-		{
-			error("duration", AlphaTexSymbols.Number, false);
-		}		
-		newSy();
+		
 		
 		beatEffects(beat);
 				
@@ -513,125 +542,10 @@ class AlphaTexParser extends SongReader
 		}
 		newSy();
 		
-		while (_sy == AlphaTexSymbols.MetaCommand)
+		while (_sy == AlphaTexSymbols.String)
 		{
 			_syData = Std.string(_syData).toLowerCase();
-			if (_syData == "f") 
-			{
-				beat.effect.fadeIn = true;
-				newSy();
-			}
-			else if (_syData == "v") 
-			{
-				beat.effect.vibrato = true;
-				newSy();
-			}
-			else if (_syData == "t")
-			{
-				beat.effect.tapping = true;
-				newSy();
-			}
-			else if (_syData == "s") 
-			{
-				beat.effect.slapping = true;
-				newSy();
-			}
-			else if (_syData == "p") 
-			{
-				beat.effect.popping = true;
-				newSy();
-			}
-			else if (_syData == "su") 
-			{
-				beat.effect.stroke.direction = BeatStrokeDirection.Up;
-				newSy();
-				if (_sy == AlphaTexSymbols.Number) 
-				{
-					if (_syData == 4 || _syData == 8 || _syData == 16 || _syData == 32 || _syData == 64) 
-					{
-						beat.effect.stroke.value = _syData;
-					}
-					else
-					{
-						beat.effect.stroke.value = 8;
-					}
-					newSy();
-				}
-				else
-				{
-					beat.effect.stroke.value = 8;
-				}
-			}
-			else if (_syData == "sd") 
-			{
-				beat.effect.stroke.direction = BeatStrokeDirection.Down;
-				newSy();
-				if (_sy == AlphaTexSymbols.Number)
-				{
-					if (_syData == 4 || _syData == 8 || _syData == 16 || _syData == 32 || _syData == 64) 
-					{
-						beat.effect.stroke.value = _syData;
-					}
-					else
-					{
-						beat.effect.stroke.value = 8;
-					}
-					newSy();
-				}
-				else
-				{
-					beat.effect.stroke.value = 8;
-				}
-			}
-			else if (_syData == "tb") 
-			{
-				// read points
-				newSy();
-				if (_sy != AlphaTexSymbols.LParensis)
-				{
-					error("tremolobar-effect", AlphaTexSymbols.LParensis);
-				}
-				newSy();
-				_allowNegatives = true;
-			
-				var points:Array<BendPoint> = new Array<BendPoint>();
-				while (_sy != AlphaTexSymbols.RParensis && _sy != AlphaTexSymbols.Eof)
-				{
-					if (_sy != AlphaTexSymbols.Number) 
-					{
-						error("tremolobar-effect", AlphaTexSymbols.Number);
-					}
-					points.push(new BendPoint(0, _syData, false));
-					newSy();
-				}
-				
-				// only 12 points allowed
-				if (points.length > 12)
-				{
-					points = points.slice(0, 12);
-				}
-								
-				// set positions
-				var count = points.length;
-				var step = Math.ceil(12 / count);
-				var i = 0; 
-				var tremoloBarEffect:TremoloBarEffect = factory.newTremoloBarEffect();
-				while (i < count) 
-				{
-					points[i].position = Math.floor(Math.min(12, (i * step)));					
-					tremoloBarEffect.points.push(points[i]);
-					i++;
-				}
-				beat.effect.tremoloBar = tremoloBarEffect;
-				_allowNegatives = false;
-				
-				if (_sy != AlphaTexSymbols.RParensis)
-				{
-					error("tremolobar-effect", AlphaTexSymbols.RParensis);
-				}
-				newSy();
-			}
-			else 
+			if(!applyBeatEffect(beat))
 			{
 				error("beat-effects", AlphaTexSymbols.String, false);
 			}
@@ -645,11 +559,192 @@ class AlphaTexParser extends SongReader
 	}
 	
 	/**
+	 * Tries to apply a beat effect to the given beat.
+	 * @return true if a effect could be applied, otherwise false
+	 */
+	private function applyBeatEffect(beat:Beat) : Bool
+	{
+		if (_syData == "f") 
+		{
+			beat.effect.fadeIn = true;
+			newSy();
+			return true;
+		}
+		else if (_syData == "v") 
+		{
+			beat.effect.vibrato = true;
+			newSy();
+			return true;
+		}
+		else if (_syData == "t")
+		{
+			beat.effect.tapping = true;
+			newSy();
+			return true;
+		}
+		else if (_syData == "s") 
+		{
+			beat.effect.slapping = true;
+			newSy();
+			return true;
+		}
+		else if (_syData == "p") 
+		{
+			beat.effect.popping = true;
+			newSy();
+			return true;
+		}
+		else if (_syData == "d")
+		{
+			beat.voices[0].duration.isDotted = true;
+			newSy();
+			return true;
+		}
+		else if (_syData == "su") 
+		{
+			beat.effect.stroke.direction = BeatStrokeDirection.Up;
+			newSy();
+			if (_sy == AlphaTexSymbols.Number) 
+			{
+				if (_syData == 4 || _syData == 8 || _syData == 16 || _syData == 32 || _syData == 64) 
+				{
+					beat.effect.stroke.value = _syData;
+				}
+				else
+				{
+					beat.effect.stroke.value = 8;
+				}
+				newSy();
+			}
+			else
+			{
+				beat.effect.stroke.value = 8;
+			}
+			return true;
+		}
+		else if (_syData == "sd") 
+		{
+			beat.effect.stroke.direction = BeatStrokeDirection.Down;
+			newSy();
+			if (_sy == AlphaTexSymbols.Number)
+			{
+				if (_syData == 4 || _syData == 8 || _syData == 16 || _syData == 32 || _syData == 64) 
+				{
+					beat.effect.stroke.value = _syData;
+				}
+				else
+				{
+					beat.effect.stroke.value = 8;
+				}
+				newSy();
+			}
+			else
+			{
+				beat.effect.stroke.value = 8;
+			}
+			return true;
+		}
+		else if (_syData == "tu")
+		{
+			newSy();
+			if (_sy != AlphaTexSymbols.Number)
+			{
+				error("tuplet", AlphaTexSymbols.Number);
+				return false;
+			}
+			var tuplet = _syData;
+			var duration = beat.voices[0].duration;
+            switch (tuplet) 
+            {
+                case 3:
+                    duration.tuplet.enters = (3);
+                    duration.tuplet.times = (2);
+                case 5:
+                    duration.tuplet.enters = (5);
+                    duration.tuplet.times = (4);
+                case 6:
+                    duration.tuplet.enters = (6);
+                    duration.tuplet.times = (4);
+                case 7:
+                    duration.tuplet.enters = (7);
+                    duration.tuplet.times = (4);
+                case 9:
+                    duration.tuplet.enters = (9);
+                    duration.tuplet.times = (8);
+                case 10:
+                    duration.tuplet.enters = (10);
+                    duration.tuplet.times = (8);
+                case 11:
+                    duration.tuplet.enters = (11);
+                    duration.tuplet.times = (8);
+                case 12:
+                    duration.tuplet.enters = (12);
+                    duration.tuplet.times = (8);
+            }
+            newSy();
+            return true;
+		}
+		else if (_syData == "tb") 
+		{
+			// read points
+			newSy();
+			if (_sy != AlphaTexSymbols.LParensis)
+			{
+				error("tremolobar-effect", AlphaTexSymbols.LParensis);
+				return false;
+			}
+			newSy();
+			_allowNegatives = true;
+		
+			var points:Array<BendPoint> = new Array<BendPoint>();
+			while (_sy != AlphaTexSymbols.RParensis && _sy != AlphaTexSymbols.Eof)
+			{
+				if (_sy != AlphaTexSymbols.Number) 
+				{
+					error("tremolobar-effect", AlphaTexSymbols.Number);
+					return false;
+				}
+				points.push(new BendPoint(0, _syData, false));
+				newSy();
+			}
+			
+			// only 12 points allowed
+			if (points.length > 12)
+			{
+				points = points.slice(0, 12);
+			}
+							
+			// set positions
+			var count = points.length;
+			var step = Math.ceil(12 / count);
+			var i = 0; 
+			var tremoloBarEffect:TremoloBarEffect = factory.newTremoloBarEffect();
+			while (i < count) 
+			{
+				points[i].position = Math.floor(Math.min(12, (i * step)));					
+				tremoloBarEffect.points.push(points[i]);
+				i++;
+			}
+			beat.effect.tremoloBar = tremoloBarEffect;
+			_allowNegatives = false;
+			
+			if (_sy != AlphaTexSymbols.RParensis)
+			{
+				error("tremolobar-effect", AlphaTexSymbols.RParensis);
+				return false;
+			}
+			newSy();
+			return true;
+		}
+		return false;
+	}
+	
+	/**
 	 * Non Terminal - Note
 	 * @param effect the current effects
 	 * @return
 	 */
-	private function note() : Note 
+	private function note(beat:Beat) : Note 
 	{
 		// fret.string
 		if (_sy != AlphaTexSymbols.Number && !(_sy == AlphaTexSymbols.String 
@@ -682,7 +777,7 @@ class AlphaTexParser extends SongReader
 		
 		// read effects
 		var effect:NoteEffect = factory.newNoteEffect();
-		noteEffects(effect);
+		noteEffects(beat, effect);
 		
 		// create note
 		var note:Note = factory.newNote();
@@ -695,11 +790,12 @@ class AlphaTexParser extends SongReader
 		return note;
 	}
 	
+	
 	/**
 	 * Non Terminal - Note Effects
 	 * @param effect the object to fill into
 	 */
-	private function noteEffects(effect:NoteEffect) : Void 
+	private function noteEffects(beat:Beat, effect:NoteEffect) : Void 
 	{
 		if (_sy != AlphaTexSymbols.LBrace) 
 		{
@@ -707,7 +803,7 @@ class AlphaTexParser extends SongReader
 		}
 		newSy();
 		
-		while (_sy == AlphaTexSymbols.MetaCommand)
+		while (_sy == AlphaTexSymbols.String)
 		{
 			_syData = Std.string(_syData).toLowerCase();
 			if (_syData == "b") 
@@ -794,16 +890,62 @@ class AlphaTexParser extends SongReader
 				effect.harmonic = harmonicEffect;
 				newSy();
 			}
-			/*Grace Notes, to complex for now. Find a simple format
 			else if (_syData == "gr") 
 			{
+				// \gr fret duration transition
 				newSy();
-				if (_sy != AlphaTexSymbols.Number) 
+				// fret
+				if (_sy != AlphaTexSymbols.Number && !(_sy == AlphaTexSymbols.String 
+					&& Std.string(_syData).toLowerCase() == "x")) 
 				{
-					throw new FileFormatException("Expected Number found  \"" + _syData + "\" on position " + _curChPos);
+					error("grace-effect-fret", AlphaTexSymbols.Number);
 				}
-				var fret = _syData;
-			}*/
+				
+				var isDead:Bool = Std.string(_syData).toLowerCase() == "x";
+				var fret:Int = isDead ? 0 : _syData;
+				newSy(); 
+				
+				// duration
+				var duration = 16;
+				if (_sy == AlphaTexSymbols.Number) 
+				{
+					if (_syData != 16 && _syData != 32 && _syData != 64) {
+						_syData = 16;
+					}
+					duration = _syData;
+					newSy();
+				}
+			
+				
+				// transition
+				var transition:GraceEffectTransition = GraceEffectTransition.None;
+				if (_sy == AlphaTexSymbols.String) 
+				{
+					if(_syData == "s")
+					{
+						transition = GraceEffectTransition.Slide;
+						newSy();
+					}
+					else if(_syData == "b")
+					{
+						transition = GraceEffectTransition.Bend;
+						newSy();
+					}
+					else if(_syData == "h")
+					{
+						transition = GraceEffectTransition.Hammer;
+						newSy();
+					}
+				}
+				
+				var graceEffect:GraceEffect = factory.newGraceEffect();
+				graceEffect.duration = duration;
+				graceEffect.fret = fret;
+				graceEffect.isDead = isDead;
+				graceEffect.transition = transition;
+				graceEffect.velocity = Velocities.FORTE;
+				effect.grace = graceEffect;
+			}
 			else if (_syData == "tr") 
 			{
 				newSy();
@@ -814,16 +956,16 @@ class AlphaTexParser extends SongReader
 				var fret = _syData;
 				newSy();
 				
-				if (_sy != AlphaTexSymbols.Number) 
+				var duration = 16;
+				if (_sy == AlphaTexSymbols.Number) 
 				{
-					error("trill-effect-fret", AlphaTexSymbols.Number);
+					if (_syData != 16 && _syData != 32 && _syData != 64) 
+					{
+						_syData = 16;
+					}
+					duration = _syData;
+					newSy();
 				}
-				var duration = 0;
-				if (_syData != 16 && _syData != 32 && _syData != 64) {
-					_syData = 16;
-				}
-				duration = _syData;
-				newSy();
 				
 				var trillEffect:TrillEffect = factory.newTrillEffect();
 				trillEffect.duration.value = duration;
@@ -833,16 +975,17 @@ class AlphaTexParser extends SongReader
 			else if (_syData == "tp")
 			{
 				newSy();
-				if (_sy != AlphaTexSymbols.Number)
+				var duration = 8;
+				if (_sy == AlphaTexSymbols.Number)
 				{
-					error("tremolopicking-effect", AlphaTexSymbols.Number);
+					if (_syData != 8 && _syData != 16 && _syData != 32)
+					{
+						_syData = 8;
+					}
+					duration = _syData;
+					newSy();
 				}
-				if (_syData != 8 && _syData != 16 && _syData != 32)
-				{
-					_syData = 8;
-				}
-				newSy();
-				var duration = _syData;
+				
 				var tremoloPicking:TremoloPickingEffect = factory.newTremoloPickingEffect();
 				tremoloPicking.duration.value = duration;
 				effect.tremoloPicking = tremoloPicking;
@@ -899,9 +1042,13 @@ class AlphaTexParser extends SongReader
 				newSy();
 				effect.letRing = true;
 			}			
+			else if(applyBeatEffect(beat)) // also try beat effects
+			{
+				// Success
+			}
 			else 
 			{
-				error("note-effect", AlphaTexSymbols.String, false);
+				error(_syData, AlphaTexSymbols.String, false);
 			}
 		}
 		
@@ -1083,24 +1230,20 @@ class AlphaTexParser extends SongReader
 					_sy = AlphaTexSymbols.Number;
 					_syData = -number;
 				}
-				else if (isLetter(_ch)) 
+				else
 				{
-					var name:String = readName();
-					if (isTuning(name)) 
-					{
-						_sy = AlphaTexSymbols.Tuning;
-						_syData = name.toLowerCase();
-					}
-					else
-					{
-						_sy = AlphaTexSymbols.String;
-						_syData = name;
-					}
+					_sy = AlphaTexSymbols.String;
+					_syData = readName();
 				}
 			}
 			else if(_ch == ".")
 			{
 				_sy = AlphaTexSymbols.Dot;
+				nextChar();
+			}
+			else if(_ch == ":")
+			{
+				_sy = AlphaTexSymbols.DoubleDot;
 				nextChar();
 			}
 			else if (_ch == "(") 
@@ -1173,10 +1316,30 @@ class AlphaTexParser extends SongReader
 		var code:Int = ch.charCodeAt(0);
 		
 		// no control characters, whitespaces, numbers or dots
-		return  code != 0x2E && (
+		return !isTerminal(ch) && (
 				(code >= 0x21 && code <= 0x2F) ||
 				(code >= 0x3A && code <= 0x7E) || 
 				(code > 0x80)); /* Unicode Symbols */
+	}
+	
+	/**
+	 * Checks if the given charater is a non terminal.
+	 * @param ch the character
+	 * @return true if the given character is a terminal, otherwise false.
+	 */
+	private static function isTerminal(ch:String) : Bool
+	{
+		return ch == "." ||
+			   ch == "{" ||
+			   ch == "}" ||
+			   ch == "[" ||
+			   ch == "]" ||
+			   ch == "(" ||
+			   ch == ")" ||
+			   ch == "|" || 
+			   ch == "'" ||
+			   ch == '"' ||
+			   ch == "\\";
 	}
 	
 	/**
@@ -1184,10 +1347,11 @@ class AlphaTexParser extends SongReader
 	 * @param ch the character
 	 * @return true if the given character is a digit, otherwise false.
 	 */
-	private static function isDigit(ch:String) : Bool
+	private function isDigit(ch:String) : Bool
 	{
 		var code:Int = ch.charCodeAt(0);
-		return (code >= 0x30 && code <= 0x39); /*0-9*/
+		return (code >= 0x30 && code <= 0x39) || /*0-9*/
+				(ch == "-" && _allowNegatives); // allow - if negatives
 	}
 	
 	/**

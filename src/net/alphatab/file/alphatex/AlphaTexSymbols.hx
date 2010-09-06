@@ -8,8 +8,8 @@ enum AlphaTexSymbols
 	No;
 	Eof;
 	Number;
+	DoubleDot;
 	Dot;
-	Version;
 	String;
 	Tuning;
 	LParensis;

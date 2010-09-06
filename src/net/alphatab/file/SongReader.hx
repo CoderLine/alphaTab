@@ -18,9 +18,18 @@ import net.alphatab.model.SongFactory;
  */
 class SongReader 
 {
+	/**
+	 * The data source for reading. 
+	 */
 	public var data:BinaryReader;
+	/**
+	 * The song factory for creating objects.
+	 */
 	public var factory:SongFactory;
 
+	/**
+	 * Gets a list of the available readers. 
+	 */
 	public static function availableReaders() : Array<SongReader>
 	{
 		var d:Array<SongReader> = new Array<SongReader>();
@@ -30,21 +39,37 @@ class SongReader
 		return d;
 	}
 
+	/**
+	 * Initializes a new instance of this class.
+	 */
 	public function new() 
 	{
 	}
 	
+	/**
+	 * Initializes the reader. 
+	 * @param data The data source for reading.
+	 * @param factory The song factory for creating objects.
+	 */
 	public function init(data:BinaryReader, factory:SongFactory) : Void 
 	{
 		this.data = data;
 		this.factory = factory;
 	}
 	
+	/**
+	 * Starts the reading of songs.
+	 * @return The song which was read from the initialized data source.
+	 * @throws FileFormatException Thrown on an error during reading. 
+	 */
 	public function readSong(): Song
 	{
 		return factory.newSong();
 	}	
 	
+	/**
+	 * Returns the value for a tied note. 
+	 */
 	public function getTiedNoteValue(stringIndex:Int, track:Track) : Int
 	{
 		var measureCount:Int = track.measureCount();
