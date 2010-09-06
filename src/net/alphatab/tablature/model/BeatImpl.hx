@@ -35,7 +35,7 @@ class BeatImpl extends Beat
 
 	public function caretPosition(layout:ViewLayout) : Int
 	{
-		return Math.round(this.getRealPosX(layout) + 8 * layout.scale);
+		return Math.floor(this.getRealPosX(layout) + 8 * layout.scale);
 	}
 	
 	public function width() : Int
@@ -133,7 +133,7 @@ class BeatImpl extends Beat
 			{ 
 				context.get(DrawingLayers.Lines).startFigure();
 				context.get(DrawingLayers.Lines).addLine(cast x1, i, cast x2, i);
-				i -= cast scorelineSpacing;
+				i -= Math.floor(scorelineSpacing);
 			}
 		}
 		else if (realY > (y + (scorelineSpacing * 4)))

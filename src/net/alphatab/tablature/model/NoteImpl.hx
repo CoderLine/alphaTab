@@ -38,8 +38,17 @@ class NoteImpl extends Note
 	public var scorePosY:Int;
 	public var tabPosY:Int;
 
+	public function getPosX() 
+	{
+		return _noteOrientation.x;
+	}
+	
+	public function getNoteWidth()
+	{
+		return _noteOrientation.width;
+	}
 
-	public function getpaintPosition(index:TrackSpacingPositions) :Int
+	public function getPaintPosition(index:TrackSpacingPositions) :Int
 	{
 		return measureImpl().ts.get(index);
 	}
@@ -105,16 +114,16 @@ class NoteImpl extends Note
 	{
 		_accidental = measureImpl().getNoteAccidental(realValue());
 		tabPosY = Math.round((this.string * layout.stringSpacing) - layout.stringSpacing); 
-		scorePosY = voiceImpl().beatGroup.getY1(layout, this, measureImpl().keySignature(), MeasureClefConverter.toInt(measureImpl().clef));
+		scorePosY = voiceImpl().beatGroup.getY1(layout, this, measureImpl().keySignature(), MeasureClefConverter.toInt(measureImpl().clef)) + Math.floor(1*layout.scale);
 	}
 
 	public function paint(layout:ViewLayout, context:DrawingContext, x:Int, y:Int) : Void
 	{
 		var spacing:Int = beatImpl().spacing();
-		paintScoreNote(layout, context, x, y + getpaintPosition(TrackSpacingPositions.ScoreMiddleLines),
+		paintScoreNote(layout, context, x, y + getPaintPosition(TrackSpacingPositions.ScoreMiddleLines),
 			spacing);
 		paintOfflineEffects(layout, context, x, y, spacing);
-		paintTablatureNote(layout, context, x, y + getpaintPosition(TrackSpacingPositions.Tablature), spacing);
+		paintTablatureNote(layout, context, x, y + getPaintPosition(TrackSpacingPositions.Tablature), spacing);
 	}
 
 	private function paintOfflineEffects(layout:ViewLayout, context:DrawingContext, x:Int, y:Int, spacing:Int)
@@ -133,18 +142,18 @@ class NoteImpl extends Note
 
 		if (effect.accentuatedNote)
 		{
-			var realY:Int = y + getpaintPosition(TrackSpacingPositions.AccentuatedEffect);
+			var realY:Int = y + getPaintPosition(TrackSpacingPositions.AccentuatedEffect);
 			paintAccentuated(layout, context, realX, realY);
 		}
 		else if (effect.heavyAccentuatedNote)
 		{
-			var realY:Int = y + getpaintPosition(TrackSpacingPositions.AccentuatedEffect);
+			var realY:Int = y + getPaintPosition(TrackSpacingPositions.AccentuatedEffect);
 			paintHeavyAccentuated(layout, context, realX, realY);
 		}
 
 		if (effect.isHarmonic())
 		{
-			var realY:Int = y + getpaintPosition(TrackSpacingPositions.HarmonicEffect);
+			var realY:Int = y + getPaintPosition(TrackSpacingPositions.HarmonicEffect);
 			var key:String = "";
 			switch (effect.harmonic.type)
 			{
@@ -202,7 +211,7 @@ class NoteImpl extends Note
 				}
 			}
 
-			var realY = y + getpaintPosition(TrackSpacingPositions.LetRingEffect);
+			var realY = y + getPaintPosition(TrackSpacingPositions.LetRingEffect);
 			var height = DrawingResources.defaultFontHeight;
 			var startX:Float = realX;
 			
@@ -273,7 +282,7 @@ class NoteImpl extends Note
 				}
 			}
 
-			var realY = y + getpaintPosition(TrackSpacingPositions.PalmMuteEffect);
+			var realY = y + getPaintPosition(TrackSpacingPositions.PalmMuteEffect);
 			var height = DrawingResources.defaultFontHeight;
 			var startX:Float = realX;
 			if (!nextPalm)
@@ -290,9 +299,13 @@ class NoteImpl extends Note
 			{
 				startX -= 6 * layout.scale;
 			}
-			draw.startFigure();
-			draw.addLine(startX, Math.round(realY), endX, Math.round(realY));
-
+			
+			if(nextPalm || prevPalm)
+			{
+				draw.startFigure();
+				draw.addLine(startX, Math.round(realY), endX, Math.round(realY));
+			}
+			
 
 			if (!nextPalm && prevPalm)
 			{
@@ -304,12 +317,12 @@ class NoteImpl extends Note
 		
 		if (effect.vibrato)
 		{
-			var realY:Int = y + getpaintPosition(TrackSpacingPositions.VibratoEffect);
+			var realY:Int = y + getPaintPosition(TrackSpacingPositions.VibratoEffect);
 			paintVibrato(layout, context, realX, realY, 0.75);
 		}
 		if (effect.isTrill())
 		{
-			var realY:Int = y + getpaintPosition(TrackSpacingPositions.VibratoEffect);
+			var realY:Int = y + getPaintPosition(TrackSpacingPositions.VibratoEffect);
 			paintTrill(layout, context, realX, realY);
 		}
 	}
@@ -557,7 +570,7 @@ class NoteImpl extends Note
 				var firstHelper:Point = new Point(firstLoc.x + ((secondLoc.x - firstLoc.x)), cast (iY - dY * firstPt.value));
 				draw.addBezier(firstLoc.x, firstLoc.y, firstHelper.x, firstHelper.y, secondLoc.x, secondLoc.y, secondLoc.x, secondLoc.y);
 
-				var arrowSize:Float = 4 * scale;
+				var arrowSize:Float = 3 * scale;
 				if (secondPt.value > firstPt.value)
 				{
 					draw.addLine(secondLoc.x - 0.5, secondLoc.y, secondLoc.x - arrowSize - 0.5, secondLoc.y + arrowSize); 
@@ -609,6 +622,7 @@ class NoteImpl extends Note
 	{
 		var xScale:Float = layout.scale;
 		var yScale:Float = layout.stringSpacing / 10.0;
+		var xMove:Float = 15.0 * xScale;
 		var yMove:Float = 3.0 * yScale;
 		var realX:Float = x;
 		var realY:Float = y;
@@ -623,25 +637,26 @@ class NoteImpl extends Note
 		{
 			realY += yMove;
 			rextY -= yMove;
-			draw.addLine(realX - (5 * xScale), realY, realX + (3 * xScale), rextY);
+			
+			draw.addLine(_noteOrientation.x - xMove, realY, _noteOrientation.x, rextY);
 		}
 		else if (effect.slideType == SlideType.IntoFromAbove)
 		{
 			realY -= yMove;
 			rextY += yMove;
-			draw.addLine(realX - (5 * xScale), realY, realX + (3 * xScale), rextY);
+			draw.addLine(_noteOrientation.x - xMove, realY, _noteOrientation.x, rextY);
 		}
 		else if (effect.slideType == SlideType.OutDownWards)
 		{
 			realY -= yMove;
 			rextY += yMove;
-			draw.addLine(realX + (10 * xScale), realY, realX + (18 * xScale), rextY);
+			draw.addLine(_noteOrientation.x + _noteOrientation.width, realY, _noteOrientation.x + _noteOrientation.width + xMove, rextY);
 		}
 		else if (effect.slideType == SlideType.OutUpWards)
 		{
 			realY += yMove;
 			rextY -= yMove;
-			draw.addLine(realX + (10 * xScale), realY, realX + (18 * xScale), rextY);
+			draw.addLine(_noteOrientation.x + _noteOrientation.width, realY, _noteOrientation.x + _noteOrientation.width + xMove, rextY);
 		}
 		else if (nextNote != null)
 		{
@@ -664,7 +679,7 @@ class NoteImpl extends Note
 				rextY -= yMove;
 			}
 
-			draw.addLine(realX + (13 * xScale), realY, fNextX, rextY);
+			draw.addLine(_noteOrientation.x + _noteOrientation.width, realY, fNextX, rextY);
 
 			if (effect.slideType == SlideType.SlowSlideTo)
 			{
@@ -673,21 +688,25 @@ class NoteImpl extends Note
 		}
 		else
 		{
-			draw.addLine(realX + (13 * xScale), realY - yMove, realX + (19 * xScale), realY - yMove);
+			draw.addLine(_noteOrientation.x + _noteOrientation.width, realY - yMove, _noteOrientation.x + _noteOrientation.width + xMove, realY - yMove);
 		}
 	}
-
+	
 	private function paintHammer(layout:ViewLayout, context:DrawingContext, nextNote:NoteImpl, x:Float, y:Float, forceDown:Bool = false) : Void
 	{
 		var xScale:Float = layout.scale;
 		var yScale:Float = layout.stringSpacing / 10.0;
 
-		var realX :Float= x + (7.0 * xScale);
+		var offset:Float = 7 *xScale;
+
+		var realX :Float= x;
 		var realY:Float = y - (DrawingResources.noteFontHeight * layout.scale);
 
-		var width:Float = nextNote != null
-						   ? nextNote.beatImpl().getRealPosX(layout) - 4 * xScale -  realX
-						   : 10.0 * xScale;
+		var endX:Float = nextNote != null ? 
+					nextNote.beatImpl().getRealPosX(layout) - (2*offset)
+					: realX + 10*xScale;
+						 
+		var width:Float = endX - realX;
 		var fill:DrawingLayer = voice.index == 0
 					? context.get(DrawingLayers.VoiceEffects1)
 					: context.get(DrawingLayers.VoiceEffects2);
@@ -697,7 +716,7 @@ class NoteImpl extends Note
 		if (this.string > 3 || forceDown)
 			realY += (DrawingResources.noteFontHeight * layout.scale) * 2;
 			
-		fill.addMusicSymbol(MusicFont.HammerPullUp, cast realX, cast realY, layout.scale * wScale, layout.scale * hScale);
+		fill.addMusicSymbol(MusicFont.HammerPullUp, realX + offset, cast realY, layout.scale * wScale, layout.scale * hScale);
 	}
 
 	private function paintGrace(layout:ViewLayout, context:DrawingContext, x:Int, y:Int) : Void
