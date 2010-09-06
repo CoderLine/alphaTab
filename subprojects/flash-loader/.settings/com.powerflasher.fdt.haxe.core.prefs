@@ -1,0 +1,8 @@
+#Sat Aug 28 07:23:04 CEST 2010
+eclipse.preferences.version=1
+haxeOutputType=swf9
+hxsrcFolders=src
+mainClass=net.alphatab.file.loader.FlashFileLoader
+outputPath=bin/alphaTab.flashloader.swf
+sdkPath=C\:\\Program Files (x86)\\Motion-Twin\\haxe
+sdkPathOverride=false
