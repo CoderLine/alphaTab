@@ -1,5 +1,4 @@
 package net.alphatab.midi;
-import js.Lib;
 import net.alphatab.model.Duration;
 import net.alphatab.model.TimeSignature;
 

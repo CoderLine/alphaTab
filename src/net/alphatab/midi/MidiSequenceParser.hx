@@ -1,10 +1,4 @@
-/**
- * ...
- * @author Daniel Kuschny
- */
-
 package net.alphatab.midi;
-import js.Lib;
 import net.alphatab.model.effects.BendEffect;
 import net.alphatab.model.effects.BendPoint;
 import net.alphatab.model.effects.HarmonicEffect;
