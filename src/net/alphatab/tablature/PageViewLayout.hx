@@ -189,7 +189,7 @@ class PageViewLayout extends ViewLayout
 	{
 		var track:Track = tablature.track;
 		y = Math.round(y + contentPadding.top);
-		y = Math.round(PaintSongInfo(ctx, clientArea, x, y) + firstMeasureSpacing);
+		y = Math.round(paintSongInfo(ctx, clientArea, x, y) + firstMeasureSpacing);
 		var beatCount:Int = 0;
 		for (l in 0 ... _lines.length) 
 		{
@@ -198,7 +198,7 @@ class PageViewLayout extends ViewLayout
 		}
 	}
 	
-	private function PaintSongInfo(ctx:DrawingContext, clientArea:Rectangle, x:Int, y:Int) : Int
+	private function paintSongInfo(ctx:DrawingContext, clientArea:Rectangle, x:Int, y:Int) : Int
 	{
 		Log.trace("Paint Song info");
 		var song:Song = tablature.track.song;

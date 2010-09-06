@@ -62,7 +62,7 @@ class DrawingLayer
 					case "rectTo":
 						graphics.rect(_currentPosition.x, _currentPosition.y, elm.Width, elm.Height);
 					case "circleTo":
-						graphics.arc(_currentPosition.x + elm.Radius, _currentPosition.y + elm.Radius, elm.Radius, 0,Math.PI*2,true);
+						graphics.circle(_currentPosition.x + elm.Radius, _currentPosition.y + elm.Radius, elm.Radius);
 					case "addString":
 						graphics.textBaseline = elm.BaseLine;
 						graphics.font = elm.Font;
@@ -81,17 +81,12 @@ class DrawingLayer
 						graphics.closePath();
 						finish(graphics);
 						graphics.beginPath();
-					case "addArc":
-						graphics.arc(elm.X, elm.Y, elm.Radius, elm.StartAngle, elm.SweepAngle, false);
 					case "addBezier":
 						graphics.moveTo(elm.X1, elm.Y1);
 						graphics.bezierCurveTo(elm.X2, elm.Y2, elm.X3, elm.Y3, elm.X4, elm.Y4);
 					case "addCircle":
 						finish(graphics);
-						graphics.beginPath();
-						graphics.arc(elm.X + elm.Radius, elm.Y + elm.Radius, elm.Radius, 0, Math.PI * 2, true);
-						finish(graphics);
-						graphics.beginPath();
+						graphics.circle(elm.X + elm.Radius, elm.Y + elm.Radius, elm.Radius);
 					case "addRect":
 						graphics.rect(elm.X, elm.Y, elm.Width, elm.Height);
 				}
@@ -189,18 +184,6 @@ class DrawingLayer
 		_path.push({
 			Command: "addPolygon",
 			Points: points
-		});
-	}
-
-	public function addArc(x:Int,y:Int,w:Int,h:Int,startAngle:Float,sweepAngle:Float): Void{
-		_path.push({
-			Command: "addArc",
-			X : x,
-			Y : y,
-			Width : w,
-			Height : h,
-			StartAngle : startAngle,
-			SweepAngle : sweepAngle
 		});
 	}
 

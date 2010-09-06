@@ -154,7 +154,7 @@ class Tablature
 	
 	public function invalidate() 
 	{
-		canvas.clearRect(0, 0, canvas.width(), canvas.height());
+		canvas.clear();
 		this.onPaint();
 	}
 	
