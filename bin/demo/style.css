@@ -1,14 +1,13 @@
+/** General Style **/
 body, html {
 	margin:0;
 	padding:0;
 }
 
-body {
-	font-family:Arial, Helvetica, sans-serif;
-	font-size:13px;
-	background:#EFEFEF;
-}
-
+body{font-family:Arial, Verdana, Helvetica, sans-serif;font-size:12px;color:#575757;background:#efefef;}
+h1{color:#575757;text-shadow:1px 1px 0 #FFF;font-weight:normal;margin:0 0 10px 0;font-size:24px;}
+h2{color:#426d9d;font-size:18px;margin:0 0 6px 0;}
+h3{color:#426d9d;font-size:16px;}
 
 a:link, a:visited {
 	color:#335c82;
@@ -17,21 +16,6 @@ a:link, a:visited {
 
 a:hover, a:active {
 	text-decoration:underline;
-}
-
-h1 {
-	color:#575757;
-	font-size:24px;
-	font-weight:normal;
-	margin:0;
-	text-shadow:1px 1px 0 #FFFFFF;
-}
-
-h2 {
-	color:#204A87;
-	font-size:18px;
-	font-weight:normal;
-	margin:0;
 }
 
 #Content {
@@ -105,86 +89,46 @@ fieldset {
 	 width:780px;
 }
 
-.playerControls {
-	position:fixed;
-	bottom:0;
-	z-index:10;
-	-moz-border-radius:5px 5px;
-	-webkit-border-radius:5px 5px;
-	border:1px solid #000;
-	padding:5px 5px;
-	margin-left:400px;
-}
-
-.measureCaret {
-	opacity: 0.25;       /* modern browser */  
-	-moz-opacity: 0.25;  /* older Mozilla browser */  
-	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=25)"; /* IE8 in Standard Compliant Mode */  
-	filter:alpha(opacity=25); /* IE5.x -7.0 */  
-	width:0;
-	height:0;
-	background:rgb(255,242, 0);
-	postition:absolute;
-} 
-
-.beatCaret {
-	opacity: 0.75;       /* modern browser */  
-	-moz-opacity: 0.75;  /* older Mozilla browser */  
-	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=75)"; /* IE8 in Standard Compliant Mode */  
-	filter:alpha(opacity=75); /* IE5.x -7.0 */  
-	width:0;
-	height:0;
-	background:rgb(64,64,255);
-	postition:absolute;
-} 
-
-.alphaTabSurface {
-	background:#F5F5F5;
-	/* Shadow */
-	-moz-box-shadow: 0 0 10px #888;
-	-webkit-box-shadow: 0 0 10px #888;
-	box-shadow: 0 0 10px #888;
-	margin:7px 7px;
-}
-
-.alphaTab {
-	/* this line is required by IE 
-	   it enables to get newline symbols from div */
-	white-space:pre;	
-}
-
-.codeEditor, code {
-	border:4px solid rgb(190,215,190);
-	background:#F5F5F5;
-	/* Shadow */
-	-moz-box-shadow: 0 0 5px #888;
-	-webkit-box-shadow: 0 0 5px #888;
-	box-shadow: 0 0 5px #888;
-	/* Radius */
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
-	width:500px;
-	height:auto!;
-	margin:7px 7px;
-}
-
-code {
-	display:block;
-	height:auto;
-	white-space:pre;	
-	border:2px solid rgb(190,215,190);
-}
-
 .hint {
 	border:4px solid rgb(190,215,190);
 	padding:4px 4px;
 }
 
-.editorCaret {	
-	position:absolute;
-	z-index:100;
-	width:20px;
-	height:15px;
-	border:1px solid #FF0000;
+ul {
+	list-style: square;
+	margin: 0 0 18px 0;
+	padding: 0 0 0 30px;
+}
+
+ul a {
+	color:#426d9d;font-size:16px;
+	margin-bottom:3px;
+	display:block;
+}
+
+ul li {
+	margin-bottom:10px;
+}
+
+code, pre {
+	border:2px solid rgb(190,215,190);
+	background:#F5F5F5;
+	/* Radius */
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	height:auto!;
+	margin:7px 7px;
+	height:auto;
+	white-space:pre;	
+	padding:5px;
+}
+
+pre {
+	width:300px;
+}
+
+code {
+	display:block;
+	float:left;
 }

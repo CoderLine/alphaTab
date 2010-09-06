@@ -128,34 +128,6 @@ if (!document.createElement('canvas').getContext) {
         this.initElement(els[i]);
       }
     },
-	
-	fixElement_ : function(el) {
-	   // in IE before version 5.5 we would need to add HTML: to the tag name
-	   // but we do not care about IE before version 6
-	   var outerHTML = el.outerHTML;
-	 
-	   var newEl = el.ownerDocument.createElement(outerHTML);
-	   // if the tag is still open IE has created the children as siblings and
-	   // it has also created a tag with the name "/FOO"
-	   if (outerHTML.slice(-2) != "/>") {
-		 var tagName = "/" + el.tagName;
-		 var ns;
-		 // remove content
-		 while ((ns = el.nextSibling) && ns.tagName != tagName) {
-		   ns.removeNode();
-		 }
-		 // remove the incorrect closing tag
-		 if (ns) {
-		   ns.removeNode();
-		 }
-	   }
-	   el.parentNode.replaceChild(newEl, el);
-	   return newEl;
-	},
-	
-	fixDynamicElement : function(el) {
-		return G_vmlCanvasManager_.initElement(G_vmlCanvasManager_.fixElement_(el));
-	},
 
     /**
      * Public initializes a canvas element so that it can be used as canvas
@@ -526,7 +498,7 @@ if (!document.createElement('canvas').getContext) {
     if (fontStyleCache[styleString]) {
       return fontStyleCache[styleString];
     }
-	
+
     var el = document.createElement('div');
     var style = el.style;
     try {
