@@ -8,8 +8,12 @@ import net.alphatab.tablature.Tablature;
  */
 class Main 
 {
+	/**
+	 * The main entry point of this application.
+	 */
 	static function main() 
 	{		
 		MyTrace.init();
+		var un = haxe.Unserializer.run(haxe.Serializer.run('test'));
 	}
 }

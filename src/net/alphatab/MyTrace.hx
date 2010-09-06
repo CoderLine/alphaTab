@@ -5,10 +5,16 @@ package net.alphatab;
  */
 class MyTrace 
 {
+	/**
+	 * Initializes a custom haxe logger.
+	 */
     public static function init() {
         haxe.Log.trace = trace;
     }
 
+	/**
+	 * The custom haxe trace implementation. 
+	 */
     private static function trace( v : Dynamic, ?i : haxe.PosInfos ) {
 		// uncomment this part to enable logging. 
 		/*untyped {
@@ -21,6 +27,7 @@ class MyTrace
 		}*/
     }
 	
+	/*
 	private static function __unhtml(s : String) {
 		return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
 	}
@@ -29,4 +36,5 @@ class MyTrace
 	{
 		return Std.string(Date.now().getTime());
 	}
+ 	*/
 }
