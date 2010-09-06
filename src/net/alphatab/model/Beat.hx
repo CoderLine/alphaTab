@@ -36,6 +36,17 @@ class Beat
 		this.effect.chord = chord;
 	}
 	
+	public function ensureVoices(count:Int, factory:SongFactory) : Void
+	{
+		while(voices.length < count) // as long we hav not enough voicex
+		{
+			// create new ones
+			var voice = factory.newVoice(voices.length);
+			voice.beat = this;
+			this.voices.push(voice);
+		}
+	}
+	
 	public function getNotes() : Array<Note>
 	{
 		var notes:Array<Note> = new Array<Note>();
