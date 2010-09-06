@@ -20,7 +20,6 @@ class BinaryReader
 		_pos = 0;
 	}
 	
-	/* Public */
 	public function readBool() : Bool
 	{ 
 		return this.readByte() == 1; 

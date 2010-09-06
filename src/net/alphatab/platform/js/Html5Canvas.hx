@@ -1,5 +1,5 @@
 package net.alphatab.platform.js;
-
+#if js
 import net.alphatab.platform.Canvas;
 
 /**
@@ -12,7 +12,7 @@ class Html5Canvas implements Canvas
 	private var _context:Dynamic;
 	
 	public function new(dom:Dynamic) 
-	{
+	{  
 		this._canvas = dom;
 		this._jCanvas = JQuery.elements(dom);
 		this._context = dom.getContext("2d");
@@ -20,7 +20,7 @@ class Html5Canvas implements Canvas
 	
 	public function width():Int 
 	{
-		return this._jCanvas.Width();
+		return this._jCanvas.Width(); 
 	}
 	public function height():Int 
 	{
@@ -76,9 +76,9 @@ class Html5Canvas implements Canvas
 	}
 	
 	// rects
-	public function clearRect(x:Float, y:Float, w:Float, h:Float):Void
+	public function clear():Void
 	{
-		this._context.clearRect(x, y, w, h);
+		this._context.clearRect(0,0, width(), height());
 	}
 	public function fillRect(x:Float, y:Float, w:Float, h:Float):Void
 	{
@@ -114,17 +114,13 @@ class Html5Canvas implements Canvas
 	{
 		this._context.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y);
 	}
-	public function arcTo(x1:Float, y1:Float, x2:Float, y2:Float, radius:Float):Void
+	public function circle(x:Float, y:Float, radius:Float):Void
 	{
-		this._context.arcTo(x1, y1, x2, y2, radius);
+		this._context.arc(x,y, radius, 0, Math.PI*2,true);
 	}
 	public function rect(x:Float, y:Float, w:Float, h:Float):Void
 	{
 		this._context.rect(x, y, w, h);
-	}
-	public function arc(x:Float, y:Float, radius:Float, startAngle:Float, endAngle:Float, anticlockwise:Bool):Void
-	{
-		this._context.arc(x, y, radius, startAngle, endAngle, anticlockwise);
 	}
 	public function fill():Void
 	{
@@ -145,17 +141,6 @@ class Html5Canvas implements Canvas
 	{
 		this._context.font = value;
 		return this._context.font;
-	}
-
-	public var textAlign(getTextAlign, setTextAlign):String; 
-	private function getTextAlign() : String
-	{
-		return this._context.textAlign;
-	}
-	private function setTextAlign(value:String) : String
-	{
-		this._context.textAlign = value;
-		return this._context.textAling;
 	}
 	
 	public var textBaseline(getTextBaseline, setTextBaseline):String; 
@@ -196,3 +181,4 @@ class Html5Canvas implements Canvas
 		return this._context.measureText(text).width;
 	}
 }
+#end

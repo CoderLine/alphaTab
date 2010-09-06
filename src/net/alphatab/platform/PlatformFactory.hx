@@ -14,7 +14,7 @@ class PlatformFactory
 		#else 
 			#error 
 		#end
-	}
+	} 
 	
 	public static function getLoader() : FileLoader
 	{ 
