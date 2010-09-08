@@ -27,9 +27,15 @@ class BinaryReader
 		
 	public function readByte() : Int
 	{
-		var data:Int = this._buffer.charCodeAt(this._pos);
-		data = data & 0xFF;
+		var data = getByte(_pos);
 		this._pos++;
+		return data;
+	}
+	
+	public function getByte(index:Int) : Int
+	{
+		var data:Int = this._buffer.charCodeAt(index);
+		data = data & 0xFF;
 		return data;
 	}
 

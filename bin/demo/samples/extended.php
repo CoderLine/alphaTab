@@ -37,10 +37,11 @@ $(document).ready(function() {
 </script>
 <!-- File List -->
 <select id="TestFile">
-	<option value="files/FadeToBlack.gp4">Metallica - Fade To Black</option>
-	<option value="files/Canon.gp5">JerryC - CanonRock</option>
-	<option value="files/Serenade.gp5">Suidakra - Serenade to a Dream</option>
-	<option value="files/Effects.gp5">Effects</option>
+	<option value="files/GuitarPro6Jingle.gpx">Guitar Pro 6 Jingle(Gpx)</option>
+	<option value="files/FadeToBlack.gp4">Metallica - Fade To Black (Gp4)</option>
+	<option value="files/Canon.gp5">JerryC - CanonRock (Gp5)</option>
+	<option value="files/Serenade.gp5">Suidakra - Serenade to a Dream (Gp5)</option>
+	<option value="files/Effects.gp5">Effects (Gp5)</option>
 </select>
 <input id="LoadSample" type="button" value="Load" />
 | 

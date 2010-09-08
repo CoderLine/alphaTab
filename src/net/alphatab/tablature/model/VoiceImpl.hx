@@ -1,3 +1,19 @@
+/*
+ * This file is part of alphaTab.
+ *
+ *  alphaTab is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  alphaTab is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.alphatab.tablature.model;
 import net.alphatab.model.Duration;
 import net.alphatab.model.MeasureClefConverter;
@@ -7,6 +23,7 @@ import net.alphatab.model.Tuplet;
 import net.alphatab.model.Voice;
 import net.alphatab.model.VoiceDirection;
 import net.alphatab.model.Point;
+import net.alphatab.model.SlideType;
 import net.alphatab.tablature.drawing.DrawingContext;
 import net.alphatab.tablature.drawing.DrawingLayer;
 import net.alphatab.tablature.drawing.DrawingLayers;
@@ -352,6 +369,54 @@ class VoiceImpl extends Voice
 			}
 		}
 	}
+	
+	// hammer
+	private function paintHammer(layout:ViewLayout, context:DrawingContext, x:Int, y:Int)
+	{
+		/*// check if hammer drawing is needed
+		var drawHammer = false;
+		for(note in notes)
+		{
+			var noteImpl:NoteImpl = cast note;
+			if(noteImpl.effect.hammer || (noteImpl.effect.slide && noteImpl.effect.slideType == SlideType.SlowSlideTo))
+			{
+				drawHammer = true;
+				break;
+			}
+		}
+		
+		if(drawHammer)
+		{
+			 TODO: Correct score note tie painting
+			var noteHeight = DrawingResources.getScoreNoteSize(layout, false).height;
+			var startX = x + (DrawingResources.getScoreNoteSize(layout, false).width/2);
+			var startNote = beatGroup.direction == VoiceDirection.Up ? minNote : maxNote;
+			var noteHeight = DrawingResources.getScoreNoteSize(layout, false).height + 3*layout.scale;
+			
+			if(beatGroup.direction == VoiceDirection.Down)
+				noteHeight *= -1; 
+			
+			var startY = measureImpl().posY + startNote.scorePosY + startNote.getPaintPosition(TrackSpacingPositions.ScoreMiddleLines) + noteHeight;
+
+			var nextVoice:VoiceImpl = cast nextBeat;
+			var endX = nextVoice != null ?
+						nextVoice.beatImpl().getRealPosX(layout) :
+						startX + (15 * layout.scale);
+			var endNote = nextVoice == null || nextVoice.isRestVoice() ? null : (nextVoice.beatGroup.direction == VoiceDirection.Up ? minNote : maxNote); 
+				
+			var endY = endNote != null ? 
+						endNote.beatImpl().measureImpl().posY + endNote.scorePosY + endNote.getPaintPosition(TrackSpacingPositions.ScoreMiddleLines) + noteHeight
+						: startY;
+			var down = endNote != null?
+						endNote.voiceImpl().beatGroup.direction == VoiceDirection.Up
+						: beatGroup.direction == VoiceDirection.Up;
+			var fill:DrawingLayer = index == 0 ? context.get(DrawingLayers.Voice1) : context.get(DrawingLayers.Voice2);
+			NoteImpl.paintTie(layout, fill, startX, startY, endX, endY, down);
+			//paintHammer(layout, context, nextNote, realX, realY1);
+			 
+		}*/
+	}
+	
 	// Beat
 	public function paintBeat(layout:ViewLayout, context:DrawingContext, x:Int, y:Int) : Void
 	{
@@ -376,6 +441,9 @@ class VoiceImpl extends Voice
 		var draw:DrawingLayer = index == 0 ? context.get(DrawingLayers.VoiceDraw1) : context.get(DrawingLayers.VoiceDraw2);
 		// Tupleto
 		paintTriplet(layout, context, x, (y - getPaintPosition(TrackSpacingPositions.ScoreMiddleLines)));
+		
+		// Hammer
+		paintHammer(layout, context, x, y);
 		
 		if (duration.value >= Duration.HALF)
 		{

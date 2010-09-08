@@ -1,5 +1,24 @@
+/*
+ * This file is part of alphaTab.
+ *
+ *  alphaTab is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  alphaTab is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
+ */
 var alphaTab;
 
+/**
+ * This is a jQuery plugin for embedding alphaTab in your websites. 
+ */
 (function($)
 {
     alphaTab = function(el, options)
@@ -9,8 +28,8 @@ var alphaTab;
         //
         var self = this;
         var el = $(el);
-        var factory = new net.alphatab.tablature.model.SongFactoryImpl();
-		var playerJar = 'alphaTab.jar';
+        this.el = el;
+        this.factory = new net.alphatab.tablature.model.SongFactoryImpl();
 		var loaderSwf = 'alphaTab.flashloader.swf';
 		
 		// resolve absolute script path
@@ -70,26 +89,10 @@ var alphaTab;
             zoom: 1.1,
             width:600,
             height:200,
-            autoSize: true,
-			
-
-            // additional feature - editor
-            editor: false,
-
-            // additional feature - player
-            player: false,
-            playerTickCallback: null,
-            createControls: true,
-            caret: true,
-            measureCaretColor: '#FFF200',
-            measureCaretOpacity: 0.25,
-            beatCaretColor: '#4040FF',
-            beatCaretOpacity: 0.75,
-            autoScroll: true,
-            language: {play: "Play", pause: "Pause", stop: "Stop", metronome: "Metronome"}
+            autoSize: true
         };
 
-        var options = $.extend(defaults, options);
+        this.options = $.extend(defaults, options);
 
         //
         // public operations (API)
@@ -107,7 +110,7 @@ var alphaTab;
 				var reader = new net.alphatab.platform.BinaryReader();
 
 				reader.initialize(tex);
-				parser.init(reader, factory);
+				parser.init(reader, self.factory);
 
                 // read song
 				songLoaded(parser.readSong());
@@ -122,7 +125,7 @@ var alphaTab;
         {
             try
 			{
-				net.alphatab.file.SongLoader.loadSong(url, factory, songLoaded);
+				net.alphatab.file.SongLoader.loadSong(url, self.factory, songLoaded);
 			}
 			catch(e)
 			{
@@ -130,54 +133,23 @@ var alphaTab;
 			}
         }
 
-        // player
-        if(options.player)
-        {
-            if(!navigator.javaEnabled()) {
-                alert('Java is not supported by your browser. The player is not available');
-                options.player = false;
-            }
-            else
-            {            
-                this.updatePlayer = function(song)
-                {
-                    var songData = net.alphatab.midi.MidiDataProvider.getSongMidiData(song, factory);
-                    if(self.player.updateSongData)
-                    {
-                        self.player.updateSongData(songData);
-                        $(self.playerControls).find('input').attr('disabled', false);
-                        self.updateCaret(0);
-                    }
-                    else
-                    {
-                        // TODO: repeat loading 3 times and then show a loading error. 
-                    }
-                }
-
-                this.updateCaret = function(tickPos)
-                {
-                    setTimeout(function(){
-                        self.tablature.notifyTickPosition(tickPos);
-                    }, 1);
-                }
-            }            
-        }
-
+        // plugin callbacks on load
+        this.loadCallbacks = []; 
+        
         //
         // private operations
         //
-
         var songLoaded = function(song)
         {
             // fire callback
-            if(options.loadCallback)
-                options.loadCallback(song);
+            if(self.options.loadCallback)
+                self.options.loadCallback(song);
             // update tablature
-            self.tablature.setTrack(song.tracks[options.track]);
-            // update player
-            if(options.player)
+            self.tablature.setTrack(song.tracks[self.options.track]);
+            // additional plugin callbacks
+            for(var i = 0; i < self.loadCallbacks.length; i++)
             {
-                self.updatePlayer(song);
+                self.loadCallbacks[i](song);
             }
         }
 
@@ -187,9 +159,9 @@ var alphaTab;
                 msg = msg.message;
 
             // use error callback if available, otherwise: render in tablature
-            if(options.errorCallback)
+            if(self.options.errorCallback)
             {
-                options.errorCallback(msg);
+                self.options.errorCallback(msg);
             }
             else
             {
@@ -204,12 +176,12 @@ var alphaTab;
         // startup
         //
         
-        var contents = $.trim(el.text());
+        this.contents = $.trim(el.text());
 		el.html('');
         // create canvas
 		// HACK: call createElement('canvas') once before. this ensures that the browser knows the element
 		document.createElement('canvas'); 
-        this.canvas = $('<canvas width="'+options.width+'" height="'+options.height+'" class="alphaTabSurface"></canvas>');
+        this.canvas = $('<canvas width="'+this.options.width+'" height="'+this.options.height+'" class="alphaTabSurface"></canvas>');
 		el.append(this.canvas);
 		this.canvas = this.canvas[0];
 		if($.browser.msie) 
@@ -246,150 +218,28 @@ var alphaTab;
 			if($('#alphaTabFlashLoaderContainer').length == 0)
 			{
 				$('<div id="alphaTabFlashLoader"></div>').appendTo('body');
-				swfobject.embedSWF(options.base + '/' + loaderSwf, 'alphaTabFlashLoader', '0', '0', '9.0', '#FFFFFF');
+				swfobject.embedSWF(this.options.base + '/' + loaderSwf, 'alphaTabFlashLoader', '0', '0', '9.0', '#FFFFFF');
 			}
 		}
 
         // create tablature
-        this.tablature = new net.alphatab.tablature.Tablature(this.canvas, options.error);
-        this.tablature.autoSizeWidth = options.autoSize;
-        this.tablature.updateScale(options.zoom);
-        
-        // editor
-        if(options.editor)
-        {
-			var editorArea = $('<textarea class="alphaTexEditor">' + contents + '</textarea>');
-			el.append($('<br />'));
-			el.append(editorArea);
+        this.tablature = new net.alphatab.tablature.Tablature(this.canvas, this.options.error);
+        this.tablature.autoSizeWidth = this.options.autoSize;
+        this.tablature.updateScale(this.options.zoom);
 
-            // size textarea
-			var str = editorArea.html();
-			var cols = editorArea[0].cols;
-			var linecount = 0;
-			$( str.split( "\n" ) ).each( function( i, l ) 
-            {
-				linecount++; // take into account long lines
-			});
-			editorArea[0].rows = linecount;
-            this.editor = editorArea;
-			editorArea.keyup(function() 
-            {
-				self.loadAlphaTex(editorArea.val());
-			});
-        }
-        
-        // player
-        if(options.player)
-        {
-            // create applet
-            var playerControls = $('<div class="player"></div>');
-			var param = options.playerTickCallback ? '<param name="onTickChanged" value="' + options.playerTickCallback + '" />' : '';
-			var applet = $('<applet height="0" width="0"  archive="' + options.base + "/" + playerJar + '" code="net.alphatab.midi.MidiPlayer.class">'+param+'</applet>');
-			this.playerControls = playerControls[0];
-			this.player = applet[0];
-			playerControls.append(applet);
-            el.append(playerControls);
-
-            // create controls
-            if(options.createControls)
-            {
-                var playButton = $('<input type="button" class="play" value="'+options.language.play+'" />');
-                var pauseButton = $('<input type="button" class="pause" value="'+options.language.pause+'" />');
-                var stopButton = $('<input type="button" class="stop" value="'+options.language.stop+'" />');
-                var metronomeCheck = $('<input type="checkbox" class="metronome" checked="checked" />');
-
-                playerControls.append(playButton);
-                playerControls.append(pauseButton);
-                playerControls.append(stopButton);
-                playerControls.append(metronomeCheck);
-                playerControls.append($('<span>'+options.language.metronome+'</span>'));
-
-                // hook up events
-                playButton.click(function() 
-                {
-                    if(self.player.play)
-                        self.player.play();
-                    else
-                        alert("The player has not loaded yet.");
-                });
-                pauseButton.click(function() 
-                {
-                    if(self.player.pause)
-                        self.player.pause();
-                    else
-                        alert("The player has not loaded yet.");
-                });
-                stopButton.click(function() 
-                {
-                    if(self.player.stop)
-                        self.player.stop();
-                    else
-                        alert("The player has not loaded yet.");
-                });
-                metronomeCheck.change(function() 
-                {
-                    if(self.player.setMetronomeEnabled)
-                    {
-                        var enabled = metronomeCheck.attr('checked') ? true : false;
-                        self.player.setMetronomeEnabled(enabled);
-                    }
-                    else
-                    {
-                        alert("The player has not loaded yet.");
-                    }
-                });
-            }
-
-            // create carets
-            if(options.caret)
-            {
-				var measureCaret = $('<div class="measureCaret"></div>');
-				var beatCaret = $('<div class="beatCaret"></div>');
-                // set styles
-                measureCaret.css({ 'opacity' : options.measureCaretOpacity, 'position' : 'absolute', background: options.measureCaretColor });
-                beatCaret.css({ 'opacity' : options.beatCaretOpacity, 'position' : 'absolute', background: options.beatCaretColor });
-                measureCaret.width(0);
-                beatCaret.width(0);
-                measureCaret.height(0);
-                beatCaret.height(0);
-				el.append(measureCaret);
-				el.append(beatCaret);
-            }
-
-            this.tablature.onCaretChanged = function(beat)
-            {
-                var x = $(self.canvas).offset().left + parseInt($(self.canvas).css("borderLeftWidth"), 10) ;
-                var y = $(self.canvas).offset().top;
-
-                y += beat.measureImpl().posY;
-
-
-                measureCaret.offset({ top: y, left: x + beat.measureImpl().posX});
-                measureCaret.width(beat.measureImpl().width + beat.measureImpl().spacing);
-                measureCaret.height(beat.measureImpl().height());
-
-                beatCaret.offset({top: y, left: x + beat.getRealPosX(self.tablature.viewLayout)});
-                beatCaret.width(3);
-                beatCaret.height(measureCaret.height());
-
-                if(beat.measureImpl().isFirstOfLine && options.autoScroll)
-                {
-                    window.scrollTo(0, y - 30);
-                }
-            }
-        }
-        
         // load data
-        if(options.file)
+        if(this.options.file)
         {
-			this.loadFile(options.file);
+			this.loadFile(this.options.file);
 		}
-        else if(contents != "")
+        else if(this.contents != "")
         {
-            this.loadAlphaTex(contents);
+            this.loadAlphaTex(this.contents);
         }
     }
-
+    
+    // Plugin Support    
+    alphaTab.fn = alphaTab.prototype;
     //
     // Plugin
     //

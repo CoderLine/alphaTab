@@ -154,6 +154,25 @@ net.alphatab.tablature.model.SongFactoryImpl.prototype.newVoice = function(index
 	return new net.alphatab.tablature.model.VoiceImpl(this,index);
 }
 net.alphatab.tablature.model.SongFactoryImpl.prototype.__class__ = net.alphatab.tablature.model.SongFactoryImpl;
+if(!net.alphatab.file) net.alphatab.file = {}
+if(!net.alphatab.file.gpx) net.alphatab.file.gpx = {}
+if(!net.alphatab.file.gpx.score) net.alphatab.file.gpx.score = {}
+net.alphatab.file.gpx.score.Score = function(p) { if( p === $_ ) return; {
+	null;
+}}
+net.alphatab.file.gpx.score.Score.__name__ = ["net","alphatab","file","gpx","score","Score"];
+net.alphatab.file.gpx.score.Score.prototype.album = null;
+net.alphatab.file.gpx.score.Score.prototype.artist = null;
+net.alphatab.file.gpx.score.Score.prototype.copyright = null;
+net.alphatab.file.gpx.score.Score.prototype.instructions = null;
+net.alphatab.file.gpx.score.Score.prototype.music = null;
+net.alphatab.file.gpx.score.Score.prototype.notices = null;
+net.alphatab.file.gpx.score.Score.prototype.subTitle = null;
+net.alphatab.file.gpx.score.Score.prototype.tabber = null;
+net.alphatab.file.gpx.score.Score.prototype.title = null;
+net.alphatab.file.gpx.score.Score.prototype.words = null;
+net.alphatab.file.gpx.score.Score.prototype.wordsAndMusic = null;
+net.alphatab.file.gpx.score.Score.prototype.__class__ = net.alphatab.file.gpx.score.Score;
 net.alphatab.model.Chord = function(length) { if( length === $_ ) return; {
 	this.strings = new Array();
 	{
@@ -764,6 +783,133 @@ net.alphatab.model.MeasureHeader.prototype.tempo = null;
 net.alphatab.model.MeasureHeader.prototype.timeSignature = null;
 net.alphatab.model.MeasureHeader.prototype.tripletFeel = null;
 net.alphatab.model.MeasureHeader.prototype.__class__ = net.alphatab.model.MeasureHeader;
+net.alphatab.file.gpx.FileSystem = function(p) { if( p === $_ ) return; {
+	this._fileSystem = new Array();
+}}
+net.alphatab.file.gpx.FileSystem.__name__ = ["net","alphatab","file","gpx","FileSystem"];
+net.alphatab.file.gpx.FileSystem.prototype._fileSystem = null;
+net.alphatab.file.gpx.FileSystem.prototype.getBytes = function(source,offset,length) {
+	var bytes = new Array();
+	var i = 0;
+	while(i < length) {
+		if(source.length >= offset + i) {
+			bytes.push(source[offset + i]);
+		}
+		i++;
+	}
+	return bytes;
+}
+net.alphatab.file.gpx.FileSystem.prototype.getFileContents = function(fileName) {
+	{
+		var _g = 0, _g1 = this._fileSystem;
+		while(_g < _g1.length) {
+			var file = _g1[_g];
+			++_g;
+			if(file.fileName == fileName) {
+				return file.fileContents;
+			}
+		}
+	}
+	return null;
+}
+net.alphatab.file.gpx.FileSystem.prototype.getFileNames = function() {
+	var names = new Array();
+	{
+		var _g = 0, _g1 = this._fileSystem;
+		while(_g < _g1.length) {
+			var file = _g1[_g];
+			++_g;
+			names.push(file.fileName);
+		}
+	}
+	return names;
+}
+net.alphatab.file.gpx.FileSystem.prototype.getInteger = function(source,offset) {
+	return ((((source[offset + 3] & 255) << 24) | ((source[offset + 2] & 255) << 16)) | ((source[offset + 1] & 255) << 8)) | (source[offset] & 255);
+}
+net.alphatab.file.gpx.FileSystem.prototype.getString = function(source,offset,length) {
+	var charsLength = 0;
+	var i = 0;
+	var str = "";
+	while(i < length) {
+		var charValue = source[offset + i] & 255;
+		if(charValue == 0) break;
+		str += String.fromCharCode(charValue);
+		i++;
+	}
+	return str;
+}
+net.alphatab.file.gpx.FileSystem.prototype.load = function(data) {
+	var srcBuffer = new net.alphatab.file.gpx.ByteBuffer(data);
+	var header = this.getInteger(srcBuffer.readBytes(4),0);
+	if(header == 1397113666) {
+		var bcfsBytes = srcBuffer.readBytes(srcBuffer.length());
+		var sectorSize = 4096;
+		var offset = 0;
+		while((offset = (offset + sectorSize)) + 3 < bcfsBytes.length) {
+			if(this.getInteger(bcfsBytes,offset) == 2) {
+				var indexFileName = offset + 4;
+				var indexFileSize = offset + 140;
+				var indexOfBlock = offset + 148;
+				var block = 0;
+				var blockCount = 0;
+				var fileBytes = new Array();
+				while((block = (this.getInteger(bcfsBytes,(indexOfBlock + (4 * (blockCount++)))))) != 0) {
+					var bytes = this.getBytes(bcfsBytes,(offset = (block * sectorSize)),sectorSize);
+					fileBytes = fileBytes.concat(bytes);
+				}
+				var fileSize = this.getInteger(bcfsBytes,indexFileSize);
+				if(fileBytes.length >= fileSize) {
+					this._fileSystem.push(new net.alphatab.file.gpx.File(this.getString(bcfsBytes,indexFileName,127),this.getBytes(fileBytes,0,fileSize)));
+				}
+			}
+		}
+	}
+	else if(header == 1514554178) {
+		var bcfsBuffer = new Array();
+		var expectLength = this.getInteger(srcBuffer.readBytes(4),0);
+		while(!srcBuffer.end() && srcBuffer.offset() < expectLength) {
+			var flag = srcBuffer.readBits(1);
+			if(flag == 1) {
+				var bits = srcBuffer.readBits(4);
+				var offs = srcBuffer.readBitsReversed(bits);
+				var size = srcBuffer.readBitsReversed(bits);
+				var pos = bcfsBuffer.length - offs;
+				var i = 0;
+				var bcfsBytes = new Array();
+				while(i < ((size > offs?offs:size))) {
+					bcfsBytes.push(bcfsBuffer[pos + i]);
+					i++;
+				}
+				bcfsBuffer = bcfsBuffer.concat(bcfsBytes);
+			}
+			else {
+				var size = srcBuffer.readBitsReversed(2);
+				var i = 0;
+				while(i < size) {
+					bcfsBuffer.push(srcBuffer.readBits(8));
+					i++;
+				}
+			}
+		}
+		var str = "";
+		{
+			var _g = 0;
+			while(_g < bcfsBuffer.length) {
+				var $byte = bcfsBuffer[_g];
+				++_g;
+				str += String.fromCharCode($byte);
+			}
+		}
+		var newReader = new net.alphatab.platform.BinaryReader();
+		newReader.initialize(str);
+		this.load(newReader);
+	}
+	else {
+		throw new net.alphatab.file.FileFormatException("This is not a GPX file");
+	}
+}
+net.alphatab.file.gpx.FileSystem.prototype.__class__ = net.alphatab.file.gpx.FileSystem;
 net.alphatab.model.MeasureClef = { __ename__ : ["net","alphatab","model","MeasureClef"], __constructs__ : ["Treble","Bass","Tenor","Alto"] }
 net.alphatab.model.MeasureClef.Alto = ["Alto",3];
 net.alphatab.model.MeasureClef.Alto.toString = $estr;
@@ -921,26 +1067,25 @@ IntIter.prototype.next = function() {
 	return this.min++;
 }
 IntIter.prototype.__class__ = IntIter;
-if(!net.alphatab.file) net.alphatab.file = {}
 net.alphatab.file.SongLoader = function() { }
 net.alphatab.file.SongLoader.__name__ = ["net","alphatab","file","SongLoader"];
 net.alphatab.file.SongLoader.loadSong = function(url,factory,success) {
 	var loader = net.alphatab.platform.PlatformFactory.getLoader();
-	haxe.Log.trace("Load song " + url,{ fileName : "SongLoader.hx", lineNumber : 25, className : "net.alphatab.file.SongLoader", methodName : "loadSong"});
+	haxe.Log.trace("Load song " + url,{ fileName : "SongLoader.hx", lineNumber : 41, className : "net.alphatab.file.SongLoader", methodName : "loadSong"});
 	loader.loadBinary("GET",url,function(data) {
 		var readers = net.alphatab.file.SongReader.availableReaders();
-		haxe.Log.trace("Song loaded, search for reader",{ fileName : "SongLoader.hx", lineNumber : 31, className : "net.alphatab.file.SongLoader", methodName : "loadSong"});
+		haxe.Log.trace("Song loaded, search for reader",{ fileName : "SongLoader.hx", lineNumber : 47, className : "net.alphatab.file.SongLoader", methodName : "loadSong"});
 		{
 			var _g = 0;
 			while(_g < readers.length) {
 				var reader = readers[_g];
 				++_g;
 				try {
-					haxe.Log.trace("Try Reader " + Type.getClassName(Type.getClass(reader)),{ fileName : "SongLoader.hx", lineNumber : 36, className : "net.alphatab.file.SongLoader", methodName : "loadSong"});
+					haxe.Log.trace("Try Reader " + Type.getClassName(Type.getClass(reader)),{ fileName : "SongLoader.hx", lineNumber : 52, className : "net.alphatab.file.SongLoader", methodName : "loadSong"});
 					data.seek(0);
 					reader.init(data,factory);
 					var song = reader.readSong();
-					haxe.Log.trace("Reading succeeded",{ fileName : "SongLoader.hx", lineNumber : 40, className : "net.alphatab.file.SongLoader", methodName : "loadSong"});
+					haxe.Log.trace("Reading succeeded",{ fileName : "SongLoader.hx", lineNumber : 56, className : "net.alphatab.file.SongLoader", methodName : "loadSong"});
 					success(song);
 					return;
 				}
@@ -948,7 +1093,7 @@ net.alphatab.file.SongLoader.loadSong = function(url,factory,success) {
 					if( js.Boot.__instanceof($e1,net.alphatab.file.FileFormatException) ) {
 						var e = $e1;
 						{
-							haxe.Log.trace("Reading failed",{ fileName : "SongLoader.hx", lineNumber : 46, className : "net.alphatab.file.SongLoader", methodName : "loadSong"});
+							haxe.Log.trace("Reading failed",{ fileName : "SongLoader.hx", lineNumber : 62, className : "net.alphatab.file.SongLoader", methodName : "loadSong"});
 							continue;
 						}
 					} else throw($e1);
@@ -957,7 +1102,7 @@ net.alphatab.file.SongLoader.loadSong = function(url,factory,success) {
 		}
 		throw new net.alphatab.file.FileFormatException("No reader for requested file found");
 	},function(err) {
-		haxe.Log.trace("Error loading file " + err,{ fileName : "SongLoader.hx", lineNumber : 55, className : "net.alphatab.file.SongLoader", methodName : "loadSong"});
+		haxe.Log.trace("Error loading file " + err,{ fileName : "SongLoader.hx", lineNumber : 71, className : "net.alphatab.file.SongLoader", methodName : "loadSong"});
 		throw err;
 	});
 }
@@ -968,6 +1113,7 @@ net.alphatab.file.SongReader = function(p) { if( p === $_ ) return; {
 net.alphatab.file.SongReader.__name__ = ["net","alphatab","file","SongReader"];
 net.alphatab.file.SongReader.availableReaders = function() {
 	var d = new Array();
+	d.push(new net.alphatab.file.gpx.GpxReader());
 	d.push(new net.alphatab.file.guitarpro.Gp5Reader());
 	d.push(new net.alphatab.file.guitarpro.Gp4Reader());
 	d.push(new net.alphatab.file.guitarpro.Gp4Reader());
@@ -2291,6 +2437,97 @@ haxe.remoting.Context.prototype.call = function(path,params) {
 }
 haxe.remoting.Context.prototype.objects = null;
 haxe.remoting.Context.prototype.__class__ = haxe.remoting.Context;
+net.alphatab.file.gpx.score.Document = function(p) { if( p === $_ ) return; {
+	this.score = new net.alphatab.file.gpx.score.Score();
+	this.tracks = new Array();
+	this.masterBars = new Array();
+	this.bars = new Array();
+	this.voices = new Array();
+	this.beats = new Array();
+	this.notes = new Array();
+	this.rythms = new Array();
+	this.automations = new Array();
+}}
+net.alphatab.file.gpx.score.Document.__name__ = ["net","alphatab","file","gpx","score","Document"];
+net.alphatab.file.gpx.score.Document.prototype.automations = null;
+net.alphatab.file.gpx.score.Document.prototype.bars = null;
+net.alphatab.file.gpx.score.Document.prototype.beats = null;
+net.alphatab.file.gpx.score.Document.prototype.getAutomation = function(type,untilBarId) {
+	var result = null;
+	{
+		var _g = 0, _g1 = this.automations;
+		while(_g < _g1.length) {
+			var automation = _g1[_g];
+			++_g;
+			if(automation.type == type && (automation.barId < untilBarId && (result == null || automation.barId > result.barId))) {
+				result = automation;
+			}
+		}
+	}
+	return result;
+}
+net.alphatab.file.gpx.score.Document.prototype.getBar = function(id) {
+	{
+		var _g = 0, _g1 = this.bars;
+		while(_g < _g1.length) {
+			var bar = _g1[_g];
+			++_g;
+			if(bar.id == id) return bar;
+		}
+	}
+	return null;
+}
+net.alphatab.file.gpx.score.Document.prototype.getBeat = function(id) {
+	{
+		var _g = 0, _g1 = this.beats;
+		while(_g < _g1.length) {
+			var beat = _g1[_g];
+			++_g;
+			if(beat.id == id) return beat;
+		}
+	}
+	return null;
+}
+net.alphatab.file.gpx.score.Document.prototype.getNote = function(id) {
+	{
+		var _g = 0, _g1 = this.notes;
+		while(_g < _g1.length) {
+			var note = _g1[_g];
+			++_g;
+			if(note.id == id) return note;
+		}
+	}
+	return null;
+}
+net.alphatab.file.gpx.score.Document.prototype.getRhythm = function(id) {
+	{
+		var _g = 0, _g1 = this.rythms;
+		while(_g < _g1.length) {
+			var rhythm = _g1[_g];
+			++_g;
+			if(rhythm.id == id) return rhythm;
+		}
+	}
+	return null;
+}
+net.alphatab.file.gpx.score.Document.prototype.getVoice = function(id) {
+	{
+		var _g = 0, _g1 = this.voices;
+		while(_g < _g1.length) {
+			var voice = _g1[_g];
+			++_g;
+			if(voice.id == id) return voice;
+		}
+	}
+	return null;
+}
+net.alphatab.file.gpx.score.Document.prototype.masterBars = null;
+net.alphatab.file.gpx.score.Document.prototype.notes = null;
+net.alphatab.file.gpx.score.Document.prototype.rythms = null;
+net.alphatab.file.gpx.score.Document.prototype.score = null;
+net.alphatab.file.gpx.score.Document.prototype.tracks = null;
+net.alphatab.file.gpx.score.Document.prototype.voices = null;
+net.alphatab.file.gpx.score.Document.prototype.__class__ = net.alphatab.file.gpx.score.Document;
 net.alphatab.model.Track = function(factory) { if( factory === $_ ) return; {
 	this.number = 0;
 	this.offset = 0;
@@ -4438,6 +4675,339 @@ js.Boot.__init = function() {
 	$closure = js.Boot.__closure;
 }
 js.Boot.prototype.__class__ = js.Boot;
+js.JsXml__ = function(p) { if( p === $_ ) return; {
+	null;
+}}
+js.JsXml__.__name__ = ["js","JsXml__"];
+js.JsXml__.parse = function(str) {
+	var rules = [js.JsXml__.enode,js.JsXml__.epcdata,js.JsXml__.eend,js.JsXml__.ecdata,js.JsXml__.edoctype,js.JsXml__.ecomment,js.JsXml__.eprolog];
+	var nrules = rules.length;
+	var current = Xml.createDocument();
+	var stack = new List();
+	while(str.length > 0) {
+		var i = 0;
+		try {
+			while(i < nrules) {
+				var r = rules[i];
+				if(r.match(str)) {
+					switch(i) {
+					case 0:{
+						var x = Xml.createElement(r.matched(1));
+						current.addChild(x);
+						str = r.matchedRight();
+						while(js.JsXml__.eattribute.match(str)) {
+							x.set(js.JsXml__.eattribute.matched(1),js.JsXml__.eattribute.matched(3));
+							str = js.JsXml__.eattribute.matchedRight();
+						}
+						if(!js.JsXml__.eclose.match(str)) {
+							i = nrules;
+							throw "__break__";
+						}
+						if(js.JsXml__.eclose.matched(1) == ">") {
+							stack.push(current);
+							current = x;
+						}
+						str = js.JsXml__.eclose.matchedRight();
+					}break;
+					case 1:{
+						var x = Xml.createPCData(r.matched(0));
+						current.addChild(x);
+						str = r.matchedRight();
+					}break;
+					case 2:{
+						if(current._children != null && current._children.length == 0) {
+							var e = Xml.createPCData("");
+							current.addChild(e);
+						}
+						else null;
+						if(r.matched(1) != current._nodeName || stack.isEmpty()) {
+							i = nrules;
+							throw "__break__";
+						}
+						else null;
+						current = stack.pop();
+						str = r.matchedRight();
+					}break;
+					case 3:{
+						str = r.matchedRight();
+						if(!js.JsXml__.ecdata_end.match(str)) throw "End of CDATA section not found";
+						var x = Xml.createCData(js.JsXml__.ecdata_end.matchedLeft());
+						current.addChild(x);
+						str = js.JsXml__.ecdata_end.matchedRight();
+					}break;
+					case 4:{
+						var pos = 0;
+						var count = 0;
+						var old = str;
+						try {
+							while(true) {
+								if(!js.JsXml__.edoctype_elt.match(str)) throw "End of DOCTYPE section not found";
+								var p = js.JsXml__.edoctype_elt.matchedPos();
+								pos += p.pos + p.len;
+								str = js.JsXml__.edoctype_elt.matchedRight();
+								switch(js.JsXml__.edoctype_elt.matched(0)) {
+								case "[":{
+									count++;
+								}break;
+								case "]":{
+									count--;
+									if(count < 0) throw "Invalid ] found in DOCTYPE declaration";
+								}break;
+								default:{
+									if(count == 0) throw "__break__";
+								}break;
+								}
+							}
+						} catch( e ) { if( e != "__break__" ) throw e; }
+						var x = Xml.createDocType(old.substr(0,pos));
+						current.addChild(x);
+					}break;
+					case 5:{
+						if(!js.JsXml__.ecomment_end.match(str)) throw "Unclosed Comment";
+						var p = js.JsXml__.ecomment_end.matchedPos();
+						var x = Xml.createComment(str.substr(0,p.pos + p.len));
+						current.addChild(x);
+						str = js.JsXml__.ecomment_end.matchedRight();
+					}break;
+					case 6:{
+						var x = Xml.createProlog(r.matched(0));
+						current.addChild(x);
+						str = r.matchedRight();
+					}break;
+					}
+					throw "__break__";
+				}
+				i += 1;
+			}
+		} catch( e ) { if( e != "__break__" ) throw e; }
+		if(i == nrules) {
+			if(str.length > 10) throw (("Xml parse error : Unexpected " + str.substr(0,10)) + "...");
+			else throw ("Xml parse error : Unexpected " + str);
+		}
+	}
+	if(!stack.isEmpty()) throw "Xml parse error : Unclosed " + stack.last().getNodeName();
+	return current;
+}
+js.JsXml__.createElement = function(name) {
+	var r = new js.JsXml__();
+	r.nodeType = Xml.Element;
+	r._children = new Array();
+	r._attributes = new Hash();
+	r.setNodeName(name);
+	return r;
+}
+js.JsXml__.createPCData = function(data) {
+	var r = new js.JsXml__();
+	r.nodeType = Xml.PCData;
+	r.setNodeValue(data);
+	return r;
+}
+js.JsXml__.createCData = function(data) {
+	var r = new js.JsXml__();
+	r.nodeType = Xml.CData;
+	r.setNodeValue(data);
+	return r;
+}
+js.JsXml__.createComment = function(data) {
+	var r = new js.JsXml__();
+	r.nodeType = Xml.Comment;
+	r.setNodeValue(data);
+	return r;
+}
+js.JsXml__.createDocType = function(data) {
+	var r = new js.JsXml__();
+	r.nodeType = Xml.DocType;
+	r.setNodeValue(data);
+	return r;
+}
+js.JsXml__.createProlog = function(data) {
+	var r = new js.JsXml__();
+	r.nodeType = Xml.Prolog;
+	r.setNodeValue(data);
+	return r;
+}
+js.JsXml__.createDocument = function() {
+	var r = new js.JsXml__();
+	r.nodeType = Xml.Document;
+	r._children = new Array();
+	return r;
+}
+js.JsXml__.prototype._attributes = null;
+js.JsXml__.prototype._children = null;
+js.JsXml__.prototype._nodeName = null;
+js.JsXml__.prototype._nodeValue = null;
+js.JsXml__.prototype._parent = null;
+js.JsXml__.prototype.addChild = function(x) {
+	if(this._children == null) throw "bad nodetype";
+	if(x._parent != null) x._parent._children.remove(x);
+	x._parent = this;
+	this._children.push(x);
+}
+js.JsXml__.prototype.attributes = function() {
+	if(this.nodeType != Xml.Element) throw "bad nodeType";
+	return this._attributes.keys();
+}
+js.JsXml__.prototype.elements = function() {
+	if(this._children == null) throw "bad nodetype";
+	return { cur : 0, x : this._children, hasNext : function() {
+		var k = this.cur;
+		var l = this.x.length;
+		while(k < l) {
+			if(this.x[k].nodeType == Xml.Element) break;
+			k += 1;
+		}
+		this.cur = k;
+		return k < l;
+	}, next : function() {
+		var k = this.cur;
+		var l = this.x.length;
+		while(k < l) {
+			var n = this.x[k];
+			k += 1;
+			if(n.nodeType == Xml.Element) {
+				this.cur = k;
+				return n;
+			}
+		}
+		return null;
+	}}
+}
+js.JsXml__.prototype.elementsNamed = function(name) {
+	if(this._children == null) throw "bad nodetype";
+	return { cur : 0, x : this._children, hasNext : function() {
+		var k = this.cur;
+		var l = this.x.length;
+		while(k < l) {
+			var n = this.x[k];
+			if(n.nodeType == Xml.Element && n._nodeName == name) break;
+			k++;
+		}
+		this.cur = k;
+		return k < l;
+	}, next : function() {
+		var k = this.cur;
+		var l = this.x.length;
+		while(k < l) {
+			var n = this.x[k];
+			k++;
+			if(n.nodeType == Xml.Element && n._nodeName == name) {
+				this.cur = k;
+				return n;
+			}
+		}
+		return null;
+	}}
+}
+js.JsXml__.prototype.exists = function(att) {
+	if(this.nodeType != Xml.Element) throw "bad nodeType";
+	return this._attributes.exists(att);
+}
+js.JsXml__.prototype.firstChild = function() {
+	if(this._children == null) throw "bad nodetype";
+	return this._children[0];
+}
+js.JsXml__.prototype.firstElement = function() {
+	if(this._children == null) throw "bad nodetype";
+	var cur = 0;
+	var l = this._children.length;
+	while(cur < l) {
+		var n = this._children[cur];
+		if(n.nodeType == Xml.Element) return n;
+		cur++;
+	}
+	return null;
+}
+js.JsXml__.prototype.get = function(att) {
+	if(this.nodeType != Xml.Element) throw "bad nodeType";
+	return this._attributes.get(att);
+}
+js.JsXml__.prototype.getNodeName = function() {
+	if(this.nodeType != Xml.Element) throw "bad nodeType";
+	return this._nodeName;
+}
+js.JsXml__.prototype.getNodeValue = function() {
+	if(this.nodeType == Xml.Element || this.nodeType == Xml.Document) throw "bad nodeType";
+	return this._nodeValue;
+}
+js.JsXml__.prototype.getParent = function() {
+	return this._parent;
+}
+js.JsXml__.prototype.insertChild = function(x,pos) {
+	if(this._children == null) throw "bad nodetype";
+	if(x._parent != null) x._parent._children.remove(x);
+	x._parent = this;
+	this._children.insert(pos,x);
+}
+js.JsXml__.prototype.iterator = function() {
+	if(this._children == null) throw "bad nodetype";
+	return { cur : 0, x : this._children, hasNext : function() {
+		return this.cur < this.x.length;
+	}, next : function() {
+		return this.x[this.cur++];
+	}}
+}
+js.JsXml__.prototype.nodeName = null;
+js.JsXml__.prototype.nodeType = null;
+js.JsXml__.prototype.nodeValue = null;
+js.JsXml__.prototype.parent = null;
+js.JsXml__.prototype.remove = function(att) {
+	if(this.nodeType != Xml.Element) throw "bad nodeType";
+	this._attributes.remove(att);
+}
+js.JsXml__.prototype.removeChild = function(x) {
+	if(this._children == null) throw "bad nodetype";
+	var b = this._children.remove(x);
+	if(b) x._parent = null;
+	return b;
+}
+js.JsXml__.prototype.set = function(att,value) {
+	if(this.nodeType != Xml.Element) throw "bad nodeType";
+	this._attributes.set(att,value);
+}
+js.JsXml__.prototype.setNodeName = function(n) {
+	if(this.nodeType != Xml.Element) throw "bad nodeType";
+	return this._nodeName = n;
+}
+js.JsXml__.prototype.setNodeValue = function(v) {
+	if(this.nodeType == Xml.Element || this.nodeType == Xml.Document) throw "bad nodeType";
+	return this._nodeValue = v;
+}
+js.JsXml__.prototype.toString = function() {
+	if(this.nodeType == Xml.PCData) return this._nodeValue;
+	if(this.nodeType == Xml.CData) return ("<![CDATA[" + this._nodeValue) + "]]>";
+	if(this.nodeType == Xml.Comment || this.nodeType == Xml.DocType || this.nodeType == Xml.Prolog) return this._nodeValue;
+	var s = new StringBuf();
+	if(this.nodeType == Xml.Element) {
+		s.add("<");
+		s.add(this._nodeName);
+		{ var $it10 = this._attributes.keys();
+		while( $it10.hasNext() ) { var k = $it10.next();
+		{
+			s.add(" ");
+			s.add(k);
+			s.add("=\"");
+			s.add(this._attributes.get(k));
+			s.add("\"");
+		}
+		}}
+		if(this._children.length == 0) {
+			s.add("/>");
+			return s.toString();
+		}
+		s.add(">");
+	}
+	{ var $it11 = this.iterator();
+	while( $it11.hasNext() ) { var x = $it11.next();
+	s.add(x.toString());
+	}}
+	if(this.nodeType == Xml.Element) {
+		s.add("</");
+		s.add(this._nodeName);
+		s.add(">");
+	}
+	return s.toString();
+}
+js.JsXml__.prototype.__class__ = js.JsXml__;
 net.alphatab.model.Note = function(factory) { if( factory === $_ ) return; {
 	this.value = 0;
 	this.velocity = 95;
@@ -4588,11 +5158,11 @@ haxe.io.Input.prototype.readAll = function(bufsize) {
 			total.addBytes(buf,0,len);
 		}
 	}
-	catch( $e10 ) {
-		if( js.Boot.__instanceof($e10,haxe.io.Eof) ) {
-			var e = $e10;
+	catch( $e12 ) {
+		if( js.Boot.__instanceof($e12,haxe.io.Eof) ) {
+			var e = $e12;
 			null;
-		} else throw($e10);
+		} else throw($e12);
 	}
 	return total.getBytes();
 }
@@ -4682,14 +5252,14 @@ haxe.io.Input.prototype.readLine = function() {
 		s = buf.toString();
 		if(s.charCodeAt(s.length - 1) == 13) s = s.substr(0,-1);
 	}
-	catch( $e11 ) {
-		if( js.Boot.__instanceof($e11,haxe.io.Eof) ) {
-			var e = $e11;
+	catch( $e13 ) {
+		if( js.Boot.__instanceof($e13,haxe.io.Eof) ) {
+			var e = $e13;
 			{
 				s = buf.toString();
 				if(s.length == 0) throw (e);
 			}
-		} else throw($e11);
+		} else throw($e13);
 	}
 	return s;
 }
@@ -4908,6 +5478,11 @@ net.alphatab.platform.BinaryReader.prototype.decodeInt = function(bits,signed) {
 	this._pos += Math.floor(bits / 8);
 	return result;
 }
+net.alphatab.platform.BinaryReader.prototype.getByte = function(index) {
+	var data = this._buffer.charCodeAt(index);
+	data = (data & 255);
+	return data;
+}
 net.alphatab.platform.BinaryReader.prototype.getPosition = function() {
 	return this._pos;
 }
@@ -4937,8 +5512,7 @@ net.alphatab.platform.BinaryReader.prototype.readBool = function() {
 	return this.readByte() == 1;
 }
 net.alphatab.platform.BinaryReader.prototype.readByte = function() {
-	var data = this._buffer.charCodeAt(this._pos);
-	data = (data & 255);
+	var data = this.getByte(this._pos);
 	this._pos++;
 	return data;
 }
@@ -5042,6 +5616,31 @@ net.alphatab.model.Beat.prototype.tableChange = null;
 net.alphatab.model.Beat.prototype.text = null;
 net.alphatab.model.Beat.prototype.voices = null;
 net.alphatab.model.Beat.prototype.__class__ = net.alphatab.model.Beat;
+net.alphatab.file.gpx.score.Note = function(p) { if( p === $_ ) return; {
+	this.id = -1;
+	this.fret = -1;
+	this.string = -1;
+	this.tone = -1;
+	this.octave = -1;
+	this.element = -1;
+	this.variation = -1;
+	this.midiNumber = -1;
+}}
+net.alphatab.file.gpx.score.Note.__name__ = ["net","alphatab","file","gpx","score","Note"];
+net.alphatab.file.gpx.score.Note.prototype.element = null;
+net.alphatab.file.gpx.score.Note.prototype.fret = null;
+net.alphatab.file.gpx.score.Note.prototype.id = null;
+net.alphatab.file.gpx.score.Note.prototype.midiNumber = null;
+net.alphatab.file.gpx.score.Note.prototype.mutedEnabled = null;
+net.alphatab.file.gpx.score.Note.prototype.octave = null;
+net.alphatab.file.gpx.score.Note.prototype.palmMutedEnabled = null;
+net.alphatab.file.gpx.score.Note.prototype.slide = null;
+net.alphatab.file.gpx.score.Note.prototype.string = null;
+net.alphatab.file.gpx.score.Note.prototype.tieDestination = null;
+net.alphatab.file.gpx.score.Note.prototype.tone = null;
+net.alphatab.file.gpx.score.Note.prototype.variation = null;
+net.alphatab.file.gpx.score.Note.prototype.vibrato = null;
+net.alphatab.file.gpx.score.Note.prototype.__class__ = net.alphatab.file.gpx.score.Note;
 net.alphatab.model.effects.TremoloBarEffect = function(p) { if( p === $_ ) return; {
 	this.points = new Array();
 }}
@@ -5148,9 +5747,9 @@ Type.resolveClass = function(name) {
 	try {
 		cl = eval(name);
 	}
-	catch( $e12 ) {
+	catch( $e14 ) {
 		{
-			var e = $e12;
+			var e = $e14;
 			{
 				cl = null;
 			}
@@ -5164,9 +5763,9 @@ Type.resolveEnum = function(name) {
 	try {
 		e = eval(name);
 	}
-	catch( $e13 ) {
+	catch( $e15 ) {
 		{
-			var err = $e13;
+			var err = $e15;
 			{
 				e = null;
 			}
@@ -5260,9 +5859,9 @@ Type.enumEq = function(a,b) {
 		var e = a.__enum__;
 		if(e != b.__enum__ || e == null) return false;
 	}
-	catch( $e14 ) {
+	catch( $e16 ) {
 		{
-			var e = $e14;
+			var e = $e16;
 			{
 				return false;
 			}
@@ -5308,6 +5907,15 @@ net.alphatab.model.TimeSignature.prototype.copy = function(timeSignature) {
 net.alphatab.model.TimeSignature.prototype.denominator = null;
 net.alphatab.model.TimeSignature.prototype.numerator = null;
 net.alphatab.model.TimeSignature.prototype.__class__ = net.alphatab.model.TimeSignature;
+net.alphatab.file.gpx.score.Beat = function(p) { if( p === $_ ) return; {
+	null;
+}}
+net.alphatab.file.gpx.score.Beat.__name__ = ["net","alphatab","file","gpx","score","Beat"];
+net.alphatab.file.gpx.score.Beat.prototype.dyn = null;
+net.alphatab.file.gpx.score.Beat.prototype.id = null;
+net.alphatab.file.gpx.score.Beat.prototype.noteIDs = null;
+net.alphatab.file.gpx.score.Beat.prototype.rythmId = null;
+net.alphatab.file.gpx.score.Beat.prototype.__class__ = net.alphatab.file.gpx.score.Beat;
 if(!net.alphatab.midi) net.alphatab.midi = {}
 net.alphatab.midi.MidiMessageUtils = function() { }
 net.alphatab.midi.MidiMessageUtils.__name__ = ["net","alphatab","midi","MidiMessageUtils"];
@@ -5357,6 +5965,18 @@ net.alphatab.midi.MidiMessageUtils.valueToString = function(num) {
 	return StringTools.hex(num,2);
 }
 net.alphatab.midi.MidiMessageUtils.prototype.__class__ = net.alphatab.midi.MidiMessageUtils;
+net.alphatab.file.gpx.score.Track = function(p) { if( p === $_ ) return; {
+	null;
+}}
+net.alphatab.file.gpx.score.Track.__name__ = ["net","alphatab","file","gpx","score","Track"];
+net.alphatab.file.gpx.score.Track.prototype.color = null;
+net.alphatab.file.gpx.score.Track.prototype.gmChannel1 = null;
+net.alphatab.file.gpx.score.Track.prototype.gmChannel2 = null;
+net.alphatab.file.gpx.score.Track.prototype.gmProgram = null;
+net.alphatab.file.gpx.score.Track.prototype.id = null;
+net.alphatab.file.gpx.score.Track.prototype.name = null;
+net.alphatab.file.gpx.score.Track.prototype.tunningPitches = null;
+net.alphatab.file.gpx.score.Track.prototype.__class__ = net.alphatab.file.gpx.score.Track;
 net.alphatab.tablature.ViewLayout = function(p) { if( p === $_ ) return; {
 	this.init(1);
 	this.contentPadding = new net.alphatab.model.Padding(0,0,0,0);
@@ -5700,8 +6320,8 @@ Reflect.__name__ = ["Reflect"];
 Reflect.hasField = function(o,field) {
 	if(o.hasOwnProperty != null) return o.hasOwnProperty(field);
 	var arr = Reflect.fields(o);
-	{ var $it15 = arr.iterator();
-	while( $it15.hasNext() ) { var t = $it15.next();
+	{ var $it17 = arr.iterator();
+	while( $it17.hasNext() ) { var t = $it17.next();
 	if(t == field) return true;
 	}}
 	return false;
@@ -5711,9 +6331,9 @@ Reflect.field = function(o,field) {
 	try {
 		v = o[field];
 	}
-	catch( $e16 ) {
+	catch( $e18 ) {
 		{
-			var e = $e16;
+			var e = $e18;
 			null;
 		}
 	}
@@ -5740,9 +6360,9 @@ Reflect.fields = function(o) {
 		try {
 			t = o.__proto__;
 		}
-		catch( $e17 ) {
+		catch( $e19 ) {
 			{
-				var e = $e17;
+				var e = $e19;
 				{
 					t = null;
 				}
@@ -5898,6 +6518,25 @@ net.alphatab.tablature.model.NoteImpl = function(factory) { if( factory === $_ )
 net.alphatab.tablature.model.NoteImpl.__name__ = ["net","alphatab","tablature","model","NoteImpl"];
 net.alphatab.tablature.model.NoteImpl.__super__ = net.alphatab.model.Note;
 for(var k in net.alphatab.model.Note.prototype ) net.alphatab.tablature.model.NoteImpl.prototype[k] = net.alphatab.model.Note.prototype[k];
+net.alphatab.tablature.model.NoteImpl.paintTie = function(layout,layer,x1,y1,x2,y2,down) {
+	if(down == null) down = false;
+	var offset = 15 * layout.scale;
+	var size = 4 * layout.scale;
+	var normalVector = { x : (y2 - y1), y : (x2 - x1)}
+	var length = Math.sqrt((normalVector.x * normalVector.x) + (normalVector.y * normalVector.y));
+	if(down) normalVector.x *= -1;
+	else normalVector.y *= -1;
+	normalVector.x /= length;
+	normalVector.y /= length;
+	var center = { x : (x2 + x1) / 2, y : (y2 + y1) / 2}
+	var cp1 = { x : center.x + (offset * normalVector.x), y : center.y + (offset * normalVector.y)}
+	var cp2 = { x : center.x + ((offset - size) * normalVector.x), y : center.y + ((offset - size) * normalVector.y)}
+	layer.startFigure();
+	layer.moveTo(x1,y1);
+	layer.quadraticCurveTo(cp1.x,cp1.y,x2,y2);
+	layer.quadraticCurveTo(cp2.x,cp2.y,x1,y1);
+	layer.closeFigure();
+}
 net.alphatab.tablature.model.NoteImpl.prototype._accidental = null;
 net.alphatab.tablature.model.NoteImpl.prototype._noteOrientation = null;
 net.alphatab.tablature.model.NoteImpl.prototype.beatImpl = function() {
@@ -6071,23 +6710,19 @@ net.alphatab.tablature.model.NoteImpl.prototype.paintGrace = function(layout,con
 	var s = (this.effect.deadNote?net.alphatab.tablature.drawing.MusicFont.GraceDeadNote:net.alphatab.tablature.drawing.MusicFont.GraceNote);
 	fill.addMusicSymbol(s,realX - scale * 1.33,realY,layout.scale);
 	if(this.effect.grace.transition == net.alphatab.model.effects.GraceEffectTransition.Hammer || this.effect.grace.transition == net.alphatab.model.effects.GraceEffectTransition.Slide) {
-		this.paintHammer(layout,context,null,x - (15 * layout.scale),y + (5 * layout.scale),true);
+		var startX = x - (10 * layout.scale);
+		var tieY = y + (10 * layout.scale);
+		net.alphatab.tablature.model.NoteImpl.paintTie(layout,fill,startX,tieY,x,tieY,true);
 	}
 }
 net.alphatab.tablature.model.NoteImpl.prototype.paintHammer = function(layout,context,nextNote,x,y,forceDown) {
 	if(forceDown == null) forceDown = false;
-	var xScale = layout.scale;
-	var yScale = layout.stringSpacing / 10.0;
-	var offset = 7 * xScale;
-	var realX = x;
-	var realY = y - (net.alphatab.tablature.drawing.DrawingResources.noteFontHeight * layout.scale);
-	var endX = (nextNote != null?nextNote.beatImpl().getRealPosX(layout) - (2 * offset):realX + 10 * xScale);
-	var width = endX - realX;
+	var down = this.string > 3 || forceDown || nextNote == null;
 	var fill = (this.voice.index == 0?context.get(net.alphatab.tablature.drawing.DrawingLayers.VoiceEffects1):context.get(net.alphatab.tablature.drawing.DrawingLayers.VoiceEffects2));
-	var wScale = width / 16;
-	var hScale = ((this.string > 3 || forceDown)?-1:1);
-	if(this.string > 3 || forceDown) realY += (net.alphatab.tablature.drawing.DrawingResources.noteFontHeight * layout.scale) * 2;
-	fill.addMusicSymbol(net.alphatab.tablature.drawing.MusicFont.HammerPullUp,realX + offset,realY,layout.scale * wScale,layout.scale * hScale);
+	var realX = this._noteOrientation.x + (this._noteOrientation.width / 2);
+	var realY = (down?y + net.alphatab.tablature.drawing.DrawingResources.noteFontHeight / 2:y - net.alphatab.tablature.drawing.DrawingResources.noteFontHeight / 2);
+	var endX = (nextNote != null?nextNote.beatImpl().getRealPosX(layout):realX + 15 * layout.scale);
+	net.alphatab.tablature.model.NoteImpl.paintTie(layout,fill,realX,realY,endX,realY,down);
 }
 net.alphatab.tablature.model.NoteImpl.prototype.paintHeavyAccentuated = function(layout,context,x,y) {
 	var layer = (this.voice.index == 0?context.get(net.alphatab.tablature.drawing.DrawingLayers.Voice1):context.get(net.alphatab.tablature.drawing.DrawingLayers.Voice2));
@@ -6276,15 +6911,12 @@ net.alphatab.tablature.model.NoteImpl.prototype.paintScoreNote = function(layout
 		var tieWidth = 20.0 * tieScale;
 		var tieHeight = 30.0 * tieScale;
 		if(noteForTie != null) {
-			tieX = noteForTie.beatImpl().lastPaintX + 15 * layout.scale;
+			tieX = noteForTie.beatImpl().lastPaintX + 13 * layout.scale;
 			tieY = y + this.scorePosY;
 			tieWidth = (realX - tieX);
 			tieHeight = (20.0 * tieScale);
 		}
-		if(tieWidth > 0 && tieHeight > 0) {
-			var wScale = tieWidth / 20;
-			fill.addMusicSymbol(net.alphatab.tablature.drawing.MusicFont.HammerPullUp,tieX,realY1,wScale,layout.scale);
-		}
+		net.alphatab.tablature.model.NoteImpl.paintTie(layout,fill,tieX,tieY,tieX + tieWidth,tieY);
 	}
 	var accidentalX = x - 2 * layout.scale;
 	if(this._accidental == 1) {
@@ -7350,6 +7982,15 @@ net.alphatab.tablature.model.MeasureImpl.prototype.updateComponents = function(l
 }
 net.alphatab.tablature.model.MeasureImpl.prototype.width = null;
 net.alphatab.tablature.model.MeasureImpl.prototype.__class__ = net.alphatab.tablature.model.MeasureImpl;
+net.alphatab.file.gpx.score.Bar = function(p) { if( p === $_ ) return; {
+	null;
+}}
+net.alphatab.file.gpx.score.Bar.__name__ = ["net","alphatab","file","gpx","score","Bar"];
+net.alphatab.file.gpx.score.Bar.prototype.clef = null;
+net.alphatab.file.gpx.score.Bar.prototype.id = null;
+net.alphatab.file.gpx.score.Bar.prototype.simileMark = null;
+net.alphatab.file.gpx.score.Bar.prototype.voiceIds = null;
+net.alphatab.file.gpx.score.Bar.prototype.__class__ = net.alphatab.file.gpx.score.Bar;
 net.alphatab.tablature.drawing.DrawingLayers = { __ename__ : ["net","alphatab","tablature","drawing","DrawingLayers"], __constructs__ : ["Background","LayoutBackground","Lines","MainComponents","MainComponentsDraw","Voice2","VoiceEffects2","VoiceEffectsDraw2","VoiceDraw2","Voice1","VoiceEffects1","VoiceEffectsDraw1","VoiceDraw1","Red"] }
 net.alphatab.tablature.drawing.DrawingLayers.Background = ["Background",0];
 net.alphatab.tablature.drawing.DrawingLayers.Background.toString = $estr;
@@ -8557,8 +9198,8 @@ haxe.Serializer.prototype.serialize = function(v) {
 		case List:{
 			this.buf.add("l");
 			var v1 = v;
-			{ var $it18 = v1.iterator();
-			while( $it18.hasNext() ) { var i = $it18.next();
+			{ var $it20 = v1.iterator();
+			while( $it20.hasNext() ) { var i = $it20.next();
 			this.serialize(i);
 			}}
 			this.buf.add("h");
@@ -8571,8 +9212,8 @@ haxe.Serializer.prototype.serialize = function(v) {
 		case Hash:{
 			this.buf.add("b");
 			var v1 = v;
-			{ var $it19 = v1.keys();
-			while( $it19.hasNext() ) { var k = $it19.next();
+			{ var $it21 = v1.keys();
+			while( $it21.hasNext() ) { var k = $it21.next();
 			{
 				this.serializeString(k);
 				this.serialize(v1.get(k));
@@ -8583,8 +9224,8 @@ haxe.Serializer.prototype.serialize = function(v) {
 		case IntHash:{
 			this.buf.add("q");
 			var v1 = v;
-			{ var $it20 = v1.keys();
-			while( $it20.hasNext() ) { var k = $it20.next();
+			{ var $it22 = v1.keys();
+			while( $it22.hasNext() ) { var k = $it22.next();
 			{
 				this.buf.add(":");
 				this.buf.add(k);
@@ -8721,6 +9362,15 @@ haxe.Serializer.prototype.toString = function() {
 haxe.Serializer.prototype.useCache = null;
 haxe.Serializer.prototype.useEnumIndex = null;
 haxe.Serializer.prototype.__class__ = haxe.Serializer;
+net.alphatab.file.gpx.score.MasterBar = function(p) { if( p === $_ ) return; {
+	null;
+}}
+net.alphatab.file.gpx.score.MasterBar.__name__ = ["net","alphatab","file","gpx","score","MasterBar"];
+net.alphatab.file.gpx.score.MasterBar.prototype.barIds = null;
+net.alphatab.file.gpx.score.MasterBar.prototype.repeatCount = null;
+net.alphatab.file.gpx.score.MasterBar.prototype.repeatStart = null;
+net.alphatab.file.gpx.score.MasterBar.prototype.time = null;
+net.alphatab.file.gpx.score.MasterBar.prototype.__class__ = net.alphatab.file.gpx.score.MasterBar;
 net.alphatab.platform.js.JsFileLoader = function(p) { if( p === $_ ) return; {
 	null;
 }}
@@ -9051,21 +9701,21 @@ haxe.Template.prototype.parseExpr = function(data) {
 		e = this.makeExpr(l);
 		if(!l.isEmpty()) throw l.first().p;
 	}
-	catch( $e21 ) {
-		if( js.Boot.__instanceof($e21,String) ) {
-			var s = $e21;
+	catch( $e23 ) {
+		if( js.Boot.__instanceof($e23,String) ) {
+			var s = $e23;
 			{
 				throw (("Unexpected '" + s) + "' in ") + expr;
 			}
-		} else throw($e21);
+		} else throw($e23);
 	}
 	return function() {
 		try {
 			return e();
 		}
-		catch( $e22 ) {
+		catch( $e24 ) {
 			{
-				var exc = $e22;
+				var exc = $e24;
 				{
 					throw (("Error : " + Std.string(exc)) + " in ") + expr;
 				}
@@ -9101,8 +9751,8 @@ haxe.Template.prototype.parseTokens = function(data) {
 }
 haxe.Template.prototype.resolve = function(v) {
 	if(Reflect.hasField(this.context,v)) return Reflect.field(this.context,v);
-	{ var $it23 = this.stack.iterator();
-	while( $it23.hasNext() ) { var ctx = $it23.next();
+	{ var $it25 = this.stack.iterator();
+	while( $it25.hasNext() ) { var ctx = $it25.next();
 	if(Reflect.hasField(ctx,v)) return Reflect.field(ctx,v);
 	}}
 	if(v == "__current__") return this.context;
@@ -9138,8 +9788,8 @@ haxe.Template.prototype.run = function(e) {
 	case 4:
 	var l = $e[2];
 	{
-		{ var $it24 = l.iterator();
-		while( $it24.hasNext() ) { var e1 = $it24.next();
+		{ var $it26 = l.iterator();
+		while( $it26.hasNext() ) { var e1 = $it26.next();
 		this.run(e1);
 		}}
 	}break;
@@ -9154,9 +9804,9 @@ haxe.Template.prototype.run = function(e) {
 				v = x;
 			}
 		}
-		catch( $e25 ) {
+		catch( $e27 ) {
 			{
-				var e2 = $e25;
+				var e2 = $e27;
 				{
 					throw "Cannot iter on " + v;
 				}
@@ -9164,8 +9814,8 @@ haxe.Template.prototype.run = function(e) {
 		}
 		this.stack.push(this.context);
 		var v1 = v;
-		{ var $it26 = v1;
-		while( $it26.hasNext() ) { var ctx = $it26.next();
+		{ var $it28 = v1;
+		while( $it28.hasNext() ) { var ctx = $it28.next();
 		{
 			this.context = ctx;
 			this.run(loop);
@@ -9180,8 +9830,8 @@ haxe.Template.prototype.run = function(e) {
 		var pl = new Array();
 		var old = this.buf;
 		pl.push($closure(this,"resolve"));
-		{ var $it27 = params.iterator();
-		while( $it27.hasNext() ) { var p = $it27.next();
+		{ var $it29 = params.iterator();
+		while( $it29.hasNext() ) { var p = $it29.next();
 		{
 			var $e = (p);
 			switch( $e[1] ) {
@@ -9202,18 +9852,18 @@ haxe.Template.prototype.run = function(e) {
 		try {
 			this.buf.add(Std.string(Reflect.callMethod(this.macros,v,pl)));
 		}
-		catch( $e28 ) {
+		catch( $e30 ) {
 			{
-				var e1 = $e28;
+				var e1 = $e30;
 				{
 					var plstr = (function($this) {
 						var $r;
 						try {
 							$r = pl.join(",");
 						}
-						catch( $e29 ) {
+						catch( $e31 ) {
 							{
-								var e2 = $e29;
+								var e2 = $e31;
 								$r = "???";
 							}
 						}
@@ -9237,6 +9887,13 @@ net.alphatab.model.PointF.__name__ = ["net","alphatab","model","PointF"];
 net.alphatab.model.PointF.prototype.x = null;
 net.alphatab.model.PointF.prototype.y = null;
 net.alphatab.model.PointF.prototype.__class__ = net.alphatab.model.PointF;
+net.alphatab.file.gpx.score.Voice = function(p) { if( p === $_ ) return; {
+	null;
+}}
+net.alphatab.file.gpx.score.Voice.__name__ = ["net","alphatab","file","gpx","score","Voice"];
+net.alphatab.file.gpx.score.Voice.prototype.beatIds = null;
+net.alphatab.file.gpx.score.Voice.prototype.id = null;
+net.alphatab.file.gpx.score.Voice.prototype.__class__ = net.alphatab.file.gpx.score.Voice;
 net.alphatab.tablature.drawing.MusicFont = function() { }
 net.alphatab.tablature.drawing.MusicFont.__name__ = ["net","alphatab","tablature","drawing","MusicFont"];
 net.alphatab.tablature.drawing.MusicFont.prototype.__class__ = net.alphatab.tablature.drawing.MusicFont;
@@ -9303,6 +9960,16 @@ net.alphatab.model.Tuplet.prototype.equals = function(tuplet) {
 }
 net.alphatab.model.Tuplet.prototype.times = null;
 net.alphatab.model.Tuplet.prototype.__class__ = net.alphatab.model.Tuplet;
+net.alphatab.file.gpx.score.Drumkit = function(midiValue,element,variation) { if( midiValue === $_ ) return; {
+	this.midiValue = midiValue;
+	this.element = element;
+	this.variation = variation;
+}}
+net.alphatab.file.gpx.score.Drumkit.__name__ = ["net","alphatab","file","gpx","score","Drumkit"];
+net.alphatab.file.gpx.score.Drumkit.prototype.element = null;
+net.alphatab.file.gpx.score.Drumkit.prototype.midiValue = null;
+net.alphatab.file.gpx.score.Drumkit.prototype.variation = null;
+net.alphatab.file.gpx.score.Drumkit.prototype.__class__ = net.alphatab.file.gpx.score.Drumkit;
 net.alphatab.model.Duration = function(factory) { if( factory === $_ ) return; {
 	this.value = 4;
 	this.isDotted = false;
@@ -9495,11 +10162,15 @@ net.alphatab.tablature.model.VoiceImpl.prototype.paintDot = function(layout,laye
 		layer.addCircle(Math.round((x + (dotSize + 2.0)) - (dotSize / 2.0)),Math.round(y - (dotSize / 2.0)),dotSize);
 	}
 }
+net.alphatab.tablature.model.VoiceImpl.prototype.paintHammer = function(layout,context,x,y) {
+	null;
+}
 net.alphatab.tablature.model.VoiceImpl.prototype.paintScoreBeat = function(layout,context,x,y,spacing) {
 	var vX = x + 4 * layout.scale;
 	var fill = (this.index == 0?context.get(net.alphatab.tablature.drawing.DrawingLayers.Voice1):context.get(net.alphatab.tablature.drawing.DrawingLayers.Voice2));
 	var draw = (this.index == 0?context.get(net.alphatab.tablature.drawing.DrawingLayers.VoiceDraw1):context.get(net.alphatab.tablature.drawing.DrawingLayers.VoiceDraw2));
 	this.paintTriplet(layout,context,x,(y - this.getPaintPosition(net.alphatab.tablature.TrackSpacingPositions.ScoreMiddleLines)));
+	this.paintHammer(layout,context,x,y);
 	if(this.duration.value >= 2) {
 		var scale = layout.scale;
 		var lineSpacing = layout.scoreLineSpacing;
@@ -9956,6 +10627,46 @@ net.alphatab.tablature.model.JoinedTypeConverter.toInt = function(t) {
 	}
 }
 net.alphatab.tablature.model.JoinedTypeConverter.prototype.__class__ = net.alphatab.tablature.model.JoinedTypeConverter;
+net.alphatab.file.gpx.GpxReader = function(p) { if( p === $_ ) return; {
+	net.alphatab.file.SongReader.apply(this,[]);
+}}
+net.alphatab.file.gpx.GpxReader.__name__ = ["net","alphatab","file","gpx","GpxReader"];
+net.alphatab.file.gpx.GpxReader.__super__ = net.alphatab.file.SongReader;
+for(var k in net.alphatab.file.SongReader.prototype ) net.alphatab.file.gpx.GpxReader.prototype[k] = net.alphatab.file.SongReader.prototype[k];
+net.alphatab.file.gpx.GpxReader.prototype._fileSystem = null;
+net.alphatab.file.gpx.GpxReader.prototype.init = function(data,factory) {
+	net.alphatab.file.SongReader.prototype.init.apply(this,[data,factory]);
+	this._fileSystem = new net.alphatab.file.gpx.FileSystem();
+}
+net.alphatab.file.gpx.GpxReader.prototype.readSong = function() {
+	try {
+		this._fileSystem.load(this.data);
+		var reader = new net.alphatab.file.gpx.DocumentReader(this._fileSystem.getFileContents("score.gpif"));
+		return this.factory.newSong();
+	}
+	catch( $e32 ) {
+		{
+			var e = $e32;
+			{
+				if(Std["is"](e,net.alphatab.file.FileFormatException)) {
+					throw e;
+				}
+				else {
+					throw new net.alphatab.file.FileFormatException(Std.string(e));
+				}
+			}
+		}
+	}
+}
+net.alphatab.file.gpx.GpxReader.prototype.__class__ = net.alphatab.file.gpx.GpxReader;
+net.alphatab.file.gpx.File = function(fileName,fileContents) { if( fileName === $_ ) return; {
+	this.fileName = fileName;
+	this.fileContents = fileContents;
+}}
+net.alphatab.file.gpx.File.__name__ = ["net","alphatab","file","gpx","File"];
+net.alphatab.file.gpx.File.prototype.fileContents = null;
+net.alphatab.file.gpx.File.prototype.fileName = null;
+net.alphatab.file.gpx.File.prototype.__class__ = net.alphatab.file.gpx.File;
 net.alphatab.model.Size = function(width,height) { if( width === $_ ) return; {
 	this.width = width;
 	this.height = height;
@@ -10132,6 +10843,17 @@ net.alphatab.model.NoteEffect.prototype.tremoloPicking = null;
 net.alphatab.model.NoteEffect.prototype.trill = null;
 net.alphatab.model.NoteEffect.prototype.vibrato = null;
 net.alphatab.model.NoteEffect.prototype.__class__ = net.alphatab.model.NoteEffect;
+net.alphatab.file.gpx.score.Automation = function(p) { if( p === $_ ) return; {
+	null;
+}}
+net.alphatab.file.gpx.score.Automation.__name__ = ["net","alphatab","file","gpx","score","Automation"];
+net.alphatab.file.gpx.score.Automation.prototype.barId = null;
+net.alphatab.file.gpx.score.Automation.prototype.linear = null;
+net.alphatab.file.gpx.score.Automation.prototype.position = null;
+net.alphatab.file.gpx.score.Automation.prototype.type = null;
+net.alphatab.file.gpx.score.Automation.prototype.value = null;
+net.alphatab.file.gpx.score.Automation.prototype.visible = null;
+net.alphatab.file.gpx.score.Automation.prototype.__class__ = net.alphatab.file.gpx.score.Automation;
 net.alphatab.model.VoiceDirection = { __ename__ : ["net","alphatab","model","VoiceDirection"], __constructs__ : ["None","Up","Down"] }
 net.alphatab.model.VoiceDirection.Down = ["Down",2];
 net.alphatab.model.VoiceDirection.Down.toString = $estr;
@@ -10529,6 +11251,70 @@ haxe.io.Error.OutsideBounds.__enum__ = haxe.io.Error;
 haxe.io.Error.Overflow = ["Overflow",1];
 haxe.io.Error.Overflow.toString = $estr;
 haxe.io.Error.Overflow.__enum__ = haxe.io.Error;
+net.alphatab.file.gpx.ByteBuffer = function(buffer) { if( buffer === $_ ) return; {
+	this._buffer = buffer;
+	this._position = 0;
+}}
+net.alphatab.file.gpx.ByteBuffer.__name__ = ["net","alphatab","file","gpx","ByteBuffer"];
+net.alphatab.file.gpx.ByteBuffer.prototype._buffer = null;
+net.alphatab.file.gpx.ByteBuffer.prototype._position = null;
+net.alphatab.file.gpx.ByteBuffer.prototype.end = function() {
+	return this.offset() >= this.length();
+}
+net.alphatab.file.gpx.ByteBuffer.prototype.length = function() {
+	return this._buffer.getSize();
+}
+net.alphatab.file.gpx.ByteBuffer.prototype.offset = function() {
+	return Math.floor(this._position / 8);
+}
+net.alphatab.file.gpx.ByteBuffer.prototype.readBit = function() {
+	var bit = -1;
+	var byteIndex = Math.floor(this._position / 8);
+	var byteOffset = (7 - (this._position % 8));
+	if(byteIndex >= 0 && byteIndex < this._buffer.getSize()) {
+		bit = (((this._buffer.getByte(byteIndex) & 255) >> byteOffset) & 1);
+		this._position++;
+	}
+	return bit;
+}
+net.alphatab.file.gpx.ByteBuffer.prototype.readBits = function(count) {
+	var bits = 0;
+	var i = count - 1;
+	while(i >= 0) {
+		bits |= (this.readBit() << i);
+		i--;
+	}
+	return bits;
+}
+net.alphatab.file.gpx.ByteBuffer.prototype.readBitsReversed = function(count) {
+	var bits = 0;
+	var i = 0;
+	while(i < count) {
+		bits |= (this.readBit() << i);
+		i++;
+	}
+	return bits;
+}
+net.alphatab.file.gpx.ByteBuffer.prototype.readBytes = function(count) {
+	var bytes = new Array();
+	var i = 0;
+	while(i < count) {
+		bytes.push(this.readBits(8));
+		i++;
+	}
+	return bytes;
+}
+net.alphatab.file.gpx.ByteBuffer.prototype.__class__ = net.alphatab.file.gpx.ByteBuffer;
+net.alphatab.file.gpx.score.Rhythm = function(p) { if( p === $_ ) return; {
+	null;
+}}
+net.alphatab.file.gpx.score.Rhythm.__name__ = ["net","alphatab","file","gpx","score","Rhythm"];
+net.alphatab.file.gpx.score.Rhythm.prototype.augmentationDotCount = null;
+net.alphatab.file.gpx.score.Rhythm.prototype.id = null;
+net.alphatab.file.gpx.score.Rhythm.prototype.noteValue = null;
+net.alphatab.file.gpx.score.Rhythm.prototype.primaryTupletDen = null;
+net.alphatab.file.gpx.score.Rhythm.prototype.primaryTupletNum = null;
+net.alphatab.file.gpx.score.Rhythm.prototype.__class__ = net.alphatab.file.gpx.score.Rhythm;
 net.alphatab.model.MixTableItem = function(p) { if( p === $_ ) return; {
 	this.value = 0;
 	this.duration = 0;
@@ -11428,9 +12214,9 @@ haxe.Http.prototype.request = function(post) {
 			try {
 				$r = r.status;
 			}
-			catch( $e30 ) {
+			catch( $e33 ) {
 				{
-					var e = $e30;
+					var e = $e33;
 					$r = null;
 				}
 			}
@@ -11457,8 +12243,8 @@ haxe.Http.prototype.request = function(post) {
 	if(this.async) r.onreadystatechange = onreadystatechange;
 	var uri = this.postData;
 	if(uri != null) post = true;
-	else { var $it31 = this.params.keys();
-	while( $it31.hasNext() ) { var p = $it31.next();
+	else { var $it34 = this.params.keys();
+	while( $it34.hasNext() ) { var p = $it34.next();
 	{
 		if(uri == null) uri = "";
 		else uri += "&";
@@ -11474,9 +12260,9 @@ haxe.Http.prototype.request = function(post) {
 		}
 		else r.open("GET",this.url,this.async);
 	}
-	catch( $e32 ) {
+	catch( $e35 ) {
 		{
-			var e = $e32;
+			var e = $e35;
 			{
 				this.onError(e.toString());
 				return;
@@ -11484,8 +12270,8 @@ haxe.Http.prototype.request = function(post) {
 		}
 	}
 	if(this.headers.get("Content-Type") == null && post && this.postData == null) r.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-	{ var $it33 = this.headers.keys();
-	while( $it33.hasNext() ) { var h = $it33.next();
+	{ var $it36 = this.headers.keys();
+	while( $it36.hasNext() ) { var h = $it36.next();
 	r.setRequestHeader(h,this.headers.get(h));
 	}}
 	r.send(uri);
@@ -11518,6 +12304,21 @@ net.alphatab.model.effects.HarmonicType.Semi.__enum__ = net.alphatab.model.effec
 net.alphatab.model.effects.HarmonicType.Tapped = ["Tapped",2];
 net.alphatab.model.effects.HarmonicType.Tapped.toString = $estr;
 net.alphatab.model.effects.HarmonicType.Tapped.__enum__ = net.alphatab.model.effects.HarmonicType;
+net.alphatab.file.gpx.DocumentReader = function(stream) { if( stream === $_ ) return; {
+	var str = "";
+	{
+		var _g = 0;
+		while(_g < stream.length) {
+			var i = stream[_g];
+			++_g;
+			str += String.fromCharCode(i);
+		}
+	}
+}}
+net.alphatab.file.gpx.DocumentReader.__name__ = ["net","alphatab","file","gpx","DocumentReader"];
+net.alphatab.file.gpx.DocumentReader.prototype.gpxDocument = null;
+net.alphatab.file.gpx.DocumentReader.prototype.xmlDocument = null;
+net.alphatab.file.gpx.DocumentReader.prototype.__class__ = net.alphatab.file.gpx.DocumentReader;
 net.alphatab.model.SlideType = { __ename__ : ["net","alphatab","model","SlideType"], __constructs__ : ["FastSlideTo","SlowSlideTo","OutDownWards","OutUpWards","IntoFromBelow","IntoFromAbove"] }
 net.alphatab.model.SlideType.FastSlideTo = ["FastSlideTo",0];
 net.alphatab.model.SlideType.FastSlideTo.toString = $estr;
@@ -12000,16 +12801,16 @@ js.Boot.__init();
 		try {
 			return new ActiveXObject("Msxml2.XMLHTTP");
 		}
-		catch( $e34 ) {
+		catch( $e37 ) {
 			{
-				var e = $e34;
+				var e = $e37;
 				{
 					try {
 						return new ActiveXObject("Microsoft.XMLHTTP");
 					}
-					catch( $e35 ) {
+					catch( $e38 ) {
 						{
-							var e1 = $e35;
+							var e1 = $e38;
 							{
 								throw "Unable to create XMLHttpRequest object.";
 							}
@@ -12038,9 +12839,22 @@ js.Boot.__init();
 	Enum = { }
 	Void = { __ename__ : ["Void"]}
 }
+{
+	Xml = js.JsXml__;
+	Xml.__name__ = ["Xml"];
+	Xml.Element = "element";
+	Xml.PCData = "pcdata";
+	Xml.CData = "cdata";
+	Xml.Comment = "comment";
+	Xml.DocType = "doctype";
+	Xml.Prolog = "prolog";
+	Xml.Document = "document";
+}
 net.alphatab.tablature.model.ChordImpl.MAX_FRETS = 6;
 net.alphatab.model.Lyrics.MAX_LINE_COUNT = 5;
 net.alphatab.model.MeasureHeader.DEFAULT_KEY_SIGNATURE = 0;
+net.alphatab.file.gpx.FileSystem.HEADER_BCFS = 1397113666;
+net.alphatab.file.gpx.FileSystem.HEADER_BCFZ = 1514554178;
 net.alphatab.file.alphatex.AlphaTexParser.EOL = String.fromCharCode(0);
 net.alphatab.file.alphatex.AlphaTexParser.TRACK_CHANNELS = [0,1];
 net.alphatab.file.alphatex.AlphaTexParser.TUNING_REGEX = new EReg("([a-g]b?)([0-9])","i");
@@ -12063,6 +12877,18 @@ net.alphatab.model.Color.Red = new net.alphatab.model.Color(255,0,0);
 net.alphatab.model.Marker.DEFAULT_COLOR = new net.alphatab.model.Color(255,0,0);
 net.alphatab.model.Marker.DEFAULT_TITLE = "Untitled";
 net.alphatab.model.PageSetup._defaults = null;
+js.JsXml__.enode = new EReg("^<([a-zA-Z0-9:_-]+)","");
+js.JsXml__.ecdata = new EReg("^<!\\[CDATA\\[","i");
+js.JsXml__.edoctype = new EReg("^<!DOCTYPE","i");
+js.JsXml__.eend = new EReg("^</([a-zA-Z0-9:_-]+)>","");
+js.JsXml__.epcdata = new EReg("^[^<]+","");
+js.JsXml__.ecomment = new EReg("^<!--","");
+js.JsXml__.eprolog = new EReg("^<\\?[^\\?]+\\?>","");
+js.JsXml__.eattribute = new EReg("^\\s*([a-zA-Z0-9:_-]+)\\s*=\\s*([\"'])([^\\2]*?)\\2","");
+js.JsXml__.eclose = new EReg("^[ \\r\\n\\t]*(>|(/>))","");
+js.JsXml__.ecdata_end = new EReg("\\]\\]>","");
+js.JsXml__.edoctype_elt = new EReg("[\\[|\\]>]","");
+js.JsXml__.ecomment_end = new EReg("-->","");
 net.alphatab.model.Beat.MAX_VOICES = 2;
 net.alphatab.model.effects.TremoloBarEffect.MAX_POSITION = 12;
 net.alphatab.model.effects.TremoloBarEffect.MAX_VALUE = 12;
@@ -12171,7 +12997,6 @@ net.alphatab.tablature.drawing.MusicFont.FooterDownEighth = "m 0 -9.832334 c 0 2
 net.alphatab.tablature.drawing.MusicFont.FooterDownSixteenth = "m 7.9441413 -15.563988 c -0.246489 3.401686 -2.5849823 6.34347 -5.5067408 7.944048 -0.4884941 0.286858 -1.65392429 0.998974 -0.9736309 -0.05759 0.7722153 -1.690976 2.4046425 -2.699085 3.6158979 -4.040337 1.0866343 -1.164153 2.1824241 -2.392975 2.8644738 -3.846119 z m -7.29473835 3.610473 c -0.41062341 -0.04914 -0.76463634 -0.04168 -0.6140317 0.470403 0 3.813966 0 7.627933 0 11.44189995 0.67659974 0.1761197 0.91140015 -0.229715 0.94945235 -0.884208 C 1.203044 -2.095641 1.668603 -3.220624 2.501682 -4.093292 c 2.0135586 -1.944946 4.2192836 -3.834761 5.4777713 -6.391119 1.0896069 -2.095626 1.2936098 -4.584216 0.6524105 -6.847988 0.6893202 -2.061494 0.2941913 -4.293619 -0.2958859 -6.331117 -0.4900269 -1.577576 -1.2950987 -3.041517 -2.2585001 -4.377696 -0.8616213 0.535669 0.5368872 1.109545 0.6077488 1.792014 0.9119085 1.703219 1.3297958 3.655318 1.2838639 5.579092 -0.026881 0.75692 -0.2079974 0.922451 -0.4563049 0.148157 -0.4147792 -0.801344 -0.9031387 -1.786956 -1.4755249 -2.343031 -0.8007521 0.546645 0.6731882 1.153037 0.7027972 1.855157 0.3340788 0.693398 0.6599843 1.402291 0.8356656 2.154563 -0.8016647 2.920027 -3.190168 5.16594 -5.8484668 6.464599 -0.3509184 0.165298 -0.7107788 0.311707 -1.07785375 0.437146 z";
 net.alphatab.tablature.drawing.MusicFont.FooterDownThirtySecond = "m 8.00785 -20.40967 c -0.2658866 3.684812 -2.9447649 6.79894 -6.17676 8.3643 -1.37639727 0.728221 0.3423708 -1.664072 0.8144894 -2.102994 1.9858665 -1.881387 4.155448 -3.779403 5.3622706 -6.261306 z M 0.00162 -0.04656966 c 0.93381462 0.28515 0.8193481 -0.807148 1.0478345 -1.42957804 0.2803803 -1.765377 1.6602707 -3.00578 2.9141899 -4.145148 2.227163 -2.103278 4.424139 -4.5900333 4.9202922 -7.7203263 0.1817268 -1.250028 0.1620208 -2.535402 -0.1365866 -3.766448 0.4749419 -1.659017 0.402825 -3.436541 -0.04508 -5.0932 0.7635674 -2.36306 0.2282278 -4.922937 -0.5760737 -7.204899 -0.494687 -1.300801 -1.2006361 -2.511752 -2.0101263 -3.6404 -0.8765523 0.676432 0.9005357 1.477463 0.8901091 2.374963 0.7554578 1.628225 1.1028346 3.461387 1.0061984 5.249487 -0.089035 1.435129 -0.6336456 -0.707146 -1.0255775 -1.11245 -0.2029432 -0.54495 -1.1629311 -1.834478 -1.1221306 -0.795272 0.8666493 1.022969 1.4110292 2.29399 1.7685006 3.575672 -0.2653544 0.651791 -0.5812977 2.518096 -1.1501375 1.108324 -0.174275 -0.980318 -1.2137408 -0.237893 -0.4146652 0.238763 1.245104 1.165052 -0.666178 2.288887 -1.3691726 3.201354 -1.211829 1.081228 -2.6445935 2.01518 -4.21469628 2.434258 -0.61090183 -0.198416 -0.495496 0.329475 -0.48449842 0.752959 0.00107986 5.32344 -0.00215979 10.6512013 0.00162 15.97194134 z M 7.83374 -14.81597 c -0.6209667 3.374064 -3.2387211 6.1295663 -6.31536 7.4842003 0.7800335 -1.661535 2.3927676 -2.660914 3.5897616 -3.9886873 1.0231181 -1.061494 1.9905477 -2.234105 2.7255984 -3.495513 z";
 net.alphatab.tablature.drawing.MusicFont.FooterDownSixtyFourth = "m 8.0712401 -20.559698 c -0.2881217 3.95408 -3.3083449 7.21635 -6.8430079 8.722955 0.5413598 -2.104476 2.5440517 -3.269645 3.9196901 -4.797782 1.1053247 -1.189878 2.2321528 -2.438206 2.9233178 -3.925173 z m -0.1754617 5.639842 c -0.6278548 3.404561 -3.2615625 6.1742288 -6.3667547 7.5448548 0.8242279 -1.732074 2.5196775 -2.7684238 3.7638111 -4.1650628 0.9627266 -1.044692 1.8923445 -2.14377 2.6029436 -3.379792 z M 0.62664908 -21.587402 C -0.03876123 -21.783357 -0.07691759 -21.352058 0 -20.805684 c 0 6.925003 0 13.8500058 0 20.77500981 1.280146 0.295956 0.80824039 -1.62911301 1.3153756 -2.36021501 0.8142156 -1.962757 2.7085255 -3.096215 4.0738065 -4.633189 2.0378619 -2.142286 3.7610936 -4.8741568 3.6837174 -7.9370978 -0.184992 -1.541798 -0.1915414 -2.99329 0.071869 -4.529302 0.083226 -1.476269 -0.6325568 -2.863738 -0.064623 -4.296462 0.3069137 -1.408285 -0.3058183 -2.812873 -0.1472625 -4.186016 0.5397501 -3.55923 -0.72835 -7.196105 -2.816788 -10.057718 -0.9095796 0.710829 0.9164872 1.492046 0.8970873 2.41113 0.7689461 1.708681 1.1679422 3.639735 0.9828598 5.509714 -0.5337687 -0.919568 -1.1618065 -2.850096 -1.99021 -3.012289 -0.2536327 0.821156 1.3342517 1.903048 1.3800106 2.996232 0.7110362 0.93492 0.031051 2.819383 -0.5671174 3.083113 -0.127103 -0.608007 -1.0218398 -1.341775 -0.9105994 -0.492703 1.4651036 1.041283 -0.066451 2.273976 -0.8855335 3.173586 -1.234025 1.229546 -2.7569852 2.185902 -4.39594332 2.774489 z m 7.26912932 -3.459103 c 0.1686807 -0.543022 0.1070891 0.399133 0 0 z m -1.4287599 2.155673 c 0.4018703 -0.556511 1.4541407 -2.234576 1.1248352 -0.711247 -0.3410446 0.71364 -0.4331583 2.26834 -1.1248352 0.711247 z m -5.0883905 5.715039 c 0.9477571 -2.055992 3.0309611 -3.193611 4.405343 -4.919195 0.7092534 -0.999322 1.1584713 0.970888 0.2647592 1.32595 -1.2081076 1.584366 -2.8358377 2.82061 -4.6701022 3.593245 z";
-net.alphatab.tablature.drawing.MusicFont.HammerPullUp = "M 20.158654 7 C 18.720384 5.0897869 16.959259 3.1952764 14.557392 2.5808289 12.07033 1.9123231 9.4379254 1.8872166 6.8990385 2.2463943 5.2521338 2.4762611 3.6424657 3.1161401 2.4270207 4.2751883 1.5171024 5.0870714 0.72865538 6.0249638 0 7 0.96533405 4.5580267 2.9933611 2.6836261 5.210036 1.3629808 7.4904871 0.00880669 10.359562 -0.42856459 12.882209 0.48369183 15.028867 1.2495373 16.938012 2.6237245 18.480957 4.2882363 19.190644 5.0859076 19.78511 5.9963755 20.158654 7 z";
 net.alphatab.tablature.drawing.MusicFont.GraceNote = "M 5.6230469 17.022354 C 5.2928444 18.806006 3.4192157 20.244739 1.5993334 19.965089 0.54977356 19.791886 -0.22613936 18.681908 0.05985309 17.63679 0.39312285 16.15639 1.8349403 15.129042 3.2776413 14.902967 c 0.7358768 -0.100852 1.5472485 0.134934 2.0224993 0.726855 0 -1.957619 0 -3.915238 0 -5.8728568 C 4.8965079 10.369142 4.4928753 10.981318 4.0892426 11.593494 3.8021382 11.450377 3.5681311 11.296108 3.8856989 11.025997 4.3571795 10.306989 4.82866 9.5879812 5.3001406 8.8689734 c 0 -2.9532459 0 -5.9064918 0 -8.85973773 C 5.959782 -0.19030778 5.8098961 0.67386816 6.0001911 1.0725556 6.2815991 2.376778 7.4861869 3.1119798 8.3352694 4.0333432 8.5396854 4.1192163 8.681338 3.5915275 8.8594545 3.4203021 9.2270025 2.8618202 9.5945504 2.3033382 9.9620984 1.7448563 10.249027 1.8878591 10.483042 2.0421339 10.1674 2.3134995 9.7020609 3.0321253 9.2367214 3.7507512 8.7713819 4.469377 10.000387 5.789384 11.008203 7.4751773 10.970549 9.3335451 10.956739 11.235663 10.21394 13.069747 9.1144696 14.600558 8.5809314 14.145753 9.6885435 13.649852 9.6868083 13.077318 10.163078 12.05979 10.383754 10.906949 10.307945 9.7887352 10.144943 8.1621028 9.2485683 6.6904313 7.9924095 5.6682048 7.2192044 6.7939265 6.4537977 7.9963106 5.6835918 9.1515162 c 0 2.6236128 0 5.2472248 0 7.8708378 l -0.045611 0 -0.014933 0 -9e-7 0 z M 7.600847 5.3573689 C 7.0735118 5.0279497 6.1087101 4.2688852 5.6835918 4.4649386 c 0 1.2661952 0 2.5323905 0 3.7985857 C 6.3226769 7.2948058 6.9617619 6.3260874 7.600847 5.3573689 z";
 net.alphatab.tablature.drawing.MusicFont.GraceDeadNote = "M 0.7761194 8 C 0.51741293 8 0.25870647 8 0 8 0 5.3333333 0 2.6666667 0 0 c 3.986733 0 7.973466 0 11.960199 0 0 2.6666667 0 5.3333333 0 8 -0.252073 0 -0.504145 0 -0.756218 0 0 -1.8971808 0 -3.7943615 0 -5.6915423 -3.4759539 0 -6.9519077 0 -10.4278616 0 0 1.8971808 0 3.7943615 0 5.6915423 z";
 net.alphatab.tablature.drawing.MusicFont.TrillUpEigth = "M 0 4.7708978 L 9 0.3684211 9 2.7089783 0 7 0 4.7708978 z";
@@ -12187,6 +13012,33 @@ net.alphatab.model.effects.BendEffect.SEMITONE_LENGTH = 1;
 net.alphatab.model.effects.BendEffect.MAX_POSITION = 12;
 net.alphatab.model.effects.BendEffect.MAX_VALUE = 12;
 net.alphatab.model.Tuplet.NORMAL = new net.alphatab.model.Tuplet();
+net.alphatab.file.gpx.score.Drumkit.DRUMKITS = (function($this) {
+	var $r;
+	var kits = new Array();
+	kits.push(new net.alphatab.file.gpx.score.Drumkit(36,0,0));
+	kits.push(new net.alphatab.file.gpx.score.Drumkit(36,0,0));
+	kits.push(new net.alphatab.file.gpx.score.Drumkit(37,1,2));
+	kits.push(new net.alphatab.file.gpx.score.Drumkit(38,1,0));
+	kits.push(new net.alphatab.file.gpx.score.Drumkit(41,5,0));
+	kits.push(new net.alphatab.file.gpx.score.Drumkit(42,10,0));
+	kits.push(new net.alphatab.file.gpx.score.Drumkit(43,6,0));
+	kits.push(new net.alphatab.file.gpx.score.Drumkit(44,11,0));
+	kits.push(new net.alphatab.file.gpx.score.Drumkit(45,7,0));
+	kits.push(new net.alphatab.file.gpx.score.Drumkit(46,10,2));
+	kits.push(new net.alphatab.file.gpx.score.Drumkit(47,8,0));
+	kits.push(new net.alphatab.file.gpx.score.Drumkit(48,9,0));
+	kits.push(new net.alphatab.file.gpx.score.Drumkit(49,12,0));
+	kits.push(new net.alphatab.file.gpx.score.Drumkit(50,9,0));
+	kits.push(new net.alphatab.file.gpx.score.Drumkit(51,15,0));
+	kits.push(new net.alphatab.file.gpx.score.Drumkit(52,16,0));
+	kits.push(new net.alphatab.file.gpx.score.Drumkit(53,15,2));
+	kits.push(new net.alphatab.file.gpx.score.Drumkit(55,14,0));
+	kits.push(new net.alphatab.file.gpx.score.Drumkit(56,3,0));
+	kits.push(new net.alphatab.file.gpx.score.Drumkit(57,13,0));
+	kits.push(new net.alphatab.file.gpx.score.Drumkit(59,15,1));
+	$r = kits;
+	return $r;
+}(this));
 net.alphatab.model.Duration.QUARTER_TIME = 960;
 net.alphatab.model.Duration.WHOLE = 1;
 net.alphatab.model.Duration.HALF = 2;
@@ -12210,6 +13062,7 @@ net.alphatab.model.effects.HarmonicEffect.NATURAL_FREQUENCIES = (function($this)
 haxe.Unserializer.DEFAULT_RESOLVER = Type;
 haxe.Unserializer.BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%:";
 haxe.Unserializer.CODES = null;
+net.alphatab.file.gpx.ByteBuffer.BUFFER_TYPE_BITS = 8;
 net.alphatab.midi.MidiSequenceParser.DEFAULT_BEND = 64;
 net.alphatab.midi.MidiSequenceParser.DEFAULT_BEND_SEMITONE = 2.75;
 net.alphatab.midi.MidiSequenceParser.DEFAULT_DURATION_DEAD = 30;

@@ -10,8 +10,14 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
+		<buildCommand>
+			<name>com.powerflasher.fdt.core.FlashBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
 		<nature>com.powerflasher.fdt.haxe.core.nature</nature>
+		<nature>com.powerflasher.fdt.core.FlashNature</nature>
 	</natures>
 </projectDescription>

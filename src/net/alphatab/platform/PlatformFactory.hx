@@ -12,7 +12,7 @@ class PlatformFactory
 		#if js
 			return new Html5Canvas(object);
 		#else 
-			#error 
+			return null;//#error 
 		#end
 	} 
 	
@@ -21,7 +21,7 @@ class PlatformFactory
 		#if js
 			return new JsFileLoader();
 		#else 
-			#error 
+			return null;//#error 
 		#end
 	}
 }

@@ -1,3 +1,19 @@
+/*
+ * This file is part of alphaTab.
+ *
+ *  alphaTab is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  alphaTab is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.alphatab.tablature.model;
 import haxe.io.StringInput;
 import net.alphatab.model.effects.BendEffect;
@@ -352,6 +368,50 @@ class NoteImpl extends Note
 		paintEffects(layout, context, x, y, spacing);
 	}
 	
+	public static function paintTie(layout:ViewLayout, layer:DrawingLayer, x1:Float, y1:Float, x2:Float, y2:Float, down:Bool=false) : Void
+	{
+    	//
+        // calculate control points 
+        //
+		var offset = 15*layout.scale;
+		var size = 4*layout.scale;
+        // normal vector
+        var normalVector = {
+            x: (y2 - y1),
+            y: (x2 - x1)
+        }
+        var length = Math.sqrt((normalVector.x*normalVector.x) + (normalVector.y * normalVector.y));
+        if(down) 
+            normalVector.x *= -1;
+        else
+            normalVector.y *= -1;
+        
+        // make to unit vector
+        normalVector.x /= length;
+        normalVector.y /= length;
+        
+        // center of connection
+        var center = {
+            x: (x2 + x1)/2,
+            y: (y2 + y1)/2
+        };
+       
+        // control points
+        var cp1 = {
+            x: center.x + (offset*normalVector.x),
+            y: center.y + (offset*normalVector.y),
+        }; 
+        var cp2 = {
+            x: center.x + ((offset-size)*normalVector.x),
+            y: center.y + ((offset-size)*normalVector.y),
+        };
+        layer.startFigure();
+        layer.moveTo(x1, y1);
+        layer.quadraticCurveTo(cp1.x, cp1.y, x2, y2);
+        layer.quadraticCurveTo(cp2.x, cp2.y, x1, y1);
+        layer.closeFigure();
+	}
+	
 	private function paintScoreNote(layout:ViewLayout, context:DrawingContext, x:Int, y:Int, spacing:Int) : Void
 	{
 		var scoreSpacing:Float = layout.scoreLineSpacing;
@@ -375,18 +435,13 @@ class NoteImpl extends Note
 
 			if (noteForTie != null)
 			{
-				tieX = cast (noteForTie.beatImpl().lastPaintX + 15 * layout.scale);
+				tieX = cast (noteForTie.beatImpl().lastPaintX + 13 * layout.scale);
 				tieY = y + scorePosY;
 				tieWidth = (realX - tieX);
 				tieHeight = (20.0 * tieScale);
 			}
-
-
-			if (tieWidth > 0 && tieHeight > 0)
-			{
-				var wScale:Float = tieWidth / 20;
-				fill.addMusicSymbol(MusicFont.HammerPullUp, cast tieX, cast realY1, wScale, layout.scale); 
-			}
+			
+			paintTie(layout, fill, tieX, tieY, tieX + tieWidth, tieY);
 		}
 
 		var accidentalX:Int = cast (x - 2 * layout.scale);
@@ -423,7 +478,7 @@ class NoteImpl extends Note
 		{
 			paintGrace(layout, context, realX, realY1);
 		}
-
+		
 		if (voice.duration.isDotted || voice.duration.isDoubleDotted)
 		{
 			voiceImpl().paintDot(
@@ -694,29 +749,18 @@ class NoteImpl extends Note
 	
 	private function paintHammer(layout:ViewLayout, context:DrawingContext, nextNote:NoteImpl, x:Float, y:Float, forceDown:Bool = false) : Void
 	{
-		var xScale:Float = layout.scale;
-		var yScale:Float = layout.stringSpacing / 10.0;
-
-		var offset:Float = 7 *xScale;
-
-		var realX :Float= x;
-		var realY:Float = y - (DrawingResources.noteFontHeight * layout.scale);
-
-		var endX:Float = nextNote != null ? 
-					nextNote.beatImpl().getRealPosX(layout) - (2*offset)
-					: realX + 10*xScale;
-						 
-		var width:Float = endX - realX;
+		var down:Bool = this.string > 3 || forceDown || nextNote == null;
 		var fill:DrawingLayer = voice.index == 0
-					? context.get(DrawingLayers.VoiceEffects1)
-					: context.get(DrawingLayers.VoiceEffects2);
-
-		var wScale:Float = width / 16;
-		var hScale:Float = (this.string > 3 || forceDown) ? -1 : 1;
-		if (this.string > 3 || forceDown)
-			realY += (DrawingResources.noteFontHeight * layout.scale) * 2;
-			
-		fill.addMusicSymbol(MusicFont.HammerPullUp, realX + offset, cast realY, layout.scale * wScale, layout.scale * hScale);
+							? context.get(DrawingLayers.VoiceEffects1)
+							: context.get(DrawingLayers.VoiceEffects2);
+		var realX = _noteOrientation.x + (_noteOrientation.width/2);
+		var realY = down ? y + DrawingResources.noteFontHeight/2
+		                 : y - DrawingResources.noteFontHeight/2;
+		var endX:Float = nextNote != null ? 
+					nextNote.beatImpl().getRealPosX(layout)
+					: realX + 15*layout.scale;
+					
+		paintTie(layout, fill, realX, realY, endX, realY, down);	
 	}
 
 	private function paintGrace(layout:ViewLayout, context:DrawingContext, x:Int, y:Int) : Void
@@ -730,7 +774,10 @@ class NoteImpl extends Note
 		fill.addMusicSymbol(s, cast (realX - scale * 1.33), cast realY, layout.scale);
 		if (effect.grace.transition == GraceEffectTransition.Hammer || effect.grace.transition == GraceEffectTransition.Slide)
 		{
-			paintHammer(layout, context, null, x - (15*layout.scale), y + (5*layout.scale), true);
+			var startX = x - (10*layout.scale);
+			var tieY = y + (10*layout.scale);
+			
+			paintTie(layout, fill, startX, tieY, x, tieY, true);
 		}
 	}
 

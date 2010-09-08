@@ -3,6 +3,6 @@ eclipse.preferences.version=1
 haxeOutputType=js
 hxsrcFolders=src
 mainClass=net.alphatab.Main
-outputPath=bin\\lib\\alphaTab\\alphaTab.js
+outputPath=bin\\lib\\alphaTab\\alphaTab.fdt.js
 sdkPath=C\:\\Program Files (x86)\\Motion-Twin\\haxe
 sdkPathOverride=false
