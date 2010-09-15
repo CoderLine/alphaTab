@@ -1,1 +1,1 @@
-ant -buildfile build.xml player
+ant -buildfile build.xml java-player

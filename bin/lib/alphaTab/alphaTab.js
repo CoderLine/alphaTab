@@ -1071,21 +1071,21 @@ net.alphatab.file.SongLoader = function() { }
 net.alphatab.file.SongLoader.__name__ = ["net","alphatab","file","SongLoader"];
 net.alphatab.file.SongLoader.loadSong = function(url,factory,success) {
 	var loader = net.alphatab.platform.PlatformFactory.getLoader();
-	haxe.Log.trace("Load song " + url,{ fileName : "SongLoader.hx", lineNumber : 25, className : "net.alphatab.file.SongLoader", methodName : "loadSong"});
+	haxe.Log.trace("Load song " + url,{ fileName : "SongLoader.hx", lineNumber : 41, className : "net.alphatab.file.SongLoader", methodName : "loadSong"});
 	loader.loadBinary("GET",url,function(data) {
 		var readers = net.alphatab.file.SongReader.availableReaders();
-		haxe.Log.trace("Song loaded, search for reader",{ fileName : "SongLoader.hx", lineNumber : 31, className : "net.alphatab.file.SongLoader", methodName : "loadSong"});
+		haxe.Log.trace("Song loaded, search for reader",{ fileName : "SongLoader.hx", lineNumber : 47, className : "net.alphatab.file.SongLoader", methodName : "loadSong"});
 		{
 			var _g = 0;
 			while(_g < readers.length) {
 				var reader = readers[_g];
 				++_g;
 				try {
-					haxe.Log.trace("Try Reader " + Type.getClassName(Type.getClass(reader)),{ fileName : "SongLoader.hx", lineNumber : 36, className : "net.alphatab.file.SongLoader", methodName : "loadSong"});
+					haxe.Log.trace("Try Reader " + Type.getClassName(Type.getClass(reader)),{ fileName : "SongLoader.hx", lineNumber : 52, className : "net.alphatab.file.SongLoader", methodName : "loadSong"});
 					data.seek(0);
 					reader.init(data,factory);
 					var song = reader.readSong();
-					haxe.Log.trace("Reading succeeded",{ fileName : "SongLoader.hx", lineNumber : 40, className : "net.alphatab.file.SongLoader", methodName : "loadSong"});
+					haxe.Log.trace("Reading succeeded",{ fileName : "SongLoader.hx", lineNumber : 56, className : "net.alphatab.file.SongLoader", methodName : "loadSong"});
 					success(song);
 					return;
 				}
@@ -1093,7 +1093,7 @@ net.alphatab.file.SongLoader.loadSong = function(url,factory,success) {
 					if( js.Boot.__instanceof($e1,net.alphatab.file.FileFormatException) ) {
 						var e = $e1;
 						{
-							haxe.Log.trace("Reading failed",{ fileName : "SongLoader.hx", lineNumber : 46, className : "net.alphatab.file.SongLoader", methodName : "loadSong"});
+							haxe.Log.trace("Reading failed",{ fileName : "SongLoader.hx", lineNumber : 62, className : "net.alphatab.file.SongLoader", methodName : "loadSong"});
 							continue;
 						}
 					} else throw($e1);
@@ -1102,7 +1102,7 @@ net.alphatab.file.SongLoader.loadSong = function(url,factory,success) {
 		}
 		throw new net.alphatab.file.FileFormatException("No reader for requested file found");
 	},function(err) {
-		haxe.Log.trace("Error loading file " + err,{ fileName : "SongLoader.hx", lineNumber : 55, className : "net.alphatab.file.SongLoader", methodName : "loadSong"});
+		haxe.Log.trace("Error loading file " + err,{ fileName : "SongLoader.hx", lineNumber : 71, className : "net.alphatab.file.SongLoader", methodName : "loadSong"});
 		throw err;
 	});
 }
@@ -12046,21 +12046,20 @@ net.alphatab.midi.MidiSequenceParser.prototype.makeTremoloBar = function(sequenc
 				var nextPoint = points[i + 1];
 				var nextValue = Math.round(64 + (nextPoint.value * (2.75 * 2)));
 				var nextPointStart = start + nextPoint.GetTime(duration);
-				if(nextValue != value) {
-					var width = (nextPointStart - pointStart) / Math.abs(nextValue - value);
-					if(value < nextValue) {
-						while(value < nextValue) {
-							value++;
-							pointStart += Math.round(width);
-							this.addBend(sequence,track,pointStart,((value <= 127)?value:127),channel);
-						}
+				if(nextValue == value) continue;
+				var width = (nextPointStart - pointStart) / Math.abs(nextValue - value);
+				if(value < nextValue) {
+					while(value < nextValue) {
+						value++;
+						pointStart += Math.round(width);
+						this.addBend(sequence,track,pointStart,((value <= 127)?value:127),channel);
 					}
-					else if(value > nextValue) {
-						while(value > nextValue) {
-							value += -1;
-							pointStart += Math.round(pointStart + width);
-							this.addBend(sequence,track,pointStart,((value >= 0)?value:0),channel);
-						}
+				}
+				else if(value > nextValue) {
+					while(value > nextValue) {
+						value += -1;
+						pointStart += Math.round(width);
+						this.addBend(sequence,track,pointStart,((value >= 0)?value:0),channel);
 					}
 				}
 			}

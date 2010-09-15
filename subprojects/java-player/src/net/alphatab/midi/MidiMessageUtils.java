@@ -13,7 +13,8 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
- */package net.alphatab.midi;
+ */
+package net.alphatab.midi;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MetaMessage;

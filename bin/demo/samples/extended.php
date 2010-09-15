@@ -1,4 +1,20 @@
 <?php 
+/*
+ * This file is part of alphaTab.
+ *
+ *  alphaTab is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  alphaTab is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
+ */
 $title = "Extended";
 $description = "This extended sample shows up different features like file loading and zoom adjustments.";
 ?> 
@@ -39,6 +55,7 @@ $(document).ready(function() {
 <select id="TestFile">
 	<option value="files/GuitarPro6Jingle.gpx">Guitar Pro 6 Jingle(Gpx)</option>
 	<option value="files/FadeToBlack.gp4">Metallica - Fade To Black (Gp4)</option>
+	<option value="files/Love.gp4">Love(Gp4)</option>
 	<option value="files/Canon.gp5">JerryC - CanonRock (Gp5)</option>
 	<option value="files/Serenade.gp5">Suidakra - Serenade to a Dream (Gp5)</option>
 	<option value="files/Effects.gp5">Effects (Gp5)</option>

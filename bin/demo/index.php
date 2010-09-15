@@ -36,7 +36,7 @@ if($isIndex)
 			ob_start();
 			include ('samples/'.$sample);
 			$dummy = ob_get_clean();				
-			$content .= '<li><a href="demo.php?s=' . $sample . '">'.$title.'</a>'.$description.'</li>';
+			$content .= '<li><a href="' . str_replace('.php', '', $sample) . '.html">'.$title.'</a>'.$description.'</li>';
 		}
 		$content .= '</ul>';
 	}
@@ -82,7 +82,7 @@ else
 		<?php
 		if($_GET['s']):
 		?>
-		<a href="demo.php">Back</a>
+		<a href="index.php">Back</a>
 		<?php
 		endif;
 		?>		

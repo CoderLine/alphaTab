@@ -96,6 +96,22 @@
             <arg value="10" />
         </exec>
 	</target>
+    
+    <target name="haxe-cpp" depends="global-init">
+		<delete dir="cpp" />
+        <exec executable="haxe">
+            <arg value="-cp" />
+            <arg value="${src}"/>
+            <arg value="net.alphatab.file.alphatex.AlphaTexParser"/>
+            <arg value="net.alphatab.midi.MidiDataProvider"/>
+            
+            <arg value="-main" />
+            <arg value="net.alphatab.Main" />
+            
+            <arg value="-cpp" />
+            <arg value="cpp" />
+        </exec>
+	</target>
 	
 	<!-- Release -->
 	<target name="release-init" depends="java-player">

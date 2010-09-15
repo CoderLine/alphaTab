@@ -828,28 +828,27 @@ class MidiSequenceParser
 				var nextPoint:BendPoint = points[i + 1];
 				var nextValue:Int = Math.round(DEFAULT_BEND + (nextPoint.value * (DEFAULT_BEND_SEMITONE * 2)));
 				var nextPointStart = start + nextPoint.GetTime(duration);
-				if (nextValue != value)
-				{
-					var width:Float = (nextPointStart - pointStart) / Math.abs(nextValue - value);
-					if (value < nextValue)
-					{
-						while (value < nextValue)
-						{
-							value++;
-							pointStart += Math.round(width);
-							addBend(sequence, track, pointStart, (value <= 127) ? value : 127, channel);
-						}
-					}
-					else if (value > nextValue)
-					{
-						while (value > nextValue)
-						{
-							value += -1;
-							pointStart += Math.round(pointStart + width);
-							addBend(sequence, track, pointStart, (value >= 0) ? value : 0, channel);
-						}
-					}
-				}
+				if (nextValue == value) continue;				
+                var width:Float = (nextPointStart - pointStart) / Math.abs(nextValue - value);
+                if (value < nextValue)
+                {
+                    while (value < nextValue)
+                    {
+                        value++;
+                        pointStart += Math.round(width);
+                        addBend(sequence, track, pointStart, (value <= 127) ? value : 127, channel);
+                    }
+                }
+                else if (value > nextValue)
+                {
+                    while (value > nextValue)
+                    {
+                        value += -1;
+                        pointStart += Math.round(width);
+                        addBend(sequence, track, pointStart, (value >= 0) ? value : 0, channel);
+                    }
+                }
+				
 			}
 		}
 		addBend(sequence, track, start + duration, 0x40, channel);
