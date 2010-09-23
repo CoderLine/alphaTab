@@ -17,6 +17,8 @@
 package net.alphatab;
 import net.alphatab.model.Song;
 import net.alphatab.tablature.Tablature;
+import net.alphatab.file.alphatex.AlphaTexParser;
+import net.alphatab.midi.MidiDataProvider;
 
 
 /**

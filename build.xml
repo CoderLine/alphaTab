@@ -46,8 +46,6 @@
         <exec executable="haxe">
             <arg value="-cp" />
             <arg value="${src}"/>
-            <arg value="net.alphatab.file.alphatex.AlphaTexParser"/>
-            <arg value="net.alphatab.midi.MidiDataProvider"/>
             
             <arg value="-main" />
             <arg value="net.alphatab.Main" />
