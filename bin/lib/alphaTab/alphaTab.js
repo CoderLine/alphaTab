@@ -1183,7 +1183,6 @@ net.alphatab.Main = function() { }
 net.alphatab.Main.__name__ = ["net","alphatab","Main"];
 net.alphatab.Main.main = function() {
 	net.alphatab.MyTrace.init();
-	var un = haxe.Unserializer.run(haxe.Serializer.run("test"));
 }
 net.alphatab.Main.prototype.__class__ = net.alphatab.Main;
 net.alphatab.file.SongReader = function(p) { if( p === $_ ) return; {
@@ -5695,22 +5694,6 @@ net.alphatab.tablature.TrackSpacing.prototype.set = function(index,value) {
 }
 net.alphatab.tablature.TrackSpacing.prototype.spacing = null;
 net.alphatab.tablature.TrackSpacing.prototype.__class__ = net.alphatab.tablature.TrackSpacing;
-js.Lib = function() { }
-js.Lib.__name__ = ["js","Lib"];
-js.Lib.isIE = null;
-js.Lib.isOpera = null;
-js.Lib.document = null;
-js.Lib.window = null;
-js.Lib.alert = function(v) {
-	alert(js.Boot.__string_rec(v,""));
-}
-js.Lib.eval = function(code) {
-	return eval(code);
-}
-js.Lib.setErrorHandler = function(f) {
-	js.Lib.onerror = f;
-}
-js.Lib.prototype.__class__ = js.Lib;
 ValueType = { __ename__ : ["ValueType"], __constructs__ : ["TNull","TInt","TFloat","TBool","TObject","TFunction","TClass","TEnum","TUnknown"] }
 ValueType.TBool = ["TBool",3];
 ValueType.TBool.toString = $estr;
@@ -5895,6 +5878,22 @@ Type.enumIndex = function(e) {
 	return e[1];
 }
 Type.prototype.__class__ = Type;
+js.Lib = function() { }
+js.Lib.__name__ = ["js","Lib"];
+js.Lib.isIE = null;
+js.Lib.isOpera = null;
+js.Lib.document = null;
+js.Lib.window = null;
+js.Lib.alert = function(v) {
+	alert(js.Boot.__string_rec(v,""));
+}
+js.Lib.eval = function(code) {
+	return eval(code);
+}
+js.Lib.setErrorHandler = function(f) {
+	js.Lib.onerror = f;
+}
+js.Lib.prototype.__class__ = js.Lib;
 net.alphatab.model.TimeSignature = function(factory) { if( factory === $_ ) return; {
 	this.numerator = 4;
 	this.denominator = factory.newDuration();
@@ -9833,11 +9832,17 @@ net.alphatab.platform.js.JsFileLoader.onError = function(uid,msg) {
 }
 net.alphatab.platform.js.JsFileLoader.prototype.loadBinary = function(method,file,success,error) {
 	if(jQuery.browser.msie) {
-		var request = { success : success, error : error}
-		var uid = net.alphatab.platform.js.JsFileLoader.getUid();
-		net.alphatab.platform.js.JsFileLoader._requests.set(uid,request);
-		var flashLoader = window["alphaTabFlashLoader"];
-		flashLoader.loadFile(file,method,uid);
+		var vbArr = VbAjaxLoader(method,file);
+		var fileContents = vbArr.toArray();
+		var data = "";
+		var i = 0;
+		while(i < (fileContents.length - 1)) {
+			data += String.fromCharCode(fileContents[i]);
+			i++;
+		}
+		var reader = new net.alphatab.platform.BinaryReader();
+		reader.initialize(data);
+		success(reader);
 	}
 	else {
 		var options = { }
@@ -10942,286 +10947,6 @@ haxe.io.Error.OutsideBounds.__enum__ = haxe.io.Error;
 haxe.io.Error.Overflow = ["Overflow",1];
 haxe.io.Error.Overflow.toString = $estr;
 haxe.io.Error.Overflow.__enum__ = haxe.io.Error;
-haxe.Unserializer = function(buf) { if( buf === $_ ) return; {
-	this.buf = buf;
-	this.length = buf.length;
-	this.pos = 0;
-	this.scache = new Array();
-	this.cache = new Array();
-	this.setResolver(haxe.Unserializer.DEFAULT_RESOLVER);
-}}
-haxe.Unserializer.__name__ = ["haxe","Unserializer"];
-haxe.Unserializer.initCodes = function() {
-	var codes = new Array();
-	{
-		var _g1 = 0, _g = haxe.Unserializer.BASE64.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			codes[haxe.Unserializer.BASE64.cca(i)] = i;
-		}
-	}
-	return codes;
-}
-haxe.Unserializer.run = function(v) {
-	return new haxe.Unserializer(v).unserialize();
-}
-haxe.Unserializer.prototype.buf = null;
-haxe.Unserializer.prototype.cache = null;
-haxe.Unserializer.prototype.get = function(p) {
-	return this.buf.cca(p);
-}
-haxe.Unserializer.prototype.length = null;
-haxe.Unserializer.prototype.pos = null;
-haxe.Unserializer.prototype.readDigits = function() {
-	var k = 0;
-	var s = false;
-	var fpos = this.pos;
-	while(true) {
-		var c = this.buf.cca(this.pos);
-		if(Math.isNaN(c)) break;
-		if(c == 45) {
-			if(this.pos != fpos) break;
-			s = true;
-			this.pos++;
-			continue;
-		}
-		c -= 48;
-		if(c < 0 || c > 9) break;
-		k = k * 10 + c;
-		this.pos++;
-	}
-	if(s) k *= -1;
-	return k;
-}
-haxe.Unserializer.prototype.resolver = null;
-haxe.Unserializer.prototype.scache = null;
-haxe.Unserializer.prototype.setResolver = function(r) {
-	if(r == null) this.resolver = { resolveClass : function(_) {
-		return null;
-	}, resolveEnum : function(_) {
-		return null;
-	}}
-	else this.resolver = r;
-}
-haxe.Unserializer.prototype.unserialize = function() {
-	switch(this.buf.cca(this.pos++)) {
-	case 110:{
-		return null;
-	}break;
-	case 116:{
-		return true;
-	}break;
-	case 102:{
-		return false;
-	}break;
-	case 122:{
-		return 0;
-	}break;
-	case 105:{
-		return this.readDigits();
-	}break;
-	case 100:{
-		var p1 = this.pos;
-		while(true) {
-			var c = this.buf.cca(this.pos);
-			if((c >= 43 && c < 58) || c == 101 || c == 69) this.pos++;
-			else break;
-		}
-		return Std.parseFloat(this.buf.substr(p1,this.pos - p1));
-	}break;
-	case 121:{
-		var len = this.readDigits();
-		if(this.buf.charAt(this.pos++) != ":" || this.length - this.pos < len) throw "Invalid string length";
-		var s = this.buf.substr(this.pos,len);
-		this.pos += len;
-		s = StringTools.urlDecode(s);
-		this.scache.push(s);
-		return s;
-	}break;
-	case 107:{
-		return Math.NaN;
-	}break;
-	case 109:{
-		return Math.NEGATIVE_INFINITY;
-	}break;
-	case 112:{
-		return Math.POSITIVE_INFINITY;
-	}break;
-	case 97:{
-		var buf = this.buf;
-		var a = new Array();
-		this.cache.push(a);
-		while(true) {
-			var c = this.buf.cca(this.pos);
-			if(c == 104) {
-				this.pos++;
-				break;
-			}
-			if(c == 117) {
-				this.pos++;
-				var n = this.readDigits();
-				a[(a.length + n) - 1] = null;
-			}
-			else a.push(this.unserialize());
-		}
-		return a;
-	}break;
-	case 111:{
-		var o = { }
-		this.cache.push(o);
-		this.unserializeObject(o);
-		return o;
-	}break;
-	case 114:{
-		var n = this.readDigits();
-		if(n < 0 || n >= this.cache.length) throw "Invalid reference";
-		return this.cache[n];
-	}break;
-	case 82:{
-		var n = this.readDigits();
-		if(n < 0 || n >= this.scache.length) throw "Invalid string reference";
-		return this.scache[n];
-	}break;
-	case 120:{
-		throw this.unserialize();
-	}break;
-	case 99:{
-		var name = this.unserialize();
-		var cl = this.resolver.resolveClass(name);
-		if(cl == null) throw "Class not found " + name;
-		var o = Type.createEmptyInstance(cl);
-		this.cache.push(o);
-		this.unserializeObject(o);
-		return o;
-	}break;
-	case 119:{
-		var name = this.unserialize();
-		var edecl = this.resolver.resolveEnum(name);
-		if(edecl == null) throw "Enum not found " + name;
-		return this.unserializeEnum(edecl,this.unserialize());
-	}break;
-	case 106:{
-		var name = this.unserialize();
-		var edecl = this.resolver.resolveEnum(name);
-		if(edecl == null) throw "Enum not found " + name;
-		this.pos++;
-		var index = this.readDigits();
-		var tag = Type.getEnumConstructs(edecl)[index];
-		if(tag == null) throw (("Unknown enum index " + name) + "@") + index;
-		return this.unserializeEnum(edecl,tag);
-	}break;
-	case 108:{
-		var l = new List();
-		this.cache.push(l);
-		var buf = this.buf;
-		while(this.buf.cca(this.pos) != 104) l.add(this.unserialize());
-		this.pos++;
-		return l;
-	}break;
-	case 98:{
-		var h = new Hash();
-		this.cache.push(h);
-		var buf = this.buf;
-		while(this.buf.cca(this.pos) != 104) {
-			var s = this.unserialize();
-			h.set(s,this.unserialize());
-		}
-		this.pos++;
-		return h;
-	}break;
-	case 113:{
-		var h = new IntHash();
-		this.cache.push(h);
-		var buf = this.buf;
-		var c = this.buf.cca(this.pos++);
-		while(c == 58) {
-			var i = this.readDigits();
-			h.set(i,this.unserialize());
-			c = this.buf.cca(this.pos++);
-		}
-		if(c != 104) throw "Invalid IntHash format";
-		return h;
-	}break;
-	case 118:{
-		var d = Date.fromString(this.buf.substr(this.pos,19));
-		this.cache.push(d);
-		this.pos += 19;
-		return d;
-	}break;
-	case 115:{
-		var len = this.readDigits();
-		var buf = this.buf;
-		if(buf.charAt(this.pos++) != ":" || this.length - this.pos < len) throw "Invalid bytes length";
-		var codes = haxe.Unserializer.CODES;
-		if(codes == null) {
-			codes = haxe.Unserializer.initCodes();
-			haxe.Unserializer.CODES = codes;
-		}
-		var i = this.pos;
-		var rest = len & 3;
-		var size = (len >> 2) * 3 + (((rest >= 2)?rest - 1:0));
-		var max = i + (len - rest);
-		var bytes = haxe.io.Bytes.alloc(size);
-		var bpos = 0;
-		while(i < max) {
-			var c1 = codes[buf.cca(i++)];
-			var c2 = codes[buf.cca(i++)];
-			bytes.b[bpos++] = (((c1 << 2) | (c2 >> 4)) & 255);
-			var c3 = codes[buf.cca(i++)];
-			bytes.b[bpos++] = (((c2 << 4) | (c3 >> 2)) & 255);
-			var c4 = codes[buf.cca(i++)];
-			bytes.b[bpos++] = (((c3 << 6) | c4) & 255);
-		}
-		if(rest >= 2) {
-			var c1 = codes[buf.cca(i++)];
-			var c2 = codes[buf.cca(i++)];
-			bytes.b[bpos++] = (((c1 << 2) | (c2 >> 4)) & 255);
-			if(rest == 3) {
-				var c3 = codes[buf.cca(i++)];
-				bytes.b[bpos++] = (((c2 << 4) | (c3 >> 2)) & 255);
-			}
-		}
-		this.pos += len;
-		this.cache.push(bytes);
-		return bytes;
-	}break;
-	default:{
-		null;
-	}break;
-	}
-	this.pos--;
-	throw ((("Invalid char " + this.buf.charAt(this.pos)) + " at position ") + this.pos);
-}
-haxe.Unserializer.prototype.unserializeEnum = function(edecl,tag) {
-	var constr = Reflect.field(edecl,tag);
-	if(constr == null) throw (("Unknown enum tag " + Type.getEnumName(edecl)) + ".") + tag;
-	if(this.buf.cca(this.pos++) != 58) throw "Invalid enum format";
-	var nargs = this.readDigits();
-	if(nargs == 0) {
-		this.cache.push(constr);
-		return constr;
-	}
-	var args = new Array();
-	while(nargs > 0) {
-		args.push(this.unserialize());
-		nargs -= 1;
-	}
-	var e = constr.apply(edecl,args);
-	this.cache.push(e);
-	return e;
-}
-haxe.Unserializer.prototype.unserializeObject = function(o) {
-	while(true) {
-		if(this.pos >= this.length) throw "Invalid object";
-		if(this.buf.cca(this.pos) == 103) break;
-		var k = this.unserialize();
-		if(!Std["is"](k,String)) throw "Invalid object key";
-		var v = this.unserialize();
-		o[k] = v;
-	}
-	this.pos++;
-}
-haxe.Unserializer.prototype.__class__ = haxe.Unserializer;
 net.alphatab.file.gpx.ByteBuffer = function(buffer) { if( buffer === $_ ) return; {
 	this._buffer = buffer;
 	this._position = 0;
@@ -12468,9 +12193,6 @@ net.alphatab.tablature.Tablature.prototype.updateTablature = function() {
 }
 net.alphatab.tablature.Tablature.prototype.viewLayout = null;
 net.alphatab.tablature.Tablature.prototype.__class__ = net.alphatab.tablature.Tablature;
-net.alphatab.midi.MidiSequenceParserFlags = function() { }
-net.alphatab.midi.MidiSequenceParserFlags.__name__ = ["net","alphatab","midi","MidiSequenceParserFlags"];
-net.alphatab.midi.MidiSequenceParserFlags.prototype.__class__ = net.alphatab.midi.MidiSequenceParserFlags;
 net.alphatab.midi.MidiSequenceHandler = function(tracks) { if( tracks === $_ ) return; {
 	this.infoTrack = 0;
 	this.metronomeTrack = tracks - 1;
@@ -12510,6 +12232,9 @@ net.alphatab.midi.MidiSequenceHandler.prototype.notifyFinish = function() {
 	this.commands = (net.alphatab.midi.MidiMessageUtils.intToString(this.metronomeTrack) + ";") + this._commands.join(";");
 }
 net.alphatab.midi.MidiSequenceHandler.prototype.__class__ = net.alphatab.midi.MidiSequenceHandler;
+net.alphatab.midi.MidiSequenceParserFlags = function() { }
+net.alphatab.midi.MidiSequenceParserFlags.__name__ = ["net","alphatab","midi","MidiSequenceParserFlags"];
+net.alphatab.midi.MidiSequenceParserFlags.prototype.__class__ = net.alphatab.midi.MidiSequenceParserFlags;
 net.alphatab.model.effects.GraceEffectTransition = { __ename__ : ["net","alphatab","model","effects","GraceEffectTransition"], __constructs__ : ["None","Slide","Bend","Hammer"] }
 net.alphatab.model.effects.GraceEffectTransition.Bend = ["Bend",2];
 net.alphatab.model.effects.GraceEffectTransition.Bend.toString = $estr;
@@ -13002,9 +12727,6 @@ net.alphatab.model.effects.HarmonicEffect.NATURAL_FREQUENCIES = (function($this)
 	$r = a;
 	return $r;
 }(this));
-haxe.Unserializer.DEFAULT_RESOLVER = Type;
-haxe.Unserializer.BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%:";
-haxe.Unserializer.CODES = null;
 net.alphatab.file.gpx.ByteBuffer.BUFFER_TYPE_BITS = 8;
 net.alphatab.midi.MidiSequenceParser.DEFAULT_BEND = 64;
 net.alphatab.midi.MidiSequenceParser.DEFAULT_BEND_SEMITONE = 2.75;

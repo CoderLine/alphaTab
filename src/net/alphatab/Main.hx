@@ -30,6 +30,5 @@ class Main
 	static function main() 
 	{		
 		MyTrace.init();
-		var un = haxe.Unserializer.run(haxe.Serializer.run('test'));
 	}
 }

@@ -187,38 +187,34 @@ var alphaTab;
 		if($.browser.msie) 
 		{
 			// Excanvas initialization
-			var fixElement_ = function(el) 
-			{
-			   // in IE before version 5.5 we would need to add HTML: to the tag name
-			   // but we do not care about IE before version 6
-			   var outerHTML = el.outerHTML;
-			 
-			   var newEl = el.ownerDocument.createElement(outerHTML);
-			   // if the tag is still open IE has created the children as siblings and
-			   // it has also created a tag with the name "/FOO"
-			   if (outerHTML.slice(-2) != "/>") {
-					 var tagName = "/" + el.tagName;
-					 var ns;
-					 // remove content
-					 while ((ns = el.nextSibling) && ns.tagName != tagName) {
-					   ns.removeNode();
-					 }
-					 // remove the incorrect closing tag
-					 if (ns) {
-					   ns.removeNode();
-					 }
-			   }
-			   el.parentNode.replaceChild(newEl, el);
-			   return newEl;
-			};
-			
-			this.canvas = G_vmlCanvasManager.initElement(fixElement_(this.canvas));
-			
-			// create flash loader for IE
-			if($('#alphaTabFlashLoaderContainer').length == 0)
-			{
-				$('<div id="alphaTabFlashLoader"></div>').appendTo('body');
-				swfobject.embedSWF(this.options.base + '/' + loaderSwf, 'alphaTabFlashLoader', '0', '0', '9.0', '#FFFFFF');
+            if($.browser.version < 9)
+            {
+                var fixElement_ = function(el) 
+                {
+                   // in IE before version 5.5 we would need to add HTML: to the tag name
+                   // but we do not care about IE before version 6
+                   var outerHTML = el.outerHTML;
+                 
+                   var newEl = el.ownerDocument.createElement(outerHTML);
+                   // if the tag is still open IE has created the children as siblings and
+                   // it has also created a tag with the name "/FOO"
+                   if (outerHTML.slice(-2) != "/>") {
+                         var tagName = "/" + el.tagName;
+                         var ns;
+                         // remove content
+                         while ((ns = el.nextSibling) && ns.tagName != tagName) {
+                           ns.removeNode();
+                         }
+                         // remove the incorrect closing tag
+                         if (ns) {
+                           ns.removeNode();
+                         }
+                   }
+                   el.parentNode.replaceChild(newEl, el);
+                   return newEl;
+                };
+                
+                this.canvas = G_vmlCanvasManager.initElement(fixElement_(this.canvas));
 			}
 		}
 
@@ -257,3 +253,41 @@ var alphaTab;
 		return ret.length > 1 ? ret : ret[0];
     }
 })(jQuery);
+
+
+                
+/**
+ * VB Loader For IE 
+ * This code is based on the code of 
+ *     http://nagoon97.com/reading-binary-files-using-ajax/
+ *     Copyright (c) 2008 Andy G.P. Na <nagoon97@naver.com>
+ *     The source code is freely distributable under the terms of an MIT-style license.
+ */           
+document.write('<script type="text/vbscript">\n\
+Function VbAjaxLoader(method, fileName)\n\
+	Dim xhr\n\
+	Set xhr = CreateObject("Microsoft.XMLHTTP")\n\
+\n\
+	xhr.Open method, fileName, False\n\
+\n\
+	xhr.setRequestHeader "Accept-Charset", "x-user-defined"\n\
+	xhr.send\n\
+\n\
+	Dim byteArray()\n\
+\n\
+	if xhr.Status = 200 Then\n\
+		Dim byteString\n\
+		Dim i\n\
+\n\
+		byteString=xhr.responseBody\n\
+\n\
+		ReDim byteArray(LenB(byteString))\n\
+\n\
+		For i = 1 To LenB(byteString)\n\
+			byteArray(i-1) = AscB(MidB(byteString, i, 1))\n\
+		Next\n\
+	End If\n\
+\n\
+	VbAjaxLoader=byteArray\n\
+End Function\n\
+</script>');

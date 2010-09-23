@@ -15,7 +15,6 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.alphatab.tablature.drawing;
-import haxe.remoting.FlashJsConnection;
 import net.alphatab.model.Color;
 import net.alphatab.model.Point;
 import net.alphatab.model.PointF;

@@ -57,20 +57,27 @@ class JsFileLoader implements FileLoader
 			_requests.remove(uid);
 		}
 	}
-		
 	
 	public function loadBinary(method:String, file:String, success:BinaryReader->Void, error:String->Void) : Void
-	{
+	{		
 		if (JQuery.isIE())
 		{
-			// Register request in list
-			var request:Dynamic = { success: success, error: error };
-			var uid:String = getUid();
-			_requests.set(uid, request);
+			// use VB Loader to load binary array
+			var vbArr = untyped VbAjaxLoader(method, file);
+			var fileContents =  vbArr.toArray();
 			
-			// start loading within flash loader
-			var flashLoader:Dynamic = untyped window['alphaTabFlashLoader'];
-			flashLoader.loadFile(file, method, uid);
+			// decode byte array to string
+			var data = "";
+			var i = 0; 
+			while(i < (fileContents.length-1))
+			{
+				data += untyped String.fromCharCode(fileContents[i]);
+				i++;
+			}
+			
+			var reader:BinaryReader = new BinaryReader();
+			reader.initialize(data);
+			success(reader);
 		}
 		else
 		{
