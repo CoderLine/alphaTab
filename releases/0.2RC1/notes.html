@@ -1,0 +1,107 @@
+ 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="Pragma" content="no-cache">
+        <title>alphaTab - Demo</title>
+		<!-- Dependencies -->
+		<!--[if IE]><script language="JavaScript" type="text/javascript" src="lib/swfobject/swfobject.js"></script><![endif]-->
+		<!--[if IE]><script language="JavaScript" type="text/javascript" src="lib/excanvas/excanvas.js"></script><![endif]-->
+
+		<script language="JavaScript" type="text/javascript" src="lib/jquery/jquery.min.js"></script>
+		
+		<!-- alphaTab -->
+		<script language="JavaScript" type="text/javascript" src="lib/alphaTab/alphaTab.js"></script>
+		<script language="JavaScript" type="text/javascript" src="lib/alphaTab/jquery.alphaTab.js"></script>
+        <style type="text/css">@import url('style.css');</style>
+        <style type="text/css">@import url('alphaTab.css');</style>
+
+    </head>
+	<body>
+		<div id="TopNavWrapper">
+			<div id="TopNav">
+				<a href="http://www.alphatab.net" id="AlphaTabLogo" title="Home"></a>
+				<ul>
+				</ul>
+			</div>
+		</div>
+
+		<div id="Content">
+		<h1>alphaTab - Notes</h1>
+				<a href="index.php">Back</a>
+				
+		<p>This sample shows how to write measures and notes.</p>
+		 
+<script language="JavaScript" type="text/javascript">
+$(document).ready(function() {
+	$('div.alphaTab').alphaTab({editor:true});
+});
+</script>
+<h2>Single Notes and Rests</h2>
+Notes: <pre>fret.string.duration</pre><br />
+
+Rests: <pre>r.duration</pre>
+Duration: <pre>1, 2, 4, 8, 16, 32 or 64</pre>
+<div class="alphaTab">
+.
+0.6.2 1.5.4 3.4.4 | 5.3.8 5.3.8 5.3.8 5.3.8 r.2
+</div>
+
+<h2>Duration Ranges</h2>
+<div class="alphaTab">
+.
+:4 2.3 3.3 :8 3.3 4.3 3.3 4.3
+</div>
+
+<h2>Chords</h2>
+
+<pre>( fret.string fret.string ...).duration</pre>
+<div class="alphaTab">
+. 
+:4
+(0.3{st} 0.4{st}) (3.3{st} 3.4{st}) (5.3 5.4) :8 r (0.3 0.4) |
+r (3.3 3.4) r (6.3 6.4) :4 (5.3 5.4){d} r |
+(0.3{st} 0.4{st}) (3.3{st} 3.4{st}) (5.3 5.4) :8 r (3.3 3.4) |
+r (0.3 0.4) (-.3 -.4).2{d}
+</div>
+
+				<h2>Source</h2>
+		<code>&lt;script language=&quot;JavaScript&quot; type=&quot;text/javascript&quot;&gt;
+$(document).ready(function() {
+	$('div.alphaTab').alphaTab({editor:true});
+});
+
+&lt;/script&gt;
+&lt;h2&gt;Single Notes and Rests&lt;/h2&gt;
+Notes: &lt;pre&gt;fret.string.duration&lt;/pre&gt;&lt;br /&gt;
+Rests: &lt;pre&gt;r.duration&lt;/pre&gt;
+
+Duration: &lt;pre&gt;1, 2, 4, 8, 16, 32 or 64&lt;/pre&gt;
+&lt;div class=&quot;alphaTab&quot;&gt;
+.
+0.6.2 1.5.4 3.4.4 | 5.3.8 5.3.8 5.3.8 5.3.8 r.2
+&lt;/div&gt;
+
+&lt;h2&gt;Duration Ranges&lt;/h2&gt;
+&lt;div class=&quot;alphaTab&quot;&gt;
+
+.
+:4 2.3 3.3 :8 3.3 4.3 3.3 4.3
+&lt;/div&gt;
+
+&lt;h2&gt;Chords&lt;/h2&gt;
+&lt;pre&gt;( fret.string fret.string ...).duration&lt;/pre&gt;
+&lt;div class=&quot;alphaTab&quot;&gt;
+. 
+:4
+(0.3{st} 0.4{st}) (3.3{st} 3.4{st}) (5.3 5.4) :8 r (0.3 0.4) |
+r (3.3 3.4) r (6.3 6.4) :4 (5.3 5.4){d} r |
+(0.3{st} 0.4{st}) (3.3{st} 3.4{st}) (5.3 5.4) :8 r (3.3 3.4) |
+r (0.3 0.4) (-.3 -.4).2{d}
+&lt;/div&gt;</code>
+
+		    </body>
+</html>				
+				

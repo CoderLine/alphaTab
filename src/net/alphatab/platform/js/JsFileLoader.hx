@@ -13,49 +13,8 @@ import net.alphatab.platform.FileLoader;
  */
 class JsFileLoader implements FileLoader
 {
-	private static var _requests:Hash<Dynamic> = new Hash<Dynamic>();
-	
 	public function new()
 	{
-		
-	}
-	
-	private static function getUid() 
-	{
-		var value:Int = (((1+Std.random(2400))*0x10000)|0);
-		return StringTools.hex(value);
-	}
-	
-	public static function onSuccess(uid:String, data:String)
-	{
-		if(_requests.exists(uid))
-		{
-			// decode data			
-			var decode = "";
-			var i = 0;
-			while(i < data.length)
-			{
-				decode += untyped String.fromCharCode(parseInt('0x' + data.substr(i, 2)));
-				i+= 2;
-			}
-			var request = _requests.get(uid);
-			var success:BinaryReader->Void = cast request.success;
-			var reader:BinaryReader = new BinaryReader();
-			reader.initialize(decode); 
-			_requests.remove(uid);
-			success(reader);
-		}
-	}
-		
-	public static function onError(uid, msg)
-	{
-		if(_requests.exists(uid))
-		{
-			var request = _requests.get(uid);
-			var error:String->Void = cast request.error;
-			error(msg);
-			_requests.remove(uid);
-		}
 	}
 	
 	public function loadBinary(method:String, file:String, success:BinaryReader->Void, error:String->Void) : Void

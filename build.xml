@@ -11,10 +11,6 @@
 	<property name="release" location="releases"/>
 	<property name="tools" location="tools"/>
 	
-	<property name="flash-loader-src" location="subprojects/flash-loader/src"/>
-	<property name="flash-loader" location="${lib}/alphaTab.flashloader.swf"/>
-
-	
 	<!-- Java-Player Properties -->	
 	<property name="player-base" location="subprojects/java-player"/>	
 	<property name="player-src" location="${player-base}/src"/>	
@@ -42,24 +38,7 @@
 
 		<!-- Remove Build Directory -->
 		<delete dir="${player-bin}" />
-	</target>
-	
-	<!-- Flash Loader -->  
-	<target name="flash-loader" depends="global-init">
-		<delete file="${flash-loader}" />
-        <exec executable="haxe">
-            <arg value="-cp" />
-            <arg value="${flash-loader-src}"/>
-
-            <arg value="-main" />
-            <arg value="net.alphatab.file.loader.FlashFileLoader" />
-            
-            <arg value="-swf9" />
-            <arg value="${flash-loader}" />
-        </exec>	
-	</target>
-	
-	
+	</target>	
 	
 	<!-- Haxe Builds -->
 	<target name="haxe-js" depends="global-init">
@@ -77,42 +56,7 @@
             <arg value="${haxe-js}" />
         </exec>
 	</target>	
-    
-    <target name="haxe-as3" depends="global-init">
-		<delete dir="as3" />
-        <exec executable="haxe">
-            <arg value="-cp" />
-            <arg value="${src}"/>
-            <arg value="net.alphatab.file.alphatex.AlphaTexParser"/>
-            <arg value="net.alphatab.midi.MidiDataProvider"/>
-            
-            <arg value="-main" />
-            <arg value="net.alphatab.Main" />
-            
-            <arg value="-as3" />
-            <arg value="as3" />
-            
-            <arg value="-swf-version" />
-            <arg value="10" />
-        </exec>
-	</target>
-    
-    <target name="haxe-cpp" depends="global-init">
-		<delete dir="cpp" />
-        <exec executable="haxe">
-            <arg value="-cp" />
-            <arg value="${src}"/>
-            <arg value="net.alphatab.file.alphatex.AlphaTexParser"/>
-            <arg value="net.alphatab.midi.MidiDataProvider"/>
-            
-            <arg value="-main" />
-            <arg value="net.alphatab.Main" />
-            
-            <arg value="-cpp" />
-            <arg value="cpp" />
-        </exec>
-	</target>
-	
+  
 	<!-- Release -->
 	<target name="release-init" depends="java-player">
 		<delete dir="${release}/{$DSTAMP}" />
