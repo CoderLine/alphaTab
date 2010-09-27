@@ -42,13 +42,13 @@
 	
 	<!-- Haxe Builds -->
 	<target name="haxe-js" depends="global-init">
-		<delete file="cpp" />
+		<delete file="${haxe-js}" />
         <exec executable="haxe">
             <arg value="-cp" />
             <arg value="${src}"/>
             
             <arg value="-main" />
-            <arg value="net.alphatab.Main" />
+            <arg value="alphatab.Main" />
             
             <arg value="-js" />
             <arg value="${haxe-js}" />

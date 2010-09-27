@@ -25,7 +25,7 @@ $description = "This sample shows how to display a GuitarPro file. <br />
 var api = null;
 $(document).ready(function() { 
     api = $('div.alphaTab').alphaTab({
-        file: 'files/Love.gp4',
+        file: 'files/Serenade.gp5',
     }).player({ // enable the player
         playerTickCallback: "onTickChanged" // !required!
     });

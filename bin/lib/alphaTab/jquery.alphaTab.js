@@ -14,14 +14,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
-var alphaTab;
+var alphaTabWrapper;
 
 /**
  * This is a jQuery plugin for embedding alphaTab in your websites. 
  */
 (function($)
 {
-    alphaTab = function(el, options)
+    alphaTabWrapper = function(el, options)
     {
         //
         // Setup
@@ -29,7 +29,7 @@ var alphaTab;
         var self = this;
         var el = $(el);
         this.el = el;
-        this.factory = new net.alphatab.tablature.model.SongFactoryImpl();
+        this.factory = new alphatab.tablature.model.SongFactoryImpl();
 		var loaderSwf = 'alphaTab.flashloader.swf';
 		
 		// resolve absolute script path
@@ -106,8 +106,8 @@ var alphaTab;
                 self.tablature.isError = false;
 
                 // create parser and reader
-				var parser = new net.alphatab.file.alphatex.AlphaTexParser();
-				var reader = new net.alphatab.platform.BinaryReader();
+				var parser = new alphatab.file.alphatex.AlphaTexParser();
+				var reader = new alphatab.platform.BinaryReader();
 
 				reader.initialize(tex);
 				parser.init(reader, self.factory);
@@ -125,7 +125,7 @@ var alphaTab;
         {
             try
 			{
-				net.alphatab.file.SongLoader.loadSong(url, self.factory, songLoaded);
+				alphatab.file.SongLoader.loadSong(url, self.factory, songLoaded);
 			}
 			catch(e)
 			{
@@ -155,7 +155,7 @@ var alphaTab;
 
         var updateError = function(msg)
         {
-            if(msg instanceof net.alphatab.file.FileFormatException)
+            if(msg instanceof alphatab.file.FileFormatException)
                 msg = msg.message;
 
             // use error callback if available, otherwise: render in tablature
@@ -219,7 +219,7 @@ var alphaTab;
 		}
 
         // create tablature
-        this.tablature = new net.alphatab.tablature.Tablature(this.canvas, this.options.error);
+        this.tablature = new alphatab.tablature.Tablature(this.canvas, this.options.error);
         this.tablature.autoSizeWidth = this.options.autoSize;
         this.tablature.updateScale(this.options.zoom);
 
@@ -235,7 +235,7 @@ var alphaTab;
     }
     
     // Plugin Support    
-    alphaTab.fn = alphaTab.prototype;
+    alphaTabWrapper.fn = alphaTabWrapper.prototype;
     //
     // Plugin
     //
@@ -246,7 +246,7 @@ var alphaTab;
         {
 			if(!this[i].alphaTab)
             {
-				this[i].alphaTab = new alphaTab(this[i], options);
+				this[i].alphaTab = new alphaTabWrapper(this[i], options);
 			}
 			ret.push(this[i].alphaTab);
 		}

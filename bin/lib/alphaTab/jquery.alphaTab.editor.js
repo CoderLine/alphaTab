@@ -18,9 +18,9 @@
 /**
  * This is a plugin which extends alphaTab with a alphaTex editor.
  */
-(function(alphaTab)
+(function(alphaTabWrapper)
 {
-    alphaTab.fn.editor = function() {
+    alphaTabWrapper.fn.editor = function() {
         var self = this;
         var editorArea = $('<textarea class="alphaTexEditor">' + this.contents + '</textarea>');
         this.el.append($('<br />'));
@@ -44,4 +44,4 @@
         return this;
     }
 
-})(alphaTab);
+})(alphaTabWrapper);

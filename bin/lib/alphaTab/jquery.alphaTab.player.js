@@ -18,9 +18,9 @@
 /**
  * This is a plugin which extends alphaTab with a java midi player.
  */
-(function(alphaTab)
+(function(alphaTabWrapper)
 {
-    alphaTab.fn.player = function(playerOptions) {
+    alphaTabWrapper.fn.player = function(playerOptions) {
         var playerJar = 'alphaTab.jar';
         var self = this;
         var defaults = {
@@ -48,7 +48,7 @@
         //        
         this.updatePlayer = function(song)
         {
-            var songData = net.alphatab.midi.MidiDataProvider.getSongMidiData(song, self.factory);
+            var songData = alphatab.midi.MidiDataProvider.getSongMidiData(song, self.factory);
             if(self.midiPlayer.updateSongData)
             {
                 self.midiPlayer.updateSongData(songData);
@@ -183,4 +183,4 @@
         return this;
     }
 
-})(alphaTab);
+})(alphaTabWrapper);

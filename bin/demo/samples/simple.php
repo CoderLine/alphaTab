@@ -18,7 +18,7 @@
 $title = "Simple";
 $description = "This sample shows a simple alphaTab inclusion.";
 ?> 
-<script language="JavaScript" type="text/javascript" src="lib/alphaTab/alphaTab.autoload.js"></script>
+<script language="JavaScript" type="text/javascript" src="../lib/alphaTab/alphaTab.autoload.js"></script>
 <div class="alphaTab">
 \title "Smoke on the Water"
 \subtitle "famous riff"
