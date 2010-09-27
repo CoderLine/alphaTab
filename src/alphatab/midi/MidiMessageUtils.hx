@@ -15,7 +15,6 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.midi;
-import haxe.io.Bytes;
 import alphatab.model.TimeSignature;
 
 /**
@@ -87,17 +86,17 @@ class MidiMessageUtils
 		return "7" + intToString(ts.numerator) + "," + intToString(ts.denominator.index()) + "," + intToString(ts.denominator.value);
 	}
 	
-	public static function intToString(num:Int) :String 
+	public static inline function intToString(num:Int) :String 
 	{
 		return StringTools.hex(num);
 	}	
 	
-	public static function channelToString(num:Int) :String 
+	public static inline function channelToString(num:Int) :String 
 	{
 		return StringTools.hex(num, 1);
 	}	
 	
-	public static function valueToString(num:Int) :String 
+	public static inline function valueToString(num:Int) :String 
 	{
 		return StringTools.hex(num, 2);
 	}

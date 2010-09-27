@@ -19,9 +19,9 @@ package alphatab.model;
 /**
  * Voice directions indicating the direction of beams. 
  */
-enum VoiceDirection
+class VoiceDirection
 {
-	None;
-	Up;
-	Down;
+	public static inline var None = 0;
+	public static inline var Up = 1;
+	public static inline var Down = 2;
 }

@@ -15,10 +15,8 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.tablature.drawing;
-import alphatab.model.BeatStrokeDirection;
 import alphatab.model.Duration;
 import alphatab.model.Point;
-import alphatab.model.PointF;
 import alphatab.tablature.ViewLayout;
 
 /**
@@ -26,12 +24,12 @@ import alphatab.tablature.ViewLayout;
  */
 class NotePainter 
 {
-	public static function paintFooter(layer:DrawingLayer, x:Int, y:Int, dur:Int, dir:Int, layout:ViewLayout) : Void
+	public static function paintFooter(layer:DrawingLayer, x:Float, y:Float, dur:Int, dir:Int, layout:ViewLayout) : Void
 	{
 		var scale = layout.scale;
 		if (dir == -1)
 		{
-			x += DrawingResources.getScoreNoteSize(layout, false).width;
+			x += DrawingResources.getScoreNoteSize(layout, false).x;
 		}
 		var s:String = "";
             switch (dur)
@@ -57,9 +55,9 @@ class NotePainter
 			var realY2:Float = (y2 - ((i * (5.0 * scale)) * dir));
 			
 			layer.startFigure();
-			layer.addPolygon([new PointF(x1, realY1), new PointF(x2, realY2), 
-								new PointF(x2, realY2 + width), 
-								new PointF(x1, realY1 + width), new PointF(x1, realY1), ]);
+			layer.addPolygon([new Point(x1, realY1), new Point(x2, realY2), 
+								new Point(x2, realY2 + width), 
+								new Point(x1, realY1 + width), new Point(x1, realY1), ]);
 			layer.closeFigure();
 		}
 	}

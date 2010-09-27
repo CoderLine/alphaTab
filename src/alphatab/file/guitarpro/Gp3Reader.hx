@@ -18,7 +18,6 @@ package alphatab.file.guitarpro;
 import alphatab.file.FileFormatException;
 import alphatab.model.effects.BendEffect;
 import alphatab.model.effects.BendPoint;
-import alphatab.model.effects.BendTypesConverter;
 import alphatab.model.effects.GraceEffect;
 import alphatab.model.effects.GraceEffectTransition;
 import alphatab.model.effects.HarmonicEffect;
@@ -63,7 +62,7 @@ import alphatab.model.Rectangle;
  */
 class Gp3Reader extends GpReaderBase
 {
-	private var _tripletFeel:TripletFeel;
+	private var _tripletFeel:Int;
 
 	public function new() 
 	{
@@ -266,7 +265,7 @@ class Gp3Reader extends GpReaderBase
 	private function readBend(noteEffect:NoteEffect) : Void
 	{
 		var bendEffect:BendEffect = factory.newBendEffect();
-        bendEffect.type = BendTypesConverter.fromInt(readByte());
+        bendEffect.type = readByte();
         bendEffect.value = readInt();
         var pointCount = readInt();
         for (i in 0 ... pointCount) {
@@ -397,7 +396,7 @@ class Gp3Reader extends GpReaderBase
 	private function readTremoloBar(effect:BeatEffect) : Void 
 	{
 		var barEffect:TremoloBarEffect = factory.newTremoloBarEffect();
-        barEffect.type = BendTypesConverter.fromInt(readByte());
+        barEffect.type = readByte();
         barEffect.value = readInt();
 		
         barEffect.points.push(new BendPoint(0, 0, false));

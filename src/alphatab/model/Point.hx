@@ -17,14 +17,14 @@
 package alphatab.model;
 
 /**
- * A point construct
+ * A point construct using floating point coordinates.
  */
-class Point 
+class Point
 {
-	public var x:Int;
-	public var y:Int;
+	public var x:Float;
+	public var y:Float;
 	
-	public function new(x:Int, y:Int) 
+	public function new(x:Float, y:Float) 
 	{
 		this.x = x;
 		this.y = y;

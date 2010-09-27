@@ -15,7 +15,6 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.tablature.model;
-import haxe.io.StringInput;
 import alphatab.model.effects.BendEffect;
 import alphatab.model.effects.BendPoint;
 import alphatab.model.effects.GraceEffectTransition;
@@ -23,7 +22,6 @@ import alphatab.model.effects.HarmonicType;
 import alphatab.model.effects.TremoloBarEffect;
 import alphatab.model.Beat;
 import alphatab.model.Duration;
-import alphatab.model.MeasureClefConverter;
 import alphatab.model.Note;
 import alphatab.model.NoteEffect;
 import alphatab.model.SlideType;
@@ -32,7 +30,6 @@ import alphatab.model.Voice;
 import alphatab.model.VoiceDirection;
 import alphatab.model.Point;
 import alphatab.model.Rectangle;
-import alphatab.model.Size;
 import alphatab.tablature.drawing.DrawingContext;
 import alphatab.tablature.drawing.DrawingLayer;
 import alphatab.tablature.drawing.DrawingLayers;
@@ -64,7 +61,7 @@ class NoteImpl extends Note
 		return _noteOrientation.width;
 	}
 
-	public function getPaintPosition(index:TrackSpacingPositions) :Int
+	public function getPaintPosition(index:Int) :Int
 	{
 		return measureImpl().ts.get(index);
 	}
@@ -130,7 +127,7 @@ class NoteImpl extends Note
 	{
 		_accidental = measureImpl().getNoteAccidental(realValue());
 		tabPosY = Math.round((this.string * layout.stringSpacing) - layout.stringSpacing); 
-		scorePosY = voiceImpl().beatGroup.getY1(layout, this, measureImpl().keySignature(), MeasureClefConverter.toInt(measureImpl().clef)) + Math.floor(1*layout.scale);
+		scorePosY = voiceImpl().beatGroup.getY1(layout, this, measureImpl().keySignature(), measureImpl().clef) + Math.floor(1*layout.scale);
 	}
 
 	public function paint(layout:ViewLayout, context:DrawingContext, x:Int, y:Int) : Void
@@ -415,9 +412,9 @@ class NoteImpl extends Note
 	private function paintScoreNote(layout:ViewLayout, context:DrawingContext, x:Int, y:Int, spacing:Int) : Void
 	{
 		var scoreSpacing:Float = layout.scoreLineSpacing;
-		var direction:VoiceDirection = voiceImpl().beatGroup.direction;
+		var direction:Int = voiceImpl().beatGroup.direction;
 		var key:Int = measureImpl().keySignature();
-		var clef:Int = MeasureClefConverter.toInt(measureImpl().clef);
+		var clef:Int = measureImpl().clef;
 
 		var realX:Int = cast (x + 4 * layout.scale);
 		var realY1:Int = y + scorePosY;
@@ -489,8 +486,8 @@ class NoteImpl extends Note
 				scoreSpacing / 10.0);
 		}
 
-		var xMove:Int = direction == VoiceDirection.Up
-						 ? DrawingResources.getScoreNoteSize(layout, false).width
+		var xMove:Float = direction == VoiceDirection.Up
+						 ? DrawingResources.getScoreNoteSize(layout, false).x
 						 : 0;
 		var realY2:Int = y + voiceImpl().beatGroup.getY2(layout, cast (posX() + spacing), key, clef);
 
@@ -498,8 +495,8 @@ class NoteImpl extends Note
 		if (effect.staccato)
 		{
 			var Size:Int = 3;
-			var stringX:Int = realX + xMove;
-			var stringY:Int = (realY2 + (4 * ((direction == VoiceDirection.Up) ? -1 : 1)));
+			var stringX:Float = realX + xMove;
+			var stringY:Float = (realY2 + (4 * ((direction == VoiceDirection.Up) ? -1 : 1)));
 
 			fill.addCircle(cast (stringX - (Size / 2)), cast (stringY - (Size / 2)), Size);
 		}
@@ -571,7 +568,7 @@ class NoteImpl extends Note
 		}
 	}
 	
-	private function paintBend(layout:ViewLayout, context:DrawingContext, nextBeat:BeatImpl, fromX:Int, fromY:Int) : Void
+	private function paintBend(layout:ViewLayout, context:DrawingContext, nextBeat:BeatImpl, fromX:Float, fromY:Float) : Void
 	{
 		var scale:Float = layout.scale;
 		var iX:Float = fromX;

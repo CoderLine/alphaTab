@@ -17,7 +17,6 @@
 package alphatab.tablature.drawing;
 import alphatab.model.Color;
 import alphatab.model.Point;
-import alphatab.model.PointF;
 import alphatab.platform.Canvas;
 
 /**
@@ -89,7 +88,7 @@ class DrawingLayer
 						finish(graphics);
 						graphics.beginPath();
 						graphics.moveTo(elm.Points[0].x, elm.Points[0].y);
-						var pts:Array<PointF> = cast elm.Points;
+						var pts:Array<Point> = cast elm.Points;
 						for (pt in pts) {
 							graphics.lineTo(pt.x, pt.y);
 						}
@@ -195,14 +194,14 @@ class DrawingLayer
 		});
 	}
 	
-	public function addPolygon(points:Array<PointF>): Void{
+	public function addPolygon(points:Array<Point>): Void{
 		_path.push({
 			Command: "addPolygon",
 			Points: points
 		});
 	}
 
-	public function addBezier (x1:Int, y1:Int, x2:Int, y2:Int, x3:Int, y3:Int, x4:Int, y4:Int): Void{
+	public function addBezier (x1:Float, y1:Float, x2:Float, y2:Float, x3:Float, y3:Float, x4:Float, y4:Float): Void{
 		_path.push({
 			Command: "addBezier",
 			X1: x1,
@@ -216,7 +215,7 @@ class DrawingLayer
 		});
 	}
 
-	public function addCircle (x:Int,y:Int,diameter:Float): Void{
+	public function addCircle (x:Float,y:Float,diameter:Float): Void{
 		_path.push({
 			Command: "addCircle",
 			X: x,
@@ -225,7 +224,7 @@ class DrawingLayer
 		});
 	}
 
-	public function addRect (x:Int,y:Int,w:Int,h:Int): Void{
+	public function addRect (x:Float,y:Float,w:Float,h:Float): Void{
 		_path.push({
 			Command: "addRect",
 			X: x,
@@ -235,7 +234,7 @@ class DrawingLayer
 		});
 	}
 
-	public function rectTo (w:Int, h:Int) : Void {
+	public function rectTo (w:Float, h:Float) : Void {
 		_path.push({Command: "rectTo",
 		Width: w,
 		Height: h});

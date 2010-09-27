@@ -360,7 +360,7 @@ class BeatImpl extends Beat
 		}
 	}
 
-	public function getPaintPosition(position:TrackSpacingPositions) : Int
+	public function getPaintPosition(position:Int) : Int
 	{
 		return measureImpl().ts.get(position);
 	}

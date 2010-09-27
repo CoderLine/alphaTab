@@ -934,7 +934,7 @@ class AlphaTexParser extends SongReader
 			
 				
 				// transition
-				var transition:GraceEffectTransition = GraceEffectTransition.None;
+				var transition:Int = GraceEffectTransition.None;
 				if (_sy == AlphaTexSymbols.String) 
 				{
 					if(_syData == "s")
@@ -1080,7 +1080,7 @@ class AlphaTexParser extends SongReader
 	 * @param str the string to convert
 	 * @return the clef value
 	 */
-	private function parseClef(str:String): MeasureClef 
+	private function parseClef(str:String): Int 
 	{
 		switch(str.toLowerCase())
 		{

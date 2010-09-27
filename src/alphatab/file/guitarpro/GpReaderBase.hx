@@ -15,10 +15,6 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.file.guitarpro;
-import haxe.Int32;
-import haxe.io.Bytes;
-import haxe.io.Error;
-import haxe.io.Input;
 import alphatab.file.SongReader;
 import alphatab.model.Song;
 import alphatab.model.SongFactory;

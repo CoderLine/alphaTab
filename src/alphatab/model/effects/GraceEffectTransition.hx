@@ -19,10 +19,10 @@ package alphatab.model.effects;
 /**
  * All transition types for grace notes. 
  */
-enum GraceEffectTransition 
+class GraceEffectTransition 
 {
-	None;
-	Slide;
-	Bend;
-	Hammer;	
+	public static inline var None = 0;
+	public static inline var Slide = 1;
+	public static inline var Bend = 2;
+	public static inline var Hammer = 3;	
 }

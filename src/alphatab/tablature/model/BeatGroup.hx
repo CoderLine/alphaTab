@@ -16,7 +16,6 @@
  */
 package alphatab.tablature.model;
 import alphatab.model.Duration;
-import alphatab.model.MeasureClefConverter;
 import alphatab.model.VoiceDirection;
 import alphatab.tablature.ViewLayout;
 
@@ -39,7 +38,7 @@ class BeatGroup
 	private var _lastMinNote:NoteImpl;
 	private var _lastMaxNote:NoteImpl;
 
-	public var direction:VoiceDirection;
+	public var direction:Int;
 	public var minNote:NoteImpl;
 	public var maxNote:NoteImpl;
 
@@ -142,8 +141,8 @@ class BeatGroup
 			}
 			else
 			{
-				var max:Float = Math.abs(minNote.realValue() - (SCORE_MIDDLE_KEYS[MeasureClefConverter.toInt(measure.clef) - 1] + 100));
-				var min:Float = Math.abs(maxNote.realValue() - (SCORE_MIDDLE_KEYS[MeasureClefConverter.toInt(measure.clef) - 1] - 100));
+				var max:Float = Math.abs(minNote.realValue() - (SCORE_MIDDLE_KEYS[measure.clef] + 100));
+				var min:Float = Math.abs(maxNote.realValue() - (SCORE_MIDDLE_KEYS[measure.clef] - 100));
 				direction = max > min ? VoiceDirection.Up : VoiceDirection.Down;
 			}
 		}
@@ -160,7 +159,7 @@ class BeatGroup
 							 ? Math.floor((SCORE_SHARP_POSITIONS[index]*scale) - offset)
 							 : Math.floor((SCORE_FLAT_POSITIONS[index]*scale) - offset);
 
-		scoreLineY += Math.floor(MeasureImpl.SCORE_KEY_OFFSETS[clef - 1] * scale);
+		scoreLineY += Math.floor(MeasureImpl.SCORE_KEY_OFFSETS[clef] * scale);
 
 		return scoreLineY;
 	}

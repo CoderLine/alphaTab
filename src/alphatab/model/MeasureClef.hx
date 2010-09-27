@@ -19,10 +19,10 @@ package alphatab.model;
 /**
  * A list of available clefs
  */
-enum MeasureClef
+class MeasureClef
 {
-	Treble;
-	Bass;
-	Tenor;
-	Alto;
+	public static inline var Treble = 0;
+	public static inline var Bass = 1;
+	public static inline var Tenor = 2;
+	public static inline var Alto = 3;
 }

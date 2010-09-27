@@ -19,18 +19,18 @@ package alphatab.model.effects;
 /**
  * All Bend presets
  */
-enum BendTypes
+class BendTypes
 {
-	None;
-	Bend;
-	BendRelease;
-	BendReleaseBend;
-	Prebend;
-	PrebendRelease;
-	Dip;
-	Dive;
-	ReleaseUp;
-	InvertedDip;
-	Return;
-	ReleaseDown;	
+	public static inline var None = 0;
+	public static inline var Bend = 1;
+	public static inline var BendRelease = 2;
+	public static inline var BendReleaseBend = 3;
+	public static inline var Prebend = 4;
+	public static inline var PrebendRelease = 5;
+	public static inline var Dip = 6;
+	public static inline var Dive = 7;
+	public static inline var ReleaseUp = 8;
+	public static inline var InvertedDip = 9;
+	public static inline var Return = 10;
+	public static inline var ReleaseDown = 11;	
 }

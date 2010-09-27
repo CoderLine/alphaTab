@@ -1,6 +1,5 @@
 package alphatab.tablature;
 
-import haxe.Log;
 import alphatab.midi.MidiRepeatController;
 import alphatab.model.Beat;
 import alphatab.model.Duration;
@@ -10,7 +9,7 @@ import alphatab.model.Song;
 import alphatab.model.Track;
 import alphatab.model.Voice;
 import alphatab.model.Rectangle;
-import alphatab.model.Size;
+import alphatab.model.Point;
 import alphatab.model.SongManager;
 import alphatab.platform.Canvas;
 import alphatab.platform.PlatformFactory;
@@ -67,7 +66,6 @@ class Tablature
 	
 	public function setTrack(track:Track) : Void 
 	{
-		Log.trace("Updating Track");
 		this.track = track;
 		_updateSong = true;
 		_updateDisplay = true;
@@ -89,20 +87,18 @@ class Tablature
 	{
 		if (track == null)
 			return;
-		Log.trace("Starting layouting");
-		var size:Size = viewLayout.layoutSize;
+		var size:Point = viewLayout.layoutSize;
 		if (!autoSizeWidth) 
 		{
-			size.width = canvas.width() - viewLayout.contentPadding.getHorizontal();
+			size.x = canvas.width() - viewLayout.contentPadding.getHorizontal();
 		}
-		viewLayout.prepareLayout(new Rectangle(0, 0, size.width, size.height), 0, 0);
+		viewLayout.prepareLayout(new Rectangle(0, 0, size.x, size.y), 0, 0);
 		
 		// update canvas
 		if(autoSizeWidth)
 			canvas.setWidth(viewLayout.width);
 		canvas.setHeight(viewLayout.height);
 
-		Log.trace("Layouting finished");
 	}
 	
 	public function onPaint() 
@@ -130,7 +126,6 @@ class Tablature
 			viewLayout.paintCache(canvas, displayRect, 0, 0);
 			_updateDisplay = false;
 		}
-		Log.trace("Drawing Finished");
 	}
 	
 	public function updateTablature()

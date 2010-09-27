@@ -15,8 +15,8 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.tablature.drawing;
-import alphatab.model.Size;
 import alphatab.tablature.ViewLayout;
+import alphatab.model.Point;
 
 /**
  * This class contains all font settings for drawing. 
@@ -64,9 +64,9 @@ class DrawingResources
 		copyrightFont =  "bold " + Std.string(11 * scale) + "px 'Arial'";
 	}
 	
-	public static function getScoreNoteSize(layout:ViewLayout, full:Bool) : Size
+	public static function getScoreNoteSize(layout:ViewLayout, full:Bool) : Point
 	{
 		var scale:Float = (full ? layout.scoreLineSpacing + 1 : layout.scoreLineSpacing) - 2;
-		return new Size(Math.round(scale * 1.3), Math.round(scale * 1.0));
+		return new Point(Math.round(scale * 1.3), Math.round(scale * 1.0));
 	}
 }

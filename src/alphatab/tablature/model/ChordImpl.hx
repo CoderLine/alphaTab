@@ -56,8 +56,8 @@ class ChordImpl extends Chord
 		}
 	}
 
-	public function getPaintPosition(iIndex:TrackSpacingPositions) : Int
+	public function getPaintPosition(index:Int) : Int
 	{
-		return beatImpl().measureImpl().ts.get(iIndex);
+		return beatImpl().measureImpl().ts.get(index);
 	}
 }

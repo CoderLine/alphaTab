@@ -1,5 +1,4 @@
 package alphatab.platform;
-import haxe.io.StringInput;
 
 /**
  * This is a  binary file reader for JavaScript.

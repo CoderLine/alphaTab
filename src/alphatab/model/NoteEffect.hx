@@ -84,7 +84,7 @@ class NoteEffect
 	
 	public var vibrato: Bool;
 	public var deadNote: Bool;
-	public var slideType:SlideType;
+	public var slideType:Int;
 	public var slide: Bool;
 	public var hammer: Bool;
 	public var ghostNote: Bool;

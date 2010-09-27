@@ -16,21 +16,19 @@ class TrackSpacing
 		}
 	}
 	
-	public function get(index:TrackSpacingPositions) : Int
+	public function get(index:Int) : Int
 	{
 		var size = 0;
-		var realIndex:Int = TrackSpacingPositionConverter.toInt(index);
-		for (i in 0 ... realIndex)
+		for (i in 0 ... index)
 		{
 			size += spacing[i];
 		}
 		return size;
 	}
 	
-	public function set(index:TrackSpacingPositions, value:Int) : Void
+	public function set(index:Int, value:Int) : Void
 	{
-		var realIndex:Int = TrackSpacingPositionConverter.toInt(index);
-		spacing[realIndex] = value;
+		spacing[index] = value;
 	}
 	
 	public function getSize() : Int

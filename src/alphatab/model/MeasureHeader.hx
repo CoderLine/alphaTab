@@ -38,7 +38,7 @@ class MeasureHeader
 	public var isRepeatOpen:Bool;
 	public var repeatAlternative:Int;
 	public var repeatClose:Int;
-	public var tripletFeel:TripletFeel;
+	public var tripletFeel:Int;
 	public var song:Song;
 	
 	public function length() : Int

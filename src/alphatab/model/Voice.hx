@@ -25,7 +25,7 @@ class Voice
 	public var duration:Duration;
 	public var notes:Array<Note>;
 	public var index:Int;
-	public var direction:VoiceDirection;
+	public var direction:Int;
 	public var isEmpty:Bool;
 	
 	public function isRestVoice() : Bool

@@ -18,7 +18,6 @@ package alphatab.file.guitarpro;
 import alphatab.file.FileFormatException;
 import alphatab.model.effects.BendEffect;
 import alphatab.model.effects.BendPoint;
-import alphatab.model.effects.BendTypesConverter;
 import alphatab.model.effects.GraceEffect;
 import alphatab.model.effects.GraceEffectTransition;
 import alphatab.model.effects.HarmonicEffect;

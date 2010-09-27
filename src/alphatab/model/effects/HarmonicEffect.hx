@@ -22,16 +22,7 @@ import alphatab.model.SongFactory;
  */
 class HarmonicEffect
 {
-	public static var NATURAL_FREQUENCIES:Array<Array<Int>> = {
-			var a = new Array<Array<Int>>();			
-			a.push([12, 12]);
-			a.push([9 , 28]);
-			a.push([5 , 28]);
-			a.push([7 , 19]); 
-			a.push([4 , 28]);
-			a.push([3 , 31]);
-			a;
-	};
+	public static var NATURAL_FREQUENCIES:Array<Array<Int>> = [[12, 12], [9, 28], [5, 28], [7, 19], [4, 28], [3, 31]];
 	
 	public var data:Int;
 	public var type:HarmonicType;

@@ -1,6 +1,5 @@
 package alphatab.tablature;
 
-import haxe.Log;
 import alphatab.model.Chord;
 import alphatab.model.Duration;
 import alphatab.model.Measure;
@@ -8,9 +7,9 @@ import alphatab.model.Note;
 import alphatab.model.Song;
 import alphatab.model.Track;
 import alphatab.model.Voice;
+import alphatab.model.Point;
 import alphatab.model.Padding;
 import alphatab.model.Rectangle;
-import alphatab.model.Size;
 import alphatab.platform.Canvas;
 import alphatab.tablature.drawing.DrawingContext;
 import alphatab.tablature.drawing.DrawingLayers;
@@ -53,7 +52,7 @@ class ViewLayout
 	public var tupletoSpacing :Float;
 	public var effectSpacing :Float;
 	
-	public var layoutSize:Size;
+	public var layoutSize:Point;
 	public var width:Int;
 	public var height:Int;
 	public var contentPadding:Padding;
@@ -115,13 +114,11 @@ class ViewLayout
 			updateCache(graphics, area, fromX, fromY);
 			return;
 		}
-		Log.trace("Painting _cache");
 		_cache.draw();
 	}
 	
 	public function updateCache(graphics:Canvas, area:Rectangle, fromX:Int, fromY:Int) : Void 
 	{
-		Log.trace("Updating _cache");
 		_cache = new DrawingContext(scale);
         _cache.graphics = graphics;
         paintSong(_cache, area, fromX, fromY);
@@ -142,9 +139,7 @@ class ViewLayout
 	{
 		if (tablature.track == null) 
             return;
-		Log.trace("Updating Song Data");
         this.updateTracks();
-		Log.trace("Updating Song Data finished");
 	}
 	
 	public function updateTracks() : Void

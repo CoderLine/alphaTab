@@ -1,13 +1,11 @@
 package alphatab.tablature;
-import haxe.Log;
-import haxe.Template;
 import alphatab.model.HeaderFooterElements;
 import alphatab.model.Measure;
 import alphatab.model.Song;
 import alphatab.model.Track;
 import alphatab.model.Padding;
+import alphatab.model.Point;
 import alphatab.model.Rectangle;
-import alphatab.model.Size;
 import alphatab.tablature.drawing.DrawingContext;
 import alphatab.tablature.drawing.DrawingLayers;
 import alphatab.tablature.drawing.DrawingResources;
@@ -25,7 +23,7 @@ class PageViewLayout extends ViewLayout
 	public static inline var WIDTH_ON_100:Int = 795;
 	
 	private var _lines:Array<TempLine>;
-	private var _maximumWidth:Int;
+	private var _maximumWidth:Float;
 	
 	public function new() 
 	{
@@ -35,7 +33,7 @@ class PageViewLayout extends ViewLayout
 		contentPadding = PAGE_PADDING;
 	}
 	
-	public function getMaxWidth() : Int
+	public function getMaxWidth() : Float
 	{
 		if (_maximumWidth <= 0) {
 			_maximumWidth = tablature.canvas.width();
@@ -51,7 +49,7 @@ class PageViewLayout extends ViewLayout
 	public override function init(scale:Float) : Void
 	{
 		super.init(scale);
-		layoutSize = new Size(this.getSheetWidth() - PAGE_PADDING.getHorizontal(), height);
+		layoutSize = new Point(this.getSheetWidth() - PAGE_PADDING.getHorizontal(), height);
 	}
 	
 	public override function prepareLayout(clientArea:Rectangle, x:Int, y:Int) : Void
@@ -71,8 +69,7 @@ class PageViewLayout extends ViewLayout
 		
 		posY = Math.floor(LayoutSongInfo(x, posY) + firstMeasureSpacing);
 		height = posY;
-		
-		
+		 
 		while (measureCount > nextMeasureIndex) {
 			var spacing:TrackSpacing = new TrackSpacing();
 			spacing.set(TrackSpacingPositions.ScoreMiddleLines, Math.round(scoreLineSpacing * 5));
@@ -200,7 +197,6 @@ class PageViewLayout extends ViewLayout
 	
 	private function paintSongInfo(ctx:DrawingContext, clientArea:Rectangle, x:Int, y:Int) : Int
 	{
-		Log.trace("Paint Song info");
 		var song:Song = tablature.track.song;
 		x += contentPadding.left;
 		var tX:Float;
@@ -289,7 +285,6 @@ class PageViewLayout extends ViewLayout
 	
 	public function PaintLine(track:Track, line:TempLine, beatCount:Int, context:DrawingContext) : Int
 	{ 
-		Log.trace("Paint Measures " + Std.string(line.Measures[0]) + " to " + Std.string(line.Measures[line.Measures.length - 1]));
 		for(i in 0 ... line.Measures.length) {
 			var index:Int = line.Measures[i];
 			var currentMeasure:MeasureImpl = cast track.measures[index]; 

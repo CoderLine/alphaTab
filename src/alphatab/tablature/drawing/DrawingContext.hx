@@ -30,20 +30,20 @@ class DrawingContext
 	public function new(scale:Float) 
 	{
 		this.layers = new Array<DrawingLayer>();
-		this.layers[DrawingLayersConverter.toInt(DrawingLayers.Background)] = new DrawingLayer(new Color(205, 205, 205), true, 0);
-		this.layers[DrawingLayersConverter.toInt(DrawingLayers.LayoutBackground)] = new DrawingLayer(new Color(34,34,17), true, 0);
-		this.layers[DrawingLayersConverter.toInt(DrawingLayers.Lines)] = new DrawingLayer(new Color(165, 165, 165), false, 1);
-		this.layers[DrawingLayersConverter.toInt(DrawingLayers.MainComponents)] = new DrawingLayer(new Color(34,34,17), true, 0);
-		this.layers[DrawingLayersConverter.toInt(DrawingLayers.MainComponentsDraw)] = new DrawingLayer(new Color(34,34,17), false, 1*scale);
-		this.layers[DrawingLayersConverter.toInt(DrawingLayers.Voice2)] = new DrawingLayer(new Color(206, 206, 206), true, 1);
-		this.layers[DrawingLayersConverter.toInt(DrawingLayers.VoiceEffects2)] = new DrawingLayer(new Color(183,183,183), true, 0);
-		this.layers[DrawingLayersConverter.toInt(DrawingLayers.VoiceEffectsDraw2)] = new DrawingLayer(new Color(183,183,183), false, 1*scale);
-		this.layers[DrawingLayersConverter.toInt(DrawingLayers.VoiceDraw2)] = new DrawingLayer(new Color(206, 206, 206), false, 1*scale);
-		this.layers[DrawingLayersConverter.toInt(DrawingLayers.Voice1)] = new DrawingLayer(new Color(34,34,17), true, 1);
-		this.layers[DrawingLayersConverter.toInt(DrawingLayers.VoiceEffects1)] = new DrawingLayer(new Color(34,34,17), true, 0);
-		this.layers[DrawingLayersConverter.toInt(DrawingLayers.VoiceEffectsDraw1)] = new DrawingLayer(new Color(34,34,17), false, 1*scale);
-		this.layers[DrawingLayersConverter.toInt(DrawingLayers.VoiceDraw1)] = new DrawingLayer(new Color(34,34,17), false, 1*scale);
-		this.layers[DrawingLayersConverter.toInt(DrawingLayers.Red)] = new DrawingLayer(new Color(255,0,0), true, 0);
+		this.layers[DrawingLayers.Background] = new DrawingLayer(new Color(205, 205, 205), true, 0);
+		this.layers[DrawingLayers.LayoutBackground] = new DrawingLayer(new Color(34,34,17), true, 0);
+		this.layers[DrawingLayers.Lines] = new DrawingLayer(new Color(165, 165, 165), false, 1);
+		this.layers[DrawingLayers.MainComponents] = new DrawingLayer(new Color(34,34,17), true, 0);
+		this.layers[DrawingLayers.MainComponentsDraw] = new DrawingLayer(new Color(34,34,17), false, 1*scale);
+		this.layers[DrawingLayers.Voice2] = new DrawingLayer(new Color(206, 206, 206), true, 1);
+		this.layers[DrawingLayers.VoiceEffects2] = new DrawingLayer(new Color(183,183,183), true, 0);
+		this.layers[DrawingLayers.VoiceEffectsDraw2] = new DrawingLayer(new Color(183,183,183), false, 1*scale);
+		this.layers[DrawingLayers.VoiceDraw2] = new DrawingLayer(new Color(206, 206, 206), false, 1*scale);
+		this.layers[DrawingLayers.Voice1] = new DrawingLayer(new Color(34,34,17), true, 1);
+		this.layers[DrawingLayers.VoiceEffects1] = new DrawingLayer(new Color(34,34,17), true, 0);
+		this.layers[DrawingLayers.VoiceEffectsDraw1] = new DrawingLayer(new Color(34,34,17), false, 1*scale);
+		this.layers[DrawingLayers.VoiceDraw1] = new DrawingLayer(new Color(34,34,17), false, 1*scale);
+		this.layers[DrawingLayers.Red] = new DrawingLayer(new Color(255,0,0), true, 0);
 	}
 	
 	public function draw() : Void
@@ -62,9 +62,8 @@ class DrawingContext
 		}
 	}	
 	
-	public function get(layer:DrawingLayers) : DrawingLayer
+	public function get(layer:Int) : DrawingLayer
 	{
-		var index:Int = DrawingLayersConverter.toInt(layer);
-		return this.layers[index];
+		return this.layers[layer];
 	}
 }

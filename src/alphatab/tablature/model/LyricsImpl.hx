@@ -19,7 +19,6 @@ import alphatab.model.Lyrics;
 import alphatab.tablature.drawing.DrawingContext;
 import alphatab.tablature.drawing.DrawingLayers;
 import alphatab.tablature.drawing.DrawingResources;
-import alphatab.tablature.TrackSpacingPositionConverter;
 import alphatab.tablature.TrackSpacingPositions;
 import alphatab.tablature.ViewLayout;
 

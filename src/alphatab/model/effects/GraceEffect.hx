@@ -30,7 +30,7 @@ class GraceEffect
 	public var velocity:Int;
 	public var fret:Int;
 	public var isOnBeat:Bool;
-	public var transition:GraceEffectTransition;
+	public var transition:Int;
 	
 	public function durationTime() : Int 
 	{

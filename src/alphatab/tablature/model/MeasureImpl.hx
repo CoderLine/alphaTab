@@ -15,12 +15,10 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.tablature.model;
-import haxe.remoting.FlashJsConnection;
 import alphatab.model.Beat;
 import alphatab.model.Duration;
 import alphatab.model.Measure;
 import alphatab.model.MeasureClef;
-import alphatab.model.MeasureClefConverter;
 import alphatab.model.MeasureHeader;
 import alphatab.model.NoteEffect;
 import alphatab.model.Tuplet;
@@ -486,7 +484,7 @@ class MeasureImpl extends Measure
 	}
 
 
-	private function checkValue(layout:ViewLayout, note:NoteImpl, direction:VoiceDirection) : Void
+	private function checkValue(layout:ViewLayout, note:NoteImpl, direction:Int) : Void
 	{
 		var y:Int = note.scorePosY;
 		var upOffset:Float = BeatGroup.getUpOffset(layout);
@@ -881,7 +879,7 @@ class MeasureImpl extends Measure
 			// Resetting
 			if (tripletFeel() == TripletFeel.None && _previousMeasure != null)
 			{
-				var previous:TripletFeel = _previousMeasure.tripletFeel();
+				var previous:Int = _previousMeasure.tripletFeel();
 				if (previous == TripletFeel.Eighth)
 				{
 					TripletFeelPainter.paintTripletFeelNone8(context, x, y1, layout.scale);

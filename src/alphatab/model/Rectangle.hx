@@ -21,12 +21,12 @@ package alphatab.model;
  */
 class Rectangle 
 {
-	public var x:Int;
-	public var y:Int;
-	public var width:Int;
-	public var height:Int;
+	public var x:Float;
+	public var y:Float;
+	public var width:Float;
+	public var height:Float;
 	
-	public function new(x:Int, y:Int, width:Int, height:Int) 
+	public function new(x:Float, y:Float, width:Float, height:Float) 
 	{
 		this.x = x;
 		this.y = y;

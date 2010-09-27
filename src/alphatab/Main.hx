@@ -31,6 +31,5 @@ class Main
 	 */
 	static function main() 
 	{		
-		MyTrace.init();
 	}
 }

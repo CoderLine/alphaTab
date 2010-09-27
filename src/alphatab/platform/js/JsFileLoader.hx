@@ -1,15 +1,12 @@
 package alphatab.platform.js;
 #if js
-import haxe.Http;
-import haxe.remoting.Context;
-import js.Lib;
 import alphatab.platform.BinaryReader;
 import alphatab.platform.FileLoader;
 
 /**
  * This is a fileloader implementation for JavaScript.
  * It uses a ajax request in case of modern browsers like Firefox or Chrome. 
- * For IE a hidden Flash Movie is used to load a binary stream. 
+ * For IE a VBScript is used to load a binary stream. 
  */
 class JsFileLoader implements FileLoader
 {

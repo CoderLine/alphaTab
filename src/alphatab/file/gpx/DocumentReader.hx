@@ -35,7 +35,6 @@ class DocumentReader
 			str += String.fromCharCode(i);
 		}
 		
-		//js.Lib.alert(str);
 		
 		//xmlDocument = Xml.parse(str);
 		//gpxDocument = new Document();		

@@ -16,7 +16,6 @@
  */
 package alphatab.tablature.model;
 import alphatab.model.Duration;
-import alphatab.model.MeasureClefConverter;
 import alphatab.model.Note;
 import alphatab.model.SongFactory;
 import alphatab.model.Tuplet;
@@ -95,9 +94,9 @@ class VoiceImpl extends Voice
 		return _usedStrings;
 	}
 
-	public function getPaintPosition(iIndex:TrackSpacingPositions) : Int
+	public function getPaintPosition(index:Int) : Int
 	{
-		return measureImpl().ts.get(iIndex);
+		return measureImpl().ts.get(index);
 	}
 
 
@@ -449,15 +448,15 @@ class VoiceImpl extends Voice
 		{
 			var scale:Float = layout.scale;
 			var lineSpacing:Float = layout.scoreLineSpacing;
-			var direction:VoiceDirection = this.beatGroup.direction;
+			var direction:Int = this.beatGroup.direction;
 
 			var key:Int = beat.measure.keySignature();
-			var clef:Int  = MeasureClefConverter.toInt(beat.measure.clef);
+			var clef:Int  = beat.measure.clef;
 
-			var xMove:Int = direction == VoiceDirection.Up
-							? DrawingResources.getScoreNoteSize(layout, false).width
+			var xMove:Float = direction == VoiceDirection.Up
+							? DrawingResources.getScoreNoteSize(layout, false).x
 							: 0;
-			var yMove:Int = direction == VoiceDirection.Up
+			var yMove:Float = direction == VoiceDirection.Up
 							? Math.round(layout.scoreLineSpacing / 3) + 1
 							: Math.round(layout.scoreLineSpacing / 3) * 2;
 			var vY1:Int = y + ((direction == VoiceDirection.Down)

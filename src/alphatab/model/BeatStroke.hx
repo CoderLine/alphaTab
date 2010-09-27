@@ -21,7 +21,7 @@ package alphatab.model;
  */
 class BeatStroke
 {
-	public var direction:BeatStrokeDirection;
+	public var direction:Int;
 	public var value:Int;
 	
 	public function new()

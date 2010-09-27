@@ -15,9 +15,6 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.file;
-import haxe.Http;
-import haxe.io.StringInput;
-import haxe.Log;
 import alphatab.model.Song;
 import alphatab.model.SongFactory;
 import alphatab.platform.BinaryReader; 
@@ -38,28 +35,23 @@ class SongLoader
 	public static function loadSong(url:String, factory:SongFactory, success:Song->Void) 
 	{
 		var loader:FileLoader = PlatformFactory.getLoader();
-		Log.trace("Load song " + url);
 		loader.loadBinary("GET", url, 
 		// success
 		function(data:BinaryReader) : Void 
 		{
 			var readers:Array<SongReader> = SongReader.availableReaders();
-			Log.trace("Song loaded, search for reader");
 			for (reader in readers) 
 			{
 				try
 				{
-					Log.trace("Try Reader " + Type.getClassName(Type.getClass(reader)));
 					data.seek(0);
 					reader.init(data, factory);
 					var song:Song = reader.readSong();
-					Log.trace("Reading succeeded");
 					success(song);
 					return;
 				}
 				catch (e:FileFormatException) 
 				{
-					Log.trace("Reading failed");
 					continue;
 				}
 			}
@@ -68,7 +60,6 @@ class SongLoader
 		// error
 		function(err:String) : Void
 		{
-			Log.trace("Error loading file " + err);
 			throw err;
 		});		
 	}

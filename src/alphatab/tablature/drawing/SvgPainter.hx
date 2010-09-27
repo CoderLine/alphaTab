@@ -16,7 +16,6 @@
  */
 package alphatab.tablature.drawing;
 import alphatab.model.Point;
-import alphatab.model.PointF;
 
 /**
  * This painter can draw SVG path data into a specified position using 
@@ -30,7 +29,7 @@ class SvgPainter
     private var _y:Float;
     private var _xScale:Float;
     private var _yScale:Float;
-    private var _currentPosition:PointF;
+    private var _currentPosition:Point;
     private var _token:Array<String>;
     private var _currentIndex:Int;
 	
@@ -42,7 +41,7 @@ class SvgPainter
 		_y = y;
 		_xScale = xScale * 0.98;
 		_yScale = yScale * 0.98;
-		_currentPosition = new PointF(x, y);
+		_currentPosition = new Point(x, y);
 		_token = svg.split(" ");
 		_currentIndex = 0;
 	}

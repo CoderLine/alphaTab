@@ -21,10 +21,10 @@ package alphatab.model;
  */
 class Measure
 {
-	public static inline var DEFAULT_CLEF:MeasureClef = MeasureClef.Treble;
+	public static inline var DEFAULT_CLEF:Int = MeasureClef.Treble;
 	
 	public var track:Track;
-	public var clef:MeasureClef;
+	public var clef:Int;
 	
 	public var beats:Array<Beat>;
 	public var header:MeasureHeader;
@@ -79,7 +79,7 @@ class Measure
 		return header.isRepeatOpen;
 	}
 	
-	public function tripletFeel() : TripletFeel
+	public function tripletFeel() : Int 
 	{
 		return header.tripletFeel;
 	}

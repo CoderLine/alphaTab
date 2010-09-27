@@ -25,7 +25,7 @@ class TremoloBarEffect
 	public static inline var MAX_POSITION:Int = 12;
 	public static inline var MAX_VALUE:Int = 12;
 	
-	public var type:BendTypes;
+	public var type:Int;
 	public var value:Int;
 	public var points:Array<BendPoint>;
 	

@@ -429,7 +429,7 @@ class MidiSequenceParser
 
 	private static function getStroke(beat:Beat, previous:Beat, stroke:Array<Int>) : Array<Int>
 	{
-		var direction:BeatStrokeDirection = beat.effect.stroke.direction;
+		var direction:Int = beat.effect.stroke.direction;
 		if (((previous == null) || (direction != BeatStrokeDirection.None)) || (previous.effect.stroke.direction != BeatStrokeDirection.None))
 		{
 			if (direction == BeatStrokeDirection.None)

@@ -15,7 +15,6 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.tablature.model;
-import alphatab.model.MeasureClefConverter;
 import alphatab.model.Note;
 import alphatab.tablature.drawing.DrawingContext;
 import alphatab.tablature.drawing.DrawingLayer;
@@ -62,11 +61,10 @@ class TripletGroup
 	public function paint(layout:ViewLayout, context:DrawingContext, x:Int, y:Int)
 	{ 
 		var scale = layout.scale;
-		var offset = DrawingResources.getScoreNoteSize(layout, false).width / 2;
+		var offset = DrawingResources.getScoreNoteSize(layout, false).x / 2;
 		var startX = _voices[0].beatImpl().getRealPosX(layout) + offset;
 		var endX = _voices[_voices.length - 1].beatImpl().getRealPosX(layout) + offset;
 		var key:Int = _voices[0].beat.measure.keySignature(); 
-		var clef:Int  = MeasureClefConverter.toInt(_voices[0].beat.measure.clef);
 		var realY:Int = y;
 				
 		var draw:DrawingLayer = _voiceIndex == 0 ? context.get(DrawingLayers.VoiceDraw1) : context.get(DrawingLayers.VoiceDraw2);

@@ -19,9 +19,9 @@ package alphatab.model;
 /**
  * A list of different triplet feels
  */
-enum TripletFeel
+class TripletFeel
 {
-	None;
-	Eighth;
-	Sixteenth;
+	public static inline var None = 0;
+	public static inline var Eighth = 1;
+	public static inline var Sixteenth = 2;
 }

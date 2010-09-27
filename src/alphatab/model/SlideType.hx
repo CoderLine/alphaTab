@@ -19,12 +19,12 @@ package alphatab.model;
 /**
  * Lists all supported slide types.
  */
-enum SlideType 
+class SlideType 
 {
-	FastSlideTo;
-	SlowSlideTo;
-	OutDownWards;
-	OutUpWards;
-	IntoFromBelow;
-	IntoFromAbove;	
+	public static inline var FastSlideTo = 0;
+	public static inline var SlowSlideTo = 1;
+	public static inline var OutDownWards = 2;
+	public static inline var OutUpWards = 3;
+	public static inline var IntoFromBelow = 4;
+	public static inline var IntoFromAbove = 5;	
 }
