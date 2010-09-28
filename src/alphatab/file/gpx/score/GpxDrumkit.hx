@@ -20,31 +20,31 @@
  */
 package alphatab.file.gpx.score;
 
-class Drumkit 
+class GpxDrumkit 
 {
-	public static var DRUMKITS:Array<Drumkit> = {
-		var kits:Array<Drumkit> = new Array<Drumkit>();
-		kits.push(new Drumkit(36, 0 , 0));
-	 	kits.push(new Drumkit(36, 0 , 0));
-	 	kits.push(new Drumkit(37, 1 , 2));
-	 	kits.push(new Drumkit(38, 1 , 0));
-	 	kits.push(new Drumkit(41, 5 ,0));
-	 	kits.push(new Drumkit(42, 10 ,0));
-	 	kits.push(new Drumkit(43, 6 ,0));
-	 	kits.push(new Drumkit(44, 11 ,0));
-	 	kits.push(new Drumkit(45, 7 ,0));
-	 	kits.push(new Drumkit(46, 10 ,2));
-	 	kits.push(new Drumkit(47, 8 ,0));
-		kits.push(new Drumkit(48, 9 ,0));
-	 	kits.push(new Drumkit(49, 12 ,0));
-	 	kits.push(new Drumkit(50, 9 ,0));
-	 	kits.push(new Drumkit(51, 15 ,0));
-	 	kits.push(new Drumkit(52, 16 ,0));
-	 	kits.push(new Drumkit(53, 15 ,2));
-	 	kits.push(new Drumkit(55, 14 ,0));
-	 	kits.push(new Drumkit(56, 3 ,0));
-	 	kits.push(new Drumkit(57, 13 ,0));
-	 	kits.push(new Drumkit(59, 15 ,1));	
+	public static var DRUMKITS:Array<GpxDrumkit> = {
+		var kits:Array<GpxDrumkit> = new Array<GpxDrumkit>();
+		kits.push(new GpxDrumkit(36, 0 , 0));
+	 	kits.push(new GpxDrumkit(36, 0 , 0));
+	 	kits.push(new GpxDrumkit(37, 1 , 2));
+	 	kits.push(new GpxDrumkit(38, 1 , 0));
+	 	kits.push(new GpxDrumkit(41, 5 ,0));
+	 	kits.push(new GpxDrumkit(42, 10 ,0));
+	 	kits.push(new GpxDrumkit(43, 6 ,0));
+	 	kits.push(new GpxDrumkit(44, 11 ,0));
+	 	kits.push(new GpxDrumkit(45, 7 ,0));
+	 	kits.push(new GpxDrumkit(46, 10 ,2));
+	 	kits.push(new GpxDrumkit(47, 8 ,0));
+		kits.push(new GpxDrumkit(48, 9 ,0));
+	 	kits.push(new GpxDrumkit(49, 12 ,0));
+	 	kits.push(new GpxDrumkit(50, 9 ,0));
+	 	kits.push(new GpxDrumkit(51, 15 ,0));
+	 	kits.push(new GpxDrumkit(52, 16 ,0));
+	 	kits.push(new GpxDrumkit(53, 15 ,2));
+	 	kits.push(new GpxDrumkit(55, 14 ,0));
+	 	kits.push(new GpxDrumkit(56, 3 ,0));
+	 	kits.push(new GpxDrumkit(57, 13 ,0));
+	 	kits.push(new GpxDrumkit(59, 15 ,1));	
 		kits;	
 	};
 	

@@ -43,9 +43,9 @@ class GpxReader extends SongReader
 			_fileSystem.load(data);
 			
 			var reader:DocumentReader = new DocumentReader(_fileSystem.getFileContents("score.gpif"));
-			//var parser:DocumentParser = new DocumentParser(factory, reader.read());
+			var parser:DocumentParser = new DocumentParser(factory, reader.read());
 			
-			return factory.newSong();//parser.parse();
+			return parser.parse();
 		}
 		catch(e:Dynamic)
 		{

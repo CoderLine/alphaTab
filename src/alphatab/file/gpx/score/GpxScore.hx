@@ -20,34 +20,24 @@
  */
 package alphatab.file.gpx.score;
 
-class Note 
+class GpxScore 
 {
-	public var id:Int;
-	public var fret:Int;
-	public var string:Int;
-	public var tone:Int;
-	public var octave:Int;
-	public var element:Int;
-	public var variation:Int;
-	public var midiNumber:Int;
+	public var title:String;
+	public var subTitle:String;
+	public var artist:String;
+	public var album:String;
+	public var words:String;
+	public var music:String;
+	public var wordsAndMusic:String;
+	public var copyright:String;
+	public var tabber:String;
+	public var instructions:String;
+	public var notices:String;
 	
-	
-	public var slide:Bool;
-	public var vibrato:Bool;
-	public var tieDestination:Bool;
-	public var mutedEnabled:Bool;
-	public var palmMutedEnabled:Bool;
-	
-	
-	public function new() 
+	public var pageSetup:GpxPageSetup;
+
+	public function new()
 	{
-	 	this.id = -1;
-	 	this.fret = -1;
-	 	this.string = -1;
-	 	this.tone = -1;
-	 	this.octave = -1;
-	 	this.element = -1;
-	 	this.variation = -1;
-	 	this.midiNumber = -1; 		
+		pageSetup = new GpxPageSetup();
 	}
 }

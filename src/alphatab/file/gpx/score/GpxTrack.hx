@@ -20,12 +20,16 @@
  */
 package alphatab.file.gpx.score;
 
-class Beat 
+class GpxTrack 
 {
 	public var id:Int;
-	public var rythmId:Int;
-	public var noteIDs:Array<Int>;
-	public var dyn:String;
+	public var tunningPitches:Array<Int>;
+	public var color:Array<Int>;
+	public var name:String;
+	
+	public var gmProgram:Int;
+	public var gmChannel1:Int;
+	public var gmChannel2:Int;
 	
 	public function new()
 	{

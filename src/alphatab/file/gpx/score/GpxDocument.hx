@@ -20,32 +20,32 @@
  */
 package alphatab.file.gpx.score;
 
-class Document 
+class GpxDocument 
 {
-	public var score:Score;
-	public var tracks:Array<Track>;
-	public var masterBars:Array<MasterBar>;
-	public var bars:Array<Bar>;
-	public var voices:Array<Voice>;
-	public var beats:Array<Beat>;
-	public var notes:Array<Note>;
-	public var rythms:Array<Rhythm>;
-	public var automations:Array<Automation>;
+	public var score:GpxScore;
+	public var tracks:Array<GpxTrack>;
+	public var masterBars:Array<GpxMasterBar>;
+	public var bars:Array<GpxBar>;
+	public var voices:Array<GpxVoice>;
+	public var beats:Array<GpxBeat>;
+	public var notes:Array<GpxNote>;
+	public var rhythms:Array<GpxRhythm>;
+	public var automations:Array<GpxAutomation>;
 	
 	public function new()
 	{
-		score = new Score();
-		tracks = new Array<Track>();
-		masterBars = new Array<MasterBar>();
-		bars = new Array<Bar>();
-		voices = new Array<Voice>();
-		beats = new Array<Beat>();
-		notes = new Array<Note>();
-		rythms = new Array<Rhythm>();
-		automations = new Array<Automation>();
+		score = new GpxScore();
+		tracks = new Array<GpxTrack>();
+		masterBars = new Array<GpxMasterBar>();
+		bars = new Array<GpxBar>();
+		voices = new Array<GpxVoice>();
+		beats = new Array<GpxBeat>();
+		notes = new Array<GpxNote>();
+		rhythms = new Array<GpxRhythm>();
+		automations = new Array<GpxAutomation>();
 	}
 	
-	public function getBar(id:Int) : Bar
+	public function getBar(id:Int) : GpxBar
 	{
 		for(bar in this.bars)
 		{
@@ -55,7 +55,7 @@ class Document
 		return null;
 	}
 	
-	public function getVoice(id:Int) : Voice
+	public function getVoice(id:Int) : GpxVoice
 	{
 		for(voice in this.voices)
 		{
@@ -65,7 +65,7 @@ class Document
 		return null;
 	}
 	
-	public function getBeat(id:Int) : Beat
+	public function getBeat(id:Int) : GpxBeat
 	{
 		for(beat in this.beats)
 		{
@@ -75,7 +75,7 @@ class Document
 		return null;
 	}
 	
-	public function getNote(id:Int) : Note
+	public function getNote(id:Int) : GpxNote
 	{
 		for(note in this.notes)
 		{
@@ -85,9 +85,9 @@ class Document
 		return null;
 	}
 	
-	public function getRhythm(id:Int) : Rhythm
+	public function getRhythm(id:Int) : GpxRhythm
 	{
-		for(rhythm in this.rythms)
+		for(rhythm in this.rhythms)
 		{
 			if(rhythm.id == id)
 				return rhythm;
@@ -95,14 +95,14 @@ class Document
 		return null;
 	}
 	
-	public function getAutomation(type:String, untilBarId:Int) : Automation
+	public function getAutomation(type:String, untilBarId:Int) : GpxAutomation
 	{
-		var result:Automation = null;
+		var result:GpxAutomation = null;
 		
 		for(automation in this.automations)
 		{
 			if(automation.type == type && 
-				(automation.barId < untilBarId && (result == null || automation.barId > result.barId)))
+				(automation.barId <= untilBarId && (result == null || automation.barId > result.barId)))
 			{
 				result = automation;
 			}

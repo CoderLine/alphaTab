@@ -20,16 +20,14 @@
  */
 package alphatab.file.gpx.score;
 
-class MasterBar 
+class GpxBar 
 {
-	public var barIds:Array<Int>;
-	public var time:Array<Int>;
-	
-	public var repeatCount:Int;
-	public var repeatStart:Bool;
+	public var id:Int;
+	public var voiceIds:Array<Int>;
+	public var clef:String;
+	public var simileMark:String;
 	
 	public function new()
 	{
-		
 	}
 }

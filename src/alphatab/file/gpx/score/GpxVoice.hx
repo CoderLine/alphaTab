@@ -20,14 +20,10 @@
  */
 package alphatab.file.gpx.score;
 
-class Automation 
+class GpxVoice 
 {
-	public var type:String;
-	public var barId:Int;
-	public var position:Int;
-	public var linear:Bool;
-	public var visible:Bool;
-	public var value:Array<Int>;
+	public var id:Int;
+	public var beatIds:Array<Int>;
 	
 	public function new()
 	{

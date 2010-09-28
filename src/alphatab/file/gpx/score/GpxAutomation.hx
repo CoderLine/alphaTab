@@ -20,16 +20,14 @@
  */
 package alphatab.file.gpx.score;
 
-class Track 
+class GpxAutomation 
 {
-	public var id:Int;
-	public var tunningPitches:Array<Int>;
-	public var color:Array<Int>;
-	public var name:String;
-	
-	public var gmProgram:Int;
-	public var gmChannel1:Int;
-	public var gmChannel2:Int;
+	public var type:String;
+	public var barId:Int;
+	public var position:Int;
+	public var linear:Bool;
+	public var visible:Bool;
+	public var value:Array<Int>;
 	
 	public function new()
 	{

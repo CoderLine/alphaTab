@@ -57,17 +57,21 @@ class FileSystem
 		return null;
 	}
 	
-	public function load(data:BinaryReader) 
-	{ 
+	public function load(data:BinaryReader)
+	{
 		var srcBuffer = new ByteBuffer(data);
 		var header = getInteger(srcBuffer.readBytes(4), 0);
-		
+		load2(header, srcBuffer);
+	}
+	
+	private function load2(header:Int, srcBuffer:ByteBuffer) 
+	{ 
 		if(header == HEADER_BCFS)
 		{
 			var bcfsBytes:Array<Int> = srcBuffer.readBytes(srcBuffer.length());
+			
 			var sectorSize = 0x1000;
 			var offset = 0;
-			
 			while( (offset = (offset + sectorSize)) + 3 < bcfsBytes.length)
 			{
 				if(getInteger(bcfsBytes, offset) == 2) 
@@ -78,17 +82,20 @@ class FileSystem
 					
 					var block = 0;
 					var blockCount = 0;
-					var fileBytes:Array<Int>  = new Array<Int>();
+					var fileBytesStream:Array<Int>  = new Array<Int>();
 					while( (block = (getInteger(bcfsBytes, (indexOfBlock + (4* (blockCount++)))))) != 0) 
 					{
 						var bytes:Array<Int> = getBytes(bcfsBytes, (offset = (block*sectorSize)), sectorSize);
-						fileBytes = fileBytes.concat(bytes);
+						for(byte in bytes)
+						{
+							fileBytesStream.push(byte);
+						}
 					}
 					
 					var fileSize = getInteger(bcfsBytes, indexFileSize);
-					if(fileBytes.length >= fileSize)
+					if(fileBytesStream.length >= fileSize)
 					{
-						this._fileSystem.push(new File(getString(bcfsBytes, indexFileName, 127), getBytes(fileBytes, 0, fileSize)));
+						this._fileSystem.push(new File(getString(bcfsBytes, indexFileName, 127), getBytes(fileBytesStream, 0, fileSize)));
 					}
 				}
 			} 
@@ -96,6 +103,7 @@ class FileSystem
 		else if(header == HEADER_BCFZ)
 		{
 			var bcfsBuffer:Array<Int> = new Array<Int>();
+			
 			var expectLength = getInteger(srcBuffer.readBytes(4), 0);
 			while( !srcBuffer.end() && srcBuffer.offset() < expectLength)
 			{
@@ -108,13 +116,11 @@ class FileSystem
 					
 					var pos = bcfsBuffer.length - offs;
 					var i = 0; 
-					var bcfsBytes = new Array<Int>();
 					while( i < (size > offs ? offs : size))
 					{
-						bcfsBytes.push(bcfsBuffer[pos+i]);
+						bcfsBuffer.push(bcfsBuffer[pos+i]);
 						i++;
 					}
-					bcfsBuffer = bcfsBuffer.concat(bcfsBytes);
 				}
 				else
 				{
@@ -137,7 +143,7 @@ class FileSystem
 			var newReader = new BinaryReader();
 			newReader.initialize(str);
 			load(newReader);
-		}
+		} 
 		else
 		{
 			throw new FileFormatException("This is not a GPX file");

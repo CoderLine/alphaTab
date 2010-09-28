@@ -20,19 +20,13 @@
  */
 package alphatab.file.gpx.score;
 
-class Score 
+class GpxMasterBar 
 {
-	public var title:String;
-	public var subTitle:String;
-	public var artist:String;
-	public var album:String;
-	public var words:String;
-	public var music:String;
-	public var wordsAndMusic:String;
-	public var copyright:String;
-	public var tabber:String;
-	public var instructions:String;
-	public var notices:String;
+	public var barIds:Array<Int>;
+	public var time:Array<Int>;
+	
+	public var repeatCount:Int;
+	public var repeatStart:Bool;
 	
 	public function new()
 	{

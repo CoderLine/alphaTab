@@ -20,14 +20,15 @@
  */
 package alphatab.file.gpx.score;
 
-class Bar 
+class GpxBeat 
 {
 	public var id:Int;
-	public var voiceIds:Array<Int>;
-	public var clef:String;
-	public var simileMark:String;
+	public var rhythmId:Int;
+	public var noteIds:Array<Int>;
+	public var dyn:String;
 	
 	public function new()
 	{
+		
 	}
 }

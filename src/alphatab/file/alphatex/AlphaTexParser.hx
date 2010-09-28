@@ -83,7 +83,7 @@ class AlphaTexParser extends SongReader
 		_song.tempoName = "";
 		_song.hideTempo = false;
 		
-		_song.pageSetup = PageSetup.defaults();	
+		_song.pageSetup = factory.newPageSetup();
 		_track = factory.newTrack();
 		_track.number = 1;
 		_track.channel.instrument(25);

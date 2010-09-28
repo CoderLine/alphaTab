@@ -55,7 +55,7 @@ import alphatab.model.TripletFeel;
 import alphatab.model.Velocities;
 import alphatab.model.Voice;
 import alphatab.model.Point;
-import alphatab.model.Rectangle;
+import alphatab.model.Padding;
 
 /**
  * A reader for GuitarPro 5 files. 
@@ -509,7 +509,7 @@ class Gp5Reader extends Gp4Reader
         var r:Int = readInt();
         var t:Int = readInt();
         var b:Int = readInt(); 
-        setup.pageMargin = new Rectangle(l, t, r, b);
+        setup.pageMargin = new Padding(l, t, r, b);
         setup.scoreSizeProportion = readInt() / 100.0;
         
         setup.headerAndFooter = readByte();

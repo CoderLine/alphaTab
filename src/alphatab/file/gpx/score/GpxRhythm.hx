@@ -20,10 +20,13 @@
  */
 package alphatab.file.gpx.score;
 
-class Voice 
+class GpxRhythm 
 {
 	public var id:Int;
-	public var beatIds:Array<Int>;
+	public var augmentationDotCount:Int;
+	public var primaryTupletNum:Int;
+	public var primaryTupletDen:Int;
+	public var noteValue:String;
 	
 	public function new()
 	{

@@ -665,7 +665,7 @@ class Gp3Reader extends GpReaderBase
 	
 	private function readPageSetup(song:Song) : Void
 	{
-		var setup:PageSetup = PageSetup.defaults();
+		var setup:PageSetup = factory.newPageSetup();
         song.pageSetup = setup;
 	}
 	

@@ -21,6 +21,7 @@ import alphatab.model.Track;
 import alphatab.model.Voice;
 import alphatab.platform.BinaryReader;
 
+import alphatab.file.gpx.GpxReader;
 import alphatab.file.guitarpro.Gp3Reader;
 import alphatab.file.guitarpro.Gp4Reader;
 import alphatab.file.guitarpro.Gp5Reader;
@@ -47,7 +48,7 @@ class SongReader
 	public static function availableReaders() : Array<SongReader>
 	{
 		var d:Array<SongReader> = new Array<SongReader>();
-		//d.push(new GpxReader());
+		d.push(new GpxReader());
 		d.push(new Gp5Reader());
 		d.push(new Gp4Reader());
 		d.push(new Gp4Reader());

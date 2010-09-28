@@ -20,16 +20,34 @@
  */
 package alphatab.file.gpx.score;
 
-class Rhythm 
+import alphatab.model.NoteEffect;
+
+class GpxNote 
 {
 	public var id:Int;
-	public var augmentationDotCount:Int;
-	public var primaryTupletNum:Int;
-	public var primaryTupletDen:Int;
-	public var noteValue:String;
+	public var fret:Int;
+	public var string:Int;
+	public var tone:Int;
+	public var octave:Int;
+	public var element:Int;
+	public var variation:Int;
+	public var midiNumber:Int;
 	
-	public function new()
+	public var tieDestination:Bool;
+	public var vibrato:Bool;
+	public var mutedEnabled:Bool;
+	public var palmMutedEnabled:Bool;
+	public var slide:Bool;
+	
+	public function new() 
 	{
-		
+	 	this.id = -1;
+	 	this.fret = -1;
+	 	this.string = -1;
+	 	this.tone = -1;
+	 	this.octave = -1;
+	 	this.element = -1;
+	 	this.variation = -1;
+	 	this.midiNumber = -1; 
 	}
 }
