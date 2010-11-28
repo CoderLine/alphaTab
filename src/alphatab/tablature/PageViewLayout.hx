@@ -6,6 +6,7 @@ import alphatab.model.Track;
 import alphatab.model.Padding;
 import alphatab.model.Point;
 import alphatab.model.Rectangle;
+import alphatab.model.Tuning;
 import alphatab.tablature.drawing.DrawingContext;
 import alphatab.tablature.drawing.DrawingLayers;
 import alphatab.tablature.drawing.DrawingResources;
@@ -67,7 +68,7 @@ class PageViewLayout extends ViewLayout
 		var nextMeasureIndex:Int = 0;
 		
 		
-		posY = Math.floor(LayoutSongInfo(x, posY) + firstMeasureSpacing);
+		posY = Math.floor(layoutSongInfo(x, posY) + firstMeasureSpacing);
 		height = posY;
 		 
 		while (measureCount > nextMeasureIndex) {
@@ -98,54 +99,64 @@ class PageViewLayout extends ViewLayout
 		width = getSheetWidth();
 	}
 	
-	private function LayoutSongInfo(x:Int, y:Int): Int
+	private function layoutSongInfo(x:Int, y:Int): Int
 	{
 		var song:Song = tablature.track.song;
-		var anySongInfo = false;
 		if (song.title != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.TITLE != 0))
 		{
 			y += Math.floor(35 * scale);
-			anySongInfo = true;
 		}
 		if (song.subtitle != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.SUBTITLE != 0))
 		{
 			y += Math.floor(20 * scale);
-			anySongInfo = true;
 		}
 		if (song.artist != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.ARTIST != 0))
 		{
 			y += Math.floor(20 * scale);
-			anySongInfo = true;
 		}
 		if (song.album != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.ALBUM != 0))
 		{
 			y += Math.floor(20 * scale);
-			anySongInfo = true;
 		}
 		if (song.music != "" && song.music == song.words && (song.pageSetup.headerAndFooter & HeaderFooterElements.WORDS_AND_MUSIC != 0))
 		{
 			y += Math.floor(20 * scale);
-			anySongInfo = true;
 		}
 		else 
 		{
 			if (song.music != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.MUSIC != 0))
 			{
 				y += Math.floor(20 * scale);
-				anySongInfo = true;
 			}
 			if (song.words != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.WORDS != 0))
 			{
 				y += Math.floor(20 * scale);
-				anySongInfo = true;
 			}
 		}	
 		
 		y += Math.floor(20 * scale);
-		if (anySongInfo)
+		
+		// tuning info
+		if(!tablature.track.isPercussionTrack)
 		{
-			y += Math.floor(20 * scale);
+			var tuning:Tuning = Tuning.findTuning(tablature.track.strings);
+			if(tuning != null)
+			{
+			    // Name
+			    y += Math.floor(15*scale);
+			    
+			    if(!tuning.IsStandard)
+	            {
+				    // Strings
+				    var stringsPerColumn = Math.ceil(tablature.track.strings.length/2);
+				    y += stringsPerColumn * Math.floor(15*scale);
+			    }
+			    
+			    y += Math.floor(15*scale);
+			}
 		}
+		
+		y += Math.floor(40 * scale);
 		
 		return y;
 	}
@@ -265,6 +276,45 @@ class PageViewLayout extends ViewLayout
 			}
 			y += Math.floor(20*scale);
 		}	
+		
+		y += Math.floor(20*scale);
+		
+		// tuning info
+        if(!tablature.track.isPercussionTrack)
+        {
+	        var tuning:Tuning = Tuning.findTuning(tablature.track.strings);
+	        if(tuning != null)
+	        {
+	            // Name
+	            ctx.get(DrawingLayers.LayoutBackground).addString(tuning.Name, DrawingResources.effectFont, x, y, "top");
+	            
+	            y += Math.floor(15*scale);
+	            
+	            if(!tuning.IsStandard)
+	            {
+		            // Strings
+		            var stringsPerColumn = Math.ceil(tablature.track.strings.length/2);
+		            
+		            var currentX = x;
+		            var currentY = y;
+		            
+		            for(i in 0 ... tablature.track.strings.length)
+		            {
+		                str = "(" + Std.string(i+1) + ") = " + Tuning.getTextForTuning(tablature.track.strings[i].value);
+		                ctx.get(DrawingLayers.LayoutBackground).addString(str, DrawingResources.effectFont, currentX, currentY, "top");
+		                currentY += Math.floor(15*scale);
+		                if(i == stringsPerColumn - 1)
+		                {
+		                    currentY = y;
+		                    currentX += Math.floor(43*scale);
+		                }
+		            }
+		            
+		            y+= stringsPerColumn * Math.floor(15*scale);
+	            }
+	        }
+        }
+        y += Math.floor(25*scale);
 		
 		return y;
 	}

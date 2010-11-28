@@ -41,6 +41,7 @@ import alphatab.model.SlideType;
 import alphatab.model.Song;
 import alphatab.model.Tempo;
 import alphatab.model.Track;
+import alphatab.model.Tuning;
 import alphatab.model.Voice;
 
 /**
@@ -51,8 +52,7 @@ class AlphaTexParser extends SongReader
 {
 	private static inline var EOL:String = String.fromCharCode(0);
 	private static inline var TRACK_CHANNELS = [0, 1];
-	private static inline var TUNING_REGEX = ~/([a-g]b?)([0-9])/i;
-
+	
 	private var _song:Song; 
 	private var _track:Track; 
 	
@@ -1152,74 +1152,12 @@ class AlphaTexParser extends SongReader
 	 */
 	private function parseTuning(str:String) : Int
 	{
-		var base = 0;
-		var regex:EReg = TUNING_REGEX;
-		if (regex.match(str.toLowerCase()))
-		{
-			var note = regex.matched(1);
-			var octave = Std.parseInt(regex.matched(2));
-			if (note == "c") 
-			{
-				base = 0;
-			}
-			else if (note == "db")
-			{
-				base = 1;
-			}
-			else if (note == "d")
-			{
-				base = 2;
-			}
-			else if (note == "eb")
-			{
-				base = 3;
-			}
-			else if (note == "e") 
-			{
-				base = 4;
-			}
-			else if (note == "f")
-			{
-				base = 5;
-			}
-			else if (note == "gb") 
-			{
-				base = 6;
-			}
-			else if (note == "g")
-			{
-				base = 7;
-			}
-			else if (note == "ab")
-			{
-				base = 8;
-			}
-			else if (note == "a") 
-			{
-				base = 9;
-			}
-			else if (note == "bb")
-			{
-				base = 10;
-			}
-			else if (note == "b") 
-			{
-				base = 11;
-			}
-			else
-			{
-				error("tuning-value", AlphaTexSymbols.String, false);
-			}
-			
-			// add octaves
-			base += (octave * 12);
-			
-		}
-		else
-		{
-			error("tuning-value", AlphaTexSymbols.String, false);
-		}
-		return base;
+	   var tuning = Tuning.getTuningForText(str);
+	   if(tuning < 0)
+	   {
+	       error("tuning-value", AlphaTexSymbols.String, false);   
+	   }
+	   return tuning;
 	}
 	
 	/**
@@ -1328,7 +1266,7 @@ class AlphaTexParser extends SongReader
 			else if (isLetter(_ch))
 			{
 				var name = readName();
-				if (isTuning(name)) 
+				if (Tuning.isTuning(name)) 
 				{
 					_sy = AlphaTexSymbols.Tuning;
 					_syData = name.toLowerCase();
@@ -1393,17 +1331,6 @@ class AlphaTexParser extends SongReader
 		var code:Int = ch.charCodeAt(0);
 		return (code >= 0x30 && code <= 0x39) || /*0-9*/
 				(ch == "-" && _allowNegatives); // allow - if negatives
-	}
-	
-	/**
-	 * Checks if the given string is a tuning inticator.
-	 * @param name
-	 * @return
-	 */
-	private static function isTuning(name:String) : Bool
-	{
-		var regex:EReg = TUNING_REGEX;
-		return regex.match(name);
 	}
 	
 	/**
