@@ -15,6 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.tablature.model;
+import alphatab.model.Note;
 import alphatab.model.Duration;
 import alphatab.model.VoiceDirection;
 import alphatab.tablature.ViewLayout;
@@ -28,7 +29,7 @@ class BeatGroup
 	private static var SCORE_SHARP_POSITIONS:Array<Int> = [7, 7, 6, 6, 5, 4, 4, 3, 3, 2, 2, 1 ];
 	private static var SCORE_FLAT_POSITIONS:Array<Int> = [ 7, 6, 6, 5, 5, 4, 3, 3, 2, 2, 1, 1 ];
 
-	private static inline var UP_OFFSET:Int = 28;
+	private static inline var UP_OFFSET:Int = 28; 
 	private static inline var DOWN_OFFSET:Int = 35;
 	
 	private var _voice:Int;
@@ -37,6 +38,8 @@ class BeatGroup
 	private var _firstMaxNote:NoteImpl;
 	private var _lastMinNote:NoteImpl;
 	private var _lastMaxNote:NoteImpl;
+	
+	public var isPercussion:Bool;
 
 	public var direction:Int;
 	public var minNote:NoteImpl;
@@ -57,6 +60,11 @@ class BeatGroup
 	
 	public function checkVoice(voice:VoiceImpl) : Void
 	{
+	    if(voice.beat.measure.track.isPercussionTrack)
+	    {
+	       isPercussion = true;
+	    }
+	
 		checkNote(voice.maxNote);
 		checkNote(voice.minNote);
 		_voices.push(voice);
@@ -141,17 +149,29 @@ class BeatGroup
 			}
 			else
 			{
-				var max:Float = Math.abs(minNote.realValue() - (SCORE_MIDDLE_KEYS[measure.clef] + 100));
-				var min:Float = Math.abs(maxNote.realValue() - (SCORE_MIDDLE_KEYS[measure.clef] - 100));
+				var max:Float = Math.abs(getNoteValueForPosition(minNote) - (SCORE_MIDDLE_KEYS[measure.clef] + 100));
+				var min:Float = Math.abs(getNoteValueForPosition(maxNote) - (SCORE_MIDDLE_KEYS[measure.clef] - 100));
 				direction = max > min ? VoiceDirection.Up : VoiceDirection.Down;
 			}
 		}
 	}
 	
+	private function getNoteValueForPosition(note:Note) 
+	{
+	   if(isPercussion) 
+	   {
+	       return PercussionMapper.getValue(note);
+	   }
+	   else
+	   {
+	       return note.realValue();
+       }
+	}
+	
 	public function getY1(layout:ViewLayout, note:NoteImpl, key:Int, clef:Int) : Int
 	{
 		var scale:Float = (layout.scoreLineSpacing / 2.00);
-		var noteValue:Int = note.realValue();
+		var noteValue:Int = getNoteValueForPosition(note);
 		var index:Int = noteValue % 12;
 		var step:Int = Math.floor(noteValue / 12);
 		var offset:Float = (7 * step) * scale;

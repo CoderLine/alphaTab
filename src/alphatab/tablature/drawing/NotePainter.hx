@@ -17,6 +17,7 @@
 package alphatab.tablature.drawing;
 import alphatab.model.Duration;
 import alphatab.model.Point;
+import alphatab.model.Note;
 import alphatab.tablature.ViewLayout;
 
 /**
@@ -67,14 +68,49 @@ class NotePainter
 		layer.addMusicSymbol(MusicFont.Harmonic, x, y, scale);
 	}
 	
-	public static function paintNote(layer:DrawingLayer, x:Int, y:Int, scale:Float, full:Bool, font:String)
+	public static function paintNote(layer:DrawingLayer, x:Int, y:Int, scale:Float, full:Bool)
 	{
 		var symbol = full ? MusicFont.NoteQuarter : MusicFont.NoteHalf;
 		layer.addMusicSymbol(symbol, x, y, scale);
 	}
 	
-	public static function paintDeadNote(layer:DrawingLayer, x:Int, y:Int, scale:Float, font:String)
+	public static function paintDeadNote(layer:DrawingLayer, x:Int, y:Int, scale:Float)
 	{
 		layer.addMusicSymbol(MusicFont.DeadNote, x, y, scale);
 	}	
+	
+	public static function paintPercussion(layer:DrawingLayer, note:Note, x:Int, y:Int, scale:Float)
+	{
+	   var normalKeys:Array<Int> = [32,34,35,36,38,39,40,41,43,45,47,48,50,55,56,58,60,61];
+	   var xKeys:Array<Int> = [31,33,37,42,44,54,62,63,64,65,66];
+	   var value = note.value;                             
+	       
+	       
+	   if(value <= 30 || value >= 67 || contains(normalKeys, value) ) {
+	       layer.addMusicSymbol(MusicFont.NoteQuarter, x, y, scale);
+	   }
+	   else if(contains(xKeys,value)) {
+	       layer.addMusicSymbol(MusicFont.Sticks, x, y, scale);
+	   }
+	   else if(value == 46) {
+	       layer.addMusicSymbol(MusicFont.HiHat, x, y, scale);
+	   }
+	   else if(value == 49 || value == 57) {
+	       layer.addMusicSymbol(MusicFont.Harmonic, x, y, scale);
+	   }
+	   else if(value == 52) {
+	       layer.addMusicSymbol(MusicFont.ChineseCymbal, x, y, scale);
+	   }
+	   else if(value == 51 || value == 53 || value == 59) {
+	       layer.addMusicSymbol(MusicFont.RideCymbal, x, y, scale);
+	   } 
+	}
+	
+	private static function contains(notes:Array<Int>, searched:Int)
+	{
+	   for(i in 0 ... notes.length) {
+	       if(notes[i] == searched) return true;
+	   }
+	   return false;
+	}
 }

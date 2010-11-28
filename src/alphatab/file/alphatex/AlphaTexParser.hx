@@ -65,6 +65,7 @@ class AlphaTexParser extends SongReader
 	private var _allowNegatives:Bool;
 	
 	private var _currentDuration:Int; 
+	
 	/**
 	 * Constructor.
 	 */
@@ -119,6 +120,7 @@ class AlphaTexParser extends SongReader
 		var str:GuitarString = factory.newString();
 		str.number = number;
 		str.value = value;
+		
 		return str;
 	}
 	
@@ -168,6 +170,8 @@ class AlphaTexParser extends SongReader
 		
 		measures();
 	}
+	
+
 	
 	/**
 	 * Non Terminal - MetaData
@@ -310,6 +314,27 @@ class AlphaTexParser extends SongReader
 					error("tuning", AlphaTexSymbols.Number);
 				}
 			}
+	        else if (_syData == "instrument") 
+            {
+                newSy(); 
+                if (_sy == AlphaTexSymbols.Number)
+                {
+                    var instrument:Int = cast _syData;
+                    if(instrument >= 0 && instrument <= 128)
+                    {
+                        _track.channel.instrument(_syData);
+                    }
+                    else
+                    {
+                        this.error("instrument", AlphaTexSymbols.Number, false);
+                    }
+                }
+                else
+                {
+                    error("tempo", AlphaTexSymbols.Number);
+                }
+                newSy();
+            }
 			else 
 			{
 				error("metaDataTags", AlphaTexSymbols.String, false);

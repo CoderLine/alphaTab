@@ -441,21 +441,28 @@ class NoteImpl extends Note
 			paintTie(layout, fill, tieX, tieY, tieX + tieWidth, tieY);
 		}
 
-		var accidentalX:Int = cast (x - 2 * layout.scale);
-		if (_accidental == MeasureImpl.NATURAL)
-		{ 
-			KeySignaturePainter.paintSmallNatural(fill, accidentalX, cast (realY1 + scoreSpacing / 2), layout);
-		}
-		else if (_accidental == MeasureImpl.SHARP)
-		{
-			KeySignaturePainter.paintSmallSharp(fill, accidentalX, cast (realY1 + scoreSpacing / 2), layout);
-		}
-		else if (_accidental == MeasureImpl.FLAT)
-		{
-			KeySignaturePainter.paintSmallFlat(fill, accidentalX, cast (realY1 + scoreSpacing / 2), layout);
+        if(!voiceImpl().beatGroup.isPercussion)
+        {
+			var accidentalX:Int = cast (x - 2 * layout.scale);
+			if (_accidental == MeasureImpl.NATURAL)
+			{ 
+				KeySignaturePainter.paintSmallNatural(fill, accidentalX, cast (realY1 + scoreSpacing / 2), layout);
+			}
+			else if (_accidental == MeasureImpl.SHARP)
+			{
+				KeySignaturePainter.paintSmallSharp(fill, accidentalX, cast (realY1 + scoreSpacing / 2), layout);
+			}
+			else if (_accidental == MeasureImpl.FLAT)
+			{
+				KeySignaturePainter.paintSmallFlat(fill, accidentalX, cast (realY1 + scoreSpacing / 2), layout);
+			}
 		}
 
-		if (effect.isHarmonic())
+        if(voiceImpl().beatGroup.isPercussion)
+        {
+            NotePainter.paintPercussion(fill, this, realX, realY1, layout.scale);
+        }
+		else if (effect.isHarmonic())
 		{
 			var full:Bool = voice.duration.value >= Duration.QUARTER;
 			var layer:DrawingLayer = full ? fill : effectLayer;
@@ -463,12 +470,12 @@ class NoteImpl extends Note
 		}
 		else if (effect.deadNote)
 		{
-			NotePainter.paintDeadNote(fill, realX, realY1, layout.scale, DrawingResources.clefFont);
+			NotePainter.paintDeadNote(fill, realX, realY1, layout.scale);
 		}
 		else
 		{
 			var full:Bool = voice.duration.value >= Duration.QUARTER;
-			NotePainter.paintNote(fill, realX, realY1, layout.scale, full, DrawingResources.clefFont);
+			NotePainter.paintNote(fill, realX, realY1, layout.scale, full);
 		}
 
 		if (effect.isGrace())

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * This file is part of alphaTab.
  *
  *  alphaTab is free software: you can redistribute it and/or modify
@@ -31,5 +31,6 @@ class Main
 	 */
 	static function main() 
 	{		
+	
 	}
 }
