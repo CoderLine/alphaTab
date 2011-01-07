@@ -73,10 +73,6 @@ class DrawingLayer
 						graphics.quadraticCurveTo(elm.X1, elm.Y1, elm.X2, elm.Y2);
 						_currentPosition.x = elm.X2;
 						_currentPosition.y = elm.Y2; 
-					case "rectTo":
-						graphics.rect(_currentPosition.x, _currentPosition.y, elm.Width, elm.Height);
-					case "circleTo":
-						graphics.circle(_currentPosition.x + elm.Radius, _currentPosition.y + elm.Radius, elm.Radius);
 					case "addString":
 						graphics.textBaseline = elm.BaseLine;
 						graphics.font = elm.Font;
@@ -100,7 +96,10 @@ class DrawingLayer
 						graphics.bezierCurveTo(elm.X2, elm.Y2, elm.X3, elm.Y3, elm.X4, elm.Y4);
 					case "addCircle":
 						finish(graphics);
-						graphics.circle(elm.X + elm.Radius, elm.Y + elm.Radius, elm.Radius);
+						var x:Int = cast elm.X;
+						var y:Int = cast elm.Y;
+						var radius:Int = cast elm.Radius;
+						graphics.circle(x+radius, y+radius, radius);
 					case "addRect":
 						graphics.rect(elm.X, elm.Y, elm.Width, elm.Height);
 				}
@@ -152,18 +151,13 @@ class DrawingLayer
 		});
 	}
 	public function lineTo(x:Float,y:Float): Void{
-		_path.push({
-			Command: "lineTo",
-			X: (x) + 0.5,
-			Y: (y) + 0.5
-		});
-	}
-	public function circleTo(diameter:Float): Void{
-		_path.push({
-			Command: "circleTo",
-			Radius: diameter/2
-		});
-	}
+        _path.push({
+            Command: "lineTo",
+            X: (x) + 0.5,
+            Y: (y) + 0.5
+        });
+    }
+	
 	public function addString(str:String, font:String, x:Float,y:Float, baseline:String="middle"): Void{
 		_path.push({
 			Command: "addString",
@@ -183,68 +177,60 @@ class DrawingLayer
 		var painter = new SvgPainter(this, symbol, x, y, xScale, yScale);
 		painter.paint();
 	}
+	
 	public function addLine(x1:Float, y1:Float, x2:Float, y2:Float): Void {
-		
-		_path.push({
-			Command: "addLine",
-			X1: (x1) + 0.5,
-			Y1: (y1) + 0.5,
-			X2: (x2) + 0.5,
-			Y2: (y2) + 0.5
-		});
-	}
+        _path.push({
+            Command: "addLine",
+            X1: (x1) + 0.5,
+            Y1: (y1) + 0.5,
+            X2: (x2) + 0.5,
+            Y2: (y2) + 0.5
+        });
+    }
 	
 	public function addPolygon(points:Array<Point>): Void{
-		_path.push({
-			Command: "addPolygon",
-			Points: points
-		});
-	}
+        _path.push({
+            Command: "addPolygon",
+            Points: points
+        });
+    }
 
 	public function addBezier (x1:Float, y1:Float, x2:Float, y2:Float, x3:Float, y3:Float, x4:Float, y4:Float): Void{
-		_path.push({
-			Command: "addBezier",
-			X1: x1,
-			Y1: y1,
-			X2: x2,
-			Y2: y2,
-			X3: x3,
-			Y3: y3,
-			X4: x4,
-			Y4: y4
-		});
-	}
+        _path.push({
+            Command: "addBezier",
+            X1: x1,
+            Y1: y1,
+            X2: x2,
+            Y2: y2,
+            X3: x3,
+            Y3: y3,
+            X4: x4,
+            Y4: y4
+        });
+    }
 
-	public function addCircle (x:Float,y:Float,diameter:Float): Void{
-		_path.push({
-			Command: "addCircle",
-			X: x,
-			Y: y,
-			Radius: diameter/2
-		});
-	}
+    public function addCircle (x:Float,y:Float,diameter:Float): Void{
+        _path.push({
+            Command: "addCircle",
+            X: x,
+            Y: y,
+            Radius: diameter/2
+        });
+    }
 
-	public function addRect (x:Float,y:Float,w:Float,h:Float): Void{
-		_path.push({
-			Command: "addRect",
-			X: x,
-			Y: y,
-			Width: w,
-			Height: h
-		});
-	}
-
-	public function rectTo (w:Float, h:Float) : Void {
-		_path.push({Command: "rectTo",
-		Width: w,
-		Height: h});
-	}
+	public function addRect (x:Float, y:Float, w:Float, h:Float) : Void {
+        _path.push({Command: "addRect",
+        X:x,
+        Y:y,
+        Width: w,
+        Height: h});
+    }
 	
 	public function clear(): Void
 	{
 		_path = new Array<Dynamic>();
 	}
-	
+	 
 	public function finish(graphics:Canvas): Void
 	{
 		if (_isFilled) 

@@ -406,7 +406,7 @@ class MeasureImpl extends Measure
 					}
 
 					voice.update(layout);
-					if (!_tupleto && voice.duration.tuplet != Tuplet.NORMAL)
+					if (!_tupleto && !voice.duration.tuplet.equals(Tuplet.NORMAL))
 					{
 						_tupleto = true;
 					}
@@ -939,8 +939,7 @@ class MeasureImpl extends Measure
 		// RepeatEndings
 		if (isRepeatOpen() || layout.isFirstMeasure(this))
 		{
-			fill.moveTo(x1, y1);
-			fill.rectTo(lineWidthBig, (y2 + offsetY) - y1);
+			fill.addRect(x1,y1,lineWidthBig, (y2 + offsetY) - y1);
 
 			draw.startFigure();
 			draw.moveTo(
@@ -956,14 +955,14 @@ class MeasureImpl extends Measure
 				var xMove:Float = ((lineWidthBig + scale + lineWidthSmall) + (2.0 * scale));
 				var yMove:Float = ((lineWidthBig + scale + lineWidthSmall) + (2.0 * scale));
 
-				fill.moveTo(
+				fill.addCircle(
 					Math.floor(x1 + xMove),
-					Math.floor(y1 + ((y2 - y1) / 2) - (yMove + (size / 2))));
-				fill.circleTo(size);
-				fill.moveTo(
+					Math.floor(y1 + ((y2 - y1) / 2) - (yMove + (size / 2))),
+					size);
+				fill.addCircle(
 					Math.floor(x1 + xMove),
-					Math.floor(y1 + ((y2 - y1) / 2) + (yMove - (size / 2))));
-				fill.circleTo(size);
+					Math.floor(y1 + ((y2 - y1) / 2) + (yMove - (size / 2))),
+					size);
 			}
 		}
 		else
@@ -973,15 +972,14 @@ class MeasureImpl extends Measure
 			draw.lineTo(x1, y2 + offsetY);
 		}
 
-		//fin
 		if (repeatClose() > 0 || layout.isLastMeasure(this))
 		{
 			draw.startFigure();
 			draw.moveTo(Math.floor(x2 + spacing - (lineWidthBig + scale + lineWidthSmall)), y1);
 			draw.lineTo(Math.floor((x2 + spacing) - (lineWidthBig + scale + lineWidthSmall)), y2);
 
-			fill.moveTo((x2 + spacing) - lineWidthBig, y1);
-			fill.rectTo(lineWidthBig, y2 - y1);
+			fill.addRect((x2 + spacing) - lineWidthBig, y1,
+			             lineWidthBig, y2 - y1);
 
 			if (repeatClose() > 0)
 			{
@@ -989,14 +987,12 @@ class MeasureImpl extends Measure
 				var xMove:Float = (((lineWidthBig + scale + lineWidthSmall) + (2.0 * scale)) + size);
 				var yMove:Float = ((lineWidthBig + scale + lineWidthSmall) + (2.0 * scale));
 
-				fill.moveTo(Math.round((x2 - xMove) + spacing),
-					Math.round(y1 + ((y2 - y1) / 2) - (yMove + (size / 2))));
-				fill.circleTo(size);
+				fill.addCircle(Math.round((x2 - xMove) + spacing),
+					Math.round(y1 + ((y2 - y1) / 2) - (yMove + (size / 2))), size);
 
-				fill.moveTo(
+				fill.addCircle(
 					Math.round((x2 - xMove) + spacing),
-					Math.round(y1 + ((y2 - y1) / 2) + (yMove - (size / 2))));
-				fill.circleTo(size);
+					Math.round(y1 + ((y2 - y1) / 2) + (yMove - (size / 2))), size);
 
 				if (addInfo)
 				{
@@ -1048,36 +1044,6 @@ class MeasureImpl extends Measure
 		return cast ((beat.start - start()) * spacing / length());
 	}
 	
-
-	private function calculateKeySignatureSpacing(layout:ViewLayout) : Int
-	{
-		var spacing:Int = 0;
-		if (headerImpl().shouldPaintKeySignature)
-		{
-		
-			if (keySignature() <= 7)
-			{
-				spacing += Math.round((6 * layout.scale) * keySignature());
-			}
-			else
-			{
-				spacing += Math.round((6 * layout.scale) * (keySignature() - 7));
-			}
-			if (_previousMeasure != null)
-			{
-				if (_previousMeasure.keySignature() <= 7)
-				{
-					spacing += Math.round((6 * layout.scale) * _previousMeasure.keySignature());
-				}
-				else
-				{
-					spacing += Math.round((6 * layout.scale) * (_previousMeasure.keySignature() - 7));
-				}
-			}
-		}
-		return spacing;
-	}
-
 	public function getFirstNoteSpacing(layout:ViewLayout) : Int
 	{
 		return headerImpl().getFirstNoteSpacing(layout, this);

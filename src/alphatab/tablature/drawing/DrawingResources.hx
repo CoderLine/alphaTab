@@ -44,24 +44,26 @@ class DrawingResources
 
 	public static function init(scale:Float) : Void
 	{ 
+	    var sansFont = "'Arial'";
+	    var serifFont = "'Times New Roman'";
 		defaultFontHeight = Math.round(9*scale);
-		defaultFont = Std.string(defaultFontHeight) + "px 'Arial'";
-		chordFont = Std.string(9*scale) + "px 'Arial'";
-		timeSignatureFont = Std.string(20*scale) + "px 'Arial'";
-		clefFont = Std.string(13*scale) + "px 'Arial'";
-		musicFont = Std.string(13*scale) + "px 'Arial'";
-		tempoFont = Std.string(11*scale) + "px 'Arial'";
+		defaultFont = Std.string(defaultFontHeight) + "px " + sansFont;
+		chordFont = Std.string(9*scale) + "px " + sansFont;
+		timeSignatureFont = Std.string(20*scale) + "px " + sansFont;
+		clefFont = Std.string(13*scale) + "px " + sansFont;
+		musicFont = Std.string(13*scale) + "px " + sansFont;
+		tempoFont = Std.string(11*scale) + "px " + sansFont;
 		graceFontHeight = Math.round(9*scale);
-		graceFont = Std.string(graceFontHeight) + "px 'Arial'";
+		graceFont = Std.string(graceFontHeight) + "px " + sansFont;
 		noteFontHeight = Math.round(11 * scale);
-		noteFont = Std.string(noteFontHeight) + "px 'Arial'";
+		noteFont = Std.string(noteFontHeight) + "px " + sansFont;
 		effectFontHeight = Math.round(11 * scale);
-		effectFont = "italic " + Std.string(effectFontHeight) + "px 'Times New Roman'";
+		effectFont = "italic " + Std.string(effectFontHeight) + "px " + serifFont;
 		
-		titleFont =  Std.string(30*scale) + "px 'Times New Roman'";
-		subtitleFont = Std.string(19 * scale) + "px 'Times New Roman'";
-		wordsFont =  Std.string(13 * scale) + "px 'Times New Roman'";
-		copyrightFont =  "bold " + Std.string(11 * scale) + "px 'Arial'";
+		titleFont =  Std.string(30*scale) + "px " + serifFont;
+		subtitleFont = Std.string(19 * scale) + "px " + serifFont;
+		wordsFont =  Std.string(13 * scale) + "px " + serifFont;
+		copyrightFont =  "bold " + Std.string(11 * scale) + "px " + sansFont;
 	}
 	
 	public static function getScoreNoteSize(layout:ViewLayout, full:Bool) : Point

@@ -51,11 +51,6 @@ class NoteImpl extends Note
 	public var scorePosY:Int;
 	public var tabPosY:Int;
 
-	public function getPosX() 
-	{
-		return _noteOrientation.x;
-	}
-	
 	public function getNoteWidth()
 	{
 		return _noteOrientation.width;
@@ -848,7 +843,7 @@ class NoteImpl extends Note
 
 		if (point == null) return 0;
 
-		// 5px*scale movement per value 
+		// 6px*scale movement per value 
 		var fullHeight:Float = point.value * (6 * layout.scale);
 		var heightToTabNote:Float = (string - 1) * layout.stringSpacing;
 

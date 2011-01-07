@@ -334,13 +334,11 @@ class VoiceImpl extends Voice
 
 		if (duration.isDotted || duration.isDoubleDotted)
 		{
-			fill.moveTo(realX + 10, realY + 1);
-			fill.circleTo(1);
+			fill.addCircle(realX + 10, realY + 1,1);
 
 			if (duration.isDoubleDotted)
 			{
-				fill.moveTo((realX + 13), realY + 1);
-				fill.circleTo(1);
+				fill.addCircle((realX + 13), realY + 1,1);
 			}
 		}
 		

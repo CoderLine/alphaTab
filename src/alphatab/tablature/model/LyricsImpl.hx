@@ -37,7 +37,6 @@ class LyricsImpl extends Lyrics
 		var beats:Array<String> = this.lyricsBeats();
 		if (beats != null && beats.length > 0)
 		{
-			var beatIndex:Int = 0;
 			for (i in 0 ... currentMeasure.beatCount())
 			{
 				var index = beatCount + i;
@@ -53,7 +52,6 @@ class LyricsImpl extends Lyrics
 							realX + 13, y + currentMeasure.ts.get(TrackSpacingPositions.Lyric));
 					}
 				}
-				beatIndex++;
 			}
 		}
 	}

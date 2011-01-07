@@ -100,8 +100,35 @@ class MeasureHeaderImpl extends MeasureHeader
 			if (keySignature != previous.keySignature || keySignatureType != previous.keySignatureType)
 			{
 				shouldPaintKeySignature = true;
+                notifyKeySignatureSpacing(calculateKeySignatureSpacing(cast previous, layout));
 			}
 		}
+	}
+
+    private function calculateKeySignatureSpacing(previous:MeasureHeaderImpl, layout:ViewLayout) : Int
+	{
+		var spacing:Int = 0;
+        if (keySignature <= 7)
+        {
+            spacing += Math.round((6 * layout.scale) * keySignature);
+        }
+        else
+        {
+            spacing += Math.round((6 * layout.scale) * (keySignature - 7));
+        }
+        
+        if (previous != null)
+        {
+            if (previous.keySignature <= 7)
+            {
+                spacing += Math.round((6 * layout.scale) * previous.keySignature);
+            }
+            else
+            {
+                spacing += Math.round((6 * layout.scale) * (previous.keySignature - 7));
+            }
+        }
+		return spacing;
 	}
 
 
