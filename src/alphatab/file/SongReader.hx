@@ -48,10 +48,10 @@ class SongReader
 	public static function availableReaders() : Array<SongReader>
 	{
 		var d:Array<SongReader> = new Array<SongReader>();
-		d.push(new GpxReader());
+        d.push(new GpxReader());
 		d.push(new Gp5Reader());
 		d.push(new Gp4Reader());
-		d.push(new Gp4Reader());
+		d.push(new Gp3Reader());
 		return d;
 	}
 

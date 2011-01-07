@@ -100,6 +100,7 @@ class GpReaderBase extends SongReader
 		var text:String = "";
 		for (i in 0 ... length)
 		{
+		  // TODO: Check for unicode support
 			text += String.fromCharCode(readByte());
 		}
 		return text;

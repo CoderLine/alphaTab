@@ -104,6 +104,20 @@ class Gp4Reader extends Gp3Reader
         
         return song;
 	}
+    
+    override private function readLyrics(song:Song) : Void
+	{
+		song.lyrics = factory.newLyrics();
+        song.lyrics.trackChoice = readInt();
+        for (i in 0 ... Lyrics.MAX_LINE_COUNT) 
+		{
+            var line:LyricLine = factory.newLyricLine();			
+            line.startingMeasure = readInt();
+            line.lyrics = readIntSizeString(); 
+            song.lyrics.lines.push(line);
+        }
+	}
+
 
 	override private function readBeat(start:Int, measure:Measure, track:Track, voiceIndex:Int) : Int
 	{

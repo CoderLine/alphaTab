@@ -17,6 +17,7 @@
 package alphatab.file.alphatex;
 import alphatab.file.FileFormatException;
 import alphatab.file.SongReader;
+import alphatab.file.guitarpro.Gp3Reader;
 import alphatab.model.effects.BendEffect;
 import alphatab.model.effects.BendPoint;
 import alphatab.model.effects.HarmonicEffect;
@@ -442,7 +443,7 @@ class AlphaTexParser extends SongReader
 				{
 					error("keysignature", AlphaTexSymbols.String);
 				}
-				header.keySignature = parseKeySignature(_syData);
+				header.keySignature = Gp3Reader.toKeySignature(parseKeySignature(_syData));
 			}
 			else if (_syData == "clef") 
 			{

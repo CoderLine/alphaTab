@@ -289,7 +289,7 @@ class Gp3Reader extends GpReaderBase
         tableChange.reverb.value = readByte();
         tableChange.phaser.value = readByte();
         tableChange.tremolo.value = readByte();
-        tableChange.tempoName = readIntSizeCheckByteString();
+        tableChange.tempoName = "";
         tableChange.tempo.value = readInt();
         
         if (tableChange.instrument.value < 0) 
@@ -328,22 +328,6 @@ class Gp3Reader extends GpReaderBase
             tableChange.tempo = null;
         
         
-        var allTracksFlags:Int = readUnsignedByte();
-        if (tableChange.volume != null) 
-            tableChange.volume.allTracks = (allTracksFlags & 0x01) != 0;
-        if (tableChange.balance != null) 
-            tableChange.balance.allTracks = (allTracksFlags & 0x02) != 0;
-        if (tableChange.chorus != null) 
-            tableChange.chorus.allTracks = (allTracksFlags & 0x04) != 0;
-        if (tableChange.reverb != null) 
-            tableChange.reverb.allTracks = (allTracksFlags & 0x08) != 0;
-        if (tableChange.phaser != null) 
-            tableChange.phaser.allTracks = (allTracksFlags & 0x10) != 0;
-        if (tableChange.tremolo != null) 
-            tableChange.tremolo.allTracks = (allTracksFlags & 0x20) != 0;
-        if (tableChange.tempo != null) 
-            tableChange.tempo.allTracks = true;
-
 		return tableChange;
 	}
 	
@@ -529,6 +513,10 @@ class Gp3Reader extends GpReaderBase
         
         track.port = readInt();
         readChannel(track.channel, channels);
+        if(track.channel.channel == 9)
+        {
+            track.isPercussionTrack = true;
+        }
         track.fretCount = readInt();
         track.offset = readInt();
         track.color = readColor();
@@ -590,7 +578,7 @@ class Gp3Reader extends GpReaderBase
             header.marker = readMarker(header);
                 
         if ((flags & 0x40) != 0) {
-            header.keySignatureType = toKeySignature(readByte());
+            header.keySignature = toKeySignature(readByte());
             header.keySignatureType = readByte();
         }
 		else if(header.number > 1) {
@@ -672,14 +660,6 @@ class Gp3Reader extends GpReaderBase
 	private function readLyrics(song:Song) : Void
 	{
 		song.lyrics = factory.newLyrics();
-        song.lyrics.trackChoice = readInt();
-        for (i in 0 ... Lyrics.MAX_LINE_COUNT) 
-		{
-            var line:LyricLine = factory.newLyricLine();			
-            line.startingMeasure = readInt();
-            line.lyrics = readIntSizeString(); 
-            song.lyrics.lines.push(line);
-        }
 	}
 	
 	private function readInfo(song:Song)

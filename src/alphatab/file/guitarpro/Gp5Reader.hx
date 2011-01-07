@@ -104,7 +104,7 @@ class Gp5Reader extends Gp4Reader
         
         return song;
 	}
-	
+	    
 	override private function readMeasure(measure:Measure, track:Track): Void
 	{
 		for (voice in 0 ... Beat.MAX_VOICES) {
@@ -430,6 +430,10 @@ class Gp5Reader extends Gp4Reader
         
         track.port = readInt();
         readChannel(track.channel, channels);
+        if(track.channel.channel == 9)
+        {
+            track.isPercussionTrack = true;
+        }
         track.fretCount = readInt();
         track.offset = readInt();
         track.color = readColor();
