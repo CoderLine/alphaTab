@@ -2,12 +2,15 @@
     <description>
         a buildfile for creating alphaTab releases
     </description>
+    
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
 	
 	<!-- Main Properties -->
 	<property name="bin" location="bin"/>
 	<property name="lib" location="${bin}/lib/alphaTab"/>
 	<property name="src" location="src"/>
 	<property name="haxe-js" location="${lib}/alphaTab.js"/>
+	<property name="haxe-cpp" location="cpp"/>
 	<property name="release" location="releases"/>
 	<property name="tools" location="tools"/>
 	
@@ -54,11 +57,39 @@
             <arg value="${haxe-js}" />
         </exec>
 	</target>	
+
+	<target name="haxe-cpp" depends="global-init">
+		<delete file="${haxe-cpp}" />
+        <exec executable="haxe">
+            <arg value="-cp" />
+            <arg value="${src}"/>
+            
+            <arg value="-main" />
+            <arg value="alphatab.Main" />
+            
+            <arg value="-cpp" />
+            <arg value="${haxe-cpp}" />
+        </exec>
+	</target>	
+    
+	<target name="haxe-xml" depends="global-init">
+		<delete file="test.xml" />
+        <exec executable="haxe">
+            <arg value="-cp" />
+            <arg value="${src}"/>
+            
+            <arg value="-main" />
+            <arg value="alphatab.Main" />
+            
+            <arg value="-xml" />
+            <arg value="test.xml" />
+        </exec>
+	</target>	
   
 	<!-- Release -->
 	<target name="release-init" depends="java-player">
-		<delete dir="${release}/{$DSTAMP}" />
-		<mkdir dir="${release}/{$DSTAMP}" />
+		<delete dir="${release}/${DSTAMP}" />
+		<mkdir dir="${release}/${DSTAMP}" />
 	</target>	
 		
 	<target name="release" depends="release-init">
@@ -92,13 +123,38 @@
 			<arg value="--js_output_file" />
 			<arg value="${release}/${DSTAMP}/lib/alphaTab/jquery.alphaTab.min.js" />
 		</java>
-		
+        
+        <!-- Remove Web files from demo -->
+        <echo message="deleting php files and .htaccess" />
+        <delete>
+            <fileset dir="${release}/${DSTAMP}/demo" includes="**/*.php" />
+        </delete>
+        <delete file="${release}/${DSTAMP}/demo/.htaccess" />
+         
+        <!-- Retrieve all samples from webserver -->
+        <echo message="loading sample pages from webserver" />
+        <foreach target="receiveSample" param="samplepath">
+            <path>
+                <fileset dir="${bin}/demo/samples" includes="**/*.php" />
+            </path>
+        </foreach>  
+        
+        		
 		<!-- replace javascript include to minified javascript -->
 		<echo message="refreshing sample files"/>
 		<replace dir="${release}/${DSTAMP}" token="alphaTab.js" value="alphaTab.min.js">
 			<include name="**/*.html" />		
+			<include name="**/*.php" />		
 		</replace>
+
 	</target>
 
-  
+    <target name="receiveSample" depends="global-init">
+        <basename property="samplename" file="${samplepath}"
+          suffix=".php"/>       
+        <echo message="loading sample ${samplename}" />
+        <get src="http://haxedev/alphaTab/bin/demo/index.php?s=${samplename}.php"
+            dest="${release}/${DSTAMP}/demo/${samplename}.html" />
+            
+    </target>
 </project>

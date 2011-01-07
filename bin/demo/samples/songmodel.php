@@ -23,8 +23,8 @@ $(document).ready(function() {
 	try
 	{
 		// use SongLoader to load files
-		var factory = new net.alphatab.tablature.model.SongFactoryImpl();
-		net.alphatab.file.SongLoader.loadSong('files/FadeToBlack.gp4', factory, 
+		var factory = new alphatab.tablature.model.SongFactoryImpl();
+        alphatab.file.SongLoader.loadSong('files/FadeToBlack.gp4', factory, 
 			function(song){ 
 				var info = $('#Info');
 				// access data
@@ -43,7 +43,7 @@ $(document).ready(function() {
 	}
 	catch(e)
 	{
-		if(e instanceof net.alphatab.file.FileFormatException)
+		if(e instanceof alphatab.file.FileFormatException)
 			alert(e.message);
 		else 
 			alert(e);

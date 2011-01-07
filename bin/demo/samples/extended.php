@@ -59,6 +59,8 @@ $(document).ready(function() {
 	<option value="files/Canon.gp5">JerryC - CanonRock (Gp5)</option>
 	<option value="files/Serenade.gp5">Suidakra - Serenade to a Dream (Gp5)</option>
 	<option value="files/Effects.gp5">Effects (Gp5)</option>
+	<option value="files/Effects.gpx">Effects (Gpx)</option>
+	<option value="files/Drums.gp5">Drums (Gp5)</option>
 </select>
 <input id="LoadSample" type="button" value="Load" />
 | 

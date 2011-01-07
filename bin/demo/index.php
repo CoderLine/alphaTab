@@ -16,13 +16,13 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 $content = ''; 
-$isIndex = !isset($_GET['s']);
+$isIndex = !isset($_GET['s']) || $_GET['s'] == 'index.php';
 if($isIndex) 
 {	
 	$samples = array(
 		"General Usage" => array('simple.php', 'file.php', 'extended.php', 'songmodel.php'),
         "Plugins" => array('player.php', 'editor.php', 'editorplayer.php'),
-		"Feature Demo" => array('effects.php', 'voices.php'),
+		"Feature Demo" => array('effects.php', 'drums.php', 'voices.php'),
 		"alphaTex" => array('metadata.php', 'notes.php', 'measuretags.php', 'beateffects.php', 'noteeffects.php', 'complex.php')
 	);
 		
@@ -59,7 +59,6 @@ else
 		<meta http-equiv="Pragma" content="no-cache">
         <title>alphaTab - Demo</title>
 		<!-- Dependencies -->
-		<!--[if IE]><script language="JavaScript" type="text/javascript" src="../lib/swfobject/swfobject.js"></script><![endif]-->
 		<!--[if IE]><script language="JavaScript" type="text/javascript" src="../lib/excanvas/excanvas.js"></script><![endif]-->
 		<script language="JavaScript" type="text/javascript" src="../lib/jquery/jquery.min.js"></script>
 		
@@ -80,9 +79,9 @@ else
 		<div id="Content">
 		<h1>alphaTab - <?php echo $title; ?></h1>
 		<?php
-		if($_GET['s']):
+		if(!$isIndex):
 		?>
-		<a href="index.php">Back</a>
+		<a href="index.html">Back</a>
 		<?php
 		endif;
 		?>		

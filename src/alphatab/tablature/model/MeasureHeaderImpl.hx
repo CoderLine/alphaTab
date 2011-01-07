@@ -144,7 +144,7 @@ class MeasureHeaderImpl extends MeasureHeader
 
 	public function getKeySignatureSpacing(layout:ViewLayout, measure:MeasureImpl):Int
 	{
-		return (!shouldPaintKeySignature) ? 0 : _maxKeySignatureSpacing;
+		return (!shouldPaintKeySignature || measure.track.isPercussionTrack) ? 0 : _maxKeySignatureSpacing;
 	}
 
 	public function getTempoSpacing(layout:ViewLayout):Int

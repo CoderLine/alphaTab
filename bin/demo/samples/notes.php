@@ -33,6 +33,7 @@ Duration: <pre>1, 2, 4, 8, 16, 32 or 64</pre>
 </div>
 
 <h2>Duration Ranges</h2>
+<pre>:duration fret.string fret.string ...</pre>
 <div class="alphaTab">
 .
 :4 2.3 3.3 :8 3.3 4.3 3.3 4.3

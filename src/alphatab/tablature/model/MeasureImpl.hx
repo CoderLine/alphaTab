@@ -743,7 +743,7 @@ class MeasureImpl extends Measure
 	// KeySignature
 	private function paintKeySignature(layout:ViewLayout, context:DrawingContext, fromX:Int, fromY:Int) :Void
 	{
-		if (headerImpl().shouldPaintKeySignature)
+		if (headerImpl().shouldPaintKeySignature && !track.isPercussionTrack)
 		{
 			var scale:Float = layout.scoreLineSpacing;
 			var x:Int = fromX + getClefSpacing(layout) + 10;

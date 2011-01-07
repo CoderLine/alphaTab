@@ -15,27 +15,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
-$title = "Adding Metadata";
-$description = "This sample shows how metadata like songtitle or tempo can be specified.";
+$title = "Drums";
+$description = "This sample shows the display of percussion tabs";
 ?> 
-Tag: <pre>\tagname value value ...</pre><br />
-
-<script language="JavaScript" type="text/javascript">
-$(document).ready(function() {
-	$('div.alphaTab').alphaTab({editor:true});
+<script language="JavaScript" type="text/javascript"> 
+$(document).ready(function() { 
+	$('div.alphaTab').alphaTab({file: 'files/Drums.gp5'});
 });
 </script>
-<div class="alphaTab">
-\title "Song Title"
-\subtitle Subtitle
-\artist Artist
-\album 'My Album' 
-\words Daniel
-\music alphaTab
-\copyright Daniel
-\tempo 200
-\instrument 30
-\capo 2
-\tuning e5 b4 g4 d4 a3 e3 
-.
-</div>
+<div class="alphaTab"></div>
