@@ -87,8 +87,8 @@ else
 		?>		
 		<p><?php echo $description; ?></p>
 		<?php echo $content; ?>
-		<?php
-		if($_GET['s']):
+		<?php 
+		if(!$isIndex): 
 		?>
 		<h2>Source</h2>
 		<code><?php echo htmlentities(trim($content)); ?></code>

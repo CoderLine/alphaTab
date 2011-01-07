@@ -1,0 +1,60 @@
+alphaTab 0.2RC2
+  - [New] Rendering of Percussion Tabs (Guitar Pro 5 Style)
+  - [New] Rendering Guitar Tuning on Page Start
+  - [New] Minimal Support For Guitar Pro 6 Files
+  - [New] Instrument support for alphaTex
+  - [Improved] Completed Music Symbols
+  - [Improved] Coding Styleguide
+  - [Improved] Rendering Performance
+  - [Changed] VBScript Loader instead of Flash Loader (IE)
+  - [Fixed] KeySignatures in alphaTex
+  - [Fixed] KeySignatures in alphaTex
+  - [Fixed] GuitarPro File Reader Corrected
+  - [Fixed] Several minor bugs
+
+alphaTab 0.2RC1 
+  - [New] Rendering Support for Internet Explorer
+  - [New] Flash File Loader for Internet Explorer
+  - [New] Multiple Voice Rendering
+  - [New] alphaTex for writing Tabs
+  - [New] AutoLoading Script
+  - [New] Plugin System 
+  - [New] Player Plugin 
+  - [New] Editor Plugin 
+  - [New] Optional AutoScaling for Tablature
+  - [Improved] Rendering Performance
+  - [Improved] Midi Exchange Format
+  - [Improved] Completed Music Symbols
+  - [Improved] Trill Effect Paints Note
+  - [Fixed] Demoved Dead Code
+  - [Fixed] Wrong Clef Positioning
+  - [Fixed] Copy Clef from previous measures
+  - [Fixed] Repitition Dot Painting
+  - [Fixed] Wrong Repetition Count
+  - [Fixed] Lyrics Positioning
+  - [Fixed] Paint Staccato Dot
+
+
+alphaTab 0.2 alpha 
+  - [New] Renamed to alphaTab
+  - [New] Platform Abstraction Layer Introduced
+  - [New] Midi Message Generator
+  - [New] Java Applet as Midi Player
+  - [New] Caret indicating played Measure
+  - [New] Caret indicating played Beat
+  - [New] Grace Note Rendering
+  - [New] Copyright Notice
+  - [New] JQuery Plugin for easy initializing
+  - [Improved] Rendering Performance
+  - [Changed] Tuplet Rendering
+  - [Changed] Two different Vibrato Types
+  - [Fixed] Wrong Keysignature Parsing (Gp3-5)
+
+    
+jsGuitarSharp 0.1 alpha 
+
+  - [New] SongModel
+  - [New] File Reader Library
+  - [New] GuitarPro 3-5 Reader
+  - [New] Tablature Control (Html5 Javascript)
+  - [New] PageViewLayout

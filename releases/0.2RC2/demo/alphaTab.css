@@ -1,0 +1,53 @@
+/** Player Controls */
+.player {
+	position:fixed;
+	bottom:0;
+	z-index:10;
+	-moz-border-radius:5px 5px;
+	-webkit-border-radius:5px 5px;
+	border:1px solid #000;
+	padding:5px 5px;
+	margin-left:400px;
+	background: rgba(0,0,0,0.5);
+	color:#FFF;
+}
+
+/** alphaTab Design **/
+.alphaTabSurface {
+	border:7px solid rgb(210,214,215);
+	background:#F5F5F5;
+	/* Shadow */
+	-moz-box-shadow: 0 0 5px #888;
+	-webkit-box-shadow: 0 0 5px #888;
+	box-shadow: 0 0 5px #888;
+	/* Radius */
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	margin:7px 7px;
+
+}
+
+/** alphaTab Div adjustment
+	this style is required by IE if you use the editor
+	it enables to get newline symbols from div **/
+.alphaTab {
+	white-space:pre;	
+}
+
+/** Styling the code editor */
+.alphaTexEditor {
+	border:4px solid rgb(190,215,190);
+	background:#F5F5F5;
+	/* Shadow */
+	-moz-box-shadow: 0 0 5px #888;
+	-webkit-box-shadow: 0 0 5px #888;
+	box-shadow: 0 0 5px #888;
+	/* Radius */
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	width:500px;
+	height:auto!;
+	margin:7px 7px;
+}
