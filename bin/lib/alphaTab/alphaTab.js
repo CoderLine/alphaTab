@@ -2379,6 +2379,18 @@ alphatab.tablature.model.BeatTextImpl.prototype.paint = function(layout,context,
 	context.get(9).addString(this.value,alphatab.tablature.drawing.DrawingResources.defaultFont,realX,realY);
 }
 alphatab.tablature.model.BeatTextImpl.prototype.__class__ = alphatab.tablature.model.BeatTextImpl;
+alphatab.file.gpx.score.GpxTrack = function(p) { if( p === $_ ) return; {
+	null;
+}}
+alphatab.file.gpx.score.GpxTrack.__name__ = ["alphatab","file","gpx","score","GpxTrack"];
+alphatab.file.gpx.score.GpxTrack.prototype.color = null;
+alphatab.file.gpx.score.GpxTrack.prototype.gmChannel1 = null;
+alphatab.file.gpx.score.GpxTrack.prototype.gmChannel2 = null;
+alphatab.file.gpx.score.GpxTrack.prototype.gmProgram = null;
+alphatab.file.gpx.score.GpxTrack.prototype.id = null;
+alphatab.file.gpx.score.GpxTrack.prototype.name = null;
+alphatab.file.gpx.score.GpxTrack.prototype.tunningPitches = null;
+alphatab.file.gpx.score.GpxTrack.prototype.__class__ = alphatab.file.gpx.score.GpxTrack;
 alphatab.model.PageSetup = function(p) { if( p === $_ ) return; {
 	this.pageSize = new alphatab.model.Point(210,297);
 	this.pageMargin = new alphatab.model.Padding(10,15,10,10);
@@ -2409,18 +2421,6 @@ alphatab.model.PageSetup.prototype.title = null;
 alphatab.model.PageSetup.prototype.words = null;
 alphatab.model.PageSetup.prototype.wordsAndMusic = null;
 alphatab.model.PageSetup.prototype.__class__ = alphatab.model.PageSetup;
-alphatab.file.gpx.score.GpxTrack = function(p) { if( p === $_ ) return; {
-	null;
-}}
-alphatab.file.gpx.score.GpxTrack.__name__ = ["alphatab","file","gpx","score","GpxTrack"];
-alphatab.file.gpx.score.GpxTrack.prototype.color = null;
-alphatab.file.gpx.score.GpxTrack.prototype.gmChannel1 = null;
-alphatab.file.gpx.score.GpxTrack.prototype.gmChannel2 = null;
-alphatab.file.gpx.score.GpxTrack.prototype.gmProgram = null;
-alphatab.file.gpx.score.GpxTrack.prototype.id = null;
-alphatab.file.gpx.score.GpxTrack.prototype.name = null;
-alphatab.file.gpx.score.GpxTrack.prototype.tunningPitches = null;
-alphatab.file.gpx.score.GpxTrack.prototype.__class__ = alphatab.file.gpx.score.GpxTrack;
 alphatab.model.BeatStrokeDirection = function() { }
 alphatab.model.BeatStrokeDirection.__name__ = ["alphatab","model","BeatStrokeDirection"];
 alphatab.model.BeatStrokeDirection.prototype.__class__ = alphatab.model.BeatStrokeDirection;
@@ -3064,6 +3064,10 @@ alphatab.file.alphatex.AlphaTexParser.prototype.metaData = function() {
 				else {
 					this.error("instrument",alphatab.file.alphatex.AlphaTexSymbols.Number,false);
 				}
+			}
+			else if(this._sy == alphatab.file.alphatex.AlphaTexSymbols.String) {
+				var instrumentName = this._syData;
+				this._track.channel.instrument(alphatab.midi.GeneralMidi.getValue(instrumentName));
 			}
 			else {
 				this.error("tempo",alphatab.file.alphatex.AlphaTexSymbols.Number);
@@ -7155,6 +7159,144 @@ alphatab.model.MidiChannel.prototype.reverb = null;
 alphatab.model.MidiChannel.prototype.tremolo = null;
 alphatab.model.MidiChannel.prototype.volume = null;
 alphatab.model.MidiChannel.prototype.__class__ = alphatab.model.MidiChannel;
+alphatab.midi.GeneralMidi = function() { }
+alphatab.midi.GeneralMidi.__name__ = ["alphatab","midi","GeneralMidi"];
+alphatab.midi.GeneralMidi._values = null;
+alphatab.midi.GeneralMidi.getValue = function(name) {
+	if(alphatab.midi.GeneralMidi._values == null) {
+		alphatab.midi.GeneralMidi._values = new Hash();
+		alphatab.midi.GeneralMidi._values.set("AcousticGrandPiano",0);
+		alphatab.midi.GeneralMidi._values.set("BrightAcousticPiano",1);
+		alphatab.midi.GeneralMidi._values.set("ElectricGrandPiano",2);
+		alphatab.midi.GeneralMidi._values.set("HonkyTonkPiano",3);
+		alphatab.midi.GeneralMidi._values.set("ElectricPiano1",4);
+		alphatab.midi.GeneralMidi._values.set("ElectricPiano2",5);
+		alphatab.midi.GeneralMidi._values.set("Harpsichord",6);
+		alphatab.midi.GeneralMidi._values.set("Clavinet",7);
+		alphatab.midi.GeneralMidi._values.set("Celesta",8);
+		alphatab.midi.GeneralMidi._values.set("Glockenspiel",9);
+		alphatab.midi.GeneralMidi._values.set("MusicBox",10);
+		alphatab.midi.GeneralMidi._values.set("Vibraphone",11);
+		alphatab.midi.GeneralMidi._values.set("Marimba",12);
+		alphatab.midi.GeneralMidi._values.set("Xylophone",13);
+		alphatab.midi.GeneralMidi._values.set("TubularBells",14);
+		alphatab.midi.GeneralMidi._values.set("Dulcimer",15);
+		alphatab.midi.GeneralMidi._values.set("DrawbarOrgan",16);
+		alphatab.midi.GeneralMidi._values.set("PercussiveOrgan",17);
+		alphatab.midi.GeneralMidi._values.set("RockOrgan",18);
+		alphatab.midi.GeneralMidi._values.set("ChurchOrgan",19);
+		alphatab.midi.GeneralMidi._values.set("ReedOrgan",20);
+		alphatab.midi.GeneralMidi._values.set("Accordion",21);
+		alphatab.midi.GeneralMidi._values.set("Harmonica",22);
+		alphatab.midi.GeneralMidi._values.set("TangoAccordion",23);
+		alphatab.midi.GeneralMidi._values.set("AcousticGuitarNylon",24);
+		alphatab.midi.GeneralMidi._values.set("AcousticGuitarSteel",25);
+		alphatab.midi.GeneralMidi._values.set("ElectricGuitarJazz",26);
+		alphatab.midi.GeneralMidi._values.set("ElectricGuitarClean",27);
+		alphatab.midi.GeneralMidi._values.set("ElectricGuitarMuted",28);
+		alphatab.midi.GeneralMidi._values.set("OverdrivenGuitar",29);
+		alphatab.midi.GeneralMidi._values.set("DistortionGuitar",30);
+		alphatab.midi.GeneralMidi._values.set("GuitarHarmonics",31);
+		alphatab.midi.GeneralMidi._values.set("AcousticBass",32);
+		alphatab.midi.GeneralMidi._values.set("ElectricBassFinger",33);
+		alphatab.midi.GeneralMidi._values.set("ElectricBassPick",34);
+		alphatab.midi.GeneralMidi._values.set("FretlessBass",35);
+		alphatab.midi.GeneralMidi._values.set("SlapBass1",36);
+		alphatab.midi.GeneralMidi._values.set("SlapBass2",37);
+		alphatab.midi.GeneralMidi._values.set("SynthBass1",38);
+		alphatab.midi.GeneralMidi._values.set("SynthBass2",39);
+		alphatab.midi.GeneralMidi._values.set("Violin",40);
+		alphatab.midi.GeneralMidi._values.set("Viola",41);
+		alphatab.midi.GeneralMidi._values.set("Cello",42);
+		alphatab.midi.GeneralMidi._values.set("Contrabass",43);
+		alphatab.midi.GeneralMidi._values.set("TremoloStrings",44);
+		alphatab.midi.GeneralMidi._values.set("PizzicatoStrings",45);
+		alphatab.midi.GeneralMidi._values.set("OrchestralHarp",46);
+		alphatab.midi.GeneralMidi._values.set("Timpani",47);
+		alphatab.midi.GeneralMidi._values.set("StringEnsemble1",48);
+		alphatab.midi.GeneralMidi._values.set("StringEnsemble2",49);
+		alphatab.midi.GeneralMidi._values.set("SynthStrings1",50);
+		alphatab.midi.GeneralMidi._values.set("SynthStrings2",51);
+		alphatab.midi.GeneralMidi._values.set("ChoirAahs",52);
+		alphatab.midi.GeneralMidi._values.set("VoiceOohs",53);
+		alphatab.midi.GeneralMidi._values.set("SynthVoice",54);
+		alphatab.midi.GeneralMidi._values.set("OrchestraHit",55);
+		alphatab.midi.GeneralMidi._values.set("Trumpet",56);
+		alphatab.midi.GeneralMidi._values.set("Trombone",57);
+		alphatab.midi.GeneralMidi._values.set("Tuba",58);
+		alphatab.midi.GeneralMidi._values.set("MutedTrumpet",59);
+		alphatab.midi.GeneralMidi._values.set("FrenchHorn",60);
+		alphatab.midi.GeneralMidi._values.set("BrassSection",61);
+		alphatab.midi.GeneralMidi._values.set("SynthBrass1",62);
+		alphatab.midi.GeneralMidi._values.set("SynthBrass2",63);
+		alphatab.midi.GeneralMidi._values.set("SopranoSax",64);
+		alphatab.midi.GeneralMidi._values.set("AltoSax",65);
+		alphatab.midi.GeneralMidi._values.set("TenorSax",66);
+		alphatab.midi.GeneralMidi._values.set("BaritoneSax",67);
+		alphatab.midi.GeneralMidi._values.set("Oboe",68);
+		alphatab.midi.GeneralMidi._values.set("EnglishHorn",69);
+		alphatab.midi.GeneralMidi._values.set("Bassoon",70);
+		alphatab.midi.GeneralMidi._values.set("Clarinet",71);
+		alphatab.midi.GeneralMidi._values.set("Piccolo",72);
+		alphatab.midi.GeneralMidi._values.set("Flute",73);
+		alphatab.midi.GeneralMidi._values.set("Recorder",74);
+		alphatab.midi.GeneralMidi._values.set("PanFlute",75);
+		alphatab.midi.GeneralMidi._values.set("BlownBottle",76);
+		alphatab.midi.GeneralMidi._values.set("Shakuhachi",77);
+		alphatab.midi.GeneralMidi._values.set("Whistle",78);
+		alphatab.midi.GeneralMidi._values.set("Ocarina",79);
+		alphatab.midi.GeneralMidi._values.set("Lead1Square",80);
+		alphatab.midi.GeneralMidi._values.set("Lead2Sawtooth",81);
+		alphatab.midi.GeneralMidi._values.set("Lead3Calliope",82);
+		alphatab.midi.GeneralMidi._values.set("Lead4Chiff",83);
+		alphatab.midi.GeneralMidi._values.set("Lead5Charang",84);
+		alphatab.midi.GeneralMidi._values.set("Lead6Voice",85);
+		alphatab.midi.GeneralMidi._values.set("Lead7Fifths",86);
+		alphatab.midi.GeneralMidi._values.set("Lead8BassAndLead",87);
+		alphatab.midi.GeneralMidi._values.set("Pad1NewAge",88);
+		alphatab.midi.GeneralMidi._values.set("Pad2Warm",89);
+		alphatab.midi.GeneralMidi._values.set("Pad3Polysynth",90);
+		alphatab.midi.GeneralMidi._values.set("Pad4Choir",91);
+		alphatab.midi.GeneralMidi._values.set("Pad5Bowed",92);
+		alphatab.midi.GeneralMidi._values.set("Pad6Metallic",93);
+		alphatab.midi.GeneralMidi._values.set("Pad7Halo",94);
+		alphatab.midi.GeneralMidi._values.set("Pad8Sweep",95);
+		alphatab.midi.GeneralMidi._values.set("Fx1Rain",96);
+		alphatab.midi.GeneralMidi._values.set("Fx2Soundtrack",97);
+		alphatab.midi.GeneralMidi._values.set("Fx3Crystal",98);
+		alphatab.midi.GeneralMidi._values.set("Fx4Atmosphere",99);
+		alphatab.midi.GeneralMidi._values.set("Fx5Brightness",100);
+		alphatab.midi.GeneralMidi._values.set("Fx6Goblins",101);
+		alphatab.midi.GeneralMidi._values.set("Fx7Echoes",102);
+		alphatab.midi.GeneralMidi._values.set("Fx8SciFi",103);
+		alphatab.midi.GeneralMidi._values.set("Sitar",104);
+		alphatab.midi.GeneralMidi._values.set("Banjo",105);
+		alphatab.midi.GeneralMidi._values.set("Shamisen",106);
+		alphatab.midi.GeneralMidi._values.set("Koto",107);
+		alphatab.midi.GeneralMidi._values.set("Kalimba",108);
+		alphatab.midi.GeneralMidi._values.set("BagPipe",109);
+		alphatab.midi.GeneralMidi._values.set("Fiddle",110);
+		alphatab.midi.GeneralMidi._values.set("Shanai",111);
+		alphatab.midi.GeneralMidi._values.set("TinkleBell",112);
+		alphatab.midi.GeneralMidi._values.set("Agogo",113);
+		alphatab.midi.GeneralMidi._values.set("SteelDrums",114);
+		alphatab.midi.GeneralMidi._values.set("Woodblock",115);
+		alphatab.midi.GeneralMidi._values.set("TaikoDrum",116);
+		alphatab.midi.GeneralMidi._values.set("MelodicTom",117);
+		alphatab.midi.GeneralMidi._values.set("SynthDrum",118);
+		alphatab.midi.GeneralMidi._values.set("ReverseCymbal",119);
+		alphatab.midi.GeneralMidi._values.set("GuitarFretNoise",120);
+		alphatab.midi.GeneralMidi._values.set("BreathNoise",121);
+		alphatab.midi.GeneralMidi._values.set("Seashore",122);
+		alphatab.midi.GeneralMidi._values.set("BirdTweet",123);
+		alphatab.midi.GeneralMidi._values.set("TelephoneRing",124);
+		alphatab.midi.GeneralMidi._values.set("Helicopter",125);
+		alphatab.midi.GeneralMidi._values.set("Applause",126);
+		alphatab.midi.GeneralMidi._values.set("Gunshot",127);
+	}
+	return (alphatab.midi.GeneralMidi._values.exists(name)?alphatab.midi.GeneralMidi._values.get(name):0);
+}
+alphatab.midi.GeneralMidi.prototype.__class__ = alphatab.midi.GeneralMidi;
 alphatab.tablature.model.LyricsImpl = function(p) { if( p === $_ ) return; {
 	alphatab.model.Lyrics.apply(this,[]);
 }}
@@ -8212,6 +8354,15 @@ alphatab.model.Tuplet.prototype.equals = function(tuplet) {
 }
 alphatab.model.Tuplet.prototype.times = null;
 alphatab.model.Tuplet.prototype.__class__ = alphatab.model.Tuplet;
+alphatab.file.gpx.score.GpxMasterBar = function(p) { if( p === $_ ) return; {
+	null;
+}}
+alphatab.file.gpx.score.GpxMasterBar.__name__ = ["alphatab","file","gpx","score","GpxMasterBar"];
+alphatab.file.gpx.score.GpxMasterBar.prototype.barIds = null;
+alphatab.file.gpx.score.GpxMasterBar.prototype.repeatCount = null;
+alphatab.file.gpx.score.GpxMasterBar.prototype.repeatStart = null;
+alphatab.file.gpx.score.GpxMasterBar.prototype.time = null;
+alphatab.file.gpx.score.GpxMasterBar.prototype.__class__ = alphatab.file.gpx.score.GpxMasterBar;
 if(typeof haxe=='undefined') haxe = {}
 if(!haxe.xml) haxe.xml = {}
 if(!haxe.xml._Fast) haxe.xml._Fast = {}
@@ -8322,15 +8473,6 @@ haxe.xml.Fast.prototype.node = null;
 haxe.xml.Fast.prototype.nodes = null;
 haxe.xml.Fast.prototype.x = null;
 haxe.xml.Fast.prototype.__class__ = haxe.xml.Fast;
-alphatab.file.gpx.score.GpxMasterBar = function(p) { if( p === $_ ) return; {
-	null;
-}}
-alphatab.file.gpx.score.GpxMasterBar.__name__ = ["alphatab","file","gpx","score","GpxMasterBar"];
-alphatab.file.gpx.score.GpxMasterBar.prototype.barIds = null;
-alphatab.file.gpx.score.GpxMasterBar.prototype.repeatCount = null;
-alphatab.file.gpx.score.GpxMasterBar.prototype.repeatStart = null;
-alphatab.file.gpx.score.GpxMasterBar.prototype.time = null;
-alphatab.file.gpx.score.GpxMasterBar.prototype.__class__ = alphatab.file.gpx.score.GpxMasterBar;
 alphatab.model.effects.GraceEffect = function(p) { if( p === $_ ) return; {
 	this.fret = 0;
 	this.duration = 1;

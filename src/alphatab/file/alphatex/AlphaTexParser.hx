@@ -18,6 +18,7 @@ package alphatab.file.alphatex;
 import alphatab.file.FileFormatException;
 import alphatab.file.SongReader;
 import alphatab.file.guitarpro.Gp3Reader;
+import alphatab.midi.GeneralMidi;
 import alphatab.model.effects.BendEffect;
 import alphatab.model.effects.BendPoint;
 import alphatab.model.effects.HarmonicEffect;
@@ -329,6 +330,11 @@ class AlphaTexParser extends SongReader
                     {
                         this.error("instrument", AlphaTexSymbols.Number, false);
                     }
+                }
+                else if(_sy == AlphaTexSymbols.String) // Name
+                {
+                    var instrumentName:String = cast _syData;
+                    _track.channel.instrument(GeneralMidi.getValue(instrumentName));
                 }
                 else
                 {
