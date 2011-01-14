@@ -30,6 +30,7 @@ class GeneralMidi
         {
             _values = new Hash<Int>();
             _values.set("acousticgrandpiano", 0);
+            _values.set("acousticgrandpiano", 0);
             _values.set("brightacousticpiano", 1);
             _values.set("electricgrandpiano", 2);
             _values.set("honkytonkpiano", 3);
@@ -158,7 +159,7 @@ class GeneralMidi
             _values.set("applause", 126);
             _values.set("gunshot", 127);
         }
-        name = name.toLowerCase();
+        name = StringTools.replace(name.toLowerCase(), " ", "");
         return _values.exists(name) ? _values.get(name) : 0; 
     }   
 	
