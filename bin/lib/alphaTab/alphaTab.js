@@ -7166,6 +7166,7 @@ alphatab.midi.GeneralMidi.getValue = function(name) {
 	if(alphatab.midi.GeneralMidi._values == null) {
 		alphatab.midi.GeneralMidi._values = new Hash();
 		alphatab.midi.GeneralMidi._values.set("acousticgrandpiano",0);
+		alphatab.midi.GeneralMidi._values.set("acousticgrandpiano",0);
 		alphatab.midi.GeneralMidi._values.set("brightacousticpiano",1);
 		alphatab.midi.GeneralMidi._values.set("electricgrandpiano",2);
 		alphatab.midi.GeneralMidi._values.set("honkytonkpiano",3);
@@ -7294,7 +7295,7 @@ alphatab.midi.GeneralMidi.getValue = function(name) {
 		alphatab.midi.GeneralMidi._values.set("applause",126);
 		alphatab.midi.GeneralMidi._values.set("gunshot",127);
 	}
-	name = name.toLowerCase();
+	name = StringTools.replace(name.toLowerCase()," ","");
 	return (alphatab.midi.GeneralMidi._values.exists(name)?alphatab.midi.GeneralMidi._values.get(name):0);
 }
 alphatab.midi.GeneralMidi.prototype.__class__ = alphatab.midi.GeneralMidi;
