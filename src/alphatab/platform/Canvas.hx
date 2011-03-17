@@ -37,6 +37,7 @@ interface Canvas
 	// text
 	var font(getFont, setFont):String; // (default 10px sans-serif)
 	var textBaseline(getTextBaseline, setTextBaseline):String; // "top", "hanging", "middle", "alphabetic", "ideographic", "bottom" (default: "alphabetic")
+	var textAlign(getTextAlign, setTextAlign):String; // "left", "right", "center", "start", "end"
 	function fillText(text:String, x:Float, y:Float, maxWidth:Float = 0):Void;
 	function strokeText(text:String, x:Float, y:Float, maxWidth:Float = 0):Void;
 	function measureText(text:String):Float;	

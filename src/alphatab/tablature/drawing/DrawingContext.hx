@@ -35,10 +35,10 @@ class DrawingContext
 		this.layers[DrawingLayers.Lines] = new DrawingLayer(new Color(165, 165, 165), false, 1);
 		this.layers[DrawingLayers.MainComponents] = new DrawingLayer(new Color(34,34,17), true, 0);
 		this.layers[DrawingLayers.MainComponentsDraw] = new DrawingLayer(new Color(34,34,17), false, 1*scale);
-		this.layers[DrawingLayers.Voice2] = new DrawingLayer(new Color(206, 206, 206), true, 1);
-		this.layers[DrawingLayers.VoiceEffects2] = new DrawingLayer(new Color(183,183,183), true, 0);
-		this.layers[DrawingLayers.VoiceEffectsDraw2] = new DrawingLayer(new Color(183,183,183), false, 1*scale);
-		this.layers[DrawingLayers.VoiceDraw2] = new DrawingLayer(new Color(206, 206, 206), false, 1*scale);
+		this.layers[DrawingLayers.Voice2] = new DrawingLayer(new Color(150, 150, 150), true, 1);
+		this.layers[DrawingLayers.VoiceEffects2] = new DrawingLayer(new Color(150, 150, 150), true, 0);
+		this.layers[DrawingLayers.VoiceEffectsDraw2] = new DrawingLayer(new Color(150, 150, 150), false, 1*scale);
+		this.layers[DrawingLayers.VoiceDraw2] = new DrawingLayer(new Color(150, 150, 150), false, 1*scale);
 		this.layers[DrawingLayers.Voice1] = new DrawingLayer(new Color(34,34,17), true, 1);
 		this.layers[DrawingLayers.VoiceEffects1] = new DrawingLayer(new Color(34,34,17), true, 0);
 		this.layers[DrawingLayers.VoiceEffectsDraw1] = new DrawingLayer(new Color(34,34,17), false, 1*scale);

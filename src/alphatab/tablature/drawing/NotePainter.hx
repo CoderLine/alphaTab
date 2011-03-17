@@ -48,7 +48,8 @@ class NotePainter
 				layer.addMusicSymbol(s, x, y, scale);
 
 	}
-	public static function paintBar(layer:DrawingLayer, x1:Int, y1:Int, x2:Int, y2:Int, count:Int, dir:Int, scale:Float ) : Void
+    
+	public static function paintBar(layer:DrawingLayer, x1:Float, y1:Float, x2:Float, y2:Float, count:Int, dir:Int, scale:Float ) : Void
 	{
 		var width:Float = Math.max(1.0, Math.round(3.0 * scale));
 		for (i in 0 ... count) {
@@ -62,7 +63,7 @@ class NotePainter
 			layer.closeFigure();
 		}
 	}
-	
+    
 	public static function paintHarmonic(layer:DrawingLayer, x:Int, y:Int, scale:Float)
 	{
 		layer.addMusicSymbol(MusicFont.Harmonic, x, y, scale);
@@ -86,10 +87,10 @@ class NotePainter
 	   var value = note.value;                             
 	       
 	       
-	   if(value <= 30 || value >= 67 || contains(normalKeys, value) ) {
+	   if(value <= 30 || value >= 67 || Lambda.has(normalKeys, value) ) {
 	       layer.addMusicSymbol(MusicFont.NoteQuarter, x, y, scale);
 	   }
-	   else if(contains(xKeys,value)) {
+	   else if(Lambda.has(xKeys, value)) {
 	       layer.addMusicSymbol(MusicFont.Sticks, x, y, scale);
 	   }
 	   else if(value == 46) {
@@ -106,11 +107,4 @@ class NotePainter
 	   } 
 	}
 	
-	private static function contains(notes:Array<Int>, searched:Int)
-	{
-	   for(i in 0 ... notes.length) {
-	       if(notes[i] == searched) return true;
-	   }
-	   return false;
-	}
 }

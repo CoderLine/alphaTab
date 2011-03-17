@@ -28,6 +28,7 @@ class DrawingResources
 	public static var chordFont:String;
 	public static var timeSignatureFont:String;
 	public static var clefFont:String;
+	public static var clefFontHeight:Int;
 	public static var musicFont:String;
 	public static var tempoFont:String;
 	public static var graceFontHeight:Int;
@@ -46,11 +47,13 @@ class DrawingResources
 	{ 
 	    var sansFont = "'Arial'";
 	    var serifFont = "'Times New Roman'";
+        
 		defaultFontHeight = Math.round(9*scale);
 		defaultFont = Std.string(defaultFontHeight) + "px " + sansFont;
 		chordFont = Std.string(9*scale) + "px " + sansFont;
 		timeSignatureFont = Std.string(20*scale) + "px " + sansFont;
-		clefFont = Std.string(13*scale) + "px " + sansFont;
+		clefFontHeight = Math.round(16 * scale);
+		clefFont = Std.string(clefFontHeight) + "px " + serifFont;
 		musicFont = Std.string(13*scale) + "px " + sansFont;
 		tempoFont = Std.string(11*scale) + "px " + sansFont;
 		graceFontHeight = Math.round(9*scale);

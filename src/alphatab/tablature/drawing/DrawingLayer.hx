@@ -42,15 +42,19 @@ class DrawingLayer
 	
 	public function draw(graphics:Canvas) : Void
 	{
+		graphics.textAlign = "left";
 		graphics.textBaseline = "middle";
         graphics.fillStyle = _color.toString();
         graphics.strokeStyle = _color.toString();
 		graphics.lineWidth = _penWidth;
 
         graphics.beginPath();
-		for (elm in _path) {
-			try {
-				switch (elm.Command) {
+		for (elm in _path) 
+        {
+			try 
+            {
+				switch (elm.Command) 
+                {
 					case "startFigure":
 						finish(graphics);
 						graphics.beginPath();
@@ -106,7 +110,8 @@ class DrawingLayer
 						graphics.rect(elm.X, elm.Y, elm.Width, elm.Height);
 				}
 			}
-			catch(err:String) {
+			catch (err:String) 
+            {
 				throw err;
 			}
 		}
@@ -183,10 +188,10 @@ class DrawingLayer
 	public function addLine(x1:Float, y1:Float, x2:Float, y2:Float): Void {
         _path.push({
             Command: "addLine",
-            X1: (x1) + 0.5,
-            Y1: (y1) + 0.5,
-            X2: (x2) + 0.5,
-            Y2: (y2) + 0.5
+            X1: Math.floor(x1) + 0.5,
+            Y1: Math.floor(y1) + 0.5,
+            X2: Math.floor(x2) + 0.5,
+            Y2: Math.floor(y2) + 0.5
         });
     }
 	

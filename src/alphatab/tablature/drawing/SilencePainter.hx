@@ -39,6 +39,7 @@ class SilencePainter
 		y += layout.scoreLineSpacing - (4*layout.scale);
 		layer.addMusicSymbol(MusicFont.SilenceHalf, x, y, layout.scale);
 	}
+    
 	public static function paintQuarter(layer:DrawingLayer, x:Float, y:Float, layout:ViewLayout)
 	{
 		y += layout.scoreLineSpacing * 0.5;

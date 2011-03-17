@@ -1,3 +1,19 @@
+/*
+ * This file is part of alphaTab.
+ *
+ *  alphaTab is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  alphaTab is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package alphatab.tablature;
 import alphatab.model.HeaderFooterElements;
 import alphatab.model.Measure;
@@ -10,10 +26,11 @@ import alphatab.model.Tuning;
 import alphatab.tablature.drawing.DrawingContext;
 import alphatab.tablature.drawing.DrawingLayers;
 import alphatab.tablature.drawing.DrawingResources;
-import alphatab.tablature.model.LyricsImpl;
-import alphatab.tablature.model.MeasureImpl;
-import alphatab.tablature.model.TrackImpl;
-
+import alphatab.tablature.model.MeasureDrawing;
+import alphatab.tablature.model.ScoreStave;
+import alphatab.tablature.model.StaveLine;
+import alphatab.tablature.model.StaveSpacing;
+import alphatab.tablature.model.TablatureStave;
 
 /**
  * This layout renders measures in form of a page. 
@@ -23,18 +40,18 @@ class PageViewLayout extends ViewLayout
 	public static var PAGE_PADDING:Padding = new Padding(20, 40, 20, 40);
 	public static inline var WIDTH_ON_100:Int = 795;
 	
-	private var _lines:Array<TempLine>;
-	private var _maximumWidth:Float;
+	private var _lines:Array<StaveLine>;
+	private var _maximumWidth:Int;
 	
 	public function new() 
 	{
 		super();
-		_lines = new Array<TempLine>();
+		_lines = new Array<StaveLine>();
 		_maximumWidth = 0;
 		contentPadding = PAGE_PADDING;
 	}
 	
-	public function getMaxWidth() : Float
+	public function getMaxWidth() : Int
 	{
 		if (_maximumWidth <= 0) {
 			_maximumWidth = tablature.canvas.width();
@@ -52,52 +69,119 @@ class PageViewLayout extends ViewLayout
 		super.init(scale);
 		layoutSize = new Point(this.getSheetWidth() - PAGE_PADDING.getHorizontal(), height);
 	}
+        
+    // 
+    // Layouting
+    //
 	
 	public override function prepareLayout(clientArea:Rectangle, x:Int, y:Int) : Void
 	{
-		_lines = new Array<TempLine>();
-		_maximumWidth = clientArea.width;
+		_lines = new Array<StaveLine>();
+		_maximumWidth = Math.floor(clientArea.width);
 		
 		width = 0;
 		height = 0;
 		
-		var posY:Int = Math.round(y);
+		var posY:Int = y;
 		
-		var track:TrackImpl = cast tablature.track;
+		var track:Track = tablature.track;
 		var measureCount:Int = tablature.track.measures.length;
 		var nextMeasureIndex:Int = 0;
 		
-		
+		x += contentPadding.left;
 		posY = Math.floor(layoutSongInfo(x, posY) + firstMeasureSpacing);
-		height = posY;
 		 
-		while (measureCount > nextMeasureIndex) {
-			var spacing:TrackSpacing = new TrackSpacing();
-			spacing.set(TrackSpacingPositions.ScoreMiddleLines, Math.round(scoreLineSpacing * 5));
+		while (measureCount > nextMeasureIndex) 
+        {
+            // calculate a stave line
+			var line:StaveLine = getStaveLine(track, nextMeasureIndex, posY, x);
+            _lines.push(line);
+
+            // try to fit full line
+            fitLine(track, line);            
 			
-			var line:TempLine = this.GetTempLines(track, nextMeasureIndex, spacing);
-			_lines.push(line);
+            // add it to offset
+            posY += line.getHeight();
 			
-			spacing.set(TrackSpacingPositions.ScoreUpLines, Math.round(Math.abs(line.MinY)));
-			if (line.MaxY + minScoreTabSpacing > scoreSpacing) {
-				spacing.set(TrackSpacingPositions.ScoreDownLines, Math.round(line.MaxY - (scoreLineSpacing * 4)));
-			}
-			spacing.set(TrackSpacingPositions.TablatureTopSeparator, Math.round(minScoreTabSpacing));
-			spacing.set(TrackSpacingPositions.Tablature, Math.round(track.tabHeight + stringSpacing + 1));
-			spacing.set(TrackSpacingPositions.Lyric, 10);
-			checkDefaultSpacing(spacing);
-			
-			measureLine(track, line, x, posY, spacing);
-			
-			var lineHeight = Math.round(spacing.getSize()); 
-			posY += Math.round(lineHeight + trackSpacing);
-			height += Math.round(lineHeight + trackSpacing);
-			
-			nextMeasureIndex = line.LastIndex + 1;
+            // next measure index
+			nextMeasureIndex = line.lastIndex() + 1;
 		}
+        
+        height = posY + contentPadding.bottom;
 		
 		width = getSheetWidth();
 	}
+        
+    public function getStaveLine(track:Track, startIndex:Int, y:Int, x:Int) : StaveLine
+	{
+		var line:StaveLine = createStaveLine(track);
+		line.y = y;
+		line.x = x;
+                
+        // default spacings
+        line.spacing.set(StaveLine.TopPadding, Math.floor(10 * scale));
+        line.spacing.set(StaveLine.BottomSpacing, Math.floor(10 * scale));
+		
+		var measureCount = track.measureCount(); 
+        x = 0;
+		for (i in startIndex ... measureCount) 
+        {
+			var measure:MeasureDrawing = cast track.measures[i];
+            measure.staveLine = line;
+            measure.performLayout(this);            
+                        
+            // try to fit measure into line            
+			if ((x + measure.width) >= getMaxWidth() && line.measures.length != 0) 
+            {
+				line.fullLine = true;
+                line.width = x;        
+				return line;
+			}
+            
+            measure.x = x;            
+			x += measure.width;            
+            
+            for (stave in line.staves)
+            {
+                stave.prepare(measure);
+            }
+            		
+			line.addMeasure(i);
+		}
+        line.width = x;        
+		return line;
+	}
+    
+    private function fitLine(track:Track, line:StaveLine)
+    {
+        // calculate additional space for each measure
+        var measureSpace:Int = 0;
+		if (line.fullLine) 
+        {
+			var freeSpace = getMaxWidth() - line.width;
+           
+			if (freeSpace != 0 && line.measures.length > 0) 
+            {
+				measureSpace = Math.round(freeSpace / line.measures.length);
+			}
+		}
+        
+        // add it to the measures
+        var measureX:Int = 0;
+        for (i in 0 ... line.measures.length)
+        {
+			var index:Int = line.measures[i];
+			var measure:MeasureDrawing = cast track.measures[index];
+            
+            measure.setSpacing(measureSpace);
+            measure.x = measureX;
+            
+            measureX += measure.width + measureSpace;
+        }
+        line.width = measureX;
+        
+        width = Math.round(Math.max(width, measureX));
+    }
 	
 	private function layoutSongInfo(x:Int, y:Int): Int
 	{
@@ -161,48 +245,20 @@ class PageViewLayout extends ViewLayout
 		return y;
 	}
 	
-	public function measureLine(track:Track, line:TempLine, x:Int, y:Int, spacing:TrackSpacing) : Void
-	{
-		var realX:Int = contentPadding.left + x;
-		var realY:Int = y;
-		var w:Int = contentPadding.left;
-		
-		var measureSpacing:Int = 0;
-		if(line.FullLine) {
-			var diff = getMaxWidth() - line.TempWidth;
-			if(diff != 0 && line.Measures.length > 0) {
-				measureSpacing = Math.round(diff / line.Measures.length);
-			}
-		}
-		
-		for(i in 0 ... line.Measures.length) {
-			var index:Int = line.Measures[i];
-			var currMeasure:MeasureImpl = cast track.measures[index];
-			
-			currMeasure.posX = realX;
-			currMeasure.posY = realY;
-			currMeasure.ts = spacing;
-			currMeasure.isFirstOfLine = i==0;
-			
-			var measureWidth:Int = Math.round(currMeasure.width + measureSpacing);
-			currMeasure.spacing = measureSpacing;
-			
-			realX += measureWidth;
-			w += measureWidth;
-		}
-		width = Math.round(Math.max(width, w));
-	}
+	//
+    // Painting
+    //
 	
 	public override function paintSong(ctx:DrawingContext, clientArea:Rectangle, x:Int, y:Int) : Void
 	{
 		var track:Track = tablature.track;
 		y = Math.round(y + contentPadding.top);
 		y = Math.round(paintSongInfo(ctx, clientArea, x, y) + firstMeasureSpacing);
-		var beatCount:Int = 0;
+		//var beatCount:Int = 0;
 		for (l in 0 ... _lines.length) 
 		{
-			var line:TempLine = _lines[l];
-			beatCount = this.PaintLine(track, line, beatCount, ctx);
+			var line:StaveLine = _lines[l];
+            line.paint(this, track, ctx);
 		}
 	}
 	
@@ -215,7 +271,7 @@ class PageViewLayout extends ViewLayout
 		var str:String = "";
 		if (song.title != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.TITLE != 0))
 		{
-			str = ParsePageSetupString(song.pageSetup.title);
+			str = parsePageSetupString(song.pageSetup.title);
 			ctx.graphics.font = DrawingResources.titleFont;
 			size = ctx.graphics.measureText(str);
 			tX = (clientArea.width - size) / 2;
@@ -224,7 +280,7 @@ class PageViewLayout extends ViewLayout
 		}		
 		if (song.subtitle != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.SUBTITLE != 0))
 		{
-			str = ParsePageSetupString(song.pageSetup.subtitle);
+			str = parsePageSetupString(song.pageSetup.subtitle);
 			ctx.graphics.font = DrawingResources.subtitleFont;
 			size = ctx.graphics.measureText(str);
 			tX = (clientArea.width - size) / 2;
@@ -233,7 +289,7 @@ class PageViewLayout extends ViewLayout
 		}
 		if (song.artist != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.ARTIST != 0))
 		{
-			str = ParsePageSetupString(song.pageSetup.artist);
+			str = parsePageSetupString(song.pageSetup.artist);
 			ctx.graphics.font = DrawingResources.subtitleFont;
 			size = ctx.graphics.measureText(str);
 			tX = (clientArea.width - size) / 2;
@@ -242,7 +298,7 @@ class PageViewLayout extends ViewLayout
 		}
 		if (song.album != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.ALBUM != 0))
 		{
-			str = ParsePageSetupString(song.pageSetup.album);
+			str = parsePageSetupString(song.pageSetup.album);
 			ctx.graphics.font = DrawingResources.subtitleFont;
 			size = ctx.graphics.measureText(str);
 			tX = (clientArea.width - size) / 2;
@@ -251,7 +307,7 @@ class PageViewLayout extends ViewLayout
 		}
 		if (song.music != "" && song.music == song.words && (song.pageSetup.headerAndFooter & HeaderFooterElements.WORDS_AND_MUSIC != 0))
 		{
-			str = ParsePageSetupString(song.pageSetup.wordsAndMusic);
+			str = parsePageSetupString(song.pageSetup.wordsAndMusic);
 			ctx.graphics.font = DrawingResources.wordsFont;
 			size = ctx.graphics.measureText(str);
 			tX = (clientArea.width - size - contentPadding.right);
@@ -262,7 +318,7 @@ class PageViewLayout extends ViewLayout
 		{
 			if (song.music != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.MUSIC != 0))
 			{
-				str = ParsePageSetupString(song.pageSetup.music);
+				str = parsePageSetupString(song.pageSetup.music);
 				ctx.graphics.font = DrawingResources.wordsFont;
 				size = ctx.graphics.measureText(str);
 				tX = (clientArea.width - size - contentPadding.right);
@@ -270,7 +326,7 @@ class PageViewLayout extends ViewLayout
 			}
 			if (song.words != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.WORDS != 0))
 			{
-				str = ParsePageSetupString(song.pageSetup.words);
+				str = parsePageSetupString(song.pageSetup.words);
 				ctx.graphics.font = DrawingResources.wordsFont;
 				ctx.get(DrawingLayers.LayoutBackground).addString(str, DrawingResources.wordsFont, x, y, "top");
 			}
@@ -319,7 +375,7 @@ class PageViewLayout extends ViewLayout
 		return y;
 	}
 	
-	private function ParsePageSetupString(input:String) : String
+	private function parsePageSetupString(input:String) : String
 	{
 		var song:Song = tablature.track.song;
 		input = StringTools.replace(input, "%TITLE%", song.title);
@@ -333,75 +389,4 @@ class PageViewLayout extends ViewLayout
 		return input;
 	}
 	
-	public function PaintLine(track:Track, line:TempLine, beatCount:Int, context:DrawingContext) : Int
-	{ 
-		for(i in 0 ... line.Measures.length) {
-			var index:Int = line.Measures[i];
-			var currentMeasure:MeasureImpl = cast track.measures[index]; 
-			
-			currentMeasure.paintMeasure(this, context);
-			
-			if (track.song.lyrics != null && track.song.lyrics.trackChoice == track.number)
-			{
-				var ly:LyricsImpl = cast track.song.lyrics;
-				ly.paintCurrentNoteBeats(context, this, currentMeasure, beatCount, currentMeasure.posX, currentMeasure.posY);
-			}
-			beatCount += currentMeasure.beatCount();
-		}
-		return beatCount;
-	}
-	
-	public function GetTempLines(track:Track, fromIndex:Int, trackSpacing:TrackSpacing) : TempLine
-	{
-		var line:TempLine = new TempLine();
-		line.MaxY = 0;
-		line.MinY = 0;
-		line.TrackSpacing = trackSpacing;
-		
-		var measureCount = track.measureCount();
-		for (i in fromIndex ...  measureCount) {
-			var measure:MeasureImpl = cast track.measures[i];
-			
-			if((line.TempWidth + measure.width) >= getMaxWidth() && line.Measures.length != 0) {
-				line.FullLine = true;
-				return line;
-			}
-			line.TempWidth += measure.width;
-			line.MaxY = measure.maxY > line.MaxY ? measure.maxY : line.MaxY;
-			line.MinY = measure.minY < line.MinY ? measure.minY : line.MinY;
-			
-			line.AddMeasure(i);
-			measure.registerSpacing(this, trackSpacing);
-		}
-		
-		return line;
-	}
-}
-
-class TempLine 
-{
-	public var TrackSpacing:TrackSpacing;
-	public var TempWidth:Int;
-	public var LastIndex:Int;
-	public var FullLine:Bool;
-	public var MaxY:Int;
-	public var MinY:Int;
-	public var Measures:Array<Int>;
-	
-	public function new()
-	{
-		this.TrackSpacing = null;
-		this.TempWidth = 0;
-		this.LastIndex = 0;
-		this.FullLine = false;
-		this.MaxY = 0;
-		this.MinY = 0;
-		this.Measures = new Array<Int>();
-	}
-	
-	public function AddMeasure(index:Int)
-	{
-		this.Measures.push(index);
-		this.LastIndex = index;
-	}
 }

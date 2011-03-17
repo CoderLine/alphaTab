@@ -60,6 +60,7 @@ import alphatab.model.Padding;
 /**
  * A reader for GuitarPro 5 files. 
  */
+// TODO: There must be a wah wah flag somewhere. 
 class Gp5Reader extends Gp4Reader
 {
 	public function new() 

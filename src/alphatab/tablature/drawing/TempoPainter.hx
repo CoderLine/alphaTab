@@ -21,17 +21,17 @@ package alphatab.tablature.drawing;
  */
 class TempoPainter 
 {
-
 	public static function paintTempo(context:DrawingContext, x:Int, y:Int, scale:Float)
 	{
-		var realScale:Float = scale /5.0;
 		var layer:DrawingLayer = context.get(DrawingLayers.MainComponents);
 		var draw:DrawingLayer = context.get(DrawingLayers.MainComponentsDraw);
-		var iWidth = Math.round(scale * 1.33);
-		var iHeight = Math.round(scale * 3.5);
-		NotePainter.paintNote(layer, Math.floor(x + (1*realScale)), Math.floor(y + (iHeight - (1.0*scale))), realScale/1.6, true);
+        
+        var w:Int = Math.round(6 * scale);
+        var h:Int = Math.round(12 * scale);
+        var h2:Int = Math.round(h - (3*scale));
+        
+		NotePainter.paintNote(layer, x, y + h, 0.75, true);
 		draw.startFigure();
-		draw.moveTo(x + iWidth, y);
-		draw.lineTo(x + iWidth, Math.floor(y + (iHeight - (0.66 * scale))));
+        draw.addLine(x + w, y, x + w, y + h);
 	}
 }

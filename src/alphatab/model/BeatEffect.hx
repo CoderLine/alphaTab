@@ -28,7 +28,12 @@ class BeatEffect
 	public var pickStroke:Int;
 	public var hasPickStroke:Bool;
 	public var chord:Chord;
+    public function isChord() : Bool
+	{
+		return this.chord != null;
+	}
 	
+
 	public var fadeIn:Bool;
 	public var vibrato:Bool;
 	

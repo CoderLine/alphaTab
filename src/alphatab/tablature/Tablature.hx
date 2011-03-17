@@ -1,3 +1,19 @@
+/*
+ * This file is part of alphaTab.
+ *
+ *  alphaTab is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  alphaTab is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package alphatab.tablature;
 
 import alphatab.midi.MidiRepeatController;
@@ -14,15 +30,14 @@ import alphatab.model.SongManager;
 import alphatab.platform.Canvas;
 import alphatab.platform.PlatformFactory;
 import alphatab.tablature.drawing.DrawingResources;
-import alphatab.tablature.model.BeatImpl;
-import alphatab.tablature.model.MeasureImpl;
-import alphatab.tablature.model.SongFactoryImpl;
+import alphatab.tablature.model.ScoreStave;
+import alphatab.tablature.model.TablatureStave;
 
 /**
  * A helper type used for searching measures. 
  */
 typedef MeasureSearchResult = {
-    var measure : MeasureImpl;
+    var measure : Measure;
     var realPosition : Int;
 }
 
@@ -40,15 +55,15 @@ class Tablature
 	public var viewLayout:ViewLayout;
 	public var track:Track;
 	public var autoSizeWidth:Bool;
-	public var onCaretChanged:BeatImpl->Void;
-	public var songManager:SongManager;
+	public var onCaretChanged:Beat->Void;
+    
+    public var staves:Array<String>;
 
 	
-	public function new(source:Dynamic, msg:String = "") 
+	public function new(source:Dynamic, staves:Array<String> = null, msg:String = "") 
 	{
 		canvas = PlatformFactory.getCanvas(source);
 		track = null;
-		songManager = new SongManager(new SongFactoryImpl());
 		
 		errorMessage = StringTools.trim(msg);
 		
@@ -56,13 +71,26 @@ class Tablature
 		{ 
 			errorMessage = "Please set a song's track to display the tablature";
 		}
-		
-		
+		this.staves = new Array<String>();	
+        if (staves == null)
+        {	
+            this.staves.push(ScoreStave.STAVE_ID);
+            this.staves.push(TablatureStave.STAVE_ID);
+        }
+        else
+        {
+            for (stave in staves)
+            {
+                this.staves.push(stave);
+            }
+        }
 		
 		viewLayout = new PageViewLayout();
 		viewLayout.setTablature(this);
 		updateScale(1.0);	
 	}
+    
+    
 	
 	public function setTrack(track:Track) : Void 
 	{
@@ -98,7 +126,6 @@ class Tablature
 		if(autoSizeWidth)
 			canvas.setWidth(viewLayout.width);
 		canvas.setHeight(viewLayout.height);
-
 	}
 	
 	public function onPaint() 
@@ -132,7 +159,6 @@ class Tablature
 	{
 		if (track == null) return;
 		
-		viewLayout.updateSong();
         doLayout();
         _updateSong = false;
 	}
@@ -168,8 +194,8 @@ class Tablature
 			var result:MeasureSearchResult = findMeasure(position);
 			var realPosition:Int = result.realPosition;
 			_lastRealPosition = realPosition;
-			var measure:MeasureImpl = result.measure;
-			var beat:BeatImpl = cast findBeat(realPosition, position, measure);
+			var measure:Measure = result.measure;
+			var beat:Beat = cast findBeat(realPosition, position, measure);
 			if (measure != null && beat != null)
 			{
 				_selectedBeat = beat;
@@ -184,7 +210,7 @@ class Tablature
 		var result:MeasureSearchResult = getMeasureAt(position);
 		if (result.measure == null)
 		{
-			result.measure = cast songManager.getFirstMeasure(track);
+			result.measure = SongManager.getFirstMeasure(track);
 		}
 		return result;
 	}
@@ -236,7 +262,7 @@ class Tablature
 					return beat;
 				}
 			}
-			return songManager.getFirstBeat(measure.beats);
+			return SongManager.getFirstBeat(measure.beats);
 		}
 		return null;
 	}	

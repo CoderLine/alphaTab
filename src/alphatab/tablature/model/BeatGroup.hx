@@ -14,118 +14,144 @@
  *  You should have received a copy of the GNU General Public License
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package alphatab.tablature.model;
-import alphatab.model.Note;
 import alphatab.model.Duration;
+import alphatab.model.Note;
+import alphatab.model.SongManager;
 import alphatab.model.VoiceDirection;
-import alphatab.tablature.ViewLayout;
 
 /**
  * A beatgroup contains a set of notes which are grouped by bars.
  */
 class BeatGroup 
 {
-	private static var SCORE_MIDDLE_KEYS:Array<Int> = [ 55, 40, 40, 50 ];
-	private static var SCORE_SHARP_POSITIONS:Array<Int> = [7, 7, 6, 6, 5, 4, 4, 3, 3, 2, 2, 1 ];
-	private static var SCORE_FLAT_POSITIONS:Array<Int> = [ 7, 6, 6, 5, 5, 4, 3, 3, 2, 2, 1, 1 ];
-
-	private static inline var UP_OFFSET:Int = 28; 
-	private static inline var DOWN_OFFSET:Int = 35;
-	
-	private var _voice:Int;
-	private var _voices:Array<VoiceImpl>;
-	private var _firstMinNote:NoteImpl;
-	private var _firstMaxNote:NoteImpl;
-	private var _lastMinNote:NoteImpl;
-	private var _lastMaxNote:NoteImpl;
-	
-	public var isPercussion:Bool;
-
-	public var direction:Int;
-	public var minNote:NoteImpl;
-	public var maxNote:NoteImpl;
-
-	public function new(voice:Int) 
+    private static var SCORE_MIDDLE_KEYS:Array<Int> = [ 55, 40, 40, 50 ];
+        
+    private var _voices:Array<VoiceDrawing>;
+    
+    private var _lastVoice:VoiceDrawing;
+    
+    // the first min note within this group
+	public var firstMinNote:NoteDrawing;
+    // the first max note within this group
+	public var firstMaxNote:NoteDrawing;
+    // the last min note within this group
+	public var lastMinNote:NoteDrawing;
+    // the last max note within this group
+	public var lastMaxNote:NoteDrawing;
+    // the overall min note within this group
+	public var minNote:NoteDrawing;
+    // the overall max note within this group
+	public var maxNote:NoteDrawing;    
+    
+    public var isPercussion:Bool;
+    
+    public function new() 
+    { 
+        _voices = new Array<VoiceDrawing>();
+    }
+ 
+    public function getDirection()
+    { 
+        var max:Float = Math.abs(getNoteValueForPosition(minNote) - (SCORE_MIDDLE_KEYS[_voices[0].measureDrawing().clef] + 100));
+        var min:Float = Math.abs(getNoteValueForPosition(maxNote) - (SCORE_MIDDLE_KEYS[_voices[0].measureDrawing().clef] - 100));
+        return max > min ? VoiceDirection.Up : VoiceDirection.Down;
+    }
+    
+    private function getNoteValueForPosition(note:Note) 
 	{
-		_voice = voice;
-		_voices = new Array<VoiceImpl>();
-		direction = VoiceDirection.None;
-		_firstMinNote = null;
-		_firstMaxNote = null;
-		_lastMinNote = null;
-		_lastMaxNote = null;
-		maxNote = null;
-		minNote = null;
+	   if(note.voice.beat.measure.track.isPercussionTrack) 
+	   {
+	       return PercussionMapper.getValue(note);
+	   }
+	   else
+	   {
+	       return note.realValue();
+       }
 	}
-	
-	public function checkVoice(voice:VoiceImpl) : Void
-	{
-	    if(voice.beat.measure.track.isPercussionTrack)
+    
+    public function check(voice:VoiceDrawing) : Bool
+    {
+        if(voice.beat.measure.track.isPercussionTrack)
 	    {
 	       isPercussion = true;
 	    }
-	
-		checkNote(voice.maxNote);
-		checkNote(voice.minNote);
-		_voices.push(voice);
+        
+        // allow adding if there are no voices yet
+        var add:Bool = false;
+        if (_voices.length == 0)
+        {
+            add = true;
+        }
+        else if (canJoin(_lastVoice, voice)) 
+        {
+            add = true;
+        }
+        
+        if (add)
+        {
+            _lastVoice = voice;
+            _voices.push(voice);
+            checkNote(voice.minNote);
+            checkNote(voice.maxNote);
+        }
+        
+        return add;
+    }
+    
+    private function checkNote(note:NoteDrawing)
+    {
+        var value:Int = note.realValue();
 
-		if (voice.direction != VoiceDirection.None)
+		// detect the smallest note which is at the beginning of this group
+		if (firstMinNote == null || note.voice.beat.start < firstMinNote.voice.beat.start)
 		{
-			voice.direction = voice.direction;
+			firstMinNote = note;
 		}
-	}
-	
-	private function checkNote(note:NoteImpl) : Void
-	{
-		var value:Int = note.realValue();
-
-		//FIRST MIN NOTE
-		if (_firstMinNote == null || note.voice.beat.start < _firstMinNote.voice.beat.start)
+		else if (note.voice.beat.start == firstMinNote.voice.beat.start)
 		{
-			_firstMinNote = note;
-		}
-		else if (note.voice.beat.start == _firstMinNote.voice.beat.start)
-		{
-			if (note.realValue() < _firstMinNote.realValue())
+			if (note.realValue() < firstMinNote.realValue())
 			{
-				_firstMinNote = note;
+				firstMinNote = note;
 			}
 		}
-		//FIRST MAX NOTE
-		if (_firstMaxNote == null || note.voice.beat.start < _firstMaxNote.voice.beat.start)
+        
+        // detect the biggest note which is at the beginning of this group
+		if (firstMaxNote == null || note.voice.beat.start < firstMaxNote.voice.beat.start)
 		{
-			_firstMaxNote = note;
+			firstMaxNote = note;
 		}
-		else if (note.voice.beat.start == _firstMaxNote.voice.beat.start)
+		else if (note.voice.beat.start == firstMaxNote.voice.beat.start)
 		{
-			if (note.realValue() > _firstMaxNote.realValue())
+			if (note.realValue() > firstMaxNote.realValue())
 			{
-				_firstMaxNote = note;
+				firstMaxNote = note;
 			}
 		}
 
-		//LAST MIN NOTE
-		if (_lastMinNote == null || note.voice.beat.start > _lastMinNote.voice.beat.start)
+        // detect the smallest note which is at the end of this group
+		if (lastMinNote == null || note.voice.beat.start > lastMinNote.voice.beat.start)
 		{
-			_lastMinNote = note;
+			lastMinNote = note;
 		}
-		else if (note.voice.beat.start == _lastMinNote.voice.beat.start)
+		else if (note.voice.beat.start == lastMinNote.voice.beat.start)
 		{
-			if (note.realValue() < _lastMinNote.realValue())
+			if (note.realValue() < lastMinNote.realValue())
 			{
-				_lastMinNote = note;
+				lastMinNote = note;
 			}
 		}
-		//LAST MIN NOTE
-		if (_lastMaxNote == null || note.voice.beat.start > _lastMaxNote.voice.beat.start)
+        // detect the biggest note which is at the end of this group
+		if (lastMaxNote == null || note.voice.beat.start > lastMaxNote.voice.beat.start)
 		{
-			_lastMaxNote = note;
+			lastMaxNote = note;
 		}
-		else if (note.voice.beat.start == _lastMaxNote.voice.beat.start)
+		else if (note.voice.beat.start == lastMaxNote.voice.beat.start)
 		{
-			if (note.realValue() > _lastMaxNote.realValue())
+			if (note.realValue() > lastMaxNote.realValue())
 			{
-				_lastMaxNote = note;
+				lastMaxNote = note;
 			}
 		}
 
@@ -137,113 +163,42 @@ class BeatGroup
 		{
 			minNote = note;
 		}
-	}
-	
-	public function finish(layout:ViewLayout, measure:MeasureImpl)
-	{
-		if (direction == VoiceDirection.None)
-		{
-			if (measure.notEmptyVoices > 1)
-			{
-				direction = _voice == 0 ? VoiceDirection.Up : VoiceDirection.Down;
-			}
-			else
-			{
-				var max:Float = Math.abs(getNoteValueForPosition(minNote) - (SCORE_MIDDLE_KEYS[measure.clef] + 100));
-				var min:Float = Math.abs(getNoteValueForPosition(maxNote) - (SCORE_MIDDLE_KEYS[measure.clef] - 100));
-				direction = max > min ? VoiceDirection.Up : VoiceDirection.Down;
-			}
-		}
-	}
-	
-	private function getNoteValueForPosition(note:Note) 
-	{
-	   if(isPercussion) 
-	   {
-	       return PercussionMapper.getValue(note);
-	   }
-	   else
-	   {
-	       return note.realValue();
-       }
-	}
-	
-	public function getY1(layout:ViewLayout, note:NoteImpl, key:Int, clef:Int) : Int
-	{
-		var scale:Float = (layout.scoreLineSpacing / 2.00);
-		var noteValue:Int = getNoteValueForPosition(note);
-		var index:Int = noteValue % 12;
-		var step:Int = Math.floor(noteValue / 12);
-		var offset:Float = (7 * step) * scale;
-		var scoreLineY:Int= key <= 7
-							 ? Math.floor((SCORE_SHARP_POSITIONS[index]*scale) - offset)
-							 : Math.floor((SCORE_FLAT_POSITIONS[index]*scale) - offset);
-
-		scoreLineY += Math.floor(MeasureImpl.SCORE_KEY_OFFSETS[clef] * scale);
-
-		return scoreLineY;
-	}
-	
-	public function getY2(layout:ViewLayout, x:Int, key:Int, clef:Int) : Int
-	{
-		var MaxDistance:Int = 10;
-		var upOffset:Float = getUpOffset(layout);
-		var downOffset:Float = getDownOffset(layout);
-		var y:Int;
-		var x1:Int;
-		var x2:Int;
-		var y1:Int;
-		var y2:Int;
-		if (direction == VoiceDirection.Down)
-		{
-			if (minNote != _firstMinNote && minNote != _lastMinNote)
-			{
-				return Math.round(getY1(layout, minNote, key, clef) + downOffset);
-			}
-
-			y = 0;
-			x1 = Math.round(_firstMinNote.posX() + _firstMinNote.beatImpl().spacing());
-			x2 = Math.round(_lastMinNote.posX() + _lastMinNote.beatImpl().spacing());
-			y1 = Math.round(getY1(layout, _firstMinNote, key, clef) + downOffset);
-			y2 = Math.round(getY1(layout, _lastMinNote, key, clef) + downOffset);
-
-			if (y1 > y2 && (y1 - y2) > MaxDistance) y2 = (y1 - MaxDistance);
-			if (y2 > y1 && (y2 - y1) > MaxDistance) y1 = (y2 - MaxDistance);
-
-			if ((y1 - y2) != 0 && (x1 - x2) != 0 && (x1 - x) != 0)
-			{
-				y = Math.round(((y1 - y2) / (x1 - x2)) * (x1 - x));
-			}
-			return y1 - y;
-		}
-		if (maxNote != _firstMaxNote && maxNote != _lastMaxNote)
-		{
-			return Math.round(getY1(layout, maxNote, key, clef) - upOffset);
-		}
-		y = 0;
-		x1 = Math.round(_firstMaxNote.posX() + _firstMaxNote.beatImpl().spacing());
-		x2 = Math.round(_lastMaxNote.posX() + _lastMaxNote.beatImpl().spacing());
-		y1 = Math.round(getY1(layout, _firstMaxNote, key, clef) - upOffset);
-		y2 = Math.round(getY1(layout, _lastMaxNote, key, clef) - upOffset);
-
-		if (y1 < y2 && (y2 - y1) > MaxDistance) y2 = (y1 + MaxDistance);
-		if (y2 < y1 && (y1 - y2) > MaxDistance) y1 = (y2 + MaxDistance);
-
-		if ((y1 - y2) != 0 && (x1 - x2) != 0 && (x1 - x) != 0)
-		{
-			y = Math.round(((y1 - y2) / (x1 - x2)) * (x1 - x));
-		}
-		return y1 - y;
-	}
-	
-	public static function getUpOffset(layout:ViewLayout) : Float
-	{
-		return UP_OFFSET * (layout.scoreLineSpacing / 8.0);
-	}
-
-	public static function getDownOffset(layout:ViewLayout) : Float
-	{
-		return DOWN_OFFSET * (layout.scoreLineSpacing / 8.0);
-	}
-
+    }
+    
+    public static function canJoin(v1:VoiceDrawing, v2:VoiceDrawing)
+    {
+        // is this a voice we can join with?
+        if (v1 == null || v2 == null || v1.isRestVoice() || v2.isRestVoice())
+        {
+            return false;
+        } 
+        
+        var m1 = v1.measureDrawing();
+        var m2 = v2.measureDrawing();
+        // only join on same measure
+        if (m1 != m2) return false;
+        
+        // get times of those voices and check if the times 
+        // are in the same division
+        var start1 = v1.beat.start;
+        var start2 = v2.beat.start;
+        
+        // we can only join 8th, 16th, 32th and 64th voices
+        if (v1.duration.value < Duration.EIGHTH || v2.duration.value < Duration.EIGHTH)
+        {
+            // other voices only get a beam if they are on the same voice
+            return start1 == start2;
+        }
+        
+        // we have two 8th, 16th, 32th and 64th voices
+        // a division can contains a single quarter
+        var divisionLength = SongManager.getDivisionLength(m1.header);
+        
+        // check if they are on the same division 
+        var division1 = Math.floor((divisionLength + start1) / divisionLength);
+        var division2 = Math.floor((divisionLength + start2) / divisionLength);
+        
+        return division1 == division2;
+    }
+    
 }

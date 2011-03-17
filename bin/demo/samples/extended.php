@@ -61,6 +61,7 @@ $(document).ready(function() {
 	<option value="files/Effects.gp5">Effects (Gp5)</option>
 	<option value="files/Effects.gpx">Effects (Gpx)</option>
 	<option value="files/Drums.gp5">Drums (Gp5)</option>
+	<option value="files/Displaced.gp5">Displaced (Gp5)</option>
 </select>
 <input id="LoadSample" type="button" value="Load" />
 | 

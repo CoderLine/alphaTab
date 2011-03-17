@@ -16,7 +16,7 @@
  */
 var alphaTabWrapper;
 
-/**
+/** 
  * This is a jQuery plugin for embedding alphaTab in your websites. 
  */
 (function($)
@@ -29,8 +29,7 @@ var alphaTabWrapper;
         var self = this;
         var el = $(el);
         this.el = el;
-        this.factory = new alphatab.tablature.model.SongFactoryImpl();
-		var loaderSwf = 'alphaTab.flashloader.swf';
+        this.factory = new alphatab.tablature.model.DrawingSongModelFactory();
 		
 		// resolve absolute script path
 		var alphaTabTag = $('script[src$=/alphaTab.js]');
@@ -89,7 +88,8 @@ var alphaTabWrapper;
             zoom: 1.1,
             width:600,
             height:200,
-            autoSize: true
+            autoSize: true,
+            staves: null,
         };
 
         this.options = $.extend(defaults, options);
@@ -219,7 +219,7 @@ var alphaTabWrapper;
 		}
 
         // create tablature
-        this.tablature = new alphatab.tablature.Tablature(this.canvas, this.options.error);
+        this.tablature = new alphatab.tablature.Tablature(this.canvas, this.options.staves, this.options.error);
         this.tablature.autoSizeWidth = this.options.autoSize;
         this.tablature.updateScale(this.options.zoom);
 

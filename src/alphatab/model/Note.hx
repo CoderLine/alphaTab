@@ -31,13 +31,20 @@ class Note
 	public var voice:Voice;
 	public var durationPercent:Float;
 	
+    
+    private var _realValue:Int;
 	public function realValue() : Int
 	{
-		return value + voice.beat.measure.track.strings[string - 1].value;
+        if (_realValue == -1)
+        {
+            _realValue = value + voice.beat.measure.track.strings[string - 1].value;
+        }
+		return _realValue;
 	}
 	
 	public function new(factory:SongFactory)
 	{
+        _realValue = -1;
 		value = 0;
 		velocity = Velocities.DEFAULT;
 		string = 1;

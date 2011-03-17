@@ -29,67 +29,67 @@ class Measure
 	public var beats:Array<Beat>;
 	public var header:MeasureHeader;
 	
-	public function beatCount() : Int
+	public inline function beatCount() : Int
 	{
 		return beats.length;
 	}
 	
-	public function end() : Int
+	public inline function end() : Int
 	{
-		return start() + length();
+		return (start() + length());
 	}
 	
-	public function number() : Int
+	public inline function number() : Int
 	{
 		return header.number;
 	}
 	
-	public function keySignature(): Int
+	public inline function keySignature(): Int
 	{
 		return header.keySignature;
 	}
 	
-	public function repeatClose() : Int
+	public inline function repeatClose() : Int
 	{
 		return header.repeatClose;
 	}
 	
-	public function start() : Int
+	public inline function start() : Int
 	{
 		return header.start;	
 	}
 	
-	public function length() : Int
+	public inline function length() : Int
 	{
 		return header.length();
 	}
 	
-	public function tempo() : Tempo
+	public inline function tempo() : Tempo
 	{
 		return header.tempo;
 	}
 	
-	public function timeSignature() : TimeSignature
+	public inline function timeSignature() : TimeSignature
 	{
 		return header.timeSignature;
 	}
 
-	public function isRepeatOpen() : Bool
+	public inline function isRepeatOpen() : Bool
 	{
 		return header.isRepeatOpen;
 	}
 	
-	public function tripletFeel() : Int 
+	public inline function tripletFeel() : Int 
 	{
 		return header.tripletFeel;
 	}
 	
-	public function hasMarker() : Bool
+	public inline function hasMarker() : Bool
 	{
 		return header.hasMarker();
 	}
 	
-	public function marker() : Marker
+	public inline function marker() : Marker
 	{
 		return header.marker;
 	}
@@ -104,6 +104,7 @@ class Measure
 	public function addBeat(beat:Beat) : Void
 	{
 		beat.measure = this;
+        beat.index = beats.length;
 		beats.push(beat);
 	}
 }

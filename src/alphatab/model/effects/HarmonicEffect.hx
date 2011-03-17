@@ -25,7 +25,7 @@ class HarmonicEffect
 	public static var NATURAL_FREQUENCIES:Array<Array<Int>> = [[12, 12], [9, 28], [5, 28], [7, 19], [4, 28], [3, 31]];
 	
 	public var data:Int;
-	public var type:HarmonicType;
+	public var type:Int;
 	
 	public function new()
 	{

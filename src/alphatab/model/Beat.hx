@@ -29,6 +29,7 @@ class Beat
 	public var measure:Measure;
 	public var start:Int;
 	public var effect:BeatEffect;
+    public var index:Int;
 		
 	public function isRestBeat() : Bool
 	{

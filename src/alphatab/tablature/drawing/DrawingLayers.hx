@@ -16,7 +16,9 @@
  */
 package alphatab.tablature.drawing;
 
-
+/**
+ * Lists all available layers to draw into.
+ */
 class DrawingLayers
 {
 	public static inline var Background = 0;

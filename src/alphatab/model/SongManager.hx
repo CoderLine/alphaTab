@@ -16,8 +16,6 @@
  */
 package alphatab.model;
 import alphatab.file.SongLoader;
-import alphatab.tablature.model.BeatGroup;
-import alphatab.tablature.model.SongFactoryImpl;
 
 /**
  * This utility provides methods
@@ -70,7 +68,7 @@ class SongManager
 		return start;
 	}
 	
-	public function getFirstBeat(list:Array<Beat>) : Beat
+	public static function getFirstBeat(list:Array<Beat>) : Beat
 	{
 		return list.length > 0 ? list[0] : null;
 	}
@@ -313,7 +311,7 @@ class SongManager
 		if (i < right) quickSort(elements, i, right);
 	}
 	
-	public function getFirstMeasure(track:Track):Measure
+	public static function getFirstMeasure(track:Track):Measure
 	{
 		return track.measureCount() > 0 ? track.measures[0] : null;
 	}

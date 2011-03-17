@@ -1,3 +1,19 @@
+/*
+ * This file is part of alphaTab.
+ *
+ *  alphaTab is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  alphaTab is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package alphatab.tablature;
 
 import alphatab.model.Chord;
@@ -14,10 +30,9 @@ import alphatab.platform.Canvas;
 import alphatab.tablature.drawing.DrawingContext;
 import alphatab.tablature.drawing.DrawingLayers;
 import alphatab.tablature.drawing.DrawingResources;
-import alphatab.tablature.model.ChordImpl;
-import alphatab.tablature.model.MeasureHeaderImpl;
-import alphatab.tablature.model.MeasureImpl;
-import alphatab.tablature.model.TrackImpl;
+import alphatab.tablature.model.MeasureDrawing;
+import alphatab.tablature.model.StaveFactory;
+import alphatab.tablature.model.StaveLine;
 
 
 /**
@@ -30,37 +45,19 @@ class ViewLayout
 	public var tablature:Tablature;
 	
 	// Size presets
-	public var stringSpacing :Float;
+	public var stringSpacing :Int;
 	public var scoreLineSpacing :Float;
 	public var scale :Float;
-	public var fontScale :Float;
+    
 	public var firstMeasureSpacing :Float;
-	public var minBufferSeparator :Float;
-	public var minTopSpacing :Float;
-	public var minScoreTabSpacing :Float;
-	public var scoreSpacing :Float;
-	public var firstTrackSpacing :Float;
-	public var trackSpacing :Float;
+    
 
-	public var chordFretIndexSpacing :Float;
-	public var chordStringSpacing :Float;
-	public var chordFretSpacing :Float;
-	public var chordNoteSize :Float;
-	public var repeatEndingSpacing :Float;
-	public var textSpacing :Float;
-	public var markerSpacing :Float;
-	public var tupletoSpacing :Float;
 	public var effectSpacing :Float;
 	
 	public var layoutSize:Point;
 	public var width:Int;
 	public var height:Int;
 	public var contentPadding:Padding;
-	
-	public function songManager()
-	{
-		return tablature.songManager;
-	}
 	
 	
 	public function new() 
@@ -73,38 +70,14 @@ class ViewLayout
 	{
 		this.tablature = tablature;
 	}
-	
-	public function getDefaultChordSpacing() : Int
-	{
-		var spacing:Float = 0;
-		spacing += (ChordImpl.MAX_FRETS * chordFretSpacing) + chordFretSpacing;
-		spacing += Math.round(15.0 * scale);
-		return Math.round(spacing);
-	}
-	
+		
 	public function init(scale:Float)
 	{
-		stringSpacing = (10 * scale);
+		stringSpacing = cast (10 * scale);
         scoreLineSpacing = (8 * scale);
         this.scale = scale;
-        fontScale = scale;
         firstMeasureSpacing = Math.round(10 * scale);
-        minBufferSeparator = this.firstMeasureSpacing;
-        minTopSpacing = Math.round(30 * scale);
-        minScoreTabSpacing = this.firstMeasureSpacing;
-        scoreSpacing = (this.scoreLineSpacing * 4) + this.minScoreTabSpacing;
-        firstTrackSpacing = this.firstMeasureSpacing;
-        trackSpacing = (10 * scale);
-        
-        chordFretIndexSpacing = Math.round(8 * scale);
-        chordStringSpacing = Math.round(5 * scale);
-        chordFretSpacing = Math.round(6 * scale);
-        chordNoteSize = Math.round(4 * scale);
-        repeatEndingSpacing = Math.round(20 * scale);
-        textSpacing = Math.round(15 * scale);
-        markerSpacing = Math.round(15 * scale);
-        tupletoSpacing = Math.round(15 * scale);
-        effectSpacing = Math.round(10 * scale);
+        effectSpacing = Math.round(15 * scale);
 	}
 	
 	public function paintCache(graphics:Canvas, area:Rectangle, fromX:Int, fromY:Int) : Void
@@ -134,107 +107,29 @@ class ViewLayout
 	{
 		// implemented in subclass
 	}
-	
-	public function updateSong() : Void
-	{
-		if (tablature.track == null) 
-            return;
-        this.updateTracks();
-	}
-	
-	public function updateTracks() : Void
-	{
-		var song:Song = tablature.track.song;
-        var measureCount:Int = song.measureHeaders.length;
-        var track:TrackImpl = cast tablature.track;
-		track.previousBeat = null;
-		track.update(this);
-				
-        for (i in 0 ... measureCount) {
-            var header:MeasureHeaderImpl = cast song.measureHeaders[i];
-            header.update(this, track);
-            
-			var measure:MeasureImpl = cast track.measures[i];
-			measure.create(this);
-			measure.update(this);
-        }
-	}
-	
-	public function paintLines(track:Track, ts:TrackSpacing, context:DrawingContext, x:Int, y:Int, width:Int)  : Void
-	{
-		if (width > 0) {
-            var tempX:Float = Math.max(0, x);
-            var tempY:Float = y;
-            
-            var posY:Float = tempY + ts.get(TrackSpacingPositions.ScoreMiddleLines);
-            for (i in 1 ... 6) {
-                context.get(DrawingLayers.Lines).startFigure();
-                context.get(DrawingLayers.Lines).addLine(Math.round(tempX), Math.round(posY), Math.round(tempX + width), Math.round(posY));
-                posY += (this.scoreLineSpacing);
-            }
-            
-            tempY += ts.get(TrackSpacingPositions.Tablature);
-            for (i in 0 ... track.stringCount()) {
-                context.get(DrawingLayers.Lines).startFigure();
-                context.get(DrawingLayers.Lines).addLine(Math.round(tempX), Math.round(tempY), Math.round(tempX + width), Math.round(tempY));
-                tempY += cast this.stringSpacing;
-            }
-        }
-	}
-	
-	public function getSpacingForQuarter(duration:Duration) :Float
-	{
-		return (Duration.QUARTER_TIME / duration.time()) * getMinSpacing(duration);
-	}
-	
-	public function getMinSpacing(duration:Duration) :Float
-	{
-        switch (duration.value) {
-            case Duration.WHOLE:
-                return 50.0 * scale;
-            case Duration.HALF:
-                return 30.0 * scale;
-            case Duration.QUARTER:
-                return 55.0 * scale;
-            case Duration.EIGHTH:
-                return 20.0 * scale;
-            default:
-                return 18.0 * scale;
-        }
-	}
-	
-	public function getVoiceWidth(voice:Voice) :Float
+    
+	public function getVoiceWidth(voice:Voice) : Int
 	{
         var duration = voice.duration;
         if (duration != null) {
             switch (duration.value) {
                 case Duration.WHOLE:
-                    return (90.0 * scale);
+                    return cast (90.0 * scale);
                 case Duration.HALF:
-                    return (65.0 * scale);
+                    return cast (65.0 * scale);
                 case Duration.QUARTER:
-                    return (45.0 * scale);
+                    return cast (45.0 * scale);
                 case Duration.EIGHTH:
-                    return (30.0 * scale);
+                    return cast (30.0 * scale);
                 case Duration.SIXTEENTH:
-                    return (20.0 * scale);
+                    return cast (20.0 * scale);
                 case Duration.THIRTY_SECOND:
-                    return (17.0 * scale);
+                    return cast (17.0 * scale);
                 default:
-                    return (15.0 * scale);
+                    return cast (15.0 * scale);
             }
         }
-		return 20.0 * scale;
-	}
-	
-	public function isFirstMeasure(measure:Measure): Bool
-	{
-		return measure.number() == 1;
-	}
-	
-	public function isLastMeasure(measure:Measure) : Bool
-	{
-		return measure.number() == tablature.track.song.measureHeaders.length;
+		return cast (20.0 * scale);
 	}
 	
 	public function getNoteOrientation(x:Int, y:Int, note:Note) : Rectangle
@@ -260,17 +155,39 @@ class ViewLayout
 		var size = tablature.canvas.measureText(str);
 		return new Rectangle(x,y, cast size, DrawingResources.noteFontHeight);
 	}
-	
-	public function checkDefaultSpacing(ts:TrackSpacing) : Void
-	{
-		var bufferSeparator:Int = ts.get(TrackSpacingPositions.ScoreUpLines) - ts.get(TrackSpacingPositions.BufferSeparator);
-		if(bufferSeparator < minBufferSeparator) {
-			ts.set(TrackSpacingPositions.BufferSeparator, Math.round(minBufferSeparator - bufferSeparator));
+    
+    public function getNoteSize(note:Note) : Point
+    {
+        var noteAsString:String = "";
+		if(note.isTiedNote) {
+			noteAsString = "L";
 		}
-		var checkPosition:Int = ts.get(TrackSpacingPositions.ScoreMiddleLines);
-		
-		if(checkPosition >= 0 && checkPosition < minTopSpacing) {
-			ts.set(TrackSpacingPositions.Top, Math.round(minTopSpacing - checkPosition));
+		else if(note.effect.deadNote) {
+			noteAsString = "X";
+		} 
+		else
+		{
+			noteAsString = Std.string(note.value);
 		}
-	}
+		noteAsString = note.effect.ghostNote ? "(" + noteAsString + ")" : noteAsString;
+        
+        tablature.canvas.font = DrawingResources.noteFont;
+		var size:Float = tablature.canvas.measureText(noteAsString);
+		return new Point(cast size, DrawingResources.noteFontHeight);        
+    }
+    
+    public function createStaveLine(track:Track) : StaveLine
+    {
+        var line :StaveLine = new StaveLine();
+        line.track = track;
+        
+        for (stave in tablature.staves)
+        { 
+            var staveImpl = StaveFactory.getStave(stave, line, this);
+            if(staveImpl != null)
+                line.addStave(staveImpl);
+        }        
+        
+        return line;
+    }
 }

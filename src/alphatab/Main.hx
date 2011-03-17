@@ -17,6 +17,7 @@
 package alphatab;
 import alphatab.model.Song;
 import alphatab.tablature.Tablature;
+import alphatab.tablature.model.DrawingSongModelFactory;
 import alphatab.file.alphatex.AlphaTexParser;
 import alphatab.midi.MidiDataProvider;
 

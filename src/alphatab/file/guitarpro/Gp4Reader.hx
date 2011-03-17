@@ -61,6 +61,7 @@ import alphatab.model.SongManager;
 /**
  * A reader for GuitarPro 4 files. 
  */
+ 
 class Gp4Reader extends Gp3Reader
 {
 	public function new() 

@@ -21,6 +21,10 @@ package alphatab.model;
  */
 class Duration
 {
+    // The time resulting with a 64th note and a 3/2 tuplet
+    public static inline var MIN_TIME:Int = Math.floor(Math.floor(Duration.QUARTER_TIME * (4.0 / Duration.SIXTY_FOURTH)) * 2 / 3);
+
+    
 	public static inline var QUARTER_TIME:Int = 960;
 	
 	public static inline var WHOLE:Int = 1;

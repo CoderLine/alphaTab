@@ -19,11 +19,12 @@ package alphatab.model.effects;
 /**
  * All harmonic effect types
  */
-enum HarmonicType
+class HarmonicType
 {
-	Natural;
-	Artificial;
-	Tapped;
-	Pinch;
-	Semi;
+	public static inline var None = -1;
+	public static inline var Natural = 0;
+	public static inline var Artificial = 1;
+	public static inline var Tapped = 2;
+	public static inline var Pinch = 3;
+	public static inline var Semi = 4;
 }

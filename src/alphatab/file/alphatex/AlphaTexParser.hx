@@ -642,7 +642,13 @@ class AlphaTexParser extends SongReader
 			newSy();
 			return true;
 		}
-		else if (_syData == "d")
+		else if (_syData == "dd")
+		{
+			beat.voices[0].duration.isDoubleDotted = true;
+			newSy();
+			return true;
+		}
+        else if (_syData == "d")
 		{
 			beat.voices[0].duration.isDotted = true;
 			newSy();
