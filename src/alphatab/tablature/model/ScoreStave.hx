@@ -374,7 +374,7 @@ class ScoreStave extends Stave
         
         y += spacing.get(Tempo);
 
-        TempoPainter.paintTempo(context, x, y, layout.scale);
+        TempoPainter.paintTempo(context, x, y, layout.scale); 
             
         x += Math.round(8 * layout.scale);
         var value:String = (" = " + measure.header.tempo.value);

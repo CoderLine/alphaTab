@@ -161,7 +161,7 @@ class Html5Canvas implements Canvas
 	}
 	private function setTextAlign(value:String) : String
 	{
-		this._context.textBaseline = value;
+		this._context.textAlign = value;
 		return this._context.textAlign;
 	}
 	

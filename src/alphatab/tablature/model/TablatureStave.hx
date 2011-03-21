@@ -635,7 +635,7 @@ class TablatureStave extends Stave
         // HACK: html5 canvas seems to ignore left alignment of 
         // the text. therefore we need to add the textsize twice
         // to be left of the text
-        x += Math.floor(note.noteSize.x * 2);
+        x += Math.floor(note.noteSize.x);
 		var endX:Float = x + note.beatDrawing().fullWidth();
         // the top offset for bends
         var minY:Float = y - 60 * scale;
@@ -820,7 +820,7 @@ class TablatureStave extends Stave
         // HACK: html5 canvas seems to ignore left alignment of 
         // the text. therefore we need to add the textsize twice
         // to be left of the text
-        x += Math.floor(note.noteSize.x * 2);
+        x += Math.floor(note.noteSize.x);
 		var endX:Float = x + beat.fullWidth();
         // the top offset for bends
         var minY:Float = y - 60 * scale;

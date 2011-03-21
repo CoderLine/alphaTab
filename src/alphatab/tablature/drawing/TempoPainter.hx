@@ -30,7 +30,7 @@ class TempoPainter
         var h:Int = Math.round(12 * scale);
         var h2:Int = Math.round(h - (3*scale));
         
-		NotePainter.paintNote(layer, x, y + h, 0.75, true);
+		NotePainter.paintNote(layer, x, y + h, 0.7 * scale, true);
 		draw.startFigure();
         draw.addLine(x + w, y, x + w, y + h);
 	}
