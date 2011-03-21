@@ -572,10 +572,10 @@ class TablatureStave extends Stave
 							? context.get(DrawingLayers.VoiceEffects1)
 							: context.get(DrawingLayers.VoiceEffects2);
                             
-		var realX = x + note.noteSize.x + 4*layout.scale;
+		var realX = x + (note.noteSize.x/2);
 		var realY = down ? y + DrawingResources.noteFontHeight/2
 		                 : y - DrawingResources.noteFontHeight/2;
-		var endX:Float = nextNote != null ? x + note.beatDrawing().fullWidth()
+		var endX:Float = nextNote != null ? x + note.beatDrawing().fullWidth() + (nextNote.noteSize.x / 2)
                                             : realX + 15*layout.scale;
 					
 		paintTie(layout, fill, realX, realY, endX, realY, down);

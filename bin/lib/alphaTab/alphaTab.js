@@ -2988,9 +2988,9 @@ alphatab.tablature.model.TablatureStave.prototype.paintHammerOn = function(layou
 	var nextNote = (nextBeat == null?null:nextBeat.getNote(note.voice.index,note.string));
 	var down = note.string > 3 || nextNote == null;
 	var fill = (note.voice.index == 0?context.get(10):context.get(6));
-	var realX = (x + note.noteSize.x) + 4 * layout.scale;
+	var realX = x + (note.noteSize.x / 2);
 	var realY = (down?y + alphatab.tablature.drawing.DrawingResources.noteFontHeight / 2:y - alphatab.tablature.drawing.DrawingResources.noteFontHeight / 2);
-	var endX = (nextNote != null?x + note.voice.beat.fullWidth():realX + 15 * layout.scale);
+	var endX = (nextNote != null?(x + note.voice.beat.fullWidth()) + (nextNote.noteSize.x / 2):realX + 15 * layout.scale);
 	alphatab.tablature.model.TablatureStave.paintTie(layout,fill,realX,realY,endX,realY,down);
 	$s.pop();
 }
