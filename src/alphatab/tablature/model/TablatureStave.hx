@@ -378,7 +378,7 @@ class TablatureStave extends Stave
         // end line on end of current beat
         var endX:Float = startX + voice.beatDrawing().fullWidth();
         var prevOnSameStaveLine = previousVoice != null && previousVoice.measureDrawing().staveLine == voice.measureDrawing().staveLine;
-        var nextOnSameStaveLine = previousVoice != null && previousVoice.measureDrawing().staveLine == voice.beatDrawing().measureDrawing().staveLine;
+        var nextOnSameStaveLine = nextVoice != null && nextVoice.measureDrawing().staveLine == voice.beatDrawing().measureDrawing().staveLine;
                 
         var fill:DrawingLayer = voice.index == 0
                          ? context.get(DrawingLayers.Voice1)
@@ -394,7 +394,7 @@ class TablatureStave extends Stave
         
         // if the next beat is on the same line and 
         // has the effect set, we stop our line there
-        var isEnd = (!nextVoiceEffect || (!nextOnSameStaveLine && nextVoiceEffect));
+        var isEnd = (!nextVoiceEffect || !nextOnSameStaveLine);
         if (isEnd)
         {
             var offset:Int = cast (8*layout.scale);

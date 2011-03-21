@@ -3096,13 +3096,14 @@ alphatab.tablature.model.TablatureStave.prototype.paintRange = function(layout,c
 	var $spos = $s.length;
 	var endX = startX + voice.beat.fullWidth();
 	var prevOnSameStaveLine = previousVoice != null && previousVoice.beat.measure.staveLine == voice.beat.measure.staveLine;
-	var nextOnSameStaveLine = previousVoice != null && previousVoice.beat.measure.staveLine == voice.beat.measure.staveLine;
+	var nextOnSameStaveLine = nextVoice != null && nextVoice.beat.measure.staveLine == voice.beat.measure.staveLine;
 	var fill = (voice.index == 0?context.get(9):context.get(5));
 	var draw = (voice.index == 0?context.get(12):context.get(8));
 	draw.startFigure();
 	y += alphatab.tablature.drawing.DrawingResources.effectFontHeight;
-	var isEnd = (!nextVoiceEffect || (!nextOnSameStaveLine && nextVoiceEffect));
+	var isEnd = (!nextVoiceEffect || !nextOnSameStaveLine);
 	if(isEnd) {
+		js.Lib.alert(("End on " + Std.string(voice.beat.measure.header.number)) + Std.string(nextOnSameStaveLine));
 		var offset = 8 * layout.scale;
 		endX -= offset;
 	}

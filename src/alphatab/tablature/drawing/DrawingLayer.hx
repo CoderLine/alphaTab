@@ -194,7 +194,7 @@ class DrawingLayer
             Y2: Math.floor(y2) + 0.5
         });
     }
-	
+
 	public function addPolygon(points:Array<Point>): Void{
         _path.push({
             Command: "addPolygon",
