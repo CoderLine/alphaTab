@@ -32,6 +32,6 @@ class Main
 	 */
 	static function main() 
 	{		
-	
+        // nothing to do here
 	}
 }

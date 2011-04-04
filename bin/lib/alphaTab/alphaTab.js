@@ -3103,7 +3103,6 @@ alphatab.tablature.model.TablatureStave.prototype.paintRange = function(layout,c
 	y += alphatab.tablature.drawing.DrawingResources.effectFontHeight;
 	var isEnd = (!nextVoiceEffect || !nextOnSameStaveLine);
 	if(isEnd) {
-		js.Lib.alert(("End on " + Std.string(voice.beat.measure.header.number)) + Std.string(nextOnSameStaveLine));
 		var offset = 8 * layout.scale;
 		endX -= offset;
 	}

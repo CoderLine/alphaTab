@@ -817,9 +817,6 @@ class TablatureStave extends Stave
         
         y = cast (y + spacing.get(Tablature) + Math.round((note.string - 1) * layout.stringSpacing)); 
        
-        // HACK: html5 canvas seems to ignore left alignment of 
-        // the text. therefore we need to add the textsize twice
-        // to be left of the text
         x += Math.floor(note.noteSize.x);
 		var endX:Float = x + beat.fullWidth();
         // the top offset for bends
