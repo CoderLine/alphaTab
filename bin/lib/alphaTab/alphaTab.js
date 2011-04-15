@@ -2665,6 +2665,10 @@ alphatab.tablature.model.TablatureStave = function(line,layout) { if( line === $
 	this.spacing.set(12,((line.track.stringCount() - 1) * layout.stringSpacing));
 	this.spacing.set(13,Math.floor(10 * layout.scale));
 	this.spacing.set(16,Math.floor(15 * layout.scale));
+	if(this.line.tablature.getStaveSetting("tablature","rhythm",false)) {
+		js.Lib.alert("test");
+		this.debug = true;
+	}
 	$s.pop();
 }}
 alphatab.tablature.model.TablatureStave.__name__ = ["alphatab","tablature","model","TablatureStave"];
@@ -2692,6 +2696,7 @@ alphatab.tablature.model.TablatureStave.paintTie = function(layout,layer,x1,y1,x
 	layer.closeFigure();
 	$s.pop();
 }
+alphatab.tablature.model.TablatureStave.prototype.debug = null;
 alphatab.tablature.model.TablatureStave.prototype.getBarBottomSpacing = function() {
 	$s.push("alphatab.tablature.model.TablatureStave::getBarBottomSpacing");
 	var $spos = $s.length;
@@ -3179,6 +3184,9 @@ alphatab.tablature.model.TablatureStave.prototype.paintSlides = function(layout,
 alphatab.tablature.model.TablatureStave.prototype.paintStave = function(layout,context,x,y) {
 	$s.push("alphatab.tablature.model.TablatureStave::paintStave");
 	var $spos = $s.length;
+	if(this.debug) {
+		context.get(13).addRect(0,0,100,100);
+	}
 	var lineY = y + this.spacing.get(12);
 	{
 		var _g1 = 0, _g = this.line.track.stringCount();
@@ -3592,10 +3600,12 @@ alphatab.tablature.ViewLayout.prototype.createStaveLine = function(track) {
 	var $spos = $s.length;
 	var line = new alphatab.tablature.model.StaveLine();
 	line.track = track;
+	line.tablature = this.tablature;
+	var staves = this.tablature.settings.get("staves");
 	{
-		var _g = 0, _g1 = this.tablature.staves;
-		while(_g < _g1.length) {
-			var stave = _g1[_g];
+		var _g = 0;
+		while(_g < staves.length) {
+			var stave = staves[_g];
 			++_g;
 			var staveImpl = alphatab.tablature.model.StaveFactory.getStave(stave,line,this);
 			if(staveImpl != null) line.addStave(staveImpl);
@@ -3814,6 +3824,18 @@ alphatab.model.effects.TrillEffect.prototype.clone = function(factory) {
 alphatab.model.effects.TrillEffect.prototype.duration = null;
 alphatab.model.effects.TrillEffect.prototype.fret = null;
 alphatab.model.effects.TrillEffect.prototype.__class__ = alphatab.model.effects.TrillEffect;
+alphatab.file.gpx.score.GpxBar = function(p) { if( p === $_ ) return; {
+	$s.push("alphatab.file.gpx.score.GpxBar::new");
+	var $spos = $s.length;
+	null;
+	$s.pop();
+}}
+alphatab.file.gpx.score.GpxBar.__name__ = ["alphatab","file","gpx","score","GpxBar"];
+alphatab.file.gpx.score.GpxBar.prototype.clef = null;
+alphatab.file.gpx.score.GpxBar.prototype.id = null;
+alphatab.file.gpx.score.GpxBar.prototype.simileMark = null;
+alphatab.file.gpx.score.GpxBar.prototype.voiceIds = null;
+alphatab.file.gpx.score.GpxBar.prototype.__class__ = alphatab.file.gpx.score.GpxBar;
 alphatab.model.Measure = function(header) { if( header === $_ ) return; {
 	$s.push("alphatab.model.Measure::new");
 	var $spos = $s.length;
@@ -3966,18 +3988,6 @@ alphatab.model.Measure.prototype.tripletFeel = function() {
 	$s.pop();
 }
 alphatab.model.Measure.prototype.__class__ = alphatab.model.Measure;
-alphatab.file.gpx.score.GpxBar = function(p) { if( p === $_ ) return; {
-	$s.push("alphatab.file.gpx.score.GpxBar::new");
-	var $spos = $s.length;
-	null;
-	$s.pop();
-}}
-alphatab.file.gpx.score.GpxBar.__name__ = ["alphatab","file","gpx","score","GpxBar"];
-alphatab.file.gpx.score.GpxBar.prototype.clef = null;
-alphatab.file.gpx.score.GpxBar.prototype.id = null;
-alphatab.file.gpx.score.GpxBar.prototype.simileMark = null;
-alphatab.file.gpx.score.GpxBar.prototype.voiceIds = null;
-alphatab.file.gpx.score.GpxBar.prototype.__class__ = alphatab.file.gpx.score.GpxBar;
 alphatab.file.guitarpro.Gp4Reader = function(p) { if( p === $_ ) return; {
 	$s.push("alphatab.file.guitarpro.Gp4Reader::new");
 	var $spos = $s.length;
@@ -13305,6 +13315,7 @@ alphatab.tablature.model.StaveLine.prototype.paint = function(layout,track,conte
 }
 alphatab.tablature.model.StaveLine.prototype.spacing = null;
 alphatab.tablature.model.StaveLine.prototype.staves = null;
+alphatab.tablature.model.StaveLine.prototype.tablature = null;
 alphatab.tablature.model.StaveLine.prototype.track = null;
 alphatab.tablature.model.StaveLine.prototype.width = null;
 alphatab.tablature.model.StaveLine.prototype.x = null;
@@ -15983,25 +15994,17 @@ alphatab.tablature.Tablature = function(source,staves,msg) { if( source === $_ )
 	if(msg == null) msg = "";
 	this.canvas = alphatab.platform.PlatformFactory.getCanvas(source);
 	this.track = null;
+	this.settings = new Hash();
 	this.errorMessage = StringTools.trim(msg);
 	if(this.errorMessage == "" || this.errorMessage == null) {
 		this.errorMessage = "Please set a song's track to display the tablature";
 	}
-	this.staves = new Array();
 	if(staves == null) {
-		this.staves.push("score");
-		this.staves.push("tablature");
+		staves = new Array();
+		staves.push("score");
+		staves.push("tablature");
 	}
-	else {
-		{
-			var _g = 0;
-			while(_g < staves.length) {
-				var stave = staves[_g];
-				++_g;
-				this.staves.push(stave);
-			}
-		}
-	}
+	this.settings.set("staves",staves);
 	this.viewLayout = new alphatab.tablature.PageViewLayout();
 	this.viewLayout.setTablature(this);
 	this.updateScale(1.0);
@@ -16110,6 +16113,17 @@ alphatab.tablature.Tablature.prototype.getMeasureAt = function(tick) {
 	}
 	$s.pop();
 }
+alphatab.tablature.Tablature.prototype.getStaveSetting = function(staveId,setting,defaultValue) {
+	$s.push("alphatab.tablature.Tablature::getStaveSetting");
+	var $spos = $s.length;
+	var value = this.settings.get((staveId + ".") + setting);
+	{
+		var $tmp = (value != null?value:defaultValue);
+		$s.pop();
+		return $tmp;
+	}
+	$s.pop();
+}
 alphatab.tablature.Tablature.prototype.invalidate = function() {
 	$s.push("alphatab.tablature.Tablature::invalidate");
 	var $spos = $s.length;
@@ -16171,6 +16185,12 @@ alphatab.tablature.Tablature.prototype.paintBackground = function() {
 	this.canvas.fillText(msg,x,this.canvas.height() - 15);
 	$s.pop();
 }
+alphatab.tablature.Tablature.prototype.setStaveSetting = function(staveId,setting,value) {
+	$s.push("alphatab.tablature.Tablature::setStaveSetting");
+	var $spos = $s.length;
+	this.settings.set((staveId + ".") + setting,value);
+	$s.pop();
+}
 alphatab.tablature.Tablature.prototype.setTrack = function(track) {
 	$s.push("alphatab.tablature.Tablature::setTrack");
 	var $spos = $s.length;
@@ -16181,7 +16201,7 @@ alphatab.tablature.Tablature.prototype.setTrack = function(track) {
 	this.invalidate();
 	$s.pop();
 }
-alphatab.tablature.Tablature.prototype.staves = null;
+alphatab.tablature.Tablature.prototype.settings = null;
 alphatab.tablature.Tablature.prototype.track = null;
 alphatab.tablature.Tablature.prototype.updateScale = function(scale) {
 	$s.push("alphatab.tablature.Tablature::updateScale");

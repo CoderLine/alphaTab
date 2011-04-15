@@ -31,6 +31,7 @@ import alphatab.tablature.drawing.DrawingLayers;
 import alphatab.tablature.drawing.DrawingResources;
 import alphatab.tablature.drawing.MusicFont;
 import alphatab.tablature.ViewLayout;
+import js.Lib;
 
 /**
  * This Stave renders the guitar tablature and this effects:
@@ -89,7 +90,7 @@ class TablatureStave extends Stave
     private static inline var Fingering = 15;
     // bottom spacing
     private static inline var BottomPadding = 16;
-
+    
     public function new(line:StaveLine, layout:ViewLayout)
     {
         super(line, layout);        

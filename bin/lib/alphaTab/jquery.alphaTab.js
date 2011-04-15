@@ -89,7 +89,7 @@ var alphaTabWrapper;
             width:600,
             height:200,
             autoSize: true,
-            staves: null,
+            staves: null
         };
 
         this.options = $.extend(defaults, options);
@@ -218,11 +218,32 @@ var alphaTabWrapper;
 			}
 		}
 
+        // prepare, stave configuration
+        var staves = [];
+        var isArray = (this.options.staves.constructor == Array);
+        if(isArray) // simple array
+        {
+            staves = this.options.staves;
+        }
+        else
+        { 
+            // complex json configuration
+            $.each(this.options.staves, function(staveId, val) {
+                staves.push(staveId);
+            });
+        }
         // create tablature
-        this.tablature = new alphatab.tablature.Tablature(this.canvas, this.options.staves, this.options.error);
+        this.tablature = new alphatab.tablature.Tablature(this.canvas, staves, this.options.error);
         this.tablature.autoSizeWidth = this.options.autoSize;
         this.tablature.updateScale(this.options.zoom);
 
+        // additional settings for this instance
+        $.each(this.options.staves, function(staveId, val) {
+            $.each(val, function(setting, val) {
+                self.tablature.setStaveSetting(staveId, setting, val);
+            });
+        });
+        
         // load data
         if(this.options.file)
         {

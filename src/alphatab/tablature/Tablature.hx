@@ -48,7 +48,8 @@ class Tablature
 {
 	private var _updateDisplay:Bool;
 	private var _updateSong:Bool;
-	
+    
+    public var settings:Hash<Dynamic>;
 	public var canvas : Canvas;
 	public var isError:Bool;
 	public var errorMessage:String;
@@ -57,13 +58,12 @@ class Tablature
 	public var autoSizeWidth:Bool;
 	public var onCaretChanged:Beat->Void;
     
-    public var staves:Array<String>;
-
-	
 	public function new(source:Dynamic, staves:Array<String> = null, msg:String = "") 
 	{
 		canvas = PlatformFactory.getCanvas(source);
 		track = null;
+        
+        settings = new Hash <Dynamic> ();
 		
 		errorMessage = StringTools.trim(msg);
 		
@@ -71,25 +71,30 @@ class Tablature
 		{ 
 			errorMessage = "Please set a song's track to display the tablature";
 		}
-		this.staves = new Array<String>();	
-        if (staves == null)
+		if (staves == null)
         {	
-            this.staves.push(ScoreStave.STAVE_ID);
-            this.staves.push(TablatureStave.STAVE_ID);
-        }
-        else
-        {
-            for (stave in staves)
-            {
-                this.staves.push(stave);
-            }
-        }
+            staves = new Array<String>();
+            staves.push(ScoreStave.STAVE_ID);
+            staves.push(TablatureStave.STAVE_ID);
+        }      
+        settings.set("staves", staves);
+        
 		
 		viewLayout = new PageViewLayout();
 		viewLayout.setTablature(this);
 		updateScale(1.0);	
 	}
     
+    public function setStaveSetting(staveId:String, setting:String, value:Dynamic)
+    {   
+        settings.set(staveId + "." + setting, value);
+    }
+    
+    public function getStaveSetting(staveId:String, setting:String, defaultValue:Dynamic = null)
+    {
+        var value:Dynamic = settings.get(staveId + "." + setting);
+        return value != null ? value : defaultValue;
+    }
     
 	
 	public function setTrack(track:Track) : Void 

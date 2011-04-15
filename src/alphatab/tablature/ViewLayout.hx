@@ -180,8 +180,10 @@ class ViewLayout
     {
         var line :StaveLine = new StaveLine();
         line.track = track;
+        line.tablature = tablature;
         
-        for (stave in tablature.staves)
+        var staves:Array<String> = cast tablature.settings.get("staves");
+        for (stave in staves)
         { 
             var staveImpl = StaveFactory.getStave(stave, line, this);
             if(staveImpl != null)

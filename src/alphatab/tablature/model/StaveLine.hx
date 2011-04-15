@@ -20,6 +20,7 @@ import alphatab.model.Track;
 import alphatab.tablature.drawing.DrawingContext;
 import alphatab.tablature.drawing.DrawingLayer;
 import alphatab.tablature.drawing.DrawingLayers;
+import alphatab.tablature.Tablature;
 import alphatab.tablature.ViewLayout;
 
 class StaveLine 
@@ -32,8 +33,11 @@ class StaveLine
     // a list of the staves to render 
     public var staves:Array<Stave>;
     
-    // spacing definitions for a fulle staveline
+    // spacing definitions for a full staveline
     public var spacing:StaveSpacing;
+    
+    // the tablature in which the line is placed in 
+    public var tablature:Tablature; 
     
     public var track:Track;
     

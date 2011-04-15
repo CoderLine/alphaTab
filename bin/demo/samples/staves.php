@@ -26,6 +26,12 @@ $(document).ready(function() {
 	$('div.alphaTabFull2').alphaTab({file: f, staves: ["tablature", "score"]});
 	$('div.alphaTabScore').alphaTab({file: f, staves: ["score"]});
 	$('div.alphaTabTablature').alphaTab({file: f, staves: ["tablature"]});
+    $('div.alphaTabConfigured').alphaTab({file: f, 
+        staves: {
+            "score": {},
+            "tablature": {rhythm: true}
+        }
+    });
 });
 </script>
 <h2>Score and Tablature</h2>
@@ -36,3 +42,5 @@ $(document).ready(function() {
 <div class="alphaTabScore"></div>
 <h2>Tablature only</h2>
 <div class="alphaTabTablature"></div>
+<h2>With Settings</h2>
+<div class="alphaTabConfigured"></div>
