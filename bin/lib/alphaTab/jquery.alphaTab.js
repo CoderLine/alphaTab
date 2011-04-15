@@ -32,9 +32,9 @@ var alphaTabWrapper;
         this.factory = new alphatab.tablature.model.DrawingSongModelFactory();
 		
 		// resolve absolute script path
-		var alphaTabTag = $('script[src$=/alphaTab.js]');
+		var alphaTabTag = $('script[src$="/alphaTab.js"]');
 		if(alphaTabTag.length == 0) // also try min-version
-			alphaTabTag = $('script[src$=/alphaTab.min.js]');
+			alphaTabTag = $('script[src$="/alphaTab.min.js"]');
 
 		var alphaTabBase = "";
 		if(alphaTabTag.length)
@@ -219,18 +219,21 @@ var alphaTabWrapper;
 		}
 
         // prepare, stave configuration
-        var staves = [];
-        var isArray = (this.options.staves.constructor == Array);
-        if(isArray) // simple array
+        var staves = null;
+        if(this.options.staves != null)
         {
-            staves = this.options.staves;
-        }
-        else
-        { 
-            // complex json configuration
-            $.each(this.options.staves, function(staveId, val) {
-                staves.push(staveId);
-            });
+            if((this.options.staves.constructor == Array)) // simple array
+            {
+                staves = this.options.staves;
+            }
+            else
+            { 
+                staves = [];
+                // complex json configuration
+                $.each(this.options.staves, function(staveId, val) {
+                    staves.push(staveId);
+                });
+            }
         }
         // create tablature
         this.tablature = new alphatab.tablature.Tablature(this.canvas, staves, this.options.error);
@@ -238,11 +241,14 @@ var alphaTabWrapper;
         this.tablature.updateScale(this.options.zoom);
 
         // additional settings for this instance
-        $.each(this.options.staves, function(staveId, val) {
-            $.each(val, function(setting, val) {
-                self.tablature.setStaveSetting(staveId, setting, val);
+        if(this.options.staves != null)
+        {
+            $.each(this.options.staves, function(staveId, val) {
+                $.each(val, function(setting, val) {
+                    self.tablature.setStaveSetting(staveId, setting, val);
+                });
             });
-        });
+        }
         
         // load data
         if(this.options.file)

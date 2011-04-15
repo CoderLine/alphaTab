@@ -58,7 +58,7 @@ class ViewLayout
 	public var width:Int;
 	public var height:Int;
 	public var contentPadding:Padding;
-	
+    
 	
 	public function new() 
 	{

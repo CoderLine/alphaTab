@@ -792,7 +792,7 @@ class ScoreStave extends Stave
         var fill:DrawingLayer = note.voice.index == 0 ? context.get(DrawingLayers.Voice1) : context.get(DrawingLayers.Voice2);
 		var effectLayer:DrawingLayer = note.voice.index == 0 ? context.get(DrawingLayers.VoiceEffects1) : context.get(DrawingLayers.VoiceEffects2);
 
-        // TODO: Displaced Note heads and better accidental placement
+        // TODO: better accidental placement
         var direction = note.voiceDrawing().beatGroup.getDirection();
 
         var displaceOffset:Int = Math.floor(DrawingResources.getScoreNoteSize(layout, false).x); 

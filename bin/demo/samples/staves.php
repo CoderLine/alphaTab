@@ -28,7 +28,6 @@ $(document).ready(function() {
 	$('div.alphaTabTablature').alphaTab({file: f, staves: ["tablature"]});
     $('div.alphaTabConfigured').alphaTab({file: f, 
         staves: {
-            "score": {},
             "tablature": {rhythm: true}
         }
     });

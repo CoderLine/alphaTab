@@ -42,6 +42,9 @@ class VoiceDrawing extends Voice
     public var joinedType:JoinedType;
     public var isJoinedGreaterThanQuarter:Bool;
     
+    public var minStringNote:NoteDrawing;
+    public var maxStringNote:NoteDrawing;
+    
     public inline function beatDrawing() : BeatDrawing
     {
         return cast beat;
@@ -93,6 +96,15 @@ class VoiceDrawing extends Voice
         if (maxNote == null || maxNote.realValue() < note.realValue())
         {
             maxNote = note;
+        }
+        
+        if (minStringNote == null || minStringNote.string > note.string)
+        {
+            minStringNote = note;
+        }
+        if (maxStringNote == null || maxStringNote.string < note.string)
+        {
+            maxStringNote = note;
         }
     }
     

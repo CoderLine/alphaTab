@@ -16,6 +16,7 @@
  */
 package alphatab.tablature.model;
 import alphatab.model.BeatStrokeDirection;
+import alphatab.model.Duration;
 import alphatab.model.effects.BendEffect;
 import alphatab.model.effects.BendPoint;
 import alphatab.model.effects.FingeringType;
@@ -25,11 +26,13 @@ import alphatab.model.Measure;
 import alphatab.model.Point;
 import alphatab.model.SlideType;
 import alphatab.model.Voice;
+import alphatab.model.VoiceDirection;
 import alphatab.tablature.drawing.DrawingContext;
 import alphatab.tablature.drawing.DrawingLayer;
 import alphatab.tablature.drawing.DrawingLayers;
 import alphatab.tablature.drawing.DrawingResources;
 import alphatab.tablature.drawing.MusicFont;
+import alphatab.tablature.drawing.NotePainter;
 import alphatab.tablature.ViewLayout;
 import js.Lib;
 
@@ -86,10 +89,12 @@ class TablatureStave extends Stave
     private static inline var TablatureBottomSeparator = 13;
     // offset to make space for tremolo bar lines (to lower tremolos)
     private static inline var TremoloBarBottom = 14;
+    // the offset for ryhtm lines
+    private static inline var Rhythm = 15;
     // Fingering Indicators
-    private static inline var Fingering = 15;
+    private static inline var Fingering = 16;
     // bottom spacing
-    private static inline var BottomPadding = 16;
+    private static inline var BottomPadding = 17;
     
     public function new(line:StaveLine, layout:ViewLayout)
     {
@@ -150,6 +155,12 @@ class TablatureStave extends Stave
             spacing.set(NoteVibrato, layout.effectSpacing);
         if(measure.effectsCache.fadeIn)
             spacing.set(FadeIn, layout.effectSpacing);
+        
+        if (line.tablature.getStaveSetting(STAVE_ID, "rhythm", false) == true)
+        {
+            spacing.set(Rhythm, 20 * layout.scale);
+        }
+            
         if(measure.effectsCache.bend)
         {
             if(spacing.spacing[Bends] < measure.effectsCache.bendOverflow)
@@ -242,22 +253,155 @@ class TablatureStave extends Stave
     
     private function paintVoice(layout:ViewLayout, context:DrawingContext, voice:VoiceDrawing, x:Int, y:Int)
     {       
-        // paint notes
-        for (note in voice.notes)
+        if (!voice.isEmpty)
         {
-            paintNote(layout, context, cast note, x, y);
+            // paint notes
+            for (note in voice.notes)
+            {
+                paintNote(layout, context, cast note, x, y);
+            }
+            
+            paintBeam(layout, context, voice, x, y);
+            // paint note effects 
+            // (only paint effects which are placed above the tablature once per voice)
+            paintVoiceEffects(layout, context, voice, x, y);
         }
+    }
+    
+    private function paintBeam(layout:ViewLayout, context:DrawingContext, voice:VoiceDrawing, x:Int, y:Int)
+    {
+        if (voice.isRestVoice() || line.tablature.getStaveSetting(STAVE_ID, "rhythm", false) == false) return;
         
-        // paint note effects 
-        // (only paint effects which are placed above the tablature once per voice)
-        paintVoiceEffects(layout, context, voice, x, y);
+		var fill:DrawingLayer = voice.index == 0 ? context.get(DrawingLayers.Voice1) : context.get(DrawingLayers.Voice2);
+		var draw:DrawingLayer = voice.index == 0 ? context.get(DrawingLayers.VoiceDraw1) : context.get(DrawingLayers.VoiceDraw2);
+        
+        if (voice.duration.value >= Duration.HALF)
+        {
+            var key:Int = voice.beat.measure.keySignature();
+            var clef:Int = voice.beat.measure.clef;
+            
+            var xMove:Float = voice.maxStringNote.noteSize.x / 2;
+            
+            var y1:Int = Math.floor(y + getNoteTablaturePosY(layout, voice.maxStringNote) + (layout.stringSpacing/1.5));
+            var y2:Int = y + spacing.get(Rhythm + 1);
+            
+            // paint the line
+            draw.addLine(x + xMove, y1, x + xMove, y2);
+            
+            // need to paint a bar?
+            if (voice.duration.value >= Duration.QUARTER)
+            {
+                var index:Int = voice.duration.index() - 2;
+                if (index > 0)
+                {
+                    var startX:Int;
+                    var endX:Int;
+
+                    if (voice.joinedType == JoinedType.NoneRight)
+                    {
+                        startX = Math.round(x + xMove);
+                        endX = Math.round(x + (6*layout.scale) + xMove);
+                    }
+                    else if (voice.joinedType == JoinedType.NoneLeft)
+                    {
+                        startX = Math.round(x - (6*layout.scale) + xMove);
+                        endX = Math.round(x + xMove);
+                    }
+                    else
+                    {
+                        startX = Math.round(voice.leftJoin.beatDrawing().fullX(layout) + xMove);
+                        endX = Math.round(voice.rightJoin.beatDrawing().fullX(layout) + (voice.rightJoin.maxStringNote.noteSize.x / 2));
+                    }
+                    
+                    NotePainter.paintBar(fill, startX, y2, endX, y2, index, 1, layout.scale);
+                    
+                }
+            }
+        }
+    }
+    
+    
+    
+    private function calculateBeamY(layout:ViewLayout, beatGroup:BeatGroup, direction:Int, x:Float, key:Float, clef:Int)
+    {
+        // we use the min/max notes to place the beam along their real position        
+        // we only want a maximum of 10 offset for their gradient
+        var maxDistance:Int = Math.round(10 * layout.scale);
+        
+        // the offsets for the min/max note to the beam
+        var upOffset:Float = 0;
+        var downOffset:Float = 0;
+        
+        // some variables for calculation
+        var y:Int;
+        var x1:Int;
+		var x2:Int;
+		var y1:Int;
+		var y2:Int;      
+        
+        // below all notes
+        if (direction == VoiceDirection.Down)
+        {
+            // if the min note is not first or last, we can align notes directly to the position
+            // of the min note
+            if (beatGroup.minNote != beatGroup.firstMinNote && beatGroup.minNote != beatGroup.lastMinNote)
+            {
+                return getNoteTablaturePosY(layout, beatGroup.minNote) + downOffset;
+            }
+            
+            // calculate the two points where to place the beam trough
+            y = 0;
+            x1 = beatGroup.firstMinNote.beatDrawing().fullX(layout);
+            x2 = beatGroup.lastMinNote.beatDrawing().fullX(layout);
+            y1 = Math.round(getNoteTablaturePosY(layout, beatGroup.firstMinNote) + downOffset);
+            y2 = Math.round(getNoteTablaturePosY(layout, beatGroup.lastMinNote) + downOffset);
+            
+            // ensure the maxDistance
+            if (y1 > y2 && (y1 - y2) > maxDistance) y2 = (y1 - maxDistance);
+            if (y2 > y1 && (y2 - y1) > maxDistance) y1 = (y2 - maxDistance);
+            
+            // calculate real y             
+            if ((y1 - y2) != 0 && (x1 - x2) != 0 && (x1 - x) != 0)
+            {
+                y = Math.round(((y1 - y2) / (x1 - x2)) * (x1 - x));
+            }
+            return y1 - y;
+        }
+        // below all notes
+        else
+        {
+            // do the same operation like above, only use max notes to ensure correct positioning
+            
+            if (beatGroup.maxNote != beatGroup.firstMaxNote && beatGroup.maxNote != beatGroup.lastMaxNote)
+            {
+                return getNoteTablaturePosY(layout, beatGroup.maxNote) - upOffset;
+            }
+            
+            // calculate the two points where to place the beam trough
+            y = 0;
+            x1 = beatGroup.firstMaxNote.beatDrawing().fullX(layout);
+            x2 = beatGroup.lastMaxNote.beatDrawing().fullX(layout);
+            y1 = Math.round(getNoteTablaturePosY(layout, beatGroup.firstMaxNote) - upOffset);
+            y2 = Math.round(getNoteTablaturePosY(layout, beatGroup.lastMaxNote) - upOffset);
+            
+            // ensure the maxDistance
+            if (y1 < y2 && (y2 - y1) > maxDistance) y2 = (y1 + maxDistance);
+            if (y2 < y1 && (y1 - y2) > maxDistance) y1 = (y2 + maxDistance);
+            
+            // calculate real y             
+            if ((y1 - y2) != 0 && (x1 - x2) != 0 && (x1 - x) != 0)
+            {
+                y = Math.round(((y1 - y2) / (x1 - x2)) * (x1 - x));
+            }
+            return y1 - y;
+        }        
     }
         
     private function paintNote(layout:ViewLayout, context:DrawingContext, note:NoteDrawing, x:Int, y:Int)
     {
         var tabX:Int = cast (note.noteSize.x / 2);
         var realX:Int = x;
-        var realY:Int = y + spacing.get(Tablature) + Math.round((note.string - 1) * layout.stringSpacing); 
+        var realY:Int = y + getNoteTablaturePosY(layout, note);
 
         // paint number for note
         var fill:DrawingLayer = note.voice.index == 0 ? context.get(DrawingLayers.Voice1) : context.get(DrawingLayers.Voice2);
@@ -271,6 +415,11 @@ class TablatureStave extends Stave
         
         // paint effects
         paintEffects(layout, context, note, x, y, realY);
+    }
+    
+    private function getNoteTablaturePosY(layout:ViewLayout, note:NoteDrawing)
+    {
+        return spacing.get(Tablature) + Math.round((note.string - 1) * layout.stringSpacing);
     }
     
     private function paintVoiceEffects(layout:ViewLayout, context:DrawingContext, voice:VoiceDrawing, x:Int, y:Int)
