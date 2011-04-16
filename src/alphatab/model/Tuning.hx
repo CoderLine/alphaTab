@@ -39,12 +39,18 @@ class Tuning
         return regex.match(name);
     }
     
-    public static function getTextForTuning(tuning:Int)
+    public static function getTextForTuning(tuning:Int, includeOctave:Bool = false)
     {
-        //var octave = Math.floor(tuning/12);
+        var octave = Math.floor(tuning/12);
         var note = tuning % 12;
         var notes = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
-        return notes[note];
+        var result = notes[note];
+        if (includeOctave)
+        {
+            result += Std.string(octave);
+        }
+        
+        return result;
     }
     
     

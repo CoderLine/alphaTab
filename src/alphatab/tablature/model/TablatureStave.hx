@@ -1005,8 +1005,12 @@ class TablatureStave extends Stave
 					var dV:Float = (secondPt.value) * 0.5;
 					var up:Bool = (secondPt.value - firstPt.value) >= 0;
 					var s:String = "";
+                    
+                    if (dV < 0)
+                        s += "-";
+                    
 					if(dV >= 1 || dV <= -1)
-						s += "-" + Std.string(Math.floor(Math.abs(dV))) + " ";
+						s += Std.string(Math.floor(Math.abs(dV))) + " ";
 					else if (dV < 0)
 						s += "-";
 					// Quaters

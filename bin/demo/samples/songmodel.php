@@ -23,7 +23,7 @@ $(document).ready(function() {
 	try
 	{
 		// use SongLoader to load files
-		var factory = new alphatab.tablature.model.SongFactoryImpl();
+		var factory = new alphatab.tablature.model.DrawingSongModelFactory();
         alphatab.file.SongLoader.loadSong('files/FadeToBlack.gp4', factory, 
 			function(song){ 
 				var info = $('#Info');

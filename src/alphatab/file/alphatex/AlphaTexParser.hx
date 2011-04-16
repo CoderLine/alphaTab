@@ -173,8 +173,6 @@ class AlphaTexParser extends SongReader
 		measures();
 	}
 	
-
-	
 	/**
 	 * Non Terminal - MetaData
 	 */
@@ -313,7 +311,7 @@ class AlphaTexParser extends SongReader
 				}
 				else
 				{
-					error("tuning", AlphaTexSymbols.Number);
+					error("tuning", AlphaTexSymbols.Tuning);
 				}
 			}
 	        else if (_syData == "instrument") 
@@ -338,7 +336,7 @@ class AlphaTexParser extends SongReader
                 }
                 else
                 {
-                    error("tempo", AlphaTexSymbols.Number);
+                    error("instrument", AlphaTexSymbols.Number);
                 }
                 newSy();
             }
@@ -747,8 +745,8 @@ class AlphaTexParser extends SongReader
 				error("tremolobar-effect", AlphaTexSymbols.LParensis);
 				return false;
 			}
-			newSy();
 			_allowNegatives = true;
+			newSy();
 		
 			var points:Array<BendPoint> = new Array<BendPoint>();
 			while (_sy != AlphaTexSymbols.RParensis && _sy != AlphaTexSymbols.Eof)
@@ -889,7 +887,7 @@ class AlphaTexParser extends SongReader
 								
 				// set positions
 				var count = points.length;
-				var step = Math.ceil(12 / count);
+				var step = Math.floor(12 / count);
 				var i = 0; 
 				var bendEffect:BendEffect = factory.newBendEffect();
 				while (i < count) 
@@ -1220,7 +1218,7 @@ class AlphaTexParser extends SongReader
 				{
 					var number:Int = readNumber();
 					_sy = AlphaTexSymbols.Number;
-					_syData = -number;
+					_syData = number;
 				}
 				else
 				{
