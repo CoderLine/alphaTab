@@ -46,8 +46,9 @@ class BeatDrawing extends Beat
         return cast (width * factor);
     }
     
-    public function fullX(layout:ViewLayout) : Int
+    public function fullX() : Int
     {
+        var layout:ViewLayout = measureDrawing().staveLine.tablature.viewLayout;
         return measureDrawing().staveLine.x + measureDrawing().x + measureDrawing().getDefaultSpacings(layout) + x;
     }
     

@@ -20,7 +20,10 @@ $description = "This sample shows how to display a GuitarPro file";
 ?> 
 <script language="JavaScript" type="text/javascript"> 
 $(document).ready(function() { 
-	$('div.alphaTab').alphaTab({file: 'files/Pm.gp5'});
+	$('div.alphaTab').alphaTab({
+        file: 'files/Pm.gp5',
+		autoSize: false, width:300, zoom: 0.75
+    });
 });
 </script>
 <div class="alphaTab"></div>

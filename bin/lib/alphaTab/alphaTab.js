@@ -2720,8 +2720,8 @@ alphatab.tablature.model.TablatureStave.prototype.calculateBeamY = function(layo
 			}
 		}
 		y = 0;
-		x1 = beatGroup.firstMinNote.voice.beat.fullX(layout);
-		x2 = beatGroup.lastMinNote.voice.beat.fullX(layout);
+		x1 = beatGroup.firstMinNote.voice.beat.fullX();
+		x2 = beatGroup.lastMinNote.voice.beat.fullX();
 		y1 = Math.round(this.getNoteTablaturePosY(layout,beatGroup.firstMinNote) + downOffset);
 		y2 = Math.round(this.getNoteTablaturePosY(layout,beatGroup.lastMinNote) + downOffset);
 		if(y1 > y2 && (y1 - y2) > maxDistance) y2 = (y1 - maxDistance);
@@ -2744,8 +2744,8 @@ alphatab.tablature.model.TablatureStave.prototype.calculateBeamY = function(layo
 			}
 		}
 		y = 0;
-		x1 = beatGroup.firstMaxNote.voice.beat.fullX(layout);
-		x2 = beatGroup.lastMaxNote.voice.beat.fullX(layout);
+		x1 = beatGroup.firstMaxNote.voice.beat.fullX();
+		x2 = beatGroup.lastMaxNote.voice.beat.fullX();
 		y1 = Math.round(this.getNoteTablaturePosY(layout,beatGroup.firstMaxNote) - upOffset);
 		y2 = Math.round(this.getNoteTablaturePosY(layout,beatGroup.lastMaxNote) - upOffset);
 		if(y1 < y2 && (y2 - y1) > maxDistance) y2 = (y1 + maxDistance);
@@ -2860,8 +2860,8 @@ alphatab.tablature.model.TablatureStave.prototype.paintBeam = function(layout,co
 					endX = Math.round(x + xMove);
 				}
 				else {
-					startX = Math.round(voice.leftJoin.beat.fullX(layout) + xMove);
-					endX = Math.round(voice.rightJoin.beat.fullX(layout) + (voice.rightJoin.maxStringNote.noteSize.x / 2));
+					startX = Math.round(voice.leftJoin.beat.fullX() + xMove);
+					endX = Math.round(voice.rightJoin.beat.fullX() + (voice.rightJoin.maxStringNote.noteSize.x / 2));
 				}
 				alphatab.tablature.drawing.NotePainter.paintBar(fill,startX,y2,endX,y2,index,1,layout.scale);
 			}
@@ -3283,7 +3283,7 @@ alphatab.tablature.model.TablatureStave.prototype.paintSlides = function(layout,
 				var down = note.string > 3;
 				var realX = (x + note.noteSize.x) + 4 * layout.scale;
 				var realY = (down?y + alphatab.tablature.drawing.DrawingResources.noteFontHeight / 2:y - alphatab.tablature.drawing.DrawingResources.noteFontHeight / 2);
-				var endX = (nextNote != null?nextNote.voice.beat.fullX(layout):realX + 15 * layout.scale);
+				var endX = (nextNote != null?nextNote.voice.beat.fullX():realX + 15 * layout.scale);
 				var fill = (note.voice.index == 0?context.get(10):context.get(6));
 				alphatab.tablature.model.TablatureStave.paintTie(layout,fill,x + xOffset / 2,realY,(x + note.voice.beat.fullWidth()) + nextNote.noteSize.x,realY,down);
 			}
@@ -10360,8 +10360,8 @@ alphatab.tablature.model.ScoreStave.prototype.calculateBeamY = function(layout,b
 			}
 		}
 		y = 0;
-		x1 = beatGroup.firstMinNote.voice.beat.fullX(layout);
-		x2 = beatGroup.lastMinNote.voice.beat.fullX(layout);
+		x1 = beatGroup.firstMinNote.voice.beat.fullX();
+		x2 = beatGroup.lastMinNote.voice.beat.fullX();
 		y1 = Math.round(this.getNoteScorePosY(layout,beatGroup.firstMinNote) + downOffset);
 		y2 = Math.round(this.getNoteScorePosY(layout,beatGroup.lastMinNote) + downOffset);
 		if(y1 > y2 && (y1 - y2) > maxDistance) y2 = (y1 - maxDistance);
@@ -10384,8 +10384,8 @@ alphatab.tablature.model.ScoreStave.prototype.calculateBeamY = function(layout,b
 			}
 		}
 		y = 0;
-		x1 = beatGroup.firstMaxNote.voice.beat.fullX(layout);
-		x2 = beatGroup.lastMaxNote.voice.beat.fullX(layout);
+		x1 = beatGroup.firstMaxNote.voice.beat.fullX();
+		x2 = beatGroup.lastMaxNote.voice.beat.fullX();
 		y1 = Math.round(this.getNoteScorePosY(layout,beatGroup.firstMaxNote) - upOffset);
 		y2 = Math.round(this.getNoteScorePosY(layout,beatGroup.lastMaxNote) - upOffset);
 		if(y1 < y2 && (y2 - y1) > maxDistance) y2 = (y1 + maxDistance);
@@ -10577,20 +10577,20 @@ alphatab.tablature.model.ScoreStave.prototype.paintBeam = function(layout,contex
 					if(voice.joinedType == alphatab.tablature.model.JoinedType.NoneRight) {
 						startX = Math.round(x + xMove);
 						endX = Math.round((x + (6 * layout.scale)) + xMove);
-						startXforCalculation = voice.beat.fullX(layout);
-						endXforCalculation = Math.floor(voice.beat.fullX(layout) + (6 * layout.scale));
+						startXforCalculation = voice.beat.fullX();
+						endXforCalculation = Math.floor(voice.beat.fullX() + (6 * layout.scale));
 					}
 					else if(voice.joinedType == alphatab.tablature.model.JoinedType.NoneLeft) {
 						startX = Math.round((x - (6 * layout.scale)) + xMove);
 						endX = Math.round(x + xMove);
-						startXforCalculation = Math.floor(voice.beat.fullX(layout) - (6 * layout.scale));
-						endXforCalculation = voice.beat.fullX(layout);
+						startXforCalculation = Math.floor(voice.beat.fullX() - (6 * layout.scale));
+						endXforCalculation = voice.beat.fullX();
 					}
 					else {
-						startX = Math.round(voice.leftJoin.beat.fullX(layout) + xMove);
-						endX = Math.round(voice.rightJoin.beat.fullX(layout) + xMove);
-						startXforCalculation = voice.leftJoin.beat.fullX(layout);
-						endXforCalculation = voice.rightJoin.beat.fullX(layout);
+						startX = Math.round(voice.leftJoin.beat.fullX() + xMove);
+						endX = Math.round(voice.rightJoin.beat.fullX() + xMove);
+						startXforCalculation = voice.leftJoin.beat.fullX();
+						endXforCalculation = voice.rightJoin.beat.fullX();
 					}
 					var hY1 = Math.round((y + yMove) + this.calculateBeamY(layout,voice.beatGroup,direction,startXforCalculation,key,clef));
 					var hY2 = Math.round((y + yMove) + this.calculateBeamY(layout,voice.beatGroup,direction,endXforCalculation,key,clef));
@@ -11088,8 +11088,8 @@ alphatab.tablature.model.ScoreStave.prototype.paintTriplet = function(layout,con
 	if(voice.tripletGroup.isFull() && (previousVoice == null || previousVoice.tripletGroup == null || previousVoice.tripletGroup != voice.tripletGroup)) {
 		var firstVoice = voice.tripletGroup.voices[0];
 		var lastVoice = voice.tripletGroup.voices[voice.tripletGroup.voices.length - 1];
-		var startX = firstVoice.beat.fullX(layout);
-		var endX = lastVoice.beat.fullX(layout);
+		var startX = firstVoice.beat.fullX();
+		var endX = lastVoice.beat.fullX();
 		var direction = voice.beatGroup.getDirection();
 		if(direction == 1) {
 			var offset = Math.floor(alphatab.tablature.drawing.DrawingResources.getScoreNoteSize(layout,false).x);
@@ -11357,9 +11357,10 @@ alphatab.tablature.model.BeatDrawing.prototype.fullWidth = function() {
 	}
 	$s.pop();
 }
-alphatab.tablature.model.BeatDrawing.prototype.fullX = function(layout) {
+alphatab.tablature.model.BeatDrawing.prototype.fullX = function() {
 	$s.push("alphatab.tablature.model.BeatDrawing::fullX");
 	var $spos = $s.length;
+	var layout = this.measure.staveLine.tablature.viewLayout;
 	{
 		var $tmp = ((this.measure.staveLine.x + this.measure.x) + this.measure.getDefaultSpacings(layout)) + this.x;
 		$s.pop();

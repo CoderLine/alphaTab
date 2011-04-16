@@ -309,8 +309,8 @@ class TablatureStave extends Stave
                     }
                     else
                     {
-                        startX = Math.round(voice.leftJoin.beatDrawing().fullX(layout) + xMove);
-                        endX = Math.round(voice.rightJoin.beatDrawing().fullX(layout) + (voice.rightJoin.maxStringNote.noteSize.x / 2));
+                        startX = Math.round(voice.leftJoin.beatDrawing().fullX() + xMove);
+                        endX = Math.round(voice.rightJoin.beatDrawing().fullX() + (voice.rightJoin.maxStringNote.noteSize.x / 2));
                     }
                     
                     NotePainter.paintBar(fill, startX, y2, endX, y2, index, 1, layout.scale);
@@ -351,8 +351,8 @@ class TablatureStave extends Stave
             
             // calculate the two points where to place the beam trough
             y = 0;
-            x1 = beatGroup.firstMinNote.beatDrawing().fullX(layout);
-            x2 = beatGroup.lastMinNote.beatDrawing().fullX(layout);
+            x1 = beatGroup.firstMinNote.beatDrawing().fullX();
+            x2 = beatGroup.lastMinNote.beatDrawing().fullX();
             y1 = Math.round(getNoteTablaturePosY(layout, beatGroup.firstMinNote) + downOffset);
             y2 = Math.round(getNoteTablaturePosY(layout, beatGroup.lastMinNote) + downOffset);
             
@@ -379,8 +379,8 @@ class TablatureStave extends Stave
             
             // calculate the two points where to place the beam trough
             y = 0;
-            x1 = beatGroup.firstMaxNote.beatDrawing().fullX(layout);
-            x2 = beatGroup.lastMaxNote.beatDrawing().fullX(layout);
+            x1 = beatGroup.firstMaxNote.beatDrawing().fullX();
+            x2 = beatGroup.lastMaxNote.beatDrawing().fullX();
             y1 = Math.round(getNoteTablaturePosY(layout, beatGroup.firstMaxNote) - upOffset);
             y2 = Math.round(getNoteTablaturePosY(layout, beatGroup.lastMaxNote) - upOffset);
             
@@ -928,7 +928,7 @@ class TablatureStave extends Stave
                     var realX = x + note.noteSize.x + 4*layout.scale;
                     var realY = down ? y + DrawingResources.noteFontHeight/2
                                      : y - DrawingResources.noteFontHeight/2;
-                    var endX:Float = nextNote != null ? nextNote.beatDrawing().fullX(layout)
+                    var endX:Float = nextNote != null ? nextNote.beatDrawing().fullX()
                                                         : realX + 15*layout.scale;
                                 
                     var fill:DrawingLayer = note.voice.index == 0

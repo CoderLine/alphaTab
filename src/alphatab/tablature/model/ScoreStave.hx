@@ -622,22 +622,22 @@ class ScoreStave extends Stave
 						{
 							startX = Math.round(x + xMove);
 							endX = Math.round(x + (6*layout.scale) + xMove);
-							startXforCalculation = voice.beatDrawing().fullX(layout);
-							endXforCalculation = Math.floor(voice.beatDrawing().fullX(layout) + (6*layout.scale));
+							startXforCalculation = voice.beatDrawing().fullX();
+							endXforCalculation = Math.floor(voice.beatDrawing().fullX() + (6*layout.scale));
 						}
 						else if (voice.joinedType == JoinedType.NoneLeft)
 						{
 							startX = Math.round(x - (6*layout.scale) + xMove);
 							endX = Math.round(x + xMove);
-							startXforCalculation = Math.floor(voice.beatDrawing().fullX(layout) - (6*layout.scale));
-							endXforCalculation = voice.beatDrawing().fullX(layout);
+							startXforCalculation = Math.floor(voice.beatDrawing().fullX() - (6*layout.scale));
+							endXforCalculation = voice.beatDrawing().fullX();
 						}
 						else
 						{
-							startX = Math.round(voice.leftJoin.beatDrawing().fullX(layout) + xMove);
-							endX = Math.round(voice.rightJoin.beatDrawing().fullX(layout) + xMove);
-							startXforCalculation = voice.leftJoin.beatDrawing().fullX(layout);
-							endXforCalculation = voice.rightJoin.beatDrawing().fullX(layout);
+							startX = Math.round(voice.leftJoin.beatDrawing().fullX() + xMove);
+							endX = Math.round(voice.rightJoin.beatDrawing().fullX() + xMove);
+							startXforCalculation = voice.leftJoin.beatDrawing().fullX();
+							endXforCalculation = voice.rightJoin.beatDrawing().fullX();
 						}
                         
 						var hY1:Int = Math.round(y + yMove + calculateBeamY(layout, voice.beatGroup, direction, startXforCalculation, key, clef));
@@ -685,8 +685,8 @@ class ScoreStave extends Stave
             
             // calculate the two points where to place the beam trough
             y = 0;
-            x1 = beatGroup.firstMinNote.beatDrawing().fullX(layout);
-            x2 = beatGroup.lastMinNote.beatDrawing().fullX(layout);
+            x1 = beatGroup.firstMinNote.beatDrawing().fullX();
+            x2 = beatGroup.lastMinNote.beatDrawing().fullX();
             y1 = Math.round(getNoteScorePosY(layout, beatGroup.firstMinNote) + downOffset);
             y2 = Math.round(getNoteScorePosY(layout, beatGroup.lastMinNote) + downOffset);
             
@@ -713,8 +713,8 @@ class ScoreStave extends Stave
             
             // calculate the two points where to place the beam trough
             y = 0;
-            x1 = beatGroup.firstMaxNote.beatDrawing().fullX(layout);
-            x2 = beatGroup.lastMaxNote.beatDrawing().fullX(layout);
+            x1 = beatGroup.firstMaxNote.beatDrawing().fullX();
+            x2 = beatGroup.lastMaxNote.beatDrawing().fullX();
             y1 = Math.round(getNoteScorePosY(layout, beatGroup.firstMaxNote) - upOffset);
             y2 = Math.round(getNoteScorePosY(layout, beatGroup.lastMaxNote) - upOffset);
             
@@ -752,8 +752,8 @@ class ScoreStave extends Stave
             var firstVoice = voice.tripletGroup.voices[0];
             var lastVoice = voice.tripletGroup.voices[voice.tripletGroup.voices.length -1];
             
-            var startX = firstVoice.beatDrawing().fullX(layout);
-            var endX = lastVoice.beatDrawing().fullX(layout);
+            var startX = firstVoice.beatDrawing().fullX();
+            var endX = lastVoice.beatDrawing().fullX();
             
             var direction:Int = voice.beatGroup.getDirection();
             

@@ -156,18 +156,22 @@
             var x = $(self.canvas).offset().left + parseInt($(self.canvas).css("borderLeftWidth"), 10) ;
             var y = $(self.canvas).offset().top;
 
-            y += beat.measureImpl().posY;
+            y += beat.measure.staveLine.y;
+
+            var measureX = x + beat.measure.staveLine.x + beat.measure.x;
+console.log("measure: " + measureX + " " + beat.measure.width);
+            measureCaret.offset({ top: y, left: measureX});
+            measureCaret.width(beat.measure.width + beat.measure.spacing);
+            measureCaret.height(beat.measure.staveLine.getHeight());
 
 
-            measureCaret.offset({ top: y, left: x + beat.measureImpl().posX});
-            measureCaret.width(beat.measureImpl().width + beat.measureImpl().spacing);
-            measureCaret.height(beat.measureImpl().height());
-
-            beatCaret.offset({top: y, left: x + beat.getRealPosX(self.tablature.viewLayout)});
+            var noteSize = alphatab.tablature.drawing.DrawingResources.getScoreNoteSize(self.tablature.viewLayout, false);
+            var beatX = x + beat.fullX() + noteSize.x/2;
+            beatCaret.offset({top: y, left: beatX});
             beatCaret.width(3);
             beatCaret.height(measureCaret.height());
 
-            if(beat.measureImpl().isFirstOfLine && playerOptions.autoScroll)
+            if(beat.measure.isFirstOfLine() && playerOptions.autoScroll)
             {
                 window.scrollTo(0, y - 30);
             }
