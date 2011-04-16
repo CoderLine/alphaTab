@@ -75,7 +75,23 @@ class AlphaTexWriter
             }
         }
         
-        return _result.toString();        
+        return cleanup(_result.toString());        
+    }
+    
+    private function cleanup(data:String) : String
+    {
+        var spaces = ~/[ ]+/g; // g : replace all instances
+        // delete empty brackets
+        data = StringTools.replace(data, "{}", " "); 
+        data = StringTools.replace(data, "{ }", " "); 
+        // delete unneeded spaces                
+        data = spaces.replace(data, " ");
+        data = StringTools.replace(data, "{ ", "{"); 
+        data = StringTools.replace(data, " }", "}"); 
+        data = StringTools.replace(data, "( ", "("); 
+        data = StringTools.replace(data, " )", ")"); 
+        data = spaces.replace(data, " ");
+        return data;
     }
     
     private function writeMeasure(measure:Measure)

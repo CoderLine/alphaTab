@@ -768,7 +768,7 @@ class AlphaTexParser extends SongReader
 							
 			// set positions
 			var count = points.length;
-			var step = Math.ceil(12 / count);
+			var step = Math.floor(12 / count);
 			var i = 0; 
 			var tremoloBarEffect:TremoloBarEffect = factory.newTremoloBarEffect();
 			while (i < count) 

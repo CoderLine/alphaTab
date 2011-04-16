@@ -4126,6 +4126,24 @@ alphatab.file.alphatex.AlphaTexWriter.prototype._result = null;
 alphatab.file.alphatex.AlphaTexWriter.prototype._timeSignature = null;
 alphatab.file.alphatex.AlphaTexWriter.prototype._track = null;
 alphatab.file.alphatex.AlphaTexWriter.prototype._voice = null;
+alphatab.file.alphatex.AlphaTexWriter.prototype.cleanup = function(data) {
+	$s.push("alphatab.file.alphatex.AlphaTexWriter::cleanup");
+	var $spos = $s.length;
+	var spaces = new EReg("[ ]+","g");
+	data = StringTools.replace(data,"{}"," ");
+	data = StringTools.replace(data,"{ }"," ");
+	data = spaces.replace(data," ");
+	data = StringTools.replace(data,"{ ","{");
+	data = StringTools.replace(data," }","}");
+	data = StringTools.replace(data,"( ","(");
+	data = StringTools.replace(data," )",")");
+	data = spaces.replace(data," ");
+	{
+		$s.pop();
+		return data;
+	}
+	$s.pop();
+}
 alphatab.file.alphatex.AlphaTexWriter.prototype.parseKeySignature = function(keySignature) {
 	$s.push("alphatab.file.alphatex.AlphaTexWriter::parseKeySignature");
 	var $spos = $s.length;
@@ -4247,7 +4265,7 @@ alphatab.file.alphatex.AlphaTexWriter.prototype.write = function() {
 		}
 	}
 	{
-		var $tmp = this._result.b.join("");
+		var $tmp = this.cleanup(this._result.b.join(""));
 		$s.pop();
 		return $tmp;
 	}
@@ -5812,7 +5830,7 @@ alphatab.file.alphatex.AlphaTexParser.prototype.applyBeatEffect = function(beat)
 			points = points.slice(0,12);
 		}
 		var count = points.length;
-		var step = Math.ceil(12 / count);
+		var step = Math.floor(12 / count);
 		var i = 0;
 		var tremoloBarEffect = this.factory.newTremoloBarEffect();
 		while(i < count) {
