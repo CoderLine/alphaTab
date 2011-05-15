@@ -202,6 +202,8 @@ class PageViewLayout extends ViewLayout
 	
 	private function layoutSongInfo(x:Int, y:Int): Int
 	{
+        if (tablature.getLayoutSetting("hideSongInfo", false)) return y;
+        
 		var song:Song = tablature.track.song;
 		if (song.title != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.TITLE != 0))
 		{
@@ -281,6 +283,8 @@ class PageViewLayout extends ViewLayout
 	
 	private function paintSongInfo(ctx:DrawingContext, clientArea:Rectangle, x:Int, y:Int) : Int
 	{
+        if (tablature.getLayoutSetting("hideSongInfo", false)) return y;
+
 		var song:Song = tablature.track.song;
 		x += contentPadding.left;
 		var tX:Float;

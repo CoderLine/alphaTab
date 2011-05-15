@@ -375,6 +375,10 @@ alphatab.tablature.PageViewLayout.prototype.init = function(scale) {
 alphatab.tablature.PageViewLayout.prototype.layoutSongInfo = function(x,y) {
 	$s.push("alphatab.tablature.PageViewLayout::layoutSongInfo");
 	var $spos = $s.length;
+	if(this.tablature.getLayoutSetting("hideSongInfo",false)) {
+		$s.pop();
+		return y;
+	}
 	var song = this.tablature.track.song;
 	if(song.title != "" && ((song.pageSetup.headerAndFooter & 1) != 0)) {
 		y += Math.floor(35 * this.scale);
@@ -437,6 +441,10 @@ alphatab.tablature.PageViewLayout.prototype.paintSong = function(ctx,clientArea,
 alphatab.tablature.PageViewLayout.prototype.paintSongInfo = function(ctx,clientArea,x,y) {
 	$s.push("alphatab.tablature.PageViewLayout::paintSongInfo");
 	var $spos = $s.length;
+	if(this.tablature.getLayoutSetting("hideSongInfo",false)) {
+		$s.pop();
+		return y;
+	}
 	var song = this.tablature.track.song;
 	x += this.contentPadding.left;
 	var tX;

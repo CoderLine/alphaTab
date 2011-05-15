@@ -25,7 +25,8 @@ $(document).ready(function() {
 	$('div.alphaTabPage').alphaTab({file: f,  layout: "page"});
 	$('div.alphaTabPage2').alphaTab({file: f, layout: {
         mode: "page",
-        measuresPerLine: 5
+        measuresPerLine: 5,
+        hideSongInfo: true
     }});
 	$('div.alphaTabHorizontal').alphaTab({file: f, layout: "horizontal"});
 });

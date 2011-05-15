@@ -108,7 +108,7 @@ class Tablature
         settings.set(staveId + "." + setting, value);
     }
     
-    public function getStaveSetting(staveId:String, setting:String, defaultValue:Dynamic = null)
+    public function getStaveSetting(staveId:String, setting:String, defaultValue:Dynamic = null) : Dynamic
     {
         var value:Dynamic = settings.get(staveId + "." + setting);
         return value != null ? value : defaultValue;
@@ -120,7 +120,7 @@ class Tablature
         settings.set("layout." + setting, value);
     }
     
-    public function getLayoutSetting(setting:String, defaultValue:Dynamic = null)
+    public function getLayoutSetting(setting:String, defaultValue:Dynamic = null) : Dynamic
     {
         var value:Dynamic = settings.get("layout." + setting);
         return value != null ? value : defaultValue;
