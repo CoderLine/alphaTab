@@ -1053,7 +1053,7 @@ class AlphaTexParser extends SongReader
 				effect.slide = true;
 				effect.slideType = SlideType.FastSlideTo;
 			}			
-			else if (_syData == "sf") 
+			else if (_syData == "ss") 
 			{
 				newSy();
 				effect.slide = true;

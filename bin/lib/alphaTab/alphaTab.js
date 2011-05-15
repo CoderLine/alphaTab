@@ -3937,12 +3937,13 @@ alphatab.tablature.model.TablatureStave.prototype.paintSlides = function(layout,
 				draw.addLine(x + xOffset,y,x + note.voice.beat.fullWidth(),y);
 			}
 			if(note.effect.slideType == 1) {
+				this.paintHammerOn(layout,context,note,x,y);
 				var down = note.string > 3;
-				var realX = (x + note.noteSize.x) + 4 * layout.scale;
+				var realX = x + (note.noteSize.x / 2);
 				var realY = (down?y + alphatab.tablature.drawing.DrawingResources.noteFontHeight / 2:y - alphatab.tablature.drawing.DrawingResources.noteFontHeight / 2);
-				var endX = (nextNote != null?nextNote.voice.beat.fullX():realX + 15 * layout.scale);
+				var endX = (nextNote != null?(x + note.voice.beat.fullWidth()) + (nextNote.noteSize.x / 2):realX + 15 * layout.scale);
 				var fill = (note.voice.index == 0?context.get(10):context.get(6));
-				alphatab.tablature.model.TablatureStave.paintTie(layout,fill,x + xOffset / 2,realY,(x + note.voice.beat.fullWidth()) + nextNote.noteSize.x,realY,down);
+				alphatab.tablature.model.TablatureStave.paintTie(layout,fill,realX,realY,endX,realY,down);
 			}
 		}
 		else {
@@ -6982,7 +6983,7 @@ alphatab.file.alphatex.AlphaTexParser.prototype.noteEffects = function(beat,effe
 			effect.slide = true;
 			effect.slideType = 0;
 		}
-		else if(this._syData == "sf") {
+		else if(this._syData == "ss") {
 			this.newSy();
 			effect.slide = true;
 			effect.slideType = 1;
@@ -10799,6 +10800,9 @@ alphatab.tablature.model.ScoreStave.prototype.paintEffects = function(layout,con
 	this.paintStaccato(layout,context,note,x,y);
 	this.paintGraceNote(layout,context,note,x,noteY);
 	this.paintTremoloPicking(layout,context,note,x,noteY);
+	this.paintHammerOn(layout,context,note,x,y);
+	this.paintSlide(layout,context,note,x,y);
+	this.paintTiedNote(layout,context,note,x,y);
 	$s.pop();
 }
 alphatab.tablature.model.ScoreStave.prototype.paintExtraLines = function(layout,context,beat,x,y) {
@@ -10857,6 +10861,27 @@ alphatab.tablature.model.ScoreStave.prototype.paintGraceNote = function(layout,c
 		var tieY = y + (10 * layout.scale);
 		alphatab.tablature.model.TablatureStave.paintTie(layout,fill,startX,tieY,x,tieY,true);
 	}
+	$s.pop();
+}
+alphatab.tablature.model.ScoreStave.prototype.paintHammerOn = function(layout,context,note,x,y) {
+	$s.push("alphatab.tablature.model.ScoreStave::paintHammerOn");
+	var $spos = $s.length;
+	if(!note.effect.hammer) {
+		$s.pop();
+		return;
+	}
+	var nextBeat = note.voice.beat.getNextBeat();
+	var nextNote = (nextBeat == null?null:nextBeat.getNote(note.voice.index,note.string));
+	var fill = (note.voice.index == 0?context.get(10):context.get(6));
+	var draw = (note.voice.index == 0?context.get(11):context.get(7));
+	var down = (note.voice.beatGroup.getDirection() == 2);
+	var noteSize = Math.round(alphatab.tablature.drawing.DrawingResources.getScoreNoteSize(layout,false).x);
+	var noteOffset = Math.round((4 + layout.scale) * (((!down)?1:-1)));
+	var startY = ((y + this.spacing.get(10)) + this.getNoteScorePosY(layout,note)) + noteOffset;
+	var startX = x + (noteSize / 2);
+	var endX = (nextNote != null?x + (note.voice.beat.fullWidth() + noteSize / 2):startX + 15 * layout.scale);
+	var endY = (nextNote != null?((y + this.spacing.get(10)) + this.getNoteScorePosY(layout,nextNote)) + noteOffset:startY);
+	alphatab.tablature.model.TablatureStave.paintTie(layout,fill,startX,startY,endX,endY,!down);
 	$s.pop();
 }
 alphatab.tablature.model.ScoreStave.prototype.paintKeySignature = function(layout,context,measure,x,y) {
@@ -11065,6 +11090,37 @@ alphatab.tablature.model.ScoreStave.prototype.paintSilence = function(layout,con
 	}
 	$s.pop();
 }
+alphatab.tablature.model.ScoreStave.prototype.paintSlide = function(layout,context,note,x,y) {
+	$s.push("alphatab.tablature.model.ScoreStave::paintSlide");
+	var $spos = $s.length;
+	if(!note.effect.slide) {
+		$s.pop();
+		return;
+	}
+	var nextBeat = note.voice.beat.getNextBeat();
+	var nextNote = (nextBeat == null?null:nextBeat.getNote(note.voice.index,note.string));
+	if(nextNote != null && (note.effect.slideType == 1 || note.effect.slideType == 0)) {
+		var down = (note.voice.beatGroup.getDirection() == 2);
+		var noteXOffset = Math.round(4 * layout.scale);
+		var noteYOffset = noteXOffset * (((!down)?1:-1));
+		var noteSize = Math.round(alphatab.tablature.drawing.DrawingResources.getScoreNoteSize(layout,false).x);
+		var startY = ((y + this.spacing.get(10)) + this.getNoteScorePosY(layout,note)) - noteYOffset;
+		var startX = (x + noteSize) + noteXOffset;
+		var endX = (nextNote != null?((x + note.voice.beat.fullWidth()) - noteYOffset) - noteXOffset:startX + 15 * layout.scale);
+		var endY = (nextNote != null?(y + this.spacing.get(10)) + this.getNoteScorePosY(layout,nextNote):startY);
+		var draw = (note.voice.index == 0?context.get(11):context.get(7));
+		draw.addLine(startX,startY,endX,endY);
+		if(note.effect.slideType == 1) {
+			var fill = (note.voice.index == 0?context.get(10):context.get(6));
+			startY = ((y + this.spacing.get(10)) + this.getNoteScorePosY(layout,note)) + noteYOffset;
+			startX = x + (noteSize / 2);
+			endX = (nextNote != null?x + (note.voice.beat.fullWidth() + noteSize / 2):startX + 15 * layout.scale);
+			endY = (nextNote != null?((y + this.spacing.get(10)) + this.getNoteScorePosY(layout,nextNote)) + noteYOffset:startY);
+			alphatab.tablature.model.TablatureStave.paintTie(layout,fill,startX,startY,endX,endY,!down);
+		}
+	}
+	$s.pop();
+}
 alphatab.tablature.model.ScoreStave.prototype.paintStaccato = function(layout,context,note,x,y) {
 	$s.push("alphatab.tablature.model.ScoreStave::paintStaccato");
 	var $spos = $s.length;
@@ -11129,6 +11185,24 @@ alphatab.tablature.model.ScoreStave.prototype.paintText = function(layout,contex
 				context.get(9).addString(str,alphatab.tablature.drawing.DrawingResources.defaultFont,x + bd.x,y + Math.floor(alphatab.tablature.drawing.DrawingResources.defaultFontHeight / 2));
 			}
 		}
+	}
+	$s.pop();
+}
+alphatab.tablature.model.ScoreStave.prototype.paintTiedNote = function(layout,context,note,x,y) {
+	$s.push("alphatab.tablature.model.ScoreStave::paintTiedNote");
+	var $spos = $s.length;
+	var nextBeat = note.voice.beat.getNextBeat();
+	var nextNote = (nextBeat == null?null:nextBeat.getNote(note.voice.index,note.string));
+	if(nextNote != null && nextNote.isTiedNote) {
+		var fill = (note.voice.index == 0?context.get(10):context.get(6));
+		var down = (note.voice.beatGroup.getDirection() == 2);
+		var noteSize = Math.round(alphatab.tablature.drawing.DrawingResources.getScoreNoteSize(layout,false).x);
+		var noteOffset = Math.round((4 + layout.scale) * (((!down)?1:-1)));
+		var startY = ((y + this.spacing.get(10)) + this.getNoteScorePosY(layout,note)) + noteOffset;
+		var startX = x + (noteSize / 2);
+		var endX = (nextNote != null?x + (note.voice.beat.fullWidth() + noteSize / 2):startX + 15 * layout.scale);
+		var endY = (nextNote != null?((y + this.spacing.get(10)) + this.getNoteScorePosY(layout,nextNote)) + noteOffset:startY);
+		alphatab.tablature.model.TablatureStave.paintTie(layout,fill,startX,startY,endX,endY,!down);
 	}
 	$s.pop();
 }

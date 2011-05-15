@@ -923,19 +923,21 @@ class TablatureStave extends Stave
                 
                 if (note.effect.slideType == SlideType.SlowSlideTo)
                 {
+                    paintHammerOn(layout, context, note, x, y);
                     var down:Bool = note.string > 3;
         
-                    var realX = x + note.noteSize.x + 4*layout.scale;
+                    var realX = x + (note.noteSize.x/2);
                     var realY = down ? y + DrawingResources.noteFontHeight/2
                                      : y - DrawingResources.noteFontHeight/2;
-                    var endX:Float = nextNote != null ? nextNote.beatDrawing().fullX()
+                    var endX:Float = nextNote != null ? x + note.beatDrawing().fullWidth() + (nextNote.noteSize.x / 2)
                                                         : realX + 15*layout.scale;
                                 
                     var fill:DrawingLayer = note.voice.index == 0
                         ? context.get(DrawingLayers.VoiceEffects1)
                         : context.get(DrawingLayers.VoiceEffects2);                                    
-                                                        
-                    paintTie(layout, fill, x + xOffset/2, realY, x + note.beatDrawing().fullWidth() + nextNote.noteSize.x, realY, down);
+                    
+                    
+                    paintTie(layout, fill, realX, realY, endX, realY, down);
                 }
             }
             else

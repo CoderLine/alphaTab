@@ -19,6 +19,7 @@ import alphatab.model.Duration;
 import alphatab.model.effects.GraceEffectTransition;
 import alphatab.model.MeasureClef;
 import alphatab.model.Note;
+import alphatab.model.SlideType;
 import alphatab.model.TripletFeel;
 import alphatab.model.Tuplet;
 import alphatab.model.VoiceDirection;
@@ -902,6 +903,118 @@ class ScoreStave extends Stave
         paintStaccato(layout, context, note, x, y);
         paintGraceNote(layout, context, note, x, noteY);
         paintTremoloPicking(layout, context, note, x, noteY);
+        paintHammerOn(layout, context, note, x, y);
+        paintSlide(layout, context, note, x, y);
+        paintTiedNote(layout, context, note, x, y);
+    }
+    
+    private function paintTiedNote(layout:ViewLayout, context:DrawingContext, note:NoteDrawing, x:Int, y:Int)
+    {
+        var nextBeat:BeatDrawing = note.beatDrawing().getNextBeat();
+        var nextNote:NoteDrawing = nextBeat == null ? null : cast nextBeat.getNote(note.voice.index, note.string);
+        
+        if (nextNote != null && nextNote.isTiedNote)
+        {                
+            var fill:DrawingLayer = note.voice.index == 0
+                                ? context.get(DrawingLayers.VoiceEffects1)
+                                : context.get(DrawingLayers.VoiceEffects2);
+                
+            var down:Bool = (note.voiceDrawing().beatGroup.getDirection() == VoiceDirection.Down);
+            
+            var noteSize = Math.round(DrawingResources.getScoreNoteSize(layout, false).x);
+            var noteOffset = Math.round( (4 + layout.scale) * ((!down) ? 1 : -1));
+                                
+            var startY = y + spacing.get(ScoreMiddleLines) + getNoteScorePosY(layout, note) + noteOffset;
+            var startX = x + (noteSize/2);
+            
+            var endX:Float = nextNote != null ? x + (note.beatDrawing().fullWidth() + noteSize / 2)
+                                                : startX + 15 * layout.scale;
+            var endY = nextNote != null ? y + spacing.get(ScoreMiddleLines) + getNoteScorePosY(layout, nextNote) + noteOffset
+                                : startY;
+                                                
+            TablatureStave.paintTie(layout, fill, startX, startY, endX, endY, !down);
+        }
+    }
+    
+    private function paintSlide(layout:ViewLayout, context:DrawingContext, note:NoteDrawing, x:Int, y:Int)
+    {
+        if (!note.effect.slide) return;
+        
+        var nextBeat:BeatDrawing = note.beatDrawing().getNextBeat();
+        var nextNote:NoteDrawing = nextBeat == null ? null : cast nextBeat.getNote(note.voice.index, note.string);
+        
+        if (nextNote != null && (note.effect.slideType == SlideType.SlowSlideTo || note.effect.slideType == SlideType.FastSlideTo))
+        {
+            // draw a line
+            var down:Bool = (note.voiceDrawing().beatGroup.getDirection() == VoiceDirection.Down);
+            var noteXOffset = Math.round( 4 * layout.scale );
+            var noteYOffset = noteXOffset * ((!down) ? 1 : -1);
+            var noteSize = Math.round(DrawingResources.getScoreNoteSize(layout, false).x);
+            
+            var startY:Float = y + spacing.get(ScoreMiddleLines) + getNoteScorePosY(layout, note) - noteYOffset;
+            var startX:Float = x + noteSize + noteXOffset;
+            
+                            
+            var endX:Float = nextNote != null ? x + note.beatDrawing().fullWidth() - noteYOffset - noteXOffset
+                                : startX + 15 * layout.scale;
+            var endY:Float = nextNote != null ? y + spacing.get(ScoreMiddleLines) + getNoteScorePosY(layout, nextNote)
+                                : startY;
+
+            var draw:DrawingLayer = note.voice.index == 0
+                    ? context.get(DrawingLayers.VoiceEffectsDraw1)
+                    : context.get(DrawingLayers.VoiceEffectsDraw2);
+
+            draw.addLine(startX, startY, endX, endY);
+            
+            // draw a tie
+            if (note.effect.slideType == SlideType.SlowSlideTo)
+            {
+                var fill:DrawingLayer = note.voice.index == 0
+                                    ? context.get(DrawingLayers.VoiceEffects1)
+                                    : context.get(DrawingLayers.VoiceEffects2);
+                    
+                
+                startY = y + spacing.get(ScoreMiddleLines) + getNoteScorePosY(layout, note) + noteYOffset;
+                startX = x + (noteSize/2);
+                
+                endX = nextNote != null ? x + (note.beatDrawing().fullWidth() + noteSize / 2)
+                                                    : startX + 15 * layout.scale;
+                endY = nextNote != null ? y + spacing.get(ScoreMiddleLines) + getNoteScorePosY(layout, nextNote) + noteYOffset
+                                    : startY;
+                                                    
+                TablatureStave.paintTie(layout, fill, startX, startY, endX, endY, !down);
+            }
+        }
+    }
+    
+    private function paintHammerOn(layout:ViewLayout, context:DrawingContext, note:NoteDrawing, x:Int, y:Int)
+    {
+        if (!note.effect.hammer) return;
+        
+        var nextBeat:BeatDrawing = note.beatDrawing().getNextBeat();
+        var nextNote:NoteDrawing = nextBeat == null ? null : cast nextBeat.getNote(note.voice.index, note.string);
+                
+		var fill:DrawingLayer = note.voice.index == 0
+							? context.get(DrawingLayers.VoiceEffects1)
+							: context.get(DrawingLayers.VoiceEffects2);
+		var draw:DrawingLayer = note.voice.index == 0
+							? context.get(DrawingLayers.VoiceEffectsDraw1)
+							: context.get(DrawingLayers.VoiceEffectsDraw2);
+            
+        var down:Bool = (note.voiceDrawing().beatGroup.getDirection() == VoiceDirection.Down);
+        
+        var noteSize = Math.round(DrawingResources.getScoreNoteSize(layout, false).x);
+        var noteOffset = Math.round( (4 + layout.scale) * ((!down) ? 1 : -1));
+                            
+        var startY = y + spacing.get(ScoreMiddleLines) + getNoteScorePosY(layout, note) + noteOffset;
+        var startX = x + (noteSize/2);
+        
+		var endX:Float = nextNote != null ? x + (note.beatDrawing().fullWidth() + noteSize / 2)
+                                            : startX + 15 * layout.scale;
+        var endY = nextNote != null ? y + spacing.get(ScoreMiddleLines) + getNoteScorePosY(layout, nextNote) + noteOffset
+                            : startY;
+                                            
+        TablatureStave.paintTie(layout, fill, startX, startY, endX, endY, !down);
     }
     
     private function paintStaccato(layout:ViewLayout, context:DrawingContext, note:NoteDrawing, x:Int, y:Int)
