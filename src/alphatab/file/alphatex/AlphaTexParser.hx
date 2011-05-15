@@ -164,11 +164,6 @@ class AlphaTexParser extends SongReader
 	private function song() : Void 
 	{
 		metaData();
-		if (_sy != AlphaTexSymbols.Dot) 
-		{
-			error("song", AlphaTexSymbols.Dot);
-		}
-		newSy();
 		
 		measures();
 	}
@@ -178,6 +173,7 @@ class AlphaTexParser extends SongReader
 	 */
 	private function metaData() : Void 
 	{
+        var anyMeta = false;
 		while (_sy == AlphaTexSymbols.MetaCommand)
 		{
 			if (_syData == "title") 
@@ -192,6 +188,7 @@ class AlphaTexParser extends SongReader
 					error("title", AlphaTexSymbols.String);
 				}
 				newSy();	
+                anyMeta = true;
 			}
 			else if (_syData == "subtitle") 
 			{
@@ -205,6 +202,7 @@ class AlphaTexParser extends SongReader
 					error("subtitle", AlphaTexSymbols.String);
 				}
 				newSy();
+                anyMeta = true;
 			}
 			else if (_syData == "artist") 
 			{
@@ -218,6 +216,7 @@ class AlphaTexParser extends SongReader
 					error("artist", AlphaTexSymbols.String);
 				}
 				newSy();
+                anyMeta = true;
 			}
 			else if (_syData == "album") 
 			{
@@ -231,6 +230,7 @@ class AlphaTexParser extends SongReader
 					error("album", AlphaTexSymbols.String);
 				}
 				newSy();
+                anyMeta = true;
 			}
 			else if (_syData == "words") 
 			{
@@ -244,6 +244,7 @@ class AlphaTexParser extends SongReader
 					error("words", AlphaTexSymbols.String);
 				}
 				newSy();
+                anyMeta = true;
 			}
 			else if (_syData == "music") 
 			{
@@ -257,6 +258,7 @@ class AlphaTexParser extends SongReader
 					error("music", AlphaTexSymbols.String);
 				}
 				newSy();
+                anyMeta = true;
 			}
 			else if (_syData == "copyright") 
 			{
@@ -270,6 +272,7 @@ class AlphaTexParser extends SongReader
 					error("copyright", AlphaTexSymbols.String);
 				}
 				newSy();
+                anyMeta = true;
 			}
 			else if (_syData == "tempo") 
 			{
@@ -283,6 +286,7 @@ class AlphaTexParser extends SongReader
 					error("tempo", AlphaTexSymbols.Number);
 				}
 				newSy();
+                anyMeta = true;
 			}
 			else if (_syData == "capo") 
 			{
@@ -296,6 +300,7 @@ class AlphaTexParser extends SongReader
 					error("capo", AlphaTexSymbols.Number);
 				}
 				newSy();
+                anyMeta = true;
 			}
 			else if (_syData == "tuning") 
 			{
@@ -313,6 +318,7 @@ class AlphaTexParser extends SongReader
 				{
 					error("tuning", AlphaTexSymbols.Tuning);
 				}
+                anyMeta = true;
 			}
 	        else if (_syData == "instrument") 
             {
@@ -339,12 +345,22 @@ class AlphaTexParser extends SongReader
                     error("instrument", AlphaTexSymbols.Number);
                 }
                 newSy();
-            }
+                anyMeta = true;
+			}
 			else 
 			{
 				error("metaDataTags", AlphaTexSymbols.String, false);
 			}
 		}
+        
+        if (anyMeta)
+        {
+            if (_sy != AlphaTexSymbols.Dot) 
+            {
+                error("song", AlphaTexSymbols.Dot);
+            }
+            newSy();
+        }
 	}
 	
 	/**

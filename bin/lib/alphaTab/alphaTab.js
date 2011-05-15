@@ -6554,6 +6554,7 @@ alphatab.file.alphatex.AlphaTexParser.prototype.measures = function() {
 alphatab.file.alphatex.AlphaTexParser.prototype.metaData = function() {
 	$s.push("alphatab.file.alphatex.AlphaTexParser::metaData");
 	var $spos = $s.length;
+	var anyMeta = false;
 	while(this._sy == alphatab.file.alphatex.AlphaTexSymbols.MetaCommand) {
 		if(this._syData == "title") {
 			this.newSy();
@@ -6564,6 +6565,7 @@ alphatab.file.alphatex.AlphaTexParser.prototype.metaData = function() {
 				this.error("title",alphatab.file.alphatex.AlphaTexSymbols.String);
 			}
 			this.newSy();
+			anyMeta = true;
 		}
 		else if(this._syData == "subtitle") {
 			this.newSy();
@@ -6574,6 +6576,7 @@ alphatab.file.alphatex.AlphaTexParser.prototype.metaData = function() {
 				this.error("subtitle",alphatab.file.alphatex.AlphaTexSymbols.String);
 			}
 			this.newSy();
+			anyMeta = true;
 		}
 		else if(this._syData == "artist") {
 			this.newSy();
@@ -6584,6 +6587,7 @@ alphatab.file.alphatex.AlphaTexParser.prototype.metaData = function() {
 				this.error("artist",alphatab.file.alphatex.AlphaTexSymbols.String);
 			}
 			this.newSy();
+			anyMeta = true;
 		}
 		else if(this._syData == "album") {
 			this.newSy();
@@ -6594,6 +6598,7 @@ alphatab.file.alphatex.AlphaTexParser.prototype.metaData = function() {
 				this.error("album",alphatab.file.alphatex.AlphaTexSymbols.String);
 			}
 			this.newSy();
+			anyMeta = true;
 		}
 		else if(this._syData == "words") {
 			this.newSy();
@@ -6604,6 +6609,7 @@ alphatab.file.alphatex.AlphaTexParser.prototype.metaData = function() {
 				this.error("words",alphatab.file.alphatex.AlphaTexSymbols.String);
 			}
 			this.newSy();
+			anyMeta = true;
 		}
 		else if(this._syData == "music") {
 			this.newSy();
@@ -6614,6 +6620,7 @@ alphatab.file.alphatex.AlphaTexParser.prototype.metaData = function() {
 				this.error("music",alphatab.file.alphatex.AlphaTexSymbols.String);
 			}
 			this.newSy();
+			anyMeta = true;
 		}
 		else if(this._syData == "copyright") {
 			this.newSy();
@@ -6624,6 +6631,7 @@ alphatab.file.alphatex.AlphaTexParser.prototype.metaData = function() {
 				this.error("copyright",alphatab.file.alphatex.AlphaTexSymbols.String);
 			}
 			this.newSy();
+			anyMeta = true;
 		}
 		else if(this._syData == "tempo") {
 			this.newSy();
@@ -6634,6 +6642,7 @@ alphatab.file.alphatex.AlphaTexParser.prototype.metaData = function() {
 				this.error("tempo",alphatab.file.alphatex.AlphaTexSymbols.Number);
 			}
 			this.newSy();
+			anyMeta = true;
 		}
 		else if(this._syData == "capo") {
 			this.newSy();
@@ -6644,6 +6653,7 @@ alphatab.file.alphatex.AlphaTexParser.prototype.metaData = function() {
 				this.error("capo",alphatab.file.alphatex.AlphaTexSymbols.Number);
 			}
 			this.newSy();
+			anyMeta = true;
 		}
 		else if(this._syData == "tuning") {
 			this.newSy();
@@ -6657,6 +6667,7 @@ alphatab.file.alphatex.AlphaTexParser.prototype.metaData = function() {
 			else {
 				this.error("tuning",alphatab.file.alphatex.AlphaTexSymbols.Tuning);
 			}
+			anyMeta = true;
 		}
 		else if(this._syData == "instrument") {
 			this.newSy();
@@ -6677,10 +6688,17 @@ alphatab.file.alphatex.AlphaTexParser.prototype.metaData = function() {
 				this.error("instrument",alphatab.file.alphatex.AlphaTexSymbols.Number);
 			}
 			this.newSy();
+			anyMeta = true;
 		}
 		else {
 			this.error("metaDataTags",alphatab.file.alphatex.AlphaTexSymbols.String,false);
 		}
+	}
+	if(anyMeta) {
+		if(this._sy != alphatab.file.alphatex.AlphaTexSymbols.Dot) {
+			this.error("song",alphatab.file.alphatex.AlphaTexSymbols.Dot);
+		}
+		this.newSy();
 	}
 	$s.pop();
 }
@@ -7229,10 +7247,6 @@ alphatab.file.alphatex.AlphaTexParser.prototype.song = function() {
 	$s.push("alphatab.file.alphatex.AlphaTexParser::song");
 	var $spos = $s.length;
 	this.metaData();
-	if(this._sy != alphatab.file.alphatex.AlphaTexSymbols.Dot) {
-		this.error("song",alphatab.file.alphatex.AlphaTexSymbols.Dot);
-	}
-	this.newSy();
 	this.measures();
 	$s.pop();
 }
