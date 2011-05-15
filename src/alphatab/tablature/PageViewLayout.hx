@@ -37,6 +37,8 @@ import alphatab.tablature.model.TablatureStave;
  */
 class PageViewLayout extends ViewLayout
 {
+    public static var LAYOUT_ID = "page"; 
+    
 	public static var PAGE_PADDING:Padding = new Padding(20, 40, 20, 40);
 	public static inline var WIDTH_ON_100:Int = 795;
 	
@@ -122,6 +124,8 @@ class PageViewLayout extends ViewLayout
         line.spacing.set(StaveLine.TopPadding, Math.floor(10 * scale));
         line.spacing.set(StaveLine.BottomSpacing, Math.floor(10 * scale));
 		
+        var measuresPerLine = tablature.getLayoutSetting("measuresPerLine", -1);
+        
 		var measureCount = track.measureCount(); 
         x = 0;
 		for (i in startIndex ... measureCount) 
@@ -130,13 +134,26 @@ class PageViewLayout extends ViewLayout
             measure.staveLine = line;
             measure.performLayout(this);            
                         
-            // try to fit measure into line            
-			if ((x + measure.width) >= getMaxWidth() && line.measures.length != 0) 
+            var lineIsFull:Bool = false;
+                        
+            // try to fit using the size
+            if (measuresPerLine == -1 && ((x + measure.width) >= getMaxWidth() && line.measures.length != 0) )
             {
-				line.fullLine = true;
-                line.width = x;        
-				return line;
-			}
+                lineIsFull = true;
+            }
+            // check if measuresPerLine is reached
+            else if (line.measures.length == measuresPerLine)
+            {
+                lineIsFull = true;
+            }
+            
+            
+            if (lineIsFull)
+            {                
+                line.fullLine = true;
+                line.width = x;  
+                return line;
+            }
             
             measure.x = x;            
 			x += measure.width;            

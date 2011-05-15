@@ -89,7 +89,8 @@ var alphaTabWrapper;
             width:600,
             height:200,
             autoSize: true,
-            staves: null
+            staves: null,
+            layout: null
         };
 
         this.options = $.extend(defaults, options);
@@ -239,6 +240,31 @@ var alphaTabWrapper;
         this.tablature = new alphatab.tablature.Tablature(this.canvas, staves, this.options.error);
         this.tablature.autoSizeWidth = this.options.autoSize;
         this.tablature.updateScale(this.options.zoom);
+        
+        // setup layout options
+        if(this.options.layout != null)
+        {
+            // only setting the layout manager
+            if(this.options.layout.constructor == String) 
+            {
+                this.tablature.setViewLayoutByKey(this.options.layout);
+            }
+            else 
+            {
+                // complex json configuration
+                $.each(this.options.layout, function(setting, val) {
+                    if(setting == "mode") // layout manager
+                    {
+                        self.tablature.setViewLayoutByKey(val);
+                    }
+                    else // additional settings
+                    {
+                        self.tablature.setLayoutSetting(setting, val);
+                    }
+                });
+            }
+        }
+
 
         // additional settings for this instance
         if(this.options.staves != null)

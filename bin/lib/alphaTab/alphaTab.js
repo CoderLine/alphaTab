@@ -1,6 +1,664 @@
 $estr = function() { return js.Boot.__string_rec(this,''); }
 if(typeof alphatab=='undefined') alphatab = {}
+if(!alphatab.tablature) alphatab.tablature = {}
+alphatab.tablature.ViewLayout = function(p) { if( p === $_ ) return; {
+	$s.push("alphatab.tablature.ViewLayout::new");
+	var $spos = $s.length;
+	this.init(1);
+	this.contentPadding = new alphatab.model.Padding(0,0,0,0);
+	$s.pop();
+}}
+alphatab.tablature.ViewLayout.__name__ = ["alphatab","tablature","ViewLayout"];
+alphatab.tablature.ViewLayout.prototype._cache = null;
+alphatab.tablature.ViewLayout.prototype.contentPadding = null;
+alphatab.tablature.ViewLayout.prototype.createStaveLine = function(track) {
+	$s.push("alphatab.tablature.ViewLayout::createStaveLine");
+	var $spos = $s.length;
+	var line = new alphatab.tablature.model.StaveLine();
+	line.track = track;
+	line.tablature = this.tablature;
+	var staves = this.tablature.settings.get("staves");
+	{
+		var _g = 0;
+		while(_g < staves.length) {
+			var stave = staves[_g];
+			++_g;
+			var staveImpl = alphatab.tablature.model.StaveFactory.getStave(stave,line,this);
+			if(staveImpl != null) line.addStave(staveImpl);
+		}
+	}
+	{
+		$s.pop();
+		return line;
+	}
+	$s.pop();
+}
+alphatab.tablature.ViewLayout.prototype.effectSpacing = null;
+alphatab.tablature.ViewLayout.prototype.firstMeasureSpacing = null;
+alphatab.tablature.ViewLayout.prototype.getNoteOrientation = function(x,y,note) {
+	$s.push("alphatab.tablature.ViewLayout::getNoteOrientation");
+	var $spos = $s.length;
+	var noteAsString = "";
+	if(note.isTiedNote) {
+		noteAsString = "L";
+	}
+	else if(note.effect.deadNote) {
+		noteAsString = "X";
+	}
+	else {
+		noteAsString = Std.string(note.value);
+	}
+	noteAsString = (note.effect.ghostNote?("(" + noteAsString) + ")":noteAsString);
+	{
+		var $tmp = this.getOrientation(x,y,noteAsString);
+		$s.pop();
+		return $tmp;
+	}
+	$s.pop();
+}
+alphatab.tablature.ViewLayout.prototype.getNoteSize = function(note) {
+	$s.push("alphatab.tablature.ViewLayout::getNoteSize");
+	var $spos = $s.length;
+	var noteAsString = "";
+	if(note.isTiedNote) {
+		noteAsString = "L";
+	}
+	else if(note.effect.deadNote) {
+		noteAsString = "X";
+	}
+	else {
+		noteAsString = Std.string(note.value);
+	}
+	noteAsString = (note.effect.ghostNote?("(" + noteAsString) + ")":noteAsString);
+	this.tablature.canvas.setFont(alphatab.tablature.drawing.DrawingResources.noteFont);
+	var size = this.tablature.canvas.measureText(noteAsString);
+	{
+		var $tmp = new alphatab.model.Point(size,alphatab.tablature.drawing.DrawingResources.noteFontHeight);
+		$s.pop();
+		return $tmp;
+	}
+	$s.pop();
+}
+alphatab.tablature.ViewLayout.prototype.getOrientation = function(x,y,str) {
+	$s.push("alphatab.tablature.ViewLayout::getOrientation");
+	var $spos = $s.length;
+	this.tablature.canvas.setFont(alphatab.tablature.drawing.DrawingResources.noteFont);
+	var size = this.tablature.canvas.measureText(str);
+	{
+		var $tmp = new alphatab.model.Rectangle(x,y,size,alphatab.tablature.drawing.DrawingResources.noteFontHeight);
+		$s.pop();
+		return $tmp;
+	}
+	$s.pop();
+}
+alphatab.tablature.ViewLayout.prototype.getVoiceWidth = function(voice) {
+	$s.push("alphatab.tablature.ViewLayout::getVoiceWidth");
+	var $spos = $s.length;
+	var duration = voice.duration;
+	if(duration != null) {
+		switch(duration.value) {
+		case 1:{
+			{
+				var $tmp = 90.0 * this.scale;
+				$s.pop();
+				return $tmp;
+			}
+		}break;
+		case 2:{
+			{
+				var $tmp = 65.0 * this.scale;
+				$s.pop();
+				return $tmp;
+			}
+		}break;
+		case 4:{
+			{
+				var $tmp = 45.0 * this.scale;
+				$s.pop();
+				return $tmp;
+			}
+		}break;
+		case 8:{
+			{
+				var $tmp = 30.0 * this.scale;
+				$s.pop();
+				return $tmp;
+			}
+		}break;
+		case 16:{
+			{
+				var $tmp = 20.0 * this.scale;
+				$s.pop();
+				return $tmp;
+			}
+		}break;
+		case 32:{
+			{
+				var $tmp = 17.0 * this.scale;
+				$s.pop();
+				return $tmp;
+			}
+		}break;
+		default:{
+			{
+				var $tmp = 15.0 * this.scale;
+				$s.pop();
+				return $tmp;
+			}
+		}break;
+		}
+	}
+	{
+		var $tmp = 20.0 * this.scale;
+		$s.pop();
+		return $tmp;
+	}
+	$s.pop();
+}
+alphatab.tablature.ViewLayout.prototype.height = null;
+alphatab.tablature.ViewLayout.prototype.init = function(scale) {
+	$s.push("alphatab.tablature.ViewLayout::init");
+	var $spos = $s.length;
+	this.stringSpacing = 10 * scale;
+	this.scoreLineSpacing = (8 * scale);
+	this.scale = scale;
+	this.firstMeasureSpacing = Math.round(10 * scale);
+	this.effectSpacing = Math.round(15 * scale);
+	$s.pop();
+}
+alphatab.tablature.ViewLayout.prototype.layoutSize = null;
+alphatab.tablature.ViewLayout.prototype.paintCache = function(graphics,area,fromX,fromY) {
+	$s.push("alphatab.tablature.ViewLayout::paintCache");
+	var $spos = $s.length;
+	if(this._cache == null) {
+		this.updateCache(graphics,area,fromX,fromY);
+		{
+			$s.pop();
+			return;
+		}
+	}
+	this._cache.draw();
+	$s.pop();
+}
+alphatab.tablature.ViewLayout.prototype.paintSong = function(ctx,clientArea,x,y) {
+	$s.push("alphatab.tablature.ViewLayout::paintSong");
+	var $spos = $s.length;
+	null;
+	$s.pop();
+}
+alphatab.tablature.ViewLayout.prototype.prepareLayout = function(clientArea,x,y) {
+	$s.push("alphatab.tablature.ViewLayout::prepareLayout");
+	var $spos = $s.length;
+	null;
+	$s.pop();
+}
+alphatab.tablature.ViewLayout.prototype.scale = null;
+alphatab.tablature.ViewLayout.prototype.scoreLineSpacing = null;
+alphatab.tablature.ViewLayout.prototype.setTablature = function(tablature) {
+	$s.push("alphatab.tablature.ViewLayout::setTablature");
+	var $spos = $s.length;
+	this.tablature = tablature;
+	$s.pop();
+}
+alphatab.tablature.ViewLayout.prototype.stringSpacing = null;
+alphatab.tablature.ViewLayout.prototype.tablature = null;
+alphatab.tablature.ViewLayout.prototype.updateCache = function(graphics,area,fromX,fromY) {
+	$s.push("alphatab.tablature.ViewLayout::updateCache");
+	var $spos = $s.length;
+	this._cache = new alphatab.tablature.drawing.DrawingContext(this.scale);
+	this._cache.graphics = graphics;
+	this.paintSong(this._cache,area,fromX,fromY);
+	this.paintCache(graphics,area,fromX,fromY);
+	$s.pop();
+}
+alphatab.tablature.ViewLayout.prototype.width = null;
+alphatab.tablature.ViewLayout.prototype.__class__ = alphatab.tablature.ViewLayout;
 if(!alphatab.model) alphatab.model = {}
+alphatab.model.Padding = function(right,top,left,bottom) { if( right === $_ ) return; {
+	$s.push("alphatab.model.Padding::new");
+	var $spos = $s.length;
+	this.right = right;
+	this.top = top;
+	this.left = left;
+	this.bottom = bottom;
+	$s.pop();
+}}
+alphatab.model.Padding.__name__ = ["alphatab","model","Padding"];
+alphatab.model.Padding.prototype.bottom = null;
+alphatab.model.Padding.prototype.getHorizontal = function() {
+	$s.push("alphatab.model.Padding::getHorizontal");
+	var $spos = $s.length;
+	{
+		var $tmp = this.left + this.right;
+		$s.pop();
+		return $tmp;
+	}
+	$s.pop();
+}
+alphatab.model.Padding.prototype.getVertical = function() {
+	$s.push("alphatab.model.Padding::getVertical");
+	var $spos = $s.length;
+	{
+		var $tmp = this.top + this.bottom;
+		$s.pop();
+		return $tmp;
+	}
+	$s.pop();
+}
+alphatab.model.Padding.prototype.left = null;
+alphatab.model.Padding.prototype.right = null;
+alphatab.model.Padding.prototype.top = null;
+alphatab.model.Padding.prototype.__class__ = alphatab.model.Padding;
+alphatab.tablature.PageViewLayout = function(p) { if( p === $_ ) return; {
+	$s.push("alphatab.tablature.PageViewLayout::new");
+	var $spos = $s.length;
+	alphatab.tablature.ViewLayout.apply(this,[]);
+	this._lines = new Array();
+	this._maximumWidth = 0;
+	this.contentPadding = alphatab.tablature.PageViewLayout.PAGE_PADDING;
+	$s.pop();
+}}
+alphatab.tablature.PageViewLayout.__name__ = ["alphatab","tablature","PageViewLayout"];
+alphatab.tablature.PageViewLayout.__super__ = alphatab.tablature.ViewLayout;
+for(var k in alphatab.tablature.ViewLayout.prototype ) alphatab.tablature.PageViewLayout.prototype[k] = alphatab.tablature.ViewLayout.prototype[k];
+alphatab.tablature.PageViewLayout.prototype._lines = null;
+alphatab.tablature.PageViewLayout.prototype._maximumWidth = null;
+alphatab.tablature.PageViewLayout.prototype.fitLine = function(track,line) {
+	$s.push("alphatab.tablature.PageViewLayout::fitLine");
+	var $spos = $s.length;
+	var measureSpace = 0;
+	if(line.fullLine) {
+		var freeSpace = this.getMaxWidth() - line.width;
+		if(freeSpace != 0 && line.measures.length > 0) {
+			measureSpace = Math.round(freeSpace / line.measures.length);
+		}
+	}
+	var measureX = 0;
+	{
+		var _g1 = 0, _g = line.measures.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var index = line.measures[i];
+			var measure = track.measures[index];
+			measure.setSpacing(measureSpace);
+			measure.x = measureX;
+			measureX += measure.width + measureSpace;
+		}
+	}
+	line.width = measureX;
+	this.width = Math.round(Math.max(this.width,measureX));
+	$s.pop();
+}
+alphatab.tablature.PageViewLayout.prototype.getMaxWidth = function() {
+	$s.push("alphatab.tablature.PageViewLayout::getMaxWidth");
+	var $spos = $s.length;
+	if(this._maximumWidth <= 0) {
+		this._maximumWidth = this.tablature.canvas.width();
+	}
+	{
+		var $tmp = this._maximumWidth - this.contentPadding.getHorizontal();
+		$s.pop();
+		return $tmp;
+	}
+	$s.pop();
+}
+alphatab.tablature.PageViewLayout.prototype.getSheetWidth = function() {
+	$s.push("alphatab.tablature.PageViewLayout::getSheetWidth");
+	var $spos = $s.length;
+	{
+		var $tmp = Math.round(795 * this.scale);
+		$s.pop();
+		return $tmp;
+	}
+	$s.pop();
+}
+alphatab.tablature.PageViewLayout.prototype.getStaveLine = function(track,startIndex,y,x) {
+	$s.push("alphatab.tablature.PageViewLayout::getStaveLine");
+	var $spos = $s.length;
+	var line = this.createStaveLine(track);
+	line.y = y;
+	line.x = x;
+	line.spacing.set(0,Math.floor(10 * this.scale));
+	line.spacing.set(1,Math.floor(10 * this.scale));
+	var measuresPerLine = this.tablature.getLayoutSetting("measuresPerLine",-1);
+	var measureCount = track.measureCount();
+	x = 0;
+	{
+		var _g = startIndex;
+		while(_g < measureCount) {
+			var i = _g++;
+			var measure = track.measures[i];
+			measure.staveLine = line;
+			measure.performLayout(this);
+			var lineIsFull = false;
+			if(measuresPerLine == -1 && ((x + measure.width) >= this.getMaxWidth() && line.measures.length != 0)) {
+				lineIsFull = true;
+			}
+			else if(line.measures.length == measuresPerLine) {
+				lineIsFull = true;
+			}
+			if(lineIsFull) {
+				line.fullLine = true;
+				line.width = x;
+				{
+					$s.pop();
+					return line;
+				}
+			}
+			measure.x = x;
+			x += measure.width;
+			{
+				var _g1 = 0, _g2 = line.staves;
+				while(_g1 < _g2.length) {
+					var stave = _g2[_g1];
+					++_g1;
+					stave.prepare(measure);
+				}
+			}
+			line.addMeasure(i);
+		}
+	}
+	line.width = x;
+	{
+		$s.pop();
+		return line;
+	}
+	$s.pop();
+}
+alphatab.tablature.PageViewLayout.prototype.init = function(scale) {
+	$s.push("alphatab.tablature.PageViewLayout::init");
+	var $spos = $s.length;
+	alphatab.tablature.ViewLayout.prototype.init.apply(this,[scale]);
+	this.layoutSize = new alphatab.model.Point(this.getSheetWidth() - alphatab.tablature.PageViewLayout.PAGE_PADDING.getHorizontal(),this.height);
+	$s.pop();
+}
+alphatab.tablature.PageViewLayout.prototype.layoutSongInfo = function(x,y) {
+	$s.push("alphatab.tablature.PageViewLayout::layoutSongInfo");
+	var $spos = $s.length;
+	var song = this.tablature.track.song;
+	if(song.title != "" && ((song.pageSetup.headerAndFooter & 1) != 0)) {
+		y += Math.floor(35 * this.scale);
+	}
+	if(song.subtitle != "" && ((song.pageSetup.headerAndFooter & 2) != 0)) {
+		y += Math.floor(20 * this.scale);
+	}
+	if(song.artist != "" && ((song.pageSetup.headerAndFooter & 4) != 0)) {
+		y += Math.floor(20 * this.scale);
+	}
+	if(song.album != "" && ((song.pageSetup.headerAndFooter & 8) != 0)) {
+		y += Math.floor(20 * this.scale);
+	}
+	if(song.music != "" && song.music == song.words && ((song.pageSetup.headerAndFooter & 64) != 0)) {
+		y += Math.floor(20 * this.scale);
+	}
+	else {
+		if(song.music != "" && ((song.pageSetup.headerAndFooter & 32) != 0)) {
+			y += Math.floor(20 * this.scale);
+		}
+		if(song.words != "" && ((song.pageSetup.headerAndFooter & 16) != 0)) {
+			y += Math.floor(20 * this.scale);
+		}
+	}
+	y += Math.floor(20 * this.scale);
+	if(!this.tablature.track.isPercussionTrack) {
+		var tuning = alphatab.model.Tuning.findTuning(this.tablature.track.strings);
+		if(tuning != null) {
+			y += Math.floor(15 * this.scale);
+			if(!tuning.IsStandard) {
+				var stringsPerColumn = Math.ceil(this.tablature.track.strings.length / 2);
+				y += stringsPerColumn * Math.floor(15 * this.scale);
+			}
+			y += Math.floor(15 * this.scale);
+		}
+	}
+	y += Math.floor(40 * this.scale);
+	{
+		$s.pop();
+		return y;
+	}
+	$s.pop();
+}
+alphatab.tablature.PageViewLayout.prototype.paintSong = function(ctx,clientArea,x,y) {
+	$s.push("alphatab.tablature.PageViewLayout::paintSong");
+	var $spos = $s.length;
+	var track = this.tablature.track;
+	y = Math.round(y + this.contentPadding.top);
+	y = Math.round(this.paintSongInfo(ctx,clientArea,x,y) + this.firstMeasureSpacing);
+	{
+		var _g1 = 0, _g = this._lines.length;
+		while(_g1 < _g) {
+			var l = _g1++;
+			var line = this._lines[l];
+			line.paint(this,track,ctx);
+		}
+	}
+	$s.pop();
+}
+alphatab.tablature.PageViewLayout.prototype.paintSongInfo = function(ctx,clientArea,x,y) {
+	$s.push("alphatab.tablature.PageViewLayout::paintSongInfo");
+	var $spos = $s.length;
+	var song = this.tablature.track.song;
+	x += this.contentPadding.left;
+	var tX;
+	var size;
+	var str = "";
+	if(song.title != "" && ((song.pageSetup.headerAndFooter & 1) != 0)) {
+		str = this.parsePageSetupString(song.pageSetup.title);
+		ctx.graphics.setFont(alphatab.tablature.drawing.DrawingResources.titleFont);
+		size = ctx.graphics.measureText(str);
+		tX = (clientArea.width - size) / 2;
+		ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.titleFont,tX,y,"top");
+		y += Math.floor(35 * this.scale);
+	}
+	if(song.subtitle != "" && ((song.pageSetup.headerAndFooter & 2) != 0)) {
+		str = this.parsePageSetupString(song.pageSetup.subtitle);
+		ctx.graphics.setFont(alphatab.tablature.drawing.DrawingResources.subtitleFont);
+		size = ctx.graphics.measureText(str);
+		tX = (clientArea.width - size) / 2;
+		ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.subtitleFont,tX,y,"top");
+		y += Math.floor(20 * this.scale);
+	}
+	if(song.artist != "" && ((song.pageSetup.headerAndFooter & 4) != 0)) {
+		str = this.parsePageSetupString(song.pageSetup.artist);
+		ctx.graphics.setFont(alphatab.tablature.drawing.DrawingResources.subtitleFont);
+		size = ctx.graphics.measureText(str);
+		tX = (clientArea.width - size) / 2;
+		ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.subtitleFont,tX,y,"top");
+		y += Math.floor(20 * this.scale);
+	}
+	if(song.album != "" && ((song.pageSetup.headerAndFooter & 8) != 0)) {
+		str = this.parsePageSetupString(song.pageSetup.album);
+		ctx.graphics.setFont(alphatab.tablature.drawing.DrawingResources.subtitleFont);
+		size = ctx.graphics.measureText(str);
+		tX = (clientArea.width - size) / 2;
+		ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.subtitleFont,tX,y,"top");
+		y += Math.floor(20 * this.scale);
+	}
+	if(song.music != "" && song.music == song.words && ((song.pageSetup.headerAndFooter & 64) != 0)) {
+		str = this.parsePageSetupString(song.pageSetup.wordsAndMusic);
+		ctx.graphics.setFont(alphatab.tablature.drawing.DrawingResources.wordsFont);
+		size = ctx.graphics.measureText(str);
+		tX = ((clientArea.width - size) - this.contentPadding.right);
+		ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.wordsFont,x,y,"top");
+		y += Math.floor(20 * this.scale);
+	}
+	else {
+		if(song.music != "" && ((song.pageSetup.headerAndFooter & 32) != 0)) {
+			str = this.parsePageSetupString(song.pageSetup.music);
+			ctx.graphics.setFont(alphatab.tablature.drawing.DrawingResources.wordsFont);
+			size = ctx.graphics.measureText(str);
+			tX = ((clientArea.width - size) - this.contentPadding.right);
+			ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.wordsFont,tX,y,"top");
+		}
+		if(song.words != "" && ((song.pageSetup.headerAndFooter & 16) != 0)) {
+			str = this.parsePageSetupString(song.pageSetup.words);
+			ctx.graphics.setFont(alphatab.tablature.drawing.DrawingResources.wordsFont);
+			ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.wordsFont,x,y,"top");
+		}
+		y += Math.floor(20 * this.scale);
+	}
+	y += Math.floor(20 * this.scale);
+	if(!this.tablature.track.isPercussionTrack) {
+		var tuning = alphatab.model.Tuning.findTuning(this.tablature.track.strings);
+		if(tuning != null) {
+			ctx.get(1).addString(tuning.Name,alphatab.tablature.drawing.DrawingResources.effectFont,x,y,"top");
+			y += Math.floor(15 * this.scale);
+			if(!tuning.IsStandard) {
+				var stringsPerColumn = Math.ceil(this.tablature.track.strings.length / 2);
+				var currentX = x;
+				var currentY = y;
+				{
+					var _g1 = 0, _g = this.tablature.track.strings.length;
+					while(_g1 < _g) {
+						var i = _g1++;
+						str = (("(" + Std.string(i + 1)) + ") = ") + alphatab.model.Tuning.getTextForTuning(this.tablature.track.strings[i].value);
+						ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.effectFont,currentX,currentY,"top");
+						currentY += Math.floor(15 * this.scale);
+						if(i == stringsPerColumn - 1) {
+							currentY = y;
+							currentX += Math.floor(43 * this.scale);
+						}
+					}
+				}
+				y += stringsPerColumn * Math.floor(15 * this.scale);
+			}
+		}
+	}
+	y += Math.floor(25 * this.scale);
+	{
+		$s.pop();
+		return y;
+	}
+	$s.pop();
+}
+alphatab.tablature.PageViewLayout.prototype.parsePageSetupString = function(input) {
+	$s.push("alphatab.tablature.PageViewLayout::parsePageSetupString");
+	var $spos = $s.length;
+	var song = this.tablature.track.song;
+	input = StringTools.replace(input,"%TITLE%",song.title);
+	input = StringTools.replace(input,"%SUBTITLE%",song.subtitle);
+	input = StringTools.replace(input,"%ARTIST%",song.artist);
+	input = StringTools.replace(input,"%ALBUM%",song.album);
+	input = StringTools.replace(input,"%WORDS%",song.words);
+	input = StringTools.replace(input,"%MUSIC%",song.music);
+	input = StringTools.replace(input,"%WORDSMUSIC%",song.words);
+	input = StringTools.replace(input,"%COPYRIGHT%",song.copyright);
+	{
+		$s.pop();
+		return input;
+	}
+	$s.pop();
+}
+alphatab.tablature.PageViewLayout.prototype.prepareLayout = function(clientArea,x,y) {
+	$s.push("alphatab.tablature.PageViewLayout::prepareLayout");
+	var $spos = $s.length;
+	this._lines = new Array();
+	this._maximumWidth = Math.floor(clientArea.width);
+	this.width = 0;
+	this.height = 0;
+	var posY = y;
+	var track = this.tablature.track;
+	var measureCount = this.tablature.track.measures.length;
+	var nextMeasureIndex = 0;
+	x += this.contentPadding.left;
+	posY = Math.floor(this.layoutSongInfo(x,posY) + this.firstMeasureSpacing);
+	while(measureCount > nextMeasureIndex) {
+		var line = this.getStaveLine(track,nextMeasureIndex,posY,x);
+		this._lines.push(line);
+		this.fitLine(track,line);
+		posY += line.getHeight();
+		nextMeasureIndex = line.lastIndex() + 1;
+	}
+	this.height = posY + this.contentPadding.bottom;
+	this.width = this.getSheetWidth();
+	$s.pop();
+}
+alphatab.tablature.PageViewLayout.prototype.__class__ = alphatab.tablature.PageViewLayout;
+alphatab.tablature.HorizontalViewLayout = function(p) { if( p === $_ ) return; {
+	$s.push("alphatab.tablature.HorizontalViewLayout::new");
+	var $spos = $s.length;
+	alphatab.tablature.ViewLayout.apply(this,[]);
+	this.contentPadding = alphatab.tablature.HorizontalViewLayout.PAGE_PADDING;
+	$s.pop();
+}}
+alphatab.tablature.HorizontalViewLayout.__name__ = ["alphatab","tablature","HorizontalViewLayout"];
+alphatab.tablature.HorizontalViewLayout.__super__ = alphatab.tablature.ViewLayout;
+for(var k in alphatab.tablature.ViewLayout.prototype ) alphatab.tablature.HorizontalViewLayout.prototype[k] = alphatab.tablature.ViewLayout.prototype[k];
+alphatab.tablature.HorizontalViewLayout.prototype._line = null;
+alphatab.tablature.HorizontalViewLayout.prototype.getStaveLine = function(track,startIndex,y,x) {
+	$s.push("alphatab.tablature.HorizontalViewLayout::getStaveLine");
+	var $spos = $s.length;
+	var line = this.createStaveLine(track);
+	line.y = y;
+	line.x = x;
+	line.spacing.set(0,Math.floor(10 * this.scale));
+	line.spacing.set(1,Math.floor(10 * this.scale));
+	var measureCount = track.measureCount();
+	x = 0;
+	{
+		var _g = startIndex;
+		while(_g < measureCount) {
+			var i = _g++;
+			var measure = track.measures[i];
+			measure.staveLine = line;
+			measure.performLayout(this);
+			measure.x = x;
+			x += measure.width;
+			{
+				var _g1 = 0, _g2 = line.staves;
+				while(_g1 < _g2.length) {
+					var stave = _g2[_g1];
+					++_g1;
+					stave.prepare(measure);
+				}
+			}
+			line.addMeasure(i);
+		}
+	}
+	line.width = x;
+	{
+		$s.pop();
+		return line;
+	}
+	$s.pop();
+}
+alphatab.tablature.HorizontalViewLayout.prototype.init = function(scale) {
+	$s.push("alphatab.tablature.HorizontalViewLayout::init");
+	var $spos = $s.length;
+	alphatab.tablature.ViewLayout.prototype.init.apply(this,[scale]);
+	this.layoutSize = new alphatab.model.Point(this.width,this.height);
+	$s.pop();
+}
+alphatab.tablature.HorizontalViewLayout.prototype.paintSong = function(ctx,clientArea,x,y) {
+	$s.push("alphatab.tablature.HorizontalViewLayout::paintSong");
+	var $spos = $s.length;
+	var track = this.tablature.track;
+	y = Math.floor((y + this.contentPadding.top) + this.firstMeasureSpacing);
+	this._line.paint(this,track,ctx);
+	$s.pop();
+}
+alphatab.tablature.HorizontalViewLayout.prototype.prepareLayout = function(clientArea,x,y) {
+	$s.push("alphatab.tablature.HorizontalViewLayout::prepareLayout");
+	var $spos = $s.length;
+	this.width = 0;
+	this.height = 0;
+	var posY = y;
+	var track = this.tablature.track;
+	var measureCount = this.tablature.track.measures.length;
+	var nextMeasureIndex = 0;
+	x += this.contentPadding.left;
+	posY = Math.floor(posY + this.firstMeasureSpacing);
+	while(measureCount > nextMeasureIndex) {
+		this._line = this.getStaveLine(track,nextMeasureIndex,posY,x);
+		posY += this._line.getHeight();
+		nextMeasureIndex = this._line.lastIndex() + 1;
+	}
+	this.height = posY + this.contentPadding.bottom;
+	this.width = this._line.width + alphatab.tablature.HorizontalViewLayout.PAGE_PADDING.getHorizontal();
+	this.layoutSize = new alphatab.model.Point(this.width,this.height);
+	$s.pop();
+}
+alphatab.tablature.HorizontalViewLayout.prototype.__class__ = alphatab.tablature.HorizontalViewLayout;
 alphatab.model.MeasureHeader = function(factory) { if( factory === $_ ) return; {
 	$s.push("alphatab.model.MeasureHeader::new");
 	var $spos = $s.length;
@@ -51,7 +709,6 @@ alphatab.model.MeasureHeader.prototype.tempo = null;
 alphatab.model.MeasureHeader.prototype.timeSignature = null;
 alphatab.model.MeasureHeader.prototype.tripletFeel = null;
 alphatab.model.MeasureHeader.prototype.__class__ = alphatab.model.MeasureHeader;
-if(!alphatab.tablature) alphatab.tablature = {}
 if(!alphatab.tablature.model) alphatab.tablature.model = {}
 alphatab.tablature.model.MeasureHeaderDrawing = function(factory) { if( factory === $_ ) return; {
 	$s.push("alphatab.tablature.model.MeasureHeaderDrawing::new");
@@ -3702,218 +4359,6 @@ alphatab.model.effects.TremoloPickingEffect.prototype.clone = function(factory) 
 }
 alphatab.model.effects.TremoloPickingEffect.prototype.duration = null;
 alphatab.model.effects.TremoloPickingEffect.prototype.__class__ = alphatab.model.effects.TremoloPickingEffect;
-alphatab.tablature.ViewLayout = function(p) { if( p === $_ ) return; {
-	$s.push("alphatab.tablature.ViewLayout::new");
-	var $spos = $s.length;
-	this.init(1);
-	this.contentPadding = new alphatab.model.Padding(0,0,0,0);
-	$s.pop();
-}}
-alphatab.tablature.ViewLayout.__name__ = ["alphatab","tablature","ViewLayout"];
-alphatab.tablature.ViewLayout.prototype._cache = null;
-alphatab.tablature.ViewLayout.prototype.contentPadding = null;
-alphatab.tablature.ViewLayout.prototype.createStaveLine = function(track) {
-	$s.push("alphatab.tablature.ViewLayout::createStaveLine");
-	var $spos = $s.length;
-	var line = new alphatab.tablature.model.StaveLine();
-	line.track = track;
-	line.tablature = this.tablature;
-	var staves = this.tablature.settings.get("staves");
-	{
-		var _g = 0;
-		while(_g < staves.length) {
-			var stave = staves[_g];
-			++_g;
-			var staveImpl = alphatab.tablature.model.StaveFactory.getStave(stave,line,this);
-			if(staveImpl != null) line.addStave(staveImpl);
-		}
-	}
-	{
-		$s.pop();
-		return line;
-	}
-	$s.pop();
-}
-alphatab.tablature.ViewLayout.prototype.effectSpacing = null;
-alphatab.tablature.ViewLayout.prototype.firstMeasureSpacing = null;
-alphatab.tablature.ViewLayout.prototype.getNoteOrientation = function(x,y,note) {
-	$s.push("alphatab.tablature.ViewLayout::getNoteOrientation");
-	var $spos = $s.length;
-	var noteAsString = "";
-	if(note.isTiedNote) {
-		noteAsString = "L";
-	}
-	else if(note.effect.deadNote) {
-		noteAsString = "X";
-	}
-	else {
-		noteAsString = Std.string(note.value);
-	}
-	noteAsString = (note.effect.ghostNote?("(" + noteAsString) + ")":noteAsString);
-	{
-		var $tmp = this.getOrientation(x,y,noteAsString);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
-}
-alphatab.tablature.ViewLayout.prototype.getNoteSize = function(note) {
-	$s.push("alphatab.tablature.ViewLayout::getNoteSize");
-	var $spos = $s.length;
-	var noteAsString = "";
-	if(note.isTiedNote) {
-		noteAsString = "L";
-	}
-	else if(note.effect.deadNote) {
-		noteAsString = "X";
-	}
-	else {
-		noteAsString = Std.string(note.value);
-	}
-	noteAsString = (note.effect.ghostNote?("(" + noteAsString) + ")":noteAsString);
-	this.tablature.canvas.setFont(alphatab.tablature.drawing.DrawingResources.noteFont);
-	var size = this.tablature.canvas.measureText(noteAsString);
-	{
-		var $tmp = new alphatab.model.Point(size,alphatab.tablature.drawing.DrawingResources.noteFontHeight);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
-}
-alphatab.tablature.ViewLayout.prototype.getOrientation = function(x,y,str) {
-	$s.push("alphatab.tablature.ViewLayout::getOrientation");
-	var $spos = $s.length;
-	this.tablature.canvas.setFont(alphatab.tablature.drawing.DrawingResources.noteFont);
-	var size = this.tablature.canvas.measureText(str);
-	{
-		var $tmp = new alphatab.model.Rectangle(x,y,size,alphatab.tablature.drawing.DrawingResources.noteFontHeight);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
-}
-alphatab.tablature.ViewLayout.prototype.getVoiceWidth = function(voice) {
-	$s.push("alphatab.tablature.ViewLayout::getVoiceWidth");
-	var $spos = $s.length;
-	var duration = voice.duration;
-	if(duration != null) {
-		switch(duration.value) {
-		case 1:{
-			{
-				var $tmp = 90.0 * this.scale;
-				$s.pop();
-				return $tmp;
-			}
-		}break;
-		case 2:{
-			{
-				var $tmp = 65.0 * this.scale;
-				$s.pop();
-				return $tmp;
-			}
-		}break;
-		case 4:{
-			{
-				var $tmp = 45.0 * this.scale;
-				$s.pop();
-				return $tmp;
-			}
-		}break;
-		case 8:{
-			{
-				var $tmp = 30.0 * this.scale;
-				$s.pop();
-				return $tmp;
-			}
-		}break;
-		case 16:{
-			{
-				var $tmp = 20.0 * this.scale;
-				$s.pop();
-				return $tmp;
-			}
-		}break;
-		case 32:{
-			{
-				var $tmp = 17.0 * this.scale;
-				$s.pop();
-				return $tmp;
-			}
-		}break;
-		default:{
-			{
-				var $tmp = 15.0 * this.scale;
-				$s.pop();
-				return $tmp;
-			}
-		}break;
-		}
-	}
-	{
-		var $tmp = 20.0 * this.scale;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
-}
-alphatab.tablature.ViewLayout.prototype.height = null;
-alphatab.tablature.ViewLayout.prototype.init = function(scale) {
-	$s.push("alphatab.tablature.ViewLayout::init");
-	var $spos = $s.length;
-	this.stringSpacing = 10 * scale;
-	this.scoreLineSpacing = (8 * scale);
-	this.scale = scale;
-	this.firstMeasureSpacing = Math.round(10 * scale);
-	this.effectSpacing = Math.round(15 * scale);
-	$s.pop();
-}
-alphatab.tablature.ViewLayout.prototype.layoutSize = null;
-alphatab.tablature.ViewLayout.prototype.paintCache = function(graphics,area,fromX,fromY) {
-	$s.push("alphatab.tablature.ViewLayout::paintCache");
-	var $spos = $s.length;
-	if(this._cache == null) {
-		this.updateCache(graphics,area,fromX,fromY);
-		{
-			$s.pop();
-			return;
-		}
-	}
-	this._cache.draw();
-	$s.pop();
-}
-alphatab.tablature.ViewLayout.prototype.paintSong = function(ctx,clientArea,x,y) {
-	$s.push("alphatab.tablature.ViewLayout::paintSong");
-	var $spos = $s.length;
-	null;
-	$s.pop();
-}
-alphatab.tablature.ViewLayout.prototype.prepareLayout = function(clientArea,x,y) {
-	$s.push("alphatab.tablature.ViewLayout::prepareLayout");
-	var $spos = $s.length;
-	null;
-	$s.pop();
-}
-alphatab.tablature.ViewLayout.prototype.scale = null;
-alphatab.tablature.ViewLayout.prototype.scoreLineSpacing = null;
-alphatab.tablature.ViewLayout.prototype.setTablature = function(tablature) {
-	$s.push("alphatab.tablature.ViewLayout::setTablature");
-	var $spos = $s.length;
-	this.tablature = tablature;
-	$s.pop();
-}
-alphatab.tablature.ViewLayout.prototype.stringSpacing = null;
-alphatab.tablature.ViewLayout.prototype.tablature = null;
-alphatab.tablature.ViewLayout.prototype.updateCache = function(graphics,area,fromX,fromY) {
-	$s.push("alphatab.tablature.ViewLayout::updateCache");
-	var $spos = $s.length;
-	this._cache = new alphatab.tablature.drawing.DrawingContext(this.scale);
-	this._cache.graphics = graphics;
-	this.paintSong(this._cache,area,fromX,fromY);
-	this.paintCache(graphics,area,fromX,fromY);
-	$s.pop();
-}
-alphatab.tablature.ViewLayout.prototype.width = null;
-alphatab.tablature.ViewLayout.prototype.__class__ = alphatab.tablature.ViewLayout;
 alphatab.model.effects.TrillEffect = function(factory) { if( factory === $_ ) return; {
 	$s.push("alphatab.model.effects.TrillEffect::new");
 	var $spos = $s.length;
@@ -5397,6 +5842,16 @@ alphatab.model.PageSetup.prototype.__class__ = alphatab.model.PageSetup;
 alphatab.model.BeatStrokeDirection = function() { }
 alphatab.model.BeatStrokeDirection.__name__ = ["alphatab","model","BeatStrokeDirection"];
 alphatab.model.BeatStrokeDirection.prototype.__class__ = alphatab.model.BeatStrokeDirection;
+alphatab.model.BeatStrokeDirection2 = { __ename__ : ["alphatab","model","BeatStrokeDirection2"], __constructs__ : ["None","Up","Down"] }
+alphatab.model.BeatStrokeDirection2.Down = ["Down",2];
+alphatab.model.BeatStrokeDirection2.Down.toString = $estr;
+alphatab.model.BeatStrokeDirection2.Down.__enum__ = alphatab.model.BeatStrokeDirection2;
+alphatab.model.BeatStrokeDirection2.None = ["None",0];
+alphatab.model.BeatStrokeDirection2.None.toString = $estr;
+alphatab.model.BeatStrokeDirection2.None.__enum__ = alphatab.model.BeatStrokeDirection2;
+alphatab.model.BeatStrokeDirection2.Up = ["Up",1];
+alphatab.model.BeatStrokeDirection2.Up.toString = $estr;
+alphatab.model.BeatStrokeDirection2.Up.__enum__ = alphatab.model.BeatStrokeDirection2;
 alphatab.tablature.drawing.SvgPainter = function(layer,svg,x,y,xScale,yScale) { if( layer === $_ ) return; {
 	$s.push("alphatab.tablature.drawing.SvgPainter::new");
 	var $spos = $s.length;
@@ -9765,358 +10220,6 @@ js.Lib.setErrorHandler = function(f) {
 	$s.pop();
 }
 js.Lib.prototype.__class__ = js.Lib;
-alphatab.model.Padding = function(right,top,left,bottom) { if( right === $_ ) return; {
-	$s.push("alphatab.model.Padding::new");
-	var $spos = $s.length;
-	this.right = right;
-	this.top = top;
-	this.left = left;
-	this.bottom = bottom;
-	$s.pop();
-}}
-alphatab.model.Padding.__name__ = ["alphatab","model","Padding"];
-alphatab.model.Padding.prototype.bottom = null;
-alphatab.model.Padding.prototype.getHorizontal = function() {
-	$s.push("alphatab.model.Padding::getHorizontal");
-	var $spos = $s.length;
-	{
-		var $tmp = this.left + this.right;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
-}
-alphatab.model.Padding.prototype.getVertical = function() {
-	$s.push("alphatab.model.Padding::getVertical");
-	var $spos = $s.length;
-	{
-		var $tmp = this.top + this.bottom;
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
-}
-alphatab.model.Padding.prototype.left = null;
-alphatab.model.Padding.prototype.right = null;
-alphatab.model.Padding.prototype.top = null;
-alphatab.model.Padding.prototype.__class__ = alphatab.model.Padding;
-alphatab.tablature.PageViewLayout = function(p) { if( p === $_ ) return; {
-	$s.push("alphatab.tablature.PageViewLayout::new");
-	var $spos = $s.length;
-	alphatab.tablature.ViewLayout.apply(this,[]);
-	this._lines = new Array();
-	this._maximumWidth = 0;
-	this.contentPadding = alphatab.tablature.PageViewLayout.PAGE_PADDING;
-	$s.pop();
-}}
-alphatab.tablature.PageViewLayout.__name__ = ["alphatab","tablature","PageViewLayout"];
-alphatab.tablature.PageViewLayout.__super__ = alphatab.tablature.ViewLayout;
-for(var k in alphatab.tablature.ViewLayout.prototype ) alphatab.tablature.PageViewLayout.prototype[k] = alphatab.tablature.ViewLayout.prototype[k];
-alphatab.tablature.PageViewLayout.prototype._lines = null;
-alphatab.tablature.PageViewLayout.prototype._maximumWidth = null;
-alphatab.tablature.PageViewLayout.prototype.fitLine = function(track,line) {
-	$s.push("alphatab.tablature.PageViewLayout::fitLine");
-	var $spos = $s.length;
-	var measureSpace = 0;
-	if(line.fullLine) {
-		var freeSpace = this.getMaxWidth() - line.width;
-		if(freeSpace != 0 && line.measures.length > 0) {
-			measureSpace = Math.round(freeSpace / line.measures.length);
-		}
-	}
-	var measureX = 0;
-	{
-		var _g1 = 0, _g = line.measures.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var index = line.measures[i];
-			var measure = track.measures[index];
-			measure.setSpacing(measureSpace);
-			measure.x = measureX;
-			measureX += measure.width + measureSpace;
-		}
-	}
-	line.width = measureX;
-	this.width = Math.round(Math.max(this.width,measureX));
-	$s.pop();
-}
-alphatab.tablature.PageViewLayout.prototype.getMaxWidth = function() {
-	$s.push("alphatab.tablature.PageViewLayout::getMaxWidth");
-	var $spos = $s.length;
-	if(this._maximumWidth <= 0) {
-		this._maximumWidth = this.tablature.canvas.width();
-	}
-	{
-		var $tmp = this._maximumWidth - this.contentPadding.getHorizontal();
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
-}
-alphatab.tablature.PageViewLayout.prototype.getSheetWidth = function() {
-	$s.push("alphatab.tablature.PageViewLayout::getSheetWidth");
-	var $spos = $s.length;
-	{
-		var $tmp = Math.round(795 * this.scale);
-		$s.pop();
-		return $tmp;
-	}
-	$s.pop();
-}
-alphatab.tablature.PageViewLayout.prototype.getStaveLine = function(track,startIndex,y,x) {
-	$s.push("alphatab.tablature.PageViewLayout::getStaveLine");
-	var $spos = $s.length;
-	var line = this.createStaveLine(track);
-	line.y = y;
-	line.x = x;
-	line.spacing.set(0,Math.floor(10 * this.scale));
-	line.spacing.set(1,Math.floor(10 * this.scale));
-	var measureCount = track.measureCount();
-	x = 0;
-	{
-		var _g = startIndex;
-		while(_g < measureCount) {
-			var i = _g++;
-			var measure = track.measures[i];
-			measure.staveLine = line;
-			measure.performLayout(this);
-			if((x + measure.width) >= this.getMaxWidth() && line.measures.length != 0) {
-				line.fullLine = true;
-				line.width = x;
-				{
-					$s.pop();
-					return line;
-				}
-			}
-			measure.x = x;
-			x += measure.width;
-			{
-				var _g1 = 0, _g2 = line.staves;
-				while(_g1 < _g2.length) {
-					var stave = _g2[_g1];
-					++_g1;
-					stave.prepare(measure);
-				}
-			}
-			line.addMeasure(i);
-		}
-	}
-	line.width = x;
-	{
-		$s.pop();
-		return line;
-	}
-	$s.pop();
-}
-alphatab.tablature.PageViewLayout.prototype.init = function(scale) {
-	$s.push("alphatab.tablature.PageViewLayout::init");
-	var $spos = $s.length;
-	alphatab.tablature.ViewLayout.prototype.init.apply(this,[scale]);
-	this.layoutSize = new alphatab.model.Point(this.getSheetWidth() - alphatab.tablature.PageViewLayout.PAGE_PADDING.getHorizontal(),this.height);
-	$s.pop();
-}
-alphatab.tablature.PageViewLayout.prototype.layoutSongInfo = function(x,y) {
-	$s.push("alphatab.tablature.PageViewLayout::layoutSongInfo");
-	var $spos = $s.length;
-	var song = this.tablature.track.song;
-	if(song.title != "" && ((song.pageSetup.headerAndFooter & 1) != 0)) {
-		y += Math.floor(35 * this.scale);
-	}
-	if(song.subtitle != "" && ((song.pageSetup.headerAndFooter & 2) != 0)) {
-		y += Math.floor(20 * this.scale);
-	}
-	if(song.artist != "" && ((song.pageSetup.headerAndFooter & 4) != 0)) {
-		y += Math.floor(20 * this.scale);
-	}
-	if(song.album != "" && ((song.pageSetup.headerAndFooter & 8) != 0)) {
-		y += Math.floor(20 * this.scale);
-	}
-	if(song.music != "" && song.music == song.words && ((song.pageSetup.headerAndFooter & 64) != 0)) {
-		y += Math.floor(20 * this.scale);
-	}
-	else {
-		if(song.music != "" && ((song.pageSetup.headerAndFooter & 32) != 0)) {
-			y += Math.floor(20 * this.scale);
-		}
-		if(song.words != "" && ((song.pageSetup.headerAndFooter & 16) != 0)) {
-			y += Math.floor(20 * this.scale);
-		}
-	}
-	y += Math.floor(20 * this.scale);
-	if(!this.tablature.track.isPercussionTrack) {
-		var tuning = alphatab.model.Tuning.findTuning(this.tablature.track.strings);
-		if(tuning != null) {
-			y += Math.floor(15 * this.scale);
-			if(!tuning.IsStandard) {
-				var stringsPerColumn = Math.ceil(this.tablature.track.strings.length / 2);
-				y += stringsPerColumn * Math.floor(15 * this.scale);
-			}
-			y += Math.floor(15 * this.scale);
-		}
-	}
-	y += Math.floor(40 * this.scale);
-	{
-		$s.pop();
-		return y;
-	}
-	$s.pop();
-}
-alphatab.tablature.PageViewLayout.prototype.paintSong = function(ctx,clientArea,x,y) {
-	$s.push("alphatab.tablature.PageViewLayout::paintSong");
-	var $spos = $s.length;
-	var track = this.tablature.track;
-	y = Math.round(y + this.contentPadding.top);
-	y = Math.round(this.paintSongInfo(ctx,clientArea,x,y) + this.firstMeasureSpacing);
-	{
-		var _g1 = 0, _g = this._lines.length;
-		while(_g1 < _g) {
-			var l = _g1++;
-			var line = this._lines[l];
-			line.paint(this,track,ctx);
-		}
-	}
-	$s.pop();
-}
-alphatab.tablature.PageViewLayout.prototype.paintSongInfo = function(ctx,clientArea,x,y) {
-	$s.push("alphatab.tablature.PageViewLayout::paintSongInfo");
-	var $spos = $s.length;
-	var song = this.tablature.track.song;
-	x += this.contentPadding.left;
-	var tX;
-	var size;
-	var str = "";
-	if(song.title != "" && ((song.pageSetup.headerAndFooter & 1) != 0)) {
-		str = this.parsePageSetupString(song.pageSetup.title);
-		ctx.graphics.setFont(alphatab.tablature.drawing.DrawingResources.titleFont);
-		size = ctx.graphics.measureText(str);
-		tX = (clientArea.width - size) / 2;
-		ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.titleFont,tX,y,"top");
-		y += Math.floor(35 * this.scale);
-	}
-	if(song.subtitle != "" && ((song.pageSetup.headerAndFooter & 2) != 0)) {
-		str = this.parsePageSetupString(song.pageSetup.subtitle);
-		ctx.graphics.setFont(alphatab.tablature.drawing.DrawingResources.subtitleFont);
-		size = ctx.graphics.measureText(str);
-		tX = (clientArea.width - size) / 2;
-		ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.subtitleFont,tX,y,"top");
-		y += Math.floor(20 * this.scale);
-	}
-	if(song.artist != "" && ((song.pageSetup.headerAndFooter & 4) != 0)) {
-		str = this.parsePageSetupString(song.pageSetup.artist);
-		ctx.graphics.setFont(alphatab.tablature.drawing.DrawingResources.subtitleFont);
-		size = ctx.graphics.measureText(str);
-		tX = (clientArea.width - size) / 2;
-		ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.subtitleFont,tX,y,"top");
-		y += Math.floor(20 * this.scale);
-	}
-	if(song.album != "" && ((song.pageSetup.headerAndFooter & 8) != 0)) {
-		str = this.parsePageSetupString(song.pageSetup.album);
-		ctx.graphics.setFont(alphatab.tablature.drawing.DrawingResources.subtitleFont);
-		size = ctx.graphics.measureText(str);
-		tX = (clientArea.width - size) / 2;
-		ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.subtitleFont,tX,y,"top");
-		y += Math.floor(20 * this.scale);
-	}
-	if(song.music != "" && song.music == song.words && ((song.pageSetup.headerAndFooter & 64) != 0)) {
-		str = this.parsePageSetupString(song.pageSetup.wordsAndMusic);
-		ctx.graphics.setFont(alphatab.tablature.drawing.DrawingResources.wordsFont);
-		size = ctx.graphics.measureText(str);
-		tX = ((clientArea.width - size) - this.contentPadding.right);
-		ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.wordsFont,x,y,"top");
-		y += Math.floor(20 * this.scale);
-	}
-	else {
-		if(song.music != "" && ((song.pageSetup.headerAndFooter & 32) != 0)) {
-			str = this.parsePageSetupString(song.pageSetup.music);
-			ctx.graphics.setFont(alphatab.tablature.drawing.DrawingResources.wordsFont);
-			size = ctx.graphics.measureText(str);
-			tX = ((clientArea.width - size) - this.contentPadding.right);
-			ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.wordsFont,tX,y,"top");
-		}
-		if(song.words != "" && ((song.pageSetup.headerAndFooter & 16) != 0)) {
-			str = this.parsePageSetupString(song.pageSetup.words);
-			ctx.graphics.setFont(alphatab.tablature.drawing.DrawingResources.wordsFont);
-			ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.wordsFont,x,y,"top");
-		}
-		y += Math.floor(20 * this.scale);
-	}
-	y += Math.floor(20 * this.scale);
-	if(!this.tablature.track.isPercussionTrack) {
-		var tuning = alphatab.model.Tuning.findTuning(this.tablature.track.strings);
-		if(tuning != null) {
-			ctx.get(1).addString(tuning.Name,alphatab.tablature.drawing.DrawingResources.effectFont,x,y,"top");
-			y += Math.floor(15 * this.scale);
-			if(!tuning.IsStandard) {
-				var stringsPerColumn = Math.ceil(this.tablature.track.strings.length / 2);
-				var currentX = x;
-				var currentY = y;
-				{
-					var _g1 = 0, _g = this.tablature.track.strings.length;
-					while(_g1 < _g) {
-						var i = _g1++;
-						str = (("(" + Std.string(i + 1)) + ") = ") + alphatab.model.Tuning.getTextForTuning(this.tablature.track.strings[i].value);
-						ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.effectFont,currentX,currentY,"top");
-						currentY += Math.floor(15 * this.scale);
-						if(i == stringsPerColumn - 1) {
-							currentY = y;
-							currentX += Math.floor(43 * this.scale);
-						}
-					}
-				}
-				y += stringsPerColumn * Math.floor(15 * this.scale);
-			}
-		}
-	}
-	y += Math.floor(25 * this.scale);
-	{
-		$s.pop();
-		return y;
-	}
-	$s.pop();
-}
-alphatab.tablature.PageViewLayout.prototype.parsePageSetupString = function(input) {
-	$s.push("alphatab.tablature.PageViewLayout::parsePageSetupString");
-	var $spos = $s.length;
-	var song = this.tablature.track.song;
-	input = StringTools.replace(input,"%TITLE%",song.title);
-	input = StringTools.replace(input,"%SUBTITLE%",song.subtitle);
-	input = StringTools.replace(input,"%ARTIST%",song.artist);
-	input = StringTools.replace(input,"%ALBUM%",song.album);
-	input = StringTools.replace(input,"%WORDS%",song.words);
-	input = StringTools.replace(input,"%MUSIC%",song.music);
-	input = StringTools.replace(input,"%WORDSMUSIC%",song.words);
-	input = StringTools.replace(input,"%COPYRIGHT%",song.copyright);
-	{
-		$s.pop();
-		return input;
-	}
-	$s.pop();
-}
-alphatab.tablature.PageViewLayout.prototype.prepareLayout = function(clientArea,x,y) {
-	$s.push("alphatab.tablature.PageViewLayout::prepareLayout");
-	var $spos = $s.length;
-	this._lines = new Array();
-	this._maximumWidth = Math.floor(clientArea.width);
-	this.width = 0;
-	this.height = 0;
-	var posY = y;
-	var track = this.tablature.track;
-	var measureCount = this.tablature.track.measures.length;
-	var nextMeasureIndex = 0;
-	x += this.contentPadding.left;
-	posY = Math.floor(this.layoutSongInfo(x,posY) + this.firstMeasureSpacing);
-	while(measureCount > nextMeasureIndex) {
-		var line = this.getStaveLine(track,nextMeasureIndex,posY,x);
-		this._lines.push(line);
-		this.fitLine(track,line);
-		posY += line.getHeight();
-		nextMeasureIndex = line.lastIndex() + 1;
-	}
-	this.height = posY + this.contentPadding.bottom;
-	this.width = this.getSheetWidth();
-	$s.pop();
-}
-alphatab.tablature.PageViewLayout.prototype.__class__ = alphatab.tablature.PageViewLayout;
 alphatab.model.effects.GraceEffectTransition = function() { }
 alphatab.model.effects.GraceEffectTransition.__name__ = ["alphatab","model","effects","GraceEffectTransition"];
 alphatab.model.effects.GraceEffectTransition.prototype.__class__ = alphatab.model.effects.GraceEffectTransition;
@@ -13207,7 +13310,6 @@ alphatab.midi.GeneralMidi.getValue = function(name) {
 	var $spos = $s.length;
 	if(alphatab.midi.GeneralMidi._values == null) {
 		alphatab.midi.GeneralMidi._values = new Hash();
-		alphatab.midi.GeneralMidi._values.set("acousticgrandpiano",0);
 		alphatab.midi.GeneralMidi._values.set("acousticgrandpiano",0);
 		alphatab.midi.GeneralMidi._values.set("brightacousticpiano",1);
 		alphatab.midi.GeneralMidi._values.set("electricgrandpiano",2);
@@ -16614,9 +16716,7 @@ alphatab.tablature.Tablature = function(source,staves,msg) { if( source === $_ )
 		staves.push("tablature");
 	}
 	this.settings.set("staves",staves);
-	this.viewLayout = new alphatab.tablature.PageViewLayout();
-	this.viewLayout.setTablature(this);
-	this.updateScale(1.0);
+	this.setViewLayoutByKey(alphatab.tablature.Tablature.DEFAULT_LAYOUT);
 	$s.pop();
 }}
 alphatab.tablature.Tablature.__name__ = ["alphatab","tablature","Tablature"];
@@ -16685,6 +16785,17 @@ alphatab.tablature.Tablature.prototype.findMeasure = function(position) {
 	{
 		$s.pop();
 		return result;
+	}
+	$s.pop();
+}
+alphatab.tablature.Tablature.prototype.getLayoutSetting = function(setting,defaultValue) {
+	$s.push("alphatab.tablature.Tablature::getLayoutSetting");
+	var $spos = $s.length;
+	var value = this.settings.get("layout." + setting);
+	{
+		var $tmp = (value != null?value:defaultValue);
+		$s.pop();
+		return $tmp;
 	}
 	$s.pop();
 }
@@ -16794,6 +16905,12 @@ alphatab.tablature.Tablature.prototype.paintBackground = function() {
 	this.canvas.fillText(msg,x,this.canvas.height() - 15);
 	$s.pop();
 }
+alphatab.tablature.Tablature.prototype.setLayoutSetting = function(setting,value) {
+	$s.push("alphatab.tablature.Tablature::setLayoutSetting");
+	var $spos = $s.length;
+	this.settings.set("layout." + setting,value);
+	$s.pop();
+}
 alphatab.tablature.Tablature.prototype.setStaveSetting = function(staveId,setting,value) {
 	$s.push("alphatab.tablature.Tablature::setStaveSetting");
 	var $spos = $s.length;
@@ -16808,6 +16925,22 @@ alphatab.tablature.Tablature.prototype.setTrack = function(track) {
 	this._updateDisplay = true;
 	this.updateTablature();
 	this.invalidate();
+	$s.pop();
+}
+alphatab.tablature.Tablature.prototype.setViewLayoutByKey = function(layout) {
+	$s.push("alphatab.tablature.Tablature::setViewLayoutByKey");
+	var $spos = $s.length;
+	if(layout == "horizontal") {
+		this.viewLayout = new alphatab.tablature.HorizontalViewLayout();
+	}
+	else if(layout == "page") {
+		this.viewLayout = new alphatab.tablature.PageViewLayout();
+	}
+	else {
+		this.viewLayout = new alphatab.tablature.PageViewLayout();
+	}
+	this.viewLayout.setTablature(this);
+	this.updateScale(1.0);
 	$s.pop();
 }
 alphatab.tablature.Tablature.prototype.settings = null;
@@ -17156,6 +17289,11 @@ js.Boot.__init();
 	Xml.Prolog = "prolog";
 	Xml.Document = "document";
 }
+alphatab.tablature.PageViewLayout.LAYOUT_ID = "page";
+alphatab.tablature.PageViewLayout.PAGE_PADDING = new alphatab.model.Padding(20,40,20,40);
+alphatab.tablature.PageViewLayout.WIDTH_ON_100 = 795;
+alphatab.tablature.HorizontalViewLayout.LAYOUT_ID = "horizontal";
+alphatab.tablature.HorizontalViewLayout.PAGE_PADDING = alphatab.tablature.PageViewLayout.PAGE_PADDING;
 alphatab.model.MeasureHeader.DEFAULT_KEY_SIGNATURE = 0;
 alphatab.model.VoiceDirection.None = 0;
 alphatab.model.VoiceDirection.Up = 1;
@@ -17304,8 +17442,6 @@ alphatab.model.SlideType.IntoFromAbove = 5;
 alphatab.file.gpx.FileSystem.HEADER_BCFS = 1397113666;
 alphatab.file.gpx.FileSystem.HEADER_BCFZ = 1514554178;
 js.Lib.onerror = null;
-alphatab.tablature.PageViewLayout.PAGE_PADDING = new alphatab.model.Padding(20,40,20,40);
-alphatab.tablature.PageViewLayout.WIDTH_ON_100 = 795;
 alphatab.model.effects.GraceEffectTransition.None = 0;
 alphatab.model.effects.GraceEffectTransition.Slide = 1;
 alphatab.model.effects.GraceEffectTransition.Bend = 2;
@@ -17438,6 +17574,7 @@ alphatab.model.MeasureClef.Treble = 0;
 alphatab.model.MeasureClef.Bass = 1;
 alphatab.model.MeasureClef.Tenor = 2;
 alphatab.model.MeasureClef.Alto = 3;
+alphatab.tablature.Tablature.DEFAULT_LAYOUT = alphatab.tablature.PageViewLayout.LAYOUT_ID;
 alphatab.model.effects.BendTypes.None = 0;
 alphatab.model.effects.BendTypes.Bend = 1;
 alphatab.model.effects.BendTypes.BendRelease = 2;

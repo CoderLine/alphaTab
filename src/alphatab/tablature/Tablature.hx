@@ -46,7 +46,9 @@ typedef MeasureSearchResult = {
  */
 class Tablature 
 {
-	private var _updateDisplay:Bool;
+    public static var DEFAULT_LAYOUT:String = PageViewLayout.LAYOUT_ID;
+    
+	private var _updateDisplay:Bool; 
 	private var _updateSong:Bool;
     
     public var settings:Hash<Dynamic>;
@@ -79,11 +81,27 @@ class Tablature
         }      
         settings.set("staves", staves);
         
-		
-		viewLayout = new PageViewLayout();
-		viewLayout.setTablature(this);
-		updateScale(1.0);	
+		setViewLayoutByKey(DEFAULT_LAYOUT);
 	}
+    
+    public function setViewLayoutByKey(layout:String)
+    {
+        if (layout == "horizontal")
+        {
+            viewLayout = new HorizontalViewLayout();
+        }
+        else if (layout == "page")
+        {
+            viewLayout = new PageViewLayout();
+        }
+        else
+        {
+            viewLayout = new PageViewLayout();
+        }
+        
+        viewLayout.setTablature(this);
+        updateScale(1.0);
+    }
     
     public function setStaveSetting(staveId:String, setting:String, value:Dynamic)
     {   
@@ -95,7 +113,18 @@ class Tablature
         var value:Dynamic = settings.get(staveId + "." + setting);
         return value != null ? value : defaultValue;
     }
+     
     
+    public function setLayoutSetting(setting:String, value:Dynamic)
+    {   
+        settings.set("layout." + setting, value);
+    }
+    
+    public function getLayoutSetting(setting:String, defaultValue:Dynamic = null)
+    {
+        var value:Dynamic = settings.get("layout." + setting);
+        return value != null ? value : defaultValue;
+    }
 	
 	public function setTrack(track:Track) : Void 
 	{

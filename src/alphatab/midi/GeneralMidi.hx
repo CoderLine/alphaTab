@@ -30,7 +30,6 @@ class GeneralMidi
         {
             _values = new Hash<Int>();
             _values.set("acousticgrandpiano", 0);
-            _values.set("acousticgrandpiano", 0);
             _values.set("brightacousticpiano", 1);
             _values.set("electricgrandpiano", 2);
             _values.set("honkytonkpiano", 3);

@@ -25,3 +25,10 @@ class BeatStrokeDirection
 	public static inline var Up:Int = 1;
 	public static inline var Down:Int = 2;
 }
+
+enum BeatStrokeDirection2
+{
+    None;
+    Up;
+    Down;
+}

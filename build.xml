@@ -58,6 +58,26 @@
         </exec>
 	</target>	
 
+    <!-- Js build using custom generator -->
+    <target name="haxe-js2" depends="global-init">
+		<delete dir="${lib}2" />
+		<mkdir dir="${lib}2" />
+        <exec executable="haxe">
+            <arg value="-cp" />
+            <arg value="${src}"/>
+            
+            <arg value="-main" />
+            <arg value="alphatab.Main" />
+            
+            <arg value="-js" />
+            <arg value="${lib}2" />
+
+            <arg value="--macro" />
+            <arg value="alphatab.AlphaTabJsGenerator.use()" />
+        </exec>
+	</target>	
+
+    
 	<target name="haxe-cpp" depends="global-init">
 		<delete file="${haxe-cpp}" />
         <exec executable="haxe">
