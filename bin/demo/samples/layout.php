@@ -32,7 +32,7 @@ $(document).ready(function() {
 </script>
 <h2>Page Layout</h2>
 <div class="alphaTabPage"></div>
-<h2>Page Layout (7 Measures per Line)</h2>
+<h2>Page Layout (5 Measures per Line)</h2>
 <div class="alphaTabPage2"></div>
 <h2>Horizontal</h2>
 <div class="alphaTabHorizontal"></div>
