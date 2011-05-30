@@ -34,7 +34,6 @@ import alphatab.tablature.drawing.DrawingResources;
 import alphatab.tablature.drawing.MusicFont;
 import alphatab.tablature.drawing.NotePainter;
 import alphatab.tablature.ViewLayout;
-import js.Lib;
 
 /**
  * This Stave renders the guitar tablature and this effects:
