@@ -53,7 +53,6 @@ class ViewLayout
 	public var scale :Float;
     
 	public var firstMeasureSpacing :Float;
-    
 
 	public var effectSpacing :Float;
 	
@@ -64,11 +63,7 @@ class ViewLayout
     
     // Returns the index of the measure drawn under the coordinates given
     public function getMeasureAt(xPos:Int, yPos:Int) : MeasureClickable {
-		for(target in _map) {
-			if(target.encompasses(xPos,yPos)) {
-				return target;
-			}
-		}
+    	// implemented in subclass
 		return null;
     }
 	

@@ -58,7 +58,7 @@ class Tablature
 	public var viewLayout:ViewLayout;
 	public var track:Track;
 	public var autoSizeWidth:Bool;
-	public var onCaretChanged:Beat->Void;
+	public var onCaretChanged:Beat->Bool->Void;
     
 	public function new(source:Dynamic, staves:Array<String> = null, msg:String = "") 
 	{
@@ -219,7 +219,7 @@ class Tablature
 	private var _lastRealPosition:Int; 
 	private var _selectedBeat:Beat; 
 	
-	public function notifyTickPosition(position:Int,forced:Bool)
+	public function notifyTickPosition(position:Int,forced:Bool,scroll:Bool)
 	{
 		position -= Duration.QUARTER_TIME; // remove first tick start
 		if (forced || position != _lastPosition)
@@ -234,7 +234,7 @@ class Tablature
 			{
 				_selectedBeat = beat;
 				 if (onCaretChanged != null)
-					onCaretChanged(beat);
+					onCaretChanged(beat,scroll);
 			}
 		}
 	}

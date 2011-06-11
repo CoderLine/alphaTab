@@ -67,12 +67,13 @@
         
         this.loadCallbacks.push(this.updatePlayer);
 
-        this.updateCaret = function(tickPos,forced)
+        this.updateCaret = function(tickPos,forced,scroll)
         {
         	self.lastTickPos=tickPos;
         	forced=forced===true;
+        	scroll=!(scroll===false);
             setTimeout(function(){
-                    self.tablature.notifyTickPosition(tickPos,forced);
+                    self.tablature.notifyTickPosition(tickPos,forced,scroll);
                 }, 1);
         }
         
@@ -97,7 +98,7 @@
 				
 				if(measure!=null) {
 					self.midiPlayer.goTo(measure.firstTick);
-					self.updateCaret(measure.firstTick);
+					self.updateCaret(measure.firstTick,true,false);
 				}
         	}
         );
@@ -187,7 +188,7 @@
             this.el.append(beatCaret);
         }
 
-        this.tablature.onCaretChanged = function(beat)
+        this.tablature.onCaretChanged = function(beat,scroll)
         {
             var x = $(self.canvas).offset().left + parseInt($(self.canvas).css("borderLeftWidth"), 10) ;
             var y = $(self.canvas).offset().top;
@@ -207,9 +208,11 @@
             beatCaret.width(3);
             beatCaret.height(measureCaret.height());
 
-            if(playerOptions.autoScroll)
+            if(scroll && beat.isFirstOfLine()  && playerOptions.autoScroll)
             {
-                window.scrollTo(0, y - 30);
+            	// uses the jQuery scrollTo plugin to smoothly scroll the screen
+                // $.scrollTo(y-30, 300);
+                window.scrollTo(0,y-30);
             }
         }
         

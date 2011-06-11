@@ -54,6 +54,21 @@ class PageViewLayout extends ViewLayout
 		contentPadding = PAGE_PADDING;
 	}
 	
+    
+    // Returns the index of the measure drawn under the coordinates given
+    public override function getMeasureAt(xPos:Int, yPos:Int) : MeasureClickable {
+    	xPos-=PAGE_PADDING.left;
+    	var target:MeasureClickable=null;
+    	
+		for(target in _map) {
+			if(target.encompasses(xPos,yPos)) {
+				return target;
+			}
+		}
+		
+		return target;
+    }
+    
 	public function getMaxWidth() : Int
 	{
 		if (_maximumWidth <= 0) {
