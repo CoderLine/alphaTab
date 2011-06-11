@@ -27,25 +27,27 @@ import javax.sound.midi.MidiMessage;
 import javax.sound.midi.Sequence;
 import javax.sound.midi.Track;
 
+import java.lang.StackTraceElement;
+
 public class MidiSequenceParser
 {
 	private static Sequence _sequence;
 	private static List<Track> _tracks;
-	
+
 	private static int _metronomeTrack;
-	
-	public static int getMetronomeTrack() 
+
+	public static int getMetronomeTrack()
 	{
 		return _metronomeTrack;
 	}
-	
-	private static Track getTrack(int index) 
+
+	private static Track getTrack(int index)
 	{
 		if(index < _tracks.size()) {
 			return _tracks.get(index);
 		}
 		// create more tracks if needed
-		while(_tracks.size() <= index) 
+		while(_tracks.size() <= index)
 		{
 			_tracks.add(_sequence.createTrack());
 		}
@@ -57,21 +59,21 @@ public class MidiSequenceParser
         String[] commandList = commands.split(";");
         _sequence = new Sequence(Sequence.PPQ, 960);
         _tracks = new ArrayList<Track>();
-        
+
 		_metronomeTrack = Integer.parseInt(commandList[0], 16);
-		
+
         for(int i = 1; i < commandList.length; i++)
         {
             try
             {
                 String command = commandList[i];
                 String[] parts = command.split("\\|");
-                
+
                 int track = Integer.parseInt(parts[0], 16);
                 long tick = Long.parseLong(parts[1], 16);
-                
+
                 String eventData = parts[2];
-                
+
                 MidiMessage message = null;
                 if(eventData.charAt(0) == '0')
                 {// noteOn
@@ -116,15 +118,22 @@ public class MidiSequenceParser
                             Integer.parseInt(timeParts[1]), // denominatorIndex
                             Integer.parseInt(timeParts[2])); // denominatorValue
                 }
-                
+
                 getTrack(track).add(new MidiEvent(message, tick));
             }
-            catch(Throwable e) 
+            catch(Throwable e)
             {
-                throw new InvalidMidiDataException("Error Parse command " + i + ": " + e.toString());
+                StackTraceElement[] elements = e.getStackTrace();
+                String combinedOutput="MidiSequenceParser Error:\n";
+                for(int eCount=0; eCount<elements.length; eCount++) {
+                 combinedOutput += "\n" + elements[eCount].toString();
+                }
+
+				//JOptionPane.showMessageDialog(null, combinedOutput);
+                //throw new InvalidMidiDataException("Error Parse command " + i + ": " + e.toString() + "\n" + );
             }
         }
-            
+
         return _sequence;
     }
 
