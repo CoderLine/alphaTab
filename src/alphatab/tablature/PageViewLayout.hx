@@ -31,6 +31,7 @@ import alphatab.tablature.model.ScoreStave;
 import alphatab.tablature.model.StaveLine;
 import alphatab.tablature.model.StaveSpacing;
 import alphatab.tablature.model.TablatureStave;
+import alphatab.tablature.model.MeasureClickable;
 
 /**
  * This layout renders measures in form of a page. 
@@ -277,7 +278,7 @@ class PageViewLayout extends ViewLayout
 		for (l in 0 ... _lines.length) 
 		{
 			var line:StaveLine = _lines[l];
-            line.paint(this, track, ctx);
+            line.paint(this, track, ctx, _map);
 		}
 	}
 	

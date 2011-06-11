@@ -35,7 +35,8 @@
             autoScroll: true,
             language: {play: "Play", pause: "Pause", stop: "Stop", metronome: "Metronome"}
         };
-
+		self.lastTickPos = 0;
+		
         var playerOptions = $.extend(defaults, playerOptions);
         
         if(!navigator.javaEnabled()) {
@@ -48,7 +49,7 @@
         //        
         this.updatePlayer = function(song)
         {
-            var songData = alphatab.midi.MidiDataProvider.getSongMidiData(song, self.factory);
+            var songData = alphatab.midi.MidiDataProvider.getSongMidiData(song, self.factory, self.tablature.viewLayout._map);
             if(self.midiPlayer.updateSongData)
             {
                 self.midiPlayer.updateSongData(songData);
@@ -63,61 +64,89 @@
                 }, 1000);
             }
         }
+        
         this.loadCallbacks.push(this.updatePlayer);
 
-        this.updateCaret = function(tickPos)
+        this.updateCaret = function(tickPos,forced)
         {
+        	self.lastTickPos=tickPos;
+        	forced=forced===true;
             setTimeout(function(){
-                    self.tablature.notifyTickPosition(tickPos);
+                    self.tablature.notifyTickPosition(tickPos,forced);
                 }, 1);
         }
-        
         
         // 
         // Create UI
         //
         // create applet
-        var playerControls = $('<div class="player"></div>');
+        
+        var playerControls = $('<div class="fixedControls player"></div>');
         var param = playerOptions.playerTickCallback ? '<param name="onTickChanged" value="' + playerOptions.playerTickCallback + '" />' : '';
         var applet = $('<applet height="0" width="0"  archive="' + this.options.base + "/" + playerJar + '" code="net.alphatab.midi.MidiPlayer.class">'+param+'</applet>');
         this.playerControls = playerControls[0];
         this.midiPlayer = applet[0];
+        
+        // Sets the player to the start of the measure clicked
+        $(this.canvas).click(
+        	function(e){
+        		var offsets=$(this).offset();
+			    var x = e.pageX - offsets.left;
+			    var y = e.pageY - offsets.top;
+				var measure=self.tablature.viewLayout.getMeasureAt(x,y);
+				
+				if(measure!=null) {
+					self.midiPlayer.goTo(measure.firstTick);
+					self.updateCaret(measure.firstTick);
+				}
+        	}
+        );
+        
+        var rightFloat = $('<div class="playerRightFloat"></div>');
+        
+        var returnToTop = $('<input type="button" id="toTop" value="Scroll To Top ^" />');
         playerControls.append(applet);
+        playerControls.append(rightFloat);
+        
         this.el.append(playerControls);
-
+        
         // create controls
         if(playerOptions.createControls)
         {
             var playButton = $('<input type="button" class="play" value="'+playerOptions.language.play+'" />');
             var pauseButton = $('<input type="button" class="pause" value="'+playerOptions.language.pause+'" />');
-            var stopButton = $('<input type="button" class="stop" value="'+playerOptions.language.stop+'" />');
-            var metronomeCheck = $('<input type="checkbox" class="metronome" checked="checked" />');
+            var metronomeCheck = $('<input type="checkbox" class="metronome" />');
 
-            playerControls.append(playButton);
-            playerControls.append(pauseButton);
-            playerControls.append(stopButton);
-            playerControls.append(metronomeCheck);
-            playerControls.append($('<span>'+playerOptions.language.metronome+'</span>'));
-
+           var trackSelect = $('<select id="tracks"><option value="">Tab is loading...</option></select>');
+            
+            rightFloat.append(trackSelect);
+            
+            rightFloat.append(playButton);
+            rightFloat.append(pauseButton);
+            
+            rightFloat.append($('<span>Metronome</span>'));
+            rightFloat.append(metronomeCheck);
+            
             // hook up events
+            returnToTop.click(function(){
+				$('html, body').animate({scrollTop:0}, 'slow');
+			});
+            
             playButton.click(function() 
             {
-                if(self.midiPlayer.play)
-                    self.midiPlayer.play();
+                if(self.midiPlayer.play) {
+					metronomeCheck.change();
+					self.midiPlayer.play();
+                }
                 else
                     alert("The player has not loaded yet.");
+                    
+                    
             });
             pauseButton.click(function() 
             {
                 if(self.midiPlayer.pause)
                     self.midiPlayer.pause();
-                else
-                    alert("The player has not loaded yet.");
-            });
-            stopButton.click(function() 
-            {
-                if(self.midiPlayer.stop)
-                    self.midiPlayer.stop();
                 else
                     alert("The player has not loaded yet.");
             });
@@ -133,8 +162,15 @@
                     alert("The player has not loaded yet.");
                 }
             });
+        	trackSelect.change(function() { 
+        		var index = parseInt($('#tracks :selected').val());
+        		api.tablature.setTrack(api.tablature.track.song.tracks[index]);
+        		self.updateCaret(self.lastTickPos,true);
+        	});
         }
-
+        
+        playerControls.append(returnToTop);
+        
         // create carets
         if(playerOptions.caret)
         {
@@ -159,7 +195,7 @@
             y += beat.measure.staveLine.y;
 
             var measureX = x + beat.measure.staveLine.x + beat.measure.x;
-console.log("measure: " + measureX + " " + beat.measure.width);
+			// console.log("measure: " + measureX + " " + beat.measure.width);
             measureCaret.offset({ top: y, left: measureX});
             measureCaret.width(beat.measure.width + beat.measure.spacing);
             measureCaret.height(beat.measure.staveLine.getHeight());
@@ -171,7 +207,7 @@ console.log("measure: " + measureX + " " + beat.measure.width);
             beatCaret.width(3);
             beatCaret.height(measureCaret.height());
 
-            if(beat.measure.isFirstOfLine() && playerOptions.autoScroll)
+            if(playerOptions.autoScroll)
             {
                 window.scrollTo(0, y - 30);
             }

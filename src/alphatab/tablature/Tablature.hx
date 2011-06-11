@@ -219,10 +219,10 @@ class Tablature
 	private var _lastRealPosition:Int; 
 	private var _selectedBeat:Beat; 
 	
-	public function notifyTickPosition(position:Int)
+	public function notifyTickPosition(position:Int,forced:Bool)
 	{
 		position -= Duration.QUARTER_TIME; // remove first tick start
-		if (position != _lastPosition)
+		if (forced || position != _lastPosition)
 		{
 			_lastPosition = position;
 			var result:MeasureSearchResult = findMeasure(position);
