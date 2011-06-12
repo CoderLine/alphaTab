@@ -7079,16 +7079,38 @@ alphatab.tablature.model.ScoreStave.prototype.paintKeySignature = function(layou
 alphatab.tablature.model.ScoreStave.prototype.paintTimeSignature = function(layout,context,measure,x,y) {
 	if(!(measure.header).shouldPaintTimeSignature(measure)) return;
 	y += this.spacing.get(10);
-	x += measure.calculateClefSpacing(layout) + measure.calculateKeySignatureSpacing(layout) + Math.floor(15 * layout.scale);
+	var x1 = x + measure.calculateClefSpacing(layout) + measure.calculateKeySignatureSpacing(layout) + Math.floor(15 * layout.scale);
+	var x2 = x1;
 	var y1 = 0;
 	var y2 = Math.round(2 * layout.scoreLineSpacing);
-	var symbol = this.getTimeSignatureSymbol(measure.header.timeSignature.numerator);
-	if(symbol != null) context.get(3).addMusicSymbol(symbol,x,y + y1,layout.scale);
-	symbol = this.getTimeSignatureSymbol(measure.header.timeSignature.denominator.value);
-	if(symbol != null) context.get(3).addMusicSymbol(symbol,x,y + y2,layout.scale);
+	if(measure.header.timeSignature.numerator > 9 && measure.header.timeSignature.denominator.value < 10) {
+		x2 += Math.round(10 * layout.scale / 2);
+	}
+	if(measure.header.timeSignature.numerator < 10 && measure.header.timeSignature.denominator.value > 9) {
+		x1 += Math.round(10 * layout.scale / 2);
+	}
+	this.paintTimeSignatureNumber(layout,context,measure.header.timeSignature.numerator,x1,y + y1);
+	this.paintTimeSignatureNumber(layout,context,measure.header.timeSignature.denominator.value,x2,y + y2);
+}
+alphatab.tablature.model.ScoreStave.prototype.paintTimeSignatureNumber = function(layout,context,number,x,y) {
+	if(number < 10) {
+		var symbol = this.getTimeSignatureSymbol(number);
+		if(symbol != null) context.get(3).addMusicSymbol(symbol,x,y,layout.scale);
+	}
+	else {
+		var firstDigit = Math.floor(number / 10);
+		var secondDigit = number - firstDigit * 10;
+		var symbol = this.getTimeSignatureSymbol(firstDigit);
+		if(symbol != null) context.get(3).addMusicSymbol(symbol,x,y,layout.scale);
+		symbol = this.getTimeSignatureSymbol(secondDigit);
+		if(symbol != null) context.get(3).addMusicSymbol(symbol,x + 10 * layout.scale,y,layout.scale);
+	}
 }
 alphatab.tablature.model.ScoreStave.prototype.getTimeSignatureSymbol = function(number) {
 	switch(number) {
+	case 0:{
+		return alphatab.tablature.drawing.MusicFont.Num0;
+	}break;
 	case 1:{
 		return alphatab.tablature.drawing.MusicFont.Num1;
 	}break;
@@ -12199,6 +12221,7 @@ alphatab.model.BeatStrokeDirection.Down = 2;
 alphatab.file.alphatex.AlphaTexParser.EOL = String.fromCharCode(0);
 alphatab.file.alphatex.AlphaTexParser.TRACK_CHANNELS = [0,1];
 alphatab.model.Tuning.TUNING_REGEX = new EReg("([a-g]b?)([0-9])","i");
+alphatab.tablature.drawing.MusicFont.Num0 = "M 0.00 7.99 C -0.00 10.44 0.57 13.08 2.37 14.84 4.18 16.54 7.44 16.36 8.93 14.32 10.61 12.22 10.97 9.39 10.78 6.78 10.62 4.66 9.96 2.42 8.31 0.97 6.53 -0.48 3.60 -0.29 2.11 1.49 0.53 3.25 -0.00 5.69 0.00 7.99 z M 5.46 15.13 C 4.46 15.17 3.80 14.18 3.64 13.29 3.03 10.66 3.00 7.93 3.19 5.25 3.32 3.95 3.53 2.57 4.31 1.48 4.74 0.87 5.67 0.62 6.26 1.14 c 0.83 0.69 1.03 1.84 1.25 2.84 0.43 2.46 0.39 4.99 0.13 7.47 -0.15 1.22 -0.44 2.57 -1.43 3.40 -0.21 0.15 -0.48 0.25 -0.75 0.26 z";
 alphatab.tablature.drawing.MusicFont.Num1 = "m 2.36 14.48 c 0 -3.87 0 -7.74 0 -11.61 C 1.69 4.15 1.01 5.42 0.34 6.7 0.23 6.54 -0.11 6.44 0.06 6.22 0.83 4.14 1.59 2.07 2.36 -8.04e-8 c 1.09 0 2.18 0 3.26 0 0 4.81 0 9.62 0 14.43 0.11 0.73 1 0.75 1.57 0.86 0 0.24 0 0.47 0 0.71 -2.13 0 -4.25 0 -6.38 0 0 -0.22 0 -0.44 0 -0.66 C 1.34 15.22 1.98 15.2 2.31 14.7 l 0.04 -0.11 0.01 -0.11 0 0 z";
 alphatab.tablature.drawing.MusicFont.Num2 = "M 3.85 1.11 C 3.32 1.21 2.1 1.37 2.27 2.07 2.67 2.48 3.62 2.08 4.03 2.69 4.75 3.6 4.54 5.13 3.54 5.77 2.47 6.55 0.7 5.98 0.42 4.65 0.08 3.16 0.99 1.68 2.2 0.89 3.47 -0.05 5.13 -0.15 6.63 0.14 8.35 0.44 10.17 1.45 10.71 3.21 11.09 4.36 10.77 5.67 9.91 6.52 8.88 7.62 7.45 8.16 6.21 8.97 5.29 9.48 4.4 10.07 3.69 10.86 3.15 11.41 2.75 12.06 2.32 12.69 3.58 11.96 5.15 11.47 6.56 12.08 c 0.95 0.31 1.61 1.07 2.42 1.6 0.8 0.43 1.88 -0.18 2.04 -1.06 0.14 -0.38 -0.08 -1.05 0.51 -0.88 0 1.34 -0.22 2.91 -1.38 3.76 -1.28 0.84 -2.98 0.49 -4.21 -0.25 -1.07 -0.69 -2.23 -1.52 -3.58 -1.31 -0.7 0.04 -1.55 0.4 -1.55 1.21 0.03 0.51 -0.25 0.64 -0.69 0.57 C -0.13 15.35 0.24 14.47 0.46 13.97 1.46 11.79 3.35 10.24 4.96 8.53 6.02 7.37 7.19 6.26 7.94 4.87 8.18 4.24 7.99 3.53 7.75 2.92 7.1 1.44 5.3 1.1 3.85 1.11 z";
 alphatab.tablature.drawing.MusicFont.Num3 = "M 3.22 8.29 C 3.23 8.01 3.1 7.62 3.54 7.72 4.49 7.43 5.46 7.06 6.26 6.45 7.1 5.78 7.29 4.61 7.05 3.61 6.73 2.07 5.23 0.71 3.6 0.92 2.89 0.97 2.15 1.23 1.72 1.82 1.74 2.68 3.01 2.05 3.3 2.84 3.67 3.53 3.69 4.51 3.15 5.12 2.55 5.68 1.58 5.71 0.85 5.42 0.01 5.03 -0.06 3.95 0.03 3.15 0.13 1.84 1.12 0.72 2.37 0.37 3.58 0.02 4.88 -0.09 6.13 0.08 8.23 0.48 10.01 2.41 9.97 4.59 9.99 5.54 9.71 6.56 8.9 7.13 8.55 7.51 7.7 7.79 7.51 8.03 8.58 8.44 9.59 9.24 9.84 10.4 10.24 11.96 9.69 13.7 8.45 14.73 7.42 15.7 5.97 16.12 4.57 15.99 3.13 15.92 1.48 15.62 0.59 14.37 -0.04 13.45 -0.17 12.21 0.2 11.17 0.58 10.38 1.62 10.33 2.38 10.46 c 0.72 0.1 1.21 0.8 1.18 1.51 0.05 0.67 -0.18 1.54 -0.95 1.67 -0.44 0.08 -1.01 -0.03 -0.69 0.57 0.43 0.7 1.47 0.83 2.25 0.83 C 5.8 14.9 7.14 13.37 7.18 11.75 7.33 10.64 6.6 9.62 5.64 9.14 4.9 8.75 4.13 8.36 3.29 8.31 c -0.03 0 -0.05 -0.01 -0.08 -0.01 z";
@@ -12276,6 +12299,7 @@ alphatab.tablature.model.ScoreStave.SCORE_FLAT_POSITIONS = [7,6,6,5,5,4,3,3,2,2,
 alphatab.tablature.model.ScoreStave.SCORE_CLEF_OFFSETS = [30,18,22,24];
 alphatab.tablature.model.ScoreStave.UP_OFFSET = 28;
 alphatab.tablature.model.ScoreStave.DOWN_OFFSET = 28;
+alphatab.tablature.model.ScoreStave.TS_NUMBER_SIZE = 10;
 alphatab.tablature.model.ScoreStave.STAVE_ID = "score";
 alphatab.tablature.model.ScoreStave.TopPadding = 0;
 alphatab.tablature.model.ScoreStave.Text = 1;

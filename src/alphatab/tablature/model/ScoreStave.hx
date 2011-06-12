@@ -60,6 +60,8 @@ class ScoreStave extends Stave
     private static inline var UP_OFFSET:Int = 28; 
 	private static inline var DOWN_OFFSET:Int = 28;
 	
+	private static inline var TS_NUMBER_SIZE:Int = 10;
+	
     public static inline var STAVE_ID = "score";
     
     // spacings
@@ -306,24 +308,54 @@ class ScoreStave extends Stave
         if (!measure.headerDrawing().shouldPaintTimeSignature(measure)) return;
         
         y += spacing.get(ScoreMiddleLines);
-        x += measure.calculateClefSpacing(layout) + measure.calculateKeySignatureSpacing(layout) + Math.floor(15*layout.scale);
+        var x1:Int = x + measure.calculateClefSpacing(layout) + measure.calculateKeySignatureSpacing(layout) + Math.floor(15*layout.scale);
+        var x2:Int = x1;
         var y1:Int = 0;
         var y2:Int = Math.round(2 * layout.scoreLineSpacing);
+        
+        if(measure.header.timeSignature.numerator > 9 && measure.header.timeSignature.denominator.value < 10)
+        {
+        	x2 += Math.round((TS_NUMBER_SIZE * layout.scale) / 2);
+        }
+        if(measure.header.timeSignature.numerator < 10 && measure.header.timeSignature.denominator.value > 9)
+        {
+        	x1 += Math.round((TS_NUMBER_SIZE * layout.scale) / 2);
+        }
 
         // numerator
-        var symbol = this.getTimeSignatureSymbol(measure.header.timeSignature.numerator);
-        if (symbol != null) 
-            context.get(DrawingLayers.MainComponents).addMusicSymbol(symbol, x, y + y1, layout.scale);
-        
+        paintTimeSignatureNumber(layout, context, measure.header.timeSignature.numerator, x1, y+y1);
         // denominator
-        symbol = this.getTimeSignatureSymbol(measure.header.timeSignature.denominator.value);
-        if (symbol != null) 
-            context.get(DrawingLayers.MainComponents).addMusicSymbol(symbol, x, y + y2, layout.scale);
+        paintTimeSignatureNumber(layout, context, measure.header.timeSignature.denominator.value, x2, y+y2);
+    }
+    
+    private function paintTimeSignatureNumber(layout:ViewLayout, context:DrawingContext, number:Int, x:Int, y:Int)
+    {
+    	if(number < 10)
+    	{
+	        var symbol = this.getTimeSignatureSymbol(number);
+	        if (symbol != null) 
+	            context.get(DrawingLayers.MainComponents).addMusicSymbol(symbol, x, y, layout.scale);
+    	}
+    	else
+    	{
+    		var firstDigit = Math.floor(number / 10);
+    		var secondDigit = number - (firstDigit * 10); 
+    		
+	        var symbol = this.getTimeSignatureSymbol(firstDigit);
+	        if (symbol != null) 
+	            context.get(DrawingLayers.MainComponents).addMusicSymbol(symbol, x, y, layout.scale);
+	        symbol = this.getTimeSignatureSymbol(secondDigit);
+	        if (symbol != null) 
+	            context.get(DrawingLayers.MainComponents).addMusicSymbol(symbol, x + TS_NUMBER_SIZE * layout.scale, y, layout.scale);
+    		
+    	}
     }
     
     private function getTimeSignatureSymbol(number:Int)
 	{
 		switch(number) {
+			case 0:  
+				return MusicFont.Num0;
 			case 1:  
 				return MusicFont.Num1;
 			case 2: 
