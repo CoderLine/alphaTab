@@ -34,6 +34,14 @@ class BeatDrawing extends Beat
     // the width of the beat
     public var width:Int;
     
+    // a boolean flag indicating whether the beat is the first one
+    // within the current MeasureDrawing
+    public function isFirstOfLine():Bool
+    {
+        return measure.beats.length == 0 || // no beats in this line yet. this instance will become the first
+            index==0; // if there are any beats yet, check if we are first
+    }
+    
     // full width including the additional spacing provided by the measure
     public function fullWidth() : Int
     {

@@ -22,6 +22,7 @@ import alphatab.model.Track;
 import alphatab.tablature.drawing.DrawingContext;
 import alphatab.tablature.model.MeasureDrawing;
 import alphatab.tablature.model.StaveLine;
+import alphatab.tablature.model.MeasureClickable;
 
 /**
  * This layout renders all measures in one single line
@@ -123,7 +124,7 @@ class HorizontalViewLayout extends ViewLayout
 	{
 		var track:Track = tablature.track;
 		y = Math.floor(y + contentPadding.top + firstMeasureSpacing);
-        _line.paint(this, track, ctx);
+        _line.paint(this, track, ctx, _map);
 	}
 	
 }

@@ -17,18 +17,19 @@
 package alphatab.midi;
 import alphatab.model.Song;
 import alphatab.model.SongFactory;
+import alphatab.tablature.model.MeasureClickable;
 
 /**
  * This wrapper allows easy converting of a song into a midi message list used by the player.
  */
 class MidiDataProvider 
 {
-	public static function getSongMidiData(song:Song, factory:SongFactory):String
+	public static function getSongMidiData(song:Song, factory:SongFactory, measureMap:Array<MeasureClickable>):String
 	{
 		var parser:MidiSequenceParser = new MidiSequenceParser(factory, song, MidiSequenceParserFlags.DEFAULT_PLAY_FLAGS,
 											   100, 0);
 		var sequence:MidiSequenceHandler = new MidiSequenceHandler(song.tracks.length + 2);
-		parser.parse(sequence);
+		parser.parse(sequence, measureMap);
 		return sequence.commands;
 	}
 }

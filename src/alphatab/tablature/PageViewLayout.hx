@@ -31,6 +31,7 @@ import alphatab.tablature.model.ScoreStave;
 import alphatab.tablature.model.StaveLine;
 import alphatab.tablature.model.StaveSpacing;
 import alphatab.tablature.model.TablatureStave;
+import alphatab.tablature.model.MeasureClickable;
 
 /**
  * This layout renders measures in form of a page. 
@@ -53,6 +54,21 @@ class PageViewLayout extends ViewLayout
 		contentPadding = PAGE_PADDING;
 	}
 	
+    
+    // Returns the index of the measure drawn under the coordinates given
+    public override function getMeasureAt(xPos:Int, yPos:Int) : MeasureClickable {
+    	xPos-=PAGE_PADDING.left;
+    	var target:MeasureClickable=null;
+    	
+		for(target in _map) {
+			if(target.encompasses(xPos,yPos)) {
+				return target;
+			}
+		}
+		
+		return target;
+    }
+    
 	public function getMaxWidth() : Int
 	{
 		if (_maximumWidth <= 0) {
@@ -277,7 +293,7 @@ class PageViewLayout extends ViewLayout
 		for (l in 0 ... _lines.length) 
 		{
 			var line:StaveLine = _lines[l];
-            line.paint(this, track, ctx);
+            line.paint(this, track, ctx, _map);
 		}
 	}
 	
