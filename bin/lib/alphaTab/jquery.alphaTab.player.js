@@ -55,6 +55,17 @@
                 self.midiPlayer.updateSongData(songData);
                 $(self.playerControls).find('input').attr('disabled', false);
                 self.updateCaret(0);
+                var tracks = $('#tracks');
+    			tracks.find('option').remove();
+    			for(var i = 0; i < song.tracks.length; i++) 
+    			{
+    				var elm = $('<option value="'+i+'">'+song.tracks[i].name+'</option>');
+    				if(i == 0)
+    				{
+    					elm.attr("selected", "selected");
+    				}	
+    				tracks.append(elm);
+    			}
             }
             else
             {
@@ -118,7 +129,7 @@
             var pauseButton = $('<input type="button" class="pause" value="'+playerOptions.language.pause+'" />');
             var metronomeCheck = $('<input type="checkbox" class="metronome" />');
 
-           var trackSelect = $('<select id="tracks"><option value="">Tab is loading...</option></select>');
+            var trackSelect = $('<select id="tracks"><option value="">Tab is loading...</option></select>');
             
             rightFloat.append(trackSelect);
             
@@ -212,6 +223,7 @@
             {
             	// uses the jQuery scrollTo plugin to smoothly scroll the screen
                 // $.scrollTo(y-30, 300);
+            	$('html, body').animate({scrollTop:y-30}, 300);
                 window.scrollTo(0,y-30);
             }
         }

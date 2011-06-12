@@ -135,8 +135,10 @@ public class MidiPlayer extends JApplet
         _sequencer.setTickPosition(0);
     }
 
-    public void goTo(int tickPosition) {
+    public void goTo(int tickPosition) 
+    {
         _sequencer.stop();
         _sequencer.setTickPosition(tickPosition);
+        _sequencer.start();
     }
 }

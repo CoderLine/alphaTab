@@ -8,6 +8,7 @@ alphatab.tablature.ViewLayout = function(p) { if( p === $_ ) return; {
 alphatab.tablature.ViewLayout.__name__ = ["alphatab","tablature","ViewLayout"];
 alphatab.tablature.ViewLayout.prototype._cache = null;
 alphatab.tablature.ViewLayout.prototype.tablature = null;
+alphatab.tablature.ViewLayout.prototype._map = null;
 alphatab.tablature.ViewLayout.prototype.stringSpacing = null;
 alphatab.tablature.ViewLayout.prototype.scoreLineSpacing = null;
 alphatab.tablature.ViewLayout.prototype.scale = null;
@@ -17,6 +18,9 @@ alphatab.tablature.ViewLayout.prototype.layoutSize = null;
 alphatab.tablature.ViewLayout.prototype.width = null;
 alphatab.tablature.ViewLayout.prototype.height = null;
 alphatab.tablature.ViewLayout.prototype.contentPadding = null;
+alphatab.tablature.ViewLayout.prototype.getMeasureAt = function(xPos,yPos) {
+	return null;
+}
 alphatab.tablature.ViewLayout.prototype.setTablature = function(tablature) {
 	this.tablature = tablature;
 }
@@ -26,6 +30,7 @@ alphatab.tablature.ViewLayout.prototype.init = function(scale) {
 	this.scale = scale;
 	this.firstMeasureSpacing = Math.round(10 * scale);
 	this.effectSpacing = Math.round(15 * scale);
+	this._map = new Array();
 }
 alphatab.tablature.ViewLayout.prototype.paintCache = function(graphics,area,fromX,fromY) {
 	if(this._cache == null) {
@@ -157,6 +162,21 @@ alphatab.tablature.PageViewLayout.__super__ = alphatab.tablature.ViewLayout;
 for(var k in alphatab.tablature.ViewLayout.prototype ) alphatab.tablature.PageViewLayout.prototype[k] = alphatab.tablature.ViewLayout.prototype[k];
 alphatab.tablature.PageViewLayout.prototype._lines = null;
 alphatab.tablature.PageViewLayout.prototype._maximumWidth = null;
+alphatab.tablature.PageViewLayout.prototype.getMeasureAt = function(xPos,yPos) {
+	xPos -= alphatab.tablature.PageViewLayout.PAGE_PADDING.left;
+	var target = null;
+	{
+		var _g = 0, _g1 = this._map;
+		while(_g < _g1.length) {
+			var target1 = _g1[_g];
+			++_g;
+			if(target1.encompasses(xPos,yPos)) {
+				return target1;
+			}
+		}
+	}
+	return target;
+}
 alphatab.tablature.PageViewLayout.prototype.getMaxWidth = function() {
 	if(this._maximumWidth <= 0) {
 		this._maximumWidth = this.tablature.canvas.width();
@@ -308,7 +328,7 @@ alphatab.tablature.PageViewLayout.prototype.paintSong = function(ctx,clientArea,
 		while(_g1 < _g) {
 			var l = _g1++;
 			var line = this._lines[l];
-			line.paint(this,track,ctx);
+			line.paint(this,track,ctx,this._map);
 		}
 	}
 }
@@ -481,7 +501,7 @@ alphatab.tablature.HorizontalViewLayout.prototype.getStaveLine = function(track,
 alphatab.tablature.HorizontalViewLayout.prototype.paintSong = function(ctx,clientArea,x,y) {
 	var track = this.tablature.track;
 	y = Math.floor(y + this.contentPadding.top + this.firstMeasureSpacing);
-	this._line.paint(this,track,ctx);
+	this._line.paint(this,track,ctx,this._map);
 }
 alphatab.tablature.HorizontalViewLayout.prototype.__class__ = alphatab.tablature.HorizontalViewLayout;
 alphatab.model.MeasureHeader = function(factory) { if( factory === $_ ) return; {
@@ -819,6 +839,32 @@ alphatab.model.SongFactory.prototype.__class__ = alphatab.model.SongFactory;
 alphatab.model.Velocities = function() { }
 alphatab.model.Velocities.__name__ = ["alphatab","model","Velocities"];
 alphatab.model.Velocities.prototype.__class__ = alphatab.model.Velocities;
+alphatab.tablature.model.MeasureClickable = function(init_mID,init_xPos,init_yPos,init_width,init_height) { if( init_mID === $_ ) return; {
+	this.id = init_mID;
+	this.xPos = init_xPos;
+	this.yPos = init_yPos;
+	this.width = init_width;
+	this.height = init_height;
+	this.firstTick = -1;
+}}
+alphatab.tablature.model.MeasureClickable.__name__ = ["alphatab","tablature","model","MeasureClickable"];
+alphatab.tablature.model.MeasureClickable.prototype.id = null;
+alphatab.tablature.model.MeasureClickable.prototype.xPos = null;
+alphatab.tablature.model.MeasureClickable.prototype.yPos = null;
+alphatab.tablature.model.MeasureClickable.prototype.width = null;
+alphatab.tablature.model.MeasureClickable.prototype.height = null;
+alphatab.tablature.model.MeasureClickable.prototype.firstTick = null;
+alphatab.tablature.model.MeasureClickable.prototype.set = function(init_mID,init_xPos,init_yPos,init_width,init_height) {
+	this.id = init_mID;
+	this.xPos = init_xPos;
+	this.yPos = init_yPos;
+	this.width = init_width;
+	this.height = init_height;
+}
+alphatab.tablature.model.MeasureClickable.prototype.encompasses = function(find_xPos,find_yPos) {
+	return find_xPos >= this.xPos && find_xPos <= this.xPos + this.width && find_yPos >= this.yPos && find_yPos <= this.yPos + this.height;
+}
+alphatab.tablature.model.MeasureClickable.prototype.__class__ = alphatab.tablature.model.MeasureClickable;
 List = function(p) { if( p === $_ ) return; {
 	this.length = 0;
 }}
@@ -2838,17 +2884,28 @@ alphatab.file.SongLoader.loadSong = function(url,factory,success) {
 alphatab.file.SongLoader.prototype.__class__ = alphatab.file.SongLoader;
 alphatab.midi.MidiSequenceHandler = function(tracks) { if( tracks === $_ ) return; {
 	this.infoTrack = 0;
+	this._ticksSoFar = 0;
 	this.metronomeTrack = tracks - 1;
 	this._commands = new Array();
 }}
 alphatab.midi.MidiSequenceHandler.__name__ = ["alphatab","midi","MidiSequenceHandler"];
 alphatab.midi.MidiSequenceHandler.prototype._commands = null;
+alphatab.midi.MidiSequenceHandler.prototype._ticksSoFar = null;
 alphatab.midi.MidiSequenceHandler.prototype.infoTrack = null;
 alphatab.midi.MidiSequenceHandler.prototype.metronomeTrack = null;
 alphatab.midi.MidiSequenceHandler.prototype.commands = null;
+alphatab.midi.MidiSequenceHandler.prototype.resetTicks = function() {
+	this._ticksSoFar = 0;
+}
+alphatab.midi.MidiSequenceHandler.prototype.getTicks = function() {
+	return this._ticksSoFar;
+}
 alphatab.midi.MidiSequenceHandler.prototype.addEvent = function(track,tick,evt) {
 	var command = StringTools.hex(track) + "|" + StringTools.hex(tick) + "|" + evt;
 	this._commands.push(command);
+	if(tick > this._ticksSoFar) {
+		this._ticksSoFar = tick;
+	}
 }
 alphatab.midi.MidiSequenceHandler.prototype.addControlChange = function(tick,track,channel,controller,value) {
 	this.addEvent(track,tick,alphatab.midi.MidiMessageUtils.controlChange(channel,controller,value));
@@ -5144,6 +5201,17 @@ alphatab.file.alphatex.AlphaTexParser.prototype.readNumber = function() {
 	return Std.parseInt(str);
 }
 alphatab.file.alphatex.AlphaTexParser.prototype.__class__ = alphatab.file.alphatex.AlphaTexParser;
+alphatab.file.gpx.score.GpxAutomation = function(p) { if( p === $_ ) return; {
+	null;
+}}
+alphatab.file.gpx.score.GpxAutomation.__name__ = ["alphatab","file","gpx","score","GpxAutomation"];
+alphatab.file.gpx.score.GpxAutomation.prototype.type = null;
+alphatab.file.gpx.score.GpxAutomation.prototype.barId = null;
+alphatab.file.gpx.score.GpxAutomation.prototype.position = null;
+alphatab.file.gpx.score.GpxAutomation.prototype.linear = null;
+alphatab.file.gpx.score.GpxAutomation.prototype.visible = null;
+alphatab.file.gpx.score.GpxAutomation.prototype.value = null;
+alphatab.file.gpx.score.GpxAutomation.prototype.__class__ = alphatab.file.gpx.score.GpxAutomation;
 if(typeof js=='undefined') js = {}
 js.Boot = function() { }
 js.Boot.__name__ = ["js","Boot"];
@@ -5354,17 +5422,6 @@ js.Boot.__init = function() {
 	$closure = js.Boot.__closure;
 }
 js.Boot.prototype.__class__ = js.Boot;
-alphatab.file.gpx.score.GpxAutomation = function(p) { if( p === $_ ) return; {
-	null;
-}}
-alphatab.file.gpx.score.GpxAutomation.__name__ = ["alphatab","file","gpx","score","GpxAutomation"];
-alphatab.file.gpx.score.GpxAutomation.prototype.type = null;
-alphatab.file.gpx.score.GpxAutomation.prototype.barId = null;
-alphatab.file.gpx.score.GpxAutomation.prototype.position = null;
-alphatab.file.gpx.score.GpxAutomation.prototype.linear = null;
-alphatab.file.gpx.score.GpxAutomation.prototype.visible = null;
-alphatab.file.gpx.score.GpxAutomation.prototype.value = null;
-alphatab.file.gpx.score.GpxAutomation.prototype.__class__ = alphatab.file.gpx.score.GpxAutomation;
 EReg = function(r,opt) { if( r === $_ ) return; {
 	opt = opt.split("u").join("");
 	this.r = new RegExp(r,opt);
@@ -7704,6 +7761,9 @@ for(var k in alphatab.model.Beat.prototype ) alphatab.tablature.model.BeatDrawin
 alphatab.tablature.model.BeatDrawing.prototype.effectsCache = null;
 alphatab.tablature.model.BeatDrawing.prototype.x = null;
 alphatab.tablature.model.BeatDrawing.prototype.width = null;
+alphatab.tablature.model.BeatDrawing.prototype.isFirstOfLine = function() {
+	return this.measure.beats.length == 0 || this.index == 0;
+}
 alphatab.tablature.model.BeatDrawing.prototype.fullWidth = function() {
 	var md = this.measure;
 	var factor = md.getSizingFactor();
@@ -9143,10 +9203,10 @@ alphatab.file.gpx.score.GpxVoice.prototype.beatIds = null;
 alphatab.file.gpx.score.GpxVoice.prototype.__class__ = alphatab.file.gpx.score.GpxVoice;
 alphatab.midi.MidiDataProvider = function() { }
 alphatab.midi.MidiDataProvider.__name__ = ["alphatab","midi","MidiDataProvider"];
-alphatab.midi.MidiDataProvider.getSongMidiData = function(song,factory) {
+alphatab.midi.MidiDataProvider.getSongMidiData = function(song,factory,measureMap) {
 	var parser = new alphatab.midi.MidiSequenceParser(factory,song,15,100,0);
 	var sequence = new alphatab.midi.MidiSequenceHandler(song.tracks.length + 2);
-	parser.parse(sequence);
+	parser.parse(sequence,measureMap);
 	return sequence.commands;
 }
 alphatab.midi.MidiDataProvider.prototype.__class__ = alphatab.midi.MidiDataProvider;
@@ -9509,22 +9569,37 @@ alphatab.tablature.model.StaveLine.prototype.addStave = function(stave) {
 	stave.index = this.staves.length;
 	this.staves.push(stave);
 }
-alphatab.tablature.model.StaveLine.prototype.paint = function(layout,track,context) {
+alphatab.tablature.model.StaveLine.prototype.paint = function(layout,track,context,locMap) {
 	if(this.staves.length == 0) return;
 	var posY = this.y + this.spacing.get(0);
+	var lastStave = false;
 	{
-		var _g = 0, _g1 = this.staves;
-		while(_g < _g1.length) {
-			var stave = _g1[_g];
-			++_g;
+		var _g1 = 0, _g = this.staves.length;
+		while(_g1 < _g) {
+			var si = _g1++;
+			var stave = this.staves[si];
+			if(si + 1 == this.staves.length) {
+				lastStave = true;
+			}
 			stave.paintStave(layout,context,this.x,posY);
+			var currentMeasure;
 			{
 				var _g3 = 0, _g2 = this.measures.length;
 				while(_g3 < _g2) {
 					var i = _g3++;
 					var index = this.measures[i];
-					var currentMeasure = track.measures[index];
+					currentMeasure = track.measures[index];
+					var previousMeasureX = 0;
 					stave.paintMeasure(layout,context,currentMeasure,this.x,posY);
+					var curWidth = currentMeasure.width + currentMeasure.spacing;
+					if(lastStave) {
+						if(locMap[index] == null) {
+							locMap.push(new alphatab.tablature.model.MeasureClickable(index,currentMeasure.x,this.y,curWidth,this.getHeight()));
+						}
+						else {
+							locMap[index].set(index,currentMeasure.x,this.y,curWidth,this.getHeight());
+						}
+					}
 				}
 			}
 			posY += stave.spacing.getSize();
@@ -9532,13 +9607,13 @@ alphatab.tablature.model.StaveLine.prototype.paint = function(layout,track,conte
 	}
 	if(this.staves.length > 1) {
 		var firstStave = this.staves[0];
-		var lastStave = this.staves[this.staves.length - 1];
+		var lastStave1 = this.staves[this.staves.length - 1];
 		var firstStaveY = this.y + this.spacing.get(0);
-		var lastStaveY = posY - lastStave.spacing.getSize();
+		var lastStaveY = posY - lastStave1.spacing.getSize();
 		var fill = context.get(3);
 		var draw = context.get(4);
 		var groupTopY = firstStaveY + firstStave.spacing.get(firstStave.getBarTopSpacing());
-		var groupBottomY = lastStaveY + lastStave.spacing.get(lastStave.getBarBottomSpacing());
+		var groupBottomY = lastStaveY + lastStave1.spacing.get(lastStave1.getBarBottomSpacing());
 		var barSize = Math.floor(3 * layout.scale);
 		var barOffset = barSize;
 		fill.addRect(this.x - barOffset - barSize,groupTopY,barSize,groupBottomY - groupTopY);
@@ -9555,7 +9630,7 @@ alphatab.tablature.model.StaveLine.prototype.paint = function(layout,track,conte
 		fill.bezierTo(this.x,groupBottomY - barSize,spikeStartX,groupBottomY - barSize,spikeStartX,groupBottomY - barSize);
 		fill.closeFigure();
 		var lineTopY = firstStaveY + firstStave.spacing.get(firstStave.getLineTopSpacing());
-		var lineBottomY = lastStaveY + lastStave.spacing.get(lastStave.getLineBottomSpacing());
+		var lineBottomY = lastStaveY + lastStave1.spacing.get(lastStave1.getLineBottomSpacing());
 		draw.addLine(this.x,lineTopY,this.x,lineBottomY);
 	}
 }
@@ -10790,9 +10865,11 @@ alphatab.midi.MidiSequenceParser.prototype.checkTripletFeel = function(voice,bea
 	}
 	return new alphatab.midi.BeatData(beatStart,beatDuration);
 }
-alphatab.midi.MidiSequenceParser.prototype.createTrack = function(sequence,track) {
+alphatab.midi.MidiSequenceParser.prototype.createTrack = function(sequence,track,measureMap,getTicks) {
 	var previous = null;
 	var controller = new alphatab.midi.MidiRepeatController(track.song);
+	var ticksAtMeasureStart = 0;
+	sequence.resetTicks();
 	this.addBend(sequence,track.number,960,64,track.channel.channel);
 	this.makeChannel(sequence,track.channel,track.number);
 	while(!controller.finished()) {
@@ -10805,6 +10882,11 @@ alphatab.midi.MidiSequenceParser.prototype.createTrack = function(sequence,track
 				this.addTimeSignature(sequence,measure,previous,move);
 				this.addTempo(sequence,measure,previous,move);
 				this.addMetronome(sequence,measure.header,move);
+				var curClickable = measureMap[index];
+				if(curClickable.firstTick == -1) {
+					curClickable.firstTick = ticksAtMeasureStart;
+				}
+				ticksAtMeasureStart = sequence.getTicks();
 			}
 			this.makeBeats(sequence,track,measure,index,move);
 		}
@@ -11191,7 +11273,7 @@ alphatab.midi.MidiSequenceParser.prototype.newDuration = function(value) {
 	duration.value = value;
 	return duration;
 }
-alphatab.midi.MidiSequenceParser.prototype.parse = function(sequence) {
+alphatab.midi.MidiSequenceParser.prototype.parse = function(sequence,measureMap) {
 	this._infoTrack = sequence.infoTrack;
 	this._metronomeTrack = sequence.metronomeTrack;
 	this.addDefaultMessages(sequence);
@@ -11200,7 +11282,8 @@ alphatab.midi.MidiSequenceParser.prototype.parse = function(sequence) {
 		while(_g1 < _g) {
 			var i = _g1++;
 			var songTrack = this._song.tracks[i];
-			this.createTrack(sequence,songTrack);
+			var isFirstTrack = i == 0;
+			this.createTrack(sequence,songTrack,measureMap,isFirstTrack);
 		}
 	}
 	sequence.notifyFinish();
@@ -11512,9 +11595,9 @@ alphatab.tablature.Tablature.prototype.invalidate = function() {
 alphatab.tablature.Tablature.prototype._lastPosition = null;
 alphatab.tablature.Tablature.prototype._lastRealPosition = null;
 alphatab.tablature.Tablature.prototype._selectedBeat = null;
-alphatab.tablature.Tablature.prototype.notifyTickPosition = function(position) {
+alphatab.tablature.Tablature.prototype.notifyTickPosition = function(position,forced,scroll) {
 	position -= 960;
-	if(position != this._lastPosition) {
+	if(forced || position != this._lastPosition) {
 		this._lastPosition = position;
 		var result = this.findMeasure(position);
 		var realPosition = result.realPosition;
@@ -11523,7 +11606,7 @@ alphatab.tablature.Tablature.prototype.notifyTickPosition = function(position) {
 		var beat = this.findBeat(realPosition,position,measure);
 		if(measure != null && beat != null) {
 			this._selectedBeat = beat;
-			if(this.onCaretChanged != null) this.onCaretChanged(beat);
+			if(this.onCaretChanged != null) this.onCaretChanged(beat,scroll);
 		}
 	}
 }
