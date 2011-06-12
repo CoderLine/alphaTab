@@ -35,6 +35,7 @@ import alphatab.model.Track;
 import alphatab.model.TripletFeel;
 import alphatab.model.Velocities;
 import alphatab.model.Voice;
+import alphatab.tablature.model.MeasureClickable;
 
 class MidiSequenceParser 
 {
@@ -232,26 +233,44 @@ class MidiSequenceParser
 		return new BeatData(beatStart, beatDuration);
 	}
 	
-	private function createTrack(sequence:MidiSequenceHandler, track:Track) : Void
+	private function createTrack(sequence:MidiSequenceHandler, track:Track, measureMap:Array<MeasureClickable>, getTicks:Bool) : Void
 	{
 		var previous:Measure = null;
 		var controller:MidiRepeatController = new MidiRepeatController(track.song);
+		var ticksAtMeasureStart:Int = 0;
+		
+		sequence.resetTicks();
+		
 		addBend(sequence, track.number, Duration.QUARTER_TIME, DEFAULT_BEND, track.channel.channel);
 		makeChannel(sequence, track.channel, track.number);
+		
 		while (!controller.finished())
 		{
 			var measure:Measure = track.measures[controller.index];
 			var index:Int = controller.index;
 			var move:Int = controller.repeatMove;
 			controller.process();
+			
 			if (controller.shouldPlay)
 			{
+				
 				if (track.number == 1)
 				{
 					addTimeSignature(sequence, measure, previous, move);
 					addTempo(sequence, measure, previous, move);
 					addMetronome(sequence, measure.header, move);
+					
+					var curClickable:MeasureClickable=measureMap[index];
+					
+					// Only set ticks here, because the metronome is the only tick we can trust..
+					// Don't overwrite repeated measure indices
+					if(curClickable.firstTick==-1) {
+						curClickable.firstTick=ticksAtMeasureStart;
+					}
+					
+					ticksAtMeasureStart=sequence.getTicks();
 				}
+				
 				makeBeats(sequence, track, measure, index, move);
 			}
 			previous = measure;
@@ -875,7 +894,7 @@ class MidiSequenceParser
 		return duration;
 	}
 	
-	public function parse(sequence:MidiSequenceHandler) : Void
+	public function parse(sequence:MidiSequenceHandler, measureMap:Array<MeasureClickable>) : Void
 	{		
 		_infoTrack = sequence.infoTrack;
 		_metronomeTrack = sequence.metronomeTrack;
@@ -883,7 +902,9 @@ class MidiSequenceParser
 		for (i in 0 ... _song.tracks.length)
 		{
 			var songTrack:Track = _song.tracks[i];
-			createTrack(sequence, songTrack);
+			var isFirstTrack:Bool = i==0;
+			
+			createTrack(sequence, songTrack, measureMap, isFirstTrack);
 		}
 		sequence.notifyFinish();
 	}

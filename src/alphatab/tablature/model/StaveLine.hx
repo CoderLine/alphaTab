@@ -68,7 +68,7 @@ class StaveLine
     // is the line full, which means we need to stretch the measures
     public var fullLine:Bool;
     // the current width including all measures.
-    public var width:Int;   
+    public var width:Int;
     
     public function new()
     {
@@ -94,23 +94,48 @@ class StaveLine
         staves.push(stave);
     }
     
-    public function paint(layout:ViewLayout, track:Track, context:DrawingContext)
+    public function paint(layout:ViewLayout, track:Track, context:DrawingContext, locMap:Array<MeasureClickable>)
     {
         if (staves.length == 0) return;
         
         var posY = y + spacing.get(TopPadding);
+    	var lastStave:Bool = false;
         
-        for (stave in staves)
+        for (si in 0 ... staves.length)
         {
+        	var stave:Stave = staves[si];
+        	
+        	//Last stave?
+            if(si+1 == staves.length) {
+            	lastStave=true;
+            }
+        	
             // stave background
             stave.paintStave(layout, context, x, posY);
+            
             // paint measures in this stave
+            var currentMeasure:MeasureDrawing;
+            
             for (i in 0 ... measures.length) 
             {
                 var index:Int = measures[i];
-                var currentMeasure:MeasureDrawing = cast track.measures[index]; 
+                currentMeasure = cast track.measures[index]; 
+                var previousMeasureX:Int = 0;
                 
                 stave.paintMeasure(layout, context, currentMeasure, x, posY);
+                
+                var curWidth=currentMeasure.width + currentMeasure.spacing;
+                
+                if(lastStave) {
+                	//If first render, push new objects
+                	if(locMap[index]==null){
+						locMap.push(new MeasureClickable(index,currentMeasure.x,y,curWidth,this.getHeight()));
+                	}
+                	//Otherwise edit existing ones
+                	else {
+                		locMap[index].set(index,currentMeasure.x,y,curWidth,this.getHeight());
+                	}
+                }
             }
             
             posY += stave.spacing.getSize();

@@ -104,17 +104,17 @@ public class MidiPlayer extends JApplet
         }
         catch (Throwable e)
         {
-            JOptionPane.showMessageDialog(null, e.toString());
+            //JOptionPane.showMessageDialog(null,"MidiPlayer Error: \n" + e.toString());
 			//e.printStackTrace();
         }
     }
-	
-	public void setMetronomeEnabled(boolean enabled) 
+
+	public void setMetronomeEnabled(boolean enabled)
 	{
 		_sequencer.setTrackMute(_metronomeTrack, !enabled);
 	}
 
-	public void isMetronomeEnabled() 
+	public void isMetronomeEnabled()
 	{
 		_sequencer.getTrackMute(_metronomeTrack);
 	}
@@ -123,15 +123,20 @@ public class MidiPlayer extends JApplet
     {
         _sequencer.start();
     }
- 
+
     public void pause()
     {
         _sequencer.stop();
     }
-    
+
     public void stop()
     {
         _sequencer.stop();
         _sequencer.setTickPosition(0);
+    }
+
+    public void goTo(int tickPosition) {
+        _sequencer.stop();
+        _sequencer.setTickPosition(tickPosition);
     }
 }
