@@ -33,26 +33,27 @@ class NotePainter
 			x += DrawingResources.getScoreNoteSize(layout, false).x;
 		}
 		var s:String = "";
-            switch (dur)
-            { 
-                case Duration.SIXTY_FOURTH:
-                    s = (dir == -1) ? MusicFont.FooterUpSixtyFourth : MusicFont.FooterDownSixtyFourth;
-                case Duration.THIRTY_SECOND:
-                    s = (dir == -1) ? MusicFont.FooterUpThirtySecond : MusicFont.FooterDownThirtySecond;
-                case Duration.SIXTEENTH:
-                    s = (dir == -1) ? MusicFont.FooterUpSixteenth :  MusicFont.FooterDownSixteenth;
-                case Duration.EIGHTH:
-                    s = (dir == -1) ? MusicFont.FooterUpEighth :  MusicFont.FooterDownEighth;
-            }
-            if (s != "")
-				layer.addMusicSymbol(s, x, y, scale);
+        switch (dur)
+        { 
+            case Duration.SIXTY_FOURTH:
+                s = (dir == -1) ? MusicFont.FooterUpSixtyFourth : MusicFont.FooterDownSixtyFourth;
+            case Duration.THIRTY_SECOND:
+                s = (dir == -1) ? MusicFont.FooterUpThirtySecond : MusicFont.FooterDownThirtySecond;
+            case Duration.SIXTEENTH:
+                s = (dir == -1) ? MusicFont.FooterUpSixteenth :  MusicFont.FooterDownSixteenth;
+            case Duration.EIGHTH:
+                s = (dir == -1) ? MusicFont.FooterUpEighth :  MusicFont.FooterDownEighth;
+        }
+        if (s != "")
+			layer.addMusicSymbol(s, x, y, scale);
 
 	}
     
 	public static function paintBar(layer:DrawingLayer, x1:Float, y1:Float, x2:Float, y2:Float, count:Int, dir:Int, scale:Float ) : Void
 	{
 		var width:Float = Math.max(1.0, Math.round(3.0 * scale));
-		for (i in 0 ... count) {
+		for (i in 0 ... count) 
+		{
 			var realY1:Float = (y1 - ((i * (5.0 * scale)) * dir));
 			var realY2:Float = (y2 - ((i * (5.0 * scale)) * dir));
 			

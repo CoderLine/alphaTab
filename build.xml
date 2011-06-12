@@ -3,8 +3,6 @@
         a buildfile for creating alphaTab releases
     </description>
     
-    <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
-	
 	<!-- Main Properties -->
 	<property name="bin" location="bin"/>
 	<property name="lib" location="${bin}/lib/alphaTab"/>
@@ -55,6 +53,21 @@
             
             <arg value="-js" />
             <arg value="${haxe-js}" />
+        </exec>
+	</target>	
+
+	<target name="haxe-cs" depends="global-init">
+		<delete dir="cs" />
+		<mkdir dir="cs" />
+        <exec executable="haxe">
+            <arg value="-cp" />
+            <arg value="${src}"/>
+            
+            <arg value="-main" />
+            <arg value="alphatab.Main" />
+            
+            <arg value="-cs" />
+            <arg value="cs" />
         </exec>
 	</target>	
 

@@ -40,7 +40,8 @@ class Tempo
 	
 	public static function tempoToUsq(tempo:Int) : Int
 	{
-		return Math.floor((60.00 / tempo * 1000) * 1000.00);
+		// BPM to microseconds per quarternote
+		return Math.floor(60000000 / tempo);
 	}
 
 }

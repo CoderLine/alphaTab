@@ -1,0 +1,3 @@
+-js bin/lib/alphaTab/alphaTab.js
+-main alphatab.Main
+-cp src

@@ -143,6 +143,7 @@ class ScoreStave extends Stave
             spacing.set(RepeatEnding, Math.floor(15 * layout.scale));
         }
         
+        var currentTopSpacing = spacing.spacing[ScoreTopLines];
         var middleLinesStart = spacing.get(ScoreMiddleLines);
         var middleLinesEnd = spacing.get(ScoreMiddleLines + 1);
         
@@ -150,15 +151,13 @@ class ScoreStave extends Stave
         var minNote = measure.minDownGroup == null ? null : measure.minDownGroup.minNote;
         if (minNote != null)
         {
-            var minScoreY = getNoteScorePosY(layout, minNote) + middleLinesStart;
-            var minNoteOverflow = middleLinesStart - minScoreY;
-            
-            // mention note beam
-            if (minNote.voiceDrawing().duration.value >= Duration.HALF &&
-                minNote.voiceDrawing().beatGroup.getDirection() == VoiceDirection.Down)
-            {
-                minScoreY += Math.round(getOffset(DOWN_OFFSET));
-            }
+        	// get the space from top to start of lines
+        	// (take care not to mention the current offset)
+        	var currentSpaceToLines = middleLinesStart - currentTopSpacing;
+        	// calculate the real score position
+            var minScoreY = getNoteScorePosY(layout, minNote) + currentSpaceToLines;
+            // calculate the overflow of the note 
+            var minNoteOverflow = currentSpaceToLines - minScoreY;
             
             // a bigger offset?
             if (spacing.spacing[ScoreTopLines] < minNoteOverflow)
@@ -167,15 +166,10 @@ class ScoreStave extends Stave
         var maxNote = measure.maxUpGroup == null ? null : measure.maxUpGroup.maxNote;
         if (maxNote != null)
         {
+        	// get the space from top to bottom of lines
+        	// (take care not to mention the current offset)
             var maxScoreY = getNoteScorePosY(layout, maxNote) + middleLinesStart;
             var maxNoteOverflow = maxScoreY - middleLinesEnd;
-            
-             // mention note beam
-            if (maxNote.voiceDrawing().duration.value >= Duration.HALF &&
-                maxNote.voiceDrawing().beatGroup.getDirection() == VoiceDirection.Up)
-            {
-                maxScoreY += Math.round(getOffset(UP_OFFSET));
-            }
             
             // a bigger offset?
             if (spacing.spacing[ScoreBottomLines] < maxNoteOverflow)
@@ -621,28 +615,28 @@ class ScoreStave extends Stave
 
 						if (voice.joinedType == JoinedType.NoneRight)
 						{
-							startX = Math.round(x + xMove);
-							endX = Math.round(x + (6*layout.scale) + xMove);
+							startX = Math.floor(x + xMove);
+							endX = Math.floor(x + (6*layout.scale) + xMove);
 							startXforCalculation = voice.beatDrawing().fullX();
 							endXforCalculation = Math.floor(voice.beatDrawing().fullX() + (6*layout.scale));
 						}
 						else if (voice.joinedType == JoinedType.NoneLeft)
 						{
-							startX = Math.round(x - (6*layout.scale) + xMove);
-							endX = Math.round(x + xMove);
+							startX = Math.floor(x - (6*layout.scale) + xMove);
+							endX = Math.floor(x + xMove);
 							startXforCalculation = Math.floor(voice.beatDrawing().fullX() - (6*layout.scale));
 							endXforCalculation = voice.beatDrawing().fullX();
 						}
 						else
 						{
-							startX = Math.round(voice.leftJoin.beatDrawing().fullX() + xMove);
-							endX = Math.round(voice.rightJoin.beatDrawing().fullX() + xMove);
+							startX = Math.floor(voice.leftJoin.beatDrawing().fullX() + xMove);
+							endX = Math.ceil(voice.rightJoin.beatDrawing().fullX() + xMove);
 							startXforCalculation = voice.leftJoin.beatDrawing().fullX();
 							endXforCalculation = voice.rightJoin.beatDrawing().fullX();
 						}
                         
-						var hY1:Int = Math.round(y + yMove + calculateBeamY(layout, voice.beatGroup, direction, startXforCalculation, key, clef));
-						var hY2:Int = Math.round(y + yMove + calculateBeamY(layout, voice.beatGroup, direction, endXforCalculation, key, clef));
+						var hY1:Int = Math.floor(y + yMove + calculateBeamY(layout, voice.beatGroup, direction, startXforCalculation, key, clef));
+						var hY2:Int = Math.floor(y + yMove + calculateBeamY(layout, voice.beatGroup, direction, endXforCalculation, key, clef));
                         
 						NotePainter.paintBar(fill, startX, hY1, endX, hY2, index, rotation, layout.scale);
                     }
@@ -756,7 +750,7 @@ class ScoreStave extends Stave
             var startX = firstVoice.beatDrawing().fullX();
             var endX = lastVoice.beatDrawing().fullX();
             
-            var direction:Int = voice.beatGroup.getDirection();
+            var direction:Int = voice.isRestVoice() ? VoiceDirection.Up : voice.beatGroup.getDirection();
             
             if (direction == VoiceDirection.Up)
             {

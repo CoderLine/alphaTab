@@ -216,9 +216,13 @@ class VoiceDrawing extends Voice
                 else
                 {
                     beatGroup = new BeatGroup();
-                    measureDrawing().groups.push(beatGroup);
                     beatGroup.check(this);
                 }
+            }
+            
+            if(!Lambda.has(measureDrawing().groups, beatGroup))
+            {
+            	measureDrawing().groups.push(beatGroup);            	
             }
         }
         

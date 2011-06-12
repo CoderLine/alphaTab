@@ -146,7 +146,14 @@ var alphaTabWrapper;
             if(self.options.loadCallback)
                 self.options.loadCallback(song);
             // update tablature
+			try
+			{
             self.tablature.setTrack(song.tracks[self.options.track]);
+			}
+			catch( e )
+			{
+				alert(e);
+			}
             // additional plugin callbacks
             for(var i = 0; i < self.loadCallbacks.length; i++)
             {

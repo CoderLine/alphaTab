@@ -1,0 +1,14 @@
+# ignore special dirs
+/tmp
+/.settings
+/.hxtypes
+
+# ignore project files
+.classpath
+.project
+
+# ignore temp files
+.DS_Store 
+*.bak
+~*
+*.lock
