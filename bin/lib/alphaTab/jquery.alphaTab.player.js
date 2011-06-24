@@ -33,7 +33,9 @@
             beatCaretColor: '#4040FF',
             beatCaretOpacity: 0.75,
             autoScroll: true,
-            language: {play: "Play", pause: "Pause", stop: "Stop", metronome: "Metronome"}
+            scrollElement: 'html, body',
+            scrollAdjustment: 0,
+            language: {play: "Play", pause: "Pause", stop: "Stop", metronome: "Metronome", scrollToTop: "Scroll To Top ^", tablatureLoading: "Loading..."}
         };
 		self.lastTickPos = 0;
 		
@@ -59,7 +61,8 @@
     			tracks.find('option').remove();
     			for(var i = 0; i < song.tracks.length; i++) 
     			{
-    				var elm = $('<option value="'+i+'">'+song.tracks[i].name+'</option>');
+    				var name = song.tracks[i].name == "" ? "Track " + i : song.tracks[i].name;
+    				var elm = $('<option value="'+i+'">'+name+'</option>');
     				if(i == 0)
     				{
     					elm.attr("selected", "selected");
@@ -93,15 +96,13 @@
         //
         // create applet
         
-        var playerControls = $('<div class="fixedControls player"></div>');
         var param = playerOptions.playerTickCallback ? '<param name="onTickChanged" value="' + playerOptions.playerTickCallback + '" />' : '';
         var applet = $('<applet height="0" width="0"  archive="' + this.options.base + "/" + playerJar + '" code="net.alphatab.midi.MidiPlayer.class">'+param+'</applet>');
-        this.playerControls = playerControls[0];
         this.midiPlayer = applet[0];
         
         // Sets the player to the start of the measure clicked
-        $(this.canvas).click(
-        	function(e){
+        $(this.canvas).click(function()
+        	{
         		var offsets=$(this).offset();
 			    var x = e.pageX - offsets.left;
 			    var y = e.pageY - offsets.top;
@@ -114,34 +115,33 @@
         	}
         );
         
-        var rightFloat = $('<div class="playerRightFloat"></div>');
-        
-        var returnToTop = $('<input type="button" id="toTop" value="Scroll To Top ^" />');
-        playerControls.append(applet);
-        playerControls.append(rightFloat);
-        
-        this.el.append(playerControls);
+        this.el.append(applet);
         
         // create controls
         if(playerOptions.createControls)
         {
-            var playButton = $('<input type="button" class="play" value="'+playerOptions.language.play+'" />');
-            var pauseButton = $('<input type="button" class="pause" value="'+playerOptions.language.pause+'" />');
+        	var playerControls = $('<div class="player"></div>');
+        	this.el.append(playerControls);
+             
+            var playButton = $('<button class="play">'+playerOptions.language.play+'</button>');
+            var pauseButton = $('<button class="pause">'+playerOptions.language.pause+'</button>');
             var metronomeCheck = $('<input type="checkbox" class="metronome" />');
-
-            var trackSelect = $('<select id="tracks"><option value="">Tab is loading...</option></select>');
+            var returnToTop = $('<button class="to-top">'+playerOptions.language.scrollToTop + '</button>');
             
-            rightFloat.append(trackSelect);
+            var trackSelect = $('<select id="tracks"><option value="">'+playerOptions.language.tablatureLoading+'</option></select>');
             
-            rightFloat.append(playButton);
-            rightFloat.append(pauseButton);
+            playerControls.append(trackSelect);
             
-            rightFloat.append($('<span>Metronome</span>'));
-            rightFloat.append(metronomeCheck);
+            playerControls.append(playButton);
+            playerControls.append(pauseButton);
+            playerControls.append(returnToTop);
+            
+            playerControls.append($('<span>'+playerOptions.language.metronome+'</span>'));
+            playerControls.append(metronomeCheck);
             
             // hook up events
             returnToTop.click(function(){
-				$('html, body').animate({scrollTop:0}, 'slow');
+				$(playerOptions.scrollElement).animate({scrollTop:0}, 'slow');
 			});
             
             playButton.click(function() 
@@ -176,12 +176,10 @@
             });
         	trackSelect.change(function() { 
         		var index = parseInt($('#tracks :selected').val());
-        		api.tablature.setTrack(api.tablature.track.song.tracks[index]);
+        		self.tablature.setTrack(api.tablature.track.song.tracks[index]);
         		self.updateCaret(self.lastTickPos,true);
         	});
         }
-        
-        playerControls.append(returnToTop);
         
         // create carets
         if(playerOptions.caret)
@@ -203,11 +201,12 @@
         {
             var x = $(self.canvas).offset().left + parseInt($(self.canvas).css("borderLeftWidth"), 10) ;
             var y = $(self.canvas).offset().top;
+            
+            
 
             y += beat.measure.staveLine.y;
 
             var measureX = x + beat.measure.staveLine.x + beat.measure.x;
-			// console.log("measure: " + measureX + " " + beat.measure.width);
             measureCaret.offset({ top: y, left: measureX});
             measureCaret.width(beat.measure.width + beat.measure.spacing);
             measureCaret.height(beat.measure.staveLine.getHeight());
@@ -221,10 +220,8 @@
 
             if(scroll && beat.isFirstOfLine()  && playerOptions.autoScroll)
             {
-            	// uses the jQuery scrollTo plugin to smoothly scroll the screen
-                // $.scrollTo(y-30, 300);
-            	$('html, body').animate({scrollTop:y-30}, 300);
-                window.scrollTo(0,y-30);
+            	var scrollTop = $(playerOptions.scrollElement).scrollTop() + playerOptions.scrollAdjustment;
+            	$(playerOptions.scrollElement).animate({scrollTop:y+scrollTop-30}, 300);
             }
         }
         
