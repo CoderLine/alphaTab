@@ -23,7 +23,6 @@ import alphatab.model.effects.BendEffect;
 import alphatab.model.effects.BendPoint;
 import alphatab.model.effects.HarmonicEffect;
 import alphatab.model.effects.HarmonicType;
-import alphatab.model.effects.TremoloBarEffect;
 import alphatab.model.effects.TremoloPickingEffect;
 import alphatab.model.effects.TrillEffect;
 import alphatab.model.effects.GraceEffect;
@@ -786,7 +785,7 @@ class AlphaTexParser extends SongReader
 			var count = points.length;
 			var step = Math.floor(12 / count);
 			var i = 0; 
-			var tremoloBarEffect:TremoloBarEffect = factory.newTremoloBarEffect();
+			var tremoloBarEffect:BendEffect = factory.newBendEffect();
 			while (i < count) 
 			{
 				points[i].position = Math.floor(Math.min(12, (i * step)));					

@@ -19,7 +19,6 @@ import alphatab.model.effects.BendEffect;
 import alphatab.model.effects.BendPoint;
 import alphatab.model.effects.HarmonicEffect;
 import alphatab.model.effects.HarmonicType;
-import alphatab.model.effects.TremoloBarEffect;
 import alphatab.model.Beat;
 import alphatab.model.BeatStrokeDirection;
 import alphatab.model.Duration;
@@ -528,7 +527,7 @@ class MidiSequenceParser
 		for (i in 0 ... points.length)
 		{
 			var point:BendPoint = points[i];
-			var bendStart:Int = start + point.GetTime(duration);
+			var bendStart:Int = start + point.getTime(duration);
 			var value:Int = Math.round(DEFAULT_BEND + (point.value * DEFAULT_BEND_SEMITONE / BendEffect.SEMITONE_LENGTH));
 			value = (value <= 127) ? value : 127;
 			value = (value >= 0) ? value : 0;
@@ -537,7 +536,7 @@ class MidiSequenceParser
 
 			var nextPoint:BendPoint = points[i + 1];
 			var nextValue:Int = Math.round(DEFAULT_BEND + (nextPoint.value * DEFAULT_BEND_SEMITONE / BendEffect.SEMITONE_LENGTH));
-			var nextBendStart:Int = Math.round(start + nextPoint.GetTime(duration));
+			var nextBendStart:Int = Math.round(start + nextPoint.getTime(duration));
 			if (nextValue == value) continue;
 			var width:Float = (nextBendStart - bendStart) / Math.abs(nextValue - value);
 			if (value < nextValue)
@@ -830,14 +829,14 @@ class MidiSequenceParser
 	}
 	 
 	public function makeTremoloBar(sequence:MidiSequenceHandler, track:Int, start:Int, duration:Int,
-									   effect:TremoloBarEffect, channel:Int) : Void
+									   effect:BendEffect, channel:Int) : Void
 	{
 		var points:Array<BendPoint> = effect.points;
 		
 		for (i in 0 ... points.length)
 		{
 			var point:BendPoint = points[i];
-			var pointStart = start + point.GetTime(duration);
+			var pointStart = start + point.getTime(duration);
 			var value:Int = Math.round(DEFAULT_BEND + (point.value * (DEFAULT_BEND_SEMITONE * 2)));
 			value = (value <= 127) ? value : 127;
 			value = (value >= 0) ? value : 0;
@@ -846,7 +845,7 @@ class MidiSequenceParser
 			{
 				var nextPoint:BendPoint = points[i + 1];
 				var nextValue:Int = Math.round(DEFAULT_BEND + (nextPoint.value * (DEFAULT_BEND_SEMITONE * 2)));
-				var nextPointStart = start + nextPoint.GetTime(duration);
+				var nextPointStart = start + nextPoint.getTime(duration);
 				if (nextValue == value) continue;				
                 var width:Float = (nextPointStart - pointStart) / Math.abs(nextValue - value);
                 if (value < nextValue)

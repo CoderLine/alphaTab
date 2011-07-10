@@ -21,7 +21,6 @@ import alphatab.model.effects.BendEffect;
 import alphatab.model.effects.BendPoint;
 import alphatab.model.effects.FingeringType;
 import alphatab.model.effects.HarmonicType;
-import alphatab.model.effects.TremoloBarEffect;
 import alphatab.model.Measure;
 import alphatab.model.Point;
 import alphatab.model.SlideType;
@@ -984,8 +983,8 @@ class TablatureStave extends Stave
 		if (beat.effect.tremoloBar.points.length >= 2)
 		{
             // calculate offsets per step
-			var dX:Float = (endX - x) / TremoloBarEffect.MAX_POSITION;
-			var dY:Float = (y - minY) / TremoloBarEffect.MAX_VALUE;
+			var dX:Float = (endX - x) / BendEffect.MAX_POSITION;
+			var dY:Float = (y - minY) / BendEffect.MAX_VALUE;
 
 			draw.startFigure();
 			for (i in 0 ... beat.effect.tremoloBar.points.length - 1)

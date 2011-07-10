@@ -17,14 +17,26 @@
 package alphatab.model.effects;
 
 /**
- * A single point within the BendEffect 
+ * A single point within the BendEffect or TremoloBarEffect 
  */
 class BendPoint 
 {
+	/**
+	 * The position of the bend point on the x-axis (time)
+	 */
 	public var position:Int;
+	/**
+	 * The value of the bend y-axis (pitch)
+	 */
 	public var value:Int;
+	/**
+	 * Whether to perform a vibrato effect on the bend. 
+	 */
 	public var vibrato:Bool;
 		
+	/**
+	 * Initializes a new instance of the BendPoint class. 
+	 */
 	public function new(position:Int = 0, value:Int = 0, vibrato:Bool = false)
 	{
 		this.position = position;
@@ -32,7 +44,12 @@ class BendPoint
 		this.vibrato = vibrato;
 	}
 	
-	public function GetTime(duration:Int) : Int
+	/**
+	 * Gets the exact time when the point need to be played (midi)
+	 * @param duration the full duration of the effect
+	 * @param the time when this point is processed according to the given song duration
+	 */
+	public function getTime(duration:Int) : Int
 	{
 		return Math.floor(duration * position / BendEffect.MAX_POSITION);
 	}

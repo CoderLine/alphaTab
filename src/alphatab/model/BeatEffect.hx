@@ -15,7 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.model;
-import alphatab.model.effects.TremoloBarEffect;
+import alphatab.model.effects.BendEffect;
 
 /**
  * 	This class contains all beat effects.
@@ -37,7 +37,7 @@ class BeatEffect
 	public var fadeIn:Bool;
 	public var vibrato:Bool;
 	
-	public var tremoloBar:TremoloBarEffect;	
+	public var tremoloBar:BendEffect;	
 	public function isTremoloBar() : Bool
 	{
 		return this.tremoloBar != null;

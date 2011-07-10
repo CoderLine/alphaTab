@@ -25,18 +25,44 @@ import alphatab.model.SongFactory;
  */
 class GraceEffect
 {
+	/**
+	 * Whether the grace note is a dead note
+	 */
 	public var isDead:Bool;
+	/**
+	 * The duration of the note effect
+	 */
 	public var duration:Int;
+	/**
+	 * The velocity of the note effect
+	 * @see Velocities
+	 */
 	public var velocity:Int;
+	/**
+	 * The fret of the grace note
+	 */
 	public var fret:Int;
+	/**
+	 * Whether the grace note is on played on beat or before
+	 */
 	public var isOnBeat:Bool;
+	/**
+	 * The Transition between the grace note and the real note
+	 * @see GraceNoteTransition
+	 */
 	public var transition:Int;
 	
+	/**
+	 * Gets the duration of the effect. 
+	 */
 	public function durationTime() : Int 
 	{
 		return Math.floor((Duration.QUARTER_TIME / 16.00) * duration);	
 	}
 	
+	/**
+	 * Initializes a new instance of the GraceEffect class. 
+	 */
 	public function new()
 	{
 		fret = 0;
@@ -47,6 +73,11 @@ class GraceEffect
 		isDead = false;
 	}
 
+    /**
+     * Creates a clone of the current GraceEffect instance.
+     * @param factory the factory for creating new instances
+     * @return a duplicate of the current instance
+     */
 	public function clone(factory : SongFactory) : GraceEffect 
 	{
 		var effect:GraceEffect = factory.newGraceEffect();

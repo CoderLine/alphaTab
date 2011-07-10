@@ -23,13 +23,25 @@ import alphatab.model.SongFactory;
  */
 class TremoloPickingEffect
 {
+	/**
+	 * The duration fo the tremolo picking
+	 */
 	public var duration:Duration;
 	
+	/**
+	 * Initializes a new instance of he TremoloPickingEffect class.
+	 * @param factory the factory to create new instances. 
+	 */
 	public function new(factory:SongFactory)
 	{
 		duration = factory.newDuration();
 	}
 	
+    /**
+     * Creates a clone of the current TremoloPickingEffect instance.
+     * @param factory the factory for creating new instances
+     * @return a duplicate of the current instance
+     */
 	public function clone(factory:SongFactory) : TremoloPickingEffect
 	{
 		var effect:TremoloPickingEffect = factory.newTremoloPickingEffect();

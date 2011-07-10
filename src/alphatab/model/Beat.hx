@@ -23,7 +23,6 @@ class Beat
 {
 	public static inline var MAX_VOICES:Int = 2;
 	
-	public var tableChange:MixTableChange;
 	public var voices:Array<Voice>;
 	public var text:BeatText;
 	public var measure:Measure;

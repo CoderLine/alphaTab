@@ -22,7 +22,6 @@ import alphatab.model.effects.GraceEffect;
 import alphatab.model.effects.GraceEffectTransition;
 import alphatab.model.effects.HarmonicEffect;
 import alphatab.model.effects.HarmonicType;
-import alphatab.model.effects.TremoloBarEffect;
 import alphatab.model.effects.TremoloPickingEffect;
 import alphatab.model.effects.TrillEffect;
 import alphatab.model.Beat;
@@ -379,13 +378,13 @@ class Gp3Reader extends GpReaderBase
 	
 	private function readTremoloBar(effect:BeatEffect) : Void 
 	{
-		var barEffect:TremoloBarEffect = factory.newTremoloBarEffect();
+		var barEffect:BendEffect = factory.newBendEffect();
         barEffect.type = readByte();
         barEffect.value = readInt();
 		
         barEffect.points.push(new BendPoint(0, 0, false));
-        barEffect.points.push(new BendPoint(Math.round(TremoloBarEffect.MAX_POSITION/2.0), Math.round(barEffect.value / (GpReaderBase.BEND_SEMITONE * 2)), false));
-        barEffect.points.push(new BendPoint(TremoloBarEffect.MAX_POSITION, 0, false));
+        barEffect.points.push(new BendPoint(Math.round(BendEffect.MAX_POSITION/2.0), Math.round(barEffect.value / (GpReaderBase.BEND_SEMITONE * 2)), false));
+        barEffect.points.push(new BendPoint(BendEffect.MAX_POSITION, 0, false));
 		
 		effect.tremoloBar = barEffect;
 	}

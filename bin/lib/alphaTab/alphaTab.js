@@ -808,9 +808,6 @@ alphatab.model.SongFactory.prototype.newBeat = function() {
 alphatab.model.SongFactory.prototype.newBendEffect = function() {
 	return new alphatab.model.effects.BendEffect();
 }
-alphatab.model.SongFactory.prototype.newTremoloBarEffect = function() {
-	return new alphatab.model.effects.TremoloBarEffect();
-}
 alphatab.model.SongFactory.prototype.newHarmonicEffect = function() {
 	return new alphatab.model.effects.HarmonicEffect();
 }
@@ -1031,7 +1028,6 @@ alphatab.model.Beat = function(factory) { if( factory === $_ ) return; {
 	}
 }}
 alphatab.model.Beat.__name__ = ["alphatab","model","Beat"];
-alphatab.model.Beat.prototype.tableChange = null;
 alphatab.model.Beat.prototype.voices = null;
 alphatab.model.Beat.prototype.text = null;
 alphatab.model.Beat.prototype.measure = null;
@@ -1623,7 +1619,7 @@ alphatab.file.guitarpro.Gp3Reader.prototype.readBeatEffects = function(beat,effe
 	}
 }
 alphatab.file.guitarpro.Gp3Reader.prototype.readTremoloBar = function(effect) {
-	var barEffect = this.factory.newTremoloBarEffect();
+	var barEffect = this.factory.newBendEffect();
 	barEffect.type = this.readByte();
 	barEffect.value = this.readInt();
 	barEffect.points.push(new alphatab.model.effects.BendPoint(0,0,false));
@@ -3708,7 +3704,7 @@ alphatab.file.guitarpro.Gp4Reader.prototype.readBeatEffects = function(beat,effe
 	}
 }
 alphatab.file.guitarpro.Gp4Reader.prototype.readTremoloBar = function(effect) {
-	var barEffect = this.factory.newTremoloBarEffect();
+	var barEffect = this.factory.newBendEffect();
 	barEffect.type = this.readByte();
 	barEffect.value = this.readInt();
 	var pointCount = this.readInt();
@@ -4087,16 +4083,6 @@ alphatab.model.PageSetup.prototype.__class__ = alphatab.model.PageSetup;
 alphatab.model.BeatStrokeDirection = function() { }
 alphatab.model.BeatStrokeDirection.__name__ = ["alphatab","model","BeatStrokeDirection"];
 alphatab.model.BeatStrokeDirection.prototype.__class__ = alphatab.model.BeatStrokeDirection;
-alphatab.model.BeatStrokeDirection2 = { __ename__ : ["alphatab","model","BeatStrokeDirection2"], __constructs__ : ["None","Up","Down"] }
-alphatab.model.BeatStrokeDirection2.None = ["None",0];
-alphatab.model.BeatStrokeDirection2.None.toString = $estr;
-alphatab.model.BeatStrokeDirection2.None.__enum__ = alphatab.model.BeatStrokeDirection2;
-alphatab.model.BeatStrokeDirection2.Up = ["Up",1];
-alphatab.model.BeatStrokeDirection2.Up.toString = $estr;
-alphatab.model.BeatStrokeDirection2.Up.__enum__ = alphatab.model.BeatStrokeDirection2;
-alphatab.model.BeatStrokeDirection2.Down = ["Down",2];
-alphatab.model.BeatStrokeDirection2.Down.toString = $estr;
-alphatab.model.BeatStrokeDirection2.Down.__enum__ = alphatab.model.BeatStrokeDirection2;
 alphatab.tablature.drawing.SvgPainter = function(layer,svg,x,y,xScale,yScale) { if( layer === $_ ) return; {
 	this._layer = layer;
 	this._svg = svg;
@@ -4772,7 +4758,7 @@ alphatab.file.alphatex.AlphaTexParser.prototype.applyBeatEffect = function(beat)
 		var count = points.length;
 		var step = Math.floor(12 / count);
 		var i = 0;
-		var tremoloBarEffect = this.factory.newTremoloBarEffect();
+		var tremoloBarEffect = this.factory.newBendEffect();
 		while(i < count) {
 			points[i].position = Math.floor(Math.min(12,i * step));
 			tremoloBarEffect.points.push(points[i]);
@@ -5201,17 +5187,6 @@ alphatab.file.alphatex.AlphaTexParser.prototype.readNumber = function() {
 	return Std.parseInt(str);
 }
 alphatab.file.alphatex.AlphaTexParser.prototype.__class__ = alphatab.file.alphatex.AlphaTexParser;
-alphatab.file.gpx.score.GpxAutomation = function(p) { if( p === $_ ) return; {
-	null;
-}}
-alphatab.file.gpx.score.GpxAutomation.__name__ = ["alphatab","file","gpx","score","GpxAutomation"];
-alphatab.file.gpx.score.GpxAutomation.prototype.type = null;
-alphatab.file.gpx.score.GpxAutomation.prototype.barId = null;
-alphatab.file.gpx.score.GpxAutomation.prototype.position = null;
-alphatab.file.gpx.score.GpxAutomation.prototype.linear = null;
-alphatab.file.gpx.score.GpxAutomation.prototype.visible = null;
-alphatab.file.gpx.score.GpxAutomation.prototype.value = null;
-alphatab.file.gpx.score.GpxAutomation.prototype.__class__ = alphatab.file.gpx.score.GpxAutomation;
 if(typeof js=='undefined') js = {}
 js.Boot = function() { }
 js.Boot.__name__ = ["js","Boot"];
@@ -5422,6 +5397,17 @@ js.Boot.__init = function() {
 	$closure = js.Boot.__closure;
 }
 js.Boot.prototype.__class__ = js.Boot;
+alphatab.file.gpx.score.GpxAutomation = function(p) { if( p === $_ ) return; {
+	null;
+}}
+alphatab.file.gpx.score.GpxAutomation.__name__ = ["alphatab","file","gpx","score","GpxAutomation"];
+alphatab.file.gpx.score.GpxAutomation.prototype.type = null;
+alphatab.file.gpx.score.GpxAutomation.prototype.barId = null;
+alphatab.file.gpx.score.GpxAutomation.prototype.position = null;
+alphatab.file.gpx.score.GpxAutomation.prototype.linear = null;
+alphatab.file.gpx.score.GpxAutomation.prototype.visible = null;
+alphatab.file.gpx.score.GpxAutomation.prototype.value = null;
+alphatab.file.gpx.score.GpxAutomation.prototype.__class__ = alphatab.file.gpx.score.GpxAutomation;
 EReg = function(r,opt) { if( r === $_ ) return; {
 	opt = opt.split("u").join("");
 	this.r = new RegExp(r,opt);
@@ -9635,28 +9621,6 @@ alphatab.tablature.model.StaveLine.prototype.paint = function(layout,track,conte
 	}
 }
 alphatab.tablature.model.StaveLine.prototype.__class__ = alphatab.tablature.model.StaveLine;
-alphatab.model.effects.TremoloBarEffect = function(p) { if( p === $_ ) return; {
-	this.points = new Array();
-}}
-alphatab.model.effects.TremoloBarEffect.__name__ = ["alphatab","model","effects","TremoloBarEffect"];
-alphatab.model.effects.TremoloBarEffect.prototype.type = null;
-alphatab.model.effects.TremoloBarEffect.prototype.value = null;
-alphatab.model.effects.TremoloBarEffect.prototype.points = null;
-alphatab.model.effects.TremoloBarEffect.prototype.clone = function(factory) {
-	var effect = factory.newTremoloBarEffect();
-	effect.type = this.type;
-	effect.value = this.value;
-	{
-		var _g1 = 0, _g = this.points.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var point = this.points[i];
-			effect.points.push(new alphatab.model.effects.BendPoint(point.position,point.value,point.vibrato));
-		}
-	}
-	return effect;
-}
-alphatab.model.effects.TremoloBarEffect.prototype.__class__ = alphatab.model.effects.TremoloBarEffect;
 alphatab.tablature.drawing.KeySignaturePainter = function() { }
 alphatab.tablature.drawing.KeySignaturePainter.__name__ = ["alphatab","tablature","drawing","KeySignaturePainter"];
 alphatab.tablature.drawing.KeySignaturePainter.paintFlat = function(context,x,y,layout) {
@@ -10979,7 +10943,7 @@ alphatab.midi.MidiSequenceParser.prototype.makeBend = function(sequence,track,st
 		while(_g1 < _g) {
 			var i = _g1++;
 			var point = points[i];
-			var bendStart = start + point.GetTime(duration);
+			var bendStart = start + point.getTime(duration);
 			var value = Math.round(64 + point.value * 2.75 / 1);
 			value = value <= 127?value:127;
 			value = value >= 0?value:0;
@@ -10987,7 +10951,7 @@ alphatab.midi.MidiSequenceParser.prototype.makeBend = function(sequence,track,st
 			if(points.length <= i + 1) continue;
 			var nextPoint = points[i + 1];
 			var nextValue = Math.round(64 + nextPoint.value * 2.75 / 1);
-			var nextBendStart = Math.round(start + nextPoint.GetTime(duration));
+			var nextBendStart = Math.round(start + nextPoint.getTime(duration));
 			if(nextValue == value) continue;
 			var width = (nextBendStart - bendStart) / Math.abs(nextValue - value);
 			if(value < nextValue) {
@@ -11227,7 +11191,7 @@ alphatab.midi.MidiSequenceParser.prototype.makeTremoloBar = function(sequence,tr
 		while(_g1 < _g) {
 			var i = _g1++;
 			var point = points[i];
-			var pointStart = start + point.GetTime(duration);
+			var pointStart = start + point.getTime(duration);
 			var value = Math.round(64 + point.value * (2.75 * 2));
 			value = value <= 127?value:127;
 			value = value >= 0?value:0;
@@ -11235,7 +11199,7 @@ alphatab.midi.MidiSequenceParser.prototype.makeTremoloBar = function(sequence,tr
 			if(points.length > i + 1) {
 				var nextPoint = points[i + 1];
 				var nextValue = Math.round(64 + nextPoint.value * (2.75 * 2));
-				var nextPointStart = start + nextPoint.GetTime(duration);
+				var nextPointStart = start + nextPoint.getTime(duration);
 				if(nextValue == value) continue;
 				var width = (nextPointStart - pointStart) / Math.abs(nextValue - value);
 				if(value < nextValue) {
@@ -11471,7 +11435,7 @@ alphatab.model.effects.BendPoint.__name__ = ["alphatab","model","effects","BendP
 alphatab.model.effects.BendPoint.prototype.position = null;
 alphatab.model.effects.BendPoint.prototype.value = null;
 alphatab.model.effects.BendPoint.prototype.vibrato = null;
-alphatab.model.effects.BendPoint.prototype.GetTime = function(duration) {
+alphatab.model.effects.BendPoint.prototype.getTime = function(duration) {
 	return Math.floor(duration * this.position / 12);
 }
 alphatab.model.effects.BendPoint.prototype.__class__ = alphatab.model.effects.BendPoint;
@@ -12466,8 +12430,6 @@ alphatab.model.TripletFeel.Eighth = 1;
 alphatab.model.TripletFeel.Sixteenth = 2;
 alphatab.tablature.model.StaveLine.TopPadding = 0;
 alphatab.tablature.model.StaveLine.BottomSpacing = 1;
-alphatab.model.effects.TremoloBarEffect.MAX_POSITION = 12;
-alphatab.model.effects.TremoloBarEffect.MAX_VALUE = 12;
 alphatab.model.Tuplet.NORMAL = new alphatab.model.Tuplet();
 alphatab.model.effects.HarmonicType.None = -1;
 alphatab.model.effects.HarmonicType.Natural = 0;

@@ -18,7 +18,6 @@ package alphatab.model;
 import alphatab.model.effects.BendEffect;
 import alphatab.model.effects.GraceEffect;
 import alphatab.model.effects.HarmonicEffect;
-import alphatab.model.effects.TremoloBarEffect;
 import alphatab.model.effects.TremoloPickingEffect;
 import alphatab.model.effects.TrillEffect;
 
@@ -129,11 +128,6 @@ class SongFactory
 	public function newBendEffect() : BendEffect
 	{
 		return new  BendEffect();
-	}
-	
-	public function newTremoloBarEffect() : TremoloBarEffect
-	{
-		return new TremoloBarEffect();
 	}
 	
 	public function newHarmonicEffect() : HarmonicEffect

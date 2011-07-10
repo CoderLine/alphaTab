@@ -18,19 +18,39 @@ package alphatab.model.effects;
 import alphatab.model.SongFactory;
 
 /**
- * A harmonic effect
+ * A harmonic note effect
  */
 class HarmonicEffect
 {
+	/**
+	 * Lists all harmonic type groups
+	 * [i][0] -> The note played
+	 * [i][1] -> The according harmonic note to [i][0]
+	 */
 	public static var NATURAL_FREQUENCIES:Array<Array<Int>> = [[12, 12], [9, 28], [5, 28], [7, 19], [4, 28], [3, 31]];
 	
+	/**
+	 * Additional harmonic data (for pinch, tapped and artificial harmonics)
+	 */
 	public var data:Int;
+	/**
+	 * The type of harmonic (pinch, tapped, artificial,..)
+	 * @see HarmonicType
+	 */
 	public var type:Int;
 	
+	/**
+	 * Initializes a new instance of the HarmonicEffect class. 
+	 */
 	public function new()
 	{
 	}
-	
+	    
+    /**
+     * Creates a clone of the current HarmonicEffect instance.
+     * @param factory the factory for creating new instances
+     * @return a duplicate of the current instance
+     */
 	public function clone(factory:SongFactory) : HarmonicEffect
 	{
 		var effect:HarmonicEffect = factory.newHarmonicEffect();

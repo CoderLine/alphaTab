@@ -22,7 +22,6 @@ import alphatab.model.effects.GraceEffect;
 import alphatab.model.effects.GraceEffectTransition;
 import alphatab.model.effects.HarmonicEffect;
 import alphatab.model.effects.HarmonicType;
-import alphatab.model.effects.TremoloBarEffect;
 import alphatab.model.effects.TremoloPickingEffect;
 import alphatab.model.effects.TrillEffect;
 import alphatab.model.Beat;

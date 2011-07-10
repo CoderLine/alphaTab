@@ -20,7 +20,7 @@ import haxe.macro.Type;
 import haxe.macro.JSGenApi;
 import haxe.macro.Expr;
 import haxe.macro.Compiler;
-import haxe.macro.Context;
+import haxe.macro.Context; 
 using Lambda;
  
 class AlphaTabJsGenerator 

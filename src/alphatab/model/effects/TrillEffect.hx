@@ -23,6 +23,9 @@ import alphatab.model.SongFactory;
  */
 class TrillEffect
 {
+	/**
+	 * The fret 
+	 */
 	public var fret:Int;
 	public var duration:Duration;
 	

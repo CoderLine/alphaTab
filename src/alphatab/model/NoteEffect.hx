@@ -18,7 +18,6 @@ package alphatab.model;
 import alphatab.model.effects.BendEffect;
 import alphatab.model.effects.GraceEffect;
 import alphatab.model.effects.HarmonicEffect;
-import alphatab.model.effects.TremoloBarEffect;
 import alphatab.model.effects.TremoloPickingEffect;
 import alphatab.model.effects.TrillEffect;
 
