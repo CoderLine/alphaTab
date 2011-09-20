@@ -32,9 +32,9 @@ var alphaTabWrapper;
         this.factory = new alphatab.tablature.model.DrawingSongModelFactory();
 		
 		// resolve absolute script path
-		var alphaTabTag = $('script[src$="/alphaTab.js"]');
+		var alphaTabTag = $('script[src*="/alphaTab.js"]');
 		if(alphaTabTag.length == 0) // also try min-version
-			alphaTabTag = $('script[src$="/alphaTab.min.js"]');
+			alphaTabTag = $('script[src*="/alphaTab.min.js"]');
 
 		var alphaTabBase = "";
 		if(alphaTabTag.length)
