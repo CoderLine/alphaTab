@@ -18,7 +18,7 @@
 /**
  * This is a plugin which extends alphaTab with a java midi player.
  */
-(function(alphaTabWrapper)
+(function($, alphaTabWrapper)
 {
     alphaTabWrapper.fn.player = function(playerOptions) {
         var playerJar = 'alphaTab.jar';
@@ -235,4 +235,4 @@
         return this;
     }
 
-})(alphaTabWrapper);
+})(jQuery, alphaTabWrapper);

@@ -18,7 +18,7 @@
 /**
  * This is a plugin which extends alphaTab with a alphaTex editor.
  */
-(function(alphaTabWrapper)
+(function($, alphaTabWrapper)
 {
     alphaTabWrapper.fn.editor = function() {
         var self = this;
@@ -44,4 +44,4 @@
         return this;
     }
 
-})(alphaTabWrapper);
+})(jQuery, alphaTabWrapper);

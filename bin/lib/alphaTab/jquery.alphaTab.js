@@ -94,6 +94,10 @@ var alphaTabWrapper;
         };
 
         this.options = $.extend(defaults, options);
+        if(this.options.autoSize == "maxWidth") {
+            alert(el.width());
+            this.options.width = el.width();
+        }
 
         //
         // public operations (API)
@@ -245,7 +249,13 @@ var alphaTabWrapper;
         }
         // create tablature
         this.tablature = new alphatab.tablature.Tablature(this.canvas, staves, this.options.error);
-        this.tablature.autoSizeWidth = this.options.autoSize;
+        if(this.options.autoSize == "maxWidth") {
+            this.tablature.autoSizeWidth = false;
+        }
+        else {
+            this.tablature.autoSizeWidth = this.options.autoSize;
+        }
+        
         this.tablature.updateScale(this.options.zoom);
         
         // setup layout options
