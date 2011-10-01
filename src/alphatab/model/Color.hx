@@ -27,20 +27,33 @@ class Color
 	public var r:Int;
 	public var g:Int;
 	public var b:Int; 
+	public var a:Float; 
 	
-	public function new(r:Int = 0, g:Int = 0, b:Int = 0)
+	public function new(r:Int = 0, g:Int = 0, b:Int = 0, a:Float=1)
 	{
 		this.r = r;
 		this.g = g;
 		this.b = b;
+        this.a = a;
 	}
 	
-	public function toString() : String
+	public function asRgbString() : String
 	{
-		var s:String = "rgb(";
-		s += Std.string(this.r) + "," ;
-		s += Std.string(this.g) + "," ;
-		s += Std.string(this.b) + ")" ;
-		return s;
+        if(this.a == 1) 
+        {
+            var s:String = "rgb(";
+            s += Std.string(this.r) + "," ;
+            s += Std.string(this.g) + "," ;
+            s += Std.string(this.b) + ")" ;
+            return s;
+        }
+        else {
+            var s:String = "rgba(";
+            s += Std.string(this.r) + "," ;
+            s += Std.string(this.g) + "," ;
+            s += Std.string(this.b) + "," ;
+            s += Std.string(this.a) + ")" ;
+            return s;
+        }
 	}
 }

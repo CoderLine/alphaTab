@@ -26,7 +26,7 @@ import alphatab.platform.Canvas;
 class DrawingLayer 
 {
 	private var _path:Array<Dynamic>;
-	private var _color:Color;
+    private var _defaultColor:Color;
 	private var _isFilled:Bool;
 	private var _penWidth:Float;
 	private var _currentPosition:Point;
@@ -34,7 +34,7 @@ class DrawingLayer
 	public function new(color:Color, isFilled:Bool, penWidth:Float) 
 	{
 		_path = new Array<Dynamic>();
-		_color = color;
+		_defaultColor = color;
 		_isFilled = isFilled;
 		_penWidth = penWidth;
 		_currentPosition = new Point(0, 0);
@@ -44,8 +44,8 @@ class DrawingLayer
 	{
 		graphics.textAlign = "left";
 		graphics.textBaseline = "middle";
-        graphics.fillStyle = _color.toString();
-        graphics.strokeStyle = _color.toString();
+        graphics.fillStyle = _defaultColor.asRgbString();
+        graphics.strokeStyle = _defaultColor.asRgbString();
 		graphics.lineWidth = _penWidth;
 
         graphics.beginPath();
@@ -55,6 +55,10 @@ class DrawingLayer
             {
 				switch (elm.Command) 
                 {
+					case "setColor":
+                        var col:String = elm.Color.asRgbString();
+                        graphics.fillStyle = col;
+                        graphics.strokeStyle = col;
 					case "startFigure":
 						finish(graphics);
 						graphics.beginPath();
@@ -193,8 +197,48 @@ class DrawingLayer
             X2: Math.floor(x2) + 0.5,
             Y2: Math.floor(y2) + 0.5
         });
+    }	
+	public function addDashedLine(x1:Float, y1:Float, x2:Float, y2:Float): Void {
+        var dashLen:Int = 5;
+    
+        var dX = x2 - x1;
+        var dY = y2 - y1;
+        var dashes = Math.floor(Math.sqrt(dX * dX + dY * dY) / dashLen);
+        var dashX = dX / dashes;
+        var dashY = dY / dashes;
+        
+        var isRight:Bool = x2 > x1;
+        var isDown:Bool = y2 > y1;
+        
+        var q = 0;
+        while (q++ < dashes) 
+        {
+            var endX:Float = 0;
+            var endY:Float = 0;
+            
+            if(isRight) {
+                endX = Math.min(x1 + dashX, x2);
+            }
+            else {
+                endX = Math.max(x1 + dashX, x2);
+            }
+            
+            if(isDown) {
+                endY = Math.min(y1 + dashY, y2);
+            }
+            else {
+                endY = Math.max(y1 + dashY, y2);
+            }
+            
+            if( (q % 2) == 0) {
+                addLine(x1, y1, endX, endY);
+            }
+            
+            x1 = endX;
+            y1 = endY;
+        } 
     }
-
+    
 	public function addPolygon(points:Array<Point>): Void{
         _path.push({
             Command: "addPolygon",
@@ -231,6 +275,14 @@ class DrawingLayer
         Y:y,
         Width: w,
         Height: h});
+    }
+    
+    public function setColor(color:Color) {
+        _path.push({Command: "setColor", Color: color}); 
+    }
+    
+    public function resetColor() {
+        _path.push({Command: "setColor", Color: _defaultColor});
     }
 	
 	public function clear(): Void

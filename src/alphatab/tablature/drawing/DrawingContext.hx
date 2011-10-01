@@ -44,6 +44,9 @@ class DrawingContext
 		this.layers[DrawingLayers.VoiceEffectsDraw1] = new DrawingLayer(new Color(34,34,17), false, 1*scale);
 		this.layers[DrawingLayers.VoiceDraw1] = new DrawingLayer(new Color(34,34,17), false, 1*scale);
 		this.layers[DrawingLayers.Red] = new DrawingLayer(new Color(255,0,0), true, 0);
+#if DEBUG_DRAWING
+		this.layers[DrawingLayers.Overlays] = new DrawingLayer(new Color(0,255,0), true, 0);
+#end
 	}
 	
 	public function draw() : Void

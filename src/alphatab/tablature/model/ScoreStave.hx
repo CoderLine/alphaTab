@@ -158,6 +158,15 @@ class ScoreStave extends Stave
         	var currentSpaceToLines = middleLinesStart - currentTopSpacing;
         	// calculate the real score position
             var minScoreY = getNoteScorePosY(layout, minNote) + currentSpaceToLines;
+            
+            // take care of note beam
+            /*if(minNote.voice.value >= Duration.HALF) 
+            {
+                var beamHeight = 0;
+                // TODO: Calculate the height of the beam 
+                minScoreY -= beamHeight;
+            } */         
+            
             // calculate the overflow of the note 
             var minNoteOverflow = currentSpaceToLines - minScoreY;
             
@@ -171,6 +180,15 @@ class ScoreStave extends Stave
         	// get the space from top to bottom of lines
         	// (take care not to mention the current offset)
             var maxScoreY = getNoteScorePosY(layout, maxNote) + middleLinesStart;
+           
+           // take care of note beam
+            /*if(maxNote.voice.value >= Duration.HALF) 
+            {
+                var beamHeight = 0;
+                // TODO: Calculate the height of the beam 
+                maxScoreY -= beamHeight;
+            }*/           
+            
             var maxNoteOverflow = maxScoreY - middleLinesEnd;
             
             // a bigger offset?

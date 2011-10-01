@@ -16,6 +16,7 @@
  */
 package alphatab.tablature.model;
 import alphatab.model.BeatStrokeDirection;
+import alphatab.model.Color;
 import alphatab.model.Duration;
 import alphatab.model.effects.BendEffect;
 import alphatab.model.effects.BendPoint;
@@ -94,6 +95,8 @@ class TablatureStave extends Stave
     // bottom spacing
     private static inline var BottomPadding = 17;
     
+    private var _rangeIndices:Array<Int>;
+    
     public function new(line:StaveLine, layout:ViewLayout)
     {
         super(line, layout);        
@@ -103,6 +106,8 @@ class TablatureStave extends Stave
         spacing.set(Tablature, ((line.track.stringCount() - 1) * layout.stringSpacing));
         spacing.set(TablatureBottomSeparator, Math.floor(10 * layout.scale));
         spacing.set(BottomPadding, Math.floor(15 * layout.scale));
+        
+        _rangeIndices = [0, 0];
     }
     
     public override function getStaveId() : String
@@ -239,6 +244,18 @@ class TablatureStave extends Stave
     
     private function paintBeat(layout:ViewLayout, context:DrawingContext, beat:BeatDrawing, x:Int, y:Int)
     {
+        #if DEBUG_DRAWING
+        var debugLayer = context.get(DrawingLayers.Overlays);
+        var c:Color = (beat.index % 2 == 0) 
+                            ? new Color(255, 0, 0, 0.5) 
+                            : new Color(0, 255, 0, 0.5);
+        debugLayer.setColor(c);
+        var top = y;
+        var bottom = y + spacing.get(BottomPadding);
+        debugLayer.addRect(x, top, beat.width, bottom-top);
+        debugLayer.startFigure();
+        #end
+    
         // paint voices
         for (voice in beat.voices)
         {
@@ -498,7 +515,7 @@ class TablatureStave extends Stave
         var nextVoiceRing = nextVoice != null && nextVoice.effectsCache.letRing;
         var previousVoiceRing = previousVoice != null && previousVoice.effectsCache.letRing;
         
-        paintRange(layout, context, voice, x, realY, "ring", nextVoice, nextVoiceRing, previousVoice, previousVoiceRing); 
+        paintRange(layout, context, voice, x, realY, "ring", nextVoice, nextVoiceRing, previousVoice, previousVoiceRing, 0); 
     }
     
     // paints the P.M.----| mark above beats
@@ -514,14 +531,15 @@ class TablatureStave extends Stave
         var nextVoicePm = nextVoice != null && nextVoice.effectsCache.palmMute;
         var previousVoicePm= previousVoice != null && previousVoice.effectsCache.palmMute;
         
-        paintRange(layout, context, voice, x, realY, "P.M.", nextVoice, nextVoicePm, previousVoice, previousVoicePm); 
+        paintRange(layout, context, voice, x, realY, "P.M.", nextVoice, nextVoicePm, previousVoice, previousVoicePm, 1); 
     }
     
     // paints a ranged effect:
     //   ring --------|
     //   P.M. --------|
     private function paintRange(layout:ViewLayout, context:DrawingContext, voice:VoiceDrawing, startX:Int, y:Int, 
-                                label:String, nextVoice:VoiceDrawing, nextVoiceEffect:Bool, previousVoice:VoiceDrawing, previousVoiceEffect:Bool)
+                                label:String, nextVoice:VoiceDrawing, nextVoiceEffect:Bool, previousVoice:VoiceDrawing, previousVoiceEffect:Bool,
+                                startOffsetIndex:Int)
     {
         // end line on end of current beat
         var endX:Float = startX + voice.beatDrawing().fullWidth();
@@ -556,8 +574,9 @@ class TablatureStave extends Stave
             fill.addString(label, DrawingResources.effectFont, startX, y);
             // offset the startX for the line
             context.graphics.font = DrawingResources.effectFont;
-            var offset:Int = cast (context.graphics.measureText(label) + 6*layout.scale);
+            var offset:Int = cast (context.graphics.measureText(label) + 4*layout.scale);
             startX += offset;
+            _rangeIndices[startOffsetIndex] = startX;
         }
         // start at the measure start, if we are on the first beat
         else if (prevOnSameStaveLine && voice.beatDrawing() == voice.beatDrawing().measure.beats[0])
@@ -566,12 +585,15 @@ class TablatureStave extends Stave
         }
         
         // draw the line
-        draw.startFigure();
-        draw.addLine(startX, y, endX, y);
+        // draw.startFigure();
+        // draw.addLine(startX, y, endX, y);
         
         // draw end segment if needed
-        if (isEnd)
+        if (isEnd) 
         {
+            draw.startFigure();
+            draw.addDashedLine(_rangeIndices[startOffsetIndex], y, endX, y);
+            
             var size:Int = cast (8 * layout.scale);
             draw.startFigure();
             draw.addLine(endX, y - size/2 , endX, y + size/2);

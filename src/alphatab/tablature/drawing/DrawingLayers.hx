@@ -35,4 +35,7 @@ class DrawingLayers
 	public static inline var VoiceEffectsDraw1 = 11;
 	public static inline var VoiceDraw1 = 12;
 	public static inline var Red = 13;	
+#if DEBUG_DRAWING
+    public static inline var Overlays = 14;
+#end
 }
