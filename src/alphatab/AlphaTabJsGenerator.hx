@@ -16,11 +16,11 @@
  */
 package alphatab;
 
-import haxe.macro.Type;
-import haxe.macro.JSGenApi;
-import haxe.macro.Expr;
 import haxe.macro.Compiler;
-import haxe.macro.Context; 
+import haxe.macro.Context;
+import haxe.macro.Expr;
+import haxe.macro.JSGenApi;
+import haxe.macro.Type;
 using Lambda;
  
 class AlphaTabJsGenerator 
@@ -31,7 +31,7 @@ class AlphaTabJsGenerator
 	var statics : List<{ c : ClassType, f : ClassField }>;
 	var packages : Hash<Bool>;
 	var forbidden : Hash<Bool>;
-    var files : List<String>;
+    var files : List<String>; 
 
 	public function new(api) {
 		this.api = api;
