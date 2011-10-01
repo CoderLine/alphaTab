@@ -17,6 +17,7 @@
  */
 $content = ''; 
 $isIndex = !isset($_GET['s']) || $_GET['s'] == 'index.php';
+$showSourceCode = false;
 if($isIndex) 
 {	
 	$samples = array(
@@ -91,7 +92,7 @@ else
 		<p><?php echo $description; ?></p>
 		<?php echo $content; ?>
 		<?php 
-		if(!$isIndex): 
+		if(!$isIndex && $showSourceCode): 
 		?>
 		<h2>Source</h2>
 		<code><?php echo htmlentities(trim($content)); ?></code>
