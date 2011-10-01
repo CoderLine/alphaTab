@@ -8,7 +8,7 @@
 	<property name="lib" location="${bin}/lib/alphaTab"/>
 	<property name="src" location="src"/>
 	<property name="haxe-js" location="${lib}/alphaTab.js"/>
-	<property name="haxe-cpp" location="cpp"/>
+	<property name="haxe-cs" location="cs"/>
 	<property name="release" location="releases"/>
 	<property name="tools" location="tools"/>
 	
@@ -56,6 +56,23 @@
         </exec>
 	</target>	
 
+	<target name="haxe-js-debug" depends="global-init">
+		<delete file="${haxe-js}" />
+        <exec executable="haxe">
+            <arg value="-cp" />
+            <arg value="${src}"/>
+            
+            <arg value="-main" />
+            <arg value="alphatab.Main" />
+            
+            <arg value="-js" />
+            <arg value="${haxe-js}" /> 
+            
+            <arg value="-D" />
+            <arg value="DEBUG_DRAWING" />
+        </exec>
+	</target>	
+
 	<target name="haxe-cs" depends="global-init">
 		<delete dir="cs" />
 		<mkdir dir="cs" />
@@ -66,59 +83,14 @@
             <arg value="-main" />
             <arg value="alphatab.Main" />
             
-            <arg value="-cs" />
-            <arg value="cs" />
-        </exec>
-	</target>	
-
-    <!-- Js build using custom generator -->
-    <target name="haxe-js2" depends="global-init">
-		<delete dir="${lib}2" />
-		<mkdir dir="${lib}2" />
-        <exec executable="haxe">
-            <arg value="-cp" />
-            <arg value="${src}"/>
-            
-            <arg value="-main" />
-            <arg value="alphatab.Main" />
-            
             <arg value="-js" />
-            <arg value="${lib}2" />
-
-            <arg value="--macro" />
-            <arg value="alphatab.AlphaTabJsGenerator.use()" />
+            <arg value="${haxe-cs}" />
+        	
+        	<arg value="--macro" />
+            <arg value="alphatab.AlphaTabCsGenerator.use()" />
         </exec>
 	</target>	
-
-    
-	<target name="haxe-cpp" depends="global-init">
-		<delete file="${haxe-cpp}" />
-        <exec executable="haxe">
-            <arg value="-cp" />
-            <arg value="${src}"/>
-            
-            <arg value="-main" />
-            <arg value="alphatab.Main" />
-            
-            <arg value="-cpp" />
-            <arg value="${haxe-cpp}" />
-        </exec>
-	</target>	
-    
-	<target name="haxe-xml" depends="global-init">
-		<delete file="test.xml" />
-        <exec executable="haxe">
-            <arg value="-cp" />
-            <arg value="${src}"/>
-            
-            <arg value="-main" />
-            <arg value="alphatab.Main" />
-            
-            <arg value="-xml" />
-            <arg value="test.xml" />
-        </exec>
-	</target>	
-  
+   
 	<!-- Release -->
 	<target name="release-init" depends="java-player">
 		<delete dir="${release}/${DSTAMP}" />
@@ -186,7 +158,7 @@
         <basename property="samplename" file="${samplepath}"
           suffix=".php"/>       
         <echo message="loading sample ${samplename}" />
-        <get src="http://haxedev/alphaTab/bin/demo/index.php?s=${samplename}.php"
+        <get src="http://alphadev/demo/index.php?s=${samplename}.php"
             dest="${release}/${DSTAMP}/demo/${samplename}.html" />
             
     </target>
