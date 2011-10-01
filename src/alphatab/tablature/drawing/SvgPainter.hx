@@ -32,32 +32,32 @@ class SvgPainter
     private var _currentPosition:Point;
     private var _token:Array<String>;
     private var _currentIndex:Int;
-	
-	public function new(layer:DrawingLayer, svg:String, x:Float, y:Float, xScale:Float, yScale:Float) 
-	{
-		_layer = layer;
-		_svg = svg;
-		_x = x;
-		_y = y;
-		_xScale = xScale * 0.98;
-		_yScale = yScale * 0.98;
-		_currentPosition = new Point(x, y);
-		_token = svg.split(" ");
-		_currentIndex = 0;
-	}
-	
-	public function paint(): Void
-	{
-		_layer.startFigure();
-		while (_currentIndex < _token.length)
-		{
-			this.parseCommand();
-		}
-	}
-	
-	private function parseCommand() 
-	{
-		var command = this.getString();
+    
+    public function new(layer:DrawingLayer, svg:String, x:Float, y:Float, xScale:Float, yScale:Float) 
+    {
+        _layer = layer;
+        _svg = svg;
+        _x = x;
+        _y = y;
+        _xScale = xScale * 0.98;
+        _yScale = yScale * 0.98;
+        _currentPosition = new Point(x, y);
+        _token = svg.split(" ");
+        _currentIndex = 0;
+    }
+    
+    public function paint(): Void
+    {
+        _layer.startFigure();
+        while (_currentIndex < _token.length)
+        {
+            this.parseCommand();
+        }
+    }
+    
+    private function parseCommand() 
+    {
+        var command = this.getString();
         switch (command) {
             case "M": // absolute moveto
                 _currentPosition.x = (_x + this.getNumber() * _xScale);
@@ -71,21 +71,21 @@ class SvgPainter
             case "Z": // closePath
                 _layer.closeFigure();
             case "L": // absolute lineTo
-				var isNextNumber = true;
+                var isNextNumber = true;
                 do {
-					_currentPosition.x = (_x + this.getNumber() * _xScale);
-					_currentPosition.y = (_y + this.getNumber() * _yScale);
-					_layer.lineTo(_currentPosition.x, _currentPosition.y);
-					isNextNumber = !this.isNextCommand();
+                    _currentPosition.x = (_x + this.getNumber() * _xScale);
+                    _currentPosition.y = (_y + this.getNumber() * _yScale);
+                    _layer.lineTo(_currentPosition.x, _currentPosition.y);
+                    isNextNumber = !this.isNextCommand();
                 }
                 while (isNextNumber);
             case "l": // relative lineTo
-				var isNextNumber = true;
+                var isNextNumber = true;
                 do {
-					_currentPosition.x += (this.getNumber() * _xScale);
-					_currentPosition.y += (this.getNumber() * _yScale);
-					_layer.lineTo(_currentPosition.x, _currentPosition.y);
-					isNextNumber = !this.isNextCommand();
+                    _currentPosition.x += (this.getNumber() * _xScale);
+                    _currentPosition.y += (this.getNumber() * _yScale);
+                    _layer.lineTo(_currentPosition.x, _currentPosition.y);
+                    isNextNumber = !this.isNextCommand();
                 }
                 while (isNextNumber);
             case "C": // absolute bezierTo
@@ -145,15 +145,15 @@ class SvgPainter
                 }
                 while (isNextNumber && _currentIndex < _token.length);
         }
-	}
-	
-	private function getNumber() : Float
-	{
-		return Std.parseFloat(_token[_currentIndex++]);
-	}
-	
-	private function isNextCommand() : Bool
-	{
+    }
+    
+    private function getNumber() : Float
+    {
+        return Std.parseFloat(_token[_currentIndex++]);
+    }
+    
+    private function isNextCommand() : Bool
+    {
         var command = this.peekString();
         return command == "m" ||
         command == "M" ||
@@ -165,19 +165,19 @@ class SvgPainter
         command == "L" ||
         command == "z" ||
         command == "Z";
-	}
-		
-	private function peekString() : String
-	{
-		return _token[_currentIndex];
-	}
-	
-	private function peekNumber() : Float
-	{
-		return Std.parseFloat(_token[_currentIndex]);
-	}
-	private function getString() : String
-	{
-		return _token[_currentIndex++];
-	}
+    }
+        
+    private function peekString() : String
+    {
+        return _token[_currentIndex];
+    }
+    
+    private function peekNumber() : Float
+    {
+        return Std.parseFloat(_token[_currentIndex]);
+    }
+    private function getString() : String
+    {
+        return _token[_currentIndex++];
+    }
 }

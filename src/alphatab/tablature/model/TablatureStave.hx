@@ -287,8 +287,8 @@ class TablatureStave extends Stave
     {
         if (voice.isRestVoice() || line.tablature.getStaveSetting(STAVE_ID, "rhythm", false) == false) return;
         
-		var fill:DrawingLayer = voice.index == 0 ? context.get(DrawingLayers.Voice1) : context.get(DrawingLayers.Voice2);
-		var draw:DrawingLayer = voice.index == 0 ? context.get(DrawingLayers.VoiceDraw1) : context.get(DrawingLayers.VoiceDraw2);
+        var fill:DrawingLayer = voice.index == 0 ? context.get(DrawingLayers.Voice1) : context.get(DrawingLayers.Voice2);
+        var draw:DrawingLayer = voice.index == 0 ? context.get(DrawingLayers.VoiceDraw1) : context.get(DrawingLayers.VoiceDraw2);
         
         if (voice.duration.value >= Duration.HALF)
         {
@@ -350,9 +350,9 @@ class TablatureStave extends Stave
         // some variables for calculation
         var y:Int;
         var x1:Int;
-		var x2:Int;
-		var y1:Int;
-		var y2:Int;      
+        var x2:Int;
+        var y1:Int;
+        var y2:Int;      
         
         // below all notes
         if (direction == VoiceDirection.Down)
@@ -421,12 +421,12 @@ class TablatureStave extends Stave
         // paint number for note
         var fill:DrawingLayer = note.voice.index == 0 ? context.get(DrawingLayers.Voice1) : context.get(DrawingLayers.Voice2);
         if (!note.isTiedNote)
-		{ 
-			var visualNote:String = note.effect.deadNote ? "X" : Std.string(note.value);
-			visualNote = note.effect.ghostNote ? "(" + visualNote + ")" : visualNote;
+        { 
+            var visualNote:String = note.effect.deadNote ? "X" : Std.string(note.value);
+            visualNote = note.effect.ghostNote ? "(" + visualNote + ")" : visualNote;
 
-			fill.addString(visualNote, DrawingResources.noteFont, realX, realY);
-		}
+            fill.addString(visualNote, DrawingResources.noteFont, realX, realY);
+        }
         
         // paint effects
         paintEffects(layout, context, note, x, y, realY);
@@ -476,8 +476,8 @@ class TablatureStave extends Stave
         if (!note.effect.isGrace()) return;
         
         var fill:DrawingLayer = note.voice.index == 0
-								 ? context.get(DrawingLayers.VoiceEffects1)
-								 : context.get(DrawingLayers.VoiceEffects2);
+                                 ? context.get(DrawingLayers.VoiceEffects1)
+                                 : context.get(DrawingLayers.VoiceEffects2);
                                  
         var value:String = note.effect.grace.isDead ? "X" : Std.string(note.effect.grace.fret);
         
@@ -493,12 +493,12 @@ class TablatureStave extends Stave
         var realY:Int = y + spacing.get(AccentuatedNote);
         
         var layer:DrawingLayer = voice.index == 0
-								 ? context.get(DrawingLayers.Voice1)
-								 : context.get(DrawingLayers.Voice2);
+                                 ? context.get(DrawingLayers.Voice1)
+                                 : context.get(DrawingLayers.Voice2);
         var symbol = voice.effectsCache.accentuatedNote ? MusicFont.AccentuatedNote : MusicFont.HeavyAccentuatedNote;              
          
                                  
-		layer.addMusicSymbol(symbol, realX, realY, layout.scale);
+        layer.addMusicSymbol(symbol, realX, realY, layout.scale);
     }
     
     
@@ -612,15 +612,15 @@ class TablatureStave extends Stave
     
     // paints vibrato symbols within the specified range using the given symbol scale
     private function paintVibrato(layout:ViewLayout, layer:DrawingLayer, x:Int, y:Int, w:Int, symbolScale:Float = 1)
-    {       	
-		var step:Float = 18 * layout.scale * symbolScale;        
-		var loops:Int = Math.floor(Math.max(1, (w / step)));
+    {           
+        var step:Float = 18 * layout.scale * symbolScale;        
+        var loops:Int = Math.floor(Math.max(1, (w / step)));
         
-		for (i in 0 ... loops)
-		{
-			layer.addMusicSymbol(MusicFont.VibratoLeftRight, x, y, layout.scale * symbolScale);
-			x += Math.floor(step);
-		}
+        for (i in 0 ... loops)
+        {
+            layer.addMusicSymbol(MusicFont.VibratoLeftRight, x, y, layout.scale * symbolScale);
+            x += Math.floor(step);
+        }
     }
     
     // paints a Tr text above the note, a small number beneath the original note
@@ -639,7 +639,7 @@ class TablatureStave extends Stave
         if (!voice.effectsCache.trill) return;
         
         var fill:DrawingLayer = voice.index == 0 ? context.get(DrawingLayers.VoiceEffects1) : context.get(DrawingLayers.VoiceEffects2);
-		fill.addString("Tr", DrawingResources.effectFont, x, y + spacing.get(NoteVibrato));
+        fill.addString("Tr", DrawingResources.effectFont, x, y + spacing.get(NoteVibrato));
     }
     
     // paints a A.H, N.H,... above the note
@@ -663,7 +663,7 @@ class TablatureStave extends Stave
         }
         
         var fill:DrawingLayer = voice.index == 0 ? context.get(DrawingLayers.VoiceEffects1) : context.get(DrawingLayers.VoiceEffects2);
-		fill.addString(key, DrawingResources.effectFont, x, y + spacing.get(Harmonics));
+        fill.addString(key, DrawingResources.effectFont, x, y + spacing.get(Harmonics));
         
     }
     
@@ -738,27 +738,27 @@ class TablatureStave extends Stave
         
         var down:Bool = note.string > 3 || nextNote == null;
         
-		var fill:DrawingLayer = note.voice.index == 0
-							? context.get(DrawingLayers.VoiceEffects1)
-							: context.get(DrawingLayers.VoiceEffects2);
+        var fill:DrawingLayer = note.voice.index == 0
+                            ? context.get(DrawingLayers.VoiceEffects1)
+                            : context.get(DrawingLayers.VoiceEffects2);
                             
-		var realX = x + (note.noteSize.x/2);
-		var realY = down ? y + DrawingResources.noteFontHeight/2
-		                 : y - DrawingResources.noteFontHeight/2;
-		var endX:Float = nextNote != null ? x + note.beatDrawing().fullWidth() + (nextNote.noteSize.x / 2)
+        var realX = x + (note.noteSize.x/2);
+        var realY = down ? y + DrawingResources.noteFontHeight/2
+                         : y - DrawingResources.noteFontHeight/2;
+        var endX:Float = nextNote != null ? x + note.beatDrawing().fullWidth() + (nextNote.noteSize.x / 2)
                                             : realX + 15*layout.scale;
-					
-		paintTie(layout, fill, realX, realY, endX, realY, down);
+                    
+        paintTie(layout, fill, realX, realY, endX, realY, down);
     }
     
     // paints a tie between the two given points
     public static function paintTie(layout:ViewLayout, layer:DrawingLayer, x1:Float, y1:Float, x2:Float, y2:Float, down:Bool=false) : Void
-	{
-    	//
+    {
+        //
         // calculate control points 
         //
-		var offset = 15*layout.scale;
-		var size = 4*layout.scale;
+        var offset = 15*layout.scale;
+        var size = 4*layout.scale;
         // normal vector
         var normalVector = {
             x: (y2 - y1),
@@ -794,7 +794,7 @@ class TablatureStave extends Stave
         layer.quadraticCurveTo(cp1.x, cp1.y, x2, y2);
         layer.quadraticCurveTo(cp2.x, cp2.y, x1, y1);
         layer.closeFigure();
-	}
+    }
         
     // paints arrowed lines and labels for all bendpoints
     private function paintBend(layout:ViewLayout, context:DrawingContext, note:NoteDrawing, x:Int, y:Int)
@@ -806,87 +806,87 @@ class TablatureStave extends Stave
         // the text. therefore we need to add the textsize twice
         // to be left of the text
         x += Math.floor(note.noteSize.x);
-		var endX:Float = x + note.beatDrawing().fullWidth();
+        var endX:Float = x + note.beatDrawing().fullWidth();
         // the top offset for bends
         var minY:Float = y - 60 * scale;
       
-		var fill:DrawingLayer = note.voice.index == 0
-					 ? context.get(DrawingLayers.VoiceEffects1)
-					 : context.get(DrawingLayers.VoiceEffects2);
+        var fill:DrawingLayer = note.voice.index == 0
+                     ? context.get(DrawingLayers.VoiceEffects1)
+                     : context.get(DrawingLayers.VoiceEffects2);
 
-		var draw:DrawingLayer = note.voice.index == 0
-					 ? context.get(DrawingLayers.VoiceEffectsDraw1)
-					 : context.get(DrawingLayers.VoiceEffectsDraw2);
+        var draw:DrawingLayer = note.voice.index == 0
+                     ? context.get(DrawingLayers.VoiceEffectsDraw1)
+                     : context.get(DrawingLayers.VoiceEffectsDraw2);
 
-		if (note.effect.bend.points.length >= 2)
-		{
+        if (note.effect.bend.points.length >= 2)
+        {
             // calculate offsets per step
-			var dX:Float = (endX - x) / BendEffect.MAX_POSITION;
-			var dY:Float = (y - minY) / BendEffect.MAX_VALUE;
+            var dX:Float = (endX - x) / BendEffect.MAX_POSITION;
+            var dY:Float = (y - minY) / BendEffect.MAX_VALUE;
 
-			draw.startFigure();
-			for (i in 0 ... note.effect.bend.points.length - 1)
-			{
-				var firstPt:BendPoint = note.effect.bend.points[i];
-				var secondPt:BendPoint = note.effect.bend.points[i + 1];
+            draw.startFigure();
+            for (i in 0 ... note.effect.bend.points.length - 1)
+            {
+                var firstPt:BendPoint = note.effect.bend.points[i];
+                var secondPt:BendPoint = note.effect.bend.points[i + 1];
 
                 // don't draw a line if there's no offset
-				if (firstPt.value == secondPt.value && i == note.effect.bend.points.length - 2) continue;
+                if (firstPt.value == secondPt.value && i == note.effect.bend.points.length - 2) continue;
 
-				// draw bezier lien from first to second point
-				var firstLoc:Point = new Point(cast (x + (dX * firstPt.position)), cast (y - dY * firstPt.value));
-				var secondLoc:Point = new Point(cast (x + (dX * secondPt.position)), cast (y - dY * secondPt.value));
-				var firstHelper:Point = new Point(firstLoc.x + ((secondLoc.x - firstLoc.x)), cast (y - dY * firstPt.value));
-				draw.addBezier(firstLoc.x, firstLoc.y, firstHelper.x, firstHelper.y, secondLoc.x, secondLoc.y, secondLoc.x, secondLoc.y);
+                // draw bezier lien from first to second point
+                var firstLoc:Point = new Point(cast (x + (dX * firstPt.position)), cast (y - dY * firstPt.value));
+                var secondLoc:Point = new Point(cast (x + (dX * secondPt.position)), cast (y - dY * secondPt.value));
+                var firstHelper:Point = new Point(firstLoc.x + ((secondLoc.x - firstLoc.x)), cast (y - dY * firstPt.value));
+                draw.addBezier(firstLoc.x, firstLoc.y, firstHelper.x, firstHelper.y, secondLoc.x, secondLoc.y, secondLoc.x, secondLoc.y);
 
                 // what type of arrow? (up/down)
-				var arrowSize:Float = 3 * scale;
-				if (secondPt.value > firstPt.value)
-				{
-					draw.addLine(secondLoc.x - 0.5, secondLoc.y, secondLoc.x - arrowSize - 0.5, secondLoc.y + arrowSize); 
-					draw.addLine(secondLoc.x - 0.5, secondLoc.y, secondLoc.x + arrowSize - 0.5, secondLoc.y + arrowSize); 
-				}
-				else if (secondPt.value != firstPt.value)
-				{
-					draw.addLine(secondLoc.x - 0.5, secondLoc.y, secondLoc.x - arrowSize - 0.5, secondLoc.y - arrowSize); 
-					draw.addLine(secondLoc.x - 0.5, secondLoc.y, secondLoc.x + arrowSize - 0.5, secondLoc.y - arrowSize); 
-				}
-								
-				if (secondPt.value != 0)
-				{
-					var dV:Float = (secondPt.value - firstPt.value) * 0.25; // dv * 1/4 
-					var up:Bool = dV > 0;
-					dV = Math.abs(dV);
+                var arrowSize:Float = 3 * scale;
+                if (secondPt.value > firstPt.value)
+                {
+                    draw.addLine(secondLoc.x - 0.5, secondLoc.y, secondLoc.x - arrowSize - 0.5, secondLoc.y + arrowSize); 
+                    draw.addLine(secondLoc.x - 0.5, secondLoc.y, secondLoc.x + arrowSize - 0.5, secondLoc.y + arrowSize); 
+                }
+                else if (secondPt.value != firstPt.value)
+                {
+                    draw.addLine(secondLoc.x - 0.5, secondLoc.y, secondLoc.x - arrowSize - 0.5, secondLoc.y - arrowSize); 
+                    draw.addLine(secondLoc.x - 0.5, secondLoc.y, secondLoc.x + arrowSize - 0.5, secondLoc.y - arrowSize); 
+                }
+                                
+                if (secondPt.value != 0)
+                {
+                    var dV:Float = (secondPt.value - firstPt.value) * 0.25; // dv * 1/4 
+                    var up:Bool = dV > 0;
+                    dV = Math.abs(dV);
                     
                     // calculate label
-					var s:String = "";
-					// Full Steps 
-					if (dV == 1)
-						s = "full";
-					else if (dV > 1)
-					{
-						s += Std.string(Math.floor(dV)) + " ";
-						// Quaters
-						dV -= Math.floor(dV);
-					}
+                    var s:String = "";
+                    // Full Steps 
+                    if (dV == 1)
+                        s = "full";
+                    else if (dV > 1)
+                    {
+                        s += Std.string(Math.floor(dV)) + " ";
+                        // Quaters
+                        dV -= Math.floor(dV);
+                    }
 
-					if (dV == 0.25)
-						s += "1/4";
-					else if (dV == 0.5)
-						s += "1/2";
-					else if (dV == 0.75)
-						s += "3/4";
+                    if (dV == 0.25)
+                        s += "1/4";
+                    else if (dV == 0.5)
+                        s += "1/2";
+                    else if (dV == 0.75)
+                        s += "3/4";
 
                     // draw label
-					context.graphics.font = DrawingResources.defaultFont;
-					var size:Float = context.graphics.measureText(s);
-					var y:Float = up ? secondLoc.y - DrawingResources.defaultFontHeight + (2 * scale) : secondLoc.y + DrawingResources.defaultFontHeight/2 + (2 * scale);
-					var x:Float = secondLoc.x - size / 2;
+                    context.graphics.font = DrawingResources.defaultFont;
+                    var size:Float = context.graphics.measureText(s);
+                    var y:Float = up ? secondLoc.y - DrawingResources.defaultFontHeight + (2 * scale) : secondLoc.y + DrawingResources.defaultFontHeight/2 + (2 * scale);
+                    var x:Float = secondLoc.x - size / 2;
 
-					fill.addString(s, DrawingResources.defaultFont, cast x, cast y);
-				}
-			}
-		}    
+                    fill.addString(s, DrawingResources.defaultFont, cast x, cast y);
+                }
+            }
+        }    
     }
 
     // paints slide lines and ties 
@@ -894,35 +894,35 @@ class TablatureStave extends Stave
     {        
         if (!note.effect.slide) return;
         
-		var xOffset:Float = note.noteSize.x * 2;
+        var xOffset:Float = note.noteSize.x * 2;
         
-		var xMove:Float = 15.0 * layout.scale;
-		var yMove:Float = 3.0 * layout.scale;
+        var xMove:Float = 15.0 * layout.scale;
+        var yMove:Float = 3.0 * layout.scale;
         
        
-		var draw:DrawingLayer = note.voice.index == 0
-								? context.get(DrawingLayers.VoiceEffectsDraw1)
-								: context.get(DrawingLayers.VoiceEffectsDraw2);
-		draw.startFigure();
+        var draw:DrawingLayer = note.voice.index == 0
+                                ? context.get(DrawingLayers.VoiceEffectsDraw1)
+                                : context.get(DrawingLayers.VoiceEffectsDraw2);
+        draw.startFigure();
 
-		if (note.effect.slideType == SlideType.IntoFromBelow)
-		{
-			draw.addLine(x - xMove, y + yMove, x, y - yMove);
-		}
-		else if (note.effect.slideType == SlideType.IntoFromAbove)
-		{
-			draw.addLine(x - xMove, y - yMove, x, y + yMove);
-		}
-		else if (note.effect.slideType == SlideType.OutDownWards)
-		{
-			draw.addLine(x + xOffset, y - yMove, x + xOffset + xMove, y + yMove);
-		}
-		else if (note.effect.slideType == SlideType.OutUpWards)
-		{
-			draw.addLine(x + xOffset, y + yMove, x + xOffset + xMove, y - yMove);
-		}
-		else 
-		{            
+        if (note.effect.slideType == SlideType.IntoFromBelow)
+        {
+            draw.addLine(x - xMove, y + yMove, x, y - yMove);
+        }
+        else if (note.effect.slideType == SlideType.IntoFromAbove)
+        {
+            draw.addLine(x - xMove, y - yMove, x, y + yMove);
+        }
+        else if (note.effect.slideType == SlideType.OutDownWards)
+        {
+            draw.addLine(x + xOffset, y - yMove, x + xOffset + xMove, y + yMove);
+        }
+        else if (note.effect.slideType == SlideType.OutUpWards)
+        {
+            draw.addLine(x + xOffset, y + yMove, x + xOffset + xMove, y - yMove);
+        }
+        else 
+        {            
             var nextBeat:BeatDrawing = note.beatDrawing().getNextBeat();            
             var nextNote:NoteDrawing = nextBeat == null ? null : cast nextBeat.getNote(note.voice.index, note.string);
             
@@ -964,7 +964,7 @@ class TablatureStave extends Stave
             {
                 draw.addLine(x + xOffset, y, x + note.beatDrawing().fullWidth(), y);
             }
-		}
+        }
     }
 
        
@@ -990,71 +990,71 @@ class TablatureStave extends Stave
         y = cast (y + spacing.get(Tablature) + Math.round((note.string - 1) * layout.stringSpacing)); 
        
         x += Math.floor(note.noteSize.x);
-		var endX:Float = x + beat.fullWidth();
+        var endX:Float = x + beat.fullWidth();
         // the top offset for bends
         var minY:Float = y - 60 * scale;
       
-		var fill:DrawingLayer = note.voice.index == 0
-					 ? context.get(DrawingLayers.VoiceEffects1)
-					 : context.get(DrawingLayers.VoiceEffects2);
+        var fill:DrawingLayer = note.voice.index == 0
+                     ? context.get(DrawingLayers.VoiceEffects1)
+                     : context.get(DrawingLayers.VoiceEffects2);
 
-		var draw:DrawingLayer = note.voice.index == 0
-					 ? context.get(DrawingLayers.VoiceEffectsDraw1)
-					 : context.get(DrawingLayers.VoiceEffectsDraw2);
+        var draw:DrawingLayer = note.voice.index == 0
+                     ? context.get(DrawingLayers.VoiceEffectsDraw1)
+                     : context.get(DrawingLayers.VoiceEffectsDraw2);
 
-		if (beat.effect.tremoloBar.points.length >= 2)
-		{
+        if (beat.effect.tremoloBar.points.length >= 2)
+        {
             // calculate offsets per step
-			var dX:Float = (endX - x) / BendEffect.MAX_POSITION;
-			var dY:Float = (y - minY) / BendEffect.MAX_VALUE;
+            var dX:Float = (endX - x) / BendEffect.MAX_POSITION;
+            var dY:Float = (y - minY) / BendEffect.MAX_VALUE;
 
-			draw.startFigure();
-			for (i in 0 ... beat.effect.tremoloBar.points.length - 1)
-			{
-				var firstPt:BendPoint = beat.effect.tremoloBar.points[i];
-				var secondPt:BendPoint = beat.effect.tremoloBar.points[i + 1];
+            draw.startFigure();
+            for (i in 0 ... beat.effect.tremoloBar.points.length - 1)
+            {
+                var firstPt:BendPoint = beat.effect.tremoloBar.points[i];
+                var secondPt:BendPoint = beat.effect.tremoloBar.points[i + 1];
 
                 // don't draw a line if there's no offset
-				if (firstPt.value == secondPt.value && i == beat.effect.tremoloBar.points.length - 2) continue;
+                if (firstPt.value == secondPt.value && i == beat.effect.tremoloBar.points.length - 2) continue;
 
-				// draw bezier lien from first to second point
-				var firstLoc:Point = new Point(cast (x + (dX * firstPt.position)), cast (y - dY * firstPt.value));
-				var secondLoc:Point = new Point(cast (x + (dX * secondPt.position)), cast (y - dY * secondPt.value));
-				draw.addLine(firstLoc.x, firstLoc.y, secondLoc.x, secondLoc.y);
+                // draw bezier lien from first to second point
+                var firstLoc:Point = new Point(cast (x + (dX * firstPt.position)), cast (y - dY * firstPt.value));
+                var secondLoc:Point = new Point(cast (x + (dX * secondPt.position)), cast (y - dY * secondPt.value));
+                draw.addLine(firstLoc.x, firstLoc.y, secondLoc.x, secondLoc.y);
                 
-				if (secondPt.value != 0)
-				{
-					var dV:Float = (secondPt.value) * 0.5;
-					var up:Bool = (secondPt.value - firstPt.value) >= 0;
-					var s:String = "";
+                if (secondPt.value != 0)
+                {
+                    var dV:Float = (secondPt.value) * 0.5;
+                    var up:Bool = (secondPt.value - firstPt.value) >= 0;
+                    var s:String = "";
                     
                     if (dV < 0)
                         s += "-";
                     
-					if(dV >= 1 || dV <= -1)
-						s += Std.string(Math.floor(Math.abs(dV))) + " ";
-					else if (dV < 0)
-						s += "-";
-					// Quaters
-					dV -= Math.floor(dV);
+                    if(dV >= 1 || dV <= -1)
+                        s += Std.string(Math.floor(Math.abs(dV))) + " ";
+                    else if (dV < 0)
+                        s += "-";
+                    // Quaters
+                    dV -= Math.floor(dV);
 
-					if (dV == 0.25)
-						s += "1/4";
-					else if (dV == 0.5)
-						s += "1/2";
-					else if (dV == 0.75)
-						s += "3/4";
+                    if (dV == 0.25)
+                        s += "1/4";
+                    else if (dV == 0.5)
+                        s += "1/2";
+                    else if (dV == 0.75)
+                        s += "3/4";
 
 
-					context.graphics.font = DrawingResources.defaultFont;
-					var size:Float = context.graphics.measureText(s);
-					var sY:Float = up ? secondLoc.y - DrawingResources.defaultFontHeight - (3 * scale) : secondLoc.y + (3 * scale);
-					var sX:Float = secondLoc.x - size / 2;
+                    context.graphics.font = DrawingResources.defaultFont;
+                    var size:Float = context.graphics.measureText(s);
+                    var sY:Float = up ? secondLoc.y - DrawingResources.defaultFontHeight - (3 * scale) : secondLoc.y + (3 * scale);
+                    var sX:Float = secondLoc.x - size / 2;
 
-					fill.addString(s, DrawingResources.defaultFont, cast sX, cast sY);
-				}
-			}
-		}    
+                    fill.addString(s, DrawingResources.defaultFont, cast sX, cast sY);
+                }
+            }
+        }    
     }
 
     // paints a vibrato symbol with a scale of 1 above the full beat
@@ -1073,17 +1073,17 @@ class TablatureStave extends Stave
         var realY:Int = y + spacing.get(TapingEffect);
  
         if (beat.effect.tapping)
-		{
-			fill.addString("T", DrawingResources.defaultFont, x, realY);
-		}
-		else if (beat.effect.slapping)
-		{
-			fill.addString("S", DrawingResources.defaultFont, x, realY);
-		}
-		else if (beat.effect.popping)
-		{
-			fill.addString("P", DrawingResources.defaultFont, x, realY);
-		}
+        {
+            fill.addString("T", DrawingResources.defaultFont, x, realY);
+        }
+        else if (beat.effect.slapping)
+        {
+            fill.addString("S", DrawingResources.defaultFont, x, realY);
+        }
+        else if (beat.effect.popping)
+        {
+            fill.addString("P", DrawingResources.defaultFont, x, realY);
+        }
     }
     
     // paints two beziers lines for the fade in
@@ -1093,13 +1093,13 @@ class TablatureStave extends Stave
         
         y += spacing.get(FadeIn);
         var size:Int = Math.round(4.0 * layout.scale);
-		
-		var width:Int = beat.fullWidth();
-		var layer:DrawingLayer = context.get(DrawingLayers.VoiceDraw1);
+        
+        var width:Int = beat.fullWidth();
+        var layer:DrawingLayer = context.get(DrawingLayers.VoiceDraw1);
 
-		layer.startFigure();
-		layer.addBezier(x, y, x, y, x + width, y, x + width, y - size);
-		layer.startFigure();
+        layer.startFigure();
+        layer.addBezier(x, y, x, y, x + width, y, x + width, y - size);
+        layer.startFigure();
         layer.addBezier(x, y, x, y, x + width, y, x + width, y + size);
     }
     
@@ -1113,22 +1113,22 @@ class TablatureStave extends Stave
         var topY:Int = y + spacing.get(Tablature);
         var bottomY:Int = topY + Math.round((beat.measure.track.stringCount() - 1) * layout.stringSpacing);
         
-		var layer:DrawingLayer = context.get(DrawingLayers.MainComponentsDraw);
-		layer.startFigure();
+        var layer:DrawingLayer = context.get(DrawingLayers.MainComponentsDraw);
+        layer.startFigure();
         
         layer.startFigure();
         layer.addLine(x, topY, x, bottomY);
         
-		if (beat.effect.stroke.direction == BeatStrokeDirection.Up)
-		{
+        if (beat.effect.stroke.direction == BeatStrokeDirection.Up)
+        {
             layer.addLine(x, topY, x + 3, topY + 5);
             layer.addLine(x, topY, x - 3, topY + 5);
-		}
-		else
-		{
+        }
+        else
+        {
             layer.addLine(x, bottomY, x + 3, bottomY - 5);
             layer.addLine(x, bottomY, x - 3, bottomY - 5);
-		}
+        }
     }
 
 }

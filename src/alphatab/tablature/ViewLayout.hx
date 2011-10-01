@@ -39,81 +39,81 @@ import alphatab.tablature.model.StaveLine;
  * This is the base class for creating layouts which arrange measures
  */
 class ViewLayout 
-{		
-	private var _cache:DrawingContext;
+{        
+    private var _cache:DrawingContext;
 
-	public var tablature:Tablature;
-	
-	// Size presets
-	public var stringSpacing :Int;
-	public var scoreLineSpacing :Float;
-	public var scale :Float;
+    public var tablature:Tablature;
     
-	public var firstMeasureSpacing :Float;
+    // Size presets
+    public var stringSpacing :Int;
+    public var scoreLineSpacing :Float;
+    public var scale :Float;
+    
+    public var firstMeasureSpacing :Float;
 
-	public var effectSpacing :Float;
-	
-	public var layoutSize:Point;
-	public var width:Int;
-	public var height:Int;
-	public var contentPadding:Padding;
+    public var effectSpacing :Float;
+    
+    public var layoutSize:Point;
+    public var width:Int;
+    public var height:Int;
+    public var contentPadding:Padding;
     
     // Returns the index of the measure drawn under the coordinates given
     public function getMeasureAt(xPos:Int, yPos:Int) : Measure {
-    	// implemented in subclass
-		return null;
+        // implemented in subclass
+        return null;
     }
-	
-	public function new() 
-	{
-		this.init(1);
-		this.contentPadding = new Padding(0, 0, 0, 0);
-	}
-	
-	public function setTablature(tablature:Tablature) : Void
-	{
-		this.tablature = tablature;
-	}
-		
-	public function init(scale:Float)
-	{
-		stringSpacing = cast (10 * scale);
+    
+    public function new() 
+    {
+        this.init(1);
+        this.contentPadding = new Padding(0, 0, 0, 0);
+    }
+    
+    public function setTablature(tablature:Tablature) : Void
+    {
+        this.tablature = tablature;
+    }
+        
+    public function init(scale:Float)
+    {
+        stringSpacing = cast (10 * scale);
         scoreLineSpacing = (8 * scale);
         this.scale = scale;
         firstMeasureSpacing = Math.round(10 * scale);
         effectSpacing = Math.round(15 * scale);
-	}
-	
-	public function paintCache(graphics:Canvas, area:Rectangle, fromX:Int, fromY:Int) : Void
-	{
-		if (_cache == null)
-		{
-			updateCache(graphics, area, fromX, fromY);
-			return;
-		}
-		_cache.draw();
-	}
-	
-	public function updateCache(graphics:Canvas, area:Rectangle, fromX:Int, fromY:Int) : Void 
-	{
-		_cache = new DrawingContext(scale);
+    }
+    
+    public function paintCache(graphics:Canvas, area:Rectangle, fromX:Int, fromY:Int) : Void
+    {
+        if (_cache == null)
+        {
+            updateCache(graphics, area, fromX, fromY);
+            return;
+        }
+        _cache.draw();
+    }
+    
+    public function updateCache(graphics:Canvas, area:Rectangle, fromX:Int, fromY:Int) : Void 
+    {
+        _cache = new DrawingContext(scale);
         _cache.graphics = graphics;
         paintSong(_cache, area, fromX, fromY);
         paintCache(graphics, area, fromX, fromY);
-	}
-	
-	public function paintSong(ctx:DrawingContext, clientArea:Rectangle, x:Int, y:Int)
-	{
-		// implemented in subclass
-	}
-	
-	public function prepareLayout(clientArea:Rectangle, x:Int, y:Int)
-	{
-		// implemented in subclass
-	}
+    }
     
-	public function getVoiceWidth(voice:Voice) : Int
-	{
+    public function paintSong(ctx:DrawingContext, clientArea:Rectangle, x:Int, y:Int)
+    {
+        // implemented in subclass
+    }
+    
+    public function prepareLayout(clientArea:Rectangle, x:Int, y:Int)
+    {
+        // implemented in subclass
+    }
+    
+    public function getVoiceWidth(voice:Voice) : Int
+    {
         var duration = voice.duration;
         if (duration != null) {
             switch (duration.value) {
@@ -133,51 +133,51 @@ class ViewLayout
                     return cast (15.0 * scale);
             }
         }
-		return cast (20.0 * scale);
-	}
-	
-	public function getNoteOrientation(x:Int, y:Int, note:Note) : Rectangle
-	{
-		var noteAsString:String = "";
-		if(note.isTiedNote) {
-			noteAsString = "L";
-		}
-		else if(note.effect.deadNote) {
-			noteAsString = "X";
-		} 
-		else
-		{
-			noteAsString = Std.string(note.value);
-		}
-		noteAsString = note.effect.ghostNote ? "(" + noteAsString + ")" : noteAsString;
-		return this.getOrientation(x,y,noteAsString);
-	}
-	
-	public function getOrientation(x:Int, y:Int, str:String) : Rectangle
-	{
-		tablature.canvas.font = DrawingResources.noteFont;
-		var size = tablature.canvas.measureText(str);
-		return new Rectangle(x,y, cast size, DrawingResources.noteFontHeight);
-	}
+        return cast (20.0 * scale);
+    }
+    
+    public function getNoteOrientation(x:Int, y:Int, note:Note) : Rectangle
+    {
+        var noteAsString:String = "";
+        if(note.isTiedNote) {
+            noteAsString = "L";
+        }
+        else if(note.effect.deadNote) {
+            noteAsString = "X";
+        } 
+        else
+        {
+            noteAsString = Std.string(note.value);
+        }
+        noteAsString = note.effect.ghostNote ? "(" + noteAsString + ")" : noteAsString;
+        return this.getOrientation(x,y,noteAsString);
+    }
+    
+    public function getOrientation(x:Int, y:Int, str:String) : Rectangle
+    {
+        tablature.canvas.font = DrawingResources.noteFont;
+        var size = tablature.canvas.measureText(str);
+        return new Rectangle(x,y, cast size, DrawingResources.noteFontHeight);
+    }
     
     public function getNoteSize(note:Note) : Point
     {
         var noteAsString:String = "";
-		if(note.isTiedNote) {
-			noteAsString = "L";
-		}
-		else if(note.effect.deadNote) {
-			noteAsString = "X";
-		} 
-		else
-		{
-			noteAsString = Std.string(note.value);
-		}
-		noteAsString = note.effect.ghostNote ? "(" + noteAsString + ")" : noteAsString;
+        if(note.isTiedNote) {
+            noteAsString = "L";
+        }
+        else if(note.effect.deadNote) {
+            noteAsString = "X";
+        } 
+        else
+        {
+            noteAsString = Std.string(note.value);
+        }
+        noteAsString = note.effect.ghostNote ? "(" + noteAsString + ")" : noteAsString;
         
         tablature.canvas.font = DrawingResources.noteFont;
-		var size:Float = tablature.canvas.measureText(noteAsString);
-		return new Point(cast size, DrawingResources.noteFontHeight);        
+        var size:Float = tablature.canvas.measureText(noteAsString);
+        return new Point(cast size, DrawingResources.noteFontHeight);        
     }
     
     public function createStaveLine(track:Track) : StaveLine

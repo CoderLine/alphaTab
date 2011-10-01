@@ -21,17 +21,17 @@ package alphatab.file.alphatex;
  */
 enum AlphaTexSymbols 
 {
-	No;
-	Eof;
-	Number;
-	DoubleDot;
-	Dot;
-	String;
-	Tuning;
-	LParensis;
-	RParensis;
-	LBrace;
-	RBrace;
-	Pipe;
-	MetaCommand;
+    No;
+    Eof;
+    Number;
+    DoubleDot;
+    Dot;
+    String;
+    Tuning;
+    LParensis;
+    RParensis;
+    LBrace;
+    RBrace;
+    Pipe;
+    MetaCommand;
 }

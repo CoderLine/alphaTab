@@ -15,18 +15,18 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  *  
  *  This code is based on the code of TuxGuitar. 
- *  	Copyright: J.Jørgen von Bargen, Julian Casadesus <julian@casadesus.com.ar>
- *  	http://tuxguitar.herac.com.ar/
+ *      Copyright: J.Jørgen von Bargen, Julian Casadesus <julian@casadesus.com.ar>
+ *      http://tuxguitar.herac.com.ar/
  */
 package alphatab.file.gpx.score;
 
 class GpxVoice 
 {
-	public var id:Int;
-	public var beatIds:Array<Int>;
-	
-	public function new()
-	{
-		
-	}
+    public var id:Int;
+    public var beatIds:Array<Int>;
+    
+    public function new()
+    {
+        
+    }
 }

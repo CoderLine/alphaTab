@@ -21,7 +21,7 @@ package alphatab.model;
  */
 class TripletFeel
 {
-	public static inline var None = 0;
-	public static inline var Eighth = 1;
-	public static inline var Sixteenth = 2;
+    public static inline var None = 0;
+    public static inline var Eighth = 1;
+    public static inline var Sixteenth = 2;
 }

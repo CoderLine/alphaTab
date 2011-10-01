@@ -161,7 +161,7 @@ class Tuning
         
         SevenStrings.push(new Tuning("Guitar 7 strings", [64,59,55,50,45,40,35], true));
 
-		SixStrings.push(new Tuning("Guitar Standard Tuning", [64,59,55,50,45,40], true));
+        SixStrings.push(new Tuning("Guitar Standard Tuning", [64,59,55,50,45,40], true));
         
         SixStrings.push(new Tuning("Guitar Tune down ½ step", [63,58,54,49,44,39]));
         SixStrings.push(new Tuning("Guitar Tune down 1 step", [62,57,53,48,43,38]));
@@ -194,15 +194,15 @@ class Tuning
         SixStrings.push(new Tuning("Guitar Nashville Tuning", [64,59,67,62,57,52]));
         SixStrings.push(new Tuning("Bass 6 Strings Tuning", [48,43,38,33,28,23]));
         SixStrings.push(new Tuning("Lute or Vihuela Tuning", [64,59,54,50,45,40]));
-		
-		FiveStrings.push(new Tuning("Bass 5 Strings Tuning", [43,38,33,28,23], true));
+        
+        FiveStrings.push(new Tuning("Bass 5 Strings Tuning", [43,38,33,28,23], true));
         FiveStrings.push(new Tuning("Banjo Dropped C Tuning", [62,59,55,48,67]));
         FiveStrings.push(new Tuning("Banjo Open D Tuning", [62,57,54,50,69]));
         FiveStrings.push(new Tuning("Banjo Open G Tuning", [62,59,55,50,67]));
         FiveStrings.push(new Tuning("Banjo G Minor Tuning", [62,58,55,50,67]));
         FiveStrings.push(new Tuning("Banjo G Modal Tuning", [62,57,55,50,67]));
-		
-		FourStrings.push(new Tuning("Bass Standard Tuning", [43,38,33,28], true));
+        
+        FourStrings.push(new Tuning("Bass Standard Tuning", [43,38,33,28], true));
         FourStrings.push(new Tuning("Bass Tune down ½ step", [42,37,32,27]));
         FourStrings.push(new Tuning("Bass Tune down 1 step", [41,36,31,26]));
         FourStrings.push(new Tuning("Bass Tune down 2 step", [39,34,29,24]));

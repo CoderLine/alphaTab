@@ -21,9 +21,9 @@ package alphatab.model.effects;
  */
 class FingeringType 
 {
-	/**
-	 * Unknown type (not documented)
-	 */
+    /**
+     * Unknown type (not documented)
+     */
     public static inline var Unknown = -2;
     /**
      * No finger, dead note

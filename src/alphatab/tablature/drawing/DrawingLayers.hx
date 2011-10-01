@@ -21,20 +21,20 @@ package alphatab.tablature.drawing;
  */
 class DrawingLayers
 {
-	public static inline var Background = 0;
-	public static inline var LayoutBackground = 1;
-	public static inline var Lines = 2;
-	public static inline var MainComponents = 3;
-	public static inline var MainComponentsDraw = 4;
-	public static inline var Voice2 = 5;
-	public static inline var VoiceEffects2 = 6;
-	public static inline var VoiceEffectsDraw2 = 7;
-	public static inline var VoiceDraw2 = 8;
-	public static inline var Voice1 = 9;
-	public static inline var VoiceEffects1 = 10;
-	public static inline var VoiceEffectsDraw1 = 11;
-	public static inline var VoiceDraw1 = 12;
-	public static inline var Red = 13;	
+    public static inline var Background = 0;
+    public static inline var LayoutBackground = 1;
+    public static inline var Lines = 2;
+    public static inline var MainComponents = 3;
+    public static inline var MainComponentsDraw = 4;
+    public static inline var Voice2 = 5;
+    public static inline var VoiceEffects2 = 6;
+    public static inline var VoiceEffectsDraw2 = 7;
+    public static inline var VoiceDraw2 = 8;
+    public static inline var Voice1 = 9;
+    public static inline var VoiceEffects1 = 10;
+    public static inline var VoiceEffectsDraw1 = 11;
+    public static inline var VoiceDraw1 = 12;
+    public static inline var Red = 13;    
 #if DEBUG_DRAWING
     public static inline var Overlays = 14;
 #end

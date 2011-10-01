@@ -25,171 +25,171 @@ import alphatab.platform.Canvas;
  */
 class DrawingLayer 
 {
-	private var _path:Array<Dynamic>;
+    private var _path:Array<Dynamic>;
     private var _defaultColor:Color;
-	private var _isFilled:Bool;
-	private var _penWidth:Float;
-	private var _currentPosition:Point;
-	
-	public function new(color:Color, isFilled:Bool, penWidth:Float) 
-	{
-		_path = new Array<Dynamic>();
-		_defaultColor = color;
-		_isFilled = isFilled;
-		_penWidth = penWidth;
-		_currentPosition = new Point(0, 0);
-	}
-	
-	public function draw(graphics:Canvas) : Void
-	{
-		graphics.textAlign = "left";
-		graphics.textBaseline = "middle";
+    private var _isFilled:Bool;
+    private var _penWidth:Float;
+    private var _currentPosition:Point;
+    
+    public function new(color:Color, isFilled:Bool, penWidth:Float) 
+    {
+        _path = new Array<Dynamic>();
+        _defaultColor = color;
+        _isFilled = isFilled;
+        _penWidth = penWidth;
+        _currentPosition = new Point(0, 0);
+    }
+    
+    public function draw(graphics:Canvas) : Void
+    {
+        graphics.textAlign = "left";
+        graphics.textBaseline = "middle";
         graphics.fillStyle = _defaultColor.asRgbString();
         graphics.strokeStyle = _defaultColor.asRgbString();
-		graphics.lineWidth = _penWidth;
+        graphics.lineWidth = _penWidth;
 
         graphics.beginPath();
-		for (elm in _path) 
+        for (elm in _path) 
         {
-			try 
+            try 
             {
-				switch (elm.Command) 
+                switch (elm.Command) 
                 {
-					case "setColor":
+                    case "setColor":
                         var col:String = elm.Color.asRgbString();
                         graphics.fillStyle = col;
                         graphics.strokeStyle = col;
-					case "startFigure":
-						finish(graphics);
-						graphics.beginPath();
-					case "closeFigure":
-                        graphics.closePath();
-						//finish(graphics);
-					case "moveTo":
-						graphics.moveTo(elm.X, elm.Y);
-						_currentPosition.x = elm.X;
-						_currentPosition.y = elm.Y;
-					case "lineTo":
-						graphics.lineTo(elm.X, elm.Y);
-						_currentPosition.x = elm.X;
-						_currentPosition.y = elm.Y;
-					case "bezierTo":
-						graphics.bezierCurveTo(elm.X1, elm.Y1, elm.X2, elm.Y2, elm.X3, elm.Y3);
-						_currentPosition.x = elm.X3;
-						_currentPosition.y = elm.Y3;
-					case "quadraticCurveTo":
-						graphics.quadraticCurveTo(elm.X1, elm.Y1, elm.X2, elm.Y2);
-						_currentPosition.x = elm.X2;
-						_currentPosition.y = elm.Y2; 
-					case "addString":
-						graphics.textBaseline = elm.BaseLine;
-						graphics.font = elm.Font;
-						graphics.fillText(elm.Text, elm.X, elm.Y);
-					case "addLine":
-						graphics.moveTo(elm.X1, elm.Y1);
-						graphics.lineTo(elm.X2, elm.Y2);
-					case "addPolygon":
-						finish(graphics);
-						graphics.beginPath();
-						graphics.moveTo(elm.Points[0].x, elm.Points[0].y);
-						var pts:Array<Point> = cast elm.Points;
-						for (pt in pts) {
-							graphics.lineTo(pt.x, pt.y);
-						}
-						graphics.closePath();
-						finish(graphics);
-						graphics.beginPath();
-					case "addBezier":
-						graphics.moveTo(elm.X1, elm.Y1);
-						graphics.bezierCurveTo(elm.X2, elm.Y2, elm.X3, elm.Y3, elm.X4, elm.Y4);
-					case "addCircle":
-						finish(graphics);
+                    case "startFigure":
+                        finish(graphics);
                         graphics.beginPath();
-						var x:Int = cast elm.X;
-						var y:Int = cast elm.Y;
-						var radius:Int = cast elm.Radius;
-						graphics.circle(x+radius, y+radius, radius);
+                    case "closeFigure":
                         graphics.closePath();
-					case "addRect":
-						graphics.rect(elm.X, elm.Y, elm.Width, elm.Height);
-				}
-			}
-			catch (err:String) 
+                        //finish(graphics);
+                    case "moveTo":
+                        graphics.moveTo(elm.X, elm.Y);
+                        _currentPosition.x = elm.X;
+                        _currentPosition.y = elm.Y;
+                    case "lineTo":
+                        graphics.lineTo(elm.X, elm.Y);
+                        _currentPosition.x = elm.X;
+                        _currentPosition.y = elm.Y;
+                    case "bezierTo":
+                        graphics.bezierCurveTo(elm.X1, elm.Y1, elm.X2, elm.Y2, elm.X3, elm.Y3);
+                        _currentPosition.x = elm.X3;
+                        _currentPosition.y = elm.Y3;
+                    case "quadraticCurveTo":
+                        graphics.quadraticCurveTo(elm.X1, elm.Y1, elm.X2, elm.Y2);
+                        _currentPosition.x = elm.X2;
+                        _currentPosition.y = elm.Y2; 
+                    case "addString":
+                        graphics.textBaseline = elm.BaseLine;
+                        graphics.font = elm.Font;
+                        graphics.fillText(elm.Text, elm.X, elm.Y);
+                    case "addLine":
+                        graphics.moveTo(elm.X1, elm.Y1);
+                        graphics.lineTo(elm.X2, elm.Y2);
+                    case "addPolygon":
+                        finish(graphics);
+                        graphics.beginPath();
+                        graphics.moveTo(elm.Points[0].x, elm.Points[0].y);
+                        var pts:Array<Point> = cast elm.Points;
+                        for (pt in pts) {
+                            graphics.lineTo(pt.x, pt.y);
+                        }
+                        graphics.closePath();
+                        finish(graphics);
+                        graphics.beginPath();
+                    case "addBezier":
+                        graphics.moveTo(elm.X1, elm.Y1);
+                        graphics.bezierCurveTo(elm.X2, elm.Y2, elm.X3, elm.Y3, elm.X4, elm.Y4);
+                    case "addCircle":
+                        finish(graphics);
+                        graphics.beginPath();
+                        var x:Int = cast elm.X;
+                        var y:Int = cast elm.Y;
+                        var radius:Int = cast elm.Radius;
+                        graphics.circle(x+radius, y+radius, radius);
+                        graphics.closePath();
+                    case "addRect":
+                        graphics.rect(elm.X, elm.Y, elm.Width, elm.Height);
+                }
+            }
+            catch (err:String) 
             {
-				throw err;
-			}
-		}
+                throw err;
+            }
+        }
         finish(graphics);
-	}
-	
-	public function startFigure(): Void
-	{
-		_path.push( { Command : "startFigure" } );
-	}
-	
-	public function closeFigure(): Void
-	{
-		_path.push( { Command : "closeFigure" } );
-	}
-	
-	public function moveTo(x:Float, y:Float): Void
-	{
-		_path.push( {
+    }
+    
+    public function startFigure(): Void
+    {
+        _path.push( { Command : "startFigure" } );
+    }
+    
+    public function closeFigure(): Void
+    {
+        _path.push( { Command : "closeFigure" } );
+    }
+    
+    public function moveTo(x:Float, y:Float): Void
+    {
+        _path.push( {
             Command: "moveTo",
             X: Math.round(x) + 0.5,
             Y: Math.round(y) + 0.5
         });
-	}
-	
-	public function bezierTo(x1:Float, y1:Float, x2:Float, y2:Float, x3:Float, y3:Float): Void{
-		_path.push({
-			Command: "bezierTo",
-			X1: x1,
-			Y1: y1,
-			X2: x2,
-			Y2: y2,
-			X3: x3,
-			Y3: y3
-		});
-	}
-	public function quadraticCurveTo(x1:Float, y1:Float, x2:Float, y2:Float): Void{
-		_path.push({
-			Command: "quadraticCurveTo",
-			X1: x1,
-			Y1: y1,
-			X2: x2,
-			Y2: y2
-		});
-	}
-	public function lineTo(x:Float,y:Float): Void{
+    }
+    
+    public function bezierTo(x1:Float, y1:Float, x2:Float, y2:Float, x3:Float, y3:Float): Void{
+        _path.push({
+            Command: "bezierTo",
+            X1: x1,
+            Y1: y1,
+            X2: x2,
+            Y2: y2,
+            X3: x3,
+            Y3: y3
+        });
+    }
+    public function quadraticCurveTo(x1:Float, y1:Float, x2:Float, y2:Float): Void{
+        _path.push({
+            Command: "quadraticCurveTo",
+            X1: x1,
+            Y1: y1,
+            X2: x2,
+            Y2: y2
+        });
+    }
+    public function lineTo(x:Float,y:Float): Void{
         _path.push({
             Command: "lineTo",
             X: (x) + 0.5,
             Y: (y) + 0.5
         });
     }
-	
-	public function addString(str:String, font:String, x:Float,y:Float, baseline:String="middle"): Void{
-		_path.push({
-			Command: "addString",
-			Text: str,
-			Font: font,
-			X: (x) + 0.5,
-			Y: (y) + 0.5,
-			BaseLine:baseline
-		});
-	}
-	public function addMusicSymbol(symbol:String, x:Float, y:Float, xScale:Float, yScale:Float = 0): Void {
-		
-		if (yScale == 0)
-		{
-			yScale = xScale;
-		}
-		var painter = new SvgPainter(this, symbol, x, y, xScale, yScale);
-		painter.paint();
-	}
-	
-	public function addLine(x1:Float, y1:Float, x2:Float, y2:Float): Void {
+    
+    public function addString(str:String, font:String, x:Float,y:Float, baseline:String="middle"): Void{
+        _path.push({
+            Command: "addString",
+            Text: str,
+            Font: font,
+            X: (x) + 0.5,
+            Y: (y) + 0.5,
+            BaseLine:baseline
+        });
+    }
+    public function addMusicSymbol(symbol:String, x:Float, y:Float, xScale:Float, yScale:Float = 0): Void {
+        
+        if (yScale == 0)
+        {
+            yScale = xScale;
+        }
+        var painter = new SvgPainter(this, symbol, x, y, xScale, yScale);
+        painter.paint();
+    }
+    
+    public function addLine(x1:Float, y1:Float, x2:Float, y2:Float): Void {
         _path.push({
             Command: "addLine",
             X1: Math.floor(x1) + 0.5,
@@ -197,8 +197,8 @@ class DrawingLayer
             X2: Math.floor(x2) + 0.5,
             Y2: Math.floor(y2) + 0.5
         });
-    }	
-	public function addDashedLine(x1:Float, y1:Float, x2:Float, y2:Float): Void {
+    }    
+    public function addDashedLine(x1:Float, y1:Float, x2:Float, y2:Float): Void {
         var dashLen:Int = 5;
     
         var dX = x2 - x1;
@@ -239,14 +239,14 @@ class DrawingLayer
         } 
     }
     
-	public function addPolygon(points:Array<Point>): Void{
+    public function addPolygon(points:Array<Point>): Void{
         _path.push({
             Command: "addPolygon",
             Points: points
         });
     }
 
-	public function addBezier (x1:Float, y1:Float, x2:Float, y2:Float, x3:Float, y3:Float, x4:Float, y4:Float): Void{
+    public function addBezier (x1:Float, y1:Float, x2:Float, y2:Float, x3:Float, y3:Float, x4:Float, y4:Float): Void{
         _path.push({
             Command: "addBezier",
             X1: x1,
@@ -269,7 +269,7 @@ class DrawingLayer
         });
     }
 
-	public function addRect (x:Float, y:Float, w:Float, h:Float) : Void {
+    public function addRect (x:Float, y:Float, w:Float, h:Float) : Void {
         _path.push({Command: "addRect",
         X:x,
         Y:y,
@@ -284,21 +284,21 @@ class DrawingLayer
     public function resetColor() {
         _path.push({Command: "setColor", Color: _defaultColor});
     }
-	
-	public function clear(): Void
-	{
-		_path = new Array<Dynamic>();
-	}
-	 
-	public function finish(graphics:Canvas): Void
-	{
-		if (_isFilled) 
-		{
-			graphics.fill();
-		}
-		else
-		{
-			graphics.stroke();
-		}
-	}
+    
+    public function clear(): Void
+    {
+        _path = new Array<Dynamic>();
+    }
+     
+    public function finish(graphics:Canvas): Void
+    {
+        if (_isFilled) 
+        {
+            graphics.fill();
+        }
+        else
+        {
+            graphics.stroke();
+        }
+    }
 }

@@ -28,11 +28,11 @@ import alphatab.file.alphatex.AlphaTexWriter;
  */
 class Main 
 {
-	/**
-	 * The main entry point of this application.
-	 */
-	static function main() 
-	{		
+    /**
+     * The main entry point of this application.
+     */
+    static function main() 
+    {        
         // nothing to do here
-	}
+    }
 }

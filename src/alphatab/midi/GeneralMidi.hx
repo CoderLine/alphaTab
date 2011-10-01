@@ -22,7 +22,7 @@ package alphatab.midi;
  */
 class GeneralMidi  
 {
-	private static var _values:Hash<Int>;
+    private static var _values:Hash<Int>;
     
     public static function getValue(name:String) : Int
     {
@@ -161,5 +161,5 @@ class GeneralMidi
         name = StringTools.replace(name.toLowerCase(), " ", "");
         return _values.exists(name) ? _values.get(name) : 0; 
     }   
-	
+    
 }

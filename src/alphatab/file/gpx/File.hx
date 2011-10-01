@@ -15,19 +15,19 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  *  
  *  This code is based on the code of TuxGuitar. 
- *  	Copyright: J.Jørgen von Bargen, Julian Casadesus <julian@casadesus.com.ar>
- *  	http://tuxguitar.herac.com.ar/
+ *      Copyright: J.Jørgen von Bargen, Julian Casadesus <julian@casadesus.com.ar>
+ *      http://tuxguitar.herac.com.ar/
  */
 package alphatab.file.gpx;
 
 class File 
 {
-	public var fileName:String;
-	public var fileContents:Array<Int>;
-	
-	public function new(fileName:String, fileContents:Array<Int>)
-	{
-		this.fileName = fileName;
-		this.fileContents = fileContents;
-	}
+    public var fileName:String;
+    public var fileContents:Array<Int>;
+    
+    public function new(fileName:String, fileContents:Array<Int>)
+    {
+        this.fileName = fileName;
+        this.fileContents = fileContents;
+    }
 }

@@ -49,19 +49,19 @@ import alphatab.tablature.ViewLayout;
  */
 class ScoreStave extends Stave
 {
-	private static var SCORE_KEYSHARP_POSITIONS:Array<Int> = [ 0, 3, -1, 2, 5, 1, 4 ];
-	private static var SCORE_KEYFLAT_POSITIONS:Array<Int> = [ 4, 1, 5, 2, 6, 3, 7 ];
+    private static var SCORE_KEYSHARP_POSITIONS:Array<Int> = [ 0, 3, -1, 2, 5, 1, 4 ];
+    private static var SCORE_KEYFLAT_POSITIONS:Array<Int> = [ 4, 1, 5, 2, 6, 3, 7 ];
     
     private static var SCORE_SHARP_POSITIONS:Array<Int> = [7, 7, 6, 6, 5, 4, 4, 3, 3, 2, 2, 1 ];
-	private static var SCORE_FLAT_POSITIONS:Array<Int> = [ 7, 6, 6, 5, 5, 4, 3, 3, 2, 2, 1, 1 ];
-    	
+    private static var SCORE_FLAT_POSITIONS:Array<Int> = [ 7, 6, 6, 5, 5, 4, 3, 3, 2, 2, 1, 1 ];
+        
     private static var SCORE_CLEF_OFFSETS:Array<Int> = [ 30, 18, 22, 24 ];
     
     private static inline var UP_OFFSET:Int = 28; 
-	private static inline var DOWN_OFFSET:Int = 28;
-	
-	private static inline var TS_NUMBER_SIZE:Int = 10;
-	
+    private static inline var DOWN_OFFSET:Int = 28;
+    
+    private static inline var TS_NUMBER_SIZE:Int = 10;
+    
     public static inline var STAVE_ID = "score";
     
     // spacings
@@ -153,10 +153,10 @@ class ScoreStave extends Stave
         var minNote = measure.minDownGroup == null ? null : measure.minDownGroup.minNote;
         if (minNote != null)
         {
-        	// get the space from top to start of lines
-        	// (take care not to mention the current offset)
-        	var currentSpaceToLines = middleLinesStart - currentTopSpacing;
-        	// calculate the real score position
+            // get the space from top to start of lines
+            // (take care not to mention the current offset)
+            var currentSpaceToLines = middleLinesStart - currentTopSpacing;
+            // calculate the real score position
             var minScoreY = getNoteScorePosY(layout, minNote) + currentSpaceToLines;
             
             // take care of note beam
@@ -177,8 +177,8 @@ class ScoreStave extends Stave
         var maxNote = measure.maxUpGroup == null ? null : measure.maxUpGroup.maxNote;
         if (maxNote != null)
         {
-        	// get the space from top to bottom of lines
-        	// (take care not to mention the current offset)
+            // get the space from top to bottom of lines
+            // (take care not to mention the current offset)
             var maxScoreY = getNoteScorePosY(layout, maxNote) + middleLinesStart;
            
            // take care of note beam
@@ -333,11 +333,11 @@ class ScoreStave extends Stave
         
         if(measure.header.timeSignature.numerator > 9 && measure.header.timeSignature.denominator.value < 10)
         {
-        	x2 += Math.round((TS_NUMBER_SIZE * layout.scale) / 2);
+            x2 += Math.round((TS_NUMBER_SIZE * layout.scale) / 2);
         }
         if(measure.header.timeSignature.numerator < 10 && measure.header.timeSignature.denominator.value > 9)
         {
-        	x1 += Math.round((TS_NUMBER_SIZE * layout.scale) / 2);
+            x1 += Math.round((TS_NUMBER_SIZE * layout.scale) / 2);
         }
 
         // numerator
@@ -348,53 +348,53 @@ class ScoreStave extends Stave
     
     private function paintTimeSignatureNumber(layout:ViewLayout, context:DrawingContext, number:Int, x:Int, y:Int)
     {
-    	if(number < 10)
-    	{
-	        var symbol = this.getTimeSignatureSymbol(number);
-	        if (symbol != null) 
-	            context.get(DrawingLayers.MainComponents).addMusicSymbol(symbol, x, y, layout.scale);
-    	}
-    	else
-    	{
-    		var firstDigit = Math.floor(number / 10);
-    		var secondDigit = number - (firstDigit * 10); 
-    		
-	        var symbol = this.getTimeSignatureSymbol(firstDigit);
-	        if (symbol != null) 
-	            context.get(DrawingLayers.MainComponents).addMusicSymbol(symbol, x, y, layout.scale);
-	        symbol = this.getTimeSignatureSymbol(secondDigit);
-	        if (symbol != null) 
-	            context.get(DrawingLayers.MainComponents).addMusicSymbol(symbol, x + TS_NUMBER_SIZE * layout.scale, y, layout.scale);
-    		
-    	}
+        if(number < 10)
+        {
+            var symbol = this.getTimeSignatureSymbol(number);
+            if (symbol != null) 
+                context.get(DrawingLayers.MainComponents).addMusicSymbol(symbol, x, y, layout.scale);
+        }
+        else
+        {
+            var firstDigit = Math.floor(number / 10);
+            var secondDigit = number - (firstDigit * 10); 
+            
+            var symbol = this.getTimeSignatureSymbol(firstDigit);
+            if (symbol != null) 
+                context.get(DrawingLayers.MainComponents).addMusicSymbol(symbol, x, y, layout.scale);
+            symbol = this.getTimeSignatureSymbol(secondDigit);
+            if (symbol != null) 
+                context.get(DrawingLayers.MainComponents).addMusicSymbol(symbol, x + TS_NUMBER_SIZE * layout.scale, y, layout.scale);
+            
+        }
     }
     
     private function getTimeSignatureSymbol(number:Int)
-	{
-		switch(number) {
-			case 0:  
-				return MusicFont.Num0;
-			case 1:  
-				return MusicFont.Num1;
-			case 2: 
-				return MusicFont.Num2;
-			case 3: 
-				return MusicFont.Num3;
-			case 4: 
-				return MusicFont.Num4;
-			case 5: 
-				return MusicFont.Num5;
-			case 6: 
-				return MusicFont.Num6;
-			case 7: 
-				return MusicFont.Num7;
-			case 8: 
-				return MusicFont.Num8;
-			case 9: 
-				return MusicFont.Num9;
-		}
-		return null;
-	}
+    {
+        switch(number) {
+            case 0:  
+                return MusicFont.Num0;
+            case 1:  
+                return MusicFont.Num1;
+            case 2: 
+                return MusicFont.Num2;
+            case 3: 
+                return MusicFont.Num3;
+            case 4: 
+                return MusicFont.Num4;
+            case 5: 
+                return MusicFont.Num5;
+            case 6: 
+                return MusicFont.Num6;
+            case 7: 
+                return MusicFont.Num7;
+            case 8: 
+                return MusicFont.Num8;
+            case 9: 
+                return MusicFont.Num9;
+        }
+        return null;
+    }
 
     private function paintText(layout:ViewLayout, context:DrawingContext, measure:MeasureDrawing, x:Int, y:Int)
     {
@@ -403,14 +403,14 @@ class ScoreStave extends Stave
         y += spacing.get(Text);
         
         for (beat in measure.beats)
-		{
-			if (beat.text != null)
-			{
+        {
+            if (beat.text != null)
+            {
                 var bd:BeatDrawing = cast beat;
                 var str = beat.text.value;
                 context.get(DrawingLayers.Voice1).addString(str, DrawingResources.defaultFont, x + bd.x, y + Math.floor(DrawingResources.defaultFontHeight/2));
-			}
-		}
+            }
+        }
     }
     
     private function paintTempo(layout:ViewLayout, context:DrawingContext, measure:MeasureDrawing, x:Int, y:Int)
@@ -490,9 +490,9 @@ class ScoreStave extends Stave
             }
         }
         
-		
+        
         context.get(DrawingLayers.MainComponents).addString(txt, DrawingResources.defaultFont, x + offset, y + offset + DrawingResources.defaultFontHeight/2);
-		
+        
     }
         
     private function paintBeats(layout:ViewLayout, context:DrawingContext, measure:MeasureDrawing, x:Int, y:Int)
@@ -525,40 +525,40 @@ class ScoreStave extends Stave
         if (!beat.isRestBeat())
         {
             var scoreY:Int = y + spacing.get(ScoreMiddleLines);
-			paintExtraLines2(context, layout, beat.minNote, x, scoreY);
-			paintExtraLines2(context, layout, beat.maxNote, x, scoreY);
+            paintExtraLines2(context, layout, beat.minNote, x, scoreY);
+            paintExtraLines2(context, layout, beat.maxNote, x, scoreY);
         }
     }
     
     private function paintExtraLines2(context:DrawingContext, layout:ViewLayout, note:NoteDrawing, x:Int, y:Int) : Void
-	{
-		var realY:Int = y + getNoteScorePosY(layout, note);
-		var x1:Float = x - 3 * layout.scale;
-		var x2:Float = x + 12 * layout.scale;
+    {
+        var realY:Int = y + getNoteScorePosY(layout, note);
+        var x1:Float = x - 3 * layout.scale;
+        var x2:Float = x + 12 * layout.scale;
 
-		var scorelineSpacing:Int = cast layout.scoreLineSpacing;
+        var scorelineSpacing:Int = cast layout.scoreLineSpacing;
 
-		if (realY < y)
-		{
-			var i = y;
-			while (i > realY)
-			{ 
-				context.get(DrawingLayers.Lines).startFigure();
-				context.get(DrawingLayers.Lines).addLine(cast x1, i, cast x2, i);
-				i -= scorelineSpacing;
-			}
-		}
-		else if (realY > (y + (scorelineSpacing * 4)))
-		{
-			var i = (y + (scorelineSpacing * 5));
-			while (i < (realY + scorelineSpacing))
-			{
-				context.get(DrawingLayers.Lines).startFigure();
-				context.get(DrawingLayers.Lines).addLine(cast x1, cast i, cast x2, cast i);
-				i += scorelineSpacing;
-			}
-		}
-	}
+        if (realY < y)
+        {
+            var i = y;
+            while (i > realY)
+            { 
+                context.get(DrawingLayers.Lines).startFigure();
+                context.get(DrawingLayers.Lines).addLine(cast x1, i, cast x2, i);
+                i -= scorelineSpacing;
+            }
+        }
+        else if (realY > (y + (scorelineSpacing * 4)))
+        {
+            var i = (y + (scorelineSpacing * 5));
+            while (i < (realY + scorelineSpacing))
+            {
+                context.get(DrawingLayers.Lines).startFigure();
+                context.get(DrawingLayers.Lines).addLine(cast x1, cast i, cast x2, cast i);
+                i += scorelineSpacing;
+            }
+        }
+    }
     
     private function paintVoice(layout:ViewLayout, context:DrawingContext, voice:VoiceDrawing, x:Int, y:Int)
     {       
@@ -587,25 +587,25 @@ class ScoreStave extends Stave
         x += Math.round(3 * layout.scale);
         y += spacing.get(ScoreMiddleLines);
 
-		var fill:DrawingLayer = voice.index == 0 ? context.get(DrawingLayers.Voice1) : context.get(DrawingLayers.Voice2);
+        var fill:DrawingLayer = voice.index == 0 ? context.get(DrawingLayers.Voice1) : context.get(DrawingLayers.Voice2);
 
-		switch (voice.duration.value)
-		{  
-			case Duration.WHOLE:
-				SilencePainter.paintWhole(fill, x, y, layout);
-			case Duration.HALF:
-				SilencePainter.paintHalf(fill, x, y, layout);
-			case Duration.QUARTER:
-				SilencePainter.paintQuarter(fill, x, y, layout);
-			case Duration.EIGHTH:
-				SilencePainter.paintEighth(fill, x, y, layout);
-			case Duration.SIXTEENTH:
-				SilencePainter.paintSixteenth(fill, x, y, layout);
-			case Duration.THIRTY_SECOND:
-				SilencePainter.paintThirtySecond(fill, x, y, layout);
-			case Duration.SIXTY_FOURTH:
-				SilencePainter.paintSixtyFourth(fill, x, y, layout);
-		}
+        switch (voice.duration.value)
+        {  
+            case Duration.WHOLE:
+                SilencePainter.paintWhole(fill, x, y, layout);
+            case Duration.HALF:
+                SilencePainter.paintHalf(fill, x, y, layout);
+            case Duration.QUARTER:
+                SilencePainter.paintQuarter(fill, x, y, layout);
+            case Duration.EIGHTH:
+                SilencePainter.paintEighth(fill, x, y, layout);
+            case Duration.SIXTEENTH:
+                SilencePainter.paintSixteenth(fill, x, y, layout);
+            case Duration.THIRTY_SECOND:
+                SilencePainter.paintThirtySecond(fill, x, y, layout);
+            case Duration.SIXTY_FOURTH:
+                SilencePainter.paintSixtyFourth(fill, x, y, layout);
+        }
 
     }
         
@@ -616,8 +616,8 @@ class ScoreStave extends Stave
         y += spacing.get(ScoreMiddleLines);
 
         
-		var fill:DrawingLayer = voice.index == 0 ? context.get(DrawingLayers.Voice1) : context.get(DrawingLayers.Voice2);
-		var draw:DrawingLayer = voice.index == 0 ? context.get(DrawingLayers.VoiceDraw1) : context.get(DrawingLayers.VoiceDraw2);
+        var fill:DrawingLayer = voice.index == 0 ? context.get(DrawingLayers.Voice1) : context.get(DrawingLayers.Voice2);
+        var draw:DrawingLayer = voice.index == 0 ? context.get(DrawingLayers.VoiceDraw1) : context.get(DrawingLayers.VoiceDraw2);
         
         if (voice.duration.value >= Duration.HALF)
         {
@@ -651,44 +651,44 @@ class ScoreStave extends Stave
                     if ((voice.joinedType == JoinedType.NoneRight || voice.joinedType == JoinedType.NoneLeft)
                         && !voice.isJoinedGreaterThanQuarter)
                     {
-						NotePainter.paintFooter(
-							fill, x, y2, voice.duration.value, rotation, layout);
+                        NotePainter.paintFooter(
+                            fill, x, y2, voice.duration.value, rotation, layout);
                     }
                     else
                     {
                         var startX:Int;
-						var endX:Int;
+                        var endX:Int;
 
-						// These two variables have to be set for the calculation of our y position
-						var startXforCalculation:Int;
-						var endXforCalculation:Int;
+                        // These two variables have to be set for the calculation of our y position
+                        var startXforCalculation:Int;
+                        var endXforCalculation:Int;
 
-						if (voice.joinedType == JoinedType.NoneRight)
-						{
-							startX = Math.floor(x + xMove);
-							endX = Math.floor(x + (6*layout.scale) + xMove);
-							startXforCalculation = voice.beatDrawing().fullX();
-							endXforCalculation = Math.floor(voice.beatDrawing().fullX() + (6*layout.scale));
-						}
-						else if (voice.joinedType == JoinedType.NoneLeft)
-						{
-							startX = Math.floor(x - (6*layout.scale) + xMove);
-							endX = Math.floor(x + xMove);
-							startXforCalculation = Math.floor(voice.beatDrawing().fullX() - (6*layout.scale));
-							endXforCalculation = voice.beatDrawing().fullX();
-						}
-						else
-						{
-							startX = Math.floor(voice.leftJoin.beatDrawing().fullX() + xMove);
-							endX = Math.ceil(voice.rightJoin.beatDrawing().fullX() + xMove);
-							startXforCalculation = voice.leftJoin.beatDrawing().fullX();
-							endXforCalculation = voice.rightJoin.beatDrawing().fullX();
-						}
+                        if (voice.joinedType == JoinedType.NoneRight)
+                        {
+                            startX = Math.floor(x + xMove);
+                            endX = Math.floor(x + (6*layout.scale) + xMove);
+                            startXforCalculation = voice.beatDrawing().fullX();
+                            endXforCalculation = Math.floor(voice.beatDrawing().fullX() + (6*layout.scale));
+                        }
+                        else if (voice.joinedType == JoinedType.NoneLeft)
+                        {
+                            startX = Math.floor(x - (6*layout.scale) + xMove);
+                            endX = Math.floor(x + xMove);
+                            startXforCalculation = Math.floor(voice.beatDrawing().fullX() - (6*layout.scale));
+                            endXforCalculation = voice.beatDrawing().fullX();
+                        }
+                        else
+                        {
+                            startX = Math.floor(voice.leftJoin.beatDrawing().fullX() + xMove);
+                            endX = Math.ceil(voice.rightJoin.beatDrawing().fullX() + xMove);
+                            startXforCalculation = voice.leftJoin.beatDrawing().fullX();
+                            endXforCalculation = voice.rightJoin.beatDrawing().fullX();
+                        }
                         
-						var hY1:Int = Math.floor(y + yMove + calculateBeamY(layout, voice.beatGroup, direction, startXforCalculation, key, clef));
-						var hY2:Int = Math.floor(y + yMove + calculateBeamY(layout, voice.beatGroup, direction, endXforCalculation, key, clef));
+                        var hY1:Int = Math.floor(y + yMove + calculateBeamY(layout, voice.beatGroup, direction, startXforCalculation, key, clef));
+                        var hY2:Int = Math.floor(y + yMove + calculateBeamY(layout, voice.beatGroup, direction, endXforCalculation, key, clef));
                         
-						NotePainter.paintBar(fill, startX, hY1, endX, hY2, index, rotation, layout.scale);
+                        NotePainter.paintBar(fill, startX, hY1, endX, hY2, index, rotation, layout.scale);
                     }
                 }
             }
@@ -714,9 +714,9 @@ class ScoreStave extends Stave
         // some variables for calculation
         var y:Int;
         var x1:Int;
-		var x2:Int;
-		var y1:Int;
-		var y2:Int;      
+        var x2:Int;
+        var y1:Int;
+        var y2:Int;      
         
         // below all notes
         if (direction == VoiceDirection.Down)
@@ -783,8 +783,8 @@ class ScoreStave extends Stave
     {
         if (voice.duration.tuplet.equals(Tuplet.NORMAL)) return;
 
-		var fill:DrawingLayer = voice.index == 0 ? context.get(DrawingLayers.Voice1) : context.get(DrawingLayers.Voice2);
-		var draw:DrawingLayer = voice.index == 0 ? context.get(DrawingLayers.VoiceDraw1) : context.get(DrawingLayers.VoiceDraw2);
+        var fill:DrawingLayer = voice.index == 0 ? context.get(DrawingLayers.Voice1) : context.get(DrawingLayers.Voice2);
+        var draw:DrawingLayer = voice.index == 0 ? context.get(DrawingLayers.VoiceDraw1) : context.get(DrawingLayers.VoiceDraw2);
         
         y += spacing.get(Triplet);
         
@@ -835,7 +835,7 @@ class ScoreStave extends Stave
         var noteHeadX = x;
         
         var fill:DrawingLayer = note.voice.index == 0 ? context.get(DrawingLayers.Voice1) : context.get(DrawingLayers.Voice2);
-		var effectLayer:DrawingLayer = note.voice.index == 0 ? context.get(DrawingLayers.VoiceEffects1) : context.get(DrawingLayers.VoiceEffects2);
+        var effectLayer:DrawingLayer = note.voice.index == 0 ? context.get(DrawingLayers.VoiceEffects1) : context.get(DrawingLayers.VoiceEffects2);
 
         // TODO: better accidental placement
         var direction = note.voiceDrawing().beatGroup.getDirection();
@@ -859,46 +859,46 @@ class ScoreStave extends Stave
         // TODO: try to place accidentals side-by-side if there is not enough space 
         if(!note.measureDrawing().track.isPercussionTrack)
         {
-			var accidentalX:Int = x - Math.floor(7 * layout.scale);
+            var accidentalX:Int = x - Math.floor(7 * layout.scale);
             if (note.voiceDrawing().anyDisplaced && direction == VoiceDirection.Down)
             {
                 accidentalX -= displaceOffset;
             }
-			var accidentalY:Int = cast (noteHeadY + 3 * layout.scale);
+            var accidentalY:Int = cast (noteHeadY + 3 * layout.scale);
             
-			if (note.getAccitental() == MeasureDrawing.NATURAL)
-			{ 
-				KeySignaturePainter.paintSmallNatural(fill, accidentalX, accidentalY , layout);
-			}
-			else if (note.getAccitental() == MeasureDrawing.SHARP)
-			{
-				KeySignaturePainter.paintSmallSharp(fill, accidentalX, accidentalY, layout);
-			}
-			else if (note.getAccitental() == MeasureDrawing.FLAT)
-			{
-				KeySignaturePainter.paintSmallFlat(fill, accidentalX, accidentalY, layout);
-			}
-		}
+            if (note.getAccitental() == MeasureDrawing.NATURAL)
+            { 
+                KeySignaturePainter.paintSmallNatural(fill, accidentalX, accidentalY , layout);
+            }
+            else if (note.getAccitental() == MeasureDrawing.SHARP)
+            {
+                KeySignaturePainter.paintSmallSharp(fill, accidentalX, accidentalY, layout);
+            }
+            else if (note.getAccitental() == MeasureDrawing.FLAT)
+            {
+                KeySignaturePainter.paintSmallFlat(fill, accidentalX, accidentalY, layout);
+            }
+        }
 
         if(note.measureDrawing().track.isPercussionTrack)
         {
             NotePainter.paintPercussion(fill, note, x, noteHeadY, layout.scale);
         }
-		else if (note.effect.isHarmonic())
-		{ 
-			var full:Bool = note.voice.duration.value >= Duration.QUARTER;
-			var layer:DrawingLayer = full ? fill : effectLayer;
-			NotePainter.paintHarmonic(layer, noteHeadX, noteHeadY, layout.scale);
-		}
-		else if (note.effect.deadNote)
-		{
-			NotePainter.paintDeadNote(fill, noteHeadX, noteHeadY, layout.scale);
-		}
-		else
-		{
-			var full:Bool = note.voice.duration.value >= Duration.QUARTER;
-			NotePainter.paintNote(fill, noteHeadX, noteHeadY, layout.scale, full);
-		}
+        else if (note.effect.isHarmonic())
+        { 
+            var full:Bool = note.voice.duration.value >= Duration.QUARTER;
+            var layer:DrawingLayer = full ? fill : effectLayer;
+            NotePainter.paintHarmonic(layer, noteHeadX, noteHeadY, layout.scale);
+        }
+        else if (note.effect.deadNote)
+        {
+            NotePainter.paintDeadNote(fill, noteHeadX, noteHeadY, layout.scale);
+        }
+        else
+        {
+            var full:Bool = note.voice.duration.value >= Duration.QUARTER;
+            NotePainter.paintNote(fill, noteHeadX, noteHeadY, layout.scale, full);
+        }
                 
         paintEffects(layout, context, note, noteHeadX, y, noteHeadY);
     }
@@ -1038,12 +1038,12 @@ class ScoreStave extends Stave
         var nextBeat:BeatDrawing = note.beatDrawing().getNextBeat();
         var nextNote:NoteDrawing = nextBeat == null ? null : cast nextBeat.getNote(note.voice.index, note.string);
                 
-		var fill:DrawingLayer = note.voice.index == 0
-							? context.get(DrawingLayers.VoiceEffects1)
-							: context.get(DrawingLayers.VoiceEffects2);
-		var draw:DrawingLayer = note.voice.index == 0
-							? context.get(DrawingLayers.VoiceEffectsDraw1)
-							: context.get(DrawingLayers.VoiceEffectsDraw2);
+        var fill:DrawingLayer = note.voice.index == 0
+                            ? context.get(DrawingLayers.VoiceEffects1)
+                            : context.get(DrawingLayers.VoiceEffects2);
+        var draw:DrawingLayer = note.voice.index == 0
+                            ? context.get(DrawingLayers.VoiceEffectsDraw1)
+                            : context.get(DrawingLayers.VoiceEffectsDraw2);
             
         var down:Bool = (note.voiceDrawing().beatGroup.getDirection() == VoiceDirection.Down);
         
@@ -1053,7 +1053,7 @@ class ScoreStave extends Stave
         var startY = y + spacing.get(ScoreMiddleLines) + getNoteScorePosY(layout, note) + noteOffset;
         var startX = x + (noteSize/2);
         
-		var endX:Float = nextNote != null ? x + (note.beatDrawing().fullWidth() + noteSize / 2)
+        var endX:Float = nextNote != null ? x + (note.beatDrawing().fullWidth() + noteSize / 2)
                                             : startX + 15 * layout.scale;
         var endY = nextNote != null ? y + spacing.get(ScoreMiddleLines) + getNoteScorePosY(layout, nextNote) + noteOffset
                             : startY;
@@ -1105,24 +1105,24 @@ class ScoreStave extends Stave
         if (!note.effect.isGrace()) return;
         
         var scale:Float = layout.scoreLineSpacing / 2.25;
-		var realX:Float = x - (10 * layout.scale);
-		var realY:Float = y - (9 * layout.scale);
-		var fill:DrawingLayer = note.voice.index == 0 ? context.get(DrawingLayers.VoiceEffects1) : context.get(DrawingLayers.VoiceEffects2);
+        var realX:Float = x - (10 * layout.scale);
+        var realY:Float = y - (9 * layout.scale);
+        var fill:DrawingLayer = note.voice.index == 0 ? context.get(DrawingLayers.VoiceEffects1) : context.get(DrawingLayers.VoiceEffects2);
         
         if (note.effect.deadNote)
         {
             realY += layout.scoreLineSpacing;
         }
 
-		var s:String = note.effect.deadNote ? MusicFont.GraceDeadNote : MusicFont.GraceNote;
-		fill.addMusicSymbol(s, cast (realX - scale * 1.33), cast realY, layout.scale);
-		if (note.effect.grace.transition == GraceEffectTransition.Hammer || note.effect.grace.transition == GraceEffectTransition.Slide)
-		{
-			var startX = x - (10*layout.scale);
-			var tieY = y + (10*layout.scale);
-			
-			TablatureStave.paintTie(layout, fill, startX, tieY, x, tieY, true);
-		}
+        var s:String = note.effect.deadNote ? MusicFont.GraceDeadNote : MusicFont.GraceNote;
+        fill.addMusicSymbol(s, cast (realX - scale * 1.33), cast realY, layout.scale);
+        if (note.effect.grace.transition == GraceEffectTransition.Hammer || note.effect.grace.transition == GraceEffectTransition.Slide)
+        {
+            var startX = x - (10*layout.scale);
+            var tieY = y + (10*layout.scale);
+            
+            TablatureStave.paintTie(layout, fill, startX, tieY, x, tieY, true);
+        }
     }
     
     private function paintTremoloPicking(layout:ViewLayout, context:DrawingContext, note:NoteDrawing, x:Int, y:Int)

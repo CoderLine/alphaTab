@@ -22,60 +22,60 @@ import alphatab.model.SongFactory;
  */
 class BendEffect
 {
-	/**
-	 * The note offset per bend point offset. 
-	 */
-	public static inline var SEMITONE_LENGTH:Int = 1;
-	/**
-	 * The max position of the bend points (x axis)
-	 */
-	public static inline var MAX_POSITION:Int = 12;
-	/**
-	 * The max value of the bend points (y axis)
-	 */
-	public static inline var MAX_VALUE:Int = SEMITONE_LENGTH * 12;
-	
-	/**
-	 * The bend preset
-	 * @see BendTypes 
-	 */
-	public var type:Int;
-	/**
-	 * The bend value used for bend presets
-	 */
-	public var value:Int;
-	
-	/**
-	 * The list of points for complex bends
-	 */
-	public var points:Array<BendPoint>;
-	 
-	/**
-	 * Initializes a new instance of the BendEffect
-	 */
-	public function new()
-	{
-		type = BendTypes.None;
-		value = 0;
-		points = new Array<BendPoint>();
-	}
-	
-	/**
-	 * Creates a clone of the current BendEffect instance.
-	 * @param factory the factory to create new objects. 
-	 * @return a duplicate of the current instance
-	 */
-	public function clone(factory:SongFactory) : BendEffect
-	{
-		var effect:BendEffect = factory.newBendEffect();
-		effect.value = value;
-		effect.type = type;
-		for(i in 0 ... this.points.length)
-		{
-			var point:BendPoint = this.points[i];
-			effect.points.push(new BendPoint(point.position, point.value, point.vibrato));
-		}
-		return effect;
-	}
+    /**
+     * The note offset per bend point offset. 
+     */
+    public static inline var SEMITONE_LENGTH:Int = 1;
+    /**
+     * The max position of the bend points (x axis)
+     */
+    public static inline var MAX_POSITION:Int = 12;
+    /**
+     * The max value of the bend points (y axis)
+     */
+    public static inline var MAX_VALUE:Int = SEMITONE_LENGTH * 12;
+    
+    /**
+     * The bend preset
+     * @see BendTypes 
+     */
+    public var type:Int;
+    /**
+     * The bend value used for bend presets
+     */
+    public var value:Int;
+    
+    /**
+     * The list of points for complex bends
+     */
+    public var points:Array<BendPoint>;
+     
+    /**
+     * Initializes a new instance of the BendEffect
+     */
+    public function new()
+    {
+        type = BendTypes.None;
+        value = 0;
+        points = new Array<BendPoint>();
+    }
+    
+    /**
+     * Creates a clone of the current BendEffect instance.
+     * @param factory the factory to create new objects. 
+     * @return a duplicate of the current instance
+     */
+    public function clone(factory:SongFactory) : BendEffect
+    {
+        var effect:BendEffect = factory.newBendEffect();
+        effect.value = value;
+        effect.type = type;
+        for(i in 0 ... this.points.length)
+        {
+            var point:BendPoint = this.points[i];
+            effect.points.push(new BendPoint(point.position, point.value, point.vibrato));
+        }
+        return effect;
+    }
 
 }

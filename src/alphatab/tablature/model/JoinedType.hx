@@ -21,8 +21,8 @@ package alphatab.tablature.model;
  */
 enum JoinedType 
 {
-	NoneLeft;
-	NoneRight;
-	Left;
-	Right;
+    NoneLeft;
+    NoneRight;
+    Left;
+    Right;
 }

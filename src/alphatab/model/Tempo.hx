@@ -21,27 +21,27 @@ package alphatab.model;
  */
 class Tempo
 {
-	public var value:Int;
-	
-	public function inUsq() : Int
-	{
-		return tempoToUsq(value);
-	}
-	
-	public function new()
-	{
-		value = 120;
-	}
-	
-	public function copy(tempo:Tempo) : Void
-	{
-		value = tempo.value;
-	}
-	
-	public static function tempoToUsq(tempo:Int) : Int
-	{
-		// BPM to microseconds per quarternote
-		return Math.floor(60000000 / tempo);
-	}
+    public var value:Int;
+    
+    public function inUsq() : Int
+    {
+        return tempoToUsq(value);
+    }
+    
+    public function new()
+    {
+        value = 120;
+    }
+    
+    public function copy(tempo:Tempo) : Void
+    {
+        value = tempo.value;
+    }
+    
+    public static function tempoToUsq(tempo:Int) : Int
+    {
+        // BPM to microseconds per quarternote
+        return Math.floor(60000000 / tempo);
+    }
 
 }

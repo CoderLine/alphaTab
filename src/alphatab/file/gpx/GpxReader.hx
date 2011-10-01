@@ -15,8 +15,8 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  *  
  *  This code is based on the code of TuxGuitar. 
- *  	Copyright: J.Jørgen von Bargen, Julian Casadesus <julian@casadesus.com.ar>
- *  	http://tuxguitar.herac.com.ar/
+ *      Copyright: J.Jørgen von Bargen, Julian Casadesus <julian@casadesus.com.ar>
+ *      http://tuxguitar.herac.com.ar/
  */
 package alphatab.file.gpx;
 
@@ -28,35 +28,35 @@ import alphatab.file.FileFormatException;
 
 class GpxReader extends SongReader
 {
-	private var _fileSystem:FileSystem;
-	
-	override public function init(data:BinaryReader, factory:SongFactory) : Void 
-	{
-		super.init(data, factory);
-		_fileSystem = new FileSystem();
-	}
-	
-	override public function readSong(): Song
-	{
-		try
-		{
-			_fileSystem.load(data);
-			
-			var reader:DocumentReader = new DocumentReader(_fileSystem.getFileContents("score.gpif"));
-			var parser:DocumentParser = new DocumentParser(factory, reader.read());
-			
-			return parser.parse();
-		}
-		catch(e:Dynamic)
-		{
-			if(Std.is(e, FileFormatException))
-			{
-				throw e;
-			}
-			else
-			{
-				throw new FileFormatException(Std.string(e));
-			}
-		}
-	}	
+    private var _fileSystem:FileSystem;
+    
+    override public function init(data:BinaryReader, factory:SongFactory) : Void 
+    {
+        super.init(data, factory);
+        _fileSystem = new FileSystem();
+    }
+    
+    override public function readSong(): Song
+    {
+        try
+        {
+            _fileSystem.load(data);
+            
+            var reader:DocumentReader = new DocumentReader(_fileSystem.getFileContents("score.gpif"));
+            var parser:DocumentParser = new DocumentParser(factory, reader.read());
+            
+            return parser.parse();
+        }
+        catch(e:Dynamic)
+        {
+            if(Std.is(e, FileFormatException))
+            {
+                throw e;
+            }
+            else
+            {
+                throw new FileFormatException(Std.string(e));
+            }
+        }
+    }    
 }

@@ -91,7 +91,7 @@ class Stave
         var x2:Int; // variable for additional calculations
         var number:String = Std.string(measure.header.number); 
         var fill:DrawingLayer = context.get(DrawingLayers.MainComponents);
-		var draw:DrawingLayer = context.get(DrawingLayers.MainComponentsDraw);
+        var draw:DrawingLayer = context.get(DrawingLayers.MainComponentsDraw);
         
         var lineWidthBig:Int = cast Math.max(1, Math.round(3.0 * layout.scale));
         
@@ -110,11 +110,11 @@ class Stave
         dotSize = cast Math.max(1, (dotSize * layout.scale));   
 
         // RepeatEndings
-		if (measure.header.isRepeatOpen)
-		{
+        if (measure.header.isRepeatOpen)
+        {
             // add a rect and a line
-			fill.addRect(x, y, lineWidthBig, bottomY - y);
-			draw.startFigure();            
+            fill.addRect(x, y, lineWidthBig, bottomY - y);
+            draw.startFigure();            
             x2 = Math.floor(x + lineWidthBig + (3 * layout.scale));
             draw.addLine(x2, y, x2, bottomY);
         
@@ -126,28 +126,28 @@ class Stave
             
             fill.addCircle(x2, centerY - yMove - dotSize, dotSize);
             fill.addCircle(x2, centerY + yMove, dotSize);
-		}
-		else
-		{
+        }
+        else
+        {
             // a simple line
-			draw.startFigure();
+            draw.startFigure();
             draw.addLine(x, y, x, bottomY);
-		}
+        }
         
         // Repeat Closings
         x += measure.width + measure.spacing;
         if (measure.header.repeatClose > 0 || measure.header.number == measure.track.measureCount())
-		{
+        {
             // add a rect and a line
             x2 = Math.floor(x - (lineWidthBig + (3 * layout.scale)));
 
             draw.startFigure();            
             draw.addLine(x2, y, x2, bottomY);            
-			fill.addRect(x - lineWidthBig, y, lineWidthBig, bottomY - y);
+            fill.addRect(x - lineWidthBig, y, lineWidthBig, bottomY - y);
 
-			if (measure.header.repeatClose > 0)
-			{
-				// two dots  
+            if (measure.header.repeatClose > 0)
+            {
+                // two dots  
                 x2 -= (Math.floor(2 * layout.scale) + dotSize);     
                 
                 var centerY = y + ((bottomY - y) / 2);            
@@ -156,19 +156,19 @@ class Stave
                 fill.addCircle(x2, centerY - yMove - dotSize, dotSize);
                 fill.addCircle(x2, centerY + yMove, dotSize);
 
-				if (index == 0)
-				{
-					var repetitions:String = ("x" + (measure.header.repeatClose + 1));
+                if (index == 0)
+                {
+                    var repetitions:String = ("x" + (measure.header.repeatClose + 1));
                     var numberSize = context.graphics.measureText(repetitions);
-					fill.addString(repetitions, DrawingResources.defaultFont, x2 - dotSize, 
+                    fill.addString(repetitions, DrawingResources.defaultFont, x2 - dotSize, 
                     y - DrawingResources.defaultFontHeight);
-				}
-			}
-		}
-		else
-		{
-			draw.startFigure();
+                }
+            }
+        }
+        else
+        {
+            draw.startFigure();
             draw.addLine(x, y, x, bottomY);
-		}
+        }
     }
 }

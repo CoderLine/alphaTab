@@ -21,7 +21,7 @@ package alphatab.model;
  */
 class VoiceDirection
 {
-	public static inline var None = 0;
-	public static inline var Up = 1;
-	public static inline var Down = 2;
+    public static inline var None = 0;
+    public static inline var Up = 1;
+    public static inline var Down = 2;
 }

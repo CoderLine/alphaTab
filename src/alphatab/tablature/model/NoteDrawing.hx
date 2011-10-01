@@ -214,21 +214,21 @@ class NoteDrawing extends Note
     }
     
     public function calculateBendOverflow(layout:ViewLayout) : Int
-	{
-		// Find Highest bend
-		var point:BendPoint = null;
-		for (curr in effect.bend.points)
-		{
-			if (point == null || point.value < curr.value)
-				point = curr;
-		}
+    {
+        // Find Highest bend
+        var point:BendPoint = null;
+        for (curr in effect.bend.points)
+        {
+            if (point == null || point.value < curr.value)
+                point = curr;
+        }
 
-		if (point == null) return 0;
+        if (point == null) return 0;
 
-		// 6px*scale movement per value 
-		var fullHeight:Float = point.value * (6 * layout.scale);
-		var heightToTabNote:Float = (string - 1) * layout.stringSpacing;
+        // 6px*scale movement per value 
+        var fullHeight:Float = point.value * (6 * layout.scale);
+        var heightToTabNote:Float = (string - 1) * layout.stringSpacing;
 
-		return Math.round(fullHeight - heightToTabNote);
-	}
+        return Math.round(fullHeight - heightToTabNote);
+    }
 }

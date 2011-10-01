@@ -29,17 +29,17 @@ class AlphaTabCsGenerator
     
     var api : JSGenApi;
     var file : CsharpFileWriter;
-	var inits : List<TypedExpr>;
-	var statics : List<{ c : ClassType, f : ClassField }>;
-	var packages : Hash<Bool>;
-	var forbidden : Hash<Bool>;
+    var inits : List<TypedExpr>;
+    var statics : List<{ c : ClassType, f : ClassField }>;
+    var packages : Hash<Bool>;
+    var forbidden : Hash<Bool>;
     var files : List<String>;
     
     var currentNamespace:String;
     var usings:Array<String>;
 
-	public function new(api) {
-		this.api = api;
+    public function new(api) {
+        this.api = api;
         
         typeMapping = new Hash<String>();
         typeMapping.set("Void", "void");
@@ -49,25 +49,25 @@ class AlphaTabCsGenerator
         typeMapping.set("String", "string");
         
         file = new CsharpFileWriter();
-		inits = new List();
-		statics = new List();
-		packages = new Hash();
-		forbidden = new Hash();
+        inits = new List();
+        statics = new List();
+        packages = new Hash();
+        forbidden = new Hash();
         files = new List<String>();
         usings = new Array<String>();
         // TODO: All keywords
-		for( x in ["byte", "short", "int", "long", "sbyte", "ushort", "uint", "ulong", "string", "public", "private", "protected", "static", "internal", "extern"] )
-			forbidden.set(x, true);
-		api.setTypeAccessor(getType);
-	}
+        for( x in ["byte", "short", "int", "long", "sbyte", "ushort", "uint", "ulong", "string", "public", "private", "protected", "static", "internal", "extern"] )
+            forbidden.set(x, true);
+        api.setTypeAccessor(getType);
+    }
     
-	function getType( t : Type ) {
-		return switch(t) {
-			case TInst(c, _): getPath(c.get());
-			case TEnum(e, _): getPath(e.get());
-			default: throw "assert";
-		};
-	}
+    function getType( t : Type ) {
+        return switch(t) {
+            case TInst(c, _): getPath(c.get());
+            case TEnum(e, _): getPath(e.get());
+            default: throw "assert";
+        };
+    }
     
     function addUsing( ns : String) {
         if(!Lambda.has(usings, ns)) {
@@ -79,16 +79,16 @@ class AlphaTabCsGenerator
         file = new CsharpFileWriter();
     } 
 
-	function getPath( t : BaseType ) {
-		return (t.pack.length == 0) ? t.name : t.pack.join(".") + "." + t.name;
-	}
+    function getPath( t : BaseType ) {
+        return (t.pack.length == 0) ? t.name : t.pack.join(".") + "." + t.name;
+    }
 
-	function checkFieldName( c : ClassType, f : ClassField ) {
-		if( forbidden.exists(f.name) )
-			Context.error("The field " + f.name + " is not allowed in C#", c.pos);
-	}
+    function checkFieldName( c : ClassType, f : ClassField ) {
+        if( forbidden.exists(f.name) )
+            Context.error("The field " + f.name + " is not allowed in C#", c.pos);
+    }
     
-	function genClass( c : ClassType ) {
+    function genClass( c : ClassType ) {
         file.println("using System;");
         file.println("using Haxe;");
         file.println();
@@ -161,7 +161,7 @@ class AlphaTabCsGenerator
         
         file.outdent();
         file.println("} // end namespace");
-	}
+    }
     
     function compileClassMember(c:ClassType, field:ClassField, isStatic:Bool) {
         
@@ -614,9 +614,9 @@ class AlphaTabCsGenerator
         
     }
 
-	function genEnum( e : EnumType ) {
+    function genEnum( e : EnumType ) {
         file.print("// TODO "); 
-	}
+    }
     
     function compileTypedExpr(t:TypedExpr) {
         var abstract:VAbstract = cast t;
@@ -810,25 +810,25 @@ class AlphaTabCsGenerator
     }
 
 
-	function genType( t : Type ) {
-		switch( t ) {
-		case TInst(c, _):
-			var c = c.get(); 
-			if ( !c.isExtern )
+    function genType( t : Type ) {
+        switch( t ) {
+        case TInst(c, _):
+            var c = c.get(); 
+            if ( !c.isExtern )
             {
                 genClass(c);
                 writeToFile(getFilePath(t));
             }
-		case TEnum(r, _):
-			var e = r.get();
-			if ( !e.isExtern ) 
+        case TEnum(r, _):
+            var e = r.get();
+            if ( !e.isExtern ) 
             {
                 genEnum(e);
                 writeToFile(getFilePath(t));
             }
-		default:
-		}
-	}
+        default:
+        }
+    }
 
     private function writeToFile(path:String)
     {
@@ -883,7 +883,7 @@ class AlphaTabCsGenerator
     
     
     
-	public function generate() {
+    public function generate() {
         
         if (!neko.FileSystem.exists(api.outputFile)) 
         {
@@ -898,23 +898,23 @@ class AlphaTabCsGenerator
                 
         // write each type into a file
         for( t in api.types )
-		{
+        {
             genType(t);
         }
             
         // main executable
-		/*if( api.main != null ) {
-			genExpr(api.main);
-			newline();
-		}
+        /*if( api.main != null ) {
+            genExpr(api.main);
+            newline();
+        }
         writeToFile(genFilePath(["Main"]));*/
-	}
+    }
 
-	#if macro
-	public static function use() {
-		Compiler.setCustomJSGenerator(function(api) new AlphaTabCsGenerator(api).generate());
-	}
-	#end
+    #if macro
+    public static function use() {
+        Compiler.setCustomJSGenerator(function(api) new AlphaTabCsGenerator(api).generate());
+    }
+    #end
 }
 
 

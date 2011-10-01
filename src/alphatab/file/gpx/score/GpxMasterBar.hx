@@ -15,21 +15,21 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  *  
  *  This code is based on the code of TuxGuitar. 
- *  	Copyright: J.Jørgen von Bargen, Julian Casadesus <julian@casadesus.com.ar>
- *  	http://tuxguitar.herac.com.ar/
+ *      Copyright: J.Jørgen von Bargen, Julian Casadesus <julian@casadesus.com.ar>
+ *      http://tuxguitar.herac.com.ar/
  */
 package alphatab.file.gpx.score;
 
 class GpxMasterBar 
 {
-	public var barIds:Array<Int>;
-	public var time:Array<Int>;
-	
-	public var repeatCount:Int;
-	public var repeatStart:Bool;
-	
-	public function new()
-	{
-		
-	}
+    public var barIds:Array<Int>;
+    public var time:Array<Int>;
+    
+    public var repeatCount:Int;
+    public var repeatStart:Bool;
+    
+    public function new()
+    {
+        
+    }
 }

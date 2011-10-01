@@ -21,8 +21,8 @@ package alphatab.model;
  */
 class MeasureClef
 {
-	public static inline var Treble = 0;
-	public static inline var Bass = 1;
-	public static inline var Tenor = 2;
-	public static inline var Alto = 3;
+    public static inline var Treble = 0;
+    public static inline var Bass = 1;
+    public static inline var Tenor = 2;
+    public static inline var Alto = 3;
 }

@@ -41,89 +41,89 @@ class HorizontalViewLayout extends ViewLayout
     }
     
     public override function init(scale:Float) : Void
-	{ 
-		super.init(scale);
-		layoutSize = new Point(width, height);
-	}
+    { 
+        super.init(scale);
+        layoutSize = new Point(width, height);
+    }
     
     // 
     // Layouting
     //
-	
-	public override function prepareLayout(clientArea:Rectangle, x:Int, y:Int) : Void
-	{
-		width = 0;
-		height = 0;
-		
-		var posY:Int = y;
-		
-		var track:Track = tablature.track;
-		var measureCount:Int = tablature.track.measures.length;
-		var nextMeasureIndex:Int = 0;
-		
-		x += contentPadding.left;
-		posY = Math.floor(posY + firstMeasureSpacing);
-		 
-		while (measureCount > nextMeasureIndex) 
+    
+    public override function prepareLayout(clientArea:Rectangle, x:Int, y:Int) : Void
+    {
+        width = 0;
+        height = 0;
+        
+        var posY:Int = y;
+        
+        var track:Track = tablature.track;
+        var measureCount:Int = tablature.track.measures.length;
+        var nextMeasureIndex:Int = 0;
+        
+        x += contentPadding.left;
+        posY = Math.floor(posY + firstMeasureSpacing);
+         
+        while (measureCount > nextMeasureIndex) 
         {
             // calculate a stave line
-			_line = getStaveLine(track, nextMeasureIndex, posY, x);
+            _line = getStaveLine(track, nextMeasureIndex, posY, x);
 
             // add it to offset
             posY += _line.getHeight();
-			
+            
             // next measure index
-			nextMeasureIndex = _line.lastIndex() + 1;
-		}
+            nextMeasureIndex = _line.lastIndex() + 1;
+        }
         
         height = posY + contentPadding.bottom;
-		
-		width = _line.width + PAGE_PADDING.getHorizontal();
+        
+        width = _line.width + PAGE_PADDING.getHorizontal();
         layoutSize = new Point(width, height);
-	}
+    }
         
     public function getStaveLine(track:Track, startIndex:Int, y:Int, x:Int) : StaveLine
-	{
-		var line:StaveLine = createStaveLine(track);
-		line.y = y;
-		line.x = x;
+    {
+        var line:StaveLine = createStaveLine(track);
+        line.y = y;
+        line.x = x;
                 
         // default spacings
         line.spacing.set(StaveLine.TopPadding, Math.floor(10 * scale));
         line.spacing.set(StaveLine.BottomSpacing, Math.floor(10 * scale));
-		
-		var measureCount = track.measureCount(); 
+        
+        var measureCount = track.measureCount(); 
         x = 0;
-		for (i in startIndex ... measureCount) 
+        for (i in startIndex ... measureCount) 
         {
-			var measure:MeasureDrawing = cast track.measures[i];
+            var measure:MeasureDrawing = cast track.measures[i];
             measure.staveLine = line;
             measure.performLayout(this);            
             
             measure.x = x;            
-			x += measure.width;            
+            x += measure.width;            
             
             for (stave in line.staves)
             {
                 stave.prepare(measure);
             }
-            		
-			line.addMeasure(i);
-		}
+                    
+            line.addMeasure(i);
+        }
         line.width = x;        
-		return line;
-	}
+        return line;
+    }
     
  
-	//
+    //
     // Painting
     //
-	
-	public override function paintSong(ctx:DrawingContext, clientArea:Rectangle, x:Int, y:Int) : Void
-	{
-		var track:Track = tablature.track;
-		y = Math.floor(y + contentPadding.top + firstMeasureSpacing);
+    
+    public override function paintSong(ctx:DrawingContext, clientArea:Rectangle, x:Int, y:Int) : Void
+    {
+        var track:Track = tablature.track;
+        y = Math.floor(y + contentPadding.top + firstMeasureSpacing);
         _line.paint(this, track, ctx);
-	}
-	
+    }
+    
 }

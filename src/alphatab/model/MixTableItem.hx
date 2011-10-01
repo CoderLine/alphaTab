@@ -22,14 +22,14 @@ package alphatab.model;
  */
 class MixTableItem
 {
-	public var value:Int;
-	public var duration:Int;
-	public var allTracks:Bool;
-	
-	public function new() 
-	{
-		value = 0;
-		duration = 0;
-		allTracks = false;
-	}
+    public var value:Int;
+    public var duration:Int;
+    public var allTracks:Bool;
+    
+    public function new() 
+    {
+        value = 0;
+        duration = 0;
+        allTracks = false;
+    }
 }

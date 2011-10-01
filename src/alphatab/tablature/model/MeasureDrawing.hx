@@ -30,7 +30,7 @@ import alphatab.tablature.ViewLayout;
 class MeasureDrawing extends Measure
 {    
     public static var ACCIDENTAL_SHARP_NOTES:Array<Int> = [ 0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6 ];
-	public static var ACCIDENTAL_FLAT_NOTES:Array<Int> = [ 0, 1, 1, 2, 2, 3, 4, 4, 5, 5, 6, 6 ];
+    public static var ACCIDENTAL_FLAT_NOTES:Array<Int> = [ 0, 1, 1, 2, 2, 3, 4, 4, 5, 5, 6, 6 ];
     // stores which notes in an octave get an accidental
     public static var ACCIDENTAL_NOTES:Array<Bool> = [ false, true, false, true, false, false,
                                                        true, false, true, false, true, false];
@@ -43,44 +43,44 @@ class MeasureDrawing extends Measure
                                                        
     // Stores for all key signatures which note will get what accidental        
     // TODO: find out if this can be calculated instead of this table
-	public static var ACCIDENTALS:Array<Array<Int>> = [
-		/*//------------NATURAL------------------------------------
-		[NONE, SHARP, NONE, SHARP, NONE, NONE, SHARP, NONE, SHARP, NONE, SHARP, NONE, NONE ], // NATURAL
-		//------------SHARPS------------------------------------
-		[NONE, SHARP, NONE, SHARP, NONE, NATURAL, SHARP, NONE, SHARP, NONE, SHARP, NONE, NONE ], // 1 SHARP
-		[NATURAL, SHARP, NONE, SHARP, NONE, NATURAL, SHARP, NONE, SHARP, NONE, SHARP, NONE, NATURAL ], // 2 SHARPS
-		[NATURAL, SHARP, NONE, SHARP, NONE, NATURAL, SHARP, NATURAL, NONE, NONE, SHARP, NONE, NATURAL ], // 3 SHARPS
-		[NATURAL, SHARP, NATURAL, SHARP, NONE, NATURAL, SHARP, NATURAL, NONE, NONE, SHARP, NONE, NATURAL ], // 4 SHARPS
-		[NATURAL, SHARP, NATURAL, SHARP, NONE, NATURAL, SHARP, NATURAL, NONE, NATURAL, SHARP, NONE, NATURAL ], // 5 SHARPS
-		[NATURAL, SHARP, NATURAL, SHARP, NATURAL, NATURAL, SHARP, NATURAL, NONE, NATURAL, SHARP, NONE, NATURAL ], // 6 SHARPS
-		[NATURAL, SHARP, NATURAL, SHARP, NATURAL, NATURAL, SHARP, NATURAL, NONE, NATURAL, SHARP, NATURAL, NATURAL ], // 7 SHARPS
-		//------------FLATS------------------------------------
-		[NONE, FLAT, NATURAL, FLAT, NONE, NONE, FLAT, NATURAL, FLAT, NATURAL, NONE, NATURAL, NONE ], // 1 FLAT
-		[NONE, FLAT, NATURAL, NONE, NATURAL, NONE, FLAT, NATURAL, FLAT, NATURAL, NONE, NATURAL, NONE ], // 2 FLATS
-		[NONE, FLAT, NATURAL, NONE, NATURAL, NONE, FLAT, NATURAL, NONE, NATURAL, NONE, NATURAL, NONE ], // 3 FLATS
-		[NONE, NONE, NATURAL, NONE, NATURAL, NONE, FLAT, NATURAL, NONE, NATURAL, NONE, NATURAL, NONE ], // 4 FLATS
-		[NONE, NONE, NATURAL, NONE, NATURAL, NONE, NONE, NATURAL, NONE, NATURAL, NONE, NATURAL, NONE ], // 5 FLATS
-		[NATURAL, NONE, NATURAL, NONE, NATURAL, NONE, NONE, NATURAL, NONE, NATURAL, NONE, NATURAL, NATURAL ], // 6 FLATS
-		[NATURAL, NONE, NATURAL, NONE, NATURAL, NATURAL, NONE, NATURAL, NONE, NATURAL, NONE, NATURAL, NATURAL ] // 7 FLATS		*/
+    public static var ACCIDENTALS:Array<Array<Int>> = [
+        /*//------------NATURAL------------------------------------
+        [NONE, SHARP, NONE, SHARP, NONE, NONE, SHARP, NONE, SHARP, NONE, SHARP, NONE, NONE ], // NATURAL
+        //------------SHARPS------------------------------------
+        [NONE, SHARP, NONE, SHARP, NONE, NATURAL, SHARP, NONE, SHARP, NONE, SHARP, NONE, NONE ], // 1 SHARP
+        [NATURAL, SHARP, NONE, SHARP, NONE, NATURAL, SHARP, NONE, SHARP, NONE, SHARP, NONE, NATURAL ], // 2 SHARPS
+        [NATURAL, SHARP, NONE, SHARP, NONE, NATURAL, SHARP, NATURAL, NONE, NONE, SHARP, NONE, NATURAL ], // 3 SHARPS
+        [NATURAL, SHARP, NATURAL, SHARP, NONE, NATURAL, SHARP, NATURAL, NONE, NONE, SHARP, NONE, NATURAL ], // 4 SHARPS
+        [NATURAL, SHARP, NATURAL, SHARP, NONE, NATURAL, SHARP, NATURAL, NONE, NATURAL, SHARP, NONE, NATURAL ], // 5 SHARPS
+        [NATURAL, SHARP, NATURAL, SHARP, NATURAL, NATURAL, SHARP, NATURAL, NONE, NATURAL, SHARP, NONE, NATURAL ], // 6 SHARPS
+        [NATURAL, SHARP, NATURAL, SHARP, NATURAL, NATURAL, SHARP, NATURAL, NONE, NATURAL, SHARP, NATURAL, NATURAL ], // 7 SHARPS
+        //------------FLATS------------------------------------
+        [NONE, FLAT, NATURAL, FLAT, NONE, NONE, FLAT, NATURAL, FLAT, NATURAL, NONE, NATURAL, NONE ], // 1 FLAT
+        [NONE, FLAT, NATURAL, NONE, NATURAL, NONE, FLAT, NATURAL, FLAT, NATURAL, NONE, NATURAL, NONE ], // 2 FLATS
+        [NONE, FLAT, NATURAL, NONE, NATURAL, NONE, FLAT, NATURAL, NONE, NATURAL, NONE, NATURAL, NONE ], // 3 FLATS
+        [NONE, NONE, NATURAL, NONE, NATURAL, NONE, FLAT, NATURAL, NONE, NATURAL, NONE, NATURAL, NONE ], // 4 FLATS
+        [NONE, NONE, NATURAL, NONE, NATURAL, NONE, NONE, NATURAL, NONE, NATURAL, NONE, NATURAL, NONE ], // 5 FLATS
+        [NATURAL, NONE, NATURAL, NONE, NATURAL, NONE, NONE, NATURAL, NONE, NATURAL, NONE, NATURAL, NATURAL ], // 6 FLATS
+        [NATURAL, NONE, NATURAL, NONE, NATURAL, NATURAL, NONE, NATURAL, NONE, NATURAL, NONE, NATURAL, NATURAL ] // 7 FLATS        */
         //------------NATURAL------------------------------------
-		[NATURAL, NATURAL, NATURAL, NATURAL, NATURAL, NATURAL, NATURAL], // NATURAL
-		//------------SHARPS------------------------------------
-		[NATURAL, NATURAL, NATURAL, SHARP, NATURAL, NATURAL, NATURAL], // 1 SHARP
-		[SHARP, NATURAL, NATURAL, SHARP, NATURAL, NATURAL, NATURAL], // 2 SHARPS
-		[SHARP, NATURAL, NATURAL, SHARP, SHARP, NATURAL, NATURAL], // 3 SHARPS
-		[SHARP, SHARP, NATURAL, SHARP, SHARP, NATURAL, NATURAL], // 4 SHARPS
-		[SHARP, SHARP, NATURAL, SHARP, SHARP, SHARP, NATURAL], // 5 SHARPS
-		[SHARP, SHARP, SHARP, SHARP, SHARP, SHARP, NATURAL], // 6 SHARPS
-		[SHARP, SHARP, SHARP, SHARP, SHARP, SHARP, SHARP], // 7 SHARPS
-		//------------FLATS------------------------------------
-		[NATURAL, NATURAL, NATURAL, NATURAL, NATURAL, NATURAL, FLAT], // 1 FLAT
-		[NATURAL, NATURAL, FLAT, NATURAL, NATURAL, NATURAL, FLAT], // 2 FLATS
-		[NATURAL, NATURAL, FLAT, NATURAL, NATURAL, FLAT, FLAT], // 3 FLATS
-		[NATURAL, FLAT, FLAT, NATURAL, NATURAL, FLAT, FLAT], // 4 FLATS
-		[NATURAL, FLAT, FLAT, NATURAL, FLAT, FLAT, FLAT], // 5 FLATS
-		[FLAT, FLAT, FLAT, NATURAL, FLAT, FLAT, FLAT], // 6 FLATS
-		[FLAT, FLAT, FLAT, FLAT, FLAT, FLAT, FLAT] // 7 FLATS        
-	];
+        [NATURAL, NATURAL, NATURAL, NATURAL, NATURAL, NATURAL, NATURAL], // NATURAL
+        //------------SHARPS------------------------------------
+        [NATURAL, NATURAL, NATURAL, SHARP, NATURAL, NATURAL, NATURAL], // 1 SHARP
+        [SHARP, NATURAL, NATURAL, SHARP, NATURAL, NATURAL, NATURAL], // 2 SHARPS
+        [SHARP, NATURAL, NATURAL, SHARP, SHARP, NATURAL, NATURAL], // 3 SHARPS
+        [SHARP, SHARP, NATURAL, SHARP, SHARP, NATURAL, NATURAL], // 4 SHARPS
+        [SHARP, SHARP, NATURAL, SHARP, SHARP, SHARP, NATURAL], // 5 SHARPS
+        [SHARP, SHARP, SHARP, SHARP, SHARP, SHARP, NATURAL], // 6 SHARPS
+        [SHARP, SHARP, SHARP, SHARP, SHARP, SHARP, SHARP], // 7 SHARPS
+        //------------FLATS------------------------------------
+        [NATURAL, NATURAL, NATURAL, NATURAL, NATURAL, NATURAL, FLAT], // 1 FLAT
+        [NATURAL, NATURAL, FLAT, NATURAL, NATURAL, NATURAL, FLAT], // 2 FLATS
+        [NATURAL, NATURAL, FLAT, NATURAL, NATURAL, FLAT, FLAT], // 3 FLATS
+        [NATURAL, FLAT, FLAT, NATURAL, NATURAL, FLAT, FLAT], // 4 FLATS
+        [NATURAL, FLAT, FLAT, NATURAL, FLAT, FLAT, FLAT], // 5 FLATS
+        [FLAT, FLAT, FLAT, NATURAL, FLAT, FLAT, FLAT], // 6 FLATS
+        [FLAT, FLAT, FLAT, FLAT, FLAT, FLAT, FLAT] // 7 FLATS        
+    ];
     
     private static inline var CLEF_OFFSET = 40;
     private static inline var TIME_SIGNATURE_SPACING:Int = 30;
@@ -143,48 +143,48 @@ class MeasureDrawing extends Measure
         }
     }
 
-	public function new(header:MeasureHeader)
-	{
+    public function new(header:MeasureHeader)
+    {
         super(header);
         effectsCache = new EffectsCache();
         _registeredAccidentals = new Array<Array<Bool>>();
-		for (i in 0 ... 11)
-		{
-			var a:Array<Bool> = new Array<Bool>();
-			for (j in 0 ... 7)
-			{
-				a.push(false);
-			}
-			_registeredAccidentals.push(a);
-		}
+        for (i in 0 ... 11)
+        {
+            var a:Array<Bool> = new Array<Bool>();
+            for (j in 0 ... 7)
+            {
+                a.push(false);
+            }
+            _registeredAccidentals.push(a);
+        }
         _defaultSpacings = -1;
     }
     
     public function getNoteAccitental(noteValue:Int)
     {
         if (noteValue >= 0 && noteValue < 128)
-		{
-			var key:Int = keySignature();
-			var note:Int = (noteValue % 12);
-			var octave:Int = Math.floor(noteValue / 12);
-			var accidentalValue:Int = (key <= 7 ? SHARP : FLAT);
-			var accidentalNotes:Array<Int> = (key <= 7 ? ACCIDENTAL_SHARP_NOTES : ACCIDENTAL_FLAT_NOTES);
-			var isAccidentalNote:Bool = ACCIDENTAL_NOTES[note];
-			var isAccidentalKey:Bool = ACCIDENTALS[key][accidentalNotes[note]] == accidentalValue;
+        {
+            var key:Int = keySignature();
+            var note:Int = (noteValue % 12);
+            var octave:Int = Math.floor(noteValue / 12);
+            var accidentalValue:Int = (key <= 7 ? SHARP : FLAT);
+            var accidentalNotes:Array<Int> = (key <= 7 ? ACCIDENTAL_SHARP_NOTES : ACCIDENTAL_FLAT_NOTES);
+            var isAccidentalNote:Bool = ACCIDENTAL_NOTES[note];
+            var isAccidentalKey:Bool = ACCIDENTALS[key][accidentalNotes[note]] == accidentalValue;
 
-			if (isAccidentalKey != isAccidentalNote && !_registeredAccidentals[octave][accidentalNotes[note]])
-			{
-				_registeredAccidentals[octave][accidentalNotes[note]] = true;
-				return (isAccidentalNote ? accidentalValue : NATURAL);
-			}
+            if (isAccidentalKey != isAccidentalNote && !_registeredAccidentals[octave][accidentalNotes[note]])
+            {
+                _registeredAccidentals[octave][accidentalNotes[note]] = true;
+                return (isAccidentalNote ? accidentalValue : NATURAL);
+            }
 
-			if (isAccidentalKey == isAccidentalNote && _registeredAccidentals[octave][accidentalNotes[note]])
-			{
-				_registeredAccidentals[octave][accidentalNotes[note]] = false;
-				return (isAccidentalNote ? accidentalValue : NATURAL);
-			}
-		}
-		return NONE;        
+            if (isAccidentalKey == isAccidentalNote && _registeredAccidentals[octave][accidentalNotes[note]])
+            {
+                _registeredAccidentals[octave][accidentalNotes[note]] = false;
+                return (isAccidentalNote ? accidentalValue : NATURAL);
+            }
+        }
+        return NONE;        
     }
     
     public function setSpacing(spacing:Int)
@@ -201,15 +201,15 @@ class MeasureDrawing extends Measure
     }
     
     private function clearRegisteredAccidentals() : Void
-	{
-		for (i in 0 ... 11)
-		{
-			for (n in 0 ... 7)
-			{
-				_registeredAccidentals[i][n] = false;
-			}
-		}
-	}
+    {
+        for (i in 0 ... 11)
+        {
+            for (n in 0 ... 7)
+            {
+                _registeredAccidentals[i][n] = false;
+            }
+        }
+    }
     
     // calculates the layout for this measure
     public function performLayout(layout:ViewLayout) : Void
@@ -286,41 +286,41 @@ class MeasureDrawing extends Measure
     private function calculateDivisionLength()
     {
         var defaultLenght:Int = Duration.QUARTER_TIME;
-		var denominator:Int = header.timeSignature.denominator.value;
-		switch (denominator)
-		{
-			case Duration.EIGHTH:
-				if (header.timeSignature.numerator % 3 == 0)
-					defaultLenght += Math.floor(Duration.QUARTER_TIME / 2);
-		}
-		return defaultLenght;
+        var denominator:Int = header.timeSignature.denominator.value;
+        switch (denominator)
+        {
+            case Duration.EIGHTH:
+                if (header.timeSignature.numerator % 3 == 0)
+                    defaultLenght += Math.floor(Duration.QUARTER_TIME / 2);
+        }
+        return defaultLenght;
     }
     
     public function getRealStart(currentStart:Int) : Int
-	{
-		var beatLength:Int = divisionLength;
-		var start:Int = currentStart;
-		var startBeat:Bool = start % beatLength == 0;
-		if (!startBeat)
-		{
-			/*var minDuration:Duration = new Duration();;
-			minDuration.value = Duration.SIXTY_FOURTH;
-			minDuration.tuplet.enters = 3;
-			minDuration.tuplet.times = 2;
-			var time : Int = minDuration.time();*/
-			var time : Int = Duration.MIN_TIME;
-			for (i in 0 ... time)
-			{
-				start++;
-				startBeat = start % beatLength == 0;
-				if (startBeat)
-					break;
-			}
-			if (!startBeat)
-				start = currentStart;
-		}
-		return start;
-	}
+    {
+        var beatLength:Int = divisionLength;
+        var start:Int = currentStart;
+        var startBeat:Bool = start % beatLength == 0;
+        if (!startBeat)
+        {
+            /*var minDuration:Duration = new Duration();;
+            minDuration.value = Duration.SIXTY_FOURTH;
+            minDuration.tuplet.enters = 3;
+            minDuration.tuplet.times = 2;
+            var time : Int = minDuration.time();*/
+            var time : Int = Duration.MIN_TIME;
+            for (i in 0 ... time)
+            {
+                start++;
+                startBeat = start % beatLength == 0;
+                if (startBeat)
+                    break;
+            }
+            if (!startBeat)
+                start = currentStart;
+        }
+        return start;
+    }
     
     private function registerSpacings(layout:ViewLayout)
     {
@@ -362,7 +362,7 @@ class MeasureDrawing extends Measure
         w += RIGHT_SPACING * layout.scale;
         
         _defaultSpacings = cast w;
-		return _defaultSpacings;
+        return _defaultSpacings;
     }
     
     public function getSizingFactor()
@@ -385,19 +385,19 @@ class MeasureDrawing extends Measure
     
     // the space required for drawing the timesignature
     public function calculateTimeSignatureSpacing(layout:ViewLayout) : Int
-	{
+    {
         if (!headerDrawing().shouldPaintTimeSignature(this)) return 0;
         return cast (TIME_SIGNATURE_SPACING * layout.scale);
     }
     
     // the space required for drawing the keysignature    
     public function calculateKeySignatureSpacing(layout:ViewLayout) : Int
-	{
+    {
         if (!headerDrawing().shouldPaintKeySignature(this)) return 0;
         
         // we have 7 possible keysignature symbols to get from 
         // the old keysignature to the new one
-        		        
+                        
         var newKeySignature = keySignature();
         
         // get the old keysignature, we need to mention this
@@ -435,7 +435,7 @@ class MeasureDrawing extends Measure
         // 8px per symbol
         
         
-		return Math.round((normalizingSymbols + offsetSymbols) * (8*layout.scale));
-	}
+        return Math.round((normalizingSymbols + offsetSymbols) * (8*layout.scale));
+    }
     
 }

@@ -21,35 +21,35 @@ package alphatab.model;
  */
 class Note
 {
-	public var duration:Int;
-	public var tuplet:Int;
-	public var value:Int;
-	public var velocity:Int;
-	public var string:Int;
-	public var isTiedNote:Bool;
-	public var effect:NoteEffect;
-	public var voice:Voice;
-	public var durationPercent:Float;
-	
+    public var duration:Int;
+    public var tuplet:Int;
+    public var value:Int;
+    public var velocity:Int;
+    public var string:Int;
+    public var isTiedNote:Bool;
+    public var effect:NoteEffect;
+    public var voice:Voice;
+    public var durationPercent:Float;
+    
     
     private var _realValue:Int;
-	public function realValue() : Int
-	{
+    public function realValue() : Int
+    {
         if (_realValue == -1)
         {
             _realValue = value + voice.beat.measure.track.strings[string - 1].value;
         }
-		return _realValue;
-	}
-	
-	public function new(factory:SongFactory)
-	{
+        return _realValue;
+    }
+    
+    public function new(factory:SongFactory)
+    {
         _realValue = -1;
-		value = 0;
-		velocity = Velocities.DEFAULT;
-		string = 1;
-		isTiedNote = false;
-		effect = factory.newNoteEffect();
-	}
+        value = 0;
+        velocity = Velocities.DEFAULT;
+        string = 1;
+        isTiedNote = false;
+        effect = factory.newNoteEffect();
+    }
 
 }

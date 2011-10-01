@@ -21,90 +21,90 @@ package alphatab.model;
  */
 class Measure
 {
-	public static inline var DEFAULT_CLEF:Int = MeasureClef.Treble;
-	
-	public var track:Track;
-	public var clef:Int;
-	
-	public var beats:Array<Beat>;
-	public var header:MeasureHeader;
-	
-	public inline function beatCount() : Int
-	{
-		return beats.length;
-	}
-	
-	public inline function end() : Int
-	{
-		return (start() + length());
-	}
-	
-	public inline function number() : Int
-	{
-		return header.number;
-	}
-	
-	public inline function keySignature(): Int
-	{
-		return header.keySignature;
-	}
-	
-	public inline function repeatClose() : Int
-	{
-		return header.repeatClose;
-	}
-	
-	public inline function start() : Int
-	{
-		return header.start;	
-	}
-	
-	public inline function length() : Int
-	{
-		return header.length();
-	}
-	
-	public inline function tempo() : Tempo
-	{
-		return header.tempo;
-	}
-	
-	public inline function timeSignature() : TimeSignature
-	{
-		return header.timeSignature;
-	}
+    public static inline var DEFAULT_CLEF:Int = MeasureClef.Treble;
+    
+    public var track:Track;
+    public var clef:Int;
+    
+    public var beats:Array<Beat>;
+    public var header:MeasureHeader;
+    
+    public inline function beatCount() : Int
+    {
+        return beats.length;
+    }
+    
+    public inline function end() : Int
+    {
+        return (start() + length());
+    }
+    
+    public inline function number() : Int
+    {
+        return header.number;
+    }
+    
+    public inline function keySignature(): Int
+    {
+        return header.keySignature;
+    }
+    
+    public inline function repeatClose() : Int
+    {
+        return header.repeatClose;
+    }
+    
+    public inline function start() : Int
+    {
+        return header.start;    
+    }
+    
+    public inline function length() : Int
+    {
+        return header.length();
+    }
+    
+    public inline function tempo() : Tempo
+    {
+        return header.tempo;
+    }
+    
+    public inline function timeSignature() : TimeSignature
+    {
+        return header.timeSignature;
+    }
 
-	public inline function isRepeatOpen() : Bool
-	{
-		return header.isRepeatOpen;
-	}
-	
-	public inline function tripletFeel() : Int 
-	{
-		return header.tripletFeel;
-	}
-	
-	public inline function hasMarker() : Bool
-	{
-		return header.hasMarker();
-	}
-	
-	public inline function marker() : Marker
-	{
-		return header.marker;
-	}
-	
-	public function new(header:MeasureHeader)
-	{
-		this.header = header;
-		clef = DEFAULT_CLEF;
-		beats = new Array<Beat>();
-	}
-	
-	public function addBeat(beat:Beat) : Void
-	{
-		beat.measure = this;
+    public inline function isRepeatOpen() : Bool
+    {
+        return header.isRepeatOpen;
+    }
+    
+    public inline function tripletFeel() : Int 
+    {
+        return header.tripletFeel;
+    }
+    
+    public inline function hasMarker() : Bool
+    {
+        return header.hasMarker();
+    }
+    
+    public inline function marker() : Marker
+    {
+        return header.marker;
+    }
+    
+    public function new(header:MeasureHeader)
+    {
+        this.header = header;
+        clef = DEFAULT_CLEF;
+        beats = new Array<Beat>();
+    }
+    
+    public function addBeat(beat:Beat) : Void
+    {
+        beat.measure = this;
         beat.index = beats.length;
-		beats.push(beat);
-	}
+        beats.push(beat);
+    }
 }

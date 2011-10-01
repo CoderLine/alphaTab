@@ -21,7 +21,7 @@ package alphatab.model;
  */
 class BeatStrokeDirection
 {
-	public static inline var None:Int = 0;
-	public static inline var Up:Int = 1;
-	public static inline var Down:Int = 2;
+    public static inline var None:Int = 0;
+    public static inline var Up:Int = 1;
+    public static inline var Down:Int = 2;
 }

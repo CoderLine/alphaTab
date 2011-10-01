@@ -15,29 +15,29 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  *  
  *  This code is based on the code of TuxGuitar. 
- *  	Copyright: J.Jørgen von Bargen, Julian Casadesus <julian@casadesus.com.ar>
- *  	http://tuxguitar.herac.com.ar/
+ *      Copyright: J.Jørgen von Bargen, Julian Casadesus <julian@casadesus.com.ar>
+ *      http://tuxguitar.herac.com.ar/
  */
 package alphatab.file.gpx.score;
 
 class GpxScore 
 {
-	public var title:String;
-	public var subTitle:String;
-	public var artist:String;
-	public var album:String;
-	public var words:String;
-	public var music:String;
-	public var wordsAndMusic:String;
-	public var copyright:String;
-	public var tabber:String;
-	public var instructions:String;
-	public var notices:String;
-	
-	public var pageSetup:GpxPageSetup;
+    public var title:String;
+    public var subTitle:String;
+    public var artist:String;
+    public var album:String;
+    public var words:String;
+    public var music:String;
+    public var wordsAndMusic:String;
+    public var copyright:String;
+    public var tabber:String;
+    public var instructions:String;
+    public var notices:String;
+    
+    public var pageSetup:GpxPageSetup;
 
-	public function new()
-	{
-		pageSetup = new GpxPageSetup();
-	}
+    public function new()
+    {
+        pageSetup = new GpxPageSetup();
+    }
 }

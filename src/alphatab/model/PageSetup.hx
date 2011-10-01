@@ -34,81 +34,81 @@ package alphatab.model;
  */
 class PageSetup
 {
-	/**
-	 * The size of the page in millimeter x millimeter
-	 */
-	public var pageSize:Point;
-	
-	/**
-	 * The padding between the page border and the song contents.
-	 */
-	public var pageMargin:Padding;
-	
-	/**
-	 * The zoom level of the song. 
-	 */
-	public var scoreSizeProportion:Float;
-	
-	/**
-	 * Flags which elements of the page should get rendered.
-	 */
-	public var headerAndFooter:Int;
-	
-	/**
-	 * The template which defines the text of the title. 
-	 */
-	public var title:String;
     /**
-     * The template which defines the text of the subtitle. 
+     * The size of the page in millimeter x millimeter
      */
-	public var subtitle:String;
+    public var pageSize:Point;
+    
     /**
-     * The template which defines the text of the artist. 
+     * The padding between the page border and the song contents.
      */
-	public var artist:String;
+    public var pageMargin:Padding;
+    
     /**
-     * The template which defines the text of the album. 
+     * The zoom level of the song. 
      */
-	public var album:String;
+    public var scoreSizeProportion:Float;
+    
+    /**
+     * Flags which elements of the page should get rendered.
+     */
+    public var headerAndFooter:Int;
+    
     /**
      * The template which defines the text of the title. 
      */
-	public var words:String;
+    public var title:String;
+    /**
+     * The template which defines the text of the subtitle. 
+     */
+    public var subtitle:String;
+    /**
+     * The template which defines the text of the artist. 
+     */
+    public var artist:String;
+    /**
+     * The template which defines the text of the album. 
+     */
+    public var album:String;
+    /**
+     * The template which defines the text of the title. 
+     */
+    public var words:String;
     /**
      * The template which defines the text of the music. 
      */
-	public var music:String;
+    public var music:String;
     /**
      * The template which defines the text of the wordsAndMusic. 
      */
-	public var wordsAndMusic:String;
+    public var wordsAndMusic:String;
     /**
      * The template which defines the text of the copyright. 
      */
-	public var copyright:String;
+    public var copyright:String;
     /**
      * The template which defines the text of the pageNumber. 
      */
-	public var pageNumber:String;
-	
-	/**
-	 * Initializes a new instance of the PageSetup class. 
-	 */
-	public function new()
-	{
-		pageSize = new Point(210,297);
-		pageMargin = new Padding(10,15,10,10);
-		scoreSizeProportion = 1;
-		headerAndFooter = HeaderFooterElements.ALL;
-		title = "%TITLE%";
-		subtitle = "%SUBTITLE%";
-		artist = "%ARTIST%";
-		album = "%ALBUM%";
-		words = "Words by %WORDS%";
-		music = "Music by %MUSIC%";
-		wordsAndMusic = "Words & Music by %WORDSMUSIC%";
-		copyright = "Copyright %COPYRIGHT%\n"  +
-				  "All Rights Reserved - International Copyright Secured";
-		pageNumber = "Page %N%/%P%";
-	}
+    public var pageNumber:String;
+    
+    /**
+     * Initializes a new instance of the PageSetup class. 
+     */
+    public function new()
+    {
+        pageSize = new Point(210,297);
+        pageMargin = new Padding(10,15,10,10);
+        scoreSizeProportion = 1;
+        headerAndFooter = HeaderFooterElements.ALL;
+        title = "%TITLE%";
+        subtitle = "%SUBTITLE%";
+        artist = "%ARTIST%";
+        album = "%ALBUM%";
+        words = "Words by %WORDS%";
+        music = "Music by %MUSIC%";
+        wordsAndMusic = "Words & Music by %WORDSMUSIC%";
+        copyright = "Copyright %COPYRIGHT%\n"  +
+                  "All Rights Reserved - International Copyright Secured";
+        pageNumber = "Page %N%/%P%";
+    }
 }

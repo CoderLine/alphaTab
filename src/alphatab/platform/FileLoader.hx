@@ -5,5 +5,5 @@ package alphatab.platform;
  */
 interface FileLoader 
 {
-	function loadBinary(method:String, file:String, success:BinaryReader->Void, error:String->Void) : Void;	
+    function loadBinary(method:String, file:String, success:BinaryReader->Void, error:String->Void) : Void;    
 }

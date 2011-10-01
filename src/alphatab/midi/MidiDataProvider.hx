@@ -23,12 +23,12 @@ import alphatab.model.SongFactory;
  */
 class MidiDataProvider 
 {
-	public static function getSongMidiData(song:Song, factory:SongFactory):String
-	{
-		var parser:MidiSequenceParser = new MidiSequenceParser(factory, song, MidiSequenceParserFlags.DEFAULT_PLAY_FLAGS,
-											   100, 0);
-		var sequence:MidiSequenceHandler = new MidiSequenceHandler(song.tracks.length + 2);
-		parser.parse(sequence);
-		return sequence.commands;
-	}
+    public static function getSongMidiData(song:Song, factory:SongFactory):String
+    {
+        var parser:MidiSequenceParser = new MidiSequenceParser(factory, song, MidiSequenceParserFlags.DEFAULT_PLAY_FLAGS,
+                                               100, 0);
+        var sequence:MidiSequenceHandler = new MidiSequenceHandler(song.tracks.length + 2);
+        parser.parse(sequence);
+        return sequence.commands;
+    }
 }

@@ -62,20 +62,20 @@ import alphatab.model.Padding;
 // TODO: There must be a wah wah flag somewhere. 
 class Gp5Reader extends Gp4Reader
 {
-	public function new() 
-	{
-		super();
-		initVersions(["FICHIER GUITAR PRO v5.00", "FICHIER GUITAR PRO v5.10"]);
-	}
-	
-	public override function readSong() : Song
-	{
-		if (!readVersion())
-		{
-			throw new FileFormatException("Unsupported Version");
-		}
+    public function new() 
+    {
+        super();
+        initVersions(["FICHIER GUITAR PRO v5.00", "FICHIER GUITAR PRO v5.10"]);
+    }
+    
+    public override function readSong() : Song
+    {
+        if (!readVersion())
+        {
+            throw new FileFormatException("Unsupported Version");
+        }
 
-		var song:Song = factory.newSong();
+        var song:Song = factory.newSong();
         
         readInfo(song);
         
@@ -103,32 +103,32 @@ class Gp5Reader extends Gp4Reader
         readMeasures(song);
         
         return song;
-	}
-	    
-	override private function readMeasure(measure:Measure, track:Track): Void
-	{
-		for (voice in 0 ... Beat.MAX_VOICES) {
+    }
+        
+    override private function readMeasure(measure:Measure, track:Track): Void
+    {
+        for (voice in 0 ... Beat.MAX_VOICES) {
             var start:Int = measure.start();
             var beats:Int = readInt();
             for (beat in 0 ... beats) { 
                 start += readBeat(start, measure, track, voice);
-			}
+            }
         }
         skip(1);
-	}
-	
-	override private function readBeat(start:Int, measure:Measure, track:Track, voiceIndex:Int) : Int
-	{
-		var flags:Int = readUnsignedByte();
+    }
+    
+    override private function readBeat(start:Int, measure:Measure, track:Track, voiceIndex:Int) : Int
+    {
+        var flags:Int = readUnsignedByte();
         
         var beat:Beat = getBeat(measure, start);
         var voice:Voice = beat.voices[voiceIndex];
-		
+        
         if ((flags & 0x40) != 0) {
             var beatType:Int = readUnsignedByte();
             voice.isEmpty = ((beatType & 0x02) == 0);
         }
-		
+        
         var duration:Duration = readDuration(flags);
         if ((flags & 0x02) != 0) {
             readChord(track.stringCount(), beat);
@@ -144,16 +144,16 @@ class Gp5Reader extends Gp4Reader
             beat.effect.mixTableChange = mixTableChange;
         }
         var stringFlags:Int = readUnsignedByte();
-		for (j in 0 ... 7)
-		{
-			var i:Int = 6 - j;
-			if ((stringFlags & (1 << i)) != 0 && (6 - i) < track.stringCount()) {
+        for (j in 0 ... 7)
+        {
+            var i:Int = 6 - j;
+            if ((stringFlags & (1 << i)) != 0 && (6 - i) < track.stringCount()) {
                 var guitarString:GuitarString = track.strings[6 - i].clone(factory);
                 var note:Note = readNote(guitarString, track, factory.newNoteEffect());
                 voice.addNote(note);
             }
             duration.copy(voice.duration);
-		}
+        }
         
         skip(1);
         
@@ -163,11 +163,11 @@ class Gp5Reader extends Gp4Reader
         }
         
         return (!voice.isEmpty) ? duration.time() : 0;
-	}
-	
-	override private function readNote(guitarString:GuitarString, track:Track, effect:NoteEffect) : Note
-	{
-		var flags:Int = readUnsignedByte();
+    }
+    
+    override private function readNote(guitarString:GuitarString, track:Track, effect:NoteEffect) : Note
+    {
+        var flags:Int = readUnsignedByte();
         var note:Note = factory.newNote();
         note.string = (guitarString.number);
         note.effect.accentuatedNote = (((flags & 0x40) != 0));
@@ -200,11 +200,11 @@ class Gp5Reader extends Gp4Reader
             readNoteEffects(note.effect);
         }
         return note;
-	}
-	
-	override private function readNoteEffects(noteEffect:NoteEffect) : Void
-	{
-		var flags1:Int = readUnsignedByte();
+    }
+    
+    override private function readNoteEffects(noteEffect:NoteEffect) : Void
+    {
+        var flags1:Int = readUnsignedByte();
         var flags2:Int = readUnsignedByte();
         if ((flags1 & 0x01) != 0) {
             readBend(noteEffect);
@@ -244,12 +244,12 @@ class Gp5Reader extends Gp4Reader
         noteEffect.vibrato = (((flags2 & 0x40) != 0) || noteEffect.vibrato);
         noteEffect.palmMute = (((flags2 & 0x02) != 0));
         noteEffect.staccato = (((flags2 & 0x01) != 0));
-	}
-	
-	
-	override private function readArtificialHarmonic(noteEffect:NoteEffect) : Void
-	{
-		var type:Int = readByte();
+    }
+    
+    
+    override private function readArtificialHarmonic(noteEffect:NoteEffect) : Void
+    {
+        var type:Int = readByte();
         var oHarmonic:HarmonicEffect = factory.newHarmonicEffect();
         oHarmonic.data = 0;
         switch (type) {
@@ -271,17 +271,17 @@ class Gp5Reader extends Gp4Reader
                 oHarmonic.type = (HarmonicType.Semi);
                 noteEffect.harmonic = (oHarmonic);
         }
-	}
+    }
 
-	override private function readGrace(noteEffect:NoteEffect) : Void
-	{
-		var fret:Int = readUnsignedByte();
+    override private function readGrace(noteEffect:NoteEffect) : Void
+    {
+        var fret:Int = readUnsignedByte();
         var dyn:Int = readUnsignedByte();
         var transition:Int = readByte();
         var duration:Int = readUnsignedByte();
         var flags:Int = readUnsignedByte();
         var grace:GraceEffect = factory.newGraceEffect();
-		
+        
         grace.fret = (fret);
         grace.velocity = ((Velocities.MIN_VELOCITY + (Velocities.VELOCITY_INCREMENT * dyn)) -
         Velocities.VELOCITY_INCREMENT);
@@ -299,11 +299,11 @@ class Gp5Reader extends Gp4Reader
                 grace.transition = GraceEffectTransition.Hammer;
         }
         noteEffect.grace = (grace);
-	}
-	
-	override private function readMixTableChange(measure:Measure) : MixTableChange
-	{
-		var tableChange:MixTableChange = factory.newMixTableChange();
+    }
+    
+    override private function readMixTableChange(measure:Measure) : MixTableChange
+    {
+        var tableChange:MixTableChange = factory.newMixTableChange();
         tableChange.instrument.value = readByte();
         skip(16); // Rse Info 
         tableChange.volume.value = readByte();
@@ -344,7 +344,7 @@ class Gp5Reader extends Gp4Reader
             tableChange.tremolo = null;
         if (tableChange.tempo.value >= 0) {
             tableChange.tempo.duration = readByte();
-			measure.tempo().value = tableChange.tempo.value;
+            measure.tempo().value = tableChange.tempo.value;
             tableChange.hideTempo = _versionIndex > 0 && readBool();
         }
         else 
@@ -372,12 +372,12 @@ class Gp5Reader extends Gp4Reader
             readIntSizeCheckByteString();
         }
         return tableChange;
-	}
+    }
 
-	
-	override private function readChord(stringCount:Int, beat:Beat)
-	{
-		var chord:Chord = factory.newChord(stringCount);
+    
+    override private function readChord(stringCount:Int, beat:Beat)
+    {
+        var chord:Chord = factory.newChord(stringCount);
         skip(17);
         chord.name = (readByteSizeString(21));
         skip(4);
@@ -392,24 +392,24 @@ class Gp5Reader extends Gp4Reader
         if (chord.noteCount() > 0) {
             beat.setChord(chord);
         }
-	}
-	
-	override private function readTracks(song:Song, trackCount:Int, channels:Array<MidiChannel>) : Void
-	{
-		for (i in 1 ... trackCount + 1) {
+    }
+    
+    override private function readTracks(song:Song, trackCount:Int, channels:Array<MidiChannel>) : Void
+    {
+        for (i in 1 ... trackCount + 1) {
             song.addTrack(readTrack(i, channels));
         }
         skip((_versionIndex == 0 ? 2 : 1));
-	}
-	
-	override private function readTrack(number:Int, channels:Array<MidiChannel>) : Track
-	{
-		var flags:Int = readUnsignedByte();
+    }
+    
+    override private function readTrack(number:Int, channels:Array<MidiChannel>) : Track
+    {
+        var flags:Int = readUnsignedByte();
         
         if (number == 1 || _versionIndex == 0) 
             skip(1);
         var track:Track = factory.newTrack();
-		
+        
         track.isPercussionTrack = (flags & 0x1) != 0;
         track.is12StringedGuitarTrack = (flags & 0x02) != 0;
         track.isBanjoTrack = (flags & 0x04) != 0;
@@ -418,7 +418,7 @@ class Gp5Reader extends Gp4Reader
         
         var stringCount:Int = readInt();
         for (i in 0 ... 7) 
-		{
+        {
             var iTuning:Int = readInt();
             if (stringCount > i) {
                 var oString:GuitarString = factory.newString();
@@ -444,11 +444,11 @@ class Gp5Reader extends Gp4Reader
             readIntSizeCheckByteString();
         }
         return track;
-	}
-	
-	override private function readMeasureHeader(i:Int, timeSignature:TimeSignature, song:Song) : MeasureHeader
-	{
-		if (i > 0) 
+    }
+    
+    override private function readMeasureHeader(i:Int, timeSignature:TimeSignature, song:Song) : MeasureHeader
+    {
+        if (i > 0) 
             skip(1);
         
         var flags:Int = readUnsignedByte();
@@ -480,10 +480,10 @@ class Gp5Reader extends Gp4Reader
             header.keySignature = Gp3Reader.toKeySignature(readByte());
             header.keySignatureType = readByte();
         }
-		else if(header.number > 1) {
-			header.keySignature = song.measureHeaders[i-1].keySignature;
-			header.keySignatureType = song.measureHeaders[i-1].keySignatureType;
-		}
+        else if(header.number > 1) {
+            header.keySignature = song.measureHeaders[i-1].keySignature;
+            header.keySignatureType = song.measureHeaders[i-1].keySignatureType;
+        }
         header.hasDoubleBar = (flags & 0x80) != 0;
         if ((flags & 0x01) != 0) 
             skip(4);
@@ -499,12 +499,12 @@ class Gp5Reader extends Gp4Reader
                 header.tripletFeel = TripletFeel.None;
         }
         return header;
-	}
-	
-	
-	override private function readPageSetup(song:Song) : Void
-	{
-		var setup:PageSetup = factory.newPageSetup();
+    }
+    
+    
+    override private function readPageSetup(song:Song) : Void
+    {
+        var setup:PageSetup = factory.newPageSetup();
         if (_versionIndex > 0) 
             skip(19);
         setup.pageSize = new Point(readInt(), readInt());
@@ -532,10 +532,10 @@ class Gp5Reader extends Gp4Reader
         setup.copyright = readIntSizeCheckByteString() + "\n" + readIntSizeCheckByteString();
         setup.pageNumber = readIntSizeCheckByteString();
         song.pageSetup = setup;
-	}
-	
-	override private function readInfo(song:Song) {
-		song.title = (readIntSizeCheckByteString());
+    }
+    
+    override private function readInfo(song:Song) {
+        song.title = (readIntSizeCheckByteString());
         song.subtitle = readIntSizeCheckByteString();
         song.artist = (readIntSizeCheckByteString());
         song.album = (readIntSizeCheckByteString());
@@ -550,5 +550,5 @@ class Gp5Reader extends Gp4Reader
         for (i in 0 ... iNotes) {
             song.notice += readIntSizeCheckByteString() + "\n";
         }
-	}
+    }
 }

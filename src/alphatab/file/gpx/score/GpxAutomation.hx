@@ -15,22 +15,22 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  *  
  *  This code is based on the code of TuxGuitar. 
- *  	Copyright: J.Jørgen von Bargen, Julian Casadesus <julian@casadesus.com.ar>
- *  	http://tuxguitar.herac.com.ar/
+ *      Copyright: J.Jørgen von Bargen, Julian Casadesus <julian@casadesus.com.ar>
+ *      http://tuxguitar.herac.com.ar/
  */
 package alphatab.file.gpx.score;
 
 class GpxAutomation 
 {
-	public var type:String;
-	public var barId:Int;
-	public var position:Int;
-	public var linear:Bool;
-	public var visible:Bool;
-	public var value:Array<Int>;
-	
-	public function new()
-	{
-		
-	}
+    public var type:String;
+    public var barId:Int;
+    public var position:Int;
+    public var linear:Bool;
+    public var visible:Bool;
+    public var value:Array<Int>;
+    
+    public function new()
+    {
+        
+    }
 }

@@ -25,8 +25,8 @@ import alphatab.model.SongFactory;
 class MeasureHeaderDrawing extends MeasureHeader
 {
 
-	public function new(factory:SongFactory)
-	{
+    public function new(factory:SongFactory)
+    {
         super(factory);
     }
     

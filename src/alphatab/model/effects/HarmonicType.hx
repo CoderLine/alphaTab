@@ -21,28 +21,28 @@ package alphatab.model.effects;
  */
 class HarmonicType
 {
-	/**
-	 * No harmonic
-	 */
-	public static inline var None = -1;
-	/**
-	 * Natural harmonic
-	 */
-	public static inline var Natural = 0;
-	/**
-	 * Artificial harmonic
-	 */
-	public static inline var Artificial = 1;
-	/**
-	 * Tapped harmonic
-	 */
-	public static inline var Tapped = 2;
-	/**
-	 * Pinch harmonic
-	 */
-	public static inline var Pinch = 3;
-	/**
-	 * Semi harmonic
-	 */
-	public static inline var Semi = 4;
+    /**
+     * No harmonic
+     */
+    public static inline var None = -1;
+    /**
+     * Natural harmonic
+     */
+    public static inline var Natural = 0;
+    /**
+     * Artificial harmonic
+     */
+    public static inline var Artificial = 1;
+    /**
+     * Tapped harmonic
+     */
+    public static inline var Tapped = 2;
+    /**
+     * Pinch harmonic
+     */
+    public static inline var Pinch = 3;
+    /**
+     * Semi harmonic
+     */
+    public static inline var Semi = 4;
 }

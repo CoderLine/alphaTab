@@ -28,34 +28,34 @@ import alphatab.tablature.ViewLayout;
  */
 class TripletGroup 
 {
-	public var voices:Array<VoiceDrawing>;
-	private var _voiceIndex:Int;
-	public var triplet : Int;
-	
-	public function isFull()
-	{
-		return voices.length == triplet;
-	}
-	
-	public function new(voice:Int) 
-	{
-		_voiceIndex = voice;
-		voices = new Array<VoiceDrawing>();
-	}
-	
-	public function check(voice:VoiceDrawing) : Bool
-	{
-		if (voices.length == 0)
-		{ // first is everytime ok
-			triplet = voice.duration.tuplet.enters;
-		}
-		else
-		{
-			// can tripletnote be fit into this group
-			if (voice.index != _voiceIndex || voice.duration.tuplet.enters != triplet || isFull()) return false;
-		}
-		voices.push(voice);
-		
-		return true;
-	}	
+    public var voices:Array<VoiceDrawing>;
+    private var _voiceIndex:Int;
+    public var triplet : Int;
+    
+    public function isFull()
+    {
+        return voices.length == triplet;
+    }
+    
+    public function new(voice:Int) 
+    {
+        _voiceIndex = voice;
+        voices = new Array<VoiceDrawing>();
+    }
+    
+    public function check(voice:VoiceDrawing) : Bool
+    {
+        if (voices.length == 0)
+        { // first is everytime ok
+            triplet = voice.duration.tuplet.enters;
+        }
+        else
+        {
+            // can tripletnote be fit into this group
+            if (voice.index != _voiceIndex || voice.duration.tuplet.enters != triplet || isFull()) return false;
+        }
+        voices.push(voice);
+        
+        return true;
+    }    
 }

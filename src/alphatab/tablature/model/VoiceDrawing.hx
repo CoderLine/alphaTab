@@ -55,7 +55,7 @@ class VoiceDrawing extends Voice
         return beatDrawing().measureDrawing();
     }
     
-	public function new(factory:SongFactory, index:Int)
+    public function new(factory:SongFactory, index:Int)
     {
         super(factory, index);
         effectsCache = new EffectsCache();
@@ -222,15 +222,15 @@ class VoiceDrawing extends Voice
             
             if(!Lambda.has(measureDrawing().groups, beatGroup))
             {
-            	measureDrawing().groups.push(beatGroup);            	
+                measureDrawing().groups.push(beatGroup);                
             }
         }
         
         
        
         // try to add on tripletgroup of previous beat or create a new group
-		if (duration.tuplet != null && !duration.tuplet.equals(Tuplet.NORMAL))
-		{
+        if (duration.tuplet != null && !duration.tuplet.equals(Tuplet.NORMAL))
+        {
             beatDrawing().effectsCache.triplet = true;
             measureDrawing().effectsCache.triplet = true;
             
@@ -238,16 +238,16 @@ class VoiceDrawing extends Voice
             if (previousVoice != null && previousVoice.measureDrawing().staveLine != measureDrawing().staveLine)
                 previousVoice == null;
                 
-			if (previousVoice == null || previousVoice.tripletGroup == null || !previousVoice.tripletGroup.check(this))
-			{			
-				tripletGroup = new TripletGroup(index);
-				tripletGroup.check(this);
-			}
-			else
-			{
-				tripletGroup = previousVoice.tripletGroup;
-			}
-		}
+            if (previousVoice == null || previousVoice.tripletGroup == null || !previousVoice.tripletGroup.check(this))
+            {            
+                tripletGroup = new TripletGroup(index);
+                tripletGroup.check(this);
+            }
+            else
+            {
+                tripletGroup = previousVoice.tripletGroup;
+            }
+        }
     }
     
 }

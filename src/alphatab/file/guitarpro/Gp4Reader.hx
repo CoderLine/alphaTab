@@ -63,24 +63,24 @@ import alphatab.model.SongManager;
  
 class Gp4Reader extends Gp3Reader
 {
-	public function new() 
-	{
-		super();
-		initVersions(["FICHIER GUITAR PRO v4.00", "FICHIER GUITAR PRO v4.06", "FICHIER GUITAR PRO L4.06"]);
-	}
-	
-	public override function readSong() : Song
-	{
-		if (!readVersion())
-		{
-			throw new FileFormatException("Unsupported Version");
-		}
-		
-		var song:Song = factory.newSong();
+    public function new() 
+    {
+        super();
+        initVersions(["FICHIER GUITAR PRO v4.00", "FICHIER GUITAR PRO v4.06", "FICHIER GUITAR PRO L4.06"]);
+    }
+    
+    public override function readSong() : Song
+    {
+        if (!readVersion())
+        {
+            throw new FileFormatException("Unsupported Version");
+        }
+        
+        var song:Song = factory.newSong();
         
         readInfo(song);
-		
-		_tripletFeel = readBool() ? TripletFeel.Eighth : TripletFeel.None;
+        
+        _tripletFeel = readBool() ? TripletFeel.Eighth : TripletFeel.None;
         
         readLyrics(song);
         
@@ -88,7 +88,7 @@ class Gp4Reader extends Gp3Reader
         
         song.tempoName = "";
         song.tempo = readInt();
-		song.hideTempo = false;
+        song.hideTempo = false;
         
         song.key = readInt();
         song.octave = readByte();
@@ -103,34 +103,34 @@ class Gp4Reader extends Gp3Reader
         readMeasures(song);
         
         return song;
-	}
+    }
     
     override private function readLyrics(song:Song) : Void
-	{
-		song.lyrics = factory.newLyrics();
+    {
+        song.lyrics = factory.newLyrics();
         song.lyrics.trackChoice = readInt();
         for (i in 0 ... Lyrics.MAX_LINE_COUNT) 
-		{
-            var line:LyricLine = factory.newLyricLine();			
+        {
+            var line:LyricLine = factory.newLyricLine();            
             line.startingMeasure = readInt();
             line.lyrics = readIntSizeString(); 
             song.lyrics.lines.push(line);
         }
-	}
+    }
 
 
-	override private function readBeat(start:Int, measure:Measure, track:Track, voiceIndex:Int) : Int
-	{
-		var flags:Int = readUnsignedByte();
+    override private function readBeat(start:Int, measure:Measure, track:Track, voiceIndex:Int) : Int
+    {
+        var flags:Int = readUnsignedByte();
         
         var beat:Beat = getBeat(measure, start);
         var voice:Voice = beat.voices[voiceIndex];
-		
+        
         if ((flags & 0x40) != 0) {
             var beatType:Int = readUnsignedByte();
             voice.isEmpty = ((beatType & 0x02) == 0);
         }
-		
+        
         var duration:Duration = readDuration(flags);
         if ((flags & 0x02) != 0) {
             readChord(track.stringCount(), beat);
@@ -146,23 +146,23 @@ class Gp4Reader extends Gp3Reader
             beat.effect.mixTableChange = mixTableChange;
         }
         var stringFlags:Int = readUnsignedByte();
-		for (j in 0 ... 7)
-		{
-			var i:Int = 6 - j;
-			if ((stringFlags & (1 << i)) != 0 && (6 - i) < track.stringCount()) {
+        for (j in 0 ... 7)
+        {
+            var i:Int = 6 - j;
+            if ((stringFlags & (1 << i)) != 0 && (6 - i) < track.stringCount()) {
                 var guitarString = track.strings[6 - i].clone(factory);
                 var note = readNote(guitarString, track, factory.newNoteEffect());
                 voice.addNote(note);
             }
             duration.copy(voice.duration);
-		}
+        }
         
         return (!voice.isEmpty) ? duration.time() : 0;
-	}
-	
-	override private function readNoteEffects(noteEffect:NoteEffect) : Void
-	{
-		var flags1:Int = readUnsignedByte();
+    }
+    
+    override private function readNoteEffects(noteEffect:NoteEffect) : Void
+    {
+        var flags1:Int = readUnsignedByte();
         var flags2:Int = readUnsignedByte();
         if ((flags1 & 0x01) != 0) {
             readBend(noteEffect);
@@ -202,11 +202,11 @@ class Gp4Reader extends Gp3Reader
         noteEffect.vibrato = (((flags2 & 0x40) != 0) || noteEffect.vibrato);
         noteEffect.palmMute = (((flags2 & 0x02) != 0));
         noteEffect.staccato = (((flags2 & 0x01) != 0));
-	}
-	
-	private function readTrill(noteEffect:NoteEffect) : Void
-	{
-		var fret:Int = readByte();
+    }
+    
+    private function readTrill(noteEffect:NoteEffect) : Void
+    {
+        var fret:Int = readByte();
         var period:Int = readByte();
         var trill:TrillEffect = factory.newTrillEffect();
         trill.fret = (fret);
@@ -221,11 +221,11 @@ class Gp4Reader extends Gp3Reader
                 trill.duration.value = (Duration.SIXTY_FOURTH);
                 noteEffect.trill = (trill);
         }
-	}
-	
-	private function readArtificialHarmonic(noteEffect:NoteEffect) : Void
-	{
-		var type:Int = readByte();
+    }
+    
+    private function readArtificialHarmonic(noteEffect:NoteEffect) : Void
+    {
+        var type:Int = readByte();
         var oHarmonic:HarmonicEffect = factory.newHarmonicEffect();
         oHarmonic.data = 0;
         switch (type) {
@@ -242,24 +242,24 @@ class Gp4Reader extends Gp3Reader
             case 5:
                 oHarmonic.type = (HarmonicType.Semi);
                 noteEffect.harmonic = (oHarmonic);
-			case 15:
+            case 15:
                 oHarmonic.data = 2;
                 oHarmonic.type = (HarmonicType.Artificial);
                 noteEffect.harmonic = (oHarmonic);
-			case 17:
+            case 17:
                 oHarmonic.data = 3;
                 oHarmonic.type = (HarmonicType.Artificial);
                 noteEffect.harmonic = (oHarmonic);
-			case 22:
+            case 22:
                 oHarmonic.data = 0;
                 oHarmonic.type = (HarmonicType.Artificial);
                 noteEffect.harmonic = (oHarmonic);
         }
-	}
-	
-	private function readTremoloPicking(noteEffect:NoteEffect) : Void
-	{
-		var value:Int = readUnsignedByte();
+    }
+    
+    private function readTremoloPicking(noteEffect:NoteEffect) : Void
+    {
+        var value:Int = readUnsignedByte();
         var tp:TremoloPickingEffect = factory.newTremoloPickingEffect();
         switch (value) {
             case 1:
@@ -272,11 +272,11 @@ class Gp4Reader extends Gp3Reader
                 tp.duration.value = (Duration.THIRTY_SECOND);
                 noteEffect.tremoloPicking = (tp);
         }
-	}
-	
-	override private function readMixTableChange(measure:Measure) : MixTableChange
-	{
-		var tableChange:MixTableChange = factory.newMixTableChange();
+    }
+    
+    override private function readMixTableChange(measure:Measure) : MixTableChange
+    {
+        var tableChange:MixTableChange = factory.newMixTableChange();
         tableChange.instrument.value = readByte();
         tableChange.volume.value = readByte();
         tableChange.balance.value = readByte();
@@ -316,7 +316,7 @@ class Gp4Reader extends Gp3Reader
             tableChange.tremolo = null;
         if (tableChange.tempo.value >= 0) {
             tableChange.tempo.duration = readByte();
-			measure.tempo().value = tableChange.tempo.value;
+            measure.tempo().value = tableChange.tempo.value;
             tableChange.hideTempo = false;
         }
         else 
@@ -339,12 +339,12 @@ class Gp4Reader extends Gp3Reader
         if (tableChange.tempo != null) 
             tableChange.tempo.allTracks = true;
 
-		return tableChange;
-	}
-	
-	override private function readBeatEffects(beat:Beat, effect:NoteEffect)  : Void
-	{
-		var flags1:Int = readUnsignedByte();
+        return tableChange;
+    }
+    
+    override private function readBeatEffects(beat:Beat, effect:NoteEffect)  : Void
+    {
+        var flags1:Int = readUnsignedByte();
         var flags2:Int = readUnsignedByte();
         beat.effect.fadeIn = (((flags1 & 0x10) != 0));
         beat.effect.vibrato = (((flags1 & 0x02) != 0)) || beat.effect.vibrato;
@@ -375,11 +375,11 @@ class Gp4Reader extends Gp3Reader
             beat.effect.pickStroke = readByte();
             beat.effect.hasPickStroke = true;
         }
-	}
-	
-	override private function readTremoloBar(effect:BeatEffect) : Void 
-	{
-		var barEffect:BendEffect = factory.newBendEffect();
+    }
+    
+    override private function readTremoloBar(effect:BeatEffect) : Void 
+    {
+        var barEffect:BendEffect = factory.newBendEffect();
         barEffect.type = readByte();
         barEffect.value = readInt();
         var pointCount = readInt();
@@ -392,13 +392,13 @@ class Gp4Reader extends Gp3Reader
         
         if (pointCount > 0) 
             effect.tremoloBar = barEffect;
-	}
-	
-	
-	
-	override private function readChord(stringCount:Int, beat:Beat)
-	{
-		var chord:Chord = factory.newChord(stringCount);
+    }
+    
+    
+    
+    override private function readChord(stringCount:Int, beat:Beat)
+    {
+        var chord:Chord = factory.newChord(stringCount);
         if ((readUnsignedByte() & 0x01) == 0) {
             chord.name = (readIntSizeCheckByteString());
             chord.firstFret = (readInt());
@@ -425,7 +425,7 @@ class Gp4Reader extends Gp3Reader
             skip(32);
         }
         if (chord.noteCount() > 0) {
-			beat.setChord(chord);
+            beat.setChord(chord);
         }
-	}
+    }
 }

@@ -18,45 +18,45 @@ package alphatab.model;
 import alphatab.model.effects.BendEffect;
 
 /**
- * 	This class contains all beat effects.
+ *     This class contains all beat effects.
  */
 class BeatEffect 
 {
-	public var stroke:BeatStroke;
-	public var hasRasgueado:Bool;
+    public var stroke:BeatStroke;
+    public var hasRasgueado:Bool;
 
-	public var pickStroke:Int;
-	public var hasPickStroke:Bool;
-	public var chord:Chord;
+    public var pickStroke:Int;
+    public var hasPickStroke:Bool;
+    public var chord:Chord;
     public function isChord() : Bool
-	{
-		return this.chord != null;
-	}
-	
+    {
+        return this.chord != null;
+    }
+    
 
-	public var fadeIn:Bool;
-	public var vibrato:Bool;
-	
-	public var tremoloBar:BendEffect;	
-	public function isTremoloBar() : Bool
-	{
-		return this.tremoloBar != null;
-	}
-	
+    public var fadeIn:Bool;
+    public var vibrato:Bool;
+    
+    public var tremoloBar:BendEffect;    
+    public function isTremoloBar() : Bool
+    {
+        return this.tremoloBar != null;
+    }
+    
 
-	public var mixTableChange:MixTableChange;
-	
-	public var tapping: Bool;
-	public var slapping: Bool;
-	public var popping: Bool;
+    public var mixTableChange:MixTableChange;
+    
+    public var tapping: Bool;
+    public var slapping: Bool;
+    public var popping: Bool;
 
-	public function new(factory:SongFactory) 
-	{
-		tapping = false;
-		slapping = false;
-		popping = false;
-		fadeIn = false;		
-		stroke = factory.newStroke();
-	}
-	
+    public function new(factory:SongFactory) 
+    {
+        tapping = false;
+        slapping = false;
+        popping = false;
+        fadeIn = false;        
+        stroke = factory.newStroke();
+    }
+    
 }

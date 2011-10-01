@@ -15,8 +15,8 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  *  
  *  This code is based on the code of TuxGuitar. 
- *  	Copyright: J.Jørgen von Bargen, Julian Casadesus <julian@casadesus.com.ar>
- *  	http://tuxguitar.herac.com.ar/
+ *      Copyright: J.Jørgen von Bargen, Julian Casadesus <julian@casadesus.com.ar>
+ *      http://tuxguitar.herac.com.ar/
  */
 package alphatab.file.gpx.score;
 
@@ -24,30 +24,30 @@ import alphatab.model.NoteEffect;
 
 class GpxNote 
 {
-	public var id:Int;
-	public var fret:Int;
-	public var string:Int;
-	public var tone:Int;
-	public var octave:Int;
-	public var element:Int;
-	public var variation:Int;
-	public var midiNumber:Int;
-	
-	public var tieDestination:Bool;
-	public var vibrato:Bool;
-	public var mutedEnabled:Bool;
-	public var palmMutedEnabled:Bool;
-	public var slide:Bool;
-	
-	public function new() 
-	{
-	 	this.id = -1;
-	 	this.fret = -1;
-	 	this.string = -1;
-	 	this.tone = -1;
-	 	this.octave = -1;
-	 	this.element = -1;
-	 	this.variation = -1;
-	 	this.midiNumber = -1; 
-	}
+    public var id:Int;
+    public var fret:Int;
+    public var string:Int;
+    public var tone:Int;
+    public var octave:Int;
+    public var element:Int;
+    public var variation:Int;
+    public var midiNumber:Int;
+    
+    public var tieDestination:Bool;
+    public var vibrato:Bool;
+    public var mutedEnabled:Bool;
+    public var palmMutedEnabled:Bool;
+    public var slide:Bool;
+    
+    public function new() 
+    {
+         this.id = -1;
+         this.fret = -1;
+         this.string = -1;
+         this.tone = -1;
+         this.octave = -1;
+         this.element = -1;
+         this.variation = -1;
+         this.midiNumber = -1; 
+    }
 }

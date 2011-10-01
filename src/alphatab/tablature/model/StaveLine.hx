@@ -99,17 +99,17 @@ class StaveLine
         if (staves.length == 0) return;
         
         var posY = y + spacing.get(TopPadding);
-    	var lastStave:Bool = false;
+        var lastStave:Bool = false;
         
         for (si in 0 ... staves.length)
         {
-        	var stave:Stave = staves[si];
-        	
-        	//Last stave?
+            var stave:Stave = staves[si];
+            
+            //Last stave?
             if(si+1 == staves.length) {
-            	lastStave=true;
+                lastStave=true;
             }
-        	
+            
             // stave background
             stave.paintStave(layout, context, x, posY);
             

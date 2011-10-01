@@ -21,24 +21,24 @@ package alphatab.model;
  */
 class Color
 {
-	public static inline var Black:Color = new Color(0, 0, 0);
-	public static inline var Red:Color = new Color(255, 0, 0);
-	
-	public var r:Int;
-	public var g:Int;
-	public var b:Int; 
-	public var a:Float; 
-	
-	public function new(r:Int = 0, g:Int = 0, b:Int = 0, a:Float=1)
-	{
-		this.r = r;
-		this.g = g;
-		this.b = b;
+    public static inline var Black:Color = new Color(0, 0, 0);
+    public static inline var Red:Color = new Color(255, 0, 0);
+    
+    public var r:Int;
+    public var g:Int;
+    public var b:Int; 
+    public var a:Float; 
+    
+    public function new(r:Int = 0, g:Int = 0, b:Int = 0, a:Float=1)
+    {
+        this.r = r;
+        this.g = g;
+        this.b = b;
         this.a = a;
-	}
-	
-	public function asRgbString() : String
-	{
+    }
+    
+    public function asRgbString() : String
+    {
         if(this.a == 1) 
         {
             var s:String = "rgb(";
@@ -55,5 +55,5 @@ class Color
             s += Std.string(this.a) + ")" ;
             return s;
         }
-	}
+    }
 }

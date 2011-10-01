@@ -21,20 +21,20 @@ package alphatab.model.effects;
  */
 class GraceEffectTransition 
 {
-	/**
-	 * No transition
-	 */
-	public static inline var None = 0;
-	/**
-	 * Slide from the grace note to the real one
-	 */
-	public static inline var Slide = 1;
-	/**
-	 * Perform a bend from the grace note to the real one
-	 */
-	public static inline var Bend = 2;
-	/**
-	 * Perform a hammer on 
-	 */
-	public static inline var Hammer = 3;	
+    /**
+     * No transition
+     */
+    public static inline var None = 0;
+    /**
+     * Slide from the grace note to the real one
+     */
+    public static inline var Slide = 1;
+    /**
+     * Perform a bend from the grace note to the real one
+     */
+    public static inline var Bend = 2;
+    /**
+     * Perform a hammer on 
+     */
+    public static inline var Hammer = 3;    
 }
