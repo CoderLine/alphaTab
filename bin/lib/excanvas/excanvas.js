@@ -200,7 +200,6 @@ if (!document.createElement('canvas').getContext) {
     }
   }
 
-
   G_vmlCanvasManager_.init();
 
   // precompute "00" to "FF"
@@ -402,7 +401,6 @@ if (!document.createElement('canvas').getContext) {
     return parts;
   }
 
-
   function percent(s) {
     return parseFloat(s) / 100;
   }
@@ -599,14 +597,13 @@ if (!document.createElement('canvas').getContext) {
     // Use a non transparent background.
     overlayEl.style.backgroundColor = 'red';
     overlayEl.style.filter = 'alpha(opacity=0)';
-    canvasElement.appendChild(overlayEl);
+    //canvasElement.appendChild(overlayEl);
 
     this.element_ = el;
     this.arcScaleX_ = 1;
     this.arcScaleY_ = 1;
     this.lineScale_ = 1;
   }
-
 
   var contextPrototype = CanvasRenderingContext2D_.prototype;
   contextPrototype.clearRect = function() {
@@ -814,7 +811,6 @@ if (!document.createElement('canvas').getContext) {
       throw Error('Invalid number of arguments');
     }
 
-
     var d = getCoords(this, dx, dy);
 
     var w2 = sw / 2;
@@ -1017,7 +1013,6 @@ if (!document.createElement('canvas').getContext) {
         var dy = p1.y - p0.y;
         angle = Math.atan2(dx, dy) * 180 / Math.PI;
 
-
         // The angle should be a non-negative number.
         if (angle < 0) {
           angle += 360;
@@ -1218,7 +1213,6 @@ if (!document.createElement('canvas').getContext) {
     var fontStyle = getComputedStyle(processFontStyle(this.font),
                                      this.element_);
 
-
     var fontStyleString = buildStyle(fontStyle);
 
     var elementStyle = this.element_.currentStyle;
@@ -1418,6 +1412,5 @@ if (!document.createElement('canvas').getContext) {
   CanvasPattern = CanvasPattern_;
   DOMException = DOMException_;
 })();
-
 
 } // if
