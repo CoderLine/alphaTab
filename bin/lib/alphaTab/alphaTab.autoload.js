@@ -14,4 +14,4 @@
  *  You should have received a copy of the GNU General Public License
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
-$(document).ready(function(){$('div.alphaTab').alphaTab();});
+jQuery(document).ready(function(){jQuery('div.alphaTab').alphaTab({autoSize:'maxWidth'});});
