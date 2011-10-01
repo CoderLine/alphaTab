@@ -95,7 +95,6 @@ var alphaTabWrapper;
 
         this.options = $.extend(defaults, options);
         if(this.options.autoSize == "maxWidth") {
-            alert(el.width());
             this.options.width = el.width();
         }
 

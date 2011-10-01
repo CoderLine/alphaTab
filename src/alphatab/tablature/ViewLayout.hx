@@ -33,7 +33,6 @@ import alphatab.tablature.drawing.DrawingResources;
 import alphatab.tablature.model.MeasureDrawing;
 import alphatab.tablature.model.StaveFactory;
 import alphatab.tablature.model.StaveLine;
-import alphatab.tablature.model.MeasureClickable;
 
 
 /**
@@ -44,8 +43,6 @@ class ViewLayout
 	private var _cache:DrawingContext;
 
 	public var tablature:Tablature;
-    
-    public var _map:Array<MeasureClickable>;
 	
 	// Size presets
 	public var stringSpacing :Int;
@@ -62,7 +59,7 @@ class ViewLayout
 	public var contentPadding:Padding;
     
     // Returns the index of the measure drawn under the coordinates given
-    public function getMeasureAt(xPos:Int, yPos:Int) : MeasureClickable {
+    public function getMeasureAt(xPos:Int, yPos:Int) : Measure {
     	// implemented in subclass
 		return null;
     }
@@ -85,7 +82,6 @@ class ViewLayout
         this.scale = scale;
         firstMeasureSpacing = Math.round(10 * scale);
         effectSpacing = Math.round(15 * scale);
-		_map = new Array();
 	}
 	
 	public function paintCache(graphics:Canvas, area:Rectangle, fromX:Int, fromY:Int) : Void

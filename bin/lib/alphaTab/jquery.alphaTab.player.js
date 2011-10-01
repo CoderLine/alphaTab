@@ -101,16 +101,16 @@
         this.midiPlayer = applet[0];
         
         // Sets the player to the start of the measure clicked
-        $(this.canvas).click(function()
+        $(this.canvas).click(function(e)
         	{
         		var offsets=$(this).offset();
 			    var x = e.pageX - offsets.left;
 			    var y = e.pageY - offsets.top;
 				var measure=self.tablature.viewLayout.getMeasureAt(x,y);
-				
 				if(measure!=null) {
-					self.midiPlayer.goTo(measure.firstTick);
-					self.updateCaret(measure.firstTick,true,false);
+					var tick = 960 + measure.start();
+					self.midiPlayer.goTo(tick);
+					self.updateCaret(tick,true,false);
 				}
         	}
         );

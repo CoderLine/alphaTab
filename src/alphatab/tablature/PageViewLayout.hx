@@ -31,7 +31,6 @@ import alphatab.tablature.model.ScoreStave;
 import alphatab.tablature.model.StaveLine;
 import alphatab.tablature.model.StaveSpacing;
 import alphatab.tablature.model.TablatureStave;
-import alphatab.tablature.model.MeasureClickable;
 
 /**
  * This layout renders measures in form of a page. 
@@ -56,17 +55,63 @@ class PageViewLayout extends ViewLayout
 	
     
     // Returns the index of the measure drawn under the coordinates given
-    public override function getMeasureAt(xPos:Int, yPos:Int) : MeasureClickable {
+    public override function getMeasureAt(xPos:Int, yPos:Int) : Measure {
     	xPos-=PAGE_PADDING.left;
-    	var target:MeasureClickable=null;
+    	var target:Measure = null;
     	
-		for(target in _map) {
-			if(target.encompasses(xPos,yPos)) {
-				return target;
+		// find staveline using a binary search
+		var startIndex = 0;
+		var endIndex = _lines.length;
+		var line:StaveLine = null;
+		do {
+			var midIndex = Std.int( (startIndex + endIndex) / 2 );
+			var current = _lines[midIndex];
+			
+			var top = current.y;
+			var bottom = top + current.getHeight();
+			
+			if (yPos >= top && yPos <= bottom) {
+				line = current;				
 			}
+			else if(yPos > bottom) {  // clicked below current line
+				startIndex = midIndex + 1;
+			}
+			else if (yPos < top) { // clicked above current line
+				endIndex = midIndex - 1;
+			}
+			
+			
+		} while ( ! (line != null || startIndex > endIndex) ) ;
+		
+		// no staveline found
+		if (line == null) {
+			return null;
 		}
 		
-		return target;
+		// find clicked measure in line using binary search
+		startIndex = 0;
+		endIndex = line.measures.length;
+		var measure:Measure = null;
+		do {
+			var midIndex = Std.int( (startIndex + endIndex) / 2 );
+			var current:MeasureDrawing = cast tablature.track.measures[line.measures[midIndex]];
+			
+			var left = current.x;
+			var right = left + current.width + current.spacing;
+			
+			if (xPos >= left && xPos <= right) {
+				measure = current;
+			}
+			else if (xPos > right) { // clicked on right side of measure 
+				startIndex = midIndex + 1;
+			}
+			else if (xPos < left) { // clicked on left side of measure
+				endIndex = midIndex - 1;
+			}
+			
+		} while ( ! (measure != null || startIndex > endIndex));
+		
+		return measure; 
     }
     
 	public function getMaxWidth() : Int
@@ -293,7 +338,7 @@ class PageViewLayout extends ViewLayout
 		for (l in 0 ... _lines.length) 
 		{
 			var line:StaveLine = _lines[l];
-            line.paint(this, track, ctx, _map);
+            line.paint(this, track, ctx);
 		}
 	}
 	

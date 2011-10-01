@@ -94,7 +94,7 @@ class StaveLine
         staves.push(stave);
     }
     
-    public function paint(layout:ViewLayout, track:Track, context:DrawingContext, locMap:Array<MeasureClickable>)
+    public function paint(layout:ViewLayout, track:Track, context:DrawingContext)
     {
         if (staves.length == 0) return;
         
@@ -123,19 +123,6 @@ class StaveLine
                 var previousMeasureX:Int = 0;
                 
                 stave.paintMeasure(layout, context, currentMeasure, x, posY);
-                
-                var curWidth=currentMeasure.width + currentMeasure.spacing;
-                
-                if(lastStave) {
-                	//If first render, push new objects
-                	if(locMap[index]==null){
-						locMap.push(new MeasureClickable(index,currentMeasure.x,y,curWidth,this.getHeight()));
-                	}
-                	//Otherwise edit existing ones
-                	else {
-                		locMap[index].set(index,currentMeasure.x,y,curWidth,this.getHeight());
-                	}
-                }
             }
             
             posY += stave.spacing.getSize();
