@@ -101,7 +101,7 @@
 		<echo message="copying release files to ${release}/${DSTAMP}"/>
 		<!-- copy distribution files -->		
 		<copy todir="${release}/${DSTAMP}" overwrite="true">
-			<fileset dir="${bin}" excludes=".svn" />
+			<fileset dir="${bin}" />
 		</copy>
 		
 		<!-- minify javascripts -->
