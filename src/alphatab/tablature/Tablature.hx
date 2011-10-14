@@ -59,6 +59,8 @@ class Tablature
     public var track:Track;
     public var autoSizeWidth:Bool;
     public var onCaretChanged:Beat->Bool->Void;
+    public var onLayouted:Void->Void;
+    public var onFinished:Void->Void;
     
     public function new(source:Dynamic, staves:Array<String> = null, msg:String = "") 
     {
@@ -160,6 +162,7 @@ class Tablature
         if(autoSizeWidth)
             canvas.setWidth(viewLayout.width);
         canvas.setHeight(viewLayout.height);
+		if(onLayouted != null) onLayouted();
     }
     
     public function onPaint() 
@@ -171,7 +174,7 @@ class Tablature
             var text = errorMessage;
             
             canvas.fillStyle = "#4e4e4e";
-            canvas.font = "20px 'Arial'";
+            canvas.font = DrawingResources.timeSignatureFont;
             canvas.textBaseline = "middle";
             canvas.fillText(text, 20, 30);
         }
@@ -187,6 +190,7 @@ class Tablature
             viewLayout.paintCache(canvas, displayRect, 0, 0);
             _updateDisplay = false;
         }
+		if (onFinished != null) onFinished();
     }
     
     public function updateTablature()

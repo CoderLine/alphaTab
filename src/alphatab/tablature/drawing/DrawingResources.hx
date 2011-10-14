@@ -49,24 +49,32 @@ class DrawingResources
         var serifFont = "'Times New Roman'";
         
         defaultFontHeight = Math.round(9*scale);
-        defaultFont = Std.string(defaultFontHeight) + "px " + sansFont;
-        chordFont = Std.string(9*scale) + "px " + sansFont;
-        timeSignatureFont = Std.string(20*scale) + "px " + sansFont;
+        defaultFont = formatFontSize(defaultFontHeight) + " " + sansFont;
+        chordFont = formatFontSize(9*scale) + " " + sansFont;
+        timeSignatureFont = formatFontSize(20*scale) + " " + sansFont;
         clefFontHeight = Math.round(16 * scale);
-        clefFont = Std.string(clefFontHeight) + "px " + serifFont;
-        musicFont = Std.string(13*scale) + "px " + sansFont;
-        tempoFont = Std.string(11*scale) + "px " + sansFont;
+        clefFont = formatFontSize(clefFontHeight) + " " + serifFont;
+        musicFont = formatFontSize(13*scale) + " " + sansFont;
+        tempoFont = formatFontSize(11*scale) + " " + sansFont;
         graceFontHeight = Math.round(9*scale);
-        graceFont = Std.string(graceFontHeight) + "px " + sansFont;
+        graceFont = formatFontSize(graceFontHeight) + " " + sansFont;
         noteFontHeight = Math.round(11 * scale);
-        noteFont = Std.string(noteFontHeight) + "px " + sansFont;
+        noteFont = formatFontSize(noteFontHeight) + " " + sansFont;
         effectFontHeight = Math.round(11 * scale);
-        effectFont = "italic " + Std.string(effectFontHeight) + "px " + serifFont;
+        effectFont = "italic " + formatFontSize(effectFontHeight) + " " + serifFont;
         
-        titleFont =  Std.string(30*scale) + "px " + serifFont;
-        subtitleFont = Std.string(19 * scale) + "px " + serifFont;
-        wordsFont =  Std.string(13 * scale) + "px " + serifFont;
-        copyrightFont =  "bold " + Std.string(11 * scale) + "px " + sansFont;
+        titleFont =  formatFontSize(30*scale) + " " + serifFont;
+        subtitleFont = formatFontSize(19 * scale) + " " + serifFont;
+        wordsFont =  formatFontSize(13 * scale) + " " + serifFont;
+        copyrightFont =  "bold " + Std.string(11 * scale) + " " + sansFont;
+    }
+    
+    private static function formatFontSize(size:Float) 
+    {
+        var num = size;
+        num = num * Math.pow(10, 2);
+        num = Math.round( num ) / Math.pow(10, 2);
+        return Std.string(num) + "px";
     }
     
     public static function getScoreNoteSize(layout:ViewLayout, full:Bool) : Point

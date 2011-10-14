@@ -82,7 +82,6 @@ class DrawingLayer
                         _currentPosition.x = elm.X2;
                         _currentPosition.y = elm.Y2; 
                     case "addString":
-                        graphics.textBaseline = elm.BaseLine;
                         graphics.font = elm.Font;
                         graphics.fillText(elm.Text, elm.X, elm.Y);
                     case "addLine":
@@ -169,14 +168,13 @@ class DrawingLayer
         });
     }
     
-    public function addString(str:String, font:String, x:Float,y:Float, baseline:String="middle"): Void{
+    public function addString(str:String, font:String, x:Float,y:Float): Void{
         _path.push({
             Command: "addString",
             Text: str,
             Font: font,
             X: (x) + 0.5,
-            Y: (y) + 0.5,
-            BaseLine:baseline
+            Y: (y) + 0.5
         });
     }
     public function addMusicSymbol(symbol:String, x:Float, y:Float, xScale:Float, yScale:Float = 0): Void {

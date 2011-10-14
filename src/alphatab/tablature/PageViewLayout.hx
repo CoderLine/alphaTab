@@ -346,8 +346,11 @@ class PageViewLayout extends ViewLayout
     {
         if (tablature.getLayoutSetting("hideSongInfo", false)) return y;
 
+        var yOffset = 19;
+        
         var song:Song = tablature.track.song;
         x += contentPadding.left;
+        y += yOffset;
         var tX:Float;
         var size:Float;
         var str:String = "";
@@ -357,7 +360,7 @@ class PageViewLayout extends ViewLayout
             ctx.graphics.font = DrawingResources.titleFont;
             size = ctx.graphics.measureText(str);
             tX = (clientArea.width - size) / 2;
-            ctx.get(DrawingLayers.LayoutBackground).addString(str, DrawingResources.titleFont, tX, y, "top");
+            ctx.get(DrawingLayers.LayoutBackground).addString(str, DrawingResources.titleFont, tX, y);
             y += Math.floor(35*scale); 
         }        
         if (song.subtitle != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.SUBTITLE != 0))
@@ -366,7 +369,7 @@ class PageViewLayout extends ViewLayout
             ctx.graphics.font = DrawingResources.subtitleFont;
             size = ctx.graphics.measureText(str);
             tX = (clientArea.width - size) / 2;
-            ctx.get(DrawingLayers.LayoutBackground).addString(str, DrawingResources.subtitleFont, tX, y, "top");
+            ctx.get(DrawingLayers.LayoutBackground).addString(str, DrawingResources.subtitleFont, tX, y);
             y += Math.floor(20*scale);
         }
         if (song.artist != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.ARTIST != 0))
@@ -375,7 +378,7 @@ class PageViewLayout extends ViewLayout
             ctx.graphics.font = DrawingResources.subtitleFont;
             size = ctx.graphics.measureText(str);
             tX = (clientArea.width - size) / 2;
-            ctx.get(DrawingLayers.LayoutBackground).addString(str, DrawingResources.subtitleFont, tX, y, "top");
+            ctx.get(DrawingLayers.LayoutBackground).addString(str, DrawingResources.subtitleFont, tX, y);
             y += Math.floor(20*scale);
         }
         if (song.album != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.ALBUM != 0))
@@ -384,7 +387,7 @@ class PageViewLayout extends ViewLayout
             ctx.graphics.font = DrawingResources.subtitleFont;
             size = ctx.graphics.measureText(str);
             tX = (clientArea.width - size) / 2;
-            ctx.get(DrawingLayers.LayoutBackground).addString(str, DrawingResources.subtitleFont, tX, y, "top");
+            ctx.get(DrawingLayers.LayoutBackground).addString(str, DrawingResources.subtitleFont, tX, y);
             y += Math.floor(20*scale);
         }
         if (song.music != "" && song.music == song.words && (song.pageSetup.headerAndFooter & HeaderFooterElements.WORDS_AND_MUSIC != 0))
@@ -393,7 +396,7 @@ class PageViewLayout extends ViewLayout
             ctx.graphics.font = DrawingResources.wordsFont;
             size = ctx.graphics.measureText(str);
             tX = (clientArea.width - size - contentPadding.right);
-            ctx.get(DrawingLayers.LayoutBackground).addString(str, DrawingResources.wordsFont, x, y, "top");
+            ctx.get(DrawingLayers.LayoutBackground).addString(str, DrawingResources.wordsFont, x, y);
             y += Math.floor(20*scale);
         }
         else 
@@ -404,13 +407,13 @@ class PageViewLayout extends ViewLayout
                 ctx.graphics.font = DrawingResources.wordsFont;
                 size = ctx.graphics.measureText(str);
                 tX = (clientArea.width - size - contentPadding.right);
-                ctx.get(DrawingLayers.LayoutBackground).addString(str, DrawingResources.wordsFont, tX, y, "top");
+                ctx.get(DrawingLayers.LayoutBackground).addString(str, DrawingResources.wordsFont, tX, y);
             }
             if (song.words != "" && (song.pageSetup.headerAndFooter & HeaderFooterElements.WORDS != 0))
             {
                 str = parsePageSetupString(song.pageSetup.words);
                 ctx.graphics.font = DrawingResources.wordsFont;
-                ctx.get(DrawingLayers.LayoutBackground).addString(str, DrawingResources.wordsFont, x, y, "top");
+                ctx.get(DrawingLayers.LayoutBackground).addString(str, DrawingResources.wordsFont, x, y);
             }
             y += Math.floor(20*scale);
         }    
@@ -424,7 +427,7 @@ class PageViewLayout extends ViewLayout
             if(tuning != null)
             {
                 // Name
-                ctx.get(DrawingLayers.LayoutBackground).addString(tuning.Name, DrawingResources.effectFont, x, y, "top");
+                ctx.get(DrawingLayers.LayoutBackground).addString(tuning.Name, DrawingResources.effectFont, x, y);
                 
                 y += Math.floor(15*scale);
                 
@@ -439,7 +442,7 @@ class PageViewLayout extends ViewLayout
                     for(i in 0 ... tablature.track.strings.length)
                     {
                         str = "(" + Std.string(i+1) + ") = " + Tuning.getTextForTuning(tablature.track.strings[i].value);
-                        ctx.get(DrawingLayers.LayoutBackground).addString(str, DrawingResources.effectFont, currentX, currentY, "top");
+                        ctx.get(DrawingLayers.LayoutBackground).addString(str, DrawingResources.effectFont, currentX, currentY);
                         currentY += Math.floor(15*scale);
                         if(i == stringsPerColumn - 1)
                         {
@@ -453,7 +456,7 @@ class PageViewLayout extends ViewLayout
             }
         }
         y += Math.floor(25*scale);
-        
+        y -= yOffset;
         return y;
     }
     

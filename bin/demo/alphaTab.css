@@ -32,7 +32,7 @@
 	this style is required by IE if you use the editor
 	it enables to get newline symbols from div **/
 .alphaTab {
-	white-space:pre;	
+	white-space:pre;
 }
 
 /** Styling the code editor */

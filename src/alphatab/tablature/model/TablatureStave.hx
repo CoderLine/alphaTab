@@ -212,22 +212,9 @@ class TablatureStave extends Stave
         paintBeats(layout, context, measure, realX, y);
     }
     
-    // Paint a "tab" text on first measure
     private function paintClef(layout:ViewLayout, context:DrawingContext, measure:MeasureDrawing, x:Int, y:Int)
     {
-        if (!measure.isFirstOfLine()) return;
-        
-        // TODO: Doesn't work for other string counts
-        /*y += spacing.get(Tablature);
-        x += Math.floor(20 * layout.scale);
-        var fill:DrawingLayer = context.get(DrawingLayers.MainComponents);
-
-        // T
-        fill.addString("T", DrawingResources.clefFont, x, y, "top");
-        y += DrawingResources.clefFontHeight;
-        fill.addString("A", DrawingResources.clefFont, x, y, "top");
-        y += DrawingResources.clefFontHeight;
-        fill.addString("B", DrawingResources.clefFont, x, y, "top"); */       
+        if (!measure.isFirstOfLine()) return; 
     }
     
     
