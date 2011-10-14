@@ -21,6 +21,8 @@ var alphaTabWrapper;
  */
 (function($)
 {
+	
+	
     alphaTabWrapper = function(el, options)
     {
         //
@@ -90,7 +92,8 @@ var alphaTabWrapper;
             height:200,
             autoSize: true,
             staves: null,
-            layout: null
+            layout: null,
+			context: "canvas"
         };
 
         this.options = $.extend(defaults, options);
@@ -151,7 +154,7 @@ var alphaTabWrapper;
             // update tablature
 			try
 			{
-            self.tablature.setTrack(song.tracks[self.options.track]);
+				self.tablature.setTrack(song.tracks[self.options.track]);
 			}
 			catch( e )
 			{
@@ -183,52 +186,74 @@ var alphaTabWrapper;
             }
         }
 
+		var createCanvas = function() {
+			// create canvas
+			// HACK: call createElement('canvas') once before. this ensures that the browser knows the element
+			document.createElement('canvas'); 
+			self.canvas = $('<canvas width="'+self.options.width+'" height="'+self.options.height+'" class="alphaTabSurface"></canvas>');
+			self.el.append(self.canvas);
+			self.canvas = self.canvas[0];
+			if($.browser.msie) 
+			{
+				// Excanvas initialization
+				if($.browser.version < 9)
+				{
+					var fixElement_ = function(el) 
+					{
+					   // in IE before version 5.5 we would need to add HTML: to the tag name
+					   // but we do not care about IE before version 6
+					   var outerHTML = el.outerHTML;
+					 
+					   var newEl = el.ownerDocument.createElement(outerHTML);
+					   // if the tag is still open IE has created the children as siblings and
+					   // it has also created a tag with the name "/FOO"
+					   if (outerHTML.slice(-2) != "/>") {
+							 var tagName = "/" + el.tagName;
+							 var ns;
+							 // remove content
+							 while ((ns = el.nextSibling) && ns.tagName != tagName) {
+							   ns.removeNode();
+							 }
+							 // remove the incorrect closing tag
+							 if (ns) {
+							   ns.removeNode();
+							 }
+					   }
+					   el.parentNode.replaceChild(newEl, el);
+					   return newEl;
+					};
+					
+					self.canvas = G_vmlCanvasManager.initElement(fixElement_(self.canvas));
+				}
+			}
+			
+            self.canvasWrapper = self.canvas;
+			return self.canvas;
+		}
+        
+        var createCanvasWrapper = function() {
+            self.canvasWrapper = $('<div class="alphaTabCanvasWrapper"></div>');
+            self.canvas = self.canvasWrapper;
+            self.el.append(self.canvasWrapper);               
+        }
+		
         //
         // startup
         //
         
         this.contents = $.trim(el.text());
 		el.html('');
-        // create canvas
-		// HACK: call createElement('canvas') once before. this ensures that the browser knows the element
-		document.createElement('canvas'); 
-        this.canvas = $('<canvas width="'+this.options.width+'" height="'+this.options.height+'" class="alphaTabSurface"></canvas>');
-		el.append(this.canvas);
-		this.canvas = this.canvas[0];
-		if($.browser.msie) 
-		{
-			// Excanvas initialization
-            if($.browser.version < 9)
-            {
-                var fixElement_ = function(el) 
-                {
-                   // in IE before version 5.5 we would need to add HTML: to the tag name
-                   // but we do not care about IE before version 6
-                   var outerHTML = el.outerHTML;
-                 
-                   var newEl = el.ownerDocument.createElement(outerHTML);
-                   // if the tag is still open IE has created the children as siblings and
-                   // it has also created a tag with the name "/FOO"
-                   if (outerHTML.slice(-2) != "/>") {
-                         var tagName = "/" + el.tagName;
-                         var ns;
-                         // remove content
-                         while ((ns = el.nextSibling) && ns.tagName != tagName) {
-                           ns.removeNode();
-                         }
-                         // remove the incorrect closing tag
-                         if (ns) {
-                           ns.removeNode();
-                         }
-                   }
-                   el.parentNode.replaceChild(newEl, el);
-                   return newEl;
-                };
-                
-                this.canvas = G_vmlCanvasManager.initElement(fixElement_(this.canvas));
-			}
+		
+		// create context
+		var contextObject = null;
+ 		if(this.options.context == "canvas") {
+			contextObject = createCanvas();
 		}
-
+		else {
+            createCanvasWrapper();
+			contextObject = this.options.context;
+		}	
+        
         // prepare, stave configuration
         var staves = null;
         if(this.options.staves != null)
@@ -247,7 +272,7 @@ var alphaTabWrapper;
             }
         }
         // create tablature
-        this.tablature = new alphatab.tablature.Tablature(this.canvas, staves, this.options.error);
+        this.tablature = new alphatab.tablature.Tablature(contextObject, staves, this.options.error);
         if(this.options.autoSize == "maxWidth") {
             this.tablature.autoSizeWidth = false;
         }
@@ -291,6 +316,16 @@ var alphaTabWrapper;
                 });
             });
         }
+		
+		if(this.options.context == alphatab.platform.PlatformFactory.SVG_CANVAS) {
+			this.tablature.onFinished = function() {
+				self.canvasWrapper.children().remove(); // remove old svg 
+				var canvas = self.tablature.canvas;
+				var svgElement = $(canvas.toSvg(true, "alphaTabSurface"));
+                self.canvas = svgElement;
+				self.canvasWrapper.append(svgElement);
+			}
+		}
         
         // load data
         if(this.options.file)
@@ -300,6 +335,14 @@ var alphaTabWrapper;
         else if(this.contents != "")
         {
             this.loadAlphaTex(this.contents);
+        }
+        else if(this.options.context == alphatab.platform.PlatformFactory.SVG_CANVAS)
+        {
+            // ensure notify of error message
+            var canvas = this.tablature.canvas;
+            canvas.setWidth(this.options.width);
+            canvas.setHeight(this.options.height);
+            this.tablature.onFinished();
         }
     }
     

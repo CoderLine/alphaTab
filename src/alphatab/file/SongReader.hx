@@ -15,7 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.file;
-import alphatab.file.ptb.PtReader;
+//import alphatab.file.ptb.PtReader;
 import alphatab.model.Measure;
 import alphatab.model.Note;
 import alphatab.model.Track;
@@ -53,7 +53,7 @@ class SongReader
         d.push(new Gp5Reader());
         d.push(new Gp4Reader());
         d.push(new Gp3Reader());
-        d.push(new PtReader());
+        //d.push(new PtReader());
         return d;
     }
 

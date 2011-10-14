@@ -21,7 +21,7 @@ $description = "This sample shows how to display a GuitarPro file";
 <script language="JavaScript" type="text/javascript"> 
 $(document).ready(function() { 
 	$('div.alphaTab').alphaTab({
-        file: 'files/Pm.gp5'
+        file: 'files/FadeToBlack.gp4'
     });
 });
 </script>

@@ -285,8 +285,10 @@ alphatab.tablature.PageViewLayout.prototype.paintSong = function(ctx,clientArea,
 }
 alphatab.tablature.PageViewLayout.prototype.paintSongInfo = function(ctx,clientArea,x,y) {
 	if(this.tablature.getLayoutSetting("hideSongInfo",false)) return y;
+	var yOffset = 19;
 	var song = this.tablature.track.song;
 	x += this.contentPadding.left;
+	y += yOffset;
 	var tX;
 	var size;
 	var str = "";
@@ -295,7 +297,7 @@ alphatab.tablature.PageViewLayout.prototype.paintSongInfo = function(ctx,clientA
 		ctx.graphics.setFont(alphatab.tablature.drawing.DrawingResources.titleFont);
 		size = ctx.graphics.measureText(str);
 		tX = (clientArea.width - size) / 2;
-		ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.titleFont,tX,y,"top");
+		ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.titleFont,tX,y);
 		y += Math.floor(35 * this.scale);
 	}
 	if(song.subtitle != "" && (song.pageSetup.headerAndFooter & 2) != 0) {
@@ -303,7 +305,7 @@ alphatab.tablature.PageViewLayout.prototype.paintSongInfo = function(ctx,clientA
 		ctx.graphics.setFont(alphatab.tablature.drawing.DrawingResources.subtitleFont);
 		size = ctx.graphics.measureText(str);
 		tX = (clientArea.width - size) / 2;
-		ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.subtitleFont,tX,y,"top");
+		ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.subtitleFont,tX,y);
 		y += Math.floor(20 * this.scale);
 	}
 	if(song.artist != "" && (song.pageSetup.headerAndFooter & 4) != 0) {
@@ -311,7 +313,7 @@ alphatab.tablature.PageViewLayout.prototype.paintSongInfo = function(ctx,clientA
 		ctx.graphics.setFont(alphatab.tablature.drawing.DrawingResources.subtitleFont);
 		size = ctx.graphics.measureText(str);
 		tX = (clientArea.width - size) / 2;
-		ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.subtitleFont,tX,y,"top");
+		ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.subtitleFont,tX,y);
 		y += Math.floor(20 * this.scale);
 	}
 	if(song.album != "" && (song.pageSetup.headerAndFooter & 8) != 0) {
@@ -319,7 +321,7 @@ alphatab.tablature.PageViewLayout.prototype.paintSongInfo = function(ctx,clientA
 		ctx.graphics.setFont(alphatab.tablature.drawing.DrawingResources.subtitleFont);
 		size = ctx.graphics.measureText(str);
 		tX = (clientArea.width - size) / 2;
-		ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.subtitleFont,tX,y,"top");
+		ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.subtitleFont,tX,y);
 		y += Math.floor(20 * this.scale);
 	}
 	if(song.music != "" && song.music == song.words && (song.pageSetup.headerAndFooter & 64) != 0) {
@@ -327,7 +329,7 @@ alphatab.tablature.PageViewLayout.prototype.paintSongInfo = function(ctx,clientA
 		ctx.graphics.setFont(alphatab.tablature.drawing.DrawingResources.wordsFont);
 		size = ctx.graphics.measureText(str);
 		tX = clientArea.width - size - this.contentPadding.right;
-		ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.wordsFont,x,y,"top");
+		ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.wordsFont,x,y);
 		y += Math.floor(20 * this.scale);
 	} else {
 		if(song.music != "" && (song.pageSetup.headerAndFooter & 32) != 0) {
@@ -335,12 +337,12 @@ alphatab.tablature.PageViewLayout.prototype.paintSongInfo = function(ctx,clientA
 			ctx.graphics.setFont(alphatab.tablature.drawing.DrawingResources.wordsFont);
 			size = ctx.graphics.measureText(str);
 			tX = clientArea.width - size - this.contentPadding.right;
-			ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.wordsFont,tX,y,"top");
+			ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.wordsFont,tX,y);
 		}
 		if(song.words != "" && (song.pageSetup.headerAndFooter & 16) != 0) {
 			str = this.parsePageSetupString(song.pageSetup.words);
 			ctx.graphics.setFont(alphatab.tablature.drawing.DrawingResources.wordsFont);
-			ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.wordsFont,x,y,"top");
+			ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.wordsFont,x,y);
 		}
 		y += Math.floor(20 * this.scale);
 	}
@@ -348,7 +350,7 @@ alphatab.tablature.PageViewLayout.prototype.paintSongInfo = function(ctx,clientA
 	if(!this.tablature.track.isPercussionTrack) {
 		var tuning = alphatab.model.Tuning.findTuning(this.tablature.track.strings);
 		if(tuning != null) {
-			ctx.get(1).addString(tuning.Name,alphatab.tablature.drawing.DrawingResources.effectFont,x,y,"top");
+			ctx.get(1).addString(tuning.Name,alphatab.tablature.drawing.DrawingResources.effectFont,x,y);
 			y += Math.floor(15 * this.scale);
 			if(!tuning.IsStandard) {
 				var stringsPerColumn = Math.ceil(this.tablature.track.strings.length / 2);
@@ -358,7 +360,7 @@ alphatab.tablature.PageViewLayout.prototype.paintSongInfo = function(ctx,clientA
 				while(_g1 < _g) {
 					var i = _g1++;
 					str = "(" + Std.string(i + 1) + ") = " + alphatab.model.Tuning.getTextForTuning(this.tablature.track.strings[i].value);
-					ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.effectFont,currentX,currentY,"top");
+					ctx.get(1).addString(str,alphatab.tablature.drawing.DrawingResources.effectFont,currentX,currentY);
 					currentY += Math.floor(15 * this.scale);
 					if(i == stringsPerColumn - 1) {
 						currentY = y;
@@ -370,6 +372,7 @@ alphatab.tablature.PageViewLayout.prototype.paintSongInfo = function(ctx,clientA
 		}
 	}
 	y += Math.floor(25 * this.scale);
+	y -= yOffset;
 	return y;
 }
 alphatab.tablature.PageViewLayout.prototype.parsePageSetupString = function(input) {
@@ -816,13 +819,13 @@ List.prototype.toString = function() {
 	var s = new StringBuf();
 	var first = true;
 	var l = this.h;
-	s.b[s.b.length] = "{" == null?"null":"{";
+	s.b[s.b.length] = "{";
 	while(l != null) {
-		if(first) first = false; else s.b[s.b.length] = ", " == null?"null":", ";
+		if(first) first = false; else s.b[s.b.length] = ", ";
 		s.add(Std.string(l[0]));
 		l = l[1];
 	}
-	s.b[s.b.length] = "}" == null?"null":"}";
+	s.b[s.b.length] = "}";
 	return s.b.join("");
 }
 List.prototype.join = function(sep) {
@@ -861,7 +864,7 @@ if(!alphatab.platform) alphatab.platform = {}
 alphatab.platform.PlatformFactory = function() { }
 alphatab.platform.PlatformFactory.__name__ = ["alphatab","platform","PlatformFactory"];
 alphatab.platform.PlatformFactory.getCanvas = function(object) {
-	return new alphatab.platform.js.Html5Canvas(object);
+	if(object == alphatab.platform.PlatformFactory.SVG_CANVAS) return new alphatab.platform.svg.SvgCanvas(); else return new alphatab.platform.js.Html5Canvas(object);
 }
 alphatab.platform.PlatformFactory.getLoader = function() {
 	return new alphatab.platform.js.JsFileLoader();
@@ -1000,16 +1003,16 @@ Hash.prototype.iterator = function() {
 }
 Hash.prototype.toString = function() {
 	var s = new StringBuf();
-	s.b[s.b.length] = "{" == null?"null":"{";
+	s.b[s.b.length] = "{";
 	var it = this.keys();
 	while( it.hasNext() ) {
 		var i = it.next();
 		s.b[s.b.length] = i == null?"null":i;
-		s.b[s.b.length] = " => " == null?"null":" => ";
+		s.b[s.b.length] = " => ";
 		s.add(Std.string(this.get(i)));
-		if(it.hasNext()) s.b[s.b.length] = ", " == null?"null":", ";
+		if(it.hasNext()) s.b[s.b.length] = ", ";
 	}
-	s.b[s.b.length] = "}" == null?"null":"}";
+	s.b[s.b.length] = "}";
 	return s.b.join("");
 }
 Hash.prototype.__class__ = Hash;
@@ -2626,6 +2629,14 @@ alphatab.model.effects.TrillEffect.prototype.clone = function(factory) {
 	return effect;
 }
 alphatab.model.effects.TrillEffect.prototype.__class__ = alphatab.model.effects.TrillEffect;
+alphatab.file.gpx.score.GpxBar = function(p) {
+}
+alphatab.file.gpx.score.GpxBar.__name__ = ["alphatab","file","gpx","score","GpxBar"];
+alphatab.file.gpx.score.GpxBar.prototype.id = null;
+alphatab.file.gpx.score.GpxBar.prototype.voiceIds = null;
+alphatab.file.gpx.score.GpxBar.prototype.clef = null;
+alphatab.file.gpx.score.GpxBar.prototype.simileMark = null;
+alphatab.file.gpx.score.GpxBar.prototype.__class__ = alphatab.file.gpx.score.GpxBar;
 alphatab.model.Measure = function(header) {
 	if( header === $_ ) return;
 	this.header = header;
@@ -3007,14 +3018,6 @@ alphatab.file.alphatex.AlphaTexWriter.prototype.writeMeta = function() {
 	this._result.add(this._track.channel.instrument());
 }
 alphatab.file.alphatex.AlphaTexWriter.prototype.__class__ = alphatab.file.alphatex.AlphaTexWriter;
-alphatab.file.gpx.score.GpxBar = function(p) {
-}
-alphatab.file.gpx.score.GpxBar.__name__ = ["alphatab","file","gpx","score","GpxBar"];
-alphatab.file.gpx.score.GpxBar.prototype.id = null;
-alphatab.file.gpx.score.GpxBar.prototype.voiceIds = null;
-alphatab.file.gpx.score.GpxBar.prototype.clef = null;
-alphatab.file.gpx.score.GpxBar.prototype.simileMark = null;
-alphatab.file.gpx.score.GpxBar.prototype.__class__ = alphatab.file.gpx.score.GpxBar;
 alphatab.file.guitarpro.Gp4Reader = function(p) {
 	if( p === $_ ) return;
 	alphatab.file.guitarpro.Gp3Reader.call(this);
@@ -6526,6 +6529,38 @@ alphatab.model.BeatText.__name__ = ["alphatab","model","BeatText"];
 alphatab.model.BeatText.prototype.value = null;
 alphatab.model.BeatText.prototype.beat = null;
 alphatab.model.BeatText.prototype.__class__ = alphatab.model.BeatText;
+if(!alphatab.platform.svg) alphatab.platform.svg = {}
+alphatab.platform.svg.FontSizes = function() { }
+alphatab.platform.svg.FontSizes.__name__ = ["alphatab","platform","svg","FontSizes"];
+alphatab.platform.svg.FontSizes.measureString = function(s,f,size) {
+	var data;
+	var dataSize;
+	switch( (f)[1] ) {
+	case 0:
+		data = alphatab.platform.svg.FontSizes.TIMES_NEW_ROMAN_11PT;
+		dataSize = 11;
+		break;
+	case 1:
+		data = alphatab.platform.svg.FontSizes.ARIAL_11PT;
+		dataSize = 11;
+		break;
+	default:
+		data = [8];
+		dataSize = 11;
+	}
+	var stringSize = 0;
+	var _g1 = 0, _g = s.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		var code = Std["int"](Math.min(data.length - 1,s.charCodeAt(i))) - alphatab.platform.svg.FontSizes.CONTROL_CHARS;
+		if(code >= 0) {
+			var charSize = data[code];
+			stringSize += Std["int"](data[code] * size / dataSize);
+		}
+	}
+	return stringSize;
+}
+alphatab.platform.svg.FontSizes.prototype.__class__ = alphatab.platform.svg.FontSizes;
 alphatab.tablature.model.BeatDrawing = function(factory) {
 	if( factory === $_ ) return;
 	alphatab.model.Beat.call(this,factory);
@@ -7154,23 +7189,29 @@ alphatab.tablature.drawing.DrawingResources.init = function(scale) {
 	var sansFont = "'Arial'";
 	var serifFont = "'Times New Roman'";
 	alphatab.tablature.drawing.DrawingResources.defaultFontHeight = Math.round(9 * scale);
-	alphatab.tablature.drawing.DrawingResources.defaultFont = Std.string(alphatab.tablature.drawing.DrawingResources.defaultFontHeight) + "px " + sansFont;
-	alphatab.tablature.drawing.DrawingResources.chordFont = Std.string(9 * scale) + "px " + sansFont;
-	alphatab.tablature.drawing.DrawingResources.timeSignatureFont = Std.string(20 * scale) + "px " + sansFont;
+	alphatab.tablature.drawing.DrawingResources.defaultFont = alphatab.tablature.drawing.DrawingResources.formatFontSize(alphatab.tablature.drawing.DrawingResources.defaultFontHeight) + " " + sansFont;
+	alphatab.tablature.drawing.DrawingResources.chordFont = alphatab.tablature.drawing.DrawingResources.formatFontSize(9 * scale) + " " + sansFont;
+	alphatab.tablature.drawing.DrawingResources.timeSignatureFont = alphatab.tablature.drawing.DrawingResources.formatFontSize(20 * scale) + " " + sansFont;
 	alphatab.tablature.drawing.DrawingResources.clefFontHeight = Math.round(16 * scale);
-	alphatab.tablature.drawing.DrawingResources.clefFont = Std.string(alphatab.tablature.drawing.DrawingResources.clefFontHeight) + "px " + serifFont;
-	alphatab.tablature.drawing.DrawingResources.musicFont = Std.string(13 * scale) + "px " + sansFont;
-	alphatab.tablature.drawing.DrawingResources.tempoFont = Std.string(11 * scale) + "px " + sansFont;
+	alphatab.tablature.drawing.DrawingResources.clefFont = alphatab.tablature.drawing.DrawingResources.formatFontSize(alphatab.tablature.drawing.DrawingResources.clefFontHeight) + " " + serifFont;
+	alphatab.tablature.drawing.DrawingResources.musicFont = alphatab.tablature.drawing.DrawingResources.formatFontSize(13 * scale) + " " + sansFont;
+	alphatab.tablature.drawing.DrawingResources.tempoFont = alphatab.tablature.drawing.DrawingResources.formatFontSize(11 * scale) + " " + sansFont;
 	alphatab.tablature.drawing.DrawingResources.graceFontHeight = Math.round(9 * scale);
-	alphatab.tablature.drawing.DrawingResources.graceFont = Std.string(alphatab.tablature.drawing.DrawingResources.graceFontHeight) + "px " + sansFont;
+	alphatab.tablature.drawing.DrawingResources.graceFont = alphatab.tablature.drawing.DrawingResources.formatFontSize(alphatab.tablature.drawing.DrawingResources.graceFontHeight) + " " + sansFont;
 	alphatab.tablature.drawing.DrawingResources.noteFontHeight = Math.round(11 * scale);
-	alphatab.tablature.drawing.DrawingResources.noteFont = Std.string(alphatab.tablature.drawing.DrawingResources.noteFontHeight) + "px " + sansFont;
+	alphatab.tablature.drawing.DrawingResources.noteFont = alphatab.tablature.drawing.DrawingResources.formatFontSize(alphatab.tablature.drawing.DrawingResources.noteFontHeight) + " " + sansFont;
 	alphatab.tablature.drawing.DrawingResources.effectFontHeight = Math.round(11 * scale);
-	alphatab.tablature.drawing.DrawingResources.effectFont = "italic " + Std.string(alphatab.tablature.drawing.DrawingResources.effectFontHeight) + "px " + serifFont;
-	alphatab.tablature.drawing.DrawingResources.titleFont = Std.string(30 * scale) + "px " + serifFont;
-	alphatab.tablature.drawing.DrawingResources.subtitleFont = Std.string(19 * scale) + "px " + serifFont;
-	alphatab.tablature.drawing.DrawingResources.wordsFont = Std.string(13 * scale) + "px " + serifFont;
-	alphatab.tablature.drawing.DrawingResources.copyrightFont = "bold " + Std.string(11 * scale) + "px " + sansFont;
+	alphatab.tablature.drawing.DrawingResources.effectFont = "italic " + alphatab.tablature.drawing.DrawingResources.formatFontSize(alphatab.tablature.drawing.DrawingResources.effectFontHeight) + " " + serifFont;
+	alphatab.tablature.drawing.DrawingResources.titleFont = alphatab.tablature.drawing.DrawingResources.formatFontSize(30 * scale) + " " + serifFont;
+	alphatab.tablature.drawing.DrawingResources.subtitleFont = alphatab.tablature.drawing.DrawingResources.formatFontSize(19 * scale) + " " + serifFont;
+	alphatab.tablature.drawing.DrawingResources.wordsFont = alphatab.tablature.drawing.DrawingResources.formatFontSize(13 * scale) + " " + serifFont;
+	alphatab.tablature.drawing.DrawingResources.copyrightFont = "bold " + Std.string(11 * scale) + " " + sansFont;
+}
+alphatab.tablature.drawing.DrawingResources.formatFontSize = function(size) {
+	var num = size;
+	num = num * Math.pow(10,2);
+	num = Math.round(num) / Math.pow(10,2);
+	return Std.string(num) + "px";
 }
 alphatab.tablature.drawing.DrawingResources.getScoreNoteSize = function(layout,full) {
 	var scale = (full?layout.scoreLineSpacing + 1:layout.scoreLineSpacing) - 2;
@@ -8343,6 +8384,9 @@ alphatab.platform.BinaryReader.prototype.getByte = function(index) {
 	data = data & 255;
 	return data;
 }
+alphatab.platform.BinaryReader.prototype.readInt16 = function() {
+	return this.decodeInt(16,true);
+}
 alphatab.platform.BinaryReader.prototype.readInt32 = function() {
 	return this.decodeInt(32,true);
 }
@@ -9101,6 +9145,345 @@ alphatab.model.TimeSignature.prototype.copy = function(timeSignature) {
 	this.denominator.copy(timeSignature.denominator);
 }
 alphatab.model.TimeSignature.prototype.__class__ = alphatab.model.TimeSignature;
+alphatab.platform.svg.SvgCanvas = function(p) {
+	if( p === $_ ) return;
+	this._buffer = new StringBuf();
+	this._currentPath = new StringBuf();
+	this.setStrokeStyle("#FFFFFF");
+	this.setFillStyle("#FFFFFF");
+	this.setLineWidth(1);
+	this._width = 0;
+	this._height = 0;
+	this.setFont("10px sans-serif");
+	this.setTextBaseline("alphabetic");
+	this.setTextAlign("left");
+}
+alphatab.platform.svg.SvgCanvas.__name__ = ["alphatab","platform","svg","SvgCanvas"];
+alphatab.platform.svg.SvgCanvas.prototype._buffer = null;
+alphatab.platform.svg.SvgCanvas.prototype._currentPath = null;
+alphatab.platform.svg.SvgCanvas.prototype._width = null;
+alphatab.platform.svg.SvgCanvas.prototype._height = null;
+alphatab.platform.svg.SvgCanvas.prototype.toSvg = function(includeWrapper,className) {
+	var svg = new StringBuf();
+	if(includeWrapper) {
+		svg.b[svg.b.length] = "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"";
+		svg.add(this._width);
+		svg.b[svg.b.length] = "px\" height=\"";
+		svg.add(this._height);
+		svg.b[svg.b.length] = "px\"";
+		if(className != null) {
+			svg.b[svg.b.length] = " class=\"";
+			svg.b[svg.b.length] = className == null?"null":className;
+			svg.b[svg.b.length] = "\"";
+		}
+		svg.b[svg.b.length] = ">";
+	}
+	svg.add(this._buffer.b.join(""));
+	if(includeWrapper) svg.b[svg.b.length] = "</svg>";
+	return svg.b.join("");
+}
+alphatab.platform.svg.SvgCanvas.prototype.width = function() {
+	return this._width;
+}
+alphatab.platform.svg.SvgCanvas.prototype.height = function() {
+	return this._height;
+}
+alphatab.platform.svg.SvgCanvas.prototype.setWidth = function(width) {
+	this._width = width;
+}
+alphatab.platform.svg.SvgCanvas.prototype.setHeight = function(height) {
+	this._height = height;
+}
+alphatab.platform.svg.SvgCanvas.prototype._strokeStyle = null;
+alphatab.platform.svg.SvgCanvas.prototype.strokeStyle = null;
+alphatab.platform.svg.SvgCanvas.prototype.getStrokeStyle = function() {
+	return this._strokeStyle;
+}
+alphatab.platform.svg.SvgCanvas.prototype.setStrokeStyle = function(value) {
+	this._strokeStyle = value;
+	return this._strokeStyle;
+}
+alphatab.platform.svg.SvgCanvas.prototype._fillStyle = null;
+alphatab.platform.svg.SvgCanvas.prototype.fillStyle = null;
+alphatab.platform.svg.SvgCanvas.prototype.getFillStyle = function() {
+	return this._fillStyle;
+}
+alphatab.platform.svg.SvgCanvas.prototype.setFillStyle = function(value) {
+	this._fillStyle = value;
+	return this._fillStyle;
+}
+alphatab.platform.svg.SvgCanvas.prototype._lineWidth = null;
+alphatab.platform.svg.SvgCanvas.prototype.lineWidth = null;
+alphatab.platform.svg.SvgCanvas.prototype.getLineWidth = function() {
+	return this._lineWidth;
+}
+alphatab.platform.svg.SvgCanvas.prototype.setLineWidth = function(value) {
+	this._lineWidth = value;
+	return this._lineWidth;
+}
+alphatab.platform.svg.SvgCanvas.prototype.clear = function() {
+	this._buffer = new StringBuf();
+	this._currentPath = new StringBuf();
+}
+alphatab.platform.svg.SvgCanvas.prototype.fillRect = function(x,y,w,h) {
+	this._buffer.add("<rect x=\"");
+	this._buffer.add(x);
+	this._buffer.add("\" y=\"");
+	this._buffer.add(y);
+	this._buffer.add("\" width=\"");
+	this._buffer.add(w);
+	this._buffer.add("\" height=\"");
+	this._buffer.add(h);
+	this._buffer.add("\" style=\"fill:");
+	this._buffer.add(this.getFillStyle());
+	this._buffer.add(";\" />");
+}
+alphatab.platform.svg.SvgCanvas.prototype.strokeRect = function(x,y,w,h) {
+	this._buffer.add("<rect x=\"");
+	this._buffer.add(x);
+	this._buffer.add("\" y=\"");
+	this._buffer.add(y);
+	this._buffer.add("\" width=\"");
+	this._buffer.add(w);
+	this._buffer.add("\" height=\"");
+	this._buffer.add(h);
+	this._buffer.add("\" style=\"stroke:");
+	this._buffer.add(this.getStrokeStyle());
+	this._buffer.add("; stroke-width:");
+	this._buffer.add(this.getLineWidth());
+	this._buffer.add(";\" />");
+}
+alphatab.platform.svg.SvgCanvas.prototype.beginPath = function() {
+}
+alphatab.platform.svg.SvgCanvas.prototype.closePath = function() {
+	this._currentPath.add(" z");
+}
+alphatab.platform.svg.SvgCanvas.prototype.moveTo = function(x,y) {
+	this._currentPath.add(" M");
+	this._currentPath.add(x);
+	this._currentPath.add(",");
+	this._currentPath.add(y);
+}
+alphatab.platform.svg.SvgCanvas.prototype.lineTo = function(x,y) {
+	this._currentPath.add(" L");
+	this._currentPath.add(x);
+	this._currentPath.add(",");
+	this._currentPath.add(y);
+}
+alphatab.platform.svg.SvgCanvas.prototype.quadraticCurveTo = function(cpx,cpy,x,y) {
+	this._currentPath.add(" Q");
+	this._currentPath.add(cpx);
+	this._currentPath.add(",");
+	this._currentPath.add(cpy);
+	this._currentPath.add(",");
+	this._currentPath.add(x);
+	this._currentPath.add(",");
+	this._currentPath.add(y);
+}
+alphatab.platform.svg.SvgCanvas.prototype.bezierCurveTo = function(cp1x,cp1y,cp2x,cp2y,x,y) {
+	this._currentPath.add(" C");
+	this._currentPath.add(cp1x);
+	this._currentPath.add(",");
+	this._currentPath.add(cp1y);
+	this._currentPath.add(",");
+	this._currentPath.add(cp2x);
+	this._currentPath.add(",");
+	this._currentPath.add(cp2y);
+	this._currentPath.add(",");
+	this._currentPath.add(x);
+	this._currentPath.add(",");
+	this._currentPath.add(y);
+}
+alphatab.platform.svg.SvgCanvas.prototype.circle = function(x,y,radius) {
+	this._currentPath.add(" M");
+	this._currentPath.add(x - radius);
+	this._currentPath.add(",");
+	this._currentPath.add(y);
+	this._currentPath.add(" A1,1 0 0,0 ");
+	this._currentPath.add(x + radius);
+	this._currentPath.add(",");
+	this._currentPath.add(y);
+	this._currentPath.add(" A1,1 0 0,0 ");
+	this._currentPath.add(x - radius);
+	this._currentPath.add(",");
+	this._currentPath.add(y);
+	this._currentPath.add(" z");
+}
+alphatab.platform.svg.SvgCanvas.prototype.rect = function(x,y,w,h) {
+	this._currentPath.add(" M");
+	this._currentPath.add(x);
+	this._currentPath.add(",");
+	this._currentPath.add(y);
+	this._currentPath.add(" L");
+	this._currentPath.add(x + w);
+	this._currentPath.add(",");
+	this._currentPath.add(y);
+	this._currentPath.add(" ");
+	this._currentPath.add(x + w);
+	this._currentPath.add(",");
+	this._currentPath.add(y + h);
+	this._currentPath.add(" ");
+	this._currentPath.add(x);
+	this._currentPath.add(",");
+	this._currentPath.add(y + h);
+	this._currentPath.add(" z");
+}
+alphatab.platform.svg.SvgCanvas.prototype.fill = function() {
+	var path = this._currentPath.b.join("");
+	if(!this.isEmptyPath(path)) {
+		this._buffer.add("<path d=\"");
+		this._buffer.add(this._currentPath.b.join(""));
+		this._buffer.add("\" style=\"fill:");
+		this._buffer.add(this.getFillStyle());
+		this._buffer.add("\" />");
+	}
+	this._currentPath = new StringBuf();
+}
+alphatab.platform.svg.SvgCanvas.prototype.stroke = function() {
+	var path = this._currentPath.b.join("");
+	if(!this.isEmptyPath(path)) {
+		this._buffer.add("<path d=\"");
+		this._buffer.add(this._currentPath.b.join(""));
+		this._buffer.add("\" style=\"stroke:");
+		this._buffer.add(this.getStrokeStyle());
+		this._buffer.add("; stroke-width:");
+		this._buffer.add(this.getLineWidth());
+		this._buffer.add(";\" />");
+	}
+	this._currentPath = new StringBuf();
+}
+alphatab.platform.svg.SvgCanvas.prototype.isEmptyPath = function(path) {
+	return path.length <= 0 || StringTools.trim(path) == "z";
+}
+alphatab.platform.svg.SvgCanvas.prototype._font = null;
+alphatab.platform.svg.SvgCanvas.prototype.font = null;
+alphatab.platform.svg.SvgCanvas.prototype.getFont = function() {
+	return this._font;
+}
+alphatab.platform.svg.SvgCanvas.prototype.setFont = function(value) {
+	this._font = value;
+	return this._font;
+}
+alphatab.platform.svg.SvgCanvas.prototype._textBaseline = null;
+alphatab.platform.svg.SvgCanvas.prototype.textBaseline = null;
+alphatab.platform.svg.SvgCanvas.prototype.getTextBaseline = function() {
+	return this._textBaseline;
+}
+alphatab.platform.svg.SvgCanvas.prototype.setTextBaseline = function(value) {
+	this._textBaseline = value;
+	return this._textBaseline;
+}
+alphatab.platform.svg.SvgCanvas.prototype._textAlign = null;
+alphatab.platform.svg.SvgCanvas.prototype.textAlign = null;
+alphatab.platform.svg.SvgCanvas.prototype.getTextAlign = function() {
+	return this._textAlign;
+}
+alphatab.platform.svg.SvgCanvas.prototype.setTextAlign = function(value) {
+	this._textAlign = value;
+	return this._textAlign;
+}
+alphatab.platform.svg.SvgCanvas.prototype.fillText = function(text,x,y,maxWidth) {
+	if(maxWidth == null) maxWidth = 0;
+	this._buffer.add("<text x=\"");
+	this._buffer.add(x);
+	this._buffer.add("\" y=\"");
+	this._buffer.add(y);
+	this._buffer.add("\" style=\"font:");
+	this._buffer.add(this.getFont());
+	this._buffer.add("; fill:");
+	this._buffer.add(this.getFillStyle());
+	this._buffer.add(";\" ");
+	if(maxWidth != 0) {
+		this._buffer.add("width=\"");
+		this._buffer.add(maxWidth);
+		this._buffer.add("\"");
+	}
+	this._buffer.add(" dominant-baseline=\"");
+	this._buffer.add(this.getSvgBaseLine());
+	this._buffer.add("\" text-anchor=\"");
+	this._buffer.add(this.getSvgTextAlignment());
+	this._buffer.add("\">");
+	this._buffer.add(text);
+	this._buffer.add("</text>");
+}
+alphatab.platform.svg.SvgCanvas.prototype.strokeText = function(text,x,y,maxWidth) {
+	if(maxWidth == null) maxWidth = 0;
+	this._buffer.add("<text x=\"");
+	this._buffer.add(x);
+	this._buffer.add("\" y=\"");
+	this._buffer.add(y);
+	this._buffer.add("\" style=\"font:");
+	this._buffer.add(this.getFont());
+	this._buffer.add("\" stroke:");
+	this._buffer.add(this.getStrokeStyle());
+	this._buffer.add("; stroke-width:");
+	this._buffer.add(this.getLineWidth());
+	this._buffer.add(";\" ");
+	if(maxWidth != 0) {
+		this._buffer.add("width=\"");
+		this._buffer.add(maxWidth);
+		this._buffer.add("\"");
+	}
+	this._buffer.add(" dominant-baseline=\"");
+	this._buffer.add(this.getSvgBaseLine());
+	this._buffer.add("\" text-anchor=\"");
+	this._buffer.add(this.getSvgTextAlignment());
+	this._buffer.add("\">");
+	this._buffer.add(text);
+	this._buffer.add("</text>");
+}
+alphatab.platform.svg.SvgCanvas.prototype.getSvgTextAlignment = function() {
+	switch(this.getTextAlign()) {
+	case "left":
+		return "start";
+	case "right":
+		return "end";
+	case "center":
+		return "middle";
+	case "start":
+		return "start";
+	case "end":
+		return "end";
+	default:
+		return "start";
+	}
+}
+alphatab.platform.svg.SvgCanvas.prototype.getSvgBaseLine = function() {
+	switch(this.getTextBaseline()) {
+	case "top":
+		return "top";
+	case "hanging":
+		return "hanging";
+	case "middle":
+		return "central";
+	case "alphabetic":
+		return "alphabetic";
+	case "ideographic":
+		return "ideographic";
+	case "bottom":
+		return "bottom";
+	default:
+		return "alphabetic";
+	}
+}
+alphatab.platform.svg.SvgCanvas.prototype.measureText = function(text) {
+	var font = alphatab.platform.svg.SupportedFonts.Arial;
+	if(this.getFont().indexOf("Times") >= 0) font = alphatab.platform.svg.SupportedFonts.TimesNewRoman;
+	var size = "";
+	var preparedFont = this.getFont();
+	if(preparedFont.indexOf("bold ") == 0) preparedFont = preparedFont.substr(5);
+	if(preparedFont.indexOf("italic ") == 0) preparedFont = preparedFont.substr(7);
+	var _g1 = 0, _g = preparedFont.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		var c = preparedFont.charCodeAt(i);
+		if((c < 48 || c > 57) && c != 46 && c != 32) break;
+		size += preparedFont.charAt(i);
+	}
+	return alphatab.platform.svg.FontSizes.measureString(text,font,Std.parseFloat(size));
+}
+alphatab.platform.svg.SvgCanvas.prototype.__class__ = alphatab.platform.svg.SvgCanvas;
+alphatab.platform.svg.SvgCanvas.__interfaces__ = [alphatab.platform.Canvas];
 alphatab.midi.MidiSequenceParser = function(factory,song,flags,tempoPercent,transpose) {
 	if( factory === $_ ) return;
 	this._song = song;
@@ -9775,7 +10158,6 @@ alphatab.tablature.drawing.DrawingLayer.prototype.draw = function(graphics) {
 				this._currentPosition.y = elm.Y2;
 				break;
 			case "addString":
-				graphics.setTextBaseline(elm.BaseLine);
 				graphics.setFont(elm.Font);
 				graphics.fillText(elm.Text,elm.X,elm.Y);
 				break;
@@ -9841,9 +10223,8 @@ alphatab.tablature.drawing.DrawingLayer.prototype.quadraticCurveTo = function(x1
 alphatab.tablature.drawing.DrawingLayer.prototype.lineTo = function(x,y) {
 	this._path.push({ Command : "lineTo", X : x + 0.5, Y : y + 0.5});
 }
-alphatab.tablature.drawing.DrawingLayer.prototype.addString = function(str,font,x,y,baseline) {
-	if(baseline == null) baseline = "middle";
-	this._path.push({ Command : "addString", Text : str, Font : font, X : x + 0.5, Y : y + 0.5, BaseLine : baseline});
+alphatab.tablature.drawing.DrawingLayer.prototype.addString = function(str,font,x,y) {
+	this._path.push({ Command : "addString", Text : str, Font : font, X : x + 0.5, Y : y + 0.5});
 }
 alphatab.tablature.drawing.DrawingLayer.prototype.addMusicSymbol = function(symbol,x,y,xScale,yScale) {
 	if(yScale == null) yScale = 0;
@@ -9943,6 +10324,8 @@ alphatab.tablature.Tablature.prototype.viewLayout = null;
 alphatab.tablature.Tablature.prototype.track = null;
 alphatab.tablature.Tablature.prototype.autoSizeWidth = null;
 alphatab.tablature.Tablature.prototype.onCaretChanged = null;
+alphatab.tablature.Tablature.prototype.onLayouted = null;
+alphatab.tablature.Tablature.prototype.onFinished = null;
 alphatab.tablature.Tablature.prototype.setViewLayoutByKey = function(layout) {
 	if(layout == "horizontal") this.viewLayout = new alphatab.tablature.HorizontalViewLayout(); else if(layout == "page") this.viewLayout = new alphatab.tablature.PageViewLayout(); else this.viewLayout = new alphatab.tablature.PageViewLayout();
 	this.viewLayout.setTablature(this);
@@ -9984,13 +10367,14 @@ alphatab.tablature.Tablature.prototype.doLayout = function() {
 	this.viewLayout.prepareLayout(new alphatab.model.Rectangle(0,0,size.x,size.y),0,0);
 	if(this.autoSizeWidth) this.canvas.setWidth(this.viewLayout.width);
 	this.canvas.setHeight(this.viewLayout.height);
+	if(this.onLayouted != null) this.onLayouted();
 }
 alphatab.tablature.Tablature.prototype.onPaint = function() {
 	this.paintBackground();
 	if(this.track == null || this.isError) {
 		var text = this.errorMessage;
 		this.canvas.setFillStyle("#4e4e4e");
-		this.canvas.setFont("20px 'Arial'");
+		this.canvas.setFont(alphatab.tablature.drawing.DrawingResources.timeSignatureFont);
 		this.canvas.setTextBaseline("middle");
 		this.canvas.fillText(text,20,30);
 	} else if(this._updateDisplay) {
@@ -10002,6 +10386,7 @@ alphatab.tablature.Tablature.prototype.onPaint = function() {
 		this.viewLayout.paintCache(this.canvas,displayRect,0,0);
 		this._updateDisplay = false;
 	}
+	if(this.onFinished != null) this.onFinished();
 }
 alphatab.tablature.Tablature.prototype.updateTablature = function() {
 	if(this.track == null) return;
@@ -10428,22 +10813,22 @@ Xml.prototype.toString = function() {
 	if(this.nodeType == Xml.Prolog) return "<?" + this._nodeValue + "?>";
 	var s = new StringBuf();
 	if(this.nodeType == Xml.Element) {
-		s.b[s.b.length] = "<" == null?"null":"<";
+		s.b[s.b.length] = "<";
 		s.add(this._nodeName);
 		var $it0 = this._attributes.keys();
 		while( $it0.hasNext() ) {
 			var k = $it0.next();
-			s.b[s.b.length] = " " == null?"null":" ";
+			s.b[s.b.length] = " ";
 			s.b[s.b.length] = k == null?"null":k;
-			s.b[s.b.length] = "=\"" == null?"null":"=\"";
+			s.b[s.b.length] = "=\"";
 			s.add(this._attributes.get(k));
-			s.b[s.b.length] = "\"" == null?"null":"\"";
+			s.b[s.b.length] = "\"";
 		}
 		if(this._children.length == 0) {
-			s.b[s.b.length] = "/>" == null?"null":"/>";
+			s.b[s.b.length] = "/>";
 			return s.b.join("");
 		}
-		s.b[s.b.length] = ">" == null?"null":">";
+		s.b[s.b.length] = ">";
 	}
 	var $it1 = this.iterator();
 	while( $it1.hasNext() ) {
@@ -10451,13 +10836,20 @@ Xml.prototype.toString = function() {
 		s.add(x.toString());
 	}
 	if(this.nodeType == Xml.Element) {
-		s.b[s.b.length] = "</" == null?"null":"</";
+		s.b[s.b.length] = "</";
 		s.add(this._nodeName);
-		s.b[s.b.length] = ">" == null?"null":">";
+		s.b[s.b.length] = ">";
 	}
 	return s.b.join("");
 }
 Xml.prototype.__class__ = Xml;
+alphatab.platform.svg.SupportedFonts = { __ename__ : ["alphatab","platform","svg","SupportedFonts"], __constructs__ : ["TimesNewRoman","Arial"] }
+alphatab.platform.svg.SupportedFonts.TimesNewRoman = ["TimesNewRoman",0];
+alphatab.platform.svg.SupportedFonts.TimesNewRoman.toString = $estr;
+alphatab.platform.svg.SupportedFonts.TimesNewRoman.__enum__ = alphatab.platform.svg.SupportedFonts;
+alphatab.platform.svg.SupportedFonts.Arial = ["Arial",1];
+alphatab.platform.svg.SupportedFonts.Arial.toString = $estr;
+alphatab.platform.svg.SupportedFonts.Arial.__enum__ = alphatab.platform.svg.SupportedFonts;
 alphatab.tablature.model.BeatGroup = function(p) {
 	if( p === $_ ) return;
 	this._voices = new Array();
@@ -10606,6 +10998,7 @@ alphatab.model.Velocities.FORTE = 95;
 alphatab.model.Velocities.FORTISSIMO = 111;
 alphatab.model.Velocities.FORTE_FORTISSIMO = 127;
 alphatab.model.Velocities.DEFAULT = 95;
+alphatab.platform.PlatformFactory.SVG_CANVAS = "svg";
 alphatab.midi.MidiSequenceParserFlags.ADD_DEFAULT_CONTROLS = 1;
 alphatab.midi.MidiSequenceParserFlags.ADD_MIXER_MESSAGES = 2;
 alphatab.midi.MidiSequenceParserFlags.ADD_METRONOME = 4;
@@ -10779,6 +11172,9 @@ alphatab.tablature.drawing.DrawingLayers.VoiceEffects1 = 10;
 alphatab.tablature.drawing.DrawingLayers.VoiceEffectsDraw1 = 11;
 alphatab.tablature.drawing.DrawingLayers.VoiceDraw1 = 12;
 alphatab.tablature.drawing.DrawingLayers.Red = 13;
+alphatab.platform.svg.FontSizes.TIMES_NEW_ROMAN_11PT = [3,4,5,6,6,9,9,2,4,4,6,6,3,4,3,3,6,6,6,6,6,6,6,6,6,6,3,3,6,6,6,5,10,8,7,7,8,7,6,7,8,4,4,8,7,10,8,8,7,8,7,5,8,8,7,11,8,8,7,4,3,4,5,6,4,5,5,5,5,5,4,5,6,3,3,6,3,9,6,6,6,5,4,4,4,5,6,7,6,6,5,5,2,5,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,4,6,6,6,6,2,5,4,8,4,6,6,0,8,6,4,6,3,3,4,5,5,4,4,3,3,6,8,8,8,5,8,8,8,8,8,8,11,7,7,7,7,7,4,4,4,4,8,8,8,8,8,8,8,6,8,8,8,8,8,8,6,5,5,5,5,5,5,5,8,5,5,5,5,5,3,3,3,3,6,6,6,6,6,6,6,6,6,5,5,5,5,6,6];
+alphatab.platform.svg.FontSizes.ARIAL_11PT = [3,2,4,6,6,10,7,2,4,4,4,6,3,4,3,3,6,6,6,6,6,6,6,6,6,6,3,3,6,6,6,6,11,8,7,7,7,6,6,8,7,2,5,7,6,8,7,8,6,8,7,7,6,7,8,10,7,8,7,3,3,3,5,6,4,6,6,6,6,6,4,6,6,2,2,5,2,8,6,6,6,6,4,6,3,6,6,10,6,6,6,4,2,4,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,2,6,6,7,6,2,6,4,8,4,6,6,0,8,6,4,6,4,4,4,6,6,4,4,4,5,6,9,10,10,6,8,8,8,8,8,8,11,7,6,6,6,6,2,2,2,2,8,7,8,8,8,8,8,6,8,7,7,7,7,8,7,7,6,6,6,6,6,6,10,6,6,6,6,6,2,2,2,2,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6];
+alphatab.platform.svg.FontSizes.CONTROL_CHARS = 32;
 alphatab.model.Duration.MIN_TIME = Math.floor(Math.floor(960 * (4.0 / 64)) * 2 / 3);
 alphatab.model.Duration.QUARTER_TIME = 960;
 alphatab.model.Duration.WHOLE = 1;

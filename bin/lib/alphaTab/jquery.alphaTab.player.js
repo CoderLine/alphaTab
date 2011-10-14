@@ -30,6 +30,7 @@
             caret: true,
             measureCaretColor: '#FFF200',
             measureCaretOpacity: 0.25,
+            caretOffset: {x: 0, y: 0},
             beatCaretColor: '#4040FF',
             beatCaretOpacity: 0.75,
             autoScroll: true,
@@ -199,11 +200,9 @@
 
         this.tablature.onCaretChanged = function(beat,scroll)
         {
-            var x = $(self.canvas).offset().left + parseInt($(self.canvas).css("borderLeftWidth"), 10) ;
-            var y = $(self.canvas).offset().top;
-            
-            
-
+            var x = $(self.canvasWrapper).offset().left + parseInt($(self.canvas).css("borderLeftWidth"), 10) + playerOptions.caretOffset.x;
+            var y = $(self.canvasWrapper).offset().top + playerOptions.caretOffset.y;
+            console.log(y);
             y += beat.measure.staveLine.y;
 
             var measureX = x + beat.measure.staveLine.x + beat.measure.x;
