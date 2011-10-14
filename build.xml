@@ -9,6 +9,7 @@
 	<property name="src" location="src"/>
 	<property name="haxe-js" location="${lib}/alphaTab.js"/>
 	<property name="haxe-cs" location="cs"/>
+	<property name="haxe-cpp" location="cpp"/>
 	<property name="release" location="releases"/>
 	<property name="tools" location="tools"/>
 	
@@ -90,6 +91,21 @@
             <arg value="alphatab.AlphaTabCsGenerator.use()" />
         </exec>
 	</target>	
+   
+    <target name="haxe-cpp" depends="global-init">
+		<delete dir="cpp" />
+		<mkdir dir="cpp" />
+        <exec executable="haxe">
+            <arg value="-cp" />
+            <arg value="${src}"/>
+            
+            <arg value="-main" />
+            <arg value="alphatab.Main" />
+            
+            <arg value="-pp" />
+            <arg value="${haxe-cs}" />
+        </exec>
+    </target>
    
 	<!-- Release -->
 	<target name="release-init" depends="java-player">
