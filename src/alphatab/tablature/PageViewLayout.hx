@@ -147,17 +147,25 @@ class PageViewLayout extends ViewLayout
         
         var posY:Int = y;
         
+        var startIndex:Int = tablature.getLayoutSetting("startMeasure", -1);
+        startIndex--;
+        startIndex = Std.int(Math.min(tablature.track.measureCount() - 1, Math.max(0, startIndex)));
+
+        var endIndex:Int = tablature.getLayoutSetting("measureCount", tablature.track.measures.length);
+        endIndex = startIndex + endIndex - 1;
+        endIndex = Std.int(Math.min(tablature.track.measureCount() - 1, Math.max(0, endIndex)));
+
+        
         var track:Track = tablature.track;
-        var measureCount:Int = tablature.track.measures.length;
-        var nextMeasureIndex:Int = 0;
+        var nextMeasureIndex:Int = startIndex;
         
         x += contentPadding.left;
         posY = Math.floor(layoutSongInfo(x, posY) + firstMeasureSpacing);
          
-        while (measureCount > nextMeasureIndex) 
+        while (endIndex >= nextMeasureIndex) 
         {
             // calculate a stave line
-            var line:StaveLine = getStaveLine(track, nextMeasureIndex, posY, x);
+            var line:StaveLine = getStaveLine(track, nextMeasureIndex, endIndex, posY, x);
             _lines.push(line);
 
             // try to fit full line
@@ -175,7 +183,7 @@ class PageViewLayout extends ViewLayout
         width = getSheetWidth();
     }
         
-    public function getStaveLine(track:Track, startIndex:Int, y:Int, x:Int) : StaveLine
+    public function getStaveLine(track:Track, startIndex:Int, endIndex:Int, y:Int, x:Int) : StaveLine
     {
         var line:StaveLine = createStaveLine(track);
         line.y = y;
@@ -187,7 +195,7 @@ class PageViewLayout extends ViewLayout
         
         var measuresPerLine = tablature.getLayoutSetting("measuresPerLine", -1);
         
-        var measureCount = track.measureCount(); 
+        var measureCount = endIndex + 1; 
         x = 0;
         for (i in startIndex ... measureCount) 
         {

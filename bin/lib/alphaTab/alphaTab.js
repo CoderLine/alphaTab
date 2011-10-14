@@ -177,13 +177,18 @@ alphatab.tablature.PageViewLayout.prototype.prepareLayout = function(clientArea,
 	this.width = 0;
 	this.height = 0;
 	var posY = y;
+	var startIndex = this.tablature.getLayoutSetting("startMeasure",-1);
+	startIndex--;
+	startIndex = Std["int"](Math.min(this.tablature.track.measureCount() - 1,Math.max(0,startIndex)));
+	var endIndex = this.tablature.getLayoutSetting("measureCount",this.tablature.track.measures.length);
+	endIndex = startIndex + endIndex - 1;
+	endIndex = Std["int"](Math.min(this.tablature.track.measureCount() - 1,Math.max(0,endIndex)));
 	var track = this.tablature.track;
-	var measureCount = this.tablature.track.measures.length;
-	var nextMeasureIndex = 0;
+	var nextMeasureIndex = startIndex;
 	x += this.contentPadding.left;
 	posY = Math.floor(this.layoutSongInfo(x,posY) + this.firstMeasureSpacing);
-	while(measureCount > nextMeasureIndex) {
-		var line = this.getStaveLine(track,nextMeasureIndex,posY,x);
+	while(endIndex >= nextMeasureIndex) {
+		var line = this.getStaveLine(track,nextMeasureIndex,endIndex,posY,x);
 		this._lines.push(line);
 		this.fitLine(track,line);
 		posY += line.getHeight();
@@ -192,14 +197,14 @@ alphatab.tablature.PageViewLayout.prototype.prepareLayout = function(clientArea,
 	this.height = posY + this.contentPadding.bottom;
 	this.width = this.getSheetWidth();
 }
-alphatab.tablature.PageViewLayout.prototype.getStaveLine = function(track,startIndex,y,x) {
+alphatab.tablature.PageViewLayout.prototype.getStaveLine = function(track,startIndex,endIndex,y,x) {
 	var line = this.createStaveLine(track);
 	line.y = y;
 	line.x = x;
 	line.spacing.set(0,Math.floor(10 * this.scale));
 	line.spacing.set(1,Math.floor(10 * this.scale));
 	var measuresPerLine = this.tablature.getLayoutSetting("measuresPerLine",-1);
-	var measureCount = track.measureCount();
+	var measureCount = endIndex + 1;
 	x = 0;
 	var _g = startIndex;
 	while(_g < measureCount) {

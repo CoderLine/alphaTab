@@ -28,6 +28,11 @@ $(document).ready(function() {
         measuresPerLine: 5,
         hideSongInfo: true
     }});
+    $('div.alphaTabPage3').alphaTab({file: f, layout: {
+        mode: "page",
+        startMeasure: 5,
+        measureCount: 5
+    }});
 	$('div.alphaTabHorizontal').alphaTab({file: f, layout: "horizontal"});
 });
 </script>
@@ -35,5 +40,7 @@ $(document).ready(function() {
 <div class="alphaTabPage"></div>
 <h2>Page Layout (5 Measures per Line)</h2>
 <div class="alphaTabPage2"></div>
+<h2>Page Layout (From Measure 5 to 20)</h2>
+<div class="alphaTabPage3"></div>
 <h2>Horizontal</h2>
 <div class="alphaTabHorizontal"></div>
