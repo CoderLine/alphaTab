@@ -66,7 +66,7 @@ class DrawingResources
         titleFont =  formatFontSize(30*scale) + " " + serifFont;
         subtitleFont = formatFontSize(19 * scale) + " " + serifFont;
         wordsFont =  formatFontSize(13 * scale) + " " + serifFont;
-        copyrightFont =  "bold " + Std.string(11 * scale) + " " + sansFont;
+        copyrightFont =  "bold " + formatFontSize(11 * scale) + " " + sansFont;
     }
     
     private static function formatFontSize(size:Float) 

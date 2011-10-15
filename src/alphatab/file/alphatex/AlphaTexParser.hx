@@ -1191,7 +1191,7 @@ class AlphaTexParser extends SongReader
      */
     private function nextChar() : Void 
     {
-        _ch = _curChPos < data.getSize() ? 
+        _ch = _curChPos < data.length() ? 
                 String.fromCharCode(data.readByte()) 
                 : EOL;
         _curChPos++;

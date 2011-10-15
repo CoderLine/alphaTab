@@ -84,19 +84,19 @@ class Gp5Reader extends Gp4Reader
         readPageSetup(song);
         
         song.tempoName = readIntSizeCheckByteString();
-        song.tempo = readInt();
+        song.tempo = data.readInt();
         
         if (_versionIndex > 0) 
-            song.hideTempo = readBool();
+            song.hideTempo = data.readBool();
         
-        song.key = readByte();
-        song.octave = readInt();
+        song.key = data.readByte();
+        song.octave = data.readInt();
         
         var channels:Array<MidiChannel> = readMidiChannels();
         
         skip(42); // rse info?
-        var measureCount:Int = readInt();
-        var trackCount:Int = readInt();
+        var measureCount:Int = data.readInt();
+        var trackCount:Int = data.readInt();
         
         readMeasureHeaders(song, measureCount);
         readTracks(song, trackCount, channels);
@@ -109,7 +109,7 @@ class Gp5Reader extends Gp4Reader
     {
         for (voice in 0 ... Beat.MAX_VOICES) {
             var start:Int = measure.start();
-            var beats:Int = readInt();
+            var beats:Int = data.readInt();
             for (beat in 0 ... beats) { 
                 start += readBeat(start, measure, track, voice);
             }
@@ -119,13 +119,13 @@ class Gp5Reader extends Gp4Reader
     
     override private function readBeat(start:Int, measure:Measure, track:Track, voiceIndex:Int) : Int
     {
-        var flags:Int = readUnsignedByte();
+        var flags:Int = data.readByte();
         
         var beat:Beat = getBeat(measure, start);
         var voice:Voice = beat.voices[voiceIndex];
         
         if ((flags & 0x40) != 0) {
-            var beatType:Int = readUnsignedByte();
+            var beatType:Int = data.readByte();
             voice.isEmpty = ((beatType & 0x02) == 0);
         }
         
@@ -143,7 +143,7 @@ class Gp5Reader extends Gp4Reader
             var mixTableChange:MixTableChange = readMixTableChange(measure);
             beat.effect.mixTableChange = mixTableChange;
         }
-        var stringFlags:Int = readUnsignedByte();
+        var stringFlags:Int = data.readByte();
         for (j in 0 ... 7)
         {
             var i:Int = 6 - j;
@@ -157,7 +157,7 @@ class Gp5Reader extends Gp4Reader
         
         skip(1);
         
-        var read:Int = readByte();
+        var read:Int = data.readByte();
         if (read == 8 || read == 10) {
             skip(1);
         }
@@ -167,33 +167,33 @@ class Gp5Reader extends Gp4Reader
     
     override private function readNote(guitarString:GuitarString, track:Track, effect:NoteEffect) : Note
     {
-        var flags:Int = readUnsignedByte();
+        var flags:Int = data.readByte();
         var note:Note = factory.newNote();
         note.string = (guitarString.number);
         note.effect.accentuatedNote = (((flags & 0x40) != 0));
         note.effect.heavyAccentuatedNote = (((flags & 0x02) != 0));
         note.effect.ghostNote = (((flags & 0x04) != 0));
         if ((flags & 0x20) != 0) {
-            var noteType:Int = readUnsignedByte();
+            var noteType:Int = data.readByte();
             note.isTiedNote = ((noteType == 0x02));
             note.effect.deadNote = ((noteType == 0x03));
         }
         if ((flags & 0x10) != 0) {
-            note.velocity = ((Velocities.MIN_VELOCITY + (Velocities.VELOCITY_INCREMENT * readByte())) -
+            note.velocity = ((Velocities.MIN_VELOCITY + (Velocities.VELOCITY_INCREMENT * data.readSignedByte())) -
             Velocities.VELOCITY_INCREMENT);
         }
         if ((flags & 0x20) != 0) {
-            var fret:Int = readByte();
+            var fret:Int = data.readSignedByte();
             var value:Int = (note.isTiedNote ? getTiedNoteValue(guitarString.number, track) : fret);
             note.value = (value >= 0 && value < 100 ? value : 0);
         }
         if ((flags & 0x80) != 0) {
-            note.effect.leftHandFinger = readByte();
-            note.effect.rightHandFinger = readByte();
+            note.effect.leftHandFinger = data.readSignedByte();
+            note.effect.rightHandFinger = data.readSignedByte();
             note.effect.isFingering = true;
         }
         if ((flags & 0x01) != 0) {
-            note.durationPercent = readDouble();
+            note.durationPercent = data.readDouble();
         }
         skip(1);
         if ((flags & 0x08) != 0) {
@@ -204,8 +204,8 @@ class Gp5Reader extends Gp4Reader
     
     override private function readNoteEffects(noteEffect:NoteEffect) : Void
     {
-        var flags1:Int = readUnsignedByte();
-        var flags2:Int = readUnsignedByte();
+        var flags1:Int = data.readByte();
+        var flags2:Int = data.readByte();
         if ((flags1 & 0x01) != 0) {
             readBend(noteEffect);
         }
@@ -217,7 +217,7 @@ class Gp5Reader extends Gp4Reader
         }
         if ((flags2 & 0x08) != 0) {
             noteEffect.slide = (true);
-            var type:Int = readByte();
+            var type:Int = data.readByte();
             switch (type) {
                 case 1:
                     noteEffect.slideType = SlideType.FastSlideTo;
@@ -249,7 +249,7 @@ class Gp5Reader extends Gp4Reader
     
     override private function readArtificialHarmonic(noteEffect:NoteEffect) : Void
     {
-        var type:Int = readByte();
+        var type:Int = data.readByte();
         var oHarmonic:HarmonicEffect = factory.newHarmonicEffect();
         oHarmonic.data = 0;
         switch (type) {
@@ -275,11 +275,11 @@ class Gp5Reader extends Gp4Reader
 
     override private function readGrace(noteEffect:NoteEffect) : Void
     {
-        var fret:Int = readUnsignedByte();
-        var dyn:Int = readUnsignedByte();
-        var transition:Int = readByte();
-        var duration:Int = readUnsignedByte();
-        var flags:Int = readUnsignedByte();
+        var fret:Int = data.readByte();
+        var dyn:Int = data.readByte();
+        var transition:Int = data.readByte();
+        var duration:Int = data.readByte();
+        var flags:Int = data.readByte();
         var grace:GraceEffect = factory.newGraceEffect();
         
         grace.fret = (fret);
@@ -304,54 +304,54 @@ class Gp5Reader extends Gp4Reader
     override private function readMixTableChange(measure:Measure) : MixTableChange
     {
         var tableChange:MixTableChange = factory.newMixTableChange();
-        tableChange.instrument.value = readByte();
+        tableChange.instrument.value = data.readSignedByte();
         skip(16); // Rse Info 
-        tableChange.volume.value = readByte();
-        tableChange.balance.value = readByte();
-        tableChange.chorus.value = readByte();
-        tableChange.reverb.value = readByte();
-        tableChange.phaser.value = readByte();
-        tableChange.tremolo.value = readByte();
+        tableChange.volume.value = data.readSignedByte();
+        tableChange.balance.value = data.readSignedByte();
+        tableChange.chorus.value = data.readSignedByte();
+        tableChange.reverb.value = data.readSignedByte();
+        tableChange.phaser.value = data.readSignedByte();
+        tableChange.tremolo.value = data.readSignedByte();
         tableChange.tempoName = readIntSizeCheckByteString();
-        tableChange.tempo.value = readInt();
+        tableChange.tempo.value = data.readInt();
         
         if (tableChange.instrument.value < 0) 
             tableChange.instrument = null;
         
         if (tableChange.volume.value >= 0) 
-            tableChange.volume.duration = readByte();
+            tableChange.volume.duration = data.readSignedByte();
         else 
             tableChange.volume = null;
         if (tableChange.balance.value >= 0) 
-            tableChange.balance.duration = readByte();
+            tableChange.balance.duration = data.readSignedByte();
         else 
             tableChange.balance = null;
         if (tableChange.chorus.value >= 0) 
-            tableChange.chorus.duration = readByte();
+            tableChange.chorus.duration = data.readSignedByte();
         else
             tableChange.chorus = null;
         if (tableChange.reverb.value >= 0) 
-            tableChange.reverb.duration = readByte();
+            tableChange.reverb.duration = data.readSignedByte();
         else 
             tableChange.reverb = null;
         if (tableChange.phaser.value >= 0) 
-            tableChange.phaser.duration = readByte();
+            tableChange.phaser.duration = data.readSignedByte();
         else 
             tableChange.phaser = null;
         if (tableChange.tremolo.value >= 0) 
-            tableChange.tremolo.duration = readByte();
+            tableChange.tremolo.duration = data.readSignedByte();
         else 
             tableChange.tremolo = null;
         if (tableChange.tempo.value >= 0) {
-            tableChange.tempo.duration = readByte();
+            tableChange.tempo.duration = data.readSignedByte();
             measure.tempo().value = tableChange.tempo.value;
-            tableChange.hideTempo = _versionIndex > 0 && readBool();
+            tableChange.hideTempo = _versionIndex > 0 && data.readBool();
         }
         else 
             tableChange.tempo = null;
         
         
-        var allTracksFlags:Int = readUnsignedByte();
+        var allTracksFlags:Int = data.readByte();
         if (tableChange.volume != null) 
             tableChange.volume.allTracks = (allTracksFlags & 0x01) != 0;
         if (tableChange.balance != null) 
@@ -381,9 +381,9 @@ class Gp5Reader extends Gp4Reader
         skip(17);
         chord.name = (readByteSizeString(21));
         skip(4);
-        chord.firstFret = readInt();
+        chord.firstFret = data.readInt();
         for (i in 0 ... 7) {
-            var fret:Int = readInt();
+            var fret:Int = data.readInt();
             if (i < chord.strings.length) {
                 chord.strings[i] = fret;
             }
@@ -404,7 +404,7 @@ class Gp5Reader extends Gp4Reader
     
     override private function readTrack(number:Int, channels:Array<MidiChannel>) : Track
     {
-        var flags:Int = readUnsignedByte();
+        var flags:Int = data.readByte();
         
         if (number == 1 || _versionIndex == 0) 
             skip(1);
@@ -416,10 +416,10 @@ class Gp5Reader extends Gp4Reader
         track.number = number;
         track.name = readByteSizeString(40);
         
-        var stringCount:Int = readInt();
+        var stringCount:Int = data.readInt();
         for (i in 0 ... 7) 
         {
-            var iTuning:Int = readInt();
+            var iTuning:Int = data.readInt();
             if (stringCount > i) {
                 var oString:GuitarString = factory.newString();
                 oString.number = (i + 1);
@@ -428,14 +428,14 @@ class Gp5Reader extends Gp4Reader
             }
         }
         
-        track.port = readInt();
+        track.port = data.readInt();
         readChannel(track.channel, channels);
         if(track.channel.channel == 9)
         {
             track.isPercussionTrack = true;
         }
-        track.fretCount = readInt();
-        track.offset = readInt();
+        track.fretCount = data.readInt();
+        track.offset = data.readInt();
         track.color = readColor();
         
         skip((_versionIndex > 0) ? 49 : 44);
@@ -451,7 +451,7 @@ class Gp5Reader extends Gp4Reader
         if (i > 0) 
             skip(1);
         
-        var flags:Int = readUnsignedByte();
+        var flags:Int = data.readByte();
         
         var header:MeasureHeader = factory.newMeasureHeader();
         header.number = i + 1;
@@ -459,26 +459,26 @@ class Gp5Reader extends Gp4Reader
         header.tempo.value = song.tempo;
         
         if ((flags & 0x01) != 0) 
-            timeSignature.numerator = readByte();
+            timeSignature.numerator = data.readByte();
         if ((flags & 0x02) != 0) 
-            timeSignature.denominator.value = readByte();
+            timeSignature.denominator.value = data.readByte();
         
         header.isRepeatOpen = ((flags & 0x04) != 0);
         
         timeSignature.copy(header.timeSignature);
         
         if ((flags & 0x08) != 0) 
-            header.repeatClose = (readByte() - 1);
+            header.repeatClose = (data.readByte() - 1);
         
         if ((flags & 0x20) != 0) 
             header.marker = readMarker(header);
         
         if ((flags & 0x10) != 0) 
-            header.repeatAlternative = readUnsignedByte();
+            header.repeatAlternative = data.readByte();
         
         if ((flags & 0x40) != 0) {
-            header.keySignature = Gp3Reader.toKeySignature(readByte());
-            header.keySignatureType = readByte();
+            header.keySignature = Gp3Reader.toKeySignature(data.readByte());
+            header.keySignatureType = data.readByte();
         }
         else if(header.number > 1) {
             header.keySignature = song.measureHeaders[i-1].keySignature;
@@ -489,7 +489,7 @@ class Gp5Reader extends Gp4Reader
             skip(4);
         if ((flags & 0x10) == 0) 
             skip(1);
-        var tripletFeel:Int = readByte();
+        var tripletFeel:Int = data.readByte();
         switch (tripletFeel) {
             case 1:
                 header.tripletFeel = TripletFeel.Eighth;
@@ -507,18 +507,18 @@ class Gp5Reader extends Gp4Reader
         var setup:PageSetup = factory.newPageSetup();
         if (_versionIndex > 0) 
             skip(19);
-        setup.pageSize = new Point(readInt(), readInt());
+        setup.pageSize = new Point(data.readInt(), data.readInt());
         
-        var l:Int = readInt();
-        var r:Int = readInt();
-        var t:Int = readInt();
-        var b:Int = readInt(); 
+        var l:Int = data.readInt();
+        var r:Int = data.readInt();
+        var t:Int = data.readInt();
+        var b:Int = data.readInt(); 
         setup.pageMargin = new Padding(l, t, r, b);
-        setup.scoreSizeProportion = readInt() / 100.0;
+        setup.scoreSizeProportion = data.readInt() / 100.0;
         
-        setup.headerAndFooter = readByte();
+        setup.headerAndFooter = data.readByte();
         
-        var flags2:Int = readUnsignedByte();
+        var flags2:Int = data.readByte();
         if ((flags2 & 0x01) != 0) 
             setup.headerAndFooter |= HeaderFooterElements.PAGE_NUMBER;
         
@@ -545,7 +545,7 @@ class Gp5Reader extends Gp4Reader
         song.tab = readIntSizeCheckByteString();
         song.instructions = readIntSizeCheckByteString();
         
-        var iNotes:Int = readInt();
+        var iNotes:Int = data.readInt();
         song.notice = "";
         for (i in 0 ... iNotes) {
             song.notice += readIntSizeCheckByteString() + "\n";

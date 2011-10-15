@@ -18,7 +18,7 @@ package alphatab.file.guitarpro;
 import alphatab.file.SongReader;
 import alphatab.model.Song;
 import alphatab.model.SongFactory;
-import alphatab.platform.BinaryReader;
+import alphatab.io.DataStream;
 
 class GpReaderBase extends SongReader
 {
@@ -42,47 +42,12 @@ class GpReaderBase extends SongReader
     
     public function skip(count:Int) : Void 
     {
-        for (i in 0 ... count) 
-        {
-            data.readByte();
-        }
+        data.skip(count);
     }
 
-    public function readUnsignedByte() : Int
-    {
-        return data.readByte();
-    }
-
-    public function readBool() : Bool
-    {
-        return data.readByte() == 1;
-    }
-
-    public function readByte() : Int
-    {
-        // convert to signed byte
-        var data = data.readByte() & 0xFF;
-        return data > 127 ? -256 + data : data;
-    }
-    
-    public function read() : Int
-    {
-        return readByte();
-    }
-    
-    public function readInt() : Int
-    {
-        return (data.readInt32());
-    }
-    
-    public function readDouble() : Float
-    {
-        return data.readDouble();
-    }
-    
     public function readByteSizeString(size:Int, charset:String=DEFAULT_CHARSET): String
     {
-        return readString(size, readUnsignedByte(), charset);
+        return readString(size, data.readByte(), charset);
     }
 
     public function readString(size:Int, len:Int = -2, charset:String=DEFAULT_CHARSET): String
@@ -101,24 +66,24 @@ class GpReaderBase extends SongReader
         for (i in 0 ... length)
         {
           // TODO: Check for unicode support
-            text += String.fromCharCode(readByte());
+            text += String.fromCharCode(data.readByte());
         }
         return text;
     }
 
     public function readIntSizeCheckByteString(charset:String=DEFAULT_CHARSET): String
     {
-        return readByteSizeString((readInt() - 1), charset);
+        return readByteSizeString((data.readInt() - 1), charset);
     }        
     
     public function readByteSizeCheckByteString(charset:String=DEFAULT_CHARSET): String
     {
-        return readByteSizeString((readUnsignedByte() - 1), charset);
+        return readByteSizeString((data.readByte() - 1), charset);
     }        
 
     public function readIntSizeString(charset:String=DEFAULT_CHARSET): String
     {
-        return readString(readInt(), -2, charset);
+        return readString(data.readInt(), -2, charset);
     }
     
     public function readVersion() : Bool

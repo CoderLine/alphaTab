@@ -17,7 +17,7 @@
 package alphatab.file;
 import alphatab.model.Song;
 import alphatab.model.SongFactory;
-import alphatab.platform.BinaryReader; 
+import alphatab.io.DataStream; 
 import alphatab.platform.FileLoader;
 import alphatab.platform.PlatformFactory;
 
@@ -37,7 +37,7 @@ class SongLoader
         var loader:FileLoader = PlatformFactory.getLoader();
         loader.loadBinary("GET", url, 
         // success
-        function(data:BinaryReader) : Void 
+        function(data:DataStream) : Void 
         {
             var readers:Array<SongReader> = SongReader.availableReaders();
             for (reader in readers) 

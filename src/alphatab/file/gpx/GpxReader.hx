@@ -23,14 +23,14 @@ package alphatab.file.gpx;
 import alphatab.model.SongFactory;
 import alphatab.model.Song;
 import alphatab.file.SongReader;
-import alphatab.platform.BinaryReader;
+import alphatab.io.DataStream;
 import alphatab.file.FileFormatException;
 
 class GpxReader extends SongReader
 {
     private var _fileSystem:FileSystem;
     
-    override public function init(data:BinaryReader, factory:SongFactory) : Void 
+    override public function init(data:DataStream, factory:SongFactory) : Void 
     {
         super.init(data, factory);
         _fileSystem = new FileSystem();

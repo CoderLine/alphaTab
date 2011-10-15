@@ -21,7 +21,9 @@
 package alphatab.file.gpx;
 
 import alphatab.file.FileFormatException;
-import alphatab.platform.BinaryReader;
+import alphatab.io.BitStream;
+import alphatab.io.DataStream;
+import alphatab.io.StringStream;
 
 class FileSystem 
 {
@@ -57,14 +59,14 @@ class FileSystem
         return null;
     }
     
-    public function load(data:BinaryReader)
+    public function load(data:DataStream)
     {
-        var srcBuffer = new ByteBuffer(data);
+        var srcBuffer = new BitStream(data);
         var header = getInteger(srcBuffer.readBytes(4), 0);
         load2(header, srcBuffer);
     }
     
-    private function load2(header:Int, srcBuffer:ByteBuffer) 
+    private function load2(header:Int, srcBuffer:BitStream) 
     { 
         if(header == HEADER_BCFS)
         {
@@ -105,7 +107,7 @@ class FileSystem
             var bcfsBuffer:Array<Int> = new Array<Int>();
             
             var expectLength = getInteger(srcBuffer.readBytes(4), 0);
-            while( !srcBuffer.end() && srcBuffer.offset() < expectLength)
+            while( !srcBuffer.eof() && srcBuffer.position() < expectLength)
             {
                 var flag = srcBuffer.readBits(1);
                 if(flag == 1)
@@ -140,8 +142,7 @@ class FileSystem
                 str += String.fromCharCode(byte);
             }
             
-            var newReader = new BinaryReader();
-            newReader.initialize(str);
+            var newReader = new DataStream(new StringStream(str));
             load(newReader);
         } 
         else
