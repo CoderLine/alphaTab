@@ -33,6 +33,8 @@ class Main
      */
     static function main() 
     {        
-        // nothing to do here
+        #if neko
+        alphatab.platform.neko.NekoMain.main();
+        #end
     }
 }

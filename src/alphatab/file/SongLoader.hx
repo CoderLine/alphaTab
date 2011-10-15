@@ -35,6 +35,10 @@ class SongLoader
     public static function loadSong(url:String, factory:SongFactory, success:Song->Void) 
     {
         var loader:FileLoader = PlatformFactory.getLoader();
+        if (loader == null)
+        {
+            throw "No file loader for you platform found";
+        }
         loader.loadBinary("GET", url, 
         // success
         function(data:DataStream) : Void 

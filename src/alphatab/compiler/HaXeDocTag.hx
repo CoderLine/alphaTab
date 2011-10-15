@@ -22,9 +22,9 @@ package alphatab.compiler;
 class HaXeDocTag 
 {
 
-	public function new() 
-	{
-		
-	}
-	
+    public function new() 
+    {
+        
+    }
+    
 }

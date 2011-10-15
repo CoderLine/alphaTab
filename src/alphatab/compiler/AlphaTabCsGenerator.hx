@@ -101,9 +101,9 @@ class AlphaTabCsGenerator
         
         var type = (c.isInterface) ? "interface" : "class";
         
-		if(c.doc != null) {
-			compileHxDoc(c.doc);
-		}
+        if(c.doc != null) {
+            compileHxDoc(c.doc);
+        }
         file.print("public ");
         file.print(type);
         file.print(" ");
@@ -168,8 +168,8 @@ class AlphaTabCsGenerator
     
     function compileClassMember(c:ClassType, field:ClassField, isStatic:Bool) {
         if (field.doc != null) {
-			compileHxDoc(field.doc);
-		}
+            compileHxDoc(field.doc);
+        }
         switch(field.kind) {
             case FVar(read, write): compileField(c, field, isStatic, read, write);
             case FMethod(k): compileMethod(c, field, isStatic, k);
@@ -680,10 +680,10 @@ class AlphaTabCsGenerator
             case CRegexp( r , opt ): file.print("/* regex " + r + ", opt: " + opt + "*/");
         }
     }
-	
-	function compileHxDoc( doc : String) {
-		
-	}
+    
+    function compileHxDoc( doc : String) {
+        
+    }
 
     function compileEArray( e1 : Expr, e2 : Expr ){
         file.print("/* earray */");

@@ -70,6 +70,7 @@ class Tablature
         settings = new Hash <Dynamic> ();
         
         errorMessage = StringTools.trim(msg);
+        autoSizeWidth = true;
         
         if (errorMessage == "" || errorMessage == null) 
         { 
@@ -162,7 +163,7 @@ class Tablature
         if(autoSizeWidth)
             canvas.setWidth(viewLayout.width);
         canvas.setHeight(viewLayout.height);
-		if(onLayouted != null) onLayouted();
+        if(onLayouted != null) onLayouted();
     }
     
     public function onPaint() 
@@ -190,7 +191,7 @@ class Tablature
             viewLayout.paintCache(canvas, displayRect, 0, 0);
             _updateDisplay = false;
         }
-		if (onFinished != null) onFinished();
+        if (onFinished != null) onFinished();
     }
     
     public function updateTablature()

@@ -59,7 +59,7 @@ class DataStream extends Stream
         {
             parseInt(((((bytes[1]&0xF) << 16) | (bytes[2] << 8) | bytes[3] ) * Math.pow(2, 32)).toString(2), 2) +
             parseInt(((bytes[4] >> 7) * Math.pow(2,31)).toString(2), 2) +
-            parseInt((((bytes[4]&0x7F) << 24) | (bytes[5] << 16) | (bytes[6] << 8) | bytes[7]).toString(2), 2);	// significand = bits 12..63
+            parseInt((((bytes[4]&0x7F) << 24) | (bytes[5] << 16) | (bytes[6] << 8) | bytes[7]).toString(2), 2);    // significand = bits 12..63
         }
         
         if (sig == 0 && exp == -1023)

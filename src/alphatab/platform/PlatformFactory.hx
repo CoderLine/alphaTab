@@ -1,6 +1,5 @@
 package alphatab.platform;
-import alphatab.platform.js.Html5Canvas;
-import alphatab.platform.js.JsFileLoader;
+
 import alphatab.platform.svg.SvgCanvas;
 
 /**
@@ -8,26 +7,28 @@ import alphatab.platform.svg.SvgCanvas;
  */
 class PlatformFactory
 {
-	public static var SVG_CANVAS = "svg";
+    public static var SVG_CANVAS = "svg";
     public static function getCanvas(object:Dynamic) : Canvas
     {
-		if (object == SVG_CANVAS)
-		{
-			return new SvgCanvas();
-		}
-		else {
-			#if js
-				return new Html5Canvas(object);
-			#else 
-				return new SvgCanvas();
-			#end
-		}
+        if (object == SVG_CANVAS)
+        {
+            return new SvgCanvas();
+        }
+        else {
+            #if js
+                return new alphatab.platform.js.Html5Canvas(object);
+            #else 
+                return new SvgCanvas();
+            #end
+        }
     } 
     
     public static function getLoader() : FileLoader
     { 
         #if js
-            return new JsFileLoader();
+            return new alphatab.platform.js.JsFileLoader();
+        #elseif neko
+            return new alphatab.platform.neko.NekoFileLoader();
         #else 
             return null;//#error 
         #end
