@@ -1092,34 +1092,30 @@ alphatab.file.guitarpro.GpReaderBase.prototype.initVersions = function(supported
 	this._supportedVersions = supportedVersions;
 }
 alphatab.file.guitarpro.GpReaderBase.prototype.skip = function(count) {
-	var _g = 0;
-	while(_g < count) {
-		var i = _g++;
-		this.data.readByte();
-	}
+	this.data.skip(count);
 }
-alphatab.file.guitarpro.GpReaderBase.prototype.readUnsignedByte = function() {
+alphatab.file.guitarpro.GpReaderBase.prototype.OLDreadUnsignedByte = function() {
 	return this.data.readByte();
 }
-alphatab.file.guitarpro.GpReaderBase.prototype.readBool = function() {
+alphatab.file.guitarpro.GpReaderBase.prototype.OLDreadBool = function() {
 	return this.data.readByte() == 1;
 }
-alphatab.file.guitarpro.GpReaderBase.prototype.readByte = function() {
+alphatab.file.guitarpro.GpReaderBase.prototype.OLDreadByte = function() {
 	var data = this.data.readByte() & 255;
 	return data > 127?-256 + data:data;
 }
-alphatab.file.guitarpro.GpReaderBase.prototype.read = function() {
-	return this.readByte();
+alphatab.file.guitarpro.GpReaderBase.prototype.OLDread = function() {
+	return this.OLDreadByte();
 }
-alphatab.file.guitarpro.GpReaderBase.prototype.readInt = function() {
-	return this.data.readInt32();
+alphatab.file.guitarpro.GpReaderBase.prototype.OLDreadInt = function() {
+	return this.data.readInt();
 }
-alphatab.file.guitarpro.GpReaderBase.prototype.readDouble = function() {
+alphatab.file.guitarpro.GpReaderBase.prototype.OLDreadDouble = function() {
 	return this.data.readDouble();
 }
 alphatab.file.guitarpro.GpReaderBase.prototype.readByteSizeString = function(size,charset) {
 	if(charset == null) charset = "UTF-8";
-	return this.readString(size,this.readUnsignedByte(),charset);
+	return this.readString(size,this.data.readByte(),charset);
 }
 alphatab.file.guitarpro.GpReaderBase.prototype.readString = function(size,len,charset) {
 	if(charset == null) charset = "UTF-8";
@@ -1134,21 +1130,21 @@ alphatab.file.guitarpro.GpReaderBase.prototype.readStringInternal = function(len
 	var _g = 0;
 	while(_g < length) {
 		var i = _g++;
-		text += String.fromCharCode(this.readByte());
+		text += String.fromCharCode(this.data.readByte());
 	}
 	return text;
 }
 alphatab.file.guitarpro.GpReaderBase.prototype.readIntSizeCheckByteString = function(charset) {
 	if(charset == null) charset = "UTF-8";
-	return this.readByteSizeString(this.readInt() - 1,charset);
+	return this.readByteSizeString(this.data.readInt() - 1,charset);
 }
 alphatab.file.guitarpro.GpReaderBase.prototype.readByteSizeCheckByteString = function(charset) {
 	if(charset == null) charset = "UTF-8";
-	return this.readByteSizeString(this.readUnsignedByte() - 1,charset);
+	return this.readByteSizeString(this.data.readByte() - 1,charset);
 }
 alphatab.file.guitarpro.GpReaderBase.prototype.readIntSizeString = function(charset) {
 	if(charset == null) charset = "UTF-8";
-	return this.readString(this.readInt(),-2,charset);
+	return this.readString(this.data.readInt(),-2,charset);
 }
 alphatab.file.guitarpro.GpReaderBase.prototype.readVersion = function() {
 	try {
@@ -1202,17 +1198,17 @@ alphatab.file.guitarpro.Gp3Reader.prototype.readSong = function() {
 	if(!this.readVersion()) throw new alphatab.file.FileFormatException("Unsupported Version");
 	var song = this.factory.newSong();
 	this.readInfo(song);
-	this._tripletFeel = this.readBool()?1:0;
+	this._tripletFeel = this.data.readBool()?1:0;
 	this.readLyrics(song);
 	this.readPageSetup(song);
 	song.tempoName = "";
-	song.tempo = this.readInt();
+	song.tempo = this.data.readInt();
 	song.hideTempo = false;
-	song.key = this.readInt();
+	song.key = this.data.readInt();
 	song.octave = 0;
 	var channels = this.readMidiChannels();
-	var measureCount = this.readInt();
-	var trackCount = this.readInt();
+	var measureCount = this.data.readInt();
+	var trackCount = this.data.readInt();
 	this.readMeasureHeaders(song,measureCount);
 	this.readTracks(song,trackCount,channels);
 	this.readMeasures(song);
@@ -1242,7 +1238,7 @@ alphatab.file.guitarpro.Gp3Reader.prototype.readMeasures = function(song) {
 }
 alphatab.file.guitarpro.Gp3Reader.prototype.readMeasure = function(measure,track) {
 	var start = measure.header.start;
-	var beats = this.readInt();
+	var beats = this.data.readInt();
 	var _g = 0;
 	while(_g < beats) {
 		var beat = _g++;
@@ -1250,11 +1246,11 @@ alphatab.file.guitarpro.Gp3Reader.prototype.readMeasure = function(measure,track
 	}
 }
 alphatab.file.guitarpro.Gp3Reader.prototype.readBeat = function(start,measure,track,voiceIndex) {
-	var flags = this.readUnsignedByte();
+	var flags = this.data.readByte();
 	var beat = this.getBeat(measure,start);
 	var voice = beat.voices[voiceIndex];
 	if((flags & 64) != 0) {
-		var beatType = this.readUnsignedByte();
+		var beatType = this.data.readByte();
 		voice.isEmpty = (beatType & 2) == 0;
 	}
 	var duration = this.readDuration(flags);
@@ -1266,7 +1262,7 @@ alphatab.file.guitarpro.Gp3Reader.prototype.readBeat = function(start,measure,tr
 		var mixTableChange = this.readMixTableChange(measure);
 		beat.effect.mixTableChange = mixTableChange;
 	}
-	var stringFlags = this.readUnsignedByte();
+	var stringFlags = this.data.readByte();
 	var _g = 0;
 	while(_g < 7) {
 		var j = _g++;
@@ -1281,7 +1277,7 @@ alphatab.file.guitarpro.Gp3Reader.prototype.readBeat = function(start,measure,tr
 	return !voice.isEmpty?duration.time():0;
 }
 alphatab.file.guitarpro.Gp3Reader.prototype.readNote = function(guitarString,track,effect) {
-	var flags = this.readUnsignedByte();
+	var flags = this.data.readByte();
 	var note = this.factory.newNote();
 	note.string = guitarString.number;
 	note.effect = effect;
@@ -1289,30 +1285,30 @@ alphatab.file.guitarpro.Gp3Reader.prototype.readNote = function(guitarString,tra
 	note.effect.heavyAccentuatedNote = (flags & 2) != 0;
 	note.effect.ghostNote = (flags & 4) != 0;
 	if((flags & 32) != 0) {
-		var noteType = this.readUnsignedByte();
+		var noteType = this.data.readByte();
 		note.isTiedNote = noteType == 2;
 		note.effect.deadNote = noteType == 3;
 	}
 	if((flags & 1) != 0) {
-		note.duration = this.readByte();
-		note.tuplet = this.readByte();
+		note.duration = this.data.readSignedByte();
+		note.tuplet = this.data.readSignedByte();
 	}
-	if((flags & 16) != 0) note.velocity = 15 + 16 * this.readByte() - 16;
+	if((flags & 16) != 0) note.velocity = 15 + 16 * this.data.readSignedByte() - 16;
 	if((flags & 32) != 0) {
-		var fret = this.readByte();
+		var fret = this.data.readSignedByte();
 		var value = note.isTiedNote?this.getTiedNoteValue(guitarString.number,track):fret;
 		note.value = value >= 0 && value < 100?value:0;
 	}
 	if((flags & 128) != 0) {
-		note.effect.leftHandFinger = this.readByte();
-		note.effect.rightHandFinger = this.readByte();
+		note.effect.leftHandFinger = this.data.readSignedByte();
+		note.effect.rightHandFinger = this.data.readSignedByte();
 		note.effect.isFingering = true;
 	}
 	if((flags & 8) != 0) this.readNoteEffects(note.effect);
 	return note;
 }
 alphatab.file.guitarpro.Gp3Reader.prototype.readNoteEffects = function(noteEffect) {
-	var flags1 = this.readUnsignedByte();
+	var flags1 = this.data.readByte();
 	noteEffect.slide = (flags1 & 4) != 0;
 	noteEffect.hammer = (flags1 & 2) != 0;
 	noteEffect.letRing = (flags1 & 8) != 0;
@@ -1320,10 +1316,10 @@ alphatab.file.guitarpro.Gp3Reader.prototype.readNoteEffects = function(noteEffec
 	if((flags1 & 16) != 0) this.readGrace(noteEffect);
 }
 alphatab.file.guitarpro.Gp3Reader.prototype.readGrace = function(noteEffect) {
-	var fret = this.readUnsignedByte();
-	var dyn = this.readUnsignedByte();
-	var transition = this.readByte();
-	var duration = this.readUnsignedByte();
+	var fret = this.data.readByte();
+	var dyn = this.data.readByte();
+	var transition = this.data.readSignedByte();
+	var duration = this.data.readByte();
 	var grace = this.factory.newGraceEffect();
 	grace.fret = fret;
 	grace.velocity = 15 + 16 * dyn - 16;
@@ -1348,60 +1344,60 @@ alphatab.file.guitarpro.Gp3Reader.prototype.readGrace = function(noteEffect) {
 }
 alphatab.file.guitarpro.Gp3Reader.prototype.readBend = function(noteEffect) {
 	var bendEffect = this.factory.newBendEffect();
-	bendEffect.type = this.readByte();
-	bendEffect.value = this.readInt();
-	var pointCount = this.readInt();
+	bendEffect.type = this.data.readSignedByte();
+	bendEffect.value = this.data.readInt();
+	var pointCount = this.data.readInt();
 	var _g = 0;
 	while(_g < pointCount) {
 		var i = _g++;
-		var pointPosition = Math.round(this.readInt() * 12 / 60);
-		var pointValue = Math.round(this.readInt() / 25);
-		var vibrato = this.readBool();
+		var pointPosition = Math.round(this.data.readInt() * 12 / 60);
+		var pointValue = Math.round(this.data.readInt() / 25);
+		var vibrato = this.data.readBool();
 		bendEffect.points.push(new alphatab.model.effects.BendPoint(pointPosition,pointValue,vibrato));
 	}
 	if(pointCount > 0) noteEffect.bend = bendEffect;
 }
 alphatab.file.guitarpro.Gp3Reader.prototype.readMixTableChange = function(measure) {
 	var tableChange = this.factory.newMixTableChange();
-	tableChange.instrument.value = this.readByte();
-	tableChange.volume.value = this.readByte();
-	tableChange.balance.value = this.readByte();
-	tableChange.chorus.value = this.readByte();
-	tableChange.reverb.value = this.readByte();
-	tableChange.phaser.value = this.readByte();
-	tableChange.tremolo.value = this.readByte();
+	tableChange.instrument.value = this.data.readSignedByte();
+	tableChange.volume.value = this.data.readSignedByte();
+	tableChange.balance.value = this.data.readSignedByte();
+	tableChange.chorus.value = this.data.readSignedByte();
+	tableChange.reverb.value = this.data.readSignedByte();
+	tableChange.phaser.value = this.data.readSignedByte();
+	tableChange.tremolo.value = this.data.readSignedByte();
 	tableChange.tempoName = "";
-	tableChange.tempo.value = this.readInt();
+	tableChange.tempo.value = this.data.readInt();
 	if(tableChange.instrument.value < 0) tableChange.instrument = null;
-	if(tableChange.volume.value >= 0) tableChange.volume.duration = this.readByte(); else tableChange.volume = null;
-	if(tableChange.balance.value >= 0) tableChange.balance.duration = this.readByte(); else tableChange.balance = null;
-	if(tableChange.chorus.value >= 0) tableChange.chorus.duration = this.readByte(); else tableChange.chorus = null;
-	if(tableChange.reverb.value >= 0) tableChange.reverb.duration = this.readByte(); else tableChange.reverb = null;
-	if(tableChange.phaser.value >= 0) tableChange.phaser.duration = this.readByte(); else tableChange.phaser = null;
-	if(tableChange.tremolo.value >= 0) tableChange.tremolo.duration = this.readByte(); else tableChange.tremolo = null;
+	if(tableChange.volume.value >= 0) tableChange.volume.duration = this.data.readSignedByte(); else tableChange.volume = null;
+	if(tableChange.balance.value >= 0) tableChange.balance.duration = this.data.readSignedByte(); else tableChange.balance = null;
+	if(tableChange.chorus.value >= 0) tableChange.chorus.duration = this.data.readSignedByte(); else tableChange.chorus = null;
+	if(tableChange.reverb.value >= 0) tableChange.reverb.duration = this.data.readSignedByte(); else tableChange.reverb = null;
+	if(tableChange.phaser.value >= 0) tableChange.phaser.duration = this.data.readSignedByte(); else tableChange.phaser = null;
+	if(tableChange.tremolo.value >= 0) tableChange.tremolo.duration = this.data.readSignedByte(); else tableChange.tremolo = null;
 	if(tableChange.tempo.value >= 0) {
-		tableChange.tempo.duration = this.readByte();
+		tableChange.tempo.duration = this.data.readSignedByte();
 		measure.header.tempo.value = tableChange.tempo.value;
 		tableChange.hideTempo = false;
 	} else tableChange.tempo = null;
 	return tableChange;
 }
 alphatab.file.guitarpro.Gp3Reader.prototype.readBeatEffects = function(beat,effect) {
-	var flags1 = this.readUnsignedByte();
+	var flags1 = this.data.readByte();
 	beat.effect.fadeIn = (flags1 & 16) != 0;
 	beat.effect.vibrato = (flags1 & 2) != 0 || beat.effect.vibrato;
 	if((flags1 & 32) != 0) {
-		var slapEffect = this.readUnsignedByte();
+		var slapEffect = this.data.readByte();
 		if(slapEffect == 0) this.readTremoloBar(beat.effect); else {
 			beat.effect.tapping = slapEffect == 1;
 			beat.effect.slapping = slapEffect == 2;
 			beat.effect.popping = slapEffect == 3;
-			this.readInt();
+			this.data.readInt();
 		}
 	}
 	if((flags1 & 64) != 0) {
-		var strokeUp = this.readByte();
-		var strokeDown = this.readByte();
+		var strokeUp = this.data.readSignedByte();
+		var strokeDown = this.data.readSignedByte();
 		if(strokeUp > 0) {
 			beat.effect.stroke.direction = 1;
 			beat.effect.stroke.value = alphatab.file.guitarpro.Gp3Reader.toStrokeValue(strokeUp);
@@ -1424,8 +1420,8 @@ alphatab.file.guitarpro.Gp3Reader.prototype.readBeatEffects = function(beat,effe
 }
 alphatab.file.guitarpro.Gp3Reader.prototype.readTremoloBar = function(effect) {
 	var barEffect = this.factory.newBendEffect();
-	barEffect.type = this.readByte();
-	barEffect.value = this.readInt();
+	barEffect.type = this.data.readSignedByte();
+	barEffect.value = this.data.readInt();
 	barEffect.points.push(new alphatab.model.effects.BendPoint(0,0,false));
 	barEffect.points.push(new alphatab.model.effects.BendPoint(Math.round(12 / 2.0),Math.round(barEffect.value / 50),false));
 	barEffect.points.push(new alphatab.model.effects.BendPoint(12,0,false));
@@ -1438,25 +1434,25 @@ alphatab.file.guitarpro.Gp3Reader.prototype.readText = function(beat) {
 }
 alphatab.file.guitarpro.Gp3Reader.prototype.readChord = function(stringCount,beat) {
 	var chord = this.factory.newChord(stringCount);
-	if((this.readUnsignedByte() & 1) == 0) {
+	if((this.data.readByte() & 1) == 0) {
 		chord.name = this.readIntSizeCheckByteString();
-		chord.firstFret = this.readInt();
+		chord.firstFret = this.data.readInt();
 		if(chord.firstFret != 0) {
 			var _g = 0;
 			while(_g < 6) {
 				var i = _g++;
-				var fret = this.readInt();
+				var fret = this.data.readInt();
 				if(i < chord.strings.length) chord.strings[i] = fret;
 			}
 		}
 	} else {
 		this.skip(25);
 		chord.name = this.readByteSizeString(34);
-		chord.firstFret = this.readInt();
+		chord.firstFret = this.data.readInt();
 		var _g = 0;
 		while(_g < 6) {
 			var i = _g++;
-			var fret = this.readInt();
+			var fret = this.data.readInt();
 			if(i < chord.strings.length) chord.strings[i] = fret;
 		}
 		this.skip(36);
@@ -1465,10 +1461,10 @@ alphatab.file.guitarpro.Gp3Reader.prototype.readChord = function(stringCount,bea
 }
 alphatab.file.guitarpro.Gp3Reader.prototype.readDuration = function(flags) {
 	var duration = this.factory.newDuration();
-	duration.value = Math.round(Math.pow(2,this.readByte() + 4) / 4);
+	duration.value = Math.round(Math.pow(2,this.data.readSignedByte() + 4) / 4);
 	duration.isDotted = (flags & 1) != 0;
 	if((flags & 32) != 0) {
-		var iTuplet = this.readInt();
+		var iTuplet = this.data.readInt();
 		switch(iTuplet) {
 		case 3:
 			duration.tuplet.enters = 3;
@@ -1526,18 +1522,18 @@ alphatab.file.guitarpro.Gp3Reader.prototype.readTracks = function(song,trackCoun
 	}
 }
 alphatab.file.guitarpro.Gp3Reader.prototype.readTrack = function(number,channels) {
-	var flags = this.readUnsignedByte();
+	var flags = this.data.readByte();
 	var track = this.factory.newTrack();
 	track.isPercussionTrack = (flags & 1) != 0;
 	track.is12StringedGuitarTrack = (flags & 2) != 0;
 	track.isBanjoTrack = (flags & 4) != 0;
 	track.number = number;
 	track.name = this.readByteSizeString(40);
-	var stringCount = this.readInt();
+	var stringCount = this.data.readInt();
 	var _g = 0;
 	while(_g < 7) {
 		var i = _g++;
-		var iTuning = this.readInt();
+		var iTuning = this.data.readInt();
 		if(stringCount > i) {
 			var oString = this.factory.newString();
 			oString.number = i + 1;
@@ -1545,17 +1541,17 @@ alphatab.file.guitarpro.Gp3Reader.prototype.readTrack = function(number,channels
 			track.strings.push(oString);
 		}
 	}
-	track.port = this.readInt();
+	track.port = this.data.readInt();
 	this.readChannel(track.channel,channels);
 	if(track.channel.channel == 9) track.isPercussionTrack = true;
-	track.fretCount = this.readInt();
-	track.offset = this.readInt();
+	track.fretCount = this.data.readInt();
+	track.offset = this.data.readInt();
 	track.color = this.readColor();
 	return track;
 }
 alphatab.file.guitarpro.Gp3Reader.prototype.readChannel = function(midiChannel,channels) {
-	var index = this.readInt() - 1;
-	var effectChannel = this.readInt() - 1;
+	var index = this.data.readInt() - 1;
+	var effectChannel = this.data.readInt() - 1;
 	if(index >= 0 && index < channels.length) {
 		channels[index].copy(midiChannel);
 		if(midiChannel.instrument() < 0) midiChannel.instrument(0);
@@ -1571,22 +1567,22 @@ alphatab.file.guitarpro.Gp3Reader.prototype.readMeasureHeaders = function(song,m
 	}
 }
 alphatab.file.guitarpro.Gp3Reader.prototype.readMeasureHeader = function(i,timeSignature,song) {
-	var flags = this.readUnsignedByte();
+	var flags = this.data.readByte();
 	var header = this.factory.newMeasureHeader();
 	header.number = i + 1;
 	header.start = 0;
 	header.tempo.value = song.tempo;
 	header.tripletFeel = this._tripletFeel;
-	if((flags & 1) != 0) timeSignature.numerator = this.readByte();
-	if((flags & 2) != 0) timeSignature.denominator.value = this.readByte();
+	if((flags & 1) != 0) timeSignature.numerator = this.data.readSignedByte();
+	if((flags & 2) != 0) timeSignature.denominator.value = this.data.readSignedByte();
 	header.isRepeatOpen = (flags & 4) != 0;
 	timeSignature.copy(header.timeSignature);
-	if((flags & 8) != 0) header.repeatClose = this.readByte() - 1;
-	if((flags & 16) != 0) header.repeatAlternative = this.parseRepeatAlternative(song,header.number,this.readUnsignedByte());
+	if((flags & 8) != 0) header.repeatClose = this.data.readSignedByte() - 1;
+	if((flags & 16) != 0) header.repeatAlternative = this.parseRepeatAlternative(song,header.number,this.data.readByte());
 	if((flags & 32) != 0) header.marker = this.readMarker(header);
 	if((flags & 64) != 0) {
-		header.keySignature = alphatab.file.guitarpro.Gp3Reader.toKeySignature(this.readByte());
-		header.keySignatureType = this.readByte();
+		header.keySignature = alphatab.file.guitarpro.Gp3Reader.toKeySignature(this.data.readSignedByte());
+		header.keySignatureType = this.data.readSignedByte();
 	} else if(header.number > 1) {
 		header.keySignature = song.measureHeaders[i - 1].keySignature;
 		header.keySignatureType = song.measureHeaders[i - 1].keySignatureType;
@@ -1620,9 +1616,9 @@ alphatab.file.guitarpro.Gp3Reader.prototype.readMarker = function(header) {
 	return marker;
 }
 alphatab.file.guitarpro.Gp3Reader.prototype.readColor = function() {
-	var r = this.readUnsignedByte();
-	var g = this.readUnsignedByte();
-	var b = this.readUnsignedByte();
+	var r = this.data.readByte();
+	var g = this.data.readByte();
+	var b = this.data.readByte();
 	this.skip(1);
 	return new alphatab.model.Color(r,g,b);
 }
@@ -1634,13 +1630,13 @@ alphatab.file.guitarpro.Gp3Reader.prototype.readMidiChannels = function() {
 		var newChannel = this.factory.newMidiChannel();
 		newChannel.channel = i;
 		newChannel.effectChannel = i;
-		newChannel.instrument(this.readInt());
-		newChannel.volume = alphatab.file.guitarpro.GpReaderBase.toChannelShort(this.readByte());
-		newChannel.balance = alphatab.file.guitarpro.GpReaderBase.toChannelShort(this.readByte());
-		newChannel.chorus = alphatab.file.guitarpro.GpReaderBase.toChannelShort(this.readByte());
-		newChannel.reverb = alphatab.file.guitarpro.GpReaderBase.toChannelShort(this.readByte());
-		newChannel.phaser = alphatab.file.guitarpro.GpReaderBase.toChannelShort(this.readByte());
-		newChannel.tremolo = alphatab.file.guitarpro.GpReaderBase.toChannelShort(this.readByte());
+		newChannel.instrument(this.data.readInt());
+		newChannel.volume = alphatab.file.guitarpro.GpReaderBase.toChannelShort(this.data.readSignedByte());
+		newChannel.balance = alphatab.file.guitarpro.GpReaderBase.toChannelShort(this.data.readSignedByte());
+		newChannel.chorus = alphatab.file.guitarpro.GpReaderBase.toChannelShort(this.data.readSignedByte());
+		newChannel.reverb = alphatab.file.guitarpro.GpReaderBase.toChannelShort(this.data.readSignedByte());
+		newChannel.phaser = alphatab.file.guitarpro.GpReaderBase.toChannelShort(this.data.readSignedByte());
+		newChannel.tremolo = alphatab.file.guitarpro.GpReaderBase.toChannelShort(this.data.readSignedByte());
 		channels.push(newChannel);
 		this.skip(2);
 	}
@@ -1663,7 +1659,7 @@ alphatab.file.guitarpro.Gp3Reader.prototype.readInfo = function(song) {
 	song.copyright = this.readIntSizeCheckByteString();
 	song.tab = this.readIntSizeCheckByteString();
 	song.instructions = this.readIntSizeCheckByteString();
-	var iNotes = this.readInt();
+	var iNotes = this.data.readInt();
 	song.notice = "";
 	var _g = 0;
 	while(_g < iNotes) {
@@ -3035,17 +3031,17 @@ alphatab.file.guitarpro.Gp4Reader.prototype.readSong = function() {
 	if(!this.readVersion()) throw new alphatab.file.FileFormatException("Unsupported Version");
 	var song = this.factory.newSong();
 	this.readInfo(song);
-	this._tripletFeel = this.readBool()?1:0;
+	this._tripletFeel = this.data.readBool()?1:0;
 	this.readLyrics(song);
 	this.readPageSetup(song);
 	song.tempoName = "";
-	song.tempo = this.readInt();
+	song.tempo = this.data.readInt();
 	song.hideTempo = false;
-	song.key = this.readInt();
-	song.octave = this.readByte();
+	song.key = this.data.readInt();
+	song.octave = this.data.readSignedByte();
 	var channels = this.readMidiChannels();
-	var measureCount = this.readInt();
-	var trackCount = this.readInt();
+	var measureCount = this.data.readInt();
+	var trackCount = this.data.readInt();
 	this.readMeasureHeaders(song,measureCount);
 	this.readTracks(song,trackCount,channels);
 	this.readMeasures(song);
@@ -3053,22 +3049,22 @@ alphatab.file.guitarpro.Gp4Reader.prototype.readSong = function() {
 }
 alphatab.file.guitarpro.Gp4Reader.prototype.readLyrics = function(song) {
 	song.lyrics = this.factory.newLyrics();
-	song.lyrics.trackChoice = this.readInt();
+	song.lyrics.trackChoice = this.data.readInt();
 	var _g = 0;
 	while(_g < 5) {
 		var i = _g++;
 		var line = this.factory.newLyricLine();
-		line.startingMeasure = this.readInt();
+		line.startingMeasure = this.data.readInt();
 		line.lyrics = this.readIntSizeString();
 		song.lyrics.lines.push(line);
 	}
 }
 alphatab.file.guitarpro.Gp4Reader.prototype.readBeat = function(start,measure,track,voiceIndex) {
-	var flags = this.readUnsignedByte();
+	var flags = this.data.readSignedByte();
 	var beat = this.getBeat(measure,start);
 	var voice = beat.voices[voiceIndex];
 	if((flags & 64) != 0) {
-		var beatType = this.readUnsignedByte();
+		var beatType = this.data.readSignedByte();
 		voice.isEmpty = (beatType & 2) == 0;
 	}
 	var duration = this.readDuration(flags);
@@ -3079,7 +3075,7 @@ alphatab.file.guitarpro.Gp4Reader.prototype.readBeat = function(start,measure,tr
 		var mixTableChange = this.readMixTableChange(measure);
 		beat.effect.mixTableChange = mixTableChange;
 	}
-	var stringFlags = this.readUnsignedByte();
+	var stringFlags = this.data.readSignedByte();
 	var _g = 0;
 	while(_g < 7) {
 		var j = _g++;
@@ -3094,14 +3090,14 @@ alphatab.file.guitarpro.Gp4Reader.prototype.readBeat = function(start,measure,tr
 	return !voice.isEmpty?duration.time():0;
 }
 alphatab.file.guitarpro.Gp4Reader.prototype.readNoteEffects = function(noteEffect) {
-	var flags1 = this.readUnsignedByte();
-	var flags2 = this.readUnsignedByte();
+	var flags1 = this.data.readSignedByte();
+	var flags2 = this.data.readSignedByte();
 	if((flags1 & 1) != 0) this.readBend(noteEffect);
 	if((flags1 & 16) != 0) this.readGrace(noteEffect);
 	if((flags2 & 4) != 0) this.readTremoloPicking(noteEffect);
 	if((flags2 & 8) != 0) {
 		noteEffect.slide = true;
-		var type = this.readByte();
+		var type = this.data.readSignedByte();
 		switch(type) {
 		case 1:
 			noteEffect.slideType = 0;
@@ -3132,8 +3128,8 @@ alphatab.file.guitarpro.Gp4Reader.prototype.readNoteEffects = function(noteEffec
 	noteEffect.staccato = (flags2 & 1) != 0;
 }
 alphatab.file.guitarpro.Gp4Reader.prototype.readTrill = function(noteEffect) {
-	var fret = this.readByte();
-	var period = this.readByte();
+	var fret = this.data.readSignedByte();
+	var period = this.data.readSignedByte();
 	var trill = this.factory.newTrillEffect();
 	trill.fret = fret;
 	switch(period) {
@@ -3152,7 +3148,7 @@ alphatab.file.guitarpro.Gp4Reader.prototype.readTrill = function(noteEffect) {
 	}
 }
 alphatab.file.guitarpro.Gp4Reader.prototype.readArtificialHarmonic = function(noteEffect) {
-	var type = this.readByte();
+	var type = this.data.readSignedByte();
 	var oHarmonic = this.factory.newHarmonicEffect();
 	oHarmonic.data = 0;
 	switch(type) {
@@ -3191,7 +3187,7 @@ alphatab.file.guitarpro.Gp4Reader.prototype.readArtificialHarmonic = function(no
 	}
 }
 alphatab.file.guitarpro.Gp4Reader.prototype.readTremoloPicking = function(noteEffect) {
-	var value = this.readUnsignedByte();
+	var value = this.data.readSignedByte();
 	var tp = this.factory.newTremoloPickingEffect();
 	switch(value) {
 	case 1:
@@ -3210,28 +3206,28 @@ alphatab.file.guitarpro.Gp4Reader.prototype.readTremoloPicking = function(noteEf
 }
 alphatab.file.guitarpro.Gp4Reader.prototype.readMixTableChange = function(measure) {
 	var tableChange = this.factory.newMixTableChange();
-	tableChange.instrument.value = this.readByte();
-	tableChange.volume.value = this.readByte();
-	tableChange.balance.value = this.readByte();
-	tableChange.chorus.value = this.readByte();
-	tableChange.reverb.value = this.readByte();
-	tableChange.phaser.value = this.readByte();
-	tableChange.tremolo.value = this.readByte();
+	tableChange.instrument.value = this.data.readSignedByte();
+	tableChange.volume.value = this.data.readSignedByte();
+	tableChange.balance.value = this.data.readSignedByte();
+	tableChange.chorus.value = this.data.readSignedByte();
+	tableChange.reverb.value = this.data.readSignedByte();
+	tableChange.phaser.value = this.data.readSignedByte();
+	tableChange.tremolo.value = this.data.readSignedByte();
 	tableChange.tempoName = "";
-	tableChange.tempo.value = this.readInt();
+	tableChange.tempo.value = this.data.readInt();
 	if(tableChange.instrument.value < 0) tableChange.instrument = null;
-	if(tableChange.volume.value >= 0) tableChange.volume.duration = this.readByte(); else tableChange.volume = null;
-	if(tableChange.balance.value >= 0) tableChange.balance.duration = this.readByte(); else tableChange.balance = null;
-	if(tableChange.chorus.value >= 0) tableChange.chorus.duration = this.readByte(); else tableChange.chorus = null;
-	if(tableChange.reverb.value >= 0) tableChange.reverb.duration = this.readByte(); else tableChange.reverb = null;
-	if(tableChange.phaser.value >= 0) tableChange.phaser.duration = this.readByte(); else tableChange.phaser = null;
-	if(tableChange.tremolo.value >= 0) tableChange.tremolo.duration = this.readByte(); else tableChange.tremolo = null;
+	if(tableChange.volume.value >= 0) tableChange.volume.duration = this.data.readSignedByte(); else tableChange.volume = null;
+	if(tableChange.balance.value >= 0) tableChange.balance.duration = this.data.readSignedByte(); else tableChange.balance = null;
+	if(tableChange.chorus.value >= 0) tableChange.chorus.duration = this.data.readSignedByte(); else tableChange.chorus = null;
+	if(tableChange.reverb.value >= 0) tableChange.reverb.duration = this.data.readSignedByte(); else tableChange.reverb = null;
+	if(tableChange.phaser.value >= 0) tableChange.phaser.duration = this.data.readSignedByte(); else tableChange.phaser = null;
+	if(tableChange.tremolo.value >= 0) tableChange.tremolo.duration = this.data.readSignedByte(); else tableChange.tremolo = null;
 	if(tableChange.tempo.value >= 0) {
-		tableChange.tempo.duration = this.readByte();
+		tableChange.tempo.duration = this.data.readSignedByte();
 		measure.header.tempo.value = tableChange.tempo.value;
 		tableChange.hideTempo = false;
 	} else tableChange.tempo = null;
-	var allTracksFlags = this.readUnsignedByte();
+	var allTracksFlags = this.data.readSignedByte();
 	if(tableChange.volume != null) tableChange.volume.allTracks = (allTracksFlags & 1) != 0;
 	if(tableChange.balance != null) tableChange.balance.allTracks = (allTracksFlags & 2) != 0;
 	if(tableChange.chorus != null) tableChange.chorus.allTracks = (allTracksFlags & 4) != 0;
@@ -3242,20 +3238,20 @@ alphatab.file.guitarpro.Gp4Reader.prototype.readMixTableChange = function(measur
 	return tableChange;
 }
 alphatab.file.guitarpro.Gp4Reader.prototype.readBeatEffects = function(beat,effect) {
-	var flags1 = this.readUnsignedByte();
-	var flags2 = this.readUnsignedByte();
+	var flags1 = this.data.readSignedByte();
+	var flags2 = this.data.readSignedByte();
 	beat.effect.fadeIn = (flags1 & 16) != 0;
 	beat.effect.vibrato = (flags1 & 2) != 0 || beat.effect.vibrato;
 	if((flags1 & 32) != 0) {
-		var slapEffect = this.readUnsignedByte();
+		var slapEffect = this.data.readSignedByte();
 		beat.effect.tapping = slapEffect == 1;
 		beat.effect.slapping = slapEffect == 2;
 		beat.effect.popping = slapEffect == 3;
 	}
 	if((flags2 & 4) != 0) this.readTremoloBar(beat.effect);
 	if((flags1 & 64) != 0) {
-		var strokeUp = this.readByte();
-		var strokeDown = this.readByte();
+		var strokeUp = this.data.readSignedByte();
+		var strokeDown = this.data.readSignedByte();
 		if(strokeUp > 0) {
 			beat.effect.stroke.direction = 1;
 			beat.effect.stroke.value = alphatab.file.guitarpro.Gp3Reader.toStrokeValue(strokeUp);
@@ -3266,35 +3262,35 @@ alphatab.file.guitarpro.Gp4Reader.prototype.readBeatEffects = function(beat,effe
 	}
 	beat.effect.hasRasgueado = (flags2 & 1) != 0;
 	if((flags2 & 2) != 0) {
-		beat.effect.pickStroke = this.readByte();
+		beat.effect.pickStroke = this.data.readSignedByte();
 		beat.effect.hasPickStroke = true;
 	}
 }
 alphatab.file.guitarpro.Gp4Reader.prototype.readTremoloBar = function(effect) {
 	var barEffect = this.factory.newBendEffect();
-	barEffect.type = this.readByte();
-	barEffect.value = this.readInt();
-	var pointCount = this.readInt();
+	barEffect.type = this.data.readSignedByte();
+	barEffect.value = this.data.readInt();
+	var pointCount = this.data.readInt();
 	var _g = 0;
 	while(_g < pointCount) {
 		var i = _g++;
-		var pointPosition = Math.round(this.readInt() * 12 / 60);
-		var pointValue = Math.round(this.readInt() / (25 * 2.0));
-		var vibrato = this.readBool();
+		var pointPosition = Math.round(this.data.readInt() * 12 / 60);
+		var pointValue = Math.round(this.data.readInt() / (25 * 2.0));
+		var vibrato = this.data.readBool();
 		barEffect.points.push(new alphatab.model.effects.BendPoint(pointPosition,pointValue,vibrato));
 	}
 	if(pointCount > 0) effect.tremoloBar = barEffect;
 }
 alphatab.file.guitarpro.Gp4Reader.prototype.readChord = function(stringCount,beat) {
 	var chord = this.factory.newChord(stringCount);
-	if((this.readUnsignedByte() & 1) == 0) {
+	if((this.data.readSignedByte() & 1) == 0) {
 		chord.name = this.readIntSizeCheckByteString();
-		chord.firstFret = this.readInt();
+		chord.firstFret = this.data.readInt();
 		if(chord.firstFret != 0) {
 			var _g = 0;
 			while(_g < 6) {
 				var i = _g++;
-				var fret = this.readInt();
+				var fret = this.data.readInt();
 				if(i < chord.strings.length) chord.strings[i] = fret;
 			}
 		}
@@ -3302,11 +3298,11 @@ alphatab.file.guitarpro.Gp4Reader.prototype.readChord = function(stringCount,bea
 		this.skip(16);
 		chord.name = this.readByteSizeString(21);
 		this.skip(4);
-		chord.firstFret = this.readInt();
+		chord.firstFret = this.data.readInt();
 		var _g = 0;
 		while(_g < 7) {
 			var i = _g++;
-			var fret = this.readInt();
+			var fret = this.data.readInt();
 			if(i < chord.strings.length) chord.strings[i] = fret;
 		}
 		this.skip(32);
@@ -4341,7 +4337,7 @@ alphatab.file.alphatex.AlphaTexParser.prototype.parseTuning = function(str) {
 	return tuning;
 }
 alphatab.file.alphatex.AlphaTexParser.prototype.nextChar = function() {
-	this._ch = this._curChPos < this.data.getSize()?String.fromCharCode(this.data.readByte()):String.fromCharCode(0);
+	this._ch = this._curChPos < this.data.length()?String.fromCharCode(this.data.readByte()):String.fromCharCode(0);
 	this._curChPos++;
 }
 alphatab.file.alphatex.AlphaTexParser.prototype.newSy = function() {
@@ -4426,6 +4422,16 @@ alphatab.file.alphatex.AlphaTexParser.prototype.readNumber = function() {
 	return Std.parseInt(str);
 }
 alphatab.file.alphatex.AlphaTexParser.prototype.__class__ = alphatab.file.alphatex.AlphaTexParser;
+alphatab.file.gpx.score.GpxAutomation = function(p) {
+}
+alphatab.file.gpx.score.GpxAutomation.__name__ = ["alphatab","file","gpx","score","GpxAutomation"];
+alphatab.file.gpx.score.GpxAutomation.prototype.type = null;
+alphatab.file.gpx.score.GpxAutomation.prototype.barId = null;
+alphatab.file.gpx.score.GpxAutomation.prototype.position = null;
+alphatab.file.gpx.score.GpxAutomation.prototype.linear = null;
+alphatab.file.gpx.score.GpxAutomation.prototype.visible = null;
+alphatab.file.gpx.score.GpxAutomation.prototype.value = null;
+alphatab.file.gpx.score.GpxAutomation.prototype.__class__ = alphatab.file.gpx.score.GpxAutomation;
 if(typeof js=='undefined') js = {}
 js.Boot = function() { }
 js.Boot.__name__ = ["js","Boot"];
@@ -4608,16 +4614,6 @@ js.Boot.__init = function() {
 	$closure = js.Boot.__closure;
 }
 js.Boot.prototype.__class__ = js.Boot;
-alphatab.file.gpx.score.GpxAutomation = function(p) {
-}
-alphatab.file.gpx.score.GpxAutomation.__name__ = ["alphatab","file","gpx","score","GpxAutomation"];
-alphatab.file.gpx.score.GpxAutomation.prototype.type = null;
-alphatab.file.gpx.score.GpxAutomation.prototype.barId = null;
-alphatab.file.gpx.score.GpxAutomation.prototype.position = null;
-alphatab.file.gpx.score.GpxAutomation.prototype.linear = null;
-alphatab.file.gpx.score.GpxAutomation.prototype.visible = null;
-alphatab.file.gpx.score.GpxAutomation.prototype.value = null;
-alphatab.file.gpx.score.GpxAutomation.prototype.__class__ = alphatab.file.gpx.score.GpxAutomation;
 EReg = function(r,opt) {
 	if( r === $_ ) return;
 	opt = opt.split("u").join("");
@@ -5197,7 +5193,7 @@ alphatab.file.gpx.FileSystem.prototype.getFileContents = function(fileName) {
 	return null;
 }
 alphatab.file.gpx.FileSystem.prototype.load = function(data) {
-	var srcBuffer = new alphatab.file.gpx.ByteBuffer(data);
+	var srcBuffer = new alphatab.io.BitStream(data);
 	var header = this.getInteger(srcBuffer.readBytes(4),0);
 	this.load2(header,srcBuffer);
 }
@@ -5228,7 +5224,7 @@ alphatab.file.gpx.FileSystem.prototype.load2 = function(header,srcBuffer) {
 	} else if(header == 1514554178) {
 		var bcfsBuffer = new Array();
 		var expectLength = this.getInteger(srcBuffer.readBytes(4),0);
-		while(!srcBuffer.end() && srcBuffer.offset() < expectLength) {
+		while(!srcBuffer.eof() && srcBuffer.position() < expectLength) {
 			var flag = srcBuffer.readBits(1);
 			if(flag == 1) {
 				var bits = srcBuffer.readBits(4);
@@ -5256,8 +5252,7 @@ alphatab.file.gpx.FileSystem.prototype.load2 = function(header,srcBuffer) {
 			++_g;
 			str += String.fromCharCode($byte);
 		}
-		var newReader = new alphatab.platform.BinaryReader();
-		newReader.initialize(str);
+		var newReader = new alphatab.io.DataStream(new alphatab.io.StringStream(str));
 		this.load(newReader);
 	} else throw new alphatab.file.FileFormatException("This is not a GPX file");
 }
@@ -5428,14 +5423,14 @@ alphatab.file.guitarpro.Gp5Reader.prototype.readSong = function() {
 	this.readLyrics(song);
 	this.readPageSetup(song);
 	song.tempoName = this.readIntSizeCheckByteString();
-	song.tempo = this.readInt();
-	if(this._versionIndex > 0) song.hideTempo = this.readBool();
-	song.key = this.readByte();
-	song.octave = this.readInt();
+	song.tempo = this.data.readInt();
+	if(this._versionIndex > 0) song.hideTempo = this.data.readBool();
+	song.key = this.data.readByte();
+	song.octave = this.data.readInt();
 	var channels = this.readMidiChannels();
 	this.skip(42);
-	var measureCount = this.readInt();
-	var trackCount = this.readInt();
+	var measureCount = this.data.readInt();
+	var trackCount = this.data.readInt();
 	this.readMeasureHeaders(song,measureCount);
 	this.readTracks(song,trackCount,channels);
 	this.readMeasures(song);
@@ -5446,7 +5441,7 @@ alphatab.file.guitarpro.Gp5Reader.prototype.readMeasure = function(measure,track
 	while(_g < 2) {
 		var voice = _g++;
 		var start = measure.header.start;
-		var beats = this.readInt();
+		var beats = this.data.readInt();
 		var _g1 = 0;
 		while(_g1 < beats) {
 			var beat = _g1++;
@@ -5456,11 +5451,11 @@ alphatab.file.guitarpro.Gp5Reader.prototype.readMeasure = function(measure,track
 	this.skip(1);
 }
 alphatab.file.guitarpro.Gp5Reader.prototype.readBeat = function(start,measure,track,voiceIndex) {
-	var flags = this.readUnsignedByte();
+	var flags = this.data.readByte();
 	var beat = this.getBeat(measure,start);
 	var voice = beat.voices[voiceIndex];
 	if((flags & 64) != 0) {
-		var beatType = this.readUnsignedByte();
+		var beatType = this.data.readByte();
 		voice.isEmpty = (beatType & 2) == 0;
 	}
 	var duration = this.readDuration(flags);
@@ -5471,7 +5466,7 @@ alphatab.file.guitarpro.Gp5Reader.prototype.readBeat = function(start,measure,tr
 		var mixTableChange = this.readMixTableChange(measure);
 		beat.effect.mixTableChange = mixTableChange;
 	}
-	var stringFlags = this.readUnsignedByte();
+	var stringFlags = this.data.readByte();
 	var _g = 0;
 	while(_g < 7) {
 		var j = _g++;
@@ -5484,47 +5479,47 @@ alphatab.file.guitarpro.Gp5Reader.prototype.readBeat = function(start,measure,tr
 		duration.copy(voice.duration);
 	}
 	this.skip(1);
-	var read = this.readByte();
+	var read = this.data.readByte();
 	if(read == 8 || read == 10) this.skip(1);
 	return !voice.isEmpty?duration.time():0;
 }
 alphatab.file.guitarpro.Gp5Reader.prototype.readNote = function(guitarString,track,effect) {
-	var flags = this.readUnsignedByte();
+	var flags = this.data.readByte();
 	var note = this.factory.newNote();
 	note.string = guitarString.number;
 	note.effect.accentuatedNote = (flags & 64) != 0;
 	note.effect.heavyAccentuatedNote = (flags & 2) != 0;
 	note.effect.ghostNote = (flags & 4) != 0;
 	if((flags & 32) != 0) {
-		var noteType = this.readUnsignedByte();
+		var noteType = this.data.readByte();
 		note.isTiedNote = noteType == 2;
 		note.effect.deadNote = noteType == 3;
 	}
-	if((flags & 16) != 0) note.velocity = 15 + 16 * this.readByte() - 16;
+	if((flags & 16) != 0) note.velocity = 15 + 16 * this.data.readSignedByte() - 16;
 	if((flags & 32) != 0) {
-		var fret = this.readByte();
+		var fret = this.data.readSignedByte();
 		var value = note.isTiedNote?this.getTiedNoteValue(guitarString.number,track):fret;
 		note.value = value >= 0 && value < 100?value:0;
 	}
 	if((flags & 128) != 0) {
-		note.effect.leftHandFinger = this.readByte();
-		note.effect.rightHandFinger = this.readByte();
+		note.effect.leftHandFinger = this.data.readSignedByte();
+		note.effect.rightHandFinger = this.data.readSignedByte();
 		note.effect.isFingering = true;
 	}
-	if((flags & 1) != 0) note.durationPercent = this.readDouble();
+	if((flags & 1) != 0) note.durationPercent = this.data.readDouble();
 	this.skip(1);
 	if((flags & 8) != 0) this.readNoteEffects(note.effect);
 	return note;
 }
 alphatab.file.guitarpro.Gp5Reader.prototype.readNoteEffects = function(noteEffect) {
-	var flags1 = this.readUnsignedByte();
-	var flags2 = this.readUnsignedByte();
+	var flags1 = this.data.readByte();
+	var flags2 = this.data.readByte();
 	if((flags1 & 1) != 0) this.readBend(noteEffect);
 	if((flags1 & 16) != 0) this.readGrace(noteEffect);
 	if((flags2 & 4) != 0) this.readTremoloPicking(noteEffect);
 	if((flags2 & 8) != 0) {
 		noteEffect.slide = true;
-		var type = this.readByte();
+		var type = this.data.readByte();
 		switch(type) {
 		case 1:
 			noteEffect.slideType = 0;
@@ -5555,7 +5550,7 @@ alphatab.file.guitarpro.Gp5Reader.prototype.readNoteEffects = function(noteEffec
 	noteEffect.staccato = (flags2 & 1) != 0;
 }
 alphatab.file.guitarpro.Gp5Reader.prototype.readArtificialHarmonic = function(noteEffect) {
-	var type = this.readByte();
+	var type = this.data.readByte();
 	var oHarmonic = this.factory.newHarmonicEffect();
 	oHarmonic.data = 0;
 	switch(type) {
@@ -5584,11 +5579,11 @@ alphatab.file.guitarpro.Gp5Reader.prototype.readArtificialHarmonic = function(no
 	}
 }
 alphatab.file.guitarpro.Gp5Reader.prototype.readGrace = function(noteEffect) {
-	var fret = this.readUnsignedByte();
-	var dyn = this.readUnsignedByte();
-	var transition = this.readByte();
-	var duration = this.readUnsignedByte();
-	var flags = this.readUnsignedByte();
+	var fret = this.data.readByte();
+	var dyn = this.data.readByte();
+	var transition = this.data.readByte();
+	var duration = this.data.readByte();
+	var flags = this.data.readByte();
 	var grace = this.factory.newGraceEffect();
 	grace.fret = fret;
 	grace.velocity = 15 + 16 * dyn - 16;
@@ -5613,29 +5608,29 @@ alphatab.file.guitarpro.Gp5Reader.prototype.readGrace = function(noteEffect) {
 }
 alphatab.file.guitarpro.Gp5Reader.prototype.readMixTableChange = function(measure) {
 	var tableChange = this.factory.newMixTableChange();
-	tableChange.instrument.value = this.readByte();
+	tableChange.instrument.value = this.data.readSignedByte();
 	this.skip(16);
-	tableChange.volume.value = this.readByte();
-	tableChange.balance.value = this.readByte();
-	tableChange.chorus.value = this.readByte();
-	tableChange.reverb.value = this.readByte();
-	tableChange.phaser.value = this.readByte();
-	tableChange.tremolo.value = this.readByte();
+	tableChange.volume.value = this.data.readSignedByte();
+	tableChange.balance.value = this.data.readSignedByte();
+	tableChange.chorus.value = this.data.readSignedByte();
+	tableChange.reverb.value = this.data.readSignedByte();
+	tableChange.phaser.value = this.data.readSignedByte();
+	tableChange.tremolo.value = this.data.readSignedByte();
 	tableChange.tempoName = this.readIntSizeCheckByteString();
-	tableChange.tempo.value = this.readInt();
+	tableChange.tempo.value = this.data.readInt();
 	if(tableChange.instrument.value < 0) tableChange.instrument = null;
-	if(tableChange.volume.value >= 0) tableChange.volume.duration = this.readByte(); else tableChange.volume = null;
-	if(tableChange.balance.value >= 0) tableChange.balance.duration = this.readByte(); else tableChange.balance = null;
-	if(tableChange.chorus.value >= 0) tableChange.chorus.duration = this.readByte(); else tableChange.chorus = null;
-	if(tableChange.reverb.value >= 0) tableChange.reverb.duration = this.readByte(); else tableChange.reverb = null;
-	if(tableChange.phaser.value >= 0) tableChange.phaser.duration = this.readByte(); else tableChange.phaser = null;
-	if(tableChange.tremolo.value >= 0) tableChange.tremolo.duration = this.readByte(); else tableChange.tremolo = null;
+	if(tableChange.volume.value >= 0) tableChange.volume.duration = this.data.readSignedByte(); else tableChange.volume = null;
+	if(tableChange.balance.value >= 0) tableChange.balance.duration = this.data.readSignedByte(); else tableChange.balance = null;
+	if(tableChange.chorus.value >= 0) tableChange.chorus.duration = this.data.readSignedByte(); else tableChange.chorus = null;
+	if(tableChange.reverb.value >= 0) tableChange.reverb.duration = this.data.readSignedByte(); else tableChange.reverb = null;
+	if(tableChange.phaser.value >= 0) tableChange.phaser.duration = this.data.readSignedByte(); else tableChange.phaser = null;
+	if(tableChange.tremolo.value >= 0) tableChange.tremolo.duration = this.data.readSignedByte(); else tableChange.tremolo = null;
 	if(tableChange.tempo.value >= 0) {
-		tableChange.tempo.duration = this.readByte();
+		tableChange.tempo.duration = this.data.readSignedByte();
 		measure.header.tempo.value = tableChange.tempo.value;
-		tableChange.hideTempo = this._versionIndex > 0 && this.readBool();
+		tableChange.hideTempo = this._versionIndex > 0 && this.data.readBool();
 	} else tableChange.tempo = null;
-	var allTracksFlags = this.readUnsignedByte();
+	var allTracksFlags = this.data.readByte();
 	if(tableChange.volume != null) tableChange.volume.allTracks = (allTracksFlags & 1) != 0;
 	if(tableChange.balance != null) tableChange.balance.allTracks = (allTracksFlags & 2) != 0;
 	if(tableChange.chorus != null) tableChange.chorus.allTracks = (allTracksFlags & 4) != 0;
@@ -5655,11 +5650,11 @@ alphatab.file.guitarpro.Gp5Reader.prototype.readChord = function(stringCount,bea
 	this.skip(17);
 	chord.name = this.readByteSizeString(21);
 	this.skip(4);
-	chord.firstFret = this.readInt();
+	chord.firstFret = this.data.readInt();
 	var _g = 0;
 	while(_g < 7) {
 		var i = _g++;
-		var fret = this.readInt();
+		var fret = this.data.readInt();
 		if(i < chord.strings.length) chord.strings[i] = fret;
 	}
 	this.skip(32);
@@ -5674,7 +5669,7 @@ alphatab.file.guitarpro.Gp5Reader.prototype.readTracks = function(song,trackCoun
 	this.skip(this._versionIndex == 0?2:1);
 }
 alphatab.file.guitarpro.Gp5Reader.prototype.readTrack = function(number,channels) {
-	var flags = this.readUnsignedByte();
+	var flags = this.data.readByte();
 	if(number == 1 || this._versionIndex == 0) this.skip(1);
 	var track = this.factory.newTrack();
 	track.isPercussionTrack = (flags & 1) != 0;
@@ -5682,11 +5677,11 @@ alphatab.file.guitarpro.Gp5Reader.prototype.readTrack = function(number,channels
 	track.isBanjoTrack = (flags & 4) != 0;
 	track.number = number;
 	track.name = this.readByteSizeString(40);
-	var stringCount = this.readInt();
+	var stringCount = this.data.readInt();
 	var _g = 0;
 	while(_g < 7) {
 		var i = _g++;
-		var iTuning = this.readInt();
+		var iTuning = this.data.readInt();
 		if(stringCount > i) {
 			var oString = this.factory.newString();
 			oString.number = i + 1;
@@ -5694,11 +5689,11 @@ alphatab.file.guitarpro.Gp5Reader.prototype.readTrack = function(number,channels
 			track.strings.push(oString);
 		}
 	}
-	track.port = this.readInt();
+	track.port = this.data.readInt();
 	this.readChannel(track.channel,channels);
 	if(track.channel.channel == 9) track.isPercussionTrack = true;
-	track.fretCount = this.readInt();
-	track.offset = this.readInt();
+	track.fretCount = this.data.readInt();
+	track.offset = this.data.readInt();
 	track.color = this.readColor();
 	this.skip(this._versionIndex > 0?49:44);
 	if(this._versionIndex > 0) {
@@ -5709,21 +5704,21 @@ alphatab.file.guitarpro.Gp5Reader.prototype.readTrack = function(number,channels
 }
 alphatab.file.guitarpro.Gp5Reader.prototype.readMeasureHeader = function(i,timeSignature,song) {
 	if(i > 0) this.skip(1);
-	var flags = this.readUnsignedByte();
+	var flags = this.data.readByte();
 	var header = this.factory.newMeasureHeader();
 	header.number = i + 1;
 	header.start = 0;
 	header.tempo.value = song.tempo;
-	if((flags & 1) != 0) timeSignature.numerator = this.readByte();
-	if((flags & 2) != 0) timeSignature.denominator.value = this.readByte();
+	if((flags & 1) != 0) timeSignature.numerator = this.data.readByte();
+	if((flags & 2) != 0) timeSignature.denominator.value = this.data.readByte();
 	header.isRepeatOpen = (flags & 4) != 0;
 	timeSignature.copy(header.timeSignature);
-	if((flags & 8) != 0) header.repeatClose = this.readByte() - 1;
+	if((flags & 8) != 0) header.repeatClose = this.data.readByte() - 1;
 	if((flags & 32) != 0) header.marker = this.readMarker(header);
-	if((flags & 16) != 0) header.repeatAlternative = this.readUnsignedByte();
+	if((flags & 16) != 0) header.repeatAlternative = this.data.readByte();
 	if((flags & 64) != 0) {
-		header.keySignature = alphatab.file.guitarpro.Gp3Reader.toKeySignature(this.readByte());
-		header.keySignatureType = this.readByte();
+		header.keySignature = alphatab.file.guitarpro.Gp3Reader.toKeySignature(this.data.readByte());
+		header.keySignatureType = this.data.readByte();
 	} else if(header.number > 1) {
 		header.keySignature = song.measureHeaders[i - 1].keySignature;
 		header.keySignatureType = song.measureHeaders[i - 1].keySignatureType;
@@ -5731,7 +5726,7 @@ alphatab.file.guitarpro.Gp5Reader.prototype.readMeasureHeader = function(i,timeS
 	header.hasDoubleBar = (flags & 128) != 0;
 	if((flags & 1) != 0) this.skip(4);
 	if((flags & 16) == 0) this.skip(1);
-	var tripletFeel = this.readByte();
+	var tripletFeel = this.data.readByte();
 	switch(tripletFeel) {
 	case 1:
 		header.tripletFeel = 1;
@@ -5747,15 +5742,15 @@ alphatab.file.guitarpro.Gp5Reader.prototype.readMeasureHeader = function(i,timeS
 alphatab.file.guitarpro.Gp5Reader.prototype.readPageSetup = function(song) {
 	var setup = this.factory.newPageSetup();
 	if(this._versionIndex > 0) this.skip(19);
-	setup.pageSize = new alphatab.model.Point(this.readInt(),this.readInt());
-	var l = this.readInt();
-	var r = this.readInt();
-	var t = this.readInt();
-	var b = this.readInt();
+	setup.pageSize = new alphatab.model.Point(this.data.readInt(),this.data.readInt());
+	var l = this.data.readInt();
+	var r = this.data.readInt();
+	var t = this.data.readInt();
+	var b = this.data.readInt();
 	setup.pageMargin = new alphatab.model.Padding(l,t,r,b);
-	setup.scoreSizeProportion = this.readInt() / 100.0;
-	setup.headerAndFooter = this.readByte();
-	var flags2 = this.readUnsignedByte();
+	setup.scoreSizeProportion = this.data.readInt() / 100.0;
+	setup.headerAndFooter = this.data.readByte();
+	var flags2 = this.data.readByte();
 	if((flags2 & 1) != 0) setup.headerAndFooter |= 256;
 	setup.title = this.readIntSizeCheckByteString();
 	setup.subtitle = this.readIntSizeCheckByteString();
@@ -5778,7 +5773,7 @@ alphatab.file.guitarpro.Gp5Reader.prototype.readInfo = function(song) {
 	song.copyright = this.readIntSizeCheckByteString();
 	song.tab = this.readIntSizeCheckByteString();
 	song.instructions = this.readIntSizeCheckByteString();
-	var iNotes = this.readInt();
+	var iNotes = this.data.readInt();
 	song.notice = "";
 	var _g = 0;
 	while(_g < iNotes) {
@@ -5804,16 +5799,14 @@ alphatab.platform.js.JsFileLoader.prototype.loadBinary = function(method,file,su
 			data += String.fromCharCode(fileContents[i]);
 			i++;
 		}
-		var reader = new alphatab.platform.BinaryReader();
-		reader.initialize(data);
+		var reader = new alphatab.io.DataStream(new alphatab.io.StringStream(data));
 		success(reader);
 	} else {
 		var options = { };
 		options.type = method;
 		options.url = file;
 		options.success = function(data) {
-			var reader = new alphatab.platform.BinaryReader();
-			reader.initialize(data);
+			var reader = new alphatab.io.DataStream(new alphatab.io.StringStream(data));
 			success(reader);
 		};
 		options.error = function(x,e) {
@@ -6886,6 +6879,72 @@ alphatab.tablature.drawing.SilencePainter.paintThirtySecond = function(layer,x,y
 	layer.addMusicSymbol(alphatab.tablature.drawing.MusicFont.SilenceThirtySecond,x,y,layout.scale);
 }
 alphatab.tablature.drawing.SilencePainter.prototype.__class__ = alphatab.tablature.drawing.SilencePainter;
+if(!alphatab.io) alphatab.io = {}
+alphatab.io.Stream = function() { }
+alphatab.io.Stream.__name__ = ["alphatab","io","Stream"];
+alphatab.io.Stream.prototype.readByte = function() {
+	return 0;
+}
+alphatab.io.Stream.prototype.readSignedByte = function() {
+	var data = this.readByte() & 255;
+	return data > 127?-256 + data:data;
+}
+alphatab.io.Stream.prototype.readBytes = function(count,bigEndian) {
+	if(bigEndian == null) bigEndian = false;
+	var bytes = new Array();
+	var _g = 0;
+	while(_g < count) {
+		var i = _g++;
+		bytes.push(this.readByte());
+	}
+	if(bigEndian) bytes.reverse();
+	return bytes;
+}
+alphatab.io.Stream.prototype.eof = function() {
+	return this.position() >= this.length();
+}
+alphatab.io.Stream.prototype.length = function() {
+	return 0;
+}
+alphatab.io.Stream.prototype.position = function() {
+	return 0;
+}
+alphatab.io.Stream.prototype.canSeek = function() {
+	return false;
+}
+alphatab.io.Stream.prototype.seek = function(position) {
+}
+alphatab.io.Stream.prototype.skip = function(count) {
+	var _g = 0;
+	while(_g < count) {
+		var i = _g++;
+		this.readByte();
+	}
+}
+alphatab.io.Stream.prototype.__class__ = alphatab.io.Stream;
+alphatab.io.StringStream = function(buffer) {
+	if( buffer === $_ ) return;
+	this._buffer = buffer;
+	this._pos = 0;
+}
+alphatab.io.StringStream.__name__ = ["alphatab","io","StringStream"];
+alphatab.io.StringStream.__super__ = alphatab.io.Stream;
+for(var k in alphatab.io.Stream.prototype ) alphatab.io.StringStream.prototype[k] = alphatab.io.Stream.prototype[k];
+alphatab.io.StringStream.prototype._pos = null;
+alphatab.io.StringStream.prototype._buffer = null;
+alphatab.io.StringStream.prototype.readByte = function() {
+	return this._buffer.charCodeAt(this._pos++) & 255;
+}
+alphatab.io.StringStream.prototype.length = function() {
+	return this._buffer.length;
+}
+alphatab.io.StringStream.prototype.position = function() {
+	return this._pos;
+}
+alphatab.io.StringStream.prototype.seek = function(position) {
+	this._pos = position;
+}
+alphatab.io.StringStream.prototype.__class__ = alphatab.io.StringStream;
 alphatab.midi.MidiController = function() { }
 alphatab.midi.MidiController.__name__ = ["alphatab","midi","MidiController"];
 alphatab.midi.MidiController.prototype.__class__ = alphatab.midi.MidiController;
@@ -7210,7 +7269,7 @@ alphatab.tablature.drawing.DrawingResources.init = function(scale) {
 	alphatab.tablature.drawing.DrawingResources.titleFont = alphatab.tablature.drawing.DrawingResources.formatFontSize(30 * scale) + " " + serifFont;
 	alphatab.tablature.drawing.DrawingResources.subtitleFont = alphatab.tablature.drawing.DrawingResources.formatFontSize(19 * scale) + " " + serifFont;
 	alphatab.tablature.drawing.DrawingResources.wordsFont = alphatab.tablature.drawing.DrawingResources.formatFontSize(13 * scale) + " " + serifFont;
-	alphatab.tablature.drawing.DrawingResources.copyrightFont = "bold " + Std.string(11 * scale) + " " + sansFont;
+	alphatab.tablature.drawing.DrawingResources.copyrightFont = "bold " + alphatab.tablature.drawing.DrawingResources.formatFontSize(11 * scale) + " " + sansFont;
 }
 alphatab.tablature.drawing.DrawingResources.formatFontSize = function(size) {
 	var num = size;
@@ -8030,6 +8089,54 @@ alphatab.model.NoteEffect.prototype.clone = function(factory) {
 	return effect;
 }
 alphatab.model.NoteEffect.prototype.__class__ = alphatab.model.NoteEffect;
+alphatab.io.DataStream = function(stream) {
+	if( stream === $_ ) return;
+	this._stream = stream;
+}
+alphatab.io.DataStream.__name__ = ["alphatab","io","DataStream"];
+alphatab.io.DataStream.__super__ = alphatab.io.Stream;
+for(var k in alphatab.io.Stream.prototype ) alphatab.io.DataStream.prototype[k] = alphatab.io.Stream.prototype[k];
+alphatab.io.DataStream.prototype._stream = null;
+alphatab.io.DataStream.prototype.readBool = function() {
+	return this.readByte() != 0;
+}
+alphatab.io.DataStream.prototype.readShort = function() {
+	var bytes = this.readBytes(2);
+	return bytes[1] << 8 | bytes[0];
+}
+alphatab.io.DataStream.prototype.readInt = function() {
+	var bytes = this.readBytes(4);
+	return bytes[3] << 24 | bytes[2] << 16 | bytes[1] << 8 | bytes[0];
+}
+alphatab.io.DataStream.prototype.readFloat = function() {
+	var bytes = this.readBytes(4);
+	var sign = 1 - (bytes[0] >> 7 << 1);
+	var exp = (bytes[0] << 1 & 255 | bytes[1] >> 7) - 127;
+	var sig = (bytes[1] & 127) << 16 | bytes[2] << 8 | bytes[3];
+	if(sig == 0 && exp == -127) return 0.0;
+	return sign * (1 + alphatab.io.DataStream.TWOeN23 * sig) * Math.pow(2,exp);
+}
+alphatab.io.DataStream.prototype.readDouble = function() {
+	var bytes = this.readBytes(8);
+	var sign = 1 - (bytes[0] >> 7 << 1);
+	var exp = (bytes[0] << 4 & 2047 | bytes[1] >> 4) - 1023;
+	var sig = parseInt((((bytes[1] & 15) << 16 | bytes[2] << 8 | bytes[3]) * Math.pow(2,32)).toString(2),2) + parseInt(((bytes[4] >> 7) * Math.pow(2,31)).toString(2),2) + parseInt(((bytes[4] & 127) << 24 | bytes[5] << 16 | bytes[6] << 8 | bytes[7]).toString(2),2);
+	if(sig == 0 && exp == -1023) return 0.0;
+	return sign * (1.0 + Math.pow(2,-52) * sig) * Math.pow(2,exp);
+}
+alphatab.io.DataStream.prototype.readByte = function() {
+	return this._stream.readByte();
+}
+alphatab.io.DataStream.prototype.seek = function(position) {
+	this._stream.seek(position);
+}
+alphatab.io.DataStream.prototype.position = function() {
+	return this._stream.position();
+}
+alphatab.io.DataStream.prototype.length = function() {
+	return this._stream.length();
+}
+alphatab.io.DataStream.prototype.__class__ = alphatab.io.DataStream;
 alphatab.model.TripletFeel = function() { }
 alphatab.model.TripletFeel.__name__ = ["alphatab","model","TripletFeel"];
 alphatab.model.TripletFeel.prototype.__class__ = alphatab.model.TripletFeel;
@@ -8367,112 +8474,6 @@ Std.random = function(x) {
 	return Math.floor(Math.random() * x);
 }
 Std.prototype.__class__ = Std;
-alphatab.platform.BinaryReader = function(p) {
-}
-alphatab.platform.BinaryReader.__name__ = ["alphatab","platform","BinaryReader"];
-alphatab.platform.BinaryReader.prototype._buffer = null;
-alphatab.platform.BinaryReader.prototype._pos = null;
-alphatab.platform.BinaryReader.prototype.initialize = function(data) {
-	this._buffer = data;
-	this._pos = 0;
-}
-alphatab.platform.BinaryReader.prototype.readBool = function() {
-	return this.readByte() == 1;
-}
-alphatab.platform.BinaryReader.prototype.readByte = function() {
-	var data = this.getByte(this._pos);
-	this._pos++;
-	return data;
-}
-alphatab.platform.BinaryReader.prototype.getByte = function(index) {
-	var data = this._buffer.charCodeAt(index);
-	data = data & 255;
-	return data;
-}
-alphatab.platform.BinaryReader.prototype.readInt16 = function() {
-	return this.decodeInt(16,true);
-}
-alphatab.platform.BinaryReader.prototype.readInt32 = function() {
-	return this.decodeInt(32,true);
-}
-alphatab.platform.BinaryReader.prototype.readDouble = function() {
-	return this.decodeFloat(52,11);
-}
-alphatab.platform.BinaryReader.prototype.seek = function(pos) {
-	this._pos = pos;
-}
-alphatab.platform.BinaryReader.prototype.getPosition = function() {
-	return this._pos;
-}
-alphatab.platform.BinaryReader.prototype.getSize = function() {
-	return this._buffer.length;
-}
-alphatab.platform.BinaryReader.prototype.decodeInt = function(bits,signed) {
-	var x = this.readBits(0,bits,Math.floor(bits / 8));
-	var max = Math.floor(Math.pow(2,bits));
-	var result = signed && x >= max / 2?x - max:x;
-	this._pos += Math.floor(bits / 8);
-	return result;
-}
-alphatab.platform.BinaryReader.prototype.readBits = function(start,length,size) {
-	var offsetLeft = (start + length) % 8;
-	var offsetRight = start % 8;
-	var curByte = size - (start >> 3) - 1;
-	var lastByte = size + (-(start + length) >> 3);
-	var diff = curByte - lastByte;
-	var sum = this.readByteForBits(curByte,size) >> offsetRight & (1 << (diff != 0?8 - offsetRight:length)) - 1;
-	if(diff != 0 && offsetLeft != 0) sum += (this.readByteForBits(lastByte++,size) & (1 << offsetLeft) - 1) << (diff-- << 3) - offsetRight;
-	while(diff != 0) sum += this.shl(this.readByteForBits(lastByte++,size),(diff-- << 3) - offsetRight);
-	return sum;
-}
-alphatab.platform.BinaryReader.prototype.readByteForBits = function(i,size) {
-	return this._buffer.charCodeAt(this._pos + size - i - 1) & 255;
-}
-alphatab.platform.BinaryReader.prototype.shl1 = function(a) {
-	a = a % -2147483648;
-	if((a & 1073741824) == 1073741824) {
-		a -= 1073741824;
-		a *= 2;
-		a += -2147483648;
-	} else a *= 2;
-	return a;
-}
-alphatab.platform.BinaryReader.prototype.shl = function(a,b) {
-	var _g = 0;
-	while(_g < b) {
-		var i = _g++;
-		a = this.shl1(a);
-	}
-	return a;
-}
-alphatab.platform.BinaryReader.prototype.decodeFloat = function(precisionBits,exponentBits) {
-	var length = precisionBits + exponentBits + 1;
-	var size = length >> 3;
-	var bias = Math.floor(Math.pow(2,exponentBits - 1) - 1);
-	var signal = this.readBits(precisionBits + exponentBits,1,size);
-	var exponent = this.readBits(precisionBits,exponentBits,size);
-	var significand = 0;
-	var divisor = 2;
-	var curByte = length + (-precisionBits >> 3) - 1;
-	var startBit;
-	do {
-		var byteValue = this.readByteForBits(++curByte,size);
-		startBit = precisionBits % 8;
-		if(startBit == 0) startBit = 8;
-		var mask = 1 << startBit;
-		while((mask >>= 1) != 0) {
-			if((byteValue & mask) != 0) significand += 1 / divisor;
-			divisor *= 2;
-		}
-	} while((precisionBits -= startBit) != 0);
-	this._pos += size;
-	if(exponent == (bias << 1) + 1) return 0; else if(exponent != 0 || significand != 0) {
-		var ret;
-		if(exponent == 0) ret = Math.pow(2,-bias + 1) * significand; else ret = Math.pow(2,exponent - bias) * (1 + significand);
-		return ret * (1 + signal * -2);
-	} else return 0;
-}
-alphatab.platform.BinaryReader.prototype.__class__ = alphatab.platform.BinaryReader;
 alphatab.tablature.drawing.TripletFeelPainter = function() { }
 alphatab.tablature.drawing.TripletFeelPainter.__name__ = ["alphatab","tablature","drawing","TripletFeelPainter"];
 alphatab.tablature.drawing.TripletFeelPainter.paintTripletFeel16 = function(context,x,y,scale) {
@@ -8854,61 +8855,6 @@ alphatab.tablature.model.EffectsCache.prototype.__class__ = alphatab.tablature.m
 alphatab.model.effects.HarmonicType = function() { }
 alphatab.model.effects.HarmonicType.__name__ = ["alphatab","model","effects","HarmonicType"];
 alphatab.model.effects.HarmonicType.prototype.__class__ = alphatab.model.effects.HarmonicType;
-alphatab.file.gpx.ByteBuffer = function(buffer) {
-	if( buffer === $_ ) return;
-	this._buffer = buffer;
-	this._position = 0;
-}
-alphatab.file.gpx.ByteBuffer.__name__ = ["alphatab","file","gpx","ByteBuffer"];
-alphatab.file.gpx.ByteBuffer.prototype._position = null;
-alphatab.file.gpx.ByteBuffer.prototype._buffer = null;
-alphatab.file.gpx.ByteBuffer.prototype.length = function() {
-	return this._buffer.getSize();
-}
-alphatab.file.gpx.ByteBuffer.prototype.offset = function() {
-	return Math.floor(this._position / 8);
-}
-alphatab.file.gpx.ByteBuffer.prototype.end = function() {
-	return this.offset() >= this.length();
-}
-alphatab.file.gpx.ByteBuffer.prototype.readBit = function() {
-	var bit = -1;
-	var byteIndex = Math.floor(this._position / 8);
-	var byteOffset = 7 - this._position % 8;
-	if(byteIndex >= 0 && byteIndex < this._buffer.getSize()) {
-		bit = (this._buffer.getByte(byteIndex) & 255) >> byteOffset & 1;
-		this._position++;
-	}
-	return bit;
-}
-alphatab.file.gpx.ByteBuffer.prototype.readBits = function(count) {
-	var bits = 0;
-	var i = count - 1;
-	while(i >= 0) {
-		bits |= this.readBit() << i;
-		i--;
-	}
-	return bits;
-}
-alphatab.file.gpx.ByteBuffer.prototype.readBitsReversed = function(count) {
-	var bits = 0;
-	var i = 0;
-	while(i < count) {
-		bits |= this.readBit() << i;
-		i++;
-	}
-	return bits;
-}
-alphatab.file.gpx.ByteBuffer.prototype.readBytes = function(count) {
-	var bytes = new Array();
-	var i = 0;
-	while(i < count) {
-		bytes.push(this.readBits(8));
-		i++;
-	}
-	return bytes;
-}
-alphatab.file.gpx.ByteBuffer.prototype.__class__ = alphatab.file.gpx.ByteBuffer;
 alphatab.model.BeatEffect = function(factory) {
 	if( factory === $_ ) return;
 	this.tapping = false;
@@ -10848,6 +10794,59 @@ Xml.prototype.toString = function() {
 	return s.b.join("");
 }
 Xml.prototype.__class__ = Xml;
+alphatab.io.BitStream = function(stream) {
+	if( stream === $_ ) return;
+	this._stream = stream;
+	this._position = 8;
+}
+alphatab.io.BitStream.__name__ = ["alphatab","io","BitStream"];
+alphatab.io.BitStream.__super__ = alphatab.io.Stream;
+for(var k in alphatab.io.Stream.prototype ) alphatab.io.BitStream.prototype[k] = alphatab.io.Stream.prototype[k];
+alphatab.io.BitStream.prototype._stream = null;
+alphatab.io.BitStream.prototype._currentByte = null;
+alphatab.io.BitStream.prototype._position = null;
+alphatab.io.BitStream.prototype.readByte = function() {
+	return this.readBits(8);
+}
+alphatab.io.BitStream.prototype.length = function() {
+	return this._stream.length();
+}
+alphatab.io.BitStream.prototype.position = function() {
+	return this._stream.position();
+}
+alphatab.io.BitStream.prototype.seek = function(position) {
+	this._position = 8;
+	this._stream.seek(position);
+}
+alphatab.io.BitStream.prototype.readBits = function(count) {
+	var bits = 0;
+	var i = count - 1;
+	while(i >= 0) {
+		bits |= this.readBit() << i;
+		i--;
+	}
+	return bits;
+}
+alphatab.io.BitStream.prototype.readBitsReversed = function(count) {
+	var bits = 0;
+	var i = 0;
+	while(i < count) {
+		bits |= this.readBit() << i;
+		i++;
+	}
+	return bits;
+}
+alphatab.io.BitStream.prototype.readBit = function() {
+	var bit = -1;
+	if(this._position >= 8) {
+		this._currentByte = this._stream.readByte();
+		this._position = 0;
+	}
+	var value = this._currentByte >> 8 - this._position - 1 & 1;
+	this._position++;
+	return value;
+}
+alphatab.io.BitStream.prototype.__class__ = alphatab.io.BitStream;
 alphatab.platform.svg.SupportedFonts = { __ename__ : ["alphatab","platform","svg","SupportedFonts"], __constructs__ : ["TimesNewRoman","Arial"] }
 alphatab.platform.svg.SupportedFonts.TimesNewRoman = ["TimesNewRoman",0];
 alphatab.platform.svg.SupportedFonts.TimesNewRoman.toString = $estr;
@@ -11226,6 +11225,7 @@ alphatab.model.MidiChannel.DEFAULT_CHORUS = 0;
 alphatab.model.MidiChannel.DEFAULT_REVERB = 0;
 alphatab.model.MidiChannel.DEFAULT_PHASER = 0;
 alphatab.model.MidiChannel.DEFAULT_TREMOLO = 0;
+alphatab.io.DataStream.TWOeN23 = Math.pow(2,-23);
 alphatab.model.TripletFeel.None = 0;
 alphatab.model.TripletFeel.Eighth = 1;
 alphatab.model.TripletFeel.Sixteenth = 2;
@@ -11238,7 +11238,6 @@ alphatab.model.effects.HarmonicType.Artificial = 1;
 alphatab.model.effects.HarmonicType.Tapped = 2;
 alphatab.model.effects.HarmonicType.Pinch = 3;
 alphatab.model.effects.HarmonicType.Semi = 4;
-alphatab.file.gpx.ByteBuffer.BUFFER_TYPE_BITS = 8;
 alphatab.tablature.model.MeasureDrawing.ACCIDENTAL_SHARP_NOTES = [0,0,1,1,2,3,3,4,4,5,5,6];
 alphatab.tablature.model.MeasureDrawing.ACCIDENTAL_FLAT_NOTES = [0,1,1,2,2,3,4,4,5,5,6,6];
 alphatab.tablature.model.MeasureDrawing.ACCIDENTAL_NOTES = [false,true,false,true,false,false,true,false,true,false,true,false];
@@ -11285,5 +11284,6 @@ Xml.eclose = new EReg("^[ \r\n\t]*(>|(/>))","");
 Xml.ecdata_end = new EReg("\\]\\]>","");
 Xml.edoctype_elt = new EReg("[\\[|\\]>]","");
 Xml.ecomment_end = new EReg("-->","");
+alphatab.io.BitStream.BYTE_SIZE = 8;
 alphatab.tablature.model.BeatGroup.SCORE_MIDDLE_KEYS = [55,40,40,50];
 alphatab.Main.main()
