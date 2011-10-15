@@ -1094,25 +1094,6 @@ alphatab.file.guitarpro.GpReaderBase.prototype.initVersions = function(supported
 alphatab.file.guitarpro.GpReaderBase.prototype.skip = function(count) {
 	this.data.skip(count);
 }
-alphatab.file.guitarpro.GpReaderBase.prototype.OLDreadUnsignedByte = function() {
-	return this.data.readByte();
-}
-alphatab.file.guitarpro.GpReaderBase.prototype.OLDreadBool = function() {
-	return this.data.readByte() == 1;
-}
-alphatab.file.guitarpro.GpReaderBase.prototype.OLDreadByte = function() {
-	var data = this.data.readByte() & 255;
-	return data > 127?-256 + data:data;
-}
-alphatab.file.guitarpro.GpReaderBase.prototype.OLDread = function() {
-	return this.OLDreadByte();
-}
-alphatab.file.guitarpro.GpReaderBase.prototype.OLDreadInt = function() {
-	return this.data.readInt();
-}
-alphatab.file.guitarpro.GpReaderBase.prototype.OLDreadDouble = function() {
-	return this.data.readDouble();
-}
 alphatab.file.guitarpro.GpReaderBase.prototype.readByteSizeString = function(size,charset) {
 	if(charset == null) charset = "UTF-8";
 	return this.readString(size,this.data.readByte(),charset);
@@ -2521,6 +2502,7 @@ alphatab.file.SongLoader = function() { }
 alphatab.file.SongLoader.__name__ = ["alphatab","file","SongLoader"];
 alphatab.file.SongLoader.loadSong = function(url,factory,success) {
 	var loader = alphatab.platform.PlatformFactory.getLoader();
+	if(loader == null) throw "No file loader for you platform found";
 	loader.loadBinary("GET",url,function(data) {
 		var readers = alphatab.file.SongReader.availableReaders();
 		var _g = 0;
@@ -2630,14 +2612,6 @@ alphatab.model.effects.TrillEffect.prototype.clone = function(factory) {
 	return effect;
 }
 alphatab.model.effects.TrillEffect.prototype.__class__ = alphatab.model.effects.TrillEffect;
-alphatab.file.gpx.score.GpxBar = function(p) {
-}
-alphatab.file.gpx.score.GpxBar.__name__ = ["alphatab","file","gpx","score","GpxBar"];
-alphatab.file.gpx.score.GpxBar.prototype.id = null;
-alphatab.file.gpx.score.GpxBar.prototype.voiceIds = null;
-alphatab.file.gpx.score.GpxBar.prototype.clef = null;
-alphatab.file.gpx.score.GpxBar.prototype.simileMark = null;
-alphatab.file.gpx.score.GpxBar.prototype.__class__ = alphatab.file.gpx.score.GpxBar;
 alphatab.model.Measure = function(header) {
 	if( header === $_ ) return;
 	this.header = header;
@@ -3019,6 +2993,14 @@ alphatab.file.alphatex.AlphaTexWriter.prototype.writeMeta = function() {
 	this._result.add(this._track.channel.instrument());
 }
 alphatab.file.alphatex.AlphaTexWriter.prototype.__class__ = alphatab.file.alphatex.AlphaTexWriter;
+alphatab.file.gpx.score.GpxBar = function(p) {
+}
+alphatab.file.gpx.score.GpxBar.__name__ = ["alphatab","file","gpx","score","GpxBar"];
+alphatab.file.gpx.score.GpxBar.prototype.id = null;
+alphatab.file.gpx.score.GpxBar.prototype.voiceIds = null;
+alphatab.file.gpx.score.GpxBar.prototype.clef = null;
+alphatab.file.gpx.score.GpxBar.prototype.simileMark = null;
+alphatab.file.gpx.score.GpxBar.prototype.__class__ = alphatab.file.gpx.score.GpxBar;
 alphatab.file.guitarpro.Gp4Reader = function(p) {
 	if( p === $_ ) return;
 	alphatab.file.guitarpro.Gp3Reader.call(this);
@@ -4422,16 +4404,6 @@ alphatab.file.alphatex.AlphaTexParser.prototype.readNumber = function() {
 	return Std.parseInt(str);
 }
 alphatab.file.alphatex.AlphaTexParser.prototype.__class__ = alphatab.file.alphatex.AlphaTexParser;
-alphatab.file.gpx.score.GpxAutomation = function(p) {
-}
-alphatab.file.gpx.score.GpxAutomation.__name__ = ["alphatab","file","gpx","score","GpxAutomation"];
-alphatab.file.gpx.score.GpxAutomation.prototype.type = null;
-alphatab.file.gpx.score.GpxAutomation.prototype.barId = null;
-alphatab.file.gpx.score.GpxAutomation.prototype.position = null;
-alphatab.file.gpx.score.GpxAutomation.prototype.linear = null;
-alphatab.file.gpx.score.GpxAutomation.prototype.visible = null;
-alphatab.file.gpx.score.GpxAutomation.prototype.value = null;
-alphatab.file.gpx.score.GpxAutomation.prototype.__class__ = alphatab.file.gpx.score.GpxAutomation;
 if(typeof js=='undefined') js = {}
 js.Boot = function() { }
 js.Boot.__name__ = ["js","Boot"];
@@ -4614,6 +4586,16 @@ js.Boot.__init = function() {
 	$closure = js.Boot.__closure;
 }
 js.Boot.prototype.__class__ = js.Boot;
+alphatab.file.gpx.score.GpxAutomation = function(p) {
+}
+alphatab.file.gpx.score.GpxAutomation.__name__ = ["alphatab","file","gpx","score","GpxAutomation"];
+alphatab.file.gpx.score.GpxAutomation.prototype.type = null;
+alphatab.file.gpx.score.GpxAutomation.prototype.barId = null;
+alphatab.file.gpx.score.GpxAutomation.prototype.position = null;
+alphatab.file.gpx.score.GpxAutomation.prototype.linear = null;
+alphatab.file.gpx.score.GpxAutomation.prototype.visible = null;
+alphatab.file.gpx.score.GpxAutomation.prototype.value = null;
+alphatab.file.gpx.score.GpxAutomation.prototype.__class__ = alphatab.file.gpx.score.GpxAutomation;
 EReg = function(r,opt) {
 	if( r === $_ ) return;
 	opt = opt.split("u").join("");
@@ -5281,7 +5263,45 @@ alphatab.file.gpx.FileSystem.prototype.getBytes = function(source,offset,length)
 	return bytes;
 }
 alphatab.file.gpx.FileSystem.prototype.__class__ = alphatab.file.gpx.FileSystem;
+alphatab.platform.FileLoader = function() { }
+alphatab.platform.FileLoader.__name__ = ["alphatab","platform","FileLoader"];
+alphatab.platform.FileLoader.prototype.loadBinary = null;
+alphatab.platform.FileLoader.prototype.__class__ = alphatab.platform.FileLoader;
 if(!alphatab.platform.js) alphatab.platform.js = {}
+alphatab.platform.js.JsFileLoader = function(p) {
+}
+alphatab.platform.js.JsFileLoader.__name__ = ["alphatab","platform","js","JsFileLoader"];
+alphatab.platform.js.JsFileLoader.prototype.loadBinary = function(method,file,success,error) {
+	if(jQuery.browser.msie) {
+		var vbArr = VbAjaxLoader(method,file);
+		var fileContents = vbArr.toArray();
+		var data = "";
+		var i = 0;
+		while(i < fileContents.length - 1) {
+			data += String.fromCharCode(fileContents[i]);
+			i++;
+		}
+		var reader = new alphatab.io.DataStream(new alphatab.io.StringStream(data));
+		success(reader);
+	} else {
+		var options = { };
+		options.type = method;
+		options.url = file;
+		options.success = function(data) {
+			var reader = new alphatab.io.DataStream(new alphatab.io.StringStream(data));
+			success(reader);
+		};
+		options.error = function(x,e) {
+			if(x.status == 0) error("You are offline!!\n Please Check Your Network."); else if(x.status == 404) error("Requested URL not found."); else if(x.status == 500) error("Internel Server Error."); else if(e == "parsererror") error("Error.\nParsing JSON Request failed."); else if(e == "timeout") error("Request Time out."); else error("Unknow Error.\n" + x.responseText);
+		};
+		options.beforeSend = function(xhr) {
+			if(xhr.overrideMimeType) xhr.overrideMimeType("text/plain; charset=x-user-defined");
+		};
+		jQuery.ajax(options);
+	}
+}
+alphatab.platform.js.JsFileLoader.prototype.__class__ = alphatab.platform.js.JsFileLoader;
+alphatab.platform.js.JsFileLoader.__interfaces__ = [alphatab.platform.FileLoader];
 alphatab.platform.js.Html5Canvas = function(dom) {
 	if( dom === $_ ) return;
 	this._canvas = dom;
@@ -5782,44 +5802,6 @@ alphatab.file.guitarpro.Gp5Reader.prototype.readInfo = function(song) {
 	}
 }
 alphatab.file.guitarpro.Gp5Reader.prototype.__class__ = alphatab.file.guitarpro.Gp5Reader;
-alphatab.platform.FileLoader = function() { }
-alphatab.platform.FileLoader.__name__ = ["alphatab","platform","FileLoader"];
-alphatab.platform.FileLoader.prototype.loadBinary = null;
-alphatab.platform.FileLoader.prototype.__class__ = alphatab.platform.FileLoader;
-alphatab.platform.js.JsFileLoader = function(p) {
-}
-alphatab.platform.js.JsFileLoader.__name__ = ["alphatab","platform","js","JsFileLoader"];
-alphatab.platform.js.JsFileLoader.prototype.loadBinary = function(method,file,success,error) {
-	if(jQuery.browser.msie) {
-		var vbArr = VbAjaxLoader(method,file);
-		var fileContents = vbArr.toArray();
-		var data = "";
-		var i = 0;
-		while(i < fileContents.length - 1) {
-			data += String.fromCharCode(fileContents[i]);
-			i++;
-		}
-		var reader = new alphatab.io.DataStream(new alphatab.io.StringStream(data));
-		success(reader);
-	} else {
-		var options = { };
-		options.type = method;
-		options.url = file;
-		options.success = function(data) {
-			var reader = new alphatab.io.DataStream(new alphatab.io.StringStream(data));
-			success(reader);
-		};
-		options.error = function(x,e) {
-			if(x.status == 0) error("You are offline!!\n Please Check Your Network."); else if(x.status == 404) error("Requested URL not found."); else if(x.status == 500) error("Internel Server Error."); else if(e == "parsererror") error("Error.\nParsing JSON Request failed."); else if(e == "timeout") error("Request Time out."); else error("Unknow Error.\n" + x.responseText);
-		};
-		options.beforeSend = function(xhr) {
-			if(xhr.overrideMimeType) xhr.overrideMimeType("text/plain; charset=x-user-defined");
-		};
-		jQuery.ajax(options);
-	}
-}
-alphatab.platform.js.JsFileLoader.prototype.__class__ = alphatab.platform.js.JsFileLoader;
-alphatab.platform.js.JsFileLoader.__interfaces__ = [alphatab.platform.FileLoader];
 js.Lib = function() { }
 js.Lib.__name__ = ["js","Lib"];
 js.Lib.isIE = null;
@@ -9127,7 +9109,7 @@ alphatab.platform.svg.SvgCanvas.prototype.toSvg = function(includeWrapper,classN
 			svg.b[svg.b.length] = className == null?"null":className;
 			svg.b[svg.b.length] = "\"";
 		}
-		svg.b[svg.b.length] = ">";
+		svg.b[svg.b.length] = ">\n";
 	}
 	svg.add(this._buffer.b.join(""));
 	if(includeWrapper) svg.b[svg.b.length] = "</svg>";
@@ -9187,7 +9169,7 @@ alphatab.platform.svg.SvgCanvas.prototype.fillRect = function(x,y,w,h) {
 	this._buffer.add(h);
 	this._buffer.add("\" style=\"fill:");
 	this._buffer.add(this.getFillStyle());
-	this._buffer.add(";\" />");
+	this._buffer.add(";\" />\n");
 }
 alphatab.platform.svg.SvgCanvas.prototype.strokeRect = function(x,y,w,h) {
 	this._buffer.add("<rect x=\"");
@@ -9202,7 +9184,7 @@ alphatab.platform.svg.SvgCanvas.prototype.strokeRect = function(x,y,w,h) {
 	this._buffer.add(this.getStrokeStyle());
 	this._buffer.add("; stroke-width:");
 	this._buffer.add(this.getLineWidth());
-	this._buffer.add(";\" />");
+	this._buffer.add(";\" />\n");
 }
 alphatab.platform.svg.SvgCanvas.prototype.beginPath = function() {
 }
@@ -9286,7 +9268,7 @@ alphatab.platform.svg.SvgCanvas.prototype.fill = function() {
 		this._buffer.add(this._currentPath.b.join(""));
 		this._buffer.add("\" style=\"fill:");
 		this._buffer.add(this.getFillStyle());
-		this._buffer.add("\" />");
+		this._buffer.add("\" />\n");
 	}
 	this._currentPath = new StringBuf();
 }
@@ -9299,7 +9281,7 @@ alphatab.platform.svg.SvgCanvas.prototype.stroke = function() {
 		this._buffer.add(this.getStrokeStyle());
 		this._buffer.add("; stroke-width:");
 		this._buffer.add(this.getLineWidth());
-		this._buffer.add(";\" />");
+		this._buffer.add(";\" />\n");
 	}
 	this._currentPath = new StringBuf();
 }
@@ -9353,9 +9335,9 @@ alphatab.platform.svg.SvgCanvas.prototype.fillText = function(text,x,y,maxWidth)
 	this._buffer.add(this.getSvgBaseLine());
 	this._buffer.add("\" text-anchor=\"");
 	this._buffer.add(this.getSvgTextAlignment());
-	this._buffer.add("\">");
+	this._buffer.add("\">\n");
 	this._buffer.add(text);
-	this._buffer.add("</text>");
+	this._buffer.add("</text>\n");
 }
 alphatab.platform.svg.SvgCanvas.prototype.strokeText = function(text,x,y,maxWidth) {
 	if(maxWidth == null) maxWidth = 0;
@@ -9379,9 +9361,9 @@ alphatab.platform.svg.SvgCanvas.prototype.strokeText = function(text,x,y,maxWidt
 	this._buffer.add(this.getSvgBaseLine());
 	this._buffer.add("\" text-anchor=\"");
 	this._buffer.add(this.getSvgTextAlignment());
-	this._buffer.add("\">");
+	this._buffer.add("\">\n");
 	this._buffer.add(text);
-	this._buffer.add("</text>");
+	this._buffer.add("</text>\n");
 }
 alphatab.platform.svg.SvgCanvas.prototype.getSvgTextAlignment = function() {
 	switch(this.getTextAlign()) {
@@ -10255,6 +10237,7 @@ alphatab.tablature.Tablature = function(source,staves,msg) {
 	this.track = null;
 	this.settings = new Hash();
 	this.errorMessage = StringTools.trim(msg);
+	this.autoSizeWidth = true;
 	if(this.errorMessage == "" || this.errorMessage == null) this.errorMessage = "Please set a song's track to display the tablature";
 	if(staves == null) {
 		staves = new Array();
