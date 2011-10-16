@@ -601,20 +601,36 @@ class ScoreStave extends Stave
         {  
             case Duration.WHOLE:
                 SilencePainter.paintWhole(fill, x, y, layout);
+                y += Math.round(10 * layout.scale);
+                x += Math.round(1 * layout.scale);
             case Duration.HALF:
                 SilencePainter.paintHalf(fill, x, y, layout);
+                y += Math.round(10 * layout.scale);
+                x += Math.round(1 * layout.scale);
             case Duration.QUARTER:
                 SilencePainter.paintQuarter(fill, x, y, layout);
+                y += Math.round(10 * layout.scale);
+                x += Math.round(1 * layout.scale);
             case Duration.EIGHTH:
                 SilencePainter.paintEighth(fill, x, y, layout);
+                y += Math.round(10 * layout.scale);
+                x += Math.round(1 * layout.scale);
             case Duration.SIXTEENTH:
                 SilencePainter.paintSixteenth(fill, x, y, layout);
+                y += Math.round(10 * layout.scale);
+                x += Math.round(1 * layout.scale);
             case Duration.THIRTY_SECOND:
                 SilencePainter.paintThirtySecond(fill, x, y, layout);
+                y += Math.round(2 * layout.scale);
+                x += Math.round(3 * layout.scale);
             case Duration.SIXTY_FOURTH:
                 SilencePainter.paintSixtyFourth(fill, x, y, layout);
+                y += Math.round(2 * layout.scale);
+                x += Math.round(5 * layout.scale);
         }
+        
 
+        paintDottedNote(layout, context, voice, false, x, y);
     }
         
     private function paintBeam(layout:ViewLayout, context:DrawingContext, voice:VoiceDrawing, x:Int, y:Int)
@@ -951,7 +967,7 @@ class ScoreStave extends Stave
     
     private function paintEffects(layout:ViewLayout, context:DrawingContext, note:NoteDrawing, x:Int, y:Int, noteY:Int)
     {
-        paintDottedNote(layout, context, note, x, noteY);
+        paintDottedNote(layout, context, note.voiceDrawing(), note.displaced, x, noteY);
         paintStaccato(layout, context, note, x, y);
         paintGraceNote(layout, context, note, x, noteY);
         paintTremoloPicking(layout, context, note, x, noteY);
@@ -1085,24 +1101,24 @@ class ScoreStave extends Stave
         var fill:DrawingLayer = note.voice.index == 0 ? context.get(DrawingLayers.Voice1) : context.get(DrawingLayers.Voice2);
         fill.addCircle(x, y, dotSize);
     }
-    private function paintDottedNote(layout:ViewLayout, context:DrawingContext, note:NoteDrawing, x:Int, y:Int)
+    private function paintDottedNote(layout:ViewLayout, context:DrawingContext, voice:VoiceDrawing, displaced:Bool, x:Int, y:Int)
     {
-        if (!note.voice.duration.isDotted && !note.voice.duration.isDoubleDotted) return;
+        if (!voice.duration.isDotted && !voice.duration.isDoubleDotted) return;
         
         var displaceOffset:Int = Math.floor(DrawingResources.getScoreNoteSize(layout, false).x); 
-        if (note.voiceDrawing().anyDisplaced && !note.displaced)
+        if (voice.anyDisplaced && !displaced)
         {
             x += displaceOffset;
         }
         
-        var fill:DrawingLayer = note.voice.index == 0 ? context.get(DrawingLayers.Voice1) : context.get(DrawingLayers.Voice2);
+        var fill:DrawingLayer = voice.index == 0 ? context.get(DrawingLayers.Voice1) : context.get(DrawingLayers.Voice2);
         var dotSize:Float = 3.0 * layout.scale;
         
         x += Math.round(DrawingResources.getScoreNoteSize(layout, false).x + (4*layout.scale));
         y += Math.round(4 * layout.scale);
         fill.addCircle(Math.round(x - (dotSize / 2.0)), Math.round(y - (dotSize / 2.0)), dotSize);
 
-        if (note.voice.duration.isDoubleDotted)
+        if (voice.duration.isDoubleDotted)
         {
             fill.addCircle(Math.round((x + (dotSize + 2.0)) - (dotSize / 2.0)), Math.round(y - (dotSize / 2.0)), dotSize);
         }

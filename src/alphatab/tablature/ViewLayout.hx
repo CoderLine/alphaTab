@@ -118,19 +118,19 @@ class ViewLayout
         if (duration != null) {
             switch (duration.value) {
                 case Duration.WHOLE:
-                    return cast (90.0 * scale);
+                    return cast (91.0 * scale);
                 case Duration.HALF:
                     return cast (65.0 * scale);
                 case Duration.QUARTER:
                     return cast (45.0 * scale);
                 case Duration.EIGHTH:
-                    return cast (30.0 * scale);
+                    return cast (33.0 * scale);
                 case Duration.SIXTEENTH:
-                    return cast (20.0 * scale);
+                    return cast (23.0 * scale);
                 case Duration.THIRTY_SECOND:
-                    return cast (17.0 * scale);
-                default:
-                    return cast (15.0 * scale);
+                    return cast (23.0 * scale);
+                case Duration.SIXTY_FOURTH:
+                    return cast (23.0 * scale);
             }
         }
         return cast (20.0 * scale);
