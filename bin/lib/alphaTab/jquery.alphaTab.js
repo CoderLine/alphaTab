@@ -114,9 +114,7 @@ var alphaTabWrapper;
 
                 // create parser and reader
 				var parser = new alphatab.file.alphatex.AlphaTexParser();
-				var reader = new alphatab.platform.BinaryReader();
-
-				reader.initialize(tex);
+				var reader = new alphatab.io.BitStream(new alphatab.io.StringStream(tex));
 				parser.init(reader, self.factory);
 
                 // read song

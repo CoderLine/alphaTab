@@ -410,6 +410,7 @@ class TablatureStave extends Stave
         var realX:Int = x;
         var realY:Int = y + getNoteTablaturePosY(layout, note);
 
+        realX += Std.int(DrawingResources.getScoreNoteSize(layout, false).x / 2);
         // paint number for note
         var fill:DrawingLayer = note.voice.index == 0 ? context.get(DrawingLayers.Voice1) : context.get(DrawingLayers.Voice2);
         if (!note.isTiedNote)
@@ -417,7 +418,10 @@ class TablatureStave extends Stave
             var visualNote:String = note.effect.deadNote ? "X" : Std.string(note.value);
             visualNote = note.effect.ghostNote ? "(" + visualNote + ")" : visualNote;
 
-            fill.addString(visualNote, DrawingResources.noteFont, realX, realY);
+            context.graphics.font = DrawingResources.noteFont;
+            var w = context.graphics.measureText(visualNote);
+            
+            fill.addString(visualNote, DrawingResources.noteFont, realX - (w/2), realY);
         }
         
         // paint effects
