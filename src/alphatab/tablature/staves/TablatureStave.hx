@@ -329,8 +329,6 @@ class TablatureStave extends Stave
         }
     }
     
-    
-    
     private function calculateBeamY(layout:ViewLayout, beatGroup:BeatGroup, direction:Int, x:Float, key:Float, clef:Int)
     {
         // we use the min/max notes to place the beam along their real position        

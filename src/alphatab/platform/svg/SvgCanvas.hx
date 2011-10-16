@@ -269,7 +269,7 @@ class SvgCanvas implements Canvas
             _buffer.add(_currentPath.toString());
             _buffer.add('" style="fill:');
             _buffer.add(fillStyle);
-            _buffer.add('" />\n');
+            _buffer.add('" stroke="none"/>\n');
         }
         _currentPath = new StringBuf();
     }
@@ -283,7 +283,7 @@ class SvgCanvas implements Canvas
             _buffer.add(strokeStyle);
             _buffer.add('; stroke-width:');
             _buffer.add(lineWidth);
-            _buffer.add(';" />\n'); 
+            _buffer.add(';" fill="none" />\n'); 
         }
         _currentPath = new StringBuf();
     }
