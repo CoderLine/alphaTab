@@ -88,7 +88,7 @@ alphatab.tablature.ViewLayout.prototype.getNoteSize = function(note) {
 	return new alphatab.model.Point(size,alphatab.tablature.drawing.DrawingResources.noteFontHeight);
 }
 alphatab.tablature.ViewLayout.prototype.createStaveLine = function(track) {
-	var line = new alphatab.tablature.model.StaveLine();
+	var line = new alphatab.tablature.staves.StaveLine();
 	line.track = track;
 	line.tablature = this.tablature;
 	var staves = this.tablature.settings.get("staves");
@@ -96,7 +96,7 @@ alphatab.tablature.ViewLayout.prototype.createStaveLine = function(track) {
 	while(_g < staves.length) {
 		var stave = staves[_g];
 		++_g;
-		var staveImpl = alphatab.tablature.model.StaveFactory.getStave(stave,line,this);
+		var staveImpl = alphatab.tablature.staves.StaveFactory.getStave(stave,line,this);
 		if(staveImpl != null) line.addStave(staveImpl);
 	}
 	return line;
@@ -596,7 +596,7 @@ alphatab.tablature.model.VoiceDrawing.prototype.performLayout = function(layout)
 		var note = _g1[_g];
 		++_g;
 		var noteDrawing = note;
-		noteDrawing.displaced = alphatab.tablature.model.ScoreStave.isDisplaced(previousNote,noteDrawing);
+		noteDrawing.displaced = alphatab.tablature.staves.ScoreStave.isDisplaced(previousNote,noteDrawing);
 		if(noteDrawing.displaced) this.anyDisplaced = true;
 		noteDrawing.performLayout(layout);
 		previousNote = noteDrawing;
@@ -1747,88 +1747,6 @@ StringTools.isEOF = function(c) {
 	return c != c;
 }
 StringTools.prototype.__class__ = StringTools;
-alphatab.tablature.model.Stave = function(line,layout) {
-	if( line === $_ ) return;
-	this.index = 0;
-	this.line = line;
-	this.layout = layout;
-}
-alphatab.tablature.model.Stave.__name__ = ["alphatab","tablature","model","Stave"];
-alphatab.tablature.model.Stave.prototype.index = null;
-alphatab.tablature.model.Stave.prototype.line = null;
-alphatab.tablature.model.Stave.prototype.spacing = null;
-alphatab.tablature.model.Stave.prototype.layout = null;
-alphatab.tablature.model.Stave.prototype.getStaveId = function() {
-	return "";
-}
-alphatab.tablature.model.Stave.prototype.getBarTopSpacing = function() {
-	return 0;
-}
-alphatab.tablature.model.Stave.prototype.getBarBottomSpacing = function() {
-	return 0;
-}
-alphatab.tablature.model.Stave.prototype.getLineTopSpacing = function() {
-	return 0;
-}
-alphatab.tablature.model.Stave.prototype.getLineBottomSpacing = function() {
-	return 0;
-}
-alphatab.tablature.model.Stave.prototype.prepare = function(measure) {
-}
-alphatab.tablature.model.Stave.prototype.paintStave = function(layout,context,x,y) {
-}
-alphatab.tablature.model.Stave.prototype.paintMeasure = function(layout,context,measure,x,y) {
-}
-alphatab.tablature.model.Stave.prototype.paintDivisions = function(layout,context,measure,x,y,dotSize,offset,staveHeight) {
-	var x2;
-	var number = Std.string(measure.header.number);
-	var fill = context.get(3);
-	var draw = context.get(4);
-	var lineWidthBig = Math.max(1,Math.round(3.0 * layout.scale));
-	var startY = y;
-	var bottomY;
-	if(this.index == 0) context.get(13).addString(number,alphatab.tablature.drawing.DrawingResources.defaultFont,x + Math.round(layout.scale * 2),y + offset - alphatab.tablature.drawing.DrawingResources.defaultFontHeight);
-	y += offset;
-	bottomY = y + staveHeight;
-	dotSize = Math.max(1,dotSize * layout.scale);
-	if(measure.header.isRepeatOpen) {
-		fill.addRect(x,y,lineWidthBig,bottomY - y);
-		draw.startFigure();
-		x2 = Math.floor(x + lineWidthBig + 3 * layout.scale);
-		draw.addLine(x2,y,x2,bottomY);
-		x2 += Math.floor(2 * layout.scale);
-		var centerY = y + (bottomY - y) / 2;
-		var yMove = 6 * layout.scale;
-		fill.addCircle(x2,centerY - yMove - dotSize,dotSize);
-		fill.addCircle(x2,centerY + yMove,dotSize);
-	} else {
-		draw.startFigure();
-		draw.addLine(x,y,x,bottomY);
-	}
-	x += measure.width + measure.spacing;
-	if(measure.header.repeatClose > 0 || measure.header.number == measure.track.measureCount()) {
-		x2 = Math.floor(x - (lineWidthBig + 3 * layout.scale));
-		draw.startFigure();
-		draw.addLine(x2,y,x2,bottomY);
-		fill.addRect(x - lineWidthBig,y,lineWidthBig,bottomY - y);
-		if(measure.header.repeatClose > 0) {
-			x2 -= Math.floor(2 * layout.scale) + dotSize;
-			var centerY = y + (bottomY - y) / 2;
-			var yMove = 6 * layout.scale;
-			fill.addCircle(x2,centerY - yMove - dotSize,dotSize);
-			fill.addCircle(x2,centerY + yMove,dotSize);
-			if(this.index == 0) {
-				var repetitions = "x" + (measure.header.repeatClose + 1);
-				var numberSize = context.graphics.measureText(repetitions);
-				fill.addString(repetitions,alphatab.tablature.drawing.DrawingResources.defaultFont,x2 - dotSize,y - alphatab.tablature.drawing.DrawingResources.defaultFontHeight);
-			}
-		}
-	} else {
-		draw.startFigure();
-		draw.addLine(x,y,x,bottomY);
-	}
-}
-alphatab.tablature.model.Stave.prototype.__class__ = alphatab.tablature.model.Stave;
 alphatab.midi.MidiRepeatController = function(song) {
 	if( song === $_ ) return;
 	this._song = song;
@@ -1899,565 +1817,6 @@ alphatab.midi.MidiRepeatController.prototype.process = function() {
 	this.index++;
 }
 alphatab.midi.MidiRepeatController.prototype.__class__ = alphatab.midi.MidiRepeatController;
-alphatab.tablature.model.TablatureStave = function(line,layout) {
-	if( line === $_ ) return;
-	alphatab.tablature.model.Stave.call(this,line,layout);
-	this.spacing = new alphatab.tablature.model.StaveSpacing(18);
-	this.spacing.set(0,Math.floor(15 * layout.scale));
-	this.spacing.set(11,Math.floor(10 * layout.scale));
-	this.spacing.set(12,(line.track.stringCount() - 1) * layout.stringSpacing);
-	this.spacing.set(13,Math.floor(10 * layout.scale));
-	this.spacing.set(17,Math.floor(15 * layout.scale));
-	this._rangeIndices = [0,0];
-}
-alphatab.tablature.model.TablatureStave.__name__ = ["alphatab","tablature","model","TablatureStave"];
-alphatab.tablature.model.TablatureStave.__super__ = alphatab.tablature.model.Stave;
-for(var k in alphatab.tablature.model.Stave.prototype ) alphatab.tablature.model.TablatureStave.prototype[k] = alphatab.tablature.model.Stave.prototype[k];
-alphatab.tablature.model.TablatureStave.paintTie = function(layout,layer,x1,y1,x2,y2,down) {
-	if(down == null) down = false;
-	var offset = 15 * layout.scale;
-	var size = 4 * layout.scale;
-	var normalVector = { x : y2 - y1, y : x2 - x1};
-	var length = Math.sqrt(normalVector.x * normalVector.x + normalVector.y * normalVector.y);
-	if(down) normalVector.x *= -1; else normalVector.y *= -1;
-	normalVector.x /= length;
-	normalVector.y /= length;
-	var center = { x : (x2 + x1) / 2, y : (y2 + y1) / 2};
-	var cp1 = { x : center.x + offset * normalVector.x, y : center.y + offset * normalVector.y};
-	var cp2 = { x : center.x + (offset - size) * normalVector.x, y : center.y + (offset - size) * normalVector.y};
-	layer.startFigure();
-	layer.moveTo(x1,y1);
-	layer.quadraticCurveTo(cp1.x,cp1.y,x2,y2);
-	layer.quadraticCurveTo(cp2.x,cp2.y,x1,y1);
-	layer.closeFigure();
-}
-alphatab.tablature.model.TablatureStave.prototype._rangeIndices = null;
-alphatab.tablature.model.TablatureStave.prototype.getStaveId = function() {
-	return "tablature";
-}
-alphatab.tablature.model.TablatureStave.prototype.getBarTopSpacing = function() {
-	return 11;
-}
-alphatab.tablature.model.TablatureStave.prototype.getBarBottomSpacing = function() {
-	return 14;
-}
-alphatab.tablature.model.TablatureStave.prototype.getLineTopSpacing = function() {
-	return 12;
-}
-alphatab.tablature.model.TablatureStave.prototype.getLineBottomSpacing = function() {
-	return 13;
-}
-alphatab.tablature.model.TablatureStave.prototype.prepare = function(measure) {
-	if(measure.effectsCache.accentuatedNote) this.spacing.set(1,this.layout.effectSpacing);
-	if(measure.effectsCache.letRing) this.spacing.set(3,this.layout.effectSpacing);
-	if(measure.effectsCache.tapSlapPop) this.spacing.set(2,this.layout.effectSpacing);
-	if(measure.effectsCache.palmMute) this.spacing.set(4,this.layout.effectSpacing);
-	if(measure.effectsCache.harmonic) this.spacing.set(8,this.layout.effectSpacing);
-	if(measure.effectsCache.beatVibrato) this.spacing.set(5,this.layout.effectSpacing);
-	if(measure.effectsCache.vibrato) this.spacing.set(6,this.layout.effectSpacing);
-	if(measure.effectsCache.fadeIn) this.spacing.set(7,this.layout.effectSpacing);
-	if(this.line.tablature.getStaveSetting("tablature","rhythm",false) == true) this.spacing.set(15,20 * this.layout.scale);
-	if(measure.effectsCache.bend) {
-		if(this.spacing.spacing[9] < measure.effectsCache.bendOverflow) this.spacing.set(9,measure.effectsCache.bendOverflow);
-	}
-	if(measure.effectsCache.fingering > 0) {
-		var fingeringSpacing = measure.effectsCache.fingering * this.layout.effectSpacing;
-		if(this.spacing.spacing[16] < fingeringSpacing) this.spacing.set(16,fingeringSpacing);
-	}
-	if(measure.effectsCache.tremoloBar) {
-		if(this.spacing.spacing[10] < measure.effectsCache.tremoloBarTopOverflow) this.spacing.set(10,measure.effectsCache.tremoloBarTopOverflow);
-		if(this.spacing.spacing[14] < measure.effectsCache.tremoloBarBottomOverflow) this.spacing.set(14,measure.effectsCache.tremoloBarBottomOverflow);
-	}
-}
-alphatab.tablature.model.TablatureStave.prototype.paintStave = function(layout,context,x,y) {
-	var lineY = y + this.spacing.get(12);
-	var _g1 = 0, _g = this.line.track.stringCount();
-	while(_g1 < _g) {
-		var i = _g1++;
-		context.get(2).startFigure();
-		context.get(2).addLine(x,lineY,x + this.line.width,lineY);
-		lineY += layout.stringSpacing;
-	}
-}
-alphatab.tablature.model.TablatureStave.prototype.paintMeasure = function(layout,context,measure,x,y) {
-	var realX = x + measure.x;
-	var w = measure.width + measure.spacing;
-	this.paintDivisions(layout,context,measure,realX,y,5,this.spacing.get(12),this.spacing.spacing[12]);
-	this.paintClef(layout,context,measure,realX,y);
-	realX += measure.getDefaultSpacings(layout);
-	this.paintBeats(layout,context,measure,realX,y);
-}
-alphatab.tablature.model.TablatureStave.prototype.paintClef = function(layout,context,measure,x,y) {
-	if(!measure.isFirstOfLine()) return;
-}
-alphatab.tablature.model.TablatureStave.prototype.paintBeats = function(layout,context,measure,x,y) {
-	var _g = 0, _g1 = measure.beats;
-	while(_g < _g1.length) {
-		var beat = _g1[_g];
-		++_g;
-		var bd = beat;
-		this.paintBeat(layout,context,bd,x + bd.x,y);
-	}
-}
-alphatab.tablature.model.TablatureStave.prototype.paintBeat = function(layout,context,beat,x,y) {
-	var _g = 0, _g1 = beat.voices;
-	while(_g < _g1.length) {
-		var voice = _g1[_g];
-		++_g;
-		this.paintVoice(layout,context,voice,x,y);
-	}
-	this.paintBeatEffects(layout,context,beat,x,y);
-}
-alphatab.tablature.model.TablatureStave.prototype.paintVoice = function(layout,context,voice,x,y) {
-	if(!voice.isEmpty) {
-		var _g = 0, _g1 = voice.notes;
-		while(_g < _g1.length) {
-			var note = _g1[_g];
-			++_g;
-			this.paintNote(layout,context,note,x,y);
-		}
-		this.paintBeam(layout,context,voice,x,y);
-		this.paintVoiceEffects(layout,context,voice,x,y);
-	}
-}
-alphatab.tablature.model.TablatureStave.prototype.paintBeam = function(layout,context,voice,x,y) {
-	if(voice.isRestVoice() || this.line.tablature.getStaveSetting("tablature","rhythm",false) == false) return;
-	var fill = voice.index == 0?context.get(9):context.get(5);
-	var draw = voice.index == 0?context.get(12):context.get(8);
-	if(voice.duration.value >= 2) {
-		var key = voice.beat.measure.header.keySignature;
-		var clef = voice.beat.measure.clef;
-		var xMove = voice.maxStringNote.noteSize.x / 2;
-		var y1 = Math.floor(y + this.getNoteTablaturePosY(layout,voice.maxStringNote) + layout.stringSpacing / 1.5);
-		var y2 = y + this.spacing.get(16);
-		draw.addLine(x + xMove,y1,x + xMove,y2);
-		if(voice.duration.value >= 4) {
-			var index = voice.duration.index() - 2;
-			if(index > 0) {
-				var startX;
-				var endX;
-				if(voice.joinedType == alphatab.tablature.model.JoinedType.NoneRight) {
-					startX = Math.round(x + xMove);
-					endX = Math.round(x + 6 * layout.scale + xMove);
-				} else if(voice.joinedType == alphatab.tablature.model.JoinedType.NoneLeft) {
-					startX = Math.round(x - 6 * layout.scale + xMove);
-					endX = Math.round(x + xMove);
-				} else {
-					startX = Math.round(voice.leftJoin.beat.fullX() + xMove);
-					endX = Math.round(voice.rightJoin.beat.fullX() + voice.rightJoin.maxStringNote.noteSize.x / 2);
-				}
-				alphatab.tablature.drawing.NotePainter.paintBar(fill,startX,y2,endX,y2,index,1,layout.scale);
-			}
-		}
-	}
-}
-alphatab.tablature.model.TablatureStave.prototype.calculateBeamY = function(layout,beatGroup,direction,x,key,clef) {
-	var maxDistance = Math.round(10 * layout.scale);
-	var upOffset = 0;
-	var downOffset = 0;
-	var y;
-	var x1;
-	var x2;
-	var y1;
-	var y2;
-	if(direction == 2) {
-		if(beatGroup.minNote != beatGroup.firstMinNote && beatGroup.minNote != beatGroup.lastMinNote) return this.getNoteTablaturePosY(layout,beatGroup.minNote) + downOffset;
-		y = 0;
-		x1 = beatGroup.firstMinNote.voice.beat.fullX();
-		x2 = beatGroup.lastMinNote.voice.beat.fullX();
-		y1 = Math.round(this.getNoteTablaturePosY(layout,beatGroup.firstMinNote) + downOffset);
-		y2 = Math.round(this.getNoteTablaturePosY(layout,beatGroup.lastMinNote) + downOffset);
-		if(y1 > y2 && y1 - y2 > maxDistance) y2 = y1 - maxDistance;
-		if(y2 > y1 && y2 - y1 > maxDistance) y1 = y2 - maxDistance;
-		if(y1 - y2 != 0 && x1 - x2 != 0 && x1 - x != 0) y = Math.round((y1 - y2) / (x1 - x2) * (x1 - x));
-		return y1 - y;
-	} else {
-		if(beatGroup.maxNote != beatGroup.firstMaxNote && beatGroup.maxNote != beatGroup.lastMaxNote) return this.getNoteTablaturePosY(layout,beatGroup.maxNote) - upOffset;
-		y = 0;
-		x1 = beatGroup.firstMaxNote.voice.beat.fullX();
-		x2 = beatGroup.lastMaxNote.voice.beat.fullX();
-		y1 = Math.round(this.getNoteTablaturePosY(layout,beatGroup.firstMaxNote) - upOffset);
-		y2 = Math.round(this.getNoteTablaturePosY(layout,beatGroup.lastMaxNote) - upOffset);
-		if(y1 < y2 && y2 - y1 > maxDistance) y2 = y1 + maxDistance;
-		if(y2 < y1 && y1 - y2 > maxDistance) y1 = y2 + maxDistance;
-		if(y1 - y2 != 0 && x1 - x2 != 0 && x1 - x != 0) y = Math.round((y1 - y2) / (x1 - x2) * (x1 - x));
-		return y1 - y;
-	}
-}
-alphatab.tablature.model.TablatureStave.prototype.paintNote = function(layout,context,note,x,y) {
-	var tabX = note.noteSize.x / 2;
-	var realX = x;
-	var realY = y + this.getNoteTablaturePosY(layout,note);
-	var fill = note.voice.index == 0?context.get(9):context.get(5);
-	if(!note.isTiedNote) {
-		var visualNote = note.effect.deadNote?"X":Std.string(note.value);
-		visualNote = note.effect.ghostNote?"(" + visualNote + ")":visualNote;
-		fill.addString(visualNote,alphatab.tablature.drawing.DrawingResources.noteFont,realX,realY);
-	}
-	this.paintEffects(layout,context,note,x,y,realY);
-}
-alphatab.tablature.model.TablatureStave.prototype.getNoteTablaturePosY = function(layout,note) {
-	return this.spacing.get(12) + Math.round((note.string - 1) * layout.stringSpacing);
-}
-alphatab.tablature.model.TablatureStave.prototype.paintVoiceEffects = function(layout,context,voice,x,y) {
-	if(voice.isEmpty || voice.isRestVoice()) return;
-	this.paintAccentuatedNote(layout,context,voice,x,y);
-	this.paintLetRing(layout,context,voice,x,y);
-	this.paintPalmMute(layout,context,voice,x,y);
-	this.paintNoteVibrato(layout,context,voice,x,y);
-	this.paintHarmonics(layout,context,voice,x,y);
-	this.paintFingering(layout,context,voice,x,y);
-	this.paintTrillBeat(layout,context,voice,x,y);
-}
-alphatab.tablature.model.TablatureStave.prototype.paintEffects = function(layout,context,note,x,y,noteY) {
-	this.paintGrace(layout,context,note,x,noteY);
-	this.paintHammerOn(layout,context,note,x,noteY);
-	this.paintBend(layout,context,note,x,noteY);
-	this.paintSlides(layout,context,note,x,noteY);
-	this.paintTrillNote(layout,context,note,x,noteY);
-}
-alphatab.tablature.model.TablatureStave.prototype.paintGrace = function(layout,context,note,x,y) {
-	if(!note.effect.isGrace()) return;
-	var fill = note.voice.index == 0?context.get(10):context.get(6);
-	var value = note.effect.grace.isDead?"X":Std.string(note.effect.grace.fret);
-	fill.addString(value,alphatab.tablature.drawing.DrawingResources.graceFont,x - Math.round(7 * layout.scale),y);
-}
-alphatab.tablature.model.TablatureStave.prototype.paintAccentuatedNote = function(layout,context,voice,x,y) {
-	if(!voice.effectsCache.accentuatedNote && !voice.effectsCache.heavyAccentuatedNote) return;
-	var realX = x + voice.minNote.noteSize.x / 2;
-	var realY = y + this.spacing.get(1);
-	var layer = voice.index == 0?context.get(9):context.get(5);
-	var symbol = voice.effectsCache.accentuatedNote?alphatab.tablature.drawing.MusicFont.AccentuatedNote:alphatab.tablature.drawing.MusicFont.HeavyAccentuatedNote;
-	layer.addMusicSymbol(symbol,realX,realY,layout.scale);
-}
-alphatab.tablature.model.TablatureStave.prototype.paintLetRing = function(layout,context,voice,x,y) {
-	if(!voice.effectsCache.letRing) return;
-	var realY = y + this.spacing.get(3);
-	var nextVoice = voice.getNextVoice();
-	var previousVoice = voice.getPreviousVoice();
-	var nextVoiceRing = nextVoice != null && nextVoice.effectsCache.letRing;
-	var previousVoiceRing = previousVoice != null && previousVoice.effectsCache.letRing;
-	this.paintRange(layout,context,voice,x,realY,"ring",nextVoice,nextVoiceRing,previousVoice,previousVoiceRing,0);
-}
-alphatab.tablature.model.TablatureStave.prototype.paintPalmMute = function(layout,context,voice,x,y) {
-	if(!voice.effectsCache.palmMute) return;
-	var realY = y + this.spacing.get(4);
-	var nextVoice = voice.getNextVoice();
-	var previousVoice = voice.getPreviousVoice();
-	var nextVoicePm = nextVoice != null && nextVoice.effectsCache.palmMute;
-	var previousVoicePm = previousVoice != null && previousVoice.effectsCache.palmMute;
-	this.paintRange(layout,context,voice,x,realY,"P.M.",nextVoice,nextVoicePm,previousVoice,previousVoicePm,1);
-}
-alphatab.tablature.model.TablatureStave.prototype.paintRange = function(layout,context,voice,startX,y,label,nextVoice,nextVoiceEffect,previousVoice,previousVoiceEffect,startOffsetIndex) {
-	var endX = startX + voice.beat.fullWidth();
-	var prevOnSameStaveLine = previousVoice != null && previousVoice.beat.measure.staveLine == voice.beat.measure.staveLine;
-	var nextOnSameStaveLine = nextVoice != null && nextVoice.beat.measure.staveLine == voice.beat.measure.staveLine;
-	var fill = voice.index == 0?context.get(9):context.get(5);
-	var draw = voice.index == 0?context.get(12):context.get(8);
-	draw.startFigure();
-	y += alphatab.tablature.drawing.DrawingResources.effectFontHeight;
-	var isEnd = !nextVoiceEffect || !nextOnSameStaveLine;
-	if(isEnd) {
-		var offset = 8 * layout.scale;
-		endX -= offset;
-	}
-	if(!prevOnSameStaveLine || !previousVoiceEffect) {
-		fill.addString(label,alphatab.tablature.drawing.DrawingResources.effectFont,startX,y);
-		context.graphics.setFont(alphatab.tablature.drawing.DrawingResources.effectFont);
-		var offset = context.graphics.measureText(label) + 4 * layout.scale;
-		startX += offset;
-		this._rangeIndices[startOffsetIndex] = startX;
-	} else if(prevOnSameStaveLine && voice.beat == voice.beat.measure.beats[0]) startX -= previousVoice.beat.measure.getDefaultSpacings(layout);
-	if(isEnd) {
-		draw.startFigure();
-		draw.addDashedLine(this._rangeIndices[startOffsetIndex],y,endX,y);
-		var size = 8 * layout.scale;
-		draw.startFigure();
-		draw.addLine(endX,y - size / 2,endX,y + size / 2);
-	}
-}
-alphatab.tablature.model.TablatureStave.prototype.paintNoteVibrato = function(layout,context,voice,x,y) {
-	if(!voice.effectsCache.vibrato) return;
-	var fill = voice.index == 0?context.get(10):context.get(6);
-	var width = voice.beat.fullWidth();
-	this.paintVibrato(layout,fill,x,y + this.spacing.get(6),width,0.75);
-}
-alphatab.tablature.model.TablatureStave.prototype.paintVibrato = function(layout,layer,x,y,w,symbolScale) {
-	if(symbolScale == null) symbolScale = 1;
-	var step = 18 * layout.scale * symbolScale;
-	var loops = Math.floor(Math.max(1,w / step));
-	var _g = 0;
-	while(_g < loops) {
-		var i = _g++;
-		layer.addMusicSymbol(alphatab.tablature.drawing.MusicFont.VibratoLeftRight,x,y,layout.scale * symbolScale);
-		x += Math.floor(step);
-	}
-}
-alphatab.tablature.model.TablatureStave.prototype.paintTrillNote = function(layout,context,note,x,y) {
-	if(!note.effect.isTrill()) return;
-	var fill = note.voice.index == 0?context.get(10):context.get(6);
-	var str = "(" + note.effect.trill.fret + ")";
-	fill.addString(str,alphatab.tablature.drawing.DrawingResources.graceFont,x + 2 * note.noteSize.x,y);
-}
-alphatab.tablature.model.TablatureStave.prototype.paintTrillBeat = function(layout,context,voice,x,y) {
-	if(!voice.effectsCache.trill) return;
-	var fill = voice.index == 0?context.get(10):context.get(6);
-	fill.addString("Tr",alphatab.tablature.drawing.DrawingResources.effectFont,x,y + this.spacing.get(6));
-}
-alphatab.tablature.model.TablatureStave.prototype.paintHarmonics = function(layout,context,voice,x,y) {
-	if(!voice.effectsCache.harmonic) return;
-	var key = "";
-	switch(voice.effectsCache.harmonicType) {
-	case 0:
-		key = "Harm";
-		break;
-	case 1:
-		key = "A.H";
-		break;
-	case 2:
-		key = "T.H";
-		break;
-	case 3:
-		key = "P.H";
-		break;
-	case 4:
-		key = "S.H";
-		break;
-	}
-	var fill = voice.index == 0?context.get(10):context.get(6);
-	fill.addString(key,alphatab.tablature.drawing.DrawingResources.effectFont,x,y + this.spacing.get(8));
-}
-alphatab.tablature.model.TablatureStave.prototype.paintFingering = function(layout,context,voice,x,y) {
-	if(voice.effectsCache.fingering == 0) return;
-	y += Math.round(alphatab.tablature.drawing.DrawingResources.effectFontHeight / 2);
-	var fill = voice.index == 0?context.get(10):context.get(6);
-	var y2 = y + this.spacing.get(16);
-	var _g = 0, _g1 = voice.effectsCache.leftHandFingering;
-	while(_g < _g1.length) {
-		var fingering = _g1[_g];
-		++_g;
-		if(fingering != -2 && fingering != -1) {
-			var str = "";
-			switch(fingering) {
-			case 0:
-				str = "T";
-				break;
-			case 1:
-				str = "1";
-				break;
-			case 2:
-				str = "2";
-				break;
-			case 3:
-				str = "3";
-				break;
-			case 4:
-				str = "4";
-				break;
-			}
-			fill.addString(str,alphatab.tablature.drawing.DrawingResources.effectFont,x,y2);
-		}
-		y2 += Math.floor(layout.effectSpacing);
-	}
-	var _g = 0, _g1 = voice.effectsCache.rightHandFingering;
-	while(_g < _g1.length) {
-		var fingering = _g1[_g];
-		++_g;
-		if(fingering != -2 && fingering != -1) {
-			var str = "";
-			switch(fingering) {
-			case 0:
-				str = "p";
-				break;
-			case 1:
-				str = "i";
-				break;
-			case 2:
-				str = "m";
-				break;
-			case 3:
-				str = "a";
-				break;
-			case 4:
-				str = "c";
-				break;
-			}
-			fill.addString(str,alphatab.tablature.drawing.DrawingResources.effectFont,x,y2);
-		}
-		y2 += Math.floor(layout.effectSpacing);
-	}
-}
-alphatab.tablature.model.TablatureStave.prototype.paintHammerOn = function(layout,context,note,x,y) {
-	if(!note.effect.hammer) return;
-	var nextBeat = note.voice.beat.getNextBeat();
-	var nextNote = nextBeat == null?null:nextBeat.getNote(note.voice.index,note.string);
-	var down = note.string > 3 || nextNote == null;
-	var fill = note.voice.index == 0?context.get(10):context.get(6);
-	var realX = x + note.noteSize.x / 2;
-	var realY = down?y + alphatab.tablature.drawing.DrawingResources.noteFontHeight / 2:y - alphatab.tablature.drawing.DrawingResources.noteFontHeight / 2;
-	var endX = nextNote != null?x + note.voice.beat.fullWidth() + nextNote.noteSize.x / 2:realX + 15 * layout.scale;
-	alphatab.tablature.model.TablatureStave.paintTie(layout,fill,realX,realY,endX,realY,down);
-}
-alphatab.tablature.model.TablatureStave.prototype.paintBend = function(layout,context,note,x,y) {
-	if(!note.effect.isBend()) return;
-	var scale = layout.scale;
-	x += Math.floor(note.noteSize.x);
-	var endX = x + note.voice.beat.fullWidth();
-	var minY = y - 60 * scale;
-	var fill = note.voice.index == 0?context.get(10):context.get(6);
-	var draw = note.voice.index == 0?context.get(11):context.get(7);
-	if(note.effect.bend.points.length >= 2) {
-		var dX = (endX - x) / 12;
-		var dY = (y - minY) / 12;
-		draw.startFigure();
-		var _g1 = 0, _g = note.effect.bend.points.length - 1;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var firstPt = note.effect.bend.points[i];
-			var secondPt = note.effect.bend.points[i + 1];
-			if(firstPt.value == secondPt.value && i == note.effect.bend.points.length - 2) continue;
-			var firstLoc = new alphatab.model.Point(x + dX * firstPt.position,y - dY * firstPt.value);
-			var secondLoc = new alphatab.model.Point(x + dX * secondPt.position,y - dY * secondPt.value);
-			var firstHelper = new alphatab.model.Point(firstLoc.x + (secondLoc.x - firstLoc.x),y - dY * firstPt.value);
-			draw.addBezier(firstLoc.x,firstLoc.y,firstHelper.x,firstHelper.y,secondLoc.x,secondLoc.y,secondLoc.x,secondLoc.y);
-			var arrowSize = 3 * scale;
-			if(secondPt.value > firstPt.value) {
-				draw.addLine(secondLoc.x - 0.5,secondLoc.y,secondLoc.x - arrowSize - 0.5,secondLoc.y + arrowSize);
-				draw.addLine(secondLoc.x - 0.5,secondLoc.y,secondLoc.x + arrowSize - 0.5,secondLoc.y + arrowSize);
-			} else if(secondPt.value != firstPt.value) {
-				draw.addLine(secondLoc.x - 0.5,secondLoc.y,secondLoc.x - arrowSize - 0.5,secondLoc.y - arrowSize);
-				draw.addLine(secondLoc.x - 0.5,secondLoc.y,secondLoc.x + arrowSize - 0.5,secondLoc.y - arrowSize);
-			}
-			if(secondPt.value != 0) {
-				var dV = (secondPt.value - firstPt.value) * 0.25;
-				var up = dV > 0;
-				dV = Math.abs(dV);
-				var s = "";
-				if(dV == 1) s = "full"; else if(dV > 1) {
-					s += Std.string(Math.floor(dV)) + " ";
-					dV -= Math.floor(dV);
-				}
-				if(dV == 0.25) s += "1/4"; else if(dV == 0.5) s += "1/2"; else if(dV == 0.75) s += "3/4";
-				context.graphics.setFont(alphatab.tablature.drawing.DrawingResources.defaultFont);
-				var size = context.graphics.measureText(s);
-				var y1 = up?secondLoc.y - alphatab.tablature.drawing.DrawingResources.defaultFontHeight + 2 * scale:secondLoc.y + alphatab.tablature.drawing.DrawingResources.defaultFontHeight / 2 + 2 * scale;
-				var x1 = secondLoc.x - size / 2;
-				fill.addString(s,alphatab.tablature.drawing.DrawingResources.defaultFont,x1,y1);
-			}
-		}
-	}
-}
-alphatab.tablature.model.TablatureStave.prototype.paintSlides = function(layout,context,note,x,y) {
-	if(!note.effect.slide) return;
-	var xOffset = note.noteSize.x * 2;
-	var xMove = 15.0 * layout.scale;
-	var yMove = 3.0 * layout.scale;
-	var draw = note.voice.index == 0?context.get(11):context.get(7);
-	draw.startFigure();
-	if(note.effect.slideType == 4) draw.addLine(x - xMove,y + yMove,x,y - yMove); else if(note.effect.slideType == 5) draw.addLine(x - xMove,y - yMove,x,y + yMove); else if(note.effect.slideType == 2) draw.addLine(x + xOffset,y - yMove,x + xOffset + xMove,y + yMove); else if(note.effect.slideType == 3) draw.addLine(x + xOffset,y + yMove,x + xOffset + xMove,y - yMove); else {
-		var nextBeat = note.voice.beat.getNextBeat();
-		var nextNote = nextBeat == null?null:nextBeat.getNote(note.voice.index,note.string);
-		if(nextNote != null) {
-			if(nextNote.value < note.value) draw.addLine(x + xOffset,y - yMove,x + note.voice.beat.fullWidth(),y + yMove); else if(nextNote.value > note.value) draw.addLine(x + xOffset,y + yMove,x + note.voice.beat.fullWidth(),y - yMove); else draw.addLine(x + xOffset,y,x + note.voice.beat.fullWidth(),y);
-			if(note.effect.slideType == 1) {
-				this.paintHammerOn(layout,context,note,x,y);
-				var down = note.string > 3;
-				var realX = x + note.noteSize.x / 2;
-				var realY = down?y + alphatab.tablature.drawing.DrawingResources.noteFontHeight / 2:y - alphatab.tablature.drawing.DrawingResources.noteFontHeight / 2;
-				var endX = nextNote != null?x + note.voice.beat.fullWidth() + nextNote.noteSize.x / 2:realX + 15 * layout.scale;
-				var fill = note.voice.index == 0?context.get(10):context.get(6);
-				alphatab.tablature.model.TablatureStave.paintTie(layout,fill,realX,realY,endX,realY,down);
-			}
-		} else draw.addLine(x + xOffset,y,x + note.voice.beat.fullWidth(),y);
-	}
-}
-alphatab.tablature.model.TablatureStave.prototype.paintBeatEffects = function(layout,context,beat,x,y) {
-	this.paintTremoloBar(layout,context,beat.getMinNote(),x,y);
-	this.paintBeatVibrato(layout,context,beat,x,y);
-	this.paintTabSlapPop(layout,context,beat,x,y);
-	this.paintFadeIn(layout,context,beat,x,y);
-	this.paintStroke(layout,context,beat,x,y);
-}
-alphatab.tablature.model.TablatureStave.prototype.paintTremoloBar = function(layout,context,note,x,y) {
-	if(note == null) return;
-	var beat = note.voice.beat;
-	if(!beat.effect.isTremoloBar()) return;
-	var scale = layout.scale;
-	y = y + this.spacing.get(12) + Math.round((note.string - 1) * layout.stringSpacing);
-	x += Math.floor(note.noteSize.x);
-	var endX = x + beat.fullWidth();
-	var minY = y - 60 * scale;
-	var fill = note.voice.index == 0?context.get(10):context.get(6);
-	var draw = note.voice.index == 0?context.get(11):context.get(7);
-	if(beat.effect.tremoloBar.points.length >= 2) {
-		var dX = (endX - x) / 12;
-		var dY = (y - minY) / 12;
-		draw.startFigure();
-		var _g1 = 0, _g = beat.effect.tremoloBar.points.length - 1;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var firstPt = beat.effect.tremoloBar.points[i];
-			var secondPt = beat.effect.tremoloBar.points[i + 1];
-			if(firstPt.value == secondPt.value && i == beat.effect.tremoloBar.points.length - 2) continue;
-			var firstLoc = new alphatab.model.Point(x + dX * firstPt.position,y - dY * firstPt.value);
-			var secondLoc = new alphatab.model.Point(x + dX * secondPt.position,y - dY * secondPt.value);
-			draw.addLine(firstLoc.x,firstLoc.y,secondLoc.x,secondLoc.y);
-			if(secondPt.value != 0) {
-				var dV = secondPt.value * 0.5;
-				var up = secondPt.value - firstPt.value >= 0;
-				var s = "";
-				if(dV < 0) s += "-";
-				if(dV >= 1 || dV <= -1) s += Std.string(Math.floor(Math.abs(dV))) + " "; else if(dV < 0) s += "-";
-				dV -= Math.floor(dV);
-				if(dV == 0.25) s += "1/4"; else if(dV == 0.5) s += "1/2"; else if(dV == 0.75) s += "3/4";
-				context.graphics.setFont(alphatab.tablature.drawing.DrawingResources.defaultFont);
-				var size = context.graphics.measureText(s);
-				var sY = up?secondLoc.y - alphatab.tablature.drawing.DrawingResources.defaultFontHeight - 3 * scale:secondLoc.y + 3 * scale;
-				var sX = secondLoc.x - size / 2;
-				fill.addString(s,alphatab.tablature.drawing.DrawingResources.defaultFont,sX,sY);
-			}
-		}
-	}
-}
-alphatab.tablature.model.TablatureStave.prototype.paintBeatVibrato = function(layout,context,beat,x,y) {
-	if(!beat.effect.vibrato) return;
-	var width = beat.fullWidth();
-	this.paintVibrato(layout,context.get(10),x,y + this.spacing.get(5),width,1);
-}
-alphatab.tablature.model.TablatureStave.prototype.paintTabSlapPop = function(layout,context,beat,x,y) {
-	var fill = context.get(10);
-	var realY = y + this.spacing.get(2);
-	if(beat.effect.tapping) fill.addString("T",alphatab.tablature.drawing.DrawingResources.defaultFont,x,realY); else if(beat.effect.slapping) fill.addString("S",alphatab.tablature.drawing.DrawingResources.defaultFont,x,realY); else if(beat.effect.popping) fill.addString("P",alphatab.tablature.drawing.DrawingResources.defaultFont,x,realY);
-}
-alphatab.tablature.model.TablatureStave.prototype.paintFadeIn = function(layout,context,beat,x,y) {
-	if(!beat.effect.fadeIn) return;
-	y += this.spacing.get(7);
-	var size = Math.round(4.0 * layout.scale);
-	var width = beat.fullWidth();
-	var layer = context.get(12);
-	layer.startFigure();
-	layer.addBezier(x,y,x,y,x + width,y,x + width,y - size);
-	layer.startFigure();
-	layer.addBezier(x,y,x,y,x + width,y,x + width,y + size);
-}
-alphatab.tablature.model.TablatureStave.prototype.paintStroke = function(layout,context,beat,x,y) {
-	if(beat.effect.stroke.direction == 0) return;
-	x -= Math.floor(2 * layout.scale);
-	var topY = y + this.spacing.get(12);
-	var bottomY = topY + Math.round((beat.measure.track.stringCount() - 1) * layout.stringSpacing);
-	var layer = context.get(4);
-	layer.startFigure();
-	layer.startFigure();
-	layer.addLine(x,topY,x,bottomY);
-	if(beat.effect.stroke.direction == 1) {
-		layer.addLine(x,topY,x + 3,topY + 5);
-		layer.addLine(x,topY,x - 3,topY + 5);
-	} else {
-		layer.addLine(x,bottomY,x + 3,bottomY - 5);
-		layer.addLine(x,bottomY,x - 3,bottomY - 5);
-	}
-}
-alphatab.tablature.model.TablatureStave.prototype.__class__ = alphatab.tablature.model.TablatureStave;
 if(!alphatab.tablature.drawing) alphatab.tablature.drawing = {}
 alphatab.tablature.drawing.DrawingContext = function(scale) {
 	if( scale === $_ ) return;
@@ -5802,6 +5161,99 @@ alphatab.file.guitarpro.Gp5Reader.prototype.readInfo = function(song) {
 	}
 }
 alphatab.file.guitarpro.Gp5Reader.prototype.__class__ = alphatab.file.guitarpro.Gp5Reader;
+if(!alphatab.tablature.staves) alphatab.tablature.staves = {}
+alphatab.tablature.staves.StaveLine = function(p) {
+	if( p === $_ ) return;
+	this.measures = new Array();
+	this.staves = new Array();
+	this.spacing = new alphatab.tablature.staves.StaveSpacing(2);
+	this.y = 0;
+	this.x = 0;
+	this.fullLine = false;
+	this.width = 0;
+}
+alphatab.tablature.staves.StaveLine.__name__ = ["alphatab","tablature","staves","StaveLine"];
+alphatab.tablature.staves.StaveLine.prototype.measures = null;
+alphatab.tablature.staves.StaveLine.prototype.staves = null;
+alphatab.tablature.staves.StaveLine.prototype.spacing = null;
+alphatab.tablature.staves.StaveLine.prototype.tablature = null;
+alphatab.tablature.staves.StaveLine.prototype.track = null;
+alphatab.tablature.staves.StaveLine.prototype.lastIndex = function() {
+	return this.measures[this.measures.length - 1];
+}
+alphatab.tablature.staves.StaveLine.prototype.getHeight = function() {
+	var height = 0;
+	height += this.spacing.getSize();
+	var _g = 0, _g1 = this.staves;
+	while(_g < _g1.length) {
+		var stave = _g1[_g];
+		++_g;
+		height += stave.spacing.getSize();
+	}
+	return height;
+}
+alphatab.tablature.staves.StaveLine.prototype.y = null;
+alphatab.tablature.staves.StaveLine.prototype.x = null;
+alphatab.tablature.staves.StaveLine.prototype.fullLine = null;
+alphatab.tablature.staves.StaveLine.prototype.width = null;
+alphatab.tablature.staves.StaveLine.prototype.addMeasure = function(index) {
+	this.measures.push(index);
+}
+alphatab.tablature.staves.StaveLine.prototype.addStave = function(stave) {
+	stave.index = this.staves.length;
+	this.staves.push(stave);
+}
+alphatab.tablature.staves.StaveLine.prototype.paint = function(layout,track,context) {
+	if(this.staves.length == 0) return;
+	var posY = this.y + this.spacing.get(0);
+	var lastStave = false;
+	var _g1 = 0, _g = this.staves.length;
+	while(_g1 < _g) {
+		var si = _g1++;
+		var stave = this.staves[si];
+		if(si + 1 == this.staves.length) lastStave = true;
+		stave.paintStave(layout,context,this.x,posY);
+		var currentMeasure;
+		var _g3 = 0, _g2 = this.measures.length;
+		while(_g3 < _g2) {
+			var i = _g3++;
+			var index = this.measures[i];
+			currentMeasure = track.measures[index];
+			var previousMeasureX = 0;
+			stave.paintMeasure(layout,context,currentMeasure,this.x,posY);
+		}
+		posY += stave.spacing.getSize();
+	}
+	if(this.staves.length > 1) {
+		var firstStave = this.staves[0];
+		var lastStave1 = this.staves[this.staves.length - 1];
+		var firstStaveY = this.y + this.spacing.get(0);
+		var lastStaveY = posY - lastStave1.spacing.getSize();
+		var fill = context.get(3);
+		var draw = context.get(4);
+		var groupTopY = firstStaveY + firstStave.spacing.get(firstStave.getBarTopSpacing());
+		var groupBottomY = lastStaveY + lastStave1.spacing.get(lastStave1.getBarBottomSpacing());
+		var barSize = Math.floor(3 * layout.scale);
+		var barOffset = barSize;
+		fill.addRect(this.x - barOffset - barSize,groupTopY,barSize,groupBottomY - groupTopY);
+		var spikeStartX = this.x - barOffset - barSize;
+		var spikeEndX = this.x + barSize * 2;
+		fill.startFigure();
+		fill.moveTo(spikeStartX,groupTopY);
+		fill.bezierTo(spikeStartX,groupTopY,this.x,groupTopY,spikeEndX,groupTopY - barSize);
+		fill.bezierTo(this.x,groupTopY + barSize,spikeStartX,groupTopY + barSize,spikeStartX,groupTopY + barSize);
+		fill.closeFigure();
+		fill.startFigure();
+		fill.moveTo(spikeStartX,groupBottomY);
+		fill.bezierTo(spikeStartX,groupBottomY,this.x,groupBottomY,spikeEndX,groupBottomY + barSize);
+		fill.bezierTo(this.x,groupBottomY - barSize,spikeStartX,groupBottomY - barSize,spikeStartX,groupBottomY - barSize);
+		fill.closeFigure();
+		var lineTopY = firstStaveY + firstStave.spacing.get(firstStave.getLineTopSpacing());
+		var lineBottomY = lastStaveY + lastStave1.spacing.get(lastStave1.getLineBottomSpacing());
+		draw.addLine(this.x,lineTopY,this.x,lineBottomY);
+	}
+}
+alphatab.tablature.staves.StaveLine.prototype.__class__ = alphatab.tablature.staves.StaveLine;
 js.Lib = function() { }
 js.Lib.__name__ = ["js","Lib"];
 js.Lib.isIE = null;
@@ -5821,6 +5273,9 @@ js.Lib.prototype.__class__ = js.Lib;
 alphatab.model.effects.GraceEffectTransition = function() { }
 alphatab.model.effects.GraceEffectTransition.__name__ = ["alphatab","model","effects","GraceEffectTransition"];
 alphatab.model.effects.GraceEffectTransition.prototype.__class__ = alphatab.model.effects.GraceEffectTransition;
+alphatab.model.effects.FingeringType = function() { }
+alphatab.model.effects.FingeringType.__name__ = ["alphatab","model","effects","FingeringType"];
+alphatab.model.effects.FingeringType.prototype.__class__ = alphatab.model.effects.FingeringType;
 alphatab.tablature.model.PercussionMapper = function() { }
 alphatab.tablature.model.PercussionMapper.__name__ = ["alphatab","tablature","model","PercussionMapper"];
 alphatab.tablature.model.PercussionMapper.getValue = function(note) {
@@ -5828,632 +5283,6 @@ alphatab.tablature.model.PercussionMapper.getValue = function(note) {
 	if(value <= 34) return 60; else if(value <= 36) return 53; else if(value <= 40) return 60; else if(value == 41) return 55; else if(value == 42) return 67; else if(value == 43) return 57; else if(value == 44) return 53; else if(value == 45) return 59; else if(value == 46) return 67; else if(value == 47) return 62; else if(value == 48) return 64; else if(value == 49) return 67; else if(value == 50) return 65; else if(value <= 53) return 67; else if(value == 54) return 62; else if(value == 55) return 60; else if(value == 56) return 64; else if(value == 57) return 67; else if(value == 58) return 60; else if(value == 59) return 67; else if(value == 60) return 52; else if(value == 61) return 50; else if(value == 62) return 57; else if(value == 63) return 59; else if(value == 64) return 55; else if(value == 65) return 52; else if(value == 66) return 50; else return 60;
 }
 alphatab.tablature.model.PercussionMapper.prototype.__class__ = alphatab.tablature.model.PercussionMapper;
-alphatab.model.effects.FingeringType = function() { }
-alphatab.model.effects.FingeringType.__name__ = ["alphatab","model","effects","FingeringType"];
-alphatab.model.effects.FingeringType.prototype.__class__ = alphatab.model.effects.FingeringType;
-alphatab.tablature.model.ScoreStave = function(line,layout) {
-	if( line === $_ ) return;
-	alphatab.tablature.model.Stave.call(this,line,layout);
-	this.spacing = new alphatab.tablature.model.StaveSpacing(13);
-	this.spacing.set(0,Math.floor(15 * layout.scale));
-	this.spacing.set(8,Math.floor(15 * layout.scale));
-	this.spacing.set(10,Math.floor(layout.scoreLineSpacing * 4));
-	this.spacing.set(12,Math.floor(15 * layout.scale));
-}
-alphatab.tablature.model.ScoreStave.__name__ = ["alphatab","tablature","model","ScoreStave"];
-alphatab.tablature.model.ScoreStave.__super__ = alphatab.tablature.model.Stave;
-for(var k in alphatab.tablature.model.Stave.prototype ) alphatab.tablature.model.ScoreStave.prototype[k] = alphatab.tablature.model.Stave.prototype[k];
-alphatab.tablature.model.ScoreStave.isDisplaced = function(previous,current) {
-	if(previous == null) return false;
-	var prevVal = previous.realValue();
-	var curVal = current.realValue();
-	var keySignature = current.voice.beat.measure.header.keySignature;
-	var prevOctave = Math.floor(prevVal / 12);
-	var currentOctave = Math.floor(curVal / 12);
-	if(prevOctave != currentOctave) return false;
-	var positions = keySignature <= 7?alphatab.tablature.model.ScoreStave.SCORE_SHARP_POSITIONS:alphatab.tablature.model.ScoreStave.SCORE_FLAT_POSITIONS;
-	var prevPosition = positions[prevVal % 12];
-	var curPosition = positions[curVal % 12];
-	return Math.abs(curPosition - prevPosition) <= 1 && !previous.displaced;
-}
-alphatab.tablature.model.ScoreStave.prototype.getBarTopSpacing = function() {
-	return 8;
-}
-alphatab.tablature.model.ScoreStave.prototype.getBarBottomSpacing = function() {
-	return 11;
-}
-alphatab.tablature.model.ScoreStave.prototype.getLineTopSpacing = function() {
-	return 10;
-}
-alphatab.tablature.model.ScoreStave.prototype.getLineBottomSpacing = function() {
-	return 11;
-}
-alphatab.tablature.model.ScoreStave.prototype.prepare = function(measure) {
-	if(measure.effectsCache.text) this.spacing.set(1,this.layout.effectSpacing);
-	if(measure.effectsCache.tempo) this.spacing.set(5,20 * this.layout.scale);
-	if(measure.effectsCache.tripletFeel) this.spacing.set(4,30 * this.layout.scale);
-	if(measure.effectsCache.triplet) this.spacing.set(6,5 * this.layout.scale);
-	if(measure.effectsCache.marker) this.spacing.set(2,this.layout.effectSpacing);
-	if(measure.effectsCache.chord) this.spacing.set(3,this.layout.effectSpacing);
-	if(measure.header.repeatAlternative > 0) this.spacing.set(7,Math.floor(15 * this.layout.scale));
-	var currentTopSpacing = this.spacing.spacing[9];
-	var middleLinesStart = this.spacing.get(10);
-	var middleLinesEnd = this.spacing.get(11);
-	var minNote = measure.minDownGroup == null?null:measure.minDownGroup.minNote;
-	if(minNote != null) {
-		var currentSpaceToLines = middleLinesStart - currentTopSpacing;
-		var minScoreY = this.getNoteScorePosY(this.layout,minNote) + currentSpaceToLines;
-		var minNoteOverflow = currentSpaceToLines - minScoreY;
-		if(this.spacing.spacing[9] < minNoteOverflow) this.spacing.set(9,minNoteOverflow);
-	}
-	var maxNote = measure.maxUpGroup == null?null:measure.maxUpGroup.maxNote;
-	if(maxNote != null) {
-		var maxScoreY = this.getNoteScorePosY(this.layout,maxNote) + middleLinesStart;
-		var maxNoteOverflow = maxScoreY - middleLinesEnd;
-		if(this.spacing.spacing[11] < maxNoteOverflow) this.spacing.set(11,maxNoteOverflow);
-	}
-}
-alphatab.tablature.model.ScoreStave.prototype.paintStave = function(layout,context,x,y) {
-	var lineY = y + this.spacing.get(10);
-	var _g = 1;
-	while(_g < 6) {
-		var i = _g++;
-		context.get(2).startFigure();
-		context.get(2).addLine(x,lineY,x + this.line.width,lineY);
-		lineY += Math.round(layout.scoreLineSpacing);
-	}
-}
-alphatab.tablature.model.ScoreStave.prototype.paintMeasure = function(layout,context,measure,x,y) {
-	var realX = x + measure.x;
-	var realY = y + this.spacing.get(0);
-	var w = measure.width + measure.spacing;
-	this.paintDivisions(layout,context,measure,realX,y,3,this.spacing.get(10),this.spacing.spacing[10]);
-	this.paintClef(layout,context,measure,realX,y);
-	this.paintKeySignature(layout,context,measure,realX,y);
-	this.paintTimeSignature(layout,context,measure,realX,y);
-	this.paintRepeatEndings(layout,context,measure,realX,y);
-	realX += measure.getDefaultSpacings(layout);
-	this.paintText(layout,context,measure,realX,y);
-	this.paintTempo(layout,context,measure,realX,y);
-	this.paintTripletFeel(layout,context,measure,realX,y);
-	this.paintMarker(layout,context,measure,realX,y);
-	this.paintBeats(layout,context,measure,realX,y);
-}
-alphatab.tablature.model.ScoreStave.prototype.paintClef = function(layout,context,measure,x,y) {
-	if(!measure.shouldPaintClef()) return;
-	x += Math.round(14 * layout.scale);
-	y += this.spacing.get(10);
-	if(measure.clef == 0) alphatab.tablature.drawing.ClefPainter.paintTreble(context,x,y,layout); else if(measure.clef == 1) alphatab.tablature.drawing.ClefPainter.paintBass(context,x,y,layout); else if(measure.clef == 2) alphatab.tablature.drawing.ClefPainter.paintTenor(context,x,y,layout); else if(measure.clef == 3) alphatab.tablature.drawing.ClefPainter.paintAlto(context,x,y,layout);
-}
-alphatab.tablature.model.ScoreStave.prototype.paintKeySignature = function(layout,context,measure,x,y) {
-	if(!measure.header.shouldPaintKeySignature(measure)) return;
-	x += measure.calculateClefSpacing(layout) + Math.floor(10 * layout.scale);
-	y += this.spacing.get(10);
-	var scale = layout.scoreLineSpacing;
-	var currentKey = measure.header.keySignature;
-	var previousKey = measure.getPreviousMeasure() != null?measure.getPreviousMeasure().header.keySignature:0;
-	var offsetClef = 0;
-	switch(measure.clef) {
-	case 0:
-		offsetClef = 0;
-		break;
-	case 1:
-		offsetClef = 2;
-		break;
-	case 2:
-		offsetClef = -1;
-		break;
-	case 3:
-		offsetClef = 1;
-		break;
-	}
-	var naturalizeSymbols = previousKey <= 7?previousKey:previousKey - 7;
-	var previousKeyPositions = previousKey <= 7?alphatab.tablature.model.ScoreStave.SCORE_KEYSHARP_POSITIONS:alphatab.tablature.model.ScoreStave.SCORE_KEYFLAT_POSITIONS;
-	var step = layout.scoreLineSpacing / 2;
-	var _g = 0;
-	while(_g < naturalizeSymbols) {
-		var i = _g++;
-		var keyY = 0;
-		var offset = Math.round((previousKeyPositions[i] + offsetClef) * step + 6 * layout.scale);
-		alphatab.tablature.drawing.KeySignaturePainter.paintNatural(context,x,y + offset,layout);
-		x += Math.floor(8 * layout.scale);
-	}
-	var offsetSymbols = currentKey <= 7?currentKey:currentKey - 7;
-	if(currentKey <= 7) {
-		var _g = 0;
-		while(_g < offsetSymbols) {
-			var i = _g++;
-			var keyY = 0;
-			var offset = Math.round((alphatab.tablature.model.ScoreStave.SCORE_KEYSHARP_POSITIONS[i] + offsetClef) * step + 2 * layout.scale);
-			alphatab.tablature.drawing.KeySignaturePainter.paintSharp(context,x,y + offset,layout);
-			x += Math.floor(8 * layout.scale);
-		}
-	} else {
-		var _g = 0;
-		while(_g < offsetSymbols) {
-			var i = _g++;
-			var keyY = 0;
-			var offset = Math.round((alphatab.tablature.model.ScoreStave.SCORE_KEYFLAT_POSITIONS[i] + offsetClef) * step + layout.scale);
-			alphatab.tablature.drawing.KeySignaturePainter.paintFlat(context,x,y + offset,layout);
-			x += Math.floor(8 * layout.scale);
-		}
-	}
-}
-alphatab.tablature.model.ScoreStave.prototype.paintTimeSignature = function(layout,context,measure,x,y) {
-	if(!measure.header.shouldPaintTimeSignature(measure)) return;
-	y += this.spacing.get(10);
-	var x1 = x + measure.calculateClefSpacing(layout) + measure.calculateKeySignatureSpacing(layout) + Math.floor(15 * layout.scale);
-	var x2 = x1;
-	var y1 = 0;
-	var y2 = Math.round(2 * layout.scoreLineSpacing);
-	if(measure.header.timeSignature.numerator > 9 && measure.header.timeSignature.denominator.value < 10) x2 += Math.round(10 * layout.scale / 2);
-	if(measure.header.timeSignature.numerator < 10 && measure.header.timeSignature.denominator.value > 9) x1 += Math.round(10 * layout.scale / 2);
-	this.paintTimeSignatureNumber(layout,context,measure.header.timeSignature.numerator,x1,y + y1);
-	this.paintTimeSignatureNumber(layout,context,measure.header.timeSignature.denominator.value,x2,y + y2);
-}
-alphatab.tablature.model.ScoreStave.prototype.paintTimeSignatureNumber = function(layout,context,number,x,y) {
-	if(number < 10) {
-		var symbol = this.getTimeSignatureSymbol(number);
-		if(symbol != null) context.get(3).addMusicSymbol(symbol,x,y,layout.scale);
-	} else {
-		var firstDigit = Math.floor(number / 10);
-		var secondDigit = number - firstDigit * 10;
-		var symbol = this.getTimeSignatureSymbol(firstDigit);
-		if(symbol != null) context.get(3).addMusicSymbol(symbol,x,y,layout.scale);
-		symbol = this.getTimeSignatureSymbol(secondDigit);
-		if(symbol != null) context.get(3).addMusicSymbol(symbol,x + 10 * layout.scale,y,layout.scale);
-	}
-}
-alphatab.tablature.model.ScoreStave.prototype.getTimeSignatureSymbol = function(number) {
-	switch(number) {
-	case 0:
-		return alphatab.tablature.drawing.MusicFont.Num0;
-	case 1:
-		return alphatab.tablature.drawing.MusicFont.Num1;
-	case 2:
-		return alphatab.tablature.drawing.MusicFont.Num2;
-	case 3:
-		return alphatab.tablature.drawing.MusicFont.Num3;
-	case 4:
-		return alphatab.tablature.drawing.MusicFont.Num4;
-	case 5:
-		return alphatab.tablature.drawing.MusicFont.Num5;
-	case 6:
-		return alphatab.tablature.drawing.MusicFont.Num6;
-	case 7:
-		return alphatab.tablature.drawing.MusicFont.Num7;
-	case 8:
-		return alphatab.tablature.drawing.MusicFont.Num8;
-	case 9:
-		return alphatab.tablature.drawing.MusicFont.Num9;
-	}
-	return null;
-}
-alphatab.tablature.model.ScoreStave.prototype.paintText = function(layout,context,measure,x,y) {
-	if(!measure.effectsCache.text) return;
-	y += this.spacing.get(1);
-	var _g = 0, _g1 = measure.beats;
-	while(_g < _g1.length) {
-		var beat = _g1[_g];
-		++_g;
-		if(beat.text != null) {
-			var bd = beat;
-			var str = beat.text.value;
-			context.get(9).addString(str,alphatab.tablature.drawing.DrawingResources.defaultFont,x + bd.x,y + Math.floor(alphatab.tablature.drawing.DrawingResources.defaultFontHeight / 2));
-		}
-	}
-}
-alphatab.tablature.model.ScoreStave.prototype.paintTempo = function(layout,context,measure,x,y) {
-	if(!measure.effectsCache.tempo) return;
-	y += this.spacing.get(5);
-	alphatab.tablature.drawing.TempoPainter.paintTempo(context,x,y,layout.scale);
-	x += Math.round(8 * layout.scale);
-	var value = " = " + measure.header.tempo.value;
-	context.get(3).addString(value,alphatab.tablature.drawing.DrawingResources.defaultFont,x,y + alphatab.tablature.drawing.DrawingResources.defaultFontHeight);
-}
-alphatab.tablature.model.ScoreStave.prototype.paintTripletFeel = function(layout,context,measure,x,y) {
-	if(!measure.effectsCache.tripletFeel) return;
-	y += this.spacing.get(4);
-	if(measure.header.tripletFeel == 0 && measure.getPreviousMeasure() != null) {
-		var previous = measure.getPreviousMeasure().header.tripletFeel;
-		if(previous == 1) alphatab.tablature.drawing.TripletFeelPainter.paintTripletFeelNone8(context,x,y,layout.scale); else if(previous == 2) alphatab.tablature.drawing.TripletFeelPainter.paintTripletFeelNone16(context,x,y,layout.scale);
-	} else if(measure.header.tripletFeel == 1) alphatab.tablature.drawing.TripletFeelPainter.paintTripletFeel8(context,x,y,layout.scale); else if(measure.header.tripletFeel == 2) alphatab.tablature.drawing.TripletFeelPainter.paintTripletFeel16(context,x,y,layout.scale);
-}
-alphatab.tablature.model.ScoreStave.prototype.paintMarker = function(layout,context,measure,x,y) {
-	if(!measure.effectsCache.marker) return;
-	y += this.spacing.get(2);
-	context.get(9).addString(measure.header.marker.title,alphatab.tablature.drawing.DrawingResources.defaultFont,x,y + Math.floor(alphatab.tablature.drawing.DrawingResources.defaultFontHeight / 2));
-}
-alphatab.tablature.model.ScoreStave.prototype.paintRepeatEndings = function(layout,context,measure,x,y) {
-	if(measure.header.repeatAlternative <= 0) return;
-	y += this.spacing.get(7);
-	var h = this.spacing.spacing[7];
-	var offset = Math.floor(3 * layout.scale);
-	var draw = context.get(4);
-	draw.startFigure();
-	draw.addLine(x,y + h,x,y);
-	draw.addLine(x,y,x + measure.width + measure.spacing - offset * 2,y);
-	var txt = "";
-	var _g = 0;
-	while(_g < 8) {
-		var i = _g++;
-		if((measure.header.repeatAlternative & 1 << i) != 0) txt += txt.length > 0?", " + (i + 1):Std.string(i + 1);
-	}
-	context.get(3).addString(txt,alphatab.tablature.drawing.DrawingResources.defaultFont,x + offset,y + offset + alphatab.tablature.drawing.DrawingResources.defaultFontHeight / 2);
-}
-alphatab.tablature.model.ScoreStave.prototype.paintBeats = function(layout,context,measure,x,y) {
-	var _g = 0, _g1 = measure.beats;
-	while(_g < _g1.length) {
-		var beat = _g1[_g];
-		++_g;
-		var bd = beat;
-		this.paintBeat(layout,context,bd,x + bd.x,y);
-	}
-}
-alphatab.tablature.model.ScoreStave.prototype.paintBeat = function(layout,context,beat,x,y) {
-	this.paintExtraLines(layout,context,beat,x,y);
-	var _g = 0, _g1 = beat.voices;
-	while(_g < _g1.length) {
-		var voice = _g1[_g];
-		++_g;
-		this.paintVoice(layout,context,voice,x,y);
-	}
-	this.paintBeatEffects(layout,context,beat,x,y);
-}
-alphatab.tablature.model.ScoreStave.prototype.paintExtraLines = function(layout,context,beat,x,y) {
-	if(!beat.isRestBeat()) {
-		var scoreY = y + this.spacing.get(10);
-		this.paintExtraLines2(context,layout,beat.minNote,x,scoreY);
-		this.paintExtraLines2(context,layout,beat.maxNote,x,scoreY);
-	}
-}
-alphatab.tablature.model.ScoreStave.prototype.paintExtraLines2 = function(context,layout,note,x,y) {
-	var realY = y + this.getNoteScorePosY(layout,note);
-	var x1 = x - 3 * layout.scale;
-	var x2 = x + 12 * layout.scale;
-	var scorelineSpacing = layout.scoreLineSpacing;
-	if(realY < y) {
-		var i = y;
-		while(i > realY) {
-			context.get(2).startFigure();
-			context.get(2).addLine(x1,i,x2,i);
-			i -= scorelineSpacing;
-		}
-	} else if(realY > y + scorelineSpacing * 4) {
-		var i = y + scorelineSpacing * 5;
-		while(i < realY + scorelineSpacing) {
-			context.get(2).startFigure();
-			context.get(2).addLine(x1,i,x2,i);
-			i += scorelineSpacing;
-		}
-	}
-}
-alphatab.tablature.model.ScoreStave.prototype.paintVoice = function(layout,context,voice,x,y) {
-	if(!voice.isEmpty) {
-		if(voice.isRestVoice()) this.paintSilence(layout,context,voice,x,y); else {
-			var _g = 0, _g1 = voice.notes;
-			while(_g < _g1.length) {
-				var note = _g1[_g];
-				++_g;
-				this.paintNote(layout,context,note,x,y);
-			}
-		}
-		this.paintBeam(layout,context,voice,x,y);
-		this.paintTriplet(layout,context,voice,x,y);
-	}
-}
-alphatab.tablature.model.ScoreStave.prototype.paintSilence = function(layout,context,voice,x,y) {
-	x += Math.round(3 * layout.scale);
-	y += this.spacing.get(10);
-	var fill = voice.index == 0?context.get(9):context.get(5);
-	switch(voice.duration.value) {
-	case 1:
-		alphatab.tablature.drawing.SilencePainter.paintWhole(fill,x,y,layout);
-		break;
-	case 2:
-		alphatab.tablature.drawing.SilencePainter.paintHalf(fill,x,y,layout);
-		break;
-	case 4:
-		alphatab.tablature.drawing.SilencePainter.paintQuarter(fill,x,y,layout);
-		break;
-	case 8:
-		alphatab.tablature.drawing.SilencePainter.paintEighth(fill,x,y,layout);
-		break;
-	case 16:
-		alphatab.tablature.drawing.SilencePainter.paintSixteenth(fill,x,y,layout);
-		break;
-	case 32:
-		alphatab.tablature.drawing.SilencePainter.paintThirtySecond(fill,x,y,layout);
-		break;
-	case 64:
-		alphatab.tablature.drawing.SilencePainter.paintSixtyFourth(fill,x,y,layout);
-		break;
-	}
-}
-alphatab.tablature.model.ScoreStave.prototype.paintBeam = function(layout,context,voice,x,y) {
-	if(voice.isRestVoice()) return;
-	y += this.spacing.get(10);
-	var fill = voice.index == 0?context.get(9):context.get(5);
-	var draw = voice.index == 0?context.get(12):context.get(8);
-	if(voice.duration.value >= 2) {
-		var direction = voice.beatGroup.getDirection();
-		var key = voice.beat.measure.header.keySignature;
-		var clef = voice.beat.measure.clef;
-		var xMove = direction == 1?alphatab.tablature.drawing.DrawingResources.getScoreNoteSize(layout,false).x:0;
-		var yMove = direction == 1?Math.round(layout.scoreLineSpacing / 3) + 1:Math.round(layout.scoreLineSpacing / 3) * 2;
-		var y1 = y + (direction == 1?this.getNoteScorePosY(layout,voice.minNote):this.getNoteScorePosY(layout,voice.maxNote));
-		var y2 = Math.round(y + this.calculateBeamY(layout,voice.beatGroup,direction,Math.round(x + xMove),key,clef));
-		draw.addLine(x + xMove,y1 + yMove,x + xMove,y2 + yMove);
-		if(voice.duration.value >= 8) {
-			var index = voice.duration.index() - 2;
-			if(index > 0) {
-				var rotation = direction == 2?1:-1;
-				if((voice.joinedType == alphatab.tablature.model.JoinedType.NoneRight || voice.joinedType == alphatab.tablature.model.JoinedType.NoneLeft) && !voice.isJoinedGreaterThanQuarter) alphatab.tablature.drawing.NotePainter.paintFooter(fill,x,y2,voice.duration.value,rotation,layout); else {
-					var startX;
-					var endX;
-					var startXforCalculation;
-					var endXforCalculation;
-					if(voice.joinedType == alphatab.tablature.model.JoinedType.NoneRight) {
-						startX = Math.floor(x + xMove);
-						endX = Math.floor(x + 6 * layout.scale + xMove);
-						startXforCalculation = voice.beat.fullX();
-						endXforCalculation = Math.floor(voice.beat.fullX() + 6 * layout.scale);
-					} else if(voice.joinedType == alphatab.tablature.model.JoinedType.NoneLeft) {
-						startX = Math.floor(x - 6 * layout.scale + xMove);
-						endX = Math.floor(x + xMove);
-						startXforCalculation = Math.floor(voice.beat.fullX() - 6 * layout.scale);
-						endXforCalculation = voice.beat.fullX();
-					} else {
-						startX = Math.floor(voice.leftJoin.beat.fullX() + xMove);
-						endX = Math.ceil(voice.rightJoin.beat.fullX() + xMove);
-						startXforCalculation = voice.leftJoin.beat.fullX();
-						endXforCalculation = voice.rightJoin.beat.fullX();
-					}
-					var hY1 = Math.floor(y + yMove + this.calculateBeamY(layout,voice.beatGroup,direction,startXforCalculation,key,clef));
-					var hY2 = Math.floor(y + yMove + this.calculateBeamY(layout,voice.beatGroup,direction,endXforCalculation,key,clef));
-					alphatab.tablature.drawing.NotePainter.paintBar(fill,startX,hY1,endX,hY2,index,rotation,layout.scale);
-				}
-			}
-		}
-	}
-}
-alphatab.tablature.model.ScoreStave.prototype.getOffset = function(offset) {
-	return offset * (this.layout.scoreLineSpacing / 8.0);
-}
-alphatab.tablature.model.ScoreStave.prototype.calculateBeamY = function(layout,beatGroup,direction,x,key,clef) {
-	var maxDistance = Math.round(10 * layout.scale);
-	var upOffset = 28 * (this.layout.scoreLineSpacing / 8.0);
-	var downOffset = 28 * (this.layout.scoreLineSpacing / 8.0);
-	var y;
-	var x1;
-	var x2;
-	var y1;
-	var y2;
-	if(direction == 2) {
-		if(beatGroup.minNote != beatGroup.firstMinNote && beatGroup.minNote != beatGroup.lastMinNote) return this.getNoteScorePosY(layout,beatGroup.minNote) + downOffset;
-		y = 0;
-		x1 = beatGroup.firstMinNote.voice.beat.fullX();
-		x2 = beatGroup.lastMinNote.voice.beat.fullX();
-		y1 = Math.round(this.getNoteScorePosY(layout,beatGroup.firstMinNote) + downOffset);
-		y2 = Math.round(this.getNoteScorePosY(layout,beatGroup.lastMinNote) + downOffset);
-		if(y1 > y2 && y1 - y2 > maxDistance) y2 = y1 - maxDistance;
-		if(y2 > y1 && y2 - y1 > maxDistance) y1 = y2 - maxDistance;
-		if(y1 - y2 != 0 && x1 - x2 != 0 && x1 - x != 0) y = Math.round((y1 - y2) / (x1 - x2) * (x1 - x));
-		return y1 - y;
-	} else {
-		if(beatGroup.maxNote != beatGroup.firstMaxNote && beatGroup.maxNote != beatGroup.lastMaxNote) return this.getNoteScorePosY(layout,beatGroup.maxNote) - upOffset;
-		y = 0;
-		x1 = beatGroup.firstMaxNote.voice.beat.fullX();
-		x2 = beatGroup.lastMaxNote.voice.beat.fullX();
-		y1 = Math.round(this.getNoteScorePosY(layout,beatGroup.firstMaxNote) - upOffset);
-		y2 = Math.round(this.getNoteScorePosY(layout,beatGroup.lastMaxNote) - upOffset);
-		if(y1 < y2 && y2 - y1 > maxDistance) y2 = y1 + maxDistance;
-		if(y2 < y1 && y1 - y2 > maxDistance) y1 = y2 + maxDistance;
-		if(y1 - y2 != 0 && x1 - x2 != 0 && x1 - x != 0) y = Math.round((y1 - y2) / (x1 - x2) * (x1 - x));
-		return y1 - y;
-	}
-}
-alphatab.tablature.model.ScoreStave.prototype.paintTriplet = function(layout,context,voice,x,y) {
-	if(voice.duration.tuplet.equals(new alphatab.model.Tuplet())) return;
-	var fill = voice.index == 0?context.get(9):context.get(5);
-	var draw = voice.index == 0?context.get(12):context.get(8);
-	y += this.spacing.get(6);
-	var previousVoice = voice.getPreviousVoice();
-	if(voice.tripletGroup.isFull() && (previousVoice == null || previousVoice.tripletGroup == null || previousVoice.tripletGroup != voice.tripletGroup)) {
-		var firstVoice = voice.tripletGroup.voices[0];
-		var lastVoice = voice.tripletGroup.voices[voice.tripletGroup.voices.length - 1];
-		var startX = firstVoice.beat.fullX();
-		var endX = lastVoice.beat.fullX();
-		var direction = voice.isRestVoice()?1:voice.beatGroup.getDirection();
-		if(direction == 1) {
-			var offset = Math.floor(alphatab.tablature.drawing.DrawingResources.getScoreNoteSize(layout,false).x);
-			startX += offset;
-			endX += offset;
-		}
-		var lineW = endX - startX;
-		var h = this.spacing.spacing[6];
-		var s = Std.string(voice.tripletGroup.triplet);
-		context.graphics.setFont(alphatab.tablature.drawing.DrawingResources.effectFont);
-		var w = context.graphics.measureText(s);
-		draw.addLine(startX,y + h,startX,y);
-		draw.addLine(startX,y,startX + lineW / 2 - w,y);
-		draw.addString(s,alphatab.tablature.drawing.DrawingResources.effectFont,startX + (lineW - w) / 2,y);
-		draw.addLine(startX + lineW / 2 + w,y,endX,y);
-		draw.addLine(endX,y + h,endX,y);
-	} else if(!voice.tripletGroup.isFull()) fill.addString(Std.string(voice.duration.tuplet.enters),alphatab.tablature.drawing.DrawingResources.defaultFont,x,y);
-}
-alphatab.tablature.model.ScoreStave.prototype.paintNote = function(layout,context,note,x,y) {
-	var noteHeadY = y + this.spacing.get(10) + this.getNoteScorePosY(layout,note);
-	var noteHeadX = x;
-	var fill = note.voice.index == 0?context.get(9):context.get(5);
-	var effectLayer = note.voice.index == 0?context.get(10):context.get(6);
-	var direction = note.voice.beatGroup.getDirection();
-	var displaceOffset = Math.floor(alphatab.tablature.drawing.DrawingResources.getScoreNoteSize(layout,false).x);
-	if(note.displaced) {
-		if(direction == 1) noteHeadX += displaceOffset; else noteHeadX -= displaceOffset;
-	}
-	if(!note.voice.beat.measure.track.isPercussionTrack) {
-		var accidentalX = x - Math.floor(7 * layout.scale);
-		if(note.voice.anyDisplaced && direction == 2) accidentalX -= displaceOffset;
-		var accidentalY = noteHeadY + 3 * layout.scale;
-		if(note.getAccitental() == 1) alphatab.tablature.drawing.KeySignaturePainter.paintSmallNatural(fill,accidentalX,accidentalY,layout); else if(note.getAccitental() == 2) alphatab.tablature.drawing.KeySignaturePainter.paintSmallSharp(fill,accidentalX,accidentalY,layout); else if(note.getAccitental() == 3) alphatab.tablature.drawing.KeySignaturePainter.paintSmallFlat(fill,accidentalX,accidentalY,layout);
-	}
-	if(note.voice.beat.measure.track.isPercussionTrack) alphatab.tablature.drawing.NotePainter.paintPercussion(fill,note,x,noteHeadY,layout.scale); else if(note.effect.isHarmonic()) {
-		var full = note.voice.duration.value >= 4;
-		var layer = full?fill:effectLayer;
-		alphatab.tablature.drawing.NotePainter.paintHarmonic(layer,noteHeadX,noteHeadY,layout.scale);
-	} else if(note.effect.deadNote) alphatab.tablature.drawing.NotePainter.paintDeadNote(fill,noteHeadX,noteHeadY,layout.scale); else {
-		var full = note.voice.duration.value >= 4;
-		alphatab.tablature.drawing.NotePainter.paintNote(fill,noteHeadX,noteHeadY,layout.scale,full);
-	}
-	this.paintEffects(layout,context,note,noteHeadX,y,noteHeadY);
-}
-alphatab.tablature.model.ScoreStave.prototype.getNoteScorePosY = function(layout,note) {
-	if(note.scorePosY <= 0) {
-		var keySignature = note.voice.beat.measure.header.keySignature;
-		var clef = note.voice.beat.measure.clef;
-		var step = layout.scoreLineSpacing / 2.00;
-		var noteValue = note.voice.beat.measure.track.isPercussionTrack?alphatab.tablature.model.PercussionMapper.getValue(note):note.realValue();
-		var index = noteValue % 12;
-		var octave = Math.floor(noteValue / 12);
-		var offset = 7 * octave * step;
-		var scoreLineY = keySignature <= 7?Math.floor(alphatab.tablature.model.ScoreStave.SCORE_SHARP_POSITIONS[index] * step - offset):Math.floor(alphatab.tablature.model.ScoreStave.SCORE_FLAT_POSITIONS[index] * step - offset);
-		scoreLineY += Math.floor(alphatab.tablature.model.ScoreStave.SCORE_CLEF_OFFSETS[clef] * step) + Math.round(layout.scale);
-		note.scorePosY = scoreLineY;
-	}
-	return note.scorePosY;
-}
-alphatab.tablature.model.ScoreStave.prototype.paintEffects = function(layout,context,note,x,y,noteY) {
-	this.paintDottedNote(layout,context,note,x,noteY);
-	this.paintStaccato(layout,context,note,x,y);
-	this.paintGraceNote(layout,context,note,x,noteY);
-	this.paintTremoloPicking(layout,context,note,x,noteY);
-	this.paintHammerOn(layout,context,note,x,y);
-	this.paintSlide(layout,context,note,x,y);
-	this.paintTiedNote(layout,context,note,x,y);
-}
-alphatab.tablature.model.ScoreStave.prototype.paintTiedNote = function(layout,context,note,x,y) {
-	var nextBeat = note.voice.beat.getNextBeat();
-	var nextNote = nextBeat == null?null:nextBeat.getNote(note.voice.index,note.string);
-	if(nextNote != null && nextNote.isTiedNote) {
-		var fill = note.voice.index == 0?context.get(10):context.get(6);
-		var down = note.voice.beatGroup.getDirection() == 2;
-		var noteSize = Math.round(alphatab.tablature.drawing.DrawingResources.getScoreNoteSize(layout,false).x);
-		var noteOffset = Math.round((4 + layout.scale) * (!down?1:-1));
-		var startY = y + this.spacing.get(10) + this.getNoteScorePosY(layout,note) + noteOffset;
-		var startX = x + noteSize / 2;
-		var endX = nextNote != null?x + (note.voice.beat.fullWidth() + noteSize / 2):startX + 15 * layout.scale;
-		var endY = nextNote != null?y + this.spacing.get(10) + this.getNoteScorePosY(layout,nextNote) + noteOffset:startY;
-		alphatab.tablature.model.TablatureStave.paintTie(layout,fill,startX,startY,endX,endY,!down);
-	}
-}
-alphatab.tablature.model.ScoreStave.prototype.paintSlide = function(layout,context,note,x,y) {
-	if(!note.effect.slide) return;
-	var nextBeat = note.voice.beat.getNextBeat();
-	var nextNote = nextBeat == null?null:nextBeat.getNote(note.voice.index,note.string);
-	if(nextNote != null && (note.effect.slideType == 1 || note.effect.slideType == 0)) {
-		var down = note.voice.beatGroup.getDirection() == 2;
-		var noteXOffset = Math.round(4 * layout.scale);
-		var noteYOffset = noteXOffset * (!down?1:-1);
-		var noteSize = Math.round(alphatab.tablature.drawing.DrawingResources.getScoreNoteSize(layout,false).x);
-		var startY = y + this.spacing.get(10) + this.getNoteScorePosY(layout,note) - noteYOffset;
-		var startX = x + noteSize + noteXOffset;
-		var endX = nextNote != null?x + note.voice.beat.fullWidth() - noteYOffset - noteXOffset:startX + 15 * layout.scale;
-		var endY = nextNote != null?y + this.spacing.get(10) + this.getNoteScorePosY(layout,nextNote):startY;
-		var draw = note.voice.index == 0?context.get(11):context.get(7);
-		draw.addLine(startX,startY,endX,endY);
-		if(note.effect.slideType == 1) {
-			var fill = note.voice.index == 0?context.get(10):context.get(6);
-			startY = y + this.spacing.get(10) + this.getNoteScorePosY(layout,note) + noteYOffset;
-			startX = x + noteSize / 2;
-			endX = nextNote != null?x + (note.voice.beat.fullWidth() + noteSize / 2):startX + 15 * layout.scale;
-			endY = nextNote != null?y + this.spacing.get(10) + this.getNoteScorePosY(layout,nextNote) + noteYOffset:startY;
-			alphatab.tablature.model.TablatureStave.paintTie(layout,fill,startX,startY,endX,endY,!down);
-		}
-	}
-}
-alphatab.tablature.model.ScoreStave.prototype.paintHammerOn = function(layout,context,note,x,y) {
-	if(!note.effect.hammer) return;
-	var nextBeat = note.voice.beat.getNextBeat();
-	var nextNote = nextBeat == null?null:nextBeat.getNote(note.voice.index,note.string);
-	var fill = note.voice.index == 0?context.get(10):context.get(6);
-	var draw = note.voice.index == 0?context.get(11):context.get(7);
-	var down = note.voice.beatGroup.getDirection() == 2;
-	var noteSize = Math.round(alphatab.tablature.drawing.DrawingResources.getScoreNoteSize(layout,false).x);
-	var noteOffset = Math.round((4 + layout.scale) * (!down?1:-1));
-	var startY = y + this.spacing.get(10) + this.getNoteScorePosY(layout,note) + noteOffset;
-	var startX = x + noteSize / 2;
-	var endX = nextNote != null?x + (note.voice.beat.fullWidth() + noteSize / 2):startX + 15 * layout.scale;
-	var endY = nextNote != null?y + this.spacing.get(10) + this.getNoteScorePosY(layout,nextNote) + noteOffset:startY;
-	alphatab.tablature.model.TablatureStave.paintTie(layout,fill,startX,startY,endX,endY,!down);
-}
-alphatab.tablature.model.ScoreStave.prototype.paintStaccato = function(layout,context,note,x,y) {
-	if(!note.effect.staccato) return;
-	var note1 = note.voice.beatGroup.getDirection() == 1?note.voice.minNote:note.voice.maxNote;
-	var dotSize = 2.0 * layout.scale;
-	y = y + this.spacing.get(10) + this.getNoteScorePosY(layout,note1);
-	y += Math.round((4 + layout.scale) * (note1.voice.beatGroup.getDirection() == 1?1:-1));
-	x += Math.round(alphatab.tablature.drawing.DrawingResources.getScoreNoteSize(layout,false).x / 1.5 - dotSize);
-	var fill = note1.voice.index == 0?context.get(9):context.get(5);
-	fill.addCircle(x,y,dotSize);
-}
-alphatab.tablature.model.ScoreStave.prototype.paintDottedNote = function(layout,context,note,x,y) {
-	if(!note.voice.duration.isDotted && !note.voice.duration.isDoubleDotted) return;
-	var displaceOffset = Math.floor(alphatab.tablature.drawing.DrawingResources.getScoreNoteSize(layout,false).x);
-	if(note.voice.anyDisplaced && !note.displaced) x += displaceOffset;
-	var fill = note.voice.index == 0?context.get(9):context.get(5);
-	var dotSize = 3.0 * layout.scale;
-	x += Math.round(alphatab.tablature.drawing.DrawingResources.getScoreNoteSize(layout,false).x + 4 * layout.scale);
-	y += Math.round(4 * layout.scale);
-	fill.addCircle(Math.round(x - dotSize / 2.0),Math.round(y - dotSize / 2.0),dotSize);
-	if(note.voice.duration.isDoubleDotted) fill.addCircle(Math.round(x + (dotSize + 2.0) - dotSize / 2.0),Math.round(y - dotSize / 2.0),dotSize);
-}
-alphatab.tablature.model.ScoreStave.prototype.paintGraceNote = function(layout,context,note,x,y) {
-	if(!note.effect.isGrace()) return;
-	var scale = layout.scoreLineSpacing / 2.25;
-	var realX = x - 10 * layout.scale;
-	var realY = y - 9 * layout.scale;
-	var fill = note.voice.index == 0?context.get(10):context.get(6);
-	if(note.effect.deadNote) realY += layout.scoreLineSpacing;
-	var s = note.effect.deadNote?alphatab.tablature.drawing.MusicFont.GraceDeadNote:alphatab.tablature.drawing.MusicFont.GraceNote;
-	fill.addMusicSymbol(s,realX - scale * 1.33,realY,layout.scale);
-	if(note.effect.grace.transition == 3 || note.effect.grace.transition == 1) {
-		var startX = x - 10 * layout.scale;
-		var tieY = y + 10 * layout.scale;
-		alphatab.tablature.model.TablatureStave.paintTie(layout,fill,startX,tieY,x,tieY,true);
-	}
-}
-alphatab.tablature.model.ScoreStave.prototype.paintTremoloPicking = function(layout,context,note,x,y) {
-	if(!note.effect.isTremoloPicking()) return;
-	var direction = note.voice.beatGroup.getDirection();
-	var trillY = direction != 1?y + Math.floor(8 * layout.scale):y - Math.floor(16 * layout.scale);
-	var trillX = direction != 1?x - Math.floor(5 * layout.scale):x + Math.floor(3 * layout.scale);
-	var s = "";
-	switch(note.effect.tremoloPicking.duration.value) {
-	case 8:
-		s = alphatab.tablature.drawing.MusicFont.TrillUpEigth;
-		if(direction == 2) trillY += Math.floor(8 * layout.scale);
-		break;
-	case 16:
-		s = alphatab.tablature.drawing.MusicFont.TrillUpSixteenth;
-		if(direction == 2) trillY += Math.floor(4 * layout.scale);
-		break;
-	case 32:
-		s = alphatab.tablature.drawing.MusicFont.TrillUpThirtySecond;
-		break;
-	}
-	var fill = note.voice.index == 0?context.get(10):context.get(6);
-	if(s != "") fill.addMusicSymbol(s,trillX,trillY,layout.scale);
-}
-alphatab.tablature.model.ScoreStave.prototype.paintBeatEffects = function(layout,context,beat,x,y) {
-	this.paintChord(layout,context,beat,x,y);
-}
-alphatab.tablature.model.ScoreStave.prototype.paintChord = function(layout,context,beat,x,y) {
-	if(!beat.effect.isChord()) return;
-	y += this.spacing.get(3);
-	context.get(9).addString(beat.effect.chord.name,alphatab.tablature.drawing.DrawingResources.defaultFont,x,y + Math.floor(alphatab.tablature.drawing.DrawingResources.defaultFontHeight / 2));
-}
-alphatab.tablature.model.ScoreStave.prototype.__class__ = alphatab.tablature.model.ScoreStave;
 alphatab.model.effects.BendEffect = function(p) {
 	if( p === $_ ) return;
 	this.type = 0;
@@ -6541,6 +5370,88 @@ alphatab.platform.svg.FontSizes.measureString = function(s,f,size) {
 	return stringSize;
 }
 alphatab.platform.svg.FontSizes.prototype.__class__ = alphatab.platform.svg.FontSizes;
+alphatab.tablature.staves.Stave = function(line,layout) {
+	if( line === $_ ) return;
+	this.index = 0;
+	this.line = line;
+	this.layout = layout;
+}
+alphatab.tablature.staves.Stave.__name__ = ["alphatab","tablature","staves","Stave"];
+alphatab.tablature.staves.Stave.prototype.index = null;
+alphatab.tablature.staves.Stave.prototype.line = null;
+alphatab.tablature.staves.Stave.prototype.spacing = null;
+alphatab.tablature.staves.Stave.prototype.layout = null;
+alphatab.tablature.staves.Stave.prototype.getStaveId = function() {
+	return "";
+}
+alphatab.tablature.staves.Stave.prototype.getBarTopSpacing = function() {
+	return 0;
+}
+alphatab.tablature.staves.Stave.prototype.getBarBottomSpacing = function() {
+	return 0;
+}
+alphatab.tablature.staves.Stave.prototype.getLineTopSpacing = function() {
+	return 0;
+}
+alphatab.tablature.staves.Stave.prototype.getLineBottomSpacing = function() {
+	return 0;
+}
+alphatab.tablature.staves.Stave.prototype.prepare = function(measure) {
+}
+alphatab.tablature.staves.Stave.prototype.paintStave = function(layout,context,x,y) {
+}
+alphatab.tablature.staves.Stave.prototype.paintMeasure = function(layout,context,measure,x,y) {
+}
+alphatab.tablature.staves.Stave.prototype.paintDivisions = function(layout,context,measure,x,y,dotSize,offset,staveHeight) {
+	var x2;
+	var number = Std.string(measure.header.number);
+	var fill = context.get(3);
+	var draw = context.get(4);
+	var lineWidthBig = Math.max(1,Math.round(3.0 * layout.scale));
+	var startY = y;
+	var bottomY;
+	if(this.index == 0) context.get(13).addString(number,alphatab.tablature.drawing.DrawingResources.defaultFont,x + Math.round(layout.scale * 2),y + offset - alphatab.tablature.drawing.DrawingResources.defaultFontHeight);
+	y += offset;
+	bottomY = y + staveHeight;
+	dotSize = Math.max(1,dotSize * layout.scale);
+	if(measure.header.isRepeatOpen) {
+		fill.addRect(x,y,lineWidthBig,bottomY - y);
+		draw.startFigure();
+		x2 = Math.floor(x + lineWidthBig + 3 * layout.scale);
+		draw.addLine(x2,y,x2,bottomY);
+		x2 += Math.floor(2 * layout.scale);
+		var centerY = y + (bottomY - y) / 2;
+		var yMove = 6 * layout.scale;
+		fill.addCircle(x2,centerY - yMove - dotSize,dotSize);
+		fill.addCircle(x2,centerY + yMove,dotSize);
+	} else {
+		draw.startFigure();
+		draw.addLine(x,y,x,bottomY);
+	}
+	x += measure.width + measure.spacing;
+	if(measure.header.repeatClose > 0 || measure.header.number == measure.track.measureCount()) {
+		x2 = Math.floor(x - (lineWidthBig + 3 * layout.scale));
+		draw.startFigure();
+		draw.addLine(x2,y,x2,bottomY);
+		fill.addRect(x - lineWidthBig,y,lineWidthBig,bottomY - y);
+		if(measure.header.repeatClose > 0) {
+			x2 -= Math.floor(2 * layout.scale) + dotSize;
+			var centerY = y + (bottomY - y) / 2;
+			var yMove = 6 * layout.scale;
+			fill.addCircle(x2,centerY - yMove - dotSize,dotSize);
+			fill.addCircle(x2,centerY + yMove,dotSize);
+			if(this.index == 0) {
+				var repetitions = "x" + (measure.header.repeatClose + 1);
+				var numberSize = context.graphics.measureText(repetitions);
+				fill.addString(repetitions,alphatab.tablature.drawing.DrawingResources.defaultFont,x2 - dotSize,y - alphatab.tablature.drawing.DrawingResources.defaultFontHeight);
+			}
+		}
+	} else {
+		draw.startFigure();
+		draw.addLine(x,y,x,bottomY);
+	}
+}
+alphatab.tablature.staves.Stave.prototype.__class__ = alphatab.tablature.staves.Stave;
 alphatab.tablature.model.BeatDrawing = function(factory) {
 	if( factory === $_ ) return;
 	alphatab.model.Beat.call(this,factory);
@@ -6703,18 +5614,6 @@ alphatab.tablature.model.BeatDrawing.prototype.calculateTremoloBarOverflow = fun
 	return offsets;
 }
 alphatab.tablature.model.BeatDrawing.prototype.__class__ = alphatab.tablature.model.BeatDrawing;
-alphatab.tablature.model.StaveFactory = function() { }
-alphatab.tablature.model.StaveFactory.__name__ = ["alphatab","tablature","model","StaveFactory"];
-alphatab.tablature.model.StaveFactory.getStave = function(id,line,layout) {
-	switch(id) {
-	case "score":
-		return new alphatab.tablature.model.ScoreStave(line,layout);
-	case "tablature":
-		return new alphatab.tablature.model.TablatureStave(line,layout);
-	}
-	return null;
-}
-alphatab.tablature.model.StaveFactory.prototype.__class__ = alphatab.tablature.model.StaveFactory;
 alphatab.model.Duration = function(factory) {
 	if( factory === $_ ) return;
 	this.value = 4;
@@ -6814,6 +5713,18 @@ alphatab.model.Point.__name__ = ["alphatab","model","Point"];
 alphatab.model.Point.prototype.x = null;
 alphatab.model.Point.prototype.y = null;
 alphatab.model.Point.prototype.__class__ = alphatab.model.Point;
+alphatab.tablature.staves.StaveFactory = function() { }
+alphatab.tablature.staves.StaveFactory.__name__ = ["alphatab","tablature","staves","StaveFactory"];
+alphatab.tablature.staves.StaveFactory.getStave = function(id,line,layout) {
+	switch(id) {
+	case "score":
+		return new alphatab.tablature.staves.ScoreStave(line,layout);
+	case "tablature":
+		return new alphatab.tablature.staves.TablatureStave(line,layout);
+	}
+	return null;
+}
+alphatab.tablature.staves.StaveFactory.prototype.__class__ = alphatab.tablature.staves.StaveFactory;
 alphatab.tablature.model.TripletGroup = function(voice) {
 	if( voice === $_ ) return;
 	this._voiceIndex = voice;
@@ -7663,6 +6574,33 @@ alphatab.platform.js.JQuery.prototype.setWidth = function(value) {
 	return this.width(value);
 }
 alphatab.platform.js.JQuery.prototype.__class__ = alphatab.platform.js.JQuery;
+alphatab.tablature.staves.StaveSpacing = function(size) {
+	if( size === $_ ) return;
+	this.spacing = new Array();
+	var _g = 0;
+	while(_g < size) {
+		var i = _g++;
+		this.spacing.push(0);
+	}
+}
+alphatab.tablature.staves.StaveSpacing.__name__ = ["alphatab","tablature","staves","StaveSpacing"];
+alphatab.tablature.staves.StaveSpacing.prototype.spacing = null;
+alphatab.tablature.staves.StaveSpacing.prototype.get = function(index) {
+	var size = 0;
+	var _g = 0;
+	while(_g < index) {
+		var i = _g++;
+		size += this.spacing[i];
+	}
+	return size;
+}
+alphatab.tablature.staves.StaveSpacing.prototype.set = function(index,value) {
+	this.spacing[index] = Math.round(value);
+}
+alphatab.tablature.staves.StaveSpacing.prototype.getSize = function() {
+	return this.get(this.spacing.length);
+}
+alphatab.tablature.staves.StaveSpacing.prototype.__class__ = alphatab.tablature.staves.StaveSpacing;
 alphatab.model.effects.HarmonicEffect = function(p) {
 }
 alphatab.model.effects.HarmonicEffect.__name__ = ["alphatab","model","effects","HarmonicEffect"];
@@ -7756,6 +6694,629 @@ alphatab.model.MixTableItem.prototype.value = null;
 alphatab.model.MixTableItem.prototype.duration = null;
 alphatab.model.MixTableItem.prototype.allTracks = null;
 alphatab.model.MixTableItem.prototype.__class__ = alphatab.model.MixTableItem;
+alphatab.tablature.staves.ScoreStave = function(line,layout) {
+	if( line === $_ ) return;
+	alphatab.tablature.staves.Stave.call(this,line,layout);
+	this.spacing = new alphatab.tablature.staves.StaveSpacing(13);
+	this.spacing.set(0,Math.floor(15 * layout.scale));
+	this.spacing.set(8,Math.floor(15 * layout.scale));
+	this.spacing.set(10,Math.floor(layout.scoreLineSpacing * 4));
+	this.spacing.set(12,Math.floor(15 * layout.scale));
+}
+alphatab.tablature.staves.ScoreStave.__name__ = ["alphatab","tablature","staves","ScoreStave"];
+alphatab.tablature.staves.ScoreStave.__super__ = alphatab.tablature.staves.Stave;
+for(var k in alphatab.tablature.staves.Stave.prototype ) alphatab.tablature.staves.ScoreStave.prototype[k] = alphatab.tablature.staves.Stave.prototype[k];
+alphatab.tablature.staves.ScoreStave.isDisplaced = function(previous,current) {
+	if(previous == null) return false;
+	var prevVal = previous.realValue();
+	var curVal = current.realValue();
+	var keySignature = current.voice.beat.measure.header.keySignature;
+	var prevOctave = Math.floor(prevVal / 12);
+	var currentOctave = Math.floor(curVal / 12);
+	if(prevOctave != currentOctave) return false;
+	var positions = keySignature <= 7?alphatab.tablature.staves.ScoreStave.SCORE_SHARP_POSITIONS:alphatab.tablature.staves.ScoreStave.SCORE_FLAT_POSITIONS;
+	var prevPosition = positions[prevVal % 12];
+	var curPosition = positions[curVal % 12];
+	return Math.abs(curPosition - prevPosition) <= 1 && !previous.displaced;
+}
+alphatab.tablature.staves.ScoreStave.prototype.getBarTopSpacing = function() {
+	return 8;
+}
+alphatab.tablature.staves.ScoreStave.prototype.getBarBottomSpacing = function() {
+	return 11;
+}
+alphatab.tablature.staves.ScoreStave.prototype.getLineTopSpacing = function() {
+	return 10;
+}
+alphatab.tablature.staves.ScoreStave.prototype.getLineBottomSpacing = function() {
+	return 11;
+}
+alphatab.tablature.staves.ScoreStave.prototype.prepare = function(measure) {
+	if(measure.effectsCache.text) this.spacing.set(1,this.layout.effectSpacing);
+	if(measure.effectsCache.tempo) this.spacing.set(5,20 * this.layout.scale);
+	if(measure.effectsCache.tripletFeel) this.spacing.set(4,30 * this.layout.scale);
+	if(measure.effectsCache.triplet) this.spacing.set(6,5 * this.layout.scale);
+	if(measure.effectsCache.marker) this.spacing.set(2,this.layout.effectSpacing);
+	if(measure.effectsCache.chord) this.spacing.set(3,this.layout.effectSpacing);
+	if(measure.header.repeatAlternative > 0) this.spacing.set(7,Math.floor(15 * this.layout.scale));
+	var currentTopSpacing = this.spacing.spacing[9];
+	var middleLinesStart = this.spacing.get(10);
+	var middleLinesEnd = this.spacing.get(11);
+	var minNote = measure.minDownGroup == null?null:measure.minDownGroup.minNote;
+	if(minNote != null) {
+		var currentSpaceToLines = middleLinesStart - currentTopSpacing;
+		var minScoreY = this.getNoteScorePosY(this.layout,minNote) + currentSpaceToLines;
+		var minNoteOverflow = currentSpaceToLines - minScoreY;
+		if(this.spacing.spacing[9] < minNoteOverflow) this.spacing.set(9,minNoteOverflow);
+	}
+	var maxNote = measure.maxUpGroup == null?null:measure.maxUpGroup.maxNote;
+	if(maxNote != null) {
+		var maxScoreY = this.getNoteScorePosY(this.layout,maxNote) + middleLinesStart;
+		var maxNoteOverflow = maxScoreY - middleLinesEnd;
+		if(this.spacing.spacing[11] < maxNoteOverflow) this.spacing.set(11,maxNoteOverflow);
+	}
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintStave = function(layout,context,x,y) {
+	var lineY = y + this.spacing.get(10);
+	var _g = 1;
+	while(_g < 6) {
+		var i = _g++;
+		context.get(2).startFigure();
+		context.get(2).addLine(x,lineY,x + this.line.width,lineY);
+		lineY += Math.round(layout.scoreLineSpacing);
+	}
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintMeasure = function(layout,context,measure,x,y) {
+	var realX = x + measure.x;
+	var realY = y + this.spacing.get(0);
+	var w = measure.width + measure.spacing;
+	this.paintDivisions(layout,context,measure,realX,y,3,this.spacing.get(10),this.spacing.spacing[10]);
+	this.paintClef(layout,context,measure,realX,y);
+	this.paintKeySignature(layout,context,measure,realX,y);
+	this.paintTimeSignature(layout,context,measure,realX,y);
+	this.paintRepeatEndings(layout,context,measure,realX,y);
+	realX += measure.getDefaultSpacings(layout);
+	this.paintText(layout,context,measure,realX,y);
+	this.paintTempo(layout,context,measure,realX,y);
+	this.paintTripletFeel(layout,context,measure,realX,y);
+	this.paintMarker(layout,context,measure,realX,y);
+	this.paintBeats(layout,context,measure,realX,y);
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintClef = function(layout,context,measure,x,y) {
+	if(!measure.shouldPaintClef()) return;
+	x += Math.round(14 * layout.scale);
+	y += this.spacing.get(10);
+	if(measure.clef == 0) alphatab.tablature.drawing.ClefPainter.paintTreble(context,x,y,layout); else if(measure.clef == 1) alphatab.tablature.drawing.ClefPainter.paintBass(context,x,y,layout); else if(measure.clef == 2) alphatab.tablature.drawing.ClefPainter.paintTenor(context,x,y,layout); else if(measure.clef == 3) alphatab.tablature.drawing.ClefPainter.paintAlto(context,x,y,layout);
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintKeySignature = function(layout,context,measure,x,y) {
+	if(!measure.header.shouldPaintKeySignature(measure)) return;
+	x += measure.calculateClefSpacing(layout) + Math.floor(10 * layout.scale);
+	y += this.spacing.get(10);
+	var scale = layout.scoreLineSpacing;
+	var currentKey = measure.header.keySignature;
+	var previousKey = measure.getPreviousMeasure() != null?measure.getPreviousMeasure().header.keySignature:0;
+	var offsetClef = 0;
+	switch(measure.clef) {
+	case 0:
+		offsetClef = 0;
+		break;
+	case 1:
+		offsetClef = 2;
+		break;
+	case 2:
+		offsetClef = -1;
+		break;
+	case 3:
+		offsetClef = 1;
+		break;
+	}
+	var naturalizeSymbols = previousKey <= 7?previousKey:previousKey - 7;
+	var previousKeyPositions = previousKey <= 7?alphatab.tablature.staves.ScoreStave.SCORE_KEYSHARP_POSITIONS:alphatab.tablature.staves.ScoreStave.SCORE_KEYFLAT_POSITIONS;
+	var step = layout.scoreLineSpacing / 2;
+	var _g = 0;
+	while(_g < naturalizeSymbols) {
+		var i = _g++;
+		var keyY = 0;
+		var offset = Math.round((previousKeyPositions[i] + offsetClef) * step + 6 * layout.scale);
+		alphatab.tablature.drawing.KeySignaturePainter.paintNatural(context,x,y + offset,layout);
+		x += Math.floor(8 * layout.scale);
+	}
+	var offsetSymbols = currentKey <= 7?currentKey:currentKey - 7;
+	if(currentKey <= 7) {
+		var _g = 0;
+		while(_g < offsetSymbols) {
+			var i = _g++;
+			var keyY = 0;
+			var offset = Math.round((alphatab.tablature.staves.ScoreStave.SCORE_KEYSHARP_POSITIONS[i] + offsetClef) * step + 2 * layout.scale);
+			alphatab.tablature.drawing.KeySignaturePainter.paintSharp(context,x,y + offset,layout);
+			x += Math.floor(8 * layout.scale);
+		}
+	} else {
+		var _g = 0;
+		while(_g < offsetSymbols) {
+			var i = _g++;
+			var keyY = 0;
+			var offset = Math.round((alphatab.tablature.staves.ScoreStave.SCORE_KEYFLAT_POSITIONS[i] + offsetClef) * step + layout.scale);
+			alphatab.tablature.drawing.KeySignaturePainter.paintFlat(context,x,y + offset,layout);
+			x += Math.floor(8 * layout.scale);
+		}
+	}
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintTimeSignature = function(layout,context,measure,x,y) {
+	if(!measure.header.shouldPaintTimeSignature(measure)) return;
+	y += this.spacing.get(10);
+	var x1 = x + measure.calculateClefSpacing(layout) + measure.calculateKeySignatureSpacing(layout) + Math.floor(15 * layout.scale);
+	var x2 = x1;
+	var y1 = 0;
+	var y2 = Math.round(2 * layout.scoreLineSpacing);
+	if(measure.header.timeSignature.numerator > 9 && measure.header.timeSignature.denominator.value < 10) x2 += Math.round(10 * layout.scale / 2);
+	if(measure.header.timeSignature.numerator < 10 && measure.header.timeSignature.denominator.value > 9) x1 += Math.round(10 * layout.scale / 2);
+	this.paintTimeSignatureNumber(layout,context,measure.header.timeSignature.numerator,x1,y + y1);
+	this.paintTimeSignatureNumber(layout,context,measure.header.timeSignature.denominator.value,x2,y + y2);
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintTimeSignatureNumber = function(layout,context,number,x,y) {
+	if(number < 10) {
+		var symbol = this.getTimeSignatureSymbol(number);
+		if(symbol != null) context.get(3).addMusicSymbol(symbol,x,y,layout.scale);
+	} else {
+		var firstDigit = Math.floor(number / 10);
+		var secondDigit = number - firstDigit * 10;
+		var symbol = this.getTimeSignatureSymbol(firstDigit);
+		if(symbol != null) context.get(3).addMusicSymbol(symbol,x,y,layout.scale);
+		symbol = this.getTimeSignatureSymbol(secondDigit);
+		if(symbol != null) context.get(3).addMusicSymbol(symbol,x + 10 * layout.scale,y,layout.scale);
+	}
+}
+alphatab.tablature.staves.ScoreStave.prototype.getTimeSignatureSymbol = function(number) {
+	switch(number) {
+	case 0:
+		return alphatab.tablature.drawing.MusicFont.Num0;
+	case 1:
+		return alphatab.tablature.drawing.MusicFont.Num1;
+	case 2:
+		return alphatab.tablature.drawing.MusicFont.Num2;
+	case 3:
+		return alphatab.tablature.drawing.MusicFont.Num3;
+	case 4:
+		return alphatab.tablature.drawing.MusicFont.Num4;
+	case 5:
+		return alphatab.tablature.drawing.MusicFont.Num5;
+	case 6:
+		return alphatab.tablature.drawing.MusicFont.Num6;
+	case 7:
+		return alphatab.tablature.drawing.MusicFont.Num7;
+	case 8:
+		return alphatab.tablature.drawing.MusicFont.Num8;
+	case 9:
+		return alphatab.tablature.drawing.MusicFont.Num9;
+	}
+	return null;
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintText = function(layout,context,measure,x,y) {
+	if(!measure.effectsCache.text) return;
+	y += this.spacing.get(1);
+	var _g = 0, _g1 = measure.beats;
+	while(_g < _g1.length) {
+		var beat = _g1[_g];
+		++_g;
+		if(beat.text != null) {
+			var bd = beat;
+			var str = beat.text.value;
+			context.get(9).addString(str,alphatab.tablature.drawing.DrawingResources.defaultFont,x + bd.x,y + Math.floor(alphatab.tablature.drawing.DrawingResources.defaultFontHeight / 2));
+		}
+	}
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintTempo = function(layout,context,measure,x,y) {
+	if(!measure.effectsCache.tempo) return;
+	y += this.spacing.get(5);
+	alphatab.tablature.drawing.TempoPainter.paintTempo(context,x,y,layout.scale);
+	x += Math.round(8 * layout.scale);
+	var value = " = " + measure.header.tempo.value;
+	context.get(3).addString(value,alphatab.tablature.drawing.DrawingResources.defaultFont,x,y + alphatab.tablature.drawing.DrawingResources.defaultFontHeight);
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintTripletFeel = function(layout,context,measure,x,y) {
+	if(!measure.effectsCache.tripletFeel) return;
+	y += this.spacing.get(4);
+	if(measure.header.tripletFeel == 0 && measure.getPreviousMeasure() != null) {
+		var previous = measure.getPreviousMeasure().header.tripletFeel;
+		if(previous == 1) alphatab.tablature.drawing.TripletFeelPainter.paintTripletFeelNone8(context,x,y,layout.scale); else if(previous == 2) alphatab.tablature.drawing.TripletFeelPainter.paintTripletFeelNone16(context,x,y,layout.scale);
+	} else if(measure.header.tripletFeel == 1) alphatab.tablature.drawing.TripletFeelPainter.paintTripletFeel8(context,x,y,layout.scale); else if(measure.header.tripletFeel == 2) alphatab.tablature.drawing.TripletFeelPainter.paintTripletFeel16(context,x,y,layout.scale);
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintMarker = function(layout,context,measure,x,y) {
+	if(!measure.effectsCache.marker) return;
+	y += this.spacing.get(2);
+	context.get(9).addString(measure.header.marker.title,alphatab.tablature.drawing.DrawingResources.defaultFont,x,y + Math.floor(alphatab.tablature.drawing.DrawingResources.defaultFontHeight / 2));
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintRepeatEndings = function(layout,context,measure,x,y) {
+	if(measure.header.repeatAlternative <= 0) return;
+	y += this.spacing.get(7);
+	var h = this.spacing.spacing[7];
+	var offset = Math.floor(3 * layout.scale);
+	var draw = context.get(4);
+	draw.startFigure();
+	draw.addLine(x,y + h,x,y);
+	draw.addLine(x,y,x + measure.width + measure.spacing - offset * 2,y);
+	var txt = "";
+	var _g = 0;
+	while(_g < 8) {
+		var i = _g++;
+		if((measure.header.repeatAlternative & 1 << i) != 0) txt += txt.length > 0?", " + (i + 1):Std.string(i + 1);
+	}
+	context.get(3).addString(txt,alphatab.tablature.drawing.DrawingResources.defaultFont,x + offset,y + offset + alphatab.tablature.drawing.DrawingResources.defaultFontHeight / 2);
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintBeats = function(layout,context,measure,x,y) {
+	var _g = 0, _g1 = measure.beats;
+	while(_g < _g1.length) {
+		var beat = _g1[_g];
+		++_g;
+		var bd = beat;
+		this.paintBeat(layout,context,bd,x + bd.x,y);
+	}
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintBeat = function(layout,context,beat,x,y) {
+	this.paintExtraLines(layout,context,beat,x,y);
+	var _g = 0, _g1 = beat.voices;
+	while(_g < _g1.length) {
+		var voice = _g1[_g];
+		++_g;
+		this.paintVoice(layout,context,voice,x,y);
+	}
+	this.paintBeatEffects(layout,context,beat,x,y);
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintExtraLines = function(layout,context,beat,x,y) {
+	if(!beat.isRestBeat()) {
+		var scoreY = y + this.spacing.get(10);
+		this.paintExtraLines2(context,layout,beat.minNote,x,scoreY);
+		this.paintExtraLines2(context,layout,beat.maxNote,x,scoreY);
+	}
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintExtraLines2 = function(context,layout,note,x,y) {
+	var realY = y + this.getNoteScorePosY(layout,note);
+	var x1 = x - 3 * layout.scale;
+	var x2 = x + 12 * layout.scale;
+	var scorelineSpacing = layout.scoreLineSpacing;
+	if(realY < y) {
+		var i = y;
+		while(i > realY) {
+			context.get(2).startFigure();
+			context.get(2).addLine(x1,i,x2,i);
+			i -= scorelineSpacing;
+		}
+	} else if(realY > y + scorelineSpacing * 4) {
+		var i = y + scorelineSpacing * 5;
+		while(i < realY + scorelineSpacing) {
+			context.get(2).startFigure();
+			context.get(2).addLine(x1,i,x2,i);
+			i += scorelineSpacing;
+		}
+	}
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintVoice = function(layout,context,voice,x,y) {
+	if(!voice.isEmpty) {
+		if(voice.isRestVoice()) this.paintSilence(layout,context,voice,x,y); else {
+			var _g = 0, _g1 = voice.notes;
+			while(_g < _g1.length) {
+				var note = _g1[_g];
+				++_g;
+				this.paintNote(layout,context,note,x,y);
+			}
+		}
+		this.paintBeam(layout,context,voice,x,y);
+		this.paintTriplet(layout,context,voice,x,y);
+	}
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintSilence = function(layout,context,voice,x,y) {
+	x += Math.round(3 * layout.scale);
+	y += this.spacing.get(10);
+	var fill = voice.index == 0?context.get(9):context.get(5);
+	switch(voice.duration.value) {
+	case 1:
+		alphatab.tablature.drawing.SilencePainter.paintWhole(fill,x,y,layout);
+		break;
+	case 2:
+		alphatab.tablature.drawing.SilencePainter.paintHalf(fill,x,y,layout);
+		break;
+	case 4:
+		alphatab.tablature.drawing.SilencePainter.paintQuarter(fill,x,y,layout);
+		break;
+	case 8:
+		alphatab.tablature.drawing.SilencePainter.paintEighth(fill,x,y,layout);
+		break;
+	case 16:
+		alphatab.tablature.drawing.SilencePainter.paintSixteenth(fill,x,y,layout);
+		break;
+	case 32:
+		alphatab.tablature.drawing.SilencePainter.paintThirtySecond(fill,x,y,layout);
+		break;
+	case 64:
+		alphatab.tablature.drawing.SilencePainter.paintSixtyFourth(fill,x,y,layout);
+		break;
+	}
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintBeam = function(layout,context,voice,x,y) {
+	if(voice.isRestVoice()) return;
+	y += this.spacing.get(10);
+	var fill = voice.index == 0?context.get(9):context.get(5);
+	var draw = voice.index == 0?context.get(12):context.get(8);
+	if(voice.duration.value >= 2) {
+		var direction = voice.beatGroup.getDirection();
+		var key = voice.beat.measure.header.keySignature;
+		var clef = voice.beat.measure.clef;
+		var xMove = direction == 1?alphatab.tablature.drawing.DrawingResources.getScoreNoteSize(layout,false).x:0;
+		var yMove = direction == 1?Math.round(layout.scoreLineSpacing / 3) + 1:Math.round(layout.scoreLineSpacing / 3) * 2;
+		var y1 = y + (direction == 1?this.getNoteScorePosY(layout,voice.minNote):this.getNoteScorePosY(layout,voice.maxNote));
+		var y2 = Math.round(y + this.calculateBeamY(layout,voice.beatGroup,direction,Math.round(x + xMove),key,clef));
+		draw.addLine(x + xMove,y1 + yMove,x + xMove,y2 + yMove);
+		if(voice.duration.value >= 8) {
+			var index = voice.duration.index() - 2;
+			if(index > 0) {
+				var rotation = direction == 2?1:-1;
+				if((voice.joinedType == alphatab.tablature.model.JoinedType.NoneRight || voice.joinedType == alphatab.tablature.model.JoinedType.NoneLeft) && !voice.isJoinedGreaterThanQuarter) alphatab.tablature.drawing.NotePainter.paintFooter(fill,x,y2,voice.duration.value,rotation,layout); else {
+					var startX;
+					var endX;
+					var startXforCalculation;
+					var endXforCalculation;
+					if(voice.joinedType == alphatab.tablature.model.JoinedType.NoneRight) {
+						startX = Math.floor(x + xMove);
+						endX = Math.floor(x + 6 * layout.scale + xMove);
+						startXforCalculation = voice.beat.fullX();
+						endXforCalculation = Math.floor(voice.beat.fullX() + 6 * layout.scale);
+					} else if(voice.joinedType == alphatab.tablature.model.JoinedType.NoneLeft) {
+						startX = Math.floor(x - 6 * layout.scale + xMove);
+						endX = Math.floor(x + xMove);
+						startXforCalculation = Math.floor(voice.beat.fullX() - 6 * layout.scale);
+						endXforCalculation = voice.beat.fullX();
+					} else {
+						startX = Math.floor(voice.leftJoin.beat.fullX() + xMove);
+						endX = Math.ceil(voice.rightJoin.beat.fullX() + xMove);
+						startXforCalculation = voice.leftJoin.beat.fullX();
+						endXforCalculation = voice.rightJoin.beat.fullX();
+					}
+					var hY1 = Math.floor(y + yMove + this.calculateBeamY(layout,voice.beatGroup,direction,startXforCalculation,key,clef));
+					var hY2 = Math.floor(y + yMove + this.calculateBeamY(layout,voice.beatGroup,direction,endXforCalculation,key,clef));
+					alphatab.tablature.drawing.NotePainter.paintBar(fill,startX,hY1,endX,hY2,index,rotation,layout.scale);
+				}
+			}
+		}
+	}
+}
+alphatab.tablature.staves.ScoreStave.prototype.getOffset = function(offset) {
+	return offset * (this.layout.scoreLineSpacing / 8.0);
+}
+alphatab.tablature.staves.ScoreStave.prototype.calculateBeamY = function(layout,beatGroup,direction,x,key,clef) {
+	var maxDistance = Math.round(10 * layout.scale);
+	var upOffset = 28 * (this.layout.scoreLineSpacing / 8.0);
+	var downOffset = 28 * (this.layout.scoreLineSpacing / 8.0);
+	var y;
+	var x1;
+	var x2;
+	var y1;
+	var y2;
+	if(direction == 2) {
+		if(beatGroup.minNote != beatGroup.firstMinNote && beatGroup.minNote != beatGroup.lastMinNote) return this.getNoteScorePosY(layout,beatGroup.minNote) + downOffset;
+		y = 0;
+		x1 = beatGroup.firstMinNote.voice.beat.fullX();
+		x2 = beatGroup.lastMinNote.voice.beat.fullX();
+		y1 = Math.round(this.getNoteScorePosY(layout,beatGroup.firstMinNote) + downOffset);
+		y2 = Math.round(this.getNoteScorePosY(layout,beatGroup.lastMinNote) + downOffset);
+		if(y1 > y2 && y1 - y2 > maxDistance) y2 = y1 - maxDistance;
+		if(y2 > y1 && y2 - y1 > maxDistance) y1 = y2 - maxDistance;
+		if(y1 - y2 != 0 && x1 - x2 != 0 && x1 - x != 0) y = Math.round((y1 - y2) / (x1 - x2) * (x1 - x));
+		return y1 - y;
+	} else {
+		if(beatGroup.maxNote != beatGroup.firstMaxNote && beatGroup.maxNote != beatGroup.lastMaxNote) return this.getNoteScorePosY(layout,beatGroup.maxNote) - upOffset;
+		y = 0;
+		x1 = beatGroup.firstMaxNote.voice.beat.fullX();
+		x2 = beatGroup.lastMaxNote.voice.beat.fullX();
+		y1 = Math.round(this.getNoteScorePosY(layout,beatGroup.firstMaxNote) - upOffset);
+		y2 = Math.round(this.getNoteScorePosY(layout,beatGroup.lastMaxNote) - upOffset);
+		if(y1 < y2 && y2 - y1 > maxDistance) y2 = y1 + maxDistance;
+		if(y2 < y1 && y1 - y2 > maxDistance) y1 = y2 + maxDistance;
+		if(y1 - y2 != 0 && x1 - x2 != 0 && x1 - x != 0) y = Math.round((y1 - y2) / (x1 - x2) * (x1 - x));
+		return y1 - y;
+	}
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintTriplet = function(layout,context,voice,x,y) {
+	if(voice.duration.tuplet.equals(new alphatab.model.Tuplet())) return;
+	var fill = voice.index == 0?context.get(9):context.get(5);
+	var draw = voice.index == 0?context.get(12):context.get(8);
+	y += this.spacing.get(6);
+	var previousVoice = voice.getPreviousVoice();
+	if(voice.tripletGroup.isFull() && (previousVoice == null || previousVoice.tripletGroup == null || previousVoice.tripletGroup != voice.tripletGroup)) {
+		var firstVoice = voice.tripletGroup.voices[0];
+		var lastVoice = voice.tripletGroup.voices[voice.tripletGroup.voices.length - 1];
+		var startX = firstVoice.beat.fullX();
+		var endX = lastVoice.beat.fullX();
+		var direction = voice.isRestVoice()?1:voice.beatGroup.getDirection();
+		if(direction == 1) {
+			var offset = Math.floor(alphatab.tablature.drawing.DrawingResources.getScoreNoteSize(layout,false).x);
+			startX += offset;
+			endX += offset;
+		}
+		var lineW = endX - startX;
+		var h = this.spacing.spacing[6];
+		var s = Std.string(voice.tripletGroup.triplet);
+		context.graphics.setFont(alphatab.tablature.drawing.DrawingResources.effectFont);
+		var w = context.graphics.measureText(s);
+		draw.addLine(startX,y + h,startX,y);
+		draw.addLine(startX,y,startX + lineW / 2 - w,y);
+		draw.addString(s,alphatab.tablature.drawing.DrawingResources.effectFont,startX + (lineW - w) / 2,y);
+		draw.addLine(startX + lineW / 2 + w,y,endX,y);
+		draw.addLine(endX,y + h,endX,y);
+	} else if(!voice.tripletGroup.isFull()) fill.addString(Std.string(voice.duration.tuplet.enters),alphatab.tablature.drawing.DrawingResources.defaultFont,x,y);
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintNote = function(layout,context,note,x,y) {
+	var noteHeadY = y + this.spacing.get(10) + this.getNoteScorePosY(layout,note);
+	var noteHeadX = x;
+	var fill = note.voice.index == 0?context.get(9):context.get(5);
+	var effectLayer = note.voice.index == 0?context.get(10):context.get(6);
+	var direction = note.voice.beatGroup.getDirection();
+	var displaceOffset = Math.floor(alphatab.tablature.drawing.DrawingResources.getScoreNoteSize(layout,false).x);
+	if(note.displaced) {
+		if(direction == 1) noteHeadX += displaceOffset; else noteHeadX -= displaceOffset;
+	}
+	if(!note.voice.beat.measure.track.isPercussionTrack) {
+		var accidentalX = x - Math.floor(7 * layout.scale);
+		if(note.voice.anyDisplaced && direction == 2) accidentalX -= displaceOffset;
+		var accidentalY = noteHeadY + 3 * layout.scale;
+		if(note.getAccitental() == 1) alphatab.tablature.drawing.KeySignaturePainter.paintSmallNatural(fill,accidentalX,accidentalY,layout); else if(note.getAccitental() == 2) alphatab.tablature.drawing.KeySignaturePainter.paintSmallSharp(fill,accidentalX,accidentalY,layout); else if(note.getAccitental() == 3) alphatab.tablature.drawing.KeySignaturePainter.paintSmallFlat(fill,accidentalX,accidentalY,layout);
+	}
+	if(note.voice.beat.measure.track.isPercussionTrack) alphatab.tablature.drawing.NotePainter.paintPercussion(fill,note,x,noteHeadY,layout.scale); else if(note.effect.isHarmonic()) {
+		var full = note.voice.duration.value >= 4;
+		var layer = full?fill:effectLayer;
+		alphatab.tablature.drawing.NotePainter.paintHarmonic(layer,noteHeadX,noteHeadY,layout.scale);
+	} else if(note.effect.deadNote) alphatab.tablature.drawing.NotePainter.paintDeadNote(fill,noteHeadX,noteHeadY,layout.scale); else {
+		var full = note.voice.duration.value >= 4;
+		alphatab.tablature.drawing.NotePainter.paintNote(fill,noteHeadX,noteHeadY,layout.scale,full);
+	}
+	this.paintEffects(layout,context,note,noteHeadX,y,noteHeadY);
+}
+alphatab.tablature.staves.ScoreStave.prototype.getNoteScorePosY = function(layout,note) {
+	if(note.scorePosY <= 0) {
+		var keySignature = note.voice.beat.measure.header.keySignature;
+		var clef = note.voice.beat.measure.clef;
+		var step = layout.scoreLineSpacing / 2.00;
+		var noteValue = note.voice.beat.measure.track.isPercussionTrack?alphatab.tablature.model.PercussionMapper.getValue(note):note.realValue();
+		var index = noteValue % 12;
+		var octave = Math.floor(noteValue / 12);
+		var offset = 7 * octave * step;
+		var scoreLineY = keySignature <= 7?Math.floor(alphatab.tablature.staves.ScoreStave.SCORE_SHARP_POSITIONS[index] * step - offset):Math.floor(alphatab.tablature.staves.ScoreStave.SCORE_FLAT_POSITIONS[index] * step - offset);
+		scoreLineY += Math.floor(alphatab.tablature.staves.ScoreStave.SCORE_CLEF_OFFSETS[clef] * step) + Math.round(layout.scale);
+		note.scorePosY = scoreLineY;
+	}
+	return note.scorePosY;
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintEffects = function(layout,context,note,x,y,noteY) {
+	this.paintDottedNote(layout,context,note,x,noteY);
+	this.paintStaccato(layout,context,note,x,y);
+	this.paintGraceNote(layout,context,note,x,noteY);
+	this.paintTremoloPicking(layout,context,note,x,noteY);
+	this.paintHammerOn(layout,context,note,x,y);
+	this.paintSlide(layout,context,note,x,y);
+	this.paintTiedNote(layout,context,note,x,y);
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintTiedNote = function(layout,context,note,x,y) {
+	var nextBeat = note.voice.beat.getNextBeat();
+	var nextNote = nextBeat == null?null:nextBeat.getNote(note.voice.index,note.string);
+	if(nextNote != null && nextNote.isTiedNote) {
+		var fill = note.voice.index == 0?context.get(10):context.get(6);
+		var down = note.voice.beatGroup.getDirection() == 2;
+		var noteSize = Math.round(alphatab.tablature.drawing.DrawingResources.getScoreNoteSize(layout,false).x);
+		var noteOffset = Math.round((4 + layout.scale) * (!down?1:-1));
+		var startY = y + this.spacing.get(10) + this.getNoteScorePosY(layout,note) + noteOffset;
+		var startX = x + noteSize / 2;
+		var endX = nextNote != null?x + (note.voice.beat.fullWidth() + noteSize / 2):startX + 15 * layout.scale;
+		var endY = nextNote != null?y + this.spacing.get(10) + this.getNoteScorePosY(layout,nextNote) + noteOffset:startY;
+		alphatab.tablature.staves.TablatureStave.paintTie(layout,fill,startX,startY,endX,endY,!down);
+	}
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintSlide = function(layout,context,note,x,y) {
+	if(!note.effect.slide) return;
+	var nextBeat = note.voice.beat.getNextBeat();
+	var nextNote = nextBeat == null?null:nextBeat.getNote(note.voice.index,note.string);
+	if(nextNote != null && (note.effect.slideType == 1 || note.effect.slideType == 0)) {
+		var down = note.voice.beatGroup.getDirection() == 2;
+		var noteXOffset = Math.round(4 * layout.scale);
+		var noteYOffset = noteXOffset * (!down?1:-1);
+		var noteSize = Math.round(alphatab.tablature.drawing.DrawingResources.getScoreNoteSize(layout,false).x);
+		var startY = y + this.spacing.get(10) + this.getNoteScorePosY(layout,note) - noteYOffset;
+		var startX = x + noteSize + noteXOffset;
+		var endX = nextNote != null?x + note.voice.beat.fullWidth() - noteYOffset - noteXOffset:startX + 15 * layout.scale;
+		var endY = nextNote != null?y + this.spacing.get(10) + this.getNoteScorePosY(layout,nextNote):startY;
+		var draw = note.voice.index == 0?context.get(11):context.get(7);
+		draw.addLine(startX,startY,endX,endY);
+		if(note.effect.slideType == 1) {
+			var fill = note.voice.index == 0?context.get(10):context.get(6);
+			startY = y + this.spacing.get(10) + this.getNoteScorePosY(layout,note) + noteYOffset;
+			startX = x + noteSize / 2;
+			endX = nextNote != null?x + (note.voice.beat.fullWidth() + noteSize / 2):startX + 15 * layout.scale;
+			endY = nextNote != null?y + this.spacing.get(10) + this.getNoteScorePosY(layout,nextNote) + noteYOffset:startY;
+			alphatab.tablature.staves.TablatureStave.paintTie(layout,fill,startX,startY,endX,endY,!down);
+		}
+	}
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintHammerOn = function(layout,context,note,x,y) {
+	if(!note.effect.hammer) return;
+	var nextBeat = note.voice.beat.getNextBeat();
+	var nextNote = nextBeat == null?null:nextBeat.getNote(note.voice.index,note.string);
+	var fill = note.voice.index == 0?context.get(10):context.get(6);
+	var draw = note.voice.index == 0?context.get(11):context.get(7);
+	var down = note.voice.beatGroup.getDirection() == 2;
+	var noteSize = Math.round(alphatab.tablature.drawing.DrawingResources.getScoreNoteSize(layout,false).x);
+	var noteOffset = Math.round((4 + layout.scale) * (!down?1:-1));
+	var startY = y + this.spacing.get(10) + this.getNoteScorePosY(layout,note) + noteOffset;
+	var startX = x + noteSize / 2;
+	var endX = nextNote != null?x + (note.voice.beat.fullWidth() + noteSize / 2):startX + 15 * layout.scale;
+	var endY = nextNote != null?y + this.spacing.get(10) + this.getNoteScorePosY(layout,nextNote) + noteOffset:startY;
+	alphatab.tablature.staves.TablatureStave.paintTie(layout,fill,startX,startY,endX,endY,!down);
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintStaccato = function(layout,context,note,x,y) {
+	if(!note.effect.staccato) return;
+	var note1 = note.voice.beatGroup.getDirection() == 1?note.voice.minNote:note.voice.maxNote;
+	var dotSize = 2.0 * layout.scale;
+	y = y + this.spacing.get(10) + this.getNoteScorePosY(layout,note1);
+	y += Math.round((4 + layout.scale) * (note1.voice.beatGroup.getDirection() == 1?1:-1));
+	x += Math.round(alphatab.tablature.drawing.DrawingResources.getScoreNoteSize(layout,false).x / 1.5 - dotSize);
+	var fill = note1.voice.index == 0?context.get(9):context.get(5);
+	fill.addCircle(x,y,dotSize);
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintDottedNote = function(layout,context,note,x,y) {
+	if(!note.voice.duration.isDotted && !note.voice.duration.isDoubleDotted) return;
+	var displaceOffset = Math.floor(alphatab.tablature.drawing.DrawingResources.getScoreNoteSize(layout,false).x);
+	if(note.voice.anyDisplaced && !note.displaced) x += displaceOffset;
+	var fill = note.voice.index == 0?context.get(9):context.get(5);
+	var dotSize = 3.0 * layout.scale;
+	x += Math.round(alphatab.tablature.drawing.DrawingResources.getScoreNoteSize(layout,false).x + 4 * layout.scale);
+	y += Math.round(4 * layout.scale);
+	fill.addCircle(Math.round(x - dotSize / 2.0),Math.round(y - dotSize / 2.0),dotSize);
+	if(note.voice.duration.isDoubleDotted) fill.addCircle(Math.round(x + (dotSize + 2.0) - dotSize / 2.0),Math.round(y - dotSize / 2.0),dotSize);
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintGraceNote = function(layout,context,note,x,y) {
+	if(!note.effect.isGrace()) return;
+	var scale = layout.scoreLineSpacing / 2.25;
+	var realX = x - 10 * layout.scale;
+	var realY = y - 9 * layout.scale;
+	var fill = note.voice.index == 0?context.get(10):context.get(6);
+	if(note.effect.deadNote) realY += layout.scoreLineSpacing;
+	var s = note.effect.deadNote?alphatab.tablature.drawing.MusicFont.GraceDeadNote:alphatab.tablature.drawing.MusicFont.GraceNote;
+	fill.addMusicSymbol(s,realX - scale * 1.33,realY,layout.scale);
+	if(note.effect.grace.transition == 3 || note.effect.grace.transition == 1) {
+		var startX = x - 10 * layout.scale;
+		var tieY = y + 10 * layout.scale;
+		alphatab.tablature.staves.TablatureStave.paintTie(layout,fill,startX,tieY,x,tieY,true);
+	}
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintTremoloPicking = function(layout,context,note,x,y) {
+	if(!note.effect.isTremoloPicking()) return;
+	var direction = note.voice.beatGroup.getDirection();
+	var trillY = direction != 1?y + Math.floor(8 * layout.scale):y - Math.floor(16 * layout.scale);
+	var trillX = direction != 1?x - Math.floor(5 * layout.scale):x + Math.floor(3 * layout.scale);
+	var s = "";
+	switch(note.effect.tremoloPicking.duration.value) {
+	case 8:
+		s = alphatab.tablature.drawing.MusicFont.TrillUpEigth;
+		if(direction == 2) trillY += Math.floor(8 * layout.scale);
+		break;
+	case 16:
+		s = alphatab.tablature.drawing.MusicFont.TrillUpSixteenth;
+		if(direction == 2) trillY += Math.floor(4 * layout.scale);
+		break;
+	case 32:
+		s = alphatab.tablature.drawing.MusicFont.TrillUpThirtySecond;
+		break;
+	}
+	var fill = note.voice.index == 0?context.get(10):context.get(6);
+	if(s != "") fill.addMusicSymbol(s,trillX,trillY,layout.scale);
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintBeatEffects = function(layout,context,beat,x,y) {
+	this.paintChord(layout,context,beat,x,y);
+}
+alphatab.tablature.staves.ScoreStave.prototype.paintChord = function(layout,context,beat,x,y) {
+	if(!beat.effect.isChord()) return;
+	y += this.spacing.get(3);
+	context.get(9).addString(beat.effect.chord.name,alphatab.tablature.drawing.DrawingResources.defaultFont,x,y + Math.floor(alphatab.tablature.drawing.DrawingResources.defaultFontHeight / 2));
+}
+alphatab.tablature.staves.ScoreStave.prototype.__class__ = alphatab.tablature.staves.ScoreStave;
 alphatab.model.MidiChannel = function(p) {
 	if( p === $_ ) return;
 	this.channel = 0;
@@ -8303,98 +7864,6 @@ alphatab.tablature.model.NoteDrawing.prototype.calculateBendOverflow = function(
 	return Math.round(fullHeight - heightToTabNote);
 }
 alphatab.tablature.model.NoteDrawing.prototype.__class__ = alphatab.tablature.model.NoteDrawing;
-alphatab.tablature.model.StaveLine = function(p) {
-	if( p === $_ ) return;
-	this.measures = new Array();
-	this.staves = new Array();
-	this.spacing = new alphatab.tablature.model.StaveSpacing(2);
-	this.y = 0;
-	this.x = 0;
-	this.fullLine = false;
-	this.width = 0;
-}
-alphatab.tablature.model.StaveLine.__name__ = ["alphatab","tablature","model","StaveLine"];
-alphatab.tablature.model.StaveLine.prototype.measures = null;
-alphatab.tablature.model.StaveLine.prototype.staves = null;
-alphatab.tablature.model.StaveLine.prototype.spacing = null;
-alphatab.tablature.model.StaveLine.prototype.tablature = null;
-alphatab.tablature.model.StaveLine.prototype.track = null;
-alphatab.tablature.model.StaveLine.prototype.lastIndex = function() {
-	return this.measures[this.measures.length - 1];
-}
-alphatab.tablature.model.StaveLine.prototype.getHeight = function() {
-	var height = 0;
-	height += this.spacing.getSize();
-	var _g = 0, _g1 = this.staves;
-	while(_g < _g1.length) {
-		var stave = _g1[_g];
-		++_g;
-		height += stave.spacing.getSize();
-	}
-	return height;
-}
-alphatab.tablature.model.StaveLine.prototype.y = null;
-alphatab.tablature.model.StaveLine.prototype.x = null;
-alphatab.tablature.model.StaveLine.prototype.fullLine = null;
-alphatab.tablature.model.StaveLine.prototype.width = null;
-alphatab.tablature.model.StaveLine.prototype.addMeasure = function(index) {
-	this.measures.push(index);
-}
-alphatab.tablature.model.StaveLine.prototype.addStave = function(stave) {
-	stave.index = this.staves.length;
-	this.staves.push(stave);
-}
-alphatab.tablature.model.StaveLine.prototype.paint = function(layout,track,context) {
-	if(this.staves.length == 0) return;
-	var posY = this.y + this.spacing.get(0);
-	var lastStave = false;
-	var _g1 = 0, _g = this.staves.length;
-	while(_g1 < _g) {
-		var si = _g1++;
-		var stave = this.staves[si];
-		if(si + 1 == this.staves.length) lastStave = true;
-		stave.paintStave(layout,context,this.x,posY);
-		var currentMeasure;
-		var _g3 = 0, _g2 = this.measures.length;
-		while(_g3 < _g2) {
-			var i = _g3++;
-			var index = this.measures[i];
-			currentMeasure = track.measures[index];
-			var previousMeasureX = 0;
-			stave.paintMeasure(layout,context,currentMeasure,this.x,posY);
-		}
-		posY += stave.spacing.getSize();
-	}
-	if(this.staves.length > 1) {
-		var firstStave = this.staves[0];
-		var lastStave1 = this.staves[this.staves.length - 1];
-		var firstStaveY = this.y + this.spacing.get(0);
-		var lastStaveY = posY - lastStave1.spacing.getSize();
-		var fill = context.get(3);
-		var draw = context.get(4);
-		var groupTopY = firstStaveY + firstStave.spacing.get(firstStave.getBarTopSpacing());
-		var groupBottomY = lastStaveY + lastStave1.spacing.get(lastStave1.getBarBottomSpacing());
-		var barSize = Math.floor(3 * layout.scale);
-		var barOffset = barSize;
-		fill.addRect(this.x - barOffset - barSize,groupTopY,barSize,groupBottomY - groupTopY);
-		var spikeStartX = this.x - barOffset - barSize;
-		var spikeEndX = this.x + barSize * 2;
-		fill.startFigure();
-		fill.moveTo(spikeStartX,groupTopY);
-		fill.bezierTo(spikeStartX,groupTopY,this.x,groupTopY,spikeEndX,groupTopY - barSize);
-		fill.bezierTo(this.x,groupTopY + barSize,spikeStartX,groupTopY + barSize,spikeStartX,groupTopY + barSize);
-		fill.closeFigure();
-		fill.startFigure();
-		fill.moveTo(spikeStartX,groupBottomY);
-		fill.bezierTo(spikeStartX,groupBottomY,this.x,groupBottomY,spikeEndX,groupBottomY + barSize);
-		fill.bezierTo(this.x,groupBottomY - barSize,spikeStartX,groupBottomY - barSize,spikeStartX,groupBottomY - barSize);
-		fill.closeFigure();
-		var lineTopY = firstStaveY + firstStave.spacing.get(firstStave.getLineTopSpacing());
-		var lineBottomY = lastStaveY + lastStave1.spacing.get(lastStave1.getLineBottomSpacing());
-		draw.addLine(this.x,lineTopY,this.x,lineBottomY);
-	}
-}
-alphatab.tablature.model.StaveLine.prototype.__class__ = alphatab.tablature.model.StaveLine;
 alphatab.tablature.drawing.KeySignaturePainter = function() { }
 alphatab.tablature.drawing.KeySignaturePainter.__name__ = ["alphatab","tablature","drawing","KeySignaturePainter"];
 alphatab.tablature.drawing.KeySignaturePainter.paintFlat = function(context,x,y,layout) {
@@ -8479,33 +7948,6 @@ alphatab.tablature.drawing.TripletFeelPainter.paintTripletFeelNone8 = function(c
 	layer.addMusicSymbol(alphatab.tablature.drawing.MusicFont.TripletFeelNone8,x,y,scale);
 }
 alphatab.tablature.drawing.TripletFeelPainter.prototype.__class__ = alphatab.tablature.drawing.TripletFeelPainter;
-alphatab.tablature.model.StaveSpacing = function(size) {
-	if( size === $_ ) return;
-	this.spacing = new Array();
-	var _g = 0;
-	while(_g < size) {
-		var i = _g++;
-		this.spacing.push(0);
-	}
-}
-alphatab.tablature.model.StaveSpacing.__name__ = ["alphatab","tablature","model","StaveSpacing"];
-alphatab.tablature.model.StaveSpacing.prototype.spacing = null;
-alphatab.tablature.model.StaveSpacing.prototype.get = function(index) {
-	var size = 0;
-	var _g = 0;
-	while(_g < index) {
-		var i = _g++;
-		size += this.spacing[i];
-	}
-	return size;
-}
-alphatab.tablature.model.StaveSpacing.prototype.set = function(index,value) {
-	this.spacing[index] = Math.round(value);
-}
-alphatab.tablature.model.StaveSpacing.prototype.getSize = function() {
-	return this.get(this.spacing.length);
-}
-alphatab.tablature.model.StaveSpacing.prototype.__class__ = alphatab.tablature.model.StaveSpacing;
 alphatab.file.FileFormatException = function(message) {
 	if( message === $_ ) return;
 	if(message == null) message = "";
@@ -10230,6 +9672,565 @@ alphatab.model.effects.BendPoint.prototype.getTime = function(duration) {
 	return Math.floor(duration * this.position / 12);
 }
 alphatab.model.effects.BendPoint.prototype.__class__ = alphatab.model.effects.BendPoint;
+alphatab.tablature.staves.TablatureStave = function(line,layout) {
+	if( line === $_ ) return;
+	alphatab.tablature.staves.Stave.call(this,line,layout);
+	this.spacing = new alphatab.tablature.staves.StaveSpacing(18);
+	this.spacing.set(0,Math.floor(15 * layout.scale));
+	this.spacing.set(11,Math.floor(10 * layout.scale));
+	this.spacing.set(12,(line.track.stringCount() - 1) * layout.stringSpacing);
+	this.spacing.set(13,Math.floor(10 * layout.scale));
+	this.spacing.set(17,Math.floor(15 * layout.scale));
+	this._rangeIndices = [0,0];
+}
+alphatab.tablature.staves.TablatureStave.__name__ = ["alphatab","tablature","staves","TablatureStave"];
+alphatab.tablature.staves.TablatureStave.__super__ = alphatab.tablature.staves.Stave;
+for(var k in alphatab.tablature.staves.Stave.prototype ) alphatab.tablature.staves.TablatureStave.prototype[k] = alphatab.tablature.staves.Stave.prototype[k];
+alphatab.tablature.staves.TablatureStave.paintTie = function(layout,layer,x1,y1,x2,y2,down) {
+	if(down == null) down = false;
+	var offset = 15 * layout.scale;
+	var size = 4 * layout.scale;
+	var normalVector = { x : y2 - y1, y : x2 - x1};
+	var length = Math.sqrt(normalVector.x * normalVector.x + normalVector.y * normalVector.y);
+	if(down) normalVector.x *= -1; else normalVector.y *= -1;
+	normalVector.x /= length;
+	normalVector.y /= length;
+	var center = { x : (x2 + x1) / 2, y : (y2 + y1) / 2};
+	var cp1 = { x : center.x + offset * normalVector.x, y : center.y + offset * normalVector.y};
+	var cp2 = { x : center.x + (offset - size) * normalVector.x, y : center.y + (offset - size) * normalVector.y};
+	layer.startFigure();
+	layer.moveTo(x1,y1);
+	layer.quadraticCurveTo(cp1.x,cp1.y,x2,y2);
+	layer.quadraticCurveTo(cp2.x,cp2.y,x1,y1);
+	layer.closeFigure();
+}
+alphatab.tablature.staves.TablatureStave.prototype._rangeIndices = null;
+alphatab.tablature.staves.TablatureStave.prototype.getStaveId = function() {
+	return "tablature";
+}
+alphatab.tablature.staves.TablatureStave.prototype.getBarTopSpacing = function() {
+	return 11;
+}
+alphatab.tablature.staves.TablatureStave.prototype.getBarBottomSpacing = function() {
+	return 14;
+}
+alphatab.tablature.staves.TablatureStave.prototype.getLineTopSpacing = function() {
+	return 12;
+}
+alphatab.tablature.staves.TablatureStave.prototype.getLineBottomSpacing = function() {
+	return 13;
+}
+alphatab.tablature.staves.TablatureStave.prototype.prepare = function(measure) {
+	if(measure.effectsCache.accentuatedNote) this.spacing.set(1,this.layout.effectSpacing);
+	if(measure.effectsCache.letRing) this.spacing.set(3,this.layout.effectSpacing);
+	if(measure.effectsCache.tapSlapPop) this.spacing.set(2,this.layout.effectSpacing);
+	if(measure.effectsCache.palmMute) this.spacing.set(4,this.layout.effectSpacing);
+	if(measure.effectsCache.harmonic) this.spacing.set(8,this.layout.effectSpacing);
+	if(measure.effectsCache.beatVibrato) this.spacing.set(5,this.layout.effectSpacing);
+	if(measure.effectsCache.vibrato) this.spacing.set(6,this.layout.effectSpacing);
+	if(measure.effectsCache.fadeIn) this.spacing.set(7,this.layout.effectSpacing);
+	if(this.line.tablature.getStaveSetting("tablature","rhythm",false) == true) this.spacing.set(15,20 * this.layout.scale);
+	if(measure.effectsCache.bend) {
+		if(this.spacing.spacing[9] < measure.effectsCache.bendOverflow) this.spacing.set(9,measure.effectsCache.bendOverflow);
+	}
+	if(measure.effectsCache.fingering > 0) {
+		var fingeringSpacing = measure.effectsCache.fingering * this.layout.effectSpacing;
+		if(this.spacing.spacing[16] < fingeringSpacing) this.spacing.set(16,fingeringSpacing);
+	}
+	if(measure.effectsCache.tremoloBar) {
+		if(this.spacing.spacing[10] < measure.effectsCache.tremoloBarTopOverflow) this.spacing.set(10,measure.effectsCache.tremoloBarTopOverflow);
+		if(this.spacing.spacing[14] < measure.effectsCache.tremoloBarBottomOverflow) this.spacing.set(14,measure.effectsCache.tremoloBarBottomOverflow);
+	}
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintStave = function(layout,context,x,y) {
+	var lineY = y + this.spacing.get(12);
+	var _g1 = 0, _g = this.line.track.stringCount();
+	while(_g1 < _g) {
+		var i = _g1++;
+		context.get(2).startFigure();
+		context.get(2).addLine(x,lineY,x + this.line.width,lineY);
+		lineY += layout.stringSpacing;
+	}
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintMeasure = function(layout,context,measure,x,y) {
+	var realX = x + measure.x;
+	var w = measure.width + measure.spacing;
+	this.paintDivisions(layout,context,measure,realX,y,5,this.spacing.get(12),this.spacing.spacing[12]);
+	this.paintClef(layout,context,measure,realX,y);
+	realX += measure.getDefaultSpacings(layout);
+	this.paintBeats(layout,context,measure,realX,y);
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintClef = function(layout,context,measure,x,y) {
+	if(!measure.isFirstOfLine()) return;
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintBeats = function(layout,context,measure,x,y) {
+	var _g = 0, _g1 = measure.beats;
+	while(_g < _g1.length) {
+		var beat = _g1[_g];
+		++_g;
+		var bd = beat;
+		this.paintBeat(layout,context,bd,x + bd.x,y);
+	}
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintBeat = function(layout,context,beat,x,y) {
+	var _g = 0, _g1 = beat.voices;
+	while(_g < _g1.length) {
+		var voice = _g1[_g];
+		++_g;
+		this.paintVoice(layout,context,voice,x,y);
+	}
+	this.paintBeatEffects(layout,context,beat,x,y);
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintVoice = function(layout,context,voice,x,y) {
+	if(!voice.isEmpty) {
+		var _g = 0, _g1 = voice.notes;
+		while(_g < _g1.length) {
+			var note = _g1[_g];
+			++_g;
+			this.paintNote(layout,context,note,x,y);
+		}
+		this.paintBeam(layout,context,voice,x,y);
+		this.paintVoiceEffects(layout,context,voice,x,y);
+	}
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintBeam = function(layout,context,voice,x,y) {
+	if(voice.isRestVoice() || this.line.tablature.getStaveSetting("tablature","rhythm",false) == false) return;
+	var fill = voice.index == 0?context.get(9):context.get(5);
+	var draw = voice.index == 0?context.get(12):context.get(8);
+	if(voice.duration.value >= 2) {
+		var key = voice.beat.measure.header.keySignature;
+		var clef = voice.beat.measure.clef;
+		var xMove = voice.maxStringNote.noteSize.x / 2;
+		var y1 = Math.floor(y + this.getNoteTablaturePosY(layout,voice.maxStringNote) + layout.stringSpacing / 1.5);
+		var y2 = y + this.spacing.get(16);
+		draw.addLine(x + xMove,y1,x + xMove,y2);
+		if(voice.duration.value >= 4) {
+			var index = voice.duration.index() - 2;
+			if(index > 0) {
+				var startX;
+				var endX;
+				if(voice.joinedType == alphatab.tablature.model.JoinedType.NoneRight) {
+					startX = Math.round(x + xMove);
+					endX = Math.round(x + 6 * layout.scale + xMove);
+				} else if(voice.joinedType == alphatab.tablature.model.JoinedType.NoneLeft) {
+					startX = Math.round(x - 6 * layout.scale + xMove);
+					endX = Math.round(x + xMove);
+				} else {
+					startX = Math.round(voice.leftJoin.beat.fullX() + xMove);
+					endX = Math.round(voice.rightJoin.beat.fullX() + voice.rightJoin.maxStringNote.noteSize.x / 2);
+				}
+				alphatab.tablature.drawing.NotePainter.paintBar(fill,startX,y2,endX,y2,index,1,layout.scale);
+			}
+		}
+	}
+}
+alphatab.tablature.staves.TablatureStave.prototype.calculateBeamY = function(layout,beatGroup,direction,x,key,clef) {
+	var maxDistance = Math.round(10 * layout.scale);
+	var upOffset = 0;
+	var downOffset = 0;
+	var y;
+	var x1;
+	var x2;
+	var y1;
+	var y2;
+	if(direction == 2) {
+		if(beatGroup.minNote != beatGroup.firstMinNote && beatGroup.minNote != beatGroup.lastMinNote) return this.getNoteTablaturePosY(layout,beatGroup.minNote) + downOffset;
+		y = 0;
+		x1 = beatGroup.firstMinNote.voice.beat.fullX();
+		x2 = beatGroup.lastMinNote.voice.beat.fullX();
+		y1 = Math.round(this.getNoteTablaturePosY(layout,beatGroup.firstMinNote) + downOffset);
+		y2 = Math.round(this.getNoteTablaturePosY(layout,beatGroup.lastMinNote) + downOffset);
+		if(y1 > y2 && y1 - y2 > maxDistance) y2 = y1 - maxDistance;
+		if(y2 > y1 && y2 - y1 > maxDistance) y1 = y2 - maxDistance;
+		if(y1 - y2 != 0 && x1 - x2 != 0 && x1 - x != 0) y = Math.round((y1 - y2) / (x1 - x2) * (x1 - x));
+		return y1 - y;
+	} else {
+		if(beatGroup.maxNote != beatGroup.firstMaxNote && beatGroup.maxNote != beatGroup.lastMaxNote) return this.getNoteTablaturePosY(layout,beatGroup.maxNote) - upOffset;
+		y = 0;
+		x1 = beatGroup.firstMaxNote.voice.beat.fullX();
+		x2 = beatGroup.lastMaxNote.voice.beat.fullX();
+		y1 = Math.round(this.getNoteTablaturePosY(layout,beatGroup.firstMaxNote) - upOffset);
+		y2 = Math.round(this.getNoteTablaturePosY(layout,beatGroup.lastMaxNote) - upOffset);
+		if(y1 < y2 && y2 - y1 > maxDistance) y2 = y1 + maxDistance;
+		if(y2 < y1 && y1 - y2 > maxDistance) y1 = y2 + maxDistance;
+		if(y1 - y2 != 0 && x1 - x2 != 0 && x1 - x != 0) y = Math.round((y1 - y2) / (x1 - x2) * (x1 - x));
+		return y1 - y;
+	}
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintNote = function(layout,context,note,x,y) {
+	var tabX = note.noteSize.x / 2;
+	var realX = x;
+	var realY = y + this.getNoteTablaturePosY(layout,note);
+	var fill = note.voice.index == 0?context.get(9):context.get(5);
+	if(!note.isTiedNote) {
+		var visualNote = note.effect.deadNote?"X":Std.string(note.value);
+		visualNote = note.effect.ghostNote?"(" + visualNote + ")":visualNote;
+		fill.addString(visualNote,alphatab.tablature.drawing.DrawingResources.noteFont,realX,realY);
+	}
+	this.paintEffects(layout,context,note,x,y,realY);
+}
+alphatab.tablature.staves.TablatureStave.prototype.getNoteTablaturePosY = function(layout,note) {
+	return this.spacing.get(12) + Math.round((note.string - 1) * layout.stringSpacing);
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintVoiceEffects = function(layout,context,voice,x,y) {
+	if(voice.isEmpty || voice.isRestVoice()) return;
+	this.paintAccentuatedNote(layout,context,voice,x,y);
+	this.paintLetRing(layout,context,voice,x,y);
+	this.paintPalmMute(layout,context,voice,x,y);
+	this.paintNoteVibrato(layout,context,voice,x,y);
+	this.paintHarmonics(layout,context,voice,x,y);
+	this.paintFingering(layout,context,voice,x,y);
+	this.paintTrillBeat(layout,context,voice,x,y);
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintEffects = function(layout,context,note,x,y,noteY) {
+	this.paintGrace(layout,context,note,x,noteY);
+	this.paintHammerOn(layout,context,note,x,noteY);
+	this.paintBend(layout,context,note,x,noteY);
+	this.paintSlides(layout,context,note,x,noteY);
+	this.paintTrillNote(layout,context,note,x,noteY);
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintGrace = function(layout,context,note,x,y) {
+	if(!note.effect.isGrace()) return;
+	var fill = note.voice.index == 0?context.get(10):context.get(6);
+	var value = note.effect.grace.isDead?"X":Std.string(note.effect.grace.fret);
+	fill.addString(value,alphatab.tablature.drawing.DrawingResources.graceFont,x - Math.round(7 * layout.scale),y);
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintAccentuatedNote = function(layout,context,voice,x,y) {
+	if(!voice.effectsCache.accentuatedNote && !voice.effectsCache.heavyAccentuatedNote) return;
+	var realX = x + voice.minNote.noteSize.x / 2;
+	var realY = y + this.spacing.get(1);
+	var layer = voice.index == 0?context.get(9):context.get(5);
+	var symbol = voice.effectsCache.accentuatedNote?alphatab.tablature.drawing.MusicFont.AccentuatedNote:alphatab.tablature.drawing.MusicFont.HeavyAccentuatedNote;
+	layer.addMusicSymbol(symbol,realX,realY,layout.scale);
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintLetRing = function(layout,context,voice,x,y) {
+	if(!voice.effectsCache.letRing) return;
+	var realY = y + this.spacing.get(3);
+	var nextVoice = voice.getNextVoice();
+	var previousVoice = voice.getPreviousVoice();
+	var nextVoiceRing = nextVoice != null && nextVoice.effectsCache.letRing;
+	var previousVoiceRing = previousVoice != null && previousVoice.effectsCache.letRing;
+	this.paintRange(layout,context,voice,x,realY,"ring",nextVoice,nextVoiceRing,previousVoice,previousVoiceRing,0);
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintPalmMute = function(layout,context,voice,x,y) {
+	if(!voice.effectsCache.palmMute) return;
+	var realY = y + this.spacing.get(4);
+	var nextVoice = voice.getNextVoice();
+	var previousVoice = voice.getPreviousVoice();
+	var nextVoicePm = nextVoice != null && nextVoice.effectsCache.palmMute;
+	var previousVoicePm = previousVoice != null && previousVoice.effectsCache.palmMute;
+	this.paintRange(layout,context,voice,x,realY,"P.M.",nextVoice,nextVoicePm,previousVoice,previousVoicePm,1);
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintRange = function(layout,context,voice,startX,y,label,nextVoice,nextVoiceEffect,previousVoice,previousVoiceEffect,startOffsetIndex) {
+	var endX = startX + voice.beat.fullWidth();
+	var prevOnSameStaveLine = previousVoice != null && previousVoice.beat.measure.staveLine == voice.beat.measure.staveLine;
+	var nextOnSameStaveLine = nextVoice != null && nextVoice.beat.measure.staveLine == voice.beat.measure.staveLine;
+	var fill = voice.index == 0?context.get(9):context.get(5);
+	var draw = voice.index == 0?context.get(12):context.get(8);
+	draw.startFigure();
+	y += alphatab.tablature.drawing.DrawingResources.effectFontHeight;
+	var isEnd = !nextVoiceEffect || !nextOnSameStaveLine;
+	if(isEnd) {
+		var offset = 8 * layout.scale;
+		endX -= offset;
+	}
+	if(!prevOnSameStaveLine || !previousVoiceEffect) {
+		fill.addString(label,alphatab.tablature.drawing.DrawingResources.effectFont,startX,y);
+		context.graphics.setFont(alphatab.tablature.drawing.DrawingResources.effectFont);
+		var offset = context.graphics.measureText(label) + 4 * layout.scale;
+		startX += offset;
+		this._rangeIndices[startOffsetIndex] = startX;
+	} else if(prevOnSameStaveLine && voice.beat == voice.beat.measure.beats[0]) startX -= previousVoice.beat.measure.getDefaultSpacings(layout);
+	if(isEnd) {
+		draw.startFigure();
+		draw.addDashedLine(this._rangeIndices[startOffsetIndex],y,endX,y);
+		var size = 8 * layout.scale;
+		draw.startFigure();
+		draw.addLine(endX,y - size / 2,endX,y + size / 2);
+	}
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintNoteVibrato = function(layout,context,voice,x,y) {
+	if(!voice.effectsCache.vibrato) return;
+	var fill = voice.index == 0?context.get(10):context.get(6);
+	var width = voice.beat.fullWidth();
+	this.paintVibrato(layout,fill,x,y + this.spacing.get(6),width,0.75);
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintVibrato = function(layout,layer,x,y,w,symbolScale) {
+	if(symbolScale == null) symbolScale = 1;
+	var step = 18 * layout.scale * symbolScale;
+	var loops = Math.floor(Math.max(1,w / step));
+	var _g = 0;
+	while(_g < loops) {
+		var i = _g++;
+		layer.addMusicSymbol(alphatab.tablature.drawing.MusicFont.VibratoLeftRight,x,y,layout.scale * symbolScale);
+		x += Math.floor(step);
+	}
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintTrillNote = function(layout,context,note,x,y) {
+	if(!note.effect.isTrill()) return;
+	var fill = note.voice.index == 0?context.get(10):context.get(6);
+	var str = "(" + note.effect.trill.fret + ")";
+	fill.addString(str,alphatab.tablature.drawing.DrawingResources.graceFont,x + 2 * note.noteSize.x,y);
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintTrillBeat = function(layout,context,voice,x,y) {
+	if(!voice.effectsCache.trill) return;
+	var fill = voice.index == 0?context.get(10):context.get(6);
+	fill.addString("Tr",alphatab.tablature.drawing.DrawingResources.effectFont,x,y + this.spacing.get(6));
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintHarmonics = function(layout,context,voice,x,y) {
+	if(!voice.effectsCache.harmonic) return;
+	var key = "";
+	switch(voice.effectsCache.harmonicType) {
+	case 0:
+		key = "Harm";
+		break;
+	case 1:
+		key = "A.H";
+		break;
+	case 2:
+		key = "T.H";
+		break;
+	case 3:
+		key = "P.H";
+		break;
+	case 4:
+		key = "S.H";
+		break;
+	}
+	var fill = voice.index == 0?context.get(10):context.get(6);
+	fill.addString(key,alphatab.tablature.drawing.DrawingResources.effectFont,x,y + this.spacing.get(8));
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintFingering = function(layout,context,voice,x,y) {
+	if(voice.effectsCache.fingering == 0) return;
+	y += Math.round(alphatab.tablature.drawing.DrawingResources.effectFontHeight / 2);
+	var fill = voice.index == 0?context.get(10):context.get(6);
+	var y2 = y + this.spacing.get(16);
+	var _g = 0, _g1 = voice.effectsCache.leftHandFingering;
+	while(_g < _g1.length) {
+		var fingering = _g1[_g];
+		++_g;
+		if(fingering != -2 && fingering != -1) {
+			var str = "";
+			switch(fingering) {
+			case 0:
+				str = "T";
+				break;
+			case 1:
+				str = "1";
+				break;
+			case 2:
+				str = "2";
+				break;
+			case 3:
+				str = "3";
+				break;
+			case 4:
+				str = "4";
+				break;
+			}
+			fill.addString(str,alphatab.tablature.drawing.DrawingResources.effectFont,x,y2);
+		}
+		y2 += Math.floor(layout.effectSpacing);
+	}
+	var _g = 0, _g1 = voice.effectsCache.rightHandFingering;
+	while(_g < _g1.length) {
+		var fingering = _g1[_g];
+		++_g;
+		if(fingering != -2 && fingering != -1) {
+			var str = "";
+			switch(fingering) {
+			case 0:
+				str = "p";
+				break;
+			case 1:
+				str = "i";
+				break;
+			case 2:
+				str = "m";
+				break;
+			case 3:
+				str = "a";
+				break;
+			case 4:
+				str = "c";
+				break;
+			}
+			fill.addString(str,alphatab.tablature.drawing.DrawingResources.effectFont,x,y2);
+		}
+		y2 += Math.floor(layout.effectSpacing);
+	}
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintHammerOn = function(layout,context,note,x,y) {
+	if(!note.effect.hammer) return;
+	var nextBeat = note.voice.beat.getNextBeat();
+	var nextNote = nextBeat == null?null:nextBeat.getNote(note.voice.index,note.string);
+	var down = note.string > 3 || nextNote == null;
+	var fill = note.voice.index == 0?context.get(10):context.get(6);
+	var realX = x + note.noteSize.x / 2;
+	var realY = down?y + alphatab.tablature.drawing.DrawingResources.noteFontHeight / 2:y - alphatab.tablature.drawing.DrawingResources.noteFontHeight / 2;
+	var endX = nextNote != null?x + note.voice.beat.fullWidth() + nextNote.noteSize.x / 2:realX + 15 * layout.scale;
+	alphatab.tablature.staves.TablatureStave.paintTie(layout,fill,realX,realY,endX,realY,down);
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintBend = function(layout,context,note,x,y) {
+	if(!note.effect.isBend()) return;
+	var scale = layout.scale;
+	x += Math.floor(note.noteSize.x);
+	var endX = x + note.voice.beat.fullWidth();
+	var minY = y - 60 * scale;
+	var fill = note.voice.index == 0?context.get(10):context.get(6);
+	var draw = note.voice.index == 0?context.get(11):context.get(7);
+	if(note.effect.bend.points.length >= 2) {
+		var dX = (endX - x) / 12;
+		var dY = (y - minY) / 12;
+		draw.startFigure();
+		var _g1 = 0, _g = note.effect.bend.points.length - 1;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var firstPt = note.effect.bend.points[i];
+			var secondPt = note.effect.bend.points[i + 1];
+			if(firstPt.value == secondPt.value && i == note.effect.bend.points.length - 2) continue;
+			var firstLoc = new alphatab.model.Point(x + dX * firstPt.position,y - dY * firstPt.value);
+			var secondLoc = new alphatab.model.Point(x + dX * secondPt.position,y - dY * secondPt.value);
+			var firstHelper = new alphatab.model.Point(firstLoc.x + (secondLoc.x - firstLoc.x),y - dY * firstPt.value);
+			draw.addBezier(firstLoc.x,firstLoc.y,firstHelper.x,firstHelper.y,secondLoc.x,secondLoc.y,secondLoc.x,secondLoc.y);
+			var arrowSize = 3 * scale;
+			if(secondPt.value > firstPt.value) {
+				draw.addLine(secondLoc.x - 0.5,secondLoc.y,secondLoc.x - arrowSize - 0.5,secondLoc.y + arrowSize);
+				draw.addLine(secondLoc.x - 0.5,secondLoc.y,secondLoc.x + arrowSize - 0.5,secondLoc.y + arrowSize);
+			} else if(secondPt.value != firstPt.value) {
+				draw.addLine(secondLoc.x - 0.5,secondLoc.y,secondLoc.x - arrowSize - 0.5,secondLoc.y - arrowSize);
+				draw.addLine(secondLoc.x - 0.5,secondLoc.y,secondLoc.x + arrowSize - 0.5,secondLoc.y - arrowSize);
+			}
+			if(secondPt.value != 0) {
+				var dV = (secondPt.value - firstPt.value) * 0.25;
+				var up = dV > 0;
+				dV = Math.abs(dV);
+				var s = "";
+				if(dV == 1) s = "full"; else if(dV > 1) {
+					s += Std.string(Math.floor(dV)) + " ";
+					dV -= Math.floor(dV);
+				}
+				if(dV == 0.25) s += "1/4"; else if(dV == 0.5) s += "1/2"; else if(dV == 0.75) s += "3/4";
+				context.graphics.setFont(alphatab.tablature.drawing.DrawingResources.defaultFont);
+				var size = context.graphics.measureText(s);
+				var y1 = up?secondLoc.y - alphatab.tablature.drawing.DrawingResources.defaultFontHeight + 2 * scale:secondLoc.y + alphatab.tablature.drawing.DrawingResources.defaultFontHeight / 2 + 2 * scale;
+				var x1 = secondLoc.x - size / 2;
+				fill.addString(s,alphatab.tablature.drawing.DrawingResources.defaultFont,x1,y1);
+			}
+		}
+	}
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintSlides = function(layout,context,note,x,y) {
+	if(!note.effect.slide) return;
+	var xOffset = note.noteSize.x * 2;
+	var xMove = 15.0 * layout.scale;
+	var yMove = 3.0 * layout.scale;
+	var draw = note.voice.index == 0?context.get(11):context.get(7);
+	draw.startFigure();
+	if(note.effect.slideType == 4) draw.addLine(x - xMove,y + yMove,x,y - yMove); else if(note.effect.slideType == 5) draw.addLine(x - xMove,y - yMove,x,y + yMove); else if(note.effect.slideType == 2) draw.addLine(x + xOffset,y - yMove,x + xOffset + xMove,y + yMove); else if(note.effect.slideType == 3) draw.addLine(x + xOffset,y + yMove,x + xOffset + xMove,y - yMove); else {
+		var nextBeat = note.voice.beat.getNextBeat();
+		var nextNote = nextBeat == null?null:nextBeat.getNote(note.voice.index,note.string);
+		if(nextNote != null) {
+			if(nextNote.value < note.value) draw.addLine(x + xOffset,y - yMove,x + note.voice.beat.fullWidth(),y + yMove); else if(nextNote.value > note.value) draw.addLine(x + xOffset,y + yMove,x + note.voice.beat.fullWidth(),y - yMove); else draw.addLine(x + xOffset,y,x + note.voice.beat.fullWidth(),y);
+			if(note.effect.slideType == 1) {
+				this.paintHammerOn(layout,context,note,x,y);
+				var down = note.string > 3;
+				var realX = x + note.noteSize.x / 2;
+				var realY = down?y + alphatab.tablature.drawing.DrawingResources.noteFontHeight / 2:y - alphatab.tablature.drawing.DrawingResources.noteFontHeight / 2;
+				var endX = nextNote != null?x + note.voice.beat.fullWidth() + nextNote.noteSize.x / 2:realX + 15 * layout.scale;
+				var fill = note.voice.index == 0?context.get(10):context.get(6);
+				alphatab.tablature.staves.TablatureStave.paintTie(layout,fill,realX,realY,endX,realY,down);
+			}
+		} else draw.addLine(x + xOffset,y,x + note.voice.beat.fullWidth(),y);
+	}
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintBeatEffects = function(layout,context,beat,x,y) {
+	this.paintTremoloBar(layout,context,beat.getMinNote(),x,y);
+	this.paintBeatVibrato(layout,context,beat,x,y);
+	this.paintTabSlapPop(layout,context,beat,x,y);
+	this.paintFadeIn(layout,context,beat,x,y);
+	this.paintStroke(layout,context,beat,x,y);
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintTremoloBar = function(layout,context,note,x,y) {
+	if(note == null) return;
+	var beat = note.voice.beat;
+	if(!beat.effect.isTremoloBar()) return;
+	var scale = layout.scale;
+	y = y + this.spacing.get(12) + Math.round((note.string - 1) * layout.stringSpacing);
+	x += Math.floor(note.noteSize.x);
+	var endX = x + beat.fullWidth();
+	var minY = y - 60 * scale;
+	var fill = note.voice.index == 0?context.get(10):context.get(6);
+	var draw = note.voice.index == 0?context.get(11):context.get(7);
+	if(beat.effect.tremoloBar.points.length >= 2) {
+		var dX = (endX - x) / 12;
+		var dY = (y - minY) / 12;
+		draw.startFigure();
+		var _g1 = 0, _g = beat.effect.tremoloBar.points.length - 1;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var firstPt = beat.effect.tremoloBar.points[i];
+			var secondPt = beat.effect.tremoloBar.points[i + 1];
+			if(firstPt.value == secondPt.value && i == beat.effect.tremoloBar.points.length - 2) continue;
+			var firstLoc = new alphatab.model.Point(x + dX * firstPt.position,y - dY * firstPt.value);
+			var secondLoc = new alphatab.model.Point(x + dX * secondPt.position,y - dY * secondPt.value);
+			draw.addLine(firstLoc.x,firstLoc.y,secondLoc.x,secondLoc.y);
+			if(secondPt.value != 0) {
+				var dV = secondPt.value * 0.5;
+				var up = secondPt.value - firstPt.value >= 0;
+				var s = "";
+				if(dV < 0) s += "-";
+				if(dV >= 1 || dV <= -1) s += Std.string(Math.floor(Math.abs(dV))) + " "; else if(dV < 0) s += "-";
+				dV -= Math.floor(dV);
+				if(dV == 0.25) s += "1/4"; else if(dV == 0.5) s += "1/2"; else if(dV == 0.75) s += "3/4";
+				context.graphics.setFont(alphatab.tablature.drawing.DrawingResources.defaultFont);
+				var size = context.graphics.measureText(s);
+				var sY = up?secondLoc.y - alphatab.tablature.drawing.DrawingResources.defaultFontHeight - 3 * scale:secondLoc.y + 3 * scale;
+				var sX = secondLoc.x - size / 2;
+				fill.addString(s,alphatab.tablature.drawing.DrawingResources.defaultFont,sX,sY);
+			}
+		}
+	}
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintBeatVibrato = function(layout,context,beat,x,y) {
+	if(!beat.effect.vibrato) return;
+	var width = beat.fullWidth();
+	this.paintVibrato(layout,context.get(10),x,y + this.spacing.get(5),width,1);
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintTabSlapPop = function(layout,context,beat,x,y) {
+	var fill = context.get(10);
+	var realY = y + this.spacing.get(2);
+	if(beat.effect.tapping) fill.addString("T",alphatab.tablature.drawing.DrawingResources.defaultFont,x,realY); else if(beat.effect.slapping) fill.addString("S",alphatab.tablature.drawing.DrawingResources.defaultFont,x,realY); else if(beat.effect.popping) fill.addString("P",alphatab.tablature.drawing.DrawingResources.defaultFont,x,realY);
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintFadeIn = function(layout,context,beat,x,y) {
+	if(!beat.effect.fadeIn) return;
+	y += this.spacing.get(7);
+	var size = Math.round(4.0 * layout.scale);
+	var width = beat.fullWidth();
+	var layer = context.get(12);
+	layer.startFigure();
+	layer.addBezier(x,y,x,y,x + width,y,x + width,y - size);
+	layer.startFigure();
+	layer.addBezier(x,y,x,y,x + width,y,x + width,y + size);
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintStroke = function(layout,context,beat,x,y) {
+	if(beat.effect.stroke.direction == 0) return;
+	x -= Math.floor(2 * layout.scale);
+	var topY = y + this.spacing.get(12);
+	var bottomY = topY + Math.round((beat.measure.track.stringCount() - 1) * layout.stringSpacing);
+	var layer = context.get(4);
+	layer.startFigure();
+	layer.startFigure();
+	layer.addLine(x,topY,x,bottomY);
+	if(beat.effect.stroke.direction == 1) {
+		layer.addLine(x,topY,x + 3,topY + 5);
+		layer.addLine(x,topY,x - 3,topY + 5);
+	} else {
+		layer.addLine(x,bottomY,x + 3,bottomY - 5);
+		layer.addLine(x,bottomY,x - 3,bottomY - 5);
+	}
+}
+alphatab.tablature.staves.TablatureStave.prototype.__class__ = alphatab.tablature.staves.TablatureStave;
 alphatab.tablature.Tablature = function(source,staves,msg) {
 	if( source === $_ ) return;
 	if(msg == null) msg = "";
@@ -11022,25 +11023,6 @@ alphatab.file.gpx.score.GpxDrumkit.DRUMKITS = (function($this) {
 	$r = kits;
 	return $r;
 }(this));
-alphatab.tablature.model.TablatureStave.STAVE_ID = "tablature";
-alphatab.tablature.model.TablatureStave.TopPadding = 0;
-alphatab.tablature.model.TablatureStave.AccentuatedNote = 1;
-alphatab.tablature.model.TablatureStave.TapingEffect = 2;
-alphatab.tablature.model.TablatureStave.LetRing = 3;
-alphatab.tablature.model.TablatureStave.PalmMute = 4;
-alphatab.tablature.model.TablatureStave.BeatVibrato = 5;
-alphatab.tablature.model.TablatureStave.NoteVibrato = 6;
-alphatab.tablature.model.TablatureStave.FadeIn = 7;
-alphatab.tablature.model.TablatureStave.Harmonics = 8;
-alphatab.tablature.model.TablatureStave.Bends = 9;
-alphatab.tablature.model.TablatureStave.TremoloBarTop = 10;
-alphatab.tablature.model.TablatureStave.TablatureTopSeparator = 11;
-alphatab.tablature.model.TablatureStave.Tablature = 12;
-alphatab.tablature.model.TablatureStave.TablatureBottomSeparator = 13;
-alphatab.tablature.model.TablatureStave.TremoloBarBottom = 14;
-alphatab.tablature.model.TablatureStave.Rhythm = 15;
-alphatab.tablature.model.TablatureStave.Fingering = 16;
-alphatab.tablature.model.TablatureStave.BottomPadding = 17;
 alphatab.model.Measure.DEFAULT_CLEF = 0;
 alphatab.model.BeatStrokeDirection.None = 0;
 alphatab.model.BeatStrokeDirection.Up = 1;
@@ -11107,6 +11089,8 @@ alphatab.model.SlideType.IntoFromBelow = 4;
 alphatab.model.SlideType.IntoFromAbove = 5;
 alphatab.file.gpx.FileSystem.HEADER_BCFS = 1397113666;
 alphatab.file.gpx.FileSystem.HEADER_BCFZ = 1514554178;
+alphatab.tablature.staves.StaveLine.TopPadding = 0;
+alphatab.tablature.staves.StaveLine.BottomSpacing = 1;
 js.Lib.onerror = null;
 alphatab.model.effects.GraceEffectTransition.None = 0;
 alphatab.model.effects.GraceEffectTransition.Slide = 1;
@@ -11119,28 +11103,6 @@ alphatab.model.effects.FingeringType.IndexFinger = 1;
 alphatab.model.effects.FingeringType.MiddleFinger = 2;
 alphatab.model.effects.FingeringType.AnnularFinger = 3;
 alphatab.model.effects.FingeringType.LittleFinger = 4;
-alphatab.tablature.model.ScoreStave.SCORE_KEYSHARP_POSITIONS = [0,3,-1,2,5,1,4];
-alphatab.tablature.model.ScoreStave.SCORE_KEYFLAT_POSITIONS = [4,1,5,2,6,3,7];
-alphatab.tablature.model.ScoreStave.SCORE_SHARP_POSITIONS = [7,7,6,6,5,4,4,3,3,2,2,1];
-alphatab.tablature.model.ScoreStave.SCORE_FLAT_POSITIONS = [7,6,6,5,5,4,3,3,2,2,1,1];
-alphatab.tablature.model.ScoreStave.SCORE_CLEF_OFFSETS = [30,18,22,24];
-alphatab.tablature.model.ScoreStave.UP_OFFSET = 28;
-alphatab.tablature.model.ScoreStave.DOWN_OFFSET = 28;
-alphatab.tablature.model.ScoreStave.TS_NUMBER_SIZE = 10;
-alphatab.tablature.model.ScoreStave.STAVE_ID = "score";
-alphatab.tablature.model.ScoreStave.TopPadding = 0;
-alphatab.tablature.model.ScoreStave.Text = 1;
-alphatab.tablature.model.ScoreStave.Marker = 2;
-alphatab.tablature.model.ScoreStave.Chord = 3;
-alphatab.tablature.model.ScoreStave.TripletFeels = 4;
-alphatab.tablature.model.ScoreStave.Tempo = 5;
-alphatab.tablature.model.ScoreStave.Triplet = 6;
-alphatab.tablature.model.ScoreStave.RepeatEnding = 7;
-alphatab.tablature.model.ScoreStave.ScoreTopPadding = 8;
-alphatab.tablature.model.ScoreStave.ScoreTopLines = 9;
-alphatab.tablature.model.ScoreStave.ScoreMiddleLines = 10;
-alphatab.tablature.model.ScoreStave.ScoreBottomLines = 11;
-alphatab.tablature.model.ScoreStave.BottomPadding = 12;
 alphatab.model.effects.BendEffect.SEMITONE_LENGTH = 1;
 alphatab.model.effects.BendEffect.MAX_POSITION = 12;
 alphatab.model.effects.BendEffect.MAX_VALUE = 12;
@@ -11200,6 +11162,28 @@ alphatab.model.HeaderFooterElements.WORDS_AND_MUSIC = 64;
 alphatab.model.HeaderFooterElements.COPYRIGHT = 128;
 alphatab.model.HeaderFooterElements.PAGE_NUMBER = 256;
 alphatab.model.HeaderFooterElements.ALL = 511;
+alphatab.tablature.staves.ScoreStave.SCORE_KEYSHARP_POSITIONS = [0,3,-1,2,5,1,4];
+alphatab.tablature.staves.ScoreStave.SCORE_KEYFLAT_POSITIONS = [4,1,5,2,6,3,7];
+alphatab.tablature.staves.ScoreStave.SCORE_SHARP_POSITIONS = [7,7,6,6,5,4,4,3,3,2,2,1];
+alphatab.tablature.staves.ScoreStave.SCORE_FLAT_POSITIONS = [7,6,6,5,5,4,3,3,2,2,1,1];
+alphatab.tablature.staves.ScoreStave.SCORE_CLEF_OFFSETS = [30,18,22,24];
+alphatab.tablature.staves.ScoreStave.UP_OFFSET = 28;
+alphatab.tablature.staves.ScoreStave.DOWN_OFFSET = 28;
+alphatab.tablature.staves.ScoreStave.TS_NUMBER_SIZE = 10;
+alphatab.tablature.staves.ScoreStave.STAVE_ID = "score";
+alphatab.tablature.staves.ScoreStave.TopPadding = 0;
+alphatab.tablature.staves.ScoreStave.Text = 1;
+alphatab.tablature.staves.ScoreStave.Marker = 2;
+alphatab.tablature.staves.ScoreStave.Chord = 3;
+alphatab.tablature.staves.ScoreStave.TripletFeels = 4;
+alphatab.tablature.staves.ScoreStave.Tempo = 5;
+alphatab.tablature.staves.ScoreStave.Triplet = 6;
+alphatab.tablature.staves.ScoreStave.RepeatEnding = 7;
+alphatab.tablature.staves.ScoreStave.ScoreTopPadding = 8;
+alphatab.tablature.staves.ScoreStave.ScoreTopLines = 9;
+alphatab.tablature.staves.ScoreStave.ScoreMiddleLines = 10;
+alphatab.tablature.staves.ScoreStave.ScoreBottomLines = 11;
+alphatab.tablature.staves.ScoreStave.BottomPadding = 12;
 alphatab.model.MidiChannel.DEFAULT_PERCUSSION_CHANNEL = 9;
 alphatab.model.MidiChannel.DEFAULT_INSTRUMENT = 25;
 alphatab.model.MidiChannel.DEFAULT_VOLUME = 127;
@@ -11212,8 +11196,6 @@ alphatab.io.DataStream.TWOeN23 = Math.pow(2,-23);
 alphatab.model.TripletFeel.None = 0;
 alphatab.model.TripletFeel.Eighth = 1;
 alphatab.model.TripletFeel.Sixteenth = 2;
-alphatab.tablature.model.StaveLine.TopPadding = 0;
-alphatab.tablature.model.StaveLine.BottomSpacing = 1;
 alphatab.model.Tuplet.NORMAL = new alphatab.model.Tuplet();
 alphatab.model.effects.HarmonicType.None = -1;
 alphatab.model.effects.HarmonicType.Natural = 0;
@@ -11242,6 +11224,25 @@ alphatab.model.MeasureClef.Treble = 0;
 alphatab.model.MeasureClef.Bass = 1;
 alphatab.model.MeasureClef.Tenor = 2;
 alphatab.model.MeasureClef.Alto = 3;
+alphatab.tablature.staves.TablatureStave.STAVE_ID = "tablature";
+alphatab.tablature.staves.TablatureStave.TopPadding = 0;
+alphatab.tablature.staves.TablatureStave.AccentuatedNote = 1;
+alphatab.tablature.staves.TablatureStave.TapingEffect = 2;
+alphatab.tablature.staves.TablatureStave.LetRing = 3;
+alphatab.tablature.staves.TablatureStave.PalmMute = 4;
+alphatab.tablature.staves.TablatureStave.BeatVibrato = 5;
+alphatab.tablature.staves.TablatureStave.NoteVibrato = 6;
+alphatab.tablature.staves.TablatureStave.FadeIn = 7;
+alphatab.tablature.staves.TablatureStave.Harmonics = 8;
+alphatab.tablature.staves.TablatureStave.Bends = 9;
+alphatab.tablature.staves.TablatureStave.TremoloBarTop = 10;
+alphatab.tablature.staves.TablatureStave.TablatureTopSeparator = 11;
+alphatab.tablature.staves.TablatureStave.Tablature = 12;
+alphatab.tablature.staves.TablatureStave.TablatureBottomSeparator = 13;
+alphatab.tablature.staves.TablatureStave.TremoloBarBottom = 14;
+alphatab.tablature.staves.TablatureStave.Rhythm = 15;
+alphatab.tablature.staves.TablatureStave.Fingering = 16;
+alphatab.tablature.staves.TablatureStave.BottomPadding = 17;
 alphatab.tablature.Tablature.DEFAULT_LAYOUT = alphatab.tablature.PageViewLayout.LAYOUT_ID;
 alphatab.model.effects.BendTypes.None = 0;
 alphatab.model.effects.BendTypes.Bend = 1;

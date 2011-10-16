@@ -31,8 +31,8 @@ import alphatab.tablature.drawing.DrawingContext;
 import alphatab.tablature.drawing.DrawingLayers;
 import alphatab.tablature.drawing.DrawingResources;
 import alphatab.tablature.model.MeasureDrawing;
-import alphatab.tablature.model.StaveFactory;
-import alphatab.tablature.model.StaveLine;
+import alphatab.tablature.staves.StaveFactory;
+import alphatab.tablature.staves.StaveLine;
 
 
 /**

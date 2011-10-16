@@ -14,42 +14,24 @@
  *  You should have received a copy of the GNU General Public License
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
-package alphatab.tablature.model;
+package alphatab.tablature.staves;
+import alphatab.tablature.ViewLayout;
 
 /**
- * Encapsulates the storage of spacing offsets for a stave.
+ * This factory provides staves according to their key
  */
-class StaveSpacing 
+class StaveFactory
 {
-    public var spacing:Array<Int>;
-    
-    public function new(size:Int) 
+    public static function getStave(id:String, line:StaveLine, layout:ViewLayout) : Stave
     {
-        spacing = new Array<Int>();
-        for (i in 0 ... size)
+        switch(id)
         {
-            spacing.push(0);
+            case ScoreStave.STAVE_ID:
+                return new ScoreStave(line, layout);
+            case TablatureStave.STAVE_ID:
+                return new TablatureStave(line, layout);
         }
-    }
-    
-    public function get(index:Int) : Int
-    {
-        var size:Int = 0;
-        for (i in 0 ... index) 
-        {
-            size += spacing[i];
-        }
-        return size;
-    }
-    
-    public function set(index:Int, value:Float) : Void
-    {
-        spacing[index] = Math.round(value);
-    }
-    
-    public function getSize() : Int
-    {
-        return this.get(spacing.length);
+        return null;
     }
     
 }

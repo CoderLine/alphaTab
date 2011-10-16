@@ -21,7 +21,7 @@ import alphatab.model.Rectangle;
 import alphatab.model.Track;
 import alphatab.tablature.drawing.DrawingContext;
 import alphatab.tablature.model.MeasureDrawing;
-import alphatab.tablature.model.StaveLine;
+import alphatab.tablature.staves.StaveLine;
 
 /**
  * This layout renders all measures in one single line

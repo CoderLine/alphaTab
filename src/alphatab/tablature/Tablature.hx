@@ -30,8 +30,8 @@ import alphatab.model.SongManager;
 import alphatab.platform.Canvas;
 import alphatab.platform.PlatformFactory;
 import alphatab.tablature.drawing.DrawingResources;
-import alphatab.tablature.model.ScoreStave;
-import alphatab.tablature.model.TablatureStave;
+import alphatab.tablature.staves.ScoreStave;
+import alphatab.tablature.staves.TablatureStave;
 
 /**
  * A helper type used for searching measures. 

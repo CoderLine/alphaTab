@@ -14,7 +14,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
-package alphatab.tablature.model;
+package alphatab.tablature.staves;
+
 import alphatab.model.BeatStrokeDirection;
 import alphatab.model.Color;
 import alphatab.model.Duration;
@@ -33,6 +34,12 @@ import alphatab.tablature.drawing.DrawingLayers;
 import alphatab.tablature.drawing.DrawingResources;
 import alphatab.tablature.drawing.MusicFont;
 import alphatab.tablature.drawing.NotePainter;
+import alphatab.tablature.model.BeatDrawing;
+import alphatab.tablature.model.BeatGroup;
+import alphatab.tablature.model.JoinedType;
+import alphatab.tablature.model.MeasureDrawing;
+import alphatab.tablature.model.NoteDrawing;
+import alphatab.tablature.model.VoiceDrawing;
 import alphatab.tablature.ViewLayout;
 
 /**

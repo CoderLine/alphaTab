@@ -27,10 +27,10 @@ import alphatab.tablature.drawing.DrawingContext;
 import alphatab.tablature.drawing.DrawingLayers;
 import alphatab.tablature.drawing.DrawingResources;
 import alphatab.tablature.model.MeasureDrawing;
-import alphatab.tablature.model.ScoreStave;
-import alphatab.tablature.model.StaveLine;
-import alphatab.tablature.model.StaveSpacing;
-import alphatab.tablature.model.TablatureStave;
+import alphatab.tablature.staves.ScoreStave;
+import alphatab.tablature.staves.StaveLine;
+import alphatab.tablature.staves.StaveSpacing;
+import alphatab.tablature.staves.TablatureStave;
 
 /**
  * This layout renders measures in form of a page. 

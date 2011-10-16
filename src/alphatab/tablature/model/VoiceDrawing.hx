@@ -21,6 +21,7 @@ import alphatab.model.SongFactory;
 import alphatab.model.Tuplet;
 import alphatab.model.Voice;
 import alphatab.tablature.drawing.DrawingResources;
+import alphatab.tablature.staves.ScoreStave;
 import alphatab.tablature.ViewLayout;
 
 class VoiceDrawing extends Voice

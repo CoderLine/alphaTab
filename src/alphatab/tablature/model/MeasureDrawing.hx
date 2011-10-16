@@ -21,6 +21,7 @@ import alphatab.model.Measure;
 import alphatab.model.MeasureHeader;
 import alphatab.model.TripletFeel;
 import alphatab.model.VoiceDirection;
+import alphatab.tablature.staves.StaveLine;
 import alphatab.tablature.ViewLayout;
 
 /**

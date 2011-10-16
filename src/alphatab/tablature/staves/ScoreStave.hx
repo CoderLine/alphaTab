@@ -14,7 +14,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
-package alphatab.tablature.model;
+package alphatab.tablature.staves;
+
 import alphatab.model.Duration;
 import alphatab.model.effects.GraceEffectTransition;
 import alphatab.model.MeasureClef;
@@ -34,6 +35,13 @@ import alphatab.tablature.drawing.NotePainter;
 import alphatab.tablature.drawing.SilencePainter;
 import alphatab.tablature.drawing.TempoPainter;
 import alphatab.tablature.drawing.TripletFeelPainter;
+import alphatab.tablature.model.JoinedType;
+import alphatab.tablature.model.PercussionMapper;
+import alphatab.tablature.model.BeatDrawing;
+import alphatab.tablature.model.BeatGroup;
+import alphatab.tablature.model.MeasureDrawing;
+import alphatab.tablature.model.NoteDrawing;
+import alphatab.tablature.model.VoiceDrawing;
 import alphatab.tablature.ViewLayout;
 
 /**
