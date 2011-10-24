@@ -590,31 +590,31 @@ class MidiSequenceParser
         }
         if (change.balance != null)
         {
-            var value:Int = getMixChangeValue(change.balance.value);
+            var value:Int = getMixChangeValue(change.balance.value, true);
             sequence.addControlChange(start, track, channel.channel, MidiController.BALANCE, value);
             sequence.addControlChange(start, track, channel.effectChannel, MidiController.BALANCE, value);
         }
         if (change.chorus != null)
         {
-            var value:Int = getMixChangeValue(change.chorus.value);
+            var value:Int = getMixChangeValue(change.chorus.value, true);
             sequence.addControlChange(start, track, channel.channel, MidiController.CHORUS, value);
             sequence.addControlChange(start, track, channel.effectChannel, MidiController.CHORUS, value);
         }
         if (change.reverb != null)
         {
-            var value:Int = getMixChangeValue(change.reverb.value);
+            var value:Int = getMixChangeValue(change.reverb.value, true);
             sequence.addControlChange(start, track, channel.channel, MidiController.REVERB, value);
             sequence.addControlChange(start, track, channel.effectChannel, MidiController.REVERB, value);
         }
         if (change.phaser != null)
         {
-            var value:Int = getMixChangeValue(change.phaser.value);
+            var value:Int = getMixChangeValue(change.phaser.value, true);
             sequence.addControlChange(start, track, channel.channel, MidiController.PHASER, value);
             sequence.addControlChange(start, track, channel.effectChannel, MidiController.PHASER, value);
         }
         if (change.tremolo != null)
         {
-            var value:Int = getMixChangeValue(change.tremolo.value);
+            var value:Int = getMixChangeValue(change.tremolo.value, true);
             sequence.addControlChange(start, track, channel.channel, MidiController.TREMOLO, value);
             sequence.addControlChange(start, track, channel.effectChannel, MidiController.TREMOLO, value);
         }
@@ -629,7 +629,7 @@ class MidiSequenceParser
         }
     }
     
-    private function getMixChangeValue(value:Int, signed:Bool=true): Int
+    private function getMixChangeValue(value:Int, signed:Bool): Int
     {
         if (signed) 
             value += 8;

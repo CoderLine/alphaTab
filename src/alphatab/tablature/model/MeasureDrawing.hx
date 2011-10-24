@@ -120,8 +120,11 @@ class MeasureDrawing extends Measure
     // all registered accidentals for further clearing
     private var _registeredAccidentals:Array<Array<Bool>>;
 
-    
+#if cpp
+    public function headerDrawing() : MeasureHeaderDrawing
+#else
     public inline function headerDrawing() : MeasureHeaderDrawing
+#end
     {
         return cast header;
     }

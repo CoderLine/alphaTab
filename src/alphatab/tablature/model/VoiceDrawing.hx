@@ -46,12 +46,20 @@ class VoiceDrawing extends Voice
     public var minStringNote:NoteDrawing;
     public var maxStringNote:NoteDrawing;
     
+#if cpp
+    public function beatDrawing() : BeatDrawing
+#else
     public inline function beatDrawing() : BeatDrawing
+#end
     {
         return cast beat;
     }
 
+#if cpp
+    public function measureDrawing() : MeasureDrawing
+#else
     public inline function measureDrawing() : MeasureDrawing
+#end
     {
         return beatDrawing().measureDrawing();
     }

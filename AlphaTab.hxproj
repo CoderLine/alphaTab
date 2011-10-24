@@ -4,7 +4,7 @@
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="bin\lib\alphaTab\alphaTab.js" />
+    <movie path="bin\js\lib\alphaTab\alphaTab.js" />
     <movie fps="0" />
     <movie width="0" />
     <movie height="0" />

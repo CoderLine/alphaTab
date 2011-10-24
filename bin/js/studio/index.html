@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>alphaTab Studio</title>
+<link type="text/css" href="css/ui-lightness/jquery-ui-1.8.13.custom.css" rel="stylesheet" />	
+<link type="text/css" href="css/studio.css" rel="stylesheet" />	
+<script type="text/javascript" src="js/jquery-1.5.1.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui-1.8.13.custom.min.js"></script>
+<script type="text/javascript" src="js/ui-init.js"></script>
+
+<!-- Dependencies -->
+<!--[if lt IE 9]>
+<script language="JavaScript" type="text/javascript" src="../lib/excanvas/excanvas.js"></script>        
+<![endif]-->
+      
+<!-- alphaTab -->
+<script language="JavaScript" type="text/javascript" src="../lib/alphaTab/alphaTab.js"></script>
+<script language="JavaScript" type="text/javascript" src="../lib/alphaTab/jquery.alphaTab.js"></script>
+<script language="JavaScript" type="text/javascript" src="../lib/alphaTab/jquery.alphaTab.player.js"></script>
+
+<script language="JavaScript" type="text/javascript">
+var api = null;
+$(document).ready(function() {
+	api = $('div.alphaTab').alphaTab().player({ // enable the player
+        playerTickCallback: "onTickChanged", // !required!
+        scrollElement: '#content',
+        scrollAdjustment: -50
+        //createControls: false
+    });
+});
+
+//!required!
+function onTickChanged(tickPosition) { 
+    api.updateCaret(tickPosition);
+}
+</script>
+</head>
+<body>
+	<div id="header">
+		<a href="#" id="logo"></a>
+		<ul id="menu">
+			<li><a href="#">New File</a></li>		
+			<li><a href="#">Open File</a></li>		
+			<li><a href="#">Share</a></li>		
+		</ul>
+	</div>
+
+	<div id="toolbox">
+		<div class="toolbox-group">
+		
+			<div class="toolbox-line">
+				<button id="clef">Clef</button>
+				<button id="key-signature">Key Signature</button>
+				<button id="time-signature">Time Signature</button>
+				<button id="triplet-feel">Triplet Feel</button>
+				<input type="checkbox" id="double-barline" />
+					<label for="double-barline">Double Barline</label>
+				<button id="tempo">Set Tempo</button>
+			</div>
+			
+			<div class="toolbox-line">
+				<input type="checkbox" id="begin-repeat-sequence" />
+					<label for="begin-repeat-sequence">Begin Repeat Sequence</label>
+				
+				<input type="checkbox" id="alternate-endings" />
+					<label for="alternate-endings"">Alternate Endings</label>
+				
+				<input type="checkbox" id="close-repeat-sequence" />
+					<label for="close-repeat-sequence">Close Repeat Sequence</label>
+			</div>
+			
+		</div>
+
+		<div class="toolbox-group">	
+		
+			<div class="toolbox-line">
+				<input type="radio" id="full-note" name="note-duration" checked="checked" />
+					<label for="full-note">Full Note</label>
+					
+				<input type="radio" id="half-note" name="note-duration" />
+					<label for="half-note">Half Note</label>
+					
+				<input type="radio" id="quarter-note" name="note-duration" />
+					<label for="quarter-note">Quarter Note</label>
+					
+				<input type="radio" id="eighth-note" name="note-duration" />
+					<label for="eighth-note">Eighth Note</label>
+					
+				<input type="radio" id="sixteenth-note" name="note-duration" />
+					<label for="sixteenth-note">Sixteenth Note</label>
+					
+				<input type="radio" id="thirtysecond-note" name="note-duration" />
+					<label for="thirtysecond-note">Thirtysecond Note</label>
+					
+				<input type="radio" id="sixtyfourth-note" name="note-duration" />
+					<label for="sixtyfourth-note">Sixtyfourth Note</label>
+					
+				<input type="checkbox" id="rest" />
+					<label for="rest">Rest</label>
+			</div>
+				
+			<div class="toolbox-line">
+				<input type="checkbox" id="dotting" />
+					<label for="dotting">Dotting</label>
+				
+				<input type="checkbox" id="double-dotting" />
+					<label for="double-dotting">Double Dotting</label>
+					
+				<input type="checkbox" id="triplet" />
+					<label for="triplet">-3-</label>
+					
+				<input type="checkbox" id="fifthlet" />
+					<label for="fifthlet">-5-</label>
+					
+				<input type="checkbox" id="tuplet" />
+					<label for="tuplet">-n-</label>
+					
+				<input type="checkbox" id="tied-note" />
+					<label for="tied-note">Tied Note</label>
+					
+			</div>
+			
+		</div>
+		
+		<div class="toolbox-group">
+		
+			<div class="toolbox-line">
+				<input type="checkbox" id="ghost-note" />
+					<label for="ghost-note">Ghost Note</label>
+			
+				<input type="checkbox" id="accentuated-note" />
+					<label for="accentuated-note">Accentuated Note</label>
+			
+				<input type="checkbox" id="heavy-accentuated-note" />
+					<label for="heavy-accentuated-note">Heavy Accentuated Note</label>
+			
+				<input type="checkbox" id="stacatto" />
+					<label for="stacatto">Stacatto</label>
+					
+				<input type="checkbox" id="let-ring" />
+					<label for="let-ring">Let Ring</label>
+					
+				<input type="checkbox" id="palm-mute" />
+					<label for="palm-mute">Palm Mute</label>
+			</div>
+			
+			<div class="toolbox-line">
+				<input type="checkbox" id="dead-note" />
+					<label for="dead-note">Dead Note</label>
+					
+				<input type="checkbox" id="natural-harmonic" />
+					<label for="natural-harmonic">Natural Harmonic</label>
+					
+				<input type="checkbox" id="artificial-harmonic" />
+					<label for="artificial-harmonic">Artificial Harmonic</label>
+				
+				<input type="checkbox" id="bend" />
+					<label for="bend">Bend</label>
+				
+				<input type="checkbox" id="tremolo-bar" />
+					<label for="tremolo-bar">Tremolo Bar</label>
+				
+				<input type="checkbox" id="note-vibrato" />
+					<label for="note-vibrato">Note Vibrato</label>
+				
+				<input type="checkbox" id="beat-vibrato" />
+					<label for="beat-vibrato">Beat Vibrato</label>
+			</div>
+			
+			<div class="toolbox-line">
+				<input type="checkbox" id="legato-slide" />
+					<label for="legato-slide">Legato Slide</label>
+				
+				<input type="checkbox" id="shift-slide" />
+					<label for="shift-slide">Shift Slide</label>
+				
+				<input type="checkbox" id="slide-into-above" />
+					<label for="slide-into-above">Slide Into From Above</label>
+				
+				<input type="checkbox" id="slide-into-below" />
+					<label for="slide-into-below">Slide Into From Below</label>
+				
+				<input type="checkbox" id="slide-out-downwards" />
+					<label for="slide-out-downwards">Slide Out Downwards</label>
+				
+				<input type="checkbox" id="slide-out-upwards" />
+					<label for="slide-out-upwards">Slide Out Upwards</label>
+			</div>
+			
+			<div class="toolbox-line">
+				<input type="checkbox" id="hammer-on" />
+					<label for="hammer-on">Hammer On / Pull Off</label>
+				
+				<input type="checkbox" id="tap" />
+					<label for="tap">Tap</label>
+				
+				<input type="checkbox" id="slap" />
+					<label for="slap">Slap</label>
+				
+				<input type="checkbox" id="pop" />
+					<label for="pop">Pop</label>
+				
+				<input type="checkbox" id="left-hand-fingering" />
+					<label for="left-hand-fingering">Left Hand Fingering</label>
+				
+				<input type="checkbox" id="right-hand-fingering" />
+					<label for="right-hand-fingering">Right Hand Fingering</label>
+			</div>
+			
+			<div class="toolbox-line">
+				<input type="checkbox" id="stroke-down" />
+					<label for="stroke-down">Stroke Down</label>
+				<input type="checkbox" id="stroke-up" />
+					<label for="stroke-up">Stroke Up</label>
+				<input type="checkbox" id="pickstroke-down" />
+					<label for="pickstroke-down">PickStroke Down</label>
+				<input type="checkbox" id="pickstroke-up" />
+					<label for="pickstroke-up">PickStroke Up</label>
+			</div>
+			
+			<div class="toolbox-line">
+				<input type="checkbox" id="grace-note" />
+					<label for="grace-note">Grace Note</label>
+				<input type="checkbox" id="trill" />
+					<label for="trill">Trill</label>
+				<input type="checkbox" id="tremolo-picking" />
+					<label for="tremolo-picking">Tremolo Picking</label>
+				<input type="checkbox" id="fade-in" />
+					<label for="fade-in">Fade In</label>
+			</div>
+		</div>	
+	</div>
+	
+	<div id="content">
+		<div class="alphaTab">
+		\title "Canon Rock"
+		\subtitle "JerryC"
+		\tempo 90
+		\instrument overdrivenguitar
+		.
+		:2 19.2{v f} 17.2{v f} | 
+		15.2{v f} 14.2{v f}| 
+		12.2{v f} 10.2{v f}| 
+		12.2{v f} 14.2{v f}.4 :8 15.2 17.2 |
+		14.1.2 :8 17.2 15.1 14.1{h} 17.2 | 
+		15.2{v d}.4 :16 17.2{h} 15.2 :8 14.2 14.1 17.1{b(0 4 4 0)}.4 |
+		15.1.8 :16 14.1{tu 3} 15.1{tu 3} 14.1{tu 3} :8 17.2 15.1 14.1 :16 12.1{tu 3} 14.1{tu 3} 12.1{tu 3} :8 15.2 14.2 | 
+		12.2 14.3 12.3 15.2 :32 14.2{h} 15.2{h} 14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h} |
+		:2 19.2{v f} 17.2{v f} | 
+		15.2{v f} 14.2{v f}| 
+		12.2{v f} 10.2{v f}| 
+		12.2{v f} 14.2{v f}.4 :8 15.2 17.2 |
+		14.1.2 :8 17.2 15.1 14.1{h} 17.2 | 
+		15.2{v d}.4 :16 17.2{h} 15.2 :8 14.2 14.1 17.1{b(0 4 4 0)}.4 |
+		15.1.8 :16 14.1{tu 3} 15.1{tu 3} 14.1{tu 3} :8 17.2 15.1 14.1 :16 12.1{tu 3} 14.1{tu 3} 12.1{tu 3} :8 15.2 14.2 | 
+		12.2 14.3 12.3 15.2 :32 14.2{h} 15.2{h} 14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h} |
+		:2 19.2{v f} 17.2{v f} | 
+		15.2{v f} 14.2{v f}| 
+		12.2{v f} 10.2{v f}| 
+		12.2{v f} 14.2{v f}.4 :8 15.2 17.2 |
+		14.1.2 :8 17.2 15.1 14.1{h} 17.2 | 
+		15.2{v d}.4 :16 17.2{h} 15.2 :8 14.2 14.1 17.1{b(0 4 4 0)}.4 |
+		15.1.8 :16 14.1{tu 3} 15.1{tu 3} 14.1{tu 3} :8 17.2 15.1 14.1 :16 12.1{tu 3} 14.1{tu 3} 12.1{tu 3} :8 15.2 14.2 | 
+		12.2 14.3 12.3 15.2 :32 14.2{h} 15.2{h} 14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h} 
+		</div>
+	</div>
+</body>
+</html>

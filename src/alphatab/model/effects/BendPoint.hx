@@ -37,7 +37,7 @@ class BendPoint
     /**
      * Initializes a new instance of the BendPoint class. 
      */
-    public function new(position:Int = 0, value:Int = 0, vibrato:Bool = false)
+    public function new(position:Int, value:Int, vibrato:Bool)
     {
         this.position = position;
         this.value = value;

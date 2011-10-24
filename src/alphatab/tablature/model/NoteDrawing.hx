@@ -43,18 +43,30 @@ class NoteDrawing extends Note
         }
         return _accidental;
     }
-    
+
+#if cpp
+    public function voiceDrawing() : VoiceDrawing
+#else
     public inline function voiceDrawing() : VoiceDrawing
+#end
     {
         return cast voice;
     }
 
+#if cpp
+    public function beatDrawing() : BeatDrawing
+#else
     public inline function beatDrawing() : BeatDrawing
+#end
     {
         return voiceDrawing().beatDrawing();
     }
 
+#if cpp
+    public function measureDrawing() : MeasureDrawing
+#else
     public inline function measureDrawing() : MeasureDrawing
+#end
     {
         return voiceDrawing().beatDrawing().measureDrawing();
     }

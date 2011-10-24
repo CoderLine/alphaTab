@@ -21,15 +21,15 @@ package alphatab.model;
  */
 class Color
 {
-    public static inline var Black:Color = new Color(0, 0, 0);
-    public static inline var Red:Color = new Color(255, 0, 0);
+    public static inline var Black:Color = Color.fromRgb(0, 0, 0);
+    public static inline var Red:Color = Color.fromRgb(255, 0, 0);
     
     public var r:Int;
     public var g:Int;
     public var b:Int; 
     public var a:Float; 
     
-    public function new(r:Int = 0, g:Int = 0, b:Int = 0, a:Float=1)
+    private function new(r:Int, g:Int, b:Int, a:Float)
     {
         this.r = r;
         this.g = g;
@@ -55,5 +55,15 @@ class Color
             s += Std.string(this.a) + ")" ;
             return s;
         }
+    }
+    
+    public static function fromRgb(r:Int, g:Int, b:Int) : Color
+    {
+        return new Color(r, g, b, 1);
+    }
+    
+    public static function fromARgb(r:Int, g:Int, b:Int, a:Float) : Color
+    {
+        return new Color(r, g, b, a);
     }
 }

@@ -3,6 +3,14 @@
 /.settings
 /.hxtypes
 
+# output directories
+/bin/cpp
+/bin/cs
+/bin/neko
+
+# usage test
+/bin/js/studio/**/*
+
 # ignore project files
 .classpath
 .project

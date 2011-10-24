@@ -59,7 +59,7 @@ class Track
         measures = new Array<Measure>();
         strings = new Array<GuitarString>();
         channel = factory.newMidiChannel();
-        color = new Color(255,0,0);
+        color = Color.fromRgb(255,0,0);
     }
     
     public function addMeasure(measure:Measure) : Void

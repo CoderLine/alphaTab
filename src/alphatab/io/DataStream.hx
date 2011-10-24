@@ -69,6 +69,16 @@ class DataStream extends Stream
 
         var sign = 1 - ((bytes[0] >> 7) << 1); // sign = bit 0
         var exp = (((bytes[0] << 4) & 0x7FF) | (bytes[1] >> 4)) - 1023; // exponent = bits 1..11
+        var sig = getDoubleSig(bytes);
+        if (sig == 0 && exp == -1023)
+            return 0.0;
+        
+        return sign*(1.0 + Math.pow(2, -52)*sig)*Math.pow(2, exp);
+    } 
+    
+    #if js
+    public function getDoubleSig(bytes:Array<Int>) : Int
+    {
         // This crazy toString() stuff works around the fact that js ints are
         // only 32 bits and signed, giving us 31 bits to work with
         var sig = untyped 
@@ -77,12 +87,17 @@ class DataStream extends Stream
             parseInt(((bytes[4] >> 7) * Math.pow(2,31)).toString(2), 2) +
             parseInt((((bytes[4]&0x7F) << 24) | (bytes[5] << 16) | (bytes[6] << 8) | bytes[7]).toString(2), 2);    // significand = bits 12..63
         }
-        
-        if (sig == 0 && exp == -1023)
-            return 0.0;
-        
-        return sign*(1.0 + Math.pow(2, -52)*sig)*Math.pow(2, exp);
-    } 
+        return sig;
+    }
+    #else
+    public function getDoubleSig(bytes:Array<Int>) : Int
+    {
+        // we need the lower 4 bits of the [1] byte and all other complete.
+        var sig = ((bytes[1] & 0x0F) << 48) | (bytes[2] << 40) | (bytes[3] << 32) | 
+                   (bytes[4] << 24) | (bytes[5] << 16) | (bytes[6] << 8) | bytes[7];
+        return sig;
+    }
+    #end
     
     public override function readByte() : Int
     {

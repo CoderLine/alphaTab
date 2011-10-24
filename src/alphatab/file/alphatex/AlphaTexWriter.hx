@@ -50,7 +50,7 @@ class AlphaTexWriter
      * Initializes a new AlphaTexWriter.
      * @param    track the track to export. 
      */
-    public function new(track:Track, voice:Int = 0) 
+    public function new(track:Track, voice:Int) 
     {
         _voice = voice;
         _track = track;

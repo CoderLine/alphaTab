@@ -60,7 +60,11 @@ class BeatDrawing extends Beat
         return measureDrawing().staveLine.x + measureDrawing().x + measureDrawing().getDefaultSpacings(layout) + x;
     }
     
+#if cpp
+    public function measureDrawing() : MeasureDrawing
+#else 
     public inline function measureDrawing() : MeasureDrawing
+#end
     {
         return cast measure;
     }

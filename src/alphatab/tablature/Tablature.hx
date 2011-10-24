@@ -62,11 +62,18 @@ class Tablature
     public var onLayouted:Void->Void;
     public var onFinished:Void->Void;
     
+#if cpp
+    public function new(source:Dynamic, staves:Array<String> = null, msg:String = null) 
+    {
+        // HACK: C++ target redeclares msg if default value is not initialized to null 
+        if (msg == null) { msg = ""; }
+#else
     public function new(source:Dynamic, staves:Array<String> = null, msg:String = "") 
     {
+#end        
         canvas = PlatformFactory.getCanvas(source);
         track = null;
-        
+                
         settings = new Hash <Dynamic> ();
         
         errorMessage = StringTools.trim(msg);

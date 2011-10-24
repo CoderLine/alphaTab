@@ -41,7 +41,7 @@ class Lyrics
         return ret.split(" ");
     }
     
-    public function new(trackChoice:Int = 0)
+    public function new(trackChoice:Int)
     {
         this.trackChoice = trackChoice;
         lines = new Array<LyricLine>();

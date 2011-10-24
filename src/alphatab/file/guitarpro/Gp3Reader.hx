@@ -625,7 +625,7 @@ class Gp3Reader extends GpReaderBase
         var g:Int = data.readByte();
         var b:Int = (data.readByte());
         skip(1);
-        return new Color(r, g, b);
+        return Color.fromRgb(r, g, b);
     }
     
     private function readMidiChannels() : Array<MidiChannel>

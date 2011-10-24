@@ -39,7 +39,7 @@ class Tuning
         return regex.match(name);
     }
     
-    public static function getTextForTuning(tuning:Int, includeOctave:Bool = false)
+    public static function getTextForTuning(tuning:Int, includeOctave:Bool)
     {
         var octave = Math.floor(tuning/12);
         var note = tuning % 12;
@@ -163,56 +163,56 @@ class Tuning
 
         SixStrings.push(new Tuning("Guitar Standard Tuning", [64,59,55,50,45,40], true));
         
-        SixStrings.push(new Tuning("Guitar Tune down ½ step", [63,58,54,49,44,39]));
-        SixStrings.push(new Tuning("Guitar Tune down 1 step", [62,57,53,48,43,38]));
-        SixStrings.push(new Tuning("Guitar Tune down 2 step", [60,55,51,46,41,36]));
-        SixStrings.push(new Tuning("Guitar Dropped D Tuning", [64,59,55,50,45,38]));
-        SixStrings.push(new Tuning("Guitar Dropped D Tuning variant", [64,57,55,50,45,38]));
-        SixStrings.push(new Tuning("Guitar Double Dropped D Tuning", [62,59,55,50,45,38]));
-        SixStrings.push(new Tuning("Guitar Dropped E Tuning", [66,61,57,52,47,40]));
-        SixStrings.push(new Tuning("Guitar Dropped C Tuning", [62,57,53,48,43,36]));
+        SixStrings.push(new Tuning("Guitar Tune down ½ step", [63,58,54,49,44,39], false));
+        SixStrings.push(new Tuning("Guitar Tune down 1 step", [62,57,53,48,43,38], false));
+        SixStrings.push(new Tuning("Guitar Tune down 2 step", [60,55,51,46,41,36], false));
+        SixStrings.push(new Tuning("Guitar Dropped D Tuning", [64,59,55,50,45,38], false));
+        SixStrings.push(new Tuning("Guitar Dropped D Tuning variant", [64,57,55,50,45,38], false));
+        SixStrings.push(new Tuning("Guitar Double Dropped D Tuning", [62,59,55,50,45,38], false));
+        SixStrings.push(new Tuning("Guitar Dropped E Tuning", [66,61,57,52,47,40], false));
+        SixStrings.push(new Tuning("Guitar Dropped C Tuning", [62,57,53,48,43,36], false));
         
-        SixStrings.push(new Tuning("Guitar Open C Tuning", [64,60,55,48,43,36]));
-        SixStrings.push(new Tuning("Guitar Open Cm Tuning", [63,60,55,48,43,36]));
-        SixStrings.push(new Tuning("Guitar Open C6 Tuning", [64,57,55,48,43,36]));
-        SixStrings.push(new Tuning("Guitar Open Cmaj7 Tuning", [64,59,55,52,43,36]));
-        SixStrings.push(new Tuning("Guitar Open D Tuning", [62,57,54,50,45,38]));
-        SixStrings.push(new Tuning("Guitar Open Dm Tuning", [62,57,53,50,45,38]));
-        SixStrings.push(new Tuning("Guitar Open D5 Tuning", [62,57,50,50,45,38]));
-        SixStrings.push(new Tuning("Guitar Open D6 Tuning", [62,59,54,50,45,38]));
-        SixStrings.push(new Tuning("Guitar Open Dsus4 Tuning", [62,57,55,50,45,38]));
-        SixStrings.push(new Tuning("Guitar Open E Tuning", [64,59,56,52,47,40]));
-        SixStrings.push(new Tuning("Guitar Open Em Tuning", [64,59,55,52,47,40]));
-        SixStrings.push(new Tuning("Guitar Open Esus11 Tuning", [64,59,55,52,45,40]));
-        SixStrings.push(new Tuning("Guitar Open F Tuning", [65,60,53,48,45,41]));
-        SixStrings.push(new Tuning("Guitar Open G Tuning", [62,59,55,50,43,38]));
-        SixStrings.push(new Tuning("Guitar Open Gm Tuning", [62,58,55,50,43,38]));
-        SixStrings.push(new Tuning("Guitar Open G6 Tuning", [64,59,55,50,43,38]));
-        SixStrings.push(new Tuning("Guitar Open Gsus4 Tuning", [62,60,55,50,43,38]));
-        SixStrings.push(new Tuning("Guitar Open A Tuning", [64,61,57,52,45,40]));
-        SixStrings.push(new Tuning("Guitar Open Am Tuning", [64,60,57,52,45,40]));
-        SixStrings.push(new Tuning("Guitar Nashville Tuning", [64,59,67,62,57,52]));
-        SixStrings.push(new Tuning("Bass 6 Strings Tuning", [48,43,38,33,28,23]));
-        SixStrings.push(new Tuning("Lute or Vihuela Tuning", [64,59,54,50,45,40]));
+        SixStrings.push(new Tuning("Guitar Open C Tuning", [64,60,55,48,43,36], false));
+        SixStrings.push(new Tuning("Guitar Open Cm Tuning", [63,60,55,48,43,36], false));
+        SixStrings.push(new Tuning("Guitar Open C6 Tuning", [64,57,55,48,43,36], false));
+        SixStrings.push(new Tuning("Guitar Open Cmaj7 Tuning", [64,59,55,52,43,36], false));
+        SixStrings.push(new Tuning("Guitar Open D Tuning", [62,57,54,50,45,38], false));
+        SixStrings.push(new Tuning("Guitar Open Dm Tuning", [62,57,53,50,45,38], false));
+        SixStrings.push(new Tuning("Guitar Open D5 Tuning", [62,57,50,50,45,38], false));
+        SixStrings.push(new Tuning("Guitar Open D6 Tuning", [62,59,54,50,45,38], false));
+        SixStrings.push(new Tuning("Guitar Open Dsus4 Tuning", [62,57,55,50,45,38], false));
+        SixStrings.push(new Tuning("Guitar Open E Tuning", [64,59,56,52,47,40], false));
+        SixStrings.push(new Tuning("Guitar Open Em Tuning", [64,59,55,52,47,40], false));
+        SixStrings.push(new Tuning("Guitar Open Esus11 Tuning", [64,59,55,52,45,40], false));
+        SixStrings.push(new Tuning("Guitar Open F Tuning", [65,60,53,48,45,41], false));
+        SixStrings.push(new Tuning("Guitar Open G Tuning", [62,59,55,50,43,38], false));
+        SixStrings.push(new Tuning("Guitar Open Gm Tuning", [62,58,55,50,43,38], false));
+        SixStrings.push(new Tuning("Guitar Open G6 Tuning", [64,59,55,50,43,38], false));
+        SixStrings.push(new Tuning("Guitar Open Gsus4 Tuning", [62,60,55,50,43,38], false));
+        SixStrings.push(new Tuning("Guitar Open A Tuning", [64,61,57,52,45,40], false));
+        SixStrings.push(new Tuning("Guitar Open Am Tuning", [64,60,57,52,45,40], false));
+        SixStrings.push(new Tuning("Guitar Nashville Tuning", [64,59,67,62,57,52], false));
+        SixStrings.push(new Tuning("Bass 6 Strings Tuning", [48,43,38,33,28,23], false));
+        SixStrings.push(new Tuning("Lute or Vihuela Tuning", [64,59,54,50,45,40], false));
         
         FiveStrings.push(new Tuning("Bass 5 Strings Tuning", [43,38,33,28,23], true));
-        FiveStrings.push(new Tuning("Banjo Dropped C Tuning", [62,59,55,48,67]));
-        FiveStrings.push(new Tuning("Banjo Open D Tuning", [62,57,54,50,69]));
-        FiveStrings.push(new Tuning("Banjo Open G Tuning", [62,59,55,50,67]));
-        FiveStrings.push(new Tuning("Banjo G Minor Tuning", [62,58,55,50,67]));
-        FiveStrings.push(new Tuning("Banjo G Modal Tuning", [62,57,55,50,67]));
+        FiveStrings.push(new Tuning("Banjo Dropped C Tuning", [62,59,55,48,67], false));
+        FiveStrings.push(new Tuning("Banjo Open D Tuning", [62,57,54,50,69], false));
+        FiveStrings.push(new Tuning("Banjo Open G Tuning", [62,59,55,50,67], false));
+        FiveStrings.push(new Tuning("Banjo G Minor Tuning", [62,58,55,50,67], false));
+        FiveStrings.push(new Tuning("Banjo G Modal Tuning", [62,57,55,50,67], false));
         
         FourStrings.push(new Tuning("Bass Standard Tuning", [43,38,33,28], true));
-        FourStrings.push(new Tuning("Bass Tune down ½ step", [42,37,32,27]));
-        FourStrings.push(new Tuning("Bass Tune down 1 step", [41,36,31,26]));
-        FourStrings.push(new Tuning("Bass Tune down 2 step", [39,34,29,24]));
-        FourStrings.push(new Tuning("Bass Dropped D Tuning", [43,38,33,26]));
-        FourStrings.push(new Tuning("Ukulele C Tuning", [45,40,36,43]));
-        FourStrings.push(new Tuning("Ukulele G Tuning", [52,47,43,38]));
-        FourStrings.push(new Tuning("Mandolin Standard Tuning", [64,57,50,43]));
-        FourStrings.push(new Tuning("Mandolin or Violin Tuning", [76,69,62,55]));
-        FourStrings.push(new Tuning("Viola Tuning", [69,62,55,48]));
-        FourStrings.push(new Tuning("Cello Tuning", [57,50,43,36]));
+        FourStrings.push(new Tuning("Bass Tune down ½ step", [42,37,32,27], false));
+        FourStrings.push(new Tuning("Bass Tune down 1 step", [41,36,31,26], false));
+        FourStrings.push(new Tuning("Bass Tune down 2 step", [39,34,29,24], false));
+        FourStrings.push(new Tuning("Bass Dropped D Tuning", [43,38,33,26], false));
+        FourStrings.push(new Tuning("Ukulele C Tuning", [45,40,36,43], false));
+        FourStrings.push(new Tuning("Ukulele G Tuning", [52,47,43,38], false));
+        FourStrings.push(new Tuning("Mandolin Standard Tuning", [64,57,50,43], false));
+        FourStrings.push(new Tuning("Mandolin or Violin Tuning", [76,69,62,55], false));
+        FourStrings.push(new Tuning("Viola Tuning", [69,62,55,48], false));
+        FourStrings.push(new Tuning("Cello Tuning", [57,50,43,36], false));
     }
     
     public static function findTuning(strings:Array<GuitarString>) : Tuning
@@ -244,7 +244,7 @@ class Tuning
     public var Name:String;
     public var Tuning:Array<Int>;
     
-    public function new(name:String, tuning:Array<Int>, isStandard:Bool = false) 
+    public function new(name:String, tuning:Array<Int>, isStandard:Bool) 
     {
         Name = name;
         Tuning = tuning;

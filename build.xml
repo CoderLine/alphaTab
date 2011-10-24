@@ -3,27 +3,35 @@
         a buildfile for creating alphaTab releases
     </description>
     
-	<!-- Main Properties -->
-	<property name="bin" location="bin"/>
-	<property name="lib" location="${bin}/lib/alphaTab"/>
-	<property name="src" location="src"/>
-	<property name="haxe-js" location="${lib}/alphaTab.js"/>
-	<property name="haxe-cs" location="cs"/>
-	<property name="haxe-cpp" location="cpp"/>
 	<property name="release" location="releases"/>
 	<property name="tools" location="tools"/>
 	
-	<!-- Java-Player Properties -->	
+    <!--*************************************************************************
+        General
+    **************************************************************************-->
+    
+    <!-- Main Properties -->
+	<property name="bin" location="bin"/>
+	<property name="src" location="src"/>
+
+    <target name="global-init">
+		<tstamp/>
+	</target>
+    
+    <!--*************************************************************************
+        Building JavaScript
+    **************************************************************************-->
+    
+    <property name="bin-js" location="${bin}/js"/>
+	<property name="lib-js" location="${bin-js}/lib/alphaTab"/>
+	<property name="haxe-js" location="${lib}/alphaTab.js"/>
+    
+    <!-- Java-Player Properties -->	
 	<property name="player-base" location="subprojects/java-player"/>	
 	<property name="player-src" location="${player-base}/src"/>	
 	<property name="player-bin" location="${player-base}/bin"/>	
 	<property name="player-jar" location="${lib}/alphaTab.jar"/>	
 
-		
-	<target name="global-init">
-		<tstamp/>
-	</target>
-	  
 	<!-- Java Player -->  
 	<target name="java-player" depends="global-init">
 		<!-- Create Build Directory -->
@@ -31,12 +39,12 @@
 
 		<!-- Compile Sources -->
 		<echo message="compiling midi player"/>
-		<javac srcdir="${player-src}" destdir="${player-bin}" classpath="C:/Program Files/Java/jre6/lib/plugin.jar" />
+		<javac srcdir="${player-src}" destdir="${player-bin}" classpath="C:/Program Files/Java/jre6/lib/plugin.jar" failonerror="true" />
 
 		<!-- Package Jar -->
 		<echo message="create midi player jar"/>
 		<delete file="${player-jar}" />
-		<jar jarfile="${player-jar}" basedir="${player-bin}"/>
+		<jar jarfile="${player-jar}" basedir="${player-bin}" failonerror="true" />
 
 		<!-- Remove Build Directory -->
 		<delete dir="${player-bin}" />
@@ -45,7 +53,7 @@
 	<!-- Haxe Builds -->
 	<target name="haxe-js" depends="global-init">
 		<delete file="${haxe-js}" />
-        <exec executable="haxe">
+        <exec executable="haxe" failonerror="true">
             <arg value="-cp" />
             <arg value="${src}"/>
             
@@ -59,7 +67,7 @@
 
 	<target name="haxe-js-debug" depends="global-init">
 		<delete file="${haxe-js}" />
-        <exec executable="haxe">
+        <exec executable="haxe" failonerror="true">
             <arg value="-cp" />
             <arg value="${src}"/>
             
@@ -73,11 +81,16 @@
             <arg value="DEBUG_DRAWING" />
         </exec>
 	</target>	
+    
+    <!--*************************************************************************
+        Building C# 
+    **************************************************************************-->
 
+    <property name="haxe-cs" location="${bin}/cs"/>
 	<target name="haxe-cs" depends="global-init">
-		<delete dir="cs" />
-		<mkdir dir="cs" />
-        <exec executable="haxe">
+		<delete dir="${haxe-cs}" />
+		<mkdir dir="${haxe-cs}" />
+        <exec executable="haxe" failonerror="true">
             <arg value="-cp" />
             <arg value="${src}"/>
             
@@ -88,26 +101,55 @@
             <arg value="${haxe-cs}" />
         	
         	<arg value="--macro" />
-            <arg value="alphatab.AlphaTabCsGenerator.use()" />
+            <arg value="alphatab.compiler.AlphaTabCsGenerator.use()" />
         </exec>
 	</target>	
    
+    <!--*************************************************************************
+        Building C++
+    **************************************************************************-->
+
+    <property name="haxe-cpp" location="${bin}/cpp"/>
     <target name="haxe-cpp" depends="global-init">
-		<delete dir="cpp" />
-		<mkdir dir="cpp" />
-        <exec executable="haxe">
+		<delete dir="${haxe-cpp}" />
+		<mkdir dir="${haxe-cpp}" />
+        <exec executable="haxe" failonerror="true">
             <arg value="-cp" />
             <arg value="${src}"/>
             
             <arg value="-main" />
             <arg value="alphatab.Main" />
             
-            <arg value="-pp" />
-            <arg value="${haxe-cs}" />
+            <arg value="-cpp" />
+            <arg value="${haxe-cpp}" />
+        </exec>
+    </target>
+       
+    <!--*************************************************************************
+        Building C++
+    **************************************************************************-->
+
+    <property name="haxe-neko" location="${bin}/neko/alphaTab.n"/>
+    <target name="haxe-neko" depends="global-init">
+		<delete file="${haxe-neko}" />
+        <exec executable="haxe" failonerror="true">
+            <arg value="-cp" />
+            <arg value="${src}"/>
+            
+            <arg value="-main" />
+            <arg value="alphatab.Main" />
+            
+            <arg value="-neko" />
+            <arg value="${haxe-neko}" />
         </exec>
     </target>
    
-	<!-- Release -->
+	
+    <!--*************************************************************************
+        Package Release (JavaScript)
+    **************************************************************************-->
+
+    <!-- Release -->
 	<target name="release-init" depends="java-player">
 		<delete dir="${release}/${DSTAMP}" />
 		<mkdir dir="${release}/${DSTAMP}" />
@@ -117,12 +159,12 @@
 		<echo message="copying release files to ${release}/${DSTAMP}"/>
 		<!-- copy distribution files -->		
 		<copy todir="${release}/${DSTAMP}" overwrite="true">
-			<fileset dir="${bin}" />
+			<fileset dir="${bin-js}" />
 		</copy>
 		
 		<!-- minify javascripts -->
 		<echo message="minify alphaTab.js"/>
-		<java jar="${tools}\compiler.jar" fork="true">
+		<java jar="${tools}\compiler.jar" fork="true" failonerror="true">
 			<arg value="--compilation_level" />
 			<arg value="SIMPLE_OPTIMIZATIONS" />
 			
@@ -134,7 +176,7 @@
 		</java>
         
 		<echo message="minify jquery.alphaTab.js"/>
-		<java jar="${tools}\compiler.jar" fork="true">		
+		<java jar="${tools}\compiler.jar" fork="true" failonerror="true">		
 			<arg value="--compilation_level" />
 			<arg value="SIMPLE_OPTIMIZATIONS" />
 			

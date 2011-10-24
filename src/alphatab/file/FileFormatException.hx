@@ -30,7 +30,7 @@ class FileFormatException
      * Initializes a new instance of this class.
      * @param message The error message
      */
-    public function new(message:String = "") 
+    public function new(message:String) 
     {
         this.message = message;
     }    

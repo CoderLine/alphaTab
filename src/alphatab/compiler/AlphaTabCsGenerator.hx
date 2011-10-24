@@ -16,6 +16,7 @@
  */
 package alphatab.compiler;
 
+import haxe.macro.Compiler;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.JSGenApi;
@@ -193,6 +194,7 @@ class AlphaTabCsGenerator
             case TFun(args, ret): return false;
             case TAnonymous(a): return false;
             case TDynamic(t): return false;
+            default: Context.error("unsupported type",null);
         }
         
         return false;
@@ -550,6 +552,7 @@ class AlphaTabCsGenerator
             case TFun(args, ret): printFunReference(args, ret);
             case TAnonymous(a): printAnonymousReference(a);
             case TDynamic(t): printDynamicReference(t);
+            default: Context.error("unsupported type",null);
         }
     }
     
@@ -624,10 +627,7 @@ class AlphaTabCsGenerator
     }
     
     function compileTypedExpr(t:TypedExpr) {
-        var abstract:VAbstract = cast t;
-        switch(abstract) {
-            case ATExpr(e): compileExpr(e);
-        }
+        // TODO: wait for update of haXe
     }
     
     function compileExpr(e:Expr) {
@@ -921,7 +921,7 @@ class AlphaTabCsGenerator
 
     #if macro
     public static function use() {
-        Compiler.setCustomCSGenerator(function(api) new AlphaTabCsGenerator(api).generate());
+        Compiler.setCustomJSGenerator(function(api) new AlphaTabCsGenerator(api).generate());
     }
     #end
 }

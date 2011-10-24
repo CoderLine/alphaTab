@@ -449,7 +449,7 @@ class PageViewLayout extends ViewLayout
                     
                     for(i in 0 ... tablature.track.strings.length)
                     {
-                        str = "(" + Std.string(i+1) + ") = " + Tuning.getTextForTuning(tablature.track.strings[i].value);
+                        str = "(" + Std.string(i+1) + ") = " + Tuning.getTextForTuning(tablature.track.strings[i].value, false);
                         ctx.get(DrawingLayers.LayoutBackground).addString(str, DrawingResources.effectFont, currentX, currentY);
                         currentY += Math.floor(15*scale);
                         if(i == stringsPerColumn - 1)

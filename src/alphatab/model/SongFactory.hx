@@ -37,12 +37,12 @@ class SongFactory
     
     public function newLyrics() : Lyrics
     {
-        return new Lyrics();
+        return new Lyrics(0);
     }
     
     public function newLyricLine() : LyricLine
     {
-        return new LyricLine();
+        return new LyricLine(0, "");
     }
     
     public function newPageSetup() : PageSetup
