@@ -21,12 +21,12 @@ package alphatab.model;
  */
 class Voice
 {
-    public var beat:Beat;
-    public var duration:Duration;
-    public var notes:Array<Note>;
-    public var index:Int;
-    public var direction:Int;
-    public var isEmpty:Bool;
+    public var beat(default,default):Beat;
+    public var duration(default,default):Duration;
+    public var notes(default,default):Array<Note>;
+    public var index(default,default):Int;
+    public var direction(default,default):Int;
+    public var isEmpty(default,default):Bool;
     
     public function isRestVoice() : Bool
     {

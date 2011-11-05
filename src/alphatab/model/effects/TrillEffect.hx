@@ -26,8 +26,8 @@ class TrillEffect
     /**
      * The fret 
      */
-    public var fret:Int;
-    public var duration:Duration;
+    public var fret(default,default):Int;
+    public var duration(default,default):Duration;
     
     public function new(factory:SongFactory)
     {

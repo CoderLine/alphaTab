@@ -23,12 +23,12 @@ class Beat
 {
     public static inline var MAX_VOICES:Int = 2;
     
-    public var voices:Array<Voice>;
-    public var text:BeatText;
-    public var measure:Measure;
-    public var start:Int;
-    public var effect:BeatEffect;
-    public var index:Int;
+    public var voices(default,default):Array<Voice>;
+    public var text(default,default):BeatText;
+    public var measure(default,default):Measure;
+    public var start(default,default):Int;
+    public var effect(default,default):BeatEffect;
+    public var index(default,default):Int;
         
     public function isRestBeat() : Bool
     {

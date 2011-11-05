@@ -21,8 +21,8 @@ package alphatab.model;
  */
 class LyricLine
 {
-    public var startingMeasure:Int;
-    public var lyrics:String;
+    public var startingMeasure(default,default):Int;
+    public var lyrics(default,default):String;
     
     public function new(startingMeasure:Int, lyrics:String)
     {

@@ -26,9 +26,9 @@ class MidiSequenceHandler
     private var _commands:Array<String>;
     private var _ticksSoFar:Int;
 
-    public var infoTrack:Int;
-    public var metronomeTrack:Int;
-    public var commands:String;
+    public var infoTrack(default,default):Int;
+    public var metronomeTrack(default,default):Int;
+    public var commands(default,default):String;
 
     public function new(tracks:Int)
     {

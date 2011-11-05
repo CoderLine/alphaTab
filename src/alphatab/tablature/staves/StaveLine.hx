@@ -30,17 +30,17 @@ class StaveLine
     public static inline var BottomSpacing = 1;
 
     // a list of the measures in the line
-    public var measures:Array<Int>;
+    public var measures(default,default):Array<Int>;
     // a list of the staves to render 
-    public var staves:Array<Stave>;
+    public var staves(default,default):Array<Stave>;
     
     // spacing definitions for a full staveline
-    public var spacing:StaveSpacing;
+    public var spacing(default,default):StaveSpacing;
     
     // the tablature in which the line is placed in 
-    public var tablature:Tablature; 
+    public var tablature(default,default):Tablature; 
     
-    public var track:Track;
+    public var track(default,default):Track;
     
     // the last measure within this line
     public function lastIndex() : Int 
@@ -63,13 +63,13 @@ class StaveLine
     }
     
     // the top Y
-    public var y:Int;    
-    public var x:Int;    
+    public var y(default,default):Int;    
+    public var x(default,default):Int;    
     
     // is the line full, which means we need to stretch the measures
-    public var fullLine:Bool;
+    public var fullLine(default,default):Bool;
     // the current width including all measures.
-    public var width:Int;
+    public var width(default,default):Int;
     
     public function new()
     {

@@ -28,9 +28,9 @@ import alphatab.tablature.ViewLayout;
  */
 class TripletGroup 
 {
-    public var voices:Array<VoiceDrawing>;
+    public var voices(default,default):Array<VoiceDrawing>;
     private var _voiceIndex:Int;
-    public var triplet : Int;
+    public var triplet(default,default): Int;
     
     public function isFull()
     {

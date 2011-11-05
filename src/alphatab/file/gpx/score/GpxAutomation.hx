@@ -22,12 +22,12 @@ package alphatab.file.gpx.score;
 
 class GpxAutomation 
 {
-    public var type:String;
-    public var barId:Int;
-    public var position:Int;
-    public var linear:Bool;
-    public var visible:Bool;
-    public var value:Array<Int>;
+    public var type(default,default):String;
+    public var barId(default,default):Int;
+    public var position(default,default):Int;
+    public var linear(default,default):Bool;
+    public var visible(default,default):Bool;
+    public var value(default,default):Array<Int>;
     
     public function new()
     {

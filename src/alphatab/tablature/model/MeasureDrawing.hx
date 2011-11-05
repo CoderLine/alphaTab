@@ -89,15 +89,15 @@ class MeasureDrawing extends Measure
     private static inline var RIGHT_SPACING:Int = 10;
     
     // cache for storing which effects are available in this measure
-    public var effectsCache:EffectsCache;
+    public var effectsCache(default,default):EffectsCache;
     
     // the width of the measure within the ui
-    public var width:Int;
+    public var width(default,default):Int;
     // the x position of the measure within the StaveLine 
-    public var x:Int;
+    public var x(default,default):Int;
     // additional space for the measure 
     // used by layout managers to ensure a fixed with if needed
-    public var spacing:Int;
+    public var spacing(default,default):Int;
     
     // a boolean flag indicating whether the measure is the first one
     // within the current StaveLine
@@ -111,11 +111,11 @@ class MeasureDrawing extends Measure
     private var _prevMeasure:MeasureDrawing;
     
     // this is the lowest group which has the direction down
-    public var minDownGroup:BeatGroup;
+    public var minDownGroup(default,default):BeatGroup;
     // this is the hightest group which has the direction up
-    public var maxUpGroup:BeatGroup;
+    public var maxUpGroup(default,default):BeatGroup;
     
-    public var staveLine:StaveLine;
+    public var staveLine(default,default):StaveLine;
     
     // all registered accidentals for further clearing
     private var _registeredAccidentals:Array<Array<Bool>>;
@@ -130,10 +130,10 @@ class MeasureDrawing extends Measure
     }
 
 
-    public var minNote:NoteDrawing;
-    public var maxNote:NoteDrawing;   
-    public var divisionLength:Int;
-    public var groups:Array<BeatGroup>;
+    public var minNote(default,default):NoteDrawing;
+    public var maxNote(default,default):NoteDrawing;   
+    public var divisionLength(default,default):Int;
+    public var groups(default,default):Array<BeatGroup>;
     
     public function checkNote(note:NoteDrawing)
     {        

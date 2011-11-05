@@ -23,8 +23,8 @@ class Lyrics
 {
     public static inline var MAX_LINE_COUNT:Int = 5;
     
-    public var trackChoice:Int;
-    public var lines:Array<LyricLine>;
+    public var trackChoice(default,default):Int;
+    public var lines(default,default):Array<LyricLine>;
     
     public function lyricsBeats() : Array<String>
     {

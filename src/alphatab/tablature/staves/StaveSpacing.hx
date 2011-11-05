@@ -21,7 +21,7 @@ package alphatab.tablature.staves;
  */
 class StaveSpacing 
 {
-    public var spacing:Array<Int>;
+    public var spacing(default,default):Array<Int>;
     
     public function new(size:Int) 
     {

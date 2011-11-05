@@ -32,12 +32,12 @@ class HarmonicEffect
     /**
      * Additional harmonic data (for pinch, tapped and artificial harmonics)
      */
-    public var data:Int;
+    public var data(default,default):Int;
     /**
      * The type of harmonic (pinch, tapped, artificial,..)
      * @see HarmonicType
      */
-    public var type:Int;
+    public var type(default,default):Int;
     
     /**
      * Initializes a new instance of the HarmonicEffect class. 

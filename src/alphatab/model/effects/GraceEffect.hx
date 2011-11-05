@@ -28,29 +28,29 @@ class GraceEffect
     /**
      * Whether the grace note is a dead note
      */
-    public var isDead:Bool;
+    public var isDead(default,default):Bool;
     /**
      * The duration of the note effect
      */
-    public var duration:Int;
+    public var duration(default,default):Int;
     /**
      * The velocity of the note effect
      * @see Velocities
      */
-    public var velocity:Int;
+    public var velocity(default,default):Int;
     /**
      * The fret of the grace note
      */
-    public var fret:Int;
+    public var fret(default,default):Int;
     /**
      * Whether the grace note is on played on beat or before
      */
-    public var isOnBeat:Bool;
+    public var isOnBeat(default,default):Bool;
     /**
      * The Transition between the grace note and the real note
      * @see GraceNoteTransition
      */
-    public var transition:Int;
+    public var transition(default,default):Int;
     
     /**
      * Gets the duration of the effect. 

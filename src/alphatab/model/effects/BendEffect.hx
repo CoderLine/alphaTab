@@ -39,16 +39,16 @@ class BendEffect
      * The bend preset
      * @see BendTypes 
      */
-    public var type:Int;
+    public var type(default,default):Int;
     /**
      * The bend value used for bend presets
      */
-    public var value:Int;
+    public var value(default,default):Int;
     
     /**
      * The list of points for complex bends
      */
-    public var points:Array<BendPoint>;
+    public var points(default,default):Array<BendPoint>;
      
     /**
      * Initializes a new instance of the BendEffect

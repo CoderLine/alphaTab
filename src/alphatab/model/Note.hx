@@ -21,15 +21,15 @@ package alphatab.model;
  */
 class Note
 {
-    public var duration:Int;
-    public var tuplet:Int;
-    public var value:Int;
-    public var velocity:Int;
-    public var string:Int;
-    public var isTiedNote:Bool;
-    public var effect:NoteEffect;
-    public var voice:Voice;
-    public var durationPercent:Float;
+    public var duration(default,default):Int;
+    public var tuplet(default,default):Int;
+    public var value(default,default):Int;
+    public var velocity(default,default):Int;
+    public var string(default,default):Int;
+    public var isTiedNote(default,default):Bool;
+    public var effect(default,default):NoteEffect;
+    public var voice(default,default):Voice;
+    public var durationPercent(default,default):Float;
     
     
     private var _realValue:Int;

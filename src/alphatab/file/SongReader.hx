@@ -37,11 +37,11 @@ class SongReader
     /**
      * The data source for reading. 
      */
-    public var data:DataStream;
+    public var data(default,default):DataStream;
     /**
      * The song factory for creating objects.
      */
-    public var factory:SongFactory;
+    public var factory(default,default):SongFactory;
 
     /**
      * Gets a list of the available readers. 

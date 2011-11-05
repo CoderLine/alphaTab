@@ -167,7 +167,7 @@ alphatab.tablature.PageViewLayout.prototype = $extend(alphatab.tablature.ViewLay
 		return measure;
 	}
 	,getMaxWidth: function() {
-		if(this._maximumWidth <= 0) this._maximumWidth = this.tablature.canvas.width();
+		if(this._maximumWidth <= 0) this._maximumWidth = this.tablature.canvas.getWidth();
 		return this._maximumWidth - this.contentPadding.getHorizontal();
 	}
 	,getSheetWidth: function() {
@@ -273,7 +273,7 @@ alphatab.tablature.PageViewLayout.prototype = $extend(alphatab.tablature.ViewLay
 			var tuning = alphatab.model.Tuning.findTuning(this.tablature.track.strings);
 			if(tuning != null) {
 				y += Math.floor(15 * this.scale);
-				if(!tuning.IsStandard) {
+				if(!tuning.isStandard) {
 					var stringsPerColumn = Math.ceil(this.tablature.track.strings.length / 2);
 					y += stringsPerColumn * Math.floor(15 * this.scale);
 				}
@@ -361,9 +361,9 @@ alphatab.tablature.PageViewLayout.prototype = $extend(alphatab.tablature.ViewLay
 		if(!this.tablature.track.isPercussionTrack) {
 			var tuning = alphatab.model.Tuning.findTuning(this.tablature.track.strings);
 			if(tuning != null) {
-				ctx.get(1).addString(tuning.Name,alphatab.tablature.drawing.DrawingResources.effectFont,x,y);
+				ctx.get(1).addString(tuning.name,alphatab.tablature.drawing.DrawingResources.effectFont,x,y);
 				y += Math.floor(15 * this.scale);
-				if(!tuning.IsStandard) {
+				if(!tuning.isStandard) {
 					var stringsPerColumn = Math.ceil(this.tablature.track.strings.length / 2);
 					var currentX = x;
 					var currentY = y;
@@ -2723,17 +2723,17 @@ alphatab.file.gpx.DocumentReader = function(stream) {
 		++_g;
 		str += String.fromCharCode(i);
 	}
-	this.xmlDocument = Xml.parse(str);
-	this.dom = new haxe.xml.Fast(this.xmlDocument.firstElement());
-	this.gpxDocument = new alphatab.file.gpx.score.GpxDocument();
+	this._xmlDocument = Xml.parse(str);
+	this._dom = new haxe.xml.Fast(this._xmlDocument.firstElement());
+	this._gpxDocument = new alphatab.file.gpx.score.GpxDocument();
 }
 alphatab.file.gpx.DocumentReader.__name__ = ["alphatab","file","gpx","DocumentReader"];
 alphatab.file.gpx.DocumentReader.prototype = {
-	xmlDocument: null
-	,dom: null
-	,gpxDocument: null
+	_xmlDocument: null
+	,_dom: null
+	,_gpxDocument: null
 	,read: function() {
-		if(this.xmlDocument != null) {
+		if(this._xmlDocument != null) {
 			this.readScore();
 			this.readAutomations();
 			this.readTracks();
@@ -2744,32 +2744,32 @@ alphatab.file.gpx.DocumentReader.prototype = {
 			this.readNotes();
 			this.readRhythms();
 		}
-		return this.gpxDocument;
+		return this._gpxDocument;
 	}
 	,readScore: function() {
-		if(this.dom.hasNode.resolve("Score")) {
-			var scoreNode = this.dom.node.resolve("Score");
-			this.gpxDocument.score.title = scoreNode.node.resolve("Title").getInnerData();
-			this.gpxDocument.score.subTitle = scoreNode.node.resolve("SubTitle").getInnerData();
-			this.gpxDocument.score.artist = scoreNode.node.resolve("Artist").getInnerData();
-			this.gpxDocument.score.album = scoreNode.node.resolve("Album").getInnerData();
-			this.gpxDocument.score.words = scoreNode.node.resolve("Words").getInnerData();
-			this.gpxDocument.score.music = scoreNode.node.resolve("Music").getInnerData();
-			this.gpxDocument.score.wordsAndMusic = scoreNode.node.resolve("WordsAndMusic").getInnerData();
-			this.gpxDocument.score.copyright = scoreNode.node.resolve("Copyright").getInnerData();
-			this.gpxDocument.score.tabber = scoreNode.node.resolve("Tabber").getInnerData();
-			this.gpxDocument.score.instructions = scoreNode.node.resolve("Instructions").getInnerData();
-			this.gpxDocument.score.notices = scoreNode.node.resolve("Notices").getInnerData();
-			this.gpxDocument.score.pageSetup.width = Std.parseInt(scoreNode.node.resolve("PageSetup").node.resolve("Width").getInnerData());
-			this.gpxDocument.score.pageSetup.height = Std.parseInt(scoreNode.node.resolve("PageSetup").node.resolve("Height").getInnerData());
-			this.gpxDocument.score.pageSetup.orientation = scoreNode.node.resolve("PageSetup").node.resolve("Orientation").getInnerData();
-			this.gpxDocument.score.pageSetup.margin = new alphatab.model.Padding(Std.parseInt(scoreNode.node.resolve("PageSetup").node.resolve("RightMargin").getInnerData()),Std.parseInt(scoreNode.node.resolve("PageSetup").node.resolve("TopMargin").getInnerData()),Std.parseInt(scoreNode.node.resolve("PageSetup").node.resolve("LeftMargin").getInnerData()),Std.parseInt(scoreNode.node.resolve("PageSetup").node.resolve("BottomMargin").getInnerData()));
-			this.gpxDocument.score.pageSetup.scale = Std.parseFloat(scoreNode.node.resolve("PageSetup").node.resolve("Scale").getInnerData());
+		if(this._dom.hasNode.resolve("Score")) {
+			var scoreNode = this._dom.node.resolve("Score");
+			this._gpxDocument.score.title = scoreNode.node.resolve("Title").getInnerData();
+			this._gpxDocument.score.subTitle = scoreNode.node.resolve("SubTitle").getInnerData();
+			this._gpxDocument.score.artist = scoreNode.node.resolve("Artist").getInnerData();
+			this._gpxDocument.score.album = scoreNode.node.resolve("Album").getInnerData();
+			this._gpxDocument.score.words = scoreNode.node.resolve("Words").getInnerData();
+			this._gpxDocument.score.music = scoreNode.node.resolve("Music").getInnerData();
+			this._gpxDocument.score.wordsAndMusic = scoreNode.node.resolve("WordsAndMusic").getInnerData();
+			this._gpxDocument.score.copyright = scoreNode.node.resolve("Copyright").getInnerData();
+			this._gpxDocument.score.tabber = scoreNode.node.resolve("Tabber").getInnerData();
+			this._gpxDocument.score.instructions = scoreNode.node.resolve("Instructions").getInnerData();
+			this._gpxDocument.score.notices = scoreNode.node.resolve("Notices").getInnerData();
+			this._gpxDocument.score.pageSetup.width = Std.parseInt(scoreNode.node.resolve("PageSetup").node.resolve("Width").getInnerData());
+			this._gpxDocument.score.pageSetup.height = Std.parseInt(scoreNode.node.resolve("PageSetup").node.resolve("Height").getInnerData());
+			this._gpxDocument.score.pageSetup.orientation = scoreNode.node.resolve("PageSetup").node.resolve("Orientation").getInnerData();
+			this._gpxDocument.score.pageSetup.margin = new alphatab.model.Padding(Std.parseInt(scoreNode.node.resolve("PageSetup").node.resolve("RightMargin").getInnerData()),Std.parseInt(scoreNode.node.resolve("PageSetup").node.resolve("TopMargin").getInnerData()),Std.parseInt(scoreNode.node.resolve("PageSetup").node.resolve("LeftMargin").getInnerData()),Std.parseInt(scoreNode.node.resolve("PageSetup").node.resolve("BottomMargin").getInnerData()));
+			this._gpxDocument.score.pageSetup.scale = Std.parseFloat(scoreNode.node.resolve("PageSetup").node.resolve("Scale").getInnerData());
 		}
 	}
 	,readAutomations: function() {
-		if(this.dom.hasNode.resolve("MasterTrack") && this.dom.node.resolve("MasterTrack").hasNode.resolve("Automations")) {
-			var $it0 = this.dom.node.resolve("MasterTrack").node.resolve("Automations").nodes.resolve("Automation").iterator();
+		if(this._dom.hasNode.resolve("MasterTrack") && this._dom.node.resolve("MasterTrack").hasNode.resolve("Automations")) {
+			var $it0 = this._dom.node.resolve("MasterTrack").node.resolve("Automations").nodes.resolve("Automation").iterator();
 			while( $it0.hasNext() ) {
 				var automationNode = $it0.next();
 				var automation = new alphatab.file.gpx.score.GpxAutomation();
@@ -2779,7 +2779,7 @@ alphatab.file.gpx.DocumentReader.prototype = {
 				automation.linear = this.toBool(automationNode.node.resolve("Linear").getInnerData());
 				automation.position = Std.parseInt(automationNode.node.resolve("Position").getInnerData());
 				automation.visible = this.toBool(automationNode.node.resolve("Visible").getInnerData());
-				this.gpxDocument.automations.push(automation);
+				this._gpxDocument.automations.push(automation);
 			}
 		}
 	}
@@ -2800,8 +2800,8 @@ alphatab.file.gpx.DocumentReader.prototype = {
 		return lst;
 	}
 	,readTracks: function() {
-		if(this.dom.hasNode.resolve("Tracks")) {
-			var $it0 = this.dom.node.resolve("Tracks").nodes.resolve("Track").iterator();
+		if(this._dom.hasNode.resolve("Tracks")) {
+			var $it0 = this._dom.node.resolve("Tracks").nodes.resolve("Track").iterator();
 			while( $it0.hasNext() ) {
 				var trackNode = $it0.next();
 				var track = new alphatab.file.gpx.score.GpxTrack();
@@ -2821,13 +2821,13 @@ alphatab.file.gpx.DocumentReader.prototype = {
 						if(propertyNode.att.resolve("name") == "Tuning") track.tunningPitches = this.toIntArray(propertyNode.node.resolve("Pitches").getInnerData());
 					}
 				}
-				this.gpxDocument.tracks.push(track);
+				this._gpxDocument.tracks.push(track);
 			}
 		}
 	}
 	,readMasterBars: function() {
-		if(this.dom.hasNode.resolve("MasterBars")) {
-			var masterBarNodes = this.dom.node.resolve("MasterBars").nodes.resolve("MasterBar");
+		if(this._dom.hasNode.resolve("MasterBars")) {
+			var masterBarNodes = this._dom.node.resolve("MasterBars").nodes.resolve("MasterBar");
 			var $it0 = masterBarNodes.iterator();
 			while( $it0.hasNext() ) {
 				var masterBarNode = $it0.next();
@@ -2839,13 +2839,13 @@ alphatab.file.gpx.DocumentReader.prototype = {
 					masterBar.repeatStart = this.toBool(repeatNode.att.resolve("start"));
 					if(this.toBool(repeatNode.att.resolve("end"))) masterBar.repeatCount = Std.parseInt(repeatNode.att.resolve("count"));
 				}
-				this.gpxDocument.masterBars.push(masterBar);
+				this._gpxDocument.masterBars.push(masterBar);
 			}
 		}
 	}
 	,readBars: function() {
-		if(this.dom.hasNode.resolve("Bars")) {
-			var $it0 = this.dom.node.resolve("Bars").nodes.resolve("Bar").iterator();
+		if(this._dom.hasNode.resolve("Bars")) {
+			var $it0 = this._dom.node.resolve("Bars").nodes.resolve("Bar").iterator();
 			while( $it0.hasNext() ) {
 				var barNode = $it0.next();
 				var bar = new alphatab.file.gpx.score.GpxBar();
@@ -2853,25 +2853,25 @@ alphatab.file.gpx.DocumentReader.prototype = {
 				bar.voiceIds = this.toIntArray(barNode.node.resolve("Voices").getInnerData());
 				bar.clef = barNode.node.resolve("Clef").getInnerData();
 				bar.simileMark = barNode.hasNode.resolve("SimileMark")?barNode.node.resolve("SimileMark").getInnerData():null;
-				this.gpxDocument.bars.push(bar);
+				this._gpxDocument.bars.push(bar);
 			}
 		}
 	}
 	,readVoices: function() {
-		if(this.dom.hasNode.resolve("Voices")) {
-			var $it0 = this.dom.node.resolve("Voices").nodes.resolve("Voice").iterator();
+		if(this._dom.hasNode.resolve("Voices")) {
+			var $it0 = this._dom.node.resolve("Voices").nodes.resolve("Voice").iterator();
 			while( $it0.hasNext() ) {
 				var voiceNode = $it0.next();
 				var voice = new alphatab.file.gpx.score.GpxVoice();
 				voice.id = Std.parseInt(voiceNode.att.resolve("id"));
 				voice.beatIds = this.toIntArray(voiceNode.node.resolve("Beats").getInnerData());
-				this.gpxDocument.voices.push(voice);
+				this._gpxDocument.voices.push(voice);
 			}
 		}
 	}
 	,readBeats: function() {
-		if(this.dom.hasNode.resolve("Beats")) {
-			var $it0 = this.dom.node.resolve("Beats").nodes.resolve("Beat").iterator();
+		if(this._dom.hasNode.resolve("Beats")) {
+			var $it0 = this._dom.node.resolve("Beats").nodes.resolve("Beat").iterator();
 			while( $it0.hasNext() ) {
 				var beatNode = $it0.next();
 				var beat = new alphatab.file.gpx.score.GpxBeat();
@@ -2879,13 +2879,13 @@ alphatab.file.gpx.DocumentReader.prototype = {
 				beat.dyn = beatNode.node.resolve("Dynamic").getInnerData();
 				beat.rhythmId = Std.parseInt(beatNode.node.resolve("Rhythm").att.resolve("ref"));
 				beat.noteIds = this.toIntArray(beatNode.node.resolve("Notes").getInnerData());
-				this.gpxDocument.beats.push(beat);
+				this._gpxDocument.beats.push(beat);
 			}
 		}
 	}
 	,readNotes: function() {
-		if(this.dom.hasNode.resolve("Notes")) {
-			var $it0 = this.dom.node.resolve("Notes").nodes.resolve("Note").iterator();
+		if(this._dom.hasNode.resolve("Notes")) {
+			var $it0 = this._dom.node.resolve("Notes").nodes.resolve("Note").iterator();
 			while( $it0.hasNext() ) {
 				var noteNode = $it0.next();
 				var note = new alphatab.file.gpx.score.GpxNote();
@@ -2899,13 +2899,13 @@ alphatab.file.gpx.DocumentReader.prototype = {
 					var name = propertyNode.att.resolve("name");
 					if(name == "String") note.string = Std.parseInt(propertyNode.node.resolve("String").getInnerData()); else if(name == "Fret") note.fret = Std.parseInt(propertyNode.node.resolve("Fret").getInnerData()); else if(name == "Midi") note.midiNumber = Std.parseInt(propertyNode.node.resolve("Number").getInnerData()); else if(name == "Tone") note.tone = Std.parseInt(propertyNode.node.resolve("Step").getInnerData()); else if(name == "Octave") note.octave = Std.parseInt(propertyNode.node.resolve("Number").getInnerData()); else if(name == "Element") note.element = Std.parseInt(propertyNode.node.resolve("Element").getInnerData()); else if(name == "Variation") note.variation = Std.parseInt(propertyNode.node.resolve("Variation").getInnerData()); else if(name == "Muted") note.mutedEnabled = propertyNode.hasNode.resolve("Enable"); else if(name == "PalmMuted") note.palmMutedEnabled = propertyNode.hasNode.resolve("Enable"); else if(name == "Slide") note.slide = true;
 				}
-				this.gpxDocument.notes.push(note);
+				this._gpxDocument.notes.push(note);
 			}
 		}
 	}
 	,readRhythms: function() {
-		if(this.dom.hasNode.resolve("Rhythms")) {
-			var $it0 = this.dom.node.resolve("Rhythms").nodes.resolve("Rhythm").iterator();
+		if(this._dom.hasNode.resolve("Rhythms")) {
+			var $it0 = this._dom.node.resolve("Rhythms").nodes.resolve("Rhythm").iterator();
 			while( $it0.hasNext() ) {
 				var rhythmNode = $it0.next();
 				var rhythm = new alphatab.file.gpx.score.GpxRhythm();
@@ -2919,7 +2919,7 @@ alphatab.file.gpx.DocumentReader.prototype = {
 					rhythm.primaryTupletNum = 1;
 				}
 				rhythm.augmentationDotCount = rhythmNode.hasNode.resolve("AugmentationDot")?Std.parseInt(rhythmNode.node.resolve("AugmentationDot").att.resolve("count")):0;
-				this.gpxDocument.rhythms.push(rhythm);
+				this._gpxDocument.rhythms.push(rhythm);
 			}
 		}
 	}
@@ -4067,15 +4067,15 @@ EReg.prototype = {
 	,__class__: EReg
 }
 alphatab.model.Tuning = function(name,tuning,isStandard) {
-	this.Name = name;
-	this.Tuning = tuning;
-	this.IsStandard = isStandard;
+	this.name = name;
+	this.tuning = tuning;
+	this.isStandard = isStandard;
 }
 alphatab.model.Tuning.__name__ = ["alphatab","model","Tuning"];
-alphatab.model.Tuning.SevenStrings = null;
-alphatab.model.Tuning.SixStrings = null;
-alphatab.model.Tuning.FiveStrings = null;
-alphatab.model.Tuning.FourStrings = null;
+alphatab.model.Tuning._sevenStrings = null;
+alphatab.model.Tuning._sixStrings = null;
+alphatab.model.Tuning._fiveStrings = null;
+alphatab.model.Tuning._fourStrings = null;
 alphatab.model.Tuning.isTuning = function(name) {
 	var regex = new EReg("([a-g]b?)([0-9])","i");
 	return regex.match(name);
@@ -4100,67 +4100,67 @@ alphatab.model.Tuning.getTuningForText = function(str) {
 	return base;
 }
 alphatab.model.Tuning.getPresetsFor = function(strings) {
-	if(alphatab.model.Tuning.SevenStrings == null) alphatab.model.Tuning.initialize();
-	if(strings == 7) return alphatab.model.Tuning.SevenStrings;
-	if(strings == 6) return alphatab.model.Tuning.SixStrings;
-	if(strings == 5) return alphatab.model.Tuning.FiveStrings;
-	if(strings == 4) return alphatab.model.Tuning.FourStrings;
+	if(alphatab.model.Tuning._sevenStrings == null) alphatab.model.Tuning.initialize();
+	if(strings == 7) return alphatab.model.Tuning._sevenStrings;
+	if(strings == 6) return alphatab.model.Tuning._sixStrings;
+	if(strings == 5) return alphatab.model.Tuning._fiveStrings;
+	if(strings == 4) return alphatab.model.Tuning._fourStrings;
 	return new Array();
 }
 alphatab.model.Tuning.initialize = function() {
-	alphatab.model.Tuning.SevenStrings = new Array();
-	alphatab.model.Tuning.SixStrings = new Array();
-	alphatab.model.Tuning.FiveStrings = new Array();
-	alphatab.model.Tuning.FourStrings = new Array();
-	alphatab.model.Tuning.SevenStrings.push(new alphatab.model.Tuning("Guitar 7 strings",[64,59,55,50,45,40,35],true));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Standard Tuning",[64,59,55,50,45,40],true));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Tune down ½ step",[63,58,54,49,44,39],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Tune down 1 step",[62,57,53,48,43,38],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Tune down 2 step",[60,55,51,46,41,36],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Dropped D Tuning",[64,59,55,50,45,38],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Dropped D Tuning variant",[64,57,55,50,45,38],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Double Dropped D Tuning",[62,59,55,50,45,38],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Dropped E Tuning",[66,61,57,52,47,40],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Dropped C Tuning",[62,57,53,48,43,36],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Open C Tuning",[64,60,55,48,43,36],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Open Cm Tuning",[63,60,55,48,43,36],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Open C6 Tuning",[64,57,55,48,43,36],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Open Cmaj7 Tuning",[64,59,55,52,43,36],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Open D Tuning",[62,57,54,50,45,38],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Open Dm Tuning",[62,57,53,50,45,38],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Open D5 Tuning",[62,57,50,50,45,38],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Open D6 Tuning",[62,59,54,50,45,38],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Open Dsus4 Tuning",[62,57,55,50,45,38],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Open E Tuning",[64,59,56,52,47,40],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Open Em Tuning",[64,59,55,52,47,40],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Open Esus11 Tuning",[64,59,55,52,45,40],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Open F Tuning",[65,60,53,48,45,41],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Open G Tuning",[62,59,55,50,43,38],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Open Gm Tuning",[62,58,55,50,43,38],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Open G6 Tuning",[64,59,55,50,43,38],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Open Gsus4 Tuning",[62,60,55,50,43,38],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Open A Tuning",[64,61,57,52,45,40],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Open Am Tuning",[64,60,57,52,45,40],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Guitar Nashville Tuning",[64,59,67,62,57,52],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Bass 6 Strings Tuning",[48,43,38,33,28,23],false));
-	alphatab.model.Tuning.SixStrings.push(new alphatab.model.Tuning("Lute or Vihuela Tuning",[64,59,54,50,45,40],false));
-	alphatab.model.Tuning.FiveStrings.push(new alphatab.model.Tuning("Bass 5 Strings Tuning",[43,38,33,28,23],true));
-	alphatab.model.Tuning.FiveStrings.push(new alphatab.model.Tuning("Banjo Dropped C Tuning",[62,59,55,48,67],false));
-	alphatab.model.Tuning.FiveStrings.push(new alphatab.model.Tuning("Banjo Open D Tuning",[62,57,54,50,69],false));
-	alphatab.model.Tuning.FiveStrings.push(new alphatab.model.Tuning("Banjo Open G Tuning",[62,59,55,50,67],false));
-	alphatab.model.Tuning.FiveStrings.push(new alphatab.model.Tuning("Banjo G Minor Tuning",[62,58,55,50,67],false));
-	alphatab.model.Tuning.FiveStrings.push(new alphatab.model.Tuning("Banjo G Modal Tuning",[62,57,55,50,67],false));
-	alphatab.model.Tuning.FourStrings.push(new alphatab.model.Tuning("Bass Standard Tuning",[43,38,33,28],true));
-	alphatab.model.Tuning.FourStrings.push(new alphatab.model.Tuning("Bass Tune down ½ step",[42,37,32,27],false));
-	alphatab.model.Tuning.FourStrings.push(new alphatab.model.Tuning("Bass Tune down 1 step",[41,36,31,26],false));
-	alphatab.model.Tuning.FourStrings.push(new alphatab.model.Tuning("Bass Tune down 2 step",[39,34,29,24],false));
-	alphatab.model.Tuning.FourStrings.push(new alphatab.model.Tuning("Bass Dropped D Tuning",[43,38,33,26],false));
-	alphatab.model.Tuning.FourStrings.push(new alphatab.model.Tuning("Ukulele C Tuning",[45,40,36,43],false));
-	alphatab.model.Tuning.FourStrings.push(new alphatab.model.Tuning("Ukulele G Tuning",[52,47,43,38],false));
-	alphatab.model.Tuning.FourStrings.push(new alphatab.model.Tuning("Mandolin Standard Tuning",[64,57,50,43],false));
-	alphatab.model.Tuning.FourStrings.push(new alphatab.model.Tuning("Mandolin or Violin Tuning",[76,69,62,55],false));
-	alphatab.model.Tuning.FourStrings.push(new alphatab.model.Tuning("Viola Tuning",[69,62,55,48],false));
-	alphatab.model.Tuning.FourStrings.push(new alphatab.model.Tuning("Cello Tuning",[57,50,43,36],false));
+	alphatab.model.Tuning._sevenStrings = new Array();
+	alphatab.model.Tuning._sixStrings = new Array();
+	alphatab.model.Tuning._fiveStrings = new Array();
+	alphatab.model.Tuning._fourStrings = new Array();
+	alphatab.model.Tuning._sevenStrings.push(new alphatab.model.Tuning("Guitar 7 strings",[64,59,55,50,45,40,35],true));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Standard Tuning",[64,59,55,50,45,40],true));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Tune down ½ step",[63,58,54,49,44,39],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Tune down 1 step",[62,57,53,48,43,38],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Tune down 2 step",[60,55,51,46,41,36],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Dropped D Tuning",[64,59,55,50,45,38],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Dropped D Tuning variant",[64,57,55,50,45,38],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Double Dropped D Tuning",[62,59,55,50,45,38],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Dropped E Tuning",[66,61,57,52,47,40],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Dropped C Tuning",[62,57,53,48,43,36],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Open C Tuning",[64,60,55,48,43,36],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Open Cm Tuning",[63,60,55,48,43,36],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Open C6 Tuning",[64,57,55,48,43,36],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Open Cmaj7 Tuning",[64,59,55,52,43,36],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Open D Tuning",[62,57,54,50,45,38],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Open Dm Tuning",[62,57,53,50,45,38],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Open D5 Tuning",[62,57,50,50,45,38],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Open D6 Tuning",[62,59,54,50,45,38],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Open Dsus4 Tuning",[62,57,55,50,45,38],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Open E Tuning",[64,59,56,52,47,40],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Open Em Tuning",[64,59,55,52,47,40],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Open Esus11 Tuning",[64,59,55,52,45,40],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Open F Tuning",[65,60,53,48,45,41],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Open G Tuning",[62,59,55,50,43,38],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Open Gm Tuning",[62,58,55,50,43,38],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Open G6 Tuning",[64,59,55,50,43,38],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Open Gsus4 Tuning",[62,60,55,50,43,38],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Open A Tuning",[64,61,57,52,45,40],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Open Am Tuning",[64,60,57,52,45,40],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Guitar Nashville Tuning",[64,59,67,62,57,52],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Bass 6 Strings Tuning",[48,43,38,33,28,23],false));
+	alphatab.model.Tuning._sixStrings.push(new alphatab.model.Tuning("Lute or Vihuela Tuning",[64,59,54,50,45,40],false));
+	alphatab.model.Tuning._fiveStrings.push(new alphatab.model.Tuning("Bass 5 Strings Tuning",[43,38,33,28,23],true));
+	alphatab.model.Tuning._fiveStrings.push(new alphatab.model.Tuning("Banjo Dropped C Tuning",[62,59,55,48,67],false));
+	alphatab.model.Tuning._fiveStrings.push(new alphatab.model.Tuning("Banjo Open D Tuning",[62,57,54,50,69],false));
+	alphatab.model.Tuning._fiveStrings.push(new alphatab.model.Tuning("Banjo Open G Tuning",[62,59,55,50,67],false));
+	alphatab.model.Tuning._fiveStrings.push(new alphatab.model.Tuning("Banjo G Minor Tuning",[62,58,55,50,67],false));
+	alphatab.model.Tuning._fiveStrings.push(new alphatab.model.Tuning("Banjo G Modal Tuning",[62,57,55,50,67],false));
+	alphatab.model.Tuning._fourStrings.push(new alphatab.model.Tuning("Bass Standard Tuning",[43,38,33,28],true));
+	alphatab.model.Tuning._fourStrings.push(new alphatab.model.Tuning("Bass Tune down ½ step",[42,37,32,27],false));
+	alphatab.model.Tuning._fourStrings.push(new alphatab.model.Tuning("Bass Tune down 1 step",[41,36,31,26],false));
+	alphatab.model.Tuning._fourStrings.push(new alphatab.model.Tuning("Bass Tune down 2 step",[39,34,29,24],false));
+	alphatab.model.Tuning._fourStrings.push(new alphatab.model.Tuning("Bass Dropped D Tuning",[43,38,33,26],false));
+	alphatab.model.Tuning._fourStrings.push(new alphatab.model.Tuning("Ukulele C Tuning",[45,40,36,43],false));
+	alphatab.model.Tuning._fourStrings.push(new alphatab.model.Tuning("Ukulele G Tuning",[52,47,43,38],false));
+	alphatab.model.Tuning._fourStrings.push(new alphatab.model.Tuning("Mandolin Standard Tuning",[64,57,50,43],false));
+	alphatab.model.Tuning._fourStrings.push(new alphatab.model.Tuning("Mandolin or Violin Tuning",[76,69,62,55],false));
+	alphatab.model.Tuning._fourStrings.push(new alphatab.model.Tuning("Viola Tuning",[69,62,55,48],false));
+	alphatab.model.Tuning._fourStrings.push(new alphatab.model.Tuning("Cello Tuning",[57,50,43,36],false));
 }
 alphatab.model.Tuning.findTuning = function(strings) {
 	var tunings = alphatab.model.Tuning.getPresetsFor(strings.length);
@@ -4172,7 +4172,7 @@ alphatab.model.Tuning.findTuning = function(strings) {
 		var _g2 = 0, _g1 = strings.length;
 		while(_g2 < _g1) {
 			var i = _g2++;
-			if(strings[i].value != tuning.Tuning[i]) {
+			if(strings[i].value != tuning.tuning[i]) {
 				equals = false;
 				break;
 			}
@@ -4182,9 +4182,9 @@ alphatab.model.Tuning.findTuning = function(strings) {
 	return null;
 }
 alphatab.model.Tuning.prototype = {
-	IsStandard: null
-	,Name: null
-	,Tuning: null
+	isStandard: null
+	,name: null
+	,tuning: null
 	,__class__: alphatab.model.Tuning
 }
 alphatab.model.SongManager = function(factory) {
@@ -4425,8 +4425,6 @@ alphatab.platform.Canvas.__name__ = ["alphatab","platform","Canvas"];
 alphatab.platform.Canvas.prototype = {
 	width: null
 	,height: null
-	,setWidth: null
-	,setHeight: null
 	,strokeStyle: null
 	,fillStyle: null
 	,lineWidth: null
@@ -4740,21 +4738,25 @@ alphatab.platform.js.Html5Canvas.prototype = {
 	_canvas: null
 	,_jCanvas: null
 	,_context: null
-	,width: function() {
+	,width: null
+	,height: null
+	,getWidth: function() {
 		return this._jCanvas.width();
 	}
-	,height: function() {
+	,getHeight: function() {
 		return this._jCanvas.height();
 	}
 	,setWidth: function(width) {
 		this._jCanvas.width(width);
 		this._canvas.width = width;
 		this._context = this._canvas.getContext("2d");
+		return width;
 	}
 	,setHeight: function(height) {
 		this._jCanvas.height(height);
 		this._canvas.height = height;
 		this._context = this._canvas.getContext("2d");
+		return height;
 	}
 	,strokeStyle: null
 	,getStrokeStyle: function() {
@@ -4781,7 +4783,7 @@ alphatab.platform.js.Html5Canvas.prototype = {
 		return this._context.lineWidth;
 	}
 	,clear: function() {
-		this._context.clearRect(0,0,this.width(),this.height());
+		this._context.clearRect(0,0,this.getWidth(),this.getHeight());
 	}
 	,fillRect: function(x,y,w,h) {
 		this._context.fillRect(x,y,w,h);
@@ -8743,17 +8745,21 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 		if(includeWrapper) svg.b[svg.b.length] = "</svg>";
 		return svg.b.join("");
 	}
-	,width: function() {
+	,width: null
+	,height: null
+	,getWidth: function() {
 		return this._width;
 	}
-	,height: function() {
+	,getHeight: function() {
 		return this._height;
 	}
 	,setWidth: function(width) {
 		this._width = width;
+		return this._width;
 	}
 	,setHeight: function(height) {
 		this._height = height;
+		return this._height;
 	}
 	,_strokeStyle: null
 	,strokeStyle: null
@@ -10488,7 +10494,7 @@ alphatab.tablature.Tablature.prototype = {
 	,doLayout: function() {
 		if(this.track == null) return;
 		var size = this.viewLayout.layoutSize;
-		if(!this.autoSizeWidth) size.x = this.canvas.width() - this.viewLayout.contentPadding.getHorizontal();
+		if(!this.autoSizeWidth) size.x = this.canvas.getWidth() - this.viewLayout.contentPadding.getHorizontal();
 		this.viewLayout.prepareLayout(new alphatab.model.Rectangle(0,0,size.x,size.y),0,0);
 		if(this.autoSizeWidth) this.canvas.setWidth(this.viewLayout.width);
 		this.canvas.setHeight(this.viewLayout.height);
@@ -10503,11 +10509,11 @@ alphatab.tablature.Tablature.prototype = {
 			this.canvas.setTextBaseline("middle");
 			this.canvas.fillText(text,20,30);
 		} else if(this._updateDisplay) {
-			var displayRect = new alphatab.model.Rectangle(0,0,this.canvas.width(),this.canvas.height());
+			var displayRect = new alphatab.model.Rectangle(0,0,this.canvas.getWidth(),this.canvas.getHeight());
 			this.viewLayout.updateCache(this.canvas,displayRect,0,0);
 			this._updateDisplay = false;
 		} else {
-			var displayRect = new alphatab.model.Rectangle(0,0,this.canvas.width(),this.canvas.height());
+			var displayRect = new alphatab.model.Rectangle(0,0,this.canvas.getWidth(),this.canvas.getHeight());
 			this.viewLayout.paintCache(this.canvas,displayRect,0,0);
 			this._updateDisplay = false;
 		}
@@ -10523,8 +10529,8 @@ alphatab.tablature.Tablature.prototype = {
 		this.canvas.setFillStyle("#4e4e4e");
 		this.canvas.setFont(alphatab.tablature.drawing.DrawingResources.copyrightFont);
 		this.canvas.setTextBaseline("top");
-		var x = (this.canvas.width() - this.canvas.measureText(msg)) / 2;
-		this.canvas.fillText(msg,x,this.canvas.height() - 15);
+		var x = (this.canvas.getWidth() - this.canvas.measureText(msg)) / 2;
+		this.canvas.fillText(msg,x,this.canvas.getHeight() - 15);
 	}
 	,invalidate: function() {
 		this.canvas.clear();

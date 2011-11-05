@@ -21,10 +21,10 @@ package alphatab.compiler;
  */
 class HaXeDoc 
 {
-    public var fullComment:String;
+    public var fullComment(default,default):String;
     
-    public var summary:String;
-    public var tags:Array<HaXeDocTag>;
+    public var summary(default,default):String;
+    public var tags(default,default):Array<HaXeDocTag>;
     
     public function new() 
     {

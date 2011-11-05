@@ -22,8 +22,8 @@ package alphatab.file.gpx.score;
 
 class GpxVoice 
 {
-    public var id:Int;
-    public var beatIds:Array<Int>;
+    public var id(default,default):Int;
+    public var beatIds(default,default):Array<Int>;
     
     public function new()
     {

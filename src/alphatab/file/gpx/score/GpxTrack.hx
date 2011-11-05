@@ -22,14 +22,14 @@ package alphatab.file.gpx.score;
 
 class GpxTrack 
 {
-    public var id:Int;
-    public var tunningPitches:Array<Int>;
-    public var color:Array<Int>;
-    public var name:String;
+    public var id(default,default):Int;
+    public var tunningPitches(default,default):Array<Int>;
+    public var color(default,default):Array<Int>;
+    public var name(default,default):String;
     
-    public var gmProgram:Int;
-    public var gmChannel1:Int;
-    public var gmChannel2:Int;
+    public var gmProgram(default,default):Int;
+    public var gmChannel1(default,default):Int;
+    public var gmChannel2(default,default):Int;
     
     public function new()
     {

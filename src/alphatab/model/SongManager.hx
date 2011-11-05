@@ -23,7 +23,7 @@ import alphatab.file.SongLoader;
  */
 class SongManager 
 {
-    public var factory:SongFactory;
+    public var factory(default,default):SongFactory;
     
     public function new(factory:SongFactory)
     {

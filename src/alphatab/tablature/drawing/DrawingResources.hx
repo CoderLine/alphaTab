@@ -23,25 +23,25 @@ import alphatab.model.Point;
  */
 class DrawingResources 
 {
-    public static var defaultFontHeight:Int;
-    public static var defaultFont:String;
-    public static var chordFont:String;
-    public static var timeSignatureFont:String;
-    public static var clefFont:String;
-    public static var clefFontHeight:Int;
-    public static var musicFont:String;
-    public static var tempoFont:String;
-    public static var graceFontHeight:Int;
-    public static var graceFont:String;
-    public static var noteFont:String;
-    public static var noteFontHeight:Int;
-    public static var effectFont:String;
-    public static var effectFontHeight:Int;
+    public static var defaultFontHeight(default,default):Int;
+    public static var defaultFont(default,default):String;
+    public static var chordFont(default,default):String;
+    public static var timeSignatureFont(default,default):String;
+    public static var clefFont(default,default):String;
+    public static var clefFontHeight(default,default):Int;
+    public static var musicFont(default,default):String;
+    public static var tempoFont(default,default):String;
+    public static var graceFontHeight(default,default):Int;
+    public static var graceFont(default,default):String;
+    public static var noteFont(default,default):String;
+    public static var noteFontHeight(default,default):Int;
+    public static var effectFont(default,default):String;
+    public static var effectFontHeight(default,default):Int;
     
-    public static var titleFont:String;
-    public static var subtitleFont:String;
-    public static var wordsFont:String;
-    public static var copyrightFont:String;
+    public static var titleFont(default,default):String;
+    public static var subtitleFont(default,default):String;
+    public static var wordsFont(default,default):String;
+    public static var copyrightFont(default,default):String;
 
     public static function init(scale:Float) : Void
     { 

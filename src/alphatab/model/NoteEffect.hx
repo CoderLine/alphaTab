@@ -46,52 +46,52 @@ class NoteEffect
         isFingering = false;
     }
     
-    public var leftHandFinger:Int;
-    public var rightHandFinger:Int;
-    public var isFingering:Bool;
+    public var leftHandFinger(default,default):Int;
+    public var rightHandFinger(default,default):Int;
+    public var isFingering(default,default):Bool;
 
 
-    public var bend:BendEffect;
+    public var bend(default,default):BendEffect;
     public function isBend() : Bool
     {
         return bend != null && bend.points.length != 0;
     }
         
-    public var harmonic:HarmonicEffect;
+    public var harmonic(default,default):HarmonicEffect;
     public function isHarmonic() : Bool
     {
         return harmonic != null;
     }
     
-    public var grace:GraceEffect;
+    public var grace(default,default):GraceEffect;
     public function isGrace() : Bool
     {
         return grace != null;    
     }
     
-    public var trill:TrillEffect;
+    public var trill(default,default):TrillEffect;
     public function isTrill() : Bool
     {
         return trill != null;
     }
     
-    public var tremoloPicking:TremoloPickingEffect;
+    public var tremoloPicking(default,default):TremoloPickingEffect;
     public function isTremoloPicking() : Bool
     {
         return tremoloPicking != null;
     }
     
-    public var vibrato: Bool;
-    public var deadNote: Bool;
-    public var slideType:Int;
-    public var slide: Bool;
-    public var hammer: Bool;
-    public var ghostNote: Bool;
-    public var accentuatedNote: Bool;
-    public var heavyAccentuatedNote: Bool;
-    public var palmMute: Bool;
-    public var staccato: Bool;
-    public var letRing: Bool;
+    public var vibrato(default,default): Bool;
+    public var deadNote(default,default): Bool;
+    public var slideType(default,default):Int;
+    public var slide(default,default): Bool;
+    public var hammer(default,default): Bool;
+    public var ghostNote(default,default): Bool;
+    public var accentuatedNote(default,default): Bool;
+    public var heavyAccentuatedNote(default,default): Bool;
+    public var palmMute(default,default): Bool;
+    public var staccato(default,default): Bool;
+    public var letRing(default,default): Bool;
     
     public function clone(factory:SongFactory) : NoteEffect
     {

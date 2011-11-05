@@ -30,15 +30,15 @@ class MidiChannel
     public static inline var DEFAULT_PHASER:Int = 0;
     public static inline var DEFAULT_TREMOLO:Int = 0;
     
-    public var channel:Int;
-    public var effectChannel:Int;
+    public var channel(default,default):Int;
+    public var effectChannel(default,default):Int;
     
-    public var volume:Int;
-    public var balance:Int;
-    public var chorus:Int;
-    public var reverb:Int;
-    public var phaser:Int;
-    public var tremolo:Int;
+    public var volume(default,default):Int;
+    public var balance(default,default):Int;
+    public var chorus(default,default):Int;
+    public var reverb(default,default):Int;
+    public var phaser(default,default):Int;
+    public var tremolo(default,default):Int;
     
     private var _instrument:Int;
     

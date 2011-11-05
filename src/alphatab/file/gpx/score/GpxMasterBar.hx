@@ -22,11 +22,11 @@ package alphatab.file.gpx.score;
 
 class GpxMasterBar 
 {
-    public var barIds:Array<Int>;
-    public var time:Array<Int>;
+    public var barIds(default,default):Array<Int>;
+    public var time(default,default):Array<Int>;
     
-    public var repeatCount:Int;
-    public var repeatStart:Bool;
+    public var repeatCount(default,default):Int;
+    public var repeatStart(default,default):Bool;
     
     public function new()
     {

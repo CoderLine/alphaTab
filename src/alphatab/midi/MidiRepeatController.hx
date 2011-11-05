@@ -34,9 +34,9 @@ class MidiRepeatController
     private var _repeatStart:Int;
     private var _repeatStartIndex:Int;
     
-    public var index:Int;
-    public var repeatMove:Int;
-    public var shouldPlay:Bool;
+    public var index(default,default):Int;
+    public var repeatMove(default,default):Int;
+    public var shouldPlay(default,default):Bool;
 
     public function new(song:Song)
     {

@@ -33,19 +33,19 @@ class BeatGroup
     private var _lastVoice:VoiceDrawing;
     
     // the first min note within this group
-    public var firstMinNote:NoteDrawing;
+    public var firstMinNote(default,default):NoteDrawing;
     // the first max note within this group
-    public var firstMaxNote:NoteDrawing;
+    public var firstMaxNote(default,default):NoteDrawing;
     // the last min note within this group
-    public var lastMinNote:NoteDrawing;
+    public var lastMinNote(default,default):NoteDrawing;
     // the last max note within this group
-    public var lastMaxNote:NoteDrawing;
+    public var lastMaxNote(default,default):NoteDrawing;
     // the overall min note within this group
-    public var minNote:NoteDrawing;
+    public var minNote(default,default):NoteDrawing;
     // the overall max note within this group
-    public var maxNote:NoteDrawing;    
+    public var maxNote(default,default):NoteDrawing;    
     
-    public var isPercussion:Bool;
+    public var isPercussion(default,default):Bool;
     
     public function new() 
     { 

@@ -21,8 +21,8 @@ package alphatab.midi;
  */
 class BeatData
 {
-    public var duration:Int;
-    public var start:Int;
+    public var duration(default,default):Int;
+    public var start(default,default):Int;
     
     public function new(start:Int, duration:Int)
     {

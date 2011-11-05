@@ -37,59 +37,59 @@ class PageSetup
     /**
      * The size of the page in millimeter x millimeter
      */
-    public var pageSize:Point;
+    public var pageSize(default,default):Point;
     
     /**
      * The padding between the page border and the song contents.
      */
-    public var pageMargin:Padding;
+    public var pageMargin(default,default):Padding;
     
     /**
      * The zoom level of the song. 
      */
-    public var scoreSizeProportion:Float;
+    public var scoreSizeProportion(default,default):Float;
     
     /**
      * Flags which elements of the page should get rendered.
      */
-    public var headerAndFooter:Int;
+    public var headerAndFooter(default,default):Int;
     
     /**
      * The template which defines the text of the title. 
      */
-    public var title:String;
+    public var title(default,default):String;
     /**
      * The template which defines the text of the subtitle. 
      */
-    public var subtitle:String;
+    public var subtitle(default,default):String;
     /**
      * The template which defines the text of the artist. 
      */
-    public var artist:String;
+    public var artist(default,default):String;
     /**
      * The template which defines the text of the album. 
      */
-    public var album:String;
+    public var album(default,default):String;
     /**
      * The template which defines the text of the title. 
      */
-    public var words:String;
+    public var words(default,default):String;
     /**
      * The template which defines the text of the music. 
      */
-    public var music:String;
+    public var music(default,default):String;
     /**
      * The template which defines the text of the wordsAndMusic. 
      */
-    public var wordsAndMusic:String;
+    public var wordsAndMusic(default,default):String;
     /**
      * The template which defines the text of the copyright. 
      */
-    public var copyright:String;
+    public var copyright(default,default):String;
     /**
      * The template which defines the text of the pageNumber. 
      */
-    public var pageNumber:String;
+    public var pageNumber(default,default):String;
     
     /**
      * Initializes a new instance of the PageSetup class. 

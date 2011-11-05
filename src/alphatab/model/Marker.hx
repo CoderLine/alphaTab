@@ -24,9 +24,9 @@ class Marker
     private static inline var DEFAULT_COLOR:Color = Color.Red;
     private static inline var DEFAULT_TITLE:String = "Untitled";
     
-    public var title:String;
-    public var color:Color;
-    public var measureHeader:MeasureHeader;
+    public var title(default,default):String;
+    public var color(default,default):Color;
+    public var measureHeader(default,default):MeasureHeader;
     
     public function new()
     {

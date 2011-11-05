@@ -34,25 +34,33 @@ class Html5Canvas implements Canvas
         this._context = dom.getContext("2d");
     }
     
-    public function width():Int 
+    public var width(getWidth, setWidth):Int;
+    public var height(getHeight, setHeight):Int;
+    
+    private function getWidth():Int 
     {
         return this._jCanvas.Width(); 
     }
-    public function height():Int 
+    
+    private function getHeight():Int 
     {
         return this._jCanvas.Height();
     }
-    public function setWidth(width:Int):Void 
+    
+    private function setWidth(width:Int):Int 
     {
         this._jCanvas.setWidth(width);
         this._canvas.width = width;
         this._context = this._canvas.getContext("2d");
+        return width;
     }
-    public function setHeight(height:Int):Void 
+    
+    private function setHeight(height:Int):Int 
     {
         this._jCanvas.setHeight(height);
         this._canvas.height = height;
         this._context = this._canvas.getContext("2d");
+        return height;
     } 
     
     // colors and styles
@@ -94,7 +102,7 @@ class Html5Canvas implements Canvas
     // rects
     public function clear():Void
     {
-        this._context.clearRect(0,0, width(), height());
+        this._context.clearRect(0,0, width, height);
     }
     public function fillRect(x:Float, y:Float, w:Float, h:Float):Void
     {

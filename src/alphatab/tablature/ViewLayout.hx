@@ -42,21 +42,21 @@ class ViewLayout
 {        
     private var _cache:DrawingContext;
 
-    public var tablature:Tablature;
+    public var tablature(default,default):Tablature;
     
     // Size presets
-    public var stringSpacing :Int;
-    public var scoreLineSpacing :Float;
-    public var scale :Float;
+    public var stringSpacing(default,default):Int;
+    public var scoreLineSpacing(default,default):Float;
+    public var scale(default,default):Float;
     
-    public var firstMeasureSpacing :Float;
+    public var firstMeasureSpacing(default,default):Float;
 
-    public var effectSpacing :Float;
+    public var effectSpacing(default,default):Float;
     
-    public var layoutSize:Point;
-    public var width:Int;
-    public var height:Int;
-    public var contentPadding:Padding;
+    public var layoutSize(default,default):Point;
+    public var width(default,default):Int;
+    public var height(default,default):Int;
+    public var contentPadding(default,default):Padding;
     
     // Returns the index of the measure drawn under the coordinates given
     public function getMeasureAt(xPos:Int, yPos:Int) : Measure {
@@ -64,7 +64,7 @@ class ViewLayout
         return null;
     }
     
-    public function new() 
+    private function new() 
     {
         this.init(1);
         this.contentPadding = new Padding(0, 0, 0, 0);

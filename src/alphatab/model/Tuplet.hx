@@ -23,8 +23,8 @@ class Tuplet
 {
     public static inline var NORMAL:Tuplet = new Tuplet();
     
-    public var enters:Int;
-    public var times:Int;
+    public var enters(default,default):Int;
+    public var times(default,default):Int;
     
     public function new()
     {

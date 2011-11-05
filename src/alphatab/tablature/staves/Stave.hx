@@ -30,10 +30,10 @@ import alphatab.tablature.ViewLayout;
 class Stave 
 {
     // the stave index within a stave line
-    public var index:Int;
-    public var line:StaveLine;
-    public var spacing:StaveSpacing;
-    public var layout:ViewLayout;
+    public var index(default,default):Int;
+    public var line(default,default):StaveLine;
+    public var spacing(default,default):StaveSpacing;
+    public var layout(default,default):ViewLayout;
     
     public function new(line:StaveLine, layout:ViewLayout)
     {

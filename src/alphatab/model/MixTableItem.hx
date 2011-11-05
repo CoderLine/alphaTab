@@ -22,9 +22,9 @@ package alphatab.model;
  */
 class MixTableItem
 {
-    public var value:Int;
-    public var duration:Int;
-    public var allTracks:Bool;
+    public var value(default,default):Int;
+    public var duration(default,default):Int;
+    public var allTracks(default,default):Bool;
     
     public function new() 
     {

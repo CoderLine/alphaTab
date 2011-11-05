@@ -21,10 +21,10 @@ package alphatab.model;
  */
 class Rectangle 
 {
-    public var x:Float;
-    public var y:Float;
-    public var width:Float;
-    public var height:Float;
+    public var x(default,default):Float;
+    public var y(default,default):Float;
+    public var width(default,default):Float;
+    public var height(default,default):Float;
     
     public function new(x:Float, y:Float, width:Float, height:Float) 
     {

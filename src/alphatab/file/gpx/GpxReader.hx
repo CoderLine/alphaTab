@@ -30,13 +30,13 @@ class GpxReader extends SongReader
 {
     private var _fileSystem:FileSystem;
     
-    override public function init(data:DataStream, factory:SongFactory) : Void 
+    public override function init(data:DataStream, factory:SongFactory) : Void 
     {
         super.init(data, factory);
         _fileSystem = new FileSystem();
     }
     
-    override public function readSong(): Song
+    public override function readSong(): Song
     {
         try
         {

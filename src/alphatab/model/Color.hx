@@ -24,10 +24,10 @@ class Color
     public static inline var Black:Color = Color.fromRgb(0, 0, 0);
     public static inline var Red:Color = Color.fromRgb(255, 0, 0);
     
-    public var r:Int;
-    public var g:Int;
-    public var b:Int; 
-    public var a:Float; 
+    public var r(default,default):Int;
+    public var g(default,default):Int;
+    public var b(default,default):Int; 
+    public var a(default,default):Float; 
     
     private function new(r:Int, g:Int, b:Int, a:Float)
     {

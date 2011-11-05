@@ -30,17 +30,17 @@ class CLI
 {
     private var _tasks:Array<CLITask>;
     
-    public var args:Array<String>;
+    public var args(default,default):Array<String>;
     
     // delegates for platforms
-    public var exit:Int->Void;
-    public var print:String->Void;
-    public var println:String->Void;
-    public var fileExists:String->Bool;
-    public var isDirectory:String->Bool;
+    public var exit(default,default):Int->Void;
+    public var print(default,default):String->Void;
+    public var println(default,default):String->Void;
+    public var fileExists(default,default):String->Bool;
+    public var isDirectory(default,default):String->Bool;
     
-    public var writeAllBytes:Array<Int> -> String -> Void;
-    public var writeAllText:String -> String -> Void;
+    public var writeAllBytes(default,default):Array<Int> -> String -> Void;
+    public var writeAllText(default,default):String -> String -> Void;
     
     public function new() 
     {

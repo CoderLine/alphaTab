@@ -28,11 +28,11 @@ import alphatab.tablature.ViewLayout;
 class BeatDrawing extends Beat
 {
     // cache for storing which effects are available in this beat
-    public var effectsCache:EffectsCache;
+    public var effectsCache(default,default):EffectsCache;
     // the x position within the measure
-    public var x:Int;
+    public var x(default,default):Int;
     // the width of the beat
-    public var width:Int;
+    public var width(default,default):Int;
     
     // a boolean flag indicating whether the beat is the first one
     // within the current MeasureDrawing
@@ -72,8 +72,8 @@ class BeatDrawing extends Beat
     private var _nextBeat:BeatDrawing;
     private var _prevBeat:BeatDrawing;    
 
-    public var minNote:NoteDrawing;
-    public var maxNote:NoteDrawing;   
+    public var minNote(default,default):NoteDrawing;
+    public var maxNote(default,default):NoteDrawing;   
     
     
     public function new(factory:SongFactory) 

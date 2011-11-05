@@ -24,8 +24,8 @@ import alphatab.platform.Canvas;
  */
 class DrawingContext 
 {
-    public var layers:Array<DrawingLayer>;
-    public var graphics:Canvas;
+    public var layers(default,default):Array<DrawingLayer>;
+    public var graphics(default,default):Canvas;
     
     public function new(scale:Float) 
     {

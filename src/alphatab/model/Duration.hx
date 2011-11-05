@@ -35,10 +35,10 @@ class Duration
     public static inline var THIRTY_SECOND:Int = 32;
     public static inline var SIXTY_FOURTH:Int = 64;
     
-    public var value:Int;
-    public var isDotted:Bool;
-    public var isDoubleDotted:Bool;
-    public var tuplet:Tuplet;
+    public var value(default,default):Int;
+    public var isDotted(default,default):Bool;
+    public var isDoubleDotted(default,default):Bool;
+    public var tuplet(default,default):Tuplet;
     
     public function time() : Int
     {

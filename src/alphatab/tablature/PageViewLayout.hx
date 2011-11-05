@@ -117,7 +117,7 @@ class PageViewLayout extends ViewLayout
     public function getMaxWidth() : Int
     {
         if (_maximumWidth <= 0) {
-            _maximumWidth = tablature.canvas.width();
+            _maximumWidth = tablature.canvas.width;
         }
         return _maximumWidth - contentPadding.getHorizontal();
     }
@@ -317,7 +317,7 @@ class PageViewLayout extends ViewLayout
                 // Name
                 y += Math.floor(15*scale);
                 
-                if(!tuning.IsStandard)
+                if(!tuning.isStandard)
                 {
                     // Strings
                     var stringsPerColumn = Math.ceil(tablature.track.strings.length/2);
@@ -435,11 +435,11 @@ class PageViewLayout extends ViewLayout
             if(tuning != null)
             {
                 // Name
-                ctx.get(DrawingLayers.LayoutBackground).addString(tuning.Name, DrawingResources.effectFont, x, y);
+                ctx.get(DrawingLayers.LayoutBackground).addString(tuning.name, DrawingResources.effectFont, x, y);
                 
                 y += Math.floor(15*scale);
                 
-                if(!tuning.IsStandard)
+                if(!tuning.isStandard)
                 {
                     // Strings
                     var stringsPerColumn = Math.ceil(tablature.track.strings.length/2);

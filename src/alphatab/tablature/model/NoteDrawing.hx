@@ -28,10 +28,10 @@ import alphatab.tablature.ViewLayout;
  */
 class NoteDrawing extends Note 
 {   
-    public var noteSize:Point;
+    public var noteSize(default,default):Point;
     // TODO: it isn't good we store stave specific data here, 
-    public var scorePosY:Int;
-    public var displaced:Bool;
+    public var scorePosY(default,default):Int;
+    public var displaced(default,default):Bool;
     
     private var _accidental:Int;
     

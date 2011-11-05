@@ -22,8 +22,8 @@ package alphatab.file.gpx;
 
 class File 
 {
-    public var fileName:String;
-    public var fileContents:Array<Int>;
+    public var fileName(default,default):String;
+    public var fileContents(default,default):Array<Int>;
     
     public function new(fileName:String, fileContents:Array<Int>)
     {

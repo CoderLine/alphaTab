@@ -24,15 +24,15 @@ class BendPoint
     /**
      * The position of the bend point on the x-axis (time)
      */
-    public var position:Int;
+    public var position(default,default):Int;
     /**
      * The value of the bend y-axis (pitch)
      */
-    public var value:Int;
+    public var value(default,default):Int;
     /**
      * Whether to perform a vibrato effect on the bend. 
      */
-    public var vibrato:Bool;
+    public var vibrato(default,default):Bool;
         
     /**
      * Initializes a new instance of the BendPoint class. 

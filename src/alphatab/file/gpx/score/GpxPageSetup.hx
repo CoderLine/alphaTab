@@ -20,11 +20,11 @@ package alphatab.file.gpx.score;
 import alphatab.model.Padding;
 
 class GpxPageSetup {
-    public var width:Int;
-    public var height:Int;
-    public var orientation:String;
-    public var margin:Padding;
-    public var scale:Float;
+    public var width(default,default):Int;
+    public var height(default,default):Int;
+    public var orientation(default,default):String;
+    public var margin(default,default):Padding;
+    public var scale(default,default):Float;
     
     public function new()
     {

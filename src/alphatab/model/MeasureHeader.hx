@@ -23,23 +23,23 @@ class MeasureHeader
 {
     public static inline var DEFAULT_KEY_SIGNATURE:Int = 0;
     
-    public var number:Int;
-    public var hasDoubleBar:Bool;
-    public var keySignature:Int;
-    public var keySignatureType:Int;
-    public var start:Int;
-    public var timeSignature:TimeSignature;
-    public var tempo:Tempo;
-    public var marker:Marker;
+    public var number(default,default):Int;
+    public var hasDoubleBar(default,default):Bool;
+    public var keySignature(default,default):Int;
+    public var keySignatureType(default,default):Int;
+    public var start(default,default):Int;
+    public var timeSignature(default,default):TimeSignature;
+    public var tempo(default,default):Tempo;
+    public var marker(default,default):Marker;
     public function hasMarker():Bool
     {
         return this.marker != null;
     }
-    public var isRepeatOpen:Bool;
-    public var repeatAlternative:Int;
-    public var repeatClose:Int;
-    public var tripletFeel:Int;
-    public var song:Song;
+    public var isRepeatOpen(default,default):Bool;
+    public var repeatAlternative(default,default):Int;
+    public var repeatClose(default,default):Int;
+    public var tripletFeel(default,default):Int;
+    public var song(default,default):Song;
     
     public function length() : Int
     {

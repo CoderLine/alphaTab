@@ -21,7 +21,7 @@ package alphatab.model;
  */
 class Tempo
 {
-    public var value:Int;
+    public var value(default,default):Int;
     
     public function inUsq() : Int
     {

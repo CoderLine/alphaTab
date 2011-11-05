@@ -22,10 +22,10 @@ package alphatab.file.gpx.score;
 
 class GpxBar 
 {
-    public var id:Int;
-    public var voiceIds:Array<Int>;
-    public var clef:String;
-    public var simileMark:String;
+    public var id(default,default):Int;
+    public var voiceIds(default,default):Array<Int>;
+    public var clef(default,default):String;
+    public var simileMark(default,default):String;
     
     public function new()
     {

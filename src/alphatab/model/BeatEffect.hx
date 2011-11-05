@@ -22,33 +22,33 @@ import alphatab.model.effects.BendEffect;
  */
 class BeatEffect 
 {
-    public var stroke:BeatStroke;
-    public var hasRasgueado:Bool;
+    public var stroke(default,default):BeatStroke;
+    public var hasRasgueado(default,default):Bool;
 
-    public var pickStroke:Int;
-    public var hasPickStroke:Bool;
-    public var chord:Chord;
+    public var pickStroke(default,default):Int;
+    public var hasPickStroke(default,default):Bool;
+    public var chord(default,default):Chord;
     public function isChord() : Bool
     {
         return this.chord != null;
     }
     
 
-    public var fadeIn:Bool;
-    public var vibrato:Bool;
+    public var fadeIn(default,default):Bool;
+    public var vibrato(default,default):Bool;
     
-    public var tremoloBar:BendEffect;    
+    public var tremoloBar(default,default):BendEffect;    
     public function isTremoloBar() : Bool
     {
         return this.tremoloBar != null;
     }
     
 
-    public var mixTableChange:MixTableChange;
+    public var mixTableChange(default,default):MixTableChange;
     
-    public var tapping: Bool;
-    public var slapping: Bool;
-    public var popping: Bool;
+    public var tapping(default,default): Bool;
+    public var slapping(default,default): Bool;
+    public var popping(default,default): Bool;
 
     public function new(factory:SongFactory) 
     {

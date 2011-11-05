@@ -21,10 +21,10 @@ package alphatab.model;
  */
 class Padding 
 {
-    public var right:Int;
-    public var top:Int;
-    public var left:Int;
-    public var bottom:Int;
+    public var right(default,default):Int;
+    public var top(default,default):Int;
+    public var left(default,default):Int;
+    public var bottom(default,default):Int;
 
     public function new(right:Int, top:Int, left:Int, bottom:Int) 
     {

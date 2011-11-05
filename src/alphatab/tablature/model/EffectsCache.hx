@@ -26,44 +26,44 @@ import alphatab.model.effects.HarmonicType;
 class EffectsCache 
 {
     // effects
-    public var bend:Bool;
-    public var bendOverflow:Int;
-    public var harmonic:Bool;
-    public var harmonicType:Int;
-    public var grace:Bool;
-    public var trill:Bool;
-    public var tremoloPicking:Bool;
-    public var beatVibrato:Bool;
-    public var vibrato:Bool;
-    public var deadNote:Bool;
-    public var slide:Bool;
-    public var hammer:Bool;
-    public var ghostNote:Bool;
-    public var accentuatedNote:Bool;
-    public var heavyAccentuatedNote:Bool;
-    public var palmMute:Bool;
-    public var staccato:Bool;
-    public var letRing:Bool;
-    public var leftHandFingering:Array<Int>;
-    public var rightHandFingering:Array<Int>;
-    public var fingering:Int;
-    public var stroke:Bool;
-    public var rasgueado:Bool;
-    public var pickStroke:Bool;
-    public var chord:Bool;
-    public var fadeIn:Bool;
-    public var tremoloBar:Bool;
-    public var tremoloBarTopOverflow:Int;
-    public var tremoloBarBottomOverflow:Int;
-    public var tapSlapPop:Bool;
-    public var mixTable:Bool;
+    public var bend(default,default):Bool;
+    public var bendOverflow(default,default):Int;
+    public var harmonic(default,default):Bool;
+    public var harmonicType(default,default):Int;
+    public var grace(default,default):Bool;
+    public var trill(default,default):Bool;
+    public var tremoloPicking(default,default):Bool;
+    public var beatVibrato(default,default):Bool;
+    public var vibrato(default,default):Bool;
+    public var deadNote(default,default):Bool;
+    public var slide(default,default):Bool;
+    public var hammer(default,default):Bool;
+    public var ghostNote(default,default):Bool;
+    public var accentuatedNote(default,default):Bool;
+    public var heavyAccentuatedNote(default,default):Bool;
+    public var palmMute(default,default):Bool;
+    public var staccato(default,default):Bool;
+    public var letRing(default,default):Bool;
+    public var leftHandFingering(default,default):Array<Int>;
+    public var rightHandFingering(default,default):Array<Int>;
+    public var fingering(default,default):Int;
+    public var stroke(default,default):Bool;
+    public var rasgueado(default,default):Bool;
+    public var pickStroke(default,default):Bool;
+    public var chord(default,default):Bool;
+    public var fadeIn(default,default):Bool;
+    public var tremoloBar(default,default):Bool;
+    public var tremoloBarTopOverflow(default,default):Int;
+    public var tremoloBarBottomOverflow(default,default):Int;
+    public var tapSlapPop(default,default):Bool;
+    public var mixTable(default,default):Bool;
     
     // other items
-    public var text:Bool;
-    public var tempo:Bool;
-    public var tripletFeel:Bool;
-    public var triplet:Bool;
-    public var marker:Bool;
+    public var text(default,default):Bool;
+    public var tempo(default,default):Bool;
+    public var tripletFeel(default,default):Bool;
+    public var triplet(default,default):Bool;
+    public var marker(default,default):Bool;
     
     public function new() 
     {

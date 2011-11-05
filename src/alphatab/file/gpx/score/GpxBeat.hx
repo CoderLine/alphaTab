@@ -22,10 +22,10 @@ package alphatab.file.gpx.score;
 
 class GpxBeat 
 {
-    public var id:Int;
-    public var rhythmId:Int;
-    public var noteIds:Array<Int>;
-    public var dyn:String;
+    public var id(default,default):Int;
+    public var rhythmId(default,default):Int;
+    public var noteIds(default,default):Array<Int>;
+    public var dyn(default,default):String;
     
     public function new()
     {

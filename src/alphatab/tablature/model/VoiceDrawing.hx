@@ -27,24 +27,24 @@ import alphatab.tablature.ViewLayout;
 class VoiceDrawing extends Voice
 {
     // cache for storing which effects are available in this beat
-    public var effectsCache:EffectsCache;
+    public var effectsCache(default,default):EffectsCache;
     
     // is there any note displaced?
-    public var anyDisplaced:Bool;
+    public var anyDisplaced(default,default):Bool;
 
     
-    public var width:Int;
+    public var width(default,default):Int;
     
-    public var beatGroup:BeatGroup;
-    public var tripletGroup:TripletGroup;
+    public var beatGroup(default,default):BeatGroup;
+    public var tripletGroup(default,default):TripletGroup;
     
-    public var leftJoin:VoiceDrawing;
-    public var rightJoin:VoiceDrawing;
-    public var joinedType:JoinedType;
-    public var isJoinedGreaterThanQuarter:Bool;
+    public var leftJoin(default,default):VoiceDrawing;
+    public var rightJoin(default,default):VoiceDrawing;
+    public var joinedType(default,default):JoinedType;
+    public var isJoinedGreaterThanQuarter(default,default):Bool;
     
-    public var minStringNote:NoteDrawing;
-    public var maxStringNote:NoteDrawing;
+    public var minStringNote(default,default):NoteDrawing;
+    public var maxStringNote(default,default):NoteDrawing;
     
 #if cpp
     public function beatDrawing() : BeatDrawing
@@ -90,8 +90,8 @@ class VoiceDrawing extends Voice
         return previousBeat != null ? cast previousBeat.voices[index] : null;
     }
     
-    public var minNote:NoteDrawing;
-    public var maxNote:NoteDrawing;   
+    public var minNote(default,default):NoteDrawing;
+    public var maxNote(default,default):NoteDrawing;   
     
     public function checkNote(note:NoteDrawing)
     {        

@@ -35,9 +35,9 @@ import alphatab.file.gpx.score.GpxVoice;
 
 class DocumentReader 
 {
-    private var xmlDocument:Xml;
-    private var dom:Fast;
-    private var gpxDocument:GpxDocument;
+    private var _xmlDocument:Xml;
+    private var _dom:Fast;
+    private var _gpxDocument:GpxDocument;
     
     public function new(stream:Array<Int>)
     {
@@ -47,14 +47,14 @@ class DocumentReader
             str += String.fromCharCode(i);
         }
         
-        xmlDocument = Xml.parse(str);
-        dom = new Fast(xmlDocument.firstElement());
-        gpxDocument = new GpxDocument();    
+        _xmlDocument = Xml.parse(str);
+        _dom = new Fast(_xmlDocument.firstElement());
+        _gpxDocument = new GpxDocument();    
     }
     
     public function read() : GpxDocument
     {
-        if(xmlDocument != null) 
+        if(_xmlDocument != null) 
         {
             readScore();
             readAutomations();
@@ -66,43 +66,43 @@ class DocumentReader
             readNotes();
             readRhythms();
         }
-        return gpxDocument;
+        return _gpxDocument;
     }
     
     public function readScore() 
     {
-        if(dom.hasNode.Score)
+        if(_dom.hasNode.Score)
         {
-            var scoreNode = dom.node.Score;
-            gpxDocument.score.title = scoreNode.node.Title.innerData;    
-            gpxDocument.score.subTitle = scoreNode.node.SubTitle.innerData;    
-            gpxDocument.score.artist = scoreNode.node.Artist.innerData;    
-            gpxDocument.score.album = scoreNode.node.Album.innerData;    
-            gpxDocument.score.words = scoreNode.node.Words.innerData;    
-            gpxDocument.score.music = scoreNode.node.Music.innerData;    
-            gpxDocument.score.wordsAndMusic = scoreNode.node.WordsAndMusic.innerData;    
-            gpxDocument.score.copyright = scoreNode.node.Copyright.innerData;    
-            gpxDocument.score.tabber = scoreNode.node.Tabber.innerData;    
-            gpxDocument.score.instructions = scoreNode.node.Instructions.innerData;    
-            gpxDocument.score.notices = scoreNode.node.Notices.innerData;    
+            var scoreNode = _dom.node.Score;
+            _gpxDocument.score.title = scoreNode.node.Title.innerData;    
+            _gpxDocument.score.subTitle = scoreNode.node.SubTitle.innerData;    
+            _gpxDocument.score.artist = scoreNode.node.Artist.innerData;    
+            _gpxDocument.score.album = scoreNode.node.Album.innerData;    
+            _gpxDocument.score.words = scoreNode.node.Words.innerData;    
+            _gpxDocument.score.music = scoreNode.node.Music.innerData;    
+            _gpxDocument.score.wordsAndMusic = scoreNode.node.WordsAndMusic.innerData;    
+            _gpxDocument.score.copyright = scoreNode.node.Copyright.innerData;    
+            _gpxDocument.score.tabber = scoreNode.node.Tabber.innerData;    
+            _gpxDocument.score.instructions = scoreNode.node.Instructions.innerData;    
+            _gpxDocument.score.notices = scoreNode.node.Notices.innerData;    
             
-            gpxDocument.score.pageSetup.width = Std.parseInt(scoreNode.node.PageSetup.node.Width.innerData);
-            gpxDocument.score.pageSetup.height = Std.parseInt(scoreNode.node.PageSetup.node.Height.innerData);
-            gpxDocument.score.pageSetup.orientation = scoreNode.node.PageSetup.node.Orientation.innerData;
-            gpxDocument.score.pageSetup.margin = new Padding(
+            _gpxDocument.score.pageSetup.width = Std.parseInt(scoreNode.node.PageSetup.node.Width.innerData);
+            _gpxDocument.score.pageSetup.height = Std.parseInt(scoreNode.node.PageSetup.node.Height.innerData);
+            _gpxDocument.score.pageSetup.orientation = scoreNode.node.PageSetup.node.Orientation.innerData;
+            _gpxDocument.score.pageSetup.margin = new Padding(
                 Std.parseInt(scoreNode.node.PageSetup.node.RightMargin.innerData),
                 Std.parseInt(scoreNode.node.PageSetup.node.TopMargin.innerData),
                 Std.parseInt(scoreNode.node.PageSetup.node.LeftMargin.innerData),
                 Std.parseInt(scoreNode.node.PageSetup.node.BottomMargin.innerData));
-            gpxDocument.score.pageSetup.scale = Std.parseFloat(scoreNode.node.PageSetup.node.Scale.innerData);
+            _gpxDocument.score.pageSetup.scale = Std.parseFloat(scoreNode.node.PageSetup.node.Scale.innerData);
         }
     }
     
     public function readAutomations() 
     {
-        if(dom.hasNode.MasterTrack && dom.node.MasterTrack.hasNode.Automations)
+        if(_dom.hasNode.MasterTrack && _dom.node.MasterTrack.hasNode.Automations)
         {
-            for(automationNode in dom.node.MasterTrack.node.Automations.nodes.Automation)
+            for(automationNode in _dom.node.MasterTrack.node.Automations.nodes.Automation)
             {
                 var automation:GpxAutomation = new GpxAutomation();
                 automation.type = automationNode.node.Type.innerData;
@@ -111,7 +111,7 @@ class DocumentReader
                 automation.linear = toBool(automationNode.node.Linear.innerData);
                 automation.position = Std.parseInt(automationNode.node.Position.innerData);
                 automation.visible = toBool(automationNode.node.Visible.innerData);
-                gpxDocument.automations.push(automation);
+                _gpxDocument.automations.push(automation);
             }
         }
     }
@@ -138,9 +138,9 @@ class DocumentReader
         
     public function readTracks() 
     {
-        if(dom.hasNode.Tracks)
+        if(_dom.hasNode.Tracks)
         {
-            for(trackNode in dom.node.Tracks.nodes.Track)
+            for(trackNode in _dom.node.Tracks.nodes.Track)
             {
                 var track = new GpxTrack();
                 track.id = Std.parseInt(trackNode.att.id);
@@ -165,16 +165,16 @@ class DocumentReader
                         }
                     }
                 }
-                gpxDocument.tracks.push(track);
+                _gpxDocument.tracks.push(track);
             }
         }
     }
     
     public function readMasterBars()
     {
-        if(dom.hasNode.MasterBars)
+        if(_dom.hasNode.MasterBars)
         {
-            var masterBarNodes = dom.node.MasterBars.nodes.MasterBar;
+            var masterBarNodes = _dom.node.MasterBars.nodes.MasterBar;
             for(masterBarNode in masterBarNodes)
             {
                 var masterBar = new GpxMasterBar();
@@ -190,46 +190,46 @@ class DocumentReader
                         masterBar.repeatCount = Std.parseInt(repeatNode.att.count);
                     }
                 }
-                gpxDocument.masterBars.push(masterBar);
+                _gpxDocument.masterBars.push(masterBar);
             }
         }
     }
     
     public function readBars()
     {
-        if(dom.hasNode.Bars)
+        if(_dom.hasNode.Bars)
         {
-            for(barNode in dom.node.Bars.nodes.Bar)
+            for(barNode in _dom.node.Bars.nodes.Bar)
             {
                 var bar = new GpxBar();
                 bar.id = Std.parseInt(barNode.att.id);
                 bar.voiceIds = toIntArray(barNode.node.Voices.innerData);
                 bar.clef = barNode.node.Clef.innerData;
                 bar.simileMark = barNode.hasNode.SimileMark ? barNode.node.SimileMark.innerData : null;
-                gpxDocument.bars.push(bar);
+                _gpxDocument.bars.push(bar);
             }
         }
     }
     
     public function readVoices()
     {
-        if(dom.hasNode.Voices)
+        if(_dom.hasNode.Voices)
         {
-            for(voiceNode in dom.node.Voices.nodes.Voice)
+            for(voiceNode in _dom.node.Voices.nodes.Voice)
             {
                 var voice = new GpxVoice();
                 voice.id = Std.parseInt(voiceNode.att.id);
                 voice.beatIds = toIntArray(voiceNode.node.Beats.innerData);
-                gpxDocument.voices.push(voice);
+                _gpxDocument.voices.push(voice);
             }
         }
     }
     
     public function readBeats()
     {
-        if(dom.hasNode.Beats)
+        if(_dom.hasNode.Beats)
         {
-            for(beatNode in dom.node.Beats.nodes.Beat)
+            for(beatNode in _dom.node.Beats.nodes.Beat)
             {
                 var beat = new GpxBeat();
                 beat.id = Std.parseInt(beatNode.att.id);
@@ -237,16 +237,16 @@ class DocumentReader
                 beat.rhythmId = Std.parseInt(beatNode.node.Rhythm.att.ref);
                 beat.noteIds = toIntArray(beatNode.node.Notes.innerData);
                 
-                gpxDocument.beats.push(beat);
+                _gpxDocument.beats.push(beat);
             }
         }
     }
     
      public function readNotes()
      {
-         if(dom.hasNode.Notes)
+         if(_dom.hasNode.Notes)
          {
-             for(noteNode in dom.node.Notes.nodes.Note)
+             for(noteNode in _dom.node.Notes.nodes.Note)
              {
                  var note = new GpxNote();
                  note.id = Std.parseInt(noteNode.att.id);
@@ -302,16 +302,16 @@ class DocumentReader
                     }
                  }
                  
-                 gpxDocument.notes.push( note );
+                 _gpxDocument.notes.push( note );
              }
          }
      } 
     
     public function readRhythms()
     {
-        if(dom.hasNode.Rhythms)
+        if(_dom.hasNode.Rhythms)
         {
-            for(rhythmNode in dom.node.Rhythms.nodes.Rhythm)
+            for(rhythmNode in _dom.node.Rhythms.nodes.Rhythm)
             {
                 var rhythm = new GpxRhythm();
                 rhythm.id = Std.parseInt(rhythmNode.att.id);
@@ -331,7 +331,7 @@ class DocumentReader
                 rhythm.augmentationDotCount = (rhythmNode.hasNode.AugmentationDot)
                                             ? Std.parseInt(rhythmNode.node.AugmentationDot.att.count)
                                             : 0;
-                gpxDocument.rhythms.push(rhythm);
+                _gpxDocument.rhythms.push(rhythm);
             }
         }
     }

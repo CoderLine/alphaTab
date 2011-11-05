@@ -23,11 +23,11 @@ class Measure
 {
     public static inline var DEFAULT_CLEF:Int = MeasureClef.Treble;
     
-    public var track:Track;
-    public var clef:Int;
+    public var track(default,default):Track;
+    public var clef(default,default):Int;
     
-    public var beats:Array<Beat>;
-    public var header:MeasureHeader;
+    public var beats(default,default):Array<Beat>;
+    public var header(default,default):MeasureHeader;
     
     public inline function beatCount() : Int
     {

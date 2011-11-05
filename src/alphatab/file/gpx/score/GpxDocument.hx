@@ -22,15 +22,15 @@ package alphatab.file.gpx.score;
 
 class GpxDocument 
 {
-    public var score:GpxScore;
-    public var tracks:Array<GpxTrack>;
-    public var masterBars:Array<GpxMasterBar>;
-    public var bars:Array<GpxBar>;
-    public var voices:Array<GpxVoice>;
-    public var beats:Array<GpxBeat>;
-    public var notes:Array<GpxNote>;
-    public var rhythms:Array<GpxRhythm>;
-    public var automations:Array<GpxAutomation>;
+    public var score(default,default):GpxScore;
+    public var tracks(default,default):Array<GpxTrack>;
+    public var masterBars(default,default):Array<GpxMasterBar>;
+    public var bars(default,default):Array<GpxBar>;
+    public var voices(default,default):Array<GpxVoice>;
+    public var beats(default,default):Array<GpxBeat>;
+    public var notes(default,default):Array<GpxNote>;
+    public var rhythms(default,default):Array<GpxRhythm>;
+    public var automations(default,default):Array<GpxAutomation>;
     
     public function new()
     {

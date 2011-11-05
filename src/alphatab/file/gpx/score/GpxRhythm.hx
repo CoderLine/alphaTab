@@ -22,11 +22,11 @@ package alphatab.file.gpx.score;
 
 class GpxRhythm 
 {
-    public var id:Int;
-    public var augmentationDotCount:Int;
-    public var primaryTupletNum:Int;
-    public var primaryTupletDen:Int;
-    public var noteValue:String;
+    public var id(default,default):Int;
+    public var augmentationDotCount(default,default):Int;
+    public var primaryTupletNum(default,default):Int;
+    public var primaryTupletDen(default,default):Int;
+    public var noteValue(default,default):String;
     
     public function new()
     {

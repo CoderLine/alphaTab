@@ -21,10 +21,8 @@ package alphatab.platform;
  */
 interface Canvas 
 {
-    function width():Int;
-    function height():Int;
-    function setWidth(width:Int):Void;
-    function setHeight(height:Int):Void;
+    var width(getWidth, setWidth):Int;
+    var height(getHeight, setHeight):Int;
         
     // colors and styles
     var strokeStyle(getStrokeStyle, setStrokeStyle):String; //(default black);

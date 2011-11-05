@@ -21,8 +21,8 @@ package alphatab.model;
  */
 class GuitarString
 {
-    public var number:Int;
-    public var value:Int;
+    public var number(default,default):Int;
+    public var value(default,default):Int;
     
     public function new()
     {

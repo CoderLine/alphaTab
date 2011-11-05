@@ -48,9 +48,9 @@ class GpxDrumkit
         kits;    
     };
     
-    public var element:Int;
-    public var variation:Int;
-    public var midiValue:Int;
+    public var element(default,default):Int;
+    public var variation(default,default):Int;
+    public var midiValue(default,default):Int;
     
     public function new(midiValue:Int, element:Int, variation:Int)
     {

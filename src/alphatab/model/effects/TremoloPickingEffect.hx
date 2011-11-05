@@ -26,7 +26,7 @@ class TremoloPickingEffect
     /**
      * The duration fo the tremolo picking
      */
-    public var duration:Duration;
+    public var duration(default,default):Duration;
     
     /**
      * Initializes a new instance of he TremoloPickingEffect class.

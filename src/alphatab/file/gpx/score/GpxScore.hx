@@ -22,19 +22,19 @@ package alphatab.file.gpx.score;
 
 class GpxScore 
 {
-    public var title:String;
-    public var subTitle:String;
-    public var artist:String;
-    public var album:String;
-    public var words:String;
-    public var music:String;
-    public var wordsAndMusic:String;
-    public var copyright:String;
-    public var tabber:String;
-    public var instructions:String;
-    public var notices:String;
+    public var title(default,default):String;
+    public var subTitle(default,default):String;
+    public var artist(default,default):String;
+    public var album(default,default):String;
+    public var words(default,default):String;
+    public var music(default,default):String;
+    public var wordsAndMusic(default,default):String;
+    public var copyright(default,default):String;
+    public var tabber(default,default):String;
+    public var instructions(default,default):String;
+    public var notices(default,default):String;
     
-    public var pageSetup:GpxPageSetup;
+    public var pageSetup(default,default):GpxPageSetup;
 
     public function new()
     {

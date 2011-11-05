@@ -21,8 +21,8 @@ package alphatab.model;
  */
 class TimeSignature
 {
-    public var denominator:Duration;
-    public var numerator:Int;
+    public var denominator(default,default):Duration;
+    public var numerator(default,default):Int;
     
     public function new(factory:SongFactory)
     {

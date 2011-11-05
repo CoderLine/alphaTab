@@ -51,16 +51,16 @@ class Tablature
     private var _updateDisplay:Bool; 
     private var _updateSong:Bool;
     
-    public var settings:Hash<Dynamic>;
-    public var canvas : Canvas;
-    public var isError:Bool;
-    public var errorMessage:String;
-    public var viewLayout:ViewLayout;
-    public var track:Track;
-    public var autoSizeWidth:Bool;
-    public var onCaretChanged:Beat->Bool->Void;
-    public var onLayouted:Void->Void;
-    public var onFinished:Void->Void;
+    public var settings(default,default):Hash<Dynamic>;
+    public var canvas(default,default): Canvas;
+    public var isError(default,default):Bool;
+    public var errorMessage(default,default):String;
+    public var viewLayout(default,default):ViewLayout;
+    public var track(default,default):Track;
+    public var autoSizeWidth(default,default):Bool;
+    public var onCaretChanged(default,default):Beat->Bool->Void;
+    public var onLayouted(default,default):Void->Void;
+    public var onFinished(default,default):Void->Void;
     
 #if cpp
     public function new(source:Dynamic, staves:Array<String> = null, msg:String = null) 
@@ -162,14 +162,14 @@ class Tablature
         var size:Point = viewLayout.layoutSize;
         if (!autoSizeWidth) 
         {
-            size.x = canvas.width() - viewLayout.contentPadding.getHorizontal();
+            size.x = canvas.width - viewLayout.contentPadding.getHorizontal();
         }
         viewLayout.prepareLayout(new Rectangle(0, 0, size.x, size.y), 0, 0);
         
         // update canvas
         if(autoSizeWidth)
-            canvas.setWidth(viewLayout.width);
-        canvas.setHeight(viewLayout.height);
+            canvas.width = viewLayout.width;
+        canvas.height = viewLayout.height;
         if(onLayouted != null) onLayouted();
     }
     
@@ -188,13 +188,13 @@ class Tablature
         }
         else if(_updateDisplay)
         {
-            var displayRect:Rectangle = new Rectangle(0, 0, canvas.width(), canvas.height());
+            var displayRect:Rectangle = new Rectangle(0, 0, canvas.width, canvas.height);
             viewLayout.updateCache(canvas, displayRect, 0, 0);
             _updateDisplay = false;
         }
         else
         {
-            var displayRect:Rectangle = new Rectangle(0, 0, canvas.width(), canvas.height());
+            var displayRect:Rectangle = new Rectangle(0, 0, canvas.width, canvas.height);
             viewLayout.paintCache(canvas, displayRect, 0, 0);
             _updateDisplay = false;
         }
@@ -215,8 +215,8 @@ class Tablature
         canvas.fillStyle = "#4e4e4e";
         canvas.font = DrawingResources.copyrightFont;
         canvas.textBaseline = "top";
-        var x:Float = (canvas.width() - canvas.measureText(msg)) / 2;
-        canvas.fillText(msg, x, canvas.height() - 15);
+        var x:Float = (canvas.width - canvas.measureText(msg)) / 2;
+        canvas.fillText(msg, x, canvas.height - 15);
     }
     
     public function invalidate() 

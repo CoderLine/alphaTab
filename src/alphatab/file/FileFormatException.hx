@@ -24,7 +24,7 @@ class FileFormatException
     /**
      * The error message.
      */
-    public var message:String;
+    public var message(default,default):String;
     
     /**
      * Initializes a new instance of this class.

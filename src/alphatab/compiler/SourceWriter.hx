@@ -20,7 +20,7 @@ class SourceWriter
 {
     private static inline var INDENT:String = "    ";
     private var _buffer:StringBuf;
-    public var indention:Int;
+    public var indention(default,default):Int;
     
     public function new() 
     {

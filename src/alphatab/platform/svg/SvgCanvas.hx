@@ -70,21 +70,29 @@ class SvgCanvas implements Canvas
         return svg.toString();        
     }
     
-    public function width():Int 
+    public var width(getWidth, setWidth):Int;
+    public var height(getHeight, setHeight):Int;
+    
+    private function getWidth():Int 
     {
         return _width; 
     }
-    public function height():Int 
+    
+    private function getHeight():Int 
     {
         return _height;
     }
-    public function setWidth(width:Int):Void 
+    
+    private function setWidth(width:Int):Int 
     {
-        _width = width; 
+        _width = width;
+        return _width;
     }
-    public function setHeight(height:Int):Void 
+    
+    private function setHeight(height:Int):Int 
     {
-        _height = height; 
+        _height = height;
+        return _height;
     } 
     
     // colors and styles
@@ -114,7 +122,7 @@ class SvgCanvas implements Canvas
     }
     
     // line caps/joins
-    public var _lineWidth:Float;
+    private var _lineWidth:Float;
     public var lineWidth(getLineWidth, setLineWidth):Float;
     private function getLineWidth() : Float
     {
@@ -294,7 +302,7 @@ class SvgCanvas implements Canvas
     }
 
     // text
-    public var _font:String; 
+    private var _font:String; 
     public var font(getFont, setFont):String; 
     private function getFont() : String
     {
@@ -306,7 +314,7 @@ class SvgCanvas implements Canvas
         return _font;
     }
     
-    public var _textBaseline:String; 
+    private var _textBaseline:String; 
     public var textBaseline(getTextBaseline, setTextBaseline):String; 
     private function getTextBaseline() : String
     {
@@ -318,7 +326,7 @@ class SvgCanvas implements Canvas
         return _textBaseline;
     }
 
-    public var _textAlign:String; 
+    private var _textAlign:String; 
     public var textAlign(getTextAlign, setTextAlign):String; 
     private function getTextAlign() : String
     {

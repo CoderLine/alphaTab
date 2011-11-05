@@ -21,10 +21,10 @@ package alphatab.model;
  */
 class Chord
 {
-    public var beat:Beat;
-    public var firstFret:Int;
-    public var strings:Array<Int>;    
-    public var name:String;
+    public var beat(default,default):Beat;
+    public var firstFret(default,default):Int;
+    public var strings(default,default):Array<Int>;    
+    public var name(default,default):String;
     
     public function stringCount() : Int
     {

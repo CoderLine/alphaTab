@@ -24,20 +24,20 @@ import alphatab.model.NoteEffect;
 
 class GpxNote 
 {
-    public var id:Int;
-    public var fret:Int;
-    public var string:Int;
-    public var tone:Int;
-    public var octave:Int;
-    public var element:Int;
-    public var variation:Int;
-    public var midiNumber:Int;
+    public var id(default,default):Int;
+    public var fret(default,default):Int;
+    public var string(default,default):Int;
+    public var tone(default,default):Int;
+    public var octave(default,default):Int;
+    public var element(default,default):Int;
+    public var variation(default,default):Int;
+    public var midiNumber(default,default):Int;
     
-    public var tieDestination:Bool;
-    public var vibrato:Bool;
-    public var mutedEnabled:Bool;
-    public var palmMutedEnabled:Bool;
-    public var slide:Bool;
+    public var tieDestination(default,default):Bool;
+    public var vibrato(default,default):Bool;
+    public var mutedEnabled(default,default):Bool;
+    public var palmMutedEnabled(default,default):Bool;
+    public var slide(default,default):Bool;
     
     public function new() 
     {
