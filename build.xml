@@ -24,13 +24,13 @@
     
     <property name="bin-js" location="${bin}/js"/>
 	<property name="lib-js" location="${bin-js}/lib/alphaTab"/>
-	<property name="haxe-js" location="${lib}/alphaTab.js"/>
+	<property name="haxe-js" location="${lib-js}/alphaTab.js"/>
     
     <!-- Java-Player Properties -->	
 	<property name="player-base" location="subprojects/java-player"/>	
 	<property name="player-src" location="${player-base}/src"/>	
 	<property name="player-bin" location="${player-base}/bin"/>	
-	<property name="player-jar" location="${lib}/alphaTab.jar"/>	
+	<property name="player-jar" location="${lib-js}/alphaTab.jar"/>	
 
 	<!-- Java Player -->  
 	<target name="java-player" depends="global-init">
@@ -99,6 +99,9 @@
             
             <arg value="-js" />
             <arg value="${haxe-cs}" />
+            
+            <arg value="--js-namespace" />
+            <arg value="AlphaTab" />
         	
         	<arg value="--macro" />
             <arg value="alphatab.compiler.AlphaTabCsGenerator.use()" />
@@ -109,7 +112,7 @@
         Building C++
     **************************************************************************-->
 
-    <property name="haxe-cpp" location="${bin}/cpp"/>
+    <property name="haxe-cpp" location="${bin}/hxcpp"/>
     <target name="haxe-cpp" depends="global-init">
 		<delete dir="${haxe-cpp}" />
 		<mkdir dir="${haxe-cpp}" />
@@ -119,9 +122,12 @@
             
             <arg value="-main" />
             <arg value="alphatab.Main" />
-            
+                        
             <arg value="-cpp" />
             <arg value="${haxe-cpp}" />
+            
+            <arg value="-D" />
+            <arg value="static" />
         </exec>
     </target>
        
