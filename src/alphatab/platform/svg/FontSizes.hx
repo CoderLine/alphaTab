@@ -28,16 +28,27 @@ class FontSizes
     
     public static var CONTROL_CHARS:Int = 0x20;
     
-    public static function measureString(s:String, f:SupportedFonts, size:Float) {
-        
+    public static function measureString(s:String, f:SupportedFonts, size:Float)
+    {
         var data:Array<Int>;
         var dataSize:Int;
-        switch(f) {
-            case TimesNewRoman: data = TIMES_NEW_ROMAN_11PT; dataSize = 11;
-            case Arial: data = ARIAL_11PT; dataSize = 11;
-            default: data = [8]; dataSize = 11;
-        }
         
+        if (f == SupportedFonts.TimesNewRoman)
+        {
+            data = TIMES_NEW_ROMAN_11PT; 
+            dataSize = 11;
+        }
+        else if (f == SupportedFonts.Arial)
+        {
+            data = ARIAL_11PT; 
+            dataSize = 11;
+        }
+        else
+        {
+            data = [8]; 
+            dataSize = 11;
+        }
+       
         var stringSize = 0;
         
         for (i in 0 ... s.length) {

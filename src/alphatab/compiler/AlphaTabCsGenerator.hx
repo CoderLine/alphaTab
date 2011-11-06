@@ -27,21 +27,21 @@ class AlphaTabCsGenerator
 {
     private static inline var ROOT_NAMESPACE = "HaxeRoot";
     private static var SEP:String = { neko.Sys.systemName() == "Windows" ? "\\" : "/"; }
-    private static var UPPER_CASE = ~/[A-Z0-9]+/;
-    var typeMapping:Hash<String>; 
     
-    var api : JSGenApi; 
-    var file : SourceWriter;
-    var inits : List<TypedExpr>;
-    var statics : List<{ c : ClassType, f : ClassField }>;
-    var packages : Hash<Bool>;
-    var forbidden : Hash<Bool>;
-    var files : List<String>;
+    private var _typeMapping:Hash<String>; 
     
-    var currentNamespace:String;
-    var usings:Array<String>;
+    private var _api : JSGenApi; 
+    private var _file : SourceWriter;
+    private var _inits : List<TypedExpr>;
+    private var _statics : List<{ c : ClassType, f : ClassField }>;
+    private var _packages : Hash<Bool>;
+    private var _forbidden : Hash<Bool>;
+    private var _files : List<String>;
     
-    var inMethodBody:Bool;
+    private var _currentNamespace:String;
+    private var _usings:Array<String>;
+    
+    private var _inMethodBody:Bool;
 
     //
     // General Stuff
@@ -49,27 +49,26 @@ class AlphaTabCsGenerator
     
     public function new(api:JSGenApi) 
     {
+        _api = api;
         
-        this.api = api;
+        _typeMapping = new Hash<String>();
+        _typeMapping.set("Void", "void");
+        _typeMapping.set("Float", "double");
+        _typeMapping.set("Int", "int");
+        _typeMapping.set("Bool", "bool");
+        _typeMapping.set("String", "string");
         
-        typeMapping = new Hash<String>();
-        typeMapping.set("Void", "void");
-        typeMapping.set("Float", "double");
-        typeMapping.set("Int", "int");
-        typeMapping.set("Bool", "bool");
-        typeMapping.set("String", "string");
-        
-        file = new SourceWriter();
-        inits = new List();
-        statics = new List();
-        packages = new Hash();
-        forbidden = new Hash();
-        files = new List<String>();
-        usings = new Array<String>();
+        _file = new SourceWriter();
+        _inits = new List();
+        _statics = new List();
+        _packages = new Hash();
+        _forbidden = new Hash();
+        _files = new List<String>();
+        _usings = new Array<String>();
         // TODO: All keywords
         for( x in ["byte", "short", "int", "long", "sbyte", "ushort", "uint", "ulong", "string", "public", "private", "protected", "static", "internal", "extern"] )
         {
-            forbidden.set(x, true);
+            _forbidden.set(x, true);
         }
         //api.setTypeAccessor(getQualifiedNameByType);
     }
@@ -83,19 +82,19 @@ class AlphaTabCsGenerator
      
     private function generate() 
     {
-        if (!neko.FileSystem.exists(api.outputFile)) 
+        if (!neko.FileSystem.exists(_api.outputFile)) 
         {
-            neko.FileSystem.createDirectory(api.outputFile);
+            neko.FileSystem.createDirectory(_api.outputFile);
         }
         
         // check if dir
-        if (!neko.FileSystem.isDirectory(api.outputFile)) 
+        if (!neko.FileSystem.isDirectory(_api.outputFile)) 
         {
             Context.error("Specified outputFile must be a directory!", null);
         }
             
         // write each type into a file
-        for( t in api.types )
+        for( t in _api.types )
         {
             dumpType(t, true);
         }
@@ -112,29 +111,29 @@ class AlphaTabCsGenerator
         {
             Context.error("Could not write type to file (unknown filename)", null);
         }
-        var typeContents = file.toString();
+        var typeContents = _file.toString();
         
         clear();
-        file.println("using System;");
-        file.println("using Haxe;");
-        for (u in usings) 
+        _file.println("using System;");
+        _file.println("using Haxe;");
+        for (u in _usings) 
         {
-            file.println("using %s;", [u]);
+            _file.println("using %s;", [u]);
         }
-        usings = new Array<String>();
-        file.println();
+        _usings = new Array<String>();
+        _file.println();
         
-        file.print(typeContents);
+        _file.print(typeContents);
         
         var out = neko.io.File.write(fileName, false);
-        out.writeString(file.toString());
+        out.writeString(_file.toString());
         out.close();
         clear();
     }
     
     private function getFileName(fqn:String)
     {
-        var fullPath = api.outputFile;
+        var fullPath = _api.outputFile;
         if (!StringTools.endsWith(fullPath, SEP)) 
         {
             fullPath += SEP;
@@ -222,15 +221,15 @@ class AlphaTabCsGenerator
     
     private function addUsing( ns : String ) 
     {
-        if (ns != null && ns.length > 0 && !Lambda.has(usings, ns)) 
+        if (ns != null && ns.length > 0 && !Lambda.has(_usings, ns)) 
         {
-            usings.push(ns);
+            _usings.push(ns);
         }
     }
     
     private function clear() 
     {
-        file = new SourceWriter();
+        _file = new SourceWriter();
     } 
 
     private function getQualifiedName( t : BaseType, mapRootTypes:Bool = true ) 
@@ -262,7 +261,7 @@ class AlphaTabCsGenerator
 
     private function checkFieldName( c : ClassType, f : ClassField ) 
     {
-        if ( forbidden.exists(f.name) ) 
+        if ( _forbidden.exists(f.name) ) 
         {
             Context.error("The field " + f.name + " is not allowed in C#", c.pos);
         }
@@ -299,7 +298,7 @@ class AlphaTabCsGenerator
     private function getFieldName(s:String)
     {
         // keep uppercase
-        if (UPPER_CASE.match(s)) 
+        if (isUpperCase(s)) 
         {
             return s;
         }
@@ -307,10 +306,15 @@ class AlphaTabCsGenerator
         return "_" + firstToLower(s);
     }
     
+    private function isUpperCase(s:String)
+    {
+        return (s == s.toUpperCase() && s.length > 1);
+    }
+    
     private function getParameterName(s:String)
     {
         // keep uppercase
-        if (UPPER_CASE.match(s)) 
+        if (isUpperCase(s)) 
         {
             return s;
         }
@@ -331,7 +335,7 @@ class AlphaTabCsGenerator
     private function firstToUpper(s:String)
     {
         // keep uppercase
-        if (UPPER_CASE.match(s)) 
+        if (isUpperCase(s)) 
         {
             return s;
         }
@@ -351,12 +355,12 @@ class AlphaTabCsGenerator
     {
         var fqn = getQualifiedName(c);
         
-        currentNamespace = getNamespace(c.pack);
-        file.println("namespace %s", [currentNamespace]);
-        file.println("{");
+        _currentNamespace = getNamespace(c.pack);
+        _file.println("namespace %s", [_currentNamespace]);
+        _file.println("{");
         
-        file.indent();
-        file.printIndent();
+        _file.indent();
+        _file.printIndent();
         
         // doc
         dumpDoc(c.doc);
@@ -366,50 +370,50 @@ class AlphaTabCsGenerator
         // visibility
         if (c.isPrivate)
         {
-            file.print("internal ");
+            _file.print("internal ");
         }
         else 
         {
-            file.print("public ");
+            _file.print("public ");
         }
         
         if (c.constructor == null)
         {
-            file.print("abstract ");
+            _file.print("abstract ");
         }
         
         // type
         if (c.isInterface)
         {
-            file.print("interface ");
+            _file.print("interface ");
         }
         else
         {
-            file.print("class ");
+            _file.print("class ");
         }
         
         // name
-        file.print(getClassName(c.name));
+        _file.print(getClassName(c.name));
         
         // generics
         if (c.params.length > 0)
         {
-            file.print("<");
+            _file.print("<");
             for (i in 0 ... c.params.length)
             {
                 if (i > 0) 
                 {
-                    file.print(", ");
+                    _file.print(", ");
                 }
-                file.print(c.params[i].name);
+                _file.print(c.params[i].name);
             }
-            file.print(">");
+            _file.print(">");
         }
         
         // base class, interfaces
         if (c.superClass != null || c.interfaces.length > 0)
         {
-            file.print(" : ");
+            _file.print(" : ");
             
             if (c.superClass != null)
             {
@@ -421,38 +425,38 @@ class AlphaTabCsGenerator
             {
                 if (c.superClass != null)
                 {
-                    file.print(", ");
+                    _file.print(", ");
                 }
                 
                 for (i in 0 ... c.interfaces.length)
                 {
                     if (i > 0)
                     {
-                        file.print(", ");
+                        _file.print(", ");
                     }
                     printBaseTypeReference(c.interfaces[i].t.get(), c.interfaces[i].params);
                 }
             }
         }
-        file.println();
+        _file.println();
         
-        // file.indent();
+        // _file.indent();
         // 
         // // type constraints
         // for (i in 0 ... c.params.length)
         // {
-        //     file.printIndent();
-        //     file.print("where ");
-        //     file.print(c.params[i].name);
-        //     file.print(" : ");
+        //     _file.printIndent();
+        //     _file.print("where ");
+        //     _file.print(c.params[i].name);
+        //     _file.print(" : ");
         //     printTypeReference(c.params[i].t);
-        //     file.println();
+        //     _file.println();
         // }
         // 
-        // file.outdent();
-        file.printIndent();
-        file.println("{");
-        file.indent();
+        // _file.outdent();
+        _file.printIndent();
+        _file.println("{");
+        _file.indent();
         
         // static
         for (s in c.statics.get())
@@ -472,14 +476,14 @@ class AlphaTabCsGenerator
             dumpConstructor(c, c.constructor.get());
         }
         
-        file.outdent();
-        file.printIndent();
-        file.println("}");
+        _file.outdent();
+        _file.printIndent();
+        _file.println("}");
         
         
-        file.outdent();
-        file.printIndent();
-        file.println("}");
+        _file.outdent();
+        _file.printIndent();
+        _file.println("}");
         
         if (write) writeFile(getFileName(fqn));  
     }
@@ -488,48 +492,48 @@ class AlphaTabCsGenerator
     {
         dumpDoc(f.doc);
         
-        file.printIndent();
+        _file.printIndent();
         switch(f.type) 
         {
             case TFun(args, ret):
             
                 if (f.isPublic)
                 {
-                    file.print("public ");
+                    _file.print("public ");
                 }
                 else
                 {
-                    file.print("protected ");
+                    _file.print("protected ");
                 }
                 
-                file.print(getClassName(c.name));
+                _file.print(getClassName(c.name));
                 
-                file.print("(");
+                _file.print("(");
                         
                     for (i in 0 ... args.length) 
                     {
                         var param = args[i];
                         if (i > 0)
                         {
-                            file.print(", ");
+                            _file.print(", ");
                         }
                         
                         printTypeReference(param.t);
-                        file.print(" ");
-                        file.print(getParameterName(param.name));
+                        _file.print(" ");
+                        _file.print(getParameterName(param.name));
                         
                         if (param.opt)
                         {
-                            file.print(" = ");
+                            _file.print(" = ");
                             getDefaultValueForType(param.t);
                         }
                     }
                     
-                file.println(")");
+                _file.println(")");
                 
-                inMethodBody = true;
+                _inMethodBody = true;
                 dumpTypedExpr(f.expr);
-                inMethodBody = false;
+                _inMethodBody = false;
                 
             default:
         }
@@ -557,54 +561,54 @@ class AlphaTabCsGenerator
         
         if (c.isInterface) 
         {
-            file.printIndent();
-            file.print(modifiers);
+            _file.printIndent();
+            _file.print(modifiers);
             printTypeReference(field.type);
-            file.print(" ");
-            file.print(getPropertyName(field.name));
-            file.println(" { get; set; }");
+            _file.print(" ");
+            _file.print(getPropertyName(field.name));
+            _file.println(" { get; set; }");
         }
         // simple private field?
         else if(!field.isPublic && 
             read == VarAccess.AccNormal && write == VarAccess.AccNormal) 
         {
             
-            file.printIndent();
-            file.print(modifiers);
+            _file.printIndent();
+            _file.print(modifiers);
             printTypeReference(field.type);
-            file.print(" ");
-            file.print(getFieldName(field.name));
+            _file.print(" ");
+            _file.print(field.name);
             
             if (field.expr != null)
             {
-                file.print(" = ");
+                _file.print(" = ");
                 dumpTypedExpr(field.expr);
             }
-            file.println(";");
+            _file.println(";");
         }
         // constant?
         else if (read == VarAccess.AccInline)
         {
-            file.printIndent();
-            file.print(modifiers);
+            _file.printIndent();
+            _file.print(modifiers);
             if (isValueType(field.type))
             {
-                file.print("const ");
+                _file.print("const ");
             }
             else
             {
-                file.print("readonly ");
+                _file.print("readonly ");
             }
             
             printTypeReference(field.type);
-            file.print(" ");
-            file.print(getFieldName(field.name));
+            _file.print(" ");
+            _file.print(field.name);
             if (field.expr != null)
             {
-                file.print(" = ");
+                _file.print(" = ");
                 dumpTypedExpr(field.expr);
             }
-            file.println(";");
+            _file.println(";");
         }
         else
         {
@@ -616,184 +620,210 @@ class AlphaTabCsGenerator
             // MethodName -> AccCall
             // dynamic    -> AccResolve
             
-            // private var
-            file.printIndent();
-            file.print("private ");
-            if (isStatic)
+            var isProperty = false;
+            
+            if (!isProperty)
             {
-                file.print("static ");
+                if( read == VarAccess.AccNormal || read == VarAccess.AccInline ||
+                        write == VarAccess.AccNormal || write == VarAccess.AccInline)
+                {
+                    // property
+                    _file.printIndent();
+                    _file.print(modifiers);
+                    printTypeReference(field.type);
+                    _file.print(" ");
+                    _file.print(getPropertyName(field.name));
+                    _file.println(";");
+                }
+
             }
-            printTypeReference(field.type);
-            file.print(" ");
-            file.print(getFieldName(field.name));
-            if (field.expr != null)
+            else
             {
-                file.print(" = ");
-                dumpTypedExpr(field.expr);
+                // private var
+                var needPrivateVar:Bool;
+                if( read == VarAccess.AccNormal || read == VarAccess.AccInline ||
+                        write == VarAccess.AccNormal || write == VarAccess.AccInline)
+                {
+                    _file.printIndent();
+                    _file.print("private ");
+                    if (isStatic)
+                    {
+                        _file.print("static ");
+                    }
+                    printTypeReference(field.type);
+                    _file.print(" ");
+                    _file.print(getFieldName(field.name));
+                    if (field.expr != null)
+                    {
+                        _file.print(" = ");
+                        dumpTypedExpr(field.expr);
+                    }
+                    _file.println(";");
+                }
+                
+                // property
+                _file.printIndent();
+                _file.print(modifiers);
+                printTypeReference(field.type);
+                _file.print(" ");
+                _file.println(getPropertyName(field.name));
+                
+                _file.printIndent();
+                _file.println("{");
+                _file.indent();
+                
+                var get = new SourceWriter();
+                get.indention = _file.indention;
+                
+                var set = new SourceWriter();
+                set.indention = _file.indention;
+                
+                switch(read) {
+                    case AccNormal: 
+                        get.printIndent();
+                        get.println("get");
+                        get.printIndent();
+                        get.println("{");
+                        get.indent();
+                            get.printIndent();
+                            get.print("return ");
+                            get.print(getFieldName(field.name));
+                            get.println(";");
+                        get.outdent();
+                        get.printIndent();
+                        get.println("}"); 
+                    case AccNo:
+                        get.printIndent();
+                        get.println("protected get");
+                        get.printIndent();
+                        get.println("{");
+                        get.indent();
+                            get.printIndent();
+                            get.print("return ");
+                            get.print(getFieldName(field.name));
+                            get.println(";");
+                        get.outdent();
+                        get.printIndent();
+                        get.println("}");  
+                    case AccNever:
+                        get.printIndent();
+                        get.println("get");
+                        get.printIndent();
+                        get.println("{");
+                        get.indent();
+                            get.printIndent();
+                            get.print("return ");
+                            get.print(getFieldName(field.name));
+                            get.println(";");
+                        get.outdent();
+                        get.printIndent();
+                        get.println("}"); 
+                    case AccCall(m):
+                        get.printIndent();
+                        get.println("get");
+                        get.printIndent();
+                        get.println("{");
+                        get.indent();
+                            get.printIndent();
+                            get.print("return ");
+                            get.print(getMethodName(m));
+                            get.println("();");
+                        get.outdent();
+                        get.printIndent();
+                        get.println("}");  
+                    case AccRequire(r):
+                        get.printIndent();
+                        get.println("get");
+                        get.printIndent();
+                        get.println("{");
+                        get.indent();
+                            get.printIndent();
+                            get.print("return ");
+                            get.print(getMethodName(r));
+                            get.println("();");
+                        get.outdent();
+                        get.printIndent();
+                        get.println("}"); 
+                    case AccResolve:
+                    case AccInline:
+                }
+                _file.print(get.toString());
+                
+                
+                switch (write) 
+                {
+                    case AccNormal:
+                        set.printIndent();
+                        set.println("set");
+                        set.printIndent();
+                        set.println("{");
+                        set.indent();
+                            set.printIndent();
+                            set.print(getFieldName(field.name));
+                            set.println(" = value;");
+                        set.outdent();
+                        set.printIndent();
+                        set.println("}"); 
+                    case AccNo:
+                        set.printIndent();
+                        set.println("protected set");
+                        set.printIndent();
+                        set.println("{");
+                        set.indent();
+                           set.printIndent();
+                           set.print(getFieldName(field.name));
+                           set.println(" = value;");
+                        set.outdent();
+                        set.printIndent();
+                        set.println("}");  
+                    case AccNever:
+                        set.printIndent();
+                        set.println("private set");
+                        set.printIndent();
+                        set.println("{");
+                        set.indent();
+                            set.printIndent();
+                            set.print(getFieldName(field.name));
+                            set.println(" = value;");
+                        set.outdent();
+                        set.printIndent();
+                        set.println("}"); 
+                    case AccCall(m):
+                        set.printIndent();
+                        set.println("set");
+                        set.printIndent();
+                        set.println("{");
+                        set.indent();
+                            set.printIndent();
+                            set.print(getMethodName(m));
+                            set.println("(value);");
+                        set.outdent();
+                        set.printIndent();
+                        set.println("}");  
+                    case AccRequire(r):
+                        set.printIndent();
+                        set.println("set");
+                        set.printIndent();
+                        set.println("{");
+                        set.indent();
+                            set.printIndent();
+                            set.print(getMethodName(r));
+                            set.println("(value);");
+                        set.outdent();
+                        set.printIndent();
+                        set.println("}");   
+                    case AccResolve:
+                    case AccInline:
+                }
+                _file.print(set.toString());
+                _file.outdent();
+                _file.printIndent();
+                _file.println("}");
             }
-            file.println(";");
             
-            // property
-            file.printIndent();
-            file.print(modifiers);
-            printTypeReference(field.type);
-            file.print(" ");
-            file.println(getPropertyName(field.name));
-            
-            file.printIndent();
-            file.println("{");
-            file.indent();
-            
-            var get = new SourceWriter();
-            get.indention = file.indention;
-            
-            var set = new SourceWriter();
-            set.indention = file.indention;
-            
-            switch(read) {
-                case AccNormal: 
-                    get.printIndent();
-                    get.println("get");
-                    get.printIndent();
-                    get.println("{");
-                    get.indent();
-                        get.printIndent();
-                        get.print("return ");
-                        get.print(getFieldName(field.name));
-                        get.println(";");
-                    get.outdent();
-                    get.printIndent();
-                    get.println("}"); 
-                case AccNo:
-                    get.printIndent();
-                    get.println("protected get");
-                    get.printIndent();
-                    get.println("{");
-                    get.indent();
-                        get.printIndent();
-                        get.print("return ");
-                        get.print(getFieldName(field.name));
-                        get.println(";");
-                    get.outdent();
-                    get.printIndent();
-                    get.println("}");  
-                case AccNever:
-                    get.printIndent();
-                    get.println("private get");
-                    get.printIndent();
-                    get.println("{");
-                    get.indent();
-                        get.printIndent();
-                        get.print("return ");
-                        get.print(getFieldName(field.name));
-                        get.println(";");
-                    get.outdent();
-                    get.printIndent();
-                    get.println("}"); 
-                case AccCall(m):
-                    get.printIndent();
-                    get.println("private get");
-                    get.printIndent();
-                    get.println("{");
-                    get.indent();
-                        get.printIndent();
-                        get.print("return ");
-                        get.print(getMethodName(m));
-                        get.println("();");
-                    get.outdent();
-                    get.printIndent();
-                    get.println("}");  
-                case AccRequire(r):
-                    get.printIndent();
-                    get.println("private get");
-                    get.printIndent();
-                    get.println("{");
-                    get.indent();
-                        get.printIndent();
-                        get.print("return ");
-                        get.print(getMethodName(r));
-                        get.println("();");
-                    get.outdent();
-                    get.printIndent();
-                    get.println("}"); 
-                case AccResolve:
-                case AccInline:
-            }
-            file.print(get.toString());
-            
-            
-            switch (write) 
-            {
-                case AccNormal:
-                    set.printIndent();
-                    set.println("set");
-                    set.printIndent();
-                    set.println("{");
-                    set.indent();
-                        set.printIndent();
-                        set.print(getFieldName(field.name));
-                        set.println(" = value;");
-                    set.outdent();
-                    set.printIndent();
-                    set.println("}"); 
-                case AccNo:
-                    set.printIndent();
-                    set.println("protected set");
-                    set.printIndent();
-                    set.println("{");
-                    set.indent();
-                       set.printIndent();
-                       set.print(getFieldName(field.name));
-                       set.println(" = value;");
-                    set.outdent();
-                    set.printIndent();
-                    set.println("}");  
-                case AccNever:
-                    set.printIndent();
-                    set.println("private get");
-                    set.printIndent();
-                    set.println("{");
-                    set.indent();
-                        set.printIndent();
-                        set.print(getFieldName(field.name));
-                        set.println(" = value;");
-                    set.outdent();
-                    set.printIndent();
-                    set.println("}"); 
-                case AccCall(m):
-                    set.printIndent();
-                    set.println("private get");
-                    set.printIndent();
-                    set.println("{");
-                    set.indent();
-                        set.printIndent();
-                        set.print(getMethodName(m));
-                        set.println("(value);");
-                    set.outdent();
-                    set.printIndent();
-                    set.println("}");  
-                case AccRequire(r):
-                    set.printIndent();
-                    set.println("private get");
-                    set.printIndent();
-                    set.println("{");
-                    set.indent();
-                        set.printIndent();
-                        set.print(getMethodName(r));
-                        set.println("(value);");
-                    set.outdent();
-                    set.printIndent();
-                    set.println("}");   
-                case AccResolve:
-                case AccInline:
-            }
-            file.print(set.toString());
-            file.outdent();
-            file.printIndent();
-            file.println("}");
         }
          
-        file.println();
+        _file.println();
     }
     
     private function dumpMethod(c:ClassType, field:ClassField, isStatic:Bool, k:MethodKind) 
@@ -808,59 +838,59 @@ class AlphaTabCsGenerator
                     modifiers += "static ";
                 }
                 
-                file.printIndent();
-                file.print(modifiers);
+                _file.printIndent();
+                _file.print(modifiers);
                 printTypeReference(ret);
-                file.print(" ");
-                file.print(getMethodName(field.name));
+                _file.print(" ");
+                _file.print(getMethodName(field.name));
                 
-                file.print("(");
+                _file.print("(");
                 
                     for (i in 0 ... args.length) 
                     {
                         var param = args[i];
                         if (i > 0)
                         {
-                            file.print(", ");
+                            _file.print(", ");
                         }
                         
                         printTypeReference(param.t);
-                        file.print(" ");
-                        file.print(getParameterName(param.name));
+                        _file.print(" ");
+                        _file.print(getParameterName(param.name));
                         
                         if (param.opt)
                         {
-                            file.print(" = ");
-                            file.print(getDefaultValueForType(param.t));
+                            _file.print(" = ");
+                            _file.print(getDefaultValueForType(param.t));
                         }
                     }
                     
-                file.print(")");
+                _file.print(")");
                 
                 if (c.isInterface) 
                 {
-                    file.println(";");
+                    _file.println(";");
                 }
                 else 
                 {
-                    file.println();
+                    _file.println();
                     if (field.expr == null)
                     {
-                        file.printIndent();
-                        file.println("// NOTE: no body expression found");
+                        _file.printIndent();
+                        _file.println("// NOTE: no body expression found");
                     }
                     else 
                     {
-                        inMethodBody = true;
+                        _inMethodBody = true;
                         dumpTypedExpr(field.expr);
-                        inMethodBody = false;
+                        _inMethodBody = false;
                     }
                 }
                 
             default:
-                file.println("/* Unknown Method Type */");
+                _file.println("/* Unknown Method Type */");
         }    
-        file.println();
+        _file.println();
     }
     
     private function printTypeReference(type:Type, params:Array<Type> = null)
@@ -898,7 +928,7 @@ class AlphaTabCsGenerator
             case TFun(args, ret): 
                 dumpFunctionDef(args, ret);
             case TDynamic(t):
-                file.print("dynamic");
+                _file.print("dynamic");
             default:
         }
     }
@@ -920,27 +950,27 @@ class AlphaTabCsGenerator
     private function printBaseTypeReference(t:BaseType, params:Array<Type> = null)
     {
         var fqn = getQualifiedName(t, false);
-        if (typeMapping.exists(fqn))
+        if (_typeMapping.exists(fqn))
         {
-            file.print(typeMapping.get(fqn));
+            _file.print(_typeMapping.get(fqn));
         }
         else
         {
             addUsing(getNamespace(t.pack));
-            file.print(t.name);
+            _file.print(t.name);
             if (params != null && params.length > 0)
             {
-                file.print("<");
+                _file.print("<");
                 for (i in 0 ... params.length)
                 {
                     if (i > 0)
                     {
-                        file.print(", ");
+                        _file.print(", ");
                     }
                     printTypeReference(params[i]);
                 }
                 
-                file.print(">");
+                _file.print(">");
             }
         }
     }
@@ -951,8 +981,8 @@ class AlphaTabCsGenerator
         var lines = s.split("\n");
         for (l in lines)
         {
-            file.printIndent();
-            file.println(l);
+            _file.printIndent();
+            _file.println(l);
         }
     }
     
@@ -963,7 +993,7 @@ class AlphaTabCsGenerator
     private function dumpEnum(e:EnumType, write:Bool) 
     {
         var fqn = getQualifiedName(e);
-        file.println("// enum " + fqn);
+        _file.println("// enum " + fqn);
         if(write) writeFile(getFileName(fqn));
     }
     
@@ -974,7 +1004,7 @@ class AlphaTabCsGenerator
     private function dumpTypedef(t:DefType, write:Bool) 
     {
         var fqn = getQualifiedName(t);
-        file.println("// typedef " + fqn);
+        _file.println("// typedef " + fqn);
         if(write) writeFile(getFileName(fqn));
     }
     
@@ -987,27 +1017,27 @@ class AlphaTabCsGenerator
         var isVoidReturn = ret == null || getQualifiedNameByType(ret) == "Void";
         if (isVoidReturn)
         {
-            file.print("Function");
+            _file.print("Function");
         }
         else 
         {
-            file.print("Action");
+            _file.print("Action");
         }
         
         if (args.length > 0)
         {
-            file.print("<");
+            _file.print("<");
             for (i in 0 ... args.length)
             {
                 if (i > 0)
                 {
-                    file.print(", ");
+                    _file.print(", ");
                 }
                 
                 // TODO: what are the correct type parameters for those?
                 printTypeReference(args[i].t);
-                //file.print(" ");
-                //file.print(args[i].name);
+                //_file.print(" ");
+                //_file.print(args[i].name);
                 
                 // TODO: what to do with optional arguments?
             }
@@ -1016,11 +1046,11 @@ class AlphaTabCsGenerator
             {
                 if (args.length > 0)
                 {
-                    file.print(", ");
+                    _file.print(", ");
                 }
                 printTypeReference(ret);
             }
-            file.print(">");
+            _file.print(">");
         }
     }
     
@@ -1030,7 +1060,7 @@ class AlphaTabCsGenerator
     
     private function dumpAnonymousType(t:AnonType) 
     {
-        file.println("// anonymous class ");
+        _file.println("// anonymous class ");
     }
     
     //
@@ -1041,7 +1071,7 @@ class AlphaTabCsGenerator
     {
         if (t != null) 
         {
-            var e = this.api.getExpr(t);
+            var e = _api.getExpr(t);
             dumpExpr(e);
         }
     }
@@ -1097,35 +1127,35 @@ class AlphaTabCsGenerator
         {
             switch(c) 
             {
-                case CInt( v ): file.print(v);
-                case CFloat( f ):   file.print(f);
-                case CString( s ) : file.print("\"" + s + "\"");
-                case CIdent( s ) :  file.print(s);
-                case CType( s ) :   file.print(s);
+                case CInt( v ): _file.print(v);
+                case CFloat( f ):   _file.print(f);
+                case CString( s ) : _file.print("\"" + s + "\"");
+                case CIdent( s ) :  _file.print(s);
+                case CType( s ) :   _file.print(s);
                 case CRegexp( r , opt ): 
-                    file.print("new EReg(\""+r+"\", \""+opt+"\")");
+                    _file.print("new EReg(\""+r+"\", \""+opt+"\")");
             }
         }
     }
     
     private function dumpEArray( e1 : Expr, e2 : Expr ) {
         dumpExpr(e1);
-        file.print("[");
+        _file.print("[");
         dumpExpr(e2);
-        file.print("]");
+        _file.print("]");
     }
 
     private function dumpEBinop( op : Binop, e1 : Expr, e2 : Expr, asStatement:Bool ) {
         if (asStatement) 
         {
-            file.printIndent();
+            _file.printIndent();
         }
         dumpExpr(e1);
-        file.print(" " + getBinop(op) + " ");
+        _file.print(" " + getBinop(op) + " ");
         dumpExpr(e2);
         if (asStatement)
         {
-            file.println(";");
+            _file.println(";");
         }
     }
     
@@ -1161,14 +1191,14 @@ class AlphaTabCsGenerator
     {
         if (asStatement) 
         {
-            file.printIndent();
+            _file.printIndent();
         }
         dumpExpr(e);
-        file.print(".");
-        file.print(getMethodName(field)); // TODO: ensure correct naming on access
+        _file.print(".");
+        _file.print(getMethodName(field)); // TODO: ensure correct naming on access
         if (asStatement) 
         {
-            file.println(";");
+            _file.println(";");
         }
 
     }
@@ -1177,14 +1207,14 @@ class AlphaTabCsGenerator
     {
         if (asStatement)
         {
-            file.printIndent();
+            _file.printIndent();
         }
         dumpExpr(e);
-        file.print(".");
-        file.print(field); // TODO: ensure correct naming on access
+        _file.print(".");
+        _file.print(field); // TODO: ensure correct naming on access
         if (asStatement)
         {
-            file.println(";");
+            _file.println(";");
         }
     }
 
@@ -1192,14 +1222,14 @@ class AlphaTabCsGenerator
     {
         if (asStatement)
         {
-            file.printIndent();
+            _file.printIndent();
         }
-        file.print("(");
+        _file.print("(");
         dumpExpr(e);
-        file.print(")");
+        _file.print(")");
         if (asStatement)
         {
-            file.println(";");
+            _file.println(";");
         }
     }
 
@@ -1207,32 +1237,32 @@ class AlphaTabCsGenerator
     {
         if (asStatement)
         {
-            file.printIndent();
+            _file.printIndent();
         }
-        file.println("new {");
-        file.indent();
+        _file.println("new {");
+        _file.indent();
         
         for(i in 0 ... fields.length)
         {
             var f = fields[i];
             if (i > 0)
             {
-                file.printIndent();
-                file.println(", ");
+                _file.printIndent();
+                _file.println(", ");
             }
-            file.printIndent();
-            file.print(f.field);
-            file.print(" = ");
+            _file.printIndent();
+            _file.print(f.field);
+            _file.print(" = ");
             dumpExpr(f.expr);
-            file.println();
+            _file.println();
         }
         
-        file.outdent();
-        file.printIndent();
-        file.println("}");
+        _file.outdent();
+        _file.printIndent();
+        _file.println("}");
         if (asStatement)
         {
-            file.println(";");
+            _file.println(";");
         }
 
     }
@@ -1241,21 +1271,21 @@ class AlphaTabCsGenerator
     {
         if (asStatement)
         {
-            file.printIndent();
+            _file.printIndent();
         }
 
         for (i in 0 ... values.length)
         {
             if (i > 0)
             {
-                file.print(", ");
+                _file.print(", ");
             }
             dumpExpr(values[i]);
         }
         
         if (asStatement)
         {
-            file.println(";");
+            _file.println(";");
         }
     }
 
@@ -1263,27 +1293,27 @@ class AlphaTabCsGenerator
     {
         if (asStatement)
         {
-            file.printIndent();
+            _file.printIndent();
         }
 
         dumpExpr(e);
         
-        file.print("(");
+        _file.print("(");
         
         for (i in 0 ... params.length)
         {
             if (i > 0)
             {
-                file.print(", ");
+                _file.print(", ");
             }
             dumpExpr(params[i]);
         }
         
-        file.print(")");
+        _file.print(")");
         
         if (asStatement)
         {
-            file.println(";");
+            _file.println(";");
         }
     }
 
@@ -1291,26 +1321,26 @@ class AlphaTabCsGenerator
     {
         if (asStatement)
         {
-            file.printIndent();
+            _file.printIndent();
         }
 
-        file.print("new ");
+        _file.print("new ");
         dumpTypePath(t);
         
-        file.print("(");
+        _file.print("(");
         for (i in 0 ... params.length)
         {
             if (i > 0)
             {
-                file.print(", ");
+                _file.print(", ");
             }
             dumpExpr(params[i]);
         }
-        file.print(")");
+        _file.print(")");
         
         if (asStatement)
         {
-            file.println(";");
+            _file.println(";");
         }
     }
     
@@ -1318,29 +1348,29 @@ class AlphaTabCsGenerator
     {
         var ns = getNamespace(t.pack, false);
         var fqn = ns.length == 0 ? getClassName(t.name) : ns + "." + getClassName(t.name);
-        if (typeMapping.exists(fqn))
+        if (_typeMapping.exists(fqn))
         {
-            file.print(typeMapping.get(fqn));
+            _file.print(_typeMapping.get(fqn));
         }
         else
         {
             ns = getNamespace(t.pack, true);
             addUsing(ns);
 
-            file.print(t.name);
+            _file.print(t.name);
             if (t.params != null && t.params.length > 0)
             {
-                file.print("<");
+                _file.print("<");
                 for (i in 0 ... t.params.length)
                 {
                     if (i > 0)
                     {
-                        file.print(", ");
+                        _file.print(", ");
                     }
                     dumpTypeParam(t.params[i]);
                 }
                 
-                file.print(">");
+                _file.print(">");
             }
         }
     }
@@ -1360,23 +1390,23 @@ class AlphaTabCsGenerator
     {
         if (asStatement)
         {
-            file.printIndent();
+            _file.printIndent();
         }
 
         if (postFix)
         {
             dumpExpr(e);
-            file.print(getUnop(op));
+            _file.print(getUnop(op));
         }
         else
         {
-            file.print(getUnop(op));
+            _file.print(getUnop(op));
             dumpExpr(e);
         }
         
         if (asStatement)
         {
-            file.println(";");
+            _file.println(";");
         }
     }
     
@@ -1396,25 +1426,25 @@ class AlphaTabCsGenerator
     { 
         for (v in vars) 
         {
-            file.printIndent();
+            _file.printIndent();
             if (v.type == null)
             {
-                file.print("var");
+                _file.print("var");
             }
             else
             {
                 dumpComplexType(v.type);
             }
             
-            file.print(" ");
-            file.print(v.name);
+            _file.print(" ");
+            _file.print(v.name);
             
             if (v.expr != null)
             {
-                file.print(" = ");
+                _file.print(" = ");
                 dumpExpr(v.expr);
             }
-            file.println(";");
+            _file.println(";");
         }
     }
     
@@ -1450,9 +1480,9 @@ class AlphaTabCsGenerator
         {
             if (i > 0)
             {
-                file.print(" ");
+                _file.print(" ");
             }
-            file.print(getAccess2(access[i]));
+            _file.print(getAccess2(access[i]));
         }
     }
     
@@ -1497,35 +1527,35 @@ class AlphaTabCsGenerator
         
         if (asStatement)
         {
-            file.printIndent();
+            _file.printIndent();
         }
 
-        if (!inMethodBody)
+        if (!_inMethodBody)
         {
-            file.print("(");
+            _file.print("(");
             for ( i in 0 ... f.args.length )
             {
                 if (i > 0)
                 {
-                    file.print(", ");
+                    _file.print(", ");
                 }
                 if (f.args[i].type != null)
                 {
                     dumpComplexType(f.args[i].type);
                 }
-                file.print(" ");
-                file.print(f.args[i].name);
+                _file.print(" ");
+                _file.print(f.args[i].name);
                 // if (f.args[i].opt && f.args[i].type != null)
                 // {
-                //     file.print(" = ");
-                //     file.print(getDefaultValueForType(f.args[i].type));
+                //     _file.print(" = ");
+                //     _file.print(getDefaultValueForType(f.args[i].type));
                 // }
             }
-            file.println(") => ");
-            file.printIndent();
-            file.println("{");
-            file.indent();
-            file.printIndent();
+            _file.println(") => ");
+            _file.printIndent();
+            _file.println("{");
+            _file.indent();
+            _file.printIndent();
         }
         
         if (f.expr != null)
@@ -1533,70 +1563,70 @@ class AlphaTabCsGenerator
             dumpExpr(f.expr);
         }
         
-        if (!inMethodBody)
+        if (!_inMethodBody)
         {
-            file.outdent();
-            file.printIndent();
-            file.println("}");
+            _file.outdent();
+            _file.printIndent();
+            _file.println("}");
         }
         
         if (asStatement)
         {
-            file.println(";");
+            _file.println(";");
         }
 
     }
 
     private function dumpEBlock( exprs : Array<Expr> )
     {
-        file.printIndent();
-        file.println("{");
-        file.indent();
+        _file.printIndent();
+        _file.println("{");
+        _file.indent();
         
         for (e in exprs)
         {
             dumpExpr(e, true);
         }
         
-        file.outdent();
-        file.printIndent();
-        file.println("}");
+        _file.outdent();
+        _file.printIndent();
+        _file.println("}");
     }
 
     private function dumpEFor( it : Expr, expr : Expr )
     {
-        file.printIndent();
-        file.print("foreach (");
+        _file.printIndent();
+        _file.print("foreach (");
         dumpExpr(it);
-        file.println(")");
-        file.indent();
+        _file.println(")");
+        _file.indent();
         dumpExpr(expr, true);
-        file.outdent();
+        _file.outdent();
     }
 
     private function dumpEIn( e1 : Expr, e2 : Expr )
     {
         dumpExpr(e1);
-        file.print(" in ");
+        _file.print(" in ");
         dumpExpr(e2);
     }
 
     private function dumpEIf( econd : Expr, eif : Expr, eelse : Null<Expr> ) {
-        file.printIndent();
-        file.print("if (");
+        _file.printIndent();
+        _file.print("if (");
         dumpExpr(econd);
-        file.println(")");
-        file.indent();
+        _file.println(")");
+        _file.indent();
         dumpExpr(eif, true);
-        file.outdent();
+        _file.outdent();
         
         if (eelse != null)
         {
-            file.printIndent();
-            file.println("else");
-            file.indent();
+            _file.printIndent();
+            _file.println("else");
+            _file.indent();
             dumpExpr(eelse, true);
-            file.outdent();
+            _file.outdent();
         }
     }
 
@@ -1604,129 +1634,129 @@ class AlphaTabCsGenerator
     {
         if (normalWhile)
         {
-            file.printIndent();
-            file.print("while (");
+            _file.printIndent();
+            _file.print("while (");
             dumpExpr(econd);
-            file.println(")");
+            _file.println(")");
             dumpExpr(e, true);
         }
         else
         {
-            file.printIndent();
-            file.println("do");
+            _file.printIndent();
+            _file.println("do");
             dumpExpr(econd);
-            file.printIndent();
-            file.print("while(");
+            _file.printIndent();
+            _file.print("while(");
             dumpExpr(econd, true);
-            file.println(");");
+            _file.println(");");
         }
     }
 
     private function dumpESwitch( e : Expr, cases : Array<{ values : Array<Expr>, expr : Expr }>, edef : Null<Expr> ){
-        file.printIndent();
-        file.print("switch (");
+        _file.printIndent();
+        _file.print("switch (");
         dumpExpr(e);
-        file.println(")");
-        file.indent();
+        _file.println(")");
+        _file.indent();
         
             for (c in cases)
             {
                 for (v in c.values)
                 {
-                    file.printIndent();
-                    file.print("case ");
+                    _file.printIndent();
+                    _file.print("case ");
                     dumpExpr(v);
-                    file.println(":");
+                    _file.println(":");
                 }
                 
-                file.printIndent();
-                file.println("{");
-                file.indent();
+                _file.printIndent();
+                _file.println("{");
+                _file.indent();
                 
                 dumpExpr(c.expr, true);
                 
-                file.outdent();
-                file.printIndent();
-                file.println("}");
-                file.printIndent();
-                file.println("break;");                
+                _file.outdent();
+                _file.printIndent();
+                _file.println("}");
+                _file.printIndent();
+                _file.println("break;");                
             }
             
             if (edef != null)
             {
-                file.printIndent();
-                file.println("default:");
-                file.printIndent();
-                file.println("{");
-                file.indent();
+                _file.printIndent();
+                _file.println("default:");
+                _file.printIndent();
+                _file.println("{");
+                _file.indent();
                 
                 dumpExpr(edef, true);
                 
-                file.outdent();
-                file.printIndent();
-                file.println("}");
-                file.printIndent();
-                file.println("break;");
+                _file.outdent();
+                _file.printIndent();
+                _file.println("}");
+                _file.printIndent();
+                _file.println("break;");
             }
             
         
-        file.outdent();
+        _file.outdent();
     }
 
     private function dumpETry( e : Expr, catches : Array<{ name : String, type : ComplexType, expr : Expr }> )
     {
-        file.printIndent();
-        file.println("try");
+        _file.printIndent();
+        _file.println("try");
         
-        file.printIndent();
-        file.println("{");
-        file.indent();
+        _file.printIndent();
+        _file.println("{");
+        _file.indent();
         
         dumpExpr(e, true);
         
-        file.outdent();
-        file.printIndent();
-        file.println("}");
+        _file.outdent();
+        _file.printIndent();
+        _file.println("}");
         
         for (c in catches)
         {
-            file.printIndent();
-            file.print("catch(");
+            _file.printIndent();
+            _file.print("catch(");
             dumpComplexType(c.type); 
-            file.print(" ");
-            file.print(c.name);
-            file.println(")");
+            _file.print(" ");
+            _file.print(c.name);
+            _file.println(")");
             
-            file.printIndent();
-            file.println("{");
-            file.indent();
+            _file.printIndent();
+            _file.println("{");
+            _file.indent();
             
             dumpExpr(c.expr, true);
             
-            file.outdent();
-            file.printIndent();
-            file.println("}");
+            _file.outdent();
+            _file.printIndent();
+            _file.println("}");
         }
     }
 
     private function dumpEReturn( ?e : Null<Expr> ) {
-        file.printIndent();
-        file.print("return ");
+        _file.printIndent();
+        _file.print("return ");
         if (e != null) 
         {
             dumpExpr(e);
-            file.println(";");
+            _file.println(";");
         }
     }
 
     private function dumpEBreak() 
     {
-        file.print("break;");
+        _file.print("break;");
     }
 
     private function dumpEContinue()
     {
-        file.print("continue;");
+        _file.print("continue;");
     }
 
     private function dumpEUntyped( e : Expr )
@@ -1738,15 +1768,15 @@ class AlphaTabCsGenerator
     {
         if (asStatement)
         {
-            file.printIndent();
+            _file.printIndent();
         }
-        file.print("throw new HaxeException(");
+        _file.print("throw new HaxeException(");
         dumpExpr(e);
-        file.print(")");
+        _file.print(")");
         
         if (asStatement)
         {
-            file.println(";");
+            _file.println(";");
         }
     }
 
@@ -1754,26 +1784,26 @@ class AlphaTabCsGenerator
     {
         if (asStatement)
         {
-            file.printIndent();
+            _file.printIndent();
         }
 
         // ( (Type)(Expr) )
         if (t != null)
         {
-            file.print("((");
+            _file.print("((");
             dumpComplexType(t);
-            file.print(")("); 
+            _file.print(")("); 
         }
         dumpExpr(e);
         
         if (t != null)
         {
-            file.print("))");
+            _file.print("))");
         }
         
         if (asStatement)
         {
-            file.println(";");
+            _file.println(";");
         }
 
     }
@@ -1789,22 +1819,22 @@ class AlphaTabCsGenerator
         
         if (asStatement)
         {
-            file.printIndent();
+            _file.printIndent();
         }
 
-        file.print("(");
+        _file.print("(");
         
-        file.print("(");
+        _file.print("(");
         dumpExpr(econd);
-        file.print(") ? (");
+        _file.print(") ? (");
         dumpExpr(eif);
-        file.print(") : (");
+        _file.print(") : (");
         dumpExpr(eelse);        
-        file.print("))");
+        _file.print("))");
         
         if (asStatement)
         {
-            file.println(";");
+            _file.println(";");
         }
 
     }

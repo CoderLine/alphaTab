@@ -5429,16 +5429,13 @@ alphatab.platform.svg.FontSizes.__name__ = ["alphatab","platform","svg","FontSiz
 alphatab.platform.svg.FontSizes.measureString = function(s,f,size) {
 	var data;
 	var dataSize;
-	switch( (f)[1] ) {
-	case 0:
+	if(f == alphatab.platform.svg.SupportedFonts.TimesNewRoman) {
 		data = alphatab.platform.svg.FontSizes.TIMES_NEW_ROMAN_11PT;
 		dataSize = 11;
-		break;
-	case 1:
+	} else if(f == alphatab.platform.svg.SupportedFonts.Arial) {
 		data = alphatab.platform.svg.FontSizes.ARIAL_11PT;
 		dataSize = 11;
-		break;
-	default:
+	} else {
 		data = [8];
 		dataSize = 11;
 	}
@@ -11287,6 +11284,7 @@ alphatab.tablature.drawing.MusicFont.TrillUpThirtySecond = "M 0 5.14 L 9 0.73 9 
 alphatab.tablature.drawing.MusicFont.AccentuatedNote = "M 13 3.18 L 0 6 0 5.63 11.13 3.18 0 0.73 0 0.36 13 3.18 z";
 alphatab.tablature.drawing.MusicFont.HeavyAccentuatedNote = "M 11 12 L 7.6 12 4.15 5.61 0.84 12 0 12 5.22 1.7 11 12 z";
 alphatab.tablature.drawing.MusicFont.VibratoLeftRight = "M 11.19 5.58 C 10.1 6.65 9.09 7.81 7.93 8.81 7.35 9.3 6.98 8.26 6.55 7.93 5.36 6.62 4.18 5.31 2.98 4 2.41 4.23 2 4.73 1.53 5.13 1.02 5.62 0.51 6.1 0 6.59 0.02 6.16 -0.05 5.69 0.03 5.29 1.79 3.63 3.51 1.94 5.28 0.3 5.93 -0.41 6.4 0.74 6.92 1.1 7.99 2.21 8.99 3.4 10.14 4.44 11.34 3.53 12.36 2.39 13.47 1.36 13.89 0.9 14.4 0.54 14.88 0.14 c 0.54 0.23 0.81 0.82 1.22 1.23 0.81 0.91 1.56 1.88 2.41 2.74 0.45 0.72 1.08 0.87 1.61 0.14 0.59 -0.63 1.15 -1.28 1.73 -1.92 -0.02 0.45 0.04 0.93 -0.03 1.35 C 20.28 5.23 18.76 6.8 17.21 8.32 16.78 8.86 16.09 9.29 15.65 8.51 14.46 7.28 13.39 5.93 12.16 4.75 11.73 4.87 11.54 5.35 11.19 5.58 z";
+alphatab.file.gpx.score.GpxNote.__meta__ = { fields : { id : { property : null}, fret : { property : null}, string : { property : null}, tone : { property : null}, octave : { property : null}, element : { property : null}, variation : { property : null}, midiNumber : { property : null}, tieDestination : { property : null}, vibrato : { property : null}, mutedEnabled : { property : null}, palmMutedEnabled : { property : null}, slide : { property : null}}};
 alphatab.model.SlideType.FastSlideTo = 0;
 alphatab.model.SlideType.SlowSlideTo = 1;
 alphatab.model.SlideType.OutDownWards = 2;
@@ -11402,6 +11400,7 @@ alphatab.io.DataStream.TWOeN23 = Math.pow(2,-23);
 alphatab.model.TripletFeel.None = 0;
 alphatab.model.TripletFeel.Eighth = 1;
 alphatab.model.TripletFeel.Sixteenth = 2;
+alphatab.file.FileFormatException.__meta__ = { fields : { message : { property : null}}};
 alphatab.model.Tuplet.NORMAL = new alphatab.model.Tuplet();
 alphatab.model.effects.HarmonicType.None = -1;
 alphatab.model.effects.HarmonicType.Natural = 0;
