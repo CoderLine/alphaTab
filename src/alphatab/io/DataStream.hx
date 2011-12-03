@@ -76,7 +76,7 @@ class DataStream extends Stream
         return sign*(1.0 + Math.pow(2, -52)*sig)*Math.pow(2, exp);
     } 
     
-    #if js
+    #if (js && !cs)
     public function getDoubleSig(bytes:Array<Int>) : Int
     {
         // This crazy toString() stuff works around the fact that js ints are

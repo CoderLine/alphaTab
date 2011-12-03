@@ -404,17 +404,17 @@ class DocumentParser
         var i = 0;
         while(i < count)
         {
-            var beat = measure.beats[i];
-            if(beat.start == start)
+            var currentBeat = measure.beats[i];
+            if(currentBeat.start == start)
             {
-                return beat;
+                return currentBeat;
             }
             i++;
         }
-        var beat = _factory.newBeat();
-        beat.start = start;
-        measure.addBeat(beat);
-        return beat;
+        var newBeat = _factory.newBeat();
+        newBeat.start = start;
+        measure.addBeat(newBeat);
+        return newBeat;
     }
     
     private function getStringFor(beat:Beat, value:Int)

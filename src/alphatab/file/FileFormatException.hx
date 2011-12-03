@@ -24,7 +24,6 @@ class FileFormatException
     /**
      * The error message.
      */
-    @property
     public var message(default,default):String;
     
     /**

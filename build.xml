@@ -103,6 +103,9 @@
             <arg value="--js-namespace" />
             <arg value="AlphaTab" />
         	
+        	<arg value="-D" />
+        	<arg value="cs" />
+            
         	<arg value="--macro" />
             <arg value="alphatab.compiler.AlphaTabCsGenerator.use()" />
         </exec>

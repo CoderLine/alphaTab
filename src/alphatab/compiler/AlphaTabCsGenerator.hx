@@ -29,13 +29,14 @@ class AlphaTabCsGenerator
     private static var SEP:String = { neko.Sys.systemName() == "Windows" ? "\\" : "/"; }
     
     private var _typeMapping:Hash<String>; 
+    private var _identifierMapping:Hash<String>; 
     
     private var _api : JSGenApi; 
     private var _file : SourceWriter;
     private var _inits : List<TypedExpr>;
     private var _statics : List<{ c : ClassType, f : ClassField }>;
     private var _packages : Hash<Bool>;
-    private var _forbidden : Hash<Bool>;
+    private var _forbidden : Array<String>;
     private var _files : List<String>;
     
     private var _currentNamespace:String;
@@ -57,19 +58,20 @@ class AlphaTabCsGenerator
         _typeMapping.set("Int", "int");
         _typeMapping.set("Bool", "bool");
         _typeMapping.set("String", "string");
+        _typeMapping.set("Array", "HxArray");
+        _typeMapping.set("Math", "HxMath");
         
+        _identifierMapping = new Hash<String>();
+        _identifierMapping.set("alphatab", "Alphatab");
+
         _file = new SourceWriter();
         _inits = new List();
         _statics = new List();
         _packages = new Hash();
-        _forbidden = new Hash();
+        // TODO: All keywords
+        _forbidden = ["byte", "short", "int", "long", "sbyte", "ushort", "uint", "ulong", "string", "public", "private", "protected", "static", "internal", "extern"];
         _files = new List<String>();
         _usings = new Array<String>();
-        // TODO: All keywords
-        for( x in ["byte", "short", "int", "long", "sbyte", "ushort", "uint", "ulong", "string", "public", "private", "protected", "static", "internal", "extern"] )
-        {
-            _forbidden.set(x, true);
-        }
         //api.setTypeAccessor(getQualifiedNameByType);
     }
    
@@ -180,6 +182,15 @@ class AlphaTabCsGenerator
             default: return false;
         }
     }
+    
+    private function saveName(s:String) : String
+    {
+        if (Lambda.has(_forbidden, s))
+        {
+            return "__" + s;
+        }
+        return s;
+    }
         
     private function dumpType(t:Type, dumpType:Bool = false) 
     {
@@ -221,7 +232,7 @@ class AlphaTabCsGenerator
     
     private function addUsing( ns : String ) 
     {
-        if (ns != null && ns.length > 0 && !Lambda.has(_usings, ns)) 
+        if (ns != null && ns.length > 0 && !Lambda.has(_usings, ns) && !StringTools.startsWith(ns, ROOT_NAMESPACE)) 
         {
             _usings.push(ns);
         }
@@ -259,14 +270,6 @@ class AlphaTabCsGenerator
         return buf.toString();
     }
 
-    private function checkFieldName( c : ClassType, f : ClassField ) 
-    {
-        if ( _forbidden.exists(f.name) ) 
-        {
-            Context.error("The field " + f.name + " is not allowed in C#", c.pos);
-        }
-    }
-    
     //
     // Naming
     //
@@ -347,6 +350,26 @@ class AlphaTabCsGenerator
         return s.charAt(0).toLowerCase() + s.substr(1);
     }
     
+    private function isExcluded(s:String) 
+    {
+        if (StringTools.startsWith(s, "haxe."))
+        {
+            return true;
+        }
+        else if (StringTools.startsWith(s, "alphatab.platform.js."))
+        {
+            return true;
+        }
+        var excludedList = ["Array", "Bool", "Class", "Date", "DateTools", 
+                            "Dynamic", "EReg", "Enum", "Float", "Hash", 
+                            "Int", "IntHash", "IntIter", "Iterable", "Iterator",
+                            "Lambda", "List", "Math", "Null", "Refect", "Std",
+                            "String", "StringBuf", "StringTools", "Type", "UInt",
+                            "ValueType", "Void", "Xml", "XmlType", "js.Lib", "js.Boot"];
+        
+        return (Lambda.has(excludedList, s));
+    }
+    
     //
     // Classes
     //
@@ -354,6 +377,14 @@ class AlphaTabCsGenerator
     private function dumpClass(c:ClassType, write:Bool) 
     {
         var fqn = getQualifiedName(c);
+        var hxName = c.pack.join(".");
+        if (hxName.length > 0) 
+        {
+            hxName += ".";
+        }
+        hxName += c.name;
+        
+        if (isExcluded(hxName)) return;
         
         _currentNamespace = getNamespace(c.pack);
         _file.println("namespace %s", [_currentNamespace]);
@@ -549,6 +580,12 @@ class AlphaTabCsGenerator
         }
     }
     
+    
+    private function isType(t:Type, fqn:String)
+    {
+        return getQualifiedNameByType(t, false) == fqn;
+    } 
+    
     private function dumpClassField(c:ClassType, field:ClassField, isStatic:Bool, read:VarAccess, write:VarAccess) 
     {
         
@@ -557,6 +594,26 @@ class AlphaTabCsGenerator
         if (isStatic) 
         {
             modifiers += "static ";
+        }
+        
+                    
+        var createInitializer = function()
+        {
+            var isArray = isType(field.type, "Array");
+            _file.print(" = ");
+            // HACK: support for array initializer
+            if (isArray)
+            {
+                _file.print("new ");
+                printTypeReference(field.type);
+                _file.print("(");
+            }
+            dumpTypedExpr(field.expr);
+            
+            if (isArray)
+            {
+                _file.print(")");
+            }
         }
         
         if (c.isInterface) 
@@ -581,8 +638,7 @@ class AlphaTabCsGenerator
             
             if (field.expr != null)
             {
-                _file.print(" = ");
-                dumpTypedExpr(field.expr);
+                createInitializer();
             }
             _file.println(";");
         }
@@ -601,12 +657,13 @@ class AlphaTabCsGenerator
             }
             
             printTypeReference(field.type);
+            
+            
             _file.print(" ");
             _file.print(field.name);
             if (field.expr != null)
             {
-                _file.print(" = ");
-                dumpTypedExpr(field.expr);
+                createInitializer();
             }
             _file.println(";");
         }
@@ -633,9 +690,15 @@ class AlphaTabCsGenerator
                     printTypeReference(field.type);
                     _file.print(" ");
                     _file.print(getPropertyName(field.name));
+                    
+                    if (field.expr != null)
+                    {
+                        createInitializer();
+                    }
+
+                    
                     _file.println(";");
                 }
-
             }
             else
             {
@@ -826,6 +889,18 @@ class AlphaTabCsGenerator
         _file.println();
     }
     
+    private function hasField(c:ClassType, field:String)
+    {
+        for (f in c.fields.get())
+        {
+            if (f.name == field)
+            {
+                return true;
+            }
+        }        
+        return false;
+    }
+    
     private function dumpMethod(c:ClassType, field:ClassField, isStatic:Bool, k:MethodKind) 
     {
         switch(field.type) 
@@ -840,8 +915,20 @@ class AlphaTabCsGenerator
                 
                 _file.printIndent();
                 _file.print(modifiers);
+                
+                if (c.superClass != null && hasField(c.superClass.t.get(), field.name))
+                {
+                    _file.print("override ");
+                } 
+                else if(!isStatic)
+                {
+                    // TODO: Preprocess all methods
+                    _file.print("virtual ");
+                }
+                
                 printTypeReference(ret);
                 _file.print(" ");
+                
                 _file.print(getMethodName(field.name));
                 
                 _file.print("(");
@@ -898,7 +985,7 @@ class AlphaTabCsGenerator
         switch(type)
         {
             case TEnum(t, p): 
-                if (params == null) 
+                if (params != null) 
                 {
                     printBaseTypeReference(t.get(), params);
                 }
@@ -907,7 +994,7 @@ class AlphaTabCsGenerator
                     printBaseTypeReference(t.get(), p);
                 }
             case TInst(t, p): 
-                if (params == null) 
+                if (params != null) 
                 {
                     printBaseTypeReference(t.get(), params);
                 }
@@ -916,7 +1003,7 @@ class AlphaTabCsGenerator
                     printBaseTypeReference(t.get(), p);
                 }
             case TType(t, p): 
-                if (params == null) 
+                if (params != null) 
                 {
                     printBaseTypeReference(t.get(), params);
                 }
@@ -958,20 +1045,21 @@ class AlphaTabCsGenerator
         {
             addUsing(getNamespace(t.pack));
             _file.print(t.name);
-            if (params != null && params.length > 0)
+        }
+        
+        if (params != null && params.length > 0)
+        {
+            _file.print("<");
+            for (i in 0 ... params.length)
             {
-                _file.print("<");
-                for (i in 0 ... params.length)
+                if (i > 0)
                 {
-                    if (i > 0)
-                    {
-                        _file.print(", ");
-                    }
-                    printTypeReference(params[i]);
+                    _file.print(", ");
                 }
-                
-                _file.print(">");
+                printTypeReference(params[i]);
             }
+
+            _file.print(">");
         }
     }
     
@@ -993,8 +1081,79 @@ class AlphaTabCsGenerator
     private function dumpEnum(e:EnumType, write:Bool) 
     {
         var fqn = getQualifiedName(e);
-        _file.println("// enum " + fqn);
-        if(write) writeFile(getFileName(fqn));
+        
+        _currentNamespace = getNamespace(e.pack);
+        _file.println("namespace %s", [_currentNamespace]);
+        _file.println("{");
+        
+        _file.indent();
+        _file.printIndent();
+        
+        // doc
+        dumpDoc(e.doc);
+        
+        // TODO: Metadata as Attributes
+        
+        // visibility
+        if (e.isPrivate)
+        {
+            _file.print("internal ");
+        }
+        else 
+        {
+            _file.print("public ");
+        }
+        
+        // type
+        _file.print("enum ");
+        
+        // name
+        _file.print(getClassName(e.name));
+        
+        // generics
+        if (e.params.length > 0)
+        {
+            _file.print("<");
+            for (i in 0 ... e.params.length)
+            {
+                if (i > 0) 
+                {
+                    _file.print(", ");
+                }
+                _file.print(e.params[i].name);
+            }
+            _file.print(">");
+        }
+        _file.println();
+        
+        _file.printIndent();
+        _file.println("{");
+        _file.indent();
+        
+        // static
+        for (i in 0 ... e.names.length)
+        {
+            if (i > 0)
+            {
+                _file.println(",");
+            }
+            
+            _file.printIndent();
+            _file.print(e.names[i]);
+        }
+        
+        _file.println();
+        
+        _file.outdent();
+        _file.printIndent();
+        _file.println("}");
+        
+        
+        _file.outdent();
+        _file.printIndent();
+        _file.println("}");
+        
+        if (write) writeFile(getFileName(fqn));
     }
     
     //
@@ -1003,9 +1162,9 @@ class AlphaTabCsGenerator
     
     private function dumpTypedef(t:DefType, write:Bool) 
     {
-        var fqn = getQualifiedName(t);
-        _file.println("// typedef " + fqn);
-        if(write) writeFile(getFileName(fqn));
+        // var fqn = getQualifiedName(t);
+        // _file.println("// typedef " + fqn);
+        // if(write) writeFile(getFileName(fqn));
     }
     
     //
@@ -1014,14 +1173,14 @@ class AlphaTabCsGenerator
     
     private function dumpFunctionDef(args : Array<{ name : String, opt : Bool, t : Type }>, ret : Type) 
     {
-        var isVoidReturn = ret == null || getQualifiedNameByType(ret) == "Void";
+        var isVoidReturn = ret == null || getQualifiedNameByType(ret, false) == "Void";
         if (isVoidReturn)
         {
-            _file.print("Function");
+            _file.print("Action");
         }
         else 
         {
-            _file.print("Action");
+            _file.print("Func");
         }
         
         if (args.length > 0)
@@ -1104,7 +1263,7 @@ class AlphaTabCsGenerator
             case EBlock( exprs /* : Array<Expr>  */): dumpEBlock(exprs);
             case EFor( it /* : Expr */, expr /* : Expr  */): dumpEFor(it, expr);
             case EIn( e1 /* : Expr */, e2 /* : Expr  */): dumpEIn(e1, e2);
-            case EIf( econd /* : Expr */, eif /* : Expr */, eelse /* : Null<Expr>  */): dumpEIf(econd, eif, eelse);
+            case EIf( econd /* : Expr */, eif /* : Expr */, eelse /* : Null<Expr>  */): dumpEIf(econd, eif, eelse, asStatement);
             case EWhile( econd /* : Expr */, e /* : Expr */, normalWhile /* : Bool  */): dumpEWhile(econd, e, normalWhile);
             case ESwitch( e /* : Expr */, cases /* : Array<{ values : Array<Expr>, expr : Expr }>*/, edef /* : Null<Expr>  */): dumpESwitch(e, cases, edef);
             case ETry( e /* : Expr */, catches /* : Array<{ name : String , type : ComplexType, expr : Expr }>*/ ): dumpETry(e, catches);
@@ -1129,9 +1288,24 @@ class AlphaTabCsGenerator
             {
                 case CInt( v ): _file.print(v);
                 case CFloat( f ):   _file.print(f);
-                case CString( s ) : _file.print("\"" + s + "\"");
-                case CIdent( s ) :  _file.print(s);
-                case CType( s ) :   _file.print(s);
+            case CString( s ) : 
+                var d = StringTools.replace(s, "\\", "\\\\");
+                d = StringTools.replace(d, "\"", "\\\"");
+                d = StringTools.replace(d, "\n", "\\n");
+                d = StringTools.replace(d, "\r", "\\r");
+                d = StringTools.replace(d, "\t", "\\t");
+                _file.print("\"" + d + "\"");
+            case CIdent( s ) :  
+                if (_identifierMapping.exists(s)) 
+                    _file.print(_identifierMapping.get(s))
+                else
+                    _file.print(saveName(s));
+                case CType( s ) :  
+                    // TODO: do better mapping
+                    if (_typeMapping.exists(s)) 
+                        _file.print(_typeMapping.get(s));
+                    else
+                        _file.print(s);
                 case CRegexp( r , opt ): 
                     _file.print("new EReg(\""+r+"\", \""+opt+"\")");
             }
@@ -1144,6 +1318,30 @@ class AlphaTabCsGenerator
         dumpExpr(e2);
         _file.print("]");
     }
+    
+    
+    private function dumpEArrayDecl( values : Array<Expr>, asStatement:Bool )
+    {
+        if (asStatement)
+        {
+            _file.printIndent();
+        }
+        
+        for (i in 0 ... values.length)
+        {
+            if (i > 0)
+            {
+                _file.print(", ");
+            }
+            dumpExpr(values[i]);
+        }
+        
+        if (asStatement)
+        {
+            _file.println(";");
+        }
+    }
+
 
     private function dumpEBinop( op : Binop, e1 : Expr, e2 : Expr, asStatement:Bool ) {
         if (asStatement) 
@@ -1181,7 +1379,7 @@ class AlphaTabCsGenerator
             case OpShr: return ">>";
             case OpUShr: return ">>>";
             case OpMod: return "%";
-            case OpAssignOp( op2 ): return "=" + getBinop(op2);
+            case OpAssignOp( op2 ): return getBinop(op2) + "=";
             case OpInterval: return "...";
 
         }
@@ -1193,9 +1391,10 @@ class AlphaTabCsGenerator
         {
             _file.printIndent();
         }
+        
         dumpExpr(e);
         _file.print(".");
-        _file.print(getMethodName(field)); // TODO: ensure correct naming on access
+        _file.print(getMethodName(field)); 
         if (asStatement) 
         {
             _file.println(";");
@@ -1211,7 +1410,7 @@ class AlphaTabCsGenerator
         }
         dumpExpr(e);
         _file.print(".");
-        _file.print(field); // TODO: ensure correct naming on access
+        _file.print(getMethodName(field)); 
         if (asStatement)
         {
             _file.println(";");
@@ -1265,28 +1464,6 @@ class AlphaTabCsGenerator
             _file.println(";");
         }
 
-    }
-
-    private function dumpEArrayDecl( values : Array<Expr>, asStatement:Bool )
-    {
-        if (asStatement)
-        {
-            _file.printIndent();
-        }
-
-        for (i in 0 ... values.length)
-        {
-            if (i > 0)
-            {
-                _file.print(", ");
-            }
-            dumpExpr(values[i]);
-        }
-        
-        if (asStatement)
-        {
-            _file.println(";");
-        }
     }
 
     private function dumpECall( e : Expr, params : Array<Expr>, asStatement:Bool )
@@ -1358,20 +1535,21 @@ class AlphaTabCsGenerator
             addUsing(ns);
 
             _file.print(t.name);
-            if (t.params != null && t.params.length > 0)
+        }
+        
+        if (t.params != null && t.params.length > 0)
+        {
+            _file.print("<");
+            for (i in 0 ... t.params.length)
             {
-                _file.print("<");
-                for (i in 0 ... t.params.length)
+                if (i > 0)
                 {
-                    if (i > 0)
-                    {
-                        _file.print(", ");
-                    }
-                    dumpTypeParam(t.params[i]);
+                    _file.print(", ");
                 }
-                
-                _file.print(">");
+                dumpTypeParam(t.params[i]);
             }
+            
+            _file.print(">");
         }
     }
 
@@ -1437,7 +1615,7 @@ class AlphaTabCsGenerator
             }
             
             _file.print(" ");
-            _file.print(v.name);
+            _file.print(saveName(v.name));
             
             if (v.expr != null)
             {
@@ -1457,7 +1635,7 @@ class AlphaTabCsGenerator
                 case TPath( p ): 
                     dumpTypePath(p);
                 case TFunction(args , ret):
-                    
+                    // TODO
                 case TAnonymous( fields ):
                     // TODO 
                 case TParent( t ):
@@ -1513,11 +1691,13 @@ class AlphaTabCsGenerator
         }
     }
     
-    private function dumpFunction(f:Function) {
+    private function dumpFunction(f:Function)
+    {
          
     }
     
-    private function dumpFunctionArg(f:FunctionArg) {
+    private function dumpFunctionArg(f:FunctionArg)
+    {
         
     }
     
@@ -1530,7 +1710,8 @@ class AlphaTabCsGenerator
             _file.printIndent();
         }
 
-        if (!_inMethodBody)
+        var inBody = _inMethodBody;
+        if (!inBody)
         {
             _file.print("(");
             for ( i in 0 ... f.args.length )
@@ -1560,10 +1741,11 @@ class AlphaTabCsGenerator
         
         if (f.expr != null)
         {
+            _inMethodBody = false;
             dumpExpr(f.expr);
         }
         
-        if (!_inMethodBody)
+        if (!inBody)
         {
             _file.outdent();
             _file.printIndent();
@@ -1599,34 +1781,37 @@ class AlphaTabCsGenerator
         _file.print("foreach (");
         dumpExpr(it);
         _file.println(")");
-        _file.indent();
         dumpExpr(expr, true);
-        _file.outdent();
     }
 
     private function dumpEIn( e1 : Expr, e2 : Expr )
     {
+        _file.print("var ");
         dumpExpr(e1);
         _file.print(" in ");
         dumpExpr(e2);
     }
 
-    private function dumpEIf( econd : Expr, eif : Expr, eelse : Null<Expr> ) {
-        _file.printIndent();
-        _file.print("if (");
-        dumpExpr(econd);
-        _file.println(")");
-        _file.indent();
-        dumpExpr(eif, true);
-        _file.outdent();
+    private function dumpEIf( econd : Expr, eif : Expr, eelse : Null<Expr>, asStatement:Bool ) {
         
-        if (eelse != null)
+        if (asStatement)
         {
             _file.printIndent();
-            _file.println("else");
-            _file.indent();
-            dumpExpr(eelse, true);
-            _file.outdent();
+            _file.print("if (");
+            dumpExpr(econd);
+            _file.println(")");
+            dumpExpr(eif, true);
+            
+            if (eelse != null)
+            {
+                _file.printIndent();
+                _file.println("else");
+                dumpExpr(eelse, true);
+            }
+        }
+        else
+        {
+            dumpETernary(econd, eif, eelse, false);
         }
     }
 
@@ -1644,19 +1829,23 @@ class AlphaTabCsGenerator
         {
             _file.printIndent();
             _file.println("do");
-            dumpExpr(econd);
+            dumpExpr(e, true);
             _file.printIndent();
             _file.print("while(");
-            dumpExpr(econd, true);
+            dumpExpr(econd);
             _file.println(");");
         }
     }
 
-    private function dumpESwitch( e : Expr, cases : Array<{ values : Array<Expr>, expr : Expr }>, edef : Null<Expr> ){
+    private function dumpESwitch( e : Expr, cases : Array<{ values : Array<Expr>, expr : Expr }>, edef : Null<Expr> )
+    {
         _file.printIndent();
         _file.print("switch (");
         dumpExpr(e);
         _file.println(")");
+        
+        _file.printIndent();
+        _file.println("{");
         _file.indent();
         
             for (c in cases)
@@ -1701,6 +1890,8 @@ class AlphaTabCsGenerator
             
         
         _file.outdent();
+        _file.printIndent();
+        _file.println("}");
     }
 
     private function dumpETry( e : Expr, catches : Array<{ name : String, type : ComplexType, expr : Expr }> )
@@ -1708,34 +1899,18 @@ class AlphaTabCsGenerator
         _file.printIndent();
         _file.println("try");
         
-        _file.printIndent();
-        _file.println("{");
-        _file.indent();
-        
         dumpExpr(e, true);
-        
-        _file.outdent();
-        _file.printIndent();
-        _file.println("}");
         
         for (c in catches)
         {
             _file.printIndent();
-            _file.print("catch(");
+            _file.print("catch(HaxeException<");
             dumpComplexType(c.type); 
-            _file.print(" ");
+            _file.print("> ");
             _file.print(c.name);
             _file.println(")");
             
-            _file.printIndent();
-            _file.println("{");
-            _file.indent();
-            
             dumpExpr(c.expr, true);
-            
-            _file.outdent();
-            _file.printIndent();
-            _file.println("}");
         }
     }
 
@@ -1745,18 +1920,20 @@ class AlphaTabCsGenerator
         if (e != null) 
         {
             dumpExpr(e);
-            _file.println(";");
         }
+        _file.println(";");
     }
 
     private function dumpEBreak() 
     {
-        _file.print("break;");
+        _file.printIndent();
+        _file.println("break;");
     }
 
     private function dumpEContinue()
     {
-        _file.print("continue;");
+        _file.printIndent();
+        _file.println("continue;");
     }
 
     private function dumpEUntyped( e : Expr )

@@ -52,7 +52,7 @@ import alphatab.model.Voice;
 class AlphaTexParser extends SongReader  
 {
     private static inline var EOL:String = String.fromCharCode(0);
-    private static inline var TRACK_CHANNELS = [0, 1];
+    private static var TRACK_CHANNELS:Array<Int> = [0, 1];
     
     private var _song:Song; 
     private var _track:Track; 
