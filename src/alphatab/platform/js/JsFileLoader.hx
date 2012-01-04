@@ -15,10 +15,13 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.platform.js;
+
 #if js
+import alphatab.file.FileFormatException;
 import alphatab.io.DataInputStream;
 import alphatab.io.StringInputStream;
 import alphatab.platform.FileLoader;
+import js.XMLHttpRequest;
 
 /**
  * This is a fileloader implementation for JavaScript.
@@ -33,7 +36,7 @@ class JsFileLoader implements FileLoader
     
     public function loadBinary(method:String, file:String, success:DataInputStream->Void, error:String->Void) : Void
     {        
-        if (JQuery.isIE())
+        if (js.Lib.isIE)
         {
             // use VB Loader to load binary array
             var vbArr = untyped VbAjaxLoader(method, file);
@@ -53,42 +56,60 @@ class JsFileLoader implements FileLoader
         }
         else
         {
-            var options:Dynamic = cast { };
-            options.type = method;
-            options.url = file;
-            options.success = function(data:String)
+            var xhr:XMLHttpRequest = new XMLHttpRequest();
+            untyped
             {
-                var reader:DataInputStream = new DataInputStream(new StringInputStream(data));
-                success(reader);
+                xhr.overrideMimeType('text/plain; charset=x-user-defined');
             }
-            options.error = function(x:Dynamic, e:String)
+            xhr.onreadystatechange = function() 
             {
-                if(x.status==0){
-                    error('You are offline!!\n Please Check Your Network.');
-                }else if(x.status==404){
-                    error('Requested URL not found.');
-                }else if(x.status==500){
-                    error('Internel Server Error.');
-                }else if(e=='parsererror'){
-                    error('Error.\nParsing JSON Request failed.');
-                }else if(e=='timeout'){
-                    error('Request Time out.');
-                }else {
-                    error('Unknow Error.\n'+x.responseText);
-                }
-            }
-            
-            options.beforeSend = function(xhr:Dynamic) {
-                untyped
+                try
                 {
-                    if (xhr.overrideMimeType)
+                    if (xhr.readyState == 4)
                     {
-                        xhr.overrideMimeType('text/plain; charset=x-user-defined');
+                        if (xhr.status == 200)
+                        {
+                            var reader:DataInputStream = new DataInputStream(new StringInputStream(xhr.responseText));
+                            success(reader);
+                        }
+                        // Error handling
+                        else if (xhr.status == 0)
+                        {
+                            error('You are offline!!\n Please Check Your Network.');
+                        }
+                        else if (xhr.status == 404)
+                        {
+                            error('Requested URL not found.');
+                        }
+                        else if (xhr.status == 500)
+                        {
+                            error('Internel Server Error.');
+                        }
+                        else if (xhr.statusText == 'parsererror')
+                        {
+                            error('Error.\nParsing JSON Request failed.');
+                        }
+                        else if (xhr.statusText == 'timeout')
+                        {
+                            error('Request Time out.');
+                        }
+                        else 
+                        {
+                            error('Unknow Error: ' + xhr.responseText);
+                        }
                     }
                 }
+                catch (e:FileFormatException)
+                {
+                    error("Error loading file: " + e.message);
+                }
+                catch (e:Dynamic)
+                {
+                    error("Error loading file: " + e);
+                }
             }
-            
-            JQuery.ajax(options);
+            xhr.open(method, file, true);
+            xhr.send(null);
         }
     }
 }

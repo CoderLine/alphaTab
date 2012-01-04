@@ -235,7 +235,14 @@ class DocumentReader
                 beat.id = Std.parseInt(beatNode.att.id);
                 beat.dyn = beatNode.node.Dynamic.innerData;
                 beat.rhythmId = Std.parseInt(beatNode.node.Rhythm.att.ref);
-                beat.noteIds = toIntArray(beatNode.node.Notes.innerData);
+                if (beatNode.hasNode.Notes)
+                {
+                    beat.noteIds = toIntArray(beatNode.node.Notes.innerData);
+                }
+                else
+                {
+                    beat.noteIds = [];
+                }
                 
                 _gpxDocument.beats.push(beat);
             }

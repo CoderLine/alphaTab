@@ -24,13 +24,11 @@ import alphatab.platform.Canvas;
 class Html5Canvas implements Canvas 
 {
     private var _canvas:Dynamic;
-    private var _jCanvas:JQuery;
     private var _context:Dynamic;
     
     public function new(dom:Dynamic) 
     {  
         this._canvas = dom;
-        this._jCanvas = JQuery.elements(dom);
         this._context = dom.getContext("2d");
     }
     
@@ -39,17 +37,16 @@ class Html5Canvas implements Canvas
     
     private function getWidth():Int 
     {
-        return this._jCanvas.Width(); 
+        return _canvas.offsetWidth; 
     }
     
     private function getHeight():Int 
     {
-        return this._jCanvas.Height();
+        return _canvas.offsetHeight;
     }
     
     private function setWidth(width:Int):Int 
     {
-        this._jCanvas.setWidth(width);
         this._canvas.width = width;
         this._context = this._canvas.getContext("2d");
         return width;
@@ -57,7 +54,6 @@ class Html5Canvas implements Canvas
     
     private function setHeight(height:Int):Int 
     {
-        this._jCanvas.setHeight(height);
         this._canvas.height = height;
         this._context = this._canvas.getContext("2d");
         return height;

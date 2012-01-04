@@ -3017,7 +3017,7 @@ alphatab.file.gpx.DocumentReader.prototype.readBeats = function() {
 			beat.id = Std.parseInt(beatNode.att.resolve("id"));
 			beat.dyn = beatNode.node.resolve("Dynamic").getInnerData();
 			beat.rhythmId = Std.parseInt(beatNode.node.resolve("Rhythm").att.resolve("ref"));
-			beat.noteIds = this.toIntArray(beatNode.node.resolve("Notes").getInnerData());
+			if(beatNode.hasNode.resolve("Notes")) beat.noteIds = this.toIntArray(beatNode.node.resolve("Notes").getInnerData()); else beat.noteIds = [];
 			this._gpxDocument.beats.push(beat);
 		}
 	}
@@ -4989,7 +4989,7 @@ alphatab.platform.js.JsFileLoader = function(p) {
 }
 alphatab.platform.js.JsFileLoader.__name__ = ["alphatab","platform","js","JsFileLoader"];
 alphatab.platform.js.JsFileLoader.prototype.loadBinary = function(method,file,success,error) {
-	if(jQuery.browser.msie) {
+	if(js.Lib.isIE) {
 		var vbArr = VbAjaxLoader(method,file);
 		var fileContents = vbArr.toArray();
 		var data = "";
@@ -5001,20 +5001,28 @@ alphatab.platform.js.JsFileLoader.prototype.loadBinary = function(method,file,su
 		var reader = new alphatab.io.DataInputStream(new alphatab.io.StringInputStream(data));
 		success(reader);
 	} else {
-		var options = { };
-		options.type = method;
-		options.url = file;
-		options.success = function(data) {
-			var reader = new alphatab.io.DataInputStream(new alphatab.io.StringInputStream(data));
-			success(reader);
+		var xhr = new js.XMLHttpRequest();
+		xhr.overrideMimeType("text/plain; charset=x-user-defined");
+		xhr.onreadystatechange = function() {
+			try {
+				if(xhr.readyState == 4) {
+					if(xhr.status == 200) {
+						var reader = new alphatab.io.DataInputStream(new alphatab.io.StringInputStream(xhr.responseText));
+						success(reader);
+					} else if(xhr.status == 0) error("You are offline!!\n Please Check Your Network."); else if(xhr.status == 404) error("Requested URL not found."); else if(xhr.status == 500) error("Internel Server Error."); else if(xhr.statusText == "parsererror") error("Error.\nParsing JSON Request failed."); else if(xhr.statusText == "timeout") error("Request Time out."); else error("Unknow Error: " + xhr.responseText);
+				}
+			} catch( $e0 ) {
+				if( js.Boot.__instanceof($e0,alphatab.file.FileFormatException) ) {
+					var e = $e0;
+					error("Error loading file: " + e.message);
+				} else {
+				var e = $e0;
+				error("Error loading file: " + e);
+				}
+			}
 		};
-		options.error = function(x,e) {
-			if(x.status == 0) error("You are offline!!\n Please Check Your Network."); else if(x.status == 404) error("Requested URL not found."); else if(x.status == 500) error("Internel Server Error."); else if(e == "parsererror") error("Error.\nParsing JSON Request failed."); else if(e == "timeout") error("Request Time out."); else error("Unknow Error.\n" + x.responseText);
-		};
-		options.beforeSend = function(xhr) {
-			if(xhr.overrideMimeType) xhr.overrideMimeType("text/plain; charset=x-user-defined");
-		};
-		jQuery.ajax(options);
+		xhr.open(method,file,true);
+		xhr.send(null);
 	}
 }
 alphatab.platform.js.JsFileLoader.prototype.__class__ = alphatab.platform.js.JsFileLoader;
@@ -5022,29 +5030,25 @@ alphatab.platform.js.JsFileLoader.__interfaces__ = [alphatab.platform.FileLoader
 alphatab.platform.js.Html5Canvas = function(dom) {
 	if( dom === $_ ) return;
 	this._canvas = dom;
-	this._jCanvas = jQuery(dom);
 	this._context = dom.getContext("2d");
 }
 alphatab.platform.js.Html5Canvas.__name__ = ["alphatab","platform","js","Html5Canvas"];
 alphatab.platform.js.Html5Canvas.prototype._canvas = null;
-alphatab.platform.js.Html5Canvas.prototype._jCanvas = null;
 alphatab.platform.js.Html5Canvas.prototype._context = null;
 alphatab.platform.js.Html5Canvas.prototype.width = null;
 alphatab.platform.js.Html5Canvas.prototype.height = null;
 alphatab.platform.js.Html5Canvas.prototype.getWidth = function() {
-	return this._jCanvas.width();
+	return this._canvas.offsetWidth;
 }
 alphatab.platform.js.Html5Canvas.prototype.getHeight = function() {
-	return this._jCanvas.height();
+	return this._canvas.offsetHeight;
 }
 alphatab.platform.js.Html5Canvas.prototype.setWidth = function(width) {
-	this._jCanvas.width(width);
 	this._canvas.width = width;
 	this._context = this._canvas.getContext("2d");
 	return width;
 }
 alphatab.platform.js.Html5Canvas.prototype.setHeight = function(height) {
-	this._jCanvas.height(height);
 	this._canvas.height = height;
 	this._context = this._canvas.getContext("2d");
 	return height;
@@ -6169,8 +6173,14 @@ alphatab.file.gpx.GpxReader.prototype.readSong = function() {
 		var reader = new alphatab.file.gpx.DocumentReader(this._fileSystem.getFileContents("score.gpif"));
 		var parser = new alphatab.file.gpx.DocumentParser(this.factory,reader.read());
 		return parser.parse();
-	} catch( e ) {
-		if(Std["is"](e,alphatab.file.FileFormatException)) throw e; else throw new alphatab.file.FileFormatException(Std.string(e));
+	} catch( $e0 ) {
+		if( js.Boot.__instanceof($e0,alphatab.file.FileFormatException) ) {
+			var e = $e0;
+			throw e;
+		} else {
+		var e = $e0;
+		throw new alphatab.file.FileFormatException(Std.string(e));
+		}
 	}
 }
 alphatab.file.gpx.GpxReader.prototype.__class__ = alphatab.file.gpx.GpxReader;
@@ -7006,30 +7016,6 @@ alphatab.file.alphatex.AlphaTexSymbols.Pipe.__enum__ = alphatab.file.alphatex.Al
 alphatab.file.alphatex.AlphaTexSymbols.MetaCommand = ["MetaCommand",12];
 alphatab.file.alphatex.AlphaTexSymbols.MetaCommand.toString = $estr;
 alphatab.file.alphatex.AlphaTexSymbols.MetaCommand.__enum__ = alphatab.file.alphatex.AlphaTexSymbols;
-alphatab.platform.js.JQuery = function() { }
-alphatab.platform.js.JQuery.__name__ = ["alphatab","platform","js","JQuery"];
-alphatab.platform.js.JQuery.elements = function(e) {
-	return jQuery(e);
-}
-alphatab.platform.js.JQuery.ajax = function(options) {
-	return jQuery.ajax(options);
-}
-alphatab.platform.js.JQuery.isIE = function() {
-	return jQuery.browser.msie;
-}
-alphatab.platform.js.JQuery.prototype.Height = function() {
-	return this.height();
-}
-alphatab.platform.js.JQuery.prototype.setHeight = function(value) {
-	return this.height(value);
-}
-alphatab.platform.js.JQuery.prototype.Width = function() {
-	return this.width();
-}
-alphatab.platform.js.JQuery.prototype.setWidth = function(value) {
-	return this.width(value);
-}
-alphatab.platform.js.JQuery.prototype.__class__ = alphatab.platform.js.JQuery;
 alphatab.tablature.staves.StaveSpacing = function(size) {
 	if( size === $_ ) return;
 	this.spacing = new Array();

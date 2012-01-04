@@ -47,16 +47,13 @@ class GpxReader extends SongReader
             
             return parser.parse();
         }
+        catch (e:FileFormatException)
+        {
+            throw e;
+        }
         catch(e:Dynamic)
         {
-            if(Std.is(e, FileFormatException))
-            {
-                throw e;
-            }
-            else
-            {
-                throw new FileFormatException(Std.string(e));
-            }
+            throw new FileFormatException(Std.string(e));
         }
     }    
 }
