@@ -59,8 +59,14 @@ class ViewLayout
     public var contentPadding(default,default):Padding;
     
     // Returns the index of the measure drawn under the coordinates given
-    public function getMeasureAt(xPos:Int, yPos:Int) : Measure {
+    public function getMeasureAt(xPos:Int, yPos:Int) : Measure 
+    {
         // implemented in subclass
+        return null;
+    }
+    
+    public function getLines() : Array<StaveLine>
+    {
         return null;
     }
     

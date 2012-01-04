@@ -16,6 +16,8 @@
  */
 package alphatab.platform.svg;
 
+import alphatab.io.OutputStream;
+import alphatab.io.StringOutputStream;
 import alphatab.platform.Canvas;
 
 /**
@@ -25,6 +27,7 @@ class SvgCanvas implements Canvas
 {
     private var _buffer:StringBuf;
     private var _currentPath:StringBuf;
+    private var _currentPathIsEmpty:Bool;
     
     private var _width:Int;
     private var _height:Int;
@@ -33,6 +36,7 @@ class SvgCanvas implements Canvas
     {
         _buffer = new StringBuf();
         _currentPath = new StringBuf();
+        _currentPathIsEmpty = true;
         strokeStyle = "#FFFFFF";
         fillStyle = "#FFFFFF";
         lineWidth = 1;
@@ -43,31 +47,37 @@ class SvgCanvas implements Canvas
         textAlign = "left";
     }
     
-    public function toSvg(includeWrapper:Bool, className:String = null) : String
+    // TODO: replace with IO lib writeTo(OutputStream)
+    public function writeTo(stream:OutputStream, includeWrapper:Bool, className:String = null)
     {
-        var svg = new StringBuf();
-        
         if (includeWrapper) 
         {
-            svg.add('<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="');
-            svg.add(_width);
-            svg.add('px" height="');
-            svg.add(_height);
-            svg.add('px"');
+            stream.writeString('<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="');
+            stream.writeAsString(_width);
+            stream.writeString('px" height="');
+            stream.writeAsString(_height);
+            stream.writeString('px"');
             if (className != null) 
             {
-                svg.add(' class="');
-                svg.add(className);
-                svg.add('"');
+                stream.writeString(' class="');
+                stream.writeString(className);
+                stream.writeString('"');
             }
-            svg.add('>\n');
+            stream.writeString('>\n');
         }
-        svg.add(_buffer.toString());
-        if(includeWrapper) {
-            svg.add('</svg>'); 
-        }
-        
-        return svg.toString();        
+        stream.writeString(_buffer.toString());
+        if (includeWrapper) 
+        {
+            stream.writeString('</svg>'); 
+        } 
+    }
+    
+    public function toSvg(includeWrapper:Bool, className:String = null) : String
+    {
+        var out:StringOutputStream = new StringOutputStream();
+        writeTo(out, includeWrapper, className);
+        out.flush();
+        return out.toString();       
     }
     
     public var width(getWidth, setWidth):Int;
@@ -139,6 +149,7 @@ class SvgCanvas implements Canvas
     {
         _buffer = new StringBuf(); 
         _currentPath = new StringBuf(); 
+        _currentPathIsEmpty = true;
     }
     
     public function fillRect(x:Float, y:Float, w:Float, h:Float):Void
@@ -191,6 +202,7 @@ class SvgCanvas implements Canvas
     }
     public function lineTo(x:Float, y:Float):Void
     {
+        _currentPathIsEmpty = false;
         _currentPath.add(" L");
         _currentPath.add(x);
         _currentPath.add(",");
@@ -198,6 +210,7 @@ class SvgCanvas implements Canvas
     }
     public function quadraticCurveTo(cpx:Float, cpy:Float, x:Float, y:Float):Void
     {
+        _currentPathIsEmpty = false;
         _currentPath.add(" Q");
         _currentPath.add(cpx);
         _currentPath.add(",");
@@ -209,6 +222,7 @@ class SvgCanvas implements Canvas
     }
     public function bezierCurveTo(cp1x:Float, cp1y:Float, cp2x:Float, cp2y:Float, x:Float, y:Float):Void
     {
+        _currentPathIsEmpty = false;
         _currentPath.add(" C");
         _currentPath.add(cp1x);
         _currentPath.add(",");
@@ -225,6 +239,7 @@ class SvgCanvas implements Canvas
     
     public function circle(x:Float, y:Float, radius:Float):Void
     {
+        _currentPathIsEmpty = false;
         // 
         // M0,250 A1,1 0 0,0 500,250 A1,1 0 0,0 0,250 z
         _currentPath.add(" M");
@@ -246,6 +261,7 @@ class SvgCanvas implements Canvas
     }
     public function rect(x:Float, y:Float, w:Float, h:Float):Void
     {
+        _currentPathIsEmpty = false;
         _currentPath.add(" M");
         _currentPath.add(x);
         _currentPath.add(",");
@@ -272,7 +288,7 @@ class SvgCanvas implements Canvas
     public function fill():Void
     {
         var path = _currentPath.toString();
-        if(!isEmptyPath(path)) {
+        if(!_currentPathIsEmpty) {
             _buffer.add('<path d="');
             _buffer.add(_currentPath.toString());
             _buffer.add('" style="fill:');
@@ -280,11 +296,12 @@ class SvgCanvas implements Canvas
             _buffer.add('" stroke="none"/>\n');
         }
         _currentPath = new StringBuf();
+        _currentPathIsEmpty = true;
     }
     public function stroke():Void
     {
         var path = _currentPath.toString();
-        if(!isEmptyPath(path)) {
+        if(!_currentPathIsEmpty) {
             _buffer.add('<path d="');
             _buffer.add(_currentPath.toString());
             _buffer.add('" style="stroke:');
@@ -294,11 +311,7 @@ class SvgCanvas implements Canvas
             _buffer.add(';" fill="none" />\n'); 
         }
         _currentPath = new StringBuf();
-    }
-    
-    private function isEmptyPath(path:String) : Bool 
-    {
-        return path.length <= 0 || StringTools.trim(path) == "z";
+        _currentPathIsEmpty = true;
     }
 
     // text

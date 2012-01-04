@@ -15,6 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.midi;
+import alphatab.midi.model.MidiFile;
 import alphatab.model.Song;
 import alphatab.model.SongFactory;
 
@@ -27,8 +28,17 @@ class MidiDataProvider
     {
         var parser:MidiSequenceParser = new MidiSequenceParser(factory, song, MidiSequenceParserFlags.DEFAULT_PLAY_FLAGS,
                                                100, 0);
-        var sequence:MidiSequenceHandler = new MidiSequenceHandler(song.tracks.length + 2);
+        var sequence:MidiSequenceDataHandler = new MidiSequenceDataHandler(song.tracks.length + 2);
         parser.parse(sequence);
         return sequence.commands;
+    }    
+    
+    public static function getSongMidiFile(song:Song, factory:SongFactory):MidiFile
+    {
+        var parser:MidiSequenceParser = new MidiSequenceParser(factory, song, MidiSequenceParserFlags.DEFAULT_PLAY_FLAGS,
+                                               100, 0);
+        var sequence:MidiSequenceFileHandler = new MidiSequenceFileHandler(song.tracks.length + 2);
+        parser.parse(sequence);
+        return sequence.midiFile;
     }
 }

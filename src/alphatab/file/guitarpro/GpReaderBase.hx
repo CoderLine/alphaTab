@@ -18,7 +18,8 @@ package alphatab.file.guitarpro;
 import alphatab.file.SongReader;
 import alphatab.model.Song;
 import alphatab.model.SongFactory;
-import alphatab.io.DataStream;
+import alphatab.io.DataInputStream;
+import haxe.Stack;
 
 class GpReaderBase extends SongReader
 {
@@ -28,11 +29,17 @@ class GpReaderBase extends SongReader
 
     private var _supportedVersions:Array<String>;
     private var _versionIndex:Int;
-    private var _version:String;
+    public var version:String;
     
     public function new() 
     {
         super();
+    }
+    
+    public override function init(data:DataInputStream, factory:SongFactory):Void 
+    {
+        super.init(data, factory);
+        data.bigEndian = false;
     }
     
     public function initVersions(supportedVersions:Array<String>)
@@ -65,7 +72,7 @@ class GpReaderBase extends SongReader
         var text:String = "";
         for (i in 0 ... length)
         {
-          // TODO: Check for unicode support
+            // TODO: Check for unicode support
             text += String.fromCharCode(data.readByte());
         }
         return text;
@@ -73,7 +80,13 @@ class GpReaderBase extends SongReader
 
     public function readIntSizeCheckByteString(charset:String=DEFAULT_CHARSET): String
     {
-        return readByteSizeString((data.readInt() - 1), charset);
+        var d = (data.readInt() - 1);
+        if (d > 2000)
+        {
+            trace(d);
+            trace(Stack.toString(Stack.callStack()));
+        }
+        return readByteSizeString(d, charset);
     }        
     
     public function readByteSizeCheckByteString(charset:String=DEFAULT_CHARSET): String
@@ -90,15 +103,15 @@ class GpReaderBase extends SongReader
     {
         try
         {
-            if(_version == null)
+            if(version == null)
             {
-                _version = readByteSizeString(30, DEFAULT_CHARSET);
+                version = readByteSizeString(30, DEFAULT_CHARSET);
             }
             // check for compatibility
             for(i in 0 ... _supportedVersions.length)
             {
                 var current:String = _supportedVersions[i];
-                if(_version == current)
+                if(version == current)
                 {
                     _versionIndex = i;
                     return true;
@@ -107,7 +120,7 @@ class GpReaderBase extends SongReader
         }
         catch(e:Dynamic)
         {
-            _version = "Not Supported";
+            version = "Not Supported";
         }
         return false;
     }
@@ -115,7 +128,7 @@ class GpReaderBase extends SongReader
     public static function toChannelShort(data:Int): Int
     {
         var value:Int = Math.floor(Math.max(-32768, Math.min(32767, (data*8)-1)));
-        return Math.floor(Math.max(value, -1));
+        return Math.floor(Math.max(value, -1)) + 1;
     }
     
 }

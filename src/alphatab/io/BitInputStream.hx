@@ -19,34 +19,22 @@ package alphatab.io;
 /**
  * This stream implementation allows bitwise reading from another stream.
  */
-class BitStream extends Stream
+class BitInputStream extends DelegatedInputStream
 {
     private static inline var BYTE_SIZE = 8; // size of byte in bits
-    
-    private var _stream:Stream;
     
     private var _currentByte:Int; // the currently read byte
     private var _position:Int; // the current bit position within the current byte
     
-    public function new(stream:Stream) 
+    public function new(stream:InputStream) 
     {
-        _stream = stream;
+        super(stream);
         _position = BYTE_SIZE; // mark end of byte to ensure a new byte is read
     }
     
     public override function readByte() : Int
     {
         return readBits(8);
-    }
-    
-    public override function length() : Int
-    {
-        return _stream.length();
-    }
-    
-    public override function position() : Int
-    {
-        return _stream.position();
     }
     
     public override function seek(position:Int) : Void

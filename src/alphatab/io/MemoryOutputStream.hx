@@ -14,33 +14,28 @@
  *  You should have received a copy of the GNU General Public License
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
-package alphatab.platform.neko;
-
-#if neko
-
-import alphatab.io.DataStream;
-import alphatab.platform.FileLoader;
-import alphatab.platform.neko.FileStream;
+package alphatab.io;
 
 /**
- * This if a fileloader implementation for Neko
+ * This stream implementation stores the written data in a array backstore
  */
-class NekoFileLoader implements FileLoader
+class MemoryOutputStream extends OutputStream
 {
+    private var _buffer:Array<Int>;
+    
     public function new() 
-    {       
+    {
+        super();
+        _buffer = new Array<Int>();
     }
     
-    public function loadBinary(method:String, file:String, success:DataStream->Void, error:String->Void) : Void
-    {        
-        try 
-        {
-            success(new DataStream(new FileStream(file)));
-        }
-        catch (e:Dynamic)
-        {
-            error(Std.string(e));
-        }
+    public function getBuffer()
+    {
+        return _buffer;
     }
+    
+    public override function writeByte(data:Int) 
+    {
+        _buffer.push(data & 0xFF);
+    }    
 }
-#end

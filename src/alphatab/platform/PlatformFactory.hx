@@ -43,8 +43,8 @@ class PlatformFactory
     { 
         #if js
             return new alphatab.platform.js.JsFileLoader();
-        #elseif neko
-            return new alphatab.platform.neko.NekoFileLoader();
+        #elseif (cpp || neko)
+            return new alphatab.platform.FileStreamFileLoader();
         #else 
             return null;//#error 
         #end

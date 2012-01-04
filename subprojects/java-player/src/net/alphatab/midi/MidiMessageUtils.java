@@ -90,6 +90,7 @@ public class MidiMessageUtils
         try
         {
             ShortMessage message = new ShortMessage();
+            
             message.setMessage(ShortMessage.PITCH_BEND, channel, 0, value);
             return message;
         }

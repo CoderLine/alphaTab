@@ -14,33 +14,18 @@
  *  You should have received a copy of the GNU General Public License
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
-package alphatab.platform.neko;
+package alphatab;
+import alphatab.file.guitarpro.GpReaderBaseTest;
+import alphatab.io.DataInputStreamTest;
+import haxe.unit.TestRunner;
 
-#if neko
-
-import alphatab.io.DataStream;
-import alphatab.platform.FileLoader;
-import alphatab.platform.cpp.FileStream;
-
-/**
- * This if a fileloader implementation for Neko
- */
-class CppFileLoader implements FileLoader
+class AlphaTabTestRunner 
 {
-    public function new() 
-    {       
-    }
-    
-    public function loadBinary(method:String, file:String, success:DataStream->Void, error:String->Void) : Void
-    {        
-        try 
-        {
-            success(new DataStream(new FileStream(file)));
-        }
-        catch (e:Dynamic)
-        {
-            error(Std.string(e));
-        }
+    static function main()
+    {
+        var r = new TestRunner();
+        r.add(new DataInputStreamTest());
+        r.add(new GpReaderBaseTest());
+        r.run();
     }
 }
-#end

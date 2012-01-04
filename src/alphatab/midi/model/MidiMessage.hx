@@ -14,40 +14,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
-package alphatab.io;
+package alphatab.midi.model;
+import alphatab.io.DataOutputStream;
+import alphatab.io.OutputStream;
 
-/**
- * A stream implementation using a string as backstore for data.
- * Each character represents a byte value. 
- */
-class StringStream extends Stream
+class MidiMessage
 {
-    private var _pos:Int;
-    private var _buffer:String;
+    public var data:Array<Int>;
     
-    public function new(buffer:String) 
+    public function new(data:Array<Int>)
     {
-        _buffer = buffer;
-        _pos = 0;
+        this.data = data;
     }
     
-    public override function readByte() : Int
+    public function writeTo(out:OutputStream)
     {
-        return _buffer.charCodeAt(_pos++) & 0xFF;
+        out.writeBytes(data);
     }
-    
-    public override function length() : Int
-    {
-       return _buffer.length;
-    }
-    
-    public override function position() : Int
-    {   
-        return _pos;
-    }
-    
-    public override function seek(position:Int) : Void
-    {
-        _pos = position;
-    }
+
 }

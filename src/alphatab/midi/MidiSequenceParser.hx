@@ -81,7 +81,7 @@ class MidiSequenceParser
      
     public function addMetronome(sequence:MidiSequenceHandler, header:MeasureHeader, startMove:Int) : Void
     {
-        if ((_flags & MidiSequenceParserFlags.ADD_METRONOME) == 0) return;
+        if ((_flags & MidiSequenceParserFlags.ADD_METRONOME) == 0) return; 
         var start:Int = startMove + header.start;
         var length:Int = header.timeSignature.denominator.time();
         for (i in  1 ... header.timeSignature.numerator + 1)
@@ -235,9 +235,6 @@ class MidiSequenceParser
     {
         var previous:Measure = null;
         var controller:MidiRepeatController = new MidiRepeatController(track.song);
-        var ticksAtMeasureStart:Int = 0;
-        
-        sequence.resetTicks();
         
         addBend(sequence, track.number, Duration.QUARTER_TIME, DEFAULT_BEND, track.channel.channel);
         makeChannel(sequence, track.channel, track.number);
@@ -257,8 +254,6 @@ class MidiSequenceParser
                     addTimeSignature(sequence, measure, previous, move);
                     addTempo(sequence, measure, previous, move);
                     addMetronome(sequence, measure.header, move);
-                                        
-                    ticksAtMeasureStart=sequence.getTicks();
                 }
                 
                 makeBeats(sequence, track, measure, index, move);
@@ -520,8 +515,8 @@ class MidiSequenceParser
             var point:BendPoint = points[i];
             var bendStart:Int = start + point.getTime(duration);
             var value:Int = Math.round(DEFAULT_BEND + (point.value * DEFAULT_BEND_SEMITONE / BendEffect.SEMITONE_LENGTH));
-            value = (value <= 127) ? value : 127;
-            value = (value >= 0) ? value : 0;
+            //value = (value <= 127) ? value : 127;
+            //value = (value >= 0) ? value : 0;
             addBend(sequence, track, bendStart, value, channel);
             if (points.length <= (i + 1)) continue;
 

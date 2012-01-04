@@ -117,7 +117,7 @@ class Gp3Reader extends GpReaderBase
         for (h in 0 ... song.measureHeaders.length) {
             var header:MeasureHeader = song.measureHeaders[h];
             header.start = start;
-            for(t in 0 ... song.tracks.length) {
+            for (t in 0 ... song.tracks.length) {
                 var track = song.tracks[t];
                 var measure = factory.newMeasure(header);
                 header.tempo.copy(tempo);
@@ -133,7 +133,8 @@ class Gp3Reader extends GpReaderBase
     {
         var start = measure.start();
         var beats = data.readInt();
-        for (beat in 0 ... beats) { 
+        for (beat in 0 ... beats) 
+        { 
             start += readBeat(start, measure, track, 0);
         }
     }
@@ -549,7 +550,6 @@ class Gp3Reader extends GpReaderBase
     
     private function readMeasureHeader(i:Int, timeSignature:TimeSignature, song:Song) : MeasureHeader
     {
-       
         var flags:Int = data.readByte();
         
         var header:MeasureHeader = factory.newMeasureHeader();
@@ -637,6 +637,7 @@ class Gp3Reader extends GpReaderBase
             newChannel.channel = (i);
             newChannel.effectChannel = (i);
             newChannel.instrument(data.readInt());
+
             newChannel.volume = (GpReaderBase.toChannelShort(data.readSignedByte()));
             newChannel.balance = (GpReaderBase.toChannelShort(data.readSignedByte()));
             newChannel.chorus = (GpReaderBase.toChannelShort(data.readSignedByte()));

@@ -15,6 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.io;
+import haxe.Int64;
 
 /**
  * This utility allows reading of datatypes from a stream instance.
@@ -23,15 +24,27 @@ package alphatab.io;
  *    readFloat: http://mercurial.intuxication.org/hg/jeash/file/a4255cd99f9c/jeash/utils/ByteArray.hx#l240 (15.10.2011)
  *    readDouble http://mercurial.intuxication.org/hg/jeash/file/a4255cd99f9c/jeash/utils/ByteArray.hx#l158 (15.10.2011)
  */
-class DataStream extends Stream
+class DataInputStream extends DelegatedInputStream
 { 
-    private static var TWOeN23 = Math.pow(2, -23);
+    // the main type handling logic is implemented as big endian,
+    // but the bytes get reversed on reading if little endian is requested
+        
+    public var bigEndian:Bool;
     
-    private var _stream:Stream;
-    
-    public function new(stream:Stream) 
+    public function new(stream:InputStream, bigEndian:Bool = true) 
     {
-        _stream = stream;
+        super(stream);
+        this.bigEndian = bigEndian;
+    }
+    
+    private function readEndianAwareBytes(count:Int) : Array<Int>
+    {
+        var bytes = readBytes(count);
+        if (!bigEndian)
+        {
+            bytes.reverse();
+        }
+        return bytes;
     }
    
     public function readBool() : Bool
@@ -41,38 +54,38 @@ class DataStream extends Stream
     
     public function readShort() : Int
     { 
-        var bytes = readBytes(2);
-        return (bytes[1] << 8) | bytes[0];
+        var bytes = readEndianAwareBytes(2);
+        var short = (bytes[0] << 8) | bytes[1];
+        return short > 32767 ? -65536 + short : short;
     }
     
     public function readInt() : Int
     { 
-        var bytes = readBytes(4);
-        return (bytes[3] << 24) | (bytes[2] << 16) | (bytes[1] << 8) | bytes[0];
+        var bytes = readEndianAwareBytes(4);
+        var int = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+        return int; // TODO: overflow handling? crossplatform int range in haxe?
     }
     
     public function readFloat() : Float 
     {
-        var bytes = readBytes(4);
+        var bytes = readEndianAwareBytes(4);
         var sign = 1 - ((bytes[0] >> 7) << 1);
         var exp = (((bytes[0] << 1) & 0xFF) | (bytes[1] >> 7)) - 127;
         var sig = ((bytes[1] & 0x7F) << 16) | (bytes[2] << 8) | bytes[3];
         if (sig == 0 && exp == -127)
             return 0.0;
         
-        return sign*(1 + TWOeN23*sig)*Math.pow(2, exp);
+        return sign*(1 + Math.pow(2, -23)*sig)*Math.pow(2, exp);
     }
     
     public function readDouble() : Float
     {
-        var bytes = readBytes(8);
-
+        var bytes = readEndianAwareBytes(8);
         var sign = 1 - ((bytes[0] >> 7) << 1); // sign = bit 0
         var exp = (((bytes[0] << 4) & 0x7FF) | (bytes[1] >> 4)) - 1023; // exponent = bits 1..11
         var sig = getDoubleSig(bytes);
         if (sig == 0 && exp == -1023)
             return 0.0;
-        
         return sign*(1.0 + Math.pow(2, -52)*sig)*Math.pow(2, exp);
     } 
     
@@ -92,31 +105,9 @@ class DataStream extends Stream
     #else
     public function getDoubleSig(bytes:Array<Int>) : Int
     {
-        // we need the lower 4 bits of the [1] byte and all other complete.
-        var sig = ((bytes[1] & 0x0F) << 48) | (bytes[2] << 40) | (bytes[3] << 32) | 
-                   (bytes[4] << 24) | (bytes[5] << 16) | (bytes[6] << 8) | bytes[7];
-        return sig;
+        return ((bytes[1] & 0x0F) << 48) | (bytes[2] << 40) | (bytes[3] << 32)
+               | (bytes[4] << 24) | (bytes[5] << 16) | (bytes[6] << 8) | bytes[7];
     }
     #end
-    
-    public override function readByte() : Int
-    {
-        return _stream.readByte();
-    }
-    
-    public override function seek(position:Int) : Void 
-    {
-        _stream.seek(position);
-    }
-    
-    public override function position() : Int
-    {
-        return _stream.position();
-    }
-    
-    public override function length() :Int 
-    {
-        return _stream.length();
-    }    
     
 }

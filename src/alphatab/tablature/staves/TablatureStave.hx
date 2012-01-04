@@ -241,8 +241,8 @@ class TablatureStave extends Stave
         #if DEBUG_DRAWING
         var debugLayer = context.get(DrawingLayers.Overlays);
         var c:Color = (beat.index % 2 == 0) 
-                            ? new Color(255, 0, 0, 0.5) 
-                            : new Color(0, 255, 0, 0.5);
+                            ? Color.fromARgb(255, 0, 0, 0.5) 
+                            : Color.fromARgb(0, 255, 0, 0.5);
         debugLayer.setColor(c);
         var top = y;
         var bottom = y + spacing.get(BottomPadding);

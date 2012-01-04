@@ -4,12 +4,13 @@
 /.hxtypes
 
 # output directories
-/bin/cpp
+/bin/hxcpp
 /bin/cs
 /bin/neko
 
-# usage test
+# in progress dirs
 /bin/js/studio/**/*
+/src/alphaTab/file/ptb/**/*
 
 # ignore project files
 .classpath

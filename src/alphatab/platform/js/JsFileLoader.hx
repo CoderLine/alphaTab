@@ -16,8 +16,8 @@
  */
 package alphatab.platform.js;
 #if js
-import alphatab.io.DataStream;
-import alphatab.io.StringStream;
+import alphatab.io.DataInputStream;
+import alphatab.io.StringInputStream;
 import alphatab.platform.FileLoader;
 
 /**
@@ -31,7 +31,7 @@ class JsFileLoader implements FileLoader
     {
     }
     
-    public function loadBinary(method:String, file:String, success:DataStream->Void, error:String->Void) : Void
+    public function loadBinary(method:String, file:String, success:DataInputStream->Void, error:String->Void) : Void
     {        
         if (JQuery.isIE())
         {
@@ -48,7 +48,7 @@ class JsFileLoader implements FileLoader
                 i++;
             }
             
-            var reader:DataStream = new DataStream(new StringStream(data));
+            var reader:DataInputStream = new DataInputStream(new StringInputStream(data));
             success(reader);
         }
         else
@@ -58,7 +58,7 @@ class JsFileLoader implements FileLoader
             options.url = file;
             options.success = function(data:String)
             {
-                var reader:DataStream = new DataStream(new StringStream(data));
+                var reader:DataInputStream = new DataInputStream(new StringInputStream(data));
                 success(reader);
             }
             options.error = function(x:Dynamic, e:String)

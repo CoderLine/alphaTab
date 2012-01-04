@@ -46,6 +46,11 @@ class HorizontalViewLayout extends ViewLayout
         layoutSize = new Point(width, height);
     }
     
+    public override function getLines() : Array<StaveLine>
+    {
+        return [_line];
+    }
+    
     // 
     // Layouting
     //

@@ -17,7 +17,7 @@
 package alphatab.file;
 import alphatab.model.Song;
 import alphatab.model.SongFactory;
-import alphatab.io.DataStream; 
+import alphatab.io.DataInputStream; 
 import alphatab.platform.FileLoader;
 import alphatab.platform.PlatformFactory;
 
@@ -41,7 +41,7 @@ class SongLoader
         }
         loader.loadBinary("GET", url, 
         // success
-        function(data:DataStream) : Void 
+        function(data:DataInputStream) : Void 
         {
             var readers:Array<SongReader> = SongReader.availableReaders();
             for (reader in readers) 
@@ -59,6 +59,7 @@ class SongLoader
                     continue;
                 }
             }
+            data.close();
             throw new FileFormatException("No reader for requested file found");
         },
         // error

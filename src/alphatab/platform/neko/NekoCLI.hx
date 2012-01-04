@@ -18,6 +18,8 @@ package alphatab.platform.neko;
 
 #if neko
 
+import alphatab.io.FileOutputStream;
+import alphatab.io.OutputStream;
 import alphatab.platform.cli.CLI;
 import neko.Sys;
 import neko.Lib;
@@ -40,44 +42,9 @@ class NekoCLI extends CLI
         println = Lib.println;
         fileExists = FileSystem.exists;
         isDirectory = FileSystem.isDirectory;
-        writeAllBytes = function(bytes:Array<Int>, path:String)
+        openWrite = function(path:String) : OutputStream
         {
-            var output:FileOutput = null;
-            try
-            {
-                output = File.write(path, true);
-                for (b in bytes)
-                {
-                    output.writeByte(b);
-                }
-                output.close();
-            }
-            catch (e:Dynamic)
-            {
-                if (output != null) 
-                {
-                    output.close();
-                }
-                throw e;
-            }
-        }
-        writeAllText = function(txt:String, path:String)
-        {
-            var output:FileOutput = null;
-            try
-            {
-                output = File.write(path, false);
-                output.writeString(txt);
-                output.close();
-            }
-            catch (e:Dynamic)
-            {
-                if (output != null) 
-                {
-                    output.close();
-                }
-                throw e;
-            }
+            return new FileOutputStream(path);
         }
     }
     

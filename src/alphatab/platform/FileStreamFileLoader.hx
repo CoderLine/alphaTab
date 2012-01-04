@@ -14,39 +14,33 @@
  *  You should have received a copy of the GNU General Public License
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
-package alphatab.platform.cpp;
+package alphatab.platform;
 
-#if cpp
+#if (neko || cpp)
 
-import alphatab.io.FileOutputStream;
-import alphatab.io.OutputStream;
-import alphatab.platform.cli.CLI;
-import cpp.Sys;
-import cpp.Lib;
-import cpp.FileSystem;
-import cpp.io.FileOutput;
-import cpp.io.File;
- 
+import alphatab.io.DataInputStream;
+import alphatab.io.FileInputStream;
+import alphatab.platform.FileLoader;
+
 /**
- * A C++ cli implementation
+ * This if a fileloader implementation for Neko
  */
-class CppCLI extends CLI
+class FileStreamFileLoader implements FileLoader
 {
-
     public function new() 
-    {
-        super();
-        args = Sys.args();
-        exit = Sys.exit;
-        print = Lib.print;
-        println = Lib.println;
-        fileExists = FileSystem.exists;
-        isDirectory = FileSystem.isDirectory;
-        openWrite = function(path:String) : OutputStream
-        {
-            return new FileOutputStream(path);
-        }
+    {       
     }
     
+    public function loadBinary(method:String, file:String, success:DataInputStream->Void, error:String->Void) : Void
+    {        
+        try 
+        {
+            success(new DataInputStream(new FileInputStream(file)));
+        }
+        catch (e:Dynamic)
+        {
+            error(Std.string(e));
+        }
+    }
 }
 #end

@@ -14,39 +14,37 @@
  *  You should have received a copy of the GNU General Public License
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
-package alphatab.platform.cpp;
+package alphatab.io;
 
-#if cpp
-
-import alphatab.io.FileOutputStream;
-import alphatab.io.OutputStream;
-import alphatab.platform.cli.CLI;
-import cpp.Sys;
-import cpp.Lib;
-import cpp.FileSystem;
-import cpp.io.FileOutput;
-import cpp.io.File;
- 
 /**
- * A C++ cli implementation
+ * A stream which stores the data in a StringBuf instance
  */
-class CppCLI extends CLI
+class StringOutputStream extends OutputStream
 {
-
+    private var _buffer:StringBuf;
+    
     public function new() 
     {
         super();
-        args = Sys.args();
-        exit = Sys.exit;
-        print = Lib.print;
-        println = Lib.println;
-        fileExists = FileSystem.exists;
-        isDirectory = FileSystem.isDirectory;
-        openWrite = function(path:String) : OutputStream
-        {
-            return new FileOutputStream(path);
-        }
+        _buffer = new StringBuf();
     }
     
+    /**
+     * Writes a 8bit unsigned integer to the stream;
+     * @param data the byte value to be written to the stream.
+     */
+    public override function writeByte(data:Int)
+    {
+        _buffer.add(String.fromCharCode(data));
+    }    
+    
+    public override function writeString(text:String)
+    {
+        _buffer.add(text);
+    }
+    
+    public function toString() : String
+    {
+        return _buffer.toString();
+    }
 }
-#end

@@ -13,6 +13,7 @@
     <!-- Main Properties -->
 	<property name="bin" location="bin"/>
 	<property name="src" location="src"/>
+	<property name="test" location="test"/>
 
     <target name="global-init">
 		<tstamp/>
@@ -77,6 +78,8 @@
             <arg value="-js" />
             <arg value="${haxe-js}" /> 
             
+            <arg value="-debug" />
+            
             <arg value="-D" />
             <arg value="DEBUG_DRAWING" />
         </exec>
@@ -128,29 +131,54 @@
                         
             <arg value="-cpp" />
             <arg value="${haxe-cpp}" />
-            
-            <arg value="-D" />
-            <arg value="static" />
         </exec>
-    </target>
-       
+    </target>   
+    
     <!--*************************************************************************
-        Building C++
+        Building Neko
     **************************************************************************-->
 
     <property name="haxe-neko" location="${bin}/neko/alphaTab.n"/>
     <target name="haxe-neko" depends="global-init">
 		<delete file="${haxe-neko}" />
+        <mkdir dir="${bin}/neko/" />
         <exec executable="haxe" failonerror="true">
             <arg value="-cp" />
             <arg value="${src}"/>
             
             <arg value="-main" />
             <arg value="alphatab.Main" />
-            
+                        
             <arg value="-neko" />
             <arg value="${haxe-neko}" />
         </exec>
+    </target>    
+   
+    <!--*************************************************************************
+        Run UnitTests
+    **************************************************************************-->
+
+    <property name="unit-tests" location="${bin}/tests.n"/>
+    <target name="test" depends="global-init">
+		<delete file="${unit-tests}" />
+        <exec executable="haxe" failonerror="true">
+            <arg value="-cp" />
+            <arg value="${src}"/>
+            <arg value="-cp" />
+            <arg value="${test}"/>
+            
+            <arg value="-main" />
+            <arg value="alphatab.AlphaTabTestRunner" />
+                        
+            <arg value="-neko" />
+            <arg value="${unit-tests}" />
+        </exec>
+        
+        <exec executable="neko" failonerror="true">
+            <arg value="${unit-tests}" />
+        </exec>
+        
+		<delete file="${unit-tests}" />
     </target>
    
 	

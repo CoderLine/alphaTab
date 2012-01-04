@@ -76,16 +76,14 @@ class Gp5Reader extends Gp4Reader
         }
 
         var song:Song = factory.newSong();
-        
         readInfo(song);
         
         readLyrics(song);
         
         readPageSetup(song);
-        
         song.tempoName = readIntSizeCheckByteString();
         song.tempo = data.readInt();
-        
+                
         if (_versionIndex > 0) 
             song.hideTempo = data.readBool();
         
@@ -114,6 +112,7 @@ class Gp5Reader extends Gp4Reader
                 start += readBeat(start, measure, track, voice);
             }
         }
+        
         skip(1);
     }
     
@@ -502,7 +501,7 @@ class Gp5Reader extends Gp4Reader
     }
     
     
-    override private function readPageSetup(song:Song) : Void
+    private override function readPageSetup(song:Song) : Void
     {
         var setup:PageSetup = factory.newPageSetup();
         if (_versionIndex > 0) 
@@ -534,7 +533,8 @@ class Gp5Reader extends Gp4Reader
         song.pageSetup = setup;
     }
     
-    override private function readInfo(song:Song) {
+    private override function readInfo(song:Song) 
+    {
         song.title = (readIntSizeCheckByteString());
         song.subtitle = readIntSizeCheckByteString();
         song.artist = (readIntSizeCheckByteString());
@@ -547,7 +547,8 @@ class Gp5Reader extends Gp4Reader
         
         var iNotes:Int = data.readInt();
         song.notice = "";
-        for (i in 0 ... iNotes) {
+        for (i in 0 ... iNotes) 
+        {
             song.notice += readIntSizeCheckByteString() + "\n";
         }
     }

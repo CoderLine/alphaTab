@@ -20,7 +20,7 @@ import alphatab.model.Measure;
 import alphatab.model.Note;
 import alphatab.model.Track;
 import alphatab.model.Voice;
-import alphatab.io.DataStream;
+import alphatab.io.DataInputStream;
 
 import alphatab.file.gpx.GpxReader;
 import alphatab.file.guitarpro.Gp3Reader;
@@ -37,7 +37,7 @@ class SongReader
     /**
      * The data source for reading. 
      */
-    public var data(default,default):DataStream;
+    public var data(default,default):DataInputStream;
     /**
      * The song factory for creating objects.
      */
@@ -69,7 +69,7 @@ class SongReader
      * @param data The data source for reading.
      * @param factory The song factory for creating objects.
      */
-    public function init(data:DataStream, factory:SongFactory) : Void 
+    public function init(data:DataInputStream, factory:SongFactory) : Void 
     {
         this.data = data;
         this.factory = factory;

@@ -16,12 +16,12 @@
  */
 package alphatab.platform;
 
-import alphatab.io.DataStream;
+import alphatab.io.DataInputStream;
 
 /**
  * This is the interface which file loaders need to implement for providing files on different plattforms. 
  */
 interface FileLoader 
 {
-    function loadBinary(method:String, file:String, success:DataStream->Void, error:String->Void) : Void;    
+    function loadBinary(method:String, file:String, success:DataInputStream->Void, error:String->Void) : Void;    
 }

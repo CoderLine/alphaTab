@@ -17,11 +17,13 @@
 package alphatab.platform.cli;
 
 import alphatab.file.SongLoader;
+import alphatab.io.OutputStream;
 import alphatab.model.Song;
 import alphatab.platform.PlatformFactory;
 import alphatab.platform.svg.SvgCanvas;
 import alphatab.tablature.model.DrawingSongModelFactory;
 import alphatab.tablature.Tablature;
+import haxe.Stack;
 
 /**
  * A command line interface for using alphaTab features
@@ -39,12 +41,12 @@ class CLI
     public var fileExists(default,default):String->Bool;
     public var isDirectory(default,default):String->Bool;
     
-    public var writeAllBytes(default,default):Array<Int> -> String -> Void;
-    public var writeAllText(default,default):String -> String -> Void;
+    public var openWrite(default,default): String -> OutputStream;
     
     public function new() 
     {
         _tasks = new Array<CLITask>();
+        _tasks.push(new ExportTask());
         _tasks.push(new SvgTask());
     }
     
@@ -102,6 +104,12 @@ class CLI
     {
         printUsage("Error: " + msg);
         exit(1);
+    }
+           
+    
+    public function warn(msg:String) 
+    {
+        printUsage("Warning: " + msg);
     }
         
     private function printUsage(msg:String) 

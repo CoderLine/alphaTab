@@ -15,6 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.platform.cli;
+import alphatab.io.OutputStream;
 import alphatab.model.Song;
 import alphatab.platform.PlatformFactory;
 import alphatab.platform.svg.SvgCanvas;
@@ -139,8 +140,11 @@ class SvgTask implements CLITask
                     var output = new StringBuf();
                     output.add('<?xml version="1.0" encoding="Cp1252"?>');
                     var c:SvgCanvas = cast tablature.canvas;
-                    output.add(c.toSvg(true));
-                    cli.writeAllText(output.toString(), _outputFile);
+                    
+                    var out:OutputStream = cli.openWrite(_outputFile);
+                    c.writeTo(out, true);
+                    out.flush();
+                    out.close();
                 }
                 catch (e:Dynamic)
                 {

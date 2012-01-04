@@ -53,6 +53,10 @@ class PageViewLayout extends ViewLayout
         contentPadding = PAGE_PADDING;
     }
     
+    public override function getLines() : Array<StaveLine>
+    {
+        return _lines;
+    }
     
     // Returns the index of the measure drawn under the coordinates given
     public override function getMeasureAt(xPos:Int, yPos:Int) : Measure {
