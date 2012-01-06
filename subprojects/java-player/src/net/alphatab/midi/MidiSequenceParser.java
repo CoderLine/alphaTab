@@ -104,19 +104,19 @@ public class MidiSequenceParser
                             Integer.parseInt(eventData.substring(2,4), 16)); // Value
                 }
                 else if(eventData.charAt(0) == '5')
-                { // systemReset
-                    message = MidiMessageUtils.systemReset();
-                }
-                else if(eventData.charAt(0) == '6')
                 { // tempoInUsq
                     message = MidiMessageUtils.tempoInUSQ(Integer.parseInt(eventData.substring(1), 16)); // Usq
                 }
-                else if(eventData.charAt(0) == '7')
+                else if(eventData.charAt(0) == '6')
                 { // timeSignature
                     String[] timeParts = eventData.substring(1).split(",");
                     message = MidiMessageUtils.timeSignature(Integer.parseInt(timeParts[0]), // numerator
                             Integer.parseInt(timeParts[1]), // denominatorIndex
                             Integer.parseInt(timeParts[2])); // denominatorValue
+                }
+                else if(eventData.charAt(0) == '7')
+                {// Rest message
+                    message = MidiMessageUtils.rest();
                 }
 
                 getTrack(track).add(new MidiEvent(message, tick));

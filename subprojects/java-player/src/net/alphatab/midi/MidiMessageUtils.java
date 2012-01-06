@@ -19,6 +19,7 @@ package net.alphatab.midi;
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MetaMessage;
 import javax.sound.midi.MidiMessage;
+import javax.sound.midi.SysexMessage;
 import javax.sound.midi.ShortMessage;
 
 public class MidiMessageUtils
@@ -45,6 +46,22 @@ public class MidiMessageUtils
         {
             ShortMessage message = new ShortMessage();
             message.setMessage(ShortMessage.NOTE_OFF, channel, note, velocity);
+            return message;
+        }
+        catch (InvalidMidiDataException e)
+        {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    public static final byte REST_MESSAGE = (byte)0x00;
+    public static MidiMessage rest()
+    {
+        try
+        {
+            SysexMessage message = new SysexMessage();
+            message.setMessage(new byte[]{(byte)0xF0, (byte)0x00, REST_MESSAGE}, 3);
             return message;
         }
         catch (InvalidMidiDataException e)

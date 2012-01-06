@@ -51,6 +51,13 @@ class MidiMessageFileUtils
         // NoteOn,Channel,Note,Velocity  
         return new MidiMessage([makeCommand(0x90, channel), fixValue(note), fixValue(velocity)]);
     }
+     
+    public static inline var REST_MESSAGE:Int = 0x00;
+    public static function rest():MidiMessage
+    {
+        // SysEx 
+        return new MidiMessage([0xF0, 0x00, REST_MESSAGE, 0xF7]);
+    }
     
     public static function controlChange(channel:Int, controller:Int, value:Int):MidiMessage 
     {
@@ -73,6 +80,25 @@ class MidiMessageFileUtils
     private static function makeCommand(command:Int, channel:Int)
     {
         return (command & 0xF0) | (channel & 0x0F);
+    }
+    
+    private static function buildSysexMessage(data:Array<Int> = null)
+    {
+        var sysex = new Array<Int>();
+        
+        sysex.push(0xF0);
+        // manufacturer
+        
+        if (data == null)
+        {
+            data = new Array<Int>();
+        }
+        data.push(0xF7);
+
+        MidiFile.writeVariableLengthValue(sysex, data.length);
+        sysex = sysex.concat(data);
+        
+        return new MidiMessage(sysex);
     }
     
     private static function buildMetaMessage(metaType:Int, data:Array<Int> = null)

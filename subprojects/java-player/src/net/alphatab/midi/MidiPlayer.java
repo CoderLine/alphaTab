@@ -31,6 +31,7 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Sequence;
 import javax.sound.midi.Sequencer;
 import javax.sound.midi.ShortMessage;
+import javax.sound.midi.SysexMessage;
 import javax.sound.midi.Transmitter;
 import javax.swing.BorderFactory;
 import javax.swing.JApplet;
@@ -65,14 +66,14 @@ public class MidiPlayer extends JApplet
                     .addControllerEventListener(new ControllerEventListener()
                     {
                         @Override
-                        public void controlChange(ShortMessage event)
+                        public void controlChange(ShortMessage message)
                         {
                             if (_sequencer.isRunning())
                             {
-                                switch (event.getCommand())
+                                switch (message.getCommand())
                                 {
-                                    case 0x80:// Noteon
-                                    case 0x90:// noteof
+                                    case 0x80:// NoteOn
+                                    case 0x90:// NoteOff
                                         notifyPosition(_sequencer
                                                 .getTickPosition());
                                     break;
@@ -80,6 +81,21 @@ public class MidiPlayer extends JApplet
                             }
                         }
                     });
+            tickReceiver.addSysexEventListener(new SysexEventListener()
+            {
+                @Override
+                public void sysex(SysexMessage message)
+                {
+                    byte[] data = message.getData();
+                    // JOptionPane.showMessageDialog(null,"Sysex" + data);
+                    
+                    if(data[0] == 0x00 &&
+                       data[1] == MidiMessageUtils.REST_MESSAGE)
+                    {
+                        notifyPosition(_sequencer.getTickPosition());
+                    }
+                }
+            });
         }
         catch (MidiUnavailableException e)
         {
@@ -104,7 +120,7 @@ public class MidiPlayer extends JApplet
         }
         catch (Throwable e)
         {
-            //JOptionPane.showMessageDialog(null,"MidiPlayer Error: \n" + e.toString());
+            // JOptionPane.showMessageDialog(null,"MidiPlayer Error: \n" + e.toString());
 			//e.printStackTrace();
         }
     }

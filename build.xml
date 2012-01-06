@@ -45,7 +45,7 @@
 		<!-- Package Jar -->
 		<echo message="create midi player jar"/>
 		<delete file="${player-jar}" />
-		<jar jarfile="${player-jar}" basedir="${player-bin}" failonerror="true" />
+		<jar jarfile="${player-jar}" basedir="${player-bin}" />
 
 		<!-- Remove Build Directory -->
 		<delete dir="${player-bin}" />

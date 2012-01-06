@@ -21,11 +21,13 @@ import java.util.ArrayList;
 import javax.sound.midi.ControllerEventListener;
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.Receiver;
+import javax.sound.midi.SysexMessage;
 import javax.sound.midi.ShortMessage;
 
 public class TickNotifierReceiver implements Receiver
 {
     private ArrayList<ControllerEventListener> _controllerEventListeners = new ArrayList<ControllerEventListener>();
+    private ArrayList<SysexEventListener> _sysexEventListeners = new ArrayList<SysexEventListener>();
 
     private Receiver _old;
 
@@ -50,19 +52,46 @@ public class TickNotifierReceiver implements Receiver
                 listener.controlChange((ShortMessage)message);
             }
         }
+        if(message instanceof SysexMessage)
+        {
+            for(SysexEventListener listener : _sysexEventListeners)
+            {
+                listener.sysex((SysexMessage)message);
+            }
+            return;
+        }
         if (_old != null) _old.send(message, timeStamp);
     }
     
-    public void addControllerEventListener(ControllerEventListener listener) {
-        synchronized(_controllerEventListeners) {
+    public void addControllerEventListener(ControllerEventListener listener) 
+    {
+        synchronized(_controllerEventListeners) 
+        {
             _controllerEventListeners.add(listener);
         }
     }
 
+    public void removeControllerEventListener(ControllerEventListener listener) 
+    {
+        synchronized(_controllerEventListeners) 
+        {
+            _controllerEventListeners.remove(listener);
+        }
+    }    
+    
+    public void addSysexEventListener(SysexEventListener listener) 
+    {
+        synchronized(_sysexEventListeners) 
+        {
+            _sysexEventListeners.add(listener);
+        }
+    }
 
-    public void removeControllerEventListener(ControllerEventListener listener, int[] controllers) {
-        synchronized(_controllerEventListeners) {
-            _controllerEventListeners.remove(_controllerEventListeners);
+    public void removeSysexEventListener(SysexEventListener listener) 
+    {
+        synchronized(_sysexEventListeners) 
+        {
+            _sysexEventListeners.remove(listener);
         }
     }
 

@@ -81,6 +81,12 @@ class MidiMessageDataUtils
         return "6" + intToString(ts.numerator) + "," + intToString(ts.denominator.index()) + "," + intToString(ts.denominator.value);
     }
     
+    public static function rest():String
+    {
+        // SysEx 
+        return "7";
+    }
+    
     public static inline function intToString(num:Int) :String 
     {
         return StringTools.hex(num);

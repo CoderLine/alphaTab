@@ -29,6 +29,8 @@ interface MidiSequenceHandler
     
     function addNoteOn(tick:Int, track:Int, channel:Int, note:Int, velocity:Int):Void;
     
+    function addRest(tick:Int, track:Int, channel:Int):Void;
+    
     function addPitchBend(tick:Int, track:Int, channel:Int, value:Int):Void;
     
     function addProgramChange(tick:Int, track:Int, channel:Int, instrument:Int):Void;

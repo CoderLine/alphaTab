@@ -56,6 +56,11 @@ class MidiSequenceFileHandler implements MidiSequenceHandler
     {
         addEvent(track, tick, MidiMessageFileUtils.noteOn(channel, note, velocity));
     }
+        
+    public function addRest(tick:Int, track:Int, channel:Int):Void
+    {
+        addEvent(track, tick, MidiMessageFileUtils.rest());
+    }
     
     public function addPitchBend(tick:Int, track:Int, channel:Int, value:Int):Void
     {

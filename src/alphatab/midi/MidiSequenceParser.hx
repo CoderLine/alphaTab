@@ -498,13 +498,11 @@ class MidiSequenceParser
             {
                 makeMixChange(sequence, track.channel, track.number, beat);
             }
-
             makeNotes(sequence, track, beat, measure.tempo(), measureIndex, beatIndex, startMove,
-                      getStroke(beat, previous, stroke));
+                  getStroke(beat, previous, stroke));
             previous = beat;
         }
     }
-
     
     public function makeBend(sequence:MidiSequenceHandler, track:Int, start:Int, duration:Int,
                                  bend:BendEffect, channel:Int) : Void
@@ -645,7 +643,12 @@ class MidiSequenceParser
         }
         sequence.addControlChange(getTick(start + duration), track, channel, MidiController.EXPRESSION, 0x7f);
     }
-     
+        
+    public function makeRest(sequence:MidiSequenceHandler, track:Track, start:Int, voice:Voice, beatIndex:Int, channel:Int) : Void
+    {
+        sequence.addRest(getTick(start), track.number, channel);
+    }
+    
     private function makeNote(sequence:MidiSequenceHandler, track:Int, key:Int, start:Int, duration:Int, velocity:Int, channel:Int) : Void
     {
         sequence.addNoteOn(getTick(start), track, channel, key, velocity);
@@ -659,131 +662,140 @@ class MidiSequenceParser
         {
             var voice:Voice = beat.voices[vIndex];
             var data:BeatData = checkTripletFeel(voice, beatIndex);
-            for (noteIndex in 0 ... voice.notes.length)
+            
+            if (voice.isRestVoice() && !voice.isEmpty)
             {
-                var note:Note = voice.notes[noteIndex];
+                makeRest(sequence, track, data.start + startMove, voice, beatIndex, track.channel.channel);
+            }
+            else
+            {
+                
+                for (noteIndex in 0 ... voice.notes.length)
+                {
+                    var note:Note = voice.notes[noteIndex];
 
-                if (note.isTiedNote) continue;
+                    if (note.isTiedNote) continue;
 
-                var key:Int = (_transpose + track.offset + note.value) +
-                           track.strings[note.string - 1].value;
-                var start:Int = applyStrokeStart(note, data.start + startMove, stroke);
-                var duration:Int = applyStrokeDuration(note,
-                                                     getRealNoteDuration(track, note, tempo, data.duration,
-                                                                         measureIndex, beatIndex), stroke);
-                var velocity:Int = getRealVelocity(note, track, measureIndex, beatIndex);
-                var channel:Int = track.channel.channel;
-                var effectChannel:Int = track.channel.effectChannel;
-                var percussionTrack:Bool = track.isPercussionTrack;
-                if (beat.effect.fadeIn)
-                {
-                    channel = effectChannel;
-                    makeFadeIn(sequence, trackId, start, duration, channel);
-                }
-                if ((note.effect.isGrace() && (effectChannel >= 0)) && !percussionTrack)
-                {
-                    channel = effectChannel;
-                    var graceKey:Int = (track.offset + note.effect.grace.fret) +
-                                    (track.strings[note.string - 1].value);
-                    var graceLength:Int = note.effect.grace.durationTime();
-                    var graceVelocity:Int = note.effect.grace.velocity;
-                    var graceDuration:Int = (!note.effect.grace.isDead)
-                                              ? graceLength
-                                              : applyStaticDuration(tempo, DEFAULT_DURATION_DEAD, graceLength);
-                    if (note.effect.grace.isOnBeat || ((start - graceLength) < Duration.QUARTER_TIME))
+                    var key:Int = (_transpose + track.offset + note.value) +
+                               track.strings[note.string - 1].value;
+                    var start:Int = applyStrokeStart(note, data.start + startMove, stroke);
+                    var duration:Int = applyStrokeDuration(note,
+                                                         getRealNoteDuration(track, note, tempo, data.duration,
+                                                                             measureIndex, beatIndex), stroke);
+                    var velocity:Int = getRealVelocity(note, track, measureIndex, beatIndex);
+                    var channel:Int = track.channel.channel;
+                    var effectChannel:Int = track.channel.effectChannel;
+                    var percussionTrack:Bool = track.isPercussionTrack;
+                    if (beat.effect.fadeIn)
                     {
-                        start += graceLength;
-                        duration -= graceLength;
+                        channel = effectChannel;
+                        makeFadeIn(sequence, trackId, start, duration, channel);
                     }
-                    makeNote(sequence, trackId, graceKey, start - graceLength, graceDuration, graceVelocity,
-                             channel);
-                }
-                if ((note.effect.isTrill() && (effectChannel >= 0)) && !percussionTrack)
-                {
-                    var trillKey:Int = (track.offset + note.effect.trill.fret) +
-                                    (track.strings[note.string - 1].value);
-                    var trillLength:Int = note.effect.trill.duration.time();
-                    var realKey:Bool = true;
-                    var tick:Int = start;
-                    while (tick + 10 < (start + duration))
+                    if ((note.effect.isGrace() && (effectChannel >= 0)) && !percussionTrack)
                     {
-                        if ((tick + trillLength) >= (start + duration))
+                        channel = effectChannel;
+                        var graceKey:Int = (track.offset + note.effect.grace.fret) +
+                                        (track.strings[note.string - 1].value);
+                        var graceLength:Int = note.effect.grace.durationTime();
+                        var graceVelocity:Int = note.effect.grace.velocity;
+                        var graceDuration:Int = (!note.effect.grace.isDead)
+                                                  ? graceLength
+                                                  : applyStaticDuration(tempo, DEFAULT_DURATION_DEAD, graceLength);
+                        if (note.effect.grace.isOnBeat || ((start - graceLength) < Duration.QUARTER_TIME))
                         {
-                            trillLength = (((start + duration) - tick) - 1);
+                            start += graceLength;
+                            duration -= graceLength;
                         }
-                        makeNote(sequence, trackId, ((realKey) ? key : trillKey), tick, trillLength,
-                                 velocity, channel);
-                        realKey = !realKey;
-                        tick += trillLength;
+                        makeNote(sequence, trackId, graceKey, start - graceLength, graceDuration, graceVelocity,
+                                 channel);
                     }
-                    continue;
-                }
-                if (note.effect.isTremoloPicking() && (effectChannel >= 0))
-                {
-                    var tpLength:Int = note.effect.tremoloPicking.duration.time();
-                    var tick:Int  = start;
-                    while (tick + 10 < (start + duration))
+                    if ((note.effect.isTrill() && (effectChannel >= 0)) && !percussionTrack)
                     {
-                        if ((tick + tpLength) >= (start + duration))
+                        var trillKey:Int = (track.offset + note.effect.trill.fret) +
+                                        (track.strings[note.string - 1].value);
+                        var trillLength:Int = note.effect.trill.duration.time();
+                        var realKey:Bool = true;
+                        var tick:Int = start;
+                        while (tick + 10 < (start + duration))
                         {
-                            tpLength = (((start + duration) - tick) - 1);
-                        }
-                        makeNote(sequence, trackId, key, start, tpLength, velocity, channel);
-                        tick += tpLength;
-                    }
-                    continue;
-                }
-                if ((note.effect.isBend() && (effectChannel >= 0)) && !percussionTrack)
-                {
-                    channel = effectChannel;
-                    makeBend(sequence, trackId, start, duration, note.effect.bend, channel);
-                }
-                else if ((note.voice.beat.effect.isTremoloBar() && (effectChannel >= 0)) && !percussionTrack)
-                {
-                    channel = effectChannel;
-                    makeTremoloBar(sequence, trackId, start, duration, note.voice.beat.effect.tremoloBar, channel);
-                }
-                else if ((note.effect.slide && (effectChannel >= 0)) && !percussionTrack)
-                {
-                    channel = effectChannel;
-                    var nextNote:Note = getNextNote(note, track, measureIndex, beatIndex);
-                    makeSlide(sequence, trackId, note, nextNote, startMove, channel);
-                }
-                else if ((note.effect.vibrato && (effectChannel >= 0)) && !percussionTrack)
-                {
-                    channel = effectChannel;
-                    makeVibrato(sequence, trackId, start, duration, channel);
-                }
-                if (note.effect.isHarmonic() && !percussionTrack)
-                {
-                    var orig:Int = key; 
-                    if (note.effect.harmonic.type == HarmonicType.Natural)
-                    {
-                        for (i in 0 ... HarmonicEffect.NATURAL_FREQUENCIES.length)
-                        {
-                            if ((note.value % 12) == (HarmonicEffect.NATURAL_FREQUENCIES[i][0] % 12))
+                            if ((tick + trillLength) >= (start + duration))
                             {
-                                key = (orig + HarmonicEffect.NATURAL_FREQUENCIES[i][1]) - note.value;
-                                break;
+                                trillLength = (((start + duration) - tick) - 1);
+                            }
+                            makeNote(sequence, trackId, ((realKey) ? key : trillKey), tick, trillLength,
+                                     velocity, channel);
+                            realKey = !realKey;
+                            tick += trillLength;
+                        }
+                        continue;
+                    }
+                    if (note.effect.isTremoloPicking() && (effectChannel >= 0))
+                    {
+                        var tpLength:Int = note.effect.tremoloPicking.duration.time();
+                        var tick:Int  = start;
+                        while (tick + 10 < (start + duration))
+                        {
+                            if ((tick + tpLength) >= (start + duration))
+                            {
+                                tpLength = (((start + duration) - tick) - 1);
+                            }
+                            makeNote(sequence, trackId, key, start, tpLength, velocity, channel);
+                            tick += tpLength;
+                        }
+                        continue;
+                    }
+                    if ((note.effect.isBend() && (effectChannel >= 0)) && !percussionTrack)
+                    {
+                        channel = effectChannel;
+                        makeBend(sequence, trackId, start, duration, note.effect.bend, channel);
+                    }
+                    else if ((note.voice.beat.effect.isTremoloBar() && (effectChannel >= 0)) && !percussionTrack)
+                    {
+                        channel = effectChannel;
+                        makeTremoloBar(sequence, trackId, start, duration, note.voice.beat.effect.tremoloBar, channel);
+                    }
+                    else if ((note.effect.slide && (effectChannel >= 0)) && !percussionTrack)
+                    {
+                        channel = effectChannel;
+                        var nextNote:Note = getNextNote(note, track, measureIndex, beatIndex);
+                        makeSlide(sequence, trackId, note, nextNote, startMove, channel);
+                    }
+                    else if ((note.effect.vibrato && (effectChannel >= 0)) && !percussionTrack)
+                    {
+                        channel = effectChannel;
+                        makeVibrato(sequence, trackId, start, duration, channel);
+                    }
+                    if (note.effect.isHarmonic() && !percussionTrack)
+                    {
+                        var orig:Int = key; 
+                        if (note.effect.harmonic.type == HarmonicType.Natural)
+                        {
+                            for (i in 0 ... HarmonicEffect.NATURAL_FREQUENCIES.length)
+                            {
+                                if ((note.value % 12) == (HarmonicEffect.NATURAL_FREQUENCIES[i][0] % 12))
+                                {
+                                    key = (orig + HarmonicEffect.NATURAL_FREQUENCIES[i][1]) - note.value;
+                                    break;
+                                }
                             }
                         }
-                    }
-                    else
-                    {
-                        if (note.effect.harmonic.type == HarmonicType.Semi)
-                        { 
-                            makeNote(sequence, trackId, Math.round(Math.min(127, orig)), start, duration,
-                                    Math.round(Math.max(Velocities.MIN_VELOCITY, velocity - (Velocities.VELOCITY_INCREMENT * 3))), channel);
+                        else
+                        {
+                            if (note.effect.harmonic.type == HarmonicType.Semi)
+                            { 
+                                makeNote(sequence, trackId, Math.round(Math.min(127, orig)), start, duration,
+                                        Math.round(Math.max(Velocities.MIN_VELOCITY, velocity - (Velocities.VELOCITY_INCREMENT * 3))), channel);
+                            }
+                            key = orig + HarmonicEffect.NATURAL_FREQUENCIES[note.effect.harmonic.data][1];
                         }
-                        key = orig + HarmonicEffect.NATURAL_FREQUENCIES[note.effect.harmonic.data][1];
+                        if ((key - 12) > 0)
+                        {
+                            var hVelocity:Int = Math.round(Math.max(Velocities.MIN_VELOCITY, velocity - (Velocities.VELOCITY_INCREMENT * 4)));
+                            makeNote(sequence, trackId, key - 12, start, duration, hVelocity, channel);
+                        }
                     }
-                    if ((key - 12) > 0)
-                    {
-                        var hVelocity:Int = Math.round(Math.max(Velocities.MIN_VELOCITY, velocity - (Velocities.VELOCITY_INCREMENT * 4)));
-                        makeNote(sequence, trackId, key - 12, start, duration, hVelocity, channel);
-                    }
+                    makeNote(sequence, trackId, Math.round(Math.min(0x7f, key)), start, duration, velocity, channel);
                 }
-                makeNote(sequence, trackId, Math.round(Math.min(0x7f, key)), start, duration, velocity, channel);
             }
         }
     }

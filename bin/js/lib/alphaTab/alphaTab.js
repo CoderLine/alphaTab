@@ -695,6 +695,9 @@ alphatab.midi.MidiMessageDataUtils.tempoInUSQ = function(usq) {
 alphatab.midi.MidiMessageDataUtils.timeSignature = function(ts) {
 	return "6" + StringTools.hex(ts.numerator) + "," + StringTools.hex(ts.denominator.index()) + "," + StringTools.hex(ts.denominator.value);
 }
+alphatab.midi.MidiMessageDataUtils.rest = function() {
+	return "7";
+}
 alphatab.midi.MidiMessageDataUtils.intToString = function(num) {
 	return StringTools.hex(num);
 }
@@ -2083,6 +2086,7 @@ alphatab.midi.MidiSequenceHandler.prototype.metronomeTrack = null;
 alphatab.midi.MidiSequenceHandler.prototype.addControlChange = null;
 alphatab.midi.MidiSequenceHandler.prototype.addNoteOff = null;
 alphatab.midi.MidiSequenceHandler.prototype.addNoteOn = null;
+alphatab.midi.MidiSequenceHandler.prototype.addRest = null;
 alphatab.midi.MidiSequenceHandler.prototype.addPitchBend = null;
 alphatab.midi.MidiSequenceHandler.prototype.addProgramChange = null;
 alphatab.midi.MidiSequenceHandler.prototype.addTempoInUSQ = null;
@@ -4960,6 +4964,9 @@ alphatab.midi.MidiMessageFileUtils.noteOff = function(channel,note,velocity) {
 alphatab.midi.MidiMessageFileUtils.noteOn = function(channel,note,velocity) {
 	return new alphatab.midi.model.MidiMessage([alphatab.midi.MidiMessageFileUtils.makeCommand(144,channel),alphatab.midi.MidiMessageFileUtils.fixValue(note),alphatab.midi.MidiMessageFileUtils.fixValue(velocity)]);
 }
+alphatab.midi.MidiMessageFileUtils.rest = function() {
+	return new alphatab.midi.model.MidiMessage([240,0,0,247]);
+}
 alphatab.midi.MidiMessageFileUtils.controlChange = function(channel,controller,value) {
 	return new alphatab.midi.model.MidiMessage([alphatab.midi.MidiMessageFileUtils.makeCommand(176,channel),alphatab.midi.MidiMessageFileUtils.fixValue(controller),alphatab.midi.MidiMessageFileUtils.fixValue(value)]);
 }
@@ -4971,6 +4978,15 @@ alphatab.midi.MidiMessageFileUtils.pitchBend = function(channel,value) {
 }
 alphatab.midi.MidiMessageFileUtils.makeCommand = function(command,channel) {
 	return command & 240 | channel & 15;
+}
+alphatab.midi.MidiMessageFileUtils.buildSysexMessage = function(data) {
+	var sysex = new Array();
+	sysex.push(240);
+	if(data == null) data = new Array();
+	data.push(247);
+	alphatab.midi.model.MidiFile.writeVariableLengthValue(sysex,data.length);
+	sysex = sysex.concat(data);
+	return new alphatab.midi.model.MidiMessage(sysex);
 }
 alphatab.midi.MidiMessageFileUtils.buildMetaMessage = function(metaType,data) {
 	var meta = new Array();
@@ -7408,6 +7424,9 @@ alphatab.midi.MidiSequenceFileHandler.prototype.addNoteOff = function(tick,track
 alphatab.midi.MidiSequenceFileHandler.prototype.addNoteOn = function(tick,track,channel,note,velocity) {
 	this.addEvent(track,tick,alphatab.midi.MidiMessageFileUtils.noteOn(channel,note,velocity));
 }
+alphatab.midi.MidiSequenceFileHandler.prototype.addRest = function(tick,track,channel) {
+	this.addEvent(track,tick,alphatab.midi.MidiMessageFileUtils.rest());
+}
 alphatab.midi.MidiSequenceFileHandler.prototype.addPitchBend = function(tick,track,channel,value) {
 	this.addEvent(track,tick,alphatab.midi.MidiMessageFileUtils.pitchBend(channel,value));
 }
@@ -8891,6 +8910,9 @@ alphatab.midi.MidiSequenceDataHandler.prototype.addNoteOff = function(tick,track
 alphatab.midi.MidiSequenceDataHandler.prototype.addNoteOn = function(tick,track,channel,note,velocity) {
 	this.addEvent(track,tick,alphatab.midi.MidiMessageDataUtils.noteOn(channel,note,velocity));
 }
+alphatab.midi.MidiSequenceDataHandler.prototype.addRest = function(tick,track,channel) {
+	this.addEvent(track,tick,alphatab.midi.MidiMessageDataUtils.rest());
+}
 alphatab.midi.MidiSequenceDataHandler.prototype.addPitchBend = function(tick,track,channel,value) {
 	this.addEvent(track,tick,alphatab.midi.MidiMessageDataUtils.pitchBend(channel,value));
 }
@@ -10084,6 +10106,9 @@ alphatab.midi.MidiSequenceParser.prototype.makeFadeIn = function(sequence,track,
 	}
 	sequence.addControlChange(this.getTick(start + duration),track,channel,11,127);
 }
+alphatab.midi.MidiSequenceParser.prototype.makeRest = function(sequence,track,start,voice,beatIndex,channel) {
+	sequence.addRest(this.getTick(start),track.number,channel);
+}
 alphatab.midi.MidiSequenceParser.prototype.makeNote = function(sequence,track,key,start,duration,velocity,channel) {
 	sequence.addNoteOn(this.getTick(start),track,channel,key,velocity);
 	sequence.addNoteOff(this.getTick(start + duration),track,channel,key,velocity);
@@ -10095,92 +10120,94 @@ alphatab.midi.MidiSequenceParser.prototype.makeNotes = function(sequence,track,b
 		var vIndex = _g1++;
 		var voice = beat.voices[vIndex];
 		var data = this.checkTripletFeel(voice,beatIndex);
-		var _g3 = 0, _g2 = voice.notes.length;
-		while(_g3 < _g2) {
-			var noteIndex = _g3++;
-			var note = voice.notes[noteIndex];
-			if(note.isTiedNote) continue;
-			var key = this._transpose + track.offset + note.value + track.strings[note.string - 1].value;
-			var start = alphatab.midi.MidiSequenceParser.applyStrokeStart(note,data.start + startMove,stroke);
-			var duration = alphatab.midi.MidiSequenceParser.applyStrokeDuration(note,this.getRealNoteDuration(track,note,tempo,data.duration,measureIndex,beatIndex),stroke);
-			var velocity = alphatab.midi.MidiSequenceParser.getRealVelocity(note,track,measureIndex,beatIndex);
-			var channel = track.channel.channel;
-			var effectChannel = track.channel.effectChannel;
-			var percussionTrack = track.isPercussionTrack;
-			if(beat.effect.fadeIn) {
-				channel = effectChannel;
-				this.makeFadeIn(sequence,trackId,start,duration,channel);
-			}
-			if(note.effect.isGrace() && effectChannel >= 0 && !percussionTrack) {
-				channel = effectChannel;
-				var graceKey = track.offset + note.effect.grace.fret + track.strings[note.string - 1].value;
-				var graceLength = note.effect.grace.durationTime();
-				var graceVelocity = note.effect.grace.velocity;
-				var graceDuration = !note.effect.grace.isDead?graceLength:alphatab.midi.MidiSequenceParser.applyStaticDuration(tempo,30,graceLength);
-				if(note.effect.grace.isOnBeat || start - graceLength < 960) {
-					start += graceLength;
-					duration -= graceLength;
+		if(voice.isRestVoice() && !voice.isEmpty) this.makeRest(sequence,track,data.start + startMove,voice,beatIndex,track.channel.channel); else {
+			var _g3 = 0, _g2 = voice.notes.length;
+			while(_g3 < _g2) {
+				var noteIndex = _g3++;
+				var note = voice.notes[noteIndex];
+				if(note.isTiedNote) continue;
+				var key = this._transpose + track.offset + note.value + track.strings[note.string - 1].value;
+				var start = alphatab.midi.MidiSequenceParser.applyStrokeStart(note,data.start + startMove,stroke);
+				var duration = alphatab.midi.MidiSequenceParser.applyStrokeDuration(note,this.getRealNoteDuration(track,note,tempo,data.duration,measureIndex,beatIndex),stroke);
+				var velocity = alphatab.midi.MidiSequenceParser.getRealVelocity(note,track,measureIndex,beatIndex);
+				var channel = track.channel.channel;
+				var effectChannel = track.channel.effectChannel;
+				var percussionTrack = track.isPercussionTrack;
+				if(beat.effect.fadeIn) {
+					channel = effectChannel;
+					this.makeFadeIn(sequence,trackId,start,duration,channel);
 				}
-				this.makeNote(sequence,trackId,graceKey,start - graceLength,graceDuration,graceVelocity,channel);
-			}
-			if(note.effect.isTrill() && effectChannel >= 0 && !percussionTrack) {
-				var trillKey = track.offset + note.effect.trill.fret + track.strings[note.string - 1].value;
-				var trillLength = note.effect.trill.duration.time();
-				var realKey = true;
-				var tick = start;
-				while(tick + 10 < start + duration) {
-					if(tick + trillLength >= start + duration) trillLength = start + duration - tick - 1;
-					this.makeNote(sequence,trackId,realKey?key:trillKey,tick,trillLength,velocity,channel);
-					realKey = !realKey;
-					tick += trillLength;
-				}
-				continue;
-			}
-			if(note.effect.isTremoloPicking() && effectChannel >= 0) {
-				var tpLength = note.effect.tremoloPicking.duration.time();
-				var tick = start;
-				while(tick + 10 < start + duration) {
-					if(tick + tpLength >= start + duration) tpLength = start + duration - tick - 1;
-					this.makeNote(sequence,trackId,key,start,tpLength,velocity,channel);
-					tick += tpLength;
-				}
-				continue;
-			}
-			if(note.effect.isBend() && effectChannel >= 0 && !percussionTrack) {
-				channel = effectChannel;
-				this.makeBend(sequence,trackId,start,duration,note.effect.bend,channel);
-			} else if(note.voice.beat.effect.isTremoloBar() && effectChannel >= 0 && !percussionTrack) {
-				channel = effectChannel;
-				this.makeTremoloBar(sequence,trackId,start,duration,note.voice.beat.effect.tremoloBar,channel);
-			} else if(note.effect.slide && effectChannel >= 0 && !percussionTrack) {
-				channel = effectChannel;
-				var nextNote = alphatab.midi.MidiSequenceParser.getNextNote(note,track,measureIndex,beatIndex);
-				this.makeSlide(sequence,trackId,note,nextNote,startMove,channel);
-			} else if(note.effect.vibrato && effectChannel >= 0 && !percussionTrack) {
-				channel = effectChannel;
-				this.makeVibrato(sequence,trackId,start,duration,channel);
-			}
-			if(note.effect.isHarmonic() && !percussionTrack) {
-				var orig = key;
-				if(note.effect.harmonic.type == 0) {
-					var _g5 = 0, _g4 = alphatab.model.effects.HarmonicEffect.NATURAL_FREQUENCIES.length;
-					while(_g5 < _g4) {
-						var i = _g5++;
-						if(note.value % 12 == alphatab.model.effects.HarmonicEffect.NATURAL_FREQUENCIES[i][0] % 12) {
-							key = orig + alphatab.model.effects.HarmonicEffect.NATURAL_FREQUENCIES[i][1] - note.value;
-							break;
-						}
+				if(note.effect.isGrace() && effectChannel >= 0 && !percussionTrack) {
+					channel = effectChannel;
+					var graceKey = track.offset + note.effect.grace.fret + track.strings[note.string - 1].value;
+					var graceLength = note.effect.grace.durationTime();
+					var graceVelocity = note.effect.grace.velocity;
+					var graceDuration = !note.effect.grace.isDead?graceLength:alphatab.midi.MidiSequenceParser.applyStaticDuration(tempo,30,graceLength);
+					if(note.effect.grace.isOnBeat || start - graceLength < 960) {
+						start += graceLength;
+						duration -= graceLength;
 					}
-				} else {
-					if(note.effect.harmonic.type == 4) this.makeNote(sequence,trackId,Math.round(Math.min(127,orig)),start,duration,Math.round(Math.max(15,velocity - 48)),channel);
-					key = orig + alphatab.model.effects.HarmonicEffect.NATURAL_FREQUENCIES[note.effect.harmonic.data][1];
+					this.makeNote(sequence,trackId,graceKey,start - graceLength,graceDuration,graceVelocity,channel);
 				}
-				if(key - 12 > 0) {
-					var hVelocity = Math.round(Math.max(15,velocity - 64));
-					this.makeNote(sequence,trackId,key - 12,start,duration,hVelocity,channel);
+				if(note.effect.isTrill() && effectChannel >= 0 && !percussionTrack) {
+					var trillKey = track.offset + note.effect.trill.fret + track.strings[note.string - 1].value;
+					var trillLength = note.effect.trill.duration.time();
+					var realKey = true;
+					var tick = start;
+					while(tick + 10 < start + duration) {
+						if(tick + trillLength >= start + duration) trillLength = start + duration - tick - 1;
+						this.makeNote(sequence,trackId,realKey?key:trillKey,tick,trillLength,velocity,channel);
+						realKey = !realKey;
+						tick += trillLength;
+					}
+					continue;
 				}
+				if(note.effect.isTremoloPicking() && effectChannel >= 0) {
+					var tpLength = note.effect.tremoloPicking.duration.time();
+					var tick = start;
+					while(tick + 10 < start + duration) {
+						if(tick + tpLength >= start + duration) tpLength = start + duration - tick - 1;
+						this.makeNote(sequence,trackId,key,start,tpLength,velocity,channel);
+						tick += tpLength;
+					}
+					continue;
+				}
+				if(note.effect.isBend() && effectChannel >= 0 && !percussionTrack) {
+					channel = effectChannel;
+					this.makeBend(sequence,trackId,start,duration,note.effect.bend,channel);
+				} else if(note.voice.beat.effect.isTremoloBar() && effectChannel >= 0 && !percussionTrack) {
+					channel = effectChannel;
+					this.makeTremoloBar(sequence,trackId,start,duration,note.voice.beat.effect.tremoloBar,channel);
+				} else if(note.effect.slide && effectChannel >= 0 && !percussionTrack) {
+					channel = effectChannel;
+					var nextNote = alphatab.midi.MidiSequenceParser.getNextNote(note,track,measureIndex,beatIndex);
+					this.makeSlide(sequence,trackId,note,nextNote,startMove,channel);
+				} else if(note.effect.vibrato && effectChannel >= 0 && !percussionTrack) {
+					channel = effectChannel;
+					this.makeVibrato(sequence,trackId,start,duration,channel);
+				}
+				if(note.effect.isHarmonic() && !percussionTrack) {
+					var orig = key;
+					if(note.effect.harmonic.type == 0) {
+						var _g5 = 0, _g4 = alphatab.model.effects.HarmonicEffect.NATURAL_FREQUENCIES.length;
+						while(_g5 < _g4) {
+							var i = _g5++;
+							if(note.value % 12 == alphatab.model.effects.HarmonicEffect.NATURAL_FREQUENCIES[i][0] % 12) {
+								key = orig + alphatab.model.effects.HarmonicEffect.NATURAL_FREQUENCIES[i][1] - note.value;
+								break;
+							}
+						}
+					} else {
+						if(note.effect.harmonic.type == 4) this.makeNote(sequence,trackId,Math.round(Math.min(127,orig)),start,duration,Math.round(Math.max(15,velocity - 48)),channel);
+						key = orig + alphatab.model.effects.HarmonicEffect.NATURAL_FREQUENCIES[note.effect.harmonic.data][1];
+					}
+					if(key - 12 > 0) {
+						var hVelocity = Math.round(Math.max(15,velocity - 64));
+						this.makeNote(sequence,trackId,key - 12,start,duration,hVelocity,channel);
+					}
+				}
+				this.makeNote(sequence,trackId,Math.round(Math.min(127,key)),start,duration,velocity,channel);
 			}
-			this.makeNote(sequence,trackId,Math.round(Math.min(127,key)),start,duration,velocity,channel);
 		}
 	}
 }
@@ -12196,6 +12223,7 @@ alphatab.model.SlideType.IntoFromAbove = 5;
 alphatab.file.gpx.FileSystem.HEADER_BCFS = 1397113666;
 alphatab.file.gpx.FileSystem.HEADER_BCFZ = 1514554178;
 alphatab.midi.MidiMessageFileUtils.TICK_MOVE = 1;
+alphatab.midi.MidiMessageFileUtils.REST_MESSAGE = 0;
 alphatab.tablature.staves.StaveLine.TopPadding = 0;
 alphatab.tablature.staves.StaveLine.BottomSpacing = 1;
 js.Lib.onerror = null;
