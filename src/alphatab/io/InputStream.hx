@@ -30,6 +30,11 @@ class InputStream
         return 0;
     }
     
+    public function readChar() : String
+    {
+        return String.fromCharCode(readByte());
+    }
+    
     /**
      * Reads a 8bit signed integer from the stream and returns it value in the
      * range of -128 to 127

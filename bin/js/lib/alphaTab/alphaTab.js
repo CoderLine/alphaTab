@@ -1104,6 +1104,9 @@ alphatab.io.InputStream.__name__ = ["alphatab","io","InputStream"];
 alphatab.io.InputStream.prototype.readByte = function() {
 	return 0;
 }
+alphatab.io.InputStream.prototype.readChar = function() {
+	return String.fromCharCode(this.readByte());
+}
 alphatab.io.InputStream.prototype.readSignedByte = function() {
 	var data = this.readByte() & 255;
 	return data > 127?-256 + data:data;
@@ -3118,6 +3121,9 @@ alphatab.io.StringInputStream.prototype._buffer = null;
 alphatab.io.StringInputStream.prototype.readByte = function() {
 	return this._buffer.charCodeAt(this._pos++) & 255;
 }
+alphatab.io.StringInputStream.prototype.readChar = function() {
+	return this._buffer.charAt(this._pos++);
+}
 alphatab.io.StringInputStream.prototype.length = function() {
 	return this._buffer.length;
 }
@@ -3884,7 +3890,7 @@ alphatab.file.alphatex.AlphaTexParser.prototype.parseTuning = function(str) {
 	return tuning;
 }
 alphatab.file.alphatex.AlphaTexParser.prototype.nextChar = function() {
-	this._ch = this._curChPos < this.data.length()?String.fromCharCode(this.data.readByte()):String.fromCharCode(0);
+	this._ch = this._curChPos < this.data.length()?this.data.readChar():String.fromCharCode(0);
 	this._curChPos++;
 }
 alphatab.file.alphatex.AlphaTexParser.prototype.newSy = function() {
@@ -4010,6 +4016,9 @@ alphatab.io.DelegatedInputStream.prototype.readBytes = function(count) {
 }
 alphatab.io.DelegatedInputStream.prototype.readSignedByte = function() {
 	return this._stream.readSignedByte();
+}
+alphatab.io.DelegatedInputStream.prototype.readChar = function() {
+	return this._stream.readChar();
 }
 alphatab.io.DelegatedInputStream.prototype.seek = function(position) {
 	this._stream.seek(position);

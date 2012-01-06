@@ -47,7 +47,6 @@ class SvgCanvas implements Canvas
         textAlign = "left";
     }
     
-    // TODO: replace with IO lib writeTo(OutputStream)
     public function writeTo(stream:OutputStream, includeWrapper:Bool, className:String = null)
     {
         if (includeWrapper) 

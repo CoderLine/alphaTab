@@ -65,6 +65,11 @@ class DelegatedInputStream extends InputStream
         return _stream.readSignedByte();
     }
     
+    public override function readChar():String 
+    {
+        return _stream.readChar();
+    }
+    
     public override function seek(position:Int):Void 
     {
         _stream.seek(position);

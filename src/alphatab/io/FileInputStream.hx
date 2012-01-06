@@ -55,6 +55,11 @@ class FileInputStream extends InputStream
        }
     }
     
+    public override function readChar():String 
+    {
+        return _input.readString(1);
+    }
+    
     public override function length() : Int
     {
         // TODO: Filesize?

@@ -36,6 +36,11 @@ class StringInputStream extends InputStream
         return _buffer.charCodeAt(_pos++) & 0xFF;
     }
     
+    public override function readChar():String 
+    {
+        return _buffer.charAt(_pos++);
+    }
+    
     public override function length() : Int
     {
        return _buffer.length;
