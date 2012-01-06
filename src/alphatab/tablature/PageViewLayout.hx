@@ -15,6 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.tablature;
+import alphatab.model.Beat;
 import alphatab.model.HeaderFooterElements;
 import alphatab.model.Measure;
 import alphatab.model.Song;
@@ -26,6 +27,7 @@ import alphatab.model.Tuning;
 import alphatab.tablature.drawing.DrawingContext;
 import alphatab.tablature.drawing.DrawingLayers;
 import alphatab.tablature.drawing.DrawingResources;
+import alphatab.tablature.model.BeatDrawing;
 import alphatab.tablature.model.MeasureDrawing;
 import alphatab.tablature.staves.ScoreStave;
 import alphatab.tablature.staves.StaveLine;
@@ -59,8 +61,7 @@ class PageViewLayout extends ViewLayout
     }
     
     // Returns the index of the measure drawn under the coordinates given
-    public override function getMeasureAt(xPos:Int, yPos:Int) : Measure {
-        xPos-=PAGE_PADDING.left;
+    public override function getBeatAt(xPos:Int, yPos:Int) : Beat {
         var target:Measure = null;
         
         // find staveline using a binary search
@@ -92,30 +93,7 @@ class PageViewLayout extends ViewLayout
             return null;
         }
         
-        // find clicked measure in line using binary search
-        startIndex = 0;
-        endIndex = line.measures.length;
-        var measure:Measure = null;
-        do {
-            var midIndex = Std.int( (startIndex + endIndex) / 2 );
-            var current:MeasureDrawing = cast tablature.track.measures[line.measures[midIndex]];
-            
-            var left = current.x;
-            var right = left + current.width + current.spacing;
-            
-            if (xPos >= left && xPos <= right) {
-                measure = current;
-            }
-            else if (xPos > right) { // clicked on right side of measure 
-                startIndex = midIndex + 1;
-            }
-            else if (xPos < left) { // clicked on left side of measure
-                endIndex = midIndex - 1;
-            }
-            
-        } while ( ! (measure != null || startIndex > endIndex));
-        
-        return measure; 
+        return getBeatAtLine(line, xPos, yPos);
     }
     
     public function getMaxWidth() : Int

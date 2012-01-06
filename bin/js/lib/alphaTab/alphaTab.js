@@ -18,8 +18,33 @@ alphatab.tablature.ViewLayout.prototype.layoutSize = null;
 alphatab.tablature.ViewLayout.prototype.width = null;
 alphatab.tablature.ViewLayout.prototype.height = null;
 alphatab.tablature.ViewLayout.prototype.contentPadding = null;
-alphatab.tablature.ViewLayout.prototype.getMeasureAt = function(xPos,yPos) {
+alphatab.tablature.ViewLayout.prototype.getBeatAt = function(xPos,yPos) {
 	return null;
+}
+alphatab.tablature.ViewLayout.prototype.getBeatAtLine = function(line,xPos,yPos) {
+	var target = null;
+	var startIndex = 0;
+	var endIndex = line.measures.length;
+	var measure = null;
+	do {
+		var midIndex = Std["int"]((startIndex + endIndex) / 2);
+		var current = this.tablature.track.measures[line.measures[midIndex]];
+		var left = current.x;
+		var right = left + current.width + current.spacing;
+		if(xPos >= left && xPos <= right) measure = current; else if(xPos > right) startIndex = midIndex + 1; else if(xPos < left) endIndex = midIndex - 1;
+	} while(!(measure != null || startIndex > endIndex));
+	if(measure == null) return null;
+	var currentBeat = null;
+	var _g = 0, _g1 = measure.beats;
+	while(_g < _g1.length) {
+		var b = _g1[_g];
+		++_g;
+		var beatDrawing = b;
+		var beatX = beatDrawing.fullX();
+		var beatW = beatDrawing.fullWidth();
+		if(xPos > beatDrawing.fullX() || currentBeat == null) currentBeat = beatDrawing; else break;
+	}
+	return currentBeat;
 }
 alphatab.tablature.ViewLayout.prototype.getLines = function() {
 	return null;
@@ -140,8 +165,7 @@ alphatab.tablature.PageViewLayout.prototype._maximumWidth = null;
 alphatab.tablature.PageViewLayout.prototype.getLines = function() {
 	return this._lines;
 }
-alphatab.tablature.PageViewLayout.prototype.getMeasureAt = function(xPos,yPos) {
-	xPos -= alphatab.tablature.PageViewLayout.PAGE_PADDING.left;
+alphatab.tablature.PageViewLayout.prototype.getBeatAt = function(xPos,yPos) {
 	var target = null;
 	var startIndex = 0;
 	var endIndex = this._lines.length;
@@ -154,17 +178,7 @@ alphatab.tablature.PageViewLayout.prototype.getMeasureAt = function(xPos,yPos) {
 		if(yPos >= top && yPos <= bottom) line = current; else if(yPos > bottom) startIndex = midIndex + 1; else if(yPos < top) endIndex = midIndex - 1;
 	} while(!(line != null || startIndex > endIndex));
 	if(line == null) return null;
-	startIndex = 0;
-	endIndex = line.measures.length;
-	var measure = null;
-	do {
-		var midIndex = Std["int"]((startIndex + endIndex) / 2);
-		var current = this.tablature.track.measures[line.measures[midIndex]];
-		var left = current.x;
-		var right = left + current.width + current.spacing;
-		if(xPos >= left && xPos <= right) measure = current; else if(xPos > right) startIndex = midIndex + 1; else if(xPos < left) endIndex = midIndex - 1;
-	} while(!(measure != null || startIndex > endIndex));
-	return measure;
+	return this.getBeatAtLine(line,xPos,yPos);
 }
 alphatab.tablature.PageViewLayout.prototype.getMaxWidth = function() {
 	if(this._maximumWidth <= 0) this._maximumWidth = this.tablature.canvas.getWidth();
@@ -415,6 +429,10 @@ alphatab.tablature.HorizontalViewLayout.prototype.init = function(scale) {
 alphatab.tablature.HorizontalViewLayout.prototype.getLines = function() {
 	return [this._line];
 }
+alphatab.tablature.HorizontalViewLayout.prototype.getBeatAt = function(xPos,yPos) {
+	xPos -= alphatab.tablature.HorizontalViewLayout.PAGE_PADDING.left;
+	return this.getBeatAtLine(this._line,xPos,yPos);
+}
 alphatab.tablature.HorizontalViewLayout.prototype.prepareLayout = function(clientArea,x,y) {
 	this.width = 0;
 	this.height = 0;
@@ -478,6 +496,7 @@ alphatab.model.MeasureHeader = function(factory) {
 	this.isRepeatOpen = false;
 	this.repeatClose = 0;
 	this.repeatAlternative = 0;
+	this.realStart = -1;
 }
 alphatab.model.MeasureHeader.__name__ = ["alphatab","model","MeasureHeader"];
 alphatab.model.MeasureHeader.prototype.number = null;
@@ -485,6 +504,7 @@ alphatab.model.MeasureHeader.prototype.hasDoubleBar = null;
 alphatab.model.MeasureHeader.prototype.keySignature = null;
 alphatab.model.MeasureHeader.prototype.keySignatureType = null;
 alphatab.model.MeasureHeader.prototype.start = null;
+alphatab.model.MeasureHeader.prototype.realStart = null;
 alphatab.model.MeasureHeader.prototype.timeSignature = null;
 alphatab.model.MeasureHeader.prototype.tempo = null;
 alphatab.model.MeasureHeader.prototype.marker = null;
@@ -1012,6 +1032,10 @@ alphatab.model.Beat.prototype.isRestBeat = function() {
 	}
 	return true;
 }
+alphatab.model.Beat.prototype.getRealStart = function() {
+	var offset = this.start - this.measure.header.start;
+	return this.measure.header.realStart + offset;
+}
 alphatab.model.Beat.prototype.setText = function(text) {
 	text.beat = this;
 	this.text = text;
@@ -1157,6 +1181,16 @@ alphatab.file.SongReader.availableReaders = function() {
 	d.push(new alphatab.file.guitarpro.Gp4Reader());
 	d.push(new alphatab.file.guitarpro.Gp3Reader());
 	return d;
+}
+alphatab.file.SongReader.finalize = function(song) {
+	var controller = new alphatab.midi.MidiRepeatController(song);
+	var start = 960;
+	while(!controller.finished()) {
+		var header = song.measureHeaders[controller.index];
+		controller.process();
+		if(header.realStart < 0) header.realStart = start;
+		if(controller.shouldPlay) start += header.length();
+	}
 }
 alphatab.file.SongReader.prototype.data = null;
 alphatab.file.SongReader.prototype.factory = null;
@@ -2108,6 +2142,7 @@ alphatab.file.SongLoader.loadSong = function(url,factory,success) {
 				data.seek(0);
 				reader.init(data,factory);
 				var song = reader.readSong();
+				alphatab.file.SongReader.finalize(song);
 				success(song);
 				return;
 			} catch( e ) {
@@ -11552,13 +11587,13 @@ alphatab.tablature.Tablature.prototype.invalidate = function() {
 	this.canvas.clear();
 	this.onPaint();
 }
-alphatab.tablature.Tablature.prototype._lastPosition = null;
+alphatab.tablature.Tablature.prototype.lastPosition = null;
 alphatab.tablature.Tablature.prototype._lastRealPosition = null;
 alphatab.tablature.Tablature.prototype._selectedBeat = null;
 alphatab.tablature.Tablature.prototype.notifyTickPosition = function(position,forced,scroll) {
 	position -= 960;
-	if(forced || position != this._lastPosition) {
-		this._lastPosition = position;
+	if(forced || position != this.lastPosition) {
+		this.lastPosition = position;
 		var result = this.findMeasure(position);
 		var realPosition = result.realPosition;
 		this._lastRealPosition = realPosition;
@@ -11580,7 +11615,7 @@ alphatab.tablature.Tablature.prototype.getMeasureAt = function(tick) {
 	var result = { measure : null, realPosition : start};
 	var song = this.track.song;
 	var controller = new alphatab.midi.MidiRepeatController(song);
-	if(this._selectedBeat != null && tick > this._lastPosition) {
+	if(this._selectedBeat != null && tick > this.lastPosition) {
 		controller.index = this._selectedBeat.measure.header.number - 1;
 		start = this._lastRealPosition;
 	}

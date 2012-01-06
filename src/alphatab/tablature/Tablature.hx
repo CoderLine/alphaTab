@@ -227,16 +227,16 @@ class Tablature
     
     // Caret
     
-    private var _lastPosition:Int; 
+    public var  lastPosition:Int; 
     private var _lastRealPosition:Int; 
     private var _selectedBeat:Beat; 
     
     public function notifyTickPosition(position:Int,forced:Bool,scroll:Bool)
     {
         position -= Duration.QUARTER_TIME; // remove first tick start
-        if (forced || position != _lastPosition)
+        if (forced || position != lastPosition)
         {
-            _lastPosition = position;
+            lastPosition = position;
             var result:MeasureSearchResult = findMeasure(position);
             var realPosition:Int = result.realPosition;
             _lastRealPosition = realPosition;
@@ -268,7 +268,7 @@ class Tablature
         var song:Song = track.song;
         var controller:MidiRepeatController = new MidiRepeatController(song);
         // start at current measure
-        if (_selectedBeat != null && tick > _lastPosition)
+        if (_selectedBeat != null && tick > lastPosition)
         {        
             controller.index = _selectedBeat.measure.number() - 1;
             start = _lastRealPosition;

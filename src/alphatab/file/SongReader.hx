@@ -16,7 +16,10 @@
  */
 package alphatab.file;
 //import alphatab.file.ptb.PtReader;
+import alphatab.midi.MidiRepeatController;
+import alphatab.model.Duration;
 import alphatab.model.Measure;
+import alphatab.model.MeasureHeader;
 import alphatab.model.Note;
 import alphatab.model.Track;
 import alphatab.model.Voice;
@@ -117,5 +120,31 @@ class SongReader
             }
         }
         return -1;
+    }
+    
+    /**
+     * This method finalizes the song by postprocess the model:
+     * - Calculate correct measure start ticks
+     */
+    public static function finalize(song:Song) : Void
+    {
+        var controller:MidiRepeatController = new MidiRepeatController(song);
+        var start:Int = Duration.QUARTER_TIME;
+        
+        while (!controller.finished())
+        {
+            var header:MeasureHeader = song.measureHeaders[controller.index];
+            controller.process();
+            
+            if (header.realStart < 0)
+            {
+                header.realStart = start;
+            }
+            
+            if (controller.shouldPlay)
+            {
+                start += header.length();
+            }
+        }
     }
 }

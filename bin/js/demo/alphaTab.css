@@ -14,7 +14,7 @@
 
 /** alphaTab Design **/
 .alphaTabSurface {
-	border:7px solid rgb(210,214,215);
+	/*border:7px solid rgb(210,214,215);*/
 	background:#F5F5F5;
 	/* Shadow */
 	-moz-box-shadow: 0 0 5px #888;

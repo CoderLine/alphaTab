@@ -41,6 +41,12 @@ class Beat
         return true;
     }
     
+    public function getRealStart() : Int
+    {
+        var offset = start - measure.start();
+        return measure.header.realStart + offset;
+    }
+    
     public function setText(text:BeatText) : Void
     {
         text.beat = this;

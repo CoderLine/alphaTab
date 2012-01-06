@@ -15,6 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.midi;
+import alphatab.model.Duration;
 import alphatab.model.MeasureHeader;
 import alphatab.model.Song;
 
@@ -47,7 +48,7 @@ class MidiRepeatController
         shouldPlay = true;
         _repeatOpen = true;
         _repeatAlternative = 0;
-        _repeatStart = 960;
+        _repeatStart = Duration.QUARTER_TIME;
         _repeatEnd = 0;
         repeatMove = 0;
         _repeatStartIndex = 0;

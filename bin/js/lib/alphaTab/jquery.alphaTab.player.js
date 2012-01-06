@@ -38,7 +38,6 @@
             scrollAdjustment: 0,
             language: {play: "Play", pause: "Pause", stop: "Stop", metronome: "Metronome", scrollToTop: "Scroll To Top ^", tablatureLoading: "Loading..."}
         };
-		self.lastTickPos = 0;
 		
         var playerOptions = $.extend(defaults, playerOptions);
         
@@ -57,6 +56,7 @@
             {
                 self.midiPlayer.updateSongData(songData);
                 $(self.playerControls).find('input').attr('disabled', false);
+                
                 self.updateCaret(0);
                 var tracks = $('#tracks');
     			tracks.find('option').remove();
@@ -81,16 +81,16 @@
         }
         
         this.loadCallbacks.push(this.updatePlayer);
-
-        this.updateCaret = function(tickPos,forced,scroll)
+        
+        this.updateCaret = function(tick, forced, scroll)
         {
-        	self.lastTickPos=tickPos;
-        	forced=forced===true;
-        	scroll=!(scroll===false);
-            setTimeout(function(){
-                    self.tablature.notifyTickPosition(tickPos,forced,scroll);
-                }, 1);
-        }
+            forced = forced === true;
+            scroll = !(scroll === false);
+            setTimeout(function()
+            {
+                self.tablature.notifyTickPosition(tick,forced,scroll);
+            }, 1);
+        };
         
         // 
         // Create UI
@@ -103,18 +103,18 @@
         
         // Sets the player to the start of the measure clicked
         $(this.canvas).click(function(e)
-        	{
-        		var offsets=$(this).offset();
-			    var x = e.pageX - offsets.left;
-			    var y = e.pageY - offsets.top;
-				var measure=self.tablature.viewLayout.getMeasureAt(x,y);
-				if(measure!=null) {
-					var tick = 960 + measure.start();
-					self.midiPlayer.goTo(tick);
-					self.updateCaret(tick,true,false);
-				}
-        	}
-        );
+        {
+            var offsets=$(this).offset();
+            var x = e.pageX - offsets.left;
+            var y = e.pageY - offsets.top;
+            var beat=self.tablature.viewLayout.getBeatAt(x,y);
+            if(beat!=null) 
+            {
+                var tick = 960 + beat.getRealStart();
+                self.midiPlayer.goTo(tick); 
+                self.updateCaret(tick, true, false);
+            }
+        });
         
         this.el.append(applet);
         
@@ -175,10 +175,11 @@
                     alert("The player has not loaded yet.");
                 }
             });
-        	trackSelect.change(function() { 
+        	trackSelect.change(function() 
+            { 
         		var index = parseInt($('#tracks :selected').val());
         		self.tablature.setTrack(api.tablature.track.song.tracks[index]);
-        		self.updateCaret(self.lastTickPos,true);
+                updateCaret(self.tablature.lastPosition + 960);
         	});
         }
         

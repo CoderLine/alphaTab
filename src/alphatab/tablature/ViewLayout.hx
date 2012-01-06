@@ -16,6 +16,7 @@
  */
 package alphatab.tablature;
 
+import alphatab.model.Beat;
 import alphatab.model.Chord;
 import alphatab.model.Duration;
 import alphatab.model.Measure;
@@ -30,6 +31,7 @@ import alphatab.platform.Canvas;
 import alphatab.tablature.drawing.DrawingContext;
 import alphatab.tablature.drawing.DrawingLayers;
 import alphatab.tablature.drawing.DrawingResources;
+import alphatab.tablature.model.BeatDrawing;
 import alphatab.tablature.model.MeasureDrawing;
 import alphatab.tablature.staves.StaveFactory;
 import alphatab.tablature.staves.StaveLine;
@@ -59,10 +61,66 @@ class ViewLayout
     public var contentPadding(default,default):Padding;
     
     // Returns the index of the measure drawn under the coordinates given
-    public function getMeasureAt(xPos:Int, yPos:Int) : Measure 
+    public function getBeatAt(xPos:Int, yPos:Int) : Beat 
     {
         // implemented in subclass
         return null;
+    }
+    
+    public function getBeatAtLine(line:StaveLine, xPos:Int, yPos:Int) : Beat
+    {
+        var target:Measure = null;
+        
+        
+        // find clicked measure in line using binary search
+        var startIndex = 0;
+        var endIndex = line.measures.length;
+        var measure:Measure = null;
+        do 
+        {
+            var midIndex = Std.int( (startIndex + endIndex) / 2 );
+            var current:MeasureDrawing = cast tablature.track.measures[line.measures[midIndex]];
+            
+            var left = current.x;
+            var right = left + current.width + current.spacing;
+            
+            if (xPos >= left && xPos <= right) {
+                measure = current;
+            }
+            else if (xPos > right) { // clicked on right side of measure 
+                startIndex = midIndex + 1;
+            }
+            else if (xPos < left) { // clicked on left side of measure
+                endIndex = midIndex - 1;
+            }
+            
+        } while ( ! (measure != null || startIndex > endIndex));
+        
+        if (measure == null)
+        {
+            return null;
+        }
+        
+        var currentBeat:Beat = null;
+        // find beat in measure
+        for (b in measure.beats)
+        {
+            var beatDrawing:BeatDrawing = cast b;
+            
+            var beatX:Int = beatDrawing.fullX();
+            var beatW:Int = beatDrawing.fullWidth();
+            
+            if (xPos > beatDrawing.fullX() || currentBeat == null)
+            {
+                currentBeat = beatDrawing;
+            }
+            else
+            {
+                break;
+            }            
+        }
+        
+        return currentBeat; 
     }
     
     public function getLines() : Array<StaveLine>

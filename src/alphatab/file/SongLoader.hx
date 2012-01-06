@@ -51,6 +51,7 @@ class SongLoader
                     data.seek(0);
                     reader.init(data, factory);
                     var song:Song = reader.readSong();
+                    SongReader.finalize(song);
                     success(song);
                     return;
                 }

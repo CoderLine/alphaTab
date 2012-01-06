@@ -116,9 +116,10 @@ var alphaTabWrapper;
 				var parser = new alphatab.file.alphatex.AlphaTexParser();
 				var reader = new alphatab.io.StringInputStream(tex);
 				parser.init(reader, self.factory);
-
+                var song = parser.readSong();
+                alphatab.file.SongReader.finalize(song);
                 // read song
-				songLoaded(parser.readSong());
+				songLoaded(song);
 			}
 			catch(e)
 			{

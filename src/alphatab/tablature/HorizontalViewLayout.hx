@@ -15,11 +15,14 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.tablature;
+import alphatab.model.Beat;
+import alphatab.model.Measure;
 import alphatab.model.Padding;
 import alphatab.model.Point;
 import alphatab.model.Rectangle;
 import alphatab.model.Track;
 import alphatab.tablature.drawing.DrawingContext;
+import alphatab.tablature.model.BeatDrawing;
 import alphatab.tablature.model.MeasureDrawing;
 import alphatab.tablature.staves.StaveLine;
 
@@ -49,6 +52,13 @@ class HorizontalViewLayout extends ViewLayout
     public override function getLines() : Array<StaveLine>
     {
         return [_line];
+    }
+    
+    // Returns the index of the measure drawn under the coordinates given
+    public override function getBeatAt(xPos:Int, yPos:Int) : Beat
+    {
+        xPos -= PAGE_PADDING.left;
+        return getBeatAtLine(_line, xPos, yPos);
     }
     
     // 

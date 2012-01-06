@@ -177,8 +177,6 @@ class Gp3Reader extends GpReaderBase
             }
             duration.copy(voice.duration);
         }
-        
-        
         return (!voice.isEmpty) ? duration.time() : 0;
     }
     
