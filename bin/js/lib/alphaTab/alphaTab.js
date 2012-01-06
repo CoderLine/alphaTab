@@ -5654,6 +5654,12 @@ alphatab.tablature.staves.StaveLine = function(p) {
 	this.measures = new Array();
 	this.staves = new Array();
 	this.spacing = new alphatab.tablature.staves.StaveSpacing(2);
+	this.paintFeatures = new Array();
+	var _g1 = 0, _g = Type.getEnumConstructs(alphatab.tablature.staves.StaveFeatures).length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		this.paintFeatures.push(0);
+	}
 	this.y = 0;
 	this.x = 0;
 	this.fullLine = false;
@@ -5665,8 +5671,20 @@ alphatab.tablature.staves.StaveLine.prototype.staves = null;
 alphatab.tablature.staves.StaveLine.prototype.spacing = null;
 alphatab.tablature.staves.StaveLine.prototype.tablature = null;
 alphatab.tablature.staves.StaveLine.prototype.track = null;
+alphatab.tablature.staves.StaveLine.prototype.paintFeatures = null;
 alphatab.tablature.staves.StaveLine.prototype.lastIndex = function() {
 	return this.measures[this.measures.length - 1];
+}
+alphatab.tablature.staves.StaveLine.prototype.getFeaturePaintPriority = function(feature) {
+	return this.paintFeatures[feature[1]];
+}
+alphatab.tablature.staves.StaveLine.prototype.shouldPaintFeature = function(feature,priority) {
+	if(priority == null) priority = 1;
+	return this.getFeaturePaintPriority(feature) <= priority;
+}
+alphatab.tablature.staves.StaveLine.prototype.setFeaturePaintPriority = function(feature,priority) {
+	if(priority == null) priority = 1;
+	if(this.getFeaturePaintPriority(feature) < priority) this.paintFeatures[feature[1]] = priority;
 }
 alphatab.tablature.staves.StaveLine.prototype.getHeight = function() {
 	var height = 0;
@@ -5757,6 +5775,163 @@ js.Lib.setErrorHandler = function(f) {
 	js.Lib.onerror = f;
 }
 js.Lib.prototype.__class__ = js.Lib;
+ValueType = { __ename__ : ["ValueType"], __constructs__ : ["TNull","TInt","TFloat","TBool","TObject","TFunction","TClass","TEnum","TUnknown"] }
+ValueType.TNull = ["TNull",0];
+ValueType.TNull.toString = $estr;
+ValueType.TNull.__enum__ = ValueType;
+ValueType.TInt = ["TInt",1];
+ValueType.TInt.toString = $estr;
+ValueType.TInt.__enum__ = ValueType;
+ValueType.TFloat = ["TFloat",2];
+ValueType.TFloat.toString = $estr;
+ValueType.TFloat.__enum__ = ValueType;
+ValueType.TBool = ["TBool",3];
+ValueType.TBool.toString = $estr;
+ValueType.TBool.__enum__ = ValueType;
+ValueType.TObject = ["TObject",4];
+ValueType.TObject.toString = $estr;
+ValueType.TObject.__enum__ = ValueType;
+ValueType.TFunction = ["TFunction",5];
+ValueType.TFunction.toString = $estr;
+ValueType.TFunction.__enum__ = ValueType;
+ValueType.TClass = function(c) { var $x = ["TClass",6,c]; $x.__enum__ = ValueType; $x.toString = $estr; return $x; }
+ValueType.TEnum = function(e) { var $x = ["TEnum",7,e]; $x.__enum__ = ValueType; $x.toString = $estr; return $x; }
+ValueType.TUnknown = ["TUnknown",8];
+ValueType.TUnknown.toString = $estr;
+ValueType.TUnknown.__enum__ = ValueType;
+Type = function() { }
+Type.__name__ = ["Type"];
+Type.getClass = function(o) {
+	if(o == null) return null;
+	if(o.__enum__ != null) return null;
+	return o.__class__;
+}
+Type.getEnum = function(o) {
+	if(o == null) return null;
+	return o.__enum__;
+}
+Type.getSuperClass = function(c) {
+	return c.__super__;
+}
+Type.getClassName = function(c) {
+	var a = c.__name__;
+	return a.join(".");
+}
+Type.getEnumName = function(e) {
+	var a = e.__ename__;
+	return a.join(".");
+}
+Type.resolveClass = function(name) {
+	var cl;
+	try {
+		cl = eval(name);
+	} catch( e ) {
+		cl = null;
+	}
+	if(cl == null || cl.__name__ == null) return null;
+	return cl;
+}
+Type.resolveEnum = function(name) {
+	var e;
+	try {
+		e = eval(name);
+	} catch( err ) {
+		e = null;
+	}
+	if(e == null || e.__ename__ == null) return null;
+	return e;
+}
+Type.createInstance = function(cl,args) {
+	if(args.length <= 3) return new cl(args[0],args[1],args[2]);
+	if(args.length > 8) throw "Too many arguments";
+	return new cl(args[0],args[1],args[2],args[3],args[4],args[5],args[6],args[7]);
+}
+Type.createEmptyInstance = function(cl) {
+	return new cl($_);
+}
+Type.createEnum = function(e,constr,params) {
+	var f = Reflect.field(e,constr);
+	if(f == null) throw "No such constructor " + constr;
+	if(Reflect.isFunction(f)) {
+		if(params == null) throw "Constructor " + constr + " need parameters";
+		return f.apply(e,params);
+	}
+	if(params != null && params.length != 0) throw "Constructor " + constr + " does not need parameters";
+	return f;
+}
+Type.createEnumIndex = function(e,index,params) {
+	var c = e.__constructs__[index];
+	if(c == null) throw index + " is not a valid enum constructor index";
+	return Type.createEnum(e,c,params);
+}
+Type.getInstanceFields = function(c) {
+	var a = Reflect.fields(c.prototype);
+	a.remove("__class__");
+	return a;
+}
+Type.getClassFields = function(c) {
+	var a = Reflect.fields(c);
+	a.remove("__name__");
+	a.remove("__interfaces__");
+	a.remove("__super__");
+	a.remove("prototype");
+	return a;
+}
+Type.getEnumConstructs = function(e) {
+	var a = e.__constructs__;
+	return a.copy();
+}
+Type["typeof"] = function(v) {
+	switch(typeof(v)) {
+	case "boolean":
+		return ValueType.TBool;
+	case "string":
+		return ValueType.TClass(String);
+	case "number":
+		if(Math.ceil(v) == v % 2147483648.0) return ValueType.TInt;
+		return ValueType.TFloat;
+	case "object":
+		if(v == null) return ValueType.TNull;
+		var e = v.__enum__;
+		if(e != null) return ValueType.TEnum(e);
+		var c = v.__class__;
+		if(c != null) return ValueType.TClass(c);
+		return ValueType.TObject;
+	case "function":
+		if(v.__name__ != null) return ValueType.TObject;
+		return ValueType.TFunction;
+	case "undefined":
+		return ValueType.TNull;
+	default:
+		return ValueType.TUnknown;
+	}
+}
+Type.enumEq = function(a,b) {
+	if(a == b) return true;
+	try {
+		if(a[0] != b[0]) return false;
+		var _g1 = 2, _g = a.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			if(!Type.enumEq(a[i],b[i])) return false;
+		}
+		var e = a.__enum__;
+		if(e != b.__enum__ || e == null) return false;
+	} catch( e ) {
+		return false;
+	}
+	return true;
+}
+Type.enumConstructor = function(e) {
+	return e[0];
+}
+Type.enumParameters = function(e) {
+	return e.slice(2);
+}
+Type.enumIndex = function(e) {
+	return e[1];
+}
+Type.prototype.__class__ = Type;
 alphatab.model.effects.GraceEffectTransition = function() { }
 alphatab.model.effects.GraceEffectTransition.__name__ = ["alphatab","model","effects","GraceEffectTransition"];
 alphatab.model.effects.GraceEffectTransition.prototype.__class__ = alphatab.model.effects.GraceEffectTransition;
@@ -5818,6 +5993,93 @@ alphatab.model.Lyrics.prototype.__class__ = alphatab.model.Lyrics;
 alphatab.tablature.drawing.DrawingLayers = function() { }
 alphatab.tablature.drawing.DrawingLayers.__name__ = ["alphatab","tablature","drawing","DrawingLayers"];
 alphatab.tablature.drawing.DrawingLayers.prototype.__class__ = alphatab.tablature.drawing.DrawingLayers;
+Reflect = function() { }
+Reflect.__name__ = ["Reflect"];
+Reflect.hasField = function(o,field) {
+	if(o.hasOwnProperty != null) return o.hasOwnProperty(field);
+	var arr = Reflect.fields(o);
+	var $it0 = arr.iterator();
+	while( $it0.hasNext() ) {
+		var t = $it0.next();
+		if(t == field) return true;
+	}
+	return false;
+}
+Reflect.field = function(o,field) {
+	var v = null;
+	try {
+		v = o[field];
+	} catch( e ) {
+	}
+	return v;
+}
+Reflect.setField = function(o,field,value) {
+	o[field] = value;
+}
+Reflect.callMethod = function(o,func,args) {
+	return func.apply(o,args);
+}
+Reflect.fields = function(o) {
+	if(o == null) return new Array();
+	var a = new Array();
+	if(o.hasOwnProperty) {
+		for(var i in o) if( o.hasOwnProperty(i) ) a.push(i);
+	} else {
+		var t;
+		try {
+			t = o.__proto__;
+		} catch( e ) {
+			t = null;
+		}
+		if(t != null) o.__proto__ = null;
+		for(var i in o) if( i != "__proto__" ) a.push(i);
+		if(t != null) o.__proto__ = t;
+	}
+	return a;
+}
+Reflect.isFunction = function(f) {
+	return typeof(f) == "function" && f.__name__ == null;
+}
+Reflect.compare = function(a,b) {
+	return a == b?0:a > b?1:-1;
+}
+Reflect.compareMethods = function(f1,f2) {
+	if(f1 == f2) return true;
+	if(!Reflect.isFunction(f1) || !Reflect.isFunction(f2)) return false;
+	return f1.scope == f2.scope && f1.method == f2.method && f1.method != null;
+}
+Reflect.isObject = function(v) {
+	if(v == null) return false;
+	var t = typeof(v);
+	return t == "string" || t == "object" && !v.__enum__ || t == "function" && v.__name__ != null;
+}
+Reflect.deleteField = function(o,f) {
+	if(!Reflect.hasField(o,f)) return false;
+	delete(o[f]);
+	return true;
+}
+Reflect.copy = function(o) {
+	var o2 = { };
+	var _g = 0, _g1 = Reflect.fields(o);
+	while(_g < _g1.length) {
+		var f = _g1[_g];
+		++_g;
+		o2[f] = Reflect.field(o,f);
+	}
+	return o2;
+}
+Reflect.makeVarArgs = function(f) {
+	return function() {
+		var a = new Array();
+		var _g1 = 0, _g = arguments.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			a.push(arguments[i]);
+		}
+		return f(a);
+	};
+}
+Reflect.prototype.__class__ = Reflect;
 alphatab.model.BeatText = function(p) {
 }
 alphatab.model.BeatText.__name__ = ["alphatab","model","BeatText"];
@@ -5933,6 +6195,44 @@ alphatab.tablature.staves.Stave.prototype.paintDivisions = function(layout,conte
 		draw.startFigure();
 		draw.addLine(x,y,x,bottomY);
 	}
+}
+alphatab.tablature.staves.Stave.prototype.paintTimeSignatureNumber = function(layout,context,number,x,y,scale) {
+	if(number < 10) {
+		var symbol = this.getTimeSignatureSymbol(number);
+		if(symbol != null) context.get(3).addMusicSymbol(symbol,x,y,scale);
+	} else {
+		var firstDigit = Math.floor(number / 10);
+		var secondDigit = number - firstDigit * 10;
+		var symbol = this.getTimeSignatureSymbol(firstDigit);
+		if(symbol != null) context.get(3).addMusicSymbol(symbol,x,y,scale);
+		symbol = this.getTimeSignatureSymbol(secondDigit);
+		if(symbol != null) context.get(3).addMusicSymbol(symbol,x + 10 * scale,y,scale);
+	}
+}
+alphatab.tablature.staves.Stave.prototype.getTimeSignatureSymbol = function(number) {
+	switch(number) {
+	case 0:
+		return alphatab.tablature.drawing.MusicFont.Num0;
+	case 1:
+		return alphatab.tablature.drawing.MusicFont.Num1;
+	case 2:
+		return alphatab.tablature.drawing.MusicFont.Num2;
+	case 3:
+		return alphatab.tablature.drawing.MusicFont.Num3;
+	case 4:
+		return alphatab.tablature.drawing.MusicFont.Num4;
+	case 5:
+		return alphatab.tablature.drawing.MusicFont.Num5;
+	case 6:
+		return alphatab.tablature.drawing.MusicFont.Num6;
+	case 7:
+		return alphatab.tablature.drawing.MusicFont.Num7;
+	case 8:
+		return alphatab.tablature.drawing.MusicFont.Num8;
+	case 9:
+		return alphatab.tablature.drawing.MusicFont.Num9;
+	}
+	return null;
 }
 alphatab.tablature.staves.Stave.prototype.__class__ = alphatab.tablature.staves.Stave;
 alphatab.tablature.model.BeatDrawing = function(factory) {
@@ -7154,6 +7454,7 @@ alphatab.tablature.staves.ScoreStave = function(line,layout) {
 	this.spacing.set(8,Math.floor(15 * layout.scale));
 	this.spacing.set(10,Math.floor(layout.scoreLineSpacing * 4));
 	this.spacing.set(12,Math.floor(15 * layout.scale));
+	line.setFeaturePaintPriority(alphatab.tablature.staves.StaveFeatures.TimeSignature,2);
 }
 alphatab.tablature.staves.ScoreStave.__name__ = ["alphatab","tablature","staves","ScoreStave"];
 alphatab.tablature.staves.ScoreStave.__super__ = alphatab.tablature.staves.Stave;
@@ -7295,7 +7596,7 @@ alphatab.tablature.staves.ScoreStave.prototype.paintKeySignature = function(layo
 	}
 }
 alphatab.tablature.staves.ScoreStave.prototype.paintTimeSignature = function(layout,context,measure,x,y) {
-	if(!measure.header.shouldPaintTimeSignature(measure)) return;
+	if(!measure.header.shouldPaintTimeSignature(measure) || !this.line.shouldPaintFeature(alphatab.tablature.staves.StaveFeatures.TimeSignature,2)) return;
 	y += this.spacing.get(10);
 	var x1 = x + measure.calculateClefSpacing(layout) + measure.calculateKeySignatureSpacing(layout) + Math.floor(15 * layout.scale);
 	var x2 = x1;
@@ -7303,46 +7604,8 @@ alphatab.tablature.staves.ScoreStave.prototype.paintTimeSignature = function(lay
 	var y2 = Math.round(2 * layout.scoreLineSpacing);
 	if(measure.header.timeSignature.numerator > 9 && measure.header.timeSignature.denominator.value < 10) x2 += Math.round(10 * layout.scale / 2);
 	if(measure.header.timeSignature.numerator < 10 && measure.header.timeSignature.denominator.value > 9) x1 += Math.round(10 * layout.scale / 2);
-	this.paintTimeSignatureNumber(layout,context,measure.header.timeSignature.numerator,x1,y + y1);
-	this.paintTimeSignatureNumber(layout,context,measure.header.timeSignature.denominator.value,x2,y + y2);
-}
-alphatab.tablature.staves.ScoreStave.prototype.paintTimeSignatureNumber = function(layout,context,number,x,y) {
-	if(number < 10) {
-		var symbol = this.getTimeSignatureSymbol(number);
-		if(symbol != null) context.get(3).addMusicSymbol(symbol,x,y,layout.scale);
-	} else {
-		var firstDigit = Math.floor(number / 10);
-		var secondDigit = number - firstDigit * 10;
-		var symbol = this.getTimeSignatureSymbol(firstDigit);
-		if(symbol != null) context.get(3).addMusicSymbol(symbol,x,y,layout.scale);
-		symbol = this.getTimeSignatureSymbol(secondDigit);
-		if(symbol != null) context.get(3).addMusicSymbol(symbol,x + 10 * layout.scale,y,layout.scale);
-	}
-}
-alphatab.tablature.staves.ScoreStave.prototype.getTimeSignatureSymbol = function(number) {
-	switch(number) {
-	case 0:
-		return alphatab.tablature.drawing.MusicFont.Num0;
-	case 1:
-		return alphatab.tablature.drawing.MusicFont.Num1;
-	case 2:
-		return alphatab.tablature.drawing.MusicFont.Num2;
-	case 3:
-		return alphatab.tablature.drawing.MusicFont.Num3;
-	case 4:
-		return alphatab.tablature.drawing.MusicFont.Num4;
-	case 5:
-		return alphatab.tablature.drawing.MusicFont.Num5;
-	case 6:
-		return alphatab.tablature.drawing.MusicFont.Num6;
-	case 7:
-		return alphatab.tablature.drawing.MusicFont.Num7;
-	case 8:
-		return alphatab.tablature.drawing.MusicFont.Num8;
-	case 9:
-		return alphatab.tablature.drawing.MusicFont.Num9;
-	}
-	return null;
+	this.paintTimeSignatureNumber(layout,context,measure.header.timeSignature.numerator,x1,y + y1,layout.scale);
+	this.paintTimeSignatureNumber(layout,context,measure.header.timeSignature.denominator.value,x2,y + y2,layout.scale);
 }
 alphatab.tablature.staves.ScoreStave.prototype.paintText = function(layout,context,measure,x,y) {
 	if(!measure.effectsCache.text) return;
@@ -8791,6 +9054,10 @@ alphatab.io.StringOutputStream.prototype.toString = function() {
 	return this._buffer.b.join("");
 }
 alphatab.io.StringOutputStream.prototype.__class__ = alphatab.io.StringOutputStream;
+alphatab.tablature.staves.StaveFeatures = { __ename__ : ["alphatab","tablature","staves","StaveFeatures"], __constructs__ : ["TimeSignature"] }
+alphatab.tablature.staves.StaveFeatures.TimeSignature = ["TimeSignature",0];
+alphatab.tablature.staves.StaveFeatures.TimeSignature.toString = $estr;
+alphatab.tablature.staves.StaveFeatures.TimeSignature.__enum__ = alphatab.tablature.staves.StaveFeatures;
 alphatab.file.gpx.score.GpxMasterBar = function(p) {
 }
 alphatab.file.gpx.score.GpxMasterBar.__name__ = ["alphatab","file","gpx","score","GpxMasterBar"];
@@ -10557,6 +10824,7 @@ alphatab.tablature.staves.TablatureStave = function(line,layout) {
 	this.spacing.set(12,(line.track.stringCount() - 1) * layout.stringSpacing);
 	this.spacing.set(13,Math.floor(10 * layout.scale));
 	this.spacing.set(17,Math.floor(15 * layout.scale));
+	line.setFeaturePaintPriority(alphatab.tablature.staves.StaveFeatures.TimeSignature);
 	this._rangeIndices = [0,0];
 }
 alphatab.tablature.staves.TablatureStave.__name__ = ["alphatab","tablature","staves","TablatureStave"];
@@ -10631,6 +10899,7 @@ alphatab.tablature.staves.TablatureStave.prototype.paintStave = function(layout,
 alphatab.tablature.staves.TablatureStave.prototype.paintMeasure = function(layout,context,measure,x,y) {
 	var realX = x + measure.x;
 	var w = measure.width + measure.spacing;
+	this.paintTimeSignature(layout,context,measure,realX,y);
 	this.paintDivisions(layout,context,measure,realX,y,5,this.spacing.get(12),this.spacing.spacing[12]);
 	this.paintClef(layout,context,measure,realX,y);
 	realX += measure.getDefaultSpacings(layout);
@@ -10638,6 +10907,22 @@ alphatab.tablature.staves.TablatureStave.prototype.paintMeasure = function(layou
 }
 alphatab.tablature.staves.TablatureStave.prototype.paintClef = function(layout,context,measure,x,y) {
 	if(!measure.isFirstOfLine()) return;
+}
+alphatab.tablature.staves.TablatureStave.prototype.paintTimeSignature = function(layout,context,measure,x,y) {
+	if(!measure.header.shouldPaintTimeSignature(measure) || !this.line.shouldPaintFeature(alphatab.tablature.staves.StaveFeatures.TimeSignature) || this.line.track.stringCount() < 3) return;
+	y += this.spacing.get(12);
+	var numberSpacing = Std["int"](2 * layout.scale);
+	var tablatureHeight = this.spacing.spacing[12];
+	var numberSize = Std["int"](tablatureHeight / 2 - numberSpacing * 2);
+	var numberScale = numberSize / 15;
+	var x1 = x + measure.calculateClefSpacing(layout) + measure.calculateKeySignatureSpacing(layout) + Math.floor(15 * layout.scale);
+	var x2 = x1;
+	var y1 = numberSpacing;
+	var y2 = tablatureHeight - numberSize - numberSpacing;
+	if(measure.header.timeSignature.numerator > 9 && measure.header.timeSignature.denominator.value < 10) x2 += Math.round(10 * numberScale / 2);
+	if(measure.header.timeSignature.numerator < 10 && measure.header.timeSignature.denominator.value > 9) x1 += Math.round(10 * numberScale / 2);
+	this.paintTimeSignatureNumber(layout,context,measure.header.timeSignature.numerator,x1,y + y1,numberScale);
+	this.paintTimeSignatureNumber(layout,context,measure.header.timeSignature.denominator.value,x2,y + y2,numberScale);
 }
 alphatab.tablature.staves.TablatureStave.prototype.paintBeats = function(layout,context,measure,x,y) {
 	var _g = 0, _g1 = measure.beats;
@@ -10742,6 +11027,11 @@ alphatab.tablature.staves.TablatureStave.prototype.paintNote = function(layout,c
 	if(!note.isTiedNote) {
 		var visualNote = note.effect.deadNote?"X":Std.string(note.value);
 		visualNote = note.effect.ghostNote?"(" + visualNote + ")":visualNote;
+		context.graphics.setFont(alphatab.tablature.drawing.DrawingResources.noteFont);
+		var w = context.graphics.measureText(visualNote);
+		fill.addString(visualNote,alphatab.tablature.drawing.DrawingResources.noteFont,realX - w / 2,realY);
+	} else if(note.voice.beat.isFirstOfLine()) {
+		var visualNote = "(" + note.value + ")";
 		context.graphics.setFont(alphatab.tablature.drawing.DrawingResources.noteFont);
 		var w = context.graphics.measureText(visualNote);
 		fill.addString(visualNote,alphatab.tablature.drawing.DrawingResources.noteFont,realX - w / 2,realY);
@@ -11941,6 +12231,8 @@ alphatab.tablature.drawing.DrawingLayers.Red = 13;
 alphatab.platform.svg.FontSizes.TIMES_NEW_ROMAN_11PT = [3,4,5,6,6,9,9,2,4,4,6,6,3,4,3,3,6,6,6,6,6,6,6,6,6,6,3,3,6,6,6,5,10,8,7,7,8,7,6,7,8,4,4,8,7,10,8,8,7,8,7,5,8,8,7,11,8,8,7,4,3,4,5,6,4,5,5,5,5,5,4,5,6,3,3,6,3,9,6,6,6,5,4,4,4,5,6,7,6,6,5,5,2,5,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,4,6,6,6,6,2,5,4,8,4,6,6,0,8,6,4,6,3,3,4,5,5,4,4,3,3,6,8,8,8,5,8,8,8,8,8,8,11,7,7,7,7,7,4,4,4,4,8,8,8,8,8,8,8,6,8,8,8,8,8,8,6,5,5,5,5,5,5,5,8,5,5,5,5,5,3,3,3,3,6,6,6,6,6,6,6,6,6,5,5,5,5,6,6];
 alphatab.platform.svg.FontSizes.ARIAL_11PT = [3,2,4,6,6,10,7,2,4,4,4,6,3,4,3,3,6,6,6,6,6,6,6,6,6,6,3,3,6,6,6,6,11,8,7,7,7,6,6,8,7,2,5,7,6,8,7,8,6,8,7,7,6,7,8,10,7,8,7,3,3,3,5,6,4,6,6,6,6,6,4,6,6,2,2,5,2,8,6,6,6,6,4,6,3,6,6,10,6,6,6,4,2,4,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,2,6,6,7,6,2,6,4,8,4,6,6,0,8,6,4,6,4,4,4,6,6,4,4,4,5,6,9,10,10,6,8,8,8,8,8,8,11,7,6,6,6,6,2,2,2,2,8,7,8,8,8,8,8,6,8,7,7,7,7,8,7,7,6,6,6,6,6,6,10,6,6,6,6,6,2,2,2,2,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6];
 alphatab.platform.svg.FontSizes.CONTROL_CHARS = 32;
+alphatab.tablature.staves.Stave.TS_NUMBER_WIDTH = 10;
+alphatab.tablature.staves.Stave.TS_NUMBER_HEIGHT = 15;
 alphatab.model.Duration.MIN_TIME = Math.floor(Math.floor(960 * (4.0 / 64)) * 2 / 3);
 alphatab.model.Duration.QUARTER_TIME = 960;
 alphatab.model.Duration.WHOLE = 1;
@@ -11985,7 +12277,6 @@ alphatab.tablature.staves.ScoreStave.SCORE_FLAT_POSITIONS = [7,6,6,5,5,4,3,3,2,2
 alphatab.tablature.staves.ScoreStave.SCORE_CLEF_OFFSETS = [30,18,22,24];
 alphatab.tablature.staves.ScoreStave.UP_OFFSET = 28;
 alphatab.tablature.staves.ScoreStave.DOWN_OFFSET = 28;
-alphatab.tablature.staves.ScoreStave.TS_NUMBER_SIZE = 10;
 alphatab.tablature.staves.ScoreStave.STAVE_ID = "score";
 alphatab.tablature.staves.ScoreStave.TopPadding = 0;
 alphatab.tablature.staves.ScoreStave.Text = 1;
@@ -12000,6 +12291,7 @@ alphatab.tablature.staves.ScoreStave.ScoreTopLines = 9;
 alphatab.tablature.staves.ScoreStave.ScoreMiddleLines = 10;
 alphatab.tablature.staves.ScoreStave.ScoreBottomLines = 11;
 alphatab.tablature.staves.ScoreStave.BottomPadding = 12;
+alphatab.tablature.staves.ScoreStave.TimeSignaturePriority = 2;
 alphatab.model.MidiChannel.DEFAULT_PERCUSSION_CHANNEL = 9;
 alphatab.model.MidiChannel.DEFAULT_INSTRUMENT = 25;
 alphatab.model.MidiChannel.DEFAULT_VOLUME = 127;

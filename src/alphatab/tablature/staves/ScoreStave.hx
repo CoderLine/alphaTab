@@ -67,9 +67,7 @@ class ScoreStave extends Stave
     
     private static inline var UP_OFFSET:Int = 28; 
     private static inline var DOWN_OFFSET:Int = 28;
-    
-    private static inline var TS_NUMBER_SIZE:Int = 10;
-    
+        
     public static inline var STAVE_ID = "score";
     
     // spacings
@@ -87,6 +85,8 @@ class ScoreStave extends Stave
     private static inline var ScoreBottomLines = 11; // additional space for extra lines below the stave
     private static inline var BottomPadding = 12;
     
+    private static inline var TimeSignaturePriority = 2;
+    
     public function new(line:StaveLine, layout:ViewLayout)
     {
         super(line, layout);        
@@ -95,6 +95,8 @@ class ScoreStave extends Stave
         spacing.set(ScoreTopPadding, Math.floor(15 * layout.scale));
         spacing.set(ScoreMiddleLines, Math.floor(layout.scoreLineSpacing * 4));
         spacing.set(BottomPadding, Math.floor(15 * layout.scale));
+        
+        line.setFeaturePaintPriority(StaveFeatures.TimeSignature, TimeSignaturePriority);
     }
    
     // gets the spacing index used for grouping staves with a bar
@@ -331,8 +333,7 @@ class ScoreStave extends Stave
     
     private function paintTimeSignature(layout:ViewLayout, context:DrawingContext, measure:MeasureDrawing, x:Int, y:Int)
     {
-        if (!measure.headerDrawing().shouldPaintTimeSignature(measure)) return;
-        
+        if (!measure.headerDrawing().shouldPaintTimeSignature(measure) || !line.shouldPaintFeature(StaveFeatures.TimeSignature, TimeSignaturePriority)) return;
         y += spacing.get(ScoreMiddleLines);
         var x1:Int = x + measure.calculateClefSpacing(layout) + measure.calculateKeySignatureSpacing(layout) + Math.floor(15*layout.scale);
         var x2:Int = x1;
@@ -341,67 +342,17 @@ class ScoreStave extends Stave
         
         if(measure.header.timeSignature.numerator > 9 && measure.header.timeSignature.denominator.value < 10)
         {
-            x2 += Math.round((TS_NUMBER_SIZE * layout.scale) / 2);
+            x2 += Math.round((Stave.TS_NUMBER_WIDTH * layout.scale) / 2);
         }
         if(measure.header.timeSignature.numerator < 10 && measure.header.timeSignature.denominator.value > 9)
         {
-            x1 += Math.round((TS_NUMBER_SIZE * layout.scale) / 2);
+            x1 += Math.round((Stave.TS_NUMBER_WIDTH * layout.scale) / 2);
         }
 
         // numerator
-        paintTimeSignatureNumber(layout, context, measure.header.timeSignature.numerator, x1, y+y1);
+        paintTimeSignatureNumber(layout, context, measure.header.timeSignature.numerator, x1, y+y1, layout.scale);
         // denominator
-        paintTimeSignatureNumber(layout, context, measure.header.timeSignature.denominator.value, x2, y+y2);
-    }
-    
-    private function paintTimeSignatureNumber(layout:ViewLayout, context:DrawingContext, number:Int, x:Int, y:Int)
-    {
-        if(number < 10)
-        {
-            var symbol = this.getTimeSignatureSymbol(number);
-            if (symbol != null) 
-                context.get(DrawingLayers.MainComponents).addMusicSymbol(symbol, x, y, layout.scale);
-        }
-        else
-        {
-            var firstDigit = Math.floor(number / 10);
-            var secondDigit = number - (firstDigit * 10); 
-            
-            var symbol = this.getTimeSignatureSymbol(firstDigit);
-            if (symbol != null) 
-                context.get(DrawingLayers.MainComponents).addMusicSymbol(symbol, x, y, layout.scale);
-            symbol = this.getTimeSignatureSymbol(secondDigit);
-            if (symbol != null) 
-                context.get(DrawingLayers.MainComponents).addMusicSymbol(symbol, x + TS_NUMBER_SIZE * layout.scale, y, layout.scale);
-            
-        }
-    }
-    
-    private function getTimeSignatureSymbol(number:Int)
-    {
-        switch(number) {
-            case 0:  
-                return MusicFont.Num0;
-            case 1:  
-                return MusicFont.Num1;
-            case 2: 
-                return MusicFont.Num2;
-            case 3: 
-                return MusicFont.Num3;
-            case 4: 
-                return MusicFont.Num4;
-            case 5: 
-                return MusicFont.Num5;
-            case 6: 
-                return MusicFont.Num6;
-            case 7: 
-                return MusicFont.Num7;
-            case 8: 
-                return MusicFont.Num8;
-            case 9: 
-                return MusicFont.Num9;
-        }
-        return null;
+        paintTimeSignatureNumber(layout, context, measure.header.timeSignature.denominator.value, x2, y+y2, layout.scale);
     }
 
     private function paintText(layout:ViewLayout, context:DrawingContext, measure:MeasureDrawing, x:Int, y:Int)

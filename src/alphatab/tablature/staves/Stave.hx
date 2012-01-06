@@ -20,6 +20,7 @@ import alphatab.tablature.drawing.DrawingContext;
 import alphatab.tablature.drawing.DrawingLayer;
 import alphatab.tablature.drawing.DrawingLayers;
 import alphatab.tablature.drawing.DrawingResources;
+import alphatab.tablature.drawing.MusicFont;
 import alphatab.tablature.model.MeasureDrawing;
 import alphatab.tablature.ViewLayout;
 
@@ -29,6 +30,9 @@ import alphatab.tablature.ViewLayout;
  */
 class Stave 
 {
+    private static inline var TS_NUMBER_WIDTH:Int = 10;
+    private static inline var TS_NUMBER_HEIGHT:Int = 15;
+
     // the stave index within a stave line
     public var index(default,default):Int;
     public var line(default,default):StaveLine;
@@ -172,5 +176,55 @@ class Stave
             draw.startFigure();
             draw.addLine(x, y, x, bottomY);
         }
+    }
+        
+    private function paintTimeSignatureNumber(layout:ViewLayout, context:DrawingContext, number:Int, x:Int, y:Int, scale:Float)
+    {
+        if(number < 10)
+        {
+            var symbol = this.getTimeSignatureSymbol(number);
+            if (symbol != null) 
+                context.get(DrawingLayers.MainComponents).addMusicSymbol(symbol, x, y, scale);
+        }
+        else
+        {
+            var firstDigit = Math.floor(number / 10);
+            var secondDigit = number - (firstDigit * 10); 
+            
+            var symbol = this.getTimeSignatureSymbol(firstDigit);
+            if (symbol != null) 
+                context.get(DrawingLayers.MainComponents).addMusicSymbol(symbol, x, y, scale);
+            symbol = this.getTimeSignatureSymbol(secondDigit);
+            if (symbol != null) 
+                context.get(DrawingLayers.MainComponents).addMusicSymbol(symbol, x + TS_NUMBER_WIDTH * scale, y, scale);
+        }
+    }
+    
+    private function getTimeSignatureSymbol(number:Int)
+    {
+        switch(number) 
+        {
+            case 0:  
+                return MusicFont.Num0;
+            case 1:  
+                return MusicFont.Num1;
+            case 2: 
+                return MusicFont.Num2;
+            case 3: 
+                return MusicFont.Num3;
+            case 4: 
+                return MusicFont.Num4;
+            case 5: 
+                return MusicFont.Num5;
+            case 6: 
+                return MusicFont.Num6;
+            case 7: 
+                return MusicFont.Num7;
+            case 8: 
+                return MusicFont.Num8;
+            case 9: 
+                return MusicFont.Num9;
+        }
+        return null;
     }
 }

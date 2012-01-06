@@ -114,6 +114,8 @@ class TablatureStave extends Stave
         spacing.set(TablatureBottomSeparator, Math.floor(10 * layout.scale));
         spacing.set(BottomPadding, Math.floor(15 * layout.scale));
         
+        line.setFeaturePaintPriority(StaveFeatures.TimeSignature);
+
         _rangeIndices = [0, 0];
     }
     
@@ -212,6 +214,8 @@ class TablatureStave extends Stave
         var realX:Int = x + measure.x;
         var w:Int = measure.width + measure.spacing;
         
+        paintTimeSignature(layout, context, measure, realX, y);
+        
         paintDivisions(layout, context, measure, realX, y, 5, spacing.get(Tablature), spacing.spacing[Tablature]);
         paintClef(layout, context, measure, realX, y);
         
@@ -224,7 +228,38 @@ class TablatureStave extends Stave
         if (!measure.isFirstOfLine()) return; 
     }
     
-    
+        
+    private function paintTimeSignature(layout:ViewLayout, context:DrawingContext, measure:MeasureDrawing, x:Int, y:Int)
+    {
+        if (!measure.headerDrawing().shouldPaintTimeSignature(measure) 
+            || !line.shouldPaintFeature(StaveFeatures.TimeSignature)
+            || line.track.stringCount() < 3) return;
+        
+        y += spacing.get(Tablature);
+        
+        var numberSpacing = Std.int(2 * layout.scale);
+        var tablatureHeight = spacing.spacing[Tablature];
+        var numberSize:Int = Std.int((tablatureHeight / 2) - numberSpacing * 2);
+        var numberScale:Float = numberSize / Stave.TS_NUMBER_HEIGHT;
+        var x1:Int = x + measure.calculateClefSpacing(layout) + measure.calculateKeySignatureSpacing(layout) + Math.floor(15*layout.scale);
+        var x2:Int = x1;
+        var y1:Int = numberSpacing;
+        var y2:Int = tablatureHeight - numberSize - numberSpacing;
+        
+        if(measure.header.timeSignature.numerator > 9 && measure.header.timeSignature.denominator.value < 10)
+        {
+            x2 += Math.round((Stave.TS_NUMBER_WIDTH * numberScale) / 2);
+        }
+        if(measure.header.timeSignature.numerator < 10 && measure.header.timeSignature.denominator.value > 9)
+        {
+            x1 += Math.round((Stave.TS_NUMBER_WIDTH * numberScale) / 2);
+        }
+
+        // numerator
+        paintTimeSignatureNumber(layout, context, measure.header.timeSignature.numerator, x1, y+y1, numberScale);
+        // denominator
+        paintTimeSignatureNumber(layout, context, measure.header.timeSignature.denominator.value, x2, y+y2, numberScale);
+    }
     
     
     private function paintBeats(layout:ViewLayout, context:DrawingContext, measure:MeasureDrawing, x:Int, y:Int)
@@ -421,6 +456,13 @@ class TablatureStave extends Stave
             context.graphics.font = DrawingResources.noteFont;
             var w = context.graphics.measureText(visualNote);
             
+            fill.addString(visualNote, DrawingResources.noteFont, realX - (w/2), realY);
+        }
+        else if(note.beatDrawing().isFirstOfLine())
+        {
+            var visualNote:String = "(" + note.value + ")";
+            context.graphics.font = DrawingResources.noteFont;
+            var w = context.graphics.measureText(visualNote);
             fill.addString(visualNote, DrawingResources.noteFont, realX - (w/2), realY);
         }
         

@@ -40,13 +40,33 @@ class StaveLine
     // the tablature in which the line is placed in 
     public var tablature(default,default):Tablature; 
     
-    public var track(default,default):Track;
+    public var track(default, default):Track;
+    
+    public var paintFeatures:Array<Int>;
     
     // the last measure within this line
     public function lastIndex() : Int 
     {
         return measures[measures.length - 1];
     }    
+    
+    public function getFeaturePaintPriority(feature:StaveFeatures) : Int
+    {
+        return paintFeatures[Type.enumIndex(feature)];
+    }
+    
+    public function shouldPaintFeature(feature:StaveFeatures, priority:Int = 1) : Bool
+    {
+        return getFeaturePaintPriority(feature) <= priority;
+    }
+    
+    public function setFeaturePaintPriority(feature:StaveFeatures, priority:Int = 1)
+    {
+        if (getFeaturePaintPriority(feature) < priority)
+        {
+            paintFeatures[Type.enumIndex(feature)] = priority;
+        }
+    }
     
     // calculates the height
     public function getHeight() : Int
@@ -76,7 +96,13 @@ class StaveLine
         measures = new Array<Int>();
         staves = new Array<Stave>();
         
-        spacing = new StaveSpacing(BottomSpacing + 1);
+        spacing = new StaveSpacing(BottomSpacing + 1);  
+        paintFeatures = new Array<Int>();
+        for (i in 0 ... Type.getEnumConstructs(StaveFeatures).length)
+        {
+            paintFeatures.push(0);
+        }
+
         
         y = 0;
         x = 0;        
