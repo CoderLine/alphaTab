@@ -1,0 +1,72 @@
+<project name="alphaTab" default="js" basedir=".">
+    <description>
+        a buildfile compiling alphaTab
+    </description>
+    
+	<property name="release" location="releases"/>
+	<property name="tools" location="tools"/>
+	
+    <!--*************************************************************************
+        General
+    **************************************************************************-->
+    
+    <!-- Main Properties -->
+	<property name="bin" location="bin"/>
+	<property name="src" location="src"/>
+	<property name="test" location="test"/>
+
+    <!--*************************************************************************
+        Building JavaScript
+    **************************************************************************-->
+    
+    <property name="bin-js" location="${bin}/js"/>
+	<property name="lib-js" location="${bin-js}/lib/alphaTab"/>
+	<property name="haxe-js" location="${lib-js}/alphaTab.js"/>
+    
+	<!-- Haxe Builds -->
+	<target name="js">
+		<delete file="${haxe-js}" />
+        <exec executable="haxe" failonerror="true">
+            <arg value="-cp" />
+            <arg value="${src}"/>
+            
+            <arg value="-main" />
+            <arg value="alphatab.Main" />
+            
+            <arg value="-js" />
+            <arg value="${haxe-js}" />
+        </exec>
+	</target>	
+
+    <!--*************************************************************************
+        Run UnitTests
+    **************************************************************************-->
+
+    <property name="unit-tests" location="${bin}/tests.n"/>
+    <target name="test">
+		<delete file="${unit-tests}" />
+        <exec executable="haxe" failonerror="true">
+            <arg value="-cp" />
+            <arg value="${src}"/>
+            <arg value="-cp" />
+            <arg value="${test}"/>
+            
+            <arg value="-D" />
+            <arg value="unit" />
+            
+            <arg value="-main" />
+            <arg value="alphatab.AlphaTestRunner" />
+                        
+            <arg value="-neko" />
+            <arg value="${unit-tests}" />
+        </exec>
+        
+        <exec executable="neko" failonerror="true">
+            <arg value="${unit-tests}" />
+            <arg value="${bin}/test-files" />
+        </exec>
+        
+		<delete file="${unit-tests}" />
+    </target>
+   
+</project>
