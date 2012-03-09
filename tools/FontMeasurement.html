@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Font Size Generation</title>
+	<script type="text/javascript">
+	
+	function run() {
+		var font = document.getElementById('font').value;
+		
+		var canvas = document.createElement('canvas');
+	    var ctx = canvas.getContext('2d');  
+		ctx.font = font;
+
+		var sizes = [];
+		for(var i = 0x20; i < 255; i++) {
+			var s = String.fromCharCode(i);
+			sizes.push(ctx.measureText(s).width);
+		}
+		
+		document.getElementById('output').innerText = JSON.stringify(sizes);
+	}
+	</script>
+</head>
+<body>
+	<input type="text" id="font" value="11px 'Times New Roman'" /><button onclick="run()">Calculate</button>
+	<div id="output">
+		
+	</div>
+</body>
+</html>

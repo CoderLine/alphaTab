@@ -5,9 +5,9 @@ import haxe.io.BytesInput;
 
 class ScoreImporter 
 {
-    private var _data:BytesInput;
+    #if unit public #else private #end var _data:BytesInput;
     
-    public static function availableReaders() : Array<ScoreImporter>
+    public static function availableImporters() : Array<ScoreImporter>
     {
         var scoreImporter = new Array<ScoreImporter>();
         scoreImporter.push(new Gp3To5Importer());

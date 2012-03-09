@@ -1,6 +1,9 @@
 package alphatab;
 
 import alphatab.importer.Gp3To5Importer;
+import alphatab.importer.ScoreLoader;
+
+import alphatab.rendering.ScoreRenderer;
 
 /**
  * ...

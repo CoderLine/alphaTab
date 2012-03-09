@@ -39,12 +39,12 @@
 	</target>	
 
     <!--*************************************************************************
-        Run UnitTests
+        UnitTests
     **************************************************************************-->
 
-    <property name="unit-tests" location="${bin}/tests.n"/>
-    <target name="test">
-		<delete file="${unit-tests}" />
+    <property name="unit-tests-neko" location="${bin}/test/tests.n"/>
+    <target name="test-neko">
+		<delete file="${unit-tests-neko}" />
         <exec executable="haxe" failonerror="true">
             <arg value="-cp" />
             <arg value="${src}"/>
@@ -58,15 +58,35 @@
             <arg value="alphatab.AlphaTestRunner" />
                         
             <arg value="-neko" />
-            <arg value="${unit-tests}" />
+            <arg value="${unit-tests-neko}" />
         </exec>
         
         <exec executable="neko" failonerror="true">
-            <arg value="${unit-tests}" />
-            <arg value="${bin}/test-files" />
+            <arg value="${unit-tests-neko}" />
+            <arg value="${bin}/test/test-files" />
         </exec>
         
-		<delete file="${unit-tests}" />
+		<delete file="${unit-tests-neko}" />
+    </target>    
+    
+   <property name="unit-tests-js" location="${bin}/test/tests.js"/>
+    <target name="test-js">
+		<delete file="${unit-tests-js}" />
+        <exec executable="haxe" failonerror="true">
+            <arg value="-cp" />
+            <arg value="${src}"/>
+            <arg value="-cp" />
+            <arg value="${test}"/>
+            
+            <arg value="-D" />
+            <arg value="unit" />
+            
+            <arg value="-main" />
+            <arg value="alphatab.AlphaTestRunner" />
+                        
+            <arg value="-js" />
+            <arg value="${unit-tests-js}" />
+        </exec>
     </target>
    
 </project>

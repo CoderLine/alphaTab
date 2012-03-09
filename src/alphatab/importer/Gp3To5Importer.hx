@@ -97,19 +97,18 @@ class Gp3To5Importer extends ScoreImporter
         }
         
         // tempo stuff
-        _tempo = _data.readInt31();
+        _tempo = readInt32();
         if (_versionNumber >= 510)
         {
             readBool(); // hide tempo?
         }
-        
         // keysignature and octave
-        _keySignature = _data.readInt31();
+        _keySignature = readInt32();
         if (_versionNumber >= 400)
         {
             _octave = readUInt8();
         }
-        
+
         readPlaybackInfos();
         
         // repetition stuff
@@ -140,8 +139,8 @@ class Gp3To5Importer extends ScoreImporter
         }
         
         // contents
-        _barCount = _data.readInt31();
-        _trackCount = _data.readInt31();
+        _barCount = readInt32();
+        _trackCount = readInt32();
         
         readMasterBars();
         readTracks();
@@ -279,7 +278,7 @@ class Gp3To5Importer extends ScoreImporter
         _score.tab = readStringIntUnused();
         _score.instructions = readStringIntUnused();
         
-        var noticeLines = _data.readInt31();
+        var noticeLines = readInt32();
         var notice:StringBuf = new StringBuf();
         for (i in 0 ... noticeLines)
         {
@@ -297,10 +296,10 @@ class Gp3To5Importer extends ScoreImporter
         _lyrics = new Array<String>();
         _lyricsIndex  = new Array<Int>();
         
-        _lyricsTrack = _data.readInt31();
+        _lyricsTrack = readInt32();
         for ( i in 0 ... 5)
         {
-            _lyricsIndex.push(_data.readInt31() - 1);
+            _lyricsIndex.push(readInt32() - 1);
             _lyrics.push(readStringInt());
         }
     }
@@ -339,7 +338,7 @@ class Gp3To5Importer extends ScoreImporter
             var info:PlaybackInformation = new PlaybackInformation();
             info.primaryChannel = i;
             info.secondaryChannel = i;
-            info.program = _data.readInt31();
+            info.program = readInt32();
             
             info.volume = readUInt8();
             info.balance = readUInt8();
@@ -509,15 +508,16 @@ class Gp3To5Importer extends ScoreImporter
     private function readTrack()
     {
         var newTrack = new Track();
+		
         
         var flags = readUInt8();
         newTrack.name = readStringByteLength(40);
         newTrack.isPercussion = (flags & 0x01) != 0;
 
-        var stringCount = _data.readInt31();
+        var stringCount = readInt32();
         for ( i in 0 ... 7)
         {
-            var tuning = _data.readInt31();
+            var tuning = readInt32();
             if (stringCount > i)
             {
                 newTrack.tuning.push(tuning);
@@ -525,9 +525,9 @@ class Gp3To5Importer extends ScoreImporter
         }
         newTrack.tuning.reverse();
         
-        var port = _data.readInt31();
-        var index = _data.readInt31() - 1;
-        var effectChannel = _data.readInt31() - 1;
+        var port = readInt32();
+        var index = readInt32() - 1;
+        var effectChannel = readInt32() - 1;
         skip(4); // Fretcount
         if (index >= 0 && index < _playbackInfos.length)
         {
@@ -540,7 +540,7 @@ class Gp3To5Importer extends ScoreImporter
             newTrack.playbackInfo = info;
         }
         
-        newTrack.capo = _data.readInt31();
+        newTrack.capo = readInt32();
         skip(4); // Color
         
         if (_versionNumber >= 500)
@@ -571,10 +571,10 @@ class Gp3To5Importer extends ScoreImporter
     
     private function readBars()
     {
-        for (t in 0 ... _trackCount)
-        {
-            for ( b in 0 ... _barCount)
-            {
+        for ( b in 0 ... _barCount)
+		{
+			for (t in 0 ... _trackCount)
+			{
                 readBar(_score.tracks[t]);
             }
         }
@@ -601,7 +601,7 @@ class Gp3To5Importer extends ScoreImporter
     
     private function readVoice(track:Track, bar:Bar)
     {
-        var beatCount = _data.readInt31();
+        var beatCount = readInt32();
         if (beatCount == 0)
         {
             return;
@@ -633,7 +633,8 @@ class Gp3To5Importer extends ScoreImporter
             readUInt8(); // isEmpty
         }
         
-        switch(_data.readInt8())
+        var duration = _data.readInt8();
+        switch(duration)
         {
             case -2:
                 newBeat.duration = Duration.Whole;
@@ -655,7 +656,7 @@ class Gp3To5Importer extends ScoreImporter
         
         if ( (flags & 0x20) != 0)
         {
-            newBeat.tupletNumerator = _data.readInt31();
+            newBeat.tupletNumerator = readInt32();
             switch(newBeat.tupletNumerator)
             {
                 case 1:
@@ -680,7 +681,7 @@ class Gp3To5Importer extends ScoreImporter
         
         if ( (flags & 0x04) != 0)
         {
-            newBeat.text = readStringIntByte();
+            newBeat.text = readStringIntUnused();
         }
         
         if ( (flags & 0x08) != 0)
@@ -726,10 +727,10 @@ class Gp3To5Importer extends ScoreImporter
             skip(17);
             chord.name = readStringByteLength(21);
             skip(4);
-            chord.firstFret = _data.readInt31();
+            chord.firstFret = readInt32();
             for (i in 0 ... 7) 
             {
-                var fret = _data.readInt31();
+                var fret = readInt32();
                 if (i < chord.strings.length) 
                 {
                     chord.strings.push(fret);
@@ -759,10 +760,10 @@ class Gp3To5Importer extends ScoreImporter
                     // Ninth (1)
                     // Eleventh (1)
                     skip(4);
-                    chord.firstFret = (_data.readInt31());
+                    chord.firstFret = (readInt32());
                     for (i in 0 ... 7) 
                     {
-                        var fret = _data.readInt31();
+                        var fret = readInt32();
                         if (i < chord.strings.length) 
                         {
                             chord.strings.push(fret);
@@ -783,10 +784,10 @@ class Gp3To5Importer extends ScoreImporter
                     // unknown
                     skip(25);
                     chord.name = readStringByteLength(34);
-                    chord.firstFret = _data.readInt31();
+                    chord.firstFret = readInt32();
                     for (i in 0 ... 6)
                     {
-                        var fret = _data.readInt31();
+                        var fret = readInt32();
                         chord.strings.push(fret);
                     }
                     // unknown
@@ -806,12 +807,12 @@ class Gp3To5Importer extends ScoreImporter
                 }
             
                 chord.name = readStringIntByte();
-                chord.firstFret = _data.readInt31();
+                chord.firstFret = readInt32();
                 if (chord.firstFret > 0)
                 {
                     for (i in 0 ... strings) 
                     {
-                        var fret = _data.readInt31();
+                        var fret = readInt32();
                         if (i < chord.strings.length) 
                         {
                             chord.strings.push(fret);
@@ -924,15 +925,15 @@ class Gp3To5Importer extends ScoreImporter
     private function readTremoloBarEffect(beat:Beat)
     {
         _data.readByte(); // type
-        _data.readInt31(); // value
-        var pointCount = _data.readInt31();
+        readInt32(); // value
+        var pointCount = readInt32();
         if (pointCount > 0)
         {
             for (i in 0 ... pointCount) 
             {
                 var point = new BendPoint();
-                point.offset = _data.readInt31(); // 0...60
-                point.value = Std.int(_data.readInt31() / BEND_STEP); // 0..12 (amount of quarters)
+                point.offset = readInt32(); // 0...60
+                point.value = Std.int(readInt32() / BEND_STEP); // 0..12 (amount of quarters)
                 readBool(); // vibrato
                 beat.whammyBarPoints.push(point);
             } 
@@ -977,7 +978,7 @@ class Gp3To5Importer extends ScoreImporter
         {
             tableChange.tempoName = readStringIntByte();
         }
-        tableChange.tempo = _data.readInt31();
+        tableChange.tempo = readInt32();
         
         // durations
         if (tableChange.volume >= 0) 
@@ -1235,15 +1236,15 @@ class Gp3To5Importer extends ScoreImporter
     private function readBend(note:Note) : Void
     {
         _data.readByte(); // type
-        _data.readInt31(); // value
-        var pointCount = _data.readInt31();
+        readInt32(); // value
+        var pointCount = readInt32();
         if (pointCount > 0)
         {
             for (i in 0 ... pointCount) 
             {
                 var point = new BendPoint();
-                point.offset = _data.readInt31(); // 0...60
-                point.value = Std.int(_data.readInt31() / BEND_STEP); // 0..12 (amount of quarters)
+                point.offset = readInt32(); // 0...60
+                point.value = Std.int(readInt32() / BEND_STEP); // 0..12 (amount of quarters)
                 readBool(); // vibrato
                 note.bendPoints.push(point);
             } 
@@ -1488,6 +1489,15 @@ class Gp3To5Importer extends ScoreImporter
         return _data.readByte();
     }
     
+    public function readInt32() 
+    {
+        var ch1 = _data.readByte();
+        var ch2 = _data.readByte();
+        var ch3 = _data.readByte();
+        var ch4 = _data.readByte();
+        return ch1 | ch2 << 8 | ch3 << 16 | ch4 << 24;
+	}
+    
     /**
      * Skips an integer (4byte) and reads a string using 
      * a bytesize
@@ -1503,7 +1513,7 @@ class Gp3To5Importer extends ScoreImporter
      */
     #if unit public #else private #end inline function readStringInt() : String
     {
-        return _data.readString(_data.readInt31());
+        return _data.readString(readInt32());
     }
     
     /**
@@ -1511,7 +1521,7 @@ class Gp3To5Importer extends ScoreImporter
      */
     #if unit public #else private #end function readStringIntByte() : String
     {
-        var length = _data.readInt31() - 1;
+        var length = readInt32() - 1;
         _data.readByte();
         return _data.readString(length);
     }

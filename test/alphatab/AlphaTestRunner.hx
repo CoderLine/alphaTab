@@ -15,7 +15,10 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab;
-import alphatab.importer.Gp3To5ImporterTest;
+import alphatab.importer.Gp3ImporterTest;
+import alphatab.importer.Gp4ImporterTest;
+import alphatab.importer.Gp5ImporterTest;
+import alphatab.importer.GpImporterTest;
 import haxe.unit.TestRunner;
 
 class AlphaTestRunner 
@@ -23,7 +26,10 @@ class AlphaTestRunner
     static function main()
     {
         var r = new TestRunner();
-        r.add(new Gp3To5ImporterTest());
+        //r.add(new GpImporterTest());
+        //r.add(new Gp3ImporterTest());
+        //r.add(new Gp4ImporterTest());
+        r.add(new Gp5ImporterTest());
         r.run();
     }
 }

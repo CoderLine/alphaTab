@@ -15,6 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.platform;
+import alphatab.platform.svg.SvgCanvas;
 
 /**
  * This factory provides objects which require custom implementations 
@@ -26,8 +27,26 @@ class PlatformFactory
     { 
         #if neko 
         return new alphatab.platform.neko.NekoFileLoader();
+        #elseif js
+        return new alphatab.platform.js.JsFileLoader();
         #else
         return null;
         #end
     }
+    
+    public static var SVG_CANVAS = "svg";
+    public static function getCanvas(object:Dynamic) : Canvas
+    {
+        if (object == SVG_CANVAS) // all Platforms
+        {
+            return new SvgCanvas();
+        }
+            
+        // target conditionals
+        #if js
+        return new alphatab.platform.js.Html5Canvas(object);
+        #else
+        return new SvgCanvas();
+        #end
+    } 
 }

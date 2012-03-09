@@ -1,4 +1,6 @@
 package alphatab.platform.neko;
+
+#if neko
 import alphatab.platform.IFileLoader;
 import haxe.io.Bytes;
 import neko.io.File;
@@ -29,3 +31,4 @@ class NekoFileLoader implements IFileLoader
     }
 
 }
+#end

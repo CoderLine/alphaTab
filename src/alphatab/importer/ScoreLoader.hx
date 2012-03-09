@@ -5,6 +5,7 @@ import alphatab.platform.IFileLoader;
 import alphatab.platform.PlatformFactory;
 import haxe.io.Bytes;
 import haxe.io.BytesInput;
+import haxe.Stack;
 
 class ScoreLoader 
 {
@@ -21,7 +22,7 @@ class ScoreLoader
                     try
                     {
                         var input:BytesInput = new BytesInput(data);
-                        importer.init(data);
+                        importer.init(input);
                         
                         var score:Score = importer.readScore();
                         success(score);
@@ -30,6 +31,7 @@ class ScoreLoader
                     }
                     catch (e:Dynamic)
                     {
+                        error(Stack.toString(Stack.exceptionStack()));
                         continue;
                     }                    
                 }

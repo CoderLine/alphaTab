@@ -4,13 +4,13 @@
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="bin\neko\alphaTab.core.n" />
+    <movie path="bin\js\lib\alphatab\alphaTab.core.js" />
     <movie fps="0" />
     <movie width="0" />
     <movie height="0" />
     <movie version="1" />
     <movie minorVersion="0" />
-    <movie platform="Neko" />
+    <movie platform="JavaScript" />
     <movie background="#FFFFFF" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
