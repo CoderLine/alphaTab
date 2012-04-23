@@ -1947,8 +1947,8 @@ alphatab.platform.js.Html5Canvas.prototype = {
 		this._context.textBaseline = "top";
 	}
 	,setColor: function(color) {
-		this._context.strokeStyle = color.toHexString();
-		this._context.fillStyle = color.toHexString();
+		this._context.strokeStyle = color.toRgbaString();
+		this._context.fillStyle = color.toRgbaString();
 	}
 	,setLineWidth: function(value) {
 		this._context.lineWidth = value;
@@ -1957,10 +1957,10 @@ alphatab.platform.js.Html5Canvas.prototype = {
 		this._context.clearRect(0,0,this.getWidth(),this.getHeight());
 	}
 	,fillRect: function(x,y,w,h) {
-		this._context.fillRect(x,y,w,h);
+		this._context.fillRect(x - 0.5,y - 0.5,w,h);
 	}
 	,strokeRect: function(x,y,w,h) {
-		this._context.strokeRect(x,y,w,h);
+		this._context.strokeRect(x - 0.5,y - 0.5,w,h);
 	}
 	,beginPath: function() {
 		this._context.beginPath();
@@ -1969,10 +1969,10 @@ alphatab.platform.js.Html5Canvas.prototype = {
 		this._context.closePath();
 	}
 	,moveTo: function(x,y) {
-		this._context.moveTo(x,y);
+		this._context.moveTo(x - 0.5,y - 0.5);
 	}
 	,lineTo: function(x,y) {
-		this._context.lineTo(x,y);
+		this._context.lineTo(x - 0.5,y - 0.5);
 	}
 	,quadraticCurveTo: function(cpx,cpy,x,y) {
 		this._context.quadraticCurveTo(cpx,cpy,x,y);
@@ -2092,27 +2092,30 @@ alphatab.platform.js.JsFileLoader.prototype = {
 if(!alphatab.platform.model) alphatab.platform.model = {}
 alphatab.platform.model.Color = $hxClasses["alphatab.platform.model.Color"] = function(r,g,b,a) {
 	if(a == null) a = 255;
-	var upper = (a & 255) << 16 | r & 255;
-	var lower = (g & 255) << 16 | b & 255;
-	this._value = upper << 16 | lower;
+	this._higherBits = (a & 255) << 8 | r & 255;
+	this._lowerBits = (g & 255) << 8 | b & 255;
 };
 alphatab.platform.model.Color.__name__ = ["alphatab","platform","model","Color"];
 alphatab.platform.model.Color.prototype = {
-	_value: null
+	_lowerBits: null
+	,_higherBits: null
 	,getA: function() {
-		return haxe.Int32.toInt(this._value & -16777216);
+		return this._higherBits >> 8 & 255;
 	}
 	,getR: function() {
-		return haxe.Int32.toInt(this._value & 16711680);
+		return this._higherBits & 255;
 	}
 	,getG: function() {
-		return haxe.Int32.toInt(this._value & 65280);
+		return this._lowerBits >> 8 & 255;
 	}
 	,getB: function() {
-		return haxe.Int32.toInt(this._value & 255);
+		return this._lowerBits & 255;
 	}
 	,toHexString: function() {
-		return "#" + StringTools.hex(haxe.Int32.toInt(this._value & -16777216),2) + StringTools.hex(haxe.Int32.toInt(this._value & 16711680),2) + StringTools.hex(haxe.Int32.toInt(this._value & 65280),2) + StringTools.hex(haxe.Int32.toInt(this._value & 255),2);
+		return "#" + StringTools.hex(this.getA(),2) + StringTools.hex(this.getR(),2) + StringTools.hex(this.getG(),2) + StringTools.hex(this.getB(),2);
+	}
+	,toRgbaString: function() {
+		return "rgba(" + this.getR() + "," + this.getG() + "," + this.getB() + "," + this.getA() / 255.0 + ")";
 	}
 	,__class__: alphatab.platform.model.Color
 }
@@ -2280,7 +2283,7 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 		this._buffer.add("\" height=\"");
 		this._buffer.add(h);
 		this._buffer.add("\" style=\"fill:");
-		this._buffer.add(this._color.toHexString());
+		this._buffer.add(this._color.toRgbaString());
 		this._buffer.add(";\" />\n");
 	}
 	,strokeRect: function(x,y,w,h) {
@@ -2293,7 +2296,7 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 		this._buffer.add("\" height=\"");
 		this._buffer.add(h);
 		this._buffer.add("\" style=\"stroke:");
-		this._buffer.add(this._color.toHexString());
+		this._buffer.add(this._color.toRgbaString());
 		this._buffer.add("; stroke-width:");
 		this._buffer.add(this._lineWidth);
 		this._buffer.add(";\" />\n");
@@ -2384,7 +2387,7 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 			this._buffer.add("<path d=\"");
 			this._buffer.add(this._currentPath.b.join(""));
 			this._buffer.add("\" style=\"fill:");
-			this._buffer.add(this._color.toHexString());
+			this._buffer.add(this._color.toRgbaString());
 			this._buffer.add("\" stroke=\"none\"/>\n");
 		}
 		this._currentPath = new StringBuf();
@@ -2396,7 +2399,7 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 			this._buffer.add("<path d=\"");
 			this._buffer.add(this._currentPath.b.join(""));
 			this._buffer.add("\" style=\"stroke:");
-			this._buffer.add(this._color.toHexString());
+			this._buffer.add(this._color.toRgbaString());
 			this._buffer.add("; stroke-width:");
 			this._buffer.add(this._lineWidth);
 			this._buffer.add(";\" fill=\"none\" />\n");
@@ -2420,7 +2423,7 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 		this._buffer.add("\" style=\"font:");
 		this._buffer.add(this._font.toCssString());
 		this._buffer.add("; fill:");
-		this._buffer.add(this._color.toHexString());
+		this._buffer.add(this._color.toRgbaString());
 		this._buffer.add(";\" ");
 		this._buffer.add(" dominant-baseline=\"");
 		this._buffer.add("top");
@@ -2438,7 +2441,7 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 		this._buffer.add("\" style=\"font:");
 		this._buffer.add(this._font.toCssString());
 		this._buffer.add("\" stroke:");
-		this._buffer.add(this._color.toHexString());
+		this._buffer.add(this._color.toRgbaString());
 		this._buffer.add("; stroke-width:");
 		this._buffer.add(this._lineWidth);
 		this._buffer.add(";\" ");
@@ -2473,6 +2476,118 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 	,__class__: alphatab.platform.svg.SvgCanvas
 }
 if(!alphatab.rendering) alphatab.rendering = {}
+alphatab.rendering.BarRendererBase = $hxClasses["alphatab.rendering.BarRendererBase"] = function() {
+};
+alphatab.rendering.BarRendererBase.__name__ = ["alphatab","rendering","BarRendererBase"];
+alphatab.rendering.BarRendererBase.prototype = {
+	stave: null
+	,x: null
+	,y: null
+	,width: null
+	,height: null
+	,index: null
+	,applyBarSpacing: function(spacing) {
+	}
+	,getLayout: function() {
+		return this.stave.staveGroup.layout;
+	}
+	,getResources: function() {
+		return this.stave.staveGroup.layout.renderer.renderingResources;
+	}
+	,isFirstOfLine: function() {
+		return this.index == 0;
+	}
+	,isLastOfLine: function() {
+		return this.index == this.stave.barRenderers.length - 1;
+	}
+	,doLayout: function() {
+	}
+	,paint: function(cx,cy,canvas) {
+	}
+	,__class__: alphatab.rendering.BarRendererBase
+}
+alphatab.rendering.BarRendererFactory = $hxClasses["alphatab.rendering.BarRendererFactory"] = function() {
+};
+alphatab.rendering.BarRendererFactory.__name__ = ["alphatab","rendering","BarRendererFactory"];
+alphatab.rendering.BarRendererFactory.prototype = {
+	create: function(bar) {
+		return null;
+	}
+	,__class__: alphatab.rendering.BarRendererFactory
+}
+alphatab.rendering.Glyph = $hxClasses["alphatab.rendering.Glyph"] = function(x,y) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	this.x = x;
+	this.y = y;
+};
+alphatab.rendering.Glyph.__name__ = ["alphatab","rendering","Glyph"];
+alphatab.rendering.Glyph.prototype = {
+	index: null
+	,x: null
+	,y: null
+	,width: null
+	,renderer: null
+	,applyGlyphSpacing: function(spacing) {
+		var oldWidth = this.renderer.width - spacing * this.renderer.glyphs.length;
+		if(this.index == 0) this.x = 0; else this.x = this.renderer.glyphs[this.index - 1].x + this.renderer.glyphs[this.index - 1].width;
+		this.width += spacing;
+	}
+	,doLayout: function() {
+	}
+	,paint: function(cx,cy,canvas) {
+	}
+	,__class__: alphatab.rendering.Glyph
+}
+alphatab.rendering.GlyphBarRenderer = $hxClasses["alphatab.rendering.GlyphBarRenderer"] = function(bar) {
+	alphatab.rendering.BarRendererBase.call(this);
+	this._bar = bar;
+	this.glyphs = new Array();
+};
+alphatab.rendering.GlyphBarRenderer.__name__ = ["alphatab","rendering","GlyphBarRenderer"];
+alphatab.rendering.GlyphBarRenderer.__super__ = alphatab.rendering.BarRendererBase;
+alphatab.rendering.GlyphBarRenderer.prototype = $extend(alphatab.rendering.BarRendererBase.prototype,{
+	_bar: null
+	,glyphs: null
+	,doLayout: function() {
+		this.createGlyphs();
+	}
+	,createGlyphs: function() {
+		var lay = this.stave.staveGroup.layout;
+		this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,10 * lay.renderer.scale | 0));
+	}
+	,addGlyph: function(glyph) {
+		glyph.x = this.width;
+		glyph.index = this.glyphs.length;
+		glyph.renderer = this;
+		glyph.doLayout();
+		if(glyph.x + glyph.width > this.width) this.width = glyph.x + glyph.width;
+		this.glyphs.push(glyph);
+	}
+	,applyBarSpacing: function(spacing) {
+		var oldWidth = this.width;
+		this.width += spacing;
+		var glyphSpacing = spacing / this.glyphs.length | 0;
+		var _g = 0, _g1 = this.glyphs;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.applyGlyphSpacing(glyphSpacing);
+		}
+	}
+	,paint: function(cx,cy,canvas) {
+		this.paintBackground(cx,cy,canvas);
+		var _g = 0, _g1 = this.glyphs;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.paint(cx + this.x,cy + this.y,canvas);
+		}
+	}
+	,paintBackground: function(cx,cy,canvas) {
+	}
+	,__class__: alphatab.rendering.GlyphBarRenderer
+});
 alphatab.rendering.RenderingResources = $hxClasses["alphatab.rendering.RenderingResources"] = function(scale) {
 	this.init(scale);
 };
@@ -2483,6 +2598,9 @@ alphatab.rendering.RenderingResources.prototype = {
 	,subTitleFont: null
 	,wordsFont: null
 	,effectFont: null
+	,tablatureFont: null
+	,staveLineColor: null
+	,barSeperatorColor: null
 	,init: function(scale) {
 		var sansFont = "Arial";
 		var serifFont = "Times New Roman";
@@ -2491,9 +2609,74 @@ alphatab.rendering.RenderingResources.prototype = {
 		this.titleFont = new alphatab.platform.model.Font(serifFont,32 * scale);
 		this.subTitleFont = new alphatab.platform.model.Font(serifFont,20 * scale);
 		this.wordsFont = new alphatab.platform.model.Font(serifFont,15 * scale);
+		this.tablatureFont = new alphatab.platform.model.Font(sansFont,12 * scale);
+		this.staveLineColor = new alphatab.platform.model.Color(165,165,165);
+		this.barSeperatorColor = new alphatab.platform.model.Color(34,34,17);
 	}
 	,__class__: alphatab.rendering.RenderingResources
 }
+alphatab.rendering.ScoreBarRenderer = $hxClasses["alphatab.rendering.ScoreBarRenderer"] = function(bar) {
+	alphatab.rendering.GlyphBarRenderer.call(this,bar);
+};
+alphatab.rendering.ScoreBarRenderer.__name__ = ["alphatab","rendering","ScoreBarRenderer"];
+alphatab.rendering.ScoreBarRenderer.__super__ = alphatab.rendering.GlyphBarRenderer;
+alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.GlyphBarRenderer.prototype,{
+	getLineOffset: function() {
+		return 9 * this.stave.staveGroup.layout.renderer.scale;
+	}
+	,doLayout: function() {
+		alphatab.rendering.GlyphBarRenderer.prototype.doLayout.call(this);
+		this.height = (9 * this.stave.staveGroup.layout.renderer.scale * 4 | 0) + this.getGlyphOverflow() * 2;
+	}
+	,createGlyphs: function() {
+		alphatab.rendering.GlyphBarRenderer.prototype.createGlyphs.call(this);
+		this.addGlyph(new alphatab.rendering.glyphs.DummyScoreGlyph(0,0,50));
+		this.addGlyph(new alphatab.rendering.glyphs.DummyScoreGlyph(0,0,50));
+		this.addGlyph(new alphatab.rendering.glyphs.DummyScoreGlyph(0,0,50));
+	}
+	,getGlyphOverflow: function() {
+		var res = this.stave.staveGroup.layout.renderer.renderingResources;
+		return res.tablatureFont.getSize() / 2 + res.tablatureFont.getSize() * 0.2 | 0;
+	}
+	,paintBackground: function(cx,cy,canvas) {
+		var res = this.stave.staveGroup.layout.renderer.renderingResources;
+		canvas.setColor(res.staveLineColor);
+		var lineY = cy + this.y + this.getGlyphOverflow();
+		var startY = lineY;
+		var _g = 0;
+		while(_g < 5) {
+			var i = _g++;
+			if(i > 0) lineY += 9 * this.stave.staveGroup.layout.renderer.scale | 0;
+			canvas.beginPath();
+			canvas.moveTo(cx + this.x,lineY);
+			canvas.lineTo(cx + this.x + this.width,lineY);
+			canvas.stroke();
+		}
+		canvas.setColor(res.barSeperatorColor);
+		if(this.index == 0) {
+			canvas.beginPath();
+			canvas.moveTo(cx + this.x,startY);
+			canvas.lineTo(cx + this.x,lineY);
+			canvas.stroke();
+		}
+		canvas.beginPath();
+		canvas.moveTo(cx + this.x + this.width,startY);
+		canvas.lineTo(cx + this.x + this.width,lineY);
+		canvas.stroke();
+	}
+	,__class__: alphatab.rendering.ScoreBarRenderer
+});
+alphatab.rendering.ScoreBarRendererFactory = $hxClasses["alphatab.rendering.ScoreBarRendererFactory"] = function() {
+	alphatab.rendering.BarRendererFactory.call(this);
+};
+alphatab.rendering.ScoreBarRendererFactory.__name__ = ["alphatab","rendering","ScoreBarRendererFactory"];
+alphatab.rendering.ScoreBarRendererFactory.__super__ = alphatab.rendering.BarRendererFactory;
+alphatab.rendering.ScoreBarRendererFactory.prototype = $extend(alphatab.rendering.BarRendererFactory.prototype,{
+	create: function(bar) {
+		return new alphatab.rendering.ScoreBarRenderer(bar);
+	}
+	,__class__: alphatab.rendering.ScoreBarRendererFactory
+});
 alphatab.rendering.ScoreRenderer = $hxClasses["alphatab.rendering.ScoreRenderer"] = function(source) {
 	this.updateScale(1.0);
 	this.settings = new Hash();
@@ -2524,7 +2707,7 @@ alphatab.rendering.ScoreRenderer.prototype = {
 	}
 	,doLayout: function() {
 		this.layout.doLayout();
-		this.canvas.setHeight(this.layout.height);
+		this.canvas.setHeight(this.layout.height + this.renderingResources.copyrightFont.getSize() * 2 | 0);
 		this.canvas.setWidth(this.layout.width);
 	}
 	,paintScore: function() {
@@ -2556,22 +2739,125 @@ alphatab.rendering.ScoreRenderer.prototype = {
 	,__class__: alphatab.rendering.ScoreRenderer
 	,__properties__: {get_score:"getScore"}
 }
-if(!alphatab.rendering.info) alphatab.rendering.info = {}
-alphatab.rendering.info.BarRenderingInfo = $hxClasses["alphatab.rendering.info.BarRenderingInfo"] = function(bar) {
-	this.bar = bar;
+alphatab.rendering.TabBarRenderer = $hxClasses["alphatab.rendering.TabBarRenderer"] = function(bar) {
+	alphatab.rendering.GlyphBarRenderer.call(this,bar);
 };
-alphatab.rendering.info.BarRenderingInfo.__name__ = ["alphatab","rendering","info","BarRenderingInfo"];
-alphatab.rendering.info.BarRenderingInfo.prototype = {
-	bar: null
-	,staveLine: null
-	,x: null
-	,width: null
+alphatab.rendering.TabBarRenderer.__name__ = ["alphatab","rendering","TabBarRenderer"];
+alphatab.rendering.TabBarRenderer.__super__ = alphatab.rendering.GlyphBarRenderer;
+alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.GlyphBarRenderer.prototype,{
+	getLineOffset: function() {
+		return 11 * this.stave.staveGroup.layout.renderer.scale;
+	}
 	,doLayout: function() {
+		alphatab.rendering.GlyphBarRenderer.prototype.doLayout.call(this);
+		this.height = (11 * this.stave.staveGroup.layout.renderer.scale * (this._bar.track.tuning.length - 1) | 0) + this.getNumberOverflow() * 2;
 	}
-	,applySpacing: function(spacing) {
+	,createGlyphs: function() {
+		alphatab.rendering.GlyphBarRenderer.prototype.createGlyphs.call(this);
+		this.addGlyph(new alphatab.rendering.glyphs.DummyTablatureGlyph(0,0));
+		this.addGlyph(new alphatab.rendering.glyphs.DummyTablatureGlyph(0,0));
+		this.addGlyph(new alphatab.rendering.glyphs.DummyTablatureGlyph(0,0));
 	}
-	,__class__: alphatab.rendering.info.BarRenderingInfo
-}
+	,getNumberOverflow: function() {
+		var res = this.stave.staveGroup.layout.renderer.renderingResources;
+		return res.tablatureFont.getSize() / 2 + res.tablatureFont.getSize() * 0.2 | 0;
+	}
+	,paintBackground: function(cx,cy,canvas) {
+		var res = this.stave.staveGroup.layout.renderer.renderingResources;
+		canvas.setColor(res.staveLineColor);
+		var lineY = cy + this.y + this.getNumberOverflow();
+		var startY = lineY;
+		var _g1 = 0, _g = this._bar.track.tuning.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			if(i > 0) lineY += 11 * this.stave.staveGroup.layout.renderer.scale | 0;
+			canvas.beginPath();
+			canvas.moveTo(cx + this.x,lineY);
+			canvas.lineTo(cx + this.x + this.width,lineY);
+			canvas.stroke();
+		}
+		canvas.setColor(res.barSeperatorColor);
+		if(this.index == 0) {
+			canvas.beginPath();
+			canvas.moveTo(cx + this.x,startY);
+			canvas.lineTo(cx + this.x,lineY);
+			canvas.stroke();
+		}
+		canvas.beginPath();
+		canvas.moveTo(cx + this.x + this.width,startY);
+		canvas.lineTo(cx + this.x + this.width,lineY);
+		canvas.stroke();
+	}
+	,__class__: alphatab.rendering.TabBarRenderer
+});
+alphatab.rendering.TabBarRendererFactory = $hxClasses["alphatab.rendering.TabBarRendererFactory"] = function() {
+	alphatab.rendering.BarRendererFactory.call(this);
+};
+alphatab.rendering.TabBarRendererFactory.__name__ = ["alphatab","rendering","TabBarRendererFactory"];
+alphatab.rendering.TabBarRendererFactory.__super__ = alphatab.rendering.BarRendererFactory;
+alphatab.rendering.TabBarRendererFactory.prototype = $extend(alphatab.rendering.BarRendererFactory.prototype,{
+	create: function(bar) {
+		return new alphatab.rendering.TabBarRenderer(bar);
+	}
+	,__class__: alphatab.rendering.TabBarRendererFactory
+});
+if(!alphatab.rendering.glyphs) alphatab.rendering.glyphs = {}
+alphatab.rendering.glyphs.DummyScoreGlyph = $hxClasses["alphatab.rendering.glyphs.DummyScoreGlyph"] = function(x,y,width) {
+	if(width == null) width = 100;
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.Glyph.call(this,x,y);
+	this.width = width;
+};
+alphatab.rendering.glyphs.DummyScoreGlyph.__name__ = ["alphatab","rendering","glyphs","DummyScoreGlyph"];
+alphatab.rendering.glyphs.DummyScoreGlyph.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.DummyScoreGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	paint: function(cx,cy,canvas) {
+		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
+		canvas.setColor(new alphatab.platform.model.Color(Std.random(256),Std.random(256),Std.random(256),128));
+		canvas.fillRect(cx + this.x,cy + this.y,this.width,this.renderer.height);
+		canvas.setColor(new alphatab.platform.model.Color(Std.random(256),Std.random(256),Std.random(256),200));
+		canvas.beginPath();
+		canvas.moveTo(cx + this.x,cy + this.y + this.renderer.height);
+		canvas.lineTo(cx + this.x,cy + this.y);
+		canvas.lineTo(cx + this.x + this.width,cy + this.y + this.renderer.height);
+		canvas.lineTo(cx + this.x + this.width,cy + this.y);
+		canvas.stroke();
+	}
+	,__class__: alphatab.rendering.glyphs.DummyScoreGlyph
+});
+alphatab.rendering.glyphs.DummyTablatureGlyph = $hxClasses["alphatab.rendering.glyphs.DummyTablatureGlyph"] = function(x,y) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.Glyph.call(this,x,y);
+};
+alphatab.rendering.glyphs.DummyTablatureGlyph.__name__ = ["alphatab","rendering","glyphs","DummyTablatureGlyph"];
+alphatab.rendering.glyphs.DummyTablatureGlyph.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.DummyTablatureGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	doLayout: function() {
+		this.width = 100;
+	}
+	,paint: function(cx,cy,canvas) {
+		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
+		canvas.setColor(new alphatab.platform.model.Color(Std.random(256),Std.random(256),Std.random(256),128));
+		canvas.fillRect(cx + this.x,cy + this.y,this.width,this.renderer.height);
+		canvas.setFont(res.tablatureFont);
+		canvas.setColor(new alphatab.platform.model.Color(0,0,0));
+		canvas.fillText("0 1 2 3 4 5 6 7 9 0",cx + this.x,cy + this.y);
+	}
+	,__class__: alphatab.rendering.glyphs.DummyTablatureGlyph
+});
+alphatab.rendering.glyphs.SpacingGlyph = $hxClasses["alphatab.rendering.glyphs.SpacingGlyph"] = function(x,y,width) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.Glyph.call(this,x,y);
+	this.width = width;
+};
+alphatab.rendering.glyphs.SpacingGlyph.__name__ = ["alphatab","rendering","glyphs","SpacingGlyph"];
+alphatab.rendering.glyphs.SpacingGlyph.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.SpacingGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	__class__: alphatab.rendering.glyphs.SpacingGlyph
+});
 if(!alphatab.rendering.layout) alphatab.rendering.layout = {}
 alphatab.rendering.layout.HeaderFooterElements = $hxClasses["alphatab.rendering.layout.HeaderFooterElements"] = function() { }
 alphatab.rendering.layout.HeaderFooterElements.__name__ = ["alphatab","rendering","layout","HeaderFooterElements"];
@@ -2590,21 +2876,24 @@ alphatab.rendering.layout.ScoreLayout.prototype = {
 	}
 	,paintScore: function() {
 	}
-	,createEmptyStaveLine: function() {
-		var line = new alphatab.rendering.staves.StaveLine();
-		return line;
+	,createEmptyStaveGroup: function() {
+		var group = new alphatab.rendering.staves.StaveGroup();
+		group.layout = this;
+		group.addStave(new alphatab.rendering.staves.Stave(new alphatab.rendering.ScoreBarRendererFactory()));
+		group.addStave(new alphatab.rendering.staves.Stave(new alphatab.rendering.TabBarRendererFactory()));
+		return group;
 	}
 	,__class__: alphatab.rendering.layout.ScoreLayout
 }
 alphatab.rendering.layout.PageViewLayout = $hxClasses["alphatab.rendering.layout.PageViewLayout"] = function(renderer) {
 	alphatab.rendering.layout.ScoreLayout.call(this,renderer);
-	this._lines = new Array();
+	this._groups = new Array();
 	renderer.setLayoutSetting(alphatab.rendering.layout.PageViewLayout.SCORE_INFOS,511);
 };
 alphatab.rendering.layout.PageViewLayout.__name__ = ["alphatab","rendering","layout","PageViewLayout"];
 alphatab.rendering.layout.PageViewLayout.__super__ = alphatab.rendering.layout.ScoreLayout;
 alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.layout.ScoreLayout.prototype,{
-	_lines: null
+	_groups: null
 	,doLayout: function() {
 		var currentBarIndex = 0;
 		var endBarIndex = this.renderer.track.bars.length - 1;
@@ -2612,13 +2901,14 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 		var y = alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[1];
 		y = this.doScoreInfoLayout(y);
 		while(currentBarIndex <= endBarIndex) {
-			var line = this.createStaveLine(currentBarIndex);
-			this._lines.push(line);
-			line.x = x;
-			line.y = y;
-			this.fitLine(line);
-			y += line.calculateHeight();
-			currentBarIndex = line.renderingInfos[line.renderingInfos.length - 1].bar.index + 1;
+			var group = this.createStaveGroup(currentBarIndex);
+			this._groups.push(group);
+			group.x = x;
+			group.y = y;
+			this.fitGroup(group);
+			group.finalizeGroup(this);
+			y += group.calculateHeight() + (20 * this.renderer.scale | 0);
+			currentBarIndex = group.bars[group.bars.length - 1].index + 1;
 		}
 		this.height = y + alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[3];
 		this.width = 795 * this.renderer.scale | 0;
@@ -2660,6 +2950,12 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 		var x = alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0];
 		var y = alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[1];
 		y = this.paintScoreInfo(x,y);
+		var _g = 0, _g1 = this._groups;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.paint(0,0,this.renderer.canvas);
+		}
 	}
 	,drawCentered: function(text,font,y) {
 		this.renderer.canvas.setFont(font);
@@ -2740,77 +3036,186 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 		y += Math.floor(25 * scale);
 		return y;
 	}
-	,fitLine: function(line) {
+	,fitGroup: function(group) {
 		var barSpace = 0;
-		if(line.isFull) {
-			var freeSpace = this.renderer.canvas.getWidth() - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0] - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2] - line.width;
-			if(freeSpace != 0 && line.renderingInfos.length > 0) barSpace = Math.round(freeSpace / line.renderingInfos.length);
+		if(group.isFull) {
+			var freeSpace = this.getSheetWidth() - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0] - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2] - group.width;
+			if(freeSpace != 0 && group.bars.length > 0) barSpace = Math.round(freeSpace / group.bars.length);
 		}
-		var barX = 0;
-		var _g = 0, _g1 = line.renderingInfos;
-		while(_g < _g1.length) {
-			var info = _g1[_g];
-			++_g;
-			info.applySpacing(barSpace);
-			info.x = barX;
-			barX += info.width + barSpace;
-		}
-		line.width = barX;
-		this.width = Math.round(Math.max(this.width,barX));
+		group.applyBarSpacing(barSpace);
+		this.width = Math.round(Math.max(this.width,group.width));
 	}
-	,createStaveLine: function(currentBarIndex) {
-		var line = this.createEmptyStaveLine();
-		var x = 0;
-		var maxWidth = this.renderer.canvas.getWidth() - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0] - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2];
+	,createStaveGroup: function(currentBarIndex) {
+		var group = this.createEmptyStaveGroup();
+		var maxWidth = this.getSheetWidth() - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0] - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2];
+		haxe.Log.trace(maxWidth,{ fileName : "PageViewLayout.hx", lineNumber : 276, className : "alphatab.rendering.layout.PageViewLayout", methodName : "createStaveGroup"});
 		var _g1 = currentBarIndex, _g = this.renderer.track.bars.length;
 		while(_g1 < _g) {
 			var i = _g1++;
 			var bar = this.renderer.track.bars[i];
-			var info = new alphatab.rendering.info.BarRenderingInfo(bar);
-			info.doLayout();
-			var lineIsFull = false;
-			if(x + info.width >= maxWidth && line.renderingInfos.length != 0) lineIsFull = true;
-			if(lineIsFull) {
-				line.isFull = true;
-				line.width = x;
-				return line;
+			group.addBar(bar);
+			var groupIsFull = false;
+			if(group.width >= maxWidth && group.bars.length != 0) groupIsFull = true;
+			if(groupIsFull) {
+				group.revertLastBar();
+				group.isFull = true;
+				return group;
 			}
-			info.x = x;
-			x += info.width;
-			line.analyze(bar);
-			line.addBarRenderingInfo(info);
+			group.x = 0;
 		}
-		return line;
+		return group;
 	}
 	,getMaxWidth: function() {
-		return this.renderer.canvas.getWidth() - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0] - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2];
+		return this.getSheetWidth() - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0] - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2];
+	}
+	,getSheetWidth: function() {
+		return Math.round(795 * this.renderer.scale);
 	}
 	,__class__: alphatab.rendering.layout.PageViewLayout
 });
 if(!alphatab.rendering.staves) alphatab.rendering.staves = {}
-alphatab.rendering.staves.StaveLine = $hxClasses["alphatab.rendering.staves.StaveLine"] = function() {
-	this.renderingInfos = new Array();
+alphatab.rendering.staves.Stave = $hxClasses["alphatab.rendering.staves.Stave"] = function(barRendererFactory) {
+	this.barRenderers = new Array();
+	this._factory = barRendererFactory;
+	this.topSpacing = 20;
+	this.bottomSpacing = 20;
 };
-alphatab.rendering.staves.StaveLine.__name__ = ["alphatab","rendering","staves","StaveLine"];
-alphatab.rendering.staves.StaveLine.prototype = {
-	renderingInfos: null
+alphatab.rendering.staves.Stave.__name__ = ["alphatab","rendering","staves","Stave"];
+alphatab.rendering.staves.Stave.prototype = {
+	staveGroup: null
+	,_factory: null
+	,barRenderers: null
 	,x: null
+	,y: null
+	,height: null
+	,topSpacing: null
+	,bottomSpacing: null
+	,addBar: function(bar) {
+		var renderer = this._factory.create(bar);
+		renderer.stave = this;
+		renderer.index = this.barRenderers.length;
+		renderer.doLayout();
+		this.barRenderers.push(renderer);
+	}
+	,revertLastBar: function() {
+		this.barRenderers.pop();
+	}
+	,applyBarSpacing: function(spacing) {
+		var _g = 0, _g1 = this.barRenderers;
+		while(_g < _g1.length) {
+			var b = _g1[_g];
+			++_g;
+			b.applyBarSpacing(spacing);
+		}
+	}
+	,finalizeStave: function(layout) {
+		var x = 0;
+		this.height = 0;
+		var _g1 = 0, _g = this.barRenderers.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			this.barRenderers[i].x = x;
+			this.barRenderers[i].y = this.topSpacing;
+			this.height = Math.max(this.height,this.barRenderers[i].height) | 0;
+			x += this.barRenderers[i].width;
+		}
+		this.height += this.topSpacing + this.bottomSpacing;
+	}
+	,paint: function(cx,cy,canvas) {
+		var _g = 0, _g1 = this.barRenderers;
+		while(_g < _g1.length) {
+			var r = _g1[_g];
+			++_g;
+			r.paint(cx + this.x,cy + this.y,canvas);
+		}
+	}
+	,__class__: alphatab.rendering.staves.Stave
+}
+alphatab.rendering.staves.StaveGroup = $hxClasses["alphatab.rendering.staves.StaveGroup"] = function() {
+	this.bars = new Array();
+	this.staves = new Array();
+	this.width = 0;
+};
+alphatab.rendering.staves.StaveGroup.__name__ = ["alphatab","rendering","staves","StaveGroup"];
+alphatab.rendering.staves.StaveGroup.prototype = {
+	x: null
 	,y: null
 	,isFull: null
 	,width: null
+	,bars: null
+	,staves: null
+	,layout: null
 	,getLastBarIndex: function() {
-		return this.renderingInfos[this.renderingInfos.length - 1].bar.index;
+		return this.bars[this.bars.length - 1].index;
 	}
-	,addBarRenderingInfo: function(info) {
-		info.staveLine = this;
-		this.renderingInfos.push(info);
+	,addBar: function(bar) {
+		this.bars.push(bar);
+		var maxW = 0;
+		var _g = 0, _g1 = this.staves;
+		while(_g < _g1.length) {
+			var s = _g1[_g];
+			++_g;
+			s.addBar(bar);
+			if(s.barRenderers[s.barRenderers.length - 1].width > maxW) maxW = s.barRenderers[s.barRenderers.length - 1].width;
+		}
+		var _g = 0, _g1 = this.staves;
+		while(_g < _g1.length) {
+			var s = _g1[_g];
+			++_g;
+			var diff = maxW - s.barRenderers[s.barRenderers.length - 1].width;
+			if(diff > 0) s.barRenderers[s.barRenderers.length - 1].applyBarSpacing(diff);
+		}
+		this.width += maxW;
 	}
-	,analyze: function(bar) {
+	,addStave: function(stave) {
+		stave.staveGroup = this;
+		this.staves.push(stave);
 	}
 	,calculateHeight: function() {
-		return 100;
+		return this.staves[this.staves.length - 1].y + this.staves[this.staves.length - 1].height;
 	}
-	,__class__: alphatab.rendering.staves.StaveLine
+	,revertLastBar: function() {
+		this.bars.pop();
+		var w = 0;
+		var _g = 0, _g1 = this.staves;
+		while(_g < _g1.length) {
+			var s = _g1[_g];
+			++_g;
+			w = Math.max(w,s.barRenderers[s.barRenderers.length - 1].width) | 0;
+			s.revertLastBar();
+		}
+		this.width -= w;
+	}
+	,applyBarSpacing: function(spacing) {
+		var _g = 0, _g1 = this.staves;
+		while(_g < _g1.length) {
+			var s = _g1[_g];
+			++_g;
+			s.applyBarSpacing(spacing);
+		}
+		this.width += this.bars.length * spacing;
+	}
+	,paint: function(cx,cy,canvas) {
+		var _g = 0, _g1 = this.staves;
+		while(_g < _g1.length) {
+			var s = _g1[_g];
+			++_g;
+			s.paint(cx + this.x,cy + this.y,canvas);
+		}
+	}
+	,finalizeGroup: function(scoreLayout) {
+		var currentY = 0;
+		var _g1 = 0, _g = this.staves.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			if(i > 0) currentY += 10 * scoreLayout.renderer.scale;
+			this.staves[i].x = 0;
+			this.staves[i].y = currentY | 0;
+			this.staves[i].finalizeStave(scoreLayout);
+			currentY += this.staves[i].height;
+		}
+	}
+	,__class__: alphatab.rendering.staves.StaveGroup
 }
 var haxe = haxe || {}
 haxe.Int32 = $hxClasses["haxe.Int32"] = function() { }
@@ -2885,6 +3290,17 @@ haxe.Int32.ucompare = function(a,b) {
 }
 haxe.Int32.prototype = {
 	__class__: haxe.Int32
+}
+haxe.Log = $hxClasses["haxe.Log"] = function() { }
+haxe.Log.__name__ = ["haxe","Log"];
+haxe.Log.trace = function(v,infos) {
+	js.Boot.__trace(v,infos);
+}
+haxe.Log.clear = function() {
+	js.Boot.__clear_trace();
+}
+haxe.Log.prototype = {
+	__class__: haxe.Log
 }
 haxe.StackItem = $hxClasses["haxe.StackItem"] = { __ename__ : ["haxe","StackItem"], __constructs__ : ["CFunction","Module","FilePos","Method","Lambda"] }
 haxe.StackItem.CFunction = ["CFunction",0];
@@ -3775,6 +4191,9 @@ alphatab.platform.model.Font.STYLE_ITALIC = 2;
 alphatab.platform.svg.FontSizes.TIMES_NEW_ROMAN_11PT = [3,4,5,6,6,9,9,2,4,4,6,6,3,4,3,3,6,6,6,6,6,6,6,6,6,6,3,3,6,6,6,5,10,8,7,7,8,7,6,7,8,4,4,8,7,10,8,8,7,8,7,5,8,8,7,11,8,8,7,4,3,4,5,6,4,5,5,5,5,5,4,5,6,3,3,6,3,9,6,6,6,5,4,4,4,5,6,7,6,6,5,5,2,5,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,4,6,6,6,6,2,5,4,8,4,6,6,0,8,6,4,6,3,3,4,5,5,4,4,3,3,6,8,8,8,5,8,8,8,8,8,8,11,7,7,7,7,7,4,4,4,4,8,8,8,8,8,8,8,6,8,8,8,8,8,8,6,5,5,5,5,5,5,5,8,5,5,5,5,5,3,3,3,3,6,6,6,6,6,6,6,6,6,5,5,5,5,6,6];
 alphatab.platform.svg.FontSizes.ARIAL_11PT = [3,2,4,6,6,10,7,2,4,4,4,6,3,4,3,3,6,6,6,6,6,6,6,6,6,6,3,3,6,6,6,6,11,8,7,7,7,6,6,8,7,2,5,7,6,8,7,8,6,8,7,7,6,7,8,10,7,8,7,3,3,3,5,6,4,6,6,6,6,6,4,6,6,2,2,5,2,8,6,6,6,6,4,6,3,6,6,10,6,6,6,4,2,4,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,2,6,6,7,6,2,6,4,8,4,6,6,0,8,6,4,6,4,4,4,6,6,4,4,4,5,6,9,10,10,6,8,8,8,8,8,8,11,7,6,6,6,6,2,2,2,2,8,7,8,8,8,8,8,6,8,7,7,7,7,8,7,7,6,6,6,6,6,6,10,6,6,6,6,6,2,2,2,2,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6];
 alphatab.platform.svg.FontSizes.CONTROL_CHARS = 32;
+alphatab.rendering.GlyphBarRenderer.FirstGlyphSpacing = 10;
+alphatab.rendering.ScoreBarRenderer.LineSpacing = 8;
+alphatab.rendering.TabBarRenderer.LineSpacing = 10;
 alphatab.rendering.layout.HeaderFooterElements.NONE = 0;
 alphatab.rendering.layout.HeaderFooterElements.TITLE = 1;
 alphatab.rendering.layout.HeaderFooterElements.SUBTITLE = 2;
@@ -3789,5 +4208,7 @@ alphatab.rendering.layout.HeaderFooterElements.ALL = 511;
 alphatab.rendering.layout.PageViewLayout.SCORE_INFOS = "scoreInfos";
 alphatab.rendering.layout.PageViewLayout.PAGE_PADDING = [20,20,20,20];
 alphatab.rendering.layout.PageViewLayout.WIDTH_ON_100 = 795;
+alphatab.rendering.layout.PageViewLayout.GroupSpacing = 20;
+alphatab.rendering.staves.StaveGroup.StaveSpacing = 10;
 js.Lib.onerror = null;
 alphatab.Main.main()

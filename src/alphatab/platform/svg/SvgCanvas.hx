@@ -119,7 +119,7 @@ class SvgCanvas implements ICanvas
         _buffer.add('" height="');
         _buffer.add(h);
         _buffer.add('" style="fill:');
-        _buffer.add(_color.toHexString());
+        _buffer.add(_color.toRgbaString());
         _buffer.add(';" />\n'); 
     }
     
@@ -134,7 +134,7 @@ class SvgCanvas implements ICanvas
         _buffer.add('" height="');
         _buffer.add(h);
         _buffer.add('" style="stroke:');
-        _buffer.add(_color.toHexString());
+        _buffer.add(_color.toRgbaString());
         _buffer.add('; stroke-width:');
         _buffer.add(_lineWidth);
         _buffer.add(';" />\n'); 
@@ -247,7 +247,7 @@ class SvgCanvas implements ICanvas
             _buffer.add('<path d="');
             _buffer.add(_currentPath.toString());
             _buffer.add('" style="fill:');
-            _buffer.add(_color.toHexString());
+            _buffer.add(_color.toRgbaString());
             _buffer.add('" stroke="none"/>\n');
         }
         _currentPath = new StringBuf();
@@ -260,7 +260,7 @@ class SvgCanvas implements ICanvas
             _buffer.add('<path d="');
             _buffer.add(_currentPath.toString());
             _buffer.add('" style="stroke:');
-            _buffer.add(_color.toHexString());
+            _buffer.add(_color.toRgbaString());
             _buffer.add('; stroke-width:');
             _buffer.add(_lineWidth);
             _buffer.add(';" fill="none" />\n'); 
@@ -291,7 +291,7 @@ class SvgCanvas implements ICanvas
         _buffer.add('" style="font:');
         _buffer.add(_font.toCssString());
         _buffer.add('; fill:');
-        _buffer.add(_color.toHexString());
+        _buffer.add(_color.toRgbaString());
         _buffer.add(';" ');
         _buffer.add(' dominant-baseline="');
         _buffer.add(getSvgBaseLine());       
@@ -310,7 +310,7 @@ class SvgCanvas implements ICanvas
         _buffer.add('" style="font:');
         _buffer.add(_font.toCssString());
         _buffer.add('" stroke:');
-        _buffer.add(_color.toHexString());
+        _buffer.add(_color.toRgbaString());
         _buffer.add('; stroke-width:');
         _buffer.add(_lineWidth);
         _buffer.add(';" ');

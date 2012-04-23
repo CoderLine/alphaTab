@@ -7,10 +7,10 @@ import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
 import alphatab.platform.model.Font;
 import alphatab.platform.model.TextAlign;
-import alphatab.rendering.info.BarRenderingInfo;
+import alphatab.rendering.BarRendererBase;
 import alphatab.rendering.RenderingResources;
 import alphatab.rendering.ScoreRenderer;
-import alphatab.rendering.staves.StaveLine;
+import alphatab.rendering.staves.StaveGroup;
 
 class PageViewLayout extends ScoreLayout
 {
@@ -21,14 +21,16 @@ class PageViewLayout extends ScoreLayout
     public static inline var WIDTH_ON_100:Int = 795;
 
         
-    private var _lines:Array<StaveLine>;
+    private var _groups:Array<StaveGroup>;
     
     public function new(renderer:ScoreRenderer) 
     {
         super(renderer);
-        _lines = new Array<StaveLine>();
+        _groups = new Array<StaveGroup>();
 		renderer.setLayoutSetting(SCORE_INFOS, HeaderFooterElements.ALL);
     }
+	
+	public static inline var GroupSpacing = 20;
     
     public override function doLayout()
     {
@@ -42,17 +44,18 @@ class PageViewLayout extends ScoreLayout
         
         while (currentBarIndex <= endBarIndex)
         {
-            var line:StaveLine = createStaveLine(currentBarIndex);
-            _lines.push(line);
+            var group:StaveGroup = createStaveGroup(currentBarIndex);
+            _groups.push(group);
             
-            line.x = x;
-            line.y = y;
+            group.x = x;
+            group.y = y;
             
-            fitLine(line);
+            fitGroup(group);
+            group.finalizeGroup(this);
+			
+            y += group.calculateHeight() + Std.int(GroupSpacing * renderer.scale);
             
-            y += line.calculateHeight();
-            
-            currentBarIndex = line.getLastBarIndex() + 1;
+            currentBarIndex = group.getLastBarIndex() + 1;
         }
         
         height = y + PAGE_PADDING[3];
@@ -131,6 +134,11 @@ class PageViewLayout extends ScoreLayout
         var y = PAGE_PADDING[1];
 		
 		y = paintScoreInfo(x, y);
+		
+        for (g in _groups)
+		{
+			g.paint(0, 0, renderer.canvas);
+		}
 	}
 	
 	private function drawCentered(text:String, font:Font, y:Int)
@@ -240,77 +248,67 @@ class PageViewLayout extends ScoreLayout
     /**
      * Realignes the bars in this line according to the available space
      */
-    private function fitLine(line:StaveLine)
+    private function fitGroup(group:StaveGroup)
     {
         // calculate additional space for each bar (can be negative!)
         var barSpace:Int = 0;
-        if (line.isFull) 
+        if (group.isFull) 
         {
-            var freeSpace = getMaxWidth() - line.width;
+            var freeSpace = getMaxWidth() - group.width;
            
-            if (freeSpace != 0 && line.renderingInfos.length > 0) 
+            if (freeSpace != 0 && group.bars.length > 0) 
             {
-                barSpace = Math.round(freeSpace / line.renderingInfos.length);
+                barSpace = Math.round(freeSpace / group.bars.length);
             }
         }
         
         // add it to the measures
-        var barX:Int = 0;
-        for (info in line.renderingInfos)
-        {
-            info.applySpacing(barSpace);
-            info.x = barX;
-            
-            barX += info.width + barSpace;
-        }
+		group.applyBarSpacing(barSpace);
         
-        line.width = barX;
-        
-        width = Math.round(Math.max(width, barX));    
+        width = Math.round(Math.max(width, group.width));    
     }
-    
-    private function createStaveLine(currentBarIndex:Int) : StaveLine
+	
+    private function createStaveGroup(currentBarIndex:Int) : StaveGroup
     {
-        var line:StaveLine = createEmptyStaveLine();
+        var group:StaveGroup = createEmptyStaveGroup();
         
-        var x = 0;
         var maxWidth = getMaxWidth();
+		trace(maxWidth);
         for (i in currentBarIndex ... renderer.track.bars.length)
         {
-            var bar:Bar = renderer.track.bars[i];
+			var bar = renderer.track.bars[i];
+			group.addBar(bar);
             
-            var info:BarRenderingInfo = new BarRenderingInfo(bar);
-            info.doLayout();
-            
-            var lineIsFull:Bool = false;
+            var groupIsFull:Bool = false;
             
             // can bar placed in this line?
-            if ( (x + info.width) >= maxWidth && line.renderingInfos.length != 0)
+            if ( (group.width) >= maxWidth && group.bars.length != 0)
             {
-                lineIsFull = true;
+                groupIsFull = true;
             }
             
-            
-            if (lineIsFull)
+            if (groupIsFull)
             {
-                line.isFull = true;
-                line.width = x;
-                return line;
+				group.revertLastBar();
+				group.isFull = true;
+                return group;
             }
             
-            info.x = x;
-            x += info.width;
-            
-            line.analyze(bar);
-            line.addBarRenderingInfo(info);
+            group.x = 0;
         }
         
-        return line;
+        return group;
     }
     
     private inline function getMaxWidth() : Int
     {
-        return (renderer.canvas.getWidth() - PAGE_PADDING[0] - PAGE_PADDING[2]);
+        return (getSheetWidth() - PAGE_PADDING[0] - PAGE_PADDING[2]);
+    }
+	
+	    
+    private function getSheetWidth() : Int
+    {
+        return Math.round(WIDTH_ON_100 * renderer.scale);
     }
     
 }

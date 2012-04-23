@@ -6,37 +6,41 @@ import haxe.Int32;
  */
 class Color 
 {
-	private var _value:Int32;
+	private var _lowerBits:Int;
+	private var _higherBits:Int;
 	
 	public function new(r:Int, g:Int, b:Int, a:Int = 0xFF) 
 	{
-		var upper = ((a & 0xFF) << 16) | (r & 0xFF);
-		var lower = ((g & 0xFF) << 16) | (b & 0xFF);
-		_value = Int32.make(upper, lower);
+		_higherBits = ((a & 0xFF) << 8) | (r & 0xFF);
+		_lowerBits = ((g & 0xFF) << 8) | (b & 0xFF);
 	}
 	
-	public inline function getA() : Int
+	public function getA() : Int
 	{
-		return Int32.toInt(Int32.and(_value, Int32.make(0xFF00, 0x0000)));
+		return (_higherBits >> 8) & 0xFF;
 	}	
 	
-	public inline function getR() : Int
+	public function getR() : Int
 	{
-		return Int32.toInt(Int32.and(_value, Int32.make(0x00FF, 0x0000)));
+		return _higherBits & 0xFF;
 	}
 		
-	public inline function getG() : Int
+	public function getG() : Int
 	{
-		return Int32.toInt(Int32.and(_value, Int32.make(0x0000, 0xFF00)));
+		return (_lowerBits >> 8) & 0xFF;
 	}
 			
-	public inline function getB() : Int
+	public function getB() : Int
 	{
-		return Int32.toInt(Int32.and(_value, Int32.make(0x0000, 0x00FF)));
+		return _lowerBits & 0xFF;
 	}
 	
 	public function toHexString() : String
 	{
 		return "#" + StringTools.hex(getA(), 2) + StringTools.hex(getR(), 2) + StringTools.hex(getG(), 2) + StringTools.hex(getB(), 2);
+	}	
+	public function toRgbaString() : String
+	{
+		return "rgba(" + getR() + "," + getG() + "," + getB() + "," + (getA() / 255.0) + ")";
 	}
 }

@@ -48,8 +48,8 @@ class Html5Canvas implements ICanvas
     // colors and styles
 	public function setColor(color : Color) : Void
 	{
-		this._context.strokeStyle = color.toHexString();
-		this._context.fillStyle = color.toHexString();
+		this._context.strokeStyle = color.toRgbaString();
+		this._context.fillStyle = color.toRgbaString();
 	}
 
     // line caps/joins
@@ -65,11 +65,11 @@ class Html5Canvas implements ICanvas
     }
     public function fillRect(x:Float, y:Float, w:Float, h:Float):Void
     {
-        this._context.fillRect(x, y, w, h);
+        this._context.fillRect(x - 0.5, y - 0.5, w, h);
     }
     public function strokeRect(x:Float, y:Float, w:Float, h:Float):Void
     {
-        this._context.strokeRect(x, y, w, h);
+        this._context.strokeRect(x - 0.5, y - 0.5, w, h);
     }
 
     // path API
@@ -83,11 +83,11 @@ class Html5Canvas implements ICanvas
     }
     public function moveTo(x:Float, y:Float):Void
     {
-        this._context.moveTo(x, y);
+        this._context.moveTo(x - 0.5, y - 0.5);
     }
     public function lineTo(x:Float, y:Float):Void
     {
-        this._context.lineTo(x, y);
+        this._context.lineTo(x - 0.5, y - 0.5);
     }
     public function quadraticCurveTo(cpx:Float, cpy:Float, x:Float, y:Float):Void
     {

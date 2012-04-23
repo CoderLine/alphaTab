@@ -1,6 +1,9 @@
 package alphatab.rendering.layout;
+import alphatab.rendering.ScoreBarRendererFactory;
 import alphatab.rendering.ScoreRenderer;
-import alphatab.rendering.staves.StaveLine;
+import alphatab.rendering.staves.Stave;
+import alphatab.rendering.staves.StaveGroup;
+import alphatab.rendering.TabBarRendererFactory;
 
 /**
  * This is the base class for creating new layouting engines for the score renderer. 
@@ -27,10 +30,12 @@ class ScoreLayout
         
     }
     
-    private function createEmptyStaveLine() : StaveLine
+    private function createEmptyStaveGroup() : StaveGroup
     {
-        var line:StaveLine = new StaveLine();
-        // TODO: Add all stave types to it
-        return line;
+        var group:StaveGroup = new StaveGroup();
+		group.layout = this;
+		group.addStave(new Stave(new ScoreBarRendererFactory()));
+		group.addStave(new Stave(new TabBarRendererFactory()));
+        return group;
     }
 }

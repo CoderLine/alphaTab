@@ -59,7 +59,7 @@ class ScoreRenderer
     private function doLayout()
     {
         layout.doLayout();
-		canvas.setHeight(layout.height);
+		canvas.setHeight(Std.int(layout.height + (renderingResources.copyrightFont.getSize() * 2)));
 		canvas.setWidth(layout.width);
     }
     
