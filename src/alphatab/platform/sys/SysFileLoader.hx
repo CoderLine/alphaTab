@@ -1,16 +1,15 @@
-package alphatab.platform.neko;
+package alphatab.platform.sys;
 
-#if neko
+#if (neko || cpp)
 import alphatab.platform.IFileLoader;
 import haxe.io.Bytes;
-import neko.io.File;
+import sys.io.File;
 
-class NekoFileLoader implements IFileLoader
+class SysFileLoader implements IFileLoader
 {
 
     public function new() 
     {
-        
     }
     
     public function loadBinary(path:String) : Bytes

@@ -26,9 +26,9 @@ class AlphaTestRunner
     static function main()
     {
         var r = new TestRunner();
-        //r.add(new GpImporterTest());
-        //r.add(new Gp3ImporterTest());
-        //r.add(new Gp4ImporterTest());
+        r.add(new GpImporterTest());
+        r.add(new Gp3ImporterTest());
+        r.add(new Gp4ImporterTest());
         r.add(new Gp5ImporterTest());
         r.run();
     }

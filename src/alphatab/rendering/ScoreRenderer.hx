@@ -20,13 +20,23 @@ class ScoreRenderer
     public var layout : ScoreLayout;
     
     public var renderingResources : RenderingResources;
+	
+	public var settings:Hash<Dynamic>;
+
         
     public function new(source:Dynamic) 
     {
+		updateScale(1.0);
+		settings = new Hash<Dynamic>();
         canvas = PlatformFactory.getCanvas(source);
         layout = new PageViewLayout(this);
-        renderingResources = new RenderingResources(1.0);
     }
+	
+	public function updateScale(scale:Float)
+	{
+		this.scale = scale;
+		this.renderingResources = new RenderingResources(scale);
+	}
     
     public function render(track:Track)
     {
@@ -47,15 +57,15 @@ class ScoreRenderer
     private function doLayout()
     {
         layout.doLayout();
+		canvas.height = layout.height;
+		canvas.width = layout.width;
     }
     
     private function paintScore()
     {
         paintBackground();
+		layout.paintScore();
     }
-    
-    
-    
     
     public function paintBackground() 
     {
@@ -65,7 +75,33 @@ class ScoreRenderer
         canvas.font = renderingResources.copyrightFont;
         canvas.textBaseline = "top";
         var x:Float = (canvas.width - canvas.measureText(msg)) / 2;
-        canvas.fillText(msg, x, canvas.height - 15);
+        canvas.fillText(msg, x, canvas.height - 18);
+    }
+	
+	//
+	// Settings
+	//
+	
+	public function setStaveSetting(staveId:String, setting:String, value:Dynamic)
+    {   
+        settings.set(staveId + "." + setting, value);
+    }
+    
+    public function getStaveSetting(staveId:String, setting:String, defaultValue:Dynamic = null) : Dynamic
+    {
+        var value:Dynamic = settings.get(staveId + "." + setting);
+        return value != null ? value : defaultValue;
+    }
+     
+    public function setLayoutSetting(setting:String, value:Dynamic)
+    {   
+        settings.set("layout." + setting, value);
+    }
+    
+    public function getLayoutSetting(setting:String, defaultValue:Dynamic = null) : Dynamic
+    {
+        var value:Dynamic = settings.get("layout." + setting);
+        return value != null ? value : defaultValue;
     }
 
 }

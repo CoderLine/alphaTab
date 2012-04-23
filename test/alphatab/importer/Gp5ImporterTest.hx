@@ -11,7 +11,6 @@ import alphatab.model.PickStrokeType;
 import alphatab.model.Score;
 import alphatab.model.SlideType;
 import alphatab.model.VibratoType;
-import alphatab.platform.neko.NekoFileLoader;
 import alphatab.platform.PlatformFactory;
 import haxe.io.Bytes;
 import haxe.io.BytesData;

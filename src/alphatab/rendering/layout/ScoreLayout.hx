@@ -9,12 +9,20 @@ class ScoreLayout
 {
     public var renderer:ScoreRenderer;
     
+    public var width:Int;
+    public var height:Int;
+
     private function new(renderer:ScoreRenderer) 
     {
         this.renderer = renderer;
     }
  
     public function doLayout()
+    {
+        
+    }
+ 
+    public function paintScore() : Void
     {
         
     }

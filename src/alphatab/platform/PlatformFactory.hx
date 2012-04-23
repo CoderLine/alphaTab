@@ -25,8 +25,8 @@ class PlatformFactory
 { 
     public static function getLoader() : IFileLoader
     { 
-        #if neko 
-        return new alphatab.platform.neko.NekoFileLoader();
+        #if (neko || cpp)
+        return new alphatab.platform.sys.SysFileLoader();
         #elseif js
         return new alphatab.platform.js.JsFileLoader();
         #else

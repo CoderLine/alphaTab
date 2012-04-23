@@ -132,7 +132,7 @@ var alphaTabWrapper;
             // update tablature
 			try
 			{
-				self.tablature.render(score.tracks[self.options.track]);
+				self.renderer.render(score.tracks[self.options.track]);
 			}
 			catch( e )
 			{
@@ -240,10 +240,10 @@ var alphaTabWrapper;
 
 		if(this.options.context == alphatab.platform.PlatformFactory.SVG_CANVAS) 
 		{
-			this.tablature.onFinished = function() 
+			this.renderer.onFinished = function() 
 			{
 				self.canvasWrapper.children().remove(); // remove old svg 
-				var canvas = self.tablature.canvas;
+				var canvas = self.renderer.canvas;
 				var svgElement = $(canvas.toSvg(true, "alphaTabSurface"));
                 self.canvas = svgElement;
 				self.canvasWrapper.append(svgElement);
@@ -262,10 +262,10 @@ var alphaTabWrapper;
         else if(this.options.context == alphatab.platform.PlatformFactory.SVG_CANVAS)
         {
             // ensure notify of error message
-            var canvas = this.tablature.canvas;
+            var canvas = this.renderer.canvas;
             canvas.setWidth(this.options.width);
             canvas.setHeight(this.options.height);
-            this.tablature.onFinished();
+            this.renderer.onFinished();
         }
     }
     
