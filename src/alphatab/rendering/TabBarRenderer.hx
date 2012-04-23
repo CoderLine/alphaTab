@@ -27,6 +27,11 @@ class TabBarRenderer extends GlyphBarRenderer
 	{
 		super.doLayout();
 		height = Std.int(getLineOffset() * (_bar.track.tuning.length - 1)) + (getNumberOverflow() * 2);
+		if (index == 0)
+		{
+			stave.registerStaveTop(getNumberOverflow());
+			stave.registerStaveBottom(height - getNumberOverflow());
+		}
 	}
 	
 	private override function createGlyphs():Void 
@@ -72,13 +77,6 @@ class TabBarRenderer extends GlyphBarRenderer
 		// 
 		
 		canvas.setColor(res.barSeperatorColor);
-		if (isFirstOfLine())
-		{
-			canvas.beginPath();
-			canvas.moveTo(cx + x, startY);
-			canvas.lineTo(cx + x, lineY);
-			canvas.stroke();
-		}
 		
 		canvas.beginPath();
 		canvas.moveTo(cx + x + width, startY);

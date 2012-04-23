@@ -2627,6 +2627,10 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Glyph
 	,doLayout: function() {
 		alphatab.rendering.GlyphBarRenderer.prototype.doLayout.call(this);
 		this.height = (9 * this.stave.staveGroup.layout.renderer.scale * 4 | 0) + this.getGlyphOverflow() * 2;
+		if(this.index == 0) {
+			this.stave.registerStaveTop(this.getGlyphOverflow());
+			this.stave.registerStaveBottom(this.height - this.getGlyphOverflow());
+		}
 	}
 	,createGlyphs: function() {
 		alphatab.rendering.GlyphBarRenderer.prototype.createGlyphs.call(this);
@@ -2653,12 +2657,6 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Glyph
 			canvas.stroke();
 		}
 		canvas.setColor(res.barSeperatorColor);
-		if(this.index == 0) {
-			canvas.beginPath();
-			canvas.moveTo(cx + this.x,startY);
-			canvas.lineTo(cx + this.x,lineY);
-			canvas.stroke();
-		}
 		canvas.beginPath();
 		canvas.moveTo(cx + this.x + this.width,startY);
 		canvas.lineTo(cx + this.x + this.width,lineY);
@@ -2751,6 +2749,10 @@ alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.GlyphBa
 	,doLayout: function() {
 		alphatab.rendering.GlyphBarRenderer.prototype.doLayout.call(this);
 		this.height = (11 * this.stave.staveGroup.layout.renderer.scale * (this._bar.track.tuning.length - 1) | 0) + this.getNumberOverflow() * 2;
+		if(this.index == 0) {
+			this.stave.registerStaveTop(this.getNumberOverflow());
+			this.stave.registerStaveBottom(this.height - this.getNumberOverflow());
+		}
 	}
 	,createGlyphs: function() {
 		alphatab.rendering.GlyphBarRenderer.prototype.createGlyphs.call(this);
@@ -2777,12 +2779,6 @@ alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.GlyphBa
 			canvas.stroke();
 		}
 		canvas.setColor(res.barSeperatorColor);
-		if(this.index == 0) {
-			canvas.beginPath();
-			canvas.moveTo(cx + this.x,startY);
-			canvas.lineTo(cx + this.x,lineY);
-			canvas.stroke();
-		}
 		canvas.beginPath();
 		canvas.moveTo(cx + this.x + this.width,startY);
 		canvas.lineTo(cx + this.x + this.width,lineY);
@@ -3088,8 +3084,16 @@ alphatab.rendering.staves.Stave.prototype = {
 	,x: null
 	,y: null
 	,height: null
+	,staveTop: null
 	,topSpacing: null
 	,bottomSpacing: null
+	,staveBottom: null
+	,registerStaveTop: function(offset) {
+		this.staveTop = offset + this.topSpacing;
+	}
+	,registerStaveBottom: function(offset) {
+		this.staveBottom = offset + this.bottomSpacing;
+	}
 	,addBar: function(bar) {
 		var renderer = this._factory.create(bar);
 		renderer.stave = this;
@@ -3201,6 +3205,49 @@ alphatab.rendering.staves.StaveGroup.prototype = {
 			var s = _g1[_g];
 			++_g;
 			s.paint(cx + this.x,cy + this.y,canvas);
+		}
+		var res = this.layout.renderer.renderingResources;
+		if(this.staves.length > 0) {
+			var firstStart = cy + this.y + this.staves[0].y + this.staves[0].staveTop;
+			var lastEnd = cy + this.y + this.staves[this.staves.length - 1].y + this.staves[this.staves.length - 1].staveBottom;
+			canvas.setColor(res.barSeperatorColor);
+			canvas.beginPath();
+			canvas.moveTo(cx + this.x + this.staves[0].x,firstStart);
+			canvas.lineTo(cx + this.x + this.staves[this.staves.length - 1].x,lastEnd);
+			canvas.stroke();
+			var barSize = 3 * this.layout.renderer.scale | 0;
+			var barOffset = barSize;
+			var accoladeStart = firstStart - barSize * 2;
+			var accoladeEnd = lastEnd + barSize * 2;
+			canvas.fillRect(cx + this.x - barOffset - barSize,accoladeStart,barSize,accoladeEnd - accoladeStart);
+			var spikeStartX = cx + this.x - barOffset - barSize;
+			var spikeEndX = cx + this.x + barSize * 2;
+			canvas.beginPath();
+			canvas.moveTo(spikeStartX,accoladeStart);
+			canvas.bezierCurveTo(spikeStartX,accoladeStart,this.x,accoladeStart,spikeEndX,accoladeStart - barSize);
+			canvas.bezierCurveTo(cx + this.x,accoladeStart + barSize,spikeStartX,accoladeStart + barSize,spikeStartX,accoladeStart + barSize);
+			canvas.closePath();
+			canvas.fill();
+			canvas.beginPath();
+			canvas.moveTo(spikeStartX,accoladeEnd);
+			canvas.bezierCurveTo(spikeStartX,accoladeStart,this.x,accoladeStart,spikeEndX,accoladeStart - barSize);
+			canvas.bezierCurveTo(cx + this.x,accoladeStart + barSize,spikeStartX,accoladeStart + barSize,spikeStartX,accoladeStart + barSize);
+			canvas.closePath();
+			canvas.beginPath();
+			canvas.moveTo(spikeStartX,accoladeEnd);
+			canvas.bezierCurveTo(spikeStartX,accoladeEnd,this.x,accoladeEnd,spikeEndX,accoladeEnd + barSize);
+			canvas.bezierCurveTo(this.x,accoladeEnd - barSize,spikeStartX,accoladeEnd - barSize,spikeStartX,accoladeEnd - barSize);
+			canvas.closePath();
+			canvas.fill();
+		}
+		if(this.staves.length > 0) {
+			var firstStart = cy + this.y + this.staves[0].y + this.staves[0].staveTop;
+			var lastEnd = cy + this.y + this.staves[this.staves.length - 1].y + this.staves[this.staves.length - 1].staveBottom;
+			canvas.setColor(res.barSeperatorColor);
+			canvas.beginPath();
+			canvas.moveTo(cx + this.x + this.staves[0].x,firstStart);
+			canvas.lineTo(cx + this.x + this.staves[this.staves.length - 1].x,lastEnd);
+			canvas.stroke();
 		}
 	}
 	,finalizeGroup: function(scoreLayout) {

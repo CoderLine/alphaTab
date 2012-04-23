@@ -21,6 +21,11 @@ class ScoreBarRenderer extends GlyphBarRenderer
 	{
 		super.doLayout();
 		height = Std.int(getLineOffset() * 4) + (getGlyphOverflow() * 2);
+		if (index == 0)
+		{
+			stave.registerStaveTop(getGlyphOverflow());
+			stave.registerStaveBottom(height - getGlyphOverflow());
+		}
 	}
 	
 	private override function createGlyphs():Void 
@@ -65,14 +70,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
 		// 
 		
 		canvas.setColor(res.barSeperatorColor);
-		if (isFirstOfLine())
-		{
-			canvas.beginPath();
-			canvas.moveTo(cx + x, startY);
-			canvas.lineTo(cx + x, lineY);
-			canvas.stroke();
-		}
-		
+
 		canvas.beginPath();
 		canvas.moveTo(cx + x + width, startY);
 		canvas.lineTo(cx + x + width, lineY);

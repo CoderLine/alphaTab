@@ -16,8 +16,21 @@ class Stave
 	public var x:Int;
 	public var y:Int;
 	public var height:Int;
+	
+	/**
+	 * This is the visual offset from top where the
+	 * stave contents actually start. Used for grouping 
+	 * using a accolade
+	 */
+	public var staveTop:Int;
 	public var topSpacing:Int;
 	public var bottomSpacing:Int;
+	/**
+	 * This is the visual offset from top where the
+	 * stave contents actually ends. Used for grouping 
+	 * using a accolade
+	 */	
+	public var staveBottom:Int;
 	
 	public function new(barRendererFactory:BarRendererFactory) 
 	{
@@ -25,6 +38,16 @@ class Stave
 		_factory = barRendererFactory;
 		topSpacing = 20;
 		bottomSpacing = 20;
+	}
+	
+	public function registerStaveTop(offset:Int)
+	{
+		staveTop = offset + topSpacing;
+	}
+	
+	public function registerStaveBottom(offset:Int)
+	{
+		staveBottom = offset + bottomSpacing;
 	}
 	
 	public function addBar(bar:Bar)
