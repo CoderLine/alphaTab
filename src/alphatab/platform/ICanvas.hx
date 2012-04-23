@@ -1,19 +1,24 @@
 package alphatab.platform;
+import alphatab.platform.model.Color;
+import alphatab.platform.model.Font;
+import alphatab.platform.model.TextAlign;
 
 /**
  * This is the base interface for canvas implementations on different plattforms.
  */
-interface Canvas 
+interface ICanvas 
 {
-    var width(getWidth, setWidth):Int;
-    var height(getHeight, setHeight):Int;
-        
+	function getWidth() : Int;
+	function setWidth(width:Int) : Void;
+	
+	function getHeight() : Int;
+	function setHeight(height:Int) : Void;
+	
     // colors and styles
-    var strokeStyle(getStrokeStyle, setStrokeStyle):String; //(default black);
-    var fillStyle(getFillStyle, setFillStyle):String; //(default black);
+	function setColor(color : Color) : Void; 
         
     // line caps/joins
-    var lineWidth(getLineWidth, setLineWidth):Float; // (default 1)
+	function setLineWidth(width:Float) : Void;
     
     // rects
     function clear():Void;
@@ -33,10 +38,11 @@ interface Canvas
     function stroke():Void;
 
     // text
-    var font(getFont, setFont):String; // (default 10px sans-serif)
-    var textBaseline(getTextBaseline, setTextBaseline):String; // "top", "hanging", "middle", "alphabetic", "ideographic", "bottom" (default: "alphabetic")
-    var textAlign(getTextAlign, setTextAlign):String; // "left", "right", "center", "start", "end"
-    function fillText(text:String, x:Float, y:Float, maxWidth:Float = 0):Void;
-    function strokeText(text:String, x:Float, y:Float, maxWidth:Float = 0):Void;
+	function setFont(font:Font) : Void;
+	
+	function setTextAlign(textAlign:TextAlign) : Void;
+	
+    function fillText(text:String, x:Float, y:Float):Void;
+    function strokeText(text:String, x:Float, y:Float):Void;
     function measureText(text:String):Float;    
 }

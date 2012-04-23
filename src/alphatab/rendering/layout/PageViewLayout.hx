@@ -3,7 +3,10 @@ import alphatab.model.Bar;
 import alphatab.model.Score;
 import alphatab.model.Track;
 import alphatab.model.Tuning;
-import alphatab.platform.Canvas;
+import alphatab.platform.ICanvas;
+import alphatab.platform.model.Color;
+import alphatab.platform.model.Font;
+import alphatab.platform.model.TextAlign;
 import alphatab.rendering.info.BarRenderingInfo;
 import alphatab.rendering.RenderingResources;
 import alphatab.rendering.ScoreRenderer;
@@ -130,11 +133,10 @@ class PageViewLayout extends ScoreLayout
 		y = paintScoreInfo(x, y);
 	}
 	
-	private function drawCentered(text:String, font:String, y:Int)
+	private function drawCentered(text:String, font:Font, y:Int)
 	{
-		renderer.canvas.font = font;
-		var x = (width - renderer.canvas.measureText(text)) / 2;
-		renderer.canvas.fillText(text, x, y);
+		renderer.canvas.setFont(font);
+		renderer.canvas.fillText(text, width/2, y);
 	}
 	
 	private function paintScoreInfo(x:Int, y:Int)
@@ -143,11 +145,11 @@ class PageViewLayout extends ScoreLayout
 		var score:Score = renderer.score;
 		var scale:Float = renderer.scale;
 		
-		var canvas:Canvas = renderer.canvas;
+		var canvas:ICanvas = renderer.canvas;
 		var res:RenderingResources = renderer.renderingResources;
 		
-		canvas.fillStyle = "#000000";
-		canvas.textBaseline = "top";
+		canvas.setColor(new Color(0, 0, 0));
+		canvas.setTextAlign(TextAlign.Center);
         
 		var tX:Float;
         var size:Float;
@@ -179,7 +181,7 @@ class PageViewLayout extends ScoreLayout
         }
         else 
         {
-			canvas.font = res.wordsFont;
+			canvas.setFont(res.wordsFont);
             if (score.music != "" && (flags & HeaderFooterElements.MUSIC != 0))
             {
 				var size = canvas.measureText(score.music);
@@ -197,11 +199,12 @@ class PageViewLayout extends ScoreLayout
         // tuning info
         if(!renderer.track.isPercussion)
         {
+			canvas.setTextAlign(TextAlign.Left);
             var tuning:Tuning = Tuning.findTuning(renderer.track.tuning);
             if(tuning != null)
             {
                 // Name
-				canvas.font = res.effectFont;
+				canvas.setFont(res.effectFont);
 				canvas.fillText(tuning.name, x, y);
                 
                 y += Math.floor(15*scale);
@@ -307,7 +310,7 @@ class PageViewLayout extends ScoreLayout
     
     private inline function getMaxWidth() : Int
     {
-        return (renderer.canvas.width - PAGE_PADDING[0] - PAGE_PADDING[2]);
+        return (renderer.canvas.getWidth() - PAGE_PADDING[0] - PAGE_PADDING[2]);
     }
     
 }

@@ -7,7 +7,6 @@ import alphatab.model.Beat;
 import alphatab.model.BendPoint;
 import alphatab.model.BrushType;
 import alphatab.model.Chord;
-import alphatab.model.Color;
 import alphatab.model.Duration;
 import alphatab.model.DynamicValue;
 import alphatab.model.GraceType;
@@ -410,7 +409,7 @@ class Gp3To5Importer extends ScoreImporter
             var section:Section = new Section();
             section.text = readStringIntByte();
             section.marker = "";
-            section.color = readColor();
+            readColor();
             newMasterBar.section = section;
         }
         
@@ -1469,14 +1468,12 @@ class Gp3To5Importer extends ScoreImporter
     #end
 
     
-    #if unit public #else private #end function readColor() : Color
+    #if unit public #else private #end function readColor() : Void
     {
-        var color:Color = new Color();
-        color.red = readUInt8();
-        color.green = readUInt8();
-        color.blue = readUInt8();
+        readUInt8();
+        readUInt8();
+        readUInt8();
         readUInt8(); // alpha?
-        return color;
     }
     
     private inline function readBool()

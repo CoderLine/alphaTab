@@ -1,12 +1,15 @@
 package alphatab.platform.js;
 
 #if js
-import alphatab.platform.Canvas;
+import alphatab.platform.ICanvas;
+import alphatab.platform.model.Color;
+import alphatab.platform.model.Font;
+import alphatab.platform.model.TextAlign;
 
 /**
  * A canvas implementation for HTML5 canvas
  */
-class Html5Canvas implements Canvas 
+class Html5Canvas implements ICanvas 
 {
     private var _canvas:Dynamic;
     private var _context:Dynamic;
@@ -15,75 +18,50 @@ class Html5Canvas implements Canvas
     {  
         this._canvas = dom;
         this._context = dom.getContext("2d");
+		this._context.textBaseline = "top";
     }
     
-    public var width(getWidth, setWidth):Int;
-    public var height(getHeight, setHeight):Int;
-    
-    private function getWidth():Int 
+    public function getWidth():Int 
     {
         return _canvas.offsetWidth; 
     }
     
-    private function getHeight():Int 
+    public function getHeight():Int 
     {
         return _canvas.offsetHeight;
     }
     
-    private function setWidth(width:Int):Int 
+    public function setWidth(width:Int):Void 
     {
         this._canvas.width = width;
         this._context = this._canvas.getContext("2d");
-        return width;
+		this._context.textBaseline = "top";
     }
     
-    private function setHeight(height:Int):Int 
+    public function setHeight(height:Int):Void 
     {
         this._canvas.height = height;
         this._context = this._canvas.getContext("2d");
-        return height;
+		this._context.textBaseline = "top";
     } 
     
     // colors and styles
-    public var strokeStyle(getStrokeStyle, setStrokeStyle):String;
-    
-    private function getStrokeStyle() : String
-    {
-        return this._context.strokeStyle;
-    } 
-    private function setStrokeStyle(value:String) : String
-    {
-        this._context.strokeStyle = value; 
-        return this._context.strokeStyle;
-    }
-    
-    public var fillStyle(getFillStyle, setFillStyle):String;
-    private function getFillStyle() : String
-    {
-        return this._context.fillStyle;
-    }
-    private function setFillStyle(value:String) : String
-    {
-        this._context.fillStyle = value;
-        return this._context.fillStyle;
-    }
-    
+	public function setColor(color : Color) : Void
+	{
+		this._context.strokeStyle = color.toHexString();
+		this._context.fillStyle = color.toHexString();
+	}
+
     // line caps/joins
-    public var lineWidth(getLineWidth, setLineWidth):Float;
-    private function getLineWidth() : Float
-    {
-        return this._context.lineWidth;
-    }
-    private function setLineWidth(value:Float) : Float
+    public function setLineWidth(value:Float) : Void
     {
         this._context.lineWidth = value;
-        return this._context.lineWidth;
     }
     
     // rects
     public function clear():Void
     {
-        this._context.clearRect(0,0, width, height);
+        this._context.clearRect(0,0, getWidth(), getHeight());
     }
     public function fillRect(x:Float, y:Float, w:Float, h:Float):Void
     {
@@ -137,60 +115,31 @@ class Html5Canvas implements Canvas
     }
 
     // text
-    public var font(getFont, setFont):String; 
-    private function getFont() : String
+    public function setFont(font:Font) : Void
     {
-        return this._context.font;
+        this._context.font = font.toCssString();
     }
-    private function setFont(value:String) : String
+     
+    public function setTextAlign(value:TextAlign) : Void
     {
-        this._context.font = value;
-        return this._context.font;
-    }
-    
-    public var textBaseline(getTextBaseline, setTextBaseline):String; 
-    private function getTextBaseline() : String
-    {
-        return this._context.textBaseline;
-    }
-    private function setTextBaseline(value:String) : String
-    {
-        this._context.textBaseline = value;
-        return this._context.textBaseLine;
-    }
-
-    public var textAlign(getTextAlign, setTextAlign):String; 
-    private function getTextAlign() : String
-    {
-        return this._context.textAlign;
-    }
-    private function setTextAlign(value:String) : String
-    {
-        this._context.textAlign = value;
-        return this._context.textAlign;
+		switch(value)
+		{
+			case Left:
+				this._context.textAlign = "left";
+			case Center:
+				this._context.textAlign = "center";
+			case Right:
+				this._context.textAlign = "right";
+		}
     }
     
-    public function fillText(text:String, x:Float, y:Float, maxWidth:Float = 0):Void
+    public function fillText(text:String, x:Float, y:Float):Void
     {
-        if (maxWidth == 0)
-        {
-            this._context.fillText(text, x, y);
-        }
-        else
-        {
-            this._context.fillText(text, x, y, maxWidth);
-        }
+		this._context.fillText(text, x, y);
     }
-    public function strokeText(text:String, x:Float, y:Float, maxWidth:Float = 0):Void
+    public function strokeText(text:String, x:Float, y:Float):Void
     {
-        if (maxWidth == 0)
-        {
-            this._context.strokeText(text, x, y);
-        }
-        else
-        {
-            this._context.strokeText(text, x, y, maxWidth);
-        }
+		this._context.strokeText(text, x, y);
     }
     public function measureText(text:String):Float
     {

@@ -1,6 +1,9 @@
 package alphatab.platform.svg;
 
-import alphatab.platform.Canvas;
+import alphatab.platform.ICanvas;
+import alphatab.platform.model.Color;
+import alphatab.platform.model.Font;
+import alphatab.platform.model.TextAlign;
 import haxe.io.BytesOutput;
 import haxe.io.Output;
 
@@ -9,7 +12,7 @@ using alphatab.io.OutputExtensions;
 /**
  * A canvas implementation storing SVG data
  */
-class SvgCanvas implements Canvas
+class SvgCanvas implements ICanvas
 {
     private var _buffer:StringBuf;
     private var _currentPath:StringBuf;
@@ -23,14 +26,12 @@ class SvgCanvas implements Canvas
         _buffer = new StringBuf();
         _currentPath = new StringBuf();
         _currentPathIsEmpty = true;
-        strokeStyle = "#FFFFFF";
-        fillStyle = "#FFFFFF";
-        lineWidth = 1;
+        _color = new Color(255, 255, 255);
+        _lineWidth = 1;
         _width = 0;
         _height = 0;
-        font = "10px sans-serif";
-        textBaseline = "alphabetic";
-        textAlign = "left";
+        _font = new Font("sans-serif", 10);
+        _textAlign = TextAlign.Left;
     }
     
     public function writeTo(stream:Output, includeWrapper:Bool, className:String = null)
@@ -65,68 +66,38 @@ class SvgCanvas implements Canvas
         return out.getBytes().toString();       
     }
     
-    public var width(getWidth, setWidth):Int;
-    public var height(getHeight, setHeight):Int;
-    
-    private function getWidth():Int 
+    public function getWidth():Int 
     {
         return _width; 
     }
     
-    private function getHeight():Int 
+    public function getHeight():Int 
     {
         return _height;
     }
     
-    private function setWidth(width:Int):Int 
+    public function setWidth(width:Int):Void 
     {
         _width = width;
-        return _width;
     }
     
-    private function setHeight(height:Int):Int 
+    public function setHeight(height:Int):Void 
     {
         _height = height;
-        return _height;
     } 
     
     // colors and styles
-    private var _strokeStyle:String;
-    public var strokeStyle(getStrokeStyle, setStrokeStyle):String;
-    
-    private function getStrokeStyle() : String
-    {
-        return _strokeStyle;
-    } 
-    private function setStrokeStyle(value:String) : String
-    {
-        _strokeStyle = value; 
-        return _strokeStyle;
-    }
-    
-    private var _fillStyle:String;
-    public var fillStyle(getFillStyle, setFillStyle):String;
-    private function getFillStyle() : String
-    {
-        return _fillStyle;
-    }
-    private function setFillStyle(value:String) : String
-    {
-        _fillStyle = value;
-        return _fillStyle;
-    }
+	private var _color:Color;
+	public function setColor(color : Color) : Void
+	{
+		_color = color;
+	}
     
     // line caps/joins
     private var _lineWidth:Float;
-    public var lineWidth(getLineWidth, setLineWidth):Float;
-    private function getLineWidth() : Float
-    {
-        return _lineWidth;
-    }
-    private function setLineWidth(value:Float) : Float
+    public function setLineWidth(value:Float) : Void
     {
         _lineWidth = value;
-        return _lineWidth;
     }
     
     // rects
@@ -148,7 +119,7 @@ class SvgCanvas implements Canvas
         _buffer.add('" height="');
         _buffer.add(h);
         _buffer.add('" style="fill:');
-        _buffer.add(fillStyle);
+        _buffer.add(_color.toHexString());
         _buffer.add(';" />\n'); 
     }
     
@@ -163,16 +134,15 @@ class SvgCanvas implements Canvas
         _buffer.add('" height="');
         _buffer.add(h);
         _buffer.add('" style="stroke:');
-        _buffer.add(strokeStyle);
+        _buffer.add(_color.toHexString());
         _buffer.add('; stroke-width:');
-        _buffer.add(lineWidth);
+        _buffer.add(_lineWidth);
         _buffer.add(';" />\n'); 
     }
 
     // path API
     public function beginPath():Void
     {
-        // TODO: check how to start a new path
     }
     public function closePath():Void
     {
@@ -277,7 +247,7 @@ class SvgCanvas implements Canvas
             _buffer.add('<path d="');
             _buffer.add(_currentPath.toString());
             _buffer.add('" style="fill:');
-            _buffer.add(fillStyle);
+            _buffer.add(_color.toHexString());
             _buffer.add('" stroke="none"/>\n');
         }
         _currentPath = new StringBuf();
@@ -290,9 +260,9 @@ class SvgCanvas implements Canvas
             _buffer.add('<path d="');
             _buffer.add(_currentPath.toString());
             _buffer.add('" style="stroke:');
-            _buffer.add(strokeStyle);
+            _buffer.add(_color.toHexString());
             _buffer.add('; stroke-width:');
-            _buffer.add(lineWidth);
+            _buffer.add(_lineWidth);
             _buffer.add(';" fill="none" />\n'); 
         }
         _currentPath = new StringBuf();
@@ -300,59 +270,29 @@ class SvgCanvas implements Canvas
     }
 
     // text
-    private var _font:String; 
-    public var font(getFont, setFont):String; 
-    private function getFont() : String
+    private var _font:Font; 
+    public function setFont(font:Font) : Void
     {
-        return _font;
-    }
-    private function setFont(value:String) : String
-    {
-        _font = value;
-        return _font;
-    }
-    
-    private var _textBaseline:String; 
-    public var textBaseline(getTextBaseline, setTextBaseline):String; 
-    private function getTextBaseline() : String
-    {
-        return _textBaseline;
-    }
-    private function setTextBaseline(value:String) : String
-    {
-        _textBaseline = value;
-        return _textBaseline;
+        _font = font;
     }
 
-    private var _textAlign:String; 
-    public var textAlign(getTextAlign, setTextAlign):String; 
-    private function getTextAlign() : String
+    private var _textAlign:TextAlign; 
+    public function setTextAlign(textAlign:TextAlign) : Void
     {
-        return _textAlign;
-    }
-    private function setTextAlign(value:String) : String
-    {
-        _textAlign = value;
-        return _textAlign;
+        _textAlign = textAlign;
     }
     
-    public function fillText(text:String, x:Float, y:Float, maxWidth:Float = 0):Void
+    public function fillText(text:String, x:Float, y:Float):Void
     {
         _buffer.add('<text x="');
         _buffer.add(x);
         _buffer.add('" y="');
         _buffer.add(y);
         _buffer.add('" style="font:');
-        _buffer.add(font);
+        _buffer.add(_font.toCssString());
         _buffer.add('; fill:');
-        _buffer.add(fillStyle);
+        _buffer.add(_color.toHexString());
         _buffer.add(';" ');
-        if (maxWidth != 0)
-        {
-            _buffer.add('width="');
-            _buffer.add(maxWidth);
-            _buffer.add('"');
-        }
         _buffer.add(' dominant-baseline="');
         _buffer.add(getSvgBaseLine());       
         _buffer.add('" text-anchor="');
@@ -361,25 +301,19 @@ class SvgCanvas implements Canvas
         _buffer.add(text);
         _buffer.add("</text>\n");
     }
-    public function strokeText(text:String, x:Float, y:Float, maxWidth:Float = 0):Void
+    public function strokeText(text:String, x:Float, y:Float):Void
     {
         _buffer.add('<text x="');
         _buffer.add(x);
         _buffer.add('" y="');
         _buffer.add(y);
         _buffer.add('" style="font:');
-        _buffer.add(font);
+        _buffer.add(_font.toCssString());
         _buffer.add('" stroke:');
-        _buffer.add(strokeStyle);
+        _buffer.add(_color.toHexString());
         _buffer.add('; stroke-width:');
-        _buffer.add(lineWidth);
+        _buffer.add(_lineWidth);
         _buffer.add(';" ');
-        if (maxWidth != 0)
-        {
-            _buffer.add('width="');
-            _buffer.add(maxWidth);
-            _buffer.add('"');
-        }
         _buffer.add(' dominant-baseline="');
         _buffer.add(getSvgBaseLine());       
         _buffer.add('" text-anchor="');
@@ -391,56 +325,26 @@ class SvgCanvas implements Canvas
     
     private function getSvgTextAlignment() : String
     {
-        switch(textAlign) 
+        switch(_textAlign) 
         {
-            case "left": return "start";
-            case "right": return "end";
-            case "center": return "middle";
-            case "start": return "start";
-            case "end": return "end";
+            case Left: return "start";
+            case Center: return "middle";
+            case Right: return "end";
             default: return "start";
         }
     }    
-    private function getSvgBaseLine() : String
+    private inline function getSvgBaseLine() : String
     {
-        switch(textBaseline) 
-        {
-            case "top": return "top";
-            case "hanging": return "hanging";
-            case "middle": return "central";
-            case "alphabetic": return "alphabetic";
-            case "ideographic": return "ideographic";
-            case "bottom": return "bottom";
-            default: return "alphabetic";
-        }
+		return "top";
     }
     
     
     public function measureText(text:String):Float
     {
         var font:SupportedFonts = SupportedFonts.Arial;
-        if (this.font.indexOf("Times") >= 0) {
+        if (_font.getFamily().indexOf("Times") >= 0) {
             font = SupportedFonts.TimesNewRoman;
         }
-        var size = "";
-        var preparedFont = this.font;
-        if (preparedFont.indexOf("bold ") == 0) 
-        {
-            preparedFont = preparedFont.substr(5);
-        }
-        if (preparedFont.indexOf("italic ") == 0) 
-        {
-            preparedFont = preparedFont.substr(7);
-        }
-        
-        for (i in 0 ... preparedFont.length) {
-            var c = preparedFont.charCodeAt(i); 
-            if ((c < 0x30 || c > 0x39) && c != 0x2E && c != 0x20) { // 0-9, . and space 
-                break;
-            }
-            size += preparedFont.charAt(i);
-        }
-        
-        return FontSizes.measureString(text, font, Std.parseFloat(size));
+        return FontSizes.measureString(text, font, _font.getSize());
     }
 }

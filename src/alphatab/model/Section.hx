@@ -8,7 +8,6 @@ class Section
 {
     public var marker:String;
     public var text:String;
-    public var color:Color;
     
     public function new() 
     {

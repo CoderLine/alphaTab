@@ -1,7 +1,9 @@
 package alphatab.rendering;
 import alphatab.model.Score;
 import alphatab.model.Track;
-import alphatab.platform.Canvas;
+import alphatab.platform.ICanvas;
+import alphatab.platform.model.Color;
+import alphatab.platform.model.TextAlign;
 import alphatab.platform.PlatformFactory;
 import alphatab.rendering.layout.PageViewLayout;
 import alphatab.rendering.layout.ScoreLayout;
@@ -12,7 +14,7 @@ import alphatab.rendering.layout.ScoreLayout;
  */
 class ScoreRenderer 
 {
-    public var canvas : Canvas;
+    public var canvas : ICanvas;
     public var score(getScore, null) : Score;
     public var track : Track;
     public var scale : Float;
@@ -57,8 +59,8 @@ class ScoreRenderer
     private function doLayout()
     {
         layout.doLayout();
-		canvas.height = layout.height;
-		canvas.width = layout.width;
+		canvas.setHeight(layout.height);
+		canvas.setWidth(layout.width);
     }
     
     private function paintScore()
@@ -71,11 +73,12 @@ class ScoreRenderer
     {
         // attention, you are not allowed to remove change this notice within any version of this library without permission!
         var msg = "Rendered using alphaTab (http://www.alphaTab.net)";
-        canvas.fillStyle = "#4e4e4e";
-        canvas.font = renderingResources.copyrightFont;
-        canvas.textBaseline = "top";
-        var x:Float = (canvas.width - canvas.measureText(msg)) / 2;
-        canvas.fillText(msg, x, canvas.height - 18);
+        canvas.setColor(new Color(62, 62, 62));
+        canvas.setFont(renderingResources.copyrightFont);
+		canvas.setTextAlign(TextAlign.Center);
+		
+        var x:Float = canvas.getWidth() / 2;
+        canvas.fillText(msg, x, canvas.getHeight() - (renderingResources.copyrightFont.getSize() * 2));
     }
 	
 	//

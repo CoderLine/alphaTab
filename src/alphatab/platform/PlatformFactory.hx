@@ -35,7 +35,7 @@ class PlatformFactory
     }
     
     public static var SVG_CANVAS = "svg";
-    public static function getCanvas(object:Dynamic) : Canvas
+    public static function getCanvas(object:Dynamic) : ICanvas
     {
         if (object == SVG_CANVAS) // all Platforms
         {

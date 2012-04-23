@@ -1,12 +1,13 @@
 package alphatab.rendering;
+import alphatab.platform.model.Font;
 
 class RenderingResources 
 {
-    public var copyrightFont:String;
-	public var titleFont:String;
-    public var subTitleFont:String;
-    public var wordsFont:String;
-    public var effectFont:String;
+    public var copyrightFont:Font;
+	public var titleFont:Font;
+    public var subTitleFont:Font;
+    public var wordsFont:Font;
+    public var effectFont:Font;
 
 
     public function new(scale:Float)
@@ -16,24 +17,14 @@ class RenderingResources
     
     public function init(scale:Float) : Void
     { 
-        var sansFont = "'Arial'";
-        var serifFont = "'Times New Roman'";
+        var sansFont = "Arial";
+        var serifFont = "Times New Roman";
         
-		effectFont = "italic " + formatFontSize(11 * scale) + " " + serifFont;
-
-        copyrightFont =  "bold " + formatFontSize(12 * scale) + " " + sansFont;
+		effectFont = new Font(serifFont, 11 * scale, Font.STYLE_ITALIC);
+		copyrightFont = new Font(sansFont, 12 * scale, Font.STYLE_BOLD);
 		
-		titleFont =  formatFontSize(32*scale) + " " + serifFont;
-        subTitleFont = formatFontSize(20 * scale) + " " + serifFont;
-        wordsFont =  formatFontSize(15 * scale) + " " + serifFont;
+		titleFont = new Font(serifFont, 32 * scale);
+		subTitleFont = new Font(serifFont, 20 * scale);
+		wordsFont = new Font(serifFont, 15 * scale);
 	}
-    
-    private static function formatFontSize(size:Float) 
-    {
-        // round to 2 decimal places
-        var num = size;
-        num = num * Math.pow(10, 2);
-        num = Math.round( num ) / Math.pow(10, 2);
-        return Std.string(num) + "px";
-    }
 }
