@@ -1,3 +1,19 @@
+/*
+ * This file is part of alphaTab.
+ *
+ *  alphaTab is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  alphaTab is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package alphatab.importer;
 import alphatab.model.AccentuationType;
 import alphatab.model.Automation;
@@ -25,7 +41,9 @@ import alphatab.model.Voice;
 import haxe.io.Bytes;
 import haxe.Stack;
 
-
+/**
+ * This ScoreImporter can read Guitar Pro 3 to 5 files.
+ */
 class Gp3To5Importer extends ScoreImporter
 {
     private static inline var VERSION_STRING = "FICHIER GUITAR PRO ";

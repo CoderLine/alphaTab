@@ -1,3 +1,19 @@
+/*
+ * This file is part of alphaTab.
+ *
+ *  alphaTab is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  alphaTab is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package alphatab.rendering.staves;
 import alphatab.model.Bar;
 import alphatab.platform.ICanvas;
@@ -5,6 +21,10 @@ import alphatab.platform.model.Color;
 import alphatab.rendering.BarRendererBase;
 import alphatab.rendering.layout.ScoreLayout;
 
+/**
+ * A stave consists of a list of different staves and groups
+ * them using an accolade. 
+ */
 class StaveGroup 
 {
 	public var x:Int;
@@ -16,6 +36,7 @@ class StaveGroup
      * the bars will not get stretched.
      */
     public var isFull:Bool;
+	
     /**
      * The width that the content bars actually need
      */
@@ -133,8 +154,8 @@ class StaveGroup
             var barSize:Int = Std.int(3 * layout.renderer.scale);
             var barOffset:Int = barSize;
 			
-			var accoladeStart = firstStart - (barSize*2);
-			var accoladeEnd = lastEnd + (barSize*2);
+			var accoladeStart = firstStart - (barSize*4);
+			var accoladeEnd = lastEnd + (barSize*4);
             
             canvas.fillRect(cx + x - barOffset - barSize, accoladeStart, barSize, accoladeEnd - accoladeStart);
             
@@ -163,27 +184,6 @@ class StaveGroup
             canvas.closePath();
 			
 			canvas.fill();
-
-            //
-            //
-            //// Draw Line for grouping
-            //var lineTopY = firstStaveY + firstStave.spacing.get(firstStave.getLineTopSpacing());
-            //var lineBottomY = lastStaveY + lastStave.spacing.get(lastStave.getLineBottomSpacing());
-            //
-            //draw.addLine(x, lineTopY, x, lineBottomY);
-		}
-		if (staves.length > 0)
-		{
-			
-			var firstStart = cy + y + staves[0].y + staves[0].staveTop;
-			var lastEnd = cy + y + staves[staves.length - 1].y + staves[staves.length - 1].staveBottom;
-			
-			canvas.setColor(res.barSeperatorColor);
-			
-			canvas.beginPath();
-			canvas.moveTo(cx + x + staves[0].x, firstStart);
-			canvas.lineTo(cx + x + staves[staves.length - 1].x, lastEnd);
-			canvas.stroke();
 		}
 	}
 	

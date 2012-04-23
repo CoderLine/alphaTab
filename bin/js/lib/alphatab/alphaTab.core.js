@@ -3044,7 +3044,7 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 	,createStaveGroup: function(currentBarIndex) {
 		var group = this.createEmptyStaveGroup();
 		var maxWidth = this.getSheetWidth() - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0] - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2];
-		haxe.Log.trace(maxWidth,{ fileName : "PageViewLayout.hx", lineNumber : 276, className : "alphatab.rendering.layout.PageViewLayout", methodName : "createStaveGroup"});
+		haxe.Log.trace(maxWidth,{ fileName : "PageViewLayout.hx", lineNumber : 295, className : "alphatab.rendering.layout.PageViewLayout", methodName : "createStaveGroup"});
 		var _g1 = currentBarIndex, _g = this.renderer.track.bars.length;
 		while(_g1 < _g) {
 			var i = _g1++;
@@ -3217,8 +3217,8 @@ alphatab.rendering.staves.StaveGroup.prototype = {
 			canvas.stroke();
 			var barSize = 3 * this.layout.renderer.scale | 0;
 			var barOffset = barSize;
-			var accoladeStart = firstStart - barSize * 2;
-			var accoladeEnd = lastEnd + barSize * 2;
+			var accoladeStart = firstStart - barSize * 4;
+			var accoladeEnd = lastEnd + barSize * 4;
 			canvas.fillRect(cx + this.x - barOffset - barSize,accoladeStart,barSize,accoladeEnd - accoladeStart);
 			var spikeStartX = cx + this.x - barOffset - barSize;
 			var spikeEndX = cx + this.x + barSize * 2;
@@ -3239,15 +3239,6 @@ alphatab.rendering.staves.StaveGroup.prototype = {
 			canvas.bezierCurveTo(this.x,accoladeEnd - barSize,spikeStartX,accoladeEnd - barSize,spikeStartX,accoladeEnd - barSize);
 			canvas.closePath();
 			canvas.fill();
-		}
-		if(this.staves.length > 0) {
-			var firstStart = cy + this.y + this.staves[0].y + this.staves[0].staveTop;
-			var lastEnd = cy + this.y + this.staves[this.staves.length - 1].y + this.staves[this.staves.length - 1].staveBottom;
-			canvas.setColor(res.barSeperatorColor);
-			canvas.beginPath();
-			canvas.moveTo(cx + this.x + this.staves[0].x,firstStart);
-			canvas.lineTo(cx + this.x + this.staves[this.staves.length - 1].x,lastEnd);
-			canvas.stroke();
 		}
 	}
 	,finalizeGroup: function(scoreLayout) {
