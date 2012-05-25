@@ -36,6 +36,7 @@ class Stave
 	public var x:Int;
 	public var y:Int;
 	public var height:Int;
+	public var index:Int;
 	
 	/**
 	 * This is the visual offset from top where the

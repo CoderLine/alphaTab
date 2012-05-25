@@ -43,5 +43,9 @@ class Voice
         }
         beats.push(beat);
     }
-    
+	
+	public function isEmpty() : Bool
+	{
+		return beats.length == 0;
+	}    
 }

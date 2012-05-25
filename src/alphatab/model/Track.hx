@@ -38,6 +38,7 @@ class Track
     {
         tuning = new Array<Int>();
         bars = new Array<Bar>();
+		playbackInfo = new PlaybackInformation();
     }
     
     public function addBar(bar:Bar)

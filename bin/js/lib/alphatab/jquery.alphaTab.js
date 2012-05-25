@@ -104,6 +104,22 @@ var alphaTabWrapper;
         // public operations (API)
         //
 
+        this.loadAlphaTex = function(tex)
+        {
+			try
+			{
+				var parser = new alphatab.importer.AlphaTexImporter();
+				var data = new haxe.io.BytesInput(haxe.io.Bytes.ofString(tex));
+				parser.init(data);
+                var score = parser.readScore();
+				scoreLoaded(score);
+			}
+			catch(e)
+			{
+                scoreError(e);
+			}
+        }		
+
         this.loadFile = function(url)
         {
             try
@@ -136,7 +152,7 @@ var alphaTabWrapper;
 			}
 			catch( e )
 			{
-				alert(e);
+				scoreError(e);
 			}
             // additional plugin callbacks
             for(var i = 0; i < self.loadCallbacks.length; i++)
@@ -155,7 +171,7 @@ var alphaTabWrapper;
             }
             else
             {
-                alert(msg);
+                console.error(msg);
             }
         }
 

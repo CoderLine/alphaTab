@@ -91,6 +91,7 @@ class StaveGroup
 	public function addStave(stave:Stave) 
 	{
 		stave.staveGroup = this;
+		stave.index = staves.length;
 		staves.push(stave);
 	}
 	

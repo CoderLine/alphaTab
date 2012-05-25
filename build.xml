@@ -37,6 +37,30 @@
             <arg value="${haxe-js}" />
         </exec>
 	</target>	
+	
+    <!--*************************************************************************
+        Building C#
+    **************************************************************************-->
+    
+    <property name="haxe-cs" location="${bin}/cs"/>
+    
+	<!-- Haxe Builds -->
+	<target name="cs">
+		<delete dir="${haxe-cs}" />
+        <exec executable="haxe" failonerror="true">
+            <arg value="-cp" />
+            <arg value="${src}"/>
+            
+            <arg value="-D" />
+            <arg value="haxe3" />
+			
+            <arg value="-main" />
+            <arg value="alphatab.Main" />
+            
+            <arg value="-cs" />
+            <arg value="${haxe-cs}" />
+        </exec>
+	</target>	
 
     <!--*************************************************************************
         UnitTests

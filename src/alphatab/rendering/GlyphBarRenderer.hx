@@ -27,12 +27,10 @@ class GlyphBarRenderer extends BarRendererBase
 {
 	public static inline var FirstGlyphSpacing = 10;
 
-	private var _bar:Bar;
 	public var glyphs:Array<Glyph>;
 	private function new(bar:Bar) 
 	{
-		super();
-		_bar = bar;
+		super(bar);
 		glyphs = new Array<Glyph>();
 	}
 	
@@ -43,13 +41,11 @@ class GlyphBarRenderer extends BarRendererBase
 	
 	private function createGlyphs() : Void
 	{
-		var lay = getLayout();
-		addGlyph(new SpacingGlyph(0, 0, Std.int(10 * lay.renderer.scale)));
 	}
 		
 	private function addGlyph(glyph:Glyph) : Void
 	{
-		glyph.x = width;
+		glyph.x = width + glyph.x;
 		glyph.index = glyphs.length;
 		glyph.renderer = this;
 		glyph.doLayout();

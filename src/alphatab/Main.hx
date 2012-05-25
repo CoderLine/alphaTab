@@ -17,6 +17,7 @@
 package alphatab;
 
 import alphatab.importer.Gp3To5Importer;
+import alphatab.importer.AlphaTexImporter;
 import alphatab.importer.ScoreLoader;
 
 import alphatab.rendering.ScoreRenderer;

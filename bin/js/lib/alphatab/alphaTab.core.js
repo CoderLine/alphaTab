@@ -1,10 +1,10 @@
-var $_, $hxClasses = $hxClasses || {}, $estr = function() { return js.Boot.__string_rec(this,''); }
+var $_, $estr = function() { return js.Boot.__string_rec(this,''); };;
 function $extend(from, fields) {
 	function inherit() {}; inherit.prototype = from; var proto = new inherit();
 	for (var name in fields) proto[name] = fields[name];
 	return proto;
 }
-var EReg = $hxClasses["EReg"] = function(r,opt) {
+var EReg = function(r,opt) {
 	opt = opt.split("u").join("");
 	this.r = new RegExp(r,opt);
 };
@@ -12,6 +12,7 @@ EReg.__name__ = ["EReg"];
 EReg.prototype = {
 	r: null
 	,match: function(s) {
+		if(this.r.global) this.r.lastIndex = 0;
 		this.r.m = this.r.exec(s);
 		this.r.s = s;
 		return this.r.m != null;
@@ -56,7 +57,7 @@ EReg.prototype = {
 	}
 	,__class__: EReg
 }
-var Hash = $hxClasses["Hash"] = function() {
+var Hash = function() {
 	this.h = { };
 };
 Hash.__name__ = ["Hash"];
@@ -108,7 +109,7 @@ Hash.prototype = {
 	}
 	,__class__: Hash
 }
-var IntIter = $hxClasses["IntIter"] = function(min,max) {
+var IntIter = function(min,max) {
 	this.min = min;
 	this.max = max;
 };
@@ -124,7 +125,7 @@ IntIter.prototype = {
 	}
 	,__class__: IntIter
 }
-var Std = $hxClasses["Std"] = function() { }
+var Std = function() { }
 Std.__name__ = ["Std"];
 Std["is"] = function(v,t) {
 	return js.Boot.__instanceof(v,t);
@@ -150,7 +151,7 @@ Std.random = function(x) {
 Std.prototype = {
 	__class__: Std
 }
-var StringBuf = $hxClasses["StringBuf"] = function() {
+var StringBuf = function() {
 	this.b = new Array();
 };
 StringBuf.__name__ = ["StringBuf"];
@@ -170,7 +171,7 @@ StringBuf.prototype = {
 	,b: null
 	,__class__: StringBuf
 }
-var StringTools = $hxClasses["StringTools"] = function() { }
+var StringTools = function() { }
 StringTools.__name__ = ["StringTools"];
 StringTools.urlEncode = function(s) {
 	return encodeURIComponent(s);
@@ -260,7 +261,7 @@ StringTools.prototype = {
 	__class__: StringTools
 }
 var alphatab = alphatab || {}
-alphatab.Main = $hxClasses["alphatab.Main"] = function() { }
+alphatab.Main = function() { }
 alphatab.Main.__name__ = ["alphatab","Main"];
 alphatab.Main.main = function() {
 }
@@ -268,12 +269,13 @@ alphatab.Main.prototype = {
 	__class__: alphatab.Main
 }
 if(!alphatab.importer) alphatab.importer = {}
-alphatab.importer.ScoreImporter = $hxClasses["alphatab.importer.ScoreImporter"] = function() {
+alphatab.importer.ScoreImporter = function() {
 };
 alphatab.importer.ScoreImporter.__name__ = ["alphatab","importer","ScoreImporter"];
 alphatab.importer.ScoreImporter.availableImporters = function() {
 	var scoreImporter = new Array();
 	scoreImporter.push(new alphatab.importer.Gp3To5Importer());
+	scoreImporter.push(new alphatab.importer.AlphaTexImporter());
 	return scoreImporter;
 }
 alphatab.importer.ScoreImporter.prototype = {
@@ -284,58 +286,8 @@ alphatab.importer.ScoreImporter.prototype = {
 	,readScore: function() {
 		return null;
 	}
-	,__class__: alphatab.importer.ScoreImporter
-}
-alphatab.importer.Gp3To5Importer = $hxClasses["alphatab.importer.Gp3To5Importer"] = function() {
-	alphatab.importer.ScoreImporter.call(this);
-	this._globalTripletFeel = alphatab.model.TripletFeel.NoTripletFeel;
-};
-alphatab.importer.Gp3To5Importer.__name__ = ["alphatab","importer","Gp3To5Importer"];
-alphatab.importer.Gp3To5Importer.__super__ = alphatab.importer.ScoreImporter;
-alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImporter.prototype,{
-	_versionNumber: null
-	,_score: null
-	,_tempo: null
-	,_keySignature: null
-	,_octave: null
-	,_globalTripletFeel: null
-	,_lyricsIndex: null
-	,_lyrics: null
-	,_lyricsTrack: null
-	,_barCount: null
-	,_trackCount: null
-	,_beatTapping: null
-	,_playbackInfos: null
-	,readScore: function() {
-		this.readVersion();
-		this._score = new alphatab.model.Score();
-		this.readScoreInformation();
-		if(this._versionNumber < 500) this._globalTripletFeel = this._data.readByte() != 0?alphatab.model.TripletFeel.Triplet8th:alphatab.model.TripletFeel.NoTripletFeel;
-		if(this._versionNumber >= 400) this.readLyrics();
-		if(this._versionNumber >= 510) this._data.read(19);
-		if(this._versionNumber >= 500) {
-			this.readPageSetup();
-			this._score.tempoLabel = this.readStringIntByte();
-		}
-		this._tempo = this.readInt32();
-		if(this._versionNumber >= 510) this._data.readByte() != 0;
-		this._keySignature = this.readInt32();
-		if(this._versionNumber >= 400) this._octave = this._data.readByte();
-		this.readPlaybackInfos();
-		if(this._versionNumber >= 500) {
-			this._data.read(38);
-			this._data.read(4);
-		}
-		this._barCount = this.readInt32();
-		this._trackCount = this.readInt32();
-		this.readMasterBars();
-		this.readTracks();
-		this.readBars();
-		this.finish();
-		return this._score;
-	}
-	,finish: function() {
-		var _g = 0, _g1 = this._score.tracks;
+	,finish: function(score) {
+		var _g = 0, _g1 = score.tracks;
 		while(_g < _g1.length) {
 			var t = _g1[_g];
 			++_g;
@@ -389,6 +341,725 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 			if(noteOnString != null) return noteOnString; else previousBeat = previousBeat.previousBeat;
 		}
 		return null;
+	}
+	,__class__: alphatab.importer.ScoreImporter
+}
+alphatab.importer.AlphaTexImporter = function() {
+	alphatab.importer.ScoreImporter.call(this);
+};
+alphatab.importer.AlphaTexImporter.__name__ = ["alphatab","importer","AlphaTexImporter"];
+alphatab.importer.AlphaTexImporter.isLetter = function(ch) {
+	var code = ch.charCodeAt(0);
+	return !alphatab.importer.AlphaTexImporter.isTerminal(ch) && (code >= 33 && code <= 47 || code >= 58 && code <= 126 || code > 128);
+}
+alphatab.importer.AlphaTexImporter.isTerminal = function(ch) {
+	return ch == "." || ch == "{" || ch == "}" || ch == "[" || ch == "]" || ch == "(" || ch == ")" || ch == "|" || ch == "'" || ch == "\"" || ch == "\\";
+}
+alphatab.importer.AlphaTexImporter.__super__ = alphatab.importer.ScoreImporter;
+alphatab.importer.AlphaTexImporter.prototype = $extend(alphatab.importer.ScoreImporter.prototype,{
+	_score: null
+	,_track: null
+	,_ch: null
+	,_curChPos: null
+	,_sy: null
+	,_syData: null
+	,_allowNegatives: null
+	,_currentDuration: null
+	,readScore: function() {
+		this.createDefaultScore();
+		this._curChPos = 0;
+		this._currentDuration = alphatab.model.Duration.Quarter;
+		this.nextChar();
+		this.newSy();
+		this.score();
+		this.finish(this._score);
+		return this._score;
+	}
+	,error: function(nonterm,expected,symbolError) {
+		if(symbolError == null) symbolError = true;
+		if(symbolError) throw haxe.io.Error.Custom(Std.string(this._curChPos) + ": Error on block " + nonterm + ", expected a " + Std.string(expected) + " found a " + this._sy); else throw haxe.io.Error.Custom(Std.string(this._curChPos) + ": Error on block " + nonterm + ", invalid value:" + Std.string(this._syData));
+	}
+	,score: function() {
+		this.metaData();
+		this.bars();
+	}
+	,metaData: function() {
+		var anyMeta = false;
+		while(this._sy == alphatab.importer.AlphaTexSymbols.MetaCommand) if(this._syData == "title") {
+			this.newSy();
+			if(this._sy == alphatab.importer.AlphaTexSymbols.String) this._score.title = this._syData; else this.error("title",alphatab.importer.AlphaTexSymbols.String);
+			this.newSy();
+			anyMeta = true;
+		} else if(this._syData == "subtitle") {
+			this.newSy();
+			if(this._sy == alphatab.importer.AlphaTexSymbols.String) this._score.subTitle = this._syData; else this.error("subtitle",alphatab.importer.AlphaTexSymbols.String);
+			this.newSy();
+			anyMeta = true;
+		} else if(this._syData == "artist") {
+			this.newSy();
+			if(this._sy == alphatab.importer.AlphaTexSymbols.String) this._score.artist = this._syData; else this.error("artist",alphatab.importer.AlphaTexSymbols.String);
+			this.newSy();
+			anyMeta = true;
+		} else if(this._syData == "album") {
+			this.newSy();
+			if(this._sy == alphatab.importer.AlphaTexSymbols.String) this._score.album = this._syData; else this.error("album",alphatab.importer.AlphaTexSymbols.String);
+			this.newSy();
+			anyMeta = true;
+		} else if(this._syData == "words") {
+			this.newSy();
+			if(this._sy == alphatab.importer.AlphaTexSymbols.String) this._score.words = this._syData; else this.error("words",alphatab.importer.AlphaTexSymbols.String);
+			this.newSy();
+			anyMeta = true;
+		} else if(this._syData == "music") {
+			this.newSy();
+			if(this._sy == alphatab.importer.AlphaTexSymbols.String) this._score.music = this._syData; else this.error("music",alphatab.importer.AlphaTexSymbols.String);
+			this.newSy();
+			anyMeta = true;
+		} else if(this._syData == "copyright") {
+			this.newSy();
+			if(this._sy == alphatab.importer.AlphaTexSymbols.String) this._score.copyright = this._syData; else this.error("copyright",alphatab.importer.AlphaTexSymbols.String);
+			this.newSy();
+			anyMeta = true;
+		} else if(this._syData == "tempo") {
+			this.newSy();
+			if(this._sy == alphatab.importer.AlphaTexSymbols.Number) this._score.tempo = this._syData; else this.error("tempo",alphatab.importer.AlphaTexSymbols.Number);
+			this.newSy();
+			anyMeta = true;
+		} else if(this._syData == "capo") {
+			this.newSy();
+			if(this._sy == alphatab.importer.AlphaTexSymbols.Number) this._track.capo = this._syData; else this.error("capo",alphatab.importer.AlphaTexSymbols.Number);
+			this.newSy();
+			anyMeta = true;
+		} else if(this._syData == "tuning") {
+			this.newSy();
+			if(this._sy == alphatab.importer.AlphaTexSymbols.Tuning) do {
+				this._track.tuning.push(this.parseTuning(this._syData));
+				this.newSy();
+			} while(this._sy == alphatab.importer.AlphaTexSymbols.Tuning); else this.error("tuning",alphatab.importer.AlphaTexSymbols.Tuning);
+			anyMeta = true;
+		} else if(this._syData == "instrument") {
+			this.newSy();
+			if(this._sy == alphatab.importer.AlphaTexSymbols.Number) {
+				var instrument = (function($this) {
+					var $r;
+					var $t = $this._syData;
+					if(Std["is"]($t,Int)) $t; else throw "Class cast error";
+					$r = $t;
+					return $r;
+				}(this));
+				if(instrument >= 0 && instrument <= 128) this._track.playbackInfo.program = this._syData; else this.error("instrument",alphatab.importer.AlphaTexSymbols.Number,false);
+			} else if(this._sy == alphatab.importer.AlphaTexSymbols.String) {
+				var instrumentName = (function($this) {
+					var $r;
+					var $t = $this._syData;
+					if(Std["is"]($t,String)) $t; else throw "Class cast error";
+					$r = $t;
+					return $r;
+				}(this));
+				this._track.playbackInfo.program = alphatab.midi.GeneralMidi.getValue(instrumentName);
+			} else this.error("instrument",alphatab.importer.AlphaTexSymbols.Number);
+			this.newSy();
+			anyMeta = true;
+		} else this.error("metaDataTags",alphatab.importer.AlphaTexSymbols.String,false);
+		if(anyMeta) {
+			if(this._sy != alphatab.importer.AlphaTexSymbols.Dot) this.error("song",alphatab.importer.AlphaTexSymbols.Dot);
+			this.newSy();
+		}
+	}
+	,bars: function() {
+		this.bar();
+		while(this._sy != alphatab.importer.AlphaTexSymbols.Eof) {
+			if(this._sy != alphatab.importer.AlphaTexSymbols.Pipe) this.error("bar",alphatab.importer.AlphaTexSymbols.Pipe);
+			this.newSy();
+			this.bar();
+		}
+	}
+	,bar: function() {
+		var master = new alphatab.model.MasterBar();
+		this._score.addMasterBar(master);
+		var bar = new alphatab.model.Bar();
+		this._track.addBar(bar);
+		if(master.index > 0) {
+			master.keySignature = master.previousMasterBar.keySignature;
+			master.timeSignatureDenominator = master.previousMasterBar.timeSignatureDenominator;
+			master.timeSignatureNumerator = master.previousMasterBar.timeSignatureNumerator;
+			bar.clef = bar.previousBar.clef;
+		}
+		this.barMeta(bar);
+		var voice = new alphatab.model.Voice();
+		bar.addVoice(voice);
+		while(this._sy != alphatab.importer.AlphaTexSymbols.Pipe && this._sy != alphatab.importer.AlphaTexSymbols.Eof) this.beat(voice);
+	}
+	,beat: function(voice) {
+		if(this._sy == alphatab.importer.AlphaTexSymbols.DoubleDot) {
+			this.newSy();
+			if(this._sy != alphatab.importer.AlphaTexSymbols.Number) this.error("duration",alphatab.importer.AlphaTexSymbols.Number);
+			if(this._syData == 1 || this._syData == 2 || this._syData == 4 || this._syData == 8 || this._syData == 16 || this._syData == 32 || this._syData == 64) this._currentDuration = this._syData; else this.error("duration",alphatab.importer.AlphaTexSymbols.Number,false);
+			this.newSy();
+			return;
+		}
+		var beat = new alphatab.model.Beat();
+		voice.addBeat(beat);
+		if(this._sy == alphatab.importer.AlphaTexSymbols.LParensis) {
+			this.newSy();
+			this.note(beat);
+			while(this._sy != alphatab.importer.AlphaTexSymbols.RParensis && this._sy != alphatab.importer.AlphaTexSymbols.Eof) this.note(beat);
+			if(this._sy != alphatab.importer.AlphaTexSymbols.RParensis) this.error("note-list",alphatab.importer.AlphaTexSymbols.RParensis);
+			this.newSy();
+		} else if(this._sy == alphatab.importer.AlphaTexSymbols.String && Std.string(this._syData).toLowerCase() == "r") this.newSy(); else this.note(beat);
+		if(this._sy == alphatab.importer.AlphaTexSymbols.Dot) {
+			this.newSy();
+			if(this._sy != alphatab.importer.AlphaTexSymbols.Number) this.error("duration",alphatab.importer.AlphaTexSymbols.Number);
+			if(this._syData == 1 || this._syData == 2 || this._syData == 4 || this._syData == 8 || this._syData == 16 || this._syData == 32 || this._syData == 64) beat.duration = this.parseDuration(this._syData); else this.error("duration",alphatab.importer.AlphaTexSymbols.Number,false);
+			this.newSy();
+		} else beat.duration = this._currentDuration;
+		this.beatEffects(beat);
+	}
+	,beatEffects: function(beat) {
+		if(this._sy != alphatab.importer.AlphaTexSymbols.LBrace) return;
+		this.newSy();
+		while(this._sy == alphatab.importer.AlphaTexSymbols.String) {
+			this._syData = Std.string(this._syData).toLowerCase();
+			if(!this.applyBeatEffect(beat)) this.error("beat-effects",alphatab.importer.AlphaTexSymbols.String,false);
+		}
+		if(this._sy != alphatab.importer.AlphaTexSymbols.RBrace) this.error("beat-effects",alphatab.importer.AlphaTexSymbols.RBrace);
+		this.newSy();
+	}
+	,applyBeatEffect: function(beat) {
+		if(this._syData == "f") {
+			beat.fadeIn = true;
+			this.newSy();
+			return true;
+		} else if(this._syData == "v") {
+			beat.vibrato = alphatab.model.VibratoType.Slight;
+			this.newSy();
+			return true;
+		} else if(this._syData == "s") {
+			beat.slap = true;
+			this.newSy();
+			return true;
+		} else if(this._syData == "p") {
+			beat.pop = true;
+			this.newSy();
+			return true;
+		} else if(this._syData == "dd") {
+			beat.dots = 2;
+			this.newSy();
+			return true;
+		} else if(this._syData == "d") {
+			beat.dots = 1;
+			this.newSy();
+			return true;
+		} else if(this._syData == "su") {
+			beat.pickStroke = alphatab.model.PickStrokeType.Up;
+			this.newSy();
+			return true;
+		} else if(this._syData == "sd") {
+			beat.pickStroke = alphatab.model.PickStrokeType.Down;
+			this.newSy();
+			return true;
+		} else if(this._syData == "tu") {
+			this.newSy();
+			if(this._sy != alphatab.importer.AlphaTexSymbols.Number) {
+				this.error("tuplet",alphatab.importer.AlphaTexSymbols.Number);
+				return false;
+			}
+			var tuplet = this._syData;
+			switch(tuplet) {
+			case 3:
+				beat.tupletDenominator = 3;
+				beat.tupletNumerator = 2;
+				break;
+			case 5:
+				beat.tupletDenominator = 5;
+				beat.tupletNumerator = 4;
+				break;
+			case 6:
+				beat.tupletDenominator = 6;
+				beat.tupletNumerator = 4;
+				break;
+			case 7:
+				beat.tupletDenominator = 7;
+				beat.tupletNumerator = 4;
+				break;
+			case 9:
+				beat.tupletDenominator = 9;
+				beat.tupletNumerator = 8;
+				break;
+			case 10:
+				beat.tupletDenominator = 10;
+				beat.tupletNumerator = 8;
+				break;
+			case 11:
+				beat.tupletDenominator = 11;
+				beat.tupletNumerator = 8;
+				break;
+			case 12:
+				beat.tupletDenominator = 12;
+				beat.tupletNumerator = 8;
+				break;
+			}
+			this.newSy();
+			return true;
+		} else if(this._syData == "tb") {
+			this.newSy();
+			if(this._sy != alphatab.importer.AlphaTexSymbols.LParensis) {
+				this.error("tremolobar-effect",alphatab.importer.AlphaTexSymbols.LParensis);
+				return false;
+			}
+			this._allowNegatives = true;
+			this.newSy();
+			while(this._sy != alphatab.importer.AlphaTexSymbols.RParensis && this._sy != alphatab.importer.AlphaTexSymbols.Eof) {
+				if(this._sy != alphatab.importer.AlphaTexSymbols.Number) {
+					this.error("tremolobar-effect",alphatab.importer.AlphaTexSymbols.Number);
+					return false;
+				}
+				beat.whammyBarPoints.push(new alphatab.model.BendPoint(0,this._syData));
+				this.newSy();
+			}
+			if(beat.whammyBarPoints.length > 60) beat.whammyBarPoints = beat.whammyBarPoints.slice(0,60);
+			var count = beat.whammyBarPoints.length;
+			var step = Math.floor(60 / count);
+			var i = 0;
+			while(i < count) {
+				beat.whammyBarPoints[i].offset = Math.floor(Math.min(60,i * step));
+				i++;
+			}
+			this._allowNegatives = false;
+			if(this._sy != alphatab.importer.AlphaTexSymbols.RParensis) {
+				this.error("tremolobar-effect",alphatab.importer.AlphaTexSymbols.RParensis);
+				return false;
+			}
+			this.newSy();
+			return true;
+		}
+		return false;
+	}
+	,note: function(beat) {
+		if(this._sy != alphatab.importer.AlphaTexSymbols.Number && !(this._sy == alphatab.importer.AlphaTexSymbols.String && (Std.string(this._syData).toLowerCase() == "x" || Std.string(this._syData).toLowerCase() == "-"))) this.error("note-fret",alphatab.importer.AlphaTexSymbols.Number);
+		var isDead = Std.string(this._syData).toLowerCase() == "x";
+		var isTie = Std.string(this._syData).toLowerCase() == "-";
+		var fret = isDead || isTie?0:this._syData;
+		this.newSy();
+		if(this._sy != alphatab.importer.AlphaTexSymbols.Dot) this.error("note",alphatab.importer.AlphaTexSymbols.Dot);
+		this.newSy();
+		if(this._sy != alphatab.importer.AlphaTexSymbols.Number) this.error("note-string",alphatab.importer.AlphaTexSymbols.Number);
+		var string = this._syData;
+		if(string < 1 || string > this._track.tuning.length) this.error("note-string",alphatab.importer.AlphaTexSymbols.Number,false);
+		this.newSy();
+		var note = new alphatab.model.Note();
+		beat.addNote(note);
+		this.noteEffects(note);
+		note.string = string;
+		note.isDead = isDead;
+		note.isTieDestination = isTie;
+		if(!isTie) note.fret = fret;
+		return note;
+	}
+	,noteEffects: function(note) {
+		if(this._sy != alphatab.importer.AlphaTexSymbols.LBrace) return;
+		this.newSy();
+		while(this._sy == alphatab.importer.AlphaTexSymbols.String) {
+			this._syData = Std.string(this._syData).toLowerCase();
+			if(this._syData == "b") {
+				this.newSy();
+				if(this._sy != alphatab.importer.AlphaTexSymbols.LParensis) this.error("bend-effect",alphatab.importer.AlphaTexSymbols.LParensis);
+				this.newSy();
+				while(this._sy != alphatab.importer.AlphaTexSymbols.RParensis && this._sy != alphatab.importer.AlphaTexSymbols.Eof) {
+					if(this._sy != alphatab.importer.AlphaTexSymbols.Number) this.error("bend-effect-value",alphatab.importer.AlphaTexSymbols.Number);
+					var bendValue = this._syData;
+					note.bendPoints.push(new alphatab.model.BendPoint(0,Math.abs(bendValue) | 0));
+					this.newSy();
+				}
+				if(note.bendPoints.length > 60) note.bendPoints = note.bendPoints.slice(0,60);
+				var count = note.bendPoints.length;
+				var step = Math.floor(60 / count);
+				var i = 0;
+				while(i < count) {
+					note.bendPoints[i].offset = Math.floor(Math.min(60,i * step));
+					i++;
+				}
+				if(this._sy != alphatab.importer.AlphaTexSymbols.RParensis) this.error("bend-effect",alphatab.importer.AlphaTexSymbols.RParensis);
+				this.newSy();
+			} else if(this._syData == "nh") {
+				note.harmonicType = alphatab.model.HarmonicType.Natural;
+				this.newSy();
+			} else if(this._syData == "ah") {
+				note.harmonicType = alphatab.model.HarmonicType.Artificial;
+				this.newSy();
+			} else if(this._syData == "th") {
+				note.harmonicType = alphatab.model.HarmonicType.Tap;
+				this.newSy();
+			} else if(this._syData == "ph") {
+				note.harmonicType = alphatab.model.HarmonicType.Pinch;
+				this.newSy();
+			} else if(this._syData == "sh") {
+				note.harmonicType = alphatab.model.HarmonicType.Semi;
+				this.newSy();
+			} else if(this._syData == "gr") {
+				this.newSy();
+				if(this._syData == "ob") note.beat.graceType = alphatab.model.GraceType.OnBeat; else note.beat.graceType = alphatab.model.GraceType.BeforeBeat;
+				this.newSy();
+			} else if(this._syData == "tr") {
+				this.newSy();
+				if(this._sy != alphatab.importer.AlphaTexSymbols.Number) this.error("trill-effect",alphatab.importer.AlphaTexSymbols.Number);
+				var fret = this._syData;
+				this.newSy();
+				var duration = 16;
+				if(this._sy == alphatab.importer.AlphaTexSymbols.Number) {
+					switch(this._syData) {
+					case 16:case 32:case 64:
+						duration = this._syData;
+						break;
+					default:
+						duration = 16;
+					}
+					this.newSy();
+				}
+				note.trillFret = fret;
+				note.trillSpeed = duration;
+			} else if(this._syData == "tp") {
+				this.newSy();
+				var duration = 8;
+				if(this._sy == alphatab.importer.AlphaTexSymbols.Number) {
+					switch(this._syData) {
+					case 8:case 16:case 32:
+						duration = this._syData;
+						break;
+					default:
+						duration = 8;
+					}
+					this.newSy();
+				}
+				note.beat.tremoloSpeed = duration;
+			} else if(this._syData == "v") {
+				this.newSy();
+				note.vibrato = alphatab.model.VibratoType.Slight;
+			} else if(this._syData == "sl") {
+				this.newSy();
+				note.slideType = alphatab.model.SlideType.Legato;
+			} else if(this._syData == "ss") {
+				this.newSy();
+				note.slideType = alphatab.model.SlideType.Shift;
+			} else if(this._syData == "h") {
+				this.newSy();
+				note.isHammerPullOrigin = true;
+			} else if(this._syData == "g") {
+				this.newSy();
+				note.isGhost = true;
+			} else if(this._syData == "ac") {
+				this.newSy();
+				note.accentuated = alphatab.model.AccentuationType.Normal;
+			} else if(this._syData == "hac") {
+				this.newSy();
+				note.accentuated = alphatab.model.AccentuationType.Heavy;
+			} else if(this._syData == "pm") {
+				this.newSy();
+				note.isPalmMute = true;
+			} else if(this._syData == "st") {
+				this.newSy();
+				note.isStaccato = true;
+			} else if(this._syData == "lr") {
+				this.newSy();
+				note.isLetRing = true;
+			} else if(this.applyBeatEffect(note.beat)) {
+			} else this.error(this._syData,alphatab.importer.AlphaTexSymbols.String,false);
+		}
+		if(this._sy != alphatab.importer.AlphaTexSymbols.RBrace) this.error("note-effect",alphatab.importer.AlphaTexSymbols.RBrace,false);
+		this.newSy();
+	}
+	,parseDuration: function(duration) {
+		switch(duration) {
+		case 1:
+			return alphatab.model.Duration.Whole;
+		case 2:
+			return alphatab.model.Duration.Half;
+		case 4:
+			return alphatab.model.Duration.Quarter;
+		case 8:
+			return alphatab.model.Duration.Eighth;
+		case 16:
+			return alphatab.model.Duration.Sixteenth;
+		case 32:
+			return alphatab.model.Duration.ThirtySecond;
+		case 64:
+			return alphatab.model.Duration.SixtyFourth;
+		default:
+			return alphatab.model.Duration.Quarter;
+		}
+	}
+	,barMeta: function(bar) {
+		var master = bar.track.score.masterBars[bar.index];
+		while(this._sy == alphatab.importer.AlphaTexSymbols.MetaCommand) {
+			if(this._syData == "ts") {
+				this.newSy();
+				if(this._sy != alphatab.importer.AlphaTexSymbols.Number) this.error("timesignature-numerator",alphatab.importer.AlphaTexSymbols.Number);
+				master.timeSignatureNumerator = this._syData;
+				this.newSy();
+				if(this._sy != alphatab.importer.AlphaTexSymbols.Number) this.error("timesignature-denominator",alphatab.importer.AlphaTexSymbols.Number);
+				master.timeSignatureDenominator = this._syData;
+			} else if(this._syData == "ro") master.isRepeatStart = true; else if(this._syData == "rc") {
+				this.newSy();
+				if(this._sy != alphatab.importer.AlphaTexSymbols.Number) this.error("repeatclose",alphatab.importer.AlphaTexSymbols.Number);
+				master.repeatCount = Std.parseInt(this._syData) - 1;
+			} else if(this._syData == "ks") {
+				this.newSy();
+				if(this._sy != alphatab.importer.AlphaTexSymbols.String) this.error("keysignature",alphatab.importer.AlphaTexSymbols.String);
+				master.keySignature = this.parseKeySignature(this._syData);
+			} else if(this._syData == "clef") {
+				this.newSy();
+				if(this._sy != alphatab.importer.AlphaTexSymbols.String && this._sy != alphatab.importer.AlphaTexSymbols.Tuning) this.error("clef",alphatab.importer.AlphaTexSymbols.String);
+				bar.clef = this.parseClef(this._syData);
+			} else this.error("measure-effects",alphatab.importer.AlphaTexSymbols.String,false);
+			this.newSy();
+		}
+	}
+	,createDefaultScore: function() {
+		this._score = new alphatab.model.Score();
+		this._score.tempo = 120;
+		this._score.tempoLabel = "";
+		this._track = new alphatab.model.Track();
+		this._track.playbackInfo.program = 25;
+		this._track.playbackInfo.primaryChannel = alphatab.importer.AlphaTexImporter.TRACK_CHANNELS[0];
+		this._track.playbackInfo.secondaryChannel = alphatab.importer.AlphaTexImporter.TRACK_CHANNELS[1];
+		this._track.tuning = alphatab.model.Tuning.getPresetsFor(6)[0].tuning;
+		this._score.addTrack(this._track);
+	}
+	,parseClef: function(str) {
+		switch(str.toLowerCase()) {
+		case "g2":case "treble":
+			return alphatab.model.Clef.G2;
+		case "f4":case "bass":
+			return alphatab.model.Clef.F4;
+		case "c3":case "tenor":
+			return alphatab.model.Clef.C3;
+		case "c4":case "alto":
+			return alphatab.model.Clef.C4;
+		default:
+			return alphatab.model.Clef.G2;
+		}
+	}
+	,parseKeySignature: function(str) {
+		switch(str.toLowerCase()) {
+		case "cb":
+			return -7;
+		case "gb":
+			return -6;
+		case "db":
+			return -5;
+		case "ab":
+			return -4;
+		case "eb":
+			return -3;
+		case "bb":
+			return -2;
+		case "f":
+			return -1;
+		case "c":
+			return 0;
+		case "g":
+			return 1;
+		case "d":
+			return 2;
+		case "a":
+			return 3;
+		case "e":
+			return 4;
+		case "b":
+			return 5;
+		case "f#":
+			return 6;
+		case "c#":
+			return 7;
+		default:
+			return 0;
+		}
+	}
+	,parseTuning: function(str) {
+		var tuning = alphatab.model.Tuning.getTuningForText(str);
+		if(tuning < 0) this.error("tuning-value",alphatab.importer.AlphaTexSymbols.String,false);
+		return tuning;
+	}
+	,nextChar: function() {
+		try {
+			this._ch = this._data.readString(1);
+			this._curChPos++;
+		} catch( e ) {
+			if( js.Boot.__instanceof(e,haxe.io.Eof) ) {
+				this._ch = alphatab.importer.AlphaTexImporter.EOL;
+			} else throw(e);
+		}
+	}
+	,newSy: function() {
+		this._sy = alphatab.importer.AlphaTexSymbols.No;
+		do if(this._ch == alphatab.importer.AlphaTexImporter.EOL) this._sy = alphatab.importer.AlphaTexSymbols.Eof; else if(this._ch == " " || this._ch == "\n" || this._ch == "\r" || this._ch == "\t") this.nextChar(); else if(this._ch == "\"" || this._ch == "'") {
+			this.nextChar();
+			this._syData = "";
+			this._sy = alphatab.importer.AlphaTexSymbols.String;
+			while(this._ch != "\"" && this._ch != "'" && this._ch != alphatab.importer.AlphaTexImporter.EOL) {
+				this._syData += this._ch;
+				this.nextChar();
+			}
+			this.nextChar();
+		} else if(this._ch == "-") {
+			if(this._allowNegatives && this.isDigit(this._ch)) {
+				var number = this.readNumber();
+				this._sy = alphatab.importer.AlphaTexSymbols.Number;
+				this._syData = number;
+			} else {
+				this._sy = alphatab.importer.AlphaTexSymbols.String;
+				this._syData = this.readName();
+			}
+		} else if(this._ch == ".") {
+			this._sy = alphatab.importer.AlphaTexSymbols.Dot;
+			this.nextChar();
+		} else if(this._ch == ":") {
+			this._sy = alphatab.importer.AlphaTexSymbols.DoubleDot;
+			this.nextChar();
+		} else if(this._ch == "(") {
+			this._sy = alphatab.importer.AlphaTexSymbols.LParensis;
+			this.nextChar();
+		} else if(this._ch == "\\") {
+			this.nextChar();
+			var name = this.readName();
+			this._sy = alphatab.importer.AlphaTexSymbols.MetaCommand;
+			this._syData = name;
+		} else if(this._ch == ")") {
+			this._sy = alphatab.importer.AlphaTexSymbols.RParensis;
+			this.nextChar();
+		} else if(this._ch == "{") {
+			this._sy = alphatab.importer.AlphaTexSymbols.LBrace;
+			this.nextChar();
+		} else if(this._ch == "}") {
+			this._sy = alphatab.importer.AlphaTexSymbols.RBrace;
+			this.nextChar();
+		} else if(this._ch == "|") {
+			this._sy = alphatab.importer.AlphaTexSymbols.Pipe;
+			this.nextChar();
+		} else if(this.isDigit(this._ch)) {
+			var number = this.readNumber();
+			this._sy = alphatab.importer.AlphaTexSymbols.Number;
+			this._syData = number;
+		} else if(alphatab.importer.AlphaTexImporter.isLetter(this._ch)) {
+			var name = this.readName();
+			if(alphatab.model.Tuning.isTuning(name)) {
+				this._sy = alphatab.importer.AlphaTexSymbols.Tuning;
+				this._syData = name.toLowerCase();
+			} else {
+				this._sy = alphatab.importer.AlphaTexSymbols.String;
+				this._syData = name;
+			}
+		} else this.error("symbol",alphatab.importer.AlphaTexSymbols.String,false); while(this._sy == alphatab.importer.AlphaTexSymbols.No);
+	}
+	,isDigit: function(ch) {
+		var code = ch.charCodeAt(0);
+		return code >= 48 && code <= 57 || ch == "-" && this._allowNegatives;
+	}
+	,readName: function() {
+		var str = "";
+		do {
+			str += this._ch;
+			this.nextChar();
+		} while(alphatab.importer.AlphaTexImporter.isLetter(this._ch) || this.isDigit(this._ch));
+		return str;
+	}
+	,readNumber: function() {
+		var str = "";
+		do {
+			str += this._ch;
+			this.nextChar();
+		} while(this.isDigit(this._ch));
+		return Std.parseInt(str);
+	}
+	,__class__: alphatab.importer.AlphaTexImporter
+});
+alphatab.importer.AlphaTexSymbols = { __ename__ : ["alphatab","importer","AlphaTexSymbols"], __constructs__ : ["No","Eof","Number","DoubleDot","Dot","String","Tuning","LParensis","RParensis","LBrace","RBrace","Pipe","MetaCommand"] }
+alphatab.importer.AlphaTexSymbols.No = ["No",0];
+alphatab.importer.AlphaTexSymbols.No.toString = $estr;
+alphatab.importer.AlphaTexSymbols.No.__enum__ = alphatab.importer.AlphaTexSymbols;
+alphatab.importer.AlphaTexSymbols.Eof = ["Eof",1];
+alphatab.importer.AlphaTexSymbols.Eof.toString = $estr;
+alphatab.importer.AlphaTexSymbols.Eof.__enum__ = alphatab.importer.AlphaTexSymbols;
+alphatab.importer.AlphaTexSymbols.Number = ["Number",2];
+alphatab.importer.AlphaTexSymbols.Number.toString = $estr;
+alphatab.importer.AlphaTexSymbols.Number.__enum__ = alphatab.importer.AlphaTexSymbols;
+alphatab.importer.AlphaTexSymbols.DoubleDot = ["DoubleDot",3];
+alphatab.importer.AlphaTexSymbols.DoubleDot.toString = $estr;
+alphatab.importer.AlphaTexSymbols.DoubleDot.__enum__ = alphatab.importer.AlphaTexSymbols;
+alphatab.importer.AlphaTexSymbols.Dot = ["Dot",4];
+alphatab.importer.AlphaTexSymbols.Dot.toString = $estr;
+alphatab.importer.AlphaTexSymbols.Dot.__enum__ = alphatab.importer.AlphaTexSymbols;
+alphatab.importer.AlphaTexSymbols.String = ["String",5];
+alphatab.importer.AlphaTexSymbols.String.toString = $estr;
+alphatab.importer.AlphaTexSymbols.String.__enum__ = alphatab.importer.AlphaTexSymbols;
+alphatab.importer.AlphaTexSymbols.Tuning = ["Tuning",6];
+alphatab.importer.AlphaTexSymbols.Tuning.toString = $estr;
+alphatab.importer.AlphaTexSymbols.Tuning.__enum__ = alphatab.importer.AlphaTexSymbols;
+alphatab.importer.AlphaTexSymbols.LParensis = ["LParensis",7];
+alphatab.importer.AlphaTexSymbols.LParensis.toString = $estr;
+alphatab.importer.AlphaTexSymbols.LParensis.__enum__ = alphatab.importer.AlphaTexSymbols;
+alphatab.importer.AlphaTexSymbols.RParensis = ["RParensis",8];
+alphatab.importer.AlphaTexSymbols.RParensis.toString = $estr;
+alphatab.importer.AlphaTexSymbols.RParensis.__enum__ = alphatab.importer.AlphaTexSymbols;
+alphatab.importer.AlphaTexSymbols.LBrace = ["LBrace",9];
+alphatab.importer.AlphaTexSymbols.LBrace.toString = $estr;
+alphatab.importer.AlphaTexSymbols.LBrace.__enum__ = alphatab.importer.AlphaTexSymbols;
+alphatab.importer.AlphaTexSymbols.RBrace = ["RBrace",10];
+alphatab.importer.AlphaTexSymbols.RBrace.toString = $estr;
+alphatab.importer.AlphaTexSymbols.RBrace.__enum__ = alphatab.importer.AlphaTexSymbols;
+alphatab.importer.AlphaTexSymbols.Pipe = ["Pipe",11];
+alphatab.importer.AlphaTexSymbols.Pipe.toString = $estr;
+alphatab.importer.AlphaTexSymbols.Pipe.__enum__ = alphatab.importer.AlphaTexSymbols;
+alphatab.importer.AlphaTexSymbols.MetaCommand = ["MetaCommand",12];
+alphatab.importer.AlphaTexSymbols.MetaCommand.toString = $estr;
+alphatab.importer.AlphaTexSymbols.MetaCommand.__enum__ = alphatab.importer.AlphaTexSymbols;
+alphatab.importer.Gp3To5Importer = function() {
+	alphatab.importer.ScoreImporter.call(this);
+	this._globalTripletFeel = alphatab.model.TripletFeel.NoTripletFeel;
+};
+alphatab.importer.Gp3To5Importer.__name__ = ["alphatab","importer","Gp3To5Importer"];
+alphatab.importer.Gp3To5Importer.__super__ = alphatab.importer.ScoreImporter;
+alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImporter.prototype,{
+	_versionNumber: null
+	,_score: null
+	,_tempo: null
+	,_keySignature: null
+	,_octave: null
+	,_globalTripletFeel: null
+	,_lyricsIndex: null
+	,_lyrics: null
+	,_lyricsTrack: null
+	,_barCount: null
+	,_trackCount: null
+	,_beatTapping: null
+	,_playbackInfos: null
+	,readScore: function() {
+		this.readVersion();
+		this._score = new alphatab.model.Score();
+		this.readScoreInformation();
+		if(this._versionNumber < 500) this._globalTripletFeel = this._data.readByte() != 0?alphatab.model.TripletFeel.Triplet8th:alphatab.model.TripletFeel.NoTripletFeel;
+		if(this._versionNumber >= 400) this.readLyrics();
+		if(this._versionNumber >= 510) this._data.read(19);
+		if(this._versionNumber >= 500) {
+			this.readPageSetup();
+			this._score.tempoLabel = this.readStringIntByte();
+		}
+		this._score.tempo = this.readInt32();
+		if(this._versionNumber >= 510) this._data.readByte() != 0;
+		this._keySignature = this.readInt32();
+		if(this._versionNumber >= 400) this._octave = this._data.readByte();
+		this.readPlaybackInfos();
+		if(this._versionNumber >= 500) {
+			this._data.read(38);
+			this._data.read(4);
+		}
+		this._barCount = this.readInt32();
+		this._trackCount = this.readInt32();
+		this.readMasterBars();
+		this.readTracks();
+		this.readBars();
+		this.finish(this._score);
+		return this._score;
 	}
 	,readVersion: function() {
 		var version = this.readStringByteLength(30);
@@ -1174,7 +1845,7 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 	}
 	,__class__: alphatab.importer.Gp3To5Importer
 });
-alphatab.importer.MixTableChange = $hxClasses["alphatab.importer.MixTableChange"] = function() {
+alphatab.importer.MixTableChange = function() {
 	this.volume = -1;
 	this.balance = -1;
 	this.instrument = -1;
@@ -1192,7 +1863,7 @@ alphatab.importer.MixTableChange.prototype = {
 	,duration: null
 	,__class__: alphatab.importer.MixTableChange
 }
-alphatab.importer.ScoreLoader = $hxClasses["alphatab.importer.ScoreLoader"] = function() { }
+alphatab.importer.ScoreLoader = function() { }
 alphatab.importer.ScoreLoader.__name__ = ["alphatab","importer","ScoreLoader"];
 alphatab.importer.ScoreLoader.loadScoreAsync = function(path,success,error) {
 	var loader = alphatab.platform.PlatformFactory.getLoader();
@@ -1220,11 +1891,11 @@ alphatab.importer.ScoreLoader.prototype = {
 	__class__: alphatab.importer.ScoreLoader
 }
 if(!alphatab.io) alphatab.io = {}
-alphatab.io.OutputExtensions = $hxClasses["alphatab.io.OutputExtensions"] = function() { }
+alphatab.io.OutputExtensions = function() { }
 alphatab.io.OutputExtensions.__name__ = ["alphatab","io","OutputExtensions"];
 alphatab.io.OutputExtensions.writeAsString = function(output,value) {
 	var text;
-	if(Std["is"](value,String)) text = (function($this) {
+	if(js.Boot.__instanceof(value,String)) text = (function($this) {
 		var $r;
 		var $t = value;
 		if(Std["is"]($t,String)) $t; else throw "Class cast error";
@@ -1236,8 +1907,150 @@ alphatab.io.OutputExtensions.writeAsString = function(output,value) {
 alphatab.io.OutputExtensions.prototype = {
 	__class__: alphatab.io.OutputExtensions
 }
+if(!alphatab.midi) alphatab.midi = {}
+alphatab.midi.GeneralMidi = function() { }
+alphatab.midi.GeneralMidi.__name__ = ["alphatab","midi","GeneralMidi"];
+alphatab.midi.GeneralMidi._values = null;
+alphatab.midi.GeneralMidi.getValue = function(name) {
+	if(alphatab.midi.GeneralMidi._values == null) {
+		alphatab.midi.GeneralMidi._values = new Hash();
+		alphatab.midi.GeneralMidi._values.set("acousticgrandpiano",0);
+		alphatab.midi.GeneralMidi._values.set("brightacousticpiano",1);
+		alphatab.midi.GeneralMidi._values.set("electricgrandpiano",2);
+		alphatab.midi.GeneralMidi._values.set("honkytonkpiano",3);
+		alphatab.midi.GeneralMidi._values.set("electricpiano1",4);
+		alphatab.midi.GeneralMidi._values.set("electricpiano2",5);
+		alphatab.midi.GeneralMidi._values.set("harpsichord",6);
+		alphatab.midi.GeneralMidi._values.set("clavinet",7);
+		alphatab.midi.GeneralMidi._values.set("celesta",8);
+		alphatab.midi.GeneralMidi._values.set("glockenspiel",9);
+		alphatab.midi.GeneralMidi._values.set("musicbox",10);
+		alphatab.midi.GeneralMidi._values.set("vibraphone",11);
+		alphatab.midi.GeneralMidi._values.set("marimba",12);
+		alphatab.midi.GeneralMidi._values.set("xylophone",13);
+		alphatab.midi.GeneralMidi._values.set("tubularbells",14);
+		alphatab.midi.GeneralMidi._values.set("dulcimer",15);
+		alphatab.midi.GeneralMidi._values.set("drawbarorgan",16);
+		alphatab.midi.GeneralMidi._values.set("percussiveorgan",17);
+		alphatab.midi.GeneralMidi._values.set("rockorgan",18);
+		alphatab.midi.GeneralMidi._values.set("churchorgan",19);
+		alphatab.midi.GeneralMidi._values.set("reedorgan",20);
+		alphatab.midi.GeneralMidi._values.set("accordion",21);
+		alphatab.midi.GeneralMidi._values.set("harmonica",22);
+		alphatab.midi.GeneralMidi._values.set("tangoaccordion",23);
+		alphatab.midi.GeneralMidi._values.set("acousticguitarnylon",24);
+		alphatab.midi.GeneralMidi._values.set("acousticguitarsteel",25);
+		alphatab.midi.GeneralMidi._values.set("electricguitarjazz",26);
+		alphatab.midi.GeneralMidi._values.set("electricguitarclean",27);
+		alphatab.midi.GeneralMidi._values.set("electricguitarmuted",28);
+		alphatab.midi.GeneralMidi._values.set("overdrivenguitar",29);
+		alphatab.midi.GeneralMidi._values.set("distortionguitar",30);
+		alphatab.midi.GeneralMidi._values.set("guitarharmonics",31);
+		alphatab.midi.GeneralMidi._values.set("acousticbass",32);
+		alphatab.midi.GeneralMidi._values.set("electricbassfinger",33);
+		alphatab.midi.GeneralMidi._values.set("electricbasspick",34);
+		alphatab.midi.GeneralMidi._values.set("fretlessbass",35);
+		alphatab.midi.GeneralMidi._values.set("slapbass1",36);
+		alphatab.midi.GeneralMidi._values.set("slapbass2",37);
+		alphatab.midi.GeneralMidi._values.set("synthbass1",38);
+		alphatab.midi.GeneralMidi._values.set("synthbass2",39);
+		alphatab.midi.GeneralMidi._values.set("violin",40);
+		alphatab.midi.GeneralMidi._values.set("viola",41);
+		alphatab.midi.GeneralMidi._values.set("cello",42);
+		alphatab.midi.GeneralMidi._values.set("contrabass",43);
+		alphatab.midi.GeneralMidi._values.set("tremolostrings",44);
+		alphatab.midi.GeneralMidi._values.set("pizzicatostrings",45);
+		alphatab.midi.GeneralMidi._values.set("orchestralharp",46);
+		alphatab.midi.GeneralMidi._values.set("timpani",47);
+		alphatab.midi.GeneralMidi._values.set("stringensemble1",48);
+		alphatab.midi.GeneralMidi._values.set("stringensemble2",49);
+		alphatab.midi.GeneralMidi._values.set("synthstrings1",50);
+		alphatab.midi.GeneralMidi._values.set("synthstrings2",51);
+		alphatab.midi.GeneralMidi._values.set("choiraahs",52);
+		alphatab.midi.GeneralMidi._values.set("voiceoohs",53);
+		alphatab.midi.GeneralMidi._values.set("synthvoice",54);
+		alphatab.midi.GeneralMidi._values.set("orchestrahit",55);
+		alphatab.midi.GeneralMidi._values.set("trumpet",56);
+		alphatab.midi.GeneralMidi._values.set("trombone",57);
+		alphatab.midi.GeneralMidi._values.set("tuba",58);
+		alphatab.midi.GeneralMidi._values.set("mutedtrumpet",59);
+		alphatab.midi.GeneralMidi._values.set("frenchhorn",60);
+		alphatab.midi.GeneralMidi._values.set("brasssection",61);
+		alphatab.midi.GeneralMidi._values.set("synthbrass1",62);
+		alphatab.midi.GeneralMidi._values.set("synthbrass2",63);
+		alphatab.midi.GeneralMidi._values.set("sopranosax",64);
+		alphatab.midi.GeneralMidi._values.set("altosax",65);
+		alphatab.midi.GeneralMidi._values.set("tenorsax",66);
+		alphatab.midi.GeneralMidi._values.set("baritonesax",67);
+		alphatab.midi.GeneralMidi._values.set("oboe",68);
+		alphatab.midi.GeneralMidi._values.set("englishhorn",69);
+		alphatab.midi.GeneralMidi._values.set("bassoon",70);
+		alphatab.midi.GeneralMidi._values.set("clarinet",71);
+		alphatab.midi.GeneralMidi._values.set("piccolo",72);
+		alphatab.midi.GeneralMidi._values.set("flute",73);
+		alphatab.midi.GeneralMidi._values.set("recorder",74);
+		alphatab.midi.GeneralMidi._values.set("panflute",75);
+		alphatab.midi.GeneralMidi._values.set("blownbottle",76);
+		alphatab.midi.GeneralMidi._values.set("shakuhachi",77);
+		alphatab.midi.GeneralMidi._values.set("whistle",78);
+		alphatab.midi.GeneralMidi._values.set("ocarina",79);
+		alphatab.midi.GeneralMidi._values.set("lead1square",80);
+		alphatab.midi.GeneralMidi._values.set("lead2sawtooth",81);
+		alphatab.midi.GeneralMidi._values.set("lead3calliope",82);
+		alphatab.midi.GeneralMidi._values.set("lead4chiff",83);
+		alphatab.midi.GeneralMidi._values.set("lead5charang",84);
+		alphatab.midi.GeneralMidi._values.set("lead6voice",85);
+		alphatab.midi.GeneralMidi._values.set("lead7fifths",86);
+		alphatab.midi.GeneralMidi._values.set("lead8bassandlead",87);
+		alphatab.midi.GeneralMidi._values.set("pad1newage",88);
+		alphatab.midi.GeneralMidi._values.set("pad2warm",89);
+		alphatab.midi.GeneralMidi._values.set("pad3polysynth",90);
+		alphatab.midi.GeneralMidi._values.set("pad4choir",91);
+		alphatab.midi.GeneralMidi._values.set("pad5bowed",92);
+		alphatab.midi.GeneralMidi._values.set("pad6metallic",93);
+		alphatab.midi.GeneralMidi._values.set("pad7halo",94);
+		alphatab.midi.GeneralMidi._values.set("pad8sweep",95);
+		alphatab.midi.GeneralMidi._values.set("fx1rain",96);
+		alphatab.midi.GeneralMidi._values.set("fx2soundtrack",97);
+		alphatab.midi.GeneralMidi._values.set("fx3crystal",98);
+		alphatab.midi.GeneralMidi._values.set("fx4atmosphere",99);
+		alphatab.midi.GeneralMidi._values.set("fx5brightness",100);
+		alphatab.midi.GeneralMidi._values.set("fx6goblins",101);
+		alphatab.midi.GeneralMidi._values.set("fx7echoes",102);
+		alphatab.midi.GeneralMidi._values.set("fx8scifi",103);
+		alphatab.midi.GeneralMidi._values.set("sitar",104);
+		alphatab.midi.GeneralMidi._values.set("banjo",105);
+		alphatab.midi.GeneralMidi._values.set("shamisen",106);
+		alphatab.midi.GeneralMidi._values.set("koto",107);
+		alphatab.midi.GeneralMidi._values.set("kalimba",108);
+		alphatab.midi.GeneralMidi._values.set("bagpipe",109);
+		alphatab.midi.GeneralMidi._values.set("fiddle",110);
+		alphatab.midi.GeneralMidi._values.set("shanai",111);
+		alphatab.midi.GeneralMidi._values.set("tinklebell",112);
+		alphatab.midi.GeneralMidi._values.set("agogo",113);
+		alphatab.midi.GeneralMidi._values.set("steeldrums",114);
+		alphatab.midi.GeneralMidi._values.set("woodblock",115);
+		alphatab.midi.GeneralMidi._values.set("taikodrum",116);
+		alphatab.midi.GeneralMidi._values.set("melodictom",117);
+		alphatab.midi.GeneralMidi._values.set("synthdrum",118);
+		alphatab.midi.GeneralMidi._values.set("reversecymbal",119);
+		alphatab.midi.GeneralMidi._values.set("guitarfretnoise",120);
+		alphatab.midi.GeneralMidi._values.set("breathnoise",121);
+		alphatab.midi.GeneralMidi._values.set("seashore",122);
+		alphatab.midi.GeneralMidi._values.set("birdtweet",123);
+		alphatab.midi.GeneralMidi._values.set("telephonering",124);
+		alphatab.midi.GeneralMidi._values.set("helicopter",125);
+		alphatab.midi.GeneralMidi._values.set("applause",126);
+		alphatab.midi.GeneralMidi._values.set("gunshot",127);
+	}
+	name = StringTools.replace(name.toLowerCase()," ","");
+	return alphatab.midi.GeneralMidi._values.exists(name)?alphatab.midi.GeneralMidi._values.get(name):0;
+}
+alphatab.midi.GeneralMidi.prototype = {
+	__class__: alphatab.midi.GeneralMidi
+}
 if(!alphatab.model) alphatab.model = {}
-alphatab.model.AccentuationType = $hxClasses["alphatab.model.AccentuationType"] = { __ename__ : ["alphatab","model","AccentuationType"], __constructs__ : ["None","Normal","Heavy"] }
+alphatab.model.AccentuationType = { __ename__ : ["alphatab","model","AccentuationType"], __constructs__ : ["None","Normal","Heavy"] }
 alphatab.model.AccentuationType.None = ["None",0];
 alphatab.model.AccentuationType.None.toString = $estr;
 alphatab.model.AccentuationType.None.__enum__ = alphatab.model.AccentuationType;
@@ -1247,7 +2060,7 @@ alphatab.model.AccentuationType.Normal.__enum__ = alphatab.model.AccentuationTyp
 alphatab.model.AccentuationType.Heavy = ["Heavy",2];
 alphatab.model.AccentuationType.Heavy.toString = $estr;
 alphatab.model.AccentuationType.Heavy.__enum__ = alphatab.model.AccentuationType;
-alphatab.model.Automation = $hxClasses["alphatab.model.Automation"] = function() {
+alphatab.model.Automation = function() {
 };
 alphatab.model.Automation.__name__ = ["alphatab","model","Automation"];
 alphatab.model.Automation.prototype = {
@@ -1257,7 +2070,7 @@ alphatab.model.Automation.prototype = {
 	,duration: null
 	,__class__: alphatab.model.Automation
 }
-alphatab.model.AutomationType = $hxClasses["alphatab.model.AutomationType"] = { __ename__ : ["alphatab","model","AutomationType"], __constructs__ : ["Tempo","Volume","Instrument","Balance"] }
+alphatab.model.AutomationType = { __ename__ : ["alphatab","model","AutomationType"], __constructs__ : ["Tempo","Volume","Instrument","Balance"] }
 alphatab.model.AutomationType.Tempo = ["Tempo",0];
 alphatab.model.AutomationType.Tempo.toString = $estr;
 alphatab.model.AutomationType.Tempo.__enum__ = alphatab.model.AutomationType;
@@ -1270,7 +2083,7 @@ alphatab.model.AutomationType.Instrument.__enum__ = alphatab.model.AutomationTyp
 alphatab.model.AutomationType.Balance = ["Balance",3];
 alphatab.model.AutomationType.Balance.toString = $estr;
 alphatab.model.AutomationType.Balance.__enum__ = alphatab.model.AutomationType;
-alphatab.model.Bar = $hxClasses["alphatab.model.Bar"] = function() {
+alphatab.model.Bar = function() {
 	this.voices = new Array();
 	this.clef = alphatab.model.Clef.G2;
 };
@@ -1287,9 +2100,21 @@ alphatab.model.Bar.prototype = {
 		voice.index = this.voices.length;
 		this.voices.push(voice);
 	}
+	,getMasterBar: function() {
+		return this.track.score.masterBars[this.index];
+	}
+	,isEmpty: function() {
+		var _g = 0, _g1 = this.voices;
+		while(_g < _g1.length) {
+			var v = _g1[_g];
+			++_g;
+			if(!v.isEmpty()) return false;
+		}
+		return true;
+	}
 	,__class__: alphatab.model.Bar
 }
-alphatab.model.Beat = $hxClasses["alphatab.model.Beat"] = function() {
+alphatab.model.Beat = function() {
 	this.whammyBarPoints = new Array();
 	this.notes = new Array();
 	this.brushType = alphatab.model.BrushType.None;
@@ -1362,7 +2187,11 @@ alphatab.model.Beat.prototype = {
 	}
 	,__class__: alphatab.model.Beat
 }
-alphatab.model.BendPoint = $hxClasses["alphatab.model.BendPoint"] = function() {
+alphatab.model.BendPoint = function(offset,value) {
+	if(value == null) value = 0;
+	if(offset == null) offset = 0;
+	this.offset = offset;
+	this.value = value;
 };
 alphatab.model.BendPoint.__name__ = ["alphatab","model","BendPoint"];
 alphatab.model.BendPoint.prototype = {
@@ -1370,7 +2199,7 @@ alphatab.model.BendPoint.prototype = {
 	,value: null
 	,__class__: alphatab.model.BendPoint
 }
-alphatab.model.BrushType = $hxClasses["alphatab.model.BrushType"] = { __ename__ : ["alphatab","model","BrushType"], __constructs__ : ["None","BrushUp","BrushDown","ArpeggioUp","ArpeggioDown"] }
+alphatab.model.BrushType = { __ename__ : ["alphatab","model","BrushType"], __constructs__ : ["None","BrushUp","BrushDown","ArpeggioUp","ArpeggioDown"] }
 alphatab.model.BrushType.None = ["None",0];
 alphatab.model.BrushType.None.toString = $estr;
 alphatab.model.BrushType.None.__enum__ = alphatab.model.BrushType;
@@ -1386,7 +2215,7 @@ alphatab.model.BrushType.ArpeggioUp.__enum__ = alphatab.model.BrushType;
 alphatab.model.BrushType.ArpeggioDown = ["ArpeggioDown",4];
 alphatab.model.BrushType.ArpeggioDown.toString = $estr;
 alphatab.model.BrushType.ArpeggioDown.__enum__ = alphatab.model.BrushType;
-alphatab.model.Chord = $hxClasses["alphatab.model.Chord"] = function() {
+alphatab.model.Chord = function() {
 	this.strings = new Array();
 };
 alphatab.model.Chord.__name__ = ["alphatab","model","Chord"];
@@ -1396,7 +2225,7 @@ alphatab.model.Chord.prototype = {
 	,strings: null
 	,__class__: alphatab.model.Chord
 }
-alphatab.model.Clef = $hxClasses["alphatab.model.Clef"] = { __ename__ : ["alphatab","model","Clef"], __constructs__ : ["C3","C4","F4","G2"] }
+alphatab.model.Clef = { __ename__ : ["alphatab","model","Clef"], __constructs__ : ["C3","C4","F4","G2"] }
 alphatab.model.Clef.C3 = ["C3",0];
 alphatab.model.Clef.C3.toString = $estr;
 alphatab.model.Clef.C3.__enum__ = alphatab.model.Clef;
@@ -1409,7 +2238,7 @@ alphatab.model.Clef.F4.__enum__ = alphatab.model.Clef;
 alphatab.model.Clef.G2 = ["G2",3];
 alphatab.model.Clef.G2.toString = $estr;
 alphatab.model.Clef.G2.__enum__ = alphatab.model.Clef;
-alphatab.model.Duration = $hxClasses["alphatab.model.Duration"] = { __ename__ : ["alphatab","model","Duration"], __constructs__ : ["Whole","Half","Quarter","Eighth","Sixteenth","ThirtySecond","SixtyFourth"] }
+alphatab.model.Duration = { __ename__ : ["alphatab","model","Duration"], __constructs__ : ["Whole","Half","Quarter","Eighth","Sixteenth","ThirtySecond","SixtyFourth"] }
 alphatab.model.Duration.Whole = ["Whole",0];
 alphatab.model.Duration.Whole.toString = $estr;
 alphatab.model.Duration.Whole.__enum__ = alphatab.model.Duration;
@@ -1431,7 +2260,7 @@ alphatab.model.Duration.ThirtySecond.__enum__ = alphatab.model.Duration;
 alphatab.model.Duration.SixtyFourth = ["SixtyFourth",6];
 alphatab.model.Duration.SixtyFourth.toString = $estr;
 alphatab.model.Duration.SixtyFourth.__enum__ = alphatab.model.Duration;
-alphatab.model.DynamicValue = $hxClasses["alphatab.model.DynamicValue"] = { __ename__ : ["alphatab","model","DynamicValue"], __constructs__ : ["PPP","PP","P","MP","MF","F","FF","FFF"] }
+alphatab.model.DynamicValue = { __ename__ : ["alphatab","model","DynamicValue"], __constructs__ : ["PPP","PP","P","MP","MF","F","FF","FFF"] }
 alphatab.model.DynamicValue.PPP = ["PPP",0];
 alphatab.model.DynamicValue.PPP.toString = $estr;
 alphatab.model.DynamicValue.PPP.__enum__ = alphatab.model.DynamicValue;
@@ -1456,7 +2285,7 @@ alphatab.model.DynamicValue.FF.__enum__ = alphatab.model.DynamicValue;
 alphatab.model.DynamicValue.FFF = ["FFF",7];
 alphatab.model.DynamicValue.FFF.toString = $estr;
 alphatab.model.DynamicValue.FFF.__enum__ = alphatab.model.DynamicValue;
-alphatab.model.GraceType = $hxClasses["alphatab.model.GraceType"] = { __ename__ : ["alphatab","model","GraceType"], __constructs__ : ["None","OnBeat","BeforeBeat"] }
+alphatab.model.GraceType = { __ename__ : ["alphatab","model","GraceType"], __constructs__ : ["None","OnBeat","BeforeBeat"] }
 alphatab.model.GraceType.None = ["None",0];
 alphatab.model.GraceType.None.toString = $estr;
 alphatab.model.GraceType.None.__enum__ = alphatab.model.GraceType;
@@ -1466,7 +2295,7 @@ alphatab.model.GraceType.OnBeat.__enum__ = alphatab.model.GraceType;
 alphatab.model.GraceType.BeforeBeat = ["BeforeBeat",2];
 alphatab.model.GraceType.BeforeBeat.toString = $estr;
 alphatab.model.GraceType.BeforeBeat.__enum__ = alphatab.model.GraceType;
-alphatab.model.HarmonicType = $hxClasses["alphatab.model.HarmonicType"] = { __ename__ : ["alphatab","model","HarmonicType"], __constructs__ : ["None","Natural","Artificial","Pinch","Tap","Semi","Feedback"] }
+alphatab.model.HarmonicType = { __ename__ : ["alphatab","model","HarmonicType"], __constructs__ : ["None","Natural","Artificial","Pinch","Tap","Semi","Feedback"] }
 alphatab.model.HarmonicType.None = ["None",0];
 alphatab.model.HarmonicType.None.toString = $estr;
 alphatab.model.HarmonicType.None.__enum__ = alphatab.model.HarmonicType;
@@ -1488,9 +2317,17 @@ alphatab.model.HarmonicType.Semi.__enum__ = alphatab.model.HarmonicType;
 alphatab.model.HarmonicType.Feedback = ["Feedback",6];
 alphatab.model.HarmonicType.Feedback.toString = $estr;
 alphatab.model.HarmonicType.Feedback.__enum__ = alphatab.model.HarmonicType;
-alphatab.model.MasterBar = $hxClasses["alphatab.model.MasterBar"] = function() {
+alphatab.model.MasterBar = function() {
 	this.alternateEndings = 0;
 	this.repeatCount = 0;
+	this.index = 0;
+	this.keySignature = 0;
+	this.isDoubleBar = false;
+	this.isRepeatStart = false;
+	this.repeatCount = 0;
+	this.timeSignatureDenominator = 4;
+	this.timeSignatureNumerator = 4;
+	this.tripletFeel = alphatab.model.TripletFeel.NoTripletFeel;
 };
 alphatab.model.MasterBar.__name__ = ["alphatab","model","MasterBar"];
 alphatab.model.MasterBar.prototype = {
@@ -1517,7 +2354,7 @@ alphatab.model.MasterBar.prototype = {
 	,score: null
 	,__class__: alphatab.model.MasterBar
 }
-alphatab.model.Note = $hxClasses["alphatab.model.Note"] = function() {
+alphatab.model.Note = function() {
 	this.bendPoints = new Array();
 	this.trillFret = -1;
 	this.dynamicValue = alphatab.model.DynamicValue.F;
@@ -1581,7 +2418,7 @@ alphatab.model.Note.prototype = {
 	,dynamicValue: null
 	,__class__: alphatab.model.Note
 }
-alphatab.model.PickStrokeType = $hxClasses["alphatab.model.PickStrokeType"] = { __ename__ : ["alphatab","model","PickStrokeType"], __constructs__ : ["None","Up","Down"] }
+alphatab.model.PickStrokeType = { __ename__ : ["alphatab","model","PickStrokeType"], __constructs__ : ["None","Up","Down"] }
 alphatab.model.PickStrokeType.None = ["None",0];
 alphatab.model.PickStrokeType.None.toString = $estr;
 alphatab.model.PickStrokeType.None.__enum__ = alphatab.model.PickStrokeType;
@@ -1591,7 +2428,7 @@ alphatab.model.PickStrokeType.Up.__enum__ = alphatab.model.PickStrokeType;
 alphatab.model.PickStrokeType.Down = ["Down",2];
 alphatab.model.PickStrokeType.Down.toString = $estr;
 alphatab.model.PickStrokeType.Down.__enum__ = alphatab.model.PickStrokeType;
-alphatab.model.PlaybackInformation = $hxClasses["alphatab.model.PlaybackInformation"] = function() {
+alphatab.model.PlaybackInformation = function() {
 };
 alphatab.model.PlaybackInformation.__name__ = ["alphatab","model","PlaybackInformation"];
 alphatab.model.PlaybackInformation.prototype = {
@@ -1605,7 +2442,7 @@ alphatab.model.PlaybackInformation.prototype = {
 	,isSolo: null
 	,__class__: alphatab.model.PlaybackInformation
 }
-alphatab.model.Score = $hxClasses["alphatab.model.Score"] = function() {
+alphatab.model.Score = function() {
 	this.masterBars = new Array();
 	this.tracks = new Array();
 };
@@ -1621,6 +2458,7 @@ alphatab.model.Score.prototype = {
 	,title: null
 	,words: null
 	,tab: null
+	,tempo: null
 	,tempoLabel: null
 	,masterBars: null
 	,tracks: null
@@ -1640,7 +2478,7 @@ alphatab.model.Score.prototype = {
 	}
 	,__class__: alphatab.model.Score
 }
-alphatab.model.Section = $hxClasses["alphatab.model.Section"] = function() {
+alphatab.model.Section = function() {
 };
 alphatab.model.Section.__name__ = ["alphatab","model","Section"];
 alphatab.model.Section.prototype = {
@@ -1648,7 +2486,7 @@ alphatab.model.Section.prototype = {
 	,text: null
 	,__class__: alphatab.model.Section
 }
-alphatab.model.SlideType = $hxClasses["alphatab.model.SlideType"] = { __ename__ : ["alphatab","model","SlideType"], __constructs__ : ["None","Shift","Legato","IntoFromBelow","IntoFromAbove","OutUp","OutDown"] }
+alphatab.model.SlideType = { __ename__ : ["alphatab","model","SlideType"], __constructs__ : ["None","Shift","Legato","IntoFromBelow","IntoFromAbove","OutUp","OutDown"] }
 alphatab.model.SlideType.None = ["None",0];
 alphatab.model.SlideType.None.toString = $estr;
 alphatab.model.SlideType.None.__enum__ = alphatab.model.SlideType;
@@ -1670,9 +2508,10 @@ alphatab.model.SlideType.OutUp.__enum__ = alphatab.model.SlideType;
 alphatab.model.SlideType.OutDown = ["OutDown",6];
 alphatab.model.SlideType.OutDown.toString = $estr;
 alphatab.model.SlideType.OutDown.__enum__ = alphatab.model.SlideType;
-alphatab.model.Track = $hxClasses["alphatab.model.Track"] = function() {
+alphatab.model.Track = function() {
 	this.tuning = new Array();
 	this.bars = new Array();
+	this.playbackInfo = new alphatab.model.PlaybackInformation();
 };
 alphatab.model.Track.__name__ = ["alphatab","model","Track"];
 alphatab.model.Track.prototype = {
@@ -1697,7 +2536,7 @@ alphatab.model.Track.prototype = {
 	}
 	,__class__: alphatab.model.Track
 }
-alphatab.model.TripletFeel = $hxClasses["alphatab.model.TripletFeel"] = { __ename__ : ["alphatab","model","TripletFeel"], __constructs__ : ["NoTripletFeel","Triplet16th","Triplet8th","Dotted16th","Dotted8th","Scottish16th","Scottish8th"] }
+alphatab.model.TripletFeel = { __ename__ : ["alphatab","model","TripletFeel"], __constructs__ : ["NoTripletFeel","Triplet16th","Triplet8th","Dotted16th","Dotted8th","Scottish16th","Scottish8th"] }
 alphatab.model.TripletFeel.NoTripletFeel = ["NoTripletFeel",0];
 alphatab.model.TripletFeel.NoTripletFeel.toString = $estr;
 alphatab.model.TripletFeel.NoTripletFeel.__enum__ = alphatab.model.TripletFeel;
@@ -1719,7 +2558,7 @@ alphatab.model.TripletFeel.Scottish16th.__enum__ = alphatab.model.TripletFeel;
 alphatab.model.TripletFeel.Scottish8th = ["Scottish8th",6];
 alphatab.model.TripletFeel.Scottish8th.toString = $estr;
 alphatab.model.TripletFeel.Scottish8th.__enum__ = alphatab.model.TripletFeel;
-alphatab.model.Tuning = $hxClasses["alphatab.model.Tuning"] = function(name,tuning,isStandard) {
+alphatab.model.Tuning = function(name,tuning,isStandard) {
 	this.name = name;
 	this.tuning = tuning;
 	this.tuning.reverse();
@@ -1731,7 +2570,7 @@ alphatab.model.Tuning._sixStrings = null;
 alphatab.model.Tuning._fiveStrings = null;
 alphatab.model.Tuning._fourStrings = null;
 alphatab.model.Tuning.isTuning = function(name) {
-	var regex = new EReg("([a-g]b?)([0-9])","i");
+	var regex = alphatab.model.Tuning.TUNING_REGEX;
 	return regex.match(name);
 }
 alphatab.model.Tuning.getTextForTuning = function(tuning,includeOctave) {
@@ -1744,7 +2583,7 @@ alphatab.model.Tuning.getTextForTuning = function(tuning,includeOctave) {
 }
 alphatab.model.Tuning.getTuningForText = function(str) {
 	var base = 0;
-	var regex = new EReg("([a-g]b?)([0-9])","i");
+	var regex = alphatab.model.Tuning.TUNING_REGEX;
 	if(regex.match(str.toLowerCase())) {
 		var note = regex.matched(1);
 		var octave = Std.parseInt(regex.matched(2));
@@ -1841,7 +2680,7 @@ alphatab.model.Tuning.prototype = {
 	,tuning: null
 	,__class__: alphatab.model.Tuning
 }
-alphatab.model.VibratoType = $hxClasses["alphatab.model.VibratoType"] = { __ename__ : ["alphatab","model","VibratoType"], __constructs__ : ["None","Slight","Wide"] }
+alphatab.model.VibratoType = { __ename__ : ["alphatab","model","VibratoType"], __constructs__ : ["None","Slight","Wide"] }
 alphatab.model.VibratoType.None = ["None",0];
 alphatab.model.VibratoType.None.toString = $estr;
 alphatab.model.VibratoType.None.__enum__ = alphatab.model.VibratoType;
@@ -1851,7 +2690,7 @@ alphatab.model.VibratoType.Slight.__enum__ = alphatab.model.VibratoType;
 alphatab.model.VibratoType.Wide = ["Wide",2];
 alphatab.model.VibratoType.Wide.toString = $estr;
 alphatab.model.VibratoType.Wide.__enum__ = alphatab.model.VibratoType;
-alphatab.model.Voice = $hxClasses["alphatab.model.Voice"] = function() {
+alphatab.model.Voice = function() {
 	this.beats = new Array();
 };
 alphatab.model.Voice.__name__ = ["alphatab","model","Voice"];
@@ -1868,10 +2707,13 @@ alphatab.model.Voice.prototype = {
 		}
 		this.beats.push(beat);
 	}
+	,isEmpty: function() {
+		return this.beats.length == 0;
+	}
 	,__class__: alphatab.model.Voice
 }
 if(!alphatab.platform) alphatab.platform = {}
-alphatab.platform.ICanvas = $hxClasses["alphatab.platform.ICanvas"] = function() { }
+alphatab.platform.ICanvas = function() { }
 alphatab.platform.ICanvas.__name__ = ["alphatab","platform","ICanvas"];
 alphatab.platform.ICanvas.prototype = {
 	getWidth: null
@@ -1900,14 +2742,14 @@ alphatab.platform.ICanvas.prototype = {
 	,measureText: null
 	,__class__: alphatab.platform.ICanvas
 }
-alphatab.platform.IFileLoader = $hxClasses["alphatab.platform.IFileLoader"] = function() { }
+alphatab.platform.IFileLoader = function() { }
 alphatab.platform.IFileLoader.__name__ = ["alphatab","platform","IFileLoader"];
 alphatab.platform.IFileLoader.prototype = {
 	loadBinary: null
 	,loadBinaryAsync: null
 	,__class__: alphatab.platform.IFileLoader
 }
-alphatab.platform.PlatformFactory = $hxClasses["alphatab.platform.PlatformFactory"] = function() { }
+alphatab.platform.PlatformFactory = function() { }
 alphatab.platform.PlatformFactory.__name__ = ["alphatab","platform","PlatformFactory"];
 alphatab.platform.PlatformFactory.getLoader = function() {
 	return new alphatab.platform.js.JsFileLoader();
@@ -1920,7 +2762,7 @@ alphatab.platform.PlatformFactory.prototype = {
 	__class__: alphatab.platform.PlatformFactory
 }
 if(!alphatab.platform.js) alphatab.platform.js = {}
-alphatab.platform.js.Html5Canvas = $hxClasses["alphatab.platform.js.Html5Canvas"] = function(dom) {
+alphatab.platform.js.Html5Canvas = function(dom) {
 	this._canvas = dom;
 	this._context = dom.getContext("2d");
 	this._context.textBaseline = "top";
@@ -1930,6 +2772,8 @@ alphatab.platform.js.Html5Canvas.__interfaces__ = [alphatab.platform.ICanvas];
 alphatab.platform.js.Html5Canvas.prototype = {
 	_canvas: null
 	,_context: null
+	,_width: null
+	,_height: null
 	,getWidth: function() {
 		return this._canvas.offsetWidth;
 	}
@@ -1940,11 +2784,13 @@ alphatab.platform.js.Html5Canvas.prototype = {
 		this._canvas.width = width;
 		this._context = this._canvas.getContext("2d");
 		this._context.textBaseline = "top";
+		this._width = width;
 	}
 	,setHeight: function(height) {
 		this._canvas.height = height;
 		this._context = this._canvas.getContext("2d");
 		this._context.textBaseline = "top";
+		this._height = height;
 	}
 	,setColor: function(color) {
 		this._context.strokeStyle = color.toRgbaString();
@@ -1954,7 +2800,8 @@ alphatab.platform.js.Html5Canvas.prototype = {
 		this._context.lineWidth = value;
 	}
 	,clear: function() {
-		this._context.clearRect(0,0,this.getWidth(),this.getHeight());
+		haxe.Log.trace("w: " + this._width + " / h:" + this._height,{ fileName : "Html5Canvas.hx", lineNumber : 84, className : "alphatab.platform.js.Html5Canvas", methodName : "clear"});
+		this._canvas.width = this._canvas.width;
 	}
 	,fillRect: function(x,y,w,h) {
 		this._context.fillRect(x - 0.5,y - 0.5,w,h);
@@ -2019,10 +2866,14 @@ alphatab.platform.js.Html5Canvas.prototype = {
 	}
 	,__class__: alphatab.platform.js.Html5Canvas
 }
-alphatab.platform.js.JsFileLoader = $hxClasses["alphatab.platform.js.JsFileLoader"] = function() {
+alphatab.platform.js.JsFileLoader = function() {
 };
 alphatab.platform.js.JsFileLoader.__name__ = ["alphatab","platform","js","JsFileLoader"];
 alphatab.platform.js.JsFileLoader.__interfaces__ = [alphatab.platform.IFileLoader];
+alphatab.platform.js.JsFileLoader.isIE = function() {
+	var agent = navigator.userAgent;
+	return agent.indexOf("MSIE") != -1;
+}
 alphatab.platform.js.JsFileLoader.getBytes = function(s) {
 	var a = new Array();
 	var _g1 = 0, _g = s.length;
@@ -2034,7 +2885,7 @@ alphatab.platform.js.JsFileLoader.getBytes = function(s) {
 }
 alphatab.platform.js.JsFileLoader.prototype = {
 	loadBinary: function(path) {
-		if(js.Lib.isIE) {
+		if(alphatab.platform.js.JsFileLoader.isIE()) {
 			var vbArr = VbAjaxLoader(method,file);
 			var fileContents = vbArr.toArray();
 			var data = "";
@@ -2057,7 +2908,7 @@ alphatab.platform.js.JsFileLoader.prototype = {
 		}
 	}
 	,loadBinaryAsync: function(path,success,error) {
-		if(js.Lib.isIE) {
+		if(alphatab.platform.js.JsFileLoader.isIE()) {
 			var vbArr = VbAjaxLoader(method,file);
 			var fileContents = vbArr.toArray();
 			var data = "";
@@ -2090,7 +2941,7 @@ alphatab.platform.js.JsFileLoader.prototype = {
 	,__class__: alphatab.platform.js.JsFileLoader
 }
 if(!alphatab.platform.model) alphatab.platform.model = {}
-alphatab.platform.model.Color = $hxClasses["alphatab.platform.model.Color"] = function(r,g,b,a) {
+alphatab.platform.model.Color = function(r,g,b,a) {
 	if(a == null) a = 255;
 	this._higherBits = (a & 255) << 8 | r & 255;
 	this._lowerBits = (g & 255) << 8 | b & 255;
@@ -2119,7 +2970,7 @@ alphatab.platform.model.Color.prototype = {
 	}
 	,__class__: alphatab.platform.model.Color
 }
-alphatab.platform.model.Font = $hxClasses["alphatab.platform.model.Font"] = function(family,size,style) {
+alphatab.platform.model.Font = function(family,size,style) {
 	if(style == null) style = 0;
 	this._family = family;
 	this._size = size;
@@ -2158,7 +3009,7 @@ alphatab.platform.model.Font.prototype = {
 	}
 	,__class__: alphatab.platform.model.Font
 }
-alphatab.platform.model.TextAlign = $hxClasses["alphatab.platform.model.TextAlign"] = { __ename__ : ["alphatab","platform","model","TextAlign"], __constructs__ : ["Left","Center","Right"] }
+alphatab.platform.model.TextAlign = { __ename__ : ["alphatab","platform","model","TextAlign"], __constructs__ : ["Left","Center","Right"] }
 alphatab.platform.model.TextAlign.Left = ["Left",0];
 alphatab.platform.model.TextAlign.Left.toString = $estr;
 alphatab.platform.model.TextAlign.Left.__enum__ = alphatab.platform.model.TextAlign;
@@ -2169,7 +3020,7 @@ alphatab.platform.model.TextAlign.Right = ["Right",2];
 alphatab.platform.model.TextAlign.Right.toString = $estr;
 alphatab.platform.model.TextAlign.Right.__enum__ = alphatab.platform.model.TextAlign;
 if(!alphatab.platform.svg) alphatab.platform.svg = {}
-alphatab.platform.svg.FontSizes = $hxClasses["alphatab.platform.svg.FontSizes"] = function() { }
+alphatab.platform.svg.FontSizes = function() { }
 alphatab.platform.svg.FontSizes.__name__ = ["alphatab","platform","svg","FontSizes"];
 alphatab.platform.svg.FontSizes.measureString = function(s,f,size) {
 	var data;
@@ -2199,14 +3050,14 @@ alphatab.platform.svg.FontSizes.measureString = function(s,f,size) {
 alphatab.platform.svg.FontSizes.prototype = {
 	__class__: alphatab.platform.svg.FontSizes
 }
-alphatab.platform.svg.SupportedFonts = $hxClasses["alphatab.platform.svg.SupportedFonts"] = { __ename__ : ["alphatab","platform","svg","SupportedFonts"], __constructs__ : ["TimesNewRoman","Arial"] }
+alphatab.platform.svg.SupportedFonts = { __ename__ : ["alphatab","platform","svg","SupportedFonts"], __constructs__ : ["TimesNewRoman","Arial"] }
 alphatab.platform.svg.SupportedFonts.TimesNewRoman = ["TimesNewRoman",0];
 alphatab.platform.svg.SupportedFonts.TimesNewRoman.toString = $estr;
 alphatab.platform.svg.SupportedFonts.TimesNewRoman.__enum__ = alphatab.platform.svg.SupportedFonts;
 alphatab.platform.svg.SupportedFonts.Arial = ["Arial",1];
 alphatab.platform.svg.SupportedFonts.Arial.toString = $estr;
 alphatab.platform.svg.SupportedFonts.Arial.__enum__ = alphatab.platform.svg.SupportedFonts;
-alphatab.platform.svg.SvgCanvas = $hxClasses["alphatab.platform.svg.SvgCanvas"] = function() {
+alphatab.platform.svg.SvgCanvas = function() {
 	this._buffer = new StringBuf();
 	this._currentPath = new StringBuf();
 	this._currentPathIsEmpty = true;
@@ -2476,7 +3327,8 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 	,__class__: alphatab.platform.svg.SvgCanvas
 }
 if(!alphatab.rendering) alphatab.rendering = {}
-alphatab.rendering.BarRendererBase = $hxClasses["alphatab.rendering.BarRendererBase"] = function() {
+alphatab.rendering.BarRendererBase = function(bar) {
+	this._bar = bar;
 };
 alphatab.rendering.BarRendererBase.__name__ = ["alphatab","rendering","BarRendererBase"];
 alphatab.rendering.BarRendererBase.prototype = {
@@ -2486,7 +3338,11 @@ alphatab.rendering.BarRendererBase.prototype = {
 	,width: null
 	,height: null
 	,index: null
+	,_bar: null
 	,applyBarSpacing: function(spacing) {
+	}
+	,getScale: function() {
+		return this.stave.staveGroup.layout.renderer.scale;
 	}
 	,getLayout: function() {
 		return this.stave.staveGroup.layout;
@@ -2500,13 +3356,22 @@ alphatab.rendering.BarRendererBase.prototype = {
 	,isLastOfLine: function() {
 		return this.index == this.stave.barRenderers.length - 1;
 	}
+	,isLast: function() {
+		return this._bar.index == this._bar.track.bars.length - 1;
+	}
+	,getTopPadding: function() {
+		return 0;
+	}
+	,getBottomPadding: function() {
+		return 0;
+	}
 	,doLayout: function() {
 	}
 	,paint: function(cx,cy,canvas) {
 	}
 	,__class__: alphatab.rendering.BarRendererBase
 }
-alphatab.rendering.BarRendererFactory = $hxClasses["alphatab.rendering.BarRendererFactory"] = function() {
+alphatab.rendering.BarRendererFactory = function() {
 };
 alphatab.rendering.BarRendererFactory.__name__ = ["alphatab","rendering","BarRendererFactory"];
 alphatab.rendering.BarRendererFactory.prototype = {
@@ -2515,7 +3380,7 @@ alphatab.rendering.BarRendererFactory.prototype = {
 	}
 	,__class__: alphatab.rendering.BarRendererFactory
 }
-alphatab.rendering.Glyph = $hxClasses["alphatab.rendering.Glyph"] = function(x,y) {
+alphatab.rendering.Glyph = function(x,y) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	this.x = x;
@@ -2533,31 +3398,30 @@ alphatab.rendering.Glyph.prototype = {
 		if(this.index == 0) this.x = 0; else this.x = this.renderer.glyphs[this.index - 1].x + this.renderer.glyphs[this.index - 1].width;
 		this.width += spacing;
 	}
+	,getScale: function() {
+		return this.renderer.stave.staveGroup.layout.renderer.scale;
+	}
 	,doLayout: function() {
 	}
 	,paint: function(cx,cy,canvas) {
 	}
 	,__class__: alphatab.rendering.Glyph
 }
-alphatab.rendering.GlyphBarRenderer = $hxClasses["alphatab.rendering.GlyphBarRenderer"] = function(bar) {
-	alphatab.rendering.BarRendererBase.call(this);
-	this._bar = bar;
+alphatab.rendering.GlyphBarRenderer = function(bar) {
+	alphatab.rendering.BarRendererBase.call(this,bar);
 	this.glyphs = new Array();
 };
 alphatab.rendering.GlyphBarRenderer.__name__ = ["alphatab","rendering","GlyphBarRenderer"];
 alphatab.rendering.GlyphBarRenderer.__super__ = alphatab.rendering.BarRendererBase;
 alphatab.rendering.GlyphBarRenderer.prototype = $extend(alphatab.rendering.BarRendererBase.prototype,{
-	_bar: null
-	,glyphs: null
+	glyphs: null
 	,doLayout: function() {
 		this.createGlyphs();
 	}
 	,createGlyphs: function() {
-		var lay = this.stave.staveGroup.layout;
-		this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,10 * lay.renderer.scale | 0));
 	}
 	,addGlyph: function(glyph) {
-		glyph.x = this.width;
+		glyph.x = this.width + glyph.x;
 		glyph.index = this.glyphs.length;
 		glyph.renderer = this;
 		glyph.doLayout();
@@ -2588,7 +3452,7 @@ alphatab.rendering.GlyphBarRenderer.prototype = $extend(alphatab.rendering.BarRe
 	}
 	,__class__: alphatab.rendering.GlyphBarRenderer
 });
-alphatab.rendering.RenderingResources = $hxClasses["alphatab.rendering.RenderingResources"] = function(scale) {
+alphatab.rendering.RenderingResources = function(scale) {
 	this.init(scale);
 };
 alphatab.rendering.RenderingResources.__name__ = ["alphatab","rendering","RenderingResources"];
@@ -2601,6 +3465,9 @@ alphatab.rendering.RenderingResources.prototype = {
 	,tablatureFont: null
 	,staveLineColor: null
 	,barSeperatorColor: null
+	,barNumberFont: null
+	,barNumberColor: null
+	,mainGlyphColor: null
 	,init: function(scale) {
 		var sansFont = "Arial";
 		var serifFont = "Times New Roman";
@@ -2612,16 +3479,25 @@ alphatab.rendering.RenderingResources.prototype = {
 		this.tablatureFont = new alphatab.platform.model.Font(sansFont,12 * scale);
 		this.staveLineColor = new alphatab.platform.model.Color(165,165,165);
 		this.barSeperatorColor = new alphatab.platform.model.Color(34,34,17);
+		this.barNumberFont = new alphatab.platform.model.Font(sansFont,11 * scale);
+		this.barNumberColor = new alphatab.platform.model.Color(200,0,0);
+		this.mainGlyphColor = new alphatab.platform.model.Color(0,0,0);
 	}
 	,__class__: alphatab.rendering.RenderingResources
 }
-alphatab.rendering.ScoreBarRenderer = $hxClasses["alphatab.rendering.ScoreBarRenderer"] = function(bar) {
+alphatab.rendering.ScoreBarRenderer = function(bar) {
 	alphatab.rendering.GlyphBarRenderer.call(this,bar);
 };
 alphatab.rendering.ScoreBarRenderer.__name__ = ["alphatab","rendering","ScoreBarRenderer"];
 alphatab.rendering.ScoreBarRenderer.__super__ = alphatab.rendering.GlyphBarRenderer;
 alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.GlyphBarRenderer.prototype,{
-	getLineOffset: function() {
+	getTopPadding: function() {
+		return this.getGlyphOverflow();
+	}
+	,getBottomPadding: function() {
+		return this.getGlyphOverflow();
+	}
+	,getLineOffset: function() {
 		return 9 * this.stave.staveGroup.layout.renderer.scale;
 	}
 	,doLayout: function() {
@@ -2633,10 +3509,103 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Glyph
 		}
 	}
 	,createGlyphs: function() {
-		alphatab.rendering.GlyphBarRenderer.prototype.createGlyphs.call(this);
-		this.addGlyph(new alphatab.rendering.glyphs.DummyScoreGlyph(0,0,50));
-		this.addGlyph(new alphatab.rendering.glyphs.DummyScoreGlyph(0,0,50));
-		this.addGlyph(new alphatab.rendering.glyphs.DummyScoreGlyph(0,0,50));
+		this.createBarStartGlyphs();
+		this.createStartGlyphs();
+		if(this._bar.isEmpty()) this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,30 * this.stave.staveGroup.layout.renderer.scale | 0));
+		this.createBarEndGlyphs();
+	}
+	,_startSpacing: null
+	,createStartSpacing: function() {
+		if(this._startSpacing) return;
+		this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,2 * this.stave.staveGroup.layout.renderer.scale | 0));
+		this._startSpacing = true;
+	}
+	,createBarStartGlyphs: function() {
+		if(this._bar.getMasterBar().isRepeatStart) this.addGlyph(new alphatab.rendering.glyphs.RepeatOpenGlyph());
+	}
+	,createBarEndGlyphs: function() {
+		if(this._bar.getMasterBar().repeatCount > 0) this.addGlyph(new alphatab.rendering.glyphs.RepeatCloseGlyph(this.x,0)); else if(this._bar.getMasterBar().isDoubleBar) {
+			this.addGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph());
+			this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,3 * this.stave.staveGroup.layout.renderer.scale | 0));
+			this.addGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph());
+		} else if(this._bar.nextBar == null || !this._bar.nextBar.getMasterBar().isRepeatStart) this.addGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph(0,0,this._bar.index == this._bar.track.bars.length - 1));
+	}
+	,createStartGlyphs: function() {
+		if(this.index == 0 || this._bar.clef != this._bar.previousBar.clef) {
+			var offset = 0;
+			switch( (this._bar.clef)[1] ) {
+			case 2:
+			case 0:
+				offset = 2;
+				break;
+			case 1:
+				offset = 0;
+				break;
+			default:
+				offset = 0;
+			}
+			this.createStartSpacing();
+			this.addGlyph(new alphatab.rendering.glyphs.ClefGlyph(0,this.getScoreY(offset,-1),this._bar.clef));
+		}
+		if(this._bar.previousBar == null && this._bar.getMasterBar().keySignature != 0 || this._bar.previousBar != null && this._bar.getMasterBar().keySignature != this._bar.previousBar.getMasterBar().keySignature) {
+			this.createStartSpacing();
+			this.createKeySignatureGlyphs();
+		}
+		if(this._bar.previousBar == null || this._bar.previousBar != null && this._bar.getMasterBar().timeSignatureNumerator != this._bar.previousBar.getMasterBar().timeSignatureNumerator || this._bar.previousBar != null && this._bar.getMasterBar().timeSignatureDenominator != this._bar.previousBar.getMasterBar().timeSignatureDenominator) {
+			this.createStartSpacing();
+			this.createTimeSignatureGlyphs();
+		}
+		if(this.stave.index == 0) this.addGlyph(new alphatab.rendering.glyphs.BarNumberGlyph(0,this.getScoreY(-1,-3),this._bar.index + 1));
+	}
+	,createKeySignatureGlyphs: function() {
+		var offsetClef = 0;
+		var currentKey = this._bar.getMasterBar().keySignature;
+		var previousKey = this._bar.previousBar == null?0:this._bar.previousBar.getMasterBar().keySignature;
+		if(currentKey < 0) currentKey = 7 + Math.round(Math.abs(currentKey));
+		if(previousKey < 0) previousKey = 7 + Math.round(Math.abs(previousKey));
+		switch( (this._bar.clef)[1] ) {
+		case 3:
+			offsetClef = 0;
+			break;
+		case 2:
+			offsetClef = 2;
+			break;
+		case 0:
+			offsetClef = -1;
+			break;
+		case 1:
+			offsetClef = 1;
+			break;
+		}
+		var naturalizeSymbols = previousKey <= 7?previousKey:previousKey - 7;
+		var previousKeyPositions = previousKey <= 7?alphatab.rendering.ScoreBarRenderer.SCORE_KEYSHARP_POSITIONS:alphatab.rendering.ScoreBarRenderer.SCORE_KEYFLAT_POSITIONS;
+		var _g = 0;
+		while(_g < naturalizeSymbols) {
+			var i = _g++;
+			this.addGlyph(new alphatab.rendering.glyphs.NaturalizeGlyph(0,this.getScoreY(previousKeyPositions[i] + offsetClef,-2) | 0));
+		}
+		var offsetSymbols = currentKey <= 7?currentKey:currentKey - 7;
+		if(currentKey <= 7) {
+			var _g = 0;
+			while(_g < offsetSymbols) {
+				var i = _g++;
+				this.addGlyph(new alphatab.rendering.glyphs.SharpGlyph(0,this.getScoreY(alphatab.rendering.ScoreBarRenderer.SCORE_KEYSHARP_POSITIONS[i] + offsetClef,-1) | 0));
+			}
+		} else {
+			var _g = 0;
+			while(_g < offsetSymbols) {
+				var i = _g++;
+				this.addGlyph(new alphatab.rendering.glyphs.FlatGlyph(0,this.getScoreY(alphatab.rendering.ScoreBarRenderer.SCORE_KEYFLAT_POSITIONS[i] + offsetClef,-8) | 0));
+			}
+		}
+	}
+	,createTimeSignatureGlyphs: function() {
+		this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,5 * this.stave.staveGroup.layout.renderer.scale | 0,false));
+		this.addGlyph(new alphatab.rendering.glyphs.TimeSignatureGlyph(0,0,this._bar.getMasterBar().timeSignatureNumerator,this._bar.getMasterBar().timeSignatureDenominator));
+	}
+	,getScoreY: function(steps,correction) {
+		if(correction == null) correction = 0;
+		return 9 * this.stave.staveGroup.layout.renderer.scale / 2 * steps + correction * this.stave.staveGroup.layout.renderer.scale | 0;
 	}
 	,getGlyphOverflow: function() {
 		var res = this.stave.staveGroup.layout.renderer.renderingResources;
@@ -2656,15 +3625,10 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Glyph
 			canvas.lineTo(cx + this.x + this.width,lineY);
 			canvas.stroke();
 		}
-		canvas.setColor(res.barSeperatorColor);
-		canvas.beginPath();
-		canvas.moveTo(cx + this.x + this.width,startY);
-		canvas.lineTo(cx + this.x + this.width,lineY);
-		canvas.stroke();
 	}
 	,__class__: alphatab.rendering.ScoreBarRenderer
 });
-alphatab.rendering.ScoreBarRendererFactory = $hxClasses["alphatab.rendering.ScoreBarRendererFactory"] = function() {
+alphatab.rendering.ScoreBarRendererFactory = function() {
 	alphatab.rendering.BarRendererFactory.call(this);
 };
 alphatab.rendering.ScoreBarRendererFactory.__name__ = ["alphatab","rendering","ScoreBarRendererFactory"];
@@ -2675,7 +3639,7 @@ alphatab.rendering.ScoreBarRendererFactory.prototype = $extend(alphatab.renderin
 	}
 	,__class__: alphatab.rendering.ScoreBarRendererFactory
 });
-alphatab.rendering.ScoreRenderer = $hxClasses["alphatab.rendering.ScoreRenderer"] = function(source) {
+alphatab.rendering.ScoreRenderer = function(source) {
 	this.updateScale(1.0);
 	this.settings = new Hash();
 	this.canvas = alphatab.platform.PlatformFactory.getCanvas(source);
@@ -2696,6 +3660,7 @@ alphatab.rendering.ScoreRenderer.prototype = {
 	}
 	,render: function(track) {
 		this.track = track;
+		this.canvas.clear();
 		this.doLayout();
 		this.paintScore();
 	}
@@ -2737,7 +3702,7 @@ alphatab.rendering.ScoreRenderer.prototype = {
 	,__class__: alphatab.rendering.ScoreRenderer
 	,__properties__: {get_score:"getScore"}
 }
-alphatab.rendering.TabBarRenderer = $hxClasses["alphatab.rendering.TabBarRenderer"] = function(bar) {
+alphatab.rendering.TabBarRenderer = function(bar) {
 	alphatab.rendering.GlyphBarRenderer.call(this,bar);
 };
 alphatab.rendering.TabBarRenderer.__name__ = ["alphatab","rendering","TabBarRenderer"];
@@ -2786,7 +3751,7 @@ alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.GlyphBa
 	}
 	,__class__: alphatab.rendering.TabBarRenderer
 });
-alphatab.rendering.TabBarRendererFactory = $hxClasses["alphatab.rendering.TabBarRendererFactory"] = function() {
+alphatab.rendering.TabBarRendererFactory = function() {
 	alphatab.rendering.BarRendererFactory.call(this);
 };
 alphatab.rendering.TabBarRendererFactory.__name__ = ["alphatab","rendering","TabBarRendererFactory"];
@@ -2798,31 +3763,297 @@ alphatab.rendering.TabBarRendererFactory.prototype = $extend(alphatab.rendering.
 	,__class__: alphatab.rendering.TabBarRendererFactory
 });
 if(!alphatab.rendering.glyphs) alphatab.rendering.glyphs = {}
-alphatab.rendering.glyphs.DummyScoreGlyph = $hxClasses["alphatab.rendering.glyphs.DummyScoreGlyph"] = function(x,y,width) {
-	if(width == null) width = 100;
+alphatab.rendering.glyphs.BarNumberGlyph = function(x,y,number) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.Glyph.call(this,x,y);
-	this.width = width;
+	this._number = number;
 };
-alphatab.rendering.glyphs.DummyScoreGlyph.__name__ = ["alphatab","rendering","glyphs","DummyScoreGlyph"];
-alphatab.rendering.glyphs.DummyScoreGlyph.__super__ = alphatab.rendering.Glyph;
-alphatab.rendering.glyphs.DummyScoreGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
-	paint: function(cx,cy,canvas) {
-		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
-		canvas.setColor(new alphatab.platform.model.Color(Std.random(256),Std.random(256),Std.random(256),128));
-		canvas.fillRect(cx + this.x,cy + this.y,this.width,this.renderer.height);
-		canvas.setColor(new alphatab.platform.model.Color(Std.random(256),Std.random(256),Std.random(256),200));
-		canvas.beginPath();
-		canvas.moveTo(cx + this.x,cy + this.y + this.renderer.height);
-		canvas.lineTo(cx + this.x,cy + this.y);
-		canvas.lineTo(cx + this.x + this.width,cy + this.y + this.renderer.height);
-		canvas.lineTo(cx + this.x + this.width,cy + this.y);
-		canvas.stroke();
+alphatab.rendering.glyphs.BarNumberGlyph.__name__ = ["alphatab","rendering","glyphs","BarNumberGlyph"];
+alphatab.rendering.glyphs.BarNumberGlyph.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.BarNumberGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	_number: null
+	,doLayout: function() {
+		this.width = 0;
 	}
-	,__class__: alphatab.rendering.glyphs.DummyScoreGlyph
+	,applyGlyphSpacing: function(spacing) {
+	}
+	,paint: function(cx,cy,canvas) {
+		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
+		canvas.setColor(res.barNumberColor);
+		canvas.setFont(res.barNumberFont);
+		canvas.fillText(Std.string(this._number),cx + this.x,cy + this.y);
+	}
+	,__class__: alphatab.rendering.glyphs.BarNumberGlyph
 });
-alphatab.rendering.glyphs.DummyTablatureGlyph = $hxClasses["alphatab.rendering.glyphs.DummyTablatureGlyph"] = function(x,y) {
+alphatab.rendering.glyphs.BarSeperatorGlyph = function(x,y,isLast) {
+	if(isLast == null) isLast = false;
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.Glyph.call(this,x,y);
+	this._isLast = isLast;
+};
+alphatab.rendering.glyphs.BarSeperatorGlyph.__name__ = ["alphatab","rendering","glyphs","BarSeperatorGlyph"];
+alphatab.rendering.glyphs.BarSeperatorGlyph.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.BarSeperatorGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	_isLast: null
+	,doLayout: function() {
+		this.width = (this._isLast?8:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,applyGlyphSpacing: function(spacing) {
+	}
+	,paint: function(cx,cy,canvas) {
+		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
+		canvas.setColor(res.barSeperatorColor);
+		var blockWidth = 4 * this.renderer.stave.staveGroup.layout.renderer.scale;
+		var top = cy + this.y + this.renderer.getTopPadding();
+		var bottom = cy + this.y + this.renderer.height - this.renderer.getBottomPadding();
+		var left = cx + this.x;
+		var h = bottom - top;
+		canvas.beginPath();
+		canvas.moveTo(left,top);
+		canvas.lineTo(left,bottom);
+		canvas.stroke();
+		if(this._isLast) {
+			left += 3 * this.renderer.stave.staveGroup.layout.renderer.scale + 0.5;
+			canvas.fillRect(left,top,blockWidth,h);
+		}
+	}
+	,__class__: alphatab.rendering.glyphs.BarSeperatorGlyph
+});
+alphatab.rendering.glyphs.SvgGlyph = function(x,y,svg,xScale,yScale) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.Glyph.call(this,x,y);
+	this._token = svg.split(" ");
+	this._xScale = xScale;
+	this._yScale = yScale;
+};
+alphatab.rendering.glyphs.SvgGlyph.__name__ = ["alphatab","rendering","glyphs","SvgGlyph"];
+alphatab.rendering.glyphs.SvgGlyph.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.SvgGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	_token: null
+	,_currentX: null
+	,_currentY: null
+	,_currentIndex: null
+	,_xScale: null
+	,_yScale: null
+	,paint: function(cx,cy,canvas) {
+		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
+		canvas.setColor(res.mainGlyphColor);
+		this._currentIndex = 0;
+		this._currentX = this.x + cx;
+		this._currentY = this.y + cy;
+		canvas.setColor(new alphatab.platform.model.Color(0,0,0));
+		canvas.beginPath();
+		while(this._currentIndex < this._token.length) this.parseCommand(cx + this.x,cy + this.y,canvas);
+		canvas.fill();
+	}
+	,parseCommand: function(cx,cy,canvas) {
+		var command = this.getString();
+		switch(command) {
+		case "M":
+			this._currentX = cx + this.getNumber() * this._xScale;
+			this._currentY = cy + this.getNumber() * this._yScale;
+			canvas.moveTo(this._currentX,this._currentY);
+			break;
+		case "m":
+			this._currentX += this.getNumber() * this._xScale;
+			this._currentY += this.getNumber() * this._yScale;
+			canvas.moveTo(this._currentX,this._currentY);
+			break;
+		case "z":
+			break;
+		case "Z":
+			canvas.closePath();
+			break;
+		case "L":
+			var isNextNumber = true;
+			do {
+				this._currentX = cx + this.getNumber() * this._xScale;
+				this._currentY = cy + this.getNumber() * this._yScale;
+				canvas.lineTo(this._currentX,this._currentY);
+				isNextNumber = !this.isNextCommand();
+			} while(isNextNumber);
+			break;
+		case "l":
+			var isNextNumber = true;
+			do {
+				this._currentX += this.getNumber() * this._xScale;
+				this._currentY += this.getNumber() * this._yScale;
+				canvas.lineTo(this._currentX,this._currentY);
+				isNextNumber = !this.isNextCommand();
+			} while(isNextNumber);
+			break;
+		case "C":
+			var isNextNumber = true;
+			do {
+				var x1 = cx + this.getNumber() * this._xScale;
+				var y1 = cy + this.getNumber() * this._yScale;
+				var x2 = cx + this.getNumber() * this._xScale;
+				var y2 = cy + this.getNumber() * this._yScale;
+				var x3 = cx + this.getNumber() * this._xScale;
+				var y3 = cy + this.getNumber() * this._yScale;
+				this._currentX = x3;
+				this._currentY = y3;
+				canvas.bezierCurveTo(x1,y1,x2,y2,x3,y3);
+				isNextNumber = !this.isNextCommand();
+			} while(isNextNumber);
+			break;
+		case "c":
+			var isNextNumber = true;
+			do {
+				var x1 = this._currentX + this.getNumber() * this._xScale;
+				var y1 = this._currentY + this.getNumber() * this._yScale;
+				var x2 = this._currentX + this.getNumber() * this._xScale;
+				var y2 = this._currentY + this.getNumber() * this._yScale;
+				var x3 = this._currentX + this.getNumber() * this._xScale;
+				var y3 = this._currentY + this.getNumber() * this._yScale;
+				this._currentX = x3;
+				this._currentY = y3;
+				canvas.bezierCurveTo(x1,y1,x2,y2,x3,y3);
+				isNextNumber = !this.isNextCommand();
+			} while(isNextNumber && this._currentIndex < this._token.length);
+			break;
+		case "Q":
+			var isNextNumber = true;
+			do {
+				var x1 = cx + this.getNumber() * this._xScale;
+				var y1 = cy + this.getNumber() * this._yScale;
+				var x2 = cx + this.getNumber() * this._xScale;
+				var y2 = cy + this.getNumber() * this._yScale;
+				this._currentX = x2;
+				this._currentY = y2;
+				canvas.quadraticCurveTo(x1,y1,x2,y2);
+				isNextNumber = !this.isNextCommand();
+			} while(isNextNumber);
+			break;
+		case "q":
+			var isNextNumber = true;
+			do {
+				var x1 = this._currentX + this.getNumber() * this._xScale;
+				var y1 = this._currentY + this.getNumber() * this._yScale;
+				var x2 = this._currentX + this.getNumber() * this._xScale;
+				var y2 = this._currentY + this.getNumber() * this._yScale;
+				this._currentX = x2;
+				this._currentY = y2;
+				canvas.quadraticCurveTo(x1,y1,x2,y2);
+				isNextNumber = !this.isNextCommand();
+			} while(isNextNumber && this._currentIndex < this._token.length);
+			break;
+		}
+	}
+	,getNumber: function() {
+		return Std.parseFloat(this._token[this._currentIndex++]);
+	}
+	,isNextCommand: function() {
+		var command = this.peekString();
+		return command == "m" || command == "M" || command == "c" || command == "C" || command == "q" || command == "Q" || command == "l" || command == "L" || command == "z" || command == "Z";
+	}
+	,peekString: function() {
+		return this._token[this._currentIndex];
+	}
+	,peekNumber: function() {
+		return Std.parseFloat(this._token[this._currentIndex]);
+	}
+	,getString: function() {
+		return this._token[this._currentIndex++];
+	}
+	,__class__: alphatab.rendering.glyphs.SvgGlyph
+});
+alphatab.rendering.glyphs.ClefGlyph = function(x,y,clef) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,this.getClefSvg(clef),this.getClefScale(clef),this.getClefScale(clef));
+};
+alphatab.rendering.glyphs.ClefGlyph.__name__ = ["alphatab","rendering","glyphs","ClefGlyph"];
+alphatab.rendering.glyphs.ClefGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
+alphatab.rendering.glyphs.ClefGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
+	doLayout: function() {
+		this.width = 24 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,applyGlyphSpacing: function(spacing) {
+	}
+	,getClefSvg: function(clef) {
+		switch( (clef)[1] ) {
+		case 0:
+			return alphatab.rendering.glyphs.MusicFont.TenorClef;
+		case 1:
+			return alphatab.rendering.glyphs.MusicFont.AltoClef;
+		case 2:
+			return alphatab.rendering.glyphs.MusicFont.BassClef;
+		case 3:
+			return alphatab.rendering.glyphs.MusicFont.TrebleClef;
+		default:
+			return "";
+		}
+	}
+	,getClefScale: function(clef) {
+		switch( (clef)[1] ) {
+		case 0:
+		case 1:
+			return 1.1;
+		default:
+			return 1.02;
+		}
+	}
+	,__class__: alphatab.rendering.glyphs.ClefGlyph
+});
+alphatab.rendering.glyphs.DigitGlyph = function(x,y,digit) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,this.getDigit(digit),1.1,1.1);
+	this._digit = digit;
+};
+alphatab.rendering.glyphs.DigitGlyph.__name__ = ["alphatab","rendering","glyphs","DigitGlyph"];
+alphatab.rendering.glyphs.DigitGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
+alphatab.rendering.glyphs.DigitGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
+	_digit: null
+	,doLayout: function() {
+		this.y += 7 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		this.width = this.getDigitWidth(this._digit) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,applyGlyphSpacing: function(spacing) {
+	}
+	,getDigitWidth: function(digit) {
+		switch(digit) {
+		case 0:case 2:case 3:case 4:case 5:case 6:case 7:case 8:case 9:
+			return 14;
+		case 1:
+			return 10;
+		default:
+			return 0;
+		}
+	}
+	,getDigit: function(digit) {
+		switch(digit) {
+		case 0:
+			return alphatab.rendering.glyphs.MusicFont.Num0;
+		case 1:
+			return alphatab.rendering.glyphs.MusicFont.Num1;
+		case 2:
+			return alphatab.rendering.glyphs.MusicFont.Num2;
+		case 3:
+			return alphatab.rendering.glyphs.MusicFont.Num3;
+		case 4:
+			return alphatab.rendering.glyphs.MusicFont.Num4;
+		case 5:
+			return alphatab.rendering.glyphs.MusicFont.Num5;
+		case 6:
+			return alphatab.rendering.glyphs.MusicFont.Num6;
+		case 7:
+			return alphatab.rendering.glyphs.MusicFont.Num7;
+		case 8:
+			return alphatab.rendering.glyphs.MusicFont.Num8;
+		case 9:
+			return alphatab.rendering.glyphs.MusicFont.Num9;
+		default:
+			return "";
+		}
+	}
+	,__class__: alphatab.rendering.glyphs.DigitGlyph
+});
+alphatab.rendering.glyphs.DummyTablatureGlyph = function(x,y) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.Glyph.call(this,x,y);
@@ -2843,24 +4074,249 @@ alphatab.rendering.glyphs.DummyTablatureGlyph.prototype = $extend(alphatab.rende
 	}
 	,__class__: alphatab.rendering.glyphs.DummyTablatureGlyph
 });
-alphatab.rendering.glyphs.SpacingGlyph = $hxClasses["alphatab.rendering.glyphs.SpacingGlyph"] = function(x,y,width) {
+alphatab.rendering.glyphs.FlatGlyph = function(x,y) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,alphatab.rendering.glyphs.MusicFont.KeyFlat,1.2,1.2);
+};
+alphatab.rendering.glyphs.FlatGlyph.__name__ = ["alphatab","rendering","glyphs","FlatGlyph"];
+alphatab.rendering.glyphs.FlatGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
+alphatab.rendering.glyphs.FlatGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
+	doLayout: function() {
+		this.width = 8 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,applyGlyphSpacing: function(spacing) {
+	}
+	,__class__: alphatab.rendering.glyphs.FlatGlyph
+});
+alphatab.rendering.glyphs.GlyphGroup = function(x,y,glyphs) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.Glyph.call(this,x,y);
+	this._glyphs = glyphs;
+};
+alphatab.rendering.glyphs.GlyphGroup.__name__ = ["alphatab","rendering","glyphs","GlyphGroup"];
+alphatab.rendering.glyphs.GlyphGroup.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.GlyphGroup.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	_glyphs: null
+	,doLayout: function() {
+		var w = 0;
+		var _g = 0, _g1 = this._glyphs;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.renderer = this.renderer;
+			g.doLayout();
+			w = Math.max(w,this.x + g.width) | 0;
+		}
+		this.width = w;
+	}
+	,paint: function(cx,cy,canvas) {
+		var _g = 0, _g1 = this._glyphs;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.paint(cx + this.x,cy + this.y,canvas);
+		}
+	}
+	,__class__: alphatab.rendering.glyphs.GlyphGroup
+});
+alphatab.rendering.glyphs.MusicFont = function() { }
+alphatab.rendering.glyphs.MusicFont.__name__ = ["alphatab","rendering","glyphs","MusicFont"];
+alphatab.rendering.glyphs.MusicFont.prototype = {
+	__class__: alphatab.rendering.glyphs.MusicFont
+}
+alphatab.rendering.glyphs.NaturalizeGlyph = function(x,y) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,alphatab.rendering.glyphs.MusicFont.KeyNormal,1.2,1.2);
+};
+alphatab.rendering.glyphs.NaturalizeGlyph.__name__ = ["alphatab","rendering","glyphs","NaturalizeGlyph"];
+alphatab.rendering.glyphs.NaturalizeGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
+alphatab.rendering.glyphs.NaturalizeGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
+	doLayout: function() {
+		this.width = 8 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,applyGlyphSpacing: function(spacing) {
+	}
+	,__class__: alphatab.rendering.glyphs.NaturalizeGlyph
+});
+alphatab.rendering.glyphs.NumberGlyph = function(x,y,number) {
+	alphatab.rendering.glyphs.GlyphGroup.call(this,x,y,new Array());
+	this._number = number;
+};
+alphatab.rendering.glyphs.NumberGlyph.__name__ = ["alphatab","rendering","glyphs","NumberGlyph"];
+alphatab.rendering.glyphs.NumberGlyph.__super__ = alphatab.rendering.glyphs.GlyphGroup;
+alphatab.rendering.glyphs.NumberGlyph.prototype = $extend(alphatab.rendering.glyphs.GlyphGroup.prototype,{
+	_number: null
+	,applyGlyphSpacing: function(spacing) {
+	}
+	,doLayout: function() {
+		var i = this._number;
+		while(i > 0) {
+			var num = i % 10;
+			var gl = new alphatab.rendering.glyphs.DigitGlyph(0,0,num);
+			this._glyphs.push(gl);
+			i = i / 10 | 0;
+		}
+		this._glyphs.reverse();
+		var cx = 0;
+		var _g = 0, _g1 = this._glyphs;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.x = cx;
+			g.y = 0;
+			g.renderer = this.renderer;
+			g.doLayout();
+			cx += g.width;
+		}
+		this.width = cx;
+	}
+	,__class__: alphatab.rendering.glyphs.NumberGlyph
+});
+alphatab.rendering.glyphs.RepeatCloseGlyph = function(x,y) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.Glyph.call(this,x,y);
+};
+alphatab.rendering.glyphs.RepeatCloseGlyph.__name__ = ["alphatab","rendering","glyphs","RepeatCloseGlyph"];
+alphatab.rendering.glyphs.RepeatCloseGlyph.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.RepeatCloseGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	doLayout: function() {
+		this.width = 13 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,applyGlyphSpacing: function(spacing) {
+	}
+	,paint: function(cx,cy,canvas) {
+		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
+		canvas.setColor(res.mainGlyphColor);
+		var blockWidth = 4 * this.renderer.stave.staveGroup.layout.renderer.scale;
+		var top = cy + this.y + this.renderer.getTopPadding();
+		var bottom = cy + this.y + this.renderer.height - this.renderer.getBottomPadding();
+		var left = cx + this.x;
+		var h = bottom - top;
+		var circleSize = 1.5 * this.renderer.stave.staveGroup.layout.renderer.scale;
+		var middle = (top + bottom) / 2;
+		var dotOffset = 3;
+		canvas.beginPath();
+		canvas.circle(left,middle - circleSize * dotOffset,circleSize);
+		canvas.circle(left,middle + circleSize * dotOffset,circleSize);
+		canvas.fill();
+		left += 4 * this.renderer.stave.staveGroup.layout.renderer.scale;
+		canvas.beginPath();
+		canvas.moveTo(left,top);
+		canvas.lineTo(left,bottom);
+		canvas.stroke();
+		left += 3 * this.renderer.stave.staveGroup.layout.renderer.scale + 0.5;
+		canvas.fillRect(left,top,blockWidth,h);
+	}
+	,__class__: alphatab.rendering.glyphs.RepeatCloseGlyph
+});
+alphatab.rendering.glyphs.RepeatOpenGlyph = function(x,y) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.Glyph.call(this,x,y);
+};
+alphatab.rendering.glyphs.RepeatOpenGlyph.__name__ = ["alphatab","rendering","glyphs","RepeatOpenGlyph"];
+alphatab.rendering.glyphs.RepeatOpenGlyph.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.RepeatOpenGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	doLayout: function() {
+		this.width = 13 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,applyGlyphSpacing: function(spacing) {
+	}
+	,paint: function(cx,cy,canvas) {
+		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
+		canvas.setColor(res.mainGlyphColor);
+		var blockWidth = 4 * this.renderer.stave.staveGroup.layout.renderer.scale;
+		var top = cy + this.y + this.renderer.getTopPadding();
+		var bottom = cy + this.y + this.renderer.height - this.renderer.getBottomPadding();
+		var left = cx + this.x + 0.5;
+		var h = bottom - top;
+		canvas.fillRect(left,top,blockWidth,h);
+		left += blockWidth * 2 - 0.5;
+		canvas.beginPath();
+		canvas.moveTo(left,top);
+		canvas.lineTo(left,bottom);
+		canvas.stroke();
+		left += 3 * this.renderer.stave.staveGroup.layout.renderer.scale;
+		var circleSize = 1.5 * this.renderer.stave.staveGroup.layout.renderer.scale;
+		var middle = (top + bottom) / 2;
+		var dotOffset = 3;
+		canvas.beginPath();
+		canvas.circle(left,middle - circleSize * dotOffset,circleSize);
+		canvas.circle(left,middle + circleSize * dotOffset,circleSize);
+		canvas.fill();
+	}
+	,__class__: alphatab.rendering.glyphs.RepeatOpenGlyph
+});
+alphatab.rendering.glyphs.SharpGlyph = function(x,y) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,alphatab.rendering.glyphs.MusicFont.KeySharp,1.2,1.2);
+};
+alphatab.rendering.glyphs.SharpGlyph.__name__ = ["alphatab","rendering","glyphs","SharpGlyph"];
+alphatab.rendering.glyphs.SharpGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
+alphatab.rendering.glyphs.SharpGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
+	doLayout: function() {
+		this.width = 8 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,applyGlyphSpacing: function(spacing) {
+	}
+	,__class__: alphatab.rendering.glyphs.SharpGlyph
+});
+alphatab.rendering.glyphs.SpacingGlyph = function(x,y,width,scaling) {
+	if(scaling == null) scaling = true;
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.Glyph.call(this,x,y);
 	this.width = width;
+	this._scaling = scaling;
 };
 alphatab.rendering.glyphs.SpacingGlyph.__name__ = ["alphatab","rendering","glyphs","SpacingGlyph"];
 alphatab.rendering.glyphs.SpacingGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.SpacingGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
-	__class__: alphatab.rendering.glyphs.SpacingGlyph
+	_scaling: null
+	,applyGlyphSpacing: function(spacing) {
+		if(this._scaling) alphatab.rendering.Glyph.prototype.applyGlyphSpacing.call(this,spacing);
+	}
+	,__class__: alphatab.rendering.glyphs.SpacingGlyph
+});
+alphatab.rendering.glyphs.TimeSignatureGlyph = function(x,y,numerator,denominator) {
+	alphatab.rendering.glyphs.GlyphGroup.call(this,x,y,new Array());
+	this._numerator = numerator;
+	this._denominator = denominator;
+};
+alphatab.rendering.glyphs.TimeSignatureGlyph.__name__ = ["alphatab","rendering","glyphs","TimeSignatureGlyph"];
+alphatab.rendering.glyphs.TimeSignatureGlyph.__super__ = alphatab.rendering.glyphs.GlyphGroup;
+alphatab.rendering.glyphs.TimeSignatureGlyph.prototype = $extend(alphatab.rendering.glyphs.GlyphGroup.prototype,{
+	_numerator: null
+	,_denominator: null
+	,applyGlyphSpacing: function(spacing) {
+	}
+	,doLayout: function() {
+		var numerator = new alphatab.rendering.glyphs.NumberGlyph(0,0,this._numerator);
+		var denominator = new alphatab.rendering.glyphs.NumberGlyph(0,18 * this.renderer.stave.staveGroup.layout.renderer.scale | 0,this._denominator);
+		this._glyphs.push(numerator);
+		this._glyphs.push(denominator);
+		alphatab.rendering.glyphs.GlyphGroup.prototype.doLayout.call(this);
+		var _g = 0, _g1 = this._glyphs;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.x = (this.width - g.width) / 2 | 0;
+		}
+	}
+	,__class__: alphatab.rendering.glyphs.TimeSignatureGlyph
 });
 if(!alphatab.rendering.layout) alphatab.rendering.layout = {}
-alphatab.rendering.layout.HeaderFooterElements = $hxClasses["alphatab.rendering.layout.HeaderFooterElements"] = function() { }
+alphatab.rendering.layout.HeaderFooterElements = function() { }
 alphatab.rendering.layout.HeaderFooterElements.__name__ = ["alphatab","rendering","layout","HeaderFooterElements"];
 alphatab.rendering.layout.HeaderFooterElements.prototype = {
 	__class__: alphatab.rendering.layout.HeaderFooterElements
 }
-alphatab.rendering.layout.ScoreLayout = $hxClasses["alphatab.rendering.layout.ScoreLayout"] = function(renderer) {
+alphatab.rendering.layout.ScoreLayout = function(renderer) {
 	this.renderer = renderer;
 };
 alphatab.rendering.layout.ScoreLayout.__name__ = ["alphatab","rendering","layout","ScoreLayout"];
@@ -2876,12 +4332,11 @@ alphatab.rendering.layout.ScoreLayout.prototype = {
 		var group = new alphatab.rendering.staves.StaveGroup();
 		group.layout = this;
 		group.addStave(new alphatab.rendering.staves.Stave(new alphatab.rendering.ScoreBarRendererFactory()));
-		group.addStave(new alphatab.rendering.staves.Stave(new alphatab.rendering.TabBarRendererFactory()));
 		return group;
 	}
 	,__class__: alphatab.rendering.layout.ScoreLayout
 }
-alphatab.rendering.layout.PageViewLayout = $hxClasses["alphatab.rendering.layout.PageViewLayout"] = function(renderer) {
+alphatab.rendering.layout.PageViewLayout = function(renderer) {
 	alphatab.rendering.layout.ScoreLayout.call(this,renderer);
 	this._groups = new Array();
 	renderer.setLayoutSetting(alphatab.rendering.layout.PageViewLayout.SCORE_INFOS,511);
@@ -2891,6 +4346,7 @@ alphatab.rendering.layout.PageViewLayout.__super__ = alphatab.rendering.layout.S
 alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.layout.ScoreLayout.prototype,{
 	_groups: null
 	,doLayout: function() {
+		this._groups = new Array();
 		var currentBarIndex = 0;
 		var endBarIndex = this.renderer.track.bars.length - 1;
 		var x = alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0];
@@ -2919,13 +4375,13 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 		}(this));
 		var score = this.renderer.getScore();
 		var scale = this.renderer.scale;
-		if(score.title != "" && (flags & 1) != 0) y += Math.floor(35 * scale);
-		if(score.subTitle != "" && (flags & 2) != 0) y += Math.floor(20 * scale);
-		if(score.artist != "" && (flags & 4) != 0) y += Math.floor(20 * scale);
-		if(score.album != "" && (flags & 8) != 0) y += Math.floor(20 * scale);
-		if(score.music != "" && score.music == score.words && (flags & 64) != 0) y += Math.floor(20 * scale); else {
-			if(score.music != "" && (flags & 32) != 0) y += Math.floor(20 * scale);
-			if(score.words != "" && (flags & 16) != 0) y += Math.floor(20 * scale);
+		if(!this.isNullOrEmpty(score.title) && (flags & 1) != 0) y += Math.floor(35 * scale);
+		if(!this.isNullOrEmpty(score.subTitle) && (flags & 2) != 0) y += Math.floor(20 * scale);
+		if(!this.isNullOrEmpty(score.artist) && (flags & 4) != 0) y += Math.floor(20 * scale);
+		if(!this.isNullOrEmpty(score.album) && (flags & 8) != 0) y += Math.floor(20 * scale);
+		if(!this.isNullOrEmpty(score.music) && score.music == score.words && (flags & 64) != 0) y += Math.floor(20 * scale); else {
+			if(!this.isNullOrEmpty(score.music) && (flags & 32) != 0) y += Math.floor(20 * scale);
+			if(!this.isNullOrEmpty(score.words) && (flags & 16) != 0) y += Math.floor(20 * scale);
 		}
 		y += Math.floor(20 * scale);
 		if(!this.renderer.track.isPercussion) {
@@ -2974,32 +4430,32 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 		var tX;
 		var size;
 		var str = "";
-		if(score.title != "" && (flags & 1) != 0) {
+		if(!this.isNullOrEmpty(score.title) && (flags & 1) != 0) {
 			this.drawCentered(score.title,res.titleFont,y);
 			y += Math.floor(35 * scale);
 		}
-		if(score.subTitle != "" && (flags & 2) != 0) {
+		if(!this.isNullOrEmpty(score.subTitle) && (flags & 2) != 0) {
 			this.drawCentered(score.subTitle,res.subTitleFont,y);
 			y += Math.floor(20 * scale);
 		}
-		if(score.artist != "" && (flags & 4) != 0) {
+		if(!this.isNullOrEmpty(score.artist) && (flags & 4) != 0) {
 			this.drawCentered(score.artist,res.subTitleFont,y);
 			y += Math.floor(20 * scale);
 		}
-		if(score.album != "" && (flags & 8) != 0) {
+		if(!this.isNullOrEmpty(score.album) && (flags & 8) != 0) {
 			this.drawCentered(score.album,res.subTitleFont,y);
 			y += Math.floor(20 * scale);
 		}
-		if(score.music != "" && score.music == score.words && (flags & 64) != 0) {
+		if(!this.isNullOrEmpty(score.music) && score.music == score.words && (flags & 64) != 0) {
 			this.drawCentered(score.words,res.wordsFont,y);
 			y += Math.floor(20 * scale);
 		} else {
 			canvas.setFont(res.wordsFont);
-			if(score.music != "" && (flags & 32) != 0) {
+			if(!this.isNullOrEmpty(score.music) && (flags & 32) != 0) {
 				var size1 = canvas.measureText(score.music);
 				canvas.fillText(score.music,this.width - size1 - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2],y);
 			}
-			if(score.words != "" && (flags & 16) != 0) canvas.fillText(score.music,x,y);
+			if(!this.isNullOrEmpty(score.words) && (flags & 16) != 0) canvas.fillText(score.music,x,y);
 			y += Math.floor(20 * scale);
 		}
 		y += Math.floor(20 * scale);
@@ -3032,6 +4488,9 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 		y += Math.floor(25 * scale);
 		return y;
 	}
+	,isNullOrEmpty: function(s) {
+		return s == null || StringTools.trim(s) == "";
+	}
 	,fitGroup: function(group) {
 		var barSpace = 0;
 		if(group.isFull) {
@@ -3044,7 +4503,6 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 	,createStaveGroup: function(currentBarIndex) {
 		var group = this.createEmptyStaveGroup();
 		var maxWidth = this.getSheetWidth() - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0] - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2];
-		haxe.Log.trace(maxWidth,{ fileName : "PageViewLayout.hx", lineNumber : 295, className : "alphatab.rendering.layout.PageViewLayout", methodName : "createStaveGroup"});
 		var _g1 = currentBarIndex, _g = this.renderer.track.bars.length;
 		while(_g1 < _g) {
 			var i = _g1++;
@@ -3070,7 +4528,7 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 	,__class__: alphatab.rendering.layout.PageViewLayout
 });
 if(!alphatab.rendering.staves) alphatab.rendering.staves = {}
-alphatab.rendering.staves.Stave = $hxClasses["alphatab.rendering.staves.Stave"] = function(barRendererFactory) {
+alphatab.rendering.staves.Stave = function(barRendererFactory) {
 	this.barRenderers = new Array();
 	this._factory = barRendererFactory;
 	this.topSpacing = 20;
@@ -3084,6 +4542,7 @@ alphatab.rendering.staves.Stave.prototype = {
 	,x: null
 	,y: null
 	,height: null
+	,index: null
 	,staveTop: null
 	,topSpacing: null
 	,bottomSpacing: null
@@ -3135,7 +4594,7 @@ alphatab.rendering.staves.Stave.prototype = {
 	}
 	,__class__: alphatab.rendering.staves.Stave
 }
-alphatab.rendering.staves.StaveGroup = $hxClasses["alphatab.rendering.staves.StaveGroup"] = function() {
+alphatab.rendering.staves.StaveGroup = function() {
 	this.bars = new Array();
 	this.staves = new Array();
 	this.width = 0;
@@ -3173,6 +4632,7 @@ alphatab.rendering.staves.StaveGroup.prototype = {
 	}
 	,addStave: function(stave) {
 		stave.staveGroup = this;
+		stave.index = this.staves.length;
 		this.staves.push(stave);
 	}
 	,calculateHeight: function() {
@@ -3256,7 +4716,7 @@ alphatab.rendering.staves.StaveGroup.prototype = {
 	,__class__: alphatab.rendering.staves.StaveGroup
 }
 var haxe = haxe || {}
-haxe.Int32 = $hxClasses["haxe.Int32"] = function() { }
+haxe.Int32 = function() { }
 haxe.Int32.__name__ = ["haxe","Int32"];
 haxe.Int32.make = function(a,b) {
 	return a << 16 | b;
@@ -3281,7 +4741,7 @@ haxe.Int32.sub = function(a,b) {
 	return a - b | 0;
 }
 haxe.Int32.mul = function(a,b) {
-	return a * b | 0;
+	return a * (b & 65535) + (a * (b >>> 16) << 16 | 0) | 0;
 }
 haxe.Int32.div = function(a,b) {
 	return a / b | 0;
@@ -3329,7 +4789,7 @@ haxe.Int32.ucompare = function(a,b) {
 haxe.Int32.prototype = {
 	__class__: haxe.Int32
 }
-haxe.Log = $hxClasses["haxe.Log"] = function() { }
+haxe.Log = function() { }
 haxe.Log.__name__ = ["haxe","Log"];
 haxe.Log.trace = function(v,infos) {
 	js.Boot.__trace(v,infos);
@@ -3340,7 +4800,7 @@ haxe.Log.clear = function() {
 haxe.Log.prototype = {
 	__class__: haxe.Log
 }
-haxe.StackItem = $hxClasses["haxe.StackItem"] = { __ename__ : ["haxe","StackItem"], __constructs__ : ["CFunction","Module","FilePos","Method","Lambda"] }
+haxe.StackItem = { __ename__ : ["haxe","StackItem"], __constructs__ : ["CFunction","Module","FilePos","Method","Lambda"] }
 haxe.StackItem.CFunction = ["CFunction",0];
 haxe.StackItem.CFunction.toString = $estr;
 haxe.StackItem.CFunction.__enum__ = haxe.StackItem;
@@ -3348,7 +4808,7 @@ haxe.StackItem.Module = function(m) { var $x = ["Module",1,m]; $x.__enum__ = hax
 haxe.StackItem.FilePos = function(s,file,line) { var $x = ["FilePos",2,s,file,line]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
 haxe.StackItem.Method = function(classname,method) { var $x = ["Method",3,classname,method]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
 haxe.StackItem.Lambda = function(v) { var $x = ["Lambda",4,v]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
-haxe.Stack = $hxClasses["haxe.Stack"] = function() { }
+haxe.Stack = function() { }
 haxe.Stack.__name__ = ["haxe","Stack"];
 haxe.Stack.callStack = function() {
 	return [];
@@ -3409,7 +4869,7 @@ haxe.Stack.prototype = {
 	__class__: haxe.Stack
 }
 if(!haxe.io) haxe.io = {}
-haxe.io.Bytes = $hxClasses["haxe.io.Bytes"] = function(length,b) {
+haxe.io.Bytes = function(length,b) {
 	this.length = length;
 	this.b = b;
 };
@@ -3539,7 +4999,7 @@ haxe.io.Bytes.prototype = {
 	}
 	,__class__: haxe.io.Bytes
 }
-haxe.io.BytesBuffer = $hxClasses["haxe.io.BytesBuffer"] = function() {
+haxe.io.BytesBuffer = function() {
 	this.b = new Array();
 };
 haxe.io.BytesBuffer.__name__ = ["haxe","io","BytesBuffer"];
@@ -3574,7 +5034,7 @@ haxe.io.BytesBuffer.prototype = {
 	}
 	,__class__: haxe.io.BytesBuffer
 }
-haxe.io.Input = $hxClasses["haxe.io.Input"] = function() { }
+haxe.io.Input = function() { }
 haxe.io.Input.__name__ = ["haxe","io","Input"];
 haxe.io.Input.prototype = {
 	bigEndian: null
@@ -3659,12 +5119,34 @@ haxe.io.Input.prototype = {
 		return s;
 	}
 	,readFloat: function() {
-		throw "Not implemented";
-		return 0;
+		var bytes = [];
+		bytes.push(this.readByte());
+		bytes.push(this.readByte());
+		bytes.push(this.readByte());
+		bytes.push(this.readByte());
+		if(this.bigEndian) bytes.reverse();
+		var sign = 1 - (bytes[0] >> 7 << 1);
+		var exp = (bytes[0] << 1 & 255 | bytes[1] >> 7) - 127;
+		var sig = (bytes[1] & 127) << 16 | bytes[2] << 8 | bytes[3];
+		if(sig == 0 && exp == -127) return 0.0;
+		return sign * (1 + Math.pow(2,-23) * sig) * Math.pow(2,exp);
 	}
 	,readDouble: function() {
-		throw "Not implemented";
-		return 0;
+		var bytes = [];
+		bytes.push(this.readByte());
+		bytes.push(this.readByte());
+		bytes.push(this.readByte());
+		bytes.push(this.readByte());
+		bytes.push(this.readByte());
+		bytes.push(this.readByte());
+		bytes.push(this.readByte());
+		bytes.push(this.readByte());
+		if(this.bigEndian) bytes.reverse();
+		var sign = 1 - (bytes[0] >> 7 << 1);
+		var exp = (bytes[0] << 4 & 2047 | bytes[1] >> 4) - 1023;
+		var sig = this.getDoubleSig(bytes);
+		if(sig == 0 && exp == -1023) return 0.0;
+		return sign * (1.0 + Math.pow(2,-52) * sig) * Math.pow(2,exp);
 	}
 	,readInt8: function() {
 		var n = this.readByte();
@@ -3733,10 +5215,13 @@ haxe.io.Input.prototype = {
 		this.readFullBytes(b,0,len);
 		return b.toString();
 	}
+	,getDoubleSig: function(bytes) {
+		return Std.parseInt((((bytes[1] & 15) << 16 | bytes[2] << 8 | bytes[3]) * Math.pow(2,32)).toString()) + Std.parseInt(((bytes[4] >> 7) * Math.pow(2,31)).toString()) + Std.parseInt(((bytes[4] & 127) << 24 | bytes[5] << 16 | bytes[6] << 8 | bytes[7]).toString());
+	}
 	,__class__: haxe.io.Input
 	,__properties__: {set_bigEndian:"setEndian"}
 }
-haxe.io.BytesInput = $hxClasses["haxe.io.BytesInput"] = function(b,pos,len) {
+haxe.io.BytesInput = function(b,pos,len) {
 	if(pos == null) pos = 0;
 	if(len == null) len = b.length - pos;
 	if(pos < 0 || len < 0 || pos + len > b.length) throw haxe.io.Error.OutsideBounds;
@@ -3772,7 +5257,7 @@ haxe.io.BytesInput.prototype = $extend(haxe.io.Input.prototype,{
 	}
 	,__class__: haxe.io.BytesInput
 });
-haxe.io.Output = $hxClasses["haxe.io.Output"] = function() { }
+haxe.io.Output = function() { }
 haxe.io.Output.__name__ = ["haxe","io","Output"];
 haxe.io.Output.prototype = {
 	bigEndian: null
@@ -3816,10 +5301,64 @@ haxe.io.Output.prototype = {
 		}
 	}
 	,writeFloat: function(x) {
-		throw "Not implemented";
+		if(x == 0.0) {
+			this.writeByte(0);
+			this.writeByte(0);
+			this.writeByte(0);
+			this.writeByte(0);
+			return;
+		}
+		var exp = Math.floor(Math.log(Math.abs(x)) / haxe.io.Output.LN2);
+		var sig = Math.floor(Math.abs(x) / Math.pow(2,exp) * 8388608) & 8388607;
+		var b1 = exp + 127 >> 1 | (exp > 0?x < 0?128:64:x < 0?128:0), b2 = exp + 127 << 7 & 255 | sig >> 16 & 127, b3 = sig >> 8 & 255, b4 = sig & 255;
+		if(this.bigEndian) {
+			this.writeByte(b4);
+			this.writeByte(b3);
+			this.writeByte(b2);
+			this.writeByte(b1);
+		} else {
+			this.writeByte(b1);
+			this.writeByte(b2);
+			this.writeByte(b3);
+			this.writeByte(b4);
+		}
 	}
 	,writeDouble: function(x) {
-		throw "Not implemented";
+		if(x == 0.0) {
+			this.writeByte(0);
+			this.writeByte(0);
+			this.writeByte(0);
+			this.writeByte(0);
+			this.writeByte(0);
+			this.writeByte(0);
+			this.writeByte(0);
+			this.writeByte(0);
+			return;
+		}
+		var exp = Math.floor(Math.log(Math.abs(x)) / haxe.io.Output.LN2);
+		var sig = Math.floor(Math.abs(x) / Math.pow(2,exp) * Math.pow(2,52));
+		var sig_h = sig & 34359738367;
+		var sig_l = Math.floor(sig / Math.pow(2,32));
+		var b1 = exp + 1023 >> 4 | (exp > 0?x < 0?128:64:x < 0?128:0), b2 = exp + 1023 << 4 & 255 | sig_l >> 16 & 15, b3 = sig_l >> 8 & 255, b4 = sig_l & 255, b5 = sig_h >> 24 & 255, b6 = sig_h >> 16 & 255, b7 = sig_h >> 8 & 255, b8 = sig_h & 255;
+		if(this.bigEndian) {
+			this.writeByte(b8);
+			this.writeByte(b7);
+			this.writeByte(b6);
+			this.writeByte(b5);
+			this.writeByte(b4);
+			this.writeByte(b3);
+			this.writeByte(b2);
+			this.writeByte(b1);
+		} else {
+			this.writeByte(b1);
+			this.writeByte(b2);
+			this.writeByte(b3);
+			this.writeByte(b4);
+			this.writeByte(b5);
+			this.writeByte(b6);
+			this.writeByte(b7);
+			this.writeByte(b8);
+		}
 	}
 	,writeInt8: function(x) {
 		if(x < -128 || x >= 128) throw haxe.io.Error.Overflow;
@@ -3925,7 +5464,7 @@ haxe.io.Output.prototype = {
 	,__class__: haxe.io.Output
 	,__properties__: {set_bigEndian:"setEndian"}
 }
-haxe.io.BytesOutput = $hxClasses["haxe.io.BytesOutput"] = function() {
+haxe.io.BytesOutput = function() {
 	this.b = new haxe.io.BytesBuffer();
 };
 haxe.io.BytesOutput.__name__ = ["haxe","io","BytesOutput"];
@@ -3944,7 +5483,7 @@ haxe.io.BytesOutput.prototype = $extend(haxe.io.Output.prototype,{
 	}
 	,__class__: haxe.io.BytesOutput
 });
-haxe.io.Eof = $hxClasses["haxe.io.Eof"] = function() {
+haxe.io.Eof = function() {
 };
 haxe.io.Eof.__name__ = ["haxe","io","Eof"];
 haxe.io.Eof.prototype = {
@@ -3953,7 +5492,7 @@ haxe.io.Eof.prototype = {
 	}
 	,__class__: haxe.io.Eof
 }
-haxe.io.Error = $hxClasses["haxe.io.Error"] = { __ename__ : ["haxe","io","Error"], __constructs__ : ["Blocked","Overflow","OutsideBounds","Custom"] }
+haxe.io.Error = { __ename__ : ["haxe","io","Error"], __constructs__ : ["Blocked","Overflow","OutsideBounds","Custom"] }
 haxe.io.Error.Blocked = ["Blocked",0];
 haxe.io.Error.Blocked.toString = $estr;
 haxe.io.Error.Blocked.__enum__ = haxe.io.Error;
@@ -3965,7 +5504,7 @@ haxe.io.Error.OutsideBounds.toString = $estr;
 haxe.io.Error.OutsideBounds.__enum__ = haxe.io.Error;
 haxe.io.Error.Custom = function(e) { var $x = ["Custom",3,e]; $x.__enum__ = haxe.io.Error; $x.toString = $estr; return $x; }
 var js = js || {}
-js.Boot = $hxClasses["js.Boot"] = function() { }
+js.Boot = function() { }
 js.Boot.__name__ = ["js","Boot"];
 js.Boot.__unhtml = function(s) {
 	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
@@ -4086,9 +5625,10 @@ js.Boot.__instanceof = function(o,cl) {
 		return o.__enum__ == cl || cl == Class && o.__name__ != null || cl == Enum && o.__ename__ != null;
 	}
 }
+js.Boot.__cast = function(o,t) {
+	if(js.Boot.__instanceof(o,t)) return o; else throw "Cannot cast " + Std.string(o) + " to " + Std.string(t);
+}
 js.Boot.__init = function() {
-	js.Lib.isIE = typeof document!='undefined' && document.all != null && typeof window!='undefined' && window.opera == null;
-	js.Lib.isOpera = typeof window!='undefined' && window.opera != null;
 	Array.prototype.copy = Array.prototype.slice;
 	Array.prototype.insert = function(i,x) {
 		this.splice(i,0,x);
@@ -4145,12 +5685,13 @@ js.Boot.__init = function() {
 js.Boot.prototype = {
 	__class__: js.Boot
 }
-js.Lib = $hxClasses["js.Lib"] = function() { }
+js.Lib = function() { }
 js.Lib.__name__ = ["js","Lib"];
-js.Lib.isIE = null;
-js.Lib.isOpera = null;
 js.Lib.document = null;
 js.Lib.window = null;
+js.Lib.debug = function() {
+	debugger;
+}
 js.Lib.alert = function(v) {
 	alert(js.Boot.__string_rec(v,""));
 }
@@ -4170,7 +5711,7 @@ js.Boot.__init();
 	Math.NaN = Number["NaN"];
 	Math.NEGATIVE_INFINITY = Number["NEGATIVE_INFINITY"];
 	Math.POSITIVE_INFINITY = Number["POSITIVE_INFINITY"];
-	$hxClasses["Math"] = Math;
+	;
 	Math.isFinite = function(i) {
 		return isFinite(i);
 	};
@@ -4179,19 +5720,19 @@ js.Boot.__init();
 	};
 }
 {
-	String.prototype.__class__ = $hxClasses["String"] = String;
+	String.prototype.__class__ = String;
 	String.__name__ = ["String"];
-	Array.prototype.__class__ = $hxClasses["Array"] = Array;
+	Array.prototype.__class__ = Array;
 	Array.__name__ = ["Array"];
-	var Int = $hxClasses["Int"] = { __name__ : ["Int"]};
-	var Dynamic = $hxClasses["Dynamic"] = { __name__ : ["Dynamic"]};
-	var Float = $hxClasses["Float"] = Number;
+	var Int = { __name__ : ["Int"]};
+	var Dynamic = { __name__ : ["Dynamic"]};
+	var Float = Number;
 	Float.__name__ = ["Float"];
-	var Bool = $hxClasses["Bool"] = Boolean;
+	var Bool = Boolean;
 	Bool.__ename__ = ["Bool"];
-	var Class = $hxClasses["Class"] = { __name__ : ["Class"]};
+	var Class = { __name__ : ["Class"]};
 	var Enum = { };
-	var Void = $hxClasses["Void"] = { __ename__ : ["Void"]};
+	var Void = { __ename__ : ["Void"]};
 }
 {
 	if(typeof document != "undefined") js.Lib.document = document;
@@ -4219,6 +5760,8 @@ js["XMLHttpRequest"] = window.XMLHttpRequest?XMLHttpRequest:window.ActiveXObject
 	throw "Unable to create XMLHttpRequest object.";
 	return $r;
 }(this));
+alphatab.importer.AlphaTexImporter.EOL = String.fromCharCode(0);
+alphatab.importer.AlphaTexImporter.TRACK_CHANNELS = [0,1];
 alphatab.importer.Gp3To5Importer.VERSION_STRING = "FICHIER GUITAR PRO ";
 alphatab.importer.Gp3To5Importer.BEND_STEP = 25;
 alphatab.model.Tuning.TUNING_REGEX = new EReg("([a-g]b?)([0-9])","i");
@@ -4230,8 +5773,64 @@ alphatab.platform.svg.FontSizes.TIMES_NEW_ROMAN_11PT = [3,4,5,6,6,9,9,2,4,4,6,6,
 alphatab.platform.svg.FontSizes.ARIAL_11PT = [3,2,4,6,6,10,7,2,4,4,4,6,3,4,3,3,6,6,6,6,6,6,6,6,6,6,3,3,6,6,6,6,11,8,7,7,7,6,6,8,7,2,5,7,6,8,7,8,6,8,7,7,6,7,8,10,7,8,7,3,3,3,5,6,4,6,6,6,6,6,4,6,6,2,2,5,2,8,6,6,6,6,4,6,3,6,6,10,6,6,6,4,2,4,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,2,6,6,7,6,2,6,4,8,4,6,6,0,8,6,4,6,4,4,4,6,6,4,4,4,5,6,9,10,10,6,8,8,8,8,8,8,11,7,6,6,6,6,2,2,2,2,8,7,8,8,8,8,8,6,8,7,7,7,7,8,7,7,6,6,6,6,6,6,10,6,6,6,6,6,2,2,2,2,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6];
 alphatab.platform.svg.FontSizes.CONTROL_CHARS = 32;
 alphatab.rendering.GlyphBarRenderer.FirstGlyphSpacing = 10;
+alphatab.rendering.ScoreBarRenderer.SCORE_KEYSHARP_POSITIONS = [0,3,-1,2,5,1,4];
+alphatab.rendering.ScoreBarRenderer.SCORE_KEYFLAT_POSITIONS = [4,1,5,2,6,3,7];
+alphatab.rendering.ScoreBarRenderer.SCORE_SHARP_POSITIONS = [7,7,6,6,5,4,4,3,3,2,2,1];
+alphatab.rendering.ScoreBarRenderer.SCORE_FLAT_POSITIONS = [7,6,6,5,5,4,3,3,2,2,1,1];
+alphatab.rendering.ScoreBarRenderer.SCORE_CLEF_OFFSETS = [30,18,22,24];
 alphatab.rendering.ScoreBarRenderer.LineSpacing = 8;
 alphatab.rendering.TabBarRenderer.LineSpacing = 10;
+alphatab.rendering.glyphs.MusicFont.Num0 = "M 0.00 7.99 C -0.00 10.44 0.57 13.08 2.37 14.84 4.18 16.54 7.44 16.36 8.93 14.32 10.61 12.22 10.97 9.39 10.78 6.78 10.62 4.66 9.96 2.42 8.31 0.97 6.53 -0.48 3.60 -0.29 2.11 1.49 0.53 3.25 -0.00 5.69 0.00 7.99 z M 5.46 15.13 C 4.46 15.17 3.80 14.18 3.64 13.29 3.03 10.66 3.00 7.93 3.19 5.25 3.32 3.95 3.53 2.57 4.31 1.48 4.74 0.87 5.67 0.62 6.26 1.14 c 0.83 0.69 1.03 1.84 1.25 2.84 0.43 2.46 0.39 4.99 0.13 7.47 -0.15 1.22 -0.44 2.57 -1.43 3.40 -0.21 0.15 -0.48 0.25 -0.75 0.26 z";
+alphatab.rendering.glyphs.MusicFont.Num1 = "m 2.36 14.48 c 0 -3.87 0 -7.74 0 -11.61 C 1.69 4.15 1.01 5.42 0.34 6.7 0.23 6.54 -0.11 6.44 0.06 6.22 0.83 4.14 1.59 2.07 2.36 -8.04e-8 c 1.09 0 2.18 0 3.26 0 0 4.81 0 9.62 0 14.43 0.11 0.73 1 0.75 1.57 0.86 0 0.24 0 0.47 0 0.71 -2.13 0 -4.25 0 -6.38 0 0 -0.22 0 -0.44 0 -0.66 C 1.34 15.22 1.98 15.2 2.31 14.7 l 0.04 -0.11 0.01 -0.11 0 0 z";
+alphatab.rendering.glyphs.MusicFont.Num2 = "M 3.85 1.11 C 3.32 1.21 2.1 1.37 2.27 2.07 2.67 2.48 3.62 2.08 4.03 2.69 4.75 3.6 4.54 5.13 3.54 5.77 2.47 6.55 0.7 5.98 0.42 4.65 0.08 3.16 0.99 1.68 2.2 0.89 3.47 -0.05 5.13 -0.15 6.63 0.14 8.35 0.44 10.17 1.45 10.71 3.21 11.09 4.36 10.77 5.67 9.91 6.52 8.88 7.62 7.45 8.16 6.21 8.97 5.29 9.48 4.4 10.07 3.69 10.86 3.15 11.41 2.75 12.06 2.32 12.69 3.58 11.96 5.15 11.47 6.56 12.08 c 0.95 0.31 1.61 1.07 2.42 1.6 0.8 0.43 1.88 -0.18 2.04 -1.06 0.14 -0.38 -0.08 -1.05 0.51 -0.88 0 1.34 -0.22 2.91 -1.38 3.76 -1.28 0.84 -2.98 0.49 -4.21 -0.25 -1.07 -0.69 -2.23 -1.52 -3.58 -1.31 -0.7 0.04 -1.55 0.4 -1.55 1.21 0.03 0.51 -0.25 0.64 -0.69 0.57 C -0.13 15.35 0.24 14.47 0.46 13.97 1.46 11.79 3.35 10.24 4.96 8.53 6.02 7.37 7.19 6.26 7.94 4.87 8.18 4.24 7.99 3.53 7.75 2.92 7.1 1.44 5.3 1.1 3.85 1.11 z";
+alphatab.rendering.glyphs.MusicFont.Num3 = "M 3.22 8.29 C 3.23 8.01 3.1 7.62 3.54 7.72 4.49 7.43 5.46 7.06 6.26 6.45 7.1 5.78 7.29 4.61 7.05 3.61 6.73 2.07 5.23 0.71 3.6 0.92 2.89 0.97 2.15 1.23 1.72 1.82 1.74 2.68 3.01 2.05 3.3 2.84 3.67 3.53 3.69 4.51 3.15 5.12 2.55 5.68 1.58 5.71 0.85 5.42 0.01 5.03 -0.06 3.95 0.03 3.15 0.13 1.84 1.12 0.72 2.37 0.37 3.58 0.02 4.88 -0.09 6.13 0.08 8.23 0.48 10.01 2.41 9.97 4.59 9.99 5.54 9.71 6.56 8.9 7.13 8.55 7.51 7.7 7.79 7.51 8.03 8.58 8.44 9.59 9.24 9.84 10.4 10.24 11.96 9.69 13.7 8.45 14.73 7.42 15.7 5.97 16.12 4.57 15.99 3.13 15.92 1.48 15.62 0.59 14.37 -0.04 13.45 -0.17 12.21 0.2 11.17 0.58 10.38 1.62 10.33 2.38 10.46 c 0.72 0.1 1.21 0.8 1.18 1.51 0.05 0.67 -0.18 1.54 -0.95 1.67 -0.44 0.08 -1.01 -0.03 -0.69 0.57 0.43 0.7 1.47 0.83 2.25 0.83 C 5.8 14.9 7.14 13.37 7.18 11.75 7.33 10.64 6.6 9.62 5.64 9.14 4.9 8.75 4.13 8.36 3.29 8.31 c -0.03 0 -0.05 -0.01 -0.08 -0.01 z";
+alphatab.rendering.glyphs.MusicFont.Num4 = "M 8.59 0 C 7.19 2.33 5.9 4.72 4.32 6.93 3.6 7.94 2.96 9.02 2.27 10.05 c -0.32 0.5 -0.65 1 -0.97 1.51 1.39 0 2.78 0 4.17 0 0 -1.73 0 -3.45 0 -5.18 C 6.65 5.4 7.83 4.42 9.01 3.44 c 0 2.71 0 5.42 0 8.12 0.5 0 1 0 1.5 0 0 0.24 0 0.47 0 0.71 -0.5 0 -1 0 -1.5 0 0.07 0.8 -0.13 1.72 0.32 2.42 0.26 0.44 1.11 0.34 1.18 0.79 -0.05 0.19 0.14 0.61 -0.19 0.52 -2.14 0 -4.29 0 -6.43 0 0 -0.24 0 -0.47 0 -0.71 0.55 -0.2 1.46 -0.31 1.48 -1.05 0.05 -0.65 0.06 -1.31 0.11 -1.97 -1.82 0 -3.65 0 -5.47 0 C 0 12.03 0 11.8 0 11.56 1.69 10.37 2.77 8.48 3.38 6.55 3.79 4.36 4.2 2.18 4.61 0 5.94 0 7.26 0 8.59 0 z";
+alphatab.rendering.glyphs.MusicFont.Num5 = "M 0.66 0 C 1.76 0.32 2.92 0.45 4.06 0.55 5.57 0.61 7.1 0.43 8.57 0.05 8.59 0.92 8.37 1.88 7.62 2.41 7 2.88 6.18 2.89 5.45 3 4.24 3.07 3.01 2.97 1.83 2.7 1.48 2.4 1.68 3.01 1.62 3.22 c 0 1.27 0 2.53 0 3.8 0.82 -0.93 2.05 -1.53 3.31 -1.39 1.75 0.04 3.55 1 4.22 2.68 C 9.94 10.33 9.22 12.72 7.73 14.23 6.61 15.47 4.92 16.14 3.26 15.99 2.03 15.88 0.67 15.28 0.25 14.04 -0.02 13.19 -0.16 12.2 0.25 11.37 0.73 10.53 1.87 10.47 2.71 10.7 3.53 10.9 3.87 11.82 3.79 12.59 3.8 13.31 3.33 14.07 2.56 14.13 2.18 14.28 1.61 14.49 2.22 14.78 3.24 15.48 4.8 15.51 5.7 14.58 6.89 13.39 7.07 11.57 7 9.96 6.89 8.75 6.37 7.41 5.22 6.84 3.97 6.29 2.37 6.8 1.68 7.98 1.53 8.17 1.19 8.03 0.96 8.07 0.62 8.17 0.64 7.92 0.66 7.66 c 0 -2.55 0 -5.11 0 -7.66 z";
+alphatab.rendering.glyphs.MusicFont.Num6 = "M 7.93 1.53 C 7.56 0.85 6.71 0.49 5.94 0.52 4.82 0.56 4.18 1.66 3.88 2.62 3.35 4.32 3.15 6.16 3.49 7.93 3.54 8.37 3.92 8.63 4.13 8.12 5.06 7.07 6.65 6.72 7.97 7.14 9.42 7.71 10.23 9.29 10.37 10.77 10.53 12.37 9.98 14.11 8.63 15.06 6.81 16.44 3.96 16.31 2.39 14.6 0.9 12.97 0.19 10.75 0.04 8.58 -0.18 6.28 0.56 3.93 2.03 2.15 3.04 0.86 4.6 -0.11 6.28 0.01 7.59 0.02 8.97 0.64 9.54 1.88 9.98 2.82 10.18 4.13 9.38 4.95 8.96 5.48 8.26 5.69 7.61 5.5 6.9 5.4 6.31 4.82 6.25 4.1 6.08 3.28 6.33 2.33 7.09 1.89 7.34 1.71 7.62 1.57 7.93 1.53 z M 7.71 11.72 C 7.67 10.66 7.76 9.51 7.19 8.56 6.59 7.5 4.72 7.59 4.31 8.78 3.84 10.14 3.82 11.61 3.98 13.03 c 0.14 0.82 0.31 1.87 1.2 2.2 0.72 0.29 1.63 -0.01 1.94 -0.74 0.41 -0.86 0.57 -1.82 0.59 -2.77 z";
+alphatab.rendering.glyphs.MusicFont.Num7 = "M 2.97 16 C 3.15 14.66 3.24 13.27 3.84 12.02 4.33 10.82 5.19 9.83 6.14 8.96 7.36 7.69 8.64 6.4 9.38 4.79 9.59 4.25 9.66 3.67 9.79 3.12 8.69 3.83 7.34 4.39 6.02 3.99 4.95 3.75 4.06 3.09 3.08 2.65 2.38 2.35 1.34 2.38 0.98 3.17 0.78 3.58 0.62 3.96 0.12 3.83 -0.13 3.85 0.06 3.43 0 3.26 0 2.34 0 1.43 0 0.52 0.38 0.45 0.63 0.56 0.69 0.97 0.88 1.7 1.76 1.48 2.19 1.12 2.92 0.67 3.64 0.1 4.52 0 5.48 -0.03 6.3 0.52 7.07 1.02 7.73 1.37 8.7 1.7 9.31 1.08 9.75 0.84 9.47 -0.08 10.01 0 10.28 -0.03 10.5 -0.03 10.4 0.31 10.38 1.58 10.46 2.86 10.34 4.13 10.24 5.12 9.88 6.06 9.33 6.89 8.72 7.98 8.01 9.02 7.45 10.13 6.91 11.48 6.76 12.95 6.73 14.38 6.68 14.88 7.04 15.76 6.69 16 5.45 16 4.21 16 2.97 16 z";
+alphatab.rendering.glyphs.MusicFont.Num8 = "M 6.97 7.18 C 7.96 7.59 8.61 8.51 9.23 9.34 9.71 9.98 9.88 10.8 9.76 11.58 9.66 13.11 8.81 14.58 7.46 15.33 5.48 16.48 2.64 16.15 1.15 14.34 0.26 13.3 -0.1 11.87 0.02 10.52 0.3 9.39 1.21 8.5 2.2 7.94 2.89 7.75 1.76 7.47 1.61 7.13 0.1 5.63 -0.1 2.86 1.5 1.35 3.29 -0.4 6.51 -0.5 8.27 1.36 9.09 2.23 9.43 3.49 9.31 4.67 9.04 5.65 8.25 6.4 7.43 6.95 7.29 7.04 7.13 7.12 6.97 7.18 z M 6.16 6.54 C 7.34 6 8.09 4.61 7.81 3.32 7.66 2.1 6.72 0.95 5.45 0.81 4.37 0.6 3.18 1.02 2.61 1.99 2.22 2.58 2.07 3.48 2.66 4 3.69 5.04 5.13 5.51 6.16 6.54 z M 3.17 8.44 C 2.19 8.9 1.31 9.78 1.26 10.92 1.11 12.72 2.32 14.69 4.17 15.01 5.32 15.21 6.73 15.01 7.4 13.94 7.83 13.37 7.9 12.54 7.43 11.97 6.35 10.42 4.51 9.72 3.17 8.44 z";
+alphatab.rendering.glyphs.MusicFont.Num9 = "m 2.46 14.47 c 0.29 0.65 1.09 0.94 1.76 1.01 1.1 0.1 1.93 -0.87 2.24 -1.83 0.55 -1.74 0.69 -3.61 0.43 -5.41 C 6.87 7.79 6.47 7.26 6.22 7.88 5.24 8.98 3.53 9.34 2.18 8.77 0.99 8.19 0.32 6.88 0.07 5.62 -0.22 3.91 0.3 1.97 1.76 0.94 3.55 -0.42 6.33 -0.31 7.93 1.3 9.74 3.09 10.4 5.74 10.39 8.22 10.41 10.83 9.17 13.42 7.12 15.04 5.69 16.16 3.56 16.33 1.99 15.41 0.83 14.66 0.19 13.12 0.55 11.77 0.85 10.85 1.86 10.24 2.82 10.48 c 0.72 0.09 1.28 0.71 1.33 1.42 0.19 0.86 -0.16 1.8 -0.92 2.27 -0.23 0.16 -0.49 0.27 -0.76 0.3 z M 2.68 4.28 C 2.73 5.38 2.62 6.6 3.28 7.56 3.94 8.53 5.67 8.32 6.03 7.18 6.54 5.72 6.61 4.13 6.36 2.61 6.23 1.73 5.67 0.71 4.67 0.67 3.84 0.55 3.14 1.22 2.98 1.99 2.76 2.73 2.68 3.51 2.68 4.28 z";
+alphatab.rendering.glyphs.MusicFont.TrebleClef = "m 12.59 0 c 2.7 1.29 2.98 5.15 3.47 7.79 0.22 4.83 -1.46 9.94 -5.32 13.04 0.32 1.61 0.63 3.22 0.95 4.83 3.43 -0.81 7.18 1.04 8.41 4.39 1.63 3.61 0.97 8.6 -2.85 10.54 -2.1 0.44 -2.9 1.25 -2.1 3.23 0.27 2.38 1.27 4.75 0.81 7.14 -1.19 3.63 -6.7 5.59 -9.39 2.39 C 3.23 51.02 5.74 45.06 9.8 46.71 13.45 47.85 11.75 53.84 8.1 53 c 2.3 2.55 6.27 0.67 7.16 -2.21 0.42 -2.48 -0.55 -4.95 -0.84 -7.42 C 14.64 40.51 11.15 42.78 9.42 41.93 2.94 41.14 -2.13 33.51 0.9 27.4 2.85 23.29 5.93 19.8 9.2 16.68 8.1 12.71 7.19 8.36 8.84 4.39 9.55 2.66 10.4 0.17 12.59 0 z M 11 25.71 c -0.28 -1.46 -0.57 -2.93 -0.85 -4.39 -3.08 3.09 -6.5 6.49 -7.28 10.97 -0.78 5 4.52 9.16 9.2 8.84 2.38 0.26 1.53 -1.63 1.24 -3.06 -0.62 -3.07 -1.24 -6.14 -1.86 -9.21 -3.95 0.27 -6.15 6.08 -2.88 8.62 0.75 1.11 5.35 2.82 1.83 1.77 C 6.94 37.88 4.59 33.92 5.95 30.3 6.7 28.02 8.65 26.22 11 25.71 z m 3.78 -19.02 c 0.53 -3.18 -3.29 -3.92 -4 -0.83 -1.76 3.04 -1.8 6.6 -1.05 9.94 0.96 0.42 3.17 -2.31 3.81 -3.67 0.95 -1.63 1.59 -3.55 1.24 -5.45 z m -2.54 22.17 c 0.75 3.81 1.5 7.63 2.24 11.44 3.92 -0.62 5.81 -5.58 3.62 -8.78 -1.23 -1.94 -3.6 -2.98 -5.86 -2.66 z";
+alphatab.rendering.glyphs.MusicFont.AltoClef = "M 0 32 C 0 21.38 0 10.77 0 0.15 c 1.33 0 2.66 0 3.99 0 0 10.62 0 21.23 0 31.85 C 2.66 32 1.33 32 0 32 z m 5.35 0 c 0 -10.62 0 -21.23 0 -31.85 0.39 0.09 1.17 -0.19 1.31 0.16 0 10.57 0 21.13 0 31.7 -0.44 0 -0.87 0 -1.31 0 z M 9.34 18.17 C 8.85 17.25 7.32 16.44 7.05 15.9 c 2.11 -1.25 3.59 -3.49 3.95 -5.92 0.15 1.3 0.74 2.78 2.15 3.09 1.39 0.43 3.17 0.18 3.92 -1.22 C 18.24 9.71 18.15 7.13 17.95 4.76 17.78 3.06 16.96 0.96 15.02 0.72 13.91 0.57 11.57 0.97 11.76 2.28 c 1.28 -0.3 2.92 0.73 2.5 2.19 -0.37 1.9 -3.18 2.09 -4.2 0.62 -1.03 -1.34 0.04 -3.16 1.27 -3.94 2.83 -1.99 7.29 -1.4 9.27 1.53 2.17 3.1 1.38 7.77 -1.6 10.08 -1.75 1.45 -4.25 2.14 -6.46 1.5 -1.25 -0.78 -1.4 1.51 -2.65 1.79 1.22 0.33 1.47 2.76 2.71 1.95 1.83 -0.61 3.93 -0.16 5.57 0.79 2.67 1.56 4.19 4.78 3.65 7.83 -0.43 3.08 -3.39 5.43 -6.46 5.38 -2.28 0.13 -4.93 -1.05 -5.57 -3.4 -0.57 -2.02 2.25 -3.54 3.76 -2.24 1.14 0.73 1.13 2.73 -0.26 3.18 -0.66 0.26 -2.36 0.07 -1.07 1.03 1.43 1.1 3.86 1.14 4.88 -0.54 1.23 -2.05 1.09 -4.59 0.9 -6.89 -0.21 -1.71 -0.87 -3.95 -2.84 -4.27 -1.35 -0.16 -3.1 0.14 -3.59 1.62 -0.35 0.58 -0.41 2.41 -0.61 0.83 -0.29 -1.15 -0.86 -2.23 -1.61 -3.14 z";
+alphatab.rendering.glyphs.MusicFont.TenorClef = "M 0 32 C 0 21.38 0 10.77 0 0.15 c 1.33 0 2.66 0 3.99 0 0 10.62 0 21.23 0 31.85 C 2.66 32 1.33 32 0 32 z m 5.35 0 c 0 -10.62 0 -21.23 0 -31.85 0.39 0.09 1.17 -0.19 1.31 0.16 0 10.57 0 21.13 0 31.7 -0.44 0 -0.87 0 -1.31 0 z M 9.34 18.17 C 8.85 17.25 7.32 16.44 7.05 15.9 c 2.11 -1.25 3.59 -3.49 3.95 -5.92 0.15 1.3 0.74 2.78 2.15 3.09 1.39 0.43 3.17 0.18 3.92 -1.22 C 18.24 9.71 18.15 7.13 17.95 4.76 17.78 3.06 16.96 0.96 15.02 0.72 13.91 0.57 11.57 0.97 11.76 2.28 c 1.28 -0.3 2.92 0.73 2.5 2.19 -0.37 1.9 -3.18 2.09 -4.2 0.62 -1.03 -1.34 0.04 -3.16 1.27 -3.94 2.83 -1.99 7.29 -1.4 9.27 1.53 2.17 3.1 1.38 7.77 -1.6 10.08 -1.75 1.45 -4.25 2.14 -6.46 1.5 -1.25 -0.78 -1.4 1.51 -2.65 1.79 1.22 0.33 1.47 2.76 2.71 1.95 1.83 -0.61 3.93 -0.16 5.57 0.79 2.67 1.56 4.19 4.78 3.65 7.83 -0.43 3.08 -3.39 5.43 -6.46 5.38 -2.28 0.13 -4.93 -1.05 -5.57 -3.4 -0.57 -2.02 2.25 -3.54 3.76 -2.24 1.14 0.73 1.13 2.73 -0.26 3.18 -0.66 0.26 -2.36 0.07 -1.07 1.03 1.43 1.1 3.86 1.14 4.88 -0.54 1.23 -2.05 1.09 -4.59 0.9 -6.89 -0.21 -1.71 -0.87 -3.95 -2.84 -4.27 -1.35 -0.16 -3.1 0.14 -3.59 1.62 -0.35 0.58 -0.41 2.41 -0.61 0.83 -0.29 -1.15 -0.86 -2.23 -1.61 -3.14 z";
+alphatab.rendering.glyphs.MusicFont.BassClef = "M 4.44 2.42 C 3.48 3.2 3.45 5.34 4.96 5.44 6.05 5.76 7.62 5.57 8.09 6.88 8.46 8 8.36 9.52 7.18 10.13 5.64 11.02 3.46 11.09 2.03 9.94 0.65 8.76 0.96 6.72 1.42 5.18 2.1 3.05 3.6 0.9 5.9 0.38 c 3.09 -0.82 6.79 -0.41 9.09 2 2.38 2.38 3.52 6.21 2.02 9.35 -1.51 3.28 -4.31 5.71 -7.08 7.91 -2.66 2.01 -5.53 3.78 -8.59 5.11 -0.49 0.46 -1.68 0.21 -1.19 -0.4 C 3.76 22.94 7.03 20.65 9.63 17.79 11.95 15.13 12.83 11.53 13 8.08 13.12 5.82 12.46 3.29 10.45 2 8.62 0.77 6.09 0.99 4.44 2.42 z M 20.84 2.57 c 1.6 -0.11 2.58 2.03 1.54 3.21 -0.89 1.19 -3.02 0.83 -3.39 -0.64 -0.43 -1.24 0.53 -2.58 1.85 -2.57 z m 0 7.01 c 1.6 -0.11 2.58 2.03 1.54 3.21 -0.89 1.19 -3.02 0.83 -3.39 -0.64 -0.43 -1.23 0.54 -2.59 1.85 -2.57 z";
+alphatab.rendering.glyphs.MusicFont.TripletFeel8 = "m 24.36 19.36 c 2.02 0 4.05 0 6.07 0 0.13 -0.91 -1.28 -0.27 -1.87 -0.46 -1.4 0 -2.8 0 -4.2 0 0 0.15 0 0.31 0 0.46 z m 0 1.86 c 2.02 -0.02 4.07 0.04 6.07 -0.03 0.16 -0.94 -1.24 -0.3 -1.8 -0.49 -1.42 0 -2.84 0 -4.26 0 1.4e-5 0.17 -2.7e-5 0.35 1.8e-5 0.52 z M 38.01 5.56 c -0.02 5.52 0.04 11.04 -0.03 16.55 -0.24 2.29 -3.95 4.19 -5.23 1.73 -0.79 -2.65 3.29 -4.74 4.89 -3.15 0 -5.04 0 -10.09 0 -15.13 0.12 1.28e-4 0.25 -3.18e-4 0.37 3.77e-4 z m -16.45 0 c -0.02 5.52 0.04 11.04 -0.03 16.55 -0.23 2.27 -3.95 4.2 -5.21 1.73 -0.75 -2.47 3.01 -4.95 4.87 -3.02 0 -4.4 0 -8.8 0 -13.21 -2.92 0 -5.84 0 -8.76 0 -0.02 4.83 0.04 9.67 -0.03 14.5 -0.23 2.28 -3.96 4.2 -5.22 1.73 -0.81 -2.65 3.28 -4.74 4.88 -3.15 0 -5.04 0 -10.09 0 -15.13 3.17 5.03e-4 6.34 0 9.5 7.55e-4 z M 1.22 18.4 c -0.17 2.26 0.72 4.54 2.62 5.84 C 4.83 25.09 2.04 23.4 1.79 22.77 -0.18 20.74 -0.63 17.36 1.12 15.05 1.67 13.94 3.72 12.2 4.07 12.38 2.04 13.75 1.02 15.97 1.22 18.4 z m 54.61 0 c 0.17 2.26 -0.72 4.54 -2.62 5.84 -0.99 0.85 1.8 -0.84 2.05 -1.47 1.97 -2.04 2.42 -5.41 0.67 -7.73 -0.55 -1.11 -2.61 -2.84 -2.95 -2.66 2.02 1.36 3.04 3.58 2.85 6.01 z M 47.2 5.56 c 0.16 2.22 2.22 3.33 3.46 4.91 2.35 2.49 1.74 6.43 -0.23 8.95 0.24 -1.29 1.6 -3.21 1.07 -4.96 -0.39 -2.26 -2.25 -4.05 -4.36 -4.78 -0.02 4.14 0.04 8.29 -0.03 12.43 -0.21 2.29 -3.95 4.19 -5.21 1.73 -0.75 -2.48 3.02 -4.95 4.88 -3.02 0 -5.09 0 -10.17 0 -15.26 0.14 3.77e-4 0.28 -6.55e-4 0.42 3.77e-4 z M 39.84 2.19 c -0.03 0.75 -1.39 0.18 -1.99 0.36 -0.67 0.08 -1.88 -0.37 -1.52 0.75 0.18 1.15 -0.39 1.34 -0.24 0.09 -0.2 -0.97 0.1 -1.44 1.12 -1.19 0.88 0 1.75 0 2.63 0 z m 9.04 0 C 48.8 2.87 49.06 3.9 48.76 4.37 48.3 4.09 49.03 2.63 48.38 2.54 c -1.08 0 -2.16 0 -3.25 0 0.03 -0.75 1.39 -0.18 1.99 -0.36 0.58 0 1.17 0 1.75 0 z m -7.12 0.15 c 1.28 -0.03 2.54 -2.28 0.38 -2.02 -0.98 0.3 0.97 0.93 -0.44 1.44 -2.45 -0.8 3.03 -3.31 2.65 -0.47 -0.36 1.15 -1.5 0.72 -0.52 1.75 0.03 2.63 -5.38 1.26 -2.65 -0.3 1.73 0.44 -1.53 1.48 0.33 1.58 1.32 -0.08 2.02 -1.92 0.25 -1.98 z";
+alphatab.rendering.glyphs.MusicFont.TripletFeel16 = "m 24.36 19.36 c 2.02 0 4.05 0 6.07 0 0.12 -0.89 -1.29 -0.25 -1.87 -0.45 -1.4 0 -2.8 0 -4.2 0 0 0.15 0 0.3 0 0.45 z m 0 1.86 c 2.02 -0.02 4.07 0.04 6.07 -0.03 0.16 -0.94 -1.24 -0.3 -1.8 -0.49 -1.42 0 -2.84 0 -4.26 0 5e-6 0.17 -9e-6 0.35 6e-6 0.52 z M 1.22 18.4 c -0.17 2.26 0.72 4.54 2.62 5.86 0.99 0.86 -1.81 -0.84 -2.05 -1.47 -1.97 -2.04 -2.42 -5.41 -0.67 -7.73 0.55 -1.11 2.61 -2.85 2.95 -2.66 -2.02 1.36 -3.04 3.58 -2.85 6.01 z m 54.61 0 c 0.17 2.26 -0.72 4.54 -2.62 5.86 -0.99 0.86 1.81 -0.84 2.05 -1.47 1.97 -2.04 2.42 -5.41 0.67 -7.73 -0.55 -1.11 -2.61 -2.84 -2.95 -2.66 2.04 1.39 3.03 3.55 2.85 6.01 z M 39.84 2.19 c -0.01 0.77 -1.39 0.19 -1.99 0.37 -0.67 0.08 -1.87 -0.37 -1.5 0.75 0.2 0.99 -0.41 1.5 -0.25 0.21 -0.1 -0.87 -0.1 -1.65 1 -1.33 0.92 0 1.83 0 2.75 0 z m 9.04 0 c -0.09 0.69 0.17 1.72 -0.12 2.2 -0.46 -0.28 0.27 -1.74 -0.38 -1.83 -1.08 0 -2.16 0 -3.25 0 0.01 -0.77 1.39 -0.19 1.99 -0.37 0.58 0 1.17 0 1.75 0 z m -7.12 0.15 c 1.28 -0.03 2.54 -2.28 0.38 -2.02 -0.97 0.31 0.97 0.93 -0.44 1.45 -2.46 -0.81 3.02 -3.33 2.65 -0.49 -0.37 1.14 -1.5 0.73 -0.52 1.77 0.01 2.62 -5.38 1.24 -2.65 -0.31 1.73 0.44 -1.54 1.47 0.33 1.59 1.32 -0.07 2.02 -1.94 0.25 -1.99 z m 0.91 8.6 c 0.09 -0.68 -0.17 -1.71 0.12 -2.19 1.33 0 2.66 0 3.99 0 0.22 -0.97 -0.14 -1.36 -1.12 -1.13 -2.55 0 -5.1 0 -7.65 0 -0.02 4.83 0.04 9.67 -0.03 14.5 -0.24 2.29 -3.95 4.19 -5.23 1.73 -0.79 -2.65 3.3 -4.75 4.89 -3.13 0 -5.04 0 -10.09 0 -15.13 3.17 0 6.34 0 9.5 0 -0.02 5.51 0.04 11.03 -0.03 16.53 -0.21 2.29 -3.95 4.19 -5.21 1.73 -0.75 -2.48 3.04 -4.96 4.88 -3.01 0 -3.3 0 -6.6 0 -9.9 -1.37 10e-7 -2.75 -3e-6 -4.12 2e-6 z M 21.56 5.58 c -0.02 5.51 0.04 11.03 -0.03 16.53 -0.23 2.27 -3.95 4.2 -5.21 1.73 -0.75 -2.47 3.03 -4.96 4.87 -3.01 0 -3.38 0 -6.76 0 -10.14 -2.92 0 -5.84 0 -8.76 0 -0.02 3.81 0.04 7.61 -0.03 11.42 -0.23 2.28 -3.96 4.2 -5.22 1.73 -0.81 -2.65 3.3 -4.75 4.88 -3.13 0 -5.04 0 -10.09 0 -15.13 3.17 0 6.34 0 9.5 0 z M 21.19 8.64 C 21.49 7.58 20.84 7.48 19.95 7.61 c -2.5 0 -5.01 0 -7.51 0 -0.3 1.06 0.35 1.16 1.25 1.03 2.5 0 5.01 0 7.51 0 z";
+alphatab.rendering.glyphs.MusicFont.TripletFeelNone8 = "m 25.85 19.36 c 2.02 0 4.05 0 6.07 0 0.13 -0.91 -1.28 -0.27 -1.87 -0.46 -1.4 0 -2.8 0 -4.2 0 0 0.15 0 0.31 0 0.46 z m 0 1.86 c 2.02 -0.02 4.07 0.04 6.07 -0.03 0.16 -0.94 -1.24 -0.31 -1.8 -0.49 -1.42 0 -2.84 0 -4.26 0 5e-5 0.17 -9.1e-5 0.35 6e-5 0.52 z M 48.78 5.56 c -0.02 5.52 0.04 11.04 -0.03 16.55 -0.23 2.27 -3.95 4.2 -5.21 1.73 -0.75 -2.47 3.01 -4.95 4.87 -3.02 0 -4.4 0 -8.8 0 -13.21 -2.92 0 -5.84 0 -8.76 0 -0.02 4.83 0.04 9.67 -0.03 14.5 -0.23 2.28 -3.96 4.2 -5.22 1.73 -0.81 -2.65 3.28 -4.74 4.88 -3.15 0 -5.04 0 -10.09 0 -15.13 3.17 6.67e-4 6.34 0 9.5 10e-4 z M 1.22 18.4 C 1.05 20.65 1.94 22.93 3.84 24.24 4.83 25.09 2.04 23.4 1.79 22.77 -0.18 20.74 -0.63 17.36 1.12 15.05 1.67 13.94 3.72 12.2 4.07 12.38 2.03 13.78 1.04 15.94 1.22 18.4 z m 54.61 0 c 0.17 2.26 -0.72 4.54 -2.62 5.84 -0.99 0.85 1.8 -0.84 2.05 -1.47 1.97 -2.04 2.42 -5.41 0.67 -7.73 -0.55 -1.11 -2.61 -2.84 -2.95 -2.66 2.04 1.39 3.03 3.55 2.85 6.01 z M 12.43 5.56 c -0.02 5.52 0.04 11.04 -0.03 16.55 -0.24 2.29 -3.95 4.19 -5.23 1.73 -0.79 -2.65 3.29 -4.74 4.89 -3.15 0 -5.04 0 -10.09 0 -15.13 0.12 1.7e-4 0.25 -4.21e-4 0.37 5e-4 z m 9.19 0 c 0.16 2.22 2.22 3.33 3.46 4.91 2.35 2.49 1.74 6.43 -0.23 8.95 0.24 -1.29 1.6 -3.21 1.07 -4.96 -0.39 -2.26 -2.25 -4.05 -4.36 -4.78 -0.02 4.14 0.04 8.29 -0.03 12.43 -0.21 2.29 -3.95 4.19 -5.21 1.73 -0.75 -2.48 3.02 -4.95 4.88 -3.02 0 -5.09 0 -10.17 0 -15.26 0.14 5e-4 0.28 -8.68e-4 0.42 5e-4 z m -7.36 -3.38 c -0.03 0.75 -1.39 0.18 -1.99 0.36 -0.67 0.08 -1.87 -0.37 -1.5 0.75 0.2 0.99 -0.41 1.5 -0.25 0.21 -0.1 -0.87 -0.09 -1.63 1 -1.31 0.92 0 1.83 0 2.75 0 z m 9.04 0 c -0.09 0.68 0.17 1.71 -0.12 2.19 -0.46 -0.28 0.27 -1.74 -0.38 -1.83 -1.08 0 -2.16 0 -3.25 0 0.03 -0.75 1.39 -0.18 1.99 -0.36 0.58 0 1.17 0 1.75 0 z m -7.12 0.15 c 1.28 -0.03 2.54 -2.28 0.38 -2.02 -0.98 0.3 0.97 0.93 -0.44 1.44 -2.45 -0.8 3.03 -3.31 2.65 -0.47 -0.36 1.15 -1.5 0.72 -0.52 1.75 0.03 2.63 -5.38 1.26 -2.65 -0.3 1.73 0.44 -1.53 1.48 0.33 1.58 1.32 -0.08 2.02 -1.92 0.25 -1.98 z";
+alphatab.rendering.glyphs.MusicFont.TripletFeelNone16 = "m 24.36 19.36 c 2.02 0 4.05 0 6.07 0 0.12 -0.89 -1.29 -0.25 -1.87 -0.45 -1.4 0 -2.8 0 -4.2 0 0 0.15 0 0.3 0 0.45 z m 0 1.86 c 2.02 -0.02 4.07 0.04 6.07 -0.03 0.16 -0.94 -1.24 -0.31 -1.8 -0.49 -1.42 0 -2.84 0 -4.26 0 5e-6 0.17 -9e-6 0.35 6e-6 0.52 z M 1.22 18.4 C 1.05 20.66 1.94 22.94 3.84 24.25 4.83 25.11 2.03 23.41 1.79 22.78 -0.18 20.74 -0.63 17.37 1.12 15.05 1.67 13.94 3.72 12.2 4.07 12.38 2.04 13.75 1.02 15.97 1.22 18.4 z m 54.61 0 c 0.17 2.26 -0.72 4.54 -2.62 5.86 -0.99 0.86 1.81 -0.84 2.05 -1.47 1.97 -2.04 2.42 -5.41 0.67 -7.73 -0.55 -1.11 -2.61 -2.84 -2.95 -2.66 2.02 1.36 3.04 3.58 2.85 6.01 z M 14.26 2.19 c -0.01 0.77 -1.39 0.19 -1.99 0.37 -0.67 0.08 -1.87 -0.37 -1.5 0.75 0.2 0.99 -0.41 1.5 -0.25 0.21 -0.1 -0.87 -0.1 -1.65 1 -1.33 0.92 0 1.83 0 2.75 0 z m 9.04 0 c -0.09 0.69 0.17 1.72 -0.12 2.2 -0.49 -0.25 0.26 -1.75 -0.39 -1.83 -1.08 0 -2.15 0 -3.23 0 0.01 -0.77 1.39 -0.19 1.99 -0.37 0.58 0 1.17 0 1.75 0 z m -7.12 0.15 c 1.28 -0.03 2.54 -2.28 0.38 -2.02 -0.97 0.31 0.97 0.93 -0.44 1.45 -2.46 -0.81 3.02 -3.33 2.65 -0.49 -0.37 1.14 -1.5 0.73 -0.52 1.77 0.01 2.62 -5.38 1.24 -2.65 -0.31 1.73 0.44 -1.54 1.47 0.33 1.59 1.32 -0.07 2.02 -1.94 0.25 -1.99 z M 47.14 5.58 c -0.02 5.51 0.04 11.03 -0.03 16.53 -0.23 2.27 -3.95 4.2 -5.21 1.73 -0.75 -2.47 3.03 -4.96 4.87 -3.01 0 -3.38 0 -6.76 0 -10.14 -2.92 0 -5.84 0 -8.76 0 -0.02 3.81 0.04 7.61 -0.03 11.42 -0.23 2.28 -3.96 4.2 -5.22 1.73 -0.81 -2.65 3.3 -4.75 4.88 -3.13 0 -5.04 0 -10.09 0 -15.13 3.17 3.33e-4 6.34 -6.67e-4 9.5 5e-4 z m -0.37 3.06 c 0.3 -1.06 -0.35 -1.16 -1.25 -1.03 -2.5 0 -5.01 0 -7.51 0 -0.3 1.06 0.35 1.16 1.25 1.03 2.5 0 5.01 0 7.51 0 z M 17.09 10.93 c 0.09 -0.68 -0.17 -1.71 0.12 -2.19 1.33 0 2.66 0 3.99 0 0.22 -0.97 -0.14 -1.36 -1.12 -1.13 -2.55 0 -5.1 0 -7.65 0 -0.02 4.83 0.04 9.67 -0.03 14.5 -0.24 2.29 -3.95 4.19 -5.23 1.73 -0.79 -2.65 3.3 -4.75 4.89 -3.13 0 -5.04 0 -10.09 0 -15.13 3.17 0 6.34 0 9.5 0 -0.02 5.51 0.04 11.03 -0.03 16.53 -0.21 2.29 -3.95 4.19 -5.21 1.73 -0.75 -2.48 3.04 -4.96 4.88 -3.01 0 -3.3 0 -6.6 0 -9.9 -1.37 3.32e-4 -2.75 -6.65e-4 -4.12 5e-4 z";
+alphatab.rendering.glyphs.MusicFont.KeySharp = "m 3.11 3.97 c 0 -1.32 0 -2.65 0 -3.97 0.22 0 0.43 0 0.65 0 0 1.24 0 2.48 0 3.73 0.31 -0.13 0.62 -0.27 0.93 -0.4 0 0.79 0 1.57 0 2.36 C 4.38 5.82 4.07 5.95 3.76 6.09 c 0 1.27 0 2.53 0 3.8 0.31 -0.15 0.62 -0.29 0.93 -0.44 0 0.79 0 1.57 0 2.36 -0.31 0.13 -0.62 0.27 -0.93 0.4 0 1.29 0 2.58 0 3.87 -0.22 0 -0.43 0 -0.65 0 0 -1.21 0 -2.41 0 -3.62 -0.51 0.22 -1.03 0.43 -1.54 0.65 0 1.3 0 2.6 0 3.9 -0.22 0 -0.43 0 -0.65 0 0 -1.22 0 -2.44 0 -3.66 C 0.62 13.47 0.31 13.59 0 13.71 0 12.92 0 12.14 0 11.35 c 0.31 -0.12 0.62 -0.24 0.93 -0.37 0 -1.27 0 -2.53 0 -3.8 C 0.62 7.32 0.31 7.46 0 7.59 0 6.79 0 5.99 0 5.19 0.31 5.07 0.62 4.95 0.93 4.83 c 0 -1.29 0 -2.58 0 -3.87 0.22 0 0.43 0 0.65 0 0 1.21 0 2.41 0 3.62 C 2.09 4.38 2.6 4.17 3.11 3.97 z M 1.57 6.94 c 0 1.27 0 2.53 0 3.8 0.51 -0.22 1.03 -0.43 1.54 -0.65 0 -1.25 0 -2.51 0 -3.76 -0.51 0.2 -1.03 0.41 -1.54 0.61 z";
+alphatab.rendering.glyphs.MusicFont.KeyNormal = "M 0 12.45 C 0 8.3 0 4.15 0 0 c 0.24 0 0.47 0 0.71 0 0 1.87 0 3.74 0 5.6 C 1.84 5.29 2.97 4.98 4.1 4.67 c 0 4.11 0 8.22 0 12.33 -0.22 0 -0.44 0 -0.67 0 0 -1.83 0 -3.66 0 -5.49 C 2.29 11.82 1.14 12.13 0 12.45 z M 0.71 10.37 C 1.61 10.12 2.52 9.87 3.43 9.62 c 0 -1.01 0 -2.02 0 -3.03 -0.91 0.25 -1.82 0.5 -2.73 0.74 0 1.01 0 2.02 0 3.03 z";
+alphatab.rendering.glyphs.MusicFont.KeyFlat = "m 0 2 c 0.21 0 0.42 0 0.63 0 0 2.93 0 5.85 0 8.78 0.88 -0.5 1.91 -1.01 2.95 -0.78 0.91 0.24 1.29 1.34 1.1 2.18 -0.31 1.25 -1.36 2.14 -2.38 2.83 C 1.42 15.52 0.7 16.27 0 17 0 12 0 7 0 2 z m 2.64 8.71 c -0.62 -0.36 -1.3 0.1 -1.8 0.47 -0.31 0.1 -0.19 0.42 -0.21 0.67 0 1.28 0 2.57 0 3.85 C 1.13 15.18 1.67 14.71 2.13 14.17 2.68 13.42 3.31 12.58 3.25 11.6 3.21 11.22 2.97 10.89 2.64 10.71 z";
+alphatab.rendering.glyphs.MusicFont.SilenceHalf = "m 0 4 c 3.22 0 6.44 0 9.66 0 0 -1.33 0 -2.67 0 -4 C 6.44 0 3.22 0 0 0 0 1.33 0 2.67 0 4 z";
+alphatab.rendering.glyphs.MusicFont.SilenceQuarter = "M 2.4 0.04 C 4.3 2.23 6.19 4.42 8.09 6.61 6.57 7.75 5.58 9.43 4.76 11.11 c -0.52 1.6 0.26 3.29 1.29 4.5 0.24 0.66 2.07 1.26 1.03 1.93 -1.31 0.03 -2.84 -0.37 -3.95 0.55 -0.77 0.84 -0.45 2.17 0.21 2.97 0.14 0.66 1.69 1.33 1.09 1.84 C 3.38 22.69 2.74 21.73 1.92 21.12 1.1 20.27 0.05 19.37 0 18.1 0 16.77 1.21 15.64 2.52 15.61 3.61 15.48 4.75 15.77 5.64 16.42 3.91 14.2 2.18 11.98 0.46 9.77 1.95 8.55 2.86 6.78 3.55 5.02 3.88 3.53 2.92 2.2 2.17 1.01 1.62 0.63 1.35 -0.35 2.4 0.04 z";
+alphatab.rendering.glyphs.MusicFont.SilenceEighth = "M 2.19 0 C 3.49 -0.03 4.76 1.37 4.32 2.66 4.26 3.18 3.53 3.64 3.47 3.89 4.27 4.3 5.11 3.75 5.7 3.24 6.67 2.38 7.28 1.18 7.97 0.11 8.48 -0.19 8.34 0.36 8.25 0.65 7.15 5.44 6.06 10.22 4.96 15 4.63 15 4.3 15 3.97 15 4.95 11.06 5.93 7.12 6.92 3.18 6.24 4.45 4.71 4.96 3.34 4.89 2.47 4.82 1.53 4.65 0.84 4.09 -0.23 3.23 -0.33 1.4 0.74 0.52 1.14 0.16 1.66 0.01 2.19 0 z";
+alphatab.rendering.glyphs.MusicFont.SilenceSixteenth = "M 4.58 12.12 C 5.95 11.59 6.78 10.24 7.35 8.97 7.83 7.03 8.3 5.09 8.77 3.15 8.07 4.45 6.51 4.93 5.11 4.84 4.52 4.91 3.98 4.62 3.43 4.44 2.32 4.03 1.69 2.76 1.97 1.62 2.28 0.02 4.57 -0.55 5.64 0.63 6.55 1.43 6.51 3.05 5.45 3.71 5.36 4.19 6.59 3.99 6.98 3.66 8.23 2.89 8.83 1.47 9.7 0.35 9.87 -0.15 10.51 0 10.17 0.49 8.42 7.99 6.67 15.5 4.91 23 4.6 23 4.29 23 3.98 23 4.92 19.1 5.86 15.19 6.8 11.29 6.13 12.56 4.62 13.09 3.25 13 2.02 12.96 0.61 12.44 0.14 11.2 -0.3 10.11 0.24 8.69 1.41 8.35 2.54 7.9 3.92 8.55 4.28 9.72 4.57 10.55 4.21 11.58 3.4 11.97 c 0.39 0.12 0.78 0.29 1.18 0.15 z";
+alphatab.rendering.glyphs.MusicFont.SilenceThirtySecond = "M 6.47 12.03 C 8.29 11.3 9.21 9.34 9.56 7.51 9.92 6.04 10.27 4.56 10.63 3.08 9.64 4.92 7.15 5.09 5.38 4.46 3.78 3.93 3.21 1.56 4.57 0.49 5.72 -0.52 7.61 0.15 8.07 1.55 8.6 2.43 7.48 3.5 7.35 3.83 8.35 4.33 9.38 3.44 10 2.71 c 0.66 -0.83 1.13 -1.9 1.82 -2.66 0.56 -0.12 0.05 0.61 0.07 0.91 C 9.56 10.97 7.22 20.99 4.89 31 4.57 30.92 3.75 31.23 4.04 30.68 4.95 26.9 5.86 23.12 6.77 19.35 5.77 21.17 3.29 21.4 1.53 20.67 0.07 20.13 -0.56 18.04 0.6 16.92 c 1.08 -1.13 3.22 -0.66 3.66 0.87 0.53 0.87 -0.54 1.99 -0.73 2.28 1.18 0.47 2.29 -0.59 2.93 -1.48 0.66 -0.79 0.95 -1.76 1.15 -2.75 C 7.98 14.32 8.35 12.78 8.72 11.25 7.96 12.7 6.22 13.02 4.72 12.93 3.53 12.75 2.13 12.09 1.95 10.75 1.57 9.33 2.89 7.91 4.33 8.13 5.89 8.21 6.92 10.33 5.77 11.51 c -1.03 0.58 0.16 0.67 0.7 0.52 z";
+alphatab.rendering.glyphs.MusicFont.SilenceSixtyFourth = "M 6.61 20.61 C 8.85 19.73 9.53 17.2 9.98 15.06 10.25 13.86 10.53 12.67 10.81 11.47 9.73 13.44 6.96 13.6 5.13 12.7 3.51 11.89 3.43 9.15 5.21 8.5 6.88 7.68 9.03 9.67 8.14 11.37 7.48 12.01 7.22 12.47 8.36 12.31 9.96 11.87 11.03 10.26 11.43 8.72 11.89 6.88 12.35 5.04 12.8 3.2 11.95 4.77 9.95 5.12 8.33 4.85 6.95 4.62 5.61 3.49 5.82 1.97 5.87 0.05 8.65 -0.7 9.75 0.8 10.95 1.74 9.66 3.52 9.62 3.97 11.16 4.33 12.19 2.71 12.93 1.6 13.18 1.26 14.26 -0.61 14.24 0.38 11.16 13.59 8.07 26.79 4.99 40 c -0.52 0.01 -1.23 0.16 -0.81 -0.58 0.91 -3.78 1.82 -7.55 2.73 -11.33 -1.12 2.02 -4.06 2.2 -5.86 1.06 -1.46 -0.88 -1.41 -3.42 0.28 -4.01 1.6 -0.79 3.65 0.92 3.01 2.62 -0.29 0.74 -1.37 1.25 -0.01 1.2 1.47 -0.28 2.42 -1.65 3.07 -2.89 C 7.89 23.99 8.41 21.91 8.91 19.82 8.06 21.39 6.06 21.74 4.45 21.47 3.08 21.23 1.74 20.1 1.96 18.59 c 0.05 -1.91 2.83 -2.68 3.93 -1.17 0.83 0.89 0.61 2.48 -0.48 3.06 0.39 0.2 0.78 0.3 1.2 0.13";
+alphatab.rendering.glyphs.MusicFont.NoteHalf = "M 2.84 0.88 C 4.09 0.12 5.69 -0.3 7.1 0.27 8.33 0.78 9.2 2.15 8.95 3.49 8.73 5.19 7.49 6.6 6.01 7.36 4.74 8.13 3.1 8.5 1.71 7.87 0.9 7.54 0.27 6.82 0.07 5.97 -0.18 4.85 0.23 3.69 0.83 2.76 1.35 1.99 2.05 1.35 2.84 0.88 z M 7.91 1.43 C 7.36 0.98 6.59 1.13 5.95 1.23 4.3 1.64 2.8 2.67 1.87 4.1 1.37 4.83 0.95 5.67 0.95 6.57 1.02 7.12 1.71 7.29 2.16 7.12 3.55 6.78 4.87 6.15 6 5.27 6.9 4.47 7.68 3.49 8.05 2.34 8.13 2.04 8.15 1.67 7.91 1.43 z";
+alphatab.rendering.glyphs.MusicFont.NoteQuarter = "m 2.85 0.87 c 1.24 -0.76 2.82 -1.17 4.22 -0.63 1.05 0.44 1.91 1.47 1.93 2.64 0.05 1.64 -0.96 3.17 -2.29 4.07 -0.97 0.62 -2.03 1.19 -3.21 1.24 -1.24 0.1 -2.62 -0.46 -3.21 -1.6 -0.58 -1.19 -0.23 -2.62 0.46 -3.69 0.52 -0.83 1.25 -1.54 2.1 -2.03 z";
+alphatab.rendering.glyphs.MusicFont.Harmonic = "M 0 4.58 C 1.47 6.06 2.94 7.53 4.42 9 5.24 8 6.1 7.01 7.18 6.28 7.97 5.66 8.76 5.04 9.55 4.42 8.1 2.94 6.64 1.47 5.19 0 4.4 1 3.39 1.79 2.51 2.7 1.75 3.42 0.9 4.04 0 4.58 z";
+alphatab.rendering.glyphs.MusicFont.Sticks = "m 4.23 4.91 l 3.65 3.65 0.62 -0.64 -3.62 -3.62 L 8.44 0.74 7.82 0.12 4.23 3.70 0.63 0.10 0 0.74 3.59 4.34 l -3.59 3.6 0.6 0.6 3.63 -3.63 z";
+alphatab.rendering.glyphs.MusicFont.HiHat = "m 9.00 6 q 0 0.70 -0.32 1.41 Q 8.35 8.13 7.75 8.71 7.14 9.30 6.44 9.63 5.74 9.95 5 10.00 q -0.73 0 -1.44 -0.32 Q 2.83 9.35 2.24 8.75 1.66 8.14 1.33 7.44 1.00 6.74 0.99 6 q 0 -0.73 0.32 -1.44 Q 1.64 3.83 2.24 3.24 2.85 2.66 3.55 2.33 4.25 2.00 5 1.99 5.73 2.02 6.44 2.35 7.16 2.67 7.75 3.28 8.33 3.88 8.66 4.58 8.99 5.28 9.00 6 z M 10 6 Q 10 5.10 9.59 4.20 9.18 3.31 8.43 2.56 7.68 1.81 6.80 1.42 5.92 1.03 5 1 4.10 1 3.20 1.40 2.31 1.81 1.56 2.56 0.81 3.31 0.42 4.19 0.03 5.07 0 6.03 0 6.92 0.40 7.82 0.81 8.71 1.56 9.45 2.31 10.18 3.19 10.57 4.07 10.96 5 11 5.94 10.96 6.84 10.56 7.73 10.15 8.45 9.42 9.16 8.68 9.57 7.80 9.98 6.92 10 6 z M 4.93 6.76 L 7.03 8.86 7.83 8.03 5.83 6 7.83 3.96 7.03 3.13 4.93 5.23 2.89 3.19 2.13 3.96 4.16 6 2.13 8.03 2.89 8.80 4.93 6.76 z";
+alphatab.rendering.glyphs.MusicFont.ChineseCymbal = "m 4.55 -4.03 l 5.46 5.48 -0.61 0.63 -4.88 -4.86 -4.85 4.85 -0.64 -0.61 5.53 -5.48 z m -0.03 9.94 l 2.99 2.97 1.37 -1.35 L 5.91 4.54 8.90 1.58 7.56 0.23 4.55 3.26 1.54 0.20 0.25 1.49 3.27 4.52 0.18 7.61 1.51 8.94 4.52 5.91 z";
+alphatab.rendering.glyphs.MusicFont.RideCymbal = "M 8 7 L 4 11 0 7 4 3 8 7 z m -1.44 0.44 l -3 -3 -2.12 2.12 3 3 2.12 -2.12 z";
+alphatab.rendering.glyphs.MusicFont.DeadNote = "M 4.99 5.57 C 5.47 5.71 5.89 6.1 5.92 6.62 6.03 7.41 6 8.21 6.01 9 7.01 9 8 9 9 9 9 7.98 9 6.97 9 5.95 8.15 5.94 7.29 6.01 6.46 5.81 6 5.73 5.63 5.31 5.57 4.86 5.59 4.53 5.49 4.18 5.69 3.88 5.88 3.45 6.34 3.24 6.78 3.22 7.52 3.14 8.26 3.16 9 3.16 9 2.14 9 1.12 9 0.11 c -1 0 -1.99 0 -2.99 0 -0.02 0.85 0.06 1.71 -0.15 2.54 -0.08 0.46 -0.49 0.82 -0.95 0.88 -0.31 0 -0.63 0 -0.94 0 C 3.49 3.39 3.09 2.96 3.07 2.44 2.97 1.67 2.99 0.89 2.99 0.11 c -1 0 -1.99 0 -2.99 0 C 0 1.12 0 2.14 0 3.16 0.85 3.17 1.71 3.1 2.54 3.3 3 3.38 3.37 3.8 3.43 4.25 3.41 4.58 3.51 4.93 3.31 5.23 3.12 5.66 2.66 5.87 2.22 5.89 1.48 5.97 0.74 5.95 0 5.95 0 6.97 0 7.98 0 9 1 9 1.99 9 2.99 9 3.01 8.15 2.93 7.29 3.14 6.46 3.22 6.01 3.61 5.63 4.05 5.57 c 0.31 0 0.63 0 0.94 0 z";
+alphatab.rendering.glyphs.MusicFont.FooterUpEighth = "m 0.19 11.86 c 0 -2.27 0 -4.54 0 -6.81 0.48 -0.06 0.88 -0.02 0.83 0.6 0.24 0.91 0.39 1.87 0.97 2.64 0.77 1.2 1.99 2 2.94 3.05 1.54 1.55 2.98 3.28 3.69 5.38 0.9 2.5 0.48 5.26 -0.41 7.69 C 7.72 25.71 7 26.91 6.22 28.04 5.56 27.64 6.21 27.27 6.49 26.8 7.6 25.04 8.1 22.96 8.13 20.89 7.98 18.65 7.01 16.5 5.43 14.9 4.12 13.58 2.53 12.46 0.76 11.86 c -0.19 0 -0.38 0 -0.57 0 z";
+alphatab.rendering.glyphs.MusicFont.FooterUpSixteenth = "M 8.07 20.52 C 7.82 17.12 5.48 14.18 2.56 12.58 2.07 12.29 0.91 11.58 1.59 12.64 c 0.77 1.69 2.4 2.7 3.62 4.04 1.09 1.16 2.18 2.39 2.86 3.85 z M 0.77 16.91 c -0.41 0.05 -0.76 0.04 -0.61 -0.47 0 -3.81 0 -7.63 0 -11.44 0.68 -0.18 0.91 0.23 0.95 0.88 0.22 1.17 0.68 2.3 1.52 3.17 2.01 1.94 4.22 3.83 5.48 6.39 1.09 2.1 1.29 4.58 0.65 6.85 0.69 2.06 0.29 4.29 -0.3 6.33 C 7.97 30.2 7.16 31.66 6.2 33 5.34 32.46 6.74 31.89 6.81 31.21 7.72 29.5 8.14 27.55 8.09 25.63 8.07 24.87 7.89 24.71 7.64 25.48 7.22 26.28 6.73 27.27 6.16 27.82 5.36 27.28 6.83 26.67 6.86 25.97 7.2 25.28 7.52 24.57 7.7 23.81 6.9 20.89 4.51 18.65 1.85 17.35 1.5 17.18 1.14 17.04 0.77 16.91 z";
+alphatab.rendering.glyphs.MusicFont.FooterUpThirtySecond = "M 8.01 20.36 C 7.74 16.68 5.06 13.56 1.83 12 0.45 11.27 2.17 13.66 2.65 14.1 4.63 15.98 6.8 17.88 8.01 20.36 z M 0 0 c 0.93 -0.29 0.82 0.81 1.05 1.43 0.28 1.77 1.66 3.01 2.91 4.15 2.23 2.1 4.42 4.59 4.92 7.72 0.18 1.25 0.16 2.54 -0.14 3.77 0.47 1.66 0.4 3.44 -0.05 5.09 0.76 2.36 0.23 4.92 -0.58 7.2 C 7.63 30.66 6.93 31.87 6.12 33 5.24 32.32 7.02 31.52 7.01 30.63 7.76 29 8.11 27.16 8.01 25.38 7.92 23.94 7.38 26.08 6.99 26.49 6.78 27.03 5.82 28.32 5.86 27.28 6.73 26.26 7.28 24.99 7.63 23.71 7.37 23.06 7.05 21.19 6.48 22.6 6.31 23.58 5.27 22.84 6.07 22.36 7.31 21.2 5.4 20.07 4.7 19.16 3.49 18.08 2.05 17.14 0.48 16.72 -0.13 16.92 -0.01 16.4 0 15.97 0 10.65 0 5.32 0 0 z M 7.83 14.77 C 7.21 11.4 4.6 8.64 1.52 7.29 2.3 8.95 3.91 9.95 5.11 11.27 6.13 12.34 7.1 13.51 7.83 14.77 z";
+alphatab.rendering.glyphs.MusicFont.FooterUpSixtyFourth = "m 8.07 20.53 c -0.29 -3.95 -3.31 -7.22 -6.84 -8.72 0.54 2.1 2.54 3.27 3.92 4.8 1.11 1.19 2.23 2.44 2.92 3.93 z M 7.9 14.89 C 7.27 11.48 4.63 8.71 1.53 7.34 2.35 9.08 4.05 10.11 5.29 11.51 c 0.96 1.04 1.89 2.14 2.6 3.38 z M 0.63 21.56 C -0.04 21.75 -0.08 21.32 0 20.78 0 13.85 0 6.93 0 0 1.28 -0.3 0.81 1.63 1.32 2.36 2.13 4.32 4.02 5.46 5.39 6.99 7.43 9.14 9.15 11.87 9.07 14.93 c -0.18 1.54 -0.19 2.99 0.07 4.53 0.08 1.48 -0.63 2.86 -0.06 4.3 0.31 1.41 -0.31 2.81 -0.15 4.19 C 9.47 31.5 8.2 35.14 6.12 38 5.21 37.29 7.03 36.51 7.01 35.59 7.78 33.88 8.18 31.95 8 30.08 7.46 31 6.83 32.93 6.01 33.09 5.75 32.27 7.34 31.19 7.39 30.1 8.1 29.16 7.42 27.28 6.82 27.01 6.69 27.62 5.8 28.35 5.91 27.5 7.37 26.46 5.84 25.23 5.02 24.33 3.79 23.1 2.27 22.15 0.63 21.56 z m 7.27 3.46 c 0.17 0.54 0.11 -0.4 0 0 z M 6.47 22.86 c 0.4 0.56 1.45 2.23 1.12 0.71 -0.34 -0.71 -0.43 -2.27 -1.12 -0.71 z M 1.38 17.15 c 0.95 2.06 3.03 3.19 4.41 4.92 0.71 1 1.16 -0.97 0.26 -1.33 C 4.84 19.15 3.21 17.92 1.38 17.15 z";
+alphatab.rendering.glyphs.MusicFont.FooterDownEighth = "m 0 -9.83 c 0 2.27 0 4.54 0 6.81 0.48 0.06 0.88 0.02 0.83 -0.6 0.24 -0.91 0.39 -1.87 0.97 -2.64 0.77 -1.2 1.99 -2 2.94 -3.05 1.54 -1.55 2.98 -3.28 3.69 -5.38 0.9 -2.5 0.48 -5.26 -0.41 -7.69 -0.49 -1.3 -1.21 -2.49 -2 -3.63 -0.65 0.41 -0.01 0.78 0.27 1.24 1.11 1.76 1.61 3.85 1.64 5.91 -0.15 2.24 -1.12 4.39 -2.7 5.99 -1.31 1.33 -2.89 2.45 -4.67 3.05 -0.19 0 -0.38 0 -0.57 0 z";
+alphatab.rendering.glyphs.MusicFont.FooterDownSixteenth = "m 7.94 -15.56 c -0.25 3.4 -2.58 6.34 -5.51 7.94 -0.49 0.29 -1.65 1 -0.97 -0.06 0.77 -1.69 2.4 -2.7 3.62 -4.04 1.09 -1.16 2.18 -2.39 2.86 -3.85 z m -7.29 3.61 c -0.41 -0.05 -0.76 -0.04 -0.61 0.47 0 3.81 0 7.63 0 11.44 0.68 0.18 0.91 -0.23 0.95 -0.88 C 1.2 -2.1 1.67 -3.22 2.5 -4.09 c 2.01 -1.94 4.22 -3.83 5.48 -6.39 1.09 -2.1 1.29 -4.58 0.65 -6.85 0.69 -2.06 0.29 -4.29 -0.3 -6.33 -0.49 -1.58 -1.3 -3.04 -2.26 -4.38 -0.86 0.54 0.54 1.11 0.61 1.79 0.91 1.7 1.33 3.66 1.28 5.58 -0.03 0.76 -0.21 0.92 -0.46 0.15 -0.41 -0.8 -0.9 -1.79 -1.48 -2.34 -0.8 0.55 0.67 1.15 0.7 1.86 0.33 0.69 0.66 1.4 0.84 2.15 -0.8 2.92 -3.19 5.17 -5.85 6.46 -0.35 0.17 -0.71 0.31 -1.08 0.44 z";
+alphatab.rendering.glyphs.MusicFont.FooterDownThirtySecond = "m 8.01 -20.41 c -0.27 3.68 -2.94 6.8 -6.18 8.36 -1.38 0.73 0.34 -1.66 0.81 -2.1 1.99 -1.88 4.16 -3.78 5.36 -6.26 z M 0 -0.05 c 0.93 0.29 0.82 -0.81 1.05 -1.43 0.28 -1.77 1.66 -3.01 2.91 -4.15 2.23 -2.1 4.42 -4.59 4.92 -7.72 0.18 -1.25 0.16 -2.54 -0.14 -3.77 0.47 -1.66 0.4 -3.44 -0.05 -5.09 0.76 -2.36 0.23 -4.92 -0.58 -7.2 -0.49 -1.3 -1.2 -2.51 -2.01 -3.64 -0.88 0.68 0.9 1.48 0.89 2.37 0.76 1.63 1.1 3.46 1.01 5.25 -0.09 1.44 -0.63 -0.71 -1.03 -1.11 -0.2 -0.54 -1.16 -1.83 -1.12 -0.8 0.87 1.02 1.41 2.29 1.77 3.58 -0.27 0.65 -0.58 2.52 -1.15 1.11 -0.17 -0.98 -1.21 -0.24 -0.41 0.24 1.25 1.17 -0.67 2.29 -1.37 3.2 -1.21 1.08 -2.64 2.02 -4.21 2.43 -0.61 -0.2 -0.5 0.33 -0.48 0.75 0 5.32 0 10.65 0 15.97 z M 7.83 -14.82 c -0.62 3.37 -3.24 6.13 -6.32 7.48 0.78 -1.66 2.39 -2.66 3.59 -3.99 1.02 -1.06 1.99 -2.23 2.73 -3.5 z";
+alphatab.rendering.glyphs.MusicFont.FooterDownSixtyFourth = "m 8.07 -20.56 c -0.29 3.95 -3.31 7.22 -6.84 8.72 0.54 -2.1 2.54 -3.27 3.92 -4.8 1.11 -1.19 2.23 -2.44 2.92 -3.93 z m -0.18 5.64 c -0.63 3.4 -3.26 6.17 -6.37 7.54 0.82 -1.73 2.52 -2.77 3.76 -4.17 0.96 -1.04 1.89 -2.14 2.6 -3.38 z M 0.63 -21.59 C -0.04 -21.78 -0.08 -21.35 0 -20.81 c 0 6.93 0 13.85 0 20.78 1.28 0.3 0.81 -1.63 1.32 -2.36 0.81 -1.96 2.71 -3.1 4.07 -4.63 2.04 -2.14 3.76 -4.87 3.68 -7.94 -0.18 -1.54 -0.19 -2.99 0.07 -4.53 0.08 -1.48 -0.63 -2.86 -0.06 -4.3 0.31 -1.41 -0.31 -2.81 -0.15 -4.19 0.54 -3.56 -0.73 -7.2 -2.82 -10.06 -0.91 0.71 0.92 1.49 0.9 2.41 0.77 1.71 1.17 3.64 0.98 5.51 -0.53 -0.92 -1.16 -2.85 -1.99 -3.01 -0.25 0.82 1.33 1.9 1.38 3 0.71 0.93 0.03 2.82 -0.57 3.08 -0.13 -0.61 -1.02 -1.34 -0.91 -0.49 1.47 1.04 -0.07 2.27 -0.89 3.17 -1.23 1.23 -2.76 2.19 -4.4 2.77 z m 7.27 -3.46 c 0.17 -0.54 0.11 0.4 0 0 z m -1.43 2.16 c 0.4 -0.56 1.45 -2.23 1.12 -0.71 -0.34 0.71 -0.43 2.27 -1.12 0.71 z m -5.09 5.72 c 0.95 -2.06 3.03 -3.19 4.41 -4.92 0.71 -1 1.16 0.97 0.26 1.33 -1.21 1.58 -2.84 2.82 -4.67 3.59 z";
+alphatab.rendering.glyphs.MusicFont.GraceNote = "M 5.62 17.02 C 5.29 18.81 3.42 20.24 1.6 19.97 0.55 19.79 -0.23 18.68 0.06 17.64 0.39 16.16 1.83 15.13 3.28 14.9 c 0.74 -0.1 1.55 0.13 2.02 0.73 0 -1.96 0 -3.92 0 -5.87 C 4.9 10.37 4.49 10.98 4.09 11.59 3.8 11.45 3.57 11.3 3.89 11.03 4.36 10.31 4.83 9.59 5.3 8.87 c 0 -2.95 0 -5.91 0 -8.86 C 5.96 -0.19 5.81 0.67 6 1.07 6.28 2.38 7.49 3.11 8.34 4.03 8.54 4.12 8.68 3.59 8.86 3.42 9.23 2.86 9.59 2.3 9.96 1.74 10.25 1.89 10.48 2.04 10.17 2.31 9.7 3.03 9.24 3.75 8.77 4.47 10 5.79 11.01 7.48 10.97 9.33 10.96 11.24 10.21 13.07 9.11 14.6 8.58 14.15 9.69 13.65 9.69 13.08 10.16 12.06 10.38 10.91 10.31 9.79 10.14 8.16 9.25 6.69 7.99 5.67 7.22 6.79 6.45 8 5.68 9.15 c 0 2.62 0 5.25 0 7.87 l -0.05 0 -0.01 0 -9e-7 0 z M 7.6 5.36 C 7.07 5.03 6.11 4.27 5.68 4.46 c 0 1.27 0 2.53 0 3.8 C 6.32 7.29 6.96 6.33 7.6 5.36 z";
+alphatab.rendering.glyphs.MusicFont.GraceDeadNote = "M 0.78 8 C 0.52 8 0.26 8 0 8 0 5.33 0 2.67 0 0 c 3.99 0 7.97 0 11.96 0 0 2.67 0 5.33 0 8 -0.25 0 -0.5 0 -0.76 0 0 -1.9 0 -3.79 0 -5.69 -3.48 0 -6.95 0 -10.43 0 0 1.9 0 3.79 0 5.69 z";
+alphatab.rendering.glyphs.MusicFont.TrillUpEigth = "M 0 4.77 L 9 0.37 9 2.71 0 7 0 4.77 z";
+alphatab.rendering.glyphs.MusicFont.TrillUpSixteenth = "M 0 8.77 L 9 4.37 9 6.71 0 11 0 8.77 z M 0 4.73 L 9 0.33 9 2.67 0 6.96 0 4.73 z";
+alphatab.rendering.glyphs.MusicFont.TrillUpThirtySecond = "M 0 5.14 L 9 0.73 9 3.07 0 7.37 0 5.14 z M 0 9.01 L 9 4.61 9 6.95 0 11.24 0 9.01 z M 0 12.77 L 9 8.37 9 10.71 0 15 0 12.77 z";
+alphatab.rendering.glyphs.MusicFont.AccentuatedNote = "M 13 3.18 L 0 6 0 5.63 11.13 3.18 0 0.73 0 0.36 13 3.18 z";
+alphatab.rendering.glyphs.MusicFont.HeavyAccentuatedNote = "M 11 12 L 7.6 12 4.15 5.61 0.84 12 0 12 5.22 1.7 11 12 z";
+alphatab.rendering.glyphs.MusicFont.VibratoLeftRight = "M 11.19 5.58 C 10.1 6.65 9.09 7.81 7.93 8.81 7.35 9.3 6.98 8.26 6.55 7.93 5.36 6.62 4.18 5.31 2.98 4 2.41 4.23 2 4.73 1.53 5.13 1.02 5.62 0.51 6.1 0 6.59 0.02 6.16 -0.05 5.69 0.03 5.29 1.79 3.63 3.51 1.94 5.28 0.3 5.93 -0.41 6.4 0.74 6.92 1.1 7.99 2.21 8.99 3.4 10.14 4.44 11.34 3.53 12.36 2.39 13.47 1.36 13.89 0.9 14.4 0.54 14.88 0.14 c 0.54 0.23 0.81 0.82 1.22 1.23 0.81 0.91 1.56 1.88 2.41 2.74 0.45 0.72 1.08 0.87 1.61 0.14 0.59 -0.63 1.15 -1.28 1.73 -1.92 -0.02 0.45 0.04 0.93 -0.03 1.35 C 20.28 5.23 18.76 6.8 17.21 8.32 16.78 8.86 16.09 9.29 15.65 8.51 14.46 7.28 13.39 5.93 12.16 4.75 11.73 4.87 11.54 5.35 11.19 5.58 z";
 alphatab.rendering.layout.HeaderFooterElements.NONE = 0;
 alphatab.rendering.layout.HeaderFooterElements.TITLE = 1;
 alphatab.rendering.layout.HeaderFooterElements.SUBTITLE = 2;
@@ -4248,5 +5847,6 @@ alphatab.rendering.layout.PageViewLayout.PAGE_PADDING = [20,20,20,20];
 alphatab.rendering.layout.PageViewLayout.WIDTH_ON_100 = 795;
 alphatab.rendering.layout.PageViewLayout.GroupSpacing = 20;
 alphatab.rendering.staves.StaveGroup.StaveSpacing = 10;
+haxe.io.Output.LN2 = Math.log(2);
 js.Lib.onerror = null;
 alphatab.Main.main()

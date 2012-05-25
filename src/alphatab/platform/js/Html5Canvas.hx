@@ -29,7 +29,9 @@ class Html5Canvas implements ICanvas
 {
     private var _canvas:Dynamic;
     private var _context:Dynamic;
-    
+    private var _width:Int;
+	private var _height:Int;
+	
     public function new(dom:Dynamic) 
     {  
         this._canvas = dom;
@@ -52,6 +54,7 @@ class Html5Canvas implements ICanvas
         this._canvas.width = width;
         this._context = this._canvas.getContext("2d");
 		this._context.textBaseline = "top";
+		_width = width;
     }
     
     public function setHeight(height:Int):Void 
@@ -59,6 +62,7 @@ class Html5Canvas implements ICanvas
         this._canvas.height = height;
         this._context = this._canvas.getContext("2d");
 		this._context.textBaseline = "top";
+		_height = height;
     } 
     
     // colors and styles
@@ -77,7 +81,9 @@ class Html5Canvas implements ICanvas
     // rects
     public function clear():Void
     {
-        this._context.clearRect(0,0, getWidth(), getHeight());
+		trace("w: " + _width + " / h:" + _height);
+		this._canvas.width = this._canvas.width;
+		// this._context.clearRect(0,0,_width, _height);
     }
     public function fillRect(x:Float, y:Float, w:Float, h:Float):Void
     {

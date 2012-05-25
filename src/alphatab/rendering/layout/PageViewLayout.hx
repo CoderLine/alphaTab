@@ -53,6 +53,7 @@ class PageViewLayout extends ScoreLayout
     
     public override function doLayout()
     {
+		_groups = new Array<StaveGroup>();
         var currentBarIndex = 0;
         var endBarIndex = renderer.track.bars.length - 1;
         
@@ -87,33 +88,33 @@ class PageViewLayout extends ScoreLayout
 		var score:Score = renderer.score;
 		var scale:Float = renderer.scale;
 
-        if (score.title != "" && (flags & HeaderFooterElements.TITLE != 0))
+        if (!isNullOrEmpty(score.title) && (flags & HeaderFooterElements.TITLE != 0))
         {
             y += Math.floor(35 * scale);
         }
-        if (score.subTitle != "" && (flags & HeaderFooterElements.SUBTITLE != 0))
+        if (!isNullOrEmpty(score.subTitle) && (flags & HeaderFooterElements.SUBTITLE != 0))
         {
             y += Math.floor(20 * scale);
         }
-        if (score.artist != "" && (flags & HeaderFooterElements.ARTIST != 0))
+        if (!isNullOrEmpty(score.artist) && (flags & HeaderFooterElements.ARTIST != 0))
         {
             y += Math.floor(20 * scale);
         }
-        if (score.album != "" && (flags & HeaderFooterElements.ALBUM != 0))
+        if (!isNullOrEmpty(score.album) && (flags & HeaderFooterElements.ALBUM != 0))
         {
             y += Math.floor(20 * scale);
         }
-        if (score.music != "" && score.music == score.words && (flags & HeaderFooterElements.WORDS_AND_MUSIC != 0))
+        if (!isNullOrEmpty(score.music) && score.music == score.words && (flags & HeaderFooterElements.WORDS_AND_MUSIC != 0))
         {
             y += Math.floor(20 * scale);
         }
         else 
         {
-            if (score.music != "" && (flags & HeaderFooterElements.MUSIC != 0))
+            if (!isNullOrEmpty(score.music) && (flags & HeaderFooterElements.MUSIC != 0))
             {
                 y += Math.floor(20 * scale);
             }
-            if (score.words != "" && (flags & HeaderFooterElements.WORDS != 0))
+            if (!isNullOrEmpty(score.words) && (flags & HeaderFooterElements.WORDS != 0))
             {
                 y += Math.floor(20 * scale);
             }
@@ -181,27 +182,27 @@ class PageViewLayout extends ScoreLayout
 		var tX:Float;
         var size:Float;
         var str:String = "";
-        if (score.title != "" && (flags & HeaderFooterElements.TITLE != 0))
+        if (!isNullOrEmpty(score.title) && (flags & HeaderFooterElements.TITLE != 0))
         {
 			drawCentered(score.title, res.titleFont, y);
             y += Math.floor(35*scale); 
         }        
-        if (score.subTitle != "" && (flags & HeaderFooterElements.SUBTITLE != 0))
+        if (!isNullOrEmpty(score.subTitle) && (flags & HeaderFooterElements.SUBTITLE != 0))
         {
 			drawCentered(score.subTitle, res.subTitleFont, y);
             y += Math.floor(20*scale);
         }
-        if (score.artist != "" && (flags & HeaderFooterElements.ARTIST != 0))
+        if (!isNullOrEmpty(score.artist) && (flags & HeaderFooterElements.ARTIST != 0))
         {
 			drawCentered(score.artist, res.subTitleFont, y);
             y += Math.floor(20*scale);
         }
-        if (score.album != "" && (flags & HeaderFooterElements.ALBUM != 0))
+        if (!isNullOrEmpty(score.album) && (flags & HeaderFooterElements.ALBUM != 0))
         {
 			drawCentered(score.album, res.subTitleFont, y);
             y += Math.floor(20*scale);
         }
-        if (score.music != "" && score.music == score.words && (flags & HeaderFooterElements.WORDS_AND_MUSIC != 0))
+        if (!isNullOrEmpty(score.music) && score.music == score.words && (flags & HeaderFooterElements.WORDS_AND_MUSIC != 0))
         {
 			drawCentered(score.words, res.wordsFont, y);
             y += Math.floor(20*scale);
@@ -209,12 +210,12 @@ class PageViewLayout extends ScoreLayout
         else 
         {
 			canvas.setFont(res.wordsFont);
-            if (score.music != "" && (flags & HeaderFooterElements.MUSIC != 0))
+            if (!isNullOrEmpty(score.music) && (flags & HeaderFooterElements.MUSIC != 0))
             {
 				var size = canvas.measureText(score.music);
 				canvas.fillText(score.music, (width - size - PAGE_PADDING[2]), y);
             }
-            if (score.words != "" && (flags & HeaderFooterElements.WORDS != 0))
+            if (!isNullOrEmpty(score.words) && (flags & HeaderFooterElements.WORDS != 0))
             {
 				canvas.fillText(score.music, x, y);
             }
@@ -263,6 +264,12 @@ class PageViewLayout extends ScoreLayout
         y += Math.floor(25*scale);
         return y;
 	}
+	
+	private function isNullOrEmpty(s:String) : Bool
+	{
+		return s == null || StringTools.trim(s) == "";
+	}
+	
     
     /**
      * Realignes the bars in this line according to the available space
@@ -292,7 +299,6 @@ class PageViewLayout extends ScoreLayout
         var group:StaveGroup = createEmptyStaveGroup();
         
         var maxWidth = getMaxWidth();
-		trace(maxWidth);
         for (i in currentBarIndex ... renderer.track.bars.length)
         {
 			var bar = renderer.track.bars[i];

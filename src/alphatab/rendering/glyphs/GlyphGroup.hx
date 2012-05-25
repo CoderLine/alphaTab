@@ -37,11 +37,9 @@ class GlyphGroup extends Glyph
 		var w = 0;
 		for (g in _glyphs)
 		{
-			g.x = 0;
-			g.y = 0;
 			g.renderer = renderer;
 			g.doLayout();
-			w = Math.max(w, g.width);
+			w = Std.int(Math.max(w, x + g.width));
 		}	
 		width = w;
 	}

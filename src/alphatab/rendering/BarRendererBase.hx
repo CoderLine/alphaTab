@@ -15,6 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.rendering;
+import alphatab.model.Bar;
 import alphatab.platform.ICanvas;
 import alphatab.rendering.layout.ScoreLayout;
 import alphatab.rendering.staves.Stave;
@@ -31,13 +32,20 @@ class BarRendererBase
 	public var height:Int;
 	public var index:Int;
 	
-	private function new() 
+	private var _bar:Bar;
+
+	private function new(bar:Bar) 
 	{
-		
+		_bar = bar;
 	}
 	
 	public function applyBarSpacing(spacing:Int) : Void
 	{
+	}
+	
+	public inline function getScale() : Float
+	{
+		return stave.staveGroup.layout.renderer.scale;
 	}
 	
 	public inline function getLayout() : ScoreLayout
@@ -57,8 +65,30 @@ class BarRendererBase
 	public inline function isLastOfLine() : Bool
 	{
 		return index == stave.barRenderers.length - 1;
+	}	
+	
+	public inline function isLast() : Bool
+	{
+		return _bar.index == _bar.track.bars.length - 1;
 	}
 	
+	/**
+	 * Gets the top padding for the main content of the renderer. 
+	 * Can be used to specify where i.E. the score lines of the notation start.
+	 */
+	public function getTopPadding() : Int
+	{
+		return 0;
+	}	
+	
+	/**
+	 * Gets the bottom padding for the main content of the renderer. 
+	 * Can be used to specify where i.E. the score lines of the notation end.
+	 */
+	public function getBottomPadding() : Int
+	{
+		return 0;
+	}
 	
 	public function doLayout()
 	{

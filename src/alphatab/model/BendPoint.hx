@@ -25,9 +25,10 @@ class BendPoint
     public var offset:Int;
     public var value:Int;
     
-    public function new() 
+    public function new(offset:Int=0, value:Int=0) 
     {
-        
+        this.offset = offset;
+		this.value = value;
     }
     
 }

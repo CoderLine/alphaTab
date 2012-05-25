@@ -33,6 +33,11 @@ class RenderingResources
 
 	public var staveLineColor:Color;
 	public var barSeperatorColor:Color;
+	
+    public var barNumberFont:Font;
+	public var barNumberColor:Color;
+	
+	public var mainGlyphColor:Color;
 
     public function new(scale:Float)
     {
@@ -55,5 +60,10 @@ class RenderingResources
 		
 		staveLineColor = new Color(165, 165, 165);
 		barSeperatorColor = new Color(34, 34, 17);
+		
+		barNumberFont = new Font(sansFont, 11 * scale); 
+		barNumberColor = new Color(200, 0, 0);
+		
+		mainGlyphColor = new Color(0,0,0);
 	}
 }

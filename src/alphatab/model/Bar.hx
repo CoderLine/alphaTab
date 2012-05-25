@@ -43,4 +43,21 @@ class Bar
         voice.index = voices.length;
         voices.push(voice);
     }
+	
+	public inline function getMasterBar() : MasterBar
+	{
+		return track.score.masterBars[index];
+	}
+	
+	public function isEmpty() : Bool
+	{
+		for (v in voices)
+		{
+			if (!v.isEmpty())
+			{
+				return false;
+			}
+		}
+		return true;
+	}
 }

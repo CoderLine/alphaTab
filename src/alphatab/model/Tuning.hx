@@ -21,7 +21,7 @@ package alphatab.model;
  */
 class Tuning 
 {
-    public static inline var TUNING_REGEX = ~/([a-g]b?)([0-9])/i;
+    public static var TUNING_REGEX = ~/([a-g]b?)([0-9])/i;
 
     private static var _sevenStrings:Array<Tuning>;
     private static var _sixStrings:Array<Tuning>;

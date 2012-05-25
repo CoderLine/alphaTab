@@ -51,6 +51,12 @@ class Glyph
 		width += spacing;
 	}
 	
+	public inline function getScale() : Float
+	{
+		return renderer.getScale();
+	}
+	
+	
 	public function doLayout()
 	{
 	}

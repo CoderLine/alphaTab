@@ -114,7 +114,7 @@ class Gp3To5Importer extends ScoreImporter
         }
         
         // tempo stuff
-        _tempo = readInt32();
+        _score.tempo = readInt32();
         if (_versionNumber >= 510)
         {
             readBool(); // hide tempo?
@@ -163,98 +163,11 @@ class Gp3To5Importer extends ScoreImporter
         readTracks();
         readBars();
         
-        finish();
+        finish(_score);
         
         return _score;
     }
-    
-    private function finish()
-    {
-        // iterate over full model and connect/determine stuff
-        for (t in _score.tracks)
-        {
-            if (!t.isPercussion)
-            {
-                for (bar in t.bars)
-                {
-                    for (v in bar.voices)
-                    {
-                        for (beat in v.beats)
-                        {
-                            for (n in beat.notes)
-                            {
-                                // connect ties
-                                if (n.isTieDestination)
-                                {
-                                    var tieOrigin:Note = determineTieOrigin(n);
-                                    if (tieOrigin == null)
-                                    {
-                                        n.isTieDestination = false;
-                                    }
-                                    else
-                                    {
-                                        tieOrigin.isTieOrigin = true;
-                                        n.fret = tieOrigin.fret;
-                                    }
-                                }
-                                if (n.isHammerPullOrigin)
-                                {
-                                    var hammerPullDestination = determineHammerPullDestination(n);
-                                    if (hammerPullDestination == null)
-                                    {
-                                        n.isHammerPullOrigin = false;
-                                    }
-                                    else
-                                    {
-                                        hammerPullDestination.isHammerPullDestination = true;
-                                    }
-                                }                                
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    private function determineHammerPullDestination(note:Note) : Note
-    {
-        var nextBeat:Beat = note.beat.nextBeat;
-        while (nextBeat != null)
-        {
-            var noteOnString = nextBeat.getNoteOnString(note.string);
-            if (noteOnString != null)
-            {
-                return noteOnString;
-            }
-            else
-            {
-                nextBeat = nextBeat.nextBeat;
-            }
-        }
-        
-        return null;
-    }
-    
-    private function determineTieOrigin(note:Note) : Note
-    {
-        var previousBeat:Beat = note.beat.previousBeat;
-        
-        while (previousBeat != null)
-        {
-            var noteOnString = previousBeat.getNoteOnString(note.string);
-            if (noteOnString != null)
-            {
-                return noteOnString;
-            }
-            else
-            {
-                previousBeat = previousBeat.previousBeat;
-            }
-        }
-        
-        return null;
-    }
+
     
     #if unit public #else private #end function readVersion()
     {

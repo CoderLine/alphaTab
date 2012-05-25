@@ -15,20 +15,53 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.rendering;
+import alphatab.model.Clef;
 import alphatab.platform.ICanvas;
-import alphatab.rendering.glyphs.DummyScoreGlyph;
+import alphatab.platform.svg.SvgCanvas;
+import alphatab.rendering.glyphs.BarNumberGlyph;
+import alphatab.rendering.glyphs.BarSeperatorGlyph;
+import alphatab.rendering.glyphs.ClefGlyph;
 import alphatab.rendering.glyphs.DummyTablatureGlyph;
+import alphatab.rendering.glyphs.FlatGlyph;
+import alphatab.rendering.glyphs.GlyphGroup;
+import alphatab.rendering.glyphs.MusicFont;
+import alphatab.rendering.glyphs.NaturalizeGlyph;
+import alphatab.rendering.glyphs.NumberGlyph;
+import alphatab.rendering.glyphs.RepeatCloseGlyph;
+import alphatab.rendering.glyphs.RepeatOpenGlyph;
+import alphatab.rendering.glyphs.SharpGlyph;
 import alphatab.rendering.glyphs.SpacingGlyph;
+import alphatab.rendering.glyphs.SvgGlyph;
+import alphatab.rendering.glyphs.TimeSignatureGlyph;
 
 /**
  * This BarRenderer renders a bar using standard music notation. 
  */
 class ScoreBarRenderer extends GlyphBarRenderer
 {
+	private static var SCORE_KEYSHARP_POSITIONS:Array<Int> = [ 0, 3, -1, 2, 5, 1, 4 ];
+    private static var SCORE_KEYFLAT_POSITIONS:Array<Int> = [ 4, 1, 5, 2, 6, 3, 7 ];
+    
+    private static var SCORE_SHARP_POSITIONS:Array<Int> = [7, 7, 6, 6, 5, 4, 4, 3, 3, 2, 2, 1 ];
+    private static var SCORE_FLAT_POSITIONS:Array<Int> = [ 7, 6, 6, 5, 5, 4, 3, 3, 2, 2, 1, 1 ];
+        
+    private static var SCORE_CLEF_OFFSETS:Array<Int> = [ 30, 18, 22, 24 ];
+
+	
 	private static inline var LineSpacing = 8;
 	public function new(bar:alphatab.model.Bar) 
 	{
 		super(bar);
+	}
+	
+	public override function getTopPadding():Int 
+	{
+		return getGlyphOverflow();
+	}	
+	
+	public override function getBottomPadding():Int 
+	{
+		return getGlyphOverflow();
 	}
 	
 	private inline function getLineOffset()
@@ -48,11 +81,162 @@ class ScoreBarRenderer extends GlyphBarRenderer
 	}
 	
 	private override function createGlyphs():Void 
+	{		
+		createBarStartGlyphs();
+		
+		createStartGlyphs();
+				
+		if (_bar.isEmpty())
+		{
+			addGlyph(new SpacingGlyph(0, 0, Std.int(30 * getScale())));
+		}
+		
+		createBarEndGlyphs();
+	}
+	
+	private var _startSpacing:Bool;
+	private function createStartSpacing()
 	{
-		super.createGlyphs();
-		addGlyph(new DummyScoreGlyph(0, 0, 50));
-		addGlyph(new DummyScoreGlyph(0, 0, 50));
-		addGlyph(new DummyScoreGlyph(0, 0, 50));
+		if (_startSpacing) return;
+		addGlyph(new SpacingGlyph(0, 0, Std.int(2 * getScale())));
+		_startSpacing = true;
+	}
+	
+	private function createBarStartGlyphs()
+	{
+		if (_bar.getMasterBar().isRepeatStart)
+		{
+			addGlyph(new RepeatOpenGlyph());
+		}
+	}	
+	private function createBarEndGlyphs()
+	{
+		if (_bar.getMasterBar().isRepeatEnd())
+		{
+			addGlyph(new RepeatCloseGlyph(x, 0));
+		}
+		else if (_bar.getMasterBar().isDoubleBar)
+		{
+			addGlyph(new BarSeperatorGlyph());
+			addGlyph(new SpacingGlyph(0, 0, Std.int(3 * getScale())));
+			addGlyph(new BarSeperatorGlyph());
+		}		
+		else if(_bar.nextBar == null || !_bar.nextBar.getMasterBar().isRepeatStart)
+		{
+			addGlyph(new BarSeperatorGlyph(0,0,isLast()));
+		}
+	}
+	
+	private function createStartGlyphs()
+	{
+		// Clef
+		if (isFirstOfLine() || _bar.clef != _bar.previousBar.clef)
+		{
+			var offset = 0;
+			switch(_bar.clef)
+			{
+				case F4,C3: offset = 2;
+				case C4: offset = 0;
+				default: offset = 0;
+			}
+			createStartSpacing();
+			addGlyph(new ClefGlyph(0, getScoreY(offset, -1), _bar.clef));
+		}
+		
+		// Key signature
+		if ( (_bar.previousBar == null && _bar.getMasterBar().keySignature != 0)
+			|| (_bar.previousBar != null && _bar.getMasterBar().keySignature != _bar.previousBar.getMasterBar().keySignature))
+		{
+			createStartSpacing();
+			createKeySignatureGlyphs();
+		}
+		
+		// Time Signature
+		if(  (_bar.previousBar == null)
+			|| (_bar.previousBar != null && _bar.getMasterBar().timeSignatureNumerator != _bar.previousBar.getMasterBar().timeSignatureNumerator)
+			|| (_bar.previousBar != null && _bar.getMasterBar().timeSignatureDenominator != _bar.previousBar.getMasterBar().timeSignatureDenominator)
+			)
+		{
+			createStartSpacing();
+			createTimeSignatureGlyphs();
+		}
+		
+		if (stave.index == 0)
+		{
+			addGlyph(new BarNumberGlyph(0,getScoreY(-1, -3),_bar.index + 1));
+		}
+	}
+	
+	private function createKeySignatureGlyphs()
+	{
+		var offsetClef:Int  = 0;
+		var currentKey:Int  = _bar.getMasterBar().keySignature;
+        var previousKey:Int  = _bar.previousBar == null ? 0 : _bar.previousBar.getMasterBar().keySignature;
+
+		if (currentKey < 0)
+		{
+			currentKey = 7 + Math.round(Math.abs(currentKey));
+		}
+		if (previousKey < 0)
+		{
+			previousKey = 7 + Math.round(Math.abs(previousKey));
+		}
+		
+        switch (_bar.clef)
+        {
+            case Clef.G2:
+                offsetClef = 0;
+            case Clef.F4:
+                offsetClef = 2;
+            case Clef.C3:
+                offsetClef = -1;
+            case Clef.C4:
+                offsetClef = 1;
+        }
+		
+		// naturalize previous key
+        var naturalizeSymbols:Int = (previousKey <= 7) ? previousKey : previousKey - 7;        
+        var previousKeyPositions:Array<Int> = (previousKey <= 7) ? SCORE_KEYSHARP_POSITIONS : SCORE_KEYFLAT_POSITIONS;
+
+		for (i in 0 ... naturalizeSymbols)
+        {
+			addGlyph(new NaturalizeGlyph(0, Std.int(getScoreY(previousKeyPositions[i] + offsetClef, -2))));
+        }
+		
+		// how many symbols do we need to get from a C-keysignature
+        // to the new one
+        var offsetSymbols:Int = (currentKey <= 7) ? currentKey : currentKey - 7;
+        // a sharp keysignature
+        if (currentKey <= 7)
+        {  
+            for (i in 0 ... offsetSymbols)
+            {
+				addGlyph(new SharpGlyph(0, Std.int(getScoreY(SCORE_KEYSHARP_POSITIONS[i] + offsetClef, -1))));
+            }
+        }
+        // a flat signature
+        else 
+        {
+            for (i in 0 ... offsetSymbols)
+            {
+				addGlyph(new FlatGlyph(0, Std.int(getScoreY(SCORE_KEYFLAT_POSITIONS[i] + offsetClef, -8))));
+            }
+        }		
+	}
+	
+	private function createTimeSignatureGlyphs()
+	{
+		addGlyph(new SpacingGlyph(0,0, Std.int(5 * getScale()), false));
+		addGlyph(new TimeSignatureGlyph(0, 0, _bar.getMasterBar().timeSignatureNumerator, _bar.getMasterBar().timeSignatureDenominator));
+	}
+	
+	/**
+	 * Gets the relative y position of the given steps relative to first line. 
+	 * @param steps the amount of steps while 2 steps are one line
+	 */
+	private function getScoreY(steps:Int, correction:Int = 0) : Int
+	{
+		return Std.int(((getLineOffset() / 2) * steps) + (correction * getScale()));
 	}
 	
 	/**
@@ -83,20 +267,5 @@ class ScoreBarRenderer extends GlyphBarRenderer
 			canvas.lineTo(cx + x + width, lineY);
 			canvas.stroke();
 		}
-		
-		//
-		// Draw separators
-		// 
-		
-		canvas.setColor(res.barSeperatorColor);
-
-		canvas.beginPath();
-		canvas.moveTo(cx + x + width, startY);
-		canvas.lineTo(cx + x + width, lineY);
-		canvas.stroke();
-				
-		// Borders of the renderer
-		// canvas.setColor(new Color(255,0,0));
-		// canvas.strokeRect(cx + x, cy + y, width, height);
 	}
 }

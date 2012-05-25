@@ -64,6 +64,7 @@ class Score
      */
     public var tab:String;
 
+    public var tempo:Int;
     public var tempoLabel:String;
     
     public var masterBars:Array<MasterBar>;

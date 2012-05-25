@@ -22,9 +22,19 @@ import alphatab.rendering.Glyph;
  */
 class SpacingGlyph extends Glyph
 {
-	public function new(x:Int = 0, y:Int = 0, width:Int)
+	private var _scaling:Bool;
+	public function new(x:Int = 0, y:Int = 0, width:Int, scaling:Bool = true)
 	{
 		super(x, y);
 		this.width = width;
+		_scaling = scaling;
+	}
+	
+	public override function applyGlyphSpacing(spacing:Int):Void
+	{
+		if (_scaling) 
+		{
+			super.applyGlyphSpacing(spacing);
+		}
 	}
 }

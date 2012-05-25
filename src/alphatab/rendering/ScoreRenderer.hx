@@ -58,7 +58,8 @@ class ScoreRenderer
     
     public function render(track:Track)
     {
-        this.track = track;
+		this.track = track;
+		canvas.clear();		
         doLayout();
         paintScore();
     }

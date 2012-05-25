@@ -20,6 +20,7 @@ package alphatab.platform.js;
 import alphatab.platform.IFileLoader;
 import haxe.io.Bytes;
 import haxe.io.BytesData;
+import js.Lib;
 import js.XMLHttpRequest;
 
 /**
@@ -32,10 +33,16 @@ class JsFileLoader implements IFileLoader
     public function new()
     {
     }
+	
+	private static function isIE()
+	{
+		var agent:String = untyped __js__("navigator.userAgent");
+		return agent.indexOf("MSIE") != -1;
+	}
     
     public function loadBinary(path:String) : Bytes
     {
-        if (js.Lib.isIE)
+        if (isIE())
         {
             // use VB Loader to load binary array
             var vbArr = untyped VbAjaxLoader(method, file);
@@ -98,7 +105,7 @@ class JsFileLoader implements IFileLoader
     
     public function loadBinaryAsync(path:String, success:Bytes->Void, error:String->Void) : Void
     {
-        if (js.Lib.isIE)
+        if (isIE())
         {
             // use VB Loader to load binary array
             var vbArr = untyped VbAjaxLoader(method, file);
