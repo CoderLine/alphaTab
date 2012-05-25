@@ -28,6 +28,7 @@ import alphatab.rendering.glyphs.MusicFont;
 import alphatab.rendering.glyphs.NaturalizeGlyph;
 import alphatab.rendering.glyphs.NumberGlyph;
 import alphatab.rendering.glyphs.RepeatCloseGlyph;
+import alphatab.rendering.glyphs.RepeatCountGlyph;
 import alphatab.rendering.glyphs.RepeatOpenGlyph;
 import alphatab.rendering.glyphs.SharpGlyph;
 import alphatab.rendering.glyphs.SpacingGlyph;
@@ -113,6 +114,10 @@ class ScoreBarRenderer extends GlyphBarRenderer
 	{
 		if (_bar.getMasterBar().isRepeatEnd())
 		{
+			if (_bar.getMasterBar().repeatCount > 1)
+			{
+				addGlyph(new RepeatCountGlyph(0, getScoreY(-1, -3), _bar.getMasterBar().repeatCount + 1));
+			}
 			addGlyph(new RepeatCloseGlyph(x, 0));
 		}
 		else if (_bar.getMasterBar().isDoubleBar)

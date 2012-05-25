@@ -3524,7 +3524,10 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Glyph
 		if(this._bar.getMasterBar().isRepeatStart) this.addGlyph(new alphatab.rendering.glyphs.RepeatOpenGlyph());
 	}
 	,createBarEndGlyphs: function() {
-		if(this._bar.getMasterBar().repeatCount > 0) this.addGlyph(new alphatab.rendering.glyphs.RepeatCloseGlyph(this.x,0)); else if(this._bar.getMasterBar().isDoubleBar) {
+		if(this._bar.getMasterBar().repeatCount > 0) {
+			if(this._bar.getMasterBar().repeatCount > 1) this.addGlyph(new alphatab.rendering.glyphs.RepeatCountGlyph(0,this.getScoreY(-1,-3),this._bar.getMasterBar().repeatCount + 1));
+			this.addGlyph(new alphatab.rendering.glyphs.RepeatCloseGlyph(this.x,0));
+		} else if(this._bar.getMasterBar().isDoubleBar) {
 			this.addGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph());
 			this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,3 * this.stave.staveGroup.layout.renderer.scale | 0));
 			this.addGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph());
@@ -4212,6 +4215,29 @@ alphatab.rendering.glyphs.RepeatCloseGlyph.prototype = $extend(alphatab.renderin
 		canvas.fillRect(left,top,blockWidth,h);
 	}
 	,__class__: alphatab.rendering.glyphs.RepeatCloseGlyph
+});
+alphatab.rendering.glyphs.RepeatCountGlyph = function(x,y,count) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.Glyph.call(this,x,y);
+	this._count = count;
+};
+alphatab.rendering.glyphs.RepeatCountGlyph.__name__ = ["alphatab","rendering","glyphs","RepeatCountGlyph"];
+alphatab.rendering.glyphs.RepeatCountGlyph.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.RepeatCountGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	_count: null
+	,doLayout: function() {
+		this.width = 0;
+	}
+	,applyGlyphSpacing: function(spacing) {
+	}
+	,paint: function(cx,cy,canvas) {
+		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
+		canvas.setColor(res.mainGlyphColor);
+		canvas.setFont(res.barNumberFont);
+		canvas.fillText("x" + Std.string(this._count),cx + this.x,cy + this.y);
+	}
+	,__class__: alphatab.rendering.glyphs.RepeatCountGlyph
 });
 alphatab.rendering.glyphs.RepeatOpenGlyph = function(x,y) {
 	if(y == null) y = 0;
