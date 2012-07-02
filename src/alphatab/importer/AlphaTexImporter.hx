@@ -227,6 +227,7 @@ class AlphaTexImporter extends ScoreImporter
                 newSy(); 
                 if (_sy == AlphaTexSymbols.Tuning) // we require at least one tuning
                 {
+                    _track.tuning = new Array<Int>();
                     do
                     {
                         _track.tuning.push(parseTuning(_syData));
@@ -346,7 +347,7 @@ class AlphaTexImporter extends ScoreImporter
             if (_syData == 1 || _syData == 2 || _syData == 4 || _syData == 8 ||
                 _syData == 16 || _syData == 32 || _syData == 64) 
             {
-                _currentDuration = _syData;
+                _currentDuration = parseDuration(_syData);
             }
             else 
             {
@@ -629,7 +630,7 @@ class AlphaTexImporter extends ScoreImporter
         noteEffects(note);
         
         // create note
-        note.string = string;
+        note.string = 6 - string;
 		note.isDead = isDead;
 		note.isTieDestination = isTie;
 		if (!isTie)

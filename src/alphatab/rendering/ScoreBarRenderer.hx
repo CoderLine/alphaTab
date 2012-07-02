@@ -15,7 +15,12 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.rendering;
+import alphatab.model.Beat;
 import alphatab.model.Clef;
+import alphatab.model.Duration;
+import alphatab.model.HarmonicType;
+import alphatab.model.Note;
+import alphatab.model.Voice;
 import alphatab.platform.ICanvas;
 import alphatab.platform.svg.SvgCanvas;
 import alphatab.rendering.glyphs.BarNumberGlyph;
@@ -26,6 +31,8 @@ import alphatab.rendering.glyphs.FlatGlyph;
 import alphatab.rendering.glyphs.GlyphGroup;
 import alphatab.rendering.glyphs.MusicFont;
 import alphatab.rendering.glyphs.NaturalizeGlyph;
+import alphatab.rendering.glyphs.NoteChordGlyph;
+import alphatab.rendering.glyphs.NoteHeadGlyph;
 import alphatab.rendering.glyphs.NumberGlyph;
 import alphatab.rendering.glyphs.RepeatCloseGlyph;
 import alphatab.rendering.glyphs.RepeatCountGlyph;
@@ -34,25 +41,55 @@ import alphatab.rendering.glyphs.SharpGlyph;
 import alphatab.rendering.glyphs.SpacingGlyph;
 import alphatab.rendering.glyphs.SvgGlyph;
 import alphatab.rendering.glyphs.TimeSignatureGlyph;
+import alphatab.rendering.utils.AccidentalHelper;
 
 /**
  * This BarRenderer renders a bar using standard music notation. 
  */
 class ScoreBarRenderer extends GlyphBarRenderer
 {
-	private static var SCORE_KEYSHARP_POSITIONS:Array<Int> = [ 0, 3, -1, 2, 5, 1, 4 ];
-    private static var SCORE_KEYFLAT_POSITIONS:Array<Int> = [ 4, 1, 5, 2, 6, 3, 7 ];
+    /**
+     * We always have 7 steps per octave. 
+     * (by a step the offsets inbetween score lines is meant, 
+     *      0 steps is on the first line (counting from top)
+     *      1 steps is on the space inbetween the first and the second line
+     */
+    private static inline var STEPS_PER_OCTAVE = 7;
     
-    private static var SCORE_SHARP_POSITIONS:Array<Int> = [7, 7, 6, 6, 5, 4, 4, 3, 3, 2, 2, 1 ];
-    private static var SCORE_FLAT_POSITIONS:Array<Int> = [ 7, 6, 6, 5, 5, 4, 3, 3, 2, 2, 1, 1 ];
-        
-    private static var SCORE_CLEF_OFFSETS:Array<Int> = [ 30, 18, 22, 24 ];
+    /**
+     * Those are the amount of steps for the different clefs in case of a note value 0
+     * [C3, C4, F4, G2]
+     */
+    private static var OCTAVE_STEPS = [32, 30, 26, 38];
+    
+    /**
+     * The step offsets of the notes within an octave in case of for sharp keysignatures
+     */
+    private static var SHARP_NOTE_STEPS:Array<Int> = [ 0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6 ];
+
+    /**
+     * The step offsets of the notes within an octave in case of for flat keysignatures
+     */
+    private static var FLAT_NOTE_STEPS:Array<Int>  = [ 0, 1, 1, 2, 2, 3, 4, 4, 5, 5, 6, 6 ];
+    
+    /**
+     * The step offsets of sharp symbols for sharp key signatures.
+     */
+    private static var SHARP_KS_STEPS:Array<Int> = [ 0, 3, -1, 2, 5, 1, 4 ];
+    
+    /**
+     * The step offsets of sharp symbols for flat key signatures.
+     */
+    private static var FLAT_KS_STEPS:Array<Int> = [ 4, 1, 5, 2, 6, 3, 7 ];
 
 	
 	private static inline var LineSpacing = 8;
+    private var _accidentalHelper:AccidentalHelper;
+    
 	public function new(bar:alphatab.model.Bar) 
 	{
 		super(bar);
+        _accidentalHelper = new AccidentalHelper();
 	}
 	
 	public override function getTopPadding():Int 
@@ -91,6 +128,11 @@ class ScoreBarRenderer extends GlyphBarRenderer
 		{
 			addGlyph(new SpacingGlyph(0, 0, Std.int(30 * getScale())));
 		}
+        
+        for (v in _bar.voices)
+        {
+            createVoiceGlyphs(v);
+        }
 		
 		createBarEndGlyphs();
 	}
@@ -171,21 +213,28 @@ class ScoreBarRenderer extends GlyphBarRenderer
 			addGlyph(new BarNumberGlyph(0,getScoreY(-1, -3),_bar.index + 1));
 		}
 	}
+    
+    // TODO: Externalize this into some model class
+    private inline static function keySignatureIsFlat(ks:Int)
+    {
+        return ks < 0;
+    }    
+    
+    private inline static function keySignatureIsNatural(ks:Int)
+    {
+        return ks == 0;
+    }    
+    
+    private inline static function keySignatureIsSharp(ks:Int)
+    {
+        return ks > 0;
+    }
 	
 	private function createKeySignatureGlyphs()
 	{
 		var offsetClef:Int  = 0;
 		var currentKey:Int  = _bar.getMasterBar().keySignature;
         var previousKey:Int  = _bar.previousBar == null ? 0 : _bar.previousBar.getMasterBar().keySignature;
-
-		if (currentKey < 0)
-		{
-			currentKey = 7 + Math.round(Math.abs(currentKey));
-		}
-		if (previousKey < 0)
-		{
-			previousKey = 7 + Math.round(Math.abs(previousKey));
-		}
 		
         switch (_bar.clef)
         {
@@ -200,41 +249,152 @@ class ScoreBarRenderer extends GlyphBarRenderer
         }
 		
 		// naturalize previous key
-        var naturalizeSymbols:Int = (previousKey <= 7) ? previousKey : previousKey - 7;        
-        var previousKeyPositions:Array<Int> = (previousKey <= 7) ? SCORE_KEYSHARP_POSITIONS : SCORE_KEYFLAT_POSITIONS;
+        // TODO: only naturalize the symbols needed 
+        var naturalizeSymbols:Int = Std.int(Math.abs(previousKey));
+        var previousKeyPositions:Array<Int> = keySignatureIsSharp(previousKey) ? SHARP_KS_STEPS : FLAT_KS_STEPS;
 
 		for (i in 0 ... naturalizeSymbols)
         {
-			addGlyph(new NaturalizeGlyph(0, Std.int(getScoreY(previousKeyPositions[i] + offsetClef, -2))));
+			addGlyph(new NaturalizeGlyph(0, Std.int(getScoreY(previousKeyPositions[i] + offsetClef, NaturalizeGlyph.CORRECTION))));
         }
 		
 		// how many symbols do we need to get from a C-keysignature
         // to the new one
         var offsetSymbols:Int = (currentKey <= 7) ? currentKey : currentKey - 7;
         // a sharp keysignature
-        if (currentKey <= 7)
+        if (keySignatureIsSharp(currentKey))
         {  
-            for (i in 0 ... offsetSymbols)
+            for (i in 0 ... Std.int(Math.abs(currentKey)))
             {
-				addGlyph(new SharpGlyph(0, Std.int(getScoreY(SCORE_KEYSHARP_POSITIONS[i] + offsetClef, -1))));
+				addGlyph(new SharpGlyph(0, Std.int(getScoreY(SHARP_KS_STEPS[i] + offsetClef, SharpGlyph.CORRECTION))));
             }
         }
         // a flat signature
         else 
         {
-            for (i in 0 ... offsetSymbols)
+            for (i in 0 ... Std.int(Math.abs(currentKey)))
             {
-				addGlyph(new FlatGlyph(0, Std.int(getScoreY(SCORE_KEYFLAT_POSITIONS[i] + offsetClef, -8))));
+				addGlyph(new FlatGlyph(0, Std.int(getScoreY(FLAT_KS_STEPS[i] + offsetClef, FlatGlyph.CORRECTION))));
             }
         }		
 	}
-	
+    
 	private function createTimeSignatureGlyphs()
 	{
 		addGlyph(new SpacingGlyph(0,0, Std.int(5 * getScale()), false));
 		addGlyph(new TimeSignatureGlyph(0, 0, _bar.getMasterBar().timeSignatureNumerator, _bar.getMasterBar().timeSignatureDenominator));
 	}
+    
+    private function createVoiceGlyphs(v:Voice)
+    {
+        for (b in v.beats)
+        {
+            createBeatGlyphs(b);
+        }
+    }
 	
+    private function createBeatGlyphs(b:Beat)
+    {
+        var i = b.notes.length -1;
+        while ( i >= 0 )
+        {
+            createAccidentalGlyph(b.notes[i--]);
+        }
+        // TODO: Create container glyph which can draw the ledge/leger lines and arrange notes displaced
+        var noteglyphs:NoteChordGlyph = new NoteChordGlyph();
+        i = b.notes.length -1;
+        while ( i >= 0 )
+        {
+            createNoteGlyph(b.notes[i--], noteglyphs);
+        }
+        addGlyph(noteglyphs);
+        
+        addGlyph(new SpacingGlyph(0, 0, Std.int(getBeatDurationWidth(b.duration) * getScale())));
+    }	
+    
+    private function getBeatDurationWidth(d:Duration) : Int
+    {
+        switch(d)
+        {
+            case Whole:         return 82;
+            case Half:          return 56;
+            case Quarter:       return 36;
+            case Eighth:        return 24;
+            case Sixteenth:     return 14;
+            case ThirtySecond:  return 14;
+            case SixtyFourth:   return 14;
+            default: return 0;
+        }
+    }
+    
+    private function createNoteGlyph(n:Note, noteglyphs:NoteChordGlyph) 
+    {
+        if (n.harmonicType == HarmonicType.None)
+        {
+            var noteHeadGlyph = new NoteHeadGlyph(n.beat.duration);
+            
+            // calculate y position
+            var line = getNoteLine(n);
+            
+            noteHeadGlyph.y = getScoreY(line, -1);
+            
+            noteglyphs.addNoteGlyph(noteHeadGlyph, line);
+        }
+    }
+    
+    private function createAccidentalGlyph(n:Note)
+    {
+        var noteLine = getNoteLine(n);
+        var accidental = _accidentalHelper.applyAccidental(n, noteLine);
+        switch (accidental) 
+        {
+            case Sharp:   addGlyph(new SharpGlyph(0, getScoreY(noteLine - NOTE_STEP_CORRECTION, SharpGlyph.CORRECTION)));
+            case Flat:    addGlyph(new FlatGlyph(0, getScoreY(noteLine - NOTE_STEP_CORRECTION, FlatGlyph.CORRECTION)));
+            case Natural: addGlyph(new NaturalizeGlyph(0, getScoreY(noteLine - NOTE_STEP_CORRECTION, NaturalizeGlyph.CORRECTION)));
+            default:
+        }
+    }
+    
+    // TODO[performance]: Maybe we should cache this (check profiler)
+    private function getNoteLine(n:Note) : Int
+    {
+        var ks = n.beat.voice.bar.getMasterBar().keySignature;
+        var clef = n.beat.voice.bar.clef;
+        
+        var value = n.realValue();
+        
+        var index = value % 12;             
+        var octave = Std.int(value / 12);
+        
+        // Initial Position
+        var steps = OCTAVE_STEPS[getClefIndex(clef)];
+        
+        // Move to Octave
+        steps -= (octave * STEPS_PER_OCTAVE);
+        
+        // Add offset for note itself
+        steps -= keySignatureIsSharp(ks) || keySignatureIsNatural(ks)
+                     ? SHARP_NOTE_STEPS[index]
+                     : FLAT_NOTE_STEPS[index];
+
+        // TODO: It seems note heads are always one step above the calculated line 
+        // maybe the SVG paths are wrong, need to recheck where step=0 is really placed
+        return steps + NOTE_STEP_CORRECTION;
+    }
+    private static inline var NOTE_STEP_CORRECTION = 1;
+    
+    private function getClefIndex(clef:Clef)
+    {
+        switch(clef)
+        {
+            case C3: return 0;
+            case C4: return 1;
+            case F4: return 2;
+            case G2: return 3;
+            default: return 0;
+        }
+    }
+    
 	/**
 	 * Gets the relative y position of the given steps relative to first line. 
 	 * @param steps the amount of steps while 2 steps are one line

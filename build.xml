@@ -51,9 +51,6 @@
             <arg value="-cp" />
             <arg value="${src}"/>
             
-            <arg value="-D" />
-            <arg value="haxe3" />
-			
             <arg value="-main" />
             <arg value="alphatab.Main" />
             

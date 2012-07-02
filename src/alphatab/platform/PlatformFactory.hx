@@ -23,10 +23,12 @@ import alphatab.platform.svg.SvgCanvas;
  */
 class PlatformFactory
 { 
-    public static function getLoader() : IFileLoader
+    public inline static function getLoader() : IFileLoader
     { 
         #if (neko || cpp)
         return new alphatab.platform.sys.SysFileLoader();
+        #elseif cs
+        return new alphatab.platform.cs.CsFileLoader();
         #elseif js
         return new alphatab.platform.js.JsFileLoader();
         #else

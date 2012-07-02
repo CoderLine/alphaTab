@@ -15,6 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.importer;
+import alphatab.model.AccidentalType;
 import alphatab.model.Beat;
 import alphatab.model.Note;
 import alphatab.model.Score;
@@ -28,7 +29,7 @@ import haxe.io.BytesInput;
 class ScoreImporter 
 {
     #if unit public #else private #end var _data:BytesInput;
-    
+        
 	/**
 	 * Gets all default ScoreImporters
 	 * @return
@@ -59,6 +60,7 @@ class ScoreImporter
     private function finish(score:Score)
     {
         // iterate over full model and connect/determine stuff
+        // TODO[performance]: maybe we can cache this data during creation 
         for (t in score.tracks)
         {
             if (!t.isPercussion)
@@ -85,6 +87,8 @@ class ScoreImporter
                                         n.fret = tieOrigin.fret;
                                     }
                                 }
+                                
+                                // set hammeron/pulloffs
                                 if (n.isHammerPullOrigin)
                                 {
                                     var hammerPullDestination = determineHammerPullDestination(n);
@@ -96,7 +100,7 @@ class ScoreImporter
                                     {
                                         hammerPullDestination.isHammerPullDestination = true;
                                     }
-                                }                                
+                                }
                             }
                         }
                     }
@@ -104,7 +108,7 @@ class ScoreImporter
             }
         }
 	}
-	    
+    
     private function determineHammerPullDestination(note:Note) : Note
     {
         var nextBeat:Beat = note.beat.nextBeat;

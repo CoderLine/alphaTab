@@ -1,11 +1,7 @@
 Open
 ==== 
-Triplet Feel
-Repeat Open 
-Repeat End
-Repeat Alternatives
-Notes
-	Note Accentuations
+Triplet Feel (Own Info Line)
+Repeat Alternatives (Own Info Line)
 Chords
 Note Beams
 Note Staves
@@ -57,6 +53,8 @@ Glyph Stave System
 Glyph Rendering Engine
 Some Basic Glyphs (Groups)
 SVG Rendering Glyph
+Notes
+	Note Accentuations
 
 Elements
 ---------

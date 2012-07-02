@@ -102,14 +102,17 @@ class StaveGroup
 	
 	public function revertLastBar() : Void
 	{
-		bars.pop();
-		var w = 0;
-		for (s in staves)
-		{
-			w = Std.int(Math.max(w, s.barRenderers[s.barRenderers.length - 1].width));
-			s.revertLastBar();
-		}
-		width -= w;
+        if (bars.length > 1)
+        {
+            bars.pop();
+            var w = 0;
+            for (s in staves)
+            {
+                w = Std.int(Math.max(w, s.barRenderers[s.barRenderers.length - 1].width));
+                s.revertLastBar();
+            }
+            width -= w;
+        }
 	}
 	
 	public function applyBarSpacing(spacing:Int)

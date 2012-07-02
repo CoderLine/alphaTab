@@ -88,4 +88,9 @@ class Note
         trillSpeed = 0;
         durationPercent = 1;
     }
+    
+    public function realValue() : Int
+    {
+        return fret + beat.voice.bar.track.tuning[string];
+    }
 }

@@ -13,7 +13,7 @@ class BarNumberGlyph extends Glyph
 
 	public override function doLayout():Void 
 	{
-		width = 0;
+		width = Std.int(8 * getScale());
 	}
 	
 	public override function applyGlyphSpacing(spacing:Int):Void

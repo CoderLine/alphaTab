@@ -37,6 +37,11 @@ class BarRendererBase
 	private function new(bar:Bar) 
 	{
 		_bar = bar;
+        x = 0;
+        y = 0;
+        width = 0;
+        height = 0;
+        index = 0;
 	}
 	
 	public function applyBarSpacing(spacing:Int) : Void

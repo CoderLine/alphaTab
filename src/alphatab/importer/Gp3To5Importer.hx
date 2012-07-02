@@ -453,7 +453,6 @@ class Gp3To5Importer extends ScoreImporter
                 newTrack.tuning.push(tuning);
             }
         }
-        newTrack.tuning.reverse();
         
         var port = readInt32();
         var index = readInt32() - 1;
@@ -630,7 +629,7 @@ class Gp3To5Importer extends ScoreImporter
         {
             if ((stringFlags & (1 << i)) != 0 && (6 - i) < track.tuning.length)
             {
-                readNote(track, bar, voice, newBeat, i);
+                readNote(track, bar, voice, newBeat, (6 - i));
             }
 
             i--;

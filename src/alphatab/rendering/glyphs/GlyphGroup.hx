@@ -39,7 +39,7 @@ class GlyphGroup extends Glyph
 		{
 			g.renderer = renderer;
 			g.doLayout();
-			w = Std.int(Math.max(w, x + g.width));
+			w = Std.int(Math.max(w, g.width));
 		}	
 		width = w;
 	}
