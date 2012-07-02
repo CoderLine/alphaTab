@@ -1,6 +1,9 @@
 package alphatab.rendering.glyphs;
 import alphatab.platform.ICanvas;
+import alphatab.platform.model.Color;
 import alphatab.rendering.Glyph;
+import alphatab.rendering.RenderingResources;
+import alphatab.rendering.ScoreBarRenderer;
 
 typedef NoteGlyphInfo = {
     glyph:NoteHeadGlyph,
@@ -11,6 +14,9 @@ class NoteChordGlyph extends Glyph
 {
     private var _infos:Array<NoteGlyphInfo>;
     
+    public var minNote:NoteGlyphInfo;
+    public var maxNote:NoteGlyphInfo;
+    
 	public function new(x:Int = 0, y:Int = 0)
     {
         super(x, y);
@@ -19,7 +25,26 @@ class NoteChordGlyph extends Glyph
     
     public function addNoteGlyph(noteGlyph:NoteHeadGlyph, noteLine:Int)
     {
-        _infos.push({glyph:noteGlyph, line:noteLine});
+        var info:NoteGlyphInfo =  { glyph:noteGlyph, line:noteLine }
+        _infos.push( info );
+        if (minNote == null || minNote.line > info.line)
+        {
+            minNote = info;
+        }
+        if (maxNote == null || maxNote.line < info.line)
+        {
+            maxNote = info;
+        }
+    }
+    
+    public function hasTopOverflow() : Bool
+    {
+        return minNote != null && minNote.line < 0;
+    }
+    
+    public function hasBottomOverflow() : Bool
+    {
+        return maxNote != null && maxNote.line > 8;
     }
     
 	public override function doLayout():Void 
@@ -30,6 +55,8 @@ class NoteChordGlyph extends Glyph
             else return -1;
         });
         
+        var padding = Std.int(4 * getScale());
+
         var displacedX = 0;
         
         var lastDisplaced = false;
@@ -42,10 +69,12 @@ class NoteChordGlyph extends Glyph
             var g = _infos[i].glyph;
  			g.renderer = renderer;
 			g.doLayout();
+            
+            g.x = padding;
            
             if (i == 0)
             {
-                displacedX = g.width;
+                displacedX = g.width + padding;
             }
             else 
             {
@@ -74,14 +103,49 @@ class NoteChordGlyph extends Glyph
             w = Std.int(Math.max(w, g.x + g.width));
         }
 
-		width = w;
+		width = w + padding;
 	}
 	
 	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
 	{
-		for (g in _infos)
+        var scoreRenderer:ScoreBarRenderer = cast renderer;
+        canvas.setColor(renderer.getLayout().renderer.renderingResources.staveLineColor);
+        
+        if (hasTopOverflow()) 
+        {
+            var l = -1;
+            while (l >= minNote.line)
+            {
+                // + 1 Because we want to place the line in the center of the note, not at the top
+                var lY = cy + y + scoreRenderer.getScoreY(l + 1, -1);
+                canvas.beginPath();
+                canvas.moveTo(cx + x, lY);
+                canvas.lineTo(cx + x + width, lY);
+                canvas.stroke();
+                l -= 2;
+            }
+        }
+      
+        if (hasBottomOverflow()) 
+        {
+            var l = 11;
+            while (l <= maxNote.line)
+            {
+                var lY = cy + y + scoreRenderer.getScoreY(l + 1, -1);
+                canvas.beginPath();
+                canvas.moveTo(cx + x, lY);
+                canvas.lineTo(cx + x + width, lY);
+                canvas.stroke();
+                l += 2;
+            }
+        }
+		
+        
+        for (g in _infos)
 		{
 			g.glyph.paint(cx + x, cy + y, canvas);
 		}
+        
+
 	}    
 }

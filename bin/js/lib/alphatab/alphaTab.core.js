@@ -3504,6 +3504,8 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Glyph
 		i = b.notes.length - 1;
 		while(i >= 0) this.createNoteGlyph(b.notes[i--],noteglyphs);
 		this.addGlyph(noteglyphs);
+		if(noteglyphs.hasTopOverflow()) this.stave.registerStaveTop(this.getScoreY(Math.abs(noteglyphs.minNote.line) | 0));
+		if(noteglyphs.hasBottomOverflow()) this.stave.registerStaveBottom(this.getScoreY(noteglyphs.maxNote.line | 0));
 		this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,this.getBeatDurationWidth(b.duration) * this.stave.staveGroup.layout.renderer.scale | 0));
 	}
 	,getBeatDurationWidth: function(d) {
@@ -4102,12 +4104,22 @@ alphatab.rendering.glyphs.NoteChordGlyph.__name__ = true;
 alphatab.rendering.glyphs.NoteChordGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.NoteChordGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	addNoteGlyph: function(noteGlyph,noteLine) {
-		this._infos.push({ glyph : noteGlyph, line : noteLine});
+		var info = { glyph : noteGlyph, line : noteLine};
+		this._infos.push(info);
+		if(this.minNote == null || this.minNote.line > info.line) this.minNote = info;
+		if(this.maxNote == null || this.maxNote.line < info.line) this.maxNote = info;
+	}
+	,hasTopOverflow: function() {
+		return this.minNote != null && this.minNote.line < 0;
+	}
+	,hasBottomOverflow: function() {
+		return this.maxNote != null && this.maxNote.line > 8;
 	}
 	,doLayout: function() {
 		this._infos.sort(function(a,b) {
 			if(a.line == b.line) return 0; else if(a.line < b.line) return 1; else return -1;
 		});
+		var padding = 4 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 		var displacedX = 0;
 		var lastDisplaced = false;
 		var lastLine = 0;
@@ -4119,7 +4131,8 @@ alphatab.rendering.glyphs.NoteChordGlyph.prototype = $extend(alphatab.rendering.
 			var g = this._infos[i].glyph;
 			g.renderer = this.renderer;
 			g.doLayout();
-			if(i == 0) displacedX = g.width; else if(Math.abs(lastLine - this._infos[i].line) <= 1) {
+			g.x = padding;
+			if(i == 0) displacedX = g.width + padding; else if(Math.abs(lastLine - this._infos[i].line) <= 1) {
 				if(!lastDisplaced) {
 					g.x = displacedX - this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 					anyDisplaced = true;
@@ -4129,9 +4142,33 @@ alphatab.rendering.glyphs.NoteChordGlyph.prototype = $extend(alphatab.rendering.
 			lastLine = this._infos[i].line;
 			w = Math.max(w,g.x + g.width) | 0;
 		}
-		this.width = w;
+		this.width = w + padding;
 	}
 	,paint: function(cx,cy,canvas) {
+		var scoreRenderer = this.renderer;
+		canvas.setColor(this.renderer.stave.staveGroup.layout.renderer.renderingResources.staveLineColor);
+		if(this.hasTopOverflow()) {
+			var l = -1;
+			while(l >= this.minNote.line) {
+				var lY = cy + this.y + scoreRenderer.getScoreY(l + 1,-1);
+				canvas.beginPath();
+				canvas.moveTo(cx + this.x,lY);
+				canvas.lineTo(cx + this.x + this.width,lY);
+				canvas.stroke();
+				l -= 2;
+			}
+		}
+		if(this.hasBottomOverflow()) {
+			var l = 11;
+			while(l <= this.maxNote.line) {
+				var lY = cy + this.y + scoreRenderer.getScoreY(l + 1,-1);
+				canvas.beginPath();
+				canvas.moveTo(cx + this.x,lY);
+				canvas.lineTo(cx + this.x + this.width,lY);
+				canvas.stroke();
+				l += 2;
+			}
+		}
 		var _g = 0, _g1 = this._infos;
 		while(_g < _g1.length) {
 			var g = _g1[_g];

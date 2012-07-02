@@ -300,7 +300,6 @@ class ScoreBarRenderer extends GlyphBarRenderer
         {
             createAccidentalGlyph(b.notes[i--]);
         }
-        // TODO: Create container glyph which can draw the ledge/leger lines and arrange notes displaced
         var noteglyphs:NoteChordGlyph = new NoteChordGlyph();
         i = b.notes.length -1;
         while ( i >= 0 )
@@ -308,6 +307,17 @@ class ScoreBarRenderer extends GlyphBarRenderer
             createNoteGlyph(b.notes[i--], noteglyphs);
         }
         addGlyph(noteglyphs);
+        
+        // register overflow spacing in line
+        if (noteglyphs.hasTopOverflow())
+        {
+            stave.registerStaveTop(getScoreY(Std.int(Math.abs(noteglyphs.minNote.line))));
+        }
+        
+        if (noteglyphs.hasBottomOverflow())
+        {
+            stave.registerStaveBottom(getScoreY(Std.int(noteglyphs.maxNote.line)));
+        }
         
         addGlyph(new SpacingGlyph(0, 0, Std.int(getBeatDurationWidth(b.duration) * getScale())));
     }	
@@ -381,7 +391,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
         // maybe the SVG paths are wrong, need to recheck where step=0 is really placed
         return steps + NOTE_STEP_CORRECTION;
     }
-    private static inline var NOTE_STEP_CORRECTION = 1;
+    public static inline var NOTE_STEP_CORRECTION = 1;
     
     private function getClefIndex(clef:Clef)
     {
@@ -399,7 +409,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
 	 * Gets the relative y position of the given steps relative to first line. 
 	 * @param steps the amount of steps while 2 steps are one line
 	 */
-	private function getScoreY(steps:Int, correction:Int = 0) : Int
+	public function getScoreY(steps:Int, correction:Int = 0) : Int
 	{
 		return Std.int(((getLineOffset() / 2) * steps) + (correction * getScale()));
 	}
