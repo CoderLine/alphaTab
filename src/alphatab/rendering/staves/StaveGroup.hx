@@ -135,7 +135,6 @@ class StaveGroup
 		
 		if (staves.length > 0)
 		{
-						
 			//
 			// Draw start grouping
 			// 
@@ -159,7 +158,7 @@ class StaveGroup
             var barOffset:Int = barSize;
 			
 			var accoladeStart = firstStart - (barSize*4);
-			var accoladeEnd = lastEnd + (barSize*4);
+			var accoladeEnd = lastEnd + (barSize * 4);
             
             canvas.fillRect(cx + x - barOffset - barSize, accoladeStart, barSize, accoladeEnd - accoladeStart);
             
@@ -191,7 +190,7 @@ class StaveGroup
 		}
 	}
 	
-	public static inline var StaveSpacing = 10;
+	public static inline var StaveSpacing = 0;
 	public function finalizeGroup(scoreLayout:ScoreLayout)
 	{
 		var currentY:Float = 0;

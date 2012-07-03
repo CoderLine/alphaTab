@@ -4818,7 +4818,7 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Glyph
 			this.createStartSpacing();
 			this.createTimeSignatureGlyphs();
 		}
-		if(this.stave.index == 0) this.addGlyph(new alphatab.rendering.glyphs.BarNumberGlyph(0,this.getScoreY(-1,-3),this._bar.index + 1));
+		if(this.stave.index == 0) this.addGlyph(new alphatab.rendering.glyphs.BarNumberGlyph(0,this.getScoreY(-1,-3),this._bar.index + 1)); else this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,8 * this.stave.staveGroup.layout.renderer.scale | 0,false));
 	}
 	,createKeySignatureGlyphs: function() {
 		var offsetClef = 0;
@@ -4889,8 +4889,8 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Glyph
 			while(i >= 0) this.createNoteGlyph(b.notes[i--],noteglyphs);
 			this.addGlyph(noteglyphs);
 			this._currentBeamHelper.registerBeatLineX(b,noteglyphs.upLineX,noteglyphs.downLineX);
-			if(noteglyphs.hasTopOverflow()) this.stave.registerStaveTop(this.getScoreY(Math.abs(noteglyphs.minNote.line) | 0));
-			if(noteglyphs.hasBottomOverflow()) this.stave.registerStaveBottom(this.getScoreY(noteglyphs.maxNote.line | 0));
+			if(noteglyphs.hasTopOverflow()) this.stave.registerOverflowTop(this.getScoreY(Math.abs(noteglyphs.minNote.line) | 0));
+			if(noteglyphs.hasBottomOverflow()) this.stave.registerOverflowBottom(this.getScoreY(noteglyphs.maxNote.line | 0));
 		} else this.createRestGlyph(b);
 		this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,this.getBeatDurationWidth(b.duration) * this.stave.staveGroup.layout.renderer.scale | 0));
 	}
@@ -5943,6 +5943,7 @@ alphatab.rendering.layout.ScoreLayout.prototype = {
 		var group = new alphatab.rendering.staves.StaveGroup();
 		group.layout = this;
 		group.addStave(new alphatab.rendering.staves.Stave(new alphatab.rendering.ScoreBarRendererFactory()));
+		group.addStave(new alphatab.rendering.staves.Stave(new alphatab.rendering.ScoreBarRendererFactory()));
 		return group;
 	}
 	,__class__: alphatab.rendering.layout.ScoreLayout
@@ -6130,8 +6131,8 @@ if(!alphatab.rendering.staves) alphatab.rendering.staves = {}
 alphatab.rendering.staves.Stave = $hxClasses["alphatab.rendering.staves.Stave"] = function(barRendererFactory) {
 	this.barRenderers = new Array();
 	this._factory = barRendererFactory;
-	this.topSpacing = 20;
-	this.bottomSpacing = 20;
+	this.topSpacing = 10;
+	this.bottomSpacing = 10;
 };
 alphatab.rendering.staves.Stave.__name__ = ["alphatab","rendering","staves","Stave"];
 alphatab.rendering.staves.Stave.prototype = {
@@ -6145,12 +6146,20 @@ alphatab.rendering.staves.Stave.prototype = {
 	,staveTop: null
 	,topSpacing: null
 	,bottomSpacing: null
+	,topOverflow: null
+	,bottomOverflow: null
 	,staveBottom: null
+	,registerOverflowTop: function(topOverflow) {
+		this.topOverflow = topOverflow;
+	}
+	,registerOverflowBottom: function(bottomOverflow) {
+		this.bottomOverflow = bottomOverflow;
+	}
 	,registerStaveTop: function(offset) {
-		this.staveTop = offset + this.topSpacing;
+		this.staveTop = offset + this.topSpacing + this.topOverflow;
 	}
 	,registerStaveBottom: function(offset) {
-		this.staveBottom = offset + this.bottomSpacing;
+		this.staveBottom = offset + this.bottomSpacing + this.topOverflow;
 	}
 	,addBar: function(bar) {
 		var renderer = this._factory.create(bar);
@@ -6177,11 +6186,11 @@ alphatab.rendering.staves.Stave.prototype = {
 		while(_g1 < _g) {
 			var i = _g1++;
 			this.barRenderers[i].x = x;
-			this.barRenderers[i].y = this.topSpacing;
+			this.barRenderers[i].y = this.topSpacing + this.topOverflow;
 			this.height = Math.max(this.height,this.barRenderers[i].height) | 0;
 			x += this.barRenderers[i].width;
 		}
-		this.height += this.topSpacing + this.bottomSpacing;
+		this.height += this.topSpacing + this.topOverflow + this.bottomOverflow + this.bottomSpacing;
 	}
 	,paint: function(cx,cy,canvas) {
 		var _g = 0, _g1 = this.barRenderers;
@@ -6307,7 +6316,7 @@ alphatab.rendering.staves.StaveGroup.prototype = {
 		var _g1 = 0, _g = this.staves.length;
 		while(_g1 < _g) {
 			var i = _g1++;
-			if(i > 0) currentY += 10 * scoreLayout.renderer.scale;
+			if(i > 0) currentY += 0 * scoreLayout.renderer.scale;
 			this.staves[i].x = 0;
 			this.staves[i].y = currentY | 0;
 			this.staves[i].finalizeStave(scoreLayout);
@@ -7671,7 +7680,7 @@ alphatab.rendering.layout.PageViewLayout.SCORE_INFOS = "scoreInfos";
 alphatab.rendering.layout.PageViewLayout.PAGE_PADDING = [20,20,20,20];
 alphatab.rendering.layout.PageViewLayout.WIDTH_ON_100 = 795;
 alphatab.rendering.layout.PageViewLayout.GroupSpacing = 20;
-alphatab.rendering.staves.StaveGroup.StaveSpacing = 10;
+alphatab.rendering.staves.StaveGroup.StaveSpacing = 0;
 alphatab.rendering.utils.AccidentalHelper.ACCIDENTAL_NOTES = [[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural]];
 alphatab.rendering.utils.BeamingHelper.SCORE_MIDDLE_KEYS = [48,45,38,59];
 haxe.io.Output.LN2 = Math.log(2);

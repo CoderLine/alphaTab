@@ -292,6 +292,10 @@ class ScoreBarRenderer extends GlyphBarRenderer
 		{
 			addGlyph(new BarNumberGlyph(0,getScoreY(-1, -3),_bar.index + 1));
 		}
+        else
+        {
+            addGlyph(new SpacingGlyph(0, 0, Std.int(8 * getScale()), false));
+        }
 	}
     
     // TODO: Externalize this into some model class
@@ -407,12 +411,12 @@ class ScoreBarRenderer extends GlyphBarRenderer
             // register overflow spacing in line
             if (noteglyphs.hasTopOverflow())
             {
-                stave.registerStaveTop(getScoreY(Std.int(Math.abs(noteglyphs.minNote.line))));
+                stave.registerOverflowTop(getScoreY(Std.int(Math.abs(noteglyphs.minNote.line))));
             }
             
             if (noteglyphs.hasBottomOverflow())
             {
-                stave.registerStaveBottom(getScoreY(Std.int(noteglyphs.maxNote.line)));
+                stave.registerOverflowBottom(getScoreY(Std.int(noteglyphs.maxNote.line)));
             }
         }
         else

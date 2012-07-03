@@ -46,6 +46,8 @@ class Stave
 	public var staveTop:Int;
 	public var topSpacing:Int;
 	public var bottomSpacing:Int;
+	public var topOverflow:Int;
+	public var bottomOverflow:Int;
 	/**
 	 * This is the visual offset from top where the
 	 * stave contents actually ends. Used for grouping 
@@ -57,18 +59,28 @@ class Stave
 	{
 		barRenderers = new Array<BarRendererBase>();
 		_factory = barRendererFactory;
-		topSpacing = 20;
-		bottomSpacing = 20;
+		topSpacing = 10;
+		bottomSpacing = 10;
 	}
+    
+    public function registerOverflowTop(topOverflow:Int)
+    {
+        this.topOverflow = topOverflow;
+    }
+	
+    public function registerOverflowBottom(bottomOverflow:Int)
+    {
+        this.bottomOverflow = bottomOverflow;
+    }
 	
 	public function registerStaveTop(offset:Int)
 	{
-		staveTop = offset + topSpacing;
+		staveTop = offset + topSpacing + topOverflow;
 	}
 	
 	public function registerStaveBottom(offset:Int)
 	{
-		staveBottom = offset + bottomSpacing;
+		staveBottom = offset + bottomSpacing + topOverflow;
 	}
 	
 	public function addBar(bar:Bar)
@@ -100,11 +112,11 @@ class Stave
 		for (i in 0 ... barRenderers.length)
 		{
 			barRenderers[i].x = x;
-			barRenderers[i].y = topSpacing; // TODO: mention registered spacing
+			barRenderers[i].y = topSpacing + topOverflow;
 			height = Std.int(Math.max(height, barRenderers[i].height));
 			x += barRenderers[i].width;
 		}
-		height += topSpacing + bottomSpacing;
+		height += topSpacing + topOverflow + bottomOverflow + bottomSpacing;
 	}
 	
 		
