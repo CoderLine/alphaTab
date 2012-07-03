@@ -37,6 +37,7 @@ import alphatab.rendering.glyphs.NumberGlyph;
 import alphatab.rendering.glyphs.RepeatCloseGlyph;
 import alphatab.rendering.glyphs.RepeatCountGlyph;
 import alphatab.rendering.glyphs.RepeatOpenGlyph;
+import alphatab.rendering.glyphs.RestGlyph;
 import alphatab.rendering.glyphs.SharpGlyph;
 import alphatab.rendering.glyphs.SpacingGlyph;
 import alphatab.rendering.glyphs.SvgGlyph;
@@ -295,32 +296,74 @@ class ScoreBarRenderer extends GlyphBarRenderer
 	
     private function createBeatGlyphs(b:Beat)
     {
-        var i = b.notes.length -1;
-        while ( i >= 0 )
+        if (!b.isRest())
         {
-            createAccidentalGlyph(b.notes[i--]);
+            var i = b.notes.length -1;
+            while ( i >= 0 )
+            {
+                createAccidentalGlyph(b.notes[i--]);
+            }
+            var noteglyphs:NoteChordGlyph = new NoteChordGlyph();
+            i = b.notes.length -1;
+            while ( i >= 0 )
+            {
+                createNoteGlyph(b.notes[i--], noteglyphs);
+            }
+            addGlyph(noteglyphs);
+            
+            // register overflow spacing in line
+            if (noteglyphs.hasTopOverflow())
+            {
+                stave.registerStaveTop(getScoreY(Std.int(Math.abs(noteglyphs.minNote.line))));
+            }
+            
+            if (noteglyphs.hasBottomOverflow())
+            {
+                stave.registerStaveBottom(getScoreY(Std.int(noteglyphs.maxNote.line)));
+            }
         }
-        var noteglyphs:NoteChordGlyph = new NoteChordGlyph();
-        i = b.notes.length -1;
-        while ( i >= 0 )
+        else
         {
-            createNoteGlyph(b.notes[i--], noteglyphs);
-        }
-        addGlyph(noteglyphs);
-        
-        // register overflow spacing in line
-        if (noteglyphs.hasTopOverflow())
-        {
-            stave.registerStaveTop(getScoreY(Std.int(Math.abs(noteglyphs.minNote.line))));
-        }
-        
-        if (noteglyphs.hasBottomOverflow())
-        {
-            stave.registerStaveBottom(getScoreY(Std.int(noteglyphs.maxNote.line)));
+            createRestGlyph(b);
         }
         
         addGlyph(new SpacingGlyph(0, 0, Std.int(getBeatDurationWidth(b.duration) * getScale())));
     }	
+    
+    private function createRestGlyph(b:Beat) : Void
+    {
+        var line = 0;
+        var correction = 0;
+        
+        // TODO: the glyphs are really bad aligned, need to recreate the font
+        switch(b.duration)
+        {
+            case Whole:         
+                line = 2;
+                correction = 8;
+            case Half:          
+                line = 4;
+                correction = 3;
+            case Quarter:       
+                line = 3;
+            case Eighth:        
+                line = 4;
+                correction -2;
+            case Sixteenth:     
+                line = 2;
+                correction -2;
+            case ThirtySecond:  
+                line = 2;
+                correction -2;
+            case SixtyFourth:   
+                line = 0;
+                correction -2;
+        }
+        
+        var y = getScoreY(line, correction);
+
+        addGlyph(new RestGlyph(0, y, b.duration));
+    }
     
     private function getBeatDurationWidth(d:Duration) : Int
     {
