@@ -15,6 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.model;
+import alphatab.audio.MidiUtils;
 
 /**
  * The MasterBar stores information about a bar which affects
@@ -46,6 +47,12 @@ class MasterBar
     
     public var score:Score;
     
+    /**
+     * The timeline position of the voice within the whole score. (unit: midi ticks)
+     */
+    public var start : Int;
+    
+
     public function new() 
     {
         alternateEndings = 0;
@@ -58,6 +65,14 @@ class MasterBar
 		timeSignatureDenominator = 4;
 		timeSignatureNumerator = 4;
 		tripletFeel = TripletFeel.NoTripletFeel;
+        start = 0;
     }
     
+    /**
+     * Calculates the time spent in this bar. (unit: midi ticks)
+     */
+    public function calculateDuration() : Int
+    {
+        return timeSignatureNumerator * MidiUtils.valueToTicks(timeSignatureDenominator);
+    }
 }

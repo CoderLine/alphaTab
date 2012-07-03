@@ -15,6 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.model;
+import alphatab.audio.MidiUtils;
 
 /**
  * A beat is a single block within a bar. A beat is a combination
@@ -28,6 +29,8 @@ class Beat
     
     public var voice:Voice;
     public var notes:Array<Note>;
+    public var minNote:Note;
+    public var maxNote:Note;
     public var duration:Duration;
     
     public var automations:Array<Automation>;
@@ -64,6 +67,11 @@ class Beat
     public inline function isTremolo():Bool { return tremoloSpeed >= 0; }
     public var tremoloSpeed:Int;
     
+    /**
+     * The timeline position of the voice within the current bar. (unit: midi ticks)
+     */
+    public var start:Int;
+    
     public function new() 
     {
         whammyBarPoints = new Array<BendPoint>();
@@ -75,12 +83,47 @@ class Beat
         duration = Duration.Quarter;
         tremoloSpeed = -1;
         automations = new Array<Automation>();
+        start = 0;        
+        tupletDenominator = -1;
+        tupletNumerator = -1;
+    }
+    
+    /**
+     * Calculates the time spent in this bar. (unit: midi ticks)
+     */
+    public function calculateDuration() : Int
+    {
+        var ticks = MidiUtils.durationToTicks(duration);
+        if (dots == 2)
+        {
+            ticks = MidiUtils.applyDot(ticks, true);
+        }
+        else if (dots == 1)
+        {
+            ticks = MidiUtils.applyDot(ticks, false);
+        }
+        
+        if (tupletDenominator > 0 && tupletNumerator >= 0)
+        {
+            ticks = MidiUtils.applyTuplet(ticks, tupletNumerator, tupletDenominator);
+        }
+        
+        return ticks;
     }
     
     public function addNote(note:Note) : Void
     {
         note.beat = this;
         notes.push(note);
+        
+        if (minNote == null || minNote.realValue() < note.realValue())
+        {
+            minNote = note;
+        }
+        if (maxNote == null || maxNote.realValue() > note.realValue())
+        {
+            maxNote = note;
+        }
     }
     
     public function getAutomation(type:AutomationType) : Automation

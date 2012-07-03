@@ -8,6 +8,8 @@ import alphatab.model.Duration;
 
 class NoteHeadGlyph extends SvgGlyph
 {
+    public static inline var noteHeadHeight = 9;
+    
 	public function new(x:Int = 0, y:Int = 0, duration:Duration)
 	{
 		super(x, y, getNoteSvg(duration), 1, 1);

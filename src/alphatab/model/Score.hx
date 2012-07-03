@@ -84,6 +84,7 @@ class Score
         {
             bar.previousMasterBar = masterBars[masterBars.length - 1];
             bar.previousMasterBar.nextMasterBar = bar;
+            bar.start = bar.previousMasterBar.start + bar.previousMasterBar.calculateDuration();
         }
         masterBars.push(bar);
     }

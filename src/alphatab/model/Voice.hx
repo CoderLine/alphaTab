@@ -40,6 +40,7 @@ class Voice
         {
             beat.previousBeat = beats[beats.length - 1];
             beat.previousBeat.nextBeat = beat;
+            beat.start = beat.previousBeat.start + beat.previousBeat.calculateDuration();
         }
         beats.push(beat);
     }

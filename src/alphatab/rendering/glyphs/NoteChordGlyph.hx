@@ -16,6 +16,8 @@ class NoteChordGlyph extends Glyph
     
     public var minNote:NoteGlyphInfo;
     public var maxNote:NoteGlyphInfo;
+    public var upLineX:Int;
+    public var downLineX:Int;
     
 	public function new(x:Int = 0, y:Int = 0)
     {
@@ -101,6 +103,17 @@ class NoteChordGlyph extends Glyph
             
             lastLine = _infos[i].line;
             w = Std.int(Math.max(w, g.x + g.width));
+        }
+        
+        if (anyDisplaced)
+        {
+            upLineX = x + displacedX;
+            downLineX = x + displacedX;
+        }
+        else
+        {
+            upLineX = x + w;
+            downLineX = x + padding;
         }
 
 		width = w + padding;

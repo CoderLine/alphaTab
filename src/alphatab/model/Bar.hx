@@ -30,7 +30,6 @@ class Bar
     public var track:Track;
     public var voices:Array<Voice>;
     
-    
     public function new() 
     {
         voices = new Array<Voice>();

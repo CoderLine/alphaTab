@@ -25,6 +25,7 @@ import alphatab.platform.ICanvas;
 import alphatab.platform.svg.SvgCanvas;
 import alphatab.rendering.glyphs.BarNumberGlyph;
 import alphatab.rendering.glyphs.BarSeperatorGlyph;
+import alphatab.rendering.glyphs.BeamGlyph;
 import alphatab.rendering.glyphs.ClefGlyph;
 import alphatab.rendering.glyphs.DummyTablatureGlyph;
 import alphatab.rendering.glyphs.FlatGlyph;
@@ -43,6 +44,7 @@ import alphatab.rendering.glyphs.SpacingGlyph;
 import alphatab.rendering.glyphs.SvgGlyph;
 import alphatab.rendering.glyphs.TimeSignatureGlyph;
 import alphatab.rendering.utils.AccidentalHelper;
+import alphatab.rendering.utils.BeamingHelper;
 
 /**
  * This BarRenderer renders a bar using standard music notation. 
@@ -86,11 +88,14 @@ class ScoreBarRenderer extends GlyphBarRenderer
 	
 	private static inline var LineSpacing = 8;
     private var _accidentalHelper:AccidentalHelper;
+    private var _beamHelpers:Array<BeamingHelper>;
+    private var _currentBeamHelper:BeamingHelper;
     
 	public function new(bar:alphatab.model.Bar) 
 	{
 		super(bar);
         _accidentalHelper = new AccidentalHelper();
+        _beamHelpers = new Array<BeamingHelper>();
 	}
 	
 	public override function getTopPadding():Int 
@@ -117,8 +122,82 @@ class ScoreBarRenderer extends GlyphBarRenderer
 			stave.registerStaveTop(getGlyphOverflow());
 			stave.registerStaveBottom(height - getGlyphOverflow());
 		}
+        // TODO beam overflows
 	}
+    
+    public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
+    {
+        super.paint(cx, cy, canvas);
+        paintBeams(cx, cy, canvas);
+    }
 	
+    private function paintBeams(cx:Int, cy:Int, canvas:ICanvas):Void
+    {
+        for (h in _beamHelpers)
+        {
+            // paint beams
+            paintBeamHelper(cx, cy, canvas, h);
+        }
+    }
+    
+    private function paintBeamHelper(cx:Int, cy:Int, canvas:ICanvas, h:BeamingHelper):Void
+    {
+        // check if we need to paint simple footer
+        if (h.beats.length == 1 || true)
+        {
+            paintFooter(cx, cy, canvas, h);
+        }
+        else
+        {
+            //paintBar(cx, cy, canvas, h);
+        }
+    }
+    
+    private function paintFooter(cx:Int, cy:Int, canvas:ICanvas, h:BeamingHelper)
+    {
+        var beat = h.beats[0];
+        
+        //
+        // draw line 
+        //
+        var beatLineX = h.getBeatLineX(beat) + getScale();
+
+        var direction = h.getDirection();
+        
+        var correction = Std.int((NoteHeadGlyph.noteHeadHeight / 2));
+        var topY = getScoreY(getNoteLine(beat.maxNote), correction - 1);
+        var bottomY = getScoreY(getNoteLine(beat.minNote), correction - 1);
+        var stemSize = getScoreY(6);
+        
+        var beamY:Int;
+        
+        if (direction == Down)
+        {
+           bottomY += stemSize;
+           beamY = Std.int(bottomY + 3 * getScale());
+        }
+        else
+        {
+           topY -= stemSize;
+           beamY = Std.int(topY - 6 * getScale());
+        }
+        
+        canvas.setColor(getLayout().renderer.renderingResources.mainGlyphColor);
+        canvas.beginPath();
+        canvas.moveTo(cx + x + beatLineX, cy + y + topY);
+        canvas.lineTo(cx + x + beatLineX, cy + y + bottomY);
+        canvas.stroke();
+        
+        //
+        // Draw beam 
+        //
+        var gx = Std.int(beatLineX - getScale());
+        var glyph = new BeamGlyph(gx, beamY, beat.duration, direction);
+		glyph.renderer = this;
+		glyph.doLayout();
+        glyph.paint(cx + x, cy + y, canvas);
+    }
+
 	private override function createGlyphs():Void 
 	{		
 		createBarStartGlyphs();
@@ -290,8 +369,21 @@ class ScoreBarRenderer extends GlyphBarRenderer
     {
         for (b in v.beats)
         {
+            if (!b.isRest())
+            {
+                // try to fit beam to current beamhelper
+                if (_currentBeamHelper == null || !_currentBeamHelper.checkBeat(b))
+                {
+                    // if not possible, create the next beaming helper
+                    _currentBeamHelper = new BeamingHelper();
+                    _currentBeamHelper.checkBeat(b);
+                    _beamHelpers.push(_currentBeamHelper);
+                }
+            }
             createBeatGlyphs(b);
         }
+        
+        _currentBeamHelper = null;
     }
 	
     private function createBeatGlyphs(b:Beat)
@@ -310,6 +402,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
                 createNoteGlyph(b.notes[i--], noteglyphs);
             }
             addGlyph(noteglyphs);
+            _currentBeamHelper.registerBeatLineX(b, noteglyphs.upLineX, noteglyphs.downLineX);
             
             // register overflow spacing in line
             if (noteglyphs.hasTopOverflow())

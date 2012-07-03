@@ -5,7 +5,6 @@ Repeat Alternatives (Own Info Line)
 Chords
 Note Beams
 Note Staves
-Rests
 Dotted Notes
 Doubledotted Notes
 Tuplets
@@ -55,6 +54,7 @@ Some Basic Glyphs (Groups)
 SVG Rendering Glyph
 Notes
 	Note Accentuations
+Rests
 
 Elements
 ---------
