@@ -119,15 +119,48 @@ class ScoreBarRenderer extends GlyphBarRenderer
 	public override function doLayout()
 	{
 		super.doLayout();
-		height = Std.int(getLineOffset() * 4) + (getGlyphOverflow() * 2);
+		height = Std.int(getLineOffset() * 4) + getTopPadding() + getBottomPadding();
 		if (index == 0)
 		{
 			stave.registerStaveTop(getGlyphOverflow());
-			stave.registerStaveBottom(height - getGlyphOverflow());
+			stave.registerStaveBottom(getGlyphOverflow());
 		}
-        // TODO beam overflows
+        
+        var top = getScoreY(0);
+        var bottom = getScoreY(8);
+        
+        for (h in _beamHelpers)
+        {
+            //
+            // max note (highest) -> top overflow
+            // 
+            var maxNoteY = getScoreY(getNoteLine(h.maxNote));
+            if (h.getDirection() == Up)
+            {
+                maxNoteY -= getStemSize(h.maxDuration);
+            }
+                        
+            if (maxNoteY < top)
+            {
+                stave.registerOverflowTop(Std.int(Math.abs(maxNoteY)));
+            }
+                
+            //
+            // min note (lowest) -> bottom overflow
+            //
+            var minNoteY = getScoreY(getNoteLine(h.minNote));
+            if (h.getDirection() == Down)
+            {
+                minNoteY += getStemSize(h.maxDuration);
+            }
+                        
+            if (minNoteY > bottom)
+            {
+                stave.registerOverflowBottom(Std.int(Math.abs(minNoteY)) - bottom);
+            }
+            
+        }
 	}
-    
     public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
     {
         super.paint(cx, cy, canvas);
@@ -172,19 +205,22 @@ class ScoreBarRenderer extends GlyphBarRenderer
         return getScoreY(size);
     }
     
+    private function calculateBeamY(h:BeamingHelper, x:Int)
+    {
+        var correction = Std.int((NoteHeadGlyph.noteHeadHeight / 2));
+        var stemSize = getStemSize(h.maxDuration);
+        return h.calculateBeamY(stemSize, Std.int(getScale()), x, getScale(), function(n) {
+            return getScoreY(getNoteLine(n), correction - 1);
+        });
+    }
+    
     private function paintBar(cx:Int, cy:Int, canvas:ICanvas, h:BeamingHelper)
     {
         for (i in 0 ... h.beats.length)
         {
             var beat = h.beats[i];
             
-            var stemSize = getStemSize(h.maxDuration);
             var correction = Std.int((NoteHeadGlyph.noteHeadHeight / 2));
-            var calculateBeamY = function(x) {
-                return h.calculateBeamY(stemSize, Std.int(getScale()), x, function(n) {
-                    return getScoreY(getNoteLine(n), correction - 1);
-                });
-            };
                         
             //
             // draw line 
@@ -193,22 +229,28 @@ class ScoreBarRenderer extends GlyphBarRenderer
 
             var direction = h.getDirection();
             
-            var y1 = direction == Up 
+            var y1 = cy + y + (direction == Up 
                         ? getScoreY(getNoteLine(beat.minNote), correction - 1)
-                        : getScoreY(getNoteLine(beat.maxNote), correction - 1);
+                        : getScoreY(getNoteLine(beat.maxNote), correction - 1));
                         
-            var y2 = calculateBeamY(beatLineX);
+            var y2 = cy + y + calculateBeamY(h, beatLineX);
             
             canvas.setColor(getLayout().renderer.renderingResources.mainGlyphColor);
             canvas.beginPath();
-            canvas.moveTo(Std.int(cx + x + beatLineX), cy + y + y1);
-            canvas.lineTo(Std.int(cx + x + beatLineX), cy + y + y2);
+            canvas.moveTo(Std.int(cx + x + beatLineX), y1);
+            canvas.lineTo(Std.int(cx + x + beatLineX), y2);
             canvas.stroke();
             
             var brokenBarOffset = Std.int(6 * getScale());
             var barSpacing = Std.int(6 * getScale());
             var barSize = Std.int(3 * getScale());
             var barCount = beat.duration.getDurationIndex() - 2;
+            var barStart = cy + y;
+            if (direction == Down)
+            {
+                barSpacing = -barSpacing;
+            }
+            
             for (barIndex in 0 ... barCount)
             {
                 var barStartX:Int;
@@ -217,7 +259,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
                 var barStartY:Int;
                 var barEndY:Int;
                 
-                var barY = cy + y + (barIndex * barSpacing);
+                var barY = barStart + (barIndex * barSpacing);
                 
                 // 
                 // Bar to Next?
@@ -227,31 +269,31 @@ class ScoreBarRenderer extends GlyphBarRenderer
                     // full bar?
                     if (isFullBarJoin(beat, h.beats[i + 1], barIndex))
                     {
-                        barStartX = cx + x + beatLineX;
-                        barEndX = Std.int(cx + x + h.getBeatLineX(h.beats[i+1]) + getScale());
+                        barStartX = beatLineX;
+                        barEndX = Std.int(h.getBeatLineX(h.beats[i+1]) + getScale());
                     }
                     // broken bar
                     else
                     {
-                        barStartX = cx + x + beatLineX;
+                        barStartX = beatLineX;
                         barEndX = barStartX + brokenBarOffset;
                     }
-                    barStartY = Std.int(barY + calculateBeamY(barStartX));
-                    barEndY = Std.int(barY + calculateBeamY(barEndX));
-                    paintSingleBar(canvas, barStartX, barStartY, barEndX, barEndY, barSize);
+                    barStartY = Std.int(barY + calculateBeamY(h,barStartX));
+                    barEndY = Std.int(barY + calculateBeamY(h,barEndX));
+                    paintSingleBar(canvas, cx + x + barStartX, barStartY, cx + x + barEndX, barEndY, barSize);
                 }
                 // 
                 // Broken Bar to Previous?
                 //
                 else if (i > 0 && !isFullBarJoin(beat, h.beats[i - 1], barIndex))
                 {
-                    barStartX = cx + x + beatLineX - brokenBarOffset;
-                    barEndX = cx + x + beatLineX;
+                    barStartX = beatLineX - brokenBarOffset;
+                    barEndX = beatLineX;
                     
-                    barStartY = Std.int(barY + calculateBeamY(barStartX));
-                    barEndY = Std.int(barY + calculateBeamY(barEndX));
+                    barStartY = Std.int(barY + calculateBeamY(h,barStartX));
+                    barEndY = Std.int(barY + calculateBeamY(h,barEndX));
                     
-                    paintSingleBar(canvas, barStartX, barStartY, barEndX, barEndY, barSize);
+                    paintSingleBar(canvas, cx + x + barStartX, barStartY, cx + x + barEndX, barEndY, barSize);
                 }                
             }
         }
@@ -512,18 +554,17 @@ class ScoreBarRenderer extends GlyphBarRenderer
                 createNoteGlyph(b.notes[i--], noteglyphs);
             }
             addGlyph(noteglyphs);
-            _currentBeamHelper.registerBeatLineX(b, noteglyphs.upLineX, noteglyphs.downLineX);
-            
+            _currentBeamHelper.registerBeatLineX(b, noteglyphs.upLineX, noteglyphs.downLineX); 
             // register overflow spacing in line
-            if (noteglyphs.hasTopOverflow())
-            {
-                stave.registerOverflowTop(getScoreY(Std.int(Math.abs(noteglyphs.minNote.line))));
-            }
-            
-            if (noteglyphs.hasBottomOverflow())
-            {
-                stave.registerOverflowBottom(getScoreY(Std.int(noteglyphs.maxNote.line)));
-            }
+            // if (noteglyphs.hasTopOverflow())
+            // {
+            //     stave.registerOverflowTop(getScoreY(Std.int(Math.abs(noteglyphs.minNote.line))));
+            // }
+            // 
+            // if (noteglyphs.hasBottomOverflow())
+            // {
+            //     stave.registerOverflowBottom(getScoreY(Std.int(noteglyphs.maxNote.line)) - getScoreY(8));
+            // }            
         }
         else
         {
@@ -661,7 +702,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
 	public override function paintBackground(cx:Int, cy:Int, canvas:ICanvas)
 	{
 		var res = getResources();
-		
+
 		//
 		// draw string lines
 		//

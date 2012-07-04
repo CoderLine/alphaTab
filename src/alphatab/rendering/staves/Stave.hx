@@ -65,22 +65,24 @@ class Stave
     
     public function registerOverflowTop(topOverflow:Int)
     {
-        this.topOverflow = topOverflow;
+        if(topOverflow > this.topOverflow)
+            this.topOverflow = topOverflow;
     }
 	
     public function registerOverflowBottom(bottomOverflow:Int)
     {
-        this.bottomOverflow = bottomOverflow;
+        if(bottomOverflow > this.bottomOverflow)
+            this.bottomOverflow = bottomOverflow;
     }
 	
-	public function registerStaveTop(offset:Int)
+    public function registerStaveTop(offset:Int)
 	{
-		staveTop = offset + topSpacing + topOverflow;
+		staveTop = offset;
 	}
 	
 	public function registerStaveBottom(offset:Int)
 	{
-		staveBottom = offset + bottomSpacing + topOverflow;
+		staveBottom = offset;
 	}
 	
 	public function addBar(bar:Bar)

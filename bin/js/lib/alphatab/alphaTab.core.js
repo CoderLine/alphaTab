@@ -4746,10 +4746,23 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Glyph
 	}
 	,doLayout: function() {
 		alphatab.rendering.GlyphBarRenderer.prototype.doLayout.call(this);
-		this.height = (9 * this.stave.staveGroup.layout.renderer.scale * 4 | 0) + this.getGlyphOverflow() * 2;
+		this.height = (9 * this.stave.staveGroup.layout.renderer.scale * 4 | 0) + this.getTopPadding() + this.getBottomPadding();
 		if(this.index == 0) {
 			this.stave.registerStaveTop(this.getGlyphOverflow());
-			this.stave.registerStaveBottom(this.height - this.getGlyphOverflow());
+			this.stave.registerStaveBottom(this.getGlyphOverflow());
+		}
+		var top = this.getScoreY(0);
+		var bottom = this.getScoreY(8);
+		var _g = 0, _g1 = this._beamHelpers;
+		while(_g < _g1.length) {
+			var h = _g1[_g];
+			++_g;
+			var maxNoteY = this.getScoreY(this.getNoteLine(h.maxNote));
+			if(h.getDirection() == alphatab.rendering.utils.BeamDirection.Up) maxNoteY -= this.getStemSize(h.maxDuration);
+			if(maxNoteY < top) this.stave.registerOverflowTop(Math.abs(maxNoteY) | 0);
+			var minNoteY = this.getScoreY(this.getNoteLine(h.minNote));
+			if(h.getDirection() == alphatab.rendering.utils.BeamDirection.Down) minNoteY += this.getStemSize(h.maxDuration);
+			if(minNoteY > bottom) this.stave.registerOverflowBottom((Math.abs(minNoteY) | 0) - bottom);
 		}
 	}
 	,paint: function(cx,cy,canvas) {
@@ -4790,36 +4803,35 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Glyph
 		}
 		return this.getScoreY(size);
 	}
-	,paintBar: function(cx,cy,canvas,h) {
+	,calculateBeamY: function(h,x) {
 		var me = this;
+		var correction = 4;
+		var stemSize = this.getStemSize(h.maxDuration);
+		return h.calculateBeamY(stemSize,this.stave.staveGroup.layout.renderer.scale | 0,x,this.stave.staveGroup.layout.renderer.scale,function(n) {
+			return me.getScoreY(me.getNoteLine(n),correction - 1);
+		});
+	}
+	,paintBar: function(cx,cy,canvas,h) {
 		var _g1 = 0, _g = h.beats.length;
 		while(_g1 < _g) {
 			var i = _g1++;
 			var beat = h.beats[i];
-			var stemSize = [this.getStemSize(h.maxDuration)];
-			var correction = [4];
-			var calculateBeamY = (function(correction,stemSize) {
-				return function(x) {
-					return h.calculateBeamY(stemSize[0],me.stave.staveGroup.layout.renderer.scale | 0,x,(function(correction) {
-						return function(n) {
-							return me.getScoreY(me.getNoteLine(n),correction[0] - 1);
-						};
-					})(correction));
-				};
-			})(correction,stemSize);
+			var correction = 4;
 			var beatLineX = h.getBeatLineX(beat) + this.stave.staveGroup.layout.renderer.scale | 0;
 			var direction = h.getDirection();
-			var y1 = direction == alphatab.rendering.utils.BeamDirection.Up?this.getScoreY(this.getNoteLine(beat.minNote),correction[0] - 1):this.getScoreY(this.getNoteLine(beat.maxNote),correction[0] - 1);
-			var y2 = calculateBeamY(beatLineX);
+			var y1 = cy + this.y + (direction == alphatab.rendering.utils.BeamDirection.Up?this.getScoreY(this.getNoteLine(beat.minNote),correction - 1):this.getScoreY(this.getNoteLine(beat.maxNote),correction - 1));
+			var y2 = cy + this.y + this.calculateBeamY(h,beatLineX);
 			canvas.setColor(this.stave.staveGroup.layout.renderer.renderingResources.mainGlyphColor);
 			canvas.beginPath();
-			canvas.moveTo(cx + this.x + beatLineX | 0,cy + this.y + y1);
-			canvas.lineTo(cx + this.x + beatLineX | 0,cy + this.y + y2);
+			canvas.moveTo(cx + this.x + beatLineX | 0,y1);
+			canvas.lineTo(cx + this.x + beatLineX | 0,y2);
 			canvas.stroke();
 			var brokenBarOffset = 6 * this.stave.staveGroup.layout.renderer.scale | 0;
 			var barSpacing = 6 * this.stave.staveGroup.layout.renderer.scale | 0;
 			var barSize = 3 * this.stave.staveGroup.layout.renderer.scale | 0;
 			var barCount = alphatab.model.ModelUtils.getDurationIndex(beat.duration) - 2;
+			var barStart = cy + this.y;
+			if(direction == alphatab.rendering.utils.BeamDirection.Down) barSpacing = -barSpacing;
 			var _g2 = 0;
 			while(_g2 < barCount) {
 				var barIndex = _g2++;
@@ -4827,24 +4839,24 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Glyph
 				var barEndX;
 				var barStartY;
 				var barEndY;
-				var barY = cy + this.y + barIndex * barSpacing;
+				var barY = barStart + barIndex * barSpacing;
 				if(i < h.beats.length - 1) {
 					if(this.isFullBarJoin(beat,h.beats[i + 1],barIndex)) {
-						barStartX = cx + this.x + beatLineX;
-						barEndX = cx + this.x + h.getBeatLineX(h.beats[i + 1]) + this.stave.staveGroup.layout.renderer.scale | 0;
+						barStartX = beatLineX;
+						barEndX = h.getBeatLineX(h.beats[i + 1]) + this.stave.staveGroup.layout.renderer.scale | 0;
 					} else {
-						barStartX = cx + this.x + beatLineX;
+						barStartX = beatLineX;
 						barEndX = barStartX + brokenBarOffset;
 					}
-					barStartY = barY + calculateBeamY(barStartX) | 0;
-					barEndY = barY + calculateBeamY(barEndX) | 0;
-					alphatab.rendering.ScoreBarRenderer.paintSingleBar(canvas,barStartX,barStartY,barEndX,barEndY,barSize);
+					barStartY = barY + this.calculateBeamY(h,barStartX) | 0;
+					barEndY = barY + this.calculateBeamY(h,barEndX) | 0;
+					alphatab.rendering.ScoreBarRenderer.paintSingleBar(canvas,cx + this.x + barStartX,barStartY,cx + this.x + barEndX,barEndY,barSize);
 				} else if(i > 0 && !this.isFullBarJoin(beat,h.beats[i - 1],barIndex)) {
-					barStartX = cx + this.x + beatLineX - brokenBarOffset;
-					barEndX = cx + this.x + beatLineX;
-					barStartY = barY + calculateBeamY(barStartX) | 0;
-					barEndY = barY + calculateBeamY(barEndX) | 0;
-					alphatab.rendering.ScoreBarRenderer.paintSingleBar(canvas,barStartX,barStartY,barEndX,barEndY,barSize);
+					barStartX = beatLineX - brokenBarOffset;
+					barEndX = beatLineX;
+					barStartY = barY + this.calculateBeamY(h,barStartX) | 0;
+					barEndY = barY + this.calculateBeamY(h,barEndX) | 0;
+					alphatab.rendering.ScoreBarRenderer.paintSingleBar(canvas,cx + this.x + barStartX,barStartY,cx + this.x + barEndX,barEndY,barSize);
 				}
 			}
 		}
@@ -5006,8 +5018,6 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Glyph
 			while(i >= 0) this.createNoteGlyph(b.notes[i--],noteglyphs);
 			this.addGlyph(noteglyphs);
 			this._currentBeamHelper.registerBeatLineX(b,noteglyphs.upLineX,noteglyphs.downLineX);
-			if(noteglyphs.hasTopOverflow()) this.stave.registerOverflowTop(this.getScoreY(Math.abs(noteglyphs.minNote.line) | 0));
-			if(noteglyphs.hasBottomOverflow()) this.stave.registerOverflowBottom(this.getScoreY(noteglyphs.maxNote.line | 0));
 		} else this.createRestGlyph(b);
 		this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,this.getBeatDurationWidth(b.duration) * this.stave.staveGroup.layout.renderer.scale | 0));
 	}
@@ -6054,6 +6064,7 @@ alphatab.rendering.layout.ScoreLayout.prototype = {
 		var group = new alphatab.rendering.staves.StaveGroup();
 		group.layout = this;
 		group.addStave(new alphatab.rendering.staves.Stave(new alphatab.rendering.ScoreBarRendererFactory()));
+		group.addStave(new alphatab.rendering.staves.Stave(new alphatab.rendering.ScoreBarRendererFactory()));
 		return group;
 	}
 	,__class__: alphatab.rendering.layout.ScoreLayout
@@ -6260,16 +6271,16 @@ alphatab.rendering.staves.Stave.prototype = {
 	,bottomOverflow: null
 	,staveBottom: null
 	,registerOverflowTop: function(topOverflow) {
-		this.topOverflow = topOverflow;
+		if(topOverflow > this.topOverflow) this.topOverflow = topOverflow;
 	}
 	,registerOverflowBottom: function(bottomOverflow) {
-		this.bottomOverflow = bottomOverflow;
+		if(bottomOverflow > this.bottomOverflow) this.bottomOverflow = bottomOverflow;
 	}
 	,registerStaveTop: function(offset) {
-		this.staveTop = offset + this.topSpacing + this.topOverflow;
+		this.staveTop = offset;
 	}
 	,registerStaveBottom: function(offset) {
-		this.staveBottom = offset + this.bottomSpacing + this.topOverflow;
+		this.staveBottom = offset;
 	}
 	,addBar: function(bar) {
 		var renderer = this._factory.create(bar);
@@ -6388,8 +6399,8 @@ alphatab.rendering.staves.StaveGroup.prototype = {
 		}
 		var res = this.layout.renderer.renderingResources;
 		if(this.staves.length > 0) {
-			var firstStart = cy + this.y + this.staves[0].y + this.staves[0].staveTop;
-			var lastEnd = cy + this.y + this.staves[this.staves.length - 1].y + this.staves[this.staves.length - 1].staveBottom;
+			var firstStart = cy + this.y + this.staves[0].y + this.staves[0].staveTop + this.staves[0].topSpacing + this.staves[0].topOverflow;
+			var lastEnd = cy + this.y + this.staves[this.staves.length - 1].y + this.staves[this.staves.length - 1].height - this.staves[this.staves.length - 1].bottomOverflow - this.staves[this.staves.length - 1].bottomSpacing - this.staves[this.staves.length - 1].staveBottom;
 			canvas.setColor(res.barSeperatorColor);
 			canvas.beginPath();
 			canvas.moveTo(cx + this.x + this.staves[0].x,firstStart);
@@ -6571,13 +6582,20 @@ alphatab.rendering.utils.BeamingHelper.prototype = {
 		if(this.maxNote == null || value > this.maxNote.realValue()) this.maxNote = note;
 		if(this.minNote == null || value < this.minNote.realValue()) this.minNote = note;
 	}
-	,calculateBeamY: function(stemSize,xCorrection,xPosition,yPosition) {
+	,calculateBeamY: function(stemSize,xCorrection,xPosition,scale,yPosition) {
 		var direction = this.getDirection();
+		if(this.beats.length == 1) {
+			if(this.getDirection() == alphatab.rendering.utils.BeamDirection.Up) return yPosition(this.maxNote) - stemSize; else return yPosition(this.minNote) + stemSize;
+		}
+		var maxDistance = 10 * scale | 0;
+		if(direction == alphatab.rendering.utils.BeamDirection.Down && this.minNote != this.firstMinNote && this.minNote != this.lastMinNote) return yPosition(this.minNote) + stemSize; else if(direction == alphatab.rendering.utils.BeamDirection.Up && this.maxNote != this.firstMaxNote && this.maxNote != this.lastMaxNote) return yPosition(this.maxNote) - stemSize;
 		var startX = this.getBeatLineX(this.firstMinNote.beat) + xCorrection;
 		var startY = direction == alphatab.rendering.utils.BeamDirection.Up?yPosition(this.firstMaxNote) - stemSize:yPosition(this.firstMinNote) + stemSize;
 		var endX = this.getBeatLineX(this.lastMaxNote.beat) + xCorrection;
 		var endY = direction == alphatab.rendering.utils.BeamDirection.Up?yPosition(this.lastMaxNote) - stemSize:yPosition(this.lastMinNote) + stemSize;
-		return (endY - startY) / (endX - startX) * (xPosition - startX) + startY;
+		if(startY > endY && startY - endY > maxDistance) endY = startY - maxDistance;
+		if(endY > startY && endY - startY > maxDistance) startY = endY - maxDistance;
+		return (endY - startY) / (endX - startX) * (xPosition - startX) + startY | 0;
 	}
 	,__class__: alphatab.rendering.utils.BeamingHelper
 }

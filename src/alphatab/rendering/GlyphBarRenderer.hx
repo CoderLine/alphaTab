@@ -17,6 +17,7 @@
 package alphatab.rendering;
 import alphatab.model.Bar;
 import alphatab.platform.ICanvas;
+import alphatab.platform.model.Color;
 import alphatab.rendering.glyphs.SpacingGlyph;
 
 /**
@@ -71,7 +72,7 @@ class GlyphBarRenderer extends BarRendererBase
 	
 	public override function paint(cx:Int, cy:Int, canvas:ICanvas)
 	{
-		paintBackground(cx, cy, canvas);
+        paintBackground(cx, cy, canvas);
 		
 		for (g in glyphs)
 		{

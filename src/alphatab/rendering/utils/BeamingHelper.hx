@@ -214,10 +214,39 @@ class BeamingHelper
         }
     }
     
-    public function calculateBeamY(stemSize:Int, xCorrection:Int, xPosition:Int, yPosition: Note-> Int)
+    public function calculateBeamY(stemSize:Int, xCorrection:Int, xPosition:Int, scale:Float, yPosition: Note-> Int) : Int
     {
         // create a line between the min and max note of the group
         var direction = getDirection();
+        
+        if (beats.length == 1)
+        {
+            if (getDirection() == Up)
+            {
+                return yPosition(maxNote) - stemSize;
+            }
+            else
+            {
+                return yPosition(minNote) + stemSize;
+            }
+        }
+        
+        // we use the min/max notes to place the beam along their real position        
+        // we only want a maximum of 10 offset for their gradient
+        var maxDistance:Int = Std.int(10 * scale);
+
+        
+        // if the min note is not first or last, we can align notes directly to the position
+        // of the min note
+        if (direction == Down && minNote != firstMinNote && minNote != lastMinNote)
+        {
+            return yPosition(minNote) + stemSize;
+        }
+        else if (direction == Up && maxNote != firstMaxNote && maxNote != lastMaxNote)
+        {
+            return yPosition(maxNote) - stemSize;
+        }
+
         
         var startX = getBeatLineX(firstMinNote.beat) + xCorrection;
         var startY = direction == Up 
@@ -228,22 +257,15 @@ class BeamingHelper
         var endY = direction == Up 
                         ? yPosition(lastMaxNote) - stemSize
                         : yPosition(lastMinNote) + stemSize;
-        
-        //if (getDirection() == Down)
-        //{
-        //   startY += stemSize;
-        //   endY += stemSize;
-        //}
-        //else
-        //{
-        //   startY -= stemSize;
-        //   endY -= stemSize;
-        //}
-        
+                        
+        // ensure the maxDistance
+        if (startY > endY && (startY - endY) > maxDistance) endY = (startY - maxDistance);
+        if (endY > startY && (endY - startY) > maxDistance) startY = (endY - maxDistance);
+                        
         // get the y position of the given beat on this curve
         
         // y(x)  = ( (y2 - y1) / (x2 - x1) )  * (x - x1) + y1;
-        return ( (endY - startY) / (endX - startX) ) * (xPosition - startX) + startY;
+        return Std.int(( (endY - startY) / (endX - startX) ) * (xPosition - startX) + startY);
     }
     
     private static function canJoin(b1:Beat, b2:Beat)
