@@ -12,21 +12,27 @@ class SvgGlyph extends Glyph
 	private var _currentIndex:Int;
 	private var _xScale:Float;
 	private var _yScale:Float;
-	
+    
+	private var _xGlyphScale:Float;
+	private var _yGlyphScale:Float;
+    
 	public function new(x:Int = 0, y:Int = 0, svg:String, 
 						xScale:Float, yScale:Float)
 	{
 		super(x, y);
 		_token = svg.split(" ");
-		_xScale = xScale;
-		_yScale = yScale;
+		_xGlyphScale = xScale;
+		_yGlyphScale = yScale;
 	}
 	
 	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
 	{
+        _xScale = _xGlyphScale * getScale();
+        _yScale = _yGlyphScale * getScale();
+        
 		var res = renderer.getResources();
 		canvas.setColor(res.mainGlyphColor);
-		
+        
 		_currentIndex = 0;
 		_currentX = x + cx;
 		_currentY = y + cy;

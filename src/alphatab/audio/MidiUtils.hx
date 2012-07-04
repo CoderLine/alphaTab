@@ -1,5 +1,6 @@
 package alphatab.audio;
 import alphatab.model.Duration;
+using alphatab.model.ModelUtils;
 
 /**
  * This class contains some utility stuff for working with 
@@ -17,19 +18,8 @@ class MidiUtils
      * Converts a duration value to its ticks equivalent.
      */
     public static function durationToTicks(value:Duration)
-    {
-        var numerical = 1;
-        switch(value)
-        {
-            case Whole: numerical = 1;
-            case Half: numerical = 2;
-            case Quarter: numerical = 4;
-            case Eighth: numerical = 8;
-            case Sixteenth: numerical = 16;
-            case ThirtySecond: numerical = 32;
-            case SixtyFourth: numerical = 64;
-        }        
-        return valueToTicks(numerical);
+    {      
+        return valueToTicks(value.getDurationValue());
     }    
     
     /**

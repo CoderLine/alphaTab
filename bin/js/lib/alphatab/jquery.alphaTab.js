@@ -85,7 +85,6 @@ var alphaTabWrapper;
             errorCallback: null,
 
             // display settings
-            zoom: 1.1,
             width:600,
             height:200,
             autoSize: true,

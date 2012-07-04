@@ -754,34 +754,148 @@ alphatab.Main.__name__ = ["alphatab","Main"];
 alphatab.Main.main = function() {
 }
 if(!alphatab.audio) alphatab.audio = {}
+alphatab.audio.GeneralMidi = $hxClasses["alphatab.audio.GeneralMidi"] = function() { }
+alphatab.audio.GeneralMidi.__name__ = ["alphatab","audio","GeneralMidi"];
+alphatab.audio.GeneralMidi._values = null;
+alphatab.audio.GeneralMidi.getValue = function(name) {
+	if(alphatab.audio.GeneralMidi._values == null) {
+		alphatab.audio.GeneralMidi._values = new Hash();
+		alphatab.audio.GeneralMidi._values.set("acousticgrandpiano",0);
+		alphatab.audio.GeneralMidi._values.set("brightacousticpiano",1);
+		alphatab.audio.GeneralMidi._values.set("electricgrandpiano",2);
+		alphatab.audio.GeneralMidi._values.set("honkytonkpiano",3);
+		alphatab.audio.GeneralMidi._values.set("electricpiano1",4);
+		alphatab.audio.GeneralMidi._values.set("electricpiano2",5);
+		alphatab.audio.GeneralMidi._values.set("harpsichord",6);
+		alphatab.audio.GeneralMidi._values.set("clavinet",7);
+		alphatab.audio.GeneralMidi._values.set("celesta",8);
+		alphatab.audio.GeneralMidi._values.set("glockenspiel",9);
+		alphatab.audio.GeneralMidi._values.set("musicbox",10);
+		alphatab.audio.GeneralMidi._values.set("vibraphone",11);
+		alphatab.audio.GeneralMidi._values.set("marimba",12);
+		alphatab.audio.GeneralMidi._values.set("xylophone",13);
+		alphatab.audio.GeneralMidi._values.set("tubularbells",14);
+		alphatab.audio.GeneralMidi._values.set("dulcimer",15);
+		alphatab.audio.GeneralMidi._values.set("drawbarorgan",16);
+		alphatab.audio.GeneralMidi._values.set("percussiveorgan",17);
+		alphatab.audio.GeneralMidi._values.set("rockorgan",18);
+		alphatab.audio.GeneralMidi._values.set("churchorgan",19);
+		alphatab.audio.GeneralMidi._values.set("reedorgan",20);
+		alphatab.audio.GeneralMidi._values.set("accordion",21);
+		alphatab.audio.GeneralMidi._values.set("harmonica",22);
+		alphatab.audio.GeneralMidi._values.set("tangoaccordion",23);
+		alphatab.audio.GeneralMidi._values.set("acousticguitarnylon",24);
+		alphatab.audio.GeneralMidi._values.set("acousticguitarsteel",25);
+		alphatab.audio.GeneralMidi._values.set("electricguitarjazz",26);
+		alphatab.audio.GeneralMidi._values.set("electricguitarclean",27);
+		alphatab.audio.GeneralMidi._values.set("electricguitarmuted",28);
+		alphatab.audio.GeneralMidi._values.set("overdrivenguitar",29);
+		alphatab.audio.GeneralMidi._values.set("distortionguitar",30);
+		alphatab.audio.GeneralMidi._values.set("guitarharmonics",31);
+		alphatab.audio.GeneralMidi._values.set("acousticbass",32);
+		alphatab.audio.GeneralMidi._values.set("electricbassfinger",33);
+		alphatab.audio.GeneralMidi._values.set("electricbasspick",34);
+		alphatab.audio.GeneralMidi._values.set("fretlessbass",35);
+		alphatab.audio.GeneralMidi._values.set("slapbass1",36);
+		alphatab.audio.GeneralMidi._values.set("slapbass2",37);
+		alphatab.audio.GeneralMidi._values.set("synthbass1",38);
+		alphatab.audio.GeneralMidi._values.set("synthbass2",39);
+		alphatab.audio.GeneralMidi._values.set("violin",40);
+		alphatab.audio.GeneralMidi._values.set("viola",41);
+		alphatab.audio.GeneralMidi._values.set("cello",42);
+		alphatab.audio.GeneralMidi._values.set("contrabass",43);
+		alphatab.audio.GeneralMidi._values.set("tremolostrings",44);
+		alphatab.audio.GeneralMidi._values.set("pizzicatostrings",45);
+		alphatab.audio.GeneralMidi._values.set("orchestralharp",46);
+		alphatab.audio.GeneralMidi._values.set("timpani",47);
+		alphatab.audio.GeneralMidi._values.set("stringensemble1",48);
+		alphatab.audio.GeneralMidi._values.set("stringensemble2",49);
+		alphatab.audio.GeneralMidi._values.set("synthstrings1",50);
+		alphatab.audio.GeneralMidi._values.set("synthstrings2",51);
+		alphatab.audio.GeneralMidi._values.set("choiraahs",52);
+		alphatab.audio.GeneralMidi._values.set("voiceoohs",53);
+		alphatab.audio.GeneralMidi._values.set("synthvoice",54);
+		alphatab.audio.GeneralMidi._values.set("orchestrahit",55);
+		alphatab.audio.GeneralMidi._values.set("trumpet",56);
+		alphatab.audio.GeneralMidi._values.set("trombone",57);
+		alphatab.audio.GeneralMidi._values.set("tuba",58);
+		alphatab.audio.GeneralMidi._values.set("mutedtrumpet",59);
+		alphatab.audio.GeneralMidi._values.set("frenchhorn",60);
+		alphatab.audio.GeneralMidi._values.set("brasssection",61);
+		alphatab.audio.GeneralMidi._values.set("synthbrass1",62);
+		alphatab.audio.GeneralMidi._values.set("synthbrass2",63);
+		alphatab.audio.GeneralMidi._values.set("sopranosax",64);
+		alphatab.audio.GeneralMidi._values.set("altosax",65);
+		alphatab.audio.GeneralMidi._values.set("tenorsax",66);
+		alphatab.audio.GeneralMidi._values.set("baritonesax",67);
+		alphatab.audio.GeneralMidi._values.set("oboe",68);
+		alphatab.audio.GeneralMidi._values.set("englishhorn",69);
+		alphatab.audio.GeneralMidi._values.set("bassoon",70);
+		alphatab.audio.GeneralMidi._values.set("clarinet",71);
+		alphatab.audio.GeneralMidi._values.set("piccolo",72);
+		alphatab.audio.GeneralMidi._values.set("flute",73);
+		alphatab.audio.GeneralMidi._values.set("recorder",74);
+		alphatab.audio.GeneralMidi._values.set("panflute",75);
+		alphatab.audio.GeneralMidi._values.set("blownbottle",76);
+		alphatab.audio.GeneralMidi._values.set("shakuhachi",77);
+		alphatab.audio.GeneralMidi._values.set("whistle",78);
+		alphatab.audio.GeneralMidi._values.set("ocarina",79);
+		alphatab.audio.GeneralMidi._values.set("lead1square",80);
+		alphatab.audio.GeneralMidi._values.set("lead2sawtooth",81);
+		alphatab.audio.GeneralMidi._values.set("lead3calliope",82);
+		alphatab.audio.GeneralMidi._values.set("lead4chiff",83);
+		alphatab.audio.GeneralMidi._values.set("lead5charang",84);
+		alphatab.audio.GeneralMidi._values.set("lead6voice",85);
+		alphatab.audio.GeneralMidi._values.set("lead7fifths",86);
+		alphatab.audio.GeneralMidi._values.set("lead8bassandlead",87);
+		alphatab.audio.GeneralMidi._values.set("pad1newage",88);
+		alphatab.audio.GeneralMidi._values.set("pad2warm",89);
+		alphatab.audio.GeneralMidi._values.set("pad3polysynth",90);
+		alphatab.audio.GeneralMidi._values.set("pad4choir",91);
+		alphatab.audio.GeneralMidi._values.set("pad5bowed",92);
+		alphatab.audio.GeneralMidi._values.set("pad6metallic",93);
+		alphatab.audio.GeneralMidi._values.set("pad7halo",94);
+		alphatab.audio.GeneralMidi._values.set("pad8sweep",95);
+		alphatab.audio.GeneralMidi._values.set("fx1rain",96);
+		alphatab.audio.GeneralMidi._values.set("fx2soundtrack",97);
+		alphatab.audio.GeneralMidi._values.set("fx3crystal",98);
+		alphatab.audio.GeneralMidi._values.set("fx4atmosphere",99);
+		alphatab.audio.GeneralMidi._values.set("fx5brightness",100);
+		alphatab.audio.GeneralMidi._values.set("fx6goblins",101);
+		alphatab.audio.GeneralMidi._values.set("fx7echoes",102);
+		alphatab.audio.GeneralMidi._values.set("fx8scifi",103);
+		alphatab.audio.GeneralMidi._values.set("sitar",104);
+		alphatab.audio.GeneralMidi._values.set("banjo",105);
+		alphatab.audio.GeneralMidi._values.set("shamisen",106);
+		alphatab.audio.GeneralMidi._values.set("koto",107);
+		alphatab.audio.GeneralMidi._values.set("kalimba",108);
+		alphatab.audio.GeneralMidi._values.set("bagpipe",109);
+		alphatab.audio.GeneralMidi._values.set("fiddle",110);
+		alphatab.audio.GeneralMidi._values.set("shanai",111);
+		alphatab.audio.GeneralMidi._values.set("tinklebell",112);
+		alphatab.audio.GeneralMidi._values.set("agogo",113);
+		alphatab.audio.GeneralMidi._values.set("steeldrums",114);
+		alphatab.audio.GeneralMidi._values.set("woodblock",115);
+		alphatab.audio.GeneralMidi._values.set("taikodrum",116);
+		alphatab.audio.GeneralMidi._values.set("melodictom",117);
+		alphatab.audio.GeneralMidi._values.set("synthdrum",118);
+		alphatab.audio.GeneralMidi._values.set("reversecymbal",119);
+		alphatab.audio.GeneralMidi._values.set("guitarfretnoise",120);
+		alphatab.audio.GeneralMidi._values.set("breathnoise",121);
+		alphatab.audio.GeneralMidi._values.set("seashore",122);
+		alphatab.audio.GeneralMidi._values.set("birdtweet",123);
+		alphatab.audio.GeneralMidi._values.set("telephonering",124);
+		alphatab.audio.GeneralMidi._values.set("helicopter",125);
+		alphatab.audio.GeneralMidi._values.set("applause",126);
+		alphatab.audio.GeneralMidi._values.set("gunshot",127);
+	}
+	name = StringTools.replace(name.toLowerCase()," ","");
+	return alphatab.audio.GeneralMidi._values.exists(name)?alphatab.audio.GeneralMidi._values.get(name):0;
+}
 alphatab.audio.MidiUtils = $hxClasses["alphatab.audio.MidiUtils"] = function() { }
 alphatab.audio.MidiUtils.__name__ = ["alphatab","audio","MidiUtils"];
 alphatab.audio.MidiUtils.durationToTicks = function(value) {
-	var numerical = 1;
-	switch( (value)[1] ) {
-	case 0:
-		numerical = 1;
-		break;
-	case 1:
-		numerical = 2;
-		break;
-	case 2:
-		numerical = 4;
-		break;
-	case 3:
-		numerical = 8;
-		break;
-	case 4:
-		numerical = 16;
-		break;
-	case 5:
-		numerical = 32;
-		break;
-	case 6:
-		numerical = 64;
-		break;
-	}
-	return alphatab.audio.MidiUtils.valueToTicks(numerical);
+	return alphatab.audio.MidiUtils.valueToTicks(alphatab.model.ModelUtils.getDurationValue(value));
 }
 alphatab.audio.MidiUtils.valueToTicks = function(value) {
 	return 960 * (4.0 / value) | 0;
@@ -890,14 +1004,18 @@ alphatab.importer.AlphaTexImporter.prototype = $extend(alphatab.importer.ScoreIm
 	,_allowNegatives: null
 	,_currentDuration: null
 	,readScore: function() {
-		this.createDefaultScore();
-		this._curChPos = 0;
-		this._currentDuration = alphatab.model.Duration.Quarter;
-		this.nextChar();
-		this.newSy();
-		this.score();
-		this.finish(this._score);
-		return this._score;
+		try {
+			this.createDefaultScore();
+			this._curChPos = 0;
+			this._currentDuration = alphatab.model.Duration.Quarter;
+			this.nextChar();
+			this.newSy();
+			this.score();
+			this.finish(this._score);
+			return this._score;
+		} catch( e ) {
+			throw alphatab.importer.ScoreImporter.UNSUPPORTED_FORMAT;
+		}
 	}
 	,error: function(nonterm,expected,symbolError) {
 		if(symbolError == null) symbolError = true;
@@ -971,7 +1089,7 @@ alphatab.importer.AlphaTexImporter.prototype = $extend(alphatab.importer.ScoreIm
 				if(instrument >= 0 && instrument <= 128) this._track.playbackInfo.program = this._syData; else this.error("instrument",alphatab.importer.AlphaTexSymbols.Number,false);
 			} else if(this._sy == alphatab.importer.AlphaTexSymbols.String) {
 				var instrumentName = js.Boot.__cast(this._syData , String);
-				this._track.playbackInfo.program = alphatab.midi.GeneralMidi.getValue(instrumentName);
+				this._track.playbackInfo.program = alphatab.audio.GeneralMidi.getValue(instrumentName);
 			} else this.error("instrument",alphatab.importer.AlphaTexSymbols.Number);
 			this.newSy();
 			anyMeta = true;
@@ -1974,7 +2092,7 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 	}
 	,readVersion: function() {
 		var version = this.readStringByteLength(30);
-		if(!StringTools.startsWith(version,"FICHIER GUITAR PRO ")) throw "unsupported file";
+		if(!StringTools.startsWith(version,"FICHIER GUITAR PRO ")) throw alphatab.importer.ScoreImporter.UNSUPPORTED_FORMAT;
 		version = HxOverrides.substr(version,"FICHIER GUITAR PRO ".length + 1,null);
 		var dot = version.indexOf(".");
 		this._versionNumber = 100 * Std.parseInt(HxOverrides.substr(version,0,dot)) + Std.parseInt(HxOverrides.substr(version,dot + 1,null));
@@ -2106,6 +2224,7 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 	}
 	,readTrack: function() {
 		var newTrack = new alphatab.model.Track();
+		this._score.addTrack(newTrack);
 		var flags = this._data.readByte();
 		newTrack.name = this.readStringByteLength(40);
 		newTrack.isPercussion = (flags & 1) != 0;
@@ -2140,7 +2259,6 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 			this.readStringIntByte();
 			this.readStringIntByte();
 		}
-		this._score.addTrack(newTrack);
 	}
 	,readBars: function() {
 		var _g1 = 0, _g = this._barCount;
@@ -2155,6 +2273,7 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 	}
 	,readBar: function(track) {
 		var newBar = new alphatab.model.Bar();
+		track.addBar(newBar);
 		var voiceCount = 1;
 		if(this._versionNumber >= 500) {
 			this._data.readByte();
@@ -2165,21 +2284,21 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 			var v = _g++;
 			this.readVoice(track,newBar);
 		}
-		track.addBar(newBar);
 	}
 	,readVoice: function(track,bar) {
 		var beatCount = this.readInt32();
 		if(beatCount == 0) return;
 		var newVoice = new alphatab.model.Voice();
+		bar.addVoice(newVoice);
 		var _g = 0;
 		while(_g < beatCount) {
 			var i = _g++;
 			this.readBeat(track,bar,newVoice);
 		}
-		bar.addVoice(newVoice);
 	}
 	,readBeat: function(track,bar,voice) {
 		var newBeat = new alphatab.model.Beat();
+		voice.addBeat(newBeat);
 		var flags = this._data.readByte();
 		if((flags & 1) != 0) newBeat.dots = 1;
 		if((flags & 64) != 0) this._data.readByte();
@@ -2246,7 +2365,6 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 			var flag = this._data.readByte();
 			if((flag & 8) != 0) this._data.readByte();
 		}
-		voice.addBeat(newBeat);
 	}
 	,readChord: function(beat) {
 		var chord = new alphatab.model.Chord();
@@ -3056,8 +3174,7 @@ alphatab.importer.ScoreLoader.loadScoreAsync = function(path,success,error) {
 				success(score);
 				return;
 			} catch( e ) {
-				error(haxe.Stack.toString(haxe.Stack.exceptionStack()));
-				continue;
+				if(e == alphatab.importer.ScoreImporter.UNSUPPORTED_FORMAT) continue; else error(haxe.Stack.toString(haxe.Stack.exceptionStack()));
 			}
 		}
 		error("No reader for the requested file found");
@@ -3070,145 +3187,6 @@ alphatab.io.OutputExtensions.writeAsString = function(output,value) {
 	var text;
 	if(js.Boot.__instanceof(value,String)) text = js.Boot.__cast(value , String); else text = Std.string(value);
 	output.writeString(text);
-}
-if(!alphatab.midi) alphatab.midi = {}
-alphatab.midi.GeneralMidi = $hxClasses["alphatab.midi.GeneralMidi"] = function() { }
-alphatab.midi.GeneralMidi.__name__ = ["alphatab","midi","GeneralMidi"];
-alphatab.midi.GeneralMidi._values = null;
-alphatab.midi.GeneralMidi.getValue = function(name) {
-	if(alphatab.midi.GeneralMidi._values == null) {
-		alphatab.midi.GeneralMidi._values = new Hash();
-		alphatab.midi.GeneralMidi._values.set("acousticgrandpiano",0);
-		alphatab.midi.GeneralMidi._values.set("brightacousticpiano",1);
-		alphatab.midi.GeneralMidi._values.set("electricgrandpiano",2);
-		alphatab.midi.GeneralMidi._values.set("honkytonkpiano",3);
-		alphatab.midi.GeneralMidi._values.set("electricpiano1",4);
-		alphatab.midi.GeneralMidi._values.set("electricpiano2",5);
-		alphatab.midi.GeneralMidi._values.set("harpsichord",6);
-		alphatab.midi.GeneralMidi._values.set("clavinet",7);
-		alphatab.midi.GeneralMidi._values.set("celesta",8);
-		alphatab.midi.GeneralMidi._values.set("glockenspiel",9);
-		alphatab.midi.GeneralMidi._values.set("musicbox",10);
-		alphatab.midi.GeneralMidi._values.set("vibraphone",11);
-		alphatab.midi.GeneralMidi._values.set("marimba",12);
-		alphatab.midi.GeneralMidi._values.set("xylophone",13);
-		alphatab.midi.GeneralMidi._values.set("tubularbells",14);
-		alphatab.midi.GeneralMidi._values.set("dulcimer",15);
-		alphatab.midi.GeneralMidi._values.set("drawbarorgan",16);
-		alphatab.midi.GeneralMidi._values.set("percussiveorgan",17);
-		alphatab.midi.GeneralMidi._values.set("rockorgan",18);
-		alphatab.midi.GeneralMidi._values.set("churchorgan",19);
-		alphatab.midi.GeneralMidi._values.set("reedorgan",20);
-		alphatab.midi.GeneralMidi._values.set("accordion",21);
-		alphatab.midi.GeneralMidi._values.set("harmonica",22);
-		alphatab.midi.GeneralMidi._values.set("tangoaccordion",23);
-		alphatab.midi.GeneralMidi._values.set("acousticguitarnylon",24);
-		alphatab.midi.GeneralMidi._values.set("acousticguitarsteel",25);
-		alphatab.midi.GeneralMidi._values.set("electricguitarjazz",26);
-		alphatab.midi.GeneralMidi._values.set("electricguitarclean",27);
-		alphatab.midi.GeneralMidi._values.set("electricguitarmuted",28);
-		alphatab.midi.GeneralMidi._values.set("overdrivenguitar",29);
-		alphatab.midi.GeneralMidi._values.set("distortionguitar",30);
-		alphatab.midi.GeneralMidi._values.set("guitarharmonics",31);
-		alphatab.midi.GeneralMidi._values.set("acousticbass",32);
-		alphatab.midi.GeneralMidi._values.set("electricbassfinger",33);
-		alphatab.midi.GeneralMidi._values.set("electricbasspick",34);
-		alphatab.midi.GeneralMidi._values.set("fretlessbass",35);
-		alphatab.midi.GeneralMidi._values.set("slapbass1",36);
-		alphatab.midi.GeneralMidi._values.set("slapbass2",37);
-		alphatab.midi.GeneralMidi._values.set("synthbass1",38);
-		alphatab.midi.GeneralMidi._values.set("synthbass2",39);
-		alphatab.midi.GeneralMidi._values.set("violin",40);
-		alphatab.midi.GeneralMidi._values.set("viola",41);
-		alphatab.midi.GeneralMidi._values.set("cello",42);
-		alphatab.midi.GeneralMidi._values.set("contrabass",43);
-		alphatab.midi.GeneralMidi._values.set("tremolostrings",44);
-		alphatab.midi.GeneralMidi._values.set("pizzicatostrings",45);
-		alphatab.midi.GeneralMidi._values.set("orchestralharp",46);
-		alphatab.midi.GeneralMidi._values.set("timpani",47);
-		alphatab.midi.GeneralMidi._values.set("stringensemble1",48);
-		alphatab.midi.GeneralMidi._values.set("stringensemble2",49);
-		alphatab.midi.GeneralMidi._values.set("synthstrings1",50);
-		alphatab.midi.GeneralMidi._values.set("synthstrings2",51);
-		alphatab.midi.GeneralMidi._values.set("choiraahs",52);
-		alphatab.midi.GeneralMidi._values.set("voiceoohs",53);
-		alphatab.midi.GeneralMidi._values.set("synthvoice",54);
-		alphatab.midi.GeneralMidi._values.set("orchestrahit",55);
-		alphatab.midi.GeneralMidi._values.set("trumpet",56);
-		alphatab.midi.GeneralMidi._values.set("trombone",57);
-		alphatab.midi.GeneralMidi._values.set("tuba",58);
-		alphatab.midi.GeneralMidi._values.set("mutedtrumpet",59);
-		alphatab.midi.GeneralMidi._values.set("frenchhorn",60);
-		alphatab.midi.GeneralMidi._values.set("brasssection",61);
-		alphatab.midi.GeneralMidi._values.set("synthbrass1",62);
-		alphatab.midi.GeneralMidi._values.set("synthbrass2",63);
-		alphatab.midi.GeneralMidi._values.set("sopranosax",64);
-		alphatab.midi.GeneralMidi._values.set("altosax",65);
-		alphatab.midi.GeneralMidi._values.set("tenorsax",66);
-		alphatab.midi.GeneralMidi._values.set("baritonesax",67);
-		alphatab.midi.GeneralMidi._values.set("oboe",68);
-		alphatab.midi.GeneralMidi._values.set("englishhorn",69);
-		alphatab.midi.GeneralMidi._values.set("bassoon",70);
-		alphatab.midi.GeneralMidi._values.set("clarinet",71);
-		alphatab.midi.GeneralMidi._values.set("piccolo",72);
-		alphatab.midi.GeneralMidi._values.set("flute",73);
-		alphatab.midi.GeneralMidi._values.set("recorder",74);
-		alphatab.midi.GeneralMidi._values.set("panflute",75);
-		alphatab.midi.GeneralMidi._values.set("blownbottle",76);
-		alphatab.midi.GeneralMidi._values.set("shakuhachi",77);
-		alphatab.midi.GeneralMidi._values.set("whistle",78);
-		alphatab.midi.GeneralMidi._values.set("ocarina",79);
-		alphatab.midi.GeneralMidi._values.set("lead1square",80);
-		alphatab.midi.GeneralMidi._values.set("lead2sawtooth",81);
-		alphatab.midi.GeneralMidi._values.set("lead3calliope",82);
-		alphatab.midi.GeneralMidi._values.set("lead4chiff",83);
-		alphatab.midi.GeneralMidi._values.set("lead5charang",84);
-		alphatab.midi.GeneralMidi._values.set("lead6voice",85);
-		alphatab.midi.GeneralMidi._values.set("lead7fifths",86);
-		alphatab.midi.GeneralMidi._values.set("lead8bassandlead",87);
-		alphatab.midi.GeneralMidi._values.set("pad1newage",88);
-		alphatab.midi.GeneralMidi._values.set("pad2warm",89);
-		alphatab.midi.GeneralMidi._values.set("pad3polysynth",90);
-		alphatab.midi.GeneralMidi._values.set("pad4choir",91);
-		alphatab.midi.GeneralMidi._values.set("pad5bowed",92);
-		alphatab.midi.GeneralMidi._values.set("pad6metallic",93);
-		alphatab.midi.GeneralMidi._values.set("pad7halo",94);
-		alphatab.midi.GeneralMidi._values.set("pad8sweep",95);
-		alphatab.midi.GeneralMidi._values.set("fx1rain",96);
-		alphatab.midi.GeneralMidi._values.set("fx2soundtrack",97);
-		alphatab.midi.GeneralMidi._values.set("fx3crystal",98);
-		alphatab.midi.GeneralMidi._values.set("fx4atmosphere",99);
-		alphatab.midi.GeneralMidi._values.set("fx5brightness",100);
-		alphatab.midi.GeneralMidi._values.set("fx6goblins",101);
-		alphatab.midi.GeneralMidi._values.set("fx7echoes",102);
-		alphatab.midi.GeneralMidi._values.set("fx8scifi",103);
-		alphatab.midi.GeneralMidi._values.set("sitar",104);
-		alphatab.midi.GeneralMidi._values.set("banjo",105);
-		alphatab.midi.GeneralMidi._values.set("shamisen",106);
-		alphatab.midi.GeneralMidi._values.set("koto",107);
-		alphatab.midi.GeneralMidi._values.set("kalimba",108);
-		alphatab.midi.GeneralMidi._values.set("bagpipe",109);
-		alphatab.midi.GeneralMidi._values.set("fiddle",110);
-		alphatab.midi.GeneralMidi._values.set("shanai",111);
-		alphatab.midi.GeneralMidi._values.set("tinklebell",112);
-		alphatab.midi.GeneralMidi._values.set("agogo",113);
-		alphatab.midi.GeneralMidi._values.set("steeldrums",114);
-		alphatab.midi.GeneralMidi._values.set("woodblock",115);
-		alphatab.midi.GeneralMidi._values.set("taikodrum",116);
-		alphatab.midi.GeneralMidi._values.set("melodictom",117);
-		alphatab.midi.GeneralMidi._values.set("synthdrum",118);
-		alphatab.midi.GeneralMidi._values.set("reversecymbal",119);
-		alphatab.midi.GeneralMidi._values.set("guitarfretnoise",120);
-		alphatab.midi.GeneralMidi._values.set("breathnoise",121);
-		alphatab.midi.GeneralMidi._values.set("seashore",122);
-		alphatab.midi.GeneralMidi._values.set("birdtweet",123);
-		alphatab.midi.GeneralMidi._values.set("telephonering",124);
-		alphatab.midi.GeneralMidi._values.set("helicopter",125);
-		alphatab.midi.GeneralMidi._values.set("applause",126);
-		alphatab.midi.GeneralMidi._values.set("gunshot",127);
-	}
-	name = StringTools.replace(name.toLowerCase()," ","");
-	return alphatab.midi.GeneralMidi._values.exists(name)?alphatab.midi.GeneralMidi._values.get(name):0;
 }
 if(!alphatab.model) alphatab.model = {}
 alphatab.model.AccentuationType = $hxClasses["alphatab.model.AccentuationType"] = { __ename__ : ["alphatab","model","AccentuationType"], __constructs__ : ["None","Normal","Heavy"] }
@@ -3352,8 +3330,8 @@ alphatab.model.Beat.prototype = {
 	,addNote: function(note) {
 		note.beat = this;
 		this.notes.push(note);
-		if(this.minNote == null || this.minNote.realValue() < note.realValue()) this.minNote = note;
-		if(this.maxNote == null || this.maxNote.realValue() > note.realValue()) this.maxNote = note;
+		if(this.minNote == null || this.minNote.realValue() > note.realValue()) this.minNote = note;
+		if(this.maxNote == null || this.maxNote.realValue() < note.realValue()) this.maxNote = note;
 	}
 	,getAutomation: function(type) {
 		var _g = 0, _g1 = this.automations;
@@ -3546,6 +3524,57 @@ alphatab.model.MasterBar.prototype = {
 		return this.timeSignatureNumerator * alphatab.audio.MidiUtils.valueToTicks(this.timeSignatureDenominator);
 	}
 	,__class__: alphatab.model.MasterBar
+}
+alphatab.model.ModelUtils = $hxClasses["alphatab.model.ModelUtils"] = function() { }
+alphatab.model.ModelUtils.__name__ = ["alphatab","model","ModelUtils"];
+alphatab.model.ModelUtils.getDurationValue = function(duration) {
+	switch( (duration)[1] ) {
+	case 0:
+		return 1;
+	case 1:
+		return 2;
+	case 2:
+		return 4;
+	case 3:
+		return 8;
+	case 4:
+		return 16;
+	case 5:
+		return 32;
+	case 6:
+		return 64;
+	default:
+		return 1;
+	}
+}
+alphatab.model.ModelUtils.getDurationIndex = function(duration) {
+	var index = 0;
+	var value = alphatab.model.ModelUtils.getDurationValue(duration);
+	while((value = value >> 1) > 0) index++;
+	return index;
+}
+alphatab.model.ModelUtils.keySignatureIsFlat = function(ks) {
+	return ks < 0;
+}
+alphatab.model.ModelUtils.keySignatureIsNatural = function(ks) {
+	return ks == 0;
+}
+alphatab.model.ModelUtils.keySignatureIsSharp = function(ks) {
+	return ks > 0;
+}
+alphatab.model.ModelUtils.getClefIndex = function(clef) {
+	switch( (clef)[1] ) {
+	case 0:
+		return 0;
+	case 1:
+		return 1;
+	case 2:
+		return 2;
+	case 3:
+		return 3;
+	default:
+		return 0;
+	}
 }
 alphatab.model.Note = $hxClasses["alphatab.model.Note"] = function() {
 	this.bendPoints = new Array();
@@ -3758,7 +3787,6 @@ alphatab.model.TripletFeel.Scottish8th.__enum__ = alphatab.model.TripletFeel;
 alphatab.model.Tuning = $hxClasses["alphatab.model.Tuning"] = function(name,tuning,isStandard) {
 	this.name = name;
 	this.tuning = tuning;
-	this.tuning.reverse();
 	this.isStandard = isStandard;
 };
 alphatab.model.Tuning.__name__ = ["alphatab","model","Tuning"];
@@ -3976,15 +4004,19 @@ alphatab.platform.js.Html5Canvas.prototype = {
 		return this._canvas.offsetHeight;
 	}
 	,setWidth: function(width) {
+		var lineWidth = this._context.lineWidth;
 		this._canvas.width = width;
 		this._context = this._canvas.getContext("2d");
 		this._context.textBaseline = "top";
+		this._context.lineWidth = lineWidth;
 		this._width = width;
 	}
 	,setHeight: function(height) {
+		var lineWidth = this._context.lineWidth;
 		this._canvas.height = height;
 		this._context = this._canvas.getContext("2d");
 		this._context.textBaseline = "top";
+		this._context.lineWidth = lineWidth;
 		this._height = height;
 	}
 	,setColor: function(color) {
@@ -3995,8 +4027,9 @@ alphatab.platform.js.Html5Canvas.prototype = {
 		this._context.lineWidth = value;
 	}
 	,clear: function() {
-		haxe.Log.trace("w: " + this._width + " / h:" + this._height,{ fileName : "Html5Canvas.hx", lineNumber : 84, className : "alphatab.platform.js.Html5Canvas", methodName : "clear"});
+		var lineWidth = this._context.lineWidth;
 		this._canvas.width = this._canvas.width;
+		this._context.lineWidth = lineWidth;
 	}
 	,fillRect: function(x,y,w,h) {
 		this._context.fillRect(x - 0.5,y - 0.5,w,h);
@@ -4688,14 +4721,14 @@ alphatab.rendering.ScoreBarRenderer = $hxClasses["alphatab.rendering.ScoreBarRen
 	this._beamHelpers = new Array();
 };
 alphatab.rendering.ScoreBarRenderer.__name__ = ["alphatab","rendering","ScoreBarRenderer"];
-alphatab.rendering.ScoreBarRenderer.keySignatureIsFlat = function(ks) {
-	return ks < 0;
-}
-alphatab.rendering.ScoreBarRenderer.keySignatureIsNatural = function(ks) {
-	return ks == 0;
-}
-alphatab.rendering.ScoreBarRenderer.keySignatureIsSharp = function(ks) {
-	return ks > 0;
+alphatab.rendering.ScoreBarRenderer.paintSingleBar = function(canvas,x1,y1,x2,y2,size) {
+	canvas.beginPath();
+	canvas.moveTo(x1,y1);
+	canvas.lineTo(x2,y2);
+	canvas.lineTo(x2,y2 - size);
+	canvas.lineTo(x1,y1 - size);
+	canvas.closePath();
+	canvas.fill();
 }
 alphatab.rendering.ScoreBarRenderer.__super__ = alphatab.rendering.GlyphBarRenderer;
 alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.GlyphBarRenderer.prototype,{
@@ -4732,8 +4765,92 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Glyph
 		}
 	}
 	,paintBeamHelper: function(cx,cy,canvas,h) {
-		if(h.beats.length == 1 || true) this.paintFooter(cx,cy,canvas,h); else {
+		if(h.beats.length == 1) this.paintFooter(cx,cy,canvas,h); else this.paintBar(cx,cy,canvas,h);
+	}
+	,getStemSize: function(duration) {
+		var size;
+		switch( (duration)[1] ) {
+		case 2:
+			size = 6;
+			break;
+		case 3:
+			size = 6;
+			break;
+		case 4:
+			size = 6;
+			break;
+		case 5:
+			size = 7;
+			break;
+		case 6:
+			size = 8;
+			break;
+		default:
+			size = 0;
 		}
+		return this.getScoreY(size);
+	}
+	,paintBar: function(cx,cy,canvas,h) {
+		var me = this;
+		var _g1 = 0, _g = h.beats.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var beat = h.beats[i];
+			var stemSize = [this.getStemSize(h.maxDuration)];
+			var correction = [4];
+			var calculateBeamY = (function(correction,stemSize) {
+				return function(x) {
+					return h.calculateBeamY(stemSize[0],me.stave.staveGroup.layout.renderer.scale | 0,x,(function(correction) {
+						return function(n) {
+							return me.getScoreY(me.getNoteLine(n),correction[0] - 1);
+						};
+					})(correction));
+				};
+			})(correction,stemSize);
+			var beatLineX = h.getBeatLineX(beat) + this.stave.staveGroup.layout.renderer.scale | 0;
+			var direction = h.getDirection();
+			var y1 = direction == alphatab.rendering.utils.BeamDirection.Up?this.getScoreY(this.getNoteLine(beat.minNote),correction[0] - 1):this.getScoreY(this.getNoteLine(beat.maxNote),correction[0] - 1);
+			var y2 = calculateBeamY(beatLineX);
+			canvas.setColor(this.stave.staveGroup.layout.renderer.renderingResources.mainGlyphColor);
+			canvas.beginPath();
+			canvas.moveTo(cx + this.x + beatLineX | 0,cy + this.y + y1);
+			canvas.lineTo(cx + this.x + beatLineX | 0,cy + this.y + y2);
+			canvas.stroke();
+			var brokenBarOffset = 6 * this.stave.staveGroup.layout.renderer.scale | 0;
+			var barSpacing = 6 * this.stave.staveGroup.layout.renderer.scale | 0;
+			var barSize = 3 * this.stave.staveGroup.layout.renderer.scale | 0;
+			var barCount = alphatab.model.ModelUtils.getDurationIndex(beat.duration) - 2;
+			var _g2 = 0;
+			while(_g2 < barCount) {
+				var barIndex = _g2++;
+				var barStartX;
+				var barEndX;
+				var barStartY;
+				var barEndY;
+				var barY = cy + this.y + barIndex * barSpacing;
+				if(i < h.beats.length - 1) {
+					if(this.isFullBarJoin(beat,h.beats[i + 1],barIndex)) {
+						barStartX = cx + this.x + beatLineX;
+						barEndX = cx + this.x + h.getBeatLineX(h.beats[i + 1]) + this.stave.staveGroup.layout.renderer.scale | 0;
+					} else {
+						barStartX = cx + this.x + beatLineX;
+						barEndX = barStartX + brokenBarOffset;
+					}
+					barStartY = barY + calculateBeamY(barStartX) | 0;
+					barEndY = barY + calculateBeamY(barEndX) | 0;
+					alphatab.rendering.ScoreBarRenderer.paintSingleBar(canvas,barStartX,barStartY,barEndX,barEndY,barSize);
+				} else if(i > 0 && !this.isFullBarJoin(beat,h.beats[i - 1],barIndex)) {
+					barStartX = cx + this.x + beatLineX - brokenBarOffset;
+					barEndX = cx + this.x + beatLineX;
+					barStartY = barY + calculateBeamY(barStartX) | 0;
+					barEndY = barY + calculateBeamY(barEndX) | 0;
+					alphatab.rendering.ScoreBarRenderer.paintSingleBar(canvas,barStartX,barStartY,barEndX,barEndY,barSize);
+				}
+			}
+		}
+	}
+	,isFullBarJoin: function(a,b,barIndex) {
+		return alphatab.model.ModelUtils.getDurationIndex(a.duration) - 2 - barIndex > 0 && alphatab.model.ModelUtils.getDurationIndex(b.duration) - 2 - barIndex > 0;
 	}
 	,paintFooter: function(cx,cy,canvas,h) {
 		var beat = h.beats[0];
@@ -4979,24 +5096,10 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Glyph
 		var value = n.realValue();
 		var index = value % 12;
 		var octave = value / 12 | 0;
-		var steps = alphatab.rendering.ScoreBarRenderer.OCTAVE_STEPS[this.getClefIndex(clef)];
+		var steps = alphatab.rendering.ScoreBarRenderer.OCTAVE_STEPS[alphatab.model.ModelUtils.getClefIndex(clef)];
 		steps -= octave * 7;
 		steps -= ks > 0 || ks == 0?alphatab.rendering.ScoreBarRenderer.SHARP_NOTE_STEPS[index]:alphatab.rendering.ScoreBarRenderer.FLAT_NOTE_STEPS[index];
 		return steps + 1;
-	}
-	,getClefIndex: function(clef) {
-		switch( (clef)[1] ) {
-		case 0:
-			return 0;
-		case 1:
-			return 1;
-		case 2:
-			return 2;
-		case 3:
-			return 3;
-		default:
-			return 0;
-		}
 	}
 	,getScoreY: function(steps,correction) {
 		if(correction == null) correction = 0;
@@ -5035,9 +5138,9 @@ alphatab.rendering.ScoreBarRendererFactory.prototype = $extend(alphatab.renderin
 	,__class__: alphatab.rendering.ScoreBarRendererFactory
 });
 alphatab.rendering.ScoreRenderer = $hxClasses["alphatab.rendering.ScoreRenderer"] = function(source) {
-	this.updateScale(1.0);
-	this.settings = new Hash();
 	this.canvas = alphatab.platform.PlatformFactory.getCanvas(source);
+	this.settings = new Hash();
+	this.updateScale(1.0);
 	this.layout = new alphatab.rendering.layout.PageViewLayout(this);
 };
 alphatab.rendering.ScoreRenderer.__name__ = ["alphatab","rendering","ScoreRenderer"];
@@ -5052,9 +5155,13 @@ alphatab.rendering.ScoreRenderer.prototype = {
 	,updateScale: function(scale) {
 		this.scale = scale;
 		this.renderingResources = new alphatab.rendering.RenderingResources(scale);
+		this.canvas.setLineWidth(scale);
 	}
 	,render: function(track) {
 		this.track = track;
+		this.invalidate();
+	}
+	,invalidate: function() {
 		this.canvas.clear();
 		this.doLayout();
 		this.paintScore();
@@ -5221,8 +5328,8 @@ alphatab.rendering.glyphs.SvgGlyph = $hxClasses["alphatab.rendering.glyphs.SvgGl
 	if(x == null) x = 0;
 	alphatab.rendering.Glyph.call(this,x,y);
 	this._token = svg.split(" ");
-	this._xScale = xScale;
-	this._yScale = yScale;
+	this._xGlyphScale = xScale;
+	this._yGlyphScale = yScale;
 };
 alphatab.rendering.glyphs.SvgGlyph.__name__ = ["alphatab","rendering","glyphs","SvgGlyph"];
 alphatab.rendering.glyphs.SvgGlyph.__super__ = alphatab.rendering.Glyph;
@@ -5233,7 +5340,11 @@ alphatab.rendering.glyphs.SvgGlyph.prototype = $extend(alphatab.rendering.Glyph.
 	,_currentIndex: null
 	,_xScale: null
 	,_yScale: null
+	,_xGlyphScale: null
+	,_yGlyphScale: null
 	,paint: function(cx,cy,canvas) {
+		this._xScale = this._xGlyphScale * this.renderer.stave.staveGroup.layout.renderer.scale;
+		this._yScale = this._yGlyphScale * this.renderer.stave.staveGroup.layout.renderer.scale;
 		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
 		canvas.setColor(res.mainGlyphColor);
 		this._currentIndex = 0;
@@ -5943,7 +6054,6 @@ alphatab.rendering.layout.ScoreLayout.prototype = {
 		var group = new alphatab.rendering.staves.StaveGroup();
 		group.layout = this;
 		group.addStave(new alphatab.rendering.staves.Stave(new alphatab.rendering.ScoreBarRendererFactory()));
-		group.addStave(new alphatab.rendering.staves.Stave(new alphatab.rendering.ScoreBarRendererFactory()));
 		return group;
 	}
 	,__class__: alphatab.rendering.layout.ScoreLayout
@@ -6357,12 +6467,23 @@ alphatab.rendering.utils.BeamDirection.Up.__enum__ = alphatab.rendering.utils.Be
 alphatab.rendering.utils.BeamDirection.Down = ["Down",1];
 alphatab.rendering.utils.BeamDirection.Down.toString = $estr;
 alphatab.rendering.utils.BeamDirection.Down.__enum__ = alphatab.rendering.utils.BeamDirection;
+alphatab.rendering.utils.BeamBarType = $hxClasses["alphatab.rendering.utils.BeamBarType"] = { __ename__ : ["alphatab","rendering","utils","BeamBarType"], __constructs__ : ["Full","PartLeft","PartRight"] }
+alphatab.rendering.utils.BeamBarType.Full = ["Full",0];
+alphatab.rendering.utils.BeamBarType.Full.toString = $estr;
+alphatab.rendering.utils.BeamBarType.Full.__enum__ = alphatab.rendering.utils.BeamBarType;
+alphatab.rendering.utils.BeamBarType.PartLeft = ["PartLeft",1];
+alphatab.rendering.utils.BeamBarType.PartLeft.toString = $estr;
+alphatab.rendering.utils.BeamBarType.PartLeft.__enum__ = alphatab.rendering.utils.BeamBarType;
+alphatab.rendering.utils.BeamBarType.PartRight = ["PartRight",2];
+alphatab.rendering.utils.BeamBarType.PartRight.toString = $estr;
+alphatab.rendering.utils.BeamBarType.PartRight.__enum__ = alphatab.rendering.utils.BeamBarType;
 alphatab.rendering.utils.BeamingHelper = $hxClasses["alphatab.rendering.utils.BeamingHelper"] = function() {
 	this.beats = new Array();
 	this.valueCalculator = function(n) {
 		return n.realValue();
 	};
 	this._beatLineXPositions = new IntHash();
+	this.maxDuration = alphatab.model.Duration.Whole;
 };
 alphatab.rendering.utils.BeamingHelper.__name__ = ["alphatab","rendering","utils","BeamingHelper"];
 alphatab.rendering.utils.BeamingHelper.canJoin = function(b1,b2) {
@@ -6399,6 +6520,7 @@ alphatab.rendering.utils.BeamingHelper.canJoinDuration = function(d) {
 alphatab.rendering.utils.BeamingHelper.prototype = {
 	beats: null
 	,_lastBeat: null
+	,maxDuration: null
 	,firstMinNote: null
 	,firstMaxNote: null
 	,lastMinNote: null
@@ -6428,25 +6550,34 @@ alphatab.rendering.utils.BeamingHelper.prototype = {
 			this.beats.push(beat);
 			this.checkNote(beat.minNote);
 			this.checkNote(beat.maxNote);
+			if(alphatab.model.ModelUtils.getDurationValue(this.maxDuration) < alphatab.model.ModelUtils.getDurationValue(beat.duration)) this.maxDuration = beat.duration;
 		}
 		return add;
 	}
 	,checkNote: function(note) {
 		var value = note.realValue();
-		if(this.firstMinNote == null || note.beat.voice.index < this.firstMinNote.beat.voice.index) this.firstMinNote = note; else if(note.beat.voice.index == this.firstMinNote.beat.voice.index) {
+		if(this.firstMinNote == null || note.beat.index < this.firstMinNote.beat.index) this.firstMinNote = note; else if(note.beat.index == this.firstMinNote.beat.index) {
 			if(note.realValue() < this.firstMinNote.realValue()) this.firstMinNote = note;
 		}
-		if(this.firstMaxNote == null || note.beat.voice.index < this.firstMaxNote.beat.voice.index) this.firstMaxNote = note; else if(note.beat.voice.index == this.firstMaxNote.beat.voice.index) {
+		if(this.firstMaxNote == null || note.beat.index < this.firstMaxNote.beat.index) this.firstMaxNote = note; else if(note.beat.index == this.firstMaxNote.beat.index) {
 			if(note.realValue() > this.firstMaxNote.realValue()) this.firstMaxNote = note;
 		}
-		if(this.lastMinNote == null || note.beat.voice.index > this.lastMinNote.beat.voice.index) this.lastMinNote = note; else if(note.beat.voice.index == this.lastMinNote.beat.voice.index) {
+		if(this.lastMinNote == null || note.beat.index > this.lastMinNote.beat.index) this.lastMinNote = note; else if(note.beat.index == this.lastMinNote.beat.index) {
 			if(note.realValue() < this.lastMinNote.realValue()) this.lastMinNote = note;
 		}
-		if(this.lastMaxNote == null || note.beat.voice.index > this.lastMaxNote.beat.voice.index) this.lastMaxNote = note; else if(note.beat.voice.index == this.lastMaxNote.beat.voice.index) {
+		if(this.lastMaxNote == null || note.beat.index > this.lastMaxNote.beat.index) this.lastMaxNote = note; else if(note.beat.index == this.lastMaxNote.beat.index) {
 			if(note.realValue() > this.lastMaxNote.realValue()) this.lastMaxNote = note;
 		}
 		if(this.maxNote == null || value > this.maxNote.realValue()) this.maxNote = note;
 		if(this.minNote == null || value < this.minNote.realValue()) this.minNote = note;
+	}
+	,calculateBeamY: function(stemSize,xCorrection,xPosition,yPosition) {
+		var direction = this.getDirection();
+		var startX = this.getBeatLineX(this.firstMinNote.beat) + xCorrection;
+		var startY = direction == alphatab.rendering.utils.BeamDirection.Up?yPosition(this.firstMaxNote) - stemSize:yPosition(this.firstMinNote) + stemSize;
+		var endX = this.getBeatLineX(this.lastMaxNote.beat) + xCorrection;
+		var endY = direction == alphatab.rendering.utils.BeamDirection.Up?yPosition(this.lastMaxNote) - stemSize:yPosition(this.lastMinNote) + stemSize;
+		return (endY - startY) / (endX - startX) * (xPosition - startX) + startY;
 	}
 	,__class__: alphatab.rendering.utils.BeamingHelper
 }
@@ -7588,6 +7719,7 @@ js.XMLHttpRequest = window.XMLHttpRequest?XMLHttpRequest:window.ActiveXObject?fu
 	return $r;
 }(this));
 alphatab.audio.MidiUtils.QUARTER_TIME = 960;
+alphatab.importer.ScoreImporter.UNSUPPORTED_FORMAT = "unsupported file";
 alphatab.importer.AlphaTexImporter.EOL = String.fromCharCode(0);
 alphatab.importer.AlphaTexImporter.TRACK_CHANNELS = [0,1];
 alphatab.importer.Gp3To5Importer.VERSION_STRING = "FICHIER GUITAR PRO ";

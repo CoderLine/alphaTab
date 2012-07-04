@@ -1,5 +1,5 @@
 package alphatab.importer;
-import alphatab.midi.GeneralMidi;
+import alphatab.audio.GeneralMidi;
 import alphatab.model.AccentuationType;
 import alphatab.model.Bar;
 import alphatab.model.Beat;
@@ -44,7 +44,6 @@ class AlphaTexImporter extends ScoreImporter
     
     private var _currentDuration:Duration; 
     
-	
     public function new() 
     {         
         super();
@@ -52,15 +51,22 @@ class AlphaTexImporter extends ScoreImporter
    
     public override function readScore():Score
 	{
-		createDefaultScore();
-        _curChPos = 0;
-        _currentDuration = Duration.Quarter;
-        nextChar();
-        newSy();
-        score();
-		
-		finish(_score);
-        return _score;
+        try
+        {
+            createDefaultScore();
+            _curChPos = 0;
+            _currentDuration = Duration.Quarter;
+            nextChar();
+            newSy();
+            score();
+           
+            finish(_score);
+            return _score;
+        }
+        catch (e:Dynamic)
+        {
+            throw ScoreImporter.UNSUPPORTED_FORMAT;
+        }
 	}
 
 	private function error(nonterm:String, expected:AlphaTexSymbols, symbolError:Bool = true )

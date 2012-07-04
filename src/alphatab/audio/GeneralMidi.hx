@@ -1,4 +1,4 @@
-package alphatab.midi;
+package alphatab.audio;
 
 /**
  * This class provides names for all general midi instruments.

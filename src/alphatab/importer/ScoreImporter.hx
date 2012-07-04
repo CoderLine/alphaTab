@@ -28,6 +28,7 @@ import haxe.io.BytesInput;
  */
 class ScoreImporter 
 {
+    public static var UNSUPPORTED_FORMAT = "unsupported file";
     #if unit public #else private #end var _data:BytesInput;
         
 	/**

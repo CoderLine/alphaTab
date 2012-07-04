@@ -175,7 +175,7 @@ class Gp3To5Importer extends ScoreImporter
         
         if (!StringTools.startsWith(version, VERSION_STRING))
         {
-            throw "unsupported file"; 
+            throw ScoreImporter.UNSUPPORTED_FORMAT; 
         }
 
         version = version.substr(VERSION_STRING.length + 1);
@@ -438,6 +438,7 @@ class Gp3To5Importer extends ScoreImporter
     private function readTrack()
     {
         var newTrack = new Track();
+        _score.addTrack(newTrack);
 		
         
         var flags = readUInt8();
@@ -495,7 +496,6 @@ class Gp3To5Importer extends ScoreImporter
             readStringIntByte();
         }
         
-        _score.addTrack(newTrack);
     }
     
     private function readBars()
@@ -512,6 +512,7 @@ class Gp3To5Importer extends ScoreImporter
     private function readBar(track:Track)
     {
         var newBar:Bar = new Bar();
+        track.addBar(newBar);
         
         var voiceCount = 1;
         if (_versionNumber >= 500)
@@ -525,7 +526,6 @@ class Gp3To5Importer extends ScoreImporter
             readVoice(track, newBar);
         }
         
-        track.addBar(newBar);
     }
     
     private function readVoice(track:Track, bar:Bar)
@@ -537,19 +537,20 @@ class Gp3To5Importer extends ScoreImporter
         }
         
         var newVoice:Voice = new Voice();
+        bar.addVoice(newVoice);
         
         for ( i in 0 ... beatCount)
         {
             readBeat(track, bar, newVoice);
         }
         
-        bar.addVoice(newVoice);
     }
     
     
     private function readBeat(track:Track, bar:Bar, voice:Voice)
     {
         var newBeat:Beat = new Beat();
+        voice.addBeat(newBeat);
         var flags:Int = readUInt8();
         
         if ( (flags & 0x01) != 0)
@@ -645,7 +646,6 @@ class Gp3To5Importer extends ScoreImporter
             }
         }
         
-        voice.addBeat(newBeat);
     }
     
     private function readChord(beat:Beat)

@@ -57,8 +57,14 @@ class ScoreLoader
                     }
                     catch (e:Dynamic)
                     {
-                        error(Stack.toString(Stack.exceptionStack()));
-                        continue;
+                        if (e == ScoreImporter.UNSUPPORTED_FORMAT)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            error(Stack.toString(Stack.exceptionStack()));
+                        }
                     }                    
                 }
                 

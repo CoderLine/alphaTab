@@ -20,7 +20,13 @@
  */
 (function($, alphaTabWrapper)
 {
-    alphaTabWrapper.fn.editor = function() {
+    alphaTabWrapper.fn.editor = function(editorOptions) {
+        var defaults = {
+            onchange: null
+        };
+        
+        var editorOptions = $.extend(defaults, editorOptions);
+
         var self = this;
         var editorArea = $('<textarea class="alphaTexEditor">' + this.contents + '</textarea>');
         this.el.append($('<br />'));
@@ -38,6 +44,9 @@
         this.editor = editorArea;
         editorArea.keyup(function() 
         {
+            if(editorOptions.onchange != null) {
+                editorOptions.onchange(editorArea)
+            }           
             self.loadAlphaTex(editorArea.val());
         });
         

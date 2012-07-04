@@ -51,17 +51,21 @@ class Html5Canvas implements ICanvas
     
     public function setWidth(width:Int):Void 
     {
+        var lineWidth = this._context.lineWidth;
         this._canvas.width = width;
         this._context = this._canvas.getContext("2d");
 		this._context.textBaseline = "top";
+		this._context.lineWidth = lineWidth;
 		_width = width;
     }
     
     public function setHeight(height:Int):Void 
     {
+        var lineWidth = this._context.lineWidth;
         this._canvas.height = height;
         this._context = this._canvas.getContext("2d");
 		this._context.textBaseline = "top";
+		this._context.lineWidth = lineWidth;
 		_height = height;
     } 
     
@@ -81,8 +85,9 @@ class Html5Canvas implements ICanvas
     // rects
     public function clear():Void
     {
-		trace("w: " + _width + " / h:" + _height);
+        var lineWidth = this._context.lineWidth;
 		this._canvas.width = this._canvas.width;
+		this._context.lineWidth = lineWidth;
 		// this._context.clearRect(0,0,_width, _height);
     }
     public function fillRect(x:Float, y:Float, w:Float, h:Float):Void

@@ -248,8 +248,6 @@ class Tuning
     {
         this.name = name;
         this.tuning = tuning;
-		// TODO: hack for old string tunings, need to reverse arrays in declaration
-		this.tuning.reverse(); 
         this.isStandard = isStandard;
     }
 }

@@ -22,6 +22,7 @@ import alphatab.model.HarmonicType;
 import alphatab.model.Note;
 import alphatab.model.Voice;
 import alphatab.platform.ICanvas;
+import alphatab.platform.model.Color;
 import alphatab.platform.svg.SvgCanvas;
 import alphatab.rendering.glyphs.BarNumberGlyph;
 import alphatab.rendering.glyphs.BarSeperatorGlyph;
@@ -45,6 +46,8 @@ import alphatab.rendering.glyphs.SvgGlyph;
 import alphatab.rendering.glyphs.TimeSignatureGlyph;
 import alphatab.rendering.utils.AccidentalHelper;
 import alphatab.rendering.utils.BeamingHelper;
+
+using alphatab.model.ModelUtils;
 
 /**
  * This BarRenderer renders a bar using standard music notation. 
@@ -143,15 +146,134 @@ class ScoreBarRenderer extends GlyphBarRenderer
     private function paintBeamHelper(cx:Int, cy:Int, canvas:ICanvas, h:BeamingHelper):Void
     {
         // check if we need to paint simple footer
-        if (h.beats.length == 1 || true)
+        if (h.beats.length == 1)
         {
             paintFooter(cx, cy, canvas, h);
         }
         else
         {
-            //paintBar(cx, cy, canvas, h);
+            paintBar(cx, cy, canvas, h);
         }
     }
+    
+    private function getStemSize(duration:Duration)
+    {
+        var size:Int;
+        switch(duration)
+        {
+            case Quarter:       size = 6;
+            case Eighth:        size = 6;
+            case Sixteenth:     size = 6;    
+            case ThirtySecond:  size = 7;
+            case SixtyFourth:   size = 8;
+            default: size = 0;
+        }
+        
+        return getScoreY(size);
+    }
+    
+    private function paintBar(cx:Int, cy:Int, canvas:ICanvas, h:BeamingHelper)
+    {
+        for (i in 0 ... h.beats.length)
+        {
+            var beat = h.beats[i];
+            
+            var stemSize = getStemSize(h.maxDuration);
+            var correction = Std.int((NoteHeadGlyph.noteHeadHeight / 2));
+            var calculateBeamY = function(x) {
+                return h.calculateBeamY(stemSize, Std.int(getScale()), x, function(n) {
+                    return getScoreY(getNoteLine(n), correction - 1);
+                });
+            };
+                        
+            //
+            // draw line 
+            //
+            var beatLineX = Std.int(h.getBeatLineX(beat) + getScale());
+
+            var direction = h.getDirection();
+            
+            var y1 = direction == Up 
+                        ? getScoreY(getNoteLine(beat.minNote), correction - 1)
+                        : getScoreY(getNoteLine(beat.maxNote), correction - 1);
+                        
+            var y2 = calculateBeamY(beatLineX);
+            
+            canvas.setColor(getLayout().renderer.renderingResources.mainGlyphColor);
+            canvas.beginPath();
+            canvas.moveTo(Std.int(cx + x + beatLineX), cy + y + y1);
+            canvas.lineTo(Std.int(cx + x + beatLineX), cy + y + y2);
+            canvas.stroke();
+            
+            var brokenBarOffset = Std.int(6 * getScale());
+            var barSpacing = Std.int(6 * getScale());
+            var barSize = Std.int(3 * getScale());
+            var barCount = beat.duration.getDurationIndex() - 2;
+            for (barIndex in 0 ... barCount)
+            {
+                var barStartX:Int;
+                var barEndX:Int;
+                
+                var barStartY:Int;
+                var barEndY:Int;
+                
+                var barY = cy + y + (barIndex * barSpacing);
+                
+                // 
+                // Bar to Next?
+                //
+                if (i < h.beats.length - 1)
+                {
+                    // full bar?
+                    if (isFullBarJoin(beat, h.beats[i + 1], barIndex))
+                    {
+                        barStartX = cx + x + beatLineX;
+                        barEndX = Std.int(cx + x + h.getBeatLineX(h.beats[i+1]) + getScale());
+                    }
+                    // broken bar
+                    else
+                    {
+                        barStartX = cx + x + beatLineX;
+                        barEndX = barStartX + brokenBarOffset;
+                    }
+                    barStartY = Std.int(barY + calculateBeamY(barStartX));
+                    barEndY = Std.int(barY + calculateBeamY(barEndX));
+                    paintSingleBar(canvas, barStartX, barStartY, barEndX, barEndY, barSize);
+                }
+                // 
+                // Broken Bar to Previous?
+                //
+                else if (i > 0 && !isFullBarJoin(beat, h.beats[i - 1], barIndex))
+                {
+                    barStartX = cx + x + beatLineX - brokenBarOffset;
+                    barEndX = cx + x + beatLineX;
+                    
+                    barStartY = Std.int(barY + calculateBeamY(barStartX));
+                    barEndY = Std.int(barY + calculateBeamY(barEndX));
+                    
+                    paintSingleBar(canvas, barStartX, barStartY, barEndX, barEndY, barSize);
+                }                
+            }
+        }
+    }
+    
+    private function isFullBarJoin(a:Beat, b:Beat, barIndex:Int)
+    {
+        return (a.duration.getDurationIndex() - 2 - barIndex > 0) 
+            && (b.duration.getDurationIndex() - 2 - barIndex > 0);
+    }
+    
+    private static function paintSingleBar(canvas:ICanvas, x1:Int, y1:Int, x2:Int, y2:Int, size:Int ) : Void
+    {
+        canvas.beginPath();
+        canvas.moveTo(x1, y1);
+        canvas.lineTo(x2, y2);
+        canvas.lineTo(x2, y2 - size);
+        canvas.lineTo(x1, y1 - size);
+        canvas.closePath();
+        canvas.fill();
+    }
+
     
     private function paintFooter(cx:Int, cy:Int, canvas:ICanvas, h:BeamingHelper)
     {
@@ -297,22 +419,6 @@ class ScoreBarRenderer extends GlyphBarRenderer
             addGlyph(new SpacingGlyph(0, 0, Std.int(8 * getScale()), false));
         }
 	}
-    
-    // TODO: Externalize this into some model class
-    private inline static function keySignatureIsFlat(ks:Int)
-    {
-        return ks < 0;
-    }    
-    
-    private inline static function keySignatureIsNatural(ks:Int)
-    {
-        return ks == 0;
-    }    
-    
-    private inline static function keySignatureIsSharp(ks:Int)
-    {
-        return ks > 0;
-    }
 	
 	private function createKeySignatureGlyphs()
 	{
@@ -335,7 +441,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
 		// naturalize previous key
         // TODO: only naturalize the symbols needed 
         var naturalizeSymbols:Int = Std.int(Math.abs(previousKey));
-        var previousKeyPositions:Array<Int> = keySignatureIsSharp(previousKey) ? SHARP_KS_STEPS : FLAT_KS_STEPS;
+        var previousKeyPositions:Array<Int> = previousKey.keySignatureIsSharp() ? SHARP_KS_STEPS : FLAT_KS_STEPS;
 
 		for (i in 0 ... naturalizeSymbols)
         {
@@ -346,7 +452,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
         // to the new one
         var offsetSymbols:Int = (currentKey <= 7) ? currentKey : currentKey - 7;
         // a sharp keysignature
-        if (keySignatureIsSharp(currentKey))
+        if (currentKey.keySignatureIsSharp())
         {  
             for (i in 0 ... Std.int(Math.abs(currentKey)))
             {
@@ -517,13 +623,13 @@ class ScoreBarRenderer extends GlyphBarRenderer
         var octave = Std.int(value / 12);
         
         // Initial Position
-        var steps = OCTAVE_STEPS[getClefIndex(clef)];
+        var steps = OCTAVE_STEPS[clef.getClefIndex()];
         
         // Move to Octave
         steps -= (octave * STEPS_PER_OCTAVE);
         
         // Add offset for note itself
-        steps -= keySignatureIsSharp(ks) || keySignatureIsNatural(ks)
+        steps -= ks.keySignatureIsSharp() || ks.keySignatureIsNatural()
                      ? SHARP_NOTE_STEPS[index]
                      : FLAT_NOTE_STEPS[index];
 
@@ -533,18 +639,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
     }
     public static inline var NOTE_STEP_CORRECTION = 1;
     
-    private function getClefIndex(clef:Clef)
-    {
-        switch(clef)
-        {
-            case C3: return 0;
-            case C4: return 1;
-            case F4: return 2;
-            case G2: return 3;
-            default: return 0;
-        }
-    }
-    
+ 
 	/**
 	 * Gets the relative y position of the given steps relative to first line. 
 	 * @param steps the amount of steps while 2 steps are one line

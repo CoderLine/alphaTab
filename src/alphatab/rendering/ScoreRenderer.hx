@@ -44,9 +44,9 @@ class ScoreRenderer
         
     public function new(source:Dynamic) 
     {
-		updateScale(1.0);
-		settings = new Hash<Dynamic>();
         canvas = PlatformFactory.getCanvas(source);
+        settings = new Hash<Dynamic>();
+        updateScale(1.0);
         layout = new PageViewLayout(this);
     }
 	
@@ -54,11 +54,17 @@ class ScoreRenderer
 	{
 		this.scale = scale;
 		this.renderingResources = new RenderingResources(scale);
+        canvas.setLineWidth(scale);
 	}
     
     public function render(track:Track)
     {
 		this.track = track;
+        invalidate();
+    }
+    
+    public function invalidate()
+    {
 		canvas.clear();		
         doLayout();
         paintScore();

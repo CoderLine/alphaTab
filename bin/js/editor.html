@@ -13,8 +13,45 @@
     <script type="text/javascript" src="lib/alphatab/jquery.alphaTab.editor.js"></script>
 	<script language="JavaScript" type="text/javascript">
 	(function($) {
+        var getCookieVal = function(offset) {
+            var endstr = document.cookie.indexOf(";", offset);
+            if(endstr == -1)  { endstr = document.cookie.length; }
+            return unescape(document.cookie.substring(offset, endstr));
+        };
+        
+        var getCookie = function(name) {
+            var arg = name + "=";
+            var alen = arg.length;
+            var clen = document.cookie.length;
+            var i = 0;
+            while( i < clen) {
+                var j = i + alen;
+                if(document.cookie.substring(i,j) == arg) {
+                    return getCookieVal(j);
+                }
+                i = document.cookie.indexOf(" ", i) + 1;
+                if(i == 0) break;
+            }
+            return null;
+        };
+    
+        var setCookie = function (name, value, expires, path, domain, secure) {
+            document.cookie = name + "=" + escape (value) +
+                ((expires) ? "; expires=" + expires.toGMTString() : "") +
+                ((path) ? "; path=" + path : "") +
+                ((domain) ? "; domain=" + domain : "") +
+                ((secure) ? "; secure" : "");
+        };
+    
 		$(document).ready(function() {
-			$('div.alphaTab').alphaTab().editor();
+            var tex = getCookie("at_editor");
+            $('div.alphaTab').text(tex);
+			$('div.alphaTab').alphaTab().editor(
+            {
+                onchange:function(box) {
+                    setCookie("at_editor", box.val());
+                }
+            });
 		});
 	})(jQuery);
 	</script>     

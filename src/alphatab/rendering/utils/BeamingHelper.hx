@@ -6,10 +6,31 @@ import alphatab.model.Beat;
 import alphatab.model.Duration;
 import alphatab.model.Note;
 
+using alphatab.model.ModelUtils;
+
 enum BeamDirection
 {
     Up;
     Down;
+}
+
+/**
+ * Lists all types how two voices can be joined with bars.
+ */
+enum BeamBarType 
+{
+    /**
+     * Full Bar from current to next
+     */
+    Full;
+    /**
+     * A small Bar from current to previous
+     */
+    PartLeft;
+    /**
+     * A small bar from current to next
+     */
+    PartRight;
 }
 
 typedef BeatLinePositions = {
@@ -27,6 +48,8 @@ class BeamingHelper
 
     public var beats:Array<Beat>;
     private var _lastBeat:Beat;
+    
+    public var maxDuration:Duration;
     
     /**
      * the first min note within this group
@@ -62,6 +85,7 @@ class BeamingHelper
         beats = new Array<Beat>();
         valueCalculator = function(n) { return n.realValue(); };
         _beatLineXPositions = new IntHash<BeatLinePositions>();
+        maxDuration = Duration.Whole;
     }
     
     // stores the X-positions for beat indices
@@ -116,6 +140,10 @@ class BeamingHelper
             beats.push(beat);
             checkNote(beat.minNote);
             checkNote(beat.maxNote);
+            if (maxDuration.getDurationValue() < beat.duration.getDurationValue()) 
+            {
+                maxDuration = beat.duration;
+            }
         }
         
         return add;
@@ -126,11 +154,11 @@ class BeamingHelper
         var value:Int = note.realValue();
 
         // detect the smallest note which is at the beginning of this group
-        if (firstMinNote == null || note.beat.voice.index  < firstMinNote.beat.voice.index)
+        if (firstMinNote == null || note.beat.index  < firstMinNote.beat.index)
         {
             firstMinNote = note;
         }
-        else if (note.beat.voice.index == firstMinNote.beat.voice.index)
+        else if (note.beat.index == firstMinNote.beat.index)
         {
             if (note.realValue() < firstMinNote.realValue())
             {
@@ -139,11 +167,11 @@ class BeamingHelper
         }
         
         // detect the biggest note which is at the beginning of this group
-        if (firstMaxNote == null || note.beat.voice.index < firstMaxNote.beat.voice.index)
+        if (firstMaxNote == null || note.beat.index < firstMaxNote.beat.index)
         {
             firstMaxNote = note;
         }
-        else if (note.beat.voice.index == firstMaxNote.beat.voice.index)
+        else if (note.beat.index == firstMaxNote.beat.index)
         {
             if (note.realValue() > firstMaxNote.realValue())
             {
@@ -152,11 +180,11 @@ class BeamingHelper
         }
 
         // detect the smallest note which is at the end of this group
-        if (lastMinNote == null || note.beat.voice.index > lastMinNote.beat.voice.index)
+        if (lastMinNote == null || note.beat.index > lastMinNote.beat.index)
         {
             lastMinNote = note;
         }
-        else if (note.beat.voice.index == lastMinNote.beat.voice.index)
+        else if (note.beat.index == lastMinNote.beat.index)
         {
             if (note.realValue() < lastMinNote.realValue())
             {
@@ -164,11 +192,11 @@ class BeamingHelper
             }
         }
         // detect the biggest note which is at the end of this group
-        if (lastMaxNote == null || note.beat.voice.index > lastMaxNote.beat.voice.index)
+        if (lastMaxNote == null || note.beat.index > lastMaxNote.beat.index)
         {
             lastMaxNote = note;
         }
-        else if (note.beat.voice.index == lastMaxNote.beat.voice.index)
+        else if (note.beat.index == lastMaxNote.beat.index)
         {
             if (note.realValue() > lastMaxNote.realValue())
             {
@@ -184,6 +212,38 @@ class BeamingHelper
         {
             minNote = note;
         }
+    }
+    
+    public function calculateBeamY(stemSize:Int, xCorrection:Int, xPosition:Int, yPosition: Note-> Int)
+    {
+        // create a line between the min and max note of the group
+        var direction = getDirection();
+        
+        var startX = getBeatLineX(firstMinNote.beat) + xCorrection;
+        var startY = direction == Up 
+                        ? yPosition(firstMaxNote) - stemSize
+                        : yPosition(firstMinNote) + stemSize;
+        
+        var endX = getBeatLineX(lastMaxNote.beat) + xCorrection;
+        var endY = direction == Up 
+                        ? yPosition(lastMaxNote) - stemSize
+                        : yPosition(lastMinNote) + stemSize;
+        
+        //if (getDirection() == Down)
+        //{
+        //   startY += stemSize;
+        //   endY += stemSize;
+        //}
+        //else
+        //{
+        //   startY -= stemSize;
+        //   endY -= stemSize;
+        //}
+        
+        // get the y position of the given beat on this curve
+        
+        // y(x)  = ( (y2 - y1) / (x2 - x1) )  * (x - x1) + y1;
+        return ( (endY - startY) / (endX - startX) ) * (xPosition - startX) + startY;
     }
     
     private static function canJoin(b1:Beat, b2:Beat)
