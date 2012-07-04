@@ -4866,24 +4866,24 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Glyph
 	}
 	,paintFooter: function(cx,cy,canvas,h) {
 		var beat = h.beats[0];
-		var beatLineX = h.getBeatLineX(beat) + this.stave.staveGroup.layout.renderer.scale;
-		var direction = h.getDirection();
+		var stemSize = this.getStemSize(h.maxDuration);
 		var correction = 4;
-		var topY = this.getScoreY(this.getNoteLine(beat.maxNote),correction - 1);
-		var bottomY = this.getScoreY(this.getNoteLine(beat.minNote),correction - 1);
-		var stemSize = this.getScoreY(6);
+		var beatLineX = h.getBeatLineX(beat) + this.stave.staveGroup.layout.renderer.scale | 0;
+		var direction = h.getDirection();
+		var y1 = this.getScoreY(this.getNoteLine(beat.maxNote),correction - 1);
+		var y2 = this.getScoreY(this.getNoteLine(beat.minNote),correction - 1);
 		var beamY;
 		if(direction == alphatab.rendering.utils.BeamDirection.Down) {
-			bottomY += stemSize;
-			beamY = bottomY + 3 * this.stave.staveGroup.layout.renderer.scale | 0;
+			y1 += stemSize;
+			beamY = y1 + 3 * this.stave.staveGroup.layout.renderer.scale | 0;
 		} else {
-			topY -= stemSize;
-			beamY = topY - 6 * this.stave.staveGroup.layout.renderer.scale | 0;
+			y2 -= stemSize;
+			beamY = y2 - 6 * this.stave.staveGroup.layout.renderer.scale | 0;
 		}
 		canvas.setColor(this.stave.staveGroup.layout.renderer.renderingResources.mainGlyphColor);
 		canvas.beginPath();
-		canvas.moveTo(cx + this.x + beatLineX,cy + this.y + topY);
-		canvas.lineTo(cx + this.x + beatLineX,cy + this.y + bottomY);
+		canvas.moveTo(cx + this.x + beatLineX | 0,cy + this.y + y1);
+		canvas.lineTo(cx + this.x + beatLineX | 0,cy + this.y + y2);
 		canvas.stroke();
 		var gx = beatLineX - this.stave.staveGroup.layout.renderer.scale | 0;
 		var glyph = new alphatab.rendering.glyphs.BeamGlyph(gx,beamY,beat.duration,direction);
@@ -6063,7 +6063,6 @@ alphatab.rendering.layout.ScoreLayout.prototype = {
 	,createEmptyStaveGroup: function() {
 		var group = new alphatab.rendering.staves.StaveGroup();
 		group.layout = this;
-		group.addStave(new alphatab.rendering.staves.Stave(new alphatab.rendering.ScoreBarRendererFactory()));
 		group.addStave(new alphatab.rendering.staves.Stave(new alphatab.rendering.ScoreBarRendererFactory()));
 		return group;
 	}

@@ -324,33 +324,37 @@ class ScoreBarRenderer extends GlyphBarRenderer
         //
         // draw line 
         //
-        var beatLineX = h.getBeatLineX(beat) + getScale();
+        
+        var stemSize = getStemSize(h.maxDuration);
+ 
+        var correction = Std.int((NoteHeadGlyph.noteHeadHeight / 2));
+        var beatLineX = Std.int(h.getBeatLineX(beat) + getScale());
 
         var direction = h.getDirection();
         
-        var correction = Std.int((NoteHeadGlyph.noteHeadHeight / 2));
-        var topY = getScoreY(getNoteLine(beat.maxNote), correction - 1);
-        var bottomY = getScoreY(getNoteLine(beat.minNote), correction - 1);
-        var stemSize = getScoreY(6);
-        
+        var y1 = getScoreY(getNoteLine(beat.maxNote), correction - 1);
+        var y2 = getScoreY(getNoteLine(beat.minNote), correction - 1);
+
         var beamY:Int;
-        
         if (direction == Down)
         {
-           bottomY += stemSize;
-           beamY = Std.int(bottomY + 3 * getScale());
+           y1 += stemSize;
+           beamY = Std.int(y1 + 3 * getScale());
         }
         else
         {
-           topY -= stemSize;
-           beamY = Std.int(topY - 6 * getScale());
+           y2 -= stemSize;
+           beamY = Std.int(y2 - 6 * getScale());
         }
+
+        
         
         canvas.setColor(getLayout().renderer.renderingResources.mainGlyphColor);
         canvas.beginPath();
-        canvas.moveTo(cx + x + beatLineX, cy + y + topY);
-        canvas.lineTo(cx + x + beatLineX, cy + y + bottomY);
+        canvas.moveTo(Std.int(cx + x + beatLineX), cy + y + y1);
+        canvas.lineTo(Std.int(cx + x + beatLineX), cy + y + y2);
         canvas.stroke();
+
         
         //
         // Draw beam 
