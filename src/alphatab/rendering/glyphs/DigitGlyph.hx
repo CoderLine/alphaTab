@@ -15,10 +15,11 @@ class DigitGlyph extends SvgGlyph
 		y += Std.int(7 * getScale());
 		width = Std.int(getDigitWidth(_digit) * getScale());
 	}
-	
-	public override function applyGlyphSpacing(spacing:Int):Void 
-	{
-	}
+    
+    public override function canScale():Bool 
+    {
+        return false;
+    }
 	
 	private function getDigitWidth(digit:Int) : Int
 	{

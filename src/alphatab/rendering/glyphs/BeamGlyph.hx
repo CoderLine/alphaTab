@@ -15,10 +15,6 @@ class BeamGlyph extends SvgGlyph
 		width = 0;
 	}
 	
-	public override function applyGlyphSpacing(spacing:Int):Void 
-	{
-	}
-	
 	private function getRestSvg(duration:Duration, direction:BeamDirection) : String
 	{
         if (direction == Up)

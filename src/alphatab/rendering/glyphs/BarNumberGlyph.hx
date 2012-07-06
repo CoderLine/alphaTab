@@ -15,11 +15,12 @@ class BarNumberGlyph extends Glyph
 	{
 		width = Std.int(8 * getScale());
 	}
+    
+    public override function canScale():Dynamic 
+    {
+        return false;
+    }
 	
-	public override function applyGlyphSpacing(spacing:Int):Void
-	{
-	}
-
 	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
 	{
 		var res = renderer.getResources();

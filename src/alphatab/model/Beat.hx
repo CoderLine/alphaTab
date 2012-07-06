@@ -116,11 +116,11 @@ class Beat
         note.beat = this;
         notes.push(note);
         
-        if (minNote == null || minNote.realValue() > note.realValue())
+        if (minNote == null || note.realValue() < minNote.realValue())
         {
             minNote = note;
         }
-        if (maxNote == null || maxNote.realValue() < note.realValue())
+        if (maxNote == null || note.realValue() > maxNote.realValue())
         {
             maxNote = note;
         }

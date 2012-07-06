@@ -318,6 +318,7 @@ class AlphaTexImporter extends ScoreImporter
         
         var bar:Bar = new Bar();
 		_track.addBar(bar);
+
         if (master.index > 0) 
         { 
 			master.keySignature = master.previousMasterBar.keySignature;
@@ -632,7 +633,6 @@ class AlphaTexImporter extends ScoreImporter
         
         // read effects
 		var note:Note = new Note();
-		beat.addNote(note);
         noteEffects(note);
         
         // create note
@@ -643,7 +643,8 @@ class AlphaTexImporter extends ScoreImporter
 		{
 			note.fret = fret;
 		}
-        
+
+        beat.addNote(note);
         return note;
     }
     

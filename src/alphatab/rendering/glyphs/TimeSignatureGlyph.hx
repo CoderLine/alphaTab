@@ -11,11 +11,12 @@ class TimeSignatureGlyph extends GlyphGroup
 		_numerator = numerator;
 		_denominator = denominator;
 	}
-	
-	public override function applyGlyphSpacing(spacing:Int):Void 
-	{
-	}
-	
+    
+    public override function canScale():Bool 
+    {
+        return false;
+    }
+    
 	public override function doLayout():Void 
 	{
 		var numerator = new NumberGlyph(0, 0, _numerator);

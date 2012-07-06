@@ -29,12 +29,9 @@ class SpacingGlyph extends Glyph
 		this.width = width;
 		_scaling = scaling;
 	}
-	
-	public override function applyGlyphSpacing(spacing:Int):Void
-	{
-		if (_scaling) 
-		{
-			super.applyGlyphSpacing(spacing);
-		}
-	}
+    
+    public override function canScale():Bool 
+    {
+        return _scaling;
+    }
 }

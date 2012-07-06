@@ -46,8 +46,6 @@ class Stave
 	public var staveTop:Int;
 	public var topSpacing:Int;
 	public var bottomSpacing:Int;
-	public var topOverflow:Int;
-	public var bottomOverflow:Int;
 	/**
 	 * This is the visual offset from top where the
 	 * stave contents actually ends. Used for grouping 
@@ -62,19 +60,7 @@ class Stave
 		topSpacing = 10;
 		bottomSpacing = 10;
 	}
-    
-    public function registerOverflowTop(topOverflow:Int)
-    {
-        if(topOverflow > this.topOverflow)
-            this.topOverflow = topOverflow;
-    }
-	
-    public function registerOverflowBottom(bottomOverflow:Int)
-    {
-        if(bottomOverflow > this.bottomOverflow)
-            this.bottomOverflow = bottomOverflow;
-    }
-	
+
     public function registerStaveTop(offset:Int)
 	{
 		staveTop = offset;
@@ -106,11 +92,39 @@ class Stave
 			b.applyBarSpacing(spacing);
 		}
 	}
+    
+    public function getTopOverflow() : Int
+    {
+        var m:Int = 0;
+        for (r in barRenderers)
+        {
+            if (r.topOverflow > m)
+            {
+                m = r.topOverflow;
+            }
+        }
+        return m;
+    }    
+    
+    public function getBottomOverflow() : Int
+    {
+        var m:Int = 0;
+        for (r in barRenderers)
+        {
+            if (r.bottomOverflow > m)
+            {
+                m = r.bottomOverflow;
+            }
+        }
+        return m;
+    }
 	
 	public function finalizeStave(layout:ScoreLayout)
 	{
 		var x = 0; 
 		height = 0;
+        var topOverflow = getTopOverflow();
+        var bottomOverflow = getBottomOverflow();
 		for (i in 0 ... barRenderers.length)
 		{
 			barRenderers[i].x = x;

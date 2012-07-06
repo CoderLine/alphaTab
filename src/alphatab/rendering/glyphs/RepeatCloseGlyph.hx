@@ -14,9 +14,11 @@ class RepeatCloseGlyph extends Glyph
 		width = Std.int( 13 * getScale());
 	}
 	
-	public override function applyGlyphSpacing(spacing:Int):Void
-	{
-	}
+    
+    public override function canScale():Bool 
+    {
+        return false;
+    }
 
 	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
 	{

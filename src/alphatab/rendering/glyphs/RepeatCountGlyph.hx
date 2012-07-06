@@ -16,9 +16,11 @@ class RepeatCountGlyph  extends Glyph
 		width = 0;
 	}
 	
-	public override function applyGlyphSpacing(spacing:Int):Void
-	{
-	}
+    
+    public override function canScale():Bool 
+    {
+        return false;
+    }
 
 	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
 	{

@@ -1,4 +1,5 @@
 package alphatab.rendering.glyphs;
+import alphatab.model.Voice;
 import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
 import alphatab.rendering.Glyph;
@@ -16,6 +17,8 @@ class NoteChordGlyph extends Glyph
     
     public var minNote:NoteGlyphInfo;
     public var maxNote:NoteGlyphInfo;
+    
+    public var spacingChanged:Void->Void;
     public var upLineX:Int;
     public var downLineX:Int;
     
@@ -37,6 +40,18 @@ class NoteChordGlyph extends Glyph
         {
             maxNote = info;
         }
+    }
+       
+    public override function canScale():Bool 
+    {
+        return false;
+    }
+    
+    public override function applyGlyphSpacing(spacing:Int):Dynamic 
+    {
+        super.applyGlyphSpacing(spacing);
+        if(spacingChanged != null)
+            spacingChanged();
     }
     
     public function hasTopOverflow() : Bool
@@ -107,13 +122,13 @@ class NoteChordGlyph extends Glyph
         
         if (anyDisplaced)
         {
-            upLineX = x + displacedX;
-            downLineX = x + displacedX;
+            upLineX = displacedX;
+            downLineX = displacedX;
         }
         else
         {
-            upLineX = x + w;
-            downLineX = x + padding;
+            upLineX = w;
+            downLineX = padding;
         }
 
 		width = w + padding;

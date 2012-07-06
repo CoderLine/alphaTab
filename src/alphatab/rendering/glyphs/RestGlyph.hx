@@ -19,10 +19,11 @@ class RestGlyph extends SvgGlyph
 		width = Std.int(9 * getScale());
 	}
 	
-	public override function applyGlyphSpacing(spacing:Int):Void 
-	{
-	}
-	
+    public override function canScale():Bool 
+    {
+        return false;
+    }
+
 	private function getRestSvg(duration:Duration) : String
 	{
 		switch(duration)

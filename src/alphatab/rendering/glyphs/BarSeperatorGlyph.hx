@@ -15,11 +15,12 @@ class BarSeperatorGlyph extends Glyph
 	{
 		width = Std.int( (_isLast ? 8 : 1) * getScale());
 	}
+    
+    public override function canScale():Bool 
+    {
+        return false;
+    }
 	
-	public override function applyGlyphSpacing(spacing:Int):Void
-	{
-	}
-
 	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
 	{
 		var res = renderer.getResources();

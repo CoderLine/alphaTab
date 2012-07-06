@@ -142,7 +142,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
                         
             if (maxNoteY < top)
             {
-                stave.registerOverflowTop(Std.int(Math.abs(maxNoteY)));
+                registerOverflowTop(Std.int(Math.abs(maxNoteY)));
             }
                 
             //
@@ -156,7 +156,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
                         
             if (minNoteY > bottom)
             {
-                stave.registerOverflowBottom(Std.int(Math.abs(minNoteY)) - bottom);
+                registerOverflowBottom(Std.int(Math.abs(minNoteY)) - bottom);
             }
             
         }
@@ -272,11 +272,15 @@ class ScoreBarRenderer extends GlyphBarRenderer
                         barStartX = beatLineX;
                         barEndX = Std.int(h.getBeatLineX(h.beats[i+1]) + getScale());
                     }
-                    // broken bar
-                    else
+                    // broken bar?
+                    else if(i == 0 || !isFullBarJoin(h.beats[i-1], beat, barIndex))
                     {
                         barStartX = beatLineX;
                         barEndX = barStartX + brokenBarOffset;
+                    }
+                    else
+                    {
+                        continue;
                     }
                     barStartY = Std.int(barY + calculateBeamY(h,barStartX));
                     barEndY = Std.int(barY + calculateBeamY(h,barEndX));
@@ -332,27 +336,27 @@ class ScoreBarRenderer extends GlyphBarRenderer
 
         var direction = h.getDirection();
         
-        var y1 = getScoreY(getNoteLine(beat.maxNote), correction - 1);
-        var y2 = getScoreY(getNoteLine(beat.minNote), correction - 1);
+        var topY = getScoreY(getNoteLine(beat.maxNote), correction - 1);
+        var bottomY = getScoreY(getNoteLine(beat.minNote), correction - 1);
 
         var beamY:Int;
         if (direction == Down)
         {
-           y1 += stemSize;
-           beamY = Std.int(y1 + 3 * getScale());
+           bottomY += stemSize;
+           beamY = Std.int(bottomY + 3 * getScale());
         }
         else
         {
-           y2 -= stemSize;
-           beamY = Std.int(y2 - 6 * getScale());
+           topY -= stemSize;
+           beamY = Std.int(topY - 6 * getScale());
         }
 
         
         
         canvas.setColor(getLayout().renderer.renderingResources.mainGlyphColor);
         canvas.beginPath();
-        canvas.moveTo(Std.int(cx + x + beatLineX), cy + y + y1);
-        canvas.lineTo(Std.int(cx + x + beatLineX), cy + y + y2);
+        canvas.moveTo(Std.int(cx + x + beatLineX), cy + y + topY);
+        canvas.lineTo(Std.int(cx + x + beatLineX), cy + y + bottomY);
         canvas.stroke();
 
         
@@ -374,13 +378,11 @@ class ScoreBarRenderer extends GlyphBarRenderer
 				
 		if (_bar.isEmpty())
 		{
-			addGlyph(new SpacingGlyph(0, 0, Std.int(30 * getScale())));
+			addGlyph(new SpacingGlyph(0, 0, Std.int(30 * getScale()), false));
 		}
         
-        for (v in _bar.voices)
-        {
-            createVoiceGlyphs(v);
-        }
+        // TODO: Render all voices
+        createVoiceGlyphs(_bar.voices[0]);
 		
 		createBarEndGlyphs();
 	}
@@ -389,7 +391,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
 	private function createStartSpacing()
 	{
 		if (_startSpacing) return;
-		addGlyph(new SpacingGlyph(0, 0, Std.int(2 * getScale())));
+		addGlyph(new SpacingGlyph(0, 0, Std.int(2 * getScale()), false));
 		_startSpacing = true;
 	}
 	
@@ -413,7 +415,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
 		else if (_bar.getMasterBar().isDoubleBar)
 		{
 			addGlyph(new BarSeperatorGlyph());
-			addGlyph(new SpacingGlyph(0, 0, Std.int(3 * getScale())));
+			addGlyph(new SpacingGlyph(0, 0, Std.int(3 * getScale()), false));
 			addGlyph(new BarSeperatorGlyph());
 		}		
 		else if(_bar.nextBar == null || !_bar.nextBar.getMasterBar().isRepeatStart)
@@ -541,6 +543,11 @@ class ScoreBarRenderer extends GlyphBarRenderer
         
         _currentBeamHelper = null;
     }
+    
+    public override function applyBarSpacing(spacing:Int):Void 
+    {
+        super.applyBarSpacing(spacing);
+    }
 	
     private function createBeatGlyphs(b:Beat)
     {
@@ -558,7 +565,11 @@ class ScoreBarRenderer extends GlyphBarRenderer
                 createNoteGlyph(b.notes[i--], noteglyphs);
             }
             addGlyph(noteglyphs);
-            _currentBeamHelper.registerBeatLineX(b, noteglyphs.upLineX, noteglyphs.downLineX); 
+            var currentBeamHelper = _currentBeamHelper;
+            noteglyphs.spacingChanged = function() {
+                currentBeamHelper.registerBeatLineX(b, noteglyphs.x + noteglyphs.upLineX, noteglyphs.x + noteglyphs.downLineX); 
+            }
+            noteglyphs.spacingChanged();
             // register overflow spacing in line
             // if (noteglyphs.hasTopOverflow())
             // {

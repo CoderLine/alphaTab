@@ -34,28 +34,24 @@ class Glyph
 		this.x = x;
 		this.y = y;
 	}
-	
+    
 	public function applyGlyphSpacing(spacing:Int)
 	{
-		// default behavior: simply replace glyph to new position
-		var oldWidth = renderer.width - (spacing * renderer.glyphs.length);
-		
-		if (index == 0)
-		{
-			x = 0;
-		}
-		else
-		{
-			x = renderer.glyphs[index - 1].x + renderer.glyphs[index - 1].width;
-		}
-		width += spacing;
-	}
-	
+        if (canScale())
+        {
+            width += spacing;
+        }
+	}    
+
 	public inline function getScale() : Float
 	{
 		return renderer.getScale();
 	}
-	
+    
+    public function canScale() : Bool
+    {
+        return true;
+    }
 	
 	public function doLayout()
 	{

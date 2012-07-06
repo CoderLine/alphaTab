@@ -20,10 +20,11 @@ class NoteHeadGlyph extends SvgGlyph
 	{
 		width = Std.int(9 * getScale());
 	}
-	
-	public override function applyGlyphSpacing(spacing:Int):Void 
-	{
-	}
+    
+    public override function canScale():Bool 
+    {
+        return false;
+    }
 	
 	private function getNoteSvg(duration:Duration) : String
 	{

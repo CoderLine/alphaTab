@@ -116,7 +116,7 @@ class Tuning
             }
             
             // add octaves
-            base += (octave * 12);
+            base += ((octave+1) * 12);
             
         }
         else

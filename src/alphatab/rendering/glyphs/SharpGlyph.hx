@@ -14,8 +14,9 @@ class SharpGlyph extends SvgGlyph
 	{
 		width = Std.int(8 * getScale());
 	}
-	
-	public override function applyGlyphSpacing(spacing:Int):Void 
-	{
-	}
+    
+    public override function canScale():Bool 
+    {
+        return false;
+    }
 }

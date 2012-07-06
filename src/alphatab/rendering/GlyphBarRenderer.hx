@@ -29,10 +29,13 @@ class GlyphBarRenderer extends BarRendererBase
 	public static inline var FirstGlyphSpacing = 10;
 
 	public var glyphs:Array<Glyph>;
+    public var scaleGlyphs:Array<Glyph>;
+    
 	private function new(bar:Bar) 
 	{
 		super(bar);
 		glyphs = new Array<Glyph>();
+		scaleGlyphs = new Array<Glyph>();
 	}
 	
 	public override function doLayout():Void 
@@ -55,6 +58,10 @@ class GlyphBarRenderer extends BarRendererBase
 			width = glyph.x + glyph.width;
 		}
 		glyphs.push(glyph);
+        if (glyph.canScale())
+        {
+            scaleGlyphs.push(glyph);
+        }
 	}	
 	
 	
@@ -63,11 +70,31 @@ class GlyphBarRenderer extends BarRendererBase
 		var oldWidth = width;
 		width += spacing;
 		
-		var glyphSpacing = Std.int(spacing / glyphs.length);
-		for (g in glyphs)
-		{
-			g.applyGlyphSpacing(glyphSpacing);
+		var glyphSpacing = Std.int(spacing / scaleGlyphs.length);
+        for (i in 0 ... glyphs.length)
+        {
+            var g = glyphs[i];
+            // default behavior: simply replace glyph to new position
+            if (i == 0)
+            {
+                g.x = 0;
+            }
+            else
+            {
+                g.x = glyphs[i - 1].x + glyphs[i - 1].width;
+            }
+            
+            if (g == scaleGlyphs[scaleGlyphs.length - 1])
+            {
+                g.applyGlyphSpacing(glyphSpacing + (spacing - (glyphSpacing * scaleGlyphs.length)));
+            }
+            else
+            {
+                g.applyGlyphSpacing(glyphSpacing);
+            }
 		}
+      
+
 	}
 	
 	public override function paint(cx:Int, cy:Int, canvas:ICanvas)

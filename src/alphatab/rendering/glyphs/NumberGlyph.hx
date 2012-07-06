@@ -16,10 +16,12 @@ class NumberGlyph extends GlyphGroup
 		_number = number;
 	}
 	
-	public override function applyGlyphSpacing(spacing:Int):Void 
-	{
-	}
-	
+    
+    public override function canScale():Bool 
+    {
+        return false;
+    }
+
 	public override function doLayout():Void 
 	{
 		var i = _number;

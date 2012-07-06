@@ -31,6 +31,9 @@ class BarRendererBase
 	public var width:Int;
 	public var height:Int;
 	public var index:Int;
+    
+	public var topOverflow:Int;
+	public var bottomOverflow:Int;
 	
 	private var _bar:Bar;
 
@@ -43,6 +46,19 @@ class BarRendererBase
         height = 0;
         index = 0;
 	}
+    
+    public function registerOverflowTop(topOverflow:Int)
+    {
+        if(topOverflow > this.topOverflow)
+            this.topOverflow = topOverflow;
+    }
+	
+    public function registerOverflowBottom(bottomOverflow:Int)
+    {
+        if(bottomOverflow > this.bottomOverflow)
+            this.bottomOverflow = bottomOverflow;
+    }
+	    
 	
 	public function applyBarSpacing(spacing:Int) : Void
 	{

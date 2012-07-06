@@ -13,12 +13,13 @@ class ClefGlyph extends SvgGlyph
 		
 	public override function doLayout():Void 
 	{
-		width = Std.int(24 * getScale());
+		width = Std.int(28 * getScale());
 	}
 	
-	public override function applyGlyphSpacing(spacing:Int):Void 
-	{
-	}
+	public override function canScale():Bool 
+    {
+        return false;
+    }
 	
 	private function getClefSvg(clef:Clef) : String
 	{
