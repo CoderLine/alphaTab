@@ -44,6 +44,11 @@ class GlyphGroup extends Glyph
 		width = w;
 	}
     
+    public function addGlyph(g:Glyph)
+    {
+        _glyphs.push(g);
+    }
+    
 	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
 	{
 		for (g in _glyphs)

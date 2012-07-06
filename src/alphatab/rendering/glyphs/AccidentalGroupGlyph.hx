@@ -1,0 +1,65 @@
+package alphatab.rendering.glyphs;
+import alphatab.rendering.Glyph;
+
+class AccidentalGroupGlyph extends GlyphGroup
+{
+    private static inline var NON_RESERVED = -3000;
+	public function new(x:Int = 0, y:Int = 0)
+    {
+        super(x, y, new Array<Glyph>());
+    }
+    
+    public override function doLayout():Void 
+    {
+        //
+        // Determine Columns for accidentals
+        //
+        _glyphs.sort(function(a, b) {
+            if (a.y == b.y) return 0;
+            if (a.y < b.y) return -1;
+            else return 1;
+        });
+        
+        // defines the reserved y position of the columns
+        var columns = new Array<Int>();
+        columns.push(NON_RESERVED);
+        
+        var accidentalSize = Std.int(21 * getScale());
+		for (g in _glyphs)
+		{
+			g.renderer = renderer;
+			g.doLayout();
+            
+            // find column where glyph fits into
+            
+            // as long the glyph does not fit into the current column
+            var gColumn = 0;
+            while(columns[gColumn] > g.y)
+            {
+                // move to next column
+                gColumn++;
+                
+                // and create the new column if needed
+                if (gColumn == columns.length)
+                {
+                    columns.push(NON_RESERVED);
+                }
+            } 
+            
+            // temporary save column as X
+            g.x = gColumn; 
+            columns[gColumn] = g.y + accidentalSize;
+		}	
+        
+        //
+        // Place accidentals in columns
+        //
+        var columnWidth = Std.int(8 * getScale());
+        width = columnWidth * columns.length;
+        
+        for (g in _glyphs)
+        {
+            g.x = width - ((g.x + 1) * columnWidth);
+        }
+    }
+}

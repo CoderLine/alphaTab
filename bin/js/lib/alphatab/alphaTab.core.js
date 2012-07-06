@@ -5026,7 +5026,9 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Glyph
 	,createBeatGlyphs: function(b) {
 		if(!b.isRest()) {
 			var i = b.notes.length - 1;
-			while(i >= 0) this.createAccidentalGlyph(b.notes[i--]);
+			var accidentals = new alphatab.rendering.glyphs.AccidentalGroupGlyph(0,0);
+			while(i >= 0) this.createAccidentalGlyph(b.notes[i--],accidentals);
+			this.addGlyph(accidentals);
 			var noteglyphs = new alphatab.rendering.glyphs.NoteChordGlyph();
 			i = b.notes.length - 1;
 			while(i >= 0) this.createNoteGlyph(b.notes[i--],noteglyphs);
@@ -5101,18 +5103,18 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Glyph
 		noteHeadGlyph.y = this.getScoreY(line,-1);
 		noteglyphs.addNoteGlyph(noteHeadGlyph,line);
 	}
-	,createAccidentalGlyph: function(n) {
+	,createAccidentalGlyph: function(n,accidentals) {
 		var noteLine = this.getNoteLine(n);
 		var accidental = this._accidentalHelper.applyAccidental(n,noteLine);
 		switch( (accidental)[1] ) {
 		case 2:
-			this.addGlyph(new alphatab.rendering.glyphs.SharpGlyph(0,this.getScoreY(noteLine - 1,-1)));
+			accidentals.addGlyph(new alphatab.rendering.glyphs.SharpGlyph(0,this.getScoreY(noteLine - 1,-1)));
 			break;
 		case 3:
-			this.addGlyph(new alphatab.rendering.glyphs.FlatGlyph(0,this.getScoreY(noteLine - 1,-8)));
+			accidentals.addGlyph(new alphatab.rendering.glyphs.FlatGlyph(0,this.getScoreY(noteLine - 1,-8)));
 			break;
 		case 1:
-			this.addGlyph(new alphatab.rendering.glyphs.NaturalizeGlyph(0,this.getScoreY(noteLine - 1,-2)));
+			accidentals.addGlyph(new alphatab.rendering.glyphs.NaturalizeGlyph(0,this.getScoreY(noteLine - 1,-2)));
 			break;
 		default:
 		}
@@ -5292,6 +5294,82 @@ alphatab.rendering.TabBarRendererFactory.prototype = $extend(alphatab.rendering.
 	,__class__: alphatab.rendering.TabBarRendererFactory
 });
 if(!alphatab.rendering.glyphs) alphatab.rendering.glyphs = {}
+alphatab.rendering.glyphs.GlyphGroup = $hxClasses["alphatab.rendering.glyphs.GlyphGroup"] = function(x,y,glyphs) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.Glyph.call(this,x,y);
+	this._glyphs = glyphs;
+};
+alphatab.rendering.glyphs.GlyphGroup.__name__ = ["alphatab","rendering","glyphs","GlyphGroup"];
+alphatab.rendering.glyphs.GlyphGroup.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.GlyphGroup.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	_glyphs: null
+	,doLayout: function() {
+		var w = 0;
+		var _g = 0, _g1 = this._glyphs;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.renderer = this.renderer;
+			g.doLayout();
+			w = Math.max(w,g.width) | 0;
+		}
+		this.width = w;
+	}
+	,addGlyph: function(g) {
+		this._glyphs.push(g);
+	}
+	,paint: function(cx,cy,canvas) {
+		var _g = 0, _g1 = this._glyphs;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.paint(cx + this.x,cy + this.y,canvas);
+		}
+	}
+	,__class__: alphatab.rendering.glyphs.GlyphGroup
+});
+alphatab.rendering.glyphs.AccidentalGroupGlyph = $hxClasses["alphatab.rendering.glyphs.AccidentalGroupGlyph"] = function(x,y) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.glyphs.GlyphGroup.call(this,x,y,new Array());
+};
+alphatab.rendering.glyphs.AccidentalGroupGlyph.__name__ = ["alphatab","rendering","glyphs","AccidentalGroupGlyph"];
+alphatab.rendering.glyphs.AccidentalGroupGlyph.__super__ = alphatab.rendering.glyphs.GlyphGroup;
+alphatab.rendering.glyphs.AccidentalGroupGlyph.prototype = $extend(alphatab.rendering.glyphs.GlyphGroup.prototype,{
+	doLayout: function() {
+		this._glyphs.sort(function(a,b) {
+			if(a.y == b.y) return 0;
+			if(a.y < b.y) return -1; else return 1;
+		});
+		var columns = new Array();
+		columns.push(-3000);
+		var accidentalSize = 21 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		var _g = 0, _g1 = this._glyphs;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.renderer = this.renderer;
+			g.doLayout();
+			var gColumn = 0;
+			while(columns[gColumn] > g.y) {
+				gColumn++;
+				if(gColumn == columns.length) columns.push(-3000);
+			}
+			g.x = gColumn;
+			columns[gColumn] = g.y + accidentalSize;
+		}
+		var columnWidth = 8 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		this.width = columnWidth * columns.length;
+		var _g = 0, _g1 = this._glyphs;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.x = this.width - (g.x + 1) * columnWidth;
+		}
+	}
+	,__class__: alphatab.rendering.glyphs.AccidentalGroupGlyph
+});
 alphatab.rendering.glyphs.BarNumberGlyph = $hxClasses["alphatab.rendering.glyphs.BarNumberGlyph"] = function(x,y,number) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
@@ -5686,38 +5764,6 @@ alphatab.rendering.glyphs.FlatGlyph.prototype = $extend(alphatab.rendering.glyph
 		return false;
 	}
 	,__class__: alphatab.rendering.glyphs.FlatGlyph
-});
-alphatab.rendering.glyphs.GlyphGroup = $hxClasses["alphatab.rendering.glyphs.GlyphGroup"] = function(x,y,glyphs) {
-	if(y == null) y = 0;
-	if(x == null) x = 0;
-	alphatab.rendering.Glyph.call(this,x,y);
-	this._glyphs = glyphs;
-};
-alphatab.rendering.glyphs.GlyphGroup.__name__ = ["alphatab","rendering","glyphs","GlyphGroup"];
-alphatab.rendering.glyphs.GlyphGroup.__super__ = alphatab.rendering.Glyph;
-alphatab.rendering.glyphs.GlyphGroup.prototype = $extend(alphatab.rendering.Glyph.prototype,{
-	_glyphs: null
-	,doLayout: function() {
-		var w = 0;
-		var _g = 0, _g1 = this._glyphs;
-		while(_g < _g1.length) {
-			var g = _g1[_g];
-			++_g;
-			g.renderer = this.renderer;
-			g.doLayout();
-			w = Math.max(w,g.width) | 0;
-		}
-		this.width = w;
-	}
-	,paint: function(cx,cy,canvas) {
-		var _g = 0, _g1 = this._glyphs;
-		while(_g < _g1.length) {
-			var g = _g1[_g];
-			++_g;
-			g.paint(cx + this.x,cy + this.y,canvas);
-		}
-	}
-	,__class__: alphatab.rendering.glyphs.GlyphGroup
 });
 alphatab.rendering.glyphs.MusicFont = $hxClasses["alphatab.rendering.glyphs.MusicFont"] = function() { }
 alphatab.rendering.glyphs.MusicFont.__name__ = ["alphatab","rendering","glyphs","MusicFont"];
@@ -7830,6 +7876,7 @@ alphatab.rendering.ScoreBarRenderer.FLAT_KS_STEPS = [4,1,5,2,6,3,7];
 alphatab.rendering.ScoreBarRenderer.LineSpacing = 8;
 alphatab.rendering.ScoreBarRenderer.NOTE_STEP_CORRECTION = 1;
 alphatab.rendering.TabBarRenderer.LineSpacing = 10;
+alphatab.rendering.glyphs.AccidentalGroupGlyph.NON_RESERVED = -3000;
 alphatab.rendering.glyphs.DiamondNoteHeadGlyph.noteHeadHeight = 9;
 alphatab.rendering.glyphs.FlatGlyph.CORRECTION = -8;
 alphatab.rendering.glyphs.MusicFont.Num0 = "M 0.00 7.99 C -0.00 10.44 0.57 13.08 2.37 14.84 4.18 16.54 7.44 16.36 8.93 14.32 10.61 12.22 10.97 9.39 10.78 6.78 10.62 4.66 9.96 2.42 8.31 0.97 6.53 -0.48 3.60 -0.29 2.11 1.49 0.53 3.25 -0.00 5.69 0.00 7.99 z M 5.46 15.13 C 4.46 15.17 3.80 14.18 3.64 13.29 3.03 10.66 3.00 7.93 3.19 5.25 3.32 3.95 3.53 2.57 4.31 1.48 4.74 0.87 5.67 0.62 6.26 1.14 c 0.83 0.69 1.03 1.84 1.25 2.84 0.43 2.46 0.39 4.99 0.13 7.47 -0.15 1.22 -0.44 2.57 -1.43 3.40 -0.21 0.15 -0.48 0.25 -0.75 0.26 z";

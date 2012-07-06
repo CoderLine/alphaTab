@@ -24,6 +24,7 @@ import alphatab.model.Voice;
 import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
 import alphatab.platform.svg.SvgCanvas;
+import alphatab.rendering.glyphs.AccidentalGroupGlyph;
 import alphatab.rendering.glyphs.BarNumberGlyph;
 import alphatab.rendering.glyphs.BarSeperatorGlyph;
 import alphatab.rendering.glyphs.BeamGlyph;
@@ -556,10 +557,12 @@ class ScoreBarRenderer extends GlyphBarRenderer
         if (!b.isRest())
         {
             var i = b.notes.length -1;
+            var accidentals:AccidentalGroupGlyph = new AccidentalGroupGlyph(0,0);
             while ( i >= 0 )
             {
-                createAccidentalGlyph(b.notes[i--]);
+                createAccidentalGlyph(b.notes[i--], accidentals);
             }
+            addGlyph(accidentals);
             var noteglyphs:NoteChordGlyph = new NoteChordGlyph();
             i = b.notes.length -1;
             while ( i >= 0 )
@@ -662,15 +665,15 @@ class ScoreBarRenderer extends GlyphBarRenderer
         noteglyphs.addNoteGlyph(noteHeadGlyph, line);
     }
     
-    private function createAccidentalGlyph(n:Note)
+    private function createAccidentalGlyph(n:Note, accidentals:AccidentalGroupGlyph)
     {
         var noteLine = getNoteLine(n);
         var accidental = _accidentalHelper.applyAccidental(n, noteLine);
         switch (accidental) 
         {
-            case Sharp:   addGlyph(new SharpGlyph(0, getScoreY(noteLine - NOTE_STEP_CORRECTION, SharpGlyph.CORRECTION)));
-            case Flat:    addGlyph(new FlatGlyph(0, getScoreY(noteLine - NOTE_STEP_CORRECTION, FlatGlyph.CORRECTION)));
-            case Natural: addGlyph(new NaturalizeGlyph(0, getScoreY(noteLine - NOTE_STEP_CORRECTION, NaturalizeGlyph.CORRECTION)));
+            case Sharp:   accidentals.addGlyph(new SharpGlyph(0, getScoreY(noteLine - NOTE_STEP_CORRECTION, SharpGlyph.CORRECTION)));
+            case Flat:    accidentals.addGlyph(new FlatGlyph(0, getScoreY(noteLine - NOTE_STEP_CORRECTION, FlatGlyph.CORRECTION)));
+            case Natural: accidentals.addGlyph(new NaturalizeGlyph(0, getScoreY(noteLine - NOTE_STEP_CORRECTION, NaturalizeGlyph.CORRECTION)));
             default:
         }
     }
