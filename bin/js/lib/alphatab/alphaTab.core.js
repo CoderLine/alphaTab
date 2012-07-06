@@ -4796,6 +4796,9 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Glyph
 	,getStemSize: function(duration) {
 		var size;
 		switch( (duration)[1] ) {
+		case 1:
+			size = 6;
+			break;
 		case 2:
 			size = 6;
 			break;
@@ -6643,8 +6646,10 @@ alphatab.rendering.utils.BeamingHelper.prototype = {
 		var startY = direction == alphatab.rendering.utils.BeamDirection.Up?yPosition(this.firstMaxNote) - stemSize:yPosition(this.firstMinNote) + stemSize;
 		var endX = this.getBeatLineX(this.lastMaxNote.beat) + xCorrection;
 		var endY = direction == alphatab.rendering.utils.BeamDirection.Up?yPosition(this.lastMaxNote) - stemSize:yPosition(this.lastMinNote) + stemSize;
-		if(startY > endY && startY - endY > maxDistance) endY = startY - maxDistance;
-		if(endY > startY && endY - startY > maxDistance) startY = endY - maxDistance;
+		if(direction == alphatab.rendering.utils.BeamDirection.Down && startY > endY && startY - endY > maxDistance) endY = startY - maxDistance;
+		if(direction == alphatab.rendering.utils.BeamDirection.Down && endY > startY && endY - startY > maxDistance) startY = endY - maxDistance;
+		if(direction == alphatab.rendering.utils.BeamDirection.Up && startY < endY && endY - startY > maxDistance) endY = startY + maxDistance;
+		if(direction == alphatab.rendering.utils.BeamDirection.Up && endY < startY && startY - endY > maxDistance) startY = endY + maxDistance;
 		return (endY - startY) / (endX - startX) * (xPosition - startX) + startY | 0;
 	}
 	,__class__: alphatab.rendering.utils.BeamingHelper

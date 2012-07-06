@@ -246,7 +246,6 @@ class BeamingHelper
         {
             return yPosition(maxNote) - stemSize;
         }
-
         
         var startX = getBeatLineX(firstMinNote.beat) + xCorrection;
         var startY = direction == Up 
@@ -259,15 +258,19 @@ class BeamingHelper
                         : yPosition(lastMinNote) + stemSize;
                         
         // ensure the maxDistance
-        if (startY > endY && (startY - endY) > maxDistance) endY = (startY - maxDistance);
-        if (endY > startY && (endY - startY) > maxDistance) startY = (endY - maxDistance);
-                        
+        if (direction == Down && startY > endY && (startY - endY) > maxDistance) endY = (startY - maxDistance);
+        if (direction == Down && endY > startY && (endY - startY) > maxDistance) startY = (endY - maxDistance);
+                    
+        if (direction == Up && startY < endY && (endY - startY) > maxDistance) endY = (startY + maxDistance);
+        if (direction == Up && endY < startY && (startY - endY) > maxDistance) startY = (endY + maxDistance);
+                    
         // get the y position of the given beat on this curve
         
         // y(x)  = ( (y2 - y1) / (x2 - x1) )  * (x - x1) + y1;
         return Std.int(( (endY - startY) / (endX - startX) ) * (xPosition - startX) + startY);
     }
     
+    // TODO: Check if this beaming is really correct, I'm not sure if we are connecting beats correctly
     private static function canJoin(b1:Beat, b2:Beat)
     {
         // is this a voice we can join with?

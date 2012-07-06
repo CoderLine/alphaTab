@@ -194,6 +194,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
         var size:Int;
         switch(duration)
         {
+            case Half:          size = 6;
             case Quarter:       size = 6;
             case Eighth:        size = 6;
             case Sixteenth:     size = 6;    

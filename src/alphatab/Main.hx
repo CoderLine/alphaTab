@@ -29,6 +29,5 @@ class Main
 {
 	static function main() 
 	{
-		// Nothing to do here
 	}
 }
