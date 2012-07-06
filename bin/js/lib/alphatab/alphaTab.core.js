@@ -5301,7 +5301,9 @@ alphatab.rendering.glyphs.BarNumberGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.BarNumberGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	_number: null
 	,doLayout: function() {
-		this.width = 8 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		var scoreRenderer = this.renderer.stave.staveGroup.layout.renderer;
+		scoreRenderer.canvas.setFont(scoreRenderer.renderingResources.barNumberFont);
+		this.width = this.renderer.stave.staveGroup.layout.renderer.canvas.measureText(Std.string(this._number)) + 3 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
 	,canScale: function() {
 		return false;

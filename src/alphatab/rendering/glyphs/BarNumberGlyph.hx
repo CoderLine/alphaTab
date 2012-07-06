@@ -13,7 +13,10 @@ class BarNumberGlyph extends Glyph
 
 	public override function doLayout():Void 
 	{
-		width = Std.int(8 * getScale());
+        var scoreRenderer = renderer.getLayout().renderer;
+        scoreRenderer.canvas.setFont(scoreRenderer.renderingResources.barNumberFont);
+        
+		width = Std.int(renderer.getLayout().renderer.canvas.measureText(Std.string(_number)) + 3 * getScale());
 	}
     
     public override function canScale():Dynamic 
