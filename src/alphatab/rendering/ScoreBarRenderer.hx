@@ -28,6 +28,7 @@ import alphatab.rendering.glyphs.AccidentalGroupGlyph;
 import alphatab.rendering.glyphs.BarNumberGlyph;
 import alphatab.rendering.glyphs.BarSeperatorGlyph;
 import alphatab.rendering.glyphs.BeamGlyph;
+import alphatab.rendering.glyphs.CircleGlyph;
 import alphatab.rendering.glyphs.ClefGlyph;
 import alphatab.rendering.glyphs.DiamondNoteHeadGlyph;
 import alphatab.rendering.glyphs.DummyTablatureGlyph;
@@ -556,35 +557,48 @@ class ScoreBarRenderer extends GlyphBarRenderer
     {
         if (!b.isRest())
         {
-            var i = b.notes.length -1;
-            var accidentals:AccidentalGroupGlyph = new AccidentalGroupGlyph(0,0);
-            while ( i >= 0 )
-            {
-                createAccidentalGlyph(b.notes[i--], accidentals);
+            var noteLoop = function( action:Note -> Void ) {
+                var i = b.notes.length -1;
+                while ( i >= 0 )
+                {
+                    action(b.notes[i--]);
+                }
             }
+            //
+            // Accidentals
+            //
+            var accidentals:AccidentalGroupGlyph = new AccidentalGroupGlyph(0, 0);
+            noteLoop( function(n) {
+                createAccidentalGlyph(n, accidentals);
+            });
             addGlyph(accidentals);
+            
+            
+            //
+            // Note heads
+            //
             var noteglyphs:NoteChordGlyph = new NoteChordGlyph();
-            i = b.notes.length -1;
-            while ( i >= 0 )
-            {
-                createNoteGlyph(b.notes[i--], noteglyphs);
-            }
+            noteLoop( function(n) {
+                createNoteGlyph(n, noteglyphs);
+            });
             addGlyph(noteglyphs);
             var currentBeamHelper = _currentBeamHelper;
             noteglyphs.spacingChanged = function() {
                 currentBeamHelper.registerBeatLineX(b, noteglyphs.x + noteglyphs.upLineX, noteglyphs.x + noteglyphs.downLineX); 
             }
             noteglyphs.spacingChanged();
-            // register overflow spacing in line
-            // if (noteglyphs.hasTopOverflow())
-            // {
-            //     stave.registerOverflowTop(getScoreY(Std.int(Math.abs(noteglyphs.minNote.line))));
-            // }
-            // 
-            // if (noteglyphs.hasBottomOverflow())
-            // {
-            //     stave.registerOverflowBottom(getScoreY(Std.int(noteglyphs.maxNote.line)) - getScoreY(8));
-            // }            
+            
+            //
+            // Note dots
+            //
+            for (i in 0 ... b.dots)
+            {
+                var group = new GlyphGroup();
+                noteLoop( function (n) {
+                    createBeatDot(n, group);                    
+                });
+                addGlyph(group);
+            }
         }
         else
         {
@@ -593,6 +607,11 @@ class ScoreBarRenderer extends GlyphBarRenderer
         
         addGlyph(new SpacingGlyph(0, 0, Std.int(getBeatDurationWidth(b.duration) * getScale())));
     }	
+    
+    private function createBeatDot(n:Note, group:GlyphGroup)
+    {
+        group.addGlyph(new CircleGlyph(0, getScoreY(getNoteLine(n), Std.int(2*getScale())), 1.5 * getScale()));
+    }
     
     private function createRestGlyph(b:Beat) : Void
     {

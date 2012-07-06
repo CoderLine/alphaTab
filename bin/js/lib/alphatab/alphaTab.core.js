@@ -5024,22 +5024,43 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Glyph
 		alphatab.rendering.GlyphBarRenderer.prototype.applyBarSpacing.call(this,spacing);
 	}
 	,createBeatGlyphs: function(b) {
+		var me = this;
 		if(!b.isRest()) {
-			var i = b.notes.length - 1;
+			var noteLoop = function(action) {
+				var i = b.notes.length - 1;
+				while(i >= 0) action(b.notes[i--]);
+			};
 			var accidentals = new alphatab.rendering.glyphs.AccidentalGroupGlyph(0,0);
-			while(i >= 0) this.createAccidentalGlyph(b.notes[i--],accidentals);
+			noteLoop(function(n) {
+				me.createAccidentalGlyph(n,accidentals);
+			});
 			this.addGlyph(accidentals);
 			var noteglyphs = new alphatab.rendering.glyphs.NoteChordGlyph();
-			i = b.notes.length - 1;
-			while(i >= 0) this.createNoteGlyph(b.notes[i--],noteglyphs);
+			noteLoop(function(n) {
+				me.createNoteGlyph(n,noteglyphs);
+			});
 			this.addGlyph(noteglyphs);
 			var currentBeamHelper = this._currentBeamHelper;
 			noteglyphs.spacingChanged = function() {
 				currentBeamHelper.registerBeatLineX(b,noteglyphs.x + noteglyphs.upLineX,noteglyphs.x + noteglyphs.downLineX);
 			};
 			noteglyphs.spacingChanged();
+			var _g1 = 0, _g = b.dots;
+			while(_g1 < _g) {
+				var i = _g1++;
+				var group = [new alphatab.rendering.glyphs.GlyphGroup()];
+				noteLoop((function(group) {
+					return function(n) {
+						me.createBeatDot(n,group[0]);
+					};
+				})(group));
+				this.addGlyph(group[0]);
+			}
 		} else this.createRestGlyph(b);
 		this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,this.getBeatDurationWidth(b.duration) * this.stave.staveGroup.layout.renderer.scale | 0));
+	}
+	,createBeatDot: function(n,group) {
+		group.addGlyph(new alphatab.rendering.glyphs.CircleGlyph(0,this.getScoreY(this.getNoteLine(n),2 * this.stave.staveGroup.layout.renderer.scale | 0),1.5 * this.stave.staveGroup.layout.renderer.scale));
 	}
 	,createRestGlyph: function(b) {
 		var line = 0;
@@ -5298,7 +5319,7 @@ alphatab.rendering.glyphs.GlyphGroup = $hxClasses["alphatab.rendering.glyphs.Gly
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.Glyph.call(this,x,y);
-	this._glyphs = glyphs;
+	this._glyphs = glyphs != null?glyphs:new Array();
 };
 alphatab.rendering.glyphs.GlyphGroup.__name__ = ["alphatab","rendering","glyphs","GlyphGroup"];
 alphatab.rendering.glyphs.GlyphGroup.__super__ = alphatab.rendering.Glyph;
@@ -5617,6 +5638,29 @@ alphatab.rendering.glyphs.BeamGlyph.prototype = $extend(alphatab.rendering.glyph
 		}
 	}
 	,__class__: alphatab.rendering.glyphs.BeamGlyph
+});
+alphatab.rendering.glyphs.CircleGlyph = $hxClasses["alphatab.rendering.glyphs.CircleGlyph"] = function(x,y,size) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.Glyph.call(this,x,y);
+	this._size = size;
+};
+alphatab.rendering.glyphs.CircleGlyph.__name__ = ["alphatab","rendering","glyphs","CircleGlyph"];
+alphatab.rendering.glyphs.CircleGlyph.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.CircleGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	_size: null
+	,doLayout: function() {
+		this.width = this._size + 3 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,canScale: function() {
+		return false;
+	}
+	,paint: function(cx,cy,canvas) {
+		canvas.beginPath();
+		canvas.circle(cx + this.x,cy + this.y,this._size);
+		canvas.fill();
+	}
+	,__class__: alphatab.rendering.glyphs.CircleGlyph
 });
 alphatab.rendering.glyphs.ClefGlyph = $hxClasses["alphatab.rendering.glyphs.ClefGlyph"] = function(x,y,clef) {
 	if(y == null) y = 0;

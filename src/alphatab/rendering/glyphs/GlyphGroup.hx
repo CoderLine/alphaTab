@@ -26,10 +26,10 @@ import alphatab.rendering.Glyph;
 class GlyphGroup extends Glyph
 {
 	private var _glyphs:Array<Glyph>;
-	public function new(x:Int = 0, y:Int = 0, glyphs:Array<Glyph>)
+	public function new(x:Int = 0, y:Int = 0, glyphs:Array<Glyph> = null)
 	{
 		super(x, y);
-		_glyphs = glyphs;
+		_glyphs = glyphs != null ? glyphs : new Array<Glyph>();
 	}
 	
 	public override function doLayout():Void 
