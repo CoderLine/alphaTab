@@ -7,7 +7,7 @@ import alphatab.rendering.RenderingResources;
 import alphatab.rendering.ScoreBarRenderer;
 
 typedef NoteGlyphInfo = {
-    glyph:NoteHeadGlyph,
+    glyph:Glyph,
     line:Int
 };
 
@@ -28,7 +28,7 @@ class NoteChordGlyph extends Glyph
         _infos = new Array<NoteGlyphInfo>();
     }
     
-    public function addNoteGlyph(noteGlyph:NoteHeadGlyph, noteLine:Int)
+    public function addNoteGlyph(noteGlyph:Glyph, noteLine:Int)
     {
         var info:NoteGlyphInfo =  { glyph:noteGlyph, line:noteLine }
         _infos.push( info );

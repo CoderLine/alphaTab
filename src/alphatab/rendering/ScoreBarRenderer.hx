@@ -28,6 +28,7 @@ import alphatab.rendering.glyphs.BarNumberGlyph;
 import alphatab.rendering.glyphs.BarSeperatorGlyph;
 import alphatab.rendering.glyphs.BeamGlyph;
 import alphatab.rendering.glyphs.ClefGlyph;
+import alphatab.rendering.glyphs.DiamondNoteHeadGlyph;
 import alphatab.rendering.glyphs.DummyTablatureGlyph;
 import alphatab.rendering.glyphs.FlatGlyph;
 import alphatab.rendering.glyphs.GlyphGroup;
@@ -642,17 +643,23 @@ class ScoreBarRenderer extends GlyphBarRenderer
     
     private function createNoteGlyph(n:Note, noteglyphs:NoteChordGlyph) 
     {
+        var noteHeadGlyph:Glyph;
         if (n.harmonicType == HarmonicType.None)
         {
-            var noteHeadGlyph = new NoteHeadGlyph(n.beat.duration);
-            
-            // calculate y position
-            var line = getNoteLine(n);
-            
-            noteHeadGlyph.y = getScoreY(line, -1);
-            
-            noteglyphs.addNoteGlyph(noteHeadGlyph, line);
+            noteHeadGlyph = new NoteHeadGlyph(n.beat.duration);
         }
+        else
+        {
+            noteHeadGlyph = new DiamondNoteHeadGlyph();
+        }
+
+                
+        // calculate y position
+        var line = getNoteLine(n);
+        
+        noteHeadGlyph.y = getScoreY(line, -1);
+        
+        noteglyphs.addNoteGlyph(noteHeadGlyph, line);
     }
     
     private function createAccidentalGlyph(n:Note)

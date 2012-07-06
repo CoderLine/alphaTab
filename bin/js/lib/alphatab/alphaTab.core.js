@@ -5095,12 +5095,11 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Glyph
 		}
 	}
 	,createNoteGlyph: function(n,noteglyphs) {
-		if(n.harmonicType == alphatab.model.HarmonicType.None) {
-			var noteHeadGlyph = new alphatab.rendering.glyphs.NoteHeadGlyph(null,null,n.beat.duration);
-			var line = this.getNoteLine(n);
-			noteHeadGlyph.y = this.getScoreY(line,-1);
-			noteglyphs.addNoteGlyph(noteHeadGlyph,line);
-		}
+		var noteHeadGlyph;
+		if(n.harmonicType == alphatab.model.HarmonicType.None) noteHeadGlyph = new alphatab.rendering.glyphs.NoteHeadGlyph(null,null,n.beat.duration); else noteHeadGlyph = new alphatab.rendering.glyphs.DiamondNoteHeadGlyph();
+		var line = this.getNoteLine(n);
+		noteHeadGlyph.y = this.getScoreY(line,-1);
+		noteglyphs.addNoteGlyph(noteHeadGlyph,line);
 	}
 	,createAccidentalGlyph: function(n) {
 		var noteLine = this.getNoteLine(n);
@@ -5579,6 +5578,22 @@ alphatab.rendering.glyphs.ClefGlyph.prototype = $extend(alphatab.rendering.glyph
 		}
 	}
 	,__class__: alphatab.rendering.glyphs.ClefGlyph
+});
+alphatab.rendering.glyphs.DiamondNoteHeadGlyph = $hxClasses["alphatab.rendering.glyphs.DiamondNoteHeadGlyph"] = function(x,y) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,alphatab.rendering.glyphs.MusicFont.Harmonic,1,1);
+};
+alphatab.rendering.glyphs.DiamondNoteHeadGlyph.__name__ = ["alphatab","rendering","glyphs","DiamondNoteHeadGlyph"];
+alphatab.rendering.glyphs.DiamondNoteHeadGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
+alphatab.rendering.glyphs.DiamondNoteHeadGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
+	doLayout: function() {
+		this.width = 9 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,canScale: function() {
+		return false;
+	}
+	,__class__: alphatab.rendering.glyphs.DiamondNoteHeadGlyph
 });
 alphatab.rendering.glyphs.DigitGlyph = $hxClasses["alphatab.rendering.glyphs.DigitGlyph"] = function(x,y,digit) {
 	if(y == null) y = 0;
@@ -7815,6 +7830,7 @@ alphatab.rendering.ScoreBarRenderer.FLAT_KS_STEPS = [4,1,5,2,6,3,7];
 alphatab.rendering.ScoreBarRenderer.LineSpacing = 8;
 alphatab.rendering.ScoreBarRenderer.NOTE_STEP_CORRECTION = 1;
 alphatab.rendering.TabBarRenderer.LineSpacing = 10;
+alphatab.rendering.glyphs.DiamondNoteHeadGlyph.noteHeadHeight = 9;
 alphatab.rendering.glyphs.FlatGlyph.CORRECTION = -8;
 alphatab.rendering.glyphs.MusicFont.Num0 = "M 0.00 7.99 C -0.00 10.44 0.57 13.08 2.37 14.84 4.18 16.54 7.44 16.36 8.93 14.32 10.61 12.22 10.97 9.39 10.78 6.78 10.62 4.66 9.96 2.42 8.31 0.97 6.53 -0.48 3.60 -0.29 2.11 1.49 0.53 3.25 -0.00 5.69 0.00 7.99 z M 5.46 15.13 C 4.46 15.17 3.80 14.18 3.64 13.29 3.03 10.66 3.00 7.93 3.19 5.25 3.32 3.95 3.53 2.57 4.31 1.48 4.74 0.87 5.67 0.62 6.26 1.14 c 0.83 0.69 1.03 1.84 1.25 2.84 0.43 2.46 0.39 4.99 0.13 7.47 -0.15 1.22 -0.44 2.57 -1.43 3.40 -0.21 0.15 -0.48 0.25 -0.75 0.26 z";
 alphatab.rendering.glyphs.MusicFont.Num1 = "m 2.36 14.48 c 0 -3.87 0 -7.74 0 -11.61 C 1.69 4.15 1.01 5.42 0.34 6.7 0.23 6.54 -0.11 6.44 0.06 6.22 0.83 4.14 1.59 2.07 2.36 -8.04e-8 c 1.09 0 2.18 0 3.26 0 0 4.81 0 9.62 0 14.43 0.11 0.73 1 0.75 1.57 0.86 0 0.24 0 0.47 0 0.71 -2.13 0 -4.25 0 -6.38 0 0 -0.22 0 -0.44 0 -0.66 C 1.34 15.22 1.98 15.2 2.31 14.7 l 0.04 -0.11 0.01 -0.11 0 0 z";
