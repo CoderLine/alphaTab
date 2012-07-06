@@ -11,7 +11,8 @@ class RepeatCloseGlyph extends Glyph
 
 	public override function doLayout():Void 
 	{
-		width = Std.int( 13 * getScale());
+        var base = renderer.isLast() ?  11 : 13;
+		width = Std.int( base * getScale());
 	}
 	
     

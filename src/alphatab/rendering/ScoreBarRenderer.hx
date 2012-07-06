@@ -410,12 +410,13 @@ class ScoreBarRenderer extends GlyphBarRenderer
 	{
 		if (_bar.getMasterBar().isRepeatEnd())
 		{
+			addGlyph(new RepeatCloseGlyph(x, 0));
 			if (_bar.getMasterBar().repeatCount > 1)
 			{
-				addGlyph(new RepeatCountGlyph(0, getScoreY(-1, -3), _bar.getMasterBar().repeatCount + 1));
+                var line = isLast() || isLastOfLine() ? -1 : -4;
+				addGlyph(new RepeatCountGlyph(0, getScoreY(line, -3), _bar.getMasterBar().repeatCount + 1));
 			}
-			addGlyph(new RepeatCloseGlyph(x, 0));
-		}
+        }
 		else if (_bar.getMasterBar().isDoubleBar)
 		{
 			addGlyph(new BarSeperatorGlyph());

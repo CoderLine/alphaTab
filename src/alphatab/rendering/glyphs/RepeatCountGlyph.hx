@@ -2,7 +2,7 @@ package alphatab.rendering.glyphs;
 import alphatab.platform.ICanvas;
 import alphatab.rendering.Glyph;
 
-class RepeatCountGlyph  extends Glyph
+class RepeatCountGlyph extends Glyph
 {
 	private var _count:Int;
 	public function new(x:Int = 0, y:Int = 0, count:Int)
@@ -28,6 +28,8 @@ class RepeatCountGlyph  extends Glyph
 		canvas.setColor(res.mainGlyphColor);
 		canvas.setFont(res.barNumberFont);
 		
-		canvas.fillText("x" + Std.string(_count), cx + x, cy + y);
+        var s = "x" + Std.string(_count);
+        var w = Std.int(canvas.measureText(s) / 1.5);
+		canvas.fillText(s, cx + x - w, cy + y);
 	}
 }

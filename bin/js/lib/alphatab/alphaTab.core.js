@@ -1014,6 +1014,7 @@ alphatab.importer.AlphaTexImporter.prototype = $extend(alphatab.importer.ScoreIm
 			this.finish(this._score);
 			return this._score;
 		} catch( e ) {
+			haxe.Log.trace(e,{ fileName : "AlphaTexImporter.hx", lineNumber : 68, className : "alphatab.importer.AlphaTexImporter", methodName : "readScore"});
 			throw alphatab.importer.ScoreImporter.UNSUPPORTED_FORMAT;
 		}
 	}
@@ -4925,8 +4926,11 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Glyph
 	}
 	,createBarEndGlyphs: function() {
 		if(this._bar.getMasterBar().repeatCount > 0) {
-			if(this._bar.getMasterBar().repeatCount > 1) this.addGlyph(new alphatab.rendering.glyphs.RepeatCountGlyph(0,this.getScoreY(-1,-3),this._bar.getMasterBar().repeatCount + 1));
 			this.addGlyph(new alphatab.rendering.glyphs.RepeatCloseGlyph(this.x,0));
+			if(this._bar.getMasterBar().repeatCount > 1) {
+				var line = this._bar.index == this._bar.track.bars.length - 1 || this.index == this.stave.barRenderers.length - 1?-1:-4;
+				this.addGlyph(new alphatab.rendering.glyphs.RepeatCountGlyph(0,this.getScoreY(line,-3),this._bar.getMasterBar().repeatCount + 1));
+			}
 		} else if(this._bar.getMasterBar().isDoubleBar) {
 			this.addGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph());
 			this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,3 * this.stave.staveGroup.layout.renderer.scale | 0,false));
@@ -6001,7 +6005,8 @@ alphatab.rendering.glyphs.RepeatCloseGlyph.__name__ = ["alphatab","rendering","g
 alphatab.rendering.glyphs.RepeatCloseGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.RepeatCloseGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	doLayout: function() {
-		this.width = 13 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		var base = this.renderer.isLast()?11:13;
+		this.width = base * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
 	,canScale: function() {
 		return false;
@@ -6051,7 +6056,9 @@ alphatab.rendering.glyphs.RepeatCountGlyph.prototype = $extend(alphatab.renderin
 		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
 		canvas.setColor(res.mainGlyphColor);
 		canvas.setFont(res.barNumberFont);
-		canvas.fillText("x" + Std.string(this._count),cx + this.x,cy + this.y);
+		var s = "x" + Std.string(this._count);
+		var w = canvas.measureText(s) / 1.5 | 0;
+		canvas.fillText(s,cx + this.x - w,cy + this.y);
 	}
 	,__class__: alphatab.rendering.glyphs.RepeatCountGlyph
 });
