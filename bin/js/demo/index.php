@@ -21,7 +21,7 @@ $showSourceCode = false;
 if($isIndex) 
 {	
 	$samples = array(
-		"General Usage" => array('simple.php', 'file.php', 'extended.php', 'staves.php', 'layout.php', 'songmodel.php', 'svg.php'),
+		"General Usage" => array('simple.php', 'file.php', 'extended.php', 'staves.php', 'layout.php', 'songmodel.php', 'svg.php', 'musicxml.php'),
         "Plugins" => array('player.php', 'editor.php', 'editorplayer.php'),
 		"Feature Demo" => array('effects.php', 'drums.php', 'voices.php'),
 		"alphaTex" => array('metadata.php', 'notes.php', 'measuretags.php', 'beateffects.php', 'noteeffects.php', 'complex.php', 'converter.php')

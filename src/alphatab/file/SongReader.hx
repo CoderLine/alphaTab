@@ -16,8 +16,10 @@
  */
 package alphatab.file;
 //import alphatab.file.ptb.PtReader;
+import alphatab.file.musicxml.MusicXmlReader;
 import alphatab.midi.MidiRepeatController;
 import alphatab.model.Duration;
+import alphatab.model.GuitarString;
 import alphatab.model.Measure;
 import alphatab.model.MeasureHeader;
 import alphatab.model.Note;
@@ -56,6 +58,7 @@ class SongReader
         d.push(new Gp5Reader());
         d.push(new Gp4Reader());
         d.push(new Gp3Reader());
+        d.push(new MusicXmlReader());
         //d.push(new PtReader());
         return d;
     }
@@ -65,6 +68,35 @@ class SongReader
      */
     public function new() 
     {
+    }
+	
+	/**
+     * Fills the given list with 6 strings in standard tuning. (EADGBE)
+     * @param list the list to fill.
+     */
+    private function createDefaultStrings(list:Array<GuitarString>) : Void
+    {
+        list.push(newString(1, 64));
+        list.push(newString(2, 59));
+        list.push(newString(3, 55));
+        list.push(newString(4, 50));
+        list.push(newString(5, 45));
+        list.push(newString(6, 40));
+    }
+    
+    /**
+     * Creates a new string using the given number and tuning.
+     * @param number the string number 
+     * @param value the tuning
+     * @return the created string.
+     */
+    private function newString(number:Int, value:Int): GuitarString
+    {
+        var str:GuitarString = factory.newString();
+        str.number = number;
+        str.value = value;
+        
+        return str;
     }
     
     /**

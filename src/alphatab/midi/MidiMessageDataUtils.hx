@@ -15,6 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.midi;
+import alphatab.io.Byte;
 import alphatab.model.TimeSignature;
 
 /**
@@ -22,49 +23,49 @@ import alphatab.model.TimeSignature;
  */
 class MidiMessageDataUtils 
 {
-    public static inline var TICK_MOVE:Int = 0x01;
+    public static inline var TICK_MOVE:Byte = 0x01;
     
-    private static function fixValue(value:Int):Int
+    private static function fixValue(value:Byte):Byte
     {
-        var fixedValue:Int = value;
+        var fixedValue:Byte = value;
         fixedValue = cast Math.min(fixedValue,127);
         fixedValue = cast Math.max(fixedValue,0);
         return fixedValue;
     }
     
-    private static function fixChannel(channel:Int):Int
+    private static function fixChannel(channel:Byte):Byte
     {
-        var fixedChannel:Int = channel;
+        var fixedChannel:Byte = channel;
         fixedChannel = cast Math.min(fixedChannel,15);
         fixedChannel = cast Math.max(fixedChannel,0);
         return fixedChannel;
     }
     
-    public static function noteOn(channel:Int, note:Int, velocity:Int):String
+    public static function noteOn(channel:Byte, note:Byte, velocity:Byte):String
     {
         // NoteOn,Channel,Note,Velocity
         return "0" + channelToString(fixChannel(channel)) + valueToString(fixValue(note)) + valueToString(fixValue(velocity));
     }
     
-    public static function noteOff(channel:Int, note:Int, velocity:Int):String 
+    public static function noteOff(channel:Byte, note:Byte, velocity:Byte):String 
     {
         // NoteOff,Channel,Note,Velocity
         return "1" + channelToString(fixChannel(channel)) + valueToString(fixValue(note)) + valueToString(fixValue(velocity));
     }
     
-    public static function controlChange(channel:Int, controller:Int, value:Int):String 
+    public static function controlChange(channel:Byte, controller:Byte, value:Byte):String 
     {
         // ControlChange,Channel,Controller,Value
         return "2" + channelToString(fixChannel(channel)) + valueToString(fixValue(controller)) + valueToString(fixValue(value));
     }
     
-    public static function programChange(channel:Int, instrument:Int):String 
+    public static function programChange(channel:Byte, instrument:Byte):String 
     {
         // ProgramChange,Channel,Instrument
         return "3" + channelToString(fixChannel(channel)) + valueToString(fixValue(instrument));
     }
     
-    public static function pitchBend(channel:Int, value:Int):String
+    public static function pitchBend(channel:Byte, value:Byte):String
     {
         // PitchBend,Channel,Value
         return "4" + channelToString(fixChannel(channel)) + valueToString(fixValue(value));

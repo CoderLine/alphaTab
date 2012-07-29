@@ -15,20 +15,21 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.model;
+import alphatab.io.Byte;
 
 /**
  * A midi channel describes playing data for a track
  */
 class MidiChannel
 {
-    public static inline var DEFAULT_PERCUSSION_CHANNEL:Int = 9;
-    public static inline var DEFAULT_INSTRUMENT:Int = 25;
-    public static inline var DEFAULT_VOLUME:Int = 127;
-    public static inline var DEFAULT_BALANCE:Int = 64;
-    public static inline var DEFAULT_CHORUS:Int = 0;
-    public static inline var DEFAULT_REVERB:Int = 0;
-    public static inline var DEFAULT_PHASER:Int = 0;
-    public static inline var DEFAULT_TREMOLO:Int = 0;
+    public static inline var DEFAULT_PERCUSSION_CHANNEL:Byte = 9;
+    public static inline var DEFAULT_INSTRUMENT:Byte = 25;
+    public static inline var DEFAULT_VOLUME:Byte = 127;
+    public static inline var DEFAULT_BALANCE:Byte = 64;
+    public static inline var DEFAULT_CHORUS:Byte = 0;
+    public static inline var DEFAULT_REVERB:Byte = 0;
+    public static inline var DEFAULT_PHASER:Byte = 0;
+    public static inline var DEFAULT_TREMOLO:Byte = 0;
     
     public var channel(default,default):Int;
     public var effectChannel(default,default):Int;

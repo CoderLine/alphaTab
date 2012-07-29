@@ -33,6 +33,10 @@ class PlatformFactory
         else {
             #if js
                 return new alphatab.platform.js.Html5Canvas(object);
+			#elseif cs
+				return new alphatab.platform.cs.GdiCanvas();
+			#elseif jvm
+				return new alphatab.platform.java.Java2DCanvas();
             #else 
                 return new SvgCanvas();
             #end
@@ -45,6 +49,10 @@ class PlatformFactory
             return new alphatab.platform.js.JsFileLoader();
         #elseif (cpp || neko)
             return new alphatab.platform.FileStreamFileLoader();
+		#elseif jvm
+			return new alphatab.platform.java.JavaFileLoader();
+		#elseif cs
+			return new alphatab.platform.cs.CsFileLoader();
         #else 
             return null;//#error 
         #end

@@ -21,8 +21,8 @@ package alphatab.model;
  */
 class Marker
 {
-    private static inline var DEFAULT_COLOR:Color = Color.Red;
-    private static inline var DEFAULT_TITLE:String = "Untitled";
+    private static var DEFAULT_COLOR:Color = Color.Red;
+    private static var DEFAULT_TITLE:String = "Untitled";
     
     public var title(default,default):String;
     public var color(default,default):Color;

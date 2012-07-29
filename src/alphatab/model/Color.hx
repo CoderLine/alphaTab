@@ -21,8 +21,8 @@ package alphatab.model;
  */
 class Color
 {
-    public static inline var Black:Color = Color.fromRgb(0, 0, 0);
-    public static inline var Red:Color = Color.fromRgb(255, 0, 0);
+    public static var Black:Color = Color.fromRgb(0, 0, 0);
+    public static var Red:Color = Color.fromRgb(255, 0, 0);
     
     public var r(default,default):Int;
     public var g(default,default):Int;

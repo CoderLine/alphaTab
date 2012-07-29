@@ -16,6 +16,8 @@
  */
 package alphatab.file.guitarpro;
 import alphatab.file.FileFormatException;
+import alphatab.io.SByte;
+import alphatab.io.Byte;
 import alphatab.model.effects.BendEffect;
 import alphatab.model.effects.BendPoint;
 import alphatab.model.effects.GraceEffect;
@@ -141,13 +143,13 @@ class Gp3Reader extends GpReaderBase
     
     private function readBeat(start:Int, measure:Measure, track:Track, voiceIndex:Int) : Int
     {
-        var flags:Int = data.readByte();
+        var flags:Byte = data.readByte();
         
         var beat:Beat = getBeat(measure, start);
         var voice:Voice = beat.voices[voiceIndex];
         
         if ((flags & 0x40) != 0) {
-            var beatType:Int = data.readByte();
+            var beatType:Byte = data.readByte();
             voice.isEmpty = ((beatType & 0x02) == 0);
         }
         
@@ -166,7 +168,7 @@ class Gp3Reader extends GpReaderBase
             var mixTableChange:MixTableChange = readMixTableChange(measure);
             beat.effect.mixTableChange = mixTableChange;
         }
-        var stringFlags:Int = data.readByte();
+        var stringFlags:Byte = data.readByte();
         for (j in 0 ... 7)
         {
             var i:Int = 6 - j;
@@ -182,7 +184,7 @@ class Gp3Reader extends GpReaderBase
     
     private function readNote(guitarString:GuitarString, track:Track, effect:NoteEffect) : Note
     {
-        var flags:Int = data.readByte();
+        var flags:Byte = data.readByte();
         var note:Note = factory.newNote();
         note.string = (guitarString.number);
         note.effect = (effect);
@@ -220,7 +222,7 @@ class Gp3Reader extends GpReaderBase
     
     private function readNoteEffects(noteEffect:NoteEffect) : Void
     {
-        var flags1:Int = data.readByte();
+        var flags1:Byte = data.readByte();
         noteEffect.slide = (flags1 & 0x04) != 0;
         noteEffect.hammer = (flags1 & 0x02) != 0;
         noteEffect.letRing = (flags1 & 0x08) != 0;
@@ -235,10 +237,10 @@ class Gp3Reader extends GpReaderBase
     
     private function readGrace(noteEffect:NoteEffect) : Void
     {
-        var fret:Int = data.readByte();
-        var dyn:Int = data.readByte();
-        var transition:Int = data.readSignedByte();
-        var duration:Int = data.readByte();
+        var fret:Byte = data.readByte();
+        var dyn:Byte = data.readByte();
+        var transition:SByte = data.readSignedByte();
+        var duration:Byte = data.readByte();
         var grace:GraceEffect = factory.newGraceEffect();
         
         grace.fret = (fret);
@@ -331,12 +333,12 @@ class Gp3Reader extends GpReaderBase
     
     private function readBeatEffects(beat:Beat, effect:NoteEffect)  : Void
     {
-        var flags1:Int = data.readByte();
+        var flags1:Byte = data.readByte();
         beat.effect.fadeIn = (((flags1 & 0x10) != 0));
         beat.effect.vibrato = (((flags1 & 0x02) != 0)) || beat.effect.vibrato;
         
         if ((flags1 & 0x20) != 0) {
-            var slapEffect:Int = data.readByte();
+            var slapEffect:Byte = data.readByte();
             if (slapEffect == 0) {
                 readTremoloBar(beat.effect);
             }
@@ -348,8 +350,8 @@ class Gp3Reader extends GpReaderBase
             }
         }
         if ((flags1 & 0x40) != 0) {
-            var strokeUp:Int = data.readSignedByte();
-            var strokeDown:Int = data.readSignedByte();
+            var strokeUp:SByte = data.readSignedByte();
+            var strokeDown:SByte = data.readSignedByte();
             if (strokeUp > 0) {
                 beat.effect.stroke.direction = BeatStrokeDirection.Up;
                 beat.effect.stroke.value = (toStrokeValue(strokeUp));
@@ -488,7 +490,7 @@ class Gp3Reader extends GpReaderBase
     
     private function readTrack(number:Int, channels:Array<MidiChannel>) : Track
     {
-        var flags:Int = data.readByte();
+        var flags:Byte = data.readByte();
         var track:Track = factory.newTrack();
         
         track.isPercussionTrack = (flags & 0x1) != 0;
@@ -619,9 +621,9 @@ class Gp3Reader extends GpReaderBase
     
     private function readColor() : Color
     {
-        var r:Int = (data.readByte());
-        var g:Int = data.readByte();
-        var b:Int = (data.readByte());
+        var r:Byte = (data.readByte());
+        var g:Byte = data.readByte();
+        var b:Byte = (data.readByte());
         skip(1);
         return Color.fromRgb(r, g, b);
     }
@@ -681,7 +683,7 @@ class Gp3Reader extends GpReaderBase
     
     public static function toKeySignature(p:Int) : Int
     {
-        return p < 0 ? 7 + Math.round(Math.abs(p)) : p;
+        return p < 0 ? 7 + Std.int(Math.abs(p)) : p;
     }
     
     public static function toStrokeValue(value:Int) : Int

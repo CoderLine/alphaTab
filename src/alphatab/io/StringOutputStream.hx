@@ -33,7 +33,7 @@ class StringOutputStream extends OutputStream
      * Writes a 8bit unsigned integer to the stream;
      * @param data the byte value to be written to the stream.
      */
-    public override function writeByte(data:Int)
+    public override function writeByte(data:Byte)
     {
         _buffer.add(String.fromCharCode(data));
     }    

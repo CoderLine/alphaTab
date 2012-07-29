@@ -85,6 +85,7 @@ class StaveLine
     // the top Y
     public var y(default,default):Int;    
     public var x(default,default):Int;    
+    public var index(default,default):Int;    
     
     // is the line full, which means we need to stretch the measures
     public var fullLine(default,default):Bool;

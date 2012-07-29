@@ -24,7 +24,7 @@ $description = "This sample shows how to display a GuitarPro file";
 (function($) {
     $(document).ready(function() { 
         $('div.alphaTab').alphaTab({
-            file: '<?php echo $filePath; ?>/FadeToBlack.gp4'
+            file: '<?php echo $filePath; ?>/RepeatBug.gp5'
         });
     });
 })(jQuery);

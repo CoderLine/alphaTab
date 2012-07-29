@@ -148,6 +148,7 @@ class PageViewLayout extends ViewLayout
         {
             // calculate a stave line
             var line:StaveLine = getStaveLine(track, nextMeasureIndex, endIndex, posY, x);
+            line.index = _lines.length;
             _lines.push(line);
 
             // try to fit full line
@@ -322,8 +323,8 @@ class PageViewLayout extends ViewLayout
     public override function paintSong(ctx:DrawingContext, clientArea:Rectangle, x:Int, y:Int) : Void
     {
         var track:Track = tablature.track;
-        y = Math.round(y + contentPadding.top);
-        y = Math.round(paintSongInfo(ctx, clientArea, x, y) + firstMeasureSpacing);
+        y = Std.int(y + contentPadding.top);
+        y = Std.int(paintSongInfo(ctx, clientArea, x, y) + firstMeasureSpacing);
         //var beatCount:Int = 0;
         for (l in 0 ... _lines.length) 
         {

@@ -33,10 +33,16 @@ class JsFileLoader implements FileLoader
     public function new()
     {
     }
+	
+	private static function isIE()
+	{
+		var agent:String = untyped __js__("navigator.userAgent");
+		return agent.indexOf("MSIE") != -1;
+	}
     
     public function loadBinary(method:String, file:String, success:DataInputStream->Void, error:String->Void) : Void
     {        
-        if (js.Lib.isIE)
+        if (isIE())
         {
             // use VB Loader to load binary array
             var vbArr = untyped VbAjaxLoader(method, file);

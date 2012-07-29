@@ -25,7 +25,7 @@ class InputStream
      * Reads a 8bit unsigned integer from the stream and returns it value 
      * in the range of 0 to 255
      */
-    public function readByte() : Int
+    public function readByte() : Byte
     {
         return 0;
     }
@@ -39,14 +39,14 @@ class InputStream
      * Reads a 8bit signed integer from the stream and returns it value in the
      * range of -128 to 127
      */
-    public function readSignedByte()  : Int
+    public function readSignedByte()  : SByte
     {
         // convert to signed byte
         var data = readByte() & 0xFF;
         return data > 127 ? -256 + data : data;
     }
     
-    public function readBytes(count:Int) : Array<Int>
+    public function readBytes(count:Int) : Array<Byte>
     {
         var bytes = new Array<Int>();
         for (i in 0 ... count) 

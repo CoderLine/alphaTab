@@ -19,13 +19,14 @@
  *      http://tuxguitar.herac.com.ar/
  */
 package alphatab.file.gpx;
+import alphatab.io.Byte;
 
 class File 
 {
     public var fileName(default,default):String;
-    public var fileContents(default,default):Array<Int>;
+    public var fileContents(default,default):Array<Byte>;
     
-    public function new(fileName:String, fileContents:Array<Int>)
+    public function new(fileName:String, fileContents:Array<Byte>)
     {
         this.fileName = fileName;
         this.fileContents = fileContents;

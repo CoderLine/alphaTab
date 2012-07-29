@@ -22,6 +22,7 @@ package alphatab.file.gpx;
 
 import alphatab.file.FileFormatException;
 import alphatab.io.BitInputStream;
+import alphatab.io.Byte;
 import alphatab.io.DataInputStream;
 import alphatab.io.StringInputStream;
 
@@ -47,7 +48,7 @@ class FileSystem
         return names;
     }
     
-    public function getFileContents(fileName:String) : Array<Int>
+    public function getFileContents(fileName:String) : Array<Byte>
     {
         for(file in _fileSystem)
         {
@@ -70,7 +71,7 @@ class FileSystem
     { 
         if(header == HEADER_BCFS)
         {
-            var bcfsBytes:Array<Int> = srcBuffer.readBytes(srcBuffer.length());
+            var bcfsBytes:Array<Byte> = srcBuffer.readBytes(srcBuffer.length());
             
             var sectorSize = 0x1000;
             var offset = 0;
@@ -84,10 +85,10 @@ class FileSystem
                     
                     var block = 0;
                     var blockCount = 0;
-                    var fileBytesStream:Array<Int>  = new Array<Int>();
+                    var fileBytesStream:Array<Byte>  = new Array<Byte>();
                     while( (block = (getInteger(bcfsBytes, (indexOfBlock + (4* (blockCount++)))))) != 0) 
                     {
-                        var bytes:Array<Int> = getBytes(bcfsBytes, (offset = (block*sectorSize)), sectorSize);
+                        var bytes:Array<Byte> = getBytes(bcfsBytes, (offset = (block*sectorSize)), sectorSize);
                         for(byte in bytes)
                         {
                             fileBytesStream.push(byte);
@@ -104,7 +105,7 @@ class FileSystem
         }
         else if(header == HEADER_BCFZ)
         {
-            var bcfsBuffer:Array<Int> = new Array<Int>();
+            var bcfsBuffer:Array<Byte> = new Array<Byte>();
             
             var expectLength = getInteger(srcBuffer.readBytes(4), 0);
             while( !srcBuffer.eof() && srcBuffer.position() < expectLength)
@@ -151,12 +152,12 @@ class FileSystem
         }
     }
     
-     private function getInteger(source:Array<Int>, offset:Int) :Int
+     private function getInteger(source:Array<Byte>, offset:Int) :Int
      {
         return ((source[ offset + 3] & 0xff) << 24) | ((source[ offset + 2] & 0xff) << 16) | ((source[ offset + 1] & 0xff) << 8) | (source[offset] & 0xff);
      } 
      
-     private function getString(source:Array<Int>, offset:Int, length:Int) : String
+     private function getString(source:Array<Byte>, offset:Int, length:Int) : String
      {
          var charsLength = 0;
          var i = 0;
@@ -171,9 +172,9 @@ class FileSystem
          return str;
      }
      
-     private function getBytes(source:Array<Int>, offset:Int, length:Int) : Array<Int>
+     private function getBytes(source:Array<Byte>, offset:Int, length:Int) : Array<Byte>
      {
-         var bytes = new Array<Int>();
+         var bytes = new Array<Byte>();
          var i = 0; 
          while(i < length)
          {

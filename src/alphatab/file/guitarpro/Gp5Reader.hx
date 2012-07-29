@@ -16,6 +16,7 @@
  */
 package alphatab.file.guitarpro;
 import alphatab.file.FileFormatException;
+import alphatab.io.Byte;
 import alphatab.model.effects.BendEffect;
 import alphatab.model.effects.BendPoint;
 import alphatab.model.effects.GraceEffect;
@@ -118,13 +119,13 @@ class Gp5Reader extends Gp4Reader
     
     override private function readBeat(start:Int, measure:Measure, track:Track, voiceIndex:Int) : Int
     {
-        var flags:Int = data.readByte();
+        var flags:Byte = data.readByte();
         
         var beat:Beat = getBeat(measure, start);
         var voice:Voice = beat.voices[voiceIndex];
         
         if ((flags & 0x40) != 0) {
-            var beatType:Int = data.readByte();
+            var beatType:Byte = data.readByte();
             voice.isEmpty = ((beatType & 0x02) == 0);
         }
         
@@ -142,7 +143,7 @@ class Gp5Reader extends Gp4Reader
             var mixTableChange:MixTableChange = readMixTableChange(measure);
             beat.effect.mixTableChange = mixTableChange;
         }
-        var stringFlags:Int = data.readByte();
+        var stringFlags:Byte = data.readByte();
         for (j in 0 ... 7)
         {
             var i:Int = 6 - j;
@@ -156,7 +157,7 @@ class Gp5Reader extends Gp4Reader
         
         skip(1);
         
-        var read:Int = data.readByte();
+        var read:Byte = data.readByte();
         if (read == 8 || read == 10) {
             skip(1);
         }
@@ -166,14 +167,14 @@ class Gp5Reader extends Gp4Reader
     
     override private function readNote(guitarString:GuitarString, track:Track, effect:NoteEffect) : Note
     {
-        var flags:Int = data.readByte();
+        var flags:Byte = data.readByte();
         var note:Note = factory.newNote();
         note.string = (guitarString.number);
         note.effect.accentuatedNote = (((flags & 0x40) != 0));
         note.effect.heavyAccentuatedNote = (((flags & 0x02) != 0));
         note.effect.ghostNote = (((flags & 0x04) != 0));
         if ((flags & 0x20) != 0) {
-            var noteType:Int = data.readByte();
+            var noteType:Byte = data.readByte();
             note.isTiedNote = ((noteType == 0x02));
             note.effect.deadNote = ((noteType == 0x03));
         }
@@ -182,7 +183,7 @@ class Gp5Reader extends Gp4Reader
             Velocities.VELOCITY_INCREMENT);
         }
         if ((flags & 0x20) != 0) {
-            var fret:Int = data.readSignedByte();
+            var fret:Byte = data.readSignedByte();
             var value:Int = (note.isTiedNote ? getTiedNoteValue(guitarString.number, track) : fret);
             note.value = (value >= 0 && value < 100 ? value : 0);
         }
@@ -203,8 +204,8 @@ class Gp5Reader extends Gp4Reader
     
     override private function readNoteEffects(noteEffect:NoteEffect) : Void
     {
-        var flags1:Int = data.readByte();
-        var flags2:Int = data.readByte();
+        var flags1:Byte = data.readByte();
+        var flags2:Byte = data.readByte();
         if ((flags1 & 0x01) != 0) {
             readBend(noteEffect);
         }
@@ -216,7 +217,7 @@ class Gp5Reader extends Gp4Reader
         }
         if ((flags2 & 0x08) != 0) {
             noteEffect.slide = (true);
-            var type:Int = data.readByte();
+            var type:Byte = data.readByte();
             switch (type) {
                 case 1:
                     noteEffect.slideType = SlideType.FastSlideTo;
@@ -248,7 +249,7 @@ class Gp5Reader extends Gp4Reader
     
     override private function readArtificialHarmonic(noteEffect:NoteEffect) : Void
     {
-        var type:Int = data.readByte();
+        var type:Byte = data.readByte();
         var oHarmonic:HarmonicEffect = factory.newHarmonicEffect();
         oHarmonic.data = 0;
         switch (type) {
@@ -274,11 +275,11 @@ class Gp5Reader extends Gp4Reader
 
     override private function readGrace(noteEffect:NoteEffect) : Void
     {
-        var fret:Int = data.readByte();
-        var dyn:Int = data.readByte();
-        var transition:Int = data.readByte();
-        var duration:Int = data.readByte();
-        var flags:Int = data.readByte();
+        var fret:Byte = data.readByte();
+        var dyn:Byte = data.readByte();
+        var transition:Byte = data.readByte();
+        var duration:Byte = data.readByte();
+        var flags:Byte = data.readByte();
         var grace:GraceEffect = factory.newGraceEffect();
         
         grace.fret = (fret);
@@ -350,7 +351,7 @@ class Gp5Reader extends Gp4Reader
             tableChange.tempo = null;
         
         
-        var allTracksFlags:Int = data.readByte();
+        var allTracksFlags:Byte = data.readByte();
         if (tableChange.volume != null) 
             tableChange.volume.allTracks = (allTracksFlags & 0x01) != 0;
         if (tableChange.balance != null) 
@@ -403,7 +404,7 @@ class Gp5Reader extends Gp4Reader
     
     override private function readTrack(number:Int, channels:Array<MidiChannel>) : Track
     {
-        var flags:Int = data.readByte();
+        var flags:Byte = data.readByte();
         
         if (number == 1 || _versionIndex == 0) 
             skip(1);
@@ -450,7 +451,7 @@ class Gp5Reader extends Gp4Reader
         if (i > 0) 
             skip(1);
         
-        var flags:Int = data.readByte();
+        var flags:Byte = data.readByte();
         
         var header:MeasureHeader = factory.newMeasureHeader();
         header.number = i + 1;
@@ -488,7 +489,7 @@ class Gp5Reader extends Gp4Reader
             skip(4);
         if ((flags & 0x10) == 0) 
             skip(1);
-        var tripletFeel:Int = data.readByte();
+        var tripletFeel:Byte = data.readByte();
         switch (tripletFeel) {
             case 1:
                 header.tripletFeel = TripletFeel.Eighth;
@@ -517,7 +518,7 @@ class Gp5Reader extends Gp4Reader
         
         setup.headerAndFooter = data.readByte();
         
-        var flags2:Int = data.readByte();
+        var flags2:Byte = data.readByte();
         if ((flags2 & 0x01) != 0) 
             setup.headerAndFooter |= HeaderFooterElements.PAGE_NUMBER;
         

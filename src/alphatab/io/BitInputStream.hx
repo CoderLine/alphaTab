@@ -23,7 +23,7 @@ class BitInputStream extends DelegatedInputStream
 {
     private static inline var BYTE_SIZE = 8; // size of byte in bits
     
-    private var _currentByte:Int; // the currently read byte
+    private var _currentByte:Byte; // the currently read byte
     private var _position:Int; // the current bit position within the current byte
     
     public function new(stream:InputStream) 
@@ -32,7 +32,7 @@ class BitInputStream extends DelegatedInputStream
         _position = BYTE_SIZE; // mark end of byte to ensure a new byte is read
     }
     
-    public override function readByte() : Int
+    public override function readByte() : Byte
     {
         return readBits(8);
     }
@@ -67,10 +67,10 @@ class BitInputStream extends DelegatedInputStream
         return bits;
     }
     
-    public function readBit() : Int
+    public function readBit() : Byte
     {
         var bit = -1;
-        // need a new byte?
+        // need a new byte? 
         if (_position >= BYTE_SIZE)
         {
             _currentByte = _stream.readByte();

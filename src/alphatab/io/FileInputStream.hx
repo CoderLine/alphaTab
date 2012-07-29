@@ -42,7 +42,7 @@ class FileInputStream extends InputStream
         _pos = 0;
     }
     
-    public override function readByte() : Int
+    public override function readByte() : Byte
     {
         if (_input.eof())
         {

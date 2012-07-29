@@ -15,6 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.midi;
+import alphatab.io.Byte;
 
 /**
  * This class provides names for all general midi instruments.
@@ -22,13 +23,13 @@ package alphatab.midi;
  */
 class GeneralMidi  
 {
-    private static var _values:Hash<Int>;
+    private static var _values:Hash<Byte>;
     
-    public static function getValue(name:String) : Int
+    public static function getValue(name:String) : Byte
     {
         if(_values == null)
         {
-            _values = new Hash<Int>();
+            _values = new Hash<Byte>();
             _values.set("acousticgrandpiano", 0);
             _values.set("brightacousticpiano", 1);
             _values.set("electricgrandpiano", 2);
@@ -159,7 +160,12 @@ class GeneralMidi
             _values.set("gunshot", 127);
         }
         name = StringTools.replace(name.toLowerCase(), " ", "");
-        return _values.exists(name) ? _values.get(name) : 0; 
+        if (_values.exists(name)) {
+            return _values.get(name);
+        }
+        else {
+            return 0;
+        }
     }   
     
 }

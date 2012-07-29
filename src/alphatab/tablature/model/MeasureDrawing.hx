@@ -369,9 +369,13 @@ class MeasureDrawing extends Measure
         return _defaultSpacings;
     }
     
-    public function getSizingFactor()
+    public function getSizingFactor() : Float
     {
         var beatBoundsWidth = width - _defaultSpacings;
+		if (beatBoundsWidth == 0)
+		{
+			return 1;
+		}
         return (beatBoundsWidth + spacing) / beatBoundsWidth;
     }
     

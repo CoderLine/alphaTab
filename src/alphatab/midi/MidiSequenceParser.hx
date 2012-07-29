@@ -298,7 +298,7 @@ class MidiSequenceParser
                         return currNode;
                     }
                 }
-                return null;
+                //return null;
             }
             nextBeatIndex = 0;
         }
@@ -520,7 +520,7 @@ class MidiSequenceParser
 
             var nextPoint:BendPoint = points[i + 1];
             var nextValue:Int = Math.round(DEFAULT_BEND + (nextPoint.value * DEFAULT_BEND_SEMITONE / BendEffect.SEMITONE_LENGTH));
-            var nextBendStart:Int = Math.round(start + nextPoint.getTime(duration));
+            var nextBendStart:Int = Std.int(start + nextPoint.getTime(duration));
             if (nextValue == value) continue;
             var width:Float = (nextBendStart - bendStart) / Math.abs(nextValue - value);
             if (value < nextValue)
@@ -783,18 +783,18 @@ class MidiSequenceParser
                         {
                             if (note.effect.harmonic.type == HarmonicType.Semi)
                             { 
-                                makeNote(sequence, trackId, Math.round(Math.min(127, orig)), start, duration,
-                                        Math.round(Math.max(Velocities.MIN_VELOCITY, velocity - (Velocities.VELOCITY_INCREMENT * 3))), channel);
+                                makeNote(sequence, trackId, Std.int(Math.min(127, orig)), start, duration,
+                                        Std.int(Math.max(Velocities.MIN_VELOCITY, velocity - (Velocities.VELOCITY_INCREMENT * 3))), channel);
                             }
                             key = orig + HarmonicEffect.NATURAL_FREQUENCIES[note.effect.harmonic.data][1];
                         }
                         if ((key - 12) > 0)
                         {
-                            var hVelocity:Int = Math.round(Math.max(Velocities.MIN_VELOCITY, velocity - (Velocities.VELOCITY_INCREMENT * 4)));
+                            var hVelocity:Int = Std.int(Math.max(Velocities.MIN_VELOCITY, velocity - (Velocities.VELOCITY_INCREMENT * 4)));
                             makeNote(sequence, trackId, key - 12, start, duration, hVelocity, channel);
                         }
                     }
-                    makeNote(sequence, trackId, Math.round(Math.min(0x7f, key)), start, duration, velocity, channel);
+                    makeNote(sequence, trackId, Std.int(Math.min(0x7f, key)), start, duration, velocity, channel);
                 }
             }
         }
@@ -893,8 +893,8 @@ class MidiSequenceParser
     
     public function parse(sequence:MidiSequenceHandler) : Void
     {        
-        _infoTrack = sequence.infoTrack;
-        _metronomeTrack = sequence.metronomeTrack;
+        _infoTrack = sequence.getInfoTrack();
+        _metronomeTrack = sequence.getMetronomeTrack();
         addDefaultMessages(sequence);
         for (i in 0 ... _song.tracks.length)
         {

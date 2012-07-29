@@ -21,7 +21,7 @@ package alphatab.model;
  */
 class Tuplet
 {
-    public static inline var NORMAL:Tuplet = new Tuplet();
+    public static var NORMAL:Tuplet = new Tuplet();
     
     public var enters(default,default):Int;
     public var times(default,default):Int;

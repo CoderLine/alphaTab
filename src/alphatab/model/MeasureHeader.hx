@@ -23,32 +23,33 @@ class MeasureHeader
 {
     public static inline var DEFAULT_KEY_SIGNATURE:Int = 0;
     
-    public var number(default,default):Int;
-    public var hasDoubleBar(default,default):Bool;
-    public var keySignature(default,default):Int;
-    public var keySignatureType(default, default):Int;
+    public var number:Int;
+    public var hasDoubleBar:Bool;
+    public var keySignature:Int;
+    public var keySignatureType:Int;
     /**
      * This is the start tick (midi) of the measure which does not take account
      * of repetitions
      */
-    public var start(default, default):Int;
+    public var start:Int;
     /**
      * This is the start tick (midi) of the measure which takes account of repetitions. 
      * The tick represents the first time the measure was played.
      */
-    public var realStart(default, default) : Int;
-    public var timeSignature(default,default):TimeSignature;
-    public var tempo(default,default):Tempo;
-    public var marker(default,default):Marker;
+    public var realStart : Int;
+    public var timeSignature:TimeSignature;
+    public var tempo:Tempo;
+    public var marker:Marker;
     public function hasMarker():Bool
     {
         return this.marker != null;
     }
-    public var isRepeatOpen(default,default):Bool;
-    public var repeatAlternative(default,default):Int;
-    public var repeatClose(default,default):Int;
-    public var tripletFeel(default,default):Int;
-    public var song(default,default):Song;
+    public var isRepeatOpen:Bool;
+    public var repeatAlternative:Int;
+    public var repeatClose:Int;
+    public var repeatGroup:RepeatGroup;
+    public var tripletFeel:Int;
+    public var song:Song;
     
     public function length() : Int
     {

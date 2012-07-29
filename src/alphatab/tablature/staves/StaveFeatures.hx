@@ -21,7 +21,7 @@ package alphatab.tablature.staves;
  * Storing a list of those features we can check whether a feature is already
  * drawn by another stave
  */
-enum StaveFeatures 
+enum StaveFeatures
 {
     TimeSignature;
 }

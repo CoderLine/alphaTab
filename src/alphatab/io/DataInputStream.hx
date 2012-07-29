@@ -36,7 +36,7 @@ class DataInputStream extends DelegatedInputStream
         super(stream);
         this.bigEndian = bigEndian;
     }
-    
+	
     private function readEndianAwareBytes(count:Int) : Array<Int>
     {
         var bytes = readBytes(count);
@@ -46,6 +46,25 @@ class DataInputStream extends DelegatedInputStream
         }
         return bytes;
     }
+	
+	public function readString(length:Int) : String
+	{
+		if (Std.is(this._stream, StringInputStream))
+		{
+			var ss:StringInputStream = cast(this._stream, StringInputStream);
+			return ss.readString(length);
+		}
+		else
+		{
+			var text:String = "";
+			for (i in 0 ... length)
+			{
+				// TODO: Check for unicode support
+				text += String.fromCharCode(readByte());
+			}
+			return text;
+		}
+	}
    
     public function readBool() : Bool
     { 
@@ -90,7 +109,7 @@ class DataInputStream extends DelegatedInputStream
     } 
     
     #if (js && !cs)
-    public function getDoubleSig(bytes:Array<Int>) : Int
+    public function getDoubleSig(bytes:Array<Byte>) : Int
     {
         // This crazy toString() stuff works around the fact that js ints are
         // only 32 bits and signed, giving us 31 bits to work with
@@ -103,7 +122,7 @@ class DataInputStream extends DelegatedInputStream
         return sig;
     }
     #else
-    public function getDoubleSig(bytes:Array<Int>) : Int
+    public function getDoubleSig(bytes:Array<Byte>) : Int
     {
         return ((bytes[1] & 0x0F) << 48) | (bytes[2] << 40) | (bytes[3] << 32)
                | (bytes[4] << 24) | (bytes[5] << 16) | (bytes[6] << 8) | bytes[7];

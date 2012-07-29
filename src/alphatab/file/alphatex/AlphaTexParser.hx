@@ -51,7 +51,7 @@ import alphatab.model.Voice;
  */
 class AlphaTexParser extends SongReader  
 {
-    private static inline var EOL:String = String.fromCharCode(0);
+    private static var EOL:String = String.fromCharCode(0);
     private static var TRACK_CHANNELS:Array<Int> = [0, 1];
     
     private var _song:Song; 
@@ -95,36 +95,7 @@ class AlphaTexParser extends SongReader
         
         _song.addTrack(_track);
     }
-    
-    /**
-     * Fills the given list with 6 strings in standard tuning. (EADGBE)
-     * @param list the list to fill.
-     */
-    private function createDefaultStrings(list:Array<GuitarString>) : Void
-    {
-        list.push(newString(1, 64));
-        list.push(newString(2, 59));
-        list.push(newString(3, 55));
-        list.push(newString(4, 50));
-        list.push(newString(5, 45));
-        list.push(newString(6, 40));
-    }
-    
-    /**
-     * Creates a new string using the given number and tuning.
-     * @param number the string number 
-     * @param value the tuning
-     * @return the created string.
-     */
-    private function newString(number:Int, value:Int): GuitarString
-    {
-        var str:GuitarString = factory.newString();
-        str.number = number;
-        str.value = value;
         
-        return str;
-    }
-    
     /**
      * Reads the song using the initialized values. 
      * @return the song read

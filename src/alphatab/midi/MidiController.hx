@@ -15,22 +15,23 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.midi;
+import alphatab.io.Byte;
 
 /**
  * A list of available midi controllers. 
  */
 class MidiController
 {
-    public static inline var ALL_NOTES_OFF:Int = 0x7b;
-    public static inline var BALANCE:Int = 0x0A;
-    public static inline var CHORUS:Int = 0x5d;
-    public static inline var DATA_ENTRY_LSB:Int = 0x26;
-    public static inline var DATA_ENTRY_MSB:Int = 0x06;
-    public static inline var EXPRESSION:Int = 0x0B;
-    public static inline var PHASER:Int = 0x5f;
-    public static inline var REVERB:Int = 0x5b;
-    public static inline var RPN_LSB:Int = 0x64;
-    public static inline var RPN_MBS:Int = 0x65;
-    public static inline var TREMOLO:Int = 0x5c;
-    public static inline var VOLUME:Int = 0x07;
+    public static inline var ALL_NOTES_OFF:Byte = 0x7b;
+    public static inline var BALANCE:Byte = 0x0A;
+    public static inline var CHORUS:Byte = 0x5d;
+    public static inline var DATA_ENTRY_LSB:Byte = 0x26;
+    public static inline var DATA_ENTRY_MSB:Byte = 0x06;
+    public static inline var EXPRESSION:Byte = 0x0B;
+    public static inline var PHASER:Byte = 0x5f;
+    public static inline var REVERB:Byte = 0x5b;
+    public static inline var RPN_LSB:Byte = 0x64;
+    public static inline var RPN_MBS:Byte = 0x65;
+    public static inline var TREMOLO:Byte = 0x5c;
+    public static inline var VOLUME:Byte = 0x07;
 }

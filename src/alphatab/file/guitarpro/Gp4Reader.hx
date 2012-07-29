@@ -16,6 +16,8 @@
  */
 package alphatab.file.guitarpro;
 import alphatab.file.FileFormatException;
+import alphatab.io.Byte;
+import alphatab.io.SByte;
 import alphatab.model.effects.BendEffect;
 import alphatab.model.effects.BendPoint;
 import alphatab.model.effects.GraceEffect;
@@ -121,13 +123,13 @@ class Gp4Reader extends Gp3Reader
 
     override private function readBeat(start:Int, measure:Measure, track:Track, voiceIndex:Int) : Int
     {
-        var flags:Int = data.readSignedByte();
+        var flags:SByte = data.readSignedByte();
         
         var beat:Beat = getBeat(measure, start);
         var voice:Voice = beat.voices[voiceIndex];
         
         if ((flags & 0x40) != 0) {
-            var beatType:Int = data.readSignedByte();
+            var beatType:SByte = data.readSignedByte();
             voice.isEmpty = ((beatType & 0x02) == 0);
         }
         
@@ -162,8 +164,8 @@ class Gp4Reader extends Gp3Reader
     
     override private function readNoteEffects(noteEffect:NoteEffect) : Void
     {
-        var flags1:Int = data.readSignedByte();
-        var flags2:Int = data.readSignedByte();
+        var flags1:SByte = data.readSignedByte();
+        var flags2:SByte = data.readSignedByte();
         if ((flags1 & 0x01) != 0) {
             readBend(noteEffect);
         }
@@ -175,7 +177,7 @@ class Gp4Reader extends Gp3Reader
         }
         if ((flags2 & 0x08) != 0) {
             noteEffect.slide = (true);
-            var type:Int = data.readSignedByte();
+            var type:SByte = data.readSignedByte();
             switch (type) {
                 case 1:
                     noteEffect.slideType = SlideType.FastSlideTo;
@@ -206,8 +208,8 @@ class Gp4Reader extends Gp3Reader
     
     private function readTrill(noteEffect:NoteEffect) : Void
     {
-        var fret:Int = data.readSignedByte();
-        var period:Int = data.readSignedByte();
+        var fret:SByte = data.readSignedByte();
+        var period:SByte = data.readSignedByte();
         var trill:TrillEffect = factory.newTrillEffect();
         trill.fret = (fret);
         switch (period) {
@@ -225,7 +227,7 @@ class Gp4Reader extends Gp3Reader
     
     private function readArtificialHarmonic(noteEffect:NoteEffect) : Void
     {
-        var type:Int = data.readSignedByte();
+        var type:SByte = data.readSignedByte();
         var oHarmonic:HarmonicEffect = factory.newHarmonicEffect();
         oHarmonic.data = 0;
         switch (type) {
@@ -259,7 +261,7 @@ class Gp4Reader extends Gp3Reader
     
     private function readTremoloPicking(noteEffect:NoteEffect) : Void
     {
-        var value:Int = data.readSignedByte();
+        var value:SByte = data.readSignedByte();
         var tp:TremoloPickingEffect = factory.newTremoloPickingEffect();
         switch (value) {
             case 1:
@@ -323,7 +325,7 @@ class Gp4Reader extends Gp3Reader
             tableChange.tempo = null;
         
         
-        var allTracksFlags:Int = data.readSignedByte();
+        var allTracksFlags:SByte = data.readSignedByte();
         if (tableChange.volume != null) 
             tableChange.volume.allTracks = (allTracksFlags & 0x01) != 0;
         if (tableChange.balance != null) 
@@ -344,12 +346,12 @@ class Gp4Reader extends Gp3Reader
     
     override private function readBeatEffects(beat:Beat, effect:NoteEffect)  : Void
     {
-        var flags1:Int = data.readSignedByte();
-        var flags2:Int = data.readSignedByte();
+        var flags1:SByte = data.readSignedByte();
+        var flags2:SByte = data.readSignedByte();
         beat.effect.fadeIn = (((flags1 & 0x10) != 0));
         beat.effect.vibrato = (((flags1 & 0x02) != 0)) || beat.effect.vibrato;
         if ((flags1 & 0x20) != 0) {
-            var slapEffect:Int = data.readSignedByte();
+            var slapEffect:SByte = data.readSignedByte();
             beat.effect.tapping = (slapEffect == 1);
             beat.effect.slapping = (slapEffect == 2);
             beat.effect.popping = (slapEffect == 3);
@@ -358,8 +360,8 @@ class Gp4Reader extends Gp3Reader
             readTremoloBar(beat.effect);
         }
         if ((flags1 & 0x40) != 0) {
-            var strokeUp:Int = data.readSignedByte();
-            var strokeDown:Int = data.readSignedByte();
+            var strokeUp:SByte = data.readSignedByte();
+            var strokeDown:SByte = data.readSignedByte();
             if (strokeUp > 0) {
                 beat.effect.stroke.direction = BeatStrokeDirection.Up;
                 beat.effect.stroke.value = (Gp3Reader.toStrokeValue(strokeUp));

@@ -22,6 +22,8 @@ import haxe.FastList;
 
 class MidiTrack 
 {
+    public var index:Int;
+    public var file:MidiFile;
     public var firstEvent:MidiEvent;
     public var lastEvent:MidiEvent;
     
@@ -32,6 +34,7 @@ class MidiTrack
     
     public function addEvent(newEvent:MidiEvent)
     {
+        newEvent.track = this;
         // first entry 
         if (firstEvent == null) 
         {

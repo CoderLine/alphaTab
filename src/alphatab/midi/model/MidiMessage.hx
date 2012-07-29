@@ -15,14 +15,16 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.midi.model;
+import alphatab.io.Byte;
 import alphatab.io.DataOutputStream;
 import alphatab.io.OutputStream;
 
 class MidiMessage
 {
-    public var data:Array<Int>;
+    public var event:MidiEvent;
+    public var data:Array<Byte>;
     
-    public function new(data:Array<Int>)
+    public function new(data:Array<Byte>)
     {
         this.data = data;
     }

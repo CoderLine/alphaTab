@@ -1,4 +1,5 @@
 package alphatab.io;
+import haxe.Int64;
 
 /**
  * This utility allows writing of datatypes to a stream instance. 
@@ -24,7 +25,7 @@ class DataOutputStream extends OutputStream
         this.bigEndian = bigEndian;
     }
     
-    private function writeEndianAware(value:Array<Int>)
+    private function writeEndianAware(value:Array<Byte>)
     {
         if (!bigEndian)
         {
@@ -77,7 +78,8 @@ class DataOutputStream extends OutputStream
         
         var exp = Math.floor(Math.log(Math.abs(value)) / LN2);
         var sig : Int = Math.floor(Math.abs(value) / Math.pow(2, exp) * Math.pow(2, 52));
-        var sig_h = (sig & cast 34359738367);
+		var mask = (7 << 32) | (255 << 24) | (255 << 8) | 255;
+        var sig_h = (sig & mask);
         var sig_l = Math.floor((sig / Math.pow(2,32)));
         var b1 = (exp + 0x3FF) >> 4 | (exp>0 ? ((value<0) ? 1<<7 : 1<<6) : ((value<0) ? 1<<7 : 0)),
             b2 = (exp + 0x3FF) << 4 & 0xFF | (sig_l >> 16 & 0xF),
@@ -91,12 +93,12 @@ class DataOutputStream extends OutputStream
         writeEndianAware([b1, b2, b3, b4, b5, b6, b7, b8]);
     } 
     
-    public override function writeByte(data:Int) 
+    public override function writeByte(data:Byte) 
     {
         _stream.writeByte(data);
     }
     
-    public override function writeBytes(data:Array<Int>) 
+    public override function writeBytes(data:Array<Byte>) 
     {
         _stream.writeBytes(data);
     }

@@ -15,11 +15,13 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.midi.model;
+import alphatab.io.Byte;
 import alphatab.io.DataOutputStream;
 import alphatab.io.OutputStream;
 
 class MidiEvent 
 {
+    public var track:MidiTrack;
     public var tick:Int;
     public var nextEvent:MidiEvent;
     public var previousEvent:MidiEvent;
@@ -30,6 +32,7 @@ class MidiEvent
     {   
         this.tick = tick;
         this.message = message;
+        this.message.event = this;
     }
     
     public function getDeltaTicks()
@@ -45,7 +48,7 @@ class MidiEvent
     {
         // deltatime
         var delta = getDeltaTicks();
-        var data = new Array<Int>();
+        var data = new Array<Byte>();
         MidiFile.writeVariableLengthValue(data, delta);
         out.writeBytes(data);
         

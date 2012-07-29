@@ -146,19 +146,19 @@ class DocumentParser
                 var tempo = tempoAutomation.value[0];
                 if(tempoAutomation.value[1] == 1)
                 {
-                    tempo = Math.floor(tempo / 2);
+                    tempo = Std.int(tempo / 2);
                 }
                 else if(tempoAutomation.value[1] == 3)
                 {
-                    tempo = Math.floor(tempo + (tempo / 2));
+                    tempo = Std.int(tempo + (tempo / 2));
                 }
                 else if(tempoAutomation.value[1] == 4)
                 {
-                    tempo = Math.floor(tempo * 2);
+                    tempo = Std.int(tempo * 2);
                 }
                 else if(tempoAutomation.value[1] == 5)
                 {
-                    tempo = Math.floor(tempo + (tempo * 2));
+                    tempo = Std.int(tempo + (tempo * 2));
                 }
                 measureHeader.tempo.value = tempo;
             }

@@ -15,6 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.midi;
+import alphatab.io.Byte;
 import alphatab.model.Duration;
 import alphatab.model.TimeSignature;
 
@@ -25,25 +26,39 @@ class MidiSequenceDataHandler  implements MidiSequenceHandler
 {
     private var _commands:Array<String>;
     private var _ticksSoFar:Int;
+    private var _infoTrack:Int;
+    private var _metronomeTrack:Int;
 
     public var commands(default, default):String;
-    public var infoTrack:Int;
-    public var metronomeTrack:Int;
 
 
     public function new(tracks:Int)
     {
-        infoTrack = 0;
+        _infoTrack = 0;
         _ticksSoFar=0;
-        metronomeTrack = tracks - 1;
+        _metronomeTrack = tracks - 1;
         _commands = new Array<String>();
     }
     
-    public function resetTicks() {
+	public function getInfoTrack():Int
+	{
+		return _infoTrack;
+	}
+    
+    public function getMetronomeTrack():Int
+	{
+		return _metronomeTrack;
+	}
+
+	
+	
+    public function resetTicks() 
+	{
         _ticksSoFar=0;
     }
     
-    public function getTicks() {
+    public function getTicks() 
+	{
         return _ticksSoFar;
     }
     
@@ -56,32 +71,32 @@ class MidiSequenceDataHandler  implements MidiSequenceHandler
         }
     }
 
-    public function addControlChange(tick:Int, track:Int, channel:Int, controller:Int, value:Int):Void
+    public function addControlChange(tick:Int, track:Int, channel:Byte, controller:Byte, value:Byte):Void
     {
         addEvent(track, tick, MidiMessageDataUtils.controlChange(channel, controller, value));
     }
     
-    public function addNoteOff(tick:Int, track:Int, channel:Int, note:Int, velocity:Int):Void
+    public function addNoteOff(tick:Int, track:Int, channel:Byte, note:Byte, velocity:Byte):Void
     {
         addEvent(track, tick, MidiMessageDataUtils.noteOff(channel, note, velocity));
     }
     
-    public function addNoteOn(tick:Int, track:Int, channel:Int, note:Int, velocity:Int):Void
+    public function addNoteOn(tick:Int, track:Int, channel:Byte, note:Byte, velocity:Byte):Void
     {
         addEvent(track, tick, MidiMessageDataUtils.noteOn(channel, note, velocity));
     }
     
-    public function addRest(tick:Int, track:Int, channel:Int):Void
+    public function addRest(tick:Int, track:Int, channel:Byte):Void
     {
         addEvent(track, tick, MidiMessageDataUtils.rest());
     }
     
-    public function addPitchBend(tick:Int, track:Int, channel:Int, value:Int):Void
+    public function addPitchBend(tick:Int, track:Int, channel:Byte, value:Byte):Void
     {
         addEvent(track, tick, MidiMessageDataUtils.pitchBend(channel, value));
     }
     
-    public function addProgramChange(tick:Int, track:Int, channel:Int, instrument:Int):Void
+    public function addProgramChange(tick:Int, track:Int, channel:Byte, instrument:Byte):Void
     {
         addEvent(track, tick, MidiMessageDataUtils.programChange(channel, instrument));
     }
@@ -98,6 +113,6 @@ class MidiSequenceDataHandler  implements MidiSequenceHandler
     
     public function notifyFinish():Void
     {
-        commands = MidiMessageDataUtils.intToString(metronomeTrack) + ";" + _commands.join(";");
+        commands = MidiMessageDataUtils.intToString(_metronomeTrack) + ";" + _commands.join(";");
     }
 }

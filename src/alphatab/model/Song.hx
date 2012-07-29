@@ -22,6 +22,8 @@ package alphatab.model;
  */
 class Song
 {
+	private var _currentRepeatGroup:RepeatGroup;
+		
     /**
      * The title of the song. 
      */
@@ -135,6 +137,7 @@ class Song
         tab = "";
         instructions = "";
         notice = "";
+		_currentRepeatGroup = new RepeatGroup();
     }
     
     /**
@@ -145,7 +148,17 @@ class Song
     {
         header.song = this;
         measureHeaders.push(header);
-    }
+		
+		// if the group is closed only the next upcoming header can
+		// reopen the group in case of a repeat alternative, so we 
+		// remove the current group 
+		if (header.isRepeatOpen || (_currentRepeatGroup.isClosed && header.repeatAlternative <= 0))
+		{
+			_currentRepeatGroup = new RepeatGroup();
+		}
+			
+		_currentRepeatGroup.addMeasureHeader(header);		
+	}
     
     /**
      * Adds a new track to the song. 

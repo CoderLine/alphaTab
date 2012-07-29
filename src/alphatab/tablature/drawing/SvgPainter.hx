@@ -57,99 +57,106 @@ class SvgPainter
     
     private function parseCommand() 
     {
-        var command = this.getString();
-        switch (command) {
-            case "M": // absolute moveto
-                _currentPosition.x = (_x + this.getNumber() * _xScale);
-                _currentPosition.y = (_y + this.getNumber() * _yScale);
-                _layer.moveTo(_currentPosition.x, _currentPosition.y);
-            case "m": // relative moveto
-                _currentPosition.x += (this.getNumber() * _xScale);
-                _currentPosition.y += (this.getNumber() * _yScale);
-                _layer.moveTo(_currentPosition.x, _currentPosition.y);
-            case "z":
-            case "Z": // closePath
-                _layer.closeFigure();
-            case "L": // absolute lineTo
-                var isNextNumber = true;
-                do {
-                    _currentPosition.x = (_x + this.getNumber() * _xScale);
-                    _currentPosition.y = (_y + this.getNumber() * _yScale);
-                    _layer.lineTo(_currentPosition.x, _currentPosition.y);
-                    isNextNumber = !this.isNextCommand();
-                }
-                while (isNextNumber);
-            case "l": // relative lineTo
-                var isNextNumber = true;
-                do {
-                    _currentPosition.x += (this.getNumber() * _xScale);
-                    _currentPosition.y += (this.getNumber() * _yScale);
-                    _layer.lineTo(_currentPosition.x, _currentPosition.y);
-                    isNextNumber = !this.isNextCommand();
-                }
-                while (isNextNumber);
-            case "C": // absolute bezierTo
-                var isNextNumber = true;
-                do {
-                    var x1:Float = (_x + this.getNumber() * _xScale);
-                    var y1:Float = (_y + this.getNumber() * _yScale);
-                    var x2:Float = (_x + this.getNumber() * _xScale);
-                    var y2:Float = (_y + this.getNumber() * _yScale);
-                    var x3:Float = (_x + this.getNumber() * _xScale);
-                    var y3:Float = (_y + this.getNumber() * _yScale);
-                    _currentPosition.x = (x3);
-                    _currentPosition.y = (y3);
-                    _layer.bezierTo(x1, y1, x2, y2, x3, y3);
-                    isNextNumber = !this.isNextCommand();
-                }
-                while (isNextNumber);
-            case "c": // relative bezierTo
-                var isNextNumber = true;
-                do {
-                    var x1:Float= (_currentPosition.x + this.getNumber() * _xScale);
-                    var y1:Float = (_currentPosition.y + this.getNumber() * _yScale);
-                    var x2:Float = (_currentPosition.x + this.getNumber() * _xScale);
-                    var y2:Float = (_currentPosition.y + this.getNumber() * _yScale);
-                    var x3:Float = (_currentPosition.x + this.getNumber() * _xScale);
-                    var y3:Float = (_currentPosition.y + this.getNumber() * _yScale);
-                    _currentPosition.x = x3;
-                    _currentPosition.y = y3;
-                    _layer.bezierTo(x1, y1, x2, y2, x3, y3);
-                    isNextNumber = !this.isNextCommand();
-                }
-                while (isNextNumber && _currentIndex < _token.length);
-            case "Q": // absolute quadraticCurveTo
-                var isNextNumber = true;
-                do {
-                    var x1:Float = (_x + this.getNumber() * _xScale);
-                    var y1:Float = (_y + this.getNumber() * _yScale);
-                    var x2:Float = (_x + this.getNumber() * _xScale);
-                    var y2:Float = (_y + this.getNumber() * _yScale);
-                    _currentPosition.x = x2;
-                    _currentPosition.y = y2;
-                    _layer.quadraticCurveTo(x1, y1, x2, y2);
-                    isNextNumber = !this.isNextCommand();
-                }
-                while (isNextNumber);
-            case "q": // relative quadraticCurveTo
-                var isNextNumber = true;
-                do {
-                    var x1:Float = (_currentPosition.x + this.getNumber() * _xScale);
-                    var y1:Float = (_currentPosition.y + this.getNumber() * _yScale);
-                    var x2:Float = (_currentPosition.x + this.getNumber() * _xScale);
-                    var y2:Float = (_currentPosition.y + this.getNumber() * _yScale);
-                    _currentPosition.x = x2;
-                    _currentPosition.y = y2;
-                    _layer.quadraticCurveTo(x1, y1, x2, y2);
-                    isNextNumber = !this.isNextCommand();
-                }
-                while (isNextNumber && _currentIndex < _token.length);
-        }
+		try
+		{
+			var command = this.getString();
+			switch (command) {
+				case "M": // absolute moveto
+					_currentPosition.x = (_x + this.getNumber() * _xScale);
+					_currentPosition.y = (_y + this.getNumber() * _yScale);
+					_layer.moveTo(_currentPosition.x, _currentPosition.y);
+				case "m": // relative moveto
+					_currentPosition.x += (this.getNumber() * _xScale);
+					_currentPosition.y += (this.getNumber() * _yScale);
+					_layer.moveTo(_currentPosition.x, _currentPosition.y);
+				case "z":
+				case "Z": // closePath
+					_layer.closeFigure();
+				case "L": // absolute lineTo
+					var isNextNumber = true;
+					do {
+						_currentPosition.x = (_x + this.getNumber() * _xScale);
+						_currentPosition.y = (_y + this.getNumber() * _yScale);
+						_layer.lineTo(_currentPosition.x, _currentPosition.y);
+						isNextNumber = !this.isNextCommand();
+					}
+					while (isNextNumber);
+				case "l": // relative lineTo
+					var isNextNumber = true;
+					do {
+						_currentPosition.x += (this.getNumber() * _xScale);
+						_currentPosition.y += (this.getNumber() * _yScale);
+						_layer.lineTo(_currentPosition.x, _currentPosition.y);
+						isNextNumber = !this.isNextCommand();
+					}
+					while (isNextNumber);
+				case "C": // absolute bezierTo
+					var isNextNumber = true;
+					do {
+						var x1:Float = (_x + this.getNumber() * _xScale);
+						var y1:Float = (_y + this.getNumber() * _yScale);
+						var x2:Float = (_x + this.getNumber() * _xScale);
+						var y2:Float = (_y + this.getNumber() * _yScale);
+						var x3:Float = (_x + this.getNumber() * _xScale);
+						var y3:Float = (_y + this.getNumber() * _yScale);
+						_currentPosition.x = (x3);
+						_currentPosition.y = (y3);
+						_layer.bezierTo(x1, y1, x2, y2, x3, y3);
+						isNextNumber = !this.isNextCommand();
+					}
+					while (isNextNumber);
+				case "c": // relative bezierTo
+					var isNextNumber = true;
+					do {
+						var x1:Float= (_currentPosition.x + this.getNumber() * _xScale);
+						var y1:Float = (_currentPosition.y + this.getNumber() * _yScale);
+						var x2:Float = (_currentPosition.x + this.getNumber() * _xScale);
+						var y2:Float = (_currentPosition.y + this.getNumber() * _yScale);
+						var x3:Float = (_currentPosition.x + this.getNumber() * _xScale);
+						var y3:Float = (_currentPosition.y + this.getNumber() * _yScale);
+						_currentPosition.x = x3;
+						_currentPosition.y = y3;
+						_layer.bezierTo(x1, y1, x2, y2, x3, y3);
+						isNextNumber = !this.isNextCommand();
+					}
+					while (isNextNumber && _currentIndex < _token.length);
+				case "Q": // absolute quadraticCurveTo
+					var isNextNumber = true;
+					do {
+						var x1:Float = (_x + this.getNumber() * _xScale);
+						var y1:Float = (_y + this.getNumber() * _yScale);
+						var x2:Float = (_x + this.getNumber() * _xScale);
+						var y2:Float = (_y + this.getNumber() * _yScale);
+						_currentPosition.x = x2;
+						_currentPosition.y = y2;
+						_layer.quadraticCurveTo(x1, y1, x2, y2);
+						isNextNumber = !this.isNextCommand();
+					}
+					while (isNextNumber);
+				case "q": // relative quadraticCurveTo
+					var isNextNumber = true;
+					do {
+						var x1:Float = (_currentPosition.x + this.getNumber() * _xScale);
+						var y1:Float = (_currentPosition.y + this.getNumber() * _yScale);
+						var x2:Float = (_currentPosition.x + this.getNumber() * _xScale);
+						var y2:Float = (_currentPosition.y + this.getNumber() * _yScale);
+						_currentPosition.x = x2;
+						_currentPosition.y = y2;
+						_layer.quadraticCurveTo(x1, y1, x2, y2);
+						isNextNumber = !this.isNextCommand();
+					}
+					while (isNextNumber && _currentIndex < _token.length);
+			}
+		}
+		catch (e:Dynamic)
+		{
+			_currentIndex = _token.length;
+		}
     }
     
     private function getNumber() : Float
     {
-        return Std.parseFloat(_token[_currentIndex++]);
+        return Std.parseFloat(getString());
     }
     
     private function isNextCommand() : Bool
@@ -178,6 +185,10 @@ class SvgPainter
     }
     private function getString() : String
     {
-        return _token[_currentIndex++];
+		if (_currentIndex < _token.length)
+		{
+			return _token[_currentIndex++];
+		}
+        return throw "EOF";
     }
 }

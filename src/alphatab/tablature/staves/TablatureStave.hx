@@ -472,7 +472,7 @@ class TablatureStave extends Stave
     
     private function getNoteTablaturePosY(layout:ViewLayout, note:NoteDrawing)
     {
-        return spacing.get(Tablature) + Math.round((note.string - 1) * layout.stringSpacing);
+        return spacing.get(Tablature) + Std.int((note.string - 1) * layout.stringSpacing);
     }
     
     private function paintVoiceEffects(layout:ViewLayout, context:DrawingContext, voice:VoiceDrawing, x:Int, y:Int)
@@ -1025,7 +1025,7 @@ class TablatureStave extends Stave
         
         var scale:Float = layout.scale;
         
-        y = cast (y + spacing.get(Tablature) + Math.round((note.string - 1) * layout.stringSpacing)); 
+        y = cast (y + spacing.get(Tablature) + Std.int((note.string - 1) * layout.stringSpacing)); 
        
         x += Math.floor(note.noteSize.x);
         var endX:Float = x + beat.fullWidth();
@@ -1149,7 +1149,7 @@ class TablatureStave extends Stave
         x -= Math.floor(2 * layout.scale);
         
         var topY:Int = y + spacing.get(Tablature);
-        var bottomY:Int = topY + Math.round((beat.measure.track.stringCount() - 1) * layout.stringSpacing);
+        var bottomY:Int = topY + Std.int((beat.measure.track.stringCount() - 1) * layout.stringSpacing);
         
         var layer:DrawingLayer = context.get(DrawingLayers.MainComponentsDraw);
         layer.startFigure();

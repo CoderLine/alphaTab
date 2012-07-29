@@ -50,17 +50,17 @@ class DelegatedInputStream extends InputStream
         return _stream.position();
     }
     
-    public override function readByte():Int 
+    public override function readByte():Byte 
     {
         return _stream.readByte();
     }
     
-    public override function readBytes(count:Int):Array<Int> 
+    public override function readBytes(count:Int):Array<Byte> 
     {
         return _stream.readBytes(count);
     }
     
-    public override function readSignedByte():Int 
+    public override function readSignedByte():SByte 
     {
         return _stream.readSignedByte();
     }

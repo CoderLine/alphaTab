@@ -86,6 +86,26 @@
 	</target>	
     
     <!--*************************************************************************
+        Building Java (Caue) 
+    **************************************************************************-->
+
+    <property name="haxe-java" location="${bin}/java"/>
+	<target name="haxe-java" depends="global-init">
+		<delete dir="${haxe-java}" />
+		<mkdir dir="${haxe-java}" />
+        <exec executable="haxe" failonerror="true">
+            <arg value="-cp" />
+            <arg value="${src}"/>
+            
+            <arg value="-main" />
+            <arg value="alphatab.Main" />
+            
+            <arg value="-java" />
+            <arg value="${haxe-java}" />
+        </exec>
+	</target>	    
+	
+    <!--*************************************************************************
         Building C# 
     **************************************************************************-->
 
@@ -100,17 +120,8 @@
             <arg value="-main" />
             <arg value="alphatab.Main" />
             
-            <arg value="-js" />
+            <arg value="-cs" />
             <arg value="${haxe-cs}" />
-            
-            <arg value="--js-namespace" />
-            <arg value="AlphaTab" />
-        	
-        	<arg value="-D" />
-        	<arg value="cs" />
-            
-        	<arg value="--macro" />
-            <arg value="alphatab.compiler.AlphaTabCsGenerator.use()" />
         </exec>
 	</target>	
    

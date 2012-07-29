@@ -15,6 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.midi.model;
+import alphatab.io.Byte;
 import alphatab.io.DataOutputStream;
 import alphatab.io.OutputStream;
 
@@ -30,8 +31,15 @@ class MidiFile
         tracks = new Array<MidiTrack>();
         for (i in 0 ... trackCount)
         {
-            tracks.push(new MidiTrack());
+            addTrack(new MidiTrack());
         }
+    }
+    
+    public function addTrack(t:MidiTrack)
+    {
+        t.index = tracks.length;
+        t.file = this;
+        tracks.push(t);
     }
     
     public function writeTo(out:OutputStream)
@@ -76,7 +84,7 @@ class MidiFile
     }
     
         
-    public static function writeVariableLengthValue(data:Array<Int>, value:Int)
+    public static function writeVariableLengthValue(data:Array<Byte>, value:Int)
     {
         var v = value;
         var array = [0, 0, 0, 0];

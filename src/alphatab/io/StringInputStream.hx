@@ -30,8 +30,15 @@ class StringInputStream extends InputStream
         _buffer = buffer;
         _pos = 0;
     }
+	
+	public function readString(length:Int) : String
+	{
+		var substr = _buffer.substr(_pos, length);
+		_pos += length;
+		return substr;
+	}
     
-    public override function readByte() : Int
+    public override function readByte() : Byte
     {
         return _buffer.charCodeAt(_pos++) & 0xFF;
     }

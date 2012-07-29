@@ -31,7 +31,7 @@ class OutputStream
      * Writes a 8bit unsigned integer to the stream;
      * @param data the byte value to be written to the stream.
      */
-    public function writeByte(data:Int)
+    public function writeByte(data:Byte)
     {
         
     }    
@@ -39,7 +39,7 @@ class OutputStream
      * Writes a 8bit unsigned integer to the stream;
      * @param data the byte value to be written to the stream.
      */
-    public function writeBytes(data:Array<Int>)
+    public function writeBytes(data:Array<Byte>)
     {
         for (d in data)
         {

@@ -21,12 +21,12 @@ package alphatab.io;
  */
 class MemoryOutputStream extends OutputStream
 {
-    private var _buffer:Array<Int>;
+    private var _buffer:Array<Byte>;
     
     public function new() 
     {
         super();
-        _buffer = new Array<Int>();
+        _buffer = new Array<Byte>();
     }
     
     public function getBuffer()
@@ -34,7 +34,7 @@ class MemoryOutputStream extends OutputStream
         return _buffer;
     }
     
-    public override function writeByte(data:Int) 
+    public override function writeByte(data:Byte) 
     {
         _buffer.push(data & 0xFF);
     }    

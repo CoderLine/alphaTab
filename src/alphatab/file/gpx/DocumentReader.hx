@@ -20,6 +20,7 @@
  */
 package alphatab.file.gpx;
 
+import alphatab.io.Byte;
 import haxe.xml.Fast;
 import alphatab.model.Padding;
 import alphatab.file.gpx.score.GpxAutomation;
@@ -39,7 +40,7 @@ class DocumentReader
     private var _dom:Fast;
     private var _gpxDocument:GpxDocument;
     
-    public function new(stream:Array<Int>)
+    public function new(stream:Array<Byte>)
     {
         var str = "";
         for(i in stream)

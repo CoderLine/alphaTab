@@ -65,6 +65,17 @@ class MidiRepeatController
     {
         var header:MeasureHeader = _song.measureHeaders[index];
         shouldPlay = true;
+		
+		// if the repeat group wasn't closed we reset the repeating 
+		// on the last group opening
+		if (!header.repeatGroup.isClosed && header.repeatGroup.openings[header.repeatGroup.openings.length -1] == header)
+		{
+			_repeatStart = 0;
+			_repeatNumber = 0;
+			_repeatEnd = 0;
+			_repeatOpen = false;
+		}
+		
         if (header.isRepeatOpen)
         {
             _repeatStartIndex = index;

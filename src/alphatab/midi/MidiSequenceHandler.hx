@@ -15,25 +15,26 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.midi;
+import alphatab.io.Byte;
 import alphatab.model.TimeSignature;
 
 interface MidiSequenceHandler 
 {
-    var infoTrack:Int;
+    function getInfoTrack():Int;
     
-    var metronomeTrack:Int;
+    function getMetronomeTrack():Int;
     
-    function addControlChange(tick:Int, track:Int, channel:Int, controller:Int, value:Int):Void;
+    function addControlChange(tick:Int, track:Int, channel:Byte, controller:Byte, value:Byte):Void;
     
-    function addNoteOff(tick:Int, track:Int, channel:Int, note:Int, velocity:Int):Void;
+    function addNoteOff(tick:Int, track:Int, channel:Byte, note:Byte, velocity:Byte):Void;
     
-    function addNoteOn(tick:Int, track:Int, channel:Int, note:Int, velocity:Int):Void;
+    function addNoteOn(tick:Int, track:Int, channel:Byte, note:Byte, velocity:Byte):Void;
     
-    function addRest(tick:Int, track:Int, channel:Int):Void;
+    function addRest(tick:Int, track:Int, channel:Byte):Void;
     
-    function addPitchBend(tick:Int, track:Int, channel:Int, value:Int):Void;
+    function addPitchBend(tick:Int, track:Int, channel:Byte, value:Byte):Void;
     
-    function addProgramChange(tick:Int, track:Int, channel:Int, instrument:Int):Void;
+    function addProgramChange(tick:Int, track:Int, channel:Byte, instrument:Byte):Void;
     
     function addTempoInUSQ(tick:Int, track:Int, usq:Int):Void;
     

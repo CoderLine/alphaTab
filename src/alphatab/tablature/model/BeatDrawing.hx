@@ -217,12 +217,12 @@ class BeatDrawing extends Beat
             md.effectsCache.chord = true;
             effectsCache.chord = true;
         }
-        if (effect.fadeIn != null)
+        if (effect.fadeIn)
         {
             md.effectsCache.fadeIn = true;
             effectsCache.fadeIn = true;
         }
-        if (effect.vibrato != null)
+        if (effect.vibrato)
         {
             md.effectsCache.beatVibrato = true;
             effectsCache.beatVibrato = true;

@@ -63,29 +63,13 @@ class GpReaderBase extends SongReader
             len = size;
         
         var count:Int = (size > 0 ? size : len);
-        var s:String = readStringInternal(count);
+        var s:String = data.readString(count);
         return s.substr(0, (len >= 0 ? len : size));
-    }
-    
-    private function readStringInternal(length:Int) : String
-    {
-        var text:String = "";
-        for (i in 0 ... length)
-        {
-            // TODO: Check for unicode support
-            text += String.fromCharCode(data.readByte());
-        }
-        return text;
     }
 
     public function readIntSizeCheckByteString(charset:String=DEFAULT_CHARSET): String
     {
         var d = (data.readInt() - 1);
-        if (d > 2000)
-        {
-            trace(d);
-            trace(Stack.toString(Stack.callStack()));
-        }
         return readByteSizeString(d, charset);
     }        
     
@@ -127,8 +111,8 @@ class GpReaderBase extends SongReader
     
     public static function toChannelShort(data:Int): Int
     {
-        var value:Int = Math.floor(Math.max(-32768, Math.min(32767, (data*8)-1)));
-        return Math.floor(Math.max(value, -1)) + 1;
+        var value:Int = Std.int(Math.max(-32768, Math.min(32767, (data*8)-1)));
+        return Std.int(Math.max(value, -1)) + 1;
     }
     
 }

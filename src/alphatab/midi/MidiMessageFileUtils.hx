@@ -15,6 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.midi;
+import alphatab.io.Byte;
 import alphatab.midi.model.MidiFile;
 import alphatab.midi.model.MidiMessage;
 import alphatab.model.TimeSignature;
@@ -26,72 +27,72 @@ class MidiMessageFileUtils
 {  
     public static inline var TICK_MOVE:Int = 0x01;
     
-    private static function fixValue(value:Int):Int
+    private static function fixValue(value:Byte):Byte
     {
         if (value < 0) return 0;
         if (value > 127) return 127;
         return value;
     }
     
-    private static function fixChannel(value:Int):Int
+    private static function fixChannel(value:Byte):Byte
     {
         if (value < 0) return 0;
         if (value > 15) return 15;
         return value;
     }
     
-    public static function noteOff(channel:Int, note:Int, velocity:Int):MidiMessage
+    public static function noteOff(channel:Byte, note:Byte, velocity:Byte):MidiMessage
     {
         // NoteOff,Channel,Note,Velocity
         return new MidiMessage([makeCommand(0x80, channel), fixValue(note), fixValue(velocity)]);
     }
     
-    public static function noteOn(channel:Int, note:Int, velocity:Int):MidiMessage
+    public static function noteOn(channel:Byte, note:Byte, velocity:Byte):MidiMessage
     {
         // NoteOn,Channel,Note,Velocity  
         return new MidiMessage([makeCommand(0x90, channel), fixValue(note), fixValue(velocity)]);
     }
      
-    public static inline var REST_MESSAGE:Int = 0x00;
+    public static inline var REST_MESSAGE:Byte = 0x00;
     public static function rest():MidiMessage
     {
         // SysEx 
         return new MidiMessage([0xF0, 0x00, REST_MESSAGE, 0xF7]);
     }
     
-    public static function controlChange(channel:Int, controller:Int, value:Int):MidiMessage 
+    public static function controlChange(channel:Byte, controller:Byte, value:Byte):MidiMessage 
     {
         // ControlChange,Channel,Controller,Value
         return new MidiMessage([makeCommand(0xB0, channel), fixValue(controller), fixValue(value)]);
     }
     
-    public static function programChange(channel:Int, instrument:Int):MidiMessage 
+    public static function programChange(channel:Byte, instrument:Byte):MidiMessage 
     {
         // ProgramChange,Channel,Instrument
         return new MidiMessage([makeCommand(0xC0, channel), fixValue(instrument)]);
     }
     
-    public static function pitchBend(channel:Int, value:Int):MidiMessage
+    public static function pitchBend(channel:Byte, value:Byte):MidiMessage
     {
         // PitchBend,Channel,Value
         return new MidiMessage([makeCommand(0xE0, channel), 0, fixValue(value)]);
     }
     
-    private static function makeCommand(command:Int, channel:Int)
+    private static function makeCommand(command:Byte, channel:Byte)
     {
         return (command & 0xF0) | (channel & 0x0F);
     }
     
-    private static function buildSysexMessage(data:Array<Int> = null)
+    private static function buildSysexMessage(data:Array<Byte> = null)
     {
-        var sysex = new Array<Int>();
+        var sysex = new Array<Byte>();
         
         sysex.push(0xF0);
         // manufacturer
         
         if (data == null)
         {
-            data = new Array<Int>();
+            data = new Array<Byte>();
         }
         data.push(0xF7);
 
@@ -101,9 +102,9 @@ class MidiMessageFileUtils
         return new MidiMessage(sysex);
     }
     
-    private static function buildMetaMessage(metaType:Int, data:Array<Int> = null)
+    private static function buildMetaMessage(metaType:Byte, data:Array<Byte> = null)
     {
-        var meta = new Array<Int>();
+        var meta = new Array<Byte>();
         
         meta.push(0xFF);
         meta.push(metaType & 0xFF);

@@ -19,15 +19,15 @@ package alphatab.io;
 class MemoryInputStream extends InputStream
 {
     private var _pos:Int;
-    private var _buffer:Array<Int>;
+    private var _buffer:Array<Byte>;
     
-    public function new(buffer:Array<Int>) 
+    public function new(buffer:Array<Byte>) 
     {
         _buffer = buffer;
         _pos = 0;
     }
     
-    public override function readByte() : Int
+    public override function readByte() : Byte
     {
         if (_pos >= _buffer.length)
         {

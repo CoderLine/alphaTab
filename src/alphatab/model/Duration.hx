@@ -22,18 +22,18 @@ package alphatab.model;
 class Duration
 {
     // The time resulting with a 64th note and a 3/2 tuplet
-    public static inline var MIN_TIME:Int = Math.floor(Math.floor(Duration.QUARTER_TIME * (4.0 / Duration.SIXTY_FOURTH)) * 2 / 3);
+    public static var MIN_TIME:Int = Math.floor(Math.floor(Duration.QUARTER_TIME * (4.0 / Duration.SIXTY_FOURTH)) * 2 / 3);
 
     
-    public static inline var QUARTER_TIME:Int = 960;
+    public static var QUARTER_TIME:Int = 960;
     
-    public static inline var WHOLE:Int = 1;
-    public static inline var HALF:Int = 2;
-    public static inline var QUARTER:Int = 4;
-    public static inline var EIGHTH:Int = 8;
-    public static inline var SIXTEENTH:Int = 16;
-    public static inline var THIRTY_SECOND:Int = 32;
-    public static inline var SIXTY_FOURTH:Int = 64;
+    public static var WHOLE:Int = 1;
+    public static var HALF:Int = 2;
+    public static var QUARTER:Int = 4;
+    public static var EIGHTH:Int = 8;
+    public static var SIXTEENTH:Int = 16;
+    public static var THIRTY_SECOND:Int = 32;
+    public static var SIXTY_FOURTH:Int = 64;
     
     public var value(default,default):Int;
     public var isDotted(default,default):Bool;

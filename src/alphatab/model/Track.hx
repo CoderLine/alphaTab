@@ -61,11 +61,11 @@ class Track
         channel = factory.newMidiChannel();
         color = Color.fromRgb(255,0,0);
     }
-    
+	
     public function addMeasure(measure:Measure) : Void
     {
         measure.track = this;
         measures.push(measure);
     }
-
+	
 }

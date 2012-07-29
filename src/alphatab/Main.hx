@@ -23,6 +23,10 @@ import alphatab.file.alphatex.AlphaTexParser;
 import alphatab.midi.MidiDataProvider;
 import alphatab.file.alphatex.AlphaTexWriter;
 
+#if jvm
+import alphatab.io.JvmInputStream;
+#end
+
 /**
  * The main entry point of this application.
  */
