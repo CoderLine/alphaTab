@@ -344,19 +344,19 @@ class ScoreBarRenderer extends GlyphBarRenderer
 
         var direction = h.getDirection();
         
-        var topY = getScoreY(getNoteLine(beat.maxNote), correction - 1);
-        var bottomY = getScoreY(getNoteLine(beat.minNote), correction - 1);
+        var topY = getScoreY(getNoteLine(beat.maxNote), correction);
+        var bottomY = getScoreY(getNoteLine(beat.minNote), correction);
 
         var beamY:Int;
         if (direction == Down)
         {
            bottomY += stemSize;
-           beamY = Std.int(bottomY + 3 * getScale());
+           beamY = bottomY;
         }
         else
         {
            topY -= stemSize;
-           beamY = Std.int(topY - 6 * getScale());
+           beamY = topY;
         }
 
         
@@ -371,7 +371,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
         //
         // Draw beam 
         //
-        var gx = Std.int(beatLineX - getScale());
+        var gx = Std.int(beatLineX);
         var glyph = new BeamGlyph(gx, beamY, beat.duration, direction);
 		glyph.renderer = this;
 		glyph.doLayout();

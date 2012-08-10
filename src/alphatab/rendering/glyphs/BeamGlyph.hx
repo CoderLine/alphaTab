@@ -32,8 +32,8 @@ class BeamGlyph extends SvgGlyph
         {
             case Eighth: return MusicFont.FooterEighth;
             case Sixteenth: return MusicFont.FooterSixteenth;
-            //case ThirtySecond: return MusicFont.FooterUpThirtySecond;
-            //case SixtyFourth: return MusicFont.FooterUpSixtyFourth;
+            case ThirtySecond: return MusicFont.FooterThirtySecond;
+            case SixtyFourth: return MusicFont.FooterSixtyFourth;
             default: return "";
         }
 }

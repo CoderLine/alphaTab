@@ -4237,22 +4237,22 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Glyph
 		var correction = 4;
 		var beatLineX = h.getBeatLineX(beat) + this.stave.staveGroup.layout.renderer.scale | 0;
 		var direction = h.getDirection();
-		var topY = this.getScoreY(this.getNoteLine(beat.maxNote),correction - 1);
-		var bottomY = this.getScoreY(this.getNoteLine(beat.minNote),correction - 1);
+		var topY = this.getScoreY(this.getNoteLine(beat.maxNote),correction);
+		var bottomY = this.getScoreY(this.getNoteLine(beat.minNote),correction);
 		var beamY;
 		if(direction == alphatab.rendering.utils.BeamDirection.Down) {
 			bottomY += stemSize;
-			beamY = bottomY + 3 * this.stave.staveGroup.layout.renderer.scale | 0;
+			beamY = bottomY;
 		} else {
 			topY -= stemSize;
-			beamY = topY - 6 * this.stave.staveGroup.layout.renderer.scale | 0;
+			beamY = topY;
 		}
 		canvas.setColor(this.stave.staveGroup.layout.renderer.renderingResources.mainGlyphColor);
 		canvas.beginPath();
 		canvas.moveTo(cx + this.x + beatLineX | 0,cy + this.y + topY);
 		canvas.lineTo(cx + this.x + beatLineX | 0,cy + this.y + bottomY);
 		canvas.stroke();
-		var gx = beatLineX - this.stave.staveGroup.layout.renderer.scale | 0;
+		var gx = beatLineX | 0;
 		var glyph = new alphatab.rendering.glyphs.BeamGlyph(gx,beamY,beat.duration,direction);
 		glyph.renderer = this;
 		glyph.doLayout();
@@ -4925,6 +4925,10 @@ alphatab.rendering.glyphs.BeamGlyph.prototype = $extend(alphatab.rendering.glyph
 			return alphatab.rendering.glyphs.MusicFont.FooterEighth;
 		case 4:
 			return alphatab.rendering.glyphs.MusicFont.FooterSixteenth;
+		case 5:
+			return alphatab.rendering.glyphs.MusicFont.FooterThirtySecond;
+		case 6:
+			return alphatab.rendering.glyphs.MusicFont.FooterSixtyFourth;
 		default:
 			return "";
 		}
