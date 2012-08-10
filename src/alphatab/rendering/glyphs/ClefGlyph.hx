@@ -25,10 +25,10 @@ class ClefGlyph extends SvgGlyph
 	{
 		switch(clef)
 		{
-			case C3: return MusicFont.TenorClef; 
-			case C4: return MusicFont.AltoClef;
-			case F4: return MusicFont.BassClef;
-			case G2: return MusicFont.TrebleClef;
+			case C3: return MusicFont.ClefC; 
+			case C4: return MusicFont.ClefC;
+			case F4: return MusicFont.ClefF;
+			case G2: return MusicFont.ClefG;
 			default: return "";
 		}
 	}

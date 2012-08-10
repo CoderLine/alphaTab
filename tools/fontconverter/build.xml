@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="fontconverter" default="all" basedir=".">
+    <description>
+        a buildfile compiling the fontconverter
+    </description>
+    
+    <!--*************************************************************************
+        Properties
+    **************************************************************************-->
+	
+	<property name="haxe.src" location="haxe/src"/>
+	<property name="haxe.bin" location="haxe/bin"/>
+	<property name="haxe.out" location="${haxe.bin}/glyphs.js"/>
+    
+	<property name="font" location="font/font.svg"/>
+
+    <!--*************************************************************************
+        Targets
+    **************************************************************************-->
+   
+	<target name="all">
+        <echo message="Compiling haxe part" />
+        <exec executable="haxe" failonerror="true">
+            <arg value="-cp" />
+            <arg value="${haxe.src}"/>
+            
+            <arg value="-cp" />
+            <arg value="../../src"/>
+            
+            <arg value="-main" />
+            <arg value="Main" />
+            
+            <arg value="-resource" />
+            <arg value="font/Glyphs.svg@glyphs" />
+            
+            <arg value="-js" />
+            <arg value="${haxe.out}" />
+        </exec>
+
+        <echo message="Done, open ${haxe.bin}/render.html" />
+    </target>	
+</project>

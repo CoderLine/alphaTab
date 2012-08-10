@@ -1,0 +1,9 @@
+# dirs
+/tmp
+/tools/fontconverter/font/*
+/private
+# temps
+.DS_Store 
+*.bak
+~*
+*.lock

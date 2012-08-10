@@ -1,10 +1,12 @@
 package alphatab.rendering.glyphs;
+import alphatab.model.Beat;
 import alphatab.model.Voice;
 import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
 import alphatab.rendering.Glyph;
 import alphatab.rendering.RenderingResources;
 import alphatab.rendering.ScoreBarRenderer;
+import alphatab.rendering.utils.BeamingHelper;
 
 typedef NoteGlyphInfo = {
     glyph:Glyph,
@@ -22,10 +24,17 @@ class NoteChordGlyph extends Glyph
     public var upLineX:Int;
     public var downLineX:Int;
     
+    public var beatEffects:Hash<Glyph>;
+    
+    public var beat:Beat;
+    public var beamingHelper:BeamingHelper;
+
+    
 	public function new(x:Int = 0, y:Int = 0)
     {
         super(x, y);
         _infos = new Array<NoteGlyphInfo>();
+        beatEffects = new Hash<Glyph>();
     }
     
     public function addNoteGlyph(noteGlyph:Glyph, noteLine:Int)
@@ -47,11 +56,15 @@ class NoteChordGlyph extends Glyph
         return false;
     }
     
+    public function updateBeamingHelper() : Void
+    { 
+         beamingHelper.registerBeatLineX(beat, x + upLineX, x + downLineX); 
+    }
+         
     public override function applyGlyphSpacing(spacing:Int):Dynamic 
     {
         super.applyGlyphSpacing(spacing);
-        if(spacingChanged != null)
-            spacingChanged();
+        updateBeamingHelper();
     }
     
     public function hasTopOverflow() : Bool
@@ -131,13 +144,41 @@ class NoteChordGlyph extends Glyph
             downLineX = padding;
         }
 
+        for (e in beatEffects)
+        {
+            e.renderer = renderer;
+            e.doLayout();
+        }
+        
 		width = w + padding;
+        
 	}
 	
 	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
 	{
         var scoreRenderer:ScoreBarRenderer = cast renderer;
+        
+        //
+        // Note Effects only painted once
+        //
+        var effectY = beamingHelper.getDirection() == Up 
+                        ? scoreRenderer.getScoreY(maxNote.line, Std.int(1.5 * NoteHeadGlyph.noteHeadHeight))
+                        : scoreRenderer.getScoreY(minNote.line, Std.int( -0.5 * NoteHeadGlyph.noteHeadHeight));
+         // TODO: take care of actual glyph height
+        var effectSpacing:Int = (beamingHelper.getDirection() == Up) 
+                        ? Std.int(7 * getScale()) 
+                        : Std.int(-7 * getScale());
+        for (g in beatEffects)
+        {
+            g.y = effectY;
+            g.x = Std.int(width / 2);
+            g.paint(cx + x, cy + y, canvas);
+            effectY += effectSpacing;
+        }
+        
         canvas.setColor(renderer.getLayout().renderer.renderingResources.staveLineColor);
+
+        // TODO: Take care of beateffects in overflow
         
         if (hasTopOverflow()) 
         {
@@ -168,12 +209,9 @@ class NoteChordGlyph extends Glyph
             }
         }
 		
-        
         for (g in _infos)
 		{
 			g.glyph.paint(cx + x, cy + y, canvas);
 		}
-        
-
 	}    
 }

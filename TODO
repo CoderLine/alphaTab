@@ -3,10 +3,6 @@ Open
 Triplet Feel (Own Info Line)
 Repeat Alternatives (Own Info Line)
 Chords
-Note Beams
-Note Staves
-Dotted Notes
-Doubledotted Notes
 Tuplets
 Tied Notes
 Note Dynamics
@@ -55,6 +51,7 @@ SVG Rendering Glyph
 Notes
 	Note Accentuations
 Rests
+Note Beams
 
 Elements
 ---------

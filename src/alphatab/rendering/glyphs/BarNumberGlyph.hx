@@ -19,7 +19,7 @@ class BarNumberGlyph extends Glyph
 		width = Std.int(renderer.getLayout().renderer.canvas.measureText(Std.string(_number)) + 3 * getScale());
 	}
     
-    public override function canScale():Dynamic 
+    public override function canScale():Bool 
     {
         return false;
     }

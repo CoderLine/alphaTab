@@ -47,18 +47,18 @@ class GlyphBarRenderer extends BarRendererBase
 	{
 	}
 		
-	private function addGlyph(glyph:Glyph) : Void
+	private function addGlyph(glyph:Glyph, ignoreSize:Bool = false) : Void
 	{
-		glyph.x = width + glyph.x;
+        glyph.x = width + glyph.x;
 		glyph.index = glyphs.length;
 		glyph.renderer = this;
 		glyph.doLayout();
-		if (glyph.x + glyph.width > width)
+		if (!ignoreSize && glyph.x + glyph.width > width)
 		{
 			width = glyph.x + glyph.width;
 		}
 		glyphs.push(glyph);
-        if (glyph.canScale())
+        if (!ignoreSize && glyph.canScale())
         {
             scaleGlyphs.push(glyph);
         }

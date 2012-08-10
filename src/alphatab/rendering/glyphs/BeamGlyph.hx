@@ -6,9 +6,20 @@ class BeamGlyph extends SvgGlyph
 {
 	public function new(x:Int = 0, y:Int = 0, duration:Duration, direction:BeamDirection)
 	{
-		super(x, y, getRestSvg(duration, direction), 1.1, 1.1);
+		super(x, y, getRestSvg(duration, direction), 1.1, getSvgScale(duration, direction));
 	}	
 	
+    private function getSvgScale(duration:Duration, direction:BeamDirection)
+    {
+        if (direction == Up)
+        {
+            return 1;
+        }
+        else
+        {
+            return -1;
+        }
+    }
 		
 	public override function doLayout():Void 
 	{
@@ -17,27 +28,13 @@ class BeamGlyph extends SvgGlyph
 	
 	private function getRestSvg(duration:Duration, direction:BeamDirection) : String
 	{
-        if (direction == Up)
+        switch(duration)
         {
-            switch(duration)
-            {
-                case Eighth: return MusicFont.FooterUpEighth;
-                case Sixteenth: return MusicFont.FooterUpSixteenth;
-                case ThirtySecond: return MusicFont.FooterUpThirtySecond;
-                case SixtyFourth: return MusicFont.FooterUpSixtyFourth;
-                default: return "";
-            }
+            case Eighth: return MusicFont.FooterEighth;
+            case Sixteenth: return MusicFont.FooterSixteenth;
+            //case ThirtySecond: return MusicFont.FooterUpThirtySecond;
+            //case SixtyFourth: return MusicFont.FooterUpSixtyFourth;
+            default: return "";
         }
-        else
-        {
-            switch(duration)
-            {
-                case Eighth: return MusicFont.FooterDownEighth;
-                case Sixteenth: return MusicFont.FooterDownSixteenth;
-                case ThirtySecond: return MusicFont.FooterDownThirtySecond;
-                case SixtyFourth: return MusicFont.FooterDownSixtyFourth;
-                default: return "";
-            }
-        }
-	}
+}
 }

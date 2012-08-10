@@ -1,5 +1,4 @@
 package alphatab.rendering.utils;
-import alphatab.AlphaTestRunner;
 import alphatab.audio.MidiUtils;
 import alphatab.model.Bar;
 import alphatab.model.Beat;

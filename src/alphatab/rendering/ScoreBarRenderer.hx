@@ -15,6 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.rendering;
+import alphatab.model.AccentuationType;
 import alphatab.model.Beat;
 import alphatab.model.Clef;
 import alphatab.model.Duration;
@@ -24,6 +25,7 @@ import alphatab.model.Voice;
 import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
 import alphatab.platform.svg.SvgCanvas;
+import alphatab.rendering.glyphs.AccentuationGlyph;
 import alphatab.rendering.glyphs.AccidentalGroupGlyph;
 import alphatab.rendering.glyphs.BarNumberGlyph;
 import alphatab.rendering.glyphs.BarSeperatorGlyph;
@@ -84,18 +86,20 @@ class ScoreBarRenderer extends GlyphBarRenderer
     /**
      * The step offsets of sharp symbols for sharp key signatures.
      */
-    private static var SHARP_KS_STEPS:Array<Int> = [ 0, 3, -1, 2, 5, 1, 4 ];
+    private static var SHARP_KS_STEPS:Array<Int> = [ 1, 4, 0, 3, 6, 2, 5 ];
     
     /**
      * The step offsets of sharp symbols for flat key signatures.
      */
-    private static var FLAT_KS_STEPS:Array<Int> = [ 4, 1, 5, 2, 6, 3, 7 ];
+    private static var FLAT_KS_STEPS:Array<Int> = [ 7, 4, 8, 5, 9, 6, 10 ];
 
 	
 	private static inline var LineSpacing = 8;
     private var _accidentalHelper:AccidentalHelper;
     private var _beamHelpers:Array<BeamingHelper>;
+    
     private var _currentBeamHelper:BeamingHelper;
+    
     
 	public function new(bar:alphatab.model.Bar) 
 	{
@@ -437,12 +441,14 @@ class ScoreBarRenderer extends GlyphBarRenderer
 			var offset = 0;
 			switch(_bar.clef)
 			{
-				case F4,C3: offset = 2;
-				case C4: offset = 0;
+				case F4: offset = 1;
+                case C3: offset = 6; 
+				case C4: offset = 4;
+				case G2: offset = 5; 
 				default: offset = 0;
 			}
 			createStartSpacing();
-			addGlyph(new ClefGlyph(0, getScoreY(offset, -1), _bar.clef));
+			addGlyph(new ClefGlyph(0, getScoreY(offset), _bar.clef));
 		}
 		
 		// Key signature
@@ -579,16 +585,14 @@ class ScoreBarRenderer extends GlyphBarRenderer
             // Note heads
             //
             var noteglyphs:NoteChordGlyph = new NoteChordGlyph();
+            noteglyphs.beat = b;
+            noteglyphs.beamingHelper = _currentBeamHelper;
             noteLoop( function(n) {
                 createNoteGlyph(n, noteglyphs);
             });
-            addGlyph(noteglyphs);
-            var currentBeamHelper = _currentBeamHelper;
-            noteglyphs.spacingChanged = function() {
-                currentBeamHelper.registerBeatLineX(b, noteglyphs.x + noteglyphs.upLineX, noteglyphs.x + noteglyphs.downLineX); 
-            }
-            noteglyphs.spacingChanged();
-            
+            addGlyph(noteglyphs);            
+            noteglyphs.updateBeamingHelper();
+
             //
             // Note dots
             //
@@ -683,6 +687,20 @@ class ScoreBarRenderer extends GlyphBarRenderer
         noteHeadGlyph.y = getScoreY(line, -1);
         
         noteglyphs.addNoteGlyph(noteHeadGlyph, line);
+        
+        if (n.isStaccato && !noteglyphs.beatEffects.exists("STACCATO"))
+        {
+            noteglyphs.beatEffects.set("STACCATO",  new CircleGlyph(0, 0, 1.5));
+        }
+        
+        if (n.accentuated == AccentuationType.Normal && !noteglyphs.beatEffects.exists("ACCENT"))
+        {
+            noteglyphs.beatEffects.set("ACCENT",  new AccentuationGlyph(0, 0, AccentuationType.Normal));
+        }
+        if (n.accentuated == AccentuationType.Heavy && !noteglyphs.beatEffects.exists("HACCENT"))
+        {
+            noteglyphs.beatEffects.set("HACCENT",  new AccentuationGlyph(0, 0, AccentuationType.Heavy));
+        }
     }
     
     private function createAccidentalGlyph(n:Note, accidentals:AccidentalGroupGlyph)
