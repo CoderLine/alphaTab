@@ -91,7 +91,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
     /**
      * The step offsets of sharp symbols for flat key signatures.
      */
-    private static var FLAT_KS_STEPS:Array<Int> = [ 7, 4, 8, 5, 9, 6, 10 ];
+    private static var FLAT_KS_STEPS:Array<Int> = [ 5, 2, 6, 3, 7, 4, 8 ];
 
 	
 	private static inline var LineSpacing = 8;
