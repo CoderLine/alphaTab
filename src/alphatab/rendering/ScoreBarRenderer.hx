@@ -702,9 +702,9 @@ class ScoreBarRenderer extends GlyphBarRenderer
         var accidental = _accidentalHelper.applyAccidental(n, noteLine);
         switch (accidental) 
         {
-            case Sharp:   accidentals.addGlyph(new SharpGlyph(0, getScoreY(noteLine - NOTE_STEP_CORRECTION)));
-            case Flat:    accidentals.addGlyph(new FlatGlyph(0, getScoreY(noteLine - NOTE_STEP_CORRECTION)));
-            case Natural: accidentals.addGlyph(new NaturalizeGlyph(0, getScoreY(noteLine - NOTE_STEP_CORRECTION)));
+            case Sharp:   accidentals.addGlyph(new SharpGlyph(0, getScoreY(noteLine)));
+            case Flat:    accidentals.addGlyph(new FlatGlyph(0, getScoreY(noteLine)));
+            case Natural: accidentals.addGlyph(new NaturalizeGlyph(0, getScoreY(noteLine + 1)));
             default:
         }
     }
