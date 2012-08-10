@@ -621,34 +621,27 @@ class ScoreBarRenderer extends GlyphBarRenderer
     private function createRestGlyph(b:Beat) : Void
     {
         var line = 0;
-        var correction = 0;
         
         // TODO: the glyphs are really bad aligned, need to recreate the font
         switch(b.duration)
         {
             case Whole:         
-                line = 2;
-                correction = 8;
+                line = 4;
             case Half:          
-                line = 4;
-                correction = 3;
+                line = 5;
             case Quarter:       
-                line = 3;
+                line = 6;
             case Eighth:        
-                line = 4;
-                correction -2;
+                line = 8;
             case Sixteenth:     
-                line = 2;
-                correction -2;
+                line = 8;
             case ThirtySecond:  
-                line = 2;
-                correction -2;
+                line = 8;
             case SixtyFourth:   
-                line = 0;
-                correction -2;
+                line = 8;
         }
         
-        var y = getScoreY(line, correction);
+        var y = getScoreY(line);
 
         addGlyph(new RestGlyph(0, y, b.duration));
     }
