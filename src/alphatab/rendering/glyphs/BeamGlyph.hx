@@ -6,7 +6,7 @@ class BeamGlyph extends SvgGlyph
 {
 	public function new(x:Int = 0, y:Int = 0, duration:Duration, direction:BeamDirection)
 	{
-		super(x, y, getRestSvg(duration, direction), 1.1, getSvgScale(duration, direction));
+		super(x, y, getRestSvg(duration, direction), 1, getSvgScale(duration, direction));
 	}	
 	
     private function getSvgScale(duration:Duration, direction:BeamDirection)

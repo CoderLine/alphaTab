@@ -26,8 +26,8 @@ class SvgGlyph extends Glyph
 	{
 		super(x, y);
 		_svg = new SvgPathParser(svg);
-		_xGlyphScale = xScale * 0.01;
-		_yGlyphScale = yScale * 0.01;
+		_xGlyphScale = xScale * 0.0099;
+		_yGlyphScale = yScale * 0.0099;
 	}
 	
 	public function getSvgData() : String

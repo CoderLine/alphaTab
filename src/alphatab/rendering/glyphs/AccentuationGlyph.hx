@@ -10,7 +10,7 @@ class AccentuationGlyph extends SvgGlyph
 {
 	public function new(x:Int = 0, y:Int = 0, accentuation:AccentuationType)
 	{
-		super(x, y, getSvg(accentuation), 0.8, 0.8);
+		super(x, y, getSvg(accentuation), 1, 1);
 	}	
 	
 		
@@ -28,8 +28,8 @@ class AccentuationGlyph extends SvgGlyph
 	{
 		switch(accentuation)
 		{
-            case Normal: return MusicFont.Accent;
-            case Heavy: return MusicFont.AccentHeavy;
+            case Normal: return MusicFont.Accentuation;
+            case Heavy: return MusicFont.HeavyAccentuation;
             default: return "";
 		}
 	}

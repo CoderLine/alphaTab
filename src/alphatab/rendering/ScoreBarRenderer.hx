@@ -441,10 +441,10 @@ class ScoreBarRenderer extends GlyphBarRenderer
 			var offset = 0;
 			switch(_bar.clef)
 			{
-				case F4: offset = 1;
+				case F4: offset = 4;
                 case C3: offset = 6; 
 				case C4: offset = 4;
-				case G2: offset = 5; 
+				case G2: offset = 6; 
 				default: offset = 0;
 			}
 			createStartSpacing();
@@ -504,7 +504,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
 
 		for (i in 0 ... naturalizeSymbols)
         {
-			addGlyph(new NaturalizeGlyph(0, Std.int(getScoreY(previousKeyPositions[i] + offsetClef, NaturalizeGlyph.CORRECTION))));
+			addGlyph(new NaturalizeGlyph(0, Std.int(getScoreY(previousKeyPositions[i] + offsetClef))));
         }
 		
 		// how many symbols do we need to get from a C-keysignature
@@ -515,7 +515,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
         {  
             for (i in 0 ... Std.int(Math.abs(currentKey)))
             {
-				addGlyph(new SharpGlyph(0, Std.int(getScoreY(SHARP_KS_STEPS[i] + offsetClef, SharpGlyph.CORRECTION))));
+				addGlyph(new SharpGlyph(0, Std.int(getScoreY(SHARP_KS_STEPS[i] + offsetClef))));
             }
         }
         // a flat signature
@@ -523,7 +523,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
         {
             for (i in 0 ... Std.int(Math.abs(currentKey)))
             {
-				addGlyph(new FlatGlyph(0, Std.int(getScoreY(FLAT_KS_STEPS[i] + offsetClef, FlatGlyph.CORRECTION))));
+				addGlyph(new FlatGlyph(0, Std.int(getScoreY(FLAT_KS_STEPS[i] + offsetClef))));
             }
         }		
 	}
@@ -709,9 +709,9 @@ class ScoreBarRenderer extends GlyphBarRenderer
         var accidental = _accidentalHelper.applyAccidental(n, noteLine);
         switch (accidental) 
         {
-            case Sharp:   accidentals.addGlyph(new SharpGlyph(0, getScoreY(noteLine - NOTE_STEP_CORRECTION, SharpGlyph.CORRECTION)));
-            case Flat:    accidentals.addGlyph(new FlatGlyph(0, getScoreY(noteLine - NOTE_STEP_CORRECTION, FlatGlyph.CORRECTION)));
-            case Natural: accidentals.addGlyph(new NaturalizeGlyph(0, getScoreY(noteLine - NOTE_STEP_CORRECTION, NaturalizeGlyph.CORRECTION)));
+            case Sharp:   accidentals.addGlyph(new SharpGlyph(0, getScoreY(noteLine - NOTE_STEP_CORRECTION)));
+            case Flat:    accidentals.addGlyph(new FlatGlyph(0, getScoreY(noteLine - NOTE_STEP_CORRECTION)));
+            case Natural: accidentals.addGlyph(new NaturalizeGlyph(0, getScoreY(noteLine - NOTE_STEP_CORRECTION)));
             default:
         }
     }

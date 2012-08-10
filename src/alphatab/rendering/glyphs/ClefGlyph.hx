@@ -7,7 +7,7 @@ class ClefGlyph extends SvgGlyph
 {
 	public function new(x:Int = 0, y:Int = 0, clef:Clef)
 	{
-		super(x, y, getClefSvg(clef), getClefScale(clef), getClefScale(clef));
+		super(x, y, getClefSvg(clef), 1, 1);
 	}	
 	
 		
@@ -31,14 +31,5 @@ class ClefGlyph extends SvgGlyph
 			case G2: return MusicFont.ClefG;
 			default: return "";
 		}
-	}
-	
-	private function getClefScale(clef:Clef) : Float
-	{
-		switch(clef)
-		{
-			case C3,C4: return 1.1;
-			default: return 1.02; 
-		}	
 	}
 }

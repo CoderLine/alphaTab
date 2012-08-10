@@ -238,7 +238,11 @@ class Main
 				{
 					case "m", "z", "l", "v", "h", "c", "s", "q", "t": // relative paths can remain
 						buf.add(newValue); // TODO: reduce decimals by scaling
-					case "M", "Z", "L", "V", "H", "C", "S", "Q", "T":
+					case "H":
+						buf.add(newValue + calculateTranslation(g.x, zoom / CoordinateScale, zeroX));
+					case "V":
+						buf.add(newValue + calculateTranslation(g.y, zoom / CoordinateScale, zeroY));
+					case "M", "Z", "L", "C", "S", "Q", "T":
 						if (isX) 
 						{
 							buf.add(newValue + calculateTranslation(g.x, zoom / CoordinateScale, zeroX));

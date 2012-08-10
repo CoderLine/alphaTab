@@ -5,7 +5,7 @@ class DigitGlyph extends SvgGlyph
 	private var _digit:Int;
 	public function new(x:Int = 0, y:Int = 0, digit:Int)
 	{
-		super(x, y, getDigit(digit), 1.1, 1.1); 
+		super(x, y, getDigit(digit), 1, 1); 
 		_digit = digit;
 	}	
 	

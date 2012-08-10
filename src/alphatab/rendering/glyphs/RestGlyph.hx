@@ -10,7 +10,7 @@ class RestGlyph extends SvgGlyph
 {
 	public function new(x:Int = 0, y:Int = 0, duration:Duration)
 	{
-		super(x, y, getRestSvg(duration), 1.1, 1.1);
+		super(x, y, getRestSvg(duration), 1, 1);
 	}	
 	
 		
@@ -28,7 +28,7 @@ class RestGlyph extends SvgGlyph
 	{
 		switch(duration)
 		{
-            case Whole, Half: return MusicFont.RestHalf;
+            case Whole, Half: return MusicFont.RestWhole;
             case Quarter: return MusicFont.RestQuarter;
             case Eighth: return MusicFont.RestEighth;
             case Sixteenth: return MusicFont.RestSixteenth;

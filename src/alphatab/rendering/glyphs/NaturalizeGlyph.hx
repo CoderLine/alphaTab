@@ -3,10 +3,9 @@ package alphatab.rendering.glyphs;
 
 class NaturalizeGlyph extends SvgGlyph
 {
-    public static inline var CORRECTION = -2;
 	public function new(x:Int = 0, y:Int = 0)
 	{
-		super(x, y, MusicFont.KeyNatural, 1.2, 1.2); 
+		super(x, y, MusicFont.AccidentalNatural, 1, 1); 
 	}	
 	
 		

@@ -2,11 +2,9 @@ package alphatab.rendering.glyphs;
 
 class FlatGlyph extends SvgGlyph
 {
-    public static inline var CORRECTION = -8;
-
     public function new(x:Int = 0, y:Int = 0)
 	{
-		super(x, y, MusicFont.KeyFlat, 1.2, 1.2); 
+		super(x, y, MusicFont.AccidentalFlat, 1, 1); 
 	}	
 	
 		
