@@ -5254,7 +5254,7 @@ alphatab.rendering.glyphs.NoteHeadGlyph.prototype = $extend(alphatab.rendering.g
 	getNoteSvg: function(duration) {
 		switch( (duration)[1] ) {
 		case 0:
-			return alphatab.rendering.glyphs.MusicFont.NoteHalf;
+			return alphatab.rendering.glyphs.MusicFont.NoteWhole;
 		case 1:
 			return alphatab.rendering.glyphs.MusicFont.NoteHalf;
 		default:

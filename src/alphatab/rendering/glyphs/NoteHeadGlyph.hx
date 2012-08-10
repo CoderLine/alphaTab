@@ -30,7 +30,7 @@ class NoteHeadGlyph extends SvgGlyph
 	{
 		switch(duration)
 		{
-            case Whole: return MusicFont.NoteHalf;
+            case Whole: return MusicFont.NoteWhole;
             case Half: return MusicFont.NoteHalf;
             default: return MusicFont.NoteQuarter;
 		}
