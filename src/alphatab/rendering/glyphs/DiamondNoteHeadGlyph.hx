@@ -7,8 +7,7 @@ class DiamondNoteHeadGlyph extends SvgGlyph
 	public function new(x:Int = 0, y:Int = 0)
 	{
 		super(x, y, MusicFont.NoteHarmonic, 1, 1);
-	}	
-	
+	}		
 		
 	public override function doLayout():Void 
 	{
