@@ -622,7 +622,6 @@ class ScoreBarRenderer extends GlyphBarRenderer
     {
         var line = 0;
         
-        // TODO: the glyphs are really bad aligned, need to recreate the font
         switch(b.duration)
         {
             case Whole:         
