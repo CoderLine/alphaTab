@@ -15,6 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.importer;
+
 import alphatab.model.AccentuationType;
 import alphatab.model.AutomationType;
 import alphatab.model.BrushType;

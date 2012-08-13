@@ -15,6 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.rendering;
+
 import alphatab.model.AccentuationType;
 import alphatab.model.Beat;
 import alphatab.model.Clef;

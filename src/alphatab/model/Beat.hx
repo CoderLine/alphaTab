@@ -15,6 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.model;
+
 import alphatab.audio.MidiUtils;
 
 /**

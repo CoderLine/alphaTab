@@ -15,6 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.rendering.layout;
+
 import alphatab.rendering.ScoreBarRendererFactory;
 import alphatab.rendering.ScoreRenderer;
 import alphatab.rendering.staves.Stave;

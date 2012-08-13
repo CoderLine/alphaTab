@@ -15,6 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.platform;
+
 import alphatab.platform.model.Color;
 import alphatab.platform.model.Font;
 import alphatab.platform.model.TextAlign;

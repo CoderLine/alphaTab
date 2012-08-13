@@ -15,6 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.rendering.glyphs;
+
 import alphatab.rendering.Glyph;
 
 /**
@@ -23,6 +24,7 @@ import alphatab.rendering.Glyph;
 class SpacingGlyph extends Glyph
 {
 	private var _scaling:Bool;
+	
 	public function new(x:Int = 0, y:Int = 0, width:Int, scaling:Bool = true)
 	{
 		super(x, y);

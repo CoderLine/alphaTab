@@ -26,8 +26,6 @@ class Section
     public var text:String;
     
     public function new() 
-    {
-        
-    }
-    
+    {   
+    }  
 }

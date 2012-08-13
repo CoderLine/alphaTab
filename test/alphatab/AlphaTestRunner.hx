@@ -15,6 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab;
+
 import alphatab.importer.Gp3ImporterTest;
 import alphatab.importer.Gp4ImporterTest;
 import alphatab.importer.Gp5ImporterTest;

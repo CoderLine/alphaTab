@@ -15,7 +15,6 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.platform.model;
-import haxe.Int32;
 
 /**
  * A RGB color number which stores the number as a 2 integer variables.
