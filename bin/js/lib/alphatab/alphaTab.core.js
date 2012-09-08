@@ -5132,7 +5132,7 @@ alphatab.rendering.glyphs.NoteChordGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.NoteChordGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
 		var scoreRenderer = this.renderer;
-		var effectY = this.beamingHelper.getDirection() == alphatab.rendering.utils.BeamDirection.Up?scoreRenderer.getScoreY(this.maxNote.line,13):scoreRenderer.getScoreY(this.minNote.line,-4);
+		var effectY = this.beamingHelper.getDirection() == alphatab.rendering.utils.BeamDirection.Up?scoreRenderer.getScoreY(this.maxNote.line,13):scoreRenderer.getScoreY(this.minNote.line,-9);
 		var effectSpacing = this.beamingHelper.getDirection() == alphatab.rendering.utils.BeamDirection.Up?7 * this.renderer.stave.staveGroup.layout.renderer.scale | 0:-7 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 		var $it0 = this.beatEffects.iterator();
 		while( $it0.hasNext() ) {

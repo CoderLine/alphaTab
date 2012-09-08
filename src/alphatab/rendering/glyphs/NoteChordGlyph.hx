@@ -180,11 +180,11 @@ class NoteChordGlyph extends Glyph
         //
         var effectY = beamingHelper.getDirection() == Up 
                         ? scoreRenderer.getScoreY(maxNote.line, Std.int(1.5 * NoteHeadGlyph.noteHeadHeight))
-                        : scoreRenderer.getScoreY(minNote.line, Std.int( -0.5 * NoteHeadGlyph.noteHeadHeight));
+                        : scoreRenderer.getScoreY(minNote.line, Std.int( -1.0 * NoteHeadGlyph.noteHeadHeight));
          // TODO: take care of actual glyph height
         var effectSpacing:Int = (beamingHelper.getDirection() == Up) 
                         ? Std.int(7 * getScale()) 
-                        : Std.int(-7 * getScale());
+                        : Std.int( -7 * getScale());
         for (g in beatEffects)
         {
             g.y = effectY;
