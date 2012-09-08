@@ -95,6 +95,7 @@ class BeamingHelper
     public var maxNote:Note;
     
     public var valueCalculator : Note -> Int;
+	
     
     public function new()
     {

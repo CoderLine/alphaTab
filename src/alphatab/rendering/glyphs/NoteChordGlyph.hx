@@ -17,6 +17,7 @@
 package alphatab.rendering.glyphs;
 
 import alphatab.model.Beat;
+import alphatab.model.Note;
 import alphatab.model.Voice;
 import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
@@ -33,6 +34,7 @@ typedef NoteGlyphInfo = {
 class NoteChordGlyph extends Glyph
 {
     private var _infos:Array<NoteGlyphInfo>;
+	private var _noteLookup:IntHash<Glyph>;
     
     public var minNote:NoteGlyphInfo;
     public var maxNote:NoteGlyphInfo;
@@ -52,12 +54,42 @@ class NoteChordGlyph extends Glyph
         super(x, y);
         _infos = new Array<NoteGlyphInfo>();
         beatEffects = new Hash<Glyph>();
+		_noteLookup = new IntHash<Glyph>();
     }
+	
+	public function getDirection() : BeamDirection
+	{
+		return beamingHelper.getDirection();
+	}	
+	public function getNoteX(note:Note, onEnd:Bool = true) 
+	{
+		if (_noteLookup.exists(note.string)) 
+		{
+			var n = _noteLookup.get(note.string);
+			var pos = x + n.x;
+			if (onEnd) 
+			{
+				pos += n.width;
+			}
+			return pos;
+		}
+		return 0;
+	}
+	
+	public function getNoteY(note:Note) 
+	{
+		if (_noteLookup.exists(note.string)) 
+		{
+			return y + _noteLookup.get(note.string).y;
+		}
+		return 0;
+	}
     
-    public function addNoteGlyph(noteGlyph:Glyph, noteLine:Int)
+    public function addNoteGlyph(noteGlyph:Glyph, note:Note, noteLine:Int)
     {
         var info:NoteGlyphInfo =  { glyph:noteGlyph, line:noteLine }
         _infos.push( info );
+		_noteLookup.set(note.string, noteGlyph);
         if (minNote == null || minNote.line > info.line)
         {
             minNote = info;

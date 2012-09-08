@@ -46,6 +46,7 @@ import alphatab.rendering.glyphs.RepeatCloseGlyph;
 import alphatab.rendering.glyphs.RepeatCountGlyph;
 import alphatab.rendering.glyphs.RepeatOpenGlyph;
 import alphatab.rendering.glyphs.RestGlyph;
+import alphatab.rendering.glyphs.ScoreTieGlyph;
 import alphatab.rendering.glyphs.SharpGlyph;
 import alphatab.rendering.glyphs.SpacingGlyph;
 import alphatab.rendering.glyphs.SvgGlyph;
@@ -98,6 +99,8 @@ class ScoreBarRenderer extends GlyphBarRenderer
 	private static inline var LineSpacing = 8;
     private var _accidentalHelper:AccidentalHelper;
     private var _beamHelpers:Array<BeamingHelper>;
+	
+	private var _beatPosition : IntHash<NoteChordGlyph>;
     
     private var _currentBeamHelper:BeamingHelper;
     
@@ -107,6 +110,37 @@ class ScoreBarRenderer extends GlyphBarRenderer
 		super(bar);
         _accidentalHelper = new AccidentalHelper();
         _beamHelpers = new Array<BeamingHelper>();
+		_beatPosition = new IntHash<NoteChordGlyph>();
+	}
+	
+	public function getBeatDirection(beat:Beat) : BeamDirection
+	{
+		if (_beatPosition.exists(beat.index)) 
+		{
+			var g = _beatPosition.get(beat.index);
+			return g.getDirection();
+		}
+		return BeamDirection.Up;
+	}		
+	
+	public function getNoteX(note:Note, onEnd:Bool=true) 
+	{
+		if (_beatPosition.exists(note.beat.index)) 
+		{
+			var beat = _beatPosition.get(note.beat.index);
+			return beat.getNoteX(note, onEnd);
+		}
+		return 0;
+	}	
+	
+	public function getNoteY(note:Note) 
+	{
+		if (_beatPosition.exists(note.beat.index)) 
+		{
+			var beat = _beatPosition.get(note.beat.index);
+			return beat.getNoteY(note);
+		}
+		return 0;
 	}
 	
 	public override function getTopPadding():Int 
@@ -360,14 +394,11 @@ class ScoreBarRenderer extends GlyphBarRenderer
            beamY = topY;
         }
 
-        
-        
         canvas.setColor(getLayout().renderer.renderingResources.mainGlyphColor);
         canvas.beginPath();
         canvas.moveTo(Std.int(cx + x + beatLineX), cy + y + topY);
         canvas.lineTo(Std.int(cx + x + beatLineX), cy + y + bottomY);
         canvas.stroke();
-
         
         //
         // Draw beam 
@@ -591,6 +622,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
             noteLoop( function(n) {
                 createNoteGlyph(n, noteglyphs);
             });
+			_beatPosition.set(b.index, noteglyphs);
             addGlyph(noteglyphs);            
             noteglyphs.updateBeamingHelper();
 
@@ -678,8 +710,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
         var line = getNoteLine(n);
         
         noteHeadGlyph.y = getScoreY(line, -1);
-        
-        noteglyphs.addNoteGlyph(noteHeadGlyph, line);
+        noteglyphs.addNoteGlyph(noteHeadGlyph, n, line);
         
         if (n.isStaccato && !noteglyphs.beatEffects.exists("STACCATO"))
         {
@@ -694,6 +725,11 @@ class ScoreBarRenderer extends GlyphBarRenderer
         {
             noteglyphs.beatEffects.set("HACCENT",  new AccentuationGlyph(0, 0, AccentuationType.Heavy));
         }
+		
+		if (n.isTieDestination && n.tieOrigin != null) 
+		{
+			addGlyph(new ScoreTieGlyph(n.tieOrigin, n));
+		}
     }
     
     private function createAccidentalGlyph(n:Note, accidentals:AccidentalGroupGlyph)

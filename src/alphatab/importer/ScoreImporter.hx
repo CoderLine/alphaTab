@@ -87,6 +87,7 @@ class ScoreImporter
                                     {
                                         tieOrigin.isTieOrigin = true;
                                         n.fret = tieOrigin.fret;
+										n.tieOrigin = tieOrigin;
                                     }
                                 }
                                 

@@ -40,6 +40,7 @@ class Note
     public var vibrato:VibratoType;
     public var isStaccato:Bool;
     public var tapping:Bool;
+    public var tieOrigin:Note;
     public var isTieOrigin:Bool;
     public var isTieDestination:Bool;
     
