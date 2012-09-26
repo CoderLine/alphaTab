@@ -365,15 +365,15 @@ class AlphaTexParser extends SongReader
         header.number = _song.measureHeaders.length + 1;
         header.start = _song.measureHeaders.length == 0 ? Duration.QUARTER_TIME : 
                                                         _song.measureHeaders[_song.measureHeaders.length - 1].start + _song.measureHeaders[_song.measureHeaders.length - 1].length();
-        _song.addMeasureHeader(header);
         
         var measure:Measure = factory.newMeasure(header);    
         header.tempo.copy(tempo); // takeover current tempo
-        if (header.number > 1) 
+		// copy stuff from previous header if available
+        if (_song.measureHeaders.length > 0) 
         { 
             // takeover clef and keysignature
-            var prevMeasure:Measure = _track.measures[header.number - 2];
-            var prevHeader:MeasureHeader = _song.measureHeaders[header.number - 2];
+            var prevMeasure:Measure = _track.measures[_song.measureHeaders.length - 1];
+            var prevHeader:MeasureHeader = _song.measureHeaders[_song.measureHeaders.length - 1];
             measure.clef = prevMeasure.clef;
             header.keySignature = prevHeader.keySignature;
             header.keySignatureType = prevHeader.keySignatureType; 
@@ -381,6 +381,7 @@ class AlphaTexParser extends SongReader
         }
         measureMeta(measure);
         tempo.copy(header.tempo); // write new tempo on change
+		_song.addMeasureHeader(header);
         _track.addMeasure(measure);
         
         while (_sy != AlphaTexSymbols.Pipe && _sy != AlphaTexSymbols.Eof)

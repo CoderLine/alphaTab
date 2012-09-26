@@ -1715,12 +1715,11 @@ alphatab.file.alphatex.AlphaTexParser.prototype = $extend(alphatab.file.SongRead
 		var header = this.factory.newMeasureHeader();
 		header.number = this._song.measureHeaders.length + 1;
 		header.start = this._song.measureHeaders.length == 0?alphatab.model.Duration.QUARTER_TIME:this._song.measureHeaders[this._song.measureHeaders.length - 1].start + this._song.measureHeaders[this._song.measureHeaders.length - 1].length();
-		this._song.addMeasureHeader(header);
 		var measure = this.factory.newMeasure(header);
 		header.tempo.copy(tempo);
-		if(header.number > 1) {
-			var prevMeasure = this._track.measures[header.number - 2];
-			var prevHeader = this._song.measureHeaders[header.number - 2];
+		if(this._song.measureHeaders.length > 0) {
+			var prevMeasure = this._track.measures[this._song.measureHeaders.length - 1];
+			var prevHeader = this._song.measureHeaders[this._song.measureHeaders.length - 1];
 			measure.clef = prevMeasure.clef;
 			header.keySignature = prevHeader.keySignature;
 			header.keySignatureType = prevHeader.keySignatureType;
@@ -1728,6 +1727,7 @@ alphatab.file.alphatex.AlphaTexParser.prototype = $extend(alphatab.file.SongRead
 		}
 		this.measureMeta(measure);
 		tempo.copy(header.tempo);
+		this._song.addMeasureHeader(header);
 		this._track.addMeasure(measure);
 		while(this._sy != alphatab.file.alphatex.AlphaTexSymbols.Pipe && this._sy != alphatab.file.alphatex.AlphaTexSymbols.Eof) this.beat(measure);
 	}
@@ -11784,71 +11784,6 @@ alphatab.tablature.staves.TablatureStave.prototype = $extend(alphatab.tablature.
 	,__class__: alphatab.tablature.staves.TablatureStave
 });
 var haxe = haxe || {}
-haxe.FastCell = $hxClasses["haxe.FastCell"] = function(elt,next) {
-	this.elt = elt;
-	this.next = next;
-};
-haxe.FastCell.__name__ = ["haxe","FastCell"];
-haxe.FastCell.prototype = {
-	next: null
-	,elt: null
-	,__class__: haxe.FastCell
-}
-haxe.FastList = $hxClasses["haxe.FastList"] = function() {
-};
-haxe.FastList.__name__ = ["haxe","FastList"];
-haxe.FastList.prototype = {
-	toString: function() {
-		var a = new Array();
-		var l = this.head;
-		while(l != null) {
-			a.push(l.elt);
-			l = l.next;
-		}
-		return "{" + a.join(",") + "}";
-	}
-	,iterator: function() {
-		var l = this.head;
-		return { hasNext : function() {
-			return l != null;
-		}, next : function() {
-			var k = l;
-			l = k.next;
-			return k.elt;
-		}};
-	}
-	,remove: function(v) {
-		var prev = null;
-		var l = this.head;
-		while(l != null) {
-			if(l.elt == v) {
-				if(prev == null) this.head = l.next; else prev.next = l.next;
-				break;
-			}
-			prev = l;
-			l = l.next;
-		}
-		return l != null;
-	}
-	,isEmpty: function() {
-		return this.head == null;
-	}
-	,pop: function() {
-		var k = this.head;
-		if(k == null) return null; else {
-			this.head = k.next;
-			return k.elt;
-		}
-	}
-	,first: function() {
-		return this.head == null?null:this.head.elt;
-	}
-	,add: function(item) {
-		this.head = new haxe.FastCell(item,this.head);
-	}
-	,head: null
-	,__class__: haxe.FastList
-}
 haxe.Int32 = $hxClasses["haxe.Int32"] = function() { }
 haxe.Int32.__name__ = ["haxe","Int32"];
 haxe.Int32.make = function(a,b) {

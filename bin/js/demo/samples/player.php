@@ -31,7 +31,7 @@ var api = null;
     $(document).ready(function() { 
         api = $('div.alphaTab').alphaTab({
             //context: alphatab.platform.PlatformFactory.SVG_CANVAS,
-            file: '<?php echo $filePath; ?>/Serenade.gp5',
+            file: '<?php echo $filePath; ?>/Rohan.gp5',
         }).player({ // enable the player
             //caretOffset: {x: 7, y: -7}, // small offset because of the css3 features
             playerTickCallback: "onTickChanged" // !required!

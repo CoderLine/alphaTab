@@ -18,7 +18,7 @@ package alphatab.midi.model;
 import alphatab.io.DataOutputStream;
 import alphatab.io.MemoryOutputStream;
 import alphatab.io.OutputStream;
-import haxe.FastList;
+//import haxe.FastList;
 
 class MidiTrack 
 {
