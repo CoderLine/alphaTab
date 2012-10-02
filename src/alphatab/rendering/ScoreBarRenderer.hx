@@ -46,6 +46,7 @@ import alphatab.rendering.glyphs.RepeatCloseGlyph;
 import alphatab.rendering.glyphs.RepeatCountGlyph;
 import alphatab.rendering.glyphs.RepeatOpenGlyph;
 import alphatab.rendering.glyphs.RestGlyph;
+import alphatab.rendering.glyphs.ScoreBeatGlyph;
 import alphatab.rendering.glyphs.ScoreTieGlyph;
 import alphatab.rendering.glyphs.SharpGlyph;
 import alphatab.rendering.glyphs.SpacingGlyph;
@@ -97,10 +98,10 @@ class ScoreBarRenderer extends GlyphBarRenderer
 
 	
 	private static inline var LineSpacing = 8;
-    private var _accidentalHelper:AccidentalHelper;
+    public var accidentalHelper:AccidentalHelper;
     private var _beamHelpers:Array<BeamingHelper>;
 	
-	private var _beatPosition : IntHash<NoteChordGlyph>;
+	private var _beatPosition : IntHash<ScoreBeatGlyph>;
     
     private var _currentBeamHelper:BeamingHelper;
     
@@ -108,9 +109,9 @@ class ScoreBarRenderer extends GlyphBarRenderer
 	public function new(bar:alphatab.model.Bar) 
 	{
 		super(bar);
-        _accidentalHelper = new AccidentalHelper();
+        accidentalHelper = new AccidentalHelper();
         _beamHelpers = new Array<BeamingHelper>();
-		_beatPosition = new IntHash<NoteChordGlyph>();
+		_beatPosition = new IntHash<ScoreBeatGlyph>();
 	}
 	
 	public function getBeatDirection(beat:Beat) : BeamDirection
@@ -118,7 +119,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
 		if (_beatPosition.exists(beat.index)) 
 		{
 			var g = _beatPosition.get(beat.index);
-			return g.getDirection();
+			return g.noteHeads.getDirection();
 		}
 		return BeamDirection.Up;
 	}		
@@ -128,7 +129,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
 		if (_beatPosition.exists(note.beat.index)) 
 		{
 			var beat = _beatPosition.get(note.beat.index);
-			return beat.getNoteX(note, onEnd);
+			return beat.noteHeads.getNoteX(note, onEnd);
 		}
 		return 0;
 	}	
@@ -138,7 +139,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
 		if (_beatPosition.exists(note.beat.index)) 
 		{
 			var beat = _beatPosition.get(note.beat.index);
-			return beat.getNoteY(note);
+			return beat.noteHeads.getNoteY(note);
 		}
 		return 0;
 	}
@@ -363,7 +364,6 @@ class ScoreBarRenderer extends GlyphBarRenderer
         canvas.fill();
     }
 
-    
     private function paintFooter(cx:Int, cy:Int, canvas:ICanvas, h:BeamingHelper)
     {
         var beat = h.beats[0];
@@ -594,159 +594,14 @@ class ScoreBarRenderer extends GlyphBarRenderer
 	
     private function createBeatGlyphs(b:Beat)
     {
-        if (!b.isRest())
-        {
-            var noteLoop = function( action:Note -> Void ) {
-                var i = b.notes.length -1;
-                while ( i >= 0 )
-                {
-                    action(b.notes[i--]);
-                }
-            }
-            //
-            // Accidentals
-            //
-            var accidentals:AccidentalGroupGlyph = new AccidentalGroupGlyph(0, 0);
-            noteLoop( function(n) {
-                createAccidentalGlyph(n, accidentals);
-            });
-            addGlyph(accidentals);
-            
-            
-            //
-            // Note heads
-            //
-            var noteglyphs:NoteChordGlyph = new NoteChordGlyph();
-            noteglyphs.beat = b;
-            noteglyphs.beamingHelper = _currentBeamHelper;
-            noteLoop( function(n) {
-                createNoteGlyph(n, noteglyphs);
-            });
-			_beatPosition.set(b.index, noteglyphs);
-            addGlyph(noteglyphs);            
-            noteglyphs.updateBeamingHelper();
-
-            //
-            // Note dots
-            //
-            for (i in 0 ... b.dots)
-            {
-                var group = new GlyphGroup();
-                noteLoop( function (n) {
-                    createBeatDot(n, group);                    
-                });
-                addGlyph(group);
-            }
-        }
-        else
-        {
-            createRestGlyph(b);
-        }
-        
-        addGlyph(new SpacingGlyph(0, 0, Std.int(getBeatDurationWidth(b.duration) * getScale())));
+		var g = new ScoreBeatGlyph(b);
+		g.beamingHelper = _currentBeamHelper;
+		_beatPosition.set(b.index, g);
+		addGlyph(g); 
     }	
     
-    private function createBeatDot(n:Note, group:GlyphGroup)
-    {
-        group.addGlyph(new CircleGlyph(0, getScoreY(getNoteLine(n), Std.int(2*getScale())), 1.5 * getScale()));
-    }
-    
-    private function createRestGlyph(b:Beat) : Void
-    {
-        var line = 0;
-        
-        switch(b.duration)
-        {
-            case Whole:         
-                line = 4;
-            case Half:          
-                line = 5;
-            case Quarter:       
-                line = 6;
-            case Eighth:        
-                line = 8;
-            case Sixteenth:     
-                line = 8;
-            case ThirtySecond:  
-                line = 8;
-            case SixtyFourth:   
-                line = 8;
-        }
-        
-        var y = getScoreY(line);
-
-        addGlyph(new RestGlyph(0, y, b.duration));
-    }
-    
-    private function getBeatDurationWidth(d:Duration) : Int
-    {
-        switch(d)
-        {
-            case Whole:         return 82;
-            case Half:          return 56;
-            case Quarter:       return 36;
-            case Eighth:        return 24;
-            case Sixteenth:     return 14;
-            case ThirtySecond:  return 14;
-            case SixtyFourth:   return 14;
-            default: return 0;
-        }
-    }
-    
-    private function createNoteGlyph(n:Note, noteglyphs:NoteChordGlyph) 
-    {
-        var noteHeadGlyph:Glyph;
-        if (n.harmonicType == HarmonicType.None)
-        {
-            noteHeadGlyph = new NoteHeadGlyph(n.beat.duration);
-        }
-        else
-        {
-            noteHeadGlyph = new DiamondNoteHeadGlyph();
-        }
-
-                
-        // calculate y position
-        var line = getNoteLine(n);
-        
-        noteHeadGlyph.y = getScoreY(line, -1);
-        noteglyphs.addNoteGlyph(noteHeadGlyph, n, line);
-        
-        if (n.isStaccato && !noteglyphs.beatEffects.exists("STACCATO"))
-        {
-            noteglyphs.beatEffects.set("STACCATO",  new CircleGlyph(0, 0, 1.5));
-        }
-        
-        if (n.accentuated == AccentuationType.Normal && !noteglyphs.beatEffects.exists("ACCENT"))
-        {
-            noteglyphs.beatEffects.set("ACCENT",  new AccentuationGlyph(0, 0, AccentuationType.Normal));
-        }
-        if (n.accentuated == AccentuationType.Heavy && !noteglyphs.beatEffects.exists("HACCENT"))
-        {
-            noteglyphs.beatEffects.set("HACCENT",  new AccentuationGlyph(0, 0, AccentuationType.Heavy));
-        }
-		
-		if (n.isTieDestination && n.tieOrigin != null) 
-		{
-			addGlyph(new ScoreTieGlyph(n.tieOrigin, n));
-		}
-    }
-    
-    private function createAccidentalGlyph(n:Note, accidentals:AccidentalGroupGlyph)
-    {
-        var noteLine = getNoteLine(n);
-        var accidental = _accidentalHelper.applyAccidental(n, noteLine);
-        switch (accidental) 
-        {
-            case Sharp:   accidentals.addGlyph(new SharpGlyph(0, getScoreY(noteLine)));
-            case Flat:    accidentals.addGlyph(new FlatGlyph(0, getScoreY(noteLine)));
-            case Natural: accidentals.addGlyph(new NaturalizeGlyph(0, getScoreY(noteLine + 1)));
-            default:
-        }
-    }
-    
     // TODO[performance]: Maybe we should cache this (check profiler)
-    private function getNoteLine(n:Note) : Int
+    public function getNoteLine(n:Note) : Int
     {
         var ks = n.beat.voice.bar.getMasterBar().keySignature;
         var clef = n.beat.voice.bar.clef;

@@ -170,7 +170,7 @@ var alphaTabWrapper;
             }
             else
             {
-                console.error(msg);
+                throw msg;
             }
         }
 

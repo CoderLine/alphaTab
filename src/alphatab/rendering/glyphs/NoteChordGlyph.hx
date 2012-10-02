@@ -105,15 +105,9 @@ class NoteChordGlyph extends Glyph
         return false;
     }
     
-    public function updateBeamingHelper() : Void
+    public function updateBeamingHelper(cx:Int) : Void
     { 
-         beamingHelper.registerBeatLineX(beat, x + upLineX, x + downLineX); 
-    }
-         
-    public override function applyGlyphSpacing(spacing:Int):Dynamic 
-    {
-        super.applyGlyphSpacing(spacing);
-        updateBeamingHelper();
+         beamingHelper.registerBeatLineX(beat, cx + x + upLineX, cx + x + downLineX); 
     }
     
     public function hasTopOverflow() : Bool
@@ -260,6 +254,7 @@ class NoteChordGlyph extends Glyph
 		
         for (g in _infos)
 		{
+			g.glyph.renderer = renderer;
 			g.glyph.paint(cx + x, cy + y, canvas);
 		}
 	}    

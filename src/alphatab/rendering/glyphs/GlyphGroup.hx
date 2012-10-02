@@ -53,6 +53,7 @@ class GlyphGroup extends Glyph
 	{
 		for (g in _glyphs)
 		{
+			g.renderer = renderer;
 			g.paint(cx + x, cy + y, canvas);
 		}
 	}

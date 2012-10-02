@@ -3949,7 +3949,7 @@ alphatab.rendering.RenderingResources.prototype = {
 }
 alphatab.rendering.ScoreBarRenderer = $hxClasses["alphatab.rendering.ScoreBarRenderer"] = function(bar) {
 	alphatab.rendering.GlyphBarRenderer.call(this,bar);
-	this._accidentalHelper = new alphatab.rendering.utils.AccidentalHelper();
+	this.accidentalHelper = new alphatab.rendering.utils.AccidentalHelper();
 	this._beamHelpers = new Array();
 	this._beatPosition = new IntHash();
 };
@@ -3999,118 +3999,11 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Glyph
 		steps -= ks > 0 || ks == 0?alphatab.rendering.ScoreBarRenderer.SHARP_NOTE_STEPS[index]:alphatab.rendering.ScoreBarRenderer.FLAT_NOTE_STEPS[index];
 		return steps + 1;
 	}
-	,createAccidentalGlyph: function(n,accidentals) {
-		var noteLine = this.getNoteLine(n);
-		var accidental = this._accidentalHelper.applyAccidental(n,noteLine);
-		switch( (accidental)[1] ) {
-		case 2:
-			accidentals.addGlyph(new alphatab.rendering.glyphs.SharpGlyph(0,this.getScoreY(noteLine)));
-			break;
-		case 3:
-			accidentals.addGlyph(new alphatab.rendering.glyphs.FlatGlyph(0,this.getScoreY(noteLine)));
-			break;
-		case 1:
-			accidentals.addGlyph(new alphatab.rendering.glyphs.NaturalizeGlyph(0,this.getScoreY(noteLine + 1)));
-			break;
-		default:
-		}
-	}
-	,createNoteGlyph: function(n,noteglyphs) {
-		var noteHeadGlyph;
-		if(n.harmonicType == alphatab.model.HarmonicType.None) noteHeadGlyph = new alphatab.rendering.glyphs.NoteHeadGlyph(null,null,n.beat.duration); else noteHeadGlyph = new alphatab.rendering.glyphs.DiamondNoteHeadGlyph();
-		var line = this.getNoteLine(n);
-		noteHeadGlyph.y = this.getScoreY(line,-1);
-		noteglyphs.addNoteGlyph(noteHeadGlyph,n,line);
-		if(n.isStaccato && !noteglyphs.beatEffects.exists("STACCATO")) noteglyphs.beatEffects.set("STACCATO",new alphatab.rendering.glyphs.CircleGlyph(0,0,1.5));
-		if(n.accentuated == alphatab.model.AccentuationType.Normal && !noteglyphs.beatEffects.exists("ACCENT")) noteglyphs.beatEffects.set("ACCENT",new alphatab.rendering.glyphs.AccentuationGlyph(0,0,alphatab.model.AccentuationType.Normal));
-		if(n.accentuated == alphatab.model.AccentuationType.Heavy && !noteglyphs.beatEffects.exists("HACCENT")) noteglyphs.beatEffects.set("HACCENT",new alphatab.rendering.glyphs.AccentuationGlyph(0,0,alphatab.model.AccentuationType.Heavy));
-		if(n.isTieDestination && n.tieOrigin != null) this.addGlyph(new alphatab.rendering.glyphs.ScoreTieGlyph(n.tieOrigin,n));
-	}
-	,getBeatDurationWidth: function(d) {
-		switch( (d)[1] ) {
-		case 0:
-			return 82;
-		case 1:
-			return 56;
-		case 2:
-			return 36;
-		case 3:
-			return 24;
-		case 4:
-			return 14;
-		case 5:
-			return 14;
-		case 6:
-			return 14;
-		default:
-			return 0;
-		}
-	}
-	,createRestGlyph: function(b) {
-		var line = 0;
-		switch( (b.duration)[1] ) {
-		case 0:
-			line = 4;
-			break;
-		case 1:
-			line = 5;
-			break;
-		case 2:
-			line = 6;
-			break;
-		case 3:
-			line = 8;
-			break;
-		case 4:
-			line = 8;
-			break;
-		case 5:
-			line = 8;
-			break;
-		case 6:
-			line = 8;
-			break;
-		}
-		var y = this.getScoreY(line);
-		this.addGlyph(new alphatab.rendering.glyphs.RestGlyph(0,y,b.duration));
-	}
-	,createBeatDot: function(n,group) {
-		group.addGlyph(new alphatab.rendering.glyphs.CircleGlyph(0,this.getScoreY(this.getNoteLine(n),2 * this.stave.staveGroup.layout.renderer.scale | 0),1.5 * this.stave.staveGroup.layout.renderer.scale));
-	}
 	,createBeatGlyphs: function(b) {
-		var _g = this;
-		if(!b.isRest()) {
-			var noteLoop = function(action) {
-				var i = b.notes.length - 1;
-				while(i >= 0) action(b.notes[i--]);
-			};
-			var accidentals = new alphatab.rendering.glyphs.AccidentalGroupGlyph(0,0);
-			noteLoop(function(n) {
-				_g.createAccidentalGlyph(n,accidentals);
-			});
-			this.addGlyph(accidentals);
-			var noteglyphs = new alphatab.rendering.glyphs.NoteChordGlyph();
-			noteglyphs.beat = b;
-			noteglyphs.beamingHelper = this._currentBeamHelper;
-			noteLoop(function(n) {
-				_g.createNoteGlyph(n,noteglyphs);
-			});
-			this._beatPosition.set(b.index,noteglyphs);
-			this.addGlyph(noteglyphs);
-			noteglyphs.updateBeamingHelper();
-			var _g1 = 0, _g2 = b.dots;
-			while(_g1 < _g2) {
-				var i = _g1++;
-				var group = [new alphatab.rendering.glyphs.GlyphGroup()];
-				noteLoop((function(group) {
-					return function(n) {
-						_g.createBeatDot(n,group[0]);
-					};
-				})(group));
-				this.addGlyph(group[0]);
-			}
-		} else this.createRestGlyph(b);
-		this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,this.getBeatDurationWidth(b.duration) * this.stave.staveGroup.layout.renderer.scale | 0));
+		var g = new alphatab.rendering.glyphs.ScoreBeatGlyph(b);
+		g.beamingHelper = this._currentBeamHelper;
+		this._beatPosition.set(b.index,g);
+		this.addGlyph(g);
 	}
 	,applyBarSpacing: function(spacing) {
 		alphatab.rendering.GlyphBarRenderer.prototype.applyBarSpacing.call(this,spacing);
@@ -4398,7 +4291,7 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Glyph
 	,getNoteY: function(note) {
 		if(this._beatPosition.exists(note.beat.index)) {
 			var beat = this._beatPosition.get(note.beat.index);
-			return beat.getNoteY(note);
+			return beat.noteHeads.getNoteY(note);
 		}
 		return 0;
 	}
@@ -4406,21 +4299,21 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Glyph
 		if(onEnd == null) onEnd = true;
 		if(this._beatPosition.exists(note.beat.index)) {
 			var beat = this._beatPosition.get(note.beat.index);
-			return beat.getNoteX(note,onEnd);
+			return beat.noteHeads.getNoteX(note,onEnd);
 		}
 		return 0;
 	}
 	,getBeatDirection: function(beat) {
 		if(this._beatPosition.exists(beat.index)) {
 			var g = this._beatPosition.get(beat.index);
-			return g.getDirection();
+			return g.noteHeads.getDirection();
 		}
 		return alphatab.rendering.utils.BeamDirection.Up;
 	}
 	,_currentBeamHelper: null
 	,_beatPosition: null
 	,_beamHelpers: null
-	,_accidentalHelper: null
+	,accidentalHelper: null
 	,__class__: alphatab.rendering.ScoreBarRenderer
 });
 alphatab.rendering.ScoreBarRendererFactory = $hxClasses["alphatab.rendering.ScoreBarRendererFactory"] = function() {
@@ -4815,6 +4708,7 @@ alphatab.rendering.glyphs.GlyphGroup.prototype = $extend(alphatab.rendering.Glyp
 		while(_g < _g1.length) {
 			var g = _g1[_g];
 			++_g;
+			g.renderer = this.renderer;
 			g.paint(cx + this.x,cy + this.y,canvas);
 		}
 	}
@@ -5198,6 +5092,7 @@ alphatab.rendering.glyphs.NoteChordGlyph.prototype = $extend(alphatab.rendering.
 		while(_g < _g1.length) {
 			var g = _g1[_g];
 			++_g;
+			g.glyph.renderer = this.renderer;
 			g.glyph.paint(cx + this.x,cy + this.y,canvas);
 		}
 	}
@@ -5249,12 +5144,8 @@ alphatab.rendering.glyphs.NoteChordGlyph.prototype = $extend(alphatab.rendering.
 	,hasTopOverflow: function() {
 		return this.minNote != null && this.minNote.line < 0;
 	}
-	,applyGlyphSpacing: function(spacing) {
-		alphatab.rendering.Glyph.prototype.applyGlyphSpacing.call(this,spacing);
-		this.updateBeamingHelper();
-	}
-	,updateBeamingHelper: function() {
-		this.beamingHelper.registerBeatLineX(this.beat,this.x + this.upLineX,this.x + this.downLineX);
+	,updateBeamingHelper: function(cx) {
+		this.beamingHelper.registerBeatLineX(this.beat,cx + this.x + this.upLineX,cx + this.x + this.downLineX);
 	}
 	,canScale: function() {
 		return false;
@@ -5495,6 +5386,140 @@ alphatab.rendering.glyphs.RestGlyph.prototype = $extend(alphatab.rendering.glyph
 		this.width = 9 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
 	,__class__: alphatab.rendering.glyphs.RestGlyph
+});
+alphatab.rendering.glyphs.ScoreBeatGlyph = $hxClasses["alphatab.rendering.glyphs.ScoreBeatGlyph"] = function(b) {
+	alphatab.rendering.glyphs.GlyphGroup.call(this);
+	this.beat = b;
+};
+alphatab.rendering.glyphs.ScoreBeatGlyph.__name__ = ["alphatab","rendering","glyphs","ScoreBeatGlyph"];
+alphatab.rendering.glyphs.ScoreBeatGlyph.__super__ = alphatab.rendering.glyphs.GlyphGroup;
+alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.glyphs.GlyphGroup.prototype,{
+	getBeatDurationWidth: function(d) {
+		switch( (d)[1] ) {
+		case 0:
+			return 82;
+		case 1:
+			return 56;
+		case 2:
+			return 36;
+		case 3:
+			return 24;
+		case 4:
+			return 14;
+		case 5:
+			return 14;
+		case 6:
+			return 14;
+		default:
+			return 0;
+		}
+	}
+	,createAccidentalGlyph: function(n) {
+		var sr = js.Boot.__cast(this.renderer , alphatab.rendering.ScoreBarRenderer);
+		var noteLine = sr.getNoteLine(n);
+		var accidental = sr.accidentalHelper.applyAccidental(n,noteLine);
+		switch( (accidental)[1] ) {
+		case 2:
+			this.accidentals.addGlyph(new alphatab.rendering.glyphs.SharpGlyph(0,sr.getScoreY(noteLine)));
+			break;
+		case 3:
+			this.accidentals.addGlyph(new alphatab.rendering.glyphs.FlatGlyph(0,sr.getScoreY(noteLine)));
+			break;
+		case 1:
+			this.accidentals.addGlyph(new alphatab.rendering.glyphs.NaturalizeGlyph(0,sr.getScoreY(noteLine + 1)));
+			break;
+		default:
+		}
+	}
+	,createNoteGlyph: function(n) {
+		var sr = js.Boot.__cast(this.renderer , alphatab.rendering.ScoreBarRenderer);
+		var noteHeadGlyph;
+		if(n.harmonicType == alphatab.model.HarmonicType.None) noteHeadGlyph = new alphatab.rendering.glyphs.NoteHeadGlyph(null,null,n.beat.duration); else noteHeadGlyph = new alphatab.rendering.glyphs.DiamondNoteHeadGlyph();
+		var line = sr.getNoteLine(n);
+		noteHeadGlyph.y = sr.getScoreY(line,-1);
+		this.noteHeads.addNoteGlyph(noteHeadGlyph,n,line);
+		if(n.isStaccato && !this.noteHeads.beatEffects.exists("STACCATO")) this.noteHeads.beatEffects.set("STACCATO",new alphatab.rendering.glyphs.CircleGlyph(0,0,1.5));
+		if(n.accentuated == alphatab.model.AccentuationType.Normal && !this.noteHeads.beatEffects.exists("ACCENT")) this.noteHeads.beatEffects.set("ACCENT",new alphatab.rendering.glyphs.AccentuationGlyph(0,0,alphatab.model.AccentuationType.Normal));
+		if(n.accentuated == alphatab.model.AccentuationType.Heavy && !this.noteHeads.beatEffects.exists("HACCENT")) this.noteHeads.beatEffects.set("HACCENT",new alphatab.rendering.glyphs.AccentuationGlyph(0,0,alphatab.model.AccentuationType.Heavy));
+		if(n.isTieDestination && n.tieOrigin != null) this.addGlyph(new alphatab.rendering.glyphs.ScoreTieGlyph(n.tieOrigin,n));
+	}
+	,createBeatDot: function(n,group) {
+		var sr = js.Boot.__cast(this.renderer , alphatab.rendering.ScoreBarRenderer);
+		group.addGlyph(new alphatab.rendering.glyphs.CircleGlyph(0,sr.getScoreY(sr.getNoteLine(n),2 * this.renderer.stave.staveGroup.layout.renderer.scale | 0),1.5 * this.renderer.stave.staveGroup.layout.renderer.scale));
+	}
+	,doLayout: function() {
+		var _g = this;
+		if(!this.beat.isRest()) {
+			var noteLoop = function(action) {
+				var i = _g.beat.notes.length - 1;
+				while(i >= 0) action(_g.beat.notes[i--]);
+			};
+			this.accidentals = new alphatab.rendering.glyphs.AccidentalGroupGlyph(0,0);
+			noteLoop(function(n) {
+				_g.createAccidentalGlyph(n);
+			});
+			this.addGlyph(this.accidentals);
+			this.noteHeads = new alphatab.rendering.glyphs.NoteChordGlyph();
+			this.noteHeads.beat = this.beat;
+			this.noteHeads.beamingHelper = this.beamingHelper;
+			noteLoop(function(n) {
+				_g.createNoteGlyph(n);
+			});
+			this.addGlyph(this.noteHeads);
+			this.noteHeads.updateBeamingHelper(this.x);
+			var _g1 = 0, _g2 = this.beat.dots;
+			while(_g1 < _g2) {
+				var i = _g1++;
+				var group = [new alphatab.rendering.glyphs.GlyphGroup()];
+				noteLoop((function(group) {
+					return function(n) {
+						_g.createBeatDot(n,group[0]);
+					};
+				})(group));
+				this.addGlyph(group[0]);
+			}
+		} else {
+			var line = 0;
+			switch( (this.beat.duration)[1] ) {
+			case 0:
+				line = 4;
+				break;
+			case 1:
+				line = 5;
+				break;
+			case 2:
+				line = 6;
+				break;
+			case 3:
+				line = 8;
+				break;
+			case 4:
+				line = 8;
+				break;
+			case 5:
+				line = 8;
+				break;
+			case 6:
+				line = 8;
+				break;
+			}
+			var sr = js.Boot.__cast(this.renderer , alphatab.rendering.ScoreBarRenderer);
+			var y = sr.getScoreY(line);
+			this.addGlyph(new alphatab.rendering.glyphs.RestGlyph(0,y,this.beat.duration));
+		}
+		this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,this.getBeatDurationWidth(this.beat.duration) * this.renderer.stave.staveGroup.layout.renderer.scale | 0));
+		alphatab.rendering.glyphs.GlyphGroup.prototype.doLayout.call(this);
+	}
+	,applyGlyphSpacing: function(spacing) {
+		alphatab.rendering.glyphs.GlyphGroup.prototype.applyGlyphSpacing.call(this,spacing);
+		this.noteHeads.updateBeamingHelper(this.x);
+	}
+	,beamingHelper: null
+	,beat: null
+	,restGlyph: null
+	,noteHeads: null
+	,accidentals: null
+	,__class__: alphatab.rendering.glyphs.ScoreBeatGlyph
 });
 alphatab.rendering.glyphs.ScoreTieGlyph = $hxClasses["alphatab.rendering.glyphs.ScoreTieGlyph"] = function(startNote,endNote) {
 	alphatab.rendering.Glyph.call(this,0,0);
