@@ -10,7 +10,6 @@ import alphatab.rendering.utils.BeamingHelper;
 
 class ScoreBeatGlyph extends BeatGlyphBase
 {
-	public var accidentals:AccidentalGroupGlyph;
 	public var noteHeads : NoteChordGlyph;
 	public var restGlyph : RestGlyph;
 	
@@ -19,6 +18,11 @@ class ScoreBeatGlyph extends BeatGlyphBase
 	public function new(b:Beat) 
 	{
 		super(b);
+	}
+	
+	public override function canScale():Bool 
+	{
+		return super.canScale();
 	}
 	
 	public override function applyGlyphSpacing(spacing:Int):Dynamic 
@@ -35,24 +39,7 @@ class ScoreBeatGlyph extends BeatGlyphBase
 	{
 		// create glyphs
 		if (!beat.isRest())
-        {
-            var noteLoop = function( action:Note -> Void ) {
-                var i = beat.notes.length -1;
-                while ( i >= 0 )
-                {
-                    action(beat.notes[i--]);
-                }
-            }
-			
-			//
-            // Accidentals
-            //
-            accidentals = new AccidentalGroupGlyph(0, 0);
-            noteLoop( function(n) {
-                createAccidentalGlyph(n);
-            });
-			addGlyph(accidentals);
-            
+        {		
 			//
             // Note heads
             //
@@ -103,8 +90,6 @@ class ScoreBeatGlyph extends BeatGlyphBase
 
 			addGlyph(new RestGlyph(0, y, beat.duration));
 		}
-		
-		addGlyph(new SpacingGlyph(0, 0, Std.int(getBeatDurationWidth(beat.duration) * getScale())));
 		
 		super.doLayout();
 		if (noteHeads != null)
@@ -157,19 +142,5 @@ class ScoreBeatGlyph extends BeatGlyphBase
 		{
 			addGlyph(new ScoreTieGlyph(n.tieOrigin, n));
 		}
-    }
-	
-    private function createAccidentalGlyph(n:Note)
-    {
-		var sr = cast(renderer, ScoreBarRenderer);
-        var noteLine = sr.getNoteLine(n);
-        var accidental = sr.accidentalHelper.applyAccidental(n, noteLine);
-        switch (accidental) 
-        {
-            case Sharp:   accidentals.addGlyph(new SharpGlyph(0, sr.getScoreY(noteLine)));
-            case Flat:    accidentals.addGlyph(new FlatGlyph(0, sr.getScoreY(noteLine)));
-            case Natural: accidentals.addGlyph(new NaturalizeGlyph(0, sr.getScoreY(noteLine + 1)));
-            default:
-        }
     }
 }

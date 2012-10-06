@@ -30,6 +30,8 @@ import alphatab.rendering.glyphs.RepeatCountGlyph;
 import alphatab.rendering.glyphs.RepeatOpenGlyph;
 import alphatab.rendering.glyphs.SpacingGlyph;
 import alphatab.rendering.glyphs.TabBeatGlyph;
+import alphatab.rendering.glyphs.TabBeatPostNotesGlyph;
+import alphatab.rendering.glyphs.TabBeatPreNotesGlyph;
 
 /**
  * This BarRenderer renders a bar using guitar tablature notation. 
@@ -86,8 +88,14 @@ class TabBarRenderer extends GroupedBarRenderer
     {
         for (b in v.beats)
         {
+			var pre = new TabBeatPreNotesGlyph(b);
+			addBeatGlyph(pre);
+			
 			var g = new TabBeatGlyph(b);
 			addBeatGlyph(g); 
+			
+			var post = new TabBeatPostNotesGlyph(b);
+			addBeatGlyph(post);
         }
     }	
 	

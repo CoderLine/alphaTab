@@ -21,8 +21,6 @@ class TabBeatGlyph extends BeatGlyphBase
 			
 		}
 		
-		addGlyph(new SpacingGlyph(0, 0, Std.int(getBeatDurationWidth(beat.duration) * getScale())));
-		
 		// left to right layout
 		var w = 0;
 		for (g in _glyphs)

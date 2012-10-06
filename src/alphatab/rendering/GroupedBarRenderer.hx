@@ -20,6 +20,7 @@ class GroupedBarRenderer extends BarRendererBase
 	
 	private var _preBeatGlyphs:Array<Glyph>;
 	private var _beatGlyphs:Array<BeatGlyphBase>;
+	private var _beatScaleGlyphs:Array<BeatGlyphBase>;
 	private var _postBeatGlyphs:Array<Glyph>;
 	 
 	public function new(bar:Bar) 
@@ -27,6 +28,7 @@ class GroupedBarRenderer extends BarRendererBase
 		super(bar);
 		_preBeatGlyphs = new Array<Glyph>();
 	    _beatGlyphs = new Array<BeatGlyphBase>();
+	    _beatScaleGlyphs = new Array<BeatGlyphBase>();
 	    _postBeatGlyphs = new Array<Glyph>();
 	}
 	
@@ -148,6 +150,10 @@ class GroupedBarRenderer extends BarRendererBase
 	private function addBeatGlyph(g:BeatGlyphBase)
 	{
 		addGlyph(_beatGlyphs, g);
+		if (g.canScale())
+		{
+			_beatScaleGlyphs.push(g);
+		}
 	}
 	
 	private function addPostBeatGlyph(g:Glyph)
@@ -199,7 +205,7 @@ class GroupedBarRenderer extends BarRendererBase
 	{
         width += spacing;
          
-        var glyphSpacing = Std.int(spacing / _beatGlyphs.length);
+        var glyphSpacing = Std.int(spacing / _beatScaleGlyphs.length);
         for (i in 0 ... _beatGlyphs.length)
         {
             var g = _beatGlyphs[i];
@@ -213,14 +219,17 @@ class GroupedBarRenderer extends BarRendererBase
                 g.x = _beatGlyphs[i - 1].x + _beatGlyphs[i - 1].width;
             }
              
-            if (g == _beatGlyphs[_beatGlyphs.length - 1])
-            {
-                g.applyGlyphSpacing(glyphSpacing + (spacing - (glyphSpacing * _beatGlyphs.length)));
-            }
-            else
-            {
-                g.applyGlyphSpacing(glyphSpacing);
-            }
+			if (g.canScale())
+			{
+				if (g == _beatGlyphs[_beatGlyphs.length - 1])
+				{
+					g.applyGlyphSpacing(glyphSpacing + (spacing - (glyphSpacing * _beatGlyphs.length)));
+				}
+				else
+				{
+					g.applyGlyphSpacing(glyphSpacing);
+				}
+			}
         }
 	}
 	

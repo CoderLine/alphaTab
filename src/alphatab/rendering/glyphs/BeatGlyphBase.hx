@@ -1,6 +1,7 @@
 package alphatab.rendering.glyphs;
 import alphatab.model.Beat;
 import alphatab.model.Duration;
+import alphatab.model.Note;
 
 class BeatGlyphBase extends GlyphGroup
 {
@@ -26,7 +27,15 @@ class BeatGlyphBase extends GlyphGroup
 		width = w;
 	}
 	
-    
+	private function noteLoop( action:Note -> Void ) 
+	{
+		var i = beat.notes.length -1;
+		while ( i >= 0 )
+		{
+			action(beat.notes[i--]);
+		}
+	}
+	
     private function getBeatDurationWidth(d:Duration) : Int
     {
         switch(d)
