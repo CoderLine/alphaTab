@@ -33,7 +33,7 @@ import alphatab.rendering.glyphs.TabBeatGlyph;
 /**
  * This BarRenderer renders a bar using guitar tablature notation. 
  */
-class TabBarRenderer extends GlyphBarRenderer
+/*class TabBarRenderer extends GroupedBarRenderer
 {
 	private static inline var LineSpacing = 10;
 	
@@ -70,7 +70,7 @@ class TabBarRenderer extends GlyphBarRenderer
 				
 		if (_bar.isEmpty())
 		{
-			addGlyph(new SpacingGlyph(0, 0, Std.int(30 * getScale()), false));
+			addPreBeatGlyph(new SpacingGlyph(0, 0, Std.int(30 * getScale()), false));
 		}
         
         // TODO: Render all voices
@@ -130,7 +130,7 @@ class TabBarRenderer extends GlyphBarRenderer
 	/**
 	 * Gets the relative y position of the given steps relative to first line. 
 	 * @param steps the amount of steps while 2 steps are one line
-	 */
+	 *
 	public function getScoreY(steps:Int, correction:Int = 0) : Int
 	{
 		return Std.int(((getLineOffset() / 2) * steps) + (correction * getScale()));
@@ -161,7 +161,7 @@ class TabBarRenderer extends GlyphBarRenderer
 	
 	/**
 	 * gets the padding needed to place numbers within the bounding box
-	 */
+	 *
 	private function getNumberOverflow()
 	{
 		var res = getResources();
@@ -205,4 +205,4 @@ class TabBarRenderer extends GlyphBarRenderer
 		canvas.lineTo(cx + x + width, cy + this.y + y);
 		canvas.stroke();
 	}
-}
+}*/

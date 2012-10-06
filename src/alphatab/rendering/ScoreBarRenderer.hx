@@ -60,7 +60,7 @@ using alphatab.model.ModelUtils;
 /**
  * This BarRenderer renders a bar using standard music notation. 
  */
-class ScoreBarRenderer extends GlyphBarRenderer
+class ScoreBarRenderer extends GroupedBarRenderer
 {
     /**
      * We always have 7 steps per octave. 
@@ -166,7 +166,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
 		if (index == 0)
 		{
 			stave.registerStaveTop(getGlyphOverflow());
-			stave.registerStaveBottom(getGlyphOverflow());
+			stave.registerStaveBottom(height - getGlyphOverflow());
 		}
         
         var top = getScoreY(0);
@@ -409,29 +409,36 @@ class ScoreBarRenderer extends GlyphBarRenderer
 		glyph.doLayout();
         glyph.paint(cx + x, cy + y, canvas);
     }
-
-	private override function createGlyphs():Void 
-	{		
+	
+	private override function createPreBeatGlyphs():Dynamic 
+	{
 		createBarStartGlyphs();
 		
 		createStartGlyphs();
 				
 		if (_bar.isEmpty())
 		{
-			addGlyph(new SpacingGlyph(0, 0, Std.int(30 * getScale()), false));
+			addPreBeatGlyph(new SpacingGlyph(0, 0, Std.int(30 * getScale())));
 		}
-        
+	}
+
+	private override function createBeatGlyphs():Void 
+	{
         // TODO: Render all voices
         createVoiceGlyphs(_bar.voices[0]);
-		
+	}
+	
+	private override function createPostBeatGlyphs():Dynamic 
+	{
 		createBarEndGlyphs();
 	}
 	
 	private var _startSpacing:Bool;
+	
 	private function createStartSpacing()
 	{
 		if (_startSpacing) return;
-		addGlyph(new SpacingGlyph(0, 0, Std.int(2 * getScale()), false));
+		addPreBeatGlyph(new SpacingGlyph(0, 0, Std.int(2 * getScale())));
 		_startSpacing = true;
 	}
 	
@@ -439,29 +446,30 @@ class ScoreBarRenderer extends GlyphBarRenderer
 	{
 		if (_bar.getMasterBar().isRepeatStart)
 		{
-			addGlyph(new RepeatOpenGlyph(0, 0, 1.5, 3));
+			addPreBeatGlyph(new RepeatOpenGlyph(0, 0, 1.5, 3));
 		}
 	}	
+	
 	private function createBarEndGlyphs()
 	{
 		if (_bar.getMasterBar().isRepeatEnd())
 		{
-			addGlyph(new RepeatCloseGlyph(x, 0));
+			addPostBeatGlyph(new RepeatCloseGlyph(x, 0));
 			if (_bar.getMasterBar().repeatCount > 1)
 			{
                 var line = isLast() || isLastOfLine() ? -1 : -4;
-				addGlyph(new RepeatCountGlyph(0, getScoreY(line, -3), _bar.getMasterBar().repeatCount + 1));
+				addPostBeatGlyph(new RepeatCountGlyph(0, getScoreY(line, -3), _bar.getMasterBar().repeatCount + 1));
 			}
         }
 		else if (_bar.getMasterBar().isDoubleBar)
 		{
-			addGlyph(new BarSeperatorGlyph());
-			addGlyph(new SpacingGlyph(0, 0, Std.int(3 * getScale()), false));
-			addGlyph(new BarSeperatorGlyph());
+			addPostBeatGlyph(new BarSeperatorGlyph());
+			addPostBeatGlyph(new SpacingGlyph(0, 0, Std.int(3 * getScale()), false));
+			addPostBeatGlyph(new BarSeperatorGlyph());
 		}		
 		else if(_bar.nextBar == null || !_bar.nextBar.getMasterBar().isRepeatStart)
 		{
-			addGlyph(new BarSeperatorGlyph(0,0,isLast()));
+			addPostBeatGlyph(new BarSeperatorGlyph(0,0,isLast()));
 		}
 	}
 	
@@ -480,7 +488,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
 				default: offset = 0;
 			}
 			createStartSpacing();
-			addGlyph(new ClefGlyph(0, getScoreY(offset), _bar.clef));
+			addPreBeatGlyph(new ClefGlyph(0, getScoreY(offset), _bar.clef));
 		}
 		
 		// Key signature
@@ -503,11 +511,11 @@ class ScoreBarRenderer extends GlyphBarRenderer
 		
 		if (stave.index == 0)
 		{
-			addGlyph(new BarNumberGlyph(0,getScoreY(-1, -3),_bar.index + 1));
+			addPreBeatGlyph(new BarNumberGlyph(0,getScoreY(-1, -3),_bar.index + 1));
 		}
         else
         {
-            addGlyph(new SpacingGlyph(0, 0, Std.int(8 * getScale()), false));
+            addPreBeatGlyph(new SpacingGlyph(0, 0, Std.int(8 * getScale())));
         }
 	}
 	
@@ -536,7 +544,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
 
 		for (i in 0 ... naturalizeSymbols)
         {
-			addGlyph(new NaturalizeGlyph(0, Std.int(getScoreY(previousKeyPositions[i] + offsetClef))));
+			addPreBeatGlyph(new NaturalizeGlyph(0, Std.int(getScoreY(previousKeyPositions[i] + offsetClef))));
         }
 		
 		// how many symbols do we need to get from a C-keysignature
@@ -547,7 +555,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
         {  
             for (i in 0 ... Std.int(Math.abs(currentKey)))
             {
-				addGlyph(new SharpGlyph(0, Std.int(getScoreY(SHARP_KS_STEPS[i] + offsetClef))));
+				addPreBeatGlyph(new SharpGlyph(0, Std.int(getScoreY(SHARP_KS_STEPS[i] + offsetClef))));
             }
         }
         // a flat signature
@@ -555,15 +563,15 @@ class ScoreBarRenderer extends GlyphBarRenderer
         {
             for (i in 0 ... Std.int(Math.abs(currentKey)))
             {
-				addGlyph(new FlatGlyph(0, Std.int(getScoreY(FLAT_KS_STEPS[i] + offsetClef))));
+				addPreBeatGlyph(new FlatGlyph(0, Std.int(getScoreY(FLAT_KS_STEPS[i] + offsetClef))));
             }
         }		
 	}
     
 	private function createTimeSignatureGlyphs()
 	{
-		addGlyph(new SpacingGlyph(0,0, Std.int(5 * getScale()), false));
-		addGlyph(new TimeSignatureGlyph(0, 0, _bar.getMasterBar().timeSignatureNumerator, _bar.getMasterBar().timeSignatureDenominator));
+		addPreBeatGlyph(new SpacingGlyph(0,0, Std.int(5 * getScale())));
+		addPreBeatGlyph(new TimeSignatureGlyph(0, 0, _bar.getMasterBar().timeSignatureNumerator, _bar.getMasterBar().timeSignatureDenominator));
 	}
     
     private function createVoiceGlyphs(v:Voice)
@@ -581,7 +589,11 @@ class ScoreBarRenderer extends GlyphBarRenderer
                     _beamHelpers.push(_currentBeamHelper);
                 }
             }
-            createBeatGlyphs(b);
+			
+			var g = new ScoreBeatGlyph(b);
+			g.beamingHelper = _currentBeamHelper;
+			_beatPosition.set(b.index, g);
+			addBeatGlyph(g); 
         }
         
         _currentBeamHelper = null;
@@ -592,14 +604,6 @@ class ScoreBarRenderer extends GlyphBarRenderer
         super.applyBarSpacing(spacing);
     }
 	
-    private function createBeatGlyphs(b:Beat)
-    {
-		var g = new ScoreBeatGlyph(b);
-		g.beamingHelper = _currentBeamHelper;
-		_beatPosition.set(b.index, g);
-		addGlyph(g); 
-    }	
-    
     // TODO[performance]: Maybe we should cache this (check profiler)
     public function getNoteLine(n:Note) : Int
     {

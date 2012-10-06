@@ -28,7 +28,7 @@ class Glyph
 	public var x:Int;
 	public var y:Int;
 	public var width:Int;
-	public var renderer:GlyphBarRenderer;
+	public var renderer:BarRendererBase;
 	
 	public function new(x:Int = 0, y:Int = 0) 
 	{
