@@ -57,7 +57,7 @@ class RenderingResources
 		subTitleFont = new Font(serifFont, 20 * scale);
 		wordsFont = new Font(serifFont, 15 * scale);
 		
-		tablatureFont = new Font(sansFont, 12 * scale); 
+		tablatureFont = new Font(sansFont, 13 * scale); 
 		
 		staveLineColor = new Color(165, 165, 165);
 		barSeperatorColor = new Color(34, 34, 17);

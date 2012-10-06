@@ -16,6 +16,7 @@
  */
 package alphatab.platform;
 
+import alphatab.model.TextBaseline;
 import alphatab.platform.model.Color;
 import alphatab.platform.model.Font;
 import alphatab.platform.model.TextAlign;
@@ -57,7 +58,10 @@ interface ICanvas
     // text
 	function setFont(font:Font) : Void;
 	
+	function getTextAlign() : TextAlign;
 	function setTextAlign(textAlign:TextAlign) : Void;
+	function getTextBaseline() : TextBaseline;
+	function setTextBaseline(textBaseLine:TextBaseline) : Void;
 	
     function fillText(text:String, x:Float, y:Float):Void;
     function strokeText(text:String, x:Float, y:Float):Void;

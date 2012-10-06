@@ -1,0 +1,54 @@
+package alphatab.rendering.glyphs;
+import alphatab.model.Beat;
+import alphatab.model.Note;
+import alphatab.model.TextBaseline;
+import alphatab.platform.ICanvas;
+import alphatab.rendering.Glyph;
+
+class TabNoteChordGlyph extends Glyph
+{
+	private var _notes:Array<Glyph>;
+	private var _noteLookup:IntHash<Glyph>;
+
+    public var beat:Beat;
+
+	public function new(x:Int = 0, y:Int = 0) 
+	{
+		super(x, y);
+		_notes = new Array<Glyph>();
+		_noteLookup = new IntHash<Glyph>();
+	}
+	
+	public override function doLayout():Void 
+	{
+		var w = 0;
+		for (g in _notes)
+		{
+			g.renderer = renderer;
+			g.doLayout();
+			if (g.width > w)
+			{
+				w = g.width;
+			}
+		}
+		width = w;
+	}
+	
+	public function addNoteGlyph(noteGlyph:Glyph, note:Note)
+    {
+		_notes.push(noteGlyph);
+		_noteLookup.set(note.string, noteGlyph);
+    }	
+	
+	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Dynamic 
+	{
+		var old = canvas.getTextBaseline();
+		canvas.setTextBaseline(TextBaseline.Middle);
+		for (g in _notes)
+		{
+			g.renderer = renderer;
+			g.paint(cx + x, cy + y, canvas);
+		}
+		canvas.setTextBaseline(old);
+	}
+}

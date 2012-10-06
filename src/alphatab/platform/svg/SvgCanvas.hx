@@ -16,6 +16,7 @@
  */
 package alphatab.platform.svg;
 
+import alphatab.model.TextBaseline;
 import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
 import alphatab.platform.model.Font;
@@ -293,9 +294,24 @@ class SvgCanvas implements ICanvas
     }
 
     private var _textAlign:TextAlign; 
+    public function getTextAlign() : TextAlign
+	{
+		return _textAlign;
+	}
     public function setTextAlign(textAlign:TextAlign) : Void
     {
         _textAlign = textAlign;
+    }
+    
+
+    private var _textBaseline:TextBaseline; 
+    public function getTextBaseline() : TextBaseline
+	{
+		return _textBaseline;
+	}
+    public function setTextBaseline(textBaseline:TextBaseline) : Void
+    {
+        _textBaseline = textBaseline;
     }
     
     public function fillText(text:String, x:Float, y:Float):Void
@@ -351,7 +367,13 @@ class SvgCanvas implements ICanvas
     }    
     private inline function getSvgBaseLine() : String
     {
-		return "top";
+		switch(_textBaseline)
+		{
+			case Top: return "top";
+			case Middle: return "middle";
+			case Bottom: return "bottom";
+			default: return "alphabetic";
+		}
     }
     
     

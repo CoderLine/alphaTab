@@ -7,9 +7,4 @@ class TabBeatPreNotesGlyph extends BeatGlyphBase
 	{
 		super(b);
 	}
-	
-	public override function canScale():Bool 
-	{
-		return false;
-	}
 }

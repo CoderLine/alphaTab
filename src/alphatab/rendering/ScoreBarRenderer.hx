@@ -39,7 +39,6 @@ import alphatab.rendering.glyphs.FlatGlyph;
 import alphatab.rendering.glyphs.GlyphGroup;
 import alphatab.rendering.glyphs.MusicFont;
 import alphatab.rendering.glyphs.NaturalizeGlyph;
-import alphatab.rendering.glyphs.NoteChordGlyph;
 import alphatab.rendering.glyphs.NoteHeadGlyph;
 import alphatab.rendering.glyphs.NumberGlyph;
 import alphatab.rendering.glyphs.RepeatCloseGlyph;

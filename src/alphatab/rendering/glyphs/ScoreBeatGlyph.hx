@@ -10,7 +10,7 @@ import alphatab.rendering.utils.BeamingHelper;
 
 class ScoreBeatGlyph extends BeatGlyphBase
 {
-	public var noteHeads : NoteChordGlyph;
+	public var noteHeads : ScoreNoteChordGlyph;
 	public var restGlyph : RestGlyph;
 	
 	public var beamingHelper:BeamingHelper;
@@ -43,7 +43,7 @@ class ScoreBeatGlyph extends BeatGlyphBase
 			//
             // Note heads
             //
-            noteHeads = new NoteChordGlyph();
+            noteHeads = new ScoreNoteChordGlyph();
             noteHeads.beat = beat;
             noteHeads.beamingHelper = beamingHelper;
             noteLoop( function(n) {

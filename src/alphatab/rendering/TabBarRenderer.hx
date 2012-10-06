@@ -70,7 +70,7 @@ class TabBarRenderer extends GroupedBarRenderer
 		
 		// Clef (TODO) 
 		 
-		addPreBeatGlyph(new BarNumberGlyph(0, getScoreY( -1, -3), _bar.index + 1, stave.index != 0));
+		addPreBeatGlyph(new BarNumberGlyph(0, getTabY( -1, -3), _bar.index + 1, stave.index != 0));
 		
 		if (_bar.isEmpty())
 		{
@@ -107,7 +107,7 @@ class TabBarRenderer extends GroupedBarRenderer
 			if (_bar.getMasterBar().repeatCount > 1)
 			{
                 var line = isLast() || isLastOfLine() ? -1 : -4;
-				addPostBeatGlyph(new RepeatCountGlyph(0, getScoreY(line, -3), _bar.getMasterBar().repeatCount + 1));
+				addPostBeatGlyph(new RepeatCountGlyph(0, getTabY(line, -3), _bar.getMasterBar().repeatCount + 1));
 			}
         }
 		else if (_bar.getMasterBar().isDoubleBar)
@@ -136,9 +136,9 @@ class TabBarRenderer extends GroupedBarRenderer
 	 * Gets the relative y position of the given steps relative to first line. 
 	 * @param steps the amount of steps while 2 steps are one line
 	 */
-	public function getScoreY(steps:Int, correction:Int = 0) : Int
+	public function getTabY(line:Int, correction:Int = 0) : Int
 	{
-		return Std.int(((getLineOffset() / 2) * steps) + (correction * getScale()));
+		return Std.int((getLineOffset() * line) + (correction * getScale()));
 	}
 	
 	/**

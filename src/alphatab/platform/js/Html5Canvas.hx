@@ -17,6 +17,7 @@
 package alphatab.platform.js;
 
 #if js
+import alphatab.model.TextBaseline;
 import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
 import alphatab.platform.model.Font;
@@ -147,9 +148,24 @@ class Html5Canvas implements ICanvas
         this._context.font = font.toCssString();
     }
      
-    public function setTextAlign(value:TextAlign) : Void
-    {
-		switch(value)
+	public function getTextAlign() : TextAlign
+	{
+		switch(this._context.textAlign)
+		{
+			case "left":
+				return TextAlign.Left;
+			case "center":
+				return TextAlign.Center;
+			case "right":
+				return TextAlign.Right;
+			default:
+				return TextAlign.Left;
+		}
+	}
+	
+	public function setTextAlign(textAlign:TextAlign) : Void
+	{
+		switch(textAlign)
 		{
 			case Left:
 				this._context.textAlign = "left";
@@ -158,8 +174,38 @@ class Html5Canvas implements ICanvas
 			case Right:
 				this._context.textAlign = "right";
 		}
-    }
-    
+	}
+	
+	public function getTextBaseline() : TextBaseline
+	{
+		switch(this._context.textBaseline)
+		{
+			case "top":
+				return TextBaseline.Top;
+			case "middle":
+				return TextBaseline.Middle;
+			case "bottom":
+				return TextBaseline.Bottom;
+			default:
+				return TextBaseline.Default;
+		}
+	}
+	
+	public function setTextBaseline(textBaseLine:TextBaseline) : Void
+	{
+		switch(textBaseLine)
+		{
+			case Top:
+				this._context.textBaseline = "top";
+			case Middle:
+				this._context.textBaseline = "middle";
+			case Bottom:
+				this._context.textBaseline = "bottom";
+			default:
+				this._context.textBaseline = "alphabetic";
+		}
+	}
+
     public function fillText(text:String, x:Float, y:Float):Void
     {
 		this._context.fillText(text, x, y);

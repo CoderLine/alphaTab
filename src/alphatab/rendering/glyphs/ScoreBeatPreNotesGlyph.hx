@@ -9,11 +9,6 @@ class ScoreBeatPreNotesGlyph extends BeatGlyphBase
 		super(b);
 	}
 	
-	public override function canScale():Bool 
-	{
-		return false;
-	}
-	
 	public override function doLayout():Void 
 	{
 		if (!beat.isRest())

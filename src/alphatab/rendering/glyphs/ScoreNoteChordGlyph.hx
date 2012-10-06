@@ -26,18 +26,18 @@ import alphatab.rendering.RenderingResources;
 import alphatab.rendering.ScoreBarRenderer;
 import alphatab.rendering.utils.BeamingHelper;
 
-typedef NoteGlyphInfo = {
+typedef ScoreNoteGlyphInfo = {
     glyph:Glyph,
     line:Int
 };
 
-class NoteChordGlyph extends Glyph
+class ScoreNoteChordGlyph extends Glyph
 {
-    private var _infos:Array<NoteGlyphInfo>;
+    private var _infos:Array<ScoreNoteGlyphInfo>;
 	private var _noteLookup:IntHash<Glyph>;
     
-    public var minNote:NoteGlyphInfo;
-    public var maxNote:NoteGlyphInfo;
+    public var minNote:ScoreNoteGlyphInfo;
+    public var maxNote:ScoreNoteGlyphInfo;
     
     public var spacingChanged:Void->Void;
     public var upLineX:Int;
@@ -52,7 +52,7 @@ class NoteChordGlyph extends Glyph
 	public function new(x:Int = 0, y:Int = 0)
     {
         super(x, y);
-        _infos = new Array<NoteGlyphInfo>();
+        _infos = new Array<ScoreNoteGlyphInfo>();
         beatEffects = new Hash<Glyph>();
 		_noteLookup = new IntHash<Glyph>();
     }
@@ -88,7 +88,7 @@ class NoteChordGlyph extends Glyph
     
     public function addNoteGlyph(noteGlyph:Glyph, note:Note, noteLine:Int)
     {
-        var info:NoteGlyphInfo =  { glyph:noteGlyph, line:noteLine }
+        var info:ScoreNoteGlyphInfo =  { glyph:noteGlyph, line:noteLine }
         _infos.push( info );
 		_noteLookup.set(note.string, noteGlyph);
         if (minNote == null || minNote.line > info.line)
