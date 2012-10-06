@@ -18,6 +18,7 @@ package alphatab.rendering;
 
 import alphatab.model.Bar;
 import alphatab.model.Beat;
+import alphatab.model.Duration;
 import alphatab.model.Voice;
 import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
@@ -67,19 +68,11 @@ class TabBarRenderer extends GroupedBarRenderer
 		
 		// Clef (TODO) 
 		 
-		
-		if (stave.index == 0)
-		{
-			addPreBeatGlyph(new BarNumberGlyph(0,getScoreY(-1, -3),_bar.index + 1));
-		}
-        else
-        {
-            addPreBeatGlyph(new SpacingGlyph(0, 0, Std.int(8 * getScale())));
-        }
+		addPreBeatGlyph(new BarNumberGlyph(0, getScoreY( -1, -3), _bar.index + 1, stave.index != 0));
 		
 		if (_bar.isEmpty())
 		{
-			addPreBeatGlyph(new SpacingGlyph(0, 0, Std.int(30 * getScale())));
+			addPreBeatGlyph(new SpacingGlyph(0, 0, Std.int(30 * getScale()), false));
 		}
 	}
 

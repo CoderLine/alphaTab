@@ -22,10 +22,12 @@ import alphatab.rendering.Glyph;
 class BarNumberGlyph extends Glyph
 {
 	private var _number:Int;
-	public function new(x:Int = 0, y:Int = 0, number:Int)
+	private var _hidden:Bool;
+	public function new(x:Int = 0, y:Int = 0, number:Int, hidden:Bool = false)
 	{
 		super(x, y);
 		_number = number;
+		_hidden = hidden;
 	}
 
 	public override function doLayout():Void 
@@ -43,6 +45,10 @@ class BarNumberGlyph extends Glyph
 	
 	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
 	{
+		if (_hidden) 
+		{
+			return;
+		}
 		var res = renderer.getResources();
 		canvas.setColor(res.barNumberColor);
 		canvas.setFont(res.barNumberFont);

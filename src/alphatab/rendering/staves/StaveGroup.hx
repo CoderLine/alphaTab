@@ -66,30 +66,20 @@ class StaveGroup
         bars.push(bar);
 		
 		// add renderers
-		var maxW:Int = 0;
+		var maxSizes = new BarSizeInfo();
 		for (s in staves)
 		{
 			s.addBar(bar);
-			if (s.barRenderers[s.barRenderers.length - 1].width > maxW)
-			{
-				maxW = s.barRenderers[s.barRenderers.length - 1].width;
-			}
+			s.barRenderers[s.barRenderers.length - 1].registerMaxSizes(maxSizes);
 		}
 		
-		// TODO: we need to iterate over all beatglyphs within the new renderers 
-		// and ensure all of those beatGlyphs have the same position and width over all staves
-		
-		// ensure same width of new renderer
+		// ensure same widths of new renderer
 		for (s in staves)
 		{
-			var diff = maxW - s.barRenderers[s.barRenderers.length - 1].width;
-			if (diff > 0)
-			{
-				s.barRenderers[s.barRenderers.length - 1].applyBarSpacing(diff);
-			}
+			s.barRenderers[s.barRenderers.length - 1].applySizes(maxSizes);
 		}
-		
-		width += maxW;
+	
+		width += maxSizes.fullWidth;
     }
 
 	public function addStave(stave:Stave) 

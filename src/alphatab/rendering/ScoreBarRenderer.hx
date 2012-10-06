@@ -446,20 +446,13 @@ class ScoreBarRenderer extends GroupedBarRenderer
 			createStartSpacing();
 			createTimeSignatureGlyphs();
 		}
-		
-		if (stave.index == 0)
-		{
-			addPreBeatGlyph(new BarNumberGlyph(0,getScoreY(-1, -3),_bar.index + 1));
-		}
-        else
-        {
-            addPreBeatGlyph(new SpacingGlyph(0, 0, Std.int(8 * getScale())));
-        }
+
+		addPreBeatGlyph(new BarNumberGlyph(0, getScoreY( -1, -3), _bar.index + 1, stave.index != 0));
 		
 		if (_bar.isEmpty())
 		{
-			addPreBeatGlyph(new SpacingGlyph(0, 0, Std.int(30 * getScale())));
-		}
+			addPreBeatGlyph(new SpacingGlyph(0, 0, Std.int(30 * getScale()), false));
+		}		
 	}
 
 	private override function createBeatGlyphs():Void 

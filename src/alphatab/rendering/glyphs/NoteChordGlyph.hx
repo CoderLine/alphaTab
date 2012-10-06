@@ -61,6 +61,7 @@ class NoteChordGlyph extends Glyph
 	{
 		return beamingHelper.getDirection();
 	}	
+	
 	public function getNoteX(note:Note, onEnd:Bool = true) 
 	{
 		if (_noteLookup.exists(note.string)) 

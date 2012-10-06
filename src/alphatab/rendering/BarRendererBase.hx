@@ -19,6 +19,7 @@ package alphatab.rendering;
 import alphatab.model.Bar;
 import alphatab.platform.ICanvas;
 import alphatab.rendering.layout.ScoreLayout;
+import alphatab.rendering.staves.BarSizeInfo;
 import alphatab.rendering.staves.Stave;
 
 /**
@@ -91,6 +92,16 @@ class BarRendererBase
 	public inline function isLast() : Bool
 	{
 		return _bar.index == _bar.track.bars.length - 1;
+	}
+	
+	public function registerMaxSizes(sizes:BarSizeInfo)
+	{
+		
+	}
+	
+	public function applySizes(sizes:BarSizeInfo)
+	{
+		
 	}
 	
 	/**

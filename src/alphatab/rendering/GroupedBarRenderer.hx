@@ -1,7 +1,10 @@
 package alphatab.rendering;
 import alphatab.model.Bar;
 import alphatab.platform.ICanvas;
+import alphatab.platform.model.Color;
 import alphatab.rendering.glyphs.BeatGlyphBase;
+import alphatab.rendering.glyphs.SpacingGlyph;
+import alphatab.rendering.staves.BarSizeInfo;
 
 /**
  * This BarRenderer has 3 different groups which cna store glyphs:
@@ -11,6 +14,10 @@ import alphatab.rendering.glyphs.BeatGlyphBase;
  */
 class GroupedBarRenderer extends BarRendererBase
 {
+	public static inline var KEY_SIZE_PRE = "PRE";
+	public static inline var KEY_SIZE_BEAT = "BEAT";
+	public static inline var KEY_SIZE_POST = "POST";
+	
 	private var _preBeatGlyphs:Array<Glyph>;
 	private var _beatGlyphs:Array<BeatGlyphBase>;
 	private var _postBeatGlyphs:Array<Glyph>;
@@ -23,11 +30,16 @@ class GroupedBarRenderer extends BarRendererBase
 	    _postBeatGlyphs = new Array<Glyph>();
 	}
 	
-	public override function doLayout():Dynamic 
+	public override function doLayout():Void 
 	{
 		createPreBeatGlyphs();
 		createBeatGlyphs();
 		createPostBeatGlyphs();
+		updateWidth();
+	}
+	
+	private function updateWidth()
+	{
 		width = getPostBeatGlyphsStart();
 		if (_postBeatGlyphs.length > 0) 
 		{
@@ -35,10 +47,94 @@ class GroupedBarRenderer extends BarRendererBase
 		}
 	}
 	
+	public override function registerMaxSizes(sizes:BarSizeInfo):Void 
+	{
+		var preSize = getBeatGlyphsStart();
+		if (sizes.getSize(KEY_SIZE_PRE) < preSize)
+		{
+			sizes.setSize(KEY_SIZE_PRE, preSize);			
+		}
+		
+		for (b in _beatGlyphs)
+		{
+			if (sizes.getIndexedSize(KEY_SIZE_BEAT, b.index) < b.width)
+			{
+				sizes.setIndexedSize(KEY_SIZE_BEAT, b.index, b.width);
+			}
+		}
+		
+		var postSize:Int;
+		if (_postBeatGlyphs.length == 0)
+		{
+			postSize = 0;
+		}
+		else
+		{
+			postSize = _postBeatGlyphs[_postBeatGlyphs.length - 1].x + _postBeatGlyphs[_postBeatGlyphs.length - 1].width;
+		}
+		if (sizes.getSize(KEY_SIZE_POST) < postSize)
+		{
+			sizes.setSize(KEY_SIZE_POST, postSize);
+		}
+	}
+	
+	public override function applySizes(sizes:BarSizeInfo):Void 
+	{
+		// if we need additional space in the preBeat group we simply
+		// add a new spacer
+		var preSize = sizes.getSize(KEY_SIZE_PRE);
+		var preSizeDiff = preSize - getBeatGlyphsStart();
+		if (preSizeDiff > 0)
+		{
+			addPreBeatGlyph(new SpacingGlyph(0, 0, preSizeDiff));
+		}
+		
+		// on beat glyphs we apply the glyph spacing
+		for (i in 0 ... _beatGlyphs.length)
+		{
+			_beatGlyphs[i].x = (i == 0) ? 0 : _beatGlyphs[i - 1].x + _beatGlyphs[i - 1].width;
+			
+			var beatSize = sizes.getIndexedSize(KEY_SIZE_BEAT, i);
+			var beatDiff = beatSize - _beatGlyphs[i].width;
+			
+			
+			if (beatDiff > 0)
+			{
+				_beatGlyphs[i].applyGlyphSpacing(beatDiff);
+			}
+		}
+		
+		// on the post glyphs we add the spacing before all other glyphs
+		var postSize = sizes.getSize(KEY_SIZE_POST);
+		var postSizeDiff:Int;
+		if (_postBeatGlyphs.length == 0)
+		{
+			postSizeDiff = 0;
+		}
+		else
+		{
+			postSizeDiff =  postSize - (_postBeatGlyphs[_postBeatGlyphs.length - 1].x + _postBeatGlyphs[_postBeatGlyphs.length - 1].width);
+		}
+		
+		if (postSizeDiff > 0)
+		{
+			_postBeatGlyphs.insert(0, new SpacingGlyph(0, 0, postSizeDiff));
+			for (i in 0 ... _postBeatGlyphs.length)
+			{
+				var g = _postBeatGlyphs[i];
+				g.x = i == 0 ? 0 : _postBeatGlyphs[_postBeatGlyphs.length - 1].x + _postBeatGlyphs[_postBeatGlyphs.length - 1].width;
+				g.index = i;
+				g.renderer = this;
+			}
+		}
+		
+		updateWidth();
+	}
+	
 	private function addGlyph<T : (Glyph)>(c:Array<T>, g:T)
 	{
 		g.x = c.length == 0 ? 0 : (c[c.length - 1].x + c[c.length - 1].width);
-		g.index = _preBeatGlyphs.length;
+		g.index = c.length;
 		g.renderer = this;
 		g.doLayout();
 		c.push(g);
@@ -81,23 +177,51 @@ class GroupedBarRenderer extends BarRendererBase
 	
 	public function getBeatGlyphsStart() : Int
 	{
-		return _preBeatGlyphs.length == 0 
-			? getPreBeatGlyphStart() 
-			: _preBeatGlyphs[_preBeatGlyphs.length - 1].x 
-			  + _preBeatGlyphs[_preBeatGlyphs.length - 1].width;
+		var start = getPreBeatGlyphStart();
+		if (_preBeatGlyphs.length > 0)
+		{
+			start += _preBeatGlyphs[_preBeatGlyphs.length - 1].x + _preBeatGlyphs[_preBeatGlyphs.length - 1].width;
+		}
+		return start;
 	}
 	
 	public function getPostBeatGlyphsStart() : Int
 	{
-		return _beatGlyphs.length == 0 
-			? getBeatGlyphsStart() 
-			: _beatGlyphs[_beatGlyphs.length - 1].x 
-			  + _beatGlyphs[_beatGlyphs.length - 1].width;
+		var start = getBeatGlyphsStart();
+		if (_beatGlyphs.length > 0)
+		{
+			start += _beatGlyphs[_beatGlyphs.length - 1].x + _beatGlyphs[_beatGlyphs.length - 1].width;
+		}
+		return start;		
 	}
 		
 	public override function applyBarSpacing(spacing:Int):Void 
 	{
-		// TODO: Find out which glyphs need to be expanded on additional spacing
+        width += spacing;
+         
+        var glyphSpacing = Std.int(spacing / _beatGlyphs.length);
+        for (i in 0 ... _beatGlyphs.length)
+        {
+            var g = _beatGlyphs[i];
+            // default behavior: simply replace glyph to new position
+            if (i == 0)
+            {
+                g.x = 0;
+            }
+            else
+            {
+                g.x = _beatGlyphs[i - 1].x + _beatGlyphs[i - 1].width;
+            }
+             
+            if (g == _beatGlyphs[_beatGlyphs.length - 1])
+            {
+                g.applyGlyphSpacing(glyphSpacing + (spacing - (glyphSpacing * _beatGlyphs.length)));
+            }
+            else
+            {
+                g.applyGlyphSpacing(glyphSpacing);
+            }
+        }
 	}
 	
 	public override function paint(cx:Int, cy:Int, canvas:ICanvas)
