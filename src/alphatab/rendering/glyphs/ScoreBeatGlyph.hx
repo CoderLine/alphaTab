@@ -8,29 +8,30 @@ import alphatab.rendering.Glyph;
 import alphatab.rendering.ScoreBarRenderer;
 import alphatab.rendering.utils.BeamingHelper;
 
-class ScoreBeatGlyph extends GlyphGroup
+class ScoreBeatGlyph extends BeatGlyphBase
 {
 	public var accidentals:AccidentalGroupGlyph;
 	public var noteHeads : NoteChordGlyph;
 	public var restGlyph : RestGlyph;
 	
-	public var beat:Beat;
-	
 	public var beamingHelper:BeamingHelper;
 	
 	public function new(b:Beat) 
 	{
-		super();
-		beat = b;
+		super(b);
 	}
 	
 	public override function applyGlyphSpacing(spacing:Int):Dynamic 
 	{
 		super.applyGlyphSpacing(spacing);
-		noteHeads.updateBeamingHelper(x);
+		// TODO: we need to tell the beaming helper the position of rest beats
+		if (!beat.isRest()) 
+		{
+			noteHeads.updateBeamingHelper(x);
+		}
 	}
 		
-	public override function doLayout():Dynamic 
+	public override function doLayout():Void 
 	{
 		// create glyphs
 		if (!beat.isRest())
@@ -106,6 +107,7 @@ class ScoreBeatGlyph extends GlyphGroup
 		}
 		
 		addGlyph(new SpacingGlyph(0, 0, Std.int(getBeatDurationWidth(beat.duration) * getScale())));
+		
 		super.doLayout();
 	}
 	
@@ -168,19 +170,4 @@ class ScoreBeatGlyph extends GlyphGroup
             default:
         }
     }
-    
-    private function getBeatDurationWidth(d:Duration) : Int
-    {
-        switch(d)
-        {
-            case Whole:         return 82;
-            case Half:          return 56;
-            case Quarter:       return 36;
-            case Eighth:        return 24;
-            case Sixteenth:     return 14;
-            case ThirtySecond:  return 14;
-            case SixtyFourth:   return 14;
-            default: return 0;
-        }
-    }	
 }

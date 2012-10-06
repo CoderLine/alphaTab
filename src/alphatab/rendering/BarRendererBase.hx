@@ -59,7 +59,6 @@ class BarRendererBase
         if(bottomOverflow > this.bottomOverflow)
             this.bottomOverflow = bottomOverflow;
     }
-	    
 	
 	public function applyBarSpacing(spacing:Int) : Void
 	{

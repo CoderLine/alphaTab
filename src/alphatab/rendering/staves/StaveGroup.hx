@@ -76,6 +76,9 @@ class StaveGroup
 			}
 		}
 		
+		// TODO: we need to iterate over all beatglyphs within the new renderers 
+		// and ensure all of those beatGlyphs have the same position and width over all staves
+		
 		// ensure same width of new renderer
 		for (s in staves)
 		{
@@ -142,9 +145,8 @@ class StaveGroup
 
 			
 			var firstStart = cy + y + staves[0].y + staves[0].staveTop + staves[0].topSpacing + staves[0].getTopOverflow();
-			var lastEnd = cy + y + staves[staves.length - 1].y + staves[staves.length - 1].height 
-                                 - staves[staves.length - 1].getBottomOverflow() - staves[staves.length - 1].bottomSpacing
-                                 - staves[staves.length - 1].staveBottom;
+			var lastEnd = cy + y + staves[staves.length - 1].y + staves[staves.length - 1].topSpacing + staves[staves.length - 1].getTopOverflow()
+							     + staves[staves.length - 1].staveBottom;
 			
 			canvas.setColor(res.barSeperatorColor);
 			

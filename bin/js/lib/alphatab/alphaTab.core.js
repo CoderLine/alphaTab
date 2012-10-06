@@ -3868,6 +3868,7 @@ alphatab.rendering.GlyphBarRenderer = $hxClasses["alphatab.rendering.GlyphBarRen
 	alphatab.rendering.BarRendererBase.call(this,bar);
 	this.glyphs = new Array();
 	this.scaleGlyphs = new Array();
+	this.beatGlyphs = new Array();
 };
 alphatab.rendering.GlyphBarRenderer.__name__ = ["alphatab","rendering","GlyphBarRenderer"];
 alphatab.rendering.GlyphBarRenderer.__super__ = alphatab.rendering.BarRendererBase;
@@ -3904,12 +3905,14 @@ alphatab.rendering.GlyphBarRenderer.prototype = $extend(alphatab.rendering.BarRe
 		if(!ignoreSize && glyph.x + glyph.width > this.width) this.width = glyph.x + glyph.width;
 		this.glyphs.push(glyph);
 		if(!ignoreSize && glyph.canScale()) this.scaleGlyphs.push(glyph);
+		if(js.Boot.__instanceof(glyph,alphatab.rendering.glyphs.BeatGlyphBase)) this.beatGlyphs.push(js.Boot.__cast(glyph , alphatab.rendering.glyphs.BeatGlyphBase));
 	}
 	,createGlyphs: function() {
 	}
 	,doLayout: function() {
 		this.createGlyphs();
 	}
+	,beatGlyphs: null
 	,scaleGlyphs: null
 	,glyphs: null
 	,__class__: alphatab.rendering.GlyphBarRenderer
@@ -4114,7 +4117,7 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Glyph
 		} else if(this._bar.nextBar == null || !this._bar.nextBar.getMasterBar().isRepeatStart) this.addGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph(0,0,this._bar.index == this._bar.track.bars.length - 1));
 	}
 	,createBarStartGlyphs: function() {
-		if(this._bar.getMasterBar().isRepeatStart) this.addGlyph(new alphatab.rendering.glyphs.RepeatOpenGlyph());
+		if(this._bar.getMasterBar().isRepeatStart) this.addGlyph(new alphatab.rendering.glyphs.RepeatOpenGlyph(0,0,1.5,3));
 	}
 	,createStartSpacing: function() {
 		if(this._startSpacing) return;
@@ -4396,11 +4399,19 @@ alphatab.rendering.ScoreRenderer.prototype = {
 }
 alphatab.rendering.TabBarRenderer = $hxClasses["alphatab.rendering.TabBarRenderer"] = function(bar) {
 	alphatab.rendering.GlyphBarRenderer.call(this,bar);
+	this._beatPosition = new IntHash();
 };
 alphatab.rendering.TabBarRenderer.__name__ = ["alphatab","rendering","TabBarRenderer"];
 alphatab.rendering.TabBarRenderer.__super__ = alphatab.rendering.GlyphBarRenderer;
 alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.GlyphBarRenderer.prototype,{
-	paintBackground: function(cx,cy,canvas) {
+	drawInfoGuide: function(canvas,cx,cy,y,c) {
+		canvas.setColor(c);
+		canvas.beginPath();
+		canvas.moveTo(cx + this.x,cy + this.y + y);
+		canvas.lineTo(cx + this.x + this.width,cy + this.y + y);
+		canvas.stroke();
+	}
+	,paintBackground: function(cx,cy,canvas) {
 		var res = this.stave.staveGroup.layout.renderer.renderingResources;
 		canvas.setColor(res.staveLineColor);
 		var lineY = cy + this.y + this.getNumberOverflow();
@@ -4414,21 +4425,59 @@ alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.GlyphBa
 			canvas.lineTo(cx + this.x + this.width,lineY);
 			canvas.stroke();
 		}
-		canvas.setColor(res.barSeperatorColor);
-		canvas.beginPath();
-		canvas.moveTo(cx + this.x + this.width,startY);
-		canvas.lineTo(cx + this.x + this.width,lineY);
-		canvas.stroke();
 	}
 	,getNumberOverflow: function() {
 		var res = this.stave.staveGroup.layout.renderer.renderingResources;
 		return res.tablatureFont.getSize() / 2 + res.tablatureFont.getSize() * 0.2 | 0;
 	}
+	,createBarEndGlyphs: function() {
+		if(this._bar.getMasterBar().repeatCount > 0) {
+			this.addGlyph(new alphatab.rendering.glyphs.RepeatCloseGlyph(this.x,0));
+			if(this._bar.getMasterBar().repeatCount > 1) {
+				var line = this._bar.index == this._bar.track.bars.length - 1 || this.index == this.stave.barRenderers.length - 1?-1:-4;
+				this.addGlyph(new alphatab.rendering.glyphs.RepeatCountGlyph(0,this.getScoreY(line,-3),this._bar.getMasterBar().repeatCount + 1));
+			}
+		} else if(this._bar.getMasterBar().isDoubleBar) {
+			this.addGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph());
+			this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,3 * this.stave.staveGroup.layout.renderer.scale | 0,false));
+			this.addGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph());
+		} else if(this._bar.nextBar == null || !this._bar.nextBar.getMasterBar().isRepeatStart) this.addGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph(0,0,this._bar.index == this._bar.track.bars.length - 1));
+	}
+	,getScoreY: function(steps,correction) {
+		if(correction == null) correction = 0;
+		return 11 * this.stave.staveGroup.layout.renderer.scale / 2 * steps + correction * this.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,getBottomPadding: function() {
+		return this.getNumberOverflow();
+	}
+	,getTopPadding: function() {
+		return this.getNumberOverflow();
+	}
+	,createBarStartGlyphs: function() {
+		if(this._bar.getMasterBar().isRepeatStart) this.addGlyph(new alphatab.rendering.glyphs.RepeatOpenGlyph(0,0,2.5,4));
+	}
+	,createBeatGlyphs: function(b) {
+		var g = new alphatab.rendering.glyphs.TabBeatGlyph(b);
+		this._beatPosition.set(b.index,g);
+		this.addGlyph(g);
+	}
+	,createVoiceGlyphs: function(v) {
+		var _g = 0, _g1 = v.beats;
+		while(_g < _g1.length) {
+			var b = _g1[_g];
+			++_g;
+			this.createBeatGlyphs(b);
+		}
+	}
+	,createStartGlyphs: function() {
+		if(this.stave.index == 0) this.addGlyph(new alphatab.rendering.glyphs.BarNumberGlyph(0,this.getScoreY(-1,-3),this._bar.index + 1)); else this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,8 * this.stave.staveGroup.layout.renderer.scale | 0,false));
+	}
 	,createGlyphs: function() {
-		alphatab.rendering.GlyphBarRenderer.prototype.createGlyphs.call(this);
-		this.addGlyph(new alphatab.rendering.glyphs.DummyTablatureGlyph(0,0));
-		this.addGlyph(new alphatab.rendering.glyphs.DummyTablatureGlyph(0,0));
-		this.addGlyph(new alphatab.rendering.glyphs.DummyTablatureGlyph(0,0));
+		this.createBarStartGlyphs();
+		this.createStartGlyphs();
+		if(this._bar.isEmpty()) this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,30 * this.stave.staveGroup.layout.renderer.scale | 0,false));
+		this.createVoiceGlyphs(this._bar.voices[0]);
+		this.createBarEndGlyphs();
 	}
 	,doLayout: function() {
 		alphatab.rendering.GlyphBarRenderer.prototype.doLayout.call(this);
@@ -4441,6 +4490,7 @@ alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.GlyphBa
 	,getLineOffset: function() {
 		return 11 * this.stave.staveGroup.layout.renderer.scale;
 	}
+	,_beatPosition: null
 	,__class__: alphatab.rendering.TabBarRenderer
 });
 alphatab.rendering.TabBarRendererFactory = $hxClasses["alphatab.rendering.TabBarRendererFactory"] = function() {
@@ -4862,6 +4912,49 @@ alphatab.rendering.glyphs.BeamGlyph.prototype = $extend(alphatab.rendering.glyph
 		if(direction == alphatab.rendering.utils.BeamDirection.Up) return 1; else return -1;
 	}
 	,__class__: alphatab.rendering.glyphs.BeamGlyph
+});
+alphatab.rendering.glyphs.BeatGlyphBase = $hxClasses["alphatab.rendering.glyphs.BeatGlyphBase"] = function(b) {
+	alphatab.rendering.glyphs.GlyphGroup.call(this);
+	this.beat = b;
+};
+alphatab.rendering.glyphs.BeatGlyphBase.__name__ = ["alphatab","rendering","glyphs","BeatGlyphBase"];
+alphatab.rendering.glyphs.BeatGlyphBase.__super__ = alphatab.rendering.glyphs.GlyphGroup;
+alphatab.rendering.glyphs.BeatGlyphBase.prototype = $extend(alphatab.rendering.glyphs.GlyphGroup.prototype,{
+	getBeatDurationWidth: function(d) {
+		switch( (d)[1] ) {
+		case 0:
+			return 82;
+		case 1:
+			return 56;
+		case 2:
+			return 36;
+		case 3:
+			return 24;
+		case 4:
+			return 14;
+		case 5:
+			return 14;
+		case 6:
+			return 14;
+		default:
+			return 0;
+		}
+	}
+	,doLayout: function() {
+		var w = 0;
+		var _g = 0, _g1 = this._glyphs;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.x = w;
+			g.renderer = this.renderer;
+			g.doLayout();
+			w += g.width;
+		}
+		this.width = w;
+	}
+	,beat: null
+	,__class__: alphatab.rendering.glyphs.BeatGlyphBase
 });
 alphatab.rendering.glyphs.CircleGlyph = $hxClasses["alphatab.rendering.glyphs.CircleGlyph"] = function(x,y,size) {
 	if(y == null) y = 0;
@@ -5313,10 +5406,12 @@ alphatab.rendering.glyphs.RepeatCountGlyph.prototype = $extend(alphatab.renderin
 	,_count: null
 	,__class__: alphatab.rendering.glyphs.RepeatCountGlyph
 });
-alphatab.rendering.glyphs.RepeatOpenGlyph = $hxClasses["alphatab.rendering.glyphs.RepeatOpenGlyph"] = function(x,y) {
+alphatab.rendering.glyphs.RepeatOpenGlyph = $hxClasses["alphatab.rendering.glyphs.RepeatOpenGlyph"] = function(x,y,circleSize,dotOffset) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.Glyph.call(this,x,y);
+	this._dotOffset = dotOffset;
+	this._circleSize = circleSize;
 };
 alphatab.rendering.glyphs.RepeatOpenGlyph.__name__ = ["alphatab","rendering","glyphs","RepeatOpenGlyph"];
 alphatab.rendering.glyphs.RepeatOpenGlyph.__super__ = alphatab.rendering.Glyph;
@@ -5336,12 +5431,11 @@ alphatab.rendering.glyphs.RepeatOpenGlyph.prototype = $extend(alphatab.rendering
 		canvas.lineTo(left,bottom);
 		canvas.stroke();
 		left += 3 * this.renderer.stave.staveGroup.layout.renderer.scale;
-		var circleSize = 1.5 * this.renderer.stave.staveGroup.layout.renderer.scale;
+		var circleSize = this._circleSize * this.renderer.stave.staveGroup.layout.renderer.scale;
 		var middle = (top + bottom) / 2;
-		var dotOffset = 3;
 		canvas.beginPath();
-		canvas.circle(left,middle - circleSize * dotOffset,circleSize);
-		canvas.circle(left,middle + circleSize * dotOffset,circleSize);
+		canvas.circle(left,middle - circleSize * this._dotOffset,circleSize);
+		canvas.circle(left,middle + circleSize * this._dotOffset,circleSize);
 		canvas.fill();
 	}
 	,canScale: function() {
@@ -5350,6 +5444,8 @@ alphatab.rendering.glyphs.RepeatOpenGlyph.prototype = $extend(alphatab.rendering
 	,doLayout: function() {
 		this.width = 13 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
+	,_circleSize: null
+	,_dotOffset: null
 	,__class__: alphatab.rendering.glyphs.RepeatOpenGlyph
 });
 alphatab.rendering.glyphs.RestGlyph = $hxClasses["alphatab.rendering.glyphs.RestGlyph"] = function(x,y,duration) {
@@ -5388,33 +5484,12 @@ alphatab.rendering.glyphs.RestGlyph.prototype = $extend(alphatab.rendering.glyph
 	,__class__: alphatab.rendering.glyphs.RestGlyph
 });
 alphatab.rendering.glyphs.ScoreBeatGlyph = $hxClasses["alphatab.rendering.glyphs.ScoreBeatGlyph"] = function(b) {
-	alphatab.rendering.glyphs.GlyphGroup.call(this);
-	this.beat = b;
+	alphatab.rendering.glyphs.BeatGlyphBase.call(this,b);
 };
 alphatab.rendering.glyphs.ScoreBeatGlyph.__name__ = ["alphatab","rendering","glyphs","ScoreBeatGlyph"];
-alphatab.rendering.glyphs.ScoreBeatGlyph.__super__ = alphatab.rendering.glyphs.GlyphGroup;
-alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.glyphs.GlyphGroup.prototype,{
-	getBeatDurationWidth: function(d) {
-		switch( (d)[1] ) {
-		case 0:
-			return 82;
-		case 1:
-			return 56;
-		case 2:
-			return 36;
-		case 3:
-			return 24;
-		case 4:
-			return 14;
-		case 5:
-			return 14;
-		case 6:
-			return 14;
-		default:
-			return 0;
-		}
-	}
-	,createAccidentalGlyph: function(n) {
+alphatab.rendering.glyphs.ScoreBeatGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
+alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
+	createAccidentalGlyph: function(n) {
 		var sr = js.Boot.__cast(this.renderer , alphatab.rendering.ScoreBarRenderer);
 		var noteLine = sr.getNoteLine(n);
 		var accidental = sr.accidentalHelper.applyAccidental(n,noteLine);
@@ -5508,14 +5583,13 @@ alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.
 			this.addGlyph(new alphatab.rendering.glyphs.RestGlyph(0,y,this.beat.duration));
 		}
 		this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,this.getBeatDurationWidth(this.beat.duration) * this.renderer.stave.staveGroup.layout.renderer.scale | 0));
-		alphatab.rendering.glyphs.GlyphGroup.prototype.doLayout.call(this);
+		alphatab.rendering.glyphs.BeatGlyphBase.prototype.doLayout.call(this);
 	}
 	,applyGlyphSpacing: function(spacing) {
-		alphatab.rendering.glyphs.GlyphGroup.prototype.applyGlyphSpacing.call(this,spacing);
-		this.noteHeads.updateBeamingHelper(this.x);
+		alphatab.rendering.glyphs.BeatGlyphBase.prototype.applyGlyphSpacing.call(this,spacing);
+		if(!this.beat.isRest()) this.noteHeads.updateBeamingHelper(this.x);
 	}
 	,beamingHelper: null
-	,beat: null
 	,restGlyph: null
 	,noteHeads: null
 	,accidentals: null
@@ -5600,6 +5674,31 @@ alphatab.rendering.glyphs.SpacingGlyph.prototype = $extend(alphatab.rendering.Gl
 	,_scaling: null
 	,__class__: alphatab.rendering.glyphs.SpacingGlyph
 });
+alphatab.rendering.glyphs.TabBeatGlyph = $hxClasses["alphatab.rendering.glyphs.TabBeatGlyph"] = function(b) {
+	alphatab.rendering.glyphs.BeatGlyphBase.call(this,b);
+};
+alphatab.rendering.glyphs.TabBeatGlyph.__name__ = ["alphatab","rendering","glyphs","TabBeatGlyph"];
+alphatab.rendering.glyphs.TabBeatGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
+alphatab.rendering.glyphs.TabBeatGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
+	doLayout: function() {
+		if(!this.beat.isRest()) {
+		} else {
+		}
+		this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,this.getBeatDurationWidth(this.beat.duration) * this.renderer.stave.staveGroup.layout.renderer.scale | 0));
+		var w = 0;
+		var _g = 0, _g1 = this._glyphs;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.x = w;
+			g.renderer = this.renderer;
+			g.doLayout();
+			w += g.width;
+		}
+		this.width = w;
+	}
+	,__class__: alphatab.rendering.glyphs.TabBeatGlyph
+});
 alphatab.rendering.glyphs.TimeSignatureGlyph = $hxClasses["alphatab.rendering.glyphs.TimeSignatureGlyph"] = function(x,y,numerator,denominator) {
 	alphatab.rendering.glyphs.GlyphGroup.call(this,x,y,new Array());
 	this._numerator = numerator;
@@ -5640,6 +5739,7 @@ alphatab.rendering.layout.ScoreLayout.prototype = {
 		var group = new alphatab.rendering.staves.StaveGroup();
 		group.layout = this;
 		group.addStave(new alphatab.rendering.staves.Stave(new alphatab.rendering.ScoreBarRendererFactory()));
+		group.addStave(new alphatab.rendering.staves.Stave(new alphatab.rendering.TabBarRendererFactory()));
 		return group;
 	}
 	,paintScore: function() {
@@ -5948,7 +6048,7 @@ alphatab.rendering.staves.StaveGroup.prototype = {
 		var res = this.layout.renderer.renderingResources;
 		if(this.staves.length > 0) {
 			var firstStart = cy + this.y + this.staves[0].y + this.staves[0].staveTop + this.staves[0].topSpacing + this.staves[0].getTopOverflow();
-			var lastEnd = cy + this.y + this.staves[this.staves.length - 1].y + this.staves[this.staves.length - 1].height - this.staves[this.staves.length - 1].getBottomOverflow() - this.staves[this.staves.length - 1].bottomSpacing - this.staves[this.staves.length - 1].staveBottom;
+			var lastEnd = cy + this.y + this.staves[this.staves.length - 1].y + this.staves[this.staves.length - 1].topSpacing + this.staves[this.staves.length - 1].getTopOverflow() + this.staves[this.staves.length - 1].staveBottom;
 			canvas.setColor(res.barSeperatorColor);
 			canvas.beginPath();
 			canvas.moveTo(cx + this.x + this.staves[0].x,firstStart);
@@ -6025,8 +6125,7 @@ alphatab.rendering.staves.StaveGroup.prototype = {
 		while(_g < _g1.length) {
 			var s = _g1[_g];
 			++_g;
-			var diff = maxW - s.barRenderers[s.barRenderers.length - 1].width;
-			if(diff > 0) s.barRenderers[s.barRenderers.length - 1].applyBarSpacing(diff);
+			if(maxW > s.barRenderers[s.barRenderers.length - 1].width) s.barRenderers[s.barRenderers.length - 1].width = maxW;
 		}
 		this.width += maxW;
 	}

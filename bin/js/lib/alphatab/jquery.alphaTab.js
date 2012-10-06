@@ -168,10 +168,15 @@ var alphaTabWrapper;
             {
                 self.options.errorCallback(msg);
             }
-            else
+            else if(msg instanceof Error)
             {
-                throw msg;
+				throw msg;
+
             }
+			else 
+			{
+				console.error(msg);
+			}
         }
 
 

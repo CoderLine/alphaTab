@@ -21,9 +21,13 @@ import alphatab.rendering.Glyph;
 
 class RepeatOpenGlyph extends Glyph
 {
-	public function new(x:Int = 0, y:Int = 0)
+	private var _dotOffset:Int;
+	private var _circleSize:Float;
+	public function new(x:Int = 0, y:Int = 0, circleSize:Float, dotOffset:Int)
 	{
 		super(x, y);
+		_dotOffset = dotOffset;
+		_circleSize = circleSize;
 	}
 
 	public override function doLayout():Void 
@@ -60,12 +64,11 @@ class RepeatOpenGlyph extends Glyph
 		//circles 
 		left += 3 * getScale();
 		
-		var circleSize = 1.5 * getScale();
+		var circleSize = _circleSize * getScale();
 		var middle = (top + bottom) / 2;
-		var dotOffset = 3;
 		canvas.beginPath();
-		canvas.circle(left, middle - (circleSize * dotOffset), circleSize);
-		canvas.circle(left, middle + (circleSize * dotOffset), circleSize);
+		canvas.circle(left, middle - (circleSize * _dotOffset), circleSize);
+		canvas.circle(left, middle + (circleSize * _dotOffset), circleSize);
 		canvas.fill();
 	}
 }

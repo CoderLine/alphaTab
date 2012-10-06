@@ -439,7 +439,7 @@ class ScoreBarRenderer extends GlyphBarRenderer
 	{
 		if (_bar.getMasterBar().isRepeatStart)
 		{
-			addGlyph(new RepeatOpenGlyph());
+			addGlyph(new RepeatOpenGlyph(0, 0, 1.5, 3));
 		}
 	}	
 	private function createBarEndGlyphs()

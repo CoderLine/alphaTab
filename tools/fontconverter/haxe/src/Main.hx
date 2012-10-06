@@ -54,7 +54,7 @@ class Main
 			var initialX = 100;
 			var initialY = 100;
 			// a zoom level for more detailed positioning 
-			var zoom = 2; 
+			var zoom = 2 * CoordinateScale; 
 			// this point will be our "zero point". we need this because we dont want to align the glyphs outside the canvas 
 			var zeroX = 150;
 			var zeroY = 150;
@@ -65,8 +65,10 @@ class Main
             var button = new JQuery('#render');
             var preview = new JQuery('#preview');
             var glyphName = new JQuery('#glyphName');
-            var generateButton = new JQuery('#generateButton');
-            var code = new JQuery('#code');
+            var generateFontButton = new JQuery('#generateFontButton');
+            var generateClassButton = new JQuery('#generateClassButton');
+            var classCode = new JQuery('#class');
+            var fontCode = new JQuery('#font');
 			
             // create the structure for rendering
             var renderer = new ScoreRenderer(Lib.document.getElementById("glyphCanvas"));
@@ -193,8 +195,12 @@ class Main
 				new JQuery("#glyphList option:selected").text(glyphName.val());
 			});
 			
-			generateButton.click(function(_) {
-				code.text(generateClass(zeroX, zeroY, zoom));
+			generateClassButton.click(function(_) {
+				classCode.text(generateClass(zeroX, zeroY, zoom));
+			});
+			
+			generateFontButton.click(function(_) {
+				fontCode.text(generateSvgFont(zeroX, zeroY, zoom));
 			});
 			
 			preview.change(function(_) {
@@ -225,11 +231,54 @@ class Main
 			buf.add("    public static var ");
 			buf.add(g.name);
 			buf.add(" = \"");
-			buf.add(rewritePathData(g, zeroX, zeroY, zoom));
+			buf.add(rewritePathData(g, zeroX, zeroY, zoom / 100));
 			buf.add("\";\r\n");
 		}
 		
 		buf.add("}");
+		
+		return buf.toString();
+	}
+		
+	
+	private static function generateSvgFont(zeroX:Float, zeroY:Float, zoom:Float) 
+	{
+		var buf = new StringBuf();
+		
+		buf.add("<?xml version=\"1.0\"?>\r\n");
+		buf.add("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\r\n");
+		buf.add("<svg viewBox=\"0 0 200 200\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">\r\n");
+		buf.add("  <defs>\r\n");
+		buf.add("    <font id=\"f\" horiz-adv-x=\"1000\">\r\n");
+		buf.add("      <font-face font-family=\"AlphaTab\" units-per-em=\"1000\" cap-height=\"600\" x-height=\"400\" ascent=\"-1000\" descent=\"1000\" alphabetic=\"0\" mathematical=\"350\" ideographic=\"400\" hanging=\"500\" />\r\n");
+			
+		var code = "0".code;
+		for (g in glyphs)
+		{
+			buf.add("        <glyph transform=\"scale(1,-1)\" unicode=\"");
+			var s = String.fromCharCode(code++);
+			if (s == "<") 
+			{
+				buf.add("&lt;");
+			}
+			else if (s == ">") 
+			{
+				buf.add("&gt;");
+			}
+			else 
+			{
+				buf.add(s);
+			}
+			buf.add("\" glyph-name=\"");
+			buf.add(g.name);
+			buf.add("\"><path d=\"");
+			buf.add(rewritePathData(g, zeroX, zeroY, zoom / 100));			
+			buf.add("\" /></glyph>\r\n");
+		}
+		
+		buf.add("    </font>\r\n");
+		buf.add("  </defs>\r\n");
+		buf.add("</svg>");
 		
 		return buf.toString();
 	}
@@ -254,7 +303,7 @@ class Main
 				switch(p.lastCommand)
 				{
 					case "m", "z", "l", "v", "h", "c", "s", "q", "t": // relative paths can remain
-						buf.add(newValue); // TODO: reduce decimals by scaling
+						buf.add(newValue); 
 					case "H":
 						buf.add(newValue + calculateTranslation(g.x, zoom / CoordinateScale, zeroX));
 					case "V":
@@ -288,6 +337,24 @@ class Main
 		var dom = Xml.parse(svg);
 		
 		processNode(dom.firstElement(), zoom);
+		
+		var mapping = Resource.getString("mapping");
+		var mappingEntry = mapping.split("\n");
+		for (m in mappingEntry) 
+		{
+			if (!StringTools.startsWith(m, "#")) 
+			{
+				var parts = StringTools.trim(m).split(';');
+				var i = Std.parseInt(parts[0]);
+				var name = parts[1];
+				var x = Std.parseInt(parts[2]);
+				var y = Std.parseInt(parts[3]);
+				
+				glyphs[i].name = name;
+				glyphs[i].x = x;
+				glyphs[i].y = y;
+			}			
+		}
 	}   
 	public static function processNode(node:Xml, zoom:Float)
 	{

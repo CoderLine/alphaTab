@@ -17,10 +17,18 @@
 package alphatab.rendering;
 
 import alphatab.model.Bar;
+import alphatab.model.Beat;
+import alphatab.model.Voice;
 import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
+import alphatab.rendering.glyphs.BarNumberGlyph;
+import alphatab.rendering.glyphs.BarSeperatorGlyph;
 import alphatab.rendering.glyphs.DummyTablatureGlyph;
+import alphatab.rendering.glyphs.RepeatCloseGlyph;
+import alphatab.rendering.glyphs.RepeatCountGlyph;
+import alphatab.rendering.glyphs.RepeatOpenGlyph;
 import alphatab.rendering.glyphs.SpacingGlyph;
+import alphatab.rendering.glyphs.TabBeatGlyph;
 
 /**
  * This BarRenderer renders a bar using guitar tablature notation. 
@@ -28,9 +36,14 @@ import alphatab.rendering.glyphs.SpacingGlyph;
 class TabBarRenderer extends GlyphBarRenderer
 {
 	private static inline var LineSpacing = 10;
+	
+	private var _beatPosition : IntHash<TabBeatGlyph>;
+
+		
 	public function new(bar:Bar) 
 	{
 		super(bar);
+		_beatPosition = new IntHash<TabBeatGlyph>();		
 	}
 	
 	private inline function getLineOffset()
@@ -51,10 +64,99 @@ class TabBarRenderer extends GlyphBarRenderer
 	
 	private override function createGlyphs():Void 
 	{
-		super.createGlyphs();
-		addGlyph(new DummyTablatureGlyph(0, 0));
-		addGlyph(new DummyTablatureGlyph(0, 0));
-		addGlyph(new DummyTablatureGlyph(0, 0));
+		createBarStartGlyphs();
+		
+		createStartGlyphs();
+				
+		if (_bar.isEmpty())
+		{
+			addGlyph(new SpacingGlyph(0, 0, Std.int(30 * getScale()), false));
+		}
+        
+        // TODO: Render all voices
+        createVoiceGlyphs(_bar.voices[0]);
+
+		
+		createBarEndGlyphs();
+	}
+	
+	private function createStartGlyphs()
+	{
+		// Clef (TODO)
+				
+		if (stave.index == 0)
+		{
+			addGlyph(new BarNumberGlyph(0,getScoreY(-1, -3),_bar.index + 1));
+		}
+        else
+        {
+            addGlyph(new SpacingGlyph(0, 0, Std.int(8 * getScale()), false));
+        }
+	}
+	
+	private function createVoiceGlyphs(v:Voice)
+    {
+        for (b in v.beats)
+        {
+            createBeatGlyphs(b);
+        }
+    }
+	
+	private function createBeatGlyphs(b:Beat)
+    {
+		var g = new TabBeatGlyph(b);
+		_beatPosition.set(b.index, g);
+		addGlyph(g); 
+    }	
+	
+	private function createBarStartGlyphs()
+	{
+		if (_bar.getMasterBar().isRepeatStart)
+		{
+			addGlyph(new RepeatOpenGlyph(0, 0, 2.5, 4));
+		}
+	}
+	
+	public override function getTopPadding():Int 
+	{
+		return getNumberOverflow();
+	}	
+	
+	public override function getBottomPadding():Int 
+	{
+		return getNumberOverflow();
+	}
+	
+	/**
+	 * Gets the relative y position of the given steps relative to first line. 
+	 * @param steps the amount of steps while 2 steps are one line
+	 */
+	public function getScoreY(steps:Int, correction:Int = 0) : Int
+	{
+		return Std.int(((getLineOffset() / 2) * steps) + (correction * getScale()));
+	}
+	
+	private function createBarEndGlyphs()
+	{
+		if (_bar.getMasterBar().isRepeatEnd())
+		{
+			addGlyph(new RepeatCloseGlyph(x, 0));
+			if (_bar.getMasterBar().repeatCount > 1)
+			{
+                var line = isLast() || isLastOfLine() ? -1 : -4;
+				addGlyph(new RepeatCountGlyph(0, getScoreY(line, -3), _bar.getMasterBar().repeatCount + 1));
+			}
+        }
+		else if (_bar.getMasterBar().isDoubleBar)
+		{
+			addGlyph(new BarSeperatorGlyph());
+			addGlyph(new SpacingGlyph(0, 0, Std.int(3 * getScale()), false));
+			addGlyph(new BarSeperatorGlyph());
+		}		
+		else if(_bar.nextBar == null || !_bar.nextBar.getMasterBar().isRepeatStart)
+		{
+			addGlyph(new BarSeperatorGlyph(0,0,isLast()));
+		}
 	}
 	
 	/**
@@ -87,19 +189,20 @@ class TabBarRenderer extends GlyphBarRenderer
 			canvas.stroke();
 		}
 		
-		//
-		// Draw separators
-		// 
-		
-		canvas.setColor(res.barSeperatorColor);
-		
+		// Info guides for debugging
+
+		// drawInfoGuide(canvas, cx, cy, 0, new Color(255, 0, 0)); // top
+		// drawInfoGuide(canvas, cx, cy, stave.staveTop, new Color(0, 255, 0)); // stavetop
+		// drawInfoGuide(canvas, cx, cy, stave.staveBottom, new Color(0,255,0)); // stavebottom
+		// drawInfoGuide(canvas, cx, cy, height, new Color(255, 0, 0)); // bottom
+	}
+	
+	private function drawInfoGuide(canvas:ICanvas, cx:Int, cy:Int, y:Int, c:Color)
+	{
+		canvas.setColor(c);
 		canvas.beginPath();
-		canvas.moveTo(cx + x + width, startY);
-		canvas.lineTo(cx + x + width, lineY);
+		canvas.moveTo(cx + x, cy + this.y + y);
+		canvas.lineTo(cx + x + width, cy + this.y + y);
 		canvas.stroke();
-				
-		// Borders of the renderer
-		// canvas.setColor(new Color(255,0,0));
-		// canvas.strokeRect(cx + x, cy + y, width, height);
 	}
 }
