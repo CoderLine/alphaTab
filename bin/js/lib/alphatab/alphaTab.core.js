@@ -1202,7 +1202,7 @@ alphatab.importer.AlphaTexImporter.prototype = $extend(alphatab.importer.ScoreIm
 		this.newSy();
 		var note = new alphatab.model.Note();
 		this.noteEffects(note);
-		note.string = this._track.tuning.length - string;
+		note.string = string - 1;
 		note.isDead = isDead;
 		note.isTieDestination = isTie;
 		if(!isTie) note.fret = fret;
@@ -5927,9 +5927,8 @@ alphatab.rendering.glyphs.TabBeatGlyph.__super__ = alphatab.rendering.glyphs.Bea
 alphatab.rendering.glyphs.TabBeatGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
 	createNoteGlyph: function(n) {
 		var tr = js.Boot.__cast(this.renderer , alphatab.rendering.TabBarRenderer);
-		var l = n.beat.voice.bar.track.tuning.length - n.string;
 		var noteNumberGlyph = new alphatab.rendering.glyphs.NoteNumberGlyph(0,0,n);
-		noteNumberGlyph.y = tr.getTabY(l,-2);
+		noteNumberGlyph.y = tr.getTabY(n.string + 1,-2);
 		this.noteNumbers.addNoteGlyph(noteNumberGlyph,n);
 	}
 	,doLayout: function() {
