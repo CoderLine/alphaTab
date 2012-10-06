@@ -4877,7 +4877,7 @@ alphatab.rendering.glyphs.AccidentalGroupGlyph.prototype = $extend(alphatab.rend
 			columns[gColumn] = g.y + accidentalSize;
 		}
 		var columnWidth = 8 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
-		this.width = columnWidth * columns.length;
+		if(this._glyphs.length == 0) this.width = 0; else this.width = columnWidth * columns.length;
 		var _g = 0, _g1 = this._glyphs;
 		while(_g < _g1.length) {
 			var g = _g1[_g];
@@ -6011,7 +6011,7 @@ alphatab.rendering.staves.BarSizeInfo.prototype = {
 		this.sizes.get(key)[index] = size;
 	}
 	,getIndexedSize: function(key,index) {
-		if(this.sizes.exists(key)) return this.sizes.get(key)[index];
+		if(this.sizes.exists(key) && index < this.sizes.get(key).length) return this.sizes.get(key)[index];
 		return 0;
 	}
 	,getSize: function(key) {

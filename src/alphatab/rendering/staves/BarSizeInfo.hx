@@ -31,7 +31,7 @@ class BarSizeInfo
 	
 	public function getIndexedSize(key:String, index:Int)
 	{
-		if (sizes.exists(key))
+		if (sizes.exists(key) && index < sizes.get(key).length)
 		{
 			return sizes.get(key)[index];
 		}

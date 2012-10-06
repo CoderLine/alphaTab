@@ -72,7 +72,14 @@ class AccidentalGroupGlyph extends GlyphGroup
         // Place accidentals in columns
         //
         var columnWidth = Std.int(8 * getScale());
-        width = columnWidth * columns.length;
+		if (_glyphs.length == 0) 
+		{
+			width = 0;
+		}
+        else
+		{
+			width = columnWidth * columns.length;
+		}
         
         for (g in _glyphs)
         {
