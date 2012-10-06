@@ -5462,7 +5462,6 @@ alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.
 				_g.createNoteGlyph(n);
 			});
 			this.addGlyph(this.noteHeads);
-			this.noteHeads.updateBeamingHelper(this.x);
 			var _g1 = 0, _g2 = this.beat.dots;
 			while(_g1 < _g2) {
 				var i = _g1++;
@@ -5505,6 +5504,7 @@ alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.
 		}
 		this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,this.getBeatDurationWidth(this.beat.duration) * this.renderer.stave.staveGroup.layout.renderer.scale | 0));
 		alphatab.rendering.glyphs.BeatGlyphBase.prototype.doLayout.call(this);
+		if(this.noteHeads != null) this.noteHeads.updateBeamingHelper(this.x);
 	}
 	,applyGlyphSpacing: function(spacing) {
 		alphatab.rendering.glyphs.BeatGlyphBase.prototype.applyGlyphSpacing.call(this,spacing);

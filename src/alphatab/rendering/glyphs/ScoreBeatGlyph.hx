@@ -62,9 +62,7 @@ class ScoreBeatGlyph extends BeatGlyphBase
             noteLoop( function(n) {
                 createNoteGlyph(n);
             });
-            addGlyph(noteHeads);
-			noteHeads.updateBeamingHelper(x);
-			
+            addGlyph(noteHeads);			
 			
             //
             // Note dots
@@ -109,6 +107,10 @@ class ScoreBeatGlyph extends BeatGlyphBase
 		addGlyph(new SpacingGlyph(0, 0, Std.int(getBeatDurationWidth(beat.duration) * getScale())));
 		
 		super.doLayout();
+		if (noteHeads != null)
+		{
+			noteHeads.updateBeamingHelper(x);
+		}
 	}
 	
     private function createBeatDot(n:Note, group:GlyphGroup)
