@@ -52,7 +52,7 @@ class ScoreLayout
         var group:StaveGroup = new StaveGroup();
 		group.layout = this;
 		group.addStave(new Stave(new ScoreBarRendererFactory()));
-		//group.addStave(new Stave(new TabBarRendererFactory()));
+		group.addStave(new Stave(new TabBarRendererFactory()));
         return group;
     }
 }

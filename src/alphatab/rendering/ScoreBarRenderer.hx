@@ -101,8 +101,6 @@ class ScoreBarRenderer extends GroupedBarRenderer
     public var accidentalHelper:AccidentalHelper;
     private var _beamHelpers:Array<BeamingHelper>;
 	
-	private var _beatPosition : IntHash<ScoreBeatGlyph>;
-    
     private var _currentBeamHelper:BeamingHelper;
     
 	public function new(bar:alphatab.model.Bar) 
@@ -110,14 +108,13 @@ class ScoreBarRenderer extends GroupedBarRenderer
 		super(bar);
         accidentalHelper = new AccidentalHelper();
         _beamHelpers = new Array<BeamingHelper>();
-		_beatPosition = new IntHash<ScoreBeatGlyph>();
 	}
 	
 	public function getBeatDirection(beat:Beat) : BeamDirection
 	{
-		if (_beatPosition.exists(beat.index)) 
+		if (beat.index < _beatGlyphs.length) 
 		{
-			var g = _beatPosition.get(beat.index);
+			var g:ScoreBeatGlyph = cast _beatGlyphs[beat.index];
 			return g.noteHeads.getDirection();
 		}
 		return BeamDirection.Up;
@@ -125,9 +122,9 @@ class ScoreBarRenderer extends GroupedBarRenderer
 	
 	public function getNoteX(note:Note, onEnd:Bool=true) 
 	{
-		if (_beatPosition.exists(note.beat.index)) 
+		if (note.beat.index < _beatGlyphs.length) 
 		{
-			var beat = _beatPosition.get(note.beat.index);
+			var beat:ScoreBeatGlyph = cast _beatGlyphs[note.beat.index];
 			return beat.noteHeads.getNoteX(note, onEnd);
 		}
 		return 0;
@@ -135,9 +132,9 @@ class ScoreBarRenderer extends GroupedBarRenderer
 	
 	public function getNoteY(note:Note) 
 	{
-		if (_beatPosition.exists(note.beat.index)) 
+		if (note.beat.index < _beatGlyphs.length) 
 		{
-			var beat = _beatPosition.get(note.beat.index);
+			var beat:ScoreBeatGlyph = cast _beatGlyphs[note.beat.index];
 			return beat.noteHeads.getNoteY(note);
 		}
 		return 0;
@@ -411,69 +408,11 @@ class ScoreBarRenderer extends GroupedBarRenderer
 	
 	private override function createPreBeatGlyphs():Dynamic 
 	{
-		createBarStartGlyphs();
-		
-		createStartGlyphs();
-				
-		if (_bar.isEmpty())
-		{
-			addPreBeatGlyph(new SpacingGlyph(0, 0, Std.int(30 * getScale())));
-		}
-	}
-
-	private override function createBeatGlyphs():Void 
-	{
-        // TODO: Render all voices
-        createVoiceGlyphs(_bar.voices[0]);
-	}
-	
-	private override function createPostBeatGlyphs():Dynamic 
-	{
-		createBarEndGlyphs();
-	}
-	
-	private var _startSpacing:Bool;
-	
-	private function createStartSpacing()
-	{
-		if (_startSpacing) return;
-		addPreBeatGlyph(new SpacingGlyph(0, 0, Std.int(2 * getScale())));
-		_startSpacing = true;
-	}
-	
-	private function createBarStartGlyphs()
-	{
 		if (_bar.getMasterBar().isRepeatStart)
 		{
 			addPreBeatGlyph(new RepeatOpenGlyph(0, 0, 1.5, 3));
 		}
-	}	
-	
-	private function createBarEndGlyphs()
-	{
-		if (_bar.getMasterBar().isRepeatEnd())
-		{
-			addPostBeatGlyph(new RepeatCloseGlyph(x, 0));
-			if (_bar.getMasterBar().repeatCount > 1)
-			{
-                var line = isLast() || isLastOfLine() ? -1 : -4;
-				addPostBeatGlyph(new RepeatCountGlyph(0, getScoreY(line, -3), _bar.getMasterBar().repeatCount + 1));
-			}
-        }
-		else if (_bar.getMasterBar().isDoubleBar)
-		{
-			addPostBeatGlyph(new BarSeperatorGlyph());
-			addPostBeatGlyph(new SpacingGlyph(0, 0, Std.int(3 * getScale()), false));
-			addPostBeatGlyph(new BarSeperatorGlyph());
-		}		
-		else if(_bar.nextBar == null || !_bar.nextBar.getMasterBar().isRepeatStart)
-		{
-			addPostBeatGlyph(new BarSeperatorGlyph(0,0,isLast()));
-		}
-	}
-	
-	private function createStartGlyphs()
-	{
+		
 		// Clef
 		if (isFirstOfLine() || _bar.clef != _bar.previousBar.clef)
 		{
@@ -516,6 +455,49 @@ class ScoreBarRenderer extends GroupedBarRenderer
         {
             addPreBeatGlyph(new SpacingGlyph(0, 0, Std.int(8 * getScale())));
         }
+		
+		if (_bar.isEmpty())
+		{
+			addPreBeatGlyph(new SpacingGlyph(0, 0, Std.int(30 * getScale())));
+		}
+	}
+
+	private override function createBeatGlyphs():Void 
+	{
+        // TODO: Render all voices
+        createVoiceGlyphs(_bar.voices[0]);
+	}
+	
+	private override function createPostBeatGlyphs():Dynamic 
+	{
+		if (_bar.getMasterBar().isRepeatEnd())
+		{
+			addPostBeatGlyph(new RepeatCloseGlyph(x, 0));
+			if (_bar.getMasterBar().repeatCount > 1)
+			{
+                var line = isLast() || isLastOfLine() ? -1 : -4;
+				addPostBeatGlyph(new RepeatCountGlyph(0, getScoreY(line, -3), _bar.getMasterBar().repeatCount + 1));
+			}
+        }
+		else if (_bar.getMasterBar().isDoubleBar)
+		{
+			addPostBeatGlyph(new BarSeperatorGlyph());
+			addPostBeatGlyph(new SpacingGlyph(0, 0, Std.int(3 * getScale()), false));
+			addPostBeatGlyph(new BarSeperatorGlyph());
+		}		
+		else if(_bar.nextBar == null || !_bar.nextBar.getMasterBar().isRepeatStart)
+		{
+			addPostBeatGlyph(new BarSeperatorGlyph(0,0,isLast()));
+		}
+	}
+	
+	private var _startSpacing:Bool;
+	
+	private function createStartSpacing()
+	{
+		if (_startSpacing) return;
+		addPreBeatGlyph(new SpacingGlyph(0, 0, Std.int(2 * getScale())));
+		_startSpacing = true;
 	}
 	
 	private function createKeySignatureGlyphs()
@@ -591,7 +573,6 @@ class ScoreBarRenderer extends GroupedBarRenderer
 			
 			var g = new ScoreBeatGlyph(b);
 			g.beamingHelper = _currentBeamHelper;
-			_beatPosition.set(b.index, g);
 			addBeatGlyph(g); 
         }
         

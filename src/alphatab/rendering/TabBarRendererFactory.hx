@@ -22,7 +22,7 @@ import alphatab.rendering.BarRendererBase;
 /**
  * This Factory procudes TabBarRenderer instances.
  */
-/*class TabBarRendererFactory extends BarRendererFactory
+class TabBarRendererFactory extends BarRendererFactory
 {
 	public function new() 
 	{
@@ -34,4 +34,4 @@ import alphatab.rendering.BarRendererBase;
 	{
 		return new TabBarRenderer(bar);
 	}
-}*/
+}

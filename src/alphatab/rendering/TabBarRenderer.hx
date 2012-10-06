@@ -33,17 +33,13 @@ import alphatab.rendering.glyphs.TabBeatGlyph;
 /**
  * This BarRenderer renders a bar using guitar tablature notation. 
  */
-/*class TabBarRenderer extends GroupedBarRenderer
+class TabBarRenderer extends GroupedBarRenderer
 {
 	private static inline var LineSpacing = 10;
 	
-	private var _beatPosition : IntHash<TabBeatGlyph>;
-
-		
 	public function new(bar:Bar) 
 	{
 		super(bar);
-		_beatPosition = new IntHash<TabBeatGlyph>();		
 	}
 	
 	private inline function getLineOffset()
@@ -62,58 +58,66 @@ import alphatab.rendering.glyphs.TabBeatGlyph;
 		}
 	}
 	
-	private override function createGlyphs():Void 
-	{
-		createBarStartGlyphs();
-		
-		createStartGlyphs();
-				
-		if (_bar.isEmpty())
-		{
-			addPreBeatGlyph(new SpacingGlyph(0, 0, Std.int(30 * getScale()), false));
-		}
-        
-        // TODO: Render all voices
-        createVoiceGlyphs(_bar.voices[0]);
-
-		
-		createBarEndGlyphs();
-	}
-	
-	private function createStartGlyphs()
-	{
-		// Clef (TODO)
-				
-		if (stave.index == 0)
-		{
-			addGlyph(new BarNumberGlyph(0,getScoreY(-1, -3),_bar.index + 1));
-		}
-        else
-        {
-            addGlyph(new SpacingGlyph(0, 0, Std.int(8 * getScale()), false));
-        }
-	}
-	
-	private function createVoiceGlyphs(v:Voice)
-    {
-        for (b in v.beats)
-        {
-            createBeatGlyphs(b);
-        }
-    }
-	
-	private function createBeatGlyphs(b:Beat)
-    {
-		var g = new TabBeatGlyph(b);
-		_beatPosition.set(b.index, g);
-		addGlyph(g); 
-    }	
-	
-	private function createBarStartGlyphs()
+	private override function createPreBeatGlyphs():Dynamic 
 	{
 		if (_bar.getMasterBar().isRepeatStart)
 		{
-			addGlyph(new RepeatOpenGlyph(0, 0, 2.5, 4));
+			addPreBeatGlyph(new RepeatOpenGlyph(0, 0, 1.5, 3));
+		}
+		
+		// Clef (TODO) 
+		 
+		
+		if (stave.index == 0)
+		{
+			addPreBeatGlyph(new BarNumberGlyph(0,getScoreY(-1, -3),_bar.index + 1));
+		}
+        else
+        {
+            addPreBeatGlyph(new SpacingGlyph(0, 0, Std.int(8 * getScale())));
+        }
+		
+		if (_bar.isEmpty())
+		{
+			addPreBeatGlyph(new SpacingGlyph(0, 0, Std.int(30 * getScale())));
+		}
+	}
+
+	private override function createBeatGlyphs():Void 
+	{
+        // TODO: Render all voices
+        createVoiceGlyphs(_bar.voices[0]);
+	}
+	
+    private function createVoiceGlyphs(v:Voice)
+    {
+        for (b in v.beats)
+        {
+			var g = new TabBeatGlyph(b);
+			addBeatGlyph(g); 
+        }
+    }	
+	
+	private override function createPostBeatGlyphs():Dynamic 
+	{
+		if (_bar.getMasterBar().isRepeatEnd())
+		{
+			addPostBeatGlyph(new RepeatCloseGlyph(x, 0));
+			if (_bar.getMasterBar().repeatCount > 1)
+			{
+                var line = isLast() || isLastOfLine() ? -1 : -4;
+				addPostBeatGlyph(new RepeatCountGlyph(0, getScoreY(line, -3), _bar.getMasterBar().repeatCount + 1));
+			}
+        }
+		else if (_bar.getMasterBar().isDoubleBar)
+		{
+			addPostBeatGlyph(new BarSeperatorGlyph());
+			addPostBeatGlyph(new SpacingGlyph(0, 0, Std.int(3 * getScale()), false));
+			addPostBeatGlyph(new BarSeperatorGlyph());
+		}		
+		else if(_bar.nextBar == null || !_bar.nextBar.getMasterBar().isRepeatStart)
+		{
+			addPostBeatGlyph(new BarSeperatorGlyph(0,0,isLast()));
 		}
 	}
 	
@@ -130,38 +134,15 @@ import alphatab.rendering.glyphs.TabBeatGlyph;
 	/**
 	 * Gets the relative y position of the given steps relative to first line. 
 	 * @param steps the amount of steps while 2 steps are one line
-	 *
+	 */
 	public function getScoreY(steps:Int, correction:Int = 0) : Int
 	{
 		return Std.int(((getLineOffset() / 2) * steps) + (correction * getScale()));
 	}
 	
-	private function createBarEndGlyphs()
-	{
-		if (_bar.getMasterBar().isRepeatEnd())
-		{
-			addGlyph(new RepeatCloseGlyph(x, 0));
-			if (_bar.getMasterBar().repeatCount > 1)
-			{
-                var line = isLast() || isLastOfLine() ? -1 : -4;
-				addGlyph(new RepeatCountGlyph(0, getScoreY(line, -3), _bar.getMasterBar().repeatCount + 1));
-			}
-        }
-		else if (_bar.getMasterBar().isDoubleBar)
-		{
-			addGlyph(new BarSeperatorGlyph());
-			addGlyph(new SpacingGlyph(0, 0, Std.int(3 * getScale()), false));
-			addGlyph(new BarSeperatorGlyph());
-		}		
-		else if(_bar.nextBar == null || !_bar.nextBar.getMasterBar().isRepeatStart)
-		{
-			addGlyph(new BarSeperatorGlyph(0,0,isLast()));
-		}
-	}
-	
 	/**
 	 * gets the padding needed to place numbers within the bounding box
-	 *
+	 */
 	private function getNumberOverflow()
 	{
 		var res = getResources();
@@ -205,4 +186,4 @@ import alphatab.rendering.glyphs.TabBeatGlyph;
 		canvas.lineTo(cx + x + width, cy + this.y + y);
 		canvas.stroke();
 	}
-}*/
+}

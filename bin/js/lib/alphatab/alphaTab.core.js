@@ -3981,7 +3981,6 @@ alphatab.rendering.ScoreBarRenderer = $hxClasses["alphatab.rendering.ScoreBarRen
 	alphatab.rendering.GroupedBarRenderer.call(this,bar);
 	this.accidentalHelper = new alphatab.rendering.utils.AccidentalHelper();
 	this._beamHelpers = new Array();
-	this._beatPosition = new IntHash();
 };
 alphatab.rendering.ScoreBarRenderer.__name__ = ["alphatab","rendering","ScoreBarRenderer"];
 alphatab.rendering.ScoreBarRenderer.paintSingleBar = function(canvas,x1,y1,x2,y2,size) {
@@ -4046,7 +4045,6 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 			}
 			var g = new alphatab.rendering.glyphs.ScoreBeatGlyph(b);
 			g.beamingHelper = this._currentBeamHelper;
-			this._beatPosition.set(b.index,g);
 			this.addBeatGlyph(g);
 		}
 		this._currentBeamHelper = null;
@@ -4095,7 +4093,30 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 			}
 		}
 	}
-	,createStartGlyphs: function() {
+	,createStartSpacing: function() {
+		if(this._startSpacing) return;
+		this.addPreBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,2 * this.stave.staveGroup.layout.renderer.scale | 0));
+		this._startSpacing = true;
+	}
+	,_startSpacing: null
+	,createPostBeatGlyphs: function() {
+		if(this._bar.getMasterBar().repeatCount > 0) {
+			this.addPostBeatGlyph(new alphatab.rendering.glyphs.RepeatCloseGlyph(this.x,0));
+			if(this._bar.getMasterBar().repeatCount > 1) {
+				var line = this._bar.index == this._bar.track.bars.length - 1 || this.index == this.stave.barRenderers.length - 1?-1:-4;
+				this.addPostBeatGlyph(new alphatab.rendering.glyphs.RepeatCountGlyph(0,this.getScoreY(line,-3),this._bar.getMasterBar().repeatCount + 1));
+			}
+		} else if(this._bar.getMasterBar().isDoubleBar) {
+			this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph());
+			this.addPostBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,3 * this.stave.staveGroup.layout.renderer.scale | 0,false));
+			this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph());
+		} else if(this._bar.nextBar == null || !this._bar.nextBar.getMasterBar().isRepeatStart) this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph(0,0,this._bar.index == this._bar.track.bars.length - 1));
+	}
+	,createBeatGlyphs: function() {
+		this.createVoiceGlyphs(this._bar.voices[0]);
+	}
+	,createPreBeatGlyphs: function() {
+		if(this._bar.getMasterBar().isRepeatStart) this.addPreBeatGlyph(new alphatab.rendering.glyphs.RepeatOpenGlyph(0,0,1.5,3));
 		if(this.index == 0 || this._bar.clef != this._bar.previousBar.clef) {
 			var offset = 0;
 			switch( (this._bar.clef)[1] ) {
@@ -4126,38 +4147,6 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 			this.createTimeSignatureGlyphs();
 		}
 		if(this.stave.index == 0) this.addPreBeatGlyph(new alphatab.rendering.glyphs.BarNumberGlyph(0,this.getScoreY(-1,-3),this._bar.index + 1)); else this.addPreBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,8 * this.stave.staveGroup.layout.renderer.scale | 0));
-	}
-	,createBarEndGlyphs: function() {
-		if(this._bar.getMasterBar().repeatCount > 0) {
-			this.addPostBeatGlyph(new alphatab.rendering.glyphs.RepeatCloseGlyph(this.x,0));
-			if(this._bar.getMasterBar().repeatCount > 1) {
-				var line = this._bar.index == this._bar.track.bars.length - 1 || this.index == this.stave.barRenderers.length - 1?-1:-4;
-				this.addPostBeatGlyph(new alphatab.rendering.glyphs.RepeatCountGlyph(0,this.getScoreY(line,-3),this._bar.getMasterBar().repeatCount + 1));
-			}
-		} else if(this._bar.getMasterBar().isDoubleBar) {
-			this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph());
-			this.addPostBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,3 * this.stave.staveGroup.layout.renderer.scale | 0,false));
-			this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph());
-		} else if(this._bar.nextBar == null || !this._bar.nextBar.getMasterBar().isRepeatStart) this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph(0,0,this._bar.index == this._bar.track.bars.length - 1));
-	}
-	,createBarStartGlyphs: function() {
-		if(this._bar.getMasterBar().isRepeatStart) this.addPreBeatGlyph(new alphatab.rendering.glyphs.RepeatOpenGlyph(0,0,1.5,3));
-	}
-	,createStartSpacing: function() {
-		if(this._startSpacing) return;
-		this.addPreBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,2 * this.stave.staveGroup.layout.renderer.scale | 0));
-		this._startSpacing = true;
-	}
-	,_startSpacing: null
-	,createPostBeatGlyphs: function() {
-		this.createBarEndGlyphs();
-	}
-	,createBeatGlyphs: function() {
-		this.createVoiceGlyphs(this._bar.voices[0]);
-	}
-	,createPreBeatGlyphs: function() {
-		this.createBarStartGlyphs();
-		this.createStartGlyphs();
 		if(this._bar.isEmpty()) this.addPreBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,30 * this.stave.staveGroup.layout.renderer.scale | 0));
 	}
 	,paintFooter: function(cx,cy,canvas,h) {
@@ -4320,29 +4309,28 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 		return this.getGlyphOverflow();
 	}
 	,getNoteY: function(note) {
-		if(this._beatPosition.exists(note.beat.index)) {
-			var beat = this._beatPosition.get(note.beat.index);
+		if(note.beat.index < this._beatGlyphs.length) {
+			var beat = this._beatGlyphs[note.beat.index];
 			return beat.noteHeads.getNoteY(note);
 		}
 		return 0;
 	}
 	,getNoteX: function(note,onEnd) {
 		if(onEnd == null) onEnd = true;
-		if(this._beatPosition.exists(note.beat.index)) {
-			var beat = this._beatPosition.get(note.beat.index);
+		if(note.beat.index < this._beatGlyphs.length) {
+			var beat = this._beatGlyphs[note.beat.index];
 			return beat.noteHeads.getNoteX(note,onEnd);
 		}
 		return 0;
 	}
 	,getBeatDirection: function(beat) {
-		if(this._beatPosition.exists(beat.index)) {
-			var g = this._beatPosition.get(beat.index);
+		if(beat.index < this._beatGlyphs.length) {
+			var g = this._beatGlyphs[beat.index];
 			return g.noteHeads.getDirection();
 		}
 		return alphatab.rendering.utils.BeamDirection.Up;
 	}
 	,_currentBeamHelper: null
-	,_beatPosition: null
 	,_beamHelpers: null
 	,accidentalHelper: null
 	,__class__: alphatab.rendering.ScoreBarRenderer
@@ -4425,6 +4413,102 @@ alphatab.rendering.ScoreRenderer.prototype = {
 	,__class__: alphatab.rendering.ScoreRenderer
 	,__properties__: {get_score:"getScore"}
 }
+alphatab.rendering.TabBarRenderer = $hxClasses["alphatab.rendering.TabBarRenderer"] = function(bar) {
+	alphatab.rendering.GroupedBarRenderer.call(this,bar);
+};
+alphatab.rendering.TabBarRenderer.__name__ = ["alphatab","rendering","TabBarRenderer"];
+alphatab.rendering.TabBarRenderer.__super__ = alphatab.rendering.GroupedBarRenderer;
+alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.GroupedBarRenderer.prototype,{
+	drawInfoGuide: function(canvas,cx,cy,y,c) {
+		canvas.setColor(c);
+		canvas.beginPath();
+		canvas.moveTo(cx + this.x,cy + this.y + y);
+		canvas.lineTo(cx + this.x + this.width,cy + this.y + y);
+		canvas.stroke();
+	}
+	,paintBackground: function(cx,cy,canvas) {
+		var res = this.stave.staveGroup.layout.renderer.renderingResources;
+		canvas.setColor(res.staveLineColor);
+		var lineY = cy + this.y + this.getNumberOverflow();
+		var startY = lineY;
+		var _g1 = 0, _g = this._bar.track.tuning.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			if(i > 0) lineY += 11 * this.stave.staveGroup.layout.renderer.scale | 0;
+			canvas.beginPath();
+			canvas.moveTo(cx + this.x,lineY);
+			canvas.lineTo(cx + this.x + this.width,lineY);
+			canvas.stroke();
+		}
+	}
+	,getNumberOverflow: function() {
+		var res = this.stave.staveGroup.layout.renderer.renderingResources;
+		return res.tablatureFont.getSize() / 2 + res.tablatureFont.getSize() * 0.2 | 0;
+	}
+	,getScoreY: function(steps,correction) {
+		if(correction == null) correction = 0;
+		return 11 * this.stave.staveGroup.layout.renderer.scale / 2 * steps + correction * this.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,getBottomPadding: function() {
+		return this.getNumberOverflow();
+	}
+	,getTopPadding: function() {
+		return this.getNumberOverflow();
+	}
+	,createPostBeatGlyphs: function() {
+		if(this._bar.getMasterBar().repeatCount > 0) {
+			this.addPostBeatGlyph(new alphatab.rendering.glyphs.RepeatCloseGlyph(this.x,0));
+			if(this._bar.getMasterBar().repeatCount > 1) {
+				var line = this._bar.index == this._bar.track.bars.length - 1 || this.index == this.stave.barRenderers.length - 1?-1:-4;
+				this.addPostBeatGlyph(new alphatab.rendering.glyphs.RepeatCountGlyph(0,this.getScoreY(line,-3),this._bar.getMasterBar().repeatCount + 1));
+			}
+		} else if(this._bar.getMasterBar().isDoubleBar) {
+			this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph());
+			this.addPostBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,3 * this.stave.staveGroup.layout.renderer.scale | 0,false));
+			this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph());
+		} else if(this._bar.nextBar == null || !this._bar.nextBar.getMasterBar().isRepeatStart) this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph(0,0,this._bar.index == this._bar.track.bars.length - 1));
+	}
+	,createVoiceGlyphs: function(v) {
+		var _g = 0, _g1 = v.beats;
+		while(_g < _g1.length) {
+			var b = _g1[_g];
+			++_g;
+			var g = new alphatab.rendering.glyphs.TabBeatGlyph(b);
+			this.addBeatGlyph(g);
+		}
+	}
+	,createBeatGlyphs: function() {
+		this.createVoiceGlyphs(this._bar.voices[0]);
+	}
+	,createPreBeatGlyphs: function() {
+		if(this._bar.getMasterBar().isRepeatStart) this.addPreBeatGlyph(new alphatab.rendering.glyphs.RepeatOpenGlyph(0,0,1.5,3));
+		if(this.stave.index == 0) this.addPreBeatGlyph(new alphatab.rendering.glyphs.BarNumberGlyph(0,this.getScoreY(-1,-3),this._bar.index + 1)); else this.addPreBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,8 * this.stave.staveGroup.layout.renderer.scale | 0));
+		if(this._bar.isEmpty()) this.addPreBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,30 * this.stave.staveGroup.layout.renderer.scale | 0));
+	}
+	,doLayout: function() {
+		alphatab.rendering.GroupedBarRenderer.prototype.doLayout.call(this);
+		this.height = (11 * this.stave.staveGroup.layout.renderer.scale * (this._bar.track.tuning.length - 1) | 0) + this.getNumberOverflow() * 2;
+		if(this.index == 0) {
+			this.stave.registerStaveTop(this.getNumberOverflow());
+			this.stave.registerStaveBottom(this.height - this.getNumberOverflow());
+		}
+	}
+	,getLineOffset: function() {
+		return 11 * this.stave.staveGroup.layout.renderer.scale;
+	}
+	,__class__: alphatab.rendering.TabBarRenderer
+});
+alphatab.rendering.TabBarRendererFactory = $hxClasses["alphatab.rendering.TabBarRendererFactory"] = function() {
+	alphatab.rendering.BarRendererFactory.call(this);
+};
+alphatab.rendering.TabBarRendererFactory.__name__ = ["alphatab","rendering","TabBarRendererFactory"];
+alphatab.rendering.TabBarRendererFactory.__super__ = alphatab.rendering.BarRendererFactory;
+alphatab.rendering.TabBarRendererFactory.prototype = $extend(alphatab.rendering.BarRendererFactory.prototype,{
+	create: function(bar) {
+		return new alphatab.rendering.TabBarRenderer(bar);
+	}
+	,__class__: alphatab.rendering.TabBarRendererFactory
+});
 if(!alphatab.rendering.glyphs) alphatab.rendering.glyphs = {}
 alphatab.rendering.glyphs.SvgGlyph = $hxClasses["alphatab.rendering.glyphs.SvgGlyph"] = function(x,y,svg,xScale,yScale) {
 	if(y == null) y = 0;
@@ -5595,6 +5679,31 @@ alphatab.rendering.glyphs.SpacingGlyph.prototype = $extend(alphatab.rendering.Gl
 	,_scaling: null
 	,__class__: alphatab.rendering.glyphs.SpacingGlyph
 });
+alphatab.rendering.glyphs.TabBeatGlyph = $hxClasses["alphatab.rendering.glyphs.TabBeatGlyph"] = function(b) {
+	alphatab.rendering.glyphs.BeatGlyphBase.call(this,b);
+};
+alphatab.rendering.glyphs.TabBeatGlyph.__name__ = ["alphatab","rendering","glyphs","TabBeatGlyph"];
+alphatab.rendering.glyphs.TabBeatGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
+alphatab.rendering.glyphs.TabBeatGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
+	doLayout: function() {
+		if(!this.beat.isRest()) {
+		} else {
+		}
+		this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,this.getBeatDurationWidth(this.beat.duration) * this.renderer.stave.staveGroup.layout.renderer.scale | 0));
+		var w = 0;
+		var _g = 0, _g1 = this._glyphs;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.x = w;
+			g.renderer = this.renderer;
+			g.doLayout();
+			w += g.width;
+		}
+		this.width = w;
+	}
+	,__class__: alphatab.rendering.glyphs.TabBeatGlyph
+});
 alphatab.rendering.glyphs.TimeSignatureGlyph = $hxClasses["alphatab.rendering.glyphs.TimeSignatureGlyph"] = function(x,y,numerator,denominator) {
 	alphatab.rendering.glyphs.GlyphGroup.call(this,x,y,new Array());
 	this._numerator = numerator;
@@ -5635,6 +5744,7 @@ alphatab.rendering.layout.ScoreLayout.prototype = {
 		var group = new alphatab.rendering.staves.StaveGroup();
 		group.layout = this;
 		group.addStave(new alphatab.rendering.staves.Stave(new alphatab.rendering.ScoreBarRendererFactory()));
+		group.addStave(new alphatab.rendering.staves.Stave(new alphatab.rendering.TabBarRendererFactory()));
 		return group;
 	}
 	,paintScore: function() {
@@ -7291,6 +7401,7 @@ alphatab.rendering.ScoreBarRenderer.SHARP_KS_STEPS = [1,4,0,3,6,2,5];
 alphatab.rendering.ScoreBarRenderer.FLAT_KS_STEPS = [5,2,6,3,7,4,8];
 alphatab.rendering.ScoreBarRenderer.LineSpacing = 8;
 alphatab.rendering.ScoreBarRenderer.NOTE_STEP_CORRECTION = 1;
+alphatab.rendering.TabBarRenderer.LineSpacing = 10;
 alphatab.rendering.glyphs.AccidentalGroupGlyph.NON_RESERVED = -3000;
 alphatab.rendering.glyphs.DiamondNoteHeadGlyph.noteHeadHeight = 9;
 alphatab.rendering.glyphs.MusicFont.ClefF = "M 545 -801c -53 49 -80 109 -80 179c 0 33 4 66 12 99c 8 33 38 57 89 74c 51 16 125 31 220 43c 95 12 159 53 192 124c 16 37 24 99 24 186c 0 95 -43 168 -130 220c -86 51 -186 77 -297 77c -128 0 -229 -28 -303 -86c -91 -70 -136 -169 -136 -297c 0 -115 23 -234 71 -356c 47 -121 118 -234 213 -337c 70 -74 163 -129 279 -164c 115 -35 233 -52 353 -52c 45 0 83 1 114 3c 31 2 81 9 151 21c 243 45 444 175 601 390c 144 198 217 409 217 632c 0 41 -2 72 -6 93c -33 281 -219 582 -558 905c -272 260 -591 493 -954 700c -330 190 -527 274 -589 254l -18 -68c 95 -33 197 -78 306 -136c 109 -57 218 -124 325 -198c 276 -198 477 -384 601 -558c 152 -210 252 -471 297 -781c 20 -128 31 -210 31 -248s 0 -68 0 -93c 0 -322 -109 -551 -328 -688c -99 -57 -200 -86 -303 -86c -78 0 -154 15 -226 46C 643 -873 586 -838 545 -801zM 2517 -783c 66 0 121 22 167 68c 45 45 68 101 68 167c 0 66 -22 121 -68 167c -45 45 -101 68 -167 68c -66 0 -122 -22 -167 -68c -45 -45 -68 -101 -68 -167c 0 -66 22 -121 68 -167C 2395 -760 2451 -783 2517 -783zM 2517 54c 66 0 121 22 167 68c 45 45 68 101 68 167c 0 66 -22 121 -68 167c -45 45 -101 68 -167 68c -66 0 -122 -22 -167 -68c -45 -45 -68 -101 -68 -167c 0 -66 22 -121 68 -167C 2395 77 2451 54 2517 54";
