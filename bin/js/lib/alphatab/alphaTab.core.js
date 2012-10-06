@@ -4282,7 +4282,7 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 		while(_g < _g1.length) {
 			var h = _g1[_g];
 			++_g;
-			this.paintBeamHelper(cx,cy,canvas,h);
+			this.paintBeamHelper(cx + this.getBeatGlyphsStart(),cy,canvas,h);
 		}
 	}
 	,paint: function(cx,cy,canvas) {

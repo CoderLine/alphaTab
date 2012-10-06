@@ -105,7 +105,6 @@ class ScoreBarRenderer extends GroupedBarRenderer
     
     private var _currentBeamHelper:BeamingHelper;
     
-    
 	public function new(bar:alphatab.model.Bar) 
 	{
 		super(bar);
@@ -215,7 +214,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
         for (h in _beamHelpers)
         {
             // paint beams
-            paintBeamHelper(cx, cy, canvas, h);
+            paintBeamHelper(cx + getBeatGlyphsStart(), cy, canvas, h);
         }
     }
     
