@@ -46,8 +46,9 @@ class TabBeatGlyph extends BeatGlyphBase
 	private function createNoteGlyph(n:Note) 
     {
 		var tr = cast(renderer, TabBarRenderer);
-        var noteNumberGlyph:Glyph = new NoteNumberGlyph(0,0, n);        
-        noteNumberGlyph.y = tr.getTabY(n.string + 1, -2);
+        var noteNumberGlyph:Glyph = new NoteNumberGlyph(0, 0, n);    
+		var l = n.beat.voice.bar.track.tuning.length - n.string + 1;
+        noteNumberGlyph.y = tr.getTabY(l, -2);
         noteNumbers.addNoteGlyph(noteNumberGlyph, n);
     }	
 }

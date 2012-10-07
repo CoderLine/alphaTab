@@ -92,6 +92,6 @@ class Note
     
     public function realValue() : Int
     {
-        return fret + beat.voice.bar.track.tuning[string];
+        return fret + beat.voice.bar.track.tuning[beat.voice.bar.track.tuning.length - (string - 1) - 1];
     }
 }

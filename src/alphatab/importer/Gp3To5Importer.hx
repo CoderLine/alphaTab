@@ -1007,7 +1007,7 @@ class Gp3To5Importer extends ScoreImporter
     private function readNote(track:Track, bar:Bar, voice:Voice, beat:Beat, stringIndex:Int)
     {
         var newNote = new Note();
-        newNote.string = stringIndex;
+        newNote.string = track.tuning.length - stringIndex;
         newNote.tapping = _beatTapping;
         
         var flags = readUInt8();

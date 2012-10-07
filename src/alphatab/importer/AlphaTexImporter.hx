@@ -654,7 +654,7 @@ class AlphaTexImporter extends ScoreImporter
         noteEffects(note);
         
         // create note
-        note.string = string - 1;
+        note.string = _track.tuning.length - (string - 1);
 		note.isDead = isDead;
 		note.isTieDestination = isTie;
 		if (!isTie)
