@@ -9,6 +9,16 @@ class ScoreBeatPreNotesGlyph extends BeatGlyphBase
 		super(b);
 	}
 	
+	public override function applyGlyphSpacing(spacing:Int):Dynamic 
+	{
+		super.applyGlyphSpacing(spacing);
+		// add spacing at the beginning, this way the elements are closer to the note head
+		for (g in _glyphs)
+		{
+			g.x += spacing;
+		}
+	}
+	
 	public override function doLayout():Void 
 	{
 		if (!beat.isRest())

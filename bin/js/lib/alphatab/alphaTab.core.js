@@ -4099,6 +4099,7 @@ alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.Bar
 		var postSize;
 		if(this._postBeatGlyphs.length == 0) postSize = 0; else postSize = this._postBeatGlyphs[this._postBeatGlyphs.length - 1].x + this._postBeatGlyphs[this._postBeatGlyphs.length - 1].width;
 		if(sizes.getSize("POST") < postSize) sizes.setSize("POST",postSize);
+		if(sizes.fullWidth < this.width) sizes.fullWidth = this.width;
 	}
 	,updateWidth: function() {
 		this.width = this.getPostBeatGlyphsStart();
@@ -4329,6 +4330,7 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 	}
 	,paintFooter: function(cx,cy,canvas,h) {
 		var beat = h.beats[0];
+		if(beat.duration == alphatab.model.Duration.Whole) return;
 		var stemSize = this.getStemSize(h.maxDuration);
 		var correction = 4;
 		var beatLineX = h.getBeatLineX(beat) + this.stave.staveGroup.layout.renderer.scale | 0;
@@ -5115,19 +5117,19 @@ alphatab.rendering.glyphs.BeatGlyphBase.prototype = $extend(alphatab.rendering.g
 	getBeatDurationWidth: function(d) {
 		switch( (d)[1] ) {
 		case 0:
-			return 82;
+			return 65;
 		case 1:
-			return 56;
+			return 45;
 		case 2:
-			return 36;
+			return 29;
 		case 3:
-			return 24;
+			return 19;
 		case 4:
-			return 14;
+			return 11;
 		case 5:
-			return 14;
+			return 11;
 		case 6:
-			return 14;
+			return 11;
 		default:
 			return 0;
 		}
@@ -5693,6 +5695,15 @@ alphatab.rendering.glyphs.ScoreBeatPreNotesGlyph.prototype = $extend(alphatab.re
 			this.addGlyph(accidentals);
 		}
 		alphatab.rendering.glyphs.BeatGlyphBase.prototype.doLayout.call(this);
+	}
+	,applyGlyphSpacing: function(spacing) {
+		alphatab.rendering.glyphs.BeatGlyphBase.prototype.applyGlyphSpacing.call(this,spacing);
+		var _g = 0, _g1 = this._glyphs;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.x += spacing;
+		}
 	}
 	,__class__: alphatab.rendering.glyphs.ScoreBeatPreNotesGlyph
 });

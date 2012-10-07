@@ -1321,7 +1321,7 @@ alphatab.importer.AlphaTexImporter.prototype = $extend(alphatab.importer.ScoreIm
 		this.newSy();
 		var note = new alphatab.model.Note();
 		this.noteEffects(note);
-		note.string = string - 1;
+		note.string = this._track.tuning.length - (string - 1);
 		note.isDead = isDead;
 		note.isTieDestination = isTie;
 		if(!isTie) note.fret = fret;
@@ -2314,7 +2314,7 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 	}
 	,readNote: function(track,bar,voice,beat,stringIndex) {
 		var newNote = new alphatab.model.Note();
-		newNote.string = stringIndex;
+		newNote.string = track.tuning.length - stringIndex;
 		newNote.tapping = this._beatTapping;
 		var flags = this._data.readByte();
 		if((flags & 2) != 0) newNote.accentuated = alphatab.model.AccentuationType.Heavy; else if((flags & 64) != 0) newNote.accentuated = alphatab.model.AccentuationType.Normal;
@@ -3605,7 +3605,7 @@ alphatab.model.Note = $hxClasses["alphatab.model.Note"] = function() {
 alphatab.model.Note.__name__ = ["alphatab","model","Note"];
 alphatab.model.Note.prototype = {
 	realValue: function() {
-		return this.fret + this.beat.voice.bar.track.tuning[this.string];
+		return this.fret + this.beat.voice.bar.track.tuning[this.beat.voice.bar.track.tuning.length - (this.string - 1) - 1];
 	}
 	,dynamicValue: null
 	,beat: null
@@ -6709,7 +6709,8 @@ alphatab.rendering.glyphs.TabBeatGlyph.prototype = $extend(alphatab.rendering.gl
 	createNoteGlyph: function(n) {
 		var tr = js.Boot.__cast(this.renderer , alphatab.rendering.TabBarRenderer);
 		var noteNumberGlyph = new alphatab.rendering.glyphs.NoteNumberGlyph(0,0,n);
-		noteNumberGlyph.y = tr.getTabY(n.string + 1,-2);
+		var l = n.beat.voice.bar.track.tuning.length - n.string + 1;
+		noteNumberGlyph.y = tr.getTabY(l,-2);
 		this.noteNumbers.addNoteGlyph(noteNumberGlyph,n);
 	}
 	,doLayout: function() {

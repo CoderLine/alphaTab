@@ -78,6 +78,11 @@ class GroupedBarRenderer extends BarRendererBase
 		{
 			sizes.setSize(KEY_SIZE_POST, postSize);
 		}
+		
+		if (sizes.fullWidth < width)
+		{
+			sizes.fullWidth = width;
+		}
 	}
 	
 	public override function applySizes(sizes:BarSizeInfo):Void 

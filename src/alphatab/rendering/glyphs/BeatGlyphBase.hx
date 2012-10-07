@@ -40,13 +40,13 @@ class BeatGlyphBase extends GlyphGroup
     {
         switch(d)
         {
-            case Whole:         return 82;
-            case Half:          return 56;
-            case Quarter:       return 36;
-            case Eighth:        return 24;
-            case Sixteenth:     return 14;
-            case ThirtySecond:  return 14;
-            case SixtyFourth:   return 14;
+            case Whole:         return 65;
+            case Half:          return 45;
+            case Quarter:       return 29;
+            case Eighth:        return 19;
+            case Sixteenth:     return 11;
+            case ThirtySecond:  return 11;
+            case SixtyFourth:   return 11;
             default: return 0;
         }
     }		

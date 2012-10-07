@@ -366,6 +366,11 @@ class ScoreBarRenderer extends GroupedBarRenderer
     private function paintFooter(cx:Int, cy:Int, canvas:ICanvas, h:BeamingHelper)
     {
         var beat = h.beats[0];
+		
+		if (beat.duration == Duration.Whole)
+		{
+			return;
+		}
         
         //
         // draw line 
