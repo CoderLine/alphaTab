@@ -30,6 +30,9 @@ class ScoreBeatPreNotesGlyph extends BeatGlyphBase
 			addGlyph(accidentals);
 		}
 		
+		// a small padding
+		addGlyph(new SpacingGlyph(0, 0, Std.int(4 * getScale()), true));
+		
 		super.doLayout();
 	}
 	

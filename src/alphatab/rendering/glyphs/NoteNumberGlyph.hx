@@ -35,10 +35,13 @@ class NoteNumberGlyph extends Glyph
 	
 	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
 	{
-		var res = renderer.getResources();
+		if (_noteString != null) 
+		{
+			var res = renderer.getResources();
 
-		canvas.setColor(res.mainGlyphColor);
-		canvas.setFont(res.tablatureFont);
-		canvas.fillText(Std.string(_noteString), cx + x + (3 * getScale()), cy + y);
+			canvas.setColor(res.mainGlyphColor);
+			canvas.setFont(res.tablatureFont);
+			canvas.fillText(Std.string(_noteString), cx + x + (3 * getScale()), cy + y);
+		}
 	}	
 }

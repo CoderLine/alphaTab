@@ -18,6 +18,7 @@ package alphatab.rendering.glyphs;
 
 import alphatab.model.Note;
 import alphatab.platform.ICanvas;
+import alphatab.platform.model.Color;
 import alphatab.rendering.Glyph;
 import alphatab.rendering.ScoreBarRenderer;
 import alphatab.rendering.utils.BeamingHelper;

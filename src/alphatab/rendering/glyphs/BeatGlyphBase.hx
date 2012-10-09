@@ -2,6 +2,9 @@ package alphatab.rendering.glyphs;
 import alphatab.model.Beat;
 import alphatab.model.Duration;
 import alphatab.model.Note;
+import alphatab.platform.ICanvas;
+import alphatab.platform.model.Color;
+import alphatab.rendering.Glyph;
 
 class BeatGlyphBase extends GlyphGroup
 {
@@ -25,7 +28,7 @@ class BeatGlyphBase extends GlyphGroup
 			w += g.width;
 		}	
 		width = w;
-	}
+	}    
 	
 	private function noteLoop( action:Note -> Void ) 
 	{

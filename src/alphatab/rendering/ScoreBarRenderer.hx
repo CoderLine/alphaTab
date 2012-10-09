@@ -128,7 +128,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
 		if (_beatPosition.exists(note.beat.index)) 
 		{
 			var beat:ScoreBeatGlyph = _beatPosition.get(note.beat.index);
-			return beat.noteHeads.getNoteX(note, onEnd);
+			return beat.x + beat.noteHeads.getNoteX(note, onEnd);
 		}
 		return 0;
 	}	

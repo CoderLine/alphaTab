@@ -4,25 +4,35 @@ import alphatab.model.Beat;
 import alphatab.model.Duration;
 import alphatab.model.HarmonicType;
 import alphatab.model.Note;
+import alphatab.platform.ICanvas;
+import alphatab.platform.model.Color;
 import alphatab.rendering.Glyph;
 import alphatab.rendering.ScoreBarRenderer;
 import alphatab.rendering.utils.BeamingHelper;
 
 class ScoreBeatGlyph extends BeatGlyphBase
 {
+	private var _ties:Array<Glyph>;
+
 	public var noteHeads : ScoreNoteChordGlyph;
 	public var restGlyph : RestGlyph;
-	
+
 	public var beamingHelper:BeamingHelper;
-	
+
 	public function new(b:Beat) 
 	{
 		super(b);
+		_ties = new Array<Glyph>();
 	}
 	
-	public override function canScale():Bool 
+	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
 	{
-		return super.canScale();
+		super.paint(cx, cy, canvas);	
+		for (t in _ties)
+		{
+			t.renderer = renderer;
+			t.paint(cx, cy + y, canvas);
+		}
 	}
 	
 	public override function applyGlyphSpacing(spacing:Int):Dynamic 
@@ -140,7 +150,8 @@ class ScoreBeatGlyph extends BeatGlyphBase
 		
 		if (n.isTieDestination && n.tieOrigin != null) 
 		{
-			addGlyph(new ScoreTieGlyph(n.tieOrigin, n));
+			var tie = new ScoreTieGlyph(n.tieOrigin, n);
+			_ties.push(tie);
 		}
     }
 }

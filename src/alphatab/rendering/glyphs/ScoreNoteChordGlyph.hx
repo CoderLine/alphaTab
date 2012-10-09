@@ -129,7 +129,7 @@ class ScoreNoteChordGlyph extends Glyph
             else return -1;
         });
         
-        var padding = Std.int(4 * getScale());
+        var padding = 0; // Std.int(4 * getScale());
 
         var displacedX = 0;
         
@@ -199,9 +199,9 @@ class ScoreNoteChordGlyph extends Glyph
 	}
 	
 	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
-	{
+	{		
         var scoreRenderer:ScoreBarRenderer = cast renderer;
-        
+		       
         //
         // Note Effects only painted once
         //
