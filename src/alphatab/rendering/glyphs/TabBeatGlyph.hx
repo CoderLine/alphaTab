@@ -65,6 +65,17 @@ class TabBeatGlyph extends BeatGlyphBase
         noteNumberGlyph.y = tr.getTabY(l, -2);
         noteNumbers.addNoteGlyph(noteNumberGlyph, n);
 		
+		if (n.isHammerPullDestination && n.hammerPullOrigin != null)
+		{
+			var tie = new TabTieGlyph(n.hammerPullOrigin, n);
+			_ties.push(tie);
+		}
+		else if (n.slideType == SlideType.Legato && n.slideTarget != null)
+		{
+			var tie = new TabTieGlyph(n, n.slideTarget);
+			_ties.push(tie);
+		}
+		
 		if (n.slideType != SlideType.None)
 		{
 			var l = new TabSlideLineGlyph(n.slideType, n);

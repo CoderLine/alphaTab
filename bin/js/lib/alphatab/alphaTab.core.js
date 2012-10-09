@@ -5955,13 +5955,13 @@ alphatab.rendering.glyphs.ScoreSlideLineGlyph.prototype = $extend(alphatab.rende
 	,_startNote: null
 	,__class__: alphatab.rendering.glyphs.ScoreSlideLineGlyph
 });
-alphatab.rendering.glyphs.ScoreTieGlyph = $hxClasses["alphatab.rendering.glyphs.ScoreTieGlyph"] = function(startNote,endNote) {
+alphatab.rendering.glyphs.TieGlyph = $hxClasses["alphatab.rendering.glyphs.TieGlyph"] = function(startNote,endNote) {
 	alphatab.rendering.Glyph.call(this,0,0);
 	this._startNote = startNote;
 	this._endNote = endNote;
 };
-alphatab.rendering.glyphs.ScoreTieGlyph.__name__ = ["alphatab","rendering","glyphs","ScoreTieGlyph"];
-alphatab.rendering.glyphs.ScoreTieGlyph.paintTie = function(canvas,scale,x1,y1,x2,y2,down) {
+alphatab.rendering.glyphs.TieGlyph.__name__ = ["alphatab","rendering","glyphs","TieGlyph"];
+alphatab.rendering.glyphs.TieGlyph.paintTie = function(canvas,scale,x1,y1,x2,y2,down) {
 	if(down == null) down = false;
 	if(x2 > x1) {
 		var t = x1;
@@ -5987,19 +5987,9 @@ alphatab.rendering.glyphs.ScoreTieGlyph.paintTie = function(canvas,scale,x1,y1,x
 	canvas.quadraticCurveTo(cp2.x,cp2.y,x1,y1);
 	canvas.closePath();
 }
-alphatab.rendering.glyphs.ScoreTieGlyph.__super__ = alphatab.rendering.Glyph;
-alphatab.rendering.glyphs.ScoreTieGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
-	paint: function(cx,cy,canvas) {
-		var r = this.renderer;
-		var startX = cx + r.getNoteX(this._startNote);
-		var endX = cx + r.getNoteX(this._endNote,false);
-		var startY = cy + r.getNoteY(this._startNote) + 4.5;
-		var endY = cy + r.getNoteY(this._endNote) + 4.5;
-		alphatab.rendering.glyphs.ScoreTieGlyph.paintTie(canvas,this.renderer.stave.staveGroup.layout.renderer.scale,startX,startY,endX,endY,r.getBeatDirection(this._startNote.beat) == alphatab.rendering.utils.BeamDirection.Down);
-		canvas.setColor(this.renderer.stave.staveGroup.layout.renderer.renderingResources.mainGlyphColor);
-		canvas.fill();
-	}
-	,canScale: function() {
+alphatab.rendering.glyphs.TieGlyph.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.TieGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	canScale: function() {
 		return false;
 	}
 	,doLayout: function() {
@@ -6007,6 +5997,24 @@ alphatab.rendering.glyphs.ScoreTieGlyph.prototype = $extend(alphatab.rendering.G
 	}
 	,_endNote: null
 	,_startNote: null
+	,__class__: alphatab.rendering.glyphs.TieGlyph
+});
+alphatab.rendering.glyphs.ScoreTieGlyph = $hxClasses["alphatab.rendering.glyphs.ScoreTieGlyph"] = function(startNote,endNote) {
+	alphatab.rendering.glyphs.TieGlyph.call(this,startNote,endNote);
+};
+alphatab.rendering.glyphs.ScoreTieGlyph.__name__ = ["alphatab","rendering","glyphs","ScoreTieGlyph"];
+alphatab.rendering.glyphs.ScoreTieGlyph.__super__ = alphatab.rendering.glyphs.TieGlyph;
+alphatab.rendering.glyphs.ScoreTieGlyph.prototype = $extend(alphatab.rendering.glyphs.TieGlyph.prototype,{
+	paint: function(cx,cy,canvas) {
+		var r = this.renderer;
+		var startX = cx + r.getNoteX(this._startNote);
+		var endX = cx + r.getNoteX(this._endNote,false);
+		var startY = cy + r.getNoteY(this._startNote) + 4.5;
+		var endY = cy + r.getNoteY(this._endNote) + 4.5;
+		alphatab.rendering.glyphs.TieGlyph.paintTie(canvas,this.renderer.stave.staveGroup.layout.renderer.scale,startX,startY,endX,endY,r.getBeatDirection(this._startNote.beat) == alphatab.rendering.utils.BeamDirection.Down);
+		canvas.setColor(this.renderer.stave.staveGroup.layout.renderer.renderingResources.mainGlyphColor);
+		canvas.fill();
+	}
 	,__class__: alphatab.rendering.glyphs.ScoreTieGlyph
 });
 alphatab.rendering.glyphs.SharpGlyph = $hxClasses["alphatab.rendering.glyphs.SharpGlyph"] = function(x,y) {
@@ -6055,6 +6063,13 @@ alphatab.rendering.glyphs.TabBeatGlyph.prototype = $extend(alphatab.rendering.gl
 		var l = n.beat.voice.bar.track.tuning.length - n.string + 1;
 		noteNumberGlyph.y = tr.getTabY(l,-2);
 		this.noteNumbers.addNoteGlyph(noteNumberGlyph,n);
+		if(n.isHammerPullDestination && n.hammerPullOrigin != null) {
+			var tie = new alphatab.rendering.glyphs.TabTieGlyph(n.hammerPullOrigin,n);
+			this._ties.push(tie);
+		} else if(n.slideType == alphatab.model.SlideType.Legato && n.slideTarget != null) {
+			var tie = new alphatab.rendering.glyphs.TabTieGlyph(n,n.slideTarget);
+			this._ties.push(tie);
+		}
 		if(n.slideType != alphatab.model.SlideType.None) {
 			var l1 = new alphatab.rendering.glyphs.TabSlideLineGlyph(n.slideType,n);
 			this._ties.push(l1);
@@ -6248,6 +6263,28 @@ alphatab.rendering.glyphs.TabSlideLineGlyph.prototype = $extend(alphatab.renderi
 	,_type: null
 	,_startNote: null
 	,__class__: alphatab.rendering.glyphs.TabSlideLineGlyph
+});
+alphatab.rendering.glyphs.TabTieGlyph = $hxClasses["alphatab.rendering.glyphs.TabTieGlyph"] = function(startNote,endNote) {
+	alphatab.rendering.glyphs.TieGlyph.call(this,startNote,endNote);
+};
+alphatab.rendering.glyphs.TabTieGlyph.__name__ = ["alphatab","rendering","glyphs","TabTieGlyph"];
+alphatab.rendering.glyphs.TabTieGlyph.__super__ = alphatab.rendering.glyphs.TieGlyph;
+alphatab.rendering.glyphs.TabTieGlyph.prototype = $extend(alphatab.rendering.glyphs.TieGlyph.prototype,{
+	paint: function(cx,cy,canvas) {
+		var r = this.renderer;
+		var res = r.stave.staveGroup.layout.renderer.renderingResources;
+		var startX = cx + r.getNoteX(this._startNote);
+		var endX = cx + r.getNoteX(this._endNote,false);
+		var down = this._startNote.string > 3;
+		var offset = res.tablatureFont.getSize() / 2;
+		if(down) offset *= -1;
+		var startY = cy + r.getNoteY(this._startNote) + offset;
+		var endY = cy + r.getNoteY(this._endNote) + offset;
+		alphatab.rendering.glyphs.TieGlyph.paintTie(canvas,this.renderer.stave.staveGroup.layout.renderer.scale,startX,startY,endX,endY,this._startNote.string > 3);
+		canvas.setColor(this.renderer.stave.staveGroup.layout.renderer.renderingResources.mainGlyphColor);
+		canvas.fill();
+	}
+	,__class__: alphatab.rendering.glyphs.TabTieGlyph
 });
 alphatab.rendering.glyphs.TimeSignatureGlyph = $hxClasses["alphatab.rendering.glyphs.TimeSignatureGlyph"] = function(x,y,numerator,denominator) {
 	alphatab.rendering.glyphs.GlyphGroup.call(this,x,y,new Array());
