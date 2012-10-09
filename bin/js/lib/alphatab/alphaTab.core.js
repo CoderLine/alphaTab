@@ -4611,6 +4611,7 @@ alphatab.rendering.ScoreRenderer.prototype = {
 }
 alphatab.rendering.TabBarRenderer = $hxClasses["alphatab.rendering.TabBarRenderer"] = function(bar) {
 	alphatab.rendering.GroupedBarRenderer.call(this,bar);
+	this._beatPosition = new IntHash();
 };
 alphatab.rendering.TabBarRenderer.__name__ = ["alphatab","rendering","TabBarRenderer"];
 alphatab.rendering.TabBarRenderer.__super__ = alphatab.rendering.GroupedBarRenderer;
@@ -4672,6 +4673,7 @@ alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.Grouped
 			var pre = new alphatab.rendering.glyphs.TabBeatPreNotesGlyph(b);
 			this.addBeatGlyph(pre);
 			var g = new alphatab.rendering.glyphs.TabBeatGlyph(b);
+			this._beatPosition.set(b.index,g);
 			this.addBeatGlyph(g);
 			var post = new alphatab.rendering.glyphs.TabBeatPostNotesGlyph(b);
 			this.addBeatGlyph(post);
@@ -4693,9 +4695,25 @@ alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.Grouped
 			this.stave.registerStaveBottom(this.height - this.getNumberOverflow());
 		}
 	}
+	,getNoteY: function(note) {
+		if(this._beatPosition.exists(note.beat.index)) {
+			var beat = this._beatPosition.get(note.beat.index);
+			return beat.noteNumbers.getNoteY(note);
+		}
+		return 0;
+	}
+	,getNoteX: function(note,onEnd) {
+		if(onEnd == null) onEnd = true;
+		if(this._beatPosition.exists(note.beat.index)) {
+			var beat = this._beatPosition.get(note.beat.index);
+			return beat.x + beat.noteNumbers.getNoteX(note,onEnd);
+		}
+		return 0;
+	}
 	,getLineOffset: function() {
 		return 11 * this.stave.staveGroup.layout.renderer.scale;
 	}
+	,_beatPosition: null
 	,__class__: alphatab.rendering.TabBarRenderer
 });
 alphatab.rendering.TabBarRendererFactory = $hxClasses["alphatab.rendering.TabBarRendererFactory"] = function() {
@@ -6026,6 +6044,7 @@ alphatab.rendering.glyphs.SpacingGlyph.prototype = $extend(alphatab.rendering.Gl
 });
 alphatab.rendering.glyphs.TabBeatGlyph = $hxClasses["alphatab.rendering.glyphs.TabBeatGlyph"] = function(b) {
 	alphatab.rendering.glyphs.BeatGlyphBase.call(this,b);
+	this._ties = new Array();
 };
 alphatab.rendering.glyphs.TabBeatGlyph.__name__ = ["alphatab","rendering","glyphs","TabBeatGlyph"];
 alphatab.rendering.glyphs.TabBeatGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
@@ -6036,6 +6055,10 @@ alphatab.rendering.glyphs.TabBeatGlyph.prototype = $extend(alphatab.rendering.gl
 		var l = n.beat.voice.bar.track.tuning.length - n.string + 1;
 		noteNumberGlyph.y = tr.getTabY(l,-2);
 		this.noteNumbers.addNoteGlyph(noteNumberGlyph,n);
+		if(n.slideType != alphatab.model.SlideType.None) {
+			var l1 = new alphatab.rendering.glyphs.TabSlideLineGlyph(n.slideType,n);
+			this._ties.push(l1);
+		}
 	}
 	,doLayout: function() {
 		var _g = this;
@@ -6059,7 +6082,18 @@ alphatab.rendering.glyphs.TabBeatGlyph.prototype = $extend(alphatab.rendering.gl
 		}
 		this.width = w;
 	}
+	,paint: function(cx,cy,canvas) {
+		alphatab.rendering.glyphs.BeatGlyphBase.prototype.paint.call(this,cx,cy,canvas);
+		var _g = 0, _g1 = this._ties;
+		while(_g < _g1.length) {
+			var t = _g1[_g];
+			++_g;
+			t.renderer = this.renderer;
+			t.paint(cx,cy + this.y,canvas);
+		}
+	}
 	,noteNumbers: null
+	,_ties: null
 	,__class__: alphatab.rendering.glyphs.TabBeatGlyph
 });
 alphatab.rendering.glyphs.TabBeatPostNotesGlyph = $hxClasses["alphatab.rendering.glyphs.TabBeatPostNotesGlyph"] = function(b) {
@@ -6120,10 +6154,100 @@ alphatab.rendering.glyphs.TabNoteChordGlyph.prototype = $extend(alphatab.renderi
 		}
 		this.width = w;
 	}
+	,getNoteY: function(note) {
+		if(this._noteLookup.exists(note.string)) return this.y + this._noteLookup.get(note.string).y;
+		return 0;
+	}
+	,getNoteX: function(note,onEnd) {
+		if(onEnd == null) onEnd = true;
+		if(this._noteLookup.exists(note.string)) {
+			var n = this._noteLookup.get(note.string);
+			var pos = this.x + n.x + (3 * this.renderer.stave.staveGroup.layout.renderer.scale | 0);
+			if(onEnd) pos += n.width;
+			return pos;
+		}
+		return 0;
+	}
 	,beat: null
 	,_noteLookup: null
 	,_notes: null
 	,__class__: alphatab.rendering.glyphs.TabNoteChordGlyph
+});
+alphatab.rendering.glyphs.TabSlideLineGlyph = $hxClasses["alphatab.rendering.glyphs.TabSlideLineGlyph"] = function(type,startNote) {
+	alphatab.rendering.Glyph.call(this,0,0);
+	this._type = type;
+	this._startNote = startNote;
+};
+alphatab.rendering.glyphs.TabSlideLineGlyph.__name__ = ["alphatab","rendering","glyphs","TabSlideLineGlyph"];
+alphatab.rendering.glyphs.TabSlideLineGlyph.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.TabSlideLineGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	paint: function(cx,cy,canvas) {
+		var r = this.renderer;
+		var sizeX = 12 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		var sizeY = 3 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		var startX;
+		var startY;
+		var endX;
+		var endY;
+		switch( (this._type)[1] ) {
+		case 1:
+		case 2:
+			var startOffsetY;
+			var endOffsetY;
+			if(this._startNote.slideTarget.fret > this._startNote.fret) {
+				startOffsetY = sizeY;
+				endOffsetY = sizeY * -1;
+			} else {
+				startOffsetY = sizeY * -1;
+				endOffsetY = sizeY;
+			}
+			startX = cx + r.getNoteX(this._startNote,true);
+			startY = cy + r.getNoteY(this._startNote) + startOffsetY;
+			endX = cx + r.getNoteX(this._startNote.slideTarget,false);
+			endY = cy + r.getNoteY(this._startNote.slideTarget) + endOffsetY;
+			break;
+		case 3:
+			endX = cx + r.getNoteX(this._startNote,false);
+			endY = cy + r.getNoteY(this._startNote);
+			startX = endX - sizeX;
+			startY = cy + r.getNoteY(this._startNote) + sizeY;
+			break;
+		case 4:
+			endX = cx + r.getNoteX(this._startNote,false);
+			endY = cy + r.getNoteY(this._startNote);
+			startX = endX - sizeX;
+			startY = cy + r.getNoteY(this._startNote) - sizeY;
+			break;
+		case 5:
+			startX = cx + r.getNoteX(this._startNote,true);
+			startY = cy + r.getNoteY(this._startNote);
+			endX = startX + sizeX;
+			endY = cy + r.getNoteY(this._startNote) - sizeY;
+			break;
+		case 6:
+			startX = cx + r.getNoteX(this._startNote,true);
+			startY = cy + r.getNoteY(this._startNote);
+			endX = startX + sizeX;
+			endY = cy + r.getNoteY(this._startNote) + sizeY;
+			break;
+		default:
+			return;
+		}
+		canvas.setColor(this.renderer.stave.staveGroup.layout.renderer.renderingResources.mainGlyphColor);
+		canvas.beginPath();
+		canvas.moveTo(startX,startY);
+		canvas.lineTo(endX,endY);
+		canvas.stroke();
+	}
+	,canScale: function() {
+		return false;
+	}
+	,doLayout: function() {
+		this.width = 0;
+	}
+	,_type: null
+	,_startNote: null
+	,__class__: alphatab.rendering.glyphs.TabSlideLineGlyph
 });
 alphatab.rendering.glyphs.TimeSignatureGlyph = $hxClasses["alphatab.rendering.glyphs.TimeSignatureGlyph"] = function(x,y,numerator,denominator) {
 	alphatab.rendering.glyphs.GlyphGroup.call(this,x,y,new Array());
@@ -7940,6 +8064,7 @@ alphatab.rendering.glyphs.MusicFont.RestSixtyFourth = "M 705 -2202c 77 -26 144 -
 alphatab.rendering.glyphs.MusicFont.AccidentalDoubleFlat = "M 67 25c 52 -27 93 -48 124 -62c 100 -45 176 -67 228 -67c 45 0 95 12 150 36V -1275h 88v 1300c 48 -27 88 -48 119 -62c 100 -45 183 -67 249 -67c 55 0 104 13 145 39c 41 26 72 71 93 137c 10 31 15 62 15 93c 0 107 -48 212 -145 316c -72 79 -163 143 -270 192c -34 17 -78 52 -132 104c -53 51 -108 107 -163 166v -529c -38 45 -72 83 -104 115c -55 55 -121 103 -197 141c -45 20 -102 68 -171 141c -41 41 -81 85 -119 131V -1275h 88V 25zM 369 15c -7 -3 -13 -6 -20 -10c -17 -6 -33 -10 -46 -10c -31 0 -64 7 -98 23c -34 15 -79 46 -135 91v 644c 65 -65 131 -131 197 -197c 131 -159 197 -287 197 -384C 462 101 431 49 369 15zM 962 15c -3 -3 -12 -6 -26 -10c -20 -6 -36 -10 -46 -10c -31 0 -63 7 -96 23c -33 15 -77 46 -132 91v 644c 65 -65 131 -131 197 -197c 131 -159 197 -287 197 -384C 1055 101 1024 49 962 15";
 alphatab.rendering.glyphs.MusicFont.AccidentalDoubleSharp = "M 22 243c -32 -31 -48 -68 -48 -110c 0 -38 15 -71 45 -98c 30 -27 63 -40 98 -40c 38 0 70 14 96 43c 64 57 116 124 158 199c 41 75 62 146 62 213c -83 0 -172 -30 -268 -91C 99 317 51 278 22 243zM 18 872c 25 25 59 38 100 38c 38 0 70 -14 96 -43c 44 -38 86 -86 124 -144c 64 -96 96 -187 96 -273c -70 0 -140 18 -211 55c -70 36 -137 87 -201 151c -32 31 -48 70 -48 115C -26 810 -11 843 18 872zM 848 32c -25 -25 -60 -38 -105 -38c -41 0 -76 16 -105 48c -57 67 -94 113 -110 139c -60 96 -91 185 -91 268c 92 0 182 -28 268 -86c 79 -67 124 -105 134 -115c 31 -31 48 -72 48 -120C 886 96 874 64 848 32zM 838 656c 31 31 48 70 48 115c 0 38 -14 72 -43 100s -62 43 -100 43c -38 0 -73 -16 -105 -48c -51 -57 -88 -105 -110 -144c -60 -96 -91 -187 -91 -273c 105 0 211 41 316 124C 803 622 832 650 838 656";
 alphatab.rendering.glyphs.NoteHeadGlyph.noteHeadHeight = 9;
+alphatab.rendering.glyphs.NoteNumberGlyph.Padding = 3;
 alphatab.rendering.layout.HeaderFooterElements.NONE = 0;
 alphatab.rendering.layout.HeaderFooterElements.TITLE = 1;
 alphatab.rendering.layout.HeaderFooterElements.SUBTITLE = 2;

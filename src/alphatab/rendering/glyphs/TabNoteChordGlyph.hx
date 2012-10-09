@@ -19,6 +19,31 @@ class TabNoteChordGlyph extends Glyph
 		_noteLookup = new IntHash<Glyph>();
 	}
 	
+	public function getNoteX(note:Note, onEnd:Bool = true) 
+	{
+		if (_noteLookup.exists(note.string)) 
+		{
+			var n = _noteLookup.get(note.string);
+			var pos = x + n.x + Std.int(NoteNumberGlyph.Padding * getScale());
+			if (onEnd) 
+			{
+				pos += n.width;
+			}
+			return pos;
+		}
+		return 0;
+	}
+	
+	public function getNoteY(note:Note) 
+	{
+		if (_noteLookup.exists(note.string)) 
+		{
+			return y + _noteLookup.get(note.string).y;
+		}
+		return 0;
+	}
+	
+	
 	public override function doLayout():Void 
 	{
 		var w = 0;

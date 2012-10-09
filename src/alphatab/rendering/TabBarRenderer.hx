@@ -19,6 +19,7 @@ package alphatab.rendering;
 import alphatab.model.Bar;
 import alphatab.model.Beat;
 import alphatab.model.Duration;
+import alphatab.model.Note;
 import alphatab.model.Voice;
 import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
@@ -38,15 +39,39 @@ import alphatab.rendering.glyphs.TabBeatPreNotesGlyph;
 class TabBarRenderer extends GroupedBarRenderer
 {
 	private static inline var LineSpacing = 10;
-	
+
+	private var _beatPosition:IntHash<TabBeatGlyph>;
+
+		
 	public function new(bar:Bar) 
 	{
 		super(bar);
+		_beatPosition = new IntHash<TabBeatGlyph>();
 	}
 	
 	private inline function getLineOffset()
 	{
 		return ((LineSpacing + 1) * getLayout().renderer.scale);
+	}
+	
+	public function getNoteX(note:Note, onEnd:Bool=true) 
+	{
+		if (_beatPosition.exists(note.beat.index)) 
+		{
+			var beat:TabBeatGlyph = _beatPosition.get(note.beat.index);
+			return beat.x + beat.noteNumbers.getNoteX(note, onEnd);
+		}
+		return 0;
+	}	
+	
+	public function getNoteY(note:Note) 
+	{
+		if (_beatPosition.exists(note.beat.index)) 
+		{
+			var beat:TabBeatGlyph = _beatPosition.get(note.beat.index);
+			return beat.noteNumbers.getNoteY(note);
+		}
+		return 0;
 	}
 	
 	public override function doLayout()
@@ -91,6 +116,7 @@ class TabBarRenderer extends GroupedBarRenderer
 			addBeatGlyph(pre);
 			
 			var g = new TabBeatGlyph(b);
+			_beatPosition.set(b.index, g);
 			addBeatGlyph(g); 
 			
 			var post = new TabBeatPostNotesGlyph(b);

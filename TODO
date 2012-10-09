@@ -4,28 +4,20 @@ Triplet Feel (Own Info Line)
 Repeat Alternatives (Own Info Line)
 Chords
 Tuplets
-Tied Notes
 Note Dynamics
 Cresendo 
 Decresendo
 Tempo Indicators
 Tab Clef
-Tab Notes
 
 Ghost Note 
-Accentuated Note 
-Heavy Accentuated Note
-Staccato
 Legato
 Let Ring
 Palm Mute
 Dead note
-Harmonics
 Bends
 Tremolo Bars
 Vibratos
-Slides 
-Hammeron / Pulloff
 Tap/slap/pop
 Fingering
 Brush down/up
@@ -35,25 +27,5 @@ Trill
 Tremolo Picking
 Fade In
 Fade Out
-Chors
-
-Done
-====
-Basic Layouting Engine for Blocks
-Top/Bottom Margin for Blocks
-Stave System
-Glyph Stave System
-Glyph Rendering Engine
-Some Basic Glyphs (Groups)
-SVG Rendering Glyph
-Notes
-	Note Accentuations
-Rests
-Note Beams
-
-Elements
----------
-Clefs
-Key Signature
-Time Signature
-Double Bar
+Chords
+ 

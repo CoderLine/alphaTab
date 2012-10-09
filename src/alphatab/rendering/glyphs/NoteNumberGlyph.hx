@@ -6,6 +6,7 @@ import alphatab.rendering.Glyph;
 
 class NoteNumberGlyph extends Glyph
 {
+	public static inline var Padding = 3;
 	private var _noteString:String;
 	
 	public function new(x:Int = 0, y:Int = 0, n:Note) 
@@ -41,7 +42,7 @@ class NoteNumberGlyph extends Glyph
 
 			canvas.setColor(res.mainGlyphColor);
 			canvas.setFont(res.tablatureFont);
-			canvas.fillText(Std.string(_noteString), cx + x + (3 * getScale()), cy + y);
+			canvas.fillText(Std.string(_noteString), cx + x + (Padding * getScale()), cy + y);
 		}
 	}	
 }
