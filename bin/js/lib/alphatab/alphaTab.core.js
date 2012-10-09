@@ -5293,27 +5293,6 @@ alphatab.rendering.glyphs.DigitGlyph.prototype = $extend(alphatab.rendering.glyp
 	,_digit: null
 	,__class__: alphatab.rendering.glyphs.DigitGlyph
 });
-alphatab.rendering.glyphs.DummyTablatureGlyph = $hxClasses["alphatab.rendering.glyphs.DummyTablatureGlyph"] = function(x,y) {
-	if(y == null) y = 0;
-	if(x == null) x = 0;
-	alphatab.rendering.Glyph.call(this,x,y);
-};
-alphatab.rendering.glyphs.DummyTablatureGlyph.__name__ = ["alphatab","rendering","glyphs","DummyTablatureGlyph"];
-alphatab.rendering.glyphs.DummyTablatureGlyph.__super__ = alphatab.rendering.Glyph;
-alphatab.rendering.glyphs.DummyTablatureGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
-	paint: function(cx,cy,canvas) {
-		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
-		canvas.setColor(new alphatab.platform.model.Color(Std.random(256),Std.random(256),Std.random(256),128));
-		canvas.fillRect(cx + this.x,cy + this.y,this.width,this.renderer.height);
-		canvas.setFont(res.tablatureFont);
-		canvas.setColor(new alphatab.platform.model.Color(0,0,0));
-		canvas.fillText("0 1 2 3 4 5 6 7 9 0",cx + this.x,cy + this.y);
-	}
-	,doLayout: function() {
-		this.width = 100;
-	}
-	,__class__: alphatab.rendering.glyphs.DummyTablatureGlyph
-});
 alphatab.rendering.glyphs.FlatGlyph = $hxClasses["alphatab.rendering.glyphs.FlatGlyph"] = function(x,y) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
@@ -5604,8 +5583,12 @@ alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.
 			var tie = new alphatab.rendering.glyphs.ScoreTieGlyph(n.hammerPullOrigin,n);
 			this._ties.push(tie);
 		} else if(n.slideType == alphatab.model.SlideType.Legato && n.slideTarget != null) {
-			var tie = new alphatab.rendering.glyphs.ScoreTieGlyph(n.slideTarget,n);
+			var tie = new alphatab.rendering.glyphs.ScoreTieGlyph(n,n.slideTarget);
 			this._ties.push(tie);
+		}
+		if(n.slideType != alphatab.model.SlideType.None) {
+			var l = new alphatab.rendering.glyphs.ScoreSlideLineGlyph(n.slideType,n);
+			this._ties.push(l);
 		}
 	}
 	,createBeatDot: function(n,group) {
@@ -5887,6 +5870,73 @@ alphatab.rendering.glyphs.ScoreNoteChordGlyph.prototype = $extend(alphatab.rende
 	,_infos: null
 	,__class__: alphatab.rendering.glyphs.ScoreNoteChordGlyph
 });
+alphatab.rendering.glyphs.ScoreSlideLineGlyph = $hxClasses["alphatab.rendering.glyphs.ScoreSlideLineGlyph"] = function(type,startNote) {
+	alphatab.rendering.Glyph.call(this,0,0);
+	this._type = type;
+	this._startNote = startNote;
+};
+alphatab.rendering.glyphs.ScoreSlideLineGlyph.__name__ = ["alphatab","rendering","glyphs","ScoreSlideLineGlyph"];
+alphatab.rendering.glyphs.ScoreSlideLineGlyph.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.ScoreSlideLineGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	paint: function(cx,cy,canvas) {
+		var r = this.renderer;
+		var sizeX = 12 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		var offsetX = this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		var startX;
+		var startY;
+		var endX;
+		var endY;
+		switch( (this._type)[1] ) {
+		case 1:
+		case 2:
+			startX = cx + r.getNoteX(this._startNote,true) + offsetX;
+			startY = cy + r.getNoteY(this._startNote) + 4;
+			endX = cx + r.getNoteX(this._startNote.slideTarget,false) - offsetX;
+			endY = cy + r.getNoteY(this._startNote.slideTarget) + 4;
+			break;
+		case 3:
+			endX = cx + r.getNoteX(this._startNote,false) - offsetX;
+			endY = cy + r.getNoteY(this._startNote) + 4;
+			startX = endX - sizeX;
+			startY = cy + r.getNoteY(this._startNote) + 9;
+			break;
+		case 4:
+			endX = cx + r.getNoteX(this._startNote,false) - offsetX;
+			endY = cy + r.getNoteY(this._startNote) + 4;
+			startX = endX - sizeX;
+			startY = cy + r.getNoteY(this._startNote);
+			break;
+		case 5:
+			startX = cx + r.getNoteX(this._startNote,true) + offsetX;
+			startY = cy + r.getNoteY(this._startNote) + 4;
+			endX = startX + sizeX;
+			endY = cy + r.getNoteY(this._startNote);
+			break;
+		case 6:
+			startX = cx + r.getNoteX(this._startNote,true) + offsetX;
+			startY = cy + r.getNoteY(this._startNote) + 4;
+			endX = startX + sizeX;
+			endY = cy + r.getNoteY(this._startNote) + 9;
+			break;
+		default:
+			return;
+		}
+		canvas.setColor(this.renderer.stave.staveGroup.layout.renderer.renderingResources.mainGlyphColor);
+		canvas.beginPath();
+		canvas.moveTo(startX,startY);
+		canvas.lineTo(endX,endY);
+		canvas.stroke();
+	}
+	,canScale: function() {
+		return false;
+	}
+	,doLayout: function() {
+		this.width = 0;
+	}
+	,_type: null
+	,_startNote: null
+	,__class__: alphatab.rendering.glyphs.ScoreSlideLineGlyph
+});
 alphatab.rendering.glyphs.ScoreTieGlyph = $hxClasses["alphatab.rendering.glyphs.ScoreTieGlyph"] = function(startNote,endNote) {
 	alphatab.rendering.Glyph.call(this,0,0);
 	this._startNote = startNote;
@@ -5899,6 +5949,9 @@ alphatab.rendering.glyphs.ScoreTieGlyph.paintTie = function(canvas,scale,x1,y1,x
 		var t = x1;
 		x1 = x2;
 		x2 = t;
+		t = y1;
+		y1 = y2;
+		y2 = t;
 	}
 	var offset = 15 * scale;
 	var size = 4 * scale;
@@ -5924,7 +5977,7 @@ alphatab.rendering.glyphs.ScoreTieGlyph.prototype = $extend(alphatab.rendering.G
 		var endX = cx + r.getNoteX(this._endNote,false);
 		var startY = cy + r.getNoteY(this._startNote) + 4.5;
 		var endY = cy + r.getNoteY(this._endNote) + 4.5;
-		alphatab.rendering.glyphs.ScoreTieGlyph.paintTie(canvas,this.renderer.stave.staveGroup.layout.renderer.scale,startX,startY,endX,endY,r.getBeatDirection(this._startNote.beat) == alphatab.rendering.utils.BeamDirection.Up);
+		alphatab.rendering.glyphs.ScoreTieGlyph.paintTie(canvas,this.renderer.stave.staveGroup.layout.renderer.scale,startX,startY,endX,endY,r.getBeatDirection(this._startNote.beat) == alphatab.rendering.utils.BeamDirection.Down);
 		canvas.setColor(this.renderer.stave.staveGroup.layout.renderer.renderingResources.mainGlyphColor);
 		canvas.fill();
 	}

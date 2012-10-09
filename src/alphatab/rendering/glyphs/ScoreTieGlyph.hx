@@ -17,6 +17,7 @@
 package alphatab.rendering.glyphs;
 
 import alphatab.model.Note;
+import alphatab.model.SlideType;
 import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
 import alphatab.rendering.Glyph;
@@ -54,7 +55,7 @@ class ScoreTieGlyph extends Glyph
 		var startY = cy + r.getNoteY(_startNote) + (NoteHeadGlyph.noteHeadHeight / 2);
 		var endY = cy + r.getNoteY(_endNote) + (NoteHeadGlyph.noteHeadHeight / 2);
 		
-		paintTie(canvas, getScale(), startX, startY, endX, endY, r.getBeatDirection(_startNote.beat) == BeamDirection.Up);
+		paintTie(canvas, getScale(), startX, startY, endX, endY, r.getBeatDirection(_startNote.beat) == BeamDirection.Down);
 		
 		canvas.setColor(renderer.getLayout().renderer.renderingResources.mainGlyphColor);
 		canvas.fill();
@@ -69,6 +70,9 @@ class ScoreTieGlyph extends Glyph
 			var t = x1;
 			x1 = x2;
 			x2 = t;
+			t = y1;
+			y1 = y2;
+			y2 = t;
 		}
         //
         // calculate control points 

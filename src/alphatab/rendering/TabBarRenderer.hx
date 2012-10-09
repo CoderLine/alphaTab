@@ -24,7 +24,6 @@ import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
 import alphatab.rendering.glyphs.BarNumberGlyph;
 import alphatab.rendering.glyphs.BarSeperatorGlyph;
-import alphatab.rendering.glyphs.DummyTablatureGlyph;
 import alphatab.rendering.glyphs.RepeatCloseGlyph;
 import alphatab.rendering.glyphs.RepeatCountGlyph;
 import alphatab.rendering.glyphs.RepeatOpenGlyph;

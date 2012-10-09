@@ -127,7 +127,6 @@ class ScoreBeatGlyph extends BeatGlyphBase
         {
             noteHeadGlyph = new DiamondNoteHeadGlyph();
         }
-
                 
         // calculate y position
         var line = sr.getNoteLine(n);
@@ -162,8 +161,14 @@ class ScoreBeatGlyph extends BeatGlyphBase
 		}
 		else if (n.slideType == SlideType.Legato && n.slideTarget != null)
 		{
-			var tie = new ScoreTieGlyph(n.slideTarget, n);
+			var tie = new ScoreTieGlyph(n, n.slideTarget);
 			_ties.push(tie);
+		}
+		
+		if (n.slideType != SlideType.None)
+		{
+			var l = new ScoreSlideLineGlyph(n.slideType, n);
+			_ties.push(l);
 		}
     }
 }

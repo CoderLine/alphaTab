@@ -34,7 +34,6 @@ import alphatab.rendering.glyphs.BeamGlyph;
 import alphatab.rendering.glyphs.CircleGlyph;
 import alphatab.rendering.glyphs.ClefGlyph;
 import alphatab.rendering.glyphs.DiamondNoteHeadGlyph;
-import alphatab.rendering.glyphs.DummyTablatureGlyph;
 import alphatab.rendering.glyphs.FlatGlyph;
 import alphatab.rendering.glyphs.GlyphGroup;
 import alphatab.rendering.glyphs.MusicFont;
