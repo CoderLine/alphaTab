@@ -48,5 +48,5 @@ class ScoreBeatPreNotesGlyph extends BeatGlyphBase
             case Natural: accidentals.addGlyph(new NaturalizeGlyph(0, sr.getScoreY(noteLine + 1)));
             default:
         }
-    }
+    } 
 }

@@ -119,7 +119,11 @@ class ScoreBeatGlyph extends BeatGlyphBase
     {
 		var sr = cast(renderer, ScoreBarRenderer);
         var noteHeadGlyph:Glyph;
-        if (n.harmonicType == HarmonicType.None)
+		if (n.isDead) 
+		{
+            noteHeadGlyph = new DeadNoteHeadGlyph();
+		}
+        else if (n.harmonicType == HarmonicType.None)
         {
             noteHeadGlyph = new NoteHeadGlyph(n.beat.duration);
         }
@@ -165,6 +169,8 @@ class ScoreBeatGlyph extends BeatGlyphBase
 			_ties.push(tie);
 		}
 		
+		// TODO: depending on the type we have other positioning
+		// we should place glyphs in the preNotesGlyph or postNotesGlyph if needed
 		if (n.slideType != SlideType.None)
 		{
 			var l = new ScoreSlideLineGlyph(n.slideType, n);

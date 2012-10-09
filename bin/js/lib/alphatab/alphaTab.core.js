@@ -2870,7 +2870,7 @@ alphatab.model.Note.prototype = {
 	,isGhost: null
 	,fret: null
 	,hasBend: function() {
-		return this.bendPoints.length > 0;
+		return this.bendPoints.length > 1;
 	}
 	,bendPoints: null
 	,accentuated: null
@@ -5187,6 +5187,88 @@ alphatab.rendering.glyphs.BeatGlyphBase.prototype = $extend(alphatab.rendering.g
 	,beat: null
 	,__class__: alphatab.rendering.glyphs.BeatGlyphBase
 });
+alphatab.rendering.glyphs.BendGlyph = $hxClasses["alphatab.rendering.glyphs.BendGlyph"] = function(n,width,height) {
+	alphatab.rendering.Glyph.call(this,0,0);
+	this._note = n;
+	this._width = width;
+	this._height = height;
+};
+alphatab.rendering.glyphs.BendGlyph.__name__ = ["alphatab","rendering","glyphs","BendGlyph"];
+alphatab.rendering.glyphs.BendGlyph.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.BendGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	paint: function(cx,cy,canvas) {
+		var r = this.renderer;
+		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
+		var dX = this._width / 60;
+		var maxValue = 0;
+		var _g1 = 0, _g = this._note.bendPoints.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			if(this._note.bendPoints[i].value > maxValue) maxValue = this._note.bendPoints[i].value;
+		}
+		var dY = this._height / maxValue;
+		var xx = cx + this.x;
+		var yy = cy + this.y + r.getNoteY(this._note);
+		canvas.beginPath();
+		var _g1 = 0, _g = this._note.bendPoints.length - 1;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var firstPt = this._note.bendPoints[i];
+			var secondPt = this._note.bendPoints[i + 1];
+			if(firstPt.value == secondPt.value && i == this._note.bendPoints.length - 2) continue;
+			var x1 = xx + dX * firstPt.offset;
+			var y1 = yy - dY * firstPt.value;
+			var x2 = xx + dX * secondPt.offset;
+			var y2 = yy - dY * secondPt.value;
+			var hx = x1 + (x2 - x1);
+			var hy = yy - dY * firstPt.value;
+			canvas.moveTo(x1,y1);
+			canvas.bezierCurveTo(hx,hy,x2,y2,x2,y2);
+			canvas.stroke();
+			var arrowSize = 6 * this.renderer.stave.staveGroup.layout.renderer.scale;
+			if(secondPt.value > firstPt.value) {
+				canvas.beginPath();
+				canvas.moveTo(x2,y2);
+				canvas.lineTo(x2 - arrowSize * 0.5,y2 + arrowSize);
+				canvas.lineTo(x2 + arrowSize * 0.5,y2 + arrowSize);
+				canvas.closePath();
+				canvas.fill();
+			} else if(secondPt.value != firstPt.value) {
+				canvas.beginPath();
+				canvas.moveTo(x2,y2);
+				canvas.lineTo(x2 - arrowSize * 0.5,y2 - arrowSize);
+				canvas.lineTo(x2 + arrowSize * 0.5,y2 - arrowSize);
+				canvas.closePath();
+				canvas.fill();
+			}
+			canvas.stroke();
+			if(secondPt.value != 0) {
+				var dV = secondPt.value - firstPt.value;
+				var up = dV > 0;
+				dV = Math.abs(dV);
+				var s = "";
+				if(dV == 4) {
+					s = "full";
+					dV -= 4;
+				} else if(dV > 4) {
+					s += Std.string(Math.floor(dV / 4)) + " ";
+					dV -= Math.floor(dV);
+				}
+				if(dV > 0) s += Std.string(dV) + "/4";
+				if(!up) s = "-" + s;
+				canvas.setFont(res.tablatureFont);
+				var size = canvas.measureText(s);
+				var y = up?y2 - res.tablatureFont.getSize() - 2 * this.renderer.stave.staveGroup.layout.renderer.scale:y2 + 2 * this.renderer.stave.staveGroup.layout.renderer.scale;
+				var x = x2 - size / 2;
+				canvas.fillText(s,x,y);
+			}
+		}
+	}
+	,_height: null
+	,_width: null
+	,_note: null
+	,__class__: alphatab.rendering.glyphs.BendGlyph
+});
 alphatab.rendering.glyphs.CircleGlyph = $hxClasses["alphatab.rendering.glyphs.CircleGlyph"] = function(x,y,size) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
@@ -5239,6 +5321,22 @@ alphatab.rendering.glyphs.ClefGlyph.prototype = $extend(alphatab.rendering.glyph
 		this.width = 28 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
 	,__class__: alphatab.rendering.glyphs.ClefGlyph
+});
+alphatab.rendering.glyphs.DeadNoteHeadGlyph = $hxClasses["alphatab.rendering.glyphs.DeadNoteHeadGlyph"] = function(x,y) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,alphatab.rendering.glyphs.MusicFont.NoteDead,1,1);
+};
+alphatab.rendering.glyphs.DeadNoteHeadGlyph.__name__ = ["alphatab","rendering","glyphs","DeadNoteHeadGlyph"];
+alphatab.rendering.glyphs.DeadNoteHeadGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
+alphatab.rendering.glyphs.DeadNoteHeadGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
+	canScale: function() {
+		return false;
+	}
+	,doLayout: function() {
+		this.width = 9 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,__class__: alphatab.rendering.glyphs.DeadNoteHeadGlyph
 });
 alphatab.rendering.glyphs.DiamondNoteHeadGlyph = $hxClasses["alphatab.rendering.glyphs.DiamondNoteHeadGlyph"] = function(x,y) {
 	if(y == null) y = 0;
@@ -5587,7 +5685,7 @@ alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.
 	createNoteGlyph: function(n) {
 		var sr = js.Boot.__cast(this.renderer , alphatab.rendering.ScoreBarRenderer);
 		var noteHeadGlyph;
-		if(n.harmonicType == alphatab.model.HarmonicType.None) noteHeadGlyph = new alphatab.rendering.glyphs.NoteHeadGlyph(null,null,n.beat.duration); else noteHeadGlyph = new alphatab.rendering.glyphs.DiamondNoteHeadGlyph();
+		if(n.isDead) noteHeadGlyph = new alphatab.rendering.glyphs.DeadNoteHeadGlyph(); else if(n.harmonicType == alphatab.model.HarmonicType.None) noteHeadGlyph = new alphatab.rendering.glyphs.NoteHeadGlyph(null,null,n.beat.duration); else noteHeadGlyph = new alphatab.rendering.glyphs.DiamondNoteHeadGlyph();
 		var line = sr.getNoteLine(n);
 		noteHeadGlyph.y = sr.getScoreY(line,-1);
 		this.noteHeads.addNoteGlyph(noteHeadGlyph,n,line);
@@ -6117,7 +6215,18 @@ alphatab.rendering.glyphs.TabBeatPostNotesGlyph = $hxClasses["alphatab.rendering
 alphatab.rendering.glyphs.TabBeatPostNotesGlyph.__name__ = ["alphatab","rendering","glyphs","TabBeatPostNotesGlyph"];
 alphatab.rendering.glyphs.TabBeatPostNotesGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
 alphatab.rendering.glyphs.TabBeatPostNotesGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
-	doLayout: function() {
+	createNoteGlyphs: function(n) {
+		if(n.bendPoints.length > 1) {
+			var bendHeight = 60 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+			this.renderer.registerOverflowTop(bendHeight);
+			this.addGlyph(new alphatab.rendering.glyphs.BendGlyph(n,this.getBeatDurationWidth(this.beat.duration) * this.renderer.stave.staveGroup.layout.renderer.scale | 0,bendHeight));
+		}
+	}
+	,doLayout: function() {
+		var _g = this;
+		this.noteLoop(function(n) {
+			_g.createNoteGlyphs(n);
+		});
 		this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,this.getBeatDurationWidth(this.beat.duration) * this.renderer.stave.staveGroup.layout.renderer.scale | 0));
 		alphatab.rendering.glyphs.BeatGlyphBase.prototype.doLayout.call(this);
 	}
@@ -8008,6 +8117,8 @@ alphatab.importer.AlphaTexImporter.EOL = String.fromCharCode(0);
 alphatab.importer.AlphaTexImporter.TRACK_CHANNELS = [0,1];
 alphatab.importer.Gp3To5Importer.VERSION_STRING = "FICHIER GUITAR PRO ";
 alphatab.importer.Gp3To5Importer.BEND_STEP = 25;
+alphatab.model.BendPoint.MAX_POSITION = 60;
+alphatab.model.BendPoint.MAX_VALUE = 12;
 alphatab.model.Tuning.TUNING_REGEX = new EReg("([a-g]b?)([0-9])","i");
 alphatab.platform.PlatformFactory.SVG_CANVAS = "svg";
 alphatab.platform.model.Font.STYLE_PLAIN = 0;
@@ -8029,6 +8140,7 @@ alphatab.rendering.ScoreBarRenderer.LineSpacing = 8;
 alphatab.rendering.ScoreBarRenderer.NOTE_STEP_CORRECTION = 1;
 alphatab.rendering.TabBarRenderer.LineSpacing = 10;
 alphatab.rendering.glyphs.AccidentalGroupGlyph.NON_RESERVED = -3000;
+alphatab.rendering.glyphs.DeadNoteHeadGlyph.noteHeadHeight = 9;
 alphatab.rendering.glyphs.DiamondNoteHeadGlyph.noteHeadHeight = 9;
 alphatab.rendering.glyphs.MusicFont.ClefF = "M 545 -801c -53 49 -80 109 -80 179c 0 33 4 66 12 99c 8 33 38 57 89 74c 51 16 125 31 220 43c 95 12 159 53 192 124c 16 37 24 99 24 186c 0 95 -43 168 -130 220c -86 51 -186 77 -297 77c -128 0 -229 -28 -303 -86c -91 -70 -136 -169 -136 -297c 0 -115 23 -234 71 -356c 47 -121 118 -234 213 -337c 70 -74 163 -129 279 -164c 115 -35 233 -52 353 -52c 45 0 83 1 114 3c 31 2 81 9 151 21c 243 45 444 175 601 390c 144 198 217 409 217 632c 0 41 -2 72 -6 93c -33 281 -219 582 -558 905c -272 260 -591 493 -954 700c -330 190 -527 274 -589 254l -18 -68c 95 -33 197 -78 306 -136c 109 -57 218 -124 325 -198c 276 -198 477 -384 601 -558c 152 -210 252 -471 297 -781c 20 -128 31 -210 31 -248s 0 -68 0 -93c 0 -322 -109 -551 -328 -688c -99 -57 -200 -86 -303 -86c -78 0 -154 15 -226 46C 643 -873 586 -838 545 -801zM 2517 -783c 66 0 121 22 167 68c 45 45 68 101 68 167c 0 66 -22 121 -68 167c -45 45 -101 68 -167 68c -66 0 -122 -22 -167 -68c -45 -45 -68 -101 -68 -167c 0 -66 22 -121 68 -167C 2395 -760 2451 -783 2517 -783zM 2517 54c 66 0 121 22 167 68c 45 45 68 101 68 167c 0 66 -22 121 -68 167c -45 45 -101 68 -167 68c -66 0 -122 -22 -167 -68c -45 -45 -68 -101 -68 -167c 0 -66 22 -121 68 -167C 2395 77 2451 54 2517 54";
 alphatab.rendering.glyphs.MusicFont.ClefC = "M 26 1736V -1924h 458v 3659H 26zM 641 1736V -1924h 150v 3659H 641zM 1099 153c -42 -53 -86 -100 -130 -140c -44 -40 -95 -75 -153 -106c 106 -58 200 -135 279 -233c 110 -135 180 -289 208 -460c 17 127 46 216 87 266c 65 73 170 110 313 110c 150 0 259 -81 324 -244c 50 -124 75 -291 75 -500c 0 -197 -25 -355 -75 -471c -69 -155 -179 -232 -330 -232c -89 0 -167 18 -234 55c -67 36 -101 72 -101 107c 0 19 23 25 69 17c 46 -7 97 6 153 43c 56 36 84 89 84 159c 0 69 -23 125 -69 168c -46 42 -108 63 -185 63c -73 0 -138 -24 -194 -72c -56 -48 -84 -105 -84 -171c 0 -112 56 -212 168 -301c 127 -100 282 -150 463 -150c 228 0 412 74 553 224c 141 149 211 334 211 555c 0 248 -86 458 -258 631c -172 172 -381 259 -629 259c -57 0 -104 -3 -139 -11c -54 -19 -98 -34 -133 -46c -15 49 -48 99 -98 149c -11 15 -48 43 -110 85c 38 19 75 52 110 99c 50 50 88 105 115 164c 65 -31 113 -50 142 -57c 28 -7 70 -11 124 -11c 247 0 457 85 629 257c 172 171 258 380 258 627c 0 211 -73 390 -219 534c -146 144 -332 216 -558 216c -183 0 -334 -47 -453 -142c -118 -94 -178 -198 -178 -310c 0 -69 28 -128 84 -176c 56 -48 120 -72 194 -72c 69 0 129 23 179 69c 50 46 75 104 75 174c 0 65 -28 116 -84 153c -56 36 -107 51 -153 43c -46 -7 -69 0 -69 23c 0 27 35 60 106 101c 70 40 147 60 229 60c 153 0 265 -77 335 -231c 51 -112 76 -268 76 -469c 0 -201 -25 -363 -75 -487c -65 -166 -172 -249 -319 -249c -143 0 -242 30 -298 92c -56 61 -93 156 -113 284C 1279 435 1211 286 1099 153";

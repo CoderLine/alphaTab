@@ -1,5 +1,6 @@
 package alphatab.rendering.glyphs;
 import alphatab.model.Beat;
+import alphatab.model.Note;
 
 class ScoreBeatPostNotesGlyph extends BeatGlyphBase
 {

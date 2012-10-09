@@ -25,7 +25,7 @@ class Note
 {
     public var accentuated:AccentuationType;
     public var bendPoints:Array<BendPoint>;
-    public inline function hasBend():Bool { return bendPoints.length > 0; }
+    public inline function hasBend():Bool { return bendPoints.length > 1; }
     public var fret:Int;
     public var isGhost:Bool;
     public var string:Int;
