@@ -29,6 +29,7 @@ class Note
     public var fret:Int;
     public var isGhost:Bool;
     public var string:Int;
+    public var hammerPullOrigin:Note;
     public var isHammerPullDestination:Bool;
     public var isHammerPullOrigin:Bool;
     public var harmonicValue:Float;
@@ -37,6 +38,7 @@ class Note
     public var isPalmMute:Bool;
     public var isDead:Bool;
     public var slideType:SlideType;
+    public var slideTarget:Note;
     public var vibrato:VibratoType;
     public var isStaccato:Bool;
     public var tapping:Bool;

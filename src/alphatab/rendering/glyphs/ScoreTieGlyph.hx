@@ -63,6 +63,13 @@ class ScoreTieGlyph extends Glyph
 	// paints a tie between the two given points
     public static function paintTie(canvas:ICanvas, scale:Float, x1:Float, y1:Float, x2:Float, y2:Float, down:Bool=false) : Void
     {
+		// ensure endX > startX
+		if (x2 > x1) 
+		{
+			var t = x1;
+			x1 = x2;
+			x2 = t;
+		}
         //
         // calculate control points 
         //

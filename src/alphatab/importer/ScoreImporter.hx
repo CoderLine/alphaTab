@@ -20,6 +20,8 @@ import alphatab.model.AccidentalType;
 import alphatab.model.Beat;
 import alphatab.model.Note;
 import alphatab.model.Score;
+import alphatab.model.SlideType;
+import alphatab.util.LazyVar;
 import haxe.io.Bytes;
 import haxe.io.BytesInput;
 
@@ -75,35 +77,42 @@ class ScoreImporter
                         {
                             for (n in beat.notes)
                             {
+								var nextNoteOnLine = new LazyVar<Note>(function() { return nextNoteOnSameLine(n); });
+								var prevNoteOnLine = new LazyVar<Note>(function() { return previousNoteOnSameLine(n); });
                                 // connect ties
                                 if (n.isTieDestination)
-                                {
-                                    var tieOrigin:Note = determineTieOrigin(n);
-                                    if (tieOrigin == null)
+                                {                                    
+                                    if (prevNoteOnLine.getValue() == null)
                                     {
                                         n.isTieDestination = false;
                                     }
                                     else
                                     {
-                                        tieOrigin.isTieOrigin = true;
-                                        n.fret = tieOrigin.fret;
-										n.tieOrigin = tieOrigin;
+										n.tieOrigin = prevNoteOnLine.getValue();
+										n.tieOrigin.isTieOrigin = true;
+                                        n.fret = n.tieOrigin.fret;
                                     }
                                 }
                                 
                                 // set hammeron/pulloffs
                                 if (n.isHammerPullOrigin)
                                 {
-                                    var hammerPullDestination = determineHammerPullDestination(n);
-                                    if (hammerPullDestination == null)
+                                    if (nextNoteOnLine.getValue() == null)
                                     {
                                         n.isHammerPullOrigin = false;
                                     }
                                     else
                                     {
-                                        hammerPullDestination.isHammerPullDestination = true;
+                                        nextNoteOnLine.getValue().isHammerPullDestination = true;
+										nextNoteOnLine.getValue().hammerPullOrigin = n;
                                     }
                                 }
+								
+								// set slides
+								if (n.slideType != SlideType.None)
+								{
+									n.slideTarget = nextNoteOnLine.getValue();
+								}
                             }
                         }
                     }
@@ -112,7 +121,7 @@ class ScoreImporter
         }
 	}
     
-    private function determineHammerPullDestination(note:Note) : Note
+    private function nextNoteOnSameLine(note:Note) : Note
     {
         var nextBeat:Beat = note.beat.nextBeat;
         while (nextBeat != null)
@@ -131,7 +140,7 @@ class ScoreImporter
         return null;
     }
     
-    private function determineTieOrigin(note:Note) : Note
+    private function previousNoteOnSameLine(note:Note) : Note
     {
         var previousBeat:Beat = note.beat.previousBeat;
         

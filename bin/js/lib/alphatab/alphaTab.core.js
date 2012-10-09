@@ -794,7 +794,7 @@ alphatab.importer.ScoreImporter.availableImporters = function() {
 	return scoreImporter;
 }
 alphatab.importer.ScoreImporter.prototype = {
-	determineTieOrigin: function(note) {
+	previousNoteOnSameLine: function(note) {
 		var previousBeat = note.beat.previousBeat;
 		while(previousBeat != null) {
 			var noteOnString = previousBeat.getNoteOnString(note.string);
@@ -802,7 +802,7 @@ alphatab.importer.ScoreImporter.prototype = {
 		}
 		return null;
 	}
-	,determineHammerPullDestination: function(note) {
+	,nextNoteOnSameLine: function(note) {
 		var nextBeat = note.beat.nextBeat;
 		while(nextBeat != null) {
 			var noteOnString = nextBeat.getNoteOnString(note.string);
@@ -811,6 +811,7 @@ alphatab.importer.ScoreImporter.prototype = {
 		return null;
 	}
 	,finish: function(score) {
+		var _g10 = this;
 		var _g = 0, _g1 = score.tracks;
 		while(_g < _g1.length) {
 			var t = _g1[_g];
@@ -830,20 +831,32 @@ alphatab.importer.ScoreImporter.prototype = {
 							++_g6;
 							var _g8 = 0, _g9 = beat.notes;
 							while(_g8 < _g9.length) {
-								var n = _g9[_g8];
+								var n = [_g9[_g8]];
 								++_g8;
-								if(n.isTieDestination) {
-									var tieOrigin = this.determineTieOrigin(n);
-									if(tieOrigin == null) n.isTieDestination = false; else {
-										tieOrigin.isTieOrigin = true;
-										n.fret = tieOrigin.fret;
-										n.tieOrigin = tieOrigin;
+								var nextNoteOnLine = new alphatab.util.LazyVar((function(n) {
+									return function() {
+										return _g10.nextNoteOnSameLine(n[0]);
+									};
+								})(n));
+								var prevNoteOnLine = new alphatab.util.LazyVar((function(n) {
+									return function() {
+										return _g10.previousNoteOnSameLine(n[0]);
+									};
+								})(n));
+								if(n[0].isTieDestination) {
+									if(prevNoteOnLine.getValue() == null) n[0].isTieDestination = false; else {
+										n[0].tieOrigin = prevNoteOnLine.getValue();
+										n[0].tieOrigin.isTieOrigin = true;
+										n[0].fret = n[0].tieOrigin.fret;
 									}
 								}
-								if(n.isHammerPullOrigin) {
-									var hammerPullDestination = this.determineHammerPullDestination(n);
-									if(hammerPullDestination == null) n.isHammerPullOrigin = false; else hammerPullDestination.isHammerPullDestination = true;
+								if(n[0].isHammerPullOrigin) {
+									if(nextNoteOnLine.getValue() == null) n[0].isHammerPullOrigin = false; else {
+										nextNoteOnLine.getValue().isHammerPullDestination = true;
+										nextNoteOnLine.getValue().hammerPullOrigin = n[0];
+									}
 								}
+								if(n[0].slideType != alphatab.model.SlideType.None) n[0].slideTarget = nextNoteOnLine.getValue();
 							}
 						}
 					}
@@ -2843,6 +2856,7 @@ alphatab.model.Note.prototype = {
 	,tapping: null
 	,isStaccato: null
 	,vibrato: null
+	,slideTarget: null
 	,slideType: null
 	,isDead: null
 	,isPalmMute: null
@@ -2851,6 +2865,7 @@ alphatab.model.Note.prototype = {
 	,harmonicValue: null
 	,isHammerPullOrigin: null
 	,isHammerPullDestination: null
+	,hammerPullOrigin: null
 	,string: null
 	,isGhost: null
 	,fret: null
@@ -5585,6 +5600,12 @@ alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.
 		if(n.isTieDestination && n.tieOrigin != null) {
 			var tie = new alphatab.rendering.glyphs.ScoreTieGlyph(n.tieOrigin,n);
 			this._ties.push(tie);
+		} else if(n.isHammerPullDestination && n.hammerPullOrigin != null) {
+			var tie = new alphatab.rendering.glyphs.ScoreTieGlyph(n.hammerPullOrigin,n);
+			this._ties.push(tie);
+		} else if(n.slideType == alphatab.model.SlideType.Legato && n.slideTarget != null) {
+			var tie = new alphatab.rendering.glyphs.ScoreTieGlyph(n.slideTarget,n);
+			this._ties.push(tie);
 		}
 	}
 	,createBeatDot: function(n,group) {
@@ -5874,6 +5895,11 @@ alphatab.rendering.glyphs.ScoreTieGlyph = $hxClasses["alphatab.rendering.glyphs.
 alphatab.rendering.glyphs.ScoreTieGlyph.__name__ = ["alphatab","rendering","glyphs","ScoreTieGlyph"];
 alphatab.rendering.glyphs.ScoreTieGlyph.paintTie = function(canvas,scale,x1,y1,x2,y2,down) {
 	if(down == null) down = false;
+	if(x2 > x1) {
+		var t = x1;
+		x1 = x2;
+		x2 = t;
+	}
 	var offset = 15 * scale;
 	var size = 4 * scale;
 	var normalVector = { x : y2 - y1, y : x2 - x1};
@@ -6730,6 +6756,24 @@ alphatab.rendering.utils.SvgPathParser.prototype = {
 	,lastCommand: null
 	,svg: null
 	,__class__: alphatab.rendering.utils.SvgPathParser
+}
+if(!alphatab.util) alphatab.util = {}
+alphatab.util.LazyVar = $hxClasses["alphatab.util.LazyVar"] = function(loader) {
+	this._loader = loader;
+};
+alphatab.util.LazyVar.__name__ = ["alphatab","util","LazyVar"];
+alphatab.util.LazyVar.prototype = {
+	getValue: function() {
+		if(!this._loaded) {
+			this._val = this._loader();
+			this._loaded = true;
+		}
+		return this._val;
+	}
+	,_loaded: null
+	,_loader: null
+	,_val: null
+	,__class__: alphatab.util.LazyVar
 }
 var haxe = haxe || {}
 haxe.Int32 = $hxClasses["haxe.Int32"] = function() { }

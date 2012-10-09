@@ -4,6 +4,7 @@ import alphatab.model.Beat;
 import alphatab.model.Duration;
 import alphatab.model.HarmonicType;
 import alphatab.model.Note;
+import alphatab.model.SlideType;
 import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
 import alphatab.rendering.Glyph;
@@ -148,9 +149,20 @@ class ScoreBeatGlyph extends BeatGlyphBase
             noteHeads.beatEffects.set("HACCENT",  new AccentuationGlyph(0, 0, AccentuationType.Heavy));
         }
 		
+		// create a tie if any effect requires it
 		if (n.isTieDestination && n.tieOrigin != null) 
 		{
 			var tie = new ScoreTieGlyph(n.tieOrigin, n);
+			_ties.push(tie);
+		}
+		else if (n.isHammerPullDestination && n.hammerPullOrigin != null)
+		{
+			var tie = new ScoreTieGlyph(n.hammerPullOrigin, n);
+			_ties.push(tie);
+		}
+		else if (n.slideType == SlideType.Legato && n.slideTarget != null)
+		{
+			var tie = new ScoreTieGlyph(n.slideTarget, n);
 			_ties.push(tie);
 		}
     }
