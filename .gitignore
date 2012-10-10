@@ -1,6 +1,8 @@
 # dirs
 /tmp
 /tools/fontconverter/font/*
+/tools/gpx-decompress/test/*
+/tools/gpx-decompress/bin/*
 /private
 # temps
 .DS_Store 

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="gpx-decompress" default="all" basedir=".">
+    <description>
+        a buildfile compiling the gpx decompressor
+    </description>
+    
+    <!--*************************************************************************
+        Properties
+    **************************************************************************-->
+	
+	<property name="haxe.src" location="src"/>
+	<property name="haxe.bin" location="bin"/>
+	<property name="haxe.out" location="${haxe.bin}/gpx.n"/>
+    
+    <!--*************************************************************************
+        Targets
+    **************************************************************************-->
+   
+	<target name="all">
+        <echo message="Compiling" />
+        <exec executable="haxe" failonerror="true">
+            <arg value="-cp" />
+            <arg value="${haxe.src}"/>
+            
+            <arg value="-cp" />
+            <arg value="../../src"/>
+            
+            <arg value="-main" />
+            <arg value="Main" />
+            
+            <arg value="-neko" />
+            <arg value="${haxe.out}" />
+        </exec>
+		<echo message="decompressing test.gpx" />
+		<exec executable="neko" failonerror="true">
+			<arg value="${haxe.out}" />
+			<arg value="-d" />
+			<arg value="test/Test.gpx" />
+			<arg value="test/Test_decompressed.gpx" />
+		</exec>
+		<echo message="extracting test.gpx" />
+		<exec executable="neko" failonerror="true">
+			<arg value="${haxe.out}" />
+			<arg value="-x" />
+			<arg value="test/Test.gpx" />
+			<arg value="test/test" />
+		</exec>
+    </target>	
+</project>
