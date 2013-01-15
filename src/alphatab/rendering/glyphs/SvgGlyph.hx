@@ -268,6 +268,7 @@ class SvgGlyph extends Glyph
             case "t": // relative shorthand quadraticTo
 				do 
 				{
+                // TODO: buggy/incomplete
 					var x1:Float = (_currentX + _svg.getNumber() * _xScale);
 					var y1:Float = (_currentY + _svg.getNumber() * _yScale);
                     var cpx = _currentX + (_currentX - _lastControlX);

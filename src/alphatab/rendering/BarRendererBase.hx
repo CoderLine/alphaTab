@@ -104,6 +104,11 @@ class BarRendererBase
 		
 	}
 	
+	public function finalizeRenderer(layout:ScoreLayout)
+	{
+		
+	}
+	
 	/**
 	 * Gets the top padding for the main content of the renderer. 
 	 * Can be used to specify where i.E. the score lines of the notation start.

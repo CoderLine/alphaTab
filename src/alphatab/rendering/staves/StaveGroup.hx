@@ -74,12 +74,17 @@ class StaveGroup
 		}
 		
 		// ensure same widths of new renderer
+		var realWidth:Int = 0;
 		for (s in staves)
 		{
 			s.barRenderers[s.barRenderers.length - 1].applySizes(maxSizes);
+			if (s.barRenderers[s.barRenderers.length - 1].width > realWidth)
+			{
+				realWidth = s.barRenderers[s.barRenderers.length - 1].width;
+			}
 		}
 	
-		width += maxSizes.fullWidth;
+		width += realWidth;
     }
 
 	public function addStave(stave:Stave) 

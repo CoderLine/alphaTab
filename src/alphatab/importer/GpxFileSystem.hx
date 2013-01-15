@@ -28,6 +28,7 @@ class GpxFileSystem
 {
     public static inline var HEADER_BCFS:String = "BCFS";
     public static inline var HEADER_BCFZ:String = "BCFZ";
+    public static inline var SCORE_GPIF:String = "score.gpif";
 	
 	private var _fileFilter:String->Bool;
 	

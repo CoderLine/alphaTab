@@ -4757,8 +4757,6 @@ alphatab.rendering.BarRendererBase.prototype = {
 	,getTopPadding: function() {
 		return 0;
 	}
-	,finalizeRenderer: function(layout) {
-	}
 	,applySizes: function(sizes) {
 	}
 	,registerMaxSizes: function(sizes) {
@@ -4871,14 +4869,6 @@ alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.Bar
 			var g = _g1[_g];
 			++_g;
 			g.paint(cx + this.x + glyphStartX,cy + this.y,canvas);
-		}
-	}
-	,finalizeRenderer: function(layout) {
-		var _g1 = 0, _g = this._beatGlyphs.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var g = this._beatGlyphs[i];
-			if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.ISupportsFinalize)) (js.Boot.__cast(g , alphatab.rendering.glyphs.ISupportsFinalize)).finalizeGlyph(layout);
 		}
 	}
 	,applyBarSpacing: function(spacing) {
@@ -6281,12 +6271,6 @@ alphatab.rendering.glyphs.FlatGlyph.prototype = $extend(alphatab.rendering.glyph
 	}
 	,__class__: alphatab.rendering.glyphs.FlatGlyph
 });
-alphatab.rendering.glyphs.ISupportsFinalize = $hxClasses["alphatab.rendering.glyphs.ISupportsFinalize"] = function() { }
-alphatab.rendering.glyphs.ISupportsFinalize.__name__ = ["alphatab","rendering","glyphs","ISupportsFinalize"];
-alphatab.rendering.glyphs.ISupportsFinalize.prototype = {
-	finalizeGlyph: null
-	,__class__: alphatab.rendering.glyphs.ISupportsFinalize
-}
 alphatab.rendering.glyphs.MusicFont = $hxClasses["alphatab.rendering.glyphs.MusicFont"] = function() { }
 alphatab.rendering.glyphs.MusicFont.__name__ = ["alphatab","rendering","glyphs","MusicFont"];
 alphatab.rendering.glyphs.NaturalizeGlyph = $hxClasses["alphatab.rendering.glyphs.NaturalizeGlyph"] = function(x,y) {
@@ -6542,7 +6526,6 @@ alphatab.rendering.glyphs.ScoreBeatGlyph = $hxClasses["alphatab.rendering.glyphs
 	this._ties = new Array();
 };
 alphatab.rendering.glyphs.ScoreBeatGlyph.__name__ = ["alphatab","rendering","glyphs","ScoreBeatGlyph"];
-alphatab.rendering.glyphs.ScoreBeatGlyph.__interfaces__ = [alphatab.rendering.glyphs.ISupportsFinalize];
 alphatab.rendering.glyphs.ScoreBeatGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
 alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
 	createNoteGlyph: function(n) {
@@ -6629,9 +6612,6 @@ alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.
 	}
 	,applyGlyphSpacing: function(spacing) {
 		alphatab.rendering.glyphs.BeatGlyphBase.prototype.applyGlyphSpacing.call(this,spacing);
-		if(!this.beat.isRest()) this.noteHeads.updateBeamingHelper(this.x);
-	}
-	,finalizeGlyph: function(layout) {
 		if(!this.beat.isRest()) this.noteHeads.updateBeamingHelper(this.x);
 	}
 	,paint: function(cx,cy,canvas) {
@@ -7544,7 +7524,6 @@ alphatab.rendering.staves.Stave.prototype = {
 			this.barRenderers[i].x = x;
 			this.barRenderers[i].y = this.topSpacing + topOverflow;
 			this.height = Math.max(this.height,this.barRenderers[i].height) | 0;
-			this.barRenderers[i].finalizeRenderer(layout);
 			x += this.barRenderers[i].width;
 		}
 		this.height += this.topSpacing + topOverflow + bottomOverflow + this.bottomSpacing;
@@ -7708,15 +7687,13 @@ alphatab.rendering.staves.StaveGroup.prototype = {
 			s.addBar(bar);
 			s.barRenderers[s.barRenderers.length - 1].registerMaxSizes(maxSizes);
 		}
-		var realWidth = 0;
 		var _g = 0, _g1 = this.staves;
 		while(_g < _g1.length) {
 			var s = _g1[_g];
 			++_g;
 			s.barRenderers[s.barRenderers.length - 1].applySizes(maxSizes);
-			if(s.barRenderers[s.barRenderers.length - 1].width > realWidth) realWidth = s.barRenderers[s.barRenderers.length - 1].width;
 		}
-		this.width += realWidth;
+		this.width += maxSizes.fullWidth;
 	}
 	,getLastBarIndex: function() {
 		return this.bars[this.bars.length - 1].index;
@@ -9289,5 +9266,3 @@ alphatab.rendering.utils.BeamingHelper.SCORE_MIDDLE_KEYS = [48,45,38,59];
 haxe.io.Output.LN2 = Math.log(2);
 js.Lib.onerror = null;
 alphatab.Main.main();
-
-//@ sourceMappingURL=alphaTab.core.js.map

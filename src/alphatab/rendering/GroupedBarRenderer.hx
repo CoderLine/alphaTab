@@ -3,7 +3,9 @@ import alphatab.model.Bar;
 import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
 import alphatab.rendering.glyphs.BeatGlyphBase;
+import alphatab.rendering.glyphs.ISupportsFinalize;
 import alphatab.rendering.glyphs.SpacingGlyph;
+import alphatab.rendering.layout.ScoreLayout;
 import alphatab.rendering.staves.BarSizeInfo;
 
 /**
@@ -234,6 +236,18 @@ class GroupedBarRenderer extends BarRendererBase
 				{
 					g.applyGlyphSpacing(glyphSpacing);
 				}
+			}
+        }
+	}
+	
+	public override function finalizeRenderer(layout:ScoreLayout):Dynamic 
+	{
+        for (i in 0 ... _beatGlyphs.length)
+        {
+            var g = _beatGlyphs[i];
+			if (Std.is(g, ISupportsFinalize))
+			{
+				cast(g, ISupportsFinalize).finalizeGlyph(layout);
 			}
         }
 	}

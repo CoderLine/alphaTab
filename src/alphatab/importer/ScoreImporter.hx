@@ -43,7 +43,7 @@ class ScoreImporter
         var scoreImporter = new Array<ScoreImporter>();
         scoreImporter.push(new Gp3To5Importer());
         scoreImporter.push(new AlphaTexImporter());
-        // scoreImporter.push(new GpXImporter());
+        scoreImporter.push(new GpxImporter());
         return scoreImporter;
     }
     

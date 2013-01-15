@@ -131,6 +131,7 @@ class Stave
 			barRenderers[i].x = x;
 			barRenderers[i].y = topSpacing + topOverflow;
 			height = Std.int(Math.max(height, barRenderers[i].height));
+			barRenderers[i].finalizeRenderer(layout);
 			x += barRenderers[i].width;
 		}
 		height += topSpacing + topOverflow + bottomOverflow + bottomSpacing;

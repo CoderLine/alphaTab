@@ -8,10 +8,12 @@ import alphatab.model.SlideType;
 import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
 import alphatab.rendering.Glyph;
+import alphatab.rendering.layout.ScoreLayout;
 import alphatab.rendering.ScoreBarRenderer;
 import alphatab.rendering.utils.BeamingHelper;
 
 class ScoreBeatGlyph extends BeatGlyphBase
+					,implements ISupportsFinalize
 {
 	private var _ties:Array<Glyph>;
 
@@ -33,6 +35,14 @@ class ScoreBeatGlyph extends BeatGlyphBase
 		{
 			t.renderer = renderer;
 			t.paint(cx, cy + y, canvas);
+		}
+	}
+	
+	public function finalizeGlyph(layout:ScoreLayout)
+	{
+		if (!beat.isRest()) 
+		{
+			noteHeads.updateBeamingHelper(x);
 		}
 	}
 	

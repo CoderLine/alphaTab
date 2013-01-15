@@ -16,7 +16,7 @@
  */
 package alphatab.platform.sys;
 
-#if (neko || cpp)
+#if (neko || cpp || cs)
 import alphatab.platform.IFileLoader;
 import haxe.io.Bytes;
 import sys.io.File;
