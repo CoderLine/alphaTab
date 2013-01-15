@@ -42,8 +42,17 @@ class ScoreSlideLineGlyph extends Glyph
 			case Shift, Legato:
 				startX = cx + r.getNoteX(_startNote, true) + offsetX;
 				startY = cy + r.getNoteY(_startNote) + Std.int(NoteHeadGlyph.noteHeadHeight / 2);
-				endX = cx + r.getNoteX(_startNote.slideTarget, false) - offsetX;
-				endY = cy + r.getNoteY(_startNote.slideTarget) + Std.int(NoteHeadGlyph.noteHeadHeight / 2);
+				
+				if (_startNote.slideTarget != null) 
+				{				
+					endX = cx + r.getNoteX(_startNote.slideTarget, false) - offsetX;
+					endY = cy + r.getNoteY(_startNote.slideTarget) + Std.int(NoteHeadGlyph.noteHeadHeight / 2);					
+				}
+				else
+				{
+					endX = startX + sizeX;
+					endY = startY;
+				}
 			case IntoFromBelow:
 				endX = cx + r.getNoteX(_startNote, false) - offsetX;
 				endY = cy + r.getNoteY(_startNote) + Std.int(NoteHeadGlyph.noteHeadHeight / 2);

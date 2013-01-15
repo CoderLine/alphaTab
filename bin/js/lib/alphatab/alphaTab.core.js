@@ -6873,8 +6873,13 @@ alphatab.rendering.glyphs.ScoreSlideLineGlyph.prototype = $extend(alphatab.rende
 		case 2:
 			startX = cx + r.getNoteX(this._startNote,true) + offsetX;
 			startY = cy + r.getNoteY(this._startNote) + 4;
-			endX = cx + r.getNoteX(this._startNote.slideTarget,false) - offsetX;
-			endY = cy + r.getNoteY(this._startNote.slideTarget) + 4;
+			if(this._startNote.slideTarget != null) {
+				endX = cx + r.getNoteX(this._startNote.slideTarget,false) - offsetX;
+				endY = cy + r.getNoteY(this._startNote.slideTarget) + 4;
+			} else {
+				endX = startX + sizeX;
+				endY = startY;
+			}
 			break;
 		case 3:
 			endX = cx + r.getNoteX(this._startNote,false) - offsetX;
@@ -7184,7 +7189,10 @@ alphatab.rendering.glyphs.TabSlideLineGlyph.prototype = $extend(alphatab.renderi
 		case 2:
 			var startOffsetY;
 			var endOffsetY;
-			if(this._startNote.slideTarget.fret > this._startNote.fret) {
+			if(this._startNote.slideTarget == null) {
+				startOffsetY = 0;
+				endOffsetY = 0;
+			} else if(this._startNote.slideTarget.fret > this._startNote.fret) {
 				startOffsetY = sizeY;
 				endOffsetY = sizeY * -1;
 			} else {
@@ -7193,8 +7201,13 @@ alphatab.rendering.glyphs.TabSlideLineGlyph.prototype = $extend(alphatab.renderi
 			}
 			startX = cx + r.getNoteX(this._startNote,true);
 			startY = cy + r.getNoteY(this._startNote) + startOffsetY;
-			endX = cx + r.getNoteX(this._startNote.slideTarget,false);
-			endY = cy + r.getNoteY(this._startNote.slideTarget) + endOffsetY;
+			if(this._startNote.slideTarget != null) {
+				endX = cx + r.getNoteX(this._startNote.slideTarget,false);
+				endY = cy + r.getNoteY(this._startNote.slideTarget) + endOffsetY;
+			} else {
+				endX = startX + sizeX;
+				endY = startY;
+			}
 			break;
 		case 3:
 			endX = cx + r.getNoteX(this._startNote,false);

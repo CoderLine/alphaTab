@@ -42,7 +42,13 @@ class TabSlideLineGlyph extends Glyph
 			case Shift, Legato:
 				var startOffsetY:Int;
 				var endOffsetY:Int;
-				if (_startNote.slideTarget.fret > _startNote.fret) 
+				
+				if (_startNote.slideTarget == null)
+				{
+					startOffsetY = 0;
+					endOffsetY = 0;
+				}
+				else if (_startNote.slideTarget.fret > _startNote.fret) 
 				{
 					startOffsetY = sizeY;
 					endOffsetY = sizeY * -1;
@@ -55,8 +61,17 @@ class TabSlideLineGlyph extends Glyph
 				
 				startX = cx + r.getNoteX(_startNote, true);
 				startY = cy + r.getNoteY(_startNote) + startOffsetY;
-				endX = cx + r.getNoteX(_startNote.slideTarget, false) ;
-				endY = cy + r.getNoteY(_startNote.slideTarget) + endOffsetY;
+				if (_startNote.slideTarget != null) 
+				{
+					endX = cx + r.getNoteX(_startNote.slideTarget, false) ;
+					endY = cy + r.getNoteY(_startNote.slideTarget) + endOffsetY;					
+				}
+				else
+				{
+					endX = startX + sizeX ;
+					endY = startY;				
+				}
+
 			case IntoFromBelow:
 				endX = cx + r.getNoteX(_startNote, false) ;
 				endY = cy + r.getNoteY(_startNote);
