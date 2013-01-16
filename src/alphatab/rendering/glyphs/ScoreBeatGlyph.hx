@@ -2,6 +2,7 @@ package alphatab.rendering.glyphs;
 import alphatab.model.AccentuationType;
 import alphatab.model.Beat;
 import alphatab.model.Duration;
+import alphatab.model.GraceType;
 import alphatab.model.HarmonicType;
 import alphatab.model.Note;
 import alphatab.model.SlideType;
@@ -129,19 +130,20 @@ class ScoreBeatGlyph extends BeatGlyphBase
     {
 		var sr = cast(renderer, ScoreBarRenderer);
         var noteHeadGlyph:Glyph;
+		var isGrace = beat.graceType != GraceType.None;
 		if (n.isDead) 
 		{
-            noteHeadGlyph = new DeadNoteHeadGlyph();
+            noteHeadGlyph = new DeadNoteHeadGlyph(0, 0, isGrace);
 		}
         else if (n.harmonicType == HarmonicType.None)
         {
-            noteHeadGlyph = new NoteHeadGlyph(n.beat.duration);
+            noteHeadGlyph = new NoteHeadGlyph(0, 0, n.beat.duration, isGrace);
         }
         else
         {
-            noteHeadGlyph = new DiamondNoteHeadGlyph();
+            noteHeadGlyph = new DiamondNoteHeadGlyph(0, 0, isGrace);
         }
-                
+		
         // calculate y position
         var line = sr.getNoteLine(n);
         
@@ -171,7 +173,6 @@ class ScoreBeatGlyph extends BeatGlyphBase
 		else if (n.isHammerPullDestination && n.hammerPullOrigin != null)
 		{
 			var tie = new ScoreTieGlyph(n.hammerPullOrigin, n);
-			_ties.push(tie);
 		}
 		else if (n.slideType == SlideType.Legato && n.slideTarget != null)
 		{

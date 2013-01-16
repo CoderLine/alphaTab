@@ -8,10 +8,12 @@ class NoteNumberGlyph extends Glyph
 {
 	public static inline var Padding = 3;
 	private var _noteString:String;
+	private var _isGrace:Bool;
 	
-	public function new(x:Int = 0, y:Int = 0, n:Note) 
+	public function new(x:Int = 0, y:Int = 0, n:Note, isGrace:Bool) 
 	{
 		super(x, y);
+		_isGrace = isGrace;
 		if (!n.isTieDestination)
 		{
 			_noteString = n.isDead ? "X" : Std.string(n.fret);
@@ -29,7 +31,14 @@ class NoteNumberGlyph extends Glyph
 	public override function doLayout():Void 
 	{
         var scoreRenderer = renderer.getLayout().renderer;
-        scoreRenderer.canvas.setFont(scoreRenderer.renderingResources.tablatureFont);
+		if (_isGrace) 
+		{
+			scoreRenderer.canvas.setFont(scoreRenderer.renderingResources.graceFont);			
+		}
+		else
+		{
+			scoreRenderer.canvas.setFont(scoreRenderer.renderingResources.tablatureFont);
+		}
         
 		width = Std.int(renderer.getLayout().renderer.canvas.measureText(_noteString));
 	}
@@ -41,7 +50,14 @@ class NoteNumberGlyph extends Glyph
 			var res = renderer.getResources();
 
 			canvas.setColor(res.mainGlyphColor);
-			canvas.setFont(res.tablatureFont);
+			if (_isGrace) 
+			{
+				canvas.setFont(res.graceFont);			
+			}
+			else
+			{
+				canvas.setFont(res.tablatureFont);
+			}
 			canvas.fillText(Std.string(_noteString), cx + x + (Padding * getScale()), cy + y);
 		}
 	}	

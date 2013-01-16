@@ -1,6 +1,7 @@
 package alphatab.rendering.glyphs;
 import alphatab.model.Beat;
 import alphatab.model.Duration;
+import alphatab.model.GraceType;
 import alphatab.model.Note;
 import alphatab.model.SlideType;
 import alphatab.platform.ICanvas;
@@ -59,8 +60,9 @@ class TabBeatGlyph extends BeatGlyphBase
 	
 	private function createNoteGlyph(n:Note) 
     {
+		var isGrace = beat.graceType != GraceType.None;
 		var tr = cast(renderer, TabBarRenderer);
-        var noteNumberGlyph:Glyph = new NoteNumberGlyph(0, 0, n);    
+        var noteNumberGlyph:Glyph = new NoteNumberGlyph(0, 0, n, isGrace);    
 		var l = n.beat.voice.bar.track.tuning.length - n.string + 1;
         noteNumberGlyph.y = tr.getTabY(l, -2);
         noteNumbers.addNoteGlyph(noteNumberGlyph, n);

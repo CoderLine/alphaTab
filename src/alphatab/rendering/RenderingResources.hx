@@ -31,6 +31,7 @@ class RenderingResources
     public var effectFont:Font;
 
 	public var tablatureFont:Font;
+	public var graceFont:Font;
 
 	public var staveLineColor:Color;
 	public var barSeperatorColor:Color;
@@ -58,6 +59,7 @@ class RenderingResources
 		wordsFont = new Font(serifFont, 15 * scale);
 		
 		tablatureFont = new Font(sansFont, 13 * scale); 
+		graceFont = new Font(sansFont, 11 * scale); 
 		
 		staveLineColor = new Color(165, 165, 165);
 		barSeperatorColor = new Color(34, 34, 17);

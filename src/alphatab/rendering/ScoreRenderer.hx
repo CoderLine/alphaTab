@@ -22,6 +22,7 @@ import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
 import alphatab.platform.model.TextAlign;
 import alphatab.platform.PlatformFactory;
+import alphatab.rendering.layout.HorizontalScreenLayout;
 import alphatab.rendering.layout.PageViewLayout;
 import alphatab.rendering.layout.ScoreLayout;
 

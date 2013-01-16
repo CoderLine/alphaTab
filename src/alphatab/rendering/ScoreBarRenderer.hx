@@ -20,6 +20,7 @@ import alphatab.model.AccentuationType;
 import alphatab.model.Beat;
 import alphatab.model.Clef;
 import alphatab.model.Duration;
+import alphatab.model.GraceType;
 import alphatab.model.HarmonicType;
 import alphatab.model.Note;
 import alphatab.model.Voice;
@@ -370,14 +371,17 @@ class ScoreBarRenderer extends GroupedBarRenderer
 		{
 			return;
 		}
-        
+		
+		var isGrace = beat.graceType != GraceType.None;
+        var scaleMod = isGrace ? NoteHeadGlyph.graceScale : 1;
+		
         //
         // draw line 
         //
         
         var stemSize = getStemSize(h.maxDuration);
  
-        var correction = Std.int((NoteHeadGlyph.noteHeadHeight / 2));
+        var correction = Std.int(((NoteHeadGlyph.noteHeadHeight * scaleMod) / 2));
         var beatLineX = Std.int(h.getBeatLineX(beat) + getScale());
 
         var direction = h.getDirection();
@@ -388,12 +392,12 @@ class ScoreBarRenderer extends GroupedBarRenderer
         var beamY:Int;
         if (direction == Down)
         {
-           bottomY += stemSize;
+           bottomY += Std.int(stemSize * scaleMod);
            beamY = bottomY;
         }
         else
         {
-           topY -= stemSize;
+           topY -= Std.int(stemSize * scaleMod);
            beamY = topY;
         }
 
@@ -402,12 +406,32 @@ class ScoreBarRenderer extends GroupedBarRenderer
         canvas.moveTo(Std.int(cx + x + beatLineX), cy + y + topY);
         canvas.lineTo(Std.int(cx + x + beatLineX), cy + y + bottomY);
         canvas.stroke();
+		
+		if (isGrace)
+		{
+			var graceSizeY = 15 * getScale();
+			var graceSizeX = 12 * getScale();
+			
+			
+			canvas.beginPath();
+			if (direction == Down)
+			{
+				canvas.moveTo(Std.int(cx + x + beatLineX - (graceSizeX / 2)), cy + y + bottomY - graceSizeY);
+				canvas.lineTo(Std.int(cx + x + beatLineX + (graceSizeX / 2)), cy + y + bottomY);
+			}
+			else
+			{
+				canvas.moveTo(Std.int(cx + x + beatLineX - (graceSizeX / 2)), cy + y + topY + graceSizeY);
+				canvas.lineTo(Std.int(cx + x + beatLineX + (graceSizeX / 2)), cy + y + topY);
+			}
+			canvas.stroke();
+		}
         
         //
         // Draw beam 
         //
         var gx = Std.int(beatLineX);
-        var glyph = new BeamGlyph(gx, beamY, beat.duration, direction);
+        var glyph = new BeamGlyph(gx, beamY, beat.duration, direction, isGrace);
 		glyph.renderer = this;
 		glyph.doLayout();
         glyph.paint(cx + x, cy + y, canvas);

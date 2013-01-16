@@ -20,14 +20,17 @@ class DiamondNoteHeadGlyph extends SvgGlyph
 {
     public static inline var noteHeadHeight = 9;
     
-	public function new(x:Int = 0, y:Int = 0)
+	private var _isGrace:Bool;
+
+	public function new(x:Int = 0, y:Int = 0, isGrace:Bool)
 	{
-		super(x, y, MusicFont.NoteHarmonic, 1, 1);
+		super(x, y, MusicFont.NoteHarmonic, isGrace ? NoteHeadGlyph.graceScale : 1, isGrace ? NoteHeadGlyph.graceScale : 1);
+		_isGrace = isGrace;
 	}		
 		
 	public override function doLayout():Void 
 	{
-		width = Std.int(9 * getScale());
+		width = Std.int(9 * (_isGrace ? NoteHeadGlyph.graceScale : 1) * getScale());
 	}
     
     public override function canScale():Bool 

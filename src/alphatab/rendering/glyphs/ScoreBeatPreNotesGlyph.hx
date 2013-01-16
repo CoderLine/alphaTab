@@ -1,5 +1,6 @@
 package alphatab.rendering.glyphs;
 import alphatab.model.Beat;
+import alphatab.model.GraceType;
 import alphatab.model.Note;
 
 class ScoreBeatPreNotesGlyph extends BeatGlyphBase
@@ -31,7 +32,7 @@ class ScoreBeatPreNotesGlyph extends BeatGlyphBase
 		}
 		
 		// a small padding
-		addGlyph(new SpacingGlyph(0, 0, Std.int(4 * getScale()), true));
+		addGlyph(new SpacingGlyph(0, 0, Std.int(4 * (beat.graceType != GraceType.None ? NoteHeadGlyph.graceScale : 1) * getScale()), true));
 		
 		super.doLayout();
 	}
@@ -41,11 +42,12 @@ class ScoreBeatPreNotesGlyph extends BeatGlyphBase
 		var sr = cast(renderer, ScoreBarRenderer);
         var noteLine = sr.getNoteLine(n);
         var accidental = sr.accidentalHelper.applyAccidental(n, noteLine);
+		var isGrace = beat.graceType != GraceType.None;
         switch (accidental) 
         {
-            case Sharp:   accidentals.addGlyph(new SharpGlyph(0, sr.getScoreY(noteLine)));
-            case Flat:    accidentals.addGlyph(new FlatGlyph(0, sr.getScoreY(noteLine)));
-            case Natural: accidentals.addGlyph(new NaturalizeGlyph(0, sr.getScoreY(noteLine + 1)));
+            case Sharp:   accidentals.addGlyph(new SharpGlyph(0, sr.getScoreY(noteLine), isGrace));
+            case Flat:    accidentals.addGlyph(new FlatGlyph(0, sr.getScoreY(noteLine), isGrace));
+            case Natural: accidentals.addGlyph(new NaturalizeGlyph(0, sr.getScoreY(noteLine + 1), isGrace));
             default:
         }
     } 

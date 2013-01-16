@@ -21,20 +21,21 @@ import alphatab.rendering.utils.BeamingHelper;
 
 class BeamGlyph extends SvgGlyph
 {
-	public function new(x:Int = 0, y:Int = 0, duration:Duration, direction:BeamDirection)
+	public function new(x:Int = 0, y:Int = 0, duration:Duration, direction:BeamDirection, isGrace:Bool)
 	{
-		super(x, y, getRestSvg(duration, direction), 1, getSvgScale(duration, direction));
+		super(x, y, getRestSvg(duration, direction, isGrace), (isGrace ? NoteHeadGlyph.graceScale : 1), getSvgScale(duration, direction, isGrace));
 	}	
 	
-    private function getSvgScale(duration:Duration, direction:BeamDirection)
+    private function getSvgScale(duration:Duration, direction:BeamDirection, isGrace:Bool)
     {
+		var scale = (isGrace ? NoteHeadGlyph.graceScale : 1);
         if (direction == Up)
         {
-            return 1;
+            return 1 * scale;
         }
         else
         {
-            return -1;
+            return -1 * scale;
         }
     }
 		
@@ -43,8 +44,12 @@ class BeamGlyph extends SvgGlyph
 		width = 0;
 	}
 	
-	private function getRestSvg(duration:Duration, direction:BeamDirection) : String
+	private function getRestSvg(duration:Duration, direction:BeamDirection, isGrace:Bool) : String
 	{
+		if (isGrace)
+		{
+			return MusicFont.FooterEighth;
+		}
         switch(duration)
         {
             case Eighth: return MusicFont.FooterEighth;
@@ -53,5 +58,5 @@ class BeamGlyph extends SvgGlyph
             case SixtyFourth: return MusicFont.FooterSixtyFourth;
             default: return "";
         }
-}
+	}
 }

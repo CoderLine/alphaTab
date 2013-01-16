@@ -1186,12 +1186,23 @@ class Gp3To5Importer extends ScoreImporter
         var graceBeat = new Beat();
         var graceNote = new Note();
         graceNote.string = note.string;
-        graceNote.fret = _data.readInt8();
+        graceNote.fret = _data.readInt8();		
         graceBeat.duration = Duration.ThirtySecond;
-        // Dynamic (1)
-        // Transition (1)
-        // Duration (1)
-        skip(3);
+		skip(1); // Dynamic
+		var transition = _data.readInt8();
+		switch (transition) 
+		{
+            case 0: // none
+            case 1:
+				graceNote.slideType = SlideType.Legato;
+				graceNote.slideTarget = note;
+            case 2: // bend
+            case 3: // hammer
+				graceNote.isHammerPullOrigin = true;
+				note.isHammerPullDestination = true;
+				note.hammerPullOrigin = graceNote;
+        }
+        skip(1); // duration
 
         if (_versionNumber < 500)
         {
@@ -1200,6 +1211,7 @@ class Gp3To5Importer extends ScoreImporter
         else
         {
             var flags = readUInt8();
+			graceNote.isDead = (flags & 0x01) != 0;
             if ( ((flags & 0x02) != 0)) 
             {
                 graceBeat.graceType = GraceType.OnBeat;
@@ -1211,7 +1223,7 @@ class Gp3To5Importer extends ScoreImporter
         }
         
         graceBeat.addNote(graceNote);
-        voice.addBeat(graceBeat); 
+        voice.addGraceBeat(graceBeat); 
     }
     
     private function readTremoloPicking(beat:Beat)

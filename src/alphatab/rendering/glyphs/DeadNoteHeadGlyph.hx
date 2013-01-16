@@ -4,8 +4,8 @@ package alphatab.rendering.glyphs;
 class DeadNoteHeadGlyph extends SvgGlyph
 {
     public static inline var noteHeadHeight = 9;
-    
-	public function new(x:Int = 0, y:Int = 0)
+	
+	public function new(x:Int = 0, y:Int = 0, isGrace:Bool)
 	{
 		super(x, y, MusicFont.NoteDead, 1, 1);
 	}		

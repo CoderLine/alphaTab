@@ -18,14 +18,17 @@ package alphatab.rendering.glyphs;
 
 class SharpGlyph extends SvgGlyph
 {
-	public function new(x:Int = 0, y:Int = 0)
+	private var _isGrace:Bool;
+	
+	public function new(x:Int = 0, y:Int = 0, isGrace:Bool = false)
 	{
-		super(x, y, MusicFont.AccidentalSharp, 1, 1); 
+		super(x, y, MusicFont.AccidentalSharp, isGrace ? NoteHeadGlyph.graceScale : 1, isGrace ? NoteHeadGlyph.graceScale : 1);
+		_isGrace = isGrace;
 	}	
 		
 	public override function doLayout():Void 
 	{
-		width = Std.int(8 * getScale());
+		width = Std.int(8 * (_isGrace ? NoteHeadGlyph.graceScale : 1) * getScale());
 	}
     
     public override function canScale():Bool 
