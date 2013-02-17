@@ -4012,7 +4012,7 @@ alphatab.file.guitarpro.Gp5Reader.prototype = $extend(alphatab.file.guitarpro.Gp
 		if((flags & 32) != 0) header.marker = this.readMarker(header);
 		if((flags & 16) != 0) header.repeatAlternative = this.data.readByte();
 		if((flags & 64) != 0) {
-			header.keySignature = alphatab.file.guitarpro.Gp3Reader.toKeySignature(this.data.readByte());
+			header.keySignature = alphatab.file.guitarpro.Gp3Reader.toKeySignature(this.data.readSignedByte());
 			header.keySignatureType = this.data.readByte();
 		} else if(header.number > 1) {
 			header.keySignature = song.measureHeaders[i - 1].keySignature;
@@ -4249,7 +4249,8 @@ alphatab.file.guitarpro.Gp5Reader.prototype = $extend(alphatab.file.guitarpro.Gp
 			note.effect.isFingering = true;
 		}
 		if((flags & 1) != 0) note.durationPercent = this.data.readDouble();
-		this.skip(1);
+		var flags2 = this.data.readByte();
+		note.swapAccidentals = (flags2 & 2) != 0;
 		if((flags & 8) != 0) this.readNoteEffects(note.effect);
 		return note;
 	}
@@ -6673,6 +6674,7 @@ alphatab.model.Note = $hxClasses["alphatab.model.Note"] = function(factory) {
 	this.velocity = 95;
 	this.string = 1;
 	this.isTiedNote = false;
+	this.swapAccidentals = false;
 	this.effect = factory.newNoteEffect();
 };
 alphatab.model.Note.__name__ = ["alphatab","model","Note"];
@@ -6682,6 +6684,7 @@ alphatab.model.Note.prototype = {
 		return this._realValue;
 	}
 	,_realValue: null
+	,swapAccidentals: null
 	,durationPercent: null
 	,voice: null
 	,effect: null
@@ -9971,25 +9974,29 @@ alphatab.tablature.model.MeasureDrawing.prototype = $extend(alphatab.model.Measu
 			beatX += bd.fullWidth();
 		}
 	}
-	,getNoteAccitental: function(noteValue) {
+	,applyNoteAccitental: function(noteDrawing) {
+		var noteValue = noteDrawing.realValue();
 		if(noteValue >= 0 && noteValue < 128) {
 			var key = this.header.keySignature;
+			var isSharp = noteDrawing.swapAccidentals?key > 7:key <= 7;
 			var note = noteValue % 12;
-			var octave = Math.floor(noteValue / 12);
-			var accidentalValue = key <= 7?2:3;
-			var accidentalNotes = key <= 7?alphatab.tablature.model.MeasureDrawing.ACCIDENTAL_SHARP_NOTES:alphatab.tablature.model.MeasureDrawing.ACCIDENTAL_FLAT_NOTES;
+			var octave = noteValue / 12 | 0;
+			var accidentalValue = isSharp?2:3;
+			var accidentalNotes = isSharp?alphatab.tablature.model.MeasureDrawing.ACCIDENTAL_SHARP_NOTES:alphatab.tablature.model.MeasureDrawing.ACCIDENTAL_FLAT_NOTES;
 			var isAccidentalNote = alphatab.tablature.model.MeasureDrawing.ACCIDENTAL_NOTES[note];
 			var isAccidentalKey = alphatab.tablature.model.MeasureDrawing.ACCIDENTALS[key][accidentalNotes[note]] == accidentalValue;
 			if(isAccidentalKey != isAccidentalNote && !this._registeredAccidentals[octave][accidentalNotes[note]]) {
 				this._registeredAccidentals[octave][accidentalNotes[note]] = true;
-				return isAccidentalNote?accidentalValue:1;
+				noteDrawing.accidental = isAccidentalNote?accidentalValue:1;
+				return;
 			}
 			if(isAccidentalKey == isAccidentalNote && this._registeredAccidentals[octave][accidentalNotes[note]]) {
 				this._registeredAccidentals[octave][accidentalNotes[note]] = false;
-				return isAccidentalNote?accidentalValue:1;
+				noteDrawing.accidental = isAccidentalNote?accidentalValue:1;
+				return;
 			}
 		}
-		return 0;
+		noteDrawing.accidental = 0;
 	}
 	,checkNote: function(note) {
 		if(this.minNote == null || this.minNote.realValue() > note.realValue()) this.minNote = note;
@@ -10035,7 +10042,7 @@ alphatab.tablature.model.MeasureHeaderDrawing.prototype = $extend(alphatab.model
 });
 alphatab.tablature.model.NoteDrawing = $hxClasses["alphatab.tablature.model.NoteDrawing"] = function(factory) {
 	alphatab.model.Note.call(this,factory);
-	this._accidental = -1;
+	this.accidental = -1;
 };
 alphatab.tablature.model.NoteDrawing.__name__ = ["alphatab","tablature","model","NoteDrawing"];
 alphatab.tablature.model.NoteDrawing.__super__ = alphatab.model.Note;
@@ -10171,10 +10178,10 @@ alphatab.tablature.model.NoteDrawing.prototype = $extend(alphatab.model.Note.pro
 		return this.voice;
 	}
 	,getAccitental: function() {
-		if(this._accidental < 0) this._accidental = this.voice.beat.measure.getNoteAccitental(this.realValue());
-		return this._accidental;
+		if(this.accidental < 0) this.voice.beat.measure.applyNoteAccitental(this);
+		return this.accidental;
 	}
-	,_accidental: null
+	,accidental: null
 	,displaced: null
 	,scorePosY: null
 	,noteSize: null
@@ -10606,7 +10613,8 @@ alphatab.tablature.staves.ScoreStave.prototype = $extend(alphatab.tablature.stav
 			var index = noteValue % 12;
 			var octave = Math.floor(noteValue / 12);
 			var offset = 7 * octave * step;
-			var scoreLineY = keySignature <= 7?Math.floor(alphatab.tablature.staves.ScoreStave.SCORE_SHARP_POSITIONS[index] * step - offset):Math.floor(alphatab.tablature.staves.ScoreStave.SCORE_FLAT_POSITIONS[index] * step - offset);
+			var isSharp = note.swapAccidentals?keySignature > 7:keySignature <= 7;
+			var scoreLineY = isSharp?Math.floor(alphatab.tablature.staves.ScoreStave.SCORE_SHARP_POSITIONS[index] * step - offset):Math.floor(alphatab.tablature.staves.ScoreStave.SCORE_FLAT_POSITIONS[index] * step - offset);
 			scoreLineY += Math.floor(alphatab.tablature.staves.ScoreStave.SCORE_CLEF_OFFSETS[clef] * step) + Math.round(layout.scale);
 			note.scorePosY = scoreLineY;
 		}
@@ -10808,7 +10816,7 @@ alphatab.tablature.staves.ScoreStave.prototype = $extend(alphatab.tablature.stav
 		}
 	}
 	,paintExtraLines2: function(context,layout,note,x,y) {
-		var realY = y + this.getNoteScorePosY(layout,note);
+		var realY = y + this.getNoteScorePosY(layout,note) - layout.scale;
 		var x1 = x - 3 * layout.scale;
 		var x2 = x + 12 * layout.scale;
 		var scorelineSpacing = layout.scoreLineSpacing;

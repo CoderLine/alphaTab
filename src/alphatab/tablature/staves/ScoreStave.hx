@@ -491,7 +491,7 @@ class ScoreStave extends Stave
     
     private function paintExtraLines2(context:DrawingContext, layout:ViewLayout, note:NoteDrawing, x:Int, y:Int) : Void
     {
-        var realY:Int = y + getNoteScorePosY(layout, note);
+        var realY:Float = y + getNoteScorePosY(layout, note) - layout.scale;
         var x1:Float = x - 3 * layout.scale;
         var x2:Float = x + 12 * layout.scale;
 
@@ -903,7 +903,8 @@ class ScoreStave extends Stave
             
             // get the position within an octave for the note and move it this amount of steps
             // afterwards we need to move the offset upwards to reach the correct octave
-            var scoreLineY:Int= keySignature <= 7
+            var isSharp = note.swapAccidentals ? keySignature > 7 : keySignature <= 7;
+            var scoreLineY:Int= isSharp
                                  ? Math.floor((SCORE_SHARP_POSITIONS[index]*step) - offset)
                                  : Math.floor((SCORE_FLAT_POSITIONS[index]*step) - offset);
 

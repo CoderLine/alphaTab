@@ -19,6 +19,7 @@ import alphatab.model.Beat;
 import alphatab.model.Duration;
 import alphatab.model.Measure;
 import alphatab.model.MeasureHeader;
+import alphatab.model.Note;
 import alphatab.model.TripletFeel;
 import alphatab.model.VoiceDirection;
 import alphatab.tablature.staves.StaveLine;
@@ -164,31 +165,38 @@ class MeasureDrawing extends Measure
         _defaultSpacings = -1;
     }
     
-    public function getNoteAccitental(noteValue:Int)
+    public function applyNoteAccitental(noteDrawing:NoteDrawing)
     {
+        var noteValue = noteDrawing.realValue();
         if (noteValue >= 0 && noteValue < 128)
-        {
+        {            
             var key:Int = keySignature();
+            
+            var isSharp = noteDrawing.swapAccidentals ? key > 7 : key <= 7;
+            
             var note:Int = (noteValue % 12);
-            var octave:Int = Math.floor(noteValue / 12);
-            var accidentalValue:Int = (key <= 7 ? SHARP : FLAT);
-            var accidentalNotes:Array<Int> = (key <= 7 ? ACCIDENTAL_SHARP_NOTES : ACCIDENTAL_FLAT_NOTES);
+            var octave:Int = Std.int(noteValue / 12);
+            var accidentalValue:Int = (isSharp ? SHARP : FLAT);
+            var accidentalNotes:Array<Int> = (isSharp ? ACCIDENTAL_SHARP_NOTES : ACCIDENTAL_FLAT_NOTES);
             var isAccidentalNote:Bool = ACCIDENTAL_NOTES[note];
             var isAccidentalKey:Bool = ACCIDENTALS[key][accidentalNotes[note]] == accidentalValue;
-
+            
             if (isAccidentalKey != isAccidentalNote && !_registeredAccidentals[octave][accidentalNotes[note]])
-            {
+            {   
                 _registeredAccidentals[octave][accidentalNotes[note]] = true;
-                return (isAccidentalNote ? accidentalValue : NATURAL);
+                noteDrawing.accidental = (isAccidentalNote ? accidentalValue : NATURAL);
+                return;
             }
 
             if (isAccidentalKey == isAccidentalNote && _registeredAccidentals[octave][accidentalNotes[note]])
             {
                 _registeredAccidentals[octave][accidentalNotes[note]] = false;
-                return (isAccidentalNote ? accidentalValue : NATURAL);
+                noteDrawing.accidental = (isAccidentalNote ? accidentalValue : NATURAL);
+                return;
             }
         }
-        return NONE;        
+        
+        noteDrawing.accidental = NONE;
     }
     
     public function setSpacing(spacing:Int)

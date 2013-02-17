@@ -195,7 +195,8 @@ class Gp5Reader extends Gp4Reader
         if ((flags & 0x01) != 0) {
             note.durationPercent = data.readDouble();
         }
-        skip(1);
+        var flags2 = data.readByte();
+        note.swapAccidentals = (flags2 & 0x02) != 0;
         if ((flags & 0x08) != 0) {
             readNoteEffects(note.effect);
         }
@@ -477,7 +478,7 @@ class Gp5Reader extends Gp4Reader
             header.repeatAlternative = data.readByte();
         
         if ((flags & 0x40) != 0) {
-            header.keySignature = Gp3Reader.toKeySignature(data.readByte());
+            header.keySignature = Gp3Reader.toKeySignature(data.readSignedByte());
             header.keySignatureType = data.readByte();
         }
         else if(header.number > 1) {

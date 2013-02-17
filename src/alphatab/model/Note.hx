@@ -30,6 +30,7 @@ class Note
     public var effect(default,default):NoteEffect;
     public var voice(default,default):Voice;
     public var durationPercent(default,default):Float;
+    public var swapAccidentals(default,default):Bool;
     
     
     private var _realValue:Int;
@@ -49,6 +50,7 @@ class Note
         velocity = Velocities.DEFAULT;
         string = 1;
         isTiedNote = false;
+        swapAccidentals = false;
         effect = factory.newNoteEffect();
     }
 

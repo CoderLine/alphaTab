@@ -33,15 +33,15 @@ class NoteDrawing extends Note
     public var scorePosY(default,default):Int;
     public var displaced(default,default):Bool;
     
-    private var _accidental:Int;
+    public var accidental:Int;
     
     public function getAccitental()
     {
-        if (_accidental < 0)
+        if (accidental < 0)
         {
-            _accidental = measureDrawing().getNoteAccitental(realValue());
+            measureDrawing().applyNoteAccitental(this);
         }
-        return _accidental;
+        return accidental;
     }
 
 #if cpp
@@ -74,7 +74,7 @@ class NoteDrawing extends Note
     public function new(factory:SongFactory) 
     {
         super(factory);  
-        _accidental = -1;
+        accidental = -1;
     }
     
     public function performLayout(layout:ViewLayout)
