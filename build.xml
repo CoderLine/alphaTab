@@ -26,6 +26,13 @@
     <property name="bin-js" location="${bin}/js"/>
 	<property name="lib-js" location="${bin-js}/lib/alphaTab"/>
 	<property name="haxe-js" location="${lib-js}/alphaTab.js"/>
+	<property name="haxe-js-min" location="${lib-js}/alphaTab.min.js"/>
+	<property name="jquery" location="${lib-js}/jquery.alphaTab.js"/>
+	<property name="jquery-min" location="${lib-js}/jquery.alphaTab.min.js"/>
+	<property name="jquery-editor" location="${lib-js}/jquery.alphaTab.editor.js"/>
+	<property name="jquery-editor-min" location="${lib-js}/jquery.alphaTab.editor.min.js"/>
+	<property name="jquery-player" location="${lib-js}/jquery.alphaTab.player.js"/>
+	<property name="jquery-player-min" location="${lib-js}/jquery.alphaTab.player.min.js"/>
     
     <!-- Java-Player Properties -->	
 	<property name="player-base" location="subprojects/java-player"/>	
@@ -84,6 +91,49 @@
             <arg value="DEBUG_DRAWING" />
         </exec>
 	</target>	
+   
+   <target name="min-js">
+		<java jar="${tools}\compiler.jar" fork="true" failonerror="true">
+			<arg value="--compilation_level" />
+			<arg value="SIMPLE_OPTIMIZATIONS" />
+			
+			<arg value="--js" />
+			<arg value="${haxe-js}" />
+			
+			<arg value="--js_output_file" />
+			<arg value="${haxe-js-min}" />
+		</java>		
+        <java jar="${tools}\compiler.jar" fork="true" failonerror="true">
+			<arg value="--compilation_level" />
+			<arg value="SIMPLE_OPTIMIZATIONS" />
+			
+			<arg value="--js" />
+			<arg value="${jquery}" />
+			
+			<arg value="--js_output_file" />
+			<arg value="${jquery-min}" />
+		</java>
+        <java jar="${tools}\compiler.jar" fork="true" failonerror="true">
+			<arg value="--compilation_level" />
+			<arg value="SIMPLE_OPTIMIZATIONS" />
+			
+			<arg value="--js" />
+			<arg value="${jquery-editor}" />
+			
+			<arg value="--js_output_file" />
+			<arg value="${jquery-editor-min}" />
+		</java>
+        <java jar="${tools}\compiler.jar" fork="true" failonerror="true">
+			<arg value="--compilation_level" />
+			<arg value="SIMPLE_OPTIMIZATIONS" />
+			
+			<arg value="--js" />
+			<arg value="${jquery-player}" />
+			
+			<arg value="--js_output_file" />
+			<arg value="${jquery-player-min}" />
+		</java>
+    </target>    
     
     <!--*************************************************************************
         Building Java (Caue) 
