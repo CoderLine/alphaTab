@@ -19,9 +19,9 @@ package alphatab.importer;
 import alphatab.model.Score;
 import alphatab.platform.IFileLoader;
 import alphatab.platform.PlatformFactory;
+import haxe.CallStack;
 import haxe.io.Bytes;
 import haxe.io.BytesInput;
-import haxe.Stack;
 
 /**
  * The ScoreLoader enables you easy loading of Scores using all 
@@ -63,7 +63,7 @@ class ScoreLoader
                         }
                         else
                         {
-                            error(Stack.toString(Stack.exceptionStack()));
+                            error(CallStack.toString(CallStack.exceptionStack()));
                         }
                     }                    
                 }

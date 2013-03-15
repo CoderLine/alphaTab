@@ -60,8 +60,15 @@ class Stave
 		_factory = barRendererFactory;
 		topSpacing = 10;
 		bottomSpacing = 10;
+        staveTop = 0;
+        staveBottom = 0;
 	}
 
+    public inline function isInAccolade()
+    {
+        return _factory.isInAccolade;
+    }
+    
     public function registerStaveTop(offset:Int)
 	{
 		staveTop = offset;

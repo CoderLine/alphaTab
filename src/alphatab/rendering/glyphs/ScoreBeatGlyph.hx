@@ -14,7 +14,7 @@ import alphatab.rendering.ScoreBarRenderer;
 import alphatab.rendering.utils.BeamingHelper;
 
 class ScoreBeatGlyph extends BeatGlyphBase
-					,implements ISupportsFinalize
+					implements ISupportsFinalize
 {
 	private var _ties:Array<Glyph>;
 
@@ -47,7 +47,7 @@ class ScoreBeatGlyph extends BeatGlyphBase
 		}
 	}
 	
-	public override function applyGlyphSpacing(spacing:Int):Dynamic 
+	public override function applyGlyphSpacing(spacing:Int):Void 
 	{
 		super.applyGlyphSpacing(spacing);
 		// TODO: we need to tell the beaming helper the position of rest beats
@@ -163,7 +163,7 @@ class ScoreBeatGlyph extends BeatGlyphBase
         {
             noteHeads.beatEffects.set("HACCENT",  new AccentuationGlyph(0, 0, AccentuationType.Heavy));
         }
-		
+			
 		// create a tie if any effect requires it
 		if (n.isTieDestination && n.tieOrigin != null) 
 		{

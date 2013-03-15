@@ -240,7 +240,7 @@ class GroupedBarRenderer extends BarRendererBase
         }
 	}
 	
-	public override function finalizeRenderer(layout:ScoreLayout):Dynamic 
+	public override function finalizeRenderer(layout:ScoreLayout):Void 
 	{
         for (i in 0 ... _beatGlyphs.length)
         {

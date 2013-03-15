@@ -25,6 +25,7 @@ import alphatab.platform.PlatformFactory;
 import alphatab.rendering.layout.HorizontalScreenLayout;
 import alphatab.rendering.layout.PageViewLayout;
 import alphatab.rendering.layout.ScoreLayout;
+import haxe.ds.StringMap;
 
 /**
  * This is the main wrapper of the rendering engine which 
@@ -33,7 +34,7 @@ import alphatab.rendering.layout.ScoreLayout;
 class ScoreRenderer 
 {
     public var canvas : ICanvas;
-    public var score(getScore, null) : Score;
+    public var score(get, null) : Score;
     public var track : Track;
     public var scale : Float;
     
@@ -41,13 +42,13 @@ class ScoreRenderer
     
     public var renderingResources : RenderingResources;
 	
-	public var settings:Hash<Dynamic>;
+	public var settings:StringMap<Dynamic>;
 
         
     public function new(source:Dynamic) 
     {
         canvas = PlatformFactory.getCanvas(source);
-        settings = new Hash<Dynamic>();
+        settings = new StringMap<Dynamic>();
         updateScale(1.0);
         layout = new PageViewLayout(this);
     }
@@ -72,7 +73,7 @@ class ScoreRenderer
         paintScore();
     }
     
-    public function getScore() : Score
+    public function get_score() : Score
     {
         if (track == null)
         {

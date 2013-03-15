@@ -1,6 +1,7 @@
 package alphatab.rendering.utils;
 import alphatab.model.AccidentalType;
 import alphatab.model.Note;
+import haxe.ds.IntMap;
 
 /**
  * This small utilty class allows the assignment of accidentals within a 
@@ -39,11 +40,11 @@ class AccidentalHelper
      * this int-hash stores the registered accidentals for
      * all octaves and notes within an octave. 
      */
-    private var _registeredAccidentals:IntHash<AccidentalType>;
+    private var _registeredAccidentals:IntMap<AccidentalType>;
                                                        
     public function new() 
     {
-        _registeredAccidentals = new IntHash<AccidentalType>();
+        _registeredAccidentals = new IntMap<AccidentalType>();
     }
     
     /**
@@ -52,12 +53,14 @@ class AccidentalHelper
      */
     public function applyAccidental(note:Note, noteLine:Int) : AccidentalType
     {
+        // TODO: we need to check for note.swapAccidentals 
         var noteValue = note.realValue();
         var ks = note.beat.voice.bar.getMasterBar().keySignature;
+        var ksi = getKeySignatureIndex(ks);
         var index = (noteValue % 12);
         var octave = Std.int(noteValue / 12);
         
-        var accidentalToSet:AccidentalType = ACCIDENTAL_NOTES[getKeySignatureIndex(ks)][index];
+        var accidentalToSet:AccidentalType = ACCIDENTAL_NOTES[ksi][index];
         
         // if there is already an accidental registered, we check if we 
         // have a new accidental

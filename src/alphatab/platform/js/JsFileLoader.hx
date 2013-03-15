@@ -20,8 +20,9 @@ package alphatab.platform.js;
 import alphatab.platform.IFileLoader;
 import haxe.io.Bytes;
 import haxe.io.BytesData;
+import js.html.Event;
+import js.html.XMLHttpRequest;
 import js.Lib;
-import js.XMLHttpRequest;
 
 /**
  * This is a fileloader implementation for JavaScript.
@@ -63,10 +64,7 @@ class JsFileLoader implements IFileLoader
         else
         {
             var xhr:XMLHttpRequest = new XMLHttpRequest();
-            untyped
-            {
-                xhr.overrideMimeType('text/plain; charset=x-user-defined');
-            }
+            xhr.overrideMimeType('text/plain; charset=x-user-defined');
             xhr.open("GET", path, false);
             xhr.send(null);
             
@@ -126,11 +124,8 @@ class JsFileLoader implements IFileLoader
         else
         {
             var xhr:XMLHttpRequest = new XMLHttpRequest();
-            untyped
-            {
-                xhr.overrideMimeType('text/plain; charset=x-user-defined');
-            }
-            xhr.onreadystatechange = function() 
+            xhr.overrideMimeType('text/plain; charset=x-user-defined');
+            xhr.onreadystatechange = function(e:Event) 
             {
                 try
                 {

@@ -45,7 +45,6 @@ class RestGlyph extends SvgGlyph
             case Sixteenth: return MusicFont.RestSixteenth;
             case ThirtySecond: return MusicFont.RestThirtySecond;
             case SixtyFourth: return MusicFont.RestSixtyFourth;
-            default: return "";
 		}
 	}
 }

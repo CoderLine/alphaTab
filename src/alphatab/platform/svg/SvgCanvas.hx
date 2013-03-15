@@ -362,7 +362,6 @@ class SvgCanvas implements ICanvas
             case Left: return "start";
             case Center: return "middle";
             case Right: return "end";
-            default: return "start";
         }
     }    
     private inline function getSvgBaseLine() : String

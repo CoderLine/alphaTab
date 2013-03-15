@@ -4,11 +4,12 @@ import alphatab.model.Note;
 import alphatab.model.TextBaseline;
 import alphatab.platform.ICanvas;
 import alphatab.rendering.Glyph;
+import haxe.ds.IntMap;
 
 class TabNoteChordGlyph extends Glyph
 {
 	private var _notes:Array<Glyph>;
-	private var _noteLookup:IntHash<Glyph>;
+	private var _noteLookup:IntMap<Glyph>;
 
     public var beat:Beat;
 
@@ -16,7 +17,7 @@ class TabNoteChordGlyph extends Glyph
 	{
 		super(x, y);
 		_notes = new Array<Glyph>();
-		_noteLookup = new IntHash<Glyph>();
+		_noteLookup = new IntMap<Glyph>();
 	}
 	
 	public function getNoteX(note:Note, onEnd:Bool = true) 
@@ -65,7 +66,7 @@ class TabNoteChordGlyph extends Glyph
 		_noteLookup.set(note.string, noteGlyph);
     }	
 	
-	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Dynamic 
+	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
 	{
 		var old = canvas.getTextBaseline();
 		canvas.setTextBaseline(TextBaseline.Middle);

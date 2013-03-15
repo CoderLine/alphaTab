@@ -15,7 +15,7 @@ class TieGlyph extends Glyph
 		_endNote = endNote;
 	}
 
-	public override function doLayout():Dynamic 
+	public override function doLayout():Void 
 	{
 		width = 0;
 	}

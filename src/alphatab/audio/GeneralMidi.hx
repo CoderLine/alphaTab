@@ -15,6 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.audio;
+import haxe.ds.StringMap;
 
 /**
  * This class provides names for all general midi instruments.
@@ -22,13 +23,13 @@ package alphatab.audio;
  */
 class GeneralMidi  
 {
-    private static var _values:Hash<Int>;
+    private static var _values:StringMap<Int>;
     
     public static function getValue(name:String) : Int
     {
         if(_values == null)
         {
-            _values = new Hash<Int>();
+            _values = new StringMap<Int>();
             _values.set("acousticgrandpiano", 0);
             _values.set("brightacousticpiano", 1);
             _values.set("electricgrandpiano", 2);

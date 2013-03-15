@@ -792,13 +792,15 @@ class AlphaTexImporter extends ScoreImporter
             else if (_syData == "tp")
             {
                 newSy();
-                var duration:Int = 8;
+                var duration:Duration = Duration.Eighth;
                 if (_sy == AlphaTexSymbols.Number)
                 {
 					switch(_syData)
 					{
-						case 8, 16, 32: duration = _syData;
-						default:duration = 8;
+						case 8: duration = Duration.Eighth;
+                        case 16: duration = Duration.Sixteenth;
+                        case 32: duration = Duration.ThirtySecond;
+						default: duration = Duration.Eighth;
 					}
                     newSy();
                 }

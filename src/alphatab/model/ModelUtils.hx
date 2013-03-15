@@ -34,7 +34,6 @@ class ModelUtils
             case Sixteenth: return 16;
             case ThirtySecond: return 32;
             case SixtyFourth: return 64;
-            default: return 1;
         }  
     }
 
@@ -75,7 +74,6 @@ class ModelUtils
             case C4: return 1;
             case F4: return 2;
             case G2: return 3;
-            default: return 0;
         }
     }
 }

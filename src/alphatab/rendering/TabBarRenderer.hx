@@ -30,8 +30,9 @@ import alphatab.rendering.glyphs.RepeatCountGlyph;
 import alphatab.rendering.glyphs.RepeatOpenGlyph;
 import alphatab.rendering.glyphs.SpacingGlyph;
 import alphatab.rendering.glyphs.TabBeatGlyph;
-import alphatab.rendering.glyphs.TabBeatPostNotesGlyph;
 import alphatab.rendering.glyphs.TabBeatPreNotesGlyph;
+import alphatab.rendering.glyphs.TabBeatPostNotesGlyph;
+import haxe.ds.IntMap;
 
 /**
  * This BarRenderer renders a bar using guitar tablature notation. 
@@ -40,13 +41,13 @@ class TabBarRenderer extends GroupedBarRenderer
 {
 	private static inline var LineSpacing = 10;
 
-	private var _beatPosition:IntHash<TabBeatGlyph>;
+	private var _beatPosition:IntMap<TabBeatGlyph>;
 
 		
 	public function new(bar:Bar) 
 	{
 		super(bar);
-		_beatPosition = new IntHash<TabBeatGlyph>();
+		_beatPosition = new IntMap<TabBeatGlyph>();
 	}
 	
 	private inline function getLineOffset()
@@ -85,7 +86,7 @@ class TabBarRenderer extends GroupedBarRenderer
 		}
 	}
 	
-	private override function createPreBeatGlyphs():Dynamic 
+	private override function createPreBeatGlyphs():Void 
 	{
 		if (_bar.getMasterBar().isRepeatStart)
 		{
@@ -124,7 +125,7 @@ class TabBarRenderer extends GroupedBarRenderer
         }
     }	
 	
-	private override function createPostBeatGlyphs():Dynamic 
+	private override function createPostBeatGlyphs():Void 
 	{
 		if (_bar.getMasterBar().isRepeatEnd())
 		{

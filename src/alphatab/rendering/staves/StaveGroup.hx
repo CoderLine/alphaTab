@@ -138,55 +138,69 @@ class StaveGroup
 			// Draw start grouping
 			// 
 
-			
-			var firstStart = cy + y + staves[0].y + staves[0].staveTop + staves[0].topSpacing + staves[0].getTopOverflow();
-			var lastEnd = cy + y + staves[staves.length - 1].y + staves[staves.length - 1].topSpacing + staves[staves.length - 1].getTopOverflow()
-							     + staves[staves.length - 1].staveBottom;
-			
-			canvas.setColor(res.barSeperatorColor);
-			
-			canvas.beginPath();
-			canvas.moveTo(cx + x + staves[0].x, firstStart);
-			canvas.lineTo(cx + x + staves[staves.length - 1].x, lastEnd);
-			canvas.stroke();
-						
-			//
-			// Draw accolade
-			// 
-			
-            var barSize:Int = Std.int(3 * layout.renderer.scale);
-            var barOffset:Int = barSize;
-			
-			var accoladeStart = firstStart - (barSize*4);
-			var accoladeEnd = lastEnd + (barSize * 4);
-            
-            canvas.fillRect(cx + x - barOffset - barSize, accoladeStart, barSize, accoladeEnd - accoladeStart);
-            
-            var spikeStartX = cx + x - barOffset - barSize;
-            var spikeEndX = cx + x + barSize * 2;
-            
-            // top spike
-            canvas.beginPath();
-            canvas.moveTo(spikeStartX, accoladeStart);
-            canvas.bezierCurveTo(spikeStartX, accoladeStart, x, accoladeStart, spikeEndX, accoladeStart - barSize);
-            canvas.bezierCurveTo(cx + x, accoladeStart + barSize, spikeStartX, accoladeStart + barSize, spikeStartX, accoladeStart + barSize);
-            canvas.closePath();
-			canvas.fill();
-            
-            // bottom spike
-			canvas.beginPath();
-            canvas.moveTo(spikeStartX, accoladeEnd);
-            canvas.bezierCurveTo(spikeStartX, accoladeStart, x, accoladeStart, spikeEndX, accoladeStart - barSize);
-            canvas.bezierCurveTo(cx + x, accoladeStart + barSize, spikeStartX, accoladeStart + barSize, spikeStartX, accoladeStart + barSize);
-            canvas.closePath();
+            var firstIndex = 0;
+            while (!staves[firstIndex].isInAccolade())
+            {
+                firstIndex++;
+            }
 
-            canvas.beginPath();
-            canvas.moveTo(spikeStartX, accoladeEnd);
-            canvas.bezierCurveTo(spikeStartX, accoladeEnd, x, accoladeEnd, spikeEndX, accoladeEnd + barSize);
-            canvas.bezierCurveTo(x, accoladeEnd - barSize, spikeStartX, accoladeEnd - barSize, spikeStartX, accoladeEnd - barSize);
-            canvas.closePath();
-			
-			canvas.fill();
+            var lastIndex = staves.length - 1;
+            while (lastIndex >= firstIndex && !staves[lastIndex].isInAccolade())
+            {
+                lastIndex--;
+            }
+            
+            if (lastIndex >= firstIndex)
+            {
+                var firstStart = cy + y + staves[firstIndex].y + staves[firstIndex].staveTop + staves[firstIndex].topSpacing + staves[firstIndex].getTopOverflow();
+                var lastEnd = cy + y + staves[lastIndex].y + staves[lastIndex].topSpacing + staves[lastIndex].getTopOverflow()
+                                     + staves[lastIndex].staveBottom;
+                
+                canvas.setColor(res.barSeperatorColor);
+                
+                canvas.beginPath();
+                canvas.moveTo(cx + x + staves[firstIndex].x, firstStart);
+                canvas.lineTo(cx + x + staves[lastIndex].x, lastEnd);
+                canvas.stroke();
+                            
+                //
+                // Draw accolade
+                // 
+                
+                var barSize:Int = Std.int(3 * layout.renderer.scale);
+                var barOffset:Int = barSize;
+                
+                var accoladeStart = firstStart - (barSize*4);
+                var accoladeEnd = lastEnd + (barSize * 4);
+                
+                canvas.fillRect(cx + x - barOffset - barSize, accoladeStart, barSize, accoladeEnd - accoladeStart);
+                
+                var spikeStartX = cx + x - barOffset - barSize;
+                var spikeEndX = cx + x + barSize * 2;
+                
+                // top spike
+                canvas.beginPath();
+                canvas.moveTo(spikeStartX, accoladeStart);
+                canvas.bezierCurveTo(spikeStartX, accoladeStart, x, accoladeStart, spikeEndX, accoladeStart - barSize);
+                canvas.bezierCurveTo(cx + x, accoladeStart + barSize, spikeStartX, accoladeStart + barSize, spikeStartX, accoladeStart + barSize);
+                canvas.closePath();
+                canvas.fill();
+                
+                // bottom spike
+                canvas.beginPath();
+                canvas.moveTo(spikeStartX, accoladeEnd);
+                canvas.bezierCurveTo(spikeStartX, accoladeStart, x, accoladeStart, spikeEndX, accoladeStart - barSize);
+                canvas.bezierCurveTo(cx + x, accoladeStart + barSize, spikeStartX, accoladeStart + barSize, spikeStartX, accoladeStart + barSize);
+                canvas.closePath();
+
+                canvas.beginPath();
+                canvas.moveTo(spikeStartX, accoladeEnd);
+                canvas.bezierCurveTo(spikeStartX, accoladeEnd, x, accoladeEnd, spikeEndX, accoladeEnd + barSize);
+                canvas.bezierCurveTo(x, accoladeEnd - barSize, spikeStartX, accoladeEnd - barSize, spikeStartX, accoladeEnd - barSize);
+                canvas.closePath();
+                
+                canvas.fill();
+            }
 		}
 	}
 	

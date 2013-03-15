@@ -97,7 +97,7 @@ class GpxFileSystem
 	public function decompress(src:BitInput, skipHeader:Bool = false) : Bytes
 	{
 		var uncompressed:BytesArray = new BytesArray();
-		var expectedLength = src.readInt31();
+		var expectedLength = src.readInt32();
 		
 		try 
 		{

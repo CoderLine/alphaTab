@@ -1,47 +1,16 @@
-var $hxClasses = $hxClasses || {},$estr = function() { return js.Boot.__string_rec(this,''); };
+var $estr = function() { return js.Boot.__string_rec(this,''); };
 function $extend(from, fields) {
 	function inherit() {}; inherit.prototype = from; var proto = new inherit();
 	for (var name in fields) proto[name] = fields[name];
 	return proto;
 }
-var EReg = $hxClasses["EReg"] = function(r,opt) {
+var EReg = function(r,opt) {
 	opt = opt.split("u").join("");
 	this.r = new RegExp(r,opt);
 };
-EReg.__name__ = ["EReg"];
+EReg.__name__ = true;
 EReg.prototype = {
-	customReplace: function(s,f) {
-		var buf = new StringBuf();
-		while(true) {
-			if(!this.match(s)) break;
-			buf.b += Std.string(this.matchedLeft());
-			buf.b += Std.string(f(this));
-			s = this.matchedRight();
-		}
-		buf.b += Std.string(s);
-		return buf.b;
-	}
-	,replace: function(s,by) {
-		return s.replace(this.r,by);
-	}
-	,split: function(s) {
-		var d = "#__delim__#";
-		return s.replace(this.r,d).split(d);
-	}
-	,matchedPos: function() {
-		if(this.r.m == null) throw "No string matched";
-		return { pos : this.r.m.index, len : this.r.m[0].length};
-	}
-	,matchedRight: function() {
-		if(this.r.m == null) throw "No string matched";
-		var sz = this.r.m.index + this.r.m[0].length;
-		return this.r.s.substr(sz,this.r.s.length - sz);
-	}
-	,matchedLeft: function() {
-		if(this.r.m == null) throw "No string matched";
-		return this.r.s.substr(0,this.r.m.index);
-	}
-	,matched: function(n) {
+	matched: function(n) {
 		return this.r.m != null && n >= 0 && n < this.r.m.length?this.r.m[n]:(function($this) {
 			var $r;
 			throw "EReg::matched";
@@ -54,93 +23,10 @@ EReg.prototype = {
 		this.r.s = s;
 		return this.r.m != null;
 	}
-	,r: null
 	,__class__: EReg
 }
-var Hash = $hxClasses["Hash"] = function() {
-	this.h = { };
-};
-Hash.__name__ = ["Hash"];
-Hash.prototype = {
-	toString: function() {
-		var s = new StringBuf();
-		s.b += Std.string("{");
-		var it = this.keys();
-		while( it.hasNext() ) {
-			var i = it.next();
-			s.b += Std.string(i);
-			s.b += Std.string(" => ");
-			s.b += Std.string(Std.string(this.get(i)));
-			if(it.hasNext()) s.b += Std.string(", ");
-		}
-		s.b += Std.string("}");
-		return s.b;
-	}
-	,iterator: function() {
-		return { ref : this.h, it : this.keys(), hasNext : function() {
-			return this.it.hasNext();
-		}, next : function() {
-			var i = this.it.next();
-			return this.ref["$" + i];
-		}};
-	}
-	,keys: function() {
-		var a = [];
-		for( var key in this.h ) {
-		if(this.h.hasOwnProperty(key)) a.push(key.substr(1));
-		}
-		return HxOverrides.iter(a);
-	}
-	,remove: function(key) {
-		key = "$" + key;
-		if(!this.h.hasOwnProperty(key)) return false;
-		delete(this.h[key]);
-		return true;
-	}
-	,exists: function(key) {
-		return this.h.hasOwnProperty("$" + key);
-	}
-	,get: function(key) {
-		return this.h["$" + key];
-	}
-	,set: function(key,value) {
-		this.h["$" + key] = value;
-	}
-	,h: null
-	,__class__: Hash
-}
-var HxOverrides = $hxClasses["HxOverrides"] = function() { }
-HxOverrides.__name__ = ["HxOverrides"];
-HxOverrides.dateStr = function(date) {
-	var m = date.getMonth() + 1;
-	var d = date.getDate();
-	var h = date.getHours();
-	var mi = date.getMinutes();
-	var s = date.getSeconds();
-	return date.getFullYear() + "-" + (m < 10?"0" + m:"" + m) + "-" + (d < 10?"0" + d:"" + d) + " " + (h < 10?"0" + h:"" + h) + ":" + (mi < 10?"0" + mi:"" + mi) + ":" + (s < 10?"0" + s:"" + s);
-}
-HxOverrides.strDate = function(s) {
-	switch(s.length) {
-	case 8:
-		var k = s.split(":");
-		var d = new Date();
-		d.setTime(0);
-		d.setUTCHours(k[0]);
-		d.setUTCMinutes(k[1]);
-		d.setUTCSeconds(k[2]);
-		return d;
-	case 10:
-		var k = s.split("-");
-		return new Date(k[0],k[1] - 1,k[2],0,0,0);
-	case 19:
-		var k = s.split(" ");
-		var y = k[0].split("-");
-		var t = k[1].split(":");
-		return new Date(y[0],y[1] - 1,y[2],t[0],t[1],t[2]);
-	default:
-		throw "Invalid date format : " + s;
-	}
-}
+var HxOverrides = function() { }
+HxOverrides.__name__ = true;
 HxOverrides.cca = function(s,index) {
 	var x = s.charCodeAt(index);
 	if(x != x) return undefined;
@@ -174,270 +60,10 @@ HxOverrides.iter = function(a) {
 		return this.arr[this.cur++];
 	}};
 }
-var IntHash = $hxClasses["IntHash"] = function() {
-	this.h = { };
-};
-IntHash.__name__ = ["IntHash"];
-IntHash.prototype = {
-	toString: function() {
-		var s = new StringBuf();
-		s.b += Std.string("{");
-		var it = this.keys();
-		while( it.hasNext() ) {
-			var i = it.next();
-			s.b += Std.string(i);
-			s.b += Std.string(" => ");
-			s.b += Std.string(Std.string(this.get(i)));
-			if(it.hasNext()) s.b += Std.string(", ");
-		}
-		s.b += Std.string("}");
-		return s.b;
-	}
-	,iterator: function() {
-		return { ref : this.h, it : this.keys(), hasNext : function() {
-			return this.it.hasNext();
-		}, next : function() {
-			var i = this.it.next();
-			return this.ref[i];
-		}};
-	}
-	,keys: function() {
-		var a = [];
-		for( var key in this.h ) {
-		if(this.h.hasOwnProperty(key)) a.push(key | 0);
-		}
-		return HxOverrides.iter(a);
-	}
-	,remove: function(key) {
-		if(!this.h.hasOwnProperty(key)) return false;
-		delete(this.h[key]);
-		return true;
-	}
-	,exists: function(key) {
-		return this.h.hasOwnProperty(key);
-	}
-	,get: function(key) {
-		return this.h[key];
-	}
-	,set: function(key,value) {
-		this.h[key] = value;
-	}
-	,h: null
-	,__class__: IntHash
-}
-var IntIter = $hxClasses["IntIter"] = function(min,max) {
-	this.min = min;
-	this.max = max;
-};
-IntIter.__name__ = ["IntIter"];
-IntIter.prototype = {
-	next: function() {
-		return this.min++;
-	}
-	,hasNext: function() {
-		return this.min < this.max;
-	}
-	,max: null
-	,min: null
-	,__class__: IntIter
-}
-var List = $hxClasses["List"] = function() {
-	this.length = 0;
-};
-List.__name__ = ["List"];
-List.prototype = {
-	map: function(f) {
-		var b = new List();
-		var l = this.h;
-		while(l != null) {
-			var v = l[0];
-			l = l[1];
-			b.add(f(v));
-		}
-		return b;
-	}
-	,filter: function(f) {
-		var l2 = new List();
-		var l = this.h;
-		while(l != null) {
-			var v = l[0];
-			l = l[1];
-			if(f(v)) l2.add(v);
-		}
-		return l2;
-	}
-	,join: function(sep) {
-		var s = new StringBuf();
-		var first = true;
-		var l = this.h;
-		while(l != null) {
-			if(first) first = false; else s.b += Std.string(sep);
-			s.b += Std.string(l[0]);
-			l = l[1];
-		}
-		return s.b;
-	}
-	,toString: function() {
-		var s = new StringBuf();
-		var first = true;
-		var l = this.h;
-		s.b += Std.string("{");
-		while(l != null) {
-			if(first) first = false; else s.b += Std.string(", ");
-			s.b += Std.string(Std.string(l[0]));
-			l = l[1];
-		}
-		s.b += Std.string("}");
-		return s.b;
-	}
-	,iterator: function() {
-		return { h : this.h, hasNext : function() {
-			return this.h != null;
-		}, next : function() {
-			if(this.h == null) return null;
-			var x = this.h[0];
-			this.h = this.h[1];
-			return x;
-		}};
-	}
-	,remove: function(v) {
-		var prev = null;
-		var l = this.h;
-		while(l != null) {
-			if(l[0] == v) {
-				if(prev == null) this.h = l[1]; else prev[1] = l[1];
-				if(this.q == l) this.q = prev;
-				this.length--;
-				return true;
-			}
-			prev = l;
-			l = l[1];
-		}
-		return false;
-	}
-	,clear: function() {
-		this.h = null;
-		this.q = null;
-		this.length = 0;
-	}
-	,isEmpty: function() {
-		return this.h == null;
-	}
-	,pop: function() {
-		if(this.h == null) return null;
-		var x = this.h[0];
-		this.h = this.h[1];
-		if(this.h == null) this.q = null;
-		this.length--;
-		return x;
-	}
-	,last: function() {
-		return this.q == null?null:this.q[0];
-	}
-	,first: function() {
-		return this.h == null?null:this.h[0];
-	}
-	,push: function(item) {
-		var x = [item,this.h];
-		this.h = x;
-		if(this.q == null) this.q = x;
-		this.length++;
-	}
-	,add: function(item) {
-		var x = [item];
-		if(this.h == null) this.h = x; else this.q[1] = x;
-		this.q = x;
-		this.length++;
-	}
-	,length: null
-	,q: null
-	,h: null
-	,__class__: List
-}
-var Reflect = $hxClasses["Reflect"] = function() { }
-Reflect.__name__ = ["Reflect"];
-Reflect.hasField = function(o,field) {
-	return Object.prototype.hasOwnProperty.call(o,field);
-}
-Reflect.field = function(o,field) {
-	var v = null;
-	try {
-		v = o[field];
-	} catch( e ) {
-	}
-	return v;
-}
-Reflect.setField = function(o,field,value) {
-	o[field] = value;
-}
-Reflect.getProperty = function(o,field) {
-	var tmp;
-	return o == null?null:o.__properties__ && (tmp = o.__properties__["get_" + field])?o[tmp]():o[field];
-}
-Reflect.setProperty = function(o,field,value) {
-	var tmp;
-	if(o.__properties__ && (tmp = o.__properties__["set_" + field])) o[tmp](value); else o[field] = value;
-}
-Reflect.callMethod = function(o,func,args) {
-	return func.apply(o,args);
-}
-Reflect.fields = function(o) {
-	var a = [];
-	if(o != null) {
-		var hasOwnProperty = Object.prototype.hasOwnProperty;
-		for( var f in o ) {
-		if(hasOwnProperty.call(o,f)) a.push(f);
-		}
-	}
-	return a;
-}
-Reflect.isFunction = function(f) {
-	return typeof(f) == "function" && !(f.__name__ || f.__ename__);
-}
-Reflect.compare = function(a,b) {
-	return a == b?0:a > b?1:-1;
-}
-Reflect.compareMethods = function(f1,f2) {
-	if(f1 == f2) return true;
-	if(!Reflect.isFunction(f1) || !Reflect.isFunction(f2)) return false;
-	return f1.scope == f2.scope && f1.method == f2.method && f1.method != null;
-}
-Reflect.isObject = function(v) {
-	if(v == null) return false;
-	var t = typeof(v);
-	return t == "string" || t == "object" && !v.__enum__ || t == "function" && (v.__name__ || v.__ename__);
-}
-Reflect.deleteField = function(o,f) {
-	if(!Reflect.hasField(o,f)) return false;
-	delete(o[f]);
-	return true;
-}
-Reflect.copy = function(o) {
-	var o2 = { };
-	var _g = 0, _g1 = Reflect.fields(o);
-	while(_g < _g1.length) {
-		var f = _g1[_g];
-		++_g;
-		o2[f] = Reflect.field(o,f);
-	}
-	return o2;
-}
-Reflect.makeVarArgs = function(f) {
-	return function() {
-		var a = Array.prototype.slice.call(arguments);
-		return f(a);
-	};
-}
-var Std = $hxClasses["Std"] = function() { }
-Std.__name__ = ["Std"];
-Std["is"] = function(v,t) {
-	return js.Boot.__instanceof(v,t);
-}
+var Std = function() { }
+Std.__name__ = true;
 Std.string = function(s) {
 	return js.Boot.__string_rec(s,"");
-}
-Std["int"] = function(x) {
-	return x | 0;
 }
 Std.parseInt = function(x) {
 	var v = parseInt(x,10);
@@ -448,54 +74,24 @@ Std.parseInt = function(x) {
 Std.parseFloat = function(x) {
 	return parseFloat(x);
 }
-Std.random = function(x) {
-	return Math.floor(Math.random() * x);
-}
-var StringBuf = $hxClasses["StringBuf"] = function() {
+var StringBuf = function() {
 	this.b = "";
 };
-StringBuf.__name__ = ["StringBuf"];
+StringBuf.__name__ = true;
 StringBuf.prototype = {
-	toString: function() {
-		return this.b;
+	addSub: function(s,pos,len) {
+		this.b += len == null?HxOverrides.substr(s,pos,null):HxOverrides.substr(s,pos,len);
 	}
-	,addSub: function(s,pos,len) {
-		this.b += HxOverrides.substr(s,pos,len);
-	}
-	,addChar: function(c) {
-		this.b += String.fromCharCode(c);
-	}
-	,add: function(x) {
-		this.b += Std.string(x);
-	}
-	,b: null
 	,__class__: StringBuf
 }
-var StringTools = $hxClasses["StringTools"] = function() { }
-StringTools.__name__ = ["StringTools"];
-StringTools.urlEncode = function(s) {
-	return encodeURIComponent(s);
-}
-StringTools.urlDecode = function(s) {
-	return decodeURIComponent(s.split("+").join(" "));
-}
-StringTools.htmlEscape = function(s) {
-	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
-}
-StringTools.htmlUnescape = function(s) {
-	return s.split("&gt;").join(">").split("&lt;").join("<").split("&amp;").join("&");
-}
+var StringTools = function() { }
+StringTools.__name__ = true;
 StringTools.startsWith = function(s,start) {
 	return s.length >= start.length && HxOverrides.substr(s,0,start.length) == start;
 }
-StringTools.endsWith = function(s,end) {
-	var elen = end.length;
-	var slen = s.length;
-	return slen >= elen && HxOverrides.substr(s,slen - elen,elen) == end;
-}
 StringTools.isSpace = function(s,pos) {
 	var c = HxOverrides.cca(s,pos);
-	return c >= 9 && c <= 13 || c == 32;
+	return c > 8 && c < 14 || c == 32;
 }
 StringTools.ltrim = function(s) {
 	var l = s.length;
@@ -512,32 +108,6 @@ StringTools.rtrim = function(s) {
 StringTools.trim = function(s) {
 	return StringTools.ltrim(StringTools.rtrim(s));
 }
-StringTools.rpad = function(s,c,l) {
-	var sl = s.length;
-	var cl = c.length;
-	while(sl < l) if(l - sl < cl) {
-		s += HxOverrides.substr(c,0,l - sl);
-		sl = l;
-	} else {
-		s += c;
-		sl += cl;
-	}
-	return s;
-}
-StringTools.lpad = function(s,c,l) {
-	var ns = "";
-	var sl = s.length;
-	if(sl >= l) return s;
-	var cl = c.length;
-	while(sl < l) if(l - sl < cl) {
-		ns += HxOverrides.substr(c,0,l - sl);
-		sl = l;
-	} else {
-		ns += c;
-		sl += cl;
-	}
-	return ns + s;
-}
 StringTools.replace = function(s,sub,by) {
 	return s.split(sub).join(by);
 }
@@ -551,203 +121,10 @@ StringTools.hex = function(n,digits) {
 	if(digits != null) while(s.length < digits) s = "0" + s;
 	return s;
 }
-StringTools.fastCodeAt = function(s,index) {
-	return s.charCodeAt(index);
-}
-StringTools.isEOF = function(c) {
-	return c != c;
-}
-var ValueType = $hxClasses["ValueType"] = { __ename__ : ["ValueType"], __constructs__ : ["TNull","TInt","TFloat","TBool","TObject","TFunction","TClass","TEnum","TUnknown"] }
-ValueType.TNull = ["TNull",0];
-ValueType.TNull.toString = $estr;
-ValueType.TNull.__enum__ = ValueType;
-ValueType.TInt = ["TInt",1];
-ValueType.TInt.toString = $estr;
-ValueType.TInt.__enum__ = ValueType;
-ValueType.TFloat = ["TFloat",2];
-ValueType.TFloat.toString = $estr;
-ValueType.TFloat.__enum__ = ValueType;
-ValueType.TBool = ["TBool",3];
-ValueType.TBool.toString = $estr;
-ValueType.TBool.__enum__ = ValueType;
-ValueType.TObject = ["TObject",4];
-ValueType.TObject.toString = $estr;
-ValueType.TObject.__enum__ = ValueType;
-ValueType.TFunction = ["TFunction",5];
-ValueType.TFunction.toString = $estr;
-ValueType.TFunction.__enum__ = ValueType;
-ValueType.TClass = function(c) { var $x = ["TClass",6,c]; $x.__enum__ = ValueType; $x.toString = $estr; return $x; }
-ValueType.TEnum = function(e) { var $x = ["TEnum",7,e]; $x.__enum__ = ValueType; $x.toString = $estr; return $x; }
-ValueType.TUnknown = ["TUnknown",8];
-ValueType.TUnknown.toString = $estr;
-ValueType.TUnknown.__enum__ = ValueType;
-var Type = $hxClasses["Type"] = function() { }
-Type.__name__ = ["Type"];
-Type.getClass = function(o) {
-	if(o == null) return null;
-	return o.__class__;
-}
-Type.getEnum = function(o) {
-	if(o == null) return null;
-	return o.__enum__;
-}
-Type.getSuperClass = function(c) {
-	return c.__super__;
-}
-Type.getClassName = function(c) {
-	var a = c.__name__;
-	return a.join(".");
-}
-Type.getEnumName = function(e) {
-	var a = e.__ename__;
-	return a.join(".");
-}
-Type.resolveClass = function(name) {
-	var cl = $hxClasses[name];
-	if(cl == null || !cl.__name__) return null;
-	return cl;
-}
-Type.resolveEnum = function(name) {
-	var e = $hxClasses[name];
-	if(e == null || !e.__ename__) return null;
-	return e;
-}
-Type.createInstance = function(cl,args) {
-	switch(args.length) {
-	case 0:
-		return new cl();
-	case 1:
-		return new cl(args[0]);
-	case 2:
-		return new cl(args[0],args[1]);
-	case 3:
-		return new cl(args[0],args[1],args[2]);
-	case 4:
-		return new cl(args[0],args[1],args[2],args[3]);
-	case 5:
-		return new cl(args[0],args[1],args[2],args[3],args[4]);
-	case 6:
-		return new cl(args[0],args[1],args[2],args[3],args[4],args[5]);
-	case 7:
-		return new cl(args[0],args[1],args[2],args[3],args[4],args[5],args[6]);
-	case 8:
-		return new cl(args[0],args[1],args[2],args[3],args[4],args[5],args[6],args[7]);
-	default:
-		throw "Too many arguments";
-	}
-	return null;
-}
-Type.createEmptyInstance = function(cl) {
-	function empty() {}; empty.prototype = cl.prototype;
-	return new empty();
-}
-Type.createEnum = function(e,constr,params) {
-	var f = Reflect.field(e,constr);
-	if(f == null) throw "No such constructor " + constr;
-	if(Reflect.isFunction(f)) {
-		if(params == null) throw "Constructor " + constr + " need parameters";
-		return f.apply(e,params);
-	}
-	if(params != null && params.length != 0) throw "Constructor " + constr + " does not need parameters";
-	return f;
-}
-Type.createEnumIndex = function(e,index,params) {
-	var c = e.__constructs__[index];
-	if(c == null) throw index + " is not a valid enum constructor index";
-	return Type.createEnum(e,c,params);
-}
-Type.getInstanceFields = function(c) {
-	var a = [];
-	for(var i in c.prototype) a.push(i);
-	HxOverrides.remove(a,"__class__");
-	HxOverrides.remove(a,"__properties__");
-	return a;
-}
-Type.getClassFields = function(c) {
-	var a = Reflect.fields(c);
-	HxOverrides.remove(a,"__name__");
-	HxOverrides.remove(a,"__interfaces__");
-	HxOverrides.remove(a,"__properties__");
-	HxOverrides.remove(a,"__super__");
-	HxOverrides.remove(a,"prototype");
-	return a;
-}
-Type.getEnumConstructs = function(e) {
-	var a = e.__constructs__;
-	return a.slice();
-}
-Type["typeof"] = function(v) {
-	switch(typeof(v)) {
-	case "boolean":
-		return ValueType.TBool;
-	case "string":
-		return ValueType.TClass(String);
-	case "number":
-		if(Math.ceil(v) == v % 2147483648.0) return ValueType.TInt;
-		return ValueType.TFloat;
-	case "object":
-		if(v == null) return ValueType.TNull;
-		var e = v.__enum__;
-		if(e != null) return ValueType.TEnum(e);
-		var c = v.__class__;
-		if(c != null) return ValueType.TClass(c);
-		return ValueType.TObject;
-	case "function":
-		if(v.__name__ || v.__ename__) return ValueType.TObject;
-		return ValueType.TFunction;
-	case "undefined":
-		return ValueType.TNull;
-	default:
-		return ValueType.TUnknown;
-	}
-}
-Type.enumEq = function(a,b) {
-	if(a == b) return true;
-	try {
-		if(a[0] != b[0]) return false;
-		var _g1 = 2, _g = a.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			if(!Type.enumEq(a[i],b[i])) return false;
-		}
-		var e = a.__enum__;
-		if(e != b.__enum__ || e == null) return false;
-	} catch( e ) {
-		return false;
-	}
-	return true;
-}
-Type.enumConstructor = function(e) {
-	return e[0];
-}
-Type.enumParameters = function(e) {
-	return e.slice(2);
-}
-Type.enumIndex = function(e) {
-	return e[1];
-}
-Type.allEnums = function(e) {
-	var all = [];
-	var cst = e.__constructs__;
-	var _g = 0;
-	while(_g < cst.length) {
-		var c = cst[_g];
-		++_g;
-		var v = Reflect.field(e,c);
-		if(!Reflect.isFunction(v)) all.push(v);
-	}
-	return all;
-}
-var Xml = $hxClasses["Xml"] = function() {
+var XmlType = { __ename__ : true, __constructs__ : [] }
+var Xml = function() {
 };
-Xml.__name__ = ["Xml"];
-Xml.Element = null;
-Xml.PCData = null;
-Xml.CData = null;
-Xml.Comment = null;
-Xml.DocType = null;
-Xml.Prolog = null;
-Xml.Document = null;
+Xml.__name__ = true;
 Xml.parse = function(str) {
 	return haxe.xml.Parser.parse(str);
 }
@@ -755,38 +132,38 @@ Xml.createElement = function(name) {
 	var r = new Xml();
 	r.nodeType = Xml.Element;
 	r._children = new Array();
-	r._attributes = new Hash();
-	r.setNodeName(name);
+	r._attributes = new haxe.ds.StringMap();
+	r.set_nodeName(name);
 	return r;
 }
 Xml.createPCData = function(data) {
 	var r = new Xml();
 	r.nodeType = Xml.PCData;
-	r.setNodeValue(data);
+	r.set_nodeValue(data);
 	return r;
 }
 Xml.createCData = function(data) {
 	var r = new Xml();
 	r.nodeType = Xml.CData;
-	r.setNodeValue(data);
+	r.set_nodeValue(data);
 	return r;
 }
 Xml.createComment = function(data) {
 	var r = new Xml();
 	r.nodeType = Xml.Comment;
-	r.setNodeValue(data);
+	r.set_nodeValue(data);
 	return r;
 }
 Xml.createDocType = function(data) {
 	var r = new Xml();
 	r.nodeType = Xml.DocType;
-	r.setNodeValue(data);
+	r.set_nodeValue(data);
 	return r;
 }
-Xml.createProlog = function(data) {
+Xml.createProcessingInstruction = function(data) {
 	var r = new Xml();
-	r.nodeType = Xml.Prolog;
-	r.setNodeValue(data);
+	r.nodeType = Xml.ProcessingInstruction;
+	r.set_nodeValue(data);
 	return r;
 }
 Xml.createDocument = function() {
@@ -796,126 +173,11 @@ Xml.createDocument = function() {
 	return r;
 }
 Xml.prototype = {
-	toString: function() {
-		if(this.nodeType == Xml.PCData) return this._nodeValue;
-		if(this.nodeType == Xml.CData) return "<![CDATA[" + this._nodeValue + "]]>";
-		if(this.nodeType == Xml.Comment) return "<!--" + this._nodeValue + "-->";
-		if(this.nodeType == Xml.DocType) return "<!DOCTYPE " + this._nodeValue + ">";
-		if(this.nodeType == Xml.Prolog) return "<?" + this._nodeValue + "?>";
-		var s = new StringBuf();
-		if(this.nodeType == Xml.Element) {
-			s.b += Std.string("<");
-			s.b += Std.string(this._nodeName);
-			var $it0 = this._attributes.keys();
-			while( $it0.hasNext() ) {
-				var k = $it0.next();
-				s.b += Std.string(" ");
-				s.b += Std.string(k);
-				s.b += Std.string("=\"");
-				s.b += Std.string(this._attributes.get(k));
-				s.b += Std.string("\"");
-			}
-			if(this._children.length == 0) {
-				s.b += Std.string("/>");
-				return s.b;
-			}
-			s.b += Std.string(">");
-		}
-		var $it1 = this.iterator();
-		while( $it1.hasNext() ) {
-			var x = $it1.next();
-			s.b += Std.string(x.toString());
-		}
-		if(this.nodeType == Xml.Element) {
-			s.b += Std.string("</");
-			s.b += Std.string(this._nodeName);
-			s.b += Std.string(">");
-		}
-		return s.b;
-	}
-	,insertChild: function(x,pos) {
-		if(this._children == null) throw "bad nodetype";
-		if(x._parent != null) HxOverrides.remove(x._parent._children,x);
-		x._parent = this;
-		this._children.splice(pos,0,x);
-	}
-	,removeChild: function(x) {
-		if(this._children == null) throw "bad nodetype";
-		var b = HxOverrides.remove(this._children,x);
-		if(b) x._parent = null;
-		return b;
-	}
-	,addChild: function(x) {
+	addChild: function(x) {
 		if(this._children == null) throw "bad nodetype";
 		if(x._parent != null) HxOverrides.remove(x._parent._children,x);
 		x._parent = this;
 		this._children.push(x);
-	}
-	,firstElement: function() {
-		if(this._children == null) throw "bad nodetype";
-		var cur = 0;
-		var l = this._children.length;
-		while(cur < l) {
-			var n = this._children[cur];
-			if(n.nodeType == Xml.Element) return n;
-			cur++;
-		}
-		return null;
-	}
-	,firstChild: function() {
-		if(this._children == null) throw "bad nodetype";
-		return this._children[0];
-	}
-	,elementsNamed: function(name) {
-		if(this._children == null) throw "bad nodetype";
-		return { cur : 0, x : this._children, hasNext : function() {
-			var k = this.cur;
-			var l = this.x.length;
-			while(k < l) {
-				var n = this.x[k];
-				if(n.nodeType == Xml.Element && n._nodeName == name) break;
-				k++;
-			}
-			this.cur = k;
-			return k < l;
-		}, next : function() {
-			var k = this.cur;
-			var l = this.x.length;
-			while(k < l) {
-				var n = this.x[k];
-				k++;
-				if(n.nodeType == Xml.Element && n._nodeName == name) {
-					this.cur = k;
-					return n;
-				}
-			}
-			return null;
-		}};
-	}
-	,elements: function() {
-		if(this._children == null) throw "bad nodetype";
-		return { cur : 0, x : this._children, hasNext : function() {
-			var k = this.cur;
-			var l = this.x.length;
-			while(k < l) {
-				if(this.x[k].nodeType == Xml.Element) break;
-				k += 1;
-			}
-			this.cur = k;
-			return k < l;
-		}, next : function() {
-			var k = this.cur;
-			var l = this.x.length;
-			while(k < l) {
-				var n = this.x[k];
-				k += 1;
-				if(n.nodeType == Xml.Element) {
-					this.cur = k;
-					return n;
-				}
-			}
-			return null;
-		}};
 	}
 	,iterator: function() {
 		if(this._children == null) throw "bad nodetype";
@@ -925,69 +187,43 @@ Xml.prototype = {
 			return this.x[this.cur++];
 		}};
 	}
-	,attributes: function() {
-		if(this.nodeType != Xml.Element) throw "bad nodeType";
-		return this._attributes.keys();
-	}
 	,exists: function(att) {
 		if(this.nodeType != Xml.Element) throw "bad nodeType";
 		return this._attributes.exists(att);
-	}
-	,remove: function(att) {
-		if(this.nodeType != Xml.Element) throw "bad nodeType";
-		this._attributes.remove(att);
 	}
 	,set: function(att,value) {
 		if(this.nodeType != Xml.Element) throw "bad nodeType";
 		this._attributes.set(att,value);
 	}
-	,get: function(att) {
-		if(this.nodeType != Xml.Element) throw "bad nodeType";
-		return this._attributes.get(att);
-	}
-	,getParent: function() {
-		return this._parent;
-	}
-	,setNodeValue: function(v) {
+	,set_nodeValue: function(v) {
 		if(this.nodeType == Xml.Element || this.nodeType == Xml.Document) throw "bad nodeType";
 		return this._nodeValue = v;
 	}
-	,getNodeValue: function() {
+	,get_nodeValue: function() {
 		if(this.nodeType == Xml.Element || this.nodeType == Xml.Document) throw "bad nodeType";
 		return this._nodeValue;
 	}
-	,setNodeName: function(n) {
+	,set_nodeName: function(n) {
 		if(this.nodeType != Xml.Element) throw "bad nodeType";
 		return this._nodeName = n;
 	}
-	,getNodeName: function() {
+	,get_nodeName: function() {
 		if(this.nodeType != Xml.Element) throw "bad nodeType";
 		return this._nodeName;
 	}
-	,_parent: null
-	,_children: null
-	,_attributes: null
-	,_nodeValue: null
-	,_nodeName: null
-	,parent: null
-	,nodeValue: null
-	,nodeName: null
-	,nodeType: null
 	,__class__: Xml
-	,__properties__: {set_nodeName:"setNodeName",get_nodeName:"getNodeName",set_nodeValue:"setNodeValue",get_nodeValue:"getNodeValue",get_parent:"getParent"}
 }
 var alphatab = alphatab || {}
-alphatab.Main = $hxClasses["alphatab.Main"] = function() { }
-alphatab.Main.__name__ = ["alphatab","Main"];
+alphatab.Main = function() { }
+alphatab.Main.__name__ = true;
 alphatab.Main.main = function() {
 }
 if(!alphatab.audio) alphatab.audio = {}
-alphatab.audio.GeneralMidi = $hxClasses["alphatab.audio.GeneralMidi"] = function() { }
-alphatab.audio.GeneralMidi.__name__ = ["alphatab","audio","GeneralMidi"];
-alphatab.audio.GeneralMidi._values = null;
+alphatab.audio.GeneralMidi = function() { }
+alphatab.audio.GeneralMidi.__name__ = true;
 alphatab.audio.GeneralMidi.getValue = function(name) {
 	if(alphatab.audio.GeneralMidi._values == null) {
-		alphatab.audio.GeneralMidi._values = new Hash();
+		alphatab.audio.GeneralMidi._values = new haxe.ds.StringMap();
 		alphatab.audio.GeneralMidi._values.set("acousticgrandpiano",0);
 		alphatab.audio.GeneralMidi._values.set("brightacousticpiano",1);
 		alphatab.audio.GeneralMidi._values.set("electricgrandpiano",2);
@@ -1120,8 +356,8 @@ alphatab.audio.GeneralMidi.getValue = function(name) {
 	name = StringTools.replace(name.toLowerCase()," ","");
 	return alphatab.audio.GeneralMidi._values.exists(name)?alphatab.audio.GeneralMidi._values.get(name):0;
 }
-alphatab.audio.MidiUtils = $hxClasses["alphatab.audio.MidiUtils"] = function() { }
-alphatab.audio.MidiUtils.__name__ = ["alphatab","audio","MidiUtils"];
+alphatab.audio.MidiUtils = function() { }
+alphatab.audio.MidiUtils.__name__ = true;
 alphatab.audio.MidiUtils.durationToTicks = function(value) {
 	return alphatab.audio.MidiUtils.valueToTicks(alphatab.model.ModelUtils.getDurationValue(value));
 }
@@ -1135,9 +371,9 @@ alphatab.audio.MidiUtils.applyTuplet = function(ticks,numerator,denominator) {
 	return ticks * numerator / denominator | 0;
 }
 if(!alphatab.importer) alphatab.importer = {}
-alphatab.importer.ScoreImporter = $hxClasses["alphatab.importer.ScoreImporter"] = function() {
+alphatab.importer.ScoreImporter = function() {
 };
-alphatab.importer.ScoreImporter.__name__ = ["alphatab","importer","ScoreImporter"];
+alphatab.importer.ScoreImporter.__name__ = true;
 alphatab.importer.ScoreImporter.availableImporters = function() {
 	var scoreImporter = new Array();
 	scoreImporter.push(new alphatab.importer.Gp3To5Importer());
@@ -1222,13 +458,12 @@ alphatab.importer.ScoreImporter.prototype = {
 	,init: function(data) {
 		this._data = data;
 	}
-	,_data: null
 	,__class__: alphatab.importer.ScoreImporter
 }
-alphatab.importer.AlphaTexImporter = $hxClasses["alphatab.importer.AlphaTexImporter"] = function() {
+alphatab.importer.AlphaTexImporter = function() {
 	alphatab.importer.ScoreImporter.call(this);
 };
-alphatab.importer.AlphaTexImporter.__name__ = ["alphatab","importer","AlphaTexImporter"];
+alphatab.importer.AlphaTexImporter.__name__ = true;
 alphatab.importer.AlphaTexImporter.isLetter = function(ch) {
 	var code = HxOverrides.cca(ch,0);
 	return !alphatab.importer.AlphaTexImporter.isTerminal(ch) && (code >= 33 && code <= 47 || code >= 58 && code <= 126 || code > 128);
@@ -1335,7 +570,8 @@ alphatab.importer.AlphaTexImporter.prototype = $extend(alphatab.importer.ScoreIm
 		return tuning;
 	}
 	,parseKeySignature: function(str) {
-		switch(str.toLowerCase()) {
+		var _g = str.toLowerCase();
+		switch(_g) {
 		case "cb":
 			return -7;
 		case "gb":
@@ -1371,7 +607,8 @@ alphatab.importer.AlphaTexImporter.prototype = $extend(alphatab.importer.ScoreIm
 		}
 	}
 	,parseClef: function(str) {
-		switch(str.toLowerCase()) {
+		var _g = str.toLowerCase();
+		switch(_g) {
 		case "g2":case "treble":
 			return alphatab.model.Clef.G2;
 		case "f4":case "bass":
@@ -1492,7 +729,8 @@ alphatab.importer.AlphaTexImporter.prototype = $extend(alphatab.importer.ScoreIm
 				this.newSy();
 				var duration = 16;
 				if(this._sy == alphatab.importer.AlphaTexSymbols.Number) {
-					switch(this._syData) {
+					var _g = this;
+					switch(_g._syData) {
 					case 16:case 32:case 64:
 						duration = this._syData;
 						break;
@@ -1505,14 +743,21 @@ alphatab.importer.AlphaTexImporter.prototype = $extend(alphatab.importer.ScoreIm
 				note.trillSpeed = duration;
 			} else if(this._syData == "tp") {
 				this.newSy();
-				var duration = 8;
+				var duration = alphatab.model.Duration.Eighth;
 				if(this._sy == alphatab.importer.AlphaTexSymbols.Number) {
-					switch(this._syData) {
-					case 8:case 16:case 32:
-						duration = this._syData;
+					var _g = this;
+					switch(_g._syData) {
+					case 8:
+						duration = alphatab.model.Duration.Eighth;
+						break;
+					case 16:
+						duration = alphatab.model.Duration.Sixteenth;
+						break;
+					case 32:
+						duration = alphatab.model.Duration.ThirtySecond;
 						break;
 					default:
-						duration = 8;
+						duration = alphatab.model.Duration.Eighth;
 					}
 					this.newSy();
 				}
@@ -1840,17 +1085,9 @@ alphatab.importer.AlphaTexImporter.prototype = $extend(alphatab.importer.ScoreIm
 			throw alphatab.importer.ScoreImporter.UNSUPPORTED_FORMAT;
 		}
 	}
-	,_currentDuration: null
-	,_allowNegatives: null
-	,_syData: null
-	,_sy: null
-	,_curChPos: null
-	,_ch: null
-	,_track: null
-	,_score: null
 	,__class__: alphatab.importer.AlphaTexImporter
 });
-alphatab.importer.AlphaTexSymbols = $hxClasses["alphatab.importer.AlphaTexSymbols"] = { __ename__ : ["alphatab","importer","AlphaTexSymbols"], __constructs__ : ["No","Eof","Number","DoubleDot","Dot","String","Tuning","LParensis","RParensis","LBrace","RBrace","Pipe","MetaCommand"] }
+alphatab.importer.AlphaTexSymbols = { __ename__ : true, __constructs__ : ["No","Eof","Number","DoubleDot","Dot","String","Tuning","LParensis","RParensis","LBrace","RBrace","Pipe","MetaCommand"] }
 alphatab.importer.AlphaTexSymbols.No = ["No",0];
 alphatab.importer.AlphaTexSymbols.No.toString = $estr;
 alphatab.importer.AlphaTexSymbols.No.__enum__ = alphatab.importer.AlphaTexSymbols;
@@ -1890,11 +1127,11 @@ alphatab.importer.AlphaTexSymbols.Pipe.__enum__ = alphatab.importer.AlphaTexSymb
 alphatab.importer.AlphaTexSymbols.MetaCommand = ["MetaCommand",12];
 alphatab.importer.AlphaTexSymbols.MetaCommand.toString = $estr;
 alphatab.importer.AlphaTexSymbols.MetaCommand.__enum__ = alphatab.importer.AlphaTexSymbols;
-alphatab.importer.Gp3To5Importer = $hxClasses["alphatab.importer.Gp3To5Importer"] = function() {
+alphatab.importer.Gp3To5Importer = function() {
 	alphatab.importer.ScoreImporter.call(this);
 	this._globalTripletFeel = alphatab.model.TripletFeel.NoTripletFeel;
 };
-alphatab.importer.Gp3To5Importer.__name__ = ["alphatab","importer","Gp3To5Importer"];
+alphatab.importer.Gp3To5Importer.__name__ = true;
 alphatab.importer.Gp3To5Importer.__super__ = alphatab.importer.ScoreImporter;
 alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImporter.prototype,{
 	skip: function(count) {
@@ -2084,7 +1321,18 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 		}
 	}
 	,readTremoloPicking: function(beat) {
-		beat.tremoloSpeed = this._data.readByte();
+		var speed = this._data.readByte();
+		switch(speed) {
+		case 1:
+			beat.tremoloSpeed = alphatab.model.Duration.Eighth;
+			break;
+		case 2:
+			beat.tremoloSpeed = alphatab.model.Duration.Sixteenth;
+			break;
+		case 3:
+			beat.tremoloSpeed = alphatab.model.Duration.ThirtySecond;
+			break;
+		}
 	}
 	,readGrace: function(voice,note) {
 		var graceBeat = new alphatab.model.Beat();
@@ -2159,7 +1407,8 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 		note.isStaccato = (flags2 & 1) != 0;
 	}
 	,toDynamicValue: function(value) {
-		switch(value + 1) {
+		var _g = value + 1;
+		switch(_g) {
 		case 1:
 			return alphatab.model.DynamicValue.PPP;
 		case 2:
@@ -2203,7 +1452,8 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 		}
 		if(this._versionNumber >= 500) {
 			if((flags & 1) != 0) newNote.durationPercent = this.readDouble();
-			this._data.readByte();
+			var flags2 = this._data.readByte();
+			newNote.swapAccidentals = (flags2 & 2) != 0;
 		}
 		if((flags & 8) != 0) this.readNoteEffects(track,voice,beat,newNote);
 		beat.addNote(newNote);
@@ -2353,16 +1603,19 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 				beat.brushDuration = this.toStrokeValue(strokeDown);
 			}
 		}
-		if((flags2 & 2) != 0) switch(this._data.readInt8()) {
-		case 0:
-			beat.pickStroke = alphatab.model.PickStrokeType.None;
-			break;
-		case 1:
-			beat.pickStroke = alphatab.model.PickStrokeType.Up;
-			break;
-		case 2:
-			beat.pickStroke = alphatab.model.PickStrokeType.Down;
-			break;
+		if((flags2 & 2) != 0) {
+			var _g = this._data.readInt8();
+			switch(_g) {
+			case 0:
+				beat.pickStroke = alphatab.model.PickStrokeType.None;
+				break;
+			case 1:
+				beat.pickStroke = alphatab.model.PickStrokeType.Up;
+				break;
+			case 2:
+				beat.pickStroke = alphatab.model.PickStrokeType.Down;
+				break;
+			}
 		}
 	}
 	,readChord: function(beat) {
@@ -2684,7 +1937,7 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 		var _g = 0;
 		while(_g < noticeLines) {
 			var i = _g++;
-			if(i > 0) notice.b += Std.string("\n");
+			if(i > 0) notice.b += "\n";
 			notice.b += Std.string(this.readStringIntUnused());
 		}
 		this._score.notices = notice.b;
@@ -2724,34 +1977,18 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 		this.finish(this._score);
 		return this._score;
 	}
-	,_playbackInfos: null
-	,_beatTapping: null
-	,_trackCount: null
-	,_barCount: null
-	,_lyricsTrack: null
-	,_lyrics: null
-	,_lyricsIndex: null
-	,_globalTripletFeel: null
-	,_octave: null
-	,_keySignature: null
-	,_tempo: null
-	,_score: null
-	,_versionNumber: null
 	,__class__: alphatab.importer.Gp3To5Importer
 });
-alphatab.importer.GpxFile = $hxClasses["alphatab.importer.GpxFile"] = function() {
+alphatab.importer.GpxFile = function() {
 };
-alphatab.importer.GpxFile.__name__ = ["alphatab","importer","GpxFile"];
+alphatab.importer.GpxFile.__name__ = true;
 alphatab.importer.GpxFile.prototype = {
-	data: null
-	,fileSize: null
-	,fileName: null
-	,__class__: alphatab.importer.GpxFile
+	__class__: alphatab.importer.GpxFile
 }
-alphatab.importer.GpxFileSystem = $hxClasses["alphatab.importer.GpxFileSystem"] = function() {
+alphatab.importer.GpxFileSystem = function() {
 	this.files = new Array();
 };
-alphatab.importer.GpxFileSystem.__name__ = ["alphatab","importer","GpxFileSystem"];
+alphatab.importer.GpxFileSystem.__name__ = true;
 alphatab.importer.GpxFileSystem.prototype = {
 	getInteger: function(data,offset) {
 		return (data.b[offset + 3] & 255) << 24 | (data.b[offset + 2] & 255) << 16 | (data.b[offset + 1] & 255) << 8 | data.b[offset] & 255;
@@ -2801,7 +2038,7 @@ alphatab.importer.GpxFileSystem.prototype = {
 	,decompress: function(src,skipHeader) {
 		if(skipHeader == null) skipHeader = false;
 		var uncompressed = new alphatab.io.BytesArray();
-		var expectedLength = src.readInt31();
+		var expectedLength = src.readInt32();
 		try {
 			while(uncompressed.length < expectedLength) {
 				var flag = src.readBits(1);
@@ -2841,14 +2078,12 @@ alphatab.importer.GpxFileSystem.prototype = {
 	,setFileFilter: function(fileFilter) {
 		this._fileFilter = fileFilter;
 	}
-	,files: null
-	,_fileFilter: null
 	,__class__: alphatab.importer.GpxFileSystem
 }
-alphatab.importer.GpxImporter = $hxClasses["alphatab.importer.GpxImporter"] = function() {
+alphatab.importer.GpxImporter = function() {
 	alphatab.importer.ScoreImporter.call(this);
 };
-alphatab.importer.GpxImporter.__name__ = ["alphatab","importer","GpxImporter"];
+alphatab.importer.GpxImporter.__name__ = true;
 alphatab.importer.GpxImporter.__super__ = alphatab.importer.ScoreImporter;
 alphatab.importer.GpxImporter.prototype = $extend(alphatab.importer.ScoreImporter.prototype,{
 	readScore: function() {
@@ -2866,55 +2101,57 @@ alphatab.importer.GpxImporter.prototype = $extend(alphatab.importer.ScoreImporte
 	}
 	,__class__: alphatab.importer.GpxImporter
 });
-alphatab.importer.GpxParser = $hxClasses["alphatab.importer.GpxParser"] = function() {
+alphatab.importer.GpxParser = function() {
 };
-alphatab.importer.GpxParser.__name__ = ["alphatab","importer","GpxParser"];
+alphatab.importer.GpxParser.__name__ = true;
 alphatab.importer.GpxParser.prototype = {
 	parseScoreNode: function(node) {
 		var $it0 = node.iterator();
 		while( $it0.hasNext() ) {
 			var c = $it0.next();
-			switch(c.getNodeName()) {
+			var _g = c.get_nodeName();
+			switch(_g) {
 			case "Title":
-				this.score.title = c.getNodeValue();
+				this.score.title = c.get_nodeValue();
 				break;
 			case "SubTitle":
-				this.score.subTitle = c.getNodeValue();
+				this.score.subTitle = c.get_nodeValue();
 				break;
 			case "Artist":
-				this.score.artist = c.getNodeValue();
+				this.score.artist = c.get_nodeValue();
 				break;
 			case "Album":
-				this.score.album = c.getNodeValue();
+				this.score.album = c.get_nodeValue();
 				break;
 			case "Words":
-				this.score.words = c.getNodeValue();
+				this.score.words = c.get_nodeValue();
 				break;
 			case "Music":
-				this.score.music = c.getNodeValue();
+				this.score.music = c.get_nodeValue();
 				break;
 			case "WordsAndMusic":
-				if(c.getNodeValue() != null && c.getNodeValue() != "") {
-					this.score.words = c.getNodeValue();
-					this.score.music = c.getNodeValue();
+				if(c.get_nodeValue() != null && c.get_nodeValue() != "") {
+					this.score.words = c.get_nodeValue();
+					this.score.music = c.get_nodeValue();
 				}
 				break;
 			case "Copyright":
-				this.score.copyright = c.getNodeValue();
+				this.score.copyright = c.get_nodeValue();
 				break;
 			case "Tabber":
-				this.score.tab = c.getNodeValue();
+				this.score.tab = c.get_nodeValue();
 				break;
 			}
 		}
 	}
 	,parseDom: function(xml) {
-		if(xml.getNodeName() == "GPIF") {
+		if(xml.get_nodeName() == "GPIF") {
 			this.score = new alphatab.model.Score();
 			var $it0 = xml.iterator();
 			while( $it0.hasNext() ) {
 				var n = $it0.next();
-				switch(n.getNodeName()) {
+				var _g = n.get_nodeName();
+				switch(_g) {
 				case "Score":
 					this.parseScoreNode(n);
 					break;
@@ -2926,10 +2163,9 @@ alphatab.importer.GpxParser.prototype = {
 		var dom = Xml.parse(xml);
 		this.parseDom(dom);
 	}
-	,score: null
 	,__class__: alphatab.importer.GpxParser
 }
-alphatab.importer.MixTableChange = $hxClasses["alphatab.importer.MixTableChange"] = function() {
+alphatab.importer.MixTableChange = function() {
 	this.volume = -1;
 	this.balance = -1;
 	this.instrument = -1;
@@ -2937,18 +2173,12 @@ alphatab.importer.MixTableChange = $hxClasses["alphatab.importer.MixTableChange"
 	this.tempo = -1;
 	this.duration = 0;
 };
-alphatab.importer.MixTableChange.__name__ = ["alphatab","importer","MixTableChange"];
+alphatab.importer.MixTableChange.__name__ = true;
 alphatab.importer.MixTableChange.prototype = {
-	duration: null
-	,tempo: null
-	,tempoName: null
-	,instrument: null
-	,balance: null
-	,volume: null
-	,__class__: alphatab.importer.MixTableChange
+	__class__: alphatab.importer.MixTableChange
 }
-alphatab.importer.ScoreLoader = $hxClasses["alphatab.importer.ScoreLoader"] = function() { }
-alphatab.importer.ScoreLoader.__name__ = ["alphatab","importer","ScoreLoader"];
+alphatab.importer.ScoreLoader = function() { }
+alphatab.importer.ScoreLoader.__name__ = true;
 alphatab.importer.ScoreLoader.loadScoreAsync = function(path,success,error) {
 	var loader = new alphatab.platform.js.JsFileLoader();
 	loader.loadBinaryAsync(path,function(data) {
@@ -2964,7 +2194,7 @@ alphatab.importer.ScoreLoader.loadScoreAsync = function(path,success,error) {
 				success(score);
 				return;
 			} catch( e ) {
-				if(e == alphatab.importer.ScoreImporter.UNSUPPORTED_FORMAT) continue; else error(haxe.Stack.toString(haxe.Stack.exceptionStack()));
+				if(e == alphatab.importer.ScoreImporter.UNSUPPORTED_FORMAT) continue; else error(haxe.CallStack.toString(haxe.CallStack.exceptionStack()));
 			}
 		}
 		error("No reader for the requested file found");
@@ -2972,13 +2202,10 @@ alphatab.importer.ScoreLoader.loadScoreAsync = function(path,success,error) {
 }
 var haxe = haxe || {}
 if(!haxe.io) haxe.io = {}
-haxe.io.Input = $hxClasses["haxe.io.Input"] = function() { }
-haxe.io.Input.__name__ = ["haxe","io","Input"];
+haxe.io.Input = function() { }
+haxe.io.Input.__name__ = true;
 haxe.io.Input.prototype = {
-	getDoubleSig: function(bytes) {
-		return Std.parseInt((((bytes[1] & 15) << 16 | bytes[2] << 8 | bytes[3]) * Math.pow(2,32)).toString()) + Std.parseInt(((bytes[4] >> 7) * Math.pow(2,31)).toString()) + Std.parseInt(((bytes[4] & 127) << 24 | bytes[5] << 16 | bytes[6] << 8 | bytes[7]).toString());
-	}
-	,readString: function(len) {
+	readString: function(len) {
 		var b = haxe.io.Bytes.alloc(len);
 		this.readFullBytes(b,0,len);
 		return b.toString();
@@ -2988,114 +2215,12 @@ haxe.io.Input.prototype = {
 		var ch2 = this.readByte();
 		var ch3 = this.readByte();
 		var ch4 = this.readByte();
-		return this.bigEndian?(ch1 << 8 | ch2) << 16 | (ch3 << 8 | ch4):(ch4 << 8 | ch3) << 16 | (ch2 << 8 | ch1);
-	}
-	,readUInt30: function() {
-		var ch1 = this.readByte();
-		var ch2 = this.readByte();
-		var ch3 = this.readByte();
-		var ch4 = this.readByte();
-		if((this.bigEndian?ch1:ch4) >= 64) throw haxe.io.Error.Overflow;
 		return this.bigEndian?ch4 | ch3 << 8 | ch2 << 16 | ch1 << 24:ch1 | ch2 << 8 | ch3 << 16 | ch4 << 24;
-	}
-	,readInt31: function() {
-		var ch1, ch2, ch3, ch4;
-		if(this.bigEndian) {
-			ch4 = this.readByte();
-			ch3 = this.readByte();
-			ch2 = this.readByte();
-			ch1 = this.readByte();
-		} else {
-			ch1 = this.readByte();
-			ch2 = this.readByte();
-			ch3 = this.readByte();
-			ch4 = this.readByte();
-		}
-		if((ch4 & 128) == 0 != ((ch4 & 64) == 0)) throw haxe.io.Error.Overflow;
-		return ch1 | ch2 << 8 | ch3 << 16 | ch4 << 24;
-	}
-	,readUInt24: function() {
-		var ch1 = this.readByte();
-		var ch2 = this.readByte();
-		var ch3 = this.readByte();
-		return this.bigEndian?ch3 | ch2 << 8 | ch1 << 16:ch1 | ch2 << 8 | ch3 << 16;
-	}
-	,readInt24: function() {
-		var ch1 = this.readByte();
-		var ch2 = this.readByte();
-		var ch3 = this.readByte();
-		var n = this.bigEndian?ch3 | ch2 << 8 | ch1 << 16:ch1 | ch2 << 8 | ch3 << 16;
-		if((n & 8388608) != 0) return n - 16777216;
-		return n;
-	}
-	,readUInt16: function() {
-		var ch1 = this.readByte();
-		var ch2 = this.readByte();
-		return this.bigEndian?ch2 | ch1 << 8:ch1 | ch2 << 8;
-	}
-	,readInt16: function() {
-		var ch1 = this.readByte();
-		var ch2 = this.readByte();
-		var n = this.bigEndian?ch2 | ch1 << 8:ch1 | ch2 << 8;
-		if((n & 32768) != 0) return n - 65536;
-		return n;
 	}
 	,readInt8: function() {
 		var n = this.readByte();
 		if(n >= 128) return n - 256;
 		return n;
-	}
-	,readDouble: function() {
-		var bytes = [];
-		bytes.push(this.readByte());
-		bytes.push(this.readByte());
-		bytes.push(this.readByte());
-		bytes.push(this.readByte());
-		bytes.push(this.readByte());
-		bytes.push(this.readByte());
-		bytes.push(this.readByte());
-		bytes.push(this.readByte());
-		if(this.bigEndian) bytes.reverse();
-		var sign = 1 - (bytes[0] >> 7 << 1);
-		var exp = (bytes[0] << 4 & 2047 | bytes[1] >> 4) - 1023;
-		var sig = this.getDoubleSig(bytes);
-		if(sig == 0 && exp == -1023) return 0.0;
-		return sign * (1.0 + Math.pow(2,-52) * sig) * Math.pow(2,exp);
-	}
-	,readFloat: function() {
-		var bytes = [];
-		bytes.push(this.readByte());
-		bytes.push(this.readByte());
-		bytes.push(this.readByte());
-		bytes.push(this.readByte());
-		if(this.bigEndian) bytes.reverse();
-		var sign = 1 - (bytes[0] >> 7 << 1);
-		var exp = (bytes[0] << 1 & 255 | bytes[1] >> 7) - 127;
-		var sig = (bytes[1] & 127) << 16 | bytes[2] << 8 | bytes[3];
-		if(sig == 0 && exp == -127) return 0.0;
-		return sign * (1 + Math.pow(2,-23) * sig) * Math.pow(2,exp);
-	}
-	,readLine: function() {
-		var buf = new StringBuf();
-		var last;
-		var s;
-		try {
-			while((last = this.readByte()) != 10) buf.b += String.fromCharCode(last);
-			s = buf.b;
-			if(HxOverrides.cca(s,s.length - 1) == 13) s = HxOverrides.substr(s,0,-1);
-		} catch( e ) {
-			if( js.Boot.__instanceof(e,haxe.io.Eof) ) {
-				s = buf.b;
-				if(s.length == 0) throw e;
-			} else throw(e);
-		}
-		return s;
-	}
-	,readUntil: function(end) {
-		var buf = new StringBuf();
-		var last;
-		while((last = this.readByte()) != end) buf.b += String.fromCharCode(last);
-		return buf.b;
 	}
 	,read: function(nbytes) {
 		var s = haxe.io.Bytes.alloc(nbytes);
@@ -3131,12 +2256,6 @@ haxe.io.Input.prototype = {
 		}
 		return total.getBytes();
 	}
-	,setEndian: function(b) {
-		this.bigEndian = b;
-		return b;
-	}
-	,close: function() {
-	}
 	,readBytes: function(s,pos,len) {
 		var k = len;
 		var b = s.b;
@@ -3155,17 +2274,15 @@ haxe.io.Input.prototype = {
 			return $r;
 		}(this));
 	}
-	,bigEndian: null
 	,__class__: haxe.io.Input
-	,__properties__: {set_bigEndian:"setEndian"}
 }
 if(!alphatab.io) alphatab.io = {}
-alphatab.io.BitInput = $hxClasses["alphatab.io.BitInput"] = function(input) {
+alphatab.io.BitInput = function(input) {
 	this._input = input;
 	this._readBytes = 0;
 	this._position = 8;
 };
-alphatab.io.BitInput.__name__ = ["alphatab","io","BitInput"];
+alphatab.io.BitInput.__name__ = true;
 alphatab.io.BitInput.__super__ = haxe.io.Input;
 alphatab.io.BitInput.prototype = $extend(haxe.io.Input.prototype,{
 	readBit: function() {
@@ -3203,18 +2320,14 @@ alphatab.io.BitInput.prototype = $extend(haxe.io.Input.prototype,{
 	,getReadBytes: function() {
 		return this._readBytes;
 	}
-	,_readBytes: null
-	,_input: null
-	,_position: null
-	,_currentByte: null
 	,__class__: alphatab.io.BitInput
 });
-alphatab.io.BytesArray = $hxClasses["alphatab.io.BytesArray"] = function(initialSize) {
+alphatab.io.BytesArray = function(initialSize) {
 	if(initialSize == null) initialSize = 4;
 	this._data = haxe.io.Bytes.alloc(initialSize);
 	this.length = 0;
 };
-alphatab.io.BytesArray.__name__ = ["alphatab","io","BytesArray"];
+alphatab.io.BytesArray.__name__ = true;
 alphatab.io.BytesArray.ofBytes = function(b) {
 	var a = new alphatab.io.BytesArray();
 	a._data = b;
@@ -3234,7 +2347,7 @@ alphatab.io.BytesArray.prototype = {
 		newData.blit(0,this._data,0,this._data.length);
 		this._data = newData;
 	}
-	,getCapacity: function() {
+	,get_capacity: function() {
 		return this._data.length;
 	}
 	,getBytes: function(offset) {
@@ -3269,21 +2382,17 @@ alphatab.io.BytesArray.prototype = {
 		if(pos >= this.length) throw haxe.io.Error.OutsideBounds;
 		return this._data.b[pos];
 	}
-	,length: null
-	,capacity: null
-	,_data: null
 	,__class__: alphatab.io.BytesArray
-	,__properties__: {get_capacity:"getCapacity"}
 }
-alphatab.io.OutputExtensions = $hxClasses["alphatab.io.OutputExtensions"] = function() { }
-alphatab.io.OutputExtensions.__name__ = ["alphatab","io","OutputExtensions"];
+alphatab.io.OutputExtensions = function() { }
+alphatab.io.OutputExtensions.__name__ = true;
 alphatab.io.OutputExtensions.writeAsString = function(output,value) {
 	var text;
 	if(js.Boot.__instanceof(value,String)) text = js.Boot.__cast(value , String); else text = Std.string(value);
 	output.writeString(text);
 }
 if(!alphatab.model) alphatab.model = {}
-alphatab.model.AccentuationType = $hxClasses["alphatab.model.AccentuationType"] = { __ename__ : ["alphatab","model","AccentuationType"], __constructs__ : ["None","Normal","Heavy"] }
+alphatab.model.AccentuationType = { __ename__ : true, __constructs__ : ["None","Normal","Heavy"] }
 alphatab.model.AccentuationType.None = ["None",0];
 alphatab.model.AccentuationType.None.toString = $estr;
 alphatab.model.AccentuationType.None.__enum__ = alphatab.model.AccentuationType;
@@ -3293,7 +2402,7 @@ alphatab.model.AccentuationType.Normal.__enum__ = alphatab.model.AccentuationTyp
 alphatab.model.AccentuationType.Heavy = ["Heavy",2];
 alphatab.model.AccentuationType.Heavy.toString = $estr;
 alphatab.model.AccentuationType.Heavy.__enum__ = alphatab.model.AccentuationType;
-alphatab.model.AccidentalType = $hxClasses["alphatab.model.AccidentalType"] = { __ename__ : ["alphatab","model","AccidentalType"], __constructs__ : ["None","Natural","Sharp","Flat"] }
+alphatab.model.AccidentalType = { __ename__ : true, __constructs__ : ["None","Natural","Sharp","Flat"] }
 alphatab.model.AccidentalType.None = ["None",0];
 alphatab.model.AccidentalType.None.toString = $estr;
 alphatab.model.AccidentalType.None.__enum__ = alphatab.model.AccidentalType;
@@ -3306,17 +2415,13 @@ alphatab.model.AccidentalType.Sharp.__enum__ = alphatab.model.AccidentalType;
 alphatab.model.AccidentalType.Flat = ["Flat",3];
 alphatab.model.AccidentalType.Flat.toString = $estr;
 alphatab.model.AccidentalType.Flat.__enum__ = alphatab.model.AccidentalType;
-alphatab.model.Automation = $hxClasses["alphatab.model.Automation"] = function() {
+alphatab.model.Automation = function() {
 };
-alphatab.model.Automation.__name__ = ["alphatab","model","Automation"];
+alphatab.model.Automation.__name__ = true;
 alphatab.model.Automation.prototype = {
-	duration: null
-	,value: null
-	,type: null
-	,isLinear: null
-	,__class__: alphatab.model.Automation
+	__class__: alphatab.model.Automation
 }
-alphatab.model.AutomationType = $hxClasses["alphatab.model.AutomationType"] = { __ename__ : ["alphatab","model","AutomationType"], __constructs__ : ["Tempo","Volume","Instrument","Balance"] }
+alphatab.model.AutomationType = { __ename__ : true, __constructs__ : ["Tempo","Volume","Instrument","Balance"] }
 alphatab.model.AutomationType.Tempo = ["Tempo",0];
 alphatab.model.AutomationType.Tempo.toString = $estr;
 alphatab.model.AutomationType.Tempo.__enum__ = alphatab.model.AutomationType;
@@ -3329,11 +2434,11 @@ alphatab.model.AutomationType.Instrument.__enum__ = alphatab.model.AutomationTyp
 alphatab.model.AutomationType.Balance = ["Balance",3];
 alphatab.model.AutomationType.Balance.toString = $estr;
 alphatab.model.AutomationType.Balance.__enum__ = alphatab.model.AutomationType;
-alphatab.model.Bar = $hxClasses["alphatab.model.Bar"] = function() {
+alphatab.model.Bar = function() {
 	this.voices = new Array();
 	this.clef = alphatab.model.Clef.G2;
 };
-alphatab.model.Bar.__name__ = ["alphatab","model","Bar"];
+alphatab.model.Bar.__name__ = true;
 alphatab.model.Bar.prototype = {
 	isEmpty: function() {
 		var _g = 0, _g1 = this.voices;
@@ -3352,15 +2457,9 @@ alphatab.model.Bar.prototype = {
 		voice.index = this.voices.length;
 		this.voices.push(voice);
 	}
-	,voices: null
-	,track: null
-	,clef: null
-	,previousBar: null
-	,nextBar: null
-	,index: null
 	,__class__: alphatab.model.Bar
 }
-alphatab.model.Beat = $hxClasses["alphatab.model.Beat"] = function() {
+alphatab.model.Beat = function() {
 	this.whammyBarPoints = new Array();
 	this.notes = new Array();
 	this.brushType = alphatab.model.BrushType.None;
@@ -3368,13 +2467,13 @@ alphatab.model.Beat = $hxClasses["alphatab.model.Beat"] = function() {
 	this.graceType = alphatab.model.GraceType.None;
 	this.pickStroke = alphatab.model.PickStrokeType.None;
 	this.duration = alphatab.model.Duration.Quarter;
-	this.tremoloSpeed = -1;
+	this.tremoloSpeed = null;
 	this.automations = new Array();
 	this.start = 0;
 	this.tupletDenominator = -1;
 	this.tupletNumerator = -1;
 };
-alphatab.model.Beat.__name__ = ["alphatab","model","Beat"];
+alphatab.model.Beat.__name__ = true;
 alphatab.model.Beat.prototype = {
 	getNoteOnString: function(string) {
 		var _g = 0, _g1 = this.notes;
@@ -3406,60 +2505,31 @@ alphatab.model.Beat.prototype = {
 		if(this.tupletDenominator > 0 && this.tupletNumerator >= 0) ticks = alphatab.audio.MidiUtils.applyTuplet(ticks,this.tupletNumerator,this.tupletDenominator);
 		return ticks;
 	}
-	,start: null
-	,tremoloSpeed: null
 	,isTremolo: function() {
-		return this.tremoloSpeed >= 0;
+		return this.tremoloSpeed != null;
 	}
-	,pickStroke: null
-	,graceType: null
 	,hasChord: function() {
 		return this.chord != null;
 	}
-	,chord: null
-	,vibrato: null
 	,hasWhammyBar: function() {
 		return this.whammyBarPoints.length > 0;
 	}
-	,whammyBarPoints: null
-	,tupletNumerator: null
-	,tupletDenominator: null
-	,brushDuration: null
-	,brushType: null
-	,text: null
-	,slap: null
-	,hasRasgueado: null
-	,pop: null
-	,lyrics: null
-	,fadeIn: null
-	,dots: null
 	,isRest: function() {
 		return this.notes.length == 0;
 	}
-	,automations: null
-	,duration: null
-	,maxNote: null
-	,minNote: null
-	,notes: null
-	,voice: null
-	,index: null
-	,nextBeat: null
-	,previousBeat: null
 	,__class__: alphatab.model.Beat
 }
-alphatab.model.BendPoint = $hxClasses["alphatab.model.BendPoint"] = function(offset,value) {
+alphatab.model.BendPoint = function(offset,value) {
 	if(value == null) value = 0;
 	if(offset == null) offset = 0;
 	this.offset = offset;
 	this.value = value;
 };
-alphatab.model.BendPoint.__name__ = ["alphatab","model","BendPoint"];
+alphatab.model.BendPoint.__name__ = true;
 alphatab.model.BendPoint.prototype = {
-	value: null
-	,offset: null
-	,__class__: alphatab.model.BendPoint
+	__class__: alphatab.model.BendPoint
 }
-alphatab.model.BrushType = $hxClasses["alphatab.model.BrushType"] = { __ename__ : ["alphatab","model","BrushType"], __constructs__ : ["None","BrushUp","BrushDown","ArpeggioUp","ArpeggioDown"] }
+alphatab.model.BrushType = { __ename__ : true, __constructs__ : ["None","BrushUp","BrushDown","ArpeggioUp","ArpeggioDown"] }
 alphatab.model.BrushType.None = ["None",0];
 alphatab.model.BrushType.None.toString = $estr;
 alphatab.model.BrushType.None.__enum__ = alphatab.model.BrushType;
@@ -3475,17 +2545,14 @@ alphatab.model.BrushType.ArpeggioUp.__enum__ = alphatab.model.BrushType;
 alphatab.model.BrushType.ArpeggioDown = ["ArpeggioDown",4];
 alphatab.model.BrushType.ArpeggioDown.toString = $estr;
 alphatab.model.BrushType.ArpeggioDown.__enum__ = alphatab.model.BrushType;
-alphatab.model.Chord = $hxClasses["alphatab.model.Chord"] = function() {
+alphatab.model.Chord = function() {
 	this.strings = new Array();
 };
-alphatab.model.Chord.__name__ = ["alphatab","model","Chord"];
+alphatab.model.Chord.__name__ = true;
 alphatab.model.Chord.prototype = {
-	strings: null
-	,firstFret: null
-	,name: null
-	,__class__: alphatab.model.Chord
+	__class__: alphatab.model.Chord
 }
-alphatab.model.Clef = $hxClasses["alphatab.model.Clef"] = { __ename__ : ["alphatab","model","Clef"], __constructs__ : ["C3","C4","F4","G2"] }
+alphatab.model.Clef = { __ename__ : true, __constructs__ : ["C3","C4","F4","G2"] }
 alphatab.model.Clef.C3 = ["C3",0];
 alphatab.model.Clef.C3.toString = $estr;
 alphatab.model.Clef.C3.__enum__ = alphatab.model.Clef;
@@ -3498,7 +2565,7 @@ alphatab.model.Clef.F4.__enum__ = alphatab.model.Clef;
 alphatab.model.Clef.G2 = ["G2",3];
 alphatab.model.Clef.G2.toString = $estr;
 alphatab.model.Clef.G2.__enum__ = alphatab.model.Clef;
-alphatab.model.Duration = $hxClasses["alphatab.model.Duration"] = { __ename__ : ["alphatab","model","Duration"], __constructs__ : ["Whole","Half","Quarter","Eighth","Sixteenth","ThirtySecond","SixtyFourth"] }
+alphatab.model.Duration = { __ename__ : true, __constructs__ : ["Whole","Half","Quarter","Eighth","Sixteenth","ThirtySecond","SixtyFourth"] }
 alphatab.model.Duration.Whole = ["Whole",0];
 alphatab.model.Duration.Whole.toString = $estr;
 alphatab.model.Duration.Whole.__enum__ = alphatab.model.Duration;
@@ -3520,7 +2587,7 @@ alphatab.model.Duration.ThirtySecond.__enum__ = alphatab.model.Duration;
 alphatab.model.Duration.SixtyFourth = ["SixtyFourth",6];
 alphatab.model.Duration.SixtyFourth.toString = $estr;
 alphatab.model.Duration.SixtyFourth.__enum__ = alphatab.model.Duration;
-alphatab.model.DynamicValue = $hxClasses["alphatab.model.DynamicValue"] = { __ename__ : ["alphatab","model","DynamicValue"], __constructs__ : ["PPP","PP","P","MP","MF","F","FF","FFF"] }
+alphatab.model.DynamicValue = { __ename__ : true, __constructs__ : ["PPP","PP","P","MP","MF","F","FF","FFF"] }
 alphatab.model.DynamicValue.PPP = ["PPP",0];
 alphatab.model.DynamicValue.PPP.toString = $estr;
 alphatab.model.DynamicValue.PPP.__enum__ = alphatab.model.DynamicValue;
@@ -3545,7 +2612,7 @@ alphatab.model.DynamicValue.FF.__enum__ = alphatab.model.DynamicValue;
 alphatab.model.DynamicValue.FFF = ["FFF",7];
 alphatab.model.DynamicValue.FFF.toString = $estr;
 alphatab.model.DynamicValue.FFF.__enum__ = alphatab.model.DynamicValue;
-alphatab.model.GraceType = $hxClasses["alphatab.model.GraceType"] = { __ename__ : ["alphatab","model","GraceType"], __constructs__ : ["None","OnBeat","BeforeBeat"] }
+alphatab.model.GraceType = { __ename__ : true, __constructs__ : ["None","OnBeat","BeforeBeat"] }
 alphatab.model.GraceType.None = ["None",0];
 alphatab.model.GraceType.None.toString = $estr;
 alphatab.model.GraceType.None.__enum__ = alphatab.model.GraceType;
@@ -3555,7 +2622,7 @@ alphatab.model.GraceType.OnBeat.__enum__ = alphatab.model.GraceType;
 alphatab.model.GraceType.BeforeBeat = ["BeforeBeat",2];
 alphatab.model.GraceType.BeforeBeat.toString = $estr;
 alphatab.model.GraceType.BeforeBeat.__enum__ = alphatab.model.GraceType;
-alphatab.model.HarmonicType = $hxClasses["alphatab.model.HarmonicType"] = { __ename__ : ["alphatab","model","HarmonicType"], __constructs__ : ["None","Natural","Artificial","Pinch","Tap","Semi","Feedback"] }
+alphatab.model.HarmonicType = { __ename__ : true, __constructs__ : ["None","Natural","Artificial","Pinch","Tap","Semi","Feedback"] }
 alphatab.model.HarmonicType.None = ["None",0];
 alphatab.model.HarmonicType.None.toString = $estr;
 alphatab.model.HarmonicType.None.__enum__ = alphatab.model.HarmonicType;
@@ -3577,7 +2644,7 @@ alphatab.model.HarmonicType.Semi.__enum__ = alphatab.model.HarmonicType;
 alphatab.model.HarmonicType.Feedback = ["Feedback",6];
 alphatab.model.HarmonicType.Feedback.toString = $estr;
 alphatab.model.HarmonicType.Feedback.__enum__ = alphatab.model.HarmonicType;
-alphatab.model.MasterBar = $hxClasses["alphatab.model.MasterBar"] = function() {
+alphatab.model.MasterBar = function() {
 	this.alternateEndings = 0;
 	this.repeatCount = 0;
 	this.index = 0;
@@ -3590,37 +2657,21 @@ alphatab.model.MasterBar = $hxClasses["alphatab.model.MasterBar"] = function() {
 	this.tripletFeel = alphatab.model.TripletFeel.NoTripletFeel;
 	this.start = 0;
 };
-alphatab.model.MasterBar.__name__ = ["alphatab","model","MasterBar"];
+alphatab.model.MasterBar.__name__ = true;
 alphatab.model.MasterBar.prototype = {
 	calculateDuration: function() {
 		return this.timeSignatureNumerator * alphatab.audio.MidiUtils.valueToTicks(this.timeSignatureDenominator);
 	}
-	,start: null
-	,score: null
-	,volumeAutomation: null
-	,tempoAutomation: null
 	,isSectionStart: function() {
 		return this.section != null;
 	}
-	,section: null
-	,tripletFeel: null
-	,timeSignatureNumerator: null
-	,timeSignatureDenominator: null
-	,repeatCount: null
 	,isRepeatEnd: function() {
 		return this.repeatCount > 0;
 	}
-	,isRepeatStart: null
-	,isDoubleBar: null
-	,keySignature: null
-	,index: null
-	,previousMasterBar: null
-	,nextMasterBar: null
-	,alternateEndings: null
 	,__class__: alphatab.model.MasterBar
 }
-alphatab.model.ModelUtils = $hxClasses["alphatab.model.ModelUtils"] = function() { }
-alphatab.model.ModelUtils.__name__ = ["alphatab","model","ModelUtils"];
+alphatab.model.ModelUtils = function() { }
+alphatab.model.ModelUtils.__name__ = true;
 alphatab.model.ModelUtils.getDurationValue = function(duration) {
 	switch( (duration)[1] ) {
 	case 0:
@@ -3637,8 +2688,6 @@ alphatab.model.ModelUtils.getDurationValue = function(duration) {
 		return 32;
 	case 6:
 		return 64;
-	default:
-		return 1;
 	}
 }
 alphatab.model.ModelUtils.getDurationIndex = function(duration) {
@@ -3666,11 +2715,9 @@ alphatab.model.ModelUtils.getClefIndex = function(clef) {
 		return 2;
 	case 3:
 		return 3;
-	default:
-		return 0;
 	}
 }
-alphatab.model.Note = $hxClasses["alphatab.model.Note"] = function() {
+alphatab.model.Note = function() {
 	this.bendPoints = new Array();
 	this.trillFret = -1;
 	this.dynamicValue = alphatab.model.DynamicValue.F;
@@ -3694,53 +2741,25 @@ alphatab.model.Note = $hxClasses["alphatab.model.Note"] = function() {
 	this.leftHandFinger = -1;
 	this.rightHandFinger = -1;
 	this.isFingering = false;
+	this.swapAccidentals = false;
 	this.trillFret = -1;
 	this.trillSpeed = 0;
 	this.durationPercent = 1;
 };
-alphatab.model.Note.__name__ = ["alphatab","model","Note"];
+alphatab.model.Note.__name__ = true;
 alphatab.model.Note.prototype = {
 	realValue: function() {
 		return this.fret + this.beat.voice.bar.track.tuning[this.beat.voice.bar.track.tuning.length - (this.string - 1) - 1];
 	}
-	,dynamicValue: null
-	,beat: null
-	,durationPercent: null
-	,trillSpeed: null
 	,isTrill: function() {
 		return this.trillFret >= 0;
 	}
-	,trillFret: null
-	,isFingering: null
-	,rightHandFinger: null
-	,leftHandFinger: null
-	,isTieDestination: null
-	,isTieOrigin: null
-	,tieOrigin: null
-	,tapping: null
-	,isStaccato: null
-	,vibrato: null
-	,slideTarget: null
-	,slideType: null
-	,isDead: null
-	,isPalmMute: null
-	,isLetRing: null
-	,harmonicType: null
-	,harmonicValue: null
-	,isHammerPullOrigin: null
-	,isHammerPullDestination: null
-	,hammerPullOrigin: null
-	,string: null
-	,isGhost: null
-	,fret: null
 	,hasBend: function() {
 		return this.bendPoints.length > 1;
 	}
-	,bendPoints: null
-	,accentuated: null
 	,__class__: alphatab.model.Note
 }
-alphatab.model.PickStrokeType = $hxClasses["alphatab.model.PickStrokeType"] = { __ename__ : ["alphatab","model","PickStrokeType"], __constructs__ : ["None","Up","Down"] }
+alphatab.model.PickStrokeType = { __ename__ : true, __constructs__ : ["None","Up","Down"] }
 alphatab.model.PickStrokeType.None = ["None",0];
 alphatab.model.PickStrokeType.None.toString = $estr;
 alphatab.model.PickStrokeType.None.__enum__ = alphatab.model.PickStrokeType;
@@ -3750,25 +2769,17 @@ alphatab.model.PickStrokeType.Up.__enum__ = alphatab.model.PickStrokeType;
 alphatab.model.PickStrokeType.Down = ["Down",2];
 alphatab.model.PickStrokeType.Down.toString = $estr;
 alphatab.model.PickStrokeType.Down.__enum__ = alphatab.model.PickStrokeType;
-alphatab.model.PlaybackInformation = $hxClasses["alphatab.model.PlaybackInformation"] = function() {
+alphatab.model.PlaybackInformation = function() {
 };
-alphatab.model.PlaybackInformation.__name__ = ["alphatab","model","PlaybackInformation"];
+alphatab.model.PlaybackInformation.__name__ = true;
 alphatab.model.PlaybackInformation.prototype = {
-	isSolo: null
-	,isMute: null
-	,secondaryChannel: null
-	,primaryChannel: null
-	,program: null
-	,port: null
-	,balance: null
-	,volume: null
-	,__class__: alphatab.model.PlaybackInformation
+	__class__: alphatab.model.PlaybackInformation
 }
-alphatab.model.Score = $hxClasses["alphatab.model.Score"] = function() {
+alphatab.model.Score = function() {
 	this.masterBars = new Array();
 	this.tracks = new Array();
 };
-alphatab.model.Score.__name__ = ["alphatab","model","Score"];
+alphatab.model.Score.__name__ = true;
 alphatab.model.Score.prototype = {
 	addTrack: function(track) {
 		track.score = this;
@@ -3785,31 +2796,15 @@ alphatab.model.Score.prototype = {
 		}
 		this.masterBars.push(bar);
 	}
-	,tracks: null
-	,masterBars: null
-	,tempoLabel: null
-	,tempo: null
-	,tab: null
-	,words: null
-	,title: null
-	,subTitle: null
-	,notices: null
-	,music: null
-	,instructions: null
-	,copyright: null
-	,artist: null
-	,album: null
 	,__class__: alphatab.model.Score
 }
-alphatab.model.Section = $hxClasses["alphatab.model.Section"] = function() {
+alphatab.model.Section = function() {
 };
-alphatab.model.Section.__name__ = ["alphatab","model","Section"];
+alphatab.model.Section.__name__ = true;
 alphatab.model.Section.prototype = {
-	text: null
-	,marker: null
-	,__class__: alphatab.model.Section
+	__class__: alphatab.model.Section
 }
-alphatab.model.SlideType = $hxClasses["alphatab.model.SlideType"] = { __ename__ : ["alphatab","model","SlideType"], __constructs__ : ["None","Shift","Legato","IntoFromBelow","IntoFromAbove","OutUp","OutDown"] }
+alphatab.model.SlideType = { __ename__ : true, __constructs__ : ["None","Shift","Legato","IntoFromBelow","IntoFromAbove","OutUp","OutDown"] }
 alphatab.model.SlideType.None = ["None",0];
 alphatab.model.SlideType.None.toString = $estr;
 alphatab.model.SlideType.None.__enum__ = alphatab.model.SlideType;
@@ -3831,7 +2826,7 @@ alphatab.model.SlideType.OutUp.__enum__ = alphatab.model.SlideType;
 alphatab.model.SlideType.OutDown = ["OutDown",6];
 alphatab.model.SlideType.OutDown.toString = $estr;
 alphatab.model.SlideType.OutDown.__enum__ = alphatab.model.SlideType;
-alphatab.model.TextBaseline = $hxClasses["alphatab.model.TextBaseline"] = { __ename__ : ["alphatab","model","TextBaseline"], __constructs__ : ["Default","Top","Middle","Bottom"] }
+alphatab.model.TextBaseline = { __ename__ : true, __constructs__ : ["Default","Top","Middle","Bottom"] }
 alphatab.model.TextBaseline.Default = ["Default",0];
 alphatab.model.TextBaseline.Default.toString = $estr;
 alphatab.model.TextBaseline.Default.__enum__ = alphatab.model.TextBaseline;
@@ -3844,12 +2839,12 @@ alphatab.model.TextBaseline.Middle.__enum__ = alphatab.model.TextBaseline;
 alphatab.model.TextBaseline.Bottom = ["Bottom",3];
 alphatab.model.TextBaseline.Bottom.toString = $estr;
 alphatab.model.TextBaseline.Bottom.__enum__ = alphatab.model.TextBaseline;
-alphatab.model.Track = $hxClasses["alphatab.model.Track"] = function() {
+alphatab.model.Track = function() {
 	this.tuning = new Array();
 	this.bars = new Array();
 	this.playbackInfo = new alphatab.model.PlaybackInformation();
 };
-alphatab.model.Track.__name__ = ["alphatab","model","Track"];
+alphatab.model.Track.__name__ = true;
 alphatab.model.Track.prototype = {
 	addBar: function(bar) {
 		bar.track = this;
@@ -3860,19 +2855,9 @@ alphatab.model.Track.prototype = {
 		}
 		this.bars.push(bar);
 	}
-	,bars: null
-	,score: null
-	,isPercussion: null
-	,playbackInfo: null
-	,tuningName: null
-	,tuning: null
-	,shortName: null
-	,name: null
-	,index: null
-	,capo: null
 	,__class__: alphatab.model.Track
 }
-alphatab.model.TripletFeel = $hxClasses["alphatab.model.TripletFeel"] = { __ename__ : ["alphatab","model","TripletFeel"], __constructs__ : ["NoTripletFeel","Triplet16th","Triplet8th","Dotted16th","Dotted8th","Scottish16th","Scottish8th"] }
+alphatab.model.TripletFeel = { __ename__ : true, __constructs__ : ["NoTripletFeel","Triplet16th","Triplet8th","Dotted16th","Dotted8th","Scottish16th","Scottish8th"] }
 alphatab.model.TripletFeel.NoTripletFeel = ["NoTripletFeel",0];
 alphatab.model.TripletFeel.NoTripletFeel.toString = $estr;
 alphatab.model.TripletFeel.NoTripletFeel.__enum__ = alphatab.model.TripletFeel;
@@ -3894,16 +2879,12 @@ alphatab.model.TripletFeel.Scottish16th.__enum__ = alphatab.model.TripletFeel;
 alphatab.model.TripletFeel.Scottish8th = ["Scottish8th",6];
 alphatab.model.TripletFeel.Scottish8th.toString = $estr;
 alphatab.model.TripletFeel.Scottish8th.__enum__ = alphatab.model.TripletFeel;
-alphatab.model.Tuning = $hxClasses["alphatab.model.Tuning"] = function(name,tuning,isStandard) {
+alphatab.model.Tuning = function(name,tuning,isStandard) {
 	this.name = name;
 	this.tuning = tuning;
 	this.isStandard = isStandard;
 };
-alphatab.model.Tuning.__name__ = ["alphatab","model","Tuning"];
-alphatab.model.Tuning._sevenStrings = null;
-alphatab.model.Tuning._sixStrings = null;
-alphatab.model.Tuning._fiveStrings = null;
-alphatab.model.Tuning._fourStrings = null;
+alphatab.model.Tuning.__name__ = true;
 alphatab.model.Tuning.isTuning = function(name) {
 	var regex = alphatab.model.Tuning.TUNING_REGEX;
 	return regex.match(name);
@@ -4010,12 +2991,9 @@ alphatab.model.Tuning.findTuning = function(strings) {
 	return null;
 }
 alphatab.model.Tuning.prototype = {
-	tuning: null
-	,name: null
-	,isStandard: null
-	,__class__: alphatab.model.Tuning
+	__class__: alphatab.model.Tuning
 }
-alphatab.model.VibratoType = $hxClasses["alphatab.model.VibratoType"] = { __ename__ : ["alphatab","model","VibratoType"], __constructs__ : ["None","Slight","Wide"] }
+alphatab.model.VibratoType = { __ename__ : true, __constructs__ : ["None","Slight","Wide"] }
 alphatab.model.VibratoType.None = ["None",0];
 alphatab.model.VibratoType.None.toString = $estr;
 alphatab.model.VibratoType.None.__enum__ = alphatab.model.VibratoType;
@@ -4025,10 +3003,10 @@ alphatab.model.VibratoType.Slight.__enum__ = alphatab.model.VibratoType;
 alphatab.model.VibratoType.Wide = ["Wide",2];
 alphatab.model.VibratoType.Wide.toString = $estr;
 alphatab.model.VibratoType.Wide.__enum__ = alphatab.model.VibratoType;
-alphatab.model.Voice = $hxClasses["alphatab.model.Voice"] = function() {
+alphatab.model.Voice = function() {
 	this.beats = new Array();
 };
-alphatab.model.Voice.__name__ = ["alphatab","model","Voice"];
+alphatab.model.Voice.__name__ = true;
 alphatab.model.Voice.prototype = {
 	isEmpty: function() {
 		return this.beats.length == 0;
@@ -4052,53 +3030,21 @@ alphatab.model.Voice.prototype = {
 		}
 		this.beats.push(beat);
 	}
-	,beats: null
-	,bar: null
-	,index: null
 	,__class__: alphatab.model.Voice
 }
 if(!alphatab.platform) alphatab.platform = {}
-alphatab.platform.ICanvas = $hxClasses["alphatab.platform.ICanvas"] = function() { }
-alphatab.platform.ICanvas.__name__ = ["alphatab","platform","ICanvas"];
+alphatab.platform.ICanvas = function() { }
+alphatab.platform.ICanvas.__name__ = true;
 alphatab.platform.ICanvas.prototype = {
-	measureText: null
-	,strokeText: null
-	,fillText: null
-	,setTextBaseline: null
-	,getTextBaseline: null
-	,setTextAlign: null
-	,getTextAlign: null
-	,setFont: null
-	,stroke: null
-	,fill: null
-	,circle: null
-	,rect: null
-	,bezierCurveTo: null
-	,quadraticCurveTo: null
-	,lineTo: null
-	,moveTo: null
-	,closePath: null
-	,beginPath: null
-	,strokeRect: null
-	,fillRect: null
-	,clear: null
-	,setLineWidth: null
-	,setColor: null
-	,setHeight: null
-	,getHeight: null
-	,setWidth: null
-	,getWidth: null
-	,__class__: alphatab.platform.ICanvas
+	__class__: alphatab.platform.ICanvas
 }
-alphatab.platform.IFileLoader = $hxClasses["alphatab.platform.IFileLoader"] = function() { }
-alphatab.platform.IFileLoader.__name__ = ["alphatab","platform","IFileLoader"];
+alphatab.platform.IFileLoader = function() { }
+alphatab.platform.IFileLoader.__name__ = true;
 alphatab.platform.IFileLoader.prototype = {
-	loadBinaryAsync: null
-	,loadBinary: null
-	,__class__: alphatab.platform.IFileLoader
+	__class__: alphatab.platform.IFileLoader
 }
-alphatab.platform.PlatformFactory = $hxClasses["alphatab.platform.PlatformFactory"] = function() { }
-alphatab.platform.PlatformFactory.__name__ = ["alphatab","platform","PlatformFactory"];
+alphatab.platform.PlatformFactory = function() { }
+alphatab.platform.PlatformFactory.__name__ = true;
 alphatab.platform.PlatformFactory.getLoader = function() {
 	return new alphatab.platform.js.JsFileLoader();
 }
@@ -4107,12 +3053,12 @@ alphatab.platform.PlatformFactory.getCanvas = function(object) {
 	return new alphatab.platform.js.Html5Canvas(object);
 }
 if(!alphatab.platform.js) alphatab.platform.js = {}
-alphatab.platform.js.Html5Canvas = $hxClasses["alphatab.platform.js.Html5Canvas"] = function(dom) {
+alphatab.platform.js.Html5Canvas = function(dom) {
 	this._canvas = dom;
 	this._context = dom.getContext("2d");
 	this._context.textBaseline = "top";
 };
-alphatab.platform.js.Html5Canvas.__name__ = ["alphatab","platform","js","Html5Canvas"];
+alphatab.platform.js.Html5Canvas.__name__ = true;
 alphatab.platform.js.Html5Canvas.__interfaces__ = [alphatab.platform.ICanvas];
 alphatab.platform.js.Html5Canvas.prototype = {
 	measureText: function(text) {
@@ -4140,7 +3086,8 @@ alphatab.platform.js.Html5Canvas.prototype = {
 		}
 	}
 	,getTextBaseline: function() {
-		switch(this._context.textBaseline) {
+		var _g = this;
+		switch(_g._context.textBaseline) {
 		case "top":
 			return alphatab.model.TextBaseline.Top;
 		case "middle":
@@ -4165,7 +3112,8 @@ alphatab.platform.js.Html5Canvas.prototype = {
 		}
 	}
 	,getTextAlign: function() {
-		switch(this._context.textAlign) {
+		var _g = this;
+		switch(_g._context.textAlign) {
 		case "left":
 			return alphatab.platform.model.TextAlign.Left;
 		case "center":
@@ -4249,15 +3197,11 @@ alphatab.platform.js.Html5Canvas.prototype = {
 	,getWidth: function() {
 		return this._canvas.offsetWidth;
 	}
-	,_height: null
-	,_width: null
-	,_context: null
-	,_canvas: null
 	,__class__: alphatab.platform.js.Html5Canvas
 }
-alphatab.platform.js.JsFileLoader = $hxClasses["alphatab.platform.js.JsFileLoader"] = function() {
+alphatab.platform.js.JsFileLoader = function() {
 };
-alphatab.platform.js.JsFileLoader.__name__ = ["alphatab","platform","js","JsFileLoader"];
+alphatab.platform.js.JsFileLoader.__name__ = true;
 alphatab.platform.js.JsFileLoader.__interfaces__ = [alphatab.platform.IFileLoader];
 alphatab.platform.js.JsFileLoader.isIE = function() {
 	var agent = navigator.userAgent;
@@ -4286,9 +3230,9 @@ alphatab.platform.js.JsFileLoader.prototype = {
 			var reader = alphatab.platform.js.JsFileLoader.getBytes(data);
 			success(reader);
 		} else {
-			var xhr = new js.XMLHttpRequest();
+			var xhr = new XMLHttpRequest();
 			xhr.overrideMimeType("text/plain; charset=x-user-defined");
-			xhr.onreadystatechange = function() {
+			xhr.onreadystatechange = function(e) {
 				try {
 					if(xhr.readyState == 4) {
 						if(xhr.status == 200) {
@@ -4296,8 +3240,8 @@ alphatab.platform.js.JsFileLoader.prototype = {
 							success(reader);
 						} else if(xhr.status == 0) error("You are offline!!\n Please Check Your Network."); else if(xhr.status == 404) error("Requested URL not found."); else if(xhr.status == 500) error("Internel Server Error."); else if(xhr.statusText == "parsererror") error("Error.\nParsing JSON Request failed."); else if(xhr.statusText == "timeout") error("Request Time out."); else error("Unknow Error: " + xhr.responseText);
 					}
-				} catch( e ) {
-					error("Error loading file: " + Std.string(e));
+				} catch( e1 ) {
+					error("Error loading file: " + Std.string(e1));
 				}
 			};
 			xhr.open("GET",path,true);
@@ -4317,7 +3261,7 @@ alphatab.platform.js.JsFileLoader.prototype = {
 			var reader = alphatab.platform.js.JsFileLoader.getBytes(data);
 			return reader;
 		} else {
-			var xhr = new js.XMLHttpRequest();
+			var xhr = new XMLHttpRequest();
 			xhr.overrideMimeType("text/plain; charset=x-user-defined");
 			xhr.open("GET",path,false);
 			xhr.send(null);
@@ -4330,12 +3274,12 @@ alphatab.platform.js.JsFileLoader.prototype = {
 	,__class__: alphatab.platform.js.JsFileLoader
 }
 if(!alphatab.platform.model) alphatab.platform.model = {}
-alphatab.platform.model.Color = $hxClasses["alphatab.platform.model.Color"] = function(r,g,b,a) {
+alphatab.platform.model.Color = function(r,g,b,a) {
 	if(a == null) a = 255;
 	this._higherBits = (a & 255) << 8 | r & 255;
 	this._lowerBits = (g & 255) << 8 | b & 255;
 };
-alphatab.platform.model.Color.__name__ = ["alphatab","platform","model","Color"];
+alphatab.platform.model.Color.__name__ = true;
 alphatab.platform.model.Color.prototype = {
 	toRgbaString: function() {
 		return "rgba(" + this.getR() + "," + this.getG() + "," + this.getB() + "," + this.getA() / 255.0 + ")";
@@ -4355,27 +3299,25 @@ alphatab.platform.model.Color.prototype = {
 	,getA: function() {
 		return this._higherBits >> 8 & 255;
 	}
-	,_higherBits: null
-	,_lowerBits: null
 	,__class__: alphatab.platform.model.Color
 }
-alphatab.platform.model.Font = $hxClasses["alphatab.platform.model.Font"] = function(family,size,style) {
+alphatab.platform.model.Font = function(family,size,style) {
 	if(style == null) style = 0;
 	this._family = family;
 	this._size = size;
 	this._style = style;
 };
-alphatab.platform.model.Font.__name__ = ["alphatab","platform","model","Font"];
+alphatab.platform.model.Font.__name__ = true;
 alphatab.platform.model.Font.prototype = {
 	toCssString: function() {
 		var buf = new StringBuf();
-		if((this.getStyle() & 1) != 0) buf.b += Std.string("bold ");
-		if((this.getStyle() & 2) != 0) buf.b += Std.string("italic ");
+		if((this.getStyle() & 1) != 0) buf.b += "bold ";
+		if((this.getStyle() & 2) != 0) buf.b += "italic ";
 		buf.b += Std.string(this._size);
-		buf.b += Std.string("px");
-		buf.b += Std.string("'");
+		buf.b += "px";
+		buf.b += "'";
 		buf.b += Std.string(this._family);
-		buf.b += Std.string("'");
+		buf.b += "'";
 		return buf.b;
 	}
 	,isItalic: function() {
@@ -4393,12 +3335,9 @@ alphatab.platform.model.Font.prototype = {
 	,getFamily: function() {
 		return this._family;
 	}
-	,_style: null
-	,_size: null
-	,_family: null
 	,__class__: alphatab.platform.model.Font
 }
-alphatab.platform.model.TextAlign = $hxClasses["alphatab.platform.model.TextAlign"] = { __ename__ : ["alphatab","platform","model","TextAlign"], __constructs__ : ["Left","Center","Right"] }
+alphatab.platform.model.TextAlign = { __ename__ : true, __constructs__ : ["Left","Center","Right"] }
 alphatab.platform.model.TextAlign.Left = ["Left",0];
 alphatab.platform.model.TextAlign.Left.toString = $estr;
 alphatab.platform.model.TextAlign.Left.__enum__ = alphatab.platform.model.TextAlign;
@@ -4409,8 +3348,8 @@ alphatab.platform.model.TextAlign.Right = ["Right",2];
 alphatab.platform.model.TextAlign.Right.toString = $estr;
 alphatab.platform.model.TextAlign.Right.__enum__ = alphatab.platform.model.TextAlign;
 if(!alphatab.platform.svg) alphatab.platform.svg = {}
-alphatab.platform.svg.FontSizes = $hxClasses["alphatab.platform.svg.FontSizes"] = function() { }
-alphatab.platform.svg.FontSizes.__name__ = ["alphatab","platform","svg","FontSizes"];
+alphatab.platform.svg.FontSizes = function() { }
+alphatab.platform.svg.FontSizes.__name__ = true;
 alphatab.platform.svg.FontSizes.measureString = function(s,f,size) {
 	var data;
 	var dataSize;
@@ -4436,14 +3375,14 @@ alphatab.platform.svg.FontSizes.measureString = function(s,f,size) {
 	}
 	return stringSize;
 }
-alphatab.platform.svg.SupportedFonts = $hxClasses["alphatab.platform.svg.SupportedFonts"] = { __ename__ : ["alphatab","platform","svg","SupportedFonts"], __constructs__ : ["TimesNewRoman","Arial"] }
+alphatab.platform.svg.SupportedFonts = { __ename__ : true, __constructs__ : ["TimesNewRoman","Arial"] }
 alphatab.platform.svg.SupportedFonts.TimesNewRoman = ["TimesNewRoman",0];
 alphatab.platform.svg.SupportedFonts.TimesNewRoman.toString = $estr;
 alphatab.platform.svg.SupportedFonts.TimesNewRoman.__enum__ = alphatab.platform.svg.SupportedFonts;
 alphatab.platform.svg.SupportedFonts.Arial = ["Arial",1];
 alphatab.platform.svg.SupportedFonts.Arial.toString = $estr;
 alphatab.platform.svg.SupportedFonts.Arial.__enum__ = alphatab.platform.svg.SupportedFonts;
-alphatab.platform.svg.SvgCanvas = $hxClasses["alphatab.platform.svg.SvgCanvas"] = function() {
+alphatab.platform.svg.SvgCanvas = function() {
 	this._buffer = new StringBuf();
 	this._currentPath = new StringBuf();
 	this._currentPathIsEmpty = true;
@@ -4454,7 +3393,7 @@ alphatab.platform.svg.SvgCanvas = $hxClasses["alphatab.platform.svg.SvgCanvas"] 
 	this._font = new alphatab.platform.model.Font("sans-serif",10);
 	this._textAlign = alphatab.platform.model.TextAlign.Left;
 };
-alphatab.platform.svg.SvgCanvas.__name__ = ["alphatab","platform","svg","SvgCanvas"];
+alphatab.platform.svg.SvgCanvas.__name__ = true;
 alphatab.platform.svg.SvgCanvas.__interfaces__ = [alphatab.platform.ICanvas];
 alphatab.platform.svg.SvgCanvas.prototype = {
 	measureText: function(text) {
@@ -4463,7 +3402,8 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 		return alphatab.platform.svg.FontSizes.measureString(text,font,this._font.getSize());
 	}
 	,getSvgBaseLine: function() {
-		switch( (this._textBaseline)[1] ) {
+		var _g = this;
+		switch( (_g._textBaseline)[1] ) {
 		case 1:
 			return "top";
 		case 2:
@@ -4475,86 +3415,53 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 		}
 	}
 	,getSvgTextAlignment: function() {
-		switch( (this._textAlign)[1] ) {
+		var _g = this;
+		switch( (_g._textAlign)[1] ) {
 		case 0:
 			return "start";
 		case 1:
 			return "middle";
 		case 2:
 			return "end";
-		default:
-			return "start";
 		}
 	}
 	,strokeText: function(text,x,y) {
-		this._buffer.b += Std.string("<text x=\"");
+		this._buffer.b += "<text x=\"";
 		this._buffer.b += Std.string(x);
-		this._buffer.b += Std.string("\" y=\"");
+		this._buffer.b += "\" y=\"";
 		this._buffer.b += Std.string(y);
-		this._buffer.b += Std.string("\" style=\"font:");
+		this._buffer.b += "\" style=\"font:";
 		this._buffer.b += Std.string(this._font.toCssString());
-		this._buffer.b += Std.string("\" stroke:");
+		this._buffer.b += "\" stroke:";
 		this._buffer.b += Std.string(this._color.toRgbaString());
-		this._buffer.b += Std.string("; stroke-width:");
+		this._buffer.b += "; stroke-width:";
 		this._buffer.b += Std.string(this._lineWidth);
-		this._buffer.b += Std.string(";\" ");
-		this._buffer.b += Std.string(" dominant-baseline=\"");
-		this._buffer.b += Std.string((function($this) {
-			var $r;
-			switch( ($this._textBaseline)[1] ) {
-			case 1:
-				$r = "top";
-				break;
-			case 2:
-				$r = "middle";
-				break;
-			case 3:
-				$r = "bottom";
-				break;
-			default:
-				$r = "alphabetic";
-			}
-			return $r;
-		}(this)));
-		this._buffer.b += Std.string("\" text-anchor=\"");
+		this._buffer.b += ";\" ";
+		this._buffer.b += " dominant-baseline=\"";
+		this._buffer.b += Std.string(this.getSvgBaseLine());
+		this._buffer.b += "\" text-anchor=\"";
 		this._buffer.b += Std.string(this.getSvgTextAlignment());
-		this._buffer.b += Std.string("\">\n");
+		this._buffer.b += "\">\n";
 		this._buffer.b += Std.string(text);
-		this._buffer.b += Std.string("</text>\n");
+		this._buffer.b += "</text>\n";
 	}
 	,fillText: function(text,x,y) {
-		this._buffer.b += Std.string("<text x=\"");
+		this._buffer.b += "<text x=\"";
 		this._buffer.b += Std.string(x);
-		this._buffer.b += Std.string("\" y=\"");
+		this._buffer.b += "\" y=\"";
 		this._buffer.b += Std.string(y);
-		this._buffer.b += Std.string("\" style=\"font:");
+		this._buffer.b += "\" style=\"font:";
 		this._buffer.b += Std.string(this._font.toCssString());
-		this._buffer.b += Std.string("; fill:");
+		this._buffer.b += "; fill:";
 		this._buffer.b += Std.string(this._color.toRgbaString());
-		this._buffer.b += Std.string(";\" ");
-		this._buffer.b += Std.string(" dominant-baseline=\"");
-		this._buffer.b += Std.string((function($this) {
-			var $r;
-			switch( ($this._textBaseline)[1] ) {
-			case 1:
-				$r = "top";
-				break;
-			case 2:
-				$r = "middle";
-				break;
-			case 3:
-				$r = "bottom";
-				break;
-			default:
-				$r = "alphabetic";
-			}
-			return $r;
-		}(this)));
-		this._buffer.b += Std.string("\" text-anchor=\"");
+		this._buffer.b += ";\" ";
+		this._buffer.b += " dominant-baseline=\"";
+		this._buffer.b += Std.string(this.getSvgBaseLine());
+		this._buffer.b += "\" text-anchor=\"";
 		this._buffer.b += Std.string(this.getSvgTextAlignment());
-		this._buffer.b += Std.string("\">\n");
+		this._buffer.b += "\">\n";
 		this._buffer.b += Std.string(text);
-		this._buffer.b += Std.string("</text>\n");
+		this._buffer.b += "</text>\n";
 	}
 	,setTextBaseline: function(textBaseline) {
 		this._textBaseline = textBaseline;
@@ -4562,28 +3469,25 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 	,getTextBaseline: function() {
 		return this._textBaseline;
 	}
-	,_textBaseline: null
 	,setTextAlign: function(textAlign) {
 		this._textAlign = textAlign;
 	}
 	,getTextAlign: function() {
 		return this._textAlign;
 	}
-	,_textAlign: null
 	,setFont: function(font) {
 		this._font = font;
 	}
-	,_font: null
 	,stroke: function() {
 		var path = this._currentPath.b;
 		if(!this._currentPathIsEmpty) {
-			this._buffer.b += Std.string("<path d=\"");
+			this._buffer.b += "<path d=\"";
 			this._buffer.b += Std.string(this._currentPath.b);
-			this._buffer.b += Std.string("\" style=\"stroke:");
+			this._buffer.b += "\" style=\"stroke:";
 			this._buffer.b += Std.string(this._color.toRgbaString());
-			this._buffer.b += Std.string("; stroke-width:");
+			this._buffer.b += "; stroke-width:";
 			this._buffer.b += Std.string(this._lineWidth);
-			this._buffer.b += Std.string(";\" fill=\"none\" />\n");
+			this._buffer.b += ";\" fill=\"none\" />\n";
 		}
 		this._currentPath = new StringBuf();
 		this._currentPathIsEmpty = true;
@@ -4591,122 +3495,122 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 	,fill: function() {
 		var path = this._currentPath.b;
 		if(!this._currentPathIsEmpty) {
-			this._buffer.b += Std.string("<path d=\"");
+			this._buffer.b += "<path d=\"";
 			this._buffer.b += Std.string(this._currentPath.b);
-			this._buffer.b += Std.string("\" style=\"fill:");
+			this._buffer.b += "\" style=\"fill:";
 			this._buffer.b += Std.string(this._color.toRgbaString());
-			this._buffer.b += Std.string("\" stroke=\"none\"/>\n");
+			this._buffer.b += "\" stroke=\"none\"/>\n";
 		}
 		this._currentPath = new StringBuf();
 		this._currentPathIsEmpty = true;
 	}
 	,rect: function(x,y,w,h) {
 		this._currentPathIsEmpty = false;
-		this._currentPath.b += Std.string(" M");
+		this._currentPath.b += " M";
 		this._currentPath.b += Std.string(x);
-		this._currentPath.b += Std.string(",");
+		this._currentPath.b += ",";
 		this._currentPath.b += Std.string(y);
-		this._currentPath.b += Std.string(" L");
+		this._currentPath.b += " L";
 		this._currentPath.b += Std.string(x + w);
-		this._currentPath.b += Std.string(",");
+		this._currentPath.b += ",";
 		this._currentPath.b += Std.string(y);
-		this._currentPath.b += Std.string(" ");
+		this._currentPath.b += " ";
 		this._currentPath.b += Std.string(x + w);
-		this._currentPath.b += Std.string(",");
+		this._currentPath.b += ",";
 		this._currentPath.b += Std.string(y + h);
-		this._currentPath.b += Std.string(" ");
+		this._currentPath.b += " ";
 		this._currentPath.b += Std.string(x);
-		this._currentPath.b += Std.string(",");
+		this._currentPath.b += ",";
 		this._currentPath.b += Std.string(y + h);
-		this._currentPath.b += Std.string(" z");
+		this._currentPath.b += " z";
 	}
 	,circle: function(x,y,radius) {
 		this._currentPathIsEmpty = false;
-		this._currentPath.b += Std.string(" M");
+		this._currentPath.b += " M";
 		this._currentPath.b += Std.string(x - radius);
-		this._currentPath.b += Std.string(",");
+		this._currentPath.b += ",";
 		this._currentPath.b += Std.string(y);
-		this._currentPath.b += Std.string(" A1,1 0 0,0 ");
+		this._currentPath.b += " A1,1 0 0,0 ";
 		this._currentPath.b += Std.string(x + radius);
-		this._currentPath.b += Std.string(",");
+		this._currentPath.b += ",";
 		this._currentPath.b += Std.string(y);
-		this._currentPath.b += Std.string(" A1,1 0 0,0 ");
+		this._currentPath.b += " A1,1 0 0,0 ";
 		this._currentPath.b += Std.string(x - radius);
-		this._currentPath.b += Std.string(",");
+		this._currentPath.b += ",";
 		this._currentPath.b += Std.string(y);
-		this._currentPath.b += Std.string(" z");
+		this._currentPath.b += " z";
 	}
 	,bezierCurveTo: function(cp1x,cp1y,cp2x,cp2y,x,y) {
 		this._currentPathIsEmpty = false;
-		this._currentPath.b += Std.string(" C");
+		this._currentPath.b += " C";
 		this._currentPath.b += Std.string(cp1x);
-		this._currentPath.b += Std.string(",");
+		this._currentPath.b += ",";
 		this._currentPath.b += Std.string(cp1y);
-		this._currentPath.b += Std.string(",");
+		this._currentPath.b += ",";
 		this._currentPath.b += Std.string(cp2x);
-		this._currentPath.b += Std.string(",");
+		this._currentPath.b += ",";
 		this._currentPath.b += Std.string(cp2y);
-		this._currentPath.b += Std.string(",");
+		this._currentPath.b += ",";
 		this._currentPath.b += Std.string(x);
-		this._currentPath.b += Std.string(",");
+		this._currentPath.b += ",";
 		this._currentPath.b += Std.string(y);
 	}
 	,quadraticCurveTo: function(cpx,cpy,x,y) {
 		this._currentPathIsEmpty = false;
-		this._currentPath.b += Std.string(" Q");
+		this._currentPath.b += " Q";
 		this._currentPath.b += Std.string(cpx);
-		this._currentPath.b += Std.string(",");
+		this._currentPath.b += ",";
 		this._currentPath.b += Std.string(cpy);
-		this._currentPath.b += Std.string(",");
+		this._currentPath.b += ",";
 		this._currentPath.b += Std.string(x);
-		this._currentPath.b += Std.string(",");
+		this._currentPath.b += ",";
 		this._currentPath.b += Std.string(y);
 	}
 	,lineTo: function(x,y) {
 		this._currentPathIsEmpty = false;
-		this._currentPath.b += Std.string(" L");
+		this._currentPath.b += " L";
 		this._currentPath.b += Std.string(x);
-		this._currentPath.b += Std.string(",");
+		this._currentPath.b += ",";
 		this._currentPath.b += Std.string(y);
 	}
 	,moveTo: function(x,y) {
-		this._currentPath.b += Std.string(" M");
+		this._currentPath.b += " M";
 		this._currentPath.b += Std.string(x);
-		this._currentPath.b += Std.string(",");
+		this._currentPath.b += ",";
 		this._currentPath.b += Std.string(y);
 	}
 	,closePath: function() {
-		this._currentPath.b += Std.string(" z");
+		this._currentPath.b += " z";
 	}
 	,beginPath: function() {
 	}
 	,strokeRect: function(x,y,w,h) {
-		this._buffer.b += Std.string("<rect x=\"");
+		this._buffer.b += "<rect x=\"";
 		this._buffer.b += Std.string(x);
-		this._buffer.b += Std.string("\" y=\"");
+		this._buffer.b += "\" y=\"";
 		this._buffer.b += Std.string(y);
-		this._buffer.b += Std.string("\" width=\"");
+		this._buffer.b += "\" width=\"";
 		this._buffer.b += Std.string(w);
-		this._buffer.b += Std.string("\" height=\"");
+		this._buffer.b += "\" height=\"";
 		this._buffer.b += Std.string(h);
-		this._buffer.b += Std.string("\" style=\"stroke:");
+		this._buffer.b += "\" style=\"stroke:";
 		this._buffer.b += Std.string(this._color.toRgbaString());
-		this._buffer.b += Std.string("; stroke-width:");
+		this._buffer.b += "; stroke-width:";
 		this._buffer.b += Std.string(this._lineWidth);
-		this._buffer.b += Std.string(";\" />\n");
+		this._buffer.b += ";\" />\n";
 	}
 	,fillRect: function(x,y,w,h) {
-		this._buffer.b += Std.string("<rect x=\"");
+		this._buffer.b += "<rect x=\"";
 		this._buffer.b += Std.string(x);
-		this._buffer.b += Std.string("\" y=\"");
+		this._buffer.b += "\" y=\"";
 		this._buffer.b += Std.string(y);
-		this._buffer.b += Std.string("\" width=\"");
+		this._buffer.b += "\" width=\"";
 		this._buffer.b += Std.string(w);
-		this._buffer.b += Std.string("\" height=\"");
+		this._buffer.b += "\" height=\"";
 		this._buffer.b += Std.string(h);
-		this._buffer.b += Std.string("\" style=\"fill:");
+		this._buffer.b += "\" style=\"fill:";
 		this._buffer.b += Std.string(this._color.toRgbaString());
-		this._buffer.b += Std.string(";\" />\n");
+		this._buffer.b += ";\" />\n";
 	}
 	,clear: function() {
 		this._buffer = new StringBuf();
@@ -4716,11 +3620,9 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 	,setLineWidth: function(value) {
 		this._lineWidth = value;
 	}
-	,_lineWidth: null
 	,setColor: function(color) {
 		this._color = color;
 	}
-	,_color: null
 	,setHeight: function(height) {
 		this._height = height;
 	}
@@ -4756,23 +3658,20 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 		stream.writeString(this._buffer.b);
 		if(includeWrapper) stream.writeString("</svg>");
 	}
-	,_height: null
-	,_width: null
-	,_currentPathIsEmpty: null
-	,_currentPath: null
-	,_buffer: null
 	,__class__: alphatab.platform.svg.SvgCanvas
 }
 if(!alphatab.rendering) alphatab.rendering = {}
-alphatab.rendering.BarRendererBase = $hxClasses["alphatab.rendering.BarRendererBase"] = function(bar) {
+alphatab.rendering.BarRendererBase = function(bar) {
 	this._bar = bar;
 	this.x = 0;
 	this.y = 0;
 	this.width = 0;
 	this.height = 0;
 	this.index = 0;
+	this.topOverflow = 0;
+	this.bottomOverflow = 0;
 };
-alphatab.rendering.BarRendererBase.__name__ = ["alphatab","rendering","BarRendererBase"];
+alphatab.rendering.BarRendererBase.__name__ = true;
 alphatab.rendering.BarRendererBase.prototype = {
 	paint: function(cx,cy,canvas) {
 	}
@@ -4816,62 +3715,26 @@ alphatab.rendering.BarRendererBase.prototype = {
 	,registerOverflowTop: function(topOverflow) {
 		if(topOverflow > this.topOverflow) this.topOverflow = topOverflow;
 	}
-	,_bar: null
-	,bottomOverflow: null
-	,topOverflow: null
-	,index: null
-	,height: null
-	,width: null
-	,y: null
-	,x: null
-	,stave: null
 	,__class__: alphatab.rendering.BarRendererBase
 }
-alphatab.rendering.BarRendererFactory = $hxClasses["alphatab.rendering.BarRendererFactory"] = function() {
+alphatab.rendering.BarRendererFactory = function() {
+	this.isInAccolade = true;
 };
-alphatab.rendering.BarRendererFactory.__name__ = ["alphatab","rendering","BarRendererFactory"];
+alphatab.rendering.BarRendererFactory.__name__ = true;
 alphatab.rendering.BarRendererFactory.prototype = {
 	create: function(bar) {
 		return null;
 	}
 	,__class__: alphatab.rendering.BarRendererFactory
 }
-alphatab.rendering.Glyph = $hxClasses["alphatab.rendering.Glyph"] = function(x,y) {
-	if(y == null) y = 0;
-	if(x == null) x = 0;
-	this.x = x;
-	this.y = y;
-};
-alphatab.rendering.Glyph.__name__ = ["alphatab","rendering","Glyph"];
-alphatab.rendering.Glyph.prototype = {
-	paint: function(cx,cy,canvas) {
-	}
-	,doLayout: function() {
-	}
-	,canScale: function() {
-		return true;
-	}
-	,getScale: function() {
-		return this.renderer.stave.staveGroup.layout.renderer.scale;
-	}
-	,applyGlyphSpacing: function(spacing) {
-		if(this.canScale()) this.width += spacing;
-	}
-	,renderer: null
-	,width: null
-	,y: null
-	,x: null
-	,index: null
-	,__class__: alphatab.rendering.Glyph
-}
-alphatab.rendering.GroupedBarRenderer = $hxClasses["alphatab.rendering.GroupedBarRenderer"] = function(bar) {
+alphatab.rendering.GroupedBarRenderer = function(bar) {
 	alphatab.rendering.BarRendererBase.call(this,bar);
 	this._preBeatGlyphs = new Array();
 	this._beatGlyphs = new Array();
 	this._beatScaleGlyphs = new Array();
 	this._postBeatGlyphs = new Array();
 };
-alphatab.rendering.GroupedBarRenderer.__name__ = ["alphatab","rendering","GroupedBarRenderer"];
+alphatab.rendering.GroupedBarRenderer.__name__ = true;
 alphatab.rendering.GroupedBarRenderer.__super__ = alphatab.rendering.BarRendererBase;
 alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.BarRendererBase.prototype,{
 	paintBackground: function(cx,cy,canvas) {
@@ -5009,16 +3872,93 @@ alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.Bar
 		this.createPostBeatGlyphs();
 		this.updateWidth();
 	}
-	,_postBeatGlyphs: null
-	,_beatScaleGlyphs: null
-	,_beatGlyphs: null
-	,_preBeatGlyphs: null
 	,__class__: alphatab.rendering.GroupedBarRenderer
 });
-alphatab.rendering.RenderingResources = $hxClasses["alphatab.rendering.RenderingResources"] = function(scale) {
+alphatab.rendering.EffectBarRenderer = function(bar) {
+	alphatab.rendering.GroupedBarRenderer.call(this,bar);
+	this._beatPosition = new haxe.ds.IntMap();
+};
+alphatab.rendering.EffectBarRenderer.__name__ = true;
+alphatab.rendering.EffectBarRenderer.__super__ = alphatab.rendering.GroupedBarRenderer;
+alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.GroupedBarRenderer.prototype,{
+	paintBackground: function(cx,cy,canvas) {
+		var res = this.stave.staveGroup.layout.renderer.renderingResources;
+		canvas.setColor(new alphatab.platform.model.Color(0,0,0,120));
+		canvas.fillRect(cx + this.x,cy + this.y,this.width,this.height);
+	}
+	,getBottomPadding: function() {
+		return 0;
+	}
+	,getTopPadding: function() {
+		return 0;
+	}
+	,createPostBeatGlyphs: function() {
+	}
+	,createVoiceGlyphs: function(v) {
+		var _g = 0, _g1 = v.beats;
+		while(_g < _g1.length) {
+			var b = _g1[_g];
+			++_g;
+			var pre = new alphatab.rendering.glyphs.BeatGlyphBase(b);
+			this.addBeatGlyph(pre);
+			var g = new alphatab.rendering.glyphs.BeatGlyphBase(b);
+			this._beatPosition.set(b.index,g);
+			this.addBeatGlyph(g);
+			var post = new alphatab.rendering.glyphs.BeatGlyphBase(b);
+			this.addBeatGlyph(post);
+		}
+	}
+	,createBeatGlyphs: function() {
+		this.createVoiceGlyphs(this._bar.voices[0]);
+	}
+	,createPreBeatGlyphs: function() {
+	}
+	,doLayout: function() {
+		alphatab.rendering.GroupedBarRenderer.prototype.doLayout.call(this);
+		this.height = 30 * this.stave.staveGroup.layout.renderer.scale | 0;
+		if(this.index == 0) this.stave.registerStaveBottom(this.height);
+	}
+	,__class__: alphatab.rendering.EffectBarRenderer
+});
+alphatab.rendering.EffectBarRendererFactory = function() {
+	alphatab.rendering.BarRendererFactory.call(this);
+	this.isInAccolade = false;
+};
+alphatab.rendering.EffectBarRendererFactory.__name__ = true;
+alphatab.rendering.EffectBarRendererFactory.__super__ = alphatab.rendering.BarRendererFactory;
+alphatab.rendering.EffectBarRendererFactory.prototype = $extend(alphatab.rendering.BarRendererFactory.prototype,{
+	create: function(bar) {
+		return new alphatab.rendering.EffectBarRenderer(bar);
+	}
+	,__class__: alphatab.rendering.EffectBarRendererFactory
+});
+alphatab.rendering.Glyph = function(x,y) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	this.x = x;
+	this.y = y;
+};
+alphatab.rendering.Glyph.__name__ = true;
+alphatab.rendering.Glyph.prototype = {
+	paint: function(cx,cy,canvas) {
+	}
+	,doLayout: function() {
+	}
+	,canScale: function() {
+		return true;
+	}
+	,getScale: function() {
+		return this.renderer.stave.staveGroup.layout.renderer.scale;
+	}
+	,applyGlyphSpacing: function(spacing) {
+		if(this.canScale()) this.width += spacing;
+	}
+	,__class__: alphatab.rendering.Glyph
+}
+alphatab.rendering.RenderingResources = function(scale) {
 	this.init(scale);
 };
-alphatab.rendering.RenderingResources.__name__ = ["alphatab","rendering","RenderingResources"];
+alphatab.rendering.RenderingResources.__name__ = true;
 alphatab.rendering.RenderingResources.prototype = {
 	init: function(scale) {
 		var sansFont = "Arial";
@@ -5036,27 +3976,15 @@ alphatab.rendering.RenderingResources.prototype = {
 		this.barNumberColor = new alphatab.platform.model.Color(200,0,0);
 		this.mainGlyphColor = new alphatab.platform.model.Color(0,0,0);
 	}
-	,mainGlyphColor: null
-	,barNumberColor: null
-	,barNumberFont: null
-	,barSeperatorColor: null
-	,staveLineColor: null
-	,graceFont: null
-	,tablatureFont: null
-	,effectFont: null
-	,wordsFont: null
-	,subTitleFont: null
-	,titleFont: null
-	,copyrightFont: null
 	,__class__: alphatab.rendering.RenderingResources
 }
-alphatab.rendering.ScoreBarRenderer = $hxClasses["alphatab.rendering.ScoreBarRenderer"] = function(bar) {
+alphatab.rendering.ScoreBarRenderer = function(bar) {
 	alphatab.rendering.GroupedBarRenderer.call(this,bar);
 	this.accidentalHelper = new alphatab.rendering.utils.AccidentalHelper();
 	this._beamHelpers = new Array();
-	this._beatPosition = new IntHash();
+	this._beatPosition = new haxe.ds.IntMap();
 };
-alphatab.rendering.ScoreBarRenderer.__name__ = ["alphatab","rendering","ScoreBarRenderer"];
+alphatab.rendering.ScoreBarRenderer.__name__ = true;
 alphatab.rendering.ScoreBarRenderer.paintSingleBar = function(canvas,x1,y1,x2,y2,size) {
 	canvas.beginPath();
 	canvas.moveTo(x1,y1);
@@ -5136,7 +4064,8 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 		var offsetClef = 0;
 		var currentKey = this._bar.getMasterBar().keySignature;
 		var previousKey = this._bar.previousBar == null?0:this._bar.previousBar.getMasterBar().keySignature;
-		switch( (this._bar.clef)[1] ) {
+		var _g = this;
+		switch( (_g._bar.clef)[1] ) {
 		case 3:
 			offsetClef = 0;
 			break;
@@ -5152,22 +4081,22 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 		}
 		var naturalizeSymbols = Math.abs(previousKey) | 0;
 		var previousKeyPositions = previousKey > 0?alphatab.rendering.ScoreBarRenderer.SHARP_KS_STEPS:alphatab.rendering.ScoreBarRenderer.FLAT_KS_STEPS;
-		var _g = 0;
-		while(_g < naturalizeSymbols) {
-			var i = _g++;
+		var _g1 = 0;
+		while(_g1 < naturalizeSymbols) {
+			var i = _g1++;
 			this.addPreBeatGlyph(new alphatab.rendering.glyphs.NaturalizeGlyph(0,this.getScoreY(previousKeyPositions[i] + offsetClef) | 0));
 		}
 		var offsetSymbols = currentKey <= 7?currentKey:currentKey - 7;
 		if(currentKey > 0) {
-			var _g1 = 0, _g = Math.abs(currentKey) | 0;
-			while(_g1 < _g) {
-				var i = _g1++;
+			var _g2 = 0, _g1 = Math.abs(currentKey) | 0;
+			while(_g2 < _g1) {
+				var i = _g2++;
 				this.addPreBeatGlyph(new alphatab.rendering.glyphs.SharpGlyph(0,this.getScoreY(alphatab.rendering.ScoreBarRenderer.SHARP_KS_STEPS[i] + offsetClef) | 0));
 			}
 		} else {
-			var _g1 = 0, _g = Math.abs(currentKey) | 0;
-			while(_g1 < _g) {
-				var i = _g1++;
+			var _g2 = 0, _g1 = Math.abs(currentKey) | 0;
+			while(_g2 < _g1) {
+				var i = _g2++;
 				this.addPreBeatGlyph(new alphatab.rendering.glyphs.FlatGlyph(0,this.getScoreY(alphatab.rendering.ScoreBarRenderer.FLAT_KS_STEPS[i] + offsetClef) | 0));
 			}
 		}
@@ -5177,7 +4106,6 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 		this.addPreBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,2 * this.stave.staveGroup.layout.renderer.scale | 0));
 		this._startSpacing = true;
 	}
-	,_startSpacing: null
 	,createPostBeatGlyphs: function() {
 		if(this._bar.getMasterBar().repeatCount > 0) {
 			this.addPostBeatGlyph(new alphatab.rendering.glyphs.RepeatCloseGlyph(this.x,0));
@@ -5198,7 +4126,8 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 		if(this._bar.getMasterBar().isRepeatStart) this.addPreBeatGlyph(new alphatab.rendering.glyphs.RepeatOpenGlyph(0,0,1.5,3));
 		if(this.index == 0 || this._bar.clef != this._bar.previousBar.clef) {
 			var offset = 0;
-			switch( (this._bar.clef)[1] ) {
+			var _g = this;
+			switch( (_g._bar.clef)[1] ) {
 			case 2:
 				offset = 4;
 				break;
@@ -5211,8 +4140,6 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 			case 3:
 				offset = 6;
 				break;
-			default:
-				offset = 0;
 			}
 			this.createStartSpacing();
 			this.addPreBeatGlyph(new alphatab.rendering.glyphs.ClefGlyph(0,this.getScoreY(offset),this._bar.clef));
@@ -5425,16 +4352,12 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 		}
 		return alphatab.rendering.utils.BeamDirection.Up;
 	}
-	,_beatPosition: null
-	,_currentBeamHelper: null
-	,_beamHelpers: null
-	,accidentalHelper: null
 	,__class__: alphatab.rendering.ScoreBarRenderer
 });
-alphatab.rendering.ScoreBarRendererFactory = $hxClasses["alphatab.rendering.ScoreBarRendererFactory"] = function() {
+alphatab.rendering.ScoreBarRendererFactory = function() {
 	alphatab.rendering.BarRendererFactory.call(this);
 };
-alphatab.rendering.ScoreBarRendererFactory.__name__ = ["alphatab","rendering","ScoreBarRendererFactory"];
+alphatab.rendering.ScoreBarRendererFactory.__name__ = true;
 alphatab.rendering.ScoreBarRendererFactory.__super__ = alphatab.rendering.BarRendererFactory;
 alphatab.rendering.ScoreBarRendererFactory.prototype = $extend(alphatab.rendering.BarRendererFactory.prototype,{
 	create: function(bar) {
@@ -5442,13 +4365,13 @@ alphatab.rendering.ScoreBarRendererFactory.prototype = $extend(alphatab.renderin
 	}
 	,__class__: alphatab.rendering.ScoreBarRendererFactory
 });
-alphatab.rendering.ScoreRenderer = $hxClasses["alphatab.rendering.ScoreRenderer"] = function(source) {
+alphatab.rendering.ScoreRenderer = function(source) {
 	this.canvas = alphatab.platform.PlatformFactory.getCanvas(source);
-	this.settings = new Hash();
+	this.settings = new haxe.ds.StringMap();
 	this.updateScale(1.0);
 	this.layout = new alphatab.rendering.layout.PageViewLayout(this);
 };
-alphatab.rendering.ScoreRenderer.__name__ = ["alphatab","rendering","ScoreRenderer"];
+alphatab.rendering.ScoreRenderer.__name__ = true;
 alphatab.rendering.ScoreRenderer.prototype = {
 	getLayoutSetting: function(setting,defaultValue) {
 		var value = this.settings.get("layout." + setting);
@@ -5481,7 +4404,7 @@ alphatab.rendering.ScoreRenderer.prototype = {
 		this.canvas.setHeight(this.layout.height + this.renderingResources.copyrightFont.getSize() * 2 | 0);
 		this.canvas.setWidth(this.layout.width);
 	}
-	,getScore: function() {
+	,get_score: function() {
 		if(this.track == null) return null;
 		return this.track.score;
 	}
@@ -5499,21 +4422,13 @@ alphatab.rendering.ScoreRenderer.prototype = {
 		this.renderingResources = new alphatab.rendering.RenderingResources(scale);
 		this.canvas.setLineWidth(scale);
 	}
-	,settings: null
-	,renderingResources: null
-	,layout: null
-	,scale: null
-	,track: null
-	,score: null
-	,canvas: null
 	,__class__: alphatab.rendering.ScoreRenderer
-	,__properties__: {get_score:"getScore"}
 }
-alphatab.rendering.TabBarRenderer = $hxClasses["alphatab.rendering.TabBarRenderer"] = function(bar) {
+alphatab.rendering.TabBarRenderer = function(bar) {
 	alphatab.rendering.GroupedBarRenderer.call(this,bar);
-	this._beatPosition = new IntHash();
+	this._beatPosition = new haxe.ds.IntMap();
 };
-alphatab.rendering.TabBarRenderer.__name__ = ["alphatab","rendering","TabBarRenderer"];
+alphatab.rendering.TabBarRenderer.__name__ = true;
 alphatab.rendering.TabBarRenderer.__super__ = alphatab.rendering.GroupedBarRenderer;
 alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.GroupedBarRenderer.prototype,{
 	drawInfoGuide: function(canvas,cx,cy,y,c) {
@@ -5613,13 +4528,12 @@ alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.Grouped
 	,getLineOffset: function() {
 		return 11 * this.stave.staveGroup.layout.renderer.scale;
 	}
-	,_beatPosition: null
 	,__class__: alphatab.rendering.TabBarRenderer
 });
-alphatab.rendering.TabBarRendererFactory = $hxClasses["alphatab.rendering.TabBarRendererFactory"] = function() {
+alphatab.rendering.TabBarRendererFactory = function() {
 	alphatab.rendering.BarRendererFactory.call(this);
 };
-alphatab.rendering.TabBarRendererFactory.__name__ = ["alphatab","rendering","TabBarRendererFactory"];
+alphatab.rendering.TabBarRendererFactory.__name__ = true;
 alphatab.rendering.TabBarRendererFactory.__super__ = alphatab.rendering.BarRendererFactory;
 alphatab.rendering.TabBarRendererFactory.prototype = $extend(alphatab.rendering.BarRendererFactory.prototype,{
 	create: function(bar) {
@@ -5628,7 +4542,7 @@ alphatab.rendering.TabBarRendererFactory.prototype = $extend(alphatab.rendering.
 	,__class__: alphatab.rendering.TabBarRendererFactory
 });
 if(!alphatab.rendering.glyphs) alphatab.rendering.glyphs = {}
-alphatab.rendering.glyphs.SvgGlyph = $hxClasses["alphatab.rendering.glyphs.SvgGlyph"] = function(x,y,svg,xScale,yScale) {
+alphatab.rendering.glyphs.SvgGlyph = function(x,y,svg,xScale,yScale) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.Glyph.call(this,x,y);
@@ -5636,7 +4550,7 @@ alphatab.rendering.glyphs.SvgGlyph = $hxClasses["alphatab.rendering.glyphs.SvgGl
 	this._xGlyphScale = xScale * 0.0099;
 	this._yGlyphScale = yScale * 0.0099;
 };
-alphatab.rendering.glyphs.SvgGlyph.__name__ = ["alphatab","rendering","glyphs","SvgGlyph"];
+alphatab.rendering.glyphs.SvgGlyph.__name__ = true;
 alphatab.rendering.glyphs.SvgGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.SvgGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	parseCommand: function(cx,cy,canvas) {
@@ -5830,23 +4744,14 @@ alphatab.rendering.glyphs.SvgGlyph.prototype = $extend(alphatab.rendering.Glyph.
 	,getSvgData: function() {
 		return this._svg.svg;
 	}
-	,_lastControlY: null
-	,_lastControlX: null
-	,_yGlyphScale: null
-	,_xGlyphScale: null
-	,_yScale: null
-	,_xScale: null
-	,_currentY: null
-	,_currentX: null
-	,_svg: null
 	,__class__: alphatab.rendering.glyphs.SvgGlyph
 });
-alphatab.rendering.glyphs.AccentuationGlyph = $hxClasses["alphatab.rendering.glyphs.AccentuationGlyph"] = function(x,y,accentuation) {
+alphatab.rendering.glyphs.AccentuationGlyph = function(x,y,accentuation) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,this.getSvg(accentuation),1,1);
 };
-alphatab.rendering.glyphs.AccentuationGlyph.__name__ = ["alphatab","rendering","glyphs","AccentuationGlyph"];
+alphatab.rendering.glyphs.AccentuationGlyph.__name__ = true;
 alphatab.rendering.glyphs.AccentuationGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.AccentuationGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	getSvg: function(accentuation) {
@@ -5867,13 +4772,13 @@ alphatab.rendering.glyphs.AccentuationGlyph.prototype = $extend(alphatab.renderi
 	}
 	,__class__: alphatab.rendering.glyphs.AccentuationGlyph
 });
-alphatab.rendering.glyphs.GlyphGroup = $hxClasses["alphatab.rendering.glyphs.GlyphGroup"] = function(x,y,glyphs) {
+alphatab.rendering.glyphs.GlyphGroup = function(x,y,glyphs) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.Glyph.call(this,x,y);
 	this._glyphs = glyphs != null?glyphs:new Array();
 };
-alphatab.rendering.glyphs.GlyphGroup.__name__ = ["alphatab","rendering","glyphs","GlyphGroup"];
+alphatab.rendering.glyphs.GlyphGroup.__name__ = true;
 alphatab.rendering.glyphs.GlyphGroup.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.GlyphGroup.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -5900,15 +4805,14 @@ alphatab.rendering.glyphs.GlyphGroup.prototype = $extend(alphatab.rendering.Glyp
 		}
 		this.width = w;
 	}
-	,_glyphs: null
 	,__class__: alphatab.rendering.glyphs.GlyphGroup
 });
-alphatab.rendering.glyphs.AccidentalGroupGlyph = $hxClasses["alphatab.rendering.glyphs.AccidentalGroupGlyph"] = function(x,y) {
+alphatab.rendering.glyphs.AccidentalGroupGlyph = function(x,y) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.glyphs.GlyphGroup.call(this,x,y,new Array());
 };
-alphatab.rendering.glyphs.AccidentalGroupGlyph.__name__ = ["alphatab","rendering","glyphs","AccidentalGroupGlyph"];
+alphatab.rendering.glyphs.AccidentalGroupGlyph.__name__ = true;
 alphatab.rendering.glyphs.AccidentalGroupGlyph.__super__ = alphatab.rendering.glyphs.GlyphGroup;
 alphatab.rendering.glyphs.AccidentalGroupGlyph.prototype = $extend(alphatab.rendering.glyphs.GlyphGroup.prototype,{
 	doLayout: function() {
@@ -5944,7 +4848,7 @@ alphatab.rendering.glyphs.AccidentalGroupGlyph.prototype = $extend(alphatab.rend
 	}
 	,__class__: alphatab.rendering.glyphs.AccidentalGroupGlyph
 });
-alphatab.rendering.glyphs.BarNumberGlyph = $hxClasses["alphatab.rendering.glyphs.BarNumberGlyph"] = function(x,y,number,hidden) {
+alphatab.rendering.glyphs.BarNumberGlyph = function(x,y,number,hidden) {
 	if(hidden == null) hidden = false;
 	if(y == null) y = 0;
 	if(x == null) x = 0;
@@ -5952,7 +4856,7 @@ alphatab.rendering.glyphs.BarNumberGlyph = $hxClasses["alphatab.rendering.glyphs
 	this._number = number;
 	this._hidden = hidden;
 };
-alphatab.rendering.glyphs.BarNumberGlyph.__name__ = ["alphatab","rendering","glyphs","BarNumberGlyph"];
+alphatab.rendering.glyphs.BarNumberGlyph.__name__ = true;
 alphatab.rendering.glyphs.BarNumberGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.BarNumberGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -5970,18 +4874,16 @@ alphatab.rendering.glyphs.BarNumberGlyph.prototype = $extend(alphatab.rendering.
 		scoreRenderer.canvas.setFont(scoreRenderer.renderingResources.barNumberFont);
 		this.width = this.renderer.stave.staveGroup.layout.renderer.canvas.measureText(Std.string(this._number)) + 3 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
-	,_hidden: null
-	,_number: null
 	,__class__: alphatab.rendering.glyphs.BarNumberGlyph
 });
-alphatab.rendering.glyphs.BarSeperatorGlyph = $hxClasses["alphatab.rendering.glyphs.BarSeperatorGlyph"] = function(x,y,isLast) {
+alphatab.rendering.glyphs.BarSeperatorGlyph = function(x,y,isLast) {
 	if(isLast == null) isLast = false;
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.Glyph.call(this,x,y);
 	this._isLast = isLast;
 };
-alphatab.rendering.glyphs.BarSeperatorGlyph.__name__ = ["alphatab","rendering","glyphs","BarSeperatorGlyph"];
+alphatab.rendering.glyphs.BarSeperatorGlyph.__name__ = true;
 alphatab.rendering.glyphs.BarSeperatorGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.BarSeperatorGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -6007,15 +4909,14 @@ alphatab.rendering.glyphs.BarSeperatorGlyph.prototype = $extend(alphatab.renderi
 	,doLayout: function() {
 		this.width = (this._isLast?8:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
-	,_isLast: null
 	,__class__: alphatab.rendering.glyphs.BarSeperatorGlyph
 });
-alphatab.rendering.glyphs.BeamGlyph = $hxClasses["alphatab.rendering.glyphs.BeamGlyph"] = function(x,y,duration,direction,isGrace) {
+alphatab.rendering.glyphs.BeamGlyph = function(x,y,duration,direction,isGrace) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,this.getRestSvg(duration,direction,isGrace),isGrace?0.7:1,this.getSvgScale(duration,direction,isGrace));
 };
-alphatab.rendering.glyphs.BeamGlyph.__name__ = ["alphatab","rendering","glyphs","BeamGlyph"];
+alphatab.rendering.glyphs.BeamGlyph.__name__ = true;
 alphatab.rendering.glyphs.BeamGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.BeamGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	getRestSvg: function(duration,direction,isGrace) {
@@ -6042,11 +4943,11 @@ alphatab.rendering.glyphs.BeamGlyph.prototype = $extend(alphatab.rendering.glyph
 	}
 	,__class__: alphatab.rendering.glyphs.BeamGlyph
 });
-alphatab.rendering.glyphs.BeatGlyphBase = $hxClasses["alphatab.rendering.glyphs.BeatGlyphBase"] = function(b) {
+alphatab.rendering.glyphs.BeatGlyphBase = function(b) {
 	alphatab.rendering.glyphs.GlyphGroup.call(this);
 	this.beat = b;
 };
-alphatab.rendering.glyphs.BeatGlyphBase.__name__ = ["alphatab","rendering","glyphs","BeatGlyphBase"];
+alphatab.rendering.glyphs.BeatGlyphBase.__name__ = true;
 alphatab.rendering.glyphs.BeatGlyphBase.__super__ = alphatab.rendering.glyphs.GlyphGroup;
 alphatab.rendering.glyphs.BeatGlyphBase.prototype = $extend(alphatab.rendering.glyphs.GlyphGroup.prototype,{
 	getBeatDurationWidth: function(d) {
@@ -6065,8 +4966,6 @@ alphatab.rendering.glyphs.BeatGlyphBase.prototype = $extend(alphatab.rendering.g
 			return 11;
 		case 6:
 			return 11;
-		default:
-			return 0;
 		}
 	}
 	,noteLoop: function(action) {
@@ -6086,22 +4985,21 @@ alphatab.rendering.glyphs.BeatGlyphBase.prototype = $extend(alphatab.rendering.g
 		}
 		this.width = w;
 	}
-	,beat: null
 	,__class__: alphatab.rendering.glyphs.BeatGlyphBase
 });
-alphatab.rendering.glyphs.BendGlyph = $hxClasses["alphatab.rendering.glyphs.BendGlyph"] = function(n,width,height) {
+alphatab.rendering.glyphs.BendGlyph = function(n,width,height) {
 	alphatab.rendering.Glyph.call(this,0,0);
 	this._note = n;
-	this._width = width;
+	this.width = width;
 	this._height = height;
 };
-alphatab.rendering.glyphs.BendGlyph.__name__ = ["alphatab","rendering","glyphs","BendGlyph"];
+alphatab.rendering.glyphs.BendGlyph.__name__ = true;
 alphatab.rendering.glyphs.BendGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.BendGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
 		var r = this.renderer;
 		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
-		var dX = this._width / 60;
+		var dX = this.width / 60;
 		var maxValue = 0;
 		var _g1 = 0, _g = this._note.bendPoints.length;
 		while(_g1 < _g) {
@@ -6122,11 +5020,17 @@ alphatab.rendering.glyphs.BendGlyph.prototype = $extend(alphatab.rendering.Glyph
 			var y1 = yy - dY * firstPt.value;
 			var x2 = xx + dX * secondPt.offset;
 			var y2 = yy - dY * secondPt.value;
-			var hx = x1 + (x2 - x1);
-			var hy = yy - dY * firstPt.value;
-			canvas.moveTo(x1,y1);
-			canvas.bezierCurveTo(hx,hy,x2,y2,x2,y2);
-			canvas.stroke();
+			if(firstPt.value == secondPt.value) {
+				canvas.moveTo(x1,y1);
+				canvas.lineTo(x2,y2);
+				canvas.stroke();
+			} else {
+				var hx = x1 + (x2 - x1);
+				var hy = yy - dY * firstPt.value;
+				canvas.moveTo(x1,y1);
+				canvas.bezierCurveTo(hx,hy,x2,y2,x2,y2);
+				canvas.stroke();
+			}
 			var arrowSize = 6 * this.renderer.stave.staveGroup.layout.renderer.scale;
 			if(secondPt.value > firstPt.value) {
 				canvas.beginPath();
@@ -6157,27 +5061,26 @@ alphatab.rendering.glyphs.BendGlyph.prototype = $extend(alphatab.rendering.Glyph
 					dV -= Math.floor(dV);
 				}
 				if(dV > 0) s += Std.string(dV) + "/4";
-				if(!up) s = "-" + s;
-				canvas.setFont(res.tablatureFont);
-				var size = canvas.measureText(s);
-				var y = up?y2 - res.tablatureFont.getSize() - 2 * this.renderer.stave.staveGroup.layout.renderer.scale:y2 + 2 * this.renderer.stave.staveGroup.layout.renderer.scale;
-				var x = x2 - size / 2;
-				canvas.fillText(s,x,y);
+				if(s != "") {
+					if(!up) s = "-" + s;
+					canvas.setFont(res.tablatureFont);
+					var size = canvas.measureText(s);
+					var y = up?y2 - res.tablatureFont.getSize() - 2 * this.renderer.stave.staveGroup.layout.renderer.scale:y2 + 2 * this.renderer.stave.staveGroup.layout.renderer.scale;
+					var x = x2 - size / 2;
+					canvas.fillText(s,x,y);
+				}
 			}
 		}
 	}
-	,_height: null
-	,_width: null
-	,_note: null
 	,__class__: alphatab.rendering.glyphs.BendGlyph
 });
-alphatab.rendering.glyphs.CircleGlyph = $hxClasses["alphatab.rendering.glyphs.CircleGlyph"] = function(x,y,size) {
+alphatab.rendering.glyphs.CircleGlyph = function(x,y,size) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.Glyph.call(this,x,y);
 	this._size = size;
 };
-alphatab.rendering.glyphs.CircleGlyph.__name__ = ["alphatab","rendering","glyphs","CircleGlyph"];
+alphatab.rendering.glyphs.CircleGlyph.__name__ = true;
 alphatab.rendering.glyphs.CircleGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.CircleGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -6191,15 +5094,14 @@ alphatab.rendering.glyphs.CircleGlyph.prototype = $extend(alphatab.rendering.Gly
 	,doLayout: function() {
 		this.width = this._size + 3 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
-	,_size: null
 	,__class__: alphatab.rendering.glyphs.CircleGlyph
 });
-alphatab.rendering.glyphs.ClefGlyph = $hxClasses["alphatab.rendering.glyphs.ClefGlyph"] = function(x,y,clef) {
+alphatab.rendering.glyphs.ClefGlyph = function(x,y,clef) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,this.getClefSvg(clef),1,1);
 };
-alphatab.rendering.glyphs.ClefGlyph.__name__ = ["alphatab","rendering","glyphs","ClefGlyph"];
+alphatab.rendering.glyphs.ClefGlyph.__name__ = true;
 alphatab.rendering.glyphs.ClefGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.ClefGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	getClefSvg: function(clef) {
@@ -6212,8 +5114,6 @@ alphatab.rendering.glyphs.ClefGlyph.prototype = $extend(alphatab.rendering.glyph
 			return alphatab.rendering.glyphs.MusicFont.ClefF;
 		case 3:
 			return alphatab.rendering.glyphs.MusicFont.ClefG;
-		default:
-			return "";
 		}
 	}
 	,canScale: function() {
@@ -6224,12 +5124,12 @@ alphatab.rendering.glyphs.ClefGlyph.prototype = $extend(alphatab.rendering.glyph
 	}
 	,__class__: alphatab.rendering.glyphs.ClefGlyph
 });
-alphatab.rendering.glyphs.DeadNoteHeadGlyph = $hxClasses["alphatab.rendering.glyphs.DeadNoteHeadGlyph"] = function(x,y,isGrace) {
+alphatab.rendering.glyphs.DeadNoteHeadGlyph = function(x,y,isGrace) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,alphatab.rendering.glyphs.MusicFont.NoteDead,1,1);
 };
-alphatab.rendering.glyphs.DeadNoteHeadGlyph.__name__ = ["alphatab","rendering","glyphs","DeadNoteHeadGlyph"];
+alphatab.rendering.glyphs.DeadNoteHeadGlyph.__name__ = true;
 alphatab.rendering.glyphs.DeadNoteHeadGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.DeadNoteHeadGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	canScale: function() {
@@ -6240,13 +5140,13 @@ alphatab.rendering.glyphs.DeadNoteHeadGlyph.prototype = $extend(alphatab.renderi
 	}
 	,__class__: alphatab.rendering.glyphs.DeadNoteHeadGlyph
 });
-alphatab.rendering.glyphs.DiamondNoteHeadGlyph = $hxClasses["alphatab.rendering.glyphs.DiamondNoteHeadGlyph"] = function(x,y,isGrace) {
+alphatab.rendering.glyphs.DiamondNoteHeadGlyph = function(x,y,isGrace) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,alphatab.rendering.glyphs.MusicFont.NoteHarmonic,isGrace?0.7:1,isGrace?0.7:1);
 	this._isGrace = isGrace;
 };
-alphatab.rendering.glyphs.DiamondNoteHeadGlyph.__name__ = ["alphatab","rendering","glyphs","DiamondNoteHeadGlyph"];
+alphatab.rendering.glyphs.DiamondNoteHeadGlyph.__name__ = true;
 alphatab.rendering.glyphs.DiamondNoteHeadGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.DiamondNoteHeadGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	canScale: function() {
@@ -6255,16 +5155,15 @@ alphatab.rendering.glyphs.DiamondNoteHeadGlyph.prototype = $extend(alphatab.rend
 	,doLayout: function() {
 		this.width = 9 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
-	,_isGrace: null
 	,__class__: alphatab.rendering.glyphs.DiamondNoteHeadGlyph
 });
-alphatab.rendering.glyphs.DigitGlyph = $hxClasses["alphatab.rendering.glyphs.DigitGlyph"] = function(x,y,digit) {
+alphatab.rendering.glyphs.DigitGlyph = function(x,y,digit) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,this.getDigit(digit),1,1);
 	this._digit = digit;
 };
-alphatab.rendering.glyphs.DigitGlyph.__name__ = ["alphatab","rendering","glyphs","DigitGlyph"];
+alphatab.rendering.glyphs.DigitGlyph.__name__ = true;
 alphatab.rendering.glyphs.DigitGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.DigitGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	getDigit: function(digit) {
@@ -6310,17 +5209,16 @@ alphatab.rendering.glyphs.DigitGlyph.prototype = $extend(alphatab.rendering.glyp
 		this.y += 7 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 		this.width = this.getDigitWidth(this._digit) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
-	,_digit: null
 	,__class__: alphatab.rendering.glyphs.DigitGlyph
 });
-alphatab.rendering.glyphs.FlatGlyph = $hxClasses["alphatab.rendering.glyphs.FlatGlyph"] = function(x,y,isGrace) {
+alphatab.rendering.glyphs.FlatGlyph = function(x,y,isGrace) {
 	if(isGrace == null) isGrace = false;
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,alphatab.rendering.glyphs.MusicFont.AccidentalFlat,isGrace?0.7:1,isGrace?0.7:1);
 	this._isGrace = isGrace;
 };
-alphatab.rendering.glyphs.FlatGlyph.__name__ = ["alphatab","rendering","glyphs","FlatGlyph"];
+alphatab.rendering.glyphs.FlatGlyph.__name__ = true;
 alphatab.rendering.glyphs.FlatGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.FlatGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	canScale: function() {
@@ -6329,25 +5227,23 @@ alphatab.rendering.glyphs.FlatGlyph.prototype = $extend(alphatab.rendering.glyph
 	,doLayout: function() {
 		this.width = 8 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
-	,_isGrace: null
 	,__class__: alphatab.rendering.glyphs.FlatGlyph
 });
-alphatab.rendering.glyphs.ISupportsFinalize = $hxClasses["alphatab.rendering.glyphs.ISupportsFinalize"] = function() { }
-alphatab.rendering.glyphs.ISupportsFinalize.__name__ = ["alphatab","rendering","glyphs","ISupportsFinalize"];
+alphatab.rendering.glyphs.ISupportsFinalize = function() { }
+alphatab.rendering.glyphs.ISupportsFinalize.__name__ = true;
 alphatab.rendering.glyphs.ISupportsFinalize.prototype = {
-	finalizeGlyph: null
-	,__class__: alphatab.rendering.glyphs.ISupportsFinalize
+	__class__: alphatab.rendering.glyphs.ISupportsFinalize
 }
-alphatab.rendering.glyphs.MusicFont = $hxClasses["alphatab.rendering.glyphs.MusicFont"] = function() { }
-alphatab.rendering.glyphs.MusicFont.__name__ = ["alphatab","rendering","glyphs","MusicFont"];
-alphatab.rendering.glyphs.NaturalizeGlyph = $hxClasses["alphatab.rendering.glyphs.NaturalizeGlyph"] = function(x,y,isGrace) {
+alphatab.rendering.glyphs.MusicFont = function() { }
+alphatab.rendering.glyphs.MusicFont.__name__ = true;
+alphatab.rendering.glyphs.NaturalizeGlyph = function(x,y,isGrace) {
 	if(isGrace == null) isGrace = false;
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,alphatab.rendering.glyphs.MusicFont.AccidentalNatural,isGrace?0.7:1,isGrace?0.7:1);
 	this._isGrace = isGrace;
 };
-alphatab.rendering.glyphs.NaturalizeGlyph.__name__ = ["alphatab","rendering","glyphs","NaturalizeGlyph"];
+alphatab.rendering.glyphs.NaturalizeGlyph.__name__ = true;
 alphatab.rendering.glyphs.NaturalizeGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.NaturalizeGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	canScale: function() {
@@ -6356,16 +5252,15 @@ alphatab.rendering.glyphs.NaturalizeGlyph.prototype = $extend(alphatab.rendering
 	,doLayout: function() {
 		this.width = 8 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
-	,_isGrace: null
 	,__class__: alphatab.rendering.glyphs.NaturalizeGlyph
 });
-alphatab.rendering.glyphs.NoteHeadGlyph = $hxClasses["alphatab.rendering.glyphs.NoteHeadGlyph"] = function(x,y,duration,isGrace) {
+alphatab.rendering.glyphs.NoteHeadGlyph = function(x,y,duration,isGrace) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,this.getNoteSvg(duration),isGrace?0.7:1,isGrace?0.7:1);
 	this._isGrace = isGrace;
 };
-alphatab.rendering.glyphs.NoteHeadGlyph.__name__ = ["alphatab","rendering","glyphs","NoteHeadGlyph"];
+alphatab.rendering.glyphs.NoteHeadGlyph.__name__ = true;
 alphatab.rendering.glyphs.NoteHeadGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.NoteHeadGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	getNoteSvg: function(duration) {
@@ -6384,10 +5279,9 @@ alphatab.rendering.glyphs.NoteHeadGlyph.prototype = $extend(alphatab.rendering.g
 	,doLayout: function() {
 		this.width = 9 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
-	,_isGrace: null
 	,__class__: alphatab.rendering.glyphs.NoteHeadGlyph
 });
-alphatab.rendering.glyphs.NoteNumberGlyph = $hxClasses["alphatab.rendering.glyphs.NoteNumberGlyph"] = function(x,y,n,isGrace) {
+alphatab.rendering.glyphs.NoteNumberGlyph = function(x,y,n,isGrace) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.Glyph.call(this,x,y);
@@ -6397,7 +5291,7 @@ alphatab.rendering.glyphs.NoteNumberGlyph = $hxClasses["alphatab.rendering.glyph
 		if(n.isGhost) this._noteString = "(" + this._noteString + ")";
 	} else if(n.beat.index == 0) this._noteString = "(" + this._noteString + ")";
 };
-alphatab.rendering.glyphs.NoteNumberGlyph.__name__ = ["alphatab","rendering","glyphs","NoteNumberGlyph"];
+alphatab.rendering.glyphs.NoteNumberGlyph.__name__ = true;
 alphatab.rendering.glyphs.NoteNumberGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.NoteNumberGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -6413,15 +5307,13 @@ alphatab.rendering.glyphs.NoteNumberGlyph.prototype = $extend(alphatab.rendering
 		if(this._isGrace) scoreRenderer.canvas.setFont(scoreRenderer.renderingResources.graceFont); else scoreRenderer.canvas.setFont(scoreRenderer.renderingResources.tablatureFont);
 		this.width = this.renderer.stave.staveGroup.layout.renderer.canvas.measureText(this._noteString) | 0;
 	}
-	,_isGrace: null
-	,_noteString: null
 	,__class__: alphatab.rendering.glyphs.NoteNumberGlyph
 });
-alphatab.rendering.glyphs.NumberGlyph = $hxClasses["alphatab.rendering.glyphs.NumberGlyph"] = function(x,y,number) {
+alphatab.rendering.glyphs.NumberGlyph = function(x,y,number) {
 	alphatab.rendering.glyphs.GlyphGroup.call(this,x,y,new Array());
 	this._number = number;
 };
-alphatab.rendering.glyphs.NumberGlyph.__name__ = ["alphatab","rendering","glyphs","NumberGlyph"];
+alphatab.rendering.glyphs.NumberGlyph.__name__ = true;
 alphatab.rendering.glyphs.NumberGlyph.__super__ = alphatab.rendering.glyphs.GlyphGroup;
 alphatab.rendering.glyphs.NumberGlyph.prototype = $extend(alphatab.rendering.glyphs.GlyphGroup.prototype,{
 	doLayout: function() {
@@ -6449,15 +5341,14 @@ alphatab.rendering.glyphs.NumberGlyph.prototype = $extend(alphatab.rendering.gly
 	,canScale: function() {
 		return false;
 	}
-	,_number: null
 	,__class__: alphatab.rendering.glyphs.NumberGlyph
 });
-alphatab.rendering.glyphs.RepeatCloseGlyph = $hxClasses["alphatab.rendering.glyphs.RepeatCloseGlyph"] = function(x,y) {
+alphatab.rendering.glyphs.RepeatCloseGlyph = function(x,y) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.Glyph.call(this,x,y);
 };
-alphatab.rendering.glyphs.RepeatCloseGlyph.__name__ = ["alphatab","rendering","glyphs","RepeatCloseGlyph"];
+alphatab.rendering.glyphs.RepeatCloseGlyph.__name__ = true;
 alphatab.rendering.glyphs.RepeatCloseGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.RepeatCloseGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -6492,13 +5383,13 @@ alphatab.rendering.glyphs.RepeatCloseGlyph.prototype = $extend(alphatab.renderin
 	}
 	,__class__: alphatab.rendering.glyphs.RepeatCloseGlyph
 });
-alphatab.rendering.glyphs.RepeatCountGlyph = $hxClasses["alphatab.rendering.glyphs.RepeatCountGlyph"] = function(x,y,count) {
+alphatab.rendering.glyphs.RepeatCountGlyph = function(x,y,count) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.Glyph.call(this,x,y);
 	this._count = count;
 };
-alphatab.rendering.glyphs.RepeatCountGlyph.__name__ = ["alphatab","rendering","glyphs","RepeatCountGlyph"];
+alphatab.rendering.glyphs.RepeatCountGlyph.__name__ = true;
 alphatab.rendering.glyphs.RepeatCountGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.RepeatCountGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -6515,17 +5406,16 @@ alphatab.rendering.glyphs.RepeatCountGlyph.prototype = $extend(alphatab.renderin
 	,doLayout: function() {
 		this.width = 0;
 	}
-	,_count: null
 	,__class__: alphatab.rendering.glyphs.RepeatCountGlyph
 });
-alphatab.rendering.glyphs.RepeatOpenGlyph = $hxClasses["alphatab.rendering.glyphs.RepeatOpenGlyph"] = function(x,y,circleSize,dotOffset) {
+alphatab.rendering.glyphs.RepeatOpenGlyph = function(x,y,circleSize,dotOffset) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.Glyph.call(this,x,y);
 	this._dotOffset = dotOffset;
 	this._circleSize = circleSize;
 };
-alphatab.rendering.glyphs.RepeatOpenGlyph.__name__ = ["alphatab","rendering","glyphs","RepeatOpenGlyph"];
+alphatab.rendering.glyphs.RepeatOpenGlyph.__name__ = true;
 alphatab.rendering.glyphs.RepeatOpenGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.RepeatOpenGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -6556,16 +5446,14 @@ alphatab.rendering.glyphs.RepeatOpenGlyph.prototype = $extend(alphatab.rendering
 	,doLayout: function() {
 		this.width = 13 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
-	,_circleSize: null
-	,_dotOffset: null
 	,__class__: alphatab.rendering.glyphs.RepeatOpenGlyph
 });
-alphatab.rendering.glyphs.RestGlyph = $hxClasses["alphatab.rendering.glyphs.RestGlyph"] = function(x,y,duration) {
+alphatab.rendering.glyphs.RestGlyph = function(x,y,duration) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,this.getRestSvg(duration),1,1);
 };
-alphatab.rendering.glyphs.RestGlyph.__name__ = ["alphatab","rendering","glyphs","RestGlyph"];
+alphatab.rendering.glyphs.RestGlyph.__name__ = true;
 alphatab.rendering.glyphs.RestGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.RestGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	getRestSvg: function(duration) {
@@ -6583,8 +5471,6 @@ alphatab.rendering.glyphs.RestGlyph.prototype = $extend(alphatab.rendering.glyph
 			return alphatab.rendering.glyphs.MusicFont.RestThirtySecond;
 		case 6:
 			return alphatab.rendering.glyphs.MusicFont.RestSixtyFourth;
-		default:
-			return "";
 		}
 	}
 	,canScale: function() {
@@ -6595,11 +5481,11 @@ alphatab.rendering.glyphs.RestGlyph.prototype = $extend(alphatab.rendering.glyph
 	}
 	,__class__: alphatab.rendering.glyphs.RestGlyph
 });
-alphatab.rendering.glyphs.ScoreBeatGlyph = $hxClasses["alphatab.rendering.glyphs.ScoreBeatGlyph"] = function(b) {
+alphatab.rendering.glyphs.ScoreBeatGlyph = function(b) {
 	alphatab.rendering.glyphs.BeatGlyphBase.call(this,b);
 	this._ties = new Array();
 };
-alphatab.rendering.glyphs.ScoreBeatGlyph.__name__ = ["alphatab","rendering","glyphs","ScoreBeatGlyph"];
+alphatab.rendering.glyphs.ScoreBeatGlyph.__name__ = true;
 alphatab.rendering.glyphs.ScoreBeatGlyph.__interfaces__ = [alphatab.rendering.glyphs.ISupportsFinalize];
 alphatab.rendering.glyphs.ScoreBeatGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
 alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
@@ -6655,7 +5541,8 @@ alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.
 			}
 		} else {
 			var line = 0;
-			switch( (this.beat.duration)[1] ) {
+			var _g1 = this;
+			switch( (_g1.beat.duration)[1] ) {
 			case 0:
 				line = 4;
 				break;
@@ -6702,16 +5589,12 @@ alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.
 			t.paint(cx,cy + this.y,canvas);
 		}
 	}
-	,beamingHelper: null
-	,restGlyph: null
-	,noteHeads: null
-	,_ties: null
 	,__class__: alphatab.rendering.glyphs.ScoreBeatGlyph
 });
-alphatab.rendering.glyphs.ScoreBeatPostNotesGlyph = $hxClasses["alphatab.rendering.glyphs.ScoreBeatPostNotesGlyph"] = function(b) {
+alphatab.rendering.glyphs.ScoreBeatPostNotesGlyph = function(b) {
 	alphatab.rendering.glyphs.BeatGlyphBase.call(this,b);
 };
-alphatab.rendering.glyphs.ScoreBeatPostNotesGlyph.__name__ = ["alphatab","rendering","glyphs","ScoreBeatPostNotesGlyph"];
+alphatab.rendering.glyphs.ScoreBeatPostNotesGlyph.__name__ = true;
 alphatab.rendering.glyphs.ScoreBeatPostNotesGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
 alphatab.rendering.glyphs.ScoreBeatPostNotesGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
 	doLayout: function() {
@@ -6720,10 +5603,10 @@ alphatab.rendering.glyphs.ScoreBeatPostNotesGlyph.prototype = $extend(alphatab.r
 	}
 	,__class__: alphatab.rendering.glyphs.ScoreBeatPostNotesGlyph
 });
-alphatab.rendering.glyphs.ScoreBeatPreNotesGlyph = $hxClasses["alphatab.rendering.glyphs.ScoreBeatPreNotesGlyph"] = function(b) {
+alphatab.rendering.glyphs.ScoreBeatPreNotesGlyph = function(b) {
 	alphatab.rendering.glyphs.BeatGlyphBase.call(this,b);
 };
-alphatab.rendering.glyphs.ScoreBeatPreNotesGlyph.__name__ = ["alphatab","rendering","glyphs","ScoreBeatPreNotesGlyph"];
+alphatab.rendering.glyphs.ScoreBeatPreNotesGlyph.__name__ = true;
 alphatab.rendering.glyphs.ScoreBeatPreNotesGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
 alphatab.rendering.glyphs.ScoreBeatPreNotesGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
 	createAccidentalGlyph: function(n,accidentals) {
@@ -6767,15 +5650,15 @@ alphatab.rendering.glyphs.ScoreBeatPreNotesGlyph.prototype = $extend(alphatab.re
 	}
 	,__class__: alphatab.rendering.glyphs.ScoreBeatPreNotesGlyph
 });
-alphatab.rendering.glyphs.ScoreNoteChordGlyph = $hxClasses["alphatab.rendering.glyphs.ScoreNoteChordGlyph"] = function(x,y) {
+alphatab.rendering.glyphs.ScoreNoteChordGlyph = function(x,y) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.Glyph.call(this,x,y);
 	this._infos = new Array();
-	this.beatEffects = new Hash();
-	this._noteLookup = new IntHash();
+	this.beatEffects = new haxe.ds.StringMap();
+	this._noteLookup = new haxe.ds.IntMap();
 };
-alphatab.rendering.glyphs.ScoreNoteChordGlyph.__name__ = ["alphatab","rendering","glyphs","ScoreNoteChordGlyph"];
+alphatab.rendering.glyphs.ScoreNoteChordGlyph.__name__ = true;
 alphatab.rendering.glyphs.ScoreNoteChordGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.ScoreNoteChordGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -6899,24 +5782,14 @@ alphatab.rendering.glyphs.ScoreNoteChordGlyph.prototype = $extend(alphatab.rende
 	,getDirection: function() {
 		return this.beamingHelper.getDirection();
 	}
-	,beamingHelper: null
-	,beat: null
-	,beatEffects: null
-	,downLineX: null
-	,upLineX: null
-	,spacingChanged: null
-	,maxNote: null
-	,minNote: null
-	,_noteLookup: null
-	,_infos: null
 	,__class__: alphatab.rendering.glyphs.ScoreNoteChordGlyph
 });
-alphatab.rendering.glyphs.ScoreSlideLineGlyph = $hxClasses["alphatab.rendering.glyphs.ScoreSlideLineGlyph"] = function(type,startNote) {
+alphatab.rendering.glyphs.ScoreSlideLineGlyph = function(type,startNote) {
 	alphatab.rendering.Glyph.call(this,0,0);
 	this._type = type;
 	this._startNote = startNote;
 };
-alphatab.rendering.glyphs.ScoreSlideLineGlyph.__name__ = ["alphatab","rendering","glyphs","ScoreSlideLineGlyph"];
+alphatab.rendering.glyphs.ScoreSlideLineGlyph.__name__ = true;
 alphatab.rendering.glyphs.ScoreSlideLineGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.ScoreSlideLineGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -6927,7 +5800,8 @@ alphatab.rendering.glyphs.ScoreSlideLineGlyph.prototype = $extend(alphatab.rende
 		var startY;
 		var endX;
 		var endY;
-		switch( (this._type)[1] ) {
+		var _g = this;
+		switch( (_g._type)[1] ) {
 		case 1:
 		case 2:
 			startX = cx + r.getNoteX(this._startNote,true) + offsetX;
@@ -6979,16 +5853,14 @@ alphatab.rendering.glyphs.ScoreSlideLineGlyph.prototype = $extend(alphatab.rende
 	,doLayout: function() {
 		this.width = 0;
 	}
-	,_type: null
-	,_startNote: null
 	,__class__: alphatab.rendering.glyphs.ScoreSlideLineGlyph
 });
-alphatab.rendering.glyphs.TieGlyph = $hxClasses["alphatab.rendering.glyphs.TieGlyph"] = function(startNote,endNote) {
+alphatab.rendering.glyphs.TieGlyph = function(startNote,endNote) {
 	alphatab.rendering.Glyph.call(this,0,0);
 	this._startNote = startNote;
 	this._endNote = endNote;
 };
-alphatab.rendering.glyphs.TieGlyph.__name__ = ["alphatab","rendering","glyphs","TieGlyph"];
+alphatab.rendering.glyphs.TieGlyph.__name__ = true;
 alphatab.rendering.glyphs.TieGlyph.paintTie = function(canvas,scale,x1,y1,x2,y2,down) {
 	if(down == null) down = false;
 	if(x2 > x1) {
@@ -7023,14 +5895,12 @@ alphatab.rendering.glyphs.TieGlyph.prototype = $extend(alphatab.rendering.Glyph.
 	,doLayout: function() {
 		this.width = 0;
 	}
-	,_endNote: null
-	,_startNote: null
 	,__class__: alphatab.rendering.glyphs.TieGlyph
 });
-alphatab.rendering.glyphs.ScoreTieGlyph = $hxClasses["alphatab.rendering.glyphs.ScoreTieGlyph"] = function(startNote,endNote) {
+alphatab.rendering.glyphs.ScoreTieGlyph = function(startNote,endNote) {
 	alphatab.rendering.glyphs.TieGlyph.call(this,startNote,endNote);
 };
-alphatab.rendering.glyphs.ScoreTieGlyph.__name__ = ["alphatab","rendering","glyphs","ScoreTieGlyph"];
+alphatab.rendering.glyphs.ScoreTieGlyph.__name__ = true;
 alphatab.rendering.glyphs.ScoreTieGlyph.__super__ = alphatab.rendering.glyphs.TieGlyph;
 alphatab.rendering.glyphs.ScoreTieGlyph.prototype = $extend(alphatab.rendering.glyphs.TieGlyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -7045,14 +5915,14 @@ alphatab.rendering.glyphs.ScoreTieGlyph.prototype = $extend(alphatab.rendering.g
 	}
 	,__class__: alphatab.rendering.glyphs.ScoreTieGlyph
 });
-alphatab.rendering.glyphs.SharpGlyph = $hxClasses["alphatab.rendering.glyphs.SharpGlyph"] = function(x,y,isGrace) {
+alphatab.rendering.glyphs.SharpGlyph = function(x,y,isGrace) {
 	if(isGrace == null) isGrace = false;
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,alphatab.rendering.glyphs.MusicFont.AccidentalSharp,isGrace?0.7:1,isGrace?0.7:1);
 	this._isGrace = isGrace;
 };
-alphatab.rendering.glyphs.SharpGlyph.__name__ = ["alphatab","rendering","glyphs","SharpGlyph"];
+alphatab.rendering.glyphs.SharpGlyph.__name__ = true;
 alphatab.rendering.glyphs.SharpGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.SharpGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	canScale: function() {
@@ -7061,10 +5931,9 @@ alphatab.rendering.glyphs.SharpGlyph.prototype = $extend(alphatab.rendering.glyp
 	,doLayout: function() {
 		this.width = 8 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
-	,_isGrace: null
 	,__class__: alphatab.rendering.glyphs.SharpGlyph
 });
-alphatab.rendering.glyphs.SpacingGlyph = $hxClasses["alphatab.rendering.glyphs.SpacingGlyph"] = function(x,y,width,scaling) {
+alphatab.rendering.glyphs.SpacingGlyph = function(x,y,width,scaling) {
 	if(scaling == null) scaling = true;
 	if(y == null) y = 0;
 	if(x == null) x = 0;
@@ -7072,20 +5941,19 @@ alphatab.rendering.glyphs.SpacingGlyph = $hxClasses["alphatab.rendering.glyphs.S
 	this.width = width;
 	this._scaling = scaling;
 };
-alphatab.rendering.glyphs.SpacingGlyph.__name__ = ["alphatab","rendering","glyphs","SpacingGlyph"];
+alphatab.rendering.glyphs.SpacingGlyph.__name__ = true;
 alphatab.rendering.glyphs.SpacingGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.SpacingGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	canScale: function() {
 		return this._scaling;
 	}
-	,_scaling: null
 	,__class__: alphatab.rendering.glyphs.SpacingGlyph
 });
-alphatab.rendering.glyphs.TabBeatGlyph = $hxClasses["alphatab.rendering.glyphs.TabBeatGlyph"] = function(b) {
+alphatab.rendering.glyphs.TabBeatGlyph = function(b) {
 	alphatab.rendering.glyphs.BeatGlyphBase.call(this,b);
 	this._ties = new Array();
 };
-alphatab.rendering.glyphs.TabBeatGlyph.__name__ = ["alphatab","rendering","glyphs","TabBeatGlyph"];
+alphatab.rendering.glyphs.TabBeatGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabBeatGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
 alphatab.rendering.glyphs.TabBeatGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
 	createNoteGlyph: function(n) {
@@ -7139,14 +6007,12 @@ alphatab.rendering.glyphs.TabBeatGlyph.prototype = $extend(alphatab.rendering.gl
 			t.paint(cx,cy + this.y,canvas);
 		}
 	}
-	,noteNumbers: null
-	,_ties: null
 	,__class__: alphatab.rendering.glyphs.TabBeatGlyph
 });
-alphatab.rendering.glyphs.TabBeatPostNotesGlyph = $hxClasses["alphatab.rendering.glyphs.TabBeatPostNotesGlyph"] = function(b) {
+alphatab.rendering.glyphs.TabBeatPostNotesGlyph = function(b) {
 	alphatab.rendering.glyphs.BeatGlyphBase.call(this,b);
 };
-alphatab.rendering.glyphs.TabBeatPostNotesGlyph.__name__ = ["alphatab","rendering","glyphs","TabBeatPostNotesGlyph"];
+alphatab.rendering.glyphs.TabBeatPostNotesGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabBeatPostNotesGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
 alphatab.rendering.glyphs.TabBeatPostNotesGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
 	createNoteGlyphs: function(n) {
@@ -7166,22 +6032,22 @@ alphatab.rendering.glyphs.TabBeatPostNotesGlyph.prototype = $extend(alphatab.ren
 	}
 	,__class__: alphatab.rendering.glyphs.TabBeatPostNotesGlyph
 });
-alphatab.rendering.glyphs.TabBeatPreNotesGlyph = $hxClasses["alphatab.rendering.glyphs.TabBeatPreNotesGlyph"] = function(b) {
+alphatab.rendering.glyphs.TabBeatPreNotesGlyph = function(b) {
 	alphatab.rendering.glyphs.BeatGlyphBase.call(this,b);
 };
-alphatab.rendering.glyphs.TabBeatPreNotesGlyph.__name__ = ["alphatab","rendering","glyphs","TabBeatPreNotesGlyph"];
+alphatab.rendering.glyphs.TabBeatPreNotesGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabBeatPreNotesGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
 alphatab.rendering.glyphs.TabBeatPreNotesGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
 	__class__: alphatab.rendering.glyphs.TabBeatPreNotesGlyph
 });
-alphatab.rendering.glyphs.TabNoteChordGlyph = $hxClasses["alphatab.rendering.glyphs.TabNoteChordGlyph"] = function(x,y) {
+alphatab.rendering.glyphs.TabNoteChordGlyph = function(x,y) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.Glyph.call(this,x,y);
 	this._notes = new Array();
-	this._noteLookup = new IntHash();
+	this._noteLookup = new haxe.ds.IntMap();
 };
-alphatab.rendering.glyphs.TabNoteChordGlyph.__name__ = ["alphatab","rendering","glyphs","TabNoteChordGlyph"];
+alphatab.rendering.glyphs.TabNoteChordGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabNoteChordGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.TabNoteChordGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -7226,17 +6092,14 @@ alphatab.rendering.glyphs.TabNoteChordGlyph.prototype = $extend(alphatab.renderi
 		}
 		return 0;
 	}
-	,beat: null
-	,_noteLookup: null
-	,_notes: null
 	,__class__: alphatab.rendering.glyphs.TabNoteChordGlyph
 });
-alphatab.rendering.glyphs.TabSlideLineGlyph = $hxClasses["alphatab.rendering.glyphs.TabSlideLineGlyph"] = function(type,startNote) {
+alphatab.rendering.glyphs.TabSlideLineGlyph = function(type,startNote) {
 	alphatab.rendering.Glyph.call(this,0,0);
 	this._type = type;
 	this._startNote = startNote;
 };
-alphatab.rendering.glyphs.TabSlideLineGlyph.__name__ = ["alphatab","rendering","glyphs","TabSlideLineGlyph"];
+alphatab.rendering.glyphs.TabSlideLineGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabSlideLineGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.TabSlideLineGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -7247,7 +6110,8 @@ alphatab.rendering.glyphs.TabSlideLineGlyph.prototype = $extend(alphatab.renderi
 		var startY;
 		var endX;
 		var endY;
-		switch( (this._type)[1] ) {
+		var _g = this;
+		switch( (_g._type)[1] ) {
 		case 1:
 		case 2:
 			var startOffsetY;
@@ -7311,14 +6175,12 @@ alphatab.rendering.glyphs.TabSlideLineGlyph.prototype = $extend(alphatab.renderi
 	,doLayout: function() {
 		this.width = 0;
 	}
-	,_type: null
-	,_startNote: null
 	,__class__: alphatab.rendering.glyphs.TabSlideLineGlyph
 });
-alphatab.rendering.glyphs.TabTieGlyph = $hxClasses["alphatab.rendering.glyphs.TabTieGlyph"] = function(startNote,endNote) {
+alphatab.rendering.glyphs.TabTieGlyph = function(startNote,endNote) {
 	alphatab.rendering.glyphs.TieGlyph.call(this,startNote,endNote);
 };
-alphatab.rendering.glyphs.TabTieGlyph.__name__ = ["alphatab","rendering","glyphs","TabTieGlyph"];
+alphatab.rendering.glyphs.TabTieGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabTieGlyph.__super__ = alphatab.rendering.glyphs.TieGlyph;
 alphatab.rendering.glyphs.TabTieGlyph.prototype = $extend(alphatab.rendering.glyphs.TieGlyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -7337,12 +6199,12 @@ alphatab.rendering.glyphs.TabTieGlyph.prototype = $extend(alphatab.rendering.gly
 	}
 	,__class__: alphatab.rendering.glyphs.TabTieGlyph
 });
-alphatab.rendering.glyphs.TimeSignatureGlyph = $hxClasses["alphatab.rendering.glyphs.TimeSignatureGlyph"] = function(x,y,numerator,denominator) {
+alphatab.rendering.glyphs.TimeSignatureGlyph = function(x,y,numerator,denominator) {
 	alphatab.rendering.glyphs.GlyphGroup.call(this,x,y,new Array());
 	this._numerator = numerator;
 	this._denominator = denominator;
 };
-alphatab.rendering.glyphs.TimeSignatureGlyph.__name__ = ["alphatab","rendering","glyphs","TimeSignatureGlyph"];
+alphatab.rendering.glyphs.TimeSignatureGlyph.__name__ = true;
 alphatab.rendering.glyphs.TimeSignatureGlyph.__super__ = alphatab.rendering.glyphs.GlyphGroup;
 alphatab.rendering.glyphs.TimeSignatureGlyph.prototype = $extend(alphatab.rendering.glyphs.GlyphGroup.prototype,{
 	doLayout: function() {
@@ -7361,39 +6223,37 @@ alphatab.rendering.glyphs.TimeSignatureGlyph.prototype = $extend(alphatab.render
 	,canScale: function() {
 		return false;
 	}
-	,_denominator: null
-	,_numerator: null
 	,__class__: alphatab.rendering.glyphs.TimeSignatureGlyph
 });
 if(!alphatab.rendering.layout) alphatab.rendering.layout = {}
-alphatab.rendering.layout.HeaderFooterElements = $hxClasses["alphatab.rendering.layout.HeaderFooterElements"] = function() { }
-alphatab.rendering.layout.HeaderFooterElements.__name__ = ["alphatab","rendering","layout","HeaderFooterElements"];
-alphatab.rendering.layout.ScoreLayout = $hxClasses["alphatab.rendering.layout.ScoreLayout"] = function(renderer) {
+alphatab.rendering.layout.HeaderFooterElements = function() { }
+alphatab.rendering.layout.HeaderFooterElements.__name__ = true;
+alphatab.rendering.layout.ScoreLayout = function(renderer) {
 	this.renderer = renderer;
 };
-alphatab.rendering.layout.ScoreLayout.__name__ = ["alphatab","rendering","layout","ScoreLayout"];
+alphatab.rendering.layout.ScoreLayout.__name__ = true;
 alphatab.rendering.layout.ScoreLayout.prototype = {
 	createEmptyStaveGroup: function() {
 		var group = new alphatab.rendering.staves.StaveGroup();
 		group.layout = this;
+		group.addStave(new alphatab.rendering.staves.Stave(new alphatab.rendering.EffectBarRendererFactory()));
 		group.addStave(new alphatab.rendering.staves.Stave(new alphatab.rendering.ScoreBarRendererFactory()));
+		group.addStave(new alphatab.rendering.staves.Stave(new alphatab.rendering.EffectBarRendererFactory()));
 		group.addStave(new alphatab.rendering.staves.Stave(new alphatab.rendering.TabBarRendererFactory()));
+		group.addStave(new alphatab.rendering.staves.Stave(new alphatab.rendering.EffectBarRendererFactory()));
 		return group;
 	}
 	,paintScore: function() {
 	}
 	,doLayout: function() {
 	}
-	,height: null
-	,width: null
-	,renderer: null
 	,__class__: alphatab.rendering.layout.ScoreLayout
 }
-alphatab.rendering.layout.HorizontalScreenLayout = $hxClasses["alphatab.rendering.layout.HorizontalScreenLayout"] = function(renderer) {
+alphatab.rendering.layout.HorizontalScreenLayout = function(renderer) {
 	alphatab.rendering.layout.ScoreLayout.call(this,renderer);
 	renderer.setLayoutSetting(alphatab.rendering.layout.HorizontalScreenLayout.SCORE_INFOS,511);
 };
-alphatab.rendering.layout.HorizontalScreenLayout.__name__ = ["alphatab","rendering","layout","HorizontalScreenLayout"];
+alphatab.rendering.layout.HorizontalScreenLayout.__name__ = true;
 alphatab.rendering.layout.HorizontalScreenLayout.__super__ = alphatab.rendering.layout.ScoreLayout;
 alphatab.rendering.layout.HorizontalScreenLayout.prototype = $extend(alphatab.rendering.layout.ScoreLayout.prototype,{
 	paintScore: function() {
@@ -7418,15 +6278,14 @@ alphatab.rendering.layout.HorizontalScreenLayout.prototype = $extend(alphatab.re
 		this.height = y + alphatab.rendering.layout.HorizontalScreenLayout.PAGE_PADDING[3];
 		this.width = this._group.x + this._group.width + alphatab.rendering.layout.HorizontalScreenLayout.PAGE_PADDING[2];
 	}
-	,_group: null
 	,__class__: alphatab.rendering.layout.HorizontalScreenLayout
 });
-alphatab.rendering.layout.PageViewLayout = $hxClasses["alphatab.rendering.layout.PageViewLayout"] = function(renderer) {
+alphatab.rendering.layout.PageViewLayout = function(renderer) {
 	alphatab.rendering.layout.ScoreLayout.call(this,renderer);
 	this._groups = new Array();
 	renderer.setLayoutSetting(alphatab.rendering.layout.PageViewLayout.SCORE_INFOS,511);
 };
-alphatab.rendering.layout.PageViewLayout.__name__ = ["alphatab","rendering","layout","PageViewLayout"];
+alphatab.rendering.layout.PageViewLayout.__name__ = true;
 alphatab.rendering.layout.PageViewLayout.__super__ = alphatab.rendering.layout.ScoreLayout;
 alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.layout.ScoreLayout.prototype,{
 	getSheetWidth: function() {
@@ -7468,7 +6327,7 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 	}
 	,paintScoreInfo: function(x,y) {
 		var flags = js.Boot.__cast(this.renderer.getLayoutSetting(alphatab.rendering.layout.PageViewLayout.SCORE_INFOS) , Int);
-		var score = this.renderer.getScore();
+		var score = this.renderer.get_score();
 		var scale = this.renderer.scale;
 		var canvas = this.renderer.canvas;
 		var res = this.renderer.renderingResources;
@@ -7552,7 +6411,7 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 	}
 	,doScoreInfoLayout: function(y) {
 		var flags = js.Boot.__cast(this.renderer.getLayoutSetting(alphatab.rendering.layout.PageViewLayout.SCORE_INFOS) , Int);
-		var score = this.renderer.getScore();
+		var score = this.renderer.get_score();
 		var scale = this.renderer.scale;
 		if(!this.isNullOrEmpty(score.title) && (flags & 1) != 0) y += Math.floor(35 * scale);
 		if(!this.isNullOrEmpty(score.subTitle) && (flags & 2) != 0) y += Math.floor(20 * scale);
@@ -7597,14 +6456,13 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 		this.height = y + alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[3];
 		this.width = 795 * this.renderer.scale | 0;
 	}
-	,_groups: null
 	,__class__: alphatab.rendering.layout.PageViewLayout
 });
 if(!alphatab.rendering.staves) alphatab.rendering.staves = {}
-alphatab.rendering.staves.BarSizeInfo = $hxClasses["alphatab.rendering.staves.BarSizeInfo"] = function() {
-	this.sizes = new Hash();
+alphatab.rendering.staves.BarSizeInfo = function() {
+	this.sizes = new haxe.ds.StringMap();
 };
-alphatab.rendering.staves.BarSizeInfo.__name__ = ["alphatab","rendering","staves","BarSizeInfo"];
+alphatab.rendering.staves.BarSizeInfo.__name__ = true;
 alphatab.rendering.staves.BarSizeInfo.prototype = {
 	setIndexedSize: function(key,index,size) {
 		if(!this.sizes.exists(key)) this.sizes.set(key,new Array());
@@ -7621,17 +6479,17 @@ alphatab.rendering.staves.BarSizeInfo.prototype = {
 	,setSize: function(key,size) {
 		this.sizes.set(key,[size]);
 	}
-	,sizes: null
-	,fullWidth: null
 	,__class__: alphatab.rendering.staves.BarSizeInfo
 }
-alphatab.rendering.staves.Stave = $hxClasses["alphatab.rendering.staves.Stave"] = function(barRendererFactory) {
+alphatab.rendering.staves.Stave = function(barRendererFactory) {
 	this.barRenderers = new Array();
 	this._factory = barRendererFactory;
 	this.topSpacing = 10;
 	this.bottomSpacing = 10;
+	this.staveTop = 0;
+	this.staveBottom = 0;
 };
-alphatab.rendering.staves.Stave.__name__ = ["alphatab","rendering","staves","Stave"];
+alphatab.rendering.staves.Stave.__name__ = true;
 alphatab.rendering.staves.Stave.prototype = {
 	paint: function(cx,cy,canvas) {
 		var _g = 0, _g1 = this.barRenderers;
@@ -7701,25 +6559,17 @@ alphatab.rendering.staves.Stave.prototype = {
 	,registerStaveTop: function(offset) {
 		this.staveTop = offset;
 	}
-	,staveBottom: null
-	,bottomSpacing: null
-	,topSpacing: null
-	,staveTop: null
-	,index: null
-	,height: null
-	,y: null
-	,x: null
-	,barRenderers: null
-	,_factory: null
-	,staveGroup: null
+	,isInAccolade: function() {
+		return this._factory.isInAccolade;
+	}
 	,__class__: alphatab.rendering.staves.Stave
 }
-alphatab.rendering.staves.StaveGroup = $hxClasses["alphatab.rendering.staves.StaveGroup"] = function() {
+alphatab.rendering.staves.StaveGroup = function() {
 	this.bars = new Array();
 	this.staves = new Array();
 	this.width = 0;
 };
-alphatab.rendering.staves.StaveGroup.__name__ = ["alphatab","rendering","staves","StaveGroup"];
+alphatab.rendering.staves.StaveGroup.__name__ = true;
 alphatab.rendering.staves.StaveGroup.prototype = {
 	finalizeGroup: function(scoreLayout) {
 		var currentY = 0;
@@ -7742,37 +6592,43 @@ alphatab.rendering.staves.StaveGroup.prototype = {
 		}
 		var res = this.layout.renderer.renderingResources;
 		if(this.staves.length > 0) {
-			var firstStart = cy + this.y + this.staves[0].y + this.staves[0].staveTop + this.staves[0].topSpacing + this.staves[0].getTopOverflow();
-			var lastEnd = cy + this.y + this.staves[this.staves.length - 1].y + this.staves[this.staves.length - 1].topSpacing + this.staves[this.staves.length - 1].getTopOverflow() + this.staves[this.staves.length - 1].staveBottom;
-			canvas.setColor(res.barSeperatorColor);
-			canvas.beginPath();
-			canvas.moveTo(cx + this.x + this.staves[0].x,firstStart);
-			canvas.lineTo(cx + this.x + this.staves[this.staves.length - 1].x,lastEnd);
-			canvas.stroke();
-			var barSize = 3 * this.layout.renderer.scale | 0;
-			var barOffset = barSize;
-			var accoladeStart = firstStart - barSize * 4;
-			var accoladeEnd = lastEnd + barSize * 4;
-			canvas.fillRect(cx + this.x - barOffset - barSize,accoladeStart,barSize,accoladeEnd - accoladeStart);
-			var spikeStartX = cx + this.x - barOffset - barSize;
-			var spikeEndX = cx + this.x + barSize * 2;
-			canvas.beginPath();
-			canvas.moveTo(spikeStartX,accoladeStart);
-			canvas.bezierCurveTo(spikeStartX,accoladeStart,this.x,accoladeStart,spikeEndX,accoladeStart - barSize);
-			canvas.bezierCurveTo(cx + this.x,accoladeStart + barSize,spikeStartX,accoladeStart + barSize,spikeStartX,accoladeStart + barSize);
-			canvas.closePath();
-			canvas.fill();
-			canvas.beginPath();
-			canvas.moveTo(spikeStartX,accoladeEnd);
-			canvas.bezierCurveTo(spikeStartX,accoladeStart,this.x,accoladeStart,spikeEndX,accoladeStart - barSize);
-			canvas.bezierCurveTo(cx + this.x,accoladeStart + barSize,spikeStartX,accoladeStart + barSize,spikeStartX,accoladeStart + barSize);
-			canvas.closePath();
-			canvas.beginPath();
-			canvas.moveTo(spikeStartX,accoladeEnd);
-			canvas.bezierCurveTo(spikeStartX,accoladeEnd,this.x,accoladeEnd,spikeEndX,accoladeEnd + barSize);
-			canvas.bezierCurveTo(this.x,accoladeEnd - barSize,spikeStartX,accoladeEnd - barSize,spikeStartX,accoladeEnd - barSize);
-			canvas.closePath();
-			canvas.fill();
+			var firstIndex = 0;
+			while(!this.staves[firstIndex]._factory.isInAccolade) firstIndex++;
+			var lastIndex = this.staves.length - 1;
+			while(lastIndex >= firstIndex && !this.staves[lastIndex]._factory.isInAccolade) lastIndex--;
+			if(lastIndex >= firstIndex) {
+				var firstStart = cy + this.y + this.staves[firstIndex].y + this.staves[firstIndex].staveTop + this.staves[firstIndex].topSpacing + this.staves[firstIndex].getTopOverflow();
+				var lastEnd = cy + this.y + this.staves[lastIndex].y + this.staves[lastIndex].topSpacing + this.staves[lastIndex].getTopOverflow() + this.staves[lastIndex].staveBottom;
+				canvas.setColor(res.barSeperatorColor);
+				canvas.beginPath();
+				canvas.moveTo(cx + this.x + this.staves[firstIndex].x,firstStart);
+				canvas.lineTo(cx + this.x + this.staves[lastIndex].x,lastEnd);
+				canvas.stroke();
+				var barSize = 3 * this.layout.renderer.scale | 0;
+				var barOffset = barSize;
+				var accoladeStart = firstStart - barSize * 4;
+				var accoladeEnd = lastEnd + barSize * 4;
+				canvas.fillRect(cx + this.x - barOffset - barSize,accoladeStart,barSize,accoladeEnd - accoladeStart);
+				var spikeStartX = cx + this.x - barOffset - barSize;
+				var spikeEndX = cx + this.x + barSize * 2;
+				canvas.beginPath();
+				canvas.moveTo(spikeStartX,accoladeStart);
+				canvas.bezierCurveTo(spikeStartX,accoladeStart,this.x,accoladeStart,spikeEndX,accoladeStart - barSize);
+				canvas.bezierCurveTo(cx + this.x,accoladeStart + barSize,spikeStartX,accoladeStart + barSize,spikeStartX,accoladeStart + barSize);
+				canvas.closePath();
+				canvas.fill();
+				canvas.beginPath();
+				canvas.moveTo(spikeStartX,accoladeEnd);
+				canvas.bezierCurveTo(spikeStartX,accoladeStart,this.x,accoladeStart,spikeEndX,accoladeStart - barSize);
+				canvas.bezierCurveTo(cx + this.x,accoladeStart + barSize,spikeStartX,accoladeStart + barSize,spikeStartX,accoladeStart + barSize);
+				canvas.closePath();
+				canvas.beginPath();
+				canvas.moveTo(spikeStartX,accoladeEnd);
+				canvas.bezierCurveTo(spikeStartX,accoladeEnd,this.x,accoladeEnd,spikeEndX,accoladeEnd + barSize);
+				canvas.bezierCurveTo(this.x,accoladeEnd - barSize,spikeStartX,accoladeEnd - barSize,spikeStartX,accoladeEnd - barSize);
+				canvas.closePath();
+				canvas.fill();
+			}
 		}
 	}
 	,applyBarSpacing: function(spacing) {
@@ -7829,20 +6685,13 @@ alphatab.rendering.staves.StaveGroup.prototype = {
 	,getLastBarIndex: function() {
 		return this.bars[this.bars.length - 1].index;
 	}
-	,layout: null
-	,staves: null
-	,bars: null
-	,width: null
-	,isFull: null
-	,y: null
-	,x: null
 	,__class__: alphatab.rendering.staves.StaveGroup
 }
 if(!alphatab.rendering.utils) alphatab.rendering.utils = {}
-alphatab.rendering.utils.AccidentalHelper = $hxClasses["alphatab.rendering.utils.AccidentalHelper"] = function() {
-	this._registeredAccidentals = new IntHash();
+alphatab.rendering.utils.AccidentalHelper = function() {
+	this._registeredAccidentals = new haxe.ds.IntMap();
 };
-alphatab.rendering.utils.AccidentalHelper.__name__ = ["alphatab","rendering","utils","AccidentalHelper"];
+alphatab.rendering.utils.AccidentalHelper.__name__ = true;
 alphatab.rendering.utils.AccidentalHelper.prototype = {
 	getKeySignatureIndex: function(ks) {
 		return ks + 7;
@@ -7850,9 +6699,10 @@ alphatab.rendering.utils.AccidentalHelper.prototype = {
 	,applyAccidental: function(note,noteLine) {
 		var noteValue = note.realValue();
 		var ks = note.beat.voice.bar.getMasterBar().keySignature;
+		var ksi = ks + 7;
 		var index = noteValue % 12;
 		var octave = noteValue / 12 | 0;
-		var accidentalToSet = alphatab.rendering.utils.AccidentalHelper.ACCIDENTAL_NOTES[ks + 7][index];
+		var accidentalToSet = alphatab.rendering.utils.AccidentalHelper.ACCIDENTAL_NOTES[ksi][index];
 		if(this._registeredAccidentals.exists(noteLine)) {
 			var registeredAccidental = this._registeredAccidentals.get(noteLine);
 			if(registeredAccidental == accidentalToSet) accidentalToSet = alphatab.model.AccidentalType.None; else if(accidentalToSet == alphatab.model.AccidentalType.None) accidentalToSet = alphatab.model.AccidentalType.Natural;
@@ -7860,17 +6710,16 @@ alphatab.rendering.utils.AccidentalHelper.prototype = {
 		if(accidentalToSet == alphatab.model.AccidentalType.None || accidentalToSet == alphatab.model.AccidentalType.Natural) this._registeredAccidentals.remove(noteLine); else this._registeredAccidentals.set(noteLine,accidentalToSet);
 		return accidentalToSet;
 	}
-	,_registeredAccidentals: null
 	,__class__: alphatab.rendering.utils.AccidentalHelper
 }
-alphatab.rendering.utils.BeamDirection = $hxClasses["alphatab.rendering.utils.BeamDirection"] = { __ename__ : ["alphatab","rendering","utils","BeamDirection"], __constructs__ : ["Up","Down"] }
+alphatab.rendering.utils.BeamDirection = { __ename__ : true, __constructs__ : ["Up","Down"] }
 alphatab.rendering.utils.BeamDirection.Up = ["Up",0];
 alphatab.rendering.utils.BeamDirection.Up.toString = $estr;
 alphatab.rendering.utils.BeamDirection.Up.__enum__ = alphatab.rendering.utils.BeamDirection;
 alphatab.rendering.utils.BeamDirection.Down = ["Down",1];
 alphatab.rendering.utils.BeamDirection.Down.toString = $estr;
 alphatab.rendering.utils.BeamDirection.Down.__enum__ = alphatab.rendering.utils.BeamDirection;
-alphatab.rendering.utils.BeamBarType = $hxClasses["alphatab.rendering.utils.BeamBarType"] = { __ename__ : ["alphatab","rendering","utils","BeamBarType"], __constructs__ : ["Full","PartLeft","PartRight"] }
+alphatab.rendering.utils.BeamBarType = { __ename__ : true, __constructs__ : ["Full","PartLeft","PartRight"] }
 alphatab.rendering.utils.BeamBarType.Full = ["Full",0];
 alphatab.rendering.utils.BeamBarType.Full.toString = $estr;
 alphatab.rendering.utils.BeamBarType.Full.__enum__ = alphatab.rendering.utils.BeamBarType;
@@ -7880,15 +6729,15 @@ alphatab.rendering.utils.BeamBarType.PartLeft.__enum__ = alphatab.rendering.util
 alphatab.rendering.utils.BeamBarType.PartRight = ["PartRight",2];
 alphatab.rendering.utils.BeamBarType.PartRight.toString = $estr;
 alphatab.rendering.utils.BeamBarType.PartRight.__enum__ = alphatab.rendering.utils.BeamBarType;
-alphatab.rendering.utils.BeamingHelper = $hxClasses["alphatab.rendering.utils.BeamingHelper"] = function() {
+alphatab.rendering.utils.BeamingHelper = function() {
 	this.beats = new Array();
 	this.valueCalculator = function(n) {
 		return n.realValue();
 	};
-	this._beatLineXPositions = new IntHash();
+	this._beatLineXPositions = new haxe.ds.IntMap();
 	this.maxDuration = alphatab.model.Duration.Whole;
 };
-alphatab.rendering.utils.BeamingHelper.__name__ = ["alphatab","rendering","utils","BeamingHelper"];
+alphatab.rendering.utils.BeamingHelper.__name__ = true;
 alphatab.rendering.utils.BeamingHelper.canJoin = function(b1,b2) {
 	if(b1 == null || b2 == null || b1.isRest() || b2.isRest()) return false;
 	var m1 = b1.voice.bar;
@@ -7898,7 +6747,8 @@ alphatab.rendering.utils.BeamingHelper.canJoin = function(b1,b2) {
 	var start2 = b2.start;
 	if(!alphatab.rendering.utils.BeamingHelper.canJoinDuration(b1.duration) || !alphatab.rendering.utils.BeamingHelper.canJoinDuration(b2.duration)) return start1 == start2;
 	var divisionLength = 960;
-	switch(m1.track.score.masterBars[m1.index].timeSignatureDenominator) {
+	var _g = m1.track.score.masterBars[m1.index];
+	switch(_g.timeSignatureDenominator) {
 	case 8:
 		if(m1.track.score.masterBars[m1.index].timeSignatureNumerator % 3 == 0) divisionLength += Math.floor(480.);
 		break;
@@ -7980,23 +6830,12 @@ alphatab.rendering.utils.BeamingHelper.prototype = {
 		}
 		return 0;
 	}
-	,_beatLineXPositions: null
-	,valueCalculator: null
-	,maxNote: null
-	,minNote: null
-	,lastMaxNote: null
-	,lastMinNote: null
-	,firstMaxNote: null
-	,firstMinNote: null
-	,maxDuration: null
-	,_lastBeat: null
-	,beats: null
 	,__class__: alphatab.rendering.utils.BeamingHelper
 }
-alphatab.rendering.utils.SvgPathParser = $hxClasses["alphatab.rendering.utils.SvgPathParser"] = function(svg) {
+alphatab.rendering.utils.SvgPathParser = function(svg) {
 	this.svg = svg;
 };
-alphatab.rendering.utils.SvgPathParser.__name__ = ["alphatab","rendering","utils","SvgPathParser"];
+alphatab.rendering.utils.SvgPathParser.__name__ = true;
 alphatab.rendering.utils.SvgPathParser.isNumber = function(s,allowSign) {
 	if(allowSign == null) allowSign = true;
 	if(s.length == 0) return false;
@@ -8051,17 +6890,13 @@ alphatab.rendering.utils.SvgPathParser.prototype = {
 		this._currentIndex = 0;
 		this.nextToken();
 	}
-	,_currentIndex: null
-	,currentToken: null
-	,lastCommand: null
-	,svg: null
 	,__class__: alphatab.rendering.utils.SvgPathParser
 }
 if(!alphatab.util) alphatab.util = {}
-alphatab.util.LazyVar = $hxClasses["alphatab.util.LazyVar"] = function(loader) {
+alphatab.util.LazyVar = function(loader) {
 	this._loader = loader;
 };
-alphatab.util.LazyVar.__name__ = ["alphatab","util","LazyVar"];
+alphatab.util.LazyVar.__name__ = true;
 alphatab.util.LazyVar.prototype = {
 	getValue: function() {
 		if(!this._loaded) {
@@ -8070,82 +6905,9 @@ alphatab.util.LazyVar.prototype = {
 		}
 		return this._val;
 	}
-	,_loaded: null
-	,_loader: null
-	,_val: null
 	,__class__: alphatab.util.LazyVar
 }
-haxe.Int32 = $hxClasses["haxe.Int32"] = function() { }
-haxe.Int32.__name__ = ["haxe","Int32"];
-haxe.Int32.make = function(a,b) {
-	return a << 16 | b;
-}
-haxe.Int32.ofInt = function(x) {
-	return x | 0;
-}
-haxe.Int32.clamp = function(x) {
-	return x | 0;
-}
-haxe.Int32.toInt = function(x) {
-	if((x >> 30 & 1) != x >>> 31) throw "Overflow " + Std.string(x);
-	return x;
-}
-haxe.Int32.toNativeInt = function(x) {
-	return x;
-}
-haxe.Int32.add = function(a,b) {
-	return a + b | 0;
-}
-haxe.Int32.sub = function(a,b) {
-	return a - b | 0;
-}
-haxe.Int32.mul = function(a,b) {
-	return a * (b & 65535) + (a * (b >>> 16) << 16 | 0) | 0;
-}
-haxe.Int32.div = function(a,b) {
-	return a / b | 0;
-}
-haxe.Int32.mod = function(a,b) {
-	return a % b;
-}
-haxe.Int32.shl = function(a,b) {
-	return a << b;
-}
-haxe.Int32.shr = function(a,b) {
-	return a >> b;
-}
-haxe.Int32.ushr = function(a,b) {
-	return a >>> b;
-}
-haxe.Int32.and = function(a,b) {
-	return a & b;
-}
-haxe.Int32.or = function(a,b) {
-	return a | b;
-}
-haxe.Int32.xor = function(a,b) {
-	return a ^ b;
-}
-haxe.Int32.neg = function(a) {
-	return -a;
-}
-haxe.Int32.isNeg = function(a) {
-	return a < 0;
-}
-haxe.Int32.isZero = function(a) {
-	return a == 0;
-}
-haxe.Int32.complement = function(a) {
-	return ~a;
-}
-haxe.Int32.compare = function(a,b) {
-	return a - b;
-}
-haxe.Int32.ucompare = function(a,b) {
-	if(a < 0) return b < 0?~b - ~a:1;
-	return b < 0?-1:a - b;
-}
-haxe.StackItem = $hxClasses["haxe.StackItem"] = { __ename__ : ["haxe","StackItem"], __constructs__ : ["CFunction","Module","FilePos","Method","Lambda"] }
+haxe.StackItem = { __ename__ : true, __constructs__ : ["CFunction","Module","FilePos","Method","Lambda"] }
 haxe.StackItem.CFunction = ["CFunction",0];
 haxe.StackItem.CFunction.toString = $estr;
 haxe.StackItem.CFunction.__enum__ = haxe.StackItem;
@@ -8153,102 +6915,115 @@ haxe.StackItem.Module = function(m) { var $x = ["Module",1,m]; $x.__enum__ = hax
 haxe.StackItem.FilePos = function(s,file,line) { var $x = ["FilePos",2,s,file,line]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
 haxe.StackItem.Method = function(classname,method) { var $x = ["Method",3,classname,method]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
 haxe.StackItem.Lambda = function(v) { var $x = ["Lambda",4,v]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
-haxe.Stack = $hxClasses["haxe.Stack"] = function() { }
-haxe.Stack.__name__ = ["haxe","Stack"];
-haxe.Stack.callStack = function() {
-	var oldValue = Error.prepareStackTrace;
-	Error.prepareStackTrace = function(error,callsites) {
-		var stack = [];
-		var _g = 0;
-		while(_g < callsites.length) {
-			var site = callsites[_g];
-			++_g;
-			var method = null;
-			var fullName = site.getFunctionName();
-			if(fullName != null) {
-				var idx = fullName.lastIndexOf(".");
-				if(idx >= 0) {
-					var className = HxOverrides.substr(fullName,0,idx);
-					var methodName = HxOverrides.substr(fullName,idx + 1,null);
-					method = haxe.StackItem.Method(className,methodName);
-				}
-			}
-			stack.push(haxe.StackItem.FilePos(method,site.getFileName(),site.getLineNumber()));
-		}
-		return stack;
-	};
-	var a = haxe.Stack.makeStack(new Error().stack);
-	a.shift();
-	Error.prepareStackTrace = oldValue;
-	return a;
-}
-haxe.Stack.exceptionStack = function() {
+haxe.CallStack = function() { }
+haxe.CallStack.__name__ = true;
+haxe.CallStack.exceptionStack = function() {
 	return [];
 }
-haxe.Stack.toString = function(stack) {
+haxe.CallStack.toString = function(stack) {
 	var b = new StringBuf();
 	var _g = 0;
 	while(_g < stack.length) {
 		var s = stack[_g];
 		++_g;
-		b.b += Std.string("\nCalled from ");
-		haxe.Stack.itemToString(b,s);
+		b.b += "\nCalled from ";
+		haxe.CallStack.itemToString(b,s);
 	}
 	return b.b;
 }
-haxe.Stack.itemToString = function(b,s) {
+haxe.CallStack.itemToString = function(b,s) {
 	var $e = (s);
 	switch( $e[1] ) {
 	case 0:
-		b.b += Std.string("a C function");
+		b.b += "a C function";
 		break;
 	case 1:
-		var m = $e[2];
-		b.b += Std.string("module ");
-		b.b += Std.string(m);
+		var s_eModule_0 = $e[2];
+		b.b += "module ";
+		b.b += Std.string(s_eModule_0);
 		break;
 	case 2:
-		var line = $e[4], file = $e[3], s1 = $e[2];
-		if(s1 != null) {
-			haxe.Stack.itemToString(b,s1);
-			b.b += Std.string(" (");
+		var s_eFilePos_2 = $e[4], s_eFilePos_1 = $e[3], s_eFilePos_0 = $e[2];
+		if(s_eFilePos_0 != null) {
+			haxe.CallStack.itemToString(b,s_eFilePos_0);
+			b.b += " (";
 		}
-		b.b += Std.string(file);
-		b.b += Std.string(" line ");
-		b.b += Std.string(line);
-		if(s1 != null) b.b += Std.string(")");
+		b.b += Std.string(s_eFilePos_1);
+		b.b += " line ";
+		b.b += Std.string(s_eFilePos_2);
+		if(s_eFilePos_0 != null) b.b += ")";
 		break;
 	case 3:
-		var meth = $e[3], cname = $e[2];
-		b.b += Std.string(cname);
-		b.b += Std.string(".");
-		b.b += Std.string(meth);
+		var s_eMethod_1 = $e[3], s_eMethod_0 = $e[2];
+		b.b += Std.string(s_eMethod_0);
+		b.b += ".";
+		b.b += Std.string(s_eMethod_1);
 		break;
 	case 4:
-		var n = $e[2];
-		b.b += Std.string("local function #");
-		b.b += Std.string(n);
+		var s_eLambda_0 = $e[2];
+		b.b += "local function #";
+		b.b += Std.string(s_eLambda_0);
 		break;
 	}
 }
-haxe.Stack.makeStack = function(s) {
-	if(typeof(s) == "string") {
-		var stack = s.split("\n");
-		var m = [];
-		var _g = 0;
-		while(_g < stack.length) {
-			var line = stack[_g];
-			++_g;
-			m.push(haxe.StackItem.Module(line));
-		}
-		return m;
-	} else return s;
+if(!haxe.ds) haxe.ds = {}
+haxe.ds.IntMap = function() {
+	this.h = { };
+};
+haxe.ds.IntMap.__name__ = true;
+haxe.ds.IntMap.prototype = {
+	remove: function(key) {
+		if(!this.h.hasOwnProperty(key)) return false;
+		delete(this.h[key]);
+		return true;
+	}
+	,exists: function(key) {
+		return this.h.hasOwnProperty(key);
+	}
+	,get: function(key) {
+		return this.h[key];
+	}
+	,set: function(key,value) {
+		this.h[key] = value;
+	}
+	,__class__: haxe.ds.IntMap
 }
-haxe.io.Bytes = $hxClasses["haxe.io.Bytes"] = function(length,b) {
+haxe.ds.StringMap = function() {
+	this.h = { };
+};
+haxe.ds.StringMap.__name__ = true;
+haxe.ds.StringMap.prototype = {
+	iterator: function() {
+		return { ref : this.h, it : this.keys(), hasNext : function() {
+			return this.it.hasNext();
+		}, next : function() {
+			var i = this.it.next();
+			return this.ref["$" + i];
+		}};
+	}
+	,keys: function() {
+		var a = [];
+		for( var key in this.h ) {
+		if(this.h.hasOwnProperty(key)) a.push(key.substr(1));
+		}
+		return HxOverrides.iter(a);
+	}
+	,exists: function(key) {
+		return this.h.hasOwnProperty("$" + key);
+	}
+	,get: function(key) {
+		return this.h["$" + key];
+	}
+	,set: function(key,value) {
+		this.h["$" + key] = value;
+	}
+	,__class__: haxe.ds.StringMap
+}
+haxe.io.Bytes = function(length,b) {
 	this.length = length;
 	this.b = b;
 };
-haxe.io.Bytes.__name__ = ["haxe","io","Bytes"];
+haxe.io.Bytes.__name__ = true;
 haxe.io.Bytes.alloc = function(length) {
 	var a = new Array();
 	var _g = 0;
@@ -8284,28 +7059,7 @@ haxe.io.Bytes.ofData = function(b) {
 	return new haxe.io.Bytes(b.length,b);
 }
 haxe.io.Bytes.prototype = {
-	getData: function() {
-		return this.b;
-	}
-	,toHex: function() {
-		var s = new StringBuf();
-		var chars = [];
-		var str = "0123456789abcdef";
-		var _g1 = 0, _g = str.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			chars.push(HxOverrides.cca(str,i));
-		}
-		var _g1 = 0, _g = this.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var c = this.b[i];
-			s.b += String.fromCharCode(chars[c >> 4]);
-			s.b += String.fromCharCode(chars[c & 15]);
-		}
-		return s.b;
-	}
-	,toString: function() {
+	toString: function() {
 		return this.readString(0,this.length);
 	}
 	,readString: function(pos,len) {
@@ -8331,17 +7085,6 @@ haxe.io.Bytes.prototype = {
 		}
 		return s;
 	}
-	,compare: function(other) {
-		var b1 = this.b;
-		var b2 = other.b;
-		var len = this.length < other.length?this.length:other.length;
-		var _g = 0;
-		while(_g < len) {
-			var i = _g++;
-			if(b1[i] != b2[i]) return b1[i] - b2[i];
-		}
-		return this.length - other.length;
-	}
 	,sub: function(pos,len) {
 		if(pos < 0 || len < 0 || pos + len > this.length) throw haxe.io.Error.OutsideBounds;
 		return new haxe.io.Bytes(len,this.b.slice(pos,pos + len));
@@ -8364,20 +7107,12 @@ haxe.io.Bytes.prototype = {
 			b1[i + pos] = b2[i + srcpos];
 		}
 	}
-	,set: function(pos,v) {
-		this.b[pos] = v & 255;
-	}
-	,get: function(pos) {
-		return this.b[pos];
-	}
-	,b: null
-	,length: null
 	,__class__: haxe.io.Bytes
 }
-haxe.io.BytesBuffer = $hxClasses["haxe.io.BytesBuffer"] = function() {
+haxe.io.BytesBuffer = function() {
 	this.b = new Array();
 };
-haxe.io.BytesBuffer.__name__ = ["haxe","io","BytesBuffer"];
+haxe.io.BytesBuffer.__name__ = true;
 haxe.io.BytesBuffer.prototype = {
 	getBytes: function() {
 		var bytes = new haxe.io.Bytes(this.b.length,this.b);
@@ -8394,22 +7129,9 @@ haxe.io.BytesBuffer.prototype = {
 			this.b.push(b2[i]);
 		}
 	}
-	,add: function(src) {
-		var b1 = this.b;
-		var b2 = src.b;
-		var _g1 = 0, _g = src.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			this.b.push(b2[i]);
-		}
-	}
-	,addByte: function($byte) {
-		this.b.push($byte);
-	}
-	,b: null
 	,__class__: haxe.io.BytesBuffer
 }
-haxe.io.BytesInput = $hxClasses["haxe.io.BytesInput"] = function(b,pos,len) {
+haxe.io.BytesInput = function(b,pos,len) {
 	if(pos == null) pos = 0;
 	if(len == null) len = b.length - pos;
 	if(pos < 0 || len < 0 || pos + len > b.length) throw haxe.io.Error.OutsideBounds;
@@ -8417,7 +7139,7 @@ haxe.io.BytesInput = $hxClasses["haxe.io.BytesInput"] = function(b,pos,len) {
 	this.pos = pos;
 	this.len = len;
 };
-haxe.io.BytesInput.__name__ = ["haxe","io","BytesInput"];
+haxe.io.BytesInput.__name__ = true;
 haxe.io.BytesInput.__super__ = haxe.io.Input;
 haxe.io.BytesInput.prototype = $extend(haxe.io.Input.prototype,{
 	readBytes: function(buf,pos,len) {
@@ -8440,174 +7162,14 @@ haxe.io.BytesInput.prototype = $extend(haxe.io.Input.prototype,{
 		this.len--;
 		return this.b[this.pos++];
 	}
-	,len: null
-	,pos: null
-	,b: null
 	,__class__: haxe.io.BytesInput
 });
-haxe.io.Output = $hxClasses["haxe.io.Output"] = function() { }
-haxe.io.Output.__name__ = ["haxe","io","Output"];
+haxe.io.Output = function() { }
+haxe.io.Output.__name__ = true;
 haxe.io.Output.prototype = {
 	writeString: function(s) {
 		var b = haxe.io.Bytes.ofString(s);
 		this.writeFullBytes(b,0,b.length);
-	}
-	,writeInput: function(i,bufsize) {
-		if(bufsize == null) bufsize = 4096;
-		var buf = haxe.io.Bytes.alloc(bufsize);
-		try {
-			while(true) {
-				var len = i.readBytes(buf,0,bufsize);
-				if(len == 0) throw haxe.io.Error.Blocked;
-				var p = 0;
-				while(len > 0) {
-					var k = this.writeBytes(buf,p,len);
-					if(k == 0) throw haxe.io.Error.Blocked;
-					p += k;
-					len -= k;
-				}
-			}
-		} catch( e ) {
-			if( js.Boot.__instanceof(e,haxe.io.Eof) ) {
-			} else throw(e);
-		}
-	}
-	,prepare: function(nbytes) {
-	}
-	,writeInt32: function(x) {
-		if(this.bigEndian) {
-			this.writeByte(haxe.Int32.toInt(x >>> 24));
-			this.writeByte(haxe.Int32.toInt(x >>> 16) & 255);
-			this.writeByte(haxe.Int32.toInt(x >>> 8) & 255);
-			this.writeByte(haxe.Int32.toInt(x & (255 | 0)));
-		} else {
-			this.writeByte(haxe.Int32.toInt(x & (255 | 0)));
-			this.writeByte(haxe.Int32.toInt(x >>> 8) & 255);
-			this.writeByte(haxe.Int32.toInt(x >>> 16) & 255);
-			this.writeByte(haxe.Int32.toInt(x >>> 24));
-		}
-	}
-	,writeUInt30: function(x) {
-		if(x < 0 || x >= 1073741824) throw haxe.io.Error.Overflow;
-		if(this.bigEndian) {
-			this.writeByte(x >>> 24);
-			this.writeByte(x >> 16 & 255);
-			this.writeByte(x >> 8 & 255);
-			this.writeByte(x & 255);
-		} else {
-			this.writeByte(x & 255);
-			this.writeByte(x >> 8 & 255);
-			this.writeByte(x >> 16 & 255);
-			this.writeByte(x >>> 24);
-		}
-	}
-	,writeInt31: function(x) {
-		if(x < -1073741824 || x >= 1073741824) throw haxe.io.Error.Overflow;
-		if(this.bigEndian) {
-			this.writeByte(x >>> 24);
-			this.writeByte(x >> 16 & 255);
-			this.writeByte(x >> 8 & 255);
-			this.writeByte(x & 255);
-		} else {
-			this.writeByte(x & 255);
-			this.writeByte(x >> 8 & 255);
-			this.writeByte(x >> 16 & 255);
-			this.writeByte(x >>> 24);
-		}
-	}
-	,writeUInt24: function(x) {
-		if(x < 0 || x >= 16777216) throw haxe.io.Error.Overflow;
-		if(this.bigEndian) {
-			this.writeByte(x >> 16);
-			this.writeByte(x >> 8 & 255);
-			this.writeByte(x & 255);
-		} else {
-			this.writeByte(x & 255);
-			this.writeByte(x >> 8 & 255);
-			this.writeByte(x >> 16);
-		}
-	}
-	,writeInt24: function(x) {
-		if(x < -8388608 || x >= 8388608) throw haxe.io.Error.Overflow;
-		this.writeUInt24(x & 16777215);
-	}
-	,writeUInt16: function(x) {
-		if(x < 0 || x >= 65536) throw haxe.io.Error.Overflow;
-		if(this.bigEndian) {
-			this.writeByte(x >> 8);
-			this.writeByte(x & 255);
-		} else {
-			this.writeByte(x & 255);
-			this.writeByte(x >> 8);
-		}
-	}
-	,writeInt16: function(x) {
-		if(x < -32768 || x >= 32768) throw haxe.io.Error.Overflow;
-		this.writeUInt16(x & 65535);
-	}
-	,writeInt8: function(x) {
-		if(x < -128 || x >= 128) throw haxe.io.Error.Overflow;
-		this.writeByte(x & 255);
-	}
-	,writeDouble: function(x) {
-		if(x == 0.0) {
-			this.writeByte(0);
-			this.writeByte(0);
-			this.writeByte(0);
-			this.writeByte(0);
-			this.writeByte(0);
-			this.writeByte(0);
-			this.writeByte(0);
-			this.writeByte(0);
-			return;
-		}
-		var exp = Math.floor(Math.log(Math.abs(x)) / haxe.io.Output.LN2);
-		var sig = Math.floor(Math.abs(x) / Math.pow(2,exp) * Math.pow(2,52));
-		var sig_h = sig & 34359738367;
-		var sig_l = Math.floor(sig / Math.pow(2,32));
-		var b1 = exp + 1023 >> 4 | (exp > 0?x < 0?128:64:x < 0?128:0), b2 = exp + 1023 << 4 & 255 | sig_l >> 16 & 15, b3 = sig_l >> 8 & 255, b4 = sig_l & 255, b5 = sig_h >> 24 & 255, b6 = sig_h >> 16 & 255, b7 = sig_h >> 8 & 255, b8 = sig_h & 255;
-		if(this.bigEndian) {
-			this.writeByte(b8);
-			this.writeByte(b7);
-			this.writeByte(b6);
-			this.writeByte(b5);
-			this.writeByte(b4);
-			this.writeByte(b3);
-			this.writeByte(b2);
-			this.writeByte(b1);
-		} else {
-			this.writeByte(b1);
-			this.writeByte(b2);
-			this.writeByte(b3);
-			this.writeByte(b4);
-			this.writeByte(b5);
-			this.writeByte(b6);
-			this.writeByte(b7);
-			this.writeByte(b8);
-		}
-	}
-	,writeFloat: function(x) {
-		if(x == 0.0) {
-			this.writeByte(0);
-			this.writeByte(0);
-			this.writeByte(0);
-			this.writeByte(0);
-			return;
-		}
-		var exp = Math.floor(Math.log(Math.abs(x)) / haxe.io.Output.LN2);
-		var sig = Math.floor(Math.abs(x) / Math.pow(2,exp) * 8388608) & 8388607;
-		var b1 = exp + 127 >> 1 | (exp > 0?x < 0?128:64:x < 0?128:0), b2 = exp + 127 << 7 & 255 | sig >> 16 & 127, b3 = sig >> 8 & 255, b4 = sig & 255;
-		if(this.bigEndian) {
-			this.writeByte(b4);
-			this.writeByte(b3);
-			this.writeByte(b2);
-			this.writeByte(b1);
-		} else {
-			this.writeByte(b1);
-			this.writeByte(b2);
-			this.writeByte(b3);
-			this.writeByte(b4);
-		}
 	}
 	,writeFullBytes: function(s,pos,len) {
 		while(len > 0) {
@@ -8615,22 +7177,6 @@ haxe.io.Output.prototype = {
 			pos += k;
 			len -= k;
 		}
-	}
-	,write: function(s) {
-		var l = s.length;
-		var p = 0;
-		while(l > 0) {
-			var k = this.writeBytes(s,p,l);
-			if(k == 0) throw haxe.io.Error.Blocked;
-			p += k;
-			l -= k;
-		}
-	}
-	,setEndian: function(b) {
-		this.bigEndian = b;
-		return b;
-	}
-	,close: function() {
 	}
 	,flush: function() {
 	}
@@ -8648,14 +7194,12 @@ haxe.io.Output.prototype = {
 	,writeByte: function(c) {
 		throw "Not implemented";
 	}
-	,bigEndian: null
 	,__class__: haxe.io.Output
-	,__properties__: {set_bigEndian:"setEndian"}
 }
-haxe.io.BytesOutput = $hxClasses["haxe.io.BytesOutput"] = function() {
+haxe.io.BytesOutput = function() {
 	this.b = new haxe.io.BytesBuffer();
 };
-haxe.io.BytesOutput.__name__ = ["haxe","io","BytesOutput"];
+haxe.io.BytesOutput.__name__ = true;
 haxe.io.BytesOutput.__super__ = haxe.io.Output;
 haxe.io.BytesOutput.prototype = $extend(haxe.io.Output.prototype,{
 	getBytes: function() {
@@ -8668,19 +7212,18 @@ haxe.io.BytesOutput.prototype = $extend(haxe.io.Output.prototype,{
 	,writeByte: function(c) {
 		this.b.b.push(c);
 	}
-	,b: null
 	,__class__: haxe.io.BytesOutput
 });
-haxe.io.Eof = $hxClasses["haxe.io.Eof"] = function() {
+haxe.io.Eof = function() {
 };
-haxe.io.Eof.__name__ = ["haxe","io","Eof"];
+haxe.io.Eof.__name__ = true;
 haxe.io.Eof.prototype = {
 	toString: function() {
 		return "Eof";
 	}
 	,__class__: haxe.io.Eof
 }
-haxe.io.Error = $hxClasses["haxe.io.Error"] = { __ename__ : ["haxe","io","Error"], __constructs__ : ["Blocked","Overflow","OutsideBounds","Custom"] }
+haxe.io.Error = { __ename__ : true, __constructs__ : ["Blocked","Overflow","OutsideBounds","Custom"] }
 haxe.io.Error.Blocked = ["Blocked",0];
 haxe.io.Error.Blocked.toString = $estr;
 haxe.io.Error.Blocked.__enum__ = haxe.io.Error;
@@ -8692,138 +7235,8 @@ haxe.io.Error.OutsideBounds.toString = $estr;
 haxe.io.Error.OutsideBounds.__enum__ = haxe.io.Error;
 haxe.io.Error.Custom = function(e) { var $x = ["Custom",3,e]; $x.__enum__ = haxe.io.Error; $x.toString = $estr; return $x; }
 if(!haxe.xml) haxe.xml = {}
-if(!haxe.xml._Fast) haxe.xml._Fast = {}
-haxe.xml._Fast.NodeAccess = $hxClasses["haxe.xml._Fast.NodeAccess"] = function(x) {
-	this.__x = x;
-};
-haxe.xml._Fast.NodeAccess.__name__ = ["haxe","xml","_Fast","NodeAccess"];
-haxe.xml._Fast.NodeAccess.prototype = {
-	resolve: function(name) {
-		var x = this.__x.elementsNamed(name).next();
-		if(x == null) {
-			var xname = this.__x.nodeType == Xml.Document?"Document":this.__x.getNodeName();
-			throw xname + " is missing element " + name;
-		}
-		return new haxe.xml.Fast(x);
-	}
-	,__x: null
-	,__class__: haxe.xml._Fast.NodeAccess
-}
-haxe.xml._Fast.AttribAccess = $hxClasses["haxe.xml._Fast.AttribAccess"] = function(x) {
-	this.__x = x;
-};
-haxe.xml._Fast.AttribAccess.__name__ = ["haxe","xml","_Fast","AttribAccess"];
-haxe.xml._Fast.AttribAccess.prototype = {
-	resolve: function(name) {
-		if(this.__x.nodeType == Xml.Document) throw "Cannot access document attribute " + name;
-		var v = this.__x.get(name);
-		if(v == null) throw this.__x.getNodeName() + " is missing attribute " + name;
-		return v;
-	}
-	,__x: null
-	,__class__: haxe.xml._Fast.AttribAccess
-}
-haxe.xml._Fast.HasAttribAccess = $hxClasses["haxe.xml._Fast.HasAttribAccess"] = function(x) {
-	this.__x = x;
-};
-haxe.xml._Fast.HasAttribAccess.__name__ = ["haxe","xml","_Fast","HasAttribAccess"];
-haxe.xml._Fast.HasAttribAccess.prototype = {
-	resolve: function(name) {
-		if(this.__x.nodeType == Xml.Document) throw "Cannot access document attribute " + name;
-		return this.__x.exists(name);
-	}
-	,__x: null
-	,__class__: haxe.xml._Fast.HasAttribAccess
-}
-haxe.xml._Fast.HasNodeAccess = $hxClasses["haxe.xml._Fast.HasNodeAccess"] = function(x) {
-	this.__x = x;
-};
-haxe.xml._Fast.HasNodeAccess.__name__ = ["haxe","xml","_Fast","HasNodeAccess"];
-haxe.xml._Fast.HasNodeAccess.prototype = {
-	resolve: function(name) {
-		return this.__x.elementsNamed(name).hasNext();
-	}
-	,__x: null
-	,__class__: haxe.xml._Fast.HasNodeAccess
-}
-haxe.xml._Fast.NodeListAccess = $hxClasses["haxe.xml._Fast.NodeListAccess"] = function(x) {
-	this.__x = x;
-};
-haxe.xml._Fast.NodeListAccess.__name__ = ["haxe","xml","_Fast","NodeListAccess"];
-haxe.xml._Fast.NodeListAccess.prototype = {
-	resolve: function(name) {
-		var l = new List();
-		var $it0 = this.__x.elementsNamed(name);
-		while( $it0.hasNext() ) {
-			var x = $it0.next();
-			l.add(new haxe.xml.Fast(x));
-		}
-		return l;
-	}
-	,__x: null
-	,__class__: haxe.xml._Fast.NodeListAccess
-}
-haxe.xml.Fast = $hxClasses["haxe.xml.Fast"] = function(x) {
-	if(x.nodeType != Xml.Document && x.nodeType != Xml.Element) throw "Invalid nodeType " + Std.string(x.nodeType);
-	this.x = x;
-	this.node = new haxe.xml._Fast.NodeAccess(x);
-	this.nodes = new haxe.xml._Fast.NodeListAccess(x);
-	this.att = new haxe.xml._Fast.AttribAccess(x);
-	this.has = new haxe.xml._Fast.HasAttribAccess(x);
-	this.hasNode = new haxe.xml._Fast.HasNodeAccess(x);
-};
-haxe.xml.Fast.__name__ = ["haxe","xml","Fast"];
-haxe.xml.Fast.prototype = {
-	getElements: function() {
-		var it = this.x.elements();
-		return { hasNext : $bind(it,it.hasNext), next : function() {
-			var x = it.next();
-			if(x == null) return null;
-			return new haxe.xml.Fast(x);
-		}};
-	}
-	,getInnerHTML: function() {
-		var s = new StringBuf();
-		var $it0 = this.x.iterator();
-		while( $it0.hasNext() ) {
-			var x = $it0.next();
-			s.b += Std.string(x.toString());
-		}
-		return s.b;
-	}
-	,getInnerData: function() {
-		var it = this.x.iterator();
-		if(!it.hasNext()) throw this.getName() + " does not have data";
-		var v = it.next();
-		var n = it.next();
-		if(n != null) {
-			if(v.nodeType == Xml.PCData && n.nodeType == Xml.CData && StringTools.trim(v.getNodeValue()) == "") {
-				var n2 = it.next();
-				if(n2 == null || n2.nodeType == Xml.PCData && StringTools.trim(n2.getNodeValue()) == "" && it.next() == null) return n.getNodeValue();
-			}
-			throw this.getName() + " does not only have data";
-		}
-		if(v.nodeType != Xml.PCData && v.nodeType != Xml.CData) throw this.getName() + " does not have data";
-		return v.getNodeValue();
-	}
-	,getName: function() {
-		return this.x.nodeType == Xml.Document?"Document":this.x.getNodeName();
-	}
-	,elements: null
-	,hasNode: null
-	,has: null
-	,att: null
-	,nodes: null
-	,node: null
-	,innerHTML: null
-	,innerData: null
-	,name: null
-	,x: null
-	,__class__: haxe.xml.Fast
-	,__properties__: {get_name:"getName",get_innerData:"getInnerData",get_innerHTML:"getInnerHTML",get_elements:"getElements"}
-}
-haxe.xml.Parser = $hxClasses["haxe.xml.Parser"] = function() { }
-haxe.xml.Parser.__name__ = ["haxe","xml","Parser"];
+haxe.xml.Parser = function() { }
+haxe.xml.Parser.__name__ = true;
 haxe.xml.Parser.parse = function(str) {
 	var doc = Xml.createDocument();
 	haxe.xml.Parser.doParse(str,0,doc);
@@ -8839,6 +7252,7 @@ haxe.xml.Parser.doParse = function(str,p,parent) {
 	var nsubs = 0;
 	var nbrackets = 0;
 	var c = str.charCodeAt(p);
+	var buf = new StringBuf();
 	while(!(c != c)) {
 		switch(state) {
 		case 0:
@@ -8864,11 +7278,17 @@ haxe.xml.Parser.doParse = function(str,p,parent) {
 			break;
 		case 13:
 			if(c == 60) {
-				var child = Xml.createPCData(HxOverrides.substr(str,start,p - start));
+				var child = Xml.createPCData(buf.b + HxOverrides.substr(str,start,p - start));
+				buf = new StringBuf();
 				parent.addChild(child);
 				nsubs++;
 				state = 0;
 				next = 2;
+			} else if(c == 38) {
+				buf.addSub(str,start,p - start);
+				state = 18;
+				next = 13;
+				start = p + 1;
 			}
 			break;
 		case 17:
@@ -9009,7 +7429,7 @@ haxe.xml.Parser.doParse = function(str,p,parent) {
 			if(!(c >= 97 && c <= 122 || c >= 65 && c <= 90 || c >= 48 && c <= 57 || c == 58 || c == 46 || c == 95 || c == 45)) {
 				if(start == p) throw "Expected node name";
 				var v = HxOverrides.substr(str,start,p - start);
-				if(v != parent.getNodeName()) throw "Expected </" + parent.getNodeName() + ">";
+				if(v != parent.get_nodeName()) throw "Expected </" + parent.get_nodeName() + ">";
 				state = 0;
 				next = 12;
 				continue;
@@ -9032,8 +7452,19 @@ haxe.xml.Parser.doParse = function(str,p,parent) {
 			if(c == 63 && str.charCodeAt(p + 1) == 62) {
 				p++;
 				var str1 = HxOverrides.substr(str,start + 1,p - start - 2);
-				parent.addChild(Xml.createProlog(str1));
+				parent.addChild(Xml.createProcessingInstruction(str1));
 				state = 1;
+			}
+			break;
+		case 18:
+			if(c == 59) {
+				var s = HxOverrides.substr(str,start,p - start);
+				if(s.charCodeAt(0) == 35) {
+					var i = s.charCodeAt(1) == 120?Std.parseInt("0" + HxOverrides.substr(s,1,s.length - 1)):Std.parseInt(HxOverrides.substr(s,1,s.length - 1));
+					buf.b += Std.string(String.fromCharCode(i));
+				} else if(!haxe.xml.Parser.escapes.exists(s)) buf.b += Std.string("&" + s + ";"); else buf.b += Std.string(haxe.xml.Parser.escapes.get(s));
+				start = p + 1;
+				state = next;
 			}
 			break;
 		}
@@ -9044,39 +7475,14 @@ haxe.xml.Parser.doParse = function(str,p,parent) {
 		state = 13;
 	}
 	if(state == 13) {
-		if(p != start || nsubs == 0) parent.addChild(Xml.createPCData(HxOverrides.substr(str,start,p - start)));
+		if(p != start || nsubs == 0) parent.addChild(Xml.createPCData(buf.b + HxOverrides.substr(str,start,p - start)));
 		return p;
 	}
 	throw "Unexpected end";
 }
-haxe.xml.Parser.isValidChar = function(c) {
-	return c >= 97 && c <= 122 || c >= 65 && c <= 90 || c >= 48 && c <= 57 || c == 58 || c == 46 || c == 95 || c == 45;
-}
 var js = js || {}
-js.Boot = $hxClasses["js.Boot"] = function() { }
-js.Boot.__name__ = ["js","Boot"];
-js.Boot.__unhtml = function(s) {
-	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
-}
-js.Boot.__trace = function(v,i) {
-	var msg = i != null?i.fileName + ":" + i.lineNumber + ": ":"";
-	msg += js.Boot.__string_rec(v,"");
-	var d;
-	if(typeof(document) != "undefined" && (d = document.getElementById("haxe:trace")) != null) d.innerHTML += js.Boot.__unhtml(msg) + "<br/>"; else if(typeof(console) != "undefined" && console.log != null) console.log(msg);
-}
-js.Boot.__clear_trace = function() {
-	var d = document.getElementById("haxe:trace");
-	if(d != null) d.innerHTML = "";
-}
-js.Boot.isClass = function(o) {
-	return o.__name__;
-}
-js.Boot.isEnum = function(e) {
-	return e.__ename__;
-}
-js.Boot.getClass = function(o) {
-	return o.__class__;
-}
+js.Boot = function() { }
+js.Boot.__name__ = true;
 js.Boot.__string_rec = function(o,s) {
 	if(o == null) return "null";
 	if(s.length >= 5) return "<...>";
@@ -9188,24 +7594,6 @@ js.Boot.__instanceof = function(o,cl) {
 js.Boot.__cast = function(o,t) {
 	if(js.Boot.__instanceof(o,t)) return o; else throw "Cannot cast " + Std.string(o) + " to " + Std.string(t);
 }
-js.Lib = $hxClasses["js.Lib"] = function() { }
-js.Lib.__name__ = ["js","Lib"];
-js.Lib.document = null;
-js.Lib.window = null;
-js.Lib.debug = function() {
-	debugger;
-}
-js.Lib.alert = function(v) {
-	alert(js.Boot.__string_rec(v,""));
-}
-js.Lib.eval = function(code) {
-	return eval(code);
-}
-js.Lib.setErrorHandler = function(f) {
-	js.Lib.onerror = f;
-}
-var $_;
-function $bind(o,m) { var f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; return f; };
 if(Array.prototype.indexOf) HxOverrides.remove = function(a,o) {
 	var i = a.indexOf(o);
 	if(i == -1) return false;
@@ -9216,59 +7604,31 @@ Math.__name__ = ["Math"];
 Math.NaN = Number.NaN;
 Math.NEGATIVE_INFINITY = Number.NEGATIVE_INFINITY;
 Math.POSITIVE_INFINITY = Number.POSITIVE_INFINITY;
-$hxClasses.Math = Math;
 Math.isFinite = function(i) {
 	return isFinite(i);
 };
 Math.isNaN = function(i) {
 	return isNaN(i);
 };
-String.prototype.__class__ = $hxClasses.String = String;
-String.__name__ = ["String"];
-Array.prototype.__class__ = $hxClasses.Array = Array;
-Array.__name__ = ["Array"];
-Date.prototype.__class__ = $hxClasses.Date = Date;
-Date.__name__ = ["Date"];
-var Int = $hxClasses.Int = { __name__ : ["Int"]};
-var Dynamic = $hxClasses.Dynamic = { __name__ : ["Dynamic"]};
-var Float = $hxClasses.Float = Number;
+String.prototype.__class__ = String;
+String.__name__ = true;
+Array.prototype.__class__ = Array;
+Array.__name__ = true;
+var Int = { __name__ : ["Int"]};
+var Dynamic = { __name__ : ["Dynamic"]};
+var Float = Number;
 Float.__name__ = ["Float"];
-var Bool = $hxClasses.Bool = Boolean;
+var Bool = Boolean;
 Bool.__ename__ = ["Bool"];
-var Class = $hxClasses.Class = { __name__ : ["Class"]};
+var Class = { __name__ : ["Class"]};
 var Enum = { };
-var Void = $hxClasses.Void = { __ename__ : ["Void"]};
 Xml.Element = "element";
 Xml.PCData = "pcdata";
 Xml.CData = "cdata";
 Xml.Comment = "comment";
 Xml.DocType = "doctype";
-Xml.Prolog = "prolog";
+Xml.ProcessingInstruction = "processingInstruction";
 Xml.Document = "document";
-if(typeof document != "undefined") js.Lib.document = document;
-if(typeof window != "undefined") {
-	js.Lib.window = window;
-	js.Lib.window.onerror = function(msg,url,line) {
-		var f = js.Lib.onerror;
-		if(f == null) return false;
-		return f(msg,[url + ":" + line]);
-	};
-}
-js.XMLHttpRequest = window.XMLHttpRequest?XMLHttpRequest:window.ActiveXObject?function() {
-	try {
-		return new ActiveXObject("Msxml2.XMLHTTP");
-	} catch( e ) {
-		try {
-			return new ActiveXObject("Microsoft.XMLHTTP");
-		} catch( e1 ) {
-			throw "Unable to create XMLHttpRequest object.";
-		}
-	}
-}:(function($this) {
-	var $r;
-	throw "Unable to create XMLHttpRequest object.";
-	return $r;
-}(this));
 alphatab.audio.MidiUtils.QUARTER_TIME = 960;
 alphatab.importer.ScoreImporter.UNSUPPORTED_FORMAT = "unsupported file";
 alphatab.importer.AlphaTexImporter.EOL = String.fromCharCode(0);
@@ -9358,7 +7718,7 @@ alphatab.rendering.glyphs.MusicFont.WaveHorizontal = "M 1382 230c -43 32 -92 69 
 alphatab.rendering.glyphs.MusicFont.WaveVertical = "M 165 4h 50c 47 44 86 85 115 122s 43 75 43 114c 0 31 -9 60 -28 85c -19 25 -47 55 -85 89s -66 64 -86 90c -19 26 -30 55 -31 88h 5c 0 31 9 60 27 86c 18 25 46 56 84 93s 66 68 86 95c 19 27 28 57 28 92c 0 33 -9 62 -28 89c -19 26 -47 57 -85 92c -37 35 -65 64 -84 89c -18 24 -27 51 -27 82c 0 17 22 59 67 127h -50c -59 -57 -100 -100 -124 -130c -23 -29 -35 -67 -35 -113c 0 -33 9 -62 27 -86c 18 -24 46 -53 85 -87c 38 -33 66 -63 85 -88c 18 -25 28 -55 28 -91c 0 -17 -8 -37 -26 -61s -42 -54 -73 -89c -31 -35 -53 -60 -64 -75c -41 -64 -61 -109 -61 -135c 1 -40 20 -80 56 -119c 35 -38 72 -77 110 -117c 38 -39 58 -76 60 -112c 0 -18 -4 -35 -13 -50C 210 72 192 44 165 4";
 alphatab.rendering.glyphs.MusicFont.PickStrokeDown = "M 0 -20h 816v 844h -74v -477h -672v 477H 0V -20";
 alphatab.rendering.glyphs.MusicFont.PickStrokeUp = "M 551 -7L 289 950l -264 -956h 66l 202 759l 193 -759H 551";
-alphatab.rendering.glyphs.MusicFont.TemoloPickingThirtySecond = "M -38 737v -250l 986 -505v 253L -38 737zM -38 1150v -250l 986 -505v 253L -38 1150zM -38 1562v -250l 986 -505v 261L -38 1562";
+alphatab.rendering.glyphs.MusicFont.TremoloPickingThirtySecond = "M -38 737v -250l 986 -505v 253L -38 737zM -38 1150v -250l 986 -505v 253L -38 1150zM -38 1562v -250l 986 -505v 261L -38 1562";
 alphatab.rendering.glyphs.MusicFont.TremoloPickingSixteenth = "M -38 737v -250l 986 -505v 253L -38 737zM -38 1150v -250l 986 -505v 253L -38 1150";
 alphatab.rendering.glyphs.MusicFont.TremoloPickingEighth = "M -38 737v -250l 986 -505v 253L -38 737";
 alphatab.rendering.glyphs.MusicFont.UpperMordent = "M 16 714v -195l 425 -494c 34 -22 53 -33 56 -33c 19 0 33 6 39 20l 349 306c 17 17 36 28 56 33c 19 -6 33 -12 39 -19l 264 -307c 33 -22 53 -33 59 -33c 17 0 29 6 36 20l 349 306c 20 21 39 34 55 40c 20 -7 34 -16 40 -26l 224 -264v 194l -422 494c -32 22 -54 33 -66 33c -15 0 -26 -6 -33 -19l -346 -310c -15 -15 -37 -23 -66 -23c -16 0 -26 3 -29 9l -267 310c -25 22 -46 33 -62 33c -14 0 -25 -6 -33 -19l -346 -310c -18 -19 -40 -29 -66 -29c -14 0 -25 5 -32 16L 16 714";
@@ -9398,8 +7758,18 @@ alphatab.rendering.layout.PageViewLayout.GroupSpacing = 20;
 alphatab.rendering.staves.StaveGroup.StaveSpacing = 0;
 alphatab.rendering.utils.AccidentalHelper.ACCIDENTAL_NOTES = [[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural]];
 alphatab.rendering.utils.BeamingHelper.SCORE_MIDDLE_KEYS = [48,45,38,59];
-haxe.io.Output.LN2 = Math.log(2);
-js.Lib.onerror = null;
+haxe.xml.Parser.escapes = (function($this) {
+	var $r;
+	var h = new haxe.ds.StringMap();
+	h.set("lt","<");
+	h.set("gt",">");
+	h.set("amp","&");
+	h.set("quot","\"");
+	h.set("apos","'");
+	h.set("nbsp",String.fromCharCode(160));
+	$r = h;
+	return $r;
+}(this));
 alphatab.Main.main();
 
 //@ sourceMappingURL=alphaTab.core.js.map

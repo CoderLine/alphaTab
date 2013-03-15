@@ -24,9 +24,12 @@ import alphatab.model.Bar;
  */
 class BarRendererFactory 
 {
+    public var isInAccolade:Bool;
+    
 	private function new() 
-	{
-	}
+    {
+        isInAccolade = true;
+    }
 	
 	public function create(bar:Bar) : BarRendererBase
 	{

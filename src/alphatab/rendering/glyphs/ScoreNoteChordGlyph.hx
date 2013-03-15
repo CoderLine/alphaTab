@@ -25,6 +25,8 @@ import alphatab.rendering.Glyph;
 import alphatab.rendering.RenderingResources;
 import alphatab.rendering.ScoreBarRenderer;
 import alphatab.rendering.utils.BeamingHelper;
+import haxe.ds.IntMap;
+import haxe.ds.StringMap;
 
 typedef ScoreNoteGlyphInfo = {
     glyph:Glyph,
@@ -34,7 +36,7 @@ typedef ScoreNoteGlyphInfo = {
 class ScoreNoteChordGlyph extends Glyph
 {
     private var _infos:Array<ScoreNoteGlyphInfo>;
-	private var _noteLookup:IntHash<Glyph>;
+	private var _noteLookup:IntMap<Glyph>;
     
     public var minNote:ScoreNoteGlyphInfo;
     public var maxNote:ScoreNoteGlyphInfo;
@@ -43,7 +45,7 @@ class ScoreNoteChordGlyph extends Glyph
     public var upLineX:Int;
     public var downLineX:Int;
     
-    public var beatEffects:Hash<Glyph>;
+    public var beatEffects:StringMap<Glyph>;
     
     public var beat:Beat;
     public var beamingHelper:BeamingHelper;
@@ -53,8 +55,8 @@ class ScoreNoteChordGlyph extends Glyph
     {
         super(x, y);
         _infos = new Array<ScoreNoteGlyphInfo>();
-        beatEffects = new Hash<Glyph>();
-		_noteLookup = new IntHash<Glyph>();
+        beatEffects = new StringMap<Glyph>();
+		_noteLookup = new IntMap<Glyph>();
     }
 	
 	public function getDirection() : BeamDirection

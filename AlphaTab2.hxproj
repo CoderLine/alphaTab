@@ -20,7 +20,7 @@
   </classpaths>
   <!-- Build options -->
   <build>
-    <option directives="unit" />
+    <option directives="unit&#xA;js-classic" />
     <option flashStrict="False" />
     <option mainClass="alphatab.Main" />
     <option enabledebug="False" />

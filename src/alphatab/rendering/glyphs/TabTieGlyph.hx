@@ -10,7 +10,7 @@ class TabTieGlyph extends TieGlyph
 		super(startNote, endNote);
 	}
 
-	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Dynamic 
+	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
 	{
 		var r:TabBarRenderer = cast renderer;
 		var res = r.getResources();

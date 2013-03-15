@@ -50,7 +50,6 @@ class BeatGlyphBase extends GlyphGroup
             case Sixteenth:     return 11;
             case ThirtySecond:  return 11;
             case SixtyFourth:   return 11;
-            default: return 0;
         }
     }		
 }

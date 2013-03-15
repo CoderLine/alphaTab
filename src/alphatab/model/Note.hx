@@ -15,6 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.model;
+import js.Boot;
 
 /**
  * A note is a single played sound on a fretted instrument. 
@@ -56,6 +57,8 @@ class Note
     public var trillSpeed:Int;
     public var durationPercent:Float;
     
+    public var swapAccidentals:Bool;
+    
     public var beat:Beat;
     public var dynamicValue:DynamicValue;
 
@@ -86,6 +89,8 @@ class Note
         leftHandFinger = -1;
         rightHandFinger = -1;
         isFingering = false;
+        
+        swapAccidentals = false;
         
         trillFret = -1;
         trillSpeed = 0;

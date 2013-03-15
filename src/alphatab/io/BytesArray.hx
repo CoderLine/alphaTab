@@ -15,7 +15,7 @@ class BytesArray
 	 * Gets the capacity of this array. The capacity is the amount
 	 * of bytes that the internal buffer currently has allocated.
 	 */
-	public var capacity(getCapacity, never) : Int;
+	public var capacity(get_capacity, never) : Int;
 	
 	/**
 	 * Gets the count of elements currently stored in this array.
@@ -120,7 +120,7 @@ class BytesArray
 	}
 	
 	// returns the current capacity
-	private function getCapacity() : Int
+	private function get_capacity() : Int
 	{
 		return _data.length;
 	}

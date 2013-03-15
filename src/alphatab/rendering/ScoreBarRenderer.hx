@@ -55,6 +55,7 @@ import alphatab.rendering.glyphs.SvgGlyph;
 import alphatab.rendering.glyphs.TimeSignatureGlyph;
 import alphatab.rendering.utils.AccidentalHelper;
 import alphatab.rendering.utils.BeamingHelper;
+import haxe.ds.IntMap;
 
 using alphatab.model.ModelUtils;
 
@@ -103,14 +104,14 @@ class ScoreBarRenderer extends GroupedBarRenderer
     private var _beamHelpers:Array<BeamingHelper>;
 	
     private var _currentBeamHelper:BeamingHelper;
-	private var _beatPosition:IntHash<ScoreBeatGlyph>;
+	private var _beatPosition:IntMap<ScoreBeatGlyph>;
     
 	public function new(bar:alphatab.model.Bar) 
 	{
 		super(bar);
         accidentalHelper = new AccidentalHelper();
         _beamHelpers = new Array<BeamingHelper>();
-		_beatPosition = new IntHash<ScoreBeatGlyph>();
+		_beatPosition = new IntMap<ScoreBeatGlyph>();
 	}
 	
 	public function getBeatDirection(beat:Beat) : BeamDirection
@@ -283,7 +284,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
             canvas.moveTo(Std.int(cx + x + beatLineX), y1);
             canvas.lineTo(Std.int(cx + x + beatLineX), y2);
             canvas.stroke();
-            
+			            
             var brokenBarOffset = Std.int(6 * getScale());
             var barSpacing = Std.int(6 * getScale());
             var barSize = Std.int(3 * getScale());
@@ -437,7 +438,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
         glyph.paint(cx + x, cy + y, canvas);
     }
 	
-	private override function createPreBeatGlyphs():Dynamic 
+	private override function createPreBeatGlyphs():Void 
 	{
 		if (_bar.getMasterBar().isRepeatStart)
 		{
@@ -454,7 +455,6 @@ class ScoreBarRenderer extends GroupedBarRenderer
                 case C3: offset = 6; 
 				case C4: offset = 4;
 				case G2: offset = 6; 
-				default: offset = 0;
 			}
 			createStartSpacing();
 			addPreBeatGlyph(new ClefGlyph(0, getScoreY(offset), _bar.clef));
@@ -492,7 +492,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
         createVoiceGlyphs(_bar.voices[0]);
 	}
 	
-	private override function createPostBeatGlyphs():Dynamic 
+	private override function createPostBeatGlyphs():Void 
 	{
 		if (_bar.getMasterBar().isRepeatEnd())
 		{

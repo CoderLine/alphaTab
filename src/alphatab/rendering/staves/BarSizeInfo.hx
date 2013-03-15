@@ -1,4 +1,5 @@
 package alphatab.rendering.staves;
+import haxe.ds.StringMap;
 
 /**
  * This class stores size information about a stave. 
@@ -8,11 +9,11 @@ package alphatab.rendering.staves;
 class BarSizeInfo 
 {
 	public var fullWidth:Int;
-	public var sizes:Hash<Array<Int>>;
+	public var sizes:StringMap<Array<Int>>;
 	
 	public function new() 
 	{
-		sizes = new Hash<Array<Int>>();
+		sizes = new StringMap<Array<Int>>();
 	}
 	
 	public function setSize(key:String, size:Int)

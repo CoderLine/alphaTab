@@ -40,7 +40,6 @@ import alphatab.model.TripletFeel;
 import alphatab.model.VibratoType;
 import alphatab.model.Voice;
 import haxe.io.Bytes;
-import haxe.Stack;
 
 /**
  * This ScoreImporter can read Guitar Pro 3 to 5 files.
@@ -1058,7 +1057,8 @@ class Gp3To5Importer extends ScoreImporter
             {
                 newNote.durationPercent = readDouble();
             }
-            _data.readByte();
+            var flags2 = _data.readByte();
+            newNote.swapAccidentals = (flags2 & 0x02) != 0;
         }
         
         if ( (flags & 0x08) != 0)
@@ -1228,7 +1228,13 @@ class Gp3To5Importer extends ScoreImporter
     
     private function readTremoloPicking(beat:Beat)
     {
-        beat.tremoloSpeed = readUInt8();
+		var speed = readUInt8();
+		switch(speed)
+		{
+			case 1: beat.tremoloSpeed = Duration.Eighth;
+			case 2: beat.tremoloSpeed = Duration.Sixteenth;
+			case 3: beat.tremoloSpeed = Duration.ThirtySecond;
+		}
     }
     
     private function readSlide(note:Note)

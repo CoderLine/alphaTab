@@ -47,6 +47,8 @@ class BarRendererBase
         width = 0;
         height = 0;
         index = 0;
+        topOverflow = 0;
+        bottomOverflow = 0;
 	}
     
     public function registerOverflowTop(topOverflow:Int)

@@ -16,6 +16,8 @@
  */
 package alphatab.rendering.layout;
 
+import alphatab.rendering.EffectBarRenderer;
+import alphatab.rendering.EffectBarRendererFactory;
 import alphatab.rendering.ScoreBarRendererFactory;
 import alphatab.rendering.ScoreRenderer;
 import alphatab.rendering.staves.Stave;
@@ -51,8 +53,11 @@ class ScoreLayout
     {
         var group:StaveGroup = new StaveGroup();
 		group.layout = this;
+		group.addStave(new Stave(new EffectBarRendererFactory()));
 		group.addStave(new Stave(new ScoreBarRendererFactory()));
+		group.addStave(new Stave(new EffectBarRendererFactory()));
 		group.addStave(new Stave(new TabBarRendererFactory()));
+		group.addStave(new Stave(new EffectBarRendererFactory()));
         return group;
     }
 }

@@ -65,8 +65,8 @@ class Beat
     public var graceType:GraceType;
     public var pickStroke:PickStrokeType;
     
-    public inline function isTremolo():Bool { return tremoloSpeed >= 0; }
-    public var tremoloSpeed:Int;
+    public inline function isTremolo():Bool { return tremoloSpeed != null; }
+    public var tremoloSpeed:Null<Duration>;
     
     /**
      * The timeline position of the voice within the current bar. (unit: midi ticks)
@@ -82,7 +82,7 @@ class Beat
         graceType = GraceType.None;
         pickStroke = PickStrokeType.None;
         duration = Duration.Quarter;
-        tremoloSpeed = -1;
+        tremoloSpeed = null;
         automations = new Array<Automation>();
         start = 0;        
         tupletDenominator = -1;

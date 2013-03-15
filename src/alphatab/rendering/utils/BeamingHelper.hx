@@ -21,6 +21,7 @@ import alphatab.model.Bar;
 import alphatab.model.Beat;
 import alphatab.model.Duration;
 import alphatab.model.Note;
+import haxe.ds.IntMap;
 
 using alphatab.model.ModelUtils;
 
@@ -101,12 +102,12 @@ class BeamingHelper
     {
         beats = new Array<Beat>();
         valueCalculator = function(n) { return n.realValue(); };
-        _beatLineXPositions = new IntHash<BeatLinePositions>();
+        _beatLineXPositions = new IntMap<BeatLinePositions>();
         maxDuration = Duration.Whole;
     }
     
     // stores the X-positions for beat indices
-    private var _beatLineXPositions:IntHash<BeatLinePositions>;
+    private var _beatLineXPositions:IntMap<BeatLinePositions>;
     
     public function getBeatLineX(beat:Beat)
     {

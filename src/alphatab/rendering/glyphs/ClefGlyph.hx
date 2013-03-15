@@ -46,7 +46,6 @@ class ClefGlyph extends SvgGlyph
 			case C4: return MusicFont.ClefC;
 			case F4: return MusicFont.ClefF;
 			case G2: return MusicFont.ClefG;
-			default: return "";
 		}
 	}
 }

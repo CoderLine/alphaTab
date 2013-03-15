@@ -31,7 +31,7 @@ class ScoreTieGlyph extends TieGlyph
 		super(startNote, endNote);
 	}
 
-	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Dynamic 
+	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
 	{
 		var r:ScoreBarRenderer = cast renderer;
 		var startX = cx + r.getNoteX(_startNote);
