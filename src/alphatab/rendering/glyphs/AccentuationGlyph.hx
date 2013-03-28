@@ -25,7 +25,6 @@ class AccentuationGlyph extends SvgGlyph
 		super(x, y, getSvg(accentuation), 1, 1);
 	}	
 	
-		
 	public override function doLayout():Void 
 	{
 		width = Std.int(9 * getScale());

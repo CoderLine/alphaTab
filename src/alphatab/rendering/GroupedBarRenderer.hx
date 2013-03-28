@@ -142,6 +142,7 @@ class GroupedBarRenderer extends BarRendererBase
 	
 	private function addGlyph<T : (Glyph)>(c:Array<T>, g:T)
 	{
+        isEmpty = false;
 		g.x = c.length == 0 ? 0 : (c[c.length - 1].x + c[c.length - 1].width);
 		g.index = c.length;
 		g.renderer = this;

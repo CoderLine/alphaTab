@@ -7,32 +7,32 @@ import alphatab.model.Voice;
 import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
 import alphatab.rendering.glyphs.BeatGlyphBase;
-import alphatab.rendering.glyphs.EffectLineGlyph;
 import alphatab.rendering.layout.ScoreLayout;
 import haxe.ds.IntMap;
 import haxe.ds.StringMap;
+import js.html.svg.AnimatedBoolean;
 
 /**
  * This enum lists and sets the order of the effects in a EffectBar
  * Each of those effects gets it's own "line" within the bar
  */
-enum EffectBarEffects
-{
-    Tempo;
-    Tuplet;
-    Fermata;
-    DynamicValue;
-    LetRing;
-    PalmMute;
-    Vibrato;
-    TapSlapPop;
-    LeftHandFinger;
-    RightHandFinger;
-    FadeIn;
-    Chord;
-    Text;
-    Marker;
-}
+//enum EffectBarEffects
+//{
+//    Tempo;
+//    Tuplet;
+//    Fermata;
+//    DynamicValue;
+//    LetRing;
+//    PalmMute;
+//    Vibrato;
+//    TapSlapPop;
+//    LeftHandFinger;
+//    RightHandFinger;
+//    FadeIn;
+//    Chord;
+//    Text;
+//    Marker;
+// }
 
 /**
  * This renderer is responsible for displaying effects above or below the other staves
@@ -40,47 +40,143 @@ enum EffectBarEffects
  */
 class EffectBarRenderer extends GroupedBarRenderer
 {
-    private var _beatPosition:IntMap<BeatGlyphBase>;
-    private var _effectLines:StringMap<EffectLineGlyph>;
-
-	public function new(bar:Bar) 
+    private var _info:IEffectBarRendererInfo;
+    private var _preBeatPosition:IntMap<Glyph>;
+    private var _onBeatPosition:IntMap<Glyph>;
+    private var _postBeatPosition:IntMap<Glyph>;
+    private var _effectGlyphs:IntMap<Glyph>;
+    
+	public function new(bar:Bar, info:IEffectBarRendererInfo) 
 	{
 		super(bar);
-        _beatPosition = new IntMap<BeatGlyphBase>();
-        _effectLines = new StringMap<EffectLineGlyph>();
+        _info = info;
+        _preBeatPosition = new IntMap<Glyph>();
+        _onBeatPosition = new IntMap<Glyph>();
+        _postBeatPosition = new IntMap<Glyph>();
+        _effectGlyphs = new IntMap<Glyph>();        
 	}
     
 	public override function doLayout()
 	{
 		super.doLayout();
-		height = 0;
-        for (e in EffectBarEffects.createAll())
+        if (index == 0)
         {
-            if (_effectLines.exists(Std.string(e)))
-            {
-                var l = _effectLines.get(Std.string(e));
-                l.y = height;
-                l.width = width;
-                l.doLayout();
-                height += l.height;
-            }
+            stave.topSpacing = 5;
+            stave.bottomSpacing = 5;
         }
-        if (stave.staveBottom < height)
-        {
-            stave.registerStaveBottom(height);
-        }
-	}
+        height = _info.getHeight(this);
+    }
     
     public override function finalizeRenderer(layout:ScoreLayout):Void 
     {
         super.finalizeRenderer(layout);
-        for (e in EffectBarEffects.createAll())
+        // after all layouting and sizing place and size the effect glyphs
+        isEmpty = true;
+        var prevGlyph:Glyph = null;
+        for (i in _effectGlyphs.keys())
         {
-            if (_effectLines.exists(Std.string(e)))
-            {
-                var l = _effectLines.get(Std.string(e));
-                l.width = width;
-            }
+            var effect:Glyph = _effectGlyphs.get(i);
+            
+            alignGlyph(_info.getSizingMode(), i, prevGlyph);
+            
+            prevGlyph = effect;
+            isEmpty = false;
+        }
+    }
+    
+    private function alignGlyph(sizing:EffectBarGlyphSizing, i:Int, prevGlyph:Glyph)
+    {
+        var g:Glyph = _effectGlyphs.get(i); 
+        var pos:Glyph; 
+        switch(sizing)
+        {
+            case SinglePreBeatOnly:
+                pos = _preBeatPosition.get(i);
+                g.x = pos.x;
+                g.y = pos.y;
+                g.width = pos.width;
+                
+            case SinglePreBeatToOnBeat:
+                pos = _preBeatPosition.get(i);
+                g.x = pos.x;
+                g.y = pos.y;
+                pos = _onBeatPosition.get(i);
+                g.width = (pos.x + pos.width) - g.x;
+                
+            case SinglePreBeatToPostBeat:
+                pos = _preBeatPosition.get(i);
+                g.x = pos.x;
+                g.y = pos.y;
+                pos = _postBeatPosition.get(i);
+                g.width = (pos.x + pos.width) - g.x;
+
+        
+            case SingleOnBeatOnly:
+                pos = _onBeatPosition.get(i);
+                g.x = pos.x;
+                g.y = pos.y;
+                g.width = pos.width;
+
+            case SingleOnBeatToPostBeat:
+                pos = _onBeatPosition.get(i);
+                g.x = pos.x;
+                g.y = pos.y;
+                pos = _postBeatPosition.get(i);
+                g.width = (pos.x + pos.width) - g.x;
+
+            case SinglePostBeatOnly:
+                pos = _postBeatPosition.get(i);
+                g.x = pos.x;
+                g.y = pos.y;
+                g.width = pos.width;
+
+            case GroupedPreBeatOnly:
+                if (g != prevGlyph) { alignGlyph(EffectBarGlyphSizing.SinglePreBeatOnly, i, prevGlyph); }
+                else 
+                {
+                    pos = _preBeatPosition.get(i);
+                    g.width = (pos.x + pos.width) - g.x;
+                }
+                
+            case GroupedPreBeatToOnBeat:
+                if (g != prevGlyph) { alignGlyph(EffectBarGlyphSizing.SinglePreBeatToOnBeat, i, prevGlyph); }
+                else 
+                {
+                    pos = _onBeatPosition.get(i);
+                    g.width = (pos.x + pos.width) - g.x;
+                }
+            
+            case GroupedPreBeatToPostBeat:
+                if (g != prevGlyph) { alignGlyph(EffectBarGlyphSizing.SinglePreBeatToPostBeat, i, prevGlyph); }
+                else 
+                {
+                    pos = _postBeatPosition.get(i);
+                    g.width = (pos.x + pos.width) - g.x;
+                }
+                
+            case GroupedOnBeatOnly:
+                if (g != prevGlyph) { alignGlyph(EffectBarGlyphSizing.SingleOnBeatOnly, i, prevGlyph); }
+                else 
+                {
+                    pos = _onBeatPosition.get(i);
+                    g.width = (pos.x + pos.width) - g.x;
+                }
+                
+            case GroupedOnBeatToPostBeat:
+                if (g != prevGlyph) { alignGlyph(EffectBarGlyphSizing.SingleOnBeatToPostBeat, i, prevGlyph); }
+                else 
+                {
+                    pos = _postBeatPosition.get(i);
+                    g.width = (pos.x + pos.width) - g.x;
+                }
+                
+            case GroupedPostBeatOnly:
+                if (g != prevGlyph) { alignGlyph(EffectBarGlyphSizing.GroupedPostBeatOnly, i, prevGlyph); }
+                else 
+                {
+                    pos = _postBeatPosition.get(i);
+                    g.width = (pos.x + pos.width) - g.x;
+                }
         }
     }
 	
@@ -97,147 +193,64 @@ class EffectBarRenderer extends GroupedBarRenderer
     private function createVoiceGlyphs(v:Voice)
     {
         for (b in v.beats)
-        {
+        {            
             // we create empty glyphs as alignment references and to get the 
             // effect bar sized
 			var pre = new BeatGlyphBase(b);
+            _preBeatPosition.set(b.index, pre);
 			addBeatGlyph(pre);
 			
 			var g = new BeatGlyphBase(b);
-			_beatPosition.set(b.index, g);
+			_onBeatPosition.set(b.index, g);
 			addBeatGlyph(g); 
 			
 			var post = new BeatGlyphBase(b);
+            _postBeatPosition.set(b.index, post);
 			addBeatGlyph(post);
             
-            createEffectLines(b);
+            if (_info.shouldCreateGlyph(this, b))
+            {
+                createOrResizeGlyph(_info.getSizingMode(), b);
+            }
         }
     }	
     
-    private function createEffectLines(b:Beat)
+    private function createOrResizeGlyph(sizing:EffectBarGlyphSizing, b:Beat)
     {
-        if (b.index == 0)
+        switch(sizing)
         {
-            // TODO: bar and masterbar glyphs
-        }
-        createTupletLine(b);
-        createDynamicValue(b);
-        createFadeInLine(b);
-        createChordLine(b);
-        createTextLine(b);
+            case SinglePreBeatOnly, SinglePreBeatToOnBeat, SinglePreBeatToPostBeat, 
+                 SingleOnBeatOnly, SingleOnBeatToPostBeat, SinglePostBeatOnly:
+                var g = _info.createNewGlyph(this, b);
+                g.renderer = this;
+                g.doLayout();
+                _effectGlyphs.set(b.index, g);
 
-        for (n in b.notes)
-        {
-            createLetRingLine(n);
-            createPalmMuteLine(n);
-            createVibratoLine(n);
-            createTapSlapPopLine(n);
-            createLeftHandFingerLine(n);
-            createRightHandFingerLine(n);
+            case GroupedPreBeatOnly, GroupedPreBeatToOnBeat, GroupedPreBeatToPostBeat,
+                 GroupedOnBeatOnly, GroupedOnBeatToPostBeat, GroupedPostBeatOnly:
+                // measure breaks continious effects
+                if (b.index > 0)
+                {
+                    // check if the previous beat also had this effect
+                    var prevBeat = b.previousBeat;
+                    if (_info.shouldCreateGlyph(this, prevBeat))
+                    {
+                        // expand the previous effect
+                        var prevEffect = _effectGlyphs.get(b.index - 1);
+                        _effectGlyphs.set(b.index, prevEffect);
+                    }
+                    else
+                    {
+                        createOrResizeGlyph(EffectBarGlyphSizing.SinglePreBeatOnly, b);
+                    }
+                }
+                else
+                {
+                    createOrResizeGlyph(EffectBarGlyphSizing.SinglePreBeatOnly, b);
+                }
         }
     }
     
-    private function createTupletLine(b:Beat)
-    {
-        if (b.tupletDenominator > 0 && b.tupletNumerator > 0)
-        {
-            registerEffectLine(EffectBarEffects.Tempo);
-        }
-    }
-	
-    private function createDynamicValue(b:Beat)
-    {
-        if ( (b.previousBeat == null) || (b.previousBeat.dynamicValue != b.dynamicValue))
-        {
-            registerEffectLine(EffectBarEffects.DynamicValue);
-        }
-    }
-    
-    private function createLetRingLine(n:Note)
-    {
-        if (n.isLetRing)
-        {
-            registerEffectLine(EffectBarEffects.LetRing);
-        }
-    }
-    
-    private function createPalmMuteLine(n:Note)
-    {
-        if (n.isPalmMute)
-        {
-            registerEffectLine(EffectBarEffects.PalmMute);
-        }
-    }
-    
-    private function createVibratoLine(n:Note)
-    {
-        if (n.vibrato != VibratoType.None)
-        {
-            registerEffectLine(EffectBarEffects.Vibrato);
-        }
-    }
-    
-    private function createLeftHandFingerLine(n:Note)
-    {
-        if (n.leftHandFinger >= 0)
-        {
-            registerEffectLine(EffectBarEffects.LeftHandFinger);
-        }
-    }
-    
-    private function createRightHandFingerLine(n:Note)
-    {
-        if (n.rightHandFinger >= 0)
-        {
-            registerEffectLine(EffectBarEffects.LeftHandFinger);
-        }
-    }
-    
-    private function createTapSlapPopLine(n:Note)
-    {
-        if (n.tapping || n.beat.slap || n.beat.pop)
-        {
-            registerEffectLine(EffectBarEffects.TapSlapPop);
-        }
-    }
-    
-    private function createFadeInLine(b:Beat)
-    {
-        if (b.fadeIn)
-        {
-            registerEffectLine(EffectBarEffects.FadeIn);
-        }
-    }
-    
-    private function createChordLine(b:Beat)
-    {
-        if (b.hasChord())
-        {
-            registerEffectLine(EffectBarEffects.Chord);
-        }
-    }
-    
-    private function createTextLine(b:Beat)
-    {
-        if (b.text != null && b.text.length > 0)
-        {
-            registerEffectLine(EffectBarEffects.Text);
-        }
-    }
-    
-    private function registerEffectLine(effect:EffectBarEffects)
-    {
-        var s = Std.string(effect);
-        if (!_effectLines.exists(s))
-        {
-            var line = new EffectLineGlyph(effect);
-            line.x = 0;
-            line.y = 0;
-            line.renderer = this;
-            _effectLines.set(s, line);
-        }
-    }
-	
 	private override function createPostBeatGlyphs():Void 
 	{
 	}
@@ -260,9 +273,10 @@ class EffectBarRenderer extends GroupedBarRenderer
     public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
     {
         super.paint(cx, cy, canvas);
-        for (l in _effectLines)
+        var glyphStart = getBeatGlyphsStart();
+        for (l in _effectGlyphs)
         {
-            l.paint(cx + x, cy + y, canvas);
+            l.paint(cx + x + glyphStart, cy + y, canvas);
         }
     }
 }

@@ -22,6 +22,7 @@ import alphatab.platform.model.Color;
 import alphatab.rendering.BarRendererBase;
 import alphatab.rendering.BarRendererFactory;
 import alphatab.rendering.layout.ScoreLayout;
+import js.Boot;
 
 /**
  * A stave represents a single line within a StaveGroup. 
@@ -133,20 +134,33 @@ class Stave
 		height = 0;
         var topOverflow = getTopOverflow();
         var bottomOverflow = getBottomOverflow();
-		for (i in 0 ... barRenderers.length)
+        var isEmpty:Bool = true;
+        for (i in 0 ... barRenderers.length)
 		{
 			barRenderers[i].x = x;
 			barRenderers[i].y = topSpacing + topOverflow;
 			height = Std.int(Math.max(height, barRenderers[i].height));
 			barRenderers[i].finalizeRenderer(layout);
 			x += barRenderers[i].width;
+            if (!barRenderers[i].isEmpty)
+            {
+                isEmpty = false;
+            }
 		}
-		height += topSpacing + topOverflow + bottomOverflow + bottomSpacing;
-	}
+        if (!isEmpty)
+        {
+            height += topSpacing + topOverflow + bottomOverflow + bottomSpacing;
+        }
+        else
+        {
+            height = 0;
+        }
+    }
 	
 		
 	public function paint(cx:Int, cy:Int, canvas:ICanvas)
 	{
+        if (height == 0) return;
 		for (r in barRenderers)
 		{
 			r.paint(cx + x, cy + y, canvas);

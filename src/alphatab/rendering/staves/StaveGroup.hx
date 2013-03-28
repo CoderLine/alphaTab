@@ -204,17 +204,11 @@ class StaveGroup
 		}
 	}
 	
-	public static inline var StaveSpacing = 0;
 	public function finalizeGroup(scoreLayout:ScoreLayout)
 	{
 		var currentY:Float = 0;
 		for (i in 0 ... staves.length)
 		{
-			if (i > 0)
-			{
-				currentY += (StaveSpacing * scoreLayout.renderer.scale);
-			}
-			
 			staves[i].x = 0;
 			staves[i].y = Std.int(currentY);
 			staves[i].finalizeStave(scoreLayout);

@@ -33,6 +33,7 @@ class BarRendererBase
 	public var width:Int;
 	public var height:Int;
 	public var index:Int;
+	public var isEmpty:Bool;
     
 	public var topOverflow:Int;
 	public var bottomOverflow:Int;
@@ -49,6 +50,7 @@ class BarRendererBase
         index = 0;
         topOverflow = 0;
         bottomOverflow = 0;
+        isEmpty = true;
 	}
     
     public function registerOverflowTop(topOverflow:Int)
