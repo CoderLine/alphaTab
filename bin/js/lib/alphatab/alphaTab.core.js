@@ -60,6 +60,19 @@ HxOverrides.iter = function(a) {
 		return this.arr[this.cur++];
 	}};
 }
+var Reflect = function() { }
+Reflect.__name__ = true;
+Reflect.field = function(o,field) {
+	var v = null;
+	try {
+		v = o[field];
+	} catch( e ) {
+	}
+	return v;
+}
+Reflect.isFunction = function(f) {
+	return typeof(f) == "function" && !(f.__name__ || f.__ename__);
+}
 var Std = function() { }
 Std.__name__ = true;
 Std.string = function(s) {
@@ -120,6 +133,20 @@ StringTools.hex = function(n,digits) {
 	} while(n > 0);
 	if(digits != null) while(s.length < digits) s = "0" + s;
 	return s;
+}
+var Type = function() { }
+Type.__name__ = true;
+Type.allEnums = function(e) {
+	var all = [];
+	var cst = e.__constructs__;
+	var _g = 0;
+	while(_g < cst.length) {
+		var c = cst[_g];
+		++_g;
+		var v = Reflect.field(e,c);
+		if(!Reflect.isFunction(v)) all.push(v);
+	}
+	return all;
 }
 var XmlType = { __ename__ : true, __constructs__ : [] }
 var Xml = function() {
@@ -1443,6 +1470,7 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 		if((flags & 16) != 0) {
 			var dynamicNumber = this._data.readInt8();
 			newNote.dynamicValue = this.toDynamicValue(dynamicNumber);
+			if(beat.dynamicValue == alphatab.model.DynamicValue.MF) beat.dynamicValue = newNote.dynamicValue;
 		}
 		if((flags & 32) != 0) newNote.fret = this._data.readInt8();
 		if((flags & 128) != 0) {
@@ -2472,6 +2500,7 @@ alphatab.model.Beat = function() {
 	this.start = 0;
 	this.tupletDenominator = -1;
 	this.tupletNumerator = -1;
+	this.dynamicValue = alphatab.model.DynamicValue.MF;
 };
 alphatab.model.Beat.__name__ = true;
 alphatab.model.Beat.prototype = {
@@ -3727,6 +3756,49 @@ alphatab.rendering.BarRendererFactory.prototype = {
 	}
 	,__class__: alphatab.rendering.BarRendererFactory
 }
+alphatab.rendering.EffectBarEffects = { __ename__ : true, __constructs__ : ["Tempo","Tuplet","Fermata","DynamicValue","LetRing","PalmMute","Vibrato","TapSlapPop","LeftHandFinger","RightHandFinger","FadeIn","Chord","Text","Marker"] }
+alphatab.rendering.EffectBarEffects.Tempo = ["Tempo",0];
+alphatab.rendering.EffectBarEffects.Tempo.toString = $estr;
+alphatab.rendering.EffectBarEffects.Tempo.__enum__ = alphatab.rendering.EffectBarEffects;
+alphatab.rendering.EffectBarEffects.Tuplet = ["Tuplet",1];
+alphatab.rendering.EffectBarEffects.Tuplet.toString = $estr;
+alphatab.rendering.EffectBarEffects.Tuplet.__enum__ = alphatab.rendering.EffectBarEffects;
+alphatab.rendering.EffectBarEffects.Fermata = ["Fermata",2];
+alphatab.rendering.EffectBarEffects.Fermata.toString = $estr;
+alphatab.rendering.EffectBarEffects.Fermata.__enum__ = alphatab.rendering.EffectBarEffects;
+alphatab.rendering.EffectBarEffects.DynamicValue = ["DynamicValue",3];
+alphatab.rendering.EffectBarEffects.DynamicValue.toString = $estr;
+alphatab.rendering.EffectBarEffects.DynamicValue.__enum__ = alphatab.rendering.EffectBarEffects;
+alphatab.rendering.EffectBarEffects.LetRing = ["LetRing",4];
+alphatab.rendering.EffectBarEffects.LetRing.toString = $estr;
+alphatab.rendering.EffectBarEffects.LetRing.__enum__ = alphatab.rendering.EffectBarEffects;
+alphatab.rendering.EffectBarEffects.PalmMute = ["PalmMute",5];
+alphatab.rendering.EffectBarEffects.PalmMute.toString = $estr;
+alphatab.rendering.EffectBarEffects.PalmMute.__enum__ = alphatab.rendering.EffectBarEffects;
+alphatab.rendering.EffectBarEffects.Vibrato = ["Vibrato",6];
+alphatab.rendering.EffectBarEffects.Vibrato.toString = $estr;
+alphatab.rendering.EffectBarEffects.Vibrato.__enum__ = alphatab.rendering.EffectBarEffects;
+alphatab.rendering.EffectBarEffects.TapSlapPop = ["TapSlapPop",7];
+alphatab.rendering.EffectBarEffects.TapSlapPop.toString = $estr;
+alphatab.rendering.EffectBarEffects.TapSlapPop.__enum__ = alphatab.rendering.EffectBarEffects;
+alphatab.rendering.EffectBarEffects.LeftHandFinger = ["LeftHandFinger",8];
+alphatab.rendering.EffectBarEffects.LeftHandFinger.toString = $estr;
+alphatab.rendering.EffectBarEffects.LeftHandFinger.__enum__ = alphatab.rendering.EffectBarEffects;
+alphatab.rendering.EffectBarEffects.RightHandFinger = ["RightHandFinger",9];
+alphatab.rendering.EffectBarEffects.RightHandFinger.toString = $estr;
+alphatab.rendering.EffectBarEffects.RightHandFinger.__enum__ = alphatab.rendering.EffectBarEffects;
+alphatab.rendering.EffectBarEffects.FadeIn = ["FadeIn",10];
+alphatab.rendering.EffectBarEffects.FadeIn.toString = $estr;
+alphatab.rendering.EffectBarEffects.FadeIn.__enum__ = alphatab.rendering.EffectBarEffects;
+alphatab.rendering.EffectBarEffects.Chord = ["Chord",11];
+alphatab.rendering.EffectBarEffects.Chord.toString = $estr;
+alphatab.rendering.EffectBarEffects.Chord.__enum__ = alphatab.rendering.EffectBarEffects;
+alphatab.rendering.EffectBarEffects.Text = ["Text",12];
+alphatab.rendering.EffectBarEffects.Text.toString = $estr;
+alphatab.rendering.EffectBarEffects.Text.__enum__ = alphatab.rendering.EffectBarEffects;
+alphatab.rendering.EffectBarEffects.Marker = ["Marker",13];
+alphatab.rendering.EffectBarEffects.Marker.toString = $estr;
+alphatab.rendering.EffectBarEffects.Marker.__enum__ = alphatab.rendering.EffectBarEffects;
 alphatab.rendering.GroupedBarRenderer = function(bar) {
 	alphatab.rendering.BarRendererBase.call(this,bar);
 	this._preBeatGlyphs = new Array();
@@ -3877,14 +3949,20 @@ alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.Bar
 alphatab.rendering.EffectBarRenderer = function(bar) {
 	alphatab.rendering.GroupedBarRenderer.call(this,bar);
 	this._beatPosition = new haxe.ds.IntMap();
+	this._effectLines = new haxe.ds.StringMap();
 };
 alphatab.rendering.EffectBarRenderer.__name__ = true;
 alphatab.rendering.EffectBarRenderer.__super__ = alphatab.rendering.GroupedBarRenderer;
 alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.GroupedBarRenderer.prototype,{
-	paintBackground: function(cx,cy,canvas) {
-		var res = this.stave.staveGroup.layout.renderer.renderingResources;
-		canvas.setColor(new alphatab.platform.model.Color(0,0,0,120));
-		canvas.fillRect(cx + this.x,cy + this.y,this.width,this.height);
+	paint: function(cx,cy,canvas) {
+		alphatab.rendering.GroupedBarRenderer.prototype.paint.call(this,cx,cy,canvas);
+		var $it0 = this._effectLines.iterator();
+		while( $it0.hasNext() ) {
+			var l = $it0.next();
+			l.paint(cx + this.x,cy + this.y,canvas);
+		}
+	}
+	,paintBackground: function(cx,cy,canvas) {
 	}
 	,getBottomPadding: function() {
 		return 0;
@@ -3893,6 +3971,69 @@ alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.Grou
 		return 0;
 	}
 	,createPostBeatGlyphs: function() {
+	}
+	,registerEffectLine: function(effect) {
+		var s = Std.string(effect);
+		if(!this._effectLines.exists(s)) {
+			var line = new alphatab.rendering.glyphs.EffectLineGlyph(effect);
+			line.x = 0;
+			line.y = 0;
+			line.renderer = this;
+			this._effectLines.set(s,line);
+		}
+	}
+	,createTextLine: function(b) {
+		if(b.text != null && b.text.length > 0) this.registerEffectLine(alphatab.rendering.EffectBarEffects.Text);
+	}
+	,createChordLine: function(b) {
+		if(b.chord != null) this.registerEffectLine(alphatab.rendering.EffectBarEffects.Chord);
+	}
+	,createFadeInLine: function(b) {
+		if(b.fadeIn) this.registerEffectLine(alphatab.rendering.EffectBarEffects.FadeIn);
+	}
+	,createTapSlapPopLine: function(n) {
+		if(n.tapping || n.beat.slap || n.beat.pop) this.registerEffectLine(alphatab.rendering.EffectBarEffects.TapSlapPop);
+	}
+	,createRightHandFingerLine: function(n) {
+		if(n.rightHandFinger >= 0) this.registerEffectLine(alphatab.rendering.EffectBarEffects.LeftHandFinger);
+	}
+	,createLeftHandFingerLine: function(n) {
+		if(n.leftHandFinger >= 0) this.registerEffectLine(alphatab.rendering.EffectBarEffects.LeftHandFinger);
+	}
+	,createVibratoLine: function(n) {
+		if(n.vibrato != alphatab.model.VibratoType.None) this.registerEffectLine(alphatab.rendering.EffectBarEffects.Vibrato);
+	}
+	,createPalmMuteLine: function(n) {
+		if(n.isPalmMute) this.registerEffectLine(alphatab.rendering.EffectBarEffects.PalmMute);
+	}
+	,createLetRingLine: function(n) {
+		if(n.isLetRing) this.registerEffectLine(alphatab.rendering.EffectBarEffects.LetRing);
+	}
+	,createDynamicValue: function(b) {
+		if(b.previousBeat == null || b.previousBeat.dynamicValue != b.dynamicValue) this.registerEffectLine(alphatab.rendering.EffectBarEffects.DynamicValue);
+	}
+	,createTupletLine: function(b) {
+		if(b.tupletDenominator > 0 && b.tupletNumerator > 0) this.registerEffectLine(alphatab.rendering.EffectBarEffects.Tempo);
+	}
+	,createEffectLines: function(b) {
+		if(b.index == 0) {
+		}
+		this.createTupletLine(b);
+		this.createDynamicValue(b);
+		this.createFadeInLine(b);
+		this.createChordLine(b);
+		this.createTextLine(b);
+		var _g = 0, _g1 = b.notes;
+		while(_g < _g1.length) {
+			var n = _g1[_g];
+			++_g;
+			this.createLetRingLine(n);
+			this.createPalmMuteLine(n);
+			this.createVibratoLine(n);
+			this.createTapSlapPopLine(n);
+			this.createLeftHandFingerLine(n);
+			this.createRightHandFingerLine(n);
+		}
 	}
 	,createVoiceGlyphs: function(v) {
 		var _g = 0, _g1 = v.beats;
@@ -3906,6 +4047,7 @@ alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.Grou
 			this.addBeatGlyph(g);
 			var post = new alphatab.rendering.glyphs.BeatGlyphBase(b);
 			this.addBeatGlyph(post);
+			this.createEffectLines(b);
 		}
 	}
 	,createBeatGlyphs: function() {
@@ -3913,10 +4055,34 @@ alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.Grou
 	}
 	,createPreBeatGlyphs: function() {
 	}
+	,finalizeRenderer: function(layout) {
+		alphatab.rendering.GroupedBarRenderer.prototype.finalizeRenderer.call(this,layout);
+		var _g = 0, _g1 = Type.allEnums(alphatab.rendering.EffectBarEffects);
+		while(_g < _g1.length) {
+			var e = _g1[_g];
+			++_g;
+			if(this._effectLines.exists(Std.string(e))) {
+				var l = this._effectLines.get(Std.string(e));
+				l.width = this.width;
+			}
+		}
+	}
 	,doLayout: function() {
 		alphatab.rendering.GroupedBarRenderer.prototype.doLayout.call(this);
-		this.height = 30 * this.stave.staveGroup.layout.renderer.scale | 0;
-		if(this.index == 0) this.stave.registerStaveBottom(this.height);
+		this.height = 0;
+		var _g = 0, _g1 = Type.allEnums(alphatab.rendering.EffectBarEffects);
+		while(_g < _g1.length) {
+			var e = _g1[_g];
+			++_g;
+			if(this._effectLines.exists(Std.string(e))) {
+				var l = this._effectLines.get(Std.string(e));
+				l.y = this.height;
+				l.width = this.width;
+				l.doLayout();
+				this.height += l.height;
+			}
+		}
+		if(this.stave.staveBottom < this.height) this.stave.registerStaveBottom(this.height);
 	}
 	,__class__: alphatab.rendering.EffectBarRenderer
 });
@@ -5210,6 +5376,26 @@ alphatab.rendering.glyphs.DigitGlyph.prototype = $extend(alphatab.rendering.glyp
 		this.width = this.getDigitWidth(this._digit) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
 	,__class__: alphatab.rendering.glyphs.DigitGlyph
+});
+alphatab.rendering.glyphs.EffectLineGlyph = function(effect) {
+	alphatab.rendering.glyphs.GlyphGroup.call(this);
+	this.effect = effect;
+};
+alphatab.rendering.glyphs.EffectLineGlyph.__name__ = true;
+alphatab.rendering.glyphs.EffectLineGlyph.__super__ = alphatab.rendering.glyphs.GlyphGroup;
+alphatab.rendering.glyphs.EffectLineGlyph.prototype = $extend(alphatab.rendering.glyphs.GlyphGroup.prototype,{
+	paint: function(cx,cy,canvas) {
+		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
+		canvas.setColor(new alphatab.platform.model.Color(0,0,0,100));
+		canvas.fillRect(cx + this.x,cy + this.y,this.width,this.height);
+		canvas.setFont(res.tablatureFont);
+		canvas.setColor(res.barNumberColor);
+		canvas.fillText(Std.string(this.effect),cx + this.x,cy + this.y);
+	}
+	,doLayout: function() {
+		this.height = 20 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,__class__: alphatab.rendering.glyphs.EffectLineGlyph
 });
 alphatab.rendering.glyphs.FlatGlyph = function(x,y,isGrace) {
 	if(isGrace == null) isGrace = false;

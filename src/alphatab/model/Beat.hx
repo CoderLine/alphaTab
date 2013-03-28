@@ -17,6 +17,7 @@
 package alphatab.model;
 
 import alphatab.audio.MidiUtils;
+import js.Boot;
 
 /**
  * A beat is a single block within a bar. A beat is a combination
@@ -73,6 +74,8 @@ class Beat
      */
     public var start:Int;
     
+    public var dynamicValue:DynamicValue;
+    
     public function new() 
     {
         whammyBarPoints = new Array<BendPoint>();
@@ -87,6 +90,7 @@ class Beat
         start = 0;        
         tupletDenominator = -1;
         tupletNumerator = -1;
+        dynamicValue = DynamicValue.MF;
     }
     
     /**

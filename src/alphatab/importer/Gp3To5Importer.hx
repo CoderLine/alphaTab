@@ -1037,6 +1037,10 @@ class Gp3To5Importer extends ScoreImporter
         {
             var dynamicNumber = _data.readInt8();
             newNote.dynamicValue = toDynamicValue(dynamicNumber);
+            if (beat.dynamicValue == DynamicValue.MF)
+            {
+                beat.dynamicValue = newNote.dynamicValue;
+            }
         }
         
         if ( (flags & 0x20) != 0)
