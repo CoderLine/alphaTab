@@ -127,45 +127,38 @@ class JsFileLoader implements IFileLoader
             xhr.overrideMimeType('text/plain; charset=x-user-defined');
             xhr.onreadystatechange = function(e:Event) 
             {
-                try
+                if (xhr.readyState == 4)
                 {
-                    if (xhr.readyState == 4)
+                    if (xhr.status == 200)
                     {
-                        if (xhr.status == 200)
-                        {
-                            var reader:Bytes = getBytes(xhr.responseText);
-                            success(reader);
-                        }
-                        // Error handling
-                        else if (xhr.status == 0)
-                        {
-                            error('You are offline!!\n Please Check Your Network.');
-                        }
-                        else if (xhr.status == 404)
-                        {
-                            error('Requested URL not found.');
-                        }
-                        else if (xhr.status == 500)
-                        {
-                            error('Internel Server Error.');
-                        }
-                        else if (xhr.statusText == 'parsererror')
-                        {
-                            error('Error.\nParsing JSON Request failed.');
-                        }
-                        else if (xhr.statusText == 'timeout')
-                        {
-                            error('Request Time out.');
-                        }
-                        else 
-                        {
-                            error('Unknow Error: ' + xhr.responseText);
-                        }
+                        var reader:Bytes = getBytes(xhr.responseText);
+                        success(reader);
                     }
-                }
-                catch (e:Dynamic)
-                {
-                    error("Error loading file: " + e);
+                    // Error handling
+                    else if (xhr.status == 0)
+                    {
+                        error('You are offline!!\n Please Check Your Network.');
+                    }
+                    else if (xhr.status == 404)
+                    {
+                        error('Requested URL not found.');
+                    }
+                    else if (xhr.status == 500)
+                    {
+                        error('Internel Server Error.');
+                    }
+                    else if (xhr.statusText == 'parsererror')
+                    {
+                        error('Error.\nParsing JSON Request failed.');
+                    }
+                    else if (xhr.statusText == 'timeout')
+                    {
+                        error('Request Time out.');
+                    }
+                    else 
+                    {
+                        error('Unknow Error: ' + xhr.responseText);
+                    }
                 }
             }
             xhr.open("GET", path, true);

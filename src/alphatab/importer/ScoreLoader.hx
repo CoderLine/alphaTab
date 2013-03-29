@@ -16,9 +16,9 @@
  */
 package alphatab.importer;
 
+import alphatab.Environment;
 import alphatab.model.Score;
 import alphatab.platform.IFileLoader;
-import alphatab.platform.PlatformFactory;
 import haxe.CallStack;
 import haxe.io.Bytes;
 import haxe.io.BytesInput;
@@ -37,12 +37,13 @@ class ScoreLoader
 	 */
     public static function loadScoreAsync(path:String, success:Score-> Void, error:String->Void)
     {
-        var loader:IFileLoader = PlatformFactory.getLoader();        
+        var loader:IFileLoader = Environment.fileLoaders.get("default")();
         loader.loadBinaryAsync(path, 
             function(data:Bytes) : Void
             {
                 var importers:Array<ScoreImporter> = ScoreImporter.availableImporters();
                 
+                var score:Score = null;
                 for (importer in importers)
                 {
                     try
@@ -50,10 +51,8 @@ class ScoreLoader
                         var input:BytesInput = new BytesInput(data);
                         importer.init(input);
                         
-                        var score:Score = importer.readScore();
-                        success(score);
-                        
-                        return;
+                        score = importer.readScore();                        
+                        break;
                     }
                     catch (e:Dynamic)
                     {
@@ -63,12 +62,19 @@ class ScoreLoader
                         }
                         else
                         {
-                            error(CallStack.toString(CallStack.exceptionStack()));
+                            error(e);
                         }
                     }                    
                 }
                 
-                error("No reader for the requested file found");
+                if (score != null)
+                {
+                    success(score);
+                }
+                else
+                {
+                    error("No reader for the requested file found");
+                }
             }
             ,
             error

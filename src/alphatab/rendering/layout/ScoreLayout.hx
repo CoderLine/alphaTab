@@ -16,6 +16,7 @@
  */
 package alphatab.rendering.layout;
 
+import alphatab.Environment;
 import alphatab.rendering.EffectBarRenderer;
 import alphatab.rendering.EffectBarRendererFactory;
 import alphatab.rendering.effects.BeatVibratoEffectInfo;
@@ -55,17 +56,14 @@ class ScoreLayout
     {
         var group:StaveGroup = new StaveGroup();
 		group.layout = this;
-        createEffectStaves(group);
-		group.addStave(new Stave(new ScoreBarRendererFactory()));
-        createEffectStaves(group);
-		group.addStave(new Stave(new TabBarRendererFactory()));
-        createEffectStaves(group);
+        
+        for (s in renderer.settings.staves)
+        {
+            if (Environment.staveFactories.exists(s.id))
+            {
+                group.addStave(new Stave(Environment.staveFactories.get(s.id)(this)));
+            }
+        }
         return group;
-    }
-    
-    private function createEffectStaves(group:StaveGroup)
-    {
-        group.addStave(new Stave(new EffectBarRendererFactory(new BeatVibratoEffectInfo())));
-		group.addStave(new Stave(new EffectBarRendererFactory(new NoteVibratoEffectInfo())));
     }
 }

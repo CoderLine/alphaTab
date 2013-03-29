@@ -1,0 +1,186 @@
+package alphatab;
+import alphatab.rendering.glyphs.TremoloPickingGlyph;
+import haxe.ds.StringMap;
+
+/**
+ * This class contains instance specific settings for alphaTab
+ */
+class Settings
+{
+    /**
+     * Sets the zoom level of the rendered notation
+     */    
+    public var scale:Float;
+    
+    /**
+     * Sets whether the width of the canvas should be automatically determined by the used layout.
+     */
+    public var autoSize:Bool;
+        
+    /**
+     * The initial size of the canvas during loading or the width when {@see autoSize} set to false
+     */
+    public var width:Int;
+    
+    /**
+     * The initial size of the canvas during loading or the fixed height on some layouts. 
+     */ 
+    public var height:Int;
+    
+    /**
+     * The engine which should be used to render the the tablature. 
+     * <ul>
+     *  <li><strong>default</strong> - Platform specific default engine</li>
+     *  <li><strong>html5</strong> - Canvas with VRML Fallback</li>
+     *  <li><strong>svg</strong> -  SVG </li>
+     * </ul>
+     */
+    public var engine:String;
+    
+    /**
+     * The layout specific settings
+     */
+    public var layout:LayoutSettings;
+    
+    /**
+     * The staves to create for each row.
+     */
+    public var staves:Array<StaveSettings>;
+    
+    public function new()
+    {
+        
+    }    
+    
+    public static function defaults() : Settings
+    {
+        var settings = new Settings();
+        
+        settings.scale = 1.0;
+        settings.autoSize = true;
+        settings.width = 600;
+        settings.height = 200;
+        settings.engine = "default";
+        
+        settings.layout = LayoutSettings.defaults();
+
+        settings.staves = new Array<StaveSettings>();
+        
+        settings.staves.push(new StaveSettings("marker"));
+        settings.staves.push(new StaveSettings("triplet-feel"));
+        settings.staves.push(new StaveSettings("tempo"));
+        settings.staves.push(new StaveSettings("fermata"));
+        settings.staves.push(new StaveSettings("text"));
+        settings.staves.push(new StaveSettings("chords"));
+        settings.staves.push(new StaveSettings("beat-vibrato"));
+        settings.staves.push(new StaveSettings("note-vibrato"));
+        settings.staves.push(new StaveSettings("tuplet"));
+        
+        settings.staves.push(new StaveSettings("score"));
+        
+        settings.staves.push(new StaveSettings("dynamics"));
+        settings.staves.push(new StaveSettings("beat-vibrato"));
+        settings.staves.push(new StaveSettings("note-vibrato"));
+        settings.staves.push(new StaveSettings("tap"));
+        settings.staves.push(new StaveSettings("fade-in"));
+        settings.staves.push(new StaveSettings("let-ring"));
+        settings.staves.push(new StaveSettings("palm-mute"));
+        
+        settings.staves.push(new StaveSettings("tab"));
+        
+        settings.staves.push(new StaveSettings("fingering"));
+
+        return settings;
+    }
+}
+
+
+class LayoutSettings
+{
+    /**
+     * The layouting mode used to arrange the the notation.
+     * <ul>
+     *  <li><strong>page</strong> - Bars are aligned in rows using a fixed width</li>
+     *  <li><strong>horizontal</strong> - Bars are aligned horizontally in one row</li>
+     * </ul>
+     */
+    public var mode:String;
+    
+    /**
+     * Additional layout mode specific settings.
+     * <strong>mode=page</strong>
+     * <ul>
+     *  <li><strong>measuresPerRow</strong> - Limit the displayed bars per row, <em>-1 for sized based limit<em> (integer, default:-1)</li>
+     *  <li><strong>start</strong> - The bar start index to start layouting with (integer: default: 0)</li>
+     *  <li><strong>count</strong> - The amount of bars to render overall, <em>-1 for all till the end</em>  (integer, default:-1)</li>
+     *  <li><strong>hideInfo</strong> - Render the song information or not (boolean, default:true)</li>
+     * </ul>
+     */
+    public var additionalSettings:StringMap<Dynamic>;
+    
+    public function get<T>(key:String, def:T) : T
+    {
+        if (additionalSettings.exists(key))
+        {
+            return cast(additionalSettings.get(key));
+        }
+        return def;
+    }
+    
+    public function new()
+    {
+        additionalSettings = new StringMap<Dynamic>();
+    }
+    
+    public static function defaults() : LayoutSettings
+    {
+        var settings = new LayoutSettings();
+        
+        settings.mode = "page";
+
+        return settings;
+    }    
+}
+
+class StaveSettings 
+{
+    /**
+     * The stave identifier.
+     * Default Staves: 
+     * <ul>
+     *  <li><strong>marker</strong> - Renders section markers</li>
+     *  <li><strong>triplet-feel</strong> - Renders triplet feel indicators</li>
+     *  <li><strong>tempo</strong> - Renders a tempo identifier</li>
+     *  <li><strong>fermata</strong> - Renders fermata symbols</li>
+     *  <li><strong>text</strong> - Renders custom text annotations</li>
+     *  <li><strong>chords</strong> - Renders chord names</li>
+     *  <li><strong>beat-vibrato</strong> - Renders beat vibrato symbols</li>
+     *  <li><strong>note-vibrato</strong> - Renders note vibrato symbols</li>
+     *  <li><strong>tuplet</strong> - Renders tuplet indicators</li>
+     *  <li><strong>score</strong> - Renders default music notation</li>
+     *  <li><strong>dynamics</strong> - Renders dynamics markers</li>
+     *  <li><strong>tap</strong> - Renders tap/slap/pop indicators</li>
+     *  <li><strong>fade-in</strong> - Renders fade-in indicators</li>
+     *  <li><strong>let-ring</strong> - Renders let-ring indicators</li>
+     *  <li><strong>palm-mute</strong> - Renders palm-mute indicators</li>
+     *  <li><strong>tab</strong> - Renders guitar tablature</li>
+     *  <li><strong>fingering</strong> - Renders finger indicators</li>
+     * </ul>
+     */
+    public var id:String;    
+    
+    /**
+     * Additional stave specific settings
+     * <strong>id=tab</strong>
+     * <ul>
+     *  <li><strong>rhythm</strong> - Renders rhythm beams to tablature notes</li>
+     * </ul>
+     */
+    public var additionalSettings:StringMap<Dynamic>;
+    
+    public function new(id:String)
+    {
+        this.id = id;
+        additionalSettings = new StringMap<Dynamic>();
+    }
+}

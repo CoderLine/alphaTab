@@ -47,7 +47,6 @@ class PageViewLayout extends ScoreLayout
     {
         super(renderer);
         _groups = new Array<StaveGroup>();
-		renderer.setLayoutSetting(SCORE_INFOS, HeaderFooterElements.ALL);
     }
 	
 	public static inline var GroupSpacing = 20;
@@ -85,7 +84,8 @@ class PageViewLayout extends ScoreLayout
 	
 	private function doScoreInfoLayout(y:Int)
 	{
-		var flags:Int = cast(renderer.getLayoutSetting(SCORE_INFOS), Int);
+        // TODO: Check if it's a good choice to provide the complete flags as setting
+		var flags:Int = renderer.settings.layout.get("hideInfo", false) ? HeaderFooterElements.NONE : HeaderFooterElements.ALL;
 		var score:Score = renderer.score;
 		var scale:Float = renderer.scale;
 
@@ -170,7 +170,7 @@ class PageViewLayout extends ScoreLayout
 	
 	private function paintScoreInfo(x:Int, y:Int)
 	{
-		var flags:Int = cast(renderer.getLayoutSetting(SCORE_INFOS), Int);
+		var flags:Int = renderer.settings.layout.get("hideInfo", false) ? HeaderFooterElements.NONE : HeaderFooterElements.ALL;
 		var score:Score = renderer.score;
 		var scale:Float = renderer.scale;
 		

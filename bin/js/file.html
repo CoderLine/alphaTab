@@ -4,7 +4,6 @@
     <meta charset="utf-8">
     <title></title>
 	<style type="text/css">
-	
 	.alphaTabSurface { border:1px solid #000; }
 	</style>
     <script type="text/javascript" src="lib/jquery/jquery-1.7.1.min.js"></script>
@@ -13,7 +12,10 @@
 	<script language="JavaScript" type="text/javascript">
 	(function($) {
 		$(document).ready(function() {
-			$('div.alphaTab').alphaTab({file: 'files/Test.gp5'});
+        
+			$('div.alphaTab')
+                .alphaTab()
+                .alphaTab('load', 'files/Test.gp5');
 		});
 	})(jQuery);
 	</script>     

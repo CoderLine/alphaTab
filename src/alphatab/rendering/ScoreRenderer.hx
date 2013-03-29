@@ -16,15 +16,16 @@
  */
 package alphatab.rendering;
 
+import alphatab.Environment;
 import alphatab.model.Score;
 import alphatab.model.Track;
 import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
 import alphatab.platform.model.TextAlign;
-import alphatab.platform.PlatformFactory;
 import alphatab.rendering.layout.HorizontalScreenLayout;
 import alphatab.rendering.layout.PageViewLayout;
 import alphatab.rendering.layout.ScoreLayout;
+import alphatab.Settings;
 import haxe.ds.StringMap;
 
 /**
@@ -42,13 +43,20 @@ class ScoreRenderer
     
     public var renderingResources : RenderingResources;
 	
-	public var settings:StringMap<Dynamic>;
+	public var settings:Settings;
 
         
-    public function new(source:Dynamic) 
+    public function new(settings:Settings, param:Dynamic) 
     {
-        canvas = PlatformFactory.getCanvas(source);
-        settings = new StringMap<Dynamic>();
+        this.settings = settings;
+        if (settings.engine == null || !Environment.renderEngines.exists(settings.engine))
+        {
+            canvas = Environment.renderEngines.get("default")(param);
+        }
+        else 
+        {
+            canvas = Environment.renderEngines.get(settings.engine)(param);
+        }
         updateScale(1.0);
         layout = new PageViewLayout(this);
     }
@@ -106,31 +114,4 @@ class ScoreRenderer
         var x:Float = canvas.getWidth() / 2;
         canvas.fillText(msg, x, canvas.getHeight() - (renderingResources.copyrightFont.getSize() * 2));
     }
-	
-	//
-	// Settings
-	//
-	
-	public function setStaveSetting(staveId:String, setting:String, value:Dynamic)
-    {   
-        settings.set(staveId + "." + setting, value);
-    }
-    
-    public function getStaveSetting(staveId:String, setting:String, defaultValue:Dynamic = null) : Dynamic
-    {
-        var value:Dynamic = settings.get(staveId + "." + setting);
-        return value != null ? value : defaultValue;
-    }
-     
-    public function setLayoutSetting(setting:String, value:Dynamic)
-    {   
-        settings.set("layout." + setting, value);
-    }
-    
-    public function getLayoutSetting(setting:String, defaultValue:Dynamic = null) : Dynamic
-    {
-        var value:Dynamic = settings.get("layout." + setting);
-        return value != null ? value : defaultValue;
-    }
-
 }

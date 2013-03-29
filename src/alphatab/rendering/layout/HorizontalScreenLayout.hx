@@ -6,7 +6,6 @@ import alphatab.rendering.staves.StaveGroup;
  */
 class HorizontalScreenLayout extends ScoreLayout
 {
-	public static var SCORE_INFOS = "scoreInfos";
     // left top right bottom
     public static var PAGE_PADDING:Array<Int> = [20, 20, 20, 20];
 	
@@ -17,7 +16,6 @@ class HorizontalScreenLayout extends ScoreLayout
     public function new(renderer:ScoreRenderer) 
     {
         super(renderer);
-		renderer.setLayoutSetting(SCORE_INFOS, HeaderFooterElements.ALL);
     }
 
 	public override function doLayout()

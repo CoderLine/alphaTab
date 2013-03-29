@@ -1,313 +1,215 @@
-/*
- * This file is part of alphaTab.
- *
- *  alphaTab is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  alphaTab is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
- */
-var alphaTabWrapper;
-
-/** 
- * This is a jQuery plugin for embedding alphaTab in your websites. 
- */
-(function($)
+(function($) 
 {
-	
-	
-    alphaTabWrapper = function(el, options)
+    var api = {};
+    
+    function scoreLoaded(context, score)
     {
-        //
-        // Setup
-        //
-        var self = this;
-        var el = $(el);
-        this.el = el;
-		
-		// resolve absolute script path
-		var alphaTabTag = $('script[src*="/alphaTab.js"]');
-		if(alphaTabTag.length == 0) // also try min-version
-			alphaTabTag = $('script[src*="/alphaTab.min.js"]');
-
-		var alphaTabBase = "";
-		if(alphaTabTag.length)
-		{
-			var toAbsURL = function(s) 
-			{
-				var l = location, h, p, f, i;
-				if (/^\w+:/.test(s)) 
-				{
-					return s;
-				}
-
-				h = l.protocol + '//' + l.host;
-				if (s.indexOf('/') == 0) 
-				{
-					return h + s;
-				}
-
-				p = l.pathname.replace(/\/[^\/]*$/, '');
-				f = s.match(/\.\.\//g);
-				if (f) 
-				{
-					s = s.substring(f.length * 3);
-					for (i = f.length; i--;)
-					{
-						p = p.substring(0, p.lastIndexOf('/'));
-					}
-				}
-
-				return h + p + '/' + s;
-			}
-			alphaTabBase = toAbsURL(alphaTabTag.attr('src'));
-			alphaTabBase = alphaTabBase.substr(0, alphaTabBase.lastIndexOf('/'));
-		}
-		
-        var defaults =
+        try
         {
-			// core
-			base: alphaTabBase,
-			
-            // initial file loading
-            file: null,
-            track: 0,
-
-            // callbacks
-            loadCallback: null,
-            errorCallback: null,
-
-            // display settings
-            width:600,
-            height:200,
-            autoSize: true,
-            staves: null,
-            layout: null,
-			context: "canvas"
-        };
-
-        this.options = $.extend(defaults, options);
-        if(this.options.autoSize == "maxWidth") 
-		{
-            this.options.width = el.width();
+            context.renderer.render(score.tracks[context.settings.track]);
         }
-
-        //
-        // public operations (API)
-        //
-
-        this.loadAlphaTex = function(tex)
+        catch(e)
         {
-			try
-			{
-				var parser = new alphatab.importer.AlphaTexImporter();
-				var data = new haxe.io.BytesInput(haxe.io.Bytes.ofString(tex));
-				parser.init(data);
-                var score = parser.readScore();
-				scoreLoaded(score);
-			}
-			catch(e)
-			{
-                scoreError(e);
-			}
-        }		
-
-        this.loadFile = function(url)
-        {
-            try
-			{
-				alphatab.importer.ScoreLoader.loadScoreAsync(url, scoreLoaded, scoreError);
-			}
-			catch(e)
-			{
-                scoreError(e);
-			}
+            $.error(e);
         }
+    }
 
-        // plugin callbacks on load
-        this.loadCallbacks = []; 
-        
-        //
-        // private operations
-        //
-        var scoreLoaded = function(score)
+
+    /*
+     * alphaTab initialization
+     */
+    function init ( options ) 
+    {
+        return this.each(function() 
         {
-            // fire callback
-            if(self.options.loadCallback)
+            // check for reinitialize
+            var $this = $(this),
+                data = $this.data('alphaTab');
+            if(!data) 
             {
-				self.options.loadCallback(score);
-			}
-            // update tablature
-			try
-			{
-				self.renderer.render(score.tracks[self.options.track]);
-			}
-			catch( e )
-			{
-				scoreError(e);
-			}
-            // additional plugin callbacks
-            for(var i = 0; i < self.loadCallbacks.length; i++)
-            {
-                self.loadCallbacks[i](score);
+                //
+                // Settings
+                var context = {};
+                
+                context.settings = $.extend( alphatab.Settings.defaults(), options);
+                context.settings = $.extend( {track: 0}, context.settings);
+                
+                
+                var contents = $.trim($this.text());
+                $this.html('');
+                
+                //
+                // Create context elements (wrapper, canvas etc)
+                if(context.settings.engine == "html5" || context.settings.engine == "default")
+                {
+                    // HACK: call createElement('canvas') once before. this ensures that the browser knows the element
+                    document.createElement('canvas'); 
+                    context.canvas = $('<canvas width="'+context.settings.width+'" height="'+context.settings.height+'" class="alphaTabSurface"></canvas>');
+                    $this.append(context.canvas);
+                    context.canvas = context.canvas[0];
+                    if($.browser.msie) 
+                    {
+                        // Excanvas initialization
+                        if($.browser.version < 9)
+                        {
+                            var fixElement_ = function(el) 
+                            {
+                               // in IE before version 5.5 we would need to add HTML: to the tag name
+                               // but we do not care about IE before version 6
+                               var outerHTML = el.outerHTML;
+                             
+                               var newEl = el.ownerDocument.createElement(outerHTML);
+                               // if the tag is still open IE has created the children as siblings and
+                               // it has also created a tag with the name "/FOO"
+                               if (outerHTML.slice(-2) != "/>") 
+                               {
+                                     var tagName = "/" + el.tagName;
+                                     var ns;
+                                     // remove content
+                                     while ((ns = el.nextSibling) && ns.tagName != tagName) 
+                                     {
+                                       ns.removeNode();
+                                     }
+                                     // remove the incorrect closing tag
+                                     if (ns) 
+                                     {
+                                       ns.removeNode();
+                                     }
+                               }
+                               el.parentNode.replaceChild(newEl, el);
+                               return newEl;
+                            };
+                            
+                            context.canvas = G_vmlCanvasManager.initElement(fixElement_(context.canvas));
+                        }
+                    }
+                }
+                else
+                {
+                    context.canvas = $('<div class="alphaTabCanvasWrapper"></div>');
+                    $this.append(context.canvas);
+                }
+                
+                //
+                // Renderer setup
+                context.renderer = new alphatab.rendering.ScoreRenderer(context.settings, context.canvas);
+                
+                // in case of SVG we hook into the renderer to create the svg element after rendering
+                if(context.settings.engine == "svg") 
+                {
+                    context.renderer.onFinished = function() 
+                    {
+                        context.canvas.children().remove(); // remove old svg 
+                        var canvas = context.renderer.canvas;
+                        var svgElement = $(canvas.toSvg(true, "alphaTabSurface"));
+                        context.canvas.append(svgElement);
+                    };
+                }
+                
+                //
+                // Load default data
+                if(contents != "") 
+                {
+                    api.tex.apply(this, [contents]);
+                }
+                
+                
+                $this.data('alphaTab', context);                
             }
+        });
+    }
+    
+    /*
+     * Open alphaTab file
+     * @param {String} url the url to load the data via ajax
+     * @param {Number} track the track index to load initially 
+     * @param {Function} success the callback function to call after successful track display
+     * @param {Function} error the callback function to call after any error during loading or rendering
+     */
+    function load( url, track, success, error ) 
+    {
+        var context = $(this).data('alphaTab');
+        if(!context) { $.error('alphaTab not initialized!'); }
+        alphatab.importer.ScoreLoader.loadScoreAsync(url, 
+        function(score)
+        {
+            scoreLoaded(context, score);
+        }, 
+        function (error)
+        {
+            $.error(error);
+        });
+    }
+    
+    /**
+     * Load alphaTex source
+     * @param {String} content the alphaTex source code to load
+     * @param {Function} success the callback function to call after successful track display
+     * @param {Function} error the callback function to call after any error during loading or rendering
+     */
+    function tex ( content, success, error ) 
+    {
+        var context = $(this).data('alphaTab');
+        if(!context) { $.error('alphaTab not initialized!'); }
+
+        var score = null;
+        try 
+        {
+            var parser = new alphatab.importer.AlphaTexImporter();
+            var data = new haxe.io.BytesInput(haxe.io.Bytes.ofString(tex));
+            parser.init(data);
+            score = parser.readScore();
+        }
+        catch(e) 
+        {
+            $.error(e);
         }
         
-        
-        var scoreError = function(msg)
+        if(score != null) 
         {
-            // use error callback if available, otherwise: render in tablature
-            if(self.options.errorCallback)
-            {
-                self.options.errorCallback(msg);
-            }
-            else if(msg instanceof Error)
-            {
-				throw msg;
-
-            }
-			else 
-			{
-				console.error(msg);
-			}
-        }
-
-
-		var createCanvas = function() 
-		{
-			// create canvas
-			// HACK: call createElement('canvas') once before. this ensures that the browser knows the element
-			document.createElement('canvas'); 
-			self.canvas = $('<canvas width="'+self.options.width+'" height="'+self.options.height+'" class="alphaTabSurface"></canvas>');
-			self.el.append(self.canvas);
-			self.canvas = self.canvas[0];
-			if($.browser.msie) 
-			{
-				// Excanvas initialization
-				if($.browser.version < 9)
-				{
-					var fixElement_ = function(el) 
-					{
-					   // in IE before version 5.5 we would need to add HTML: to the tag name
-					   // but we do not care about IE before version 6
-					   var outerHTML = el.outerHTML;
-					 
-					   var newEl = el.ownerDocument.createElement(outerHTML);
-					   // if the tag is still open IE has created the children as siblings and
-					   // it has also created a tag with the name "/FOO"
-					   if (outerHTML.slice(-2) != "/>") 
-					   {
-							 var tagName = "/" + el.tagName;
-							 var ns;
-							 // remove content
-							 while ((ns = el.nextSibling) && ns.tagName != tagName) 
-							 {
-							   ns.removeNode();
-							 }
-							 // remove the incorrect closing tag
-							 if (ns) 
-							 {
-							   ns.removeNode();
-							 }
-					   }
-					   el.parentNode.replaceChild(newEl, el);
-					   return newEl;
-					};
-					
-					self.canvas = G_vmlCanvasManager.initElement(fixElement_(self.canvas));
-				}
-			}
-			
-            self.canvasWrapper = self.canvas;
-			return self.canvas;
-		}
-        
-        var createCanvasWrapper = function() 
-		{
-            self.canvasWrapper = $('<div class="alphaTabCanvasWrapper"></div>');
-            self.canvas = self.canvasWrapper;
-            self.el.append(self.canvasWrapper);               
-        }
-		
-        //
-        // startup
-        //
-        
-        this.contents = $.trim(el.text());
-		el.html('');
-		
-		// create context
-		var contextObject = null;
- 		if(this.options.context == "canvas") 
-		{
-			contextObject = createCanvas();
-		}
-		else 
-		{
-            createCanvasWrapper();
-			contextObject = this.options.context;
-		}	
-        
-        // create renderer
-        this.renderer = new alphatab.rendering.ScoreRenderer(contextObject);
-
-		if(this.options.context == alphatab.platform.PlatformFactory.SVG_CANVAS) 
-		{
-			this.renderer.onFinished = function() 
-			{
-				self.canvasWrapper.children().remove(); // remove old svg 
-				var canvas = self.renderer.canvas;
-				var svgElement = $(canvas.toSvg(true, "alphaTabSurface"));
-                self.canvas = svgElement;
-				self.canvasWrapper.append(svgElement);
-			}
-		}
-        
-        // load data
-        if(this.options.file)
-        {
-			this.loadFile(this.options.file);
-		}
-        else if(this.contents != "")
-        {
-            this.loadAlphaTex(this.contents);
-        }
-        else if(this.options.context == alphatab.platform.PlatformFactory.SVG_CANVAS)
-        {
-            // ensure notify of error message
-            var canvas = this.renderer.canvas;
-            canvas.setWidth(this.options.width);
-            canvas.setHeight(this.options.height);
-            this.renderer.onFinished();
+            scoreLoaded(context, score);
         }
     }
     
-    // Plugin Support    
-    alphaTabWrapper.fn = alphaTabWrapper.prototype;
-    //
-    // Plugin
-    //
-    $.fn.alphaTab = function(options)
+    /**
+     * Switches the displayed track of the currently loaded song
+     * @param {Number} track the index of the track to display
+     */
+    function track( track ) 
     {
-		var ret = [];
-		for(var i=0; i<this.length; i++)
-        {
-			if(!this[i].alphaTab)
-            {
-				this[i].alphaTab = new alphaTabWrapper(this[i], options);
-			}
-			ret.push(this[i].alphaTab);
-		}
-		return ret.length > 1 ? ret : ret[0];
+        
     }
+    
+    /**
+     * Get the currently loaded song
+     */
+    function song() 
+    {
+        
+    }
+
+    // expose API
+    api.init = init;
+    api.load = load;
+    api.tex = tex;
+    api.track = track;
+    api.song = song;
+    
+    
+    $.fn.alphaTab = function(method) {
+        if(api[method]) {
+            return api[method].apply(this, Array.prototype.slice.call(arguments, 1));
+        }
+        else if(typeof method === 'object' || !method) {
+            return api.init.apply(this, arguments);
+        }
+        else {
+            $.error('Method ' + method + ' does not exist on jQuery.alphaTab');
+        }
+    };   
+    
 })(jQuery);
+
 
 
                 

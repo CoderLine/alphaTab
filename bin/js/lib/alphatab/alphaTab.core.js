@@ -213,10 +213,1052 @@ Xml.prototype = {
 	}
 	,__class__: Xml
 }
+var haxe = haxe || {}
+if(!haxe.ds) haxe.ds = {}
+haxe.ds.StringMap = function() {
+	this.h = { };
+};
+haxe.ds.StringMap.__name__ = true;
+haxe.ds.StringMap.prototype = {
+	iterator: function() {
+		return { ref : this.h, it : this.keys(), hasNext : function() {
+			return this.it.hasNext();
+		}, next : function() {
+			var i = this.it.next();
+			return this.ref["$" + i];
+		}};
+	}
+	,keys: function() {
+		var a = [];
+		for( var key in this.h ) {
+		if(this.h.hasOwnProperty(key)) a.push(key.substr(1));
+		}
+		return HxOverrides.iter(a);
+	}
+	,exists: function(key) {
+		return this.h.hasOwnProperty("$" + key);
+	}
+	,get: function(key) {
+		return this.h["$" + key];
+	}
+	,set: function(key,value) {
+		this.h["$" + key] = value;
+	}
+	,__class__: haxe.ds.StringMap
+}
 var alphatab = alphatab || {}
+if(!alphatab.platform) alphatab.platform = {}
+alphatab.platform.ICanvas = function() { }
+alphatab.platform.ICanvas.__name__ = true;
+alphatab.platform.ICanvas.prototype = {
+	__class__: alphatab.platform.ICanvas
+}
+if(!alphatab.platform.js) alphatab.platform.js = {}
+alphatab.platform.js.Html5Canvas = function(dom) {
+	this._canvas = dom;
+	this._context = dom.getContext("2d");
+	this._context.textBaseline = "top";
+};
+alphatab.platform.js.Html5Canvas.__name__ = true;
+alphatab.platform.js.Html5Canvas.__interfaces__ = [alphatab.platform.ICanvas];
+alphatab.platform.js.Html5Canvas.prototype = {
+	measureText: function(text) {
+		return this._context.measureText(text).width;
+	}
+	,strokeText: function(text,x,y) {
+		this._context.strokeText(text,x,y);
+	}
+	,fillText: function(text,x,y) {
+		this._context.fillText(text,x,y);
+	}
+	,setTextBaseline: function(textBaseLine) {
+		switch( (textBaseLine)[1] ) {
+		case 1:
+			this._context.textBaseline = "top";
+			break;
+		case 2:
+			this._context.textBaseline = "middle";
+			break;
+		case 3:
+			this._context.textBaseline = "bottom";
+			break;
+		default:
+			this._context.textBaseline = "alphabetic";
+		}
+	}
+	,getTextBaseline: function() {
+		var _g = this;
+		switch(_g._context.textBaseline) {
+		case "top":
+			return alphatab.model.TextBaseline.Top;
+		case "middle":
+			return alphatab.model.TextBaseline.Middle;
+		case "bottom":
+			return alphatab.model.TextBaseline.Bottom;
+		default:
+			return alphatab.model.TextBaseline.Default;
+		}
+	}
+	,setTextAlign: function(textAlign) {
+		switch( (textAlign)[1] ) {
+		case 0:
+			this._context.textAlign = "left";
+			break;
+		case 1:
+			this._context.textAlign = "center";
+			break;
+		case 2:
+			this._context.textAlign = "right";
+			break;
+		}
+	}
+	,getTextAlign: function() {
+		var _g = this;
+		switch(_g._context.textAlign) {
+		case "left":
+			return alphatab.platform.model.TextAlign.Left;
+		case "center":
+			return alphatab.platform.model.TextAlign.Center;
+		case "right":
+			return alphatab.platform.model.TextAlign.Right;
+		default:
+			return alphatab.platform.model.TextAlign.Left;
+		}
+	}
+	,setFont: function(font) {
+		this._context.font = font.toCssString();
+	}
+	,stroke: function() {
+		this._context.stroke();
+	}
+	,fill: function() {
+		this._context.fill();
+	}
+	,rect: function(x,y,w,h) {
+		this._context.rect(x,y,w,h);
+	}
+	,circle: function(x,y,radius) {
+		this._context.arc(x,y,radius,0,Math.PI * 2,true);
+	}
+	,bezierCurveTo: function(cp1x,cp1y,cp2x,cp2y,x,y) {
+		this._context.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,x,y);
+	}
+	,quadraticCurveTo: function(cpx,cpy,x,y) {
+		this._context.quadraticCurveTo(cpx,cpy,x,y);
+	}
+	,lineTo: function(x,y) {
+		this._context.lineTo(x - 0.5,y - 0.5);
+	}
+	,moveTo: function(x,y) {
+		this._context.moveTo(x - 0.5,y - 0.5);
+	}
+	,closePath: function() {
+		this._context.closePath();
+	}
+	,beginPath: function() {
+		this._context.beginPath();
+	}
+	,strokeRect: function(x,y,w,h) {
+		this._context.strokeRect(x - 0.5,y - 0.5,w,h);
+	}
+	,fillRect: function(x,y,w,h) {
+		this._context.fillRect(x - 0.5,y - 0.5,w,h);
+	}
+	,clear: function() {
+		var lineWidth = this._context.lineWidth;
+		this._canvas.width = this._canvas.width;
+		this._context.lineWidth = lineWidth;
+	}
+	,setLineWidth: function(value) {
+		this._context.lineWidth = value;
+	}
+	,setColor: function(color) {
+		this._context.strokeStyle = color.toRgbaString();
+		this._context.fillStyle = color.toRgbaString();
+	}
+	,setHeight: function(height) {
+		var lineWidth = this._context.lineWidth;
+		this._canvas.height = height;
+		this._context = this._canvas.getContext("2d");
+		this._context.textBaseline = "top";
+		this._context.lineWidth = lineWidth;
+		this._height = height;
+	}
+	,setWidth: function(width) {
+		var lineWidth = this._context.lineWidth;
+		this._canvas.width = width;
+		this._context = this._canvas.getContext("2d");
+		this._context.textBaseline = "top";
+		this._context.lineWidth = lineWidth;
+		this._width = width;
+	}
+	,getHeight: function() {
+		return this._canvas.offsetHeight;
+	}
+	,getWidth: function() {
+		return this._canvas.offsetWidth;
+	}
+	,__class__: alphatab.platform.js.Html5Canvas
+}
+if(!alphatab.platform.svg) alphatab.platform.svg = {}
+alphatab.platform.svg.SvgCanvas = function() {
+	this._buffer = new StringBuf();
+	this._currentPath = new StringBuf();
+	this._currentPathIsEmpty = true;
+	this._color = new alphatab.platform.model.Color(255,255,255);
+	this._lineWidth = 1;
+	this._width = 0;
+	this._height = 0;
+	this._font = new alphatab.platform.model.Font("sans-serif",10);
+	this._textAlign = alphatab.platform.model.TextAlign.Left;
+};
+alphatab.platform.svg.SvgCanvas.__name__ = true;
+alphatab.platform.svg.SvgCanvas.__interfaces__ = [alphatab.platform.ICanvas];
+alphatab.platform.svg.SvgCanvas.prototype = {
+	measureText: function(text) {
+		var font = alphatab.platform.svg.SupportedFonts.Arial;
+		if(this._font.getFamily().indexOf("Times") >= 0) font = alphatab.platform.svg.SupportedFonts.TimesNewRoman;
+		return alphatab.platform.svg.FontSizes.measureString(text,font,this._font.getSize());
+	}
+	,getSvgBaseLine: function() {
+		var _g = this;
+		switch( (_g._textBaseline)[1] ) {
+		case 1:
+			return "top";
+		case 2:
+			return "middle";
+		case 3:
+			return "bottom";
+		default:
+			return "alphabetic";
+		}
+	}
+	,getSvgTextAlignment: function() {
+		var _g = this;
+		switch( (_g._textAlign)[1] ) {
+		case 0:
+			return "start";
+		case 1:
+			return "middle";
+		case 2:
+			return "end";
+		}
+	}
+	,strokeText: function(text,x,y) {
+		this._buffer.b += "<text x=\"";
+		this._buffer.b += Std.string(x);
+		this._buffer.b += "\" y=\"";
+		this._buffer.b += Std.string(y);
+		this._buffer.b += "\" style=\"font:";
+		this._buffer.b += Std.string(this._font.toCssString());
+		this._buffer.b += "\" stroke:";
+		this._buffer.b += Std.string(this._color.toRgbaString());
+		this._buffer.b += "; stroke-width:";
+		this._buffer.b += Std.string(this._lineWidth);
+		this._buffer.b += ";\" ";
+		this._buffer.b += " dominant-baseline=\"";
+		this._buffer.b += Std.string(this.getSvgBaseLine());
+		this._buffer.b += "\" text-anchor=\"";
+		this._buffer.b += Std.string(this.getSvgTextAlignment());
+		this._buffer.b += "\">\n";
+		this._buffer.b += Std.string(text);
+		this._buffer.b += "</text>\n";
+	}
+	,fillText: function(text,x,y) {
+		this._buffer.b += "<text x=\"";
+		this._buffer.b += Std.string(x);
+		this._buffer.b += "\" y=\"";
+		this._buffer.b += Std.string(y);
+		this._buffer.b += "\" style=\"font:";
+		this._buffer.b += Std.string(this._font.toCssString());
+		this._buffer.b += "; fill:";
+		this._buffer.b += Std.string(this._color.toRgbaString());
+		this._buffer.b += ";\" ";
+		this._buffer.b += " dominant-baseline=\"";
+		this._buffer.b += Std.string(this.getSvgBaseLine());
+		this._buffer.b += "\" text-anchor=\"";
+		this._buffer.b += Std.string(this.getSvgTextAlignment());
+		this._buffer.b += "\">\n";
+		this._buffer.b += Std.string(text);
+		this._buffer.b += "</text>\n";
+	}
+	,setTextBaseline: function(textBaseline) {
+		this._textBaseline = textBaseline;
+	}
+	,getTextBaseline: function() {
+		return this._textBaseline;
+	}
+	,setTextAlign: function(textAlign) {
+		this._textAlign = textAlign;
+	}
+	,getTextAlign: function() {
+		return this._textAlign;
+	}
+	,setFont: function(font) {
+		this._font = font;
+	}
+	,stroke: function() {
+		var path = this._currentPath.b;
+		if(!this._currentPathIsEmpty) {
+			this._buffer.b += "<path d=\"";
+			this._buffer.b += Std.string(this._currentPath.b);
+			this._buffer.b += "\" style=\"stroke:";
+			this._buffer.b += Std.string(this._color.toRgbaString());
+			this._buffer.b += "; stroke-width:";
+			this._buffer.b += Std.string(this._lineWidth);
+			this._buffer.b += ";\" fill=\"none\" />\n";
+		}
+		this._currentPath = new StringBuf();
+		this._currentPathIsEmpty = true;
+	}
+	,fill: function() {
+		var path = this._currentPath.b;
+		if(!this._currentPathIsEmpty) {
+			this._buffer.b += "<path d=\"";
+			this._buffer.b += Std.string(this._currentPath.b);
+			this._buffer.b += "\" style=\"fill:";
+			this._buffer.b += Std.string(this._color.toRgbaString());
+			this._buffer.b += "\" stroke=\"none\"/>\n";
+		}
+		this._currentPath = new StringBuf();
+		this._currentPathIsEmpty = true;
+	}
+	,rect: function(x,y,w,h) {
+		this._currentPathIsEmpty = false;
+		this._currentPath.b += " M";
+		this._currentPath.b += Std.string(x);
+		this._currentPath.b += ",";
+		this._currentPath.b += Std.string(y);
+		this._currentPath.b += " L";
+		this._currentPath.b += Std.string(x + w);
+		this._currentPath.b += ",";
+		this._currentPath.b += Std.string(y);
+		this._currentPath.b += " ";
+		this._currentPath.b += Std.string(x + w);
+		this._currentPath.b += ",";
+		this._currentPath.b += Std.string(y + h);
+		this._currentPath.b += " ";
+		this._currentPath.b += Std.string(x);
+		this._currentPath.b += ",";
+		this._currentPath.b += Std.string(y + h);
+		this._currentPath.b += " z";
+	}
+	,circle: function(x,y,radius) {
+		this._currentPathIsEmpty = false;
+		this._currentPath.b += " M";
+		this._currentPath.b += Std.string(x - radius);
+		this._currentPath.b += ",";
+		this._currentPath.b += Std.string(y);
+		this._currentPath.b += " A1,1 0 0,0 ";
+		this._currentPath.b += Std.string(x + radius);
+		this._currentPath.b += ",";
+		this._currentPath.b += Std.string(y);
+		this._currentPath.b += " A1,1 0 0,0 ";
+		this._currentPath.b += Std.string(x - radius);
+		this._currentPath.b += ",";
+		this._currentPath.b += Std.string(y);
+		this._currentPath.b += " z";
+	}
+	,bezierCurveTo: function(cp1x,cp1y,cp2x,cp2y,x,y) {
+		this._currentPathIsEmpty = false;
+		this._currentPath.b += " C";
+		this._currentPath.b += Std.string(cp1x);
+		this._currentPath.b += ",";
+		this._currentPath.b += Std.string(cp1y);
+		this._currentPath.b += ",";
+		this._currentPath.b += Std.string(cp2x);
+		this._currentPath.b += ",";
+		this._currentPath.b += Std.string(cp2y);
+		this._currentPath.b += ",";
+		this._currentPath.b += Std.string(x);
+		this._currentPath.b += ",";
+		this._currentPath.b += Std.string(y);
+	}
+	,quadraticCurveTo: function(cpx,cpy,x,y) {
+		this._currentPathIsEmpty = false;
+		this._currentPath.b += " Q";
+		this._currentPath.b += Std.string(cpx);
+		this._currentPath.b += ",";
+		this._currentPath.b += Std.string(cpy);
+		this._currentPath.b += ",";
+		this._currentPath.b += Std.string(x);
+		this._currentPath.b += ",";
+		this._currentPath.b += Std.string(y);
+	}
+	,lineTo: function(x,y) {
+		this._currentPathIsEmpty = false;
+		this._currentPath.b += " L";
+		this._currentPath.b += Std.string(x);
+		this._currentPath.b += ",";
+		this._currentPath.b += Std.string(y);
+	}
+	,moveTo: function(x,y) {
+		this._currentPath.b += " M";
+		this._currentPath.b += Std.string(x);
+		this._currentPath.b += ",";
+		this._currentPath.b += Std.string(y);
+	}
+	,closePath: function() {
+		this._currentPath.b += " z";
+	}
+	,beginPath: function() {
+	}
+	,strokeRect: function(x,y,w,h) {
+		this._buffer.b += "<rect x=\"";
+		this._buffer.b += Std.string(x);
+		this._buffer.b += "\" y=\"";
+		this._buffer.b += Std.string(y);
+		this._buffer.b += "\" width=\"";
+		this._buffer.b += Std.string(w);
+		this._buffer.b += "\" height=\"";
+		this._buffer.b += Std.string(h);
+		this._buffer.b += "\" style=\"stroke:";
+		this._buffer.b += Std.string(this._color.toRgbaString());
+		this._buffer.b += "; stroke-width:";
+		this._buffer.b += Std.string(this._lineWidth);
+		this._buffer.b += ";\" />\n";
+	}
+	,fillRect: function(x,y,w,h) {
+		this._buffer.b += "<rect x=\"";
+		this._buffer.b += Std.string(x);
+		this._buffer.b += "\" y=\"";
+		this._buffer.b += Std.string(y);
+		this._buffer.b += "\" width=\"";
+		this._buffer.b += Std.string(w);
+		this._buffer.b += "\" height=\"";
+		this._buffer.b += Std.string(h);
+		this._buffer.b += "\" style=\"fill:";
+		this._buffer.b += Std.string(this._color.toRgbaString());
+		this._buffer.b += ";\" />\n";
+	}
+	,clear: function() {
+		this._buffer = new StringBuf();
+		this._currentPath = new StringBuf();
+		this._currentPathIsEmpty = true;
+	}
+	,setLineWidth: function(value) {
+		this._lineWidth = value;
+	}
+	,setColor: function(color) {
+		this._color = color;
+	}
+	,setHeight: function(height) {
+		this._height = height;
+	}
+	,setWidth: function(width) {
+		this._width = width;
+	}
+	,getHeight: function() {
+		return this._height;
+	}
+	,getWidth: function() {
+		return this._width;
+	}
+	,toSvg: function(includeWrapper,className) {
+		var out = new haxe.io.BytesOutput();
+		this.writeTo(out,includeWrapper,className);
+		out.flush();
+		return out.getBytes().toString();
+	}
+	,writeTo: function(stream,includeWrapper,className) {
+		if(includeWrapper) {
+			stream.writeString("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"");
+			alphatab.io.OutputExtensions.writeAsString(stream,this._width);
+			stream.writeString("px\" height=\"");
+			alphatab.io.OutputExtensions.writeAsString(stream,this._height);
+			stream.writeString("px\"");
+			if(className != null) {
+				stream.writeString(" class=\"");
+				stream.writeString(className);
+				stream.writeString("\"");
+			}
+			stream.writeString(">\n");
+		}
+		stream.writeString(this._buffer.b);
+		if(includeWrapper) stream.writeString("</svg>");
+	}
+	,__class__: alphatab.platform.svg.SvgCanvas
+}
+if(!alphatab.platform.model) alphatab.platform.model = {}
+alphatab.platform.model.Color = function(r,g,b,a) {
+	if(a == null) a = 255;
+	this._higherBits = (a & 255) << 8 | r & 255;
+	this._lowerBits = (g & 255) << 8 | b & 255;
+};
+alphatab.platform.model.Color.__name__ = true;
+alphatab.platform.model.Color.prototype = {
+	toRgbaString: function() {
+		return "rgba(" + this.getR() + "," + this.getG() + "," + this.getB() + "," + this.getA() / 255.0 + ")";
+	}
+	,toHexString: function() {
+		return "#" + StringTools.hex(this.getA(),2) + StringTools.hex(this.getR(),2) + StringTools.hex(this.getG(),2) + StringTools.hex(this.getB(),2);
+	}
+	,getB: function() {
+		return this._lowerBits & 255;
+	}
+	,getG: function() {
+		return this._lowerBits >> 8 & 255;
+	}
+	,getR: function() {
+		return this._higherBits & 255;
+	}
+	,getA: function() {
+		return this._higherBits >> 8 & 255;
+	}
+	,__class__: alphatab.platform.model.Color
+}
+alphatab.platform.model.Font = function(family,size,style) {
+	if(style == null) style = 0;
+	this._family = family;
+	this._size = size;
+	this._style = style;
+};
+alphatab.platform.model.Font.__name__ = true;
+alphatab.platform.model.Font.prototype = {
+	toCssString: function() {
+		var buf = new StringBuf();
+		if((this.getStyle() & 1) != 0) buf.b += "bold ";
+		if((this.getStyle() & 2) != 0) buf.b += "italic ";
+		buf.b += Std.string(this._size);
+		buf.b += "px";
+		buf.b += "'";
+		buf.b += Std.string(this._family);
+		buf.b += "'";
+		return buf.b;
+	}
+	,isItalic: function() {
+		return (this.getStyle() & 2) != 0;
+	}
+	,isBold: function() {
+		return (this.getStyle() & 1) != 0;
+	}
+	,getStyle: function() {
+		return this._style;
+	}
+	,getSize: function() {
+		return this._size;
+	}
+	,getFamily: function() {
+		return this._family;
+	}
+	,__class__: alphatab.platform.model.Font
+}
+alphatab.platform.model.TextAlign = { __ename__ : true, __constructs__ : ["Left","Center","Right"] }
+alphatab.platform.model.TextAlign.Left = ["Left",0];
+alphatab.platform.model.TextAlign.Left.toString = $estr;
+alphatab.platform.model.TextAlign.Left.__enum__ = alphatab.platform.model.TextAlign;
+alphatab.platform.model.TextAlign.Center = ["Center",1];
+alphatab.platform.model.TextAlign.Center.toString = $estr;
+alphatab.platform.model.TextAlign.Center.__enum__ = alphatab.platform.model.TextAlign;
+alphatab.platform.model.TextAlign.Right = ["Right",2];
+alphatab.platform.model.TextAlign.Right.toString = $estr;
+alphatab.platform.model.TextAlign.Right.__enum__ = alphatab.platform.model.TextAlign;
+alphatab.platform.IFileLoader = function() { }
+alphatab.platform.IFileLoader.__name__ = true;
+alphatab.platform.IFileLoader.prototype = {
+	__class__: alphatab.platform.IFileLoader
+}
+alphatab.platform.js.JsFileLoader = function() {
+};
+alphatab.platform.js.JsFileLoader.__name__ = true;
+alphatab.platform.js.JsFileLoader.__interfaces__ = [alphatab.platform.IFileLoader];
+alphatab.platform.js.JsFileLoader.isIE = function() {
+	var agent = navigator.userAgent;
+	return agent.indexOf("MSIE") != -1;
+}
+alphatab.platform.js.JsFileLoader.getBytes = function(s) {
+	var a = new Array();
+	var _g1 = 0, _g = s.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		a.push(HxOverrides.cca(s,i) & 255);
+	}
+	return haxe.io.Bytes.ofData(a);
+}
+alphatab.platform.js.JsFileLoader.prototype = {
+	loadBinaryAsync: function(path,success,error) {
+		if(alphatab.platform.js.JsFileLoader.isIE()) {
+			var vbArr = VbAjaxLoader(method,file);
+			var fileContents = vbArr.toArray();
+			var data = "";
+			var i = 0;
+			while(i < fileContents.length - 1) {
+				data += String.fromCharCode(fileContents[i]);
+				i++;
+			}
+			var reader = alphatab.platform.js.JsFileLoader.getBytes(data);
+			success(reader);
+		} else {
+			var xhr = new XMLHttpRequest();
+			xhr.overrideMimeType("text/plain; charset=x-user-defined");
+			xhr.onreadystatechange = function(e) {
+				if(xhr.readyState == 4) {
+					if(xhr.status == 200) {
+						var reader = alphatab.platform.js.JsFileLoader.getBytes(xhr.responseText);
+						success(reader);
+					} else if(xhr.status == 0) error("You are offline!!\n Please Check Your Network."); else if(xhr.status == 404) error("Requested URL not found."); else if(xhr.status == 500) error("Internel Server Error."); else if(xhr.statusText == "parsererror") error("Error.\nParsing JSON Request failed."); else if(xhr.statusText == "timeout") error("Request Time out."); else error("Unknow Error: " + xhr.responseText);
+				}
+			};
+			xhr.open("GET",path,true);
+			xhr.send(null);
+		}
+	}
+	,loadBinary: function(path) {
+		if(alphatab.platform.js.JsFileLoader.isIE()) {
+			var vbArr = VbAjaxLoader(method,file);
+			var fileContents = vbArr.toArray();
+			var data = "";
+			var i = 0;
+			while(i < fileContents.length - 1) {
+				data += String.fromCharCode(fileContents[i]);
+				i++;
+			}
+			var reader = alphatab.platform.js.JsFileLoader.getBytes(data);
+			return reader;
+		} else {
+			var xhr = new XMLHttpRequest();
+			xhr.overrideMimeType("text/plain; charset=x-user-defined");
+			xhr.open("GET",path,false);
+			xhr.send(null);
+			if(xhr.status == 200) {
+				var reader = alphatab.platform.js.JsFileLoader.getBytes(xhr.responseText);
+				return reader;
+			} else if(xhr.status == 0) throw "You are offline!!\n Please Check Your Network."; else if(xhr.status == 404) throw "Requested URL not found."; else if(xhr.status == 500) throw "Internel Server Error."; else if(xhr.statusText == "parsererror") throw "Error.\nParsing JSON Request failed."; else if(xhr.statusText == "timeout") throw "Request Time out."; else throw "Unknow Error: " + xhr.responseText;
+		}
+	}
+	,__class__: alphatab.platform.js.JsFileLoader
+}
+if(!alphatab.rendering) alphatab.rendering = {}
+if(!alphatab.rendering.layout) alphatab.rendering.layout = {}
+alphatab.rendering.layout.ScoreLayout = function(renderer) {
+	this.renderer = renderer;
+};
+alphatab.rendering.layout.ScoreLayout.__name__ = true;
+alphatab.rendering.layout.ScoreLayout.prototype = {
+	createEmptyStaveGroup: function() {
+		var group = new alphatab.rendering.staves.StaveGroup();
+		group.layout = this;
+		var _g = 0, _g1 = this.renderer.settings.staves;
+		while(_g < _g1.length) {
+			var s = _g1[_g];
+			++_g;
+			if(alphatab.Environment.staveFactories.exists(s.id)) group.addStave(new alphatab.rendering.staves.Stave((alphatab.Environment.staveFactories.get(s.id))(this)));
+		}
+		return group;
+	}
+	,paintScore: function() {
+	}
+	,doLayout: function() {
+	}
+	,__class__: alphatab.rendering.layout.ScoreLayout
+}
+alphatab.rendering.layout.PageViewLayout = function(renderer) {
+	alphatab.rendering.layout.ScoreLayout.call(this,renderer);
+	this._groups = new Array();
+};
+alphatab.rendering.layout.PageViewLayout.__name__ = true;
+alphatab.rendering.layout.PageViewLayout.__super__ = alphatab.rendering.layout.ScoreLayout;
+alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.layout.ScoreLayout.prototype,{
+	getSheetWidth: function() {
+		return Math.round(795 * this.renderer.scale);
+	}
+	,getMaxWidth: function() {
+		return this.getSheetWidth() - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0] - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2];
+	}
+	,createStaveGroup: function(currentBarIndex) {
+		var group = this.createEmptyStaveGroup();
+		var maxWidth = this.getSheetWidth() - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0] - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2];
+		var _g1 = currentBarIndex, _g = this.renderer.track.bars.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var bar = this.renderer.track.bars[i];
+			group.addBar(bar);
+			var groupIsFull = false;
+			if(group.width >= maxWidth && group.bars.length != 0) groupIsFull = true;
+			if(groupIsFull) {
+				group.revertLastBar();
+				group.isFull = true;
+				return group;
+			}
+			group.x = 0;
+		}
+		return group;
+	}
+	,fitGroup: function(group) {
+		var barSpace = 0;
+		if(group.isFull) {
+			var freeSpace = this.getSheetWidth() - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0] - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2] - group.width;
+			if(freeSpace != 0 && group.bars.length > 0) barSpace = Math.round(freeSpace / group.bars.length);
+		}
+		group.applyBarSpacing(barSpace);
+		this.width = Math.round(Math.max(this.width,group.width));
+	}
+	,isNullOrEmpty: function(s) {
+		return s == null || StringTools.trim(s) == "";
+	}
+	,paintScoreInfo: function(x,y) {
+		var flags = this.renderer.settings.layout.get("hideInfo",false)?0:511;
+		var score = this.renderer.get_score();
+		var scale = this.renderer.scale;
+		var canvas = this.renderer.canvas;
+		var res = this.renderer.renderingResources;
+		canvas.setColor(new alphatab.platform.model.Color(0,0,0));
+		canvas.setTextAlign(alphatab.platform.model.TextAlign.Center);
+		var tX;
+		var size;
+		var str = "";
+		if(!this.isNullOrEmpty(score.title) && (flags & 1) != 0) {
+			this.drawCentered(score.title,res.titleFont,y);
+			y += Math.floor(35 * scale);
+		}
+		if(!this.isNullOrEmpty(score.subTitle) && (flags & 2) != 0) {
+			this.drawCentered(score.subTitle,res.subTitleFont,y);
+			y += Math.floor(20 * scale);
+		}
+		if(!this.isNullOrEmpty(score.artist) && (flags & 4) != 0) {
+			this.drawCentered(score.artist,res.subTitleFont,y);
+			y += Math.floor(20 * scale);
+		}
+		if(!this.isNullOrEmpty(score.album) && (flags & 8) != 0) {
+			this.drawCentered(score.album,res.subTitleFont,y);
+			y += Math.floor(20 * scale);
+		}
+		if(!this.isNullOrEmpty(score.music) && score.music == score.words && (flags & 64) != 0) {
+			this.drawCentered(score.words,res.wordsFont,y);
+			y += Math.floor(20 * scale);
+		} else {
+			canvas.setFont(res.wordsFont);
+			if(!this.isNullOrEmpty(score.music) && (flags & 32) != 0) {
+				var size1 = canvas.measureText(score.music);
+				canvas.fillText(score.music,this.width - size1 - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2],y);
+			}
+			if(!this.isNullOrEmpty(score.words) && (flags & 16) != 0) canvas.fillText(score.music,x,y);
+			y += Math.floor(20 * scale);
+		}
+		y += Math.floor(20 * scale);
+		if(!this.renderer.track.isPercussion) {
+			canvas.setTextAlign(alphatab.platform.model.TextAlign.Left);
+			var tuning = alphatab.model.Tuning.findTuning(this.renderer.track.tuning);
+			if(tuning != null) {
+				canvas.setFont(res.effectFont);
+				canvas.fillText(tuning.name,x,y);
+				y += Math.floor(15 * scale);
+				if(!tuning.isStandard) {
+					var stringsPerColumn = Math.ceil(this.renderer.track.tuning.length / 2);
+					var currentX = x;
+					var currentY = y;
+					var _g1 = 0, _g = this.renderer.track.tuning.length;
+					while(_g1 < _g) {
+						var i = _g1++;
+						str = "(" + Std.string(i + 1) + ") = " + alphatab.model.Tuning.getTextForTuning(this.renderer.track.tuning[i],false);
+						canvas.fillText(str,currentX,currentY);
+						currentY += Math.floor(15 * scale);
+						if(i == stringsPerColumn - 1) {
+							currentY = y;
+							currentX += Math.floor(43 * scale);
+						}
+					}
+					y += stringsPerColumn * Math.floor(15 * scale);
+				}
+			}
+		}
+		y += Math.floor(25 * scale);
+		return y;
+	}
+	,drawCentered: function(text,font,y) {
+		this.renderer.canvas.setFont(font);
+		this.renderer.canvas.fillText(text,this.width / 2,y);
+	}
+	,paintScore: function() {
+		var x = alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0];
+		var y = alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[1];
+		y = this.paintScoreInfo(x,y);
+		var _g = 0, _g1 = this._groups;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.paint(0,0,this.renderer.canvas);
+		}
+	}
+	,doScoreInfoLayout: function(y) {
+		var flags = this.renderer.settings.layout.get("hideInfo",false)?0:511;
+		var score = this.renderer.get_score();
+		var scale = this.renderer.scale;
+		if(!this.isNullOrEmpty(score.title) && (flags & 1) != 0) y += Math.floor(35 * scale);
+		if(!this.isNullOrEmpty(score.subTitle) && (flags & 2) != 0) y += Math.floor(20 * scale);
+		if(!this.isNullOrEmpty(score.artist) && (flags & 4) != 0) y += Math.floor(20 * scale);
+		if(!this.isNullOrEmpty(score.album) && (flags & 8) != 0) y += Math.floor(20 * scale);
+		if(!this.isNullOrEmpty(score.music) && score.music == score.words && (flags & 64) != 0) y += Math.floor(20 * scale); else {
+			if(!this.isNullOrEmpty(score.music) && (flags & 32) != 0) y += Math.floor(20 * scale);
+			if(!this.isNullOrEmpty(score.words) && (flags & 16) != 0) y += Math.floor(20 * scale);
+		}
+		y += Math.floor(20 * scale);
+		if(!this.renderer.track.isPercussion) {
+			var tuning = alphatab.model.Tuning.findTuning(this.renderer.track.tuning);
+			if(tuning != null) {
+				y += Math.floor(15 * scale);
+				if(!tuning.isStandard) {
+					var stringsPerColumn = Math.ceil(this.renderer.track.tuning.length / 2);
+					y += stringsPerColumn * Math.floor(15 * scale);
+				}
+				y += Math.floor(15 * scale);
+			}
+		}
+		y += Math.floor(40 * scale);
+		return y;
+	}
+	,doLayout: function() {
+		this._groups = new Array();
+		var currentBarIndex = 0;
+		var endBarIndex = this.renderer.track.bars.length - 1;
+		var x = alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0];
+		var y = alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[1];
+		y = this.doScoreInfoLayout(y);
+		while(currentBarIndex <= endBarIndex) {
+			var group = this.createStaveGroup(currentBarIndex);
+			this._groups.push(group);
+			group.x = x;
+			group.y = y;
+			this.fitGroup(group);
+			group.finalizeGroup(this);
+			y += group.calculateHeight() + (20 * this.renderer.scale | 0);
+			currentBarIndex = group.bars[group.bars.length - 1].index + 1;
+		}
+		this.height = y + alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[3];
+		this.width = 795 * this.renderer.scale | 0;
+	}
+	,__class__: alphatab.rendering.layout.PageViewLayout
+});
+alphatab.rendering.layout.HorizontalScreenLayout = function(renderer) {
+	alphatab.rendering.layout.ScoreLayout.call(this,renderer);
+};
+alphatab.rendering.layout.HorizontalScreenLayout.__name__ = true;
+alphatab.rendering.layout.HorizontalScreenLayout.__super__ = alphatab.rendering.layout.ScoreLayout;
+alphatab.rendering.layout.HorizontalScreenLayout.prototype = $extend(alphatab.rendering.layout.ScoreLayout.prototype,{
+	paintScore: function() {
+		this._group.paint(0,0,this.renderer.canvas);
+	}
+	,doLayout: function() {
+		var currentBarIndex = 0;
+		var endBarIndex = this.renderer.track.bars.length - 1;
+		var x = alphatab.rendering.layout.HorizontalScreenLayout.PAGE_PADDING[0];
+		var y = alphatab.rendering.layout.HorizontalScreenLayout.PAGE_PADDING[1];
+		this._group = this.createEmptyStaveGroup();
+		var _g1 = 0, _g = this.renderer.track.bars.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var bar = this.renderer.track.bars[i];
+			this._group.addBar(bar);
+		}
+		this._group.x = x;
+		this._group.y = y;
+		this._group.finalizeGroup(this);
+		y += this._group.calculateHeight() + (20 * this.renderer.scale | 0);
+		this.height = y + alphatab.rendering.layout.HorizontalScreenLayout.PAGE_PADDING[3];
+		this.width = this._group.x + this._group.width + alphatab.rendering.layout.HorizontalScreenLayout.PAGE_PADDING[2];
+	}
+	,__class__: alphatab.rendering.layout.HorizontalScreenLayout
+});
+alphatab.rendering.IEffectBarRendererInfo = function() { }
+alphatab.rendering.IEffectBarRendererInfo.__name__ = true;
+alphatab.rendering.IEffectBarRendererInfo.prototype = {
+	__class__: alphatab.rendering.IEffectBarRendererInfo
+}
+if(!alphatab.rendering.effects) alphatab.rendering.effects = {}
+alphatab.rendering.effects.DummyEffectInfo = function() {
+};
+alphatab.rendering.effects.DummyEffectInfo.__name__ = true;
+alphatab.rendering.effects.DummyEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
+alphatab.rendering.effects.DummyEffectInfo.prototype = {
+	createNewGlyph: function(renderer,beat) {
+		return null;
+	}
+	,getSizingMode: function() {
+		return alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly;
+	}
+	,getHeight: function(renderer) {
+		return 0;
+	}
+	,shouldCreateGlyph: function(renderer,beat) {
+		return false;
+	}
+	,__class__: alphatab.rendering.effects.DummyEffectInfo
+}
+alphatab.rendering.BarRendererFactory = function() {
+	this.isInAccolade = true;
+};
+alphatab.rendering.BarRendererFactory.__name__ = true;
+alphatab.rendering.BarRendererFactory.prototype = {
+	create: function(bar) {
+		return null;
+	}
+	,__class__: alphatab.rendering.BarRendererFactory
+}
+alphatab.rendering.EffectBarRendererFactory = function(info) {
+	alphatab.rendering.BarRendererFactory.call(this);
+	this.isInAccolade = false;
+	this._info = info;
+};
+alphatab.rendering.EffectBarRendererFactory.__name__ = true;
+alphatab.rendering.EffectBarRendererFactory.__super__ = alphatab.rendering.BarRendererFactory;
+alphatab.rendering.EffectBarRendererFactory.prototype = $extend(alphatab.rendering.BarRendererFactory.prototype,{
+	create: function(bar) {
+		return new alphatab.rendering.EffectBarRenderer(bar,this._info);
+	}
+	,__class__: alphatab.rendering.EffectBarRendererFactory
+});
+alphatab.rendering.effects.BeatVibratoEffectInfo = function() {
+};
+alphatab.rendering.effects.BeatVibratoEffectInfo.__name__ = true;
+alphatab.rendering.effects.BeatVibratoEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
+alphatab.rendering.effects.BeatVibratoEffectInfo.prototype = {
+	createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(null,null,"b~");
+	}
+	,getHeight: function(renderer) {
+		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,getSizingMode: function() {
+		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatToPostBeat;
+	}
+	,shouldCreateGlyph: function(renderer,beat) {
+		return beat.vibrato != alphatab.model.VibratoType.None;
+	}
+	,__class__: alphatab.rendering.effects.BeatVibratoEffectInfo
+}
+alphatab.rendering.effects.NoteEffectInfoBase = function() {
+};
+alphatab.rendering.effects.NoteEffectInfoBase.__name__ = true;
+alphatab.rendering.effects.NoteEffectInfoBase.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
+alphatab.rendering.effects.NoteEffectInfoBase.prototype = {
+	createNewGlyph: function(renderer,beat) {
+		return null;
+	}
+	,getSizingMode: function() {
+		return alphatab.rendering.EffectBarGlyphSizing.GroupedOnBeatToPostBeat;
+	}
+	,getHeight: function(renderer) {
+		return 0;
+	}
+	,shouldCreateGlyphForNote: function(renderer,note) {
+		return false;
+	}
+	,shouldCreateGlyph: function(renderer,beat) {
+		this._lastCreateInfo = new Array();
+		var _g = 0, _g1 = beat.notes;
+		while(_g < _g1.length) {
+			var n = _g1[_g];
+			++_g;
+			if(this.shouldCreateGlyphForNote(renderer,n)) this._lastCreateInfo.push(n);
+		}
+		return this._lastCreateInfo.length > 0;
+	}
+	,__class__: alphatab.rendering.effects.NoteEffectInfoBase
+}
+alphatab.rendering.effects.NoteVibratoEffectInfo = function() {
+	alphatab.rendering.effects.NoteEffectInfoBase.call(this);
+};
+alphatab.rendering.effects.NoteVibratoEffectInfo.__name__ = true;
+alphatab.rendering.effects.NoteVibratoEffectInfo.__super__ = alphatab.rendering.effects.NoteEffectInfoBase;
+alphatab.rendering.effects.NoteVibratoEffectInfo.prototype = $extend(alphatab.rendering.effects.NoteEffectInfoBase.prototype,{
+	createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(null,null,"n~");
+	}
+	,getHeight: function(renderer) {
+		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,shouldCreateGlyphForNote: function(renderer,note) {
+		return note.vibrato != alphatab.model.VibratoType.None;
+	}
+	,__class__: alphatab.rendering.effects.NoteVibratoEffectInfo
+});
+alphatab.rendering.ScoreBarRendererFactory = function() {
+	alphatab.rendering.BarRendererFactory.call(this);
+};
+alphatab.rendering.ScoreBarRendererFactory.__name__ = true;
+alphatab.rendering.ScoreBarRendererFactory.__super__ = alphatab.rendering.BarRendererFactory;
+alphatab.rendering.ScoreBarRendererFactory.prototype = $extend(alphatab.rendering.BarRendererFactory.prototype,{
+	create: function(bar) {
+		return new alphatab.rendering.ScoreBarRenderer(bar);
+	}
+	,__class__: alphatab.rendering.ScoreBarRendererFactory
+});
+alphatab.rendering.TabBarRendererFactory = function() {
+	alphatab.rendering.BarRendererFactory.call(this);
+};
+alphatab.rendering.TabBarRendererFactory.__name__ = true;
+alphatab.rendering.TabBarRendererFactory.__super__ = alphatab.rendering.BarRendererFactory;
+alphatab.rendering.TabBarRendererFactory.prototype = $extend(alphatab.rendering.BarRendererFactory.prototype,{
+	create: function(bar) {
+		return new alphatab.rendering.TabBarRenderer(bar);
+	}
+	,__class__: alphatab.rendering.TabBarRendererFactory
+});
+alphatab.Environment = function() { }
+alphatab.Environment.__name__ = true;
 alphatab.Main = function() { }
 alphatab.Main.__name__ = true;
 alphatab.Main.main = function() {
+}
+alphatab.Settings = function() {
+};
+alphatab.Settings.__name__ = true;
+alphatab.Settings.defaults = function() {
+	var settings = new alphatab.Settings();
+	settings.scale = 1.0;
+	settings.autoSize = true;
+	settings.width = 600;
+	settings.height = 200;
+	settings.engine = "default";
+	settings.layout = alphatab.LayoutSettings.defaults();
+	settings.staves = new Array();
+	settings.staves.push(new alphatab.StaveSettings("marker"));
+	settings.staves.push(new alphatab.StaveSettings("triplet-feel"));
+	settings.staves.push(new alphatab.StaveSettings("tempo"));
+	settings.staves.push(new alphatab.StaveSettings("fermata"));
+	settings.staves.push(new alphatab.StaveSettings("text"));
+	settings.staves.push(new alphatab.StaveSettings("chords"));
+	settings.staves.push(new alphatab.StaveSettings("beat-vibrato"));
+	settings.staves.push(new alphatab.StaveSettings("note-vibrato"));
+	settings.staves.push(new alphatab.StaveSettings("tuplet"));
+	settings.staves.push(new alphatab.StaveSettings("score"));
+	settings.staves.push(new alphatab.StaveSettings("dynamics"));
+	settings.staves.push(new alphatab.StaveSettings("beat-vibrato"));
+	settings.staves.push(new alphatab.StaveSettings("note-vibrato"));
+	settings.staves.push(new alphatab.StaveSettings("tap"));
+	settings.staves.push(new alphatab.StaveSettings("fade-in"));
+	settings.staves.push(new alphatab.StaveSettings("let-ring"));
+	settings.staves.push(new alphatab.StaveSettings("palm-mute"));
+	settings.staves.push(new alphatab.StaveSettings("tab"));
+	settings.staves.push(new alphatab.StaveSettings("fingering"));
+	return settings;
+}
+alphatab.Settings.prototype = {
+	__class__: alphatab.Settings
+}
+alphatab.LayoutSettings = function() {
+	this.additionalSettings = new haxe.ds.StringMap();
+};
+alphatab.LayoutSettings.__name__ = true;
+alphatab.LayoutSettings.defaults = function() {
+	var settings = new alphatab.LayoutSettings();
+	settings.mode = "page";
+	return settings;
+}
+alphatab.LayoutSettings.prototype = {
+	get: function(key,def) {
+		if(this.additionalSettings.exists(key)) return this.additionalSettings.get(key);
+		return def;
+	}
+	,__class__: alphatab.LayoutSettings
+}
+alphatab.StaveSettings = function(id) {
+	this.id = id;
+	this.additionalSettings = new haxe.ds.StringMap();
+};
+alphatab.StaveSettings.__name__ = true;
+alphatab.StaveSettings.prototype = {
+	__class__: alphatab.StaveSettings
 }
 if(!alphatab.audio) alphatab.audio = {}
 alphatab.audio.GeneralMidi = function() { }
@@ -2181,9 +3223,10 @@ alphatab.importer.MixTableChange.prototype = {
 alphatab.importer.ScoreLoader = function() { }
 alphatab.importer.ScoreLoader.__name__ = true;
 alphatab.importer.ScoreLoader.loadScoreAsync = function(path,success,error) {
-	var loader = new alphatab.platform.js.JsFileLoader();
+	var loader = (alphatab.Environment.fileLoaders.get("default"))();
 	loader.loadBinaryAsync(path,function(data) {
 		var importers = alphatab.importer.ScoreImporter.availableImporters();
+		var score = null;
 		var _g = 0;
 		while(_g < importers.length) {
 			var importer = importers[_g];
@@ -2191,17 +3234,15 @@ alphatab.importer.ScoreLoader.loadScoreAsync = function(path,success,error) {
 			try {
 				var input = new haxe.io.BytesInput(data);
 				importer.init(input);
-				var score = importer.readScore();
-				success(score);
-				return;
+				score = importer.readScore();
+				break;
 			} catch( e ) {
-				if(e == alphatab.importer.ScoreImporter.UNSUPPORTED_FORMAT) continue; else error(haxe.CallStack.toString(haxe.CallStack.exceptionStack()));
+				if(e == alphatab.importer.ScoreImporter.UNSUPPORTED_FORMAT) continue; else error(e);
 			}
 		}
-		error("No reader for the requested file found");
+		if(score != null) success(score); else error("No reader for the requested file found");
 	},error);
 }
-var haxe = haxe || {}
 if(!haxe.io) haxe.io = {}
 haxe.io.Input = function() { }
 haxe.io.Input.__name__ = true;
@@ -3038,322 +4079,6 @@ alphatab.model.Voice.prototype = {
 	}
 	,__class__: alphatab.model.Voice
 }
-if(!alphatab.platform) alphatab.platform = {}
-alphatab.platform.ICanvas = function() { }
-alphatab.platform.ICanvas.__name__ = true;
-alphatab.platform.ICanvas.prototype = {
-	__class__: alphatab.platform.ICanvas
-}
-alphatab.platform.IFileLoader = function() { }
-alphatab.platform.IFileLoader.__name__ = true;
-alphatab.platform.IFileLoader.prototype = {
-	__class__: alphatab.platform.IFileLoader
-}
-alphatab.platform.PlatformFactory = function() { }
-alphatab.platform.PlatformFactory.__name__ = true;
-alphatab.platform.PlatformFactory.getLoader = function() {
-	return new alphatab.platform.js.JsFileLoader();
-}
-alphatab.platform.PlatformFactory.getCanvas = function(object) {
-	if(object == alphatab.platform.PlatformFactory.SVG_CANVAS) return new alphatab.platform.svg.SvgCanvas();
-	return new alphatab.platform.js.Html5Canvas(object);
-}
-if(!alphatab.platform.js) alphatab.platform.js = {}
-alphatab.platform.js.Html5Canvas = function(dom) {
-	this._canvas = dom;
-	this._context = dom.getContext("2d");
-	this._context.textBaseline = "top";
-};
-alphatab.platform.js.Html5Canvas.__name__ = true;
-alphatab.platform.js.Html5Canvas.__interfaces__ = [alphatab.platform.ICanvas];
-alphatab.platform.js.Html5Canvas.prototype = {
-	measureText: function(text) {
-		return this._context.measureText(text).width;
-	}
-	,strokeText: function(text,x,y) {
-		this._context.strokeText(text,x,y);
-	}
-	,fillText: function(text,x,y) {
-		this._context.fillText(text,x,y);
-	}
-	,setTextBaseline: function(textBaseLine) {
-		switch( (textBaseLine)[1] ) {
-		case 1:
-			this._context.textBaseline = "top";
-			break;
-		case 2:
-			this._context.textBaseline = "middle";
-			break;
-		case 3:
-			this._context.textBaseline = "bottom";
-			break;
-		default:
-			this._context.textBaseline = "alphabetic";
-		}
-	}
-	,getTextBaseline: function() {
-		var _g = this;
-		switch(_g._context.textBaseline) {
-		case "top":
-			return alphatab.model.TextBaseline.Top;
-		case "middle":
-			return alphatab.model.TextBaseline.Middle;
-		case "bottom":
-			return alphatab.model.TextBaseline.Bottom;
-		default:
-			return alphatab.model.TextBaseline.Default;
-		}
-	}
-	,setTextAlign: function(textAlign) {
-		switch( (textAlign)[1] ) {
-		case 0:
-			this._context.textAlign = "left";
-			break;
-		case 1:
-			this._context.textAlign = "center";
-			break;
-		case 2:
-			this._context.textAlign = "right";
-			break;
-		}
-	}
-	,getTextAlign: function() {
-		var _g = this;
-		switch(_g._context.textAlign) {
-		case "left":
-			return alphatab.platform.model.TextAlign.Left;
-		case "center":
-			return alphatab.platform.model.TextAlign.Center;
-		case "right":
-			return alphatab.platform.model.TextAlign.Right;
-		default:
-			return alphatab.platform.model.TextAlign.Left;
-		}
-	}
-	,setFont: function(font) {
-		this._context.font = font.toCssString();
-	}
-	,stroke: function() {
-		this._context.stroke();
-	}
-	,fill: function() {
-		this._context.fill();
-	}
-	,rect: function(x,y,w,h) {
-		this._context.rect(x,y,w,h);
-	}
-	,circle: function(x,y,radius) {
-		this._context.arc(x,y,radius,0,Math.PI * 2,true);
-	}
-	,bezierCurveTo: function(cp1x,cp1y,cp2x,cp2y,x,y) {
-		this._context.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,x,y);
-	}
-	,quadraticCurveTo: function(cpx,cpy,x,y) {
-		this._context.quadraticCurveTo(cpx,cpy,x,y);
-	}
-	,lineTo: function(x,y) {
-		this._context.lineTo(x - 0.5,y - 0.5);
-	}
-	,moveTo: function(x,y) {
-		this._context.moveTo(x - 0.5,y - 0.5);
-	}
-	,closePath: function() {
-		this._context.closePath();
-	}
-	,beginPath: function() {
-		this._context.beginPath();
-	}
-	,strokeRect: function(x,y,w,h) {
-		this._context.strokeRect(x - 0.5,y - 0.5,w,h);
-	}
-	,fillRect: function(x,y,w,h) {
-		this._context.fillRect(x - 0.5,y - 0.5,w,h);
-	}
-	,clear: function() {
-		var lineWidth = this._context.lineWidth;
-		this._canvas.width = this._canvas.width;
-		this._context.lineWidth = lineWidth;
-	}
-	,setLineWidth: function(value) {
-		this._context.lineWidth = value;
-	}
-	,setColor: function(color) {
-		this._context.strokeStyle = color.toRgbaString();
-		this._context.fillStyle = color.toRgbaString();
-	}
-	,setHeight: function(height) {
-		var lineWidth = this._context.lineWidth;
-		this._canvas.height = height;
-		this._context = this._canvas.getContext("2d");
-		this._context.textBaseline = "top";
-		this._context.lineWidth = lineWidth;
-		this._height = height;
-	}
-	,setWidth: function(width) {
-		var lineWidth = this._context.lineWidth;
-		this._canvas.width = width;
-		this._context = this._canvas.getContext("2d");
-		this._context.textBaseline = "top";
-		this._context.lineWidth = lineWidth;
-		this._width = width;
-	}
-	,getHeight: function() {
-		return this._canvas.offsetHeight;
-	}
-	,getWidth: function() {
-		return this._canvas.offsetWidth;
-	}
-	,__class__: alphatab.platform.js.Html5Canvas
-}
-alphatab.platform.js.JsFileLoader = function() {
-};
-alphatab.platform.js.JsFileLoader.__name__ = true;
-alphatab.platform.js.JsFileLoader.__interfaces__ = [alphatab.platform.IFileLoader];
-alphatab.platform.js.JsFileLoader.isIE = function() {
-	var agent = navigator.userAgent;
-	return agent.indexOf("MSIE") != -1;
-}
-alphatab.platform.js.JsFileLoader.getBytes = function(s) {
-	var a = new Array();
-	var _g1 = 0, _g = s.length;
-	while(_g1 < _g) {
-		var i = _g1++;
-		a.push(HxOverrides.cca(s,i) & 255);
-	}
-	return haxe.io.Bytes.ofData(a);
-}
-alphatab.platform.js.JsFileLoader.prototype = {
-	loadBinaryAsync: function(path,success,error) {
-		if(alphatab.platform.js.JsFileLoader.isIE()) {
-			var vbArr = VbAjaxLoader(method,file);
-			var fileContents = vbArr.toArray();
-			var data = "";
-			var i = 0;
-			while(i < fileContents.length - 1) {
-				data += String.fromCharCode(fileContents[i]);
-				i++;
-			}
-			var reader = alphatab.platform.js.JsFileLoader.getBytes(data);
-			success(reader);
-		} else {
-			var xhr = new XMLHttpRequest();
-			xhr.overrideMimeType("text/plain; charset=x-user-defined");
-			xhr.onreadystatechange = function(e) {
-				try {
-					if(xhr.readyState == 4) {
-						if(xhr.status == 200) {
-							var reader = alphatab.platform.js.JsFileLoader.getBytes(xhr.responseText);
-							success(reader);
-						} else if(xhr.status == 0) error("You are offline!!\n Please Check Your Network."); else if(xhr.status == 404) error("Requested URL not found."); else if(xhr.status == 500) error("Internel Server Error."); else if(xhr.statusText == "parsererror") error("Error.\nParsing JSON Request failed."); else if(xhr.statusText == "timeout") error("Request Time out."); else error("Unknow Error: " + xhr.responseText);
-					}
-				} catch( e1 ) {
-					error("Error loading file: " + Std.string(e1));
-				}
-			};
-			xhr.open("GET",path,true);
-			xhr.send(null);
-		}
-	}
-	,loadBinary: function(path) {
-		if(alphatab.platform.js.JsFileLoader.isIE()) {
-			var vbArr = VbAjaxLoader(method,file);
-			var fileContents = vbArr.toArray();
-			var data = "";
-			var i = 0;
-			while(i < fileContents.length - 1) {
-				data += String.fromCharCode(fileContents[i]);
-				i++;
-			}
-			var reader = alphatab.platform.js.JsFileLoader.getBytes(data);
-			return reader;
-		} else {
-			var xhr = new XMLHttpRequest();
-			xhr.overrideMimeType("text/plain; charset=x-user-defined");
-			xhr.open("GET",path,false);
-			xhr.send(null);
-			if(xhr.status == 200) {
-				var reader = alphatab.platform.js.JsFileLoader.getBytes(xhr.responseText);
-				return reader;
-			} else if(xhr.status == 0) throw "You are offline!!\n Please Check Your Network."; else if(xhr.status == 404) throw "Requested URL not found."; else if(xhr.status == 500) throw "Internel Server Error."; else if(xhr.statusText == "parsererror") throw "Error.\nParsing JSON Request failed."; else if(xhr.statusText == "timeout") throw "Request Time out."; else throw "Unknow Error: " + xhr.responseText;
-		}
-	}
-	,__class__: alphatab.platform.js.JsFileLoader
-}
-if(!alphatab.platform.model) alphatab.platform.model = {}
-alphatab.platform.model.Color = function(r,g,b,a) {
-	if(a == null) a = 255;
-	this._higherBits = (a & 255) << 8 | r & 255;
-	this._lowerBits = (g & 255) << 8 | b & 255;
-};
-alphatab.platform.model.Color.__name__ = true;
-alphatab.platform.model.Color.prototype = {
-	toRgbaString: function() {
-		return "rgba(" + this.getR() + "," + this.getG() + "," + this.getB() + "," + this.getA() / 255.0 + ")";
-	}
-	,toHexString: function() {
-		return "#" + StringTools.hex(this.getA(),2) + StringTools.hex(this.getR(),2) + StringTools.hex(this.getG(),2) + StringTools.hex(this.getB(),2);
-	}
-	,getB: function() {
-		return this._lowerBits & 255;
-	}
-	,getG: function() {
-		return this._lowerBits >> 8 & 255;
-	}
-	,getR: function() {
-		return this._higherBits & 255;
-	}
-	,getA: function() {
-		return this._higherBits >> 8 & 255;
-	}
-	,__class__: alphatab.platform.model.Color
-}
-alphatab.platform.model.Font = function(family,size,style) {
-	if(style == null) style = 0;
-	this._family = family;
-	this._size = size;
-	this._style = style;
-};
-alphatab.platform.model.Font.__name__ = true;
-alphatab.platform.model.Font.prototype = {
-	toCssString: function() {
-		var buf = new StringBuf();
-		if((this.getStyle() & 1) != 0) buf.b += "bold ";
-		if((this.getStyle() & 2) != 0) buf.b += "italic ";
-		buf.b += Std.string(this._size);
-		buf.b += "px";
-		buf.b += "'";
-		buf.b += Std.string(this._family);
-		buf.b += "'";
-		return buf.b;
-	}
-	,isItalic: function() {
-		return (this.getStyle() & 2) != 0;
-	}
-	,isBold: function() {
-		return (this.getStyle() & 1) != 0;
-	}
-	,getStyle: function() {
-		return this._style;
-	}
-	,getSize: function() {
-		return this._size;
-	}
-	,getFamily: function() {
-		return this._family;
-	}
-	,__class__: alphatab.platform.model.Font
-}
-alphatab.platform.model.TextAlign = { __ename__ : true, __constructs__ : ["Left","Center","Right"] }
-alphatab.platform.model.TextAlign.Left = ["Left",0];
-alphatab.platform.model.TextAlign.Left.toString = $estr;
-alphatab.platform.model.TextAlign.Left.__enum__ = alphatab.platform.model.TextAlign;
-alphatab.platform.model.TextAlign.Center = ["Center",1];
-alphatab.platform.model.TextAlign.Center.toString = $estr;
-alphatab.platform.model.TextAlign.Center.__enum__ = alphatab.platform.model.TextAlign;
-alphatab.platform.model.TextAlign.Right = ["Right",2];
-alphatab.platform.model.TextAlign.Right.toString = $estr;
-alphatab.platform.model.TextAlign.Right.__enum__ = alphatab.platform.model.TextAlign;
-if(!alphatab.platform.svg) alphatab.platform.svg = {}
 alphatab.platform.svg.FontSizes = function() { }
 alphatab.platform.svg.FontSizes.__name__ = true;
 alphatab.platform.svg.FontSizes.measureString = function(s,f,size) {
@@ -3388,285 +4113,6 @@ alphatab.platform.svg.SupportedFonts.TimesNewRoman.__enum__ = alphatab.platform.
 alphatab.platform.svg.SupportedFonts.Arial = ["Arial",1];
 alphatab.platform.svg.SupportedFonts.Arial.toString = $estr;
 alphatab.platform.svg.SupportedFonts.Arial.__enum__ = alphatab.platform.svg.SupportedFonts;
-alphatab.platform.svg.SvgCanvas = function() {
-	this._buffer = new StringBuf();
-	this._currentPath = new StringBuf();
-	this._currentPathIsEmpty = true;
-	this._color = new alphatab.platform.model.Color(255,255,255);
-	this._lineWidth = 1;
-	this._width = 0;
-	this._height = 0;
-	this._font = new alphatab.platform.model.Font("sans-serif",10);
-	this._textAlign = alphatab.platform.model.TextAlign.Left;
-};
-alphatab.platform.svg.SvgCanvas.__name__ = true;
-alphatab.platform.svg.SvgCanvas.__interfaces__ = [alphatab.platform.ICanvas];
-alphatab.platform.svg.SvgCanvas.prototype = {
-	measureText: function(text) {
-		var font = alphatab.platform.svg.SupportedFonts.Arial;
-		if(this._font.getFamily().indexOf("Times") >= 0) font = alphatab.platform.svg.SupportedFonts.TimesNewRoman;
-		return alphatab.platform.svg.FontSizes.measureString(text,font,this._font.getSize());
-	}
-	,getSvgBaseLine: function() {
-		var _g = this;
-		switch( (_g._textBaseline)[1] ) {
-		case 1:
-			return "top";
-		case 2:
-			return "middle";
-		case 3:
-			return "bottom";
-		default:
-			return "alphabetic";
-		}
-	}
-	,getSvgTextAlignment: function() {
-		var _g = this;
-		switch( (_g._textAlign)[1] ) {
-		case 0:
-			return "start";
-		case 1:
-			return "middle";
-		case 2:
-			return "end";
-		}
-	}
-	,strokeText: function(text,x,y) {
-		this._buffer.b += "<text x=\"";
-		this._buffer.b += Std.string(x);
-		this._buffer.b += "\" y=\"";
-		this._buffer.b += Std.string(y);
-		this._buffer.b += "\" style=\"font:";
-		this._buffer.b += Std.string(this._font.toCssString());
-		this._buffer.b += "\" stroke:";
-		this._buffer.b += Std.string(this._color.toRgbaString());
-		this._buffer.b += "; stroke-width:";
-		this._buffer.b += Std.string(this._lineWidth);
-		this._buffer.b += ";\" ";
-		this._buffer.b += " dominant-baseline=\"";
-		this._buffer.b += Std.string(this.getSvgBaseLine());
-		this._buffer.b += "\" text-anchor=\"";
-		this._buffer.b += Std.string(this.getSvgTextAlignment());
-		this._buffer.b += "\">\n";
-		this._buffer.b += Std.string(text);
-		this._buffer.b += "</text>\n";
-	}
-	,fillText: function(text,x,y) {
-		this._buffer.b += "<text x=\"";
-		this._buffer.b += Std.string(x);
-		this._buffer.b += "\" y=\"";
-		this._buffer.b += Std.string(y);
-		this._buffer.b += "\" style=\"font:";
-		this._buffer.b += Std.string(this._font.toCssString());
-		this._buffer.b += "; fill:";
-		this._buffer.b += Std.string(this._color.toRgbaString());
-		this._buffer.b += ";\" ";
-		this._buffer.b += " dominant-baseline=\"";
-		this._buffer.b += Std.string(this.getSvgBaseLine());
-		this._buffer.b += "\" text-anchor=\"";
-		this._buffer.b += Std.string(this.getSvgTextAlignment());
-		this._buffer.b += "\">\n";
-		this._buffer.b += Std.string(text);
-		this._buffer.b += "</text>\n";
-	}
-	,setTextBaseline: function(textBaseline) {
-		this._textBaseline = textBaseline;
-	}
-	,getTextBaseline: function() {
-		return this._textBaseline;
-	}
-	,setTextAlign: function(textAlign) {
-		this._textAlign = textAlign;
-	}
-	,getTextAlign: function() {
-		return this._textAlign;
-	}
-	,setFont: function(font) {
-		this._font = font;
-	}
-	,stroke: function() {
-		var path = this._currentPath.b;
-		if(!this._currentPathIsEmpty) {
-			this._buffer.b += "<path d=\"";
-			this._buffer.b += Std.string(this._currentPath.b);
-			this._buffer.b += "\" style=\"stroke:";
-			this._buffer.b += Std.string(this._color.toRgbaString());
-			this._buffer.b += "; stroke-width:";
-			this._buffer.b += Std.string(this._lineWidth);
-			this._buffer.b += ";\" fill=\"none\" />\n";
-		}
-		this._currentPath = new StringBuf();
-		this._currentPathIsEmpty = true;
-	}
-	,fill: function() {
-		var path = this._currentPath.b;
-		if(!this._currentPathIsEmpty) {
-			this._buffer.b += "<path d=\"";
-			this._buffer.b += Std.string(this._currentPath.b);
-			this._buffer.b += "\" style=\"fill:";
-			this._buffer.b += Std.string(this._color.toRgbaString());
-			this._buffer.b += "\" stroke=\"none\"/>\n";
-		}
-		this._currentPath = new StringBuf();
-		this._currentPathIsEmpty = true;
-	}
-	,rect: function(x,y,w,h) {
-		this._currentPathIsEmpty = false;
-		this._currentPath.b += " M";
-		this._currentPath.b += Std.string(x);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(y);
-		this._currentPath.b += " L";
-		this._currentPath.b += Std.string(x + w);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(y);
-		this._currentPath.b += " ";
-		this._currentPath.b += Std.string(x + w);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(y + h);
-		this._currentPath.b += " ";
-		this._currentPath.b += Std.string(x);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(y + h);
-		this._currentPath.b += " z";
-	}
-	,circle: function(x,y,radius) {
-		this._currentPathIsEmpty = false;
-		this._currentPath.b += " M";
-		this._currentPath.b += Std.string(x - radius);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(y);
-		this._currentPath.b += " A1,1 0 0,0 ";
-		this._currentPath.b += Std.string(x + radius);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(y);
-		this._currentPath.b += " A1,1 0 0,0 ";
-		this._currentPath.b += Std.string(x - radius);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(y);
-		this._currentPath.b += " z";
-	}
-	,bezierCurveTo: function(cp1x,cp1y,cp2x,cp2y,x,y) {
-		this._currentPathIsEmpty = false;
-		this._currentPath.b += " C";
-		this._currentPath.b += Std.string(cp1x);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(cp1y);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(cp2x);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(cp2y);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(x);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(y);
-	}
-	,quadraticCurveTo: function(cpx,cpy,x,y) {
-		this._currentPathIsEmpty = false;
-		this._currentPath.b += " Q";
-		this._currentPath.b += Std.string(cpx);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(cpy);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(x);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(y);
-	}
-	,lineTo: function(x,y) {
-		this._currentPathIsEmpty = false;
-		this._currentPath.b += " L";
-		this._currentPath.b += Std.string(x);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(y);
-	}
-	,moveTo: function(x,y) {
-		this._currentPath.b += " M";
-		this._currentPath.b += Std.string(x);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(y);
-	}
-	,closePath: function() {
-		this._currentPath.b += " z";
-	}
-	,beginPath: function() {
-	}
-	,strokeRect: function(x,y,w,h) {
-		this._buffer.b += "<rect x=\"";
-		this._buffer.b += Std.string(x);
-		this._buffer.b += "\" y=\"";
-		this._buffer.b += Std.string(y);
-		this._buffer.b += "\" width=\"";
-		this._buffer.b += Std.string(w);
-		this._buffer.b += "\" height=\"";
-		this._buffer.b += Std.string(h);
-		this._buffer.b += "\" style=\"stroke:";
-		this._buffer.b += Std.string(this._color.toRgbaString());
-		this._buffer.b += "; stroke-width:";
-		this._buffer.b += Std.string(this._lineWidth);
-		this._buffer.b += ";\" />\n";
-	}
-	,fillRect: function(x,y,w,h) {
-		this._buffer.b += "<rect x=\"";
-		this._buffer.b += Std.string(x);
-		this._buffer.b += "\" y=\"";
-		this._buffer.b += Std.string(y);
-		this._buffer.b += "\" width=\"";
-		this._buffer.b += Std.string(w);
-		this._buffer.b += "\" height=\"";
-		this._buffer.b += Std.string(h);
-		this._buffer.b += "\" style=\"fill:";
-		this._buffer.b += Std.string(this._color.toRgbaString());
-		this._buffer.b += ";\" />\n";
-	}
-	,clear: function() {
-		this._buffer = new StringBuf();
-		this._currentPath = new StringBuf();
-		this._currentPathIsEmpty = true;
-	}
-	,setLineWidth: function(value) {
-		this._lineWidth = value;
-	}
-	,setColor: function(color) {
-		this._color = color;
-	}
-	,setHeight: function(height) {
-		this._height = height;
-	}
-	,setWidth: function(width) {
-		this._width = width;
-	}
-	,getHeight: function() {
-		return this._height;
-	}
-	,getWidth: function() {
-		return this._width;
-	}
-	,toSvg: function(includeWrapper,className) {
-		var out = new haxe.io.BytesOutput();
-		this.writeTo(out,includeWrapper,className);
-		out.flush();
-		return out.getBytes().toString();
-	}
-	,writeTo: function(stream,includeWrapper,className) {
-		if(includeWrapper) {
-			stream.writeString("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"");
-			alphatab.io.OutputExtensions.writeAsString(stream,this._width);
-			stream.writeString("px\" height=\"");
-			alphatab.io.OutputExtensions.writeAsString(stream,this._height);
-			stream.writeString("px\"");
-			if(className != null) {
-				stream.writeString(" class=\"");
-				stream.writeString(className);
-				stream.writeString("\"");
-			}
-			stream.writeString(">\n");
-		}
-		stream.writeString(this._buffer.b);
-		if(includeWrapper) stream.writeString("</svg>");
-	}
-	,__class__: alphatab.platform.svg.SvgCanvas
-}
-if(!alphatab.rendering) alphatab.rendering = {}
 alphatab.rendering.BarRendererBase = function(bar) {
 	this._bar = bar;
 	this.x = 0;
@@ -3723,16 +4169,6 @@ alphatab.rendering.BarRendererBase.prototype = {
 		if(topOverflow > this.topOverflow) this.topOverflow = topOverflow;
 	}
 	,__class__: alphatab.rendering.BarRendererBase
-}
-alphatab.rendering.BarRendererFactory = function() {
-	this.isInAccolade = true;
-};
-alphatab.rendering.BarRendererFactory.__name__ = true;
-alphatab.rendering.BarRendererFactory.prototype = {
-	create: function(bar) {
-		return null;
-	}
-	,__class__: alphatab.rendering.BarRendererFactory
 }
 alphatab.rendering.EffectBarGlyphSizing = { __ename__ : true, __constructs__ : ["SinglePreBeatOnly","SinglePreBeatToOnBeat","SinglePreBeatToPostBeat","SingleOnBeatOnly","SingleOnBeatToPostBeat","SinglePostBeatOnly","GroupedPreBeatOnly","GroupedPreBeatToOnBeat","GroupedPreBeatToPostBeat","GroupedOnBeatOnly","GroupedOnBeatToPostBeat","GroupedPostBeatOnly"] }
 alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly = ["SinglePreBeatOnly",0];
@@ -4125,19 +4561,6 @@ alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.Grou
 	}
 	,__class__: alphatab.rendering.EffectBarRenderer
 });
-alphatab.rendering.EffectBarRendererFactory = function(info) {
-	alphatab.rendering.BarRendererFactory.call(this);
-	this.isInAccolade = false;
-	this._info = info;
-};
-alphatab.rendering.EffectBarRendererFactory.__name__ = true;
-alphatab.rendering.EffectBarRendererFactory.__super__ = alphatab.rendering.BarRendererFactory;
-alphatab.rendering.EffectBarRendererFactory.prototype = $extend(alphatab.rendering.BarRendererFactory.prototype,{
-	create: function(bar) {
-		return new alphatab.rendering.EffectBarRenderer(bar,this._info);
-	}
-	,__class__: alphatab.rendering.EffectBarRendererFactory
-});
 alphatab.rendering.Glyph = function(x,y) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
@@ -4160,11 +4583,6 @@ alphatab.rendering.Glyph.prototype = {
 		if(this.canScale()) this.width += spacing;
 	}
 	,__class__: alphatab.rendering.Glyph
-}
-alphatab.rendering.IEffectBarRendererInfo = function() { }
-alphatab.rendering.IEffectBarRendererInfo.__name__ = true;
-alphatab.rendering.IEffectBarRendererInfo.prototype = {
-	__class__: alphatab.rendering.IEffectBarRendererInfo
 }
 alphatab.rendering.RenderingResources = function(scale) {
 	this.init(scale);
@@ -4565,40 +4983,15 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 	}
 	,__class__: alphatab.rendering.ScoreBarRenderer
 });
-alphatab.rendering.ScoreBarRendererFactory = function() {
-	alphatab.rendering.BarRendererFactory.call(this);
-};
-alphatab.rendering.ScoreBarRendererFactory.__name__ = true;
-alphatab.rendering.ScoreBarRendererFactory.__super__ = alphatab.rendering.BarRendererFactory;
-alphatab.rendering.ScoreBarRendererFactory.prototype = $extend(alphatab.rendering.BarRendererFactory.prototype,{
-	create: function(bar) {
-		return new alphatab.rendering.ScoreBarRenderer(bar);
-	}
-	,__class__: alphatab.rendering.ScoreBarRendererFactory
-});
-alphatab.rendering.ScoreRenderer = function(source) {
-	this.canvas = alphatab.platform.PlatformFactory.getCanvas(source);
-	this.settings = new haxe.ds.StringMap();
+alphatab.rendering.ScoreRenderer = function(settings,param) {
+	this.settings = settings;
+	if(settings.engine == null || !alphatab.Environment.renderEngines.exists(settings.engine)) this.canvas = (alphatab.Environment.renderEngines.get("default"))(param); else this.canvas = (alphatab.Environment.renderEngines.get(settings.engine))(param);
 	this.updateScale(1.0);
 	this.layout = new alphatab.rendering.layout.PageViewLayout(this);
 };
 alphatab.rendering.ScoreRenderer.__name__ = true;
 alphatab.rendering.ScoreRenderer.prototype = {
-	getLayoutSetting: function(setting,defaultValue) {
-		var value = this.settings.get("layout." + setting);
-		return value != null?value:defaultValue;
-	}
-	,setLayoutSetting: function(setting,value) {
-		this.settings.set("layout." + setting,value);
-	}
-	,getStaveSetting: function(staveId,setting,defaultValue) {
-		var value = this.settings.get(staveId + "." + setting);
-		return value != null?value:defaultValue;
-	}
-	,setStaveSetting: function(staveId,setting,value) {
-		this.settings.set(staveId + "." + setting,value);
-	}
-	,paintBackground: function() {
+	paintBackground: function() {
 		var msg = "Rendered using alphaTab (http://www.alphaTab.net)";
 		this.canvas.setColor(new alphatab.platform.model.Color(62,62,62));
 		this.canvas.setFont(this.renderingResources.copyrightFont);
@@ -4740,83 +5133,6 @@ alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.Grouped
 		return 11 * this.stave.staveGroup.layout.renderer.scale;
 	}
 	,__class__: alphatab.rendering.TabBarRenderer
-});
-alphatab.rendering.TabBarRendererFactory = function() {
-	alphatab.rendering.BarRendererFactory.call(this);
-};
-alphatab.rendering.TabBarRendererFactory.__name__ = true;
-alphatab.rendering.TabBarRendererFactory.__super__ = alphatab.rendering.BarRendererFactory;
-alphatab.rendering.TabBarRendererFactory.prototype = $extend(alphatab.rendering.BarRendererFactory.prototype,{
-	create: function(bar) {
-		return new alphatab.rendering.TabBarRenderer(bar);
-	}
-	,__class__: alphatab.rendering.TabBarRendererFactory
-});
-if(!alphatab.rendering.effects) alphatab.rendering.effects = {}
-alphatab.rendering.effects.BeatVibratoEffectInfo = function() {
-};
-alphatab.rendering.effects.BeatVibratoEffectInfo.__name__ = true;
-alphatab.rendering.effects.BeatVibratoEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
-alphatab.rendering.effects.BeatVibratoEffectInfo.prototype = {
-	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(null,null,"b~");
-	}
-	,getHeight: function(renderer) {
-		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
-	}
-	,getSizingMode: function() {
-		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatToPostBeat;
-	}
-	,shouldCreateGlyph: function(renderer,beat) {
-		return beat.vibrato != alphatab.model.VibratoType.None;
-	}
-	,__class__: alphatab.rendering.effects.BeatVibratoEffectInfo
-}
-alphatab.rendering.effects.NoteEffectInfoBase = function() {
-};
-alphatab.rendering.effects.NoteEffectInfoBase.__name__ = true;
-alphatab.rendering.effects.NoteEffectInfoBase.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
-alphatab.rendering.effects.NoteEffectInfoBase.prototype = {
-	createNewGlyph: function(renderer,beat) {
-		return null;
-	}
-	,getSizingMode: function() {
-		return alphatab.rendering.EffectBarGlyphSizing.GroupedOnBeatToPostBeat;
-	}
-	,getHeight: function(renderer) {
-		return 0;
-	}
-	,shouldCreateGlyphForNote: function(renderer,note) {
-		return false;
-	}
-	,shouldCreateGlyph: function(renderer,beat) {
-		this._lastCreateInfo = new Array();
-		var _g = 0, _g1 = beat.notes;
-		while(_g < _g1.length) {
-			var n = _g1[_g];
-			++_g;
-			if(this.shouldCreateGlyphForNote(renderer,n)) this._lastCreateInfo.push(n);
-		}
-		return this._lastCreateInfo.length > 0;
-	}
-	,__class__: alphatab.rendering.effects.NoteEffectInfoBase
-}
-alphatab.rendering.effects.NoteVibratoEffectInfo = function() {
-	alphatab.rendering.effects.NoteEffectInfoBase.call(this);
-};
-alphatab.rendering.effects.NoteVibratoEffectInfo.__name__ = true;
-alphatab.rendering.effects.NoteVibratoEffectInfo.__super__ = alphatab.rendering.effects.NoteEffectInfoBase;
-alphatab.rendering.effects.NoteVibratoEffectInfo.prototype = $extend(alphatab.rendering.effects.NoteEffectInfoBase.prototype,{
-	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(null,null,"n~");
-	}
-	,getHeight: function(renderer) {
-		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
-	}
-	,shouldCreateGlyphForNote: function(renderer,note) {
-		return note.vibrato != alphatab.model.VibratoType.None;
-	}
-	,__class__: alphatab.rendering.effects.NoteVibratoEffectInfo
 });
 if(!alphatab.rendering.glyphs) alphatab.rendering.glyphs = {}
 alphatab.rendering.glyphs.SvgGlyph = function(x,y,svg,xScale,yScale) {
@@ -6502,6 +6818,34 @@ alphatab.rendering.glyphs.TimeSignatureGlyph.prototype = $extend(alphatab.render
 	}
 	,__class__: alphatab.rendering.glyphs.TimeSignatureGlyph
 });
+alphatab.rendering.glyphs.TremoloPickingGlyph = function(x,y,duration) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,this.getSvg(duration),1,1);
+};
+alphatab.rendering.glyphs.TremoloPickingGlyph.__name__ = true;
+alphatab.rendering.glyphs.TremoloPickingGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
+alphatab.rendering.glyphs.TremoloPickingGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
+	getSvg: function(duration) {
+		switch( (duration)[1] ) {
+		case 5:
+			return alphatab.rendering.glyphs.MusicFont.TremoloPickingThirtySecond;
+		case 4:
+			return alphatab.rendering.glyphs.MusicFont.TremoloPickingSixteenth;
+		case 3:
+			return alphatab.rendering.glyphs.MusicFont.TremoloPickingEighth;
+		default:
+			return "";
+		}
+	}
+	,canScale: function() {
+		return false;
+	}
+	,doLayout: function() {
+		this.width = 12 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,__class__: alphatab.rendering.glyphs.TremoloPickingGlyph
+});
 if(!alphatab.rendering.glyphs.effects) alphatab.rendering.glyphs.effects = {}
 alphatab.rendering.glyphs.effects.DummyEffectGlyph = function(x,y,s) {
 	if(y == null) y = 0;
@@ -6527,243 +6871,8 @@ alphatab.rendering.glyphs.effects.DummyEffectGlyph.prototype = $extend(alphatab.
 	}
 	,__class__: alphatab.rendering.glyphs.effects.DummyEffectGlyph
 });
-if(!alphatab.rendering.layout) alphatab.rendering.layout = {}
 alphatab.rendering.layout.HeaderFooterElements = function() { }
 alphatab.rendering.layout.HeaderFooterElements.__name__ = true;
-alphatab.rendering.layout.ScoreLayout = function(renderer) {
-	this.renderer = renderer;
-};
-alphatab.rendering.layout.ScoreLayout.__name__ = true;
-alphatab.rendering.layout.ScoreLayout.prototype = {
-	createEffectStaves: function(group) {
-		group.addStave(new alphatab.rendering.staves.Stave(new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.BeatVibratoEffectInfo())));
-		group.addStave(new alphatab.rendering.staves.Stave(new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.NoteVibratoEffectInfo())));
-	}
-	,createEmptyStaveGroup: function() {
-		var group = new alphatab.rendering.staves.StaveGroup();
-		group.layout = this;
-		this.createEffectStaves(group);
-		group.addStave(new alphatab.rendering.staves.Stave(new alphatab.rendering.ScoreBarRendererFactory()));
-		this.createEffectStaves(group);
-		group.addStave(new alphatab.rendering.staves.Stave(new alphatab.rendering.TabBarRendererFactory()));
-		this.createEffectStaves(group);
-		return group;
-	}
-	,paintScore: function() {
-	}
-	,doLayout: function() {
-	}
-	,__class__: alphatab.rendering.layout.ScoreLayout
-}
-alphatab.rendering.layout.HorizontalScreenLayout = function(renderer) {
-	alphatab.rendering.layout.ScoreLayout.call(this,renderer);
-	renderer.setLayoutSetting(alphatab.rendering.layout.HorizontalScreenLayout.SCORE_INFOS,511);
-};
-alphatab.rendering.layout.HorizontalScreenLayout.__name__ = true;
-alphatab.rendering.layout.HorizontalScreenLayout.__super__ = alphatab.rendering.layout.ScoreLayout;
-alphatab.rendering.layout.HorizontalScreenLayout.prototype = $extend(alphatab.rendering.layout.ScoreLayout.prototype,{
-	paintScore: function() {
-		this._group.paint(0,0,this.renderer.canvas);
-	}
-	,doLayout: function() {
-		var currentBarIndex = 0;
-		var endBarIndex = this.renderer.track.bars.length - 1;
-		var x = alphatab.rendering.layout.HorizontalScreenLayout.PAGE_PADDING[0];
-		var y = alphatab.rendering.layout.HorizontalScreenLayout.PAGE_PADDING[1];
-		this._group = this.createEmptyStaveGroup();
-		var _g1 = 0, _g = this.renderer.track.bars.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var bar = this.renderer.track.bars[i];
-			this._group.addBar(bar);
-		}
-		this._group.x = x;
-		this._group.y = y;
-		this._group.finalizeGroup(this);
-		y += this._group.calculateHeight() + (20 * this.renderer.scale | 0);
-		this.height = y + alphatab.rendering.layout.HorizontalScreenLayout.PAGE_PADDING[3];
-		this.width = this._group.x + this._group.width + alphatab.rendering.layout.HorizontalScreenLayout.PAGE_PADDING[2];
-	}
-	,__class__: alphatab.rendering.layout.HorizontalScreenLayout
-});
-alphatab.rendering.layout.PageViewLayout = function(renderer) {
-	alphatab.rendering.layout.ScoreLayout.call(this,renderer);
-	this._groups = new Array();
-	renderer.setLayoutSetting(alphatab.rendering.layout.PageViewLayout.SCORE_INFOS,511);
-};
-alphatab.rendering.layout.PageViewLayout.__name__ = true;
-alphatab.rendering.layout.PageViewLayout.__super__ = alphatab.rendering.layout.ScoreLayout;
-alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.layout.ScoreLayout.prototype,{
-	getSheetWidth: function() {
-		return Math.round(795 * this.renderer.scale);
-	}
-	,getMaxWidth: function() {
-		return this.getSheetWidth() - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0] - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2];
-	}
-	,createStaveGroup: function(currentBarIndex) {
-		var group = this.createEmptyStaveGroup();
-		var maxWidth = this.getSheetWidth() - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0] - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2];
-		var _g1 = currentBarIndex, _g = this.renderer.track.bars.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var bar = this.renderer.track.bars[i];
-			group.addBar(bar);
-			var groupIsFull = false;
-			if(group.width >= maxWidth && group.bars.length != 0) groupIsFull = true;
-			if(groupIsFull) {
-				group.revertLastBar();
-				group.isFull = true;
-				return group;
-			}
-			group.x = 0;
-		}
-		return group;
-	}
-	,fitGroup: function(group) {
-		var barSpace = 0;
-		if(group.isFull) {
-			var freeSpace = this.getSheetWidth() - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0] - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2] - group.width;
-			if(freeSpace != 0 && group.bars.length > 0) barSpace = Math.round(freeSpace / group.bars.length);
-		}
-		group.applyBarSpacing(barSpace);
-		this.width = Math.round(Math.max(this.width,group.width));
-	}
-	,isNullOrEmpty: function(s) {
-		return s == null || StringTools.trim(s) == "";
-	}
-	,paintScoreInfo: function(x,y) {
-		var flags = js.Boot.__cast(this.renderer.getLayoutSetting(alphatab.rendering.layout.PageViewLayout.SCORE_INFOS) , Int);
-		var score = this.renderer.get_score();
-		var scale = this.renderer.scale;
-		var canvas = this.renderer.canvas;
-		var res = this.renderer.renderingResources;
-		canvas.setColor(new alphatab.platform.model.Color(0,0,0));
-		canvas.setTextAlign(alphatab.platform.model.TextAlign.Center);
-		var tX;
-		var size;
-		var str = "";
-		if(!this.isNullOrEmpty(score.title) && (flags & 1) != 0) {
-			this.drawCentered(score.title,res.titleFont,y);
-			y += Math.floor(35 * scale);
-		}
-		if(!this.isNullOrEmpty(score.subTitle) && (flags & 2) != 0) {
-			this.drawCentered(score.subTitle,res.subTitleFont,y);
-			y += Math.floor(20 * scale);
-		}
-		if(!this.isNullOrEmpty(score.artist) && (flags & 4) != 0) {
-			this.drawCentered(score.artist,res.subTitleFont,y);
-			y += Math.floor(20 * scale);
-		}
-		if(!this.isNullOrEmpty(score.album) && (flags & 8) != 0) {
-			this.drawCentered(score.album,res.subTitleFont,y);
-			y += Math.floor(20 * scale);
-		}
-		if(!this.isNullOrEmpty(score.music) && score.music == score.words && (flags & 64) != 0) {
-			this.drawCentered(score.words,res.wordsFont,y);
-			y += Math.floor(20 * scale);
-		} else {
-			canvas.setFont(res.wordsFont);
-			if(!this.isNullOrEmpty(score.music) && (flags & 32) != 0) {
-				var size1 = canvas.measureText(score.music);
-				canvas.fillText(score.music,this.width - size1 - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2],y);
-			}
-			if(!this.isNullOrEmpty(score.words) && (flags & 16) != 0) canvas.fillText(score.music,x,y);
-			y += Math.floor(20 * scale);
-		}
-		y += Math.floor(20 * scale);
-		if(!this.renderer.track.isPercussion) {
-			canvas.setTextAlign(alphatab.platform.model.TextAlign.Left);
-			var tuning = alphatab.model.Tuning.findTuning(this.renderer.track.tuning);
-			if(tuning != null) {
-				canvas.setFont(res.effectFont);
-				canvas.fillText(tuning.name,x,y);
-				y += Math.floor(15 * scale);
-				if(!tuning.isStandard) {
-					var stringsPerColumn = Math.ceil(this.renderer.track.tuning.length / 2);
-					var currentX = x;
-					var currentY = y;
-					var _g1 = 0, _g = this.renderer.track.tuning.length;
-					while(_g1 < _g) {
-						var i = _g1++;
-						str = "(" + Std.string(i + 1) + ") = " + alphatab.model.Tuning.getTextForTuning(this.renderer.track.tuning[i],false);
-						canvas.fillText(str,currentX,currentY);
-						currentY += Math.floor(15 * scale);
-						if(i == stringsPerColumn - 1) {
-							currentY = y;
-							currentX += Math.floor(43 * scale);
-						}
-					}
-					y += stringsPerColumn * Math.floor(15 * scale);
-				}
-			}
-		}
-		y += Math.floor(25 * scale);
-		return y;
-	}
-	,drawCentered: function(text,font,y) {
-		this.renderer.canvas.setFont(font);
-		this.renderer.canvas.fillText(text,this.width / 2,y);
-	}
-	,paintScore: function() {
-		var x = alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0];
-		var y = alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[1];
-		y = this.paintScoreInfo(x,y);
-		var _g = 0, _g1 = this._groups;
-		while(_g < _g1.length) {
-			var g = _g1[_g];
-			++_g;
-			g.paint(0,0,this.renderer.canvas);
-		}
-	}
-	,doScoreInfoLayout: function(y) {
-		var flags = js.Boot.__cast(this.renderer.getLayoutSetting(alphatab.rendering.layout.PageViewLayout.SCORE_INFOS) , Int);
-		var score = this.renderer.get_score();
-		var scale = this.renderer.scale;
-		if(!this.isNullOrEmpty(score.title) && (flags & 1) != 0) y += Math.floor(35 * scale);
-		if(!this.isNullOrEmpty(score.subTitle) && (flags & 2) != 0) y += Math.floor(20 * scale);
-		if(!this.isNullOrEmpty(score.artist) && (flags & 4) != 0) y += Math.floor(20 * scale);
-		if(!this.isNullOrEmpty(score.album) && (flags & 8) != 0) y += Math.floor(20 * scale);
-		if(!this.isNullOrEmpty(score.music) && score.music == score.words && (flags & 64) != 0) y += Math.floor(20 * scale); else {
-			if(!this.isNullOrEmpty(score.music) && (flags & 32) != 0) y += Math.floor(20 * scale);
-			if(!this.isNullOrEmpty(score.words) && (flags & 16) != 0) y += Math.floor(20 * scale);
-		}
-		y += Math.floor(20 * scale);
-		if(!this.renderer.track.isPercussion) {
-			var tuning = alphatab.model.Tuning.findTuning(this.renderer.track.tuning);
-			if(tuning != null) {
-				y += Math.floor(15 * scale);
-				if(!tuning.isStandard) {
-					var stringsPerColumn = Math.ceil(this.renderer.track.tuning.length / 2);
-					y += stringsPerColumn * Math.floor(15 * scale);
-				}
-				y += Math.floor(15 * scale);
-			}
-		}
-		y += Math.floor(40 * scale);
-		return y;
-	}
-	,doLayout: function() {
-		this._groups = new Array();
-		var currentBarIndex = 0;
-		var endBarIndex = this.renderer.track.bars.length - 1;
-		var x = alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0];
-		var y = alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[1];
-		y = this.doScoreInfoLayout(y);
-		while(currentBarIndex <= endBarIndex) {
-			var group = this.createStaveGroup(currentBarIndex);
-			this._groups.push(group);
-			group.x = x;
-			group.y = y;
-			this.fitGroup(group);
-			group.finalizeGroup(this);
-			y += group.calculateHeight() + (20 * this.renderer.scale | 0);
-			currentBarIndex = group.bars[group.bars.length - 1].index + 1;
-		}
-		this.height = y + alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[3];
-		this.width = 795 * this.renderer.scale | 0;
-	}
-	,__class__: alphatab.rendering.layout.PageViewLayout
-});
 if(!alphatab.rendering.staves) alphatab.rendering.staves = {}
 alphatab.rendering.staves.BarSizeInfo = function() {
 	this.sizes = new haxe.ds.StringMap();
@@ -7220,66 +7329,6 @@ alphatab.util.LazyVar.prototype = {
 	}
 	,__class__: alphatab.util.LazyVar
 }
-haxe.StackItem = { __ename__ : true, __constructs__ : ["CFunction","Module","FilePos","Method","Lambda"] }
-haxe.StackItem.CFunction = ["CFunction",0];
-haxe.StackItem.CFunction.toString = $estr;
-haxe.StackItem.CFunction.__enum__ = haxe.StackItem;
-haxe.StackItem.Module = function(m) { var $x = ["Module",1,m]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
-haxe.StackItem.FilePos = function(s,file,line) { var $x = ["FilePos",2,s,file,line]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
-haxe.StackItem.Method = function(classname,method) { var $x = ["Method",3,classname,method]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
-haxe.StackItem.Lambda = function(v) { var $x = ["Lambda",4,v]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
-haxe.CallStack = function() { }
-haxe.CallStack.__name__ = true;
-haxe.CallStack.exceptionStack = function() {
-	return [];
-}
-haxe.CallStack.toString = function(stack) {
-	var b = new StringBuf();
-	var _g = 0;
-	while(_g < stack.length) {
-		var s = stack[_g];
-		++_g;
-		b.b += "\nCalled from ";
-		haxe.CallStack.itemToString(b,s);
-	}
-	return b.b;
-}
-haxe.CallStack.itemToString = function(b,s) {
-	var $e = (s);
-	switch( $e[1] ) {
-	case 0:
-		b.b += "a C function";
-		break;
-	case 1:
-		var s_eModule_0 = $e[2];
-		b.b += "module ";
-		b.b += Std.string(s_eModule_0);
-		break;
-	case 2:
-		var s_eFilePos_2 = $e[4], s_eFilePos_1 = $e[3], s_eFilePos_0 = $e[2];
-		if(s_eFilePos_0 != null) {
-			haxe.CallStack.itemToString(b,s_eFilePos_0);
-			b.b += " (";
-		}
-		b.b += Std.string(s_eFilePos_1);
-		b.b += " line ";
-		b.b += Std.string(s_eFilePos_2);
-		if(s_eFilePos_0 != null) b.b += ")";
-		break;
-	case 3:
-		var s_eMethod_1 = $e[3], s_eMethod_0 = $e[2];
-		b.b += Std.string(s_eMethod_0);
-		b.b += ".";
-		b.b += Std.string(s_eMethod_1);
-		break;
-	case 4:
-		var s_eLambda_0 = $e[2];
-		b.b += "local function #";
-		b.b += Std.string(s_eLambda_0);
-		break;
-	}
-}
-if(!haxe.ds) haxe.ds = {}
 haxe.ds.IntMap = function() {
 	this.h = { };
 };
@@ -7315,37 +7364,6 @@ haxe.ds.IntMap.prototype = {
 		this.h[key] = value;
 	}
 	,__class__: haxe.ds.IntMap
-}
-haxe.ds.StringMap = function() {
-	this.h = { };
-};
-haxe.ds.StringMap.__name__ = true;
-haxe.ds.StringMap.prototype = {
-	iterator: function() {
-		return { ref : this.h, it : this.keys(), hasNext : function() {
-			return this.it.hasNext();
-		}, next : function() {
-			var i = this.it.next();
-			return this.ref["$" + i];
-		}};
-	}
-	,keys: function() {
-		var a = [];
-		for( var key in this.h ) {
-		if(this.h.hasOwnProperty(key)) a.push(key.substr(1));
-		}
-		return HxOverrides.iter(a);
-	}
-	,exists: function(key) {
-		return this.h.hasOwnProperty("$" + key);
-	}
-	,get: function(key) {
-		return this.h["$" + key];
-	}
-	,set: function(key,value) {
-		this.h["$" + key] = value;
-	}
-	,__class__: haxe.ds.StringMap
 }
 haxe.io.Bytes = function(length,b) {
 	this.length = length;
@@ -7957,6 +7975,68 @@ Xml.Comment = "comment";
 Xml.DocType = "doctype";
 Xml.ProcessingInstruction = "processingInstruction";
 Xml.Document = "document";
+alphatab.Environment.renderEngines = new haxe.ds.StringMap();
+alphatab.Environment.fileLoaders = new haxe.ds.StringMap();
+alphatab.Environment.layoutEngines = new haxe.ds.StringMap();
+alphatab.Environment.staveFactories = new haxe.ds.StringMap();
+alphatab.Environment.renderEngines.set("default",function(d) {
+	return new alphatab.platform.js.Html5Canvas(d);
+});
+alphatab.Environment.renderEngines.set("html5",function(d) {
+	return new alphatab.platform.js.Html5Canvas(d);
+});
+alphatab.Environment.renderEngines.set("svg",function(d) {
+	return new alphatab.platform.svg.SvgCanvas();
+});
+alphatab.Environment.fileLoaders.set("default",function() {
+	return new alphatab.platform.js.JsFileLoader();
+});
+alphatab.Environment.layoutEngines.set("default",function(r) {
+	return new alphatab.rendering.layout.PageViewLayout(r);
+});
+alphatab.Environment.layoutEngines.set("page",function(r) {
+	return new alphatab.rendering.layout.PageViewLayout(r);
+});
+alphatab.Environment.layoutEngines.set("horizontal",function(r) {
+	return new alphatab.rendering.layout.HorizontalScreenLayout(r);
+});
+var dummy = function(l) {
+	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.DummyEffectInfo());
+};
+alphatab.Environment.staveFactories.set("marker",dummy);
+alphatab.Environment.staveFactories.set("triplet-feel",dummy);
+alphatab.Environment.staveFactories.set("tempo",dummy);
+alphatab.Environment.staveFactories.set("fermata",dummy);
+alphatab.Environment.staveFactories.set("text",dummy);
+alphatab.Environment.staveFactories.set("chords",dummy);
+alphatab.Environment.staveFactories.set("beat-vibrato",function(l) {
+	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.BeatVibratoEffectInfo());
+});
+alphatab.Environment.staveFactories.set("note-vibrato",function(l) {
+	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.NoteVibratoEffectInfo());
+});
+alphatab.Environment.staveFactories.set("tuplet",dummy);
+alphatab.Environment.staveFactories.set("score",function(l) {
+	return new alphatab.rendering.ScoreBarRendererFactory();
+});
+alphatab.Environment.staveFactories.set("dynamics",dummy);
+alphatab.Environment.staveFactories.set("tap",dummy);
+alphatab.Environment.staveFactories.set("fade-in",dummy);
+alphatab.Environment.staveFactories.set("let-ring",dummy);
+alphatab.Environment.staveFactories.set("palm-mute",dummy);
+alphatab.Environment.staveFactories.set("tab",function(l) {
+	return new alphatab.rendering.TabBarRendererFactory();
+});
+alphatab.Environment.staveFactories.set("fingering",dummy);
+alphatab.platform.model.Font.STYLE_PLAIN = 0;
+alphatab.platform.model.Font.STYLE_BOLD = 1;
+alphatab.platform.model.Font.STYLE_ITALIC = 2;
+alphatab.rendering.layout.PageViewLayout.SCORE_INFOS = "scoreInfos";
+alphatab.rendering.layout.PageViewLayout.PAGE_PADDING = [20,20,20,20];
+alphatab.rendering.layout.PageViewLayout.WIDTH_ON_100 = 795;
+alphatab.rendering.layout.PageViewLayout.GroupSpacing = 20;
+alphatab.rendering.layout.HorizontalScreenLayout.PAGE_PADDING = [20,20,20,20];
+alphatab.rendering.layout.HorizontalScreenLayout.GroupSpacing = 20;
 alphatab.audio.MidiUtils.QUARTER_TIME = 960;
 alphatab.importer.ScoreImporter.UNSUPPORTED_FORMAT = "unsupported file";
 alphatab.importer.AlphaTexImporter.EOL = String.fromCharCode(0);
@@ -7970,10 +8050,6 @@ alphatab.io.BitInput.BYTE_SIZE = 8;
 alphatab.model.BendPoint.MAX_POSITION = 60;
 alphatab.model.BendPoint.MAX_VALUE = 12;
 alphatab.model.Tuning.TUNING_REGEX = new EReg("([a-g]b?)([0-9])","i");
-alphatab.platform.PlatformFactory.SVG_CANVAS = "svg";
-alphatab.platform.model.Font.STYLE_PLAIN = 0;
-alphatab.platform.model.Font.STYLE_BOLD = 1;
-alphatab.platform.model.Font.STYLE_ITALIC = 2;
 alphatab.platform.svg.FontSizes.TIMES_NEW_ROMAN_11PT = [3,4,5,6,6,9,9,2,4,4,6,6,3,4,3,3,6,6,6,6,6,6,6,6,6,6,3,3,6,6,6,5,10,8,7,7,8,7,6,7,8,4,4,8,7,10,8,8,7,8,7,5,8,8,7,11,8,8,7,4,3,4,5,6,4,5,5,5,5,5,4,5,6,3,3,6,3,9,6,6,6,5,4,4,4,5,6,7,6,6,5,5,2,5,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,4,6,6,6,6,2,5,4,8,4,6,6,0,8,6,4,6,3,3,4,5,5,4,4,3,3,6,8,8,8,5,8,8,8,8,8,8,11,7,7,7,7,7,4,4,4,4,8,8,8,8,8,8,8,6,8,8,8,8,8,8,6,5,5,5,5,5,5,5,8,5,5,5,5,5,3,3,3,3,6,6,6,6,6,6,6,6,6,5,5,5,5,6,6];
 alphatab.platform.svg.FontSizes.ARIAL_11PT = [3,2,4,6,6,10,7,2,4,4,4,6,3,4,3,3,6,6,6,6,6,6,6,6,6,6,3,3,6,6,6,6,11,8,7,7,7,6,6,8,7,2,5,7,6,8,7,8,6,8,7,7,6,7,8,10,7,8,7,3,3,3,5,6,4,6,6,6,6,6,4,6,6,2,2,5,2,8,6,6,6,6,4,6,3,6,6,10,6,6,6,4,2,4,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,2,6,6,7,6,2,6,4,8,4,6,6,0,8,6,4,6,4,4,4,6,6,4,4,4,5,6,9,10,10,6,8,8,8,8,8,8,11,7,6,6,6,6,2,2,2,2,8,7,8,8,8,8,8,6,8,7,7,7,7,8,7,7,6,6,6,6,6,6,10,6,6,6,6,6,2,2,2,2,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6];
 alphatab.platform.svg.FontSizes.CONTROL_CHARS = 32;
@@ -8076,13 +8152,6 @@ alphatab.rendering.layout.HeaderFooterElements.WORDS_AND_MUSIC = 64;
 alphatab.rendering.layout.HeaderFooterElements.COPYRIGHT = 128;
 alphatab.rendering.layout.HeaderFooterElements.PAGE_NUMBER = 256;
 alphatab.rendering.layout.HeaderFooterElements.ALL = 511;
-alphatab.rendering.layout.HorizontalScreenLayout.SCORE_INFOS = "scoreInfos";
-alphatab.rendering.layout.HorizontalScreenLayout.PAGE_PADDING = [20,20,20,20];
-alphatab.rendering.layout.HorizontalScreenLayout.GroupSpacing = 20;
-alphatab.rendering.layout.PageViewLayout.SCORE_INFOS = "scoreInfos";
-alphatab.rendering.layout.PageViewLayout.PAGE_PADDING = [20,20,20,20];
-alphatab.rendering.layout.PageViewLayout.WIDTH_ON_100 = 795;
-alphatab.rendering.layout.PageViewLayout.GroupSpacing = 20;
 alphatab.rendering.utils.AccidentalHelper.ACCIDENTAL_NOTES = [[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural]];
 alphatab.rendering.utils.BeamingHelper.SCORE_MIDDLE_KEYS = [48,45,38,59];
 haxe.xml.Parser.escapes = (function($this) {
