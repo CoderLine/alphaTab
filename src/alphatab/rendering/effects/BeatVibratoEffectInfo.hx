@@ -5,6 +5,7 @@ import alphatab.rendering.EffectBarGlyphSizing;
 import alphatab.rendering.EffectBarRenderer;
 import alphatab.rendering.Glyph;
 import alphatab.rendering.glyphs.effects.DummyEffectGlyph;
+import alphatab.rendering.glyphs.effects.VibratoGlyph;
 import alphatab.rendering.IEffectBarRendererInfo;
 
 class BeatVibratoEffectInfo implements IEffectBarRendererInfo
@@ -30,7 +31,7 @@ class BeatVibratoEffectInfo implements IEffectBarRendererInfo
     
     public function createNewGlyph(renderer : EffectBarRenderer, beat:Beat) : Glyph
     {
-        return new DummyEffectGlyph("b~");
+        return new VibratoGlyph(0,0,1.15);
     }
     
 }

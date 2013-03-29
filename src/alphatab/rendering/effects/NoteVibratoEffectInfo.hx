@@ -5,6 +5,7 @@ import alphatab.model.VibratoType;
 import alphatab.rendering.EffectBarRenderer;
 import alphatab.rendering.Glyph;
 import alphatab.rendering.glyphs.effects.DummyEffectGlyph;
+import alphatab.rendering.glyphs.effects.VibratoGlyph;
 
 class NoteVibratoEffectInfo extends NoteEffectInfoBase
 {
@@ -25,6 +26,6 @@ class NoteVibratoEffectInfo extends NoteEffectInfoBase
     
     public override function createNewGlyph(renderer:EffectBarRenderer, beat:Beat):Glyph 
     {
-        return new DummyEffectGlyph("n~");
+        return new VibratoGlyph();
     }
 }

@@ -10,7 +10,8 @@
         }
         catch(e)
         {
-            $.error(e);
+            if(e instanceof Error) throw e;
+            else $.error(e);
         }
     }
 

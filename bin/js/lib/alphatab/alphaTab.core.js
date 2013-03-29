@@ -1113,7 +1113,7 @@ alphatab.rendering.effects.BeatVibratoEffectInfo.__name__ = true;
 alphatab.rendering.effects.BeatVibratoEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.BeatVibratoEffectInfo.prototype = {
 	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(null,null,"b~");
+		return new alphatab.rendering.glyphs.effects.VibratoGlyph(0,0,1.15);
 	}
 	,getHeight: function(renderer) {
 		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
@@ -1162,7 +1162,7 @@ alphatab.rendering.effects.NoteVibratoEffectInfo.__name__ = true;
 alphatab.rendering.effects.NoteVibratoEffectInfo.__super__ = alphatab.rendering.effects.NoteEffectInfoBase;
 alphatab.rendering.effects.NoteVibratoEffectInfo.prototype = $extend(alphatab.rendering.effects.NoteEffectInfoBase.prototype,{
 	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(null,null,"n~");
+		return new alphatab.rendering.glyphs.effects.VibratoGlyph();
 	}
 	,getHeight: function(renderer) {
 		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
@@ -6870,6 +6870,31 @@ alphatab.rendering.glyphs.effects.DummyEffectGlyph.prototype = $extend(alphatab.
 		this.width = 20 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
 	,__class__: alphatab.rendering.glyphs.effects.DummyEffectGlyph
+});
+alphatab.rendering.glyphs.effects.VibratoGlyph = function(x,y,scale) {
+	if(scale == null) scale = 0.9;
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.Glyph.call(this,x,y);
+	this._scale = scale;
+};
+alphatab.rendering.glyphs.effects.VibratoGlyph.__name__ = true;
+alphatab.rendering.glyphs.effects.VibratoGlyph.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.effects.VibratoGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	paint: function(cx,cy,canvas) {
+		var step = 11 * this.renderer.stave.staveGroup.layout.renderer.scale * this._scale;
+		var loops = Math.floor(Math.max(1,this.width / step));
+		var loopX = 0;
+		var _g = 0;
+		while(_g < loops) {
+			var i = _g++;
+			var glyph = new alphatab.rendering.glyphs.SvgGlyph(loopX,0,alphatab.rendering.glyphs.MusicFont.WaveHorizontal,this._scale,this._scale);
+			glyph.renderer = this.renderer;
+			glyph.paint(cx + this.x,cy + this.y,canvas);
+			loopX += Math.floor(step);
+		}
+	}
+	,__class__: alphatab.rendering.glyphs.effects.VibratoGlyph
 });
 alphatab.rendering.layout.HeaderFooterElements = function() { }
 alphatab.rendering.layout.HeaderFooterElements.__name__ = true;
