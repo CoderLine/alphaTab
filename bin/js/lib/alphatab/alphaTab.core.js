@@ -384,7 +384,7 @@ alphatab.importer.ScoreImporter.availableImporters = function() {
 alphatab.importer.ScoreImporter.prototype = {
 	previousNoteOnSameLine: function(note) {
 		var previousBeat = note.beat.previousBeat;
-		while(previousBeat != null) {
+		while(previousBeat != null && previousBeat.voice.bar == note.beat.voice.bar) {
 			var noteOnString = previousBeat.getNoteOnString(note.string);
 			if(noteOnString != null) return noteOnString; else previousBeat = previousBeat.previousBeat;
 		}
@@ -392,7 +392,7 @@ alphatab.importer.ScoreImporter.prototype = {
 	}
 	,nextNoteOnSameLine: function(note) {
 		var nextBeat = note.beat.nextBeat;
-		while(nextBeat != null) {
+		while(nextBeat != null && nextBeat.voice.bar == note.beat.voice.bar) {
 			var noteOnString = nextBeat.getNoteOnString(note.string);
 			if(noteOnString != null) return noteOnString; else nextBeat = nextBeat.nextBeat;
 		}
@@ -3029,6 +3029,10 @@ alphatab.model.Voice.prototype = {
 			beat.previousBeat = this.beats[this.beats.length - 1];
 			beat.previousBeat.nextBeat = beat;
 			beat.start = beat.previousBeat.start + beat.previousBeat.calculateDuration();
+		} else if(this.bar.previousBar != null && this.bar.previousBar.voices[this.index].beats.length > 0) {
+			beat.previousBeat = this.bar.previousBar.voices[this.index].beats[this.bar.previousBar.voices[this.index].beats.length - 1];
+			beat.previousBeat.nextBeat = beat;
+			beat.start = beat.previousBeat.start + beat.previousBeat.calculateDuration();
 		}
 		this.beats.push(beat);
 	}
@@ -3932,7 +3936,7 @@ alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.Grou
 		var $it0 = this._effectGlyphs.iterator();
 		while( $it0.hasNext() ) {
 			var l = $it0.next();
-			l.paint(cx + this.x + glyphStart,cy + this.y,canvas);
+			if(l.renderer == this) l.paint(cx + this.x + glyphStart,cy + this.y,canvas);
 		}
 	}
 	,paintBackground: function(cx,cy,canvas) {
@@ -3964,10 +3968,14 @@ alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.Grou
 		case 9:
 		case 10:
 		case 11:
-			if(b.index > 0) {
+			if(b.index > 0 || this.index > 0) {
 				var prevBeat = b.previousBeat;
 				if(this._info.shouldCreateGlyph(this,prevBeat)) {
-					var prevEffect = this._effectGlyphs.get(b.index - 1);
+					var prevEffect;
+					if(b.index > 0) {
+						prevEffect = this._effectGlyphs.get(prevBeat.index);
+						this._effectGlyphs.set(b.index,prevEffect);
+					} else prevEffect = (js.Boot.__cast(this.stave.barRenderers[this.index - 1] , alphatab.rendering.EffectBarRenderer))._effectGlyphs.get(prevBeat.index);
 					this._effectGlyphs.set(b.index,prevEffect);
 				} else this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b);
 			} else this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b);
@@ -3989,6 +3997,7 @@ alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.Grou
 			this._postBeatPosition.set(b.index,post);
 			this.addBeatGlyph(post);
 			if(this._info.shouldCreateGlyph(this,b)) this.createOrResizeGlyph(this._info.getSizingMode(),b);
+			this._lastBeat = b;
 		}
 	}
 	,createBeatGlyphs: function() {
@@ -4042,37 +4051,49 @@ alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.Grou
 		case 6:
 			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,i,prevGlyph); else {
 				pos = this._preBeatPosition.get(i);
-				g.width = pos.x + pos.width - g.x;
+				var posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
+				var gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
+				g.width = posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width - (gR.x + gR.getBeatGlyphsStart() + g.x);
 			}
 			break;
 		case 7:
 			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatToOnBeat,i,prevGlyph); else {
 				pos = this._onBeatPosition.get(i);
-				g.width = pos.x + pos.width - g.x;
+				var posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
+				var gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
+				g.width = posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width - (gR.x + gR.getBeatGlyphsStart() + g.x);
 			}
 			break;
 		case 8:
 			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatToPostBeat,i,prevGlyph); else {
 				pos = this._postBeatPosition.get(i);
-				g.width = pos.x + pos.width - g.x;
+				var posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
+				var gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
+				g.width = posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width - (gR.x + gR.getBeatGlyphsStart() + g.x);
 			}
 			break;
 		case 9:
 			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatOnly,i,prevGlyph); else {
 				pos = this._onBeatPosition.get(i);
-				g.width = pos.x + pos.width - g.x;
+				var posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
+				var gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
+				g.width = posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width - (gR.x + gR.getBeatGlyphsStart() + g.x);
 			}
 			break;
 		case 10:
 			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatToPostBeat,i,prevGlyph); else {
 				pos = this._postBeatPosition.get(i);
-				g.width = pos.x + pos.width - g.x;
+				var posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
+				var gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
+				g.width = posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width - (gR.x + gR.getBeatGlyphsStart() + g.x);
 			}
 			break;
 		case 11:
 			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.GroupedPostBeatOnly,i,prevGlyph); else {
 				pos = this._postBeatPosition.get(i);
-				g.width = pos.x + pos.width - g.x;
+				var posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
+				var gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
+				g.width = posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width - (gR.x + gR.getBeatGlyphsStart() + g.x);
 			}
 			break;
 		}
@@ -4081,6 +4102,10 @@ alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.Grou
 		alphatab.rendering.GroupedBarRenderer.prototype.finalizeRenderer.call(this,layout);
 		this.isEmpty = true;
 		var prevGlyph = null;
+		if(this.index > 0) {
+			var prevRenderer = js.Boot.__cast(this.stave.barRenderers[this.index - 1] , alphatab.rendering.EffectBarRenderer);
+			if(prevRenderer._lastBeat != null) prevGlyph = prevRenderer._effectGlyphs.get(prevRenderer._lastBeat.index);
+		}
 		var $it0 = this._effectGlyphs.keys();
 		while( $it0.hasNext() ) {
 			var i = $it0.next();
@@ -4734,7 +4759,7 @@ alphatab.rendering.effects.BeatVibratoEffectInfo.__name__ = true;
 alphatab.rendering.effects.BeatVibratoEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.BeatVibratoEffectInfo.prototype = {
 	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph();
+		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(null,null,"b~");
 	}
 	,getHeight: function(renderer) {
 		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
@@ -4783,7 +4808,7 @@ alphatab.rendering.effects.NoteVibratoEffectInfo.__name__ = true;
 alphatab.rendering.effects.NoteVibratoEffectInfo.__super__ = alphatab.rendering.effects.NoteEffectInfoBase;
 alphatab.rendering.effects.NoteVibratoEffectInfo.prototype = $extend(alphatab.rendering.effects.NoteEffectInfoBase.prototype,{
 	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph();
+		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(null,null,"n~");
 	}
 	,getHeight: function(renderer) {
 		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
@@ -6478,10 +6503,11 @@ alphatab.rendering.glyphs.TimeSignatureGlyph.prototype = $extend(alphatab.render
 	,__class__: alphatab.rendering.glyphs.TimeSignatureGlyph
 });
 if(!alphatab.rendering.glyphs.effects) alphatab.rendering.glyphs.effects = {}
-alphatab.rendering.glyphs.effects.DummyEffectGlyph = function(x,y) {
+alphatab.rendering.glyphs.effects.DummyEffectGlyph = function(x,y,s) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.Glyph.call(this,x,y);
+	this._s = s;
 };
 alphatab.rendering.glyphs.effects.DummyEffectGlyph.__name__ = true;
 alphatab.rendering.glyphs.effects.DummyEffectGlyph.__super__ = alphatab.rendering.Glyph;
@@ -6490,6 +6516,8 @@ alphatab.rendering.glyphs.effects.DummyEffectGlyph.prototype = $extend(alphatab.
 		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
 		canvas.setColor(res.mainGlyphColor);
 		canvas.strokeRect(cx + this.x,cy + this.y,this.width,20 * this.renderer.stave.staveGroup.layout.renderer.scale);
+		canvas.setFont(res.tablatureFont);
+		canvas.fillText(this._s,cx + this.x,cy + this.y);
 	}
 	,canScale: function() {
 		return false;

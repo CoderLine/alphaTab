@@ -5,9 +5,11 @@ import alphatab.rendering.RenderingResources;
 
 class DummyEffectGlyph extends Glyph
 {
-	public function new(x:Int = 0, y:Int = 0)
+    private var _s:String;
+	public function new(x:Int = 0, y:Int = 0, s:String)
 	{
 		super(x, y);
+        _s = s;
 	}
 
 	public override function doLayout():Void 
@@ -25,5 +27,7 @@ class DummyEffectGlyph extends Glyph
         var res:RenderingResources = renderer.getResources();
         canvas.setColor(res.mainGlyphColor);
         canvas.strokeRect(cx + x, cy + y, width, 20 * getScale());
+        canvas.setFont(res.tablatureFont);
+        canvas.fillText(_s, cx + x, cy + y);
 	}
 }

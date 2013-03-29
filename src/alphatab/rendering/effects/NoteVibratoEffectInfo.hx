@@ -25,6 +25,6 @@ class NoteVibratoEffectInfo extends NoteEffectInfoBase
     
     public override function createNewGlyph(renderer:EffectBarRenderer, beat:Beat):Glyph 
     {
-        return new DummyEffectGlyph();
+        return new DummyEffectGlyph("n~");
     }
 }

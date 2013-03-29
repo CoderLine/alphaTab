@@ -30,7 +30,7 @@ class BeatVibratoEffectInfo implements IEffectBarRendererInfo
     
     public function createNewGlyph(renderer : EffectBarRenderer, beat:Beat) : Glyph
     {
-        return new DummyEffectGlyph();
+        return new DummyEffectGlyph("b~");
     }
     
 }

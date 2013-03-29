@@ -124,7 +124,8 @@ class ScoreImporter
     private function nextNoteOnSameLine(note:Note) : Note
     {
         var nextBeat:Beat = note.beat.nextBeat;
-        while (nextBeat != null)
+        // keep searching in same bar
+        while (nextBeat != null && nextBeat.voice.bar == note.beat.voice.bar)
         {
             var noteOnString = nextBeat.getNoteOnString(note.string);
             if (noteOnString != null)
@@ -144,7 +145,8 @@ class ScoreImporter
     {
         var previousBeat:Beat = note.beat.previousBeat;
         
-        while (previousBeat != null)
+        // keep searching in same bar
+        while (previousBeat != null && previousBeat.voice.bar == note.beat.voice.bar)
         {
             var noteOnString = previousBeat.getNoteOnString(note.string);
             if (noteOnString != null)
