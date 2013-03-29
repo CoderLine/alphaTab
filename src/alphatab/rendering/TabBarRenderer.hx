@@ -95,7 +95,7 @@ class TabBarRenderer extends GroupedBarRenderer
 		
 		// Clef (TODO) 
 		 
-		addPreBeatGlyph(new BarNumberGlyph(0, getTabY( -1, -3), _bar.index + 1, stave.index != 0));
+		addPreBeatGlyph(new BarNumberGlyph(0, getTabY( -1, -3), _bar.index + 1, !stave.isFirstInAccolade));
 		
 		if (_bar.isEmpty())
 		{

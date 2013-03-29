@@ -28,6 +28,9 @@ import alphatab.rendering.layout.ScoreLayout;
  */
 class StaveGroup 
 {
+    private var _firstStaveInAccolade:Stave;
+    private var _lastStaveInAccolade:Stave;
+    
 	public var x:Int;
     public var y:Int;
 
@@ -92,6 +95,17 @@ class StaveGroup
 		stave.staveGroup = this;
 		stave.index = staves.length;
 		staves.push(stave);
+        if (_firstStaveInAccolade == null && stave.isInAccolade())
+        {
+            _firstStaveInAccolade = stave;
+            stave.isFirstInAccolade = true;
+        }
+        if (stave.isInAccolade())
+        {
+            if (_lastStaveInAccolade != null) { _lastStaveInAccolade.isLastInAccolade = false; }
+            _lastStaveInAccolade = stave;
+            _lastStaveInAccolade.isLastInAccolade = true;
+        }
 	}
 	
 	public function calculateHeight() : Int
@@ -137,30 +151,18 @@ class StaveGroup
 			//
 			// Draw start grouping
 			// 
-
-            var firstIndex = 0;
-            while (!staves[firstIndex].isInAccolade())
-            {
-                firstIndex++;
-            }
-
-            var lastIndex = staves.length - 1;
-            while (lastIndex >= firstIndex && !staves[lastIndex].isInAccolade())
-            {
-                lastIndex--;
-            }
             
-            if (lastIndex >= firstIndex)
+            if (_firstStaveInAccolade != null && _lastStaveInAccolade != null)
             {
-                var firstStart = cy + y + staves[firstIndex].y + staves[firstIndex].staveTop + staves[firstIndex].topSpacing + staves[firstIndex].getTopOverflow();
-                var lastEnd = cy + y + staves[lastIndex].y + staves[lastIndex].topSpacing + staves[lastIndex].getTopOverflow()
-                                     + staves[lastIndex].staveBottom;
+                var firstStart = cy + y + _firstStaveInAccolade.y + _firstStaveInAccolade.staveTop + _firstStaveInAccolade.topSpacing + _firstStaveInAccolade.getTopOverflow();
+                var lastEnd = cy + y + _lastStaveInAccolade.y + _lastStaveInAccolade.topSpacing + _lastStaveInAccolade.getTopOverflow()
+                                     + _lastStaveInAccolade.staveBottom;
                 
                 canvas.setColor(res.barSeperatorColor);
                 
                 canvas.beginPath();
-                canvas.moveTo(cx + x + staves[firstIndex].x, firstStart);
-                canvas.lineTo(cx + x + staves[lastIndex].x, lastEnd);
+                canvas.moveTo(cx + x + _firstStaveInAccolade.x, firstStart);
+                canvas.lineTo(cx + x + _lastStaveInAccolade.x, lastEnd);
                 canvas.stroke();
                             
                 //

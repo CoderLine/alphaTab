@@ -54,6 +54,9 @@ class Stave
 	 * using a accolade
 	 */	
 	public var staveBottom:Int;
+    
+    public var isFirstInAccolade:Bool;
+    public var isLastInAccolade:Bool;
 	
 	public function new(barRendererFactory:BarRendererFactory) 
 	{

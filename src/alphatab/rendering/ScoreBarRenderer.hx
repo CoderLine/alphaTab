@@ -478,7 +478,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
 			createTimeSignatureGlyphs();
 		}
 
-		addPreBeatGlyph(new BarNumberGlyph(0, getScoreY( -1, -3), _bar.index + 1, stave.index != 0));
+		addPreBeatGlyph(new BarNumberGlyph(0, getScoreY( -1, -3), _bar.index + 1, !stave.isFirstInAccolade));
 		
 		if (_bar.isEmpty())
 		{

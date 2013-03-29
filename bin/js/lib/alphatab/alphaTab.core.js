@@ -4363,7 +4363,7 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 			this.createStartSpacing();
 			this.createTimeSignatureGlyphs();
 		}
-		this.addPreBeatGlyph(new alphatab.rendering.glyphs.BarNumberGlyph(0,this.getScoreY(-1,-3),this._bar.index + 1,this.stave.index != 0));
+		this.addPreBeatGlyph(new alphatab.rendering.glyphs.BarNumberGlyph(0,this.getScoreY(-1,-3),this._bar.index + 1,!this.stave.isFirstInAccolade));
 		if(this._bar.isEmpty()) this.addPreBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,30 * this.stave.staveGroup.layout.renderer.scale | 0,false));
 	}
 	,paintFooter: function(cx,cy,canvas,h) {
@@ -4710,7 +4710,7 @@ alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.Grouped
 	}
 	,createPreBeatGlyphs: function() {
 		if(this._bar.getMasterBar().isRepeatStart) this.addPreBeatGlyph(new alphatab.rendering.glyphs.RepeatOpenGlyph(0,0,1.5,3));
-		this.addPreBeatGlyph(new alphatab.rendering.glyphs.BarNumberGlyph(0,this.getTabY(-1,-3),this._bar.index + 1,this.stave.index != 0));
+		this.addPreBeatGlyph(new alphatab.rendering.glyphs.BarNumberGlyph(0,this.getTabY(-1,-3),this._bar.index + 1,!this.stave.isFirstInAccolade));
 		if(this._bar.isEmpty()) this.addPreBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,30 * this.stave.staveGroup.layout.renderer.scale | 0,false));
 	}
 	,doLayout: function() {
@@ -6900,17 +6900,13 @@ alphatab.rendering.staves.StaveGroup.prototype = {
 		}
 		var res = this.layout.renderer.renderingResources;
 		if(this.staves.length > 0) {
-			var firstIndex = 0;
-			while(!this.staves[firstIndex]._factory.isInAccolade) firstIndex++;
-			var lastIndex = this.staves.length - 1;
-			while(lastIndex >= firstIndex && !this.staves[lastIndex]._factory.isInAccolade) lastIndex--;
-			if(lastIndex >= firstIndex) {
-				var firstStart = cy + this.y + this.staves[firstIndex].y + this.staves[firstIndex].staveTop + this.staves[firstIndex].topSpacing + this.staves[firstIndex].getTopOverflow();
-				var lastEnd = cy + this.y + this.staves[lastIndex].y + this.staves[lastIndex].topSpacing + this.staves[lastIndex].getTopOverflow() + this.staves[lastIndex].staveBottom;
+			if(this._firstStaveInAccolade != null && this._lastStaveInAccolade != null) {
+				var firstStart = cy + this.y + this._firstStaveInAccolade.y + this._firstStaveInAccolade.staveTop + this._firstStaveInAccolade.topSpacing + this._firstStaveInAccolade.getTopOverflow();
+				var lastEnd = cy + this.y + this._lastStaveInAccolade.y + this._lastStaveInAccolade.topSpacing + this._lastStaveInAccolade.getTopOverflow() + this._lastStaveInAccolade.staveBottom;
 				canvas.setColor(res.barSeperatorColor);
 				canvas.beginPath();
-				canvas.moveTo(cx + this.x + this.staves[firstIndex].x,firstStart);
-				canvas.lineTo(cx + this.x + this.staves[lastIndex].x,lastEnd);
+				canvas.moveTo(cx + this.x + this._firstStaveInAccolade.x,firstStart);
+				canvas.lineTo(cx + this.x + this._lastStaveInAccolade.x,lastEnd);
 				canvas.stroke();
 				var barSize = 3 * this.layout.renderer.scale | 0;
 				var barOffset = barSize;
@@ -6969,6 +6965,15 @@ alphatab.rendering.staves.StaveGroup.prototype = {
 		stave.staveGroup = this;
 		stave.index = this.staves.length;
 		this.staves.push(stave);
+		if(this._firstStaveInAccolade == null && stave._factory.isInAccolade) {
+			this._firstStaveInAccolade = stave;
+			stave.isFirstInAccolade = true;
+		}
+		if(stave._factory.isInAccolade) {
+			if(this._lastStaveInAccolade != null) this._lastStaveInAccolade.isLastInAccolade = false;
+			this._lastStaveInAccolade = stave;
+			this._lastStaveInAccolade.isLastInAccolade = true;
+		}
 	}
 	,addBar: function(bar) {
 		this.bars.push(bar);
