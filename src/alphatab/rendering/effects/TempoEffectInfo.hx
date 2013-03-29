@@ -1,50 +1,35 @@
 package alphatab.rendering.effects;
 
 import alphatab.model.Beat;
-import alphatab.model.Note;
 import alphatab.rendering.EffectBarGlyphSizing;
 import alphatab.rendering.EffectBarRenderer;
 import alphatab.rendering.Glyph;
+import alphatab.rendering.glyphs.effects.DummyEffectGlyph;
 import alphatab.rendering.IEffectBarRendererInfo;
 
-class NoteEffectInfoBase implements IEffectBarRendererInfo
+class TempoEffectInfo implements IEffectBarRendererInfo
 {
-    private var _lastCreateInfo:Array<Note>;
     public function new() 
     {       
     }
     
     public function shouldCreateGlyph(renderer : EffectBarRenderer, beat:Beat) : Bool
     {
-        _lastCreateInfo = new Array<Note>();
-        for (n in beat.notes)
-        {
-            if (shouldCreateGlyphForNote(renderer, n))
-            {
-                _lastCreateInfo.push(n);
-            }
-        }
-        return _lastCreateInfo.length > 0;
-    }
-    
-    private function shouldCreateGlyphForNote(renderer : EffectBarRenderer, note:Note) : Bool
-    {
-        return false;
+        return beat.index == 0 && (beat.voice.bar.getMasterBar().tempoAutomation != null && beat.voice.bar.index == 0);
     }
     
     public function getHeight(renderer : EffectBarRenderer) : Int
     {
-        return 0;
+        return Std.int(20 * renderer.getScale());
     }
     
     public function getSizingMode() : EffectBarGlyphSizing
     {
-        return EffectBarGlyphSizing.GroupedOnBeatToPostBeat;
+        return EffectBarGlyphSizing.SinglePreBeatOnly;
     }
 
     public function createNewGlyph(renderer : EffectBarRenderer, beat:Beat) : Glyph
     {
-        return null;
+        return new DummyEffectGlyph(0,0,"Tempo");
     }
-    
 }

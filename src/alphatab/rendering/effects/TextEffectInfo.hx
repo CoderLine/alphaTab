@@ -1,11 +1,13 @@
 package alphatab.rendering.effects;
+
 import alphatab.model.Beat;
 import alphatab.rendering.EffectBarGlyphSizing;
 import alphatab.rendering.EffectBarRenderer;
 import alphatab.rendering.Glyph;
+import alphatab.rendering.glyphs.effects.DummyEffectGlyph;
 import alphatab.rendering.IEffectBarRendererInfo;
 
-class DummyEffectInfo implements IEffectBarRendererInfo
+class TextEffectInfo implements IEffectBarRendererInfo
 {
     public function new() 
     {       
@@ -13,12 +15,12 @@ class DummyEffectInfo implements IEffectBarRendererInfo
     
     public function shouldCreateGlyph(renderer : EffectBarRenderer, beat:Beat) : Bool
     {
-        return false;
+        return beat.text != null && StringTools.trim(beat.text).length > 0;
     }
     
     public function getHeight(renderer : EffectBarRenderer) : Int
     {
-        return 0;
+        return Std.int(20 * renderer.getScale());
     }
     
     public function getSizingMode() : EffectBarGlyphSizing
@@ -28,7 +30,6 @@ class DummyEffectInfo implements IEffectBarRendererInfo
 
     public function createNewGlyph(renderer : EffectBarRenderer, beat:Beat) : Glyph
     {
-        return null;
+        return new DummyEffectGlyph(0, 0, "Text");
     }
-    
 }

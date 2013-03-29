@@ -2,22 +2,22 @@ package alphatab.rendering.effects;
 
 import alphatab.model.Beat;
 import alphatab.model.Note;
-import alphatab.model.VibratoType;
+import alphatab.rendering.EffectBarGlyphSizing;
 import alphatab.rendering.EffectBarRenderer;
 import alphatab.rendering.Glyph;
 import alphatab.rendering.glyphs.effects.DummyEffectGlyph;
-import alphatab.rendering.glyphs.effects.VibratoGlyph;
+import alphatab.rendering.IEffectBarRendererInfo;
 
-class NoteVibratoEffectInfo extends NoteEffectInfoBase
+class PalmMuteEffectInfo extends NoteEffectInfoBase
 {
     public function new() 
-    {
+    {       
         super();
     }
     
     private override function shouldCreateGlyphForNote(renderer:EffectBarRenderer, note:Note):Bool 
     {
-        return note.vibrato != VibratoType.None;
+        return note.isPalmMute;
     }
     
     public override function getHeight(renderer : EffectBarRenderer) : Int
@@ -25,8 +25,13 @@ class NoteVibratoEffectInfo extends NoteEffectInfoBase
         return Std.int(20 * renderer.getScale());
     }
     
-    public override function createNewGlyph(renderer:EffectBarRenderer, beat:Beat):Glyph 
+    public override function getSizingMode() : EffectBarGlyphSizing
     {
-        return new VibratoGlyph();
+        return EffectBarGlyphSizing.GroupedOnBeatToPostBeat;
+    }
+
+    public override function createNewGlyph(renderer : EffectBarRenderer, beat:Beat) : Glyph
+    {
+        return new DummyEffectGlyph(0,0, "PalmMute");
     }
 }

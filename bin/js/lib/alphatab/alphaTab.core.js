@@ -1065,13 +1065,13 @@ alphatab.rendering.IEffectBarRendererInfo.prototype = {
 	__class__: alphatab.rendering.IEffectBarRendererInfo
 }
 if(!alphatab.rendering.effects) alphatab.rendering.effects = {}
-alphatab.rendering.effects.DummyEffectInfo = function() {
+alphatab.rendering.effects.MarkerEffectInfo = function() {
 };
-alphatab.rendering.effects.DummyEffectInfo.__name__ = true;
-alphatab.rendering.effects.DummyEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
-alphatab.rendering.effects.DummyEffectInfo.prototype = {
+alphatab.rendering.effects.MarkerEffectInfo.__name__ = true;
+alphatab.rendering.effects.MarkerEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
+alphatab.rendering.effects.MarkerEffectInfo.prototype = {
 	createNewGlyph: function(renderer,beat) {
-		return null;
+		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(0,0,"Marker");
 	}
 	,getSizingMode: function() {
 		return alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly;
@@ -1080,9 +1080,9 @@ alphatab.rendering.effects.DummyEffectInfo.prototype = {
 		return 0;
 	}
 	,shouldCreateGlyph: function(renderer,beat) {
-		return false;
+		return beat.index == 0 && beat.voice.bar.getMasterBar().section != null;
 	}
-	,__class__: alphatab.rendering.effects.DummyEffectInfo
+	,__class__: alphatab.rendering.effects.MarkerEffectInfo
 }
 alphatab.rendering.BarRendererFactory = function() {
 	this.isInAccolade = true;
@@ -1107,6 +1107,82 @@ alphatab.rendering.EffectBarRendererFactory.prototype = $extend(alphatab.renderi
 	}
 	,__class__: alphatab.rendering.EffectBarRendererFactory
 });
+alphatab.rendering.effects.TripletFeelEffectInfo = function() {
+};
+alphatab.rendering.effects.TripletFeelEffectInfo.__name__ = true;
+alphatab.rendering.effects.TripletFeelEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
+alphatab.rendering.effects.TripletFeelEffectInfo.prototype = {
+	createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(0,0,"TripletFeel");
+	}
+	,getSizingMode: function() {
+		return alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly;
+	}
+	,getHeight: function(renderer) {
+		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,shouldCreateGlyph: function(renderer,beat) {
+		return beat.index == 0 && (beat.voice.bar.getMasterBar().index == 0 && beat.voice.bar.getMasterBar().tripletFeel != alphatab.model.TripletFeel.NoTripletFeel) || beat.voice.bar.getMasterBar().tripletFeel != beat.voice.bar.getMasterBar().previousMasterBar.tripletFeel;
+	}
+	,__class__: alphatab.rendering.effects.TripletFeelEffectInfo
+}
+alphatab.rendering.effects.TempoEffectInfo = function() {
+};
+alphatab.rendering.effects.TempoEffectInfo.__name__ = true;
+alphatab.rendering.effects.TempoEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
+alphatab.rendering.effects.TempoEffectInfo.prototype = {
+	createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(0,0,"Tempo");
+	}
+	,getSizingMode: function() {
+		return alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly;
+	}
+	,getHeight: function(renderer) {
+		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,shouldCreateGlyph: function(renderer,beat) {
+		return beat.index == 0 && (beat.voice.bar.getMasterBar().tempoAutomation != null && beat.voice.bar.index == 0);
+	}
+	,__class__: alphatab.rendering.effects.TempoEffectInfo
+}
+alphatab.rendering.effects.TextEffectInfo = function() {
+};
+alphatab.rendering.effects.TextEffectInfo.__name__ = true;
+alphatab.rendering.effects.TextEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
+alphatab.rendering.effects.TextEffectInfo.prototype = {
+	createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(0,0,"Text");
+	}
+	,getSizingMode: function() {
+		return alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly;
+	}
+	,getHeight: function(renderer) {
+		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,shouldCreateGlyph: function(renderer,beat) {
+		return beat.text != null && StringTools.trim(beat.text).length > 0;
+	}
+	,__class__: alphatab.rendering.effects.TextEffectInfo
+}
+alphatab.rendering.effects.ChordsEffectInfo = function() {
+};
+alphatab.rendering.effects.ChordsEffectInfo.__name__ = true;
+alphatab.rendering.effects.ChordsEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
+alphatab.rendering.effects.ChordsEffectInfo.prototype = {
+	createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(0,0,"Chord");
+	}
+	,getSizingMode: function() {
+		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatOnly;
+	}
+	,getHeight: function(renderer) {
+		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,shouldCreateGlyph: function(renderer,beat) {
+		return beat.chord != null;
+	}
+	,__class__: alphatab.rendering.effects.ChordsEffectInfo
+}
 alphatab.rendering.effects.BeatVibratoEffectInfo = function() {
 };
 alphatab.rendering.effects.BeatVibratoEffectInfo.__name__ = true;
@@ -1183,6 +1259,108 @@ alphatab.rendering.ScoreBarRendererFactory.prototype = $extend(alphatab.renderin
 	}
 	,__class__: alphatab.rendering.ScoreBarRendererFactory
 });
+alphatab.rendering.effects.DynamicsEffectInfo = function() {
+};
+alphatab.rendering.effects.DynamicsEffectInfo.__name__ = true;
+alphatab.rendering.effects.DynamicsEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
+alphatab.rendering.effects.DynamicsEffectInfo.prototype = {
+	createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(0,0,"Dynamics");
+	}
+	,getSizingMode: function() {
+		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatOnly;
+	}
+	,getHeight: function(renderer) {
+		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,shouldCreateGlyph: function(renderer,beat) {
+		return beat.index == 0 && beat.voice.bar.index == 0 || beat.previousBeat != null && beat.dynamicValue != beat.previousBeat.dynamicValue;
+	}
+	,__class__: alphatab.rendering.effects.DynamicsEffectInfo
+}
+alphatab.rendering.effects.TapEffectInfo = function() {
+	alphatab.rendering.effects.NoteEffectInfoBase.call(this);
+};
+alphatab.rendering.effects.TapEffectInfo.__name__ = true;
+alphatab.rendering.effects.TapEffectInfo.__super__ = alphatab.rendering.effects.NoteEffectInfoBase;
+alphatab.rendering.effects.TapEffectInfo.prototype = $extend(alphatab.rendering.effects.NoteEffectInfoBase.prototype,{
+	createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(0,0,"Tap");
+	}
+	,getSizingMode: function() {
+		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatOnly;
+	}
+	,getHeight: function(renderer) {
+		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,shouldCreateGlyphForNote: function(renderer,note) {
+		return note.tapping;
+	}
+	,shouldCreateGlyph: function(renderer,beat) {
+		if(beat.slap || beat.pop) return true;
+		return alphatab.rendering.effects.NoteEffectInfoBase.prototype.shouldCreateGlyph.call(this,renderer,beat);
+	}
+	,__class__: alphatab.rendering.effects.TapEffectInfo
+});
+alphatab.rendering.effects.FadeInEffectInfo = function() {
+};
+alphatab.rendering.effects.FadeInEffectInfo.__name__ = true;
+alphatab.rendering.effects.FadeInEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
+alphatab.rendering.effects.FadeInEffectInfo.prototype = {
+	createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(0,0,"FadeIn");
+	}
+	,getSizingMode: function() {
+		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatOnly;
+	}
+	,getHeight: function(renderer) {
+		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,shouldCreateGlyph: function(renderer,beat) {
+		return beat.fadeIn;
+	}
+	,__class__: alphatab.rendering.effects.FadeInEffectInfo
+}
+alphatab.rendering.effects.LetRingEffectInfo = function() {
+	alphatab.rendering.effects.NoteEffectInfoBase.call(this);
+};
+alphatab.rendering.effects.LetRingEffectInfo.__name__ = true;
+alphatab.rendering.effects.LetRingEffectInfo.__super__ = alphatab.rendering.effects.NoteEffectInfoBase;
+alphatab.rendering.effects.LetRingEffectInfo.prototype = $extend(alphatab.rendering.effects.NoteEffectInfoBase.prototype,{
+	createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(0,0,"LetRing");
+	}
+	,getSizingMode: function() {
+		return alphatab.rendering.EffectBarGlyphSizing.GroupedOnBeatToPostBeat;
+	}
+	,getHeight: function(renderer) {
+		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,shouldCreateGlyphForNote: function(renderer,note) {
+		return note.isLetRing;
+	}
+	,__class__: alphatab.rendering.effects.LetRingEffectInfo
+});
+alphatab.rendering.effects.PalmMuteEffectInfo = function() {
+	alphatab.rendering.effects.NoteEffectInfoBase.call(this);
+};
+alphatab.rendering.effects.PalmMuteEffectInfo.__name__ = true;
+alphatab.rendering.effects.PalmMuteEffectInfo.__super__ = alphatab.rendering.effects.NoteEffectInfoBase;
+alphatab.rendering.effects.PalmMuteEffectInfo.prototype = $extend(alphatab.rendering.effects.NoteEffectInfoBase.prototype,{
+	createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(0,0,"PalmMute");
+	}
+	,getSizingMode: function() {
+		return alphatab.rendering.EffectBarGlyphSizing.GroupedOnBeatToPostBeat;
+	}
+	,getHeight: function(renderer) {
+		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,shouldCreateGlyphForNote: function(renderer,note) {
+		return note.isPalmMute;
+	}
+	,__class__: alphatab.rendering.effects.PalmMuteEffectInfo
+});
 alphatab.rendering.TabBarRendererFactory = function() {
 	alphatab.rendering.BarRendererFactory.call(this);
 };
@@ -1193,6 +1371,32 @@ alphatab.rendering.TabBarRendererFactory.prototype = $extend(alphatab.rendering.
 		return new alphatab.rendering.TabBarRenderer(bar);
 	}
 	,__class__: alphatab.rendering.TabBarRendererFactory
+});
+alphatab.rendering.effects.FingeringEffectInfo = function() {
+	alphatab.rendering.effects.NoteEffectInfoBase.call(this);
+	this._maxGlyphCount = 0;
+};
+alphatab.rendering.effects.FingeringEffectInfo.__name__ = true;
+alphatab.rendering.effects.FingeringEffectInfo.__super__ = alphatab.rendering.effects.NoteEffectInfoBase;
+alphatab.rendering.effects.FingeringEffectInfo.prototype = $extend(alphatab.rendering.effects.NoteEffectInfoBase.prototype,{
+	createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(0,0,this._lastCreateInfo.length + "fingering");
+	}
+	,getSizingMode: function() {
+		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatOnly;
+	}
+	,getHeight: function(renderer) {
+		return this._maxGlyphCount * (20 * renderer.stave.staveGroup.layout.renderer.scale | 0);
+	}
+	,shouldCreateGlyphForNote: function(renderer,note) {
+		return note.leftHandFinger != -1 && note.leftHandFinger != -2 || note.rightHandFinger != -1 && note.rightHandFinger != -2;
+	}
+	,shouldCreateGlyph: function(renderer,beat) {
+		var result = alphatab.rendering.effects.NoteEffectInfoBase.prototype.shouldCreateGlyph.call(this,renderer,beat);
+		if(this._lastCreateInfo.length > this._maxGlyphCount) this._maxGlyphCount = this._lastCreateInfo.length;
+		return result;
+	}
+	,__class__: alphatab.rendering.effects.FingeringEffectInfo
 });
 alphatab.Environment = function() { }
 alphatab.Environment.__name__ = true;
@@ -1215,12 +1419,10 @@ alphatab.Settings.defaults = function() {
 	settings.staves.push(new alphatab.StaveSettings("marker"));
 	settings.staves.push(new alphatab.StaveSettings("triplet-feel"));
 	settings.staves.push(new alphatab.StaveSettings("tempo"));
-	settings.staves.push(new alphatab.StaveSettings("fermata"));
 	settings.staves.push(new alphatab.StaveSettings("text"));
 	settings.staves.push(new alphatab.StaveSettings("chords"));
 	settings.staves.push(new alphatab.StaveSettings("beat-vibrato"));
 	settings.staves.push(new alphatab.StaveSettings("note-vibrato"));
-	settings.staves.push(new alphatab.StaveSettings("tuplet"));
 	settings.staves.push(new alphatab.StaveSettings("score"));
 	settings.staves.push(new alphatab.StaveSettings("dynamics"));
 	settings.staves.push(new alphatab.StaveSettings("beat-vibrato"));
@@ -8025,34 +8227,51 @@ alphatab.Environment.layoutEngines.set("page",function(r) {
 alphatab.Environment.layoutEngines.set("horizontal",function(r) {
 	return new alphatab.rendering.layout.HorizontalScreenLayout(r);
 });
-var dummy = function(l) {
-	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.DummyEffectInfo());
-};
-alphatab.Environment.staveFactories.set("marker",dummy);
-alphatab.Environment.staveFactories.set("triplet-feel",dummy);
-alphatab.Environment.staveFactories.set("tempo",dummy);
-alphatab.Environment.staveFactories.set("fermata",dummy);
-alphatab.Environment.staveFactories.set("text",dummy);
-alphatab.Environment.staveFactories.set("chords",dummy);
+alphatab.Environment.staveFactories.set("marker",function(l) {
+	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.MarkerEffectInfo());
+});
+alphatab.Environment.staveFactories.set("triplet-feel",function(l) {
+	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.TripletFeelEffectInfo());
+});
+alphatab.Environment.staveFactories.set("tempo",function(l) {
+	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.TempoEffectInfo());
+});
+alphatab.Environment.staveFactories.set("text",function(l) {
+	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.TextEffectInfo());
+});
+alphatab.Environment.staveFactories.set("chords",function(l) {
+	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.ChordsEffectInfo());
+});
 alphatab.Environment.staveFactories.set("beat-vibrato",function(l) {
 	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.BeatVibratoEffectInfo());
 });
 alphatab.Environment.staveFactories.set("note-vibrato",function(l) {
 	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.NoteVibratoEffectInfo());
 });
-alphatab.Environment.staveFactories.set("tuplet",dummy);
 alphatab.Environment.staveFactories.set("score",function(l) {
 	return new alphatab.rendering.ScoreBarRendererFactory();
 });
-alphatab.Environment.staveFactories.set("dynamics",dummy);
-alphatab.Environment.staveFactories.set("tap",dummy);
-alphatab.Environment.staveFactories.set("fade-in",dummy);
-alphatab.Environment.staveFactories.set("let-ring",dummy);
-alphatab.Environment.staveFactories.set("palm-mute",dummy);
+alphatab.Environment.staveFactories.set("dynamics",function(l) {
+	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.DynamicsEffectInfo());
+});
+alphatab.Environment.staveFactories.set("tap",function(l) {
+	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.TapEffectInfo());
+});
+alphatab.Environment.staveFactories.set("fade-in",function(l) {
+	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.FadeInEffectInfo());
+});
+alphatab.Environment.staveFactories.set("let-ring",function(l) {
+	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.LetRingEffectInfo());
+});
+alphatab.Environment.staveFactories.set("palm-mute",function(l) {
+	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.PalmMuteEffectInfo());
+});
 alphatab.Environment.staveFactories.set("tab",function(l) {
 	return new alphatab.rendering.TabBarRendererFactory();
 });
-alphatab.Environment.staveFactories.set("fingering",dummy);
+alphatab.Environment.staveFactories.set("fingering",function(l) {
+	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.FingeringEffectInfo());
+});
 alphatab.platform.model.Font.STYLE_PLAIN = 0;
 alphatab.platform.model.Font.STYLE_BOLD = 1;
 alphatab.platform.model.Font.STYLE_ITALIC = 2;
@@ -8074,6 +8293,13 @@ alphatab.importer.GpxFileSystem.SCORE_GPIF = "score.gpif";
 alphatab.io.BitInput.BYTE_SIZE = 8;
 alphatab.model.BendPoint.MAX_POSITION = 60;
 alphatab.model.BendPoint.MAX_VALUE = 12;
+alphatab.model.Note.FingeringUnknown = -2;
+alphatab.model.Note.FingeringNoOrDead = -1;
+alphatab.model.Note.FingeringThumb = 0;
+alphatab.model.Note.FingeringIndexFinger = 1;
+alphatab.model.Note.FingeringMiddleFinger = 2;
+alphatab.model.Note.FingeringAnnularFinger = 3;
+alphatab.model.Note.FingeringLittleFinger = 4;
 alphatab.model.Tuning.TUNING_REGEX = new EReg("([a-g]b?)([0-9])","i");
 alphatab.platform.svg.FontSizes.TIMES_NEW_ROMAN_11PT = [3,4,5,6,6,9,9,2,4,4,6,6,3,4,3,3,6,6,6,6,6,6,6,6,6,6,3,3,6,6,6,5,10,8,7,7,8,7,6,7,8,4,4,8,7,10,8,8,7,8,7,5,8,8,7,11,8,8,7,4,3,4,5,6,4,5,5,5,5,5,4,5,6,3,3,6,3,9,6,6,6,5,4,4,4,5,6,7,6,6,5,5,2,5,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,4,6,6,6,6,2,5,4,8,4,6,6,0,8,6,4,6,3,3,4,5,5,4,4,3,3,6,8,8,8,5,8,8,8,8,8,8,11,7,7,7,7,7,4,4,4,4,8,8,8,8,8,8,8,6,8,8,8,8,8,8,6,5,5,5,5,5,5,5,8,5,5,5,5,5,3,3,3,3,6,6,6,6,6,6,6,6,6,5,5,5,5,6,6];
 alphatab.platform.svg.FontSizes.ARIAL_11PT = [3,2,4,6,6,10,7,2,4,4,4,6,3,4,3,3,6,6,6,6,6,6,6,6,6,6,3,3,6,6,6,6,11,8,7,7,7,6,6,8,7,2,5,7,6,8,7,8,6,8,7,7,6,7,8,10,7,8,7,3,3,3,5,6,4,6,6,6,6,6,4,6,6,2,2,5,2,8,6,6,6,6,4,6,3,6,6,10,6,6,6,4,2,4,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,2,6,6,7,6,2,6,4,8,4,6,6,0,8,6,4,6,4,4,4,6,6,4,4,4,5,6,9,10,10,6,8,8,8,8,8,8,11,7,6,6,6,6,2,2,2,2,8,7,8,8,8,8,8,6,8,7,7,7,7,8,7,7,6,6,6,6,6,6,10,6,6,6,6,6,2,2,2,2,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6];

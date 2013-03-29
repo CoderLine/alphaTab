@@ -4,8 +4,18 @@ import alphatab.platform.IFileLoader;
 import alphatab.rendering.BarRendererFactory;
 import alphatab.rendering.EffectBarRendererFactory;
 import alphatab.rendering.effects.BeatVibratoEffectInfo;
-import alphatab.rendering.effects.DummyEffectInfo;
+import alphatab.rendering.effects.ChordsEffectInfo;
+import alphatab.rendering.effects.DynamicsEffectInfo;
+import alphatab.rendering.effects.FadeInEffectInfo;
+import alphatab.rendering.effects.FingeringEffectInfo;
+import alphatab.rendering.effects.LetRingEffectInfo;
+import alphatab.rendering.effects.MarkerEffectInfo;
 import alphatab.rendering.effects.NoteVibratoEffectInfo;
+import alphatab.rendering.effects.PalmMuteEffectInfo;
+import alphatab.rendering.effects.TapEffectInfo;
+import alphatab.rendering.effects.TempoEffectInfo;
+import alphatab.rendering.effects.TextEffectInfo;
+import alphatab.rendering.effects.TripletFeelEffectInfo;
 import alphatab.rendering.glyphs.effects.DummyEffectGlyph;
 import alphatab.rendering.layout.HorizontalScreenLayout;
 import alphatab.rendering.layout.PageViewLayout;
@@ -63,23 +73,20 @@ class Environment
         layoutEngines.set("horizontal", function(r) { return new HorizontalScreenLayout(r); } );
         
         // default staves 
-        var dummy = function(l) { return new EffectBarRendererFactory(new DummyEffectInfo()); };
-        staveFactories.set("marker", dummy);
-        staveFactories.set("triplet-feel", dummy);
-        staveFactories.set("tempo", dummy); 
-        staveFactories.set("fermata", dummy); 
-        staveFactories.set("text", dummy); 
-        staveFactories.set("chords", dummy); 
+        staveFactories.set("marker", function(l) { return new EffectBarRendererFactory(new MarkerEffectInfo()); } );
+        staveFactories.set("triplet-feel", function(l) { return new EffectBarRendererFactory(new TripletFeelEffectInfo()); });
+        staveFactories.set("tempo", function(l) { return new EffectBarRendererFactory(new TempoEffectInfo()); }); 
+        staveFactories.set("text", function(l) { return new EffectBarRendererFactory(new TextEffectInfo()); }); 
+        staveFactories.set("chords", function(l) { return new EffectBarRendererFactory(new ChordsEffectInfo()); }); 
         staveFactories.set("beat-vibrato", function(l) { return new EffectBarRendererFactory(new BeatVibratoEffectInfo()); } ); 
         staveFactories.set("note-vibrato", function(l) { return new EffectBarRendererFactory(new NoteVibratoEffectInfo()); } ); 
-        staveFactories.set("tuplet", dummy); 
         staveFactories.set("score", function(l) { return new ScoreBarRendererFactory(); } ); 
-        staveFactories.set("dynamics", dummy); 
-        staveFactories.set("tap", dummy); 
-        staveFactories.set("fade-in", dummy); 
-        staveFactories.set("let-ring", dummy); 
-        staveFactories.set("palm-mute", dummy); 
+        staveFactories.set("dynamics", function(l) { return new EffectBarRendererFactory(new DynamicsEffectInfo()); }); 
+        staveFactories.set("tap", function(l) { return new EffectBarRendererFactory(new TapEffectInfo()); }); 
+        staveFactories.set("fade-in", function(l) { return new EffectBarRendererFactory(new FadeInEffectInfo()); }); 
+        staveFactories.set("let-ring", function(l) { return new EffectBarRendererFactory(new LetRingEffectInfo()); }); 
+        staveFactories.set("palm-mute", function(l) { return new EffectBarRendererFactory(new PalmMuteEffectInfo()); }); 
         staveFactories.set("tab", function(l) { return new TabBarRendererFactory(); } ); 
-        staveFactories.set("fingering", dummy);   
+        staveFactories.set("fingering", function(l) { return new EffectBarRendererFactory(new FingeringEffectInfo()); });   
     }
 }

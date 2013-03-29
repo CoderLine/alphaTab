@@ -21,12 +21,10 @@ class VibratoGlyph extends Glyph
         var loopX = 0;
         for (i in 0 ... loops)
         {
-            // TODO: 
             var glyph = new SvgGlyph(loopX, 0, MusicFont.WaveHorizontal, _scale, _scale);
             glyph.renderer = renderer;
             glyph.paint(cx + x, cy + y, canvas);
             loopX += Math.floor(step);
         }
     }
-    
 }

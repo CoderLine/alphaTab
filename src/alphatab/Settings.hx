@@ -69,12 +69,10 @@ class Settings
         settings.staves.push(new StaveSettings("marker"));
         settings.staves.push(new StaveSettings("triplet-feel"));
         settings.staves.push(new StaveSettings("tempo"));
-        settings.staves.push(new StaveSettings("fermata"));
         settings.staves.push(new StaveSettings("text"));
         settings.staves.push(new StaveSettings("chords"));
         settings.staves.push(new StaveSettings("beat-vibrato"));
         settings.staves.push(new StaveSettings("note-vibrato"));
-        settings.staves.push(new StaveSettings("tuplet"));
         
         settings.staves.push(new StaveSettings("score"));
         
@@ -151,7 +149,6 @@ class StaveSettings
      *  <li><strong>marker</strong> - Renders section markers</li>
      *  <li><strong>triplet-feel</strong> - Renders triplet feel indicators</li>
      *  <li><strong>tempo</strong> - Renders a tempo identifier</li>
-     *  <li><strong>fermata</strong> - Renders fermata symbols</li>
      *  <li><strong>text</strong> - Renders custom text annotations</li>
      *  <li><strong>chords</strong> - Renders chord names</li>
      *  <li><strong>beat-vibrato</strong> - Renders beat vibrato symbols</li>

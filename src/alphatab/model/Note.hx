@@ -24,6 +24,36 @@ import js.Boot;
  */
 class Note 
 {
+    /**
+     * Unknown type (not documented)
+     */
+    public static inline var FingeringUnknown = -2;
+    /**
+     * No finger, dead note
+     */
+    public static inline var FingeringNoOrDead = -1;
+    /**
+     * The thumb
+     */
+    public static inline var FingeringThumb = 0;
+    /**
+     * The index finger
+     */
+    public static inline var FingeringIndexFinger = 1;
+    /**
+     * The middle finger
+     */
+    public static inline var FingeringMiddleFinger = 2;
+    /**
+     * The annular finger
+     */
+    public static inline var FingeringAnnularFinger = 3;
+    /**
+     * The little finger
+     */
+    public static inline var FingeringLittleFinger = 4;
+
+    
     public var accentuated:AccentuationType;
     public var bendPoints:Array<BendPoint>;
     public inline function hasBend():Bool { return bendPoints.length > 1; }
