@@ -60,26 +60,26 @@ class DynamicsGlyph extends Glyph
         }
     }
     
-    private static inline var GlyphScale = 0.75;
+    private static inline var GlyphScale = 0.8;
     
     private function p() 
     {
         var p = new SvgGlyph(0, 0, MusicFont.DynamicP, GlyphScale,GlyphScale);
-        p.width = Std.int(8 * getScale());
+        p.width = Std.int(7 * getScale());
         return p;
     }
     
     private function m() 
     {
         var m = new SvgGlyph(0, 0, MusicFont.DynamicM, GlyphScale, GlyphScale);
-        m.width = Std.int(10 * getScale());
+        m.width = Std.int(7 * getScale());
         return m;
     }
     
     private function f() 
     {
         var f = new SvgGlyph(0, 0, MusicFont.DynamicF, GlyphScale, GlyphScale);
-        f.width = Std.int(8 * getScale());
+        f.width = Std.int(7 * getScale());
         return f;
     }
     

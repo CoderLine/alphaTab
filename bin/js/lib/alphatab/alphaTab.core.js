@@ -7098,18 +7098,18 @@ alphatab.rendering.glyphs.effects.DynamicsGlyph.__name__ = true;
 alphatab.rendering.glyphs.effects.DynamicsGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.effects.DynamicsGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	f: function() {
-		var f = new alphatab.rendering.glyphs.SvgGlyph(0,0,alphatab.rendering.glyphs.MusicFont.DynamicF,0.75,0.75);
-		f.width = 8 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		var f = new alphatab.rendering.glyphs.SvgGlyph(0,0,alphatab.rendering.glyphs.MusicFont.DynamicF,0.8,0.8);
+		f.width = 7 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 		return f;
 	}
 	,m: function() {
-		var m = new alphatab.rendering.glyphs.SvgGlyph(0,0,alphatab.rendering.glyphs.MusicFont.DynamicM,0.75,0.75);
-		m.width = 10 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		var m = new alphatab.rendering.glyphs.SvgGlyph(0,0,alphatab.rendering.glyphs.MusicFont.DynamicM,0.8,0.8);
+		m.width = 7 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 		return m;
 	}
 	,p: function() {
-		var p = new alphatab.rendering.glyphs.SvgGlyph(0,0,alphatab.rendering.glyphs.MusicFont.DynamicP,0.75,0.75);
-		p.width = 8 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		var p = new alphatab.rendering.glyphs.SvgGlyph(0,0,alphatab.rendering.glyphs.MusicFont.DynamicP,0.8,0.8);
+		p.width = 7 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 		return p;
 	}
 	,paint: function(cx,cy,canvas) {
@@ -8556,7 +8556,7 @@ alphatab.rendering.glyphs.MusicFont.AccidentalDoubleSharp = "M 22 243c -32 -31 -
 alphatab.rendering.glyphs.NoteHeadGlyph.graceScale = 0.7;
 alphatab.rendering.glyphs.NoteHeadGlyph.noteHeadHeight = 9;
 alphatab.rendering.glyphs.NoteNumberGlyph.Padding = 3;
-alphatab.rendering.glyphs.effects.DynamicsGlyph.GlyphScale = 0.75;
+alphatab.rendering.glyphs.effects.DynamicsGlyph.GlyphScale = 0.8;
 alphatab.rendering.glyphs.effects.LineRangedGlyph.LineSpacing = 3;
 alphatab.rendering.glyphs.effects.LineRangedGlyph.LineTopPadding = 8;
 alphatab.rendering.glyphs.effects.LineRangedGlyph.LineTopOffset = 6;
