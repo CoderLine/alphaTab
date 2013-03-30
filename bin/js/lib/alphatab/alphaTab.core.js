@@ -1285,7 +1285,10 @@ alphatab.rendering.effects.TapEffectInfo.__name__ = true;
 alphatab.rendering.effects.TapEffectInfo.__super__ = alphatab.rendering.effects.NoteEffectInfoBase;
 alphatab.rendering.effects.TapEffectInfo.prototype = $extend(alphatab.rendering.effects.NoteEffectInfoBase.prototype,{
 	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(0,0,"Tap");
+		var res = renderer.stave.staveGroup.layout.renderer.renderingResources;
+		if(beat.slap) return new alphatab.rendering.glyphs.effects.TextGlyph(0,0,"S",res.effectFont);
+		if(beat.pop) return new alphatab.rendering.glyphs.effects.TextGlyph(0,0,"P",res.effectFont);
+		return new alphatab.rendering.glyphs.effects.TextGlyph(0,0,"T",res.effectFont);
 	}
 	,getSizingMode: function() {
 		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatOnly;
@@ -7093,17 +7096,17 @@ alphatab.rendering.glyphs.effects.DynamicsGlyph.__name__ = true;
 alphatab.rendering.glyphs.effects.DynamicsGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.effects.DynamicsGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	f: function() {
-		var f = new alphatab.rendering.glyphs.SvgGlyph(0,0,alphatab.rendering.glyphs.MusicFont.DynamicF,1,1);
+		var f = new alphatab.rendering.glyphs.SvgGlyph(0,0,alphatab.rendering.glyphs.MusicFont.DynamicF,0.75,0.75);
 		f.width = 8 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 		return f;
 	}
 	,m: function() {
-		var m = new alphatab.rendering.glyphs.SvgGlyph(0,0,alphatab.rendering.glyphs.MusicFont.DynamicM,1,1);
+		var m = new alphatab.rendering.glyphs.SvgGlyph(0,0,alphatab.rendering.glyphs.MusicFont.DynamicM,0.75,0.75);
 		m.width = 10 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 		return m;
 	}
 	,p: function() {
-		var p = new alphatab.rendering.glyphs.SvgGlyph(0,0,alphatab.rendering.glyphs.MusicFont.DynamicP,1,1);
+		var p = new alphatab.rendering.glyphs.SvgGlyph(0,0,alphatab.rendering.glyphs.MusicFont.DynamicP,0.75,0.75);
 		p.width = 8 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 		return p;
 	}
@@ -8551,6 +8554,7 @@ alphatab.rendering.glyphs.MusicFont.AccidentalDoubleSharp = "M 22 243c -32 -31 -
 alphatab.rendering.glyphs.NoteHeadGlyph.graceScale = 0.7;
 alphatab.rendering.glyphs.NoteHeadGlyph.noteHeadHeight = 9;
 alphatab.rendering.glyphs.NoteNumberGlyph.Padding = 3;
+alphatab.rendering.glyphs.effects.DynamicsGlyph.GlyphScale = 0.75;
 alphatab.rendering.glyphs.effects.LineRangedGlyph.LineSpacing = 3;
 alphatab.rendering.glyphs.effects.LineRangedGlyph.LineTopPadding = 8;
 alphatab.rendering.glyphs.effects.LineRangedGlyph.LineTopOffset = 6;
