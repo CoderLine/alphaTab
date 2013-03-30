@@ -88,6 +88,7 @@ class ScoreBeatGlyph extends BeatGlyphBase
 		else
 		{
 			var line = 0;
+            var offset = 0;
         
 			switch(beat.duration)
 			{
@@ -96,7 +97,8 @@ class ScoreBeatGlyph extends BeatGlyphBase
 				case Half:          
 					line = 5;
 				case Quarter:       
-					line = 6;
+					line = 7;
+                    offset = -2;
 				case Eighth:        
 					line = 8;
 				case Sixteenth:     
@@ -108,7 +110,7 @@ class ScoreBeatGlyph extends BeatGlyphBase
 			}
 			
 			var sr = cast(renderer, ScoreBarRenderer);
-			var y = sr.getScoreY(line);
+			var y = sr.getScoreY(line, offset);
 
 			addGlyph(new RestGlyph(0, y, beat.duration));
 		}

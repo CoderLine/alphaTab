@@ -6349,6 +6349,7 @@ alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.
 			}
 		} else {
 			var line = 0;
+			var offset = 0;
 			var _g1 = this;
 			switch( (_g1.beat.duration)[1] ) {
 			case 0:
@@ -6358,7 +6359,8 @@ alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.
 				line = 5;
 				break;
 			case 2:
-				line = 6;
+				line = 7;
+				offset = -2;
 				break;
 			case 3:
 				line = 8;
@@ -6374,7 +6376,7 @@ alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.
 				break;
 			}
 			var sr = js.Boot.__cast(this.renderer , alphatab.rendering.ScoreBarRenderer);
-			var y = sr.getScoreY(line);
+			var y = sr.getScoreY(line,offset);
 			this.addGlyph(new alphatab.rendering.glyphs.RestGlyph(0,y,this.beat.duration));
 		}
 		alphatab.rendering.glyphs.BeatGlyphBase.prototype.doLayout.call(this);
