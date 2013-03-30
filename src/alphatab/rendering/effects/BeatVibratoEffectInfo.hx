@@ -26,12 +26,12 @@ class BeatVibratoEffectInfo implements IEffectBarRendererInfo
     
     public function getHeight(renderer : EffectBarRenderer) : Int
     {
-        return Std.int(20 * renderer.getScale());
+        return Std.int(17 * renderer.getScale());
     }
     
     public function createNewGlyph(renderer : EffectBarRenderer, beat:Beat) : Glyph
     {
-        return new VibratoGlyph(0,0,1.15);
+        return new VibratoGlyph(0,Std.int(5*renderer.getScale()),1.15);
     }
     
 }

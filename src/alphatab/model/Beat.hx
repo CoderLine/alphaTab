@@ -90,7 +90,6 @@ class Beat
         start = 0;        
         tupletDenominator = -1;
         tupletNumerator = -1;
-        dynamicValue = DynamicValue.MF;
     }
     
     /**

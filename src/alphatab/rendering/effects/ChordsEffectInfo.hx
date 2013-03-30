@@ -5,6 +5,7 @@ import alphatab.rendering.EffectBarGlyphSizing;
 import alphatab.rendering.EffectBarRenderer;
 import alphatab.rendering.Glyph;
 import alphatab.rendering.glyphs.effects.DummyEffectGlyph;
+import alphatab.rendering.glyphs.effects.TextGlyph;
 import alphatab.rendering.IEffectBarRendererInfo;
 
 class ChordsEffectInfo implements IEffectBarRendererInfo
@@ -30,6 +31,6 @@ class ChordsEffectInfo implements IEffectBarRendererInfo
 
     public function createNewGlyph(renderer : EffectBarRenderer, beat:Beat) : Glyph
     {
-        return new DummyEffectGlyph(0,0,"Chord");
+        return new TextGlyph(0, 0, beat.chord.name, renderer.getResources().effectFont);
     }
 }

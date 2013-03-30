@@ -38,6 +38,8 @@ class RenderingResources
 	
     public var barNumberFont:Font;
 	public var barNumberColor:Color;
+    
+	public var markerFont:Font;
 	
 	public var mainGlyphColor:Color;
 
@@ -51,7 +53,7 @@ class RenderingResources
         var sansFont = "Arial";
         var serifFont = "Times New Roman";
         
-		effectFont = new Font(serifFont, 11 * scale, Font.STYLE_ITALIC);
+		effectFont = new Font(serifFont, 12 * scale, Font.STYLE_ITALIC);
 		copyrightFont = new Font(sansFont, 12 * scale, Font.STYLE_BOLD);
 		
 		titleFont = new Font(serifFont, 32 * scale);
@@ -66,6 +68,8 @@ class RenderingResources
 		
 		barNumberFont = new Font(sansFont, 11 * scale); 
 		barNumberColor = new Color(200, 0, 0);
+        
+		markerFont = new Font(serifFont, 14 * scale, Font.STYLE_BOLD);
 		
 		mainGlyphColor = new Color(0,0,0);
 	}

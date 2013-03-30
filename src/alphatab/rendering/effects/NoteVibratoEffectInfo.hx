@@ -22,11 +22,11 @@ class NoteVibratoEffectInfo extends NoteEffectInfoBase
     
     public override function getHeight(renderer : EffectBarRenderer) : Int
     {
-        return Std.int(20 * renderer.getScale());
+        return Std.int(15 * renderer.getScale());
     }
     
     public override function createNewGlyph(renderer:EffectBarRenderer, beat:Beat):Glyph 
     {
-        return new VibratoGlyph();
+        return new VibratoGlyph(0, Std.int(5*renderer.getScale()));
     }
 }

@@ -1071,13 +1071,13 @@ alphatab.rendering.effects.MarkerEffectInfo.__name__ = true;
 alphatab.rendering.effects.MarkerEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.MarkerEffectInfo.prototype = {
 	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(0,0,"Marker");
+		return new alphatab.rendering.glyphs.effects.TextGlyph(0,0,beat.voice.bar.getMasterBar().section.text,renderer.stave.staveGroup.layout.renderer.renderingResources.markerFont);
 	}
 	,getSizingMode: function() {
 		return alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly;
 	}
 	,getHeight: function(renderer) {
-		return 0;
+		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
 	,shouldCreateGlyph: function(renderer,beat) {
 		return beat.index == 0 && beat.voice.bar.getMasterBar().section != null;
@@ -1122,7 +1122,7 @@ alphatab.rendering.effects.TripletFeelEffectInfo.prototype = {
 		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
 	,shouldCreateGlyph: function(renderer,beat) {
-		return beat.index == 0 && (beat.voice.bar.getMasterBar().index == 0 && beat.voice.bar.getMasterBar().tripletFeel != alphatab.model.TripletFeel.NoTripletFeel) || beat.voice.bar.getMasterBar().tripletFeel != beat.voice.bar.getMasterBar().previousMasterBar.tripletFeel;
+		return beat.index == 0 && (beat.voice.bar.getMasterBar().index == 0 && beat.voice.bar.getMasterBar().tripletFeel != alphatab.model.TripletFeel.NoTripletFeel) || beat.voice.bar.getMasterBar().index > 0 && beat.voice.bar.getMasterBar().tripletFeel != beat.voice.bar.getMasterBar().previousMasterBar.tripletFeel;
 	}
 	,__class__: alphatab.rendering.effects.TripletFeelEffectInfo
 }
@@ -1151,7 +1151,7 @@ alphatab.rendering.effects.TextEffectInfo.__name__ = true;
 alphatab.rendering.effects.TextEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.TextEffectInfo.prototype = {
 	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(0,0,"Text");
+		return new alphatab.rendering.glyphs.effects.TextGlyph(0,0,beat.text,renderer.stave.staveGroup.layout.renderer.renderingResources.effectFont);
 	}
 	,getSizingMode: function() {
 		return alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly;
@@ -1170,7 +1170,7 @@ alphatab.rendering.effects.ChordsEffectInfo.__name__ = true;
 alphatab.rendering.effects.ChordsEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.ChordsEffectInfo.prototype = {
 	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(0,0,"Chord");
+		return new alphatab.rendering.glyphs.effects.TextGlyph(0,0,beat.chord.name,renderer.stave.staveGroup.layout.renderer.renderingResources.effectFont);
 	}
 	,getSizingMode: function() {
 		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatOnly;
@@ -1189,10 +1189,10 @@ alphatab.rendering.effects.BeatVibratoEffectInfo.__name__ = true;
 alphatab.rendering.effects.BeatVibratoEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.BeatVibratoEffectInfo.prototype = {
 	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.VibratoGlyph(0,0,1.15);
+		return new alphatab.rendering.glyphs.effects.VibratoGlyph(0,5 * renderer.stave.staveGroup.layout.renderer.scale | 0,1.15);
 	}
 	,getHeight: function(renderer) {
-		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
+		return 17 * renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
 	,getSizingMode: function() {
 		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatToPostBeat;
@@ -1238,10 +1238,10 @@ alphatab.rendering.effects.NoteVibratoEffectInfo.__name__ = true;
 alphatab.rendering.effects.NoteVibratoEffectInfo.__super__ = alphatab.rendering.effects.NoteEffectInfoBase;
 alphatab.rendering.effects.NoteVibratoEffectInfo.prototype = $extend(alphatab.rendering.effects.NoteEffectInfoBase.prototype,{
 	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.VibratoGlyph();
+		return new alphatab.rendering.glyphs.effects.VibratoGlyph(0,5 * renderer.stave.staveGroup.layout.renderer.scale | 0);
 	}
 	,getHeight: function(renderer) {
-		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
+		return 15 * renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
 	,shouldCreateGlyphForNote: function(renderer,note) {
 		return note.vibrato != alphatab.model.VibratoType.None;
@@ -1265,7 +1265,7 @@ alphatab.rendering.effects.DynamicsEffectInfo.__name__ = true;
 alphatab.rendering.effects.DynamicsEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.DynamicsEffectInfo.prototype = {
 	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(0,0,"Dynamics");
+		return new alphatab.rendering.glyphs.effects.DynamicsGlyph(0,0,beat.dynamicValue);
 	}
 	,getSizingMode: function() {
 		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatOnly;
@@ -2584,7 +2584,7 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 		graceNote.string = note.string;
 		graceNote.fret = this._data.readInt8();
 		graceBeat.duration = alphatab.model.Duration.ThirtySecond;
-		this._data.read(1);
+		graceBeat.dynamicValue = this.toDynamicValue(this._data.readInt8());
 		var transition = this._data.readInt8();
 		switch(transition) {
 		case 0:
@@ -2601,6 +2601,7 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 			note.hammerPullOrigin = graceNote;
 			break;
 		}
+		graceNote.dynamicValue = graceBeat.dynamicValue;
 		this._data.read(1);
 		if(this._versionNumber < 500) graceBeat.graceType = alphatab.model.GraceType.BeforeBeat; else {
 			var flags = this._data.readByte();
@@ -2651,8 +2652,7 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 		note.isStaccato = (flags2 & 1) != 0;
 	}
 	,toDynamicValue: function(value) {
-		var _g = value + 1;
-		switch(_g) {
+		switch(value) {
 		case 1:
 			return alphatab.model.DynamicValue.PPP;
 		case 2:
@@ -2663,11 +2663,11 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 			return alphatab.model.DynamicValue.MP;
 		case 5:
 			return alphatab.model.DynamicValue.MF;
-		case 7:
+		case 6:
 			return alphatab.model.DynamicValue.F;
-		case 8:
+		case 7:
 			return alphatab.model.DynamicValue.FF;
-		case 9:
+		case 8:
 			return alphatab.model.DynamicValue.FFF;
 		default:
 			return alphatab.model.DynamicValue.F;
@@ -2687,8 +2687,9 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 		if((flags & 16) != 0) {
 			var dynamicNumber = this._data.readInt8();
 			newNote.dynamicValue = this.toDynamicValue(dynamicNumber);
-			if(beat.dynamicValue == alphatab.model.DynamicValue.MF) beat.dynamicValue = newNote.dynamicValue;
+			if(beat.dynamicValue == null) beat.dynamicValue = newNote.dynamicValue;
 		}
+		if(beat.dynamicValue == null) beat.dynamicValue = alphatab.model.DynamicValue.F;
 		if((flags & 32) != 0) newNote.fret = this._data.readInt8();
 		if((flags & 128) != 0) {
 			newNote.leftHandFinger = this._data.readInt8();
@@ -2982,6 +2983,7 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 			if((stringFlags & 1 << i) != 0 && 6 - i < track.tuning.length) this.readNote(track,bar,voice,newBeat,6 - i);
 			i--;
 		}
+		if(newBeat.dynamicValue == null) newBeat.dynamicValue = alphatab.model.DynamicValue.F;
 		if(this._versionNumber >= 500) {
 			this._data.readByte();
 			var flag = this._data.readByte();
@@ -3716,7 +3718,6 @@ alphatab.model.Beat = function() {
 	this.start = 0;
 	this.tupletDenominator = -1;
 	this.tupletNumerator = -1;
-	this.dynamicValue = alphatab.model.DynamicValue.MF;
 };
 alphatab.model.Beat.__name__ = true;
 alphatab.model.Beat.prototype = {
@@ -4650,40 +4651,34 @@ alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.Grou
 		case 0:
 			pos = this._preBeatPosition.get(i);
 			g.x = pos.x;
-			g.y = pos.y;
 			g.width = pos.width;
 			break;
 		case 1:
 			pos = this._preBeatPosition.get(i);
 			g.x = pos.x;
-			g.y = pos.y;
 			pos = this._onBeatPosition.get(i);
 			g.width = pos.x + pos.width - g.x;
 			break;
 		case 2:
 			pos = this._preBeatPosition.get(i);
 			g.x = pos.x;
-			g.y = pos.y;
 			pos = this._postBeatPosition.get(i);
 			g.width = pos.x + pos.width - g.x;
 			break;
 		case 3:
 			pos = this._onBeatPosition.get(i);
 			g.x = pos.x;
-			g.y = pos.y;
 			g.width = pos.width;
 			break;
 		case 4:
 			pos = this._onBeatPosition.get(i);
 			g.x = pos.x;
-			g.y = pos.y;
 			pos = this._postBeatPosition.get(i);
 			g.width = pos.x + pos.width - g.x;
 			break;
 		case 5:
 			pos = this._postBeatPosition.get(i);
 			g.x = pos.x;
-			g.y = pos.y;
 			g.width = pos.width;
 			break;
 		case 6:
@@ -4794,7 +4789,7 @@ alphatab.rendering.RenderingResources.prototype = {
 	init: function(scale) {
 		var sansFont = "Arial";
 		var serifFont = "Times New Roman";
-		this.effectFont = new alphatab.platform.model.Font(serifFont,11 * scale,2);
+		this.effectFont = new alphatab.platform.model.Font(serifFont,12 * scale,2);
 		this.copyrightFont = new alphatab.platform.model.Font(sansFont,12 * scale,1);
 		this.titleFont = new alphatab.platform.model.Font(serifFont,32 * scale);
 		this.subTitleFont = new alphatab.platform.model.Font(serifFont,20 * scale);
@@ -4805,6 +4800,7 @@ alphatab.rendering.RenderingResources.prototype = {
 		this.barSeperatorColor = new alphatab.platform.model.Color(34,34,17);
 		this.barNumberFont = new alphatab.platform.model.Font(sansFont,11 * scale);
 		this.barNumberColor = new alphatab.platform.model.Color(200,0,0);
+		this.markerFont = new alphatab.platform.model.Font(serifFont,14 * scale,1);
 		this.mainGlyphColor = new alphatab.platform.model.Color(0,0,0);
 	}
 	,__class__: alphatab.rendering.RenderingResources
@@ -7072,6 +7068,100 @@ alphatab.rendering.glyphs.effects.DummyEffectGlyph.prototype = $extend(alphatab.
 		this.width = 20 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
 	,__class__: alphatab.rendering.glyphs.effects.DummyEffectGlyph
+});
+alphatab.rendering.glyphs.effects.DynamicsGlyph = function(x,y,dynamics) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.Glyph.call(this,x,y);
+	this._dynamics = dynamics;
+};
+alphatab.rendering.glyphs.effects.DynamicsGlyph.__name__ = true;
+alphatab.rendering.glyphs.effects.DynamicsGlyph.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.effects.DynamicsGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	f: function() {
+		var f = new alphatab.rendering.glyphs.SvgGlyph(0,0,alphatab.rendering.glyphs.MusicFont.DynamicF,1,1);
+		f.width = 8 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		return f;
+	}
+	,m: function() {
+		var m = new alphatab.rendering.glyphs.SvgGlyph(0,0,alphatab.rendering.glyphs.MusicFont.DynamicM,1,1);
+		m.width = 10 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		return m;
+	}
+	,p: function() {
+		var p = new alphatab.rendering.glyphs.SvgGlyph(0,0,alphatab.rendering.glyphs.MusicFont.DynamicP,1,1);
+		p.width = 8 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		return p;
+	}
+	,paint: function(cx,cy,canvas) {
+		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
+		canvas.setColor(res.mainGlyphColor);
+		var glyphs;
+		var _g = this;
+		switch( (_g._dynamics)[1] ) {
+		case 0:
+			glyphs = [this.p(),this.p(),this.p()];
+			break;
+		case 1:
+			glyphs = [this.p(),this.p()];
+			break;
+		case 2:
+			glyphs = [this.p()];
+			break;
+		case 3:
+			glyphs = [this.m(),this.p()];
+			break;
+		case 4:
+			glyphs = [this.m(),this.f()];
+			break;
+		case 5:
+			glyphs = [this.f()];
+			break;
+		case 6:
+			glyphs = [this.f(),this.f()];
+			break;
+		case 7:
+			glyphs = [this.f(),this.f(),this.f()];
+			break;
+		}
+		var glyphWidth = 0;
+		var _g1 = 0;
+		while(_g1 < glyphs.length) {
+			var g = glyphs[_g1];
+			++_g1;
+			glyphWidth += g.width;
+		}
+		var startX = (this.width - glyphWidth) / 2 | 0;
+		var _g1 = 0;
+		while(_g1 < glyphs.length) {
+			var g = glyphs[_g1];
+			++_g1;
+			g.x = startX;
+			g.y = 0;
+			g.renderer = this.renderer;
+			g.paint(cx + this.x,cy + this.y,canvas);
+			startX += g.width;
+		}
+	}
+	,__class__: alphatab.rendering.glyphs.effects.DynamicsGlyph
+});
+alphatab.rendering.glyphs.effects.TextGlyph = function(x,y,text,font) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.Glyph.call(this,x,y);
+	this._text = text;
+	this._font = font;
+};
+alphatab.rendering.glyphs.effects.TextGlyph.__name__ = true;
+alphatab.rendering.glyphs.effects.TextGlyph.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.effects.TextGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	paint: function(cx,cy,canvas) {
+		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
+		canvas.setFont(this._font);
+		canvas.setColor(res.mainGlyphColor);
+		canvas.fillText(this._text,cx + this.x,cy + this.y);
+	}
+	,__class__: alphatab.rendering.glyphs.effects.TextGlyph
 });
 alphatab.rendering.glyphs.effects.VibratoGlyph = function(x,y,scale) {
 	if(scale == null) scale = 0.9;

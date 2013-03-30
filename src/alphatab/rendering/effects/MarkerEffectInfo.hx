@@ -5,6 +5,7 @@ import alphatab.rendering.EffectBarGlyphSizing;
 import alphatab.rendering.EffectBarRenderer;
 import alphatab.rendering.Glyph;
 import alphatab.rendering.glyphs.effects.DummyEffectGlyph;
+import alphatab.rendering.glyphs.effects.TextGlyph;
 import alphatab.rendering.IEffectBarRendererInfo;
 
 class MarkerEffectInfo implements IEffectBarRendererInfo
@@ -20,7 +21,7 @@ class MarkerEffectInfo implements IEffectBarRendererInfo
     
     public function getHeight(renderer : EffectBarRenderer) : Int
     {
-        return 0;
+        return Std.int(20 * renderer.getScale());
     }
     
     public function getSizingMode() : EffectBarGlyphSizing
@@ -30,7 +31,7 @@ class MarkerEffectInfo implements IEffectBarRendererInfo
 
     public function createNewGlyph(renderer : EffectBarRenderer, beat:Beat) : Glyph
     {
-        return new DummyEffectGlyph(0,0, "Marker");
+        return new TextGlyph(0,0, beat.voice.bar.getMasterBar().section.text, renderer.getResources().markerFont);
     }
     
 }

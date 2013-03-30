@@ -636,6 +636,11 @@ class Gp3To5Importer extends ScoreImporter
             i--;
         }
         
+        if (newBeat.dynamicValue == null)
+        {
+            newBeat.dynamicValue = DynamicValue.F;
+        }
+        
         if (_versionNumber >= 500)
         {
             readUInt8();
@@ -1037,10 +1042,14 @@ class Gp3To5Importer extends ScoreImporter
         {
             var dynamicNumber = _data.readInt8();
             newNote.dynamicValue = toDynamicValue(dynamicNumber);
-            if (beat.dynamicValue == DynamicValue.MF)
+            if (beat.dynamicValue == null)
             {
                 beat.dynamicValue = newNote.dynamicValue;
             }
+        }
+        if (beat.dynamicValue == null)
+        {
+            beat.dynamicValue = DynamicValue.F;
         }
         
         if ( (flags & 0x20) != 0)
@@ -1075,7 +1084,7 @@ class Gp3To5Importer extends ScoreImporter
     
     private function toDynamicValue(value:Int)
     {
-        switch(value + 1)
+        switch(value)
         {
             case 1:
                 return DynamicValue.PPP;
@@ -1087,11 +1096,11 @@ class Gp3To5Importer extends ScoreImporter
                 return DynamicValue.MP;
             case 5:
                 return DynamicValue.MF;
-            case 7:
+            case 6:
                 return DynamicValue.F;
-            case 8:
+            case 7:
                 return DynamicValue.FF;
-            case 9:
+            case 8:
                 return DynamicValue.FFF;
             default:
                 return DynamicValue.F;
@@ -1192,7 +1201,7 @@ class Gp3To5Importer extends ScoreImporter
         graceNote.string = note.string;
         graceNote.fret = _data.readInt8();		
         graceBeat.duration = Duration.ThirtySecond;
-		skip(1); // Dynamic
+        graceBeat.dynamicValue = toDynamicValue(_data.readInt8());
 		var transition = _data.readInt8();
 		switch (transition) 
 		{
@@ -1206,6 +1215,7 @@ class Gp3To5Importer extends ScoreImporter
 				note.isHammerPullDestination = true;
 				note.hammerPullOrigin = graceNote;
         }
+        graceNote.dynamicValue = graceBeat.dynamicValue;
         skip(1); // duration
 
         if (_versionNumber < 500)

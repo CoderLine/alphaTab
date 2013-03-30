@@ -104,20 +104,17 @@ class EffectBarRenderer extends GroupedBarRenderer
             case SinglePreBeatOnly:
                 pos = _preBeatPosition.get(i);
                 g.x = pos.x;
-                g.y = pos.y;
                 g.width = pos.width;
                 
             case SinglePreBeatToOnBeat:
                 pos = _preBeatPosition.get(i);
                 g.x = pos.x;
-                g.y = pos.y;
                 pos = _onBeatPosition.get(i);
                 g.width = (pos.x + pos.width) - g.x;
                 
             case SinglePreBeatToPostBeat:
                 pos = _preBeatPosition.get(i);
                 g.x = pos.x;
-                g.y = pos.y;
                 pos = _postBeatPosition.get(i);
                 g.width = (pos.x + pos.width) - g.x;
 
@@ -125,20 +122,17 @@ class EffectBarRenderer extends GroupedBarRenderer
             case SingleOnBeatOnly:
                 pos = _onBeatPosition.get(i);
                 g.x = pos.x;
-                g.y = pos.y;
                 g.width = pos.width;
 
             case SingleOnBeatToPostBeat:
                 pos = _onBeatPosition.get(i);
                 g.x = pos.x;
-                g.y = pos.y;
                 pos = _postBeatPosition.get(i);
                 g.width = (pos.x + pos.width) - g.x;
 
             case SinglePostBeatOnly:
                 pos = _postBeatPosition.get(i);
                 g.x = pos.x;
-                g.y = pos.y;
                 g.width = pos.width;
 
             case GroupedPreBeatOnly:
@@ -306,6 +300,7 @@ class EffectBarRenderer extends GroupedBarRenderer
     public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
     {
         super.paint(cx, cy, canvas);
+
         var glyphStart = getBeatGlyphsStart();
         for (l in _effectGlyphs)
         {

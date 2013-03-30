@@ -1,5 +1,6 @@
 package alphatab.rendering.glyphs.effects;
 import alphatab.platform.ICanvas;
+import alphatab.platform.model.Color;
 import alphatab.rendering.Glyph;
 import alphatab.rendering.glyphs.MusicFont;
 import alphatab.rendering.glyphs.SvgGlyph;

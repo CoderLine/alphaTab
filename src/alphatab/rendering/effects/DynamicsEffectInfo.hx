@@ -5,6 +5,7 @@ import alphatab.rendering.EffectBarGlyphSizing;
 import alphatab.rendering.EffectBarRenderer;
 import alphatab.rendering.Glyph;
 import alphatab.rendering.glyphs.effects.DummyEffectGlyph;
+import alphatab.rendering.glyphs.effects.DynamicsGlyph;
 import alphatab.rendering.IEffectBarRendererInfo;
 
 class DynamicsEffectInfo implements IEffectBarRendererInfo
@@ -30,6 +31,6 @@ class DynamicsEffectInfo implements IEffectBarRendererInfo
 
     public function createNewGlyph(renderer : EffectBarRenderer, beat:Beat) : Glyph
     {
-        return new DummyEffectGlyph(0,0,"Dynamics");
+        return new DynamicsGlyph(0,0, beat.dynamicValue);
     }
 }
