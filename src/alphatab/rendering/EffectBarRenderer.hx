@@ -290,6 +290,9 @@ class EffectBarRenderer extends GroupedBarRenderer
     {
         super.paint(cx, cy, canvas);
         
+        // canvas.setColor(new Color(0, 0, 200, 100));
+        // canvas.fillRect(cx + x, cy + y, width, height);
+        
         var glyphStart = getBeatGlyphsStart();
         
         for (g in _uniqueEffectGlyphs)

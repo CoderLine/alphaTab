@@ -1132,16 +1132,18 @@ alphatab.rendering.effects.TempoEffectInfo.__name__ = true;
 alphatab.rendering.effects.TempoEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.TempoEffectInfo.prototype = {
 	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(0,0,"Tempo");
+		var tempo;
+		if(beat.voice.bar.getMasterBar().tempoAutomation != null) tempo = beat.voice.bar.getMasterBar().tempoAutomation.value | 0; else tempo = beat.voice.bar.track.score.tempo;
+		return new alphatab.rendering.glyphs.effects.TempoGlyph(0,0,tempo);
 	}
 	,getSizingMode: function() {
 		return alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly;
 	}
 	,getHeight: function(renderer) {
-		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
+		return 25 * renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
 	,shouldCreateGlyph: function(renderer,beat) {
-		return beat.index == 0 && (beat.voice.bar.getMasterBar().tempoAutomation != null && beat.voice.bar.index == 0);
+		return beat.index == 0 && (beat.voice.bar.getMasterBar().tempoAutomation != null || beat.voice.bar.index == 0);
 	}
 	,__class__: alphatab.rendering.effects.TempoEffectInfo
 }
@@ -1271,7 +1273,7 @@ alphatab.rendering.effects.DynamicsEffectInfo.prototype = {
 		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatOnly;
 	}
 	,getHeight: function(renderer) {
-		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
+		return 15 * renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
 	,shouldCreateGlyph: function(renderer,beat) {
 		return beat.index == 0 && beat.voice.bar.index == 0 || beat.previousBeat != null && beat.dynamicValue != beat.previousBeat.dynamicValue;
@@ -7226,6 +7228,26 @@ alphatab.rendering.glyphs.effects.LineRangedGlyph.prototype = $extend(alphatab.r
 		this._isExpanded = true;
 	}
 	,__class__: alphatab.rendering.glyphs.effects.LineRangedGlyph
+});
+alphatab.rendering.glyphs.effects.TempoGlyph = function(x,y,tempo) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.Glyph.call(this,x,y);
+	this._tempo = tempo;
+};
+alphatab.rendering.glyphs.effects.TempoGlyph.__name__ = true;
+alphatab.rendering.glyphs.effects.TempoGlyph.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.effects.TempoGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	paint: function(cx,cy,canvas) {
+		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
+		canvas.setFont(res.markerFont);
+		canvas.setColor(res.mainGlyphColor);
+		var symbol = new alphatab.rendering.glyphs.SvgGlyph(0,0,alphatab.rendering.glyphs.MusicFont.Tempo,1,1);
+		symbol.renderer = this.renderer;
+		symbol.paint(cx + this.x,cy + this.y,canvas);
+		canvas.fillText("" + this._tempo,cx + this.x + (17 * this.renderer.stave.staveGroup.layout.renderer.scale | 0),cy + this.y + (7 * this.renderer.stave.staveGroup.layout.renderer.scale | 0));
+	}
+	,__class__: alphatab.rendering.glyphs.effects.TempoGlyph
 });
 alphatab.rendering.glyphs.effects.TextGlyph = function(x,y,text,font) {
 	if(y == null) y = 0;

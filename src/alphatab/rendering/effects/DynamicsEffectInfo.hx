@@ -21,7 +21,7 @@ class DynamicsEffectInfo implements IEffectBarRendererInfo
     
     public function getHeight(renderer : EffectBarRenderer) : Int
     {
-        return Std.int(20 * renderer.getScale());
+        return Std.int(15 * renderer.getScale());
     }
     
     public function getSizingMode() : EffectBarGlyphSizing
