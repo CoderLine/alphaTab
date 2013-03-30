@@ -6,6 +6,7 @@ import alphatab.rendering.EffectBarGlyphSizing;
 import alphatab.rendering.EffectBarRenderer;
 import alphatab.rendering.Glyph;
 import alphatab.rendering.glyphs.effects.DummyEffectGlyph;
+import alphatab.rendering.glyphs.effects.LineRangedGlyph;
 import alphatab.rendering.IEffectBarRendererInfo;
 
 class LetRingEffectInfo extends NoteEffectInfoBase
@@ -22,7 +23,7 @@ class LetRingEffectInfo extends NoteEffectInfoBase
     
     public override function getHeight(renderer : EffectBarRenderer) : Int
     {
-        return Std.int(20 * renderer.getScale());
+        return Std.int(15 * renderer.getScale());
     }
     
     public override function getSizingMode() : EffectBarGlyphSizing
@@ -32,6 +33,6 @@ class LetRingEffectInfo extends NoteEffectInfoBase
 
     public override function createNewGlyph(renderer : EffectBarRenderer, beat:Beat) : Glyph
     {
-        return new DummyEffectGlyph(0,0, "LetRing");
+        return new LineRangedGlyph(0,0,"LetRing");
     }
 }

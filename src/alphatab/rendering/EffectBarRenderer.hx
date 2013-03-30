@@ -7,32 +7,12 @@ import alphatab.model.Voice;
 import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
 import alphatab.rendering.glyphs.BeatGlyphBase;
+import alphatab.rendering.glyphs.IMultiBeatEffectGlyph;
 import alphatab.rendering.layout.ScoreLayout;
 import haxe.ds.IntMap;
+import haxe.ds.ObjectMap;
 import haxe.ds.StringMap;
 import js.html.svg.AnimatedBoolean;
-
-/**
- * This enum lists and sets the order of the effects in a EffectBar
- * Each of those effects gets it's own "line" within the bar
- */
-//enum EffectBarEffects
-//{
-//    Tempo;
-//    Tuplet;
-//    Fermata;
-//    DynamicValue;
-//    LetRing;
-//    PalmMute;
-//    Vibrato;
-//    TapSlapPop;
-//    LeftHandFinger;
-//    RightHandFinger;
-//    FadeIn;
-//    Chord;
-//    Text;
-//    Marker;
-// }
 
 /**
  * This renderer is responsible for displaying effects above or below the other staves
@@ -44,6 +24,7 @@ class EffectBarRenderer extends GroupedBarRenderer
     private var _preBeatPosition:IntMap<Glyph>;
     private var _onBeatPosition:IntMap<Glyph>;
     private var _postBeatPosition:IntMap<Glyph>;
+    private var _uniqueEffectGlyphs:Array<Glyph>;
     private var _effectGlyphs:IntMap<Glyph>;
     private var _lastBeat:Beat;
     
@@ -54,6 +35,7 @@ class EffectBarRenderer extends GroupedBarRenderer
         _preBeatPosition = new IntMap<Glyph>();
         _onBeatPosition = new IntMap<Glyph>();
         _postBeatPosition = new IntMap<Glyph>();
+        _uniqueEffectGlyphs = new Array<Glyph>();
         _effectGlyphs = new IntMap<Glyph>();
 	}
     
@@ -143,6 +125,7 @@ class EffectBarRenderer extends GroupedBarRenderer
                     var posR = cast(pos.renderer, EffectBarRenderer);
                     var gR = cast(g.renderer, EffectBarRenderer);
                     g.width = (posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width) - (gR.x + gR.getBeatGlyphsStart() + g.x);
+                    if (Std.is(g, IMultiBeatEffectGlyph)) cast(g, IMultiBeatEffectGlyph).expandedTo(cast(_onBeatPosition.get(i), BeatGlyphBase).beat);
                 }
                 
             case GroupedPreBeatToOnBeat:
@@ -153,6 +136,7 @@ class EffectBarRenderer extends GroupedBarRenderer
                     var posR = cast(pos.renderer, EffectBarRenderer);
                     var gR = cast(g.renderer, EffectBarRenderer);
                     g.width = (posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width) - (gR.x + gR.getBeatGlyphsStart() + g.x);
+                    if (Std.is(g, IMultiBeatEffectGlyph)) cast(g, IMultiBeatEffectGlyph).expandedTo(cast(_onBeatPosition.get(i), BeatGlyphBase).beat);
                 }
             
             case GroupedPreBeatToPostBeat:
@@ -163,6 +147,7 @@ class EffectBarRenderer extends GroupedBarRenderer
                     var posR = cast(pos.renderer, EffectBarRenderer);
                     var gR = cast(g.renderer, EffectBarRenderer);
                     g.width = (posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width) - (gR.x + gR.getBeatGlyphsStart() + g.x);
+                    if (Std.is(g, IMultiBeatEffectGlyph)) cast(g, IMultiBeatEffectGlyph).expandedTo(cast(_onBeatPosition.get(i), BeatGlyphBase).beat);
                 }
                 
             case GroupedOnBeatOnly:
@@ -173,6 +158,7 @@ class EffectBarRenderer extends GroupedBarRenderer
                     var posR = cast(pos.renderer, EffectBarRenderer);
                     var gR = cast(g.renderer, EffectBarRenderer);
                     g.width = (posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width) - (gR.x + gR.getBeatGlyphsStart() + g.x);
+                    if (Std.is(g, IMultiBeatEffectGlyph)) cast(g, IMultiBeatEffectGlyph).expandedTo(cast(_onBeatPosition.get(i), BeatGlyphBase).beat);
                 }
                 
             case GroupedOnBeatToPostBeat:
@@ -183,6 +169,7 @@ class EffectBarRenderer extends GroupedBarRenderer
                     var posR = cast(pos.renderer, EffectBarRenderer);
                     var gR = cast(g.renderer, EffectBarRenderer);
                     g.width = (posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width) - (gR.x + gR.getBeatGlyphsStart() + g.x);
+                    if (Std.is(g, IMultiBeatEffectGlyph)) cast(g, IMultiBeatEffectGlyph).expandedTo(cast(_onBeatPosition.get(i), BeatGlyphBase).beat);
                 }
                 
             case GroupedPostBeatOnly:
@@ -193,6 +180,7 @@ class EffectBarRenderer extends GroupedBarRenderer
                     var posR = cast(pos.renderer, EffectBarRenderer);
                     var gR = cast(g.renderer, EffectBarRenderer);
                     g.width = (posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width) - (gR.x + gR.getBeatGlyphsStart() + g.x);
+                    if (Std.is(g, IMultiBeatEffectGlyph)) cast(g, IMultiBeatEffectGlyph).expandedTo(cast(_onBeatPosition.get(i), BeatGlyphBase).beat);
                 }
         }
     }
@@ -244,6 +232,7 @@ class EffectBarRenderer extends GroupedBarRenderer
                 g.renderer = this;
                 g.doLayout();
                 _effectGlyphs.set(b.index, g);
+                _uniqueEffectGlyphs.push(g);
                 
             case GroupedPreBeatOnly, GroupedPreBeatToOnBeat, GroupedPreBeatToPostBeat,
                  GroupedOnBeatOnly, GroupedOnBeatToPostBeat, GroupedPostBeatOnly:
@@ -300,13 +289,14 @@ class EffectBarRenderer extends GroupedBarRenderer
     public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
     {
         super.paint(cx, cy, canvas);
-
+        
         var glyphStart = getBeatGlyphsStart();
-        for (l in _effectGlyphs)
+        
+        for (g in _uniqueEffectGlyphs)
         {
-            if (l.renderer == this)
+            if (g.renderer == this)
             {
-                l.paint(cx + x + glyphStart, cy + y, canvas);                
+                g.paint(cx + x + glyphStart, cy + y, canvas);             
             }
         }
     }
