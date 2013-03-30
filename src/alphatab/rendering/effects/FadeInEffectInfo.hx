@@ -5,6 +5,7 @@ import alphatab.rendering.EffectBarGlyphSizing;
 import alphatab.rendering.EffectBarRenderer;
 import alphatab.rendering.Glyph;
 import alphatab.rendering.glyphs.effects.DummyEffectGlyph;
+import alphatab.rendering.glyphs.effects.FadeInGlyph;
 import alphatab.rendering.IEffectBarRendererInfo;
 
 class FadeInEffectInfo implements IEffectBarRendererInfo
@@ -30,6 +31,6 @@ class FadeInEffectInfo implements IEffectBarRendererInfo
 
     public function createNewGlyph(renderer : EffectBarRenderer, beat:Beat) : Glyph
     {
-        return new DummyEffectGlyph(0,0,"FadeIn");
+        return new FadeInGlyph();
     }
 }

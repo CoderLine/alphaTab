@@ -1308,7 +1308,7 @@ alphatab.rendering.effects.FadeInEffectInfo.__name__ = true;
 alphatab.rendering.effects.FadeInEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.FadeInEffectInfo.prototype = {
 	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(0,0,"FadeIn");
+		return new alphatab.rendering.glyphs.effects.FadeInGlyph();
 	}
 	,getSizingMode: function() {
 		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatOnly;
@@ -7158,6 +7158,25 @@ alphatab.rendering.glyphs.effects.DynamicsGlyph.prototype = $extend(alphatab.ren
 		}
 	}
 	,__class__: alphatab.rendering.glyphs.effects.DynamicsGlyph
+});
+alphatab.rendering.glyphs.effects.FadeInGlyph = function(x,y) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.Glyph.call(this,x,y);
+};
+alphatab.rendering.glyphs.effects.FadeInGlyph.__name__ = true;
+alphatab.rendering.glyphs.effects.FadeInGlyph.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.effects.FadeInGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	paint: function(cx,cy,canvas) {
+		var size = 6 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		canvas.beginPath();
+		canvas.moveTo(cx + this.x,cy + this.y);
+		canvas.quadraticCurveTo(cx + this.x + (this.width / 2 | 0),cy + this.y,cx + this.x + this.width,cy + this.y - size);
+		canvas.moveTo(cx + this.x,cy + this.y);
+		canvas.quadraticCurveTo(cx + this.x + (this.width / 2 | 0),cy + this.y,cx + this.x + this.width,cy + this.y + size);
+		canvas.stroke();
+	}
+	,__class__: alphatab.rendering.glyphs.effects.FadeInGlyph
 });
 alphatab.rendering.glyphs.effects.LineRangedGlyph = function(x,y,label) {
 	if(y == null) y = 0;
