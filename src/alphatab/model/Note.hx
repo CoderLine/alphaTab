@@ -72,7 +72,6 @@ class Note
     public var slideTarget:Note;
     public var vibrato:VibratoType;
     public var isStaccato:Bool;
-    public var tapping:Bool;
     public var tieOrigin:Note;
     public var isTieOrigin:Bool;
     public var isTieDestination:Bool;
@@ -112,7 +111,6 @@ class Note
         slideType = SlideType.None;
         vibrato = VibratoType.None;
         isStaccato = false;
-        tapping = false;
         isTieOrigin = false;
         isTieDestination = false;
         

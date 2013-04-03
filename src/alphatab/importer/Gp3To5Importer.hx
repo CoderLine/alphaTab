@@ -65,8 +65,6 @@ class Gp3To5Importer extends ScoreImporter
     private var _barCount:Int;
     private var _trackCount:Int;
     
-    private var _beatTapping:Bool;
-    
     private var _playbackInfos:Array<PlaybackInformation>;
     
     public function new() 
@@ -345,37 +343,44 @@ class Gp3To5Importer extends ScoreImporter
         }
         
         // alternate endings
-        if ( (flags & 0x10) != 0 && _versionNumber < 500 )
+        if ( (flags & 0x10) != 0 )
         {
-            var currentMasterBar:MasterBar = previousMasterBar;
-            // get the already existing alternatives to ignore them 
-            var existentAlternatives:Int = 0;
-            while (currentMasterBar != null)
+            if (_versionNumber < 500)
             {
-                // found another repeat ending?
-                if ( currentMasterBar.isRepeatEnd() && currentMasterBar != previousMasterBar)
-                    break;
-                // found the opening?
-                if (currentMasterBar.isRepeatStart) 
-                    break;
-                
-                existentAlternatives |= currentMasterBar.alternateEndings;
-            }
-            
-            // now calculate the alternative for this bar
-            var repeatAlternative:Int = 0;
-            var repeatMask = readUInt8();
-            for (i in 0 ... 8)
-            {
-                // only add the repeating if it is not existing
-                var repeating = (1 << i);
-                if (repeatMask > i && (existentAlternatives & repeating) == 0)
+                var currentMasterBar:MasterBar = previousMasterBar;
+                // get the already existing alternatives to ignore them 
+                var existentAlternatives:Int = 0;
+                while (currentMasterBar != null)
                 {
-                    repeatAlternative |=  repeating;
+                    // found another repeat ending?
+                    if ( currentMasterBar.isRepeatEnd() && currentMasterBar != previousMasterBar)
+                        break;
+                    // found the opening?
+                    if (currentMasterBar.isRepeatStart) 
+                        break;
+                    
+                    existentAlternatives |= currentMasterBar.alternateEndings;
                 }
+                
+                // now calculate the alternative for this bar
+                var repeatAlternative:Int = 0;
+                var repeatMask = readUInt8();
+                for (i in 0 ... 8)
+                {
+                    // only add the repeating if it is not existing
+                    var repeating = (1 << i);
+                    if (repeatMask > i && (existentAlternatives & repeating) == 0)
+                    {
+                        repeatAlternative |=  repeating;
+                    }
+                }
+                
+                newMasterBar.alternateEndings = repeatAlternative;
             }
-            
-            newMasterBar.alternateEndings = repeatAlternative;
+            else
+            {
+                newMasterBar.alternateEndings = readUInt8();
+            }
         }
 
         
@@ -786,7 +791,7 @@ class Gp3To5Importer extends ScoreImporter
             switch(slapPop)
             {
                 case 1:
-                    _beatTapping = true;
+                    beat.tap = true;
                 case 2:
                     beat.slap = true;
                 case 3:
@@ -799,7 +804,7 @@ class Gp3To5Importer extends ScoreImporter
             switch(slapPop)
             {
                 case 1:
-                    _beatTapping = true;
+                    beat.tap = true;
                 case 2:
                     beat.slap = true;
                 case 3:
@@ -1012,7 +1017,6 @@ class Gp3To5Importer extends ScoreImporter
     {
         var newNote = new Note();
         newNote.string = track.tuning.length - stringIndex;
-        newNote.tapping = _beatTapping;
         
         var flags = readUInt8();
         if ( (flags & 0x02) != 0 )

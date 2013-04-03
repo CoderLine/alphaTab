@@ -129,6 +129,7 @@
      */
     function load( url, track, success, error ) 
     {
+        debugger;
         var context = $(this).data('alphaTab');
         if(!context) { $.error('alphaTab not initialized!'); }
         alphatab.importer.ScoreLoader.loadScoreAsync(url, 
@@ -178,7 +179,19 @@
      */
     function track( track ) 
     {
+        var context = $(this).data('alphaTab');
+        var score = context.renderer.track.score;
+        if(track < 0 || track >= score.tracks.length) return;
         
+        try
+        {
+            context.renderer.render(score.tracks[track]);
+        }
+        catch(e)
+        {
+            if(e instanceof Error) throw e;
+            else $.error(e);
+        }
     }
     
     /**

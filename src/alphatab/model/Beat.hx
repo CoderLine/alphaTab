@@ -49,6 +49,7 @@ class Beat
     public var pop:Bool;
     public var hasRasgueado:Bool;
     public var slap:Bool;
+    public var tap:Bool;
     public var text:String;
     
     public var brushType:BrushType;

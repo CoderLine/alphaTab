@@ -5,6 +5,7 @@ import alphatab.platform.model.Color;
 import alphatab.rendering.glyphs.BeatGlyphBase;
 import alphatab.rendering.glyphs.ISupportsFinalize;
 import alphatab.rendering.glyphs.SpacingGlyph;
+import alphatab.rendering.glyphs.VoiceContainerGlyph;
 import alphatab.rendering.layout.ScoreLayout;
 import alphatab.rendering.staves.BarSizeInfo;
 
@@ -17,26 +18,24 @@ import alphatab.rendering.staves.BarSizeInfo;
 class GroupedBarRenderer extends BarRendererBase
 {
 	public static inline var KEY_SIZE_PRE = "PRE";
-	public static inline var KEY_SIZE_BEAT = "BEAT";
 	public static inline var KEY_SIZE_POST = "POST";
 	
 	private var _preBeatGlyphs:Array<Glyph>;
-	private var _beatGlyphs:Array<BeatGlyphBase>;
-	private var _beatScaleGlyphs:Array<BeatGlyphBase>;
+    private var _voiceContainer:VoiceContainerGlyph;
 	private var _postBeatGlyphs:Array<Glyph>;
 	 
 	public function new(bar:Bar) 
 	{
 		super(bar);
 		_preBeatGlyphs = new Array<Glyph>();
-	    _beatGlyphs = new Array<BeatGlyphBase>();
-	    _beatScaleGlyphs = new Array<BeatGlyphBase>();
 	    _postBeatGlyphs = new Array<Glyph>();
 	}
 	
 	public override function doLayout():Void 
 	{
 		createPreBeatGlyphs();
+        _voiceContainer = new VoiceContainerGlyph();
+        _voiceContainer.renderer = this;
 		createBeatGlyphs();
 		createPostBeatGlyphs();
 		updateWidth();
@@ -59,13 +58,7 @@ class GroupedBarRenderer extends BarRendererBase
 			sizes.setSize(KEY_SIZE_PRE, preSize);			
 		}
 		
-		for (b in _beatGlyphs)
-		{
-			if (sizes.getIndexedSize(KEY_SIZE_BEAT, b.index) < b.width)
-			{
-				sizes.setIndexedSize(KEY_SIZE_BEAT, b.index, b.width);
-			}
-		}
+        _voiceContainer.registerMaxSizes(sizes);
 		
 		var postSize:Int;
 		if (_postBeatGlyphs.length == 0)
@@ -99,19 +92,7 @@ class GroupedBarRenderer extends BarRendererBase
 		}
 		
 		// on beat glyphs we apply the glyph spacing
-		for (i in 0 ... _beatGlyphs.length)
-		{
-			_beatGlyphs[i].x = (i == 0) ? 0 : _beatGlyphs[i - 1].x + _beatGlyphs[i - 1].width;
-			
-			var beatSize = sizes.getIndexedSize(KEY_SIZE_BEAT, i);
-			var beatDiff = beatSize - _beatGlyphs[i].width;
-			
-			
-			if (beatDiff > 0)
-			{
-				_beatGlyphs[i].applyGlyphSpacing(beatDiff);
-			}
-		}
+        _voiceContainer.applySizes(sizes);
 		
 		// on the post glyphs we add the spacing before all other glyphs
 		var postSize = sizes.getSize(KEY_SIZE_POST);
@@ -157,11 +138,7 @@ class GroupedBarRenderer extends BarRendererBase
 	
 	private function addBeatGlyph(g:BeatGlyphBase)
 	{
-		addGlyph(_beatGlyphs, g);
-		if (g.canScale())
-		{
-			_beatScaleGlyphs.push(g);
-		}
+        _voiceContainer.addGlyph(g);
 	}
 	
 	private function addPostBeatGlyph(g:Glyph)
@@ -202,9 +179,9 @@ class GroupedBarRenderer extends BarRendererBase
 	public function getPostBeatGlyphsStart() : Int
 	{
 		var start = getBeatGlyphsStart();
-		if (_beatGlyphs.length > 0)
+		if (_voiceContainer.beatGlyphs.length > 0)
 		{
-			start += _beatGlyphs[_beatGlyphs.length - 1].x + _beatGlyphs[_beatGlyphs.length - 1].width;
+			start += _voiceContainer.beatGlyphs[_voiceContainer.beatGlyphs.length - 1].x + _voiceContainer.beatGlyphs[_voiceContainer.beatGlyphs.length - 1].width;
 		}
 		return start;		
 	}
@@ -212,45 +189,14 @@ class GroupedBarRenderer extends BarRendererBase
 	public override function applyBarSpacing(spacing:Int):Void 
 	{
         width += spacing;
-         
-        var glyphSpacing = Std.int(spacing / _beatScaleGlyphs.length);
-        for (i in 0 ... _beatGlyphs.length)
-        {
-            var g = _beatGlyphs[i];
-            // default behavior: simply replace glyph to new position
-            if (i == 0)
-            {
-                g.x = 0;
-            }
-            else
-            {
-                g.x = _beatGlyphs[i - 1].x + _beatGlyphs[i - 1].width;
-            }
-             
-			if (g.canScale())
-			{
-				if (g == _beatGlyphs[_beatGlyphs.length - 1])
-				{
-					g.applyGlyphSpacing(glyphSpacing + (spacing - (glyphSpacing * _beatGlyphs.length)));
-				}
-				else
-				{
-					g.applyGlyphSpacing(glyphSpacing);
-				}
-			}
-        }
+     
+        _voiceContainer.applyGlyphSpacing(spacing);
+        
 	}
 	
 	public override function finalizeRenderer(layout:ScoreLayout):Void 
 	{
-        for (i in 0 ... _beatGlyphs.length)
-        {
-            var g = _beatGlyphs[i];
-			if (Std.is(g, ISupportsFinalize))
-			{
-				cast(g, ISupportsFinalize).finalizeGlyph(layout);
-			}
-        }
+        _voiceContainer.finalizeGlyph(layout);
 	}
 	
 	public override function paint(cx:Int, cy:Int, canvas:ICanvas)
@@ -264,10 +210,7 @@ class GroupedBarRenderer extends BarRendererBase
 		}		
 		
 		glyphStartX = getBeatGlyphsStart();
-		for (g in _beatGlyphs)
-		{
-			g.paint(cx + x + glyphStartX, cy + y, canvas);
-		}	
+        _voiceContainer.paint(cx + x + glyphStartX, cy + y, canvas);
 
 		glyphStartX = getPostBeatGlyphsStart();
 		for (g in _postBeatGlyphs)

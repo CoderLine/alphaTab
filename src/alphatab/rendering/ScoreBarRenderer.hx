@@ -497,10 +497,10 @@ class ScoreBarRenderer extends GroupedBarRenderer
 		if (_bar.getMasterBar().isRepeatEnd())
 		{
 			addPostBeatGlyph(new RepeatCloseGlyph(x, 0));
-			if (_bar.getMasterBar().repeatCount > 1)
+			if (_bar.getMasterBar().repeatCount > 2)
 			{
                 var line = isLast() || isLastOfLine() ? -1 : -4;
-				addPostBeatGlyph(new RepeatCountGlyph(0, getScoreY(line, -3), _bar.getMasterBar().repeatCount + 1));
+				addPostBeatGlyph(new RepeatCountGlyph(0, getScoreY(line, -3), _bar.getMasterBar().repeatCount));
 			}
         }
 		else if (_bar.getMasterBar().isDoubleBar)
