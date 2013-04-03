@@ -41,13 +41,9 @@ class TabBarRenderer extends GroupedBarRenderer
 {
 	private static inline var LineSpacing = 10;
 
-	private var _beatPosition:IntMap<TabBeatGlyph>;
-
-		
 	public function new(bar:Bar) 
 	{
 		super(bar);
-		_beatPosition = new IntMap<TabBeatGlyph>();
 	}
 	
 	private inline function getLineOffset()
@@ -57,9 +53,9 @@ class TabBarRenderer extends GroupedBarRenderer
 	
 	public function getNoteX(note:Note, onEnd:Bool=true) 
 	{
-		if (_beatPosition.exists(note.beat.index)) 
+        var beat:TabBeatGlyph = cast getOnBeatPosition(note.beat.voice.index, note.beat.index);
+		if (beat != null) 
 		{
-			var beat:TabBeatGlyph = _beatPosition.get(note.beat.index);
 			return beat.x + beat.noteNumbers.getNoteX(note, onEnd);
 		}
 		return 0;
@@ -67,9 +63,9 @@ class TabBarRenderer extends GroupedBarRenderer
 	
 	public function getNoteY(note:Note) 
 	{
-		if (_beatPosition.exists(note.beat.index)) 
+        var beat:TabBeatGlyph = cast getOnBeatPosition(note.beat.voice.index, note.beat.index);
+		if (beat != null) 
 		{
-			var beat:TabBeatGlyph = _beatPosition.get(note.beat.index);
 			return beat.noteNumbers.getNoteY(note);
 		}
 		return 0;
@@ -117,11 +113,12 @@ class TabBarRenderer extends GroupedBarRenderer
 			addBeatGlyph(pre);
 			
 			var g = new TabBeatGlyph(b);
-			_beatPosition.set(b.index, g);
 			addBeatGlyph(g); 
 			
 			var post = new TabBeatPostNotesGlyph(b);
 			addBeatGlyph(post);
+            
+            registerBeatPositions(b, pre, g, post);
         }
     }	
 	

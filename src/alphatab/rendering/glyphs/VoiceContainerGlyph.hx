@@ -3,6 +3,7 @@ import alphatab.platform.ICanvas;
 import alphatab.rendering.Glyph;
 import alphatab.rendering.layout.ScoreLayout;
 import alphatab.rendering.staves.BarSizeInfo;
+import haxe.ds.IntMap;
 
 
 /**
@@ -16,6 +17,11 @@ class VoiceContainerGlyph extends GlyphGroup implements ISupportsFinalize
     public var beatGlyphs:Array<BeatGlyphBase>;
 	public var beatScaleGlyphs:Array<BeatGlyphBase>;
     
+    public var preBeatPosition:IntMap<Glyph>;
+    public var onBeatPosition:IntMap<Glyph>;
+    public var postBeatPosition:IntMap<Glyph>;
+
+    
     public var voiceIndex:Int;
 
 	public function new(x:Int = 0, y:Int = 0, voiceIndex:Int)
@@ -24,6 +30,10 @@ class VoiceContainerGlyph extends GlyphGroup implements ISupportsFinalize
 	    beatGlyphs = new Array<BeatGlyphBase>();
 	    beatScaleGlyphs = new Array<BeatGlyphBase>();
         this.voiceIndex = voiceIndex;
+        
+        preBeatPosition = new IntMap<Glyph>();
+        onBeatPosition = new IntMap<Glyph>();
+        postBeatPosition = new IntMap<Glyph>();
 	}
 
     public override function applyGlyphSpacing(spacing:Int):Void 

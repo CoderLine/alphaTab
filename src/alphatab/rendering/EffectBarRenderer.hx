@@ -21,9 +21,6 @@ import js.html.svg.AnimatedBoolean;
 class EffectBarRenderer extends GroupedBarRenderer
 {
     private var _info:IEffectBarRendererInfo;
-    private var _preBeatPosition:IntMap<Glyph>;
-    private var _onBeatPosition:IntMap<Glyph>;
-    private var _postBeatPosition:IntMap<Glyph>;
     private var _uniqueEffectGlyphs:Array<Glyph>;
     private var _effectGlyphs:IntMap<Glyph>;
     private var _lastBeat:Beat;
@@ -32,9 +29,6 @@ class EffectBarRenderer extends GroupedBarRenderer
 	{
 		super(bar);
         _info = info;
-        _preBeatPosition = new IntMap<Glyph>();
-        _onBeatPosition = new IntMap<Glyph>();
-        _postBeatPosition = new IntMap<Glyph>();
         _uniqueEffectGlyphs = new Array<Glyph>();
         _effectGlyphs = new IntMap<Glyph>();
 	}
@@ -66,121 +60,121 @@ class EffectBarRenderer extends GroupedBarRenderer
                 prevGlyph = prevRenderer._effectGlyphs.get(prevRenderer._lastBeat.index);
             }
         }
-        for (i in _effectGlyphs.keys())
+        for (beatIndex in _effectGlyphs.keys())
         {
-            var effect:Glyph = _effectGlyphs.get(i);
+            var effect:Glyph = _effectGlyphs.get(beatIndex);
             
-            alignGlyph(_info.getSizingMode(), i, prevGlyph);
+            alignGlyph(_info.getSizingMode(), beatIndex, 0, prevGlyph);
             
             prevGlyph = effect;
             isEmpty = false;
         }
     }
     
-    private function alignGlyph(sizing:EffectBarGlyphSizing, i:Int, prevGlyph:Glyph)
+    private function alignGlyph(sizing:EffectBarGlyphSizing, beatIndex:Int, voiceIndex:Int, prevGlyph:Glyph)
     {
-        var g:Glyph = _effectGlyphs.get(i); 
+        var g:Glyph = _effectGlyphs.get(beatIndex); 
         var pos:Glyph; 
         switch(sizing)
         {
             case SinglePreBeatOnly:
-                pos = _preBeatPosition.get(i);
+                pos = getPreBeatPosition(voiceIndex, beatIndex);
                 g.x = pos.x;
                 g.width = pos.width;
                 
             case SinglePreBeatToOnBeat:
-                pos = _preBeatPosition.get(i);
+                pos = getPreBeatPosition(voiceIndex, beatIndex);
                 g.x = pos.x;
-                pos = _onBeatPosition.get(i);
+                pos = getOnBeatPosition(voiceIndex, beatIndex);
                 g.width = (pos.x + pos.width) - g.x;
                 
             case SinglePreBeatToPostBeat:
-                pos = _preBeatPosition.get(i);
+                pos = getPreBeatPosition(voiceIndex, beatIndex);
                 g.x = pos.x;
-                pos = _postBeatPosition.get(i);
+                pos = getPostBeatPosition(voiceIndex, beatIndex);
                 g.width = (pos.x + pos.width) - g.x;
 
         
             case SingleOnBeatOnly:
-                pos = _onBeatPosition.get(i);
+                pos = getOnBeatPosition(voiceIndex, beatIndex);
                 g.x = pos.x;
                 g.width = pos.width;
 
             case SingleOnBeatToPostBeat:
-                pos = _onBeatPosition.get(i);
+                pos = getOnBeatPosition(voiceIndex, beatIndex);
                 g.x = pos.x;
-                pos = _postBeatPosition.get(i);
+                pos = getPostBeatPosition(voiceIndex, beatIndex);
                 g.width = (pos.x + pos.width) - g.x;
 
             case SinglePostBeatOnly:
-                pos = _postBeatPosition.get(i);
+                pos = getPostBeatPosition(voiceIndex, beatIndex);
                 g.x = pos.x;
                 g.width = pos.width;
 
             case GroupedPreBeatOnly:
-                if (g != prevGlyph) { alignGlyph(EffectBarGlyphSizing.SinglePreBeatOnly, i, prevGlyph); }
+                if (g != prevGlyph) { alignGlyph(EffectBarGlyphSizing.SinglePreBeatOnly, beatIndex, voiceIndex, prevGlyph); }
                 else 
                 {
-                    pos = _preBeatPosition.get(i);
+                    pos = getPreBeatPosition(voiceIndex, beatIndex);
                     var posR = cast(pos.renderer, EffectBarRenderer);
                     var gR = cast(g.renderer, EffectBarRenderer);
                     g.width = (posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width) - (gR.x + gR.getBeatGlyphsStart() + g.x);
-                    if (Std.is(g, IMultiBeatEffectGlyph)) cast(g, IMultiBeatEffectGlyph).expandedTo(cast(_onBeatPosition.get(i), BeatGlyphBase).beat);
+                    if (Std.is(g, IMultiBeatEffectGlyph)) cast(g, IMultiBeatEffectGlyph).expandedTo(cast(getOnBeatPosition(voiceIndex, beatIndex), BeatGlyphBase).beat);
                 }
                 
             case GroupedPreBeatToOnBeat:
-                if (g != prevGlyph) { alignGlyph(EffectBarGlyphSizing.SinglePreBeatToOnBeat, i, prevGlyph); }
+                if (g != prevGlyph) { alignGlyph(EffectBarGlyphSizing.SinglePreBeatToOnBeat, beatIndex, voiceIndex, prevGlyph); }
                 else 
                 {
-                    pos = _onBeatPosition.get(i);
+                    pos = getOnBeatPosition(voiceIndex, beatIndex);
                     var posR = cast(pos.renderer, EffectBarRenderer);
                     var gR = cast(g.renderer, EffectBarRenderer);
                     g.width = (posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width) - (gR.x + gR.getBeatGlyphsStart() + g.x);
-                    if (Std.is(g, IMultiBeatEffectGlyph)) cast(g, IMultiBeatEffectGlyph).expandedTo(cast(_onBeatPosition.get(i), BeatGlyphBase).beat);
+                    if (Std.is(g, IMultiBeatEffectGlyph)) cast(g, IMultiBeatEffectGlyph).expandedTo(cast(getOnBeatPosition(voiceIndex, beatIndex), BeatGlyphBase).beat);
                 }
             
             case GroupedPreBeatToPostBeat:
-                if (g != prevGlyph) { alignGlyph(EffectBarGlyphSizing.SinglePreBeatToPostBeat, i, prevGlyph); }
+                if (g != prevGlyph) { alignGlyph(EffectBarGlyphSizing.SinglePreBeatToPostBeat, beatIndex, voiceIndex, prevGlyph); }
                 else 
                 {
-                    pos = _postBeatPosition.get(i);
+                    pos = getPostBeatPosition(voiceIndex, beatIndex);
                     var posR = cast(pos.renderer, EffectBarRenderer);
                     var gR = cast(g.renderer, EffectBarRenderer);
                     g.width = (posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width) - (gR.x + gR.getBeatGlyphsStart() + g.x);
-                    if (Std.is(g, IMultiBeatEffectGlyph)) cast(g, IMultiBeatEffectGlyph).expandedTo(cast(_onBeatPosition.get(i), BeatGlyphBase).beat);
+                    if (Std.is(g, IMultiBeatEffectGlyph)) cast(g, IMultiBeatEffectGlyph).expandedTo(cast(getOnBeatPosition(voiceIndex, beatIndex), BeatGlyphBase).beat);
                 }
                 
             case GroupedOnBeatOnly:
-                if (g != prevGlyph) { alignGlyph(EffectBarGlyphSizing.SingleOnBeatOnly, i, prevGlyph); }
+                if (g != prevGlyph) { alignGlyph(EffectBarGlyphSizing.SingleOnBeatOnly, beatIndex, voiceIndex, prevGlyph); }
                 else 
                 {
-                    pos = _onBeatPosition.get(i);
+                    pos = getOnBeatPosition(voiceIndex, beatIndex);
                     var posR = cast(pos.renderer, EffectBarRenderer);
                     var gR = cast(g.renderer, EffectBarRenderer);
                     g.width = (posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width) - (gR.x + gR.getBeatGlyphsStart() + g.x);
-                    if (Std.is(g, IMultiBeatEffectGlyph)) cast(g, IMultiBeatEffectGlyph).expandedTo(cast(_onBeatPosition.get(i), BeatGlyphBase).beat);
+                    if (Std.is(g, IMultiBeatEffectGlyph)) cast(g, IMultiBeatEffectGlyph).expandedTo(cast(getOnBeatPosition(voiceIndex, beatIndex), BeatGlyphBase).beat);
                 }
                 
             case GroupedOnBeatToPostBeat:
-                if (g != prevGlyph) { alignGlyph(EffectBarGlyphSizing.SingleOnBeatToPostBeat, i, prevGlyph); }
+                if (g != prevGlyph) { alignGlyph(EffectBarGlyphSizing.SingleOnBeatToPostBeat, beatIndex, voiceIndex, prevGlyph); }
                 else 
                 {
-                    pos = _postBeatPosition.get(i);
+                    pos = getPostBeatPosition(voiceIndex, beatIndex);
                     var posR = cast(pos.renderer, EffectBarRenderer);
                     var gR = cast(g.renderer, EffectBarRenderer);
                     g.width = (posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width) - (gR.x + gR.getBeatGlyphsStart() + g.x);
-                    if (Std.is(g, IMultiBeatEffectGlyph)) cast(g, IMultiBeatEffectGlyph).expandedTo(cast(_onBeatPosition.get(i), BeatGlyphBase).beat);
+                    if (Std.is(g, IMultiBeatEffectGlyph)) cast(g, IMultiBeatEffectGlyph).expandedTo(cast(getOnBeatPosition(voiceIndex, beatIndex), BeatGlyphBase).beat);
                 }
                 
             case GroupedPostBeatOnly:
-                if (g != prevGlyph) { alignGlyph(EffectBarGlyphSizing.GroupedPostBeatOnly, i, prevGlyph); }
+                if (g != prevGlyph) { alignGlyph(EffectBarGlyphSizing.GroupedPostBeatOnly, beatIndex, voiceIndex, prevGlyph); }
                 else 
                 {
-                    pos = _postBeatPosition.get(i);
+                    pos = getPostBeatPosition(voiceIndex, beatIndex);
                     var posR = cast(pos.renderer, EffectBarRenderer);
                     var gR = cast(g.renderer, EffectBarRenderer);
                     g.width = (posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width) - (gR.x + gR.getBeatGlyphsStart() + g.x);
-                    if (Std.is(g, IMultiBeatEffectGlyph)) cast(g, IMultiBeatEffectGlyph).expandedTo(cast(_onBeatPosition.get(i), BeatGlyphBase).beat);
+                    if (Std.is(g, IMultiBeatEffectGlyph)) cast(g, IMultiBeatEffectGlyph).expandedTo(cast(getOnBeatPosition(voiceIndex, beatIndex), BeatGlyphBase).beat);
                 }
         }
     }
@@ -202,16 +196,15 @@ class EffectBarRenderer extends GroupedBarRenderer
             // we create empty glyphs as alignment references and to get the 
             // effect bar sized
 			var pre = new BeatGlyphBase(b);
-            _preBeatPosition.set(b.index, pre);
 			addBeatGlyph(pre);
 			
 			var g = new BeatGlyphBase(b);
-			_onBeatPosition.set(b.index, g);
 			addBeatGlyph(g); 
 			
 			var post = new BeatGlyphBase(b);
-            _postBeatPosition.set(b.index, post);
 			addBeatGlyph(post);
+            
+            registerBeatPositions(b, pre, g, post);
             
             if (_info.shouldCreateGlyph(this, b))
             {

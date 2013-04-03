@@ -4489,14 +4489,32 @@ alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.Bar
 	,addPostBeatGlyph: function(g) {
 		this.addGlyph(this._postBeatGlyphs,g);
 	}
-	,addBeatGlyph: function(g) {
+	,getPostBeatPosition: function(voice,beat) {
+		return this.getOrCreateVoiceContainer(voice).postBeatPosition.get(beat);
+	}
+	,getOnBeatPosition: function(voice,beat) {
+		return this.getOrCreateVoiceContainer(voice).onBeatPosition.get(beat);
+	}
+	,getPreBeatPosition: function(voice,beat) {
+		return this.getOrCreateVoiceContainer(voice).preBeatPosition.get(beat);
+	}
+	,registerBeatPositions: function(b,pre,on,post) {
+		var c = this.getOrCreateVoiceContainer(b.voice.index);
+		c.preBeatPosition.set(b.index,pre);
+		c.onBeatPosition.set(b.index,on);
+		c.postBeatPosition.set(b.index,post);
+	}
+	,getOrCreateVoiceContainer: function(voiceIndex) {
 		var c;
-		if(!this._voiceContainers.exists(g.beat.voice.index)) {
-			c = new alphatab.rendering.glyphs.VoiceContainerGlyph(0,0,g.beat.voice.index);
+		if(!this._voiceContainers.exists(voiceIndex)) {
+			c = new alphatab.rendering.glyphs.VoiceContainerGlyph(0,0,voiceIndex);
 			c.renderer = this;
-			this._voiceContainers.set(g.beat.voice.index,c);
-		} else c = this._voiceContainers.get(g.beat.voice.index);
-		c.addGlyph(g);
+			this._voiceContainers.set(voiceIndex,c);
+		} else c = this._voiceContainers.get(voiceIndex);
+		return c;
+	}
+	,addBeatGlyph: function(g) {
+		this.getOrCreateVoiceContainer(g.beat.voice.index).addGlyph(g);
 	}
 	,addPreBeatGlyph: function(g) {
 		this.addGlyph(this._preBeatGlyphs,g);
@@ -4562,9 +4580,6 @@ alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.Bar
 alphatab.rendering.EffectBarRenderer = function(bar,info) {
 	alphatab.rendering.GroupedBarRenderer.call(this,bar);
 	this._info = info;
-	this._preBeatPosition = new haxe.ds.IntMap();
-	this._onBeatPosition = new haxe.ds.IntMap();
-	this._postBeatPosition = new haxe.ds.IntMap();
 	this._uniqueEffectGlyphs = new Array();
 	this._effectGlyphs = new haxe.ds.IntMap();
 };
@@ -4631,14 +4646,12 @@ alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.Grou
 			var b = _g1[_g];
 			++_g;
 			var pre = new alphatab.rendering.glyphs.BeatGlyphBase(b);
-			this._preBeatPosition.set(b.index,pre);
 			this.addBeatGlyph(pre);
 			var g = new alphatab.rendering.glyphs.BeatGlyphBase(b);
-			this._onBeatPosition.set(b.index,g);
 			this.addBeatGlyph(g);
 			var post = new alphatab.rendering.glyphs.BeatGlyphBase(b);
-			this._postBeatPosition.set(b.index,post);
 			this.addBeatGlyph(post);
+			this.registerBeatPositions(b,pre,g,post);
 			if(this._info.shouldCreateGlyph(this,b)) this.createOrResizeGlyph(this._info.getSizingMode(),b);
 			this._lastBeat = b;
 		}
@@ -4648,95 +4661,95 @@ alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.Grou
 	}
 	,createPreBeatGlyphs: function() {
 	}
-	,alignGlyph: function(sizing,i,prevGlyph) {
-		var g = this._effectGlyphs.get(i);
+	,alignGlyph: function(sizing,beatIndex,voiceIndex,prevGlyph) {
+		var g = this._effectGlyphs.get(beatIndex);
 		var pos;
 		switch( (sizing)[1] ) {
 		case 0:
-			pos = this._preBeatPosition.get(i);
+			pos = this.getPreBeatPosition(voiceIndex,beatIndex);
 			g.x = pos.x;
 			g.width = pos.width;
 			break;
 		case 1:
-			pos = this._preBeatPosition.get(i);
+			pos = this.getPreBeatPosition(voiceIndex,beatIndex);
 			g.x = pos.x;
-			pos = this._onBeatPosition.get(i);
+			pos = this.getOnBeatPosition(voiceIndex,beatIndex);
 			g.width = pos.x + pos.width - g.x;
 			break;
 		case 2:
-			pos = this._preBeatPosition.get(i);
+			pos = this.getPreBeatPosition(voiceIndex,beatIndex);
 			g.x = pos.x;
-			pos = this._postBeatPosition.get(i);
+			pos = this.getPostBeatPosition(voiceIndex,beatIndex);
 			g.width = pos.x + pos.width - g.x;
 			break;
 		case 3:
-			pos = this._onBeatPosition.get(i);
+			pos = this.getOnBeatPosition(voiceIndex,beatIndex);
 			g.x = pos.x;
 			g.width = pos.width;
 			break;
 		case 4:
-			pos = this._onBeatPosition.get(i);
+			pos = this.getOnBeatPosition(voiceIndex,beatIndex);
 			g.x = pos.x;
-			pos = this._postBeatPosition.get(i);
+			pos = this.getPostBeatPosition(voiceIndex,beatIndex);
 			g.width = pos.x + pos.width - g.x;
 			break;
 		case 5:
-			pos = this._postBeatPosition.get(i);
+			pos = this.getPostBeatPosition(voiceIndex,beatIndex);
 			g.x = pos.x;
 			g.width = pos.width;
 			break;
 		case 6:
-			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,i,prevGlyph); else {
-				pos = this._preBeatPosition.get(i);
+			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,beatIndex,voiceIndex,prevGlyph); else {
+				pos = this.getPreBeatPosition(voiceIndex,beatIndex);
 				var posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
 				var gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
 				g.width = posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width - (gR.x + gR.getBeatGlyphsStart() + g.x);
-				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo((js.Boot.__cast(this._onBeatPosition.get(i) , alphatab.rendering.glyphs.BeatGlyphBase)).beat);
+				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo((js.Boot.__cast(this.getOnBeatPosition(voiceIndex,beatIndex) , alphatab.rendering.glyphs.BeatGlyphBase)).beat);
 			}
 			break;
 		case 7:
-			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatToOnBeat,i,prevGlyph); else {
-				pos = this._onBeatPosition.get(i);
+			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatToOnBeat,beatIndex,voiceIndex,prevGlyph); else {
+				pos = this.getOnBeatPosition(voiceIndex,beatIndex);
 				var posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
 				var gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
 				g.width = posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width - (gR.x + gR.getBeatGlyphsStart() + g.x);
-				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo((js.Boot.__cast(this._onBeatPosition.get(i) , alphatab.rendering.glyphs.BeatGlyphBase)).beat);
+				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo((js.Boot.__cast(this.getOnBeatPosition(voiceIndex,beatIndex) , alphatab.rendering.glyphs.BeatGlyphBase)).beat);
 			}
 			break;
 		case 8:
-			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatToPostBeat,i,prevGlyph); else {
-				pos = this._postBeatPosition.get(i);
+			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatToPostBeat,beatIndex,voiceIndex,prevGlyph); else {
+				pos = this.getPostBeatPosition(voiceIndex,beatIndex);
 				var posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
 				var gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
 				g.width = posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width - (gR.x + gR.getBeatGlyphsStart() + g.x);
-				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo((js.Boot.__cast(this._onBeatPosition.get(i) , alphatab.rendering.glyphs.BeatGlyphBase)).beat);
+				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo((js.Boot.__cast(this.getOnBeatPosition(voiceIndex,beatIndex) , alphatab.rendering.glyphs.BeatGlyphBase)).beat);
 			}
 			break;
 		case 9:
-			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatOnly,i,prevGlyph); else {
-				pos = this._onBeatPosition.get(i);
+			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatOnly,beatIndex,voiceIndex,prevGlyph); else {
+				pos = this.getOnBeatPosition(voiceIndex,beatIndex);
 				var posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
 				var gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
 				g.width = posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width - (gR.x + gR.getBeatGlyphsStart() + g.x);
-				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo((js.Boot.__cast(this._onBeatPosition.get(i) , alphatab.rendering.glyphs.BeatGlyphBase)).beat);
+				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo((js.Boot.__cast(this.getOnBeatPosition(voiceIndex,beatIndex) , alphatab.rendering.glyphs.BeatGlyphBase)).beat);
 			}
 			break;
 		case 10:
-			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatToPostBeat,i,prevGlyph); else {
-				pos = this._postBeatPosition.get(i);
+			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatToPostBeat,beatIndex,voiceIndex,prevGlyph); else {
+				pos = this.getPostBeatPosition(voiceIndex,beatIndex);
 				var posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
 				var gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
 				g.width = posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width - (gR.x + gR.getBeatGlyphsStart() + g.x);
-				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo((js.Boot.__cast(this._onBeatPosition.get(i) , alphatab.rendering.glyphs.BeatGlyphBase)).beat);
+				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo((js.Boot.__cast(this.getOnBeatPosition(voiceIndex,beatIndex) , alphatab.rendering.glyphs.BeatGlyphBase)).beat);
 			}
 			break;
 		case 11:
-			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.GroupedPostBeatOnly,i,prevGlyph); else {
-				pos = this._postBeatPosition.get(i);
+			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.GroupedPostBeatOnly,beatIndex,voiceIndex,prevGlyph); else {
+				pos = this.getPostBeatPosition(voiceIndex,beatIndex);
 				var posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
 				var gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
 				g.width = posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width - (gR.x + gR.getBeatGlyphsStart() + g.x);
-				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo((js.Boot.__cast(this._onBeatPosition.get(i) , alphatab.rendering.glyphs.BeatGlyphBase)).beat);
+				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo((js.Boot.__cast(this.getOnBeatPosition(voiceIndex,beatIndex) , alphatab.rendering.glyphs.BeatGlyphBase)).beat);
 			}
 			break;
 		}
@@ -4751,9 +4764,9 @@ alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.Grou
 		}
 		var $it0 = this._effectGlyphs.keys();
 		while( $it0.hasNext() ) {
-			var i = $it0.next();
-			var effect = this._effectGlyphs.get(i);
-			this.alignGlyph(this._info.getSizingMode(),i,prevGlyph);
+			var beatIndex = $it0.next();
+			var effect = this._effectGlyphs.get(beatIndex);
+			this.alignGlyph(this._info.getSizingMode(),beatIndex,0,prevGlyph);
 			prevGlyph = effect;
 			this.isEmpty = false;
 		}
@@ -4819,7 +4832,6 @@ alphatab.rendering.ScoreBarRenderer = function(bar) {
 	alphatab.rendering.GroupedBarRenderer.call(this,bar);
 	this.accidentalHelper = new alphatab.rendering.utils.AccidentalHelper();
 	this._beamHelpers = new Array();
-	this._beatPosition = new haxe.ds.IntMap();
 };
 alphatab.rendering.ScoreBarRenderer.__name__ = true;
 alphatab.rendering.ScoreBarRenderer.paintSingleBar = function(canvas,x1,y1,x2,y2,size) {
@@ -4885,11 +4897,11 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 			var pre = new alphatab.rendering.glyphs.ScoreBeatPreNotesGlyph(b);
 			this.addBeatGlyph(pre);
 			var g = new alphatab.rendering.glyphs.ScoreBeatGlyph(b);
-			this._beatPosition.set(b.index,g);
 			g.beamingHelper = this._currentBeamHelper;
 			this.addBeatGlyph(g);
 			var post = new alphatab.rendering.glyphs.ScoreBeatPostNotesGlyph(b);
 			this.addBeatGlyph(post);
+			this.registerBeatPositions(b,pre,g,post);
 		}
 		this._currentBeamHelper = null;
 	}
@@ -5168,25 +5180,19 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 		return this.getGlyphOverflow();
 	}
 	,getNoteY: function(note) {
-		if(this._beatPosition.exists(note.beat.index)) {
-			var beat = this._beatPosition.get(note.beat.index);
-			return beat.noteHeads.getNoteY(note);
-		}
+		var beat = this.getOnBeatPosition(note.beat.voice.index,note.beat.index);
+		if(beat != null) return beat.noteHeads.getNoteY(note);
 		return 0;
 	}
 	,getNoteX: function(note,onEnd) {
 		if(onEnd == null) onEnd = true;
-		if(this._beatPosition.exists(note.beat.index)) {
-			var beat = this._beatPosition.get(note.beat.index);
-			return beat.x + beat.noteHeads.getNoteX(note,onEnd);
-		}
+		var g = this.getOnBeatPosition(note.beat.voice.index,note.beat.index);
+		if(g != null) return g.x + g.noteHeads.getNoteX(note,onEnd);
 		return 0;
 	}
 	,getBeatDirection: function(beat) {
-		if(this._beatPosition.exists(beat.index)) {
-			var g = this._beatPosition.get(beat.index);
-			return g.noteHeads.getDirection();
-		}
+		var g = this.getOnBeatPosition(beat.voice.index,beat.index);
+		if(g != null) return g.noteHeads.getDirection();
 		return alphatab.rendering.utils.BeamDirection.Up;
 	}
 	,__class__: alphatab.rendering.ScoreBarRenderer
@@ -5238,7 +5244,6 @@ alphatab.rendering.ScoreRenderer.prototype = {
 }
 alphatab.rendering.TabBarRenderer = function(bar) {
 	alphatab.rendering.GroupedBarRenderer.call(this,bar);
-	this._beatPosition = new haxe.ds.IntMap();
 };
 alphatab.rendering.TabBarRenderer.__name__ = true;
 alphatab.rendering.TabBarRenderer.__super__ = alphatab.rendering.GroupedBarRenderer;
@@ -5300,10 +5305,10 @@ alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.Grouped
 			var pre = new alphatab.rendering.glyphs.TabBeatPreNotesGlyph(b);
 			this.addBeatGlyph(pre);
 			var g = new alphatab.rendering.glyphs.TabBeatGlyph(b);
-			this._beatPosition.set(b.index,g);
 			this.addBeatGlyph(g);
 			var post = new alphatab.rendering.glyphs.TabBeatPostNotesGlyph(b);
 			this.addBeatGlyph(post);
+			this.registerBeatPositions(b,pre,g,post);
 		}
 	}
 	,createBeatGlyphs: function() {
@@ -5323,18 +5328,14 @@ alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.Grouped
 		}
 	}
 	,getNoteY: function(note) {
-		if(this._beatPosition.exists(note.beat.index)) {
-			var beat = this._beatPosition.get(note.beat.index);
-			return beat.noteNumbers.getNoteY(note);
-		}
+		var beat = this.getOnBeatPosition(note.beat.voice.index,note.beat.index);
+		if(beat != null) return beat.noteNumbers.getNoteY(note);
 		return 0;
 	}
 	,getNoteX: function(note,onEnd) {
 		if(onEnd == null) onEnd = true;
-		if(this._beatPosition.exists(note.beat.index)) {
-			var beat = this._beatPosition.get(note.beat.index);
-			return beat.x + beat.noteNumbers.getNoteX(note,onEnd);
-		}
+		var beat = this.getOnBeatPosition(note.beat.voice.index,note.beat.index);
+		if(beat != null) return beat.x + beat.noteNumbers.getNoteX(note,onEnd);
 		return 0;
 	}
 	,getLineOffset: function() {
@@ -7068,6 +7069,9 @@ alphatab.rendering.glyphs.VoiceContainerGlyph = function(x,y,voiceIndex) {
 	this.beatGlyphs = new Array();
 	this.beatScaleGlyphs = new Array();
 	this.voiceIndex = voiceIndex;
+	this.preBeatPosition = new haxe.ds.IntMap();
+	this.onBeatPosition = new haxe.ds.IntMap();
+	this.postBeatPosition = new haxe.ds.IntMap();
 };
 alphatab.rendering.glyphs.VoiceContainerGlyph.__name__ = true;
 alphatab.rendering.glyphs.VoiceContainerGlyph.__interfaces__ = [alphatab.rendering.glyphs.ISupportsFinalize];

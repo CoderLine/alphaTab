@@ -104,21 +104,19 @@ class ScoreBarRenderer extends GroupedBarRenderer
     private var _beamHelpers:Array<BeamingHelper>;
 	
     private var _currentBeamHelper:BeamingHelper;
-	private var _beatPosition:IntMap<ScoreBeatGlyph>;
     
 	public function new(bar:alphatab.model.Bar) 
 	{
 		super(bar);
         accidentalHelper = new AccidentalHelper();
         _beamHelpers = new Array<BeamingHelper>();
-		_beatPosition = new IntMap<ScoreBeatGlyph>();
 	}
 	
 	public function getBeatDirection(beat:Beat) : BeamDirection
 	{
-		if (_beatPosition.exists(beat.index)) 
+        var g:ScoreBeatGlyph = cast getOnBeatPosition(beat.voice.index, beat.index);
+		if (g != null) 
 		{
-			var g:ScoreBeatGlyph = _beatPosition.get(beat.index);
 			return g.noteHeads.getDirection();
 		}
 		return BeamDirection.Up;
@@ -126,19 +124,19 @@ class ScoreBarRenderer extends GroupedBarRenderer
 	
 	public function getNoteX(note:Note, onEnd:Bool=true) 
 	{
-		if (_beatPosition.exists(note.beat.index)) 
+        var g:ScoreBeatGlyph = cast getOnBeatPosition(note.beat.voice.index, note.beat.index);
+		if (g != null) 
 		{
-			var beat:ScoreBeatGlyph = _beatPosition.get(note.beat.index);
-			return beat.x + beat.noteHeads.getNoteX(note, onEnd);
+			return g.x + g.noteHeads.getNoteX(note, onEnd);
 		}
 		return 0;
 	}	
 	
 	public function getNoteY(note:Note) 
 	{
-		if (_beatPosition.exists(note.beat.index)) 
+        var beat:ScoreBeatGlyph = cast getOnBeatPosition(note.beat.voice.index, note.beat.index);
+		if (beat != null)
 		{
-			var beat:ScoreBeatGlyph = _beatPosition.get(note.beat.index);
 			return beat.noteHeads.getNoteY(note);
 		}
 		return 0;
@@ -599,12 +597,13 @@ class ScoreBarRenderer extends GroupedBarRenderer
 			addBeatGlyph(pre);
 			
 			var g = new ScoreBeatGlyph(b);
-			_beatPosition.set(b.index, g);
 			g.beamingHelper = _currentBeamHelper;
 			addBeatGlyph(g); 
 			
 			var post = new ScoreBeatPostNotesGlyph(b);
 			addBeatGlyph(post);
+            
+            registerBeatPositions(b, pre, g, post);
 
         }
         

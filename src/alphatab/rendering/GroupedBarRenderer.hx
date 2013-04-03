@@ -1,5 +1,6 @@
 package alphatab.rendering;
 import alphatab.model.Bar;
+import alphatab.model.Beat;
 import alphatab.model.Voice;
 import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
@@ -145,19 +146,49 @@ class GroupedBarRenderer extends BarRendererBase
 	
 	private function addBeatGlyph(g:BeatGlyphBase)
 	{
+        getOrCreateVoiceContainer(g.beat.voice.index).addGlyph(g);
+	}
+    
+    private function getOrCreateVoiceContainer(voiceIndex:Int)
+    {
         var c:VoiceContainerGlyph;
-        if (!_voiceContainers.exists(g.beat.voice.index))
+        if (!_voiceContainers.exists(voiceIndex))
         {
-            c = new VoiceContainerGlyph(0, 0, g.beat.voice.index);
+            c = new VoiceContainerGlyph(0, 0, voiceIndex);
             c.renderer = this;
-            _voiceContainers.set(g.beat.voice.index, c);
+            _voiceContainers.set(voiceIndex, c);
         }
         else
         {
-            c = _voiceContainers.get(g.beat.voice.index);
+            c = _voiceContainers.get(voiceIndex);
         }
-        c.addGlyph(g);
-	}
+        return c;
+    }
+    
+    public function registerBeatPositions(b:Beat, pre:BeatGlyphBase, on:BeatGlyphBase, post:BeatGlyphBase)
+    {
+        var c = getOrCreateVoiceContainer(b.voice.index);
+        
+        c.preBeatPosition.set(b.index, pre);
+        c.onBeatPosition.set(b.index, on);
+        c.postBeatPosition.set(b.index, post);
+    }
+    
+    public function getPreBeatPosition(voice:Int, beat:Int)
+    {
+        return getOrCreateVoiceContainer(voice).preBeatPosition.get(beat);
+    }
+    
+    public function getOnBeatPosition(voice:Int, beat:Int)
+    {
+        return getOrCreateVoiceContainer(voice).onBeatPosition.get(beat);
+    }
+    
+    public function getPostBeatPosition(voice:Int, beat:Int)
+    {
+        return getOrCreateVoiceContainer(voice).postBeatPosition.get(beat);
+    }
+    
 	
 	private function addPostBeatGlyph(g:Glyph)
 	{
