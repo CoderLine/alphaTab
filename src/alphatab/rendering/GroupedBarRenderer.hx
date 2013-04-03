@@ -1,5 +1,6 @@
 package alphatab.rendering;
 import alphatab.model.Bar;
+import alphatab.model.Voice;
 import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
 import alphatab.rendering.glyphs.BeatGlyphBase;
@@ -8,6 +9,7 @@ import alphatab.rendering.glyphs.SpacingGlyph;
 import alphatab.rendering.glyphs.VoiceContainerGlyph;
 import alphatab.rendering.layout.ScoreLayout;
 import alphatab.rendering.staves.BarSizeInfo;
+import haxe.ds.IntMap;
 
 /**
  * This BarRenderer has 3 different groups which cna store glyphs:
@@ -21,21 +23,20 @@ class GroupedBarRenderer extends BarRendererBase
 	public static inline var KEY_SIZE_POST = "POST";
 	
 	private var _preBeatGlyphs:Array<Glyph>;
-    private var _voiceContainer:VoiceContainerGlyph;
+    private var _voiceContainers:IntMap<VoiceContainerGlyph>;
 	private var _postBeatGlyphs:Array<Glyph>;
 	 
 	public function new(bar:Bar) 
 	{
 		super(bar);
 		_preBeatGlyphs = new Array<Glyph>();
+        _voiceContainers = new IntMap<VoiceContainerGlyph>();
 	    _postBeatGlyphs = new Array<Glyph>();
 	}
 	
 	public override function doLayout():Void 
 	{
 		createPreBeatGlyphs();
-        _voiceContainer = new VoiceContainerGlyph();
-        _voiceContainer.renderer = this;
 		createBeatGlyphs();
 		createPostBeatGlyphs();
 		updateWidth();
@@ -58,7 +59,10 @@ class GroupedBarRenderer extends BarRendererBase
 			sizes.setSize(KEY_SIZE_PRE, preSize);			
 		}
 		
-        _voiceContainer.registerMaxSizes(sizes);
+        for (c in _voiceContainers)
+        {
+            c.registerMaxSizes(sizes);
+        }
 		
 		var postSize:Int;
 		if (_postBeatGlyphs.length == 0)
@@ -92,7 +96,10 @@ class GroupedBarRenderer extends BarRendererBase
 		}
 		
 		// on beat glyphs we apply the glyph spacing
-        _voiceContainer.applySizes(sizes);
+        for (c in _voiceContainers)
+        {
+            c.applySizes(sizes);
+        }
 		
 		// on the post glyphs we add the spacing before all other glyphs
 		var postSize = sizes.getSize(KEY_SIZE_POST);
@@ -138,7 +145,18 @@ class GroupedBarRenderer extends BarRendererBase
 	
 	private function addBeatGlyph(g:BeatGlyphBase)
 	{
-        _voiceContainer.addGlyph(g);
+        var c:VoiceContainerGlyph;
+        if (!_voiceContainers.exists(g.beat.voice.index))
+        {
+            c = new VoiceContainerGlyph(0, 0, g.beat.voice.index);
+            c.renderer = this;
+            _voiceContainers.set(g.beat.voice.index, c);
+        }
+        else
+        {
+            c = _voiceContainers.get(g.beat.voice.index);
+        }
+        c.addGlyph(g);
 	}
 	
 	private function addPostBeatGlyph(g:Glyph)
@@ -179,24 +197,38 @@ class GroupedBarRenderer extends BarRendererBase
 	public function getPostBeatGlyphsStart() : Int
 	{
 		var start = getBeatGlyphsStart();
-		if (_voiceContainer.beatGlyphs.length > 0)
-		{
-			start += _voiceContainer.beatGlyphs[_voiceContainer.beatGlyphs.length - 1].x + _voiceContainer.beatGlyphs[_voiceContainer.beatGlyphs.length - 1].width;
-		}
-		return start;		
+        var offset:Int = 0;
+        for (c in _voiceContainers)
+        {
+            if (c.beatGlyphs.length > 0)
+            {
+                var coff = c.beatGlyphs[c.beatGlyphs.length - 1].x + c.beatGlyphs[c.beatGlyphs.length - 1].width;
+                if (coff > offset)
+                {
+                    offset = coff;
+                }
+            }
+        }
+		
+		return start + offset;		
 	}
 		
 	public override function applyBarSpacing(spacing:Int):Void 
 	{
         width += spacing;
      
-        _voiceContainer.applyGlyphSpacing(spacing);
-        
+        for (c in _voiceContainers)
+        {
+            c.applyGlyphSpacing(spacing);
+        }
 	}
 	
 	public override function finalizeRenderer(layout:ScoreLayout):Void 
 	{
-        _voiceContainer.finalizeGlyph(layout);
+        for (c in _voiceContainers)
+        {
+            c.finalizeGlyph(layout);
+        }
 	}
 	
 	public override function paint(cx:Int, cy:Int, canvas:ICanvas)
@@ -210,7 +242,10 @@ class GroupedBarRenderer extends BarRendererBase
 		}		
 		
 		glyphStartX = getBeatGlyphsStart();
-        _voiceContainer.paint(cx + x + glyphStartX, cy + y, canvas);
+        for (c in _voiceContainers)
+        {
+            c.paint(cx + x + glyphStartX, cy + y, canvas);
+        }
 
 		glyphStartX = getPostBeatGlyphsStart();
 		for (g in _postBeatGlyphs)

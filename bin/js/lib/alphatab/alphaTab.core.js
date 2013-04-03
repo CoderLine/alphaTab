@@ -4413,6 +4413,7 @@ alphatab.rendering.EffectBarGlyphSizing.GroupedPostBeatOnly.__enum__ = alphatab.
 alphatab.rendering.GroupedBarRenderer = function(bar) {
 	alphatab.rendering.BarRendererBase.call(this,bar);
 	this._preBeatGlyphs = new Array();
+	this._voiceContainers = new haxe.ds.IntMap();
 	this._postBeatGlyphs = new Array();
 };
 alphatab.rendering.GroupedBarRenderer.__name__ = true;
@@ -4430,7 +4431,11 @@ alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.Bar
 			g.paint(cx + this.x + glyphStartX,cy + this.y,canvas);
 		}
 		glyphStartX = this.getBeatGlyphsStart();
-		this._voiceContainer.paint(cx + this.x + glyphStartX,cy + this.y,canvas);
+		var $it0 = this._voiceContainers.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			c.paint(cx + this.x + glyphStartX,cy + this.y,canvas);
+		}
 		glyphStartX = this.getPostBeatGlyphsStart();
 		var _g = 0, _g1 = this._postBeatGlyphs;
 		while(_g < _g1.length) {
@@ -4440,16 +4445,32 @@ alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.Bar
 		}
 	}
 	,finalizeRenderer: function(layout) {
-		this._voiceContainer.finalizeGlyph(layout);
+		var $it0 = this._voiceContainers.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			c.finalizeGlyph(layout);
+		}
 	}
 	,applyBarSpacing: function(spacing) {
 		this.width += spacing;
-		this._voiceContainer.applyGlyphSpacing(spacing);
+		var $it0 = this._voiceContainers.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			c.applyGlyphSpacing(spacing);
+		}
 	}
 	,getPostBeatGlyphsStart: function() {
 		var start = this.getBeatGlyphsStart();
-		if(this._voiceContainer.beatGlyphs.length > 0) start += this._voiceContainer.beatGlyphs[this._voiceContainer.beatGlyphs.length - 1].x + this._voiceContainer.beatGlyphs[this._voiceContainer.beatGlyphs.length - 1].width;
-		return start;
+		var offset = 0;
+		var $it0 = this._voiceContainers.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.beatGlyphs.length > 0) {
+				var coff = c.beatGlyphs[c.beatGlyphs.length - 1].x + c.beatGlyphs[c.beatGlyphs.length - 1].width;
+				if(coff > offset) offset = coff;
+			}
+		}
+		return start + offset;
 	}
 	,getBeatGlyphsStart: function() {
 		var start = this.getPreBeatGlyphStart();
@@ -4469,7 +4490,13 @@ alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.Bar
 		this.addGlyph(this._postBeatGlyphs,g);
 	}
 	,addBeatGlyph: function(g) {
-		this._voiceContainer.addGlyph(g);
+		var c;
+		if(!this._voiceContainers.exists(g.beat.voice.index)) {
+			c = new alphatab.rendering.glyphs.VoiceContainerGlyph(0,0,g.beat.voice.index);
+			c.renderer = this;
+			this._voiceContainers.set(g.beat.voice.index,c);
+		} else c = this._voiceContainers.get(g.beat.voice.index);
+		c.addGlyph(g);
 	}
 	,addPreBeatGlyph: function(g) {
 		this.addGlyph(this._preBeatGlyphs,g);
@@ -4486,7 +4513,11 @@ alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.Bar
 		var preSize = sizes.getSize("PRE");
 		var preSizeDiff = preSize - this.getBeatGlyphsStart();
 		if(preSizeDiff > 0) this.addPreBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,preSizeDiff));
-		this._voiceContainer.applySizes(sizes);
+		var $it0 = this._voiceContainers.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			c.applySizes(sizes);
+		}
 		var postSize = sizes.getSize("POST");
 		var postSizeDiff;
 		if(this._postBeatGlyphs.length == 0) postSizeDiff = 0; else postSizeDiff = postSize - (this._postBeatGlyphs[this._postBeatGlyphs.length - 1].x + this._postBeatGlyphs[this._postBeatGlyphs.length - 1].width);
@@ -4506,7 +4537,11 @@ alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.Bar
 	,registerMaxSizes: function(sizes) {
 		var preSize = this.getBeatGlyphsStart();
 		if(sizes.getSize("PRE") < preSize) sizes.setSize("PRE",preSize);
-		this._voiceContainer.registerMaxSizes(sizes);
+		var $it0 = this._voiceContainers.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			c.registerMaxSizes(sizes);
+		}
 		var postSize;
 		if(this._postBeatGlyphs.length == 0) postSize = 0; else postSize = this._postBeatGlyphs[this._postBeatGlyphs.length - 1].x + this._postBeatGlyphs[this._postBeatGlyphs.length - 1].width;
 		if(sizes.getSize("POST") < postSize) sizes.setSize("POST",postSize);
@@ -4518,8 +4553,6 @@ alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.Bar
 	}
 	,doLayout: function() {
 		this.createPreBeatGlyphs();
-		this._voiceContainer = new alphatab.rendering.glyphs.VoiceContainerGlyph();
-		this._voiceContainer.renderer = this;
 		this.createBeatGlyphs();
 		this.createPostBeatGlyphs();
 		this.updateWidth();
@@ -7028,12 +7061,13 @@ alphatab.rendering.glyphs.TremoloPickingGlyph.prototype = $extend(alphatab.rende
 	}
 	,__class__: alphatab.rendering.glyphs.TremoloPickingGlyph
 });
-alphatab.rendering.glyphs.VoiceContainerGlyph = function(x,y) {
+alphatab.rendering.glyphs.VoiceContainerGlyph = function(x,y,voiceIndex) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.glyphs.GlyphGroup.call(this,x,y);
 	this.beatGlyphs = new Array();
 	this.beatScaleGlyphs = new Array();
+	this.voiceIndex = voiceIndex;
 };
 alphatab.rendering.glyphs.VoiceContainerGlyph.__name__ = true;
 alphatab.rendering.glyphs.VoiceContainerGlyph.__interfaces__ = [alphatab.rendering.glyphs.ISupportsFinalize];
@@ -7785,7 +7819,15 @@ haxe.ds.IntMap = function() {
 };
 haxe.ds.IntMap.__name__ = true;
 haxe.ds.IntMap.prototype = {
-	keys: function() {
+	iterator: function() {
+		return { ref : this.h, it : this.keys(), hasNext : function() {
+			return this.it.hasNext();
+		}, next : function() {
+			var i = this.it.next();
+			return this.ref[i];
+		}};
+	}
+	,keys: function() {
 		var a = [];
 		for( var key in this.h ) {
 		if(this.h.hasOwnProperty(key)) a.push(key | 0);

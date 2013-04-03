@@ -15,12 +15,15 @@ class VoiceContainerGlyph extends GlyphGroup implements ISupportsFinalize
 
     public var beatGlyphs:Array<BeatGlyphBase>;
 	public var beatScaleGlyphs:Array<BeatGlyphBase>;
+    
+    public var voiceIndex:Int;
 
-	public function new(x:Int = 0, y:Int = 0)
+	public function new(x:Int = 0, y:Int = 0, voiceIndex:Int)
 	{
 		super(x, y);
 	    beatGlyphs = new Array<BeatGlyphBase>();
 	    beatScaleGlyphs = new Array<BeatGlyphBase>();
+        this.voiceIndex = voiceIndex;
 	}
 
     public override function applyGlyphSpacing(spacing:Int):Void 
