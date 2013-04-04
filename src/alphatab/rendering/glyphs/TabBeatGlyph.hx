@@ -18,7 +18,7 @@ class TabBeatGlyph extends BeatGlyphBase
 		super();
 		_ties = new Array<Glyph>();
 	}
-	
+    
 	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
 	{
 		super.paint(cx, cy, canvas);	

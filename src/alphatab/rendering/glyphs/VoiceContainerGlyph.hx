@@ -53,29 +53,21 @@ class VoiceContainerGlyph extends GlyphGroup implements ISupportsFinalize
     
     public function registerMaxSizes(sizes:BarSizeInfo)
     {
-        //for (b in beatGlyphs)
-		//{
-		//	if (sizes.getIndexedSize(getKey(voiceIndex), b.index) < b.width)
-		//	{
-		//		sizes.setIndexedSize(getKey(voiceIndex), b.index, b.width);
-		//	}
-		//}
+        for (b in beatGlyphs)
+		{
+            b.registerMaxSizes(sizes);
+		}
     }
     
     public function applySizes(sizes:BarSizeInfo)
     {
-        //for (i in 0 ... beatGlyphs.length)
-		//{
-		//	beatGlyphs[i].x = (i == 0) ? 0 : beatGlyphs[i - 1].x + beatGlyphs[i - 1].width;
-		//	
-		//	var beatSize = sizes.getIndexedSize(getKey(voiceIndex), i);
-		//	var beatDiff = beatSize - beatGlyphs[i].width;
-		//	if(beatDiff > 0)
-        //    {
-        //        beatGlyphs[i].applyGlyphSpacing(beatDiff);
-        //    }
-		//}
-        //
+        width = 0;
+        for (i in 0 ... beatGlyphs.length)
+		{
+			beatGlyphs[i].x = (i == 0) ? 0 : beatGlyphs[i - 1].x + beatGlyphs[i - 1].width;
+			beatGlyphs[i].applySizes(sizes);
+		}
+        
         if (beatGlyphs.length > 0)
         {
             width = beatGlyphs[beatGlyphs.length -1].x + beatGlyphs[beatGlyphs.length -1].width;
@@ -106,8 +98,8 @@ class VoiceContainerGlyph extends GlyphGroup implements ISupportsFinalize
     
     public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
     {
-        canvas.setColor(new Color(Std.int(255 * Math.random()), Std.int(255 * Math.random()), Std.int(255 * Math.random()), 100));
-        canvas.fillRect(cx + x, cy + y + (15 * voiceIndex), width, 10);
+        //canvas.setColor(new Color(Std.int(255 * Math.random()), Std.int(255 * Math.random()), Std.int(255 * Math.random()), 100));
+        //canvas.fillRect(cx + x, cy + y + (15 * voiceIndex), width, 10);
         for (g in beatGlyphs)
 		{
 			g.paint(cx + x, cy + y, canvas);

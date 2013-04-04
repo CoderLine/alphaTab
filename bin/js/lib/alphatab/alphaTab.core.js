@@ -1416,7 +1416,23 @@ alphatab.Settings.defaults = function() {
 	settings.engine = "default";
 	settings.layout = alphatab.LayoutSettings.defaults();
 	settings.staves = new Array();
+	settings.staves.push(new alphatab.StaveSettings("marker"));
+	settings.staves.push(new alphatab.StaveSettings("triplet-feel"));
+	settings.staves.push(new alphatab.StaveSettings("tempo"));
+	settings.staves.push(new alphatab.StaveSettings("text"));
+	settings.staves.push(new alphatab.StaveSettings("chords"));
+	settings.staves.push(new alphatab.StaveSettings("beat-vibrato"));
+	settings.staves.push(new alphatab.StaveSettings("note-vibrato"));
 	settings.staves.push(new alphatab.StaveSettings("score"));
+	settings.staves.push(new alphatab.StaveSettings("dynamics"));
+	settings.staves.push(new alphatab.StaveSettings("beat-vibrato"));
+	settings.staves.push(new alphatab.StaveSettings("note-vibrato"));
+	settings.staves.push(new alphatab.StaveSettings("tap"));
+	settings.staves.push(new alphatab.StaveSettings("fade-in"));
+	settings.staves.push(new alphatab.StaveSettings("let-ring"));
+	settings.staves.push(new alphatab.StaveSettings("palm-mute"));
+	settings.staves.push(new alphatab.StaveSettings("tab"));
+	settings.staves.push(new alphatab.StaveSettings("fingering"));
 	return settings;
 }
 alphatab.Settings.prototype = {
@@ -5802,6 +5818,28 @@ alphatab.rendering.glyphs.BeatContainerGlyph.prototype = $extend(alphatab.render
 		this.postNotes.doLayout();
 		this.width = this.postNotes.x + this.postNotes.width;
 	}
+	,applySizes: function(sizes) {
+		var size;
+		var diff;
+		size = sizes.getIndexedSize("PRE_NOTES",this.beat.index);
+		diff = size - this.preNotes.width;
+		this.preNotes.x = 0;
+		if(diff > 0) this.preNotes.applyGlyphSpacing(diff);
+		size = sizes.getIndexedSize("ON_NOTES",this.beat.index);
+		diff = size - this.onNotes.width;
+		this.onNotes.x = this.preNotes.x + this.preNotes.width;
+		if(diff > 0) this.onNotes.applyGlyphSpacing(diff);
+		size = sizes.getIndexedSize("POST_NOTES",this.beat.index);
+		diff = size - this.postNotes.width;
+		this.postNotes.x = this.onNotes.x + this.onNotes.width;
+		if(diff > 0) this.postNotes.applyGlyphSpacing(diff);
+		this.width = this.postNotes.x + this.postNotes.width;
+	}
+	,registerMaxSizes: function(sizes) {
+		if(sizes.getIndexedSize("PRE_NOTES",this.beat.index) < this.preNotes.width) sizes.setIndexedSize("PRE_NOTES",this.beat.index,this.preNotes.width);
+		if(sizes.getIndexedSize("ON_NOTES",this.beat.index) < this.onNotes.width) sizes.setIndexedSize("ON_NOTES",this.beat.index,this.onNotes.width);
+		if(sizes.getIndexedSize("POST_NOTES",this.beat.index) < this.postNotes.width) sizes.setIndexedSize("POST_NOTES",this.beat.index,this.postNotes.width);
+	}
 	,finalizeGlyph: function(layout) {
 		if(js.Boot.__instanceof(this.preNotes,alphatab.rendering.glyphs.ISupportsFinalize)) (js.Boot.__cast(this.preNotes , alphatab.rendering.glyphs.ISupportsFinalize)).finalizeGlyph(layout);
 		if(js.Boot.__instanceof(this.onNotes,alphatab.rendering.glyphs.ISupportsFinalize)) (js.Boot.__cast(this.onNotes , alphatab.rendering.glyphs.ISupportsFinalize)).finalizeGlyph(layout);
@@ -6163,9 +6201,11 @@ alphatab.rendering.glyphs.NoteNumberGlyph.prototype = $extend(alphatab.rendering
 	paint: function(cx,cy,canvas) {
 		if(this._noteString != null) {
 			var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
+			canvas.setColor(new alphatab.platform.model.Color(200,200,0,100));
+			canvas.fillRect(cx + this.x,cy + this.y,this.width,10);
 			canvas.setColor(res.mainGlyphColor);
 			if(this._isGrace) canvas.setFont(res.graceFont); else canvas.setFont(res.tablatureFont);
-			canvas.fillText(Std.string(this._noteString),cx + this.x + 3 * this.renderer.stave.staveGroup.layout.renderer.scale,cy + this.y);
+			canvas.fillText(Std.string(this._noteString),cx + this.x + 0 * this.renderer.stave.staveGroup.layout.renderer.scale,cy + this.y);
 		}
 	}
 	,doLayout: function() {
@@ -6508,6 +6548,13 @@ alphatab.rendering.glyphs.ScoreBeatPreNotesGlyph.prototype = $extend(alphatab.re
 		alphatab.rendering.glyphs.BeatGlyphBase.prototype.doLayout.call(this);
 	}
 	,applyGlyphSpacing: function(spacing) {
+		alphatab.rendering.glyphs.BeatGlyphBase.prototype.applyGlyphSpacing.call(this,spacing);
+		var _g = 0, _g1 = this._glyphs;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.x += spacing;
+		}
 	}
 	,canScale: function() {
 		return false;
@@ -6950,7 +6997,7 @@ alphatab.rendering.glyphs.TabNoteChordGlyph.prototype = $extend(alphatab.renderi
 		if(onEnd == null) onEnd = true;
 		if(this._noteLookup.exists(note.string)) {
 			var n = this._noteLookup.get(note.string);
-			var pos = this.x + n.x + (3 * this.renderer.stave.staveGroup.layout.renderer.scale | 0);
+			var pos = this.x + n.x + (0 * this.renderer.stave.staveGroup.layout.renderer.scale | 0);
 			if(onEnd) pos += n.width;
 			return pos;
 		}
@@ -7132,8 +7179,6 @@ alphatab.rendering.glyphs.VoiceContainerGlyph.getKey = function(index) {
 alphatab.rendering.glyphs.VoiceContainerGlyph.__super__ = alphatab.rendering.glyphs.GlyphGroup;
 alphatab.rendering.glyphs.VoiceContainerGlyph.prototype = $extend(alphatab.rendering.glyphs.GlyphGroup.prototype,{
 	paint: function(cx,cy,canvas) {
-		canvas.setColor(new alphatab.platform.model.Color(255 * Math.random() | 0,255 * Math.random() | 0,255 * Math.random() | 0,100));
-		canvas.fillRect(cx + this.x,cy + this.y + 15 * this.voiceIndex,this.width,10);
 		var _g = 0, _g1 = this.beatGlyphs;
 		while(_g < _g1.length) {
 			var g = _g1[_g];
@@ -7159,9 +7204,22 @@ alphatab.rendering.glyphs.VoiceContainerGlyph.prototype = $extend(alphatab.rende
 		this.width = g.x + g.width;
 	}
 	,applySizes: function(sizes) {
+		this.width = 0;
+		var _g1 = 0, _g = this.beatGlyphs.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			this.beatGlyphs[i].x = i == 0?0:this.beatGlyphs[i - 1].x + this.beatGlyphs[i - 1].width;
+			this.beatGlyphs[i].applySizes(sizes);
+		}
 		if(this.beatGlyphs.length > 0) this.width = this.beatGlyphs[this.beatGlyphs.length - 1].x + this.beatGlyphs[this.beatGlyphs.length - 1].width;
 	}
 	,registerMaxSizes: function(sizes) {
+		var _g = 0, _g1 = this.beatGlyphs;
+		while(_g < _g1.length) {
+			var b = _g1[_g];
+			++_g;
+			b.registerMaxSizes(sizes);
+		}
 	}
 	,applyGlyphSpacing: function(spacing) {
 		var glyphSpacing = spacing / this.beatGlyphs.length;
@@ -8706,7 +8764,7 @@ alphatab.rendering.glyphs.MusicFont.AccidentalDoubleFlat = "M 67 25c 52 -27 93 -
 alphatab.rendering.glyphs.MusicFont.AccidentalDoubleSharp = "M 22 243c -32 -31 -48 -68 -48 -110c 0 -38 15 -71 45 -98c 30 -27 63 -40 98 -40c 38 0 70 14 96 43c 64 57 116 124 158 199c 41 75 62 146 62 213c -83 0 -172 -30 -268 -91C 99 317 51 278 22 243zM 18 872c 25 25 59 38 100 38c 38 0 70 -14 96 -43c 44 -38 86 -86 124 -144c 64 -96 96 -187 96 -273c -70 0 -140 18 -211 55c -70 36 -137 87 -201 151c -32 31 -48 70 -48 115C -26 810 -11 843 18 872zM 848 32c -25 -25 -60 -38 -105 -38c -41 0 -76 16 -105 48c -57 67 -94 113 -110 139c -60 96 -91 185 -91 268c 92 0 182 -28 268 -86c 79 -67 124 -105 134 -115c 31 -31 48 -72 48 -120C 886 96 874 64 848 32zM 838 656c 31 31 48 70 48 115c 0 38 -14 72 -43 100s -62 43 -100 43c -38 0 -73 -16 -105 -48c -51 -57 -88 -105 -110 -144c -60 -96 -91 -187 -91 -273c 105 0 211 41 316 124C 803 622 832 650 838 656";
 alphatab.rendering.glyphs.NoteHeadGlyph.graceScale = 0.7;
 alphatab.rendering.glyphs.NoteHeadGlyph.noteHeadHeight = 9;
-alphatab.rendering.glyphs.NoteNumberGlyph.Padding = 3;
+alphatab.rendering.glyphs.NoteNumberGlyph.Padding = 0;
 alphatab.rendering.glyphs.VoiceContainerGlyph.KEY_SIZE_BEAT = "BEAT";
 alphatab.rendering.glyphs.effects.DynamicsGlyph.GlyphScale = 0.8;
 alphatab.rendering.glyphs.effects.LineRangedGlyph.LineSpacing = 3;

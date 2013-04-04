@@ -6,7 +6,7 @@ import alphatab.rendering.Glyph;
 
 class NoteNumberGlyph extends Glyph
 {
-	public static inline var Padding = 3;
+	public static inline var Padding = 0;
 	private var _noteString:String;
 	private var _isGrace:Bool;
 	
@@ -48,7 +48,8 @@ class NoteNumberGlyph extends Glyph
 		if (_noteString != null) 
 		{
 			var res = renderer.getResources();
-
+            canvas.setColor(new Color(200, 200, 0, 100));
+            canvas.fillRect(cx + x, cy + y, width, 10);
 			canvas.setColor(res.mainGlyphColor);
 			if (_isGrace) 
 			{
