@@ -32,6 +32,7 @@ import alphatab.rendering.glyphs.AccidentalGroupGlyph;
 import alphatab.rendering.glyphs.BarNumberGlyph;
 import alphatab.rendering.glyphs.BarSeperatorGlyph;
 import alphatab.rendering.glyphs.BeamGlyph;
+import alphatab.rendering.glyphs.BeatContainerGlyph;
 import alphatab.rendering.glyphs.CircleGlyph;
 import alphatab.rendering.glyphs.ClefGlyph;
 import alphatab.rendering.glyphs.DiamondNoteHeadGlyph;
@@ -101,7 +102,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
 	
 	private static inline var LineSpacing = 8;
     public var accidentalHelper:AccidentalHelper;
-    private var _beamHelpers:Array<BeamingHelper>;
+    private var _beamHelpers:Array<Array<BeamingHelper>>;
 	
     private var _currentBeamHelper:BeamingHelper;
     
@@ -109,12 +110,12 @@ class ScoreBarRenderer extends GroupedBarRenderer
 	{
 		super(bar);
         accidentalHelper = new AccidentalHelper();
-        _beamHelpers = new Array<BeamingHelper>();
+        _beamHelpers = new Array<Array<BeamingHelper>>();
 	}
 	
 	public function getBeatDirection(beat:Beat) : BeamDirection
 	{
-        var g:ScoreBeatGlyph = cast getOnBeatPosition(beat.voice.index, beat.index);
+        var g:ScoreBeatGlyph = cast getOnNotesPosition(beat.voice.index, beat.index);
 		if (g != null) 
 		{
 			return g.noteHeads.getDirection();
@@ -124,7 +125,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
 	
 	public function getNoteX(note:Note, onEnd:Bool=true) 
 	{
-        var g:ScoreBeatGlyph = cast getOnBeatPosition(note.beat.voice.index, note.beat.index);
+        var g:ScoreBeatGlyph = cast getOnNotesPosition(note.beat.voice.index, note.beat.index);
 		if (g != null) 
 		{
 			return g.x + g.noteHeads.getNoteX(note, onEnd);
@@ -134,7 +135,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
 	
 	public function getNoteY(note:Note) 
 	{
-        var beat:ScoreBeatGlyph = cast getOnBeatPosition(note.beat.voice.index, note.beat.index);
+        var beat:ScoreBeatGlyph = cast getOnNotesPosition(note.beat.voice.index, note.beat.index);
 		if (beat != null)
 		{
 			return beat.noteHeads.getNoteY(note);
@@ -170,36 +171,38 @@ class ScoreBarRenderer extends GroupedBarRenderer
         var top = getScoreY(0);
         var bottom = getScoreY(8);
         
-        for (h in _beamHelpers)
+        for (v in _beamHelpers)
         {
-            //
-            // max note (highest) -> top overflow
-            // 
-            var maxNoteY = getScoreY(getNoteLine(h.maxNote));
-            if (h.getDirection() == Up)
+            for (h in v)
             {
-                maxNoteY -= getStemSize(h.maxDuration);
+                //
+                // max note (highest) -> top overflow
+                // 
+                var maxNoteY = getScoreY(getNoteLine(h.maxNote));
+                if (h.getDirection() == Up)
+                {
+                    maxNoteY -= getStemSize(h.maxDuration);
+                }
+                            
+                if (maxNoteY < top)
+                {
+                    registerOverflowTop(Std.int(Math.abs(maxNoteY)));
+                }
+                    
+                //
+                // min note (lowest) -> bottom overflow
+                //
+                var minNoteY = getScoreY(getNoteLine(h.minNote));
+                if (h.getDirection() == Down)
+                {
+                    minNoteY += getStemSize(h.maxDuration);
+                }
+                            
+                if (minNoteY > bottom)
+                {
+                    registerOverflowBottom(Std.int(Math.abs(minNoteY)) - bottom);
+                }
             }
-                        
-            if (maxNoteY < top)
-            {
-                registerOverflowTop(Std.int(Math.abs(maxNoteY)));
-            }
-                
-            //
-            // min note (lowest) -> bottom overflow
-            //
-            var minNoteY = getScoreY(getNoteLine(h.minNote));
-            if (h.getDirection() == Down)
-            {
-                minNoteY += getStemSize(h.maxDuration);
-            }
-                        
-            if (minNoteY > bottom)
-            {
-                registerOverflowBottom(Std.int(Math.abs(minNoteY)) - bottom);
-            }
-            
         }
 	}
     public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
@@ -210,11 +213,15 @@ class ScoreBarRenderer extends GroupedBarRenderer
 	
     private function paintBeams(cx:Int, cy:Int, canvas:ICanvas):Void
     {
-        for (h in _beamHelpers)
+        for (v in _beamHelpers)
         {
-            // paint beams
-            paintBeamHelper(cx + getBeatGlyphsStart(), cy, canvas, h);
+            for (h in v)
+            {
+                // paint beams
+                paintBeamHelper(cx + getBeatGlyphsStart(), cy, canvas, h);
+            }
         }
+
     }
     
     private function paintBeamHelper(cx:Int, cy:Int, canvas:ICanvas, h:BeamingHelper):Void
@@ -486,8 +493,10 @@ class ScoreBarRenderer extends GroupedBarRenderer
 
 	private override function createBeatGlyphs():Void 
 	{
-        // TODO: Render all voices
-        createVoiceGlyphs(_bar.voices[0]);
+        for (v in _bar.voices)
+        {
+            createVoiceGlyphs(v);
+        }
 	}
 	
 	private override function createPostBeatGlyphs():Void 
@@ -579,6 +588,9 @@ class ScoreBarRenderer extends GroupedBarRenderer
     
     private function createVoiceGlyphs(v:Voice)
     {
+        _currentBeamHelper = null; // reset beams for each voice
+        _beamHelpers.push(new Array<BeamingHelper>());
+        
         for (b in v.beats)
         {
             if (!b.isRest())
@@ -589,32 +601,21 @@ class ScoreBarRenderer extends GroupedBarRenderer
                     // if not possible, create the next beaming helper
                     _currentBeamHelper = new BeamingHelper();
                     _currentBeamHelper.checkBeat(b);
-                    _beamHelpers.push(_currentBeamHelper);
+                    _beamHelpers[v.index].push(_currentBeamHelper);
                 }
             }
-			
-			var pre = new ScoreBeatPreNotesGlyph(b);
-			addBeatGlyph(pre);
-			
-			var g = new ScoreBeatGlyph(b);
-			g.beamingHelper = _currentBeamHelper;
-			addBeatGlyph(g); 
-			
-			var post = new ScoreBeatPostNotesGlyph(b);
-			addBeatGlyph(post);
             
-            registerBeatPositions(b, pre, g, post);
-
+            var container = new BeatContainerGlyph(b);
+            container.preNotes = new ScoreBeatPreNotesGlyph();
+            container.onNotes = new ScoreBeatGlyph();
+            cast(container.onNotes, ScoreBeatGlyph).beamingHelper = _currentBeamHelper;
+            container.postNotes = new ScoreBeatPostNotesGlyph();
+			addBeatGlyph(container);
         }
         
         _currentBeamHelper = null;
     }
     
-    public override function applyBarSpacing(spacing:Int):Void 
-    {
-        super.applyBarSpacing(spacing);
-    }
-	
     // TODO[performance]: Maybe we should cache this (check profiler)
     public function getNoteLine(n:Note) : Int
     {

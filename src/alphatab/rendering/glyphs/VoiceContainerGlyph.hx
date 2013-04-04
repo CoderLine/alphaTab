@@ -1,5 +1,6 @@
 package alphatab.rendering.glyphs;
 import alphatab.platform.ICanvas;
+import alphatab.platform.model.Color;
 import alphatab.rendering.Glyph;
 import alphatab.rendering.layout.ScoreLayout;
 import alphatab.rendering.staves.BarSizeInfo;
@@ -14,83 +15,71 @@ class VoiceContainerGlyph extends GlyphGroup implements ISupportsFinalize
 {
     public static inline var KEY_SIZE_BEAT = "BEAT";
 
-    public var beatGlyphs:Array<BeatGlyphBase>;
-	public var beatScaleGlyphs:Array<BeatGlyphBase>;
-    
-    public var preBeatPosition:IntMap<Glyph>;
-    public var onBeatPosition:IntMap<Glyph>;
-    public var postBeatPosition:IntMap<Glyph>;
-
-    
+    public var beatGlyphs:Array<BeatContainerGlyph>;
     public var voiceIndex:Int;
 
 	public function new(x:Int = 0, y:Int = 0, voiceIndex:Int)
 	{
 		super(x, y);
-	    beatGlyphs = new Array<BeatGlyphBase>();
-	    beatScaleGlyphs = new Array<BeatGlyphBase>();
+	    beatGlyphs = new Array<BeatContainerGlyph>();
         this.voiceIndex = voiceIndex;
-        
-        preBeatPosition = new IntMap<Glyph>();
-        onBeatPosition = new IntMap<Glyph>();
-        postBeatPosition = new IntMap<Glyph>();
 	}
 
     public override function applyGlyphSpacing(spacing:Int):Void 
-    {
-        var glyphSpacing = Std.int(spacing / beatScaleGlyphs.length);
-        for (i in 0 ... beatScaleGlyphs.length)
+    {   
+        var glyphSpacing = spacing / beatGlyphs.length;
+        var gx = 0.0;
+        for (i in 0 ... beatGlyphs.length)
         {
             var g = beatGlyphs[i];
-            // default behavior: simply replace glyph to new position
-            if (i == 0)
+            g.x = Std.int(gx);
+            gx += g.width + glyphSpacing;
+            if (g == beatGlyphs[beatGlyphs.length - 1])
             {
-                g.x = 0;
+                g.applyGlyphSpacing(Std.int(glyphSpacing + (spacing - gx)));
             }
             else
             {
-                g.x = beatGlyphs[i - 1].x + beatGlyphs[i - 1].width;
+                g.applyGlyphSpacing(Std.int(glyphSpacing));
             }
-             
-			if (g.canScale())
-			{
-				if (g == beatGlyphs[beatGlyphs.length - 1])
-				{
-					g.applyGlyphSpacing(glyphSpacing + (spacing - (glyphSpacing * beatGlyphs.length)));
-				}
-				else
-				{
-					g.applyGlyphSpacing(glyphSpacing);
-				}
-			}
         }
+        width = Std.int(gx);
+    }
+    
+    private static inline function getKey(index:Int) : String
+    {
+        return KEY_SIZE_BEAT;
     }
     
     public function registerMaxSizes(sizes:BarSizeInfo)
     {
-        for (b in beatGlyphs)
-		{
-			if (sizes.getIndexedSize(KEY_SIZE_BEAT, b.index) < b.width)
-			{
-				sizes.setIndexedSize(KEY_SIZE_BEAT, b.index, b.width);
-			}
-		}
+        //for (b in beatGlyphs)
+		//{
+		//	if (sizes.getIndexedSize(getKey(voiceIndex), b.index) < b.width)
+		//	{
+		//		sizes.setIndexedSize(getKey(voiceIndex), b.index, b.width);
+		//	}
+		//}
     }
     
     public function applySizes(sizes:BarSizeInfo)
     {
-        for (i in 0 ... beatGlyphs.length)
-		{
-			beatGlyphs[i].x = (i == 0) ? 0 : beatGlyphs[i - 1].x + beatGlyphs[i - 1].width;
-			
-			var beatSize = sizes.getIndexedSize(KEY_SIZE_BEAT, i);
-			var beatDiff = beatSize - beatGlyphs[i].width;
-			
-			if (beatDiff > 0)
-			{
-				beatGlyphs[i].applyGlyphSpacing(beatDiff);
-			}
-		}
+        //for (i in 0 ... beatGlyphs.length)
+		//{
+		//	beatGlyphs[i].x = (i == 0) ? 0 : beatGlyphs[i - 1].x + beatGlyphs[i - 1].width;
+		//	
+		//	var beatSize = sizes.getIndexedSize(getKey(voiceIndex), i);
+		//	var beatDiff = beatSize - beatGlyphs[i].width;
+		//	if(beatDiff > 0)
+        //    {
+        //        beatGlyphs[i].applyGlyphSpacing(beatDiff);
+        //    }
+		//}
+        //
+        if (beatGlyphs.length > 0)
+        {
+            width = beatGlyphs[beatGlyphs.length -1].x + beatGlyphs[beatGlyphs.length -1].width;
+        }
     }
     
     public override function addGlyph(g:Glyph):Void 
@@ -100,26 +89,25 @@ class VoiceContainerGlyph extends GlyphGroup implements ISupportsFinalize
 		g.renderer = renderer;
 		g.doLayout();
 		beatGlyphs.push(cast g);
-		if (g.canScale())
-		{
-			beatScaleGlyphs.push(cast g);
-		}
+        width = g.x + g.width;
+    }
+    
+    public override function doLayout():Void 
+    {
     }
     
     public function finalizeGlyph(layout:ScoreLayout) : Void
     {
         for (i in 0 ... beatGlyphs.length)
         {
-            var g = beatGlyphs[i];
-			if (Std.is(g, ISupportsFinalize))
-			{
-				cast(g, ISupportsFinalize).finalizeGlyph(layout);
-			}
+            beatGlyphs[i].finalizeGlyph(layout);
         }
     }
     
     public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
     {
+        canvas.setColor(new Color(Std.int(255 * Math.random()), Std.int(255 * Math.random()), Std.int(255 * Math.random()), 100));
+        canvas.fillRect(cx + x, cy + y + (15 * voiceIndex), width, 10);
         for (g in beatGlyphs)
 		{
 			g.paint(cx + x, cy + y, canvas);

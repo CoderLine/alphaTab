@@ -8,14 +8,13 @@ import alphatab.rendering.Glyph;
 
 class BeatGlyphBase extends GlyphGroup
 {
-	public var beat:Beat;
+	public var container:BeatContainerGlyph;
 
-	public function new(b:Beat) 
+	public function new() 
 	{
 		super();
-		beat = b;
 	}
-	
+    
 	public override function doLayout():Void 
 	{
 		// left to right layout
@@ -32,18 +31,18 @@ class BeatGlyphBase extends GlyphGroup
 	
 	private function noteLoop( action:Note -> Void ) 
 	{
-		var i = beat.notes.length -1;
+		var i = container.beat.notes.length -1;
 		while ( i >= 0 )
 		{
-			action(beat.notes[i--]);
+			action(container.beat.notes[i--]);
 		}
 	}
 	
-    private function getBeatDurationWidth(d:Duration) : Int
+    private function getBeatDurationWidth() : Int
     {
-        switch(d)
+        switch(container.beat.duration)
         {
-            case Whole:         return 65;
+            case Whole:         return 103;
             case Half:          return 45;
             case Quarter:       return 29;
             case Eighth:        return 19;

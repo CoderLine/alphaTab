@@ -66,27 +66,27 @@ class Settings
 
         settings.staves = new Array<StaveSettings>();
         
-        settings.staves.push(new StaveSettings("marker"));
-        settings.staves.push(new StaveSettings("triplet-feel"));
-        settings.staves.push(new StaveSettings("tempo"));
-        settings.staves.push(new StaveSettings("text"));
-        settings.staves.push(new StaveSettings("chords"));
-        settings.staves.push(new StaveSettings("beat-vibrato"));
-        settings.staves.push(new StaveSettings("note-vibrato"));
+        //settings.staves.push(new StaveSettings("marker"));
+        //settings.staves.push(new StaveSettings("triplet-feel"));
+        //settings.staves.push(new StaveSettings("tempo"));
+        //settings.staves.push(new StaveSettings("text"));
+        //settings.staves.push(new StaveSettings("chords"));
+        //settings.staves.push(new StaveSettings("beat-vibrato"));
+        //settings.staves.push(new StaveSettings("note-vibrato"));
         
         settings.staves.push(new StaveSettings("score"));
         
-        settings.staves.push(new StaveSettings("dynamics"));
-        settings.staves.push(new StaveSettings("beat-vibrato"));
-        settings.staves.push(new StaveSettings("note-vibrato"));
-        settings.staves.push(new StaveSettings("tap"));
-        settings.staves.push(new StaveSettings("fade-in"));
-        settings.staves.push(new StaveSettings("let-ring"));
-        settings.staves.push(new StaveSettings("palm-mute"));
-        
-        settings.staves.push(new StaveSettings("tab"));
-        
-        settings.staves.push(new StaveSettings("fingering"));
+        //settings.staves.push(new StaveSettings("dynamics"));
+        //settings.staves.push(new StaveSettings("beat-vibrato"));
+        //settings.staves.push(new StaveSettings("note-vibrato"));
+        //settings.staves.push(new StaveSettings("tap"));
+        //settings.staves.push(new StaveSettings("fade-in"));
+        //settings.staves.push(new StaveSettings("let-ring"));
+        //settings.staves.push(new StaveSettings("palm-mute"));
+        //
+        //settings.staves.push(new StaveSettings("tab"));
+        //
+        //settings.staves.push(new StaveSettings("fingering"));
 
         return settings;
     }

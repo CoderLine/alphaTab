@@ -3,8 +3,8 @@ import alphatab.model.Beat;
 
 class TabBeatPreNotesGlyph extends BeatGlyphBase
 {
-	public function new(b:Beat) 
+	public function new() 
 	{
-		super(b);
+		super();
 	}
 }

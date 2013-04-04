@@ -25,6 +25,7 @@ import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
 import alphatab.rendering.glyphs.BarNumberGlyph;
 import alphatab.rendering.glyphs.BarSeperatorGlyph;
+import alphatab.rendering.glyphs.BeatContainerGlyph;
 import alphatab.rendering.glyphs.RepeatCloseGlyph;
 import alphatab.rendering.glyphs.RepeatCountGlyph;
 import alphatab.rendering.glyphs.RepeatOpenGlyph;
@@ -45,6 +46,7 @@ class TabBarRenderer extends GroupedBarRenderer
 	{
 		super(bar);
 	}
+    
 	
 	private inline function getLineOffset()
 	{
@@ -53,7 +55,7 @@ class TabBarRenderer extends GroupedBarRenderer
 	
 	public function getNoteX(note:Note, onEnd:Bool=true) 
 	{
-        var beat:TabBeatGlyph = cast getOnBeatPosition(note.beat.voice.index, note.beat.index);
+        var beat:TabBeatGlyph = cast getOnNotesPosition(note.beat.voice.index, note.beat.index);
 		if (beat != null) 
 		{
 			return beat.x + beat.noteNumbers.getNoteX(note, onEnd);
@@ -63,7 +65,7 @@ class TabBarRenderer extends GroupedBarRenderer
 	
 	public function getNoteY(note:Note) 
 	{
-        var beat:TabBeatGlyph = cast getOnBeatPosition(note.beat.voice.index, note.beat.index);
+        var beat:TabBeatGlyph = cast getOnNotesPosition(note.beat.voice.index, note.beat.index);
 		if (beat != null) 
 		{
 			return beat.noteNumbers.getNoteY(note);
@@ -101,24 +103,21 @@ class TabBarRenderer extends GroupedBarRenderer
 
 	private override function createBeatGlyphs():Void 
 	{
-        // TODO: Render all voices
-        createVoiceGlyphs(_bar.voices[0]);
+        for (v in _bar.voices)
+        {
+            createVoiceGlyphs(v);
+        }
 	}
 	
     private function createVoiceGlyphs(v:Voice)
     {
         for (b in v.beats)
         {
-			var pre = new TabBeatPreNotesGlyph(b);
-			addBeatGlyph(pre);
-			
-			var g = new TabBeatGlyph(b);
-			addBeatGlyph(g); 
-			
-			var post = new TabBeatPostNotesGlyph(b);
-			addBeatGlyph(post);
-            
-            registerBeatPositions(b, pre, g, post);
+            var container = new BeatContainerGlyph(b);
+            container.preNotes = new TabBeatPreNotesGlyph();
+			container.onNotes = new TabBeatGlyph();
+			container.postNotes = new TabBeatPostNotesGlyph();
+			addBeatGlyph(container);
         }
     }	
 	

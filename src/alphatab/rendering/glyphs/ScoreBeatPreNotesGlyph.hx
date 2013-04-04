@@ -5,24 +5,29 @@ import alphatab.model.Note;
 
 class ScoreBeatPreNotesGlyph extends BeatGlyphBase
 {
-	public function new(b:Beat) 
+	public function new() 
 	{
-		super(b);
+		super();
 	}
-	
+    
+    public override function canScale():Bool 
+    {
+        return false;
+    }
+    
 	public override function applyGlyphSpacing(spacing:Int):Void 
 	{
-		super.applyGlyphSpacing(spacing);
-		// add spacing at the beginning, this way the elements are closer to the note head
-		for (g in _glyphs)
-		{
-			g.x += spacing;
-		}
+		//super.applyGlyphSpacing(spacing);
+		//// add spacing at the beginning, this way the elements are closer to the note head
+		//for (g in _glyphs)
+		//{
+		//	g.x += spacing;
+		//}
 	}
 	
 	public override function doLayout():Void 
 	{
-		if (!beat.isRest())
+		if (!container.beat.isRest())
 		{
 			var accidentals:AccidentalGroupGlyph = new AccidentalGroupGlyph(0, 0);
             noteLoop( function(n) {
@@ -32,7 +37,7 @@ class ScoreBeatPreNotesGlyph extends BeatGlyphBase
 		}
 		
 		// a small padding
-		addGlyph(new SpacingGlyph(0, 0, Std.int(4 * (beat.graceType != GraceType.None ? NoteHeadGlyph.graceScale : 1) * getScale()), true));
+		addGlyph(new SpacingGlyph(0, 0, Std.int(4 * (container.beat.graceType != GraceType.None ? NoteHeadGlyph.graceScale : 1) * getScale()), true));
 		
 		super.doLayout();
 	}
@@ -42,7 +47,7 @@ class ScoreBeatPreNotesGlyph extends BeatGlyphBase
 		var sr = cast(renderer, ScoreBarRenderer);
         var noteLine = sr.getNoteLine(n);
         var accidental = sr.accidentalHelper.applyAccidental(n, noteLine);
-		var isGrace = beat.graceType != GraceType.None;
+		var isGrace = container.beat.graceType != GraceType.None;
         switch (accidental) 
         {
             case Sharp:   accidentals.addGlyph(new SharpGlyph(0, sr.getScoreY(noteLine), isGrace));

@@ -548,14 +548,12 @@ class Gp3To5Importer extends ScoreImporter
         {
             readBeat(track, bar, newVoice);
         }
-        
     }
     
     
     private function readBeat(track:Track, bar:Bar, voice:Voice)
     {
         var newBeat:Beat = new Beat();
-        voice.addBeat(newBeat);
         var flags:Int = readUInt8();
         
         if ( (flags & 0x01) != 0)
@@ -565,8 +563,16 @@ class Gp3To5Importer extends ScoreImporter
         
         if ( (flags & 0x40) != 0)
         {
-            readUInt8(); // isEmpty
+            if (readBool()) // emptybeat / emptyvoice
+            {
+                return;
+            }
         }
+        else
+        {
+            voice.addBeat(newBeat);
+        }
+
         
         var duration = _data.readInt8();
         switch(duration)

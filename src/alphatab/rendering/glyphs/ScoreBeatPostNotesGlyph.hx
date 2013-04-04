@@ -4,14 +4,14 @@ import alphatab.model.Note;
 
 class ScoreBeatPostNotesGlyph extends BeatGlyphBase
 {
-	public function new(b:Beat) 
+	public function new() 
 	{
-		super(b);
+		super();
 	}
-	
+    
 	public override function doLayout():Void 
 	{
-		addGlyph(new SpacingGlyph(0, 0, Std.int(getBeatDurationWidth(beat.duration) * getScale())));
+		addGlyph(new SpacingGlyph(0, 0, Std.int(getBeatDurationWidth() * getScale())));
 		super.doLayout();
 	}
 }

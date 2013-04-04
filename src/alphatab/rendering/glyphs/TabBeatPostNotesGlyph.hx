@@ -5,11 +5,11 @@ import alphatab.model.Note;
 class TabBeatPostNotesGlyph extends BeatGlyphBase
 {
 
-	public function new(b:Beat) 
+	public function new() 
 	{
-		super(b);
+		super();
 	}
-	
+        
 	public override function doLayout():Void 
 	{
 		// note specific effects
@@ -17,7 +17,7 @@ class TabBeatPostNotesGlyph extends BeatGlyphBase
 			createNoteGlyphs(n);
 		});
 		
-		addGlyph(new SpacingGlyph(0, 0, Std.int(getBeatDurationWidth(beat.duration) * getScale())));
+		addGlyph(new SpacingGlyph(0, 0, Std.int(getBeatDurationWidth() * getScale())));
 		super.doLayout();
 	}	
 	
@@ -27,7 +27,7 @@ class TabBeatPostNotesGlyph extends BeatGlyphBase
 		{
 			var bendHeight = Std.int(60 * getScale());
 			renderer.registerOverflowTop(bendHeight);
-			addGlyph(new BendGlyph(n, Std.int(getBeatDurationWidth(beat.duration) * getScale()), bendHeight));
+			addGlyph(new BendGlyph(n, Std.int(getBeatDurationWidth() * getScale()), bendHeight));
 		}
 	}	
 }

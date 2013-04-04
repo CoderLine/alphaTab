@@ -23,9 +23,9 @@ class ScoreBeatGlyph extends BeatGlyphBase
 
 	public var beamingHelper:BeamingHelper;
 
-	public function new(b:Beat) 
+	public function new() 
 	{
-		super(b);
+        super();
 		_ties = new Array<Glyph>();
 	}
 	
@@ -41,9 +41,9 @@ class ScoreBeatGlyph extends BeatGlyphBase
 	
 	public function finalizeGlyph(layout:ScoreLayout)
 	{
-		if (!beat.isRest()) 
+		if (!container.beat.isRest()) 
 		{
-			noteHeads.updateBeamingHelper(x);
+			noteHeads.updateBeamingHelper(container.x + x);
 		}
 	}
 	
@@ -51,22 +51,22 @@ class ScoreBeatGlyph extends BeatGlyphBase
 	{
 		super.applyGlyphSpacing(spacing);
 		// TODO: we need to tell the beaming helper the position of rest beats
-		if (!beat.isRest()) 
+		if (!container.beat.isRest()) 
 		{
-			noteHeads.updateBeamingHelper(x);
+			noteHeads.updateBeamingHelper(container.x + x);
 		}
 	}
 		
 	public override function doLayout():Void 
 	{
 		// create glyphs
-		if (!beat.isRest())
+		if (!container.beat.isRest())
         {		
 			//
             // Note heads
             //
             noteHeads = new ScoreNoteChordGlyph();
-            noteHeads.beat = beat;
+            noteHeads.beat = container.beat;
             noteHeads.beamingHelper = beamingHelper;
             noteLoop( function(n) {
                 createNoteGlyph(n);
@@ -76,7 +76,7 @@ class ScoreBeatGlyph extends BeatGlyphBase
             //
             // Note dots
             //
-            for (i in 0 ... beat.dots)
+            for (i in 0 ... container.beat.dots)
             {
                 var group = new GlyphGroup();
                 noteLoop( function (n) {
@@ -90,7 +90,7 @@ class ScoreBeatGlyph extends BeatGlyphBase
 			var line = 0;
             var offset = 0;
         
-			switch(beat.duration)
+			switch(container.beat.duration)
 			{
 				case Whole:         
 					line = 4;
@@ -112,7 +112,7 @@ class ScoreBeatGlyph extends BeatGlyphBase
 			var sr = cast(renderer, ScoreBarRenderer);
 			var y = sr.getScoreY(line, offset);
 
-			addGlyph(new RestGlyph(0, y, beat.duration));
+			addGlyph(new RestGlyph(0, y, container.beat.duration));
 		}
 		
 		super.doLayout();
@@ -132,7 +132,7 @@ class ScoreBeatGlyph extends BeatGlyphBase
     {
 		var sr = cast(renderer, ScoreBarRenderer);
         var noteHeadGlyph:Glyph;
-		var isGrace = beat.graceType != GraceType.None;
+		var isGrace = container.beat.graceType != GraceType.None;
 		if (n.isDead) 
 		{
             noteHeadGlyph = new DeadNoteHeadGlyph(0, 0, isGrace);

@@ -59,7 +59,7 @@ class ScoreNoteChordGlyph extends Glyph
 		_noteLookup = new IntMap<Glyph>();
     }
 	
-	public function getDirection() : BeamDirection
+	public inline function getDirection() : BeamDirection
 	{
 		return beamingHelper.getDirection();
 	}	
@@ -87,7 +87,7 @@ class ScoreNoteChordGlyph extends Glyph
 		}
 		return 0;
 	}
-    
+       
     public function addNoteGlyph(noteGlyph:Glyph, note:Note, noteLine:Int)
     {
         var info:ScoreNoteGlyphInfo =  { glyph:noteGlyph, line:noteLine }
@@ -110,7 +110,7 @@ class ScoreNoteChordGlyph extends Glyph
     
     public function updateBeamingHelper(cx:Int) : Void
     { 
-         beamingHelper.registerBeatLineX(beat, cx + x + upLineX, cx + x + downLineX); 
+        beamingHelper.registerBeatLineX(beat, cx + x + upLineX, cx + x + downLineX); 
     }
     
     public function hasTopOverflow() : Bool

@@ -150,6 +150,7 @@ class Stave
                 isEmpty = false;
             }
 		}
+        
         if (!isEmpty)
         {
             height += topSpacing + topOverflow + bottomOverflow + bottomSpacing;

@@ -21,6 +21,7 @@ import alphatab.model.Bar;
 import alphatab.model.Beat;
 import alphatab.model.Duration;
 import alphatab.model.Note;
+import alphatab.model.Voice;
 import haxe.ds.IntMap;
 
 using alphatab.model.ModelUtils;
@@ -63,6 +64,7 @@ class BeamingHelper
 {
     private static var SCORE_MIDDLE_KEYS:Array<Int> = [ 48, 45, 38, 59 ];
 
+    public var voice:Voice;
     public var beats:Array<Beat>;
     private var _lastBeat:Beat;
     
@@ -132,6 +134,21 @@ class BeamingHelper
     
     public function getDirection() : BeamDirection
     { 
+        // multivoice handling
+        if (voice.index > 0)
+        {
+            return Down;
+        }
+        if (voice.bar.voices.length > 1)
+        {
+            for (v in 1 ... voice.bar.voices.length)
+            {
+                if (!voice.bar.voices[v].isEmpty())
+                {
+                    return Up;
+                }
+            }
+        }
         // the average key is used for determination
         //      key lowerequal than middle line -> up
         //      key higher than middle line -> down
@@ -141,6 +158,10 @@ class BeamingHelper
      
     public function checkBeat(beat:Beat) : Bool
     {
+        if (voice == null)
+        {
+            voice = beat.voice;
+        }
         // allow adding if there are no beats yet
         var add:Bool = false;
         if (beats.length == 0)

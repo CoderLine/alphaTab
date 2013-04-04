@@ -4,6 +4,7 @@ import alphatab.model.Beat;
 import alphatab.model.Voice;
 import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
+import alphatab.rendering.glyphs.BeatContainerGlyph;
 import alphatab.rendering.glyphs.BeatGlyphBase;
 import alphatab.rendering.glyphs.ISupportsFinalize;
 import alphatab.rendering.glyphs.SpacingGlyph;
@@ -26,7 +27,9 @@ class GroupedBarRenderer extends BarRendererBase
 	private var _preBeatGlyphs:Array<Glyph>;
     private var _voiceContainers:IntMap<VoiceContainerGlyph>;
 	private var _postBeatGlyphs:Array<Glyph>;
-	 
+	
+    private var _biggestVoiceContainer:VoiceContainerGlyph;
+    
 	public function new(bar:Bar) 
 	{
 		super(bar);
@@ -40,6 +43,10 @@ class GroupedBarRenderer extends BarRendererBase
 		createPreBeatGlyphs();
 		createBeatGlyphs();
 		createPostBeatGlyphs();
+        for (c in _voiceContainers)
+        {
+            c.doLayout();
+        }
 		updateWidth();
 	}
 	
@@ -50,6 +57,13 @@ class GroupedBarRenderer extends BarRendererBase
 		{
 			width += _postBeatGlyphs[_postBeatGlyphs.length - 1].x + _postBeatGlyphs[_postBeatGlyphs.length - 1].width;
 		}
+        for (c in _voiceContainers)
+        {
+            if (_biggestVoiceContainer == null || c.width > _biggestVoiceContainer.width)
+            {
+                _biggestVoiceContainer = c;
+            }
+        }
 	}
 	
 	public override function registerMaxSizes(sizes:BarSizeInfo):Void 
@@ -127,6 +141,7 @@ class GroupedBarRenderer extends BarRendererBase
 		}
 		
 		updateWidth();
+        
 	}
 	
 	private function addGlyph<T : (Glyph)>(c:Array<T>, g:T)
@@ -144,7 +159,7 @@ class GroupedBarRenderer extends BarRendererBase
 		addGlyph(_preBeatGlyphs, g);
 	}
 	
-	private function addBeatGlyph(g:BeatGlyphBase)
+	private function addBeatGlyph(g:BeatContainerGlyph)
 	{
         getOrCreateVoiceContainer(g.beat.voice.index).addGlyph(g);
 	}
@@ -165,28 +180,24 @@ class GroupedBarRenderer extends BarRendererBase
         return c;
     }
     
-    public function registerBeatPositions(b:Beat, pre:BeatGlyphBase, on:BeatGlyphBase, post:BeatGlyphBase)
+    public inline function getBeatContainer(voice:Int, beat:Int) :BeatContainerGlyph
     {
-        var c = getOrCreateVoiceContainer(b.voice.index);
-        
-        c.preBeatPosition.set(b.index, pre);
-        c.onBeatPosition.set(b.index, on);
-        c.postBeatPosition.set(b.index, post);
+        return getOrCreateVoiceContainer(voice).beatGlyphs[beat];
+    }    
+    
+    public inline function getPreNotesPosition(voice:Int, beat:Int)
+    {
+        return getBeatContainer(voice,beat).preNotes;
     }
     
-    public function getPreBeatPosition(voice:Int, beat:Int)
+    public inline function getOnNotesPosition(voice:Int, beat:Int)
     {
-        return getOrCreateVoiceContainer(voice).preBeatPosition.get(beat);
+        return getBeatContainer(voice,beat).onNotes;
     }
     
-    public function getOnBeatPosition(voice:Int, beat:Int)
+    public inline function getPostNotesPosition(voice:Int, beat:Int)
     {
-        return getOrCreateVoiceContainer(voice).onBeatPosition.get(beat);
-    }
-    
-    public function getPostBeatPosition(voice:Int, beat:Int)
-    {
-        return getOrCreateVoiceContainer(voice).postBeatPosition.get(beat);
+        return getBeatContainer(voice,beat).postNotes;
     }
     
 	
@@ -231,14 +242,18 @@ class GroupedBarRenderer extends BarRendererBase
         var offset:Int = 0;
         for (c in _voiceContainers)
         {
-            if (c.beatGlyphs.length > 0)
+            if (c.width > offset)
             {
-                var coff = c.beatGlyphs[c.beatGlyphs.length - 1].x + c.beatGlyphs[c.beatGlyphs.length - 1].width;
-                if (coff > offset)
-                {
-                    offset = coff;
-                }
+                offset = c.width;
             }
+            //if (c.beatGlyphs.length > 0)
+            //{
+            //    var coff = c.beatGlyphs[c.beatGlyphs.length - 1].x + c.beatGlyphs[c.beatGlyphs.length - 1].width;
+            //    if (coff > offset)
+            //    {
+            //        offset = coff;
+            //    }
+            //}
         }
 		
 		return start + offset;		
@@ -246,11 +261,16 @@ class GroupedBarRenderer extends BarRendererBase
 		
 	public override function applyBarSpacing(spacing:Int):Void 
 	{
-        width += spacing;
-     
+        width += spacing;     
+        
         for (c in _voiceContainers)
         {
-            c.applyGlyphSpacing(spacing);
+            var toApply = spacing;
+            if (_biggestVoiceContainer != null)
+            {
+                toApply += _biggestVoiceContainer.width - c.width; 
+            }
+            c.applyGlyphSpacing(toApply);
         }
 	}
 	
@@ -284,7 +304,7 @@ class GroupedBarRenderer extends BarRendererBase
 			g.paint(cx + x + glyphStartX, cy + y, canvas);
 		}	
 	}
-	
+    
 	public function paintBackground(cx:Int, cy:Int, canvas:ICanvas)
 	{
 		

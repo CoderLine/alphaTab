@@ -44,7 +44,6 @@ class TabNoteChordGlyph extends Glyph
 		return 0;
 	}
 	
-	
 	public override function doLayout():Void 
 	{
 		var w = 0;

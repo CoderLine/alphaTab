@@ -13,9 +13,9 @@ class TabBeatGlyph extends BeatGlyphBase
 	private var _ties:Array<Glyph>;
 	public var noteNumbers : TabNoteChordGlyph;
 
-	public function new(b:Beat) 
+	public function new() 
 	{
-		super(b);
+		super();
 		_ties = new Array<Glyph>();
 	}
 	
@@ -32,13 +32,13 @@ class TabBeatGlyph extends BeatGlyphBase
 	public override function doLayout():Void 
 	{
 		// create glyphs
-		if (!beat.isRest())
+		if (!container.beat.isRest())
         {
 			//
             // Note numbers
             //
             noteNumbers = new TabNoteChordGlyph();
-            noteNumbers.beat = beat;
+            noteNumbers.beat = container.beat;
             noteLoop( function(n) {
                 createNoteGlyph(n);
             });
@@ -60,7 +60,7 @@ class TabBeatGlyph extends BeatGlyphBase
 	
 	private function createNoteGlyph(n:Note) 
     {
-		var isGrace = beat.graceType != GraceType.None;
+		var isGrace = container.beat.graceType != GraceType.None;
 		var tr = cast(renderer, TabBarRenderer);
         var noteNumberGlyph:Glyph = new NoteNumberGlyph(0, 0, n, isGrace);    
 		var l = n.beat.voice.bar.track.tuning.length - n.string + 1;
