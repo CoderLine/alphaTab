@@ -35,6 +35,8 @@ class Beat
     public var maxNote:Note;
     public var duration:Duration;
     
+    public var isEmpty:Bool;
+    
     public var automations:Array<Automation>;
     
     public function isRest():Bool 

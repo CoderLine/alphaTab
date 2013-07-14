@@ -103,10 +103,14 @@ class TabBarRenderer extends GroupedBarRenderer
 
 	private override function createBeatGlyphs():Void 
 	{
+#if MULTIVOICE_SUPPORT
         for (v in _bar.voices)
         {
             createVoiceGlyphs(v);
         }
+#else
+        createVoiceGlyphs(_bar.voices[0]);
+#end
 	}
 	
     private function createVoiceGlyphs(v:Voice)

@@ -128,7 +128,7 @@ class Gp3ImporterTest extends GpImporterTestBase
         var reader = prepareImporterWithFile("TestOtherEffects.gp3");
         var score = reader.readScore();
                
-        assertTrue(score.tracks[0].bars[0].voices[0].beats[2].notes[0].tapping);
+        assertTrue(score.tracks[0].bars[0].voices[0].beats[2].tap);
         assertTrue(score.tracks[0].bars[0].voices[0].beats[3].slap);
         
         assertTrue(score.tracks[0].bars[1].voices[0].beats[0].pop);

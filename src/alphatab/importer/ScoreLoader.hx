@@ -79,6 +79,52 @@ class ScoreLoader
             ,
             error
         );
-
+    }	
+    
+    /**
+	 * Loads a score synchronously from the given datasource
+	 * @param	path the source path to load the binary file from
+	 * @param	success this function is called if the Score was successfully loaded from the datasource
+	 * @param	error this function is called if any error during the loading occured.
+	 */
+    public static function loadScore(path:String) : Score
+    {
+        var loader:IFileLoader = Environment.fileLoaders.get("default")();
+        var data = loader.loadBinary(path);
+                
+        var importers:Array<ScoreImporter> = ScoreImporter.availableImporters();
+                
+        var score:Score = null;
+        for (importer in importers)
+        {
+            try
+            {
+                var input:BytesInput = new BytesInput(data);
+                importer.init(input);
+                
+                score = importer.readScore();                        
+                break;
+            }
+            catch (e:Dynamic)
+            {
+                if (e == ScoreImporter.UNSUPPORTED_FORMAT)
+                {
+                    continue;
+                }
+                else
+                {
+                    throw e;
+                }
+            }                    
+        }
+        
+        if (score != null)
+        {
+            return score;
+        }
+        else
+        {
+            throw "No reader for the requested file found";
+        }
     }
 }

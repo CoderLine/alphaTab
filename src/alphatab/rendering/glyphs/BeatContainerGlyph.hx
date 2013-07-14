@@ -2,12 +2,17 @@ package alphatab.rendering.glyphs;
 import alphatab.model.Beat;
 import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
+import alphatab.platform.model.Font;
 import alphatab.rendering.Glyph;
 import alphatab.rendering.layout.ScoreLayout;
 import alphatab.rendering.staves.BarSizeInfo;
 
 class BeatContainerGlyph extends Glyph implements ISupportsFinalize
 {
+    /**
+     * pixel / fullnote ticks
+     */
+    private static inline var PixelPerTick:Float = 160 / 3840;
     public var beat:Beat;
     public var preNotes:BeatGlyphBase;
     public var onNotes:BeatGlyphBase;
@@ -35,19 +40,34 @@ class BeatContainerGlyph extends Glyph implements ISupportsFinalize
         }
     }
     
+    private inline function preNotesKey()
+    {
+        return "PRE_NOTES" + beat.voice.index;
+    }
+    
+    private inline function onNotesKey()
+    {
+        return "ON_NOTES" + beat.voice.index;
+    }
+    
+    private inline function postNotesKey()
+    {
+        return "POST_NOTES" + beat.voice.index;
+    }
+    
     public function registerMaxSizes(sizes:BarSizeInfo)
     {
-        if (sizes.getIndexedSize("PRE_NOTES", beat.index) < preNotes.width)
+        if (sizes.getIndexedSize(preNotesKey(), beat.start) < preNotes.width)
         {
-            sizes.setIndexedSize("PRE_NOTES", beat.index, preNotes.width);
+            sizes.setIndexedSize(preNotesKey(), beat.start, preNotes.width);
         }      
-        if (sizes.getIndexedSize("ON_NOTES", beat.index) < onNotes.width)
+        if (sizes.getIndexedSize(onNotesKey(), beat.start) < onNotes.width)
         {
-            sizes.setIndexedSize("ON_NOTES", beat.index, onNotes.width);
+            sizes.setIndexedSize(onNotesKey(), beat.start, onNotes.width);
         }
-        if (sizes.getIndexedSize("POST_NOTES", beat.index) < postNotes.width)
+        if (sizes.getIndexedSize(postNotesKey(), beat.start) < postNotes.width)
         {
-            sizes.setIndexedSize("POST_NOTES", beat.index, postNotes.width);
+            sizes.setIndexedSize(postNotesKey(), beat.start, postNotes.width);
         }
     }
     
@@ -56,23 +76,32 @@ class BeatContainerGlyph extends Glyph implements ISupportsFinalize
         var size:Int;
         var diff:Int;
         
-        size = sizes.getIndexedSize("PRE_NOTES", beat.index);
+        size = sizes.getIndexedSize(preNotesKey(), beat.start);
         diff = size - preNotes.width;
         preNotes.x = 0;
         if (diff > 0) preNotes.applyGlyphSpacing(diff);
         
-        size = sizes.getIndexedSize("ON_NOTES", beat.index);
+        size = sizes.getIndexedSize(onNotesKey(), beat.start);
         diff = size - onNotes.width;
         onNotes.x = preNotes.x + preNotes.width;
         if (diff > 0) onNotes.applyGlyphSpacing(diff);
         
-        size = sizes.getIndexedSize("POST_NOTES", beat.index);
+        size = sizes.getIndexedSize(postNotesKey(), beat.start);
         diff = size - postNotes.width;
         postNotes.x = onNotes.x + onNotes.width;
         if (diff > 0) postNotes.applyGlyphSpacing(diff);
-        
-        width = postNotes.x + postNotes.width;
+
+        width = calculateWidth();
     }    
+    
+    private function calculateWidth() : Int
+    {
+#if MULTIVOICE_SUPPORT
+        return Std.int(beat.calculateDuration() * PixelPerTick * getScale());
+#else 
+        return postNotes.x + postNotes.width;
+#end        
+    }
     
     public override function doLayout():Void 
     {
@@ -94,11 +123,17 @@ class BeatContainerGlyph extends Glyph implements ISupportsFinalize
         postNotes.container = this;
         postNotes.doLayout();
         
-        width = postNotes.x + postNotes.width;
+        width = calculateWidth();
     }
     
     public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
     {
+        // canvas.setColor(new Color(200, 0, 0, 100));
+        // canvas.fillRect(cx + x, cy + y + 15 * beat.voice.index, width, 10);
+        // canvas.setFont(new Font("Arial", 10));
+        // canvas.setColor(new Color(0, 0, 0));
+        // canvas.fillText(beat.voice.index + ":" + beat.index, cx + x, cy +y + 15 * beat.voice.index);
+        
         preNotes.paint(cx + x, cy + y, canvas);
         //canvas.setColor(new Color(200, 0, 0, 100));
         //canvas.fillRect(cx + x + preNotes.x, cy + y + preNotes.y, preNotes.width, 10);

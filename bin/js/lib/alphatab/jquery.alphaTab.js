@@ -129,7 +129,6 @@
      */
     function load( url, track, success, error ) 
     {
-        debugger;
         var context = $(this).data('alphaTab');
         if(!context) { $.error('alphaTab not initialized!'); }
         alphatab.importer.ScoreLoader.loadScoreAsync(url, 

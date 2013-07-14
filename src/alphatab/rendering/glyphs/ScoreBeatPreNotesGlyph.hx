@@ -10,11 +10,6 @@ class ScoreBeatPreNotesGlyph extends BeatGlyphBase
 		super();
 	}
     
-    public override function canScale():Bool 
-    {
-        return false;
-    }
-    
 	public override function applyGlyphSpacing(spacing:Int):Void 
 	{
 		super.applyGlyphSpacing(spacing);

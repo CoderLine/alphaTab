@@ -34,14 +34,7 @@ class VoiceContainerGlyph extends GlyphGroup implements ISupportsFinalize
             var g = beatGlyphs[i];
             g.x = Std.int(gx);
             gx += g.width + glyphSpacing;
-            if (g == beatGlyphs[beatGlyphs.length - 1])
-            {
-                g.applyGlyphSpacing(Std.int(glyphSpacing + (spacing - gx)));
-            }
-            else
-            {
-                g.applyGlyphSpacing(Std.int(glyphSpacing));
-            }
+            g.applyGlyphSpacing(Std.int(glyphSpacing));
         }
         width = Std.int(gx);
     }

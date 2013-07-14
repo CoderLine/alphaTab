@@ -493,10 +493,14 @@ class ScoreBarRenderer extends GroupedBarRenderer
 
 	private override function createBeatGlyphs():Void 
 	{
+#if MULTIVOICE_SUPPORT
         for (v in _bar.voices)
         {
             createVoiceGlyphs(v);
         }
+#else
+        createVoiceGlyphs(_bar.voices[0]);
+#end
 	}
 	
 	private override function createPostBeatGlyphs():Void 

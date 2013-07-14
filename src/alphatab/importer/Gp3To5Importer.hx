@@ -563,15 +563,10 @@ class Gp3To5Importer extends ScoreImporter
         
         if ( (flags & 0x40) != 0)
         {
-            if (readBool()) // emptybeat / emptyvoice
-            {
-                return;
-            }
+            var type = readUInt8();
+            newBeat.isEmpty = (type & 0x02) == 0;
         }
-        else
-        {
-            voice.addBeat(newBeat);
-        }
+        voice.addBeat(newBeat);
 
         
         var duration = _data.readInt8();

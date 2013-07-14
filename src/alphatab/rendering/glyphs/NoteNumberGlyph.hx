@@ -48,8 +48,8 @@ class NoteNumberGlyph extends Glyph
 		if (_noteString != null) 
 		{
 			var res = renderer.getResources();
-            canvas.setColor(new Color(200, 200, 0, 100));
-            canvas.fillRect(cx + x, cy + y, width, 10);
+            //canvas.setColor(new Color(200, 200, 0, 100));
+            //canvas.fillRect(cx + x, cy + y, width, 10);
 			canvas.setColor(res.mainGlyphColor);
 			if (_isGrace) 
 			{

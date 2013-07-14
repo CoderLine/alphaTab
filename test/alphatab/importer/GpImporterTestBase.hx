@@ -16,6 +16,7 @@
  */
 package alphatab.importer;
 
+import alphatab.Environment;
 import alphatab.model.AccentuationType;
 import alphatab.model.AutomationType;
 import alphatab.model.BrushType;
@@ -26,7 +27,6 @@ import alphatab.model.PickStrokeType;
 import alphatab.model.Score;
 import alphatab.model.SlideType;
 import alphatab.model.VibratoType;
-import alphatab.platform.PlatformFactory;
 import haxe.io.Bytes;
 import haxe.io.BytesInput;
 import haxe.unit.TestCase;
@@ -51,7 +51,7 @@ class GpImporterTestBase extends TestCase
 #elseif js
         var path = "test-files";
 #end
-        var buffer = PlatformFactory.getLoader().loadBinary(path + "/" + name);
+        var buffer = Environment.fileLoaders.get("default")().loadBinary(path + "/" + name);
         return prepareImporterWithBytes(buffer);
     }
     
@@ -289,20 +289,20 @@ class GpImporterTestBase extends TestCase
         assertEquals(0, score.tracks[0].bars[0].voices[0].beats[1].notes[0].trillSpeed);
         
         assertTrue(score.tracks[0].bars[0].voices[0].beats[1].isTremolo());
-        assertEquals(3, score.tracks[0].bars[0].voices[0].beats[1].tremoloSpeed);
+        assertEquals(Duration.ThirtySecond, score.tracks[0].bars[0].voices[0].beats[1].tremoloSpeed);
         
         assertTrue(score.tracks[0].bars[0].voices[0].beats[2].isTremolo());
-        assertEquals(2, score.tracks[0].bars[0].voices[0].beats[2].tremoloSpeed);
+        assertEquals(Duration.Sixteenth, score.tracks[0].bars[0].voices[0].beats[2].tremoloSpeed);
         
         assertTrue(score.tracks[0].bars[0].voices[0].beats[3].isTremolo());
-        assertEquals(1, score.tracks[0].bars[0].voices[0].beats[3].tremoloSpeed);
+        assertEquals(Duration.Eighth, score.tracks[0].bars[0].voices[0].beats[3].tremoloSpeed);
     } 
     
     public function checkOtherEffects(score:Score)
     {
         assertTrue(score.tracks[0].bars[0].voices[0].beats[0].notes[0].isPalmMute);
         assertTrue(score.tracks[0].bars[0].voices[0].beats[1].notes[0].isStaccato);
-        assertTrue(score.tracks[0].bars[0].voices[0].beats[2].notes[0].tapping);
+        assertTrue(score.tracks[0].bars[0].voices[0].beats[2].tap);
         assertTrue(score.tracks[0].bars[0].voices[0].beats[3].slap);
         
         assertTrue(score.tracks[0].bars[1].voices[0].beats[0].pop);
