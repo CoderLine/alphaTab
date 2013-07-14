@@ -34,8 +34,8 @@ import alphatab.rendering.staves.StaveGroup;
  */
 class PageViewLayout extends ScoreLayout
 {
-	public static var SCORE_INFOS = "scoreInfos";
-	
+    public static var SCORE_INFOS = "scoreInfos";
+    
     // left top right bottom
     public static var PAGE_PADDING:Array<Int> = [20, 20, 20, 20];
     public static inline var WIDTH_ON_100:Int = 795;
@@ -48,19 +48,19 @@ class PageViewLayout extends ScoreLayout
         super(renderer);
         _groups = new Array<StaveGroup>();
     }
-	
-	public static inline var GroupSpacing = 20;
+    
+    public static inline var GroupSpacing = 20;
     
     public override function doLayout()
     {
-		_groups = new Array<StaveGroup>();
+        _groups = new Array<StaveGroup>();
         var currentBarIndex = 0;
         var endBarIndex = renderer.track.bars.length - 1;
         
         var x = PAGE_PADDING[0];
         var y = PAGE_PADDING[1];
-		
-		y = doScoreInfoLayout(y);
+        
+        y = doScoreInfoLayout(y);
         
         while (currentBarIndex <= endBarIndex)
         {
@@ -72,7 +72,7 @@ class PageViewLayout extends ScoreLayout
             
             fitGroup(group);
             group.finalizeGroup(this);
-			
+            
             y += group.calculateHeight() + Std.int(GroupSpacing * renderer.scale);
             
             currentBarIndex = group.getLastBarIndex() + 1;
@@ -81,13 +81,13 @@ class PageViewLayout extends ScoreLayout
         height = y + PAGE_PADDING[3];
         width = Std.int(WIDTH_ON_100 * renderer.scale);
     }
-	
-	private function doScoreInfoLayout(y:Int)
-	{
+    
+    private function doScoreInfoLayout(y:Int)
+    {
         // TODO: Check if it's a good choice to provide the complete flags as setting
-		var flags:Int = renderer.settings.layout.get("hideInfo", false) ? HeaderFooterElements.NONE : HeaderFooterElements.ALL;
-		var score:Score = renderer.score;
-		var scale:Float = renderer.scale;
+        var flags:Int = renderer.settings.layout.get("hideInfo", false) ? HeaderFooterElements.NONE : HeaderFooterElements.ALL;
+        var score:Score = renderer.score;
+        var scale:Float = renderer.scale;
 
         if (!isNullOrEmpty(score.title) && (flags & HeaderFooterElements.TITLE != 0))
         {
@@ -147,78 +147,79 @@ class PageViewLayout extends ScoreLayout
         
         return y;
 
-	}
-	
-	public override function paintScore():Void 
-	{
-		var x = PAGE_PADDING[0];
+    }
+    
+    public override function paintScore():Void 
+    {
+        var x = PAGE_PADDING[0];
         var y = PAGE_PADDING[1];
-		
-		y = paintScoreInfo(x, y);
-		
-        for (g in _groups)
-		{
-			g.paint(0, 0, renderer.canvas);
-		}
-	}
-	
-	private function drawCentered(text:String, font:Font, y:Int)
-	{
-		renderer.canvas.setFont(font);
-		renderer.canvas.fillText(text, width/2, y);
-	}
-	
-	private function paintScoreInfo(x:Int, y:Int)
-	{
-		var flags:Int = renderer.settings.layout.get("hideInfo", false) ? HeaderFooterElements.NONE : HeaderFooterElements.ALL;
-		var score:Score = renderer.score;
-		var scale:Float = renderer.scale;
-		
-		var canvas:ICanvas = renderer.canvas;
-		var res:RenderingResources = renderer.renderingResources;
-		
-		canvas.setColor(new Color(0, 0, 0));
-		canvas.setTextAlign(TextAlign.Center);
         
-		var tX:Float;
+        y = paintScoreInfo(x, y);
+        
+        for (g in _groups)
+        {
+            g.paint(0, 0, renderer.canvas);
+        }
+    }
+    
+    private function drawCentered(text:String, font:Font, y:Int)
+    {
+        renderer.canvas.setFont(font);
+        renderer.canvas.fillText(text, width/2, y);
+    }
+    
+    private function paintScoreInfo(x:Int, y:Int)
+    {
+        var flags:Int = renderer.settings.layout.get("hideInfo", false) ? HeaderFooterElements.NONE : HeaderFooterElements.ALL;
+        var score:Score = renderer.score;
+        var scale:Float = renderer.scale;
+        
+        var canvas:ICanvas = renderer.canvas;
+        var res:RenderingResources = renderer.renderingResources;
+        
+        canvas.setColor(new Color(0, 0, 0));
+        canvas.setTextAlign(TextAlign.Center);
+        
+        var tX:Float;
         var size:Float;
         var str:String = "";
         if (!isNullOrEmpty(score.title) && (flags & HeaderFooterElements.TITLE != 0))
         {
-			drawCentered(score.title, res.titleFont, y);
+            drawCentered(score.title, res.titleFont, y);
             y += Math.floor(35*scale); 
         }        
         if (!isNullOrEmpty(score.subTitle) && (flags & HeaderFooterElements.SUBTITLE != 0))
         {
-			drawCentered(score.subTitle, res.subTitleFont, y);
+            drawCentered(score.subTitle, res.subTitleFont, y);
             y += Math.floor(20*scale);
         }
         if (!isNullOrEmpty(score.artist) && (flags & HeaderFooterElements.ARTIST != 0))
         {
-			drawCentered(score.artist, res.subTitleFont, y);
+            drawCentered(score.artist, res.subTitleFont, y);
             y += Math.floor(20*scale);
         }
         if (!isNullOrEmpty(score.album) && (flags & HeaderFooterElements.ALBUM != 0))
         {
-			drawCentered(score.album, res.subTitleFont, y);
+            drawCentered(score.album, res.subTitleFont, y);
             y += Math.floor(20*scale);
         }
         if (!isNullOrEmpty(score.music) && score.music == score.words && (flags & HeaderFooterElements.WORDS_AND_MUSIC != 0))
         {
-			drawCentered(score.words, res.wordsFont, y);
+            drawCentered("Music and Words by " + score.words, res.wordsFont, y);
             y += Math.floor(20*scale);
         }
         else 
         {
-			canvas.setFont(res.wordsFont);
+            canvas.setFont(res.wordsFont);
             if (!isNullOrEmpty(score.music) && (flags & HeaderFooterElements.MUSIC != 0))
             {
-				var size = canvas.measureText(score.music);
-				canvas.fillText(score.music, (width - size - PAGE_PADDING[2]), y);
+                var size = canvas.measureText(score.music);
+                canvas.fillText("Music by " + score.music, (width - size - PAGE_PADDING[2]), y);
             }
             if (!isNullOrEmpty(score.words) && (flags & HeaderFooterElements.WORDS != 0))
             {
-				canvas.fillText(score.music, x, y);
+                canvas.setTextAlign(TextAlign.Left);
+                canvas.fillText("Words by " + score.music, x, y);
             }
             y += Math.floor(20*scale);
         }    
@@ -228,13 +229,13 @@ class PageViewLayout extends ScoreLayout
         // tuning info
         if(!renderer.track.isPercussion)
         {
-			canvas.setTextAlign(TextAlign.Left);
+            canvas.setTextAlign(TextAlign.Left);
             var tuning:Tuning = Tuning.findTuning(renderer.track.tuning);
             if(tuning != null)
             {
                 // Name
-				canvas.setFont(res.effectFont);
-				canvas.fillText(tuning.name, x, y);
+                canvas.setFont(res.effectFont);
+                canvas.fillText(tuning.name, x, y);
                 
                 y += Math.floor(15*scale);
                 
@@ -249,7 +250,7 @@ class PageViewLayout extends ScoreLayout
                     for(i in 0 ... renderer.track.tuning.length)
                     {
                         str = "(" + Std.string(i + 1) + ") = " + Tuning.getTextForTuning(renderer.track.tuning[i], false);
-						canvas.fillText(str, currentX, currentY);
+                        canvas.fillText(str, currentX, currentY);
                         currentY += Math.floor(15*scale);
                         if(i == stringsPerColumn - 1)
                         {
@@ -264,13 +265,13 @@ class PageViewLayout extends ScoreLayout
         }
         y += Math.floor(25*scale);
         return y;
-	}
-	
-	private function isNullOrEmpty(s:String) : Bool
-	{
-		return s == null || StringTools.trim(s) == "";
-	}
-	
+    }
+    
+    private function isNullOrEmpty(s:String) : Bool
+    {
+        return s == null || StringTools.trim(s) == "";
+    }
+    
     
     /**
      * Realignes the bars in this line according to the available space
@@ -290,11 +291,11 @@ class PageViewLayout extends ScoreLayout
         }
         
         // add it to the measures
-		group.applyBarSpacing(barSpace);
+        group.applyBarSpacing(barSpace);
         
         width = Math.round(Math.max(width, group.width));    
     }
-	
+    
     private function createStaveGroup(currentBarIndex:Int) : StaveGroup
     {
         var group:StaveGroup = createEmptyStaveGroup();
@@ -302,8 +303,8 @@ class PageViewLayout extends ScoreLayout
         var maxWidth = getMaxWidth();
         for (i in currentBarIndex ... renderer.track.bars.length)
         {
-			var bar = renderer.track.bars[i];
-			group.addBar(bar);
+            var bar = renderer.track.bars[i];
+            group.addBar(bar);
             
             var groupIsFull:Bool = false;
             
@@ -315,8 +316,8 @@ class PageViewLayout extends ScoreLayout
             
             if (groupIsFull)
             {
-				group.revertLastBar();
-				group.isFull = true;
+                group.revertLastBar();
+                group.isFull = true;
                 return group;
             }
             
@@ -330,8 +331,8 @@ class PageViewLayout extends ScoreLayout
     {
         return (getSheetWidth() - PAGE_PADDING[0] - PAGE_PADDING[2]);
     }
-	
-	    
+    
+        
     private function getSheetWidth() : Int
     {
         return Math.round(WIDTH_ON_100 * renderer.scale);

@@ -927,15 +927,18 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 			y += Math.floor(20 * scale);
 		}
 		if(!this.isNullOrEmpty(score.music) && score.music == score.words && (flags & 64) != 0) {
-			this.drawCentered(score.words,res.wordsFont,y);
+			this.drawCentered("Music and Words by " + score.words,res.wordsFont,y);
 			y += Math.floor(20 * scale);
 		} else {
 			canvas.setFont(res.wordsFont);
 			if(!this.isNullOrEmpty(score.music) && (flags & 32) != 0) {
 				var size1 = canvas.measureText(score.music);
-				canvas.fillText(score.music,this.width - size1 - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2],y);
+				canvas.fillText("Music by " + score.music,this.width - size1 - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2],y);
 			}
-			if(!this.isNullOrEmpty(score.words) && (flags & 16) != 0) canvas.fillText(score.music,x,y);
+			if(!this.isNullOrEmpty(score.words) && (flags & 16) != 0) {
+				canvas.setTextAlign(alphatab.platform.model.TextAlign.Left);
+				canvas.fillText("Words by " + score.music,x,y);
+			}
 			y += Math.floor(20 * scale);
 		}
 		y += Math.floor(20 * scale);

@@ -107,15 +107,26 @@
                     };
                 }
                 
+                $this.data('alphaTab', context);                
+                
                 //
                 // Load default data
                 if(contents != "") 
                 {
                     api.tex.apply(this, [contents]);
                 }
-                
-                
-                $this.data('alphaTab', context);                
+                else if($this.data('file') != '') 
+                {
+                    alphatab.importer.ScoreLoader.loadScoreAsync($this.data('file'), 
+                    function(score)
+                    {
+                        scoreLoaded(context, score);
+                    }, 
+                    function (error)
+                    {
+                        $.error(error);
+                    });
+                }
             }
         });
     }
@@ -194,11 +205,12 @@
     }
     
     /**
-     * Get the currently loaded song
+     * Get the currently loaded score
      */
-    function song() 
+    function score() 
     {
-        
+        var context = $(this).data('alphaTab');
+        return context.renderer.track.score;
     }
 
     // expose API
@@ -206,7 +218,7 @@
     api.load = load;
     api.tex = tex;
     api.track = track;
-    api.song = song;
+    api.score = score;
     
     
     $.fn.alphaTab = function(method) {
