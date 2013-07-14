@@ -58,7 +58,14 @@ class ScoreRenderer
             canvas = Environment.renderEngines.get(settings.engine)(param);
         }
         updateScale(1.0);
-        layout = new PageViewLayout(this);
+        if (settings.layout == null || !Environment.layoutEngines.exists(settings.layout.mode))
+        {
+            layout = Environment.layoutEngines.get("default")(this);
+        }
+        else 
+        {
+            layout = Environment.layoutEngines.get(settings.layout.mode)(this);
+        }
     }
 	
 	public function updateScale(scale:Float)

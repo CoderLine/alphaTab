@@ -1,5 +1,6 @@
 package alphatab.rendering.glyphs.effects;
 import alphatab.platform.ICanvas;
+import alphatab.platform.model.Color;
 import alphatab.platform.model.Font;
 import alphatab.rendering.Glyph;
 
@@ -14,10 +15,11 @@ class TextGlyph extends Glyph
         _text = text;
         _font = font;
 	}	
-	
+    
     public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
     {
         var res = renderer.getResources();
+        
         canvas.setFont(_font);
         canvas.setColor(res.mainGlyphColor);
         

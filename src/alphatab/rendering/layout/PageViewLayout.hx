@@ -54,28 +54,39 @@ class PageViewLayout extends ScoreLayout
     public override function doLayout()
     {
         _groups = new Array<StaveGroup>();
-        var currentBarIndex = 0;
-        var endBarIndex = renderer.track.bars.length - 1;
+        
+        var startIndex = renderer.settings.layout.get('start', 1);
+        startIndex--; // map to array index
+        startIndex = Std.int(Math.min(renderer.track.bars.length - 1, Math.max(0, startIndex)));
+        var currentBarIndex = startIndex;
+ 
+        var endBarIndex = renderer.settings.layout.get('count', renderer.track.bars.length);
+        endBarIndex = startIndex + endBarIndex - 1; // map count to array index
+        endBarIndex = Std.int(Math.min(renderer.track.bars.length - 1, Math.max(0, endBarIndex)));
+                
         
         var x = PAGE_PADDING[0];
         var y = PAGE_PADDING[1];
         
         y = doScoreInfoLayout(y);
         
-        while (currentBarIndex <= endBarIndex)
-        {
-            var group:StaveGroup = createStaveGroup(currentBarIndex);
-            _groups.push(group);
-            
-            group.x = x;
-            group.y = y;
-            
-            fitGroup(group);
-            group.finalizeGroup(this);
-            
-            y += group.calculateHeight() + Std.int(GroupSpacing * renderer.scale);
-            
-            currentBarIndex = group.getLastBarIndex() + 1;
+        if (renderer.settings.staves.length > 0) 
+        {       
+            while (currentBarIndex <= endBarIndex)
+            {
+                var group:StaveGroup = createStaveGroup(currentBarIndex, endBarIndex);
+                _groups.push(group);
+                
+                group.x = x;
+                group.y = y;
+                
+                fitGroup(group);
+                group.finalizeGroup(this);
+                
+                y += group.calculateHeight() + Std.int(GroupSpacing * renderer.scale);
+                
+                currentBarIndex = group.getLastBarIndex() + 1;
+            }
         }
         
         height = y + PAGE_PADDING[3];
@@ -296,14 +307,15 @@ class PageViewLayout extends ScoreLayout
         width = Math.round(Math.max(width, group.width));    
     }
     
-    private function createStaveGroup(currentBarIndex:Int) : StaveGroup
+    private function createStaveGroup(currentBarIndex:Int, endIndex:Int) : StaveGroup
     {
         var group:StaveGroup = createEmptyStaveGroup();
         
         var barsPerRow:Int = renderer.settings.layout.get("barsPerRow", -1);
                 
         var maxWidth = getMaxWidth();
-        for (i in currentBarIndex ... renderer.track.bars.length)
+        var end = endIndex + 1;
+        for (i in currentBarIndex ... end)
         {
             var bar = renderer.track.bars[i];
             group.addBar(bar);

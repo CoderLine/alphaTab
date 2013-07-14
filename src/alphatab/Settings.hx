@@ -125,9 +125,9 @@ class Settings
         if (json.staves)
         {
             settings.staves = new Array<StaveSettings>();
-            for (key in Reflect.fields(json.layout.additionalSettings))
+            for (key in Reflect.fields(json.staves.additionalSettings))
             {
-                var val:Dynamic = Reflect.field(json.layout.additionalSettings, key);
+                var val:Dynamic = Reflect.field(json.staves.additionalSettings, key);
                 if (Std.is(val, String))
                 {
                     settings.staves.push(new StaveSettings(val));
@@ -174,6 +174,11 @@ class LayoutSettings
      *  <li><strong>start</strong> - The bar start index to start layouting with (integer: default: 0)</li>
      *  <li><strong>count</strong> - The amount of bars to render overall, <em>-1 for all till the end</em>  (integer, default:-1)</li>
      *  <li><strong>hideInfo</strong> - Render the song information or not (boolean, default:true)</li>
+     * </ul>
+     * <strong>mode=horizontal</strong>
+     * <ul>
+     *  <li><strong>start</strong> - The bar start index to start layouting with (integer: default: 0)</li>
+     *  <li><strong>count</strong> - The amount of bars to render overall, <em>-1 for all till the end</em>  (integer, default:-1)</li>
      * </ul>
      */
     public var additionalSettings:StringMap<Dynamic>;

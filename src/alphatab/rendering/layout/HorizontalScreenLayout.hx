@@ -20,18 +20,28 @@ class HorizontalScreenLayout extends ScoreLayout
 
 	public override function doLayout()
     {
-        var currentBarIndex = 0;
-        var endBarIndex = renderer.track.bars.length - 1;
+        if (renderer.settings.staves.length == 0) return;
         
+        var startIndex = renderer.settings.layout.get('start', 1);
+        startIndex--; // map to array index
+        startIndex = Std.int(Math.min(renderer.track.bars.length - 1, Math.max(0, startIndex)));
+        var currentBarIndex = startIndex;
+ 
+        var endBarIndex = renderer.settings.layout.get('count', renderer.track.bars.length);
+        endBarIndex = startIndex + endBarIndex - 1; // map count to array index
+        endBarIndex = Std.int(Math.min(renderer.track.bars.length - 1, Math.max(0, endBarIndex)));
+
         var x = PAGE_PADDING[0];
         var y = PAGE_PADDING[1];
 		
 		_group = createEmptyStaveGroup();
 		
-		for (i in 0 ... renderer.track.bars.length)
+		while (currentBarIndex <= endBarIndex)
 		{
-			var bar = renderer.track.bars[i];
+			var bar = renderer.track.bars[currentBarIndex];
 			_group.addBar(bar);
+            
+            currentBarIndex++;
 		}		
 		
 		_group.x = x;

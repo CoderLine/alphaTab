@@ -26,7 +26,7 @@ class TextEffectInfo implements IEffectBarRendererInfo
     
     public function getSizingMode() : EffectBarGlyphSizing
     {
-        return EffectBarGlyphSizing.SinglePreBeatOnly;
+        return EffectBarGlyphSizing.SingleOnBeatOnly;
     }
 
     public function createNewGlyph(renderer : EffectBarRenderer, beat:Beat) : Glyph

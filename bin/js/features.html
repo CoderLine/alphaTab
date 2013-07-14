@@ -4,34 +4,66 @@
     <meta charset="utf-8">
     <title></title>
     <style type="text/css">
-	.alphaTabSurface { border:1px solid #000; }
+    body { text-align:center; font-family:Open Sans, Arial sans-serif; background:#F5F6F7; }
+	.alphaTabSurface { box-shadow: 0 0 10px rgba(0,0,0,0.3); background:#FFF; border-radius:3px; }
+    #alphaTabScore { margin: 0 auto; width: 500px; text-align:left; }
 	</style>
     <script type="text/javascript" src="lib/jquery/jquery-1.7.1.min.js"></script>
     <script type="text/javascript" src="lib/alphatab/alphaTab.core.js"></script>
     <script type="text/javascript" src="lib/alphatab/jquery.alphaTab.js"></script>
-	<script language="JavaScript" type="text/javascript">
-	(function($) {
-		$(document).ready(function() {
-			// $('div.alphaTab1').alphaTab();
-			$('div.alphaTab2').alphaTab({
-                layout: {
-                    mode: 'blubb',
-                    additionalSettings: {
-                        barsPerRow: 5
-                    }
-                }
-            });
-		});
-	})(jQuery);
-	</script> 
 </head>
 <body>
     
+    <h1>Score Details</h1>
+    
+    <p>
+        The full score details are available as object dom. This way you can read and process any
+        file like you need. 
+    </p>
+    
+    <div id="alphaTabScore" data-file="files/features/Skillet.gp5">
+        Loading...        
+    </div>
+    <script language="JavaScript" type="text/javascript">
+        var score = alphatab.importer.ScoreLoader.loadScoreAsync(jQuery('#alphaTabScore').data('file'), 
+        function(score) {
+            var info = jQuery('#alphaTabScore');
+            info.html('');
+            info.append('<p><b>Title:</b> '+score.title+'</p>');
+            info.append('<p><b>Subtitle:</b> '+score.subtitle+'</p>');
+            info.append('<p><b>Album:</b> '+score.album+'</p>');
+            info.append('<p><b>Tempo:</b> '+score.tempo+'</p>');
+            info.append('<p><b>Bars:</b> '+score.masterBars.length+'</p>');
+            info.append('<p><b>Tracks:</b> ('+score.tracks.length+')</p>');
+            var tracks = $('<ul></ul>');
+            for(var i = 0; i < score.tracks.length; i++) {
+                tracks.append('<li>'+score.tracks[i].name+'</li>');
+            }
+            info.append(tracks);
+        },
+        function(error) {
+            jQuery('#alphaTabScore').text('Error Loading the file: ' + error);
+        });
+	</script>
+    
     <h1>Song Details</h1>
     
-    <div class="alphaTab1" data-file="files/features/SongDetails.gp5"></div>
-
+    <p>
+        Some of the layout engines can render the song details on top of the music sheet.
+    </p>
+    
+    <div id="alphaTabDetails" data-file="files/features/SongDetails.gp5"></div>
+    <script language="JavaScript" type="text/javascript">
+        jQuery('#alphaTabDetails').alphaTab({
+            staves: [] // hide content 
+        });
+	</script>
+    
     <h1>Layouts</h1>
+    
+    <p>
+        alphaTab supports several different layouts which align bars in a various manner. 
+    </p>
     
     <h2>Page Layout</h2>
     
@@ -39,9 +71,84 @@
         All bars are aligned in rows side by side till the row is full. 
     </p>
     
-    <div class="alphaTab2" data-file="files/features/Skillet.gp5"></div>
+    <div id="alphaTabPageLayout" data-file="files/features/Skillet.gp5"></div>
+    <script language="JavaScript" type="text/javascript">
+        jQuery('#alphaTabPageLayout').alphaTab({
+            layout: 'page'
+        });
+	</script>
 
+    <h2>Page Layout (5 bars per row)</h2>
     
+    <p>
+        You can configure how many bars should be placed per row
+    </p>
+    
+    <div id="alphaTabPagePerRow" data-file="files/features/Skillet.gp5"></div>
+    <script language="JavaScript" type="text/javascript">
+        jQuery('#alphaTabPagePerRow').alphaTab({
+            layout: {
+                mode: 'page',
+                additionalSettings: {
+                    barsPerRow: 5
+                }
+            }
+        });
+	</script>
+
+    <h2>Page Layout (bar 5 to 8)</h2>
+    
+    <p>
+        It's also possible to only render some of the bars available in a track.
+    </p>
+    
+    <div id="alphaTabPageSubSet" data-file="files/features/Skillet.gp5"></div>
+    <script language="JavaScript" type="text/javascript">
+        jQuery('#alphaTabPageSubSet').alphaTab({
+            layout: {
+                mode: 'page',
+                additionalSettings: {
+                    start: 5,
+                    count: 4
+                }
+            }
+        });
+	</script>
+    
+    <h2>Horizontal Layout</h2>
+    
+    <p>
+        This is another layout type available. All bars are aligned horizontally.
+    </p>
+    
+    <div id="alphaTabHorizontal" data-file="files/features/Skillet.gp5"></div>
+    <script language="JavaScript" type="text/javascript">
+        jQuery('#alphaTabHorizontal').alphaTab({
+            layout: {
+                mode: 'horizontal'
+            }
+        });
+	</script>
+
+    <h2>Horizontal Layout (bar 5 to 8)</h2>
+    
+    <p>
+        You can also filter the rendered bars using this layout.
+    </p>
+    
+    <div id="alphaTabHorizontalSubSet" data-file="files/features/Skillet.gp5"></div>
+    <script language="JavaScript" type="text/javascript">
+        jQuery('#alphaTabHorizontalSubSet').alphaTab({
+            layout: {
+                mode: 'horizontal',
+                additionalSettings: {
+                    start: 5,
+                    count: 4
+                }
+            }
+        });
+	</script>
+
     
 </body>
 </html>

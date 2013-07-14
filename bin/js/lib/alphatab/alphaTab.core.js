@@ -888,13 +888,14 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 	,getMaxWidth: function() {
 		return this.getSheetWidth() - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0] - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2];
 	}
-	,createStaveGroup: function(currentBarIndex) {
+	,createStaveGroup: function(currentBarIndex,endIndex) {
 		var group = this.createEmptyStaveGroup();
 		var barsPerRow = this.renderer.settings.layout.get("barsPerRow",-1);
 		var maxWidth = this.getSheetWidth() - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0] - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2];
-		var _g1 = currentBarIndex, _g = this.renderer.track.bars.length;
-		while(_g1 < _g) {
-			var i = _g1++;
+		var end = endIndex + 1;
+		var _g = currentBarIndex;
+		while(_g < end) {
+			var i = _g++;
 			var bar = this.renderer.track.bars[i];
 			group.addBar(bar);
 			var groupIsFull = false;
@@ -1036,13 +1037,18 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 	}
 	,doLayout: function() {
 		this._groups = new Array();
-		var currentBarIndex = 0;
-		var endBarIndex = this.renderer.track.bars.length - 1;
+		var startIndex = this.renderer.settings.layout.get("start",1);
+		startIndex--;
+		startIndex = Math.min(this.renderer.track.bars.length - 1,Math.max(0,startIndex)) | 0;
+		var currentBarIndex = startIndex;
+		var endBarIndex = this.renderer.settings.layout.get("count",this.renderer.track.bars.length);
+		endBarIndex = startIndex + endBarIndex - 1;
+		endBarIndex = Math.min(this.renderer.track.bars.length - 1,Math.max(0,endBarIndex)) | 0;
 		var x = alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0];
 		var y = alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[1];
 		y = this.doScoreInfoLayout(y);
-		while(currentBarIndex <= endBarIndex) {
-			var group = this.createStaveGroup(currentBarIndex);
+		if(this.renderer.settings.staves.length > 0) while(currentBarIndex <= endBarIndex) {
+			var group = this.createStaveGroup(currentBarIndex,endBarIndex);
 			this._groups.push(group);
 			group.x = x;
 			group.y = y;
@@ -1066,16 +1072,21 @@ alphatab.rendering.layout.HorizontalScreenLayout.prototype = $extend(alphatab.re
 		this._group.paint(0,0,this.renderer.canvas);
 	}
 	,doLayout: function() {
-		var currentBarIndex = 0;
-		var endBarIndex = this.renderer.track.bars.length - 1;
+		if(this.renderer.settings.staves.length == 0) return;
+		var startIndex = this.renderer.settings.layout.get("start",1);
+		startIndex--;
+		startIndex = Math.min(this.renderer.track.bars.length - 1,Math.max(0,startIndex)) | 0;
+		var currentBarIndex = startIndex;
+		var endBarIndex = this.renderer.settings.layout.get("count",this.renderer.track.bars.length);
+		endBarIndex = startIndex + endBarIndex - 1;
+		endBarIndex = Math.min(this.renderer.track.bars.length - 1,Math.max(0,endBarIndex)) | 0;
 		var x = alphatab.rendering.layout.HorizontalScreenLayout.PAGE_PADDING[0];
 		var y = alphatab.rendering.layout.HorizontalScreenLayout.PAGE_PADDING[1];
 		this._group = this.createEmptyStaveGroup();
-		var _g1 = 0, _g = this.renderer.track.bars.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var bar = this.renderer.track.bars[i];
+		while(currentBarIndex <= endBarIndex) {
+			var bar = this.renderer.track.bars[currentBarIndex];
 			this._group.addBar(bar);
+			currentBarIndex++;
 		}
 		this._group.x = x;
 		this._group.y = y;
@@ -1183,7 +1194,7 @@ alphatab.rendering.effects.TextEffectInfo.prototype = {
 		return new alphatab.rendering.glyphs.effects.TextGlyph(0,0,beat.text,renderer.stave.staveGroup.layout.renderer.renderingResources.effectFont);
 	}
 	,getSizingMode: function() {
-		return alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly;
+		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatOnly;
 	}
 	,getHeight: function(renderer) {
 		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
@@ -1485,11 +1496,11 @@ alphatab.Settings.fromJson = function(json) {
 	}
 	if(json.staves) {
 		settings.staves = new Array();
-		var _g = 0, _g1 = Reflect.fields(json.layout.additionalSettings);
+		var _g = 0, _g1 = Reflect.fields(json.staves.additionalSettings);
 		while(_g < _g1.length) {
 			var key = _g1[_g];
 			++_g;
-			var val = Reflect.field(json.layout.additionalSettings,key);
+			var val = Reflect.field(json.staves.additionalSettings,key);
 			if(js.Boot.__instanceof(val,String)) settings.staves.push(new alphatab.StaveSettings(val)); else if(val.id) {
 				var staveSettings = new alphatab.StaveSettings(val.id);
 				if(val.additionalSettings) {
@@ -4925,8 +4936,8 @@ alphatab.rendering.RenderingResources = function(scale) {
 alphatab.rendering.RenderingResources.__name__ = true;
 alphatab.rendering.RenderingResources.prototype = {
 	init: function(scale) {
-		var sansFont = "Arial";
-		var serifFont = "Times New Roman";
+		var sansFont = "Open Sans";
+		var serifFont = "Georgia";
 		this.effectFont = new alphatab.platform.model.Font(serifFont,12 * scale,2);
 		this.copyrightFont = new alphatab.platform.model.Font(sansFont,12 * scale,1);
 		this.titleFont = new alphatab.platform.model.Font(serifFont,32 * scale);
@@ -5323,7 +5334,7 @@ alphatab.rendering.ScoreRenderer = function(settings,param) {
 	this.settings = settings;
 	if(settings.engine == null || !alphatab.Environment.renderEngines.exists(settings.engine)) this.canvas = (alphatab.Environment.renderEngines.get("default"))(param); else this.canvas = (alphatab.Environment.renderEngines.get(settings.engine))(param);
 	this.updateScale(1.0);
-	this.layout = new alphatab.rendering.layout.PageViewLayout(this);
+	if(settings.layout == null || !alphatab.Environment.layoutEngines.exists(settings.layout.mode)) this.layout = (alphatab.Environment.layoutEngines.get("default"))(this); else this.layout = (alphatab.Environment.layoutEngines.get(settings.layout.mode))(this);
 };
 alphatab.rendering.ScoreRenderer.__name__ = true;
 alphatab.rendering.ScoreRenderer.prototype = {

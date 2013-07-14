@@ -50,8 +50,8 @@ class RenderingResources
     
     public function init(scale:Float) : Void
     { 
-        var sansFont = "Arial";
-        var serifFont = "Times New Roman";
+        var sansFont = "Open Sans";
+        var serifFont = "Georgia";
         
 		effectFont = new Font(serifFont, 12 * scale, Font.STYLE_ITALIC);
 		copyrightFont = new Font(sansFont, 12 * scale, Font.STYLE_BOLD);
