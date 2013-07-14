@@ -300,6 +300,8 @@ class PageViewLayout extends ScoreLayout
     {
         var group:StaveGroup = createEmptyStaveGroup();
         
+        var barsPerRow:Int = renderer.settings.layout.get("barsPerRow", -1);
+                
         var maxWidth = getMaxWidth();
         for (i in currentBarIndex ... renderer.track.bars.length)
         {
@@ -309,7 +311,11 @@ class PageViewLayout extends ScoreLayout
             var groupIsFull:Bool = false;
             
             // can bar placed in this line?
-            if ( (group.width) >= maxWidth && group.bars.length != 0)
+            if ( barsPerRow == -1 && ((group.width) >= maxWidth && group.bars.length != 0))
+            {
+                groupIsFull = true;
+            }
+            else if (group.bars.length == barsPerRow + 1)
             {
                 groupIsFull = true;
             }

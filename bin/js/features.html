@@ -12,7 +12,15 @@
 	<script language="JavaScript" type="text/javascript">
 	(function($) {
 		$(document).ready(function() {
-			$('div.alphaTab').alphaTab();
+			// $('div.alphaTab1').alphaTab();
+			$('div.alphaTab2').alphaTab({
+                layout: {
+                    mode: 'blubb',
+                    additionalSettings: {
+                        barsPerRow: 5
+                    }
+                }
+            });
 		});
 	})(jQuery);
 	</script> 
@@ -21,7 +29,19 @@
     
     <h1>Song Details</h1>
     
-    <div class="alphaTab" data-file="files/features/SongDetails.gp5"></div>
+    <div class="alphaTab1" data-file="files/features/SongDetails.gp5"></div>
 
+    <h1>Layouts</h1>
+    
+    <h2>Page Layout</h2>
+    
+    <p>
+        All bars are aligned in rows side by side till the row is full. 
+    </p>
+    
+    <div class="alphaTab2" data-file="files/features/Skillet.gp5"></div>
+
+    
+    
 </body>
 </html>

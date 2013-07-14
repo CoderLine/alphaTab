@@ -90,6 +90,68 @@ class Settings
 
         return settings;
     }
+    
+#if js
+    public static function fromJson(json:Dynamic) : Settings
+    {
+        var settings = defaults();
+        
+        if (!json) return settings;        
+        if(json.scale) settings.scale = json.scale;
+        if(json.autoSize) settings.autoSize = json.autoSize;
+        if(json.width) settings.width = json.width;
+        if(json.height) settings.height = json.height;
+        if(json.engine) settings.engine = json.engine;
+
+        if (json.layout) 
+        {
+            if (Std.is(json.layout, String))
+            {
+                settings.layout.mode = json.layout;
+            }
+            else
+            {
+                if (json.layout.mode) settings.layout.mode = json.layout.mode;
+                if (json.layout.additionalSettings)
+                {
+                    for (key in Reflect.fields(json.layout.additionalSettings))
+                    {
+                        settings.layout.additionalSettings.set(key, Reflect.field(json.layout.additionalSettings, key));
+                    }
+                }            
+            }
+        }
+        
+        if (json.staves)
+        {
+            settings.staves = new Array<StaveSettings>();
+            for (key in Reflect.fields(json.layout.additionalSettings))
+            {
+                var val:Dynamic = Reflect.field(json.layout.additionalSettings, key);
+                if (Std.is(val, String))
+                {
+                    settings.staves.push(new StaveSettings(val));
+                }
+                else
+                {   
+                    if (val.id)
+                    {
+                        var staveSettings = new StaveSettings(val.id);
+                        if (val.additionalSettings)
+                        {
+                            for (key in Reflect.fields(val.additionalSettings))
+                            {
+                                staveSettings.additionalSettings.set(key, Reflect.field(val.additionalSettings, key));
+                            }
+                        }                            
+                    }
+                }
+            }
+        }
+        
+        return settings;        
+    }
+#end
 }
 
 
@@ -108,7 +170,7 @@ class LayoutSettings
      * Additional layout mode specific settings.
      * <strong>mode=page</strong>
      * <ul>
-     *  <li><strong>measuresPerRow</strong> - Limit the displayed bars per row, <em>-1 for sized based limit<em> (integer, default:-1)</li>
+     *  <li><strong>barsPerRow</strong> - Limit the displayed bars per row, <em>-1 for sized based limit<em> (integer, default:-1)</li>
      *  <li><strong>start</strong> - The bar start index to start layouting with (integer: default: 0)</li>
      *  <li><strong>count</strong> - The amount of bars to render overall, <em>-1 for all till the end</em>  (integer, default:-1)</li>
      *  <li><strong>hideInfo</strong> - Render the song information or not (boolean, default:true)</li>

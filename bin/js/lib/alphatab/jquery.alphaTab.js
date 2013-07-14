@@ -32,9 +32,9 @@
                 // Settings
                 var context = {};
                 
-                context.settings = $.extend( alphatab.Settings.defaults(), options);
-                context.settings = $.extend( {track: 0}, context.settings);
-                
+                context.settings = alphatab.Settings.fromJson(options);
+                if(options && options.track) context.settings.track = options.track;
+                else context.settings.track = 0;
                 
                 var contents = $.trim($this.text());
                 $this.html('');

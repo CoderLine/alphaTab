@@ -62,6 +62,26 @@ HxOverrides.iter = function(a) {
 }
 var IMap = function() { }
 IMap.__name__ = true;
+var Reflect = function() { }
+Reflect.__name__ = true;
+Reflect.field = function(o,field) {
+	var v = null;
+	try {
+		v = o[field];
+	} catch( e ) {
+	}
+	return v;
+}
+Reflect.fields = function(o) {
+	var a = [];
+	if(o != null) {
+		var hasOwnProperty = Object.prototype.hasOwnProperty;
+		for( var f in o ) {
+		if(f != "__id__" && f != "hx__closures__" && hasOwnProperty.call(o,f)) a.push(f);
+		}
+	}
+	return a;
+}
 var Std = function() { }
 Std.__name__ = true;
 Std.string = function(s) {
@@ -870,6 +890,7 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 	}
 	,createStaveGroup: function(currentBarIndex) {
 		var group = this.createEmptyStaveGroup();
+		var barsPerRow = this.renderer.settings.layout.get("barsPerRow",-1);
 		var maxWidth = this.getSheetWidth() - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0] - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2];
 		var _g1 = currentBarIndex, _g = this.renderer.track.bars.length;
 		while(_g1 < _g) {
@@ -877,7 +898,7 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 			var bar = this.renderer.track.bars[i];
 			group.addBar(bar);
 			var groupIsFull = false;
-			if(group.width >= maxWidth && group.bars.length != 0) groupIsFull = true;
+			if(barsPerRow == -1 && (group.width >= maxWidth && group.bars.length != 0)) groupIsFull = true; else if(group.bars.length == barsPerRow + 1) groupIsFull = true;
 			if(groupIsFull) {
 				group.revertLastBar();
 				group.isFull = true;
@@ -1439,6 +1460,49 @@ alphatab.Settings.defaults = function() {
 	settings.staves.push(new alphatab.StaveSettings("palm-mute"));
 	settings.staves.push(new alphatab.StaveSettings("tab"));
 	settings.staves.push(new alphatab.StaveSettings("fingering"));
+	return settings;
+}
+alphatab.Settings.fromJson = function(json) {
+	var settings = alphatab.Settings.defaults();
+	if(!json) return settings;
+	if(json.scale) settings.scale = json.scale;
+	if(json.autoSize) settings.autoSize = json.autoSize;
+	if(json.width) settings.width = json.width;
+	if(json.height) settings.height = json.height;
+	if(json.engine) settings.engine = json.engine;
+	if(json.layout) {
+		if(js.Boot.__instanceof(json.layout,String)) settings.layout.mode = json.layout; else {
+			if(json.layout.mode) settings.layout.mode = json.layout.mode;
+			if(json.layout.additionalSettings) {
+				var _g = 0, _g1 = Reflect.fields(json.layout.additionalSettings);
+				while(_g < _g1.length) {
+					var key = _g1[_g];
+					++_g;
+					settings.layout.additionalSettings.set(key,Reflect.field(json.layout.additionalSettings,key));
+				}
+			}
+		}
+	}
+	if(json.staves) {
+		settings.staves = new Array();
+		var _g = 0, _g1 = Reflect.fields(json.layout.additionalSettings);
+		while(_g < _g1.length) {
+			var key = _g1[_g];
+			++_g;
+			var val = Reflect.field(json.layout.additionalSettings,key);
+			if(js.Boot.__instanceof(val,String)) settings.staves.push(new alphatab.StaveSettings(val)); else if(val.id) {
+				var staveSettings = new alphatab.StaveSettings(val.id);
+				if(val.additionalSettings) {
+					var _g2 = 0, _g3 = Reflect.fields(val.additionalSettings);
+					while(_g2 < _g3.length) {
+						var key1 = _g3[_g2];
+						++_g2;
+						staveSettings.additionalSettings.set(key1,Reflect.field(val.additionalSettings,key1));
+					}
+				}
+			}
+		}
+	}
 	return settings;
 }
 alphatab.Settings.prototype = {
@@ -4709,92 +4773,93 @@ alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.Grou
 	,alignGlyph: function(sizing,beatIndex,voiceIndex,prevGlyph) {
 		var g = this._effectGlyphs[voiceIndex].get(beatIndex);
 		var pos;
+		var container = this.getOrCreateVoiceContainer(voiceIndex).beatGlyphs[beatIndex];
 		switch( (sizing)[1] ) {
 		case 0:
-			pos = this.getOrCreateVoiceContainer(voiceIndex).beatGlyphs[beatIndex].preNotes;
-			g.x = pos.x;
+			pos = container.preNotes;
+			g.x = pos.x + container.x;
 			g.width = pos.width;
 			break;
 		case 1:
-			pos = this.getOrCreateVoiceContainer(voiceIndex).beatGlyphs[beatIndex].preNotes;
-			g.x = pos.x;
-			pos = this.getOrCreateVoiceContainer(voiceIndex).beatGlyphs[beatIndex].onNotes;
-			g.width = pos.x + pos.width - g.x;
+			pos = container.preNotes;
+			g.x = pos.x + container.x;
+			pos = container.onNotes;
+			g.width = pos.x + container.x + pos.width - g.x;
 			break;
 		case 2:
-			pos = this.getOrCreateVoiceContainer(voiceIndex).beatGlyphs[beatIndex].preNotes;
-			g.x = pos.x;
-			pos = this.getOrCreateVoiceContainer(voiceIndex).beatGlyphs[beatIndex].postNotes;
-			g.width = pos.x + pos.width - g.x;
+			pos = container.preNotes;
+			g.x = pos.x + container.x;
+			pos = container.postNotes;
+			g.width = pos.x + container.x + pos.width - g.x;
 			break;
 		case 3:
-			pos = this.getOrCreateVoiceContainer(voiceIndex).beatGlyphs[beatIndex].onNotes;
-			g.x = pos.x;
+			pos = container.onNotes;
+			g.x = pos.x + container.x;
 			g.width = pos.width;
 			break;
 		case 4:
-			pos = this.getOrCreateVoiceContainer(voiceIndex).beatGlyphs[beatIndex].onNotes;
-			g.x = pos.x;
-			pos = this.getOrCreateVoiceContainer(voiceIndex).beatGlyphs[beatIndex].postNotes;
-			g.width = pos.x + pos.width - g.x;
+			pos = container.onNotes;
+			g.x = pos.x + container.x;
+			pos = container.postNotes;
+			g.width = pos.x + container.x + pos.width - g.x;
 			break;
 		case 5:
-			pos = this.getOrCreateVoiceContainer(voiceIndex).beatGlyphs[beatIndex].postNotes;
-			g.x = pos.x;
+			pos = container.postNotes;
+			g.x = pos.x + container.x;
 			g.width = pos.width;
 			break;
 		case 6:
 			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,beatIndex,voiceIndex,prevGlyph); else {
-				pos = this.getOrCreateVoiceContainer(voiceIndex).beatGlyphs[beatIndex].preNotes;
+				pos = container.preNotes;
 				var posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
 				var gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
 				g.width = posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width - (gR.x + gR.getBeatGlyphsStart() + g.x);
-				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo(this.getOrCreateVoiceContainer(voiceIndex).beatGlyphs[beatIndex].beat);
+				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo(container.beat);
 			}
 			break;
 		case 7:
 			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatToOnBeat,beatIndex,voiceIndex,prevGlyph); else {
-				pos = this.getOrCreateVoiceContainer(voiceIndex).beatGlyphs[beatIndex].onNotes;
+				pos = container.onNotes;
 				var posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
 				var gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
 				g.width = posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width - (gR.x + gR.getBeatGlyphsStart() + g.x);
-				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo(this.getOrCreateVoiceContainer(voiceIndex).beatGlyphs[beatIndex].beat);
+				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo(container.beat);
 			}
 			break;
 		case 8:
 			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatToPostBeat,beatIndex,voiceIndex,prevGlyph); else {
-				pos = this.getOrCreateVoiceContainer(voiceIndex).beatGlyphs[beatIndex].postNotes;
+				pos = container.postNotes;
 				var posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
 				var gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
 				g.width = posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width - (gR.x + gR.getBeatGlyphsStart() + g.x);
-				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo(this.getOrCreateVoiceContainer(voiceIndex).beatGlyphs[beatIndex].beat);
+				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo(container.beat);
 			}
 			break;
 		case 9:
 			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatOnly,beatIndex,voiceIndex,prevGlyph); else {
-				pos = this.getOrCreateVoiceContainer(voiceIndex).beatGlyphs[beatIndex].onNotes;
+				pos = container.onNotes;
 				var posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
 				var gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
 				g.width = posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width - (gR.x + gR.getBeatGlyphsStart() + g.x);
-				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo(this.getOrCreateVoiceContainer(voiceIndex).beatGlyphs[beatIndex].beat);
+				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo(container.beat);
 			}
 			break;
 		case 10:
 			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatToPostBeat,beatIndex,voiceIndex,prevGlyph); else {
-				pos = this.getOrCreateVoiceContainer(voiceIndex).beatGlyphs[beatIndex].postNotes;
+				pos = container.postNotes;
 				var posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
 				var gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
 				g.width = posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width - (gR.x + gR.getBeatGlyphsStart() + g.x);
-				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo(this.getOrCreateVoiceContainer(voiceIndex).beatGlyphs[beatIndex].beat);
+				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo(container.beat);
 			}
 			break;
 		case 11:
 			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.GroupedPostBeatOnly,beatIndex,voiceIndex,prevGlyph); else {
-				pos = this.getOrCreateVoiceContainer(voiceIndex).beatGlyphs[beatIndex].postNotes;
+				pos = container.postNotes;
 				var posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
 				var gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
 				g.width = posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width - (gR.x + gR.getBeatGlyphsStart() + g.x);
-				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo(this.getOrCreateVoiceContainer(voiceIndex).beatGlyphs[beatIndex].beat);
+				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo(container.beat);
 			}
 			break;
 		}
