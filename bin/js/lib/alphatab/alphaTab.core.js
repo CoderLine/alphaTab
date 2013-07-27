@@ -108,6 +108,10 @@ StringBuf.prototype = {
 }
 var StringTools = function() { }
 StringTools.__name__ = true;
+StringTools.htmlEscape = function(s,quotes) {
+	s = s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
+	return quotes?s.split("\"").join("&quot;").split("'").join("&#039;"):s;
+}
 StringTools.startsWith = function(s,start) {
 	return s.length >= start.length && HxOverrides.substr(s,0,start.length) == start;
 }
@@ -195,11 +199,63 @@ Xml.createDocument = function() {
 	return r;
 }
 Xml.prototype = {
-	addChild: function(x) {
+	toString: function() {
+		if(this.nodeType == Xml.PCData) return StringTools.htmlEscape(this._nodeValue);
+		if(this.nodeType == Xml.CData) return "<![CDATA[" + this._nodeValue + "]]>";
+		if(this.nodeType == Xml.Comment) return "<!--" + this._nodeValue + "-->";
+		if(this.nodeType == Xml.DocType) return "<!DOCTYPE " + this._nodeValue + ">";
+		if(this.nodeType == Xml.ProcessingInstruction) return "<?" + this._nodeValue + "?>";
+		var s = new StringBuf();
+		if(this.nodeType == Xml.Element) {
+			s.b += "<";
+			s.b += Std.string(this._nodeName);
+			var $it0 = this._attributes.keys();
+			while( $it0.hasNext() ) {
+				var k = $it0.next();
+				s.b += " ";
+				s.b += Std.string(k);
+				s.b += "=\"";
+				s.b += Std.string(this._attributes.get(k));
+				s.b += "\"";
+			}
+			if(this._children.length == 0) {
+				s.b += "/>";
+				return s.b;
+			}
+			s.b += ">";
+		}
+		var $it1 = this.iterator();
+		while( $it1.hasNext() ) {
+			var x = $it1.next();
+			s.b += Std.string(x.toString());
+		}
+		if(this.nodeType == Xml.Element) {
+			s.b += "</";
+			s.b += Std.string(this._nodeName);
+			s.b += ">";
+		}
+		return s.b;
+	}
+	,addChild: function(x) {
 		if(this._children == null) throw "bad nodetype";
 		if(x._parent != null) HxOverrides.remove(x._parent._children,x);
 		x._parent = this;
 		this._children.push(x);
+	}
+	,firstElement: function() {
+		if(this._children == null) throw "bad nodetype";
+		var cur = 0;
+		var l = this._children.length;
+		while(cur < l) {
+			var n = this._children[cur];
+			if(n.nodeType == Xml.Element) return n;
+			cur++;
+		}
+		return null;
+	}
+	,firstChild: function() {
+		if(this._children == null) throw "bad nodetype";
+		return this._children[0];
 	}
 	,iterator: function() {
 		if(this._children == null) throw "bad nodetype";
@@ -220,10 +276,6 @@ Xml.prototype = {
 	,set_nodeValue: function(v) {
 		if(this.nodeType == Xml.Element || this.nodeType == Xml.Document) throw "bad nodeType";
 		return this._nodeValue = v;
-	}
-	,get_nodeValue: function() {
-		if(this.nodeType == Xml.Element || this.nodeType == Xml.Document) throw "bad nodeType";
-		return this._nodeValue;
 	}
 	,set_nodeName: function(n) {
 		if(this.nodeType != Xml.Element) throw "bad nodeType";
@@ -3453,52 +3505,57 @@ alphatab.importer.GpxParser.prototype = {
 		var $it0 = node.iterator();
 		while( $it0.hasNext() ) {
 			var c = $it0.next();
-			var _g = c.get_nodeName();
-			switch(_g) {
-			case "Title":
-				this.score.title = c.get_nodeValue();
-				break;
-			case "SubTitle":
-				this.score.subTitle = c.get_nodeValue();
-				break;
-			case "Artist":
-				this.score.artist = c.get_nodeValue();
-				break;
-			case "Album":
-				this.score.album = c.get_nodeValue();
-				break;
-			case "Words":
-				this.score.words = c.get_nodeValue();
-				break;
-			case "Music":
-				this.score.music = c.get_nodeValue();
-				break;
-			case "WordsAndMusic":
-				if(c.get_nodeValue() != null && c.get_nodeValue() != "") {
-					this.score.words = c.get_nodeValue();
-					this.score.music = c.get_nodeValue();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Title":
+					this.score.title = c.firstChild().toString();
+					break;
+				case "SubTitle":
+					this.score.subTitle = c.firstChild().toString();
+					break;
+				case "Artist":
+					this.score.artist = c.firstChild().toString();
+					break;
+				case "Album":
+					this.score.album = c.firstChild().toString();
+					break;
+				case "Words":
+					this.score.words = c.firstChild().toString();
+					break;
+				case "Music":
+					this.score.music = c.firstChild().toString();
+					break;
+				case "WordsAndMusic":
+					if(c.firstChild() != null && c.firstChild().toString() != "") {
+						this.score.words = c.firstChild().toString();
+						this.score.music = c.firstChild().toString();
+					}
+					break;
+				case "Copyright":
+					this.score.copyright = c.firstChild().toString();
+					break;
+				case "Tabber":
+					this.score.tab = c.firstChild().toString();
+					break;
 				}
-				break;
-			case "Copyright":
-				this.score.copyright = c.get_nodeValue();
-				break;
-			case "Tabber":
-				this.score.tab = c.get_nodeValue();
-				break;
 			}
 		}
 	}
 	,parseDom: function(xml) {
+		if(xml.nodeType == Xml.Document) xml = xml.firstElement();
 		if(xml.get_nodeName() == "GPIF") {
 			this.score = new alphatab.model.Score();
 			var $it0 = xml.iterator();
 			while( $it0.hasNext() ) {
 				var n = $it0.next();
-				var _g = n.get_nodeName();
-				switch(_g) {
-				case "Score":
-					this.parseScoreNode(n);
-					break;
+				if(n.nodeType == Xml.Element) {
+					var _g = n.get_nodeName();
+					switch(_g) {
+					case "Score":
+						this.parseScoreNode(n);
+						break;
+					}
 				}
 			}
 		} else throw alphatab.importer.ScoreImporter.UNSUPPORTED_FORMAT;
@@ -5089,7 +5146,7 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 					this._beamHelpers[v.index].push(this._currentBeamHelper);
 				}
 			}
-			var container = new alphatab.rendering.glyphs.BeatContainerGlyph(b);
+			var container = new alphatab.rendering.glyphs.ScoreBeatContainerGlyph(b);
 			container.preNotes = new alphatab.rendering.glyphs.ScoreBeatPreNotesGlyph();
 			container.onNotes = new alphatab.rendering.glyphs.ScoreBeatGlyph();
 			(js.Boot.__cast(container.onNotes , alphatab.rendering.glyphs.ScoreBeatGlyph)).beamingHelper = this._currentBeamHelper;
@@ -5390,7 +5447,7 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 	,getNoteX: function(note,onEnd) {
 		if(onEnd == null) onEnd = true;
 		var g = this.getOrCreateVoiceContainer(note.beat.voice.index).beatGlyphs[note.beat.index].onNotes;
-		if(g != null) return g.x + g.noteHeads.getNoteX(note,onEnd);
+		if(g != null) return g.container.x + g.x + g.noteHeads.getNoteX(note,onEnd);
 		return 0;
 	}
 	,getBeatDirection: function(beat) {
@@ -5505,7 +5562,7 @@ alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.Grouped
 		while(_g < _g1.length) {
 			var b = _g1[_g];
 			++_g;
-			var container = new alphatab.rendering.glyphs.BeatContainerGlyph(b);
+			var container = new alphatab.rendering.glyphs.TabBeatContainerGlyph(b);
 			container.preNotes = new alphatab.rendering.glyphs.TabBeatPreNotesGlyph();
 			container.onNotes = new alphatab.rendering.glyphs.TabBeatGlyph();
 			container.postNotes = new alphatab.rendering.glyphs.TabBeatPostNotesGlyph();
@@ -5536,7 +5593,7 @@ alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.Grouped
 	,getNoteX: function(note,onEnd) {
 		if(onEnd == null) onEnd = true;
 		var beat = this.getOrCreateVoiceContainer(note.beat.voice.index).beatGlyphs[note.beat.index].onNotes;
-		if(beat != null) return beat.x + beat.noteNumbers.getNoteX(note,onEnd);
+		if(beat != null) return beat.container.x + beat.x + beat.noteNumbers.getNoteX(note,onEnd);
 		return 0;
 	}
 	,getLineOffset: function() {
@@ -5954,6 +6011,7 @@ alphatab.rendering.glyphs.ISupportsFinalize.prototype = {
 alphatab.rendering.glyphs.BeatContainerGlyph = function(beat) {
 	alphatab.rendering.Glyph.call(this,0,0);
 	this.beat = beat;
+	this.ties = new Array();
 };
 alphatab.rendering.glyphs.BeatContainerGlyph.__name__ = true;
 alphatab.rendering.glyphs.BeatContainerGlyph.__interfaces__ = [alphatab.rendering.glyphs.ISupportsFinalize];
@@ -5963,6 +6021,15 @@ alphatab.rendering.glyphs.BeatContainerGlyph.prototype = $extend(alphatab.render
 		this.preNotes.paint(cx + this.x,cy + this.y,canvas);
 		this.onNotes.paint(cx + this.x,cy + this.y,canvas);
 		this.postNotes.paint(cx + this.x,cy + this.y,canvas);
+		var _g = 0, _g1 = this.ties;
+		while(_g < _g1.length) {
+			var t = _g1[_g];
+			++_g;
+			t.renderer = this.renderer;
+			t.paint(cx,cy + this.y,canvas);
+		}
+	}
+	,createTies: function(n) {
 	}
 	,doLayout: function() {
 		this.preNotes.x = 0;
@@ -5980,6 +6047,8 @@ alphatab.rendering.glyphs.BeatContainerGlyph.prototype = $extend(alphatab.render
 		this.postNotes.renderer = this.renderer;
 		this.postNotes.container = this;
 		this.postNotes.doLayout();
+		var i = this.beat.notes.length - 1;
+		while(i >= 0) this.createTies(this.beat.notes[i--]);
 		this.width = this.calculateWidth();
 	}
 	,calculateWidth: function() {
@@ -6561,9 +6630,32 @@ alphatab.rendering.glyphs.RestGlyph.prototype = $extend(alphatab.rendering.glyph
 	}
 	,__class__: alphatab.rendering.glyphs.RestGlyph
 });
+alphatab.rendering.glyphs.ScoreBeatContainerGlyph = function(beat) {
+	alphatab.rendering.glyphs.BeatContainerGlyph.call(this,beat);
+};
+alphatab.rendering.glyphs.ScoreBeatContainerGlyph.__name__ = true;
+alphatab.rendering.glyphs.ScoreBeatContainerGlyph.__super__ = alphatab.rendering.glyphs.BeatContainerGlyph;
+alphatab.rendering.glyphs.ScoreBeatContainerGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatContainerGlyph.prototype,{
+	createTies: function(n) {
+		if(n.isTieDestination && n.tieOrigin != null) {
+			var tie = new alphatab.rendering.glyphs.ScoreTieGlyph(n.tieOrigin,n);
+			this.ties.push(tie);
+		} else if(n.isHammerPullDestination && n.hammerPullOrigin != null) {
+			var tie = new alphatab.rendering.glyphs.ScoreTieGlyph(n.hammerPullOrigin,n);
+			this.ties.push(tie);
+		} else if(n.slideType == alphatab.model.SlideType.Legato && n.slideTarget != null) {
+			var tie = new alphatab.rendering.glyphs.ScoreTieGlyph(n,n.slideTarget);
+			this.ties.push(tie);
+		}
+		if(n.slideType != alphatab.model.SlideType.None) {
+			var l = new alphatab.rendering.glyphs.ScoreSlideLineGlyph(n.slideType,n);
+			this.ties.push(l);
+		}
+	}
+	,__class__: alphatab.rendering.glyphs.ScoreBeatContainerGlyph
+});
 alphatab.rendering.glyphs.ScoreBeatGlyph = function() {
 	alphatab.rendering.glyphs.BeatGlyphBase.call(this);
-	this._ties = new Array();
 };
 alphatab.rendering.glyphs.ScoreBeatGlyph.__name__ = true;
 alphatab.rendering.glyphs.ScoreBeatGlyph.__interfaces__ = [alphatab.rendering.glyphs.ISupportsFinalize];
@@ -6580,19 +6672,6 @@ alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.
 		if(n.isStaccato && !this.noteHeads.beatEffects.exists("STACCATO")) this.noteHeads.beatEffects.set("STACCATO",new alphatab.rendering.glyphs.CircleGlyph(0,0,1.5));
 		if(n.accentuated == alphatab.model.AccentuationType.Normal && !this.noteHeads.beatEffects.exists("ACCENT")) this.noteHeads.beatEffects.set("ACCENT",new alphatab.rendering.glyphs.AccentuationGlyph(0,0,alphatab.model.AccentuationType.Normal));
 		if(n.accentuated == alphatab.model.AccentuationType.Heavy && !this.noteHeads.beatEffects.exists("HACCENT")) this.noteHeads.beatEffects.set("HACCENT",new alphatab.rendering.glyphs.AccentuationGlyph(0,0,alphatab.model.AccentuationType.Heavy));
-		if(n.isTieDestination && n.tieOrigin != null) {
-			var tie = new alphatab.rendering.glyphs.ScoreTieGlyph(n.tieOrigin,n);
-			this._ties.push(tie);
-		} else if(n.isHammerPullDestination && n.hammerPullOrigin != null) {
-			var tie = new alphatab.rendering.glyphs.ScoreTieGlyph(n.hammerPullOrigin,n);
-		} else if(n.slideType == alphatab.model.SlideType.Legato && n.slideTarget != null) {
-			var tie = new alphatab.rendering.glyphs.ScoreTieGlyph(n,n.slideTarget);
-			this._ties.push(tie);
-		}
-		if(n.slideType != alphatab.model.SlideType.None) {
-			var l = new alphatab.rendering.glyphs.ScoreSlideLineGlyph(n.slideType,n);
-			this._ties.push(l);
-		}
 	}
 	,createBeatDot: function(n,group) {
 		var sr = js.Boot.__cast(this.renderer , alphatab.rendering.ScoreBarRenderer);
@@ -6662,16 +6741,6 @@ alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.
 	}
 	,finalizeGlyph: function(layout) {
 		if(!this.container.beat.isRest()) this.noteHeads.updateBeamingHelper(this.container.x + this.x);
-	}
-	,paint: function(cx,cy,canvas) {
-		alphatab.rendering.glyphs.BeatGlyphBase.prototype.paint.call(this,cx,cy,canvas);
-		var _g = 0, _g1 = this._ties;
-		while(_g < _g1.length) {
-			var t = _g1[_g];
-			++_g;
-			t.renderer = this.renderer;
-			t.paint(cx,cy + this.y,canvas);
-		}
 	}
 	,__class__: alphatab.rendering.glyphs.ScoreBeatGlyph
 });
@@ -7033,9 +7102,30 @@ alphatab.rendering.glyphs.SpacingGlyph.prototype = $extend(alphatab.rendering.Gl
 	}
 	,__class__: alphatab.rendering.glyphs.SpacingGlyph
 });
+alphatab.rendering.glyphs.TabBeatContainerGlyph = function(beat) {
+	alphatab.rendering.glyphs.BeatContainerGlyph.call(this,beat);
+};
+alphatab.rendering.glyphs.TabBeatContainerGlyph.__name__ = true;
+alphatab.rendering.glyphs.TabBeatContainerGlyph.__super__ = alphatab.rendering.glyphs.BeatContainerGlyph;
+alphatab.rendering.glyphs.TabBeatContainerGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatContainerGlyph.prototype,{
+	createTies: function(n) {
+		if(n.isHammerPullDestination && n.hammerPullOrigin != null) {
+			var tie = new alphatab.rendering.glyphs.TabTieGlyph(n.hammerPullOrigin,n);
+			this.ties.push(tie);
+		} else if(n.slideType == alphatab.model.SlideType.Legato && n.slideTarget != null) {
+			var tie = new alphatab.rendering.glyphs.TabTieGlyph(n,n.slideTarget);
+			this.ties.push(tie);
+		}
+		if(n.slideType != alphatab.model.SlideType.None) {
+			var l = new alphatab.rendering.glyphs.TabSlideLineGlyph(n.slideType,n);
+			this.ties.push(l);
+			this.ties.push(l);
+		}
+	}
+	,__class__: alphatab.rendering.glyphs.TabBeatContainerGlyph
+});
 alphatab.rendering.glyphs.TabBeatGlyph = function() {
 	alphatab.rendering.glyphs.BeatGlyphBase.call(this);
-	this._ties = new Array();
 };
 alphatab.rendering.glyphs.TabBeatGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabBeatGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
@@ -7047,17 +7137,6 @@ alphatab.rendering.glyphs.TabBeatGlyph.prototype = $extend(alphatab.rendering.gl
 		var l = n.beat.voice.bar.track.tuning.length - n.string + 1;
 		noteNumberGlyph.y = tr.getTabY(l,-2);
 		this.noteNumbers.addNoteGlyph(noteNumberGlyph,n);
-		if(n.isHammerPullDestination && n.hammerPullOrigin != null) {
-			var tie = new alphatab.rendering.glyphs.TabTieGlyph(n.hammerPullOrigin,n);
-			this._ties.push(tie);
-		} else if(n.slideType == alphatab.model.SlideType.Legato && n.slideTarget != null) {
-			var tie = new alphatab.rendering.glyphs.TabTieGlyph(n,n.slideTarget);
-			this._ties.push(tie);
-		}
-		if(n.slideType != alphatab.model.SlideType.None) {
-			var l1 = new alphatab.rendering.glyphs.TabSlideLineGlyph(n.slideType,n);
-			this._ties.push(l1);
-		}
 	}
 	,doLayout: function() {
 		var _g = this;
@@ -7080,16 +7159,6 @@ alphatab.rendering.glyphs.TabBeatGlyph.prototype = $extend(alphatab.rendering.gl
 			w += g.width;
 		}
 		this.width = w;
-	}
-	,paint: function(cx,cy,canvas) {
-		alphatab.rendering.glyphs.BeatGlyphBase.prototype.paint.call(this,cx,cy,canvas);
-		var _g = 0, _g1 = this._ties;
-		while(_g < _g1.length) {
-			var t = _g1[_g];
-			++_g;
-			t.renderer = this.renderer;
-			t.paint(cx,cy + this.y,canvas);
-		}
 	}
 	,__class__: alphatab.rendering.glyphs.TabBeatGlyph
 });

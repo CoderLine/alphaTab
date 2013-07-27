@@ -1,5 +1,6 @@
 package alphatab.rendering.glyphs;
 import alphatab.model.Beat;
+import alphatab.model.Note;
 import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
 import alphatab.platform.model.Font;
@@ -17,11 +18,13 @@ class BeatContainerGlyph extends Glyph implements ISupportsFinalize
     public var preNotes:BeatGlyphBase;
     public var onNotes:BeatGlyphBase;
     public var postNotes:BeatGlyphBase;
-    
+    public var ties:Array<Glyph>;
+
     public function new(beat:Beat) 
     {
         super(0, 0);
         this.beat = beat;
+        ties = new Array<Glyph>();
     }
     
     public function finalizeGlyph(layout:ScoreLayout) : Void
@@ -123,7 +126,18 @@ class BeatContainerGlyph extends Glyph implements ISupportsFinalize
         postNotes.container = this;
         postNotes.doLayout();
         
+        var i = beat.notes.length -1;
+		while ( i >= 0 )
+		{
+			createTies(beat.notes[i--]);
+		}
+        
         width = calculateWidth();
+    }
+    
+    private function createTies(n:Note) 
+    {
+        
     }
     
     public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
@@ -145,6 +159,11 @@ class BeatContainerGlyph extends Glyph implements ISupportsFinalize
         postNotes.paint(cx + x, cy + y, canvas);
         //canvas.setColor(new Color(0, 0, 200, 100));
         //canvas.fillRect(cx + x + postNotes.x, cy + y + postNotes.y + 20, postNotes.width, 10);
-
+		
+        for (t in ties)
+		{
+			t.renderer = renderer;
+			t.paint(cx, cy + y, canvas);
+		}
     }
 }

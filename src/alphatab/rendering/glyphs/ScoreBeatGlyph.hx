@@ -26,17 +26,6 @@ class ScoreBeatGlyph extends BeatGlyphBase
 	public function new() 
 	{
         super();
-		_ties = new Array<Glyph>();
-	}
-	
-	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
-	{
-		super.paint(cx, cy, canvas);	
-		for (t in _ties)
-		{
-			t.renderer = renderer;
-			t.paint(cx, cy + y, canvas);
-		}
 	}
 	
 	public function finalizeGlyph(layout:ScoreLayout)
@@ -168,29 +157,5 @@ class ScoreBeatGlyph extends BeatGlyphBase
         {
             noteHeads.beatEffects.set("HACCENT",  new AccentuationGlyph(0, 0, AccentuationType.Heavy));
         }
-			
-		// create a tie if any effect requires it
-		if (n.isTieDestination && n.tieOrigin != null) 
-		{
-			var tie = new ScoreTieGlyph(n.tieOrigin, n);
-			_ties.push(tie);
-		}
-		else if (n.isHammerPullDestination && n.hammerPullOrigin != null)
-		{
-			var tie = new ScoreTieGlyph(n.hammerPullOrigin, n);
-		}
-		else if (n.slideType == SlideType.Legato && n.slideTarget != null)
-		{
-			var tie = new ScoreTieGlyph(n, n.slideTarget);
-			_ties.push(tie);
-		}
-		
-		// TODO: depending on the type we have other positioning
-		// we should place glyphs in the preNotesGlyph or postNotesGlyph if needed
-		if (n.slideType != SlideType.None)
-		{
-			var l = new ScoreSlideLineGlyph(n.slideType, n);
-			_ties.push(l);
-		}
     }
 }

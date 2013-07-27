@@ -46,6 +46,7 @@ import alphatab.rendering.glyphs.RepeatCloseGlyph;
 import alphatab.rendering.glyphs.RepeatCountGlyph;
 import alphatab.rendering.glyphs.RepeatOpenGlyph;
 import alphatab.rendering.glyphs.RestGlyph;
+import alphatab.rendering.glyphs.ScoreBeatContainerGlyph;
 import alphatab.rendering.glyphs.ScoreBeatGlyph;
 import alphatab.rendering.glyphs.ScoreBeatPostNotesGlyph;
 import alphatab.rendering.glyphs.ScoreBeatPreNotesGlyph;
@@ -128,7 +129,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
         var g:ScoreBeatGlyph = cast getOnNotesPosition(note.beat.voice.index, note.beat.index);
 		if (g != null) 
 		{
-			return g.x + g.noteHeads.getNoteX(note, onEnd);
+			return g.container.x + g.x + g.noteHeads.getNoteX(note, onEnd);
 		}
 		return 0;
 	}	
@@ -609,7 +610,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
                 }
             }
             
-            var container = new BeatContainerGlyph(b);
+            var container = new ScoreBeatContainerGlyph(b);
             container.preNotes = new ScoreBeatPreNotesGlyph();
             container.onNotes = new ScoreBeatGlyph();
             cast(container.onNotes, ScoreBeatGlyph).beamingHelper = _currentBeamHelper;

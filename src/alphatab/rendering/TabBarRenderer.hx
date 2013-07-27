@@ -30,6 +30,7 @@ import alphatab.rendering.glyphs.RepeatCloseGlyph;
 import alphatab.rendering.glyphs.RepeatCountGlyph;
 import alphatab.rendering.glyphs.RepeatOpenGlyph;
 import alphatab.rendering.glyphs.SpacingGlyph;
+import alphatab.rendering.glyphs.TabBeatContainerGlyph;
 import alphatab.rendering.glyphs.TabBeatGlyph;
 import alphatab.rendering.glyphs.TabBeatPreNotesGlyph;
 import alphatab.rendering.glyphs.TabBeatPostNotesGlyph;
@@ -58,7 +59,7 @@ class TabBarRenderer extends GroupedBarRenderer
         var beat:TabBeatGlyph = cast getOnNotesPosition(note.beat.voice.index, note.beat.index);
 		if (beat != null) 
 		{
-			return beat.x + beat.noteNumbers.getNoteX(note, onEnd);
+			return beat.container.x +  beat.x + beat.noteNumbers.getNoteX(note, onEnd);
 		}
 		return 0;
 	}	
@@ -117,7 +118,7 @@ class TabBarRenderer extends GroupedBarRenderer
     {
         for (b in v.beats)
         {
-            var container = new BeatContainerGlyph(b);
+            var container = new TabBeatContainerGlyph(b);
             container.preNotes = new TabBeatPreNotesGlyph();
 			container.onNotes = new TabBeatGlyph();
 			container.postNotes = new TabBeatPostNotesGlyph();

@@ -215,15 +215,102 @@
         </p>
                
         <h2>Clefs</h2>
+        
+        <p>
+            Clefs are important for music notation too.
+        </p>
+        
+        <div id="alphaTabClefs">
+            \title "Clefs"
+            .
+            \clef G2 | \clef F4 | \clef C3 | \clef C4
+        </div>
+        <script language="JavaScript" type="text/javascript">
+            jQuery('#alphaTabClefs').alphaTab({
+                staves: ['score'],
+                layout: {
+                    mode: 'page',
+                    additionalSettings: {
+                        hideInfo: true
+                    }
+                }
+            });
+        </script>
  
         <h2>Key Signatures</h2>
         
+        <p>
+            Want key signatures? No problem, alphaTab will render them for you. 
+        </p>
+
+        <div id="alphaTabKeySignatures" data-file="files/features/KeySignatures.gp5"></div>
+        <script language="JavaScript" type="text/javascript">
+            jQuery('#alphaTabKeySignatures').alphaTab({
+                staves: ['score']
+            });
+        </script>
+
         <h2>Time Signatures</h2>
         
+        
+        <p>
+            Time signatures are important too.  
+        </p>
+
+        <div id="alphaTabTimeSignatures" data-file="files/features/TimeSignatures.gp5"></div>
+        <script language="JavaScript" type="text/javascript">
+            jQuery('#alphaTabTimeSignatures').alphaTab({
+                staves: ['score']
+            });
+        </script>
+        
+        <h2>Notes, Rests and Beams</h2>
+        
+        <p>
+            We automatically create beams for notes and ensure they are aligned in the most readable way. 
+        </p>
+
+        <div id="alphaTabBeams" data-file="files/features/Beams.gp5"></div>
+        <script language="JavaScript" type="text/javascript">
+            jQuery('#alphaTabBeams').alphaTab({
+                staves: ['score']
+            });
+        </script>
+        
+        <h2>Accidentals</h2>
+        
+        <p>
+            Accidentals are an essential element of music notation.
+        </p>
+
+        <div id="alphaTabAccidentals" data-file="files/features/Accidentals.gp5"></div>
+        <script language="JavaScript" type="text/javascript">
+            jQuery('#alphaTabAccidentals').alphaTab({
+                staves: ['score']
+            });
+        </script>
+
+        
+
     </div>
 
     <div class="group">
         <h1>Guitar Tabs</h1>
+        
+        <h2>String Variations</h2>
+        
+        <p>
+            alphaTab will render tabs for stringed instruments. It takes care of 
+            the number of strings and displays the tabs as you would expect.
+        </p>
+        
+        <div id="alphaTabTabs" data-file="files/features/Tabs.gp5"></div>
+        <script language="JavaScript" type="text/javascript">
+            jQuery('#alphaTabTabs').alphaTab({
+                staves: ['tab']
+            });
+        </script>
+        
     </div>
 
     <div class="group">

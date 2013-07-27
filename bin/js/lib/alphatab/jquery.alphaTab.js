@@ -168,7 +168,7 @@
         try 
         {
             var parser = new alphatab.importer.AlphaTexImporter();
-            var data = new haxe.io.BytesInput(haxe.io.Bytes.ofString(tex));
+            var data = new haxe.io.BytesInput(haxe.io.Bytes.ofString(content));
             parser.init(data);
             score = parser.readScore();
         }

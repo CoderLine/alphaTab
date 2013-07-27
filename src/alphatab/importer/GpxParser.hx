@@ -22,11 +22,16 @@ class GpxParser
 	
 	public function parseDom(xml:Xml)
 	{
+        if (xml.nodeType == Xml.Document)
+        {
+            xml = xml.firstElement();
+        }
+        
+        
 		// the XML uses IDs for referring elements within the 
 		// model. Therefore we do the parsing in 2 steps:
 		// - at first we read all model elements and store them by ID in a lookup table
 		// - after that we need to join up the information. 
-		
 		if (xml.nodeName == "GPIF")
 		{
 			score = new Score();
@@ -34,28 +39,31 @@ class GpxParser
 			// parse all children
 			for (n in xml)
 			{
-				switch(n.nodeName)
-				{
-					case "Score":
-						parseScoreNode(n);
-					// TODO: A lot of xml parsing work :(
-					// case "MasterTrack":
-					// 	parseMasterTrackNode(n);
-					// case "Tracks":
-					// 	parseTrackNode(n);
-					// case "MasterBars":
-					// 	parseMasterBarNode(n);
-					// case "Bars":
-					// 	parseBars(n)
-					// case "Voices":
-					// 	parseDomVoices(n);
-					// case "Beats":
-					// 	parseBeats(n);
-					// case "Notes":
-					// 	parseNotes(n);
-					// case "Rhythms":
-					// 	parseRhythms(n);
-				}
+                if (n.nodeType == Xml.Element)
+                {
+                    switch(n.nodeName)
+                    {
+                        case "Score":
+                            parseScoreNode(n);
+                        // TODO: A lot of xml parsing work :(
+                        // case "MasterTrack":
+                        // 	parseMasterTrackNode(n);
+                        // case "Tracks":
+                        // 	parseTrackNode(n);
+                        // case "MasterBars":
+                        // 	parseMasterBarNode(n);
+                        // case "Bars":
+                        // 	parseBars(n)
+                        // case "Voices":
+                        // 	parseDomVoices(n);
+                        // case "Beats":
+                        // 	parseBeats(n);
+                        // case "Notes":
+                        // 	parseNotes(n);
+                        // case "Rhythms":
+                        // 	parseRhythms(n);
+                    }
+                }
 			}
 		}
 		else
@@ -68,18 +76,21 @@ class GpxParser
 	{
 		for (c in node)
 		{
-			switch(c.nodeName)
-			{
-				case "Title": score.title = c.nodeValue;
-				case "SubTitle": score.subTitle = c.nodeValue;
-				case "Artist": score.artist = c.nodeValue;
-				case "Album": score.album = c.nodeValue;
-				case "Words": score.words = c.nodeValue;
-				case "Music": score.music = c.nodeValue;
-				case "WordsAndMusic": if (c.nodeValue != null && c.nodeValue != "") { score.words = c.nodeValue; score.music = c.nodeValue; } 
-				case "Copyright": score.copyright = c.nodeValue;
-				case "Tabber": score.tab = c.nodeValue;
-			}
+            if (c.nodeType == Xml.Element)
+            {
+                switch(c.nodeName)
+                {
+                    case "Title": score.title = c.firstChild().toString();
+                    case "SubTitle": score.subTitle = c.firstChild().toString();
+                    case "Artist": score.artist = c.firstChild().toString();
+                    case "Album": score.album = c.firstChild().toString();
+                    case "Words": score.words = c.firstChild().toString();
+                    case "Music": score.music = c.firstChild().toString();
+                    case "WordsAndMusic": if (c.firstChild() != null && c.firstChild().toString() != "") { score.words = c.firstChild().toString(); score.music = c.firstChild().toString(); } 
+                    case "Copyright": score.copyright = c.firstChild().toString();
+                    case "Tabber": score.tab = c.firstChild().toString();
+                }
+            }
 		}
 	}
 }
