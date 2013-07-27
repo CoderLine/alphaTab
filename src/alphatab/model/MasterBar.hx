@@ -24,6 +24,11 @@ import alphatab.audio.MidiUtils;
  */
 class MasterBar 
 {
+    /**
+     * The maximum alternate endings. 
+     */
+    public static inline var MaxAlternateEndings = 8;
+    
     public var alternateEndings:Int;
     public var nextMasterBar:MasterBar;
     public var previousMasterBar:MasterBar;

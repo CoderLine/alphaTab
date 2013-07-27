@@ -1,0 +1,8 @@
+body { text-align:center; font-family:Open Sans, Arial sans-serif; background:#F5F6F7; padding:10px; }
+
+.button { font-size:14px; }
+
+#alphaTabScore { margin: 0 auto; width: 700px; text-align:left; }
+
+.samples { position:absolute; width: 800px;}
+.group { position: absolute; top: 50px; left: 0; right: 0; display:none;}

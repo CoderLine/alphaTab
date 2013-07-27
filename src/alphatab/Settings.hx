@@ -125,9 +125,9 @@ class Settings
         if (json.staves)
         {
             settings.staves = new Array<StaveSettings>();
-            for (key in Reflect.fields(json.staves.additionalSettings))
+            for (key in Reflect.fields(json.staves))
             {
-                var val:Dynamic = Reflect.field(json.staves.additionalSettings, key);
+                var val:Dynamic = Reflect.field(json.staves, key);
                 if (Std.is(val, String))
                 {
                     settings.staves.push(new StaveSettings(val));

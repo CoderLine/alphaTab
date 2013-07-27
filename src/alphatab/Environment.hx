@@ -1,6 +1,7 @@
 package alphatab;
 import alphatab.platform.ICanvas;
 import alphatab.platform.IFileLoader;
+import alphatab.rendering.AlternateEndingsBarRendererFactory;
 import alphatab.rendering.BarRendererFactory;
 import alphatab.rendering.EffectBarRendererFactory;
 import alphatab.rendering.effects.BeatVibratoEffectInfo;
@@ -80,6 +81,7 @@ class Environment
         staveFactories.set("chords", function(l) { return new EffectBarRendererFactory(new ChordsEffectInfo()); }); 
         staveFactories.set("beat-vibrato", function(l) { return new EffectBarRendererFactory(new BeatVibratoEffectInfo()); } ); 
         staveFactories.set("note-vibrato", function(l) { return new EffectBarRendererFactory(new NoteVibratoEffectInfo()); } ); 
+        staveFactories.set("alternate-endings", function(l) { return new AlternateEndingsBarRendererFactory(); } ); 
         staveFactories.set("score", function(l) { return new ScoreBarRendererFactory(); } ); 
         staveFactories.set("dynamics", function(l) { return new EffectBarRendererFactory(new DynamicsEffectInfo()); }); 
         staveFactories.set("tap", function(l) { return new EffectBarRendererFactory(new TapEffectInfo()); }); 

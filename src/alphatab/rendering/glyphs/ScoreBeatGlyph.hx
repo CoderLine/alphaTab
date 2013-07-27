@@ -60,60 +60,63 @@ class ScoreBeatGlyph extends BeatGlyphBase
 	public override function doLayout():Void 
 	{
 		// create glyphs
-		if (!container.beat.isRest())
-        {		
-			//
-            // Note heads
-            //
-            noteHeads = new ScoreNoteChordGlyph();
-            noteHeads.beat = container.beat;
-            noteHeads.beamingHelper = beamingHelper;
-            noteLoop( function(n) {
-                createNoteGlyph(n);
-            });
-            addGlyph(noteHeads);			
-			
-            //
-            // Note dots
-            //
-            for (i in 0 ... container.beat.dots)
-            {
-                var group = new GlyphGroup();
-                noteLoop( function (n) {
-                    createBeatDot(n, group);                    
+        if (!container.beat.isEmpty)
+        {
+            if (!container.beat.isRest())
+            {		
+                //
+                // Note heads
+                //
+                noteHeads = new ScoreNoteChordGlyph();
+                noteHeads.beat = container.beat;
+                noteHeads.beamingHelper = beamingHelper;
+                noteLoop( function(n) {
+                    createNoteGlyph(n);
                 });
-                addGlyph(group);
+                addGlyph(noteHeads);			
+                
+                //
+                // Note dots
+                //
+                for (i in 0 ... container.beat.dots)
+                {
+                    var group = new GlyphGroup();
+                    noteLoop( function (n) {
+                        createBeatDot(n, group);                    
+                    });
+                    addGlyph(group);
+                }
             }
-		}
-		else
-		{
-			var line = 0;
-            var offset = 0;
-        
-			switch(container.beat.duration)
-			{
-				case Whole:         
-					line = 4;
-				case Half:          
-					line = 5;
-				case Quarter:       
-					line = 7;
-                    offset = -2;
-				case Eighth:        
-					line = 8;
-				case Sixteenth:     
-					line = 8;
-				case ThirtySecond:  
-					line = 8;
-				case SixtyFourth:   
-					line = 8;
-			}
-			
-			var sr = cast(renderer, ScoreBarRenderer);
-			var y = sr.getScoreY(line, offset);
+            else
+            {
+                var line = 0;
+                var offset = 0;
+            
+                switch(container.beat.duration)
+                {
+                    case Whole:         
+                        line = 4;
+                    case Half:          
+                        line = 5;
+                    case Quarter:       
+                        line = 7;
+                        offset = -2;
+                    case Eighth:        
+                        line = 8;
+                    case Sixteenth:     
+                        line = 8;
+                    case ThirtySecond:  
+                        line = 8;
+                    case SixtyFourth:   
+                        line = 8;
+                }
+                
+                var sr = cast(renderer, ScoreBarRenderer);
+                var y = sr.getScoreY(line, offset);
 
-			addGlyph(new RestGlyph(0, y, container.beat.duration));
-		}
+                addGlyph(new RestGlyph(0, y, container.beat.duration));
+            }
+        }
 		
 		super.doLayout();
 		if (noteHeads != null)

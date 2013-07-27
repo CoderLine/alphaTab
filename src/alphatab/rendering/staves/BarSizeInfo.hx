@@ -14,6 +14,7 @@ class BarSizeInfo
 	public function new() 
 	{
 		sizes = new StringMap<Array<Int>>();
+        fullWidth = 0;
 	}
 	
 	public function setSize(key:String, size:Int)

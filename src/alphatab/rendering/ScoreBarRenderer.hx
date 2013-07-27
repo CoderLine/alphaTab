@@ -614,7 +614,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
             container.onNotes = new ScoreBeatGlyph();
             cast(container.onNotes, ScoreBeatGlyph).beamingHelper = _currentBeamHelper;
             container.postNotes = new ScoreBeatPostNotesGlyph();
-			addBeatGlyph(container);
+            addBeatGlyph(container);
         }
         
         _currentBeamHelper = null;

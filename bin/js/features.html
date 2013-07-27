@@ -3,18 +3,34 @@
 <head>
     <meta charset="utf-8">
     <title></title>
+    <!-- Styling of alphaTab -->
     <style type="text/css">
-    body { text-align:center; font-family:Open Sans, Arial sans-serif; background:#F5F6F7; }
 	.alphaTabSurface { box-shadow: 0 0 10px rgba(0,0,0,0.3); background:#FFF; border-radius:3px; }
-    #alphaTabScore { margin: 0 auto; width: 500px; text-align:left; }
 	</style>
-    <script type="text/javascript" src="lib/jquery/jquery-1.7.1.min.js"></script>
+    
+    <!-- Including alphaTab -->
     <script type="text/javascript" src="lib/alphatab/alphaTab.core.js"></script>
+
+    
+    <!-- jQuery Plugin -->
+    <script type="text/javascript" src="lib/jquery/jquery-1.7.1.min.js"></script>
     <script type="text/javascript" src="lib/alphatab/jquery.alphaTab.js"></script>
+
+    
+    <!-- Demo Styles and Scripts -->
+    <link rel="stylesheet" href="support/gh-buttons.css" />
+    <link rel="stylesheet" href="support/demo.css" />
+    <script type="text/javascript" src="support/demo.js"></script>
+    
 </head>
 <body>
+    <div id="menu" class="button-group">
+    </div>
+            
+    <div class="group">
+    <h1>General</h1>
     
-    <h1>Score Details</h1>
+    <h2>Score Details</h2>
     
     <p>
         The full score details are available as object dom. This way you can read and process any
@@ -44,9 +60,9 @@
         function(error) {
             jQuery('#alphaTabScore').text('Error Loading the file: ' + error);
         });
-	</script>
+    </script>
     
-    <h1>Song Details</h1>
+    <h2>Song Details</h2>
     
     <p>
         Some of the layout engines can render the song details on top of the music sheet.
@@ -57,8 +73,49 @@
         jQuery('#alphaTabDetails').alphaTab({
             staves: [] // hide content 
         });
-	</script>
+    </script>
     
+    <h2>Repeats</h2>
+    
+    <p>
+        Need display repeat marks? No problem, single repeats and multiple repeats come out of the box.
+    </p>
+    
+    <div id="alphaTabRepeats" data-file="files/features/Repeats.gp5"></div>
+    <script language="JavaScript" type="text/javascript">
+        jQuery('#alphaTabRepeats').alphaTab({
+            staves: ['score']
+        });
+    </script>
+
+    
+    <h2>Alternate Endings</h2>
+    
+    <p>
+       Even alternate repeat endings are no problem. 
+    </p>
+    
+    <div id="alphaTabAlternateEndings" data-file="files/features/AlternateEndings.gp5"></div>
+    <script language="JavaScript" type="text/javascript">
+        jQuery('#alphaTabAlternateEndings').alphaTab({
+            staves: ['alternate-endings', 'score']
+        });
+    </script>
+    
+    <h2>Tunings</h2>
+    
+    <p>
+        The guitar tuning of the current track is rendered on the top of the music notation.
+    </p>
+    
+    <div id="alphaTabTuning" data-file="files/features/Tuning.gp5"></div>
+    <script language="JavaScript" type="text/javascript">
+        jQuery('#alphaTabTuning').alphaTab();
+    </script>
+
+    </div>
+
+    <div class="group">
     <h1>Layouts</h1>
     
     <p>
@@ -76,7 +133,7 @@
         jQuery('#alphaTabPageLayout').alphaTab({
             layout: 'page'
         });
-	</script>
+    </script>
 
     <h2>Page Layout (5 bars per row)</h2>
     
@@ -94,7 +151,7 @@
                 }
             }
         });
-	</script>
+    </script>
 
     <h2>Page Layout (bar 5 to 8)</h2>
     
@@ -113,7 +170,7 @@
                 }
             }
         });
-	</script>
+    </script>
     
     <h2>Horizontal Layout</h2>
     
@@ -128,7 +185,7 @@
                 mode: 'horizontal'
             }
         });
-	</script>
+    </script>
 
     <h2>Horizontal Layout (bar 5 to 8)</h2>
     
@@ -147,8 +204,31 @@
                 }
             }
         });
-	</script>
+    </script>
+    </div>   
 
+    <div class="group">
+        <h1>Music Notation</h1>
+        
+        <p>
+            Rendering standard music notation is one of the essential features of alphaTab. 
+        </p>
+               
+        <h2>Clefs</h2>
+ 
+        <h2>Key Signatures</h2>
+        
+        <h2>Time Signatures</h2>
+        
+    </div>
+
+    <div class="group">
+        <h1>Guitar Tabs</h1>
+    </div>
+
+    <div class="group">
+        <h1>Effects</h1>
+    </div>
     
 </body>
 </html>

@@ -99,7 +99,6 @@ class EffectBarRenderer extends GroupedBarRenderer
                 g.x = pos.x + container.x;
                 pos = container.postNotes;
                 g.width = (pos.x + container.x + pos.width) - g.x;
-
         
             case SingleOnBeatOnly:
                 pos = container.onNotes;
