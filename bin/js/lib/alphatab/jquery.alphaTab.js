@@ -191,18 +191,25 @@
      */
     function track( track ) 
     {
-        var context = $(this).data('alphaTab');
-        var score = context.renderer.track.score;
-        if(track < 0 || track >= score.tracks.length) return;
-        
-        try
+       var context = $(this).data('alphaTab');
+        if(track) 
         {
-            context.renderer.render(score.tracks[track]);
+            var score = context.renderer.track.score;
+            if(track < 0 || track >= score.tracks.length) return;
+            
+            try
+            {
+                context.renderer.render(score.tracks[track]);
+            }
+            catch(e)
+            {
+                if(e instanceof Error) throw e;
+                else $.error(e);
+            }
         }
-        catch(e)
+        else
         {
-            if(e instanceof Error) throw e;
-            else $.error(e);
+            return context.renderer.track;
         }
     }
     

@@ -21,7 +21,7 @@ class BeatVibratoEffectInfo implements IEffectBarRendererInfo
     
     public function getSizingMode() : EffectBarGlyphSizing
     {
-        return EffectBarGlyphSizing.SingleOnBeatToPostBeat;
+        return EffectBarGlyphSizing.GroupedOnBeatToPostBeat;
     }
     
     public function getHeight(renderer : EffectBarRenderer) : Int

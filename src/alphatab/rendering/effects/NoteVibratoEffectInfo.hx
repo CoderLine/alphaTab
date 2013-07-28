@@ -3,6 +3,7 @@ package alphatab.rendering.effects;
 import alphatab.model.Beat;
 import alphatab.model.Note;
 import alphatab.model.VibratoType;
+import alphatab.rendering.EffectBarGlyphSizing;
 import alphatab.rendering.EffectBarRenderer;
 import alphatab.rendering.Glyph;
 import alphatab.rendering.glyphs.effects.DummyEffectGlyph;
@@ -18,6 +19,11 @@ class NoteVibratoEffectInfo extends NoteEffectInfoBase
     private override function shouldCreateGlyphForNote(renderer:EffectBarRenderer, note:Note):Bool 
     {
         return note.vibrato != VibratoType.None;
+    }
+    
+    public override function getSizingMode() : EffectBarGlyphSizing
+    {
+        return EffectBarGlyphSizing.GroupedOnBeatToPostBeat;
     }
     
     public override function getHeight(renderer : EffectBarRenderer) : Int

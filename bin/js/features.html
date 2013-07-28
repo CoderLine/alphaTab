@@ -96,6 +96,21 @@
             });
         });
     </script>
+        
+    <h2>SVG</h2>
+    
+    <p>
+        Do you prefer an SVG output instead of HTML5 canvas? No problem.
+    </p>
+    
+    <div id="alphaTabSvg" data-file="files/features/SongDetails.gp5"></div>
+    <script language="JavaScript" type="text/javascript">
+        $(document).ready(function() {
+            $('#alphaTabSvg').alphaTab({
+                engine: 'svg' 
+            });
+        });
+    </script>
     
     <h2>Repeats</h2>
     
@@ -362,9 +377,160 @@
         
     </div>
 
+    <div id="notes" class="group">
+        <h1>Special Notes</h1>
+        
+        <h2>Tied Notes</h2>
+        
+        <h2>Grace Notes</h2>
+        
+        <h2>Dead Notes</h2>
+        
+        <h2>Ghost Notes</h2>
+        
+    </div>
+    
     <div id="effects" class="group">
-        <h1>Effects</h1>
+        <h1>Effects and Annotations</h1>
+        
+        <h2>Markers</h2>
+        
+        <p>
+            Markers are a nice element to annotate different sections of the song. 
+        </p>
+        <div id="alphaTabMarkers" data-file="files/features/Markers.gp5"></div>
+        <script language="JavaScript" type="text/javascript">
+            $(document).ready(function() {
+                $('#alphaTabMarkers').alphaTab();
+            });
+        </script>
+        
+        <h2>Tempo</h2>
+        
+        <p>
+            You might already have mentioned them: Tempo markers are supported too. 
+        </p>
+        
+        <div id="alphaTabTempo" data-file="files/features/Tempo.gp5"></div>
+        <script language="JavaScript" type="text/javascript">
+            $(document).ready(function() {
+                $('#alphaTabTempo').alphaTab();
+            });
+        </script>
+        
+        <h2>Text</h2>
+        
+        <p>
+            Each beat can have a text attached. 
+        </p>
+        
+        <div id="alphaTabText" data-file="files/features/Text.gp5"></div>
+        <script language="JavaScript" type="text/javascript">
+            $(document).ready(function() {
+                $('#alphaTabText').alphaTab();
+            });
+        </script>
+
+        <h2>Chords</h2>
+        
+        <p>
+            Chord names can be useful to indicate how to play a song. 
+        </p>
+        
+        <div id="alphaTabChords" data-file="files/features/Chords.gp5"></div>
+        <script language="JavaScript" type="text/javascript">
+            $(document).ready(function() {
+                $('#alphaTabChords').alphaTab();
+            });
+        </script>
+        
+        <h2>Vibrato</h2>
+        
+        <p>
+            Beat vibrators and note vibratos are both available.
+        </p>
+        
+        <div id="alphaTabVibrato" data-file="files/features/Vibrato.gp5"></div>
+        <script language="JavaScript" type="text/javascript">
+            $(document).ready(function() {
+                $('#alphaTabVibrato').alphaTab();
+            });
+        </script>
+        
+        <h2>Dynamics</h2>
+        
+        <p>
+            From piano pianissimo to forte fortissimo, they are all there
+        </p>
+        
+        <div id="alphaTabDynamics" data-file="files/features/Dynamics.gp5"></div>
+        <script language="JavaScript" type="text/javascript">
+            $(document).ready(function() {
+                $('#alphaTabDynamics').alphaTab();
+            });
+        </script>   
+        
+        <h2>Tap/Slap/Pop</h2>
+        
+        <p>
+            Especially bass guitar players will like this feature.
+        </p>
+                
+        <div id="alphaTabTap" data-file="files/features/Tap.gp5"></div>
+        <script language="JavaScript" type="text/javascript">
+            $(document).ready(function() {
+                $('#alphaTabTap').alphaTab();
+            });
+        </script>   
+        
+        <h2>Fade-In</h2>
+        
+        <p>
+            This annotation is shown if you need to increase the note volume from silent to normal when
+            playing it. 
+        </p>
+        
+        <div id="alphaTabFadeIn" data-file="files/features/FadeIn.gp5"></div>
+        <script language="JavaScript" type="text/javascript">
+            $(document).ready(function() {
+                $('#alphaTabFadeIn').alphaTab();
+            });
+        </script>   
+        
+        <h2>Let Ring</h2>
+        
+        <p>
+            If this annotation is placed on a note, you don't stop the string after the beat ends. 
+        </p>
+                
+        <div id="alphaTabLetRing" data-file="files/features/LetRing.gp5"></div>
+        <script language="JavaScript" type="text/javascript">
+            $(document).ready(function() {
+                $('#alphaTabLetRing').alphaTab();
+            });
+        </script>  
+        
+        <h2>Palm Mute</h2>
+        
+        <p>
+            A feature you won't miss: Palm Mute markers.
+        </p>
+                
+        <div id="alphaTabPalmMute" data-file="files/features/PalmMute.gp5"></div>
+        <script language="JavaScript" type="text/javascript">
+            $(document).ready(function() {
+                $('#alphaTabPalmMute').alphaTab();
+            });
+        </script>       
+        
+        <h2>String Bends</h2>
+        
+        <h2>Tremolo Bar</h2>
+        
+        <h2>Tremolo Picking</h2>
+        
+        
     </div>
     
 </body>
-</html>
+</html> 

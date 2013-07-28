@@ -53,7 +53,7 @@ class DynamicsGlyph extends Glyph
         {
             g.x = startX;
             g.y = 0;
-           g.renderer = renderer;
+            g.renderer = renderer;
  
             g.paint(cx + x, cy + y, canvas);
             startX += g.width;

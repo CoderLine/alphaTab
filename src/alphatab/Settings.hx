@@ -73,6 +73,7 @@ class Settings
         settings.staves.push(new StaveSettings("chords"));
         settings.staves.push(new StaveSettings("beat-vibrato"));
         settings.staves.push(new StaveSettings("note-vibrato"));
+        settings.staves.push(new StaveSettings("alternate-endings"));
         
         settings.staves.push(new StaveSettings("score"));
         

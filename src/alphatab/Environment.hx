@@ -89,6 +89,6 @@ class Environment
         staveFactories.set("let-ring", function(l) { return new EffectBarRendererFactory(new LetRingEffectInfo()); }); 
         staveFactories.set("palm-mute", function(l) { return new EffectBarRendererFactory(new PalmMuteEffectInfo()); }); 
         staveFactories.set("tab", function(l) { return new TabBarRendererFactory(); } ); 
-        staveFactories.set("fingering", function(l) { return new EffectBarRendererFactory(new FingeringEffectInfo()); });   
+        // staveFactories.set("fingering", function(l) { return new EffectBarRendererFactory(new FingeringEffectInfo()); });   
     }
 }

@@ -1011,6 +1011,8 @@ class Gp3To5Importer extends ScoreImporter
             tempoAutomation.type = AutomationType.Tempo;
             tempoAutomation.value = tableChange.tempo;
             beat.automations.push(tempoAutomation);
+            
+            beat.voice.bar.getMasterBar().tempoAutomation = tempoAutomation;
         }
     }
     

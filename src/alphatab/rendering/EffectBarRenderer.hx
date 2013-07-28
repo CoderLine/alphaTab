@@ -50,6 +50,8 @@ class EffectBarRenderer extends GroupedBarRenderer
         super.finalizeRenderer(layout);
         // after all layouting and sizing place and size the effect glyphs
         isEmpty = true;
+        
+#if MULTIVOICE_SUPPORT
         for (v in _bar.voices)
         {
             var prevGlyph:Glyph = null;
@@ -74,6 +76,28 @@ class EffectBarRenderer extends GroupedBarRenderer
             }
             
         }
+#else
+        var prevGlyph:Glyph = null;
+        if (index > 0)
+        {
+            // check if previous renderer had an effect on his last beat
+            // and use this as merging element
+            var prevRenderer = cast(stave.barRenderers[index - 1], EffectBarRenderer);
+            if (prevRenderer._lastBeat != null)
+            {
+                prevGlyph = prevRenderer._effectGlyphs[0].get(prevRenderer._lastBeat.index);
+            }
+        }
+        for (beatIndex in _effectGlyphs[0].keys())
+        {
+            var effect:Glyph = _effectGlyphs[0].get(beatIndex);
+            
+            alignGlyph(_info.getSizingMode(), beatIndex, 0, prevGlyph);
+            
+            prevGlyph = effect;
+            isEmpty = false;
+        }
+#end
     }
     
     private function alignGlyph(sizing:EffectBarGlyphSizing, beatIndex:Int, voiceIndex:Int, prevGlyph:Glyph)
@@ -123,7 +147,7 @@ class EffectBarRenderer extends GroupedBarRenderer
                     pos = container.preNotes;
                     var posR = cast(pos.renderer, EffectBarRenderer);
                     var gR = cast(g.renderer, EffectBarRenderer);
-                    g.width = (posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width) - (gR.x + gR.getBeatGlyphsStart() + g.x);
+                    g.width = (posR.x + posR.getBeatGlyphsStart() + container.x + pos.x + pos.width) - (gR.x + gR.getBeatGlyphsStart() + g.x);
                     if (Std.is(g, IMultiBeatEffectGlyph)) cast(g, IMultiBeatEffectGlyph).expandedTo(container.beat);
                 }
                 
@@ -134,7 +158,7 @@ class EffectBarRenderer extends GroupedBarRenderer
                     pos = container.onNotes;
                     var posR = cast(pos.renderer, EffectBarRenderer);
                     var gR = cast(g.renderer, EffectBarRenderer);
-                    g.width = (posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width) - (gR.x + gR.getBeatGlyphsStart() + g.x);
+                    g.width = (posR.x + posR.getBeatGlyphsStart() + container.x + pos.x + pos.width) - (gR.x + gR.getBeatGlyphsStart() + g.x);
                     if (Std.is(g, IMultiBeatEffectGlyph)) cast(g, IMultiBeatEffectGlyph).expandedTo(container.beat);
                 }
             
@@ -145,7 +169,7 @@ class EffectBarRenderer extends GroupedBarRenderer
                     pos = container.postNotes;
                     var posR = cast(pos.renderer, EffectBarRenderer);
                     var gR = cast(g.renderer, EffectBarRenderer);
-                    g.width = (posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width) - (gR.x + gR.getBeatGlyphsStart() + g.x);
+                    g.width = (posR.x + posR.getBeatGlyphsStart() + container.x + pos.x + pos.width) - (gR.x + gR.getBeatGlyphsStart() + g.x);
                     if (Std.is(g, IMultiBeatEffectGlyph)) cast(g, IMultiBeatEffectGlyph).expandedTo(container.beat);
                 }
                 
@@ -156,7 +180,7 @@ class EffectBarRenderer extends GroupedBarRenderer
                     pos = container.onNotes;
                     var posR = cast(pos.renderer, EffectBarRenderer);
                     var gR = cast(g.renderer, EffectBarRenderer);
-                    g.width = (posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width) - (gR.x + gR.getBeatGlyphsStart() + g.x);
+                    g.width = (posR.x + posR.getBeatGlyphsStart() + container.x + pos.x + pos.width) - (gR.x + gR.getBeatGlyphsStart() + g.x);
                     if (Std.is(g, IMultiBeatEffectGlyph)) cast(g, IMultiBeatEffectGlyph).expandedTo(container.beat);
                 }
                 
@@ -167,7 +191,7 @@ class EffectBarRenderer extends GroupedBarRenderer
                     pos = container.postNotes;
                     var posR = cast(pos.renderer, EffectBarRenderer);
                     var gR = cast(g.renderer, EffectBarRenderer);
-                    g.width = (posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width) - (gR.x + gR.getBeatGlyphsStart() + g.x);
+                    g.width = (posR.x + posR.getBeatGlyphsStart() + container.x + pos.x + pos.width) - (gR.x + gR.getBeatGlyphsStart() + g.x);
                     if (Std.is(g, IMultiBeatEffectGlyph)) cast(g, IMultiBeatEffectGlyph).expandedTo(container.beat);
                 }
                 
@@ -178,7 +202,7 @@ class EffectBarRenderer extends GroupedBarRenderer
                     pos = container.postNotes;
                     var posR = cast(pos.renderer, EffectBarRenderer);
                     var gR = cast(g.renderer, EffectBarRenderer);
-                    g.width = (posR.x + posR.getBeatGlyphsStart() + pos.x + pos.width) - (gR.x + gR.getBeatGlyphsStart() + g.x);
+                    g.width = (posR.x + posR.getBeatGlyphsStart() + container.x + pos.x + pos.width) - (gR.x + gR.getBeatGlyphsStart() + g.x);
                     if (Std.is(g, IMultiBeatEffectGlyph)) cast(g, IMultiBeatEffectGlyph).expandedTo(container.beat);
                 }
         }
@@ -190,12 +214,17 @@ class EffectBarRenderer extends GroupedBarRenderer
 
 	private override function createBeatGlyphs():Void 
 	{
+        _effectGlyphs.push(new IntMap<Glyph>());
+        _uniqueEffectGlyphs.push(new Array<Glyph>());
+#if MULTIVOICE_SUPPORT
         for (v in _bar.voices)
         {
-            _effectGlyphs.push(new IntMap<Glyph>());
-            _uniqueEffectGlyphs.push(new Array<Glyph>());
             createVoiceGlyphs(v);
         }
+#else
+        createVoiceGlyphs(_bar.voices[0]);
+#end
+
 	}
     
     private function createVoiceGlyphs(v:Voice)
