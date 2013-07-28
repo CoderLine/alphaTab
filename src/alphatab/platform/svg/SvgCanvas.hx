@@ -49,6 +49,7 @@ class SvgCanvas implements ICanvas
         _height = 0;
         _font = new Font("sans-serif", 10);
         _textAlign = TextAlign.Left;
+        _textBaseline = TextBaseline.Default;
     }
     
     public function writeTo(stream:Output, includeWrapper:Bool, className:String = null)
@@ -319,7 +320,7 @@ class SvgCanvas implements ICanvas
         _buffer.add('<text x="');
         _buffer.add(x);
         _buffer.add('" y="');
-        _buffer.add(y);
+        _buffer.add(y + getSvgBaseLineOffset());
         _buffer.add('" style="font:');
         _buffer.add(_font.toCssString());
         _buffer.add('; fill:');
@@ -364,20 +365,34 @@ class SvgCanvas implements ICanvas
             case Right: return "end";
         }
     }    
-    private inline function getSvgBaseLine() : String
+    
+    private function getSvgBaseLineOffset() : Float
     {
 		switch(_textBaseline)
 		{
-			case Top: return "top";
-			case Middle: return "middle";
-			case Bottom: return "bottom";
-			default: return "alphabetic";
-		}
+			case Top: return 0;
+			case Middle: return 0;
+			case Bottom: return 0;
+			default: return _font.getSize();
+		}    
+    }
+    
+    private inline function getSvgBaseLine() : String
+    {
+        return "middle";
+		// switch(_textBaseline)
+		// {
+		// 	case Top: return "top";
+		// 	case Middle: return "middle";
+		// 	case Bottom: return "bottom";
+		// 	default: return "alphabetic";
+		// }
     }
     
     
     public function measureText(text:String):Float
     {
+        if (text == null || text.length == 0) return 0;
         var font:SupportedFonts = SupportedFonts.Arial;
         if (_font.getFamily().indexOf("Times") >= 0) {
             font = SupportedFonts.TimesNewRoman;

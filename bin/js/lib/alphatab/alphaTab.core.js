@@ -468,10 +468,10 @@ alphatab.platform.js.Html5Canvas.prototype = {
 		this._width = width;
 	}
 	,getHeight: function() {
-		return this._canvas.offsetHeight;
+		return this._canvas.height;
 	}
 	,getWidth: function() {
-		return this._canvas.offsetWidth;
+		return this._canvas.width;
 	}
 	,__class__: alphatab.platform.js.Html5Canvas
 }
@@ -486,26 +486,31 @@ alphatab.platform.svg.SvgCanvas = function() {
 	this._height = 0;
 	this._font = new alphatab.platform.model.Font("sans-serif",10);
 	this._textAlign = alphatab.platform.model.TextAlign.Left;
+	this._textBaseline = alphatab.model.TextBaseline.Default;
 };
 alphatab.platform.svg.SvgCanvas.__name__ = true;
 alphatab.platform.svg.SvgCanvas.__interfaces__ = [alphatab.platform.ICanvas];
 alphatab.platform.svg.SvgCanvas.prototype = {
 	measureText: function(text) {
+		if(text == null || text.length == 0) return 0;
 		var font = alphatab.platform.svg.SupportedFonts.Arial;
 		if(this._font.getFamily().indexOf("Times") >= 0) font = alphatab.platform.svg.SupportedFonts.TimesNewRoman;
 		return alphatab.platform.svg.FontSizes.measureString(text,font,this._font.getSize());
 	}
 	,getSvgBaseLine: function() {
+		return "middle";
+	}
+	,getSvgBaseLineOffset: function() {
 		var _g = this;
 		switch( (_g._textBaseline)[1] ) {
 		case 1:
-			return "top";
+			return 0;
 		case 2:
-			return "middle";
+			return 0;
 		case 3:
-			return "bottom";
+			return 0;
 		default:
-			return "alphabetic";
+			return this._font.getSize();
 		}
 	}
 	,getSvgTextAlignment: function() {
@@ -532,7 +537,7 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 		this._buffer.b += Std.string(this._lineWidth);
 		this._buffer.b += ";\" ";
 		this._buffer.b += " dominant-baseline=\"";
-		this._buffer.b += Std.string(this.getSvgBaseLine());
+		this._buffer.b += "middle";
 		this._buffer.b += "\" text-anchor=\"";
 		this._buffer.b += Std.string(this.getSvgTextAlignment());
 		this._buffer.b += "\">\n";
@@ -543,14 +548,14 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 		this._buffer.b += "<text x=\"";
 		this._buffer.b += Std.string(x);
 		this._buffer.b += "\" y=\"";
-		this._buffer.b += Std.string(y);
+		this._buffer.b += Std.string(y + this.getSvgBaseLineOffset());
 		this._buffer.b += "\" style=\"font:";
 		this._buffer.b += Std.string(this._font.toCssString());
 		this._buffer.b += "; fill:";
 		this._buffer.b += Std.string(this._color.toRgbaString());
 		this._buffer.b += ";\" ";
 		this._buffer.b += " dominant-baseline=\"";
-		this._buffer.b += Std.string(this.getSvgBaseLine());
+		this._buffer.b += "middle";
 		this._buffer.b += "\" text-anchor=\"";
 		this._buffer.b += Std.string(this.getSvgTextAlignment());
 		this._buffer.b += "\">\n";
@@ -828,6 +833,20 @@ alphatab.platform.model.TextAlign.Center.__enum__ = alphatab.platform.model.Text
 alphatab.platform.model.TextAlign.Right = ["Right",2];
 alphatab.platform.model.TextAlign.Right.toString = $estr;
 alphatab.platform.model.TextAlign.Right.__enum__ = alphatab.platform.model.TextAlign;
+if(!alphatab.model) alphatab.model = {}
+alphatab.model.TextBaseline = { __ename__ : true, __constructs__ : ["Default","Top","Middle","Bottom"] }
+alphatab.model.TextBaseline.Default = ["Default",0];
+alphatab.model.TextBaseline.Default.toString = $estr;
+alphatab.model.TextBaseline.Default.__enum__ = alphatab.model.TextBaseline;
+alphatab.model.TextBaseline.Top = ["Top",1];
+alphatab.model.TextBaseline.Top.toString = $estr;
+alphatab.model.TextBaseline.Top.__enum__ = alphatab.model.TextBaseline;
+alphatab.model.TextBaseline.Middle = ["Middle",2];
+alphatab.model.TextBaseline.Middle.toString = $estr;
+alphatab.model.TextBaseline.Middle.__enum__ = alphatab.model.TextBaseline;
+alphatab.model.TextBaseline.Bottom = ["Bottom",3];
+alphatab.model.TextBaseline.Bottom.toString = $estr;
+alphatab.model.TextBaseline.Bottom.__enum__ = alphatab.model.TextBaseline;
 alphatab.platform.IFileLoader = function() { }
 alphatab.platform.IFileLoader.__name__ = true;
 alphatab.platform.IFileLoader.prototype = {
@@ -1006,8 +1025,8 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 		} else {
 			canvas.setFont(res.wordsFont);
 			if(!this.isNullOrEmpty(score.music) && (flags & 32) != 0) {
-				var size1 = canvas.measureText(score.music);
-				canvas.fillText("Music by " + score.music,this.width - size1 - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2],y);
+				canvas.setTextAlign(alphatab.platform.model.TextAlign.Right);
+				canvas.fillText("Music by " + score.music,this.width - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2],y);
 			}
 			if(!this.isNullOrEmpty(score.words) && (flags & 16) != 0) {
 				canvas.setTextAlign(alphatab.platform.model.TextAlign.Left);
@@ -3811,7 +3830,6 @@ alphatab.io.OutputExtensions.writeAsString = function(output,value) {
 	if(js.Boot.__instanceof(value,String)) text = js.Boot.__cast(value , String); else text = Std.string(value);
 	output.writeString(text);
 }
-if(!alphatab.model) alphatab.model = {}
 alphatab.model.AccentuationType = { __ename__ : true, __constructs__ : ["None","Normal","Heavy"] }
 alphatab.model.AccentuationType.None = ["None",0];
 alphatab.model.AccentuationType.None.toString = $estr;
@@ -4245,19 +4263,6 @@ alphatab.model.SlideType.OutUp.__enum__ = alphatab.model.SlideType;
 alphatab.model.SlideType.OutDown = ["OutDown",6];
 alphatab.model.SlideType.OutDown.toString = $estr;
 alphatab.model.SlideType.OutDown.__enum__ = alphatab.model.SlideType;
-alphatab.model.TextBaseline = { __ename__ : true, __constructs__ : ["Default","Top","Middle","Bottom"] }
-alphatab.model.TextBaseline.Default = ["Default",0];
-alphatab.model.TextBaseline.Default.toString = $estr;
-alphatab.model.TextBaseline.Default.__enum__ = alphatab.model.TextBaseline;
-alphatab.model.TextBaseline.Top = ["Top",1];
-alphatab.model.TextBaseline.Top.toString = $estr;
-alphatab.model.TextBaseline.Top.__enum__ = alphatab.model.TextBaseline;
-alphatab.model.TextBaseline.Middle = ["Middle",2];
-alphatab.model.TextBaseline.Middle.toString = $estr;
-alphatab.model.TextBaseline.Middle.__enum__ = alphatab.model.TextBaseline;
-alphatab.model.TextBaseline.Bottom = ["Bottom",3];
-alphatab.model.TextBaseline.Bottom.toString = $estr;
-alphatab.model.TextBaseline.Bottom.__enum__ = alphatab.model.TextBaseline;
 alphatab.model.Track = function() {
 	this.tuning = new Array();
 	this.bars = new Array();
@@ -5459,13 +5464,28 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 });
 alphatab.rendering.ScoreRenderer = function(settings,param) {
 	this.settings = settings;
+	this._renderFinishedListeners = new Array();
 	if(settings.engine == null || !alphatab.Environment.renderEngines.exists(settings.engine)) this.canvas = (alphatab.Environment.renderEngines.get("default"))(param); else this.canvas = (alphatab.Environment.renderEngines.get(settings.engine))(param);
 	this.updateScale(1.0);
 	if(settings.layout == null || !alphatab.Environment.layoutEngines.exists(settings.layout.mode)) this.layout = (alphatab.Environment.layoutEngines.get("default"))(this); else this.layout = (alphatab.Environment.layoutEngines.get(settings.layout.mode))(this);
 };
 alphatab.rendering.ScoreRenderer.__name__ = true;
 alphatab.rendering.ScoreRenderer.prototype = {
-	paintBackground: function() {
+	raiseRenderFinished: function() {
+		var _g = 0, _g1 = this._renderFinishedListeners;
+		while(_g < _g1.length) {
+			var l = _g1[_g];
+			++_g;
+			if(l != null) l();
+		}
+	}
+	,removeRenderFinishedListener: function(listener) {
+		HxOverrides.remove(this._renderFinishedListeners,listener);
+	}
+	,addRenderFinishedListener: function(listener) {
+		this._renderFinishedListeners.push(listener);
+	}
+	,paintBackground: function() {
 		var msg = "Rendered using alphaTab (http://www.alphaTab.net)";
 		this.canvas.setColor(new alphatab.platform.model.Color(62,62,62));
 		this.canvas.setFont(this.renderingResources.copyrightFont);
@@ -5490,6 +5510,7 @@ alphatab.rendering.ScoreRenderer.prototype = {
 		this.canvas.clear();
 		this.doLayout();
 		this.paintScore();
+		this.raiseRenderFinished();
 	}
 	,render: function(track) {
 		this.track = track;
@@ -7867,11 +7888,6 @@ alphatab.rendering.staves.StaveGroup.prototype = {
 				canvas.fill();
 				canvas.beginPath();
 				canvas.moveTo(spikeStartX,accoladeEnd);
-				canvas.bezierCurveTo(spikeStartX,accoladeStart,this.x,accoladeStart,spikeEndX,accoladeStart - barSize);
-				canvas.bezierCurveTo(cx + this.x,accoladeStart + barSize,spikeStartX,accoladeStart + barSize,spikeStartX,accoladeStart + barSize);
-				canvas.closePath();
-				canvas.beginPath();
-				canvas.moveTo(spikeStartX,accoladeEnd);
 				canvas.bezierCurveTo(spikeStartX,accoladeEnd,this.x,accoladeEnd,spikeEndX,accoladeEnd + barSize);
 				canvas.bezierCurveTo(this.x,accoladeEnd - barSize,spikeStartX,accoladeEnd - barSize,spikeStartX,accoladeEnd - barSize);
 				canvas.closePath();
@@ -8117,8 +8133,12 @@ alphatab.rendering.utils.SvgPathParser.prototype = {
 	nextToken: function() {
 		var token = new StringBuf();
 		var c;
-		do c = this.nextChar(); while(!this.eof() && (alphatab.rendering.utils.SvgPathParser.isWhiteSpace(c) || c == ","));
-		if(!this.eof()) {
+		var skipChar;
+		do {
+			c = this.nextChar();
+			skipChar = alphatab.rendering.utils.SvgPathParser.isWhiteSpace(c) || c == ",";
+		} while(!this.eof() && skipChar);
+		if(!this.eof() || !skipChar) {
 			token.b += Std.string(c);
 			if(alphatab.rendering.utils.SvgPathParser.isNumber(c)) {
 				c = this.peekChar();

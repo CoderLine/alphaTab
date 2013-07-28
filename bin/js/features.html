@@ -26,8 +26,26 @@
 <body>
     <div id="menu" class="button-group">
     </div>
+    
+    <div id="all" class="group">
+        <h1>Showcase</h1>
+        
+        <p>
+            Here is a small example what you can expect from alphaTab. 
+        </p>
+        
+        <div id="alphaTabShowcase" data-file="files/Canon.gp5"></div>
+        <script language="JavaScript" type="text/javascript">
+            $(document).ready(function() {
+                $('#alphaTabShowcase').alphaTab({
+                    engine: 'svg'
+                });
+            });
+        </script>
             
-    <div class="group">
+    </div>
+            
+    <div id="general" class="group">
     <h1>General</h1>
     
     <h2>Score Details</h2>
@@ -41,24 +59,26 @@
         Loading...        
     </div>
     <script language="JavaScript" type="text/javascript">
-        var score = alphatab.importer.ScoreLoader.loadScoreAsync(jQuery('#alphaTabScore').data('file'), 
-        function(score) {
-            var info = jQuery('#alphaTabScore');
-            info.html('');
-            info.append('<p><b>Title:</b> '+score.title+'</p>');
-            info.append('<p><b>Subtitle:</b> '+score.subtitle+'</p>');
-            info.append('<p><b>Album:</b> '+score.album+'</p>');
-            info.append('<p><b>Tempo:</b> '+score.tempo+'</p>');
-            info.append('<p><b>Bars:</b> '+score.masterBars.length+'</p>');
-            info.append('<p><b>Tracks:</b> ('+score.tracks.length+')</p>');
-            var tracks = $('<ul></ul>');
-            for(var i = 0; i < score.tracks.length; i++) {
-                tracks.append('<li>'+score.tracks[i].name+'</li>');
-            }
-            info.append(tracks);
-        },
-        function(error) {
-            jQuery('#alphaTabScore').text('Error Loading the file: ' + error);
+        $(document).ready(function() {
+            var score = alphatab.importer.ScoreLoader.loadScoreAsync($('#alphaTabScore').data('file'), 
+            function(score) {
+                var info = jQuery('#alphaTabScore');
+                info.html('');
+                info.append('<p><b>Title:</b> '+score.title+'</p>');
+                info.append('<p><b>Subtitle:</b> '+score.subtitle+'</p>');
+                info.append('<p><b>Album:</b> '+score.album+'</p>');
+                info.append('<p><b>Tempo:</b> '+score.tempo+'</p>');
+                info.append('<p><b>Bars:</b> '+score.masterBars.length+'</p>');
+                info.append('<p><b>Tracks:</b> ('+score.tracks.length+')</p>');
+                var tracks = $('<ul></ul>');
+                for(var i = 0; i < score.tracks.length; i++) {
+                    tracks.append('<li>'+score.tracks[i].name+'</li>');
+                }
+                info.append(tracks);
+            },
+            function(error) {
+                jQuery('#alphaTabScore').text('Error Loading the file: ' + error);
+            });
         });
     </script>
     
@@ -70,8 +90,10 @@
     
     <div id="alphaTabDetails" data-file="files/features/SongDetails.gp5"></div>
     <script language="JavaScript" type="text/javascript">
-        jQuery('#alphaTabDetails').alphaTab({
-            staves: [] // hide content 
+        $(document).ready(function() {
+            $('#alphaTabDetails').alphaTab({
+                staves: [] // hide content 
+            });
         });
     </script>
     
@@ -83,8 +105,10 @@
     
     <div id="alphaTabRepeats" data-file="files/features/Repeats.gp5"></div>
     <script language="JavaScript" type="text/javascript">
-        jQuery('#alphaTabRepeats').alphaTab({
-            staves: ['score']
+        $(document).ready(function() {
+            $('#alphaTabRepeats').alphaTab({
+                staves: ['score']
+            });
         });
     </script>
 
@@ -97,8 +121,10 @@
     
     <div id="alphaTabAlternateEndings" data-file="files/features/AlternateEndings.gp5"></div>
     <script language="JavaScript" type="text/javascript">
-        jQuery('#alphaTabAlternateEndings').alphaTab({
-            staves: ['alternate-endings', 'score']
+        $(document).ready(function() {
+            $('#alphaTabAlternateEndings').alphaTab({
+                staves: ['alternate-endings', 'score']
+            });
         });
     </script>
     
@@ -110,12 +136,14 @@
     
     <div id="alphaTabTuning" data-file="files/features/Tuning.gp5"></div>
     <script language="JavaScript" type="text/javascript">
-        jQuery('#alphaTabTuning').alphaTab();
+        $(document).ready(function() {
+            $('#alphaTabTuning').alphaTab();
+        });
     </script>
 
     </div>
 
-    <div class="group">
+    <div id="layouts" class="group">
     <h1>Layouts</h1>
     
     <p>
@@ -130,10 +158,13 @@
     
     <div id="alphaTabPageLayout" data-file="files/features/Skillet.gp5"></div>
     <script language="JavaScript" type="text/javascript">
-        jQuery('#alphaTabPageLayout').alphaTab({
-            layout: 'page'
+        $(document).ready(function() {
+            $('#alphaTabPageLayout').alphaTab({
+                layout: 'page'
+            });
         });
     </script>
+
 
     <h2>Page Layout (5 bars per row)</h2>
     
@@ -143,13 +174,15 @@
     
     <div id="alphaTabPagePerRow" data-file="files/features/Skillet.gp5"></div>
     <script language="JavaScript" type="text/javascript">
-        jQuery('#alphaTabPagePerRow').alphaTab({
-            layout: {
-                mode: 'page',
-                additionalSettings: {
-                    barsPerRow: 5
+        $(document).ready(function() {
+            $('#alphaTabPagePerRow').alphaTab({
+                layout: {
+                    mode: 'page',
+                    additionalSettings: {
+                        barsPerRow: 5
+                    }
                 }
-            }
+            });
         });
     </script>
 
@@ -161,14 +194,16 @@
     
     <div id="alphaTabPageSubSet" data-file="files/features/Skillet.gp5"></div>
     <script language="JavaScript" type="text/javascript">
-        jQuery('#alphaTabPageSubSet').alphaTab({
-            layout: {
-                mode: 'page',
-                additionalSettings: {
-                    start: 5,
-                    count: 4
+        $(document).ready(function() {
+            $('#alphaTabPageSubSet').alphaTab({
+                layout: {
+                    mode: 'page',
+                    additionalSettings: {
+                        start: 5,
+                        count: 4
+                    }
                 }
-            }
+            });
         });
     </script>
     
@@ -180,10 +215,12 @@
     
     <div id="alphaTabHorizontal" data-file="files/features/Skillet.gp5"></div>
     <script language="JavaScript" type="text/javascript">
-        jQuery('#alphaTabHorizontal').alphaTab({
-            layout: {
-                mode: 'horizontal'
-            }
+        $(document).ready(function() {
+            $('#alphaTabHorizontal').alphaTab({
+                layout: {
+                    mode: 'horizontal'
+                }
+            });
         });
     </script>
 
@@ -195,19 +232,21 @@
     
     <div id="alphaTabHorizontalSubSet" data-file="files/features/Skillet.gp5"></div>
     <script language="JavaScript" type="text/javascript">
-        jQuery('#alphaTabHorizontalSubSet').alphaTab({
-            layout: {
-                mode: 'horizontal',
-                additionalSettings: {
-                    start: 5,
-                    count: 4
+        $(document).ready(function() {
+            $('#alphaTabHorizontalSubSet').alphaTab({
+                layout: {
+                    mode: 'horizontal',
+                    additionalSettings: {
+                        start: 5,
+                        count: 4
+                    }
                 }
-            }
+            });
         });
     </script>
     </div>   
 
-    <div class="group">
+    <div id="score" class="group">
         <h1>Music Notation</h1>
         
         <p>
@@ -226,14 +265,16 @@
             \clef G2 | \clef F4 | \clef C3 | \clef C4
         </div>
         <script language="JavaScript" type="text/javascript">
-            jQuery('#alphaTabClefs').alphaTab({
-                staves: ['score'],
-                layout: {
-                    mode: 'page',
-                    additionalSettings: {
-                        hideInfo: true
+            $(document).ready(function() {
+                $('#alphaTabClefs').alphaTab({
+                    staves: ['score'],
+                    layout: {
+                        mode: 'page',
+                        additionalSettings: {
+                            hideInfo: true
+                        }
                     }
-                }
+                });
             });
         </script>
  
@@ -245,8 +286,10 @@
 
         <div id="alphaTabKeySignatures" data-file="files/features/KeySignatures.gp5"></div>
         <script language="JavaScript" type="text/javascript">
-            jQuery('#alphaTabKeySignatures').alphaTab({
-                staves: ['score']
+            $(document).ready(function() {
+                $('#alphaTabKeySignatures').alphaTab({
+                    staves: ['score']
+                });
             });
         </script>
 
@@ -259,8 +302,10 @@
 
         <div id="alphaTabTimeSignatures" data-file="files/features/TimeSignatures.gp5"></div>
         <script language="JavaScript" type="text/javascript">
-            jQuery('#alphaTabTimeSignatures').alphaTab({
-                staves: ['score']
+            $(document).ready(function() {
+                $('#alphaTabTimeSignatures').alphaTab({
+                    staves: ['score']
+                });
             });
         </script>
         
@@ -272,8 +317,10 @@
 
         <div id="alphaTabBeams" data-file="files/features/Beams.gp5"></div>
         <script language="JavaScript" type="text/javascript">
-            jQuery('#alphaTabBeams').alphaTab({
-                staves: ['score']
+            $(document).ready(function() {
+                $('#alphaTabBeams').alphaTab({
+                    staves: ['score']
+                });
             });
         </script>
         
@@ -285,16 +332,16 @@
 
         <div id="alphaTabAccidentals" data-file="files/features/Accidentals.gp5"></div>
         <script language="JavaScript" type="text/javascript">
-            jQuery('#alphaTabAccidentals').alphaTab({
-                staves: ['score']
+            $(document).ready(function() {
+                $('#alphaTabAccidentals').alphaTab({
+                    staves: ['score']
+                });
             });
         </script>
 
-        
-
     </div>
 
-    <div class="group">
+    <div id="tabs" class="group">
         <h1>Guitar Tabs</h1>
         
         <h2>String Variations</h2>
@@ -306,14 +353,16 @@
         
         <div id="alphaTabTabs" data-file="files/features/Tabs.gp5"></div>
         <script language="JavaScript" type="text/javascript">
-            jQuery('#alphaTabTabs').alphaTab({
-                staves: ['tab']
+            $(document).ready(function() {
+                $('#alphaTabTabs').alphaTab({
+                    staves: ['tab']
+                });
             });
         </script>
         
     </div>
 
-    <div class="group">
+    <div id="effects" class="group">
         <h1>Effects</h1>
     </div>
     

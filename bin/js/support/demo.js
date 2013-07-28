@@ -1,15 +1,31 @@
 var currentGroup = null;
+var firstGroup = null;
 var currentGroupMenuItem = null;
+var menuLookup = {};
 
-function showGroup(group) {
-    if(group == currentGroup) return;
-    if(currentGroup != null) $(currentGroup).fadeOut();
-    $(group).fadeIn();
-    currentGroup = group;
+function showGroup(groupId) {
+    if(!groupId || groupId.length == 0) 
+        groupId = firstGroup;
+    
+    if(currentGroupMenuItem != null)
+        currentGroupMenuItem.removeClass('active');
+    currentGroupMenuItem = menuLookup[groupId];
+    if(currentGroupMenuItem)
+    {
+        currentGroupMenuItem.addClass('active');
+        
+        var group = currentGroupMenuItem.data('group');
+        if(group == currentGroup) return;
+        if(currentGroup != null) $(currentGroup).fadeOut();
+        $(group).fadeIn();
+        currentGroup = group;
+        $("html, body").animate({ scrollTop: 0 }, 400);
+    }    
 }
-
+       
 $(document).ready(function() {
     var menu = $('#menu');
+    
     
     $('.group').each(function() {
         var group = this;
@@ -18,16 +34,19 @@ $(document).ready(function() {
         var menuItem = $(document.createElement('a'));
         menuItem.addClass('button');
         menuItem.text(title);
-        menuItem.click(function() {
-            if(currentGroupMenuItem != null)
-                currentGroupMenuItem.removeClass('active');
-            currentGroupMenuItem = menuItem;
-            currentGroupMenuItem.addClass('active');
-            showGroup(group);
-        });
+        menuItem.data('group', group);
+        var groupId = '#' + group.id;
+        menuItem.attr('href', groupId);
+        menuLookup[groupId] = menuItem;
+        if(firstGroup == null)
+            firstGroup = groupId;
         menu.append(menuItem);
         
     });
     
-    $('#menu a').first().click();
+    $(window).on('hashchange', function() {
+        showGroup(window.location.hash);
+    });
+    
+    showGroup(window.location.hash);
 });

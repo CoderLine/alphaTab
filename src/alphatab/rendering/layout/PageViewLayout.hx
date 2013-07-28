@@ -18,6 +18,7 @@ package alphatab.rendering.layout;
 
 import alphatab.model.Bar;
 import alphatab.model.Score;
+import alphatab.model.TextBaseline;
 import alphatab.model.Track;
 import alphatab.model.Tuning;
 import alphatab.platform.ICanvas;
@@ -224,8 +225,8 @@ class PageViewLayout extends ScoreLayout
             canvas.setFont(res.wordsFont);
             if (!isNullOrEmpty(score.music) && (flags & HeaderFooterElements.MUSIC != 0))
             {
-                var size = canvas.measureText(score.music);
-                canvas.fillText("Music by " + score.music, (width - size - PAGE_PADDING[2]), y);
+                canvas.setTextAlign(TextAlign.Right);
+                canvas.fillText("Music by " + score.music, width - PAGE_PADDING[2], y);
             }
             if (!isNullOrEmpty(score.words) && (flags & HeaderFooterElements.WORDS != 0))
             {

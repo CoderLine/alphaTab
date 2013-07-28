@@ -34,6 +34,7 @@ import haxe.ds.StringMap;
  */
 class ScoreRenderer 
 {
+    private var _renderFinishedListeners:Array < Void->Void > ;
     public var canvas : ICanvas;
     public var score(get, null) : Score;
     public var track : Track;
@@ -44,11 +45,11 @@ class ScoreRenderer
     public var renderingResources : RenderingResources;
 	
 	public var settings:Settings;
-
-        
+    
     public function new(settings:Settings, param:Dynamic) 
     {
         this.settings = settings;
+        _renderFinishedListeners = new Array < Void->Void > ();
         if (settings.engine == null || !Environment.renderEngines.exists(settings.engine))
         {
             canvas = Environment.renderEngines.get("default")(param);
@@ -86,6 +87,7 @@ class ScoreRenderer
 		canvas.clear();		
         doLayout();
         paintScore();
+        raiseRenderFinished();
     }
     
     public function get_score() : Score
@@ -121,4 +123,23 @@ class ScoreRenderer
         var x:Float = canvas.getWidth() / 2;
         canvas.fillText(msg, x, canvas.getHeight() - (renderingResources.copyrightFont.getSize() * 2));
     }
+
+    public function addRenderFinishedListener(listener:Void->Void)
+    {
+        _renderFinishedListeners.push(listener);
+    }
+    
+    public function removeRenderFinishedListener(listener:Void->Void)
+    {
+        _renderFinishedListeners.remove(listener);
+    }
+    
+    private function raiseRenderFinished()
+    {
+        for (l in _renderFinishedListeners)
+        {
+            if(l != null) l();
+        }
+    }
+    
 }

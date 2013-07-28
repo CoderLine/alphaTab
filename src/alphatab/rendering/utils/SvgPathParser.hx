@@ -77,15 +77,17 @@ class SvgPathParser
 		var token = new StringBuf();
 		
 		var c:String;
+        var skipChar:Bool;
 		
 		// skip leading spaces and separators
 		do
 		{
 			c = nextChar();
-		} while (!eof() && (isWhiteSpace(c) || c == ","));
+            skipChar = isWhiteSpace(c) ||  c == ",";
+		} while (!eof() && skipChar);
 		
 		// read token itself 
-		if (!eof())
+		if (!eof() || !skipChar)
 		{
 			token.add(c);		
 			if (isNumber(c)) // do we have a number?

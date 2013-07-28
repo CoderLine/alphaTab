@@ -42,12 +42,12 @@ class Html5Canvas implements ICanvas
     
     public function getWidth():Int 
     {
-        return _canvas.offsetWidth; 
+        return _canvas.width; 
     }
     
     public function getHeight():Int 
     {
-        return _canvas.offsetHeight;
+        return _canvas.height;
     }
     
     public function setWidth(width:Int):Void 

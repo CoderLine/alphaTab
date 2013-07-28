@@ -91,6 +91,8 @@
                     $this.append(context.canvas);
                 }
                 
+               
+                
                 //
                 // Renderer setup
                 context.renderer = new alphatab.rendering.ScoreRenderer(context.settings, context.canvas);
@@ -98,13 +100,13 @@
                 // in case of SVG we hook into the renderer to create the svg element after rendering
                 if(context.settings.engine == "svg") 
                 {
-                    context.renderer.onFinished = function() 
+                    context.renderer.addRenderFinishedListener(function() 
                     {
                         context.canvas.children().remove(); // remove old svg 
                         var canvas = context.renderer.canvas;
                         var svgElement = $(canvas.toSvg(true, "alphaTabSurface"));
                         context.canvas.append(svgElement);
-                    };
+                    });
                 }
                 
                 $this.data('alphaTab', context);                

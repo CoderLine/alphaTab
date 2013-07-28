@@ -188,13 +188,7 @@ class StaveGroup
                 canvas.closePath();
                 canvas.fill();
                 
-                // bottom spike
-                canvas.beginPath();
-                canvas.moveTo(spikeStartX, accoladeEnd);
-                canvas.bezierCurveTo(spikeStartX, accoladeStart, x, accoladeStart, spikeEndX, accoladeStart - barSize);
-                canvas.bezierCurveTo(cx + x, accoladeStart + barSize, spikeStartX, accoladeStart + barSize, spikeStartX, accoladeStart + barSize);
-                canvas.closePath();
-
+                // bottom spike 
                 canvas.beginPath();
                 canvas.moveTo(spikeStartX, accoladeEnd);
                 canvas.bezierCurveTo(spikeStartX, accoladeEnd, x, accoladeEnd, spikeEndX, accoladeEnd + barSize);

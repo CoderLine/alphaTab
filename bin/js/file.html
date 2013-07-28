@@ -8,19 +8,15 @@
 	</style>
     <script type="text/javascript" src="lib/jquery/jquery-1.7.1.min.js"></script>
     <script type="text/javascript" src="lib/alphatab/alphaTab.core.js"></script>
-    <script type="text/javascript" src="lib/alphatab/jquery.alphaTab.js"></script>
-	<script language="JavaScript" type="text/javascript">
-	(function($) {
-		$(document).ready(function() {
-			$('div.alphaTab').alphaTab();
-		});
-	})(jQuery);
-	</script>     
+    <script type="text/javascript" src="lib/alphatab/jquery.alphaTab.js"></script>   
 </head>
 <body>
 
-<div class="alphaTab" data-file="files/Test.gp5">
-</div>
-
+    <div id="alphaTabRepeats" data-file="files/Test.gp5"></div>
+    <script language="JavaScript" type="text/javascript">
+        jQuery('#alphaTabRepeats').alphaTab({
+        });
+    </script>
+    
 </body>
 </html>
