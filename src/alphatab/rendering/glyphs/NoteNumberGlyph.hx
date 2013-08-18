@@ -26,6 +26,10 @@ class NoteNumberGlyph extends Glyph
 		{
 			_noteString = "(" + _noteString + ")";
 		}
+        else
+        {
+            _noteString = "";
+        }
 	}
 	
 	public override function doLayout():Void 

@@ -6523,7 +6523,7 @@ alphatab.rendering.glyphs.NoteNumberGlyph = function(x,y,n,isGrace) {
 	if(!n.isTieDestination) {
 		this._noteString = n.isDead?"X":Std.string(n.fret);
 		if(n.isGhost) this._noteString = "(" + this._noteString + ")";
-	} else if(n.beat.index == 0) this._noteString = "(" + this._noteString + ")";
+	} else if(n.beat.index == 0) this._noteString = "(" + this._noteString + ")"; else this._noteString = "";
 };
 alphatab.rendering.glyphs.NoteNumberGlyph.__name__ = true;
 alphatab.rendering.glyphs.NoteNumberGlyph.__super__ = alphatab.rendering.Glyph;

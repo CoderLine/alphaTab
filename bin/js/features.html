@@ -381,13 +381,58 @@
         <h1>Special Notes</h1>
         
         <h2>Tied Notes</h2>
+          
+        <p>
+            Tied notes are notes which are not hit a second time, 
+            the note is being held. 
+        </p>
+        
+        <div id="alphaTabTied" data-file="files/features/TiedNotes.gp5"></div>
+        <script language="JavaScript" type="text/javascript">
+            $(document).ready(function() {
+                $('#alphaTabTied').alphaTab();
+            });
+        </script>  
         
         <h2>Grace Notes</h2>
+         
+        <p>
+            Yes, alphaTab can render grace notes. 
+        </p>
+        
+        <div id="alphaTabGrace" data-file="files/features/GraceNotes.gp5"></div>
+        <script language="JavaScript" type="text/javascript">
+            $(document).ready(function() {
+                $('#alphaTabGrace').alphaTab();
+            });
+        </script>  
         
         <h2>Dead Notes</h2>
         
+        <p>
+            Dead notes are notes without a defined note height. On stringed instruments<br />
+            they are played by hitting the string without pressing but with touching the finger on the fret.
+        </p>
+        
+        <div id="alphaTabDead" data-file="files/features/DeadNotes.gp5"></div>
+        <script language="JavaScript" type="text/javascript">
+            $(document).ready(function() {
+                $('#alphaTabDead').alphaTab();
+            });
+        </script>  
+        
         <h2>Ghost Notes</h2>
         
+        <p>
+            Ghost notes are played more slient than normal notes.
+        </p>
+        
+        <div id="alphaTabGhost" data-file="files/features/GhostNotes.gp5"></div>
+        <script language="JavaScript" type="text/javascript">
+            $(document).ready(function() {
+                $('#alphaTabGhost').alphaTab();
+            });
+        </script>       
     </div>
     
     <div id="effects" class="group">
