@@ -89,6 +89,7 @@ class Settings
         
         settings.staves.push(new StaveSettings("tab"));
         
+        settings.staves.push(new StaveSettings("pick-stroke"));
         settings.staves.push(new StaveSettings("fingering"));
 
         return settings;

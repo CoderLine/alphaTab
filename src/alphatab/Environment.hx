@@ -13,6 +13,7 @@ import alphatab.rendering.effects.LetRingEffectInfo;
 import alphatab.rendering.effects.MarkerEffectInfo;
 import alphatab.rendering.effects.NoteVibratoEffectInfo;
 import alphatab.rendering.effects.PalmMuteEffectInfo;
+import alphatab.rendering.effects.PickStrokeEffectInfo;
 import alphatab.rendering.effects.TapEffectInfo;
 import alphatab.rendering.effects.TempoEffectInfo;
 import alphatab.rendering.effects.TextEffectInfo;
@@ -91,6 +92,7 @@ class Environment
         staveFactories.set("let-ring", function(l) { return new EffectBarRendererFactory(new LetRingEffectInfo()); }); 
         staveFactories.set("palm-mute", function(l) { return new EffectBarRendererFactory(new PalmMuteEffectInfo()); }); 
         staveFactories.set("tab", function(l) { return new TabBarRendererFactory(); } ); 
+        staveFactories.set("pick-stroke", function(l) { return new EffectBarRendererFactory(new PickStrokeEffectInfo()); }); 
         // staveFactories.set("fingering", function(l) { return new EffectBarRendererFactory(new FingeringEffectInfo()); });   
     }
 }

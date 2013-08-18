@@ -1516,6 +1516,25 @@ alphatab.rendering.TabBarRendererFactory.prototype = $extend(alphatab.rendering.
 	}
 	,__class__: alphatab.rendering.TabBarRendererFactory
 });
+alphatab.rendering.effects.PickStrokeEffectInfo = function() {
+};
+alphatab.rendering.effects.PickStrokeEffectInfo.__name__ = true;
+alphatab.rendering.effects.PickStrokeEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
+alphatab.rendering.effects.PickStrokeEffectInfo.prototype = {
+	createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.PickStrokeGlyph(0,0,beat.pickStroke);
+	}
+	,getSizingMode: function() {
+		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatOnly;
+	}
+	,getHeight: function(renderer) {
+		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,shouldCreateGlyph: function(renderer,beat) {
+		return beat.pickStroke != alphatab.model.PickStrokeType.None;
+	}
+	,__class__: alphatab.rendering.effects.PickStrokeEffectInfo
+}
 alphatab.Environment = function() { }
 alphatab.Environment.__name__ = true;
 alphatab.Main = function() { }
@@ -1553,6 +1572,7 @@ alphatab.Settings.defaults = function() {
 	settings.staves.push(new alphatab.StaveSettings("let-ring"));
 	settings.staves.push(new alphatab.StaveSettings("palm-mute"));
 	settings.staves.push(new alphatab.StaveSettings("tab"));
+	settings.staves.push(new alphatab.StaveSettings("pick-stroke"));
 	settings.staves.push(new alphatab.StaveSettings("fingering"));
 	return settings;
 }
@@ -7843,6 +7863,32 @@ alphatab.rendering.glyphs.effects.LineRangedGlyph.prototype = $extend(alphatab.r
 	}
 	,__class__: alphatab.rendering.glyphs.effects.LineRangedGlyph
 });
+alphatab.rendering.glyphs.effects.PickStrokeGlyph = function(x,y,pickStroke) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,this.getNoteSvg(pickStroke),1,1);
+};
+alphatab.rendering.glyphs.effects.PickStrokeGlyph.__name__ = true;
+alphatab.rendering.glyphs.effects.PickStrokeGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
+alphatab.rendering.glyphs.effects.PickStrokeGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
+	getNoteSvg: function(pickStroke) {
+		switch( (pickStroke)[1] ) {
+		case 1:
+			return alphatab.rendering.glyphs.MusicFont.PickStrokeUp;
+		case 2:
+			return alphatab.rendering.glyphs.MusicFont.PickStrokeDown;
+		case 0:
+			return "";
+		}
+	}
+	,canScale: function() {
+		return false;
+	}
+	,doLayout: function() {
+		this.width = 9 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,__class__: alphatab.rendering.glyphs.effects.PickStrokeGlyph
+});
 alphatab.rendering.glyphs.effects.TempoGlyph = function(x,y,tempo) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
@@ -9116,6 +9162,9 @@ alphatab.Environment.staveFactories.set("palm-mute",function(l) {
 });
 alphatab.Environment.staveFactories.set("tab",function(l) {
 	return new alphatab.rendering.TabBarRendererFactory();
+});
+alphatab.Environment.staveFactories.set("pick-stroke",function(l) {
+	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.PickStrokeEffectInfo());
 });
 alphatab.platform.model.Font.STYLE_PLAIN = 0;
 alphatab.platform.model.Font.STYLE_BOLD = 1;
