@@ -7510,17 +7510,10 @@ alphatab.rendering.glyphs.TabNoteChordGlyph.prototype = $extend(alphatab.renderi
 			g.paint(cx + this.x,cy + this.y,canvas);
 		}
 		canvas.setTextBaseline(old);
-		var tabRenderer = this.renderer;
-		var tabHeight = this.renderer.stave.staveGroup.layout.renderer.renderingResources.tablatureFont.getSize();
-		var effectY = tabRenderer.getNoteY(this._minNote) + tabHeight / 2 | 0;
-		var effectSpacing = 7 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 		var $it0 = this.beatEffects.iterator();
 		while( $it0.hasNext() ) {
 			var g = $it0.next();
-			g.y = effectY;
-			g.x = this.width / 2 | 0;
 			g.paint(cx + this.x,cy + this.y,canvas);
-			effectY += effectSpacing;
 		}
 	}
 	,addNoteGlyph: function(noteGlyph,note) {
@@ -7538,11 +7531,18 @@ alphatab.rendering.glyphs.TabNoteChordGlyph.prototype = $extend(alphatab.renderi
 			g.doLayout();
 			if(g.width > w) w = g.width;
 		}
+		var tabRenderer = this.renderer;
+		var tabHeight = this.renderer.stave.staveGroup.layout.renderer.renderingResources.tablatureFont.getSize();
+		var effectY = this.getNoteY(this._minNote) + tabHeight / 2 | 0;
+		var effectSpacing = 7 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 		var $it0 = this.beatEffects.iterator();
 		while( $it0.hasNext() ) {
-			var e = $it0.next();
-			e.renderer = this.renderer;
-			e.doLayout();
+			var g = $it0.next();
+			g.y = effectY;
+			g.x = this.width / 2 | 0;
+			g.renderer = this.renderer;
+			effectY += effectSpacing;
+			g.doLayout();
 		}
 		this.width = w;
 	}
@@ -7811,6 +7811,7 @@ alphatab.rendering.glyphs.WhammyBarGlyph.prototype = $extend(alphatab.rendering.
 		var startY = cy + this.y;
 		var textOffset = 3 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 		var sizeY = 60 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		canvas.setTextAlign(alphatab.platform.model.TextAlign.Center);
 		if(this._beat.whammyBarPoints.length >= 2) {
 			var dx = (endX - startX) / 60;
 			var dy = sizeY / 24;
@@ -7838,12 +7839,38 @@ alphatab.rendering.glyphs.WhammyBarGlyph.prototype = $extend(alphatab.rendering.
 					canvas.setFont(res.graceFont);
 					var size = canvas.measureText(s);
 					var sy = up?pt2Y - res.graceFont.getSize() - textOffset:pt2Y + textOffset;
-					var sx = pt2X - size / 2;
+					var sx = pt2X;
 					canvas.fillText(s,sx,sy);
 				}
 			}
 			canvas.stroke();
 		}
+	}
+	,doLayout: function() {
+		alphatab.rendering.Glyph.prototype.doLayout.call(this);
+		var minY = 0;
+		var maxY = 0;
+		var sizeY = 60 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		if(this._beat.whammyBarPoints.length >= 2) {
+			var dy = sizeY / 24;
+			var _g1 = 0, _g = this._beat.whammyBarPoints.length;
+			while(_g1 < _g) {
+				var i = _g1++;
+				var pt = this._beat.whammyBarPoints[i];
+				var ptY = 0 - dy * pt.value | 0;
+				if(ptY > maxY) maxY = ptY;
+				if(ptY < minY) minY = ptY;
+			}
+		}
+		var tabBarRenderer = this.renderer;
+		var track = this.renderer.stave.staveGroup.layout.renderer.track;
+		var tabTop = tabBarRenderer.getTabY(0,-2);
+		var tabBottom = tabBarRenderer.getTabY(track.tuning.length,-2);
+		var absMinY = this.y + minY + tabTop;
+		var absMaxY = this.y + maxY - tabBottom;
+		if(absMinY < 0) tabBarRenderer.registerOverflowTop(Math.abs(absMinY) | 0);
+		if(absMaxY > 0) tabBarRenderer.registerOverflowBottom(Math.abs(absMaxY) | 0);
+		var height = tabBarRenderer.height;
 	}
 	,__class__: alphatab.rendering.glyphs.WhammyBarGlyph
 });
@@ -9458,6 +9485,7 @@ alphatab.rendering.glyphs.NoteHeadGlyph.graceScale = 0.7;
 alphatab.rendering.glyphs.NoteHeadGlyph.noteHeadHeight = 9;
 alphatab.rendering.glyphs.NoteNumberGlyph.Padding = 0;
 alphatab.rendering.glyphs.VoiceContainerGlyph.KEY_SIZE_BEAT = "BEAT";
+alphatab.rendering.glyphs.WhammyBarGlyph.WhammyMaxOffset = 60;
 alphatab.rendering.glyphs.effects.DynamicsGlyph.GlyphScale = 0.8;
 alphatab.rendering.glyphs.effects.LineRangedGlyph.LineSpacing = 3;
 alphatab.rendering.glyphs.effects.LineRangedGlyph.LineTopPadding = 8;

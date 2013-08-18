@@ -62,10 +62,18 @@ class TabNoteChordGlyph extends Glyph
 			}
 		}
         
-        for (e in beatEffects)
+        var tabRenderer:TabBarRenderer = cast renderer;
+        var tabHeight = renderer.getResources().tablatureFont.getSize();
+        var effectY = Std.int(getNoteY(_minNote) + tabHeight / 2);
+         // TODO: take care of actual glyph height
+        var effectSpacing:Int = Std.int(7 * getScale());
+        for (g in beatEffects)
         {
-            e.renderer = renderer;
-            e.doLayout();
+            g.y = effectY;
+            g.x = Std.int(width / 2);
+            g.renderer = renderer;
+            effectY += effectSpacing;
+            g.doLayout();
         }
         
 		width = w;
@@ -89,17 +97,9 @@ class TabNoteChordGlyph extends Glyph
 		}
 		canvas.setTextBaseline(old);
         
-        var tabRenderer:TabBarRenderer = cast renderer;
-        var tabHeight = renderer.getResources().tablatureFont.getSize();
-        var effectY = Std.int(tabRenderer.getNoteY(_minNote) + tabHeight / 2);
-         // TODO: take care of actual glyph height
-        var effectSpacing:Int = Std.int(7 * getScale());
         for (g in beatEffects)
         {
-            g.y = effectY;
-            g.x = Std.int(width / 2);
             g.paint(cx + x, cy + y, canvas);
-            effectY += effectSpacing;
         }
 	}
 }

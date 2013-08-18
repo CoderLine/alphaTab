@@ -43,13 +43,12 @@ import haxe.ds.IntMap;
 class TabBarRenderer extends GroupedBarRenderer
 {
 	public static inline var LineSpacing = 10;
-
+    
 	public function new(bar:Bar) 
 	{
 		super(bar);
 	}
     
-	
 	private inline function getLineOffset()
 	{
 		return ((LineSpacing + 1) * getLayout().renderer.scale);

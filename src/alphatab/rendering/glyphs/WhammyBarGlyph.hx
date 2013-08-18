@@ -1,12 +1,15 @@
 package alphatab.rendering.glyphs;
 import alphatab.model.Beat;
 import alphatab.platform.ICanvas;
+import alphatab.platform.model.Color;
+import alphatab.platform.model.TextAlign;
 import alphatab.rendering.Glyph;
 import alphatab.rendering.TabBarRenderer;
 import js.html.Point;
 
 class WhammyBarGlyph extends Glyph
 {
+    private static inline var WhammyMaxOffset = 60;
     private var _beat:Beat;
     private var _parent:BeatContainerGlyph;
     public function new(beat:Beat, parent:BeatContainerGlyph) 
@@ -14,6 +17,47 @@ class WhammyBarGlyph extends Glyph
         super();
         _beat = beat;
         _parent = parent;
+    }
+    
+    override public function doLayout():Void 
+    {
+        super.doLayout();
+        
+        // 
+        // Calculate the min and max offsets
+        var minY = 0;
+        var maxY = 0;
+        
+        var sizeY = Std.int(WhammyMaxOffset * getScale());
+        if (_beat.whammyBarPoints.length >= 2)
+        {
+            var dy = sizeY / Beat.WhammyBarMaxValue;
+            for (i in 0 ... _beat.whammyBarPoints.length)
+            {
+                var pt = _beat.whammyBarPoints[i];
+                var ptY = Std.int( 0 - (dy * pt.value));
+                if (ptY > maxY) maxY = ptY;
+                if (ptY < minY) minY = ptY;
+            }
+        }
+        
+        //
+        // calculate the overflow 
+        var tabBarRenderer:TabBarRenderer = cast renderer;
+        var track = renderer.getLayout().renderer.track;
+        var tabTop = tabBarRenderer.getTabY(0, -2);
+        var tabBottom = tabBarRenderer.getTabY(track.tuning.length, -2);
+
+        var absMinY = y + minY + tabTop; 
+        var absMaxY = y + maxY - tabBottom;
+        
+        if(absMinY < 0)
+            tabBarRenderer.registerOverflowTop(Std.int(Math.abs(absMinY)));
+        if(absMaxY > 0)
+            tabBarRenderer.registerOverflowBottom(Std.int(Math.abs(absMaxY)));
+            
+        var height = tabBarRenderer.height;
+        
     }
     
     public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
@@ -27,8 +71,9 @@ class WhammyBarGlyph extends Glyph
         var startY = cy + y;
         var textOffset = Std.int(3 * getScale());
         
-        var sizeY = Std.int(60 * getScale());
+        var sizeY = Std.int(WhammyMaxOffset * getScale());
         
+        canvas.setTextAlign(TextAlign.Center);
         if (_beat.whammyBarPoints.length >= 2)
         {
             var dx = (endX - startX) / Beat.WhammyBarMaxPosition;
@@ -76,7 +121,7 @@ class WhammyBarGlyph extends Glyph
                     var sy = up 
                                 ? pt2Y - res.graceFont.getSize() - textOffset
                                 : pt2Y + textOffset;
-                    var sx = pt2X - size / 2;
+                    var sx = pt2X;
                     canvas.fillText(s, sx, sy);
                     
                 }
