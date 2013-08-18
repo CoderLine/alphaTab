@@ -29,7 +29,6 @@ class TabBeatContainerGlyph extends BeatContainerGlyph
 		{
 			var l = new TabSlideLineGlyph(n.slideType, n, this);
 			ties.push(l);
-			ties.push(l);
 		}		
     }
 }

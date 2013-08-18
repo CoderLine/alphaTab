@@ -7208,7 +7208,6 @@ alphatab.rendering.glyphs.TabBeatContainerGlyph.prototype = $extend(alphatab.ren
 		if(n.slideType != alphatab.model.SlideType.None) {
 			var l = new alphatab.rendering.glyphs.TabSlideLineGlyph(n.slideType,n,this);
 			this.ties.push(l);
-			this.ties.push(l);
 		}
 	}
 	,__class__: alphatab.rendering.glyphs.TabBeatContainerGlyph
