@@ -71,6 +71,7 @@ class Settings
         settings.staves.push(new StaveSettings("tempo"));
         settings.staves.push(new StaveSettings("text"));
         settings.staves.push(new StaveSettings("chords"));
+        settings.staves.push(new StaveSettings("trill"));
         settings.staves.push(new StaveSettings("beat-vibrato"));
         settings.staves.push(new StaveSettings("note-vibrato"));
         settings.staves.push(new StaveSettings("alternate-endings"));
@@ -78,6 +79,7 @@ class Settings
         settings.staves.push(new StaveSettings("score"));
         
         settings.staves.push(new StaveSettings("dynamics"));
+        settings.staves.push(new StaveSettings("trill"));
         settings.staves.push(new StaveSettings("beat-vibrato"));
         settings.staves.push(new StaveSettings("note-vibrato"));
         settings.staves.push(new StaveSettings("tap"));

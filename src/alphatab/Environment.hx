@@ -16,6 +16,7 @@ import alphatab.rendering.effects.PalmMuteEffectInfo;
 import alphatab.rendering.effects.TapEffectInfo;
 import alphatab.rendering.effects.TempoEffectInfo;
 import alphatab.rendering.effects.TextEffectInfo;
+import alphatab.rendering.effects.TrillEffectInfo;
 import alphatab.rendering.effects.TripletFeelEffectInfo;
 import alphatab.rendering.glyphs.effects.DummyEffectGlyph;
 import alphatab.rendering.layout.HorizontalScreenLayout;
@@ -79,6 +80,7 @@ class Environment
         staveFactories.set("tempo", function(l) { return new EffectBarRendererFactory(new TempoEffectInfo()); }); 
         staveFactories.set("text", function(l) { return new EffectBarRendererFactory(new TextEffectInfo()); }); 
         staveFactories.set("chords", function(l) { return new EffectBarRendererFactory(new ChordsEffectInfo()); }); 
+        staveFactories.set("trill", function(l) { return new EffectBarRendererFactory(new TrillEffectInfo()); } ); 
         staveFactories.set("beat-vibrato", function(l) { return new EffectBarRendererFactory(new BeatVibratoEffectInfo()); } ); 
         staveFactories.set("note-vibrato", function(l) { return new EffectBarRendererFactory(new NoteVibratoEffectInfo()); } ); 
         staveFactories.set("alternate-endings", function(l) { return new AlternateEndingsBarRendererFactory(); } ); 

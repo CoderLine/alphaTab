@@ -1,6 +1,7 @@
 package alphatab.rendering.glyphs;
 import alphatab.model.Beat;
 import alphatab.model.Note;
+import alphatab.rendering.TabBarRenderer;
 
 class TabBeatPostNotesGlyph extends BeatGlyphBase
 {
@@ -23,6 +24,20 @@ class TabBeatPostNotesGlyph extends BeatGlyphBase
 	
 	private function createNoteGlyphs(n:Note) 
 	{
+        if (n.isTrill())
+        {
+            var trillNote = new Note();
+            trillNote.isGhost = true;
+            trillNote.fret = n.trillFret;
+            trillNote.string = n.string;
+            var tr = cast(renderer, TabBarRenderer);
+            var trillNumberGlyph:Glyph = new NoteNumberGlyph(0, 0, trillNote, true);    
+            var l = n.beat.voice.bar.track.tuning.length - n.string;
+            trillNumberGlyph.y = tr.getTabY(l);
+
+            addGlyph(trillNumberGlyph);
+        }
+
 		if (n.hasBend()) 
 		{
 			var bendHeight = Std.int(60 * getScale());

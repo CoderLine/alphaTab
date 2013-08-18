@@ -1294,25 +1294,6 @@ alphatab.rendering.effects.ChordsEffectInfo.prototype = {
 	}
 	,__class__: alphatab.rendering.effects.ChordsEffectInfo
 }
-alphatab.rendering.effects.BeatVibratoEffectInfo = function() {
-};
-alphatab.rendering.effects.BeatVibratoEffectInfo.__name__ = true;
-alphatab.rendering.effects.BeatVibratoEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
-alphatab.rendering.effects.BeatVibratoEffectInfo.prototype = {
-	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.VibratoGlyph(0,5 * renderer.stave.staveGroup.layout.renderer.scale | 0,1.15);
-	}
-	,getHeight: function(renderer) {
-		return 17 * renderer.stave.staveGroup.layout.renderer.scale | 0;
-	}
-	,getSizingMode: function() {
-		return alphatab.rendering.EffectBarGlyphSizing.GroupedOnBeatToPostBeat;
-	}
-	,shouldCreateGlyph: function(renderer,beat) {
-		return beat.vibrato != alphatab.model.VibratoType.None;
-	}
-	,__class__: alphatab.rendering.effects.BeatVibratoEffectInfo
-}
 alphatab.rendering.effects.NoteEffectInfoBase = function() {
 };
 alphatab.rendering.effects.NoteEffectInfoBase.__name__ = true;
@@ -1341,6 +1322,45 @@ alphatab.rendering.effects.NoteEffectInfoBase.prototype = {
 		return this._lastCreateInfo.length > 0;
 	}
 	,__class__: alphatab.rendering.effects.NoteEffectInfoBase
+}
+alphatab.rendering.effects.TrillEffectInfo = function() {
+	alphatab.rendering.effects.NoteEffectInfoBase.call(this);
+};
+alphatab.rendering.effects.TrillEffectInfo.__name__ = true;
+alphatab.rendering.effects.TrillEffectInfo.__super__ = alphatab.rendering.effects.NoteEffectInfoBase;
+alphatab.rendering.effects.TrillEffectInfo.prototype = $extend(alphatab.rendering.effects.NoteEffectInfoBase.prototype,{
+	createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.TrillGlyph();
+	}
+	,getHeight: function(renderer) {
+		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,getSizingMode: function() {
+		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatToPostBeat;
+	}
+	,shouldCreateGlyphForNote: function(renderer,note) {
+		return note.trillFret >= 0;
+	}
+	,__class__: alphatab.rendering.effects.TrillEffectInfo
+});
+alphatab.rendering.effects.BeatVibratoEffectInfo = function() {
+};
+alphatab.rendering.effects.BeatVibratoEffectInfo.__name__ = true;
+alphatab.rendering.effects.BeatVibratoEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
+alphatab.rendering.effects.BeatVibratoEffectInfo.prototype = {
+	createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.VibratoGlyph(0,5 * renderer.stave.staveGroup.layout.renderer.scale | 0,1.15);
+	}
+	,getHeight: function(renderer) {
+		return 17 * renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,getSizingMode: function() {
+		return alphatab.rendering.EffectBarGlyphSizing.GroupedOnBeatToPostBeat;
+	}
+	,shouldCreateGlyph: function(renderer,beat) {
+		return beat.vibrato != alphatab.model.VibratoType.None;
+	}
+	,__class__: alphatab.rendering.effects.BeatVibratoEffectInfo
 }
 alphatab.rendering.effects.NoteVibratoEffectInfo = function() {
 	alphatab.rendering.effects.NoteEffectInfoBase.call(this);
@@ -1519,11 +1539,13 @@ alphatab.Settings.defaults = function() {
 	settings.staves.push(new alphatab.StaveSettings("tempo"));
 	settings.staves.push(new alphatab.StaveSettings("text"));
 	settings.staves.push(new alphatab.StaveSettings("chords"));
+	settings.staves.push(new alphatab.StaveSettings("trill"));
 	settings.staves.push(new alphatab.StaveSettings("beat-vibrato"));
 	settings.staves.push(new alphatab.StaveSettings("note-vibrato"));
 	settings.staves.push(new alphatab.StaveSettings("alternate-endings"));
 	settings.staves.push(new alphatab.StaveSettings("score"));
 	settings.staves.push(new alphatab.StaveSettings("dynamics"));
+	settings.staves.push(new alphatab.StaveSettings("trill"));
 	settings.staves.push(new alphatab.StaveSettings("beat-vibrato"));
 	settings.staves.push(new alphatab.StaveSettings("note-vibrato"));
 	settings.staves.push(new alphatab.StaveSettings("tap"));
@@ -7259,6 +7281,17 @@ alphatab.rendering.glyphs.TabBeatPostNotesGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabBeatPostNotesGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
 alphatab.rendering.glyphs.TabBeatPostNotesGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
 	createNoteGlyphs: function(n) {
+		if(n.trillFret >= 0) {
+			var trillNote = new alphatab.model.Note();
+			trillNote.isGhost = true;
+			trillNote.fret = n.trillFret;
+			trillNote.string = n.string;
+			var tr = js.Boot.__cast(this.renderer , alphatab.rendering.TabBarRenderer);
+			var trillNumberGlyph = new alphatab.rendering.glyphs.NoteNumberGlyph(0,0,trillNote,true);
+			var l = n.beat.voice.bar.track.tuning.length - n.string;
+			trillNumberGlyph.y = tr.getTabY(l);
+			this.addGlyph(trillNumberGlyph);
+		}
 		if(n.bendPoints.length > 1) {
 			var bendHeight = 60 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 			this.renderer.registerOverflowTop(bendHeight);
@@ -7847,6 +7880,38 @@ alphatab.rendering.glyphs.effects.TextGlyph.prototype = $extend(alphatab.renderi
 		canvas.fillText(this._text,cx + this.x,cy + this.y);
 	}
 	,__class__: alphatab.rendering.glyphs.effects.TextGlyph
+});
+alphatab.rendering.glyphs.effects.TrillGlyph = function(x,y,scale) {
+	if(scale == null) scale = 0.9;
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.Glyph.call(this,x,y);
+	this._scale = scale;
+};
+alphatab.rendering.glyphs.effects.TrillGlyph.__name__ = true;
+alphatab.rendering.glyphs.effects.TrillGlyph.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.effects.TrillGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	paint: function(cx,cy,canvas) {
+		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
+		canvas.setFont(res.markerFont);
+		canvas.setColor(res.mainGlyphColor);
+		var textw = canvas.measureText("tr");
+		canvas.fillText("tr",cx + this.x,cy + this.y);
+		var startX = textw;
+		var endX = this.width - startX;
+		var step = 11 * this.renderer.stave.staveGroup.layout.renderer.scale * this._scale;
+		var loops = Math.floor(Math.max(1,(endX - startX) / step));
+		var loopX = startX | 0;
+		var _g = 0;
+		while(_g < loops) {
+			var i = _g++;
+			var glyph = new alphatab.rendering.glyphs.SvgGlyph(loopX,0,alphatab.rendering.glyphs.MusicFont.WaveHorizontal,this._scale,this._scale);
+			glyph.renderer = this.renderer;
+			glyph.paint(cx + this.x,cy + this.y + (res.markerFont.getSize() / 2 | 0),canvas);
+			loopX += Math.floor(step);
+		}
+	}
+	,__class__: alphatab.rendering.glyphs.effects.TrillGlyph
 });
 alphatab.rendering.glyphs.effects.VibratoGlyph = function(x,y,scale) {
 	if(scale == null) scale = 0.9;
@@ -9018,6 +9083,9 @@ alphatab.Environment.staveFactories.set("text",function(l) {
 });
 alphatab.Environment.staveFactories.set("chords",function(l) {
 	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.ChordsEffectInfo());
+});
+alphatab.Environment.staveFactories.set("trill",function(l) {
+	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.TrillEffectInfo());
 });
 alphatab.Environment.staveFactories.set("beat-vibrato",function(l) {
 	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.BeatVibratoEffectInfo());
