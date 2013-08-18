@@ -26,19 +26,22 @@ import alphatab.rendering.utils.BeamingHelper;
 
 class ScoreTieGlyph extends TieGlyph
 {
-	public function new(startNote:Note, endNote:Note)
+	public function new(startNote:Note, endNote:Note, parent:Glyph)
 	{
-		super(startNote, endNote);
+		super(startNote, endNote, parent);
 	}
 
 	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
 	{
 		var r:ScoreBarRenderer = cast renderer;
+        var parent:BeatContainerGlyph = cast _parent;
 		var startX = cx + r.getNoteX(_startNote);
-		var endX = cx + r.getNoteX(_endNote, false);
+		var endX = _endNote == null 
+                    ? cx + parent.x + parent.postNotes.x + parent.postNotes.width  // end of beat container
+                    : cx + r.getNoteX(_endNote, false); 
 		
 		var startY = cy + r.getNoteY(_startNote) + (NoteHeadGlyph.noteHeadHeight / 2);
-		var endY = cy + r.getNoteY(_endNote) + (NoteHeadGlyph.noteHeadHeight / 2);
+		var endY = _endNote == null ? startY : cy + r.getNoteY(_endNote) + (NoteHeadGlyph.noteHeadHeight / 2);
 		
 		TieGlyph.paintTie(canvas, getScale(), startX, startY, endX, endY, r.getBeatDirection(_startNote.beat) == BeamDirection.Down);
 		

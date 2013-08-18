@@ -4,19 +4,24 @@ import alphatab.model.Note;
 import alphatab.model.TextBaseline;
 import alphatab.platform.ICanvas;
 import alphatab.rendering.Glyph;
+import alphatab.rendering.TabBarRenderer;
 import haxe.ds.IntMap;
+import haxe.ds.StringMap;
 
 class TabNoteChordGlyph extends Glyph
 {
 	private var _notes:Array<Glyph>;
 	private var _noteLookup:IntMap<Glyph>;
-
+    private var _maxNote:Note;
+    
     public var beat:Beat;
-
+    public var beatEffects:StringMap<Glyph>;
+    
 	public function new(x:Int = 0, y:Int = 0) 
 	{
 		super(x, y);
 		_notes = new Array<Glyph>();
+        beatEffects = new StringMap<Glyph>();
 		_noteLookup = new IntMap<Glyph>();
 	}
 	
@@ -56,6 +61,13 @@ class TabNoteChordGlyph extends Glyph
 				w = g.width;
 			}
 		}
+        
+        for (e in beatEffects)
+        {
+            e.renderer = renderer;
+            e.doLayout();
+        }
+        
 		width = w;
 	}
 	
@@ -63,6 +75,7 @@ class TabNoteChordGlyph extends Glyph
     {
 		_notes.push(noteGlyph);
 		_noteLookup.set(note.string, noteGlyph);
+        if (_maxNote == null || note.string > _maxNote.string) _maxNote = note;
     }	
 	
 	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
@@ -75,5 +88,18 @@ class TabNoteChordGlyph extends Glyph
 			g.paint(cx + x, cy + y, canvas);
 		}
 		canvas.setTextBaseline(old);
+        
+        var tabRenderer:TabBarRenderer = cast renderer;
+        var tabHeight = renderer.getResources().tablatureFont.getSize();
+        var effectY = Std.int(tabRenderer.getNoteY(_maxNote) + tabHeight);
+         // TODO: take care of actual glyph height
+        var effectSpacing:Int = Std.int(7 * getScale());
+        for (g in beatEffects)
+        {
+            g.y = effectY;
+            g.x = Std.int(width / 2);
+            g.paint(cx + x, cy + y, canvas);
+            effectY += effectSpacing;
+        }
 	}
 }

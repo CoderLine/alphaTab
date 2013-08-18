@@ -61,9 +61,19 @@ class TabBarRenderer extends GroupedBarRenderer
 		{
 			return beat.container.x +  beat.x + beat.noteNumbers.getNoteX(note, onEnd);
 		}
+		return getPostBeatGlyphsStart();
+	}	
+		
+	public function getBeatX(beat:Beat) 
+	{
+        var bg:TabBeatGlyph = cast getPreNotesPosition(beat.voice.index, beat.index);
+		if (bg != null) 
+		{
+			return bg.container.x + bg.x;
+		}
 		return 0;
 	}	
-	
+
 	public function getNoteY(note:Note) 
 	{
         var beat:TabBeatGlyph = cast getOnNotesPosition(note.beat.voice.index, note.beat.index);

@@ -191,7 +191,7 @@
      */
     function track( track ) 
     {
-       var context = $(this).data('alphaTab');
+        var context = $(this).data('alphaTab');
         if(track) 
         {
             var score = context.renderer.track.score;

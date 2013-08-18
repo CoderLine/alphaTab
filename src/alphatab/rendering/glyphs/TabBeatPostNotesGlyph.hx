@@ -28,6 +28,6 @@ class TabBeatPostNotesGlyph extends BeatGlyphBase
 			var bendHeight = Std.int(60 * getScale());
 			renderer.registerOverflowTop(bendHeight);
 			addGlyph(new BendGlyph(n, Std.int(getBeatDurationWidth() * getScale()), bendHeight));
-		}
+		}     
 	}	
 }

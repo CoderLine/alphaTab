@@ -7,12 +7,14 @@ class TieGlyph extends Glyph
 {
 	private var _startNote:Note;
 	private var _endNote:Note;
+    private var _parent:Glyph;
 	
-	public function new(startNote:Note, endNote:Note)
+	public function new(startNote:Note, endNote:Note, parent:Glyph)
 	{
 		super(0, 0);
 		_startNote = startNote;
 		_endNote = endNote;
+        _parent = parent;
 	}
 
 	public override function doLayout():Void 

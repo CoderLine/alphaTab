@@ -9,12 +9,14 @@ class ScoreSlideLineGlyph extends Glyph
 {
 	private var _startNote:Note;
 	private var _type:SlideType;
+    private var _parent:BeatContainerGlyph;
 
-	public function new(type:SlideType,startNote:Note) 
+	public function new(type:SlideType,startNote:Note, parent:BeatContainerGlyph) 
 	{
 		super(0,0);
 		_type = type;
 		_startNote = startNote;
+        _parent = parent;
 	}
 	
 	public override function doLayout():Void 
@@ -30,7 +32,6 @@ class ScoreSlideLineGlyph extends Glyph
 	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
 	{
 		var r:ScoreBarRenderer = cast renderer;
-		
 		var sizeX = Std.int(12 * getScale());
 		var offsetX = Std.int(1 * getScale());
 		var startX:Int;
@@ -50,7 +51,7 @@ class ScoreSlideLineGlyph extends Glyph
 				}
 				else
 				{
-					endX = startX + sizeX;
+					endX = cx + _parent.x + _parent.postNotes.x + _parent.postNotes.width;
 					endY = startY;
 				}
 			case IntoFromBelow:

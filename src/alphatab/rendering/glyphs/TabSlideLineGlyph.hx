@@ -9,12 +9,13 @@ class TabSlideLineGlyph extends Glyph
 {
 	private var _startNote:Note;
 	private var _type:SlideType;
-
-	public function new(type:SlideType,startNote:Note) 
+    private var _parent:BeatContainerGlyph;
+	public function new(type:SlideType,startNote:Note, parent:BeatContainerGlyph) 
 	{
 		super(0,0);
 		_type = type;
 		_startNote = startNote;
+        _parent = parent;
 	}
 	
 	public override function doLayout():Void 
@@ -68,7 +69,7 @@ class TabSlideLineGlyph extends Glyph
 				}
 				else
 				{
-					endX = startX + sizeX ;
+					endX = cx + _parent.x + _parent.postNotes.x + _parent.postNotes.width;
 					endY = startY;				
 				}
 

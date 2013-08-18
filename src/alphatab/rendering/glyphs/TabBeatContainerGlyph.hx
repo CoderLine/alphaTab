@@ -16,21 +16,20 @@ class TabBeatContainerGlyph extends BeatContainerGlyph
     {
 		if (n.isHammerPullDestination && n.hammerPullOrigin != null)
 		{
-			var tie = new TabTieGlyph(n.hammerPullOrigin, n);
+			var tie = new TabTieGlyph(n.hammerPullOrigin, n, this);
 			ties.push(tie);
 		}
-		else if (n.slideType == SlideType.Legato && n.slideTarget != null)
+		else if (n.slideType == SlideType.Legato)
 		{
-			var tie = new TabTieGlyph(n, n.slideTarget);
+			var tie = new TabTieGlyph(n, n.slideTarget, this);
 			ties.push(tie);
 		}
 		
 		if (n.slideType != SlideType.None)
 		{
-			var l = new TabSlideLineGlyph(n.slideType, n);
+			var l = new TabSlideLineGlyph(n.slideType, n, this);
 			ties.push(l);
 			ties.push(l);
 		}		
     }
-    
 }

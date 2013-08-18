@@ -5580,11 +5580,16 @@ alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.Grouped
 		if(beat != null) return beat.noteNumbers.getNoteY(note);
 		return 0;
 	}
+	,getBeatX: function(beat) {
+		var bg = this.getOrCreateVoiceContainer(beat.voice.index).beatGlyphs[beat.index].preNotes;
+		if(bg != null) return bg.container.x + bg.x;
+		return 0;
+	}
 	,getNoteX: function(note,onEnd) {
 		if(onEnd == null) onEnd = true;
 		var beat = this.getOrCreateVoiceContainer(note.beat.voice.index).beatGlyphs[note.beat.index].onNotes;
 		if(beat != null) return beat.container.x + beat.x + beat.noteNumbers.getNoteX(note,onEnd);
-		return 0;
+		return this.getPostBeatGlyphsStart();
 	}
 	,getLineOffset: function() {
 		return 11 * this.stave.staveGroup.layout.renderer.scale;
@@ -6654,17 +6659,17 @@ alphatab.rendering.glyphs.ScoreBeatContainerGlyph.__super__ = alphatab.rendering
 alphatab.rendering.glyphs.ScoreBeatContainerGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatContainerGlyph.prototype,{
 	createTies: function(n) {
 		if(n.isTieDestination && n.tieOrigin != null) {
-			var tie = new alphatab.rendering.glyphs.ScoreTieGlyph(n.tieOrigin,n);
+			var tie = new alphatab.rendering.glyphs.ScoreTieGlyph(n.tieOrigin,n,this);
 			this.ties.push(tie);
-		} else if(n.isHammerPullDestination && n.hammerPullOrigin != null) {
-			var tie = new alphatab.rendering.glyphs.ScoreTieGlyph(n.hammerPullOrigin,n);
+		} else if(n.isHammerPullDestination) {
+			var tie = new alphatab.rendering.glyphs.ScoreTieGlyph(n.hammerPullOrigin,n,this);
 			this.ties.push(tie);
-		} else if(n.slideType == alphatab.model.SlideType.Legato && n.slideTarget != null) {
-			var tie = new alphatab.rendering.glyphs.ScoreTieGlyph(n,n.slideTarget);
+		} else if(n.slideType == alphatab.model.SlideType.Legato) {
+			var tie = new alphatab.rendering.glyphs.ScoreTieGlyph(n,n.slideTarget,this);
 			this.ties.push(tie);
 		}
 		if(n.slideType != alphatab.model.SlideType.None) {
-			var l = new alphatab.rendering.glyphs.ScoreSlideLineGlyph(n.slideType,n);
+			var l = new alphatab.rendering.glyphs.ScoreSlideLineGlyph(n.slideType,n,this);
 			this.ties.push(l);
 		}
 	}
@@ -6953,10 +6958,11 @@ alphatab.rendering.glyphs.ScoreNoteChordGlyph.prototype = $extend(alphatab.rende
 	}
 	,__class__: alphatab.rendering.glyphs.ScoreNoteChordGlyph
 });
-alphatab.rendering.glyphs.ScoreSlideLineGlyph = function(type,startNote) {
+alphatab.rendering.glyphs.ScoreSlideLineGlyph = function(type,startNote,parent) {
 	alphatab.rendering.Glyph.call(this,0,0);
 	this._type = type;
 	this._startNote = startNote;
+	this._parent = parent;
 };
 alphatab.rendering.glyphs.ScoreSlideLineGlyph.__name__ = true;
 alphatab.rendering.glyphs.ScoreSlideLineGlyph.__super__ = alphatab.rendering.Glyph;
@@ -6979,7 +6985,7 @@ alphatab.rendering.glyphs.ScoreSlideLineGlyph.prototype = $extend(alphatab.rende
 				endX = cx + r.getNoteX(this._startNote.slideTarget,false) - offsetX;
 				endY = cy + r.getNoteY(this._startNote.slideTarget) + 4;
 			} else {
-				endX = startX + sizeX;
+				endX = cx + this._parent.x + this._parent.postNotes.x + this._parent.postNotes.width;
 				endY = startY;
 			}
 			break;
@@ -7024,10 +7030,11 @@ alphatab.rendering.glyphs.ScoreSlideLineGlyph.prototype = $extend(alphatab.rende
 	}
 	,__class__: alphatab.rendering.glyphs.ScoreSlideLineGlyph
 });
-alphatab.rendering.glyphs.TieGlyph = function(startNote,endNote) {
+alphatab.rendering.glyphs.TieGlyph = function(startNote,endNote,parent) {
 	alphatab.rendering.Glyph.call(this,0,0);
 	this._startNote = startNote;
 	this._endNote = endNote;
+	this._parent = parent;
 };
 alphatab.rendering.glyphs.TieGlyph.__name__ = true;
 alphatab.rendering.glyphs.TieGlyph.paintTie = function(canvas,scale,x1,y1,x2,y2,down) {
@@ -7066,18 +7073,19 @@ alphatab.rendering.glyphs.TieGlyph.prototype = $extend(alphatab.rendering.Glyph.
 	}
 	,__class__: alphatab.rendering.glyphs.TieGlyph
 });
-alphatab.rendering.glyphs.ScoreTieGlyph = function(startNote,endNote) {
-	alphatab.rendering.glyphs.TieGlyph.call(this,startNote,endNote);
+alphatab.rendering.glyphs.ScoreTieGlyph = function(startNote,endNote,parent) {
+	alphatab.rendering.glyphs.TieGlyph.call(this,startNote,endNote,parent);
 };
 alphatab.rendering.glyphs.ScoreTieGlyph.__name__ = true;
 alphatab.rendering.glyphs.ScoreTieGlyph.__super__ = alphatab.rendering.glyphs.TieGlyph;
 alphatab.rendering.glyphs.ScoreTieGlyph.prototype = $extend(alphatab.rendering.glyphs.TieGlyph.prototype,{
 	paint: function(cx,cy,canvas) {
 		var r = this.renderer;
+		var parent = this._parent;
 		var startX = cx + r.getNoteX(this._startNote);
-		var endX = cx + r.getNoteX(this._endNote,false);
+		var endX = this._endNote == null?cx + parent.x + parent.postNotes.x + parent.postNotes.width:cx + r.getNoteX(this._endNote,false);
 		var startY = cy + r.getNoteY(this._startNote) + 4.5;
-		var endY = cy + r.getNoteY(this._endNote) + 4.5;
+		var endY = this._endNote == null?startY:cy + r.getNoteY(this._endNote) + 4.5;
 		alphatab.rendering.glyphs.TieGlyph.paintTie(canvas,this.renderer.stave.staveGroup.layout.renderer.scale,startX,startY,endX,endY,r.getBeatDirection(this._startNote.beat) == alphatab.rendering.utils.BeamDirection.Down);
 		canvas.setColor(this.renderer.stave.staveGroup.layout.renderer.renderingResources.mainGlyphColor);
 		canvas.fill();
@@ -7126,14 +7134,14 @@ alphatab.rendering.glyphs.TabBeatContainerGlyph.__super__ = alphatab.rendering.g
 alphatab.rendering.glyphs.TabBeatContainerGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatContainerGlyph.prototype,{
 	createTies: function(n) {
 		if(n.isHammerPullDestination && n.hammerPullOrigin != null) {
-			var tie = new alphatab.rendering.glyphs.TabTieGlyph(n.hammerPullOrigin,n);
+			var tie = new alphatab.rendering.glyphs.TabTieGlyph(n.hammerPullOrigin,n,this);
 			this.ties.push(tie);
-		} else if(n.slideType == alphatab.model.SlideType.Legato && n.slideTarget != null) {
-			var tie = new alphatab.rendering.glyphs.TabTieGlyph(n,n.slideTarget);
+		} else if(n.slideType == alphatab.model.SlideType.Legato) {
+			var tie = new alphatab.rendering.glyphs.TabTieGlyph(n,n.slideTarget,this);
 			this.ties.push(tie);
 		}
 		if(n.slideType != alphatab.model.SlideType.None) {
-			var l = new alphatab.rendering.glyphs.TabSlideLineGlyph(n.slideType,n);
+			var l = new alphatab.rendering.glyphs.TabSlideLineGlyph(n.slideType,n,this);
 			this.ties.push(l);
 			this.ties.push(l);
 		}
@@ -7163,6 +7171,7 @@ alphatab.rendering.glyphs.TabBeatGlyph.prototype = $extend(alphatab.rendering.gl
 				_g.createNoteGlyph(n);
 			});
 			this.addGlyph(this.noteNumbers);
+			if(this.container.beat.whammyBarPoints.length > 0 && !this.noteNumbers.beatEffects.exists("WHAMMY")) this.noteNumbers.beatEffects.set("WHAMMY",new alphatab.rendering.glyphs.WhammyBarGlyph(this.container.beat,this.container));
 		}
 		var w = 0;
 		var _g1 = 0, _g11 = this._glyphs;
@@ -7214,6 +7223,7 @@ alphatab.rendering.glyphs.TabNoteChordGlyph = function(x,y) {
 	if(x == null) x = 0;
 	alphatab.rendering.Glyph.call(this,x,y);
 	this._notes = new Array();
+	this.beatEffects = new haxe.ds.StringMap();
 	this._noteLookup = new haxe.ds.IntMap();
 };
 alphatab.rendering.glyphs.TabNoteChordGlyph.__name__ = true;
@@ -7230,10 +7240,23 @@ alphatab.rendering.glyphs.TabNoteChordGlyph.prototype = $extend(alphatab.renderi
 			g.paint(cx + this.x,cy + this.y,canvas);
 		}
 		canvas.setTextBaseline(old);
+		var tabRenderer = this.renderer;
+		var tabHeight = this.renderer.stave.staveGroup.layout.renderer.renderingResources.tablatureFont.getSize();
+		var effectY = tabRenderer.getNoteY(this._maxNote) + tabHeight | 0;
+		var effectSpacing = 7 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		var $it0 = this.beatEffects.iterator();
+		while( $it0.hasNext() ) {
+			var g = $it0.next();
+			g.y = effectY;
+			g.x = this.width / 2 | 0;
+			g.paint(cx + this.x,cy + this.y,canvas);
+			effectY += effectSpacing;
+		}
 	}
 	,addNoteGlyph: function(noteGlyph,note) {
 		this._notes.push(noteGlyph);
 		this._noteLookup.set(note.string,noteGlyph);
+		if(this._maxNote == null || note.string > this._maxNote.string) this._maxNote = note;
 	}
 	,doLayout: function() {
 		var w = 0;
@@ -7244,6 +7267,12 @@ alphatab.rendering.glyphs.TabNoteChordGlyph.prototype = $extend(alphatab.renderi
 			g.renderer = this.renderer;
 			g.doLayout();
 			if(g.width > w) w = g.width;
+		}
+		var $it0 = this.beatEffects.iterator();
+		while( $it0.hasNext() ) {
+			var e = $it0.next();
+			e.renderer = this.renderer;
+			e.doLayout();
 		}
 		this.width = w;
 	}
@@ -7263,10 +7292,11 @@ alphatab.rendering.glyphs.TabNoteChordGlyph.prototype = $extend(alphatab.renderi
 	}
 	,__class__: alphatab.rendering.glyphs.TabNoteChordGlyph
 });
-alphatab.rendering.glyphs.TabSlideLineGlyph = function(type,startNote) {
+alphatab.rendering.glyphs.TabSlideLineGlyph = function(type,startNote,parent) {
 	alphatab.rendering.Glyph.call(this,0,0);
 	this._type = type;
 	this._startNote = startNote;
+	this._parent = parent;
 };
 alphatab.rendering.glyphs.TabSlideLineGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabSlideLineGlyph.__super__ = alphatab.rendering.Glyph;
@@ -7301,7 +7331,7 @@ alphatab.rendering.glyphs.TabSlideLineGlyph.prototype = $extend(alphatab.renderi
 				endX = cx + r.getNoteX(this._startNote.slideTarget,false);
 				endY = cy + r.getNoteY(this._startNote.slideTarget) + endOffsetY;
 			} else {
-				endX = startX + sizeX;
+				endX = cx + this._parent.x + this._parent.postNotes.x + this._parent.postNotes.width;
 				endY = startY;
 			}
 			break;
@@ -7346,22 +7376,23 @@ alphatab.rendering.glyphs.TabSlideLineGlyph.prototype = $extend(alphatab.renderi
 	}
 	,__class__: alphatab.rendering.glyphs.TabSlideLineGlyph
 });
-alphatab.rendering.glyphs.TabTieGlyph = function(startNote,endNote) {
-	alphatab.rendering.glyphs.TieGlyph.call(this,startNote,endNote);
+alphatab.rendering.glyphs.TabTieGlyph = function(startNote,endNote,parent) {
+	alphatab.rendering.glyphs.TieGlyph.call(this,startNote,endNote,parent);
 };
 alphatab.rendering.glyphs.TabTieGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabTieGlyph.__super__ = alphatab.rendering.glyphs.TieGlyph;
 alphatab.rendering.glyphs.TabTieGlyph.prototype = $extend(alphatab.rendering.glyphs.TieGlyph.prototype,{
 	paint: function(cx,cy,canvas) {
 		var r = this.renderer;
+		var parent = this._parent;
 		var res = r.stave.staveGroup.layout.renderer.renderingResources;
 		var startX = cx + r.getNoteX(this._startNote);
-		var endX = cx + r.getNoteX(this._endNote,false);
+		var endX = this._endNote == null?cx + parent.x + parent.postNotes.x + parent.postNotes.width:cx + r.getNoteX(this._endNote,false);
 		var down = this._startNote.string > 3;
 		var offset = res.tablatureFont.getSize() / 2;
 		if(down) offset *= -1;
 		var startY = cy + r.getNoteY(this._startNote) + offset;
-		var endY = cy + r.getNoteY(this._endNote) + offset;
+		var endY = this._endNote == null?startY:cy + r.getNoteY(this._endNote) + offset;
 		alphatab.rendering.glyphs.TieGlyph.paintTie(canvas,this.renderer.stave.staveGroup.layout.renderer.scale,startX,startY,endX,endY,this._startNote.string > 3);
 		canvas.setColor(this.renderer.stave.staveGroup.layout.renderer.renderingResources.mainGlyphColor);
 		canvas.fill();
@@ -7493,6 +7524,58 @@ alphatab.rendering.glyphs.VoiceContainerGlyph.prototype = $extend(alphatab.rende
 		this.width = gx | 0;
 	}
 	,__class__: alphatab.rendering.glyphs.VoiceContainerGlyph
+});
+alphatab.rendering.glyphs.WhammyBarGlyph = function(beat,parent) {
+	alphatab.rendering.Glyph.call(this);
+	this._beat = beat;
+	this._parent = parent;
+};
+alphatab.rendering.glyphs.WhammyBarGlyph.__name__ = true;
+alphatab.rendering.glyphs.WhammyBarGlyph.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.WhammyBarGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	paint: function(cx,cy,canvas) {
+		var tabBarRenderer = this.renderer;
+		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
+		var startX = cx + this.x + this._parent.onNotes.width / 2;
+		var endX = this._beat.nextBeat == null || this._beat.voice != this._beat.nextBeat.voice?cx + this.x + this._parent.onNotes.width / 2 + this._parent.postNotes.width:cx + tabBarRenderer.getBeatX(this._beat.nextBeat);
+		var startY = cy + this.y;
+		var textOffset = 3 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		var sizeY = 60 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		if(this._beat.whammyBarPoints.length >= 2) {
+			var dx = (endX - startX) / 60;
+			var dy = sizeY / 24;
+			canvas.beginPath();
+			var _g1 = 0, _g = this._beat.whammyBarPoints.length - 1;
+			while(_g1 < _g) {
+				var i = _g1++;
+				var pt1 = this._beat.whammyBarPoints[i];
+				var pt2 = this._beat.whammyBarPoints[i + 1];
+				if(pt1.value == pt2.value && i == this._beat.whammyBarPoints.length - 2) continue;
+				var pt1X = startX + dx * pt1.offset | 0;
+				var pt1Y = startY - dy * pt1.value | 0;
+				var pt2X = startX + dx * pt2.offset | 0;
+				var pt2Y = startY - dy * pt2.value | 0;
+				canvas.moveTo(pt1X,pt1Y);
+				canvas.lineTo(pt2X,pt2Y);
+				if(pt2.value != 0) {
+					var dv = pt2.value / 4.0;
+					var up = pt2.value - pt1.value >= 0;
+					var s = "";
+					if(dv < 0) s += "-";
+					if(dv >= 1 || dv <= 1) s += Std.string(Math.floor(Math.abs(dv))) + " "; else if(dv < 0) s += "-";
+					dv -= Math.floor(dv);
+					if(dv == 0.25) s += "1/4"; else if(dv == 0.5) s += "1/2"; else if(dv == 0.75) s += "3/4";
+					canvas.setFont(res.graceFont);
+					var size = canvas.measureText(s);
+					var sy = up?pt2Y - res.graceFont.getSize() - textOffset:pt2Y + textOffset;
+					var sx = pt2X - size / 2;
+					canvas.fillText(s,sx,sy);
+				}
+			}
+			canvas.stroke();
+		}
+	}
+	,__class__: alphatab.rendering.glyphs.WhammyBarGlyph
 });
 if(!alphatab.rendering.glyphs.effects) alphatab.rendering.glyphs.effects = {}
 alphatab.rendering.glyphs.effects.DummyEffectGlyph = function(x,y,s) {
@@ -8924,6 +9007,8 @@ alphatab.importer.GpxFileSystem.HEADER_BCFS = "BCFS";
 alphatab.importer.GpxFileSystem.HEADER_BCFZ = "BCFZ";
 alphatab.importer.GpxFileSystem.SCORE_GPIF = "score.gpif";
 alphatab.io.BitInput.BYTE_SIZE = 8;
+alphatab.model.Beat.WhammyBarMaxPosition = 60;
+alphatab.model.Beat.WhammyBarMaxValue = 24;
 alphatab.model.BendPoint.MAX_POSITION = 60;
 alphatab.model.BendPoint.MAX_VALUE = 12;
 alphatab.model.MasterBar.MaxAlternateEndings = 8;

@@ -25,6 +25,10 @@ import js.Boot;
  */
 class Beat 
 {
+    public static inline var WhammyBarMaxPosition = 60;
+    public static inline var WhammyBarMaxValue = 24;
+    
+    
     public var previousBeat:Beat;
     public var nextBeat:Beat;
     public var index:Int;

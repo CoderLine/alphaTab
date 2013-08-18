@@ -17,17 +17,17 @@ class ScoreBeatContainerGlyph extends BeatContainerGlyph
 		// create a tie if any effect requires it
 		if (n.isTieDestination && n.tieOrigin != null) 
 		{
-			var tie = new ScoreTieGlyph(n.tieOrigin, n);
+			var tie = new ScoreTieGlyph(n.tieOrigin, n, this);
 			ties.push(tie);
 		}
-		else if (n.isHammerPullDestination && n.hammerPullOrigin != null)
+		else if (n.isHammerPullDestination)
 		{
-			var tie = new ScoreTieGlyph(n.hammerPullOrigin, n);
+			var tie = new ScoreTieGlyph(n.hammerPullOrigin, n, this);
             ties.push(tie);
 		}
-		else if (n.slideType == SlideType.Legato && n.slideTarget != null)
+		else if (n.slideType == SlideType.Legato)
 		{
-			var tie = new ScoreTieGlyph(n, n.slideTarget);
+			var tie = new ScoreTieGlyph(n, n.slideTarget, this);
 			ties.push(tie);
 		}
 		
@@ -35,7 +35,7 @@ class ScoreBeatContainerGlyph extends BeatContainerGlyph
 		// we should place glyphs in the preNotesGlyph or postNotesGlyph if needed
 		if (n.slideType != SlideType.None)
 		{
-			var l = new ScoreSlideLineGlyph(n.slideType, n);
+			var l = new ScoreSlideLineGlyph(n.slideType, n, this);
 			ties.push(l);
 		}	
     }

@@ -24,15 +24,20 @@ class TabBeatGlyph extends BeatGlyphBase
         {
 			//
             // Note numbers
-            //
             noteNumbers = new TabNoteChordGlyph();
             noteNumbers.beat = container.beat;
             noteLoop( function(n) {
                 createNoteGlyph(n);
             });
-            addGlyph(noteNumbers);			
+            addGlyph(noteNumbers);	
+            
+            //
+            // Whammy Bar
+            if (container.beat.hasWhammyBar() && !noteNumbers.beatEffects.exists("WHAMMY"))
+            {
+                noteNumbers.beatEffects.set("WHAMMY",  new WhammyBarGlyph(container.beat, container));
+            }
 		}
-
 		
 		// left to right layout
 		var w = 0;
@@ -45,7 +50,6 @@ class TabBeatGlyph extends BeatGlyphBase
 		}	
 		width = w;
 	} 
-	
 	private function createNoteGlyph(n:Note) 
     {
 		var isGrace = container.beat.graceType != GraceType.None;
