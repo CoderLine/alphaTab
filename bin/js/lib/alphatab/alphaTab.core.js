@@ -3964,6 +3964,9 @@ alphatab.model.Beat.prototype = {
 		if(this.tupletDenominator > 0 && this.tupletNumerator >= 0) ticks = alphatab.audio.MidiUtils.applyTuplet(ticks,this.tupletNumerator,this.tupletDenominator);
 		return ticks;
 	}
+	,hasTuplet: function() {
+		return !(this.tupletDenominator == -1 && this.tupletNumerator == -1) && !(this.tupletDenominator == 1 && this.tupletNumerator == 1);
+	}
 	,isTremolo: function() {
 		return this.tremoloSpeed != null;
 	}
@@ -5101,6 +5104,8 @@ alphatab.rendering.ScoreBarRenderer = function(bar) {
 	alphatab.rendering.GroupedBarRenderer.call(this,bar);
 	this.accidentalHelper = new alphatab.rendering.utils.AccidentalHelper();
 	this._beamHelpers = new Array();
+	this._beamHelperLookup = new Array();
+	this._tupletHelpers = new Array();
 };
 alphatab.rendering.ScoreBarRenderer.__name__ = true;
 alphatab.rendering.ScoreBarRenderer.paintSingleBar = function(canvas,x1,y1,x2,y2,size) {
@@ -5151,15 +5156,29 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 	,createVoiceGlyphs: function(v) {
 		this._currentBeamHelper = null;
 		this._beamHelpers.push(new Array());
+		this._beamHelperLookup.push(new haxe.ds.IntMap());
+		this._tupletHelpers.push(new Array());
 		var _g = 0, _g1 = v.beats;
 		while(_g < _g1.length) {
 			var b = _g1[_g];
 			++_g;
+			var newBeamingHelper = false;
 			if(!b.isRest()) {
 				if(this._currentBeamHelper == null || !this._currentBeamHelper.checkBeat(b)) {
 					this._currentBeamHelper = new alphatab.rendering.utils.BeamingHelper();
 					this._currentBeamHelper.checkBeat(b);
 					this._beamHelpers[v.index].push(this._currentBeamHelper);
+					newBeamingHelper = true;
+				}
+			}
+			if(!(b.tupletDenominator == -1 && b.tupletNumerator == -1) && !(b.tupletDenominator == 1 && b.tupletNumerator == 1)) {
+				var previousBeat = b.previousBeat;
+				if(previousBeat != null && previousBeat.voice != b.voice) previousBeat = null;
+				if(newBeamingHelper && this._currentTupletHelper != null) this._currentTupletHelper.finish();
+				if(previousBeat == null || this._currentTupletHelper == null || !this._currentTupletHelper.check(b)) {
+					this._currentTupletHelper = new alphatab.rendering.utils.TupletHelper(v.index);
+					this._currentTupletHelper.check(b);
+					this._tupletHelpers[v.index].push(this._currentTupletHelper);
 				}
 			}
 			var container = new alphatab.rendering.glyphs.ScoreBeatContainerGlyph(b);
@@ -5167,6 +5186,7 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 			container.onNotes = new alphatab.rendering.glyphs.ScoreBeatGlyph();
 			(js.Boot.__cast(container.onNotes , alphatab.rendering.glyphs.ScoreBeatGlyph)).beamingHelper = this._currentBeamHelper;
 			container.postNotes = new alphatab.rendering.glyphs.ScoreBeatPostNotesGlyph();
+			this._beamHelperLookup[v.index].set(b.index,this._currentBeamHelper);
 			this.addBeatGlyph(container);
 		}
 		this._currentBeamHelper = null;
@@ -5400,6 +5420,62 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 		}
 		return this.getScoreY(size);
 	}
+	,paintTupletHelper: function(cx,cy,canvas,h) {
+		var res = this.stave.staveGroup.layout.renderer.renderingResources;
+		var oldAlign = canvas.getTextAlign();
+		canvas.setTextAlign(alphatab.platform.model.TextAlign.Center);
+		if(h.beats.length == 1 || !(h.beats.length == h.tuplet)) {
+			var _g1 = 0, _g = h.beats.length;
+			while(_g1 < _g) {
+				var i = _g1++;
+				var beat = h.beats[i];
+				var beamingHelper = this._beamHelperLookup[h.voiceIndex].get(beat.index);
+				var direction = beamingHelper.getDirection();
+				var tupletX = beamingHelper.getBeatLineX(beat) + this.stave.staveGroup.layout.renderer.scale | 0;
+				var tupletY = cy + this.y + this.calculateBeamY(beamingHelper,tupletX);
+				var offset = direction == alphatab.rendering.utils.BeamDirection.Up?res.effectFont.getSize() * 1.8 | 0:-(3 * this.stave.staveGroup.layout.renderer.scale | 0);
+				canvas.setFont(res.effectFont);
+				canvas.fillText(Std.string(h.tuplet),cx + this.x + tupletX,tupletY - offset);
+			}
+		} else {
+			var firstBeat = h.beats[0];
+			var lastBeat = h.beats[h.beats.length - 1];
+			var beamingHelper = this._beamHelperLookup[h.voiceIndex].get(firstBeat.index);
+			var direction = beamingHelper.getDirection();
+			var startX = beamingHelper.getBeatLineX(firstBeat) + this.stave.staveGroup.layout.renderer.scale | 0;
+			var endX = beamingHelper.getBeatLineX(lastBeat) + this.stave.staveGroup.layout.renderer.scale | 0;
+			canvas.setFont(res.effectFont);
+			var s = Std.string(h.tuplet);
+			var sw = canvas.measureText(s);
+			var sp = 3 * this.stave.staveGroup.layout.renderer.scale | 0;
+			var middleX = (startX + endX) / 2 | 0;
+			var offset1X = middleX - sw / 2 - sp | 0;
+			var offset2X = middleX + sw / 2 + sp | 0;
+			var startY = this.calculateBeamY(beamingHelper,startX);
+			var offset1Y = this.calculateBeamY(beamingHelper,offset1X);
+			var middleY = this.calculateBeamY(beamingHelper,middleX);
+			var offset2Y = this.calculateBeamY(beamingHelper,offset2X);
+			var endY = this.calculateBeamY(beamingHelper,endX);
+			var offset = 10 * this.stave.staveGroup.layout.renderer.scale | 0;
+			var size = 5 * this.stave.staveGroup.layout.renderer.scale | 0;
+			if(direction == alphatab.rendering.utils.BeamDirection.Down) {
+				offset *= -1;
+				size *= -1;
+			}
+			canvas.beginPath();
+			canvas.moveTo(cx + this.x + startX,cy + this.y + startY - offset);
+			canvas.lineTo(cx + this.x + startX,cy + this.y + startY - offset - size);
+			canvas.lineTo(cx + this.x + offset1X,cy + this.y + offset1Y - offset - size);
+			canvas.stroke();
+			canvas.beginPath();
+			canvas.lineTo(cx + this.x + offset2X,cy + this.y + offset2Y - offset - size);
+			canvas.lineTo(cx + this.x + endX,cy + this.y + endY - offset - size);
+			canvas.lineTo(cx + this.x + endX,cy + this.y + endY - offset);
+			canvas.stroke();
+			canvas.fillText(s,cx + this.x + middleX,cy + this.y + middleY - offset - size - res.effectFont.getSize());
+		}
+		canvas.setTextAlign(oldAlign);
+	}
 	,paintBeamHelper: function(cx,cy,canvas,h) {
 		if(h.beats.length == 1) this.paintFooter(cx,cy,canvas,h); else this.paintBar(cx,cy,canvas,h);
 	}
@@ -5416,9 +5492,23 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 			}
 		}
 	}
+	,paintTuplets: function(cx,cy,canvas) {
+		var _g = 0, _g1 = this._tupletHelpers;
+		while(_g < _g1.length) {
+			var v = _g1[_g];
+			++_g;
+			var _g2 = 0;
+			while(_g2 < v.length) {
+				var h = v[_g2];
+				++_g2;
+				this.paintTupletHelper(cx + this.getBeatGlyphsStart(),cy,canvas,h);
+			}
+		}
+	}
 	,paint: function(cx,cy,canvas) {
 		alphatab.rendering.GroupedBarRenderer.prototype.paint.call(this,cx,cy,canvas);
 		this.paintBeams(cx,cy,canvas);
+		this.paintTuplets(cx,cy,canvas);
 	}
 	,doLayout: function() {
 		alphatab.rendering.GroupedBarRenderer.prototype.doLayout.call(this);
@@ -8427,6 +8517,25 @@ alphatab.rendering.utils.SvgPathParser.prototype = {
 		this.nextToken();
 	}
 	,__class__: alphatab.rendering.utils.SvgPathParser
+}
+alphatab.rendering.utils.TupletHelper = function(voice) {
+	this.voiceIndex = voice;
+	this.beats = new Array();
+};
+alphatab.rendering.utils.TupletHelper.__name__ = true;
+alphatab.rendering.utils.TupletHelper.prototype = {
+	check: function(beat) {
+		if(this.beats.length == 0) this.tuplet = beat.tupletNumerator; else if(beat.voice.index != this.voiceIndex || beat.tupletNumerator != this.tuplet || this.beats.length == this.tuplet || this._isFinished) return false;
+		this.beats.push(beat);
+		return true;
+	}
+	,finish: function() {
+		this._isFinished = true;
+	}
+	,isFull: function() {
+		return this.beats.length == this.tuplet;
+	}
+	,__class__: alphatab.rendering.utils.TupletHelper
 }
 if(!alphatab.util) alphatab.util = {}
 alphatab.util.LazyVar = function(loader) {

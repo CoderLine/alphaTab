@@ -99,6 +99,12 @@ class Beat
         tupletNumerator = -1;
     }
     
+    public inline function hasTuplet()
+    {
+        return !(tupletDenominator == -1 && tupletNumerator == -1) &&
+               !(tupletDenominator == 1 && tupletNumerator == 1);
+    }
+    
     /**
      * Calculates the time spent in this bar. (unit: midi ticks)
      */

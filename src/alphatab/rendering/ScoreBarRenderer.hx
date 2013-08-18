@@ -26,6 +26,7 @@ import alphatab.model.Note;
 import alphatab.model.Voice;
 import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
+import alphatab.platform.model.TextAlign;
 import alphatab.platform.svg.SvgCanvas;
 import alphatab.rendering.glyphs.AccentuationGlyph;
 import alphatab.rendering.glyphs.AccidentalGroupGlyph;
@@ -58,6 +59,7 @@ import alphatab.rendering.glyphs.TimeSignatureGlyph;
 import alphatab.rendering.glyphs.TremoloPickingGlyph;
 import alphatab.rendering.utils.AccidentalHelper;
 import alphatab.rendering.utils.BeamingHelper;
+import alphatab.rendering.utils.TupletHelper;
 import haxe.ds.IntMap;
 
 using alphatab.model.ModelUtils;
@@ -105,14 +107,19 @@ class ScoreBarRenderer extends GroupedBarRenderer
 	private static inline var LineSpacing = 8;
     public var accidentalHelper:AccidentalHelper;
     private var _beamHelpers:Array<Array<BeamingHelper>>;
+    private var _beamHelperLookup:Array<IntMap<BeamingHelper>>;
+    private var _tupletHelpers:Array<Array<TupletHelper>>;
 	
     private var _currentBeamHelper:BeamingHelper;
+    private var _currentTupletHelper:TupletHelper;
     
 	public function new(bar:alphatab.model.Bar) 
 	{
 		super(bar);
         accidentalHelper = new AccidentalHelper();
         _beamHelpers = new Array<Array<BeamingHelper>>();
+        _beamHelperLookup = new Array<IntMap<BeamingHelper>>();
+        _tupletHelpers = new Array<Array<TupletHelper>>();
 	}
 	
 	public function getBeatDirection(beat:Beat) : BeamDirection
@@ -211,6 +218,18 @@ class ScoreBarRenderer extends GroupedBarRenderer
     {
         super.paint(cx, cy, canvas);
         paintBeams(cx, cy, canvas);
+        paintTuplets(cx, cy, canvas);
+    }
+    
+    private function paintTuplets(cx:Int, cy:Int, canvas:ICanvas):Void
+    {
+        for (v in _tupletHelpers)
+        {
+            for (h in v)
+            {
+                paintTupletHelper(cx + getBeatGlyphsStart(), cy, canvas, h);
+            }
+        }
     }
 	
     private function paintBeams(cx:Int, cy:Int, canvas:ICanvas):Void
@@ -219,11 +238,9 @@ class ScoreBarRenderer extends GroupedBarRenderer
         {
             for (h in v)
             {
-                // paint beams
                 paintBeamHelper(cx + getBeatGlyphsStart(), cy, canvas, h);
             }
         }
-
     }
     
     private function paintBeamHelper(cx:Int, cy:Int, canvas:ICanvas, h:BeamingHelper):Void
@@ -237,6 +254,96 @@ class ScoreBarRenderer extends GroupedBarRenderer
         {
             paintBar(cx, cy, canvas, h);
         }
+    }
+    
+    private function paintTupletHelper(cx:Int, cy:Int, canvas:ICanvas, h:TupletHelper):Void
+    {
+        var res = getResources();
+        var oldAlign = canvas.getTextAlign();
+        canvas.setTextAlign(TextAlign.Center);
+        // check if we need to paint simple footer
+        if (h.beats.length == 1 || !h.isFull())
+        {
+            for (i in 0 ... h.beats.length)
+            {
+                var beat = h.beats[i];
+                var beamingHelper = _beamHelperLookup[h.voiceIndex].get(beat.index);
+                var direction = beamingHelper.getDirection();
+                
+                var tupletX = Std.int(beamingHelper.getBeatLineX(beat) + getScale());
+                var tupletY = cy + y + calculateBeamY(beamingHelper, tupletX);
+                
+                var offset = direction == Up 
+                            ?  Std.int(res.effectFont.getSize() * 1.8 )
+                            :  - Std.int(3 * getScale());
+                
+                canvas.setFont(res.effectFont);
+                canvas.fillText(Std.string(h.tuplet), cx + x + tupletX, tupletY - offset);
+            }
+        }
+        else
+        {
+            var firstBeat = h.beats[0];
+            var lastBeat = h.beats[h.beats.length - 1];
+            
+            var beamingHelper = _beamHelperLookup[h.voiceIndex].get(firstBeat.index);
+            var direction = beamingHelper.getDirection();
+            
+            // 
+            // Calculate the overall area of the tuplet bracket
+            
+            var startX = Std.int(beamingHelper.getBeatLineX(firstBeat) + getScale());
+            var endX = Std.int(beamingHelper.getBeatLineX(lastBeat) + getScale());
+            
+            //
+            // Calculate how many space the text will need
+            canvas.setFont(res.effectFont);
+            var s = Std.string(h.tuplet);
+            var sw = canvas.measureText(s);
+            var sp = Std.int(3 * getScale());
+            
+            // 
+            // Calculate the offsets where to break the bracket
+            var middleX = Std.int((startX + endX) / 2);
+            var offset1X = Std.int(middleX - sw / 2 - sp);
+            var offset2X = Std.int(middleX + sw / 2 + sp);
+            
+            //
+            // calculate the y positions for our bracket
+            
+            var startY = calculateBeamY(beamingHelper, startX);
+            var offset1Y = calculateBeamY(beamingHelper, offset1X);
+            var middleY = calculateBeamY(beamingHelper, middleX);
+            var offset2Y = calculateBeamY(beamingHelper, offset2X);
+            var endY = calculateBeamY(beamingHelper, endX);
+            
+            var offset = Std.int(10 * getScale()); 
+            var size = Std.int(5 * getScale());
+            if (direction == Down)
+            {
+                offset *= -1;
+                size *= -1;
+            }
+            
+            //
+            // draw the bracket
+            canvas.beginPath();
+            canvas.moveTo(cx + x + startX, cy + y + startY - offset);
+            canvas.lineTo(cx + x + startX, cy + y + startY - offset - size);
+            canvas.lineTo(cx + x + offset1X, cy + y + offset1Y - offset - size);
+            canvas.stroke();
+            
+            canvas.beginPath();
+            canvas.lineTo(cx + x + offset2X, cy + y + offset2Y - offset - size);
+            canvas.lineTo(cx + x + endX, cy + y + endY - offset - size); 
+            canvas.lineTo(cx + x + endX, cy + y + endY - offset); 
+            canvas.stroke();
+            
+            //
+            // Draw the string
+            canvas.fillText(s, cx + x + middleX, cy + y + middleY - offset - size - res.effectFont.getSize());
+        }
+        canvas.setTextAlign(oldAlign);
     }
     
     private function getStemSize(duration:Duration)
@@ -596,9 +703,12 @@ class ScoreBarRenderer extends GroupedBarRenderer
     {
         _currentBeamHelper = null; // reset beams for each voice
         _beamHelpers.push(new Array<BeamingHelper>());
+        _beamHelperLookup.push(new IntMap<BeamingHelper>());
+        _tupletHelpers.push(new Array<TupletHelper>());
         
         for (b in v.beats)
         {
+            var newBeamingHelper = false;
             if (!b.isRest())
             {
                 // try to fit beam to current beamhelper
@@ -608,6 +718,30 @@ class ScoreBarRenderer extends GroupedBarRenderer
                     _currentBeamHelper = new BeamingHelper();
                     _currentBeamHelper.checkBeat(b);
                     _beamHelpers[v.index].push(_currentBeamHelper);
+                    newBeamingHelper = true;
+                }
+            }
+            
+            if (b.hasTuplet())
+            {
+                // try to fit tuplet to current tuplethelper
+                // TODO: register tuplet overflow
+                var previousBeat = b.previousBeat;
+                
+                // don't group if the previous beat isn't in the same voice
+                if (previousBeat != null && previousBeat.voice != b.voice) previousBeat = null;
+                
+                // if a new beaming helper was started, we close our tuplet grouping as well
+                if (newBeamingHelper && _currentTupletHelper != null)
+                {
+                    _currentTupletHelper.finish();
+                }
+                
+                if (previousBeat == null || _currentTupletHelper == null || !_currentTupletHelper.check(b))
+                {
+                    _currentTupletHelper = new TupletHelper(v.index);
+                    _currentTupletHelper.check(b);
+                    _tupletHelpers[v.index].push(_currentTupletHelper);
                 }
             }
             
@@ -616,6 +750,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
             container.onNotes = new ScoreBeatGlyph();
             cast(container.onNotes, ScoreBeatGlyph).beamingHelper = _currentBeamHelper;
             container.postNotes = new ScoreBeatPostNotesGlyph();
+            _beamHelperLookup[v.index].set(b.index, _currentBeamHelper);
             addBeatGlyph(container);
         }
         
