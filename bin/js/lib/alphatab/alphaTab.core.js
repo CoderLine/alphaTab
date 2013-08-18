@@ -1796,7 +1796,7 @@ alphatab.audio.MidiUtils.applyDot = function(ticks,doubleDotted) {
 	if(doubleDotted) return ticks + (ticks / 4 * 3 | 0); else return ticks + (ticks / 2 | 0);
 }
 alphatab.audio.MidiUtils.applyTuplet = function(ticks,numerator,denominator) {
-	return ticks * numerator / denominator | 0;
+	return ticks * denominator / numerator | 0;
 }
 if(!alphatab.importer) alphatab.importer = {}
 alphatab.importer.ScoreImporter = function() {

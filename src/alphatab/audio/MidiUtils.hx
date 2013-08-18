@@ -41,7 +41,7 @@ class MidiUtils
     
     /**
      * Converts a numerical value to its ticks equivalent.
-     * @param value the numerical proportion to convert. (i.E. timesignature tenominator, note duration,...)
+     * @param value the numerical proportion to convert. (i.E. timesignature denominator, note duration,...)
      */
     public static function valueToTicks(value:Int)
     {
@@ -62,6 +62,6 @@ class MidiUtils
     
     public static function applyTuplet(ticks:Int, numerator:Int, denominator:Int)
     {
-        return Std.int(ticks * numerator / denominator);
+        return Std.int(ticks * denominator / numerator);
     }
 }
