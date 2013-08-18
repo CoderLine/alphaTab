@@ -6244,6 +6244,48 @@ alphatab.rendering.glyphs.BendGlyph.prototype = $extend(alphatab.rendering.Glyph
 	}
 	,__class__: alphatab.rendering.glyphs.BendGlyph
 });
+alphatab.rendering.glyphs.BrushGlyph = function(beat) {
+	alphatab.rendering.Glyph.call(this,0,0);
+	this._beat = beat;
+};
+alphatab.rendering.glyphs.BrushGlyph.__name__ = true;
+alphatab.rendering.glyphs.BrushGlyph.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.BrushGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	paint: function(cx,cy,canvas) {
+		var tabBarRenderer = this.renderer;
+		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
+		var startY = cy + this.y + (tabBarRenderer.getNoteY(this._beat.maxNote) - res.tablatureFont.getSize() / 2 | 0);
+		var endY = cy + this.y + tabBarRenderer.getNoteY(this._beat.minNote) + res.tablatureFont.getSize() / 2;
+		var arrowX = cx + this.x + this.width / 2 | 0;
+		var arrowSize = 8 * this.renderer.stave.staveGroup.layout.renderer.scale;
+		canvas.setColor(res.mainGlyphColor);
+		if(this._beat.brushType == alphatab.model.BrushType.BrushUp || this._beat.brushType == alphatab.model.BrushType.BrushDown) {
+			canvas.beginPath();
+			canvas.moveTo(arrowX,startY);
+			canvas.lineTo(arrowX,endY);
+			canvas.stroke();
+			if(this._beat.brushType == alphatab.model.BrushType.BrushUp) {
+				canvas.beginPath();
+				canvas.moveTo(arrowX,endY);
+				canvas.lineTo(arrowX + arrowSize / 2 | 0,endY - arrowSize | 0);
+				canvas.lineTo(arrowX - arrowSize / 2 | 0,endY - arrowSize | 0);
+				canvas.closePath();
+				canvas.fill();
+			} else {
+				canvas.beginPath();
+				canvas.moveTo(arrowX,startY);
+				canvas.lineTo(arrowX + arrowSize / 2 | 0,startY + arrowSize | 0);
+				canvas.lineTo(arrowX - arrowSize / 2 | 0,startY + arrowSize | 0);
+				canvas.closePath();
+				canvas.fill();
+			}
+		}
+	}
+	,doLayout: function() {
+		this.width = 10 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,__class__: alphatab.rendering.glyphs.BrushGlyph
+});
 alphatab.rendering.glyphs.CircleGlyph = function(x,y,size) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
@@ -7240,7 +7282,11 @@ alphatab.rendering.glyphs.TabBeatPreNotesGlyph = function() {
 alphatab.rendering.glyphs.TabBeatPreNotesGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabBeatPreNotesGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
 alphatab.rendering.glyphs.TabBeatPreNotesGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
-	__class__: alphatab.rendering.glyphs.TabBeatPreNotesGlyph
+	doLayout: function() {
+		if(this.container.beat.brushType != alphatab.model.BrushType.None) this.addGlyph(new alphatab.rendering.glyphs.BrushGlyph(this.container.beat));
+		alphatab.rendering.glyphs.BeatGlyphBase.prototype.doLayout.call(this);
+	}
+	,__class__: alphatab.rendering.glyphs.TabBeatPreNotesGlyph
 });
 alphatab.rendering.glyphs.TabNoteChordGlyph = function(x,y) {
 	if(y == null) y = 0;
