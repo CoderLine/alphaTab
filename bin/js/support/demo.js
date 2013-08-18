@@ -20,6 +20,10 @@ function showGroup(groupId) {
         $(group).fadeIn();
         currentGroup = group;
         $("html, body").animate({ scrollTop: 0 }, 400);
+        
+        $('script[type="text/javascript-lazy"]', group).each(function() {
+            eval($(this).text());
+        });
     }    
 }
        
