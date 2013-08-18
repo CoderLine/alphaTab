@@ -135,6 +135,7 @@ class BeamingHelper
     public function getDirection() : BeamDirection
     { 
         // multivoice handling
+#if MULTIVOICE_SUPPORT
         if (voice.index > 0)
         {
             return Down;
@@ -149,6 +150,7 @@ class BeamingHelper
                 }
             }
         }
+#end
         // the average key is used for determination
         //      key lowerequal than middle line -> up
         //      key higher than middle line -> down

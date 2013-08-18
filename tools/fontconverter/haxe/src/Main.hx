@@ -15,6 +15,8 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 import alphatab.model.Bar;
+import alphatab.Settings;
+import js.Browser;
 
 import alphatab.platform.js.Html5Canvas;
 import alphatab.platform.model.Color;
@@ -37,6 +39,7 @@ import js.Lib;
 /**
  * This small utiltiy application allows the rendering of single glyphs
  */
+@:expose()
 class Main 
 {
 	public static var glyphs:Array<NamedSvgGlyph>;
@@ -46,7 +49,7 @@ class Main
 	
     public static function main() 
     {
-        new JQuery(Lib.document).ready(function (_) {
+        new JQuery(untyped Browser.document).ready(function (_) {
             
 			glyphs = new Array<NamedSvgGlyph>();
 			
@@ -71,7 +74,7 @@ class Main
             var fontCode = new JQuery('#font');
 			
             // create the structure for rendering
-            var renderer = new ScoreRenderer(Lib.document.getElementById("glyphCanvas"));
+            var renderer = new ScoreRenderer(Settings.defaults(), Browser.document.getElementById("glyphCanvas"));
                         
             var staveGroup = new StaveGroup();
             staveGroup.layout = renderer.layout;
@@ -102,7 +105,7 @@ class Main
 				//glyph lines
 				var glx:Float;
 				var gly:Float;
-				if (untyped(preview.attr("checked")))
+				if (untyped(preview.is(":checked")))
 				{
 					glx = zeroX;
 					gly = zeroY;
@@ -129,7 +132,7 @@ class Main
 				renderer.canvas.fillText(s, Math.max(10, currentGlyph.x), Math.max(20, currentGlyph.y));
 				
 				var renderGlyph:Glyph;
-				if (untyped(preview.attr("checked")))
+				if (untyped(preview.is(":checked")))
 				{
 					renderGlyph = new SvgGlyph(zeroX, zeroY, rewritePathData(currentGlyph, zeroX, zeroY, zoom), zoom / CoordinateScale, zoom / CoordinateScale);
 				}
@@ -177,7 +180,7 @@ class Main
 				}
 			});
 			
-			new JQuery(Lib.document).bind('mouseup', function(_) {
+			new JQuery(untyped Browser.document).bind('mouseup', function(_) {
 				dragging = false;
 			});
             

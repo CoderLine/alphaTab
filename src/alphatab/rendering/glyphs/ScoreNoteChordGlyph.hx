@@ -37,6 +37,7 @@ class ScoreNoteChordGlyph extends Glyph
 {
     private var _infos:Array<ScoreNoteGlyphInfo>;
 	private var _noteLookup:IntMap<Glyph>;
+    private var _tremoloPicking:Glyph;
     
     public var minNote:ScoreNoteGlyphInfo;
     public var maxNote:ScoreNoteGlyphInfo;
@@ -196,6 +197,24 @@ class ScoreNoteChordGlyph extends Glyph
             e.doLayout();
         }
         
+        if (beat.isTremolo())
+        {
+            var offset:Int;
+            var baseNote = beamingHelper.getDirection() == Up ? minNote : maxNote;
+            var tremoloX = beamingHelper.getDirection() == Up ? displacedX : 0;
+            switch(beat.tremoloSpeed)
+            {
+                case ThirtySecond: offset = beamingHelper.getDirection() == Up ? -15 : 10;
+                case Sixteenth: offset = beamingHelper.getDirection() == Up ? -12 : 10;
+                case Eighth: offset = beamingHelper.getDirection() == Up ? -10 : 10;
+                default: offset = beamingHelper.getDirection() == Up ? -15 : 15;
+            }
+            
+            _tremoloPicking = new TremoloPickingGlyph(tremoloX, baseNote.glyph.y + Std.int(offset * getScale()), beat.tremoloSpeed);
+            _tremoloPicking.renderer = renderer;
+            _tremoloPicking.doLayout();
+        }
+        
 		width = w + padding;
         
 	}
@@ -255,6 +274,8 @@ class ScoreNoteChordGlyph extends Glyph
             }
         }
 		
+        if(_tremoloPicking != null)
+            _tremoloPicking.paint(cx + x, cy + y, canvas);
         for (g in _infos)
 		{
 			g.glyph.renderer = renderer;

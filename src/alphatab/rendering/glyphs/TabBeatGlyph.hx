@@ -37,6 +37,13 @@ class TabBeatGlyph extends BeatGlyphBase
             {
                 noteNumbers.beatEffects.set("WHAMMY",  new WhammyBarGlyph(container.beat, container));
             }
+            
+            //
+            // Tremolo Picking
+            if (container.beat.isTremolo() && !noteNumbers.beatEffects.exists("TREMOLO"))
+            {
+                noteNumbers.beatEffects.set("TREMOLO",  new TremoloPickingGlyph(0, 0, container.beat.tremoloSpeed));
+            }
 		}
 		
 		// left to right layout
@@ -50,6 +57,7 @@ class TabBeatGlyph extends BeatGlyphBase
 		}	
 		width = w;
 	} 
+    
 	private function createNoteGlyph(n:Note) 
     {
 		var isGrace = container.beat.graceType != GraceType.None;

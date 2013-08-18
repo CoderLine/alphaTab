@@ -12,7 +12,7 @@ class TabNoteChordGlyph extends Glyph
 {
 	private var _notes:Array<Glyph>;
 	private var _noteLookup:IntMap<Glyph>;
-    private var _maxNote:Note;
+    private var _minNote:Note;
     
     public var beat:Beat;
     public var beatEffects:StringMap<Glyph>;
@@ -75,7 +75,7 @@ class TabNoteChordGlyph extends Glyph
     {
 		_notes.push(noteGlyph);
 		_noteLookup.set(note.string, noteGlyph);
-        if (_maxNote == null || note.string > _maxNote.string) _maxNote = note;
+        if (_minNote == null || note.string < _minNote.string) _minNote = note;
     }	
 	
 	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
@@ -91,7 +91,7 @@ class TabNoteChordGlyph extends Glyph
         
         var tabRenderer:TabBarRenderer = cast renderer;
         var tabHeight = renderer.getResources().tablatureFont.getSize();
-        var effectY = Std.int(tabRenderer.getNoteY(_maxNote) + tabHeight);
+        var effectY = Std.int(tabRenderer.getNoteY(_minNote) + tabHeight / 2);
          // TODO: take care of actual glyph height
         var effectSpacing:Int = Std.int(7 * getScale());
         for (g in beatEffects)

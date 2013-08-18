@@ -55,6 +55,7 @@ import alphatab.rendering.glyphs.SharpGlyph;
 import alphatab.rendering.glyphs.SpacingGlyph;
 import alphatab.rendering.glyphs.SvgGlyph;
 import alphatab.rendering.glyphs.TimeSignatureGlyph;
+import alphatab.rendering.glyphs.TremoloPickingGlyph;
 import alphatab.rendering.utils.AccidentalHelper;
 import alphatab.rendering.utils.BeamingHelper;
 import haxe.ds.IntMap;
@@ -413,7 +414,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
         canvas.moveTo(Std.int(cx + x + beatLineX), cy + y + topY);
         canvas.lineTo(Std.int(cx + x + beatLineX), cy + y + bottomY);
         canvas.stroke();
-		
+        
 		if (isGrace)
 		{
 			var graceSizeY = 15 * getScale();

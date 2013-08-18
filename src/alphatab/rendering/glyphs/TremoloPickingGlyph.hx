@@ -1,5 +1,6 @@
 package alphatab.rendering.glyphs;
 import alphatab.model.Duration;
+import alphatab.platform.ICanvas;
 
 class TremoloPickingGlyph extends SvgGlyph
 {

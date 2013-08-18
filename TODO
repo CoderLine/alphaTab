@@ -1,28 +1,15 @@
-Open
-==== 
-Triplet Feel (Own Info Line)
-Tuplets
-Cresendo 
-Decresendo
-Tab Clef
-Whammy Bar
-
-Ghost Note 
-Legato
-Let Ring
-Palm Mute
-Dead note
-Bends
-Tremolo Bars
-Vibratos
-Tap/slap/pop
-Fingering
-Brush down/up
-Pickstroke down/up
-Grace Note
-Trill
-Tremolo Picking
-Fade In
-Fade Out
-Chords
- 
+Take care of Whammy Bar in Overflow
+Rendering of Triplet Feel
+Rendering of Tuplets
+Rendering of Cresendo and Decresendo
+Rendering of Tab Clef
+Rendering of Ghost Notes
+Rendering of Dead Notes
+Rendering of Drum Tab
+Rendering of Fingering Glyphs
+Rendering of Brush Effects
+Rendering of Pick Strokes
+Rendering of Grace Notes
+Rendering of Trill Effect
+Rendering of Tremolo Picking
+Rendering of Chord Diagrams
