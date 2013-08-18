@@ -34,6 +34,7 @@ import alphatab.rendering.glyphs.TabBeatContainerGlyph;
 import alphatab.rendering.glyphs.TabBeatGlyph;
 import alphatab.rendering.glyphs.TabBeatPreNotesGlyph;
 import alphatab.rendering.glyphs.TabBeatPostNotesGlyph;
+import alphatab.rendering.glyphs.TabClefGlyph;
 import haxe.ds.IntMap;
 
 /**
@@ -41,7 +42,7 @@ import haxe.ds.IntMap;
  */
 class TabBarRenderer extends GroupedBarRenderer
 {
-	private static inline var LineSpacing = 10;
+	public static inline var LineSpacing = 10;
 
 	public function new(bar:Bar) 
 	{
@@ -102,7 +103,11 @@ class TabBarRenderer extends GroupedBarRenderer
 			addPreBeatGlyph(new RepeatOpenGlyph(0, 0, 1.5, 3));
 		}
 		
-		// Clef (TODO) 
+        // Clef
+		if (isFirstOfLine())
+		{
+			addPreBeatGlyph(new TabClefGlyph());
+		}
 		 
 		addPreBeatGlyph(new BarNumberGlyph(0, getTabY( -1, -3), _bar.index + 1, !stave.isFirstInAccolade));
 		

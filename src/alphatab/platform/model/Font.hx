@@ -33,16 +33,31 @@ class Font
 	{
 		return _family;
 	}
+    
+    public function setFamily(family:String)
+    {
+        _family = family;
+    }
 	
 	public function getSize() : Float
 	{
 		return _size;
 	}	
+    
+    public function setSize(size:Float)
+    {
+        _size = size;
+    }
 	
 	public function getStyle() : Int
 	{
 		return _style;
 	}
+    
+    public function setStyle(style:Int)
+    {
+        _style = style;
+    }
 	
 	public inline function isBold() : Bool
 	{
@@ -60,6 +75,11 @@ class Font
 		_size = size;
 		_style = style;
 	}
+    
+    public function clone() : Font
+    {
+        return new Font(_family, _size, _style);
+    }
 	
 	public function toCssString() : String
 	{

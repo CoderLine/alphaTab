@@ -806,17 +806,29 @@ alphatab.platform.model.Font.prototype = {
 		buf.b += "'";
 		return buf.b;
 	}
+	,clone: function() {
+		return new alphatab.platform.model.Font(this._family,this._size,this._style);
+	}
 	,isItalic: function() {
 		return (this.getStyle() & 2) != 0;
 	}
 	,isBold: function() {
 		return (this.getStyle() & 1) != 0;
 	}
+	,setStyle: function(style) {
+		this._style = style;
+	}
 	,getStyle: function() {
 		return this._style;
 	}
+	,setSize: function(size) {
+		this._size = size;
+	}
 	,getSize: function() {
 		return this._size;
+	}
+	,setFamily: function(family) {
+		this._family = family;
 	}
 	,getFamily: function() {
 		return this._family;
@@ -5096,6 +5108,7 @@ alphatab.rendering.RenderingResources.prototype = {
 		this.barNumberFont = new alphatab.platform.model.Font(sansFont,11 * scale);
 		this.barNumberColor = new alphatab.platform.model.Color(200,0,0);
 		this.markerFont = new alphatab.platform.model.Font(serifFont,14 * scale,1);
+		this.tabClefFont = new alphatab.platform.model.Font(sansFont,18 * scale,1);
 		this.mainGlyphColor = new alphatab.platform.model.Color(0,0,0);
 	}
 	,__class__: alphatab.rendering.RenderingResources
@@ -5696,6 +5709,7 @@ alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.Grouped
 	}
 	,createPreBeatGlyphs: function() {
 		if(this._bar.getMasterBar().isRepeatStart) this.addPreBeatGlyph(new alphatab.rendering.glyphs.RepeatOpenGlyph(0,0,1.5,3));
+		if(this.index == 0) this.addPreBeatGlyph(new alphatab.rendering.glyphs.TabClefGlyph());
 		this.addPreBeatGlyph(new alphatab.rendering.glyphs.BarNumberGlyph(0,this.getTabY(-1,-3),this._bar.index + 1,!this.stave.isFirstInAccolade));
 		if(this._bar.isEmpty()) this.addPreBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,30 * this.stave.staveGroup.layout.renderer.scale | 0,false));
 	}
@@ -7429,6 +7443,50 @@ alphatab.rendering.glyphs.TabBeatPreNotesGlyph.prototype = $extend(alphatab.rend
 		alphatab.rendering.glyphs.BeatGlyphBase.prototype.doLayout.call(this);
 	}
 	,__class__: alphatab.rendering.glyphs.TabBeatPreNotesGlyph
+});
+alphatab.rendering.glyphs.TabClefGlyph = function() {
+	alphatab.rendering.Glyph.call(this,0,0);
+};
+alphatab.rendering.glyphs.TabClefGlyph.__name__ = true;
+alphatab.rendering.glyphs.TabClefGlyph.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.TabClefGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	paint: function(cx,cy,canvas) {
+		var tabBarRenderer = this.renderer;
+		var track = this.renderer.stave.staveGroup.layout.renderer.track;
+		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
+		var startY = cy + this.y + 10 * this.renderer.stave.staveGroup.layout.renderer.scale * 0.6;
+		var endY = cy + this.y + tabBarRenderer.getTabY(track.tuning.length,-2);
+		var fontScale = 1;
+		switch(track.tuning.length) {
+		case 4:
+			fontScale = 0.6;
+			break;
+		case 5:
+			fontScale = 0.8;
+			break;
+		case 6:
+			fontScale = 1.1;
+			break;
+		case 7:
+			fontScale = 1.15;
+			break;
+		}
+		var font = res.tabClefFont.clone();
+		font.setSize(font.getSize() * fontScale);
+		canvas.setColor(res.mainGlyphColor);
+		canvas.setFont(font);
+		canvas.setTextAlign(alphatab.platform.model.TextAlign.Center);
+		canvas.fillText("T",cx + this.x + (this.width / 2 | 0),startY);
+		canvas.fillText("A",cx + this.x + (this.width / 2 | 0),startY + font.getSize());
+		canvas.fillText("B",cx + this.x + (this.width / 2 | 0),startY + font.getSize() * 2);
+	}
+	,canScale: function() {
+		return false;
+	}
+	,doLayout: function() {
+		this.width = 28 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,__class__: alphatab.rendering.glyphs.TabClefGlyph
 });
 alphatab.rendering.glyphs.TabNoteChordGlyph = function(x,y) {
 	if(y == null) y = 0;

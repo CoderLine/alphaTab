@@ -40,8 +40,10 @@ class RenderingResources
 	public var barNumberColor:Color;
     
 	public var markerFont:Font;
+    public var tabClefFont:Font;
 	
 	public var mainGlyphColor:Color;
+	
 
     public function new(scale:Float)
     {
@@ -70,6 +72,7 @@ class RenderingResources
 		barNumberColor = new Color(200, 0, 0);
         
 		markerFont = new Font(serifFont, 14 * scale, Font.STYLE_BOLD);
+		tabClefFont = new Font(sansFont, 18 * scale, Font.STYLE_BOLD);
 		
 		mainGlyphColor = new Color(0,0,0);
 	}
