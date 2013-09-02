@@ -32,6 +32,7 @@ import alphatab.platform.PlatformFactory;
 import alphatab.tablature.drawing.DrawingResources;
 import alphatab.tablature.staves.ScoreStave;
 import alphatab.tablature.staves.TablatureStave;
+import haxe.ds.StringMap;
 
 /**
  * A helper type used for searching measures. 
@@ -51,7 +52,7 @@ class Tablature
     private var _updateDisplay:Bool; 
     private var _updateSong:Bool;
     
-    public var settings(default,default):Hash<Dynamic>;
+    public var settings(default,default):StringMap<Dynamic>;
     public var canvas(default,default): Canvas;
     public var isError(default,default):Bool;
     public var errorMessage(default,default):String;
@@ -74,7 +75,7 @@ class Tablature
         canvas = PlatformFactory.getCanvas(source);
         track = null;
                 
-        settings = new Hash <Dynamic> ();
+        settings = new StringMap <Dynamic> ();
         
         errorMessage = StringTools.trim(msg);
         autoSizeWidth = true;

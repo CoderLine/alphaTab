@@ -28,6 +28,7 @@ import alphatab.model.SongFactory;
 import alphatab.model.Track;
 import alphatab.model.Tuning;
 import alphatab.model.Voice;
+import haxe.ds.StringMap;
 import haxe.xml.Fast;
 
 import alphatab.file.SongReader;
@@ -38,7 +39,7 @@ import alphatab.model.Song;
 class MusicXmlReader extends SongReader
 {
 	private var _dom:Fast;
-	private var _idToTrack:Hash<Track>;
+	private var _idToTrack:StringMap<Track>;
 	
     public override function readSong() : Song
     {
@@ -53,7 +54,7 @@ class MusicXmlReader extends SongReader
 			throw new FileFormatException("not a valid xml file");
 		}	
 			
-		_idToTrack = new Hash<Track>();
+		_idToTrack = new StringMap<Track>();
 		if (_dom.name == "score-partwise")
 		{
 			return parsePartwise();

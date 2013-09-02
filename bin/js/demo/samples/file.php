@@ -24,7 +24,7 @@ $description = "This sample shows how to display a GuitarPro file";
 (function($) {
     $(document).ready(function() { 
         $('div.alphaTab').alphaTab({
-            file: '<?php echo $filePath; ?>/RepeatBug.gp5'
+            file: '<?php echo $filePath; ?>/Tuplets.gp5'
         });
     });
 })(jQuery);

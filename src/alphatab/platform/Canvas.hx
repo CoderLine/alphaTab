@@ -21,15 +21,15 @@ package alphatab.platform;
  */
 interface Canvas 
 {
-    var width(getWidth, setWidth):Int;
-    var height(getHeight, setHeight):Int;
+    var width(get, set):Int;
+    var height(get, set):Int;
         
     // colors and styles
-    var strokeStyle(getStrokeStyle, setStrokeStyle):String; //(default black);
-    var fillStyle(getFillStyle, setFillStyle):String; //(default black);
+    var strokeStyle(get, set):String; //(default black);
+    var fillStyle(get, set):String; //(default black);
         
     // line caps/joins
-    var lineWidth(getLineWidth, setLineWidth):Float; // (default 1)
+    var lineWidth(get, set):Float; // (default 1)
     
     // rects
     function clear():Void;
@@ -49,9 +49,9 @@ interface Canvas
     function stroke():Void;
 
     // text
-    var font(getFont, setFont):String; // (default 10px sans-serif)
-    var textBaseline(getTextBaseline, setTextBaseline):String; // "top", "hanging", "middle", "alphabetic", "ideographic", "bottom" (default: "alphabetic")
-    var textAlign(getTextAlign, setTextAlign):String; // "left", "right", "center", "start", "end"
+    var font(get, set):String; // (default 10px sans-serif)
+    var textBaseline(get, set):String; // "top", "hanging", "middle", "alphabetic", "ideographic", "bottom" (default: "alphabetic")
+    var textAlign(get, set):String; // "left", "right", "center", "start", "end"
     function fillText(text:String, x:Float, y:Float, maxWidth:Float = 0):Void;
     function strokeText(text:String, x:Float, y:Float, maxWidth:Float = 0):Void;
     function measureText(text:String):Float;    

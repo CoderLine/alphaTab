@@ -19,7 +19,6 @@ import alphatab.file.SongReader;
 import alphatab.model.Song;
 import alphatab.model.SongFactory;
 import alphatab.io.DataInputStream;
-import haxe.Stack;
 
 class GpReaderBase extends SongReader
 {

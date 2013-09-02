@@ -79,26 +79,26 @@ class SvgCanvas implements Canvas
         return out.toString();       
     }
     
-    public var width(getWidth, setWidth):Int;
-    public var height(getHeight, setHeight):Int;
+    public var width(get, set):Int;
+    public var height(get, set):Int;
     
-    private function getWidth():Int 
+    private function get_width():Int 
     {
         return _width; 
     }
     
-    private function getHeight():Int 
+    private function get_height():Int 
     {
         return _height;
     }
     
-    private function setWidth(width:Int):Int 
+    private function set_width(width:Int):Int 
     {
         _width = width;
         return _width;
     }
     
-    private function setHeight(height:Int):Int 
+    private function set_height(height:Int):Int 
     {
         _height = height;
         return _height;
@@ -106,25 +106,25 @@ class SvgCanvas implements Canvas
     
     // colors and styles
     private var _strokeStyle:String;
-    public var strokeStyle(getStrokeStyle, setStrokeStyle):String;
+    public var strokeStyle(get, set):String;
     
-    private function getStrokeStyle() : String
+    private function get_strokeStyle() : String
     {
         return _strokeStyle;
     } 
-    private function setStrokeStyle(value:String) : String
+    private function set_strokeStyle(value:String) : String
     {
         _strokeStyle = value; 
         return _strokeStyle;
     }
     
     private var _fillStyle:String;
-    public var fillStyle(getFillStyle, setFillStyle):String;
-    private function getFillStyle() : String
+    public var fillStyle(get, set):String;
+    private function get_fillStyle() : String
     {
         return _fillStyle;
     }
-    private function setFillStyle(value:String) : String
+    private function set_fillStyle(value:String) : String
     {
         _fillStyle = value;
         return _fillStyle;
@@ -132,12 +132,12 @@ class SvgCanvas implements Canvas
     
     // line caps/joins
     private var _lineWidth:Float;
-    public var lineWidth(getLineWidth, setLineWidth):Float;
-    private function getLineWidth() : Float
+    public var lineWidth(get, set):Float;
+    private function get_lineWidth() : Float
     {
         return _lineWidth;
     }
-    private function setLineWidth(value:Float) : Float
+    private function set_lineWidth(value:Float) : Float
     {
         _lineWidth = value;
         return _lineWidth;
@@ -315,36 +315,36 @@ class SvgCanvas implements Canvas
 
     // text
     private var _font:String; 
-    public var font(getFont, setFont):String; 
-    private function getFont() : String
+    public var font(get, set):String; 
+    private function get_font() : String
     {
         return _font;
     }
-    private function setFont(value:String) : String
+    private function set_font(value:String) : String
     {
         _font = value;
         return _font;
     }
     
     private var _textBaseline:String; 
-    public var textBaseline(getTextBaseline, setTextBaseline):String; 
-    private function getTextBaseline() : String
+    public var textBaseline(get, set):String; 
+    private function get_textBaseline() : String
     {
         return _textBaseline;
     }
-    private function setTextBaseline(value:String) : String
+    private function set_textBaseline(value:String) : String
     {
         _textBaseline = value;
         return _textBaseline;
     }
 
     private var _textAlign:String; 
-    public var textAlign(getTextAlign, setTextAlign):String; 
-    private function getTextAlign() : String
+    public var textAlign(get, set):String; 
+    private function get_textAlign() : String
     {
         return _textAlign;
     }
-    private function setTextAlign(value:String) : String
+    private function set_textAlign(value:String) : String
     {
         _textAlign = value;
         return _textAlign;

@@ -32,27 +32,27 @@ class Html5Canvas implements Canvas
         this._context = dom.getContext("2d");
     }
     
-    public var width(getWidth, setWidth):Int;
-    public var height(getHeight, setHeight):Int;
+    public var width(get, set):Int;
+    public var height(get, set):Int;
     
-    private function getWidth():Int 
+    private function get_width():Int 
     {
         return _canvas.offsetWidth; 
     }
     
-    private function getHeight():Int 
+    private function get_height():Int 
     {
         return _canvas.offsetHeight;
     }
     
-    private function setWidth(width:Int):Int 
+    private function set_width(width:Int):Int 
     {
         this._canvas.width = width;
         this._context = this._canvas.getContext("2d");
         return width;
     }
     
-    private function setHeight(height:Int):Int 
+    private function set_height(height:Int):Int 
     {
         this._canvas.height = height;
         this._context = this._canvas.getContext("2d");
@@ -60,36 +60,36 @@ class Html5Canvas implements Canvas
     } 
     
     // colors and styles
-    public var strokeStyle(getStrokeStyle, setStrokeStyle):String;
+    public var strokeStyle(get, set):String;
     
-    private function getStrokeStyle() : String
+    private function get_strokeStyle() : String
     {
         return this._context.strokeStyle;
     } 
-    private function setStrokeStyle(value:String) : String
+    private function set_strokeStyle(value:String) : String
     {
         this._context.strokeStyle = value; 
         return this._context.strokeStyle;
     }
     
-    public var fillStyle(getFillStyle, setFillStyle):String;
-    private function getFillStyle() : String
+    public var fillStyle(get, set):String;
+    private function get_fillStyle() : String
     {
         return this._context.fillStyle;
     }
-    private function setFillStyle(value:String) : String
+    private function set_fillStyle(value:String) : String
     {
         this._context.fillStyle = value;
         return this._context.fillStyle;
     }
     
     // line caps/joins
-    public var lineWidth(getLineWidth, setLineWidth):Float;
-    private function getLineWidth() : Float
+    public var lineWidth(get, set):Float;
+    private function get_lineWidth() : Float
     {
         return this._context.lineWidth;
     }
-    private function setLineWidth(value:Float) : Float
+    private function set_lineWidth(value:Float) : Float
     {
         this._context.lineWidth = value;
         return this._context.lineWidth;
@@ -152,34 +152,34 @@ class Html5Canvas implements Canvas
     }
 
     // text
-    public var font(getFont, setFont):String; 
-    private function getFont() : String
+    public var font(get, set):String; 
+    private function get_font() : String
     {
         return this._context.font;
     }
-    private function setFont(value:String) : String
+    private function set_font(value:String) : String
     {
         this._context.font = value;
         return this._context.font;
     }
     
-    public var textBaseline(getTextBaseline, setTextBaseline):String; 
-    private function getTextBaseline() : String
+    public var textBaseline(get, set):String; 
+    private function get_textBaseline() : String
     {
         return this._context.textBaseline;
     }
-    private function setTextBaseline(value:String) : String
+    private function set_textBaseline(value:String) : String
     {
         this._context.textBaseline = value;
         return this._context.textBaseLine;
     }
 
-    public var textAlign(getTextAlign, setTextAlign):String; 
-    private function getTextAlign() : String
+    public var textAlign(get, set):String; 
+    private function get_textAlign() : String
     {
         return this._context.textAlign;
     }
-    private function setTextAlign(value:String) : String
+    private function set_textAlign(value:String) : String
     {
         this._context.textAlign = value;
         return this._context.textAlign;

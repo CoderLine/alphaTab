@@ -21,7 +21,7 @@ import alphatab.file.FileFormatException;
 import alphatab.io.DataInputStream;
 import alphatab.io.StringInputStream;
 import alphatab.platform.FileLoader;
-import js.XMLHttpRequest;
+import js.html.XMLHttpRequest;
 
 /**
  * This is a fileloader implementation for JavaScript.
@@ -67,7 +67,7 @@ class JsFileLoader implements FileLoader
             {
                 xhr.overrideMimeType('text/plain; charset=x-user-defined');
             }
-            xhr.onreadystatechange = function() 
+            xhr.onreadystatechange = function(d) 
             {
                 try
                 {

@@ -167,6 +167,7 @@
             <arg value="-cp" />
             <arg value="${src}"/>
             
+            <arg value="--no-inline" />
             <arg value="-main" />
             <arg value="alphatab.Main" />
             

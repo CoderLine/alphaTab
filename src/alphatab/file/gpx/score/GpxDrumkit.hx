@@ -23,9 +23,9 @@ package alphatab.file.gpx.score;
 class GpxDrumkit 
 {
     public static var _kits:Array<GpxDrumkit>;
-    public static var DRUMKITS(getDrumkits, null):Array<GpxDrumkit>;
+    public static var DRUMKITS(get, null):Array<GpxDrumkit>;
     
-    public static function getDrumkits() : Array<GpxDrumkit>
+    public static function get_DRUMKITS() : Array<GpxDrumkit>
     {
         if (_kits == null) 
         {

@@ -16,6 +16,7 @@
  */
 package alphatab.midi;
 import alphatab.io.Byte;
+import haxe.ds.StringMap;
 
 /**
  * This class provides names for all general midi instruments.
@@ -23,13 +24,13 @@ import alphatab.io.Byte;
  */
 class GeneralMidi  
 {
-    private static var _values:Hash<Byte>;
+    private static var _values:StringMap<Byte>;
     
     public static function getValue(name:String) : Byte
     {
         if(_values == null)
         {
-            _values = new Hash<Byte>();
+            _values = new StringMap<Byte>();
             _values.set("acousticgrandpiano", 0);
             _values.set("brightacousticpiano", 1);
             _values.set("electricgrandpiano", 2);

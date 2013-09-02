@@ -47,27 +47,27 @@ class GdiCanvas implements Canvas
     private var _lineWidth:Float;
     private var _font:FontInfo;
     
-    public var width(getWidth, setWidth):Int;
-    public var height(getHeight, setHeight):Int;
+    public var width(get, set):Int;
+    public var height(get, set):Int;
     
-    private function getWidth():Int 
+    private function get_width():Int 
     {
         return _width; 
     }
     
-    private function getHeight():Int 
+    private function get_height():Int 
     {
         return _height;
     }
     
-    private function setWidth(width:Int):Int 
+    private function set_width(width:Int):Int 
     {
         _width = width;
         recreateImage();
         return width;
     }
     
-    private function setHeight(height:Int):Int 
+    private function set_height(height:Int):Int 
     {
         _height = height;
         recreateImage();
@@ -75,37 +75,37 @@ class GdiCanvas implements Canvas
     } 
     
     // colors and styles
-    public var strokeStyle(getStrokeStyle, setStrokeStyle):String;
+    public var strokeStyle(get, set):String;
     
-    private function getStrokeStyle() : String
+    private function get_strokeStyle() : String
     {
         return GdiColorTranslator.ToHtml(_strokeColor.Color);
     } 
     
-    private function setStrokeStyle(value:String) : String
+    private function set_strokeStyle(value:String) : String
     {
         _strokeColor.Color = ColorFromCss(value);
         return value;
     }
     
-    public var fillStyle(getFillStyle, setFillStyle):String;
-    private function getFillStyle() : String
+    public var fillStyle(get, set):String;
+    private function get_fillStyle() : String
     {
         return GdiColorTranslator.ToHtml(_fillColor.Color);
     }
-    private function setFillStyle(value:String) : String
+    private function set_fillStyle(value:String) : String
     {
         _fillColor.Color = ColorFromCss(value);
         return value;
     }
     
     // line caps/joins
-    public var lineWidth(getLineWidth, setLineWidth):Float;
-    private function getLineWidth() : Float
+    public var lineWidth(get, set):Float;
+    private function get_lineWidth() : Float
     {
         return _lineWidth;
     }
-    private function setLineWidth(value:Float) : Float
+    private function set_lineWidth(value:Float) : Float
     {
         _lineWidth = value;
         return value;
@@ -182,23 +182,23 @@ class GdiCanvas implements Canvas
     }
 
     // text
-    public var font(getFont, setFont):String; 
-    private function getFont() : String
+    public var font(get, set):String; 
+    private function get_font() : String
     {
         return _font.toString();
     }
-    private function setFont(value:String) : String
+    private function set_font(value:String) : String
     {
         _font = new FontInfo(value);
         return value;
     }
     
-    public var textBaseline(getTextBaseline, setTextBaseline):String; 
-    private function getTextBaseline() : String
+    public var textBaseline(get_textBaseline, set_textBaseline):String; 
+    private function get_textBaseline() : String
     {
         return alignmentToString(_format.LineAlignment);
     }
-    private function setTextBaseline(value:String) : String
+    private function set_textBaseline(value:String) : String
     {
         _format.LineAlignment = stringToAlignment(value);
         return value;
@@ -221,16 +221,15 @@ class GdiCanvas implements Canvas
             case Near: return "top";
             case Center: return "middle";
             case Far: return "bottom";
-            default: return "top";
         }
     }
 
-    public var textAlign(getTextAlign, setTextAlign):String; 
-    private function getTextAlign() : String
+    public var textAlign(get_textAlign, set_textAlign):String; 
+    private function get_textAlign() : String
     {
         return alignmentToString(_format.Alignment);
     }
-    private function setTextAlign(value:String) : String
+    private function set_textAlign(value:String) : String
     {
         _format.Alignment = stringToAlignment(value);
         return value;
