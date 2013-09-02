@@ -8953,7 +8953,7 @@ alphatab.tablature.model.VoiceDrawing.prototype = $extend(alphatab.model.Voice.p
 		if(this.duration.tuplet != null && !this.duration.tuplet.equals(alphatab.model.Tuplet.NORMAL)) {
 			this.beat.effectsCache.triplet = true;
 			this.beat.measure.effectsCache.triplet = true;
-			if(previousVoice != null && previousVoice.beat.measure.staveLine != this.beat.measure.staveLine) previousVoice == null;
+			if(previousVoice != null && previousVoice.beat.measure.staveLine != this.beat.measure.staveLine) previousVoice = null;
 			if(previousVoice == null || previousVoice.tripletGroup == null || !previousVoice.tripletGroup.check(this)) {
 				this.tripletGroup = new alphatab.tablature.model.TripletGroup(this.index);
 				this.tripletGroup.check(this);

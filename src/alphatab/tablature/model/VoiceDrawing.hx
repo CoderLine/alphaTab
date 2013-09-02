@@ -245,7 +245,7 @@ class VoiceDrawing extends Voice
             
             // ignore previous beat if it is not in the same line
             if (previousVoice != null && previousVoice.measureDrawing().staveLine != measureDrawing().staveLine)
-                previousVoice == null;
+                previousVoice = null;
                 
             if (previousVoice == null || previousVoice.tripletGroup == null || !previousVoice.tripletGroup.check(this))
             {            
