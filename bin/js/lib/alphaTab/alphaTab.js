@@ -477,11 +477,20 @@ alphatab.file.alphatex.AlphaTexParser.prototype = $extend(alphatab.file.SongRead
 	}
 	,newSy: function() {
 		this._sy = alphatab.file.alphatex.AlphaTexSymbols.No;
-		do if(this._ch == alphatab.file.alphatex.AlphaTexParser.EOL) this._sy = alphatab.file.alphatex.AlphaTexSymbols.Eof; else if(this._ch == " " || this._ch == "\n" || this._ch == "\r" || this._ch == "\t") this.nextChar(); else if(this._ch == "\"" || this._ch == "'") {
+		do if(this._ch == alphatab.file.alphatex.AlphaTexParser.EOF) this._sy = alphatab.file.alphatex.AlphaTexSymbols.Eof; else if(this._ch == " " || this._ch == "\n" || this._ch == "\r" || this._ch == "\t") this.nextChar(); else if(this._ch == "/") {
+			this.nextChar();
+			if(this._ch == "/") while(this._ch != "\r" && this._ch != "\n" && this._ch != alphatab.file.alphatex.AlphaTexParser.EOF) this.nextChar(); else if(this._ch == "*") while(this._ch != alphatab.file.alphatex.AlphaTexParser.EOF) if(this._ch == "*") {
+				this.nextChar();
+				if(this._ch == "/") {
+					this.nextChar();
+					break;
+				}
+			} else this.nextChar(); else this.error("symbol",alphatab.file.alphatex.AlphaTexSymbols.String,false);
+		} else if(this._ch == "\"" || this._ch == "'") {
 			this.nextChar();
 			this._syData = "";
 			this._sy = alphatab.file.alphatex.AlphaTexSymbols.String;
-			while(this._ch != "\"" && this._ch != "'" && this._ch != alphatab.file.alphatex.AlphaTexParser.EOL) {
+			while(this._ch != "\"" && this._ch != "'" && this._ch != alphatab.file.alphatex.AlphaTexParser.EOF) {
 				this._syData += this._ch;
 				this.nextChar();
 			}
@@ -540,7 +549,7 @@ alphatab.file.alphatex.AlphaTexParser.prototype = $extend(alphatab.file.SongRead
 		} else this.error("symbol",alphatab.file.alphatex.AlphaTexSymbols.String,false); while(this._sy == alphatab.file.alphatex.AlphaTexSymbols.No);
 	}
 	,nextChar: function() {
-		this._ch = this._curChPos < this.data.length()?this.data.readChar():alphatab.file.alphatex.AlphaTexParser.EOL;
+		this._ch = this._curChPos < this.data.length()?this.data.readChar():alphatab.file.alphatex.AlphaTexParser.EOF;
 		this._curChPos++;
 	}
 	,parseTuning: function(str) {
@@ -11035,7 +11044,7 @@ Xml.Comment = "comment";
 Xml.DocType = "doctype";
 Xml.ProcessingInstruction = "processingInstruction";
 Xml.Document = "document";
-alphatab.file.alphatex.AlphaTexParser.EOL = String.fromCharCode(0);
+alphatab.file.alphatex.AlphaTexParser.EOF = String.fromCharCode(0);
 alphatab.file.alphatex.AlphaTexParser.TRACK_CHANNELS = [0,1];
 alphatab.file.gpx.FileSystem.HEADER_BCFS = 1397113666;
 alphatab.file.gpx.FileSystem.HEADER_BCFZ = 1514554178;
