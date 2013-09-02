@@ -70,6 +70,9 @@
             
             <arg value="-js" />
             <arg value="${haxe-js}" />
+            
+            <arg value="-D" />
+            <arg value="js-classic" />
         </exec>
 	</target>	
 
@@ -89,6 +92,8 @@
             
             <arg value="-D" />
             <arg value="DEBUG_DRAWING" />
+
+            <arg value="-js-classic" />
         </exec>
 	</target>	
    

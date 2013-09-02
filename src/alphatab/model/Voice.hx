@@ -42,6 +42,21 @@ class Voice
         isEmpty = true;
     }
     
+    public function clone(factory:SongFactory)  : Voice
+    {
+        var clone = factory.newVoice(index);
+        clone.duration = duration.clone(factory);
+        clone.index = index;
+        clone.direction = direction;
+        clone.isEmpty = isEmpty;
+        
+        for (n in notes)
+        {
+            clone.addNote(n.clone(factory));
+        }
+        return clone;
+    }
+    
     public function addNote(note:Note) : Void
     {
         note.voice = this;

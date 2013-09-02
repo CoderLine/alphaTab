@@ -555,11 +555,37 @@ class AlphaTexParser extends SongReader
             voice.duration.value = _currentDuration;
         }
         
-        
+       
+        // beat multiplier (repeat beat n times)
+        var beatRepeat = 1;
+        if (_sy == AlphaTexSymbols.Multiply)
+        {
+            newSy();
+            
+            // multiplier count
+            if (_sy != AlphaTexSymbols.Number) 
+            {
+                error("multiplier", AlphaTexSymbols.Number);
+            }
+            else 
+            {
+                beatRepeat = _syData;            
+            }        
+            newSy();
+        }
         
         beatEffects(beat);
-                
-        measure.addBeat(beat);
+             
+        for (i in 0 ... beatRepeat)
+        {
+            measure.addBeat(beat);
+
+            // clone beat 
+            beat = beat.clone(factory);
+            
+            var index = measure.beats.length - 1;
+            beat.start = measure.beats[index].start + measure.beats[index].voices[0].duration.time();
+        }
     }
     
     /**
@@ -1252,6 +1278,11 @@ class AlphaTexParser extends SongReader
             else if (_ch == "|") 
             {
                 _sy = AlphaTexSymbols.Pipe;
+                nextChar();
+            }
+            else if (_ch == "*")
+            {
+                _sy = AlphaTexSymbols.Multiply;
                 nextChar();
             }
             else if (isDigit(_ch)) 

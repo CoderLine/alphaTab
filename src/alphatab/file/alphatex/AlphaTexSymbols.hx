@@ -34,4 +34,5 @@ enum AlphaTexSymbols
     RBrace;
     Pipe;
     MetaCommand;
+    Multiply;
 }

@@ -51,4 +51,12 @@ class BeatStroke
         }
         return 0;
     }
+    
+    public function clone(factory:SongFactory)
+    {
+        var clone = factory.newStroke();
+        clone.direction = direction;
+        clone.value = value;
+        return clone;
+    }
 }

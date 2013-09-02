@@ -58,5 +58,15 @@ class BeatEffect
         fadeIn = false;        
         stroke = factory.newStroke();
     }
-    
+ 
+    public function clone(factory:SongFactory) : BeatEffect
+    {
+        var clone = factory.newBeatEffect();
+        clone.tapping = tapping;
+        clone.slapping = slapping;
+        clone.popping = popping;
+        clone.fadeIn = fadeIn;        
+        clone.stroke = stroke.clone(factory);
+        return clone;
+    }
 }

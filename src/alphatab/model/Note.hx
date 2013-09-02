@@ -54,4 +54,16 @@ class Note
         effect = factory.newNoteEffect();
     }
 
+    public function clone(factory:SongFactory) : Note
+    {
+        var clone = factory.newNote();
+        clone._realValue = _realValue;
+        clone.value = value;
+        clone.velocity = velocity;
+        clone.string = string;
+        clone.isTiedNote = isTiedNote;
+        clone.swapAccidentals = swapAccidentals;
+        clone.effect = effect.clone(factory);
+        return clone;
+    }
 }

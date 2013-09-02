@@ -90,8 +90,26 @@ class Beat
         for(i in 0 ... Beat.MAX_VOICES)
         {
             var voice = factory.newVoice(i);
-            voice.beat = this;
-            this.voices.push(voice);
+            addVoice(voice);
         }
+    }
+    
+    private function addVoice(voice:Voice)
+    {
+        voice.beat = this;
+        this.voices.push(voice);
+    }
+    
+    public function clone(factory:SongFactory) : Beat
+    {
+        var clone = factory.newBeat();
+        clone.start = start;
+        clone.effect = effect.clone(factory);
+        clone.voices = new Array<Voice>();
+        for (v in voices)
+        {
+            clone.addVoice(v.clone(factory));
+        }
+        return clone;
     }
 }

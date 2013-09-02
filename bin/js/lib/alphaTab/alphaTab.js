@@ -1,8 +1,8 @@
-(function () { "use strict";
 var $estr = function() { return js.Boot.__string_rec(this,''); };
 function $extend(from, fields) {
 	function inherit() {}; inherit.prototype = from; var proto = new inherit();
 	for (var name in fields) proto[name] = fields[name];
+	if( fields.toString !== Object.prototype.toString ) proto.toString = fields.toString;
 	return proto;
 }
 var EReg = function(r,opt) {
@@ -321,12 +321,12 @@ Xml.prototype = {
 	}
 	,__class__: Xml
 }
-var alphatab = {}
+var alphatab = alphatab || {}
 alphatab.Main = function() { }
 alphatab.Main.__name__ = true;
 alphatab.Main.main = function() {
 }
-alphatab.file = {}
+if(!alphatab.file) alphatab.file = {}
 alphatab.file.FileFormatException = function(message) {
 	this.message = message;
 };
@@ -441,7 +441,7 @@ alphatab.file.SongReader.prototype = {
 	}
 	,__class__: alphatab.file.SongReader
 }
-alphatab.file.alphatex = {}
+if(!alphatab.file.alphatex) alphatab.file.alphatex = {}
 alphatab.file.alphatex.AlphaTexParser = function() {
 	alphatab.file.SongReader.call(this);
 };
@@ -520,6 +520,9 @@ alphatab.file.alphatex.AlphaTexParser.prototype = $extend(alphatab.file.SongRead
 			this.nextChar();
 		} else if(this._ch == "|") {
 			this._sy = alphatab.file.alphatex.AlphaTexSymbols.Pipe;
+			this.nextChar();
+		} else if(this._ch == "*") {
+			this._sy = alphatab.file.alphatex.AlphaTexSymbols.Multiply;
 			this.nextChar();
 		} else if(this.isDigit(this._ch)) {
 			var number = this.readNumber();
@@ -934,8 +937,21 @@ alphatab.file.alphatex.AlphaTexParser.prototype = $extend(alphatab.file.SongRead
 			if(this._syData == 1 || this._syData == 2 || this._syData == 4 || this._syData == 8 || this._syData == 16 || this._syData == 32 || this._syData == 64) voice.duration.value = this._syData; else this.error("duration",alphatab.file.alphatex.AlphaTexSymbols.Number,false);
 			this.newSy();
 		} else voice.duration.value = this._currentDuration;
+		var beatRepeat = 1;
+		if(this._sy == alphatab.file.alphatex.AlphaTexSymbols.Multiply) {
+			this.newSy();
+			if(this._sy != alphatab.file.alphatex.AlphaTexSymbols.Number) this.error("multiplier",alphatab.file.alphatex.AlphaTexSymbols.Number); else beatRepeat = this._syData;
+			this.newSy();
+		}
 		this.beatEffects(beat);
-		measure.addBeat(beat);
+		var _g = 0;
+		while(_g < beatRepeat) {
+			var i = _g++;
+			measure.addBeat(beat);
+			beat = beat.clone(this.factory);
+			var index = measure.beats.length - 1;
+			beat.start = measure.beats[index].start + measure.beats[index].voices[0].duration.time();
+		}
 	}
 	,measureMeta: function(measure) {
 		var header = measure.header;
@@ -1104,7 +1120,7 @@ alphatab.file.alphatex.AlphaTexParser.prototype = $extend(alphatab.file.SongRead
 	}
 	,__class__: alphatab.file.alphatex.AlphaTexParser
 });
-alphatab.file.alphatex.AlphaTexSymbols = { __ename__ : true, __constructs__ : ["No","Eof","Number","DoubleDot","Dot","String","Tuning","LParensis","RParensis","LBrace","RBrace","Pipe","MetaCommand"] }
+alphatab.file.alphatex.AlphaTexSymbols = { __ename__ : true, __constructs__ : ["No","Eof","Number","DoubleDot","Dot","String","Tuning","LParensis","RParensis","LBrace","RBrace","Pipe","MetaCommand","Multiply"] }
 alphatab.file.alphatex.AlphaTexSymbols.No = ["No",0];
 alphatab.file.alphatex.AlphaTexSymbols.No.toString = $estr;
 alphatab.file.alphatex.AlphaTexSymbols.No.__enum__ = alphatab.file.alphatex.AlphaTexSymbols;
@@ -1144,6 +1160,9 @@ alphatab.file.alphatex.AlphaTexSymbols.Pipe.__enum__ = alphatab.file.alphatex.Al
 alphatab.file.alphatex.AlphaTexSymbols.MetaCommand = ["MetaCommand",12];
 alphatab.file.alphatex.AlphaTexSymbols.MetaCommand.toString = $estr;
 alphatab.file.alphatex.AlphaTexSymbols.MetaCommand.__enum__ = alphatab.file.alphatex.AlphaTexSymbols;
+alphatab.file.alphatex.AlphaTexSymbols.Multiply = ["Multiply",13];
+alphatab.file.alphatex.AlphaTexSymbols.Multiply.toString = $estr;
+alphatab.file.alphatex.AlphaTexSymbols.Multiply.__enum__ = alphatab.file.alphatex.AlphaTexSymbols;
 alphatab.file.alphatex.AlphaTexWriter = function(track,voice) {
 	this._voice = voice;
 	this._track = track;
@@ -1460,7 +1479,7 @@ alphatab.file.alphatex.AlphaTexWriter.prototype = {
 	}
 	,__class__: alphatab.file.alphatex.AlphaTexWriter
 }
-alphatab.file.gpx = {}
+if(!alphatab.file.gpx) alphatab.file.gpx = {}
 alphatab.file.gpx.DocumentParser = function(factory,document) {
 	this._factory = factory;
 	this._document = document;
@@ -2063,7 +2082,7 @@ alphatab.file.gpx.GpxReader.prototype = $extend(alphatab.file.SongReader.prototy
 	}
 	,__class__: alphatab.file.gpx.GpxReader
 });
-alphatab.file.gpx.score = {}
+if(!alphatab.file.gpx.score) alphatab.file.gpx.score = {}
 alphatab.file.gpx.score.GpxAutomation = function() {
 };
 alphatab.file.gpx.score.GpxAutomation.__name__ = true;
@@ -2239,7 +2258,7 @@ alphatab.file.gpx.score.GpxVoice.__name__ = true;
 alphatab.file.gpx.score.GpxVoice.prototype = {
 	__class__: alphatab.file.gpx.score.GpxVoice
 }
-alphatab.file.guitarpro = {}
+if(!alphatab.file.guitarpro) alphatab.file.guitarpro = {}
 alphatab.file.guitarpro.GpReaderBase = function() {
 	alphatab.file.SongReader.call(this);
 };
@@ -3473,7 +3492,7 @@ alphatab.file.guitarpro.Gp5Reader.prototype = $extend(alphatab.file.guitarpro.Gp
 	}
 	,__class__: alphatab.file.guitarpro.Gp5Reader
 });
-alphatab.file.musicxml = {}
+if(!alphatab.file.musicxml) alphatab.file.musicxml = {}
 alphatab.file.musicxml.MusicXmlReader = function() {
 	alphatab.file.SongReader.call(this);
 };
@@ -3726,7 +3745,7 @@ alphatab.file.musicxml.MusicXmlReader.prototype = $extend(alphatab.file.SongRead
 	}
 	,__class__: alphatab.file.musicxml.MusicXmlReader
 });
-alphatab.io = {}
+if(!alphatab.io) alphatab.io = {}
 alphatab.io.InputStream = function() { }
 alphatab.io.InputStream.__name__ = true;
 alphatab.io.InputStream.prototype = {
@@ -4068,7 +4087,7 @@ alphatab.io.StringOutputStream.prototype = $extend(alphatab.io.OutputStream.prot
 	}
 	,__class__: alphatab.io.StringOutputStream
 });
-alphatab.midi = {}
+if(!alphatab.midi) alphatab.midi = {}
 alphatab.midi.BeatData = function(start,duration) {
 	this.start = start;
 	this.duration = duration;
@@ -5111,7 +5130,7 @@ alphatab.midi.MidiSequenceParser.prototype = {
 }
 alphatab.midi.MidiSequenceParserFlags = function() { }
 alphatab.midi.MidiSequenceParserFlags.__name__ = true;
-alphatab.midi.model = {}
+if(!alphatab.midi.model) alphatab.midi.model = {}
 alphatab.midi.model.MidiEvent = function(tick,message) {
 	this.tick = tick;
 	this.message = message;
@@ -5252,7 +5271,7 @@ alphatab.midi.model.MidiTrack.prototype = {
 	}
 	,__class__: alphatab.midi.model.MidiTrack
 }
-alphatab.model = {}
+if(!alphatab.model) alphatab.model = {}
 alphatab.model.Beat = function(factory) {
 	this.start = alphatab.model.Duration.QUARTER_TIME;
 	this.effect = factory.newBeatEffect();
@@ -5261,13 +5280,29 @@ alphatab.model.Beat = function(factory) {
 	while(_g < 2) {
 		var i = _g++;
 		var voice = factory.newVoice(i);
-		voice.beat = this;
-		this.voices.push(voice);
+		this.addVoice(voice);
 	}
 };
 alphatab.model.Beat.__name__ = true;
 alphatab.model.Beat.prototype = {
-	getNotes: function() {
+	clone: function(factory) {
+		var clone = factory.newBeat();
+		clone.start = this.start;
+		clone.effect = this.effect.clone(factory);
+		clone.voices = new Array();
+		var _g = 0, _g1 = this.voices;
+		while(_g < _g1.length) {
+			var v = _g1[_g];
+			++_g;
+			clone.addVoice(v.clone(factory));
+		}
+		return clone;
+	}
+	,addVoice: function(voice) {
+		voice.beat = this;
+		this.voices.push(voice);
+	}
+	,getNotes: function() {
 		var notes = new Array();
 		var _g = 0, _g1 = this.voices;
 		while(_g < _g1.length) {
@@ -5321,7 +5356,16 @@ alphatab.model.BeatEffect = function(factory) {
 };
 alphatab.model.BeatEffect.__name__ = true;
 alphatab.model.BeatEffect.prototype = {
-	isTremoloBar: function() {
+	clone: function(factory) {
+		var clone = factory.newBeatEffect();
+		clone.tapping = this.tapping;
+		clone.slapping = this.slapping;
+		clone.popping = this.popping;
+		clone.fadeIn = this.fadeIn;
+		clone.stroke = this.stroke.clone(factory);
+		return clone;
+	}
+	,isTremoloBar: function() {
 		return this.tremoloBar != null;
 	}
 	,isChord: function() {
@@ -5334,7 +5378,13 @@ alphatab.model.BeatStroke = function() {
 };
 alphatab.model.BeatStroke.__name__ = true;
 alphatab.model.BeatStroke.prototype = {
-	getIncrementTime: function(beat) {
+	clone: function(factory) {
+		var clone = factory.newStroke();
+		clone.direction = this.direction;
+		clone.value = this.value;
+		return clone;
+	}
+	,getIncrementTime: function(beat) {
 		var duration = 0;
 		if(this.value > 0) {
 			var _g1 = 0, _g = beat.voices.length;
@@ -5677,7 +5727,18 @@ alphatab.model.Note = function(factory) {
 };
 alphatab.model.Note.__name__ = true;
 alphatab.model.Note.prototype = {
-	realValue: function() {
+	clone: function(factory) {
+		var clone = factory.newNote();
+		clone._realValue = this._realValue;
+		clone.value = this.value;
+		clone.velocity = this.velocity;
+		clone.string = this.string;
+		clone.isTiedNote = this.isTiedNote;
+		clone.swapAccidentals = this.swapAccidentals;
+		clone.effect = this.effect.clone(factory);
+		return clone;
+	}
+	,realValue: function() {
 		if(this._realValue == -1) this._realValue = this.value + this.voice.beat.measure.track.strings[this.string - 1].value;
 		return this._realValue;
 	}
@@ -6374,6 +6435,20 @@ alphatab.model.Voice.prototype = {
 		this.notes.push(note);
 		this.isEmpty = false;
 	}
+	,clone: function(factory) {
+		var clone = factory.newVoice(this.index);
+		clone.duration = this.duration.clone(factory);
+		clone.index = this.index;
+		clone.direction = this.direction;
+		clone.isEmpty = this.isEmpty;
+		var _g = 0, _g1 = this.notes;
+		while(_g < _g1.length) {
+			var n = _g1[_g];
+			++_g;
+			clone.addNote(n.clone(factory));
+		}
+		return clone;
+	}
 	,isRestVoice: function() {
 		return this.notes.length == 0;
 	}
@@ -6381,7 +6456,7 @@ alphatab.model.Voice.prototype = {
 }
 alphatab.model.VoiceDirection = function() { }
 alphatab.model.VoiceDirection.__name__ = true;
-alphatab.model.effects = {}
+if(!alphatab.model.effects) alphatab.model.effects = {}
 alphatab.model.effects.BendEffect = function() {
 	this.type = 0;
 	this.value = 0;
@@ -6494,7 +6569,7 @@ alphatab.model.effects.TrillEffect.prototype = {
 	}
 	,__class__: alphatab.model.effects.TrillEffect
 }
-alphatab.platform = {}
+if(!alphatab.platform) alphatab.platform = {}
 alphatab.platform.Canvas = function() { }
 alphatab.platform.Canvas.__name__ = true;
 alphatab.platform.Canvas.prototype = {
@@ -6513,7 +6588,7 @@ alphatab.platform.PlatformFactory.getCanvas = function(object) {
 alphatab.platform.PlatformFactory.getLoader = function() {
 	return new alphatab.platform.js.JsFileLoader();
 }
-alphatab.platform.js = {}
+if(!alphatab.platform.js) alphatab.platform.js = {}
 alphatab.platform.js.Html5Canvas = function(dom) {
 	this._canvas = dom;
 	this._context = dom.getContext("2d");
@@ -6679,7 +6754,7 @@ alphatab.platform.js.JsFileLoader.prototype = {
 	}
 	,__class__: alphatab.platform.js.JsFileLoader
 }
-alphatab.platform.svg = {}
+if(!alphatab.platform.svg) alphatab.platform.svg = {}
 alphatab.platform.svg.FontSizes = function() { }
 alphatab.platform.svg.FontSizes.__name__ = true;
 alphatab.platform.svg.FontSizes.measureString = function(s,f,size) {
@@ -7052,7 +7127,7 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 	}
 	,__class__: alphatab.platform.svg.SvgCanvas
 }
-alphatab.tablature = {}
+if(!alphatab.tablature) alphatab.tablature = {}
 alphatab.tablature.ViewLayout = function() {
 	this.init(1);
 	this.contentPadding = new alphatab.model.Padding(0,0,0,0);
@@ -7662,7 +7737,7 @@ alphatab.tablature.Tablature.prototype = {
 	}
 	,__class__: alphatab.tablature.Tablature
 }
-alphatab.tablature.drawing = {}
+if(!alphatab.tablature.drawing) alphatab.tablature.drawing = {}
 alphatab.tablature.drawing.ClefPainter = function() { }
 alphatab.tablature.drawing.ClefPainter.__name__ = true;
 alphatab.tablature.drawing.ClefPainter.paintAlto = function(context,x,y,layout) {
@@ -8226,7 +8301,7 @@ alphatab.tablature.drawing.TripletFeelPainter.paintTripletFeelNone8 = function(c
 	var layer = context.get(3);
 	layer.addMusicSymbol(alphatab.tablature.drawing.MusicFont.TripletFeelNone8,x,y,scale);
 }
-alphatab.tablature.model = {}
+if(!alphatab.tablature.model) alphatab.tablature.model = {}
 alphatab.tablature.model.BeatDrawing = function(factory) {
 	alphatab.model.Beat.call(this,factory);
 	this.effectsCache = new alphatab.tablature.model.EffectsCache();
@@ -8991,7 +9066,7 @@ alphatab.tablature.model.VoiceDrawing.prototype = $extend(alphatab.model.Voice.p
 	}
 	,__class__: alphatab.tablature.model.VoiceDrawing
 });
-alphatab.tablature.staves = {}
+if(!alphatab.tablature.staves) alphatab.tablature.staves = {}
 alphatab.tablature.staves.Stave = function(line,layout) {
 	this.index = 0;
 	this.line = line;
@@ -10438,8 +10513,8 @@ alphatab.tablature.staves.TablatureStave.prototype = $extend(alphatab.tablature.
 	}
 	,__class__: alphatab.tablature.staves.TablatureStave
 });
-var haxe = {}
-haxe.ds = {}
+var haxe = haxe || {}
+if(!haxe.ds) haxe.ds = {}
 haxe.ds.StringMap = function() {
 	this.h = { };
 };
@@ -10457,8 +10532,8 @@ haxe.ds.StringMap.prototype = {
 	}
 	,__class__: haxe.ds.StringMap
 }
-haxe.xml = {}
-haxe.xml._Fast = {}
+if(!haxe.xml) haxe.xml = {}
+if(!haxe.xml._Fast) haxe.xml._Fast = {}
 haxe.xml._Fast.NodeAccess = function(x) {
 	this.__x = x;
 };
@@ -10808,7 +10883,7 @@ haxe.xml.Parser.doParse = function(str,p,parent) {
 	}
 	throw "Unexpected end";
 }
-var js = {}
+var js = js || {}
 js.Boot = function() { }
 js.Boot.__name__ = true;
 js.Boot.__string_rec = function(o,s) {
@@ -10914,8 +10989,8 @@ js.Boot.__instanceof = function(o,cl) {
 				if(js.Boot.__interfLoop(o.__class__,cl)) return true;
 			}
 		} else return false;
-		if(cl == Class && o.__name__ != null) return true; else null;
-		if(cl == Enum && o.__ename__ != null) return true; else null;
+		if(cl == Class && o.__name__ != null) return true;
+		if(cl == Enum && o.__ename__ != null) return true;
 		return o.__enum__ == cl;
 	}
 }
@@ -10924,13 +10999,13 @@ js.Boot.__cast = function(o,t) {
 }
 function $iterator(o) { if( o instanceof Array ) return function() { return HxOverrides.iter(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; };
 var $_, $fid = 0;
-function $bind(o,m) { if( m.__id__ == null ) m.__id__ = $fid++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; };
+function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; };
 if(Array.prototype.indexOf) HxOverrides.remove = function(a,o) {
 	var i = a.indexOf(o);
 	if(i == -1) return false;
 	a.splice(i,1);
 	return true;
-}; else null;
+};
 Math.__name__ = ["Math"];
 Math.NaN = Number.NaN;
 Math.NEGATIVE_INFINITY = Number.NEGATIVE_INFINITY;
@@ -11241,4 +11316,3 @@ haxe.xml.Parser.escapes = (function($this) {
 	return $r;
 }(this));
 alphatab.Main.main();
-})();
