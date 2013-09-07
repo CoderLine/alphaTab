@@ -437,7 +437,30 @@ class AlphaTexImporter extends ScoreImporter
 			beat.duration = _currentDuration;
         }
         
+        // beat multiplier (repeat beat n times)
+        var beatRepeat = 1;
+        if (_sy == AlphaTexSymbols.Multiply)
+        {
+            newSy();
+            
+            // multiplier count
+            if (_sy != AlphaTexSymbols.Number) 
+            {
+                error("multiplier", AlphaTexSymbols.Number);
+            }
+            else 
+            {
+                beatRepeat = _syData;            
+            }        
+            newSy();
+        }        
+        
         beatEffects(beat);
+        
+        for (i in 0 ... beatRepeat - 1)
+        {
+            voice.addBeat(beat.clone());
+        }
     }
 
 	    /**
@@ -1176,6 +1199,11 @@ class AlphaTexImporter extends ScoreImporter
             else if (_ch == "|") 
             {
                 _sy = AlphaTexSymbols.Pipe;
+                nextChar();
+            }
+            else if (_ch == "*") 
+            {
+                _sy = AlphaTexSymbols.Multiply;
                 nextChar();
             }
             else if (isDigit(_ch)) 

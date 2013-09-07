@@ -64,6 +64,7 @@ class AccidentalHelper
         
         // if there is already an accidental registered, we check if we 
         // have a new accidental
+        var updateAccidental = true;
         if (_registeredAccidentals.exists(noteLine))
         {
             var registeredAccidental = _registeredAccidentals.get(noteLine);
@@ -73,6 +74,7 @@ class AccidentalHelper
             {
                  // we set the accidental to none, as the accidental is already set by a previous note
                 accidentalToSet = AccidentalType.None;
+                updateAccidental = false;
             }
             // check if we need naturalizing
             else if (accidentalToSet == None)
@@ -81,13 +83,16 @@ class AccidentalHelper
             }
         }
         
-        if (accidentalToSet == None || accidentalToSet == Natural)
+        if (updateAccidental)
         {
-            _registeredAccidentals.remove(noteLine);
-        }
-        else
-        {
-            _registeredAccidentals.set(noteLine, accidentalToSet); 
+            if ((accidentalToSet == None || accidentalToSet == Natural))
+            {
+                _registeredAccidentals.remove(noteLine);
+            }
+            else
+            {
+                _registeredAccidentals.set(noteLine, accidentalToSet); 
+            }
         }
         
         return accidentalToSet;

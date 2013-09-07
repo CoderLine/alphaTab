@@ -28,7 +28,15 @@ class Automation
     
     public function new() 
     {
-        
     }
     
+    public function clone() : Automation
+    {
+        var a = new Automation();
+        a.isLinear = isLinear;
+        a.type = type;
+        a.value = value;
+        a.duration = duration;
+        return a;
+    }
 }

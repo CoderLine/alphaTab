@@ -125,6 +125,42 @@ class Note
         durationPercent = 1;
     }
     
+    public function clone() : Note
+    {
+        var n = new Note();
+        for (p in bendPoints)
+        {
+            n.bendPoints.push(p.clone());
+        }
+        n.trillFret = trillFret;
+        n.dynamicValue = dynamicValue;
+        n.accentuated = accentuated;
+        n.fret = fret;
+        n.isGhost = isGhost;
+        n.string = string;
+        n.isHammerPullDestination = isHammerPullDestination;
+        n.isHammerPullOrigin = isHammerPullOrigin;
+        n.harmonicValue = harmonicValue;
+        n.harmonicType = harmonicType;
+        n.isLetRing = isLetRing;
+        n.isPalmMute = isPalmMute;
+        n.isDead = isDead;
+        n.slideType = slideType;
+        n.vibrato = vibrato;
+        n.isStaccato = isStaccato;
+        n.isTieOrigin = isTieOrigin;
+        n.isTieDestination = isTieDestination;
+        n.leftHandFinger = leftHandFinger;
+        n.rightHandFinger = rightHandFinger;
+        n.isFingering = n.isFingering;
+        n.swapAccidentals = swapAccidentals;
+        n.trillFret = trillFret;
+        n.trillSpeed = trillSpeed;
+        n.durationPercent = durationPercent;        
+        
+        return n;
+    }
+    
     public function realValue() : Int
     {
         return fret + beat.voice.bar.track.tuning[beat.voice.bar.track.tuning.length - (string - 1) - 1];

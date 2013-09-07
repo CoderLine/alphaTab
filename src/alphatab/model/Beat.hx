@@ -97,6 +97,36 @@ class Beat
         start = 0;        
         tupletDenominator = -1;
         tupletNumerator = -1;
+        dynamicValue = DynamicValue.F;
+    }
+    
+    public function clone() : Beat
+    {
+        var beat = new Beat();
+        for (b in whammyBarPoints)
+        {
+            beat.whammyBarPoints.push(b.clone());
+        }
+        for (n in notes)
+        {
+            beat.addNote(n.clone());
+        }
+        beat.brushType = brushType;
+        beat.vibrato = vibrato;
+        beat.graceType = graceType;
+        beat.pickStroke = pickStroke;
+        beat.duration = duration;
+        beat.tremoloSpeed = tremoloSpeed;
+        for (a in automations)
+        {
+            beat.automations.push(a.clone());
+        }
+        beat.start = start;
+        beat.tupletDenominator = tupletDenominator;
+        beat.tupletNumerator = tupletNumerator;       
+        beat.dynamicValue = dynamicValue;       
+        
+        return beat;    
     }
     
     public inline function hasTuplet()

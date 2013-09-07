@@ -1989,6 +1989,9 @@ alphatab.importer.AlphaTexImporter.prototype = $extend(alphatab.importer.ScoreIm
 		} else if(this._ch == "|") {
 			this._sy = alphatab.importer.AlphaTexSymbols.Pipe;
 			this.nextChar();
+		} else if(this._ch == "*") {
+			this._sy = alphatab.importer.AlphaTexSymbols.Multiply;
+			this.nextChar();
 		} else if(this.isDigit(this._ch)) {
 			var number = this.readNumber();
 			this._sy = alphatab.importer.AlphaTexSymbols.Number;
@@ -2412,7 +2415,18 @@ alphatab.importer.AlphaTexImporter.prototype = $extend(alphatab.importer.ScoreIm
 			if(this._syData == 1 || this._syData == 2 || this._syData == 4 || this._syData == 8 || this._syData == 16 || this._syData == 32 || this._syData == 64) beat.duration = this.parseDuration(this._syData); else this.error("duration",alphatab.importer.AlphaTexSymbols.Number,false);
 			this.newSy();
 		} else beat.duration = this._currentDuration;
+		var beatRepeat = 1;
+		if(this._sy == alphatab.importer.AlphaTexSymbols.Multiply) {
+			this.newSy();
+			if(this._sy != alphatab.importer.AlphaTexSymbols.Number) this.error("multiplier",alphatab.importer.AlphaTexSymbols.Number); else beatRepeat = this._syData;
+			this.newSy();
+		}
 		this.beatEffects(beat);
+		var _g1 = 0, _g = beatRepeat - 1;
+		while(_g1 < _g) {
+			var i = _g1++;
+			voice.addBeat(beat.clone());
+		}
 	}
 	,bar: function() {
 		var master = new alphatab.model.MasterBar();
@@ -2537,7 +2551,7 @@ alphatab.importer.AlphaTexImporter.prototype = $extend(alphatab.importer.ScoreIm
 	}
 	,__class__: alphatab.importer.AlphaTexImporter
 });
-alphatab.importer.AlphaTexSymbols = { __ename__ : true, __constructs__ : ["No","Eof","Number","DoubleDot","Dot","String","Tuning","LParensis","RParensis","LBrace","RBrace","Pipe","MetaCommand"] }
+alphatab.importer.AlphaTexSymbols = { __ename__ : true, __constructs__ : ["No","Eof","Number","DoubleDot","Dot","String","Tuning","LParensis","RParensis","LBrace","RBrace","Pipe","MetaCommand","Multiply"] }
 alphatab.importer.AlphaTexSymbols.No = ["No",0];
 alphatab.importer.AlphaTexSymbols.No.toString = $estr;
 alphatab.importer.AlphaTexSymbols.No.__enum__ = alphatab.importer.AlphaTexSymbols;
@@ -2577,6 +2591,9 @@ alphatab.importer.AlphaTexSymbols.Pipe.__enum__ = alphatab.importer.AlphaTexSymb
 alphatab.importer.AlphaTexSymbols.MetaCommand = ["MetaCommand",12];
 alphatab.importer.AlphaTexSymbols.MetaCommand.toString = $estr;
 alphatab.importer.AlphaTexSymbols.MetaCommand.__enum__ = alphatab.importer.AlphaTexSymbols;
+alphatab.importer.AlphaTexSymbols.Multiply = ["Multiply",13];
+alphatab.importer.AlphaTexSymbols.Multiply.toString = $estr;
+alphatab.importer.AlphaTexSymbols.Multiply.__enum__ = alphatab.importer.AlphaTexSymbols;
 alphatab.importer.Gp3To5Importer = function() {
 	alphatab.importer.ScoreImporter.call(this);
 	this._globalTripletFeel = alphatab.model.TripletFeel.NoTripletFeel;
@@ -3900,7 +3917,15 @@ alphatab.model.Automation = function() {
 };
 alphatab.model.Automation.__name__ = true;
 alphatab.model.Automation.prototype = {
-	__class__: alphatab.model.Automation
+	clone: function() {
+		var a = new alphatab.model.Automation();
+		a.isLinear = this.isLinear;
+		a.type = this.type;
+		a.value = this.value;
+		a.duration = this.duration;
+		return a;
+	}
+	,__class__: alphatab.model.Automation
 }
 alphatab.model.AutomationType = { __ename__ : true, __constructs__ : ["Tempo","Volume","Instrument","Balance"] }
 alphatab.model.AutomationType.Tempo = ["Tempo",0];
@@ -3953,6 +3978,7 @@ alphatab.model.Beat = function() {
 	this.start = 0;
 	this.tupletDenominator = -1;
 	this.tupletNumerator = -1;
+	this.dynamicValue = alphatab.model.DynamicValue.F;
 };
 alphatab.model.Beat.__name__ = true;
 alphatab.model.Beat.prototype = {
@@ -3989,6 +4015,38 @@ alphatab.model.Beat.prototype = {
 	,hasTuplet: function() {
 		return !(this.tupletDenominator == -1 && this.tupletNumerator == -1) && !(this.tupletDenominator == 1 && this.tupletNumerator == 1);
 	}
+	,clone: function() {
+		var beat = new alphatab.model.Beat();
+		var _g = 0, _g1 = this.whammyBarPoints;
+		while(_g < _g1.length) {
+			var b = _g1[_g];
+			++_g;
+			beat.whammyBarPoints.push(b.clone());
+		}
+		var _g = 0, _g1 = this.notes;
+		while(_g < _g1.length) {
+			var n = _g1[_g];
+			++_g;
+			beat.addNote(n.clone());
+		}
+		beat.brushType = this.brushType;
+		beat.vibrato = this.vibrato;
+		beat.graceType = this.graceType;
+		beat.pickStroke = this.pickStroke;
+		beat.duration = this.duration;
+		beat.tremoloSpeed = this.tremoloSpeed;
+		var _g = 0, _g1 = this.automations;
+		while(_g < _g1.length) {
+			var a = _g1[_g];
+			++_g;
+			beat.automations.push(a.clone());
+		}
+		beat.start = this.start;
+		beat.tupletDenominator = this.tupletDenominator;
+		beat.tupletNumerator = this.tupletNumerator;
+		beat.dynamicValue = this.dynamicValue;
+		return beat;
+	}
 	,isTremolo: function() {
 		return this.tremoloSpeed != null;
 	}
@@ -4011,7 +4069,13 @@ alphatab.model.BendPoint = function(offset,value) {
 };
 alphatab.model.BendPoint.__name__ = true;
 alphatab.model.BendPoint.prototype = {
-	__class__: alphatab.model.BendPoint
+	clone: function() {
+		var point = new alphatab.model.BendPoint();
+		point.offset = this.offset;
+		point.value = this.value;
+		return point;
+	}
+	,__class__: alphatab.model.BendPoint
 }
 alphatab.model.BrushType = { __ename__ : true, __constructs__ : ["None","BrushUp","BrushDown","ArpeggioUp","ArpeggioDown"] }
 alphatab.model.BrushType.None = ["None",0];
@@ -4233,6 +4297,41 @@ alphatab.model.Note.__name__ = true;
 alphatab.model.Note.prototype = {
 	realValue: function() {
 		return this.fret + this.beat.voice.bar.track.tuning[this.beat.voice.bar.track.tuning.length - (this.string - 1) - 1];
+	}
+	,clone: function() {
+		var n = new alphatab.model.Note();
+		var _g = 0, _g1 = this.bendPoints;
+		while(_g < _g1.length) {
+			var p = _g1[_g];
+			++_g;
+			n.bendPoints.push(p.clone());
+		}
+		n.trillFret = this.trillFret;
+		n.dynamicValue = this.dynamicValue;
+		n.accentuated = this.accentuated;
+		n.fret = this.fret;
+		n.isGhost = this.isGhost;
+		n.string = this.string;
+		n.isHammerPullDestination = this.isHammerPullDestination;
+		n.isHammerPullOrigin = this.isHammerPullOrigin;
+		n.harmonicValue = this.harmonicValue;
+		n.harmonicType = this.harmonicType;
+		n.isLetRing = this.isLetRing;
+		n.isPalmMute = this.isPalmMute;
+		n.isDead = this.isDead;
+		n.slideType = this.slideType;
+		n.vibrato = this.vibrato;
+		n.isStaccato = this.isStaccato;
+		n.isTieOrigin = this.isTieOrigin;
+		n.isTieDestination = this.isTieDestination;
+		n.leftHandFinger = this.leftHandFinger;
+		n.rightHandFinger = this.rightHandFinger;
+		n.isFingering = n.isFingering;
+		n.swapAccidentals = this.swapAccidentals;
+		n.trillFret = this.trillFret;
+		n.trillSpeed = this.trillSpeed;
+		n.durationPercent = this.durationPercent;
+		return n;
 	}
 	,isTrill: function() {
 		return this.trillFret >= 0;
@@ -7467,6 +7566,7 @@ alphatab.rendering.glyphs.TabClefGlyph.prototype = $extend(alphatab.rendering.Gl
 		var startY = cy + this.y + 10 * this.renderer.stave.staveGroup.layout.renderer.scale * 0.6;
 		var endY = cy + this.y + tabBarRenderer.getTabY(track.tuning.length,-2);
 		var fontScale = 1;
+		var correction = 0;
 		switch(track.tuning.length) {
 		case 4:
 			fontScale = 0.6;
@@ -7476,9 +7576,13 @@ alphatab.rendering.glyphs.TabClefGlyph.prototype = $extend(alphatab.rendering.Gl
 			break;
 		case 6:
 			fontScale = 1.1;
+			correction = 3;
 			break;
 		case 7:
 			fontScale = 1.15;
+			break;
+		case 8:
+			fontScale = 1.35;
 			break;
 		}
 		var font = res.tabClefFont.clone();
@@ -7487,8 +7591,8 @@ alphatab.rendering.glyphs.TabClefGlyph.prototype = $extend(alphatab.rendering.Gl
 		canvas.setFont(font);
 		canvas.setTextAlign(alphatab.platform.model.TextAlign.Center);
 		canvas.fillText("T",cx + this.x + (this.width / 2 | 0),startY);
-		canvas.fillText("A",cx + this.x + (this.width / 2 | 0),startY + font.getSize());
-		canvas.fillText("B",cx + this.x + (this.width / 2 | 0),startY + font.getSize() * 2);
+		canvas.fillText("A",cx + this.x + (this.width / 2 | 0),startY + font.getSize() - (correction * this.renderer.stave.staveGroup.layout.renderer.scale | 0));
+		canvas.fillText("B",cx + this.x + (this.width / 2 | 0),startY + (font.getSize() - (correction * this.renderer.stave.staveGroup.layout.renderer.scale | 0)) * 2);
 	}
 	,canScale: function() {
 		return false;
@@ -8419,11 +8523,17 @@ alphatab.rendering.utils.AccidentalHelper.prototype = {
 		var index = noteValue % 12;
 		var octave = noteValue / 12 | 0;
 		var accidentalToSet = alphatab.rendering.utils.AccidentalHelper.ACCIDENTAL_NOTES[ksi][index];
+		var updateAccidental = true;
 		if(this._registeredAccidentals.exists(noteLine)) {
 			var registeredAccidental = this._registeredAccidentals.get(noteLine);
-			if(registeredAccidental == accidentalToSet) accidentalToSet = alphatab.model.AccidentalType.None; else if(accidentalToSet == alphatab.model.AccidentalType.None) accidentalToSet = alphatab.model.AccidentalType.Natural;
+			if(registeredAccidental == accidentalToSet) {
+				accidentalToSet = alphatab.model.AccidentalType.None;
+				updateAccidental = false;
+			} else if(accidentalToSet == alphatab.model.AccidentalType.None) accidentalToSet = alphatab.model.AccidentalType.Natural;
 		}
-		if(accidentalToSet == alphatab.model.AccidentalType.None || accidentalToSet == alphatab.model.AccidentalType.Natural) this._registeredAccidentals.remove(noteLine); else this._registeredAccidentals.set(noteLine,accidentalToSet);
+		if(updateAccidental) {
+			if(accidentalToSet == alphatab.model.AccidentalType.None || accidentalToSet == alphatab.model.AccidentalType.Natural) this._registeredAccidentals.remove(noteLine); else this._registeredAccidentals.set(noteLine,accidentalToSet);
+		}
 		return accidentalToSet;
 	}
 	,__class__: alphatab.rendering.utils.AccidentalHelper

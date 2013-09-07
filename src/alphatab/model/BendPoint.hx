@@ -34,4 +34,12 @@ class BendPoint
 		this.value = value;
     }
     
+    public function clone() : BendPoint
+    {
+        var point = new BendPoint();
+        point.offset = offset;
+        point.value = value;
+        return point;
+    }
+    
 }
