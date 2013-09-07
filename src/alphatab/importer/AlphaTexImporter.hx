@@ -45,7 +45,7 @@ import haxe.io.Error;
 
 class AlphaTexImporter extends ScoreImporter
 {
-	private static var EOL:String = String.fromCharCode(0);
+	private static var EOF:String = String.fromCharCode(0);
     private static var TRACK_CHANNELS:Array<Int> = [0, 1];
     
     private var _score:Score; 
@@ -1051,7 +1051,7 @@ class AlphaTexImporter extends ScoreImporter
 		}
 		catch (e:Eof)
 		{
-			_ch = EOL;
+			_ch = EOF;
 		}
     }
 
@@ -1064,7 +1064,7 @@ class AlphaTexImporter extends ScoreImporter
         _sy = AlphaTexSymbols.No;
         do 
         {
-            if (_ch == EOL) 
+            if (_ch == EOF) 
             {
                 _sy = AlphaTexSymbols.Eof;
             }
@@ -1073,12 +1073,48 @@ class AlphaTexImporter extends ScoreImporter
                 // skip whitespaces 
                 nextChar();
             }
+            else if (_ch == "/")
+            {
+                nextChar();
+                if (_ch == "/")
+                {
+                    // single line comment
+                    while (_ch != "\r" && _ch != "\n" && _ch != EOF)
+                    {
+                        nextChar();
+                    }
+                }
+                else if (_ch == "*")
+                {
+                    // multiline comment
+                    while (_ch != EOF)
+                    {
+                        if (_ch == "*") // possible end
+                        {
+                            nextChar();
+                            if (_ch == "/") 
+                            {
+                                nextChar();
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            nextChar();
+                        }
+                    }
+                }
+                else
+                {
+                    error("symbol", AlphaTexSymbols.String, false);
+                }
+            }            
             else if (_ch == '"' || _ch == "'") 
             {
                 nextChar();
                 _syData = "";
                 _sy = AlphaTexSymbols.String;
-                while(_ch != '"' && _ch != "'" && _ch != EOL) 
+                while(_ch != '"' && _ch != "'" && _ch != EOF) 
                 {
                     _syData += _ch;
                     nextChar();

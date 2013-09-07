@@ -2,6 +2,7 @@ var $estr = function() { return js.Boot.__string_rec(this,''); };
 function $extend(from, fields) {
 	function inherit() {}; inherit.prototype = from; var proto = new inherit();
 	for (var name in fields) proto[name] = fields[name];
+	if( fields.toString !== Object.prototype.toString ) proto.toString = fields.toString;
 	return proto;
 }
 var EReg = function(r,opt) {
@@ -1935,11 +1936,20 @@ alphatab.importer.AlphaTexImporter.prototype = $extend(alphatab.importer.ScoreIm
 	}
 	,newSy: function() {
 		this._sy = alphatab.importer.AlphaTexSymbols.No;
-		do if(this._ch == alphatab.importer.AlphaTexImporter.EOL) this._sy = alphatab.importer.AlphaTexSymbols.Eof; else if(this._ch == " " || this._ch == "\n" || this._ch == "\r" || this._ch == "\t") this.nextChar(); else if(this._ch == "\"" || this._ch == "'") {
+		do if(this._ch == alphatab.importer.AlphaTexImporter.EOF) this._sy = alphatab.importer.AlphaTexSymbols.Eof; else if(this._ch == " " || this._ch == "\n" || this._ch == "\r" || this._ch == "\t") this.nextChar(); else if(this._ch == "/") {
+			this.nextChar();
+			if(this._ch == "/") while(this._ch != "\r" && this._ch != "\n" && this._ch != alphatab.importer.AlphaTexImporter.EOF) this.nextChar(); else if(this._ch == "*") while(this._ch != alphatab.importer.AlphaTexImporter.EOF) if(this._ch == "*") {
+				this.nextChar();
+				if(this._ch == "/") {
+					this.nextChar();
+					break;
+				}
+			} else this.nextChar(); else this.error("symbol",alphatab.importer.AlphaTexSymbols.String,false);
+		} else if(this._ch == "\"" || this._ch == "'") {
 			this.nextChar();
 			this._syData = "";
 			this._sy = alphatab.importer.AlphaTexSymbols.String;
-			while(this._ch != "\"" && this._ch != "'" && this._ch != alphatab.importer.AlphaTexImporter.EOL) {
+			while(this._ch != "\"" && this._ch != "'" && this._ch != alphatab.importer.AlphaTexImporter.EOF) {
 				this._syData += this._ch;
 				this.nextChar();
 			}
@@ -2000,7 +2010,7 @@ alphatab.importer.AlphaTexImporter.prototype = $extend(alphatab.importer.ScoreIm
 			this._curChPos++;
 		} catch( e ) {
 			if( js.Boot.__instanceof(e,haxe.io.Eof) ) {
-				this._ch = alphatab.importer.AlphaTexImporter.EOL;
+				this._ch = alphatab.importer.AlphaTexImporter.EOF;
 			} else throw(e);
 		}
 	}
@@ -9241,8 +9251,8 @@ js.Boot.__instanceof = function(o,cl) {
 				if(js.Boot.__interfLoop(o.__class__,cl)) return true;
 			}
 		} else return false;
-		if(cl == Class && o.__name__ != null) return true; else null;
-		if(cl == Enum && o.__ename__ != null) return true; else null;
+		if(cl == Class && o.__name__ != null) return true;
+		if(cl == Enum && o.__ename__ != null) return true;
 		return o.__enum__ == cl;
 	}
 }
@@ -9254,7 +9264,7 @@ if(Array.prototype.indexOf) HxOverrides.remove = function(a,o) {
 	if(i == -1) return false;
 	a.splice(i,1);
 	return true;
-}; else null;
+};
 Math.__name__ = ["Math"];
 Math.NaN = Number.NaN;
 Math.NEGATIVE_INFINITY = Number.NEGATIVE_INFINITY;
@@ -9371,7 +9381,7 @@ alphatab.rendering.layout.HorizontalScreenLayout.PAGE_PADDING = [20,20,20,20];
 alphatab.rendering.layout.HorizontalScreenLayout.GroupSpacing = 20;
 alphatab.audio.MidiUtils.QUARTER_TIME = 960;
 alphatab.importer.ScoreImporter.UNSUPPORTED_FORMAT = "unsupported file";
-alphatab.importer.AlphaTexImporter.EOL = String.fromCharCode(0);
+alphatab.importer.AlphaTexImporter.EOF = String.fromCharCode(0);
 alphatab.importer.AlphaTexImporter.TRACK_CHANNELS = [0,1];
 alphatab.importer.Gp3To5Importer.VERSION_STRING = "FICHIER GUITAR PRO ";
 alphatab.importer.Gp3To5Importer.BEND_STEP = 25;
