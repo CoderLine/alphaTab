@@ -26,7 +26,7 @@ import haxe.ds.StringMap.StringMap;
 import haxe.xml.Fast;
 
 class GpxRhythm
-{
+{    
     public var dots:Int;
     public var tupletDenominator:Int;
     public var tupletNumerator:Int;
@@ -45,8 +45,10 @@ class GpxRhythm
  */
 class GpxParser 
 {
+    private static inline var InvalidId = "-1";
+
 	public var score:Score;
-    private var _automations:IntMap<Array<Automation>>;
+    private var _automations:StringMap<Array<Automation>>;
     private var _tracksMapping:Array<String>;
     private var _tracksById:StringMap<Track>; // contains tracks by their id
     
@@ -74,7 +76,7 @@ class GpxParser
 	
 	public function parseXml(xml:String)
 	{
-        _automations = new IntMap<Array<Automation>>();
+        _automations = new StringMap<Array<Automation>>();
         _tracksMapping = new Array<String>();
         _tracksById = new StringMap<Track>(); 
         _masterBars = new Array<MasterBar>(); 
@@ -150,7 +152,12 @@ class GpxParser
     {
         if (n.nodeType == Xml.Element || n.nodeType == Xml.Document)
         {
-            return getValue(n.firstChild());
+            var txt = new StringBuf();
+            for (c in n)
+            {
+                txt.add(getValue(c));
+            }
+            return StringTools.trim(txt.toString());
         }
         else
         {
@@ -205,11 +212,14 @@ class GpxParser
 		for (c in node)
 		{
             if (c.nodeType == Xml.Element)
-            {               
-               if (c.nodeName == "Automations")
-               {
-                   parseAutomations(c);
-               }
+            {      
+                switch(c.nodeName)
+                {
+                    case "Automations":
+                        parseAutomations(c);
+                    case "Tracks":
+                        _tracksMapping = getValue(c).split(" ");
+                }
             }
 		}
     }
@@ -223,8 +233,6 @@ class GpxParser
                 switch(c.nodeName)
                 {
                     case "Automation": parseAutomation(c);
-                    case "Tracks":
-                        _tracksMapping = getValue(c).split(" ");
                 }
             }
 		}
@@ -234,10 +242,11 @@ class GpxParser
     {
         var type:String = null;
         var isLinear:Bool = false;
-        var barIndex:Int = 0;
+        var barId:String = null;
         var ratioPosition:Float = 0;
         var value:Float = 0;
         var reference:Int = 0;
+        var text:String = null;
         
         for (c in node)
 		{
@@ -247,12 +256,13 @@ class GpxParser
                 {
                     case "Type": type = getValue(c);
                     case "Linear": isLinear = getValue(c).toLowerCase() == "true";
-                    case "Bar": barIndex = Std.parseInt(getValue(c));
+                    case "Bar": barId = getValue(c);
                     case "Position": ratioPosition = Std.parseFloat(getValue(c));
                     case "Value":
                         var parts = getValue(c).split(" ");
                         value = Std.parseFloat(parts[0]);
                         reference = Std.parseInt(parts[1]);
+                    case "Text": text = getValue(c);
                 }
             }
 		}
@@ -265,11 +275,12 @@ class GpxParser
                 automation = Automation.builtTempoAutomation(isLinear, ratioPosition, value, reference);
             // TODO: other automations
         }
+        automation.text = text;
         
         if (automation != null)
         {
-            if (!_automations.exists(barIndex)) _automations.set(barIndex, new Array<Automation>());
-            _automations.get(barIndex).push(automation);
+            if (!_automations.exists(barId)) _automations.set(barId, new Array<Automation>());
+            _automations.get(barId).push(automation);
         }
     }
    
@@ -364,6 +375,7 @@ class GpxParser
             case "Tuning": 
                 var tuningParts = getValue(findChildElement(node, "Pitches")).split(" ");
                 for (s in tuningParts) track.tuning.push(Std.parseInt(s));
+                track.tuning.reverse();
             case "CapoFret":
                 track.capo = Std.parseInt(getValue(findChildElement(node, "Fret")));
         }
@@ -374,7 +386,7 @@ class GpxParser
         track.playbackInfo.port = Std.parseInt(getValue(findChildElement(node, "Port")));
         track.playbackInfo.program = Std.parseInt(getValue(findChildElement(node, "Program")));
         track.playbackInfo.primaryChannel = Std.parseInt(getValue(findChildElement(node, "PrimaryChannel")));
-        track.playbackInfo.secondaryChannel = Std.parseInt(getValue(findChildElement(node, "SecondaryCannel")));
+        track.playbackInfo.secondaryChannel = Std.parseInt(getValue(findChildElement(node, "SecondaryChannel")));
 
         track.isPercussion = (node.get("table") == "Percussion");
     }
@@ -488,6 +500,7 @@ class GpxParser
                     case "Clef":
                         switch(getValue(c))
                         {
+                            case "Neutral": bar.clef = Clef.Neutral;
                             case "G2": bar.clef = Clef.G2;
                             case "F4": bar.clef = Clef.F4;
                             case "C4": bar.clef = Clef.C4;
@@ -796,7 +809,7 @@ class GpxParser
         switch(name)
         {
             case "String": 
-                note.string = Std.parseInt(getValue(findChildElement(node, "String")));
+                note.string = Std.parseInt(getValue(findChildElement(node, "String"))) + 1;
             case "Fret": 
                 note.fret = Std.parseInt(getValue(findChildElement(node, "Fret")));
             // case "Tapped": 
@@ -863,8 +876,9 @@ class GpxParser
                 if (findChildElement(node, "Enable") != null)
                     note.isHammerPullOrigin = true;
             case "HopoDestination": 
-                if (findChildElement(node, "Enable") != null)
-                    note.isHammerPullDestination = true;
+                // NOTE: gets automatically calculated 
+                // if (findChildElement(node, "Enable") != null)
+                //     note.isHammerPullDestination = true;
             case "Slide": 
                 var slideFlags = Std.parseInt(getValue(findChildElement(node, "Flags")));
                 if ( (slideFlags & 0x01) != 0) note.slideType = SlideType.Shift;
@@ -965,12 +979,14 @@ class GpxParser
             {
                 for (noteId in _notesOfBeat.get(beatId))
                 {
-                    var note = _noteById.get(noteId);
-                    beat.addNote(note);
+                    if (noteId != InvalidId)
+                    {
+                        beat.addNote(_noteById.get(noteId));
+                    }
                 }
             }
         }
-        
+
         // build voices
         for (voiceId in _voiceById.keys())
         {
@@ -980,7 +996,12 @@ class GpxParser
                 // add beats to voices
                 for (beatId in _beatsOfVoice.get(voiceId))
                 {
-                    voice.addBeat(_beatById.get(beatId));
+                    if (beatId != InvalidId)
+                    {                        
+                        // important! we clone the beat because beats get reused
+                        // in gp6, our model needs to have unique beats.
+                        voice.addBeat(_beatById.get(beatId).clone() );
+                    }
                 }
             }
         }
@@ -994,11 +1015,14 @@ class GpxParser
                 // add voices to bars
                 for (voiceId in _voicesOfBar.get(barId))
                 {
-                    bar.addVoice(_voiceById.get(voiceId));
+                    if (voiceId != InvalidId)
+                    {
+                        bar.addVoice(_voiceById.get(voiceId));
+                    }
                 }
             }
         }
-        
+
         // build tracks (not all, only those used by the score)
         var trackIndex = 0;
         for (trackId in _tracksMapping)
@@ -1010,16 +1034,49 @@ class GpxParser
             // and add the correct bar to the track
             for (barIds in _barsOfMasterBar)
             {
-                track.addBar(_barsById.get(barIds[trackIndex]));
+                var barId = barIds[trackIndex];
+                if (barId != InvalidId)
+                {
+                    track.addBar(_barsById.get(barId));
+                }
             }
             
             trackIndex++;
         }
         
+        // build automations
+        for (barId in _automations.keys())
+        {
+            var bar:Bar = _barsById.get(barId);
+            for (v in bar.voices)
+            {
+                if (v.beats.length > 0)
+                {
+                    for (automation in _automations.get(barId))
+                    {
+                        v.beats[0].automations.push(automation);
+                    }
+                }
+            }
+        }        
+        
         // build score
         for (masterBar in _masterBars)
         {
             score.addMasterBar(masterBar);
+        }
+        if (_automations.exists("0")) // TODO find the correct first bar id
+        {
+            var automations = _automations.get("0");
+            for (automation in automations)
+            {
+                if (automation.type == AutomationType.Tempo)
+                {
+                    score.tempo = Std.int(automation.value);
+                    score.tempoLabel = automation.text;
+                    break;
+                }
+            }
         }
     }        
 }

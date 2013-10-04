@@ -35,8 +35,10 @@ class Beat
     
     public var voice:Voice;
     public var notes:Array<Note>;
-    public var minNote:Note;
-    public var maxNote:Note;
+    private var _minNote:Note;
+    public function minNote():Note { if (_minNote == null) refreshNotes(); return _minNote; }
+    private var _maxNote:Note;
+    public function maxNote():Note { if (_maxNote == null) refreshNotes(); return _maxNote; }
     public var duration:Duration;
     
     public var isEmpty:Bool;
@@ -163,14 +165,21 @@ class Beat
     {
         note.beat = this;
         notes.push(note);
-        
-        if (minNote == null || note.realValue() < minNote.realValue())
+       
+    }
+    
+    public function refreshNotes()
+    {
+        for (n in notes)
         {
-            minNote = note;
-        }
-        if (maxNote == null || note.realValue() > maxNote.realValue())
-        {
-            maxNote = note;
+            if (_minNote == null || n.realValue() < _minNote.realValue())
+            {
+                _minNote = n;
+            }
+            if (_maxNote == null || n.realValue() > _maxNote.realValue())
+            {
+                _maxNote = n;
+            }
         }
     }
     

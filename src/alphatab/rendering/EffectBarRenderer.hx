@@ -273,13 +273,20 @@ class EffectBarRenderer extends GroupedBarRenderer
                         if (b.index > 0)
                         {
                             prevEffect = _effectGlyphs[b.voice.index].get(prevBeat.index);
-                            _effectGlyphs[b.voice.index].set(b.index, prevEffect);
                         }
                         else 
                         {
                             prevEffect = cast(stave.barRenderers[index - 1], EffectBarRenderer)._effectGlyphs[b.voice.index].get(prevBeat.index);
                         }
-                        _effectGlyphs[b.voice.index].set(b.index, prevEffect);
+                        
+                        if (prevEffect == null)
+                        {
+                            createOrResizeGlyph(EffectBarGlyphSizing.SinglePreBeatOnly, b);
+                        }
+                        else
+                        {
+                            _effectGlyphs[b.voice.index].set(b.index, prevEffect);
+                        }
                     }
                     else
                     {

@@ -36,18 +36,6 @@ class Voice
     {
         beat.voice = this;
         beat.index = beats.length;
-        if (beats.length > 0)
-        {
-            beat.previousBeat = beats[beats.length - 1];
-            beat.previousBeat.nextBeat = beat;
-            beat.start = beat.previousBeat.start + beat.previousBeat.calculateDuration();
-        }
-        else if(bar.previousBar != null && bar.previousBar.voices[index].beats.length > 0)
-        {
-            beat.previousBeat = bar.previousBar.voices[index].beats[bar.previousBar.voices[index].beats.length - 1];
-            beat.previousBeat.nextBeat = beat;
-            beat.start = beat.previousBeat.start + beat.previousBeat.calculateDuration();
-        }
         beats.push(beat);
     }
     

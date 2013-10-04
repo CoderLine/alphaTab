@@ -190,8 +190,8 @@ class BeamingHelper
         {
             _lastBeat = beat;
             beats.push(beat);
-            checkNote(beat.minNote);
-            checkNote(beat.maxNote);
+            checkNote(beat.minNote());
+            checkNote(beat.maxNote());
             if (maxDuration.getDurationValue() < beat.duration.getDurationValue()) 
             {
                 maxDuration = beat.duration;

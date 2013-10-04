@@ -75,6 +75,25 @@ class ScoreImporter
                     {
                         for (beat in v.beats)
                         {
+                            if (beat.voice.bar.index == 0 && beat.index == 0)
+                            {
+                                beat.start = 0;
+                                beat.previousBeat = null;
+                            }
+                            else
+                            {
+                                if (beat.index == 0)
+                                {
+                                    beat.previousBeat = bar.previousBar.voices[v.index].beats[bar.previousBar.voices[v.index].beats.length - 1];
+                                }
+                                else
+                                {
+                                    beat.previousBeat = v.beats[beat.index - 1];
+                                }
+                                beat.previousBeat.nextBeat = beat;
+                                beat.start = beat.previousBeat.start + beat.previousBeat.calculateDuration();
+                            }
+                            
                             for (n in beat.notes)
                             {
 								var nextNoteOnLine = new LazyVar<Note>(function() { return nextNoteOnSameLine(n); });

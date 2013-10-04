@@ -389,8 +389,8 @@ class ScoreBarRenderer extends GroupedBarRenderer
             var direction = h.getDirection();
             
             var y1 = cy + y + (direction == Up 
-                        ? getScoreY(getNoteLine(beat.minNote), correction - 1)
-                        : getScoreY(getNoteLine(beat.maxNote), correction - 1));
+                        ? getScoreY(getNoteLine(beat.minNote()), correction - 1)
+                        : getScoreY(getNoteLine(beat.maxNote()), correction - 1));
                         
             var y2 = cy + y + calculateBeamY(h, beatLineX);
             
@@ -502,8 +502,8 @@ class ScoreBarRenderer extends GroupedBarRenderer
 
         var direction = h.getDirection();
         
-        var topY = getScoreY(getNoteLine(beat.maxNote), correction);
-        var bottomY = getScoreY(getNoteLine(beat.minNote), correction);
+        var topY = getScoreY(getNoteLine(beat.maxNote()), correction);
+        var bottomY = getScoreY(getNoteLine(beat.minNote()), correction);
 
         var beamY:Int;
         if (direction == Down)

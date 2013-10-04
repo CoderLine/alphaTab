@@ -25,6 +25,7 @@ class Automation
     public var type:AutomationType;
     public var value:Float;
     public var ratioPosition:Float;
+    public var text:String;
     
     public function new() 
     {

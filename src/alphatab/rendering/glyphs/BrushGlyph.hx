@@ -24,8 +24,8 @@ class BrushGlyph extends Glyph
     {
         var tabBarRenderer:TabBarRenderer = cast renderer;
         var res = renderer.getResources();
-        var startY = cy + y + Std.int(tabBarRenderer.getNoteY(_beat.maxNote) - res.tablatureFont.getSize() / 2);
-        var endY = cy + y + tabBarRenderer.getNoteY(_beat.minNote) + res.tablatureFont.getSize() / 2;
+        var startY = cy + y + Std.int(tabBarRenderer.getNoteY(_beat.maxNote()) - res.tablatureFont.getSize() / 2);
+        var endY = cy + y + tabBarRenderer.getNoteY(_beat.minNote()) + res.tablatureFont.getSize() / 2;
         var arrowX = Std.int(cx + x + width / 2);
         var arrowSize = 8 * getScale();
         

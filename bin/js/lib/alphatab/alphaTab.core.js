@@ -1876,6 +1876,14 @@ alphatab.importer.ScoreImporter.prototype = {
 						while(_g6 < _g7.length) {
 							var beat = _g7[_g6];
 							++_g6;
+							if(beat.voice.bar.index == 0 && beat.index == 0) {
+								beat.start = 0;
+								beat.previousBeat = null;
+							} else {
+								if(beat.index == 0) beat.previousBeat = bar.previousBar.voices[v.index].beats[bar.previousBar.voices[v.index].beats.length - 1]; else beat.previousBeat = v.beats[beat.index - 1];
+								beat.previousBeat.nextBeat = beat;
+								beat.start = beat.previousBeat.start + beat.previousBeat.calculateDuration();
+							}
 							var _g8 = 0, _g9 = beat.notes;
 							while(_g8 < _g9.length) {
 								var n = [_g9[_g8]];
@@ -3595,6 +3603,7 @@ alphatab.importer.GpxImporter.prototype = $extend(alphatab.importer.ScoreImporte
 		fileSystem = null;
 		var parser = new alphatab.importer.GpxParser();
 		parser.parseXml(xml);
+		this.finish(parser.score);
 		return parser.score;
 	}
 	,__class__: alphatab.importer.GpxImporter
@@ -3628,8 +3637,7 @@ alphatab.importer.GpxParser.prototype = {
 				while(_g < _g1.length) {
 					var noteId = _g1[_g];
 					++_g;
-					var note = this._noteById.get(noteId);
-					beat.addNote(note);
+					if(noteId != "-1") beat.addNote(this._noteById.get(noteId));
 				}
 			}
 		}
@@ -3642,7 +3650,7 @@ alphatab.importer.GpxParser.prototype = {
 				while(_g < _g1.length) {
 					var beatId = _g1[_g];
 					++_g;
-					voice.addBeat(this._beatById.get(beatId));
+					if(beatId != "-1") voice.addBeat(this._beatById.get(beatId).clone());
 				}
 			}
 		}
@@ -3655,7 +3663,7 @@ alphatab.importer.GpxParser.prototype = {
 				while(_g < _g1.length) {
 					var voiceId = _g1[_g];
 					++_g;
-					bar.addVoice(this._voiceById.get(voiceId));
+					if(voiceId != "-1") bar.addVoice(this._voiceById.get(voiceId));
 				}
 			}
 		}
@@ -3670,15 +3678,47 @@ alphatab.importer.GpxParser.prototype = {
 			while(_g2 < _g3.length) {
 				var barIds = _g3[_g2];
 				++_g2;
-				track.addBar(this._barsById.get(barIds[trackIndex]));
+				var barId = barIds[trackIndex];
+				if(barId != "-1") track.addBar(this._barsById.get(barId));
 			}
 			trackIndex++;
+		}
+		var $it3 = this._automations.keys();
+		while( $it3.hasNext() ) {
+			var barId = $it3.next();
+			var bar = this._barsById.get(barId);
+			var _g = 0, _g1 = bar.voices;
+			while(_g < _g1.length) {
+				var v = _g1[_g];
+				++_g;
+				if(v.beats.length > 0) {
+					var _g2 = 0, _g3 = this._automations.get(barId);
+					while(_g2 < _g3.length) {
+						var automation = _g3[_g2];
+						++_g2;
+						v.beats[0].automations.push(automation);
+					}
+				}
+			}
 		}
 		var _g = 0, _g1 = this._masterBars;
 		while(_g < _g1.length) {
 			var masterBar = _g1[_g];
 			++_g;
 			this.score.addMasterBar(masterBar);
+		}
+		if(this._automations.exists("0")) {
+			var automations = this._automations.get("0");
+			var _g = 0;
+			while(_g < automations.length) {
+				var automation = automations[_g];
+				++_g;
+				if(automation.type == alphatab.model.AutomationType.Tempo) {
+					this.score.tempo = automation.value | 0;
+					this.score.tempoLabel = automation.text;
+					break;
+				}
+			}
 		}
 	}
 	,parseRhythm: function(node) {
@@ -3751,7 +3791,7 @@ alphatab.importer.GpxParser.prototype = {
 		var name = node.get("name");
 		switch(name) {
 		case "String":
-			note.string = Std.parseInt(this.getValue(this.findChildElement(node,"String")));
+			note.string = Std.parseInt(this.getValue(this.findChildElement(node,"String"))) + 1;
 			break;
 		case "Fret":
 			note.fret = Std.parseInt(this.getValue(this.findChildElement(node,"Fret")));
@@ -3832,7 +3872,6 @@ alphatab.importer.GpxParser.prototype = {
 			if(this.findChildElement(node,"Enable") != null) note.isHammerPullOrigin = true;
 			break;
 		case "HopoDestination":
-			if(this.findChildElement(node,"Enable") != null) note.isHammerPullDestination = true;
 			break;
 		case "Slide":
 			var slideFlags = Std.parseInt(this.getValue(this.findChildElement(node,"Flags")));
@@ -4151,6 +4190,9 @@ alphatab.importer.GpxParser.prototype = {
 				case "Clef":
 					var _g1 = this.getValue(c);
 					switch(_g1) {
+					case "Neutral":
+						bar.clef = alphatab.model.Clef.Neutral;
+						break;
 					case "G2":
 						bar.clef = alphatab.model.Clef.G2;
 						break;
@@ -4271,7 +4313,7 @@ alphatab.importer.GpxParser.prototype = {
 		track.playbackInfo.port = Std.parseInt(this.getValue(this.findChildElement(node,"Port")));
 		track.playbackInfo.program = Std.parseInt(this.getValue(this.findChildElement(node,"Program")));
 		track.playbackInfo.primaryChannel = Std.parseInt(this.getValue(this.findChildElement(node,"PrimaryChannel")));
-		track.playbackInfo.secondaryChannel = Std.parseInt(this.getValue(this.findChildElement(node,"SecondaryCannel")));
+		track.playbackInfo.secondaryChannel = Std.parseInt(this.getValue(this.findChildElement(node,"SecondaryChannel")));
 		track.isPercussion = node.get("table") == "Percussion";
 	}
 	,parseTrackProperty: function(track,node) {
@@ -4285,6 +4327,7 @@ alphatab.importer.GpxParser.prototype = {
 				++_g;
 				track.tuning.push(Std.parseInt(s));
 			}
+			track.tuning.reverse();
 			break;
 		case "CapoFret":
 			track.capo = Std.parseInt(this.getValue(this.findChildElement(node,"Fret")));
@@ -4377,10 +4420,11 @@ alphatab.importer.GpxParser.prototype = {
 	,parseAutomation: function(node) {
 		var type = null;
 		var isLinear = false;
-		var barIndex = 0;
+		var barId = null;
 		var ratioPosition = 0;
 		var value = 0;
 		var reference = 0;
+		var text = null;
 		var $it0 = node.iterator();
 		while( $it0.hasNext() ) {
 			var c = $it0.next();
@@ -4394,7 +4438,7 @@ alphatab.importer.GpxParser.prototype = {
 					isLinear = this.getValue(c).toLowerCase() == "true";
 					break;
 				case "Bar":
-					barIndex = Std.parseInt(this.getValue(c));
+					barId = this.getValue(c);
 					break;
 				case "Position":
 					ratioPosition = Std.parseFloat(this.getValue(c));
@@ -4403,6 +4447,9 @@ alphatab.importer.GpxParser.prototype = {
 					var parts = this.getValue(c).split(" ");
 					value = Std.parseFloat(parts[0]);
 					reference = Std.parseInt(parts[1]);
+					break;
+				case "Text":
+					text = this.getValue(c);
 					break;
 				}
 			}
@@ -4414,9 +4461,10 @@ alphatab.importer.GpxParser.prototype = {
 			automation = alphatab.model.Automation.builtTempoAutomation(isLinear,ratioPosition,value,reference);
 			break;
 		}
+		automation.text = text;
 		if(automation != null) {
-			if(!this._automations.exists(barIndex)) this._automations.set(barIndex,new Array());
-			this._automations.get(barIndex).push(automation);
+			if(!this._automations.exists(barId)) this._automations.set(barId,new Array());
+			this._automations.get(barId).push(automation);
 		}
 	}
 	,parseAutomations: function(node) {
@@ -4429,9 +4477,6 @@ alphatab.importer.GpxParser.prototype = {
 				case "Automation":
 					this.parseAutomation(c);
 					break;
-				case "Tracks":
-					this._tracksMapping = this.getValue(c).split(" ");
-					break;
 				}
 			}
 		}
@@ -4441,7 +4486,15 @@ alphatab.importer.GpxParser.prototype = {
 		while( $it0.hasNext() ) {
 			var c = $it0.next();
 			if(c.nodeType == Xml.Element) {
-				if(c.get_nodeName() == "Automations") this.parseAutomations(c);
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Automations":
+					this.parseAutomations(c);
+					break;
+				case "Tracks":
+					this._tracksMapping = this.getValue(c).split(" ");
+					break;
+				}
 			}
 		}
 	}
@@ -4497,7 +4550,15 @@ alphatab.importer.GpxParser.prototype = {
 		return null;
 	}
 	,getValue: function(n) {
-		if(n.nodeType == Xml.Element || n.nodeType == Xml.Document) return this.getValue(n.firstChild()); else return n.get_nodeValue();
+		if(n.nodeType == Xml.Element || n.nodeType == Xml.Document) {
+			var txt = new StringBuf();
+			var $it0 = n.iterator();
+			while( $it0.hasNext() ) {
+				var c = $it0.next();
+				txt.b += Std.string(this.getValue(c));
+			}
+			return StringTools.trim(txt.b);
+		} else return n.get_nodeValue();
 	}
 	,parseDom: function(xml) {
 		if(xml.nodeType == Xml.Document) xml = xml.firstElement();
@@ -4543,7 +4604,7 @@ alphatab.importer.GpxParser.prototype = {
 		this.buildModel();
 	}
 	,parseXml: function(xml) {
-		this._automations = new haxe.ds.IntMap();
+		this._automations = new haxe.ds.StringMap();
 		this._tracksMapping = new Array();
 		this._tracksById = new haxe.ds.StringMap();
 		this._masterBars = new Array();
@@ -4927,11 +4988,18 @@ alphatab.model.Beat.prototype = {
 		}
 		return null;
 	}
+	,refreshNotes: function() {
+		var _g = 0, _g1 = this.notes;
+		while(_g < _g1.length) {
+			var n = _g1[_g];
+			++_g;
+			if(this._minNote == null || n.realValue() < this._minNote.realValue()) this._minNote = n;
+			if(this._maxNote == null || n.realValue() > this._maxNote.realValue()) this._maxNote = n;
+		}
+	}
 	,addNote: function(note) {
 		note.beat = this;
 		this.notes.push(note);
-		if(this.minNote == null || note.realValue() < this.minNote.realValue()) this.minNote = note;
-		if(this.maxNote == null || note.realValue() > this.maxNote.realValue()) this.maxNote = note;
 	}
 	,calculateDuration: function() {
 		var ticks = alphatab.audio.MidiUtils.durationToTicks(this.duration);
@@ -4988,6 +5056,14 @@ alphatab.model.Beat.prototype = {
 	}
 	,isRest: function() {
 		return this.notes.length == 0;
+	}
+	,maxNote: function() {
+		if(this._maxNote == null) this.refreshNotes();
+		return this._maxNote;
+	}
+	,minNote: function() {
+		if(this._minNote == null) this.refreshNotes();
+		return this._minNote;
 	}
 	,__class__: alphatab.model.Beat
 }
@@ -5529,15 +5605,6 @@ alphatab.model.Voice.prototype = {
 	,addBeat: function(beat) {
 		beat.voice = this;
 		beat.index = this.beats.length;
-		if(this.beats.length > 0) {
-			beat.previousBeat = this.beats[this.beats.length - 1];
-			beat.previousBeat.nextBeat = beat;
-			beat.start = beat.previousBeat.start + beat.previousBeat.calculateDuration();
-		} else if(this.bar.previousBar != null && this.bar.previousBar.voices[this.index].beats.length > 0) {
-			beat.previousBeat = this.bar.previousBar.voices[this.index].beats[this.bar.previousBar.voices[this.index].beats.length - 1];
-			beat.previousBeat.nextBeat = beat;
-			beat.start = beat.previousBeat.start + beat.previousBeat.calculateDuration();
-		}
 		this.beats.push(beat);
 	}
 	,__class__: alphatab.model.Voice
@@ -5959,11 +6026,8 @@ alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.Grou
 				var prevBeat = b.previousBeat;
 				if(this._info.shouldCreateGlyph(this,prevBeat)) {
 					var prevEffect;
-					if(b.index > 0) {
-						prevEffect = this._effectGlyphs[b.voice.index].get(prevBeat.index);
-						this._effectGlyphs[b.voice.index].set(b.index,prevEffect);
-					} else prevEffect = (js.Boot.__cast(this.stave.barRenderers[this.index - 1] , alphatab.rendering.EffectBarRenderer))._effectGlyphs[b.voice.index].get(prevBeat.index);
-					this._effectGlyphs[b.voice.index].set(b.index,prevEffect);
+					if(b.index > 0) prevEffect = this._effectGlyphs[b.voice.index].get(prevBeat.index); else prevEffect = (js.Boot.__cast(this.stave.barRenderers[this.index - 1] , alphatab.rendering.EffectBarRenderer))._effectGlyphs[b.voice.index].get(prevBeat.index);
+					if(prevEffect == null) this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b); else this._effectGlyphs[b.voice.index].set(b.index,prevEffect);
 				} else this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b);
 			} else this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b);
 			break;
@@ -6364,8 +6428,8 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 		var correction = 9 * scaleMod / 2 | 0;
 		var beatLineX = h.getBeatLineX(beat) + this.stave.staveGroup.layout.renderer.scale | 0;
 		var direction = h.getDirection();
-		var topY = this.getScoreY(this.getNoteLine(beat.maxNote),correction);
-		var bottomY = this.getScoreY(this.getNoteLine(beat.minNote),correction);
+		var topY = this.getScoreY(this.getNoteLine(beat.maxNote()),correction);
+		var bottomY = this.getScoreY(this.getNoteLine(beat.minNote()),correction);
 		var beamY;
 		if(direction == alphatab.rendering.utils.BeamDirection.Down) {
 			bottomY += stemSize * scaleMod | 0;
@@ -6409,7 +6473,7 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 			var correction = 4;
 			var beatLineX = h.getBeatLineX(beat) + this.stave.staveGroup.layout.renderer.scale | 0;
 			var direction = h.getDirection();
-			var y1 = cy + this.y + (direction == alphatab.rendering.utils.BeamDirection.Up?this.getScoreY(this.getNoteLine(beat.minNote),correction - 1):this.getScoreY(this.getNoteLine(beat.maxNote),correction - 1));
+			var y1 = cy + this.y + (direction == alphatab.rendering.utils.BeamDirection.Up?this.getScoreY(this.getNoteLine(beat.minNote()),correction - 1):this.getScoreY(this.getNoteLine(beat.maxNote()),correction - 1));
 			var y2 = cy + this.y + this.calculateBeamY(h,beatLineX);
 			canvas.setColor(this.stave.staveGroup.layout.renderer.renderingResources.mainGlyphColor);
 			canvas.beginPath();
@@ -7452,8 +7516,8 @@ alphatab.rendering.glyphs.BrushGlyph.prototype = $extend(alphatab.rendering.Glyp
 	paint: function(cx,cy,canvas) {
 		var tabBarRenderer = this.renderer;
 		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
-		var startY = cy + this.y + (tabBarRenderer.getNoteY(this._beat.maxNote) - res.tablatureFont.getSize() / 2 | 0);
-		var endY = cy + this.y + tabBarRenderer.getNoteY(this._beat.minNote) + res.tablatureFont.getSize() / 2;
+		var startY = cy + this.y + (tabBarRenderer.getNoteY(this._beat.maxNote()) - res.tablatureFont.getSize() / 2 | 0);
+		var endY = cy + this.y + tabBarRenderer.getNoteY(this._beat.minNote()) + res.tablatureFont.getSize() / 2;
 		var arrowX = cx + this.x + this.width / 2 | 0;
 		var arrowSize = 8 * this.renderer.stave.staveGroup.layout.renderer.scale;
 		canvas.setColor(res.mainGlyphColor);
@@ -9657,8 +9721,8 @@ alphatab.rendering.utils.BeamingHelper.prototype = {
 		if(add) {
 			this._lastBeat = beat;
 			this.beats.push(beat);
-			this.checkNote(beat.minNote);
-			this.checkNote(beat.maxNote);
+			this.checkNote(beat.minNote());
+			this.checkNote(beat.maxNote());
 			if(alphatab.model.ModelUtils.getDurationValue(this.maxDuration) < alphatab.model.ModelUtils.getDurationValue(beat.duration)) this.maxDuration = beat.duration;
 		}
 		return add;
@@ -10542,6 +10606,7 @@ alphatab.importer.Gp3To5Importer.BEND_STEP = 25;
 alphatab.importer.GpxFileSystem.HEADER_BCFS = "BCFS";
 alphatab.importer.GpxFileSystem.HEADER_BCFZ = "BCFZ";
 alphatab.importer.GpxFileSystem.SCORE_GPIF = "score.gpif";
+alphatab.importer.GpxParser.InvalidId = "-1";
 alphatab.io.BitInput.BYTE_SIZE = 8;
 alphatab.model.Beat.WhammyBarMaxPosition = 60;
 alphatab.model.Beat.WhammyBarMaxValue = 24;
