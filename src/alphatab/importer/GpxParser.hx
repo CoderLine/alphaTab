@@ -79,6 +79,7 @@ class GpxParser
 
     private var _noteById:StringMap<Note>; // contains notes by their id
     private var _notesOfBeat:StringMap<Array<String>>; // contains ids of notes stored in a beat (key = beat id);
+    private var _tappedNotes:StringMap<Bool>; // contains a flag indicating whether a note is tapped (key = note id);
     
 	public function new() 
 	{
@@ -101,6 +102,7 @@ class GpxParser
         _rhythmById = new StringMap<GpxRhythm>(); 
         _notesOfBeat = new StringMap<Array<String>>(); 
         _noteById = new StringMap<Note>(); 
+        _tappedNotes = new StringMap<Bool>();
 
 		var dom = Xml.parse(xml);
 		parseDom(dom);		
@@ -783,7 +785,7 @@ class GpxParser
                 switch(c.nodeName)
                 {
                     case "Properties":
-                        parseNoteProperties(c, note);
+                        parseNoteProperties(c, note, noteId);
                     case "AntiAccent":
                         if (getValue(c).toLowerCase() == "normal")
                         {
@@ -823,7 +825,7 @@ class GpxParser
         _noteById.set(noteId, note);
     }
     
-    private function parseNoteProperties(node:Xml, note:Note)
+    private function parseNoteProperties(node:Xml, note:Note, noteId:String)
     {
         var isBended :Bool = false;
         var bendOrigin:BendPoint = null;
@@ -846,7 +848,8 @@ class GpxParser
                                 note.string = Std.parseInt(getValue(findChildElement(c, "String"))) + 1;
                             case "Fret": 
                                 note.fret = Std.parseInt(getValue(findChildElement(c, "Fret")));
-                            // case "Tapped": 
+                            case "Tapped": 
+                                _tappedNotes.set(noteId, true);
                             case "HarmonicType":
                                 var htype = findChildElement(c, "HType");
                                 if (htype != null)
@@ -1026,6 +1029,10 @@ class GpxParser
                     if (noteId != InvalidId)
                     {
                         beat.addNote(_noteById.get(noteId));
+                        if (_tappedNotes.exists(noteId))
+                        {
+                            beat.tap = true;
+                        }
                     }
                 }
             }

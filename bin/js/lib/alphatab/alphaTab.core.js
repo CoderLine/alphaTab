@@ -3637,7 +3637,10 @@ alphatab.importer.GpxParser.prototype = {
 				while(_g < _g1.length) {
 					var noteId = _g1[_g];
 					++_g;
-					if(noteId != "-1") beat.addNote(this._noteById.get(noteId));
+					if(noteId != "-1") {
+						beat.addNote(this._noteById.get(noteId));
+						if(this._tappedNotes.exists(noteId)) beat.tap = true;
+					}
 				}
 			}
 		}
@@ -3787,7 +3790,7 @@ alphatab.importer.GpxParser.prototype = {
 			}
 		}
 	}
-	,parseNoteProperties: function(node,note) {
+	,parseNoteProperties: function(node,note,noteId) {
 		var isBended = false;
 		var bendOrigin = null;
 		var bendMiddleValue = null;
@@ -3808,6 +3811,9 @@ alphatab.importer.GpxParser.prototype = {
 						break;
 					case "Fret":
 						note.fret = Std.parseInt(this.getValue(this.findChildElement(c,"Fret")));
+						break;
+					case "Tapped":
+						this._tappedNotes.set(noteId,true);
 						break;
 					case "HarmonicType":
 						var htype = this.findChildElement(c,"HType");
@@ -3917,7 +3923,7 @@ alphatab.importer.GpxParser.prototype = {
 				var _g = c.get_nodeName();
 				switch(_g) {
 				case "Properties":
-					this.parseNoteProperties(c,note);
+					this.parseNoteProperties(c,note,noteId);
 					break;
 				case "AntiAccent":
 					if(this.getValue(c).toLowerCase() == "normal") note.isGhost = true;
@@ -4632,6 +4638,7 @@ alphatab.importer.GpxParser.prototype = {
 		this._rhythmById = new haxe.ds.StringMap();
 		this._notesOfBeat = new haxe.ds.StringMap();
 		this._noteById = new haxe.ds.StringMap();
+		this._tappedNotes = new haxe.ds.StringMap();
 		var dom = Xml.parse(xml);
 		this.parseDom(dom);
 	}
@@ -9229,6 +9236,7 @@ alphatab.rendering.glyphs.effects.LineRangedGlyph.prototype = $extend(alphatab.r
 		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
 		canvas.setColor(res.mainGlyphColor);
 		canvas.setFont(res.effectFont);
+		canvas.setTextAlign(alphatab.platform.model.TextAlign.Left);
 		var textWidth = canvas.measureText(this._label);
 		canvas.fillText(this._label,cx + this.x,cy + this.y);
 		if(this._isExpanded) {

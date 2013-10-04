@@ -1,6 +1,7 @@
 package alphatab.rendering.glyphs.effects;
 import alphatab.model.Beat;
 import alphatab.platform.ICanvas;
+import alphatab.platform.model.TextAlign;
 import alphatab.rendering.Glyph;
 import alphatab.rendering.glyphs.IMultiBeatEffectGlyph;
 
@@ -34,6 +35,7 @@ class LineRangedGlyph extends Glyph implements IMultiBeatEffectGlyph
         var res = renderer.getResources();
         canvas.setColor(res.mainGlyphColor);
         canvas.setFont(res.effectFont);
+        canvas.setTextAlign(TextAlign.Left);
         var textWidth = canvas.measureText(_label);
         canvas.fillText(_label, cx + x, cy + y);
         
