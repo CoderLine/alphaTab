@@ -16,6 +16,7 @@
  */
 import alphatab.model.Bar;
 import alphatab.Settings;
+import haxe.ds.StringMap.StringMap;
 import js.Browser;
 
 import alphatab.platform.js.Html5Canvas;
@@ -45,7 +46,6 @@ class Main
 	public static var glyphs:Array<NamedSvgGlyph>;
 	
 	public static var currentGlyph:NamedSvgGlyph;
-	private static inline var CoordinateScale:Int = 100; // we will adjust the original coordinates by this to get rid of decimals
 	
     public static function main() 
     {
@@ -53,11 +53,8 @@ class Main
             
 			glyphs = new Array<NamedSvgGlyph>();
 			
-			// some initial offset that we really can see the controls
-			var initialX = 100;
-			var initialY = 100;
 			// a zoom level for more detailed positioning 
-			var zoom = 2 * CoordinateScale; 
+			var zoom = 2; 
 			// this point will be our "zero point". we need this because we dont want to align the glyphs outside the canvas 
 			var zeroX = 150;
 			var zeroY = 150;
@@ -129,16 +126,17 @@ class Main
 				// info text that we know the translation we will apply
 				var s = "x: " + calculateTranslation(currentGlyph.x, zoom, zeroX) + " y: " + calculateTranslation(currentGlyph.y, zoom, zeroY);
 				renderer.canvas.setFont(new Font("Arial", 12));
-				renderer.canvas.fillText(s, Math.max(10, currentGlyph.x), Math.max(20, currentGlyph.y));
-				
+								
 				var renderGlyph:Glyph;
 				if (untyped(preview.is(":checked")))
 				{
-					renderGlyph = new SvgGlyph(zeroX, zeroY, rewritePathData(currentGlyph, zeroX, zeroY, zoom), zoom / CoordinateScale, zoom / CoordinateScale);
+					renderGlyph = new SvgGlyph(zeroX, zeroY, rewritePathData(currentGlyph, zeroX, zeroY, zoom), zoom, zoom);
+                    renderer.canvas.fillText(s, Math.max(10, currentGlyph.x) + zeroX - 50, Math.max(20, currentGlyph.y) + zeroY - 50);
 				}
 				else
 				{
 					renderGlyph = currentGlyph;
+                    renderer.canvas.fillText(s, Math.max(10, currentGlyph.x), Math.max(20, currentGlyph.y));
 				}
 				renderGlyph.renderer = barRenderer;
                 renderGlyph.doLayout();
@@ -234,7 +232,7 @@ class Main
 			buf.add("    public static var ");
 			buf.add(g.name);
 			buf.add(" = \"");
-			buf.add(rewritePathData(g, zeroX, zeroY, zoom / 100));
+			buf.add(rewritePathData(g, zeroX, zeroY, zoom));
 			buf.add("\";\r\n");
 		}
 		
@@ -275,7 +273,7 @@ class Main
 			buf.add("\" glyph-name=\"");
 			buf.add(g.name);
 			buf.add("\"><path d=\"");
-			buf.add(rewritePathData(g, zeroX, zeroY, zoom / 100));			
+			buf.add(rewritePathData(g, zeroX, zeroY, zoom));			
 			buf.add("\" /></glyph>\r\n");
 		}
 		
@@ -292,8 +290,18 @@ class Main
 		var p = new SvgPathParser(g.getSvgData());
 		p.reset();
 		var isX:Bool = true;
+        var isFirst = true;
 		while (!p.eof())
 		{
+            if (isFirst) 
+            {
+                isFirst = false;
+            }
+            else
+            {
+                p.nextToken();                
+            }
+            
 			if (!p.currentTokenIsNumber())
 			{
 				buf.add(p.currentToken);
@@ -302,28 +310,27 @@ class Main
 			else
 			{
 				buf.add(" ");
-				var newValue = Std.int(Std.parseFloat(p.currentToken) * CoordinateScale);
+				var newValue = Std.int(Std.parseFloat(p.currentToken));
 				switch(p.lastCommand)
 				{
 					case "m", "z", "l", "v", "h", "c", "s", "q", "t": // relative paths can remain
 						buf.add(newValue); 
 					case "H":
-						buf.add(newValue + calculateTranslation(g.x, zoom / CoordinateScale, zeroX));
+						buf.add(newValue + calculateTranslation(g.x, zoom, zeroX));
 					case "V":
-						buf.add(newValue + calculateTranslation(g.y, zoom / CoordinateScale, zeroY));
+						buf.add(newValue + calculateTranslation(g.y, zoom, zeroY));
 					case "M", "Z", "L", "C", "S", "Q", "T":
 						if (isX) 
 						{
-							buf.add(newValue + calculateTranslation(g.x, zoom / CoordinateScale, zeroX));
+							buf.add(newValue + calculateTranslation(g.x, zoom, zeroX));
 						}
 						else
 						{
-							buf.add(newValue + calculateTranslation(g.y, zoom / CoordinateScale, zeroY));
+							buf.add(newValue + calculateTranslation(g.y, zoom, zeroY));
 						}
 				}
 				isX = !isX;
 			}
-			p.nextToken();
 		}
 		
 		return buf.toString();
@@ -331,7 +338,7 @@ class Main
 	
 	private static function calculateTranslation(glyph:Float, zoom:Float, zero:Float) : Int
 	{
-		return Std.int((glyph - zero) / zoom);
+		return Std.int(glyph / (zoom/100));
 	}
     
 	public static function loadGlyphs(zoom:Float)
@@ -340,25 +347,8 @@ class Main
 		var dom = Xml.parse(svg);
 		
 		processNode(dom.firstElement(), zoom);
-		
-		var mapping = Resource.getString("mapping");
-		var mappingEntry = mapping.split("\n");
-		for (m in mappingEntry) 
-		{
-			if (!StringTools.startsWith(m, "#")) 
-			{
-				var parts = StringTools.trim(m).split(';');
-				var i = Std.parseInt(parts[0]);
-				var name = parts[1];
-				var x = Std.parseInt(parts[2]);
-				var y = Std.parseInt(parts[3]);
-				
-				glyphs[i].name = name;
-				glyphs[i].x = x;
-				glyphs[i].y = y;
-			}			
-		}
 	}   
+    
 	public static function processNode(node:Xml, zoom:Float)
 	{
 		if (node.nodeType == Xml.Element)

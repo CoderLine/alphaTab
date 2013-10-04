@@ -1,4 +1,5 @@
 package alphatab.rendering.glyphs.effects;
+import alphatab.model.TextBaseline;
 import alphatab.platform.ICanvas;
 import alphatab.rendering.Glyph;
 import alphatab.rendering.glyphs.MusicFont;
@@ -24,6 +25,6 @@ class TempoGlyph extends Glyph
         symbol.renderer = renderer;
         symbol.paint(cx + x, cy + y, canvas);
         
-        canvas.fillText("" + _tempo, cx + x + Std.int(17 * getScale()), cy + y + Std.int(7*getScale()));
+        canvas.fillText("" + _tempo, cx + x + Std.int(30 * getScale()), cy + y + Std.int(7*getScale()));
     }
 }

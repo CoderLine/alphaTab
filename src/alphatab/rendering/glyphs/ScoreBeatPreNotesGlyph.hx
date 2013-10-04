@@ -22,7 +22,7 @@ class ScoreBeatPreNotesGlyph extends BeatGlyphBase
 	
 	public override function doLayout():Void 
 	{
-		if (!container.beat.isRest())
+		if (!container.beat.isRest() && !container.beat.voice.bar.track.isPercussion)
 		{
 			var accidentals:AccidentalGroupGlyph = new AccidentalGroupGlyph(0, 0);
             noteLoop( function(n) {

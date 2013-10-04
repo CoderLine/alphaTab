@@ -59,6 +59,7 @@ import alphatab.rendering.glyphs.TimeSignatureGlyph;
 import alphatab.rendering.glyphs.TremoloPickingGlyph;
 import alphatab.rendering.utils.AccidentalHelper;
 import alphatab.rendering.utils.BeamingHelper;
+import alphatab.rendering.utils.PercussionMapper;
 import alphatab.rendering.utils.TupletHelper;
 import haxe.ds.IntMap;
 
@@ -715,7 +716,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
                 if (_currentBeamHelper == null || !_currentBeamHelper.checkBeat(b))
                 {
                     // if not possible, create the next beaming helper
-                    _currentBeamHelper = new BeamingHelper();
+                    _currentBeamHelper = new BeamingHelper(_bar.track);
                     _currentBeamHelper.checkBeat(b);
                     _beamHelpers[v.index].push(_currentBeamHelper);
                     newBeamingHelper = true;
@@ -760,10 +761,10 @@ class ScoreBarRenderer extends GroupedBarRenderer
     // TODO[performance]: Maybe we should cache this (check profiler)
     public function getNoteLine(n:Note) : Int
     {
+        var value = n.beat.voice.bar.track.isPercussion ? PercussionMapper.mapValue(n) : n.realValue();
         var ks = n.beat.voice.bar.getMasterBar().keySignature;
         var clef = n.beat.voice.bar.clef;
         
-        var value = n.realValue();
         
         var index = value % 12;             
         var octave = Std.int(value / 12);

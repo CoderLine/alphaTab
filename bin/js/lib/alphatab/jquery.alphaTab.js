@@ -6,7 +6,12 @@
     {
         try
         {
-            context.renderer.render(score.tracks[context.settings.track]);
+			var trackIndex = context.settings.track;
+			if(trackIndex < 0 || trackIndex >= score.tracks.length)
+			{
+				trackIndex = 0;
+			}
+            context.renderer.render(score.tracks[trackIndex]);
         }
         catch(e)
         {
@@ -31,10 +36,21 @@
                 //
                 // Settings
                 var context = {};
-                
+				                
                 context.settings = alphatab.Settings.fromJson(options);
                 if(options && options.track) context.settings.track = options.track;
-                else context.settings.track = 0;
+                else if($this.data('track'))
+				{
+					try
+					{
+						context.settings.track = parseInt($this.data('track'));
+					}
+					catch(e)
+					{
+						context.settings.track = 0;
+					}
+				}
+				else context.settings.track = 0;
                 
                 var contents = $.trim($this.text());
                 $this.html('');

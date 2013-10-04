@@ -21,6 +21,7 @@ import alphatab.model.Bar;
 import alphatab.model.Beat;
 import alphatab.model.Duration;
 import alphatab.model.Note;
+import alphatab.model.Track;
 import alphatab.model.Voice;
 import haxe.ds.IntMap;
 
@@ -97,15 +98,25 @@ class BeamingHelper
      */
     public var maxNote:Note;
     
-    public var valueCalculator : Note -> Int;
-	
-    
-    public function new()
+    private var _track:Track;
+    public function new(track:Track)
     {
         beats = new Array<Beat>();
-        valueCalculator = function(n) { return n.realValue(); };
+        _track = track;
         _beatLineXPositions = new IntMap<BeatLinePositions>();
         maxDuration = Duration.Whole;
+    }
+    
+    private function getValue(n:Note)
+    {
+        if (_track.isPercussion)
+        {
+            return PercussionMapper.mapValue(n);
+        }
+        else
+        {
+            return n.realValue();
+        }
     }
     
     // stores the X-positions for beat indices
@@ -154,7 +165,7 @@ class BeamingHelper
         // the average key is used for determination
         //      key lowerequal than middle line -> up
         //      key higher than middle line -> down
-        var avg = Std.int((valueCalculator(maxNote) + valueCalculator(minNote)) / 2);
+        var avg = Std.int((getValue(maxNote) + getValue(minNote)) / 2);
         return avg <= SCORE_MIDDLE_KEYS[Type.enumIndex(_lastBeat.voice.bar.clef)] ? Up : Down;
     }
      
