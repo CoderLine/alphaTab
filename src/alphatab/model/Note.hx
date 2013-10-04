@@ -90,6 +90,8 @@ class Note
     
     public var beat:Beat;
     public var dynamicValue:DynamicValue;
+    
+    public var octave:Int;
 
     public function new() 
     {
@@ -123,6 +125,7 @@ class Note
         trillFret = -1;
         trillSpeed = 0;
         durationPercent = 1;
+        octave = -1;
     }
     
     public function clone() : Note

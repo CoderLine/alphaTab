@@ -15,6 +15,7 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.model;
+import haxe.ds.StringMap.StringMap;
 
 /**
  * This class describes a single track or instrument of score
@@ -34,10 +35,13 @@ class Track
     public var score:Score;
     public var bars:Array<Bar>;
     
+    public var chords:StringMap<Chord>;
+    
     public function new() 
     {
         tuning = new Array<Int>();
         bars = new Array<Bar>();
+        chords = new StringMap<Chord>();
 		playbackInfo = new PlaybackInformation();
     }
     

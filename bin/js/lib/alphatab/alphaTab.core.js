@@ -284,9 +284,17 @@ Xml.prototype = {
 		if(this.nodeType != Xml.Element) throw "bad nodeType";
 		this._attributes.set(att,value);
 	}
+	,get: function(att) {
+		if(this.nodeType != Xml.Element) throw "bad nodeType";
+		return this._attributes.get(att);
+	}
 	,set_nodeValue: function(v) {
 		if(this.nodeType == Xml.Element || this.nodeType == Xml.Document) throw "bad nodeType";
 		return this._nodeValue = v;
+	}
+	,get_nodeValue: function() {
+		if(this.nodeType == Xml.Element || this.nodeType == Xml.Document) throw "bad nodeType";
+		return this._nodeValue;
 	}
 	,set_nodeName: function(n) {
 		if(this.nodeType != Xml.Element) throw "bad nodeType";
@@ -1304,7 +1312,7 @@ alphatab.rendering.effects.ChordsEffectInfo.__name__ = true;
 alphatab.rendering.effects.ChordsEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.ChordsEffectInfo.prototype = {
 	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.TextGlyph(0,0,beat.chord.name,renderer.stave.staveGroup.layout.renderer.renderingResources.effectFont);
+		return new alphatab.rendering.glyphs.effects.TextGlyph(0,0,beat.voice.bar.track.chords.get(beat.chordId).name,renderer.stave.staveGroup.layout.renderer.renderingResources.effectFont);
 	}
 	,getSizingMode: function() {
 		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatOnly;
@@ -1313,7 +1321,7 @@ alphatab.rendering.effects.ChordsEffectInfo.prototype = {
 		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
 	,shouldCreateGlyph: function(renderer,beat) {
-		return beat.chord != null;
+		return beat.chordId != null;
 	}
 	,__class__: alphatab.rendering.effects.ChordsEffectInfo
 }
@@ -3099,6 +3107,7 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 	}
 	,readChord: function(beat) {
 		var chord = new alphatab.model.Chord();
+		var chordId = alphatab.util.Guid.generate();
 		if(this._versionNumber >= 500) {
 			this._data.read(17);
 			chord.name = this.readStringByteLength(21);
@@ -3150,7 +3159,10 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 				}
 			}
 		}
-		if(chord.name.length > 0) beat.chord = chord;
+		if(chord.name.length > 0) {
+			beat.voice.bar.track.chords.set(chordId,chord);
+			beat.chordId = chordId;
+		}
 	}
 	,readBeat: function(track,bar,voice) {
 		var newBeat = new alphatab.model.Beat();
@@ -3587,11 +3599,853 @@ alphatab.importer.GpxImporter.prototype = $extend(alphatab.importer.ScoreImporte
 	}
 	,__class__: alphatab.importer.GpxImporter
 });
+alphatab.importer.GpxRhythm = function() {
+	this.tupletNumerator = 1;
+	this.tupletDenominator = 1;
+	this.value = alphatab.model.Duration.Quarter;
+};
+alphatab.importer.GpxRhythm.__name__ = true;
+alphatab.importer.GpxRhythm.prototype = {
+	__class__: alphatab.importer.GpxRhythm
+}
 alphatab.importer.GpxParser = function() {
 };
 alphatab.importer.GpxParser.__name__ = true;
 alphatab.importer.GpxParser.prototype = {
-	parseScoreNode: function(node) {
+	buildModel: function() {
+		var $it0 = this._beatById.keys();
+		while( $it0.hasNext() ) {
+			var beatId = $it0.next();
+			var beat = this._beatById.get(beatId);
+			var rhythmId = this._rhythmOfBeat.get(beatId);
+			var rhythm = this._rhythmById.get(rhythmId);
+			beat.duration = rhythm.value;
+			beat.dots = rhythm.dots;
+			beat.tupletNumerator = rhythm.tupletNumerator;
+			beat.tupletDenominator = rhythm.tupletDenominator;
+			if(this._notesOfBeat.exists(beatId)) {
+				var _g = 0, _g1 = this._notesOfBeat.get(beatId);
+				while(_g < _g1.length) {
+					var noteId = _g1[_g];
+					++_g;
+					var note = this._noteById.get(noteId);
+					beat.addNote(note);
+				}
+			}
+		}
+		var $it1 = this._voiceById.keys();
+		while( $it1.hasNext() ) {
+			var voiceId = $it1.next();
+			var voice = this._voiceById.get(voiceId);
+			if(this._beatsOfVoice.exists(voiceId)) {
+				var _g = 0, _g1 = this._beatsOfVoice.get(voiceId);
+				while(_g < _g1.length) {
+					var beatId = _g1[_g];
+					++_g;
+					voice.addBeat(this._beatById.get(beatId));
+				}
+			}
+		}
+		var $it2 = this._barsById.keys();
+		while( $it2.hasNext() ) {
+			var barId = $it2.next();
+			var bar = this._barsById.get(barId);
+			if(this._voicesOfBar.exists(barId)) {
+				var _g = 0, _g1 = this._voicesOfBar.get(barId);
+				while(_g < _g1.length) {
+					var voiceId = _g1[_g];
+					++_g;
+					bar.addVoice(this._voiceById.get(voiceId));
+				}
+			}
+		}
+		var trackIndex = 0;
+		var _g = 0, _g1 = this._tracksMapping;
+		while(_g < _g1.length) {
+			var trackId = _g1[_g];
+			++_g;
+			var track = this._tracksById.get(trackId);
+			this.score.addTrack(track);
+			var _g2 = 0, _g3 = this._barsOfMasterBar;
+			while(_g2 < _g3.length) {
+				var barIds = _g3[_g2];
+				++_g2;
+				track.addBar(this._barsById.get(barIds[trackIndex]));
+			}
+			trackIndex++;
+		}
+		var _g = 0, _g1 = this._masterBars;
+		while(_g < _g1.length) {
+			var masterBar = _g1[_g];
+			++_g;
+			this.score.addMasterBar(masterBar);
+		}
+	}
+	,parseRhythm: function(node) {
+		var rhythm = new alphatab.importer.GpxRhythm();
+		var rhythmId = node.get("id");
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "NoteValue":
+					var _g1 = this.getValue(c);
+					switch(_g1) {
+					case "Whole":
+						rhythm.value = alphatab.model.Duration.Whole;
+						break;
+					case "Half":
+						rhythm.value = alphatab.model.Duration.Half;
+						break;
+					case "Quarter":
+						rhythm.value = alphatab.model.Duration.Quarter;
+						break;
+					case "Eighth":
+						rhythm.value = alphatab.model.Duration.Eighth;
+						break;
+					case "16th":
+						rhythm.value = alphatab.model.Duration.Sixteenth;
+						break;
+					case "32nd":
+						rhythm.value = alphatab.model.Duration.ThirtySecond;
+						break;
+					case "64th":
+						rhythm.value = alphatab.model.Duration.SixtyFourth;
+						break;
+					}
+					break;
+				case "PrimaryTuplet":
+					rhythm.tupletNumerator = Std.parseInt(c.get("num"));
+					rhythm.tupletDenominator = Std.parseInt(c.get("den"));
+					break;
+				case "AugmentationDot":
+					rhythm.dots = Std.parseInt(c.get("count"));
+					break;
+				}
+			}
+		}
+		this._rhythmById.set(rhythmId,rhythm);
+	}
+	,parseRhythms: function(node) {
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Rhythm":
+					this.parseRhythm(c);
+					break;
+				}
+			}
+		}
+	}
+	,parseNoteProperty: function(node,note) {
+		var isBended = false;
+		var bendOrigin = null;
+		var bendMiddle1 = null;
+		var bendMiddle2 = null;
+		var bendDestination = null;
+		var name = node.get("name");
+		switch(name) {
+		case "String":
+			note.string = Std.parseInt(this.getValue(this.findChildElement(node,"String")));
+			break;
+		case "Fret":
+			note.fret = Std.parseInt(this.getValue(this.findChildElement(node,"Fret")));
+			break;
+		case "HarmonicType":
+			var htype = this.findChildElement(node,"HType");
+			if(htype != null) {
+				var _g = this.getValue(htype);
+				switch(_g) {
+				case "NoHarmonic":
+					note.harmonicType = alphatab.model.HarmonicType.None;
+					break;
+				case "Natural":
+					note.harmonicType = alphatab.model.HarmonicType.Natural;
+					break;
+				case "Artificial":
+					note.harmonicType = alphatab.model.HarmonicType.Artificial;
+					break;
+				case "Pinch":
+					note.harmonicType = alphatab.model.HarmonicType.Pinch;
+					break;
+				case "Tap":
+					note.harmonicType = alphatab.model.HarmonicType.Tap;
+					break;
+				case "Semi":
+					note.harmonicType = alphatab.model.HarmonicType.Semi;
+					break;
+				case "Feedback":
+					note.harmonicType = alphatab.model.HarmonicType.Feedback;
+					break;
+				}
+			}
+			break;
+		case "HarmonicFret":
+			var hfret = this.findChildElement(node,"HFret");
+			if(hfret != null) note.harmonicValue = Std.parseFloat(this.getValue(hfret));
+			break;
+		case "PalmMuted":
+			if(this.findChildElement(node,"Enable") != null) note.isPalmMute = true;
+			break;
+		case "Octave":
+			note.octave = Std.parseInt(this.getValue(this.findChildElement(node,"Number")));
+			break;
+		case "Bended":
+			isBended = true;
+			break;
+		case "BendOriginValue":
+			if(bendOrigin == null) bendOrigin = new alphatab.model.BendPoint();
+			bendOrigin.value = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
+			break;
+		case "BendOriginOffset":
+			if(bendOrigin == null) bendOrigin = new alphatab.model.BendPoint();
+			bendOrigin.offset = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
+			break;
+		case "BendMiddleValue":
+			if(bendMiddle1 == null) bendMiddle1 = new alphatab.model.BendPoint();
+			if(bendMiddle2 == null) bendMiddle2 = new alphatab.model.BendPoint();
+			bendMiddle1.value = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
+			bendMiddle2.value = bendMiddle1.value;
+			break;
+		case "BendMiddleOffset1":
+			if(bendMiddle1 == null) bendMiddle1 = new alphatab.model.BendPoint();
+			bendMiddle1.offset = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
+			break;
+		case "BendMiddleOffset2":
+			if(bendMiddle2 == null) bendMiddle2 = new alphatab.model.BendPoint();
+			bendMiddle2.offset = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
+			break;
+		case "BendDestinationValue":
+			if(bendDestination == null) bendDestination = new alphatab.model.BendPoint();
+			bendDestination.value = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
+			break;
+		case "BendDestinationOffset":
+			if(bendDestination == null) bendDestination = new alphatab.model.BendPoint();
+			bendDestination.offset = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
+			break;
+		case "HopoOrigin":
+			if(this.findChildElement(node,"Enable") != null) note.isHammerPullOrigin = true;
+			break;
+		case "HopoDestination":
+			if(this.findChildElement(node,"Enable") != null) note.isHammerPullDestination = true;
+			break;
+		case "Slide":
+			var slideFlags = Std.parseInt(this.getValue(this.findChildElement(node,"Flags")));
+			if((slideFlags & 1) != 0) note.slideType = alphatab.model.SlideType.Shift;
+			if((slideFlags & 2) != 0) note.slideType = alphatab.model.SlideType.Legato;
+			if((slideFlags & 4) != 0) note.slideType = alphatab.model.SlideType.OutDown;
+			if((slideFlags & 8) != 0) note.slideType = alphatab.model.SlideType.OutUp;
+			if((slideFlags & 16) != 0) note.slideType = alphatab.model.SlideType.IntoFromBelow;
+			if((slideFlags & 32) != 0) note.slideType = alphatab.model.SlideType.IntoFromAbove;
+			break;
+		}
+		if(isBended && bendOrigin != null && bendDestination != null) {
+			var bend = new Array();
+			bend.push(bendOrigin);
+			if(bendMiddle1 != null) bend.push(bendMiddle1);
+			if(bendMiddle2 != null) bend.push(bendMiddle2);
+			bend.push(bendDestination);
+			note.bendPoints = bend;
+		}
+	}
+	,parseNoteProperties: function(node,note) {
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Property":
+					this.parseNoteProperty(c,note);
+					break;
+				}
+			}
+		}
+	}
+	,parseNote: function(node) {
+		var note = new alphatab.model.Note();
+		var noteId = node.get("id");
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Properties":
+					this.parseNoteProperties(c,note);
+					break;
+				case "AntiAccent":
+					if(this.getValue(c).toLowerCase() == "normal") note.isGhost = true;
+					break;
+				case "LetRing":
+					note.isLetRing = true;
+					break;
+				case "Trill":
+					note.trillFret = Std.parseInt(this.getValue(c));
+					note.trillSpeed = 1;
+					break;
+				case "Accent":
+					var accentFlags = Std.parseInt(this.getValue(c));
+					if((accentFlags & 1) != 0) note.isStaccato = true;
+					if((accentFlags & 4) != 0) note.accentuated = alphatab.model.AccentuationType.Heavy;
+					if((accentFlags & 8) != 0) note.accentuated = alphatab.model.AccentuationType.Normal;
+					break;
+				case "Tie":
+					if(c.get("origin").toLowerCase() == "true") note.isTieOrigin = true;
+					if(c.get("destination").toLowerCase() == "true") note.isTieDestination = true;
+					break;
+				case "Vibrato":
+					var _g1 = this.getValue(c);
+					switch(_g1) {
+					case "Slight":
+						note.vibrato = alphatab.model.VibratoType.Slight;
+						break;
+					case "Wide":
+						note.vibrato = alphatab.model.VibratoType.Wide;
+						break;
+					}
+					break;
+				}
+			}
+		}
+		this._noteById.set(noteId,note);
+	}
+	,parseNotes: function(node) {
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Note":
+					this.parseNote(c);
+					break;
+				}
+			}
+		}
+	}
+	,parseBeatProperty: function(node,beat) {
+		var isWhammyBar = false;
+		var whammyBarOrigin = null;
+		var whammyBarMiddle1 = null;
+		var whammyBarMiddle2 = null;
+		var whammyBarDestination = null;
+		var name = node.get("name");
+		switch(name) {
+		case "Brush":
+			if(this.getValue(this.findChildElement(node,"Direction")) == "Up") beat.brushType = alphatab.model.BrushType.BrushUp; else beat.brushType = alphatab.model.BrushType.BrushDown;
+			break;
+		case "Slapped":
+			if(this.findChildElement(node,"Enable") != null) beat.slap = true;
+			break;
+		case "Popped":
+			if(this.findChildElement(node,"Enable") != null) beat.pop = true;
+			break;
+		case "WhammyBar":
+			isWhammyBar = true;
+			break;
+		case "WhammyBarExtend":
+			break;
+		case "WhammyBarOriginValue":
+			if(whammyBarOrigin == null) whammyBarOrigin = new alphatab.model.BendPoint();
+			whammyBarOrigin.value = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
+			break;
+		case "WhammyBarOriginOffset":
+			if(whammyBarOrigin == null) whammyBarOrigin = new alphatab.model.BendPoint();
+			whammyBarOrigin.offset = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
+			break;
+		case "WhammyBarMiddleValue":
+			if(whammyBarMiddle1 == null) whammyBarMiddle1 = new alphatab.model.BendPoint();
+			if(whammyBarMiddle2 == null) whammyBarMiddle2 = new alphatab.model.BendPoint();
+			whammyBarMiddle1.value = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
+			whammyBarMiddle2.value = whammyBarMiddle1.value;
+			break;
+		case "WhammyBarMiddleOffset1":
+			if(whammyBarMiddle1 == null) whammyBarMiddle1 = new alphatab.model.BendPoint();
+			whammyBarMiddle1.offset = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
+			break;
+		case "WhammyBarMiddleOffset2":
+			if(whammyBarMiddle2 == null) whammyBarMiddle2 = new alphatab.model.BendPoint();
+			whammyBarMiddle2.offset = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
+			break;
+		case "WhammyBarDestinationValue":
+			if(whammyBarDestination == null) whammyBarDestination = new alphatab.model.BendPoint();
+			whammyBarDestination.value = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
+			break;
+		case "WhammyBarDestinationOffset":
+			if(whammyBarDestination == null) whammyBarDestination = new alphatab.model.BendPoint();
+			whammyBarDestination.offset = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
+			break;
+		}
+		if(isWhammyBar && whammyBarOrigin != null && whammyBarDestination != null) {
+			var whammy = new Array();
+			whammy.push(whammyBarOrigin);
+			if(whammyBarMiddle1 != null) whammy.push(whammyBarMiddle1);
+			if(whammyBarMiddle2 != null) whammy.push(whammyBarMiddle2);
+			whammy.push(whammyBarDestination);
+			beat.whammyBarPoints = whammy;
+		}
+	}
+	,parseBeatProperties: function(node,beat) {
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Property":
+					this.parseBeatProperty(c,beat);
+					break;
+				}
+			}
+		}
+	}
+	,parseBeat: function(node) {
+		var beat = new alphatab.model.Beat();
+		var beatId = node.get("id");
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Notes":
+					this._notesOfBeat.set(beatId,this.getValue(c).split(" "));
+					break;
+				case "Rhythm":
+					this._rhythmOfBeat.set(beatId,c.get("ref"));
+					break;
+				case "Tremolo":
+					var _g1 = this.getValue(c);
+					switch(_g1) {
+					case "1/2":
+						beat.tremoloSpeed = alphatab.model.Duration.Half;
+						break;
+					case "1/4":
+						beat.tremoloSpeed = alphatab.model.Duration.Quarter;
+						break;
+					case "1/8":
+						beat.tremoloSpeed = alphatab.model.Duration.Eighth;
+						break;
+					}
+					break;
+				case "Chord":
+					beat.chordId = this.getValue(c);
+					break;
+				case "Arpreggio":
+					if(this.getValue(c) == "Up") beat.brushType = alphatab.model.BrushType.ArpeggioUp; else beat.brushType = alphatab.model.BrushType.ArpeggioDown;
+					break;
+				case "Properties":
+					this.parseBeatProperties(c,beat);
+					break;
+				case "FreeText":
+					beat.text = this.getValue(c);
+					break;
+				case "Dynamic":
+					var _g1 = this.getValue(c);
+					switch(_g1) {
+					case "PPP":
+						beat.dynamicValue = alphatab.model.DynamicValue.PPP;
+						break;
+					case "PP":
+						beat.dynamicValue = alphatab.model.DynamicValue.PP;
+						break;
+					case "P":
+						beat.dynamicValue = alphatab.model.DynamicValue.P;
+						break;
+					case "MP":
+						beat.dynamicValue = alphatab.model.DynamicValue.MP;
+						break;
+					case "MF":
+						beat.dynamicValue = alphatab.model.DynamicValue.MF;
+						break;
+					case "F":
+						beat.dynamicValue = alphatab.model.DynamicValue.F;
+						break;
+					case "FF":
+						beat.dynamicValue = alphatab.model.DynamicValue.FF;
+						break;
+					case "FFF":
+						beat.dynamicValue = alphatab.model.DynamicValue.FFF;
+						break;
+					}
+					break;
+				case "GraceNotes":
+					var _g1 = this.getValue(c);
+					switch(_g1) {
+					case "OnBeat":
+						beat.graceType = alphatab.model.GraceType.OnBeat;
+						break;
+					case "BeforeBeat":
+						beat.graceType = alphatab.model.GraceType.BeforeBeat;
+						break;
+					}
+					break;
+				}
+			}
+		}
+		this._beatById.set(beatId,beat);
+	}
+	,parseBeats: function(node) {
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Beat":
+					this.parseBeat(c);
+					break;
+				}
+			}
+		}
+	}
+	,parseVoice: function(node) {
+		var voice = new alphatab.model.Voice();
+		var voiceId = node.get("id");
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Beats":
+					this._beatsOfVoice.set(voiceId,this.getValue(c).split(" "));
+					break;
+				}
+			}
+		}
+		this._voiceById.set(voiceId,voice);
+	}
+	,parseVoices: function(node) {
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Voice":
+					this.parseVoice(c);
+					break;
+				}
+			}
+		}
+	}
+	,parseBar: function(node) {
+		var bar = new alphatab.model.Bar();
+		var barId = node.get("id");
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Voices":
+					this._voicesOfBar.set(barId,this.getValue(c).split(" "));
+					break;
+				case "Clef":
+					var _g1 = this.getValue(c);
+					switch(_g1) {
+					case "G2":
+						bar.clef = alphatab.model.Clef.G2;
+						break;
+					case "F4":
+						bar.clef = alphatab.model.Clef.F4;
+						break;
+					case "C4":
+						bar.clef = alphatab.model.Clef.C4;
+						break;
+					case "C3":
+						bar.clef = alphatab.model.Clef.C3;
+						break;
+					}
+					break;
+				}
+			}
+		}
+		this._barsById.set(barId,bar);
+	}
+	,parseBars: function(node) {
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Bar":
+					this.parseBar(c);
+					break;
+				}
+			}
+		}
+	}
+	,parseMasterBar: function(node) {
+		var masterBar = new alphatab.model.MasterBar();
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Time":
+					var timeParts = this.getValue(c).split("/");
+					masterBar.timeSignatureNumerator = Std.parseInt(timeParts[0]);
+					masterBar.timeSignatureDenominator = Std.parseInt(timeParts[1]);
+					break;
+				case "DoubleBar":
+					masterBar.isDoubleBar = true;
+					break;
+				case "Section":
+					masterBar.section = new alphatab.model.Section();
+					masterBar.section.marker = this.getValue(this.findChildElement(c,"Letter"));
+					masterBar.section.text = this.getValue(this.findChildElement(c,"Text"));
+					break;
+				case "Repeat":
+					if(c.get("start").toLowerCase() == "true") masterBar.isRepeatStart = true;
+					if(c.get("end").toLowerCase() == "true" && c.get("count") != null) masterBar.repeatCount = Std.parseInt(c.get("count"));
+					break;
+				case "AlternateEndings":
+					var alternateEndings = this.getValue(c).split(" ");
+					var i = 0;
+					var _g2 = 0, _g1 = alternateEndings.length;
+					while(_g2 < _g1) {
+						var k = _g2++;
+						i |= 1 << -1 + Std.parseInt(alternateEndings[i]);
+					}
+					masterBar.alternateEndings = i;
+					break;
+				case "Bars":
+					this._barsOfMasterBar.push(this.getValue(c).split(" "));
+					break;
+				case "TripletFeel":
+					var _g1 = this.getValue(c);
+					switch(_g1) {
+					case "NoTripletFeel":
+						masterBar.tripletFeel = alphatab.model.TripletFeel.NoTripletFeel;
+						break;
+					case "Triplet8th":
+						masterBar.tripletFeel = alphatab.model.TripletFeel.Triplet8th;
+						break;
+					case "Triplet16th":
+						masterBar.tripletFeel = alphatab.model.TripletFeel.Triplet16th;
+						break;
+					case "Dotted8th":
+						masterBar.tripletFeel = alphatab.model.TripletFeel.Dotted8th;
+						break;
+					case "Dotted16th":
+						masterBar.tripletFeel = alphatab.model.TripletFeel.Dotted16th;
+						break;
+					case "Scottish8th":
+						masterBar.tripletFeel = alphatab.model.TripletFeel.Scottish8th;
+						break;
+					case "Scottish16th":
+						masterBar.tripletFeel = alphatab.model.TripletFeel.Scottish16th;
+						break;
+					}
+					break;
+				}
+			}
+		}
+		this._masterBars.push(masterBar);
+	}
+	,parseMasterBarsNode: function(node) {
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "MasterBar":
+					this.parseMasterBar(c);
+					break;
+				}
+			}
+		}
+	}
+	,parseGeneralMidi: function(track,node) {
+		track.playbackInfo.port = Std.parseInt(this.getValue(this.findChildElement(node,"Port")));
+		track.playbackInfo.program = Std.parseInt(this.getValue(this.findChildElement(node,"Program")));
+		track.playbackInfo.primaryChannel = Std.parseInt(this.getValue(this.findChildElement(node,"PrimaryChannel")));
+		track.playbackInfo.secondaryChannel = Std.parseInt(this.getValue(this.findChildElement(node,"SecondaryCannel")));
+		track.isPercussion = node.get("table") == "Percussion";
+	}
+	,parseTrackProperty: function(track,node) {
+		var propertyName = node.get("name");
+		switch(propertyName) {
+		case "Tuning":
+			var tuningParts = this.getValue(this.findChildElement(node,"Pitches")).split(" ");
+			var _g = 0;
+			while(_g < tuningParts.length) {
+				var s = tuningParts[_g];
+				++_g;
+				track.tuning.push(Std.parseInt(s));
+			}
+			break;
+		case "CapoFret":
+			track.capo = Std.parseInt(this.getValue(this.findChildElement(node,"Fret")));
+			break;
+		}
+	}
+	,parseTrackProperties: function(track,node) {
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Property":
+					this.parseTrackProperty(track,c);
+					break;
+				}
+			}
+		}
+	}
+	,parseDiagramItem: function(track,node) {
+		var chord = new alphatab.model.Chord();
+		var chordId = node.get("id");
+		chord.name = node.get("name");
+		track.chords.set(chordId,chord);
+	}
+	,parseDiagramCollection: function(track,node) {
+		var items = this.findChildElement(node,"Items");
+		var $it0 = items.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Item":
+					this.parseDiagramItem(track,c);
+					break;
+				}
+			}
+		}
+	}
+	,parseTrack: function(node) {
+		var track = new alphatab.model.Track();
+		var trackId = node.get("id");
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Name":
+					track.name = this.getValue(c);
+					break;
+				case "ShortName":
+					track.shortName = this.getValue(c);
+					break;
+				case "Properties":
+					this.parseTrackProperties(track,c);
+					break;
+				case "DiagramCollection":
+					this.parseDiagramCollection(track,c);
+					break;
+				case "GeneralMidi":
+					this.parseGeneralMidi(track,c);
+					break;
+				case "PlaybackState":
+					var state = this.getValue(c);
+					track.playbackInfo.isSolo = state == "Solo";
+					track.playbackInfo.isMute = state == "Mute";
+					break;
+				}
+			}
+		}
+		this._tracksById.set(trackId,track);
+	}
+	,parseTracksNode: function(node) {
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Track":
+					this.parseTrack(c);
+					break;
+				}
+			}
+		}
+	}
+	,parseAutomation: function(node) {
+		var type = null;
+		var isLinear = false;
+		var barIndex = 0;
+		var ratioPosition = 0;
+		var value = 0;
+		var reference = 0;
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Type":
+					type = this.getValue(c);
+					break;
+				case "Linear":
+					isLinear = this.getValue(c).toLowerCase() == "true";
+					break;
+				case "Bar":
+					barIndex = Std.parseInt(this.getValue(c));
+					break;
+				case "Position":
+					ratioPosition = Std.parseFloat(this.getValue(c));
+					break;
+				case "Value":
+					var parts = this.getValue(c).split(" ");
+					value = Std.parseFloat(parts[0]);
+					reference = Std.parseInt(parts[1]);
+					break;
+				}
+			}
+		}
+		if(type == null) return;
+		var automation = null;
+		switch(type) {
+		case "Tempo":
+			automation = alphatab.model.Automation.builtTempoAutomation(isLinear,ratioPosition,value,reference);
+			break;
+		}
+		if(automation != null) {
+			if(!this._automations.exists(barIndex)) this._automations.set(barIndex,new Array());
+			this._automations.get(barIndex).push(automation);
+		}
+	}
+	,parseAutomations: function(node) {
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Automation":
+					this.parseAutomation(c);
+					break;
+				case "Tracks":
+					this._tracksMapping = this.getValue(c).split(" ");
+					break;
+				}
+			}
+		}
+	}
+	,parseMasterTrackNode: function(node) {
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				if(c.get_nodeName() == "Automations") this.parseAutomations(c);
+			}
+		}
+	}
+	,parseScoreNode: function(node) {
 		var $it0 = node.iterator();
 		while( $it0.hasNext() ) {
 			var c = $it0.next();
@@ -3599,38 +4453,51 @@ alphatab.importer.GpxParser.prototype = {
 				var _g = c.get_nodeName();
 				switch(_g) {
 				case "Title":
-					this.score.title = c.firstChild().toString();
+					this.score.title = this.getValue(c.firstChild());
 					break;
 				case "SubTitle":
-					this.score.subTitle = c.firstChild().toString();
+					this.score.subTitle = this.getValue(c.firstChild());
 					break;
 				case "Artist":
-					this.score.artist = c.firstChild().toString();
+					this.score.artist = this.getValue(c.firstChild());
 					break;
 				case "Album":
-					this.score.album = c.firstChild().toString();
+					this.score.album = this.getValue(c.firstChild());
 					break;
 				case "Words":
-					this.score.words = c.firstChild().toString();
+					this.score.words = this.getValue(c.firstChild());
 					break;
 				case "Music":
-					this.score.music = c.firstChild().toString();
+					this.score.music = this.getValue(c.firstChild());
 					break;
 				case "WordsAndMusic":
 					if(c.firstChild() != null && c.firstChild().toString() != "") {
-						this.score.words = c.firstChild().toString();
-						this.score.music = c.firstChild().toString();
+						this.score.words = this.getValue(c.firstChild());
+						this.score.music = this.getValue(c.firstChild());
 					}
 					break;
 				case "Copyright":
-					this.score.copyright = c.firstChild().toString();
+					this.score.copyright = this.getValue(c.firstChild());
 					break;
 				case "Tabber":
-					this.score.tab = c.firstChild().toString();
+					this.score.tab = this.getValue(c.firstChild());
 					break;
 				}
 			}
 		}
+	}
+	,findChildElement: function(node,name) {
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				if(c.get_nodeName() == name) return c;
+			}
+		}
+		return null;
+	}
+	,getValue: function(n) {
+		if(n.nodeType == Xml.Element || n.nodeType == Xml.Document) return this.getValue(n.firstChild()); else return n.get_nodeValue();
 	}
 	,parseDom: function(xml) {
 		if(xml.nodeType == Xml.Document) xml = xml.firstElement();
@@ -3645,12 +4512,51 @@ alphatab.importer.GpxParser.prototype = {
 					case "Score":
 						this.parseScoreNode(n);
 						break;
+					case "MasterTrack":
+						this.parseMasterTrackNode(n);
+						break;
+					case "Tracks":
+						this.parseTracksNode(n);
+						break;
+					case "MasterBars":
+						this.parseMasterBarsNode(n);
+						break;
+					case "Bars":
+						this.parseBars(n);
+						break;
+					case "Voices":
+						this.parseVoices(n);
+						break;
+					case "Beats":
+						this.parseBeats(n);
+						break;
+					case "Notes":
+						this.parseNotes(n);
+						break;
+					case "Rhythms":
+						this.parseRhythms(n);
+						break;
 					}
 				}
 			}
 		} else throw alphatab.importer.ScoreImporter.UNSUPPORTED_FORMAT;
+		this.buildModel();
 	}
 	,parseXml: function(xml) {
+		this._automations = new haxe.ds.IntMap();
+		this._tracksMapping = new Array();
+		this._tracksById = new haxe.ds.StringMap();
+		this._masterBars = new Array();
+		this._barsOfMasterBar = new Array();
+		this._voicesOfBar = new haxe.ds.StringMap();
+		this._barsById = new haxe.ds.StringMap();
+		this._voiceById = new haxe.ds.StringMap();
+		this._beatsOfVoice = new haxe.ds.StringMap();
+		this._beatById = new haxe.ds.StringMap();
+		this._rhythmOfBeat = new haxe.ds.StringMap();
+		this._rhythmById = new haxe.ds.StringMap();
+		this._notesOfBeat = new haxe.ds.StringMap();
+		this._noteById = new haxe.ds.StringMap();
 		var dom = Xml.parse(xml);
 		this.parseDom(dom);
 	}
@@ -3927,13 +4833,23 @@ alphatab.model.AccidentalType.Flat.__enum__ = alphatab.model.AccidentalType;
 alphatab.model.Automation = function() {
 };
 alphatab.model.Automation.__name__ = true;
+alphatab.model.Automation.builtTempoAutomation = function(isLinear,ratioPosition,value,reference) {
+	if(reference < 1 || reference > 5) reference = 2;
+	var references = [1.0,0.5,1.0,1.5,2.0,3.0];
+	var automation = new alphatab.model.Automation();
+	automation.type = alphatab.model.AutomationType.Tempo;
+	automation.isLinear = isLinear;
+	automation.ratioPosition = ratioPosition;
+	var realValue = value * references[reference];
+	automation.value = realValue;
+	return automation;
+}
 alphatab.model.Automation.prototype = {
 	clone: function() {
 		var a = new alphatab.model.Automation();
 		a.isLinear = this.isLinear;
 		a.type = this.type;
 		a.value = this.value;
-		a.duration = this.duration;
 		return a;
 	}
 	,__class__: alphatab.model.Automation
@@ -4061,8 +4977,11 @@ alphatab.model.Beat.prototype = {
 	,isTremolo: function() {
 		return this.tremoloSpeed != null;
 	}
+	,chord: function() {
+		return this.voice.bar.track.chords.get(this.chordId);
+	}
 	,hasChord: function() {
-		return this.chord != null;
+		return this.chordId != null;
 	}
 	,hasWhammyBar: function() {
 		return this.whammyBarPoints.length > 0;
@@ -4308,6 +5227,7 @@ alphatab.model.Note = function() {
 	this.trillFret = -1;
 	this.trillSpeed = 0;
 	this.durationPercent = 1;
+	this.octave = -1;
 };
 alphatab.model.Note.__name__ = true;
 alphatab.model.Note.prototype = {
@@ -4427,6 +5347,7 @@ alphatab.model.SlideType.OutDown.__enum__ = alphatab.model.SlideType;
 alphatab.model.Track = function() {
 	this.tuning = new Array();
 	this.bars = new Array();
+	this.chords = new haxe.ds.StringMap();
 	this.playbackInfo = new alphatab.model.PlaybackInformation();
 };
 alphatab.model.Track.__name__ = true;
@@ -8851,6 +9772,18 @@ alphatab.rendering.utils.TupletHelper.prototype = {
 	,__class__: alphatab.rendering.utils.TupletHelper
 }
 if(!alphatab.util) alphatab.util = {}
+alphatab.util.Guid = function() { }
+alphatab.util.Guid.__name__ = true;
+alphatab.util.Guid.generate = function() {
+	var result = new StringBuf();
+	var _g = 0;
+	while(_g < 32) {
+		var j = _g++;
+		if(j == 8 || j == 12 || j == 16 || j == 20) result.b += "-";
+		result.b += Std.string(StringTools.hex(Math.floor(Math.random() * 16)));
+	}
+	return result.b.toUpperCase();
+}
 alphatab.util.LazyVar = function(loader) {
 	this._loader = loader;
 };

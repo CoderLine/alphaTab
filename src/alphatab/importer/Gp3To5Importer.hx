@@ -40,6 +40,7 @@ import alphatab.model.Track;
 import alphatab.model.TripletFeel;
 import alphatab.model.VibratoType;
 import alphatab.model.Voice;
+import alphatab.util.Guid;
 import haxe.io.Bytes;
 
 /**
@@ -667,6 +668,7 @@ class Gp3To5Importer extends ScoreImporter
     private function readChord(beat:Beat)
     {
         var chord:Chord = new Chord();
+        var chordId:String = Guid.generate();
         if (_versionNumber >= 500)
         {
             skip(17);
@@ -770,7 +772,8 @@ class Gp3To5Importer extends ScoreImporter
     
         if (chord.name.length > 0)
         {
-            beat.chord = chord;
+            beat.voice.bar.track.chords.set(chordId, chord);
+            beat.chordId = chordId;
         }
     }
     

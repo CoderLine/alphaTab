@@ -31,6 +31,6 @@ class ChordsEffectInfo implements IEffectBarRendererInfo
 
     public function createNewGlyph(renderer : EffectBarRenderer, beat:Beat) : Glyph
     {
-        return new TextGlyph(0, 0, beat.chord.name, renderer.getResources().effectFont);
+        return new TextGlyph(0, 0, beat.chord().name, renderer.getResources().effectFont);
     }
 }

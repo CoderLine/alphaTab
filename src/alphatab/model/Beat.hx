@@ -68,8 +68,9 @@ class Beat
     public inline function hasWhammyBar():Bool { return whammyBarPoints.length > 0; }
     
     public var vibrato:VibratoType;
-    public var chord:Chord;
-    public inline function hasChord():Bool { return chord != null; }
+    public var chordId:String;
+    public inline function hasChord():Bool { return chordId != null; }
+    public inline function chord():Chord { return voice.bar.track.chords.get(chordId); }
     public var graceType:GraceType;
     public var pickStroke:PickStrokeType;
     

@@ -24,10 +24,25 @@ class Automation
     public var isLinear:Bool;
     public var type:AutomationType;
     public var value:Float;
-    public var duration:Int;
+    public var ratioPosition:Float;
     
     public function new() 
     {
+    }
+    
+    public static function builtTempoAutomation(isLinear:Bool, ratioPosition:Float, value:Float, reference:Int) : Automation
+    {
+        if (reference < 1 || reference > 5) reference = 2;
+
+        var references = [1.0, 0.5, 1.0, 1.5, 2.0, 3.0];
+        var automation = new Automation();
+        automation.type = AutomationType.Tempo;
+        automation.isLinear = isLinear;
+        automation.ratioPosition = ratioPosition;
+        var realValue = value * references[reference];
+        automation.value = realValue;
+        
+        return automation;
     }
     
     public function clone() : Automation
@@ -36,7 +51,6 @@ class Automation
         a.isLinear = isLinear;
         a.type = type;
         a.value = value;
-        a.duration = duration;
         return a;
     }
 }
