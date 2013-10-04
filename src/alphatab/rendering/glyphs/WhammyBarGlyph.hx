@@ -103,10 +103,8 @@ class WhammyBarGlyph extends Glyph
                     var s = "";
                     if (dv < 0) s += "-";
                     
-                    if (dv >= 1 || dv <= 1)
+                    if (dv >= 1 || dv <= -1)
                         s += Std.string(Math.floor(Math.abs(dv))) + " ";
-                    else if (dv < 0)
-                        s += "-";
                     
                     dv -= Math.floor(dv);
                     if (dv == 0.25)

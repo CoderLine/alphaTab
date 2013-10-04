@@ -14,6 +14,7 @@ import alphatab.model.GraceType;
 import alphatab.model.HarmonicType;
 import alphatab.model.MasterBar;
 import alphatab.model.Note;
+import alphatab.model.PickStrokeType;
 import alphatab.model.Score;
 import alphatab.model.Section;
 import alphatab.model.SlideType;
@@ -46,7 +47,17 @@ class GpxRhythm
 class GpxParser 
 {
     private static inline var InvalidId = "-1";
-
+    /*
+     * GPX range: 0-100
+     * Internal range: 0 - 60
+     */
+    private static inline var BendPointPositionFactor =  60.0/100.0;
+    /*
+     * GPX Range: 0-300
+     * Internal Range: 0-12
+     */
+    private static inline var BendPointValueFactor = 12.0/300.0;
+    
 	public var score:Score;
     private var _automations:StringMap<Array<Automation>>;
     private var _tracksMapping:Array<String>;
@@ -318,7 +329,6 @@ class GpxParser
                     case "ShortName": track.shortName = getValue(c);
                     //TODO: case "Lyrics": parseLyrics(track, c);
                     case "Properties": parseTrackProperties(track, c);
-                    case "DiagramCollection": parseDiagramCollection(track, c);
                     case "GeneralMidi": parseGeneralMidi(track, c);
                     case "PlaybackState": 
                         var state = getValue(c);
@@ -376,6 +386,7 @@ class GpxParser
                 var tuningParts = getValue(findChildElement(node, "Pitches")).split(" ");
                 for (s in tuningParts) track.tuning.push(Std.parseInt(s));
                 track.tuning.reverse();
+            case "DiagramCollection": parseDiagramCollection(track, node);
             case "CapoFret":
                 track.capo = Std.parseInt(getValue(findChildElement(node, "Fret")));
         }
@@ -585,12 +596,17 @@ class GpxParser
                         _notesOfBeat.set(beatId, getValue(c).split(" "));
                     case "Rhythm":
                         _rhythmOfBeat.set(beatId, c.get("ref"));
+                    case "Fadding":
+                        if (getValue(c) == "FadeIn")
+                        {
+                            beat.fadeIn = true;
+                        }
                     case "Tremolo":
                         switch(getValue(c))
                         {
-                            case "1/2": beat.tremoloSpeed = Duration.Half;
-                            case "1/4": beat.tremoloSpeed = Duration.Quarter;
-                            case "1/8": beat.tremoloSpeed = Duration.Eighth;
+                            case "1/2": beat.tremoloSpeed = Duration.Eighth;
+                            case "1/4": beat.tremoloSpeed = Duration.Sixteenth;
+                            case "1/8": beat.tremoloSpeed = Duration.ThirtySecond;
                         }
                     case "Chord":
                         beat.chordId = getValue(c);
@@ -635,6 +651,13 @@ class GpxParser
     
     private function parseBeatProperties(node:Xml, beat:Beat)
     {
+        var isWhammy :Bool = false;
+        var whammyOrigin:BendPoint = null;
+        var whammyMiddleValue:Null<Int> = null;
+        var whammyMiddleOffset1:Null<Int> = null;
+        var whammyMiddleOffset2:Null<Int> = null;
+        var whammyDestination:BendPoint = null;
+
         for (c in node)
 		{
             if (c.nodeType == Xml.Element)
@@ -642,77 +665,92 @@ class GpxParser
                 switch(c.nodeName)
                 {
                     case "Property":
-                        parseBeatProperty(c, beat);
+                        var name = c.get("name");
+                        switch(name)
+                        {
+                            case "Brush": 
+                                if (getValue(findChildElement(c, "Direction")) == "Up")
+                                {
+                                    beat.brushType = BrushType.BrushUp;
+                                }
+                                else
+                                {
+                                    beat.brushType = BrushType.BrushDown;
+                                }
+                                // TODO: brush duration
+                            case "PickStroke": 
+                                if (getValue(findChildElement(c, "Direction")) == "Up")
+                                {
+                                    beat.pickStroke = PickStrokeType.Up;
+                                }
+                                else
+                                {
+                                    beat.pickStroke = PickStrokeType.Down;
+                                }
+                                // TODO: brush duration
+                            case "Slapped":if (findChildElement(c, "Enable") != null) beat.slap = true;
+                            case "Popped": if (findChildElement(c, "Enable") != null) beat.pop = true;
+                            case "VibratoWTremBar": 
+                                switch(getValue(findChildElement(c, "Strength")))
+                                {
+                                    case "Wide": beat.vibrato = VibratoType.Wide;
+                                    case "Slight": beat.vibrato = VibratoType.Slight;
+                                }
+                                
+                            case "WhammyBar": isWhammy = true;
+                            case "WhammyBarExtend":
+                            
+                            case "WhammyBarOriginValue": 
+                                if (whammyOrigin == null) whammyOrigin = new BendPoint();
+                                whammyOrigin.value = Std.int(Std.parseFloat(getValue(findChildElement(c, "Float"))) * BendPointValueFactor);
+                            case "WhammyBarOriginOffset":
+                                if (whammyOrigin == null) whammyOrigin = new BendPoint();
+                                whammyOrigin.offset = Std.int(Std.parseFloat(getValue(findChildElement(c, "Float"))) * BendPointPositionFactor);
+
+                            case "WhammyBarMiddleValue":
+                                whammyMiddleValue = Std.int(Std.parseFloat(getValue(findChildElement(c, "Float"))) * BendPointValueFactor);
+
+                            case "WhammyBarMiddleOffset1":
+                                whammyMiddleOffset1 = Std.int(Std.parseFloat(getValue(findChildElement(c, "Float"))) * BendPointPositionFactor);
+                            case "WhammyBarMiddleOffset2":
+                                whammyMiddleOffset2 = Std.int(Std.parseFloat(getValue(findChildElement(c, "Float"))) * BendPointPositionFactor);
+                            
+                            case "WhammyBarDestinationValue":
+                                if (whammyDestination == null) whammyDestination = new BendPoint(BendPoint.MaxPosition);
+                                whammyDestination.value = Std.int(Std.parseFloat(getValue(findChildElement(c, "Float"))) * BendPointValueFactor);
+
+                            case "WhammyBarDestinationOffset":
+                                if (whammyDestination == null) whammyDestination = new BendPoint();
+                                whammyDestination.offset = Std.int(Std.parseFloat(getValue(findChildElement(c, "Float"))) * BendPointPositionFactor);
+
+                        }
                 }
-            }
+            }            
 		}
-    }
-    
-    private function parseBeatProperty(node:Xml, beat:Beat)
-    {
-        var isWhammyBar :Bool = false;
-        var whammyBarOrigin:BendPoint = null;
-        var whammyBarMiddle1:BendPoint = null;
-        var whammyBarMiddle2:BendPoint = null;
-        var whammyBarDestination:BendPoint = null;
         
-        var name = node.get("name");
-        switch(name)
+                
+        if (isWhammy)
         {
-            case "Brush": 
-                if (getValue(findChildElement(node, "Direction")) == "Up")
-                {
-                    beat.brushType = BrushType.BrushUp;
-                }
-                else
-                {
-                    beat.brushType = BrushType.BrushDown;
-                }
-                // TODO: brush duration
-            case "Slapped":if (findChildElement(node, "Enable") != null) beat.slap = true;
-            case "Popped": if (findChildElement(node, "Enable") != null) beat.pop = true;
-            // TODO: correct whammy bar values and offsets
-            case "WhammyBar": isWhammyBar = true;
-            case "WhammyBarExtend":
-            
-            case "WhammyBarOriginValue": 
-                if (whammyBarOrigin == null) whammyBarOrigin = new BendPoint();
-                whammyBarOrigin.value = Std.int(Std.parseFloat(getValue(findChildElement(node, "Float"))));
-            case "WhammyBarOriginOffset":
-                if (whammyBarOrigin == null) whammyBarOrigin = new BendPoint();
-                whammyBarOrigin.offset = Std.int(Std.parseFloat(getValue(findChildElement(node, "Float"))));
-
-            case "WhammyBarMiddleValue":
-                if (whammyBarMiddle1 == null) whammyBarMiddle1 = new BendPoint();
-                if (whammyBarMiddle2 == null) whammyBarMiddle2 = new BendPoint();
-                whammyBarMiddle1.value = Std.int(Std.parseFloat(getValue(findChildElement(node, "Float"))));
-                whammyBarMiddle2.value = whammyBarMiddle1.value;
-
-            case "WhammyBarMiddleOffset1":
-                if (whammyBarMiddle1 == null) whammyBarMiddle1 = new BendPoint();
-                whammyBarMiddle1.offset = Std.int(Std.parseFloat(getValue(findChildElement(node, "Float"))));
-            case "WhammyBarMiddleOffset2":
-                if (whammyBarMiddle2 == null) whammyBarMiddle2 = new BendPoint();
-                whammyBarMiddle2.offset = Std.int(Std.parseFloat(getValue(findChildElement(node, "Float"))));
-            
-            case "WhammyBarDestinationValue":
-                if (whammyBarDestination == null) whammyBarDestination = new BendPoint();
-                whammyBarDestination.value = Std.int(Std.parseFloat(getValue(findChildElement(node, "Float"))));
-
-            case "WhammyBarDestinationOffset":
-                if (whammyBarDestination == null) whammyBarDestination = new BendPoint();
-                whammyBarDestination.offset = Std.int(Std.parseFloat(getValue(findChildElement(node, "Float"))));
-        }
-        
-        if (isWhammyBar && whammyBarOrigin != null && whammyBarDestination != null)
-        {
+            if (whammyOrigin == null) whammyOrigin = new BendPoint();
+            if (whammyDestination == null) whammyDestination = new BendPoint(BendPoint.MaxPosition);
             var whammy = new Array<BendPoint>();
-            whammy.push(whammyBarOrigin);
-            if (whammyBarMiddle1 != null) whammy.push(whammyBarMiddle1);
-            if (whammyBarMiddle2 != null) whammy.push(whammyBarMiddle2);
-            whammy.push(whammyBarDestination);
+            whammy.push(whammyOrigin);
+            if (whammyMiddleOffset1 != null && whammyMiddleValue != null) 
+            {
+                whammy.push(new BendPoint(whammyMiddleOffset1, whammyMiddleValue));
+            }
+            if (whammyMiddleOffset2 != null && whammyMiddleValue != null) 
+            {
+                whammy.push(new BendPoint(whammyMiddleOffset2, whammyMiddleValue));
+            }
+            
+            if (whammyMiddleOffset1 == null && whammyMiddleOffset2 == null && whammyMiddleValue != null)
+            {
+                whammy.push(new BendPoint(Std.int(BendPoint.MaxPosition / 2), whammyMiddleValue));
+            }
+            whammy.push(whammyDestination);
             beat.whammyBarPoints = whammy;
-        }
+        }  
     }
     
     //
@@ -754,6 +792,8 @@ class GpxParser
                     case "LetRing":
                         note.isLetRing = true;
                     case "Trill":
+                        // NOTE: why is this fret specified in absolute note value? annoying
+                        // TODO: find a good way to calculate the acutal fret
                         note.trillFret = Std.parseInt(getValue(c));
                         note.trillSpeed = 1;
                     case "Accent":
@@ -785,6 +825,13 @@ class GpxParser
     
     private function parseNoteProperties(node:Xml, note:Note)
     {
+        var isBended :Bool = false;
+        var bendOrigin:BendPoint = null;
+        var bendMiddleValue:Null<Int> = null;
+        var bendMiddleOffset1:Null<Int> = null;
+        var bendMiddleOffset2:Null<Int> = null;
+        var bendDestination:BendPoint = null;
+
         for (c in node)
 		{
             if (c.nodeType == Xml.Element)
@@ -792,115 +839,112 @@ class GpxParser
                 switch(c.nodeName)
                 {
                     case "Property":
-                        parseNoteProperty(c, note);
+                        var name = c.get("name");
+                        switch(name)
+                        {
+                            case "String": 
+                                note.string = Std.parseInt(getValue(findChildElement(c, "String"))) + 1;
+                            case "Fret": 
+                                note.fret = Std.parseInt(getValue(findChildElement(c, "Fret")));
+                            // case "Tapped": 
+                            case "HarmonicType":
+                                var htype = findChildElement(c, "HType");
+                                if (htype != null)
+                                {
+                                    switch(getValue(htype))
+                                    {
+                                        case "NoHarmonic": note.harmonicType = HarmonicType.None;
+                                        case "Natural": note.harmonicType = HarmonicType.Natural;
+                                        case "Artificial": note.harmonicType = HarmonicType.Artificial;
+                                        case "Pinch": note.harmonicType = HarmonicType.Pinch;
+                                        case "Tap": note.harmonicType = HarmonicType.Tap;
+                                        case "Semi": note.harmonicType = HarmonicType.Semi;
+                                        case "Feedback": note.harmonicType = HarmonicType.Feedback;
+                                    }
+                                }
+                            case "HarmonicFret": 
+                                var hfret = findChildElement(c, "HFret");
+                                if (hfret != null)
+                                {
+                                    note.harmonicValue = Std.parseFloat(getValue(hfret));
+                                }
+                            // case "Muted": 
+                            case "PalmMuted": 
+                                if (findChildElement(c, "Enable") != null) note.isPalmMute = true;
+                            // case "Element": 
+                            // case "Variation": 
+                            // case "Tone": 
+                            case "Octave": 
+                                note.octave = Std.parseInt(getValue(findChildElement(c, "Number")));
+                            case "Bended": isBended = true;
+                            
+                            case "BendOriginValue": 
+                                if (bendOrigin == null) bendOrigin = new BendPoint();
+                                bendOrigin.value = Std.int(Std.parseFloat(getValue(findChildElement(c, "Float"))) * BendPointValueFactor);
+                            case "BendOriginOffset":
+                                if (bendOrigin == null) bendOrigin = new BendPoint();
+                                bendOrigin.offset = Std.int(Std.parseFloat(getValue(findChildElement(c, "Float"))) * BendPointPositionFactor);
+
+                            case "BendMiddleValue":
+                                bendMiddleValue = Std.int(Std.parseFloat(getValue(findChildElement(c, "Float"))) * BendPointValueFactor);
+
+                            case "BendMiddleOffset1":
+                                bendMiddleOffset1 = Std.int(Std.parseFloat(getValue(findChildElement(c, "Float"))) * BendPointPositionFactor);
+                            case "BendMiddleOffset2":
+                                bendMiddleOffset2 = Std.int(Std.parseFloat(getValue(findChildElement(c, "Float"))) * BendPointPositionFactor);
+                            
+                            case "BendDestinationValue":
+                                if (bendDestination == null) bendDestination = new BendPoint(BendPoint.MaxPosition);
+                                bendDestination.value = Std.int(Std.parseFloat(getValue(findChildElement(c, "Float"))) * BendPointValueFactor);
+
+                            case "BendDestinationOffset":
+                                if (bendDestination == null) bendDestination = new BendPoint();
+                                bendDestination.offset = Std.int(Std.parseFloat(getValue(findChildElement(c, "Float"))) * BendPointPositionFactor);
+                                
+                            case "HopoOrigin": 
+                                if (findChildElement(c, "Enable") != null)
+                                    note.isHammerPullOrigin = true;
+                            case "HopoDestination": 
+                                // NOTE: gets automatically calculated 
+                                // if (findChildElement(node, "Enable") != null)
+                                //     note.isHammerPullDestination = true;
+                            case "Slide": 
+                                var slideFlags = Std.parseInt(getValue(findChildElement(c, "Flags")));
+                                if ( (slideFlags & 0x01) != 0) note.slideType = SlideType.Shift;
+                                if ( (slideFlags & 0x02) != 0) note.slideType = SlideType.Legato;
+                                if ( (slideFlags & 0x04) != 0) note.slideType = SlideType.OutDown;
+                                if ( (slideFlags & 0x08) != 0) note.slideType = SlideType.OutUp;
+                                if ( (slideFlags & 0x10) != 0) note.slideType = SlideType.IntoFromBelow;
+                                if ( (slideFlags & 0x20) != 0) note.slideType = SlideType.IntoFromAbove;
+                        }
                 }
             }
 		}
-    }    
-    private function parseNoteProperty(node:Xml, note:Note)
-    {
-        var isBended :Bool = false;
-        var bendOrigin:BendPoint = null;
-        var bendMiddle1:BendPoint = null;
-        var bendMiddle2:BendPoint = null;
-        var bendDestination:BendPoint = null;
-
-        var name = node.get("name");
-        switch(name)
-        {
-            case "String": 
-                note.string = Std.parseInt(getValue(findChildElement(node, "String"))) + 1;
-            case "Fret": 
-                note.fret = Std.parseInt(getValue(findChildElement(node, "Fret")));
-            // case "Tapped": 
-            case "HarmonicType":
-                var htype = findChildElement(node, "HType");
-                if (htype != null)
-                {
-                    switch(getValue(htype))
-                    {
-                        case "NoHarmonic": note.harmonicType = HarmonicType.None;
-                        case "Natural": note.harmonicType = HarmonicType.Natural;
-                        case "Artificial": note.harmonicType = HarmonicType.Artificial;
-                        case "Pinch": note.harmonicType = HarmonicType.Pinch;
-                        case "Tap": note.harmonicType = HarmonicType.Tap;
-                        case "Semi": note.harmonicType = HarmonicType.Semi;
-                        case "Feedback": note.harmonicType = HarmonicType.Feedback;
-                    }
-                }
-            case "HarmonicFret": 
-                var hfret = findChildElement(node, "HFret");
-                if (hfret != null)
-                {
-                    note.harmonicValue = Std.parseFloat(getValue(hfret));
-                }
-            // case "Muted": 
-            case "PalmMuted": 
-                if (findChildElement(node, "Enable") != null) note.isPalmMute = true;
-            // case "Element": 
-            // case "Variation": 
-            // case "Tone": 
-            case "Octave": 
-                note.octave = Std.parseInt(getValue(findChildElement(node, "Number")));
-            case "Bended": isBended = true;
-            
-            case "BendOriginValue": 
-                if (bendOrigin == null) bendOrigin = new BendPoint();
-                bendOrigin.value = Std.int(Std.parseFloat(getValue(findChildElement(node, "Float"))));
-            case "BendOriginOffset":
-                if (bendOrigin == null) bendOrigin = new BendPoint();
-                bendOrigin.offset = Std.int(Std.parseFloat(getValue(findChildElement(node, "Float"))));
-
-            case "BendMiddleValue":
-                if (bendMiddle1 == null) bendMiddle1 = new BendPoint();
-                if (bendMiddle2 == null) bendMiddle2 = new BendPoint();
-                bendMiddle1.value = Std.int(Std.parseFloat(getValue(findChildElement(node, "Float"))));
-                bendMiddle2.value = bendMiddle1.value;
-
-            case "BendMiddleOffset1":
-                if (bendMiddle1 == null) bendMiddle1 = new BendPoint();
-                bendMiddle1.offset = Std.int(Std.parseFloat(getValue(findChildElement(node, "Float"))));
-            case "BendMiddleOffset2":
-                if (bendMiddle2 == null) bendMiddle2 = new BendPoint();
-                bendMiddle2.offset = Std.int(Std.parseFloat(getValue(findChildElement(node, "Float"))));
-            
-            case "BendDestinationValue":
-                if (bendDestination == null) bendDestination = new BendPoint();
-                bendDestination.value = Std.int(Std.parseFloat(getValue(findChildElement(node, "Float"))));
-
-            case "BendDestinationOffset":
-                if (bendDestination == null) bendDestination = new BendPoint();
-                bendDestination.offset = Std.int(Std.parseFloat(getValue(findChildElement(node, "Float"))));
-                
-            case "HopoOrigin": 
-                if (findChildElement(node, "Enable") != null)
-                    note.isHammerPullOrigin = true;
-            case "HopoDestination": 
-                // NOTE: gets automatically calculated 
-                // if (findChildElement(node, "Enable") != null)
-                //     note.isHammerPullDestination = true;
-            case "Slide": 
-                var slideFlags = Std.parseInt(getValue(findChildElement(node, "Flags")));
-                if ( (slideFlags & 0x01) != 0) note.slideType = SlideType.Shift;
-                if ( (slideFlags & 0x02) != 0) note.slideType = SlideType.Legato;
-                if ( (slideFlags & 0x04) != 0) note.slideType = SlideType.OutDown;
-                if ( (slideFlags & 0x08) != 0) note.slideType = SlideType.OutUp;
-                if ( (slideFlags & 0x10) != 0) note.slideType = SlideType.IntoFromBelow;
-                if ( (slideFlags & 0x20) != 0) note.slideType = SlideType.IntoFromAbove;
-        }
         
-        if (isBended && bendOrigin != null && bendDestination != null)
+        if (isBended)
         {
+            if (bendOrigin == null) bendOrigin = new BendPoint();
+            if (bendDestination == null) bendDestination = new BendPoint(BendPoint.MaxPosition);
             var bend = new Array<BendPoint>();
             bend.push(bendOrigin);
-            if (bendMiddle1 != null) bend.push(bendMiddle1);
-            if (bendMiddle2 != null) bend.push(bendMiddle2);
+            if (bendMiddleOffset1 != null && bendMiddleValue != null) 
+            {
+                bend.push(new BendPoint(bendMiddleOffset1, bendMiddleValue));
+            }
+            if (bendMiddleOffset2 != null && bendMiddleValue != null) 
+            {
+                bend.push(new BendPoint(bendMiddleOffset2, bendMiddleValue));
+            }
+            
+            if (bendMiddleOffset1 == null && bendMiddleOffset2 == null && bendMiddleValue != null)
+            {
+                bend.push(new BendPoint(Std.int(BendPoint.MaxPosition / 2), bendMiddleValue));
+            }
             bend.push(bendDestination);
             note.bendPoints = bend;
-        }
-
-    }
-    
+        }        
+    }    
+   
     private function parseRhythms(node:Xml)
     {
         for (c in node)
@@ -1065,16 +1109,23 @@ class GpxParser
         {
             score.addMasterBar(masterBar);
         }
-        if (_automations.exists("0")) // TODO find the correct first bar id
+        
+        // build automations
+        for (barId in _automations.keys())
         {
-            var automations = _automations.get("0");
+            var automations = _automations.get(barId);
+            var bar = _barsById.get(barId);
             for (automation in automations)
             {
                 if (automation.type == AutomationType.Tempo)
                 {
-                    score.tempo = Std.int(automation.value);
-                    score.tempoLabel = automation.text;
-                    break;
+                    if (barId == "0") // // TODO find the correct first bar id
+                    {
+                        score.tempo = Std.int(automation.value);
+                        score.tempoLabel = automation.text;
+                    }
+                   
+                    bar.getMasterBar().tempoAutomation = automation;
                 }
             }
         }

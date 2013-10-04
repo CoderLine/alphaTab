@@ -114,12 +114,18 @@ class Beat
         {
             beat.addNote(n.clone());
         }
+        beat.chordId = chordId;
         beat.brushType = brushType;
         beat.vibrato = vibrato;
         beat.graceType = graceType;
         beat.pickStroke = pickStroke;
         beat.duration = duration;
         beat.tremoloSpeed = tremoloSpeed;
+        beat.text = text;
+        beat.fadeIn = fadeIn;
+        beat.tap = tap;
+        beat.slap = slap;
+        beat.pop = pop;
         for (a in automations)
         {
             beat.automations.push(a.clone());

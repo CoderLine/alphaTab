@@ -22,7 +22,7 @@ class BendGlyph extends Glyph
 		var r:TabBarRenderer = cast renderer;
 		var res = renderer.getResources();
 		// calculate offsets per step
-		var dX:Float = width / BendPoint.MAX_POSITION;
+		var dX:Float = width / BendPoint.MaxPosition;
 		var maxValue = 0;
 		for (i in 0 ... _note.bendPoints.length)  
 		{

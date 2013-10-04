@@ -22,8 +22,8 @@ package alphatab.model;
  */
 class BendPoint 
 {
-	public static inline var MAX_POSITION = 60;
-	public static inline var MAX_VALUE = 12;
+	public static inline var MaxPosition = 60;
+	public static inline var MaxValue = 12;
 	
     public var offset:Int;
     public var value:Int;

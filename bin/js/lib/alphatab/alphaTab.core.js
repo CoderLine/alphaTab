@@ -3707,16 +3707,21 @@ alphatab.importer.GpxParser.prototype = {
 			++_g;
 			this.score.addMasterBar(masterBar);
 		}
-		if(this._automations.exists("0")) {
-			var automations = this._automations.get("0");
+		var $it4 = this._automations.keys();
+		while( $it4.hasNext() ) {
+			var barId = $it4.next();
+			var automations = this._automations.get(barId);
+			var bar = this._barsById.get(barId);
 			var _g = 0;
 			while(_g < automations.length) {
 				var automation = automations[_g];
 				++_g;
 				if(automation.type == alphatab.model.AutomationType.Tempo) {
-					this.score.tempo = automation.value | 0;
-					this.score.tempoLabel = automation.text;
-					break;
+					if(barId == "0") {
+						this.score.tempo = automation.value | 0;
+						this.score.tempoLabel = automation.text;
+					}
+					bar.track.score.masterBars[bar.index].tempoAutomation = automation;
 				}
 			}
 		}
@@ -3782,117 +3787,13 @@ alphatab.importer.GpxParser.prototype = {
 			}
 		}
 	}
-	,parseNoteProperty: function(node,note) {
+	,parseNoteProperties: function(node,note) {
 		var isBended = false;
 		var bendOrigin = null;
-		var bendMiddle1 = null;
-		var bendMiddle2 = null;
+		var bendMiddleValue = null;
+		var bendMiddleOffset1 = null;
+		var bendMiddleOffset2 = null;
 		var bendDestination = null;
-		var name = node.get("name");
-		switch(name) {
-		case "String":
-			note.string = Std.parseInt(this.getValue(this.findChildElement(node,"String"))) + 1;
-			break;
-		case "Fret":
-			note.fret = Std.parseInt(this.getValue(this.findChildElement(node,"Fret")));
-			break;
-		case "HarmonicType":
-			var htype = this.findChildElement(node,"HType");
-			if(htype != null) {
-				var _g = this.getValue(htype);
-				switch(_g) {
-				case "NoHarmonic":
-					note.harmonicType = alphatab.model.HarmonicType.None;
-					break;
-				case "Natural":
-					note.harmonicType = alphatab.model.HarmonicType.Natural;
-					break;
-				case "Artificial":
-					note.harmonicType = alphatab.model.HarmonicType.Artificial;
-					break;
-				case "Pinch":
-					note.harmonicType = alphatab.model.HarmonicType.Pinch;
-					break;
-				case "Tap":
-					note.harmonicType = alphatab.model.HarmonicType.Tap;
-					break;
-				case "Semi":
-					note.harmonicType = alphatab.model.HarmonicType.Semi;
-					break;
-				case "Feedback":
-					note.harmonicType = alphatab.model.HarmonicType.Feedback;
-					break;
-				}
-			}
-			break;
-		case "HarmonicFret":
-			var hfret = this.findChildElement(node,"HFret");
-			if(hfret != null) note.harmonicValue = Std.parseFloat(this.getValue(hfret));
-			break;
-		case "PalmMuted":
-			if(this.findChildElement(node,"Enable") != null) note.isPalmMute = true;
-			break;
-		case "Octave":
-			note.octave = Std.parseInt(this.getValue(this.findChildElement(node,"Number")));
-			break;
-		case "Bended":
-			isBended = true;
-			break;
-		case "BendOriginValue":
-			if(bendOrigin == null) bendOrigin = new alphatab.model.BendPoint();
-			bendOrigin.value = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
-			break;
-		case "BendOriginOffset":
-			if(bendOrigin == null) bendOrigin = new alphatab.model.BendPoint();
-			bendOrigin.offset = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
-			break;
-		case "BendMiddleValue":
-			if(bendMiddle1 == null) bendMiddle1 = new alphatab.model.BendPoint();
-			if(bendMiddle2 == null) bendMiddle2 = new alphatab.model.BendPoint();
-			bendMiddle1.value = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
-			bendMiddle2.value = bendMiddle1.value;
-			break;
-		case "BendMiddleOffset1":
-			if(bendMiddle1 == null) bendMiddle1 = new alphatab.model.BendPoint();
-			bendMiddle1.offset = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
-			break;
-		case "BendMiddleOffset2":
-			if(bendMiddle2 == null) bendMiddle2 = new alphatab.model.BendPoint();
-			bendMiddle2.offset = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
-			break;
-		case "BendDestinationValue":
-			if(bendDestination == null) bendDestination = new alphatab.model.BendPoint();
-			bendDestination.value = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
-			break;
-		case "BendDestinationOffset":
-			if(bendDestination == null) bendDestination = new alphatab.model.BendPoint();
-			bendDestination.offset = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
-			break;
-		case "HopoOrigin":
-			if(this.findChildElement(node,"Enable") != null) note.isHammerPullOrigin = true;
-			break;
-		case "HopoDestination":
-			break;
-		case "Slide":
-			var slideFlags = Std.parseInt(this.getValue(this.findChildElement(node,"Flags")));
-			if((slideFlags & 1) != 0) note.slideType = alphatab.model.SlideType.Shift;
-			if((slideFlags & 2) != 0) note.slideType = alphatab.model.SlideType.Legato;
-			if((slideFlags & 4) != 0) note.slideType = alphatab.model.SlideType.OutDown;
-			if((slideFlags & 8) != 0) note.slideType = alphatab.model.SlideType.OutUp;
-			if((slideFlags & 16) != 0) note.slideType = alphatab.model.SlideType.IntoFromBelow;
-			if((slideFlags & 32) != 0) note.slideType = alphatab.model.SlideType.IntoFromAbove;
-			break;
-		}
-		if(isBended && bendOrigin != null && bendDestination != null) {
-			var bend = new Array();
-			bend.push(bendOrigin);
-			if(bendMiddle1 != null) bend.push(bendMiddle1);
-			if(bendMiddle2 != null) bend.push(bendMiddle2);
-			bend.push(bendDestination);
-			note.bendPoints = bend;
-		}
-	}
-	,parseNoteProperties: function(node,note) {
 		var $it0 = node.iterator();
 		while( $it0.hasNext() ) {
 			var c = $it0.next();
@@ -3900,10 +3801,110 @@ alphatab.importer.GpxParser.prototype = {
 				var _g = c.get_nodeName();
 				switch(_g) {
 				case "Property":
-					this.parseNoteProperty(c,note);
+					var name = c.get("name");
+					switch(name) {
+					case "String":
+						note.string = Std.parseInt(this.getValue(this.findChildElement(c,"String"))) + 1;
+						break;
+					case "Fret":
+						note.fret = Std.parseInt(this.getValue(this.findChildElement(c,"Fret")));
+						break;
+					case "HarmonicType":
+						var htype = this.findChildElement(c,"HType");
+						if(htype != null) {
+							var _g1 = this.getValue(htype);
+							switch(_g1) {
+							case "NoHarmonic":
+								note.harmonicType = alphatab.model.HarmonicType.None;
+								break;
+							case "Natural":
+								note.harmonicType = alphatab.model.HarmonicType.Natural;
+								break;
+							case "Artificial":
+								note.harmonicType = alphatab.model.HarmonicType.Artificial;
+								break;
+							case "Pinch":
+								note.harmonicType = alphatab.model.HarmonicType.Pinch;
+								break;
+							case "Tap":
+								note.harmonicType = alphatab.model.HarmonicType.Tap;
+								break;
+							case "Semi":
+								note.harmonicType = alphatab.model.HarmonicType.Semi;
+								break;
+							case "Feedback":
+								note.harmonicType = alphatab.model.HarmonicType.Feedback;
+								break;
+							}
+						}
+						break;
+					case "HarmonicFret":
+						var hfret = this.findChildElement(c,"HFret");
+						if(hfret != null) note.harmonicValue = Std.parseFloat(this.getValue(hfret));
+						break;
+					case "PalmMuted":
+						if(this.findChildElement(c,"Enable") != null) note.isPalmMute = true;
+						break;
+					case "Octave":
+						note.octave = Std.parseInt(this.getValue(this.findChildElement(c,"Number")));
+						break;
+					case "Bended":
+						isBended = true;
+						break;
+					case "BendOriginValue":
+						if(bendOrigin == null) bendOrigin = new alphatab.model.BendPoint();
+						bendOrigin.value = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.04 | 0;
+						break;
+					case "BendOriginOffset":
+						if(bendOrigin == null) bendOrigin = new alphatab.model.BendPoint();
+						bendOrigin.offset = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.6 | 0;
+						break;
+					case "BendMiddleValue":
+						bendMiddleValue = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.04 | 0;
+						break;
+					case "BendMiddleOffset1":
+						bendMiddleOffset1 = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.6 | 0;
+						break;
+					case "BendMiddleOffset2":
+						bendMiddleOffset2 = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.6 | 0;
+						break;
+					case "BendDestinationValue":
+						if(bendDestination == null) bendDestination = new alphatab.model.BendPoint(60);
+						bendDestination.value = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.04 | 0;
+						break;
+					case "BendDestinationOffset":
+						if(bendDestination == null) bendDestination = new alphatab.model.BendPoint();
+						bendDestination.offset = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.6 | 0;
+						break;
+					case "HopoOrigin":
+						if(this.findChildElement(c,"Enable") != null) note.isHammerPullOrigin = true;
+						break;
+					case "HopoDestination":
+						break;
+					case "Slide":
+						var slideFlags = Std.parseInt(this.getValue(this.findChildElement(c,"Flags")));
+						if((slideFlags & 1) != 0) note.slideType = alphatab.model.SlideType.Shift;
+						if((slideFlags & 2) != 0) note.slideType = alphatab.model.SlideType.Legato;
+						if((slideFlags & 4) != 0) note.slideType = alphatab.model.SlideType.OutDown;
+						if((slideFlags & 8) != 0) note.slideType = alphatab.model.SlideType.OutUp;
+						if((slideFlags & 16) != 0) note.slideType = alphatab.model.SlideType.IntoFromBelow;
+						if((slideFlags & 32) != 0) note.slideType = alphatab.model.SlideType.IntoFromAbove;
+						break;
+					}
 					break;
 				}
 			}
+		}
+		if(isBended) {
+			if(bendOrigin == null) bendOrigin = new alphatab.model.BendPoint();
+			if(bendDestination == null) bendDestination = new alphatab.model.BendPoint(60);
+			var bend = new Array();
+			bend.push(bendOrigin);
+			if(bendMiddleOffset1 != null && bendMiddleValue != null) bend.push(new alphatab.model.BendPoint(bendMiddleOffset1,bendMiddleValue));
+			if(bendMiddleOffset2 != null && bendMiddleValue != null) bend.push(new alphatab.model.BendPoint(bendMiddleOffset2,bendMiddleValue));
+			if(bendMiddleOffset1 == null && bendMiddleOffset2 == null && bendMiddleValue != null) bend.push(new alphatab.model.BendPoint(30,bendMiddleValue));
+			bend.push(bendDestination);
+			note.bendPoints = bend;
 		}
 	}
 	,parseNote: function(node) {
@@ -3968,69 +3969,13 @@ alphatab.importer.GpxParser.prototype = {
 			}
 		}
 	}
-	,parseBeatProperty: function(node,beat) {
-		var isWhammyBar = false;
-		var whammyBarOrigin = null;
-		var whammyBarMiddle1 = null;
-		var whammyBarMiddle2 = null;
-		var whammyBarDestination = null;
-		var name = node.get("name");
-		switch(name) {
-		case "Brush":
-			if(this.getValue(this.findChildElement(node,"Direction")) == "Up") beat.brushType = alphatab.model.BrushType.BrushUp; else beat.brushType = alphatab.model.BrushType.BrushDown;
-			break;
-		case "Slapped":
-			if(this.findChildElement(node,"Enable") != null) beat.slap = true;
-			break;
-		case "Popped":
-			if(this.findChildElement(node,"Enable") != null) beat.pop = true;
-			break;
-		case "WhammyBar":
-			isWhammyBar = true;
-			break;
-		case "WhammyBarExtend":
-			break;
-		case "WhammyBarOriginValue":
-			if(whammyBarOrigin == null) whammyBarOrigin = new alphatab.model.BendPoint();
-			whammyBarOrigin.value = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
-			break;
-		case "WhammyBarOriginOffset":
-			if(whammyBarOrigin == null) whammyBarOrigin = new alphatab.model.BendPoint();
-			whammyBarOrigin.offset = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
-			break;
-		case "WhammyBarMiddleValue":
-			if(whammyBarMiddle1 == null) whammyBarMiddle1 = new alphatab.model.BendPoint();
-			if(whammyBarMiddle2 == null) whammyBarMiddle2 = new alphatab.model.BendPoint();
-			whammyBarMiddle1.value = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
-			whammyBarMiddle2.value = whammyBarMiddle1.value;
-			break;
-		case "WhammyBarMiddleOffset1":
-			if(whammyBarMiddle1 == null) whammyBarMiddle1 = new alphatab.model.BendPoint();
-			whammyBarMiddle1.offset = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
-			break;
-		case "WhammyBarMiddleOffset2":
-			if(whammyBarMiddle2 == null) whammyBarMiddle2 = new alphatab.model.BendPoint();
-			whammyBarMiddle2.offset = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
-			break;
-		case "WhammyBarDestinationValue":
-			if(whammyBarDestination == null) whammyBarDestination = new alphatab.model.BendPoint();
-			whammyBarDestination.value = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
-			break;
-		case "WhammyBarDestinationOffset":
-			if(whammyBarDestination == null) whammyBarDestination = new alphatab.model.BendPoint();
-			whammyBarDestination.offset = Std.parseFloat(this.getValue(this.findChildElement(node,"Float"))) | 0;
-			break;
-		}
-		if(isWhammyBar && whammyBarOrigin != null && whammyBarDestination != null) {
-			var whammy = new Array();
-			whammy.push(whammyBarOrigin);
-			if(whammyBarMiddle1 != null) whammy.push(whammyBarMiddle1);
-			if(whammyBarMiddle2 != null) whammy.push(whammyBarMiddle2);
-			whammy.push(whammyBarDestination);
-			beat.whammyBarPoints = whammy;
-		}
-	}
 	,parseBeatProperties: function(node,beat) {
+		var isWhammy = false;
+		var whammyOrigin = null;
+		var whammyMiddleValue = null;
+		var whammyMiddleOffset1 = null;
+		var whammyMiddleOffset2 = null;
+		var whammyDestination = null;
 		var $it0 = node.iterator();
 		while( $it0.hasNext() ) {
 			var c = $it0.next();
@@ -4038,10 +3983,76 @@ alphatab.importer.GpxParser.prototype = {
 				var _g = c.get_nodeName();
 				switch(_g) {
 				case "Property":
-					this.parseBeatProperty(c,beat);
+					var name = c.get("name");
+					switch(name) {
+					case "Brush":
+						if(this.getValue(this.findChildElement(c,"Direction")) == "Up") beat.brushType = alphatab.model.BrushType.BrushUp; else beat.brushType = alphatab.model.BrushType.BrushDown;
+						break;
+					case "PickStroke":
+						if(this.getValue(this.findChildElement(c,"Direction")) == "Up") beat.pickStroke = alphatab.model.PickStrokeType.Up; else beat.pickStroke = alphatab.model.PickStrokeType.Down;
+						break;
+					case "Slapped":
+						if(this.findChildElement(c,"Enable") != null) beat.slap = true;
+						break;
+					case "Popped":
+						if(this.findChildElement(c,"Enable") != null) beat.pop = true;
+						break;
+					case "VibratoWTremBar":
+						var _g1 = this.getValue(this.findChildElement(c,"Strength"));
+						switch(_g1) {
+						case "Wide":
+							beat.vibrato = alphatab.model.VibratoType.Wide;
+							break;
+						case "Slight":
+							beat.vibrato = alphatab.model.VibratoType.Slight;
+							break;
+						}
+						break;
+					case "WhammyBar":
+						isWhammy = true;
+						break;
+					case "WhammyBarExtend":
+						break;
+					case "WhammyBarOriginValue":
+						if(whammyOrigin == null) whammyOrigin = new alphatab.model.BendPoint();
+						whammyOrigin.value = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.04 | 0;
+						break;
+					case "WhammyBarOriginOffset":
+						if(whammyOrigin == null) whammyOrigin = new alphatab.model.BendPoint();
+						whammyOrigin.offset = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.6 | 0;
+						break;
+					case "WhammyBarMiddleValue":
+						whammyMiddleValue = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.04 | 0;
+						break;
+					case "WhammyBarMiddleOffset1":
+						whammyMiddleOffset1 = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.6 | 0;
+						break;
+					case "WhammyBarMiddleOffset2":
+						whammyMiddleOffset2 = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.6 | 0;
+						break;
+					case "WhammyBarDestinationValue":
+						if(whammyDestination == null) whammyDestination = new alphatab.model.BendPoint(60);
+						whammyDestination.value = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.04 | 0;
+						break;
+					case "WhammyBarDestinationOffset":
+						if(whammyDestination == null) whammyDestination = new alphatab.model.BendPoint();
+						whammyDestination.offset = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.6 | 0;
+						break;
+					}
 					break;
 				}
 			}
+		}
+		if(isWhammy) {
+			if(whammyOrigin == null) whammyOrigin = new alphatab.model.BendPoint();
+			if(whammyDestination == null) whammyDestination = new alphatab.model.BendPoint(60);
+			var whammy = new Array();
+			whammy.push(whammyOrigin);
+			if(whammyMiddleOffset1 != null && whammyMiddleValue != null) whammy.push(new alphatab.model.BendPoint(whammyMiddleOffset1,whammyMiddleValue));
+			if(whammyMiddleOffset2 != null && whammyMiddleValue != null) whammy.push(new alphatab.model.BendPoint(whammyMiddleOffset2,whammyMiddleValue));
+			if(whammyMiddleOffset1 == null && whammyMiddleOffset2 == null && whammyMiddleValue != null) whammy.push(new alphatab.model.BendPoint(30,whammyMiddleValue));
+			whammy.push(whammyDestination);
+			beat.whammyBarPoints = whammy;
 		}
 	}
 	,parseBeat: function(node) {
@@ -4059,17 +4070,20 @@ alphatab.importer.GpxParser.prototype = {
 				case "Rhythm":
 					this._rhythmOfBeat.set(beatId,c.get("ref"));
 					break;
+				case "Fadding":
+					if(this.getValue(c) == "FadeIn") beat.fadeIn = true;
+					break;
 				case "Tremolo":
 					var _g1 = this.getValue(c);
 					switch(_g1) {
 					case "1/2":
-						beat.tremoloSpeed = alphatab.model.Duration.Half;
+						beat.tremoloSpeed = alphatab.model.Duration.Eighth;
 						break;
 					case "1/4":
-						beat.tremoloSpeed = alphatab.model.Duration.Quarter;
+						beat.tremoloSpeed = alphatab.model.Duration.Sixteenth;
 						break;
 					case "1/8":
-						beat.tremoloSpeed = alphatab.model.Duration.Eighth;
+						beat.tremoloSpeed = alphatab.model.Duration.ThirtySecond;
 						break;
 					}
 					break;
@@ -4329,6 +4343,9 @@ alphatab.importer.GpxParser.prototype = {
 			}
 			track.tuning.reverse();
 			break;
+		case "DiagramCollection":
+			this.parseDiagramCollection(track,node);
+			break;
 		case "CapoFret":
 			track.capo = Std.parseInt(this.getValue(this.findChildElement(node,"Fret")));
 			break;
@@ -4386,9 +4403,6 @@ alphatab.importer.GpxParser.prototype = {
 					break;
 				case "Properties":
 					this.parseTrackProperties(track,c);
-					break;
-				case "DiagramCollection":
-					this.parseDiagramCollection(track,c);
 					break;
 				case "GeneralMidi":
 					this.parseGeneralMidi(track,c);
@@ -5024,12 +5038,18 @@ alphatab.model.Beat.prototype = {
 			++_g;
 			beat.addNote(n.clone());
 		}
+		beat.chordId = this.chordId;
 		beat.brushType = this.brushType;
 		beat.vibrato = this.vibrato;
 		beat.graceType = this.graceType;
 		beat.pickStroke = this.pickStroke;
 		beat.duration = this.duration;
 		beat.tremoloSpeed = this.tremoloSpeed;
+		beat.text = this.text;
+		beat.fadeIn = this.fadeIn;
+		beat.tap = this.tap;
+		beat.slap = this.slap;
+		beat.pop = this.pop;
 		var _g = 0, _g1 = this.automations;
 		while(_g < _g1.length) {
 			var a = _g1[_g];
@@ -9032,7 +9052,7 @@ alphatab.rendering.glyphs.WhammyBarGlyph.prototype = $extend(alphatab.rendering.
 					var up = pt2.value - pt1.value >= 0;
 					var s = "";
 					if(dv < 0) s += "-";
-					if(dv >= 1 || dv <= 1) s += Std.string(Math.floor(Math.abs(dv))) + " "; else if(dv < 0) s += "-";
+					if(dv >= 1 || dv <= -1) s += Std.string(Math.floor(Math.abs(dv))) + " ";
 					dv -= Math.floor(dv);
 					if(dv == 0.25) s += "1/4"; else if(dv == 0.5) s += "1/2"; else if(dv == 0.75) s += "3/4";
 					canvas.setFont(res.graceFont);
@@ -10607,11 +10627,13 @@ alphatab.importer.GpxFileSystem.HEADER_BCFS = "BCFS";
 alphatab.importer.GpxFileSystem.HEADER_BCFZ = "BCFZ";
 alphatab.importer.GpxFileSystem.SCORE_GPIF = "score.gpif";
 alphatab.importer.GpxParser.InvalidId = "-1";
+alphatab.importer.GpxParser.BendPointPositionFactor = 0.6;
+alphatab.importer.GpxParser.BendPointValueFactor = 0.04;
 alphatab.io.BitInput.BYTE_SIZE = 8;
 alphatab.model.Beat.WhammyBarMaxPosition = 60;
 alphatab.model.Beat.WhammyBarMaxValue = 24;
-alphatab.model.BendPoint.MAX_POSITION = 60;
-alphatab.model.BendPoint.MAX_VALUE = 12;
+alphatab.model.BendPoint.MaxPosition = 60;
+alphatab.model.BendPoint.MaxValue = 12;
 alphatab.model.MasterBar.MaxAlternateEndings = 8;
 alphatab.model.Note.FingeringUnknown = -2;
 alphatab.model.Note.FingeringNoOrDead = -1;
