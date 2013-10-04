@@ -3239,6 +3239,7 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 	}
 	,readBar: function(track) {
 		var newBar = new alphatab.model.Bar();
+		if(track.isPercussion) newBar.clef = alphatab.model.Clef.Neutral;
 		track.addBar(newBar);
 		var voiceCount = 1;
 		if(this._versionNumber >= 500) {
@@ -4110,17 +4111,20 @@ alphatab.model.Chord.__name__ = true;
 alphatab.model.Chord.prototype = {
 	__class__: alphatab.model.Chord
 }
-alphatab.model.Clef = { __ename__ : true, __constructs__ : ["C3","C4","F4","G2"] }
-alphatab.model.Clef.C3 = ["C3",0];
+alphatab.model.Clef = { __ename__ : true, __constructs__ : ["Neutral","C3","C4","F4","G2"] }
+alphatab.model.Clef.Neutral = ["Neutral",0];
+alphatab.model.Clef.Neutral.toString = $estr;
+alphatab.model.Clef.Neutral.__enum__ = alphatab.model.Clef;
+alphatab.model.Clef.C3 = ["C3",1];
 alphatab.model.Clef.C3.toString = $estr;
 alphatab.model.Clef.C3.__enum__ = alphatab.model.Clef;
-alphatab.model.Clef.C4 = ["C4",1];
+alphatab.model.Clef.C4 = ["C4",2];
 alphatab.model.Clef.C4.toString = $estr;
 alphatab.model.Clef.C4.__enum__ = alphatab.model.Clef;
-alphatab.model.Clef.F4 = ["F4",2];
+alphatab.model.Clef.F4 = ["F4",3];
 alphatab.model.Clef.F4.toString = $estr;
 alphatab.model.Clef.F4.__enum__ = alphatab.model.Clef;
-alphatab.model.Clef.G2 = ["G2",3];
+alphatab.model.Clef.G2 = ["G2",4];
 alphatab.model.Clef.G2.toString = $estr;
 alphatab.model.Clef.G2.__enum__ = alphatab.model.Clef;
 alphatab.model.Duration = { __ename__ : true, __constructs__ : ["Whole","Half","Quarter","Eighth","Sixteenth","ThirtySecond","SixtyFourth"] }
@@ -4273,6 +4277,8 @@ alphatab.model.ModelUtils.getClefIndex = function(clef) {
 		return 2;
 	case 3:
 		return 3;
+	case 4:
+		return 4;
 	}
 }
 alphatab.model.Note = function() {
@@ -5333,16 +5339,19 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 		var previousKey = this._bar.previousBar == null?0:this._bar.previousBar.getMasterBar().keySignature;
 		var _g = this;
 		switch( (_g._bar.clef)[1] ) {
-		case 3:
+		case 0:
 			offsetClef = 0;
 			break;
-		case 2:
+		case 4:
+			offsetClef = 0;
+			break;
+		case 3:
 			offsetClef = 2;
 			break;
-		case 0:
+		case 1:
 			offsetClef = -1;
 			break;
-		case 1:
+		case 2:
 			offsetClef = 1;
 			break;
 		}
@@ -5395,16 +5404,19 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 			var offset = 0;
 			var _g = this;
 			switch( (_g._bar.clef)[1] ) {
-			case 2:
-				offset = 4;
-				break;
 			case 0:
-				offset = 6;
-				break;
-			case 1:
 				offset = 4;
 				break;
 			case 3:
+				offset = 4;
+				break;
+			case 1:
+				offset = 6;
+				break;
+			case 2:
+				offset = 4;
+				break;
+			case 4:
 				offset = 6;
 				break;
 			}
@@ -6601,12 +6613,14 @@ alphatab.rendering.glyphs.ClefGlyph.prototype = $extend(alphatab.rendering.glyph
 	getClefSvg: function(clef) {
 		switch( (clef)[1] ) {
 		case 0:
-			return alphatab.rendering.glyphs.MusicFont.ClefC;
+			return alphatab.rendering.glyphs.MusicFont.ClefNeutral;
 		case 1:
 			return alphatab.rendering.glyphs.MusicFont.ClefC;
 		case 2:
-			return alphatab.rendering.glyphs.MusicFont.ClefF;
+			return alphatab.rendering.glyphs.MusicFont.ClefC;
 		case 3:
+			return alphatab.rendering.glyphs.MusicFont.ClefF;
+		case 4:
 			return alphatab.rendering.glyphs.MusicFont.ClefG;
 		}
 	}
@@ -7662,7 +7676,7 @@ alphatab.rendering.glyphs.TabClefGlyph.prototype = $extend(alphatab.rendering.Gl
 			break;
 		case 6:
 			fontScale = 1.1;
-			correction = 3;
+			correction = 1;
 			break;
 		case 7:
 			fontScale = 1.15;
@@ -9616,7 +9630,7 @@ alphatab.rendering.AlternateEndingsBarRenderer.Padding = 3;
 alphatab.rendering.GroupedBarRenderer.KEY_SIZE_PRE = "PRE";
 alphatab.rendering.GroupedBarRenderer.KEY_SIZE_POST = "POST";
 alphatab.rendering.ScoreBarRenderer.STEPS_PER_OCTAVE = 7;
-alphatab.rendering.ScoreBarRenderer.OCTAVE_STEPS = [32,30,26,38];
+alphatab.rendering.ScoreBarRenderer.OCTAVE_STEPS = [38,32,30,26,38];
 alphatab.rendering.ScoreBarRenderer.SHARP_NOTE_STEPS = [0,0,1,1,2,3,3,4,4,5,5,6];
 alphatab.rendering.ScoreBarRenderer.FLAT_NOTE_STEPS = [0,1,1,2,2,3,4,4,5,5,6,6];
 alphatab.rendering.ScoreBarRenderer.SHARP_KS_STEPS = [1,4,0,3,6,2,5];
@@ -9701,7 +9715,7 @@ alphatab.rendering.glyphs.MusicFont.Tempo = "M 550 1578V 30l 43 8v 1679c 0 86 -4
 alphatab.rendering.glyphs.MusicFont.AccidentalSharp = "M 482 -275v -577h 93v 540l 135 -57v 343l -135 57v 551l 135 -62v 343l -135 57v 561h -93v -525l -223 93v 566h -93v -530l -135 52v -343l 135 -52v -551l -135 57v -348l 135 -52v -561h 93v 525L 482 -275zM 258 156v 551l 223 -93v -546L 258 156";
 alphatab.rendering.glyphs.MusicFont.AccidentalFlat = "M -23 -1273h 93v 1300c 48 -27 86 -48 114 -62c 93 -41 176 -62 249 -62c 52 0 97 13 137 39c 39 26 70 70 91 132c 10 31 15 62 15 93c 0 100 -50 204 -150 311c -72 76 -157 143 -254 202c -41 24 -97 69 -166 135c -45 41 -88 84 -130 129V -1273zM 367 17c -7 -3 -13 -6 -20 -10c -17 -6 -33 -10 -46 -10c -27 0 -59 7 -93 23c -34 15 -79 46 -135 91v 644c 65 -65 131 -131 197 -197c 128 -156 192 -284 192 -384C 460 103 429 51 367 17";
 alphatab.rendering.glyphs.MusicFont.AccidentalNatural = "M 38 472V -1283h 99v 792l 478 -132v 1738h -93v -775L 38 472zM 137 180l 385 -104v -429l -385 104V 180";
-alphatab.rendering.glyphs.MusicFont.ClefNeutral = "M -35 1887v -1875h 337v 1875H -35zM 527 1887v -1875h 337v 1875H 527";
+alphatab.rendering.glyphs.MusicFont.ClefNeutral = "M 915 1887v -1875h 337v 1875H 915zM 1477 1887v -1875h 337v 1875H 1477";
 alphatab.rendering.glyphs.MusicFont.RestSixtyFourth = "M 705 -2202c 77 -26 144 -77 200 -150c 56 -73 101 -174 136 -305l 127 -547c -69 127 -197 191 -382 191c -46 0 -100 -7 -162 -23c -61 -15 -114 -46 -156 -92c -42 -46 -63 -108 -63 -185c 0 -65 23 -121 69 -168c 46 -46 104 -69 174 -69c 65 0 123 25 174 75c 50 50 75 104 75 162c 0 31 -7 63 -23 98c -15 34 -44 63 -87 87c 46 15 71 23 75 23c 7 0 27 -3 57 -11c 77 -23 148 -81 213 -174c 53 -73 86 -137 98 -191l 154 -638c -73 128 -198 192 -375 192c -30 0 -61 0 -92 0c -34 -11 -57 -19 -69 -23c -69 -19 -125 -52 -167 -98c -42 -46 -63 -106 -63 -179c 0 -69 23 -127 69 -174c 46 -46 104 -69 174 -69s 128 24 176 72c 48 48 72 103 72 165c 0 31 -7 63 -23 98c -15 34 -42 65 -81 92c 19 7 40 15 63 23c 11 0 32 -3 63 -11c 73 -23 140 -80 202 -169c 61 -89 121 -179 179 -271l 41 0l -1032 4425l -107 0l 319 -1316c -73 128 -196 192 -370 192c -19 0 -38 0 -57 0c -27 -3 -68 -13 -124 -28c -55 -15 -105 -46 -147 -92c -42 -46 -63 -106 -63 -179c 0 -65 23 -121 69 -168c 46 -46 106 -69 179 -69c 65 0 122 24 171 72c 48 48 72 103 72 165c 0 30 -7 63 -23 98c -15 34 -44 63 -87 87c 46 15 71 23 75 23c 7 0 26 -3 57 -11c 76 -23 150 -83 219 -180c 57 -77 86 -129 86 -156l 161 -667c -73 124 -198 186 -375 186c -30 0 -61 0 -92 0c -34 -11 -57 -19 -69 -22c -69 -19 -125 -51 -167 -97c -42 -45 -63 -105 -63 -177c 0 -68 23 -126 69 -172c 46 -45 106 -68 179 -68c 65 0 122 23 171 71c 48 47 72 102 72 163c 0 30 -7 63 -23 97c -15 34 -44 65 -87 91c 23 7 46 14 69 21C 653 -2190 674 -2194 705 -2202";
 alphatab.rendering.glyphs.MusicFont.AccidentalDoubleFlat = "M 67 25c 52 -27 93 -48 124 -62c 100 -45 176 -67 228 -67c 45 0 95 12 150 36V -1275h 88v 1300c 48 -27 88 -48 119 -62c 100 -45 183 -67 249 -67c 55 0 104 13 145 39c 41 26 72 71 93 137c 10 31 15 62 15 93c 0 107 -48 212 -145 316c -72 79 -163 143 -270 192c -34 17 -78 52 -132 104c -53 51 -108 107 -163 166v -529c -38 45 -72 83 -104 115c -55 55 -121 103 -197 141c -45 20 -102 68 -171 141c -41 41 -81 85 -119 131V -1275h 88V 25zM 369 15c -7 -3 -13 -6 -20 -10c -17 -6 -33 -10 -46 -10c -31 0 -64 7 -98 23c -34 15 -79 46 -135 91v 644c 65 -65 131 -131 197 -197c 131 -159 197 -287 197 -384C 462 101 431 49 369 15zM 962 15c -3 -3 -12 -6 -26 -10c -20 -6 -36 -10 -46 -10c -31 0 -63 7 -96 23c -33 15 -77 46 -132 91v 644c 65 -65 131 -131 197 -197c 131 -159 197 -287 197 -384C 1055 101 1024 49 962 15";
 alphatab.rendering.glyphs.MusicFont.AccidentalDoubleSharp = "M 22 243c -32 -31 -48 -68 -48 -110c 0 -38 15 -71 45 -98c 30 -27 63 -40 98 -40c 38 0 70 14 96 43c 64 57 116 124 158 199c 41 75 62 146 62 213c -83 0 -172 -30 -268 -91C 99 317 51 278 22 243zM 18 872c 25 25 59 38 100 38c 38 0 70 -14 96 -43c 44 -38 86 -86 124 -144c 64 -96 96 -187 96 -273c -70 0 -140 18 -211 55c -70 36 -137 87 -201 151c -32 31 -48 70 -48 115C -26 810 -11 843 18 872zM 848 32c -25 -25 -60 -38 -105 -38c -41 0 -76 16 -105 48c -57 67 -94 113 -110 139c -60 96 -91 185 -91 268c 92 0 182 -28 268 -86c 79 -67 124 -105 134 -115c 31 -31 48 -72 48 -120C 886 96 874 64 848 32zM 838 656c 31 31 48 70 48 115c 0 38 -14 72 -43 100s -62 43 -100 43c -38 0 -73 -16 -105 -48c -51 -57 -88 -105 -110 -144c -60 -96 -91 -187 -91 -273c 105 0 211 41 316 124C 803 622 832 650 838 656";

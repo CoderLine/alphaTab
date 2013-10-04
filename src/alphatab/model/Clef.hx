@@ -21,6 +21,7 @@ package alphatab.model;
  */
 enum Clef 
 {
+    Neutral;
     C3;
     C4;
     F4;

@@ -24,6 +24,7 @@ import alphatab.model.Beat;
 import alphatab.model.BendPoint;
 import alphatab.model.BrushType;
 import alphatab.model.Chord;
+import alphatab.model.Clef;
 import alphatab.model.Duration;
 import alphatab.model.DynamicValue;
 import alphatab.model.GraceType;
@@ -517,6 +518,10 @@ class Gp3To5Importer extends ScoreImporter
     private function readBar(track:Track)
     {
         var newBar:Bar = new Bar();
+        if (track.isPercussion)
+        {
+            newBar.clef = Clef.Neutral;
+        }
         track.addBar(newBar);
         
         var voiceCount = 1;

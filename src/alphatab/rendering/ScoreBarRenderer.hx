@@ -80,9 +80,9 @@ class ScoreBarRenderer extends GroupedBarRenderer
     
     /**
      * Those are the amount of steps for the different clefs in case of a note value 0
-     * [C3, C4, F4, G2]
+     * [Neutral, C3, C4, F4, G2]
      */
-    private static var OCTAVE_STEPS = [32, 30, 26, 38];
+    private static var OCTAVE_STEPS = [38, 32, 30, 26, 38];
     
     /**
      * The step offsets of the notes within an octave in case of for sharp keysignatures
@@ -566,6 +566,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
 			var offset = 0;
 			switch(_bar.clef)
 			{
+				case Neutral: offset = 4;
 				case F4: offset = 4;
                 case C3: offset = 6; 
 				case C4: offset = 4;
@@ -653,6 +654,8 @@ class ScoreBarRenderer extends GroupedBarRenderer
 		
         switch (_bar.clef)
         {
+            case Clef.Neutral:
+                offsetClef = 0;
             case Clef.G2:
                 offsetClef = 0;
             case Clef.F4:

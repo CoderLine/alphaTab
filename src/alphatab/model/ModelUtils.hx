@@ -70,10 +70,11 @@ class ModelUtils
     {
         switch(clef)
         {
-            case C3: return 0;
-            case C4: return 1;
-            case F4: return 2;
-            case G2: return 3;
+            case Neutral: return 0;
+            case C3: return 1;
+            case C4: return 2;
+            case F4: return 3;
+            case G2: return 4;
         }
     }
 }
