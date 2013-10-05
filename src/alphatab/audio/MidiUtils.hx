@@ -29,7 +29,12 @@ class MidiUtils
      * The amount of ticks per quarter note used within this midi system.
      * (Pulses Per Quarter Note)
      */
-    public static inline var QUARTER_TIME:Int = 960;
+    public static inline var QuarterTime:Int = 960;
+    
+    /**
+     * The default midi channel used for percussion
+     */
+    public static inline var PercussionChannel:Int = 9;
     
     /**
      * Converts a duration value to its ticks equivalent.
@@ -45,7 +50,7 @@ class MidiUtils
      */
     public static function valueToTicks(value:Int)
     {
-        return Std.int(QUARTER_TIME * (4.0 / value));
+        return Std.int(QuarterTime * (4.0 / value));
     }
     
     public static function applyDot(ticks:Int, doubleDotted:Bool)

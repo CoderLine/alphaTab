@@ -63,7 +63,7 @@ typedef BeatLinePositions = {
  */
 class BeamingHelper 
 {
-    private static var SCORE_MIDDLE_KEYS:Array<Int> = [ 48, 45, 38, 59 ];
+    private static var ScoreMiddleKeys:Array<Int> = [ 48, 45, 38, 59 ];
 
     public var voice:Voice;
     public var beats:Array<Beat>;
@@ -166,7 +166,7 @@ class BeamingHelper
         //      key lowerequal than middle line -> up
         //      key higher than middle line -> down
         var avg = Std.int((getValue(maxNote) + getValue(minNote)) / 2);
-        return avg <= SCORE_MIDDLE_KEYS[Type.enumIndex(_lastBeat.voice.bar.clef)] ? Up : Down;
+        return avg <= ScoreMiddleKeys[Type.enumIndex(_lastBeat.voice.bar.clef)] ? Up : Down;
     }
      
     public function checkBeat(beat:Beat) : Bool
@@ -349,13 +349,13 @@ class BeamingHelper
         
         
         // TODO: create more rules for automatic beaming
-        var divisionLength:Int = MidiUtils.QUARTER_TIME;
+        var divisionLength:Int = MidiUtils.QuarterTime;
         switch (m1.getMasterBar().timeSignatureDenominator)
         {
             case 8:
                 if (m1.getMasterBar().timeSignatureNumerator % 3 == 0)
                 {
-                    divisionLength += Math.floor(MidiUtils.QUARTER_TIME / 2);
+                    divisionLength += Math.floor(MidiUtils.QuarterTime / 2);
                 }
         }
 

@@ -45,8 +45,8 @@ import haxe.io.Error;
 
 class AlphaTexImporter extends ScoreImporter
 {
-	private static var EOF:String = String.fromCharCode(0);
-    private static var TRACK_CHANNELS:Array<Int> = [0, 1];
+	private static var Eof:String = String.fromCharCode(0);
+    private static var TrackChannels:Array<Int> = [0, 1];
     
     private var _score:Score; 
     private var _track:Track; 
@@ -83,7 +83,7 @@ class AlphaTexImporter extends ScoreImporter
         catch (e:Dynamic)
         {
             trace(e);
-            throw ScoreImporter.UNSUPPORTED_FORMAT;
+            throw ScoreImporter.UnsupportedFormat;
         }
 	}
 
@@ -798,13 +798,15 @@ class AlphaTexImporter extends ScoreImporter
                 var fret = _syData;
                 newSy();
                 
-                var duration:Int = 16;
+                var duration:Duration = Duration.Sixteenth;
                 if (_sy == AlphaTexSymbols.Number) 
                 {
 					switch(_syData)
 					{
-						case 16, 32, 64: duration = _syData;
-						default: duration = 16;
+						case 16: duration = Duration.Sixteenth;
+                        case 32: duration = Duration.ThirtySecond;
+                        case 64: duration = Duration.ThirtySecond;
+						default: duration = Duration.Sixteenth;
 					}
                     newSy();
                 }
@@ -995,8 +997,8 @@ class AlphaTexImporter extends ScoreImporter
         
         _track = new Track();
 		_track.playbackInfo.program = 25;
-		_track.playbackInfo.primaryChannel = TRACK_CHANNELS[0];
-		_track.playbackInfo.secondaryChannel = TRACK_CHANNELS[1];
+		_track.playbackInfo.primaryChannel = TrackChannels[0];
+		_track.playbackInfo.secondaryChannel = TrackChannels[1];
 		_track.tuning = Tuning.getPresetsFor(6)[0].tuning;
         
         _score.addTrack(_track);
@@ -1072,9 +1074,9 @@ class AlphaTexImporter extends ScoreImporter
 			_ch = _data.readString(1);
 			_curChPos++;
 		}
-		catch (e:Eof)
+		catch (e:haxe.io.Eof)
 		{
-			_ch = EOF;
+			_ch = Eof;
 		}
     }
 
@@ -1087,7 +1089,7 @@ class AlphaTexImporter extends ScoreImporter
         _sy = AlphaTexSymbols.No;
         do 
         {
-            if (_ch == EOF) 
+            if (_ch == Eof) 
             {
                 _sy = AlphaTexSymbols.Eof;
             }
@@ -1102,7 +1104,7 @@ class AlphaTexImporter extends ScoreImporter
                 if (_ch == "/")
                 {
                     // single line comment
-                    while (_ch != "\r" && _ch != "\n" && _ch != EOF)
+                    while (_ch != "\r" && _ch != "\n" && _ch != Eof)
                     {
                         nextChar();
                     }
@@ -1110,7 +1112,7 @@ class AlphaTexImporter extends ScoreImporter
                 else if (_ch == "*")
                 {
                     // multiline comment
-                    while (_ch != EOF)
+                    while (_ch != Eof)
                     {
                         if (_ch == "*") // possible end
                         {
@@ -1137,7 +1139,7 @@ class AlphaTexImporter extends ScoreImporter
                 nextChar();
                 _syData = "";
                 _sy = AlphaTexSymbols.String;
-                while(_ch != '"' && _ch != "'" && _ch != EOF) 
+                while(_ch != '"' && _ch != "'" && _ch != Eof) 
                 {
                     _syData += _ch;
                     nextChar();

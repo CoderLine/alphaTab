@@ -13,7 +13,7 @@ import haxe.ds.IntMap;
  */
 class VoiceContainerGlyph extends GlyphGroup implements ISupportsFinalize
 {
-    public static inline var KEY_SIZE_BEAT = "BEAT";
+    public static inline var KeySizeBeat = "Beat";
 
     public var beatGlyphs:Array<BeatContainerGlyph>;
     public var voiceIndex:Int;
@@ -41,7 +41,7 @@ class VoiceContainerGlyph extends GlyphGroup implements ISupportsFinalize
     
     private static inline function getKey(index:Int) : String
     {
-        return KEY_SIZE_BEAT;
+        return KeySizeBeat;
     }
     
     public function registerMaxSizes(sizes:BarSizeInfo)

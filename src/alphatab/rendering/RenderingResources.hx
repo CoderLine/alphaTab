@@ -55,8 +55,8 @@ class RenderingResources
         var sansFont = "Arial";
         var serifFont = "Georgia";
         
-		effectFont = new Font(serifFont, 12 * scale, Font.STYLE_ITALIC);
-		copyrightFont = new Font(sansFont, 12 * scale, Font.STYLE_BOLD);
+		effectFont = new Font(serifFont, 12 * scale, Font.StyleItalic);
+		copyrightFont = new Font(sansFont, 12 * scale, Font.StyleBold);
 		
 		titleFont = new Font(serifFont, 32 * scale);
 		subTitleFont = new Font(serifFont, 20 * scale);
@@ -71,8 +71,8 @@ class RenderingResources
 		barNumberFont = new Font(sansFont, 11 * scale); 
 		barNumberColor = new Color(200, 0, 0);
         
-		markerFont = new Font(serifFont, 14 * scale, Font.STYLE_BOLD);
-		tabClefFont = new Font(sansFont, 18 * scale, Font.STYLE_BOLD);
+		markerFont = new Font(serifFont, 14 * scale, Font.StyleBold);
+		tabClefFont = new Font(sansFont, 18 * scale, Font.StyleBold);
 		
 		mainGlyphColor = new Color(0,0,0);
 	}

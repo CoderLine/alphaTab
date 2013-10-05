@@ -84,7 +84,7 @@ class Note
     public var trillValue:Int;
     public inline function trillFret():Int { return trillValue - stringTuning(); }
     public inline function isTrill():Bool { return trillValue >= 0; }
-    public var trillSpeed:Int;
+    public var trillSpeed:Duration;
     public var durationPercent:Float;
     
     public var swapAccidentals:Bool;
@@ -123,7 +123,7 @@ class Note
         swapAccidentals = false;
         
         trillValue = -1;
-        trillSpeed = 0;
+        trillSpeed = Duration.ThirtySecond;
         durationPercent = 1;
         octave = -1;
     }

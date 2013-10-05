@@ -23,6 +23,8 @@ package alphatab.model;
  */
 class Score 
 {
+	private var _currentRepeatGroup:RepeatGroup;
+    
     /**
      * The album of this song. 
      */
@@ -74,6 +76,7 @@ class Score
     {
         masterBars = new Array<MasterBar>();
         tracks = new Array<Track>();
+        _currentRepeatGroup = new RepeatGroup();
     }
     
     public function addMasterBar(bar:MasterBar)
@@ -86,6 +89,15 @@ class Score
             bar.previousMasterBar.nextMasterBar = bar;
             bar.start = bar.previousMasterBar.start + bar.previousMasterBar.calculateDuration();
         }
+        
+		// if the group is closed only the next upcoming header can
+		// reopen the group in case of a repeat alternative, so we 
+		// remove the current group 
+		if (bar.isRepeatStart || (_currentRepeatGroup.isClosed && bar.alternateEndings <= 0))
+		{
+			_currentRepeatGroup = new RepeatGroup();
+		}
+        _currentRepeatGroup.addMasterBar(bar);
         masterBars.push(bar);
     }
     

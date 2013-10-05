@@ -7,7 +7,7 @@ import alphatab.rendering.staves.StaveGroup;
 class HorizontalScreenLayout extends ScoreLayout
 {
     // left top right bottom
-    public static var PAGE_PADDING:Array<Int> = [20, 20, 20, 20];
+    public static var PagePadding:Array<Int> = [20, 20, 20, 20];
 	
 	public static inline var GroupSpacing = 20;
 
@@ -31,8 +31,8 @@ class HorizontalScreenLayout extends ScoreLayout
         endBarIndex = startIndex + endBarIndex - 1; // map count to array index
         endBarIndex = Std.int(Math.min(renderer.track.bars.length - 1, Math.max(0, endBarIndex)));
 
-        var x = PAGE_PADDING[0];
-        var y = PAGE_PADDING[1];
+        var x = PagePadding[0];
+        var y = PagePadding[1];
 		
 		_group = createEmptyStaveGroup();
 		
@@ -50,8 +50,8 @@ class HorizontalScreenLayout extends ScoreLayout
 		_group.finalizeGroup(this);
 		
 		y += _group.calculateHeight() + Std.int(GroupSpacing * renderer.scale);
-		height = y + PAGE_PADDING[3];
-		width = _group.x + _group.width + PAGE_PADDING[2];
+		height = y + PagePadding[3];
+		width = _group.x + _group.width + PagePadding[2];
     }
 
 	public override function paintScore():Void 

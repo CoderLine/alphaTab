@@ -285,8 +285,8 @@ class GpImporterTestBase extends TestCase
     
     public function checkTrills(score:Score)
     {
-        assertEquals(2, score.tracks[0].bars[0].voices[0].beats[0].notes[0].trillFret);
-        assertEquals(0, score.tracks[0].bars[0].voices[0].beats[1].notes[0].trillSpeed);
+        assertEquals(2, score.tracks[0].bars[0].voices[0].beats[0].notes[0].trillFret());
+        assertEquals(Duration.Sixteenth, score.tracks[0].bars[0].voices[0].beats[1].notes[0].trillSpeed);
         
         assertTrue(score.tracks[0].bars[0].voices[0].beats[1].isTremolo());
         assertEquals(Duration.ThirtySecond, score.tracks[0].bars[0].voices[0].beats[1].tremoloSpeed);
@@ -309,7 +309,7 @@ class GpImporterTestBase extends TestCase
         assertTrue(score.tracks[0].bars[1].voices[0].beats[1].fadeIn);
         
         assertTrue(score.tracks[0].bars[3].voices[0].beats[0].hasChord());
-        assertEquals("C", score.tracks[0].bars[3].voices[0].beats[0].chord.name);
+        assertEquals("C", score.tracks[0].bars[3].voices[0].beats[0].chord().name);
         assertEquals("Text", score.tracks[0].bars[3].voices[0].beats[1].text);
         assertTrue(score.masterBars[4].isDoubleBar);
         assertTrue(score.tracks[0].bars[4].voices[0].beats[0].getAutomation(AutomationType.Tempo) != null);

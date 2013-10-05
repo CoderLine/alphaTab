@@ -33,16 +33,16 @@ class TabBeatGlyph extends BeatGlyphBase
             
             //
             // Whammy Bar
-            if (container.beat.hasWhammyBar() && !noteNumbers.beatEffects.exists("WHAMMY"))
+            if (container.beat.hasWhammyBar() && !noteNumbers.beatEffects.exists("Whammy"))
             {
-                noteNumbers.beatEffects.set("WHAMMY",  new WhammyBarGlyph(container.beat, container));
+                noteNumbers.beatEffects.set("Whammy",  new WhammyBarGlyph(container.beat, container));
             }
             
             //
             // Tremolo Picking
-            if (container.beat.isTremolo() && !noteNumbers.beatEffects.exists("TREMOLO"))
+            if (container.beat.isTremolo() && !noteNumbers.beatEffects.exists("Tremolo"))
             {
-                noteNumbers.beatEffects.set("TREMOLO",  new TremoloPickingGlyph(0, 0, container.beat.tremoloSpeed));
+                noteNumbers.beatEffects.set("Tremolo",  new TremoloPickingGlyph(0, 0, container.beat.tremoloSpeed));
             }
 		}
 		

@@ -87,7 +87,7 @@ class Main
 
 			var header = fs.readHeader(src);
 			Sys.println("Found header: '" + header + "'");
-			if (header != GpxFileSystem.HEADER_BCFZ)
+			if (header != GpxFileSystem.HeaderBcFz)
 			{
 				Sys.println("the requested file is no compressed gpx");
 				Sys.exit(1);

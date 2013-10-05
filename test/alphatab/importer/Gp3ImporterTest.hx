@@ -135,7 +135,7 @@ class Gp3ImporterTest extends GpImporterTestBase
         assertTrue(score.tracks[0].bars[1].voices[0].beats[1].fadeIn);
         
         assertTrue(score.tracks[0].bars[3].voices[0].beats[0].hasChord());
-        assertEquals("C", score.tracks[0].bars[3].voices[0].beats[0].chord.name);
+        assertEquals("C", score.tracks[0].bars[3].voices[0].beats[0].chord().name);
         assertEquals("Text", score.tracks[0].bars[3].voices[0].beats[1].text);
         assertTrue(score.tracks[0].bars[4].voices[0].beats[0].getAutomation(AutomationType.Tempo) != null);
         assertEquals(120.0, score.tracks[0].bars[4].voices[0].beats[0].getAutomation(AutomationType.Tempo).value);

@@ -156,7 +156,7 @@ class GpxParser
 		}
 		else
 		{
-			throw ScoreImporter.UNSUPPORTED_FORMAT;
+			throw ScoreImporter.UnsupportedFormat;
 		}
             
         buildModel();
@@ -802,7 +802,7 @@ class GpxParser
                         note.isLetRing = true;
                     case "Trill":
                         note.trillValue = Std.parseInt(getValue(c));
-                        note.trillSpeed = 1;
+                        note.trillSpeed = Duration.Sixteenth;
                     case "Accent":
                         var accentFlags = Std.parseInt(getValue(c));
                         if ( (accentFlags & 0x01) != 0) note.isStaccato = true;

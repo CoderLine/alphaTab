@@ -14,24 +14,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
-package alphatab;
+package alphatab.audio.model;
 
-import alphatab.Environment;
-
-import alphatab.importer.Gp3To5Importer;
-import alphatab.importer.AlphaTexImporter;
-import alphatab.importer.ScoreLoader;
-
-import alphatab.rendering.ScoreRenderer;
-
-import alphatab.audio.generator.MidiFileGenerator;
-
-/**
- * This is the applications main class. (required by Haxe)
- */
-class Main 
+class MidiEvent
 {
-	static function main() 
-	{
-	}
+    public var track:MidiTrack;
+    public var tick:Int;
+    public var nextEvent:MidiEvent;
+    public var previousEvent:MidiEvent;
+
+    public function new() 
+    {
+        
+    }
+    
+    public function getDeltaTicks()
+    {
+        return previousEvent == null ? 0 : tick - previousEvent.tick;
+    }
 }

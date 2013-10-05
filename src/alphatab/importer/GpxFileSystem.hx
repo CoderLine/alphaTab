@@ -26,9 +26,9 @@ class GpxFile
  */
 class GpxFileSystem 
 {
-    public static inline var HEADER_BCFS:String = "BCFS";
-    public static inline var HEADER_BCFZ:String = "BCFZ";
-    public static inline var SCORE_GPIF:String = "score.gpif";
+    public static inline var HeaderBcFs:String = "BCFS";
+    public static inline var HeaderBcFz:String = "BCFZ";
+    public static inline var ScoreGpif:String = "score.gpif";
 	
 	private var _fileFilter:String->Bool;
 	
@@ -149,19 +149,19 @@ class GpxFileSystem
 	private function readBlock(data:BitInput)
 	{
 		var header = readHeader(data);
-		if (header == HEADER_BCFZ) // compressed file?
+		if (header == HeaderBcFz) // compressed file?
 		{
 			// decompress the data and use this 
 			// we will skip the header 
 			readUncompressedBlock(decompress(data, true));
 		}
-		else if (header == HEADER_BCFS) // uncompressed file?
+		else if (header == HeaderBcFs) // uncompressed file?
 		{
 			readUncompressedBlock(data.readAll());
 		}
 		else
 		{
-			throw ScoreImporter.UNSUPPORTED_FORMAT; 
+			throw ScoreImporter.UnsupportedFormat; 
 		}
 	}
 	

@@ -35,11 +35,11 @@ import alphatab.rendering.staves.StaveGroup;
  */
 class PageViewLayout extends ScoreLayout
 {
-    public static var SCORE_INFOS = "scoreInfos";
+    public static var ScoreInfos = "ScoreInfos";
     
     // left top right bottom
-    public static var PAGE_PADDING:Array<Int> = [20, 20, 20, 20];
-    public static inline var WIDTH_ON_100:Int = 795;
+    public static var PagePadding:Array<Int> = [20, 20, 20, 20];
+    public static inline var WidthOn100:Int = 795;
 
         
     private var _groups:Array<StaveGroup>;
@@ -66,8 +66,8 @@ class PageViewLayout extends ScoreLayout
         endBarIndex = Std.int(Math.min(renderer.track.bars.length - 1, Math.max(0, endBarIndex)));
                 
         
-        var x = PAGE_PADDING[0];
-        var y = PAGE_PADDING[1];
+        var x = PagePadding[0];
+        var y = PagePadding[1];
         
         y = doScoreInfoLayout(y);
         
@@ -90,44 +90,44 @@ class PageViewLayout extends ScoreLayout
             }
         }
         
-        height = y + PAGE_PADDING[3];
-        width = Std.int(WIDTH_ON_100 * renderer.scale);
+        height = y + PagePadding[3];
+        width = Std.int(WidthOn100 * renderer.scale);
     }
     
     private function doScoreInfoLayout(y:Int)
     {
         // TODO: Check if it's a good choice to provide the complete flags as setting
-        var flags:Int = renderer.settings.layout.get("hideInfo", false) ? HeaderFooterElements.NONE : HeaderFooterElements.ALL;
+        var flags:Int = renderer.settings.layout.get("hideInfo", false) ? HeaderFooterElements.None : HeaderFooterElements.All;
         var score:Score = renderer.score;
         var scale:Float = renderer.scale;
 
-        if (!isNullOrEmpty(score.title) && (flags & HeaderFooterElements.TITLE != 0))
+        if (!isNullOrEmpty(score.title) && (flags & HeaderFooterElements.Title != 0))
         {
             y += Math.floor(35 * scale);
         }
-        if (!isNullOrEmpty(score.subTitle) && (flags & HeaderFooterElements.SUBTITLE != 0))
+        if (!isNullOrEmpty(score.subTitle) && (flags & HeaderFooterElements.SubTitle != 0))
         {
             y += Math.floor(20 * scale);
         }
-        if (!isNullOrEmpty(score.artist) && (flags & HeaderFooterElements.ARTIST != 0))
+        if (!isNullOrEmpty(score.artist) && (flags & HeaderFooterElements.Artist != 0))
         {
             y += Math.floor(20 * scale);
         }
-        if (!isNullOrEmpty(score.album) && (flags & HeaderFooterElements.ALBUM != 0))
+        if (!isNullOrEmpty(score.album) && (flags & HeaderFooterElements.Album != 0))
         {
             y += Math.floor(20 * scale);
         }
-        if (!isNullOrEmpty(score.music) && score.music == score.words && (flags & HeaderFooterElements.WORDS_AND_MUSIC != 0))
+        if (!isNullOrEmpty(score.music) && score.music == score.words && (flags & HeaderFooterElements.WordsAndMusic != 0))
         {
             y += Math.floor(20 * scale);
         }
         else 
         {
-            if (!isNullOrEmpty(score.music) && (flags & HeaderFooterElements.MUSIC != 0))
+            if (!isNullOrEmpty(score.music) && (flags & HeaderFooterElements.Music != 0))
             {
                 y += Math.floor(20 * scale);
             }
-            if (!isNullOrEmpty(score.words) && (flags & HeaderFooterElements.WORDS != 0))
+            if (!isNullOrEmpty(score.words) && (flags & HeaderFooterElements.Words != 0))
             {
                 y += Math.floor(20 * scale);
             }
@@ -163,8 +163,8 @@ class PageViewLayout extends ScoreLayout
     
     public override function paintScore():Void 
     {
-        var x = PAGE_PADDING[0];
-        var y = PAGE_PADDING[1];
+        var x = PagePadding[0];
+        var y = PagePadding[1];
         
         y = paintScoreInfo(x, y);
         
@@ -182,7 +182,7 @@ class PageViewLayout extends ScoreLayout
     
     private function paintScoreInfo(x:Int, y:Int)
     {
-        var flags:Int = renderer.settings.layout.get("hideInfo", false) ? HeaderFooterElements.NONE : HeaderFooterElements.ALL;
+        var flags:Int = renderer.settings.layout.get("hideInfo", false) ? HeaderFooterElements.None : HeaderFooterElements.All;
         var score:Score = renderer.score;
         var scale:Float = renderer.scale;
         
@@ -195,27 +195,27 @@ class PageViewLayout extends ScoreLayout
         var tX:Float;
         var size:Float;
         var str:String = "";
-        if (!isNullOrEmpty(score.title) && (flags & HeaderFooterElements.TITLE != 0))
+        if (!isNullOrEmpty(score.title) && (flags & HeaderFooterElements.Title != 0))
         {
             drawCentered(score.title, res.titleFont, y);
             y += Math.floor(35*scale); 
         }        
-        if (!isNullOrEmpty(score.subTitle) && (flags & HeaderFooterElements.SUBTITLE != 0))
+        if (!isNullOrEmpty(score.subTitle) && (flags & HeaderFooterElements.SubTitle != 0))
         {
             drawCentered(score.subTitle, res.subTitleFont, y);
             y += Math.floor(20*scale);
         }
-        if (!isNullOrEmpty(score.artist) && (flags & HeaderFooterElements.ARTIST != 0))
+        if (!isNullOrEmpty(score.artist) && (flags & HeaderFooterElements.Artist != 0))
         {
             drawCentered(score.artist, res.subTitleFont, y);
             y += Math.floor(20*scale);
         }
-        if (!isNullOrEmpty(score.album) && (flags & HeaderFooterElements.ALBUM != 0))
+        if (!isNullOrEmpty(score.album) && (flags & HeaderFooterElements.Album != 0))
         {
             drawCentered(score.album, res.subTitleFont, y);
             y += Math.floor(20*scale);
         }
-        if (!isNullOrEmpty(score.music) && score.music == score.words && (flags & HeaderFooterElements.WORDS_AND_MUSIC != 0))
+        if (!isNullOrEmpty(score.music) && score.music == score.words && (flags & HeaderFooterElements.WordsAndMusic != 0))
         {
             drawCentered("Music and Words by " + score.words, res.wordsFont, y);
             y += Math.floor(20*scale);
@@ -223,12 +223,12 @@ class PageViewLayout extends ScoreLayout
         else 
         {
             canvas.setFont(res.wordsFont);
-            if (!isNullOrEmpty(score.music) && (flags & HeaderFooterElements.MUSIC != 0))
+            if (!isNullOrEmpty(score.music) && (flags & HeaderFooterElements.Music != 0))
             {
                 canvas.setTextAlign(TextAlign.Right);
-                canvas.fillText("Music by " + score.music, width - PAGE_PADDING[2], y);
+                canvas.fillText("Music by " + score.music, width - PagePadding[2], y);
             }
-            if (!isNullOrEmpty(score.words) && (flags & HeaderFooterElements.WORDS != 0))
+            if (!isNullOrEmpty(score.words) && (flags & HeaderFooterElements.Words != 0))
             {
                 canvas.setTextAlign(TextAlign.Left);
                 canvas.fillText("Words by " + score.music, x, y);
@@ -348,13 +348,13 @@ class PageViewLayout extends ScoreLayout
     
     private inline function getMaxWidth() : Int
     {
-        return (getSheetWidth() - PAGE_PADDING[0] - PAGE_PADDING[2]);
+        return (getSheetWidth() - PagePadding[0] - PagePadding[2]);
     }
     
         
     private function getSheetWidth() : Int
     {
-        return Math.round(WIDTH_ON_100 * renderer.scale);
+        return Math.round(WidthOn100 * renderer.scale);
     }
     
 }

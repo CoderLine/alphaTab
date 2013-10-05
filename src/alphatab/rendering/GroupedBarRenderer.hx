@@ -21,8 +21,8 @@ import haxe.ds.IntMap;
  */
 class GroupedBarRenderer extends BarRendererBase
 {
-	public static inline var KEY_SIZE_PRE = "PRE";
-	public static inline var KEY_SIZE_POST = "POST";
+	public static inline var KeySizePre = "Pre";
+	public static inline var KeySizePost = "Post";
 	
 	private var _preBeatGlyphs:Array<Glyph>;
     private var _voiceContainers:IntMap<VoiceContainerGlyph>;
@@ -69,9 +69,9 @@ class GroupedBarRenderer extends BarRendererBase
 	public override function registerMaxSizes(sizes:BarSizeInfo):Void 
 	{
 		var preSize = getBeatGlyphsStart();
-		if (sizes.getSize(KEY_SIZE_PRE) < preSize)
+		if (sizes.getSize(KeySizePre) < preSize)
 		{
-			sizes.setSize(KEY_SIZE_PRE, preSize);			
+			sizes.setSize(KeySizePre, preSize);			
 		}
 		
         for (c in _voiceContainers)
@@ -88,9 +88,9 @@ class GroupedBarRenderer extends BarRendererBase
 		{
 			postSize = _postBeatGlyphs[_postBeatGlyphs.length - 1].x + _postBeatGlyphs[_postBeatGlyphs.length - 1].width;
 		}
-		if (sizes.getSize(KEY_SIZE_POST) < postSize)
+		if (sizes.getSize(KeySizePost) < postSize)
 		{
-			sizes.setSize(KEY_SIZE_POST, postSize);
+			sizes.setSize(KeySizePost, postSize);
 		}
 		
 		if (sizes.fullWidth < width)
@@ -103,7 +103,7 @@ class GroupedBarRenderer extends BarRendererBase
 	{
 		// if we need additional space in the preBeat group we simply
 		// add a new spacer
-		var preSize = sizes.getSize(KEY_SIZE_PRE);
+		var preSize = sizes.getSize(KeySizePre);
 		var preSizeDiff = preSize - getBeatGlyphsStart();
 		if (preSizeDiff > 0)
 		{
@@ -117,7 +117,7 @@ class GroupedBarRenderer extends BarRendererBase
         }
 		
 		// on the post glyphs we add the spacing before all other glyphs
-		var postSize = sizes.getSize(KEY_SIZE_POST);
+		var postSize = sizes.getSize(KeySizePost);
 		var postSizeDiff:Int;
 		if (_postBeatGlyphs.length == 0)
 		{

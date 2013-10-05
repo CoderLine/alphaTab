@@ -39,6 +39,7 @@ class MasterBar
     public var isRepeatStart:Bool;
     public inline function isRepeatEnd():Bool { return repeatCount > 0; }
     public var repeatCount:Int;
+    public var repeatGroup:RepeatGroup;
  
     public var timeSignatureDenominator:Int;
     public var timeSignatureNumerator:Int;

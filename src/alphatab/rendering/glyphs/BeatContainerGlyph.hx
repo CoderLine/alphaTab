@@ -45,17 +45,17 @@ class BeatContainerGlyph extends Glyph implements ISupportsFinalize
     
     private inline function preNotesKey()
     {
-        return "PRE_NOTES" + beat.voice.index;
+        return "PreNotes" + beat.voice.index;
     }
     
     private inline function onNotesKey()
     {
-        return "ON_NOTES" + beat.voice.index;
+        return "OnNotes" + beat.voice.index;
     }
     
     private inline function postNotesKey()
     {
-        return "POST_NOTES" + beat.voice.index;
+        return "PostNotes" + beat.voice.index;
     }
     
     public function registerMaxSizes(sizes:BarSizeInfo)

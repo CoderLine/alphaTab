@@ -14,24 +14,33 @@
  *  You should have received a copy of the GNU General Public License
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
-package alphatab;
+package alphatab.audio.model;
 
-import alphatab.Environment;
-
-import alphatab.importer.Gp3To5Importer;
-import alphatab.importer.AlphaTexImporter;
-import alphatab.importer.ScoreLoader;
-
-import alphatab.rendering.ScoreRenderer;
-
-import alphatab.audio.generator.MidiFileGenerator;
-
-/**
- * This is the applications main class. (required by Haxe)
- */
-class Main 
+class MidiFile
 {
-	static function main() 
-	{
-	}
+    public var tracks:Array<MidiTrack>;
+    
+    /**
+     * Gets or sets the index of the track used for midi events
+     * affecting all tracks. (like the tempo)
+     */
+    public var infoTrack:Int;
+    
+    /**
+     * Gets or sets the index of the track used as metronome.
+     */
+    public var metronomeTrack:Int;
+    
+    public function new() 
+    {
+    }
+    
+    public function createTrack() : MidiTrack
+    {
+        var track = new MidiTrack();
+        track.index = tracks.length;
+        track.file = this;
+        tracks.push(track);
+        return track;
+    }
 }

@@ -183,18 +183,18 @@ class ScoreBeatGlyph extends BeatGlyphBase
         noteHeadGlyph.y = sr.getScoreY(line, -1);
         noteHeads.addNoteGlyph(noteHeadGlyph, n, line);
         
-        if (n.isStaccato && !noteHeads.beatEffects.exists("STACCATO"))
+        if (n.isStaccato && !noteHeads.beatEffects.exists("Staccato"))
         {
-            noteHeads.beatEffects.set("STACCATO",  new CircleGlyph(0, 0, 1.5));
+            noteHeads.beatEffects.set("Staccato",  new CircleGlyph(0, 0, 1.5));
         }
         
-        if (n.accentuated == AccentuationType.Normal && !noteHeads.beatEffects.exists("ACCENT"))
+        if (n.accentuated == AccentuationType.Normal && !noteHeads.beatEffects.exists("Accent"))
         {
-            noteHeads.beatEffects.set("ACCENT",  new AccentuationGlyph(0, 0, AccentuationType.Normal));
+            noteHeads.beatEffects.set("Accent",  new AccentuationGlyph(0, 0, AccentuationType.Normal));
         }
-        if (n.accentuated == AccentuationType.Heavy && !noteHeads.beatEffects.exists("HACCENT"))
+        if (n.accentuated == AccentuationType.Heavy && !noteHeads.beatEffects.exists("HAccent"))
         {
-            noteHeads.beatEffects.set("HACCENT",  new AccentuationGlyph(0, 0, AccentuationType.Heavy));
+            noteHeads.beatEffects.set("HAccent",  new AccentuationGlyph(0, 0, AccentuationType.Heavy));
         }
     }
 }

@@ -76,18 +76,18 @@ class ScoreBarRenderer extends GroupedBarRenderer
      *      0 steps is on the first line (counting from top)
      *      1 steps is on the space inbetween the first and the second line
      */
-    private static inline var STEPS_PER_OCTAVE = 7;
+    private static inline var StepsPerOctave = 7;
     
     /**
-     * Those are the amount of steps for the different clefs in case of a note value 0
+     * Those are the amount of steps for the different clefs in case of a note value 0	
      * [Neutral, C3, C4, F4, G2]
      */
-    private static var OCTAVE_STEPS = [38, 32, 30, 26, 38];
+    private static var OctaveSteps = [38, 32, 30, 26, 38];
     
     /**
      * The step offsets of the notes within an octave in case of for sharp keysignatures
      */
-    private static var SHARP_NOTE_STEPS:Array<Int> = [ 0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6 ];
+    private static var SharpNoteSteps:Array<Int> = [ 0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6 ];
 
     /**
      * The step offsets of the notes within an octave in case of for flat keysignatures
@@ -97,12 +97,12 @@ class ScoreBarRenderer extends GroupedBarRenderer
     /**
      * The step offsets of sharp symbols for sharp key signatures.
      */
-    private static var SHARP_KS_STEPS:Array<Int> = [ 1, 4, 0, 3, 6, 2, 5 ];
+    private static var SharpKsSteps:Array<Int> = [ 1, 4, 0, 3, 6, 2, 5 ];
     
     /**
      * The step offsets of sharp symbols for flat key signatures.
      */
-    private static var FLAT_KS_STEPS:Array<Int> = [ 5, 2, 6, 3, 7, 4, 8 ];
+    private static var FlatKsSteps:Array<Int> = [ 5, 2, 6, 3, 7, 4, 8 ];
 
 	
 	private static inline var LineSpacing = 8;
@@ -669,7 +669,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
 		// naturalize previous key
         // TODO: only naturalize the symbols needed 
         var naturalizeSymbols:Int = Std.int(Math.abs(previousKey));
-        var previousKeyPositions:Array<Int> = previousKey.keySignatureIsSharp() ? SHARP_KS_STEPS : FLAT_KS_STEPS;
+        var previousKeyPositions:Array<Int> = previousKey.keySignatureIsSharp() ? SharpKsSteps : FlatKsSteps;
 
 		for (i in 0 ... naturalizeSymbols)
         {
@@ -684,7 +684,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
         {  
             for (i in 0 ... Std.int(Math.abs(currentKey)))
             {
-				addPreBeatGlyph(new SharpGlyph(0, Std.int(getScoreY(SHARP_KS_STEPS[i] + offsetClef))));
+				addPreBeatGlyph(new SharpGlyph(0, Std.int(getScoreY(SharpKsSteps[i] + offsetClef))));
             }
         }
         // a flat signature
@@ -692,7 +692,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
         {
             for (i in 0 ... Std.int(Math.abs(currentKey)))
             {
-				addPreBeatGlyph(new FlatGlyph(0, Std.int(getScoreY(FLAT_KS_STEPS[i] + offsetClef))));
+				addPreBeatGlyph(new FlatGlyph(0, Std.int(getScoreY(FlatKsSteps[i] + offsetClef))));
             }
         }		
 	}
@@ -773,14 +773,14 @@ class ScoreBarRenderer extends GroupedBarRenderer
         var octave = Std.int(value / 12);
         
         // Initial Position
-        var steps = OCTAVE_STEPS[clef.getClefIndex()];
+        var steps = OctaveSteps[clef.getClefIndex()];
         
         // Move to Octave
-        steps -= (octave * STEPS_PER_OCTAVE);
+        steps -= (octave * StepsPerOctave);
         
         // Add offset for note itself
         steps -= ks.keySignatureIsSharp() || ks.keySignatureIsNatural()
-                     ? SHARP_NOTE_STEPS[index]
+                     ? SharpNoteSteps[index]
                      : FLAT_NOTE_STEPS[index];
 
         // TODO: It seems note heads are always one step above the calculated line 

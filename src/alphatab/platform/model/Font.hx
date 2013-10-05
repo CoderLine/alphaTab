@@ -21,9 +21,9 @@ package alphatab.platform.model;
  */
 class Font 
 {
-	public static inline var STYLE_PLAIN = 0;
-	public static inline var STYLE_BOLD = 1;
-	public static inline var STYLE_ITALIC = 2;
+	public static inline var StylePlain = 0;
+	public static inline var StyleBold = 1;
+	public static inline var StyleItalic = 2;
 	
 	private var _family:String;
 	private var _size:Float;
@@ -61,15 +61,15 @@ class Font
 	
 	public inline function isBold() : Bool
 	{
-		return ((getStyle() & STYLE_BOLD) != 0);
+		return ((getStyle() & StyleBold) != 0);
 	}	
 	
 	public inline function isItalic() : Bool
 	{
-		return ((getStyle() & STYLE_ITALIC) != 0);
+		return ((getStyle() & StyleItalic) != 0);
 	}
 	
-	public function new(family:String, size:Float, style:Int = STYLE_PLAIN) 
+	public function new(family:String, size:Float, style:Int = StylePlain) 
 	{
 		_family = family;
 		_size = size;

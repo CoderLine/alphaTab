@@ -18,7 +18,7 @@ class GpxImporter extends ScoreImporter
 		// from the GPX container
 		var fileSystem = new GpxFileSystem();
 		fileSystem.setFileFilter(function(s:String) {
-			return s == GpxFileSystem.SCORE_GPIF; // only load the GPIF file to memory
+			return s == GpxFileSystem.ScoreGpif; // only load the GPIF file to memory
 		});
 		fileSystem.load(_data);
 		

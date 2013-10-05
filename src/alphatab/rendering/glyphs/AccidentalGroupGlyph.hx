@@ -20,7 +20,7 @@ import alphatab.rendering.Glyph;
 
 class AccidentalGroupGlyph extends GlyphGroup
 {
-    private static inline var NON_RESERVED = -3000;
+    private static inline var NonReserved = -3000;
 	public function new(x:Int = 0, y:Int = 0)
     {
         super(x, y, new Array<Glyph>());
@@ -39,7 +39,7 @@ class AccidentalGroupGlyph extends GlyphGroup
         
         // defines the reserved y position of the columns
         var columns = new Array<Int>();
-        columns.push(NON_RESERVED);
+        columns.push(NonReserved);
         
         var accidentalSize = Std.int(21 * getScale());
 		for (g in _glyphs)
@@ -59,7 +59,7 @@ class AccidentalGroupGlyph extends GlyphGroup
                 // and create the new column if needed
                 if (gColumn == columns.length)
                 {
-                    columns.push(NON_RESERVED);
+                    columns.push(NonReserved);
                 }
             } 
             

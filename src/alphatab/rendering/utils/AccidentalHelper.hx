@@ -14,7 +14,7 @@ class AccidentalHelper
      * it's the easiest way to store them as an array like that, than calculate all the stuff. 
      * ( or at least I am missing some knowledge )
      */
-    private static var ACCIDENTAL_NOTES : Array< Array<AccidentalType> > = 
+    private static var AccidentalNotes : Array< Array<AccidentalType> > = 
     [
         // Flats
         [Natural, None, Natural, None, Natural, Natural, None, Natural, None, Natural, None, Natural ], // 7 Flats
@@ -60,7 +60,7 @@ class AccidentalHelper
         var index = (noteValue % 12);
         var octave = Std.int(noteValue / 12);
         
-        var accidentalToSet:AccidentalType = ACCIDENTAL_NOTES[ksi][index];
+        var accidentalToSet:AccidentalType = AccidentalNotes[ksi][index];
         
         // if there is already an accidental registered, we check if we 
         // have a new accidental

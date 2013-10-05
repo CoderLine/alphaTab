@@ -21,7 +21,7 @@ package alphatab.model;
  */
 class Tuning 
 {
-    public static var TUNING_REGEX = ~/([a-g]b?)([0-9])/i;
+    public static var TuningRegex = ~/([a-g]b?)([0-9])/i;
 
     private static var _sevenStrings:Array<Tuning>;
     private static var _sixStrings:Array<Tuning>;
@@ -35,7 +35,7 @@ class Tuning
      */
     public static function isTuning(name:String) : Bool
     {
-        var regex:EReg = TUNING_REGEX;
+        var regex:EReg = TuningRegex;
         return regex.match(name);
     }
     
@@ -57,7 +57,7 @@ class Tuning
     public static function getTuningForText(str:String)
     {
         var base = 0;
-        var regex:EReg = TUNING_REGEX;
+        var regex:EReg = TuningRegex;
         if (regex.match(str.toLowerCase()))
         {
             var note = regex.matched(1);

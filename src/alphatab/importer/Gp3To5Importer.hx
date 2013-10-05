@@ -48,7 +48,7 @@ import haxe.io.Bytes;
  */
 class Gp3To5Importer extends ScoreImporter
 {
-    private static inline var VERSION_STRING = "FICHIER GUITAR PRO ";
+    private static inline var VersionString = "FICHIER GUITAR PRO ";
     
     #if unit public #else private #end var _versionNumber:Int;
     
@@ -173,12 +173,12 @@ class Gp3To5Importer extends ScoreImporter
     {
         var version = readStringByteLength(30);
         
-        if (!StringTools.startsWith(version, VERSION_STRING))
+        if (!StringTools.startsWith(version, VersionString))
         {
-            throw ScoreImporter.UNSUPPORTED_FORMAT; 
+            throw ScoreImporter.UnsupportedFormat; 
         }
 
-        version = version.substr(VERSION_STRING.length + 1);
+        version = version.substr(VersionString.length + 1);
         var dot:Int = version.indexOf(".");
         // assert(dot != -1)
         
@@ -881,7 +881,7 @@ class Gp3To5Importer extends ScoreImporter
             {
                 var point = new BendPoint();
                 point.offset = readInt32(); // 0...60
-                point.value = Std.int(readInt32() / BEND_STEP); // 0..12 (amount of quarters)
+                point.value = Std.int(readInt32() / BendStep); // 0..12 (amount of quarters)
                 readBool(); // vibrato
                 beat.whammyBarPoints.push(point);
             } 
@@ -1190,7 +1190,7 @@ class Gp3To5Importer extends ScoreImporter
         note.isStaccato = (flags2 & 0x01) != 0;
     }
     
-    private static inline var BEND_STEP:Float = 25; // 25 per Quarter Note
+    private static inline var BendStep:Float = 25; // 25 per Quarter Note
     private function readBend(note:Note) : Void
     {
         _data.readByte(); // type
@@ -1202,7 +1202,7 @@ class Gp3To5Importer extends ScoreImporter
             {
                 var point = new BendPoint();
                 point.offset = readInt32(); // 0...60
-                point.value = Std.int(readInt32() / BEND_STEP); // 0..12 (amount of quarters)
+                point.value = Std.int(readInt32() / BendStep); // 0..12 (amount of quarters)
                 readBool(); // vibrato
                 note.bendPoints.push(point);
             } 
@@ -1396,7 +1396,12 @@ class Gp3To5Importer extends ScoreImporter
     private function readTrill(note:Note) : Void
     {
         note.trillValue = readUInt8() + note.stringTuning();
-        note.trillSpeed = 1 + readUInt8();
+        switch(readUInt8())
+        {
+            case 1: note.trillSpeed = Duration.Sixteenth;
+            case 2: note.trillSpeed = Duration.ThirtySecond;
+            case 3: note.trillSpeed = Duration.SixtyFourth;
+        }
     }
     
     // Some special reading methods

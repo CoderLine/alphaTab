@@ -56,7 +56,7 @@ class ScoreLoader
                     }
                     catch (e:Dynamic)
                     {
-                        if (e == ScoreImporter.UNSUPPORTED_FORMAT)
+                        if (e == ScoreImporter.UnsupportedFormat)
                         {
                             continue;
                         }
@@ -107,7 +107,7 @@ class ScoreLoader
             }
             catch (e:Dynamic)
             {
-                if (e == ScoreImporter.UNSUPPORTED_FORMAT)
+                if (e == ScoreImporter.UnsupportedFormat)
                 {
                     continue;
                 }
