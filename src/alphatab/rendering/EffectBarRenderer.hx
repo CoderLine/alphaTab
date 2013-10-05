@@ -279,7 +279,7 @@ class EffectBarRenderer extends GroupedBarRenderer
                             prevEffect = cast(stave.barRenderers[index - 1], EffectBarRenderer)._effectGlyphs[b.voice.index].get(prevBeat.index);
                         }
                         
-                        if (prevEffect == null)
+                        if (prevEffect == null || !_info.canExpand(this, prevBeat, b))
                         {
                             createOrResizeGlyph(EffectBarGlyphSizing.SinglePreBeatOnly, b);
                         }

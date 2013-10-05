@@ -19,6 +19,11 @@ class TextEffectInfo implements IEffectBarRendererInfo
         return beat.text != null && StringTools.trim(beat.text).length > 0;
     }
     
+    public function canExpand(renderer : EffectBarRenderer, from:Beat, to:Beat): Bool
+    {
+        return true;
+    } 
+    
     public function getHeight(renderer : EffectBarRenderer) : Int
     {
         return Std.int(20 * renderer.getScale());

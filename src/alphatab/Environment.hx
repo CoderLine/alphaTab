@@ -6,6 +6,7 @@ import alphatab.rendering.BarRendererFactory;
 import alphatab.rendering.EffectBarRendererFactory;
 import alphatab.rendering.effects.BeatVibratoEffectInfo;
 import alphatab.rendering.effects.ChordsEffectInfo;
+import alphatab.rendering.effects.CrescendoEffectInfo;
 import alphatab.rendering.effects.DynamicsEffectInfo;
 import alphatab.rendering.effects.FadeInEffectInfo;
 import alphatab.rendering.effects.FingeringEffectInfo;
@@ -86,6 +87,7 @@ class Environment
         staveFactories.set("note-vibrato", function(l) { return new EffectBarRendererFactory(new NoteVibratoEffectInfo()); } ); 
         staveFactories.set("alternate-endings", function(l) { return new AlternateEndingsBarRendererFactory(); } ); 
         staveFactories.set("score", function(l) { return new ScoreBarRendererFactory(); } ); 
+        staveFactories.set("crescendo", function(l) { return new EffectBarRendererFactory(new CrescendoEffectInfo()); }); 
         staveFactories.set("dynamics", function(l) { return new EffectBarRendererFactory(new DynamicsEffectInfo()); }); 
         staveFactories.set("tap", function(l) { return new EffectBarRendererFactory(new TapEffectInfo()); }); 
         staveFactories.set("fade-in", function(l) { return new EffectBarRendererFactory(new FadeInEffectInfo()); }); 

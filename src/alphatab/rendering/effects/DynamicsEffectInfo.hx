@@ -19,6 +19,11 @@ class DynamicsEffectInfo implements IEffectBarRendererInfo
         return (beat.index == 0 && beat.voice.bar.index == 0) || (beat.previousBeat != null && beat.dynamicValue != beat.previousBeat.dynamicValue);
     }
     
+    public function canExpand(renderer : EffectBarRenderer, from:Beat, to:Beat): Bool
+    {
+        return true;
+    }    
+    
     public function getHeight(renderer : EffectBarRenderer) : Int
     {
         return Std.int(15 * renderer.getScale());

@@ -19,6 +19,11 @@ class FadeInEffectInfo implements IEffectBarRendererInfo
         return beat.fadeIn;
     }
     
+    public function canExpand(renderer : EffectBarRenderer, from:Beat, to:Beat): Bool
+    {
+        return true;
+    } 
+    
     public function getHeight(renderer : EffectBarRenderer) : Int
     {
         return Std.int(20 * renderer.getScale());

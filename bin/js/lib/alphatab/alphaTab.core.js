@@ -1219,6 +1219,9 @@ alphatab.rendering.effects.MarkerEffectInfo.prototype = {
 	,getHeight: function(renderer) {
 		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
+	,canExpand: function(renderer,from,to) {
+		return true;
+	}
 	,shouldCreateGlyph: function(renderer,beat) {
 		return beat.index == 0 && beat.voice.bar.getMasterBar().section != null;
 	}
@@ -1261,6 +1264,9 @@ alphatab.rendering.effects.TripletFeelEffectInfo.prototype = {
 	,getHeight: function(renderer) {
 		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
+	,canExpand: function(renderer,from,to) {
+		return true;
+	}
 	,shouldCreateGlyph: function(renderer,beat) {
 		return beat.index == 0 && (beat.voice.bar.getMasterBar().index == 0 && beat.voice.bar.getMasterBar().tripletFeel != alphatab.model.TripletFeel.NoTripletFeel) || beat.voice.bar.getMasterBar().index > 0 && beat.voice.bar.getMasterBar().tripletFeel != beat.voice.bar.getMasterBar().previousMasterBar.tripletFeel;
 	}
@@ -1282,6 +1288,9 @@ alphatab.rendering.effects.TempoEffectInfo.prototype = {
 	,getHeight: function(renderer) {
 		return 25 * renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
+	,canExpand: function(renderer,from,to) {
+		return true;
+	}
 	,shouldCreateGlyph: function(renderer,beat) {
 		return beat.index == 0 && (beat.voice.bar.getMasterBar().tempoAutomation != null || beat.voice.bar.index == 0);
 	}
@@ -1301,6 +1310,9 @@ alphatab.rendering.effects.TextEffectInfo.prototype = {
 	,getHeight: function(renderer) {
 		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
+	,canExpand: function(renderer,from,to) {
+		return true;
+	}
 	,shouldCreateGlyph: function(renderer,beat) {
 		return beat.text != null && StringTools.trim(beat.text).length > 0;
 	}
@@ -1319,6 +1331,9 @@ alphatab.rendering.effects.ChordsEffectInfo.prototype = {
 	}
 	,getHeight: function(renderer) {
 		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,canExpand: function(renderer,from,to) {
+		return true;
 	}
 	,shouldCreateGlyph: function(renderer,beat) {
 		return beat.chordId != null;
@@ -1341,6 +1356,9 @@ alphatab.rendering.effects.NoteEffectInfoBase.prototype = {
 	}
 	,shouldCreateGlyphForNote: function(renderer,note) {
 		return false;
+	}
+	,canExpand: function(renderer,from,to) {
+		return true;
 	}
 	,shouldCreateGlyph: function(renderer,beat) {
 		this._lastCreateInfo = new Array();
@@ -1387,6 +1405,9 @@ alphatab.rendering.effects.BeatVibratoEffectInfo.prototype = {
 	}
 	,getSizingMode: function() {
 		return alphatab.rendering.EffectBarGlyphSizing.GroupedOnBeatToPostBeat;
+	}
+	,canExpand: function(renderer,from,to) {
+		return true;
 	}
 	,shouldCreateGlyph: function(renderer,beat) {
 		return beat.vibrato != alphatab.model.VibratoType.None;
@@ -1436,6 +1457,28 @@ alphatab.rendering.ScoreBarRendererFactory.prototype = $extend(alphatab.renderin
 	}
 	,__class__: alphatab.rendering.ScoreBarRendererFactory
 });
+alphatab.rendering.effects.CrescendoEffectInfo = function() {
+};
+alphatab.rendering.effects.CrescendoEffectInfo.__name__ = true;
+alphatab.rendering.effects.CrescendoEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
+alphatab.rendering.effects.CrescendoEffectInfo.prototype = {
+	createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.CrescendoGlyph(0,0,beat.crescendo);
+	}
+	,getHeight: function(renderer) {
+		return 17 * renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,getSizingMode: function() {
+		return alphatab.rendering.EffectBarGlyphSizing.GroupedPreBeatToPostBeat;
+	}
+	,canExpand: function(renderer,from,to) {
+		return from.crescendo == to.crescendo;
+	}
+	,shouldCreateGlyph: function(renderer,beat) {
+		return beat.crescendo != alphatab.rendering.glyphs.CrescendoType.None;
+	}
+	,__class__: alphatab.rendering.effects.CrescendoEffectInfo
+}
 alphatab.rendering.effects.DynamicsEffectInfo = function() {
 };
 alphatab.rendering.effects.DynamicsEffectInfo.__name__ = true;
@@ -1449,6 +1492,9 @@ alphatab.rendering.effects.DynamicsEffectInfo.prototype = {
 	}
 	,getHeight: function(renderer) {
 		return 15 * renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,canExpand: function(renderer,from,to) {
+		return true;
 	}
 	,shouldCreateGlyph: function(renderer,beat) {
 		return beat.index == 0 && beat.voice.bar.index == 0 || beat.previousBeat != null && beat.dynamicValue != beat.previousBeat.dynamicValue;
@@ -1472,6 +1518,9 @@ alphatab.rendering.effects.TapEffectInfo.prototype = {
 	,getHeight: function(renderer) {
 		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
+	,canExpand: function(renderer,from,to) {
+		return true;
+	}
 	,shouldCreateGlyph: function(renderer,beat) {
 		return beat.slap || beat.pop || beat.tap;
 	}
@@ -1490,6 +1539,9 @@ alphatab.rendering.effects.FadeInEffectInfo.prototype = {
 	}
 	,getHeight: function(renderer) {
 		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
+	}
+	,canExpand: function(renderer,from,to) {
+		return true;
 	}
 	,shouldCreateGlyph: function(renderer,beat) {
 		return beat.fadeIn;
@@ -1561,6 +1613,9 @@ alphatab.rendering.effects.PickStrokeEffectInfo.prototype = {
 	,getHeight: function(renderer) {
 		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
+	,canExpand: function(renderer,from,to) {
+		return true;
+	}
 	,shouldCreateGlyph: function(renderer,beat) {
 		return beat.pickStroke != alphatab.model.PickStrokeType.None;
 	}
@@ -1594,6 +1649,7 @@ alphatab.Settings.defaults = function() {
 	settings.staves.push(new alphatab.StaveSettings("note-vibrato"));
 	settings.staves.push(new alphatab.StaveSettings("alternate-endings"));
 	settings.staves.push(new alphatab.StaveSettings("score"));
+	settings.staves.push(new alphatab.StaveSettings("crescendo"));
 	settings.staves.push(new alphatab.StaveSettings("dynamics"));
 	settings.staves.push(new alphatab.StaveSettings("trill"));
 	settings.staves.push(new alphatab.StaveSettings("beat-vibrato"));
@@ -4096,6 +4152,17 @@ alphatab.importer.GpxParser.prototype = {
 				case "Chord":
 					beat.chordId = this.getValue(c);
 					break;
+				case "Hairpin":
+					var _g1 = this.getValue(c);
+					switch(_g1) {
+					case "Crescendo":
+						beat.crescendo = alphatab.rendering.glyphs.CrescendoType.Crescendo;
+						break;
+					case "Decrescendo":
+						beat.crescendo = alphatab.rendering.glyphs.CrescendoType.Decrescendo;
+						break;
+					}
+					break;
 				case "Arpeggio":
 					if(this.getValue(c) == "Up") beat.brushType = alphatab.model.BrushType.ArpeggioUp; else beat.brushType = alphatab.model.BrushType.ArpeggioDown;
 					break;
@@ -4988,6 +5055,7 @@ alphatab.model.Beat = function() {
 	this.tupletDenominator = -1;
 	this.tupletNumerator = -1;
 	this.dynamicValue = alphatab.model.DynamicValue.F;
+	this.crescendo = alphatab.rendering.glyphs.CrescendoType.None;
 };
 alphatab.model.Beat.__name__ = true;
 alphatab.model.Beat.prototype = {
@@ -5067,6 +5135,7 @@ alphatab.model.Beat.prototype = {
 		beat.tupletDenominator = this.tupletDenominator;
 		beat.tupletNumerator = this.tupletNumerator;
 		beat.dynamicValue = this.dynamicValue;
+		beat.crescendo = this.crescendo;
 		return beat;
 	}
 	,isTremolo: function() {
@@ -6058,7 +6127,7 @@ alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.Grou
 				if(this._info.shouldCreateGlyph(this,prevBeat)) {
 					var prevEffect;
 					if(b.index > 0) prevEffect = this._effectGlyphs[b.voice.index].get(prevBeat.index); else prevEffect = (js.Boot.__cast(this.stave.barRenderers[this.index - 1] , alphatab.rendering.EffectBarRenderer))._effectGlyphs[b.voice.index].get(prevBeat.index);
-					if(prevEffect == null) this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b); else this._effectGlyphs[b.voice.index].set(b.index,prevEffect);
+					if(prevEffect == null || !this._info.canExpand(this,prevBeat,b)) this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b); else this._effectGlyphs[b.voice.index].set(b.index,prevEffect);
 				} else this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b);
 			} else this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b);
 			break;
@@ -7606,6 +7675,16 @@ alphatab.rendering.glyphs.ClefGlyph.prototype = $extend(alphatab.rendering.glyph
 	}
 	,__class__: alphatab.rendering.glyphs.ClefGlyph
 });
+alphatab.rendering.glyphs.CrescendoType = { __ename__ : true, __constructs__ : ["None","Crescendo","Decrescendo"] }
+alphatab.rendering.glyphs.CrescendoType.None = ["None",0];
+alphatab.rendering.glyphs.CrescendoType.None.toString = $estr;
+alphatab.rendering.glyphs.CrescendoType.None.__enum__ = alphatab.rendering.glyphs.CrescendoType;
+alphatab.rendering.glyphs.CrescendoType.Crescendo = ["Crescendo",1];
+alphatab.rendering.glyphs.CrescendoType.Crescendo.toString = $estr;
+alphatab.rendering.glyphs.CrescendoType.Crescendo.__enum__ = alphatab.rendering.glyphs.CrescendoType;
+alphatab.rendering.glyphs.CrescendoType.Decrescendo = ["Decrescendo",2];
+alphatab.rendering.glyphs.CrescendoType.Decrescendo.toString = $estr;
+alphatab.rendering.glyphs.CrescendoType.Decrescendo.__enum__ = alphatab.rendering.glyphs.CrescendoType;
 alphatab.rendering.glyphs.DeadNoteHeadGlyph = function(x,y,isGrace) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
@@ -9177,6 +9256,33 @@ alphatab.rendering.glyphs.WhammyBarGlyph.prototype = $extend(alphatab.rendering.
 	,__class__: alphatab.rendering.glyphs.WhammyBarGlyph
 });
 if(!alphatab.rendering.glyphs.effects) alphatab.rendering.glyphs.effects = {}
+alphatab.rendering.glyphs.effects.CrescendoGlyph = function(x,y,crescendo) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.Glyph.call(this,x,y);
+	this._crescendo = crescendo;
+};
+alphatab.rendering.glyphs.effects.CrescendoGlyph.__name__ = true;
+alphatab.rendering.glyphs.effects.CrescendoGlyph.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.effects.CrescendoGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	paint: function(cx,cy,canvas) {
+		var height = 17 * this.renderer.stave.staveGroup.layout.renderer.scale;
+		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
+		canvas.setColor(res.mainGlyphColor);
+		canvas.beginPath();
+		if(this._crescendo == alphatab.rendering.glyphs.CrescendoType.Crescendo) {
+			canvas.moveTo(cx + this.x + this.width,cy + this.y);
+			canvas.lineTo(cx + this.x,cy + this.y + (height / 2 | 0));
+			canvas.lineTo(cx + this.x + this.width,cy + this.y + height);
+		} else {
+			canvas.moveTo(cx + this.x,cy + this.y);
+			canvas.lineTo(cx + this.x + this.width,cy + this.y + (height / 2 | 0));
+			canvas.lineTo(cx + this.x,cy + this.y + height);
+		}
+		canvas.stroke();
+	}
+	,__class__: alphatab.rendering.glyphs.effects.CrescendoGlyph
+});
 alphatab.rendering.glyphs.effects.DummyEffectGlyph = function(x,y,s) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
@@ -10671,6 +10777,9 @@ alphatab.Environment.staveFactories.set("alternate-endings",function(l) {
 alphatab.Environment.staveFactories.set("score",function(l) {
 	return new alphatab.rendering.ScoreBarRendererFactory();
 });
+alphatab.Environment.staveFactories.set("crescendo",function(l) {
+	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.CrescendoEffectInfo());
+});
 alphatab.Environment.staveFactories.set("dynamics",function(l) {
 	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.DynamicsEffectInfo());
 });
@@ -10830,6 +10939,7 @@ alphatab.rendering.glyphs.RideCymbalGlyph.graceScale = 0.7;
 alphatab.rendering.glyphs.RideCymbalGlyph.noteHeadHeight = 9;
 alphatab.rendering.glyphs.VoiceContainerGlyph.KEY_SIZE_BEAT = "BEAT";
 alphatab.rendering.glyphs.WhammyBarGlyph.WhammyMaxOffset = 60;
+alphatab.rendering.glyphs.effects.CrescendoGlyph.Height = 17;
 alphatab.rendering.glyphs.effects.DynamicsGlyph.GlyphScale = 0.8;
 alphatab.rendering.glyphs.effects.LineRangedGlyph.LineSpacing = 3;
 alphatab.rendering.glyphs.effects.LineRangedGlyph.LineTopPadding = 8;

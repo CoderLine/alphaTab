@@ -36,4 +36,13 @@ interface IEffectBarRendererInfo
      * @return the glyph which needs to be added to the renderer
      */
     function createNewGlyph(renderer : EffectBarRenderer, beat:Beat) : Glyph;
+    
+    /**
+     * Checks whether an effect glyph can be expanded to a particular beat.
+     * @param renderer the renderer which requests for glyph creation
+     * @param from the beat which already has the glyph applied
+     * @param to the beat which the glyph should get expanded to
+     * @return true if the glyph can be expanded, false if a new glyph needs to be created.
+     */
+    function canExpand(renderer : EffectBarRenderer, from:Beat, to:Beat): Bool;
 }

@@ -17,6 +17,7 @@
 package alphatab.model;
 
 import alphatab.audio.MidiUtils;
+import alphatab.rendering.glyphs.CrescendoType;
 import js.Boot;
 
 /**
@@ -79,6 +80,8 @@ class Beat
     public inline function isTremolo():Bool { return tremoloSpeed != null; }
     public var tremoloSpeed:Null<Duration>;
     
+    public var crescendo:CrescendoType;
+    
     /**
      * The timeline position of the voice within the current bar. (unit: midi ticks)
      */
@@ -101,6 +104,7 @@ class Beat
         tupletDenominator = -1;
         tupletNumerator = -1;
         dynamicValue = DynamicValue.F;
+        crescendo = CrescendoType.None;
     }
     
     public function clone() : Beat
@@ -134,6 +138,7 @@ class Beat
         beat.tupletDenominator = tupletDenominator;
         beat.tupletNumerator = tupletNumerator;       
         beat.dynamicValue = dynamicValue;       
+        beat.crescendo = crescendo;
         
         return beat;    
     }

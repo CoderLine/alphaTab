@@ -78,6 +78,7 @@ class Settings
         
         settings.staves.push(new StaveSettings("score"));
         
+        settings.staves.push(new StaveSettings("crescendo"));
         settings.staves.push(new StaveSettings("dynamics"));
         settings.staves.push(new StaveSettings("trill"));
         settings.staves.push(new StaveSettings("beat-vibrato"));
@@ -226,6 +227,7 @@ class StaveSettings
      *  <li><strong>note-vibrato</strong> - Renders note vibrato symbols</li>
      *  <li><strong>tuplet</strong> - Renders tuplet indicators</li>
      *  <li><strong>score</strong> - Renders default music notation</li>
+     *  <li><strong>crescendo</strong> - Renders crescendo and decresencod</li>
      *  <li><strong>dynamics</strong> - Renders dynamics markers</li>
      *  <li><strong>tap</strong> - Renders tap/slap/pop indicators</li>
      *  <li><strong>fade-in</strong> - Renders fade-in indicators</li>

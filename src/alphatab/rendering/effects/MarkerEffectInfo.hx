@@ -19,6 +19,11 @@ class MarkerEffectInfo implements IEffectBarRendererInfo
         return beat.index == 0 && beat.voice.bar.getMasterBar().isSectionStart();
     }
     
+    public function canExpand(renderer : EffectBarRenderer, from:Beat, to:Beat): Bool
+    {
+        return true;
+    } 
+    
     public function getHeight(renderer : EffectBarRenderer) : Int
     {
         return Std.int(20 * renderer.getScale());

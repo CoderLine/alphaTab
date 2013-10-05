@@ -19,6 +19,11 @@ class BeatVibratoEffectInfo implements IEffectBarRendererInfo
         return (beat.vibrato != VibratoType.None);
     }
     
+    public function canExpand(renderer : EffectBarRenderer, from:Beat, to:Beat): Bool
+    {
+        return true;
+    } 
+    
     public function getSizingMode() : EffectBarGlyphSizing
     {
         return EffectBarGlyphSizing.GroupedOnBeatToPostBeat;

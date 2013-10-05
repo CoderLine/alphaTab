@@ -2,54 +2,42 @@ package alphatab.rendering.effects;
 
 import alphatab.model.Beat;
 import alphatab.model.Note;
+import alphatab.model.VibratoType;
 import alphatab.rendering.EffectBarGlyphSizing;
 import alphatab.rendering.EffectBarRenderer;
 import alphatab.rendering.Glyph;
+import alphatab.rendering.glyphs.CrescendoType;
+import alphatab.rendering.glyphs.effects.CrescendoGlyph;
 import alphatab.rendering.IEffectBarRendererInfo;
 
-class NoteEffectInfoBase implements IEffectBarRendererInfo
+class CrescendoEffectInfo implements IEffectBarRendererInfo
 {
-    private var _lastCreateInfo:Array<Note>;
     public function new() 
     {       
     }
     
     public function shouldCreateGlyph(renderer : EffectBarRenderer, beat:Beat) : Bool
     {
-        _lastCreateInfo = new Array<Note>();
-        for (n in beat.notes)
-        {
-            if (shouldCreateGlyphForNote(renderer, n))
-            {
-                _lastCreateInfo.push(n);
-            }
-        }
-        return _lastCreateInfo.length > 0;
+        return beat.crescendo != CrescendoType.None;
     }
     
     public function canExpand(renderer : EffectBarRenderer, from:Beat, to:Beat): Bool
     {
-        return true;
-    } 
-    
-    private function shouldCreateGlyphForNote(renderer : EffectBarRenderer, note:Note) : Bool
-    {
-        return false;
-    }
-    
-    public function getHeight(renderer : EffectBarRenderer) : Int
-    {
-        return 0;
+        return from.crescendo == to.crescendo;
     }
     
     public function getSizingMode() : EffectBarGlyphSizing
     {
-        return EffectBarGlyphSizing.GroupedOnBeatToPostBeat;
-    }
-
-    public function createNewGlyph(renderer : EffectBarRenderer, beat:Beat) : Glyph
-    {
-        return null;
+        return EffectBarGlyphSizing.GroupedPreBeatToPostBeat;
     }
     
+    public function getHeight(renderer : EffectBarRenderer) : Int
+    {
+        return Std.int(CrescendoGlyph.Height * renderer.getScale());
+    }
+    
+    public function createNewGlyph(renderer : EffectBarRenderer, beat:Beat) : Glyph
+    {
+        return new CrescendoGlyph(0, 0, beat.crescendo);
+    }    
 }

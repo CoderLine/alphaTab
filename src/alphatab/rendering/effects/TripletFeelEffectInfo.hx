@@ -21,6 +21,11 @@ class TripletFeelEffectInfo implements IEffectBarRendererInfo
                 || (beat.voice.bar.getMasterBar().index > 0 && beat.voice.bar.getMasterBar().tripletFeel != beat.voice.bar.getMasterBar().previousMasterBar.tripletFeel);
     }
     
+    public function canExpand(renderer : EffectBarRenderer, from:Beat, to:Beat): Bool
+    {
+        return true;
+    } 
+    
     public function getHeight(renderer : EffectBarRenderer) : Int
     {
         return Std.int(20 * renderer.getScale());

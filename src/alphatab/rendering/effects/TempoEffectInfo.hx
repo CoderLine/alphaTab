@@ -19,6 +19,11 @@ class TempoEffectInfo implements IEffectBarRendererInfo
         return beat.index == 0 && (beat.voice.bar.getMasterBar().tempoAutomation != null || beat.voice.bar.index == 0);
     }
     
+    public function canExpand(renderer : EffectBarRenderer, from:Beat, to:Beat): Bool
+    {
+        return true;
+    } 
+    
     public function getHeight(renderer : EffectBarRenderer) : Int
     {
         return Std.int(25 * renderer.getScale());

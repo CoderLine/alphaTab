@@ -22,6 +22,7 @@ import alphatab.model.Track;
 import alphatab.model.TripletFeel;
 import alphatab.model.VibratoType;
 import alphatab.model.Voice;
+import alphatab.rendering.glyphs.CrescendoType;
 import haxe.ds.IntMap.IntMap;
 import haxe.ds.StringMap.StringMap;
 import haxe.xml.Fast;
@@ -612,6 +613,12 @@ class GpxParser
                         }
                     case "Chord":
                         beat.chordId = getValue(c);
+                    case "Hairpin":
+                        switch(getValue(c))
+                        {
+                            case "Crescendo": beat.crescendo = CrescendoType.Crescendo;
+                            case "Decrescendo": beat.crescendo = CrescendoType.Decrescendo;
+                        }
                     case "Arpeggio":
                         if (getValue(c) == "Up")
                         {
