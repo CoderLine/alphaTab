@@ -26,9 +26,10 @@ class TabBeatPostNotesGlyph extends BeatGlyphBase
 	{
         if (n.isTrill())
         {
+            addGlyph(new SpacingGlyph(0, 0, Std.int(4 * getScale())));
             var trillNote = new Note();
             trillNote.isGhost = true;
-            trillNote.fret = n.trillFret;
+            trillNote.fret = n.trillFret();
             trillNote.string = n.string;
             var tr = cast(renderer, TabBarRenderer);
             var trillNumberGlyph:Glyph = new NoteNumberGlyph(0, 0, trillNote, true);    

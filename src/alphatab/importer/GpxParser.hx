@@ -794,9 +794,7 @@ class GpxParser
                     case "LetRing":
                         note.isLetRing = true;
                     case "Trill":
-                        // NOTE: why is this fret specified in absolute note value? annoying
-                        // TODO: find a good way to calculate the acutal fret
-                        note.trillFret = Std.parseInt(getValue(c));
+                        note.trillValue = Std.parseInt(getValue(c));
                         note.trillSpeed = 1;
                     case "Accent":
                         var accentFlags = Std.parseInt(getValue(c));

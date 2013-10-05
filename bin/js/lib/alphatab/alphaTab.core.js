@@ -1370,7 +1370,7 @@ alphatab.rendering.effects.TrillEffectInfo.prototype = $extend(alphatab.renderin
 		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatToPostBeat;
 	}
 	,shouldCreateGlyphForNote: function(renderer,note) {
-		return note.trillFret >= 0;
+		return note.trillValue >= 0;
 	}
 	,__class__: alphatab.rendering.effects.TrillEffectInfo
 });
@@ -2218,7 +2218,7 @@ alphatab.importer.AlphaTexImporter.prototype = $extend(alphatab.importer.ScoreIm
 					}
 					this.newSy();
 				}
-				note.trillFret = fret;
+				note.trillValue = fret + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1];
 				note.trillSpeed = duration;
 			} else if(this._syData == "tp") {
 				this.newSy();
@@ -2683,7 +2683,7 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 		return sign * (1.0 + Math.pow(2,-52) * sig) * Math.pow(2,exp);
 	}
 	,readTrill: function(note) {
-		note.trillFret = this._data.readByte();
+		note.trillValue = this._data.readByte() + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1];
 		note.trillSpeed = 1 + this._data.readByte();
 	}
 	,deltaFretToHarmonicValue: function(deltaFret) {
@@ -2949,8 +2949,8 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 			var flags2 = this._data.readByte();
 			newNote.swapAccidentals = (flags2 & 2) != 0;
 		}
-		if((flags & 8) != 0) this.readNoteEffects(track,voice,beat,newNote);
 		beat.addNote(newNote);
+		if((flags & 8) != 0) this.readNoteEffects(track,voice,beat,newNote);
 	}
 	,readMixTableChange: function(beat) {
 		var tableChange = new alphatab.importer.MixTableChange();
@@ -3932,7 +3932,7 @@ alphatab.importer.GpxParser.prototype = {
 					note.isLetRing = true;
 					break;
 				case "Trill":
-					note.trillFret = Std.parseInt(this.getValue(c));
+					note.trillValue = Std.parseInt(this.getValue(c));
 					note.trillSpeed = 1;
 					break;
 				case "Accent":
@@ -5014,8 +5014,8 @@ alphatab.model.Beat.prototype = {
 		while(_g < _g1.length) {
 			var n = _g1[_g];
 			++_g;
-			if(this._minNote == null || n.realValue() < this._minNote.realValue()) this._minNote = n;
-			if(this._maxNote == null || n.realValue() > this._maxNote.realValue()) this._maxNote = n;
+			if(this._minNote == null || n.fret + n.beat.voice.bar.track.tuning[n.beat.voice.bar.track.tuning.length - (n.string - 1) - 1] < this._minNote.realValue()) this._minNote = n;
+			if(this._maxNote == null || n.fret + n.beat.voice.bar.track.tuning[n.beat.voice.bar.track.tuning.length - (n.string - 1) - 1] > this._maxNote.realValue()) this._maxNote = n;
 		}
 	}
 	,addNote: function(note) {
@@ -5305,7 +5305,6 @@ alphatab.model.ModelUtils.getClefIndex = function(clef) {
 }
 alphatab.model.Note = function() {
 	this.bendPoints = new Array();
-	this.trillFret = -1;
 	this.dynamicValue = alphatab.model.DynamicValue.F;
 	this.accentuated = alphatab.model.AccentuationType.None;
 	this.fret = -1;
@@ -5327,7 +5326,7 @@ alphatab.model.Note = function() {
 	this.rightHandFinger = -1;
 	this.isFingering = false;
 	this.swapAccidentals = false;
-	this.trillFret = -1;
+	this.trillValue = -1;
 	this.trillSpeed = 0;
 	this.durationPercent = 1;
 	this.octave = -1;
@@ -5337,6 +5336,9 @@ alphatab.model.Note.prototype = {
 	realValue: function() {
 		return this.fret + this.beat.voice.bar.track.tuning[this.beat.voice.bar.track.tuning.length - (this.string - 1) - 1];
 	}
+	,stringTuning: function() {
+		return this.beat.voice.bar.track.tuning[this.beat.voice.bar.track.tuning.length - (this.string - 1) - 1];
+	}
 	,clone: function() {
 		var n = new alphatab.model.Note();
 		var _g = 0, _g1 = this.bendPoints;
@@ -5345,7 +5347,6 @@ alphatab.model.Note.prototype = {
 			++_g;
 			n.bendPoints.push(p.clone());
 		}
-		n.trillFret = this.trillFret;
 		n.dynamicValue = this.dynamicValue;
 		n.accentuated = this.accentuated;
 		n.fret = this.fret;
@@ -5367,13 +5368,16 @@ alphatab.model.Note.prototype = {
 		n.rightHandFinger = this.rightHandFinger;
 		n.isFingering = n.isFingering;
 		n.swapAccidentals = this.swapAccidentals;
-		n.trillFret = this.trillFret;
+		n.trillValue = this.trillValue;
 		n.trillSpeed = this.trillSpeed;
 		n.durationPercent = this.durationPercent;
 		return n;
 	}
 	,isTrill: function() {
-		return this.trillFret >= 0;
+		return this.trillValue >= 0;
+	}
+	,trillFret: function() {
+		return this.trillValue - this.beat.voice.bar.track.tuning[this.beat.voice.bar.track.tuning.length - (this.string - 1) - 1];
 	}
 	,hasBend: function() {
 		return this.bendPoints.length > 1;
@@ -6293,7 +6297,7 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 		return 9 * this.stave.staveGroup.layout.renderer.scale / 2 * steps + correction * this.stave.staveGroup.layout.renderer.scale | 0;
 	}
 	,getNoteLine: function(n) {
-		var value = n.beat.voice.bar.track.isPercussion?alphatab.rendering.utils.PercussionMapper.mapValue(n):n.realValue();
+		var value = n.beat.voice.bar.track.isPercussion?alphatab.rendering.utils.PercussionMapper.mapValue(n):n.fret + n.beat.voice.bar.track.tuning[n.beat.voice.bar.track.tuning.length - (n.string - 1) - 1];
 		var ks = n.beat.voice.bar.getMasterBar().keySignature;
 		var clef = n.beat.voice.bar.clef;
 		var index = value % 12;
@@ -8098,7 +8102,7 @@ alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.
 		if(n.beat.voice.bar.track.isPercussion) {
 			var normalKeys = [32,34,35,36,38,39,40,41,43,45,47,48,50,55,56,58,60,61];
 			var xKeys = [31,33,37,42,44,54,62,63,64,65,66];
-			var value = n.realValue();
+			var value = n.fret + n.beat.voice.bar.track.tuning[n.beat.voice.bar.track.tuning.length - (n.string - 1) - 1];
 			if(value <= 30 || value >= 67 || Lambda.has(normalKeys,value)) return new alphatab.rendering.glyphs.NoteHeadGlyph(0,0,alphatab.model.Duration.Quarter,isGrace); else if(Lambda.has(xKeys,value)) return new alphatab.rendering.glyphs.DrumSticksGlyph(0,0,isGrace); else if(value == 46) return new alphatab.rendering.glyphs.HiHatGlyph(0,0,isGrace); else if(value == 49 || value == 57) return new alphatab.rendering.glyphs.DiamondNoteHeadGlyph(0,0,isGrace); else if(value == 52) return new alphatab.rendering.glyphs.ChineseCymbalGlyph(0,0,isGrace); else if(value == 51 || value == 53 || value == 59) return new alphatab.rendering.glyphs.RideCymbalGlyph(0,0,isGrace); else return new alphatab.rendering.glyphs.NoteHeadGlyph(0,0,alphatab.model.Duration.Quarter,isGrace);
 		}
 		if(n.isDead) return new alphatab.rendering.glyphs.DeadNoteHeadGlyph(0,0,isGrace); else if(n.harmonicType == alphatab.model.HarmonicType.None) return new alphatab.rendering.glyphs.NoteHeadGlyph(0,0,n.beat.duration,isGrace); else return new alphatab.rendering.glyphs.DiamondNoteHeadGlyph(0,0,isGrace);
@@ -8626,10 +8630,11 @@ alphatab.rendering.glyphs.TabBeatPostNotesGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabBeatPostNotesGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
 alphatab.rendering.glyphs.TabBeatPostNotesGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
 	createNoteGlyphs: function(n) {
-		if(n.trillFret >= 0) {
+		if(n.trillValue >= 0) {
+			this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,4 * this.renderer.stave.staveGroup.layout.renderer.scale | 0));
 			var trillNote = new alphatab.model.Note();
 			trillNote.isGhost = true;
-			trillNote.fret = n.trillFret;
+			trillNote.fret = n.trillValue - n.beat.voice.bar.track.tuning[n.beat.voice.bar.track.tuning.length - (n.string - 1) - 1];
 			trillNote.string = n.string;
 			var tr = js.Boot.__cast(this.renderer , alphatab.rendering.TabBarRenderer);
 			var trillNumberGlyph = new alphatab.rendering.glyphs.NoteNumberGlyph(0,0,trillNote,true);
@@ -9630,7 +9635,7 @@ alphatab.rendering.utils.AccidentalHelper.prototype = {
 		return ks + 7;
 	}
 	,applyAccidental: function(note,noteLine) {
-		var noteValue = note.realValue();
+		var noteValue = note.fret + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1];
 		var ks = note.beat.voice.bar.getMasterBar().keySignature;
 		var ksi = ks + 7;
 		var index = noteValue % 12;
@@ -9726,18 +9731,18 @@ alphatab.rendering.utils.BeamingHelper.prototype = {
 		return (endY - startY) / (endX - startX) * (xPosition - startX) + startY | 0;
 	}
 	,checkNote: function(note) {
-		var value = note.realValue();
+		var value = note.fret + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1];
 		if(this.firstMinNote == null || note.beat.index < this.firstMinNote.beat.index) this.firstMinNote = note; else if(note.beat.index == this.firstMinNote.beat.index) {
-			if(note.realValue() < this.firstMinNote.realValue()) this.firstMinNote = note;
+			if(note.fret + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1] < this.firstMinNote.realValue()) this.firstMinNote = note;
 		}
 		if(this.firstMaxNote == null || note.beat.index < this.firstMaxNote.beat.index) this.firstMaxNote = note; else if(note.beat.index == this.firstMaxNote.beat.index) {
-			if(note.realValue() > this.firstMaxNote.realValue()) this.firstMaxNote = note;
+			if(note.fret + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1] > this.firstMaxNote.realValue()) this.firstMaxNote = note;
 		}
 		if(this.lastMinNote == null || note.beat.index > this.lastMinNote.beat.index) this.lastMinNote = note; else if(note.beat.index == this.lastMinNote.beat.index) {
-			if(note.realValue() < this.lastMinNote.realValue()) this.lastMinNote = note;
+			if(note.fret + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1] < this.lastMinNote.realValue()) this.lastMinNote = note;
 		}
 		if(this.lastMaxNote == null || note.beat.index > this.lastMaxNote.beat.index) this.lastMaxNote = note; else if(note.beat.index == this.lastMaxNote.beat.index) {
-			if(note.realValue() > this.lastMaxNote.realValue()) this.lastMaxNote = note;
+			if(note.fret + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1] > this.lastMaxNote.realValue()) this.lastMaxNote = note;
 		}
 		if(this.maxNote == null || value > this.maxNote.realValue()) this.maxNote = note;
 		if(this.minNote == null || value < this.minNote.realValue()) this.minNote = note;
@@ -9769,14 +9774,14 @@ alphatab.rendering.utils.BeamingHelper.prototype = {
 		return 0;
 	}
 	,getValue: function(n) {
-		if(this._track.isPercussion) return alphatab.rendering.utils.PercussionMapper.mapValue(n); else return n.realValue();
+		if(this._track.isPercussion) return alphatab.rendering.utils.PercussionMapper.mapValue(n); else return n.fret + n.beat.voice.bar.track.tuning[n.beat.voice.bar.track.tuning.length - (n.string - 1) - 1];
 	}
 	,__class__: alphatab.rendering.utils.BeamingHelper
 }
 alphatab.rendering.utils.PercussionMapper = function() { }
 alphatab.rendering.utils.PercussionMapper.__name__ = true;
 alphatab.rendering.utils.PercussionMapper.mapValue = function(n) {
-	var value = n.realValue();
+	var value = n.fret + n.beat.voice.bar.track.tuning[n.beat.voice.bar.track.tuning.length - (n.string - 1) - 1];
 	if(value == 61 || value == 66) return 50; else if(value == 60 || value == 65) return 52; else if(value >= 35 && value <= 36 || value == 44) return 53; else if(value == 41 || value == 64) return 55; else if(value == 43 || value == 62) return 57; else if(value == 45 || value == 63) return 59; else if(value == 47 || value == 54) return 62; else if(value == 48 || value == 56) return 64; else if(value == 50) return 65; else if(value == 42 || value == 46 || value >= 49 && value <= 53 || value == 57 || value == 59) return 67;
 	return 60;
 }

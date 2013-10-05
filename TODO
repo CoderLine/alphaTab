@@ -1,7 +1,6 @@
 Version 1.0
     Rendering of Arpreggio Arrows        - Will be implemented when GPX Reader is finalized
     Rendering of Cresendo and Decresendo - Will be implemented when GPX Reader is finalized
-    Correct lodaing of the trill fret on GPX
     Implement Midi Module
 
 Version 1.1

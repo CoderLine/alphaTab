@@ -1089,12 +1089,12 @@ class Gp3To5Importer extends ScoreImporter
             newNote.swapAccidentals = (flags2 & 0x02) != 0;
         }
         
+        beat.addNote(newNote);
         if ( (flags & 0x08) != 0)
         {
             readNoteEffects(track, voice, beat, newNote);
         }
 
-        beat.addNote(newNote);
     }
     
     private function toDynamicValue(value:Int)
@@ -1395,7 +1395,7 @@ class Gp3To5Importer extends ScoreImporter
     
     private function readTrill(note:Note) : Void
     {
-        note.trillFret = readUInt8();
+        note.trillValue = readUInt8() + note.stringTuning();
         note.trillSpeed = 1 + readUInt8();
     }
     

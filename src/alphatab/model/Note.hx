@@ -81,8 +81,9 @@ class Note
     public var isFingering:Bool;
     
     
-    public var trillFret:Int;
-    public inline function isTrill():Bool { return trillFret >= 0; }
+    public var trillValue:Int;
+    public inline function trillFret():Int { return trillValue - stringTuning(); }
+    public inline function isTrill():Bool { return trillValue >= 0; }
     public var trillSpeed:Int;
     public var durationPercent:Float;
     
@@ -96,7 +97,6 @@ class Note
     public function new() 
     {
         bendPoints = new Array<BendPoint>();
-        trillFret = -1;
         dynamicValue = DynamicValue.F;
         
         accentuated = AccentuationType.None;
@@ -122,7 +122,7 @@ class Note
         
         swapAccidentals = false;
         
-        trillFret = -1;
+        trillValue = -1;
         trillSpeed = 0;
         durationPercent = 1;
         octave = -1;
@@ -135,7 +135,6 @@ class Note
         {
             n.bendPoints.push(p.clone());
         }
-        n.trillFret = trillFret;
         n.dynamicValue = dynamicValue;
         n.accentuated = accentuated;
         n.fret = fret;
@@ -157,15 +156,20 @@ class Note
         n.rightHandFinger = rightHandFinger;
         n.isFingering = n.isFingering;
         n.swapAccidentals = swapAccidentals;
-        n.trillFret = trillFret;
+        n.trillValue = trillValue;
         n.trillSpeed = trillSpeed;
         n.durationPercent = durationPercent;        
         
         return n;
     }
     
-    public function realValue() : Int
+    public inline function stringTuning() : Int
     {
-        return fret + beat.voice.bar.track.tuning[beat.voice.bar.track.tuning.length - (string - 1) - 1];
+        return beat.voice.bar.track.tuning[beat.voice.bar.track.tuning.length - (string - 1) - 1];
+    }
+    
+    public inline function realValue() : Int
+    {
+        return fret + stringTuning();
     }
 }

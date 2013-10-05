@@ -809,7 +809,7 @@ class AlphaTexImporter extends ScoreImporter
                     newSy();
                 }
                 
-				note.trillFret = fret;
+				note.trillValue = fret + note.stringTuning();
 				note.trillSpeed = duration;
             }
             else if (_syData == "tp")
