@@ -91,7 +91,7 @@
 			<ShortName><![CDATA[S-Gt]]></ShortName>
 			<Color>246 74 38</Color>
 			<SystemsDefautLayout>3</SystemsDefautLayout>
-			<SystemsLayout>3 3 3 3 3 3 3 3 3 3 2</SystemsLayout>
+			<SystemsLayout>3 3 3 3 3 3 3 3 3 3 3</SystemsLayout>
 			<PalmMute>0</PalmMute>
 			<PlayingStyle>Default</PlayingStyle>
 			<Instrument ref="s-gtr6" />
@@ -995,8 +995,33 @@
 				<Mode>Major</Mode>
 			</Key>
 			<Time>4/4</Time>
-			<DoubleBar />
 			<Bars>26</Bars>
+			<XProperties>
+				<XProperty id="1124139010">
+					<Int>8</Int>
+				</XProperty>
+				<XProperty id="1124139264">
+					<Int>2</Int>
+				</XProperty>
+				<XProperty id="1124139265">
+					<Int>2</Int>
+				</XProperty>
+				<XProperty id="1124139266">
+					<Int>2</Int>
+				</XProperty>
+				<XProperty id="1124139267">
+					<Int>2</Int>
+				</XProperty>
+			</XProperties>
+		</MasterBar>
+		<MasterBar>
+			<Key>
+				<AccidentalCount>0</AccidentalCount>
+				<Mode>Major</Mode>
+			</Key>
+			<Time>4/4</Time>
+			<DoubleBar />
+			<Bars>27</Bars>
 			<XProperties>
 				<XProperty id="1124139010">
 					<Int>8</Int>
@@ -1029,7 +1054,7 @@
 					<![CDATA[Titles]]>
 				</Text>
 			</Section>
-			<Bars>27</Bars>
+			<Bars>28</Bars>
 			<XProperties>
 				<XProperty id="1124139010">
 					<Int>8</Int>
@@ -1055,7 +1080,7 @@
 			</Key>
 			<Time>4/4</Time>
 			<DoubleBar />
-			<Bars>28</Bars>
+			<Bars>29</Bars>
 			<XProperties>
 				<XProperty id="1124139010">
 					<Int>8</Int>
@@ -1088,31 +1113,6 @@
 					<![CDATA[Ranges]]>
 				</Text>
 			</Section>
-			<Bars>29</Bars>
-			<XProperties>
-				<XProperty id="1124139010">
-					<Int>8</Int>
-				</XProperty>
-				<XProperty id="1124139264">
-					<Int>2</Int>
-				</XProperty>
-				<XProperty id="1124139265">
-					<Int>2</Int>
-				</XProperty>
-				<XProperty id="1124139266">
-					<Int>2</Int>
-				</XProperty>
-				<XProperty id="1124139267">
-					<Int>2</Int>
-				</XProperty>
-			</XProperties>
-		</MasterBar>
-		<MasterBar>
-			<Key>
-				<AccidentalCount>0</AccidentalCount>
-				<Mode>Major</Mode>
-			</Key>
-			<Time>4/4</Time>
 			<Bars>30</Bars>
 			<XProperties>
 				<XProperty id="1124139010">
@@ -1139,6 +1139,31 @@
 			</Key>
 			<Time>4/4</Time>
 			<Bars>31</Bars>
+			<XProperties>
+				<XProperty id="1124139010">
+					<Int>8</Int>
+				</XProperty>
+				<XProperty id="1124139264">
+					<Int>2</Int>
+				</XProperty>
+				<XProperty id="1124139265">
+					<Int>2</Int>
+				</XProperty>
+				<XProperty id="1124139266">
+					<Int>2</Int>
+				</XProperty>
+				<XProperty id="1124139267">
+					<Int>2</Int>
+				</XProperty>
+			</XProperties>
+		</MasterBar>
+		<MasterBar>
+			<Key>
+				<AccidentalCount>0</AccidentalCount>
+				<Mode>Major</Mode>
+			</Key>
+			<Time>4/4</Time>
+			<Bars>32</Bars>
 			<XProperties>
 				<XProperty id="1124139010">
 					<Int>8</Int>
@@ -1287,6 +1312,10 @@
 			<Clef>G2</Clef>
 			<Voices>31 -1 -1 -1</Voices>
 		</Bar>
+		<Bar id="32">
+			<Clef>G2</Clef>
+			<Voices>32 -1 -1 -1</Voices>
+		</Bar>
 	</Bars>
 	<Voices>
 		<Voice id="0">
@@ -1347,43 +1376,46 @@
 			<Beats>51 52 53 53</Beats>
 		</Voice>
 		<Voice id="19">
-			<Beats>54 55</Beats>
+			<Beats>53 54</Beats>
 		</Voice>
 		<Voice id="20">
-			<Beats>56 57 58</Beats>
+			<Beats>55 56 57</Beats>
 		</Voice>
 		<Voice id="21">
-			<Beats>54 55</Beats>
+			<Beats>53 54</Beats>
 		</Voice>
 		<Voice id="22">
-			<Beats>59 60</Beats>
+			<Beats>58 59</Beats>
 		</Voice>
 		<Voice id="23">
-			<Beats>61 62 63 64 65 66 67 68 69 70</Beats>
+			<Beats>60 61 62 63 64 65 66 67 68 69</Beats>
 		</Voice>
 		<Voice id="24">
-			<Beats>71 72 73 74</Beats>
+			<Beats>70 71 72 73</Beats>
 		</Voice>
 		<Voice id="25">
-			<Beats>75 75 75 58</Beats>
+			<Beats>74 75 76 76</Beats>
 		</Voice>
 		<Voice id="26">
-			<Beats>76 76 76 76 76</Beats>
+			<Beats>77 77 77 57</Beats>
 		</Voice>
 		<Voice id="27">
-			<Beats>77 78 79 80</Beats>
+			<Beats>78 78 78 78 78</Beats>
 		</Voice>
 		<Voice id="28">
-			<Beats>81 82 55</Beats>
+			<Beats>79 80 81 82</Beats>
 		</Voice>
 		<Voice id="29">
-			<Beats>83 83 83 83</Beats>
+			<Beats>83 84 54</Beats>
 		</Voice>
 		<Voice id="30">
-			<Beats>83 84 84 84</Beats>
+			<Beats>85 85 85 85</Beats>
 		</Voice>
 		<Voice id="31">
-			<Beats>84 85 58</Beats>
+			<Beats>85 86 86 86</Beats>
+		</Voice>
+		<Voice id="32">
+			<Beats>86 87 57</Beats>
 		</Voice>
 	</Voices>
 	<Beats>
@@ -1825,25 +1857,17 @@
 		<Beat id="53">
 			<Dynamic>F</Dynamic>
 			<Rhythm ref="0" />
-			<Wah>Open</Wah>
 			<Notes>16</Notes>
 			<Properties>
 			</Properties>
 		</Beat>
 		<Beat id="54">
 			<Dynamic>F</Dynamic>
-			<Rhythm ref="0" />
-			<Notes>16</Notes>
-			<Properties>
-			</Properties>
-		</Beat>
-		<Beat id="55">
-			<Dynamic>F</Dynamic>
 			<Rhythm ref="4" />
 			<Properties>
 			</Properties>
 		</Beat>
-		<Beat id="56">
+		<Beat id="55">
 			<Dynamic>F</Dynamic>
 			<Rhythm ref="0" />
 			<Chord><![CDATA[1]]></Chord>
@@ -1851,7 +1875,7 @@
 			<Properties>
 			</Properties>
 		</Beat>
-		<Beat id="57">
+		<Beat id="56">
 			<Dynamic>F</Dynamic>
 			<Rhythm ref="0" />
 			<FreeText><![CDATA[Text]]></FreeText>
@@ -1859,93 +1883,108 @@
 			<Properties>
 			</Properties>
 		</Beat>
-		<Beat id="58">
+		<Beat id="57">
 			<Dynamic>F</Dynamic>
 			<Rhythm ref="2" />
 			<Properties>
 			</Properties>
 		</Beat>
-		<Beat id="59">
+		<Beat id="58">
 			<Dynamic>MF</Dynamic>
 			<Rhythm ref="0" />
 			<Properties>
 			</Properties>
 		</Beat>
-		<Beat id="60">
+		<Beat id="59">
 			<Dynamic>MF</Dynamic>
 			<Rhythm ref="4" />
 			<Properties>
 			</Properties>
 		</Beat>
-		<Beat id="61">
+		<Beat id="60">
 			<Dynamic>F</Dynamic>
 			<Rhythm ref="0" />
 			<Notes>46</Notes>
 			<Properties>
 			</Properties>
 		</Beat>
-		<Beat id="62">
+		<Beat id="61">
 			<Dynamic>F</Dynamic>
 			<Rhythm ref="0" />
 			<Notes>47</Notes>
 			<Properties>
 			</Properties>
 		</Beat>
-		<Beat id="63">
+		<Beat id="62">
 			<Dynamic>F</Dynamic>
 			<Rhythm ref="0" />
 			<Notes>48</Notes>
 			<Properties>
 			</Properties>
 		</Beat>
-		<Beat id="64">
+		<Beat id="63">
 			<Dynamic>F</Dynamic>
 			<Rhythm ref="0" />
 			<Notes>49</Notes>
 			<Properties>
 			</Properties>
 		</Beat>
-		<Beat id="65">
+		<Beat id="64">
 			<Dynamic>F</Dynamic>
 			<Rhythm ref="0" />
 			<Notes>50</Notes>
 			<Properties>
 			</Properties>
 		</Beat>
-		<Beat id="66">
+		<Beat id="65">
 			<Dynamic>F</Dynamic>
 			<Rhythm ref="0" />
 			<Notes>51</Notes>
 			<Properties>
 			</Properties>
 		</Beat>
-		<Beat id="67">
+		<Beat id="66">
 			<Dynamic>F</Dynamic>
 			<Rhythm ref="0" />
 			<Notes>52</Notes>
 			<Properties>
 			</Properties>
 		</Beat>
-		<Beat id="68">
+		<Beat id="67">
 			<Dynamic>F</Dynamic>
 			<Rhythm ref="0" />
 			<Notes>53</Notes>
 			<Properties>
 			</Properties>
 		</Beat>
-		<Beat id="69">
+		<Beat id="68">
 			<Dynamic>F</Dynamic>
 			<Rhythm ref="0" />
 			<Notes>54</Notes>
 			<Properties>
 			</Properties>
 		</Beat>
-		<Beat id="70">
+		<Beat id="69">
 			<Dynamic>F</Dynamic>
 			<Rhythm ref="0" />
 			<Notes>55</Notes>
 			<Properties>
 			</Properties>
+		</Beat>
+		<Beat id="70">
+			<Dynamic>F</Dynamic>
+			<Rhythm ref="0" />
+			<Notes>56 57 23 34</Notes>
+			<Properties>
+				<Property name="Brush">
+					<Direction>Down</Direction>
+				</Property>
+			</Properties>
+			<XProperties>
+				<XProperty id="687935489">
+					<Int>60</Int>
+				</XProperty>
+			</XProperties>
 		</Beat>
 		<Beat id="71">
 			<Dynamic>F</Dynamic>
@@ -1953,7 +1992,7 @@
 			<Notes>56 57 23 34</Notes>
 			<Properties>
 				<Property name="Brush">
-					<Direction>Down</Direction>
+					<Direction>Up</Direction>
 				</Property>
 			</Properties>
 			<XProperties>
@@ -1965,21 +2004,6 @@
 		<Beat id="72">
 			<Dynamic>F</Dynamic>
 			<Rhythm ref="0" />
-			<Notes>56 57 23 34</Notes>
-			<Properties>
-				<Property name="Brush">
-					<Direction>Up</Direction>
-				</Property>
-			</Properties>
-			<XProperties>
-				<XProperty id="687935489">
-					<Int>60</Int>
-				</XProperty>
-			</XProperties>
-		</Beat>
-		<Beat id="73">
-			<Dynamic>F</Dynamic>
-			<Rhythm ref="0" />
 			<Notes>20</Notes>
 			<Properties>
 				<Property name="PickStroke">
@@ -1987,7 +2011,7 @@
 				</Property>
 			</Properties>
 		</Beat>
-		<Beat id="74">
+		<Beat id="73">
 			<Dynamic>F</Dynamic>
 			<Rhythm ref="0" />
 			<Notes>20</Notes>
@@ -1997,21 +2021,65 @@
 				</Property>
 			</Properties>
 		</Beat>
+		<Beat id="74">
+			<Dynamic>F</Dynamic>
+			<Rhythm ref="0" />
+			<Arpeggio>Down</Arpeggio>
+			<Notes>56 57 23 34</Notes>
+			<Properties>
+			</Properties>
+			<XProperties>
+				<XProperty id="687931393">
+					<Int>480</Int>
+				</XProperty>
+				<XProperty id="687931394">
+					<Float>1</Float>
+				</XProperty>
+				<XProperty id="687935489">
+					<Int>60</Int>
+				</XProperty>
+			</XProperties>
+		</Beat>
 		<Beat id="75">
+			<Dynamic>F</Dynamic>
+			<Rhythm ref="0" />
+			<Arpeggio>Up</Arpeggio>
+			<Notes>56 57 23 34</Notes>
+			<Properties>
+			</Properties>
+			<XProperties>
+				<XProperty id="687931393">
+					<Int>480</Int>
+				</XProperty>
+				<XProperty id="687931394">
+					<Float>1</Float>
+				</XProperty>
+				<XProperty id="687935489">
+					<Int>60</Int>
+				</XProperty>
+			</XProperties>
+		</Beat>
+		<Beat id="76">
+			<Dynamic>F</Dynamic>
+			<Rhythm ref="0" />
+			<Properties>
+			</Properties>
+		</Beat>
+		<Beat id="77">
 			<Dynamic>F</Dynamic>
 			<Rhythm ref="5" />
 			<Notes>34</Notes>
 			<Properties>
 			</Properties>
 		</Beat>
-		<Beat id="76">
+		<Beat id="78">
 			<Dynamic>F</Dynamic>
 			<Rhythm ref="6" />
 			<Notes>58</Notes>
 			<Properties>
 			</Properties>
 		</Beat>
-		<Beat id="77">
+		<Beat id="79">
 			<Dynamic>F</Dynamic>
 			<Rhythm ref="0" />
 			<Ottavia>8va</Ottavia>
@@ -2019,7 +2087,7 @@
 			<Properties>
 			</Properties>
 		</Beat>
-		<Beat id="78">
+		<Beat id="80">
 			<Dynamic>F</Dynamic>
 			<Rhythm ref="0" />
 			<Ottavia>8vb</Ottavia>
@@ -2027,7 +2095,7 @@
 			<Properties>
 			</Properties>
 		</Beat>
-		<Beat id="79">
+		<Beat id="81">
 			<Dynamic>F</Dynamic>
 			<Rhythm ref="0" />
 			<Ottavia>15ma</Ottavia>
@@ -2035,7 +2103,7 @@
 			<Properties>
 			</Properties>
 		</Beat>
-		<Beat id="80">
+		<Beat id="82">
 			<Dynamic>F</Dynamic>
 			<Rhythm ref="0" />
 			<Ottavia>15mb</Ottavia>
@@ -2043,34 +2111,34 @@
 			<Properties>
 			</Properties>
 		</Beat>
-		<Beat id="81">
+		<Beat id="83">
 			<Dynamic>F</Dynamic>
 			<Rhythm ref="6" />
 			<Notes>20</Notes>
 			<Properties>
 			</Properties>
 		</Beat>
-		<Beat id="82">
+		<Beat id="84">
 			<Dynamic>F</Dynamic>
 			<Rhythm ref="7" />
 			<Properties>
 			</Properties>
 		</Beat>
-		<Beat id="83">
+		<Beat id="85">
 			<Dynamic>F</Dynamic>
 			<Rhythm ref="0" />
 			<Notes>59</Notes>
 			<Properties>
 			</Properties>
 		</Beat>
-		<Beat id="84">
+		<Beat id="86">
 			<Dynamic>F</Dynamic>
 			<Rhythm ref="0" />
 			<Notes>60</Notes>
 			<Properties>
 			</Properties>
 		</Beat>
-		<Beat id="85">
+		<Beat id="87">
 			<Dynamic>F</Dynamic>
 			<Rhythm ref="0" />
 			<Notes>61</Notes>

@@ -3,9 +3,9 @@ import alphatab.model.Beat;
 import alphatab.model.BrushType;
 import alphatab.platform.ICanvas;
 import alphatab.rendering.Glyph;
-import alphatab.rendering.TabBarRenderer;
+import alphatab.rendering.ScoreBarRenderer;
 
-class BrushGlyph extends Glyph
+class ScoreBrushGlyph extends Glyph
 {
     private var _beat:Beat;
     
@@ -22,22 +22,32 @@ class BrushGlyph extends Glyph
     
     public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
     {
-        var tabBarRenderer:TabBarRenderer = cast renderer;
-        var res = renderer.getResources();
-        var startY = cy + y + Std.int(tabBarRenderer.getNoteY(_beat.maxNote()) - res.tablatureFont.getSize() / 2);
-        var endY = cy + y + tabBarRenderer.getNoteY(_beat.minNote()) + res.tablatureFont.getSize() / 2;
+        var scoreBarRenderer:ScoreBarRenderer = cast renderer;
+        var lineSize = scoreBarRenderer.getLineOffset();
+        var res = renderer.getResources(); 
+        var startY = cy + y + Std.int(scoreBarRenderer.getNoteY(_beat.maxNote()) - lineSize / 2);
+        var endY = cy + y + scoreBarRenderer.getNoteY(_beat.minNote()) + lineSize;
         var arrowX = Std.int(cx + x + width / 2);
         var arrowSize = 8 * getScale();
         
         canvas.setColor(res.mainGlyphColor);
-        if (_beat.brushType == BrushType.BrushUp || _beat.brushType == BrushType.BrushDown)
+        if (_beat.brushType != BrushType.None)
         {
-            canvas.beginPath();
-            canvas.moveTo(arrowX, startY);
-            canvas.lineTo(arrowX, endY);
-            canvas.stroke();
+            if (_beat.brushType == BrushType.ArpeggioUp || _beat.brushType == BrushType.ArpeggioDown)
+            {
+                var size = Std.int(15 * getScale());
+                var steps = Math.floor(Math.abs(endY - startY) / size);
+                for (i in 0 ... steps)
+                {
+                    var arrow = new SvgGlyph(Std.int(3 * getScale()), 0, MusicFont.WaveVertical, 1, 1);
+                    arrow.renderer = renderer;
+                    arrow.doLayout();
+                    
+                    arrow.paint(cx + x, startY + (i * size), canvas);
+                }
+            }
             
-            if (_beat.brushType == BrushType.BrushUp)
+            if (_beat.brushType == BrushType.ArpeggioUp)
             {
                 canvas.beginPath();
                 canvas.moveTo(arrowX, endY);
@@ -46,7 +56,7 @@ class BrushGlyph extends Glyph
                 canvas.closePath();
                 canvas.fill();
             }
-            else
+            else if(_beat.brushType == BrushType.ArpeggioDown)
             {
                 canvas.beginPath();
                 canvas.moveTo(arrowX, startY);

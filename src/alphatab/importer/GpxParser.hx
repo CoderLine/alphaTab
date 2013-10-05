@@ -612,7 +612,7 @@ class GpxParser
                         }
                     case "Chord":
                         beat.chordId = getValue(c);
-                    case "Arpreggio":
+                    case "Arpeggio":
                         if (getValue(c) == "Up")
                         {
                             beat.brushType = BrushType.ArpeggioUp;

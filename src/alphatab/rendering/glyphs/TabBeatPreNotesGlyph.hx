@@ -13,7 +13,8 @@ class TabBeatPreNotesGlyph extends BeatGlyphBase
     {
         if (container.beat.brushType != BrushType.None)
         {
-            addGlyph(new BrushGlyph(container.beat));    
+            addGlyph(new TabBrushGlyph(container.beat));    
+            addGlyph(new SpacingGlyph(0, 0, Std.int(4 * getScale())));
         }
         super.doLayout();
     }

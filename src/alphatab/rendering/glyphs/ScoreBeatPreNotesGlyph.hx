@@ -1,5 +1,6 @@
 package alphatab.rendering.glyphs;
 import alphatab.model.Beat;
+import alphatab.model.BrushType;
 import alphatab.model.GraceType;
 import alphatab.model.Note;
 
@@ -22,6 +23,12 @@ class ScoreBeatPreNotesGlyph extends BeatGlyphBase
 	
 	public override function doLayout():Void 
 	{
+        if (container.beat.brushType != BrushType.None)
+        {
+            addGlyph(new ScoreBrushGlyph(container.beat));    
+            addGlyph(new SpacingGlyph(0, 0, Std.int(4 * getScale())));
+        }
+
 		if (!container.beat.isRest() && !container.beat.voice.bar.track.isPercussion)
 		{
 			var accidentals:AccidentalGroupGlyph = new AccidentalGroupGlyph(0, 0);
