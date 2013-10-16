@@ -1433,7 +1433,7 @@ alphatab.rendering.effects.NoteVibratoEffectInfo.prototype = $extend(alphatab.re
 		return alphatab.rendering.EffectBarGlyphSizing.GroupedOnBeatToPostBeat;
 	}
 	,shouldCreateGlyphForNote: function(renderer,note) {
-		return note.vibrato != alphatab.model.VibratoType.None;
+		return note.vibrato != alphatab.model.VibratoType.None || note.isTieDestination && note.tieOrigin.vibrato != alphatab.model.VibratoType.None;
 	}
 	,__class__: alphatab.rendering.effects.NoteVibratoEffectInfo
 });

@@ -18,7 +18,7 @@ class NoteVibratoEffectInfo extends NoteEffectInfoBase
     
     private override function shouldCreateGlyphForNote(renderer:EffectBarRenderer, note:Note):Bool 
     {
-        return note.vibrato != VibratoType.None;
+        return note.vibrato != VibratoType.None ||(note.isTieDestination && note.tieOrigin.vibrato != VibratoType.None);
     }
     
     public override function getSizingMode() : EffectBarGlyphSizing

@@ -1,8 +1,6 @@
 Version 1.0
     Implement Midi Module
     Use js-modern and expose only required classes
-    Fix Tied notes if the tie destination is on the next beat
-    Expand vibrato effect to tie destinations
 
 Version 1.1
     Rendering of Chord Diagrams
