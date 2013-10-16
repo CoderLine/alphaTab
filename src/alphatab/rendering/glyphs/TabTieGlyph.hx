@@ -13,7 +13,8 @@ class TabTieGlyph extends TieGlyph
 
 	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
 	{
-		var r:TabBarRenderer = cast renderer;
+        if (_endNote == null || _startNote.beat.index != _endNote.beat.index) return;
+        var r:TabBarRenderer = cast renderer;
         var parent:TabBeatContainerGlyph = cast _parent;
 		var res = r.getResources();
 		var startX = cx + r.getNoteX(_startNote);

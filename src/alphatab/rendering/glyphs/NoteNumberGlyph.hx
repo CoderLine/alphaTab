@@ -24,7 +24,7 @@ class NoteNumberGlyph extends Glyph
 		}
 		else if (n.beat.index == 0)
 		{
-			_noteString = "(" + _noteString + ")";
+			_noteString = "(" + n.tieOrigin.fret + ")";
 		}
         else
         {

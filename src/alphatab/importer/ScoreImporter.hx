@@ -144,7 +144,7 @@ class ScoreImporter
     {
         var nextBeat:Beat = note.beat.nextBeat;
         // keep searching in same bar
-        while (nextBeat != null && nextBeat.voice.bar == note.beat.voice.bar)
+        while (nextBeat != null && nextBeat.voice.bar.index <= note.beat.voice.bar.index + 3)
         {
             var noteOnString = nextBeat.getNoteOnString(note.string);
             if (noteOnString != null)
@@ -165,7 +165,7 @@ class ScoreImporter
         var previousBeat:Beat = note.beat.previousBeat;
         
         // keep searching in same bar
-        while (previousBeat != null && previousBeat.voice.bar == note.beat.voice.bar)
+        while (previousBeat != null && previousBeat.voice.bar.index >= note.beat.voice.bar.index - 3)
         {
             var noteOnString = previousBeat.getNoteOnString(note.string);
             if (noteOnString != null)

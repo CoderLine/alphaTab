@@ -1485,7 +1485,7 @@ class Gp3To5Importer extends ScoreImporter
     #if unit public #else private #end function readStringIntUnused() : String
     {
         skip(4);
-        return _data.readString(_data.readByte());
+        return readString(_data.readByte());
     }
     
     /**
@@ -1493,7 +1493,7 @@ class Gp3To5Importer extends ScoreImporter
      */
     #if unit public #else private #end inline function readStringInt() : String
     {
-        return _data.readString(readInt32());
+        return readString(readInt32());
     }
     
     /**
@@ -1503,8 +1503,24 @@ class Gp3To5Importer extends ScoreImporter
     {
         var length = readInt32() - 1;
         _data.readByte();
-        return _data.readString(length);
+        return readString(length);
     }
+    
+    #if unit public #else private #end function readString(length:Int) : String
+    {
+        var b = Bytes.alloc(length);
+        _data.readFullBytes(b, 0, length);
+        
+        #if cs 
+        return untyped cs.system.text.Encoding.Default.GetString(b.getData(), 0, length);
+        #else
+        var s = new StringBuf();
+        for (i in 0 ... length) s.addChar(b.get(i));
+        return s.toString();
+        #end
+    }
+    
+    
     
     /**
      * Reads a byte as size and the string itself 
@@ -1514,7 +1530,7 @@ class Gp3To5Importer extends ScoreImporter
     #if unit public #else private #end function readStringByteLength(length:Int) : String
     {
         var stringLength = readUInt8();
-        var string = _data.readString(stringLength);
+        var string = readString(stringLength);
         if (stringLength < length)
         {
             skip( length - stringLength );

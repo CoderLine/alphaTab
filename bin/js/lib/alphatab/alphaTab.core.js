@@ -601,7 +601,6 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 		this._font = font;
 	}
 	,stroke: function() {
-		var path = this._currentPath.b;
 		if(!this._currentPathIsEmpty) {
 			this._buffer.b += "<path d=\"";
 			this._buffer.b += Std.string(this._currentPath.b);
@@ -615,7 +614,6 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 		this._currentPathIsEmpty = true;
 	}
 	,fill: function() {
-		var path = this._currentPath.b;
 		if(!this._currentPathIsEmpty) {
 			this._buffer.b += "<path d=\"";
 			this._buffer.b += Std.string(this._currentPath.b);
@@ -992,12 +990,13 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 		return Math.round(795 * this.renderer.scale);
 	}
 	,getMaxWidth: function() {
-		return this.getSheetWidth() - alphatab.rendering.layout.PageViewLayout.PagePadding[0] - alphatab.rendering.layout.PageViewLayout.PagePadding[2];
+		var width = this.renderer.settings.autoSize?this.getSheetWidth():this.renderer.settings.width;
+		return width - alphatab.rendering.layout.PageViewLayout.PagePadding[0] - alphatab.rendering.layout.PageViewLayout.PagePadding[2];
 	}
 	,createStaveGroup: function(currentBarIndex,endIndex) {
 		var group = this.createEmptyStaveGroup();
 		var barsPerRow = this.renderer.settings.layout.get("barsPerRow",-1);
-		var maxWidth = this.getSheetWidth() - alphatab.rendering.layout.PageViewLayout.PagePadding[0] - alphatab.rendering.layout.PageViewLayout.PagePadding[2];
+		var maxWidth = this.getMaxWidth();
 		var end = endIndex + 1;
 		var _g = currentBarIndex;
 		while(_g < end) {
@@ -1018,7 +1017,7 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 	,fitGroup: function(group) {
 		var barSpace = 0;
 		if(group.isFull) {
-			var freeSpace = this.getSheetWidth() - alphatab.rendering.layout.PageViewLayout.PagePadding[0] - alphatab.rendering.layout.PageViewLayout.PagePadding[2] - group.width;
+			var freeSpace = this.getMaxWidth() - group.width;
 			if(freeSpace != 0 && group.bars.length > 0) barSpace = Math.round(freeSpace / group.bars.length);
 		}
 		group.applyBarSpacing(barSpace);
@@ -1153,6 +1152,7 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 		var x = alphatab.rendering.layout.PageViewLayout.PagePadding[0];
 		var y = alphatab.rendering.layout.PageViewLayout.PagePadding[1];
 		y = this.doScoreInfoLayout(y);
+		if(this.renderer.settings.autoSize || this.renderer.settings.width <= 0) this.width = 795 * this.renderer.scale | 0; else this.width = this.renderer.settings.width;
 		if(this.renderer.settings.staves.length > 0) while(currentBarIndex <= endBarIndex) {
 			var group = this.createStaveGroup(currentBarIndex,endBarIndex);
 			this._groups.push(group);
@@ -1164,7 +1164,6 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 			currentBarIndex = group.bars[group.bars.length - 1].index + 1;
 		}
 		this.height = y + alphatab.rendering.layout.PageViewLayout.PagePadding[3];
-		this.width = 795 * this.renderer.scale | 0;
 	}
 	,__class__: alphatab.rendering.layout.PageViewLayout
 });
@@ -2318,7 +2317,7 @@ alphatab.importer.ScoreImporter.availableImporters = function() {
 alphatab.importer.ScoreImporter.prototype = {
 	previousNoteOnSameLine: function(note) {
 		var previousBeat = note.beat.previousBeat;
-		while(previousBeat != null && previousBeat.voice.bar == note.beat.voice.bar) {
+		while(previousBeat != null && previousBeat.voice.bar.index >= note.beat.voice.bar.index - 3) {
 			var noteOnString = previousBeat.getNoteOnString(note.string);
 			if(noteOnString != null) return noteOnString; else previousBeat = previousBeat.previousBeat;
 		}
@@ -2326,7 +2325,7 @@ alphatab.importer.ScoreImporter.prototype = {
 	}
 	,nextNoteOnSameLine: function(note) {
 		var nextBeat = note.beat.nextBeat;
-		while(nextBeat != null && nextBeat.voice.bar == note.beat.voice.bar) {
+		while(nextBeat != null && nextBeat.voice.bar.index <= note.beat.voice.bar.index + 3) {
 			var noteOnString = nextBeat.getNoteOnString(note.string);
 			if(noteOnString != null) return noteOnString; else nextBeat = nextBeat.nextBeat;
 		}
@@ -3113,21 +3112,32 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 	}
 	,readStringByteLength: function(length) {
 		var stringLength = this._data.readByte();
-		var string = this._data.readString(stringLength);
+		var string = this.readString(stringLength);
 		if(stringLength < length) this._data.read(length - stringLength);
 		return string;
+	}
+	,readString: function(length) {
+		var b = haxe.io.Bytes.alloc(length);
+		this._data.readFullBytes(b,0,length);
+		var s = new StringBuf();
+		var _g = 0;
+		while(_g < length) {
+			var i = _g++;
+			s.b += String.fromCharCode(b.b[i]);
+		}
+		return s.b;
 	}
 	,readStringIntByte: function() {
 		var length = this.readInt32() - 1;
 		this._data.readByte();
-		return this._data.readString(length);
+		return this.readString(length);
 	}
 	,readStringInt: function() {
-		return this._data.readString(this.readInt32());
+		return this.readString(this.readInt32());
 	}
 	,readStringIntUnused: function() {
 		this._data.read(4);
-		return this._data.readString(this._data.readByte());
+		return this.readString(this._data.readByte());
 	}
 	,readInt32: function() {
 		var ch1 = this._data.readByte();
@@ -3917,7 +3927,7 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 		while(_g < 5) {
 			var i = _g++;
 			this._lyricsIndex.push(this.readInt32() - 1);
-			this._lyrics.push(this._data.readString(this.readInt32()));
+			this._lyrics.push(this.readString(this.readInt32()));
 		}
 	}
 	,readScoreInformation: function() {
@@ -5164,27 +5174,16 @@ alphatab.importer.ScoreLoader.__name__ = true;
 alphatab.importer.ScoreLoader.loadScoreAsync = function(path,success,error) {
 	var loader = (alphatab.Environment.fileLoaders.get("default"))();
 	loader.loadBinaryAsync(path,function(data) {
-		var importers = alphatab.importer.ScoreImporter.availableImporters();
-		var score = null;
-		var _g = 0;
-		while(_g < importers.length) {
-			var importer = importers[_g];
-			++_g;
-			try {
-				var input = new haxe.io.BytesInput(data);
-				importer.init(input);
-				score = importer.readScore();
-				break;
-			} catch( e ) {
-				if(e == alphatab.importer.ScoreImporter.UnsupportedFormat) continue; else error(e);
-			}
+		try {
+			success(alphatab.importer.ScoreLoader.loadScoreFromBytes(data));
+		} catch( e ) {
+			if( js.Boot.__instanceof(e,String) ) {
+				error(e);
+			} else throw(e);
 		}
-		if(score != null) success(score); else error("No reader for the requested file found");
 	},error);
 }
-alphatab.importer.ScoreLoader.loadScore = function(path) {
-	var loader = (alphatab.Environment.fileLoaders.get("default"))();
-	var data = loader.loadBinary(path);
+alphatab.importer.ScoreLoader.loadScoreFromBytes = function(data) {
 	var importers = alphatab.importer.ScoreImporter.availableImporters();
 	var score = null;
 	var _g = 0;
@@ -5201,6 +5200,11 @@ alphatab.importer.ScoreLoader.loadScore = function(path) {
 		}
 	}
 	if(score != null) return score; else throw "No reader for the requested file found";
+}
+alphatab.importer.ScoreLoader.loadScore = function(path) {
+	var loader = (alphatab.Environment.fileLoaders.get("default"))();
+	var data = loader.loadBinary(path);
+	return alphatab.importer.ScoreLoader.loadScoreFromBytes(data);
 }
 if(!haxe.io) haxe.io = {}
 haxe.io.Input = function() { }
@@ -7158,7 +7162,7 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 			canvas.lineTo(cx + this.x + offset1X,cy + this.y + offset1Y - offset - size);
 			canvas.stroke();
 			canvas.beginPath();
-			canvas.lineTo(cx + this.x + offset2X,cy + this.y + offset2Y - offset - size);
+			canvas.moveTo(cx + this.x + offset2X,cy + this.y + offset2Y - offset - size);
 			canvas.lineTo(cx + this.x + endX,cy + this.y + endY - offset - size);
 			canvas.lineTo(cx + this.x + endX,cy + this.y + endY - offset);
 			canvas.stroke();
@@ -8345,7 +8349,7 @@ alphatab.rendering.glyphs.NoteNumberGlyph = function(x,y,n,isGrace) {
 	if(!n.isTieDestination) {
 		this._noteString = n.isDead?"X":Std.string(n.fret);
 		if(n.isGhost) this._noteString = "(" + this._noteString + ")";
-	} else if(n.beat.index == 0) this._noteString = "(" + this._noteString + ")"; else this._noteString = "";
+	} else if(n.beat.index == 0) this._noteString = "(" + n.tieOrigin.fret + ")"; else this._noteString = "";
 };
 alphatab.rendering.glyphs.NoteNumberGlyph.__name__ = true;
 alphatab.rendering.glyphs.NoteNumberGlyph.__super__ = alphatab.rendering.Glyph;
@@ -9069,6 +9073,7 @@ alphatab.rendering.glyphs.ScoreTieGlyph.__name__ = true;
 alphatab.rendering.glyphs.ScoreTieGlyph.__super__ = alphatab.rendering.glyphs.TieGlyph;
 alphatab.rendering.glyphs.ScoreTieGlyph.prototype = $extend(alphatab.rendering.glyphs.TieGlyph.prototype,{
 	paint: function(cx,cy,canvas) {
+		if(this._endNote == null || this._startNote.beat.index != this._endNote.beat.index) return;
 		var r = this.renderer;
 		var parent = this._parent;
 		var startX = cx + r.getNoteX(this._startNote);
@@ -9495,6 +9500,7 @@ alphatab.rendering.glyphs.TabTieGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabTieGlyph.__super__ = alphatab.rendering.glyphs.TieGlyph;
 alphatab.rendering.glyphs.TabTieGlyph.prototype = $extend(alphatab.rendering.glyphs.TieGlyph.prototype,{
 	paint: function(cx,cy,canvas) {
+		if(this._endNote == null || this._startNote.beat.index != this._endNote.beat.index) return;
 		var r = this.renderer;
 		var parent = this._parent;
 		var res = r.stave.staveGroup.layout.renderer.renderingResources;
@@ -9892,6 +9898,7 @@ alphatab.rendering.glyphs.effects.LineRangedGlyph.prototype = $extend(alphatab.r
 				var lineX = startX;
 				canvas.beginPath();
 				while(lineX < endX) {
+					canvas.beginPath();
 					canvas.moveTo(lineX,lineY);
 					canvas.lineTo(Math.min(lineX + lineSize,endX) | 0,lineY);
 					lineX += lineSize + lineSpacing;

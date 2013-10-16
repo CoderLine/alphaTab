@@ -33,6 +33,7 @@ class ScoreTieGlyph extends TieGlyph
 
 	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
 	{
+        if (_endNote == null || _startNote.beat.index != _endNote.beat.index) return;
 		var r:ScoreBarRenderer = cast renderer;
         var parent:BeatContainerGlyph = cast _parent;
 		var startX = cx + r.getNoteX(_startNote);
