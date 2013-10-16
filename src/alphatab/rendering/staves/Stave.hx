@@ -22,7 +22,6 @@ import alphatab.platform.model.Color;
 import alphatab.rendering.BarRendererBase;
 import alphatab.rendering.BarRendererFactory;
 import alphatab.rendering.layout.ScoreLayout;
-import js.Boot;
 
 /**
  * A stave represents a single line within a StaveGroup. 

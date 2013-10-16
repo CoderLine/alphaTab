@@ -5,7 +5,6 @@ import alphatab.platform.model.Color;
 import alphatab.platform.model.TextAlign;
 import alphatab.rendering.Glyph;
 import alphatab.rendering.TabBarRenderer;
-import js.html.Point;
 
 class WhammyBarGlyph extends Glyph
 {

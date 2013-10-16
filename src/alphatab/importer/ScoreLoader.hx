@@ -41,39 +41,13 @@ class ScoreLoader
         loader.loadBinaryAsync(path, 
             function(data:Bytes) : Void
             {
-                var importers:Array<ScoreImporter> = ScoreImporter.availableImporters();
-                
-                var score:Score = null;
-                for (importer in importers)
+                try
                 {
-                    try
-                    {
-                        var input:BytesInput = new BytesInput(data);
-                        importer.init(input);
-                        
-                        score = importer.readScore();                        
-                        break;
-                    }
-                    catch (e:Dynamic)
-                    {
-                        if (e == ScoreImporter.UnsupportedFormat)
-                        {
-                            continue;
-                        }
-                        else
-                        {
-                            error(e);
-                        }
-                    }                    
+                    success(loadScoreFromBytes(data));
                 }
-                
-                if (score != null)
+                catch (e:String)
                 {
-                    success(score);
-                }
-                else
-                {
-                    error("No reader for the requested file found");
+                    error(e);
                 }
             }
             ,
@@ -81,17 +55,8 @@ class ScoreLoader
         );
     }	
     
-    /**
-	 * Loads a score synchronously from the given datasource
-	 * @param	path the source path to load the binary file from
-	 * @param	success this function is called if the Score was successfully loaded from the datasource
-	 * @param	error this function is called if any error during the loading occured.
-	 */
-    public static function loadScore(path:String) : Score
+    public static function loadScoreFromBytes(data:Bytes)
     {
-        var loader:IFileLoader = Environment.fileLoaders.get("default")();
-        var data = loader.loadBinary(path);
-                
         var importers:Array<ScoreImporter> = ScoreImporter.availableImporters();
                 
         var score:Score = null;
@@ -126,5 +91,18 @@ class ScoreLoader
         {
             throw "No reader for the requested file found";
         }
+    }
+    
+    /**
+	 * Loads a score synchronously from the given datasource
+	 * @param	path the source path to load the binary file from
+	 * @param	success this function is called if the Score was successfully loaded from the datasource
+	 * @param	error this function is called if any error during the loading occured.
+	 */
+    public static function loadScore(path:String) : Score
+    {
+        var loader:IFileLoader = Environment.fileLoaders.get("default")();
+        var data = loader.loadBinary(path);
+        return loadScoreFromBytes(data);
     }
 }

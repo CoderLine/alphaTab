@@ -335,7 +335,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
             canvas.stroke();
             
             canvas.beginPath();
-            canvas.lineTo(cx + x + offset2X, cy + y + offset2Y - offset - size);
+            canvas.moveTo(cx + x + offset2X, cy + y + offset2Y - offset - size);
             canvas.lineTo(cx + x + endX, cy + y + endY - offset - size); 
             canvas.lineTo(cx + x + endX, cy + y + endY - offset); 
             canvas.stroke();

@@ -54,6 +54,7 @@ class LineRangedGlyph extends Glyph implements IMultiBeatEffectGlyph
                 canvas.beginPath();
                 while (lineX < endX)
                 {
+                    canvas.beginPath();
                     canvas.moveTo(lineX, lineY);
                     canvas.lineTo(Std.int(Math.min(lineX + lineSize, endX)), lineY);
                     lineX += lineSize + lineSpacing;

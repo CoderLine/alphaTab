@@ -71,6 +71,15 @@ class PageViewLayout extends ScoreLayout
         
         y = doScoreInfoLayout(y);
         
+        if (renderer.settings.autoSize || renderer.settings.width <= 0)
+        {
+            width = Std.int(WidthOn100 * renderer.scale);
+        }
+        else
+        {
+            width = renderer.settings.width;
+        }
+
         if (renderer.settings.staves.length > 0) 
         {       
             while (currentBarIndex <= endBarIndex)
@@ -91,7 +100,6 @@ class PageViewLayout extends ScoreLayout
         }
         
         height = y + PagePadding[3];
-        width = Std.int(WidthOn100 * renderer.scale);
     }
     
     private function doScoreInfoLayout(y:Int)
@@ -346,9 +354,10 @@ class PageViewLayout extends ScoreLayout
         return group;
     }
     
-    private inline function getMaxWidth() : Int
+    private function getMaxWidth() : Int
     {
-        return (getSheetWidth() - PagePadding[0] - PagePadding[2]);
+        var width = renderer.settings.autoSize ? getSheetWidth() : renderer.settings.width;
+        return width - PagePadding[0] - PagePadding[2];
     }
     
         

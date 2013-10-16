@@ -15,7 +15,6 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.model;
-import js.Boot;
 
 /**
  * A note is a single played sound on a fretted instrument. 

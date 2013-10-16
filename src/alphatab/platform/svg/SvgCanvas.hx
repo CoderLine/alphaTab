@@ -260,7 +260,6 @@ class SvgCanvas implements ICanvas
     
     public function fill():Void
     {
-        var path = _currentPath.toString();
         if(!_currentPathIsEmpty) {
             _buffer.add('<path d="');
             _buffer.add(_currentPath.toString());
@@ -273,7 +272,6 @@ class SvgCanvas implements ICanvas
     }
     public function stroke():Void
     {
-        var path = _currentPath.toString();
         if(!_currentPathIsEmpty) {
             _buffer.add('<path d="');
             _buffer.add(_currentPath.toString());
@@ -325,27 +323,6 @@ class SvgCanvas implements ICanvas
         _buffer.add(_font.toCssString());
         _buffer.add('; fill:');
         _buffer.add(_color.toRgbaString());
-        _buffer.add(';" ');
-        _buffer.add(' dominant-baseline="');
-        _buffer.add(getSvgBaseLine());       
-        _buffer.add('" text-anchor="');
-        _buffer.add(getSvgTextAlignment());
-        _buffer.add('">\n');
-        _buffer.add(text);
-        _buffer.add("</text>\n");
-    }
-    public function strokeText(text:String, x:Float, y:Float):Void
-    {
-        _buffer.add('<text x="');
-        _buffer.add(x);
-        _buffer.add('" y="');
-        _buffer.add(y);
-        _buffer.add('" style="font:');
-        _buffer.add(_font.toCssString());
-        _buffer.add('" stroke:');
-        _buffer.add(_color.toRgbaString());
-        _buffer.add('; stroke-width:');
-        _buffer.add(_lineWidth);
         _buffer.add(';" ');
         _buffer.add(' dominant-baseline="');
         _buffer.add(getSvgBaseLine());       

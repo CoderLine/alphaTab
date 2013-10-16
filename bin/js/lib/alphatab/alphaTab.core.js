@@ -9,7 +9,7 @@ var EReg = function(r,opt) {
 	opt = opt.split("u").join("");
 	this.r = new RegExp(r,opt);
 };
-EReg.__name__ = ["EReg"];
+EReg.__name__ = true;
 EReg.prototype = {
 	matched: function(n) {
 		return this.r.m != null && n >= 0 && n < this.r.m.length?this.r.m[n]:(function($this) {
@@ -24,11 +24,10 @@ EReg.prototype = {
 		this.r.s = s;
 		return this.r.m != null;
 	}
-	,r: null
 	,__class__: EReg
 }
 var HxOverrides = function() { }
-HxOverrides.__name__ = ["HxOverrides"];
+HxOverrides.__name__ = true;
 HxOverrides.cca = function(s,index) {
 	var x = s.charCodeAt(index);
 	if(x != x) return undefined;
@@ -63,7 +62,7 @@ HxOverrides.iter = function(a) {
 	}};
 }
 var Lambda = function() { }
-Lambda.__name__ = ["Lambda"];
+Lambda.__name__ = true;
 Lambda.has = function(it,elt) {
 	var $it0 = $iterator(it)();
 	while( $it0.hasNext() ) {
@@ -82,36 +81,10 @@ Lambda.indexOf = function(it,v) {
 	}
 	return -1;
 }
-var List = function() {
-	this.length = 0;
-};
-List.__name__ = ["List"];
-List.prototype = {
-	iterator: function() {
-		return { h : this.h, hasNext : function() {
-			return this.h != null;
-		}, next : function() {
-			if(this.h == null) return null;
-			var x = this.h[0];
-			this.h = this.h[1];
-			return x;
-		}};
-	}
-	,add: function(item) {
-		var x = [item];
-		if(this.h == null) this.h = x; else this.q[1] = x;
-		this.q = x;
-		this.length++;
-	}
-	,length: null
-	,q: null
-	,h: null
-	,__class__: List
-}
 var IMap = function() { }
-IMap.__name__ = ["IMap"];
+IMap.__name__ = true;
 var Reflect = function() { }
-Reflect.__name__ = ["Reflect"];
+Reflect.__name__ = true;
 Reflect.field = function(o,field) {
 	var v = null;
 	try {
@@ -134,7 +107,7 @@ Reflect.isFunction = function(f) {
 	return typeof(f) == "function" && !(f.__name__ || f.__ename__);
 }
 var Std = function() { }
-Std.__name__ = ["Std"];
+Std.__name__ = true;
 Std.string = function(s) {
 	return js.Boot.__string_rec(s,"");
 }
@@ -150,16 +123,15 @@ Std.parseFloat = function(x) {
 var StringBuf = function() {
 	this.b = "";
 };
-StringBuf.__name__ = ["StringBuf"];
+StringBuf.__name__ = true;
 StringBuf.prototype = {
 	addSub: function(s,pos,len) {
 		this.b += len == null?HxOverrides.substr(s,pos,null):HxOverrides.substr(s,pos,len);
 	}
-	,b: null
 	,__class__: StringBuf
 }
 var StringTools = function() { }
-StringTools.__name__ = ["StringTools"];
+StringTools.__name__ = true;
 StringTools.htmlEscape = function(s,quotes) {
 	s = s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
 	return quotes?s.split("\"").join("&quot;").split("'").join("&#039;"):s;
@@ -200,26 +172,7 @@ StringTools.hex = function(n,digits) {
 	return s;
 }
 var Type = function() { }
-Type.__name__ = ["Type"];
-Type.getClass = function(o) {
-	if(o == null) return null;
-	return o.__class__;
-}
-Type.getClassName = function(c) {
-	var a = c.__name__;
-	return a.join(".");
-}
-Type.getInstanceFields = function(c) {
-	var a = [];
-	for(var i in c.prototype) a.push(i);
-	HxOverrides.remove(a,"__class__");
-	HxOverrides.remove(a,"__properties__");
-	return a;
-}
-Type.getEnumConstructs = function(e) {
-	var a = e.__constructs__;
-	return a.slice();
-}
+Type.__name__ = true;
 Type.allEnums = function(e) {
 	var all = [];
 	var cst = e.__constructs__;
@@ -235,7 +188,7 @@ Type.allEnums = function(e) {
 var XmlType = { __ename__ : true, __constructs__ : [] }
 var Xml = function() {
 };
-Xml.__name__ = ["Xml"];
+Xml.__name__ = true;
 Xml.parse = function(str) {
 	return haxe.xml.Parser.parse(str);
 }
@@ -378,31 +331,14 @@ Xml.prototype = {
 		if(this.nodeType != Xml.Element) throw "bad nodeType";
 		return this._nodeName;
 	}
-	,_parent: null
-	,_children: null
-	,_attributes: null
-	,_nodeValue: null
-	,_nodeName: null
-	,nodeType: null
 	,__class__: Xml
-}
-var alphatab = alphatab || {}
-alphatab.AlphaTestRunner = function() { }
-alphatab.AlphaTestRunner.__name__ = ["alphatab","AlphaTestRunner"];
-alphatab.AlphaTestRunner.main = function() {
-	var r = new haxe.unit.TestRunner();
-	r.add(new alphatab.importer.GpImporterTest());
-	r.add(new alphatab.importer.Gp3ImporterTest());
-	r.add(new alphatab.importer.Gp4ImporterTest());
-	r.add(new alphatab.importer.Gp5ImporterTest());
-	r.run();
 }
 var haxe = haxe || {}
 if(!haxe.ds) haxe.ds = {}
 haxe.ds.StringMap = function() {
 	this.h = { };
 };
-haxe.ds.StringMap.__name__ = ["haxe","ds","StringMap"];
+haxe.ds.StringMap.__name__ = true;
 haxe.ds.StringMap.__interfaces__ = [IMap];
 haxe.ds.StringMap.prototype = {
 	iterator: function() {
@@ -429,41 +365,14 @@ haxe.ds.StringMap.prototype = {
 	,set: function(key,value) {
 		this.h["$" + key] = value;
 	}
-	,h: null
 	,__class__: haxe.ds.StringMap
 }
+var alphatab = alphatab || {}
 if(!alphatab.platform) alphatab.platform = {}
 alphatab.platform.ICanvas = function() { }
-alphatab.platform.ICanvas.__name__ = ["alphatab","platform","ICanvas"];
+alphatab.platform.ICanvas.__name__ = true;
 alphatab.platform.ICanvas.prototype = {
-	measureText: null
-	,strokeText: null
-	,fillText: null
-	,setTextBaseline: null
-	,getTextBaseline: null
-	,setTextAlign: null
-	,getTextAlign: null
-	,setFont: null
-	,stroke: null
-	,fill: null
-	,circle: null
-	,rect: null
-	,bezierCurveTo: null
-	,quadraticCurveTo: null
-	,lineTo: null
-	,moveTo: null
-	,closePath: null
-	,beginPath: null
-	,strokeRect: null
-	,fillRect: null
-	,clear: null
-	,setLineWidth: null
-	,setColor: null
-	,setHeight: null
-	,getHeight: null
-	,setWidth: null
-	,getWidth: null
-	,__class__: alphatab.platform.ICanvas
+	__class__: alphatab.platform.ICanvas
 }
 if(!alphatab.platform.js) alphatab.platform.js = {}
 alphatab.platform.js.Html5Canvas = function(dom) {
@@ -471,14 +380,11 @@ alphatab.platform.js.Html5Canvas = function(dom) {
 	this._context = dom.getContext("2d");
 	this._context.textBaseline = "top";
 };
-alphatab.platform.js.Html5Canvas.__name__ = ["alphatab","platform","js","Html5Canvas"];
+alphatab.platform.js.Html5Canvas.__name__ = true;
 alphatab.platform.js.Html5Canvas.__interfaces__ = [alphatab.platform.ICanvas];
 alphatab.platform.js.Html5Canvas.prototype = {
 	measureText: function(text) {
 		return this._context.measureText(text).width;
-	}
-	,strokeText: function(text,x,y) {
-		this._context.strokeText(text,x,y);
 	}
 	,fillText: function(text,x,y) {
 		this._context.fillText(text,x,y);
@@ -610,10 +516,6 @@ alphatab.platform.js.Html5Canvas.prototype = {
 	,getWidth: function() {
 		return this._canvas.width;
 	}
-	,_height: null
-	,_width: null
-	,_context: null
-	,_canvas: null
 	,__class__: alphatab.platform.js.Html5Canvas
 }
 if(!alphatab.platform.svg) alphatab.platform.svg = {}
@@ -629,7 +531,7 @@ alphatab.platform.svg.SvgCanvas = function() {
 	this._textAlign = alphatab.platform.model.TextAlign.Left;
 	this._textBaseline = alphatab.model.TextBaseline.Default;
 };
-alphatab.platform.svg.SvgCanvas.__name__ = ["alphatab","platform","svg","SvgCanvas"];
+alphatab.platform.svg.SvgCanvas.__name__ = true;
 alphatab.platform.svg.SvgCanvas.__interfaces__ = [alphatab.platform.ICanvas];
 alphatab.platform.svg.SvgCanvas.prototype = {
 	measureText: function(text) {
@@ -665,26 +567,6 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 			return "end";
 		}
 	}
-	,strokeText: function(text,x,y) {
-		this._buffer.b += "<text x=\"";
-		this._buffer.b += Std.string(x);
-		this._buffer.b += "\" y=\"";
-		this._buffer.b += Std.string(y);
-		this._buffer.b += "\" style=\"font:";
-		this._buffer.b += Std.string(this._font.toCssString());
-		this._buffer.b += "\" stroke:";
-		this._buffer.b += Std.string(this._color.toRgbaString());
-		this._buffer.b += "; stroke-width:";
-		this._buffer.b += Std.string(this._lineWidth);
-		this._buffer.b += ";\" ";
-		this._buffer.b += " dominant-baseline=\"";
-		this._buffer.b += "middle";
-		this._buffer.b += "\" text-anchor=\"";
-		this._buffer.b += Std.string(this.getSvgTextAlignment());
-		this._buffer.b += "\">\n";
-		this._buffer.b += Std.string(text);
-		this._buffer.b += "</text>\n";
-	}
 	,fillText: function(text,x,y) {
 		this._buffer.b += "<text x=\"";
 		this._buffer.b += Std.string(x);
@@ -709,18 +591,15 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 	,getTextBaseline: function() {
 		return this._textBaseline;
 	}
-	,_textBaseline: null
 	,setTextAlign: function(textAlign) {
 		this._textAlign = textAlign;
 	}
 	,getTextAlign: function() {
 		return this._textAlign;
 	}
-	,_textAlign: null
 	,setFont: function(font) {
 		this._font = font;
 	}
-	,_font: null
 	,stroke: function() {
 		var path = this._currentPath.b;
 		if(!this._currentPathIsEmpty) {
@@ -863,11 +742,9 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 	,setLineWidth: function(value) {
 		this._lineWidth = value;
 	}
-	,_lineWidth: null
 	,setColor: function(color) {
 		this._color = color;
 	}
-	,_color: null
 	,setHeight: function(height) {
 		this._height = height;
 	}
@@ -903,11 +780,6 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 		stream.writeString(this._buffer.b);
 		if(includeWrapper) stream.writeString("</svg>");
 	}
-	,_height: null
-	,_width: null
-	,_currentPathIsEmpty: null
-	,_currentPath: null
-	,_buffer: null
 	,__class__: alphatab.platform.svg.SvgCanvas
 }
 if(!alphatab.platform.model) alphatab.platform.model = {}
@@ -916,7 +788,7 @@ alphatab.platform.model.Color = function(r,g,b,a) {
 	this._higherBits = (a & 255) << 8 | r & 255;
 	this._lowerBits = (g & 255) << 8 | b & 255;
 };
-alphatab.platform.model.Color.__name__ = ["alphatab","platform","model","Color"];
+alphatab.platform.model.Color.__name__ = true;
 alphatab.platform.model.Color.prototype = {
 	toRgbaString: function() {
 		return "rgba(" + this.getR() + "," + this.getG() + "," + this.getB() + "," + this.getA() / 255.0 + ")";
@@ -936,8 +808,6 @@ alphatab.platform.model.Color.prototype = {
 	,getA: function() {
 		return this._higherBits >> 8 & 255;
 	}
-	,_higherBits: null
-	,_lowerBits: null
 	,__class__: alphatab.platform.model.Color
 }
 alphatab.platform.model.Font = function(family,size,style) {
@@ -946,7 +816,7 @@ alphatab.platform.model.Font = function(family,size,style) {
 	this._size = size;
 	this._style = style;
 };
-alphatab.platform.model.Font.__name__ = ["alphatab","platform","model","Font"];
+alphatab.platform.model.Font.__name__ = true;
 alphatab.platform.model.Font.prototype = {
 	toCssString: function() {
 		var buf = new StringBuf();
@@ -986,9 +856,6 @@ alphatab.platform.model.Font.prototype = {
 	,getFamily: function() {
 		return this._family;
 	}
-	,_style: null
-	,_size: null
-	,_family: null
 	,__class__: alphatab.platform.model.Font
 }
 alphatab.platform.model.TextAlign = { __ename__ : true, __constructs__ : ["Left","Center","Right"] }
@@ -1016,15 +883,13 @@ alphatab.model.TextBaseline.Bottom = ["Bottom",3];
 alphatab.model.TextBaseline.Bottom.toString = $estr;
 alphatab.model.TextBaseline.Bottom.__enum__ = alphatab.model.TextBaseline;
 alphatab.platform.IFileLoader = function() { }
-alphatab.platform.IFileLoader.__name__ = ["alphatab","platform","IFileLoader"];
+alphatab.platform.IFileLoader.__name__ = true;
 alphatab.platform.IFileLoader.prototype = {
-	loadBinaryAsync: null
-	,loadBinary: null
-	,__class__: alphatab.platform.IFileLoader
+	__class__: alphatab.platform.IFileLoader
 }
 alphatab.platform.js.JsFileLoader = function() {
 };
-alphatab.platform.js.JsFileLoader.__name__ = ["alphatab","platform","js","JsFileLoader"];
+alphatab.platform.js.JsFileLoader.__name__ = true;
 alphatab.platform.js.JsFileLoader.__interfaces__ = [alphatab.platform.IFileLoader];
 alphatab.platform.js.JsFileLoader.isIE = function() {
 	var agent = navigator.userAgent;
@@ -1097,7 +962,7 @@ if(!alphatab.rendering.layout) alphatab.rendering.layout = {}
 alphatab.rendering.layout.ScoreLayout = function(renderer) {
 	this.renderer = renderer;
 };
-alphatab.rendering.layout.ScoreLayout.__name__ = ["alphatab","rendering","layout","ScoreLayout"];
+alphatab.rendering.layout.ScoreLayout.__name__ = true;
 alphatab.rendering.layout.ScoreLayout.prototype = {
 	createEmptyStaveGroup: function() {
 		var group = new alphatab.rendering.staves.StaveGroup();
@@ -1114,16 +979,13 @@ alphatab.rendering.layout.ScoreLayout.prototype = {
 	}
 	,doLayout: function() {
 	}
-	,height: null
-	,width: null
-	,renderer: null
 	,__class__: alphatab.rendering.layout.ScoreLayout
 }
 alphatab.rendering.layout.PageViewLayout = function(renderer) {
 	alphatab.rendering.layout.ScoreLayout.call(this,renderer);
 	this._groups = new Array();
 };
-alphatab.rendering.layout.PageViewLayout.__name__ = ["alphatab","rendering","layout","PageViewLayout"];
+alphatab.rendering.layout.PageViewLayout.__name__ = true;
 alphatab.rendering.layout.PageViewLayout.__super__ = alphatab.rendering.layout.ScoreLayout;
 alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.layout.ScoreLayout.prototype,{
 	getSheetWidth: function() {
@@ -1304,13 +1166,12 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 		this.height = y + alphatab.rendering.layout.PageViewLayout.PagePadding[3];
 		this.width = 795 * this.renderer.scale | 0;
 	}
-	,_groups: null
 	,__class__: alphatab.rendering.layout.PageViewLayout
 });
 alphatab.rendering.layout.HorizontalScreenLayout = function(renderer) {
 	alphatab.rendering.layout.ScoreLayout.call(this,renderer);
 };
-alphatab.rendering.layout.HorizontalScreenLayout.__name__ = ["alphatab","rendering","layout","HorizontalScreenLayout"];
+alphatab.rendering.layout.HorizontalScreenLayout.__name__ = true;
 alphatab.rendering.layout.HorizontalScreenLayout.__super__ = alphatab.rendering.layout.ScoreLayout;
 alphatab.rendering.layout.HorizontalScreenLayout.prototype = $extend(alphatab.rendering.layout.ScoreLayout.prototype,{
 	paintScore: function() {
@@ -1340,23 +1201,17 @@ alphatab.rendering.layout.HorizontalScreenLayout.prototype = $extend(alphatab.re
 		this.height = y + alphatab.rendering.layout.HorizontalScreenLayout.PagePadding[3];
 		this.width = this._group.x + this._group.width + alphatab.rendering.layout.HorizontalScreenLayout.PagePadding[2];
 	}
-	,_group: null
 	,__class__: alphatab.rendering.layout.HorizontalScreenLayout
 });
 alphatab.rendering.IEffectBarRendererInfo = function() { }
-alphatab.rendering.IEffectBarRendererInfo.__name__ = ["alphatab","rendering","IEffectBarRendererInfo"];
+alphatab.rendering.IEffectBarRendererInfo.__name__ = true;
 alphatab.rendering.IEffectBarRendererInfo.prototype = {
-	canExpand: null
-	,createNewGlyph: null
-	,getHeight: null
-	,getSizingMode: null
-	,shouldCreateGlyph: null
-	,__class__: alphatab.rendering.IEffectBarRendererInfo
+	__class__: alphatab.rendering.IEffectBarRendererInfo
 }
 if(!alphatab.rendering.effects) alphatab.rendering.effects = {}
 alphatab.rendering.effects.MarkerEffectInfo = function() {
 };
-alphatab.rendering.effects.MarkerEffectInfo.__name__ = ["alphatab","rendering","effects","MarkerEffectInfo"];
+alphatab.rendering.effects.MarkerEffectInfo.__name__ = true;
 alphatab.rendering.effects.MarkerEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.MarkerEffectInfo.prototype = {
 	createNewGlyph: function(renderer,beat) {
@@ -1379,12 +1234,11 @@ alphatab.rendering.effects.MarkerEffectInfo.prototype = {
 alphatab.rendering.BarRendererFactory = function() {
 	this.isInAccolade = true;
 };
-alphatab.rendering.BarRendererFactory.__name__ = ["alphatab","rendering","BarRendererFactory"];
+alphatab.rendering.BarRendererFactory.__name__ = true;
 alphatab.rendering.BarRendererFactory.prototype = {
 	create: function(bar) {
 		return null;
 	}
-	,isInAccolade: null
 	,__class__: alphatab.rendering.BarRendererFactory
 }
 alphatab.rendering.EffectBarRendererFactory = function(info) {
@@ -1392,18 +1246,17 @@ alphatab.rendering.EffectBarRendererFactory = function(info) {
 	this.isInAccolade = false;
 	this._info = info;
 };
-alphatab.rendering.EffectBarRendererFactory.__name__ = ["alphatab","rendering","EffectBarRendererFactory"];
+alphatab.rendering.EffectBarRendererFactory.__name__ = true;
 alphatab.rendering.EffectBarRendererFactory.__super__ = alphatab.rendering.BarRendererFactory;
 alphatab.rendering.EffectBarRendererFactory.prototype = $extend(alphatab.rendering.BarRendererFactory.prototype,{
 	create: function(bar) {
 		return new alphatab.rendering.EffectBarRenderer(bar,this._info);
 	}
-	,_info: null
 	,__class__: alphatab.rendering.EffectBarRendererFactory
 });
 alphatab.rendering.effects.TripletFeelEffectInfo = function() {
 };
-alphatab.rendering.effects.TripletFeelEffectInfo.__name__ = ["alphatab","rendering","effects","TripletFeelEffectInfo"];
+alphatab.rendering.effects.TripletFeelEffectInfo.__name__ = true;
 alphatab.rendering.effects.TripletFeelEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.TripletFeelEffectInfo.prototype = {
 	createNewGlyph: function(renderer,beat) {
@@ -1425,7 +1278,7 @@ alphatab.rendering.effects.TripletFeelEffectInfo.prototype = {
 }
 alphatab.rendering.effects.TempoEffectInfo = function() {
 };
-alphatab.rendering.effects.TempoEffectInfo.__name__ = ["alphatab","rendering","effects","TempoEffectInfo"];
+alphatab.rendering.effects.TempoEffectInfo.__name__ = true;
 alphatab.rendering.effects.TempoEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.TempoEffectInfo.prototype = {
 	createNewGlyph: function(renderer,beat) {
@@ -1449,7 +1302,7 @@ alphatab.rendering.effects.TempoEffectInfo.prototype = {
 }
 alphatab.rendering.effects.TextEffectInfo = function() {
 };
-alphatab.rendering.effects.TextEffectInfo.__name__ = ["alphatab","rendering","effects","TextEffectInfo"];
+alphatab.rendering.effects.TextEffectInfo.__name__ = true;
 alphatab.rendering.effects.TextEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.TextEffectInfo.prototype = {
 	createNewGlyph: function(renderer,beat) {
@@ -1471,7 +1324,7 @@ alphatab.rendering.effects.TextEffectInfo.prototype = {
 }
 alphatab.rendering.effects.ChordsEffectInfo = function() {
 };
-alphatab.rendering.effects.ChordsEffectInfo.__name__ = ["alphatab","rendering","effects","ChordsEffectInfo"];
+alphatab.rendering.effects.ChordsEffectInfo.__name__ = true;
 alphatab.rendering.effects.ChordsEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.ChordsEffectInfo.prototype = {
 	createNewGlyph: function(renderer,beat) {
@@ -1493,7 +1346,7 @@ alphatab.rendering.effects.ChordsEffectInfo.prototype = {
 }
 alphatab.rendering.effects.NoteEffectInfoBase = function() {
 };
-alphatab.rendering.effects.NoteEffectInfoBase.__name__ = ["alphatab","rendering","effects","NoteEffectInfoBase"];
+alphatab.rendering.effects.NoteEffectInfoBase.__name__ = true;
 alphatab.rendering.effects.NoteEffectInfoBase.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.NoteEffectInfoBase.prototype = {
 	createNewGlyph: function(renderer,beat) {
@@ -1521,13 +1374,12 @@ alphatab.rendering.effects.NoteEffectInfoBase.prototype = {
 		}
 		return this._lastCreateInfo.length > 0;
 	}
-	,_lastCreateInfo: null
 	,__class__: alphatab.rendering.effects.NoteEffectInfoBase
 }
 alphatab.rendering.effects.TrillEffectInfo = function() {
 	alphatab.rendering.effects.NoteEffectInfoBase.call(this);
 };
-alphatab.rendering.effects.TrillEffectInfo.__name__ = ["alphatab","rendering","effects","TrillEffectInfo"];
+alphatab.rendering.effects.TrillEffectInfo.__name__ = true;
 alphatab.rendering.effects.TrillEffectInfo.__super__ = alphatab.rendering.effects.NoteEffectInfoBase;
 alphatab.rendering.effects.TrillEffectInfo.prototype = $extend(alphatab.rendering.effects.NoteEffectInfoBase.prototype,{
 	createNewGlyph: function(renderer,beat) {
@@ -1546,7 +1398,7 @@ alphatab.rendering.effects.TrillEffectInfo.prototype = $extend(alphatab.renderin
 });
 alphatab.rendering.effects.BeatVibratoEffectInfo = function() {
 };
-alphatab.rendering.effects.BeatVibratoEffectInfo.__name__ = ["alphatab","rendering","effects","BeatVibratoEffectInfo"];
+alphatab.rendering.effects.BeatVibratoEffectInfo.__name__ = true;
 alphatab.rendering.effects.BeatVibratoEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.BeatVibratoEffectInfo.prototype = {
 	createNewGlyph: function(renderer,beat) {
@@ -1569,7 +1421,7 @@ alphatab.rendering.effects.BeatVibratoEffectInfo.prototype = {
 alphatab.rendering.effects.NoteVibratoEffectInfo = function() {
 	alphatab.rendering.effects.NoteEffectInfoBase.call(this);
 };
-alphatab.rendering.effects.NoteVibratoEffectInfo.__name__ = ["alphatab","rendering","effects","NoteVibratoEffectInfo"];
+alphatab.rendering.effects.NoteVibratoEffectInfo.__name__ = true;
 alphatab.rendering.effects.NoteVibratoEffectInfo.__super__ = alphatab.rendering.effects.NoteEffectInfoBase;
 alphatab.rendering.effects.NoteVibratoEffectInfo.prototype = $extend(alphatab.rendering.effects.NoteEffectInfoBase.prototype,{
 	createNewGlyph: function(renderer,beat) {
@@ -1590,7 +1442,7 @@ alphatab.rendering.AlternateEndingsBarRendererFactory = function() {
 	alphatab.rendering.BarRendererFactory.call(this);
 	this.isInAccolade = false;
 };
-alphatab.rendering.AlternateEndingsBarRendererFactory.__name__ = ["alphatab","rendering","AlternateEndingsBarRendererFactory"];
+alphatab.rendering.AlternateEndingsBarRendererFactory.__name__ = true;
 alphatab.rendering.AlternateEndingsBarRendererFactory.__super__ = alphatab.rendering.BarRendererFactory;
 alphatab.rendering.AlternateEndingsBarRendererFactory.prototype = $extend(alphatab.rendering.BarRendererFactory.prototype,{
 	create: function(bar) {
@@ -1601,7 +1453,7 @@ alphatab.rendering.AlternateEndingsBarRendererFactory.prototype = $extend(alphat
 alphatab.rendering.ScoreBarRendererFactory = function() {
 	alphatab.rendering.BarRendererFactory.call(this);
 };
-alphatab.rendering.ScoreBarRendererFactory.__name__ = ["alphatab","rendering","ScoreBarRendererFactory"];
+alphatab.rendering.ScoreBarRendererFactory.__name__ = true;
 alphatab.rendering.ScoreBarRendererFactory.__super__ = alphatab.rendering.BarRendererFactory;
 alphatab.rendering.ScoreBarRendererFactory.prototype = $extend(alphatab.rendering.BarRendererFactory.prototype,{
 	create: function(bar) {
@@ -1611,7 +1463,7 @@ alphatab.rendering.ScoreBarRendererFactory.prototype = $extend(alphatab.renderin
 });
 alphatab.rendering.effects.CrescendoEffectInfo = function() {
 };
-alphatab.rendering.effects.CrescendoEffectInfo.__name__ = ["alphatab","rendering","effects","CrescendoEffectInfo"];
+alphatab.rendering.effects.CrescendoEffectInfo.__name__ = true;
 alphatab.rendering.effects.CrescendoEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.CrescendoEffectInfo.prototype = {
 	createNewGlyph: function(renderer,beat) {
@@ -1633,7 +1485,7 @@ alphatab.rendering.effects.CrescendoEffectInfo.prototype = {
 }
 alphatab.rendering.effects.DynamicsEffectInfo = function() {
 };
-alphatab.rendering.effects.DynamicsEffectInfo.__name__ = ["alphatab","rendering","effects","DynamicsEffectInfo"];
+alphatab.rendering.effects.DynamicsEffectInfo.__name__ = true;
 alphatab.rendering.effects.DynamicsEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.DynamicsEffectInfo.prototype = {
 	createNewGlyph: function(renderer,beat) {
@@ -1655,7 +1507,7 @@ alphatab.rendering.effects.DynamicsEffectInfo.prototype = {
 }
 alphatab.rendering.effects.TapEffectInfo = function() {
 };
-alphatab.rendering.effects.TapEffectInfo.__name__ = ["alphatab","rendering","effects","TapEffectInfo"];
+alphatab.rendering.effects.TapEffectInfo.__name__ = true;
 alphatab.rendering.effects.TapEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.TapEffectInfo.prototype = {
 	createNewGlyph: function(renderer,beat) {
@@ -1680,7 +1532,7 @@ alphatab.rendering.effects.TapEffectInfo.prototype = {
 }
 alphatab.rendering.effects.FadeInEffectInfo = function() {
 };
-alphatab.rendering.effects.FadeInEffectInfo.__name__ = ["alphatab","rendering","effects","FadeInEffectInfo"];
+alphatab.rendering.effects.FadeInEffectInfo.__name__ = true;
 alphatab.rendering.effects.FadeInEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.FadeInEffectInfo.prototype = {
 	createNewGlyph: function(renderer,beat) {
@@ -1703,7 +1555,7 @@ alphatab.rendering.effects.FadeInEffectInfo.prototype = {
 alphatab.rendering.effects.LetRingEffectInfo = function() {
 	alphatab.rendering.effects.NoteEffectInfoBase.call(this);
 };
-alphatab.rendering.effects.LetRingEffectInfo.__name__ = ["alphatab","rendering","effects","LetRingEffectInfo"];
+alphatab.rendering.effects.LetRingEffectInfo.__name__ = true;
 alphatab.rendering.effects.LetRingEffectInfo.__super__ = alphatab.rendering.effects.NoteEffectInfoBase;
 alphatab.rendering.effects.LetRingEffectInfo.prototype = $extend(alphatab.rendering.effects.NoteEffectInfoBase.prototype,{
 	createNewGlyph: function(renderer,beat) {
@@ -1723,7 +1575,7 @@ alphatab.rendering.effects.LetRingEffectInfo.prototype = $extend(alphatab.render
 alphatab.rendering.effects.PalmMuteEffectInfo = function() {
 	alphatab.rendering.effects.NoteEffectInfoBase.call(this);
 };
-alphatab.rendering.effects.PalmMuteEffectInfo.__name__ = ["alphatab","rendering","effects","PalmMuteEffectInfo"];
+alphatab.rendering.effects.PalmMuteEffectInfo.__name__ = true;
 alphatab.rendering.effects.PalmMuteEffectInfo.__super__ = alphatab.rendering.effects.NoteEffectInfoBase;
 alphatab.rendering.effects.PalmMuteEffectInfo.prototype = $extend(alphatab.rendering.effects.NoteEffectInfoBase.prototype,{
 	createNewGlyph: function(renderer,beat) {
@@ -1743,7 +1595,7 @@ alphatab.rendering.effects.PalmMuteEffectInfo.prototype = $extend(alphatab.rende
 alphatab.rendering.TabBarRendererFactory = function() {
 	alphatab.rendering.BarRendererFactory.call(this);
 };
-alphatab.rendering.TabBarRendererFactory.__name__ = ["alphatab","rendering","TabBarRendererFactory"];
+alphatab.rendering.TabBarRendererFactory.__name__ = true;
 alphatab.rendering.TabBarRendererFactory.__super__ = alphatab.rendering.BarRendererFactory;
 alphatab.rendering.TabBarRendererFactory.prototype = $extend(alphatab.rendering.BarRendererFactory.prototype,{
 	create: function(bar) {
@@ -1753,7 +1605,7 @@ alphatab.rendering.TabBarRendererFactory.prototype = $extend(alphatab.rendering.
 });
 alphatab.rendering.effects.PickStrokeEffectInfo = function() {
 };
-alphatab.rendering.effects.PickStrokeEffectInfo.__name__ = ["alphatab","rendering","effects","PickStrokeEffectInfo"];
+alphatab.rendering.effects.PickStrokeEffectInfo.__name__ = true;
 alphatab.rendering.effects.PickStrokeEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.PickStrokeEffectInfo.prototype = {
 	createNewGlyph: function(renderer,beat) {
@@ -1774,14 +1626,14 @@ alphatab.rendering.effects.PickStrokeEffectInfo.prototype = {
 	,__class__: alphatab.rendering.effects.PickStrokeEffectInfo
 }
 alphatab.Environment = function() { }
-alphatab.Environment.__name__ = ["alphatab","Environment"];
+alphatab.Environment.__name__ = true;
 alphatab.Main = function() { }
-alphatab.Main.__name__ = ["alphatab","Main"];
+alphatab.Main.__name__ = true;
 alphatab.Main.main = function() {
 }
 alphatab.Settings = function() {
 };
-alphatab.Settings.__name__ = ["alphatab","Settings"];
+alphatab.Settings.__name__ = true;
 alphatab.Settings.defaults = function() {
 	var settings = new alphatab.Settings();
 	settings.scale = 1.0;
@@ -1859,19 +1711,12 @@ alphatab.Settings.fromJson = function(json) {
 	return settings;
 }
 alphatab.Settings.prototype = {
-	staves: null
-	,layout: null
-	,engine: null
-	,height: null
-	,width: null
-	,autoSize: null
-	,scale: null
-	,__class__: alphatab.Settings
+	__class__: alphatab.Settings
 }
 alphatab.LayoutSettings = function() {
 	this.additionalSettings = new haxe.ds.StringMap();
 };
-alphatab.LayoutSettings.__name__ = ["alphatab","LayoutSettings"];
+alphatab.LayoutSettings.__name__ = true;
 alphatab.LayoutSettings.defaults = function() {
 	var settings = new alphatab.LayoutSettings();
 	settings.mode = "page";
@@ -1882,23 +1727,19 @@ alphatab.LayoutSettings.prototype = {
 		if(this.additionalSettings.exists(key)) return this.additionalSettings.get(key);
 		return def;
 	}
-	,additionalSettings: null
-	,mode: null
 	,__class__: alphatab.LayoutSettings
 }
 alphatab.StaveSettings = function(id) {
 	this.id = id;
 	this.additionalSettings = new haxe.ds.StringMap();
 };
-alphatab.StaveSettings.__name__ = ["alphatab","StaveSettings"];
+alphatab.StaveSettings.__name__ = true;
 alphatab.StaveSettings.prototype = {
-	additionalSettings: null
-	,id: null
-	,__class__: alphatab.StaveSettings
+	__class__: alphatab.StaveSettings
 }
 if(!alphatab.audio) alphatab.audio = {}
 alphatab.audio.GeneralMidi = function() { }
-alphatab.audio.GeneralMidi.__name__ = ["alphatab","audio","GeneralMidi"];
+alphatab.audio.GeneralMidi.__name__ = true;
 alphatab.audio.GeneralMidi.getValue = function(name) {
 	if(alphatab.audio.GeneralMidi._values == null) {
 		alphatab.audio.GeneralMidi._values = new haxe.ds.StringMap();
@@ -2035,7 +1876,7 @@ alphatab.audio.GeneralMidi.getValue = function(name) {
 	return alphatab.audio.GeneralMidi._values.exists(name)?alphatab.audio.GeneralMidi._values.get(name):0;
 }
 alphatab.audio.MidiUtils = function() { }
-alphatab.audio.MidiUtils.__name__ = ["alphatab","audio","MidiUtils"];
+alphatab.audio.MidiUtils.__name__ = true;
 alphatab.audio.MidiUtils.durationToTicks = function(value) {
 	return alphatab.audio.MidiUtils.valueToTicks(alphatab.model.ModelUtils.getDurationValue(value));
 }
@@ -2062,7 +1903,7 @@ alphatab.audio.generator.MidiFileGenerator = function(score) {
 	this._midiFile.infoTrack = this._midiFile.tracks.length - 2;
 	this._midiFile.metronomeTrack = this._midiFile.tracks.length - 1;
 };
-alphatab.audio.generator.MidiFileGenerator.__name__ = ["alphatab","audio","generator","MidiFileGenerator"];
+alphatab.audio.generator.MidiFileGenerator.__name__ = true;
 alphatab.audio.generator.MidiFileGenerator.prototype = {
 	generateAutomation: function(beat,automation,startMove) {
 		switch( (automation.type)[1] ) {
@@ -2320,16 +2161,12 @@ alphatab.audio.generator.MidiFileGenerator.prototype = {
 			previousMasterBar = this._score.masterBars[controller.index];
 		}
 	}
-	,_currentTempo: null
-	,_handler: null
-	,_midiFile: null
-	,_score: null
 	,__class__: alphatab.audio.generator.MidiFileGenerator
 }
 alphatab.audio.generator.MidiFileHandler = function(midiFile) {
 	this._midiFile = midiFile;
 };
-alphatab.audio.generator.MidiFileHandler.__name__ = ["alphatab","audio","generator","MidiFileHandler"];
+alphatab.audio.generator.MidiFileHandler.__name__ = true;
 alphatab.audio.generator.MidiFileHandler.prototype = {
 	addTempo: function(tick,tempo) {
 	}
@@ -2343,7 +2180,6 @@ alphatab.audio.generator.MidiFileHandler.prototype = {
 	}
 	,addTimeSignature: function(tick,timeSignatureNumerator,timeSignatureDenominator) {
 	}
-	,_midiFile: null
 	,__class__: alphatab.audio.generator.MidiFileHandler
 }
 alphatab.audio.generator.MidiPlaybackController = function(score) {
@@ -2352,7 +2188,7 @@ alphatab.audio.generator.MidiPlaybackController = function(score) {
 	this.repeatMove = 0;
 	this.index = 0;
 };
-alphatab.audio.generator.MidiPlaybackController.__name__ = ["alphatab","audio","generator","MidiPlaybackController"];
+alphatab.audio.generator.MidiPlaybackController.__name__ = true;
 alphatab.audio.generator.MidiPlaybackController.prototype = {
 	process: function() {
 		var masterBar = this._score.masterBars[this.index];
@@ -2400,36 +2236,21 @@ alphatab.audio.generator.MidiPlaybackController.prototype = {
 	,finished: function() {
 		return this.index >= this._score.masterBars.length;
 	}
-	,index: null
-	,repeatMove: null
-	,shouldPlay: null
-	,_repeatOpen: null
-	,_repeatEnd: null
-	,_repeatNumber: null
-	,_repeatStartIndex: null
-	,_repeatStart: null
-	,_repeatAlternative: null
-	,_lastIndex: null
-	,_score: null
 	,__class__: alphatab.audio.generator.MidiPlaybackController
 }
 if(!alphatab.audio.model) alphatab.audio.model = {}
 alphatab.audio.model.MidiEvent = function() {
 };
-alphatab.audio.model.MidiEvent.__name__ = ["alphatab","audio","model","MidiEvent"];
+alphatab.audio.model.MidiEvent.__name__ = true;
 alphatab.audio.model.MidiEvent.prototype = {
 	getDeltaTicks: function() {
 		return this.previousEvent == null?0:this.tick - this.previousEvent.tick;
 	}
-	,previousEvent: null
-	,nextEvent: null
-	,tick: null
-	,track: null
 	,__class__: alphatab.audio.model.MidiEvent
 }
 alphatab.audio.model.MidiFile = function() {
 };
-alphatab.audio.model.MidiFile.__name__ = ["alphatab","audio","model","MidiFile"];
+alphatab.audio.model.MidiFile.__name__ = true;
 alphatab.audio.model.MidiFile.prototype = {
 	createTrack: function() {
 		var track = new alphatab.audio.model.MidiTrack();
@@ -2438,14 +2259,11 @@ alphatab.audio.model.MidiFile.prototype = {
 		this.tracks.push(track);
 		return track;
 	}
-	,metronomeTrack: null
-	,infoTrack: null
-	,tracks: null
 	,__class__: alphatab.audio.model.MidiFile
 }
 alphatab.audio.model.MidiTrack = function() {
 };
-alphatab.audio.model.MidiTrack.__name__ = ["alphatab","audio","model","MidiTrack"];
+alphatab.audio.model.MidiTrack.__name__ = true;
 alphatab.audio.model.MidiTrack.prototype = {
 	addEvent: function(event) {
 		event.track = this;
@@ -2484,16 +2302,12 @@ alphatab.audio.model.MidiTrack.prototype = {
 			}
 		}
 	}
-	,lastEvent: null
-	,firstEvent: null
-	,file: null
-	,index: null
 	,__class__: alphatab.audio.model.MidiTrack
 }
 if(!alphatab.importer) alphatab.importer = {}
 alphatab.importer.ScoreImporter = function() {
 };
-alphatab.importer.ScoreImporter.__name__ = ["alphatab","importer","ScoreImporter"];
+alphatab.importer.ScoreImporter.__name__ = true;
 alphatab.importer.ScoreImporter.availableImporters = function() {
 	var scoreImporter = new Array();
 	scoreImporter.push(new alphatab.importer.Gp3To5Importer());
@@ -2586,13 +2400,12 @@ alphatab.importer.ScoreImporter.prototype = {
 	,init: function(data) {
 		this._data = data;
 	}
-	,_data: null
 	,__class__: alphatab.importer.ScoreImporter
 }
 alphatab.importer.AlphaTexImporter = function() {
 	alphatab.importer.ScoreImporter.call(this);
 };
-alphatab.importer.AlphaTexImporter.__name__ = ["alphatab","importer","AlphaTexImporter"];
+alphatab.importer.AlphaTexImporter.__name__ = true;
 alphatab.importer.AlphaTexImporter.isLetter = function(ch) {
 	var code = HxOverrides.cca(ch,0);
 	return !alphatab.importer.AlphaTexImporter.isTerminal(ch) && (code >= 33 && code <= 47 || code >= 58 && code <= 126 || code > 128);
@@ -3239,18 +3052,10 @@ alphatab.importer.AlphaTexImporter.prototype = $extend(alphatab.importer.ScoreIm
 			this.finish(this._score);
 			return this._score;
 		} catch( e ) {
-			haxe.Log.trace(e,{ fileName : "AlphaTexImporter.hx", lineNumber : 85, className : "alphatab.importer.AlphaTexImporter", methodName : "readScore"});
+			console.log(e);
 			throw alphatab.importer.ScoreImporter.UnsupportedFormat;
 		}
 	}
-	,_currentDuration: null
-	,_allowNegatives: null
-	,_syData: null
-	,_sy: null
-	,_curChPos: null
-	,_ch: null
-	,_track: null
-	,_score: null
 	,__class__: alphatab.importer.AlphaTexImporter
 });
 alphatab.importer.AlphaTexSymbols = { __ename__ : true, __constructs__ : ["No","Eof","Number","DoubleDot","Dot","String","Tuning","LParensis","RParensis","LBrace","RBrace","Pipe","MetaCommand","Multiply"] }
@@ -3296,403 +3101,11 @@ alphatab.importer.AlphaTexSymbols.MetaCommand.__enum__ = alphatab.importer.Alpha
 alphatab.importer.AlphaTexSymbols.Multiply = ["Multiply",13];
 alphatab.importer.AlphaTexSymbols.Multiply.toString = $estr;
 alphatab.importer.AlphaTexSymbols.Multiply.__enum__ = alphatab.importer.AlphaTexSymbols;
-if(!haxe.unit) haxe.unit = {}
-haxe.unit.TestCase = function() {
-};
-haxe.unit.TestCase.__name__ = ["haxe","unit","TestCase"];
-haxe.unit.TestCase.prototype = {
-	assertEquals: function(expected,actual,c) {
-		this.currentTest.done = true;
-		if(actual != expected) {
-			this.currentTest.success = false;
-			this.currentTest.error = "expected '" + Std.string(expected) + "' but was '" + Std.string(actual) + "'";
-			this.currentTest.posInfos = c;
-			throw this.currentTest;
-		}
-	}
-	,assertFalse: function(b,c) {
-		this.currentTest.done = true;
-		if(b == true) {
-			this.currentTest.success = false;
-			this.currentTest.error = "expected false but was true";
-			this.currentTest.posInfos = c;
-			throw this.currentTest;
-		}
-	}
-	,assertTrue: function(b,c) {
-		this.currentTest.done = true;
-		if(b == false) {
-			this.currentTest.success = false;
-			this.currentTest.error = "expected true but was false";
-			this.currentTest.posInfos = c;
-			throw this.currentTest;
-		}
-	}
-	,print: function(v) {
-		haxe.unit.TestRunner.print(v);
-	}
-	,tearDown: function() {
-	}
-	,setup: function() {
-	}
-	,currentTest: null
-	,__class__: haxe.unit.TestCase
-}
-alphatab.importer.GpImporterTestBase = function() {
-	haxe.unit.TestCase.call(this);
-};
-alphatab.importer.GpImporterTestBase.__name__ = ["alphatab","importer","GpImporterTestBase"];
-alphatab.importer.GpImporterTestBase.__super__ = haxe.unit.TestCase;
-alphatab.importer.GpImporterTestBase.prototype = $extend(haxe.unit.TestCase.prototype,{
-	checkEffects: function(score) {
-		this.assertTrue(true,{ fileName : "GpImporterTestBase.hx", lineNumber : 375, className : "alphatab.importer.GpImporterTestBase", methodName : "checkEffects"});
-	}
-	,checkRanges: function(score) {
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[0].notes[0].isPalmMute,{ fileName : "GpImporterTestBase.hx", lineNumber : 359, className : "alphatab.importer.GpImporterTestBase", methodName : "checkRanges"});
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[1].notes[0].isPalmMute,{ fileName : "GpImporterTestBase.hx", lineNumber : 360, className : "alphatab.importer.GpImporterTestBase", methodName : "checkRanges"});
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[2].notes[0].isPalmMute,{ fileName : "GpImporterTestBase.hx", lineNumber : 361, className : "alphatab.importer.GpImporterTestBase", methodName : "checkRanges"});
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[3].notes[0].isPalmMute,{ fileName : "GpImporterTestBase.hx", lineNumber : 362, className : "alphatab.importer.GpImporterTestBase", methodName : "checkRanges"});
-		this.assertTrue(score.tracks[0].bars[1].voices[0].beats[0].notes[0].isPalmMute,{ fileName : "GpImporterTestBase.hx", lineNumber : 363, className : "alphatab.importer.GpImporterTestBase", methodName : "checkRanges"});
-		this.assertTrue(score.tracks[0].bars[1].voices[0].beats[0].notes[0].isPalmMute,{ fileName : "GpImporterTestBase.hx", lineNumber : 364, className : "alphatab.importer.GpImporterTestBase", methodName : "checkRanges"});
-		this.assertTrue(score.tracks[0].bars[1].voices[0].beats[1].notes[0].isLetRing,{ fileName : "GpImporterTestBase.hx", lineNumber : 366, className : "alphatab.importer.GpImporterTestBase", methodName : "checkRanges"});
-		this.assertTrue(score.tracks[0].bars[1].voices[0].beats[2].notes[0].isLetRing,{ fileName : "GpImporterTestBase.hx", lineNumber : 367, className : "alphatab.importer.GpImporterTestBase", methodName : "checkRanges"});
-		this.assertTrue(score.tracks[0].bars[1].voices[0].beats[3].notes[0].isLetRing,{ fileName : "GpImporterTestBase.hx", lineNumber : 368, className : "alphatab.importer.GpImporterTestBase", methodName : "checkRanges"});
-		this.assertTrue(score.tracks[0].bars[2].voices[0].beats[0].notes[0].isLetRing,{ fileName : "GpImporterTestBase.hx", lineNumber : 369, className : "alphatab.importer.GpImporterTestBase", methodName : "checkRanges"});
-	}
-	,checkTuplets: function(score) {
-		this.assertEquals(3,score.tracks[0].bars[0].voices[0].beats[0].tupletNumerator,{ fileName : "GpImporterTestBase.hx", lineNumber : 346, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTuplets"});
-		this.assertEquals(3,score.tracks[0].bars[0].voices[0].beats[1].tupletNumerator,{ fileName : "GpImporterTestBase.hx", lineNumber : 347, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTuplets"});
-		this.assertEquals(3,score.tracks[0].bars[0].voices[0].beats[2].tupletNumerator,{ fileName : "GpImporterTestBase.hx", lineNumber : 348, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTuplets"});
-		this.assertEquals(5,score.tracks[0].bars[1].voices[0].beats[0].tupletNumerator,{ fileName : "GpImporterTestBase.hx", lineNumber : 350, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTuplets"});
-		this.assertEquals(5,score.tracks[0].bars[1].voices[0].beats[1].tupletNumerator,{ fileName : "GpImporterTestBase.hx", lineNumber : 351, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTuplets"});
-		this.assertEquals(5,score.tracks[0].bars[1].voices[0].beats[2].tupletNumerator,{ fileName : "GpImporterTestBase.hx", lineNumber : 352, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTuplets"});
-		this.assertEquals(5,score.tracks[0].bars[1].voices[0].beats[3].tupletNumerator,{ fileName : "GpImporterTestBase.hx", lineNumber : 353, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTuplets"});
-		this.assertEquals(5,score.tracks[0].bars[1].voices[0].beats[4].tupletNumerator,{ fileName : "GpImporterTestBase.hx", lineNumber : 354, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTuplets"});
-	}
-	,checkStroke: function(score) {
-		this.assertEquals(alphatab.model.BrushType.BrushDown,score.tracks[0].bars[0].voices[0].beats[0].brushType,{ fileName : "GpImporterTestBase.hx", lineNumber : 338, className : "alphatab.importer.GpImporterTestBase", methodName : "checkStroke"});
-		this.assertEquals(alphatab.model.BrushType.BrushUp,score.tracks[0].bars[0].voices[0].beats[1].brushType,{ fileName : "GpImporterTestBase.hx", lineNumber : 339, className : "alphatab.importer.GpImporterTestBase", methodName : "checkStroke"});
-		this.assertEquals(alphatab.model.PickStrokeType.Up,score.tracks[0].bars[0].voices[0].beats[2].pickStroke,{ fileName : "GpImporterTestBase.hx", lineNumber : 340, className : "alphatab.importer.GpImporterTestBase", methodName : "checkStroke"});
-		this.assertEquals(alphatab.model.PickStrokeType.Down,score.tracks[0].bars[0].voices[0].beats[3].pickStroke,{ fileName : "GpImporterTestBase.hx", lineNumber : 341, className : "alphatab.importer.GpImporterTestBase", methodName : "checkStroke"});
-	}
-	,checkFingering: function(score) {
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[0].notes[0].isFingering,{ fileName : "GpImporterTestBase.hx", lineNumber : 323, className : "alphatab.importer.GpImporterTestBase", methodName : "checkFingering"});
-		this.assertEquals(0,score.tracks[0].bars[0].voices[0].beats[0].notes[0].leftHandFinger,{ fileName : "GpImporterTestBase.hx", lineNumber : 324, className : "alphatab.importer.GpImporterTestBase", methodName : "checkFingering"});
-		this.assertEquals(1,score.tracks[0].bars[0].voices[0].beats[1].notes[0].leftHandFinger,{ fileName : "GpImporterTestBase.hx", lineNumber : 325, className : "alphatab.importer.GpImporterTestBase", methodName : "checkFingering"});
-		this.assertEquals(2,score.tracks[0].bars[0].voices[0].beats[2].notes[0].leftHandFinger,{ fileName : "GpImporterTestBase.hx", lineNumber : 326, className : "alphatab.importer.GpImporterTestBase", methodName : "checkFingering"});
-		this.assertEquals(3,score.tracks[0].bars[0].voices[0].beats[3].notes[0].leftHandFinger,{ fileName : "GpImporterTestBase.hx", lineNumber : 327, className : "alphatab.importer.GpImporterTestBase", methodName : "checkFingering"});
-		this.assertEquals(4,score.tracks[0].bars[0].voices[0].beats[4].notes[0].leftHandFinger,{ fileName : "GpImporterTestBase.hx", lineNumber : 328, className : "alphatab.importer.GpImporterTestBase", methodName : "checkFingering"});
-		this.assertEquals(0,score.tracks[0].bars[0].voices[0].beats[5].notes[0].rightHandFinger,{ fileName : "GpImporterTestBase.hx", lineNumber : 329, className : "alphatab.importer.GpImporterTestBase", methodName : "checkFingering"});
-		this.assertEquals(1,score.tracks[0].bars[0].voices[0].beats[6].notes[0].rightHandFinger,{ fileName : "GpImporterTestBase.hx", lineNumber : 330, className : "alphatab.importer.GpImporterTestBase", methodName : "checkFingering"});
-		this.assertEquals(2,score.tracks[0].bars[0].voices[0].beats[7].notes[0].rightHandFinger,{ fileName : "GpImporterTestBase.hx", lineNumber : 331, className : "alphatab.importer.GpImporterTestBase", methodName : "checkFingering"});
-		this.assertEquals(3,score.tracks[0].bars[0].voices[0].beats[8].notes[0].rightHandFinger,{ fileName : "GpImporterTestBase.hx", lineNumber : 332, className : "alphatab.importer.GpImporterTestBase", methodName : "checkFingering"});
-		this.assertEquals(4,score.tracks[0].bars[0].voices[0].beats[9].notes[0].rightHandFinger,{ fileName : "GpImporterTestBase.hx", lineNumber : 333, className : "alphatab.importer.GpImporterTestBase", methodName : "checkFingering"});
-	}
-	,checkOtherEffects: function(score) {
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[0].notes[0].isPalmMute,{ fileName : "GpImporterTestBase.hx", lineNumber : 303, className : "alphatab.importer.GpImporterTestBase", methodName : "checkOtherEffects"});
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[1].notes[0].isStaccato,{ fileName : "GpImporterTestBase.hx", lineNumber : 304, className : "alphatab.importer.GpImporterTestBase", methodName : "checkOtherEffects"});
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[2].tap,{ fileName : "GpImporterTestBase.hx", lineNumber : 305, className : "alphatab.importer.GpImporterTestBase", methodName : "checkOtherEffects"});
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[3].slap,{ fileName : "GpImporterTestBase.hx", lineNumber : 306, className : "alphatab.importer.GpImporterTestBase", methodName : "checkOtherEffects"});
-		this.assertTrue(score.tracks[0].bars[1].voices[0].beats[0].pop,{ fileName : "GpImporterTestBase.hx", lineNumber : 308, className : "alphatab.importer.GpImporterTestBase", methodName : "checkOtherEffects"});
-		this.assertTrue(score.tracks[0].bars[1].voices[0].beats[1].fadeIn,{ fileName : "GpImporterTestBase.hx", lineNumber : 309, className : "alphatab.importer.GpImporterTestBase", methodName : "checkOtherEffects"});
-		this.assertTrue(score.tracks[0].bars[3].voices[0].beats[0].chordId != null,{ fileName : "GpImporterTestBase.hx", lineNumber : 311, className : "alphatab.importer.GpImporterTestBase", methodName : "checkOtherEffects"});
-		this.assertEquals("C",score.tracks[0].bars[3].voices[0].beats[0].chord().name,{ fileName : "GpImporterTestBase.hx", lineNumber : 312, className : "alphatab.importer.GpImporterTestBase", methodName : "checkOtherEffects"});
-		this.assertEquals("Text",score.tracks[0].bars[3].voices[0].beats[1].text,{ fileName : "GpImporterTestBase.hx", lineNumber : 313, className : "alphatab.importer.GpImporterTestBase", methodName : "checkOtherEffects"});
-		this.assertTrue(score.masterBars[4].isDoubleBar,{ fileName : "GpImporterTestBase.hx", lineNumber : 314, className : "alphatab.importer.GpImporterTestBase", methodName : "checkOtherEffects"});
-		this.assertTrue(score.tracks[0].bars[4].voices[0].beats[0].getAutomation(alphatab.model.AutomationType.Tempo) != null,{ fileName : "GpImporterTestBase.hx", lineNumber : 315, className : "alphatab.importer.GpImporterTestBase", methodName : "checkOtherEffects"});
-		this.assertEquals(120.0,score.tracks[0].bars[4].voices[0].beats[0].getAutomation(alphatab.model.AutomationType.Tempo).value,{ fileName : "GpImporterTestBase.hx", lineNumber : 316, className : "alphatab.importer.GpImporterTestBase", methodName : "checkOtherEffects"});
-		this.assertTrue(score.tracks[0].bars[4].voices[0].beats[0].getAutomation(alphatab.model.AutomationType.Instrument) != null,{ fileName : "GpImporterTestBase.hx", lineNumber : 317, className : "alphatab.importer.GpImporterTestBase", methodName : "checkOtherEffects"});
-		this.assertEquals(25.0,score.tracks[0].bars[4].voices[0].beats[0].getAutomation(alphatab.model.AutomationType.Instrument).value,{ fileName : "GpImporterTestBase.hx", lineNumber : 318, className : "alphatab.importer.GpImporterTestBase", methodName : "checkOtherEffects"});
-	}
-	,checkTrills: function(score) {
-		this.assertEquals(2,score.tracks[0].bars[0].voices[0].beats[0].notes[0].trillFret(),{ fileName : "GpImporterTestBase.hx", lineNumber : 288, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTrills"});
-		this.assertEquals(alphatab.model.Duration.Sixteenth,score.tracks[0].bars[0].voices[0].beats[1].notes[0].trillSpeed,{ fileName : "GpImporterTestBase.hx", lineNumber : 289, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTrills"});
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[1].tremoloSpeed != null,{ fileName : "GpImporterTestBase.hx", lineNumber : 291, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTrills"});
-		this.assertEquals(alphatab.model.Duration.ThirtySecond,score.tracks[0].bars[0].voices[0].beats[1].tremoloSpeed,{ fileName : "GpImporterTestBase.hx", lineNumber : 292, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTrills"});
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[2].tremoloSpeed != null,{ fileName : "GpImporterTestBase.hx", lineNumber : 294, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTrills"});
-		this.assertEquals(alphatab.model.Duration.Sixteenth,score.tracks[0].bars[0].voices[0].beats[2].tremoloSpeed,{ fileName : "GpImporterTestBase.hx", lineNumber : 295, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTrills"});
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[3].tremoloSpeed != null,{ fileName : "GpImporterTestBase.hx", lineNumber : 297, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTrills"});
-		this.assertEquals(alphatab.model.Duration.Eighth,score.tracks[0].bars[0].voices[0].beats[3].tremoloSpeed,{ fileName : "GpImporterTestBase.hx", lineNumber : 298, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTrills"});
-	}
-	,checkVibrato: function(score) {
-		this.assertEquals(alphatab.model.VibratoType.Slight,score.tracks[0].bars[0].voices[0].beats[0].notes[0].vibrato,{ fileName : "GpImporterTestBase.hx", lineNumber : 279, className : "alphatab.importer.GpImporterTestBase", methodName : "checkVibrato"});
-		this.assertEquals(alphatab.model.VibratoType.Slight,score.tracks[0].bars[0].voices[0].beats[1].notes[0].vibrato,{ fileName : "GpImporterTestBase.hx", lineNumber : 280, className : "alphatab.importer.GpImporterTestBase", methodName : "checkVibrato"});
-		this.assertEquals(alphatab.model.VibratoType.Slight,score.tracks[0].bars[0].voices[0].beats[2].vibrato,{ fileName : "GpImporterTestBase.hx", lineNumber : 282, className : "alphatab.importer.GpImporterTestBase", methodName : "checkVibrato"});
-		this.assertEquals(alphatab.model.VibratoType.Slight,score.tracks[0].bars[0].voices[0].beats[3].vibrato,{ fileName : "GpImporterTestBase.hx", lineNumber : 283, className : "alphatab.importer.GpImporterTestBase", methodName : "checkVibrato"});
-	}
-	,checkSlides: function(score) {
-		this.assertEquals(alphatab.model.SlideType.Legato,score.tracks[0].bars[0].voices[0].beats[0].getNoteOnString(5).slideType,{ fileName : "GpImporterTestBase.hx", lineNumber : 269, className : "alphatab.importer.GpImporterTestBase", methodName : "checkSlides"});
-		this.assertEquals(alphatab.model.SlideType.Shift,score.tracks[0].bars[0].voices[0].beats[2].getNoteOnString(2).slideType,{ fileName : "GpImporterTestBase.hx", lineNumber : 270, className : "alphatab.importer.GpImporterTestBase", methodName : "checkSlides"});
-		this.assertEquals(alphatab.model.SlideType.IntoFromBelow,score.tracks[0].bars[1].voices[0].beats[0].getNoteOnString(5).slideType,{ fileName : "GpImporterTestBase.hx", lineNumber : 271, className : "alphatab.importer.GpImporterTestBase", methodName : "checkSlides"});
-		this.assertEquals(alphatab.model.SlideType.IntoFromAbove,score.tracks[0].bars[1].voices[0].beats[1].getNoteOnString(5).slideType,{ fileName : "GpImporterTestBase.hx", lineNumber : 272, className : "alphatab.importer.GpImporterTestBase", methodName : "checkSlides"});
-		this.assertEquals(alphatab.model.SlideType.OutDown,score.tracks[0].bars[1].voices[0].beats[2].getNoteOnString(5).slideType,{ fileName : "GpImporterTestBase.hx", lineNumber : 273, className : "alphatab.importer.GpImporterTestBase", methodName : "checkSlides"});
-		this.assertEquals(alphatab.model.SlideType.OutUp,score.tracks[0].bars[1].voices[0].beats[3].getNoteOnString(5).slideType,{ fileName : "GpImporterTestBase.hx", lineNumber : 274, className : "alphatab.importer.GpImporterTestBase", methodName : "checkSlides"});
-	}
-	,checkTremolo: function(score) {
-		this.assertEquals(3,score.tracks[0].bars[0].voices[0].beats[0].whammyBarPoints.length,{ fileName : "GpImporterTestBase.hx", lineNumber : 232, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTremolo"});
-		this.assertEquals(0,score.tracks[0].bars[0].voices[0].beats[0].whammyBarPoints[0].offset,{ fileName : "GpImporterTestBase.hx", lineNumber : 234, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTremolo"});
-		this.assertEquals(0,score.tracks[0].bars[0].voices[0].beats[0].whammyBarPoints[0].value,{ fileName : "GpImporterTestBase.hx", lineNumber : 235, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTremolo"});
-		this.assertEquals(30,score.tracks[0].bars[0].voices[0].beats[0].whammyBarPoints[1].offset,{ fileName : "GpImporterTestBase.hx", lineNumber : 237, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTremolo"});
-		this.assertEquals(-4,score.tracks[0].bars[0].voices[0].beats[0].whammyBarPoints[1].value,{ fileName : "GpImporterTestBase.hx", lineNumber : 238, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTremolo"});
-		this.assertEquals(60,score.tracks[0].bars[0].voices[0].beats[0].whammyBarPoints[2].offset,{ fileName : "GpImporterTestBase.hx", lineNumber : 240, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTremolo"});
-		this.assertEquals(0,score.tracks[0].bars[0].voices[0].beats[0].whammyBarPoints[2].value,{ fileName : "GpImporterTestBase.hx", lineNumber : 241, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTremolo"});
-		this.assertEquals(3,score.tracks[0].bars[1].voices[0].beats[0].whammyBarPoints.length,{ fileName : "GpImporterTestBase.hx", lineNumber : 243, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTremolo"});
-		this.assertEquals(0,score.tracks[0].bars[1].voices[0].beats[0].whammyBarPoints[0].offset,{ fileName : "GpImporterTestBase.hx", lineNumber : 245, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTremolo"});
-		this.assertEquals(-4,score.tracks[0].bars[1].voices[0].beats[0].whammyBarPoints[0].value,{ fileName : "GpImporterTestBase.hx", lineNumber : 246, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTremolo"});
-		this.assertEquals(45,score.tracks[0].bars[1].voices[0].beats[0].whammyBarPoints[1].offset,{ fileName : "GpImporterTestBase.hx", lineNumber : 248, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTremolo"});
-		this.assertEquals(-4,score.tracks[0].bars[1].voices[0].beats[0].whammyBarPoints[1].value,{ fileName : "GpImporterTestBase.hx", lineNumber : 249, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTremolo"});
-		this.assertEquals(60,score.tracks[0].bars[1].voices[0].beats[0].whammyBarPoints[2].offset,{ fileName : "GpImporterTestBase.hx", lineNumber : 251, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTremolo"});
-		this.assertEquals(0,score.tracks[0].bars[1].voices[0].beats[0].whammyBarPoints[2].value,{ fileName : "GpImporterTestBase.hx", lineNumber : 252, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTremolo"});
-		this.assertEquals(3,score.tracks[0].bars[2].voices[0].beats[0].whammyBarPoints.length,{ fileName : "GpImporterTestBase.hx", lineNumber : 254, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTremolo"});
-		this.assertEquals(0,score.tracks[0].bars[2].voices[0].beats[0].whammyBarPoints[0].offset,{ fileName : "GpImporterTestBase.hx", lineNumber : 256, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTremolo"});
-		this.assertEquals(0,score.tracks[0].bars[2].voices[0].beats[0].whammyBarPoints[0].value,{ fileName : "GpImporterTestBase.hx", lineNumber : 257, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTremolo"});
-		this.assertEquals(45,score.tracks[0].bars[2].voices[0].beats[0].whammyBarPoints[1].offset,{ fileName : "GpImporterTestBase.hx", lineNumber : 259, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTremolo"});
-		this.assertEquals(-4,score.tracks[0].bars[2].voices[0].beats[0].whammyBarPoints[1].value,{ fileName : "GpImporterTestBase.hx", lineNumber : 260, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTremolo"});
-		this.assertEquals(60,score.tracks[0].bars[2].voices[0].beats[0].whammyBarPoints[2].offset,{ fileName : "GpImporterTestBase.hx", lineNumber : 262, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTremolo"});
-		this.assertEquals(-4,score.tracks[0].bars[2].voices[0].beats[0].whammyBarPoints[2].value,{ fileName : "GpImporterTestBase.hx", lineNumber : 263, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTremolo"});
-	}
-	,checkBend: function(score) {
-		this.assertEquals(3,score.tracks[0].bars[0].voices[0].beats[0].notes[0].bendPoints.length,{ fileName : "GpImporterTestBase.hx", lineNumber : 194, className : "alphatab.importer.GpImporterTestBase", methodName : "checkBend"});
-		this.assertEquals(0,score.tracks[0].bars[0].voices[0].beats[0].notes[0].bendPoints[0].offset,{ fileName : "GpImporterTestBase.hx", lineNumber : 196, className : "alphatab.importer.GpImporterTestBase", methodName : "checkBend"});
-		this.assertEquals(0,score.tracks[0].bars[0].voices[0].beats[0].notes[0].bendPoints[0].value,{ fileName : "GpImporterTestBase.hx", lineNumber : 197, className : "alphatab.importer.GpImporterTestBase", methodName : "checkBend"});
-		this.assertEquals(15,score.tracks[0].bars[0].voices[0].beats[0].notes[0].bendPoints[1].offset,{ fileName : "GpImporterTestBase.hx", lineNumber : 199, className : "alphatab.importer.GpImporterTestBase", methodName : "checkBend"});
-		this.assertEquals(4,score.tracks[0].bars[0].voices[0].beats[0].notes[0].bendPoints[1].value,{ fileName : "GpImporterTestBase.hx", lineNumber : 200, className : "alphatab.importer.GpImporterTestBase", methodName : "checkBend"});
-		this.assertEquals(60,score.tracks[0].bars[0].voices[0].beats[0].notes[0].bendPoints[2].offset,{ fileName : "GpImporterTestBase.hx", lineNumber : 202, className : "alphatab.importer.GpImporterTestBase", methodName : "checkBend"});
-		this.assertEquals(4,score.tracks[0].bars[0].voices[0].beats[0].notes[0].bendPoints[2].value,{ fileName : "GpImporterTestBase.hx", lineNumber : 203, className : "alphatab.importer.GpImporterTestBase", methodName : "checkBend"});
-		this.assertEquals(7,score.tracks[0].bars[0].voices[0].beats[1].notes[0].bendPoints.length,{ fileName : "GpImporterTestBase.hx", lineNumber : 205, className : "alphatab.importer.GpImporterTestBase", methodName : "checkBend"});
-		this.assertEquals(0,score.tracks[0].bars[0].voices[0].beats[1].notes[0].bendPoints[0].offset,{ fileName : "GpImporterTestBase.hx", lineNumber : 208, className : "alphatab.importer.GpImporterTestBase", methodName : "checkBend"});
-		this.assertEquals(0,score.tracks[0].bars[0].voices[0].beats[1].notes[0].bendPoints[0].value,{ fileName : "GpImporterTestBase.hx", lineNumber : 209, className : "alphatab.importer.GpImporterTestBase", methodName : "checkBend"});
-		this.assertEquals(10,score.tracks[0].bars[0].voices[0].beats[1].notes[0].bendPoints[1].offset,{ fileName : "GpImporterTestBase.hx", lineNumber : 211, className : "alphatab.importer.GpImporterTestBase", methodName : "checkBend"});
-		this.assertEquals(4,score.tracks[0].bars[0].voices[0].beats[1].notes[0].bendPoints[1].value,{ fileName : "GpImporterTestBase.hx", lineNumber : 212, className : "alphatab.importer.GpImporterTestBase", methodName : "checkBend"});
-		this.assertEquals(20,score.tracks[0].bars[0].voices[0].beats[1].notes[0].bendPoints[2].offset,{ fileName : "GpImporterTestBase.hx", lineNumber : 214, className : "alphatab.importer.GpImporterTestBase", methodName : "checkBend"});
-		this.assertEquals(4,score.tracks[0].bars[0].voices[0].beats[1].notes[0].bendPoints[2].value,{ fileName : "GpImporterTestBase.hx", lineNumber : 215, className : "alphatab.importer.GpImporterTestBase", methodName : "checkBend"});
-		this.assertEquals(30,score.tracks[0].bars[0].voices[0].beats[1].notes[0].bendPoints[3].offset,{ fileName : "GpImporterTestBase.hx", lineNumber : 217, className : "alphatab.importer.GpImporterTestBase", methodName : "checkBend"});
-		this.assertEquals(0,score.tracks[0].bars[0].voices[0].beats[1].notes[0].bendPoints[3].value,{ fileName : "GpImporterTestBase.hx", lineNumber : 218, className : "alphatab.importer.GpImporterTestBase", methodName : "checkBend"});
-		this.assertEquals(40,score.tracks[0].bars[0].voices[0].beats[1].notes[0].bendPoints[4].offset,{ fileName : "GpImporterTestBase.hx", lineNumber : 220, className : "alphatab.importer.GpImporterTestBase", methodName : "checkBend"});
-		this.assertEquals(0,score.tracks[0].bars[0].voices[0].beats[1].notes[0].bendPoints[4].value,{ fileName : "GpImporterTestBase.hx", lineNumber : 221, className : "alphatab.importer.GpImporterTestBase", methodName : "checkBend"});
-		this.assertEquals(50,score.tracks[0].bars[0].voices[0].beats[1].notes[0].bendPoints[5].offset,{ fileName : "GpImporterTestBase.hx", lineNumber : 223, className : "alphatab.importer.GpImporterTestBase", methodName : "checkBend"});
-		this.assertEquals(4,score.tracks[0].bars[0].voices[0].beats[1].notes[0].bendPoints[5].value,{ fileName : "GpImporterTestBase.hx", lineNumber : 224, className : "alphatab.importer.GpImporterTestBase", methodName : "checkBend"});
-		this.assertEquals(60,score.tracks[0].bars[0].voices[0].beats[1].notes[0].bendPoints[6].offset,{ fileName : "GpImporterTestBase.hx", lineNumber : 226, className : "alphatab.importer.GpImporterTestBase", methodName : "checkBend"});
-		this.assertEquals(4,score.tracks[0].bars[0].voices[0].beats[1].notes[0].bendPoints[6].value,{ fileName : "GpImporterTestBase.hx", lineNumber : 227, className : "alphatab.importer.GpImporterTestBase", methodName : "checkBend"});
-	}
-	,checkHammer: function(score) {
-		this.assertEquals(false,score.tracks[0].bars[0].voices[0].beats[0].notes[0].isHammerPullOrigin,{ fileName : "GpImporterTestBase.hx", lineNumber : 177, className : "alphatab.importer.GpImporterTestBase", methodName : "checkHammer"});
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[0].notes[1].isHammerPullOrigin,{ fileName : "GpImporterTestBase.hx", lineNumber : 178, className : "alphatab.importer.GpImporterTestBase", methodName : "checkHammer"});
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[0].notes[2].isHammerPullOrigin,{ fileName : "GpImporterTestBase.hx", lineNumber : 179, className : "alphatab.importer.GpImporterTestBase", methodName : "checkHammer"});
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[0].notes[3].isHammerPullOrigin,{ fileName : "GpImporterTestBase.hx", lineNumber : 180, className : "alphatab.importer.GpImporterTestBase", methodName : "checkHammer"});
-		this.assertEquals(false,score.tracks[0].bars[0].voices[0].beats[1].notes[0].isHammerPullDestination,{ fileName : "GpImporterTestBase.hx", lineNumber : 182, className : "alphatab.importer.GpImporterTestBase", methodName : "checkHammer"});
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[1].notes[1].isHammerPullDestination,{ fileName : "GpImporterTestBase.hx", lineNumber : 183, className : "alphatab.importer.GpImporterTestBase", methodName : "checkHammer"});
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[1].notes[2].isHammerPullDestination,{ fileName : "GpImporterTestBase.hx", lineNumber : 184, className : "alphatab.importer.GpImporterTestBase", methodName : "checkHammer"});
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[1].notes[3].isHammerPullDestination,{ fileName : "GpImporterTestBase.hx", lineNumber : 185, className : "alphatab.importer.GpImporterTestBase", methodName : "checkHammer"});
-		this.assertTrue(score.tracks[0].bars[1].voices[0].beats[0].notes[0].isHammerPullOrigin,{ fileName : "GpImporterTestBase.hx", lineNumber : 187, className : "alphatab.importer.GpImporterTestBase", methodName : "checkHammer"});
-		this.assertTrue(score.tracks[0].bars[1].voices[0].beats[1].notes[0].isHammerPullOrigin,{ fileName : "GpImporterTestBase.hx", lineNumber : 188, className : "alphatab.importer.GpImporterTestBase", methodName : "checkHammer"});
-		this.assertTrue(score.tracks[0].bars[1].voices[0].beats[2].notes[0].isHammerPullDestination,{ fileName : "GpImporterTestBase.hx", lineNumber : 189, className : "alphatab.importer.GpImporterTestBase", methodName : "checkHammer"});
-	}
-	,checkHarmonics: function(score) {
-		this.assertEquals(alphatab.model.HarmonicType.Natural,score.tracks[0].bars[0].voices[0].beats[0].notes[0].harmonicType,{ fileName : "GpImporterTestBase.hx", lineNumber : 167, className : "alphatab.importer.GpImporterTestBase", methodName : "checkHarmonics"});
-		this.assertEquals(alphatab.model.HarmonicType.Artificial,score.tracks[0].bars[0].voices[0].beats[1].notes[0].harmonicType,{ fileName : "GpImporterTestBase.hx", lineNumber : 168, className : "alphatab.importer.GpImporterTestBase", methodName : "checkHarmonics"});
-		this.assertEquals(alphatab.model.HarmonicType.Tap,score.tracks[0].bars[0].voices[0].beats[2].notes[0].harmonicType,{ fileName : "GpImporterTestBase.hx", lineNumber : 169, className : "alphatab.importer.GpImporterTestBase", methodName : "checkHarmonics"});
-		this.assertEquals(alphatab.model.HarmonicType.Semi,score.tracks[0].bars[0].voices[0].beats[3].notes[0].harmonicType,{ fileName : "GpImporterTestBase.hx", lineNumber : 170, className : "alphatab.importer.GpImporterTestBase", methodName : "checkHarmonics"});
-		this.assertEquals(alphatab.model.HarmonicType.Pinch,score.tracks[0].bars[0].voices[0].beats[4].notes[0].harmonicType,{ fileName : "GpImporterTestBase.hx", lineNumber : 171, className : "alphatab.importer.GpImporterTestBase", methodName : "checkHarmonics"});
-	}
-	,checkAccentuation: function(score,includeHeavy) {
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[0].notes[0].isGhost,{ fileName : "GpImporterTestBase.hx", lineNumber : 156, className : "alphatab.importer.GpImporterTestBase", methodName : "checkAccentuation"});
-		this.assertEquals(alphatab.model.AccentuationType.Normal,score.tracks[0].bars[0].voices[0].beats[1].notes[0].accentuated,{ fileName : "GpImporterTestBase.hx", lineNumber : 157, className : "alphatab.importer.GpImporterTestBase", methodName : "checkAccentuation"});
-		if(includeHeavy) this.assertEquals(alphatab.model.AccentuationType.Heavy,score.tracks[0].bars[0].voices[0].beats[2].notes[0].accentuated,{ fileName : "GpImporterTestBase.hx", lineNumber : 160, className : "alphatab.importer.GpImporterTestBase", methodName : "checkAccentuation"});
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[3].notes[0].isLetRing,{ fileName : "GpImporterTestBase.hx", lineNumber : 162, className : "alphatab.importer.GpImporterTestBase", methodName : "checkAccentuation"});
-	}
-	,checkGrace: function(score) {
-		this.assertEquals(alphatab.model.GraceType.BeforeBeat,score.tracks[0].bars[0].voices[0].beats[0].graceType,{ fileName : "GpImporterTestBase.hx", lineNumber : 141, className : "alphatab.importer.GpImporterTestBase", methodName : "checkGrace"});
-		this.assertEquals(3,score.tracks[0].bars[0].voices[0].beats[0].notes[0].fret,{ fileName : "GpImporterTestBase.hx", lineNumber : 142, className : "alphatab.importer.GpImporterTestBase", methodName : "checkGrace"});
-		this.assertEquals(alphatab.model.Duration.ThirtySecond,score.tracks[0].bars[0].voices[0].beats[0].duration,{ fileName : "GpImporterTestBase.hx", lineNumber : 143, className : "alphatab.importer.GpImporterTestBase", methodName : "checkGrace"});
-		this.assertEquals(2,score.tracks[0].bars[0].voices[0].beats[1].notes[0].fret,{ fileName : "GpImporterTestBase.hx", lineNumber : 144, className : "alphatab.importer.GpImporterTestBase", methodName : "checkGrace"});
-		this.assertEquals(alphatab.model.Duration.Quarter,score.tracks[0].bars[0].voices[0].beats[1].duration,{ fileName : "GpImporterTestBase.hx", lineNumber : 145, className : "alphatab.importer.GpImporterTestBase", methodName : "checkGrace"});
-		this.assertEquals(alphatab.model.GraceType.BeforeBeat,score.tracks[0].bars[0].voices[0].beats[2].graceType,{ fileName : "GpImporterTestBase.hx", lineNumber : 147, className : "alphatab.importer.GpImporterTestBase", methodName : "checkGrace"});
-		this.assertEquals(2,score.tracks[0].bars[0].voices[0].beats[2].notes[0].fret,{ fileName : "GpImporterTestBase.hx", lineNumber : 148, className : "alphatab.importer.GpImporterTestBase", methodName : "checkGrace"});
-		this.assertEquals(alphatab.model.Duration.ThirtySecond,score.tracks[0].bars[0].voices[0].beats[2].duration,{ fileName : "GpImporterTestBase.hx", lineNumber : 149, className : "alphatab.importer.GpImporterTestBase", methodName : "checkGrace"});
-		this.assertEquals(2,score.tracks[0].bars[0].voices[0].beats[3].notes[0].fret,{ fileName : "GpImporterTestBase.hx", lineNumber : 150, className : "alphatab.importer.GpImporterTestBase", methodName : "checkGrace"});
-		this.assertEquals(alphatab.model.Duration.Quarter,score.tracks[0].bars[0].voices[0].beats[3].duration,{ fileName : "GpImporterTestBase.hx", lineNumber : 151, className : "alphatab.importer.GpImporterTestBase", methodName : "checkGrace"});
-	}
-	,checkDead: function(score) {
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[0].notes[0].isDead,{ fileName : "GpImporterTestBase.hx", lineNumber : 126, className : "alphatab.importer.GpImporterTestBase", methodName : "checkDead"});
-		this.assertEquals(1,score.tracks[0].bars[0].voices[0].beats[0].notes[0].string,{ fileName : "GpImporterTestBase.hx", lineNumber : 127, className : "alphatab.importer.GpImporterTestBase", methodName : "checkDead"});
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[1].notes[0].isDead,{ fileName : "GpImporterTestBase.hx", lineNumber : 129, className : "alphatab.importer.GpImporterTestBase", methodName : "checkDead"});
-		this.assertEquals(2,score.tracks[0].bars[0].voices[0].beats[1].notes[0].string,{ fileName : "GpImporterTestBase.hx", lineNumber : 130, className : "alphatab.importer.GpImporterTestBase", methodName : "checkDead"});
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[2].notes[0].isDead,{ fileName : "GpImporterTestBase.hx", lineNumber : 132, className : "alphatab.importer.GpImporterTestBase", methodName : "checkDead"});
-		this.assertEquals(3,score.tracks[0].bars[0].voices[0].beats[2].notes[0].string,{ fileName : "GpImporterTestBase.hx", lineNumber : 133, className : "alphatab.importer.GpImporterTestBase", methodName : "checkDead"});
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[3].notes[0].isDead,{ fileName : "GpImporterTestBase.hx", lineNumber : 135, className : "alphatab.importer.GpImporterTestBase", methodName : "checkDead"});
-		this.assertEquals(4,score.tracks[0].bars[0].voices[0].beats[3].notes[0].string,{ fileName : "GpImporterTestBase.hx", lineNumber : 136, className : "alphatab.importer.GpImporterTestBase", methodName : "checkDead"});
-	}
-	,checkTest03Score: function(score) {
-		this.assertEquals(4,score.masterBars[0].timeSignatureNumerator,{ fileName : "GpImporterTestBase.hx", lineNumber : 108, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTest03Score"});
-		this.assertEquals(4,score.masterBars[0].timeSignatureDenominator,{ fileName : "GpImporterTestBase.hx", lineNumber : 109, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTest03Score"});
-		this.assertEquals(3,score.masterBars[1].timeSignatureNumerator,{ fileName : "GpImporterTestBase.hx", lineNumber : 111, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTest03Score"});
-		this.assertEquals(4,score.masterBars[1].timeSignatureDenominator,{ fileName : "GpImporterTestBase.hx", lineNumber : 112, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTest03Score"});
-		this.assertEquals(2,score.masterBars[2].timeSignatureNumerator,{ fileName : "GpImporterTestBase.hx", lineNumber : 114, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTest03Score"});
-		this.assertEquals(4,score.masterBars[2].timeSignatureDenominator,{ fileName : "GpImporterTestBase.hx", lineNumber : 115, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTest03Score"});
-		this.assertEquals(1,score.masterBars[3].timeSignatureNumerator,{ fileName : "GpImporterTestBase.hx", lineNumber : 117, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTest03Score"});
-		this.assertEquals(4,score.masterBars[3].timeSignatureDenominator,{ fileName : "GpImporterTestBase.hx", lineNumber : 118, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTest03Score"});
-		this.assertEquals(20,score.masterBars[4].timeSignatureNumerator,{ fileName : "GpImporterTestBase.hx", lineNumber : 120, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTest03Score"});
-		this.assertEquals(32,score.masterBars[4].timeSignatureDenominator,{ fileName : "GpImporterTestBase.hx", lineNumber : 121, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTest03Score"});
-	}
-	,checkTest02Score: function(score) {
-		var beat;
-		beat = 0;
-		var durations = Type.getEnumConstructs(alphatab.model.Duration);
-		var _g = 0;
-		while(_g < durations.length) {
-			var durationName = durations[_g];
-			++_g;
-			var duration = Reflect.field(alphatab.model.Duration,durationName);
-			this.assertEquals(1,score.tracks[0].bars[0].voices[0].beats[beat].notes[0].fret,{ fileName : "GpImporterTestBase.hx", lineNumber : 80, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTest02Score"});
-			this.assertEquals(1,score.tracks[0].bars[0].voices[0].beats[beat].notes[0].string,{ fileName : "GpImporterTestBase.hx", lineNumber : 81, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTest02Score"});
-			this.assertEquals(duration,score.tracks[0].bars[0].voices[0].beats[beat].duration,{ fileName : "GpImporterTestBase.hx", lineNumber : 82, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTest02Score"});
-			beat++;
-			this.assertEquals(2,score.tracks[0].bars[0].voices[0].beats[beat].notes[0].fret,{ fileName : "GpImporterTestBase.hx", lineNumber : 85, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTest02Score"});
-			this.assertEquals(1,score.tracks[0].bars[0].voices[0].beats[beat].notes[0].string,{ fileName : "GpImporterTestBase.hx", lineNumber : 86, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTest02Score"});
-			this.assertEquals(duration,score.tracks[0].bars[0].voices[0].beats[beat].duration,{ fileName : "GpImporterTestBase.hx", lineNumber : 87, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTest02Score"});
-			beat++;
-			this.assertEquals(3,score.tracks[0].bars[0].voices[0].beats[beat].notes[0].fret,{ fileName : "GpImporterTestBase.hx", lineNumber : 90, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTest02Score"});
-			this.assertEquals(1,score.tracks[0].bars[0].voices[0].beats[beat].notes[0].string,{ fileName : "GpImporterTestBase.hx", lineNumber : 91, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTest02Score"});
-			this.assertEquals(duration,score.tracks[0].bars[0].voices[0].beats[beat].duration,{ fileName : "GpImporterTestBase.hx", lineNumber : 92, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTest02Score"});
-			beat++;
-			this.assertEquals(4,score.tracks[0].bars[0].voices[0].beats[beat].notes[0].fret,{ fileName : "GpImporterTestBase.hx", lineNumber : 95, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTest02Score"});
-			this.assertEquals(1,score.tracks[0].bars[0].voices[0].beats[beat].notes[0].string,{ fileName : "GpImporterTestBase.hx", lineNumber : 96, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTest02Score"});
-			this.assertEquals(duration,score.tracks[0].bars[0].voices[0].beats[beat].duration,{ fileName : "GpImporterTestBase.hx", lineNumber : 97, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTest02Score"});
-			beat++;
-			this.assertTrue(score.tracks[0].bars[0].voices[0].beats[beat].isRest(),{ fileName : "GpImporterTestBase.hx", lineNumber : 100, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTest02Score"});
-			this.assertEquals(duration,score.tracks[0].bars[0].voices[0].beats[beat].duration,{ fileName : "GpImporterTestBase.hx", lineNumber : 101, className : "alphatab.importer.GpImporterTestBase", methodName : "checkTest02Score"});
-			beat++;
-		}
-	}
-	,prepareImporterWithBytes: function(buffer) {
-		var readerBase = new alphatab.importer.Gp3To5Importer();
-		readerBase.init(new haxe.io.BytesInput(buffer,0,buffer.length));
-		return readerBase;
-	}
-	,prepareImporterWithFile: function(name) {
-		var path = "test-files";
-		var buffer = (alphatab.Environment.fileLoaders.get("default"))().loadBinary(path + "/" + name);
-		return this.prepareImporterWithBytes(buffer);
-	}
-	,prepareImporterWithData: function(data) {
-		var buffer = haxe.io.Bytes.alloc(data.length);
-		var _g1 = 0, _g = data.length;
-		while(_g1 < _g) {
-			var b = _g1++;
-			buffer.b[b] = data[b] & 255;
-		}
-		return this.prepareImporterWithBytes(buffer);
-	}
-	,__class__: alphatab.importer.GpImporterTestBase
-});
-alphatab.importer.Gp3ImporterTest = function() {
-	alphatab.importer.GpImporterTestBase.call(this);
-};
-alphatab.importer.Gp3ImporterTest.__name__ = ["alphatab","importer","Gp3ImporterTest"];
-alphatab.importer.Gp3ImporterTest.__super__ = alphatab.importer.GpImporterTestBase;
-alphatab.importer.Gp3ImporterTest.prototype = $extend(alphatab.importer.GpImporterTestBase.prototype,{
-	testEffects: function() {
-		var reader = this.prepareImporterWithFile("Effects.gp3");
-		var score = reader.readScore();
-		this.checkEffects(score);
-	}
-	,testRanges: function() {
-		var reader = this.prepareImporterWithFile("TestRanges.gp3");
-		var score = reader.readScore();
-		this.assertTrue(score.tracks[0].bars[1].voices[0].beats[1].notes[0].isLetRing,{ fileName : "Gp3ImporterTest.hx", lineNumber : 167, className : "alphatab.importer.Gp3ImporterTest", methodName : "testRanges"});
-		this.assertTrue(score.tracks[0].bars[1].voices[0].beats[2].notes[0].isLetRing,{ fileName : "Gp3ImporterTest.hx", lineNumber : 168, className : "alphatab.importer.Gp3ImporterTest", methodName : "testRanges"});
-		this.assertTrue(score.tracks[0].bars[1].voices[0].beats[3].notes[0].isLetRing,{ fileName : "Gp3ImporterTest.hx", lineNumber : 169, className : "alphatab.importer.Gp3ImporterTest", methodName : "testRanges"});
-		this.assertTrue(score.tracks[0].bars[2].voices[0].beats[0].notes[0].isLetRing,{ fileName : "Gp3ImporterTest.hx", lineNumber : 170, className : "alphatab.importer.Gp3ImporterTest", methodName : "testRanges"});
-	}
-	,testTuplets: function() {
-		var reader = this.prepareImporterWithFile("TestTuplets.gp3");
-		var score = reader.readScore();
-		this.checkTuplets(score);
-	}
-	,testStroke: function() {
-		var reader = this.prepareImporterWithFile("TestStrokes.gp3");
-		var score = reader.readScore();
-		this.assertEquals(alphatab.model.BrushType.BrushDown,score.tracks[0].bars[0].voices[0].beats[0].brushType,{ fileName : "Gp3ImporterTest.hx", lineNumber : 151, className : "alphatab.importer.Gp3ImporterTest", methodName : "testStroke"});
-		this.assertEquals(alphatab.model.BrushType.BrushUp,score.tracks[0].bars[0].voices[0].beats[1].brushType,{ fileName : "Gp3ImporterTest.hx", lineNumber : 152, className : "alphatab.importer.Gp3ImporterTest", methodName : "testStroke"});
-	}
-	,testOtherEffects: function() {
-		var reader = this.prepareImporterWithFile("TestOtherEffects.gp3");
-		var score = reader.readScore();
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[2].tap,{ fileName : "Gp3ImporterTest.hx", lineNumber : 131, className : "alphatab.importer.Gp3ImporterTest", methodName : "testOtherEffects"});
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[3].slap,{ fileName : "Gp3ImporterTest.hx", lineNumber : 132, className : "alphatab.importer.Gp3ImporterTest", methodName : "testOtherEffects"});
-		this.assertTrue(score.tracks[0].bars[1].voices[0].beats[0].pop,{ fileName : "Gp3ImporterTest.hx", lineNumber : 134, className : "alphatab.importer.Gp3ImporterTest", methodName : "testOtherEffects"});
-		this.assertTrue(score.tracks[0].bars[1].voices[0].beats[1].fadeIn,{ fileName : "Gp3ImporterTest.hx", lineNumber : 135, className : "alphatab.importer.Gp3ImporterTest", methodName : "testOtherEffects"});
-		this.assertTrue(score.tracks[0].bars[3].voices[0].beats[0].chordId != null,{ fileName : "Gp3ImporterTest.hx", lineNumber : 137, className : "alphatab.importer.Gp3ImporterTest", methodName : "testOtherEffects"});
-		this.assertEquals("C",score.tracks[0].bars[3].voices[0].beats[0].chord().name,{ fileName : "Gp3ImporterTest.hx", lineNumber : 138, className : "alphatab.importer.Gp3ImporterTest", methodName : "testOtherEffects"});
-		this.assertEquals("Text",score.tracks[0].bars[3].voices[0].beats[1].text,{ fileName : "Gp3ImporterTest.hx", lineNumber : 139, className : "alphatab.importer.Gp3ImporterTest", methodName : "testOtherEffects"});
-		this.assertTrue(score.tracks[0].bars[4].voices[0].beats[0].getAutomation(alphatab.model.AutomationType.Tempo) != null,{ fileName : "Gp3ImporterTest.hx", lineNumber : 140, className : "alphatab.importer.Gp3ImporterTest", methodName : "testOtherEffects"});
-		this.assertEquals(120.0,score.tracks[0].bars[4].voices[0].beats[0].getAutomation(alphatab.model.AutomationType.Tempo).value,{ fileName : "Gp3ImporterTest.hx", lineNumber : 141, className : "alphatab.importer.Gp3ImporterTest", methodName : "testOtherEffects"});
-		this.assertTrue(score.tracks[0].bars[4].voices[0].beats[0].getAutomation(alphatab.model.AutomationType.Instrument) != null,{ fileName : "Gp3ImporterTest.hx", lineNumber : 142, className : "alphatab.importer.Gp3ImporterTest", methodName : "testOtherEffects"});
-		this.assertEquals(25.0,score.tracks[0].bars[4].voices[0].beats[0].getAutomation(alphatab.model.AutomationType.Instrument).value,{ fileName : "Gp3ImporterTest.hx", lineNumber : 143, className : "alphatab.importer.Gp3ImporterTest", methodName : "testOtherEffects"});
-	}
-	,testSlides: function() {
-		var reader = this.prepareImporterWithFile("TestSlides.gp3");
-		var score = reader.readScore();
-		this.assertEquals(alphatab.model.SlideType.Shift,score.tracks[0].bars[0].voices[0].beats[0].getNoteOnString(5).slideType,{ fileName : "Gp3ImporterTest.hx", lineNumber : 114, className : "alphatab.importer.Gp3ImporterTest", methodName : "testSlides"});
-		this.assertEquals(alphatab.model.SlideType.Shift,score.tracks[0].bars[0].voices[0].beats[2].getNoteOnString(2).slideType,{ fileName : "Gp3ImporterTest.hx", lineNumber : 115, className : "alphatab.importer.Gp3ImporterTest", methodName : "testSlides"});
-	}
-	,testBend: function() {
-		var reader = this.prepareImporterWithFile("TestBends.gp3");
-		var score = reader.readScore();
-		this.checkBend(score);
-	}
-	,testHammer: function() {
-		var reader = this.prepareImporterWithFile("TestHammer.gp3");
-		var score = reader.readScore();
-		this.checkHammer(score);
-	}
-	,testAccentuation: function() {
-		var reader = this.prepareImporterWithFile("TestAccentuations.gp3");
-		var score = reader.readScore();
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[0].notes[0].isGhost,{ fileName : "Gp3ImporterTest.hx", lineNumber : 79, className : "alphatab.importer.Gp3ImporterTest", methodName : "testAccentuation"});
-		this.assertEquals(alphatab.model.DynamicValue.FFF,score.tracks[0].bars[0].voices[0].beats[1].notes[0].dynamicValue,{ fileName : "Gp3ImporterTest.hx", lineNumber : 81, className : "alphatab.importer.Gp3ImporterTest", methodName : "testAccentuation"});
-		this.assertTrue(score.tracks[0].bars[0].voices[0].beats[3].notes[0].isLetRing,{ fileName : "Gp3ImporterTest.hx", lineNumber : 82, className : "alphatab.importer.Gp3ImporterTest", methodName : "testAccentuation"});
-	}
-	,testDead: function() {
-		var reader = this.prepareImporterWithFile("TestDead.gp3");
-		var score = reader.readScore();
-		this.checkDead(score);
-	}
-	,testTimeSignatures: function() {
-		var reader = this.prepareImporterWithFile("Test03.gp3");
-		var score = reader.readScore();
-		this.checkTest03Score(score);
-	}
-	,testNotes: function() {
-		var reader = this.prepareImporterWithFile("Test02.gp3");
-		var score = reader.readScore();
-		this.checkTest02Score(score);
-	}
-	,testScoreInfo: function() {
-		var reader = this.prepareImporterWithFile("Test01.gp3");
-		var score = reader.readScore();
-		this.assertEquals("Title",score.title,{ fileName : "Gp3ImporterTest.hx", lineNumber : 37, className : "alphatab.importer.Gp3ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Subtitle",score.subTitle,{ fileName : "Gp3ImporterTest.hx", lineNumber : 38, className : "alphatab.importer.Gp3ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Artist",score.artist,{ fileName : "Gp3ImporterTest.hx", lineNumber : 39, className : "alphatab.importer.Gp3ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Album",score.album,{ fileName : "Gp3ImporterTest.hx", lineNumber : 40, className : "alphatab.importer.Gp3ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Music",score.words,{ fileName : "Gp3ImporterTest.hx", lineNumber : 41, className : "alphatab.importer.Gp3ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Music",score.music,{ fileName : "Gp3ImporterTest.hx", lineNumber : 42, className : "alphatab.importer.Gp3ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Copyright",score.copyright,{ fileName : "Gp3ImporterTest.hx", lineNumber : 43, className : "alphatab.importer.Gp3ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Tab",score.tab,{ fileName : "Gp3ImporterTest.hx", lineNumber : 44, className : "alphatab.importer.Gp3ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Instructions",score.instructions,{ fileName : "Gp3ImporterTest.hx", lineNumber : 45, className : "alphatab.importer.Gp3ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Notice1\nNotice2",score.notices,{ fileName : "Gp3ImporterTest.hx", lineNumber : 46, className : "alphatab.importer.Gp3ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals(5,score.masterBars.length,{ fileName : "Gp3ImporterTest.hx", lineNumber : 47, className : "alphatab.importer.Gp3ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals(1,score.tracks.length,{ fileName : "Gp3ImporterTest.hx", lineNumber : 48, className : "alphatab.importer.Gp3ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Track 1",score.tracks[0].name,{ fileName : "Gp3ImporterTest.hx", lineNumber : 49, className : "alphatab.importer.Gp3ImporterTest", methodName : "testScoreInfo"});
-	}
-	,__class__: alphatab.importer.Gp3ImporterTest
-});
 alphatab.importer.Gp3To5Importer = function() {
 	alphatab.importer.ScoreImporter.call(this);
 	this._globalTripletFeel = alphatab.model.TripletFeel.NoTripletFeel;
 };
-alphatab.importer.Gp3To5Importer.__name__ = ["alphatab","importer","Gp3To5Importer"];
+alphatab.importer.Gp3To5Importer.__name__ = true;
 alphatab.importer.Gp3To5Importer.__super__ = alphatab.importer.ScoreImporter;
 alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImporter.prototype,{
 	skip: function(count) {
@@ -4562,299 +3975,18 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 		this.finish(this._score);
 		return this._score;
 	}
-	,_playbackInfos: null
-	,_trackCount: null
-	,_barCount: null
-	,_lyricsTrack: null
-	,_lyrics: null
-	,_lyricsIndex: null
-	,_globalTripletFeel: null
-	,_octave: null
-	,_keySignature: null
-	,_tempo: null
-	,_score: null
-	,_versionNumber: null
 	,__class__: alphatab.importer.Gp3To5Importer
-});
-alphatab.importer.Gp4ImporterTest = function() {
-	alphatab.importer.GpImporterTestBase.call(this);
-};
-alphatab.importer.Gp4ImporterTest.__name__ = ["alphatab","importer","Gp4ImporterTest"];
-alphatab.importer.Gp4ImporterTest.__super__ = alphatab.importer.GpImporterTestBase;
-alphatab.importer.Gp4ImporterTest.prototype = $extend(alphatab.importer.GpImporterTestBase.prototype,{
-	testEffects: function() {
-		var reader = this.prepareImporterWithFile("Effects.gp4");
-		var score = reader.readScore();
-		this.checkEffects(score);
-	}
-	,testRanges: function() {
-		var reader = this.prepareImporterWithFile("TestRanges.gp4");
-		var score = reader.readScore();
-		this.checkRanges(score);
-	}
-	,testTuplets: function() {
-		var reader = this.prepareImporterWithFile("TestTuplets.gp4");
-		var score = reader.readScore();
-		this.checkTuplets(score);
-	}
-	,testStroke: function() {
-		var reader = this.prepareImporterWithFile("TestStrokes.gp4");
-		var score = reader.readScore();
-		this.checkStroke(score);
-	}
-	,testFingering: function() {
-		var reader = this.prepareImporterWithFile("TestFingering.gp4");
-		var score = reader.readScore();
-		this.checkFingering(score);
-	}
-	,testOtherEffects: function() {
-		var reader = this.prepareImporterWithFile("TestOtherEffects.gp4");
-		var score = reader.readScore();
-		this.checkOtherEffects(score);
-	}
-	,testTrills: function() {
-		var reader = this.prepareImporterWithFile("TestTrills.gp4");
-		var score = reader.readScore();
-		this.checkTrills(score);
-	}
-	,testVibrato: function() {
-		var reader = this.prepareImporterWithFile("TestVibrato.gp4");
-		var score = reader.readScore();
-		this.checkVibrato(score);
-	}
-	,testSlides: function() {
-		var reader = this.prepareImporterWithFile("TestSlides.gp4");
-		var score = reader.readScore();
-		this.checkSlides(score);
-	}
-	,testTremolo: function() {
-		var reader = this.prepareImporterWithFile("TestTremolo.gp4");
-		var score = reader.readScore();
-		this.checkTremolo(score);
-	}
-	,testBend: function() {
-		var reader = this.prepareImporterWithFile("TestBends.gp4");
-		var score = reader.readScore();
-		this.checkBend(score);
-	}
-	,testHammer: function() {
-		var reader = this.prepareImporterWithFile("TestHammer.gp4");
-		var score = reader.readScore();
-		this.checkHammer(score);
-	}
-	,testHarmonics: function() {
-		var reader = this.prepareImporterWithFile("TestHarmonics.gp4");
-		var score = reader.readScore();
-		this.checkHarmonics(score);
-	}
-	,testAccentuation: function() {
-		var reader = this.prepareImporterWithFile("TestAccentuations.gp4");
-		var score = reader.readScore();
-		this.checkAccentuation(score,false);
-	}
-	,testGrace: function() {
-		var reader = this.prepareImporterWithFile("TestGrace.gp4");
-		var score = reader.readScore();
-		this.checkGrace(score);
-	}
-	,testDead: function() {
-		var reader = this.prepareImporterWithFile("TestDead.gp4");
-		var score = reader.readScore();
-		this.checkDead(score);
-	}
-	,testTimeSignatures: function() {
-		var reader = this.prepareImporterWithFile("Test03.gp4");
-		var score = reader.readScore();
-		this.checkTest03Score(score);
-	}
-	,testNotes: function() {
-		var reader = this.prepareImporterWithFile("Test02.gp4");
-		var score = reader.readScore();
-		this.checkTest02Score(score);
-	}
-	,testScoreInfo: function() {
-		var reader = this.prepareImporterWithFile("Test01.gp4");
-		var score = reader.readScore();
-		this.assertEquals("Title",score.title,{ fileName : "Gp4ImporterTest.hx", lineNumber : 31, className : "alphatab.importer.Gp4ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Subtitle",score.subTitle,{ fileName : "Gp4ImporterTest.hx", lineNumber : 32, className : "alphatab.importer.Gp4ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Artist",score.artist,{ fileName : "Gp4ImporterTest.hx", lineNumber : 33, className : "alphatab.importer.Gp4ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Album",score.album,{ fileName : "Gp4ImporterTest.hx", lineNumber : 34, className : "alphatab.importer.Gp4ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Music",score.words,{ fileName : "Gp4ImporterTest.hx", lineNumber : 35, className : "alphatab.importer.Gp4ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Music",score.music,{ fileName : "Gp4ImporterTest.hx", lineNumber : 36, className : "alphatab.importer.Gp4ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Copyright",score.copyright,{ fileName : "Gp4ImporterTest.hx", lineNumber : 37, className : "alphatab.importer.Gp4ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Tab",score.tab,{ fileName : "Gp4ImporterTest.hx", lineNumber : 38, className : "alphatab.importer.Gp4ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Instructions",score.instructions,{ fileName : "Gp4ImporterTest.hx", lineNumber : 39, className : "alphatab.importer.Gp4ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Notice1\nNotice2",score.notices,{ fileName : "Gp4ImporterTest.hx", lineNumber : 40, className : "alphatab.importer.Gp4ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals(5,score.masterBars.length,{ fileName : "Gp4ImporterTest.hx", lineNumber : 41, className : "alphatab.importer.Gp4ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals(1,score.tracks.length,{ fileName : "Gp4ImporterTest.hx", lineNumber : 42, className : "alphatab.importer.Gp4ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Track 1",score.tracks[0].name,{ fileName : "Gp4ImporterTest.hx", lineNumber : 43, className : "alphatab.importer.Gp4ImporterTest", methodName : "testScoreInfo"});
-	}
-	,__class__: alphatab.importer.Gp4ImporterTest
-});
-alphatab.importer.Gp5ImporterTest = function() {
-	alphatab.importer.GpImporterTestBase.call(this);
-};
-alphatab.importer.Gp5ImporterTest.__name__ = ["alphatab","importer","Gp5ImporterTest"];
-alphatab.importer.Gp5ImporterTest.__super__ = alphatab.importer.GpImporterTestBase;
-alphatab.importer.Gp5ImporterTest.prototype = $extend(alphatab.importer.GpImporterTestBase.prototype,{
-	testSerenade: function() {
-		var reader = this.prepareImporterWithFile("Serenade.gp5");
-		var score = reader.readScore();
-		this.assertTrue(true,{ fileName : "Gp5ImporterTest.hx", lineNumber : 194, className : "alphatab.importer.Gp5ImporterTest", methodName : "testSerenade"});
-	}
-	,testEffects: function() {
-		var reader = this.prepareImporterWithFile("Effects.gp5");
-		var score = reader.readScore();
-		this.checkEffects(score);
-	}
-	,testRanges: function() {
-		var reader = this.prepareImporterWithFile("TestRanges.gp5");
-		var score = reader.readScore();
-		this.checkRanges(score);
-	}
-	,testTuplets: function() {
-		var reader = this.prepareImporterWithFile("TestTuplets.gp5");
-		var score = reader.readScore();
-		this.checkTuplets(score);
-	}
-	,testStroke: function() {
-		var reader = this.prepareImporterWithFile("TestStrokes.gp5");
-		var score = reader.readScore();
-		this.checkStroke(score);
-	}
-	,testFingering: function() {
-		var reader = this.prepareImporterWithFile("TestFingering.gp5");
-		var score = reader.readScore();
-		this.checkFingering(score);
-	}
-	,testOtherEffects: function() {
-		var reader = this.prepareImporterWithFile("TestOtherEffects.gp5");
-		var score = reader.readScore();
-		this.checkOtherEffects(score);
-	}
-	,testTrills: function() {
-		var reader = this.prepareImporterWithFile("TestTrills.gp5");
-		var score = reader.readScore();
-		this.checkTrills(score);
-	}
-	,testVibrato: function() {
-		var reader = this.prepareImporterWithFile("TestVibrato.gp5");
-		var score = reader.readScore();
-		this.checkVibrato(score);
-	}
-	,testSlides: function() {
-		var reader = this.prepareImporterWithFile("TestSlides.gp5");
-		var score = reader.readScore();
-		this.checkSlides(score);
-	}
-	,testTremolo: function() {
-		var reader = this.prepareImporterWithFile("TestTremolo.gp5");
-		var score = reader.readScore();
-		this.checkTremolo(score);
-	}
-	,testBend: function() {
-		var reader = this.prepareImporterWithFile("TestBends.gp5");
-		var score = reader.readScore();
-		this.checkBend(score);
-	}
-	,testHammer: function() {
-		var reader = this.prepareImporterWithFile("TestHammer.gp5");
-		var score = reader.readScore();
-		this.checkHammer(score);
-	}
-	,testHarmonics: function() {
-		var reader = this.prepareImporterWithFile("TestHarmonics.gp5");
-		var score = reader.readScore();
-		this.checkHarmonics(score);
-	}
-	,testAccentuation: function() {
-		var reader = this.prepareImporterWithFile("TestAccentuations.gp5");
-		var score = reader.readScore();
-		this.checkAccentuation(score,true);
-	}
-	,testGrace: function() {
-		var reader = this.prepareImporterWithFile("TestGrace.gp5");
-		var score = reader.readScore();
-		this.checkGrace(score);
-	}
-	,testDead: function() {
-		var reader = this.prepareImporterWithFile("TestDead.gp5");
-		var score = reader.readScore();
-		this.checkDead(score);
-	}
-	,testTimeSignatures: function() {
-		var reader = this.prepareImporterWithFile("Test03.gp5");
-		var score = reader.readScore();
-		this.checkTest03Score(score);
-	}
-	,testNotes: function() {
-		var reader = this.prepareImporterWithFile("Test02.gp5");
-		var score = reader.readScore();
-		this.checkTest02Score(score);
-	}
-	,testScoreInfo: function() {
-		var reader = this.prepareImporterWithFile("Test01.gp5");
-		var score = reader.readScore();
-		this.assertEquals("Title",score.title,{ fileName : "Gp5ImporterTest.hx", lineNumber : 47, className : "alphatab.importer.Gp5ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Subtitle",score.subTitle,{ fileName : "Gp5ImporterTest.hx", lineNumber : 48, className : "alphatab.importer.Gp5ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Artist",score.artist,{ fileName : "Gp5ImporterTest.hx", lineNumber : 49, className : "alphatab.importer.Gp5ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Album",score.album,{ fileName : "Gp5ImporterTest.hx", lineNumber : 50, className : "alphatab.importer.Gp5ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Words",score.words,{ fileName : "Gp5ImporterTest.hx", lineNumber : 51, className : "alphatab.importer.Gp5ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Music",score.music,{ fileName : "Gp5ImporterTest.hx", lineNumber : 52, className : "alphatab.importer.Gp5ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Copyright",score.copyright,{ fileName : "Gp5ImporterTest.hx", lineNumber : 53, className : "alphatab.importer.Gp5ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Tab",score.tab,{ fileName : "Gp5ImporterTest.hx", lineNumber : 54, className : "alphatab.importer.Gp5ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Instructions",score.instructions,{ fileName : "Gp5ImporterTest.hx", lineNumber : 55, className : "alphatab.importer.Gp5ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Notice1\nNotice2",score.notices,{ fileName : "Gp5ImporterTest.hx", lineNumber : 56, className : "alphatab.importer.Gp5ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals(5,score.masterBars.length,{ fileName : "Gp5ImporterTest.hx", lineNumber : 57, className : "alphatab.importer.Gp5ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals(2,score.tracks.length,{ fileName : "Gp5ImporterTest.hx", lineNumber : 58, className : "alphatab.importer.Gp5ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Track 1",score.tracks[0].name,{ fileName : "Gp5ImporterTest.hx", lineNumber : 59, className : "alphatab.importer.Gp5ImporterTest", methodName : "testScoreInfo"});
-		this.assertEquals("Track 2",score.tracks[1].name,{ fileName : "Gp5ImporterTest.hx", lineNumber : 60, className : "alphatab.importer.Gp5ImporterTest", methodName : "testScoreInfo"});
-	}
-	,__class__: alphatab.importer.Gp5ImporterTest
-});
-alphatab.importer.GpImporterTest = function() {
-	alphatab.importer.GpImporterTestBase.call(this);
-};
-alphatab.importer.GpImporterTest.__name__ = ["alphatab","importer","GpImporterTest"];
-alphatab.importer.GpImporterTest.__super__ = alphatab.importer.GpImporterTestBase;
-alphatab.importer.GpImporterTest.prototype = $extend(alphatab.importer.GpImporterTestBase.prototype,{
-	testReadVersion: function() {
-		var reader = this.prepareImporterWithData([24,70,73,67,72,73,69,82,32,71,85,73,84,65,82,32,80,82,79,32,118,51,46,48,48,0,0,0,0,0,0,24]);
-		reader.readVersion();
-		this.assertEquals(300,reader._versionNumber,{ fileName : "GpImporterTest.hx", lineNumber : 55, className : "alphatab.importer.GpImporterTest", methodName : "testReadVersion"});
-		this.assertEquals(24,reader._data.readByte(),{ fileName : "GpImporterTest.hx", lineNumber : 56, className : "alphatab.importer.GpImporterTest", methodName : "testReadVersion"});
-	}
-	,testReadStringByteLength: function() {
-		var reader = this.prepareImporterWithData([11,72,101,108,108,111,32,87,111,114,108,100]);
-		this.assertEquals("Hello World",reader.readStringByteLength(3),{ fileName : "GpImporterTest.hx", lineNumber : 47, className : "alphatab.importer.GpImporterTest", methodName : "testReadStringByteLength"});
-	}
-	,testReadStringIntByte: function() {
-		var reader = this.prepareImporterWithData([12,0,0,0,11,72,101,108,108,111,32,87,111,114,108,100]);
-		this.assertEquals("Hello World",reader.readStringIntByte(),{ fileName : "GpImporterTest.hx", lineNumber : 41, className : "alphatab.importer.GpImporterTest", methodName : "testReadStringIntByte"});
-	}
-	,testReadStringInt: function() {
-		var reader = this.prepareImporterWithData([11,0,0,0,72,101,108,108,111,32,87,111,114,108,100]);
-		this.assertEquals("Hello World",reader._data.readString(reader.readInt32()),{ fileName : "GpImporterTest.hx", lineNumber : 35, className : "alphatab.importer.GpImporterTest", methodName : "testReadStringInt"});
-	}
-	,testReadStringIntUnused: function() {
-		var reader = this.prepareImporterWithData([0,0,0,0,11,72,101,108,108,111,32,87,111,114,108,100]);
-		this.assertEquals("Hello World",reader.readStringIntUnused(),{ fileName : "GpImporterTest.hx", lineNumber : 29, className : "alphatab.importer.GpImporterTest", methodName : "testReadStringIntUnused"});
-	}
-	,__class__: alphatab.importer.GpImporterTest
 });
 alphatab.importer.GpxFile = function() {
 };
-alphatab.importer.GpxFile.__name__ = ["alphatab","importer","GpxFile"];
+alphatab.importer.GpxFile.__name__ = true;
 alphatab.importer.GpxFile.prototype = {
-	data: null
-	,fileSize: null
-	,fileName: null
-	,__class__: alphatab.importer.GpxFile
+	__class__: alphatab.importer.GpxFile
 }
 alphatab.importer.GpxFileSystem = function() {
 	this.files = new Array();
 };
-alphatab.importer.GpxFileSystem.__name__ = ["alphatab","importer","GpxFileSystem"];
+alphatab.importer.GpxFileSystem.__name__ = true;
 alphatab.importer.GpxFileSystem.prototype = {
 	getInteger: function(data,offset) {
 		return (data.b[offset + 3] & 255) << 24 | (data.b[offset + 2] & 255) << 16 | (data.b[offset + 1] & 255) << 8 | data.b[offset] & 255;
@@ -4944,14 +4076,12 @@ alphatab.importer.GpxFileSystem.prototype = {
 	,setFileFilter: function(fileFilter) {
 		this._fileFilter = fileFilter;
 	}
-	,files: null
-	,_fileFilter: null
 	,__class__: alphatab.importer.GpxFileSystem
 }
 alphatab.importer.GpxImporter = function() {
 	alphatab.importer.ScoreImporter.call(this);
 };
-alphatab.importer.GpxImporter.__name__ = ["alphatab","importer","GpxImporter"];
+alphatab.importer.GpxImporter.__name__ = true;
 alphatab.importer.GpxImporter.__super__ = alphatab.importer.ScoreImporter;
 alphatab.importer.GpxImporter.prototype = $extend(alphatab.importer.ScoreImporter.prototype,{
 	readScore: function() {
@@ -4975,17 +4105,13 @@ alphatab.importer.GpxRhythm = function() {
 	this.tupletDenominator = 1;
 	this.value = alphatab.model.Duration.Quarter;
 };
-alphatab.importer.GpxRhythm.__name__ = ["alphatab","importer","GpxRhythm"];
+alphatab.importer.GpxRhythm.__name__ = true;
 alphatab.importer.GpxRhythm.prototype = {
-	value: null
-	,tupletNumerator: null
-	,tupletDenominator: null
-	,dots: null
-	,__class__: alphatab.importer.GpxRhythm
+	__class__: alphatab.importer.GpxRhythm
 }
 alphatab.importer.GpxParser = function() {
 };
-alphatab.importer.GpxParser.__name__ = ["alphatab","importer","GpxParser"];
+alphatab.importer.GpxParser.__name__ = true;
 alphatab.importer.GpxParser.prototype = {
 	buildModel: function() {
 		var $it0 = this._beatById.keys();
@@ -6019,22 +5145,6 @@ alphatab.importer.GpxParser.prototype = {
 		var dom = Xml.parse(xml);
 		this.parseDom(dom);
 	}
-	,_tappedNotes: null
-	,_notesOfBeat: null
-	,_noteById: null
-	,_rhythmById: null
-	,_beatById: null
-	,_rhythmOfBeat: null
-	,_beatsOfVoice: null
-	,_voiceById: null
-	,_voicesOfBar: null
-	,_barsById: null
-	,_barsOfMasterBar: null
-	,_masterBars: null
-	,_tracksById: null
-	,_tracksMapping: null
-	,_automations: null
-	,score: null
 	,__class__: alphatab.importer.GpxParser
 }
 alphatab.importer.MixTableChange = function() {
@@ -6045,18 +5155,12 @@ alphatab.importer.MixTableChange = function() {
 	this.tempo = -1;
 	this.duration = 0;
 };
-alphatab.importer.MixTableChange.__name__ = ["alphatab","importer","MixTableChange"];
+alphatab.importer.MixTableChange.__name__ = true;
 alphatab.importer.MixTableChange.prototype = {
-	duration: null
-	,tempo: null
-	,tempoName: null
-	,instrument: null
-	,balance: null
-	,volume: null
-	,__class__: alphatab.importer.MixTableChange
+	__class__: alphatab.importer.MixTableChange
 }
 alphatab.importer.ScoreLoader = function() { }
-alphatab.importer.ScoreLoader.__name__ = ["alphatab","importer","ScoreLoader"];
+alphatab.importer.ScoreLoader.__name__ = true;
 alphatab.importer.ScoreLoader.loadScoreAsync = function(path,success,error) {
 	var loader = (alphatab.Environment.fileLoaders.get("default"))();
 	loader.loadBinaryAsync(path,function(data) {
@@ -6100,7 +5204,7 @@ alphatab.importer.ScoreLoader.loadScore = function(path) {
 }
 if(!haxe.io) haxe.io = {}
 haxe.io.Input = function() { }
-haxe.io.Input.__name__ = ["haxe","io","Input"];
+haxe.io.Input.__name__ = true;
 haxe.io.Input.prototype = {
 	readString: function(len) {
 		var b = haxe.io.Bytes.alloc(len);
@@ -6171,7 +5275,6 @@ haxe.io.Input.prototype = {
 			return $r;
 		}(this));
 	}
-	,bigEndian: null
 	,__class__: haxe.io.Input
 }
 if(!alphatab.io) alphatab.io = {}
@@ -6180,7 +5283,7 @@ alphatab.io.BitInput = function(input) {
 	this._readBytes = 0;
 	this._position = 8;
 };
-alphatab.io.BitInput.__name__ = ["alphatab","io","BitInput"];
+alphatab.io.BitInput.__name__ = true;
 alphatab.io.BitInput.__super__ = haxe.io.Input;
 alphatab.io.BitInput.prototype = $extend(haxe.io.Input.prototype,{
 	readBit: function() {
@@ -6218,10 +5321,6 @@ alphatab.io.BitInput.prototype = $extend(haxe.io.Input.prototype,{
 	,getReadBytes: function() {
 		return this._readBytes;
 	}
-	,_readBytes: null
-	,_input: null
-	,_position: null
-	,_currentByte: null
 	,__class__: alphatab.io.BitInput
 });
 alphatab.io.BytesArray = function(initialSize) {
@@ -6229,7 +5328,7 @@ alphatab.io.BytesArray = function(initialSize) {
 	this._data = haxe.io.Bytes.alloc(initialSize);
 	this.length = 0;
 };
-alphatab.io.BytesArray.__name__ = ["alphatab","io","BytesArray"];
+alphatab.io.BytesArray.__name__ = true;
 alphatab.io.BytesArray.ofBytes = function(b) {
 	var a = new alphatab.io.BytesArray();
 	a._data = b;
@@ -6284,12 +5383,10 @@ alphatab.io.BytesArray.prototype = {
 		if(pos >= this.length) throw haxe.io.Error.OutsideBounds;
 		return this._data.b[pos];
 	}
-	,length: null
-	,_data: null
 	,__class__: alphatab.io.BytesArray
 }
 alphatab.io.OutputExtensions = function() { }
-alphatab.io.OutputExtensions.__name__ = ["alphatab","io","OutputExtensions"];
+alphatab.io.OutputExtensions.__name__ = true;
 alphatab.io.OutputExtensions.writeAsString = function(output,value) {
 	var text;
 	if(js.Boot.__instanceof(value,String)) text = js.Boot.__cast(value , String); else text = Std.string(value);
@@ -6320,7 +5417,7 @@ alphatab.model.AccidentalType.Flat.toString = $estr;
 alphatab.model.AccidentalType.Flat.__enum__ = alphatab.model.AccidentalType;
 alphatab.model.Automation = function() {
 };
-alphatab.model.Automation.__name__ = ["alphatab","model","Automation"];
+alphatab.model.Automation.__name__ = true;
 alphatab.model.Automation.builtTempoAutomation = function(isLinear,ratioPosition,value,reference) {
 	if(reference < 1 || reference > 5) reference = 2;
 	var references = [1.0,0.5,1.0,1.5,2.0,3.0];
@@ -6340,11 +5437,6 @@ alphatab.model.Automation.prototype = {
 		a.value = this.value;
 		return a;
 	}
-	,text: null
-	,ratioPosition: null
-	,value: null
-	,type: null
-	,isLinear: null
 	,__class__: alphatab.model.Automation
 }
 alphatab.model.AutomationType = { __ename__ : true, __constructs__ : ["Tempo","Volume","Instrument","Balance"] }
@@ -6364,7 +5456,7 @@ alphatab.model.Bar = function() {
 	this.voices = new Array();
 	this.clef = alphatab.model.Clef.G2;
 };
-alphatab.model.Bar.__name__ = ["alphatab","model","Bar"];
+alphatab.model.Bar.__name__ = true;
 alphatab.model.Bar.prototype = {
 	isEmpty: function() {
 		var _g = 0, _g1 = this.voices;
@@ -6383,12 +5475,6 @@ alphatab.model.Bar.prototype = {
 		voice.index = this.voices.length;
 		this.voices.push(voice);
 	}
-	,voices: null
-	,track: null
-	,clef: null
-	,previousBar: null
-	,nextBar: null
-	,index: null
 	,__class__: alphatab.model.Bar
 }
 alphatab.model.Beat = function() {
@@ -6407,7 +5493,7 @@ alphatab.model.Beat = function() {
 	this.dynamicValue = alphatab.model.DynamicValue.F;
 	this.crescendo = alphatab.rendering.glyphs.CrescendoType.None;
 };
-alphatab.model.Beat.__name__ = ["alphatab","model","Beat"];
+alphatab.model.Beat.__name__ = true;
 alphatab.model.Beat.prototype = {
 	getNoteOnString: function(string) {
 		var _g = 0, _g1 = this.notes;
@@ -6488,60 +5574,29 @@ alphatab.model.Beat.prototype = {
 		beat.crescendo = this.crescendo;
 		return beat;
 	}
-	,dynamicValue: null
-	,start: null
-	,crescendo: null
-	,tremoloSpeed: null
 	,isTremolo: function() {
 		return this.tremoloSpeed != null;
 	}
-	,pickStroke: null
-	,graceType: null
 	,chord: function() {
 		return this.voice.bar.track.chords.get(this.chordId);
 	}
 	,hasChord: function() {
 		return this.chordId != null;
 	}
-	,chordId: null
-	,vibrato: null
 	,hasWhammyBar: function() {
 		return this.whammyBarPoints.length > 0;
 	}
-	,whammyBarPoints: null
-	,tupletNumerator: null
-	,tupletDenominator: null
-	,brushDuration: null
-	,brushType: null
-	,text: null
-	,tap: null
-	,slap: null
-	,hasRasgueado: null
-	,pop: null
-	,lyrics: null
-	,fadeIn: null
-	,dots: null
 	,isRest: function() {
 		return this.notes.length == 0;
 	}
-	,automations: null
-	,isEmpty: null
-	,duration: null
 	,maxNote: function() {
 		if(this._maxNote == null) this.refreshNotes();
 		return this._maxNote;
 	}
-	,_maxNote: null
 	,minNote: function() {
 		if(this._minNote == null) this.refreshNotes();
 		return this._minNote;
 	}
-	,_minNote: null
-	,notes: null
-	,voice: null
-	,index: null
-	,nextBeat: null
-	,previousBeat: null
 	,__class__: alphatab.model.Beat
 }
 alphatab.model.BendPoint = function(offset,value) {
@@ -6550,7 +5605,7 @@ alphatab.model.BendPoint = function(offset,value) {
 	this.offset = offset;
 	this.value = value;
 };
-alphatab.model.BendPoint.__name__ = ["alphatab","model","BendPoint"];
+alphatab.model.BendPoint.__name__ = true;
 alphatab.model.BendPoint.prototype = {
 	clone: function() {
 		var point = new alphatab.model.BendPoint();
@@ -6558,8 +5613,6 @@ alphatab.model.BendPoint.prototype = {
 		point.value = this.value;
 		return point;
 	}
-	,value: null
-	,offset: null
 	,__class__: alphatab.model.BendPoint
 }
 alphatab.model.BrushType = { __ename__ : true, __constructs__ : ["None","BrushUp","BrushDown","ArpeggioUp","ArpeggioDown"] }
@@ -6581,12 +5634,9 @@ alphatab.model.BrushType.ArpeggioDown.__enum__ = alphatab.model.BrushType;
 alphatab.model.Chord = function() {
 	this.strings = new Array();
 };
-alphatab.model.Chord.__name__ = ["alphatab","model","Chord"];
+alphatab.model.Chord.__name__ = true;
 alphatab.model.Chord.prototype = {
-	strings: null
-	,firstFret: null
-	,name: null
-	,__class__: alphatab.model.Chord
+	__class__: alphatab.model.Chord
 }
 alphatab.model.Clef = { __ename__ : true, __constructs__ : ["Neutral","C3","C4","F4","G2"] }
 alphatab.model.Clef.Neutral = ["Neutral",0];
@@ -6696,38 +5746,21 @@ alphatab.model.MasterBar = function() {
 	this.tripletFeel = alphatab.model.TripletFeel.NoTripletFeel;
 	this.start = 0;
 };
-alphatab.model.MasterBar.__name__ = ["alphatab","model","MasterBar"];
+alphatab.model.MasterBar.__name__ = true;
 alphatab.model.MasterBar.prototype = {
 	calculateDuration: function() {
 		return this.timeSignatureNumerator * alphatab.audio.MidiUtils.valueToTicks(this.timeSignatureDenominator);
 	}
-	,start: null
-	,score: null
-	,volumeAutomation: null
-	,tempoAutomation: null
 	,isSectionStart: function() {
 		return this.section != null;
 	}
-	,section: null
-	,tripletFeel: null
-	,timeSignatureNumerator: null
-	,timeSignatureDenominator: null
-	,repeatGroup: null
-	,repeatCount: null
 	,isRepeatEnd: function() {
 		return this.repeatCount > 0;
 	}
-	,isRepeatStart: null
-	,isDoubleBar: null
-	,keySignature: null
-	,index: null
-	,previousMasterBar: null
-	,nextMasterBar: null
-	,alternateEndings: null
 	,__class__: alphatab.model.MasterBar
 }
 alphatab.model.ModelUtils = function() { }
-alphatab.model.ModelUtils.__name__ = ["alphatab","model","ModelUtils"];
+alphatab.model.ModelUtils.__name__ = true;
 alphatab.model.ModelUtils.getDurationValue = function(duration) {
 	switch( (duration)[1] ) {
 	case 0:
@@ -6803,7 +5836,7 @@ alphatab.model.Note = function() {
 	this.durationPercent = 1;
 	this.octave = -1;
 };
-alphatab.model.Note.__name__ = ["alphatab","model","Note"];
+alphatab.model.Note.__name__ = true;
 alphatab.model.Note.prototype = {
 	realValue: function() {
 		return this.fret + this.beat.voice.bar.track.tuning[this.beat.voice.bar.track.tuning.length - (this.string - 1) - 1];
@@ -6845,45 +5878,15 @@ alphatab.model.Note.prototype = {
 		n.durationPercent = this.durationPercent;
 		return n;
 	}
-	,octave: null
-	,dynamicValue: null
-	,beat: null
-	,swapAccidentals: null
-	,durationPercent: null
-	,trillSpeed: null
 	,isTrill: function() {
 		return this.trillValue >= 0;
 	}
 	,trillFret: function() {
 		return this.trillValue - this.beat.voice.bar.track.tuning[this.beat.voice.bar.track.tuning.length - (this.string - 1) - 1];
 	}
-	,trillValue: null
-	,isFingering: null
-	,rightHandFinger: null
-	,leftHandFinger: null
-	,isTieDestination: null
-	,isTieOrigin: null
-	,tieOrigin: null
-	,isStaccato: null
-	,vibrato: null
-	,slideTarget: null
-	,slideType: null
-	,isDead: null
-	,isPalmMute: null
-	,isLetRing: null
-	,harmonicType: null
-	,harmonicValue: null
-	,isHammerPullOrigin: null
-	,isHammerPullDestination: null
-	,hammerPullOrigin: null
-	,string: null
-	,isGhost: null
-	,fret: null
 	,hasBend: function() {
 		return this.bendPoints.length > 1;
 	}
-	,bendPoints: null
-	,accentuated: null
 	,__class__: alphatab.model.Note
 }
 alphatab.model.PickStrokeType = { __ename__ : true, __constructs__ : ["None","Up","Down"] }
@@ -6898,17 +5901,9 @@ alphatab.model.PickStrokeType.Down.toString = $estr;
 alphatab.model.PickStrokeType.Down.__enum__ = alphatab.model.PickStrokeType;
 alphatab.model.PlaybackInformation = function() {
 };
-alphatab.model.PlaybackInformation.__name__ = ["alphatab","model","PlaybackInformation"];
+alphatab.model.PlaybackInformation.__name__ = true;
 alphatab.model.PlaybackInformation.prototype = {
-	isSolo: null
-	,isMute: null
-	,secondaryChannel: null
-	,primaryChannel: null
-	,program: null
-	,port: null
-	,balance: null
-	,volume: null
-	,__class__: alphatab.model.PlaybackInformation
+	__class__: alphatab.model.PlaybackInformation
 }
 alphatab.model.RepeatGroup = function() {
 	this.masterBars = new Array();
@@ -6916,7 +5911,7 @@ alphatab.model.RepeatGroup = function() {
 	this.openings = new Array();
 	this.isClosed = false;
 };
-alphatab.model.RepeatGroup.__name__ = ["alphatab","model","RepeatGroup"];
+alphatab.model.RepeatGroup.__name__ = true;
 alphatab.model.RepeatGroup.prototype = {
 	addMasterBar: function(masterBar) {
 		if(this.openings.length == 0) this.openings.push(masterBar);
@@ -6930,10 +5925,6 @@ alphatab.model.RepeatGroup.prototype = {
 			this.openings.push(masterBar);
 		}
 	}
-	,isClosed: null
-	,closings: null
-	,openings: null
-	,masterBars: null
 	,__class__: alphatab.model.RepeatGroup
 }
 alphatab.model.Score = function() {
@@ -6941,7 +5932,7 @@ alphatab.model.Score = function() {
 	this.tracks = new Array();
 	this._currentRepeatGroup = new alphatab.model.RepeatGroup();
 };
-alphatab.model.Score.__name__ = ["alphatab","model","Score"];
+alphatab.model.Score.__name__ = true;
 alphatab.model.Score.prototype = {
 	addTrack: function(track) {
 		track.score = this;
@@ -6960,30 +5951,13 @@ alphatab.model.Score.prototype = {
 		this._currentRepeatGroup.addMasterBar(bar);
 		this.masterBars.push(bar);
 	}
-	,tracks: null
-	,masterBars: null
-	,tempoLabel: null
-	,tempo: null
-	,tab: null
-	,words: null
-	,title: null
-	,subTitle: null
-	,notices: null
-	,music: null
-	,instructions: null
-	,copyright: null
-	,artist: null
-	,album: null
-	,_currentRepeatGroup: null
 	,__class__: alphatab.model.Score
 }
 alphatab.model.Section = function() {
 };
-alphatab.model.Section.__name__ = ["alphatab","model","Section"];
+alphatab.model.Section.__name__ = true;
 alphatab.model.Section.prototype = {
-	text: null
-	,marker: null
-	,__class__: alphatab.model.Section
+	__class__: alphatab.model.Section
 }
 alphatab.model.SlideType = { __ename__ : true, __constructs__ : ["None","Shift","Legato","IntoFromBelow","IntoFromAbove","OutUp","OutDown"] }
 alphatab.model.SlideType.None = ["None",0];
@@ -7013,7 +5987,7 @@ alphatab.model.Track = function() {
 	this.chords = new haxe.ds.StringMap();
 	this.playbackInfo = new alphatab.model.PlaybackInformation();
 };
-alphatab.model.Track.__name__ = ["alphatab","model","Track"];
+alphatab.model.Track.__name__ = true;
 alphatab.model.Track.prototype = {
 	addBar: function(bar) {
 		bar.track = this;
@@ -7024,17 +5998,6 @@ alphatab.model.Track.prototype = {
 		}
 		this.bars.push(bar);
 	}
-	,chords: null
-	,bars: null
-	,score: null
-	,isPercussion: null
-	,playbackInfo: null
-	,tuningName: null
-	,tuning: null
-	,shortName: null
-	,name: null
-	,index: null
-	,capo: null
 	,__class__: alphatab.model.Track
 }
 alphatab.model.TripletFeel = { __ename__ : true, __constructs__ : ["NoTripletFeel","Triplet16th","Triplet8th","Dotted16th","Dotted8th","Scottish16th","Scottish8th"] }
@@ -7064,7 +6027,7 @@ alphatab.model.Tuning = function(name,tuning,isStandard) {
 	this.tuning = tuning;
 	this.isStandard = isStandard;
 };
-alphatab.model.Tuning.__name__ = ["alphatab","model","Tuning"];
+alphatab.model.Tuning.__name__ = true;
 alphatab.model.Tuning.isTuning = function(name) {
 	var regex = alphatab.model.Tuning.TuningRegex;
 	return regex.match(name);
@@ -7171,10 +6134,7 @@ alphatab.model.Tuning.findTuning = function(strings) {
 	return null;
 }
 alphatab.model.Tuning.prototype = {
-	tuning: null
-	,name: null
-	,isStandard: null
-	,__class__: alphatab.model.Tuning
+	__class__: alphatab.model.Tuning
 }
 alphatab.model.VibratoType = { __ename__ : true, __constructs__ : ["None","Slight","Wide"] }
 alphatab.model.VibratoType.None = ["None",0];
@@ -7189,7 +6149,7 @@ alphatab.model.VibratoType.Wide.__enum__ = alphatab.model.VibratoType;
 alphatab.model.Voice = function() {
 	this.beats = new Array();
 };
-alphatab.model.Voice.__name__ = ["alphatab","model","Voice"];
+alphatab.model.Voice.__name__ = true;
 alphatab.model.Voice.prototype = {
 	isEmpty: function() {
 		return this.beats.length == 0;
@@ -7208,13 +6168,10 @@ alphatab.model.Voice.prototype = {
 		beat.index = this.beats.length;
 		this.beats.push(beat);
 	}
-	,beats: null
-	,bar: null
-	,index: null
 	,__class__: alphatab.model.Voice
 }
 alphatab.platform.svg.FontSizes = function() { }
-alphatab.platform.svg.FontSizes.__name__ = ["alphatab","platform","svg","FontSizes"];
+alphatab.platform.svg.FontSizes.__name__ = true;
 alphatab.platform.svg.FontSizes.measureString = function(s,f,size) {
 	var data;
 	var dataSize;
@@ -7258,7 +6215,7 @@ alphatab.rendering.BarRendererBase = function(bar) {
 	this.bottomOverflow = 0;
 	this.isEmpty = true;
 };
-alphatab.rendering.BarRendererBase.__name__ = ["alphatab","rendering","BarRendererBase"];
+alphatab.rendering.BarRendererBase.__name__ = true;
 alphatab.rendering.BarRendererBase.prototype = {
 	paint: function(cx,cy,canvas) {
 	}
@@ -7302,16 +6259,6 @@ alphatab.rendering.BarRendererBase.prototype = {
 	,registerOverflowTop: function(topOverflow) {
 		if(topOverflow > this.topOverflow) this.topOverflow = topOverflow;
 	}
-	,_bar: null
-	,bottomOverflow: null
-	,topOverflow: null
-	,isEmpty: null
-	,index: null
-	,height: null
-	,width: null
-	,y: null
-	,x: null
-	,stave: null
 	,__class__: alphatab.rendering.BarRendererBase
 }
 alphatab.rendering.AlternateEndingsBarRenderer = function(bar) {
@@ -7324,7 +6271,7 @@ alphatab.rendering.AlternateEndingsBarRenderer = function(bar) {
 		if((alternateEndings & 1 << i) != 0) this._endings.push(i);
 	}
 };
-alphatab.rendering.AlternateEndingsBarRenderer.__name__ = ["alphatab","rendering","AlternateEndingsBarRenderer"];
+alphatab.rendering.AlternateEndingsBarRenderer.__name__ = true;
 alphatab.rendering.AlternateEndingsBarRenderer.__super__ = alphatab.rendering.BarRendererBase;
 alphatab.rendering.AlternateEndingsBarRenderer.prototype = $extend(alphatab.rendering.BarRendererBase.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -7370,8 +6317,6 @@ alphatab.rendering.AlternateEndingsBarRenderer.prototype = $extend(alphatab.rend
 		alphatab.rendering.BarRendererBase.prototype.finalizeRenderer.call(this,layout);
 		this.isEmpty = this._endings.length == 0;
 	}
-	,_endingsString: null
-	,_endings: null
 	,__class__: alphatab.rendering.AlternateEndingsBarRenderer
 });
 alphatab.rendering.EffectBarGlyphSizing = { __ename__ : true, __constructs__ : ["SinglePreBeatOnly","SinglePreBeatToOnBeat","SinglePreBeatToPostBeat","SingleOnBeatOnly","SingleOnBeatToPostBeat","SinglePostBeatOnly","GroupedPreBeatOnly","GroupedPreBeatToOnBeat","GroupedPreBeatToPostBeat","GroupedOnBeatOnly","GroupedOnBeatToPostBeat","GroupedPostBeatOnly"] }
@@ -7417,7 +6362,7 @@ alphatab.rendering.GroupedBarRenderer = function(bar) {
 	this._voiceContainers = new haxe.ds.IntMap();
 	this._postBeatGlyphs = new Array();
 };
-alphatab.rendering.GroupedBarRenderer.__name__ = ["alphatab","rendering","GroupedBarRenderer"];
+alphatab.rendering.GroupedBarRenderer.__name__ = true;
 alphatab.rendering.GroupedBarRenderer.__super__ = alphatab.rendering.BarRendererBase;
 alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.BarRendererBase.prototype,{
 	paintBackground: function(cx,cy,canvas) {
@@ -7582,10 +6527,6 @@ alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.Bar
 		}
 		this.updateWidth();
 	}
-	,_biggestVoiceContainer: null
-	,_postBeatGlyphs: null
-	,_voiceContainers: null
-	,_preBeatGlyphs: null
 	,__class__: alphatab.rendering.GroupedBarRenderer
 });
 alphatab.rendering.EffectBarRenderer = function(bar,info) {
@@ -7594,7 +6535,7 @@ alphatab.rendering.EffectBarRenderer = function(bar,info) {
 	this._uniqueEffectGlyphs = new Array();
 	this._effectGlyphs = new Array();
 };
-alphatab.rendering.EffectBarRenderer.__name__ = ["alphatab","rendering","EffectBarRenderer"];
+alphatab.rendering.EffectBarRenderer.__name__ = true;
 alphatab.rendering.EffectBarRenderer.__super__ = alphatab.rendering.GroupedBarRenderer;
 alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.GroupedBarRenderer.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -7793,10 +6734,6 @@ alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.Grou
 		}
 		this.height = this._info.getHeight(this);
 	}
-	,_lastBeat: null
-	,_effectGlyphs: null
-	,_uniqueEffectGlyphs: null
-	,_info: null
 	,__class__: alphatab.rendering.EffectBarRenderer
 });
 alphatab.rendering.Glyph = function(x,y) {
@@ -7805,7 +6742,7 @@ alphatab.rendering.Glyph = function(x,y) {
 	this.x = x;
 	this.y = y;
 };
-alphatab.rendering.Glyph.__name__ = ["alphatab","rendering","Glyph"];
+alphatab.rendering.Glyph.__name__ = true;
 alphatab.rendering.Glyph.prototype = {
 	paint: function(cx,cy,canvas) {
 	}
@@ -7820,17 +6757,12 @@ alphatab.rendering.Glyph.prototype = {
 	,applyGlyphSpacing: function(spacing) {
 		if(this.canScale()) this.width += spacing;
 	}
-	,renderer: null
-	,width: null
-	,y: null
-	,x: null
-	,index: null
 	,__class__: alphatab.rendering.Glyph
 }
 alphatab.rendering.RenderingResources = function(scale) {
 	this.init(scale);
 };
-alphatab.rendering.RenderingResources.__name__ = ["alphatab","rendering","RenderingResources"];
+alphatab.rendering.RenderingResources.__name__ = true;
 alphatab.rendering.RenderingResources.prototype = {
 	init: function(scale) {
 		var sansFont = "Arial";
@@ -7850,20 +6782,6 @@ alphatab.rendering.RenderingResources.prototype = {
 		this.tabClefFont = new alphatab.platform.model.Font(sansFont,18 * scale,1);
 		this.mainGlyphColor = new alphatab.platform.model.Color(0,0,0);
 	}
-	,mainGlyphColor: null
-	,tabClefFont: null
-	,markerFont: null
-	,barNumberColor: null
-	,barNumberFont: null
-	,barSeperatorColor: null
-	,staveLineColor: null
-	,graceFont: null
-	,tablatureFont: null
-	,effectFont: null
-	,wordsFont: null
-	,subTitleFont: null
-	,titleFont: null
-	,copyrightFont: null
 	,__class__: alphatab.rendering.RenderingResources
 }
 alphatab.rendering.ScoreBarRenderer = function(bar) {
@@ -7873,7 +6791,7 @@ alphatab.rendering.ScoreBarRenderer = function(bar) {
 	this._beamHelperLookup = new Array();
 	this._tupletHelpers = new Array();
 };
-alphatab.rendering.ScoreBarRenderer.__name__ = ["alphatab","rendering","ScoreBarRenderer"];
+alphatab.rendering.ScoreBarRenderer.__name__ = true;
 alphatab.rendering.ScoreBarRenderer.paintSingleBar = function(canvas,x1,y1,x2,y2,size) {
 	canvas.beginPath();
 	canvas.moveTo(x1,y1);
@@ -8010,7 +6928,6 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 		this.addPreBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,2 * this.stave.staveGroup.layout.renderer.scale | 0));
 		this._startSpacing = true;
 	}
-	,_startSpacing: null
 	,createPostBeatGlyphs: function() {
 		if(this._bar.getMasterBar().repeatCount > 0) {
 			this.addPostBeatGlyph(new alphatab.rendering.glyphs.RepeatCloseGlyph(this.x,0));
@@ -8334,12 +7251,6 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 		if(g != null) return g.noteHeads.beamingHelper.getDirection();
 		return alphatab.rendering.utils.BeamDirection.Up;
 	}
-	,_currentTupletHelper: null
-	,_currentBeamHelper: null
-	,_tupletHelpers: null
-	,_beamHelperLookup: null
-	,_beamHelpers: null
-	,accidentalHelper: null
 	,__class__: alphatab.rendering.ScoreBarRenderer
 });
 alphatab.rendering.ScoreRenderer = function(settings,param) {
@@ -8349,7 +7260,7 @@ alphatab.rendering.ScoreRenderer = function(settings,param) {
 	this.updateScale(1.0);
 	if(settings.layout == null || !alphatab.Environment.layoutEngines.exists(settings.layout.mode)) this.layout = (alphatab.Environment.layoutEngines.get("default"))(this); else this.layout = (alphatab.Environment.layoutEngines.get(settings.layout.mode))(this);
 };
-alphatab.rendering.ScoreRenderer.__name__ = ["alphatab","rendering","ScoreRenderer"];
+alphatab.rendering.ScoreRenderer.__name__ = true;
 alphatab.rendering.ScoreRenderer.prototype = {
 	raiseRenderFinished: function() {
 		var _g = 0, _g1 = this._renderFinishedListeners;
@@ -8401,20 +7312,12 @@ alphatab.rendering.ScoreRenderer.prototype = {
 		this.renderingResources = new alphatab.rendering.RenderingResources(scale);
 		this.canvas.setLineWidth(scale);
 	}
-	,settings: null
-	,renderingResources: null
-	,layout: null
-	,scale: null
-	,track: null
-	,score: null
-	,canvas: null
-	,_renderFinishedListeners: null
 	,__class__: alphatab.rendering.ScoreRenderer
 }
 alphatab.rendering.TabBarRenderer = function(bar) {
 	alphatab.rendering.GroupedBarRenderer.call(this,bar);
 };
-alphatab.rendering.TabBarRenderer.__name__ = ["alphatab","rendering","TabBarRenderer"];
+alphatab.rendering.TabBarRenderer.__name__ = true;
 alphatab.rendering.TabBarRenderer.__super__ = alphatab.rendering.GroupedBarRenderer;
 alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.GroupedBarRenderer.prototype,{
 	drawInfoGuide: function(canvas,cx,cy,y,c) {
@@ -8520,7 +7423,7 @@ alphatab.rendering.effects.FingeringEffectInfo = function() {
 	alphatab.rendering.effects.NoteEffectInfoBase.call(this);
 	this._maxGlyphCount = 0;
 };
-alphatab.rendering.effects.FingeringEffectInfo.__name__ = ["alphatab","rendering","effects","FingeringEffectInfo"];
+alphatab.rendering.effects.FingeringEffectInfo.__name__ = true;
 alphatab.rendering.effects.FingeringEffectInfo.__super__ = alphatab.rendering.effects.NoteEffectInfoBase;
 alphatab.rendering.effects.FingeringEffectInfo.prototype = $extend(alphatab.rendering.effects.NoteEffectInfoBase.prototype,{
 	createNewGlyph: function(renderer,beat) {
@@ -8540,7 +7443,6 @@ alphatab.rendering.effects.FingeringEffectInfo.prototype = $extend(alphatab.rend
 		if(this._lastCreateInfo.length > this._maxGlyphCount) this._maxGlyphCount = this._lastCreateInfo.length;
 		return result;
 	}
-	,_maxGlyphCount: null
 	,__class__: alphatab.rendering.effects.FingeringEffectInfo
 });
 if(!alphatab.rendering.glyphs) alphatab.rendering.glyphs = {}
@@ -8552,7 +7454,7 @@ alphatab.rendering.glyphs.SvgGlyph = function(x,y,svg,xScale,yScale) {
 	this._xGlyphScale = xScale * 0.0099;
 	this._yGlyphScale = yScale * 0.0099;
 };
-alphatab.rendering.glyphs.SvgGlyph.__name__ = ["alphatab","rendering","glyphs","SvgGlyph"];
+alphatab.rendering.glyphs.SvgGlyph.__name__ = true;
 alphatab.rendering.glyphs.SvgGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.SvgGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	parseCommand: function(cx,cy,canvas) {
@@ -8746,15 +7648,6 @@ alphatab.rendering.glyphs.SvgGlyph.prototype = $extend(alphatab.rendering.Glyph.
 	,getSvgData: function() {
 		return this._svg.svg;
 	}
-	,_lastControlY: null
-	,_lastControlX: null
-	,_yGlyphScale: null
-	,_xGlyphScale: null
-	,_yScale: null
-	,_xScale: null
-	,_currentY: null
-	,_currentX: null
-	,_svg: null
 	,__class__: alphatab.rendering.glyphs.SvgGlyph
 });
 alphatab.rendering.glyphs.AccentuationGlyph = function(x,y,accentuation) {
@@ -8762,7 +7655,7 @@ alphatab.rendering.glyphs.AccentuationGlyph = function(x,y,accentuation) {
 	if(x == null) x = 0;
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,this.getSvg(accentuation),1,1);
 };
-alphatab.rendering.glyphs.AccentuationGlyph.__name__ = ["alphatab","rendering","glyphs","AccentuationGlyph"];
+alphatab.rendering.glyphs.AccentuationGlyph.__name__ = true;
 alphatab.rendering.glyphs.AccentuationGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.AccentuationGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	getSvg: function(accentuation) {
@@ -8789,7 +7682,7 @@ alphatab.rendering.glyphs.GlyphGroup = function(x,y,glyphs) {
 	alphatab.rendering.Glyph.call(this,x,y);
 	this._glyphs = glyphs != null?glyphs:new Array();
 };
-alphatab.rendering.glyphs.GlyphGroup.__name__ = ["alphatab","rendering","glyphs","GlyphGroup"];
+alphatab.rendering.glyphs.GlyphGroup.__name__ = true;
 alphatab.rendering.glyphs.GlyphGroup.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.GlyphGroup.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -8816,7 +7709,6 @@ alphatab.rendering.glyphs.GlyphGroup.prototype = $extend(alphatab.rendering.Glyp
 		}
 		this.width = w;
 	}
-	,_glyphs: null
 	,__class__: alphatab.rendering.glyphs.GlyphGroup
 });
 alphatab.rendering.glyphs.AccidentalGroupGlyph = function(x,y) {
@@ -8824,7 +7716,7 @@ alphatab.rendering.glyphs.AccidentalGroupGlyph = function(x,y) {
 	if(x == null) x = 0;
 	alphatab.rendering.glyphs.GlyphGroup.call(this,x,y,new Array());
 };
-alphatab.rendering.glyphs.AccidentalGroupGlyph.__name__ = ["alphatab","rendering","glyphs","AccidentalGroupGlyph"];
+alphatab.rendering.glyphs.AccidentalGroupGlyph.__name__ = true;
 alphatab.rendering.glyphs.AccidentalGroupGlyph.__super__ = alphatab.rendering.glyphs.GlyphGroup;
 alphatab.rendering.glyphs.AccidentalGroupGlyph.prototype = $extend(alphatab.rendering.glyphs.GlyphGroup.prototype,{
 	doLayout: function() {
@@ -8868,7 +7760,7 @@ alphatab.rendering.glyphs.BarNumberGlyph = function(x,y,number,hidden) {
 	this._number = number;
 	this._hidden = hidden;
 };
-alphatab.rendering.glyphs.BarNumberGlyph.__name__ = ["alphatab","rendering","glyphs","BarNumberGlyph"];
+alphatab.rendering.glyphs.BarNumberGlyph.__name__ = true;
 alphatab.rendering.glyphs.BarNumberGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.BarNumberGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -8886,8 +7778,6 @@ alphatab.rendering.glyphs.BarNumberGlyph.prototype = $extend(alphatab.rendering.
 		scoreRenderer.canvas.setFont(scoreRenderer.renderingResources.barNumberFont);
 		this.width = this.renderer.stave.staveGroup.layout.renderer.canvas.measureText(Std.string(this._number)) + 3 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
-	,_hidden: null
-	,_number: null
 	,__class__: alphatab.rendering.glyphs.BarNumberGlyph
 });
 alphatab.rendering.glyphs.BarSeperatorGlyph = function(x,y,isLast) {
@@ -8897,7 +7787,7 @@ alphatab.rendering.glyphs.BarSeperatorGlyph = function(x,y,isLast) {
 	alphatab.rendering.Glyph.call(this,x,y);
 	this._isLast = isLast;
 };
-alphatab.rendering.glyphs.BarSeperatorGlyph.__name__ = ["alphatab","rendering","glyphs","BarSeperatorGlyph"];
+alphatab.rendering.glyphs.BarSeperatorGlyph.__name__ = true;
 alphatab.rendering.glyphs.BarSeperatorGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.BarSeperatorGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -8923,7 +7813,6 @@ alphatab.rendering.glyphs.BarSeperatorGlyph.prototype = $extend(alphatab.renderi
 	,doLayout: function() {
 		this.width = (this._isLast?8:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
-	,_isLast: null
 	,__class__: alphatab.rendering.glyphs.BarSeperatorGlyph
 });
 alphatab.rendering.glyphs.BeamGlyph = function(x,y,duration,direction,isGrace) {
@@ -8931,7 +7820,7 @@ alphatab.rendering.glyphs.BeamGlyph = function(x,y,duration,direction,isGrace) {
 	if(x == null) x = 0;
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,this.getRestSvg(duration,direction,isGrace),isGrace?0.7:1,this.getSvgScale(duration,direction,isGrace));
 };
-alphatab.rendering.glyphs.BeamGlyph.__name__ = ["alphatab","rendering","glyphs","BeamGlyph"];
+alphatab.rendering.glyphs.BeamGlyph.__name__ = true;
 alphatab.rendering.glyphs.BeamGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.BeamGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	getRestSvg: function(duration,direction,isGrace) {
@@ -8959,17 +7848,16 @@ alphatab.rendering.glyphs.BeamGlyph.prototype = $extend(alphatab.rendering.glyph
 	,__class__: alphatab.rendering.glyphs.BeamGlyph
 });
 alphatab.rendering.glyphs.ISupportsFinalize = function() { }
-alphatab.rendering.glyphs.ISupportsFinalize.__name__ = ["alphatab","rendering","glyphs","ISupportsFinalize"];
+alphatab.rendering.glyphs.ISupportsFinalize.__name__ = true;
 alphatab.rendering.glyphs.ISupportsFinalize.prototype = {
-	finalizeGlyph: null
-	,__class__: alphatab.rendering.glyphs.ISupportsFinalize
+	__class__: alphatab.rendering.glyphs.ISupportsFinalize
 }
 alphatab.rendering.glyphs.BeatContainerGlyph = function(beat) {
 	alphatab.rendering.Glyph.call(this,0,0);
 	this.beat = beat;
 	this.ties = new Array();
 };
-alphatab.rendering.glyphs.BeatContainerGlyph.__name__ = ["alphatab","rendering","glyphs","BeatContainerGlyph"];
+alphatab.rendering.glyphs.BeatContainerGlyph.__name__ = true;
 alphatab.rendering.glyphs.BeatContainerGlyph.__interfaces__ = [alphatab.rendering.glyphs.ISupportsFinalize];
 alphatab.rendering.glyphs.BeatContainerGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.BeatContainerGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
@@ -9046,17 +7934,12 @@ alphatab.rendering.glyphs.BeatContainerGlyph.prototype = $extend(alphatab.render
 		if(js.Boot.__instanceof(this.onNotes,alphatab.rendering.glyphs.ISupportsFinalize)) (js.Boot.__cast(this.onNotes , alphatab.rendering.glyphs.ISupportsFinalize)).finalizeGlyph(layout);
 		if(js.Boot.__instanceof(this.postNotes,alphatab.rendering.glyphs.ISupportsFinalize)) (js.Boot.__cast(this.postNotes , alphatab.rendering.glyphs.ISupportsFinalize)).finalizeGlyph(layout);
 	}
-	,ties: null
-	,postNotes: null
-	,onNotes: null
-	,preNotes: null
-	,beat: null
 	,__class__: alphatab.rendering.glyphs.BeatContainerGlyph
 });
 alphatab.rendering.glyphs.BeatGlyphBase = function() {
 	alphatab.rendering.glyphs.GlyphGroup.call(this);
 };
-alphatab.rendering.glyphs.BeatGlyphBase.__name__ = ["alphatab","rendering","glyphs","BeatGlyphBase"];
+alphatab.rendering.glyphs.BeatGlyphBase.__name__ = true;
 alphatab.rendering.glyphs.BeatGlyphBase.__super__ = alphatab.rendering.glyphs.GlyphGroup;
 alphatab.rendering.glyphs.BeatGlyphBase.prototype = $extend(alphatab.rendering.glyphs.GlyphGroup.prototype,{
 	getBeatDurationWidth: function() {
@@ -9095,7 +7978,6 @@ alphatab.rendering.glyphs.BeatGlyphBase.prototype = $extend(alphatab.rendering.g
 		}
 		this.width = w;
 	}
-	,container: null
 	,__class__: alphatab.rendering.glyphs.BeatGlyphBase
 });
 alphatab.rendering.glyphs.BendGlyph = function(n,width,height) {
@@ -9104,7 +7986,7 @@ alphatab.rendering.glyphs.BendGlyph = function(n,width,height) {
 	this.width = width;
 	this._height = height;
 };
-alphatab.rendering.glyphs.BendGlyph.__name__ = ["alphatab","rendering","glyphs","BendGlyph"];
+alphatab.rendering.glyphs.BendGlyph.__name__ = true;
 alphatab.rendering.glyphs.BendGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.BendGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -9183,8 +8065,6 @@ alphatab.rendering.glyphs.BendGlyph.prototype = $extend(alphatab.rendering.Glyph
 			}
 		}
 	}
-	,_height: null
-	,_note: null
 	,__class__: alphatab.rendering.glyphs.BendGlyph
 });
 alphatab.rendering.glyphs.ChineseCymbalGlyph = function(x,y,isGrace) {
@@ -9193,7 +8073,7 @@ alphatab.rendering.glyphs.ChineseCymbalGlyph = function(x,y,isGrace) {
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,alphatab.rendering.glyphs.MusicFont.NoteChineseCymbal,isGrace?0.7:1,isGrace?0.7:1);
 	this._isGrace = isGrace;
 };
-alphatab.rendering.glyphs.ChineseCymbalGlyph.__name__ = ["alphatab","rendering","glyphs","ChineseCymbalGlyph"];
+alphatab.rendering.glyphs.ChineseCymbalGlyph.__name__ = true;
 alphatab.rendering.glyphs.ChineseCymbalGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.ChineseCymbalGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	canScale: function() {
@@ -9202,7 +8082,6 @@ alphatab.rendering.glyphs.ChineseCymbalGlyph.prototype = $extend(alphatab.render
 	,doLayout: function() {
 		this.width = 9 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
-	,_isGrace: null
 	,__class__: alphatab.rendering.glyphs.ChineseCymbalGlyph
 });
 alphatab.rendering.glyphs.CircleGlyph = function(x,y,size) {
@@ -9211,7 +8090,7 @@ alphatab.rendering.glyphs.CircleGlyph = function(x,y,size) {
 	alphatab.rendering.Glyph.call(this,x,y);
 	this._size = size;
 };
-alphatab.rendering.glyphs.CircleGlyph.__name__ = ["alphatab","rendering","glyphs","CircleGlyph"];
+alphatab.rendering.glyphs.CircleGlyph.__name__ = true;
 alphatab.rendering.glyphs.CircleGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.CircleGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -9225,7 +8104,6 @@ alphatab.rendering.glyphs.CircleGlyph.prototype = $extend(alphatab.rendering.Gly
 	,doLayout: function() {
 		this.width = this._size + 3 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
-	,_size: null
 	,__class__: alphatab.rendering.glyphs.CircleGlyph
 });
 alphatab.rendering.glyphs.ClefGlyph = function(x,y,clef) {
@@ -9233,7 +8111,7 @@ alphatab.rendering.glyphs.ClefGlyph = function(x,y,clef) {
 	if(x == null) x = 0;
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,this.getClefSvg(clef),1,1);
 };
-alphatab.rendering.glyphs.ClefGlyph.__name__ = ["alphatab","rendering","glyphs","ClefGlyph"];
+alphatab.rendering.glyphs.ClefGlyph.__name__ = true;
 alphatab.rendering.glyphs.ClefGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.ClefGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	getClefSvg: function(clef) {
@@ -9273,7 +8151,7 @@ alphatab.rendering.glyphs.DeadNoteHeadGlyph = function(x,y,isGrace) {
 	if(x == null) x = 0;
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,alphatab.rendering.glyphs.MusicFont.NoteDead,1,1);
 };
-alphatab.rendering.glyphs.DeadNoteHeadGlyph.__name__ = ["alphatab","rendering","glyphs","DeadNoteHeadGlyph"];
+alphatab.rendering.glyphs.DeadNoteHeadGlyph.__name__ = true;
 alphatab.rendering.glyphs.DeadNoteHeadGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.DeadNoteHeadGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	canScale: function() {
@@ -9290,7 +8168,7 @@ alphatab.rendering.glyphs.DiamondNoteHeadGlyph = function(x,y,isGrace) {
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,alphatab.rendering.glyphs.MusicFont.NoteHarmonic,isGrace?0.7:1,isGrace?0.7:1);
 	this._isGrace = isGrace;
 };
-alphatab.rendering.glyphs.DiamondNoteHeadGlyph.__name__ = ["alphatab","rendering","glyphs","DiamondNoteHeadGlyph"];
+alphatab.rendering.glyphs.DiamondNoteHeadGlyph.__name__ = true;
 alphatab.rendering.glyphs.DiamondNoteHeadGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.DiamondNoteHeadGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	canScale: function() {
@@ -9299,7 +8177,6 @@ alphatab.rendering.glyphs.DiamondNoteHeadGlyph.prototype = $extend(alphatab.rend
 	,doLayout: function() {
 		this.width = 9 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
-	,_isGrace: null
 	,__class__: alphatab.rendering.glyphs.DiamondNoteHeadGlyph
 });
 alphatab.rendering.glyphs.DigitGlyph = function(x,y,digit) {
@@ -9308,7 +8185,7 @@ alphatab.rendering.glyphs.DigitGlyph = function(x,y,digit) {
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,this.getDigit(digit),1,1);
 	this._digit = digit;
 };
-alphatab.rendering.glyphs.DigitGlyph.__name__ = ["alphatab","rendering","glyphs","DigitGlyph"];
+alphatab.rendering.glyphs.DigitGlyph.__name__ = true;
 alphatab.rendering.glyphs.DigitGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.DigitGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	getDigit: function(digit) {
@@ -9354,7 +8231,6 @@ alphatab.rendering.glyphs.DigitGlyph.prototype = $extend(alphatab.rendering.glyp
 		this.y += 7 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 		this.width = this.getDigitWidth(this._digit) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
-	,_digit: null
 	,__class__: alphatab.rendering.glyphs.DigitGlyph
 });
 alphatab.rendering.glyphs.DrumSticksGlyph = function(x,y,isGrace) {
@@ -9363,7 +8239,7 @@ alphatab.rendering.glyphs.DrumSticksGlyph = function(x,y,isGrace) {
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,alphatab.rendering.glyphs.MusicFont.NoteSideStick,isGrace?0.7:1,isGrace?0.7:1);
 	this._isGrace = isGrace;
 };
-alphatab.rendering.glyphs.DrumSticksGlyph.__name__ = ["alphatab","rendering","glyphs","DrumSticksGlyph"];
+alphatab.rendering.glyphs.DrumSticksGlyph.__name__ = true;
 alphatab.rendering.glyphs.DrumSticksGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.DrumSticksGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	canScale: function() {
@@ -9372,7 +8248,6 @@ alphatab.rendering.glyphs.DrumSticksGlyph.prototype = $extend(alphatab.rendering
 	,doLayout: function() {
 		this.width = 9 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
-	,_isGrace: null
 	,__class__: alphatab.rendering.glyphs.DrumSticksGlyph
 });
 alphatab.rendering.glyphs.FlatGlyph = function(x,y,isGrace) {
@@ -9382,7 +8257,7 @@ alphatab.rendering.glyphs.FlatGlyph = function(x,y,isGrace) {
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,alphatab.rendering.glyphs.MusicFont.AccidentalFlat,isGrace?0.7:1,isGrace?0.7:1);
 	this._isGrace = isGrace;
 };
-alphatab.rendering.glyphs.FlatGlyph.__name__ = ["alphatab","rendering","glyphs","FlatGlyph"];
+alphatab.rendering.glyphs.FlatGlyph.__name__ = true;
 alphatab.rendering.glyphs.FlatGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.FlatGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	canScale: function() {
@@ -9391,7 +8266,6 @@ alphatab.rendering.glyphs.FlatGlyph.prototype = $extend(alphatab.rendering.glyph
 	,doLayout: function() {
 		this.width = 8 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
-	,_isGrace: null
 	,__class__: alphatab.rendering.glyphs.FlatGlyph
 });
 alphatab.rendering.glyphs.HiHatGlyph = function(x,y,isGrace) {
@@ -9400,7 +8274,7 @@ alphatab.rendering.glyphs.HiHatGlyph = function(x,y,isGrace) {
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,alphatab.rendering.glyphs.MusicFont.NoteHiHat,isGrace?0.7:1,isGrace?0.7:1);
 	this._isGrace = isGrace;
 };
-alphatab.rendering.glyphs.HiHatGlyph.__name__ = ["alphatab","rendering","glyphs","HiHatGlyph"];
+alphatab.rendering.glyphs.HiHatGlyph.__name__ = true;
 alphatab.rendering.glyphs.HiHatGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.HiHatGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	canScale: function() {
@@ -9409,17 +8283,15 @@ alphatab.rendering.glyphs.HiHatGlyph.prototype = $extend(alphatab.rendering.glyp
 	,doLayout: function() {
 		this.width = 9 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
-	,_isGrace: null
 	,__class__: alphatab.rendering.glyphs.HiHatGlyph
 });
 alphatab.rendering.glyphs.IMultiBeatEffectGlyph = function() { }
-alphatab.rendering.glyphs.IMultiBeatEffectGlyph.__name__ = ["alphatab","rendering","glyphs","IMultiBeatEffectGlyph"];
+alphatab.rendering.glyphs.IMultiBeatEffectGlyph.__name__ = true;
 alphatab.rendering.glyphs.IMultiBeatEffectGlyph.prototype = {
-	expandedTo: null
-	,__class__: alphatab.rendering.glyphs.IMultiBeatEffectGlyph
+	__class__: alphatab.rendering.glyphs.IMultiBeatEffectGlyph
 }
 alphatab.rendering.glyphs.MusicFont = function() { }
-alphatab.rendering.glyphs.MusicFont.__name__ = ["alphatab","rendering","glyphs","MusicFont"];
+alphatab.rendering.glyphs.MusicFont.__name__ = true;
 alphatab.rendering.glyphs.NaturalizeGlyph = function(x,y,isGrace) {
 	if(isGrace == null) isGrace = false;
 	if(y == null) y = 0;
@@ -9427,7 +8299,7 @@ alphatab.rendering.glyphs.NaturalizeGlyph = function(x,y,isGrace) {
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,alphatab.rendering.glyphs.MusicFont.AccidentalNatural,isGrace?0.7:1,isGrace?0.7:1);
 	this._isGrace = isGrace;
 };
-alphatab.rendering.glyphs.NaturalizeGlyph.__name__ = ["alphatab","rendering","glyphs","NaturalizeGlyph"];
+alphatab.rendering.glyphs.NaturalizeGlyph.__name__ = true;
 alphatab.rendering.glyphs.NaturalizeGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.NaturalizeGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	canScale: function() {
@@ -9436,7 +8308,6 @@ alphatab.rendering.glyphs.NaturalizeGlyph.prototype = $extend(alphatab.rendering
 	,doLayout: function() {
 		this.width = 8 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
-	,_isGrace: null
 	,__class__: alphatab.rendering.glyphs.NaturalizeGlyph
 });
 alphatab.rendering.glyphs.NoteHeadGlyph = function(x,y,duration,isGrace) {
@@ -9445,7 +8316,7 @@ alphatab.rendering.glyphs.NoteHeadGlyph = function(x,y,duration,isGrace) {
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,this.getNoteSvg(duration),isGrace?0.7:1,isGrace?0.7:1);
 	this._isGrace = isGrace;
 };
-alphatab.rendering.glyphs.NoteHeadGlyph.__name__ = ["alphatab","rendering","glyphs","NoteHeadGlyph"];
+alphatab.rendering.glyphs.NoteHeadGlyph.__name__ = true;
 alphatab.rendering.glyphs.NoteHeadGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.NoteHeadGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	getNoteSvg: function(duration) {
@@ -9464,7 +8335,6 @@ alphatab.rendering.glyphs.NoteHeadGlyph.prototype = $extend(alphatab.rendering.g
 	,doLayout: function() {
 		this.width = 9 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
-	,_isGrace: null
 	,__class__: alphatab.rendering.glyphs.NoteHeadGlyph
 });
 alphatab.rendering.glyphs.NoteNumberGlyph = function(x,y,n,isGrace) {
@@ -9477,7 +8347,7 @@ alphatab.rendering.glyphs.NoteNumberGlyph = function(x,y,n,isGrace) {
 		if(n.isGhost) this._noteString = "(" + this._noteString + ")";
 	} else if(n.beat.index == 0) this._noteString = "(" + this._noteString + ")"; else this._noteString = "";
 };
-alphatab.rendering.glyphs.NoteNumberGlyph.__name__ = ["alphatab","rendering","glyphs","NoteNumberGlyph"];
+alphatab.rendering.glyphs.NoteNumberGlyph.__name__ = true;
 alphatab.rendering.glyphs.NoteNumberGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.NoteNumberGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -9493,15 +8363,13 @@ alphatab.rendering.glyphs.NoteNumberGlyph.prototype = $extend(alphatab.rendering
 		if(this._isGrace) scoreRenderer.canvas.setFont(scoreRenderer.renderingResources.graceFont); else scoreRenderer.canvas.setFont(scoreRenderer.renderingResources.tablatureFont);
 		this.width = this.renderer.stave.staveGroup.layout.renderer.canvas.measureText(this._noteString) | 0;
 	}
-	,_isGrace: null
-	,_noteString: null
 	,__class__: alphatab.rendering.glyphs.NoteNumberGlyph
 });
 alphatab.rendering.glyphs.NumberGlyph = function(x,y,number) {
 	alphatab.rendering.glyphs.GlyphGroup.call(this,x,y,new Array());
 	this._number = number;
 };
-alphatab.rendering.glyphs.NumberGlyph.__name__ = ["alphatab","rendering","glyphs","NumberGlyph"];
+alphatab.rendering.glyphs.NumberGlyph.__name__ = true;
 alphatab.rendering.glyphs.NumberGlyph.__super__ = alphatab.rendering.glyphs.GlyphGroup;
 alphatab.rendering.glyphs.NumberGlyph.prototype = $extend(alphatab.rendering.glyphs.GlyphGroup.prototype,{
 	doLayout: function() {
@@ -9529,7 +8397,6 @@ alphatab.rendering.glyphs.NumberGlyph.prototype = $extend(alphatab.rendering.gly
 	,canScale: function() {
 		return false;
 	}
-	,_number: null
 	,__class__: alphatab.rendering.glyphs.NumberGlyph
 });
 alphatab.rendering.glyphs.RepeatCloseGlyph = function(x,y) {
@@ -9537,7 +8404,7 @@ alphatab.rendering.glyphs.RepeatCloseGlyph = function(x,y) {
 	if(x == null) x = 0;
 	alphatab.rendering.Glyph.call(this,x,y);
 };
-alphatab.rendering.glyphs.RepeatCloseGlyph.__name__ = ["alphatab","rendering","glyphs","RepeatCloseGlyph"];
+alphatab.rendering.glyphs.RepeatCloseGlyph.__name__ = true;
 alphatab.rendering.glyphs.RepeatCloseGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.RepeatCloseGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -9578,7 +8445,7 @@ alphatab.rendering.glyphs.RepeatCountGlyph = function(x,y,count) {
 	alphatab.rendering.Glyph.call(this,x,y);
 	this._count = count;
 };
-alphatab.rendering.glyphs.RepeatCountGlyph.__name__ = ["alphatab","rendering","glyphs","RepeatCountGlyph"];
+alphatab.rendering.glyphs.RepeatCountGlyph.__name__ = true;
 alphatab.rendering.glyphs.RepeatCountGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.RepeatCountGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -9595,7 +8462,6 @@ alphatab.rendering.glyphs.RepeatCountGlyph.prototype = $extend(alphatab.renderin
 	,doLayout: function() {
 		this.width = 0;
 	}
-	,_count: null
 	,__class__: alphatab.rendering.glyphs.RepeatCountGlyph
 });
 alphatab.rendering.glyphs.RepeatOpenGlyph = function(x,y,circleSize,dotOffset) {
@@ -9605,7 +8471,7 @@ alphatab.rendering.glyphs.RepeatOpenGlyph = function(x,y,circleSize,dotOffset) {
 	this._dotOffset = dotOffset;
 	this._circleSize = circleSize;
 };
-alphatab.rendering.glyphs.RepeatOpenGlyph.__name__ = ["alphatab","rendering","glyphs","RepeatOpenGlyph"];
+alphatab.rendering.glyphs.RepeatOpenGlyph.__name__ = true;
 alphatab.rendering.glyphs.RepeatOpenGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.RepeatOpenGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -9636,8 +8502,6 @@ alphatab.rendering.glyphs.RepeatOpenGlyph.prototype = $extend(alphatab.rendering
 	,doLayout: function() {
 		this.width = 13 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
-	,_circleSize: null
-	,_dotOffset: null
 	,__class__: alphatab.rendering.glyphs.RepeatOpenGlyph
 });
 alphatab.rendering.glyphs.RestGlyph = function(x,y,duration) {
@@ -9645,7 +8509,7 @@ alphatab.rendering.glyphs.RestGlyph = function(x,y,duration) {
 	if(x == null) x = 0;
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,this.getRestSvg(duration),1,1);
 };
-alphatab.rendering.glyphs.RestGlyph.__name__ = ["alphatab","rendering","glyphs","RestGlyph"];
+alphatab.rendering.glyphs.RestGlyph.__name__ = true;
 alphatab.rendering.glyphs.RestGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.RestGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	getRestSvg: function(duration) {
@@ -9679,7 +8543,7 @@ alphatab.rendering.glyphs.RideCymbalGlyph = function(x,y,isGrace) {
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,alphatab.rendering.glyphs.MusicFont.NoteRideCymbal,isGrace?0.7:1,isGrace?0.7:1);
 	this._isGrace = isGrace;
 };
-alphatab.rendering.glyphs.RideCymbalGlyph.__name__ = ["alphatab","rendering","glyphs","RideCymbalGlyph"];
+alphatab.rendering.glyphs.RideCymbalGlyph.__name__ = true;
 alphatab.rendering.glyphs.RideCymbalGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.RideCymbalGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	canScale: function() {
@@ -9688,13 +8552,12 @@ alphatab.rendering.glyphs.RideCymbalGlyph.prototype = $extend(alphatab.rendering
 	,doLayout: function() {
 		this.width = 9 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
-	,_isGrace: null
 	,__class__: alphatab.rendering.glyphs.RideCymbalGlyph
 });
 alphatab.rendering.glyphs.ScoreBeatContainerGlyph = function(beat) {
 	alphatab.rendering.glyphs.BeatContainerGlyph.call(this,beat);
 };
-alphatab.rendering.glyphs.ScoreBeatContainerGlyph.__name__ = ["alphatab","rendering","glyphs","ScoreBeatContainerGlyph"];
+alphatab.rendering.glyphs.ScoreBeatContainerGlyph.__name__ = true;
 alphatab.rendering.glyphs.ScoreBeatContainerGlyph.__super__ = alphatab.rendering.glyphs.BeatContainerGlyph;
 alphatab.rendering.glyphs.ScoreBeatContainerGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatContainerGlyph.prototype,{
 	createTies: function(n) {
@@ -9718,7 +8581,7 @@ alphatab.rendering.glyphs.ScoreBeatContainerGlyph.prototype = $extend(alphatab.r
 alphatab.rendering.glyphs.ScoreBeatGlyph = function() {
 	alphatab.rendering.glyphs.BeatGlyphBase.call(this);
 };
-alphatab.rendering.glyphs.ScoreBeatGlyph.__name__ = ["alphatab","rendering","glyphs","ScoreBeatGlyph"];
+alphatab.rendering.glyphs.ScoreBeatGlyph.__name__ = true;
 alphatab.rendering.glyphs.ScoreBeatGlyph.__interfaces__ = [alphatab.rendering.glyphs.ISupportsFinalize];
 alphatab.rendering.glyphs.ScoreBeatGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
 alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
@@ -9811,16 +8674,12 @@ alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.
 	,finalizeGlyph: function(layout) {
 		if(!this.container.beat.isRest()) this.noteHeads.updateBeamingHelper(this.container.x + this.x);
 	}
-	,beamingHelper: null
-	,restGlyph: null
-	,noteHeads: null
-	,_ties: null
 	,__class__: alphatab.rendering.glyphs.ScoreBeatGlyph
 });
 alphatab.rendering.glyphs.ScoreBeatPostNotesGlyph = function() {
 	alphatab.rendering.glyphs.BeatGlyphBase.call(this);
 };
-alphatab.rendering.glyphs.ScoreBeatPostNotesGlyph.__name__ = ["alphatab","rendering","glyphs","ScoreBeatPostNotesGlyph"];
+alphatab.rendering.glyphs.ScoreBeatPostNotesGlyph.__name__ = true;
 alphatab.rendering.glyphs.ScoreBeatPostNotesGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
 alphatab.rendering.glyphs.ScoreBeatPostNotesGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
 	doLayout: function() {
@@ -9832,7 +8691,7 @@ alphatab.rendering.glyphs.ScoreBeatPostNotesGlyph.prototype = $extend(alphatab.r
 alphatab.rendering.glyphs.ScoreBeatPreNotesGlyph = function() {
 	alphatab.rendering.glyphs.BeatGlyphBase.call(this);
 };
-alphatab.rendering.glyphs.ScoreBeatPreNotesGlyph.__name__ = ["alphatab","rendering","glyphs","ScoreBeatPreNotesGlyph"];
+alphatab.rendering.glyphs.ScoreBeatPreNotesGlyph.__name__ = true;
 alphatab.rendering.glyphs.ScoreBeatPreNotesGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
 alphatab.rendering.glyphs.ScoreBeatPreNotesGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
 	createAccidentalGlyph: function(n,accidentals) {
@@ -9884,7 +8743,7 @@ alphatab.rendering.glyphs.ScoreBrushGlyph = function(beat) {
 	alphatab.rendering.Glyph.call(this,0,0);
 	this._beat = beat;
 };
-alphatab.rendering.glyphs.ScoreBrushGlyph.__name__ = ["alphatab","rendering","glyphs","ScoreBrushGlyph"];
+alphatab.rendering.glyphs.ScoreBrushGlyph.__name__ = true;
 alphatab.rendering.glyphs.ScoreBrushGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.ScoreBrushGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -9929,7 +8788,6 @@ alphatab.rendering.glyphs.ScoreBrushGlyph.prototype = $extend(alphatab.rendering
 	,doLayout: function() {
 		this.width = 10 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
-	,_beat: null
 	,__class__: alphatab.rendering.glyphs.ScoreBrushGlyph
 });
 alphatab.rendering.glyphs.ScoreNoteChordGlyph = function(x,y) {
@@ -9940,7 +8798,7 @@ alphatab.rendering.glyphs.ScoreNoteChordGlyph = function(x,y) {
 	this.beatEffects = new haxe.ds.StringMap();
 	this._noteLookup = new haxe.ds.IntMap();
 };
-alphatab.rendering.glyphs.ScoreNoteChordGlyph.__name__ = ["alphatab","rendering","glyphs","ScoreNoteChordGlyph"];
+alphatab.rendering.glyphs.ScoreNoteChordGlyph.__name__ = true;
 alphatab.rendering.glyphs.ScoreNoteChordGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.ScoreNoteChordGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -10087,17 +8945,6 @@ alphatab.rendering.glyphs.ScoreNoteChordGlyph.prototype = $extend(alphatab.rende
 	,getDirection: function() {
 		return this.beamingHelper.getDirection();
 	}
-	,beamingHelper: null
-	,beat: null
-	,beatEffects: null
-	,downLineX: null
-	,upLineX: null
-	,spacingChanged: null
-	,maxNote: null
-	,minNote: null
-	,_tremoloPicking: null
-	,_noteLookup: null
-	,_infos: null
 	,__class__: alphatab.rendering.glyphs.ScoreNoteChordGlyph
 });
 alphatab.rendering.glyphs.ScoreSlideLineGlyph = function(type,startNote,parent) {
@@ -10106,7 +8953,7 @@ alphatab.rendering.glyphs.ScoreSlideLineGlyph = function(type,startNote,parent) 
 	this._startNote = startNote;
 	this._parent = parent;
 };
-alphatab.rendering.glyphs.ScoreSlideLineGlyph.__name__ = ["alphatab","rendering","glyphs","ScoreSlideLineGlyph"];
+alphatab.rendering.glyphs.ScoreSlideLineGlyph.__name__ = true;
 alphatab.rendering.glyphs.ScoreSlideLineGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.ScoreSlideLineGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -10170,9 +9017,6 @@ alphatab.rendering.glyphs.ScoreSlideLineGlyph.prototype = $extend(alphatab.rende
 	,doLayout: function() {
 		this.width = 0;
 	}
-	,_parent: null
-	,_type: null
-	,_startNote: null
 	,__class__: alphatab.rendering.glyphs.ScoreSlideLineGlyph
 });
 alphatab.rendering.glyphs.TieGlyph = function(startNote,endNote,parent) {
@@ -10181,7 +9025,7 @@ alphatab.rendering.glyphs.TieGlyph = function(startNote,endNote,parent) {
 	this._endNote = endNote;
 	this._parent = parent;
 };
-alphatab.rendering.glyphs.TieGlyph.__name__ = ["alphatab","rendering","glyphs","TieGlyph"];
+alphatab.rendering.glyphs.TieGlyph.__name__ = true;
 alphatab.rendering.glyphs.TieGlyph.paintTie = function(canvas,scale,x1,y1,x2,y2,down) {
 	if(down == null) down = false;
 	if(x2 > x1) {
@@ -10216,15 +9060,12 @@ alphatab.rendering.glyphs.TieGlyph.prototype = $extend(alphatab.rendering.Glyph.
 	,doLayout: function() {
 		this.width = 0;
 	}
-	,_parent: null
-	,_endNote: null
-	,_startNote: null
 	,__class__: alphatab.rendering.glyphs.TieGlyph
 });
 alphatab.rendering.glyphs.ScoreTieGlyph = function(startNote,endNote,parent) {
 	alphatab.rendering.glyphs.TieGlyph.call(this,startNote,endNote,parent);
 };
-alphatab.rendering.glyphs.ScoreTieGlyph.__name__ = ["alphatab","rendering","glyphs","ScoreTieGlyph"];
+alphatab.rendering.glyphs.ScoreTieGlyph.__name__ = true;
 alphatab.rendering.glyphs.ScoreTieGlyph.__super__ = alphatab.rendering.glyphs.TieGlyph;
 alphatab.rendering.glyphs.ScoreTieGlyph.prototype = $extend(alphatab.rendering.glyphs.TieGlyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -10247,7 +9088,7 @@ alphatab.rendering.glyphs.SharpGlyph = function(x,y,isGrace) {
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,alphatab.rendering.glyphs.MusicFont.AccidentalSharp,isGrace?0.7:1,isGrace?0.7:1);
 	this._isGrace = isGrace;
 };
-alphatab.rendering.glyphs.SharpGlyph.__name__ = ["alphatab","rendering","glyphs","SharpGlyph"];
+alphatab.rendering.glyphs.SharpGlyph.__name__ = true;
 alphatab.rendering.glyphs.SharpGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.SharpGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	canScale: function() {
@@ -10256,7 +9097,6 @@ alphatab.rendering.glyphs.SharpGlyph.prototype = $extend(alphatab.rendering.glyp
 	,doLayout: function() {
 		this.width = 8 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
-	,_isGrace: null
 	,__class__: alphatab.rendering.glyphs.SharpGlyph
 });
 alphatab.rendering.glyphs.SpacingGlyph = function(x,y,width,scaling) {
@@ -10267,19 +9107,18 @@ alphatab.rendering.glyphs.SpacingGlyph = function(x,y,width,scaling) {
 	this.width = width;
 	this._scaling = scaling;
 };
-alphatab.rendering.glyphs.SpacingGlyph.__name__ = ["alphatab","rendering","glyphs","SpacingGlyph"];
+alphatab.rendering.glyphs.SpacingGlyph.__name__ = true;
 alphatab.rendering.glyphs.SpacingGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.SpacingGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	canScale: function() {
 		return this._scaling;
 	}
-	,_scaling: null
 	,__class__: alphatab.rendering.glyphs.SpacingGlyph
 });
 alphatab.rendering.glyphs.TabBeatContainerGlyph = function(beat) {
 	alphatab.rendering.glyphs.BeatContainerGlyph.call(this,beat);
 };
-alphatab.rendering.glyphs.TabBeatContainerGlyph.__name__ = ["alphatab","rendering","glyphs","TabBeatContainerGlyph"];
+alphatab.rendering.glyphs.TabBeatContainerGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabBeatContainerGlyph.__super__ = alphatab.rendering.glyphs.BeatContainerGlyph;
 alphatab.rendering.glyphs.TabBeatContainerGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatContainerGlyph.prototype,{
 	createTies: function(n) {
@@ -10300,7 +9139,7 @@ alphatab.rendering.glyphs.TabBeatContainerGlyph.prototype = $extend(alphatab.ren
 alphatab.rendering.glyphs.TabBeatGlyph = function() {
 	alphatab.rendering.glyphs.BeatGlyphBase.call(this);
 };
-alphatab.rendering.glyphs.TabBeatGlyph.__name__ = ["alphatab","rendering","glyphs","TabBeatGlyph"];
+alphatab.rendering.glyphs.TabBeatGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabBeatGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
 alphatab.rendering.glyphs.TabBeatGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
 	createNoteGlyph: function(n) {
@@ -10335,13 +9174,12 @@ alphatab.rendering.glyphs.TabBeatGlyph.prototype = $extend(alphatab.rendering.gl
 		}
 		this.width = w;
 	}
-	,noteNumbers: null
 	,__class__: alphatab.rendering.glyphs.TabBeatGlyph
 });
 alphatab.rendering.glyphs.TabBeatPostNotesGlyph = function() {
 	alphatab.rendering.glyphs.BeatGlyphBase.call(this);
 };
-alphatab.rendering.glyphs.TabBeatPostNotesGlyph.__name__ = ["alphatab","rendering","glyphs","TabBeatPostNotesGlyph"];
+alphatab.rendering.glyphs.TabBeatPostNotesGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabBeatPostNotesGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
 alphatab.rendering.glyphs.TabBeatPostNotesGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
 	createNoteGlyphs: function(n) {
@@ -10376,7 +9214,7 @@ alphatab.rendering.glyphs.TabBeatPostNotesGlyph.prototype = $extend(alphatab.ren
 alphatab.rendering.glyphs.TabBeatPreNotesGlyph = function() {
 	alphatab.rendering.glyphs.BeatGlyphBase.call(this);
 };
-alphatab.rendering.glyphs.TabBeatPreNotesGlyph.__name__ = ["alphatab","rendering","glyphs","TabBeatPreNotesGlyph"];
+alphatab.rendering.glyphs.TabBeatPreNotesGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabBeatPreNotesGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
 alphatab.rendering.glyphs.TabBeatPreNotesGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
 	doLayout: function() {
@@ -10392,7 +9230,7 @@ alphatab.rendering.glyphs.TabBrushGlyph = function(beat) {
 	alphatab.rendering.Glyph.call(this,0,0);
 	this._beat = beat;
 };
-alphatab.rendering.glyphs.TabBrushGlyph.__name__ = ["alphatab","rendering","glyphs","TabBrushGlyph"];
+alphatab.rendering.glyphs.TabBrushGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabBrushGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.TabBrushGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -10441,13 +9279,12 @@ alphatab.rendering.glyphs.TabBrushGlyph.prototype = $extend(alphatab.rendering.G
 	,doLayout: function() {
 		this.width = 10 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
-	,_beat: null
 	,__class__: alphatab.rendering.glyphs.TabBrushGlyph
 });
 alphatab.rendering.glyphs.TabClefGlyph = function() {
 	alphatab.rendering.Glyph.call(this,0,0);
 };
-alphatab.rendering.glyphs.TabClefGlyph.__name__ = ["alphatab","rendering","glyphs","TabClefGlyph"];
+alphatab.rendering.glyphs.TabClefGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabClefGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.TabClefGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -10501,7 +9338,7 @@ alphatab.rendering.glyphs.TabNoteChordGlyph = function(x,y) {
 	this.beatEffects = new haxe.ds.StringMap();
 	this._noteLookup = new haxe.ds.IntMap();
 };
-alphatab.rendering.glyphs.TabNoteChordGlyph.__name__ = ["alphatab","rendering","glyphs","TabNoteChordGlyph"];
+alphatab.rendering.glyphs.TabNoteChordGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabNoteChordGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.TabNoteChordGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -10565,11 +9402,6 @@ alphatab.rendering.glyphs.TabNoteChordGlyph.prototype = $extend(alphatab.renderi
 		}
 		return 0;
 	}
-	,beatEffects: null
-	,beat: null
-	,_minNote: null
-	,_noteLookup: null
-	,_notes: null
 	,__class__: alphatab.rendering.glyphs.TabNoteChordGlyph
 });
 alphatab.rendering.glyphs.TabSlideLineGlyph = function(type,startNote,parent) {
@@ -10578,7 +9410,7 @@ alphatab.rendering.glyphs.TabSlideLineGlyph = function(type,startNote,parent) {
 	this._startNote = startNote;
 	this._parent = parent;
 };
-alphatab.rendering.glyphs.TabSlideLineGlyph.__name__ = ["alphatab","rendering","glyphs","TabSlideLineGlyph"];
+alphatab.rendering.glyphs.TabSlideLineGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabSlideLineGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.TabSlideLineGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -10654,15 +9486,12 @@ alphatab.rendering.glyphs.TabSlideLineGlyph.prototype = $extend(alphatab.renderi
 	,doLayout: function() {
 		this.width = 0;
 	}
-	,_parent: null
-	,_type: null
-	,_startNote: null
 	,__class__: alphatab.rendering.glyphs.TabSlideLineGlyph
 });
 alphatab.rendering.glyphs.TabTieGlyph = function(startNote,endNote,parent) {
 	alphatab.rendering.glyphs.TieGlyph.call(this,startNote,endNote,parent);
 };
-alphatab.rendering.glyphs.TabTieGlyph.__name__ = ["alphatab","rendering","glyphs","TabTieGlyph"];
+alphatab.rendering.glyphs.TabTieGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabTieGlyph.__super__ = alphatab.rendering.glyphs.TieGlyph;
 alphatab.rendering.glyphs.TabTieGlyph.prototype = $extend(alphatab.rendering.glyphs.TieGlyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -10687,7 +9516,7 @@ alphatab.rendering.glyphs.TimeSignatureGlyph = function(x,y,numerator,denominato
 	this._numerator = numerator;
 	this._denominator = denominator;
 };
-alphatab.rendering.glyphs.TimeSignatureGlyph.__name__ = ["alphatab","rendering","glyphs","TimeSignatureGlyph"];
+alphatab.rendering.glyphs.TimeSignatureGlyph.__name__ = true;
 alphatab.rendering.glyphs.TimeSignatureGlyph.__super__ = alphatab.rendering.glyphs.GlyphGroup;
 alphatab.rendering.glyphs.TimeSignatureGlyph.prototype = $extend(alphatab.rendering.glyphs.GlyphGroup.prototype,{
 	doLayout: function() {
@@ -10706,8 +9535,6 @@ alphatab.rendering.glyphs.TimeSignatureGlyph.prototype = $extend(alphatab.render
 	,canScale: function() {
 		return false;
 	}
-	,_denominator: null
-	,_numerator: null
 	,__class__: alphatab.rendering.glyphs.TimeSignatureGlyph
 });
 alphatab.rendering.glyphs.TremoloPickingGlyph = function(x,y,duration) {
@@ -10715,7 +9542,7 @@ alphatab.rendering.glyphs.TremoloPickingGlyph = function(x,y,duration) {
 	if(x == null) x = 0;
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,this.getSvg(duration),1,1);
 };
-alphatab.rendering.glyphs.TremoloPickingGlyph.__name__ = ["alphatab","rendering","glyphs","TremoloPickingGlyph"];
+alphatab.rendering.glyphs.TremoloPickingGlyph.__name__ = true;
 alphatab.rendering.glyphs.TremoloPickingGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.TremoloPickingGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	getSvg: function(duration) {
@@ -10745,7 +9572,7 @@ alphatab.rendering.glyphs.VoiceContainerGlyph = function(x,y,voiceIndex) {
 	this.beatGlyphs = new Array();
 	this.voiceIndex = voiceIndex;
 };
-alphatab.rendering.glyphs.VoiceContainerGlyph.__name__ = ["alphatab","rendering","glyphs","VoiceContainerGlyph"];
+alphatab.rendering.glyphs.VoiceContainerGlyph.__name__ = true;
 alphatab.rendering.glyphs.VoiceContainerGlyph.__interfaces__ = [alphatab.rendering.glyphs.ISupportsFinalize];
 alphatab.rendering.glyphs.VoiceContainerGlyph.getKey = function(index) {
 	return "Beat";
@@ -10808,8 +9635,6 @@ alphatab.rendering.glyphs.VoiceContainerGlyph.prototype = $extend(alphatab.rende
 		}
 		this.width = gx | 0;
 	}
-	,voiceIndex: null
-	,beatGlyphs: null
 	,__class__: alphatab.rendering.glyphs.VoiceContainerGlyph
 });
 alphatab.rendering.glyphs.WhammyBarGlyph = function(beat,parent) {
@@ -10817,7 +9642,7 @@ alphatab.rendering.glyphs.WhammyBarGlyph = function(beat,parent) {
 	this._beat = beat;
 	this._parent = parent;
 };
-alphatab.rendering.glyphs.WhammyBarGlyph.__name__ = ["alphatab","rendering","glyphs","WhammyBarGlyph"];
+alphatab.rendering.glyphs.WhammyBarGlyph.__name__ = true;
 alphatab.rendering.glyphs.WhammyBarGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.WhammyBarGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -10889,8 +9714,6 @@ alphatab.rendering.glyphs.WhammyBarGlyph.prototype = $extend(alphatab.rendering.
 		if(absMaxY > 0) tabBarRenderer.registerOverflowBottom(Math.abs(absMaxY) | 0);
 		var height = tabBarRenderer.height;
 	}
-	,_parent: null
-	,_beat: null
 	,__class__: alphatab.rendering.glyphs.WhammyBarGlyph
 });
 if(!alphatab.rendering.glyphs.effects) alphatab.rendering.glyphs.effects = {}
@@ -10900,7 +9723,7 @@ alphatab.rendering.glyphs.effects.CrescendoGlyph = function(x,y,crescendo) {
 	alphatab.rendering.Glyph.call(this,x,y);
 	this._crescendo = crescendo;
 };
-alphatab.rendering.glyphs.effects.CrescendoGlyph.__name__ = ["alphatab","rendering","glyphs","effects","CrescendoGlyph"];
+alphatab.rendering.glyphs.effects.CrescendoGlyph.__name__ = true;
 alphatab.rendering.glyphs.effects.CrescendoGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.effects.CrescendoGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -10919,7 +9742,6 @@ alphatab.rendering.glyphs.effects.CrescendoGlyph.prototype = $extend(alphatab.re
 		}
 		canvas.stroke();
 	}
-	,_crescendo: null
 	,__class__: alphatab.rendering.glyphs.effects.CrescendoGlyph
 });
 alphatab.rendering.glyphs.effects.DummyEffectGlyph = function(x,y,s) {
@@ -10928,7 +9750,7 @@ alphatab.rendering.glyphs.effects.DummyEffectGlyph = function(x,y,s) {
 	alphatab.rendering.Glyph.call(this,x,y);
 	this._s = s;
 };
-alphatab.rendering.glyphs.effects.DummyEffectGlyph.__name__ = ["alphatab","rendering","glyphs","effects","DummyEffectGlyph"];
+alphatab.rendering.glyphs.effects.DummyEffectGlyph.__name__ = true;
 alphatab.rendering.glyphs.effects.DummyEffectGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.effects.DummyEffectGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -10944,7 +9766,6 @@ alphatab.rendering.glyphs.effects.DummyEffectGlyph.prototype = $extend(alphatab.
 	,doLayout: function() {
 		this.width = 20 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
-	,_s: null
 	,__class__: alphatab.rendering.glyphs.effects.DummyEffectGlyph
 });
 alphatab.rendering.glyphs.effects.DynamicsGlyph = function(x,y,dynamics) {
@@ -10953,7 +9774,7 @@ alphatab.rendering.glyphs.effects.DynamicsGlyph = function(x,y,dynamics) {
 	alphatab.rendering.Glyph.call(this,x,y);
 	this._dynamics = dynamics;
 };
-alphatab.rendering.glyphs.effects.DynamicsGlyph.__name__ = ["alphatab","rendering","glyphs","effects","DynamicsGlyph"];
+alphatab.rendering.glyphs.effects.DynamicsGlyph.__name__ = true;
 alphatab.rendering.glyphs.effects.DynamicsGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.effects.DynamicsGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	f: function() {
@@ -11021,7 +9842,6 @@ alphatab.rendering.glyphs.effects.DynamicsGlyph.prototype = $extend(alphatab.ren
 			startX += g.width;
 		}
 	}
-	,_dynamics: null
 	,__class__: alphatab.rendering.glyphs.effects.DynamicsGlyph
 });
 alphatab.rendering.glyphs.effects.FadeInGlyph = function(x,y) {
@@ -11029,7 +9849,7 @@ alphatab.rendering.glyphs.effects.FadeInGlyph = function(x,y) {
 	if(x == null) x = 0;
 	alphatab.rendering.Glyph.call(this,x,y);
 };
-alphatab.rendering.glyphs.effects.FadeInGlyph.__name__ = ["alphatab","rendering","glyphs","effects","FadeInGlyph"];
+alphatab.rendering.glyphs.effects.FadeInGlyph.__name__ = true;
 alphatab.rendering.glyphs.effects.FadeInGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.effects.FadeInGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -11049,7 +9869,7 @@ alphatab.rendering.glyphs.effects.LineRangedGlyph = function(x,y,label) {
 	alphatab.rendering.Glyph.call(this,x,y);
 	this._label = label;
 };
-alphatab.rendering.glyphs.effects.LineRangedGlyph.__name__ = ["alphatab","rendering","glyphs","effects","LineRangedGlyph"];
+alphatab.rendering.glyphs.effects.LineRangedGlyph.__name__ = true;
 alphatab.rendering.glyphs.effects.LineRangedGlyph.__interfaces__ = [alphatab.rendering.glyphs.IMultiBeatEffectGlyph];
 alphatab.rendering.glyphs.effects.LineRangedGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.effects.LineRangedGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
@@ -11086,8 +9906,6 @@ alphatab.rendering.glyphs.effects.LineRangedGlyph.prototype = $extend(alphatab.r
 	,expandedTo: function(beat) {
 		this._isExpanded = true;
 	}
-	,_label: null
-	,_isExpanded: null
 	,__class__: alphatab.rendering.glyphs.effects.LineRangedGlyph
 });
 alphatab.rendering.glyphs.effects.PickStrokeGlyph = function(x,y,pickStroke) {
@@ -11095,7 +9913,7 @@ alphatab.rendering.glyphs.effects.PickStrokeGlyph = function(x,y,pickStroke) {
 	if(x == null) x = 0;
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,this.getNoteSvg(pickStroke),1,1);
 };
-alphatab.rendering.glyphs.effects.PickStrokeGlyph.__name__ = ["alphatab","rendering","glyphs","effects","PickStrokeGlyph"];
+alphatab.rendering.glyphs.effects.PickStrokeGlyph.__name__ = true;
 alphatab.rendering.glyphs.effects.PickStrokeGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.effects.PickStrokeGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	getNoteSvg: function(pickStroke) {
@@ -11122,7 +9940,7 @@ alphatab.rendering.glyphs.effects.TempoGlyph = function(x,y,tempo) {
 	alphatab.rendering.Glyph.call(this,x,y);
 	this._tempo = tempo;
 };
-alphatab.rendering.glyphs.effects.TempoGlyph.__name__ = ["alphatab","rendering","glyphs","effects","TempoGlyph"];
+alphatab.rendering.glyphs.effects.TempoGlyph.__name__ = true;
 alphatab.rendering.glyphs.effects.TempoGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.effects.TempoGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -11134,7 +9952,6 @@ alphatab.rendering.glyphs.effects.TempoGlyph.prototype = $extend(alphatab.render
 		symbol.paint(cx + this.x,cy + this.y,canvas);
 		canvas.fillText("" + this._tempo,cx + this.x + (30 * this.renderer.stave.staveGroup.layout.renderer.scale | 0),cy + this.y + (7 * this.renderer.stave.staveGroup.layout.renderer.scale | 0));
 	}
-	,_tempo: null
 	,__class__: alphatab.rendering.glyphs.effects.TempoGlyph
 });
 alphatab.rendering.glyphs.effects.TextGlyph = function(x,y,text,font) {
@@ -11144,7 +9961,7 @@ alphatab.rendering.glyphs.effects.TextGlyph = function(x,y,text,font) {
 	this._text = text;
 	this._font = font;
 };
-alphatab.rendering.glyphs.effects.TextGlyph.__name__ = ["alphatab","rendering","glyphs","effects","TextGlyph"];
+alphatab.rendering.glyphs.effects.TextGlyph.__name__ = true;
 alphatab.rendering.glyphs.effects.TextGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.effects.TextGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -11153,8 +9970,6 @@ alphatab.rendering.glyphs.effects.TextGlyph.prototype = $extend(alphatab.renderi
 		canvas.setColor(res.mainGlyphColor);
 		canvas.fillText(this._text,cx + this.x,cy + this.y);
 	}
-	,_font: null
-	,_text: null
 	,__class__: alphatab.rendering.glyphs.effects.TextGlyph
 });
 alphatab.rendering.glyphs.effects.TrillGlyph = function(x,y,scale) {
@@ -11164,7 +9979,7 @@ alphatab.rendering.glyphs.effects.TrillGlyph = function(x,y,scale) {
 	alphatab.rendering.Glyph.call(this,x,y);
 	this._scale = scale;
 };
-alphatab.rendering.glyphs.effects.TrillGlyph.__name__ = ["alphatab","rendering","glyphs","effects","TrillGlyph"];
+alphatab.rendering.glyphs.effects.TrillGlyph.__name__ = true;
 alphatab.rendering.glyphs.effects.TrillGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.effects.TrillGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -11187,7 +10002,6 @@ alphatab.rendering.glyphs.effects.TrillGlyph.prototype = $extend(alphatab.render
 			loopX += Math.floor(step);
 		}
 	}
-	,_scale: null
 	,__class__: alphatab.rendering.glyphs.effects.TrillGlyph
 });
 alphatab.rendering.glyphs.effects.VibratoGlyph = function(x,y,scale) {
@@ -11197,7 +10011,7 @@ alphatab.rendering.glyphs.effects.VibratoGlyph = function(x,y,scale) {
 	alphatab.rendering.Glyph.call(this,x,y);
 	this._scale = scale;
 };
-alphatab.rendering.glyphs.effects.VibratoGlyph.__name__ = ["alphatab","rendering","glyphs","effects","VibratoGlyph"];
+alphatab.rendering.glyphs.effects.VibratoGlyph.__name__ = true;
 alphatab.rendering.glyphs.effects.VibratoGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.effects.VibratoGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
@@ -11213,17 +10027,16 @@ alphatab.rendering.glyphs.effects.VibratoGlyph.prototype = $extend(alphatab.rend
 			loopX += Math.floor(step);
 		}
 	}
-	,_scale: null
 	,__class__: alphatab.rendering.glyphs.effects.VibratoGlyph
 });
 alphatab.rendering.layout.HeaderFooterElements = function() { }
-alphatab.rendering.layout.HeaderFooterElements.__name__ = ["alphatab","rendering","layout","HeaderFooterElements"];
+alphatab.rendering.layout.HeaderFooterElements.__name__ = true;
 if(!alphatab.rendering.staves) alphatab.rendering.staves = {}
 alphatab.rendering.staves.BarSizeInfo = function() {
 	this.sizes = new haxe.ds.StringMap();
 	this.fullWidth = 0;
 };
-alphatab.rendering.staves.BarSizeInfo.__name__ = ["alphatab","rendering","staves","BarSizeInfo"];
+alphatab.rendering.staves.BarSizeInfo.__name__ = true;
 alphatab.rendering.staves.BarSizeInfo.prototype = {
 	setIndexedSize: function(key,index,size) {
 		if(!this.sizes.exists(key)) this.sizes.set(key,new Array());
@@ -11240,8 +10053,6 @@ alphatab.rendering.staves.BarSizeInfo.prototype = {
 	,setSize: function(key,size) {
 		this.sizes.set(key,[size]);
 	}
-	,sizes: null
-	,fullWidth: null
 	,__class__: alphatab.rendering.staves.BarSizeInfo
 }
 alphatab.rendering.staves.Stave = function(barRendererFactory) {
@@ -11252,7 +10063,7 @@ alphatab.rendering.staves.Stave = function(barRendererFactory) {
 	this.staveTop = 0;
 	this.staveBottom = 0;
 };
-alphatab.rendering.staves.Stave.__name__ = ["alphatab","rendering","staves","Stave"];
+alphatab.rendering.staves.Stave.__name__ = true;
 alphatab.rendering.staves.Stave.prototype = {
 	paint: function(cx,cy,canvas) {
 		if(this.height == 0) return;
@@ -11328,19 +10139,6 @@ alphatab.rendering.staves.Stave.prototype = {
 	,isInAccolade: function() {
 		return this._factory.isInAccolade;
 	}
-	,isLastInAccolade: null
-	,isFirstInAccolade: null
-	,staveBottom: null
-	,bottomSpacing: null
-	,topSpacing: null
-	,staveTop: null
-	,index: null
-	,height: null
-	,y: null
-	,x: null
-	,barRenderers: null
-	,_factory: null
-	,staveGroup: null
 	,__class__: alphatab.rendering.staves.Stave
 }
 alphatab.rendering.staves.StaveGroup = function() {
@@ -11348,7 +10146,7 @@ alphatab.rendering.staves.StaveGroup = function() {
 	this.staves = new Array();
 	this.width = 0;
 };
-alphatab.rendering.staves.StaveGroup.__name__ = ["alphatab","rendering","staves","StaveGroup"];
+alphatab.rendering.staves.StaveGroup.__name__ = true;
 alphatab.rendering.staves.StaveGroup.prototype = {
 	finalizeGroup: function(scoreLayout) {
 		var currentY = 0;
@@ -11463,22 +10261,13 @@ alphatab.rendering.staves.StaveGroup.prototype = {
 	,getLastBarIndex: function() {
 		return this.bars[this.bars.length - 1].index;
 	}
-	,layout: null
-	,staves: null
-	,bars: null
-	,width: null
-	,isFull: null
-	,y: null
-	,x: null
-	,_lastStaveInAccolade: null
-	,_firstStaveInAccolade: null
 	,__class__: alphatab.rendering.staves.StaveGroup
 }
 if(!alphatab.rendering.utils) alphatab.rendering.utils = {}
 alphatab.rendering.utils.AccidentalHelper = function() {
 	this._registeredAccidentals = new haxe.ds.IntMap();
 };
-alphatab.rendering.utils.AccidentalHelper.__name__ = ["alphatab","rendering","utils","AccidentalHelper"];
+alphatab.rendering.utils.AccidentalHelper.__name__ = true;
 alphatab.rendering.utils.AccidentalHelper.prototype = {
 	getKeySignatureIndex: function(ks) {
 		return ks + 7;
@@ -11503,7 +10292,6 @@ alphatab.rendering.utils.AccidentalHelper.prototype = {
 		}
 		return accidentalToSet;
 	}
-	,_registeredAccidentals: null
 	,__class__: alphatab.rendering.utils.AccidentalHelper
 }
 alphatab.rendering.utils.BeamDirection = { __ename__ : true, __constructs__ : ["Up","Down"] }
@@ -11529,7 +10317,7 @@ alphatab.rendering.utils.BeamingHelper = function(track) {
 	this._beatLineXPositions = new haxe.ds.IntMap();
 	this.maxDuration = alphatab.model.Duration.Whole;
 };
-alphatab.rendering.utils.BeamingHelper.__name__ = ["alphatab","rendering","utils","BeamingHelper"];
+alphatab.rendering.utils.BeamingHelper.__name__ = true;
 alphatab.rendering.utils.BeamingHelper.canJoin = function(b1,b2) {
 	if(b1 == null || b2 == null || b1.isRest() || b2.isRest()) return false;
 	var m1 = b1.voice.bar;
@@ -11623,25 +10411,13 @@ alphatab.rendering.utils.BeamingHelper.prototype = {
 		}
 		return 0;
 	}
-	,_beatLineXPositions: null
 	,getValue: function(n) {
 		if(this._track.isPercussion) return alphatab.rendering.utils.PercussionMapper.mapValue(n); else return n.fret + n.beat.voice.bar.track.tuning[n.beat.voice.bar.track.tuning.length - (n.string - 1) - 1];
 	}
-	,_track: null
-	,maxNote: null
-	,minNote: null
-	,lastMaxNote: null
-	,lastMinNote: null
-	,firstMaxNote: null
-	,firstMinNote: null
-	,maxDuration: null
-	,_lastBeat: null
-	,beats: null
-	,voice: null
 	,__class__: alphatab.rendering.utils.BeamingHelper
 }
 alphatab.rendering.utils.PercussionMapper = function() { }
-alphatab.rendering.utils.PercussionMapper.__name__ = ["alphatab","rendering","utils","PercussionMapper"];
+alphatab.rendering.utils.PercussionMapper.__name__ = true;
 alphatab.rendering.utils.PercussionMapper.mapValue = function(n) {
 	var value = n.fret + n.beat.voice.bar.track.tuning[n.beat.voice.bar.track.tuning.length - (n.string - 1) - 1];
 	if(value == 61 || value == 66) return 50; else if(value == 60 || value == 65) return 52; else if(value >= 35 && value <= 36 || value == 44) return 53; else if(value == 41 || value == 64) return 55; else if(value == 43 || value == 62) return 57; else if(value == 45 || value == 63) return 59; else if(value == 47 || value == 54) return 62; else if(value == 48 || value == 56) return 64; else if(value == 50) return 65; else if(value == 42 || value == 46 || value >= 49 && value <= 53 || value == 57 || value == 59) return 67;
@@ -11650,7 +10426,7 @@ alphatab.rendering.utils.PercussionMapper.mapValue = function(n) {
 alphatab.rendering.utils.SvgPathParser = function(svg) {
 	this.svg = svg;
 };
-alphatab.rendering.utils.SvgPathParser.__name__ = ["alphatab","rendering","utils","SvgPathParser"];
+alphatab.rendering.utils.SvgPathParser.__name__ = true;
 alphatab.rendering.utils.SvgPathParser.isNumber = function(s,allowSign) {
 	if(allowSign == null) allowSign = true;
 	if(s.length == 0) return false;
@@ -11709,17 +10485,13 @@ alphatab.rendering.utils.SvgPathParser.prototype = {
 		this._currentIndex = 0;
 		this.nextToken();
 	}
-	,_currentIndex: null
-	,currentToken: null
-	,lastCommand: null
-	,svg: null
 	,__class__: alphatab.rendering.utils.SvgPathParser
 }
 alphatab.rendering.utils.TupletHelper = function(voice) {
 	this.voiceIndex = voice;
 	this.beats = new Array();
 };
-alphatab.rendering.utils.TupletHelper.__name__ = ["alphatab","rendering","utils","TupletHelper"];
+alphatab.rendering.utils.TupletHelper.__name__ = true;
 alphatab.rendering.utils.TupletHelper.prototype = {
 	check: function(beat) {
 		if(this.beats.length == 0) this.tuplet = beat.tupletNumerator; else if(beat.voice.index != this.voiceIndex || beat.tupletNumerator != this.tuplet || this.beats.length == this.tuplet || this._isFinished) return false;
@@ -11732,15 +10504,11 @@ alphatab.rendering.utils.TupletHelper.prototype = {
 	,isFull: function() {
 		return this.beats.length == this.tuplet;
 	}
-	,_isFinished: null
-	,tuplet: null
-	,voiceIndex: null
-	,beats: null
 	,__class__: alphatab.rendering.utils.TupletHelper
 }
 if(!alphatab.util) alphatab.util = {}
 alphatab.util.Guid = function() { }
-alphatab.util.Guid.__name__ = ["alphatab","util","Guid"];
+alphatab.util.Guid.__name__ = true;
 alphatab.util.Guid.generate = function() {
 	var result = new StringBuf();
 	var _g = 0;
@@ -11754,7 +10522,7 @@ alphatab.util.Guid.generate = function() {
 alphatab.util.LazyVar = function(loader) {
 	this._loader = loader;
 };
-alphatab.util.LazyVar.__name__ = ["alphatab","util","LazyVar"];
+alphatab.util.LazyVar.__name__ = true;
 alphatab.util.LazyVar.prototype = {
 	getValue: function() {
 		if(!this._loaded) {
@@ -11763,79 +10531,12 @@ alphatab.util.LazyVar.prototype = {
 		}
 		return this._val;
 	}
-	,_loaded: null
-	,_loader: null
-	,_val: null
 	,__class__: alphatab.util.LazyVar
-}
-haxe.StackItem = { __ename__ : true, __constructs__ : ["CFunction","Module","FilePos","Method","Lambda"] }
-haxe.StackItem.CFunction = ["CFunction",0];
-haxe.StackItem.CFunction.toString = $estr;
-haxe.StackItem.CFunction.__enum__ = haxe.StackItem;
-haxe.StackItem.Module = function(m) { var $x = ["Module",1,m]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
-haxe.StackItem.FilePos = function(s,file,line) { var $x = ["FilePos",2,s,file,line]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
-haxe.StackItem.Method = function(classname,method) { var $x = ["Method",3,classname,method]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
-haxe.StackItem.Lambda = function(v) { var $x = ["Lambda",4,v]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
-haxe.CallStack = function() { }
-haxe.CallStack.__name__ = ["haxe","CallStack"];
-haxe.CallStack.exceptionStack = function() {
-	return [];
-}
-haxe.CallStack.toString = function(stack) {
-	var b = new StringBuf();
-	var _g = 0;
-	while(_g < stack.length) {
-		var s = stack[_g];
-		++_g;
-		b.b += "\nCalled from ";
-		haxe.CallStack.itemToString(b,s);
-	}
-	return b.b;
-}
-haxe.CallStack.itemToString = function(b,s) {
-	var $e = (s);
-	switch( $e[1] ) {
-	case 0:
-		b.b += "a C function";
-		break;
-	case 1:
-		var m = $e[2];
-		b.b += "module ";
-		b.b += Std.string(m);
-		break;
-	case 2:
-		var line = $e[4], file = $e[3], s1 = $e[2];
-		if(s1 != null) {
-			haxe.CallStack.itemToString(b,s1);
-			b.b += " (";
-		}
-		b.b += Std.string(file);
-		b.b += " line ";
-		b.b += Std.string(line);
-		if(s1 != null) b.b += ")";
-		break;
-	case 3:
-		var meth = $e[3], cname = $e[2];
-		b.b += Std.string(cname);
-		b.b += ".";
-		b.b += Std.string(meth);
-		break;
-	case 4:
-		var n = $e[2];
-		b.b += "local function #";
-		b.b += Std.string(n);
-		break;
-	}
-}
-haxe.Log = function() { }
-haxe.Log.__name__ = ["haxe","Log"];
-haxe.Log.trace = function(v,infos) {
-	js.Boot.__trace(v,infos);
 }
 haxe.ds.IntMap = function() {
 	this.h = { };
 };
-haxe.ds.IntMap.__name__ = ["haxe","ds","IntMap"];
+haxe.ds.IntMap.__name__ = true;
 haxe.ds.IntMap.__interfaces__ = [IMap];
 haxe.ds.IntMap.prototype = {
 	iterator: function() {
@@ -11867,14 +10568,13 @@ haxe.ds.IntMap.prototype = {
 	,set: function(key,value) {
 		this.h[key] = value;
 	}
-	,h: null
 	,__class__: haxe.ds.IntMap
 }
 haxe.io.Bytes = function(length,b) {
 	this.length = length;
 	this.b = b;
 };
-haxe.io.Bytes.__name__ = ["haxe","io","Bytes"];
+haxe.io.Bytes.__name__ = true;
 haxe.io.Bytes.alloc = function(length) {
 	var a = new Array();
 	var _g = 0;
@@ -11958,14 +10658,12 @@ haxe.io.Bytes.prototype = {
 			b1[i + pos] = b2[i + srcpos];
 		}
 	}
-	,b: null
-	,length: null
 	,__class__: haxe.io.Bytes
 }
 haxe.io.BytesBuffer = function() {
 	this.b = new Array();
 };
-haxe.io.BytesBuffer.__name__ = ["haxe","io","BytesBuffer"];
+haxe.io.BytesBuffer.__name__ = true;
 haxe.io.BytesBuffer.prototype = {
 	getBytes: function() {
 		var bytes = new haxe.io.Bytes(this.b.length,this.b);
@@ -11982,7 +10680,6 @@ haxe.io.BytesBuffer.prototype = {
 			this.b.push(b2[i]);
 		}
 	}
-	,b: null
 	,__class__: haxe.io.BytesBuffer
 }
 haxe.io.BytesInput = function(b,pos,len) {
@@ -11993,7 +10690,7 @@ haxe.io.BytesInput = function(b,pos,len) {
 	this.pos = pos;
 	this.len = len;
 };
-haxe.io.BytesInput.__name__ = ["haxe","io","BytesInput"];
+haxe.io.BytesInput.__name__ = true;
 haxe.io.BytesInput.__super__ = haxe.io.Input;
 haxe.io.BytesInput.prototype = $extend(haxe.io.Input.prototype,{
 	readBytes: function(buf,pos,len) {
@@ -12016,13 +10713,10 @@ haxe.io.BytesInput.prototype = $extend(haxe.io.Input.prototype,{
 		this.len--;
 		return this.b[this.pos++];
 	}
-	,len: null
-	,pos: null
-	,b: null
 	,__class__: haxe.io.BytesInput
 });
 haxe.io.Output = function() { }
-haxe.io.Output.__name__ = ["haxe","io","Output"];
+haxe.io.Output.__name__ = true;
 haxe.io.Output.prototype = {
 	writeString: function(s) {
 		var b = haxe.io.Bytes.ofString(s);
@@ -12056,7 +10750,7 @@ haxe.io.Output.prototype = {
 haxe.io.BytesOutput = function() {
 	this.b = new haxe.io.BytesBuffer();
 };
-haxe.io.BytesOutput.__name__ = ["haxe","io","BytesOutput"];
+haxe.io.BytesOutput.__name__ = true;
 haxe.io.BytesOutput.__super__ = haxe.io.Output;
 haxe.io.BytesOutput.prototype = $extend(haxe.io.Output.prototype,{
 	getBytes: function() {
@@ -12069,12 +10763,11 @@ haxe.io.BytesOutput.prototype = $extend(haxe.io.Output.prototype,{
 	,writeByte: function(c) {
 		this.b.b.push(c);
 	}
-	,b: null
 	,__class__: haxe.io.BytesOutput
 });
 haxe.io.Eof = function() {
 };
-haxe.io.Eof.__name__ = ["haxe","io","Eof"];
+haxe.io.Eof.__name__ = true;
 haxe.io.Eof.prototype = {
 	toString: function() {
 		return "Eof";
@@ -12092,160 +10785,9 @@ haxe.io.Error.OutsideBounds = ["OutsideBounds",2];
 haxe.io.Error.OutsideBounds.toString = $estr;
 haxe.io.Error.OutsideBounds.__enum__ = haxe.io.Error;
 haxe.io.Error.Custom = function(e) { var $x = ["Custom",3,e]; $x.__enum__ = haxe.io.Error; $x.toString = $estr; return $x; }
-haxe.unit.TestResult = function() {
-	this.m_tests = new List();
-	this.success = true;
-};
-haxe.unit.TestResult.__name__ = ["haxe","unit","TestResult"];
-haxe.unit.TestResult.prototype = {
-	toString: function() {
-		var buf = new StringBuf();
-		var failures = 0;
-		var $it0 = this.m_tests.iterator();
-		while( $it0.hasNext() ) {
-			var test = $it0.next();
-			if(test.success == false) {
-				buf.b += "* ";
-				buf.b += Std.string(test.classname);
-				buf.b += "::";
-				buf.b += Std.string(test.method);
-				buf.b += "()";
-				buf.b += "\n";
-				buf.b += "ERR: ";
-				if(test.posInfos != null) {
-					buf.b += Std.string(test.posInfos.fileName);
-					buf.b += ":";
-					buf.b += Std.string(test.posInfos.lineNumber);
-					buf.b += "(";
-					buf.b += Std.string(test.posInfos.className);
-					buf.b += ".";
-					buf.b += Std.string(test.posInfos.methodName);
-					buf.b += ") - ";
-				}
-				buf.b += Std.string(test.error);
-				buf.b += "\n";
-				if(test.backtrace != null) {
-					buf.b += Std.string(test.backtrace);
-					buf.b += "\n";
-				}
-				buf.b += "\n";
-				failures++;
-			}
-		}
-		buf.b += "\n";
-		if(failures == 0) buf.b += "OK "; else buf.b += "FAILED ";
-		buf.b += Std.string(this.m_tests.length);
-		buf.b += " tests, ";
-		buf.b += Std.string(failures);
-		buf.b += " failed, ";
-		buf.b += Std.string(this.m_tests.length - failures);
-		buf.b += " success";
-		buf.b += "\n";
-		return buf.b;
-	}
-	,add: function(t) {
-		this.m_tests.add(t);
-		if(!t.success) this.success = false;
-	}
-	,success: null
-	,m_tests: null
-	,__class__: haxe.unit.TestResult
-}
-haxe.unit.TestRunner = function() {
-	this.result = new haxe.unit.TestResult();
-	this.cases = new List();
-};
-haxe.unit.TestRunner.__name__ = ["haxe","unit","TestRunner"];
-haxe.unit.TestRunner.print = function(v) {
-	var msg = StringTools.htmlEscape(js.Boot.__string_rec(v,"")).split("\n").join("<br/>");
-	var d = document.getElementById("haxe:trace");
-	if(d == null) alert("haxe:trace element not found"); else d.innerHTML += msg;
-}
-haxe.unit.TestRunner.customTrace = function(v,p) {
-	haxe.unit.TestRunner.print(p.fileName + ":" + p.lineNumber + ": " + Std.string(v) + "\n");
-}
-haxe.unit.TestRunner.prototype = {
-	runCase: function(t) {
-		var old = haxe.Log.trace;
-		haxe.Log.trace = haxe.unit.TestRunner.customTrace;
-		var cl = Type.getClass(t);
-		var fields = Type.getInstanceFields(cl);
-		haxe.unit.TestRunner.print("Class: " + Type.getClassName(cl) + " ");
-		var _g = 0;
-		while(_g < fields.length) {
-			var f = fields[_g];
-			++_g;
-			var fname = f;
-			var field = Reflect.field(t,f);
-			if(StringTools.startsWith(fname,"test") && Reflect.isFunction(field)) {
-				t.currentTest = new haxe.unit.TestStatus();
-				t.currentTest.classname = Type.getClassName(cl);
-				t.currentTest.method = fname;
-				t.setup();
-				try {
-					field.apply(t,new Array());
-					if(t.currentTest.done) {
-						t.currentTest.success = true;
-						haxe.unit.TestRunner.print(".");
-					} else {
-						t.currentTest.success = false;
-						t.currentTest.error = "(warning) no assert";
-						haxe.unit.TestRunner.print("W");
-					}
-				} catch( $e0 ) {
-					if( js.Boot.__instanceof($e0,haxe.unit.TestStatus) ) {
-						var e = $e0;
-						haxe.unit.TestRunner.print("F");
-						t.currentTest.backtrace = haxe.CallStack.toString(haxe.CallStack.exceptionStack());
-					} else {
-					var e = $e0;
-					haxe.unit.TestRunner.print("E");
-					if(e.message != null) t.currentTest.error = "exception thrown : " + Std.string(e) + " [" + Std.string(e.message) + "]"; else t.currentTest.error = "exception thrown : " + Std.string(e);
-					t.currentTest.backtrace = haxe.CallStack.toString(haxe.CallStack.exceptionStack());
-					}
-				}
-				this.result.add(t.currentTest);
-				t.tearDown();
-			}
-		}
-		haxe.unit.TestRunner.print("\n");
-		haxe.Log.trace = old;
-	}
-	,run: function() {
-		this.result = new haxe.unit.TestResult();
-		var $it0 = this.cases.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
-			this.runCase(c);
-		}
-		haxe.unit.TestRunner.print(this.result.toString());
-		return this.result.success;
-	}
-	,add: function(c) {
-		this.cases.add(c);
-	}
-	,cases: null
-	,result: null
-	,__class__: haxe.unit.TestRunner
-}
-haxe.unit.TestStatus = function() {
-	this.done = false;
-	this.success = false;
-};
-haxe.unit.TestStatus.__name__ = ["haxe","unit","TestStatus"];
-haxe.unit.TestStatus.prototype = {
-	backtrace: null
-	,posInfos: null
-	,classname: null
-	,method: null
-	,error: null
-	,success: null
-	,done: null
-	,__class__: haxe.unit.TestStatus
-}
 if(!haxe.xml) haxe.xml = {}
 haxe.xml.Parser = function() { }
-haxe.xml.Parser.__name__ = ["haxe","xml","Parser"];
+haxe.xml.Parser.__name__ = true;
 haxe.xml.Parser.parse = function(str) {
 	var doc = Xml.createDocument();
 	haxe.xml.Parser.doParse(str,0,doc);
@@ -12491,24 +11033,7 @@ haxe.xml.Parser.doParse = function(str,p,parent) {
 }
 var js = js || {}
 js.Boot = function() { }
-js.Boot.__name__ = ["js","Boot"];
-js.Boot.__unhtml = function(s) {
-	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
-}
-js.Boot.__trace = function(v,i) {
-	var msg = i != null?i.fileName + ":" + i.lineNumber + ": ":"";
-	msg += js.Boot.__string_rec(v,"");
-	if(i != null && i.customParams != null) {
-		var _g = 0, _g1 = i.customParams;
-		while(_g < _g1.length) {
-			var v1 = _g1[_g];
-			++_g;
-			msg += "," + js.Boot.__string_rec(v1,"");
-		}
-	}
-	var d;
-	if(typeof(document) != "undefined" && (d = document.getElementById("haxe:trace")) != null) d.innerHTML += js.Boot.__unhtml(msg) + "<br/>"; else if(typeof(console) != "undefined" && console.log != null) console.log(msg);
-}
+js.Boot.__name__ = true;
 js.Boot.__string_rec = function(o,s) {
 	if(o == null) return "null";
 	if(s.length >= 5) return "<...>";
@@ -12640,9 +11165,9 @@ Math.isNaN = function(i) {
 	return isNaN(i);
 };
 String.prototype.__class__ = String;
-String.__name__ = ["String"];
+String.__name__ = true;
 Array.prototype.__class__ = Array;
-Array.__name__ = ["Array"];
+Array.__name__ = true;
 var Int = { __name__ : ["Int"]};
 var Dynamic = { __name__ : ["Dynamic"]};
 var Float = Number;

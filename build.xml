@@ -21,7 +21,7 @@
     
     <property name="bin-js" location="${bin}/js"/>
 	<property name="lib-js" location="${bin-js}/lib/alphaTab"/>
-	<property name="haxe-js" location="${lib-js}/alphaTab.js"/>
+	<property name="haxe-js" location="${lib-js}/alphaTab.core.js"/>
     
 	<!-- Haxe Builds -->
 	<target name="js">
@@ -29,6 +29,9 @@
         <exec executable="haxe" failonerror="true">
             <arg value="-cp" />
             <arg value="${src}"/>
+            
+            <arg value="-D" />
+            <arg value="js-classic" />
             
             <arg value="-main" />
             <arg value="alphatab.Main" />
@@ -50,6 +53,18 @@
         <exec executable="haxe" failonerror="true">
             <arg value="-cp" />
             <arg value="${src}"/>
+            
+            <arg value="-D" />
+            <arg value="real-position" />
+            
+            <arg value="-D" />
+            <arg value="no-compilation" />
+            
+            <arg value="-D" />
+            <arg value="no-root" />
+            
+            <arg value="-D" />
+            <arg value="wpf" />
             
             <arg value="-main" />
             <arg value="alphatab.Main" />

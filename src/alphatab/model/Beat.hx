@@ -18,7 +18,6 @@ package alphatab.model;
 
 import alphatab.audio.MidiUtils;
 import alphatab.rendering.glyphs.CrescendoType;
-import js.Boot;
 
 /**
  * A beat is a single block within a bar. A beat is a combination

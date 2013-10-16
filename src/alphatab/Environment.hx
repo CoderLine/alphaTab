@@ -53,11 +53,21 @@ class Environment
         renderEngines.set("default", function(d) { 
             #if js
             return new alphatab.platform.js.Html5Canvas(d);
+            #elseif (cs && gdi)
+            return new alphatab.platform.cs.GdiCanvas();
+            #elseif (cs && wpf)
+            return new alphatab.platform.cs.WpfCanvas(d);
             #else
             return new alphatab.platform.svg.SvgCanvas();
             #end
         } );
+        #if js
         renderEngines.set("html5", function(d) { return new alphatab.platform.js.Html5Canvas(d); } );
+        #elseif (cs && gdi)
+        renderEngines.set("gdi", function(d) { return new alphatab.platform.cs.GdiCanvas(); } );
+        #elseif (cs && wpf)
+        renderEngines.set("wpf", function(d) { return new alphatab.platform.cs.WpfCanvas(d); } );
+        #end
         renderEngines.set("svg", function(d) { return new alphatab.platform.svg.SvgCanvas(); } );
         
         // default file loaders

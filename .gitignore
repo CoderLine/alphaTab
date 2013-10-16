@@ -1,4 +1,5 @@
 # dirs
+/bin/cs
 /tmp
 /tools/fontconverter/font/*
 /tools/gpx-decompress/test/*

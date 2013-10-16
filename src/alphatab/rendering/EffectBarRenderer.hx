@@ -13,7 +13,6 @@ import alphatab.rendering.layout.ScoreLayout;
 import haxe.ds.IntMap;
 import haxe.ds.ObjectMap;
 import haxe.ds.StringMap;
-import js.html.svg.AnimatedBoolean;
 
 /**
  * This renderer is responsible for displaying effects above or below the other staves

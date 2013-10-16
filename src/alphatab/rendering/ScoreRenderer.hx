@@ -103,7 +103,7 @@ class ScoreRenderer
     {
         layout.doLayout();
 		canvas.setHeight(Std.int(layout.height + (renderingResources.copyrightFont.getSize() * 2)));
-		canvas.setWidth(layout.width);
+        canvas.setWidth(layout.width);
     }
     
     private function paintScore()

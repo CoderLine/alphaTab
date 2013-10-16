@@ -2,7 +2,7 @@
 <project version="2">
   <!-- Output SWF options -->
   <output>
-    <movie outputType="Application" />
+    <movie outputType="CustomBuild" />
     <movie input="" />
     <movie path="bin\js\lib\alphatab\alphaTab.core.js" />
     <movie fps="0" />
@@ -20,7 +20,7 @@
   </classpaths>
   <!-- Build options -->
   <build>
-    <option directives="unit&#xA;js-classic" />
+    <option directives="" />
     <option flashStrict="False" />
     <option mainClass="alphatab.Main" />
     <option enabledebug="False" />
@@ -39,7 +39,7 @@
     <hidden path="obj" />
   </hiddenPaths>
   <!-- Executed before build -->
-  <preBuildCommand />
+  <preBuildCommand>cmd /C "ant cs"</preBuildCommand>
   <!-- Executed after build -->
   <postBuildCommand alwaysRun="False" />
   <!-- Other project options -->

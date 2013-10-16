@@ -64,6 +64,5 @@ interface ICanvas
 	function setTextBaseline(textBaseLine:TextBaseline) : Void;
 	
     function fillText(text:String, x:Float, y:Float):Void;
-    function strokeText(text:String, x:Float, y:Float):Void;
     function measureText(text:String):Float;    
 }

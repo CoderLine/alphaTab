@@ -210,10 +210,6 @@ class Html5Canvas implements ICanvas
     {
 		this._context.fillText(text, x, y);
     }
-    public function strokeText(text:String, x:Float, y:Float):Void
-    {
-		this._context.strokeText(text, x, y);
-    }
     public function measureText(text:String):Float
     {
         return this._context.measureText(text).width;

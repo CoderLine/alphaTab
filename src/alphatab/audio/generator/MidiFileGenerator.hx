@@ -1,5 +1,4 @@
 package alphatab.audio.generator;
-import alphatab.AlphaTestRunner;
 import alphatab.audio.MidiUtils;
 import alphatab.audio.model.MidiFile;
 import alphatab.audio.model.MidiTrack;
