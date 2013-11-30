@@ -35,15 +35,27 @@ class JsFileLoader implements IFileLoader
     {
     }
 	
-	private static function isIE()
+    // http://msdn.microsoft.com/en-us/library/ms537509(v=vs.85).aspx
+	public static function getIeVersion()
 	{
+        var rv:Float = -1;
+        var appName = untyped __js__("navigator.appName");
 		var agent:String = untyped __js__("navigator.userAgent");
-		return agent.indexOf("MSIE") != -1;
+        if (appName == "Microsoft Internet Explorer")
+        {
+            var e:EReg = ~/MSIE ([0-9]{1,}[\.0-9]{0,})/;
+            if (e.match(agent))
+            {
+                rv = Std.parseFloat(e.matched(1));
+            }
+        }
+		return rv;
 	}
     
     public function loadBinary(path:String) : Bytes
     {
-        if (isIE())
+        var ie = getIeVersion();
+        if (ie >= 0 && ie <= 9)
         {
             // use VB Loader to load binary array
             var vbArr = untyped VbAjaxLoader(method, file);
@@ -58,19 +70,20 @@ class JsFileLoader implements IFileLoader
                 i++;
             }
             
-            var reader:Bytes = getBytes(data);
+            var reader:Bytes = getBytesFromString(data);
             return reader;
         }
         else
         {
+            // TODO: typedarray
             var xhr:XMLHttpRequest = new XMLHttpRequest();
-            xhr.overrideMimeType('text/plain; charset=x-user-defined');
             xhr.open("GET", path, false);
+            xhr.responseType = "arraybuffer";
             xhr.send(null);
             
             if (xhr.status == 200)
             {
-                var reader:Bytes = getBytes(xhr.responseText);
+                var reader:Bytes = getBytesFromTyped(xhr.response);
                 return (reader);
             }
             // Error handling
@@ -103,7 +116,8 @@ class JsFileLoader implements IFileLoader
     
     public function loadBinaryAsync(path:String, success:Bytes->Void, error:String->Void) : Void
     {
-        if (isIE())
+        var ie = getIeVersion();
+        if (ie >= 0 && ie <= 9)
         {
             // use VB Loader to load binary array
             var vbArr = untyped VbAjaxLoader(method, file);
@@ -118,20 +132,19 @@ class JsFileLoader implements IFileLoader
                 i++;
             }
             
-            var reader:Bytes = getBytes(data);
+            var reader:Bytes = getBytesFromString(data);
             success(reader);
         }
         else
         {
             var xhr:XMLHttpRequest = new XMLHttpRequest();
-            xhr.overrideMimeType('text/plain; charset=x-user-defined');
             xhr.onreadystatechange = function(e:Event) 
             {
                 if (xhr.readyState == 4)
                 {
                     if (xhr.status == 200)
                     {
-                        var reader:Bytes = getBytes(xhr.responseText);
+                        var reader:Bytes = getBytesFromTyped(xhr.response);
                         success(reader);
                     }
                     // Error handling
@@ -162,17 +175,24 @@ class JsFileLoader implements IFileLoader
                 }
             }
             xhr.open("GET", path, true);
+            xhr.responseType = "arraybuffer";
             xhr.send(null);
         }
     }
     
-    private static function getBytes(s:String) : Bytes
+    private static function getBytesFromString(s:String) : Bytes
     {
         var a = new BytesData();
 		for (i in 0 ... s.length) 
         {
             a.push(s.charCodeAt(i) & 0xFF);
 		}
+		return Bytes.ofData(a);
+    }
+    
+    private static function getBytesFromTyped(s:Dynamic) : Bytes
+    {
+        var a:BytesData = untyped __js__("new Uint8Array(s)");
 		return Bytes.ofData(a);
     }
 }

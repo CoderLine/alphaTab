@@ -16,6 +16,10 @@
  */
 package alphatab.audio.model;
 
+/**
+ * A midi file consists of multiple tracks including a
+ * info track for multi-track messages and a track for metronome ticks. 
+ */
 class MidiFile
 {
     public var tracks:Array<MidiTrack>;

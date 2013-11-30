@@ -1,4 +1,21 @@
+/*
+ * This file is part of alphaTab.
+ *
+ *  alphaTab is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  alphaTab is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package alphatab.rendering;
+
 import alphatab.model.Bar;
 import alphatab.model.Beat;
 import alphatab.model.Note;
@@ -58,7 +75,7 @@ class EffectBarRenderer extends GroupedBarRenderer
             {
                 // check if previous renderer had an effect on his last beat
                 // and use this as merging element
-                var prevRenderer = cast(stave.barRenderers[index - 1], EffectBarRenderer);
+                var prevRenderer:EffectBarRenderer = stave.barRenderers[index - 1];
                 if (prevRenderer._lastBeat != null)
                 {
                     prevGlyph = prevRenderer._effectGlyphs[v.index].get(prevRenderer._lastBeat.index);
@@ -81,7 +98,7 @@ class EffectBarRenderer extends GroupedBarRenderer
         {
             // check if previous renderer had an effect on his last beat
             // and use this as merging element
-            var prevRenderer = cast(stave.barRenderers[index - 1], EffectBarRenderer);
+            var prevRenderer:EffectBarRenderer = cast stave.barRenderers[index - 1];
             if (prevRenderer._lastBeat != null)
             {
                 prevGlyph = prevRenderer._effectGlyphs[0].get(prevRenderer._lastBeat.index);

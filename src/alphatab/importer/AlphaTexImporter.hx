@@ -39,10 +39,8 @@ import haxe.io.Eof;
 import haxe.io.Error;
 
 /**
- * ...
- * @author 
+ * This importer can parse alphaTex markup into a score structure. 
  */
-
 class AlphaTexImporter extends ScoreImporter
 {
 	private static var Eof:String = String.fromCharCode(0);

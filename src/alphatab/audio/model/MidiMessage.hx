@@ -15,8 +15,12 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.audio.model;
+
 import haxe.io.Bytes;
 
+/**
+ * Represents a midi message. 
+ */
 class MidiMessage
 {
     public var event:MidiEvent;
@@ -26,7 +30,18 @@ class MidiMessage
      */
     public var data:Bytes;
 
-    public function new() 
+    public function new(data:Bytes) 
     {
+        this.data = data;
+    }
+    
+    public static function fromArray(data:Array<Int>)
+    {
+        var bytes = Bytes.alloc(data.length);
+        for (i in 0 ... data.length)
+        {
+            bytes.set(i, data[i]);
+        }
+        return new MidiMessage(bytes);
     }
 }

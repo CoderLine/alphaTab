@@ -16,16 +16,21 @@
  */
 package alphatab.audio.model;
 
+/**
+ * A midi event is a timed midi message. 
+ */
 class MidiEvent
 {
     public var track:MidiTrack;
     public var tick:Int;
+    public var message:MidiMessage;
     public var nextEvent:MidiEvent;
     public var previousEvent:MidiEvent;
 
-    public function new() 
+    public function new(tick:Int, message:MidiMessage) 
     {
-        
+        this.tick = tick;
+        this.message = message;
     }
     
     public function getDeltaTicks()

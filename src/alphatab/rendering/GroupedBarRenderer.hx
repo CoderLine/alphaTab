@@ -1,4 +1,21 @@
+/*
+ * This file is part of alphaTab.
+ *
+ *  alphaTab is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  alphaTab is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package alphatab.rendering;
+
 import alphatab.model.Bar;
 import alphatab.model.Beat;
 import alphatab.model.Voice;
@@ -25,7 +42,7 @@ class GroupedBarRenderer extends BarRendererBase
 	public static inline var KeySizePost = "Post";
 	
 	private var _preBeatGlyphs:Array<Glyph>;
-    private var _voiceContainers:IntMap<VoiceContainerGlyph>;
+    private var _voiceContainers:Array<VoiceContainerGlyph>;
 	private var _postBeatGlyphs:Array<Glyph>;
 	
     private var _biggestVoiceContainer:VoiceContainerGlyph;
@@ -34,7 +51,7 @@ class GroupedBarRenderer extends BarRendererBase
 	{
 		super(bar);
 		_preBeatGlyphs = new Array<Glyph>();
-        _voiceContainers = new IntMap<VoiceContainerGlyph>();
+        _voiceContainers = new Array<VoiceContainerGlyph>();
 	    _postBeatGlyphs = new Array<Glyph>();
 	}
 	
@@ -144,7 +161,7 @@ class GroupedBarRenderer extends BarRendererBase
         
 	}
 	
-	private function addGlyph<T : (Glyph)>(c:Array<T>, g:T)
+	private function addGlyph(c:Array<Glyph>, g:Glyph)
 	{
         isEmpty = false;
 		g.x = c.length == 0 ? 0 : (c[c.length - 1].x + c[c.length - 1].width);
@@ -167,15 +184,15 @@ class GroupedBarRenderer extends BarRendererBase
     private function getOrCreateVoiceContainer(voiceIndex:Int)
     {
         var c:VoiceContainerGlyph;
-        if (!_voiceContainers.exists(voiceIndex))
+        if (voiceIndex >= _voiceContainers.length)
         {
             c = new VoiceContainerGlyph(0, 0, voiceIndex);
             c.renderer = this;
-            _voiceContainers.set(voiceIndex, c);
+            _voiceContainers[voiceIndex] = c;
         }
         else
         {
-            c = _voiceContainers.get(voiceIndex);
+            c = _voiceContainers[voiceIndex];
         }
         return c;
     }

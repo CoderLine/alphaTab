@@ -1,5 +1,23 @@
+/*
+ * This file is part of alphaTab.
+ *
+ *  alphaTab is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  alphaTab is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package alphatab.audio.generator;
+
 import alphatab.audio.MidiUtils;
+import alphatab.audio.model.MidiController;
 import alphatab.audio.model.MidiFile;
 import alphatab.audio.model.MidiTrack;
 import alphatab.model.AccentuationType;
@@ -73,6 +91,7 @@ class MidiFileGenerator
             
             previousMasterBar = _score.masterBars[controller.index];
         }
+        return _midiFile;
     }
     
     //
@@ -91,9 +110,9 @@ class MidiFileGenerator
     
     private function generateChannel(track:Track, channel:Int, playbackInfo:PlaybackInformation)
     {
-        _handler.addControlChange(track.index, 0, channel, MidiFileHandler.Volume, playbackInfo.volume);
-        _handler.addControlChange(track.index, 0, channel, MidiFileHandler.Balance, playbackInfo.balance);
-        _handler.addControlChange(track.index, 0, channel, MidiFileHandler.Expression, 127); 
+        _handler.addControlChange(track.index, 0, channel, MidiController.Volume, playbackInfo.volume);
+        _handler.addControlChange(track.index, 0, channel, MidiController.Balance, playbackInfo.balance);
+        _handler.addControlChange(track.index, 0, channel, MidiController.Expression, 127); 
         _handler.addProgramChange(track.index, 0, channel, playbackInfo.program);
     }
     
@@ -504,20 +523,20 @@ class MidiFileGenerator
             case Balance:
                 _handler.addControlChange(beat.voice.bar.track.index, beat.start + startMove, 
                                             beat.voice.bar.track.playbackInfo.primaryChannel,
-                                            MidiFileHandler.Balance,
+                                            MidiController.Balance,
                                             Std.int(automation.value));
                 _handler.addControlChange(beat.voice.bar.track.index, beat.start + startMove, 
                                             beat.voice.bar.track.playbackInfo.secondaryChannel,
-                                            MidiFileHandler.Balance,
+                                            MidiController.Balance,
                                             Std.int(automation.value));
             case Volume:
                 _handler.addControlChange(beat.voice.bar.track.index, beat.start + startMove, 
                                             beat.voice.bar.track.playbackInfo.primaryChannel,
-                                            MidiFileHandler.Volume,
+                                            MidiController.Volume,
                                             Std.int(automation.value));
                 _handler.addControlChange(beat.voice.bar.track.index, beat.start + startMove, 
                                             beat.voice.bar.track.playbackInfo.secondaryChannel,
-                                            MidiFileHandler.Volume,
+                                            MidiController.Volume,
                                             Std.int(automation.value));
             default:
         }

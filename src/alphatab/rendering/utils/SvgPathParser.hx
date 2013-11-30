@@ -52,7 +52,7 @@ class SvgPathParser
 	
 	public function getNumber() : Float
 	{
-		return Std.parseFloat(getString());
+		return Std.parseInt(getString());
 	}
 	
 	public function currentTokenIsNumber()  : Bool

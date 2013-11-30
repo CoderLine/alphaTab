@@ -17,6 +17,7 @@
 package alphatab.audio;
 
 import alphatab.model.Duration;
+import alphatab.model.DynamicValue;
 using alphatab.model.ModelUtils;
 
 /**
@@ -68,5 +69,24 @@ class MidiUtils
     public static function applyTuplet(ticks:Int, numerator:Int, denominator:Int)
     {
         return Std.int(ticks * denominator / numerator);
+    }
+    
+    private static inline var MinVelocity :Int = 15;
+    private static inline var VelocityIncrement :Int = 16;
+
+    public static function dynamicToVelocity(dynamicValue:DynamicValue)
+    {
+        return (MinVelocity + (Type.enumIndex(dynamicValue) * VelocityIncrement));
+        // switch(dynamicValue)
+        // {
+        //     case PPP:   return (MinVelocity + (0 * VelocityIncrement));
+        //     case PP:    return (MinVelocity + (1 * VelocityIncrement));
+        //     case P:     return (MinVelocity + (2 * VelocityIncrement));
+        //     case MP:    return (MinVelocity + (3 * VelocityIncrement));
+        //     case MF:    return (MinVelocity + (4 * VelocityIncrement));
+        //     case F:     return (MinVelocity + (5 * VelocityIncrement));
+        //     case FF:    return (MinVelocity + (6 * VelocityIncrement));
+        //     case FFF:   return (MinVelocity + (7 * VelocityIncrement));
+        // }
     }
 }

@@ -1,4 +1,21 @@
+/*
+ * This file is part of alphaTab.
+ *
+ *  alphaTab is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  alphaTab is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package alphatab.rendering.glyphs;
+
 import alphatab.model.Beat;
 import alphatab.model.Note;
 import alphatab.model.TextBaseline;
@@ -10,8 +27,8 @@ import haxe.ds.StringMap;
 
 class TabNoteChordGlyph extends Glyph
 {
-	private var _notes:Array<Glyph>;
-	private var _noteLookup:IntMap<Glyph>;
+	private var _notes:Array<NoteNumberGlyph>;
+	private var _noteLookup:IntMap<NoteNumberGlyph>;
     private var _minNote:Note;
     
     public var beat:Beat;
@@ -20,9 +37,9 @@ class TabNoteChordGlyph extends Glyph
 	public function new(x:Int = 0, y:Int = 0) 
 	{
 		super(x, y);
-		_notes = new Array<Glyph>();
+		_notes = new Array<NoteNumberGlyph>();
         beatEffects = new StringMap<Glyph>();
-		_noteLookup = new IntMap<Glyph>();
+		_noteLookup = new IntMap<NoteNumberGlyph>();
 	}
 	
 	public function getNoteX(note:Note, onEnd:Bool = true) 
@@ -33,6 +50,7 @@ class TabNoteChordGlyph extends Glyph
 			var pos = x + n.x + Std.int(NoteNumberGlyph.Padding * getScale());
 			if (onEnd) 
 			{
+                n.calculateWidth();
 				pos += n.width;
 			}
 			return pos;
@@ -79,7 +97,7 @@ class TabNoteChordGlyph extends Glyph
 		width = w;
 	}
 	
-	public function addNoteGlyph(noteGlyph:Glyph, note:Note)
+	public function addNoteGlyph(noteGlyph:NoteNumberGlyph, note:Note)
     {
 		_notes.push(noteGlyph);
 		_noteLookup.set(note.string, noteGlyph);

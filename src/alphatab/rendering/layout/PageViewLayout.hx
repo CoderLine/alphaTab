@@ -38,7 +38,7 @@ class PageViewLayout extends ScoreLayout
     public static var ScoreInfos = "ScoreInfos";
     
     // left top right bottom
-    public static var PagePadding:Array<Int> = [20, 20, 20, 20];
+    public static var PagePadding:Array<Int> = [40, 40, 40, 40];
     public static inline var WidthOn100:Int = 795;
 
         

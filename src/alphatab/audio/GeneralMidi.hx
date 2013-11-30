@@ -15,11 +15,11 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.audio;
+
 import haxe.ds.StringMap;
 
 /**
  * This class provides names for all general midi instruments.
- * @author Daniel Kuschny
  */
 class GeneralMidi  
 {

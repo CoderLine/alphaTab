@@ -20,7 +20,6 @@
         }
     }
 
-
     /*
      * alphaTab initialization
      */
@@ -61,44 +60,45 @@
                 {
                     // HACK: call createElement('canvas') once before. this ensures that the browser knows the element
                     document.createElement('canvas'); 
-                    context.canvas = $('<canvas width="'+context.settings.width+'" height="'+context.settings.height+'" class="alphaTabSurface"></canvas>');
+                    context.canvas = $(document.createElement('canvas'));
+                    $(context.canvas).attr("width", context.settings.width)
+                     .attr("height", context.settings.height)
+                     .addClass("alphaTabSurface");
                     $this.append(context.canvas);
                     context.canvas = context.canvas[0];
-                    if($.browser.msie) 
+                    
+                    var ie = alphatab.platform.js.JsFileLoader.getIeVersion();
+                    if(ie >= 0 && ie < 9) 
                     {
-                        // Excanvas initialization
-                        if($.browser.version < 9)
+                        var fixElement_ = function(el) 
                         {
-                            var fixElement_ = function(el) 
-                            {
-                               // in IE before version 5.5 we would need to add HTML: to the tag name
-                               // but we do not care about IE before version 6
-                               var outerHTML = el.outerHTML;
-                             
-                               var newEl = el.ownerDocument.createElement(outerHTML);
-                               // if the tag is still open IE has created the children as siblings and
-                               // it has also created a tag with the name "/FOO"
-                               if (outerHTML.slice(-2) != "/>") 
-                               {
-                                     var tagName = "/" + el.tagName;
-                                     var ns;
-                                     // remove content
-                                     while ((ns = el.nextSibling) && ns.tagName != tagName) 
-                                     {
-                                       ns.removeNode();
-                                     }
-                                     // remove the incorrect closing tag
-                                     if (ns) 
-                                     {
-                                       ns.removeNode();
-                                     }
-                               }
-                               el.parentNode.replaceChild(newEl, el);
-                               return newEl;
-                            };
-                            
-                            context.canvas = G_vmlCanvasManager.initElement(fixElement_(context.canvas));
-                        }
+                           // in IE before version 5.5 we would need to add HTML: to the tag name
+                           // but we do not care about IE before version 6
+                           var outerHTML = el.outerHTML;
+                         
+                           var newEl = el.ownerDocument.createElement(outerHTML);
+                           // if the tag is still open IE has created the children as siblings and
+                           // it has also created a tag with the name "/FOO"
+                           if (outerHTML.slice(-2) != "/>") 
+                           {
+                                 var tagName = "/" + el.tagName;
+                                 var ns;
+                                 // remove content
+                                 while ((ns = el.nextSibling) && ns.tagName != tagName) 
+                                 {
+                                   ns.removeNode();
+                                 }
+                                 // remove the incorrect closing tag
+                                 if (ns) 
+                                 {
+                                   ns.removeNode();
+                                 }
+                           }
+                           el.parentNode.replaceChild(newEl, el);
+                           return newEl;
+                        };
+                        
+                        context.canvas = G_vmlCanvasManager.initElement(fixElement_(context.canvas));
                     }
                 }
                 else

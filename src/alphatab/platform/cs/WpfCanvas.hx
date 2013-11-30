@@ -1,4 +1,21 @@
+/*
+ * This file is part of alphaTab.
+ *
+ *  alphaTab is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  alphaTab is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package alphatab.platform.cs;
+
 import alphatab.model.TextBaseline;
 import alphatab.platform.ICanvas;
 import alphatab.platform.model.Font;
@@ -60,7 +77,7 @@ extern class Geometry
 
 @:native("System.Windows.Shapes.Rectangle")
 @:nativeGen
-extern class Rectangle extends Shape
+extern class WpfRectangle extends Shape
 {
     public function new():Void;
 }
@@ -74,7 +91,7 @@ extern class FontFamily
 
 @:native("System.Windows.FontStyle")
 @:nativeGen
-extern class FontStyle 
+extern class WpfFontStyle 
 {
 }
 
@@ -88,7 +105,7 @@ extern class FontWeight
 @:nativeGen
 extern class FontStyles 
 {
-    public static var Italic:FontStyle;
+    public static var Italic:WpfFontStyle;
 }
 
 @:native("System.Windows.FontWeights")
@@ -106,7 +123,7 @@ extern class TextBlock extends FrameworkElement
     var Text:String;
     var FontFamily:FontFamily;
     var FontSize:Float;
-    var FontStyle:FontStyle;
+    var FontStyle:WpfFontStyle;
     var FontWeight:FontWeight;
     public function new():Void;
 }
@@ -212,7 +229,7 @@ class WpfCanvas implements ICanvas
     
     public function fillRect(x:Float, y:Float, w:Float, h:Float):Void
     {
-        var rectangle = new Rectangle();
+        var rectangle = new WpfRectangle();
         rectangle.Fill = _brush;
         rectangle.Width = w;
         rectangle.Height = h;
@@ -223,7 +240,7 @@ class WpfCanvas implements ICanvas
     
     public function strokeRect(x:Float, y:Float, w:Float, h:Float):Void
     {
-        var rectangle = new Rectangle();
+        var rectangle = new WpfRectangle();
         rectangle.Stroke = _brush;
         rectangle.StrokeThickness = _lineWidth;
         rectangle.Width = w;

@@ -8,8 +8,6 @@ alphaTab can
 
 * load GuitarPro 3-5 files 
 * load GuitarPro 6 files
-* load MusicXml Files
-* load PowerTab files
 * load AlphaTex markup
 
 and 
@@ -17,6 +15,12 @@ and
 * render standard music notation 
 * render guitar tablatures
 * render a huge amount of effects 
+
+# Planned Features
+alphaTab will 
+
+* load MusicXml Files
+* load PowerTab files
 
 and
 
@@ -26,7 +30,7 @@ and
 alphaTab is not only a JavaScript library. alphaTab can be used im many different platforms 
 
 * HTML5/JS
-* Flash
-* iOS
-* C#
-* Java (Java2D and Android)
+* Flash (future)
+* iOS (future)
+* C# (Gdi and WPF)
+* Java (future - Java2D and Android) 

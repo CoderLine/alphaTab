@@ -71,16 +71,6 @@ Lambda.has = function(it,elt) {
 	}
 	return false;
 }
-Lambda.indexOf = function(it,v) {
-	var i = 0;
-	var $it0 = $iterator(it)();
-	while( $it0.hasNext() ) {
-		var v2 = $it0.next();
-		if(v == v2) return i;
-		i++;
-	}
-	return -1;
-}
 var IMap = function() { }
 IMap.__name__ = true;
 var Reflect = function() { }
@@ -102,9 +92,6 @@ Reflect.fields = function(o) {
 		}
 	}
 	return a;
-}
-Reflect.isFunction = function(f) {
-	return typeof(f) == "function" && !(f.__name__ || f.__ename__);
 }
 var Std = function() { }
 Std.__name__ = true;
@@ -170,20 +157,6 @@ StringTools.hex = function(n,digits) {
 	} while(n > 0);
 	if(digits != null) while(s.length < digits) s = "0" + s;
 	return s;
-}
-var Type = function() { }
-Type.__name__ = true;
-Type.allEnums = function(e) {
-	var all = [];
-	var cst = e.__constructs__;
-	var _g = 0;
-	while(_g < cst.length) {
-		var c = cst[_g];
-		++_g;
-		var v = Reflect.field(e,c);
-		if(!Reflect.isFunction(v)) all.push(v);
-	}
-	return all;
 }
 var XmlType = { __ename__ : true, __constructs__ : [] }
 var Xml = function() {
@@ -889,11 +862,17 @@ alphatab.platform.js.JsFileLoader = function() {
 };
 alphatab.platform.js.JsFileLoader.__name__ = true;
 alphatab.platform.js.JsFileLoader.__interfaces__ = [alphatab.platform.IFileLoader];
-alphatab.platform.js.JsFileLoader.isIE = function() {
+alphatab.platform.js.JsFileLoader.getIeVersion = function() {
+	var rv = -1;
+	var appName = navigator.appName;
 	var agent = navigator.userAgent;
-	return agent.indexOf("MSIE") != -1;
+	if(appName == "Microsoft Internet Explorer") {
+		var e = new EReg("MSIE ([0-9]{1,}[\\.0-9]{0,})","");
+		if(e.match(agent)) rv = Std.parseFloat(e.matched(1));
+	}
+	return rv;
 }
-alphatab.platform.js.JsFileLoader.getBytes = function(s) {
+alphatab.platform.js.JsFileLoader.getBytesFromString = function(s) {
 	var a = new Array();
 	var _g1 = 0, _g = s.length;
 	while(_g1 < _g) {
@@ -902,9 +881,14 @@ alphatab.platform.js.JsFileLoader.getBytes = function(s) {
 	}
 	return haxe.io.Bytes.ofData(a);
 }
+alphatab.platform.js.JsFileLoader.getBytesFromTyped = function(s) {
+	var a = new Uint8Array(s);
+	return haxe.io.Bytes.ofData(a);
+}
 alphatab.platform.js.JsFileLoader.prototype = {
 	loadBinaryAsync: function(path,success,error) {
-		if(alphatab.platform.js.JsFileLoader.isIE()) {
+		var ie = alphatab.platform.js.JsFileLoader.getIeVersion();
+		if(ie >= 0 && ie <= 9) {
 			var vbArr = VbAjaxLoader(method,file);
 			var fileContents = vbArr.toArray();
 			var data = "";
@@ -913,25 +897,26 @@ alphatab.platform.js.JsFileLoader.prototype = {
 				data += String.fromCharCode(fileContents[i]);
 				i++;
 			}
-			var reader = alphatab.platform.js.JsFileLoader.getBytes(data);
+			var reader = alphatab.platform.js.JsFileLoader.getBytesFromString(data);
 			success(reader);
 		} else {
 			var xhr = new XMLHttpRequest();
-			xhr.overrideMimeType("text/plain; charset=x-user-defined");
 			xhr.onreadystatechange = function(e) {
 				if(xhr.readyState == 4) {
 					if(xhr.status == 200) {
-						var reader = alphatab.platform.js.JsFileLoader.getBytes(xhr.responseText);
+						var reader = alphatab.platform.js.JsFileLoader.getBytesFromTyped(xhr.response);
 						success(reader);
 					} else if(xhr.status == 0) error("You are offline!!\n Please Check Your Network."); else if(xhr.status == 404) error("Requested URL not found."); else if(xhr.status == 500) error("Internel Server Error."); else if(xhr.statusText == "parsererror") error("Error.\nParsing JSON Request failed."); else if(xhr.statusText == "timeout") error("Request Time out."); else error("Unknow Error: " + xhr.responseText);
 				}
 			};
 			xhr.open("GET",path,true);
+			xhr.responseType = "arraybuffer";
 			xhr.send(null);
 		}
 	}
 	,loadBinary: function(path) {
-		if(alphatab.platform.js.JsFileLoader.isIE()) {
+		var ie = alphatab.platform.js.JsFileLoader.getIeVersion();
+		if(ie >= 0 && ie <= 9) {
 			var vbArr = VbAjaxLoader(method,file);
 			var fileContents = vbArr.toArray();
 			var data = "";
@@ -940,15 +925,15 @@ alphatab.platform.js.JsFileLoader.prototype = {
 				data += String.fromCharCode(fileContents[i]);
 				i++;
 			}
-			var reader = alphatab.platform.js.JsFileLoader.getBytes(data);
+			var reader = alphatab.platform.js.JsFileLoader.getBytesFromString(data);
 			return reader;
 		} else {
 			var xhr = new XMLHttpRequest();
-			xhr.overrideMimeType("text/plain; charset=x-user-defined");
 			xhr.open("GET",path,false);
+			xhr.responseType = "arraybuffer";
 			xhr.send(null);
 			if(xhr.status == 200) {
-				var reader = alphatab.platform.js.JsFileLoader.getBytes(xhr.responseText);
+				var reader = alphatab.platform.js.JsFileLoader.getBytesFromTyped(xhr.response);
 				return reader;
 			} else if(xhr.status == 0) throw "You are offline!!\n Please Check Your Network."; else if(xhr.status == 404) throw "Requested URL not found."; else if(xhr.status == 500) throw "Internel Server Error."; else if(xhr.statusText == "parsererror") throw "Error.\nParsing JSON Request failed."; else if(xhr.statusText == "timeout") throw "Request Time out."; else throw "Unknow Error: " + xhr.responseText;
 		}
@@ -1888,420 +1873,8 @@ alphatab.audio.MidiUtils.applyDot = function(ticks,doubleDotted) {
 alphatab.audio.MidiUtils.applyTuplet = function(ticks,numerator,denominator) {
 	return ticks * denominator / numerator | 0;
 }
-if(!alphatab.audio.generator) alphatab.audio.generator = {}
-alphatab.audio.generator.MidiFileGenerator = function(score) {
-	this._score = score;
-	this._currentTempo = this._score.tempo;
-	this._midiFile = new alphatab.audio.model.MidiFile();
-	this._handler = new alphatab.audio.generator.MidiFileHandler(this._midiFile);
-	var _g1 = 0, _g = this._score.tracks.length + 2;
-	while(_g1 < _g) {
-		var i = _g1++;
-		this._midiFile.createTrack();
-	}
-	this._midiFile.infoTrack = this._midiFile.tracks.length - 2;
-	this._midiFile.metronomeTrack = this._midiFile.tracks.length - 1;
-};
-alphatab.audio.generator.MidiFileGenerator.__name__ = true;
-alphatab.audio.generator.MidiFileGenerator.prototype = {
-	generateAutomation: function(beat,automation,startMove) {
-		switch( (automation.type)[1] ) {
-		case 2:
-			this._handler.addProgramChange(beat.voice.bar.track.index,beat.start + startMove,beat.voice.bar.track.playbackInfo.primaryChannel,automation.value | 0);
-			this._handler.addProgramChange(beat.voice.bar.track.index,beat.start + startMove,beat.voice.bar.track.playbackInfo.secondaryChannel,automation.value | 0);
-			break;
-		case 3:
-			this._handler.addControlChange(beat.voice.bar.track.index,beat.start + startMove,beat.voice.bar.track.playbackInfo.primaryChannel,10,automation.value | 0);
-			this._handler.addControlChange(beat.voice.bar.track.index,beat.start + startMove,beat.voice.bar.track.playbackInfo.secondaryChannel,10,automation.value | 0);
-			break;
-		case 1:
-			this._handler.addControlChange(beat.voice.bar.track.index,beat.start + startMove,beat.voice.bar.track.playbackInfo.primaryChannel,7,automation.value | 0);
-			this._handler.addControlChange(beat.voice.bar.track.index,beat.start + startMove,beat.voice.bar.track.playbackInfo.secondaryChannel,7,automation.value | 0);
-			break;
-		default:
-		}
-	}
-	,getBrushIncrement: function(beat) {
-		if(beat.brushDuration == 0) return 0;
-		var duration = beat.calculateDuration();
-		if(duration == 0) return 0;
-		return duration / 8.0 * (4.0 / beat.brushDuration) | 0;
-	}
-	,getBrushInfo: function(beat) {
-		var brushInfo = new Array();
-		var _g1 = 0, _g = beat.voice.bar.track.tuning.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			brushInfo.push(0);
-		}
-		if(beat.brushType != alphatab.model.BrushType.None) {
-			var stringUsed = 0;
-			var stringCount = 0;
-			var _g = 0, _g1 = beat.notes;
-			while(_g < _g1.length) {
-				var n = _g1[_g];
-				++_g;
-				if(n.isTieDestination) continue;
-				stringUsed |= 1 << n.string - 1;
-				stringCount++;
-			}
-			if(beat.notes.length > 0) {
-				var brushMove = 0;
-				var brushIncrement = this.getBrushIncrement(beat);
-				var _g1 = 0, _g = beat.voice.bar.track.tuning.length;
-				while(_g1 < _g) {
-					var i = _g1++;
-					var index = beat.brushType == alphatab.model.BrushType.ArpeggioDown || beat.brushType == alphatab.model.BrushType.BrushDown?i:brushInfo.length - 1 - i;
-					if((stringUsed & 1 << index) != 0) {
-						brushInfo[index] = brushMove;
-						brushMove = brushIncrement;
-					}
-				}
-			}
-		}
-		return brushInfo;
-	}
-	,generateTremoloPicking: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
-		var track = note.beat.voice.bar.track;
-		var tpLength = alphatab.audio.MidiUtils.durationToTicks(note.beat.tremoloSpeed);
-		var tick = noteStart;
-		while(tick + 10 < noteStart + noteDuration) {
-			if(tick + tpLength >= noteStart + noteDuration) tpLength = noteStart + noteDuration - tick;
-			this._handler.addNote(track.index,tick,tpLength,noteKey,dynamicValue,track.playbackInfo.primaryChannel);
-			tick += tpLength;
-		}
-	}
-	,generateTrill: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
-		var track = note.beat.voice.bar.track;
-		var trillKey = track.capo + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1] + (note.trillValue - note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1]);
-		var trillLength = alphatab.audio.MidiUtils.durationToTicks(note.trillSpeed);
-		var realKey = true;
-		var tick = noteStart;
-		while(tick + 10 < noteStart + noteDuration) {
-			if(tick + trillLength >= noteStart + noteDuration) trillLength = noteStart + noteDuration - tick;
-			this._handler.addNote(track.index,tick,trillLength,realKey?trillKey:noteKey,dynamicValue,track.playbackInfo.primaryChannel);
-			realKey = !realKey;
-			tick += trillLength;
-		}
-	}
-	,generateBend: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
-	}
-	,generateWhammyBar: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
-	}
-	,generateSlide: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
-	}
-	,generateVibrato: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
-	}
-	,generateHarmonic: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
-	}
-	,generateFadeIn: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
-	}
-	,getDynamicValue: function(note) {
-		var dynamicValue = note.dynamicValue;
-		var allDynamics = Type.allEnums(alphatab.model.DynamicValue);
-		var currentIndex = Lambda.indexOf(allDynamics,dynamicValue);
-		if(!note.beat.voice.bar.track.isPercussion && note.isHammerPullDestination) currentIndex--;
-		if(note.isGhost) currentIndex--;
-		switch( (note.accentuated)[1] ) {
-		case 1:
-			currentIndex++;
-			break;
-		case 2:
-			currentIndex += 2;
-			break;
-		default:
-		}
-		return allDynamics[Math.max(0,Math.min(allDynamics.length - 1,currentIndex)) | 0];
-	}
-	,applyStaticDuration: function(duration,maximum) {
-		var value = this._currentTempo * duration / 60;
-		return Math.min(value,maximum) | 0;
-	}
-	,applyDurationEffects: function(note,duration) {
-		if(note.isDead) return this.applyStaticDuration(30,duration);
-		if(note.isPalmMute) return this.applyStaticDuration(80,duration);
-		if(note.isStaccato) return duration / 2 | 0;
-		return duration;
-	}
-	,getNoteDuration: function(note,beatDuration) {
-		var lastNoteEnd = note.beat.start - note.beat.calculateDuration();
-		var noteDuration = beatDuration;
-		var currentBeat = note.beat.nextBeat;
-		var letRingSuspend = false;
-		while(currentBeat != null) {
-			if(currentBeat.isRest()) return this.applyDurationEffects(note,noteDuration);
-			var letRing = currentBeat.voice == note.beat.voice && note.isLetRing;
-			var letRingApplied = false;
-			var noteOnSameString = currentBeat.getNoteOnString(note.string);
-			if(noteOnSameString != null) {
-				if(!noteOnSameString.isTieDestination) {
-					letRing = false;
-					letRingSuspend = true;
-					if(!noteOnSameString.isLetRing) return this.applyDurationEffects(note,noteDuration);
-				}
-				letRingApplied = true;
-				noteDuration += currentBeat.start - lastNoteEnd + noteOnSameString.beat.calculateDuration();
-				lastNoteEnd = currentBeat.start + currentBeat.calculateDuration();
-			}
-			if(letRing && !letRingApplied && !letRingSuspend) {
-				noteDuration += currentBeat.start - lastNoteEnd + noteOnSameString.beat.calculateDuration();
-				lastNoteEnd = currentBeat.start + currentBeat.calculateDuration();
-			}
-			currentBeat = currentBeat.nextBeat;
-		}
-		return this.applyDurationEffects(note,noteDuration);
-	}
-	,generateNote: function(note,beatStart,beatDuration,startMove,brushInfo) {
-		var track = note.beat.voice.bar.track;
-		var noteKey = track.capo + (note.fret + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1]);
-		var noteStart = beatStart + startMove + brushInfo[note.string - 1];
-		var noteDuration = this.getNoteDuration(note,beatDuration) - brushInfo[note.string - 1];
-		var dynamicValue = this.getDynamicValue(note);
-		if(note.beat.fadeIn) this.generateFadeIn(note,noteStart,noteDuration,noteKey,dynamicValue);
-		if(note.trillValue >= 0 && !track.isPercussion) {
-			this.generateTrill(note,noteStart,noteDuration,noteKey,dynamicValue);
-			return;
-		}
-		if(note.beat.tremoloSpeed != null) {
-			this.generateTremoloPicking(note,noteStart,noteDuration,noteKey,dynamicValue);
-			return;
-		}
-		if(note.bendPoints.length > 1) this.generateBend(note,noteStart,noteDuration,noteKey,dynamicValue); else if(note.beat.whammyBarPoints.length > 0) this.generateWhammyBar(note,noteStart,noteDuration,noteKey,dynamicValue); else if(note.slideType != alphatab.model.SlideType.None) this.generateSlide(note,noteStart,noteDuration,noteKey,dynamicValue); else if(note.vibrato != alphatab.model.VibratoType.None) this.generateVibrato(note,noteStart,noteDuration,noteKey,dynamicValue);
-		if(note.harmonicType != alphatab.model.HarmonicType.None) this.generateHarmonic(note,noteStart,noteDuration,noteKey,dynamicValue);
-		this._handler.addNote(track.index,noteStart,noteDuration,noteKey,dynamicValue,track.playbackInfo.primaryChannel);
-	}
-	,generateBeat: function(beat,startMove) {
-		var start = beat.start;
-		var duration = beat.calculateDuration();
-		var track = beat.voice.bar.track;
-		var _g = 0, _g1 = beat.automations;
-		while(_g < _g1.length) {
-			var automation = _g1[_g];
-			++_g;
-			this.generateAutomation(beat,automation,startMove);
-		}
-		if(beat.isRest()) this._handler.addRest(track.index,start + startMove,track.playbackInfo.primaryChannel); else {
-			var brushInfo = this.getBrushInfo(beat);
-			var _g = 0, _g1 = beat.notes;
-			while(_g < _g1.length) {
-				var n = _g1[_g];
-				++_g;
-				if(n.isTieDestination) continue;
-				this.generateNote(n,start,duration,startMove,brushInfo);
-			}
-		}
-	}
-	,generateVoice: function(voice,startMove) {
-		var _g = 0, _g1 = voice.beats;
-		while(_g < _g1.length) {
-			var b = _g1[_g];
-			++_g;
-			this.generateBeat(b,startMove);
-		}
-	}
-	,generateBar: function(bar,startMove) {
-		var _g = 0, _g1 = bar.voices;
-		while(_g < _g1.length) {
-			var voice = _g1[_g];
-			++_g;
-			this.generateVoice(voice,startMove);
-		}
-	}
-	,generateMasterBar: function(masterBar,previousMasterBar,startMove) {
-		if(previousMasterBar == null || previousMasterBar.timeSignatureDenominator != masterBar.timeSignatureDenominator || previousMasterBar.timeSignatureNumerator != masterBar.timeSignatureNumerator) this._handler.addTimeSignature(masterBar.start + startMove,masterBar.timeSignatureNumerator,masterBar.timeSignatureDenominator);
-		if(previousMasterBar == null) {
-			this._handler.addTempo(masterBar.start + startMove,masterBar.score.tempo);
-			this._currentTempo = masterBar.score.tempo;
-		} else if(masterBar.tempoAutomation != null) {
-			this._handler.addTempo(masterBar.start + startMove,masterBar.tempoAutomation.value | 0);
-			this._currentTempo = masterBar.tempoAutomation.value | 0;
-		}
-		var start = masterBar.start + startMove;
-		var length = alphatab.audio.MidiUtils.valueToTicks(masterBar.timeSignatureDenominator);
-		var _g1 = 0, _g = masterBar.timeSignatureNumerator;
-		while(_g1 < _g) {
-			var i = _g1++;
-			this._handler.addNote(this._midiFile.metronomeTrack,start,length,37,alphatab.model.DynamicValue.F,9);
-			start += length;
-		}
-	}
-	,generateChannel: function(track,channel,playbackInfo) {
-		this._handler.addControlChange(track.index,0,channel,7,playbackInfo.volume);
-		this._handler.addControlChange(track.index,0,channel,10,playbackInfo.balance);
-		this._handler.addControlChange(track.index,0,channel,11,127);
-		this._handler.addProgramChange(track.index,0,channel,playbackInfo.program);
-	}
-	,generateTrack: function(track) {
-		this.generateChannel(track,track.playbackInfo.primaryChannel,track.playbackInfo);
-		if(track.playbackInfo.primaryChannel != track.playbackInfo.secondaryChannel) this.generateChannel(track,track.playbackInfo.secondaryChannel,track.playbackInfo);
-	}
-	,generate: function() {
-		var _g = 0, _g1 = this._score.tracks;
-		while(_g < _g1.length) {
-			var track = _g1[_g];
-			++_g;
-			this.generateTrack(track);
-		}
-		var controller = new alphatab.audio.generator.MidiPlaybackController(this._score);
-		var previousMasterBar = null;
-		while(!(controller.index >= controller._score.masterBars.length)) {
-			var index = controller.index;
-			var repeatMove = controller.repeatMove;
-			controller.process();
-			if(controller.shouldPlay) {
-				this.generateMasterBar(this._score.masterBars[controller.index],previousMasterBar,controller.repeatMove);
-				var _g = 0, _g1 = this._score.tracks;
-				while(_g < _g1.length) {
-					var track = _g1[_g];
-					++_g;
-					this.generateBar(track.bars[controller.index],controller.repeatMove);
-				}
-			}
-			previousMasterBar = this._score.masterBars[controller.index];
-		}
-	}
-	,__class__: alphatab.audio.generator.MidiFileGenerator
-}
-alphatab.audio.generator.MidiFileHandler = function(midiFile) {
-	this._midiFile = midiFile;
-};
-alphatab.audio.generator.MidiFileHandler.__name__ = true;
-alphatab.audio.generator.MidiFileHandler.prototype = {
-	addTempo: function(tick,tempo) {
-	}
-	,addProgramChange: function(track,tick,channel,program) {
-	}
-	,addControlChange: function(track,tick,channel,controller,value) {
-	}
-	,addNote: function(track,start,length,key,dynamicValue,channel) {
-	}
-	,addRest: function(track,start,channel) {
-	}
-	,addTimeSignature: function(tick,timeSignatureNumerator,timeSignatureDenominator) {
-	}
-	,__class__: alphatab.audio.generator.MidiFileHandler
-}
-alphatab.audio.generator.MidiPlaybackController = function(score) {
-	this._score = score;
-	this.shouldPlay = true;
-	this.repeatMove = 0;
-	this.index = 0;
-};
-alphatab.audio.generator.MidiPlaybackController.__name__ = true;
-alphatab.audio.generator.MidiPlaybackController.prototype = {
-	process: function() {
-		var masterBar = this._score.masterBars[this.index];
-		if(!masterBar.repeatGroup.isClosed && masterBar.repeatGroup.openings[masterBar.repeatGroup.openings.length - 1] == masterBar) {
-			this._repeatStart = 0;
-			this._repeatNumber = 0;
-			this._repeatEnd = 0;
-			this._repeatOpen = false;
-		}
-		if(masterBar.isRepeatStart) {
-			this._repeatStartIndex = this.index;
-			this._repeatStart = masterBar.start;
-			this._repeatOpen = true;
-			if(this.index > this._lastIndex) {
-				this._repeatNumber = 0;
-				this._repeatAlternative = 0;
-			}
-		} else {
-			if(this._repeatAlternative == 0) this._repeatAlternative = masterBar.alternateEndings;
-			if(this._repeatOpen && this._repeatAlternative > 0 && (this._repeatAlternative & 1 << this._repeatNumber) == 0) {
-				this.repeatMove -= masterBar.calculateDuration();
-				if(masterBar.repeatCount > 0) this._repeatAlternative = 0;
-				this.shouldPlay = false;
-				this.index++;
-				return;
-			}
-		}
-		this._lastIndex = Math.max(this._lastIndex,this.index) | 0;
-		if(this._repeatOpen && masterBar.repeatCount > 0) {
-			if(this._repeatNumber < masterBar.repeatCount || this._repeatAlternative > 0) {
-				this._repeatEnd = masterBar.start + masterBar.calculateDuration();
-				this.repeatMove += this._repeatEnd - this._repeatStart;
-				this.index = this._repeatStartIndex - 1;
-				this._repeatNumber++;
-			} else {
-				this._repeatStart = 0;
-				this._repeatNumber = 0;
-				this._repeatEnd = 0;
-				this._repeatOpen = false;
-			}
-			this._repeatAlternative = 0;
-		}
-		this.index++;
-	}
-	,finished: function() {
-		return this.index >= this._score.masterBars.length;
-	}
-	,__class__: alphatab.audio.generator.MidiPlaybackController
-}
-if(!alphatab.audio.model) alphatab.audio.model = {}
-alphatab.audio.model.MidiEvent = function() {
-};
-alphatab.audio.model.MidiEvent.__name__ = true;
-alphatab.audio.model.MidiEvent.prototype = {
-	getDeltaTicks: function() {
-		return this.previousEvent == null?0:this.tick - this.previousEvent.tick;
-	}
-	,__class__: alphatab.audio.model.MidiEvent
-}
-alphatab.audio.model.MidiFile = function() {
-};
-alphatab.audio.model.MidiFile.__name__ = true;
-alphatab.audio.model.MidiFile.prototype = {
-	createTrack: function() {
-		var track = new alphatab.audio.model.MidiTrack();
-		track.index = this.tracks.length;
-		track.file = this;
-		this.tracks.push(track);
-		return track;
-	}
-	,__class__: alphatab.audio.model.MidiFile
-}
-alphatab.audio.model.MidiTrack = function() {
-};
-alphatab.audio.model.MidiTrack.__name__ = true;
-alphatab.audio.model.MidiTrack.prototype = {
-	addEvent: function(event) {
-		event.track = this;
-		if(this.firstEvent == null) {
-			this.firstEvent = event;
-			this.lastEvent = event;
-		} else if(this.lastEvent.tick <= event.tick) {
-			this.lastEvent.nextEvent = event;
-			event.previousEvent = this.lastEvent;
-			this.lastEvent = event;
-		} else if(this.firstEvent.tick > event.tick) {
-			event.nextEvent = this.firstEvent;
-			this.firstEvent.previousEvent = event;
-			this.firstEvent = event;
-		} else {
-			var firstDelta = event.tick - this.firstEvent.tick;
-			var lastDelta = this.lastEvent.tick - event.tick;
-			if(firstDelta < lastDelta) {
-				var previous = this.firstEvent;
-				while(previous != null && previous.nextEvent != null && previous.nextEvent.tick < event.tick) previous = previous.nextEvent;
-				if(previous == null) return;
-				var next = previous.nextEvent;
-				previous.nextEvent = event;
-				event.previousEvent = previous;
-				event.nextEvent = next;
-				if(next != null) next.previousEvent = event;
-			} else {
-				var next = this.lastEvent;
-				while(next != null && next.previousEvent != null && next.previousEvent.tick > event.tick) next = next.previousEvent;
-				if(next == null) return;
-				var previous = next.previousEvent;
-				next.previousEvent = event;
-				event.nextEvent = next;
-				event.previousEvent = previous;
-				if(previous != null) previous.nextEvent = event; else this.firstEvent = event;
-			}
-		}
-	}
-	,__class__: alphatab.audio.model.MidiTrack
+alphatab.audio.MidiUtils.dynamicToVelocity = function(dynamicValue) {
+	return 15 + dynamicValue[1] * 16;
 }
 if(!alphatab.importer) alphatab.importer = {}
 alphatab.importer.ScoreImporter = function() {
@@ -6363,7 +5936,7 @@ alphatab.rendering.EffectBarGlyphSizing.GroupedPostBeatOnly.__enum__ = alphatab.
 alphatab.rendering.GroupedBarRenderer = function(bar) {
 	alphatab.rendering.BarRendererBase.call(this,bar);
 	this._preBeatGlyphs = new Array();
-	this._voiceContainers = new haxe.ds.IntMap();
+	this._voiceContainers = new Array();
 	this._postBeatGlyphs = new Array();
 };
 alphatab.rendering.GroupedBarRenderer.__name__ = true;
@@ -6381,9 +5954,10 @@ alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.Bar
 			g.paint(cx + this.x + glyphStartX,cy + this.y,canvas);
 		}
 		glyphStartX = this.getBeatGlyphsStart();
-		var $it0 = this._voiceContainers.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
+		var _g = 0, _g1 = this._voiceContainers;
+		while(_g < _g1.length) {
+			var c = _g1[_g];
+			++_g;
 			c.paint(cx + this.x + glyphStartX,cy + this.y,canvas);
 		}
 		glyphStartX = this.getPostBeatGlyphsStart();
@@ -6395,17 +5969,19 @@ alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.Bar
 		}
 	}
 	,finalizeRenderer: function(layout) {
-		var $it0 = this._voiceContainers.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
+		var _g = 0, _g1 = this._voiceContainers;
+		while(_g < _g1.length) {
+			var c = _g1[_g];
+			++_g;
 			c.finalizeGlyph(layout);
 		}
 	}
 	,applyBarSpacing: function(spacing) {
 		this.width += spacing;
-		var $it0 = this._voiceContainers.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
+		var _g = 0, _g1 = this._voiceContainers;
+		while(_g < _g1.length) {
+			var c = _g1[_g];
+			++_g;
 			var toApply = spacing;
 			if(this._biggestVoiceContainer != null) toApply += this._biggestVoiceContainer.width - c.width;
 			c.applyGlyphSpacing(toApply);
@@ -6414,9 +5990,10 @@ alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.Bar
 	,getPostBeatGlyphsStart: function() {
 		var start = this.getBeatGlyphsStart();
 		var offset = 0;
-		var $it0 = this._voiceContainers.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
+		var _g = 0, _g1 = this._voiceContainers;
+		while(_g < _g1.length) {
+			var c = _g1[_g];
+			++_g;
 			if(c.width > offset) offset = c.width;
 		}
 		return start + offset;
@@ -6452,11 +6029,11 @@ alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.Bar
 	}
 	,getOrCreateVoiceContainer: function(voiceIndex) {
 		var c;
-		if(!this._voiceContainers.exists(voiceIndex)) {
+		if(voiceIndex >= this._voiceContainers.length) {
 			c = new alphatab.rendering.glyphs.VoiceContainerGlyph(0,0,voiceIndex);
 			c.renderer = this;
-			this._voiceContainers.set(voiceIndex,c);
-		} else c = this._voiceContainers.get(voiceIndex);
+			this._voiceContainers[voiceIndex] = c;
+		} else c = this._voiceContainers[voiceIndex];
 		return c;
 	}
 	,addBeatGlyph: function(g) {
@@ -6477,9 +6054,10 @@ alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.Bar
 		var preSize = sizes.getSize("Pre");
 		var preSizeDiff = preSize - this.getBeatGlyphsStart();
 		if(preSizeDiff > 0) this.addPreBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,preSizeDiff));
-		var $it0 = this._voiceContainers.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
+		var _g = 0, _g1 = this._voiceContainers;
+		while(_g < _g1.length) {
+			var c = _g1[_g];
+			++_g;
 			c.applySizes(sizes);
 		}
 		var postSize = sizes.getSize("Post");
@@ -6501,9 +6079,10 @@ alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.Bar
 	,registerMaxSizes: function(sizes) {
 		var preSize = this.getBeatGlyphsStart();
 		if(sizes.getSize("Pre") < preSize) sizes.setSize("Pre",preSize);
-		var $it0 = this._voiceContainers.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
+		var _g = 0, _g1 = this._voiceContainers;
+		while(_g < _g1.length) {
+			var c = _g1[_g];
+			++_g;
 			c.registerMaxSizes(sizes);
 		}
 		var postSize;
@@ -6514,9 +6093,10 @@ alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.Bar
 	,updateWidth: function() {
 		this.width = this.getPostBeatGlyphsStart();
 		if(this._postBeatGlyphs.length > 0) this.width += this._postBeatGlyphs[this._postBeatGlyphs.length - 1].x + this._postBeatGlyphs[this._postBeatGlyphs.length - 1].width;
-		var $it0 = this._voiceContainers.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
+		var _g = 0, _g1 = this._voiceContainers;
+		while(_g < _g1.length) {
+			var c = _g1[_g];
+			++_g;
 			if(this._biggestVoiceContainer == null || c.width > this._biggestVoiceContainer.width) this._biggestVoiceContainer = c;
 		}
 	}
@@ -6524,9 +6104,10 @@ alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.Bar
 		this.createPreBeatGlyphs();
 		this.createBeatGlyphs();
 		this.createPostBeatGlyphs();
-		var $it0 = this._voiceContainers.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
+		var _g = 0, _g1 = this._voiceContainers;
+		while(_g < _g1.length) {
+			var c = _g1[_g];
+			++_g;
 			c.doLayout();
 		}
 		this.updateWidth();
@@ -6718,7 +6299,7 @@ alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.Grou
 		this.isEmpty = true;
 		var prevGlyph = null;
 		if(this.index > 0) {
-			var prevRenderer = js.Boot.__cast(this.stave.barRenderers[this.index - 1] , alphatab.rendering.EffectBarRenderer);
+			var prevRenderer = this.stave.barRenderers[this.index - 1];
 			if(prevRenderer._lastBeat != null) prevGlyph = prevRenderer._effectGlyphs[0].get(prevRenderer._lastBeat.index);
 		}
 		var $it0 = this._effectGlyphs[0].keys();
@@ -7780,7 +7361,7 @@ alphatab.rendering.glyphs.BarNumberGlyph.prototype = $extend(alphatab.rendering.
 	,doLayout: function() {
 		var scoreRenderer = this.renderer.stave.staveGroup.layout.renderer;
 		scoreRenderer.canvas.setFont(scoreRenderer.renderingResources.barNumberFont);
-		this.width = this.renderer.stave.staveGroup.layout.renderer.canvas.measureText(Std.string(this._number)) + 3 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		this.width = 10 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
 	,__class__: alphatab.rendering.glyphs.BarNumberGlyph
 });
@@ -8362,10 +7943,12 @@ alphatab.rendering.glyphs.NoteNumberGlyph.prototype = $extend(alphatab.rendering
 			canvas.fillText(Std.string(this._noteString),cx + this.x + 0 * this.renderer.stave.staveGroup.layout.renderer.scale,cy + this.y);
 		}
 	}
+	,calculateWidth: function() {
+		this.width = this.renderer.stave.staveGroup.layout.renderer.canvas.measureText(this._noteString) | 0;
+	}
 	,doLayout: function() {
 		var scoreRenderer = this.renderer.stave.staveGroup.layout.renderer;
 		if(this._isGrace) scoreRenderer.canvas.setFont(scoreRenderer.renderingResources.graceFont); else scoreRenderer.canvas.setFont(scoreRenderer.renderingResources.tablatureFont);
-		this.width = this.renderer.stave.staveGroup.layout.renderer.canvas.measureText(this._noteString) | 0;
 	}
 	,__class__: alphatab.rendering.glyphs.NoteNumberGlyph
 });
@@ -9402,7 +8985,10 @@ alphatab.rendering.glyphs.TabNoteChordGlyph.prototype = $extend(alphatab.renderi
 		if(this._noteLookup.exists(note.string)) {
 			var n = this._noteLookup.get(note.string);
 			var pos = this.x + n.x + (0 * this.renderer.stave.staveGroup.layout.renderer.scale | 0);
-			if(onEnd) pos += n.width;
+			if(onEnd) {
+				n.calculateWidth();
+				pos += n.width;
+			}
 			return pos;
 		}
 		return 0;
@@ -10478,7 +10064,7 @@ alphatab.rendering.utils.SvgPathParser.prototype = {
 		return alphatab.rendering.utils.SvgPathParser.isNumber(this.currentToken);
 	}
 	,getNumber: function() {
-		return Std.parseFloat(this.getString());
+		return Std.parseInt(this.getString());
 	}
 	,getString: function() {
 		var t = this.currentToken;
@@ -10546,15 +10132,7 @@ haxe.ds.IntMap = function() {
 haxe.ds.IntMap.__name__ = true;
 haxe.ds.IntMap.__interfaces__ = [IMap];
 haxe.ds.IntMap.prototype = {
-	iterator: function() {
-		return { ref : this.h, it : this.keys(), hasNext : function() {
-			return this.it.hasNext();
-		}, next : function() {
-			var i = this.it.next();
-			return this.ref[i];
-		}};
-	}
-	,keys: function() {
+	keys: function() {
 		var a = [];
 		for( var key in this.h ) {
 		if(this.h.hasOwnProperty(key)) a.push(key | 0);
@@ -11273,19 +10851,15 @@ alphatab.platform.model.Font.StylePlain = 0;
 alphatab.platform.model.Font.StyleBold = 1;
 alphatab.platform.model.Font.StyleItalic = 2;
 alphatab.rendering.layout.PageViewLayout.ScoreInfos = "ScoreInfos";
-alphatab.rendering.layout.PageViewLayout.PagePadding = [20,20,20,20];
+alphatab.rendering.layout.PageViewLayout.PagePadding = [40,40,40,40];
 alphatab.rendering.layout.PageViewLayout.WidthOn100 = 795;
 alphatab.rendering.layout.PageViewLayout.GroupSpacing = 20;
 alphatab.rendering.layout.HorizontalScreenLayout.PagePadding = [20,20,20,20];
 alphatab.rendering.layout.HorizontalScreenLayout.GroupSpacing = 20;
 alphatab.audio.MidiUtils.QuarterTime = 960;
 alphatab.audio.MidiUtils.PercussionChannel = 9;
-alphatab.audio.generator.MidiFileHandler.Volume = 7;
-alphatab.audio.generator.MidiFileHandler.Balance = 10;
-alphatab.audio.generator.MidiFileHandler.Expression = 11;
-alphatab.audio.generator.MidiFileHandler.DefaultMetronomeKey = 37;
-alphatab.audio.generator.MidiFileHandler.DefaultDurationDead = 30;
-alphatab.audio.generator.MidiFileHandler.DefaultDurationPalmMute = 80;
+alphatab.audio.MidiUtils.MinVelocity = 15;
+alphatab.audio.MidiUtils.VelocityIncrement = 16;
 alphatab.importer.ScoreImporter.UnsupportedFormat = "unsupported file";
 alphatab.importer.AlphaTexImporter.Eof = String.fromCharCode(0);
 alphatab.importer.AlphaTexImporter.TrackChannels = [0,1];

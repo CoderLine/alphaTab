@@ -15,8 +15,13 @@
  *  along with alphaTab.  If not, see <http://www.gnu.org/licenses/>.
  */
 package alphatab.audio.generator;
+
 import alphatab.model.Score;
 
+/**
+ * This controller can process the correct playback of tracks 
+ * taking care of repeats. 
+ */
 class MidiPlaybackController
 {
     private var _score:Score;

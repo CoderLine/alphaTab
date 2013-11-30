@@ -34,8 +34,7 @@ class BarNumberGlyph extends Glyph
 	{
         var scoreRenderer = renderer.getLayout().renderer;
         scoreRenderer.canvas.setFont(scoreRenderer.renderingResources.barNumberFont);
-        
-		width = Std.int(renderer.getLayout().renderer.canvas.measureText(Std.string(_number)) + 3 * getScale());
+        width = Std.int(10 * getScale());
 	}
     
     public override function canScale():Bool 
