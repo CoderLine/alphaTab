@@ -889,7 +889,7 @@ alphatab.platform.js.JsFileLoader.prototype = {
 	loadBinaryAsync: function(path,success,error) {
 		var ie = alphatab.platform.js.JsFileLoader.getIeVersion();
 		if(ie >= 0 && ie <= 9) {
-			var vbArr = VbAjaxLoader(method,file);
+			var vbArr = VbAjaxLoader("GET",path);
 			var fileContents = vbArr.toArray();
 			var data = "";
 			var i = 0;
@@ -917,7 +917,7 @@ alphatab.platform.js.JsFileLoader.prototype = {
 	,loadBinary: function(path) {
 		var ie = alphatab.platform.js.JsFileLoader.getIeVersion();
 		if(ie >= 0 && ie <= 9) {
-			var vbArr = VbAjaxLoader(method,file);
+			var vbArr = VbAjaxLoader("GET",path);
 			var fileContents = vbArr.toArray();
 			var data = "";
 			var i = 0;
@@ -1651,15 +1651,18 @@ alphatab.Settings.defaults = function() {
 	settings.staves.push(new alphatab.StaveSettings("fingering"));
 	return settings;
 }
+alphatab.Settings.jsonExists = function(json,property) {
+	return property in json;
+}
 alphatab.Settings.fromJson = function(json) {
 	var settings = alphatab.Settings.defaults();
 	if(!json) return settings;
-	if(json.scale) settings.scale = json.scale;
-	if(json.autoSize) settings.autoSize = json.autoSize;
-	if(json.width) settings.width = json.width;
-	if(json.height) settings.height = json.height;
-	if(json.engine) settings.engine = json.engine;
-	if(json.layout) {
+	if(alphatab.Settings.jsonExists(json,"scale")) settings.scale = json.scale;
+	if(alphatab.Settings.jsonExists(json,"autoSize")) settings.autoSize = json.autoSize;
+	if(alphatab.Settings.jsonExists(json,"width")) settings.width = json.width;
+	if(alphatab.Settings.jsonExists(json,"height")) settings.height = json.height;
+	if(alphatab.Settings.jsonExists(json,"engine")) settings.engine = json.engine;
+	if(alphatab.Settings.jsonExists(json,"layout")) {
 		if(js.Boot.__instanceof(json.layout,String)) settings.layout.mode = json.layout; else {
 			if(json.layout.mode) settings.layout.mode = json.layout.mode;
 			if(json.layout.additionalSettings) {
@@ -1672,7 +1675,7 @@ alphatab.Settings.fromJson = function(json) {
 			}
 		}
 	}
-	if(json.staves) {
+	if(alphatab.Settings.jsonExists(json,"staves")) {
 		settings.staves = new Array();
 		var _g = 0, _g1 = Reflect.fields(json.staves);
 		while(_g < _g1.length) {

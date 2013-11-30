@@ -114,18 +114,23 @@ class Settings
     }
     
 #if js
+    private static function jsonExists(json:Dynamic, property:String) : Bool
+    {
+        return untyped __js__("property in json");
+    }
+
     public static function fromJson(json:Dynamic) : Settings
     {
         var settings = defaults();
         
         if (!json) return settings;        
-        if(json.scale) settings.scale = json.scale;
-        if(json.autoSize) settings.autoSize = json.autoSize;
-        if(json.width) settings.width = json.width;
-        if(json.height) settings.height = json.height;
-        if(json.engine) settings.engine = json.engine;
+        if(jsonExists(json, "scale")) settings.scale = json.scale;
+        if(jsonExists(json, "autoSize")) settings.autoSize = json.autoSize;
+        if(jsonExists(json, "width")) settings.width = json.width;
+        if(jsonExists(json, "height")) settings.height = json.height;
+        if(jsonExists(json, "engine")) settings.engine = json.engine;
 
-        if (json.layout) 
+        if (jsonExists(json, "layout")) 
         {
             if (Std.is(json.layout, String))
             {
@@ -144,7 +149,7 @@ class Settings
             }
         }
         
-        if (json.staves)
+        if (jsonExists(json, "staves"))
         {
             settings.staves = new Array<StaveSettings>();
             for (key in Reflect.fields(json.staves))

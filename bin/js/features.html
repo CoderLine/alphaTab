@@ -13,7 +13,7 @@
 
     
     <!-- jQuery Plugin -->
-    <script type="text/javascript" src="lib/jquery/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="lib/jquery/jquery-1.10.2.min.js"></script>
     <script type="text/javascript" src="lib/alphatab/jquery.alphaTab.js"></script>
 
     
@@ -176,6 +176,23 @@
         $(document).ready(function() {
             $('#alphaTabPageLayout').alphaTab({
                 layout: 'page'
+            });
+        });
+    </script>
+    
+    <h2>Page Layout (custom width)</h2>
+    
+    <p>
+        All bars are aligned in rows side by side till the row is full. 
+    </p>
+    
+    <div id="alphaTabPageLayoutWidth" data-file="files/features/Skillet.gp5"></div>
+    <script language="JavaScript" type="text/javascript-lazy">
+        $(document).ready(function() {
+            $('#alphaTabPageLayoutWidth').alphaTab({
+                layout: 'page',
+                autoSize:false,
+                width: 1280
             });
         });
     </script>

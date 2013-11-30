@@ -58,7 +58,7 @@ class JsFileLoader implements IFileLoader
         if (ie >= 0 && ie <= 9)
         {
             // use VB Loader to load binary array
-            var vbArr = untyped VbAjaxLoader(method, file);
+            var vbArr = untyped VbAjaxLoader("GET", path);
             var fileContents =  vbArr.toArray();
             
             // decode byte array to string
@@ -120,7 +120,7 @@ class JsFileLoader implements IFileLoader
         if (ie >= 0 && ie <= 9)
         {
             // use VB Loader to load binary array
-            var vbArr = untyped VbAjaxLoader(method, file);
+            var vbArr = untyped VbAjaxLoader("GET", path);
             var fileContents =  vbArr.toArray();
             
             // decode byte array to string
