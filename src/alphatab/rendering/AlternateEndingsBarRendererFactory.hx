@@ -23,14 +23,14 @@ import alphatab.model.Bar;
  */
 class AlternateEndingsBarRendererFactory extends BarRendererFactory
 {
-	public function new() 
-	{
-		super();
+    public function new() 
+    {
+        super();
         isInAccolade = false;
-	}
-	
-	public override function create(bar:Bar):BarRendererBase 
-	{
-		return new AlternateEndingsBarRenderer(bar);
-	}
+    }
+    
+    public override function create(bar:Bar):BarRendererBase 
+    {
+        return new AlternateEndingsBarRenderer(bar);
+    }
 }

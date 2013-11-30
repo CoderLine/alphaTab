@@ -26,13 +26,13 @@ class BarRendererFactory
 {
     public var isInAccolade:Bool;
     
-	private function new() 
+    private function new() 
     {
         isInAccolade = true;
     }
-	
-	public function create(bar:Bar) : BarRendererBase
-	{
-		return null;
-	}
+    
+    public function create(bar:Bar) : BarRendererBase
+    {
+        return null;
+    }
 }

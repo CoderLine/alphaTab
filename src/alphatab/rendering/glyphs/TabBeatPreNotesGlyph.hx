@@ -21,10 +21,10 @@ import alphatab.model.BrushType;
 
 class TabBeatPreNotesGlyph extends BeatGlyphBase
 {
-	public function new() 
-	{
-		super();
-	}
+    public function new() 
+    {
+        super();
+    }
     
     public override function doLayout():Void 
     {

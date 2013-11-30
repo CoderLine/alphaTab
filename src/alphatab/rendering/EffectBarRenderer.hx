@@ -42,17 +42,17 @@ class EffectBarRenderer extends GroupedBarRenderer
     private var _effectGlyphs:Array<IntMap<Glyph>>;
     private var _lastBeat:Beat;
     
-	public function new(bar:Bar, info:IEffectBarRendererInfo) 
-	{
-		super(bar);
+    public function new(bar:Bar, info:IEffectBarRendererInfo) 
+    {
+        super(bar);
         _info = info;
         _uniqueEffectGlyphs = new Array<Array<Glyph>>();
         _effectGlyphs = new Array<IntMap<Glyph>>();
-	}
+    }
     
-	public override function doLayout()
-	{
-		super.doLayout();
+    public override function doLayout()
+    {
+        super.doLayout();
         if (index == 0)
         {
             stave.topSpacing = 5;
@@ -223,13 +223,13 @@ class EffectBarRenderer extends GroupedBarRenderer
                 }
         }
     }
-	
-	private override function createPreBeatGlyphs():Void 
-	{
-	}
+    
+    private override function createPreBeatGlyphs():Void 
+    {
+    }
 
-	private override function createBeatGlyphs():Void 
-	{
+    private override function createBeatGlyphs():Void 
+    {
         _effectGlyphs.push(new IntMap<Glyph>());
         _uniqueEffectGlyphs.push(new Array<Glyph>());
 #if MULTIVOICE_SUPPORT
@@ -241,7 +241,7 @@ class EffectBarRenderer extends GroupedBarRenderer
         createVoiceGlyphs(_bar.voices[0]);
 #end
 
-	}
+    }
     
     private function createVoiceGlyphs(v:Voice)
     {
@@ -253,7 +253,7 @@ class EffectBarRenderer extends GroupedBarRenderer
             container.preNotes = new BeatGlyphBase();
             container.onNotes = new BeatGlyphBase();
             container.postNotes = new BeatGlyphBase();
-			addBeatGlyph(container);
+            addBeatGlyph(container);
             
             if (_info.shouldCreateGlyph(this, b))
             {
@@ -262,7 +262,7 @@ class EffectBarRenderer extends GroupedBarRenderer
             
             _lastBeat = b;
         }
-    }	
+    }    
     
     private function createOrResizeGlyph(sizing:EffectBarGlyphSizing, b:Beat)
     {
@@ -316,24 +316,24 @@ class EffectBarRenderer extends GroupedBarRenderer
         }
     }
     
-	private override function createPostBeatGlyphs():Void 
-	{
-	}
-	
-	public override function getTopPadding():Int 
-	{
-		return 0;
-	}	
-	
-	public override function getBottomPadding():Int 
-	{
-		return 0;
-	}
-	
-	public override function paintBackground(cx:Int, cy:Int, canvas:ICanvas)
-	{
+    private override function createPostBeatGlyphs():Void 
+    {
+    }
+    
+    public override function getTopPadding():Int 
+    {
+        return 0;
+    }    
+    
+    public override function getBottomPadding():Int 
+    {
+        return 0;
+    }
+    
+    public override function paintBackground(cx:Int, cy:Int, canvas:ICanvas)
+    {
         
-	}
+    }
     
     public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
     {

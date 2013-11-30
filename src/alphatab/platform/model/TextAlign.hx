@@ -21,7 +21,7 @@ package alphatab.platform.model;
  */
 enum TextAlign 
 {
-	Left;
-	Center;
-	Right;
+    Left;
+    Center;
+    Right;
 }

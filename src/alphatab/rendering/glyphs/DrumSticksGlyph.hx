@@ -22,19 +22,19 @@ class DrumSticksGlyph extends SvgGlyph
 {
     public static inline var graceScale = 0.7;
     public static inline var noteHeadHeight = 9;
-	
-	private var _isGrace:Bool;
+    
+    private var _isGrace:Bool;
 
-	public function new(x:Int = 0, y:Int = 0, isGrace:Bool)
-	{
-		super(x, y, MusicFont.NoteSideStick, isGrace ? graceScale : 1, isGrace ? graceScale : 1);
-		_isGrace = isGrace;
-	}	
-	
-	public override function doLayout():Void 
-	{
-		width = Std.int(9 * (_isGrace ? NoteHeadGlyph.graceScale : 1) * getScale());
-	}
+    public function new(x:Int = 0, y:Int = 0, isGrace:Bool)
+    {
+        super(x, y, MusicFont.NoteSideStick, isGrace ? graceScale : 1, isGrace ? graceScale : 1);
+        _isGrace = isGrace;
+    }    
+    
+    public override function doLayout():Void 
+    {
+        width = Std.int(9 * (_isGrace ? NoteHeadGlyph.graceScale : 1) * getScale());
+    }
     
     public override function canScale():Bool 
     {

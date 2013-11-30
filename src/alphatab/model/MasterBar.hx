@@ -64,14 +64,14 @@ class MasterBar
     {
         alternateEndings = 0;
         repeatCount = 0;
-		index = 0;
-		keySignature = 0;
-		isDoubleBar = false;
-		isRepeatStart = false;
-		repeatCount = 0;
-		timeSignatureDenominator = 4;
-		timeSignatureNumerator = 4;
-		tripletFeel = TripletFeel.NoTripletFeel;
+        index = 0;
+        keySignature = 0;
+        isDoubleBar = false;
+        isRepeatStart = false;
+        repeatCount = 0;
+        timeSignatureDenominator = 4;
+        timeSignatureNumerator = 4;
+        tripletFeel = TripletFeel.NoTripletFeel;
         start = 0;
     }
     

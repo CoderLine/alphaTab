@@ -21,7 +21,7 @@ import alphatab.rendering.Glyph;
 class AccidentalGroupGlyph extends GlyphGroup
 {
     private static inline var NonReserved = -3000;
-	public function new(x:Int = 0, y:Int = 0)
+    public function new(x:Int = 0, y:Int = 0)
     {
         super(x, y, new Array<Glyph>());
     }
@@ -42,10 +42,10 @@ class AccidentalGroupGlyph extends GlyphGroup
         columns.push(NonReserved);
         
         var accidentalSize = Std.int(21 * getScale());
-		for (g in _glyphs)
-		{
-			g.renderer = renderer;
-			g.doLayout();
+        for (g in _glyphs)
+        {
+            g.renderer = renderer;
+            g.doLayout();
             
             // find column where glyph fits into
             
@@ -66,20 +66,20 @@ class AccidentalGroupGlyph extends GlyphGroup
             // temporary save column as X
             g.x = gColumn; 
             columns[gColumn] = g.y + accidentalSize;
-		}	
+        }    
         
         //
         // Place accidentals in columns
         //
         var columnWidth = Std.int(8 * getScale());
- 		if (_glyphs.length == 0) 
- 		{
- 			width = 0;
- 		}
+         if (_glyphs.length == 0) 
+         {
+             width = 0;
+         }
         else
- 		{
- 			width = columnWidth * columns.length;
- 		}
+         {
+             width = columnWidth * columns.length;
+         }
 
         for (g in _glyphs)
         {

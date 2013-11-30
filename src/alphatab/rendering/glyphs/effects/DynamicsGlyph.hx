@@ -26,12 +26,12 @@ class DynamicsGlyph extends Glyph
 {
     private var _dynamics:DynamicValue;
     
-	public function new(x:Int = 0, y:Int = 0, dynamics:DynamicValue)
-	{
-		super(x, y);
+    public function new(x:Int = 0, y:Int = 0, dynamics:DynamicValue)
+    {
+        super(x, y);
         _dynamics = dynamics;
-	}	
-	
+    }    
+    
     public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
     {
         var res = renderer.getResources();

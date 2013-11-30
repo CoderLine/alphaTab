@@ -21,37 +21,37 @@ import alphatab.rendering.Glyph;
 
 class BarNumberGlyph extends Glyph
 {
-	private var _number:Int;
-	private var _hidden:Bool;
-	public function new(x:Int = 0, y:Int = 0, number:Int, hidden:Bool = false)
-	{
-		super(x, y);
-		_number = number;
-		_hidden = hidden;
-	}
+    private var _number:Int;
+    private var _hidden:Bool;
+    public function new(x:Int = 0, y:Int = 0, number:Int, hidden:Bool = false)
+    {
+        super(x, y);
+        _number = number;
+        _hidden = hidden;
+    }
 
-	public override function doLayout():Void 
-	{
+    public override function doLayout():Void 
+    {
         var scoreRenderer = renderer.getLayout().renderer;
         scoreRenderer.canvas.setFont(scoreRenderer.renderingResources.barNumberFont);
         width = Std.int(10 * getScale());
-	}
+    }
     
     public override function canScale():Bool 
     {
         return false;
     }
-	
-	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
-	{
-		if (_hidden) 
-		{
-			return;
-		}
-		var res = renderer.getResources();
-		canvas.setColor(res.barNumberColor);
-		canvas.setFont(res.barNumberFont);
-		
-		canvas.fillText(Std.string(_number), cx + x, cy + y);
-	}
+    
+    public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
+    {
+        if (_hidden) 
+        {
+            return;
+        }
+        var res = renderer.getResources();
+        canvas.setColor(res.barNumberColor);
+        canvas.setFont(res.barNumberFont);
+        
+        canvas.fillText(Std.string(_number), cx + x, cy + y);
+    }
 }

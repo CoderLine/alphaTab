@@ -31,45 +31,45 @@ import alphatab.rendering.ScoreBarRenderer;
 import alphatab.rendering.utils.BeamingHelper;
 
 class ScoreBeatGlyph extends BeatGlyphBase
-					implements ISupportsFinalize
+                    implements ISupportsFinalize
 {
-	private var _ties:Array<Glyph>;
+    private var _ties:Array<Glyph>;
 
-	public var noteHeads : ScoreNoteChordGlyph;
-	public var restGlyph : RestGlyph;
+    public var noteHeads : ScoreNoteChordGlyph;
+    public var restGlyph : RestGlyph;
 
-	public var beamingHelper:BeamingHelper;
+    public var beamingHelper:BeamingHelper;
 
-	public function new() 
-	{
+    public function new() 
+    {
         super();
-	}
-	
-	public function finalizeGlyph(layout:ScoreLayout)
-	{
-		if (!container.beat.isRest()) 
-		{
-			noteHeads.updateBeamingHelper(container.x + x);
-		}
-	}
-	
-	public override function applyGlyphSpacing(spacing:Int):Void 
-	{
-		super.applyGlyphSpacing(spacing);
-		// TODO: we need to tell the beaming helper the position of rest beats
-		if (!container.beat.isRest()) 
-		{
-			noteHeads.updateBeamingHelper(container.x + x);
-		}
-	}
-		
-	public override function doLayout():Void 
-	{
-		// create glyphs
+    }
+    
+    public function finalizeGlyph(layout:ScoreLayout)
+    {
+        if (!container.beat.isRest()) 
+        {
+            noteHeads.updateBeamingHelper(container.x + x);
+        }
+    }
+    
+    public override function applyGlyphSpacing(spacing:Int):Void 
+    {
+        super.applyGlyphSpacing(spacing);
+        // TODO: we need to tell the beaming helper the position of rest beats
+        if (!container.beat.isRest()) 
+        {
+            noteHeads.updateBeamingHelper(container.x + x);
+        }
+    }
+        
+    public override function doLayout():Void 
+    {
+        // create glyphs
         if (!container.beat.isEmpty)
         {
             if (!container.beat.isRest())
-            {		
+            {        
                 //
                 // Note heads
                 //
@@ -79,7 +79,7 @@ class ScoreBeatGlyph extends BeatGlyphBase
                 noteLoop( function(n) {
                     createNoteGlyph(n);
                 });
-                addGlyph(noteHeads);			
+                addGlyph(noteHeads);            
                 
                 //
                 // Note dots
@@ -123,32 +123,32 @@ class ScoreBeatGlyph extends BeatGlyphBase
                 addGlyph(new RestGlyph(0, y, container.beat.duration));
             }
         }
-		
-		super.doLayout();
-		if (noteHeads != null)
-		{
-			noteHeads.updateBeamingHelper(x);
-		}
-	}
-	
+        
+        super.doLayout();
+        if (noteHeads != null)
+        {
+            noteHeads.updateBeamingHelper(x);
+        }
+    }
+    
     private function createBeatDot(n:Note, group:GlyphGroup)
-    {			
-		var sr = cast(renderer, ScoreBarRenderer);
+    {            
+        var sr = cast(renderer, ScoreBarRenderer);
         group.addGlyph(new CircleGlyph(0, sr.getScoreY(sr.getNoteLine(n), Std.int(2*getScale())), 1.5 * getScale()));
     }
-	
-	private function createNoteHeadGlyph(n:Note) : Glyph
-	{
-		var isGrace = container.beat.graceType != GraceType.None;
-		if (n.beat.voice.bar.track.isPercussion)
-		{
-		    var normalKeys:Array<Int> = [32,34,35,36,38,39,40,41,43,45,47,48,50,55,56,58,60,61];
-			var xKeys:Array<Int> = [31,33,37,42,44,54,62,63,64,65,66];
+    
+    private function createNoteHeadGlyph(n:Note) : Glyph
+    {
+        var isGrace = container.beat.graceType != GraceType.None;
+        if (n.beat.voice.bar.track.isPercussion)
+        {
+            var normalKeys:Array<Int> = [32,34,35,36,38,39,40,41,43,45,47,48,50,55,56,58,60,61];
+            var xKeys:Array<Int> = [31,33,37,42,44,54,62,63,64,65,66];
             var value = n.realValue();                             
              
             if (value <= 30 || value >= 67 || Lambda.has(normalKeys, value) ) 
             {
-            	return new NoteHeadGlyph(0, 0, Duration.Quarter, isGrace);
+                return new NoteHeadGlyph(0, 0, Duration.Quarter, isGrace);
             }
             else if (Lambda.has(xKeys, value)) 
             {
@@ -172,13 +172,13 @@ class ScoreBeatGlyph extends BeatGlyphBase
             } 
             else
             {
-            	return new NoteHeadGlyph(0, 0, Duration.Quarter, isGrace);
+                return new NoteHeadGlyph(0, 0, Duration.Quarter, isGrace);
             }
-		}
-		if (n.isDead) 
-		{
+        }
+        if (n.isDead) 
+        {
             return new DeadNoteHeadGlyph(0, 0, isGrace);
-		}
+        }
         else if (n.harmonicType == HarmonicType.None)
         {
             return new NoteHeadGlyph(0, 0, n.beat.duration, isGrace);
@@ -187,13 +187,13 @@ class ScoreBeatGlyph extends BeatGlyphBase
         {
             return new DiamondNoteHeadGlyph(0, 0, isGrace);
         }
-	}
+    }
 
-	private function createNoteGlyph(n:Note) 
+    private function createNoteGlyph(n:Note) 
     {
-		var sr = cast(renderer, ScoreBarRenderer);
+        var sr = cast(renderer, ScoreBarRenderer);
         var noteHeadGlyph:Glyph = createNoteHeadGlyph(n);
-		
+        
         // calculate y position
         var line = sr.getNoteLine(n);
         

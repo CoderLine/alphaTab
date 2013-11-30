@@ -121,7 +121,7 @@ extern class StringFormat implements IDisposable
 @:nativeGen
 extern class GdiFont implements IDisposable
 {
-	@:overload(function(fontFamily:String, size:Single,style:FontStyle, unit:GraphicsUnit):GdiFont{})
+    @:overload(function(fontFamily:String, size:Single,style:FontStyle, unit:GraphicsUnit):GdiFont{})
     public function new(fontFamily:String, size:Single, unit:GraphicsUnit):Void;
     public function Dispose():Void;
 }
@@ -295,14 +295,14 @@ class GdiCanvas implements ICanvas
     // colors and styles
     private var _brush:SolidBrush;
     private var _pen:Pen;
-	private var _color:GdiColor;
-	public function setColor(color : Color) : Void
-	{
-		_color = GdiColor.FromArgb(color.getA(), color.getR(), color.getG(), color.getB());
+    private var _color:GdiColor;
+    public function setColor(color : Color) : Void
+    {
+        _color = GdiColor.FromArgb(color.getA(), color.getR(), color.getG(), color.getB());
         
         recreateBrush();
         recreatePen();
-	}
+    }
     
     private function recreateBrush()
     {
@@ -435,9 +435,9 @@ class GdiCanvas implements ICanvas
     private var _textAlign:TextAlign; 
     private var _stringFormat:StringFormat;
     public function getTextAlign() : TextAlign
-	{
-		return _textAlign;
-	}
+    {
+        return _textAlign;
+    }
     public function setTextAlign(textAlign:TextAlign) : Void
     {
         _textAlign = textAlign;
@@ -452,18 +452,18 @@ class GdiCanvas implements ICanvas
 
     private var _textBaseline:TextBaseline; 
     public function getTextBaseline() : TextBaseline
-	{
-		return _textBaseline;
-	}
+    {
+        return _textBaseline;
+    }
     public function setTextBaseline(textBaseline:TextBaseline) : Void
     {
         _textBaseline = textBaseline;
         switch(textBaseline)
         {
-			case Top: _stringFormat.LineAlignment = StringAlignment.Near;
-			case Middle: _stringFormat.LineAlignment = StringAlignment.Center;
-			case Bottom: _stringFormat.LineAlignment = StringAlignment.Far;
-			default: _stringFormat.LineAlignment = StringAlignment.Near;
+            case Top: _stringFormat.LineAlignment = StringAlignment.Near;
+            case Middle: _stringFormat.LineAlignment = StringAlignment.Center;
+            case Bottom: _stringFormat.LineAlignment = StringAlignment.Far;
+            default: _stringFormat.LineAlignment = StringAlignment.Near;
         }
     }
     

@@ -31,13 +31,13 @@ class Html5Canvas implements ICanvas
     private var _canvas:Dynamic;
     private var _context:Dynamic;
     private var _width:Int;
-	private var _height:Int;
-	
+    private var _height:Int;
+    
     public function new(dom:Dynamic) 
     {  
         this._canvas = dom;
         this._context = dom.getContext("2d");
-		this._context.textBaseline = "top";
+        this._context.textBaseline = "top";
     }
     
     public function getWidth():Int 
@@ -55,9 +55,9 @@ class Html5Canvas implements ICanvas
         var lineWidth = this._context.lineWidth;
         this._canvas.width = width;
         this._context = this._canvas.getContext("2d");
-		this._context.textBaseline = "top";
-		this._context.lineWidth = lineWidth;
-		_width = width;
+        this._context.textBaseline = "top";
+        this._context.lineWidth = lineWidth;
+        _width = width;
     }
     
     public function setHeight(height:Int):Void 
@@ -65,17 +65,17 @@ class Html5Canvas implements ICanvas
         var lineWidth = this._context.lineWidth;
         this._canvas.height = height;
         this._context = this._canvas.getContext("2d");
-		this._context.textBaseline = "top";
-		this._context.lineWidth = lineWidth;
-		_height = height;
+        this._context.textBaseline = "top";
+        this._context.lineWidth = lineWidth;
+        _height = height;
     } 
     
     // colors and styles
-	public function setColor(color : Color) : Void
-	{
-		this._context.strokeStyle = color.toRgbaString();
-		this._context.fillStyle = color.toRgbaString();
-	}
+    public function setColor(color : Color) : Void
+    {
+        this._context.strokeStyle = color.toRgbaString();
+        this._context.fillStyle = color.toRgbaString();
+    }
 
     // line caps/joins
     public function setLineWidth(value:Float) : Void
@@ -87,9 +87,9 @@ class Html5Canvas implements ICanvas
     public function clear():Void
     {
         var lineWidth = this._context.lineWidth;
-		this._canvas.width = this._canvas.width;
-		this._context.lineWidth = lineWidth;
-		// this._context.clearRect(0,0,_width, _height);
+        this._canvas.width = this._canvas.width;
+        this._context.lineWidth = lineWidth;
+        // this._context.clearRect(0,0,_width, _height);
     }
     public function fillRect(x:Float, y:Float, w:Float, h:Float):Void
     {
@@ -148,67 +148,67 @@ class Html5Canvas implements ICanvas
         this._context.font = font.toCssString();
     }
      
-	public function getTextAlign() : TextAlign
-	{
-		switch(this._context.textAlign)
-		{
-			case "left":
-				return TextAlign.Left;
-			case "center":
-				return TextAlign.Center;
-			case "right":
-				return TextAlign.Right;
-			default:
-				return TextAlign.Left;
-		}
-	}
-	
-	public function setTextAlign(textAlign:TextAlign) : Void
-	{
-		switch(textAlign)
-		{
-			case Left:
-				this._context.textAlign = "left";
-			case Center:
-				this._context.textAlign = "center";
-			case Right:
-				this._context.textAlign = "right";
-		}
-	}
-	
-	public function getTextBaseline() : TextBaseline
-	{
-		switch(this._context.textBaseline)
-		{
-			case "top":
-				return TextBaseline.Top;
-			case "middle":
-				return TextBaseline.Middle;
-			case "bottom":
-				return TextBaseline.Bottom;
-			default:
-				return TextBaseline.Default;
-		}
-	}
-	
-	public function setTextBaseline(textBaseLine:TextBaseline) : Void
-	{
-		switch(textBaseLine)
-		{
-			case Top:
-				this._context.textBaseline = "top";
-			case Middle:
-				this._context.textBaseline = "middle";
-			case Bottom:
-				this._context.textBaseline = "bottom";
-			default:
-				this._context.textBaseline = "alphabetic";
-		}
-	}
+    public function getTextAlign() : TextAlign
+    {
+        switch(this._context.textAlign)
+        {
+            case "left":
+                return TextAlign.Left;
+            case "center":
+                return TextAlign.Center;
+            case "right":
+                return TextAlign.Right;
+            default:
+                return TextAlign.Left;
+        }
+    }
+    
+    public function setTextAlign(textAlign:TextAlign) : Void
+    {
+        switch(textAlign)
+        {
+            case Left:
+                this._context.textAlign = "left";
+            case Center:
+                this._context.textAlign = "center";
+            case Right:
+                this._context.textAlign = "right";
+        }
+    }
+    
+    public function getTextBaseline() : TextBaseline
+    {
+        switch(this._context.textBaseline)
+        {
+            case "top":
+                return TextBaseline.Top;
+            case "middle":
+                return TextBaseline.Middle;
+            case "bottom":
+                return TextBaseline.Bottom;
+            default:
+                return TextBaseline.Default;
+        }
+    }
+    
+    public function setTextBaseline(textBaseLine:TextBaseline) : Void
+    {
+        switch(textBaseLine)
+        {
+            case Top:
+                this._context.textBaseline = "top";
+            case Middle:
+                this._context.textBaseline = "middle";
+            case Bottom:
+                this._context.textBaseline = "bottom";
+            default:
+                this._context.textBaseline = "alphabetic";
+        }
+    }
 
     public function fillText(text:String, x:Float, y:Float):Void
     {
-		this._context.fillText(text, x, y);
+        this._context.fillText(text, x, y);
     }
     public function measureText(text:String):Float
     {

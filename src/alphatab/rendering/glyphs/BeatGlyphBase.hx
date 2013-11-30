@@ -25,36 +25,36 @@ import alphatab.rendering.Glyph;
 
 class BeatGlyphBase extends GlyphGroup
 {
-	public var container:BeatContainerGlyph;
+    public var container:BeatContainerGlyph;
 
-	public function new() 
-	{
-		super();
-	}
+    public function new() 
+    {
+        super();
+    }
     
-	public override function doLayout():Void 
-	{
-		// left to right layout
-		var w = 0;
-		for (g in _glyphs)
-		{
-			g.x = w;
-			g.renderer = renderer;
-			g.doLayout();
-			w += g.width;
-		}	
-		width = w;
-	}    
-	
-	private function noteLoop( action:Note -> Void ) 
-	{
-		var i = container.beat.notes.length -1;
-		while ( i >= 0 )
-		{
-			action(container.beat.notes[i--]);
-		}
-	}
-	
+    public override function doLayout():Void 
+    {
+        // left to right layout
+        var w = 0;
+        for (g in _glyphs)
+        {
+            g.x = w;
+            g.renderer = renderer;
+            g.doLayout();
+            w += g.width;
+        }    
+        width = w;
+    }    
+    
+    private function noteLoop( action:Note -> Void ) 
+    {
+        var i = container.beat.notes.length -1;
+        while ( i >= 0 )
+        {
+            action(container.beat.notes[i--]);
+        }
+    }
+    
     private function getBeatDurationWidth() : Int
     {
         switch(container.beat.duration)
@@ -67,5 +67,5 @@ class BeatGlyphBase extends GlyphGroup
             case ThirtySecond:  return 11;
             case SixtyFourth:   return 11;
         }
-    }		
+    }        
 }

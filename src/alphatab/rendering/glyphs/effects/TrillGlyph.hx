@@ -23,12 +23,12 @@ import alphatab.rendering.glyphs.SvgGlyph;
 class TrillGlyph extends Glyph
 {
     private var _scale:Float;
-	public function new(x:Int = 0, y:Int = 0, scale:Float = 0.9)
-	{
-		super(x, y);
+    public function new(x:Int = 0, y:Int = 0, scale:Float = 0.9)
+    {
+        super(x, y);
         _scale = scale;
-	}	
-	
+    }    
+    
     public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
     {
         var res = renderer.getResources();

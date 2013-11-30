@@ -42,7 +42,7 @@ class Track
         tuning = new Array<Int>();
         bars = new Array<Bar>();
         chords = new StringMap<Chord>();
-		playbackInfo = new PlaybackInformation();
+        playbackInfo = new PlaybackInformation();
     }
     
     public function addBar(bar:Bar)

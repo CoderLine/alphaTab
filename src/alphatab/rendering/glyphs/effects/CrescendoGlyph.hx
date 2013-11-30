@@ -27,12 +27,12 @@ class CrescendoGlyph extends Glyph
 {
     public static inline var Height = 17;
     private var _crescendo:CrescendoType;
-	public function new(x:Int = 0, y:Int = 0, crescendo:CrescendoType)
-	{
-		super(x, y);
+    public function new(x:Int = 0, y:Int = 0, crescendo:CrescendoType)
+    {
+        super(x, y);
         _crescendo = crescendo;
-	}	
-	
+    }    
+    
     public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
     {
         var height = Height * getScale();

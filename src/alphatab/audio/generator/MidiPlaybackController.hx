@@ -56,16 +56,16 @@ class MidiPlaybackController
     {
         var masterBar = _score.masterBars[index];
         
-		// if the repeat group wasn't closed we reset the repeating 
-		// on the last group opening
-		if (!masterBar.repeatGroup.isClosed && masterBar.repeatGroup.openings[masterBar.repeatGroup.openings.length -1] == masterBar)
-		{
-			_repeatStart = 0;
-			_repeatNumber = 0;
-			_repeatEnd = 0;
-			_repeatOpen = false;
-		}
-		
+        // if the repeat group wasn't closed we reset the repeating 
+        // on the last group opening
+        if (!masterBar.repeatGroup.isClosed && masterBar.repeatGroup.openings[masterBar.repeatGroup.openings.length -1] == masterBar)
+        {
+            _repeatStart = 0;
+            _repeatNumber = 0;
+            _repeatEnd = 0;
+            _repeatOpen = false;
+        }
+        
         if (masterBar.isRepeatStart)
         {
             _repeatStartIndex = index;

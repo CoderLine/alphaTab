@@ -24,42 +24,42 @@ import alphatab.platform.ICanvas;
  */
 class Glyph 
 {
-	public var index:Int;
-	public var x:Int;
-	public var y:Int;
-	public var width:Int;
-	public var renderer:BarRendererBase;
-	
-	public function new(x:Int = 0, y:Int = 0) 
-	{
-		this.x = x;
-		this.y = y;
-	}
+    public var index:Int;
+    public var x:Int;
+    public var y:Int;
+    public var width:Int;
+    public var renderer:BarRendererBase;
     
-	public function applyGlyphSpacing(spacing:Int)
-	{
+    public function new(x:Int = 0, y:Int = 0) 
+    {
+        this.x = x;
+        this.y = y;
+    }
+    
+    public function applyGlyphSpacing(spacing:Int)
+    {
         if (canScale())
         {
             width += spacing;
         }
-	}    
+    }    
 
-	public inline function getScale() : Float
-	{
-		return renderer.getScale();
-	}
+    public inline function getScale() : Float
+    {
+        return renderer.getScale();
+    }
     
     public function canScale() : Bool
     {
         return true;
     }
-	
-	public function doLayout()
-	{
-	}
-	
-	public function paint(cx:Int, cy:Int, canvas:ICanvas)
-	{
+    
+    public function doLayout()
+    {
+    }
+    
+    public function paint(cx:Int, cy:Int, canvas:ICanvas)
+    {
 
-	}
+    }
 }

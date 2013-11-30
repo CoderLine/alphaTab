@@ -446,7 +446,7 @@ class Gp3To5Importer extends ScoreImporter
     {
         var newTrack = new Track();
         _score.addTrack(newTrack);
-		
+        
         
         var flags = readUInt8();
         newTrack.name = readStringByteLength(40);
@@ -508,9 +508,9 @@ class Gp3To5Importer extends ScoreImporter
     private function readBars()
     {
         for ( b in 0 ... _barCount)
-		{
-			for (t in 0 ... _trackCount)
-			{
+        {
+            for (t in 0 ... _trackCount)
+            {
                 readBar(_score.tracks[t]);
             }
         }
@@ -1214,21 +1214,21 @@ class Gp3To5Importer extends ScoreImporter
         var graceBeat = new Beat();
         var graceNote = new Note();
         graceNote.string = note.string;
-        graceNote.fret = _data.readInt8();		
+        graceNote.fret = _data.readInt8();        
         graceBeat.duration = Duration.ThirtySecond;
         graceBeat.dynamicValue = toDynamicValue(_data.readInt8());
-		var transition = _data.readInt8();
-		switch (transition) 
-		{
+        var transition = _data.readInt8();
+        switch (transition) 
+        {
             case 0: // none
             case 1:
-				graceNote.slideType = SlideType.Legato;
-				graceNote.slideTarget = note;
+                graceNote.slideType = SlideType.Legato;
+                graceNote.slideTarget = note;
             case 2: // bend
             case 3: // hammer
-				graceNote.isHammerPullOrigin = true;
-				note.isHammerPullDestination = true;
-				note.hammerPullOrigin = graceNote;
+                graceNote.isHammerPullOrigin = true;
+                note.isHammerPullDestination = true;
+                note.hammerPullOrigin = graceNote;
         }
         graceNote.dynamicValue = graceBeat.dynamicValue;
         skip(1); // duration
@@ -1240,7 +1240,7 @@ class Gp3To5Importer extends ScoreImporter
         else
         {
             var flags = readUInt8();
-			graceNote.isDead = (flags & 0x01) != 0;
+            graceNote.isDead = (flags & 0x01) != 0;
             if ( ((flags & 0x02) != 0)) 
             {
                 graceBeat.graceType = GraceType.OnBeat;
@@ -1257,13 +1257,13 @@ class Gp3To5Importer extends ScoreImporter
     
     private function readTremoloPicking(beat:Beat)
     {
-		var speed = readUInt8();
-		switch(speed)
-		{
-			case 1: beat.tremoloSpeed = Duration.Eighth;
-			case 2: beat.tremoloSpeed = Duration.Sixteenth;
-			case 3: beat.tremoloSpeed = Duration.ThirtySecond;
-		}
+        var speed = readUInt8();
+        switch(speed)
+        {
+            case 1: beat.tremoloSpeed = Duration.Eighth;
+            case 2: beat.tremoloSpeed = Duration.Sixteenth;
+            case 3: beat.tremoloSpeed = Duration.ThirtySecond;
+        }
     }
     
     private function readSlide(note:Note)
@@ -1476,7 +1476,7 @@ class Gp3To5Importer extends ScoreImporter
         var ch3 = _data.readByte();
         var ch4 = _data.readByte();
         return ch1 | ch2 << 8 | ch3 << 16 | ch4 << 24;
-	}
+    }
     
     /**
      * Skips an integer (4byte) and reads a string using 
@@ -1525,7 +1525,7 @@ class Gp3To5Importer extends ScoreImporter
     /**
      * Reads a byte as size and the string itself 
      * Additionally it is ensured the specified amount of bytes is read. 
-     * @param	length the amount of bytes to read
+     * @param    length the amount of bytes to read
      */
     #if unit public #else private #end function readStringByteLength(length:Int) : String
     {

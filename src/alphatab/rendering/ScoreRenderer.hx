@@ -43,8 +43,8 @@ class ScoreRenderer
     public var layout : ScoreLayout;
     
     public var renderingResources : RenderingResources;
-	
-	public var settings:Settings;
+    
+    public var settings:Settings;
     
     public function new(settings:Settings, param:Dynamic) 
     {
@@ -68,23 +68,23 @@ class ScoreRenderer
             layout = Environment.layoutEngines.get(settings.layout.mode)(this);
         }
     }
-	
-	public function updateScale(scale:Float)
-	{
-		this.scale = scale;
-		this.renderingResources = new RenderingResources(scale);
+    
+    public function updateScale(scale:Float)
+    {
+        this.scale = scale;
+        this.renderingResources = new RenderingResources(scale);
         canvas.setLineWidth(scale);
-	}
+    }
     
     public function render(track:Track)
     {
-		this.track = track;
+        this.track = track;
         invalidate();
     }
     
     public function invalidate()
     {
-		canvas.clear();		
+        canvas.clear();        
         doLayout();
         paintScore();
         raiseRenderFinished();
@@ -102,14 +102,14 @@ class ScoreRenderer
     private function doLayout()
     {
         layout.doLayout();
-		canvas.setHeight(Std.int(layout.height + (renderingResources.copyrightFont.getSize() * 2)));
+        canvas.setHeight(Std.int(layout.height + (renderingResources.copyrightFont.getSize() * 2)));
         canvas.setWidth(layout.width);
     }
     
     private function paintScore()
     {
         paintBackground();
-		layout.paintScore();
+        layout.paintScore();
     }
     
     public function paintBackground() 
@@ -118,8 +118,8 @@ class ScoreRenderer
         var msg = "Rendered using alphaTab (http://www.alphaTab.net)";
         canvas.setColor(new Color(62, 62, 62));
         canvas.setFont(renderingResources.copyrightFont);
-		canvas.setTextAlign(TextAlign.Center);
-		
+        canvas.setTextAlign(TextAlign.Center);
+        
         var x:Float = canvas.getWidth() / 2;
         canvas.fillText(msg, x, canvas.getHeight() - (renderingResources.copyrightFont.getSize() * 2));
     }

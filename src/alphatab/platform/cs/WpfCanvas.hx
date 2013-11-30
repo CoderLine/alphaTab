@@ -207,10 +207,10 @@ class WpfCanvas implements ICanvas
     
     // colors and styles
     private var _brush:SolidColorBrush;
-	public function setColor(color : alphatab.platform.model.Color) : Void
-	{
+    public function setColor(color : alphatab.platform.model.Color) : Void
+    {
         _brush = new SolidColorBrush(Color.FromArgb(color.getA(), color.getR(), color.getG(), color.getB()));
-	}
+    }
     
     // line caps/joins
     private var _lineWidth:Float;
@@ -386,9 +386,9 @@ class WpfCanvas implements ICanvas
 
     private var _textAlign:TextAlign; 
     public function getTextAlign() : TextAlign
-	{
-		return _textAlign;
-	}
+    {
+        return _textAlign;
+    }
     public function setTextAlign(textAlign:TextAlign) : Void
     {
         _textAlign = textAlign;
@@ -397,9 +397,9 @@ class WpfCanvas implements ICanvas
 
     private var _textBaseline:TextBaseline; 
     public function getTextBaseline() : TextBaseline
-	{
-		return _textBaseline;
-	}
+    {
+        return _textBaseline;
+    }
     public function setTextBaseline(textBaseline:TextBaseline) : Void
     {
         _textBaseline = textBaseline;

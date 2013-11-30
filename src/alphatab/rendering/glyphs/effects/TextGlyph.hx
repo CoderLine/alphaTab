@@ -26,12 +26,12 @@ class TextGlyph extends Glyph
     private var _text:String;
     private var _font:Font;
     
-	public function new(x:Int = 0, y:Int = 0, text:String, font:Font)
-	{
-		super(x, y);
+    public function new(x:Int = 0, y:Int = 0, text:String, font:Font)
+    {
+        super(x, y);
         _text = text;
         _font = font;
-	}	
+    }    
     
     public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
     {

@@ -29,12 +29,12 @@ import haxe.io.BytesInput;
  */
 class ScoreLoader 
 {
-	/**
-	 * Loads a score asynchronously from the given datasource
-	 * @param	path the source path to load the binary file from
-	 * @param	success this function is called if the Score was successfully loaded from the datasource
-	 * @param	error this function is called if any error during the loading occured.
-	 */
+    /**
+     * Loads a score asynchronously from the given datasource
+     * @param    path the source path to load the binary file from
+     * @param    success this function is called if the Score was successfully loaded from the datasource
+     * @param    error this function is called if any error during the loading occured.
+     */
     public static function loadScoreAsync(path:String, success:Score-> Void, error:String->Void)
     {
         var loader:IFileLoader = Environment.fileLoaders.get("default")();
@@ -53,7 +53,7 @@ class ScoreLoader
             ,
             error
         );
-    }	
+    }    
     
     public static function loadScoreFromBytes(data:Bytes)
     {
@@ -94,11 +94,11 @@ class ScoreLoader
     }
     
     /**
-	 * Loads a score synchronously from the given datasource
-	 * @param	path the source path to load the binary file from
-	 * @param	success this function is called if the Score was successfully loaded from the datasource
-	 * @param	error this function is called if any error during the loading occured.
-	 */
+     * Loads a score synchronously from the given datasource
+     * @param    path the source path to load the binary file from
+     * @param    success this function is called if the Score was successfully loaded from the datasource
+     * @param    error this function is called if any error during the loading occured.
+     */
     public static function loadScore(path:String) : Score
     {
         var loader:IFileLoader = Environment.fileLoaders.get("default")();

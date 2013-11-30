@@ -25,36 +25,36 @@ import alphatab.rendering.Glyph;
  */
 class GlyphGroup extends Glyph
 {
-	private var _glyphs:Array<Glyph>;
-	public function new(x:Int = 0, y:Int = 0, glyphs:Array<Glyph> = null)
-	{
-		super(x, y);
-		_glyphs = glyphs != null ? glyphs : new Array<Glyph>();
-	}
-	
-	public override function doLayout():Void 
-	{
-		var w = 0;
-		for (g in _glyphs)
-		{
-			g.renderer = renderer;
-			g.doLayout();
-			w = Std.int(Math.max(w, g.width));
-		}	
-		width = w;
-	}
+    private var _glyphs:Array<Glyph>;
+    public function new(x:Int = 0, y:Int = 0, glyphs:Array<Glyph> = null)
+    {
+        super(x, y);
+        _glyphs = glyphs != null ? glyphs : new Array<Glyph>();
+    }
+    
+    public override function doLayout():Void 
+    {
+        var w = 0;
+        for (g in _glyphs)
+        {
+            g.renderer = renderer;
+            g.doLayout();
+            w = Std.int(Math.max(w, g.width));
+        }    
+        width = w;
+    }
     
     public function addGlyph(g:Glyph)
     {
         _glyphs.push(g);
     }
     
-	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
-	{
-		for (g in _glyphs)
-		{
-			g.renderer = renderer;
-			g.paint(cx + x, cy + y, canvas);
-		}
-	}
+    public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
+    {
+        for (g in _glyphs)
+        {
+            g.renderer = renderer;
+            g.paint(cx + x, cy + y, canvas);
+        }
+    }
 }

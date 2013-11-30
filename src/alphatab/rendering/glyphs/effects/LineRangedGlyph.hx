@@ -31,17 +31,17 @@ class LineRangedGlyph extends Glyph implements IMultiBeatEffectGlyph
     private var _isExpanded:Bool;
     private var _label:String;
     
-	public function new(x:Int = 0, y:Int = 0, label:String)
-	{
-		super(x, y);
+    public function new(x:Int = 0, y:Int = 0, label:String)
+    {
+        super(x, y);
         _label = label;
-	}	
+    }    
     
     public function expandedTo(beat:Beat)
     {
         _isExpanded = true;
     }
-	
+    
     public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
     {
         var step:Float = 11 * getScale();        

@@ -36,7 +36,7 @@ typedef ScoreNoteGlyphInfo = {
 class ScoreNoteChordGlyph extends Glyph
 {
     private var _infos:Array<ScoreNoteGlyphInfo>;
-	private var _noteLookup:IntMap<Glyph>;
+    private var _noteLookup:IntMap<Glyph>;
     private var _tremoloPicking:Glyph;
     
     public var minNote:ScoreNoteGlyphInfo;
@@ -52,48 +52,48 @@ class ScoreNoteChordGlyph extends Glyph
     public var beamingHelper:BeamingHelper;
 
     
-	public function new(x:Int = 0, y:Int = 0)
+    public function new(x:Int = 0, y:Int = 0)
     {
         super(x, y);
         _infos = new Array<ScoreNoteGlyphInfo>();
         beatEffects = new StringMap<Glyph>();
-		_noteLookup = new IntMap<Glyph>();
+        _noteLookup = new IntMap<Glyph>();
     }
-	
-	public inline function getDirection() : BeamDirection
-	{
-		return beamingHelper.getDirection();
-	}	
-	
-	public function getNoteX(note:Note, onEnd:Bool = true) 
-	{
-		if (_noteLookup.exists(note.string)) 
-		{
-			var n = _noteLookup.get(note.string);
-			var pos = x + n.x;
-			if (onEnd) 
-			{
-				pos += n.width;
-			}
-			return pos;
-		}
-		return 0;
-	}
-	
-	public function getNoteY(note:Note) 
-	{
-		if (_noteLookup.exists(note.string)) 
-		{
-			return y + _noteLookup.get(note.string).y;
-		}
-		return 0;
-	}
+    
+    public inline function getDirection() : BeamDirection
+    {
+        return beamingHelper.getDirection();
+    }    
+    
+    public function getNoteX(note:Note, onEnd:Bool = true) 
+    {
+        if (_noteLookup.exists(note.string)) 
+        {
+            var n = _noteLookup.get(note.string);
+            var pos = x + n.x;
+            if (onEnd) 
+            {
+                pos += n.width;
+            }
+            return pos;
+        }
+        return 0;
+    }
+    
+    public function getNoteY(note:Note) 
+    {
+        if (_noteLookup.exists(note.string)) 
+        {
+            return y + _noteLookup.get(note.string).y;
+        }
+        return 0;
+    }
        
     public function addNoteGlyph(noteGlyph:Glyph, note:Note, noteLine:Int)
     {
         var info:ScoreNoteGlyphInfo =  { glyph:noteGlyph, line:noteLine }
         _infos.push( info );
-		_noteLookup.set(note.string, noteGlyph);
+        _noteLookup.set(note.string, noteGlyph);
         if (minNote == null || minNote.line > info.line)
         {
             minNote = info;
@@ -124,8 +124,8 @@ class ScoreNoteChordGlyph extends Glyph
         return maxNote != null && maxNote.line > 8;
     }
     
-	public override function doLayout():Void 
-	{
+    public override function doLayout():Void 
+    {
         _infos.sort( function(a, b) {
             if (a.line == b.line) return 0;
             else if (a.line < b.line) return 1;
@@ -140,12 +140,12 @@ class ScoreNoteChordGlyph extends Glyph
         var lastLine = 0; 
         var anyDisplaced = false; 
         
-		var w = 0;
+        var w = 0;
         for (i in 0 ... _infos.length)
         {
             var g = _infos[i].glyph;
- 			g.renderer = renderer;
-			g.doLayout();
+             g.renderer = renderer;
+            g.doLayout();
             
             g.x = padding;
            
@@ -215,14 +215,14 @@ class ScoreNoteChordGlyph extends Glyph
             _tremoloPicking.doLayout();
         }
         
-		width = w + padding;
+        width = w + padding;
         
-	}
-	
-	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
-	{		
+    }
+    
+    public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
+    {        
         var scoreRenderer:ScoreBarRenderer = cast renderer;
-		       
+               
         //
         // Note Effects only painted once
         //
@@ -273,13 +273,13 @@ class ScoreNoteChordGlyph extends Glyph
                 l += 2;
             }
         }
-		
+        
         if(_tremoloPicking != null)
             _tremoloPicking.paint(cx + x, cy + y, canvas);
         for (g in _infos)
-		{
-			g.glyph.renderer = renderer;
-			g.glyph.paint(cx + x, cy + y, canvas);
-		}
-	}    
+        {
+            g.glyph.renderer = renderer;
+            g.glyph.paint(cx + x, cy + y, canvas);
+        }
+    }    
 }

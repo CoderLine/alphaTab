@@ -31,32 +31,32 @@ class StaveGroup
     private var _firstStaveInAccolade:Stave;
     private var _lastStaveInAccolade:Stave;
     
-	public var x:Int;
+    public var x:Int;
     public var y:Int;
 
-	/**
+    /**
      * Indicates whether this line is full or not. If the line is full the
      * bars can be aligned to the maximum width. If the line is not full 
      * the bars will not get stretched.
      */
     public var isFull:Bool;
-	
+    
     /**
      * The width that the content bars actually need
      */
     public var width:Int;
 
-	public var bars:Array<Bar>;
-	public var staves:Array<Stave>;
-	
-	public var layout:ScoreLayout;
-	
+    public var bars:Array<Bar>;
+    public var staves:Array<Stave>;
+    
+    public var layout:ScoreLayout;
+    
     
     public function new() 
     {
-		bars = new Array<Bar>();
-		staves = new Array<Stave>();
-		width = 0;
+        bars = new Array<Bar>();
+        staves = new Array<Stave>();
+        width = 0;
     }
     
     public inline function getLastBarIndex() : Int
@@ -67,34 +67,34 @@ class StaveGroup
     public function addBar(bar:Bar) : Void
     {
         bars.push(bar);
-		
-		// add renderers
-		var maxSizes = new BarSizeInfo();
-		for (s in staves)
-		{
-			s.addBar(bar);
-			s.barRenderers[s.barRenderers.length - 1].registerMaxSizes(maxSizes);
-		}
-		
-		// ensure same widths of new renderer
-		var realWidth:Int = 0;
-		for (s in staves)
-		{
-			s.barRenderers[s.barRenderers.length - 1].applySizes(maxSizes);
-			if (s.barRenderers[s.barRenderers.length - 1].width > realWidth)
-			{
-				realWidth = s.barRenderers[s.barRenderers.length - 1].width;
-			}
-		}
-	
-		width += realWidth;
+        
+        // add renderers
+        var maxSizes = new BarSizeInfo();
+        for (s in staves)
+        {
+            s.addBar(bar);
+            s.barRenderers[s.barRenderers.length - 1].registerMaxSizes(maxSizes);
+        }
+        
+        // ensure same widths of new renderer
+        var realWidth:Int = 0;
+        for (s in staves)
+        {
+            s.barRenderers[s.barRenderers.length - 1].applySizes(maxSizes);
+            if (s.barRenderers[s.barRenderers.length - 1].width > realWidth)
+            {
+                realWidth = s.barRenderers[s.barRenderers.length - 1].width;
+            }
+        }
+    
+        width += realWidth;
     }
 
-	public function addStave(stave:Stave) 
-	{
-		stave.staveGroup = this;
-		stave.index = staves.length;
-		staves.push(stave);
+    public function addStave(stave:Stave) 
+    {
+        stave.staveGroup = this;
+        stave.index = staves.length;
+        staves.push(stave);
         if (_firstStaveInAccolade == null && stave.isInAccolade())
         {
             _firstStaveInAccolade = stave;
@@ -106,15 +106,15 @@ class StaveGroup
             _lastStaveInAccolade = stave;
             _lastStaveInAccolade.isLastInAccolade = true;
         }
-	}
-	
-	public function calculateHeight() : Int
-	{
-		return staves[staves.length - 1].y + staves[staves.length - 1].height; 
-	}
-	
-	public function revertLastBar() : Void
-	{
+    }
+    
+    public function calculateHeight() : Int
+    {
+        return staves[staves.length - 1].y + staves[staves.length - 1].height; 
+    }
+    
+    public function revertLastBar() : Void
+    {
         if (bars.length > 1)
         {
             bars.pop();
@@ -126,31 +126,31 @@ class StaveGroup
             }
             width -= w;
         }
-	}
-	
-	public function applyBarSpacing(spacing:Int)
-	{
-		for (s in staves)
-		{
-			s.applyBarSpacing(spacing);
-		}
-		width += bars.length * spacing;
-	}
-	
-	public function paint(cx:Int, cy:Int,  canvas:ICanvas)
-	{
-		for (s in staves)
-		{
-			s.paint(cx + x, cy + y, canvas);
-		}
-		
-		var res = layout.renderer.renderingResources; 
-		
-		if (staves.length > 0)
-		{
-			//
-			// Draw start grouping
-			// 
+    }
+    
+    public function applyBarSpacing(spacing:Int)
+    {
+        for (s in staves)
+        {
+            s.applyBarSpacing(spacing);
+        }
+        width += bars.length * spacing;
+    }
+    
+    public function paint(cx:Int, cy:Int,  canvas:ICanvas)
+    {
+        for (s in staves)
+        {
+            s.paint(cx + x, cy + y, canvas);
+        }
+        
+        var res = layout.renderer.renderingResources; 
+        
+        if (staves.length > 0)
+        {
+            //
+            // Draw start grouping
+            // 
             
             if (_firstStaveInAccolade != null && _lastStaveInAccolade != null)
             {
@@ -197,18 +197,18 @@ class StaveGroup
                 
                 canvas.fill();
             }
-		}
-	}
-	
-	public function finalizeGroup(scoreLayout:ScoreLayout)
-	{
-		var currentY:Float = 0;
-		for (i in 0 ... staves.length)
-		{
-			staves[i].x = 0;
-			staves[i].y = Std.int(currentY);
-			staves[i].finalizeStave(scoreLayout);
-			currentY += staves[i].height;
-		}
-	}
+        }
+    }
+    
+    public function finalizeGroup(scoreLayout:ScoreLayout)
+    {
+        var currentY:Float = 0;
+        for (i in 0 ... staves.length)
+        {
+            staves[i].x = 0;
+            staves[i].y = Std.int(currentY);
+            staves[i].finalizeStave(scoreLayout);
+            currentY += staves[i].height;
+        }
+    }
 }

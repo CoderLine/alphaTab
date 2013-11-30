@@ -22,41 +22,41 @@ import alphatab.rendering.Glyph;
 
 class TieGlyph extends Glyph
 {
-	private var _startNote:Note;
-	private var _endNote:Note;
+    private var _startNote:Note;
+    private var _endNote:Note;
     private var _parent:Glyph;
-	
-	public function new(startNote:Note, endNote:Note, parent:Glyph)
-	{
-		super(0, 0);
-		_startNote = startNote;
-		_endNote = endNote;
+    
+    public function new(startNote:Note, endNote:Note, parent:Glyph)
+    {
+        super(0, 0);
+        _startNote = startNote;
+        _endNote = endNote;
         _parent = parent;
-	}
+    }
 
-	public override function doLayout():Void 
-	{
-		width = 0;
-	}
-	
-	public override function canScale():Bool 
-	{
-		return false;
-	}
-	
-	// paints a tie between the two given points
+    public override function doLayout():Void 
+    {
+        width = 0;
+    }
+    
+    public override function canScale():Bool 
+    {
+        return false;
+    }
+    
+    // paints a tie between the two given points
     public static function paintTie(canvas:ICanvas, scale:Float, x1:Float, y1:Float, x2:Float, y2:Float, down:Bool=false) : Void
     {
-		// ensure endX > startX
-		if (x2 > x1) 
-		{
-			var t = x1;
-			x1 = x2;
-			x2 = t;
-			t = y1;
-			y1 = y2;
-			y2 = t;
-		}
+        // ensure endX > startX
+        if (x2 > x1) 
+        {
+            var t = x1;
+            x1 = x2;
+            x2 = t;
+            t = y1;
+            y1 = y2;
+            y2 = t;
+        }
         //
         // calculate control points 
         //

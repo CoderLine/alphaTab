@@ -25,17 +25,17 @@ class HorizontalScreenLayout extends ScoreLayout
 {
     // left top right bottom
     public static var PagePadding:Array<Int> = [20, 20, 20, 20];
-	
-	public static inline var GroupSpacing = 20;
+    
+    public static inline var GroupSpacing = 20;
 
-	private var _group:StaveGroup;
+    private var _group:StaveGroup;
 
     public function new(renderer:ScoreRenderer) 
     {
         super(renderer);
     }
 
-	public override function doLayout()
+    public override function doLayout()
     {
         if (renderer.settings.staves.length == 0) return;
         
@@ -50,30 +50,30 @@ class HorizontalScreenLayout extends ScoreLayout
 
         var x = PagePadding[0];
         var y = PagePadding[1];
-		
-		_group = createEmptyStaveGroup();
-		
-		while (currentBarIndex <= endBarIndex)
-		{
-			var bar = renderer.track.bars[currentBarIndex];
-			_group.addBar(bar);
+        
+        _group = createEmptyStaveGroup();
+        
+        while (currentBarIndex <= endBarIndex)
+        {
+            var bar = renderer.track.bars[currentBarIndex];
+            _group.addBar(bar);
             
             currentBarIndex++;
-		}		
-		
-		_group.x = x;
-		_group.y = y;
-		
-		_group.finalizeGroup(this);
-		
-		y += _group.calculateHeight() + Std.int(GroupSpacing * renderer.scale);
-		height = y + PagePadding[3];
-		width = _group.x + _group.width + PagePadding[2];
+        }        
+        
+        _group.x = x;
+        _group.y = y;
+        
+        _group.finalizeGroup(this);
+        
+        y += _group.calculateHeight() + Std.int(GroupSpacing * renderer.scale);
+        height = y + PagePadding[3];
+        width = _group.x + _group.width + PagePadding[2];
     }
 
-	public override function paintScore():Void 
-	{
-		_group.paint(0, 0, renderer.canvas);
-	}
+    public override function paintScore():Void 
+    {
+        _group.paint(0, 0, renderer.canvas);
+    }
 
 }

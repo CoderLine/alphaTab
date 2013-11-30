@@ -79,7 +79,7 @@ class GpxParser
      */
     private static inline var BendPointValueFactor = 12.0/300.0;
     
-	public var score:Score;
+    public var score:Score;
     private var _automations:StringMap<Array<Automation>>;
     private var _tracksMapping:Array<String>;
     private var _tracksById:StringMap<Track>; // contains tracks by their id
@@ -102,13 +102,13 @@ class GpxParser
     private var _notesOfBeat:StringMap<Array<String>>; // contains ids of notes stored in a beat (key = beat id);
     private var _tappedNotes:StringMap<Bool>; // contains a flag indicating whether a note is tapped (key = note id);
     
-	public function new() 
-	{
-		
-	}
-	
-	public function parseXml(xml:String)
-	{
+    public function new() 
+    {
+        
+    }
+    
+    public function parseXml(xml:String)
+    {
         _automations = new StringMap<Array<Automation>>();
         _tracksMapping = new Array<String>();
         _tracksById = new StringMap<Track>(); 
@@ -125,29 +125,29 @@ class GpxParser
         _noteById = new StringMap<Note>(); 
         _tappedNotes = new StringMap<Bool>();
 
-		var dom = Xml.parse(xml);
-		parseDom(dom);		
-	}
-	
-	public function parseDom(xml:Xml)
-	{
+        var dom = Xml.parse(xml);
+        parseDom(dom);        
+    }
+    
+    public function parseDom(xml:Xml)
+    {
         if (xml.nodeType == Xml.Document)
         {
             xml = xml.firstElement();
         }
         
         
-		// the XML uses IDs for referring elements within the 
-		// model. Therefore we do the parsing in 2 steps:
-		// - at first we read all model elements and store them by ID in a lookup table
-		// - after that we need to join up the information. 
-		if (xml.nodeName == "GPIF")
-		{
-			score = new Score();
-			
-			// parse all children
-			for (n in xml)
-			{
+        // the XML uses IDs for referring elements within the 
+        // model. Therefore we do the parsing in 2 steps:
+        // - at first we read all model elements and store them by ID in a lookup table
+        // - after that we need to join up the information. 
+        if (xml.nodeName == "GPIF")
+        {
+            score = new Score();
+            
+            // parse all children
+            for (n in xml)
+            {
                 if (n.nodeType == Xml.Element)
                 {
                     switch(n.nodeName)
@@ -155,32 +155,32 @@ class GpxParser
                         case "Score":
                             parseScoreNode(n);
                         case "MasterTrack":
-                        	parseMasterTrackNode(n);
+                            parseMasterTrackNode(n);
                         case "Tracks":
-                        	parseTracksNode(n);
+                            parseTracksNode(n);
                         case "MasterBars":
-                        	parseMasterBarsNode(n);
+                            parseMasterBarsNode(n);
                         case "Bars":
-                        	parseBars(n);
+                            parseBars(n);
                         case "Voices":
-                        	parseVoices(n);
+                            parseVoices(n);
                         case "Beats":
-                        	parseBeats(n);
+                            parseBeats(n);
                         case "Notes":
-                        	parseNotes(n);
+                            parseNotes(n);
                         case "Rhythms":
-                        	parseRhythms(n);
+                            parseRhythms(n);
                     }
                 }
-			}
-		}
-		else
-		{
-			throw ScoreImporter.UnsupportedFormat;
-		}
+            }
+        }
+        else
+        {
+            throw ScoreImporter.UnsupportedFormat;
+        }
             
         buildModel();
-	}
+    }
     
     private function getValue(n:Xml) : String
     {
@@ -210,15 +210,15 @@ class GpxParser
         }
         return null;
     }
-	
+    
     //
     // <Score>...</Score>
     // 
     
-	private function parseScoreNode(node:Xml)
-	{
-		for (c in node)
-		{
+    private function parseScoreNode(node:Xml)
+    {
+        for (c in node)
+        {
             if (c.nodeType == Xml.Element)
             {
                 switch(c.nodeName)
@@ -234,17 +234,17 @@ class GpxParser
                     case "Tabber": score.tab = getValue(c.firstChild());
                 }
             }
-		}
-	}
-    	
+        }
+    }
+        
     //
     // <MasterTrack>...</MasterTrack>
     //  
     
     private function parseMasterTrackNode(node:Xml)
     {
-		for (c in node)
-		{
+        for (c in node)
+        {
             if (c.nodeType == Xml.Element)
             {      
                 switch(c.nodeName)
@@ -255,13 +255,13 @@ class GpxParser
                         _tracksMapping = getValue(c).split(" ");
                 }
             }
-		}
+        }
     }
     
     private function parseAutomations(node:Xml)
     {
         for (c in node)
-		{
+        {
             if (c.nodeType == Xml.Element)
             {           
                 switch(c.nodeName)
@@ -269,7 +269,7 @@ class GpxParser
                     case "Automation": parseAutomation(c);
                 }
             }
-		}
+        }
     }
     
     private function parseAutomation(node:Xml)
@@ -283,7 +283,7 @@ class GpxParser
         var text:String = null;
         
         for (c in node)
-		{
+        {
             if (c.nodeType == Xml.Element)
             {               
                 switch(c.nodeName)
@@ -299,7 +299,7 @@ class GpxParser
                     case "Text": text = getValue(c);
                 }
             }
-		}
+        }
         
         if (type == null) return;
         var automation:Automation = null;
@@ -318,7 +318,7 @@ class GpxParser
         }
     }
    
-    	
+        
     //
     // <Tracks>...</Tracks>
     //  
@@ -326,7 +326,7 @@ class GpxParser
     private function parseTracksNode(node:Xml)
     {
         for (c in node)
-		{
+        {
             if (c.nodeType == Xml.Element)
             {           
                 switch(c.nodeName)
@@ -334,7 +334,7 @@ class GpxParser
                     case "Track": parseTrack(c);
                 }
             }
-		}
+        }
     }
     
     private function parseTrack(node:Xml)
@@ -343,7 +343,7 @@ class GpxParser
         var trackId:String = node.get("id");
         
         for (c in node)
-		{
+        {
             if (c.nodeType == Xml.Element)
             {           
                 switch(c.nodeName)
@@ -359,7 +359,7 @@ class GpxParser
                         track.playbackInfo.isMute = state == "Mute";
                 }
             }
-		}
+        }
         _tracksById.set(trackId, track);
     }
     
@@ -367,7 +367,7 @@ class GpxParser
     {
         var items = findChildElement(node, "Items");
         for (c in items)
-		{
+        {
             if (c.nodeType == Xml.Element)
             {           
                 switch(c.nodeName)
@@ -375,7 +375,7 @@ class GpxParser
                     case "Item": parseDiagramItem(track, c);
                 }
             }
-		}
+        }
     }
     
     private function parseDiagramItem(track:Track, node:Xml)
@@ -389,7 +389,7 @@ class GpxParser
     private function parseTrackProperties(track:Track, node:Xml)
     {
         for (c in node)
-		{
+        {
             if (c.nodeType == Xml.Element)
             {           
                 switch(c.nodeName)
@@ -397,7 +397,7 @@ class GpxParser
                     case "Property": parseTrackProperty(track, c);
                 }
             }
-		}
+        }
     }
     
     private function parseTrackProperty(track:Track, node:Xml)
@@ -424,7 +424,7 @@ class GpxParser
 
         track.isPercussion = (node.get("table") == "Percussion");
     }
-    	
+        
     //
     // <MasterBars>...</MasterBars>
     //  
@@ -432,7 +432,7 @@ class GpxParser
     private function parseMasterBarsNode(node:Xml)
     {
         for (c in node)
-		{
+        {
             if (c.nodeType == Xml.Element)
             {           
                 switch(c.nodeName)
@@ -440,14 +440,14 @@ class GpxParser
                     case "MasterBar": parseMasterBar(c);
                 }
             }
-		}
+        }
     }
    
     private function parseMasterBar(node:Xml)
     {
         var masterBar = new MasterBar();
         for (c in node)
-		{
+        {
             if (c.nodeType == Xml.Element)
             {           
                 switch(c.nodeName)
@@ -496,10 +496,10 @@ class GpxParser
                         }
                 }
             }
-		}
+        }
         _masterBars.push(masterBar);        
     }
-    	
+        
     //
     // <Bars>...</Bars>
     //  
@@ -507,7 +507,7 @@ class GpxParser
     private function parseBars(node:Xml)
     {
         for (c in node)
-		{
+        {
             if (c.nodeType == Xml.Element)
             {           
                 switch(c.nodeName)
@@ -515,7 +515,7 @@ class GpxParser
                     case "Bar": parseBar(c);
                 }
             }
-		}        
+        }        
     }
     
     private function parseBar(node:Xml)
@@ -524,7 +524,7 @@ class GpxParser
         var barId = node.get("id");
         
         for (c in node)
-		{
+        {
             if (c.nodeType == Xml.Element)
             {           
                 switch(c.nodeName)
@@ -543,7 +543,7 @@ class GpxParser
                     // case "SimileMark":
                 }
             }
-		}
+        }
         
         _barsById.set(barId, bar);
     }
@@ -555,7 +555,7 @@ class GpxParser
     private function parseVoices(node:Xml)
     {
         for (c in node)
-		{
+        {
             if (c.nodeType == Xml.Element)
             {           
                 switch(c.nodeName)
@@ -563,7 +563,7 @@ class GpxParser
                     case "Voice": parseVoice(c);
                 }
             }
-		}        
+        }        
     }
     
     private function parseVoice(node:Xml)
@@ -572,7 +572,7 @@ class GpxParser
         var voiceId = node.get("id");
         
         for (c in node)
-		{
+        {
             if (c.nodeType == Xml.Element)
             {           
                 switch(c.nodeName)
@@ -581,7 +581,7 @@ class GpxParser
                         _beatsOfVoice.set(voiceId, getValue(c).split(" "));
                 }
             }
-		}
+        }
         
         _voiceById.set(voiceId, voice);
     }
@@ -593,7 +593,7 @@ class GpxParser
     private function parseBeats(node:Xml)
     {
         for (c in node)
-		{
+        {
             if (c.nodeType == Xml.Element)
             {           
                 switch(c.nodeName)
@@ -601,7 +601,7 @@ class GpxParser
                     case "Beat": parseBeat(c);
                 }
             }
-		}        
+        }        
     }
     
     private function parseBeat(node:Xml)
@@ -610,7 +610,7 @@ class GpxParser
         var beatId = node.get("id");
         
         for (c in node)
-		{
+        {
             if (c.nodeType == Xml.Element)
             {           
                 switch(c.nodeName)
@@ -673,7 +673,7 @@ class GpxParser
                         }
                 }
             }
-		}
+        }
         
         _beatById.set(beatId, beat);
     }
@@ -688,7 +688,7 @@ class GpxParser
         var whammyDestination:BendPoint = null;
 
         for (c in node)
-		{
+        {
             if (c.nodeType == Xml.Element)
             {           
                 switch(c.nodeName)
@@ -755,7 +755,7 @@ class GpxParser
                         }
                 }
             }            
-		}
+        }
         
                 
         if (isWhammy)
@@ -789,7 +789,7 @@ class GpxParser
     private function parseNotes(node:Xml)
     {
         for (c in node)
-		{
+        {
             if (c.nodeType == Xml.Element)
             {           
                 switch(c.nodeName)
@@ -797,7 +797,7 @@ class GpxParser
                     case "Note": parseNote(c);
                 }
             }
-		}        
+        }        
     }
     
     private function parseNote(node:Xml)
@@ -806,7 +806,7 @@ class GpxParser
         var noteId = node.get("id");
         
         for (c in node)
-		{
+        {
             if (c.nodeType == Xml.Element)
             {           
                 switch(c.nodeName)
@@ -845,7 +845,7 @@ class GpxParser
                         }
                 }
             }
-		}
+        }
                 
         _noteById.set(noteId, note);
     }
@@ -860,7 +860,7 @@ class GpxParser
         var bendDestination:BendPoint = null;
 
         for (c in node)
-		{
+        {
             if (c.nodeType == Xml.Element)
             {           
                 switch(c.nodeName)
@@ -947,7 +947,7 @@ class GpxParser
                         }
                 }
             }
-		}
+        }
         
         if (isBended)
         {
@@ -976,7 +976,7 @@ class GpxParser
     private function parseRhythms(node:Xml)
     {
         for (c in node)
-		{
+        {
             if (c.nodeType == Xml.Element)
             {           
                 switch(c.nodeName)
@@ -984,7 +984,7 @@ class GpxParser
                     case "Rhythm": parseRhythm(c);
                 }
             }
-		}         
+        }         
     }
     
     private function parseRhythm(node:Xml)
@@ -992,7 +992,7 @@ class GpxParser
         var rhythm = new GpxRhythm();
         var rhythmId = node.get("id");
         for (c in node)
-		{
+        {
             if (c.nodeType == Xml.Element)
             {           
                 switch(c.nodeName)
@@ -1026,7 +1026,7 @@ class GpxParser
                         rhythm.dots = Std.parseInt(c.get("count"));
                 }
             }
-		}
+        }
         
         _rhythmById.set(rhythmId, rhythm);
     }

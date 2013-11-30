@@ -43,7 +43,7 @@ import haxe.io.Error;
  */
 class AlphaTexImporter extends ScoreImporter
 {
-	private static var Eof:String = String.fromCharCode(0);
+    private static var Eof:String = String.fromCharCode(0);
     private static var TrackChannels:Array<Int> = [0, 1];
     
     private var _score:Score; 
@@ -65,7 +65,7 @@ class AlphaTexImporter extends ScoreImporter
     }
    
     public override function readScore():Score
-	{
+    {
         try
         {
             createDefaultScore();
@@ -83,9 +83,9 @@ class AlphaTexImporter extends ScoreImporter
             trace(e);
             throw ScoreImporter.UnsupportedFormat;
         }
-	}
+    }
 
-	private function error(nonterm:String, expected:AlphaTexSymbols, symbolError:Bool = true )
+    private function error(nonterm:String, expected:AlphaTexSymbols, symbolError:Bool = true )
     {
         if (symbolError)
         {
@@ -100,16 +100,16 @@ class AlphaTexImporter extends ScoreImporter
                                         ", invalid value:" + Std.string(_syData));
         }
     }
-	
-	/**
+    
+    /**
      * Non Terminal - score
-	 */
+     */
     private function score() : Void 
     {
         metaData();
         bars();
     }
-	
+    
     /**
      * Non Terminal - MetaData
      */
@@ -305,7 +305,7 @@ class AlphaTexImporter extends ScoreImporter
         }
     }
         
-	/**
+    /**
      * Non Terminal - Measures
      */
     private function bars() : Void
@@ -323,37 +323,37 @@ class AlphaTexImporter extends ScoreImporter
             bar();
         }
     }
-	
+    
    /**
      * Non Terminal - Bar
      */
     private function bar() : Void
     { 
-		var master:MasterBar = new MasterBar();
-		_score.addMasterBar(master);
+        var master:MasterBar = new MasterBar();
+        _score.addMasterBar(master);
         
         var bar:Bar = new Bar();
-		_track.addBar(bar);
+        _track.addBar(bar);
 
         if (master.index > 0) 
         { 
-			master.keySignature = master.previousMasterBar.keySignature;
-			master.timeSignatureDenominator = master.previousMasterBar.timeSignatureDenominator;
-			master.timeSignatureNumerator = master.previousMasterBar.timeSignatureNumerator;
-			bar.clef = bar.previousBar.clef;
+            master.keySignature = master.previousMasterBar.keySignature;
+            master.timeSignatureDenominator = master.previousMasterBar.timeSignatureDenominator;
+            master.timeSignatureNumerator = master.previousMasterBar.timeSignatureNumerator;
+            bar.clef = bar.previousBar.clef;
         }
         barMeta(bar);
-		
-		var voice:Voice = new Voice();
-		bar.addVoice(voice);
+        
+        var voice:Voice = new Voice();
+        bar.addVoice(voice);
 
         while (_sy != AlphaTexSymbols.Pipe && _sy != AlphaTexSymbols.Eof)
         {
             beat(voice);
         }
     }
-	
-	/**
+    
+    /**
      * Non Terminal - Beat
      * @param voice the current voice
      */
@@ -381,14 +381,14 @@ class AlphaTexImporter extends ScoreImporter
         }
         
         var beat:Beat = new Beat();
-		voice.addBeat(beat);
+        voice.addBeat(beat);
                 
         // notes
         if (_sy == AlphaTexSymbols.LParensis) 
         {
             newSy();
             
-			note(beat);
+            note(beat);
             while (_sy != AlphaTexSymbols.RParensis && _sy != AlphaTexSymbols.Eof) 
             {
                 note(beat);
@@ -408,7 +408,7 @@ class AlphaTexImporter extends ScoreImporter
         }
         else 
         {
-			note(beat);
+            note(beat);
         }
         
         // new duration
@@ -422,7 +422,7 @@ class AlphaTexImporter extends ScoreImporter
             if (_syData == 1 || _syData == 2 || _syData == 4 || _syData == 8 ||
                 _syData == 16 || _syData == 32 || _syData == 64) 
             {
-				beat.duration = parseDuration(_syData);
+                beat.duration = parseDuration(_syData);
             }
             else 
             {
@@ -432,7 +432,7 @@ class AlphaTexImporter extends ScoreImporter
         }
         else
         {
-			beat.duration = _currentDuration;
+            beat.duration = _currentDuration;
         }
         
         // beat multiplier (repeat beat n times)
@@ -461,7 +461,7 @@ class AlphaTexImporter extends ScoreImporter
         }
     }
 
-	    /**
+        /**
      * Non Terminal - BeatEffects
      * @param beat the current beat
      * @param effect the current effects
@@ -498,13 +498,13 @@ class AlphaTexImporter extends ScoreImporter
     {
         if (_syData == "f") 
         {
-			beat.fadeIn = true;
+            beat.fadeIn = true;
             newSy();
             return true;
         }
         else if (_syData == "v") 
         {
-			beat.vibrato = VibratoType.Slight;
+            beat.vibrato = VibratoType.Slight;
             newSy();
             return true;
         }
@@ -522,26 +522,26 @@ class AlphaTexImporter extends ScoreImporter
         }
         else if (_syData == "dd")
         {
-			beat.dots = 2;
+            beat.dots = 2;
             newSy();
             return true;
         }
         else if (_syData == "d")
         {
-			beat.dots = 1;
+            beat.dots = 1;
             newSy();
             return true;
         }
         else if (_syData == "su") 
         {
-			beat.pickStroke = PickStrokeType.Up;
-			newSy();
+            beat.pickStroke = PickStrokeType.Up;
+            newSy();
             return true;
         }
         else if (_syData == "sd") 
         {
-			beat.pickStroke = PickStrokeType.Down;
-			newSy();
+            beat.pickStroke = PickStrokeType.Down;
+            newSy();
             return true;
         }
         else if (_syData == "tu")
@@ -602,7 +602,7 @@ class AlphaTexImporter extends ScoreImporter
                     error("tremolobar-effect", AlphaTexSymbols.Number);
                     return false;
                 }
-				beat.whammyBarPoints.push(new BendPoint(0, _syData));
+                beat.whammyBarPoints.push(new BendPoint(0, _syData));
                 newSy();
             }
             
@@ -632,8 +632,8 @@ class AlphaTexImporter extends ScoreImporter
         }
         return false;
     }
-	
-	    
+    
+        
     /**
      * Non Terminal - Note
      * @param effect the current effects
@@ -671,23 +671,23 @@ class AlphaTexImporter extends ScoreImporter
         newSy(); // string done
         
         // read effects
-		var note:Note = new Note();
+        var note:Note = new Note();
         noteEffects(note);
         
         // create note
         note.string = _track.tuning.length - (string - 1);
-		note.isDead = isDead;
-		note.isTieDestination = isTie;
-		if (!isTie)
-		{
-			note.fret = fret;
-		}
+        note.isDead = isDead;
+        note.isTieDestination = isTie;
+        if (!isTie)
+        {
+            note.fret = fret;
+        }
 
         beat.addNote(note);
         return note;
     }
     
-	/**
+    /**
      * Non Terminal - Note Effects
      * @param effect the object to fill into
      */
@@ -718,7 +718,7 @@ class AlphaTexImporter extends ScoreImporter
                     {
                         error("bend-effect-value", AlphaTexSymbols.Number);
                     }
-					var bendValue:Int = cast _syData;
+                    var bendValue:Int = cast _syData;
                     note.bendPoints.push(new BendPoint(0, Std.int(Math.abs(bendValue))));
                     newSy();
                 }
@@ -747,42 +747,42 @@ class AlphaTexImporter extends ScoreImporter
             }
             else if (_syData == "nh") 
             {
-				note.harmonicType = HarmonicType.Natural;
+                note.harmonicType = HarmonicType.Natural;
                 newSy();
             }
             else if (_syData == "ah") 
             {
                 // todo: Artificial Key
-				note.harmonicType = HarmonicType.Artificial;
+                note.harmonicType = HarmonicType.Artificial;
                 newSy();
             }    
             else if (_syData == "th")
             {
                 // todo: store tapped fret in data
-				note.harmonicType = HarmonicType.Tap;
+                note.harmonicType = HarmonicType.Tap;
                 newSy();
             }
             else if (_syData == "ph") 
             {
-				note.harmonicType = HarmonicType.Pinch;
+                note.harmonicType = HarmonicType.Pinch;
                 newSy();
             }
             else if (_syData == "sh")
             {
-				note.harmonicType = HarmonicType.Semi;
+                note.harmonicType = HarmonicType.Semi;
                 newSy();
             } 
             else if (_syData == "gr") // TODO: Make this a beat effect!
             {
-				newSy();
-				if (_syData == "ob")
-				{
-					note.beat.graceType = GraceType.OnBeat;
-				}
-				else
-				{
-					note.beat.graceType = GraceType.BeforeBeat;
-				}
+                newSy();
+                if (_syData == "ob")
+                {
+                    note.beat.graceType = GraceType.OnBeat;
+                }
+                else
+                {
+                    note.beat.graceType = GraceType.BeforeBeat;
+                }
                 // \gr fret duration transition
                 newSy();
             }
@@ -799,18 +799,18 @@ class AlphaTexImporter extends ScoreImporter
                 var duration:Duration = Duration.Sixteenth;
                 if (_sy == AlphaTexSymbols.Number) 
                 {
-					switch(_syData)
-					{
-						case 16: duration = Duration.Sixteenth;
+                    switch(_syData)
+                    {
+                        case 16: duration = Duration.Sixteenth;
                         case 32: duration = Duration.ThirtySecond;
                         case 64: duration = Duration.ThirtySecond;
-						default: duration = Duration.Sixteenth;
-					}
+                        default: duration = Duration.Sixteenth;
+                    }
                     newSy();
                 }
                 
-				note.trillValue = fret + note.stringTuning();
-				note.trillSpeed = duration;
+                note.trillValue = fret + note.stringTuning();
+                note.trillSpeed = duration;
             }
             else if (_syData == "tp")
             {
@@ -818,13 +818,13 @@ class AlphaTexImporter extends ScoreImporter
                 var duration:Duration = Duration.Eighth;
                 if (_sy == AlphaTexSymbols.Number)
                 {
-					switch(_syData)
-					{
-						case 8: duration = Duration.Eighth;
+                    switch(_syData)
+                    {
+                        case 8: duration = Duration.Eighth;
                         case 16: duration = Duration.Sixteenth;
                         case 32: duration = Duration.ThirtySecond;
-						default: duration = Duration.Eighth;
-					}
+                        default: duration = Duration.Eighth;
+                    }
                     newSy();
                 }
                 note.beat.tremoloSpeed = duration;
@@ -832,12 +832,12 @@ class AlphaTexImporter extends ScoreImporter
             else if (_syData == "v") 
             {
                 newSy();
-				note.vibrato = VibratoType.Slight;
+                note.vibrato = VibratoType.Slight;
             }
             else if (_syData == "sl") 
             {
                 newSy();
-				note.slideType = SlideType.Legato;
+                note.slideType = SlideType.Legato;
             }            
             else if (_syData == "ss") 
             {
@@ -847,37 +847,37 @@ class AlphaTexImporter extends ScoreImporter
             else if (_syData == "h")
             {
                 newSy();
-				note.isHammerPullOrigin = true;
+                note.isHammerPullOrigin = true;
             }
             else if (_syData == "g") 
             {
                 newSy();
-				note.isGhost = true;
+                note.isGhost = true;
             }
             else if (_syData == "ac") 
             {
                 newSy();
-				note.accentuated = AccentuationType.Normal;
+                note.accentuated = AccentuationType.Normal;
             }
             else if (_syData == "hac")
             {
                 newSy();
-				note.accentuated = AccentuationType.Heavy;
+                note.accentuated = AccentuationType.Heavy;
             }
             else if (_syData == "pm") 
             {
                 newSy();
-				note.isPalmMute = true;
+                note.isPalmMute = true;
             }
             else if (_syData == "st")
             {
                 newSy();
-				note.isStaccato = true;
+                note.isStaccato = true;
             }            
             else if (_syData == "lr") 
             {
                 newSy();
-				note.isLetRing = true;
+                note.isLetRing = true;
             }            
             else if(applyBeatEffect(note.beat)) // also try beat effects
             {
@@ -895,23 +895,23 @@ class AlphaTexImporter extends ScoreImporter
         }
         newSy();
     }
-	
-	private function parseDuration(duration:Int):Duration
-	{
-		switch(duration)
-		{
-			case 1: return Duration.Whole;
-			case 2: return Duration.Half;
-			case 4: return Duration.Quarter;
-			case 8: return Duration.Eighth;
-			case 16: return Duration.Sixteenth;
-			case 32: return Duration.ThirtySecond;
-			case 64: return Duration.SixtyFourth;
-			default: return Duration.Quarter;
-		}
-	}
-	
-	/**
+    
+    private function parseDuration(duration:Int):Duration
+    {
+        switch(duration)
+        {
+            case 1: return Duration.Whole;
+            case 2: return Duration.Half;
+            case 4: return Duration.Quarter;
+            case 8: return Duration.Eighth;
+            case 16: return Duration.Sixteenth;
+            case 32: return Duration.ThirtySecond;
+            case 64: return Duration.SixtyFourth;
+            default: return Duration.Quarter;
+        }
+    }
+    
+    /**
      * Non Terminal - BarMeta
      * @param bar The current bar. 
      */
@@ -937,7 +937,7 @@ class AlphaTexImporter extends ScoreImporter
             }
             else if (_syData == "ro") 
             {
-				master.isRepeatStart = true;
+                master.isRepeatStart = true;
             }
             else if (_syData == "rc") 
             {
@@ -946,7 +946,7 @@ class AlphaTexImporter extends ScoreImporter
                 {
                     error("repeatclose", AlphaTexSymbols.Number);
                 }
-				master.repeatCount = Std.parseInt(_syData) - 1;
+                master.repeatCount = Std.parseInt(_syData) - 1;
             }
             else if (_syData == "ks") 
             {
@@ -966,7 +966,7 @@ class AlphaTexImporter extends ScoreImporter
                 }
                 bar.clef = parseClef(_syData);
             }
-			// TODO: Tempo automation on beat
+            // TODO: Tempo automation on beat
             // else if (_syData == "tempo") 
             // {
             //     newSy();
@@ -994,15 +994,15 @@ class AlphaTexImporter extends ScoreImporter
         _score.tempoLabel = "";
         
         _track = new Track();
-		_track.playbackInfo.program = 25;
-		_track.playbackInfo.primaryChannel = TrackChannels[0];
-		_track.playbackInfo.secondaryChannel = TrackChannels[1];
-		_track.tuning = Tuning.getPresetsFor(6)[0].tuning;
+        _track.playbackInfo.program = 25;
+        _track.playbackInfo.primaryChannel = TrackChannels[0];
+        _track.playbackInfo.secondaryChannel = TrackChannels[1];
+        _track.tuning = Tuning.getPresetsFor(6)[0].tuning;
         
         _score.addTrack(_track);
     }
-	
-	    /**
+    
+        /**
      * Converts a clef string into the clef value.
      * @param str the string to convert
      * @return the clef value
@@ -1046,8 +1046,8 @@ class AlphaTexImporter extends ScoreImporter
             default: return 0; // error("keysignature-value", AlphaTexSymbols.String, false); return 0
         }
     }
-	
-	/**
+    
+    /**
      * Converts a string into the associated tuning. 
      * @param str the tuning string
      * @return the tuning value. 
@@ -1061,21 +1061,21 @@ class AlphaTexImporter extends ScoreImporter
        }
        return tuning;
     }
-	
+    
     /**
      * Reads the next character of the source stream.
      */
     private function nextChar() : Void 
     {
         try
-		{
-			_ch = _data.readString(1);
-			_curChPos++;
-		}
-		catch (e:haxe.io.Eof)
-		{
-			_ch = Eof;
-		}
+        {
+            _ch = _data.readString(1);
+            _curChPos++;
+        }
+        catch (e:haxe.io.Eof)
+        {
+            _ch = Eof;
+        }
     }
 
         
@@ -1310,5 +1310,5 @@ class AlphaTexImporter extends ScoreImporter
             nextChar();
         } while (isDigit(_ch));
         return Std.parseInt(str) ;
-    }	
+    }    
 }

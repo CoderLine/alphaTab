@@ -26,17 +26,17 @@ import alphatab.platform.model.TextAlign;
  */
 interface ICanvas 
 {
-	function getWidth() : Int;
-	function setWidth(width:Int) : Void;
-	
-	function getHeight() : Int;
-	function setHeight(height:Int) : Void;
-	
+    function getWidth() : Int;
+    function setWidth(width:Int) : Void;
+    
+    function getHeight() : Int;
+    function setHeight(height:Int) : Void;
+    
     // colors and styles
-	function setColor(color : Color) : Void; 
+    function setColor(color : Color) : Void; 
         
     // line caps/joins
-	function setLineWidth(width:Float) : Void;
+    function setLineWidth(width:Float) : Void;
     
     // rects
     function clear():Void;
@@ -56,13 +56,13 @@ interface ICanvas
     function stroke():Void;
 
     // text
-	function setFont(font:Font) : Void;
-	
-	function getTextAlign() : TextAlign;
-	function setTextAlign(textAlign:TextAlign) : Void;
-	function getTextBaseline() : TextBaseline;
-	function setTextBaseline(textBaseLine:TextBaseline) : Void;
-	
+    function setFont(font:Font) : Void;
+    
+    function getTextAlign() : TextAlign;
+    function setTextAlign(textAlign:TextAlign) : Void;
+    function getTextBaseline() : TextBaseline;
+    function setTextBaseline(textBaseLine:TextBaseline) : Void;
+    
     function fillText(text:String, x:Float, y:Float):Void;
     function measureText(text:String):Float;    
 }

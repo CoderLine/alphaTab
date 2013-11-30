@@ -21,14 +21,14 @@ import alphatab.rendering.utils.BeamingHelper;
 
 class BeamGlyph extends SvgGlyph
 {
-	public function new(x:Int = 0, y:Int = 0, duration:Duration, direction:BeamDirection, isGrace:Bool)
-	{
-		super(x, y, getRestSvg(duration, direction, isGrace), (isGrace ? NoteHeadGlyph.graceScale : 1), getSvgScale(duration, direction, isGrace));
-	}	
-	
+    public function new(x:Int = 0, y:Int = 0, duration:Duration, direction:BeamDirection, isGrace:Bool)
+    {
+        super(x, y, getRestSvg(duration, direction, isGrace), (isGrace ? NoteHeadGlyph.graceScale : 1), getSvgScale(duration, direction, isGrace));
+    }    
+    
     private function getSvgScale(duration:Duration, direction:BeamDirection, isGrace:Bool)
     {
-		var scale = (isGrace ? NoteHeadGlyph.graceScale : 1);
+        var scale = (isGrace ? NoteHeadGlyph.graceScale : 1);
         if (direction == Up)
         {
             return 1 * scale;
@@ -38,18 +38,18 @@ class BeamGlyph extends SvgGlyph
             return -1 * scale;
         }
     }
-		
-	public override function doLayout():Void 
-	{
-		width = 0;
-	}
-	
-	private function getRestSvg(duration:Duration, direction:BeamDirection, isGrace:Bool) : String
-	{
-		if (isGrace)
-		{
-			return MusicFont.FooterEighth;
-		}
+        
+    public override function doLayout():Void 
+    {
+        width = 0;
+    }
+    
+    private function getRestSvg(duration:Duration, direction:BeamDirection, isGrace:Bool) : String
+    {
+        if (isGrace)
+        {
+            return MusicFont.FooterEighth;
+        }
         switch(duration)
         {
             case Eighth: return MusicFont.FooterEighth;
@@ -58,5 +58,5 @@ class BeamGlyph extends SvgGlyph
             case SixtyFourth: return MusicFont.FooterSixtyFourth;
             default: return "";
         }
-	}
+    }
 }

@@ -79,7 +79,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
     private static inline var StepsPerOctave = 7;
     
     /**
-     * Those are the amount of steps for the different clefs in case of a note value 0	
+     * Those are the amount of steps for the different clefs in case of a note value 0    
      * [Neutral, C3, C4, F4, G2]
      */
     private static var OctaveSteps = [38, 32, 30, 26, 38];
@@ -104,79 +104,79 @@ class ScoreBarRenderer extends GroupedBarRenderer
      */
     private static var FlatKsSteps:Array<Int> = [ 5, 2, 6, 3, 7, 4, 8 ];
 
-	
-	private static inline var LineSpacing = 8;
+    
+    private static inline var LineSpacing = 8;
     public var accidentalHelper:AccidentalHelper;
     private var _beamHelpers:Array<Array<BeamingHelper>>;
     private var _beamHelperLookup:Array<IntMap<BeamingHelper>>;
     private var _tupletHelpers:Array<Array<TupletHelper>>;
-	
+    
     private var _currentBeamHelper:BeamingHelper;
     private var _currentTupletHelper:TupletHelper;
     
-	public function new(bar:alphatab.model.Bar) 
-	{
-		super(bar);
+    public function new(bar:alphatab.model.Bar) 
+    {
+        super(bar);
         accidentalHelper = new AccidentalHelper();
         _beamHelpers = new Array<Array<BeamingHelper>>();
         _beamHelperLookup = new Array<IntMap<BeamingHelper>>();
         _tupletHelpers = new Array<Array<TupletHelper>>();
-	}
-	
-	public function getBeatDirection(beat:Beat) : BeamDirection
-	{
+    }
+    
+    public function getBeatDirection(beat:Beat) : BeamDirection
+    {
         var g:ScoreBeatGlyph = cast getOnNotesPosition(beat.voice.index, beat.index);
-		if (g != null) 
-		{
-			return g.noteHeads.getDirection();
-		}
-		return BeamDirection.Up;
-	}		
-	
-	public function getNoteX(note:Note, onEnd:Bool=true) 
-	{
+        if (g != null) 
+        {
+            return g.noteHeads.getDirection();
+        }
+        return BeamDirection.Up;
+    }        
+    
+    public function getNoteX(note:Note, onEnd:Bool=true) 
+    {
         var g:ScoreBeatGlyph = cast getOnNotesPosition(note.beat.voice.index, note.beat.index);
-		if (g != null) 
-		{
-			return g.container.x + g.x + g.noteHeads.getNoteX(note, onEnd);
-		}
-		return 0;
-	}	
-	
-	public function getNoteY(note:Note) 
-	{
+        if (g != null) 
+        {
+            return g.container.x + g.x + g.noteHeads.getNoteX(note, onEnd);
+        }
+        return 0;
+    }    
+    
+    public function getNoteY(note:Note) 
+    {
         var beat:ScoreBeatGlyph = cast getOnNotesPosition(note.beat.voice.index, note.beat.index);
-		if (beat != null)
-		{
-			return beat.noteHeads.getNoteY(note);
-		}
-		return 0;
-	}
-	
-	public override function getTopPadding():Int 
-	{
-		return getGlyphOverflow();
-	}	
-	
-	public override function getBottomPadding():Int 
-	{
-		return getGlyphOverflow();
-	}
-	
-	public inline function getLineOffset()
-	{
-		return ((LineSpacing + 1) * getLayout().renderer.scale);
-	}
-	
-	public override function doLayout()
-	{
-		super.doLayout();
-		height = Std.int(getLineOffset() * 4) + getTopPadding() + getBottomPadding();
-		if (index == 0)
-		{
-			stave.registerStaveTop(getGlyphOverflow());
-			stave.registerStaveBottom(height - getGlyphOverflow());
-		}
+        if (beat != null)
+        {
+            return beat.noteHeads.getNoteY(note);
+        }
+        return 0;
+    }
+    
+    public override function getTopPadding():Int 
+    {
+        return getGlyphOverflow();
+    }    
+    
+    public override function getBottomPadding():Int 
+    {
+        return getGlyphOverflow();
+    }
+    
+    public inline function getLineOffset()
+    {
+        return ((LineSpacing + 1) * getLayout().renderer.scale);
+    }
+    
+    public override function doLayout()
+    {
+        super.doLayout();
+        height = Std.int(getLineOffset() * 4) + getTopPadding() + getBottomPadding();
+        if (index == 0)
+        {
+            stave.registerStaveTop(getGlyphOverflow());
+            stave.registerStaveBottom(height - getGlyphOverflow());
+        }
         
         var top = getScoreY(0);
         var bottom = getScoreY(8);
@@ -214,7 +214,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
                 }
             }
         }
-	}
+    }
     public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
     {
         super.paint(cx, cy, canvas);
@@ -232,7 +232,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
             }
         }
     }
-	
+    
     private function paintBeams(cx:Int, cy:Int, canvas:ICanvas):Void
     {
         for (v in _beamHelpers)
@@ -399,7 +399,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
             canvas.moveTo(Std.int(cx + x + beatLineX), y1);
             canvas.lineTo(Std.int(cx + x + beatLineX), y2);
             canvas.stroke();
-			            
+                        
             var brokenBarOffset = Std.int(6 * getScale());
             var barSpacing = Std.int(6 * getScale());
             var barSize = Std.int(3 * getScale());
@@ -482,15 +482,15 @@ class ScoreBarRenderer extends GroupedBarRenderer
     private function paintFooter(cx:Int, cy:Int, canvas:ICanvas, h:BeamingHelper)
     {
         var beat = h.beats[0];
-		
-		if (beat.duration == Duration.Whole)
-		{
-			return;
-		}
-		
-		var isGrace = beat.graceType != GraceType.None;
+        
+        if (beat.duration == Duration.Whole)
+        {
+            return;
+        }
+        
+        var isGrace = beat.graceType != GraceType.None;
         var scaleMod = isGrace ? NoteHeadGlyph.graceScale : 1;
-		
+        
         //
         // draw line 
         //
@@ -523,87 +523,87 @@ class ScoreBarRenderer extends GroupedBarRenderer
         canvas.lineTo(Std.int(cx + x + beatLineX), cy + y + bottomY);
         canvas.stroke();
         
-		if (isGrace)
-		{
-			var graceSizeY = 15 * getScale();
-			var graceSizeX = 12 * getScale();
-			
-			
-			canvas.beginPath();
-			if (direction == Down)
-			{
-				canvas.moveTo(Std.int(cx + x + beatLineX - (graceSizeX / 2)), cy + y + bottomY - graceSizeY);
-				canvas.lineTo(Std.int(cx + x + beatLineX + (graceSizeX / 2)), cy + y + bottomY);
-			}
-			else
-			{
-				canvas.moveTo(Std.int(cx + x + beatLineX - (graceSizeX / 2)), cy + y + topY + graceSizeY);
-				canvas.lineTo(Std.int(cx + x + beatLineX + (graceSizeX / 2)), cy + y + topY);
-			}
-			canvas.stroke();
-		}
+        if (isGrace)
+        {
+            var graceSizeY = 15 * getScale();
+            var graceSizeX = 12 * getScale();
+            
+            
+            canvas.beginPath();
+            if (direction == Down)
+            {
+                canvas.moveTo(Std.int(cx + x + beatLineX - (graceSizeX / 2)), cy + y + bottomY - graceSizeY);
+                canvas.lineTo(Std.int(cx + x + beatLineX + (graceSizeX / 2)), cy + y + bottomY);
+            }
+            else
+            {
+                canvas.moveTo(Std.int(cx + x + beatLineX - (graceSizeX / 2)), cy + y + topY + graceSizeY);
+                canvas.lineTo(Std.int(cx + x + beatLineX + (graceSizeX / 2)), cy + y + topY);
+            }
+            canvas.stroke();
+        }
         
         //
         // Draw beam 
         //
         var gx = Std.int(beatLineX);
         var glyph = new BeamGlyph(gx, beamY, beat.duration, direction, isGrace);
-		glyph.renderer = this;
-		glyph.doLayout();
+        glyph.renderer = this;
+        glyph.doLayout();
         glyph.paint(cx + x, cy + y, canvas);
     }
-	
-	private override function createPreBeatGlyphs():Void 
-	{
-		if (_bar.getMasterBar().isRepeatStart)
-		{
-			addPreBeatGlyph(new RepeatOpenGlyph(0, 0, 1.5, 3));
-		}
-		
-		// Clef
-		if (isFirstOfLine() || _bar.clef != _bar.previousBar.clef)
-		{
-			var offset = 0;
-			switch(_bar.clef)
-			{
-				case Neutral: offset = 4;
-				case F4: offset = 4;
+    
+    private override function createPreBeatGlyphs():Void 
+    {
+        if (_bar.getMasterBar().isRepeatStart)
+        {
+            addPreBeatGlyph(new RepeatOpenGlyph(0, 0, 1.5, 3));
+        }
+        
+        // Clef
+        if (isFirstOfLine() || _bar.clef != _bar.previousBar.clef)
+        {
+            var offset = 0;
+            switch(_bar.clef)
+            {
+                case Neutral: offset = 4;
+                case F4: offset = 4;
                 case C3: offset = 6; 
-				case C4: offset = 4;
-				case G2: offset = 6; 
-			}
-			createStartSpacing();
-			addPreBeatGlyph(new ClefGlyph(0, getScoreY(offset), _bar.clef));
-		}
-		
-		// Key signature
-		if ( (_bar.previousBar == null && _bar.getMasterBar().keySignature != 0)
-			|| (_bar.previousBar != null && _bar.getMasterBar().keySignature != _bar.previousBar.getMasterBar().keySignature))
-		{
-			createStartSpacing();
-			createKeySignatureGlyphs();
-		}
-		
-		// Time Signature
-		if(  (_bar.previousBar == null)
-			|| (_bar.previousBar != null && _bar.getMasterBar().timeSignatureNumerator != _bar.previousBar.getMasterBar().timeSignatureNumerator)
-			|| (_bar.previousBar != null && _bar.getMasterBar().timeSignatureDenominator != _bar.previousBar.getMasterBar().timeSignatureDenominator)
-			)
-		{
-			createStartSpacing();
-			createTimeSignatureGlyphs();
-		}
+                case C4: offset = 4;
+                case G2: offset = 6; 
+            }
+            createStartSpacing();
+            addPreBeatGlyph(new ClefGlyph(0, getScoreY(offset), _bar.clef));
+        }
+        
+        // Key signature
+        if ( (_bar.previousBar == null && _bar.getMasterBar().keySignature != 0)
+            || (_bar.previousBar != null && _bar.getMasterBar().keySignature != _bar.previousBar.getMasterBar().keySignature))
+        {
+            createStartSpacing();
+            createKeySignatureGlyphs();
+        }
+        
+        // Time Signature
+        if(  (_bar.previousBar == null)
+            || (_bar.previousBar != null && _bar.getMasterBar().timeSignatureNumerator != _bar.previousBar.getMasterBar().timeSignatureNumerator)
+            || (_bar.previousBar != null && _bar.getMasterBar().timeSignatureDenominator != _bar.previousBar.getMasterBar().timeSignatureDenominator)
+            )
+        {
+            createStartSpacing();
+            createTimeSignatureGlyphs();
+        }
 
-		addPreBeatGlyph(new BarNumberGlyph(0, getScoreY( -1, -3), _bar.index + 1, !stave.isFirstInAccolade));
-		
-		if (_bar.isEmpty())
-		{
-			addPreBeatGlyph(new SpacingGlyph(0, 0, Std.int(30 * getScale()), false));
-		}		
-	}
+        addPreBeatGlyph(new BarNumberGlyph(0, getScoreY( -1, -3), _bar.index + 1, !stave.isFirstInAccolade));
+        
+        if (_bar.isEmpty())
+        {
+            addPreBeatGlyph(new SpacingGlyph(0, 0, Std.int(30 * getScale()), false));
+        }        
+    }
 
-	private override function createBeatGlyphs():Void 
-	{
+    private override function createBeatGlyphs():Void 
+    {
 #if MULTIVOICE_SUPPORT
         for (v in _bar.voices)
         {
@@ -612,46 +612,46 @@ class ScoreBarRenderer extends GroupedBarRenderer
 #else
         createVoiceGlyphs(_bar.voices[0]);
 #end
-	}
-	
-	private override function createPostBeatGlyphs():Void 
-	{
-		if (_bar.getMasterBar().isRepeatEnd())
-		{
-			addPostBeatGlyph(new RepeatCloseGlyph(x, 0));
-			if (_bar.getMasterBar().repeatCount > 2)
-			{
+    }
+    
+    private override function createPostBeatGlyphs():Void 
+    {
+        if (_bar.getMasterBar().isRepeatEnd())
+        {
+            addPostBeatGlyph(new RepeatCloseGlyph(x, 0));
+            if (_bar.getMasterBar().repeatCount > 2)
+            {
                 var line = isLast() || isLastOfLine() ? -1 : -4;
-				addPostBeatGlyph(new RepeatCountGlyph(0, getScoreY(line, -3), _bar.getMasterBar().repeatCount));
-			}
+                addPostBeatGlyph(new RepeatCountGlyph(0, getScoreY(line, -3), _bar.getMasterBar().repeatCount));
+            }
         }
-		else if (_bar.getMasterBar().isDoubleBar)
-		{
-			addPostBeatGlyph(new BarSeperatorGlyph());
-			addPostBeatGlyph(new SpacingGlyph(0, 0, Std.int(3 * getScale()), false));
-			addPostBeatGlyph(new BarSeperatorGlyph());
-		}		
-		else if(_bar.nextBar == null || !_bar.nextBar.getMasterBar().isRepeatStart)
-		{
-			addPostBeatGlyph(new BarSeperatorGlyph(0,0,isLast()));
-		}
-	}
-	
-	private var _startSpacing:Bool;
-	
-	private function createStartSpacing()
-	{
-		if (_startSpacing) return;
-		addPreBeatGlyph(new SpacingGlyph(0, 0, Std.int(2 * getScale())));
-		_startSpacing = true;
-	}
-	
-	private function createKeySignatureGlyphs()
-	{
-		var offsetClef:Int  = 0;
-		var currentKey:Int  = _bar.getMasterBar().keySignature;
+        else if (_bar.getMasterBar().isDoubleBar)
+        {
+            addPostBeatGlyph(new BarSeperatorGlyph());
+            addPostBeatGlyph(new SpacingGlyph(0, 0, Std.int(3 * getScale()), false));
+            addPostBeatGlyph(new BarSeperatorGlyph());
+        }        
+        else if(_bar.nextBar == null || !_bar.nextBar.getMasterBar().isRepeatStart)
+        {
+            addPostBeatGlyph(new BarSeperatorGlyph(0,0,isLast()));
+        }
+    }
+    
+    private var _startSpacing:Bool;
+    
+    private function createStartSpacing()
+    {
+        if (_startSpacing) return;
+        addPreBeatGlyph(new SpacingGlyph(0, 0, Std.int(2 * getScale())));
+        _startSpacing = true;
+    }
+    
+    private function createKeySignatureGlyphs()
+    {
+        var offsetClef:Int  = 0;
+        var currentKey:Int  = _bar.getMasterBar().keySignature;
         var previousKey:Int  = _bar.previousBar == null ? 0 : _bar.previousBar.getMasterBar().keySignature;
-		
+        
         switch (_bar.clef)
         {
             case Clef.Neutral:
@@ -665,18 +665,18 @@ class ScoreBarRenderer extends GroupedBarRenderer
             case Clef.C4:
                 offsetClef = 1;
         }
-		
-		// naturalize previous key
+        
+        // naturalize previous key
         // TODO: only naturalize the symbols needed 
         var naturalizeSymbols:Int = Std.int(Math.abs(previousKey));
         var previousKeyPositions:Array<Int> = previousKey.keySignatureIsSharp() ? SharpKsSteps : FlatKsSteps;
 
-		for (i in 0 ... naturalizeSymbols)
+        for (i in 0 ... naturalizeSymbols)
         {
-			addPreBeatGlyph(new NaturalizeGlyph(0, Std.int(getScoreY(previousKeyPositions[i] + offsetClef))));
+            addPreBeatGlyph(new NaturalizeGlyph(0, Std.int(getScoreY(previousKeyPositions[i] + offsetClef))));
         }
-		
-		// how many symbols do we need to get from a C-keysignature
+        
+        // how many symbols do we need to get from a C-keysignature
         // to the new one
         var offsetSymbols:Int = (currentKey <= 7) ? currentKey : currentKey - 7;
         // a sharp keysignature
@@ -684,7 +684,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
         {  
             for (i in 0 ... Std.int(Math.abs(currentKey)))
             {
-				addPreBeatGlyph(new SharpGlyph(0, Std.int(getScoreY(SharpKsSteps[i] + offsetClef))));
+                addPreBeatGlyph(new SharpGlyph(0, Std.int(getScoreY(SharpKsSteps[i] + offsetClef))));
             }
         }
         // a flat signature
@@ -692,16 +692,16 @@ class ScoreBarRenderer extends GroupedBarRenderer
         {
             for (i in 0 ... Std.int(Math.abs(currentKey)))
             {
-				addPreBeatGlyph(new FlatGlyph(0, Std.int(getScoreY(FlatKsSteps[i] + offsetClef))));
+                addPreBeatGlyph(new FlatGlyph(0, Std.int(getScoreY(FlatKsSteps[i] + offsetClef))));
             }
-        }		
-	}
+        }        
+    }
     
-	private function createTimeSignatureGlyphs()
-	{
-		addPreBeatGlyph(new SpacingGlyph(0,0, Std.int(5 * getScale())));
-		addPreBeatGlyph(new TimeSignatureGlyph(0, 0, _bar.getMasterBar().timeSignatureNumerator, _bar.getMasterBar().timeSignatureDenominator));
-	}
+    private function createTimeSignatureGlyphs()
+    {
+        addPreBeatGlyph(new SpacingGlyph(0,0, Std.int(5 * getScale())));
+        addPreBeatGlyph(new TimeSignatureGlyph(0, 0, _bar.getMasterBar().timeSignatureNumerator, _bar.getMasterBar().timeSignatureDenominator));
+    }
     
     private function createVoiceGlyphs(v:Voice)
     {
@@ -790,42 +790,42 @@ class ScoreBarRenderer extends GroupedBarRenderer
     public static inline var NOTE_STEP_CORRECTION = 1;
     
  
-	/**
-	 * Gets the relative y position of the given steps relative to first line. 
-	 * @param steps the amount of steps while 2 steps are one line
-	 */
-	public function getScoreY(steps:Int, correction:Int = 0) : Int
-	{
-		return Std.int(((getLineOffset() / 2) * steps) + (correction * getScale()));
-	}
-	
-	/**
-	 * gets the padding needed to place glyphs within the bounding box
-	 */
-	private function getGlyphOverflow()
-	{
-		var res = getResources();
-		return Std.int((res.tablatureFont.getSize() / 2) + (res.tablatureFont.getSize() * 0.2));
-	}
+    /**
+     * Gets the relative y position of the given steps relative to first line. 
+     * @param steps the amount of steps while 2 steps are one line
+     */
+    public function getScoreY(steps:Int, correction:Int = 0) : Int
+    {
+        return Std.int(((getLineOffset() / 2) * steps) + (correction * getScale()));
+    }
+    
+    /**
+     * gets the padding needed to place glyphs within the bounding box
+     */
+    private function getGlyphOverflow()
+    {
+        var res = getResources();
+        return Std.int((res.tablatureFont.getSize() / 2) + (res.tablatureFont.getSize() * 0.2));
+    }
 
-	public override function paintBackground(cx:Int, cy:Int, canvas:ICanvas)
-	{
-		var res = getResources();
+    public override function paintBackground(cx:Int, cy:Int, canvas:ICanvas)
+    {
+        var res = getResources();
 
-		//
-		// draw string lines
-		//
-		canvas.setColor(res.staveLineColor);
-		var lineY = cy + y + getGlyphOverflow();
-		
-		var startY = lineY;
-		for (i in 0 ... 5)
-		{
-			if (i > 0) lineY += Std.int(getLineOffset());
-			canvas.beginPath();
-			canvas.moveTo(cx + x, lineY);
-			canvas.lineTo(cx + x + width, lineY);
-			canvas.stroke();
-		}
-	}
+        //
+        // draw string lines
+        //
+        canvas.setColor(res.staveLineColor);
+        var lineY = cy + y + getGlyphOverflow();
+        
+        var startY = lineY;
+        for (i in 0 ... 5)
+        {
+            if (i > 0) lineY += Std.int(getLineOffset());
+            canvas.beginPath();
+            canvas.moveTo(cx + x, lineY);
+            canvas.lineTo(cx + x + width, lineY);
+            canvas.stroke();
+        }
+    }
 }

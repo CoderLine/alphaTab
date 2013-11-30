@@ -55,7 +55,7 @@ class ScoreLayout
     private function createEmptyStaveGroup() : StaveGroup
     {
         var group:StaveGroup = new StaveGroup();
-		group.layout = this;
+        group.layout = this;
         
         for (s in renderer.settings.staves)
         {

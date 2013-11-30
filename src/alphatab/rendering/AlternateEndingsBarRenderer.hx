@@ -36,9 +36,9 @@ class AlternateEndingsBarRenderer extends BarRendererBase
     private var _endings:Array<Int>;
     private var _endingsString:String;
     
-	public function new(bar:Bar) 
-	{
-		super(bar);
+    public function new(bar:Bar) 
+    {
+        super(bar);
         
         var alternateEndings = bar.getMasterBar().alternateEndings;
         _endings = new Array<Int>();
@@ -49,7 +49,7 @@ class AlternateEndingsBarRenderer extends BarRendererBase
                 _endings.push(i);
             }
         }
-	}
+    }
     
     public override function finalizeRenderer(layout:ScoreLayout):Void 
     {
@@ -57,9 +57,9 @@ class AlternateEndingsBarRenderer extends BarRendererBase
         isEmpty = _endings.length == 0;        
     }
     
-	
-	public override function doLayout():Void 
-	{
+    
+    public override function doLayout():Void 
+    {
         super.doLayout();
         if (index == 0)
         {
@@ -76,25 +76,25 @@ class AlternateEndingsBarRenderer extends BarRendererBase
         }
         _endingsString = endingsString.toString();
         
-	}
-	
-	public override function getTopPadding():Int 
-	{
-		return 0;
-	}	
-	
-	public override function getBottomPadding():Int 
-	{
-		return 0;
-	}
+    }
+    
+    public override function getTopPadding():Int 
+    {
+        return 0;
+    }    
+    
+    public override function getBottomPadding():Int 
+    {
+        return 0;
+    }
     
     public override function applySizes(sizes:BarSizeInfo):Void 
     {
         super.applySizes(sizes);
         width = sizes.fullWidth;
     }
-	
-	public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
+    
+    public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
     {
         if (_endings.length > 0)
         {

@@ -22,32 +22,32 @@ class NoteHeadGlyph extends SvgGlyph
 {
     public static inline var graceScale = 0.7;
     public static inline var noteHeadHeight = 9;
-	
-	private var _isGrace:Bool;
+    
+    private var _isGrace:Bool;
 
-	public function new(x:Int = 0, y:Int = 0, duration:Duration, isGrace:Bool)
-	{
-		super(x, y, getNoteSvg(duration), isGrace ? graceScale : 1, isGrace ? graceScale : 1);
-		_isGrace = isGrace;
-	}	
-	
-	public override function doLayout():Void 
-	{
-		width = Std.int(9 * (_isGrace ? NoteHeadGlyph.graceScale : 1) * getScale());
-	}
+    public function new(x:Int = 0, y:Int = 0, duration:Duration, isGrace:Bool)
+    {
+        super(x, y, getNoteSvg(duration), isGrace ? graceScale : 1, isGrace ? graceScale : 1);
+        _isGrace = isGrace;
+    }    
+    
+    public override function doLayout():Void 
+    {
+        width = Std.int(9 * (_isGrace ? NoteHeadGlyph.graceScale : 1) * getScale());
+    }
     
     public override function canScale():Bool 
     {
         return false;
     }
-	
-	private function getNoteSvg(duration:Duration) : String
-	{
-		switch(duration)
-		{
+    
+    private function getNoteSvg(duration:Duration) : String
+    {
+        switch(duration)
+        {
             case Whole: return MusicFont.NoteWhole;
             case Half: return MusicFont.NoteHalf;
             default: return MusicFont.NoteQuarter;
-		}
-	}
+        }
+    }
 }

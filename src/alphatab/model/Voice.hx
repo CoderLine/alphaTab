@@ -41,23 +41,23 @@ class Voice
     
     public function addGraceBeat(beat:Beat)
     {
-		if (beats.length == 0) 
-		{
-			addBeat(beat);
-			return;
-		}
-		
-		// remove last beat
-		var lastBeat = beats.splice(beats.length - 1, 1)[0];
-		
-		// insert grace beat
-		addBeat(beat);
-		// reinsert last beat
-		addBeat(lastBeat);
+        if (beats.length == 0) 
+        {
+            addBeat(beat);
+            return;
+        }
+        
+        // remove last beat
+        var lastBeat = beats.splice(beats.length - 1, 1)[0];
+        
+        // insert grace beat
+        addBeat(beat);
+        // reinsert last beat
+        addBeat(lastBeat);
     }
-	
-	public function isEmpty() : Bool
-	{
-		return beats.length == 0;
-	}    
+    
+    public function isEmpty() : Bool
+    {
+        return beats.length == 0;
+    }    
 }

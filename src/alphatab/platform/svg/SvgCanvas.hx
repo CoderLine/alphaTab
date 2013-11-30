@@ -105,11 +105,11 @@ class SvgCanvas implements ICanvas
     } 
     
     // colors and styles
-	private var _color:Color;
-	public function setColor(color : Color) : Void
-	{
-		_color = color;
-	}
+    private var _color:Color;
+    public function setColor(color : Color) : Void
+    {
+        _color = color;
+    }
     
     // line caps/joins
     private var _lineWidth:Float;
@@ -294,9 +294,9 @@ class SvgCanvas implements ICanvas
 
     private var _textAlign:TextAlign; 
     public function getTextAlign() : TextAlign
-	{
-		return _textAlign;
-	}
+    {
+        return _textAlign;
+    }
     public function setTextAlign(textAlign:TextAlign) : Void
     {
         _textAlign = textAlign;
@@ -305,9 +305,9 @@ class SvgCanvas implements ICanvas
 
     private var _textBaseline:TextBaseline; 
     public function getTextBaseline() : TextBaseline
-	{
-		return _textBaseline;
-	}
+    {
+        return _textBaseline;
+    }
     public function setTextBaseline(textBaseline:TextBaseline) : Void
     {
         _textBaseline = textBaseline;
@@ -345,25 +345,25 @@ class SvgCanvas implements ICanvas
     
     private function getSvgBaseLineOffset() : Float
     {
-		switch(_textBaseline)
-		{
-			case Top: return 0;
-			case Middle: return 0;
-			case Bottom: return 0;
-			default: return _font.getSize();
-		}    
+        switch(_textBaseline)
+        {
+            case Top: return 0;
+            case Middle: return 0;
+            case Bottom: return 0;
+            default: return _font.getSize();
+        }    
     }
     
     private inline function getSvgBaseLine() : String
     {
         return "middle";
-		// switch(_textBaseline)
-		// {
-		// 	case Top: return "top";
-		// 	case Middle: return "middle";
-		// 	case Bottom: return "bottom";
-		// 	default: return "alphabetic";
-		// }
+        // switch(_textBaseline)
+        // {
+        //     case Top: return "top";
+        //     case Middle: return "middle";
+        //     case Bottom: return "bottom";
+        //     default: return "alphabetic";
+        // }
     }
     
     

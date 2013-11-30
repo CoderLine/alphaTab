@@ -21,8 +21,8 @@ package alphatab.model;
  */
 enum TextBaseline 
 {
-	Default;
-	Top;
-	Middle;
-	Bottom;
+    Default;
+    Top;
+    Middle;
+    Bottom;
 }

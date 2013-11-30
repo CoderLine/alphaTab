@@ -22,16 +22,16 @@ package alphatab.model;
  */
 class BendPoint 
 {
-	public static inline var MaxPosition = 60;
-	public static inline var MaxValue = 12;
-	
+    public static inline var MaxPosition = 60;
+    public static inline var MaxValue = 12;
+    
     public var offset:Int;
     public var value:Int;
     
     public function new(offset:Int=0, value:Int=0) 
     {
         this.offset = offset;
-		this.value = value;
+        this.value = value;
     }
     
     public function clone() : BendPoint

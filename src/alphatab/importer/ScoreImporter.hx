@@ -34,10 +34,10 @@ class ScoreImporter
     public static var UnsupportedFormat = "unsupported file";
     #if unit public #else private #end var _data:BytesInput;
         
-	/**
-	 * Gets all default ScoreImporters
-	 * @return
-	 */
+    /**
+     * Gets all default ScoreImporters
+     * @return
+     */
     public static function availableImporters() : Array<ScoreImporter>
     {
         var scoreImporter = new Array<ScoreImporter>();
@@ -60,7 +60,7 @@ class ScoreImporter
     {
         return null;
     }
-	
+    
     private function finish(score:Score)
     {
         // iterate over full model and connect/determine stuff
@@ -96,8 +96,8 @@ class ScoreImporter
                             
                             for (n in beat.notes)
                             {
-								var nextNoteOnLine = new LazyVar<Note>(function() { return nextNoteOnSameLine(n); });
-								var prevNoteOnLine = new LazyVar<Note>(function() { return previousNoteOnSameLine(n); });
+                                var nextNoteOnLine = new LazyVar<Note>(function() { return nextNoteOnSameLine(n); });
+                                var prevNoteOnLine = new LazyVar<Note>(function() { return previousNoteOnSameLine(n); });
                                 // connect ties
                                 if (n.isTieDestination)
                                 {                                    
@@ -107,8 +107,8 @@ class ScoreImporter
                                     }
                                     else
                                     {
-										n.tieOrigin = prevNoteOnLine.getValue();
-										n.tieOrigin.isTieOrigin = true;
+                                        n.tieOrigin = prevNoteOnLine.getValue();
+                                        n.tieOrigin.isTieOrigin = true;
                                         n.fret = n.tieOrigin.fret;
                                     }
                                 }
@@ -123,22 +123,22 @@ class ScoreImporter
                                     else
                                     {
                                         nextNoteOnLine.getValue().isHammerPullDestination = true;
-										nextNoteOnLine.getValue().hammerPullOrigin = n;
+                                        nextNoteOnLine.getValue().hammerPullOrigin = n;
                                     }
                                 }
-								
-								// set slides
-								if (n.slideType != SlideType.None)
-								{
-									n.slideTarget = nextNoteOnLine.getValue();
-								}
+                                
+                                // set slides
+                                if (n.slideType != SlideType.None)
+                                {
+                                    n.slideTarget = nextNoteOnLine.getValue();
+                                }
                             }
                         }
                     }
                 }
             }
         }
-	}
+    }
     
     private function nextNoteOnSameLine(note:Note) : Note
     {

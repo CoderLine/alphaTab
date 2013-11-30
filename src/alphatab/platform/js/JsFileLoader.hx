@@ -34,13 +34,13 @@ class JsFileLoader implements IFileLoader
     public function new()
     {
     }
-	
+    
     // http://msdn.microsoft.com/en-us/library/ms537509(v=vs.85).aspx
-	public static function getIeVersion()
-	{
+    public static function getIeVersion()
+    {
         var rv:Float = -1;
         var appName = untyped __js__("navigator.appName");
-		var agent:String = untyped __js__("navigator.userAgent");
+        var agent:String = untyped __js__("navigator.userAgent");
         if (appName == "Microsoft Internet Explorer")
         {
             var e:EReg = ~/MSIE ([0-9]{1,}[\.0-9]{0,})/;
@@ -49,8 +49,8 @@ class JsFileLoader implements IFileLoader
                 rv = Std.parseFloat(e.matched(1));
             }
         }
-		return rv;
-	}
+        return rv;
+    }
     
     public function loadBinary(path:String) : Bytes
     {
@@ -183,17 +183,17 @@ class JsFileLoader implements IFileLoader
     private static function getBytesFromString(s:String) : Bytes
     {
         var a = new BytesData();
-		for (i in 0 ... s.length) 
+        for (i in 0 ... s.length) 
         {
             a.push(s.charCodeAt(i) & 0xFF);
-		}
-		return Bytes.ofData(a);
+        }
+        return Bytes.ofData(a);
     }
     
     private static function getBytesFromTyped(s:Dynamic) : Bytes
     {
         var a:BytesData = untyped __js__("new Uint8Array(s)");
-		return Bytes.ofData(a);
+        return Bytes.ofData(a);
     }
 }
 #end

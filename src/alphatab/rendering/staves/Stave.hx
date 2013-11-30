@@ -29,43 +29,43 @@ import alphatab.rendering.layout.ScoreLayout;
  */
 class Stave 
 {
-	public var staveGroup:StaveGroup;
-	
-	private var _factory:BarRendererFactory;
-	public var barRenderers:Array<BarRendererBase>;
-	
-	public var x:Int;
-	public var y:Int;
-	public var height:Int;
-	public var index:Int;
-	
-	/**
-	 * This is the visual offset from top where the
-	 * stave contents actually start. Used for grouping 
-	 * using a accolade
-	 */
-	public var staveTop:Int;
-	public var topSpacing:Int;
-	public var bottomSpacing:Int;
-	/**
-	 * This is the visual offset from top where the
-	 * stave contents actually ends. Used for grouping 
-	 * using a accolade
-	 */	
-	public var staveBottom:Int;
+    public var staveGroup:StaveGroup;
+    
+    private var _factory:BarRendererFactory;
+    public var barRenderers:Array<BarRendererBase>;
+    
+    public var x:Int;
+    public var y:Int;
+    public var height:Int;
+    public var index:Int;
+    
+    /**
+     * This is the visual offset from top where the
+     * stave contents actually start. Used for grouping 
+     * using a accolade
+     */
+    public var staveTop:Int;
+    public var topSpacing:Int;
+    public var bottomSpacing:Int;
+    /**
+     * This is the visual offset from top where the
+     * stave contents actually ends. Used for grouping 
+     * using a accolade
+     */    
+    public var staveBottom:Int;
     
     public var isFirstInAccolade:Bool;
     public var isLastInAccolade:Bool;
-	
-	public function new(barRendererFactory:BarRendererFactory) 
-	{
-		barRenderers = new Array<BarRendererBase>();
-		_factory = barRendererFactory;
-		topSpacing = 10;
-		bottomSpacing = 10;
+    
+    public function new(barRendererFactory:BarRendererFactory) 
+    {
+        barRenderers = new Array<BarRendererBase>();
+        _factory = barRendererFactory;
+        topSpacing = 10;
+        bottomSpacing = 10;
         staveTop = 0;
         staveBottom = 0;
-	}
+    }
 
     public inline function isInAccolade()
     {
@@ -73,36 +73,36 @@ class Stave
     }
     
     public function registerStaveTop(offset:Int)
-	{
-		staveTop = offset;
-	}
-	
-	public function registerStaveBottom(offset:Int)
-	{
-		staveBottom = offset;
-	}
-	
-	public function addBar(bar:Bar)
-	{
-		var renderer:BarRendererBase = _factory.create(bar);
-		renderer.stave = this;
-		renderer.index = barRenderers.length;
-		renderer.doLayout();
-		barRenderers.push(renderer);
-	}
-	
-	public function revertLastBar()
-	{
-		barRenderers.pop();
-	}
-	
-	public function applyBarSpacing(spacing:Int)
-	{
-		for (b in barRenderers)
-		{
-			b.applyBarSpacing(spacing);
-		}
-	}
+    {
+        staveTop = offset;
+    }
+    
+    public function registerStaveBottom(offset:Int)
+    {
+        staveBottom = offset;
+    }
+    
+    public function addBar(bar:Bar)
+    {
+        var renderer:BarRendererBase = _factory.create(bar);
+        renderer.stave = this;
+        renderer.index = barRenderers.length;
+        renderer.doLayout();
+        barRenderers.push(renderer);
+    }
+    
+    public function revertLastBar()
+    {
+        barRenderers.pop();
+    }
+    
+    public function applyBarSpacing(spacing:Int)
+    {
+        for (b in barRenderers)
+        {
+            b.applyBarSpacing(spacing);
+        }
+    }
     
     public function getTopOverflow() : Int
     {
@@ -129,26 +129,26 @@ class Stave
         }
         return m;
     }
-	
-	public function finalizeStave(layout:ScoreLayout)
-	{
-		var x = 0; 
-		height = 0;
+    
+    public function finalizeStave(layout:ScoreLayout)
+    {
+        var x = 0; 
+        height = 0;
         var topOverflow = getTopOverflow();
         var bottomOverflow = getBottomOverflow();
         var isEmpty:Bool = true;
         for (i in 0 ... barRenderers.length)
-		{
-			barRenderers[i].x = x;
-			barRenderers[i].y = topSpacing + topOverflow;
-			height = Std.int(Math.max(height, barRenderers[i].height));
-			barRenderers[i].finalizeRenderer(layout);
-			x += barRenderers[i].width;
+        {
+            barRenderers[i].x = x;
+            barRenderers[i].y = topSpacing + topOverflow;
+            height = Std.int(Math.max(height, barRenderers[i].height));
+            barRenderers[i].finalizeRenderer(layout);
+            x += barRenderers[i].width;
             if (!barRenderers[i].isEmpty)
             {
                 isEmpty = false;
             }
-		}
+        }
         
         if (!isEmpty)
         {
@@ -159,14 +159,14 @@ class Stave
             height = 0;
         }
     }
-	
-		
-	public function paint(cx:Int, cy:Int, canvas:ICanvas)
-	{
+    
+        
+    public function paint(cx:Int, cy:Int, canvas:ICanvas)
+    {
         if (height == 0) return;
-		for (r in barRenderers)
-		{
-			r.paint(cx + x, cy + y, canvas);
-		}
-	}
+        for (r in barRenderers)
+        {
+            r.paint(cx + x, cy + y, canvas);
+        }
+    }
 }

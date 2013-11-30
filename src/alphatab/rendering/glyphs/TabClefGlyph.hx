@@ -30,13 +30,13 @@ class TabClefGlyph extends Glyph
     {
         super(0, 0);        
     }
-		
-	public override function doLayout():Void 
-	{
-		width = Std.int(28 * getScale());
-	}
-	
-	public override function canScale():Bool 
+        
+    public override function doLayout():Void 
+    {
+        width = Std.int(28 * getScale());
+    }
+    
+    public override function canScale():Bool 
     {
         return false;
     }

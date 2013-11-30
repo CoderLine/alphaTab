@@ -144,10 +144,10 @@ class BeatContainerGlyph extends Glyph implements ISupportsFinalize
         postNotes.doLayout();
         
         var i = beat.notes.length -1;
-		while ( i >= 0 )
-		{
-			createTies(beat.notes[i--]);
-		}
+        while ( i >= 0 )
+        {
+            createTies(beat.notes[i--]);
+        }
         
         width = calculateWidth();
     }
@@ -176,11 +176,11 @@ class BeatContainerGlyph extends Glyph implements ISupportsFinalize
         postNotes.paint(cx + x, cy + y, canvas);
         //canvas.setColor(new Color(0, 0, 200, 100));
         //canvas.fillRect(cx + x + postNotes.x, cy + y + postNotes.y + 20, postNotes.width, 10);
-		
+        
         for (t in ties)
-		{
-			t.renderer = renderer;
-			t.paint(cx, cy + y, canvas);
-		}
+        {
+            t.renderer = renderer;
+            t.paint(cx, cy + y, canvas);
+        }
     }
 }

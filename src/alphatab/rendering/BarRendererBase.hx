@@ -27,22 +27,22 @@ import alphatab.rendering.staves.Stave;
  */
 class BarRendererBase 
 {
-	public var stave:Stave;
-	public var x:Int;
-	public var y:Int;
-	public var width:Int;
-	public var height:Int;
-	public var index:Int;
-	public var isEmpty:Bool;
+    public var stave:Stave;
+    public var x:Int;
+    public var y:Int;
+    public var width:Int;
+    public var height:Int;
+    public var index:Int;
+    public var isEmpty:Bool;
     
-	public var topOverflow:Int;
-	public var bottomOverflow:Int;
-	
-	private var _bar:Bar;
+    public var topOverflow:Int;
+    public var bottomOverflow:Int;
+    
+    private var _bar:Bar;
 
-	private function new(bar:Bar) 
-	{
-		_bar = bar;
+    private function new(bar:Bar) 
+    {
+        _bar = bar;
         x = 0;
         y = 0;
         width = 0;
@@ -51,92 +51,92 @@ class BarRendererBase
         topOverflow = 0;
         bottomOverflow = 0;
         isEmpty = true;
-	}
+    }
     
     public function registerOverflowTop(topOverflow:Int)
     {
         if(topOverflow > this.topOverflow)
             this.topOverflow = topOverflow;
     }
-	
+    
     public function registerOverflowBottom(bottomOverflow:Int)
     {
         if(bottomOverflow > this.bottomOverflow)
             this.bottomOverflow = bottomOverflow;
     }
-	
-	public function applyBarSpacing(spacing:Int) : Void
-	{
-	}
-	
-	public inline function getScale() : Float
-	{
-		return stave.staveGroup.layout.renderer.scale;
-	}
-	
-	public inline function getLayout() : ScoreLayout
-	{
-		return stave.staveGroup.layout;
-	}	
-	public inline function getResources() : RenderingResources
-	{
-		return getLayout().renderer.renderingResources;
-	}
-	
-	public inline function isFirstOfLine() : Bool
-	{
-		return index == 0;
-	}
-	
-	public inline function isLastOfLine() : Bool
-	{
-		return index == stave.barRenderers.length - 1;
-	}	
-	
-	public inline function isLast() : Bool
-	{
-		return _bar.index == _bar.track.bars.length - 1;
-	}
-	
-	public function registerMaxSizes(sizes:BarSizeInfo)
-	{
-		
-	}
-	
-	public function applySizes(sizes:BarSizeInfo)
-	{
-		
-	}
-	
-	public function finalizeRenderer(layout:ScoreLayout)
-	{
-		
-	}
-	
-	/**
-	 * Gets the top padding for the main content of the renderer. 
-	 * Can be used to specify where i.E. the score lines of the notation start.
-	 */
-	public function getTopPadding() : Int
-	{
-		return 0;
-	}	
-	
-	/**
-	 * Gets the bottom padding for the main content of the renderer. 
-	 * Can be used to specify where i.E. the score lines of the notation end.
-	 */
-	public function getBottomPadding() : Int
-	{
-		return 0;
-	}
-	
-	public function doLayout()
-	{
-		
-	}
-	
-	public function paint(cx:Int, cy:Int, canvas:ICanvas)
-	{
-	}
+    
+    public function applyBarSpacing(spacing:Int) : Void
+    {
+    }
+    
+    public inline function getScale() : Float
+    {
+        return stave.staveGroup.layout.renderer.scale;
+    }
+    
+    public inline function getLayout() : ScoreLayout
+    {
+        return stave.staveGroup.layout;
+    }    
+    public inline function getResources() : RenderingResources
+    {
+        return getLayout().renderer.renderingResources;
+    }
+    
+    public inline function isFirstOfLine() : Bool
+    {
+        return index == 0;
+    }
+    
+    public inline function isLastOfLine() : Bool
+    {
+        return index == stave.barRenderers.length - 1;
+    }    
+    
+    public inline function isLast() : Bool
+    {
+        return _bar.index == _bar.track.bars.length - 1;
+    }
+    
+    public function registerMaxSizes(sizes:BarSizeInfo)
+    {
+        
+    }
+    
+    public function applySizes(sizes:BarSizeInfo)
+    {
+        
+    }
+    
+    public function finalizeRenderer(layout:ScoreLayout)
+    {
+        
+    }
+    
+    /**
+     * Gets the top padding for the main content of the renderer. 
+     * Can be used to specify where i.E. the score lines of the notation start.
+     */
+    public function getTopPadding() : Int
+    {
+        return 0;
+    }    
+    
+    /**
+     * Gets the bottom padding for the main content of the renderer. 
+     * Can be used to specify where i.E. the score lines of the notation end.
+     */
+    public function getBottomPadding() : Int
+    {
+        return 0;
+    }
+    
+    public function doLayout()
+    {
+        
+    }
+    
+    public function paint(cx:Int, cy:Int, canvas:ICanvas)
+    {
+    }
 }
