@@ -18,6 +18,7 @@
 package alphatab.rendering.glyphs;
 
 import alphatab.platform.ICanvas;
+import alphatab.platform.model.Color;
 import alphatab.platform.model.Font;
 import alphatab.platform.model.TextAlign;
 import alphatab.rendering.Glyph;

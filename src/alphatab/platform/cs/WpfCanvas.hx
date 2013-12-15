@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+#if cs
 package alphatab.platform.cs;
 
 import alphatab.model.TextBaseline;
@@ -433,3 +434,4 @@ class WpfCanvas implements ICanvas
         return MeasureUtil.MeasureText(text, _font);
     }
 }
+#end

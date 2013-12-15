@@ -706,7 +706,28 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 		this._buffer.b += Std.string(x1);
 		this._buffer.b += ";\" ";
 		this._buffer.b += " dominant-baseline=\"";
-		this._buffer.b += "middle";
+		this._buffer.b += Std.string((function($this) {
+			var $r;
+			var _g = $this._textBaseline;
+			$r = (function($this) {
+				var $r;
+				switch(_g[1]) {
+				case 1:
+					$r = "top";
+					break;
+				case 2:
+					$r = "middle";
+					break;
+				case 3:
+					$r = "bottom";
+					break;
+				default:
+					$r = "top";
+				}
+				return $r;
+			}($this));
+			return $r;
+		}(this)));
 		this._buffer.b += "\" text-anchor=\"";
 		var x1 = this.getSvgTextAlignment();
 		this._buffer.b += Std.string(x1);
@@ -739,7 +760,17 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 		}
 	}
 	,getSvgBaseLine: function() {
-		return "middle";
+		var _g = this._textBaseline;
+		switch(_g[1]) {
+		case 1:
+			return "top";
+		case 2:
+			return "middle";
+		case 3:
+			return "bottom";
+		default:
+			return "top";
+		}
 	}
 	,measureText: function(text) {
 		if(text == null || text.length == 0) return 0;

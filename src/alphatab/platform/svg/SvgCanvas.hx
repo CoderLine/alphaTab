@@ -357,14 +357,13 @@ class SvgCanvas implements ICanvas
     
     private inline function getSvgBaseLine() : String
     {
-        return "middle";
-        // switch(_textBaseline)
-        // {
-        //     case Top: return "top";
-        //     case Middle: return "middle";
-        //     case Bottom: return "bottom";
-        //     default: return "alphabetic";
-        // }
+        switch(_textBaseline)
+        {
+            case Top: return "top";
+            case Middle: return "middle";
+            case Bottom: return "bottom";
+            default: return "top";
+        }
     }
     
     
