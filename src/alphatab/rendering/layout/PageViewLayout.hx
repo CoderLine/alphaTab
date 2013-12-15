@@ -40,7 +40,7 @@ class PageViewLayout extends ScoreLayout
     
     // left top right bottom
     public static var PagePadding:Array<Int> = [40, 40, 40, 40];
-    public static inline var WidthOn100:Int = 795;
+    public static inline var WidthOn100:Int = 950;
 
         
     private var _groups:Array<StaveGroup>;

@@ -1027,7 +1027,7 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 		var x = alphatab.rendering.layout.PageViewLayout.PagePadding[0];
 		var y = alphatab.rendering.layout.PageViewLayout.PagePadding[1];
 		y = this.doScoreInfoLayout(y);
-		if(this.renderer.settings.autoSize || this.renderer.settings.width <= 0) this.width = 795 * this.renderer.scale | 0; else this.width = this.renderer.settings.width;
+		if(this.renderer.settings.autoSize || this.renderer.settings.width <= 0) this.width = 950 * this.renderer.scale | 0; else this.width = this.renderer.settings.width;
 		if(this.renderer.settings.staves.length > 0) while(currentBarIndex <= endBarIndex) {
 			var group = this.createStaveGroup(currentBarIndex,endBarIndex);
 			this._groups.push(group);
@@ -1197,7 +1197,7 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 		return width - alphatab.rendering.layout.PageViewLayout.PagePadding[0] - alphatab.rendering.layout.PageViewLayout.PagePadding[2];
 	}
 	,getSheetWidth: function() {
-		return Math.round(795 * this.renderer.scale);
+		return Math.round(950 * this.renderer.scale);
 	}
 	,__class__: alphatab.rendering.layout.PageViewLayout
 });
@@ -11632,7 +11632,7 @@ alphatab.platform.model.Font.StyleBold = 1;
 alphatab.platform.model.Font.StyleItalic = 2;
 alphatab.rendering.layout.PageViewLayout.ScoreInfos = "ScoreInfos";
 alphatab.rendering.layout.PageViewLayout.PagePadding = [40,40,40,40];
-alphatab.rendering.layout.PageViewLayout.WidthOn100 = 795;
+alphatab.rendering.layout.PageViewLayout.WidthOn100 = 950;
 alphatab.rendering.layout.PageViewLayout.GroupSpacing = 20;
 alphatab.rendering.layout.HorizontalScreenLayout.PagePadding = [20,20,20,20];
 alphatab.rendering.layout.HorizontalScreenLayout.GroupSpacing = 20;
