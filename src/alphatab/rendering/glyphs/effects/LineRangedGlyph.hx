@@ -67,15 +67,15 @@ class LineRangedGlyph extends Glyph implements IMultiBeatEffectGlyph
             if (endX > startX)
             {
                 var lineX = startX;
-                canvas.beginPath();
                 while (lineX < endX)
                 {
                     canvas.beginPath();
                     canvas.moveTo(lineX, lineY);
                     canvas.lineTo(Std.int(Math.min(lineX + lineSize, endX)), lineY);
                     lineX += lineSize + lineSpacing;
+                    canvas.stroke();
                 }
-                canvas.stroke();
+                canvas.beginPath();
                 canvas.moveTo(endX, lineY - Std.int(LineTopOffset * getScale()));
                 canvas.lineTo(endX, lineY + Std.int(LineTopOffset * getScale()));
                 canvas.stroke();

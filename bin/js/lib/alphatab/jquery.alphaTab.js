@@ -237,6 +237,15 @@
         var context = $(this).data('alphaTab');
         return context.renderer.track.score;
     }
+    
+    /**
+     * Get the ScoreRenderer used for display
+     */
+    function renderer()
+    {
+        var context = $(this).data('alphaTab');
+        return context.renderer;
+    }
 
     // expose API
     api.init = init;
@@ -244,6 +253,7 @@
     api.tex = tex;
     api.track = track;
     api.score = score;
+    api.renderer = renderer;
     
     
     $.fn.alphaTab = function(method) {

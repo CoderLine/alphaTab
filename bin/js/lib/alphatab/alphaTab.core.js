@@ -10198,7 +10198,6 @@ alphatab.rendering.glyphs.effects.LineRangedGlyph.prototype = $extend(alphatab.r
 			var lineSize = 8 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 			if(endX > startX) {
 				var lineX = startX;
-				canvas.beginPath();
 				while(lineX < endX) {
 					canvas.beginPath();
 					canvas.moveTo(lineX,lineY);
@@ -10209,8 +10208,9 @@ alphatab.rendering.glyphs.effects.LineRangedGlyph.prototype = $extend(alphatab.r
 						return $r;
 					}(this)),lineY);
 					lineX += lineSize + lineSpacing;
+					canvas.stroke();
 				}
-				canvas.stroke();
+				canvas.beginPath();
 				canvas.moveTo(endX,lineY - (6 * this.renderer.stave.staveGroup.layout.renderer.scale | 0));
 				canvas.lineTo(endX,lineY + (6 * this.renderer.stave.staveGroup.layout.renderer.scale | 0));
 				canvas.stroke();
