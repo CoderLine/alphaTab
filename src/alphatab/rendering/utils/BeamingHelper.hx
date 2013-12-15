@@ -167,7 +167,7 @@ class BeamingHelper
         //      key lowerequal than middle line -> up
         //      key higher than middle line -> down
         var avg = Std.int((getValue(maxNote) + getValue(minNote)) / 2);
-        return avg <= ScoreMiddleKeys[Type.enumIndex(_lastBeat.voice.bar.clef)] ? Up : Down;
+        return avg <= ScoreMiddleKeys[Type.enumIndex(_lastBeat.voice.bar.clef) - 1] ? Up : Down;
     }
      
     public function checkBeat(beat:Beat) : Bool

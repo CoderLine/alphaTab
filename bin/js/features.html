@@ -35,11 +35,9 @@
         </p>
         
         <div id="alphaTabShowcase" data-file="files/Canon.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabShowcase').alphaTab({
-                    engine: 'svg'
-                });
+        <script type="text/javascript-lazy">
+            $('#alphaTabShowcase').alphaTab({
+                engine: 'svg'
             });
         </script>
             
@@ -58,27 +56,25 @@
     <div id="alphaTabScore" data-file="files/features/Skillet.gp5">
         Loading...        
     </div>
-    <script language="JavaScript" type="text/javascript-lazy">
-        $(document).ready(function() {
-            var score = alphatab.importer.ScoreLoader.loadScoreAsync($('#alphaTabScore').data('file'), 
-            function(score) {
-                var info = jQuery('#alphaTabScore');
-                info.html('');
-                info.append('<p><b>Title:</b> '+score.title+'</p>');
-                info.append('<p><b>Subtitle:</b> '+score.subtitle+'</p>');
-                info.append('<p><b>Album:</b> '+score.album+'</p>');
-                info.append('<p><b>Tempo:</b> '+score.tempo+'</p>');
-                info.append('<p><b>Bars:</b> '+score.masterBars.length+'</p>');
-                info.append('<p><b>Tracks:</b> ('+score.tracks.length+')</p>');
-                var tracks = $('<ul></ul>');
-                for(var i = 0; i < score.tracks.length; i++) {
-                    tracks.append('<li>'+score.tracks[i].name+'</li>');
-                }
-                info.append(tracks);
-            },
-            function(error) {
-                jQuery('#alphaTabScore').text('Error Loading the file: ' + error);
-            });
+    <script type="text/javascript-lazy">
+        var score = alphatab.importer.ScoreLoader.loadScoreAsync($('#alphaTabScore').data('file'), 
+        function(score) {
+            var info = jQuery('#alphaTabScore');
+            info.html('');
+            info.append('<p><b>Title:</b> '+score.title+'</p>');
+            info.append('<p><b>Subtitle:</b> '+score.subtitle+'</p>');
+            info.append('<p><b>Album:</b> '+score.album+'</p>');
+            info.append('<p><b>Tempo:</b> '+score.tempo+'</p>');
+            info.append('<p><b>Bars:</b> '+score.masterBars.length+'</p>');
+            info.append('<p><b>Tracks:</b> ('+score.tracks.length+')</p>');
+            var tracks = $('<ul></ul>');
+            for(var i = 0; i < score.tracks.length; i++) {
+                tracks.append('<li>'+score.tracks[i].name+'</li>');
+            }
+            info.append(tracks);
+        },
+        function(error) {
+            jQuery('#alphaTabScore').text('Error Loading the file: ' + error);
         });
     </script>
     
@@ -89,11 +85,9 @@
     </p>
     
     <div id="alphaTabDetails" data-file="files/features/SongDetails.gp5"></div>
-    <script language="JavaScript" type="text/javascript-lazy">
-        $(document).ready(function() {
-            $('#alphaTabDetails').alphaTab({
-                staves: [] // hide content 
-            });
+    <script type="text/javascript-lazy">
+        $('#alphaTabDetails').alphaTab({
+            staves: [] // hide content 
         });
     </script>
         
@@ -104,11 +98,9 @@
     </p>
     
     <div id="alphaTabSvg" data-file="files/features/SongDetails.gp5"></div>
-    <script language="JavaScript" type="text/javascript-lazy">
-        $(document).ready(function() {
-            $('#alphaTabSvg').alphaTab({
-                engine: 'svg' 
-            });
+    <script type="text/javascript-lazy">
+        $('#alphaTabSvg').alphaTab({
+            engine: 'svg' 
         });
     </script>
     
@@ -119,11 +111,9 @@
     </p>
     
     <div id="alphaTabRepeats" data-file="files/features/Repeats.gp5"></div>
-    <script language="JavaScript" type="text/javascript-lazy">
-        $(document).ready(function() {
-            $('#alphaTabRepeats').alphaTab({
-                staves: ['score']
-            });
+    <script type="text/javascript-lazy">
+        $('#alphaTabRepeats').alphaTab({
+            staves: ['score']
         });
     </script>
 
@@ -135,11 +125,9 @@
     </p>
     
     <div id="alphaTabAlternateEndings" data-file="files/features/AlternateEndings.gp5"></div>
-    <script language="JavaScript" type="text/javascript-lazy">
-        $(document).ready(function() {
-            $('#alphaTabAlternateEndings').alphaTab({
-                staves: ['alternate-endings', 'score']
-            });
+    <script type="text/javascript-lazy">
+        $('#alphaTabAlternateEndings').alphaTab({
+            staves: ['alternate-endings', 'score']
         });
     </script>
     
@@ -150,10 +138,8 @@
     </p>
     
     <div id="alphaTabTuning" data-file="files/features/Tuning.gp5"></div>
-    <script language="JavaScript" type="text/javascript-lazy">
-        $(document).ready(function() {
-            $('#alphaTabTuning').alphaTab();
-        });
+    <script type="text/javascript-lazy">
+        $('#alphaTabTuning').alphaTab();
     </script>
 
     </div>
@@ -172,11 +158,9 @@
     </p>
     
     <div id="alphaTabPageLayout" data-file="files/features/Skillet.gp5"></div>
-    <script language="JavaScript" type="text/javascript-lazy">
-        $(document).ready(function() {
-            $('#alphaTabPageLayout').alphaTab({
-                layout: 'page'
-            });
+    <script type="text/javascript-lazy">
+        $('#alphaTabPageLayout').alphaTab({
+            layout: 'page'
         });
     </script>
     
@@ -187,13 +171,11 @@
     </p>
     
     <div id="alphaTabPageLayoutWidth" data-file="files/features/Skillet.gp5"></div>
-    <script language="JavaScript" type="text/javascript-lazy">
-        $(document).ready(function() {
-            $('#alphaTabPageLayoutWidth').alphaTab({
-                layout: 'page',
-                autoSize:false,
-                width: 1280
-            });
+    <script type="text/javascript-lazy">
+        $('#alphaTabPageLayoutWidth').alphaTab({
+            layout: 'page',
+            autoSize:false,
+            width: 1280
         });
     </script>
 
@@ -205,16 +187,14 @@
     </p>
     
     <div id="alphaTabPagePerRow" data-file="files/features/Skillet.gp5"></div>
-    <script language="JavaScript" type="text/javascript-lazy">
-        $(document).ready(function() {
-            $('#alphaTabPagePerRow').alphaTab({
-                layout: {
-                    mode: 'page',
-                    additionalSettings: {
-                        barsPerRow: 5
-                    }
+    <script type="text/javascript-lazy">
+        $('#alphaTabPagePerRow').alphaTab({
+            layout: {
+                mode: 'page',
+                additionalSettings: {
+                    barsPerRow: 5
                 }
-            });
+            }
         });
     </script>
 
@@ -225,17 +205,15 @@
     </p>
     
     <div id="alphaTabPageSubSet" data-file="files/features/Skillet.gp5"></div>
-    <script language="JavaScript" type="text/javascript-lazy">
-        $(document).ready(function() {
-            $('#alphaTabPageSubSet').alphaTab({
-                layout: {
-                    mode: 'page',
-                    additionalSettings: {
-                        start: 5,
-                        count: 4
-                    }
+    <script type="text/javascript-lazy">
+        $('#alphaTabPageSubSet').alphaTab({
+            layout: {
+                mode: 'page',
+                additionalSettings: {
+                    start: 5,
+                    count: 4
                 }
-            });
+            }
         });
     </script>
     
@@ -246,13 +224,11 @@
     </p>
     
     <div id="alphaTabHorizontal" data-file="files/features/Skillet.gp5"></div>
-    <script language="JavaScript" type="text/javascript-lazy">
-        $(document).ready(function() {
-            $('#alphaTabHorizontal').alphaTab({
-                layout: {
-                    mode: 'horizontal'
-                }
-            });
+    <script type="text/javascript-lazy">
+        $('#alphaTabHorizontal').alphaTab({
+            layout: {
+                mode: 'horizontal'
+            }
         });
     </script>
 
@@ -263,17 +239,15 @@
     </p>
     
     <div id="alphaTabHorizontalSubSet" data-file="files/features/Skillet.gp5"></div>
-    <script language="JavaScript" type="text/javascript-lazy">
-        $(document).ready(function() {
-            $('#alphaTabHorizontalSubSet').alphaTab({
-                layout: {
-                    mode: 'horizontal',
-                    additionalSettings: {
-                        start: 5,
-                        count: 4
-                    }
+    <script type="text/javascript-lazy">
+        $('#alphaTabHorizontalSubSet').alphaTab({
+            layout: {
+                mode: 'horizontal',
+                additionalSettings: {
+                    start: 5,
+                    count: 4
                 }
-            });
+            }
         });
     </script>
     </div>   
@@ -296,17 +270,15 @@
             .
             \clef G2 | \clef F4 | \clef C3 | \clef C4
         </div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabClefs').alphaTab({
-                    staves: ['score'],
-                    layout: {
-                        mode: 'page',
-                        additionalSettings: {
-                            hideInfo: true
-                        }
+        <script type="text/javascript-lazy">
+            $('#alphaTabClefs').alphaTab({
+                staves: ['score'],
+                layout: {
+                    mode: 'page',
+                    additionalSettings: {
+                        hideInfo: true
                     }
-                });
+                }
             });
         </script>
  
@@ -317,11 +289,9 @@
         </p>
 
         <div id="alphaTabKeySignatures" data-file="files/features/KeySignatures.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabKeySignatures').alphaTab({
-                    staves: ['score']
-                });
+        <script type="text/javascript-lazy">
+            $('#alphaTabKeySignatures').alphaTab({
+                staves: ['score']
             });
         </script>
 
@@ -333,11 +303,9 @@
         </p>
 
         <div id="alphaTabTimeSignatures" data-file="files/features/TimeSignatures.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabTimeSignatures').alphaTab({
-                    staves: ['score']
-                });
+        <script type="text/javascript-lazy">
+            $('#alphaTabTimeSignatures').alphaTab({
+                staves: ['score']
             });
         </script>
         
@@ -348,11 +316,9 @@
         </p>
 
         <div id="alphaTabBeams" data-file="files/features/Beams.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabBeams').alphaTab({
-                    staves: ['score']
-                });
+        <script type="text/javascript-lazy">
+            $('#alphaTabBeams').alphaTab({
+                staves: ['score']
             });
         </script>
         
@@ -363,11 +329,9 @@
         </p>
 
         <div id="alphaTabAccidentals" data-file="files/features/Accidentals.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabAccidentals').alphaTab({
-                    staves: ['score']
-                });
+        <script type="text/javascript-lazy">
+            $('#alphaTabAccidentals').alphaTab({
+                staves: ['score']
             });
         </script>
 
@@ -384,11 +348,9 @@
         </p>
         
         <div id="alphaTabTabs" data-file="files/features/Tabs.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabTabs').alphaTab({
-                    staves: ['tab']
-                });
+        <script type="text/javascript-lazy">
+            $('#alphaTabTabs').alphaTab({
+                staves: ['tab']
             });
         </script>
         
@@ -405,10 +367,8 @@
         </p>
         
         <div id="alphaTabTied" data-file="files/features/TiedNotes.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabTied').alphaTab();
-            });
+        <script type="text/javascript-lazy">
+            $('#alphaTabTied').alphaTab();
         </script>  
         
         <h2>Grace Notes</h2>
@@ -418,10 +378,8 @@
         </p>
         
         <div id="alphaTabGrace" data-file="files/features/GraceNotes.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabGrace').alphaTab();
-            });
+        <script type="text/javascript-lazy">
+            $('#alphaTabGrace').alphaTab();
         </script>  
         
         <h2>Dead Notes</h2>
@@ -432,10 +390,8 @@
         </p>
         
         <div id="alphaTabDead" data-file="files/features/DeadNotes.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabDead').alphaTab();
-            });
+        <script type="text/javascript-lazy">
+            $('#alphaTabDead').alphaTab();
         </script>  
         
         <h2>Ghost Notes</h2>
@@ -445,10 +401,8 @@
         </p>
         
         <div id="alphaTabGhost" data-file="files/features/GhostNotes.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabGhost').alphaTab();
-            });
+        <script type="text/javascript-lazy">
+            $('#alphaTabGhost').alphaTab();
         </script>       
     </div>
     
@@ -461,10 +415,8 @@
             Markers are a nice element to annotate different sections of the song. 
         </p>
         <div id="alphaTabMarkers" data-file="files/features/Markers.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabMarkers').alphaTab();
-            });
+        <script type="text/javascript-lazy">
+            $('#alphaTabMarkers').alphaTab();
         </script>
         
         <h2>Tempo</h2>
@@ -474,10 +426,8 @@
         </p>
         
         <div id="alphaTabTempo" data-file="files/features/Tempo.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabTempo').alphaTab();
-            });
+        <script type="text/javascript-lazy">
+            $('#alphaTabTempo').alphaTab();
         </script>
         
         <h2>Text</h2>
@@ -487,10 +437,8 @@
         </p>
         
         <div id="alphaTabText" data-file="files/features/Text.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabText').alphaTab();
-            });
+        <script type="text/javascript-lazy">
+            $('#alphaTabText').alphaTab();
         </script>
 
         <h2>Chords</h2>
@@ -500,10 +448,8 @@
         </p>
         
         <div id="alphaTabChords" data-file="files/features/Chords.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabChords').alphaTab();
-            });
+        <script type="text/javascript-lazy">
+            $('#alphaTabChords').alphaTab();
         </script>
         
         <h2>Vibrato</h2>
@@ -513,10 +459,8 @@
         </p>
         
         <div id="alphaTabVibrato" data-file="files/features/Vibrato.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabVibrato').alphaTab();
-            });
+        <script type="text/javascript-lazy">
+            $('#alphaTabVibrato').alphaTab();
         </script>
         
         <h2>Dynamics</h2>
@@ -526,10 +470,8 @@
         </p>
         
         <div id="alphaTabDynamics" data-file="files/features/Dynamics.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabDynamics').alphaTab();
-            });
+        <script type="text/javascript-lazy">
+            $('#alphaTabDynamics').alphaTab();
         </script>   
         
         <h2>Tap/Slap/Pop</h2>
@@ -539,10 +481,8 @@
         </p>
                 
         <div id="alphaTabTap" data-file="files/features/Tap.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabTap').alphaTab();
-            });
+        <script type="text/javascript-lazy">
+            $('#alphaTabTap').alphaTab();
         </script>   
         
         <h2>Fade-In</h2>
@@ -553,10 +493,8 @@
         </p>
         
         <div id="alphaTabFadeIn" data-file="files/features/FadeIn.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabFadeIn').alphaTab();
-            });
+        <script type="text/javascript-lazy">
+            $('#alphaTabFadeIn').alphaTab();
         </script>   
         
         <h2>Let Ring</h2>
@@ -566,10 +504,8 @@
         </p>
                 
         <div id="alphaTabLetRing" data-file="files/features/LetRing.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabLetRing').alphaTab();
-            });
+        <script type="text/javascript-lazy">
+            $('#alphaTabLetRing').alphaTab();
         </script>  
         
         <h2>Palm Mute</h2>
@@ -579,10 +515,8 @@
         </p>
                 
         <div id="alphaTabPalmMute" data-file="files/features/PalmMute.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabPalmMute').alphaTab();
-            });
+        <script type="text/javascript-lazy">
+            $('#alphaTabPalmMute').alphaTab();
         </script>       
         
         <h2>String Bends</h2>
@@ -592,10 +526,8 @@
         </p>
         
         <div id="alphaTabBends" data-file="files/features/Bends.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabBends').alphaTab();
-            });
+        <script type="text/javascript-lazy">
+            $('#alphaTabBends').alphaTab();
         </script>         
         
         <h2>Whammy Bar</h2>
@@ -606,10 +538,8 @@
         </p>
         
         <div id="alphaTabTremoloBar" data-file="files/features/TremoloBar.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabTremoloBar').alphaTab();
-            });
+        <script type="text/javascript-lazy">
+            $('#alphaTabTremoloBar').alphaTab();
         </script>  
                 
         <h2>Tremolo Picking</h2>
@@ -619,10 +549,8 @@
         </p>
         
         <div id="alphaTabTremoloPicking" data-file="files/features/TremoloPicking.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
+        <script type="text/javascript-lazy">
                 $('#alphaTabTremoloPicking').alphaTab();
-            });
         </script>  
                 
         <h2>Brush Strokes</h2>
@@ -632,10 +560,8 @@
         </p>
         
         <div id="alphaTabBrushes" data-file="files/features/Brush.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabBrushes').alphaTab();
-            });
+        <script type="text/javascript-lazy">
+            $('#alphaTabBrushes').alphaTab();
         </script>  
         
         <h2>Slides</h2>
@@ -645,10 +571,8 @@
         </p>
         
         <div id="alphaTabSlides" data-file="files/features/Slides.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabSlides').alphaTab();
-            });
+        <script type="text/javascript-lazy">
+            $('#alphaTabSlides').alphaTab();
         </script>    
         
         <h2>Trill</h2>
@@ -658,10 +582,8 @@
         </p>
         
         <div id="alphaTabTrill" data-file="files/features/Trill.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabTrill').alphaTab();
-            });
+        <script type="text/javascript-lazy">
+            $('#alphaTabTrill').alphaTab();
         </script>   
         
         <h2>Pick Stroke</h2>
@@ -671,10 +593,8 @@
         </p>
         
         <div id="alphaTabPickStroke" data-file="files/features/PickStroke.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabPickStroke').alphaTab();
-            });
+        <script type="text/javascript-lazy">
+            $('#alphaTabPickStroke').alphaTab();
         </script>   
         
         
@@ -685,10 +605,8 @@
         </p>
         
         <div id="alphaTabTuplets" data-file="files/features/Tuplets.gp5"></div>
-        <script language="JavaScript" type="text/javascript-lazy">
-            $(document).ready(function() {
-                $('#alphaTabTuplets').alphaTab();
-            });
+        <script type="text/javascript-lazy">
+            $('#alphaTabTuplets').alphaTab();
         </script>   
         
         

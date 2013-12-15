@@ -105,7 +105,7 @@ class Environment
         
         // default staves 
         staveFactories.set("marker", function(l) { return new EffectBarRendererFactory(new MarkerEffectInfo()); } );
-        staveFactories.set("triplet-feel", function(l) { return new EffectBarRendererFactory(new TripletFeelEffectInfo()); });
+        // staveFactories.set("triplet-feel", function(l) { return new EffectBarRendererFactory(new TripletFeelEffectInfo()); });
         staveFactories.set("tempo", function(l) { return new EffectBarRendererFactory(new TempoEffectInfo()); }); 
         staveFactories.set("text", function(l) { return new EffectBarRendererFactory(new TextEffectInfo()); }); 
         staveFactories.set("chords", function(l) { return new EffectBarRendererFactory(new ChordsEffectInfo()); }); 

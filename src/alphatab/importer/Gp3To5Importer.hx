@@ -649,11 +649,6 @@ class Gp3To5Importer extends ScoreImporter
             i--;
         }
         
-        if (newBeat.dynamicValue == null)
-        {
-            newBeat.dynamicValue = DynamicValue.F;
-        }
-        
         if (_versionNumber >= 500)
         {
             readUInt8();
@@ -1058,14 +1053,7 @@ class Gp3To5Importer extends ScoreImporter
         {
             var dynamicNumber = _data.readInt8();
             newNote.dynamicValue = toDynamicValue(dynamicNumber);
-            if (beat.dynamicValue == null)
-            {
-                beat.dynamicValue = newNote.dynamicValue;
-            }
-        }
-        if (beat.dynamicValue == null)
-        {
-            beat.dynamicValue = DynamicValue.F;
+            beat.dynamicValue = newNote.dynamicValue;
         }
         
         if ( (flags & 0x20) != 0)

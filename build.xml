@@ -14,7 +14,64 @@
 	<property name="bin" location="bin"/>
 	<property name="src" location="src"/>
 	<property name="test" location="test"/>
+	<property name="api" location="api"/>
 
+    <!--*************************************************************************
+        Building Docs
+    **************************************************************************-->
+
+	<!-- Haxe Builds -->
+	<target name="api">
+		<delete file="${api}" />
+		<mkdir dir="${api}" />
+		<!-- Build XMLs -->
+        <exec executable="haxe" failonerror="true">
+            <arg value="-cp" />
+            <arg value="${src}"/>
+            
+            <arg value="-main" />
+            <arg value="alphatab.Main" />
+            
+            <arg value="-js" />
+            <arg value="${api}/all.js" />
+			
+			<arg value="-xml" />
+			<arg value="${api}/js.xml" />
+        </exec>
+        <exec executable="haxe" failonerror="true">
+            <arg value="-cp" />
+            <arg value="${src}"/>
+            
+            <arg value="-main" />
+            <arg value="alphatab.Main" />
+            
+            <arg value="-cs" />
+            <arg value="${api}/all.cs" />
+			
+			<arg value="-xml" />
+			<arg value="${api}/cs.xml" />
+			
+			<arg value="-D" />
+			<arg value="no-compilation" />
+        </exec>
+		<delete file="${api}/all.js" />
+		<delete dir="${api}/all.cs" />
+        <exec executable="haxelib" failonerror="true">
+            <arg value="run" />
+            <arg value="dox"/>
+            
+            <arg value="-r" />
+            <arg value="/" />
+            
+            <arg value="-o" />
+            <arg value="${api}/pages" />
+			
+			<arg value="-i" />
+			<arg value="${api}" />
+        </exec>
+
+	</target>
+	
     <!--*************************************************************************
         Building JavaScript
     **************************************************************************-->

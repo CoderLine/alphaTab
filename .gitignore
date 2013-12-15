@@ -1,6 +1,7 @@
 # dirs
 /bin/cs
 /tmp
+/api
 /tools/fontconverter/font/*
 /tools/gpx-decompress/test/*
 /tools/gpx-decompress/bin/*
