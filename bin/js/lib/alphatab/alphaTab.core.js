@@ -513,10 +513,23 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 		if(includeWrapper) stream.writeString("</svg>");
 	}
 	,toSvg: function(includeWrapper,className) {
-		var out = new haxe.io.BytesOutput();
-		this.writeTo(out,includeWrapper,className);
-		out.flush();
-		return out.getBytes().toString();
+		var buf = new StringBuf();
+		if(includeWrapper) {
+			buf.b += "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"";
+			buf.b += Std.string(this._width);
+			buf.b += "px\" height=\"";
+			buf.b += Std.string(this._height);
+			buf.b += "px\"";
+			if(className != null) {
+				buf.b += " class=\"";
+				buf.b += Std.string(className);
+				buf.b += "\"";
+			}
+			buf.b += ">\n";
+		}
+		buf.b += Std.string(this._buffer.b);
+		if(includeWrapper) buf.b += "</svg>";
+		return buf.b;
 	}
 	,getWidth: function() {
 		return this._width;
@@ -9133,13 +9146,14 @@ alphatab.rendering.glyphs.ScoreNoteChordGlyph.prototype = $extend(alphatab.rende
 			effectY += effectSpacing;
 		}
 		canvas.setColor(this.renderer.stave.staveGroup.layout.renderer.renderingResources.staveLineColor);
+		var linePadding = 3 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 		if(this.hasTopOverflow()) {
 			var l = -1;
 			while(l >= this.minNote.line) {
 				var lY = cy + this.y + scoreRenderer.getScoreY(l + 1,-1);
 				canvas.beginPath();
-				canvas.moveTo(cx + this.x,lY);
-				canvas.lineTo(cx + this.x + this.width,lY);
+				canvas.moveTo(cx + this.x - linePadding,lY);
+				canvas.lineTo(cx + this.x + this.width + linePadding,lY);
 				canvas.stroke();
 				l -= 2;
 			}
@@ -9149,8 +9163,8 @@ alphatab.rendering.glyphs.ScoreNoteChordGlyph.prototype = $extend(alphatab.rende
 			while(l <= this.maxNote.line) {
 				var lY = cy + this.y + scoreRenderer.getScoreY(l + 1,-1);
 				canvas.beginPath();
-				canvas.moveTo(cx + this.x,lY);
-				canvas.lineTo(cx + this.x + this.width,lY);
+				canvas.moveTo(cx + this.x - linePadding,lY);
+				canvas.lineTo(cx + this.x + this.width + linePadding,lY);
 				canvas.stroke();
 				l += 2;
 			}
@@ -11088,8 +11102,6 @@ haxe.io.Output.prototype = {
 		}
 		return len;
 	}
-	,flush: function() {
-	}
 	,writeFullBytes: function(s,pos,len) {
 		while(len > 0) {
 			var k = this.writeBytes(s,pos,len);
@@ -11103,33 +11115,6 @@ haxe.io.Output.prototype = {
 	}
 	,__class__: haxe.io.Output
 };
-haxe.io.BytesOutput = function() {
-	this.b = new haxe.io.BytesBuffer();
-};
-haxe.io.BytesOutput.__name__ = true;
-haxe.io.BytesOutput.__super__ = haxe.io.Output;
-haxe.io.BytesOutput.prototype = $extend(haxe.io.Output.prototype,{
-	writeByte: function(c) {
-		this.b.b.push(c);
-	}
-	,writeBytes: function(buf,pos,len) {
-		var _this = this.b;
-		if(pos < 0 || len < 0 || pos + len > buf.length) throw haxe.io.Error.OutsideBounds;
-		var b1 = _this.b;
-		var b2 = buf.b;
-		var _g1 = pos;
-		var _g = pos + len;
-		while(_g1 < _g) {
-			var i = _g1++;
-			_this.b.push(b2[i]);
-		}
-		return len;
-	}
-	,getBytes: function() {
-		return this.b.getBytes();
-	}
-	,__class__: haxe.io.BytesOutput
-});
 haxe.io.Eof = function() {
 };
 haxe.io.Eof.__name__ = true;

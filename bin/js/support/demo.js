@@ -22,7 +22,10 @@ function showGroup(groupId) {
         $("html, body").animate({ scrollTop: 0 }, 400);
         
         $('script[type="text/javascript-lazy"]', group).each(function() {
-            eval($(this).text());
+            if(!$(this).data('run')) {
+                eval($(this).text());
+                $(this).data('run',true);
+            }
         });
     }    
 }

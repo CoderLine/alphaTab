@@ -118,10 +118,8 @@
                 {
                     context.renderer.addRenderFinishedListener(function() 
                     {
-                        context.canvas.children().remove(); // remove old svg 
                         var canvas = context.renderer.canvas;
-                        var svgElement = $(canvas.toSvg(true, "alphaTabSurface"));
-                        context.canvas.append(svgElement);
+                        context.canvas[0].innerHTML = canvas.toSvg(true, "alphaTabSurface");
                     });
                 }
                 

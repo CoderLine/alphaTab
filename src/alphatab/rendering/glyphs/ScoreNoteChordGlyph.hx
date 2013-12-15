@@ -246,6 +246,7 @@ class ScoreNoteChordGlyph extends Glyph
 
         // TODO: Take care of beateffects in overflow
         
+        var linePadding = Std.int(3 * getScale());
         if (hasTopOverflow()) 
         {
             var l = -1;
@@ -254,8 +255,8 @@ class ScoreNoteChordGlyph extends Glyph
                 // + 1 Because we want to place the line in the center of the note, not at the top
                 var lY = cy + y + scoreRenderer.getScoreY(l + 1, -1);
                 canvas.beginPath();
-                canvas.moveTo(cx + x, lY);
-                canvas.lineTo(cx + x + width, lY);
+                canvas.moveTo(cx + x - linePadding, lY);
+                canvas.lineTo(cx + x + width + linePadding, lY);
                 canvas.stroke();
                 l -= 2;
             }
@@ -268,8 +269,8 @@ class ScoreNoteChordGlyph extends Glyph
             {
                 var lY = cy + y + scoreRenderer.getScoreY(l + 1, -1);
                 canvas.beginPath();
-                canvas.moveTo(cx + x, lY);
-                canvas.lineTo(cx + x + width, lY);
+                canvas.moveTo(cx + x - linePadding, lY);
+                canvas.lineTo(cx + x + width + linePadding, lY);
                 canvas.stroke();
                 l += 2;
             }

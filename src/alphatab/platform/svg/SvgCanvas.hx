@@ -79,10 +79,28 @@ class SvgCanvas implements ICanvas
     
     public function toSvg(includeWrapper:Bool, className:String = null) : String
     {
-        var out:BytesOutput = new BytesOutput();
-        writeTo(out, includeWrapper, className);
-        out.flush();
-        return out.getBytes().toString();       
+        var buf:StringBuf = new StringBuf();
+        if (includeWrapper) 
+        {
+            buf.add('<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="');
+            buf.add(_width);
+            buf.add('px" height="');
+            buf.add(_height);
+            buf.add('px"');
+            if (className != null) 
+            {
+                buf.add(' class="');
+                buf.add(className);
+                buf.add('"');
+            }
+            buf.add('>\n');
+        }
+        buf.add(_buffer.toString());
+        if (includeWrapper) 
+        {
+            buf.add('</svg>'); 
+        }       
+        return buf.toString();
     }
     
     public function getWidth():Int 
