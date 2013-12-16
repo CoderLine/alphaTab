@@ -148,7 +148,7 @@ extern class CsWpfCanvas extends FrameworkElement
     public static function SetLeft(element:UIElement, length:Float):Void;
 }
 
-@:native("AlphaTab2.Utils.AlignmentHelper")
+@:native("AlphaTab.Utils.AlignmentHelper")
 @:nativeGen
 extern extern class AlignmentHelper 
 {
@@ -156,7 +156,7 @@ extern extern class AlignmentHelper
     public static function SetLineAlignment(element:UIElement, alignment:TextBaseline):Void;
 }
 
-@:native("AlphaTab2.Utils.MeasureUtil")
+@:native("AlphaTab.Utils.MeasureUtil")
 @:nativeGen
 extern extern class MeasureUtil 
 {

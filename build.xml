@@ -102,11 +102,13 @@
         Building C#
     **************************************************************************-->
     
-    <property name="haxe-cs" location="${bin}/cs"/>
+    <property name="haxe-cs" location="${bin}/cs/"/>
+    <property name="haxe-cs-core" location="${haxe-cs}/AlphaTab.Core"/>
     
 	<!-- Haxe Builds -->
 	<target name="cs">
-		<delete dir="${haxe-cs}" />
+		<mkdir dir="${haxe-cs}" />
+		<delete dir="${haxe-cs-core}/src" />
         <exec executable="haxe" failonerror="true">
             <arg value="-cp" />
             <arg value="${src}"/>
@@ -120,14 +122,11 @@
             <arg value="-D" />
             <arg value="no-root" />
             
-            <arg value="-D" />
-            <arg value="wpf" />
-            
             <arg value="-main" />
             <arg value="alphatab.Main" />
             
             <arg value="-cs" />
-            <arg value="${haxe-cs}" />
+            <arg value="${haxe-cs-core}" />
         </exec>
 	</target>	
 

@@ -23,7 +23,7 @@ function showGroup(groupId) {
         
         $('script[type="text/javascript-lazy"]', group).each(function() {
             if(!$(this).data('run')) {
-                eval($(this).text());
+                eval($(this).html());
                 $(this).data('run',true);
             }
         });

@@ -71,10 +71,8 @@ class Environment
         renderEngines.set("default", function(d) { 
             #if js
             return new alphatab.platform.js.Html5Canvas(d);
-            #elseif (cs && gdi)
+            #elseif cs
             return new alphatab.platform.cs.GdiCanvas();
-            #elseif (cs && wpf)
-            return new alphatab.platform.cs.WpfCanvas(d);
             #else
             return new alphatab.platform.svg.SvgCanvas();
             #end
