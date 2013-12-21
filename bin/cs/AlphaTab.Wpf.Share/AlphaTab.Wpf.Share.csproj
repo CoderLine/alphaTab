@@ -52,11 +52,15 @@
     <Compile Include="Converter\BoolToBrushConverter.cs" />
     <Compile Include="Data\ErrorService.cs" />
     <Compile Include="Data\IErrorService.cs" />
-    <Compile Include="Data\IIOService.cs" />
-    <Compile Include="Data\IOService.cs" />
+    <Compile Include="Data\IDialogService.cs" />
+    <Compile Include="Data\DialogService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ScoreInfoWindow.xaml.cs">
+      <DependentUpon>ScoreInfoWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Utils\RelayCommand.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
+    <Compile Include="ViewModel\ScoreInfoViewModel.cs" />
     <Compile Include="ViewModel\TrackViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -68,6 +72,12 @@
       <Project>{A3A01A41-EE58-4C99-867B-D88D2512F72F}</Project>
       <Name>AlphaTab.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="ScoreInfoWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -223,6 +223,8 @@ extern class Pen implements IDisposable
 class GdiCanvas implements ICanvas
 {    
     private var _image:Bitmap;
+    private var _width:Int;
+    private var _height:Int;
     private var _graphics:Graphics;
     
     private var _currentPath:GraphicsPath;
@@ -232,6 +234,8 @@ class GdiCanvas implements ICanvas
 
     public function new() 
     {
+        _width = 1;
+        _height = 1;
         _image = new Bitmap(1, 1, PixelFormat.Format32bppArgb);
         _graphics = Graphics.FromImage(_image);
         _graphics.SmoothingMode = SmoothingMode.HighQuality;
@@ -250,22 +254,24 @@ class GdiCanvas implements ICanvas
 
     public function getWidth():Int 
     {
-        return _image.Width; 
+        return _width; 
     }
     
     public function getHeight():Int 
     {
-        return _image.Height;
+        return _height;
     }
     
     public function setWidth(width:Int):Void 
     {
-        recreateImage(width, _image.Height);
+        _width = width;
+        recreateImage();
     }
     
     public function setHeight(height:Int):Void 
     {
-        recreateImage(_image.Width, height);
+        _height = height;
+        recreateImage();
     } 
     
     public function getImage() : Bitmap
@@ -279,9 +285,9 @@ class GdiCanvas implements ICanvas
         return _image;
     }
     
-    private function recreateImage(width:Int, height:Int) : Void
+    private function recreateImage() : Void
     {
-        var newImage = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+        var newImage = new Bitmap(_width, _height, PixelFormat.Format32bppArgb);
         var newGraphics = Graphics.FromImage(newImage);
         newGraphics.SmoothingMode = SmoothingMode.HighQuality;
         newGraphics.TextRenderingHint = TextRenderingHint.AntiAlias;

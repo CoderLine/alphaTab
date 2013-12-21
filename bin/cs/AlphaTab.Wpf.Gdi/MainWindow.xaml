@@ -15,8 +15,11 @@
 
         <ToolBarTray Background="#4b4c4c">
             <controls:ToolBarCustom ToolBarTray.IsLocked="True" Background="#4b4c4c">
-                <Button Command="{Binding OpenFileCommand}" ToolTip="Open File">
+                <Button Command="{Binding OpenFileCommand}" ToolTip="Open File" Style="{StaticResource ToolbarButtonStyle}">
                     <Image Source="Images\32\folder_page_white.png" Width="24" Height="24" />
+                </Button>
+                <Button Command="{Binding ShowScoreInfoCommand}" ToolTip="Show Score Info" Style="{StaticResource ToolbarButtonStyle}">
+                    <Image Source="Images\32\information.png" Width="24" Height="24" />
                 </Button>
             </controls:ToolBarCustom>
         </ToolBarTray>

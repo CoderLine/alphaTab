@@ -2570,21 +2570,13 @@ alphatab.importer.AlphaTexImporter.prototype = $extend(alphatab.importer.ScoreIm
 	,parseClef: function(str) {
 		var _g = str.toLowerCase();
 		switch(_g) {
-		case "g2":
+		case "g2":case "treble":
 			return alphatab.model.Clef.G2;
-		case "treble":
-			return alphatab.model.Clef.G2;
-		case "f4":
+		case "f4":case "bass":
 			return alphatab.model.Clef.F4;
-		case "bass":
-			return alphatab.model.Clef.F4;
-		case "c3":
+		case "c3":case "tenor":
 			return alphatab.model.Clef.C3;
-		case "tenor":
-			return alphatab.model.Clef.C3;
-		case "c4":
-			return alphatab.model.Clef.C4;
-		case "alto":
+		case "c4":case "alto":
 			return alphatab.model.Clef.C4;
 		default:
 			return alphatab.model.Clef.G2;
@@ -2978,7 +2970,7 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 			newTrack.playbackInfo = info;
 		}
 		newTrack.capo = this.readInt32();
-		this._data.read(4);
+		newTrack.color = this.readColor();
 		if(this._versionNumber >= 500) {
 			this._data.readByte();
 			this._data.readByte();
@@ -3074,35 +3066,13 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 			case 3:
 				newBeat.tupletDenominator = 2;
 				break;
-			case 5:
+			case 5:case 6:case 7:
 				newBeat.tupletDenominator = 4;
 				break;
-			case 6:
-				newBeat.tupletDenominator = 4;
-				break;
-			case 7:
-				newBeat.tupletDenominator = 4;
-				break;
-			case 9:
+			case 9:case 10:case 11:case 12:case 13:
 				newBeat.tupletDenominator = 8;
 				break;
-			case 10:
-				newBeat.tupletDenominator = 8;
-				break;
-			case 11:
-				newBeat.tupletDenominator = 8;
-				break;
-			case 12:
-				newBeat.tupletDenominator = 8;
-				break;
-			case 13:
-				newBeat.tupletDenominator = 8;
-				break;
-			case 2:
-				break;
-			case 4:
-				break;
-			case 8:
+			case 2:case 4:case 8:
 				break;
 			default:
 				newBeat.tupletNumerator = 1;
@@ -3603,35 +3573,15 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 			return 2.4;
 		case 3:
 			return 3.2;
-		case 4:
-			return deltaFret;
-		case 5:
-			return deltaFret;
-		case 7:
-			return deltaFret;
-		case 9:
-			return deltaFret;
-		case 12:
-			return deltaFret;
-		case 16:
-			return deltaFret;
-		case 17:
-			return deltaFret;
-		case 19:
-			return deltaFret;
-		case 24:
+		case 4:case 5:case 7:case 9:case 12:case 16:case 17:case 19:case 24:
 			return deltaFret;
 		case 8:
 			return 8.2;
 		case 10:
 			return 9.6;
-		case 14:
+		case 14:case 15:
 			return 14.7;
-		case 15:
-			return 14.7;
-		case 21:
-			return 21.7;
-		case 22:
+		case 21:case 22:
 			return 21.7;
 		default:
 			return 12;
@@ -3668,10 +3618,11 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 		return sig;
 	}
 	,readColor: function() {
-		this._data.readByte();
-		this._data.readByte();
-		this._data.readByte();
-		this._data.readByte();
+		var r = this._data.readByte();
+		var g = this._data.readByte();
+		var b = this._data.readByte();
+		this._data.read(1);
+		return new alphatab.platform.model.Color(r,g,b);
 	}
 	,readBool: function() {
 		return this._data.readByte() != 0;
@@ -5781,6 +5732,7 @@ alphatab.model.Track = function() {
 	this.bars = new Array();
 	this.chords = new haxe.ds.StringMap();
 	this.playbackInfo = new alphatab.model.PlaybackInformation();
+	this.color = new alphatab.platform.model.Color(200,0,0);
 };
 alphatab.model.Track.__name__ = true;
 alphatab.model.Track.prototype = {
@@ -6518,99 +6470,14 @@ alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.Grou
 	}
 	,createOrResizeGlyph: function(sizing,b) {
 		switch(sizing[1]) {
-		case 0:
+		case 0:case 1:case 2:case 3:case 4:case 5:
 			var g = this._info.createNewGlyph(this,b);
 			g.renderer = this;
 			g.doLayout();
 			this._effectGlyphs[b.voice.index].set(b.index,g);
 			this._uniqueEffectGlyphs[b.voice.index].push(g);
 			break;
-		case 1:
-			var g = this._info.createNewGlyph(this,b);
-			g.renderer = this;
-			g.doLayout();
-			this._effectGlyphs[b.voice.index].set(b.index,g);
-			this._uniqueEffectGlyphs[b.voice.index].push(g);
-			break;
-		case 2:
-			var g = this._info.createNewGlyph(this,b);
-			g.renderer = this;
-			g.doLayout();
-			this._effectGlyphs[b.voice.index].set(b.index,g);
-			this._uniqueEffectGlyphs[b.voice.index].push(g);
-			break;
-		case 3:
-			var g = this._info.createNewGlyph(this,b);
-			g.renderer = this;
-			g.doLayout();
-			this._effectGlyphs[b.voice.index].set(b.index,g);
-			this._uniqueEffectGlyphs[b.voice.index].push(g);
-			break;
-		case 4:
-			var g = this._info.createNewGlyph(this,b);
-			g.renderer = this;
-			g.doLayout();
-			this._effectGlyphs[b.voice.index].set(b.index,g);
-			this._uniqueEffectGlyphs[b.voice.index].push(g);
-			break;
-		case 5:
-			var g = this._info.createNewGlyph(this,b);
-			g.renderer = this;
-			g.doLayout();
-			this._effectGlyphs[b.voice.index].set(b.index,g);
-			this._uniqueEffectGlyphs[b.voice.index].push(g);
-			break;
-		case 6:
-			if(b.index > 0 || this.index > 0) {
-				var prevBeat = b.previousBeat;
-				if(this._info.shouldCreateGlyph(this,prevBeat)) {
-					var prevEffect;
-					if(b.index > 0) prevEffect = this._effectGlyphs[b.voice.index].get(prevBeat.index); else prevEffect = (js.Boot.__cast(this.stave.barRenderers[this.index - 1] , alphatab.rendering.EffectBarRenderer))._effectGlyphs[b.voice.index].get(prevBeat.index);
-					if(prevEffect == null || !this._info.canExpand(this,prevBeat,b)) this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b); else this._effectGlyphs[b.voice.index].set(b.index,prevEffect);
-				} else this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b);
-			} else this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b);
-			break;
-		case 7:
-			if(b.index > 0 || this.index > 0) {
-				var prevBeat = b.previousBeat;
-				if(this._info.shouldCreateGlyph(this,prevBeat)) {
-					var prevEffect;
-					if(b.index > 0) prevEffect = this._effectGlyphs[b.voice.index].get(prevBeat.index); else prevEffect = (js.Boot.__cast(this.stave.barRenderers[this.index - 1] , alphatab.rendering.EffectBarRenderer))._effectGlyphs[b.voice.index].get(prevBeat.index);
-					if(prevEffect == null || !this._info.canExpand(this,prevBeat,b)) this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b); else this._effectGlyphs[b.voice.index].set(b.index,prevEffect);
-				} else this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b);
-			} else this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b);
-			break;
-		case 8:
-			if(b.index > 0 || this.index > 0) {
-				var prevBeat = b.previousBeat;
-				if(this._info.shouldCreateGlyph(this,prevBeat)) {
-					var prevEffect;
-					if(b.index > 0) prevEffect = this._effectGlyphs[b.voice.index].get(prevBeat.index); else prevEffect = (js.Boot.__cast(this.stave.barRenderers[this.index - 1] , alphatab.rendering.EffectBarRenderer))._effectGlyphs[b.voice.index].get(prevBeat.index);
-					if(prevEffect == null || !this._info.canExpand(this,prevBeat,b)) this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b); else this._effectGlyphs[b.voice.index].set(b.index,prevEffect);
-				} else this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b);
-			} else this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b);
-			break;
-		case 9:
-			if(b.index > 0 || this.index > 0) {
-				var prevBeat = b.previousBeat;
-				if(this._info.shouldCreateGlyph(this,prevBeat)) {
-					var prevEffect;
-					if(b.index > 0) prevEffect = this._effectGlyphs[b.voice.index].get(prevBeat.index); else prevEffect = (js.Boot.__cast(this.stave.barRenderers[this.index - 1] , alphatab.rendering.EffectBarRenderer))._effectGlyphs[b.voice.index].get(prevBeat.index);
-					if(prevEffect == null || !this._info.canExpand(this,prevBeat,b)) this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b); else this._effectGlyphs[b.voice.index].set(b.index,prevEffect);
-				} else this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b);
-			} else this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b);
-			break;
-		case 10:
-			if(b.index > 0 || this.index > 0) {
-				var prevBeat = b.previousBeat;
-				if(this._info.shouldCreateGlyph(this,prevBeat)) {
-					var prevEffect;
-					if(b.index > 0) prevEffect = this._effectGlyphs[b.voice.index].get(prevBeat.index); else prevEffect = (js.Boot.__cast(this.stave.barRenderers[this.index - 1] , alphatab.rendering.EffectBarRenderer))._effectGlyphs[b.voice.index].get(prevBeat.index);
-					if(prevEffect == null || !this._info.canExpand(this,prevBeat,b)) this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b); else this._effectGlyphs[b.voice.index].set(b.index,prevEffect);
-				} else this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b);
-			} else this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b);
-			break;
-		case 11:
+		case 6:case 7:case 8:case 9:case 10:case 11:
 			if(b.index > 0 || this.index > 0) {
 				var prevBeat = b.previousBeat;
 				if(this._info.shouldCreateGlyph(this,prevBeat)) {
@@ -7646,10 +7513,7 @@ alphatab.rendering.glyphs.SvgGlyph.prototype = $extend(alphatab.rendering.Glyph.
 			this._currentY += this._svg.getNumber() * this._yScale;
 			canvas.moveTo(this._currentX,this._currentY);
 			break;
-		case "Z":
-			canvas.closePath();
-			break;
-		case "z":
+		case "Z":case "z":
 			canvas.closePath();
 			break;
 		case "L":
@@ -8377,23 +8241,7 @@ alphatab.rendering.glyphs.DigitGlyph.prototype = $extend(alphatab.rendering.glyp
 	}
 	,getDigitWidth: function(digit) {
 		switch(digit) {
-		case 0:
-			return 14;
-		case 2:
-			return 14;
-		case 3:
-			return 14;
-		case 4:
-			return 14;
-		case 5:
-			return 14;
-		case 6:
-			return 14;
-		case 7:
-			return 14;
-		case 8:
-			return 14;
-		case 9:
+		case 0:case 2:case 3:case 4:case 5:case 6:case 7:case 8:case 9:
 			return 14;
 		case 1:
 			return 10;
@@ -8728,9 +8576,7 @@ alphatab.rendering.glyphs.RestGlyph.prototype = $extend(alphatab.rendering.glyph
 	}
 	,getRestSvg: function(duration) {
 		switch(duration[1]) {
-		case 0:
-			return alphatab.rendering.glyphs.MusicFont.RestWhole;
-		case 1:
+		case 0:case 1:
 			return alphatab.rendering.glyphs.MusicFont.RestWhole;
 		case 2:
 			return alphatab.rendering.glyphs.MusicFont.RestQuarter;
@@ -9206,18 +9052,7 @@ alphatab.rendering.glyphs.ScoreSlideLineGlyph.prototype = $extend(alphatab.rende
 		var endY;
 		var _g = this._type;
 		switch(_g[1]) {
-		case 1:
-			startX = cx + r.getNoteX(this._startNote,true) + offsetX;
-			startY = cy + r.getNoteY(this._startNote) + 4;
-			if(this._startNote.slideTarget != null) {
-				endX = cx + r.getNoteX(this._startNote.slideTarget,false) - offsetX;
-				endY = cy + r.getNoteY(this._startNote.slideTarget) + 4;
-			} else {
-				endX = cx + this._parent.x + this._parent.postNotes.x + this._parent.postNotes.width;
-				endY = startY;
-			}
-			break;
-		case 2:
+		case 1:case 2:
 			startX = cx + r.getNoteX(this._startNote,true) + offsetX;
 			startY = cy + r.getNoteY(this._startNote) + 4;
 			if(this._startNote.slideTarget != null) {
@@ -9282,18 +9117,22 @@ alphatab.rendering.glyphs.TieGlyph.paintTie = function(canvas,scale,x1,y1,x2,y2,
 	}
 	var offset = 15 * scale;
 	var size = 4 * scale;
-	var normalVector = { x : y2 - y1, y : x2 - x1};
-	var length = Math.sqrt(normalVector.x * normalVector.x + normalVector.y * normalVector.y);
-	if(down) normalVector.x *= -1; else normalVector.y *= -1;
-	normalVector.x /= length;
-	normalVector.y /= length;
-	var center = { x : (x2 + x1) / 2, y : (y2 + y1) / 2};
-	var cp1 = { x : center.x + offset * normalVector.x, y : center.y + offset * normalVector.y};
-	var cp2 = { x : center.x + (offset - size) * normalVector.x, y : center.y + (offset - size) * normalVector.y};
+	var normalVector_x = y2 - y1;
+	var normalVector_y = x2 - x1;
+	var length = Math.sqrt(normalVector_x * normalVector_x + normalVector_y * normalVector_y);
+	if(down) normalVector_x *= -1; else normalVector_y *= -1;
+	normalVector_x /= length;
+	normalVector_y /= length;
+	var center_x = (x2 + x1) / 2;
+	var center_y = (y2 + y1) / 2;
+	var cp1_x = center_x + offset * normalVector_x;
+	var cp1_y = center_y + offset * normalVector_y;
+	var cp2_x = center_x + (offset - size) * normalVector_x;
+	var cp2_y = center_y + (offset - size) * normalVector_y;
 	canvas.beginPath();
 	canvas.moveTo(x1,y1);
-	canvas.quadraticCurveTo(cp1.x,cp1.y,x2,y2);
-	canvas.quadraticCurveTo(cp2.x,cp2.y,x1,y1);
+	canvas.quadraticCurveTo(cp1_x,cp1_y,x2,y2);
+	canvas.quadraticCurveTo(cp2_x,cp2_y,x1,y1);
 	canvas.closePath();
 };
 alphatab.rendering.glyphs.TieGlyph.__super__ = alphatab.rendering.Glyph;
@@ -9703,30 +9542,7 @@ alphatab.rendering.glyphs.TabSlideLineGlyph.prototype = $extend(alphatab.renderi
 		var endY;
 		var _g = this._type;
 		switch(_g[1]) {
-		case 1:
-			var startOffsetY;
-			var endOffsetY;
-			if(this._startNote.slideTarget == null) {
-				startOffsetY = 0;
-				endOffsetY = 0;
-			} else if(this._startNote.slideTarget.fret > this._startNote.fret) {
-				startOffsetY = sizeY;
-				endOffsetY = sizeY * -1;
-			} else {
-				startOffsetY = sizeY * -1;
-				endOffsetY = sizeY;
-			}
-			startX = cx + r.getNoteX(this._startNote,true);
-			startY = cy + r.getNoteY(this._startNote) + startOffsetY;
-			if(this._startNote.slideTarget != null) {
-				endX = cx + r.getNoteX(this._startNote.slideTarget,false);
-				endY = cy + r.getNoteY(this._startNote.slideTarget) + endOffsetY;
-			} else {
-				endX = cx + this._parent.x + this._parent.postNotes.x + this._parent.postNotes.width;
-				endY = startY;
-			}
-			break;
-		case 2:
+		case 1:case 2:
 			var startOffsetY;
 			var endOffsetY;
 			if(this._startNote.slideTarget == null) {
@@ -10690,11 +10506,7 @@ alphatab.rendering.utils.BeamingHelper.calculateDivision = function(b,l) {
 };
 alphatab.rendering.utils.BeamingHelper.canJoinDuration = function(d) {
 	switch(d[1]) {
-	case 0:
-		return false;
-	case 1:
-		return false;
-	case 2:
+	case 0:case 1:case 2:
 		return false;
 	default:
 		return true;
@@ -11158,13 +10970,7 @@ haxe.xml.Parser.doParse = function(str,p,parent) {
 		switch(state) {
 		case 0:
 			switch(c) {
-			case 10:
-				break;
-			case 13:
-				break;
-			case 9:
-				break;
-			case 32:
+			case 10:case 13:case 9:case 32:
 				break;
 			default:
 				state = next;
@@ -11294,11 +11100,7 @@ haxe.xml.Parser.doParse = function(str,p,parent) {
 			break;
 		case 7:
 			switch(c) {
-			case 34:
-				state = 8;
-				start = p;
-				break;
-			case 39:
+			case 34:case 39:
 				state = 8;
 				start = p;
 				break;

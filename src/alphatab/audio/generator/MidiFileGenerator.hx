@@ -45,23 +45,33 @@ import alphatab.model.Voice;
 class MidiFileGenerator
 {
     private var _score:Score;
-    private var _midiFile:MidiFile;
-    private var _handler:MidiFileHandler;
+    private var _handler:IMidiFileHandler;
     private var _currentTempo:Int;
+    private var _metronomeTrack:Int;
     
-    public function new(score:Score) 
+    public function new(score:Score, handler:IMidiFileHandler, metronomeTrack:Int) 
     {
         _score = score;
         _currentTempo = _score.tempo;
-        _midiFile = new MidiFile();
-        _handler = new MidiFileHandler(_midiFile);
+        _handler = handler;
+        _metronomeTrack = metronomeTrack;
+    }
+    
+    public static function generateMidiFile(score:Score) : MidiFile
+    {
+        var midiFile =  new MidiFile();
         // create score tracks + infotrack + metronometrack
-        for (i in 0 ... _score.tracks.length + 2)
+        for (i in 0 ... score.tracks.length + 2)
         {
-            _midiFile.createTrack();
+            midiFile.createTrack();
         }
-        _midiFile.infoTrack = _midiFile.tracks.length - 2;
-        _midiFile.metronomeTrack = _midiFile.tracks.length - 1;
+        midiFile.infoTrack = midiFile.tracks.length - 2;
+        midiFile.metronomeTrack = midiFile.tracks.length - 1;
+
+        var handler = new MidiFileHandler(midiFile);
+        var generator = new MidiFileGenerator(score, handler, midiFile.metronomeTrack);
+        generator.generate();
+        return midiFile;
     }
     
     public function generate()
@@ -82,17 +92,16 @@ class MidiFileGenerator
             
             if (controller.shouldPlay)
             {
-                generateMasterBar(_score.masterBars[controller.index], previousMasterBar, controller.repeatMove);
+                generateMasterBar(_score.masterBars[index], previousMasterBar, controller.repeatMove);
                 
                 for (track in _score.tracks)
                 {
-                    generateBar(track.bars[controller.index], controller.repeatMove);
+                    generateBar(track.bars[index], controller.repeatMove);
                 }
             }
             
-            previousMasterBar = _score.masterBars[controller.index];
+            previousMasterBar = _score.masterBars[index];
         }
-        return _midiFile;
     }
     
     //
@@ -147,7 +156,7 @@ class MidiFileGenerator
         var length = MidiUtils.valueToTicks(masterBar.timeSignatureDenominator);
         for (i in 0 ... masterBar.timeSignatureNumerator)
         {
-            _handler.addNote(_midiFile.metronomeTrack, start, length, MidiFileHandler.DefaultMetronomeKey, DynamicValue.F, MidiUtils.PercussionChannel);
+            _handler.addNote(_metronomeTrack, start, length, MidiFileHandler.DefaultMetronomeKey, DynamicValue.F, MidiUtils.PercussionChannel);
             start += length;
         }
     }
@@ -314,7 +323,7 @@ class MidiFileGenerator
             // then we increase our duration as well
             if (letRing && !letRingApplied && !letRingSuspend)
             {
-                noteDuration += (currentBeat.start - lastNoteEnd) + noteOnSameString.beat.calculateDuration();
+                noteDuration += (currentBeat.start - lastNoteEnd) + currentBeat.calculateDuration();
                 lastNoteEnd = currentBeat.start + currentBeat.calculateDuration();
             }
             

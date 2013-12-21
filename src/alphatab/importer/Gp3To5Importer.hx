@@ -41,6 +41,7 @@ import alphatab.model.Track;
 import alphatab.model.TripletFeel;
 import alphatab.model.VibratoType;
 import alphatab.model.Voice;
+import alphatab.platform.model.Color;
 import alphatab.util.Guid;
 import haxe.io.Bytes;
 
@@ -479,7 +480,7 @@ class Gp3To5Importer extends ScoreImporter
         }
         
         newTrack.capo = readInt32();
-        skip(4); // Color
+        newTrack.color = readColor();
         
         if (_versionNumber >= 500)
         {
@@ -502,8 +503,7 @@ class Gp3To5Importer extends ScoreImporter
             skip(4);
             readStringIntByte();
             readStringIntByte();
-        }
-        
+        }        
     }
     
     private function readBars()
@@ -1440,12 +1440,13 @@ class Gp3To5Importer extends ScoreImporter
     #end
 
     
-    #if unit public #else private #end function readColor() : Void
+    #if unit public #else private #end function readColor() : Color
     {
-        readUInt8();
-        readUInt8();
-        readUInt8();
-        readUInt8(); // alpha?
+        var r = readUInt8();
+        var g = readUInt8();
+        var b = readUInt8();
+        skip(1); // alpha?
+        return new Color(r, g, b);
     }
     
     private inline function readBool()

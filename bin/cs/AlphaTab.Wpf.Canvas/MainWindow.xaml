@@ -4,7 +4,7 @@
         xmlns:wpf="clr-namespace:AlphaTab.Wpf;assembly=AlphaTab.Core"
         xmlns:controls="clr-namespace:AlphaTab.Wpf.Share.Controls;assembly=AlphaTab.Wpf.Share"
         xmlns:converter="clr-namespace:AlphaTab.Wpf.Share.Converter;assembly=AlphaTab.Wpf.Share"
-        Title="AlphaTab" Height="800" Width="600" WindowState="Maximized">
+        Title="{Binding ScoreTitle,StringFormat={}AlphaTab - {0}}" Height="800" Width="600" WindowState="Maximized">
     <Grid Background="#4b4c4c">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -15,8 +15,11 @@
 
         <ToolBarTray Background="#4b4c4c">
             <controls:ToolBarCustom ToolBarTray.IsLocked="True" Background="#4b4c4c">
-                <Button Command="{Binding OpenFileCommand}" ToolTip="Open File">
+                <Button Command="{Binding OpenFileCommand}" ToolTip="Open File" Style="{StaticResource ToolbarButtonStyle}">
                     <Image Source="Images\32\folder_page_white.png" Width="24" Height="24" />
+                </Button>
+                <Button Command="{Binding ShowScoreInfoCommand}" ToolTip="Show Score Info" Style="{StaticResource ToolbarButtonStyle}">
+                    <Image Source="Images\32\information.png" Width="24" Height="24" />
                 </Button>
             </controls:ToolBarCustom>
         </ToolBarTray>
@@ -40,7 +43,7 @@
 
         <GridSplitter Grid.Row="2" Grid.Column="0" Height="4" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" />
 
-        <ScrollViewer Grid.Row="3">
+        <ScrollViewer Grid.Row="3" HorizontalScrollBarVisibility="Hidden">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="420" />
@@ -138,7 +141,7 @@
                 </ListView>
 
                 <!-- a list of horizontal squares for each track -->
-                <ItemsControl Grid.Column="1" ItemsSource="{Binding TrackInfos}" Margin="0,26,0,0" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                <ItemsControl Grid.Column="1" ItemsSource="{Binding TrackInfos}" Margin="0,26,0,0">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <ItemsControl ItemsSource="{Binding UsedBars}">

@@ -26,15 +26,17 @@ namespace AlphaTab.Wpf.Share.Utils
     public class RelayCommand : ICommand
     {
         private readonly Action _action;
+        private readonly Func<bool> _canExecute;
 
-        public RelayCommand(Action action)
+        public RelayCommand(Action action, Func<bool> canExecute = null)
         {
             _action = action;
+            _canExecute = canExecute;
         }
 
         public bool CanExecute(object parameter)
         {
-            return true;
+            return _canExecute == null || _canExecute();
         }
 
         public void Execute(object parameter)
@@ -43,5 +45,10 @@ namespace AlphaTab.Wpf.Share.Utils
         }
 
         public event EventHandler CanExecuteChanged;
+        public virtual void RaiseCanExecuteChanged()
+        {
+            EventHandler handler = CanExecuteChanged;
+            if (handler != null) handler(this, EventArgs.Empty);
+        }
     }
 }

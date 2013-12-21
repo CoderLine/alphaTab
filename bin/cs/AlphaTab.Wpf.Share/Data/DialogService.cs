@@ -16,15 +16,16 @@
  * License along with this library.
  */
 using System.Windows;
+using alphatab.model;
+using AlphaTab.Wpf.Share.ViewModel;
 using Microsoft.Win32;
 
 namespace AlphaTab.Wpf.Share.Data
 {
     /// <summary>
-    /// This IOService implementation opens an OpenFileDialog to let the user
-    /// select a file
+    /// This DialogService implementation opens uses WPF dialogs
     /// </summary>
-    public class IOService :IIOService
+    public class DialogService :IDialogService
     {
         public string OpenFile()
         {
@@ -37,6 +38,14 @@ namespace AlphaTab.Wpf.Share.Data
                 return dialog.FileName;
             }
             return null;
+        }
+
+        public void ShowScoreInfo(Score score)
+        {
+            ScoreInfoViewModel viewModel = new ScoreInfoViewModel(score);
+            ScoreInfoWindow window = new ScoreInfoWindow();
+            window.DataContext = viewModel;
+            window.ShowDialog();
         }
     }
 }

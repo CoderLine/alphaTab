@@ -68,6 +68,12 @@
 			
 			<arg value="-i" />
 			<arg value="${api}" />
+			
+			<arg value="-ex" />
+			<arg value=".*" />
+			
+			<arg value="-in" />
+			<arg value="alphatab.*" />
         </exec>
 
 	</target>

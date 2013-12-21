@@ -29,7 +29,7 @@ import haxe.io.BytesData;
  * This handler is responsible for writing midi events
  * to a MidiFile object.
  */
-class MidiFileHandler
+class MidiFileHandler implements IMidiFileHandler
 {
     public static inline var DefaultMetronomeKey:Int = 0x25;
     public static inline var DefaultDurationDead:Int = 30;

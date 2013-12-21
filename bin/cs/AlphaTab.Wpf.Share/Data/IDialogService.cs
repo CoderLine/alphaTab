@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using alphatab.model;
+
 namespace AlphaTab.Wpf.Share.Data
 {
-    /// <summary>
-    /// Implement this interface to provide a file opening mechanism to the application. 
-    /// </summary>
-    public interface IIOService
+    public interface IDialogService
     {
         /// <summary>
         /// Called when the application wants to open a new file. 
@@ -28,5 +28,10 @@ namespace AlphaTab.Wpf.Share.Data
         /// </summary>
         /// <returns>The path to the file which should be opened or <code>null</code> if no file should be opened</returns>
         string OpenFile();
+
+        /// <summary>
+        /// Called when the application wants to show a score information. 
+        /// </summary>
+        void ShowScoreInfo(Score score);
     }
 }

@@ -33,7 +33,7 @@ namespace AlphaTab.Wpf.Canvas
             App.InitializeCultures();
 
             // create a our viewmodel for databinding
-            MainViewModel viewModel = new MainViewModel(new IOService(), new ErrorService());
+            MainViewModel viewModel = new MainViewModel(new DialogService(), new ErrorService());
             DataContext = viewModel;
         }
 

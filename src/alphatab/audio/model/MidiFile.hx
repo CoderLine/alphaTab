@@ -38,6 +38,7 @@ class MidiFile
     
     public function new() 
     {
+        tracks = new Array<MidiTrack>();
     }
     
     public function createTrack() : MidiTrack

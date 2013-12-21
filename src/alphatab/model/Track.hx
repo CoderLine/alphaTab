@@ -16,6 +16,7 @@
  * License along with this library.
  */
 package alphatab.model;
+import alphatab.platform.model.Color;
 import haxe.ds.StringMap.StringMap;
 
 /**
@@ -29,6 +30,7 @@ class Track
     public var shortName:String;
     public var tuning:Array<Int>;
     public var tuningName:String;
+    public var color:Color;
 
     public var playbackInfo:PlaybackInformation;
     public var isPercussion:Bool;
@@ -44,6 +46,7 @@ class Track
         bars = new Array<Bar>();
         chords = new StringMap<Chord>();
         playbackInfo = new PlaybackInformation();
+        color = new Color(200, 0, 0);
     }
     
     public function addBar(bar:Bar)

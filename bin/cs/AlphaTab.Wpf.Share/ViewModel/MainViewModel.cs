@@ -34,7 +34,7 @@ namespace AlphaTab.Wpf.Share.ViewModel
     public class MainViewModel : INotifyPropertyChanged
     {
         // references to the services we want to use
-        private readonly IIOService _ioService;
+        private readonly IDialogService _dialogService;
         private readonly IErrorService _errorService;
 
         #region Score Data
@@ -45,6 +45,15 @@ namespace AlphaTab.Wpf.Share.ViewModel
         private int _currentTrackIndex;
         private IEnumerable<TrackViewModel> _trackInfos;
         private TrackViewModel _selectedTrackInfo;
+        private readonly RelayCommand _showScoreInfoCommand;
+
+        /// <summary>
+        /// A command which raises the <see cref="ShowScoreInfo"/> method
+        /// </summary>
+        public ICommand ShowScoreInfoCommand
+        {
+            get { return _showScoreInfoCommand; }
+        }
 
         /// <summary>
         /// Gets or sets the currently opened score. 
@@ -57,9 +66,22 @@ namespace AlphaTab.Wpf.Share.ViewModel
             {
                 _score = value;
                 OnPropertyChanged();
+                OnPropertyChangedExplicit("ScoreTitle");
+                _showScoreInfoCommand.RaiseCanExecuteChanged();
 
                 // select the first track
                 CurrentTrackIndex = 0;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the title of the currently loaded sore.
+        /// </summary>
+        public string ScoreTitle
+        {
+            get
+            {
+                return _score == null ? "No File Opened" : _score.title;
             }
         }
 
@@ -128,6 +150,15 @@ namespace AlphaTab.Wpf.Share.ViewModel
             }
         }
 
+        /// <summary>
+        /// Opens a score info dialog for the current score.
+        /// </summary>
+        public void ShowScoreInfo()
+        {
+            if (_score != null)
+                _dialogService.ShowScoreInfo(_score);
+        }
+
         #endregion
 
         #region Score Loading
@@ -142,7 +173,7 @@ namespace AlphaTab.Wpf.Share.ViewModel
         /// </summary>
         public void OpenFile()
         {
-            OpenFile(_ioService.OpenFile());
+            OpenFile(_dialogService.OpenFile());
         }
 
         /// <summary>
@@ -195,11 +226,12 @@ namespace AlphaTab.Wpf.Share.ViewModel
 
         #endregion
 
-        public MainViewModel(IIOService ioService, IErrorService errorService)
+        public MainViewModel(IDialogService dialogService, IErrorService errorService)
         {
-            _ioService = ioService;
+            _dialogService = dialogService;
             _errorService = errorService;
             OpenFileCommand = new RelayCommand(OpenFile);
+            _showScoreInfoCommand = new RelayCommand(ShowScoreInfo, () => _score != null);
         }
 
 

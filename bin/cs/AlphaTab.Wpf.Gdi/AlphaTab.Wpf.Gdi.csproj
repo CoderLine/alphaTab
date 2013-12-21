@@ -89,6 +89,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <None Include="Readme.md" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -105,6 +106,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\32\folder_page_white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\32\information.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
