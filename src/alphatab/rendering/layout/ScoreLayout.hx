@@ -53,6 +53,11 @@ class ScoreLayout
         
     }
     
+    public inline function getScale() : Float
+    {
+        return renderer.settings.scale;
+    }
+    
     private function createEmptyStaveGroup() : StaveGroup
     {
         var group:StaveGroup = new StaveGroup();

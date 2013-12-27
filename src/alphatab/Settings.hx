@@ -29,11 +29,6 @@ class Settings
      * Sets the zoom level of the rendered notation
      */    
     public var scale:Float;
-    
-    /**
-     * Sets whether the width of the canvas should be automatically determined by the used layout.
-     */
-    public var autoSize:Bool;
         
     /**
      * The initial size of the canvas during loading or the width when {@see autoSize} set to false
@@ -75,7 +70,6 @@ class Settings
         var settings = new Settings();
         
         settings.scale = 1.0;
-        settings.autoSize = true;
         settings.width = 600;
         settings.height = 200;
         settings.engine = "default";
@@ -85,7 +79,7 @@ class Settings
         settings.staves = new Array<StaveSettings>();
         
         settings.staves.push(new StaveSettings("marker"));
-        settings.staves.push(new StaveSettings("triplet-feel"));
+        //settings.staves.push(new StaveSettings("triplet-feel"));
         settings.staves.push(new StaveSettings("tempo"));
         settings.staves.push(new StaveSettings("text"));
         settings.staves.push(new StaveSettings("chords"));
@@ -109,7 +103,7 @@ class Settings
         settings.staves.push(new StaveSettings("tab"));
         
         settings.staves.push(new StaveSettings("pick-stroke"));
-        settings.staves.push(new StaveSettings("fingering"));
+        //settings.staves.push(new StaveSettings("fingering"));
 
         return settings;
     }
@@ -122,11 +116,15 @@ class Settings
 
     public static function fromJson(json:Dynamic) : Settings
     {
+        if (Std.is(json, Settings)) 
+        {
+            return cast json;
+        }
+        
         var settings = defaults();
         
         if (!json) return settings;        
         if(jsonExists(json, "scale")) settings.scale = json.scale;
-        if(jsonExists(json, "autoSize")) settings.autoSize = json.autoSize;
         if(jsonExists(json, "width")) settings.width = json.width;
         if(jsonExists(json, "height")) settings.height = json.height;
         if(jsonExists(json, "engine")) settings.engine = json.engine;
@@ -198,6 +196,7 @@ class LayoutSettings
      * Additional layout mode specific settings.
      * <strong>mode=page</strong>
      * <ul>
+     *  <li><strong>autoSize</strong> - Whether the width of the canvas should be automatically determined by the used layout. (bool, default:true)</li>
      *  <li><strong>barsPerRow</strong> - Limit the displayed bars per row, <em>-1 for sized based limit<em> (integer, default:-1)</li>
      *  <li><strong>start</strong> - The bar start index to start layouting with (integer: default: 0)</li>
      *  <li><strong>count</strong> - The amount of bars to render overall, <em>-1 for all till the end</em>  (integer, default:-1)</li>

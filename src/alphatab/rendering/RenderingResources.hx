@@ -45,6 +45,8 @@ class RenderingResources
     
     public var mainGlyphColor:Color;
     
+    public var scale:Float;
+    
 
     public function new(scale:Float)
     {
@@ -53,6 +55,8 @@ class RenderingResources
     
     public function init(scale:Float) : Void
     { 
+        this.scale = scale;
+        
         var sansFont = "Arial";
         var serifFont = "Georgia";
         

@@ -63,6 +63,7 @@ class PageViewLayout extends ScoreLayout
         var currentBarIndex = startIndex;
  
         var endBarIndex = renderer.settings.layout.get('count', renderer.track.bars.length);
+        if (endBarIndex < 0) endBarIndex = renderer.track.bars.length;
         endBarIndex = startIndex + endBarIndex - 1; // map count to array index
         endBarIndex = Std.int(Math.min(renderer.track.bars.length - 1, Math.max(0, endBarIndex)));
                 
@@ -72,9 +73,10 @@ class PageViewLayout extends ScoreLayout
         
         y = doScoreInfoLayout(y);
         
-        if (renderer.settings.autoSize || renderer.settings.width <= 0)
+        var autoSize = renderer.settings.layout.get('autoSize', true);
+        if (autoSize || renderer.settings.width <= 0)
         {
-            width = Std.int(WidthOn100 * renderer.scale);
+            width = Std.int(WidthOn100 * getScale());
         }
         else
         {
@@ -94,7 +96,7 @@ class PageViewLayout extends ScoreLayout
                 fitGroup(group);
                 group.finalizeGroup(this);
                 
-                y += group.calculateHeight() + Std.int(GroupSpacing * renderer.scale);
+                y += group.calculateHeight() + Std.int(GroupSpacing * getScale());
                 
                 currentBarIndex = group.getLastBarIndex() + 1;
             }
@@ -108,7 +110,7 @@ class PageViewLayout extends ScoreLayout
         // TODO: Check if it's a good choice to provide the complete flags as setting
         var flags:Int = renderer.settings.layout.get("hideInfo", false) ? HeaderFooterElements.None : HeaderFooterElements.All;
         var score:Score = renderer.score;
-        var scale:Float = renderer.scale;
+        var scale:Float = getScale();
 
         if (!isNullOrEmpty(score.title) && (flags & HeaderFooterElements.Title != 0))
         {
@@ -193,7 +195,7 @@ class PageViewLayout extends ScoreLayout
     {
         var flags:Int = renderer.settings.layout.get("hideInfo", false) ? HeaderFooterElements.None : HeaderFooterElements.All;
         var score:Score = renderer.score;
-        var scale:Float = renderer.scale;
+        var scale:Float = getScale();
         
         var canvas:ICanvas = renderer.canvas;
         var res:RenderingResources = renderer.renderingResources;
@@ -301,18 +303,18 @@ class PageViewLayout extends ScoreLayout
     {
         // calculate additional space for each bar (can be negative!)
         var barSpace:Int = 0;
-        if (group.isFull) 
+        var freeSpace = getMaxWidth() - group.width;
+       
+        if (freeSpace != 0 && group.bars.length > 0) 
         {
-            var freeSpace = getMaxWidth() - group.width;
-           
-            if (freeSpace != 0 && group.bars.length > 0) 
-            {
-                barSpace = Math.round(freeSpace / group.bars.length);
-            }
+            barSpace = Math.round(freeSpace / group.bars.length);
         }
         
-        // add it to the measures
-        group.applyBarSpacing(barSpace);
+        if(group.isFull || barSpace < 0) 
+        {
+            // add it to the measures
+            group.applyBarSpacing(barSpace);
+        }
         
         width = Math.round(Math.max(width, group.width));    
     }
@@ -357,14 +359,15 @@ class PageViewLayout extends ScoreLayout
     
     private function getMaxWidth() : Int
     {
-        var width = renderer.settings.autoSize ? getSheetWidth() : renderer.settings.width;
+        var autoSize = renderer.settings.layout.get('autoSize', true);
+        var width = autoSize ? getSheetWidth() : renderer.settings.width;
         return width - PagePadding[0] - PagePadding[2];
     }
     
         
     private function getSheetWidth() : Int
     {
-        return Math.round(WidthOn100 * renderer.scale);
+        return Math.round(WidthOn100 * getScale());
     }
     
 }

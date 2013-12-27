@@ -39,6 +39,7 @@
 }
 
 .button:hover,
+.button.hover,
 .button:focus,
 .button:active,
 .button.active {

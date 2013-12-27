@@ -21,6 +21,20 @@ body { text-align:center; font-family:Open Sans, Arial sans-serif; background:#F
 }
 
 
+.cf:before,
+.cf:after {
+    content: " "; 
+    display: table;
+}
+
+.cf:after {
+    clear: both;
+}
+
+.cf {
+    *zoom: 1;
+}
+
 .button { font-size:14px; }
 
 #alphaTabScore { margin: 0 auto; width: 700px; text-align:left; }

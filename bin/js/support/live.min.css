@@ -1,0 +1,16 @@
+html,body{padding:0;margin:0;}
+label{display:block;}
+label.inline{display:inline;font-size:90%;}
+p{margin:0;}
+select,input[type=text],input[type=number]{width:150px;padding:5px;}
+#settings{position:fixed;left:0;top:0;bottom:0;background:#EEE;text-align:left;padding:0;width:300px;}
+#actions{position:absolute;top:0;height:50px;left:0;right:0;padding:10px;}
+#settingsContent{position:absolute;top:50px;bottom:0;left:0;right:0;overflow:auto;}
+#settings h1{margin:0;padding:10px;background:#FFF;color:#555;font-size:20px;font-weight:normal;border-bottom:1px solid #EEE;}
+#settingsContent>a{display:block;margin:0;padding:10px;background:#FFF;font-size:16px;font-weight:normal;border-bottom:1px solid #DFDFDF;text-decoration:none;color:#555;}
+#settingsContent>a.open{background:#F5F5F5;}
+#settingsContent>a::after,#settingsContent>a:after{content:'\25BE';font-size:24px;float:right;line-height:18px;color:#AAA;}
+#settingsContent>a.open::after,#settingsContent>a.open:after{content:'\25B4';}
+#content{margin-left:300px;}
+.settingsGroup{display:none;background:#FFF;border-bottom:1px solid #DFDFDF;padding:10px;}
+

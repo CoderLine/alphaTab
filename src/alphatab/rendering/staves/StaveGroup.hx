@@ -170,7 +170,7 @@ class StaveGroup
                 // Draw accolade
                 // 
                 
-                var barSize:Int = Std.int(3 * layout.renderer.scale);
+                var barSize:Int = Std.int(3 * layout.renderer.settings.scale);
                 var barOffset:Int = barSize;
                 
                 var accoladeStart = firstStart - (barSize*4);

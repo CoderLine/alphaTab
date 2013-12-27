@@ -266,6 +266,12 @@
         }
     };   
     
+    $.alphaTab = {
+        restore: function(selector) {
+            $(selector).empty().removeData('alphaTab');
+        }
+    };
+    
 })(jQuery);
 
 

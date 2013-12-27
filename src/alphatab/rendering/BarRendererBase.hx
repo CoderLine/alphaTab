@@ -22,6 +22,7 @@ import alphatab.platform.ICanvas;
 import alphatab.rendering.layout.ScoreLayout;
 import alphatab.rendering.staves.BarSizeInfo;
 import alphatab.rendering.staves.Stave;
+import alphatab.Settings;
 
 /**
  * This is the base class for creating blocks which can render bars.
@@ -70,15 +71,21 @@ class BarRendererBase
     {
     }
     
+    public inline function getSettings() : Settings
+    {
+        return stave.staveGroup.layout.renderer.settings;
+    }
+    
     public inline function getScale() : Float
     {
-        return stave.staveGroup.layout.renderer.scale;
+        return getSettings().scale;
     }
     
     public inline function getLayout() : ScoreLayout
     {
         return stave.staveGroup.layout;
     }    
+    
     public inline function getResources() : RenderingResources
     {
         return getLayout().renderer.renderingResources;

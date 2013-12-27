@@ -174,8 +174,12 @@
     <div id="alphaTabPageLayoutWidth" data-file="files/features/Skillet.gp5"></div>
     <script type="text/javascript-lazy">
         $('#alphaTabPageLayoutWidth').alphaTab({
-            layout: 'page',
-            autoSize:false,
+            layout: {
+                mode: 'page',
+                additionalSettings: {
+                    autoSize: false
+                }
+            },                
             width: 1280
         });
     </script>

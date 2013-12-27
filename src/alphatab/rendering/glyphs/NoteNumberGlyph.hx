@@ -61,7 +61,7 @@ class NoteNumberGlyph extends Glyph
         {
             scoreRenderer.canvas.setFont(scoreRenderer.renderingResources.tablatureFont);
         }
-        
+        width = Std.int(10 * getScale());
     }
     
     public function calculateWidth() : Void

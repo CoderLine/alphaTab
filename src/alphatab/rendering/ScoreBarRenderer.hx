@@ -166,7 +166,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
     
     public inline function getLineOffset()
     {
-        return ((LineSpacing + 1) * getLayout().renderer.scale);
+        return ((LineSpacing + 1) * getScale());
     }
     
     public override function doLayout()

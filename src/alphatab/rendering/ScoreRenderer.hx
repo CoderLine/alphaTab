@@ -39,8 +39,8 @@ class ScoreRenderer
     public var canvas : ICanvas;
     public var score(get, null) : Score;
     public var track : Track;
-    public var scale : Float;
     
+    private var _currentLayoutMode:String;
     public var layout : ScoreLayout;
     
     public var renderingResources : RenderingResources;
@@ -51,6 +51,7 @@ class ScoreRenderer
     {
         this.settings = settings;
         _renderFinishedListeners = new Array < Void->Void > ();
+        this.renderingResources = new RenderingResources(1);
         if (settings.engine == null || !Environment.renderEngines.exists(settings.engine))
         {
             canvas = Environment.renderEngines.get("default")(param);
@@ -59,22 +60,23 @@ class ScoreRenderer
         {
             canvas = Environment.renderEngines.get(settings.engine)(param);
         }
-        updateScale(1.0);
-        if (settings.layout == null || !Environment.layoutEngines.exists(settings.layout.mode))
-        {
-            layout = Environment.layoutEngines.get("default")(this);
-        }
-        else 
-        {
-            layout = Environment.layoutEngines.get(settings.layout.mode)(this);
-        }
+        recreateLayout();
     }
     
-    public function updateScale(scale:Float)
+    private function recreateLayout() 
     {
-        this.scale = scale;
-        this.renderingResources = new RenderingResources(scale);
-        canvas.setLineWidth(scale);
+        if (_currentLayoutMode != settings.layout.mode)
+        {
+            if (settings.layout == null || !Environment.layoutEngines.exists(settings.layout.mode))
+            {
+                layout = Environment.layoutEngines.get("default")(this);
+            }
+            else 
+            {
+                layout = Environment.layoutEngines.get(settings.layout.mode)(this);
+            }
+            _currentLayoutMode = settings.layout.mode;
+        }
     }
     
     public function render(track:Track)
@@ -85,6 +87,12 @@ class ScoreRenderer
     
     public function invalidate()
     {
+        if (this.renderingResources.scale != this.settings.scale)
+        {
+            this.renderingResources.init(this.settings.scale);         
+            canvas.setLineWidth(this.settings.scale);
+        }
+        recreateLayout();
         canvas.clear();        
         doLayout();
         paintScore();

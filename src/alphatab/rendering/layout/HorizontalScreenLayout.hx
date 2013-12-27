@@ -67,7 +67,7 @@ class HorizontalScreenLayout extends ScoreLayout
         
         _group.finalizeGroup(this);
         
-        y += _group.calculateHeight() + Std.int(GroupSpacing * renderer.scale);
+        y += _group.calculateHeight() + Std.int(GroupSpacing * getScale());
         height = y + PagePadding[3];
         width = _group.x + _group.width + PagePadding[2];
     }
