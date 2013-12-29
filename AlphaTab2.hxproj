@@ -22,6 +22,7 @@
   <build>
     <option directives="" />
     <option flashStrict="False" />
+    <option noInlineOnDebug="False" />
     <option mainClass="alphatab.Main" />
     <option enabledebug="False" />
     <option additional="" />
@@ -39,7 +40,7 @@
     <hidden path="obj" />
   </hiddenPaths>
   <!-- Executed before build -->
-  <preBuildCommand>cmd /C "ant js"</preBuildCommand>
+  <preBuildCommand>cmd /C "ant cs"</preBuildCommand>
   <!-- Executed after build -->
   <postBuildCommand alwaysRun="False" />
   <!-- Other project options -->

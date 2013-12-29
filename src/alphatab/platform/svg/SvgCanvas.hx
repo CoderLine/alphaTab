@@ -32,8 +32,8 @@ using alphatab.io.OutputExtensions;
  */
 class SvgCanvas implements ICanvas
 {
-    private var _buffer:StringBuf;
-    private var _currentPath:StringBuf;
+    private var _buffer:String;
+    private var _currentPath:String;
     private var _currentPathIsEmpty:Bool;
     
     private var _width:Int;
@@ -41,8 +41,8 @@ class SvgCanvas implements ICanvas
      
     public function new() 
     {
-        _buffer = new StringBuf();
-        _currentPath = new StringBuf();
+        _buffer = "";
+        _currentPath = "";
         _currentPathIsEmpty = true;
         _color = new Color(255, 255, 255);
         _lineWidth = 1;
@@ -140,41 +140,41 @@ class SvgCanvas implements ICanvas
     // rects
     public function clear():Void
     {
-        _buffer = new StringBuf(); 
-        _currentPath = new StringBuf(); 
+        _buffer = ""; 
+        _currentPath = ""; 
         _currentPathIsEmpty = true;
     }
     
     public function fillRect(x:Float, y:Float, w:Float, h:Float):Void
     {
-        _buffer.add('<rect x="');
-        _buffer.add(x);
-        _buffer.add('" y="');
-        _buffer.add(y);
-        _buffer.add('" width="');
-        _buffer.add(w);
-        _buffer.add('" height="');
-        _buffer.add(h);
-        _buffer.add('" style="fill:');
-        _buffer.add(_color.toRgbaString());
-        _buffer.add(';" />\n'); 
+        _buffer += ('<rect x="');
+        _buffer += (x);
+        _buffer += ('" y="');
+        _buffer += (y);
+        _buffer += ('" width="');
+        _buffer += (w);
+        _buffer += ('" height="');
+        _buffer += (h);
+        _buffer += ('" style="fill:');
+        _buffer += (_color.toRgbaString());
+        _buffer += (';" />\n'); 
     }
     
     public function strokeRect(x:Float, y:Float, w:Float, h:Float):Void
     {
-        _buffer.add('<rect x="');
-        _buffer.add(x);
-        _buffer.add('" y="');
-        _buffer.add(y);
-        _buffer.add('" width="');
-        _buffer.add(w);
-        _buffer.add('" height="');
-        _buffer.add(h);
-        _buffer.add('" style="stroke:');
-        _buffer.add(_color.toRgbaString());
-        _buffer.add('; stroke-width:');
-        _buffer.add(_lineWidth);
-        _buffer.add(';" />\n'); 
+        _buffer += ('<rect x="');
+        _buffer += (x);
+        _buffer += ('" y="');
+        _buffer += (y);
+        _buffer += ('" width="');
+        _buffer += (w);
+        _buffer += ('" height="');
+        _buffer += (h);
+        _buffer += ('" style="stroke:');
+        _buffer += (_color.toRgbaString());
+        _buffer += ('; stroke-width:');
+        _buffer += (_lineWidth);
+        _buffer += (';" />\n'); 
     }
 
     // path API
@@ -183,50 +183,50 @@ class SvgCanvas implements ICanvas
     }
     public function closePath():Void
     {
-        _currentPath.add(" z");
+        _currentPath += (" z");
     }
     public function moveTo(x:Float, y:Float):Void
     {
-        _currentPath.add(" M");
-        _currentPath.add(x);
-        _currentPath.add(",");
-        _currentPath.add(y);
+        _currentPath += (" M");
+        _currentPath += (x);
+        _currentPath += (",");
+        _currentPath += (y);
     }
     public function lineTo(x:Float, y:Float):Void
     {
         _currentPathIsEmpty = false;
-        _currentPath.add(" L");
-        _currentPath.add(x);
-        _currentPath.add(",");
-        _currentPath.add(y);
+        _currentPath += (" L");
+        _currentPath += (x);
+        _currentPath += (",");
+        _currentPath += (y);
     }
     public function quadraticCurveTo(cpx:Float, cpy:Float, x:Float, y:Float):Void
     {
         _currentPathIsEmpty = false;
-        _currentPath.add(" Q");
-        _currentPath.add(cpx);
-        _currentPath.add(",");
-        _currentPath.add(cpy);
-        _currentPath.add(",");
-        _currentPath.add(x);
-        _currentPath.add(",");
-        _currentPath.add(y);
+        _currentPath += (" Q");
+        _currentPath += (cpx);
+        _currentPath += (",");
+        _currentPath += (cpy);
+        _currentPath += (",");
+        _currentPath += (x);
+        _currentPath += (",");
+        _currentPath += (y);
     }
     public function bezierCurveTo(cp1x:Float, cp1y:Float, cp2x:Float, cp2y:Float, x:Float, y:Float):Void
     {
         _currentPathIsEmpty = false;
-        _currentPath.add(" C");
-        _currentPath.add(cp1x);
-        _currentPath.add(",");
-        _currentPath.add(cp1y);
-        _currentPath.add(",");
-        _currentPath.add(cp2x);
-        _currentPath.add(",");
-        _currentPath.add(cp2y);
-        _currentPath.add(",");
-        _currentPath.add(x);
-        _currentPath.add(",");
-        _currentPath.add(y);    
+        _currentPath += (" C");
+        _currentPath += (cp1x);
+        _currentPath += (",");
+        _currentPath += (cp1y);
+        _currentPath += (",");
+        _currentPath += (cp2x);
+        _currentPath += (",");
+        _currentPath += (cp2y);
+        _currentPath += (",");
+        _currentPath += (x);
+        _currentPath += (",");
+        _currentPath += (y);    
     }
     
     public function circle(x:Float, y:Float, radius:Float):Void
@@ -234,73 +234,73 @@ class SvgCanvas implements ICanvas
         _currentPathIsEmpty = false;
         // 
         // M0,250 A1,1 0 0,0 500,250 A1,1 0 0,0 0,250 z
-        _currentPath.add(" M");
-        _currentPath.add(x - radius);
-        _currentPath.add(",");
-        _currentPath.add(y);
+        _currentPath += (" M");
+        _currentPath += (x - radius);
+        _currentPath += (",");
+        _currentPath += (y);
         
-        _currentPath.add(" A1,1 0 0,0 ");
-        _currentPath.add(x + radius);
-        _currentPath.add(",");
-        _currentPath.add(y);
+        _currentPath += (" A1,1 0 0,0 ");
+        _currentPath += (x + radius);
+        _currentPath += (",");
+        _currentPath += (y);
         
-        _currentPath.add(" A1,1 0 0,0 ");
-        _currentPath.add(x - radius);
-        _currentPath.add(",");
-        _currentPath.add(y);
+        _currentPath += (" A1,1 0 0,0 ");
+        _currentPath += (x - radius);
+        _currentPath += (",");
+        _currentPath += (y);
         
-        _currentPath.add(" z");
+        _currentPath += (" z");
     }
     public function rect(x:Float, y:Float, w:Float, h:Float):Void
     {
         _currentPathIsEmpty = false;
-        _currentPath.add(" M");
-        _currentPath.add(x);
-        _currentPath.add(",");
-        _currentPath.add(y);
+        _currentPath += (" M");
+        _currentPath += (x);
+        _currentPath += (",");
+        _currentPath += (y);
         
-        _currentPath.add(" L");
+        _currentPath += (" L");
         
-        _currentPath.add(x + w);
-        _currentPath.add(",");
-        _currentPath.add(y);
-        _currentPath.add(" ");
+        _currentPath += (x + w);
+        _currentPath += (",");
+        _currentPath += (y);
+        _currentPath += (" ");
 
-        _currentPath.add(x + w);
-        _currentPath.add(",");
-        _currentPath.add(y + h);
-        _currentPath.add(" ");
+        _currentPath += (x + w);
+        _currentPath += (",");
+        _currentPath += (y + h);
+        _currentPath += (" ");
 
-        _currentPath.add(x);
-        _currentPath.add(",");
-        _currentPath.add(y + h);
-        _currentPath.add(" z");
+        _currentPath += (x);
+        _currentPath += (",");
+        _currentPath += (y + h);
+        _currentPath += (" z");
     }
     
     public function fill():Void
     {
         if(!_currentPathIsEmpty) {
-            _buffer.add('<path d="');
-            _buffer.add(_currentPath.toString());
-            _buffer.add('" style="fill:');
-            _buffer.add(_color.toRgbaString());
-            _buffer.add('" stroke="none"/>\n');
+            _buffer += ('<path d="');
+            _buffer += (_currentPath.toString());
+            _buffer += ('" style="fill:');
+            _buffer += (_color.toRgbaString());
+            _buffer += ('" stroke="none"/>\n');
         }
-        _currentPath = new StringBuf();
+        _currentPath = "";
         _currentPathIsEmpty = true;
     }
     public function stroke():Void
     {
         if(!_currentPathIsEmpty) {
-            _buffer.add('<path d="');
-            _buffer.add(_currentPath.toString());
-            _buffer.add('" style="stroke:');
-            _buffer.add(_color.toRgbaString());
-            _buffer.add('; stroke-width:');
-            _buffer.add(_lineWidth);
-            _buffer.add(';" fill="none" />\n'); 
+            _buffer += ('<path d="');
+            _buffer += (_currentPath.toString());
+            _buffer += ('" style="stroke:');
+            _buffer += (_color.toRgbaString());
+            _buffer += ('; stroke-width:');
+            _buffer += (_lineWidth);
+            _buffer += (';" fill="none" />\n'); 
         }
-        _currentPath = new StringBuf();
+        _currentPath = "";
         _currentPathIsEmpty = true;
     }
 
@@ -334,22 +334,22 @@ class SvgCanvas implements ICanvas
     
     public function fillText(text:String, x:Float, y:Float):Void
     {
-        _buffer.add('<text x="');
-        _buffer.add(x);
-        _buffer.add('" y="');
-        _buffer.add(y + getSvgBaseLineOffset());
-        _buffer.add('" style="font:');
-        _buffer.add(_font.toCssString());
-        _buffer.add('; fill:');
-        _buffer.add(_color.toRgbaString());
-        _buffer.add(';" ');
-        _buffer.add(' dominant-baseline="');
-        _buffer.add(getSvgBaseLine());       
-        _buffer.add('" text-anchor="');
-        _buffer.add(getSvgTextAlignment());
-        _buffer.add('">\n');
-        _buffer.add(text);
-        _buffer.add("</text>\n");
+        _buffer += ('<text x="');
+        _buffer += (x);
+        _buffer += ('" y="');
+        _buffer += (y + getSvgBaseLineOffset());
+        _buffer += ('" style="font:');
+        _buffer += (_font.toCssString());
+        _buffer += ('; fill:');
+        _buffer += (_color.toRgbaString());
+        _buffer += (';" ');
+        _buffer += (' dominant-baseline="');
+        _buffer += (getSvgBaseLine());       
+        _buffer += ('" text-anchor="');
+        _buffer += (getSvgTextAlignment());
+        _buffer += ('">\n');
+        _buffer += (text);
+        _buffer += ("</text>\n");
     }
     
     private function getSvgTextAlignment() : String
