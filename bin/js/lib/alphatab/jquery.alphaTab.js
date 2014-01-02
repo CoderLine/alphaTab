@@ -6,6 +6,8 @@
     {
         try
         {
+            if(context.trigger) context.trigger('loaded', score);
+            else if(context.element) $(context.element).trigger('loaded', score);
 			var trackIndex = context.settings.track;
 			if(trackIndex < 0 || trackIndex >= score.tracks.length)
 			{
@@ -35,6 +37,7 @@
                 //
                 // Settings
                 var context = {};
+                context.element = this;
 				                
                 context.settings = alphatab.Settings.fromJson(options);
                 if(options && options.track) context.settings.track = options.track;
@@ -112,7 +115,9 @@
                 //
                 // Renderer setup
                 context.renderer = new alphatab.rendering.ScoreRenderer(context.settings, context.canvas);
-                
+                context.renderer.addRenderFinishedListener(function() {
+                    $this.trigger('rendered'); 
+                });
                 // in case of SVG we hook into the renderer to create the svg element after rendering
                 if(context.settings.engine == "svg") 
                 {
@@ -131,7 +136,7 @@
                 {
                     api.tex.apply(this, [contents]);
                 }
-                else if($this.data('file') != '') 
+                else if($this.data('file') != '' && $this.data('file') != null) 
                 {
                     alphatab.importer.ScoreLoader.loadScoreAsync($this.data('file'), 
                     function(score)

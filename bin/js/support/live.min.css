@@ -13,4 +13,5 @@ select,input[type=text],input[type=number]{width:150px;padding:5px;}
 #settingsContent>a.open::after,#settingsContent>a.open:after{content:'\25B4';}
 #content{margin-left:300px;}
 .settingsGroup{display:none;background:#FFF;border-bottom:1px solid #DFDFDF;padding:10px;}
-
+#openFile{display:inline-block;position:relative;margin:0;overflow:hidden;vertical-align:top;}
+#openFileData{position:absolute;top:0;left:0;bottom:0;right:0;height:32px;opacity:0;}

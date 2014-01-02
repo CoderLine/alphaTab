@@ -1,4 +1,5 @@
 var settings = alphatab.Settings.defaults();
+var currentScore = null;
 
 function highlightEngine(engine) {
     $('#engine a').each(function() {
@@ -9,6 +10,17 @@ function highlightEngine(engine) {
             $(this).removeClass('active');
         }
     });
+}
+
+function openFile(bytes) {
+    try {
+        currentScore = alphatab.importer.ScoreLoader.loadScoreFromBytes(haxe.io.Bytes.ofData(new Uint8Array(bytes)));
+        $('#alphaTab').alphaTab('renderer').render(currentScore.tracks[0]);
+    }
+    catch(e) {
+        alert('Error opening the file');
+        console.error(e);
+    }
 }
 
 function updateSettings() {
@@ -64,7 +76,8 @@ function changeEngine(newEngine) {
     settings.engine = newEngine;
     highlightEngine(newEngine);
     $.alphaTab.restore('#alphaTab');
-    $('#alphaTab').alphaTab(settings);
+    $('#alphaTab').alphaTab(settings);  
+    $('#alphaTab').alphaTab('renderer').render(currentScore.tracks[0]);
 }
 
 $(document).ready(function() {
@@ -123,5 +136,37 @@ $(document).ready(function() {
    settings.engine = "html5";
    updateUi();
 
-   $('#alphaTab').alphaTab(settings);
+    $('#alphaTab').on('loaded', function(e, score) {
+        currentScore = score;
+    });
+   
+    $('#alphaTab').alphaTab(settings);
+    $('#alphaTab').data('file', null); 
+    
+   
+    var endsWith = function(s, suffix) {
+        return s.indexOf(suffix, this.length - suffix.length) !== -1;
+    };
+   
+   /* file reader */
+   // Check for the various File API support.
+    if (window.File && window.FileReader && window.FileList && window.Blob) {
+        $('#openFileData').change(function(e) {
+            var file = e.target.files[0];
+            if(endsWith(file.name, "gp3") || endsWith(file.name, "gp4") || endsWith(file.name, "gp5") || endsWith(file.name, "gpx")) {
+               
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    openFile(e.target.result);
+                };
+                reader.readAsArrayBuffer(file)
+           }
+           else {
+               alert('Please open a Guitar Pro 3-6 File');
+           }
+        });
+    } 
+    else {
+      $('#openFile').hide();
+    }
 });
