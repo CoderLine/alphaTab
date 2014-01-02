@@ -51,12 +51,12 @@ class SvgPathParser
         return t;
     }
     
-    public function getNumber() : Float
+    public function getNumber() : Int
     {
         return Std.parseInt(getString());
     }
     
-    public function currentTokenIsNumber()  : Bool
+    public inline function currentTokenIsNumber()  : Bool
     {
         return isNumber(currentToken);
     }
@@ -114,15 +114,15 @@ class SvgPathParser
     private static function isNumber(s:String, allowSign:Bool = true)  : Bool
     {
         if (s.length == 0) return false;
-        var c = s.charCodeAt(0);
+        var c = StringTools.fastCodeAt(s, 0);
         return (allowSign && c == 0x2D) || (c >= 0x30 && c <= 0x39); 
     }
     
     private static function isWhiteSpace(s:String)  : Bool
     {
         if (s.length == 0) return false;
-        var c = s.charAt(0);
-        return c == " " || c == "\t" || c == "\r" || c == "\n";
+        var c = StringTools.fastCodeAt(s, 0);
+        return c == " ".code || c == "\t".code || c == "\r".code || c == "\n".code;
     }
 
 }

@@ -228,13 +228,14 @@ class Main
         buf.add("class MusicFont\r\n");
         buf.add("{\r\n");
             
+        var i = 0;
         for (g in glyphs)
         {
             buf.add("    public static var ");
             buf.add(g.name);
-            buf.add(" = \"");
+            buf.add(" = new LazySvg(\"");
             buf.add(rewritePathData(g, zeroX, zeroY, zoom));
-            buf.add("\";\r\n");
+            buf.add("\");\r\n");
         }
         
         buf.add("}");

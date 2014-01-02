@@ -1,7 +1,7 @@
-(function () { "use strict";
+(function ($hx_exports) { "use strict";
 var $hxClasses = {},$estr = function() { return js.Boot.__string_rec(this,''); };
 function $extend(from, fields) {
-	function inherit() {}; inherit.prototype = from; var proto = new inherit();
+	function Inherit() {} Inherit.prototype = from; var proto = new Inherit();
 	for (var name in fields) proto[name] = fields[name];
 	if( fields.toString !== Object.prototype.toString ) proto.toString = fields.toString;
 	return proto;
@@ -13,26 +13,23 @@ var EReg = function(r,opt) {
 $hxClasses["EReg"] = EReg;
 EReg.__name__ = true;
 EReg.prototype = {
-	matched: function(n) {
-		return this.r.m != null && n >= 0 && n < this.r.m.length?this.r.m[n]:(function($this) {
-			var $r;
-			throw "EReg::matched";
-			return $r;
-		}(this));
-	}
-	,match: function(s) {
+	match: function(s) {
 		if(this.r.global) this.r.lastIndex = 0;
 		this.r.m = this.r.exec(s);
 		this.r.s = s;
 		return this.r.m != null;
 	}
+	,matched: function(n) {
+		if(this.r.m != null && n >= 0 && n < this.r.m.length) return this.r.m[n]; else throw "EReg::matched";
+	}
 	,__class__: EReg
-}
-var HxOverrides = function() { }
+};
+var HxOverrides = function() { };
 $hxClasses["HxOverrides"] = HxOverrides;
 HxOverrides.__name__ = true;
 HxOverrides.strDate = function(s) {
-	switch(s.length) {
+	var _g = s.length;
+	switch(_g) {
 	case 8:
 		var k = s.split(":");
 		var d = new Date();
@@ -52,12 +49,12 @@ HxOverrides.strDate = function(s) {
 	default:
 		throw "Invalid date format : " + s;
 	}
-}
+};
 HxOverrides.cca = function(s,index) {
 	var x = s.charCodeAt(index);
 	if(x != x) return undefined;
 	return x;
-}
+};
 HxOverrides.substr = function(s,pos,len) {
 	if(pos != null && pos != 0 && len != null && len < 0) return "";
 	if(len == null) len = s.length;
@@ -66,7 +63,7 @@ HxOverrides.substr = function(s,pos,len) {
 		if(pos < 0) pos = 0;
 	} else if(len < 0) len = s.length + len - pos;
 	return s.substr(pos,len);
-}
+};
 HxOverrides.remove = function(a,obj) {
 	var i = 0;
 	var l = a.length;
@@ -78,15 +75,15 @@ HxOverrides.remove = function(a,obj) {
 		i++;
 	}
 	return false;
-}
+};
 HxOverrides.iter = function(a) {
 	return { cur : 0, arr : a, hasNext : function() {
 		return this.cur < this.arr.length;
 	}, next : function() {
 		return this.arr[this.cur++];
 	}};
-}
-var Lambda = function() { }
+};
+var Lambda = function() { };
 $hxClasses["Lambda"] = Lambda;
 Lambda.__name__ = true;
 Lambda.has = function(it,elt) {
@@ -96,7 +93,7 @@ Lambda.has = function(it,elt) {
 		if(x == elt) return true;
 	}
 	return false;
-}
+};
 var List = function() {
 	this.length = 0;
 };
@@ -110,13 +107,12 @@ List.prototype = {
 		this.length++;
 	}
 	,__class__: List
-}
-var Main = function() { }
+};
+var Main = $hx_exports.Main = function() { };
 $hxClasses["Main"] = Main;
-$hxExpose(Main, "Main");
 Main.__name__ = true;
 Main.main = function() {
-	new js.JQuery(js.Browser.document).ready(function(_) {
+	new js.JQuery(window.document).ready(function(_) {
 		Main.glyphs = new Array();
 		var zoom = 2;
 		var zeroX = 150;
@@ -130,7 +126,7 @@ Main.main = function() {
 		var generateClassButton = new js.JQuery("#generateClassButton");
 		var classCode = new js.JQuery("#class");
 		var fontCode = new js.JQuery("#font");
-		var renderer = new alphatab.rendering.ScoreRenderer(alphatab.Settings.defaults(),js.Browser.document.getElementById("glyphCanvas"));
+		var renderer = new alphatab.rendering.ScoreRenderer(alphatab.Settings.defaults(),window.document.getElementById("glyphCanvas"));
 		var staveGroup = new alphatab.rendering.staves.StaveGroup();
 		staveGroup.layout = renderer.layout;
 		var stave = new alphatab.rendering.staves.Stave(new alphatab.rendering.ScoreBarRendererFactory());
@@ -149,7 +145,7 @@ Main.main = function() {
 			renderer.canvas.stroke();
 			var glx;
 			var gly;
-			if(preview["is"](":checked")) {
+			if(preview.is(":checked")) {
 				glx = zeroX;
 				gly = zeroY;
 			} else {
@@ -166,7 +162,7 @@ Main.main = function() {
 			var s = "x: " + Main.calculateTranslation(Main.currentGlyph.x,zoom,zeroX) + " y: " + Main.calculateTranslation(Main.currentGlyph.y,zoom,zeroY);
 			renderer.canvas.setFont(new alphatab.platform.model.Font("Arial",12));
 			var renderGlyph;
-			if(preview["is"](":checked")) {
+			if(preview.is(":checked")) {
 				renderGlyph = new alphatab.rendering.glyphs.SvgGlyph(zeroX,zeroY,Main.rewritePathData(Main.currentGlyph,zeroX,zeroY,zoom),zoom,zoom);
 				renderer.canvas.fillText(s,Math.max(10,Main.currentGlyph.x) + zeroX - 50,Math.max(20,Main.currentGlyph.y) + zeroY - 50);
 			} else {
@@ -178,7 +174,8 @@ Main.main = function() {
 			renderGlyph.paint(0,0,renderer.canvas);
 		};
 		var i = 0;
-		var _g = 0, _g1 = Main.glyphs;
+		var _g = 0;
+		var _g1 = Main.glyphs;
 		while(_g < _g1.length) {
 			var g = _g1[_g];
 			++_g;
@@ -207,7 +204,7 @@ Main.main = function() {
 				repaint();
 			}
 		});
-		new js.JQuery(js.Browser.document).bind("mouseup",function(_1) {
+		new js.JQuery(window.document).bind("mouseup",function(_1) {
 			dragging = false;
 		});
 		list.change(function(_1) {
@@ -232,7 +229,7 @@ Main.main = function() {
 		list.val("0");
 		list.change();
 	});
-}
+};
 Main.generateClass = function(zeroX,zeroY,zoom) {
 	var buf = new StringBuf();
 	buf.b += "package alphatab.rendering.glyphs;\r\n";
@@ -243,19 +240,22 @@ Main.generateClass = function(zeroX,zeroY,zoom) {
 	buf.b += " */\r\n";
 	buf.b += "class MusicFont\r\n";
 	buf.b += "{\r\n";
-	var _g = 0, _g1 = Main.glyphs;
+	var i = 0;
+	var _g = 0;
+	var _g1 = Main.glyphs;
 	while(_g < _g1.length) {
 		var g = _g1[_g];
 		++_g;
 		buf.b += "    public static var ";
 		buf.b += Std.string(g.name);
-		buf.b += " = \"";
-		buf.b += Std.string(Main.rewritePathData(g,zeroX,zeroY,zoom));
-		buf.b += "\";\r\n";
+		buf.b += " = new LazySvg(\"";
+		var x = Main.rewritePathData(g,zeroX,zeroY,zoom);
+		buf.b += Std.string(x);
+		buf.b += "\");\r\n";
 	}
 	buf.b += "}";
 	return buf.b;
-}
+};
 Main.generateSvgFont = function(zeroX,zeroY,zoom) {
 	var buf = new StringBuf();
 	buf.b += "<?xml version=\"1.0\"?>\r\n";
@@ -265,7 +265,8 @@ Main.generateSvgFont = function(zeroX,zeroY,zoom) {
 	buf.b += "    <font id=\"f\" horiz-adv-x=\"1000\">\r\n";
 	buf.b += "      <font-face font-family=\"AlphaTab\" units-per-em=\"1000\" cap-height=\"600\" x-height=\"400\" ascent=\"-1000\" descent=\"1000\" alphabetic=\"0\" mathematical=\"350\" ideographic=\"400\" hanging=\"500\" />\r\n";
 	var code = 48;
-	var _g = 0, _g1 = Main.glyphs;
+	var _g = 0;
+	var _g1 = Main.glyphs;
 	while(_g < _g1.length) {
 		var g = _g1[_g];
 		++_g;
@@ -275,14 +276,15 @@ Main.generateSvgFont = function(zeroX,zeroY,zoom) {
 		buf.b += "\" glyph-name=\"";
 		buf.b += Std.string(g.name);
 		buf.b += "\"><path d=\"";
-		buf.b += Std.string(Main.rewritePathData(g,zeroX,zeroY,zoom));
+		var x = Main.rewritePathData(g,zeroX,zeroY,zoom);
+		buf.b += Std.string(x);
 		buf.b += "\" /></glyph>\r\n";
 	}
 	buf.b += "    </font>\r\n";
 	buf.b += "  </defs>\r\n";
 	buf.b += "</svg>";
 	return buf.b;
-}
+};
 Main.rewritePathData = function(g,zeroX,zeroY,zoom) {
 	var buf = new StringBuf();
 	var p = new alphatab.rendering.utils.SvgPathParser(g.getSvgData());
@@ -296,34 +298,45 @@ Main.rewritePathData = function(g,zeroX,zeroY,zoom) {
 			isX = true;
 		} else {
 			buf.b += " ";
-			var newValue = Std.parseFloat(p.currentToken) | 0;
-			switch(p.lastCommand) {
+			var newValue;
+			var x = Std.parseFloat(p.currentToken);
+			newValue = x | 0;
+			var _g = p.lastCommand;
+			switch(_g) {
 			case "m":case "z":case "l":case "v":case "h":case "c":case "s":case "q":case "t":
 				buf.b += Std.string(newValue);
 				break;
 			case "H":
-				buf.b += Std.string(newValue + Main.calculateTranslation(g.x,zoom,zeroX));
+				var x = newValue + Main.calculateTranslation(g.x,zoom,zeroX);
+				buf.b += Std.string(x);
 				break;
 			case "V":
-				buf.b += Std.string(newValue + Main.calculateTranslation(g.y,zoom,zeroY));
+				var x = newValue + Main.calculateTranslation(g.y,zoom,zeroY);
+				buf.b += Std.string(x);
 				break;
 			case "M":case "Z":case "L":case "C":case "S":case "Q":case "T":
-				if(isX) buf.b += Std.string(newValue + Main.calculateTranslation(g.x,zoom,zeroX)); else buf.b += Std.string(newValue + Main.calculateTranslation(g.y,zoom,zeroY));
+				if(isX) {
+					var x = newValue + Main.calculateTranslation(g.x,zoom,zeroX);
+					buf.b += Std.string(x);
+				} else {
+					var x = newValue + Main.calculateTranslation(g.y,zoom,zeroY);
+					buf.b += Std.string(x);
+				}
 				break;
 			}
 			isX = !isX;
 		}
 	}
 	return buf.b;
-}
+};
 Main.calculateTranslation = function(glyph,zoom,zero) {
 	return glyph / (zoom / 100) | 0;
-}
+};
 Main.loadGlyphs = function(zoom) {
 	var svg = haxe.Resource.getString("glyphs");
 	var dom = Xml.parse(svg);
 	Main.processNode(dom.firstElement(),zoom);
-}
+};
 Main.processNode = function(node,zoom) {
 	if(node.nodeType == Xml.Element) {
 		if(node.get_nodeName() == "path") {
@@ -337,12 +350,13 @@ Main.processNode = function(node,zoom) {
 			}
 		}
 	}
-}
-var IMap = function() { }
+};
+var IMap = function() { };
 $hxClasses["IMap"] = IMap;
 IMap.__name__ = true;
-var alphatab = {}
-alphatab.rendering = {}
+Math.__name__ = true;
+var alphatab = {};
+alphatab.rendering = {};
 alphatab.rendering.Glyph = function(x,y) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
@@ -352,22 +366,22 @@ alphatab.rendering.Glyph = function(x,y) {
 $hxClasses["alphatab.rendering.Glyph"] = alphatab.rendering.Glyph;
 alphatab.rendering.Glyph.__name__ = true;
 alphatab.rendering.Glyph.prototype = {
-	paint: function(cx,cy,canvas) {
+	applyGlyphSpacing: function(spacing) {
+		if(this.canScale()) this.width += spacing;
 	}
-	,doLayout: function() {
+	,getScale: function() {
+		return this.renderer.stave.staveGroup.layout.renderer.settings.scale;
 	}
 	,canScale: function() {
 		return true;
 	}
-	,getScale: function() {
-		return this.renderer.stave.staveGroup.layout.renderer.scale;
+	,doLayout: function() {
 	}
-	,applyGlyphSpacing: function(spacing) {
-		if(this.canScale()) this.width += spacing;
+	,paint: function(cx,cy,canvas) {
 	}
 	,__class__: alphatab.rendering.Glyph
-}
-alphatab.rendering.glyphs = {}
+};
+alphatab.rendering.glyphs = {};
 alphatab.rendering.glyphs.SvgGlyph = function(x,y,svg,xScale,yScale) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
@@ -380,7 +394,25 @@ $hxClasses["alphatab.rendering.glyphs.SvgGlyph"] = alphatab.rendering.glyphs.Svg
 alphatab.rendering.glyphs.SvgGlyph.__name__ = true;
 alphatab.rendering.glyphs.SvgGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.SvgGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
-	parseCommand: function(cx,cy,canvas) {
+	getSvgData: function() {
+		return this._svg.svg;
+	}
+	,paint: function(cx,cy,canvas) {
+		this._xScale = this._xGlyphScale * this.renderer.stave.staveGroup.layout.renderer.settings.scale;
+		this._yScale = this._yGlyphScale * this.renderer.stave.staveGroup.layout.renderer.settings.scale;
+		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
+		canvas.setColor(res.mainGlyphColor);
+		var startX = this.x + cx;
+		var startY = this.y + cy;
+		this._svg.reset();
+		this._currentX = startX;
+		this._currentY = startY;
+		canvas.setColor(new alphatab.platform.model.Color(0,0,0));
+		canvas.beginPath();
+		while(!this._svg.eof()) this.parseCommand(startX,startY,canvas);
+		canvas.fill();
+	}
+	,parseCommand: function(cx,cy,canvas) {
 		var command = this._svg.getString();
 		var canContinue;
 		switch(command) {
@@ -470,8 +502,10 @@ alphatab.rendering.glyphs.SvgGlyph.prototype = $extend(alphatab.rendering.Glyph.
 				var x1 = cx + this._svg.getNumber() * this._xScale;
 				var y1 = cy + this._svg.getNumber() * this._yScale;
 				canContinue = this._svg.lastCommand == "c" || this._svg.lastCommand == "C" || this._svg.lastCommand == "S" || this._svg.lastCommand == "s";
-				var x2 = canContinue?this._currentX + (this._currentX - this._lastControlX):this._currentX;
-				var y2 = canContinue?this._currentY + (this._currentY - this._lastControlY):this._currentY;
+				var x2;
+				if(canContinue) x2 = this._currentX + (this._currentX - this._lastControlX); else x2 = this._currentX;
+				var y2;
+				if(canContinue) y2 = this._currentY + (this._currentY - this._lastControlY); else y2 = this._currentY;
 				var x3 = cx + this._svg.getNumber() * this._xScale;
 				var y3 = cy + this._svg.getNumber() * this._yScale;
 				this._lastControlX = x2;
@@ -486,8 +520,10 @@ alphatab.rendering.glyphs.SvgGlyph.prototype = $extend(alphatab.rendering.Glyph.
 				var x1 = this._currentX + this._svg.getNumber() * this._xScale;
 				var y1 = this._currentY + this._svg.getNumber() * this._yScale;
 				canContinue = this._svg.lastCommand == "c" || this._svg.lastCommand == "C" || this._svg.lastCommand == "S" || this._svg.lastCommand == "s";
-				var x2 = canContinue?this._currentX + (this._currentX - this._lastControlX):this._currentX;
-				var y2 = canContinue?this._currentY + (this._currentY - this._lastControlY):this._currentY;
+				var x2;
+				if(canContinue) x2 = this._currentX + (this._currentX - this._lastControlX); else x2 = this._currentX;
+				var y2;
+				if(canContinue) y2 = this._currentY + (this._currentY - this._lastControlY); else y2 = this._currentY;
 				var x3 = this._currentX + this._svg.getNumber() * this._xScale;
 				var y3 = this._currentY + this._svg.getNumber() * this._yScale;
 				this._lastControlX = x2;
@@ -528,8 +564,10 @@ alphatab.rendering.glyphs.SvgGlyph.prototype = $extend(alphatab.rendering.Glyph.
 				var x1 = cx + this._svg.getNumber() * this._xScale;
 				var y1 = cy + this._svg.getNumber() * this._yScale;
 				canContinue = this._svg.lastCommand == "q" || this._svg.lastCommand == "Q" || this._svg.lastCommand == "t" || this._svg.lastCommand == "T";
-				var cpx = canContinue?this._currentX + (this._currentX - this._lastControlX):this._currentX;
-				var cpy = canContinue?this._currentY + (this._currentY - this._lastControlY):this._currentY;
+				var cpx;
+				if(canContinue) cpx = this._currentX + (this._currentX - this._lastControlX); else cpx = this._currentX;
+				var cpy;
+				if(canContinue) cpy = this._currentY + (this._currentY - this._lastControlY); else cpy = this._currentY;
 				this._currentX = x1;
 				this._currentY = y1;
 				this._lastControlX = cpx;
@@ -544,32 +582,16 @@ alphatab.rendering.glyphs.SvgGlyph.prototype = $extend(alphatab.rendering.Glyph.
 				var cpx = this._currentX + (this._currentX - this._lastControlX);
 				var cpy = this._currentY + (this._currentY - this._lastControlY);
 				canContinue = this._svg.lastCommand == "q" || this._svg.lastCommand == "Q" || this._svg.lastCommand == "t" || this._svg.lastCommand == "T";
-				var cpx1 = canContinue?this._currentX + (this._currentX - this._lastControlX):this._currentX;
-				var cpy1 = canContinue?this._currentY + (this._currentY - this._lastControlY):this._currentY;
+				var cpx1;
+				if(canContinue) cpx1 = this._currentX + (this._currentX - this._lastControlX); else cpx1 = this._currentX;
+				var cpy1;
+				if(canContinue) cpy1 = this._currentY + (this._currentY - this._lastControlY); else cpy1 = this._currentY;
 				this._lastControlX = cpx1;
 				this._lastControlY = cpy1;
 				canvas.quadraticCurveTo(cpx1,cpy1,x1,y1);
 			} while(this._svg.currentTokenIsNumber());
 			break;
 		}
-	}
-	,paint: function(cx,cy,canvas) {
-		this._xScale = this._xGlyphScale * this.renderer.stave.staveGroup.layout.renderer.scale;
-		this._yScale = this._yGlyphScale * this.renderer.stave.staveGroup.layout.renderer.scale;
-		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
-		canvas.setColor(res.mainGlyphColor);
-		var startX = this.x + cx;
-		var startY = this.y + cy;
-		this._svg.reset();
-		this._currentX = startX;
-		this._currentY = startY;
-		canvas.setColor(new alphatab.platform.model.Color(0,0,0));
-		canvas.beginPath();
-		while(!this._svg.eof()) this.parseCommand(startX,startY,canvas);
-		canvas.fill();
-	}
-	,getSvgData: function() {
-		return this._svg.svg;
 	}
 	,__class__: alphatab.rendering.glyphs.SvgGlyph
 });
@@ -583,17 +605,9 @@ NamedSvgGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 NamedSvgGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
 	__class__: NamedSvgGlyph
 });
-var Reflect = function() { }
+var Reflect = function() { };
 $hxClasses["Reflect"] = Reflect;
 Reflect.__name__ = true;
-Reflect.field = function(o,field) {
-	var v = null;
-	try {
-		v = o[field];
-	} catch( e ) {
-	}
-	return v;
-}
 Reflect.fields = function(o) {
 	var a = [];
 	if(o != null) {
@@ -603,71 +617,68 @@ Reflect.fields = function(o) {
 		}
 	}
 	return a;
-}
+};
 Reflect.isFunction = function(f) {
 	return typeof(f) == "function" && !(f.__name__ || f.__ename__);
-}
-var Std = function() { }
+};
+var Std = function() { };
 $hxClasses["Std"] = Std;
 Std.__name__ = true;
 Std.string = function(s) {
 	return js.Boot.__string_rec(s,"");
-}
+};
 Std.parseInt = function(x) {
 	var v = parseInt(x,10);
 	if(v == 0 && (HxOverrides.cca(x,1) == 120 || HxOverrides.cca(x,1) == 88)) v = parseInt(x);
 	if(isNaN(v)) return null;
 	return v;
-}
+};
 Std.parseFloat = function(x) {
 	return parseFloat(x);
-}
+};
 var StringBuf = function() {
 	this.b = "";
 };
 $hxClasses["StringBuf"] = StringBuf;
 StringBuf.__name__ = true;
 StringBuf.prototype = {
-	addSub: function(s,pos,len) {
-		this.b += len == null?HxOverrides.substr(s,pos,null):HxOverrides.substr(s,pos,len);
-	}
-	,__class__: StringBuf
-}
-var StringTools = function() { }
+	__class__: StringBuf
+};
+var StringTools = function() { };
 $hxClasses["StringTools"] = StringTools;
 StringTools.__name__ = true;
 StringTools.urlDecode = function(s) {
 	return decodeURIComponent(s.split("+").join(" "));
-}
+};
 StringTools.htmlEscape = function(s,quotes) {
 	s = s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
-	return quotes?s.split("\"").join("&quot;").split("'").join("&#039;"):s;
-}
+	if(quotes) return s.split("\"").join("&quot;").split("'").join("&#039;"); else return s;
+};
 StringTools.startsWith = function(s,start) {
 	return s.length >= start.length && HxOverrides.substr(s,0,start.length) == start;
-}
+};
 StringTools.isSpace = function(s,pos) {
 	var c = HxOverrides.cca(s,pos);
 	return c > 8 && c < 14 || c == 32;
-}
+};
 StringTools.ltrim = function(s) {
 	var l = s.length;
 	var r = 0;
 	while(r < l && StringTools.isSpace(s,r)) r++;
 	if(r > 0) return HxOverrides.substr(s,r,l - r); else return s;
-}
+};
 StringTools.rtrim = function(s) {
 	var l = s.length;
 	var r = 0;
 	while(r < l && StringTools.isSpace(s,l - r - 1)) r++;
 	if(r > 0) return HxOverrides.substr(s,0,l - r); else return s;
-}
+};
 StringTools.trim = function(s) {
 	return StringTools.ltrim(StringTools.rtrim(s));
-}
+};
 StringTools.replace = function(s,sub,by) {
 	return s.split(sub).join(by);
-}
+};
 StringTools.hex = function(n,digits) {
 	var s = "";
 	var hexChars = "0123456789ABCDEF";
@@ -677,26 +688,32 @@ StringTools.hex = function(n,digits) {
 	} while(n > 0);
 	if(digits != null) while(s.length < digits) s = "0" + s;
 	return s;
-}
-var Type = function() { }
+};
+var Type = function() { };
 $hxClasses["Type"] = Type;
 Type.__name__ = true;
 Type.resolveClass = function(name) {
 	var cl = $hxClasses[name];
 	if(cl == null || !cl.__name__) return null;
 	return cl;
-}
+};
 Type.resolveEnum = function(name) {
 	var e = $hxClasses[name];
 	if(e == null || !e.__ename__) return null;
 	return e;
-}
+};
 Type.createEmptyInstance = function(cl) {
 	function empty() {}; empty.prototype = cl.prototype;
 	return new empty();
-}
+};
 Type.createEnum = function(e,constr,params) {
-	var f = Reflect.field(e,constr);
+	var f;
+	var v = null;
+	try {
+		v = e[constr];
+	} catch( e1 ) {
+	}
+	f = v;
 	if(f == null) throw "No such constructor " + constr;
 	if(Reflect.isFunction(f)) {
 		if(params == null) throw "Constructor " + constr + " need parameters";
@@ -704,19 +721,19 @@ Type.createEnum = function(e,constr,params) {
 	}
 	if(params != null && params.length != 0) throw "Constructor " + constr + " does not need parameters";
 	return f;
-}
+};
 Type.getEnumConstructs = function(e) {
 	var a = e.__constructs__;
 	return a.slice();
-}
-var XmlType = $hxClasses["XmlType"] = { __ename__ : true, __constructs__ : [] }
+};
+var XmlType = $hxClasses["XmlType"] = { __ename__ : true, __constructs__ : [] };
 var Xml = function() {
 };
 $hxClasses["Xml"] = Xml;
 Xml.__name__ = true;
 Xml.parse = function(str) {
 	return haxe.xml.Parser.parse(str);
-}
+};
 Xml.createElement = function(name) {
 	var r = new Xml();
 	r.nodeType = Xml.Element;
@@ -724,45 +741,102 @@ Xml.createElement = function(name) {
 	r._attributes = new haxe.ds.StringMap();
 	r.set_nodeName(name);
 	return r;
-}
+};
 Xml.createPCData = function(data) {
 	var r = new Xml();
 	r.nodeType = Xml.PCData;
 	r.set_nodeValue(data);
 	return r;
-}
+};
 Xml.createCData = function(data) {
 	var r = new Xml();
 	r.nodeType = Xml.CData;
 	r.set_nodeValue(data);
 	return r;
-}
+};
 Xml.createComment = function(data) {
 	var r = new Xml();
 	r.nodeType = Xml.Comment;
 	r.set_nodeValue(data);
 	return r;
-}
+};
 Xml.createDocType = function(data) {
 	var r = new Xml();
 	r.nodeType = Xml.DocType;
 	r.set_nodeValue(data);
 	return r;
-}
+};
 Xml.createProcessingInstruction = function(data) {
 	var r = new Xml();
 	r.nodeType = Xml.ProcessingInstruction;
 	r.set_nodeValue(data);
 	return r;
-}
+};
 Xml.createDocument = function() {
 	var r = new Xml();
 	r.nodeType = Xml.Document;
 	r._children = new Array();
 	return r;
-}
+};
 Xml.prototype = {
-	toString: function() {
+	get_nodeName: function() {
+		if(this.nodeType != Xml.Element) throw "bad nodeType";
+		return this._nodeName;
+	}
+	,set_nodeName: function(n) {
+		if(this.nodeType != Xml.Element) throw "bad nodeType";
+		return this._nodeName = n;
+	}
+	,get_nodeValue: function() {
+		if(this.nodeType == Xml.Element || this.nodeType == Xml.Document) throw "bad nodeType";
+		return this._nodeValue;
+	}
+	,set_nodeValue: function(v) {
+		if(this.nodeType == Xml.Element || this.nodeType == Xml.Document) throw "bad nodeType";
+		return this._nodeValue = v;
+	}
+	,get: function(att) {
+		if(this.nodeType != Xml.Element) throw "bad nodeType";
+		return this._attributes.get(att);
+	}
+	,set: function(att,value) {
+		if(this.nodeType != Xml.Element) throw "bad nodeType";
+		this._attributes.set(att,value);
+	}
+	,exists: function(att) {
+		if(this.nodeType != Xml.Element) throw "bad nodeType";
+		return this._attributes.exists(att);
+	}
+	,iterator: function() {
+		if(this._children == null) throw "bad nodetype";
+		return { cur : 0, x : this._children, hasNext : function() {
+			return this.cur < this.x.length;
+		}, next : function() {
+			return this.x[this.cur++];
+		}};
+	}
+	,firstChild: function() {
+		if(this._children == null) throw "bad nodetype";
+		return this._children[0];
+	}
+	,firstElement: function() {
+		if(this._children == null) throw "bad nodetype";
+		var cur = 0;
+		var l = this._children.length;
+		while(cur < l) {
+			var n = this._children[cur];
+			if(n.nodeType == Xml.Element) return n;
+			cur++;
+		}
+		return null;
+	}
+	,addChild: function(x) {
+		if(this._children == null) throw "bad nodetype";
+		if(x._parent != null) HxOverrides.remove(x._parent._children,x);
+		x._parent = this;
+		this._children.push(x);
+	}
+	,toString: function() {
 		if(this.nodeType == Xml.PCData) return StringTools.htmlEscape(this._nodeValue);
 		if(this.nodeType == Xml.CData) return "<![CDATA[" + this._nodeValue + "]]>";
 		if(this.nodeType == Xml.Comment) return "<!--" + this._nodeValue + "-->";
@@ -778,7 +852,8 @@ Xml.prototype = {
 				s.b += " ";
 				s.b += Std.string(k);
 				s.b += "=\"";
-				s.b += Std.string(this._attributes.get(k));
+				var x = this._attributes.get(k);
+				s.b += Std.string(x);
 				s.b += "\"";
 			}
 			if(this._children.length == 0) {
@@ -790,7 +865,8 @@ Xml.prototype = {
 		var $it1 = this.iterator();
 		while( $it1.hasNext() ) {
 			var x = $it1.next();
-			s.b += Std.string(x.toString());
+			var x1 = x.toString();
+			s.b += Std.string(x1);
 		}
 		if(this.nodeType == Xml.Element) {
 			s.b += "</";
@@ -799,67 +875,10 @@ Xml.prototype = {
 		}
 		return s.b;
 	}
-	,addChild: function(x) {
-		if(this._children == null) throw "bad nodetype";
-		if(x._parent != null) HxOverrides.remove(x._parent._children,x);
-		x._parent = this;
-		this._children.push(x);
-	}
-	,firstElement: function() {
-		if(this._children == null) throw "bad nodetype";
-		var cur = 0;
-		var l = this._children.length;
-		while(cur < l) {
-			var n = this._children[cur];
-			if(n.nodeType == Xml.Element) return n;
-			cur++;
-		}
-		return null;
-	}
-	,firstChild: function() {
-		if(this._children == null) throw "bad nodetype";
-		return this._children[0];
-	}
-	,iterator: function() {
-		if(this._children == null) throw "bad nodetype";
-		return { cur : 0, x : this._children, hasNext : function() {
-			return this.cur < this.x.length;
-		}, next : function() {
-			return this.x[this.cur++];
-		}};
-	}
-	,exists: function(att) {
-		if(this.nodeType != Xml.Element) throw "bad nodeType";
-		return this._attributes.exists(att);
-	}
-	,set: function(att,value) {
-		if(this.nodeType != Xml.Element) throw "bad nodeType";
-		this._attributes.set(att,value);
-	}
-	,get: function(att) {
-		if(this.nodeType != Xml.Element) throw "bad nodeType";
-		return this._attributes.get(att);
-	}
-	,set_nodeValue: function(v) {
-		if(this.nodeType == Xml.Element || this.nodeType == Xml.Document) throw "bad nodeType";
-		return this._nodeValue = v;
-	}
-	,get_nodeValue: function() {
-		if(this.nodeType == Xml.Element || this.nodeType == Xml.Document) throw "bad nodeType";
-		return this._nodeValue;
-	}
-	,set_nodeName: function(n) {
-		if(this.nodeType != Xml.Element) throw "bad nodeType";
-		return this._nodeName = n;
-	}
-	,get_nodeName: function() {
-		if(this.nodeType != Xml.Element) throw "bad nodeType";
-		return this._nodeName;
-	}
 	,__class__: Xml
-}
-var haxe = {}
-haxe.ds = {}
+};
+var haxe = {};
+haxe.ds = {};
 haxe.ds.StringMap = function() {
 	this.h = { };
 };
@@ -867,13 +886,14 @@ $hxClasses["haxe.ds.StringMap"] = haxe.ds.StringMap;
 haxe.ds.StringMap.__name__ = true;
 haxe.ds.StringMap.__interfaces__ = [IMap];
 haxe.ds.StringMap.prototype = {
-	iterator: function() {
-		return { ref : this.h, it : this.keys(), hasNext : function() {
-			return this.it.hasNext();
-		}, next : function() {
-			var i = this.it.next();
-			return this.ref["$" + i];
-		}};
+	set: function(key,value) {
+		this.h["$" + key] = value;
+	}
+	,get: function(key) {
+		return this.h["$" + key];
+	}
+	,exists: function(key) {
+		return this.h.hasOwnProperty("$" + key);
 	}
 	,keys: function() {
 		var a = [];
@@ -882,25 +902,24 @@ haxe.ds.StringMap.prototype = {
 		}
 		return HxOverrides.iter(a);
 	}
-	,exists: function(key) {
-		return this.h.hasOwnProperty("$" + key);
-	}
-	,get: function(key) {
-		return this.h["$" + key];
-	}
-	,set: function(key,value) {
-		this.h["$" + key] = value;
+	,iterator: function() {
+		return { ref : this.h, it : this.keys(), hasNext : function() {
+			return this.it.hasNext();
+		}, next : function() {
+			var i = this.it.next();
+			return this.ref["$" + i];
+		}};
 	}
 	,__class__: haxe.ds.StringMap
-}
-alphatab.platform = {}
-alphatab.platform.ICanvas = function() { }
+};
+alphatab.platform = {};
+alphatab.platform.ICanvas = function() { };
 $hxClasses["alphatab.platform.ICanvas"] = alphatab.platform.ICanvas;
 alphatab.platform.ICanvas.__name__ = true;
 alphatab.platform.ICanvas.prototype = {
 	__class__: alphatab.platform.ICanvas
-}
-alphatab.platform.js = {}
+};
+alphatab.platform.js = {};
 alphatab.platform.js.Html5Canvas = function(dom) {
 	this._canvas = dom;
 	this._context = dom.getContext("2d");
@@ -910,17 +929,120 @@ $hxClasses["alphatab.platform.js.Html5Canvas"] = alphatab.platform.js.Html5Canva
 alphatab.platform.js.Html5Canvas.__name__ = true;
 alphatab.platform.js.Html5Canvas.__interfaces__ = [alphatab.platform.ICanvas];
 alphatab.platform.js.Html5Canvas.prototype = {
-	measureText: function(text) {
-		return this._context.measureText(text).width;
+	getWidth: function() {
+		return this._canvas.width;
 	}
-	,strokeText: function(text,x,y) {
-		this._context.strokeText(text,x,y);
+	,getHeight: function() {
+		return this._canvas.height;
 	}
-	,fillText: function(text,x,y) {
-		this._context.fillText(text,x,y);
+	,setWidth: function(width) {
+		var lineWidth = this._context.lineWidth;
+		this._canvas.width = width;
+		this._context = this._canvas.getContext("2d");
+		this._context.textBaseline = "top";
+		this._context.lineWidth = lineWidth;
+		this._width = width;
+	}
+	,setHeight: function(height) {
+		var lineWidth = this._context.lineWidth;
+		this._canvas.height = height;
+		this._context = this._canvas.getContext("2d");
+		this._context.textBaseline = "top";
+		this._context.lineWidth = lineWidth;
+		this._height = height;
+	}
+	,setColor: function(color) {
+		this._context.strokeStyle = color.toRgbaString();
+		this._context.fillStyle = color.toRgbaString();
+	}
+	,setLineWidth: function(value) {
+		this._context.lineWidth = value;
+	}
+	,clear: function() {
+		var lineWidth = this._context.lineWidth;
+		this._canvas.width = this._canvas.width;
+		this._context.lineWidth = lineWidth;
+	}
+	,fillRect: function(x,y,w,h) {
+		this._context.fillRect(x - 0.5,y - 0.5,w,h);
+	}
+	,strokeRect: function(x,y,w,h) {
+		this._context.strokeRect(x - 0.5,y - 0.5,w,h);
+	}
+	,beginPath: function() {
+		this._context.beginPath();
+	}
+	,closePath: function() {
+		this._context.closePath();
+	}
+	,moveTo: function(x,y) {
+		this._context.moveTo(x - 0.5,y - 0.5);
+	}
+	,lineTo: function(x,y) {
+		this._context.lineTo(x - 0.5,y - 0.5);
+	}
+	,quadraticCurveTo: function(cpx,cpy,x,y) {
+		this._context.quadraticCurveTo(cpx,cpy,x,y);
+	}
+	,bezierCurveTo: function(cp1x,cp1y,cp2x,cp2y,x,y) {
+		this._context.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,x,y);
+	}
+	,circle: function(x,y,radius) {
+		this._context.arc(x,y,radius,0,Math.PI * 2,true);
+	}
+	,rect: function(x,y,w,h) {
+		this._context.rect(x,y,w,h);
+	}
+	,fill: function() {
+		this._context.fill();
+	}
+	,stroke: function() {
+		this._context.stroke();
+	}
+	,setFont: function(font) {
+		this._context.font = font.toCssString();
+	}
+	,getTextAlign: function() {
+		var _g = this._context.textAlign;
+		switch(_g) {
+		case "left":
+			return alphatab.platform.model.TextAlign.Left;
+		case "center":
+			return alphatab.platform.model.TextAlign.Center;
+		case "right":
+			return alphatab.platform.model.TextAlign.Right;
+		default:
+			return alphatab.platform.model.TextAlign.Left;
+		}
+	}
+	,setTextAlign: function(textAlign) {
+		switch(textAlign[1]) {
+		case 0:
+			this._context.textAlign = "left";
+			break;
+		case 1:
+			this._context.textAlign = "center";
+			break;
+		case 2:
+			this._context.textAlign = "right";
+			break;
+		}
+	}
+	,getTextBaseline: function() {
+		var _g = this._context.textBaseline;
+		switch(_g) {
+		case "top":
+			return alphatab.model.TextBaseline.Top;
+		case "middle":
+			return alphatab.model.TextBaseline.Middle;
+		case "bottom":
+			return alphatab.model.TextBaseline.Bottom;
+		default:
+			return alphatab.model.TextBaseline.Default;
+		}
 	}
 	,setTextBaseline: function(textBaseLine) {
-		switch( (textBaseLine)[1] ) {
+		switch(textBaseLine[1]) {
 		case 1:
 			this._context.textBaseline = "top";
 			break;
@@ -934,124 +1056,18 @@ alphatab.platform.js.Html5Canvas.prototype = {
 			this._context.textBaseline = "alphabetic";
 		}
 	}
-	,getTextBaseline: function() {
-		var _g = this;
-		switch(_g._context.textBaseline) {
-		case "top":
-			return alphatab.model.TextBaseline.Top;
-		case "middle":
-			return alphatab.model.TextBaseline.Middle;
-		case "bottom":
-			return alphatab.model.TextBaseline.Bottom;
-		default:
-			return alphatab.model.TextBaseline.Default;
-		}
+	,fillText: function(text,x,y) {
+		this._context.fillText(text,x,y);
 	}
-	,setTextAlign: function(textAlign) {
-		switch( (textAlign)[1] ) {
-		case 0:
-			this._context.textAlign = "left";
-			break;
-		case 1:
-			this._context.textAlign = "center";
-			break;
-		case 2:
-			this._context.textAlign = "right";
-			break;
-		}
-	}
-	,getTextAlign: function() {
-		var _g = this;
-		switch(_g._context.textAlign) {
-		case "left":
-			return alphatab.platform.model.TextAlign.Left;
-		case "center":
-			return alphatab.platform.model.TextAlign.Center;
-		case "right":
-			return alphatab.platform.model.TextAlign.Right;
-		default:
-			return alphatab.platform.model.TextAlign.Left;
-		}
-	}
-	,setFont: function(font) {
-		this._context.font = font.toCssString();
-	}
-	,stroke: function() {
-		this._context.stroke();
-	}
-	,fill: function() {
-		this._context.fill();
-	}
-	,rect: function(x,y,w,h) {
-		this._context.rect(x,y,w,h);
-	}
-	,circle: function(x,y,radius) {
-		this._context.arc(x,y,radius,0,Math.PI * 2,true);
-	}
-	,bezierCurveTo: function(cp1x,cp1y,cp2x,cp2y,x,y) {
-		this._context.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,x,y);
-	}
-	,quadraticCurveTo: function(cpx,cpy,x,y) {
-		this._context.quadraticCurveTo(cpx,cpy,x,y);
-	}
-	,lineTo: function(x,y) {
-		this._context.lineTo(x - 0.5,y - 0.5);
-	}
-	,moveTo: function(x,y) {
-		this._context.moveTo(x - 0.5,y - 0.5);
-	}
-	,closePath: function() {
-		this._context.closePath();
-	}
-	,beginPath: function() {
-		this._context.beginPath();
-	}
-	,strokeRect: function(x,y,w,h) {
-		this._context.strokeRect(x - 0.5,y - 0.5,w,h);
-	}
-	,fillRect: function(x,y,w,h) {
-		this._context.fillRect(x - 0.5,y - 0.5,w,h);
-	}
-	,clear: function() {
-		var lineWidth = this._context.lineWidth;
-		this._canvas.width = this._canvas.width;
-		this._context.lineWidth = lineWidth;
-	}
-	,setLineWidth: function(value) {
-		this._context.lineWidth = value;
-	}
-	,setColor: function(color) {
-		this._context.strokeStyle = color.toRgbaString();
-		this._context.fillStyle = color.toRgbaString();
-	}
-	,setHeight: function(height) {
-		var lineWidth = this._context.lineWidth;
-		this._canvas.height = height;
-		this._context = this._canvas.getContext("2d");
-		this._context.textBaseline = "top";
-		this._context.lineWidth = lineWidth;
-		this._height = height;
-	}
-	,setWidth: function(width) {
-		var lineWidth = this._context.lineWidth;
-		this._canvas.width = width;
-		this._context = this._canvas.getContext("2d");
-		this._context.textBaseline = "top";
-		this._context.lineWidth = lineWidth;
-		this._width = width;
-	}
-	,getHeight: function() {
-		return this._canvas.height;
-	}
-	,getWidth: function() {
-		return this._canvas.width;
+	,measureText: function(text) {
+		return this._context.measureText(text).width;
 	}
 	,__class__: alphatab.platform.js.Html5Canvas
-}
-alphatab.platform.svg = {}
+};
+alphatab.platform.svg = {};
 alphatab.platform.svg.SvgCanvas = function() {
-	this._buffer = new StringBuf();
-	this._currentPath = new StringBuf();
+	this._buffer = "";
+	this._currentPath = "";
 	this._currentPathIsEmpty = true;
 	this._color = new alphatab.platform.model.Color(255,255,255);
 	this._lineWidth = 1;
@@ -1065,256 +1081,7 @@ $hxClasses["alphatab.platform.svg.SvgCanvas"] = alphatab.platform.svg.SvgCanvas;
 alphatab.platform.svg.SvgCanvas.__name__ = true;
 alphatab.platform.svg.SvgCanvas.__interfaces__ = [alphatab.platform.ICanvas];
 alphatab.platform.svg.SvgCanvas.prototype = {
-	measureText: function(text) {
-		if(text == null || text.length == 0) return 0;
-		var font = alphatab.platform.svg.SupportedFonts.Arial;
-		if(this._font.getFamily().indexOf("Times") >= 0) font = alphatab.platform.svg.SupportedFonts.TimesNewRoman;
-		return alphatab.platform.svg.FontSizes.measureString(text,font,this._font.getSize());
-	}
-	,getSvgBaseLine: function() {
-		return "middle";
-	}
-	,getSvgBaseLineOffset: function() {
-		var _g = this;
-		switch( (_g._textBaseline)[1] ) {
-		case 1:
-			return 0;
-		case 2:
-			return 0;
-		case 3:
-			return 0;
-		default:
-			return this._font.getSize();
-		}
-	}
-	,getSvgTextAlignment: function() {
-		var _g = this;
-		switch( (_g._textAlign)[1] ) {
-		case 0:
-			return "start";
-		case 1:
-			return "middle";
-		case 2:
-			return "end";
-		}
-	}
-	,strokeText: function(text,x,y) {
-		this._buffer.b += "<text x=\"";
-		this._buffer.b += Std.string(x);
-		this._buffer.b += "\" y=\"";
-		this._buffer.b += Std.string(y);
-		this._buffer.b += "\" style=\"font:";
-		this._buffer.b += Std.string(this._font.toCssString());
-		this._buffer.b += "\" stroke:";
-		this._buffer.b += Std.string(this._color.toRgbaString());
-		this._buffer.b += "; stroke-width:";
-		this._buffer.b += Std.string(this._lineWidth);
-		this._buffer.b += ";\" ";
-		this._buffer.b += " dominant-baseline=\"";
-		this._buffer.b += "middle";
-		this._buffer.b += "\" text-anchor=\"";
-		this._buffer.b += Std.string(this.getSvgTextAlignment());
-		this._buffer.b += "\">\n";
-		this._buffer.b += Std.string(text);
-		this._buffer.b += "</text>\n";
-	}
-	,fillText: function(text,x,y) {
-		this._buffer.b += "<text x=\"";
-		this._buffer.b += Std.string(x);
-		this._buffer.b += "\" y=\"";
-		this._buffer.b += Std.string(y + this.getSvgBaseLineOffset());
-		this._buffer.b += "\" style=\"font:";
-		this._buffer.b += Std.string(this._font.toCssString());
-		this._buffer.b += "; fill:";
-		this._buffer.b += Std.string(this._color.toRgbaString());
-		this._buffer.b += ";\" ";
-		this._buffer.b += " dominant-baseline=\"";
-		this._buffer.b += "middle";
-		this._buffer.b += "\" text-anchor=\"";
-		this._buffer.b += Std.string(this.getSvgTextAlignment());
-		this._buffer.b += "\">\n";
-		this._buffer.b += Std.string(text);
-		this._buffer.b += "</text>\n";
-	}
-	,setTextBaseline: function(textBaseline) {
-		this._textBaseline = textBaseline;
-	}
-	,getTextBaseline: function() {
-		return this._textBaseline;
-	}
-	,setTextAlign: function(textAlign) {
-		this._textAlign = textAlign;
-	}
-	,getTextAlign: function() {
-		return this._textAlign;
-	}
-	,setFont: function(font) {
-		this._font = font;
-	}
-	,stroke: function() {
-		var path = this._currentPath.b;
-		if(!this._currentPathIsEmpty) {
-			this._buffer.b += "<path d=\"";
-			this._buffer.b += Std.string(this._currentPath.b);
-			this._buffer.b += "\" style=\"stroke:";
-			this._buffer.b += Std.string(this._color.toRgbaString());
-			this._buffer.b += "; stroke-width:";
-			this._buffer.b += Std.string(this._lineWidth);
-			this._buffer.b += ";\" fill=\"none\" />\n";
-		}
-		this._currentPath = new StringBuf();
-		this._currentPathIsEmpty = true;
-	}
-	,fill: function() {
-		var path = this._currentPath.b;
-		if(!this._currentPathIsEmpty) {
-			this._buffer.b += "<path d=\"";
-			this._buffer.b += Std.string(this._currentPath.b);
-			this._buffer.b += "\" style=\"fill:";
-			this._buffer.b += Std.string(this._color.toRgbaString());
-			this._buffer.b += "\" stroke=\"none\"/>\n";
-		}
-		this._currentPath = new StringBuf();
-		this._currentPathIsEmpty = true;
-	}
-	,rect: function(x,y,w,h) {
-		this._currentPathIsEmpty = false;
-		this._currentPath.b += " M";
-		this._currentPath.b += Std.string(x);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(y);
-		this._currentPath.b += " L";
-		this._currentPath.b += Std.string(x + w);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(y);
-		this._currentPath.b += " ";
-		this._currentPath.b += Std.string(x + w);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(y + h);
-		this._currentPath.b += " ";
-		this._currentPath.b += Std.string(x);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(y + h);
-		this._currentPath.b += " z";
-	}
-	,circle: function(x,y,radius) {
-		this._currentPathIsEmpty = false;
-		this._currentPath.b += " M";
-		this._currentPath.b += Std.string(x - radius);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(y);
-		this._currentPath.b += " A1,1 0 0,0 ";
-		this._currentPath.b += Std.string(x + radius);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(y);
-		this._currentPath.b += " A1,1 0 0,0 ";
-		this._currentPath.b += Std.string(x - radius);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(y);
-		this._currentPath.b += " z";
-	}
-	,bezierCurveTo: function(cp1x,cp1y,cp2x,cp2y,x,y) {
-		this._currentPathIsEmpty = false;
-		this._currentPath.b += " C";
-		this._currentPath.b += Std.string(cp1x);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(cp1y);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(cp2x);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(cp2y);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(x);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(y);
-	}
-	,quadraticCurveTo: function(cpx,cpy,x,y) {
-		this._currentPathIsEmpty = false;
-		this._currentPath.b += " Q";
-		this._currentPath.b += Std.string(cpx);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(cpy);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(x);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(y);
-	}
-	,lineTo: function(x,y) {
-		this._currentPathIsEmpty = false;
-		this._currentPath.b += " L";
-		this._currentPath.b += Std.string(x);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(y);
-	}
-	,moveTo: function(x,y) {
-		this._currentPath.b += " M";
-		this._currentPath.b += Std.string(x);
-		this._currentPath.b += ",";
-		this._currentPath.b += Std.string(y);
-	}
-	,closePath: function() {
-		this._currentPath.b += " z";
-	}
-	,beginPath: function() {
-	}
-	,strokeRect: function(x,y,w,h) {
-		this._buffer.b += "<rect x=\"";
-		this._buffer.b += Std.string(x);
-		this._buffer.b += "\" y=\"";
-		this._buffer.b += Std.string(y);
-		this._buffer.b += "\" width=\"";
-		this._buffer.b += Std.string(w);
-		this._buffer.b += "\" height=\"";
-		this._buffer.b += Std.string(h);
-		this._buffer.b += "\" style=\"stroke:";
-		this._buffer.b += Std.string(this._color.toRgbaString());
-		this._buffer.b += "; stroke-width:";
-		this._buffer.b += Std.string(this._lineWidth);
-		this._buffer.b += ";\" />\n";
-	}
-	,fillRect: function(x,y,w,h) {
-		this._buffer.b += "<rect x=\"";
-		this._buffer.b += Std.string(x);
-		this._buffer.b += "\" y=\"";
-		this._buffer.b += Std.string(y);
-		this._buffer.b += "\" width=\"";
-		this._buffer.b += Std.string(w);
-		this._buffer.b += "\" height=\"";
-		this._buffer.b += Std.string(h);
-		this._buffer.b += "\" style=\"fill:";
-		this._buffer.b += Std.string(this._color.toRgbaString());
-		this._buffer.b += ";\" />\n";
-	}
-	,clear: function() {
-		this._buffer = new StringBuf();
-		this._currentPath = new StringBuf();
-		this._currentPathIsEmpty = true;
-	}
-	,setLineWidth: function(value) {
-		this._lineWidth = value;
-	}
-	,setColor: function(color) {
-		this._color = color;
-	}
-	,setHeight: function(height) {
-		this._height = height;
-	}
-	,setWidth: function(width) {
-		this._width = width;
-	}
-	,getHeight: function() {
-		return this._height;
-	}
-	,getWidth: function() {
-		return this._width;
-	}
-	,toSvg: function(includeWrapper,className) {
-		var out = new haxe.io.BytesOutput();
-		this.writeTo(out,includeWrapper,className);
-		out.flush();
-		return out.getBytes().toString();
-	}
-	,writeTo: function(stream,includeWrapper,className) {
+	writeTo: function(stream,includeWrapper,className) {
 		if(includeWrapper) {
 			stream.writeString("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"");
 			alphatab.io.OutputExtensions.writeAsString(stream,this._width);
@@ -1328,12 +1095,284 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 			}
 			stream.writeString(">\n");
 		}
-		stream.writeString(this._buffer.b);
+		stream.writeString(this._buffer.toString());
 		if(includeWrapper) stream.writeString("</svg>");
 	}
+	,toSvg: function(includeWrapper,className) {
+		var buf = new StringBuf();
+		if(includeWrapper) {
+			buf.b += "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"";
+			buf.b += Std.string(this._width);
+			buf.b += "px\" height=\"";
+			buf.b += Std.string(this._height);
+			buf.b += "px\"";
+			if(className != null) {
+				buf.b += " class=\"";
+				buf.b += Std.string(className);
+				buf.b += "\"";
+			}
+			buf.b += ">\n";
+		}
+		var x = this._buffer.toString();
+		buf.b += Std.string(x);
+		if(includeWrapper) buf.b += "</svg>";
+		return buf.b;
+	}
+	,getWidth: function() {
+		return this._width;
+	}
+	,getHeight: function() {
+		return this._height;
+	}
+	,setWidth: function(width) {
+		this._width = width;
+	}
+	,setHeight: function(height) {
+		this._height = height;
+	}
+	,setColor: function(color) {
+		this._color = color;
+	}
+	,setLineWidth: function(value) {
+		this._lineWidth = value;
+	}
+	,clear: function() {
+		this._buffer = "";
+		this._currentPath = "";
+		this._currentPathIsEmpty = true;
+	}
+	,fillRect: function(x,y,w,h) {
+		this._buffer += "<rect x=\"";
+		this._buffer += x;
+		this._buffer += "\" y=\"";
+		this._buffer += y;
+		this._buffer += "\" width=\"";
+		this._buffer += w;
+		this._buffer += "\" height=\"";
+		this._buffer += h;
+		this._buffer += "\" style=\"fill:";
+		this._buffer += this._color.toRgbaString();
+		this._buffer += ";\" />\n";
+	}
+	,strokeRect: function(x,y,w,h) {
+		this._buffer += "<rect x=\"";
+		this._buffer += x;
+		this._buffer += "\" y=\"";
+		this._buffer += y;
+		this._buffer += "\" width=\"";
+		this._buffer += w;
+		this._buffer += "\" height=\"";
+		this._buffer += h;
+		this._buffer += "\" style=\"stroke:";
+		this._buffer += this._color.toRgbaString();
+		this._buffer += "; stroke-width:";
+		this._buffer += this._lineWidth;
+		this._buffer += ";\" />\n";
+	}
+	,beginPath: function() {
+	}
+	,closePath: function() {
+		this._currentPath += " z";
+	}
+	,moveTo: function(x,y) {
+		this._currentPath += " M";
+		this._currentPath += x;
+		this._currentPath += ",";
+		this._currentPath += y;
+	}
+	,lineTo: function(x,y) {
+		this._currentPathIsEmpty = false;
+		this._currentPath += " L";
+		this._currentPath += x;
+		this._currentPath += ",";
+		this._currentPath += y;
+	}
+	,quadraticCurveTo: function(cpx,cpy,x,y) {
+		this._currentPathIsEmpty = false;
+		this._currentPath += " Q";
+		this._currentPath += cpx;
+		this._currentPath += ",";
+		this._currentPath += cpy;
+		this._currentPath += ",";
+		this._currentPath += x;
+		this._currentPath += ",";
+		this._currentPath += y;
+	}
+	,bezierCurveTo: function(cp1x,cp1y,cp2x,cp2y,x,y) {
+		this._currentPathIsEmpty = false;
+		this._currentPath += " C";
+		this._currentPath += cp1x;
+		this._currentPath += ",";
+		this._currentPath += cp1y;
+		this._currentPath += ",";
+		this._currentPath += cp2x;
+		this._currentPath += ",";
+		this._currentPath += cp2y;
+		this._currentPath += ",";
+		this._currentPath += x;
+		this._currentPath += ",";
+		this._currentPath += y;
+	}
+	,circle: function(x,y,radius) {
+		this._currentPathIsEmpty = false;
+		this._currentPath += " M";
+		this._currentPath += x - radius;
+		this._currentPath += ",";
+		this._currentPath += y;
+		this._currentPath += " A1,1 0 0,0 ";
+		this._currentPath += x + radius;
+		this._currentPath += ",";
+		this._currentPath += y;
+		this._currentPath += " A1,1 0 0,0 ";
+		this._currentPath += x - radius;
+		this._currentPath += ",";
+		this._currentPath += y;
+		this._currentPath += " z";
+	}
+	,rect: function(x,y,w,h) {
+		this._currentPathIsEmpty = false;
+		this._currentPath += " M";
+		this._currentPath += x;
+		this._currentPath += ",";
+		this._currentPath += y;
+		this._currentPath += " L";
+		this._currentPath += x + w;
+		this._currentPath += ",";
+		this._currentPath += y;
+		this._currentPath += " ";
+		this._currentPath += x + w;
+		this._currentPath += ",";
+		this._currentPath += y + h;
+		this._currentPath += " ";
+		this._currentPath += x;
+		this._currentPath += ",";
+		this._currentPath += y + h;
+		this._currentPath += " z";
+	}
+	,fill: function() {
+		if(!this._currentPathIsEmpty) {
+			this._buffer += "<path d=\"";
+			this._buffer += this._currentPath.toString();
+			this._buffer += "\" style=\"fill:";
+			this._buffer += this._color.toRgbaString();
+			this._buffer += "\" stroke=\"none\"/>\n";
+		}
+		this._currentPath = "";
+		this._currentPathIsEmpty = true;
+	}
+	,stroke: function() {
+		if(!this._currentPathIsEmpty) {
+			this._buffer += "<path d=\"";
+			this._buffer += this._currentPath.toString();
+			this._buffer += "\" style=\"stroke:";
+			this._buffer += this._color.toRgbaString();
+			this._buffer += "; stroke-width:";
+			this._buffer += this._lineWidth;
+			this._buffer += ";\" fill=\"none\" />\n";
+		}
+		this._currentPath = "";
+		this._currentPathIsEmpty = true;
+	}
+	,setFont: function(font) {
+		this._font = font;
+	}
+	,getTextAlign: function() {
+		return this._textAlign;
+	}
+	,setTextAlign: function(textAlign) {
+		this._textAlign = textAlign;
+	}
+	,getTextBaseline: function() {
+		return this._textBaseline;
+	}
+	,setTextBaseline: function(textBaseline) {
+		this._textBaseline = textBaseline;
+	}
+	,fillText: function(text,x,y) {
+		this._buffer += "<text x=\"";
+		this._buffer += x;
+		this._buffer += "\" y=\"";
+		this._buffer += y + this.getSvgBaseLineOffset();
+		this._buffer += "\" style=\"font:";
+		this._buffer += this._font.toCssString();
+		this._buffer += "; fill:";
+		this._buffer += this._color.toRgbaString();
+		this._buffer += ";\" ";
+		this._buffer += " dominant-baseline=\"";
+		this._buffer += (function($this) {
+			var $r;
+			var _g = $this._textBaseline;
+			$r = (function($this) {
+				var $r;
+				switch(_g[1]) {
+				case 1:
+					$r = "top";
+					break;
+				case 2:
+					$r = "middle";
+					break;
+				case 3:
+					$r = "bottom";
+					break;
+				default:
+					$r = "top";
+				}
+				return $r;
+			}($this));
+			return $r;
+		}(this));
+		this._buffer += "\" text-anchor=\"";
+		this._buffer += this.getSvgTextAlignment();
+		this._buffer += "\">\n";
+		this._buffer += text;
+		this._buffer += "</text>\n";
+	}
+	,getSvgTextAlignment: function() {
+		var _g = this._textAlign;
+		switch(_g[1]) {
+		case 0:
+			return "start";
+		case 1:
+			return "middle";
+		case 2:
+			return "end";
+		}
+	}
+	,getSvgBaseLineOffset: function() {
+		var _g = this._textBaseline;
+		switch(_g[1]) {
+		case 1:
+			return 0;
+		case 2:
+			return 0;
+		case 3:
+			return 0;
+		default:
+			return this._font.getSize();
+		}
+	}
+	,getSvgBaseLine: function() {
+		var _g = this._textBaseline;
+		switch(_g[1]) {
+		case 1:
+			return "top";
+		case 2:
+			return "middle";
+		case 3:
+			return "bottom";
+		default:
+			return "top";
+		}
+	}
+	,measureText: function(text) {
+		if(text == null || text.length == 0) return 0;
+		var font = alphatab.platform.svg.SupportedFonts.Arial;
+		if(this._font.getFamily().indexOf("Times") >= 0) font = alphatab.platform.svg.SupportedFonts.TimesNewRoman;
+		return alphatab.platform.svg.FontSizes.measureString(text,font,this._font.getSize());
+	}
 	,__class__: alphatab.platform.svg.SvgCanvas
-}
-alphatab.platform.model = {}
+};
+alphatab.platform.model = {};
 alphatab.platform.model.Color = function(r,g,b,a) {
 	if(a == null) a = 255;
 	this._higherBits = (a & 255) << 8 | r & 255;
@@ -1342,26 +1381,26 @@ alphatab.platform.model.Color = function(r,g,b,a) {
 $hxClasses["alphatab.platform.model.Color"] = alphatab.platform.model.Color;
 alphatab.platform.model.Color.__name__ = true;
 alphatab.platform.model.Color.prototype = {
-	toRgbaString: function() {
-		return "rgba(" + this.getR() + "," + this.getG() + "," + this.getB() + "," + this.getA() / 255.0 + ")";
-	}
-	,toHexString: function() {
-		return "#" + StringTools.hex(this.getA(),2) + StringTools.hex(this.getR(),2) + StringTools.hex(this.getG(),2) + StringTools.hex(this.getB(),2);
-	}
-	,getB: function() {
-		return this._lowerBits & 255;
-	}
-	,getG: function() {
-		return this._lowerBits >> 8 & 255;
+	getA: function() {
+		return this._higherBits >> 8 & 255;
 	}
 	,getR: function() {
 		return this._higherBits & 255;
 	}
-	,getA: function() {
-		return this._higherBits >> 8 & 255;
+	,getG: function() {
+		return this._lowerBits >> 8 & 255;
+	}
+	,getB: function() {
+		return this._lowerBits & 255;
+	}
+	,toHexString: function() {
+		return "#" + StringTools.hex(this.getA(),2) + StringTools.hex(this.getR(),2) + StringTools.hex(this.getG(),2) + StringTools.hex(this.getB(),2);
+	}
+	,toRgbaString: function() {
+		return "rgba(" + this.getR() + "," + this.getG() + "," + this.getB() + "," + this.getA() / 255.0 + ")";
 	}
 	,__class__: alphatab.platform.model.Color
-}
+};
 alphatab.platform.model.Font = function(family,size,style) {
 	if(style == null) style = 0;
 	this._family = family;
@@ -1371,7 +1410,34 @@ alphatab.platform.model.Font = function(family,size,style) {
 $hxClasses["alphatab.platform.model.Font"] = alphatab.platform.model.Font;
 alphatab.platform.model.Font.__name__ = true;
 alphatab.platform.model.Font.prototype = {
-	toCssString: function() {
+	getFamily: function() {
+		return this._family;
+	}
+	,setFamily: function(family) {
+		this._family = family;
+	}
+	,getSize: function() {
+		return this._size;
+	}
+	,setSize: function(size) {
+		this._size = size;
+	}
+	,getStyle: function() {
+		return this._style;
+	}
+	,setStyle: function(style) {
+		this._style = style;
+	}
+	,isBold: function() {
+		return (this.getStyle() & 1) != 0;
+	}
+	,isItalic: function() {
+		return (this.getStyle() & 2) != 0;
+	}
+	,clone: function() {
+		return new alphatab.platform.model.Font(this._family,this._size,this._style);
+	}
+	,toCssString: function() {
 		var buf = new StringBuf();
 		if((this.getStyle() & 1) != 0) buf.b += "bold ";
 		if((this.getStyle() & 2) != 0) buf.b += "italic ";
@@ -1382,36 +1448,9 @@ alphatab.platform.model.Font.prototype = {
 		buf.b += "'";
 		return buf.b;
 	}
-	,clone: function() {
-		return new alphatab.platform.model.Font(this._family,this._size,this._style);
-	}
-	,isItalic: function() {
-		return (this.getStyle() & 2) != 0;
-	}
-	,isBold: function() {
-		return (this.getStyle() & 1) != 0;
-	}
-	,setStyle: function(style) {
-		this._style = style;
-	}
-	,getStyle: function() {
-		return this._style;
-	}
-	,setSize: function(size) {
-		this._size = size;
-	}
-	,getSize: function() {
-		return this._size;
-	}
-	,setFamily: function(family) {
-		this._family = family;
-	}
-	,getFamily: function() {
-		return this._family;
-	}
 	,__class__: alphatab.platform.model.Font
-}
-alphatab.platform.model.TextAlign = $hxClasses["alphatab.platform.model.TextAlign"] = { __ename__ : true, __constructs__ : ["Left","Center","Right"] }
+};
+alphatab.platform.model.TextAlign = $hxClasses["alphatab.platform.model.TextAlign"] = { __ename__ : true, __constructs__ : ["Left","Center","Right"] };
 alphatab.platform.model.TextAlign.Left = ["Left",0];
 alphatab.platform.model.TextAlign.Left.toString = $estr;
 alphatab.platform.model.TextAlign.Left.__enum__ = alphatab.platform.model.TextAlign;
@@ -1421,8 +1460,8 @@ alphatab.platform.model.TextAlign.Center.__enum__ = alphatab.platform.model.Text
 alphatab.platform.model.TextAlign.Right = ["Right",2];
 alphatab.platform.model.TextAlign.Right.toString = $estr;
 alphatab.platform.model.TextAlign.Right.__enum__ = alphatab.platform.model.TextAlign;
-alphatab.model = {}
-alphatab.model.TextBaseline = $hxClasses["alphatab.model.TextBaseline"] = { __ename__ : true, __constructs__ : ["Default","Top","Middle","Bottom"] }
+alphatab.model = {};
+alphatab.model.TextBaseline = $hxClasses["alphatab.model.TextBaseline"] = { __ename__ : true, __constructs__ : ["Default","Top","Middle","Bottom"] };
 alphatab.model.TextBaseline.Default = ["Default",0];
 alphatab.model.TextBaseline.Default.toString = $estr;
 alphatab.model.TextBaseline.Default.__enum__ = alphatab.model.TextBaseline;
@@ -1435,34 +1474,46 @@ alphatab.model.TextBaseline.Middle.__enum__ = alphatab.model.TextBaseline;
 alphatab.model.TextBaseline.Bottom = ["Bottom",3];
 alphatab.model.TextBaseline.Bottom.toString = $estr;
 alphatab.model.TextBaseline.Bottom.__enum__ = alphatab.model.TextBaseline;
-alphatab.platform.IFileLoader = function() { }
+alphatab.platform.IFileLoader = function() { };
 $hxClasses["alphatab.platform.IFileLoader"] = alphatab.platform.IFileLoader;
 alphatab.platform.IFileLoader.__name__ = true;
 alphatab.platform.IFileLoader.prototype = {
 	__class__: alphatab.platform.IFileLoader
-}
+};
 alphatab.platform.js.JsFileLoader = function() {
 };
 $hxClasses["alphatab.platform.js.JsFileLoader"] = alphatab.platform.js.JsFileLoader;
 alphatab.platform.js.JsFileLoader.__name__ = true;
 alphatab.platform.js.JsFileLoader.__interfaces__ = [alphatab.platform.IFileLoader];
-alphatab.platform.js.JsFileLoader.isIE = function() {
+alphatab.platform.js.JsFileLoader.getIeVersion = function() {
+	var rv = -1;
+	var appName = navigator.appName;
 	var agent = navigator.userAgent;
-	return agent.indexOf("MSIE") != -1;
-}
-alphatab.platform.js.JsFileLoader.getBytes = function(s) {
+	if(appName == "Microsoft Internet Explorer") {
+		var e = new EReg("MSIE ([0-9]{1,}[\\.0-9]{0,})","");
+		if(e.match(agent)) rv = Std.parseFloat(e.matched(1));
+	}
+	return rv;
+};
+alphatab.platform.js.JsFileLoader.getBytesFromString = function(s) {
 	var a = new Array();
-	var _g1 = 0, _g = s.length;
+	var _g1 = 0;
+	var _g = s.length;
 	while(_g1 < _g) {
 		var i = _g1++;
 		a.push(HxOverrides.cca(s,i) & 255);
 	}
 	return haxe.io.Bytes.ofData(a);
-}
+};
+alphatab.platform.js.JsFileLoader.getBytesFromTyped = function(s) {
+	var a = new Uint8Array(s);
+	return haxe.io.Bytes.ofData(a);
+};
 alphatab.platform.js.JsFileLoader.prototype = {
-	loadBinaryAsync: function(path,success,error) {
-		if(alphatab.platform.js.JsFileLoader.isIE()) {
-			var vbArr = VbAjaxLoader(method,file);
+	loadBinary: function(path) {
+		var ie = alphatab.platform.js.JsFileLoader.getIeVersion();
+		if(ie >= 0 && ie <= 9) {
+			var vbArr = VbAjaxLoader("GET",path);
 			var fileContents = vbArr.toArray();
 			var data = "";
 			var i = 0;
@@ -1470,59 +1521,68 @@ alphatab.platform.js.JsFileLoader.prototype = {
 				data += String.fromCharCode(fileContents[i]);
 				i++;
 			}
-			var reader = alphatab.platform.js.JsFileLoader.getBytes(data);
+			var reader = alphatab.platform.js.JsFileLoader.getBytesFromString(data);
+			return reader;
+		} else {
+			var xhr = new XMLHttpRequest();
+			xhr.open("GET",path,false);
+			xhr.responseType = "arraybuffer";
+			xhr.send(null);
+			if(xhr.status == 200) {
+				var reader = alphatab.platform.js.JsFileLoader.getBytesFromTyped(xhr.response);
+				return reader;
+			} else if(xhr.status == 0) throw "You are offline!!\n Please Check Your Network."; else if(xhr.status == 404) throw "Requested URL not found."; else if(xhr.status == 500) throw "Internel Server Error."; else if(xhr.statusText == "parsererror") throw "Error.\nParsing JSON Request failed."; else if(xhr.statusText == "timeout") throw "Request Time out."; else throw "Unknow Error: " + xhr.responseText;
+		}
+	}
+	,loadBinaryAsync: function(path,success,error) {
+		var ie = alphatab.platform.js.JsFileLoader.getIeVersion();
+		if(ie >= 0 && ie <= 9) {
+			var vbArr = VbAjaxLoader("GET",path);
+			var fileContents = vbArr.toArray();
+			var data = "";
+			var i = 0;
+			while(i < fileContents.length - 1) {
+				data += String.fromCharCode(fileContents[i]);
+				i++;
+			}
+			var reader = alphatab.platform.js.JsFileLoader.getBytesFromString(data);
 			success(reader);
 		} else {
 			var xhr = new XMLHttpRequest();
-			xhr.overrideMimeType("text/plain; charset=x-user-defined");
 			xhr.onreadystatechange = function(e) {
 				if(xhr.readyState == 4) {
 					if(xhr.status == 200) {
-						var reader = alphatab.platform.js.JsFileLoader.getBytes(xhr.responseText);
+						var reader = alphatab.platform.js.JsFileLoader.getBytesFromTyped(xhr.response);
 						success(reader);
 					} else if(xhr.status == 0) error("You are offline!!\n Please Check Your Network."); else if(xhr.status == 404) error("Requested URL not found."); else if(xhr.status == 500) error("Internel Server Error."); else if(xhr.statusText == "parsererror") error("Error.\nParsing JSON Request failed."); else if(xhr.statusText == "timeout") error("Request Time out."); else error("Unknow Error: " + xhr.responseText);
 				}
 			};
 			xhr.open("GET",path,true);
+			xhr.responseType = "arraybuffer";
 			xhr.send(null);
-		}
-	}
-	,loadBinary: function(path) {
-		if(alphatab.platform.js.JsFileLoader.isIE()) {
-			var vbArr = VbAjaxLoader(method,file);
-			var fileContents = vbArr.toArray();
-			var data = "";
-			var i = 0;
-			while(i < fileContents.length - 1) {
-				data += String.fromCharCode(fileContents[i]);
-				i++;
-			}
-			var reader = alphatab.platform.js.JsFileLoader.getBytes(data);
-			return reader;
-		} else {
-			var xhr = new XMLHttpRequest();
-			xhr.overrideMimeType("text/plain; charset=x-user-defined");
-			xhr.open("GET",path,false);
-			xhr.send(null);
-			if(xhr.status == 200) {
-				var reader = alphatab.platform.js.JsFileLoader.getBytes(xhr.responseText);
-				return reader;
-			} else if(xhr.status == 0) throw "You are offline!!\n Please Check Your Network."; else if(xhr.status == 404) throw "Requested URL not found."; else if(xhr.status == 500) throw "Internel Server Error."; else if(xhr.statusText == "parsererror") throw "Error.\nParsing JSON Request failed."; else if(xhr.statusText == "timeout") throw "Request Time out."; else throw "Unknow Error: " + xhr.responseText;
 		}
 	}
 	,__class__: alphatab.platform.js.JsFileLoader
-}
-alphatab.rendering.layout = {}
+};
+alphatab.rendering.layout = {};
 alphatab.rendering.layout.ScoreLayout = function(renderer) {
 	this.renderer = renderer;
 };
 $hxClasses["alphatab.rendering.layout.ScoreLayout"] = alphatab.rendering.layout.ScoreLayout;
 alphatab.rendering.layout.ScoreLayout.__name__ = true;
 alphatab.rendering.layout.ScoreLayout.prototype = {
-	createEmptyStaveGroup: function() {
+	doLayout: function() {
+	}
+	,paintScore: function() {
+	}
+	,getScale: function() {
+		return this.renderer.settings.scale;
+	}
+	,createEmptyStaveGroup: function() {
 		var group = new alphatab.rendering.staves.StaveGroup();
 		group.layout = this;
-		var _g = 0, _g1 = this.renderer.settings.staves;
+		var _g = 0;
+		var _g1 = this.renderer.settings.staves;
 		while(_g < _g1.length) {
 			var s = _g1[_g];
 			++_g;
@@ -1530,12 +1590,8 @@ alphatab.rendering.layout.ScoreLayout.prototype = {
 		}
 		return group;
 	}
-	,paintScore: function() {
-	}
-	,doLayout: function() {
-	}
 	,__class__: alphatab.rendering.layout.ScoreLayout
-}
+};
 alphatab.rendering.layout.PageViewLayout = function(renderer) {
 	alphatab.rendering.layout.ScoreLayout.call(this,renderer);
 	this._groups = new Array();
@@ -1544,49 +1600,84 @@ $hxClasses["alphatab.rendering.layout.PageViewLayout"] = alphatab.rendering.layo
 alphatab.rendering.layout.PageViewLayout.__name__ = true;
 alphatab.rendering.layout.PageViewLayout.__super__ = alphatab.rendering.layout.ScoreLayout;
 alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.layout.ScoreLayout.prototype,{
-	getSheetWidth: function() {
-		return Math.round(795 * this.renderer.scale);
+	doLayout: function() {
+		this._groups = new Array();
+		var startIndex = this.renderer.settings.layout.get("start",1);
+		startIndex--;
+		var x = Math.min(this.renderer.track.bars.length - 1,Math.max(0,startIndex));
+		startIndex = x | 0;
+		var currentBarIndex = startIndex;
+		var endBarIndex = this.renderer.settings.layout.get("count",this.renderer.track.bars.length);
+		if(endBarIndex < 0) endBarIndex = this.renderer.track.bars.length;
+		endBarIndex = startIndex + endBarIndex - 1;
+		var x = Math.min(this.renderer.track.bars.length - 1,Math.max(0,endBarIndex));
+		endBarIndex = x | 0;
+		var x = alphatab.rendering.layout.PageViewLayout.PagePadding[0];
+		var y = alphatab.rendering.layout.PageViewLayout.PagePadding[1];
+		y = this.doScoreInfoLayout(y);
+		var autoSize = this.renderer.settings.layout.get("autoSize",true);
+		if(autoSize || this.renderer.settings.width <= 0) this.width = 950 * this.renderer.settings.scale | 0; else this.width = this.renderer.settings.width;
+		if(this.renderer.settings.staves.length > 0) while(currentBarIndex <= endBarIndex) {
+			var group = this.createStaveGroup(currentBarIndex,endBarIndex);
+			this._groups.push(group);
+			group.x = x;
+			group.y = y;
+			this.fitGroup(group);
+			group.finalizeGroup(this);
+			y += group.calculateHeight() + (20 * this.renderer.settings.scale | 0);
+			currentBarIndex = group.bars[group.bars.length - 1].index + 1;
+		}
+		this.height = y + alphatab.rendering.layout.PageViewLayout.PagePadding[3];
 	}
-	,getMaxWidth: function() {
-		return this.getSheetWidth() - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0] - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2];
-	}
-	,createStaveGroup: function(currentBarIndex,endIndex) {
-		var group = this.createEmptyStaveGroup();
-		var barsPerRow = this.renderer.settings.layout.get("barsPerRow",-1);
-		var maxWidth = this.getSheetWidth() - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0] - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2];
-		var end = endIndex + 1;
-		var _g = currentBarIndex;
-		while(_g < end) {
-			var i = _g++;
-			var bar = this.renderer.track.bars[i];
-			group.addBar(bar);
-			var groupIsFull = false;
-			if(barsPerRow == -1 && (group.width >= maxWidth && group.bars.length != 0)) groupIsFull = true; else if(group.bars.length == barsPerRow + 1) groupIsFull = true;
-			if(groupIsFull) {
-				group.revertLastBar();
-				group.isFull = true;
-				return group;
+	,doScoreInfoLayout: function(y) {
+		var flags;
+		if(this.renderer.settings.layout.get("hideInfo",false)) flags = 0; else flags = 511;
+		var score = this.renderer.get_score();
+		var scale = this.renderer.settings.scale;
+		if(!this.isNullOrEmpty(score.title) && (flags & 1) != 0) y += Math.floor(35 * scale);
+		if(!this.isNullOrEmpty(score.subTitle) && (flags & 2) != 0) y += Math.floor(20 * scale);
+		if(!this.isNullOrEmpty(score.artist) && (flags & 4) != 0) y += Math.floor(20 * scale);
+		if(!this.isNullOrEmpty(score.album) && (flags & 8) != 0) y += Math.floor(20 * scale);
+		if(!this.isNullOrEmpty(score.music) && score.music == score.words && (flags & 64) != 0) y += Math.floor(20 * scale); else {
+			if(!this.isNullOrEmpty(score.music) && (flags & 32) != 0) y += Math.floor(20 * scale);
+			if(!this.isNullOrEmpty(score.words) && (flags & 16) != 0) y += Math.floor(20 * scale);
+		}
+		y += Math.floor(20 * scale);
+		if(!this.renderer.track.isPercussion) {
+			var tuning = alphatab.model.Tuning.findTuning(this.renderer.track.tuning);
+			if(tuning != null) {
+				y += Math.floor(15 * scale);
+				if(!tuning.isStandard) {
+					var stringsPerColumn = Math.ceil(this.renderer.track.tuning.length / 2);
+					y += stringsPerColumn * Math.floor(15 * scale);
+				}
+				y += Math.floor(15 * scale);
 			}
-			group.x = 0;
 		}
-		return group;
+		y += Math.floor(40 * scale);
+		return y;
 	}
-	,fitGroup: function(group) {
-		var barSpace = 0;
-		if(group.isFull) {
-			var freeSpace = this.getSheetWidth() - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0] - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2] - group.width;
-			if(freeSpace != 0 && group.bars.length > 0) barSpace = Math.round(freeSpace / group.bars.length);
+	,paintScore: function() {
+		var x = alphatab.rendering.layout.PageViewLayout.PagePadding[0];
+		var y = alphatab.rendering.layout.PageViewLayout.PagePadding[1];
+		y = this.paintScoreInfo(x,y);
+		var _g = 0;
+		var _g1 = this._groups;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.paint(0,0,this.renderer.canvas);
 		}
-		group.applyBarSpacing(barSpace);
-		this.width = Math.round(Math.max(this.width,group.width));
 	}
-	,isNullOrEmpty: function(s) {
-		return s == null || StringTools.trim(s) == "";
+	,drawCentered: function(text,font,y) {
+		this.renderer.canvas.setFont(font);
+		this.renderer.canvas.fillText(text,this.width / 2,y);
 	}
 	,paintScoreInfo: function(x,y) {
-		var flags = this.renderer.settings.layout.get("hideInfo",false)?0:511;
+		var flags;
+		if(this.renderer.settings.layout.get("hideInfo",false)) flags = 0; else flags = 511;
 		var score = this.renderer.get_score();
-		var scale = this.renderer.scale;
+		var scale = this.renderer.settings.scale;
 		var canvas = this.renderer.canvas;
 		var res = this.renderer.renderingResources;
 		canvas.setColor(new alphatab.platform.model.Color(0,0,0));
@@ -1617,7 +1708,7 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 			canvas.setFont(res.wordsFont);
 			if(!this.isNullOrEmpty(score.music) && (flags & 32) != 0) {
 				canvas.setTextAlign(alphatab.platform.model.TextAlign.Right);
-				canvas.fillText("Music by " + score.music,this.width - alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[2],y);
+				canvas.fillText("Music by " + score.music,this.width - alphatab.rendering.layout.PageViewLayout.PagePadding[2],y);
 			}
 			if(!this.isNullOrEmpty(score.words) && (flags & 16) != 0) {
 				canvas.setTextAlign(alphatab.platform.model.TextAlign.Left);
@@ -1637,7 +1728,8 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 					var stringsPerColumn = Math.ceil(this.renderer.track.tuning.length / 2);
 					var currentX = x;
 					var currentY = y;
-					var _g1 = 0, _g = this.renderer.track.tuning.length;
+					var _g1 = 0;
+					var _g = this.renderer.track.tuning.length;
 					while(_g1 < _g) {
 						var i = _g1++;
 						str = "(" + Std.string(i + 1) + ") = " + alphatab.model.Tuning.getTextForTuning(this.renderer.track.tuning[i],false);
@@ -1655,72 +1747,45 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 		y += Math.floor(25 * scale);
 		return y;
 	}
-	,drawCentered: function(text,font,y) {
-		this.renderer.canvas.setFont(font);
-		this.renderer.canvas.fillText(text,this.width / 2,y);
+	,isNullOrEmpty: function(s) {
+		return s == null || StringTools.trim(s) == "";
 	}
-	,paintScore: function() {
-		var x = alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0];
-		var y = alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[1];
-		y = this.paintScoreInfo(x,y);
-		var _g = 0, _g1 = this._groups;
-		while(_g < _g1.length) {
-			var g = _g1[_g];
-			++_g;
-			g.paint(0,0,this.renderer.canvas);
-		}
+	,fitGroup: function(group) {
+		var barSpace = 0;
+		var freeSpace = this.getMaxWidth() - group.width;
+		if(freeSpace != 0 && group.bars.length > 0) barSpace = Math.round(freeSpace / group.bars.length);
+		if(group.isFull || barSpace < 0) group.applyBarSpacing(barSpace);
+		this.width = Math.round(Math.max(this.width,group.width));
 	}
-	,doScoreInfoLayout: function(y) {
-		var flags = this.renderer.settings.layout.get("hideInfo",false)?0:511;
-		var score = this.renderer.get_score();
-		var scale = this.renderer.scale;
-		if(!this.isNullOrEmpty(score.title) && (flags & 1) != 0) y += Math.floor(35 * scale);
-		if(!this.isNullOrEmpty(score.subTitle) && (flags & 2) != 0) y += Math.floor(20 * scale);
-		if(!this.isNullOrEmpty(score.artist) && (flags & 4) != 0) y += Math.floor(20 * scale);
-		if(!this.isNullOrEmpty(score.album) && (flags & 8) != 0) y += Math.floor(20 * scale);
-		if(!this.isNullOrEmpty(score.music) && score.music == score.words && (flags & 64) != 0) y += Math.floor(20 * scale); else {
-			if(!this.isNullOrEmpty(score.music) && (flags & 32) != 0) y += Math.floor(20 * scale);
-			if(!this.isNullOrEmpty(score.words) && (flags & 16) != 0) y += Math.floor(20 * scale);
-		}
-		y += Math.floor(20 * scale);
-		if(!this.renderer.track.isPercussion) {
-			var tuning = alphatab.model.Tuning.findTuning(this.renderer.track.tuning);
-			if(tuning != null) {
-				y += Math.floor(15 * scale);
-				if(!tuning.isStandard) {
-					var stringsPerColumn = Math.ceil(this.renderer.track.tuning.length / 2);
-					y += stringsPerColumn * Math.floor(15 * scale);
-				}
-				y += Math.floor(15 * scale);
+	,createStaveGroup: function(currentBarIndex,endIndex) {
+		var group = this.createEmptyStaveGroup();
+		var barsPerRow = this.renderer.settings.layout.get("barsPerRow",-1);
+		var maxWidth = this.getMaxWidth();
+		var end = endIndex + 1;
+		var _g = currentBarIndex;
+		while(_g < end) {
+			var i = _g++;
+			var bar = this.renderer.track.bars[i];
+			group.addBar(bar);
+			var groupIsFull = false;
+			if(barsPerRow == -1 && (group.width >= maxWidth && group.bars.length != 0)) groupIsFull = true; else if(group.bars.length == barsPerRow + 1) groupIsFull = true;
+			if(groupIsFull) {
+				group.revertLastBar();
+				group.isFull = true;
+				return group;
 			}
+			group.x = 0;
 		}
-		y += Math.floor(40 * scale);
-		return y;
+		return group;
 	}
-	,doLayout: function() {
-		this._groups = new Array();
-		var startIndex = this.renderer.settings.layout.get("start",1);
-		startIndex--;
-		startIndex = Math.min(this.renderer.track.bars.length - 1,Math.max(0,startIndex)) | 0;
-		var currentBarIndex = startIndex;
-		var endBarIndex = this.renderer.settings.layout.get("count",this.renderer.track.bars.length);
-		endBarIndex = startIndex + endBarIndex - 1;
-		endBarIndex = Math.min(this.renderer.track.bars.length - 1,Math.max(0,endBarIndex)) | 0;
-		var x = alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[0];
-		var y = alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[1];
-		y = this.doScoreInfoLayout(y);
-		if(this.renderer.settings.staves.length > 0) while(currentBarIndex <= endBarIndex) {
-			var group = this.createStaveGroup(currentBarIndex,endBarIndex);
-			this._groups.push(group);
-			group.x = x;
-			group.y = y;
-			this.fitGroup(group);
-			group.finalizeGroup(this);
-			y += group.calculateHeight() + (20 * this.renderer.scale | 0);
-			currentBarIndex = group.bars[group.bars.length - 1].index + 1;
-		}
-		this.height = y + alphatab.rendering.layout.PageViewLayout.PAGE_PADDING[3];
-		this.width = 795 * this.renderer.scale | 0;
+	,getMaxWidth: function() {
+		var autoSize = this.renderer.settings.layout.get("autoSize",true);
+		var width;
+		if(autoSize) width = this.getSheetWidth(); else width = this.renderer.settings.width;
+		return width - alphatab.rendering.layout.PageViewLayout.PagePadding[0] - alphatab.rendering.layout.PageViewLayout.PagePadding[2];
+	}
+	,getSheetWidth: function() {
+		return Math.round(950 * this.renderer.settings.scale);
 	}
 	,__class__: alphatab.rendering.layout.PageViewLayout
 });
@@ -1731,20 +1796,19 @@ $hxClasses["alphatab.rendering.layout.HorizontalScreenLayout"] = alphatab.render
 alphatab.rendering.layout.HorizontalScreenLayout.__name__ = true;
 alphatab.rendering.layout.HorizontalScreenLayout.__super__ = alphatab.rendering.layout.ScoreLayout;
 alphatab.rendering.layout.HorizontalScreenLayout.prototype = $extend(alphatab.rendering.layout.ScoreLayout.prototype,{
-	paintScore: function() {
-		this._group.paint(0,0,this.renderer.canvas);
-	}
-	,doLayout: function() {
+	doLayout: function() {
 		if(this.renderer.settings.staves.length == 0) return;
 		var startIndex = this.renderer.settings.layout.get("start",1);
 		startIndex--;
-		startIndex = Math.min(this.renderer.track.bars.length - 1,Math.max(0,startIndex)) | 0;
+		var x = Math.min(this.renderer.track.bars.length - 1,Math.max(0,startIndex));
+		startIndex = x | 0;
 		var currentBarIndex = startIndex;
 		var endBarIndex = this.renderer.settings.layout.get("count",this.renderer.track.bars.length);
 		endBarIndex = startIndex + endBarIndex - 1;
-		endBarIndex = Math.min(this.renderer.track.bars.length - 1,Math.max(0,endBarIndex)) | 0;
-		var x = alphatab.rendering.layout.HorizontalScreenLayout.PAGE_PADDING[0];
-		var y = alphatab.rendering.layout.HorizontalScreenLayout.PAGE_PADDING[1];
+		var x = Math.min(this.renderer.track.bars.length - 1,Math.max(0,endBarIndex));
+		endBarIndex = x | 0;
+		var x = alphatab.rendering.layout.HorizontalScreenLayout.PagePadding[0];
+		var y = alphatab.rendering.layout.HorizontalScreenLayout.PagePadding[1];
 		this._group = this.createEmptyStaveGroup();
 		while(currentBarIndex <= endBarIndex) {
 			var bar = this.renderer.track.bars[currentBarIndex];
@@ -1754,39 +1818,55 @@ alphatab.rendering.layout.HorizontalScreenLayout.prototype = $extend(alphatab.re
 		this._group.x = x;
 		this._group.y = y;
 		this._group.finalizeGroup(this);
-		y += this._group.calculateHeight() + (20 * this.renderer.scale | 0);
-		this.height = y + alphatab.rendering.layout.HorizontalScreenLayout.PAGE_PADDING[3];
-		this.width = this._group.x + this._group.width + alphatab.rendering.layout.HorizontalScreenLayout.PAGE_PADDING[2];
+		y += this._group.calculateHeight() + (20 * this.renderer.settings.scale | 0);
+		this.height = y + alphatab.rendering.layout.HorizontalScreenLayout.PagePadding[3];
+		this.width = this._group.x + this._group.width + alphatab.rendering.layout.HorizontalScreenLayout.PagePadding[2];
+	}
+	,paintScore: function() {
+		this._group.paint(0,0,this.renderer.canvas);
 	}
 	,__class__: alphatab.rendering.layout.HorizontalScreenLayout
 });
-alphatab.rendering.IEffectBarRendererInfo = function() { }
+alphatab.rendering.IEffectBarRendererInfo = function() { };
 $hxClasses["alphatab.rendering.IEffectBarRendererInfo"] = alphatab.rendering.IEffectBarRendererInfo;
 alphatab.rendering.IEffectBarRendererInfo.__name__ = true;
 alphatab.rendering.IEffectBarRendererInfo.prototype = {
 	__class__: alphatab.rendering.IEffectBarRendererInfo
-}
-alphatab.rendering.effects = {}
+};
+alphatab.rendering.effects = {};
 alphatab.rendering.effects.MarkerEffectInfo = function() {
 };
 $hxClasses["alphatab.rendering.effects.MarkerEffectInfo"] = alphatab.rendering.effects.MarkerEffectInfo;
 alphatab.rendering.effects.MarkerEffectInfo.__name__ = true;
 alphatab.rendering.effects.MarkerEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.MarkerEffectInfo.prototype = {
-	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.TextGlyph(0,0,beat.voice.bar.getMasterBar().section.text,renderer.stave.staveGroup.layout.renderer.renderingResources.markerFont);
+	shouldCreateGlyph: function(renderer,beat) {
+		return beat.index == 0 && ((function($this) {
+			var $r;
+			var _this = beat.voice.bar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).section != null;
+	}
+	,canExpand: function(renderer,from,to) {
+		return true;
+	}
+	,getHeight: function(renderer) {
+		return 20 * renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 	}
 	,getSizingMode: function() {
 		return alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly;
 	}
-	,getHeight: function(renderer) {
-		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
-	}
-	,shouldCreateGlyph: function(renderer,beat) {
-		return beat.index == 0 && beat.voice.bar.getMasterBar().section != null;
+	,createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.TextGlyph(0,0,((function($this) {
+			var $r;
+			var _this = beat.voice.bar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).section.text,renderer.stave.staveGroup.layout.renderer.renderingResources.markerFont);
 	}
 	,__class__: alphatab.rendering.effects.MarkerEffectInfo
-}
+};
 alphatab.rendering.BarRendererFactory = function() {
 	this.isInAccolade = true;
 };
@@ -1797,7 +1877,7 @@ alphatab.rendering.BarRendererFactory.prototype = {
 		return null;
 	}
 	,__class__: alphatab.rendering.BarRendererFactory
-}
+};
 alphatab.rendering.EffectBarRendererFactory = function(info) {
 	alphatab.rendering.BarRendererFactory.call(this);
 	this.isInAccolade = false;
@@ -1812,109 +1892,102 @@ alphatab.rendering.EffectBarRendererFactory.prototype = $extend(alphatab.renderi
 	}
 	,__class__: alphatab.rendering.EffectBarRendererFactory
 });
-alphatab.rendering.effects.TripletFeelEffectInfo = function() {
-};
-$hxClasses["alphatab.rendering.effects.TripletFeelEffectInfo"] = alphatab.rendering.effects.TripletFeelEffectInfo;
-alphatab.rendering.effects.TripletFeelEffectInfo.__name__ = true;
-alphatab.rendering.effects.TripletFeelEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
-alphatab.rendering.effects.TripletFeelEffectInfo.prototype = {
-	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(0,0,"TripletFeel");
-	}
-	,getSizingMode: function() {
-		return alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly;
-	}
-	,getHeight: function(renderer) {
-		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
-	}
-	,shouldCreateGlyph: function(renderer,beat) {
-		return beat.index == 0 && (beat.voice.bar.getMasterBar().index == 0 && beat.voice.bar.getMasterBar().tripletFeel != alphatab.model.TripletFeel.NoTripletFeel) || beat.voice.bar.getMasterBar().index > 0 && beat.voice.bar.getMasterBar().tripletFeel != beat.voice.bar.getMasterBar().previousMasterBar.tripletFeel;
-	}
-	,__class__: alphatab.rendering.effects.TripletFeelEffectInfo
-}
 alphatab.rendering.effects.TempoEffectInfo = function() {
 };
 $hxClasses["alphatab.rendering.effects.TempoEffectInfo"] = alphatab.rendering.effects.TempoEffectInfo;
 alphatab.rendering.effects.TempoEffectInfo.__name__ = true;
 alphatab.rendering.effects.TempoEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.TempoEffectInfo.prototype = {
-	createNewGlyph: function(renderer,beat) {
-		var tempo;
-		if(beat.voice.bar.getMasterBar().tempoAutomation != null) tempo = beat.voice.bar.getMasterBar().tempoAutomation.value | 0; else tempo = beat.voice.bar.track.score.tempo;
-		return new alphatab.rendering.glyphs.effects.TempoGlyph(0,0,tempo);
+	shouldCreateGlyph: function(renderer,beat) {
+		return beat.index == 0 && (((function($this) {
+			var $r;
+			var _this = beat.voice.bar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).tempoAutomation != null || beat.voice.bar.index == 0);
+	}
+	,canExpand: function(renderer,from,to) {
+		return true;
+	}
+	,getHeight: function(renderer) {
+		return 25 * renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 	}
 	,getSizingMode: function() {
 		return alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly;
 	}
-	,getHeight: function(renderer) {
-		return 25 * renderer.stave.staveGroup.layout.renderer.scale | 0;
-	}
-	,shouldCreateGlyph: function(renderer,beat) {
-		return beat.index == 0 && (beat.voice.bar.getMasterBar().tempoAutomation != null || beat.voice.bar.index == 0);
+	,createNewGlyph: function(renderer,beat) {
+		var tempo;
+		if(((function($this) {
+			var $r;
+			var _this = beat.voice.bar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).tempoAutomation != null) tempo = ((function($this) {
+			var $r;
+			var _this = beat.voice.bar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).tempoAutomation.value | 0; else tempo = beat.voice.bar.track.score.tempo;
+		return new alphatab.rendering.glyphs.effects.TempoGlyph(0,0,tempo);
 	}
 	,__class__: alphatab.rendering.effects.TempoEffectInfo
-}
+};
 alphatab.rendering.effects.TextEffectInfo = function() {
 };
 $hxClasses["alphatab.rendering.effects.TextEffectInfo"] = alphatab.rendering.effects.TextEffectInfo;
 alphatab.rendering.effects.TextEffectInfo.__name__ = true;
 alphatab.rendering.effects.TextEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.TextEffectInfo.prototype = {
-	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.TextGlyph(0,0,beat.text,renderer.stave.staveGroup.layout.renderer.renderingResources.effectFont);
+	shouldCreateGlyph: function(renderer,beat) {
+		return beat.text != null && StringTools.trim(beat.text).length > 0;
+	}
+	,canExpand: function(renderer,from,to) {
+		return true;
+	}
+	,getHeight: function(renderer) {
+		return 20 * renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 	}
 	,getSizingMode: function() {
 		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatOnly;
 	}
-	,getHeight: function(renderer) {
-		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
-	}
-	,shouldCreateGlyph: function(renderer,beat) {
-		return beat.text != null && StringTools.trim(beat.text).length > 0;
+	,createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.TextGlyph(0,0,beat.text,renderer.stave.staveGroup.layout.renderer.renderingResources.effectFont);
 	}
 	,__class__: alphatab.rendering.effects.TextEffectInfo
-}
+};
 alphatab.rendering.effects.ChordsEffectInfo = function() {
 };
 $hxClasses["alphatab.rendering.effects.ChordsEffectInfo"] = alphatab.rendering.effects.ChordsEffectInfo;
 alphatab.rendering.effects.ChordsEffectInfo.__name__ = true;
 alphatab.rendering.effects.ChordsEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.ChordsEffectInfo.prototype = {
-	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.TextGlyph(0,0,beat.voice.bar.track.chords.get(beat.chordId).name,renderer.stave.staveGroup.layout.renderer.renderingResources.effectFont);
+	shouldCreateGlyph: function(renderer,beat) {
+		return beat.chordId != null;
+	}
+	,canExpand: function(renderer,from,to) {
+		return true;
+	}
+	,getHeight: function(renderer) {
+		return 20 * renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 	}
 	,getSizingMode: function() {
 		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatOnly;
 	}
-	,getHeight: function(renderer) {
-		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
-	}
-	,shouldCreateGlyph: function(renderer,beat) {
-		return beat.chordId != null;
+	,createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.TextGlyph(0,0,beat.voice.bar.track.chords.get(beat.chordId).name,renderer.stave.staveGroup.layout.renderer.renderingResources.effectFont);
 	}
 	,__class__: alphatab.rendering.effects.ChordsEffectInfo
-}
+};
 alphatab.rendering.effects.NoteEffectInfoBase = function() {
 };
 $hxClasses["alphatab.rendering.effects.NoteEffectInfoBase"] = alphatab.rendering.effects.NoteEffectInfoBase;
 alphatab.rendering.effects.NoteEffectInfoBase.__name__ = true;
 alphatab.rendering.effects.NoteEffectInfoBase.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.NoteEffectInfoBase.prototype = {
-	createNewGlyph: function(renderer,beat) {
-		return null;
-	}
-	,getSizingMode: function() {
-		return alphatab.rendering.EffectBarGlyphSizing.GroupedOnBeatToPostBeat;
-	}
-	,getHeight: function(renderer) {
-		return 0;
-	}
-	,shouldCreateGlyphForNote: function(renderer,note) {
-		return false;
-	}
-	,shouldCreateGlyph: function(renderer,beat) {
+	shouldCreateGlyph: function(renderer,beat) {
 		this._lastCreateInfo = new Array();
-		var _g = 0, _g1 = beat.notes;
+		var _g = 0;
+		var _g1 = beat.notes;
 		while(_g < _g1.length) {
 			var n = _g1[_g];
 			++_g;
@@ -1922,8 +1995,23 @@ alphatab.rendering.effects.NoteEffectInfoBase.prototype = {
 		}
 		return this._lastCreateInfo.length > 0;
 	}
+	,canExpand: function(renderer,from,to) {
+		return true;
+	}
+	,shouldCreateGlyphForNote: function(renderer,note) {
+		return false;
+	}
+	,getHeight: function(renderer) {
+		return 0;
+	}
+	,getSizingMode: function() {
+		return alphatab.rendering.EffectBarGlyphSizing.GroupedOnBeatToPostBeat;
+	}
+	,createNewGlyph: function(renderer,beat) {
+		return null;
+	}
 	,__class__: alphatab.rendering.effects.NoteEffectInfoBase
-}
+};
 alphatab.rendering.effects.TrillEffectInfo = function() {
 	alphatab.rendering.effects.NoteEffectInfoBase.call(this);
 };
@@ -1931,17 +2019,17 @@ $hxClasses["alphatab.rendering.effects.TrillEffectInfo"] = alphatab.rendering.ef
 alphatab.rendering.effects.TrillEffectInfo.__name__ = true;
 alphatab.rendering.effects.TrillEffectInfo.__super__ = alphatab.rendering.effects.NoteEffectInfoBase;
 alphatab.rendering.effects.TrillEffectInfo.prototype = $extend(alphatab.rendering.effects.NoteEffectInfoBase.prototype,{
-	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.TrillGlyph();
-	}
-	,getHeight: function(renderer) {
-		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
+	shouldCreateGlyphForNote: function(renderer,note) {
+		return note.trillValue >= 0;
 	}
 	,getSizingMode: function() {
 		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatToPostBeat;
 	}
-	,shouldCreateGlyphForNote: function(renderer,note) {
-		return note.trillFret >= 0;
+	,getHeight: function(renderer) {
+		return 20 * renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+	}
+	,createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.TrillGlyph();
 	}
 	,__class__: alphatab.rendering.effects.TrillEffectInfo
 });
@@ -1951,20 +2039,23 @@ $hxClasses["alphatab.rendering.effects.BeatVibratoEffectInfo"] = alphatab.render
 alphatab.rendering.effects.BeatVibratoEffectInfo.__name__ = true;
 alphatab.rendering.effects.BeatVibratoEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.BeatVibratoEffectInfo.prototype = {
-	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.VibratoGlyph(0,5 * renderer.stave.staveGroup.layout.renderer.scale | 0,1.15);
+	shouldCreateGlyph: function(renderer,beat) {
+		return beat.vibrato != alphatab.model.VibratoType.None;
 	}
-	,getHeight: function(renderer) {
-		return 17 * renderer.stave.staveGroup.layout.renderer.scale | 0;
+	,canExpand: function(renderer,from,to) {
+		return true;
 	}
 	,getSizingMode: function() {
 		return alphatab.rendering.EffectBarGlyphSizing.GroupedOnBeatToPostBeat;
 	}
-	,shouldCreateGlyph: function(renderer,beat) {
-		return beat.vibrato != alphatab.model.VibratoType.None;
+	,getHeight: function(renderer) {
+		return 17 * renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+	}
+	,createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.VibratoGlyph(0,5 * renderer.stave.staveGroup.layout.renderer.settings.scale | 0,1.15);
 	}
 	,__class__: alphatab.rendering.effects.BeatVibratoEffectInfo
-}
+};
 alphatab.rendering.effects.NoteVibratoEffectInfo = function() {
 	alphatab.rendering.effects.NoteEffectInfoBase.call(this);
 };
@@ -1972,17 +2063,17 @@ $hxClasses["alphatab.rendering.effects.NoteVibratoEffectInfo"] = alphatab.render
 alphatab.rendering.effects.NoteVibratoEffectInfo.__name__ = true;
 alphatab.rendering.effects.NoteVibratoEffectInfo.__super__ = alphatab.rendering.effects.NoteEffectInfoBase;
 alphatab.rendering.effects.NoteVibratoEffectInfo.prototype = $extend(alphatab.rendering.effects.NoteEffectInfoBase.prototype,{
-	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.VibratoGlyph(0,5 * renderer.stave.staveGroup.layout.renderer.scale | 0);
-	}
-	,getHeight: function(renderer) {
-		return 15 * renderer.stave.staveGroup.layout.renderer.scale | 0;
+	shouldCreateGlyphForNote: function(renderer,note) {
+		return note.vibrato != alphatab.model.VibratoType.None || note.isTieDestination && note.tieOrigin.vibrato != alphatab.model.VibratoType.None;
 	}
 	,getSizingMode: function() {
 		return alphatab.rendering.EffectBarGlyphSizing.GroupedOnBeatToPostBeat;
 	}
-	,shouldCreateGlyphForNote: function(renderer,note) {
-		return note.vibrato != alphatab.model.VibratoType.None;
+	,getHeight: function(renderer) {
+		return 15 * renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+	}
+	,createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.VibratoGlyph(0,5 * renderer.stave.staveGroup.layout.renderer.settings.scale | 0);
 	}
 	,__class__: alphatab.rendering.effects.NoteVibratoEffectInfo
 });
@@ -2011,69 +2102,101 @@ alphatab.rendering.ScoreBarRendererFactory.prototype = $extend(alphatab.renderin
 	}
 	,__class__: alphatab.rendering.ScoreBarRendererFactory
 });
+alphatab.rendering.effects.CrescendoEffectInfo = function() {
+};
+$hxClasses["alphatab.rendering.effects.CrescendoEffectInfo"] = alphatab.rendering.effects.CrescendoEffectInfo;
+alphatab.rendering.effects.CrescendoEffectInfo.__name__ = true;
+alphatab.rendering.effects.CrescendoEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
+alphatab.rendering.effects.CrescendoEffectInfo.prototype = {
+	shouldCreateGlyph: function(renderer,beat) {
+		return beat.crescendo != alphatab.rendering.glyphs.CrescendoType.None;
+	}
+	,canExpand: function(renderer,from,to) {
+		return from.crescendo == to.crescendo;
+	}
+	,getSizingMode: function() {
+		return alphatab.rendering.EffectBarGlyphSizing.GroupedPreBeatToPostBeat;
+	}
+	,getHeight: function(renderer) {
+		return 17 * renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+	}
+	,createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.CrescendoGlyph(0,0,beat.crescendo);
+	}
+	,__class__: alphatab.rendering.effects.CrescendoEffectInfo
+};
 alphatab.rendering.effects.DynamicsEffectInfo = function() {
 };
 $hxClasses["alphatab.rendering.effects.DynamicsEffectInfo"] = alphatab.rendering.effects.DynamicsEffectInfo;
 alphatab.rendering.effects.DynamicsEffectInfo.__name__ = true;
 alphatab.rendering.effects.DynamicsEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.DynamicsEffectInfo.prototype = {
-	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.DynamicsGlyph(0,0,beat.dynamicValue);
+	shouldCreateGlyph: function(renderer,beat) {
+		return beat.index == 0 && beat.voice.bar.index == 0 || beat.previousBeat != null && beat.dynamicValue != beat.previousBeat.dynamicValue;
+	}
+	,canExpand: function(renderer,from,to) {
+		return true;
+	}
+	,getHeight: function(renderer) {
+		return 15 * renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 	}
 	,getSizingMode: function() {
 		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatOnly;
 	}
-	,getHeight: function(renderer) {
-		return 15 * renderer.stave.staveGroup.layout.renderer.scale | 0;
-	}
-	,shouldCreateGlyph: function(renderer,beat) {
-		return beat.index == 0 && beat.voice.bar.index == 0 || beat.previousBeat != null && beat.dynamicValue != beat.previousBeat.dynamicValue;
+	,createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.DynamicsGlyph(0,0,beat.dynamicValue);
 	}
 	,__class__: alphatab.rendering.effects.DynamicsEffectInfo
-}
+};
 alphatab.rendering.effects.TapEffectInfo = function() {
 };
 $hxClasses["alphatab.rendering.effects.TapEffectInfo"] = alphatab.rendering.effects.TapEffectInfo;
 alphatab.rendering.effects.TapEffectInfo.__name__ = true;
 alphatab.rendering.effects.TapEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.TapEffectInfo.prototype = {
-	createNewGlyph: function(renderer,beat) {
+	shouldCreateGlyph: function(renderer,beat) {
+		return beat.slap || beat.pop || beat.tap;
+	}
+	,canExpand: function(renderer,from,to) {
+		return true;
+	}
+	,getHeight: function(renderer) {
+		return 20 * renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+	}
+	,getSizingMode: function() {
+		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatOnly;
+	}
+	,createNewGlyph: function(renderer,beat) {
 		var res = renderer.stave.staveGroup.layout.renderer.renderingResources;
 		if(beat.slap) return new alphatab.rendering.glyphs.effects.TextGlyph(0,0,"S",res.effectFont);
 		if(beat.pop) return new alphatab.rendering.glyphs.effects.TextGlyph(0,0,"P",res.effectFont);
 		return new alphatab.rendering.glyphs.effects.TextGlyph(0,0,"T",res.effectFont);
 	}
-	,getSizingMode: function() {
-		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatOnly;
-	}
-	,getHeight: function(renderer) {
-		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
-	}
-	,shouldCreateGlyph: function(renderer,beat) {
-		return beat.slap || beat.pop || beat.tap;
-	}
 	,__class__: alphatab.rendering.effects.TapEffectInfo
-}
+};
 alphatab.rendering.effects.FadeInEffectInfo = function() {
 };
 $hxClasses["alphatab.rendering.effects.FadeInEffectInfo"] = alphatab.rendering.effects.FadeInEffectInfo;
 alphatab.rendering.effects.FadeInEffectInfo.__name__ = true;
 alphatab.rendering.effects.FadeInEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.FadeInEffectInfo.prototype = {
-	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.FadeInGlyph();
+	shouldCreateGlyph: function(renderer,beat) {
+		return beat.fadeIn;
+	}
+	,canExpand: function(renderer,from,to) {
+		return true;
+	}
+	,getHeight: function(renderer) {
+		return 20 * renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 	}
 	,getSizingMode: function() {
 		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatOnly;
 	}
-	,getHeight: function(renderer) {
-		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
-	}
-	,shouldCreateGlyph: function(renderer,beat) {
-		return beat.fadeIn;
+	,createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.FadeInGlyph();
 	}
 	,__class__: alphatab.rendering.effects.FadeInEffectInfo
-}
+};
 alphatab.rendering.effects.LetRingEffectInfo = function() {
 	alphatab.rendering.effects.NoteEffectInfoBase.call(this);
 };
@@ -2081,17 +2204,17 @@ $hxClasses["alphatab.rendering.effects.LetRingEffectInfo"] = alphatab.rendering.
 alphatab.rendering.effects.LetRingEffectInfo.__name__ = true;
 alphatab.rendering.effects.LetRingEffectInfo.__super__ = alphatab.rendering.effects.NoteEffectInfoBase;
 alphatab.rendering.effects.LetRingEffectInfo.prototype = $extend(alphatab.rendering.effects.NoteEffectInfoBase.prototype,{
-	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.LineRangedGlyph(0,0,"LetRing");
+	shouldCreateGlyphForNote: function(renderer,note) {
+		return note.isLetRing;
+	}
+	,getHeight: function(renderer) {
+		return 15 * renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 	}
 	,getSizingMode: function() {
 		return alphatab.rendering.EffectBarGlyphSizing.GroupedOnBeatToPostBeat;
 	}
-	,getHeight: function(renderer) {
-		return 15 * renderer.stave.staveGroup.layout.renderer.scale | 0;
-	}
-	,shouldCreateGlyphForNote: function(renderer,note) {
-		return note.isLetRing;
+	,createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.LineRangedGlyph(0,0,"LetRing");
 	}
 	,__class__: alphatab.rendering.effects.LetRingEffectInfo
 });
@@ -2102,17 +2225,17 @@ $hxClasses["alphatab.rendering.effects.PalmMuteEffectInfo"] = alphatab.rendering
 alphatab.rendering.effects.PalmMuteEffectInfo.__name__ = true;
 alphatab.rendering.effects.PalmMuteEffectInfo.__super__ = alphatab.rendering.effects.NoteEffectInfoBase;
 alphatab.rendering.effects.PalmMuteEffectInfo.prototype = $extend(alphatab.rendering.effects.NoteEffectInfoBase.prototype,{
-	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.LineRangedGlyph(0,0,"PalmMute");
+	shouldCreateGlyphForNote: function(renderer,note) {
+		return note.isPalmMute;
+	}
+	,getHeight: function(renderer) {
+		return 20 * renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 	}
 	,getSizingMode: function() {
 		return alphatab.rendering.EffectBarGlyphSizing.GroupedOnBeatToPostBeat;
 	}
-	,getHeight: function(renderer) {
-		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
-	}
-	,shouldCreateGlyphForNote: function(renderer,note) {
-		return note.isPalmMute;
+	,createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.LineRangedGlyph(0,0,"PalmMute");
 	}
 	,__class__: alphatab.rendering.effects.PalmMuteEffectInfo
 });
@@ -2134,21 +2257,24 @@ $hxClasses["alphatab.rendering.effects.PickStrokeEffectInfo"] = alphatab.renderi
 alphatab.rendering.effects.PickStrokeEffectInfo.__name__ = true;
 alphatab.rendering.effects.PickStrokeEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.PickStrokeEffectInfo.prototype = {
-	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.PickStrokeGlyph(0,0,beat.pickStroke);
+	shouldCreateGlyph: function(renderer,beat) {
+		return beat.pickStroke != alphatab.model.PickStrokeType.None;
+	}
+	,canExpand: function(renderer,from,to) {
+		return true;
+	}
+	,getHeight: function(renderer) {
+		return 20 * renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 	}
 	,getSizingMode: function() {
 		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatOnly;
 	}
-	,getHeight: function(renderer) {
-		return 20 * renderer.stave.staveGroup.layout.renderer.scale | 0;
-	}
-	,shouldCreateGlyph: function(renderer,beat) {
-		return beat.pickStroke != alphatab.model.PickStrokeType.None;
+	,createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.PickStrokeGlyph(0,0,beat.pickStroke);
 	}
 	,__class__: alphatab.rendering.effects.PickStrokeEffectInfo
-}
-alphatab.Environment = function() { }
+};
+alphatab.Environment = function() { };
 $hxClasses["alphatab.Environment"] = alphatab.Environment;
 alphatab.Environment.__name__ = true;
 alphatab.Settings = function() {
@@ -2158,14 +2284,12 @@ alphatab.Settings.__name__ = true;
 alphatab.Settings.defaults = function() {
 	var settings = new alphatab.Settings();
 	settings.scale = 1.0;
-	settings.autoSize = true;
 	settings.width = 600;
 	settings.height = 200;
 	settings.engine = "default";
 	settings.layout = alphatab.LayoutSettings.defaults();
 	settings.staves = new Array();
 	settings.staves.push(new alphatab.StaveSettings("marker"));
-	settings.staves.push(new alphatab.StaveSettings("triplet-feel"));
 	settings.staves.push(new alphatab.StaveSettings("tempo"));
 	settings.staves.push(new alphatab.StaveSettings("text"));
 	settings.staves.push(new alphatab.StaveSettings("chords"));
@@ -2174,6 +2298,7 @@ alphatab.Settings.defaults = function() {
 	settings.staves.push(new alphatab.StaveSettings("note-vibrato"));
 	settings.staves.push(new alphatab.StaveSettings("alternate-endings"));
 	settings.staves.push(new alphatab.StaveSettings("score"));
+	settings.staves.push(new alphatab.StaveSettings("crescendo"));
 	settings.staves.push(new alphatab.StaveSettings("dynamics"));
 	settings.staves.push(new alphatab.StaveSettings("trill"));
 	settings.staves.push(new alphatab.StaveSettings("beat-vibrato"));
@@ -2184,55 +2309,84 @@ alphatab.Settings.defaults = function() {
 	settings.staves.push(new alphatab.StaveSettings("palm-mute"));
 	settings.staves.push(new alphatab.StaveSettings("tab"));
 	settings.staves.push(new alphatab.StaveSettings("pick-stroke"));
-	settings.staves.push(new alphatab.StaveSettings("fingering"));
 	return settings;
-}
+};
+alphatab.Settings.jsonExists = function(json,property) {
+	return property in json;
+};
 alphatab.Settings.fromJson = function(json) {
+	if(js.Boot.__instanceof(json,alphatab.Settings)) return json;
 	var settings = alphatab.Settings.defaults();
 	if(!json) return settings;
-	if(json.scale) settings.scale = json.scale;
-	if(json.autoSize) settings.autoSize = json.autoSize;
-	if(json.width) settings.width = json.width;
-	if(json.height) settings.height = json.height;
-	if(json.engine) settings.engine = json.engine;
-	if(json.layout) {
+	if(alphatab.Settings.jsonExists(json,"scale")) settings.scale = json.scale;
+	if(alphatab.Settings.jsonExists(json,"width")) settings.width = json.width;
+	if(alphatab.Settings.jsonExists(json,"height")) settings.height = json.height;
+	if(alphatab.Settings.jsonExists(json,"engine")) settings.engine = json.engine;
+	if(alphatab.Settings.jsonExists(json,"layout")) {
 		if(js.Boot.__instanceof(json.layout,String)) settings.layout.mode = json.layout; else {
 			if(json.layout.mode) settings.layout.mode = json.layout.mode;
 			if(json.layout.additionalSettings) {
-				var _g = 0, _g1 = Reflect.fields(json.layout.additionalSettings);
+				var _g = 0;
+				var _g1 = Reflect.fields(json.layout.additionalSettings);
 				while(_g < _g1.length) {
 					var key = _g1[_g];
 					++_g;
-					settings.layout.additionalSettings.set(key,Reflect.field(json.layout.additionalSettings,key));
+					settings.layout.additionalSettings.set(key,(function($this) {
+						var $r;
+						var v = null;
+						try {
+							v = json.layout.additionalSettings[key];
+						} catch( e ) {
+						}
+						$r = v;
+						return $r;
+					}(this)));
 				}
 			}
 		}
 	}
-	if(json.staves) {
+	if(alphatab.Settings.jsonExists(json,"staves")) {
 		settings.staves = new Array();
-		var _g = 0, _g1 = Reflect.fields(json.staves);
+		var _g = 0;
+		var _g1 = Reflect.fields(json.staves);
 		while(_g < _g1.length) {
 			var key = _g1[_g];
 			++_g;
-			var val = Reflect.field(json.staves,key);
+			var val;
+			var v = null;
+			try {
+				v = json.staves[key];
+			} catch( e ) {
+			}
+			val = v;
 			if(js.Boot.__instanceof(val,String)) settings.staves.push(new alphatab.StaveSettings(val)); else if(val.id) {
 				var staveSettings = new alphatab.StaveSettings(val.id);
 				if(val.additionalSettings) {
-					var _g2 = 0, _g3 = Reflect.fields(val.additionalSettings);
+					var _g2 = 0;
+					var _g3 = Reflect.fields(val.additionalSettings);
 					while(_g2 < _g3.length) {
 						var key1 = _g3[_g2];
 						++_g2;
-						staveSettings.additionalSettings.set(key1,Reflect.field(val.additionalSettings,key1));
+						staveSettings.additionalSettings.set(key1,(function($this) {
+							var $r;
+							var v = null;
+							try {
+								v = val.additionalSettings[key1];
+							} catch( e ) {
+							}
+							$r = v;
+							return $r;
+						}(this)));
 					}
 				}
 			}
 		}
 	}
 	return settings;
-}
+};
 alphatab.Settings.prototype = {
 	__class__: alphatab.Settings
-}
+};
 alphatab.LayoutSettings = function() {
 	this.additionalSettings = new haxe.ds.StringMap();
 };
@@ -2242,14 +2396,14 @@ alphatab.LayoutSettings.defaults = function() {
 	var settings = new alphatab.LayoutSettings();
 	settings.mode = "page";
 	return settings;
-}
+};
 alphatab.LayoutSettings.prototype = {
 	get: function(key,def) {
 		if(this.additionalSettings.exists(key)) return this.additionalSettings.get(key);
 		return def;
 	}
 	,__class__: alphatab.LayoutSettings
-}
+};
 alphatab.StaveSettings = function(id) {
 	this.id = id;
 	this.additionalSettings = new haxe.ds.StringMap();
@@ -2258,9 +2412,9 @@ $hxClasses["alphatab.StaveSettings"] = alphatab.StaveSettings;
 alphatab.StaveSettings.__name__ = true;
 alphatab.StaveSettings.prototype = {
 	__class__: alphatab.StaveSettings
-}
-alphatab.audio = {}
-alphatab.audio.GeneralMidi = function() { }
+};
+alphatab.audio = {};
+alphatab.audio.GeneralMidi = function() { };
 $hxClasses["alphatab.audio.GeneralMidi"] = alphatab.audio.GeneralMidi;
 alphatab.audio.GeneralMidi.__name__ = true;
 alphatab.audio.GeneralMidi.getValue = function(name) {
@@ -2396,24 +2550,27 @@ alphatab.audio.GeneralMidi.getValue = function(name) {
 		alphatab.audio.GeneralMidi._values.set("gunshot",127);
 	}
 	name = StringTools.replace(name.toLowerCase()," ","");
-	return alphatab.audio.GeneralMidi._values.exists(name)?alphatab.audio.GeneralMidi._values.get(name):0;
-}
-alphatab.audio.MidiUtils = function() { }
+	if(alphatab.audio.GeneralMidi._values.exists(name)) return alphatab.audio.GeneralMidi._values.get(name); else return 0;
+};
+alphatab.audio.MidiUtils = function() { };
 $hxClasses["alphatab.audio.MidiUtils"] = alphatab.audio.MidiUtils;
 alphatab.audio.MidiUtils.__name__ = true;
 alphatab.audio.MidiUtils.durationToTicks = function(value) {
 	return alphatab.audio.MidiUtils.valueToTicks(alphatab.model.ModelUtils.getDurationValue(value));
-}
+};
 alphatab.audio.MidiUtils.valueToTicks = function(value) {
 	return 960 * (4.0 / value) | 0;
-}
+};
 alphatab.audio.MidiUtils.applyDot = function(ticks,doubleDotted) {
 	if(doubleDotted) return ticks + (ticks / 4 * 3 | 0); else return ticks + (ticks / 2 | 0);
-}
+};
 alphatab.audio.MidiUtils.applyTuplet = function(ticks,numerator,denominator) {
 	return ticks * denominator / numerator | 0;
-}
-alphatab.importer = {}
+};
+alphatab.audio.MidiUtils.dynamicToVelocity = function(dynamicValue) {
+	return 15 + dynamicValue[1] * 16;
+};
+alphatab.importer = {};
 alphatab.importer.ScoreImporter = function() {
 };
 $hxClasses["alphatab.importer.ScoreImporter"] = alphatab.importer.ScoreImporter;
@@ -2424,40 +2581,34 @@ alphatab.importer.ScoreImporter.availableImporters = function() {
 	scoreImporter.push(new alphatab.importer.AlphaTexImporter());
 	scoreImporter.push(new alphatab.importer.GpxImporter());
 	return scoreImporter;
-}
+};
 alphatab.importer.ScoreImporter.prototype = {
-	previousNoteOnSameLine: function(note) {
-		var previousBeat = note.beat.previousBeat;
-		while(previousBeat != null && previousBeat.voice.bar == note.beat.voice.bar) {
-			var noteOnString = previousBeat.getNoteOnString(note.string);
-			if(noteOnString != null) return noteOnString; else previousBeat = previousBeat.previousBeat;
-		}
-		return null;
+	init: function(data) {
+		this._data = data;
 	}
-	,nextNoteOnSameLine: function(note) {
-		var nextBeat = note.beat.nextBeat;
-		while(nextBeat != null && nextBeat.voice.bar == note.beat.voice.bar) {
-			var noteOnString = nextBeat.getNoteOnString(note.string);
-			if(noteOnString != null) return noteOnString; else nextBeat = nextBeat.nextBeat;
-		}
+	,readScore: function() {
 		return null;
 	}
 	,finish: function(score) {
 		var _g10 = this;
-		var _g = 0, _g1 = score.tracks;
+		var _g = 0;
+		var _g1 = score.tracks;
 		while(_g < _g1.length) {
 			var t = _g1[_g];
 			++_g;
 			if(!t.isPercussion) {
-				var _g2 = 0, _g3 = t.bars;
+				var _g2 = 0;
+				var _g3 = t.bars;
 				while(_g2 < _g3.length) {
 					var bar = _g3[_g2];
 					++_g2;
-					var _g4 = 0, _g5 = bar.voices;
+					var _g4 = 0;
+					var _g5 = bar.voices;
 					while(_g4 < _g5.length) {
 						var v = _g5[_g4];
 						++_g4;
-						var _g6 = 0, _g7 = v.beats;
+						var _g6 = 0;
+						var _g7 = v.beats;
 						while(_g6 < _g7.length) {
 							var beat = _g7[_g6];
 							++_g6;
@@ -2469,7 +2620,8 @@ alphatab.importer.ScoreImporter.prototype = {
 								beat.previousBeat.nextBeat = beat;
 								beat.start = beat.previousBeat.start + beat.previousBeat.calculateDuration();
 							}
-							var _g8 = 0, _g9 = beat.notes;
+							var _g8 = 0;
+							var _g9 = beat.notes;
 							while(_g8 < _g9.length) {
 								var n = [_g9[_g8]];
 								++_g8;
@@ -2504,14 +2656,24 @@ alphatab.importer.ScoreImporter.prototype = {
 			}
 		}
 	}
-	,readScore: function() {
+	,nextNoteOnSameLine: function(note) {
+		var nextBeat = note.beat.nextBeat;
+		while(nextBeat != null && nextBeat.voice.bar.index <= note.beat.voice.bar.index + 3) {
+			var noteOnString = nextBeat.getNoteOnString(note.string);
+			if(noteOnString != null) return noteOnString; else nextBeat = nextBeat.nextBeat;
+		}
 		return null;
 	}
-	,init: function(data) {
-		this._data = data;
+	,previousNoteOnSameLine: function(note) {
+		var previousBeat = note.beat.previousBeat;
+		while(previousBeat != null && previousBeat.voice.bar.index >= note.beat.voice.bar.index - 3) {
+			var noteOnString = previousBeat.getNoteOnString(note.string);
+			if(noteOnString != null) return noteOnString; else previousBeat = previousBeat.previousBeat;
+		}
+		return null;
 	}
 	,__class__: alphatab.importer.ScoreImporter
-}
+};
 alphatab.importer.AlphaTexImporter = function() {
 	alphatab.importer.ScoreImporter.call(this);
 };
@@ -2520,369 +2682,181 @@ alphatab.importer.AlphaTexImporter.__name__ = true;
 alphatab.importer.AlphaTexImporter.isLetter = function(ch) {
 	var code = HxOverrides.cca(ch,0);
 	return !alphatab.importer.AlphaTexImporter.isTerminal(ch) && (code >= 33 && code <= 47 || code >= 58 && code <= 126 || code > 128);
-}
+};
 alphatab.importer.AlphaTexImporter.isTerminal = function(ch) {
 	return ch == "." || ch == "{" || ch == "}" || ch == "[" || ch == "]" || ch == "(" || ch == ")" || ch == "|" || ch == "'" || ch == "\"" || ch == "\\";
-}
+};
 alphatab.importer.AlphaTexImporter.__super__ = alphatab.importer.ScoreImporter;
 alphatab.importer.AlphaTexImporter.prototype = $extend(alphatab.importer.ScoreImporter.prototype,{
-	readNumber: function() {
-		var str = "";
-		do {
-			str += this._ch;
-			this.nextChar();
-		} while(this.isDigit(this._ch));
-		return Std.parseInt(str);
-	}
-	,readName: function() {
-		var str = "";
-		do {
-			str += this._ch;
-			this.nextChar();
-		} while(alphatab.importer.AlphaTexImporter.isLetter(this._ch) || this.isDigit(this._ch));
-		return str;
-	}
-	,isDigit: function(ch) {
-		var code = HxOverrides.cca(ch,0);
-		return code >= 48 && code <= 57 || ch == "-" && this._allowNegatives;
-	}
-	,newSy: function() {
-		this._sy = alphatab.importer.AlphaTexSymbols.No;
-		do if(this._ch == alphatab.importer.AlphaTexImporter.EOF) this._sy = alphatab.importer.AlphaTexSymbols.Eof; else if(this._ch == " " || this._ch == "\n" || this._ch == "\r" || this._ch == "\t") this.nextChar(); else if(this._ch == "/") {
-			this.nextChar();
-			if(this._ch == "/") while(this._ch != "\r" && this._ch != "\n" && this._ch != alphatab.importer.AlphaTexImporter.EOF) this.nextChar(); else if(this._ch == "*") while(this._ch != alphatab.importer.AlphaTexImporter.EOF) if(this._ch == "*") {
-				this.nextChar();
-				if(this._ch == "/") {
-					this.nextChar();
-					break;
-				}
-			} else this.nextChar(); else this.error("symbol",alphatab.importer.AlphaTexSymbols.String,false);
-		} else if(this._ch == "\"" || this._ch == "'") {
-			this.nextChar();
-			this._syData = "";
-			this._sy = alphatab.importer.AlphaTexSymbols.String;
-			while(this._ch != "\"" && this._ch != "'" && this._ch != alphatab.importer.AlphaTexImporter.EOF) {
-				this._syData += this._ch;
-				this.nextChar();
-			}
-			this.nextChar();
-		} else if(this._ch == "-") {
-			if(this._allowNegatives && this.isDigit(this._ch)) {
-				var number = this.readNumber();
-				this._sy = alphatab.importer.AlphaTexSymbols.Number;
-				this._syData = number;
-			} else {
-				this._sy = alphatab.importer.AlphaTexSymbols.String;
-				this._syData = this.readName();
-			}
-		} else if(this._ch == ".") {
-			this._sy = alphatab.importer.AlphaTexSymbols.Dot;
-			this.nextChar();
-		} else if(this._ch == ":") {
-			this._sy = alphatab.importer.AlphaTexSymbols.DoubleDot;
-			this.nextChar();
-		} else if(this._ch == "(") {
-			this._sy = alphatab.importer.AlphaTexSymbols.LParensis;
-			this.nextChar();
-		} else if(this._ch == "\\") {
-			this.nextChar();
-			var name = this.readName();
-			this._sy = alphatab.importer.AlphaTexSymbols.MetaCommand;
-			this._syData = name;
-		} else if(this._ch == ")") {
-			this._sy = alphatab.importer.AlphaTexSymbols.RParensis;
-			this.nextChar();
-		} else if(this._ch == "{") {
-			this._sy = alphatab.importer.AlphaTexSymbols.LBrace;
-			this.nextChar();
-		} else if(this._ch == "}") {
-			this._sy = alphatab.importer.AlphaTexSymbols.RBrace;
-			this.nextChar();
-		} else if(this._ch == "|") {
-			this._sy = alphatab.importer.AlphaTexSymbols.Pipe;
-			this.nextChar();
-		} else if(this._ch == "*") {
-			this._sy = alphatab.importer.AlphaTexSymbols.Multiply;
-			this.nextChar();
-		} else if(this.isDigit(this._ch)) {
-			var number = this.readNumber();
-			this._sy = alphatab.importer.AlphaTexSymbols.Number;
-			this._syData = number;
-		} else if(alphatab.importer.AlphaTexImporter.isLetter(this._ch)) {
-			var name = this.readName();
-			if(alphatab.model.Tuning.isTuning(name)) {
-				this._sy = alphatab.importer.AlphaTexSymbols.Tuning;
-				this._syData = name.toLowerCase();
-			} else {
-				this._sy = alphatab.importer.AlphaTexSymbols.String;
-				this._syData = name;
-			}
-		} else this.error("symbol",alphatab.importer.AlphaTexSymbols.String,false); while(this._sy == alphatab.importer.AlphaTexSymbols.No);
-	}
-	,nextChar: function() {
+	readScore: function() {
 		try {
-			this._ch = this._data.readString(1);
-			this._curChPos++;
+			this.createDefaultScore();
+			this._curChPos = 0;
+			this._currentDuration = alphatab.model.Duration.Quarter;
+			this.nextChar();
+			this.newSy();
+			this.score();
+			this.finish(this._score);
+			return this._score;
 		} catch( e ) {
-			if( js.Boot.__instanceof(e,haxe.io.Eof) ) {
-				this._ch = alphatab.importer.AlphaTexImporter.EOF;
-			} else throw(e);
+			console.log(e);
+			throw alphatab.importer.ScoreImporter.UnsupportedFormat;
 		}
 	}
-	,parseTuning: function(str) {
-		var tuning = alphatab.model.Tuning.getTuningForText(str);
-		if(tuning < 0) this.error("tuning-value",alphatab.importer.AlphaTexSymbols.String,false);
-		return tuning;
+	,error: function(nonterm,expected,symbolError) {
+		if(symbolError == null) symbolError = true;
+		if(symbolError) throw haxe.io.Error.Custom(Std.string(this._curChPos) + ": Error on block " + nonterm + ", expected a " + Std.string(expected) + " found a " + Std.string(this._sy)); else throw haxe.io.Error.Custom(Std.string(this._curChPos) + ": Error on block " + nonterm + ", invalid value:" + Std.string(this._syData));
 	}
-	,parseKeySignature: function(str) {
-		var _g = str.toLowerCase();
-		switch(_g) {
-		case "cb":
-			return -7;
-		case "gb":
-			return -6;
-		case "db":
-			return -5;
-		case "ab":
-			return -4;
-		case "eb":
-			return -3;
-		case "bb":
-			return -2;
-		case "f":
-			return -1;
-		case "c":
-			return 0;
-		case "g":
-			return 1;
-		case "d":
-			return 2;
-		case "a":
-			return 3;
-		case "e":
-			return 4;
-		case "b":
-			return 5;
-		case "f#":
-			return 6;
-		case "c#":
-			return 7;
-		default:
-			return 0;
-		}
+	,score: function() {
+		this.metaData();
+		this.bars();
 	}
-	,parseClef: function(str) {
-		var _g = str.toLowerCase();
-		switch(_g) {
-		case "g2":case "treble":
-			return alphatab.model.Clef.G2;
-		case "f4":case "bass":
-			return alphatab.model.Clef.F4;
-		case "c3":case "tenor":
-			return alphatab.model.Clef.C3;
-		case "c4":case "alto":
-			return alphatab.model.Clef.C4;
-		default:
-			return alphatab.model.Clef.G2;
-		}
-	}
-	,createDefaultScore: function() {
-		this._score = new alphatab.model.Score();
-		this._score.tempo = 120;
-		this._score.tempoLabel = "";
-		this._track = new alphatab.model.Track();
-		this._track.playbackInfo.program = 25;
-		this._track.playbackInfo.primaryChannel = alphatab.importer.AlphaTexImporter.TRACK_CHANNELS[0];
-		this._track.playbackInfo.secondaryChannel = alphatab.importer.AlphaTexImporter.TRACK_CHANNELS[1];
-		this._track.tuning = alphatab.model.Tuning.getPresetsFor(6)[0].tuning;
-		this._score.addTrack(this._track);
-	}
-	,barMeta: function(bar) {
-		var master = bar.track.score.masterBars[bar.index];
-		while(this._sy == alphatab.importer.AlphaTexSymbols.MetaCommand) {
-			if(this._syData == "ts") {
-				this.newSy();
-				if(this._sy != alphatab.importer.AlphaTexSymbols.Number) this.error("timesignature-numerator",alphatab.importer.AlphaTexSymbols.Number);
-				master.timeSignatureNumerator = this._syData;
-				this.newSy();
-				if(this._sy != alphatab.importer.AlphaTexSymbols.Number) this.error("timesignature-denominator",alphatab.importer.AlphaTexSymbols.Number);
-				master.timeSignatureDenominator = this._syData;
-			} else if(this._syData == "ro") master.isRepeatStart = true; else if(this._syData == "rc") {
-				this.newSy();
-				if(this._sy != alphatab.importer.AlphaTexSymbols.Number) this.error("repeatclose",alphatab.importer.AlphaTexSymbols.Number);
-				master.repeatCount = Std.parseInt(this._syData) - 1;
-			} else if(this._syData == "ks") {
-				this.newSy();
-				if(this._sy != alphatab.importer.AlphaTexSymbols.String) this.error("keysignature",alphatab.importer.AlphaTexSymbols.String);
-				master.keySignature = this.parseKeySignature(this._syData);
-			} else if(this._syData == "clef") {
-				this.newSy();
-				if(this._sy != alphatab.importer.AlphaTexSymbols.String && this._sy != alphatab.importer.AlphaTexSymbols.Tuning) this.error("clef",alphatab.importer.AlphaTexSymbols.String);
-				bar.clef = this.parseClef(this._syData);
-			} else this.error("measure-effects",alphatab.importer.AlphaTexSymbols.String,false);
+	,metaData: function() {
+		var anyMeta = false;
+		while(this._sy == alphatab.importer.AlphaTexSymbols.MetaCommand) if(this._syData == "title") {
+			this.newSy();
+			if(this._sy == alphatab.importer.AlphaTexSymbols.String) this._score.title = this._syData; else this.error("title",alphatab.importer.AlphaTexSymbols.String);
+			this.newSy();
+			anyMeta = true;
+		} else if(this._syData == "subtitle") {
+			this.newSy();
+			if(this._sy == alphatab.importer.AlphaTexSymbols.String) this._score.subTitle = this._syData; else this.error("subtitle",alphatab.importer.AlphaTexSymbols.String);
+			this.newSy();
+			anyMeta = true;
+		} else if(this._syData == "artist") {
+			this.newSy();
+			if(this._sy == alphatab.importer.AlphaTexSymbols.String) this._score.artist = this._syData; else this.error("artist",alphatab.importer.AlphaTexSymbols.String);
+			this.newSy();
+			anyMeta = true;
+		} else if(this._syData == "album") {
+			this.newSy();
+			if(this._sy == alphatab.importer.AlphaTexSymbols.String) this._score.album = this._syData; else this.error("album",alphatab.importer.AlphaTexSymbols.String);
+			this.newSy();
+			anyMeta = true;
+		} else if(this._syData == "words") {
+			this.newSy();
+			if(this._sy == alphatab.importer.AlphaTexSymbols.String) this._score.words = this._syData; else this.error("words",alphatab.importer.AlphaTexSymbols.String);
+			this.newSy();
+			anyMeta = true;
+		} else if(this._syData == "music") {
+			this.newSy();
+			if(this._sy == alphatab.importer.AlphaTexSymbols.String) this._score.music = this._syData; else this.error("music",alphatab.importer.AlphaTexSymbols.String);
+			this.newSy();
+			anyMeta = true;
+		} else if(this._syData == "copyright") {
+			this.newSy();
+			if(this._sy == alphatab.importer.AlphaTexSymbols.String) this._score.copyright = this._syData; else this.error("copyright",alphatab.importer.AlphaTexSymbols.String);
+			this.newSy();
+			anyMeta = true;
+		} else if(this._syData == "tempo") {
+			this.newSy();
+			if(this._sy == alphatab.importer.AlphaTexSymbols.Number) this._score.tempo = this._syData; else this.error("tempo",alphatab.importer.AlphaTexSymbols.Number);
+			this.newSy();
+			anyMeta = true;
+		} else if(this._syData == "capo") {
+			this.newSy();
+			if(this._sy == alphatab.importer.AlphaTexSymbols.Number) this._track.capo = this._syData; else this.error("capo",alphatab.importer.AlphaTexSymbols.Number);
+			this.newSy();
+			anyMeta = true;
+		} else if(this._syData == "tuning") {
+			this.newSy();
+			if(this._sy == alphatab.importer.AlphaTexSymbols.Tuning) {
+				this._track.tuning = new Array();
+				do {
+					this._track.tuning.push(this.parseTuning(this._syData));
+					this.newSy();
+				} while(this._sy == alphatab.importer.AlphaTexSymbols.Tuning);
+			} else this.error("tuning",alphatab.importer.AlphaTexSymbols.Tuning);
+			anyMeta = true;
+		} else if(this._syData == "instrument") {
+			this.newSy();
+			if(this._sy == alphatab.importer.AlphaTexSymbols.Number) {
+				var instrument;
+				instrument = js.Boot.__cast(this._syData , Int);
+				if(instrument >= 0 && instrument <= 128) this._track.playbackInfo.program = this._syData; else this.error("instrument",alphatab.importer.AlphaTexSymbols.Number,false);
+			} else if(this._sy == alphatab.importer.AlphaTexSymbols.String) {
+				var instrumentName;
+				instrumentName = js.Boot.__cast(this._syData , String);
+				this._track.playbackInfo.program = alphatab.audio.GeneralMidi.getValue(instrumentName);
+			} else this.error("instrument",alphatab.importer.AlphaTexSymbols.Number);
+			this.newSy();
+			anyMeta = true;
+		} else this.error("metaDataTags",alphatab.importer.AlphaTexSymbols.String,false);
+		if(anyMeta) {
+			if(this._sy != alphatab.importer.AlphaTexSymbols.Dot) this.error("song",alphatab.importer.AlphaTexSymbols.Dot);
 			this.newSy();
 		}
 	}
-	,parseDuration: function(duration) {
-		switch(duration) {
-		case 1:
-			return alphatab.model.Duration.Whole;
-		case 2:
-			return alphatab.model.Duration.Half;
-		case 4:
-			return alphatab.model.Duration.Quarter;
-		case 8:
-			return alphatab.model.Duration.Eighth;
-		case 16:
-			return alphatab.model.Duration.Sixteenth;
-		case 32:
-			return alphatab.model.Duration.ThirtySecond;
-		case 64:
-			return alphatab.model.Duration.SixtyFourth;
-		default:
-			return alphatab.model.Duration.Quarter;
+	,bars: function() {
+		this.bar();
+		while(this._sy != alphatab.importer.AlphaTexSymbols.Eof) {
+			if(this._sy != alphatab.importer.AlphaTexSymbols.Pipe) this.error("bar",alphatab.importer.AlphaTexSymbols.Pipe);
+			this.newSy();
+			this.bar();
 		}
 	}
-	,noteEffects: function(note) {
+	,bar: function() {
+		var master = new alphatab.model.MasterBar();
+		this._score.addMasterBar(master);
+		var bar = new alphatab.model.Bar();
+		this._track.addBar(bar);
+		if(master.index > 0) {
+			master.keySignature = master.previousMasterBar.keySignature;
+			master.timeSignatureDenominator = master.previousMasterBar.timeSignatureDenominator;
+			master.timeSignatureNumerator = master.previousMasterBar.timeSignatureNumerator;
+			bar.clef = bar.previousBar.clef;
+		}
+		this.barMeta(bar);
+		var voice = new alphatab.model.Voice();
+		bar.addVoice(voice);
+		while(this._sy != alphatab.importer.AlphaTexSymbols.Pipe && this._sy != alphatab.importer.AlphaTexSymbols.Eof) this.beat(voice);
+	}
+	,beat: function(voice) {
+		if(this._sy == alphatab.importer.AlphaTexSymbols.DoubleDot) {
+			this.newSy();
+			if(this._sy != alphatab.importer.AlphaTexSymbols.Number) this.error("duration",alphatab.importer.AlphaTexSymbols.Number);
+			if(this._syData == 1 || this._syData == 2 || this._syData == 4 || this._syData == 8 || this._syData == 16 || this._syData == 32 || this._syData == 64) this._currentDuration = this.parseDuration(this._syData); else this.error("duration",alphatab.importer.AlphaTexSymbols.Number,false);
+			this.newSy();
+			return;
+		}
+		var beat = new alphatab.model.Beat();
+		voice.addBeat(beat);
+		if(this._sy == alphatab.importer.AlphaTexSymbols.LParensis) {
+			this.newSy();
+			this.note(beat);
+			while(this._sy != alphatab.importer.AlphaTexSymbols.RParensis && this._sy != alphatab.importer.AlphaTexSymbols.Eof) this.note(beat);
+			if(this._sy != alphatab.importer.AlphaTexSymbols.RParensis) this.error("note-list",alphatab.importer.AlphaTexSymbols.RParensis);
+			this.newSy();
+		} else if(this._sy == alphatab.importer.AlphaTexSymbols.String && Std.string(this._syData).toLowerCase() == "r") this.newSy(); else this.note(beat);
+		if(this._sy == alphatab.importer.AlphaTexSymbols.Dot) {
+			this.newSy();
+			if(this._sy != alphatab.importer.AlphaTexSymbols.Number) this.error("duration",alphatab.importer.AlphaTexSymbols.Number);
+			if(this._syData == 1 || this._syData == 2 || this._syData == 4 || this._syData == 8 || this._syData == 16 || this._syData == 32 || this._syData == 64) beat.duration = this.parseDuration(this._syData); else this.error("duration",alphatab.importer.AlphaTexSymbols.Number,false);
+			this.newSy();
+		} else beat.duration = this._currentDuration;
+		var beatRepeat = 1;
+		if(this._sy == alphatab.importer.AlphaTexSymbols.Multiply) {
+			this.newSy();
+			if(this._sy != alphatab.importer.AlphaTexSymbols.Number) this.error("multiplier",alphatab.importer.AlphaTexSymbols.Number); else beatRepeat = this._syData;
+			this.newSy();
+		}
+		this.beatEffects(beat);
+		var _g1 = 0;
+		var _g = beatRepeat - 1;
+		while(_g1 < _g) {
+			var i = _g1++;
+			voice.addBeat(beat.clone());
+		}
+	}
+	,beatEffects: function(beat) {
 		if(this._sy != alphatab.importer.AlphaTexSymbols.LBrace) return;
 		this.newSy();
 		while(this._sy == alphatab.importer.AlphaTexSymbols.String) {
 			this._syData = Std.string(this._syData).toLowerCase();
-			if(this._syData == "b") {
-				this.newSy();
-				if(this._sy != alphatab.importer.AlphaTexSymbols.LParensis) this.error("bend-effect",alphatab.importer.AlphaTexSymbols.LParensis);
-				this.newSy();
-				while(this._sy != alphatab.importer.AlphaTexSymbols.RParensis && this._sy != alphatab.importer.AlphaTexSymbols.Eof) {
-					if(this._sy != alphatab.importer.AlphaTexSymbols.Number) this.error("bend-effect-value",alphatab.importer.AlphaTexSymbols.Number);
-					var bendValue = this._syData;
-					note.bendPoints.push(new alphatab.model.BendPoint(0,Math.abs(bendValue) | 0));
-					this.newSy();
-				}
-				if(note.bendPoints.length > 60) note.bendPoints = note.bendPoints.slice(0,60);
-				var count = note.bendPoints.length;
-				var step = Math.floor(60 / count);
-				var i = 0;
-				while(i < count) {
-					note.bendPoints[i].offset = Math.floor(Math.min(60,i * step));
-					i++;
-				}
-				if(this._sy != alphatab.importer.AlphaTexSymbols.RParensis) this.error("bend-effect",alphatab.importer.AlphaTexSymbols.RParensis);
-				this.newSy();
-			} else if(this._syData == "nh") {
-				note.harmonicType = alphatab.model.HarmonicType.Natural;
-				this.newSy();
-			} else if(this._syData == "ah") {
-				note.harmonicType = alphatab.model.HarmonicType.Artificial;
-				this.newSy();
-			} else if(this._syData == "th") {
-				note.harmonicType = alphatab.model.HarmonicType.Tap;
-				this.newSy();
-			} else if(this._syData == "ph") {
-				note.harmonicType = alphatab.model.HarmonicType.Pinch;
-				this.newSy();
-			} else if(this._syData == "sh") {
-				note.harmonicType = alphatab.model.HarmonicType.Semi;
-				this.newSy();
-			} else if(this._syData == "gr") {
-				this.newSy();
-				if(this._syData == "ob") note.beat.graceType = alphatab.model.GraceType.OnBeat; else note.beat.graceType = alphatab.model.GraceType.BeforeBeat;
-				this.newSy();
-			} else if(this._syData == "tr") {
-				this.newSy();
-				if(this._sy != alphatab.importer.AlphaTexSymbols.Number) this.error("trill-effect",alphatab.importer.AlphaTexSymbols.Number);
-				var fret = this._syData;
-				this.newSy();
-				var duration = 16;
-				if(this._sy == alphatab.importer.AlphaTexSymbols.Number) {
-					var _g = this;
-					switch(_g._syData) {
-					case 16:case 32:case 64:
-						duration = this._syData;
-						break;
-					default:
-						duration = 16;
-					}
-					this.newSy();
-				}
-				note.trillFret = fret;
-				note.trillSpeed = duration;
-			} else if(this._syData == "tp") {
-				this.newSy();
-				var duration = alphatab.model.Duration.Eighth;
-				if(this._sy == alphatab.importer.AlphaTexSymbols.Number) {
-					var _g = this;
-					switch(_g._syData) {
-					case 8:
-						duration = alphatab.model.Duration.Eighth;
-						break;
-					case 16:
-						duration = alphatab.model.Duration.Sixteenth;
-						break;
-					case 32:
-						duration = alphatab.model.Duration.ThirtySecond;
-						break;
-					default:
-						duration = alphatab.model.Duration.Eighth;
-					}
-					this.newSy();
-				}
-				note.beat.tremoloSpeed = duration;
-			} else if(this._syData == "v") {
-				this.newSy();
-				note.vibrato = alphatab.model.VibratoType.Slight;
-			} else if(this._syData == "sl") {
-				this.newSy();
-				note.slideType = alphatab.model.SlideType.Legato;
-			} else if(this._syData == "ss") {
-				this.newSy();
-				note.slideType = alphatab.model.SlideType.Shift;
-			} else if(this._syData == "h") {
-				this.newSy();
-				note.isHammerPullOrigin = true;
-			} else if(this._syData == "g") {
-				this.newSy();
-				note.isGhost = true;
-			} else if(this._syData == "ac") {
-				this.newSy();
-				note.accentuated = alphatab.model.AccentuationType.Normal;
-			} else if(this._syData == "hac") {
-				this.newSy();
-				note.accentuated = alphatab.model.AccentuationType.Heavy;
-			} else if(this._syData == "pm") {
-				this.newSy();
-				note.isPalmMute = true;
-			} else if(this._syData == "st") {
-				this.newSy();
-				note.isStaccato = true;
-			} else if(this._syData == "lr") {
-				this.newSy();
-				note.isLetRing = true;
-			} else if(this.applyBeatEffect(note.beat)) {
-			} else this.error(this._syData,alphatab.importer.AlphaTexSymbols.String,false);
+			if(!this.applyBeatEffect(beat)) this.error("beat-effects",alphatab.importer.AlphaTexSymbols.String,false);
 		}
-		if(this._sy != alphatab.importer.AlphaTexSymbols.RBrace) this.error("note-effect",alphatab.importer.AlphaTexSymbols.RBrace,false);
+		if(this._sy != alphatab.importer.AlphaTexSymbols.RBrace) this.error("beat-effects",alphatab.importer.AlphaTexSymbols.RBrace);
 		this.newSy();
-	}
-	,note: function(beat) {
-		if(this._sy != alphatab.importer.AlphaTexSymbols.Number && !(this._sy == alphatab.importer.AlphaTexSymbols.String && (Std.string(this._syData).toLowerCase() == "x" || Std.string(this._syData).toLowerCase() == "-"))) this.error("note-fret",alphatab.importer.AlphaTexSymbols.Number);
-		var isDead = Std.string(this._syData).toLowerCase() == "x";
-		var isTie = Std.string(this._syData).toLowerCase() == "-";
-		var fret = isDead || isTie?0:this._syData;
-		this.newSy();
-		if(this._sy != alphatab.importer.AlphaTexSymbols.Dot) this.error("note",alphatab.importer.AlphaTexSymbols.Dot);
-		this.newSy();
-		if(this._sy != alphatab.importer.AlphaTexSymbols.Number) this.error("note-string",alphatab.importer.AlphaTexSymbols.Number);
-		var string = this._syData;
-		if(string < 1 || string > this._track.tuning.length) this.error("note-string",alphatab.importer.AlphaTexSymbols.Number,false);
-		this.newSy();
-		var note = new alphatab.model.Note();
-		this.noteEffects(note);
-		note.string = this._track.tuning.length - (string - 1);
-		note.isDead = isDead;
-		note.isTieDestination = isTie;
-		if(!isTie) note.fret = fret;
-		beat.addNote(note);
-		return note;
 	}
 	,applyBeatEffect: function(beat) {
 		if(this._syData == "f") {
@@ -2994,176 +2968,379 @@ alphatab.importer.AlphaTexImporter.prototype = $extend(alphatab.importer.ScoreIm
 		}
 		return false;
 	}
-	,beatEffects: function(beat) {
+	,note: function(beat) {
+		if(this._sy != alphatab.importer.AlphaTexSymbols.Number && !(this._sy == alphatab.importer.AlphaTexSymbols.String && (Std.string(this._syData).toLowerCase() == "x" || Std.string(this._syData).toLowerCase() == "-"))) this.error("note-fret",alphatab.importer.AlphaTexSymbols.Number);
+		var isDead = Std.string(this._syData).toLowerCase() == "x";
+		var isTie = Std.string(this._syData).toLowerCase() == "-";
+		var fret;
+		if(isDead || isTie) fret = 0; else fret = this._syData;
+		this.newSy();
+		if(this._sy != alphatab.importer.AlphaTexSymbols.Dot) this.error("note",alphatab.importer.AlphaTexSymbols.Dot);
+		this.newSy();
+		if(this._sy != alphatab.importer.AlphaTexSymbols.Number) this.error("note-string",alphatab.importer.AlphaTexSymbols.Number);
+		var string = this._syData;
+		if(string < 1 || string > this._track.tuning.length) this.error("note-string",alphatab.importer.AlphaTexSymbols.Number,false);
+		this.newSy();
+		var note = new alphatab.model.Note();
+		this.noteEffects(note);
+		note.string = this._track.tuning.length - (string - 1);
+		note.isDead = isDead;
+		note.isTieDestination = isTie;
+		if(!isTie) note.fret = fret;
+		beat.addNote(note);
+		return note;
+	}
+	,noteEffects: function(note) {
 		if(this._sy != alphatab.importer.AlphaTexSymbols.LBrace) return;
 		this.newSy();
 		while(this._sy == alphatab.importer.AlphaTexSymbols.String) {
 			this._syData = Std.string(this._syData).toLowerCase();
-			if(!this.applyBeatEffect(beat)) this.error("beat-effects",alphatab.importer.AlphaTexSymbols.String,false);
+			if(this._syData == "b") {
+				this.newSy();
+				if(this._sy != alphatab.importer.AlphaTexSymbols.LParensis) this.error("bend-effect",alphatab.importer.AlphaTexSymbols.LParensis);
+				this.newSy();
+				while(this._sy != alphatab.importer.AlphaTexSymbols.RParensis && this._sy != alphatab.importer.AlphaTexSymbols.Eof) {
+					if(this._sy != alphatab.importer.AlphaTexSymbols.Number) this.error("bend-effect-value",alphatab.importer.AlphaTexSymbols.Number);
+					var bendValue = this._syData;
+					note.bendPoints.push(new alphatab.model.BendPoint(0,(function($this) {
+						var $r;
+						var x = Math.abs(bendValue);
+						$r = x | 0;
+						return $r;
+					}(this))));
+					this.newSy();
+				}
+				if(note.bendPoints.length > 60) note.bendPoints = note.bendPoints.slice(0,60);
+				var count = note.bendPoints.length;
+				var step = Math.floor(60 / count);
+				var i = 0;
+				while(i < count) {
+					note.bendPoints[i].offset = Math.floor(Math.min(60,i * step));
+					i++;
+				}
+				if(this._sy != alphatab.importer.AlphaTexSymbols.RParensis) this.error("bend-effect",alphatab.importer.AlphaTexSymbols.RParensis);
+				this.newSy();
+			} else if(this._syData == "nh") {
+				note.harmonicType = alphatab.model.HarmonicType.Natural;
+				this.newSy();
+			} else if(this._syData == "ah") {
+				note.harmonicType = alphatab.model.HarmonicType.Artificial;
+				this.newSy();
+			} else if(this._syData == "th") {
+				note.harmonicType = alphatab.model.HarmonicType.Tap;
+				this.newSy();
+			} else if(this._syData == "ph") {
+				note.harmonicType = alphatab.model.HarmonicType.Pinch;
+				this.newSy();
+			} else if(this._syData == "sh") {
+				note.harmonicType = alphatab.model.HarmonicType.Semi;
+				this.newSy();
+			} else if(this._syData == "gr") {
+				this.newSy();
+				if(this._syData == "ob") note.beat.graceType = alphatab.model.GraceType.OnBeat; else note.beat.graceType = alphatab.model.GraceType.BeforeBeat;
+				this.newSy();
+			} else if(this._syData == "tr") {
+				this.newSy();
+				if(this._sy != alphatab.importer.AlphaTexSymbols.Number) this.error("trill-effect",alphatab.importer.AlphaTexSymbols.Number);
+				var fret = this._syData;
+				this.newSy();
+				var duration = alphatab.model.Duration.Sixteenth;
+				if(this._sy == alphatab.importer.AlphaTexSymbols.Number) {
+					var _g = this._syData;
+					switch(_g) {
+					case 16:
+						duration = alphatab.model.Duration.Sixteenth;
+						break;
+					case 32:
+						duration = alphatab.model.Duration.ThirtySecond;
+						break;
+					case 64:
+						duration = alphatab.model.Duration.ThirtySecond;
+						break;
+					default:
+						duration = alphatab.model.Duration.Sixteenth;
+					}
+					this.newSy();
+				}
+				note.trillValue = fret + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1];
+				note.trillSpeed = duration;
+			} else if(this._syData == "tp") {
+				this.newSy();
+				var duration = alphatab.model.Duration.Eighth;
+				if(this._sy == alphatab.importer.AlphaTexSymbols.Number) {
+					var _g = this._syData;
+					switch(_g) {
+					case 8:
+						duration = alphatab.model.Duration.Eighth;
+						break;
+					case 16:
+						duration = alphatab.model.Duration.Sixteenth;
+						break;
+					case 32:
+						duration = alphatab.model.Duration.ThirtySecond;
+						break;
+					default:
+						duration = alphatab.model.Duration.Eighth;
+					}
+					this.newSy();
+				}
+				note.beat.tremoloSpeed = duration;
+			} else if(this._syData == "v") {
+				this.newSy();
+				note.vibrato = alphatab.model.VibratoType.Slight;
+			} else if(this._syData == "sl") {
+				this.newSy();
+				note.slideType = alphatab.model.SlideType.Legato;
+			} else if(this._syData == "ss") {
+				this.newSy();
+				note.slideType = alphatab.model.SlideType.Shift;
+			} else if(this._syData == "h") {
+				this.newSy();
+				note.isHammerPullOrigin = true;
+			} else if(this._syData == "g") {
+				this.newSy();
+				note.isGhost = true;
+			} else if(this._syData == "ac") {
+				this.newSy();
+				note.accentuated = alphatab.model.AccentuationType.Normal;
+			} else if(this._syData == "hac") {
+				this.newSy();
+				note.accentuated = alphatab.model.AccentuationType.Heavy;
+			} else if(this._syData == "pm") {
+				this.newSy();
+				note.isPalmMute = true;
+			} else if(this._syData == "st") {
+				this.newSy();
+				note.isStaccato = true;
+			} else if(this._syData == "lr") {
+				this.newSy();
+				note.isLetRing = true;
+			} else if(this.applyBeatEffect(note.beat)) {
+			} else this.error(this._syData,alphatab.importer.AlphaTexSymbols.String,false);
 		}
-		if(this._sy != alphatab.importer.AlphaTexSymbols.RBrace) this.error("beat-effects",alphatab.importer.AlphaTexSymbols.RBrace);
+		if(this._sy != alphatab.importer.AlphaTexSymbols.RBrace) this.error("note-effect",alphatab.importer.AlphaTexSymbols.RBrace,false);
 		this.newSy();
 	}
-	,beat: function(voice) {
-		if(this._sy == alphatab.importer.AlphaTexSymbols.DoubleDot) {
-			this.newSy();
-			if(this._sy != alphatab.importer.AlphaTexSymbols.Number) this.error("duration",alphatab.importer.AlphaTexSymbols.Number);
-			if(this._syData == 1 || this._syData == 2 || this._syData == 4 || this._syData == 8 || this._syData == 16 || this._syData == 32 || this._syData == 64) this._currentDuration = this.parseDuration(this._syData); else this.error("duration",alphatab.importer.AlphaTexSymbols.Number,false);
-			this.newSy();
-			return;
-		}
-		var beat = new alphatab.model.Beat();
-		voice.addBeat(beat);
-		if(this._sy == alphatab.importer.AlphaTexSymbols.LParensis) {
-			this.newSy();
-			this.note(beat);
-			while(this._sy != alphatab.importer.AlphaTexSymbols.RParensis && this._sy != alphatab.importer.AlphaTexSymbols.Eof) this.note(beat);
-			if(this._sy != alphatab.importer.AlphaTexSymbols.RParensis) this.error("note-list",alphatab.importer.AlphaTexSymbols.RParensis);
-			this.newSy();
-		} else if(this._sy == alphatab.importer.AlphaTexSymbols.String && Std.string(this._syData).toLowerCase() == "r") this.newSy(); else this.note(beat);
-		if(this._sy == alphatab.importer.AlphaTexSymbols.Dot) {
-			this.newSy();
-			if(this._sy != alphatab.importer.AlphaTexSymbols.Number) this.error("duration",alphatab.importer.AlphaTexSymbols.Number);
-			if(this._syData == 1 || this._syData == 2 || this._syData == 4 || this._syData == 8 || this._syData == 16 || this._syData == 32 || this._syData == 64) beat.duration = this.parseDuration(this._syData); else this.error("duration",alphatab.importer.AlphaTexSymbols.Number,false);
-			this.newSy();
-		} else beat.duration = this._currentDuration;
-		var beatRepeat = 1;
-		if(this._sy == alphatab.importer.AlphaTexSymbols.Multiply) {
-			this.newSy();
-			if(this._sy != alphatab.importer.AlphaTexSymbols.Number) this.error("multiplier",alphatab.importer.AlphaTexSymbols.Number); else beatRepeat = this._syData;
-			this.newSy();
-		}
-		this.beatEffects(beat);
-		var _g1 = 0, _g = beatRepeat - 1;
-		while(_g1 < _g) {
-			var i = _g1++;
-			voice.addBeat(beat.clone());
+	,parseDuration: function(duration) {
+		switch(duration) {
+		case 1:
+			return alphatab.model.Duration.Whole;
+		case 2:
+			return alphatab.model.Duration.Half;
+		case 4:
+			return alphatab.model.Duration.Quarter;
+		case 8:
+			return alphatab.model.Duration.Eighth;
+		case 16:
+			return alphatab.model.Duration.Sixteenth;
+		case 32:
+			return alphatab.model.Duration.ThirtySecond;
+		case 64:
+			return alphatab.model.Duration.SixtyFourth;
+		default:
+			return alphatab.model.Duration.Quarter;
 		}
 	}
-	,bar: function() {
-		var master = new alphatab.model.MasterBar();
-		this._score.addMasterBar(master);
-		var bar = new alphatab.model.Bar();
-		this._track.addBar(bar);
-		if(master.index > 0) {
-			master.keySignature = master.previousMasterBar.keySignature;
-			master.timeSignatureDenominator = master.previousMasterBar.timeSignatureDenominator;
-			master.timeSignatureNumerator = master.previousMasterBar.timeSignatureNumerator;
-			bar.clef = bar.previousBar.clef;
-		}
-		this.barMeta(bar);
-		var voice = new alphatab.model.Voice();
-		bar.addVoice(voice);
-		while(this._sy != alphatab.importer.AlphaTexSymbols.Pipe && this._sy != alphatab.importer.AlphaTexSymbols.Eof) this.beat(voice);
-	}
-	,bars: function() {
-		this.bar();
-		while(this._sy != alphatab.importer.AlphaTexSymbols.Eof) {
-			if(this._sy != alphatab.importer.AlphaTexSymbols.Pipe) this.error("bar",alphatab.importer.AlphaTexSymbols.Pipe);
-			this.newSy();
-			this.bar();
-		}
-	}
-	,metaData: function() {
-		var anyMeta = false;
-		while(this._sy == alphatab.importer.AlphaTexSymbols.MetaCommand) if(this._syData == "title") {
-			this.newSy();
-			if(this._sy == alphatab.importer.AlphaTexSymbols.String) this._score.title = this._syData; else this.error("title",alphatab.importer.AlphaTexSymbols.String);
-			this.newSy();
-			anyMeta = true;
-		} else if(this._syData == "subtitle") {
-			this.newSy();
-			if(this._sy == alphatab.importer.AlphaTexSymbols.String) this._score.subTitle = this._syData; else this.error("subtitle",alphatab.importer.AlphaTexSymbols.String);
-			this.newSy();
-			anyMeta = true;
-		} else if(this._syData == "artist") {
-			this.newSy();
-			if(this._sy == alphatab.importer.AlphaTexSymbols.String) this._score.artist = this._syData; else this.error("artist",alphatab.importer.AlphaTexSymbols.String);
-			this.newSy();
-			anyMeta = true;
-		} else if(this._syData == "album") {
-			this.newSy();
-			if(this._sy == alphatab.importer.AlphaTexSymbols.String) this._score.album = this._syData; else this.error("album",alphatab.importer.AlphaTexSymbols.String);
-			this.newSy();
-			anyMeta = true;
-		} else if(this._syData == "words") {
-			this.newSy();
-			if(this._sy == alphatab.importer.AlphaTexSymbols.String) this._score.words = this._syData; else this.error("words",alphatab.importer.AlphaTexSymbols.String);
-			this.newSy();
-			anyMeta = true;
-		} else if(this._syData == "music") {
-			this.newSy();
-			if(this._sy == alphatab.importer.AlphaTexSymbols.String) this._score.music = this._syData; else this.error("music",alphatab.importer.AlphaTexSymbols.String);
-			this.newSy();
-			anyMeta = true;
-		} else if(this._syData == "copyright") {
-			this.newSy();
-			if(this._sy == alphatab.importer.AlphaTexSymbols.String) this._score.copyright = this._syData; else this.error("copyright",alphatab.importer.AlphaTexSymbols.String);
-			this.newSy();
-			anyMeta = true;
-		} else if(this._syData == "tempo") {
-			this.newSy();
-			if(this._sy == alphatab.importer.AlphaTexSymbols.Number) this._score.tempo = this._syData; else this.error("tempo",alphatab.importer.AlphaTexSymbols.Number);
-			this.newSy();
-			anyMeta = true;
-		} else if(this._syData == "capo") {
-			this.newSy();
-			if(this._sy == alphatab.importer.AlphaTexSymbols.Number) this._track.capo = this._syData; else this.error("capo",alphatab.importer.AlphaTexSymbols.Number);
-			this.newSy();
-			anyMeta = true;
-		} else if(this._syData == "tuning") {
-			this.newSy();
-			if(this._sy == alphatab.importer.AlphaTexSymbols.Tuning) {
-				this._track.tuning = new Array();
-				do {
-					this._track.tuning.push(this.parseTuning(this._syData));
-					this.newSy();
-				} while(this._sy == alphatab.importer.AlphaTexSymbols.Tuning);
-			} else this.error("tuning",alphatab.importer.AlphaTexSymbols.Tuning);
-			anyMeta = true;
-		} else if(this._syData == "instrument") {
-			this.newSy();
-			if(this._sy == alphatab.importer.AlphaTexSymbols.Number) {
-				var instrument = js.Boot.__cast(this._syData , Int);
-				if(instrument >= 0 && instrument <= 128) this._track.playbackInfo.program = this._syData; else this.error("instrument",alphatab.importer.AlphaTexSymbols.Number,false);
-			} else if(this._sy == alphatab.importer.AlphaTexSymbols.String) {
-				var instrumentName = js.Boot.__cast(this._syData , String);
-				this._track.playbackInfo.program = alphatab.audio.GeneralMidi.getValue(instrumentName);
-			} else this.error("instrument",alphatab.importer.AlphaTexSymbols.Number);
-			this.newSy();
-			anyMeta = true;
-		} else this.error("metaDataTags",alphatab.importer.AlphaTexSymbols.String,false);
-		if(anyMeta) {
-			if(this._sy != alphatab.importer.AlphaTexSymbols.Dot) this.error("song",alphatab.importer.AlphaTexSymbols.Dot);
+	,barMeta: function(bar) {
+		var master = bar.track.score.masterBars[bar.index];
+		while(this._sy == alphatab.importer.AlphaTexSymbols.MetaCommand) {
+			if(this._syData == "ts") {
+				this.newSy();
+				if(this._sy != alphatab.importer.AlphaTexSymbols.Number) this.error("timesignature-numerator",alphatab.importer.AlphaTexSymbols.Number);
+				master.timeSignatureNumerator = this._syData;
+				this.newSy();
+				if(this._sy != alphatab.importer.AlphaTexSymbols.Number) this.error("timesignature-denominator",alphatab.importer.AlphaTexSymbols.Number);
+				master.timeSignatureDenominator = this._syData;
+			} else if(this._syData == "ro") master.isRepeatStart = true; else if(this._syData == "rc") {
+				this.newSy();
+				if(this._sy != alphatab.importer.AlphaTexSymbols.Number) this.error("repeatclose",alphatab.importer.AlphaTexSymbols.Number);
+				master.repeatCount = Std.parseInt(this._syData) - 1;
+			} else if(this._syData == "ks") {
+				this.newSy();
+				if(this._sy != alphatab.importer.AlphaTexSymbols.String) this.error("keysignature",alphatab.importer.AlphaTexSymbols.String);
+				master.keySignature = this.parseKeySignature(this._syData);
+			} else if(this._syData == "clef") {
+				this.newSy();
+				if(this._sy != alphatab.importer.AlphaTexSymbols.String && this._sy != alphatab.importer.AlphaTexSymbols.Tuning) this.error("clef",alphatab.importer.AlphaTexSymbols.String);
+				bar.clef = this.parseClef(this._syData);
+			} else this.error("measure-effects",alphatab.importer.AlphaTexSymbols.String,false);
 			this.newSy();
 		}
 	}
-	,score: function() {
-		this.metaData();
-		this.bars();
+	,createDefaultScore: function() {
+		this._score = new alphatab.model.Score();
+		this._score.tempo = 120;
+		this._score.tempoLabel = "";
+		this._track = new alphatab.model.Track();
+		this._track.playbackInfo.program = 25;
+		this._track.playbackInfo.primaryChannel = alphatab.importer.AlphaTexImporter.TrackChannels[0];
+		this._track.playbackInfo.secondaryChannel = alphatab.importer.AlphaTexImporter.TrackChannels[1];
+		this._track.tuning = alphatab.model.Tuning.getPresetsFor(6)[0].tuning;
+		this._score.addTrack(this._track);
 	}
-	,error: function(nonterm,expected,symbolError) {
-		if(symbolError == null) symbolError = true;
-		if(symbolError) throw haxe.io.Error.Custom(Std.string(this._curChPos) + ": Error on block " + nonterm + ", expected a " + Std.string(expected) + " found a " + Std.string(this._sy)); else throw haxe.io.Error.Custom(Std.string(this._curChPos) + ": Error on block " + nonterm + ", invalid value:" + Std.string(this._syData));
+	,parseClef: function(str) {
+		var _g = str.toLowerCase();
+		switch(_g) {
+		case "g2":case "treble":
+			return alphatab.model.Clef.G2;
+		case "f4":case "bass":
+			return alphatab.model.Clef.F4;
+		case "c3":case "tenor":
+			return alphatab.model.Clef.C3;
+		case "c4":case "alto":
+			return alphatab.model.Clef.C4;
+		default:
+			return alphatab.model.Clef.G2;
+		}
 	}
-	,readScore: function() {
+	,parseKeySignature: function(str) {
+		var _g = str.toLowerCase();
+		switch(_g) {
+		case "cb":
+			return -7;
+		case "gb":
+			return -6;
+		case "db":
+			return -5;
+		case "ab":
+			return -4;
+		case "eb":
+			return -3;
+		case "bb":
+			return -2;
+		case "f":
+			return -1;
+		case "c":
+			return 0;
+		case "g":
+			return 1;
+		case "d":
+			return 2;
+		case "a":
+			return 3;
+		case "e":
+			return 4;
+		case "b":
+			return 5;
+		case "f#":
+			return 6;
+		case "c#":
+			return 7;
+		default:
+			return 0;
+		}
+	}
+	,parseTuning: function(str) {
+		var tuning = alphatab.model.Tuning.getTuningForText(str);
+		if(tuning < 0) this.error("tuning-value",alphatab.importer.AlphaTexSymbols.String,false);
+		return tuning;
+	}
+	,nextChar: function() {
 		try {
-			this.createDefaultScore();
-			this._curChPos = 0;
-			this._currentDuration = alphatab.model.Duration.Quarter;
-			this.nextChar();
-			this.newSy();
-			this.score();
-			this.finish(this._score);
-			return this._score;
+			this._ch = this._data.readString(1);
+			this._curChPos++;
 		} catch( e ) {
-			console.log(e);
-			throw alphatab.importer.ScoreImporter.UNSUPPORTED_FORMAT;
+			if( js.Boot.__instanceof(e,haxe.io.Eof) ) {
+				this._ch = alphatab.importer.AlphaTexImporter.Eof;
+			} else throw(e);
 		}
+	}
+	,newSy: function() {
+		this._sy = alphatab.importer.AlphaTexSymbols.No;
+		do if(this._ch == alphatab.importer.AlphaTexImporter.Eof) this._sy = alphatab.importer.AlphaTexSymbols.Eof; else if(this._ch == " " || this._ch == "\n" || this._ch == "\r" || this._ch == "\t") this.nextChar(); else if(this._ch == "/") {
+			this.nextChar();
+			if(this._ch == "/") while(this._ch != "\r" && this._ch != "\n" && this._ch != alphatab.importer.AlphaTexImporter.Eof) this.nextChar(); else if(this._ch == "*") while(this._ch != alphatab.importer.AlphaTexImporter.Eof) if(this._ch == "*") {
+				this.nextChar();
+				if(this._ch == "/") {
+					this.nextChar();
+					break;
+				}
+			} else this.nextChar(); else this.error("symbol",alphatab.importer.AlphaTexSymbols.String,false);
+		} else if(this._ch == "\"" || this._ch == "'") {
+			this.nextChar();
+			this._syData = "";
+			this._sy = alphatab.importer.AlphaTexSymbols.String;
+			while(this._ch != "\"" && this._ch != "'" && this._ch != alphatab.importer.AlphaTexImporter.Eof) {
+				this._syData += this._ch;
+				this.nextChar();
+			}
+			this.nextChar();
+		} else if(this._ch == "-") {
+			if(this._allowNegatives && this.isDigit(this._ch)) {
+				var number = this.readNumber();
+				this._sy = alphatab.importer.AlphaTexSymbols.Number;
+				this._syData = number;
+			} else {
+				this._sy = alphatab.importer.AlphaTexSymbols.String;
+				this._syData = this.readName();
+			}
+		} else if(this._ch == ".") {
+			this._sy = alphatab.importer.AlphaTexSymbols.Dot;
+			this.nextChar();
+		} else if(this._ch == ":") {
+			this._sy = alphatab.importer.AlphaTexSymbols.DoubleDot;
+			this.nextChar();
+		} else if(this._ch == "(") {
+			this._sy = alphatab.importer.AlphaTexSymbols.LParensis;
+			this.nextChar();
+		} else if(this._ch == "\\") {
+			this.nextChar();
+			var name = this.readName();
+			this._sy = alphatab.importer.AlphaTexSymbols.MetaCommand;
+			this._syData = name;
+		} else if(this._ch == ")") {
+			this._sy = alphatab.importer.AlphaTexSymbols.RParensis;
+			this.nextChar();
+		} else if(this._ch == "{") {
+			this._sy = alphatab.importer.AlphaTexSymbols.LBrace;
+			this.nextChar();
+		} else if(this._ch == "}") {
+			this._sy = alphatab.importer.AlphaTexSymbols.RBrace;
+			this.nextChar();
+		} else if(this._ch == "|") {
+			this._sy = alphatab.importer.AlphaTexSymbols.Pipe;
+			this.nextChar();
+		} else if(this._ch == "*") {
+			this._sy = alphatab.importer.AlphaTexSymbols.Multiply;
+			this.nextChar();
+		} else if(this.isDigit(this._ch)) {
+			var number = this.readNumber();
+			this._sy = alphatab.importer.AlphaTexSymbols.Number;
+			this._syData = number;
+		} else if(alphatab.importer.AlphaTexImporter.isLetter(this._ch)) {
+			var name = this.readName();
+			if(alphatab.model.Tuning.isTuning(name)) {
+				this._sy = alphatab.importer.AlphaTexSymbols.Tuning;
+				this._syData = name.toLowerCase();
+			} else {
+				this._sy = alphatab.importer.AlphaTexSymbols.String;
+				this._syData = name;
+			}
+		} else this.error("symbol",alphatab.importer.AlphaTexSymbols.String,false); while(this._sy == alphatab.importer.AlphaTexSymbols.No);
+	}
+	,isDigit: function(ch) {
+		var code = HxOverrides.cca(ch,0);
+		return code >= 48 && code <= 57 || ch == "-" && this._allowNegatives;
+	}
+	,readName: function() {
+		var str = "";
+		do {
+			str += this._ch;
+			this.nextChar();
+		} while(alphatab.importer.AlphaTexImporter.isLetter(this._ch) || this.isDigit(this._ch));
+		return str;
+	}
+	,readNumber: function() {
+		var str = "";
+		do {
+			str += this._ch;
+			this.nextChar();
+		} while(this.isDigit(this._ch));
+		return Std.parseInt(str);
 	}
 	,__class__: alphatab.importer.AlphaTexImporter
 });
-alphatab.importer.AlphaTexSymbols = $hxClasses["alphatab.importer.AlphaTexSymbols"] = { __ename__ : true, __constructs__ : ["No","Eof","Number","DoubleDot","Dot","String","Tuning","LParensis","RParensis","LBrace","RBrace","Pipe","MetaCommand","Multiply"] }
+alphatab.importer.AlphaTexSymbols = $hxClasses["alphatab.importer.AlphaTexSymbols"] = { __ename__ : true, __constructs__ : ["No","Eof","Number","DoubleDot","Dot","String","Tuning","LParensis","RParensis","LBrace","RBrace","Pipe","MetaCommand","Multiply"] };
 alphatab.importer.AlphaTexSymbols.No = ["No",0];
 alphatab.importer.AlphaTexSymbols.No.toString = $estr;
 alphatab.importer.AlphaTexSymbols.No.__enum__ = alphatab.importer.AlphaTexSymbols;
@@ -3214,421 +3391,379 @@ $hxClasses["alphatab.importer.Gp3To5Importer"] = alphatab.importer.Gp3To5Importe
 alphatab.importer.Gp3To5Importer.__name__ = true;
 alphatab.importer.Gp3To5Importer.__super__ = alphatab.importer.ScoreImporter;
 alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImporter.prototype,{
-	skip: function(count) {
-		this._data.read(count);
-	}
-	,readStringByteLength: function(length) {
-		var stringLength = this._data.readByte();
-		var string = this._data.readString(stringLength);
-		if(stringLength < length) this._data.read(length - stringLength);
-		return string;
-	}
-	,readStringIntByte: function() {
-		var length = this.readInt32() - 1;
-		this._data.readByte();
-		return this._data.readString(length);
-	}
-	,readStringInt: function() {
-		return this._data.readString(this.readInt32());
-	}
-	,readStringIntUnused: function() {
-		this._data.read(4);
-		return this._data.readString(this._data.readByte());
-	}
-	,readInt32: function() {
-		var ch1 = this._data.readByte();
-		var ch2 = this._data.readByte();
-		var ch3 = this._data.readByte();
-		var ch4 = this._data.readByte();
-		return ch1 | ch2 << 8 | ch3 << 16 | ch4 << 24;
-	}
-	,readUInt8: function() {
-		return this._data.readByte();
-	}
-	,readBool: function() {
-		return this._data.readByte() != 0;
-	}
-	,readColor: function() {
-		this._data.readByte();
-		this._data.readByte();
-		this._data.readByte();
-		this._data.readByte();
-	}
-	,getDoubleSig: function(bytes,indices) {
-		var sig = parseInt((((bytes.b[indices[1]] & 15) << 16 | bytes.b[indices[2]] << 8 | bytes.b[indices[3]]) * Math.pow(2,32)).toString(2),2) + parseInt(((bytes.b[indices[4]] >> 7) * Math.pow(2,31)).toString(2),2) + parseInt(((bytes.b[indices[4]] & 127) << 24 | bytes.b[indices[5]] << 16 | bytes.b[indices[6]] << 8 | bytes.b[indices[7]]).toString(2),2);
-		return sig;
-	}
-	,readDouble: function() {
-		var bytes = haxe.io.Bytes.alloc(8);
-		this._data.readBytes(bytes,0,8);
-		var indices;
-		if(!this._data.bigEndian) indices = [7,6,5,4,3,2,1,0]; else indices = [0,1,2,3,4,5,6,7];
-		var sign = 1 - (bytes.b[indices[0]] >> 7 << 1);
-		var exp = (bytes.b[indices[0]] << 4 & 2047 | bytes.b[indices[1]] >> 4) - 1023;
-		var sig = this.getDoubleSig(bytes,indices);
-		if(sig == 0 && exp == -1023) return 0.0;
-		return sign * (1.0 + Math.pow(2,-52) * sig) * Math.pow(2,exp);
-	}
-	,readTrill: function(note) {
-		note.trillFret = this._data.readByte();
-		note.trillSpeed = 1 + this._data.readByte();
-	}
-	,deltaFretToHarmonicValue: function(deltaFret) {
-		switch(deltaFret) {
-		case 2:
-			return 2.4;
-		case 3:
-			return 3.2;
-		case 4:case 5:case 7:case 9:case 12:case 16:case 17:case 19:case 24:
-			return deltaFret;
-		case 8:
-			return 8.2;
-		case 10:
-			return 9.6;
-		case 14:case 15:
-			return 14.7;
-		case 21:case 22:
-			return 21.7;
-		default:
-			return 12;
-		}
-	}
-	,readArtificialHarmonic: function(note) {
-		var type = this._data.readByte();
-		if(this._versionNumber >= 500) switch(type) {
-		case 1:
-			note.harmonicType = alphatab.model.HarmonicType.Natural;
-			note.harmonicValue = this.deltaFretToHarmonicValue(note.fret);
-			break;
-		case 2:
-			var harmonicTone = this._data.readByte();
-			var harmonicKey = this._data.readByte();
-			var harmonicOctaveOffset = this._data.readByte();
-			note.harmonicType = alphatab.model.HarmonicType.Artificial;
-			break;
-		case 3:
-			note.harmonicType = alphatab.model.HarmonicType.Tap;
-			note.harmonicValue = this.deltaFretToHarmonicValue(this._data.readByte());
-			break;
-		case 4:
-			note.harmonicType = alphatab.model.HarmonicType.Pinch;
-			note.harmonicValue = 12;
-			break;
-		case 5:
-			note.harmonicType = alphatab.model.HarmonicType.Semi;
-			note.harmonicValue = 12;
-			break;
-		} else if(this._versionNumber >= 400) switch(type) {
-		case 1:
-			note.harmonicType = alphatab.model.HarmonicType.Natural;
-			note.harmonicValue = this.deltaFretToHarmonicValue(note.fret);
-			break;
-		case 3:
-			note.harmonicType = alphatab.model.HarmonicType.Tap;
-			break;
-		case 4:
-			note.harmonicType = alphatab.model.HarmonicType.Pinch;
-			note.harmonicValue = 12;
-			break;
-		case 5:
-			note.harmonicType = alphatab.model.HarmonicType.Semi;
-			note.harmonicValue = 12;
-			break;
-		case 15:
-			note.harmonicType = alphatab.model.HarmonicType.Artificial;
-			note.harmonicValue = this.deltaFretToHarmonicValue(note.fret + 5);
-			break;
-		case 17:
-			note.harmonicType = alphatab.model.HarmonicType.Artificial;
-			note.harmonicValue = this.deltaFretToHarmonicValue(note.fret + 7);
-			break;
-		case 22:
-			note.harmonicType = alphatab.model.HarmonicType.Artificial;
-			note.harmonicValue = this.deltaFretToHarmonicValue(note.fret + 12);
-			break;
-		default:
-		}
-	}
-	,readSlide: function(note) {
+	readScore: function() {
+		this.readVersion();
+		this._score = new alphatab.model.Score();
+		this.readScoreInformation();
+		if(this._versionNumber < 500) if(this._data.readByte() != 0) this._globalTripletFeel = alphatab.model.TripletFeel.Triplet8th; else this._globalTripletFeel = alphatab.model.TripletFeel.NoTripletFeel;
+		if(this._versionNumber >= 400) this.readLyrics();
+		if(this._versionNumber >= 510) this._data.read(19);
 		if(this._versionNumber >= 500) {
-			var type = this._data.readByte();
-			switch(type) {
-			case 1:
-				note.slideType = alphatab.model.SlideType.Shift;
-				break;
-			case 2:
-				note.slideType = alphatab.model.SlideType.Legato;
-				break;
-			case 4:
-				note.slideType = alphatab.model.SlideType.OutDown;
-				break;
-			case 8:
-				note.slideType = alphatab.model.SlideType.OutUp;
-				break;
-			case 16:
-				note.slideType = alphatab.model.SlideType.IntoFromBelow;
-				break;
-			case 32:
-				note.slideType = alphatab.model.SlideType.IntoFromAbove;
-				break;
-			default:
-				note.slideType = alphatab.model.SlideType.None;
-			}
-		} else {
-			var type = this._data.readInt8();
-			switch(type) {
-			case 1:
-				note.slideType = alphatab.model.SlideType.Shift;
-				break;
-			case 2:
-				note.slideType = alphatab.model.SlideType.Legato;
-				break;
-			case 3:
-				note.slideType = alphatab.model.SlideType.OutDown;
-				break;
-			case 4:
-				note.slideType = alphatab.model.SlideType.OutUp;
-				break;
-			case -1:
-				note.slideType = alphatab.model.SlideType.IntoFromBelow;
-				break;
-			case -2:
-				note.slideType = alphatab.model.SlideType.IntoFromAbove;
-				break;
-			default:
-				note.slideType = alphatab.model.SlideType.None;
-			}
+			this.readPageSetup();
+			this._score.tempoLabel = this.readStringIntByte();
+		}
+		this._score.tempo = this.readInt32();
+		if(this._versionNumber >= 510) this._data.readByte() != 0;
+		this._keySignature = this.readInt32();
+		if(this._versionNumber >= 400) this._octave = this._data.readByte();
+		this.readPlaybackInfos();
+		if(this._versionNumber >= 500) {
+			this._data.read(38);
+			this._data.read(4);
+		}
+		this._barCount = this.readInt32();
+		this._trackCount = this.readInt32();
+		this.readMasterBars();
+		this.readTracks();
+		this.readBars();
+		this.finish(this._score);
+		return this._score;
+	}
+	,readVersion: function() {
+		var version = this.readStringByteLength(30);
+		if(!StringTools.startsWith(version,"FICHIER GUITAR PRO ")) throw alphatab.importer.ScoreImporter.UnsupportedFormat;
+		version = HxOverrides.substr(version,"FICHIER GUITAR PRO ".length + 1,null);
+		var dot = version.indexOf(".");
+		this._versionNumber = 100 * Std.parseInt(HxOverrides.substr(version,0,dot)) + Std.parseInt(HxOverrides.substr(version,dot + 1,null));
+	}
+	,readScoreInformation: function() {
+		this._score.title = this.readStringIntUnused();
+		this._score.subTitle = this.readStringIntUnused();
+		this._score.artist = this.readStringIntUnused();
+		this._score.album = this.readStringIntUnused();
+		this._score.words = this.readStringIntUnused();
+		if(this._versionNumber >= 500) this._score.music = this.readStringIntUnused(); else this._score.music = this._score.words;
+		this._score.copyright = this.readStringIntUnused();
+		this._score.tab = this.readStringIntUnused();
+		this._score.instructions = this.readStringIntUnused();
+		var noticeLines = this.readInt32();
+		var notice = new StringBuf();
+		var _g = 0;
+		while(_g < noticeLines) {
+			var i = _g++;
+			if(i > 0) notice.b += "\n";
+			var x = this.readStringIntUnused();
+			notice.b += Std.string(x);
+		}
+		this._score.notices = notice.b;
+	}
+	,readLyrics: function() {
+		this._lyrics = new Array();
+		this._lyricsIndex = new Array();
+		this._lyricsTrack = this.readInt32();
+		var _g = 0;
+		while(_g < 5) {
+			var i = _g++;
+			this._lyricsIndex.push(this.readInt32() - 1);
+			this._lyrics.push(this.readString(this.readInt32()));
 		}
 	}
-	,readTremoloPicking: function(beat) {
-		var speed = this._data.readByte();
-		switch(speed) {
-		case 1:
-			beat.tremoloSpeed = alphatab.model.Duration.Eighth;
-			break;
-		case 2:
-			beat.tremoloSpeed = alphatab.model.Duration.Sixteenth;
-			break;
-		case 3:
-			beat.tremoloSpeed = alphatab.model.Duration.ThirtySecond;
-			break;
+	,readPageSetup: function() {
+		this._data.read(30);
+		var _g = 0;
+		while(_g < 10) {
+			var i = _g++;
+			this.readStringIntByte();
 		}
 	}
-	,readGrace: function(voice,note) {
-		var graceBeat = new alphatab.model.Beat();
-		var graceNote = new alphatab.model.Note();
-		graceNote.string = note.string;
-		graceNote.fret = this._data.readInt8();
-		graceBeat.duration = alphatab.model.Duration.ThirtySecond;
-		graceBeat.dynamicValue = this.toDynamicValue(this._data.readInt8());
-		var transition = this._data.readInt8();
-		switch(transition) {
-		case 0:
-			break;
-		case 1:
-			graceNote.slideType = alphatab.model.SlideType.Legato;
-			graceNote.slideTarget = note;
-			break;
-		case 2:
-			break;
-		case 3:
-			graceNote.isHammerPullOrigin = true;
-			note.isHammerPullDestination = true;
-			note.hammerPullOrigin = graceNote;
-			break;
-		}
-		graceNote.dynamicValue = graceBeat.dynamicValue;
-		this._data.read(1);
-		if(this._versionNumber < 500) graceBeat.graceType = alphatab.model.GraceType.BeforeBeat; else {
-			var flags = this._data.readByte();
-			graceNote.isDead = (flags & 1) != 0;
-			if((flags & 2) != 0) graceBeat.graceType = alphatab.model.GraceType.OnBeat; else graceBeat.graceType = alphatab.model.GraceType.BeforeBeat;
-		}
-		graceBeat.addNote(graceNote);
-		voice.addGraceBeat(graceBeat);
-	}
-	,readBend: function(note) {
-		this._data.readByte();
-		this.readInt32();
-		var pointCount = this.readInt32();
-		if(pointCount > 0) {
-			var _g = 0;
-			while(_g < pointCount) {
-				var i = _g++;
-				var point = new alphatab.model.BendPoint();
-				point.offset = this.readInt32();
-				point.value = this.readInt32() / 25 | 0;
-				this._data.readByte() != 0;
-				note.bendPoints.push(point);
-			}
+	,readPlaybackInfos: function() {
+		this._playbackInfos = new Array();
+		var _g = 0;
+		while(_g < 64) {
+			var i = _g++;
+			var info = new alphatab.model.PlaybackInformation();
+			info.primaryChannel = i;
+			info.secondaryChannel = i;
+			info.program = this.readInt32();
+			info.volume = this._data.readByte();
+			info.balance = this._data.readByte();
+			this._data.read(6);
+			this._playbackInfos.push(info);
 		}
 	}
-	,readNoteEffects: function(track,voice,beat,note) {
+	,readMasterBars: function() {
+		var _g1 = 0;
+		var _g = this._barCount;
+		while(_g1 < _g) {
+			var i = _g1++;
+			this.readMasterBar();
+		}
+	}
+	,readMasterBar: function() {
+		var previousMasterBar = null;
+		if(this._score.masterBars.length > 0) previousMasterBar = this._score.masterBars[this._score.masterBars.length - 1];
+		var newMasterBar = new alphatab.model.MasterBar();
 		var flags = this._data.readByte();
-		var flags2 = 0;
-		if(this._versionNumber >= 400) flags2 = this._data.readByte();
-		if((flags & 1) != 0) this.readBend(note);
-		if((flags & 16) != 0) this.readGrace(voice,note);
-		if((flags2 & 4) != 0) this.readTremoloPicking(beat);
-		if((flags2 & 8) != 0) this.readSlide(note); else if(this._versionNumber < 400) {
-			if((flags & 4) != 0) note.slideType = alphatab.model.SlideType.Shift;
+		if((flags & 1) != 0) newMasterBar.timeSignatureNumerator = this._data.readByte(); else if(previousMasterBar != null) newMasterBar.timeSignatureNumerator = previousMasterBar.timeSignatureNumerator;
+		if((flags & 2) != 0) newMasterBar.timeSignatureDenominator = this._data.readByte(); else if(previousMasterBar != null) newMasterBar.timeSignatureDenominator = previousMasterBar.timeSignatureDenominator;
+		newMasterBar.isRepeatStart = (flags & 4) != 0;
+		if((flags & 8) != 0) {
+			if(this._versionNumber >= 500) newMasterBar.repeatCount = this._data.readByte(); else newMasterBar.repeatCount = 1;
 		}
-		if((flags2 & 16) != 0) this.readArtificialHarmonic(note); else if(this._versionNumber < 400) {
-			if((flags & 4) != 0) {
-				note.harmonicType = alphatab.model.HarmonicType.Natural;
-				note.harmonicValue = this.deltaFretToHarmonicValue(note.fret);
-			}
-			if((flags & 8) != 0) note.harmonicType = alphatab.model.HarmonicType.Artificial;
-		}
-		if((flags2 & 32) != 0) this.readTrill(note);
-		note.isLetRing = (flags & 8) != 0;
-		note.isHammerPullOrigin = (flags & 2) != 0;
-		if((flags2 & 64) != 0) note.vibrato = alphatab.model.VibratoType.Slight;
-		note.isPalmMute = (flags2 & 2) != 0;
-		note.isStaccato = (flags2 & 1) != 0;
-	}
-	,toDynamicValue: function(value) {
-		switch(value) {
-		case 1:
-			return alphatab.model.DynamicValue.PPP;
-		case 2:
-			return alphatab.model.DynamicValue.PP;
-		case 3:
-			return alphatab.model.DynamicValue.P;
-		case 4:
-			return alphatab.model.DynamicValue.MP;
-		case 5:
-			return alphatab.model.DynamicValue.MF;
-		case 6:
-			return alphatab.model.DynamicValue.F;
-		case 7:
-			return alphatab.model.DynamicValue.FF;
-		case 8:
-			return alphatab.model.DynamicValue.FFF;
-		default:
-			return alphatab.model.DynamicValue.F;
-		}
-	}
-	,readNote: function(track,bar,voice,beat,stringIndex) {
-		var newNote = new alphatab.model.Note();
-		newNote.string = track.tuning.length - stringIndex;
-		var flags = this._data.readByte();
-		if((flags & 2) != 0) newNote.accentuated = alphatab.model.AccentuationType.Heavy; else if((flags & 64) != 0) newNote.accentuated = alphatab.model.AccentuationType.Normal;
-		newNote.isGhost = (flags & 4) != 0;
 		if((flags & 32) != 0) {
-			var noteType = this._data.readByte();
-			if(noteType == 3) newNote.isDead = true; else if(noteType == 2) newNote.isTieDestination = true;
+			var section = new alphatab.model.Section();
+			section.text = this.readStringIntByte();
+			section.marker = "";
+			this.readColor();
+			newMasterBar.section = section;
 		}
 		if((flags & 16) != 0) {
-			var dynamicNumber = this._data.readInt8();
-			newNote.dynamicValue = this.toDynamicValue(dynamicNumber);
-			if(beat.dynamicValue == null) beat.dynamicValue = newNote.dynamicValue;
+			if(this._versionNumber < 500) {
+				var currentMasterBar = previousMasterBar;
+				var existentAlternatives = 0;
+				while(currentMasterBar != null) {
+					if(currentMasterBar.repeatCount > 0 && currentMasterBar != previousMasterBar) break;
+					if(currentMasterBar.isRepeatStart) break;
+					existentAlternatives |= currentMasterBar.alternateEndings;
+				}
+				var repeatAlternative = 0;
+				var repeatMask = this._data.readByte();
+				var _g = 0;
+				while(_g < 8) {
+					var i = _g++;
+					var repeating = 1 << i;
+					if(repeatMask > i && (existentAlternatives & repeating) == 0) repeatAlternative |= repeating;
+				}
+				newMasterBar.alternateEndings = repeatAlternative;
+			} else newMasterBar.alternateEndings = this._data.readByte();
 		}
-		if(beat.dynamicValue == null) beat.dynamicValue = alphatab.model.DynamicValue.F;
-		if((flags & 32) != 0) newNote.fret = this._data.readInt8();
-		if((flags & 128) != 0) {
-			newNote.leftHandFinger = this._data.readInt8();
-			newNote.rightHandFinger = this._data.readInt8();
-			newNote.isFingering = true;
+		if((flags & 64) != 0) {
+			newMasterBar.keySignature = this._data.readInt8();
+			this._data.readByte();
+		} else if(previousMasterBar != null) newMasterBar.keySignature = previousMasterBar.keySignature;
+		if(this._versionNumber >= 500 && (flags & 3) != 0) this._data.read(4);
+		if(this._versionNumber >= 500 && (flags & 16) == 0) newMasterBar.alternateEndings = this._data.readByte();
+		if(this._versionNumber >= 500) {
+			var tripletFeel = this._data.readByte();
+			switch(tripletFeel) {
+			case 1:
+				newMasterBar.tripletFeel = alphatab.model.TripletFeel.Triplet8th;
+				break;
+			case 2:
+				newMasterBar.tripletFeel = alphatab.model.TripletFeel.Triplet16th;
+				break;
+			}
+			this._data.readByte();
+		} else newMasterBar.tripletFeel = this._globalTripletFeel;
+		newMasterBar.isDoubleBar = (flags & 128) != 0;
+		this._score.addMasterBar(newMasterBar);
+	}
+	,readTracks: function() {
+		var _g1 = 0;
+		var _g = this._trackCount;
+		while(_g1 < _g) {
+			var i = _g1++;
+			this.readTrack();
+		}
+	}
+	,readTrack: function() {
+		var newTrack = new alphatab.model.Track();
+		this._score.addTrack(newTrack);
+		var flags = this._data.readByte();
+		newTrack.name = this.readStringByteLength(40);
+		newTrack.isPercussion = (flags & 1) != 0;
+		var stringCount = this.readInt32();
+		var _g = 0;
+		while(_g < 7) {
+			var i = _g++;
+			var tuning = this.readInt32();
+			if(stringCount > i) newTrack.tuning.push(tuning);
+		}
+		var port = this.readInt32();
+		var index = this.readInt32() - 1;
+		var effectChannel = this.readInt32() - 1;
+		this._data.read(4);
+		if(index >= 0 && index < this._playbackInfos.length) {
+			var info = this._playbackInfos[index];
+			info.port = port;
+			info.isSolo = (flags & 16) != 0;
+			info.isMute = (flags & 32) != 0;
+			info.secondaryChannel = effectChannel;
+			newTrack.playbackInfo = info;
+		}
+		newTrack.capo = this.readInt32();
+		newTrack.color = this.readColor();
+		if(this._versionNumber >= 500) {
+			this._data.readByte();
+			this._data.readByte();
+			this._data.read(43);
+		}
+		if(this._versionNumber >= 510) {
+			this._data.read(4);
+			this.readStringIntByte();
+			this.readStringIntByte();
+		}
+	}
+	,readBars: function() {
+		var _g1 = 0;
+		var _g = this._barCount;
+		while(_g1 < _g) {
+			var b = _g1++;
+			var _g3 = 0;
+			var _g2 = this._trackCount;
+			while(_g3 < _g2) {
+				var t = _g3++;
+				this.readBar(this._score.tracks[t]);
+			}
+		}
+	}
+	,readBar: function(track) {
+		var newBar = new alphatab.model.Bar();
+		if(track.isPercussion) newBar.clef = alphatab.model.Clef.Neutral;
+		track.addBar(newBar);
+		var voiceCount = 1;
+		if(this._versionNumber >= 500) {
+			this._data.readByte();
+			voiceCount = 2;
+		}
+		var _g = 0;
+		while(_g < voiceCount) {
+			var v = _g++;
+			this.readVoice(track,newBar);
+		}
+	}
+	,readVoice: function(track,bar) {
+		var beatCount = this.readInt32();
+		if(beatCount == 0) return;
+		var newVoice = new alphatab.model.Voice();
+		bar.addVoice(newVoice);
+		var _g = 0;
+		while(_g < beatCount) {
+			var i = _g++;
+			this.readBeat(track,bar,newVoice);
+		}
+	}
+	,readBeat: function(track,bar,voice) {
+		var newBeat = new alphatab.model.Beat();
+		var flags = this._data.readByte();
+		if((flags & 1) != 0) newBeat.dots = 1;
+		if((flags & 64) != 0) {
+			var type = this._data.readByte();
+			newBeat.isEmpty = (type & 2) == 0;
+		}
+		voice.addBeat(newBeat);
+		var duration = this._data.readInt8();
+		switch(duration) {
+		case -2:
+			newBeat.duration = alphatab.model.Duration.Whole;
+			break;
+		case -1:
+			newBeat.duration = alphatab.model.Duration.Half;
+			break;
+		case 0:
+			newBeat.duration = alphatab.model.Duration.Quarter;
+			break;
+		case 1:
+			newBeat.duration = alphatab.model.Duration.Eighth;
+			break;
+		case 2:
+			newBeat.duration = alphatab.model.Duration.Sixteenth;
+			break;
+		case 3:
+			newBeat.duration = alphatab.model.Duration.ThirtySecond;
+			break;
+		case 4:
+			newBeat.duration = alphatab.model.Duration.SixtyFourth;
+			break;
+		default:
+			newBeat.duration = alphatab.model.Duration.Quarter;
+		}
+		if((flags & 32) != 0) {
+			newBeat.tupletNumerator = this.readInt32();
+			var _g = newBeat.tupletNumerator;
+			switch(_g) {
+			case 1:
+				newBeat.tupletDenominator = 1;
+				break;
+			case 3:
+				newBeat.tupletDenominator = 2;
+				break;
+			case 5:case 6:case 7:
+				newBeat.tupletDenominator = 4;
+				break;
+			case 9:case 10:case 11:case 12:case 13:
+				newBeat.tupletDenominator = 8;
+				break;
+			case 2:case 4:case 8:
+				break;
+			default:
+				newBeat.tupletNumerator = 1;
+				newBeat.tupletDenominator = 1;
+			}
+		}
+		if((flags & 2) != 0) this.readChord(newBeat);
+		if((flags & 4) != 0) newBeat.text = this.readStringIntUnused();
+		if((flags & 8) != 0) this.readBeatEffects(newBeat);
+		if((flags & 16) != 0) this.readMixTableChange(newBeat);
+		var stringFlags = this._data.readByte();
+		var i = 6;
+		while(i >= 0) {
+			if((stringFlags & 1 << i) != 0 && 6 - i < track.tuning.length) this.readNote(track,bar,voice,newBeat,6 - i);
+			i--;
 		}
 		if(this._versionNumber >= 500) {
-			if((flags & 1) != 0) newNote.durationPercent = this.readDouble();
-			var flags2 = this._data.readByte();
-			newNote.swapAccidentals = (flags2 & 2) != 0;
-		}
-		if((flags & 8) != 0) this.readNoteEffects(track,voice,beat,newNote);
-		beat.addNote(newNote);
-	}
-	,readMixTableChange: function(beat) {
-		var tableChange = new alphatab.importer.MixTableChange();
-		tableChange.instrument = this._data.readInt8();
-		if(this._versionNumber >= 500) this._data.read(16);
-		tableChange.volume = this._data.readInt8();
-		tableChange.balance = this._data.readInt8();
-		var chorus = this._data.readInt8();
-		var reverb = this._data.readInt8();
-		var phaser = this._data.readInt8();
-		var tremolo = this._data.readInt8();
-		if(this._versionNumber >= 500) tableChange.tempoName = this.readStringIntByte();
-		tableChange.tempo = this.readInt32();
-		if(tableChange.volume >= 0) this._data.readByte();
-		if(tableChange.balance >= 0) this._data.readByte();
-		if(chorus >= 0) this._data.readByte();
-		if(reverb >= 0) this._data.readByte();
-		if(phaser >= 0) this._data.readByte();
-		if(tremolo >= 0) this._data.readByte();
-		if(tableChange.tempo >= 0) {
-			tableChange.duration = this._data.readInt8();
-			if(this._versionNumber >= 510) this._data.readByte();
-		}
-		if(this._versionNumber >= 400) this._data.readByte();
-		if(this._versionNumber >= 500) this._data.readByte();
-		if(this._versionNumber >= 510) {
-			this.readStringIntByte();
-			this.readStringIntByte();
-		}
-		if(tableChange.volume >= 0) {
-			var volumeAutomation = new alphatab.model.Automation();
-			volumeAutomation.isLinear = true;
-			volumeAutomation.type = alphatab.model.AutomationType.Volume;
-			volumeAutomation.value = tableChange.volume;
-			beat.automations.push(volumeAutomation);
-		}
-		if(tableChange.balance >= 0) {
-			var balanceAutomation = new alphatab.model.Automation();
-			balanceAutomation.isLinear = true;
-			balanceAutomation.type = alphatab.model.AutomationType.Balance;
-			balanceAutomation.value = tableChange.balance;
-			beat.automations.push(balanceAutomation);
-		}
-		if(tableChange.instrument >= 0) {
-			var instrumentAutomation = new alphatab.model.Automation();
-			instrumentAutomation.isLinear = true;
-			instrumentAutomation.type = alphatab.model.AutomationType.Instrument;
-			instrumentAutomation.value = tableChange.instrument;
-			beat.automations.push(instrumentAutomation);
-		}
-		if(tableChange.tempo >= 0) {
-			var tempoAutomation = new alphatab.model.Automation();
-			tempoAutomation.isLinear = true;
-			tempoAutomation.type = alphatab.model.AutomationType.Tempo;
-			tempoAutomation.value = tableChange.tempo;
-			beat.automations.push(tempoAutomation);
-			beat.voice.bar.getMasterBar().tempoAutomation = tempoAutomation;
+			this._data.readByte();
+			var flag = this._data.readByte();
+			if((flag & 8) != 0) this._data.readByte();
 		}
 	}
-	,toStrokeValue: function(value) {
-		switch(value) {
-		case 1:
-			return 30;
-		case 2:
-			return 30;
-		case 3:
-			return 60;
-		case 4:
-			return 120;
-		case 5:
-			return 240;
-		case 6:
-			return 480;
-		default:
-			return 0;
-		}
-	}
-	,readTremoloBarEffect: function(beat) {
-		this._data.readByte();
-		this.readInt32();
-		var pointCount = this.readInt32();
-		if(pointCount > 0) {
+	,readChord: function(beat) {
+		var chord = new alphatab.model.Chord();
+		var chordId = alphatab.util.Guid.generate();
+		if(this._versionNumber >= 500) {
+			this._data.read(17);
+			chord.name = this.readStringByteLength(21);
+			this._data.read(4);
+			chord.firstFret = this.readInt32();
 			var _g = 0;
-			while(_g < pointCount) {
+			while(_g < 7) {
 				var i = _g++;
-				var point = new alphatab.model.BendPoint();
-				point.offset = this.readInt32();
-				point.value = this.readInt32() / 25 | 0;
-				this._data.readByte() != 0;
-				beat.whammyBarPoints.push(point);
+				var fret = this.readInt32();
+				if(i < chord.strings.length) chord.strings.push(fret);
 			}
+			this._data.read(32);
+		} else if(this._data.readByte() != 0) {
+			if(this._versionNumber >= 400) {
+				this._data.read(16);
+				chord.name = this.readStringByteLength(21);
+				this._data.read(4);
+				chord.firstFret = this.readInt32();
+				var _g = 0;
+				while(_g < 7) {
+					var i = _g++;
+					var fret = this.readInt32();
+					if(i < chord.strings.length) chord.strings.push(fret);
+				}
+				this._data.read(32);
+			} else {
+				this._data.read(25);
+				chord.name = this.readStringByteLength(34);
+				chord.firstFret = this.readInt32();
+				var _g = 0;
+				while(_g < 6) {
+					var i = _g++;
+					var fret = this.readInt32();
+					chord.strings.push(fret);
+				}
+				this._data.read(36);
+			}
+		} else {
+			var strings;
+			if(this._versionNumber >= 406) strings = 7; else strings = 6;
+			chord.name = this.readStringIntByte();
+			chord.firstFret = this.readInt32();
+			if(chord.firstFret > 0) {
+				var _g = 0;
+				while(_g < strings) {
+					var i = _g++;
+					var fret = this.readInt32();
+					if(i < chord.strings.length) chord.strings.push(fret);
+				}
+			}
+		}
+		if(chord.name.length > 0) {
+			beat.voice.bar.track.chords.set(chordId,chord);
+			beat.chordId = chordId;
 		}
 	}
 	,readBeatEffects: function(beat) {
@@ -3700,375 +3835,451 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 			}
 		}
 	}
-	,readChord: function(beat) {
-		var chord = new alphatab.model.Chord();
-		var chordId = alphatab.util.Guid.generate();
-		if(this._versionNumber >= 500) {
-			this._data.read(17);
-			chord.name = this.readStringByteLength(21);
-			this._data.read(4);
-			chord.firstFret = this.readInt32();
+	,readTremoloBarEffect: function(beat) {
+		this._data.readByte();
+		this.readInt32();
+		var pointCount = this.readInt32();
+		if(pointCount > 0) {
 			var _g = 0;
-			while(_g < 7) {
+			while(_g < pointCount) {
 				var i = _g++;
-				var fret = this.readInt32();
-				if(i < chord.strings.length) chord.strings.push(fret);
+				var point = new alphatab.model.BendPoint();
+				point.offset = this.readInt32();
+				var x = this.readInt32() / 25;
+				point.value = x | 0;
+				this._data.readByte() != 0;
+				beat.whammyBarPoints.push(point);
 			}
-			this._data.read(32);
-		} else if(this._data.readByte() != 0) {
-			if(this._versionNumber >= 400) {
-				this._data.read(16);
-				chord.name = this.readStringByteLength(21);
-				this._data.read(4);
-				chord.firstFret = this.readInt32();
-				var _g = 0;
-				while(_g < 7) {
-					var i = _g++;
-					var fret = this.readInt32();
-					if(i < chord.strings.length) chord.strings.push(fret);
-				}
-				this._data.read(32);
-			} else {
-				this._data.read(25);
-				chord.name = this.readStringByteLength(34);
-				chord.firstFret = this.readInt32();
-				var _g = 0;
-				while(_g < 6) {
-					var i = _g++;
-					var fret = this.readInt32();
-					chord.strings.push(fret);
-				}
-				this._data.read(36);
-			}
-		} else {
-			var strings;
-			if(this._versionNumber >= 406) strings = 7; else strings = 6;
-			chord.name = this.readStringIntByte();
-			chord.firstFret = this.readInt32();
-			if(chord.firstFret > 0) {
-				var _g = 0;
-				while(_g < strings) {
-					var i = _g++;
-					var fret = this.readInt32();
-					if(i < chord.strings.length) chord.strings.push(fret);
-				}
-			}
-		}
-		if(chord.name.length > 0) {
-			beat.voice.bar.track.chords.set(chordId,chord);
-			beat.chordId = chordId;
 		}
 	}
-	,readBeat: function(track,bar,voice) {
-		var newBeat = new alphatab.model.Beat();
-		var flags = this._data.readByte();
-		if((flags & 1) != 0) newBeat.dots = 1;
-		if((flags & 64) != 0) {
-			var type = this._data.readByte();
-			newBeat.isEmpty = (type & 2) == 0;
-		}
-		voice.addBeat(newBeat);
-		var duration = this._data.readInt8();
-		switch(duration) {
-		case -2:
-			newBeat.duration = alphatab.model.Duration.Whole;
-			break;
-		case -1:
-			newBeat.duration = alphatab.model.Duration.Half;
-			break;
-		case 0:
-			newBeat.duration = alphatab.model.Duration.Quarter;
-			break;
+	,toStrokeValue: function(value) {
+		switch(value) {
 		case 1:
-			newBeat.duration = alphatab.model.Duration.Eighth;
-			break;
+			return 30;
 		case 2:
-			newBeat.duration = alphatab.model.Duration.Sixteenth;
-			break;
+			return 30;
 		case 3:
-			newBeat.duration = alphatab.model.Duration.ThirtySecond;
-			break;
+			return 60;
 		case 4:
-			newBeat.duration = alphatab.model.Duration.SixtyFourth;
-			break;
+			return 120;
+		case 5:
+			return 240;
+		case 6:
+			return 480;
 		default:
-			newBeat.duration = alphatab.model.Duration.Quarter;
-		}
-		if((flags & 32) != 0) {
-			newBeat.tupletNumerator = this.readInt32();
-			switch(newBeat.tupletNumerator) {
-			case 1:
-				newBeat.tupletDenominator = 1;
-				break;
-			case 3:
-				newBeat.tupletDenominator = 2;
-				break;
-			case 5:case 6:case 7:
-				newBeat.tupletDenominator = 4;
-				break;
-			case 9:case 10:case 11:case 12:case 13:
-				newBeat.tupletDenominator = 8;
-				break;
-			case 2:case 4:case 8:
-				break;
-			default:
-				newBeat.tupletNumerator = 1;
-				newBeat.tupletDenominator = 1;
-			}
-		}
-		if((flags & 2) != 0) this.readChord(newBeat);
-		if((flags & 4) != 0) newBeat.text = this.readStringIntUnused();
-		if((flags & 8) != 0) this.readBeatEffects(newBeat);
-		if((flags & 16) != 0) this.readMixTableChange(newBeat);
-		var stringFlags = this._data.readByte();
-		var i = 6;
-		while(i >= 0) {
-			if((stringFlags & 1 << i) != 0 && 6 - i < track.tuning.length) this.readNote(track,bar,voice,newBeat,6 - i);
-			i--;
-		}
-		if(newBeat.dynamicValue == null) newBeat.dynamicValue = alphatab.model.DynamicValue.F;
-		if(this._versionNumber >= 500) {
-			this._data.readByte();
-			var flag = this._data.readByte();
-			if((flag & 8) != 0) this._data.readByte();
+			return 0;
 		}
 	}
-	,readVoice: function(track,bar) {
-		var beatCount = this.readInt32();
-		if(beatCount == 0) return;
-		var newVoice = new alphatab.model.Voice();
-		bar.addVoice(newVoice);
-		var _g = 0;
-		while(_g < beatCount) {
-			var i = _g++;
-			this.readBeat(track,bar,newVoice);
+	,readMixTableChange: function(beat) {
+		var tableChange = new alphatab.importer.MixTableChange();
+		tableChange.instrument = this._data.readInt8();
+		if(this._versionNumber >= 500) this._data.read(16);
+		tableChange.volume = this._data.readInt8();
+		tableChange.balance = this._data.readInt8();
+		var chorus = this._data.readInt8();
+		var reverb = this._data.readInt8();
+		var phaser = this._data.readInt8();
+		var tremolo = this._data.readInt8();
+		if(this._versionNumber >= 500) tableChange.tempoName = this.readStringIntByte();
+		tableChange.tempo = this.readInt32();
+		if(tableChange.volume >= 0) this._data.readByte();
+		if(tableChange.balance >= 0) this._data.readByte();
+		if(chorus >= 0) this._data.readByte();
+		if(reverb >= 0) this._data.readByte();
+		if(phaser >= 0) this._data.readByte();
+		if(tremolo >= 0) this._data.readByte();
+		if(tableChange.tempo >= 0) {
+			tableChange.duration = this._data.readInt8();
+			if(this._versionNumber >= 510) this._data.readByte();
 		}
-	}
-	,readBar: function(track) {
-		var newBar = new alphatab.model.Bar();
-		if(track.isPercussion) newBar.clef = alphatab.model.Clef.Neutral;
-		track.addBar(newBar);
-		var voiceCount = 1;
-		if(this._versionNumber >= 500) {
-			this._data.readByte();
-			voiceCount = 2;
-		}
-		var _g = 0;
-		while(_g < voiceCount) {
-			var v = _g++;
-			this.readVoice(track,newBar);
-		}
-	}
-	,readBars: function() {
-		var _g1 = 0, _g = this._barCount;
-		while(_g1 < _g) {
-			var b = _g1++;
-			var _g3 = 0, _g2 = this._trackCount;
-			while(_g3 < _g2) {
-				var t = _g3++;
-				this.readBar(this._score.tracks[t]);
-			}
-		}
-	}
-	,readTrack: function() {
-		var newTrack = new alphatab.model.Track();
-		this._score.addTrack(newTrack);
-		var flags = this._data.readByte();
-		newTrack.name = this.readStringByteLength(40);
-		newTrack.isPercussion = (flags & 1) != 0;
-		var stringCount = this.readInt32();
-		var _g = 0;
-		while(_g < 7) {
-			var i = _g++;
-			var tuning = this.readInt32();
-			if(stringCount > i) newTrack.tuning.push(tuning);
-		}
-		var port = this.readInt32();
-		var index = this.readInt32() - 1;
-		var effectChannel = this.readInt32() - 1;
-		this._data.read(4);
-		if(index >= 0 && index < this._playbackInfos.length) {
-			var info = this._playbackInfos[index];
-			info.port = port;
-			info.isSolo = (flags & 16) != 0;
-			info.isMute = (flags & 32) != 0;
-			info.secondaryChannel = effectChannel;
-			newTrack.playbackInfo = info;
-		}
-		newTrack.capo = this.readInt32();
-		this._data.read(4);
-		if(this._versionNumber >= 500) {
-			this._data.readByte();
-			this._data.readByte();
-			this._data.read(43);
-		}
+		if(this._versionNumber >= 400) this._data.readByte();
+		if(this._versionNumber >= 500) this._data.readByte();
 		if(this._versionNumber >= 510) {
-			this._data.read(4);
 			this.readStringIntByte();
 			this.readStringIntByte();
 		}
-	}
-	,readTracks: function() {
-		var _g1 = 0, _g = this._trackCount;
-		while(_g1 < _g) {
-			var i = _g1++;
-			this.readTrack();
+		if(tableChange.volume >= 0) {
+			var volumeAutomation = new alphatab.model.Automation();
+			volumeAutomation.isLinear = true;
+			volumeAutomation.type = alphatab.model.AutomationType.Volume;
+			volumeAutomation.value = tableChange.volume;
+			beat.automations.push(volumeAutomation);
+		}
+		if(tableChange.balance >= 0) {
+			var balanceAutomation = new alphatab.model.Automation();
+			balanceAutomation.isLinear = true;
+			balanceAutomation.type = alphatab.model.AutomationType.Balance;
+			balanceAutomation.value = tableChange.balance;
+			beat.automations.push(balanceAutomation);
+		}
+		if(tableChange.instrument >= 0) {
+			var instrumentAutomation = new alphatab.model.Automation();
+			instrumentAutomation.isLinear = true;
+			instrumentAutomation.type = alphatab.model.AutomationType.Instrument;
+			instrumentAutomation.value = tableChange.instrument;
+			beat.automations.push(instrumentAutomation);
+		}
+		if(tableChange.tempo >= 0) {
+			var tempoAutomation = new alphatab.model.Automation();
+			tempoAutomation.isLinear = true;
+			tempoAutomation.type = alphatab.model.AutomationType.Tempo;
+			tempoAutomation.value = tableChange.tempo;
+			beat.automations.push(tempoAutomation);
+			((function($this) {
+				var $r;
+				var _this = beat.voice.bar;
+				$r = _this.track.score.masterBars[_this.index];
+				return $r;
+			}(this))).tempoAutomation = tempoAutomation;
 		}
 	}
-	,readMasterBar: function() {
-		var previousMasterBar = null;
-		if(this._score.masterBars.length > 0) previousMasterBar = this._score.masterBars[this._score.masterBars.length - 1];
-		var newMasterBar = new alphatab.model.MasterBar();
+	,readNote: function(track,bar,voice,beat,stringIndex) {
+		var newNote = new alphatab.model.Note();
+		newNote.string = track.tuning.length - stringIndex;
 		var flags = this._data.readByte();
-		if((flags & 1) != 0) newMasterBar.timeSignatureNumerator = this._data.readByte(); else if(previousMasterBar != null) newMasterBar.timeSignatureNumerator = previousMasterBar.timeSignatureNumerator;
-		if((flags & 2) != 0) newMasterBar.timeSignatureDenominator = this._data.readByte(); else if(previousMasterBar != null) newMasterBar.timeSignatureDenominator = previousMasterBar.timeSignatureDenominator;
-		newMasterBar.isRepeatStart = (flags & 4) != 0;
-		if((flags & 8) != 0) {
-			if(this._versionNumber >= 500) newMasterBar.repeatCount = this._data.readByte(); else newMasterBar.repeatCount = 1;
-		}
+		if((flags & 2) != 0) newNote.accentuated = alphatab.model.AccentuationType.Heavy; else if((flags & 64) != 0) newNote.accentuated = alphatab.model.AccentuationType.Normal;
+		newNote.isGhost = (flags & 4) != 0;
 		if((flags & 32) != 0) {
-			var section = new alphatab.model.Section();
-			section.text = this.readStringIntByte();
-			section.marker = "";
-			this.readColor();
-			newMasterBar.section = section;
+			var noteType = this._data.readByte();
+			if(noteType == 3) newNote.isDead = true; else if(noteType == 2) newNote.isTieDestination = true;
 		}
 		if((flags & 16) != 0) {
-			if(this._versionNumber < 500) {
-				var currentMasterBar = previousMasterBar;
-				var existentAlternatives = 0;
-				while(currentMasterBar != null) {
-					if(currentMasterBar.repeatCount > 0 && currentMasterBar != previousMasterBar) break;
-					if(currentMasterBar.isRepeatStart) break;
-					existentAlternatives |= currentMasterBar.alternateEndings;
-				}
-				var repeatAlternative = 0;
-				var repeatMask = this._data.readByte();
-				var _g = 0;
-				while(_g < 8) {
-					var i = _g++;
-					var repeating = 1 << i;
-					if(repeatMask > i && (existentAlternatives & repeating) == 0) repeatAlternative |= repeating;
-				}
-				newMasterBar.alternateEndings = repeatAlternative;
-			} else newMasterBar.alternateEndings = this._data.readByte();
+			var dynamicNumber = this._data.readInt8();
+			newNote.dynamicValue = this.toDynamicValue(dynamicNumber);
+			beat.dynamicValue = newNote.dynamicValue;
 		}
-		if((flags & 64) != 0) {
-			newMasterBar.keySignature = this._data.readInt8();
-			this._data.readByte();
-		} else if(previousMasterBar != null) newMasterBar.keySignature = previousMasterBar.keySignature;
-		if(this._versionNumber >= 500 && (flags & 3) != 0) this._data.read(4);
-		if(this._versionNumber >= 500 && (flags & 16) == 0) newMasterBar.alternateEndings = this._data.readByte();
+		if((flags & 32) != 0) newNote.fret = this._data.readInt8();
+		if((flags & 128) != 0) {
+			newNote.leftHandFinger = this._data.readInt8();
+			newNote.rightHandFinger = this._data.readInt8();
+			newNote.isFingering = true;
+		}
 		if(this._versionNumber >= 500) {
-			var tripletFeel = this._data.readByte();
-			switch(tripletFeel) {
+			if((flags & 1) != 0) newNote.durationPercent = this.readDouble();
+			var flags2 = this._data.readByte();
+			newNote.swapAccidentals = (flags2 & 2) != 0;
+		}
+		beat.addNote(newNote);
+		if((flags & 8) != 0) this.readNoteEffects(track,voice,beat,newNote);
+	}
+	,toDynamicValue: function(value) {
+		switch(value) {
+		case 1:
+			return alphatab.model.DynamicValue.PPP;
+		case 2:
+			return alphatab.model.DynamicValue.PP;
+		case 3:
+			return alphatab.model.DynamicValue.P;
+		case 4:
+			return alphatab.model.DynamicValue.MP;
+		case 5:
+			return alphatab.model.DynamicValue.MF;
+		case 6:
+			return alphatab.model.DynamicValue.F;
+		case 7:
+			return alphatab.model.DynamicValue.FF;
+		case 8:
+			return alphatab.model.DynamicValue.FFF;
+		default:
+			return alphatab.model.DynamicValue.F;
+		}
+	}
+	,readNoteEffects: function(track,voice,beat,note) {
+		var flags = this._data.readByte();
+		var flags2 = 0;
+		if(this._versionNumber >= 400) flags2 = this._data.readByte();
+		if((flags & 1) != 0) this.readBend(note);
+		if((flags & 16) != 0) this.readGrace(voice,note);
+		if((flags2 & 4) != 0) this.readTremoloPicking(beat);
+		if((flags2 & 8) != 0) this.readSlide(note); else if(this._versionNumber < 400) {
+			if((flags & 4) != 0) note.slideType = alphatab.model.SlideType.Shift;
+		}
+		if((flags2 & 16) != 0) this.readArtificialHarmonic(note); else if(this._versionNumber < 400) {
+			if((flags & 4) != 0) {
+				note.harmonicType = alphatab.model.HarmonicType.Natural;
+				note.harmonicValue = this.deltaFretToHarmonicValue(note.fret);
+			}
+			if((flags & 8) != 0) note.harmonicType = alphatab.model.HarmonicType.Artificial;
+		}
+		if((flags2 & 32) != 0) this.readTrill(note);
+		note.isLetRing = (flags & 8) != 0;
+		note.isHammerPullOrigin = (flags & 2) != 0;
+		if((flags2 & 64) != 0) note.vibrato = alphatab.model.VibratoType.Slight;
+		note.isPalmMute = (flags2 & 2) != 0;
+		note.isStaccato = (flags2 & 1) != 0;
+	}
+	,readBend: function(note) {
+		this._data.readByte();
+		this.readInt32();
+		var pointCount = this.readInt32();
+		if(pointCount > 0) {
+			var _g = 0;
+			while(_g < pointCount) {
+				var i = _g++;
+				var point = new alphatab.model.BendPoint();
+				point.offset = this.readInt32();
+				var x = this.readInt32() / 25;
+				point.value = x | 0;
+				this._data.readByte() != 0;
+				note.bendPoints.push(point);
+			}
+		}
+	}
+	,readGrace: function(voice,note) {
+		var graceBeat = new alphatab.model.Beat();
+		var graceNote = new alphatab.model.Note();
+		graceNote.string = note.string;
+		graceNote.fret = this._data.readInt8();
+		graceBeat.duration = alphatab.model.Duration.ThirtySecond;
+		graceBeat.dynamicValue = this.toDynamicValue(this._data.readInt8());
+		var transition = this._data.readInt8();
+		switch(transition) {
+		case 0:
+			break;
+		case 1:
+			graceNote.slideType = alphatab.model.SlideType.Legato;
+			graceNote.slideTarget = note;
+			break;
+		case 2:
+			break;
+		case 3:
+			graceNote.isHammerPullOrigin = true;
+			note.isHammerPullDestination = true;
+			note.hammerPullOrigin = graceNote;
+			break;
+		}
+		graceNote.dynamicValue = graceBeat.dynamicValue;
+		this._data.read(1);
+		if(this._versionNumber < 500) graceBeat.graceType = alphatab.model.GraceType.BeforeBeat; else {
+			var flags = this._data.readByte();
+			graceNote.isDead = (flags & 1) != 0;
+			if((flags & 2) != 0) graceBeat.graceType = alphatab.model.GraceType.OnBeat; else graceBeat.graceType = alphatab.model.GraceType.BeforeBeat;
+		}
+		graceBeat.addNote(graceNote);
+		voice.addGraceBeat(graceBeat);
+	}
+	,readTremoloPicking: function(beat) {
+		var speed = this._data.readByte();
+		switch(speed) {
+		case 1:
+			beat.tremoloSpeed = alphatab.model.Duration.Eighth;
+			break;
+		case 2:
+			beat.tremoloSpeed = alphatab.model.Duration.Sixteenth;
+			break;
+		case 3:
+			beat.tremoloSpeed = alphatab.model.Duration.ThirtySecond;
+			break;
+		}
+	}
+	,readSlide: function(note) {
+		if(this._versionNumber >= 500) {
+			var type = this._data.readByte();
+			switch(type) {
 			case 1:
-				newMasterBar.tripletFeel = alphatab.model.TripletFeel.Triplet8th;
+				note.slideType = alphatab.model.SlideType.Shift;
 				break;
 			case 2:
-				newMasterBar.tripletFeel = alphatab.model.TripletFeel.Triplet16th;
+				note.slideType = alphatab.model.SlideType.Legato;
 				break;
+			case 4:
+				note.slideType = alphatab.model.SlideType.OutDown;
+				break;
+			case 8:
+				note.slideType = alphatab.model.SlideType.OutUp;
+				break;
+			case 16:
+				note.slideType = alphatab.model.SlideType.IntoFromBelow;
+				break;
+			case 32:
+				note.slideType = alphatab.model.SlideType.IntoFromAbove;
+				break;
+			default:
+				note.slideType = alphatab.model.SlideType.None;
 			}
-			this._data.readByte();
-		} else newMasterBar.tripletFeel = this._globalTripletFeel;
-		newMasterBar.isDoubleBar = (flags & 128) != 0;
-		this._score.addMasterBar(newMasterBar);
-	}
-	,readMasterBars: function() {
-		var _g1 = 0, _g = this._barCount;
-		while(_g1 < _g) {
-			var i = _g1++;
-			this.readMasterBar();
+		} else {
+			var type = this._data.readInt8();
+			switch(type) {
+			case 1:
+				note.slideType = alphatab.model.SlideType.Shift;
+				break;
+			case 2:
+				note.slideType = alphatab.model.SlideType.Legato;
+				break;
+			case 3:
+				note.slideType = alphatab.model.SlideType.OutDown;
+				break;
+			case 4:
+				note.slideType = alphatab.model.SlideType.OutUp;
+				break;
+			case -1:
+				note.slideType = alphatab.model.SlideType.IntoFromBelow;
+				break;
+			case -2:
+				note.slideType = alphatab.model.SlideType.IntoFromAbove;
+				break;
+			default:
+				note.slideType = alphatab.model.SlideType.None;
+			}
 		}
 	}
-	,readPlaybackInfos: function() {
-		this._playbackInfos = new Array();
+	,readArtificialHarmonic: function(note) {
+		var type = this._data.readByte();
+		if(this._versionNumber >= 500) switch(type) {
+		case 1:
+			note.harmonicType = alphatab.model.HarmonicType.Natural;
+			note.harmonicValue = this.deltaFretToHarmonicValue(note.fret);
+			break;
+		case 2:
+			var harmonicTone = this._data.readByte();
+			var harmonicKey = this._data.readByte();
+			var harmonicOctaveOffset = this._data.readByte();
+			note.harmonicType = alphatab.model.HarmonicType.Artificial;
+			break;
+		case 3:
+			note.harmonicType = alphatab.model.HarmonicType.Tap;
+			note.harmonicValue = this.deltaFretToHarmonicValue(this._data.readByte());
+			break;
+		case 4:
+			note.harmonicType = alphatab.model.HarmonicType.Pinch;
+			note.harmonicValue = 12;
+			break;
+		case 5:
+			note.harmonicType = alphatab.model.HarmonicType.Semi;
+			note.harmonicValue = 12;
+			break;
+		} else if(this._versionNumber >= 400) switch(type) {
+		case 1:
+			note.harmonicType = alphatab.model.HarmonicType.Natural;
+			note.harmonicValue = this.deltaFretToHarmonicValue(note.fret);
+			break;
+		case 3:
+			note.harmonicType = alphatab.model.HarmonicType.Tap;
+			break;
+		case 4:
+			note.harmonicType = alphatab.model.HarmonicType.Pinch;
+			note.harmonicValue = 12;
+			break;
+		case 5:
+			note.harmonicType = alphatab.model.HarmonicType.Semi;
+			note.harmonicValue = 12;
+			break;
+		case 15:
+			note.harmonicType = alphatab.model.HarmonicType.Artificial;
+			note.harmonicValue = this.deltaFretToHarmonicValue(note.fret + 5);
+			break;
+		case 17:
+			note.harmonicType = alphatab.model.HarmonicType.Artificial;
+			note.harmonicValue = this.deltaFretToHarmonicValue(note.fret + 7);
+			break;
+		case 22:
+			note.harmonicType = alphatab.model.HarmonicType.Artificial;
+			note.harmonicValue = this.deltaFretToHarmonicValue(note.fret + 12);
+			break;
+		default:
+		}
+	}
+	,deltaFretToHarmonicValue: function(deltaFret) {
+		switch(deltaFret) {
+		case 2:
+			return 2.4;
+		case 3:
+			return 3.2;
+		case 4:case 5:case 7:case 9:case 12:case 16:case 17:case 19:case 24:
+			return deltaFret;
+		case 8:
+			return 8.2;
+		case 10:
+			return 9.6;
+		case 14:case 15:
+			return 14.7;
+		case 21:case 22:
+			return 21.7;
+		default:
+			return 12;
+		}
+	}
+	,readTrill: function(note) {
+		note.trillValue = this._data.readByte() + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1];
+		var _g = this._data.readByte();
+		switch(_g) {
+		case 1:
+			note.trillSpeed = alphatab.model.Duration.Sixteenth;
+			break;
+		case 2:
+			note.trillSpeed = alphatab.model.Duration.ThirtySecond;
+			break;
+		case 3:
+			note.trillSpeed = alphatab.model.Duration.SixtyFourth;
+			break;
+		}
+	}
+	,readDouble: function() {
+		var bytes = haxe.io.Bytes.alloc(8);
+		this._data.readBytes(bytes,0,8);
+		var indices;
+		if(!this._data.bigEndian) indices = [7,6,5,4,3,2,1,0]; else indices = [0,1,2,3,4,5,6,7];
+		var sign = 1 - (bytes.b[indices[0]] >> 7 << 1);
+		var exp = (bytes.b[indices[0]] << 4 & 2047 | bytes.b[indices[1]] >> 4) - 1023;
+		var sig = this.getDoubleSig(bytes,indices);
+		if(sig == 0 && exp == -1023) return 0.0;
+		return sign * (1.0 + Math.pow(2,-52) * sig) * Math.pow(2,exp);
+	}
+	,getDoubleSig: function(bytes,indices) {
+		var sig = parseInt((((bytes.b[indices[1]] & 15) << 16 | bytes.b[indices[2]] << 8 | bytes.b[indices[3]]) * Math.pow(2,32)).toString(2),2) + parseInt(((bytes.b[indices[4]] >> 7) * Math.pow(2,31)).toString(2),2) + parseInt(((bytes.b[indices[4]] & 127) << 24 | bytes.b[indices[5]] << 16 | bytes.b[indices[6]] << 8 | bytes.b[indices[7]]).toString(2),2);
+		return sig;
+	}
+	,readColor: function() {
+		var r = this._data.readByte();
+		var g = this._data.readByte();
+		var b = this._data.readByte();
+		this._data.read(1);
+		return new alphatab.platform.model.Color(r,g,b);
+	}
+	,readBool: function() {
+		return this._data.readByte() != 0;
+	}
+	,readUInt8: function() {
+		return this._data.readByte();
+	}
+	,readInt32: function() {
+		var ch1 = this._data.readByte();
+		var ch2 = this._data.readByte();
+		var ch3 = this._data.readByte();
+		var ch4 = this._data.readByte();
+		return ch1 | ch2 << 8 | ch3 << 16 | ch4 << 24;
+	}
+	,readStringIntUnused: function() {
+		this._data.read(4);
+		return this.readString(this._data.readByte());
+	}
+	,readStringInt: function() {
+		return this.readString(this.readInt32());
+	}
+	,readStringIntByte: function() {
+		var length = this.readInt32() - 1;
+		this._data.readByte();
+		return this.readString(length);
+	}
+	,readString: function(length) {
+		var b = haxe.io.Bytes.alloc(length);
+		this._data.readFullBytes(b,0,length);
+		var s = new StringBuf();
 		var _g = 0;
-		while(_g < 64) {
+		while(_g < length) {
 			var i = _g++;
-			var info = new alphatab.model.PlaybackInformation();
-			info.primaryChannel = i;
-			info.secondaryChannel = i;
-			info.program = this.readInt32();
-			info.volume = this._data.readByte();
-			info.balance = this._data.readByte();
-			this._data.read(6);
-			this._playbackInfos.push(info);
+			s.b += String.fromCharCode(b.b[i]);
 		}
+		return s.b;
 	}
-	,readPageSetup: function() {
-		this._data.read(30);
-		var _g = 0;
-		while(_g < 10) {
-			var i = _g++;
-			this.readStringIntByte();
-		}
+	,readStringByteLength: function(length) {
+		var stringLength = this._data.readByte();
+		var string = this.readString(stringLength);
+		if(stringLength < length) this._data.read(length - stringLength);
+		return string;
 	}
-	,readLyrics: function() {
-		this._lyrics = new Array();
-		this._lyricsIndex = new Array();
-		this._lyricsTrack = this.readInt32();
-		var _g = 0;
-		while(_g < 5) {
-			var i = _g++;
-			this._lyricsIndex.push(this.readInt32() - 1);
-			this._lyrics.push(this._data.readString(this.readInt32()));
-		}
-	}
-	,readScoreInformation: function() {
-		this._score.title = this.readStringIntUnused();
-		this._score.subTitle = this.readStringIntUnused();
-		this._score.artist = this.readStringIntUnused();
-		this._score.album = this.readStringIntUnused();
-		this._score.words = this.readStringIntUnused();
-		if(this._versionNumber >= 500) this._score.music = this.readStringIntUnused(); else this._score.music = this._score.words;
-		this._score.copyright = this.readStringIntUnused();
-		this._score.tab = this.readStringIntUnused();
-		this._score.instructions = this.readStringIntUnused();
-		var noticeLines = this.readInt32();
-		var notice = new StringBuf();
-		var _g = 0;
-		while(_g < noticeLines) {
-			var i = _g++;
-			if(i > 0) notice.b += "\n";
-			notice.b += Std.string(this.readStringIntUnused());
-		}
-		this._score.notices = notice.b;
-	}
-	,readVersion: function() {
-		var version = this.readStringByteLength(30);
-		if(!StringTools.startsWith(version,"FICHIER GUITAR PRO ")) throw alphatab.importer.ScoreImporter.UNSUPPORTED_FORMAT;
-		version = HxOverrides.substr(version,"FICHIER GUITAR PRO ".length + 1,null);
-		var dot = version.indexOf(".");
-		this._versionNumber = 100 * Std.parseInt(HxOverrides.substr(version,0,dot)) + Std.parseInt(HxOverrides.substr(version,dot + 1,null));
-	}
-	,readScore: function() {
-		this.readVersion();
-		this._score = new alphatab.model.Score();
-		this.readScoreInformation();
-		if(this._versionNumber < 500) this._globalTripletFeel = this._data.readByte() != 0?alphatab.model.TripletFeel.Triplet8th:alphatab.model.TripletFeel.NoTripletFeel;
-		if(this._versionNumber >= 400) this.readLyrics();
-		if(this._versionNumber >= 510) this._data.read(19);
-		if(this._versionNumber >= 500) {
-			this.readPageSetup();
-			this._score.tempoLabel = this.readStringIntByte();
-		}
-		this._score.tempo = this.readInt32();
-		if(this._versionNumber >= 510) this._data.readByte() != 0;
-		this._keySignature = this.readInt32();
-		if(this._versionNumber >= 400) this._octave = this._data.readByte();
-		this.readPlaybackInfos();
-		if(this._versionNumber >= 500) {
-			this._data.read(38);
-			this._data.read(4);
-		}
-		this._barCount = this.readInt32();
-		this._trackCount = this.readInt32();
-		this.readMasterBars();
-		this.readTracks();
-		this.readBars();
-		this.finish(this._score);
-		return this._score;
+	,skip: function(count) {
+		this._data.read(count);
 	}
 	,__class__: alphatab.importer.Gp3To5Importer
 });
@@ -4078,57 +4289,25 @@ $hxClasses["alphatab.importer.GpxFile"] = alphatab.importer.GpxFile;
 alphatab.importer.GpxFile.__name__ = true;
 alphatab.importer.GpxFile.prototype = {
 	__class__: alphatab.importer.GpxFile
-}
+};
 alphatab.importer.GpxFileSystem = function() {
 	this.files = new Array();
 };
 $hxClasses["alphatab.importer.GpxFileSystem"] = alphatab.importer.GpxFileSystem;
 alphatab.importer.GpxFileSystem.__name__ = true;
 alphatab.importer.GpxFileSystem.prototype = {
-	getInteger: function(data,offset) {
-		return (data.b[offset + 3] & 255) << 24 | (data.b[offset + 2] & 255) << 16 | (data.b[offset + 1] & 255) << 8 | data.b[offset] & 255;
+	setFileFilter: function(fileFilter) {
+		this._fileFilter = fileFilter;
 	}
-	,getString: function(data,offset,length) {
-		var buf = new StringBuf();
-		var _g = 0;
-		while(_g < length) {
-			var i = _g++;
-			var code = data.b[offset + i] & 255;
-			if(code == 0) break;
-			buf.b += String.fromCharCode(code);
-		}
-		return buf.b;
+	,defaultFileFilter: function(s) {
+		return true;
 	}
-	,readUncompressedBlock: function(data) {
-		var sectorSize = 4096;
-		var offset = sectorSize;
-		while(offset + 3 < data.length) {
-			var entryType = this.getInteger(data,offset);
-			if(entryType == 2) {
-				var file = new alphatab.importer.GpxFile();
-				file.fileName = this.getString(data,offset + 4,127);
-				file.fileSize = this.getInteger(data,offset + 140);
-				var storeFile = this._fileFilter != null?this._fileFilter(file.fileName):this.defaultFileFilter(file.fileName);
-				if(storeFile) this.files.push(file);
-				var dataPointerOffset = offset + 148;
-				var sector = 0;
-				var sectorCount = 0;
-				var fileData = storeFile?new alphatab.io.BytesArray(file.fileSize):null;
-				while((sector = this.getInteger(data,dataPointerOffset + 4 * sectorCount++)) != 0) {
-					offset = sector * sectorSize;
-					if(storeFile) fileData.addBytes(data.sub(offset,sectorSize));
-				}
-				if(storeFile) {
-					file.data = haxe.io.Bytes.alloc(Math.min(file.fileSize,fileData.length) | 0);
-					file.data.blit(0,fileData.getBuffer(),0,file.data.length);
-				}
-			}
-			offset += sectorSize;
-		}
+	,load: function(data) {
+		var src = new alphatab.io.BitInput(data);
+		this.readBlock(src);
 	}
-	,readBlock: function(data) {
-		var header = this.readHeader(data);
-		if(header == "BCFZ") this.readUncompressedBlock(this.decompress(data,true)); else if(header == "BCFS") this.readUncompressedBlock(data.readAll()); else throw alphatab.importer.ScoreImporter.UNSUPPORTED_FORMAT;
+	,readHeader: function(src) {
+		return src.readString(4);
 	}
 	,decompress: function(src,skipHeader) {
 		if(skipHeader == null) skipHeader = false;
@@ -4142,7 +4321,9 @@ alphatab.importer.GpxFileSystem.prototype = {
 					var offset = src.readBitsReversed(wordSize);
 					var size = src.readBitsReversed(wordSize);
 					var sourcePosition = uncompressed.length - offset;
-					var toRead = Math.min(offset,size) | 0;
+					var toRead;
+					var x = Math.min(offset,size);
+					toRead = x | 0;
 					var subBuffer = uncompressed.sub(sourcePosition,toRead);
 					uncompressed.addBytes(subBuffer);
 				} else {
@@ -4160,21 +4341,60 @@ alphatab.importer.GpxFileSystem.prototype = {
 		}
 		return uncompressed.getBytes(skipHeader?4:0);
 	}
-	,readHeader: function(src) {
-		return src.readString(4);
+	,readBlock: function(data) {
+		var header = this.readHeader(data);
+		if(header == "BCFZ") this.readUncompressedBlock(this.decompress(data,true)); else if(header == "BCFS") this.readUncompressedBlock(data.readAll()); else throw alphatab.importer.ScoreImporter.UnsupportedFormat;
 	}
-	,load: function(data) {
-		var src = new alphatab.io.BitInput(data);
-		this.readBlock(src);
+	,readUncompressedBlock: function(data) {
+		var sectorSize = 4096;
+		var offset = sectorSize;
+		while(offset + 3 < data.length) {
+			var entryType = this.getInteger(data,offset);
+			if(entryType == 2) {
+				var file = new alphatab.importer.GpxFile();
+				file.fileName = this.getString(data,offset + 4,127);
+				file.fileSize = this.getInteger(data,offset + 140);
+				var storeFile;
+				if(this._fileFilter != null) storeFile = this._fileFilter(file.fileName); else storeFile = this.defaultFileFilter(file.fileName);
+				if(storeFile) this.files.push(file);
+				var dataPointerOffset = offset + 148;
+				var sector = 0;
+				var sectorCount = 0;
+				var fileData;
+				if(storeFile) fileData = new alphatab.io.BytesArray(file.fileSize); else fileData = null;
+				while((sector = this.getInteger(data,dataPointerOffset + 4 * sectorCount++)) != 0) {
+					offset = sector * sectorSize;
+					if(storeFile) fileData.addBytes(data.sub(offset,sectorSize));
+				}
+				if(storeFile) {
+					file.data = haxe.io.Bytes.alloc((function($this) {
+						var $r;
+						var x = Math.min(file.fileSize,fileData.length);
+						$r = x | 0;
+						return $r;
+					}(this)));
+					file.data.blit(0,fileData.getBuffer(),0,file.data.length);
+				}
+			}
+			offset += sectorSize;
+		}
 	}
-	,defaultFileFilter: function(s) {
-		return true;
+	,getString: function(data,offset,length) {
+		var buf = new StringBuf();
+		var _g = 0;
+		while(_g < length) {
+			var i = _g++;
+			var code = data.b[offset + i] & 255;
+			if(code == 0) break;
+			buf.b += String.fromCharCode(code);
+		}
+		return buf.b;
 	}
-	,setFileFilter: function(fileFilter) {
-		this._fileFilter = fileFilter;
+	,getInteger: function(data,offset) {
+		return (data.b[offset + 3] & 255) << 24 | (data.b[offset + 2] & 255) << 16 | (data.b[offset + 1] & 255) << 8 | data.b[offset] & 255;
 	}
 	,__class__: alphatab.importer.GpxFileSystem
-}
+};
 alphatab.importer.GpxImporter = function() {
 	alphatab.importer.ScoreImporter.call(this);
 };
@@ -4207,817 +4427,163 @@ $hxClasses["alphatab.importer.GpxRhythm"] = alphatab.importer.GpxRhythm;
 alphatab.importer.GpxRhythm.__name__ = true;
 alphatab.importer.GpxRhythm.prototype = {
 	__class__: alphatab.importer.GpxRhythm
-}
+};
 alphatab.importer.GpxParser = function() {
 };
 $hxClasses["alphatab.importer.GpxParser"] = alphatab.importer.GpxParser;
 alphatab.importer.GpxParser.__name__ = true;
 alphatab.importer.GpxParser.prototype = {
-	buildModel: function() {
-		var $it0 = this._beatById.keys();
-		while( $it0.hasNext() ) {
-			var beatId = $it0.next();
-			var beat = this._beatById.get(beatId);
-			var rhythmId = this._rhythmOfBeat.get(beatId);
-			var rhythm = this._rhythmById.get(rhythmId);
-			beat.duration = rhythm.value;
-			beat.dots = rhythm.dots;
-			beat.tupletNumerator = rhythm.tupletNumerator;
-			beat.tupletDenominator = rhythm.tupletDenominator;
-			if(this._notesOfBeat.exists(beatId)) {
-				var _g = 0, _g1 = this._notesOfBeat.get(beatId);
-				while(_g < _g1.length) {
-					var noteId = _g1[_g];
-					++_g;
-					if(noteId != "-1") beat.addNote(this._noteById.get(noteId));
-				}
-			}
-		}
-		var $it1 = this._voiceById.keys();
-		while( $it1.hasNext() ) {
-			var voiceId = $it1.next();
-			var voice = this._voiceById.get(voiceId);
-			if(this._beatsOfVoice.exists(voiceId)) {
-				var _g = 0, _g1 = this._beatsOfVoice.get(voiceId);
-				while(_g < _g1.length) {
-					var beatId = _g1[_g];
-					++_g;
-					if(beatId != "-1") voice.addBeat(this._beatById.get(beatId).clone());
-				}
-			}
-		}
-		var $it2 = this._barsById.keys();
-		while( $it2.hasNext() ) {
-			var barId = $it2.next();
-			var bar = this._barsById.get(barId);
-			if(this._voicesOfBar.exists(barId)) {
-				var _g = 0, _g1 = this._voicesOfBar.get(barId);
-				while(_g < _g1.length) {
-					var voiceId = _g1[_g];
-					++_g;
-					if(voiceId != "-1") bar.addVoice(this._voiceById.get(voiceId));
-				}
-			}
-		}
-		var trackIndex = 0;
-		var _g = 0, _g1 = this._tracksMapping;
-		while(_g < _g1.length) {
-			var trackId = _g1[_g];
-			++_g;
-			var track = this._tracksById.get(trackId);
-			this.score.addTrack(track);
-			var _g2 = 0, _g3 = this._barsOfMasterBar;
-			while(_g2 < _g3.length) {
-				var barIds = _g3[_g2];
-				++_g2;
-				var barId = barIds[trackIndex];
-				if(barId != "-1") track.addBar(this._barsById.get(barId));
-			}
-			trackIndex++;
-		}
-		var $it3 = this._automations.keys();
-		while( $it3.hasNext() ) {
-			var barId = $it3.next();
-			var bar = this._barsById.get(barId);
-			var _g = 0, _g1 = bar.voices;
-			while(_g < _g1.length) {
-				var v = _g1[_g];
-				++_g;
-				if(v.beats.length > 0) {
-					var _g2 = 0, _g3 = this._automations.get(barId);
-					while(_g2 < _g3.length) {
-						var automation = _g3[_g2];
-						++_g2;
-						v.beats[0].automations.push(automation);
+	parseXml: function(xml) {
+		this._automations = new haxe.ds.StringMap();
+		this._tracksMapping = new Array();
+		this._tracksById = new haxe.ds.StringMap();
+		this._masterBars = new Array();
+		this._barsOfMasterBar = new Array();
+		this._voicesOfBar = new haxe.ds.StringMap();
+		this._barsById = new haxe.ds.StringMap();
+		this._voiceById = new haxe.ds.StringMap();
+		this._beatsOfVoice = new haxe.ds.StringMap();
+		this._beatById = new haxe.ds.StringMap();
+		this._rhythmOfBeat = new haxe.ds.StringMap();
+		this._rhythmById = new haxe.ds.StringMap();
+		this._notesOfBeat = new haxe.ds.StringMap();
+		this._noteById = new haxe.ds.StringMap();
+		this._tappedNotes = new haxe.ds.StringMap();
+		var dom = Xml.parse(xml);
+		this.parseDom(dom);
+	}
+	,parseDom: function(xml) {
+		if(xml.nodeType == Xml.Document) xml = xml.firstElement();
+		if(xml.get_nodeName() == "GPIF") {
+			this.score = new alphatab.model.Score();
+			var $it0 = xml.iterator();
+			while( $it0.hasNext() ) {
+				var n = $it0.next();
+				if(n.nodeType == Xml.Element) {
+					var _g = n.get_nodeName();
+					switch(_g) {
+					case "Score":
+						this.parseScoreNode(n);
+						break;
+					case "MasterTrack":
+						this.parseMasterTrackNode(n);
+						break;
+					case "Tracks":
+						this.parseTracksNode(n);
+						break;
+					case "MasterBars":
+						this.parseMasterBarsNode(n);
+						break;
+					case "Bars":
+						this.parseBars(n);
+						break;
+					case "Voices":
+						this.parseVoices(n);
+						break;
+					case "Beats":
+						this.parseBeats(n);
+						break;
+					case "Notes":
+						this.parseNotes(n);
+						break;
+					case "Rhythms":
+						this.parseRhythms(n);
+						break;
 					}
 				}
 			}
-		}
-		var _g = 0, _g1 = this._masterBars;
-		while(_g < _g1.length) {
-			var masterBar = _g1[_g];
-			++_g;
-			this.score.addMasterBar(masterBar);
-		}
-		var $it4 = this._automations.keys();
-		while( $it4.hasNext() ) {
-			var barId = $it4.next();
-			var automations = this._automations.get(barId);
-			var bar = this._barsById.get(barId);
-			var _g = 0;
-			while(_g < automations.length) {
-				var automation = automations[_g];
-				++_g;
-				if(automation.type == alphatab.model.AutomationType.Tempo) {
-					if(barId == "0") {
-						this.score.tempo = automation.value | 0;
-						this.score.tempoLabel = automation.text;
-					}
-					bar.track.score.masterBars[bar.index].tempoAutomation = automation;
-				}
+		} else throw alphatab.importer.ScoreImporter.UnsupportedFormat;
+		this.buildModel();
+	}
+	,getValue: function(n) {
+		if(n.nodeType == Xml.Element || n.nodeType == Xml.Document) {
+			var txt = new StringBuf();
+			var $it0 = n.iterator();
+			while( $it0.hasNext() ) {
+				var c = $it0.next();
+				var x = this.getValue(c);
+				txt.b += Std.string(x);
+			}
+			return StringTools.trim(txt.b);
+		} else return n.get_nodeValue();
+	}
+	,findChildElement: function(node,name) {
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				if(c.get_nodeName() == name) return c;
 			}
 		}
+		return null;
 	}
-	,parseRhythm: function(node) {
-		var rhythm = new alphatab.importer.GpxRhythm();
-		var rhythmId = node.get("id");
+	,parseScoreNode: function(node) {
 		var $it0 = node.iterator();
 		while( $it0.hasNext() ) {
 			var c = $it0.next();
 			if(c.nodeType == Xml.Element) {
 				var _g = c.get_nodeName();
 				switch(_g) {
-				case "NoteValue":
-					var _g1 = this.getValue(c);
-					switch(_g1) {
-					case "Whole":
-						rhythm.value = alphatab.model.Duration.Whole;
-						break;
-					case "Half":
-						rhythm.value = alphatab.model.Duration.Half;
-						break;
-					case "Quarter":
-						rhythm.value = alphatab.model.Duration.Quarter;
-						break;
-					case "Eighth":
-						rhythm.value = alphatab.model.Duration.Eighth;
-						break;
-					case "16th":
-						rhythm.value = alphatab.model.Duration.Sixteenth;
-						break;
-					case "32nd":
-						rhythm.value = alphatab.model.Duration.ThirtySecond;
-						break;
-					case "64th":
-						rhythm.value = alphatab.model.Duration.SixtyFourth;
-						break;
+				case "Title":
+					this.score.title = this.getValue(c.firstChild());
+					break;
+				case "SubTitle":
+					this.score.subTitle = this.getValue(c.firstChild());
+					break;
+				case "Artist":
+					this.score.artist = this.getValue(c.firstChild());
+					break;
+				case "Album":
+					this.score.album = this.getValue(c.firstChild());
+					break;
+				case "Words":
+					this.score.words = this.getValue(c.firstChild());
+					break;
+				case "Music":
+					this.score.music = this.getValue(c.firstChild());
+					break;
+				case "WordsAndMusic":
+					if(c.firstChild() != null && c.firstChild().toString() != "") {
+						this.score.words = this.getValue(c.firstChild());
+						this.score.music = this.getValue(c.firstChild());
 					}
 					break;
-				case "PrimaryTuplet":
-					rhythm.tupletNumerator = Std.parseInt(c.get("num"));
-					rhythm.tupletDenominator = Std.parseInt(c.get("den"));
+				case "Copyright":
+					this.score.copyright = this.getValue(c.firstChild());
 					break;
-				case "AugmentationDot":
-					rhythm.dots = Std.parseInt(c.get("count"));
+				case "Tabber":
+					this.score.tab = this.getValue(c.firstChild());
 					break;
 				}
 			}
 		}
-		this._rhythmById.set(rhythmId,rhythm);
 	}
-	,parseRhythms: function(node) {
+	,parseMasterTrackNode: function(node) {
 		var $it0 = node.iterator();
 		while( $it0.hasNext() ) {
 			var c = $it0.next();
 			if(c.nodeType == Xml.Element) {
 				var _g = c.get_nodeName();
 				switch(_g) {
-				case "Rhythm":
-					this.parseRhythm(c);
+				case "Automations":
+					this.parseAutomations(c);
+					break;
+				case "Tracks":
+					this._tracksMapping = this.getValue(c).split(" ");
 					break;
 				}
 			}
 		}
 	}
-	,parseNoteProperties: function(node,note) {
-		var isBended = false;
-		var bendOrigin = null;
-		var bendMiddleValue = null;
-		var bendMiddleOffset1 = null;
-		var bendMiddleOffset2 = null;
-		var bendDestination = null;
+	,parseAutomations: function(node) {
 		var $it0 = node.iterator();
 		while( $it0.hasNext() ) {
 			var c = $it0.next();
 			if(c.nodeType == Xml.Element) {
 				var _g = c.get_nodeName();
 				switch(_g) {
-				case "Property":
-					var name = c.get("name");
-					switch(name) {
-					case "String":
-						note.string = Std.parseInt(this.getValue(this.findChildElement(c,"String"))) + 1;
-						break;
-					case "Fret":
-						note.fret = Std.parseInt(this.getValue(this.findChildElement(c,"Fret")));
-						break;
-					case "HarmonicType":
-						var htype = this.findChildElement(c,"HType");
-						if(htype != null) {
-							var _g1 = this.getValue(htype);
-							switch(_g1) {
-							case "NoHarmonic":
-								note.harmonicType = alphatab.model.HarmonicType.None;
-								break;
-							case "Natural":
-								note.harmonicType = alphatab.model.HarmonicType.Natural;
-								break;
-							case "Artificial":
-								note.harmonicType = alphatab.model.HarmonicType.Artificial;
-								break;
-							case "Pinch":
-								note.harmonicType = alphatab.model.HarmonicType.Pinch;
-								break;
-							case "Tap":
-								note.harmonicType = alphatab.model.HarmonicType.Tap;
-								break;
-							case "Semi":
-								note.harmonicType = alphatab.model.HarmonicType.Semi;
-								break;
-							case "Feedback":
-								note.harmonicType = alphatab.model.HarmonicType.Feedback;
-								break;
-							}
-						}
-						break;
-					case "HarmonicFret":
-						var hfret = this.findChildElement(c,"HFret");
-						if(hfret != null) note.harmonicValue = Std.parseFloat(this.getValue(hfret));
-						break;
-					case "PalmMuted":
-						if(this.findChildElement(c,"Enable") != null) note.isPalmMute = true;
-						break;
-					case "Octave":
-						note.octave = Std.parseInt(this.getValue(this.findChildElement(c,"Number")));
-						break;
-					case "Bended":
-						isBended = true;
-						break;
-					case "BendOriginValue":
-						if(bendOrigin == null) bendOrigin = new alphatab.model.BendPoint();
-						bendOrigin.value = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.04 | 0;
-						break;
-					case "BendOriginOffset":
-						if(bendOrigin == null) bendOrigin = new alphatab.model.BendPoint();
-						bendOrigin.offset = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.6 | 0;
-						break;
-					case "BendMiddleValue":
-						bendMiddleValue = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.04 | 0;
-						break;
-					case "BendMiddleOffset1":
-						bendMiddleOffset1 = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.6 | 0;
-						break;
-					case "BendMiddleOffset2":
-						bendMiddleOffset2 = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.6 | 0;
-						break;
-					case "BendDestinationValue":
-						if(bendDestination == null) bendDestination = new alphatab.model.BendPoint(60);
-						bendDestination.value = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.04 | 0;
-						break;
-					case "BendDestinationOffset":
-						if(bendDestination == null) bendDestination = new alphatab.model.BendPoint();
-						bendDestination.offset = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.6 | 0;
-						break;
-					case "HopoOrigin":
-						if(this.findChildElement(c,"Enable") != null) note.isHammerPullOrigin = true;
-						break;
-					case "HopoDestination":
-						break;
-					case "Slide":
-						var slideFlags = Std.parseInt(this.getValue(this.findChildElement(c,"Flags")));
-						if((slideFlags & 1) != 0) note.slideType = alphatab.model.SlideType.Shift;
-						if((slideFlags & 2) != 0) note.slideType = alphatab.model.SlideType.Legato;
-						if((slideFlags & 4) != 0) note.slideType = alphatab.model.SlideType.OutDown;
-						if((slideFlags & 8) != 0) note.slideType = alphatab.model.SlideType.OutUp;
-						if((slideFlags & 16) != 0) note.slideType = alphatab.model.SlideType.IntoFromBelow;
-						if((slideFlags & 32) != 0) note.slideType = alphatab.model.SlideType.IntoFromAbove;
-						break;
-					}
-					break;
-				}
-			}
-		}
-		if(isBended) {
-			if(bendOrigin == null) bendOrigin = new alphatab.model.BendPoint();
-			if(bendDestination == null) bendDestination = new alphatab.model.BendPoint(60);
-			var bend = new Array();
-			bend.push(bendOrigin);
-			if(bendMiddleOffset1 != null && bendMiddleValue != null) bend.push(new alphatab.model.BendPoint(bendMiddleOffset1,bendMiddleValue));
-			if(bendMiddleOffset2 != null && bendMiddleValue != null) bend.push(new alphatab.model.BendPoint(bendMiddleOffset2,bendMiddleValue));
-			if(bendMiddleOffset1 == null && bendMiddleOffset2 == null && bendMiddleValue != null) bend.push(new alphatab.model.BendPoint(30,bendMiddleValue));
-			bend.push(bendDestination);
-			note.bendPoints = bend;
-		}
-	}
-	,parseNote: function(node) {
-		var note = new alphatab.model.Note();
-		var noteId = node.get("id");
-		var $it0 = node.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
-			if(c.nodeType == Xml.Element) {
-				var _g = c.get_nodeName();
-				switch(_g) {
-				case "Properties":
-					this.parseNoteProperties(c,note);
-					break;
-				case "AntiAccent":
-					if(this.getValue(c).toLowerCase() == "normal") note.isGhost = true;
-					break;
-				case "LetRing":
-					note.isLetRing = true;
-					break;
-				case "Trill":
-					note.trillFret = Std.parseInt(this.getValue(c));
-					note.trillSpeed = 1;
-					break;
-				case "Accent":
-					var accentFlags = Std.parseInt(this.getValue(c));
-					if((accentFlags & 1) != 0) note.isStaccato = true;
-					if((accentFlags & 4) != 0) note.accentuated = alphatab.model.AccentuationType.Heavy;
-					if((accentFlags & 8) != 0) note.accentuated = alphatab.model.AccentuationType.Normal;
-					break;
-				case "Tie":
-					if(c.get("origin").toLowerCase() == "true") note.isTieOrigin = true;
-					if(c.get("destination").toLowerCase() == "true") note.isTieDestination = true;
-					break;
-				case "Vibrato":
-					var _g1 = this.getValue(c);
-					switch(_g1) {
-					case "Slight":
-						note.vibrato = alphatab.model.VibratoType.Slight;
-						break;
-					case "Wide":
-						note.vibrato = alphatab.model.VibratoType.Wide;
-						break;
-					}
-					break;
-				}
-			}
-		}
-		this._noteById.set(noteId,note);
-	}
-	,parseNotes: function(node) {
-		var $it0 = node.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
-			if(c.nodeType == Xml.Element) {
-				var _g = c.get_nodeName();
-				switch(_g) {
-				case "Note":
-					this.parseNote(c);
-					break;
-				}
-			}
-		}
-	}
-	,parseBeatProperties: function(node,beat) {
-		var isWhammy = false;
-		var whammyOrigin = null;
-		var whammyMiddleValue = null;
-		var whammyMiddleOffset1 = null;
-		var whammyMiddleOffset2 = null;
-		var whammyDestination = null;
-		var $it0 = node.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
-			if(c.nodeType == Xml.Element) {
-				var _g = c.get_nodeName();
-				switch(_g) {
-				case "Property":
-					var name = c.get("name");
-					switch(name) {
-					case "Brush":
-						if(this.getValue(this.findChildElement(c,"Direction")) == "Up") beat.brushType = alphatab.model.BrushType.BrushUp; else beat.brushType = alphatab.model.BrushType.BrushDown;
-						break;
-					case "PickStroke":
-						if(this.getValue(this.findChildElement(c,"Direction")) == "Up") beat.pickStroke = alphatab.model.PickStrokeType.Up; else beat.pickStroke = alphatab.model.PickStrokeType.Down;
-						break;
-					case "Slapped":
-						if(this.findChildElement(c,"Enable") != null) beat.slap = true;
-						break;
-					case "Popped":
-						if(this.findChildElement(c,"Enable") != null) beat.pop = true;
-						break;
-					case "VibratoWTremBar":
-						var _g1 = this.getValue(this.findChildElement(c,"Strength"));
-						switch(_g1) {
-						case "Wide":
-							beat.vibrato = alphatab.model.VibratoType.Wide;
-							break;
-						case "Slight":
-							beat.vibrato = alphatab.model.VibratoType.Slight;
-							break;
-						}
-						break;
-					case "WhammyBar":
-						isWhammy = true;
-						break;
-					case "WhammyBarExtend":
-						break;
-					case "WhammyBarOriginValue":
-						if(whammyOrigin == null) whammyOrigin = new alphatab.model.BendPoint();
-						whammyOrigin.value = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.04 | 0;
-						break;
-					case "WhammyBarOriginOffset":
-						if(whammyOrigin == null) whammyOrigin = new alphatab.model.BendPoint();
-						whammyOrigin.offset = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.6 | 0;
-						break;
-					case "WhammyBarMiddleValue":
-						whammyMiddleValue = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.04 | 0;
-						break;
-					case "WhammyBarMiddleOffset1":
-						whammyMiddleOffset1 = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.6 | 0;
-						break;
-					case "WhammyBarMiddleOffset2":
-						whammyMiddleOffset2 = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.6 | 0;
-						break;
-					case "WhammyBarDestinationValue":
-						if(whammyDestination == null) whammyDestination = new alphatab.model.BendPoint(60);
-						whammyDestination.value = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.04 | 0;
-						break;
-					case "WhammyBarDestinationOffset":
-						if(whammyDestination == null) whammyDestination = new alphatab.model.BendPoint();
-						whammyDestination.offset = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.6 | 0;
-						break;
-					}
-					break;
-				}
-			}
-		}
-		if(isWhammy) {
-			if(whammyOrigin == null) whammyOrigin = new alphatab.model.BendPoint();
-			if(whammyDestination == null) whammyDestination = new alphatab.model.BendPoint(60);
-			var whammy = new Array();
-			whammy.push(whammyOrigin);
-			if(whammyMiddleOffset1 != null && whammyMiddleValue != null) whammy.push(new alphatab.model.BendPoint(whammyMiddleOffset1,whammyMiddleValue));
-			if(whammyMiddleOffset2 != null && whammyMiddleValue != null) whammy.push(new alphatab.model.BendPoint(whammyMiddleOffset2,whammyMiddleValue));
-			if(whammyMiddleOffset1 == null && whammyMiddleOffset2 == null && whammyMiddleValue != null) whammy.push(new alphatab.model.BendPoint(30,whammyMiddleValue));
-			whammy.push(whammyDestination);
-			beat.whammyBarPoints = whammy;
-		}
-	}
-	,parseBeat: function(node) {
-		var beat = new alphatab.model.Beat();
-		var beatId = node.get("id");
-		var $it0 = node.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
-			if(c.nodeType == Xml.Element) {
-				var _g = c.get_nodeName();
-				switch(_g) {
-				case "Notes":
-					this._notesOfBeat.set(beatId,this.getValue(c).split(" "));
-					break;
-				case "Rhythm":
-					this._rhythmOfBeat.set(beatId,c.get("ref"));
-					break;
-				case "Fadding":
-					if(this.getValue(c) == "FadeIn") beat.fadeIn = true;
-					break;
-				case "Tremolo":
-					var _g1 = this.getValue(c);
-					switch(_g1) {
-					case "1/2":
-						beat.tremoloSpeed = alphatab.model.Duration.Eighth;
-						break;
-					case "1/4":
-						beat.tremoloSpeed = alphatab.model.Duration.Sixteenth;
-						break;
-					case "1/8":
-						beat.tremoloSpeed = alphatab.model.Duration.ThirtySecond;
-						break;
-					}
-					break;
-				case "Chord":
-					beat.chordId = this.getValue(c);
-					break;
-				case "Arpreggio":
-					if(this.getValue(c) == "Up") beat.brushType = alphatab.model.BrushType.ArpeggioUp; else beat.brushType = alphatab.model.BrushType.ArpeggioDown;
-					break;
-				case "Properties":
-					this.parseBeatProperties(c,beat);
-					break;
-				case "FreeText":
-					beat.text = this.getValue(c);
-					break;
-				case "Dynamic":
-					var _g1 = this.getValue(c);
-					switch(_g1) {
-					case "PPP":
-						beat.dynamicValue = alphatab.model.DynamicValue.PPP;
-						break;
-					case "PP":
-						beat.dynamicValue = alphatab.model.DynamicValue.PP;
-						break;
-					case "P":
-						beat.dynamicValue = alphatab.model.DynamicValue.P;
-						break;
-					case "MP":
-						beat.dynamicValue = alphatab.model.DynamicValue.MP;
-						break;
-					case "MF":
-						beat.dynamicValue = alphatab.model.DynamicValue.MF;
-						break;
-					case "F":
-						beat.dynamicValue = alphatab.model.DynamicValue.F;
-						break;
-					case "FF":
-						beat.dynamicValue = alphatab.model.DynamicValue.FF;
-						break;
-					case "FFF":
-						beat.dynamicValue = alphatab.model.DynamicValue.FFF;
-						break;
-					}
-					break;
-				case "GraceNotes":
-					var _g1 = this.getValue(c);
-					switch(_g1) {
-					case "OnBeat":
-						beat.graceType = alphatab.model.GraceType.OnBeat;
-						break;
-					case "BeforeBeat":
-						beat.graceType = alphatab.model.GraceType.BeforeBeat;
-						break;
-					}
-					break;
-				}
-			}
-		}
-		this._beatById.set(beatId,beat);
-	}
-	,parseBeats: function(node) {
-		var $it0 = node.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
-			if(c.nodeType == Xml.Element) {
-				var _g = c.get_nodeName();
-				switch(_g) {
-				case "Beat":
-					this.parseBeat(c);
-					break;
-				}
-			}
-		}
-	}
-	,parseVoice: function(node) {
-		var voice = new alphatab.model.Voice();
-		var voiceId = node.get("id");
-		var $it0 = node.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
-			if(c.nodeType == Xml.Element) {
-				var _g = c.get_nodeName();
-				switch(_g) {
-				case "Beats":
-					this._beatsOfVoice.set(voiceId,this.getValue(c).split(" "));
-					break;
-				}
-			}
-		}
-		this._voiceById.set(voiceId,voice);
-	}
-	,parseVoices: function(node) {
-		var $it0 = node.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
-			if(c.nodeType == Xml.Element) {
-				var _g = c.get_nodeName();
-				switch(_g) {
-				case "Voice":
-					this.parseVoice(c);
-					break;
-				}
-			}
-		}
-	}
-	,parseBar: function(node) {
-		var bar = new alphatab.model.Bar();
-		var barId = node.get("id");
-		var $it0 = node.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
-			if(c.nodeType == Xml.Element) {
-				var _g = c.get_nodeName();
-				switch(_g) {
-				case "Voices":
-					this._voicesOfBar.set(barId,this.getValue(c).split(" "));
-					break;
-				case "Clef":
-					var _g1 = this.getValue(c);
-					switch(_g1) {
-					case "Neutral":
-						bar.clef = alphatab.model.Clef.Neutral;
-						break;
-					case "G2":
-						bar.clef = alphatab.model.Clef.G2;
-						break;
-					case "F4":
-						bar.clef = alphatab.model.Clef.F4;
-						break;
-					case "C4":
-						bar.clef = alphatab.model.Clef.C4;
-						break;
-					case "C3":
-						bar.clef = alphatab.model.Clef.C3;
-						break;
-					}
-					break;
-				}
-			}
-		}
-		this._barsById.set(barId,bar);
-	}
-	,parseBars: function(node) {
-		var $it0 = node.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
-			if(c.nodeType == Xml.Element) {
-				var _g = c.get_nodeName();
-				switch(_g) {
-				case "Bar":
-					this.parseBar(c);
-					break;
-				}
-			}
-		}
-	}
-	,parseMasterBar: function(node) {
-		var masterBar = new alphatab.model.MasterBar();
-		var $it0 = node.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
-			if(c.nodeType == Xml.Element) {
-				var _g = c.get_nodeName();
-				switch(_g) {
-				case "Time":
-					var timeParts = this.getValue(c).split("/");
-					masterBar.timeSignatureNumerator = Std.parseInt(timeParts[0]);
-					masterBar.timeSignatureDenominator = Std.parseInt(timeParts[1]);
-					break;
-				case "DoubleBar":
-					masterBar.isDoubleBar = true;
-					break;
-				case "Section":
-					masterBar.section = new alphatab.model.Section();
-					masterBar.section.marker = this.getValue(this.findChildElement(c,"Letter"));
-					masterBar.section.text = this.getValue(this.findChildElement(c,"Text"));
-					break;
-				case "Repeat":
-					if(c.get("start").toLowerCase() == "true") masterBar.isRepeatStart = true;
-					if(c.get("end").toLowerCase() == "true" && c.get("count") != null) masterBar.repeatCount = Std.parseInt(c.get("count"));
-					break;
-				case "AlternateEndings":
-					var alternateEndings = this.getValue(c).split(" ");
-					var i = 0;
-					var _g2 = 0, _g1 = alternateEndings.length;
-					while(_g2 < _g1) {
-						var k = _g2++;
-						i |= 1 << -1 + Std.parseInt(alternateEndings[i]);
-					}
-					masterBar.alternateEndings = i;
-					break;
-				case "Bars":
-					this._barsOfMasterBar.push(this.getValue(c).split(" "));
-					break;
-				case "TripletFeel":
-					var _g1 = this.getValue(c);
-					switch(_g1) {
-					case "NoTripletFeel":
-						masterBar.tripletFeel = alphatab.model.TripletFeel.NoTripletFeel;
-						break;
-					case "Triplet8th":
-						masterBar.tripletFeel = alphatab.model.TripletFeel.Triplet8th;
-						break;
-					case "Triplet16th":
-						masterBar.tripletFeel = alphatab.model.TripletFeel.Triplet16th;
-						break;
-					case "Dotted8th":
-						masterBar.tripletFeel = alphatab.model.TripletFeel.Dotted8th;
-						break;
-					case "Dotted16th":
-						masterBar.tripletFeel = alphatab.model.TripletFeel.Dotted16th;
-						break;
-					case "Scottish8th":
-						masterBar.tripletFeel = alphatab.model.TripletFeel.Scottish8th;
-						break;
-					case "Scottish16th":
-						masterBar.tripletFeel = alphatab.model.TripletFeel.Scottish16th;
-						break;
-					}
-					break;
-				}
-			}
-		}
-		this._masterBars.push(masterBar);
-	}
-	,parseMasterBarsNode: function(node) {
-		var $it0 = node.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
-			if(c.nodeType == Xml.Element) {
-				var _g = c.get_nodeName();
-				switch(_g) {
-				case "MasterBar":
-					this.parseMasterBar(c);
-					break;
-				}
-			}
-		}
-	}
-	,parseGeneralMidi: function(track,node) {
-		track.playbackInfo.port = Std.parseInt(this.getValue(this.findChildElement(node,"Port")));
-		track.playbackInfo.program = Std.parseInt(this.getValue(this.findChildElement(node,"Program")));
-		track.playbackInfo.primaryChannel = Std.parseInt(this.getValue(this.findChildElement(node,"PrimaryChannel")));
-		track.playbackInfo.secondaryChannel = Std.parseInt(this.getValue(this.findChildElement(node,"SecondaryChannel")));
-		track.isPercussion = node.get("table") == "Percussion";
-	}
-	,parseTrackProperty: function(track,node) {
-		var propertyName = node.get("name");
-		switch(propertyName) {
-		case "Tuning":
-			var tuningParts = this.getValue(this.findChildElement(node,"Pitches")).split(" ");
-			var _g = 0;
-			while(_g < tuningParts.length) {
-				var s = tuningParts[_g];
-				++_g;
-				track.tuning.push(Std.parseInt(s));
-			}
-			track.tuning.reverse();
-			break;
-		case "DiagramCollection":
-			this.parseDiagramCollection(track,node);
-			break;
-		case "CapoFret":
-			track.capo = Std.parseInt(this.getValue(this.findChildElement(node,"Fret")));
-			break;
-		}
-	}
-	,parseTrackProperties: function(track,node) {
-		var $it0 = node.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
-			if(c.nodeType == Xml.Element) {
-				var _g = c.get_nodeName();
-				switch(_g) {
-				case "Property":
-					this.parseTrackProperty(track,c);
-					break;
-				}
-			}
-		}
-	}
-	,parseDiagramItem: function(track,node) {
-		var chord = new alphatab.model.Chord();
-		var chordId = node.get("id");
-		chord.name = node.get("name");
-		track.chords.set(chordId,chord);
-	}
-	,parseDiagramCollection: function(track,node) {
-		var items = this.findChildElement(node,"Items");
-		var $it0 = items.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
-			if(c.nodeType == Xml.Element) {
-				var _g = c.get_nodeName();
-				switch(_g) {
-				case "Item":
-					this.parseDiagramItem(track,c);
-					break;
-				}
-			}
-		}
-	}
-	,parseTrack: function(node) {
-		var track = new alphatab.model.Track();
-		var trackId = node.get("id");
-		var $it0 = node.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
-			if(c.nodeType == Xml.Element) {
-				var _g = c.get_nodeName();
-				switch(_g) {
-				case "Name":
-					track.name = this.getValue(c);
-					break;
-				case "ShortName":
-					track.shortName = this.getValue(c);
-					break;
-				case "Properties":
-					this.parseTrackProperties(track,c);
-					break;
-				case "GeneralMidi":
-					this.parseGeneralMidi(track,c);
-					break;
-				case "PlaybackState":
-					var state = this.getValue(c);
-					track.playbackInfo.isSolo = state == "Solo";
-					track.playbackInfo.isMute = state == "Mute";
-					break;
-				}
-			}
-		}
-		this._tracksById.set(trackId,track);
-	}
-	,parseTracksNode: function(node) {
-		var $it0 = node.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
-			if(c.nodeType == Xml.Element) {
-				var _g = c.get_nodeName();
-				switch(_g) {
-				case "Track":
-					this.parseTrack(c);
+				case "Automation":
+					this.parseAutomation(c);
 					break;
 				}
 			}
@@ -5073,162 +4639,858 @@ alphatab.importer.GpxParser.prototype = {
 			this._automations.get(barId).push(automation);
 		}
 	}
-	,parseAutomations: function(node) {
+	,parseTracksNode: function(node) {
 		var $it0 = node.iterator();
 		while( $it0.hasNext() ) {
 			var c = $it0.next();
 			if(c.nodeType == Xml.Element) {
 				var _g = c.get_nodeName();
 				switch(_g) {
-				case "Automation":
-					this.parseAutomation(c);
+				case "Track":
+					this.parseTrack(c);
 					break;
 				}
 			}
 		}
 	}
-	,parseMasterTrackNode: function(node) {
+	,parseTrack: function(node) {
+		var track = new alphatab.model.Track();
+		var trackId = node.get("id");
 		var $it0 = node.iterator();
 		while( $it0.hasNext() ) {
 			var c = $it0.next();
 			if(c.nodeType == Xml.Element) {
 				var _g = c.get_nodeName();
 				switch(_g) {
-				case "Automations":
-					this.parseAutomations(c);
+				case "Name":
+					track.name = this.getValue(c);
 					break;
-				case "Tracks":
-					this._tracksMapping = this.getValue(c).split(" ");
+				case "ShortName":
+					track.shortName = this.getValue(c);
+					break;
+				case "Properties":
+					this.parseTrackProperties(track,c);
+					break;
+				case "GeneralMidi":
+					this.parseGeneralMidi(track,c);
+					break;
+				case "PlaybackState":
+					var state = this.getValue(c);
+					track.playbackInfo.isSolo = state == "Solo";
+					track.playbackInfo.isMute = state == "Mute";
+					break;
+				}
+			}
+		}
+		this._tracksById.set(trackId,track);
+	}
+	,parseDiagramCollection: function(track,node) {
+		var items = this.findChildElement(node,"Items");
+		var $it0 = items.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Item":
+					this.parseDiagramItem(track,c);
 					break;
 				}
 			}
 		}
 	}
-	,parseScoreNode: function(node) {
+	,parseDiagramItem: function(track,node) {
+		var chord = new alphatab.model.Chord();
+		var chordId = node.get("id");
+		chord.name = node.get("name");
+		track.chords.set(chordId,chord);
+	}
+	,parseTrackProperties: function(track,node) {
 		var $it0 = node.iterator();
 		while( $it0.hasNext() ) {
 			var c = $it0.next();
 			if(c.nodeType == Xml.Element) {
 				var _g = c.get_nodeName();
 				switch(_g) {
-				case "Title":
-					this.score.title = this.getValue(c.firstChild());
+				case "Property":
+					this.parseTrackProperty(track,c);
 					break;
-				case "SubTitle":
-					this.score.subTitle = this.getValue(c.firstChild());
+				}
+			}
+		}
+	}
+	,parseTrackProperty: function(track,node) {
+		var propertyName = node.get("name");
+		switch(propertyName) {
+		case "Tuning":
+			var tuningParts = this.getValue(this.findChildElement(node,"Pitches")).split(" ");
+			var _g = 0;
+			while(_g < tuningParts.length) {
+				var s = tuningParts[_g];
+				++_g;
+				track.tuning.push(Std.parseInt(s));
+			}
+			track.tuning.reverse();
+			break;
+		case "DiagramCollection":
+			this.parseDiagramCollection(track,node);
+			break;
+		case "CapoFret":
+			track.capo = Std.parseInt(this.getValue(this.findChildElement(node,"Fret")));
+			break;
+		}
+	}
+	,parseGeneralMidi: function(track,node) {
+		track.playbackInfo.port = Std.parseInt(this.getValue(this.findChildElement(node,"Port")));
+		track.playbackInfo.program = Std.parseInt(this.getValue(this.findChildElement(node,"Program")));
+		track.playbackInfo.primaryChannel = Std.parseInt(this.getValue(this.findChildElement(node,"PrimaryChannel")));
+		track.playbackInfo.secondaryChannel = Std.parseInt(this.getValue(this.findChildElement(node,"SecondaryChannel")));
+		track.isPercussion = node.get("table") == "Percussion";
+	}
+	,parseMasterBarsNode: function(node) {
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "MasterBar":
+					this.parseMasterBar(c);
 					break;
-				case "Artist":
-					this.score.artist = this.getValue(c.firstChild());
+				}
+			}
+		}
+	}
+	,parseMasterBar: function(node) {
+		var masterBar = new alphatab.model.MasterBar();
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Time":
+					var timeParts = this.getValue(c).split("/");
+					masterBar.timeSignatureNumerator = Std.parseInt(timeParts[0]);
+					masterBar.timeSignatureDenominator = Std.parseInt(timeParts[1]);
 					break;
-				case "Album":
-					this.score.album = this.getValue(c.firstChild());
+				case "DoubleBar":
+					masterBar.isDoubleBar = true;
 					break;
-				case "Words":
-					this.score.words = this.getValue(c.firstChild());
+				case "Section":
+					masterBar.section = new alphatab.model.Section();
+					masterBar.section.marker = this.getValue(this.findChildElement(c,"Letter"));
+					masterBar.section.text = this.getValue(this.findChildElement(c,"Text"));
 					break;
-				case "Music":
-					this.score.music = this.getValue(c.firstChild());
+				case "Repeat":
+					if(c.get("start").toLowerCase() == "true") masterBar.isRepeatStart = true;
+					if(c.get("end").toLowerCase() == "true" && c.get("count") != null) masterBar.repeatCount = Std.parseInt(c.get("count"));
 					break;
-				case "WordsAndMusic":
-					if(c.firstChild() != null && c.firstChild().toString() != "") {
-						this.score.words = this.getValue(c.firstChild());
-						this.score.music = this.getValue(c.firstChild());
+				case "AlternateEndings":
+					var alternateEndings = this.getValue(c).split(" ");
+					var i = 0;
+					var _g2 = 0;
+					var _g1 = alternateEndings.length;
+					while(_g2 < _g1) {
+						var k = _g2++;
+						i |= 1 << -1 + Std.parseInt(alternateEndings[i]);
+					}
+					masterBar.alternateEndings = i;
+					break;
+				case "Bars":
+					this._barsOfMasterBar.push(this.getValue(c).split(" "));
+					break;
+				case "TripletFeel":
+					var _g1 = this.getValue(c);
+					switch(_g1) {
+					case "NoTripletFeel":
+						masterBar.tripletFeel = alphatab.model.TripletFeel.NoTripletFeel;
+						break;
+					case "Triplet8th":
+						masterBar.tripletFeel = alphatab.model.TripletFeel.Triplet8th;
+						break;
+					case "Triplet16th":
+						masterBar.tripletFeel = alphatab.model.TripletFeel.Triplet16th;
+						break;
+					case "Dotted8th":
+						masterBar.tripletFeel = alphatab.model.TripletFeel.Dotted8th;
+						break;
+					case "Dotted16th":
+						masterBar.tripletFeel = alphatab.model.TripletFeel.Dotted16th;
+						break;
+					case "Scottish8th":
+						masterBar.tripletFeel = alphatab.model.TripletFeel.Scottish8th;
+						break;
+					case "Scottish16th":
+						masterBar.tripletFeel = alphatab.model.TripletFeel.Scottish16th;
+						break;
 					}
 					break;
-				case "Copyright":
-					this.score.copyright = this.getValue(c.firstChild());
-					break;
-				case "Tabber":
-					this.score.tab = this.getValue(c.firstChild());
-					break;
 				}
 			}
 		}
+		this._masterBars.push(masterBar);
 	}
-	,findChildElement: function(node,name) {
+	,parseBars: function(node) {
 		var $it0 = node.iterator();
 		while( $it0.hasNext() ) {
 			var c = $it0.next();
 			if(c.nodeType == Xml.Element) {
-				if(c.get_nodeName() == name) return c;
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Bar":
+					this.parseBar(c);
+					break;
+				}
 			}
 		}
-		return null;
 	}
-	,getValue: function(n) {
-		if(n.nodeType == Xml.Element || n.nodeType == Xml.Document) {
-			var txt = new StringBuf();
-			var $it0 = n.iterator();
-			while( $it0.hasNext() ) {
-				var c = $it0.next();
-				txt.b += Std.string(this.getValue(c));
+	,parseBar: function(node) {
+		var bar = new alphatab.model.Bar();
+		var barId = node.get("id");
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Voices":
+					this._voicesOfBar.set(barId,this.getValue(c).split(" "));
+					break;
+				case "Clef":
+					var _g1 = this.getValue(c);
+					switch(_g1) {
+					case "Neutral":
+						bar.clef = alphatab.model.Clef.Neutral;
+						break;
+					case "G2":
+						bar.clef = alphatab.model.Clef.G2;
+						break;
+					case "F4":
+						bar.clef = alphatab.model.Clef.F4;
+						break;
+					case "C4":
+						bar.clef = alphatab.model.Clef.C4;
+						break;
+					case "C3":
+						bar.clef = alphatab.model.Clef.C3;
+						break;
+					}
+					break;
+				}
 			}
-			return StringTools.trim(txt.b);
-		} else return n.get_nodeValue();
+		}
+		this._barsById.set(barId,bar);
 	}
-	,parseDom: function(xml) {
-		if(xml.nodeType == Xml.Document) xml = xml.firstElement();
-		if(xml.get_nodeName() == "GPIF") {
-			this.score = new alphatab.model.Score();
-			var $it0 = xml.iterator();
-			while( $it0.hasNext() ) {
-				var n = $it0.next();
-				if(n.nodeType == Xml.Element) {
-					var _g = n.get_nodeName();
-					switch(_g) {
-					case "Score":
-						this.parseScoreNode(n);
+	,parseVoices: function(node) {
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Voice":
+					this.parseVoice(c);
+					break;
+				}
+			}
+		}
+	}
+	,parseVoice: function(node) {
+		var voice = new alphatab.model.Voice();
+		var voiceId = node.get("id");
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Beats":
+					this._beatsOfVoice.set(voiceId,this.getValue(c).split(" "));
+					break;
+				}
+			}
+		}
+		this._voiceById.set(voiceId,voice);
+	}
+	,parseBeats: function(node) {
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Beat":
+					this.parseBeat(c);
+					break;
+				}
+			}
+		}
+	}
+	,parseBeat: function(node) {
+		var beat = new alphatab.model.Beat();
+		var beatId = node.get("id");
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Notes":
+					this._notesOfBeat.set(beatId,this.getValue(c).split(" "));
+					break;
+				case "Rhythm":
+					this._rhythmOfBeat.set(beatId,c.get("ref"));
+					break;
+				case "Fadding":
+					if(this.getValue(c) == "FadeIn") beat.fadeIn = true;
+					break;
+				case "Tremolo":
+					var _g1 = this.getValue(c);
+					switch(_g1) {
+					case "1/2":
+						beat.tremoloSpeed = alphatab.model.Duration.Eighth;
 						break;
-					case "MasterTrack":
-						this.parseMasterTrackNode(n);
+					case "1/4":
+						beat.tremoloSpeed = alphatab.model.Duration.Sixteenth;
 						break;
-					case "Tracks":
-						this.parseTracksNode(n);
+					case "1/8":
+						beat.tremoloSpeed = alphatab.model.Duration.ThirtySecond;
 						break;
-					case "MasterBars":
-						this.parseMasterBarsNode(n);
+					}
+					break;
+				case "Chord":
+					beat.chordId = this.getValue(c);
+					break;
+				case "Hairpin":
+					var _g1 = this.getValue(c);
+					switch(_g1) {
+					case "Crescendo":
+						beat.crescendo = alphatab.rendering.glyphs.CrescendoType.Crescendo;
 						break;
-					case "Bars":
-						this.parseBars(n);
+					case "Decrescendo":
+						beat.crescendo = alphatab.rendering.glyphs.CrescendoType.Decrescendo;
 						break;
-					case "Voices":
-						this.parseVoices(n);
+					}
+					break;
+				case "Arpeggio":
+					if(this.getValue(c) == "Up") beat.brushType = alphatab.model.BrushType.ArpeggioUp; else beat.brushType = alphatab.model.BrushType.ArpeggioDown;
+					break;
+				case "Properties":
+					this.parseBeatProperties(c,beat);
+					break;
+				case "FreeText":
+					beat.text = this.getValue(c);
+					break;
+				case "Dynamic":
+					var _g1 = this.getValue(c);
+					switch(_g1) {
+					case "PPP":
+						beat.dynamicValue = alphatab.model.DynamicValue.PPP;
 						break;
-					case "Beats":
-						this.parseBeats(n);
+					case "PP":
+						beat.dynamicValue = alphatab.model.DynamicValue.PP;
 						break;
-					case "Notes":
-						this.parseNotes(n);
+					case "P":
+						beat.dynamicValue = alphatab.model.DynamicValue.P;
 						break;
-					case "Rhythms":
-						this.parseRhythms(n);
+					case "MP":
+						beat.dynamicValue = alphatab.model.DynamicValue.MP;
 						break;
+					case "MF":
+						beat.dynamicValue = alphatab.model.DynamicValue.MF;
+						break;
+					case "F":
+						beat.dynamicValue = alphatab.model.DynamicValue.F;
+						break;
+					case "FF":
+						beat.dynamicValue = alphatab.model.DynamicValue.FF;
+						break;
+					case "FFF":
+						beat.dynamicValue = alphatab.model.DynamicValue.FFF;
+						break;
+					}
+					break;
+				case "GraceNotes":
+					var _g1 = this.getValue(c);
+					switch(_g1) {
+					case "OnBeat":
+						beat.graceType = alphatab.model.GraceType.OnBeat;
+						break;
+					case "BeforeBeat":
+						beat.graceType = alphatab.model.GraceType.BeforeBeat;
+						break;
+					}
+					break;
+				}
+			}
+		}
+		this._beatById.set(beatId,beat);
+	}
+	,parseBeatProperties: function(node,beat) {
+		var isWhammy = false;
+		var whammyOrigin = null;
+		var whammyMiddleValue = null;
+		var whammyMiddleOffset1 = null;
+		var whammyMiddleOffset2 = null;
+		var whammyDestination = null;
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Property":
+					var name = c.get("name");
+					switch(name) {
+					case "Brush":
+						if(this.getValue(this.findChildElement(c,"Direction")) == "Up") beat.brushType = alphatab.model.BrushType.BrushUp; else beat.brushType = alphatab.model.BrushType.BrushDown;
+						break;
+					case "PickStroke":
+						if(this.getValue(this.findChildElement(c,"Direction")) == "Up") beat.pickStroke = alphatab.model.PickStrokeType.Up; else beat.pickStroke = alphatab.model.PickStrokeType.Down;
+						break;
+					case "Slapped":
+						if(this.findChildElement(c,"Enable") != null) beat.slap = true;
+						break;
+					case "Popped":
+						if(this.findChildElement(c,"Enable") != null) beat.pop = true;
+						break;
+					case "VibratoWTremBar":
+						var _g1 = this.getValue(this.findChildElement(c,"Strength"));
+						switch(_g1) {
+						case "Wide":
+							beat.vibrato = alphatab.model.VibratoType.Wide;
+							break;
+						case "Slight":
+							beat.vibrato = alphatab.model.VibratoType.Slight;
+							break;
+						}
+						break;
+					case "WhammyBar":
+						isWhammy = true;
+						break;
+					case "WhammyBarExtend":
+						break;
+					case "WhammyBarOriginValue":
+						if(whammyOrigin == null) whammyOrigin = new alphatab.model.BendPoint();
+						var x = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.04;
+						whammyOrigin.value = x | 0;
+						break;
+					case "WhammyBarOriginOffset":
+						if(whammyOrigin == null) whammyOrigin = new alphatab.model.BendPoint();
+						var x = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.6;
+						whammyOrigin.offset = x | 0;
+						break;
+					case "WhammyBarMiddleValue":
+						var x = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.04;
+						whammyMiddleValue = x | 0;
+						break;
+					case "WhammyBarMiddleOffset1":
+						var x = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.6;
+						whammyMiddleOffset1 = x | 0;
+						break;
+					case "WhammyBarMiddleOffset2":
+						var x = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.6;
+						whammyMiddleOffset2 = x | 0;
+						break;
+					case "WhammyBarDestinationValue":
+						if(whammyDestination == null) whammyDestination = new alphatab.model.BendPoint(60);
+						var x = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.04;
+						whammyDestination.value = x | 0;
+						break;
+					case "WhammyBarDestinationOffset":
+						if(whammyDestination == null) whammyDestination = new alphatab.model.BendPoint();
+						var x = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.6;
+						whammyDestination.offset = x | 0;
+						break;
+					}
+					break;
+				}
+			}
+		}
+		if(isWhammy) {
+			if(whammyOrigin == null) whammyOrigin = new alphatab.model.BendPoint();
+			if(whammyDestination == null) whammyDestination = new alphatab.model.BendPoint(60);
+			var whammy = new Array();
+			whammy.push(whammyOrigin);
+			if(whammyMiddleOffset1 != null && whammyMiddleValue != null) whammy.push(new alphatab.model.BendPoint(whammyMiddleOffset1,whammyMiddleValue));
+			if(whammyMiddleOffset2 != null && whammyMiddleValue != null) whammy.push(new alphatab.model.BendPoint(whammyMiddleOffset2,whammyMiddleValue));
+			if(whammyMiddleOffset1 == null && whammyMiddleOffset2 == null && whammyMiddleValue != null) whammy.push(new alphatab.model.BendPoint(30,whammyMiddleValue));
+			whammy.push(whammyDestination);
+			beat.whammyBarPoints = whammy;
+		}
+	}
+	,parseNotes: function(node) {
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Note":
+					this.parseNote(c);
+					break;
+				}
+			}
+		}
+	}
+	,parseNote: function(node) {
+		var note = new alphatab.model.Note();
+		var noteId = node.get("id");
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Properties":
+					this.parseNoteProperties(c,note,noteId);
+					break;
+				case "AntiAccent":
+					if(this.getValue(c).toLowerCase() == "normal") note.isGhost = true;
+					break;
+				case "LetRing":
+					note.isLetRing = true;
+					break;
+				case "Trill":
+					note.trillValue = Std.parseInt(this.getValue(c));
+					note.trillSpeed = alphatab.model.Duration.Sixteenth;
+					break;
+				case "Accent":
+					var accentFlags = Std.parseInt(this.getValue(c));
+					if((accentFlags & 1) != 0) note.isStaccato = true;
+					if((accentFlags & 4) != 0) note.accentuated = alphatab.model.AccentuationType.Heavy;
+					if((accentFlags & 8) != 0) note.accentuated = alphatab.model.AccentuationType.Normal;
+					break;
+				case "Tie":
+					if(c.get("origin").toLowerCase() == "true") note.isTieOrigin = true;
+					if(c.get("destination").toLowerCase() == "true") note.isTieDestination = true;
+					break;
+				case "Vibrato":
+					var _g1 = this.getValue(c);
+					switch(_g1) {
+					case "Slight":
+						note.vibrato = alphatab.model.VibratoType.Slight;
+						break;
+					case "Wide":
+						note.vibrato = alphatab.model.VibratoType.Wide;
+						break;
+					}
+					break;
+				}
+			}
+		}
+		this._noteById.set(noteId,note);
+	}
+	,parseNoteProperties: function(node,note,noteId) {
+		var isBended = false;
+		var bendOrigin = null;
+		var bendMiddleValue = null;
+		var bendMiddleOffset1 = null;
+		var bendMiddleOffset2 = null;
+		var bendDestination = null;
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Property":
+					var name = c.get("name");
+					switch(name) {
+					case "String":
+						note.string = Std.parseInt(this.getValue(this.findChildElement(c,"String"))) + 1;
+						break;
+					case "Fret":
+						note.fret = Std.parseInt(this.getValue(this.findChildElement(c,"Fret")));
+						break;
+					case "Tapped":
+						this._tappedNotes.set(noteId,true);
+						break;
+					case "HarmonicType":
+						var htype = this.findChildElement(c,"HType");
+						if(htype != null) {
+							var _g1 = this.getValue(htype);
+							switch(_g1) {
+							case "NoHarmonic":
+								note.harmonicType = alphatab.model.HarmonicType.None;
+								break;
+							case "Natural":
+								note.harmonicType = alphatab.model.HarmonicType.Natural;
+								break;
+							case "Artificial":
+								note.harmonicType = alphatab.model.HarmonicType.Artificial;
+								break;
+							case "Pinch":
+								note.harmonicType = alphatab.model.HarmonicType.Pinch;
+								break;
+							case "Tap":
+								note.harmonicType = alphatab.model.HarmonicType.Tap;
+								break;
+							case "Semi":
+								note.harmonicType = alphatab.model.HarmonicType.Semi;
+								break;
+							case "Feedback":
+								note.harmonicType = alphatab.model.HarmonicType.Feedback;
+								break;
+							}
+						}
+						break;
+					case "HarmonicFret":
+						var hfret = this.findChildElement(c,"HFret");
+						if(hfret != null) note.harmonicValue = Std.parseFloat(this.getValue(hfret));
+						break;
+					case "PalmMuted":
+						if(this.findChildElement(c,"Enable") != null) note.isPalmMute = true;
+						break;
+					case "Octave":
+						note.octave = Std.parseInt(this.getValue(this.findChildElement(c,"Number")));
+						break;
+					case "Bended":
+						isBended = true;
+						break;
+					case "BendOriginValue":
+						if(bendOrigin == null) bendOrigin = new alphatab.model.BendPoint();
+						var x = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.04;
+						bendOrigin.value = x | 0;
+						break;
+					case "BendOriginOffset":
+						if(bendOrigin == null) bendOrigin = new alphatab.model.BendPoint();
+						var x = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.6;
+						bendOrigin.offset = x | 0;
+						break;
+					case "BendMiddleValue":
+						var x = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.04;
+						bendMiddleValue = x | 0;
+						break;
+					case "BendMiddleOffset1":
+						var x = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.6;
+						bendMiddleOffset1 = x | 0;
+						break;
+					case "BendMiddleOffset2":
+						var x = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.6;
+						bendMiddleOffset2 = x | 0;
+						break;
+					case "BendDestinationValue":
+						if(bendDestination == null) bendDestination = new alphatab.model.BendPoint(60);
+						var x = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.04;
+						bendDestination.value = x | 0;
+						break;
+					case "BendDestinationOffset":
+						if(bendDestination == null) bendDestination = new alphatab.model.BendPoint();
+						var x = Std.parseFloat(this.getValue(this.findChildElement(c,"Float"))) * 0.6;
+						bendDestination.offset = x | 0;
+						break;
+					case "HopoOrigin":
+						if(this.findChildElement(c,"Enable") != null) note.isHammerPullOrigin = true;
+						break;
+					case "HopoDestination":
+						break;
+					case "Slide":
+						var slideFlags = Std.parseInt(this.getValue(this.findChildElement(c,"Flags")));
+						if((slideFlags & 1) != 0) note.slideType = alphatab.model.SlideType.Shift;
+						if((slideFlags & 2) != 0) note.slideType = alphatab.model.SlideType.Legato;
+						if((slideFlags & 4) != 0) note.slideType = alphatab.model.SlideType.OutDown;
+						if((slideFlags & 8) != 0) note.slideType = alphatab.model.SlideType.OutUp;
+						if((slideFlags & 16) != 0) note.slideType = alphatab.model.SlideType.IntoFromBelow;
+						if((slideFlags & 32) != 0) note.slideType = alphatab.model.SlideType.IntoFromAbove;
+						break;
+					}
+					break;
+				}
+			}
+		}
+		if(isBended) {
+			if(bendOrigin == null) bendOrigin = new alphatab.model.BendPoint();
+			if(bendDestination == null) bendDestination = new alphatab.model.BendPoint(60);
+			var bend = new Array();
+			bend.push(bendOrigin);
+			if(bendMiddleOffset1 != null && bendMiddleValue != null) bend.push(new alphatab.model.BendPoint(bendMiddleOffset1,bendMiddleValue));
+			if(bendMiddleOffset2 != null && bendMiddleValue != null) bend.push(new alphatab.model.BendPoint(bendMiddleOffset2,bendMiddleValue));
+			if(bendMiddleOffset1 == null && bendMiddleOffset2 == null && bendMiddleValue != null) bend.push(new alphatab.model.BendPoint(30,bendMiddleValue));
+			bend.push(bendDestination);
+			note.bendPoints = bend;
+		}
+	}
+	,parseRhythms: function(node) {
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "Rhythm":
+					this.parseRhythm(c);
+					break;
+				}
+			}
+		}
+	}
+	,parseRhythm: function(node) {
+		var rhythm = new alphatab.importer.GpxRhythm();
+		var rhythmId = node.get("id");
+		var $it0 = node.iterator();
+		while( $it0.hasNext() ) {
+			var c = $it0.next();
+			if(c.nodeType == Xml.Element) {
+				var _g = c.get_nodeName();
+				switch(_g) {
+				case "NoteValue":
+					var _g1 = this.getValue(c);
+					switch(_g1) {
+					case "Whole":
+						rhythm.value = alphatab.model.Duration.Whole;
+						break;
+					case "Half":
+						rhythm.value = alphatab.model.Duration.Half;
+						break;
+					case "Quarter":
+						rhythm.value = alphatab.model.Duration.Quarter;
+						break;
+					case "Eighth":
+						rhythm.value = alphatab.model.Duration.Eighth;
+						break;
+					case "16th":
+						rhythm.value = alphatab.model.Duration.Sixteenth;
+						break;
+					case "32nd":
+						rhythm.value = alphatab.model.Duration.ThirtySecond;
+						break;
+					case "64th":
+						rhythm.value = alphatab.model.Duration.SixtyFourth;
+						break;
+					}
+					break;
+				case "PrimaryTuplet":
+					rhythm.tupletNumerator = Std.parseInt(c.get("num"));
+					rhythm.tupletDenominator = Std.parseInt(c.get("den"));
+					break;
+				case "AugmentationDot":
+					rhythm.dots = Std.parseInt(c.get("count"));
+					break;
+				}
+			}
+		}
+		this._rhythmById.set(rhythmId,rhythm);
+	}
+	,buildModel: function() {
+		var $it0 = this._beatById.keys();
+		while( $it0.hasNext() ) {
+			var beatId = $it0.next();
+			var beat = this._beatById.get(beatId);
+			var rhythmId = this._rhythmOfBeat.get(beatId);
+			var rhythm = this._rhythmById.get(rhythmId);
+			beat.duration = rhythm.value;
+			beat.dots = rhythm.dots;
+			beat.tupletNumerator = rhythm.tupletNumerator;
+			beat.tupletDenominator = rhythm.tupletDenominator;
+			if(this._notesOfBeat.exists(beatId)) {
+				var _g = 0;
+				var _g1 = this._notesOfBeat.get(beatId);
+				while(_g < _g1.length) {
+					var noteId = _g1[_g];
+					++_g;
+					if(noteId != "-1") {
+						beat.addNote(this._noteById.get(noteId));
+						if(this._tappedNotes.exists(noteId)) beat.tap = true;
 					}
 				}
 			}
-		} else throw alphatab.importer.ScoreImporter.UNSUPPORTED_FORMAT;
-		this.buildModel();
-	}
-	,parseXml: function(xml) {
-		this._automations = new haxe.ds.StringMap();
-		this._tracksMapping = new Array();
-		this._tracksById = new haxe.ds.StringMap();
-		this._masterBars = new Array();
-		this._barsOfMasterBar = new Array();
-		this._voicesOfBar = new haxe.ds.StringMap();
-		this._barsById = new haxe.ds.StringMap();
-		this._voiceById = new haxe.ds.StringMap();
-		this._beatsOfVoice = new haxe.ds.StringMap();
-		this._beatById = new haxe.ds.StringMap();
-		this._rhythmOfBeat = new haxe.ds.StringMap();
-		this._rhythmById = new haxe.ds.StringMap();
-		this._notesOfBeat = new haxe.ds.StringMap();
-		this._noteById = new haxe.ds.StringMap();
-		var dom = Xml.parse(xml);
-		this.parseDom(dom);
+		}
+		var $it1 = this._voiceById.keys();
+		while( $it1.hasNext() ) {
+			var voiceId = $it1.next();
+			var voice = this._voiceById.get(voiceId);
+			if(this._beatsOfVoice.exists(voiceId)) {
+				var _g = 0;
+				var _g1 = this._beatsOfVoice.get(voiceId);
+				while(_g < _g1.length) {
+					var beatId = _g1[_g];
+					++_g;
+					if(beatId != "-1") voice.addBeat(this._beatById.get(beatId).clone());
+				}
+			}
+		}
+		var $it2 = this._barsById.keys();
+		while( $it2.hasNext() ) {
+			var barId = $it2.next();
+			var bar = this._barsById.get(barId);
+			if(this._voicesOfBar.exists(barId)) {
+				var _g = 0;
+				var _g1 = this._voicesOfBar.get(barId);
+				while(_g < _g1.length) {
+					var voiceId = _g1[_g];
+					++_g;
+					if(voiceId != "-1") bar.addVoice(this._voiceById.get(voiceId));
+				}
+			}
+		}
+		var trackIndex = 0;
+		var _g = 0;
+		var _g1 = this._tracksMapping;
+		while(_g < _g1.length) {
+			var trackId = _g1[_g];
+			++_g;
+			var track = this._tracksById.get(trackId);
+			this.score.addTrack(track);
+			var _g2 = 0;
+			var _g3 = this._barsOfMasterBar;
+			while(_g2 < _g3.length) {
+				var barIds = _g3[_g2];
+				++_g2;
+				var barId = barIds[trackIndex];
+				if(barId != "-1") track.addBar(this._barsById.get(barId));
+			}
+			trackIndex++;
+		}
+		var $it3 = this._automations.keys();
+		while( $it3.hasNext() ) {
+			var barId = $it3.next();
+			var bar = this._barsById.get(barId);
+			var _g = 0;
+			var _g1 = bar.voices;
+			while(_g < _g1.length) {
+				var v = _g1[_g];
+				++_g;
+				if(v.beats.length > 0) {
+					var _g2 = 0;
+					var _g3 = this._automations.get(barId);
+					while(_g2 < _g3.length) {
+						var automation = _g3[_g2];
+						++_g2;
+						v.beats[0].automations.push(automation);
+					}
+				}
+			}
+		}
+		var _g = 0;
+		var _g1 = this._masterBars;
+		while(_g < _g1.length) {
+			var masterBar = _g1[_g];
+			++_g;
+			this.score.addMasterBar(masterBar);
+		}
+		var $it4 = this._automations.keys();
+		while( $it4.hasNext() ) {
+			var barId = $it4.next();
+			var automations = this._automations.get(barId);
+			var bar = this._barsById.get(barId);
+			var _g = 0;
+			while(_g < automations.length) {
+				var automation = automations[_g];
+				++_g;
+				if(automation.type == alphatab.model.AutomationType.Tempo) {
+					if(barId == "0") {
+						this.score.tempo = automation.value | 0;
+						this.score.tempoLabel = automation.text;
+					}
+					bar.track.score.masterBars[bar.index].tempoAutomation = automation;
+				}
+			}
+		}
 	}
 	,__class__: alphatab.importer.GpxParser
-}
+};
 alphatab.importer.MixTableChange = function() {
 	this.volume = -1;
 	this.balance = -1;
@@ -5241,34 +5503,23 @@ $hxClasses["alphatab.importer.MixTableChange"] = alphatab.importer.MixTableChang
 alphatab.importer.MixTableChange.__name__ = true;
 alphatab.importer.MixTableChange.prototype = {
 	__class__: alphatab.importer.MixTableChange
-}
-alphatab.importer.ScoreLoader = function() { }
+};
+alphatab.importer.ScoreLoader = function() { };
 $hxClasses["alphatab.importer.ScoreLoader"] = alphatab.importer.ScoreLoader;
 alphatab.importer.ScoreLoader.__name__ = true;
 alphatab.importer.ScoreLoader.loadScoreAsync = function(path,success,error) {
 	var loader = (alphatab.Environment.fileLoaders.get("default"))();
 	loader.loadBinaryAsync(path,function(data) {
-		var importers = alphatab.importer.ScoreImporter.availableImporters();
-		var score = null;
-		var _g = 0;
-		while(_g < importers.length) {
-			var importer = importers[_g];
-			++_g;
-			try {
-				var input = new haxe.io.BytesInput(data);
-				importer.init(input);
-				score = importer.readScore();
-				break;
-			} catch( e ) {
-				if(e == alphatab.importer.ScoreImporter.UNSUPPORTED_FORMAT) continue; else error(e);
-			}
+		try {
+			success(alphatab.importer.ScoreLoader.loadScoreFromBytes(data));
+		} catch( e ) {
+			if( js.Boot.__instanceof(e,String) ) {
+				error(e);
+			} else throw(e);
 		}
-		if(score != null) success(score); else error("No reader for the requested file found");
 	},error);
-}
-alphatab.importer.ScoreLoader.loadScore = function(path) {
-	var loader = (alphatab.Environment.fileLoaders.get("default"))();
-	var data = loader.loadBinary(path);
+};
+alphatab.importer.ScoreLoader.loadScoreFromBytes = function(data) {
 	var importers = alphatab.importer.ScoreImporter.availableImporters();
 	var score = null;
 	var _g = 0;
@@ -5281,66 +5532,23 @@ alphatab.importer.ScoreLoader.loadScore = function(path) {
 			score = importer.readScore();
 			break;
 		} catch( e ) {
-			if(e == alphatab.importer.ScoreImporter.UNSUPPORTED_FORMAT) continue; else throw e;
+			if(e == alphatab.importer.ScoreImporter.UnsupportedFormat) continue; else throw e;
 		}
 	}
 	if(score != null) return score; else throw "No reader for the requested file found";
-}
-haxe.io = {}
-haxe.io.Input = function() { }
+};
+alphatab.importer.ScoreLoader.loadScore = function(path) {
+	var loader = (alphatab.Environment.fileLoaders.get("default"))();
+	var data = loader.loadBinary(path);
+	return alphatab.importer.ScoreLoader.loadScoreFromBytes(data);
+};
+haxe.io = {};
+haxe.io.Input = function() { };
 $hxClasses["haxe.io.Input"] = haxe.io.Input;
 haxe.io.Input.__name__ = true;
 haxe.io.Input.prototype = {
-	readString: function(len) {
-		var b = haxe.io.Bytes.alloc(len);
-		this.readFullBytes(b,0,len);
-		return b.toString();
-	}
-	,readInt32: function() {
-		var ch1 = this.readByte();
-		var ch2 = this.readByte();
-		var ch3 = this.readByte();
-		var ch4 = this.readByte();
-		return this.bigEndian?ch4 | ch3 << 8 | ch2 << 16 | ch1 << 24:ch1 | ch2 << 8 | ch3 << 16 | ch4 << 24;
-	}
-	,readInt8: function() {
-		var n = this.readByte();
-		if(n >= 128) return n - 256;
-		return n;
-	}
-	,read: function(nbytes) {
-		var s = haxe.io.Bytes.alloc(nbytes);
-		var p = 0;
-		while(nbytes > 0) {
-			var k = this.readBytes(s,p,nbytes);
-			if(k == 0) throw haxe.io.Error.Blocked;
-			p += k;
-			nbytes -= k;
-		}
-		return s;
-	}
-	,readFullBytes: function(s,pos,len) {
-		while(len > 0) {
-			var k = this.readBytes(s,pos,len);
-			pos += k;
-			len -= k;
-		}
-	}
-	,readAll: function(bufsize) {
-		if(bufsize == null) bufsize = 16384;
-		var buf = haxe.io.Bytes.alloc(bufsize);
-		var total = new haxe.io.BytesBuffer();
-		try {
-			while(true) {
-				var len = this.readBytes(buf,0,bufsize);
-				if(len == 0) throw haxe.io.Error.Blocked;
-				total.addBytes(buf,0,len);
-			}
-		} catch( e ) {
-			if( js.Boot.__instanceof(e,haxe.io.Eof) ) {
-			} else throw(e);
-		}
-		return total.getBytes();
+	readByte: function() {
+		throw "Not implemented";
 	}
 	,readBytes: function(s,pos,len) {
 		var k = len;
@@ -5353,16 +5561,68 @@ haxe.io.Input.prototype = {
 		}
 		return len;
 	}
-	,readByte: function() {
-		return (function($this) {
-			var $r;
-			throw "Not implemented";
-			return $r;
-		}(this));
+	,readAll: function(bufsize) {
+		if(bufsize == null) bufsize = 16384;
+		var buf = haxe.io.Bytes.alloc(bufsize);
+		var total = new haxe.io.BytesBuffer();
+		try {
+			while(true) {
+				var len = this.readBytes(buf,0,bufsize);
+				if(len == 0) throw haxe.io.Error.Blocked;
+				if(len < 0 || len > buf.length) throw haxe.io.Error.OutsideBounds;
+				var b1 = total.b;
+				var b2 = buf.b;
+				var _g1 = 0;
+				var _g = len;
+				while(_g1 < _g) {
+					var i = _g1++;
+					total.b.push(b2[i]);
+				}
+			}
+		} catch( e ) {
+			if( js.Boot.__instanceof(e,haxe.io.Eof) ) {
+			} else throw(e);
+		}
+		return total.getBytes();
+	}
+	,readFullBytes: function(s,pos,len) {
+		while(len > 0) {
+			var k = this.readBytes(s,pos,len);
+			pos += k;
+			len -= k;
+		}
+	}
+	,read: function(nbytes) {
+		var s = haxe.io.Bytes.alloc(nbytes);
+		var p = 0;
+		while(nbytes > 0) {
+			var k = this.readBytes(s,p,nbytes);
+			if(k == 0) throw haxe.io.Error.Blocked;
+			p += k;
+			nbytes -= k;
+		}
+		return s;
+	}
+	,readInt8: function() {
+		var n = this.readByte();
+		if(n >= 128) return n - 256;
+		return n;
+	}
+	,readInt32: function() {
+		var ch1 = this.readByte();
+		var ch2 = this.readByte();
+		var ch3 = this.readByte();
+		var ch4 = this.readByte();
+		if(this.bigEndian) return ch4 | ch3 << 8 | ch2 << 16 | ch1 << 24; else return ch1 | ch2 << 8 | ch3 << 16 | ch4 << 24;
+	}
+	,readString: function(len) {
+		var b = haxe.io.Bytes.alloc(len);
+		this.readFullBytes(b,0,len);
+		return b.toString();
 	}
 	,__class__: haxe.io.Input
-}
-alphatab.io = {}
+};
+alphatab.io = {};
 alphatab.io.BitInput = function(input) {
 	this._input = input;
 	this._readBytes = 0;
@@ -5372,25 +5632,11 @@ $hxClasses["alphatab.io.BitInput"] = alphatab.io.BitInput;
 alphatab.io.BitInput.__name__ = true;
 alphatab.io.BitInput.__super__ = haxe.io.Input;
 alphatab.io.BitInput.prototype = $extend(haxe.io.Input.prototype,{
-	readBit: function() {
-		var bit = -1;
-		if(this._position >= 8) {
-			this._currentByte = this._input.readByte();
-			this._readBytes++;
-			this._position = 0;
-		}
-		var value = this._currentByte >> 8 - this._position - 1 & 1;
-		this._position++;
-		return value;
+	getReadBytes: function() {
+		return this._readBytes;
 	}
-	,readBitsReversed: function(count) {
-		var bits = 0;
-		var i = 0;
-		while(i < count) {
-			bits |= this.readBit() << i;
-			i++;
-		}
-		return bits;
+	,readByte: function() {
+		return this.readBits(8);
 	}
 	,readBits: function(count) {
 		var bits = 0;
@@ -5401,11 +5647,25 @@ alphatab.io.BitInput.prototype = $extend(haxe.io.Input.prototype,{
 		}
 		return bits;
 	}
-	,readByte: function() {
-		return this.readBits(8);
+	,readBitsReversed: function(count) {
+		var bits = 0;
+		var i = 0;
+		while(i < count) {
+			bits |= this.readBit() << i;
+			i++;
+		}
+		return bits;
 	}
-	,getReadBytes: function() {
-		return this._readBytes;
+	,readBit: function() {
+		var bit = -1;
+		if(this._position >= 8) {
+			this._currentByte = this._input.readByte();
+			this._readBytes++;
+			this._position = 0;
+		}
+		var value = this._currentByte >> 8 - this._position - 1 & 1;
+		this._position++;
+		return value;
 	}
 	,__class__: alphatab.io.BitInput
 });
@@ -5421,31 +5681,24 @@ alphatab.io.BytesArray.ofBytes = function(b) {
 	a._data = b;
 	a.length = a._data.length;
 	return a;
-}
+};
 alphatab.io.BytesArray.prototype = {
-	updateCapacity: function(min) {
-		if(min < 0) throw haxe.io.Error.Overflow;
-		if(this._data.length < min) {
-			var c = Math.max(this._data.length * 2,min) | 0;
-			this.setCapacity(c);
-		}
+	get: function(pos) {
+		if(pos >= this.length) throw haxe.io.Error.OutsideBounds;
+		return this._data.b[pos];
 	}
-	,setCapacity: function(capacity) {
-		var newData = haxe.io.Bytes.alloc(capacity);
-		newData.blit(0,this._data,0,this._data.length);
-		this._data = newData;
+	,set: function(pos,v) {
+		if(pos >= this.length) throw haxe.io.Error.OutsideBounds;
+		this._data.b[pos] = v & 255 & 255;
 	}
-	,get_capacity: function() {
-		return this._data.length;
+	,sub: function(pos,len) {
+		if(pos < 0 || len < 0 || pos + len > this.length) throw haxe.io.Error.OutsideBounds;
+		return this._data.sub(pos,len);
 	}
-	,getBytes: function(offset) {
-		if(offset == null) offset = 0;
-		var copy = haxe.io.Bytes.alloc(this.length);
-		copy.blit(0,this._data,offset,this.length - offset);
-		return copy;
-	}
-	,getBuffer: function() {
-		return this._data;
+	,add: function(v) {
+		this.updateCapacity(this.length + 1);
+		var pos = this.length++;
+		this._data.b[pos] = v & 255 & 255;
 	}
 	,addBytes: function(v) {
 		if(v.length > 0) {
@@ -5454,33 +5707,43 @@ alphatab.io.BytesArray.prototype = {
 			this.length += v.length;
 		}
 	}
-	,add: function(v) {
-		this.updateCapacity(this.length + 1);
-		this._data.b[this.length++] = v & 255 & 255;
+	,getBuffer: function() {
+		return this._data;
 	}
-	,sub: function(pos,len) {
-		if(pos < 0 || len < 0 || pos + len > this.length) throw haxe.io.Error.OutsideBounds;
-		return this._data.sub(pos,len);
+	,getBytes: function(offset) {
+		if(offset == null) offset = 0;
+		var copy = haxe.io.Bytes.alloc(this.length);
+		copy.blit(0,this._data,offset,this.length - offset);
+		return copy;
 	}
-	,set: function(pos,v) {
-		if(pos >= this.length) throw haxe.io.Error.OutsideBounds;
-		this._data.b[pos] = v & 255 & 255;
+	,get_capacity: function() {
+		return this._data.length;
 	}
-	,get: function(pos) {
-		if(pos >= this.length) throw haxe.io.Error.OutsideBounds;
-		return this._data.b[pos];
+	,setCapacity: function(capacity) {
+		var newData = haxe.io.Bytes.alloc(capacity);
+		newData.blit(0,this._data,0,this._data.length);
+		this._data = newData;
+	}
+	,updateCapacity: function(min) {
+		if(min < 0) throw haxe.io.Error.Overflow;
+		if(this._data.length < min) {
+			var c;
+			var x = Math.max(this._data.length * 2,min);
+			c = x | 0;
+			this.setCapacity(c);
+		}
 	}
 	,__class__: alphatab.io.BytesArray
-}
-alphatab.io.OutputExtensions = function() { }
+};
+alphatab.io.OutputExtensions = function() { };
 $hxClasses["alphatab.io.OutputExtensions"] = alphatab.io.OutputExtensions;
 alphatab.io.OutputExtensions.__name__ = true;
 alphatab.io.OutputExtensions.writeAsString = function(output,value) {
 	var text;
 	if(js.Boot.__instanceof(value,String)) text = js.Boot.__cast(value , String); else text = Std.string(value);
 	output.writeString(text);
-}
-alphatab.model.AccentuationType = $hxClasses["alphatab.model.AccentuationType"] = { __ename__ : true, __constructs__ : ["None","Normal","Heavy"] }
+};
+alphatab.model.AccentuationType = $hxClasses["alphatab.model.AccentuationType"] = { __ename__ : true, __constructs__ : ["None","Normal","Heavy"] };
 alphatab.model.AccentuationType.None = ["None",0];
 alphatab.model.AccentuationType.None.toString = $estr;
 alphatab.model.AccentuationType.None.__enum__ = alphatab.model.AccentuationType;
@@ -5490,7 +5753,7 @@ alphatab.model.AccentuationType.Normal.__enum__ = alphatab.model.AccentuationTyp
 alphatab.model.AccentuationType.Heavy = ["Heavy",2];
 alphatab.model.AccentuationType.Heavy.toString = $estr;
 alphatab.model.AccentuationType.Heavy.__enum__ = alphatab.model.AccentuationType;
-alphatab.model.AccidentalType = $hxClasses["alphatab.model.AccidentalType"] = { __ename__ : true, __constructs__ : ["None","Natural","Sharp","Flat"] }
+alphatab.model.AccidentalType = $hxClasses["alphatab.model.AccidentalType"] = { __ename__ : true, __constructs__ : ["None","Natural","Sharp","Flat"] };
 alphatab.model.AccidentalType.None = ["None",0];
 alphatab.model.AccidentalType.None.toString = $estr;
 alphatab.model.AccidentalType.None.__enum__ = alphatab.model.AccidentalType;
@@ -5517,7 +5780,7 @@ alphatab.model.Automation.builtTempoAutomation = function(isLinear,ratioPosition
 	var realValue = value * references[reference];
 	automation.value = realValue;
 	return automation;
-}
+};
 alphatab.model.Automation.prototype = {
 	clone: function() {
 		var a = new alphatab.model.Automation();
@@ -5527,8 +5790,8 @@ alphatab.model.Automation.prototype = {
 		return a;
 	}
 	,__class__: alphatab.model.Automation
-}
-alphatab.model.AutomationType = $hxClasses["alphatab.model.AutomationType"] = { __ename__ : true, __constructs__ : ["Tempo","Volume","Instrument","Balance"] }
+};
+alphatab.model.AutomationType = $hxClasses["alphatab.model.AutomationType"] = { __ename__ : true, __constructs__ : ["Tempo","Volume","Instrument","Balance"] };
 alphatab.model.AutomationType.Tempo = ["Tempo",0];
 alphatab.model.AutomationType.Tempo.toString = $estr;
 alphatab.model.AutomationType.Tempo.__enum__ = alphatab.model.AutomationType;
@@ -5548,8 +5811,17 @@ alphatab.model.Bar = function() {
 $hxClasses["alphatab.model.Bar"] = alphatab.model.Bar;
 alphatab.model.Bar.__name__ = true;
 alphatab.model.Bar.prototype = {
-	isEmpty: function() {
-		var _g = 0, _g1 = this.voices;
+	addVoice: function(voice) {
+		voice.bar = this;
+		voice.index = this.voices.length;
+		this.voices.push(voice);
+	}
+	,getMasterBar: function() {
+		return this.track.score.masterBars[this.index];
+	}
+	,isEmpty: function() {
+		var _g = 0;
+		var _g1 = this.voices;
 		while(_g < _g1.length) {
 			var v = _g1[_g];
 			++_g;
@@ -5557,16 +5829,8 @@ alphatab.model.Bar.prototype = {
 		}
 		return true;
 	}
-	,getMasterBar: function() {
-		return this.track.score.masterBars[this.index];
-	}
-	,addVoice: function(voice) {
-		voice.bar = this;
-		voice.index = this.voices.length;
-		this.voices.push(voice);
-	}
 	,__class__: alphatab.model.Bar
-}
+};
 alphatab.model.Beat = function() {
 	this.whammyBarPoints = new Array();
 	this.notes = new Array();
@@ -5581,59 +5845,45 @@ alphatab.model.Beat = function() {
 	this.tupletDenominator = -1;
 	this.tupletNumerator = -1;
 	this.dynamicValue = alphatab.model.DynamicValue.F;
+	this.crescendo = alphatab.rendering.glyphs.CrescendoType.None;
 };
 $hxClasses["alphatab.model.Beat"] = alphatab.model.Beat;
 alphatab.model.Beat.__name__ = true;
 alphatab.model.Beat.prototype = {
-	getNoteOnString: function(string) {
-		var _g = 0, _g1 = this.notes;
-		while(_g < _g1.length) {
-			var n = _g1[_g];
-			++_g;
-			if(n.string == string) return n;
-		}
-		return null;
+	minNote: function() {
+		if(this._minNote == null) this.refreshNotes();
+		return this._minNote;
 	}
-	,getAutomation: function(type) {
-		var _g = 0, _g1 = this.automations;
-		while(_g < _g1.length) {
-			var a = _g1[_g];
-			++_g;
-			if(a.type == type) return a;
-		}
-		return null;
+	,maxNote: function() {
+		if(this._maxNote == null) this.refreshNotes();
+		return this._maxNote;
 	}
-	,refreshNotes: function() {
-		var _g = 0, _g1 = this.notes;
-		while(_g < _g1.length) {
-			var n = _g1[_g];
-			++_g;
-			if(this._minNote == null || n.realValue() < this._minNote.realValue()) this._minNote = n;
-			if(this._maxNote == null || n.realValue() > this._maxNote.realValue()) this._maxNote = n;
-		}
+	,isRest: function() {
+		return this.notes.length == 0;
 	}
-	,addNote: function(note) {
-		note.beat = this;
-		this.notes.push(note);
+	,hasWhammyBar: function() {
+		return this.whammyBarPoints.length > 0;
 	}
-	,calculateDuration: function() {
-		var ticks = alphatab.audio.MidiUtils.durationToTicks(this.duration);
-		if(this.dots == 2) ticks = alphatab.audio.MidiUtils.applyDot(ticks,true); else if(this.dots == 1) ticks = alphatab.audio.MidiUtils.applyDot(ticks,false);
-		if(this.tupletDenominator > 0 && this.tupletNumerator >= 0) ticks = alphatab.audio.MidiUtils.applyTuplet(ticks,this.tupletNumerator,this.tupletDenominator);
-		return ticks;
+	,hasChord: function() {
+		return this.chordId != null;
 	}
-	,hasTuplet: function() {
-		return !(this.tupletDenominator == -1 && this.tupletNumerator == -1) && !(this.tupletDenominator == 1 && this.tupletNumerator == 1);
+	,chord: function() {
+		return this.voice.bar.track.chords.get(this.chordId);
+	}
+	,isTremolo: function() {
+		return this.tremoloSpeed != null;
 	}
 	,clone: function() {
 		var beat = new alphatab.model.Beat();
-		var _g = 0, _g1 = this.whammyBarPoints;
+		var _g = 0;
+		var _g1 = this.whammyBarPoints;
 		while(_g < _g1.length) {
 			var b = _g1[_g];
 			++_g;
 			beat.whammyBarPoints.push(b.clone());
 		}
-		var _g = 0, _g1 = this.notes;
+		var _g = 0;
+		var _g1 = this.notes;
 		while(_g < _g1.length) {
 			var n = _g1[_g];
 			++_g;
@@ -5651,7 +5901,8 @@ alphatab.model.Beat.prototype = {
 		beat.tap = this.tap;
 		beat.slap = this.slap;
 		beat.pop = this.pop;
-		var _g = 0, _g1 = this.automations;
+		var _g = 0;
+		var _g1 = this.automations;
 		while(_g < _g1.length) {
 			var a = _g1[_g];
 			++_g;
@@ -5661,33 +5912,64 @@ alphatab.model.Beat.prototype = {
 		beat.tupletDenominator = this.tupletDenominator;
 		beat.tupletNumerator = this.tupletNumerator;
 		beat.dynamicValue = this.dynamicValue;
+		beat.crescendo = this.crescendo;
 		return beat;
 	}
-	,isTremolo: function() {
-		return this.tremoloSpeed != null;
+	,hasTuplet: function() {
+		return !(this.tupletDenominator == -1 && this.tupletNumerator == -1) && !(this.tupletDenominator == 1 && this.tupletNumerator == 1);
 	}
-	,chord: function() {
-		return this.voice.bar.track.chords.get(this.chordId);
+	,calculateDuration: function() {
+		var ticks = alphatab.audio.MidiUtils.durationToTicks(this.duration);
+		if(this.dots == 2) ticks = alphatab.audio.MidiUtils.applyDot(ticks,true); else if(this.dots == 1) ticks = alphatab.audio.MidiUtils.applyDot(ticks,false);
+		if(this.tupletDenominator > 0 && this.tupletNumerator >= 0) ticks = alphatab.audio.MidiUtils.applyTuplet(ticks,this.tupletNumerator,this.tupletDenominator);
+		return ticks;
 	}
-	,hasChord: function() {
-		return this.chordId != null;
+	,addNote: function(note) {
+		note.beat = this;
+		this.notes.push(note);
 	}
-	,hasWhammyBar: function() {
-		return this.whammyBarPoints.length > 0;
+	,refreshNotes: function() {
+		var _g = 0;
+		var _g1 = this.notes;
+		while(_g < _g1.length) {
+			var n = _g1[_g];
+			++_g;
+			if(this._minNote == null || n.fret + n.beat.voice.bar.track.tuning[n.beat.voice.bar.track.tuning.length - (n.string - 1) - 1] < (function($this) {
+				var $r;
+				var _this = $this._minNote;
+				$r = _this.fret + _this.beat.voice.bar.track.tuning[_this.beat.voice.bar.track.tuning.length - (_this.string - 1) - 1];
+				return $r;
+			}(this))) this._minNote = n;
+			if(this._maxNote == null || n.fret + n.beat.voice.bar.track.tuning[n.beat.voice.bar.track.tuning.length - (n.string - 1) - 1] > (function($this) {
+				var $r;
+				var _this = $this._maxNote;
+				$r = _this.fret + _this.beat.voice.bar.track.tuning[_this.beat.voice.bar.track.tuning.length - (_this.string - 1) - 1];
+				return $r;
+			}(this))) this._maxNote = n;
+		}
 	}
-	,isRest: function() {
-		return this.notes.length == 0;
+	,getAutomation: function(type) {
+		var _g = 0;
+		var _g1 = this.automations;
+		while(_g < _g1.length) {
+			var a = _g1[_g];
+			++_g;
+			if(a.type == type) return a;
+		}
+		return null;
 	}
-	,maxNote: function() {
-		if(this._maxNote == null) this.refreshNotes();
-		return this._maxNote;
-	}
-	,minNote: function() {
-		if(this._minNote == null) this.refreshNotes();
-		return this._minNote;
+	,getNoteOnString: function(string) {
+		var _g = 0;
+		var _g1 = this.notes;
+		while(_g < _g1.length) {
+			var n = _g1[_g];
+			++_g;
+			if(n.string == string) return n;
+		}
+		return null;
 	}
 	,__class__: alphatab.model.Beat
-}
+};
 alphatab.model.BendPoint = function(offset,value) {
 	if(value == null) value = 0;
 	if(offset == null) offset = 0;
@@ -5704,8 +5986,8 @@ alphatab.model.BendPoint.prototype = {
 		return point;
 	}
 	,__class__: alphatab.model.BendPoint
-}
-alphatab.model.BrushType = $hxClasses["alphatab.model.BrushType"] = { __ename__ : true, __constructs__ : ["None","BrushUp","BrushDown","ArpeggioUp","ArpeggioDown"] }
+};
+alphatab.model.BrushType = $hxClasses["alphatab.model.BrushType"] = { __ename__ : true, __constructs__ : ["None","BrushUp","BrushDown","ArpeggioUp","ArpeggioDown"] };
 alphatab.model.BrushType.None = ["None",0];
 alphatab.model.BrushType.None.toString = $estr;
 alphatab.model.BrushType.None.__enum__ = alphatab.model.BrushType;
@@ -5728,8 +6010,8 @@ $hxClasses["alphatab.model.Chord"] = alphatab.model.Chord;
 alphatab.model.Chord.__name__ = true;
 alphatab.model.Chord.prototype = {
 	__class__: alphatab.model.Chord
-}
-alphatab.model.Clef = $hxClasses["alphatab.model.Clef"] = { __ename__ : true, __constructs__ : ["Neutral","C3","C4","F4","G2"] }
+};
+alphatab.model.Clef = $hxClasses["alphatab.model.Clef"] = { __ename__ : true, __constructs__ : ["Neutral","C3","C4","F4","G2"] };
 alphatab.model.Clef.Neutral = ["Neutral",0];
 alphatab.model.Clef.Neutral.toString = $estr;
 alphatab.model.Clef.Neutral.__enum__ = alphatab.model.Clef;
@@ -5745,7 +6027,7 @@ alphatab.model.Clef.F4.__enum__ = alphatab.model.Clef;
 alphatab.model.Clef.G2 = ["G2",4];
 alphatab.model.Clef.G2.toString = $estr;
 alphatab.model.Clef.G2.__enum__ = alphatab.model.Clef;
-alphatab.model.Duration = $hxClasses["alphatab.model.Duration"] = { __ename__ : true, __constructs__ : ["Whole","Half","Quarter","Eighth","Sixteenth","ThirtySecond","SixtyFourth"] }
+alphatab.model.Duration = $hxClasses["alphatab.model.Duration"] = { __ename__ : true, __constructs__ : ["Whole","Half","Quarter","Eighth","Sixteenth","ThirtySecond","SixtyFourth"] };
 alphatab.model.Duration.Whole = ["Whole",0];
 alphatab.model.Duration.Whole.toString = $estr;
 alphatab.model.Duration.Whole.__enum__ = alphatab.model.Duration;
@@ -5767,7 +6049,7 @@ alphatab.model.Duration.ThirtySecond.__enum__ = alphatab.model.Duration;
 alphatab.model.Duration.SixtyFourth = ["SixtyFourth",6];
 alphatab.model.Duration.SixtyFourth.toString = $estr;
 alphatab.model.Duration.SixtyFourth.__enum__ = alphatab.model.Duration;
-alphatab.model.DynamicValue = $hxClasses["alphatab.model.DynamicValue"] = { __ename__ : true, __constructs__ : ["PPP","PP","P","MP","MF","F","FF","FFF"] }
+alphatab.model.DynamicValue = $hxClasses["alphatab.model.DynamicValue"] = { __ename__ : true, __constructs__ : ["PPP","PP","P","MP","MF","F","FF","FFF"] };
 alphatab.model.DynamicValue.PPP = ["PPP",0];
 alphatab.model.DynamicValue.PPP.toString = $estr;
 alphatab.model.DynamicValue.PPP.__enum__ = alphatab.model.DynamicValue;
@@ -5792,7 +6074,7 @@ alphatab.model.DynamicValue.FF.__enum__ = alphatab.model.DynamicValue;
 alphatab.model.DynamicValue.FFF = ["FFF",7];
 alphatab.model.DynamicValue.FFF.toString = $estr;
 alphatab.model.DynamicValue.FFF.__enum__ = alphatab.model.DynamicValue;
-alphatab.model.GraceType = $hxClasses["alphatab.model.GraceType"] = { __ename__ : true, __constructs__ : ["None","OnBeat","BeforeBeat"] }
+alphatab.model.GraceType = $hxClasses["alphatab.model.GraceType"] = { __ename__ : true, __constructs__ : ["None","OnBeat","BeforeBeat"] };
 alphatab.model.GraceType.None = ["None",0];
 alphatab.model.GraceType.None.toString = $estr;
 alphatab.model.GraceType.None.__enum__ = alphatab.model.GraceType;
@@ -5802,7 +6084,7 @@ alphatab.model.GraceType.OnBeat.__enum__ = alphatab.model.GraceType;
 alphatab.model.GraceType.BeforeBeat = ["BeforeBeat",2];
 alphatab.model.GraceType.BeforeBeat.toString = $estr;
 alphatab.model.GraceType.BeforeBeat.__enum__ = alphatab.model.GraceType;
-alphatab.model.HarmonicType = $hxClasses["alphatab.model.HarmonicType"] = { __ename__ : true, __constructs__ : ["None","Natural","Artificial","Pinch","Tap","Semi","Feedback"] }
+alphatab.model.HarmonicType = $hxClasses["alphatab.model.HarmonicType"] = { __ename__ : true, __constructs__ : ["None","Natural","Artificial","Pinch","Tap","Semi","Feedback"] };
 alphatab.model.HarmonicType.None = ["None",0];
 alphatab.model.HarmonicType.None.toString = $estr;
 alphatab.model.HarmonicType.None.__enum__ = alphatab.model.HarmonicType;
@@ -5840,22 +6122,22 @@ alphatab.model.MasterBar = function() {
 $hxClasses["alphatab.model.MasterBar"] = alphatab.model.MasterBar;
 alphatab.model.MasterBar.__name__ = true;
 alphatab.model.MasterBar.prototype = {
-	calculateDuration: function() {
-		return this.timeSignatureNumerator * alphatab.audio.MidiUtils.valueToTicks(this.timeSignatureDenominator);
+	isRepeatEnd: function() {
+		return this.repeatCount > 0;
 	}
 	,isSectionStart: function() {
 		return this.section != null;
 	}
-	,isRepeatEnd: function() {
-		return this.repeatCount > 0;
+	,calculateDuration: function() {
+		return this.timeSignatureNumerator * alphatab.audio.MidiUtils.valueToTicks(this.timeSignatureDenominator);
 	}
 	,__class__: alphatab.model.MasterBar
-}
-alphatab.model.ModelUtils = function() { }
+};
+alphatab.model.ModelUtils = function() { };
 $hxClasses["alphatab.model.ModelUtils"] = alphatab.model.ModelUtils;
 alphatab.model.ModelUtils.__name__ = true;
 alphatab.model.ModelUtils.getDurationValue = function(duration) {
-	switch( (duration)[1] ) {
+	switch(duration[1]) {
 	case 0:
 		return 1;
 	case 1:
@@ -5871,24 +6153,24 @@ alphatab.model.ModelUtils.getDurationValue = function(duration) {
 	case 6:
 		return 64;
 	}
-}
+};
 alphatab.model.ModelUtils.getDurationIndex = function(duration) {
 	var index = 0;
 	var value = alphatab.model.ModelUtils.getDurationValue(duration);
 	while((value = value >> 1) > 0) index++;
 	return index;
-}
+};
 alphatab.model.ModelUtils.keySignatureIsFlat = function(ks) {
 	return ks < 0;
-}
+};
 alphatab.model.ModelUtils.keySignatureIsNatural = function(ks) {
 	return ks == 0;
-}
+};
 alphatab.model.ModelUtils.keySignatureIsSharp = function(ks) {
 	return ks > 0;
-}
+};
 alphatab.model.ModelUtils.getClefIndex = function(clef) {
-	switch( (clef)[1] ) {
+	switch(clef[1]) {
 	case 0:
 		return 0;
 	case 1:
@@ -5900,10 +6182,9 @@ alphatab.model.ModelUtils.getClefIndex = function(clef) {
 	case 4:
 		return 4;
 	}
-}
+};
 alphatab.model.Note = function() {
 	this.bendPoints = new Array();
-	this.trillFret = -1;
 	this.dynamicValue = alphatab.model.DynamicValue.F;
 	this.accentuated = alphatab.model.AccentuationType.None;
 	this.fret = -1;
@@ -5925,26 +6206,32 @@ alphatab.model.Note = function() {
 	this.rightHandFinger = -1;
 	this.isFingering = false;
 	this.swapAccidentals = false;
-	this.trillFret = -1;
-	this.trillSpeed = 0;
+	this.trillValue = -1;
+	this.trillSpeed = alphatab.model.Duration.ThirtySecond;
 	this.durationPercent = 1;
 	this.octave = -1;
 };
 $hxClasses["alphatab.model.Note"] = alphatab.model.Note;
 alphatab.model.Note.__name__ = true;
 alphatab.model.Note.prototype = {
-	realValue: function() {
-		return this.fret + this.beat.voice.bar.track.tuning[this.beat.voice.bar.track.tuning.length - (this.string - 1) - 1];
+	hasBend: function() {
+		return this.bendPoints.length > 1;
+	}
+	,trillFret: function() {
+		return this.trillValue - this.beat.voice.bar.track.tuning[this.beat.voice.bar.track.tuning.length - (this.string - 1) - 1];
+	}
+	,isTrill: function() {
+		return this.trillValue >= 0;
 	}
 	,clone: function() {
 		var n = new alphatab.model.Note();
-		var _g = 0, _g1 = this.bendPoints;
+		var _g = 0;
+		var _g1 = this.bendPoints;
 		while(_g < _g1.length) {
 			var p = _g1[_g];
 			++_g;
 			n.bendPoints.push(p.clone());
 		}
-		n.trillFret = this.trillFret;
 		n.dynamicValue = this.dynamicValue;
 		n.accentuated = this.accentuated;
 		n.fret = this.fret;
@@ -5966,20 +6253,20 @@ alphatab.model.Note.prototype = {
 		n.rightHandFinger = this.rightHandFinger;
 		n.isFingering = n.isFingering;
 		n.swapAccidentals = this.swapAccidentals;
-		n.trillFret = this.trillFret;
+		n.trillValue = this.trillValue;
 		n.trillSpeed = this.trillSpeed;
 		n.durationPercent = this.durationPercent;
 		return n;
 	}
-	,isTrill: function() {
-		return this.trillFret >= 0;
+	,stringTuning: function() {
+		return this.beat.voice.bar.track.tuning[this.beat.voice.bar.track.tuning.length - (this.string - 1) - 1];
 	}
-	,hasBend: function() {
-		return this.bendPoints.length > 1;
+	,realValue: function() {
+		return this.fret + this.beat.voice.bar.track.tuning[this.beat.voice.bar.track.tuning.length - (this.string - 1) - 1];
 	}
 	,__class__: alphatab.model.Note
-}
-alphatab.model.PickStrokeType = $hxClasses["alphatab.model.PickStrokeType"] = { __ename__ : true, __constructs__ : ["None","Up","Down"] }
+};
+alphatab.model.PickStrokeType = $hxClasses["alphatab.model.PickStrokeType"] = { __ename__ : true, __constructs__ : ["None","Up","Down"] };
 alphatab.model.PickStrokeType.None = ["None",0];
 alphatab.model.PickStrokeType.None.toString = $estr;
 alphatab.model.PickStrokeType.None.__enum__ = alphatab.model.PickStrokeType;
@@ -5995,20 +6282,39 @@ $hxClasses["alphatab.model.PlaybackInformation"] = alphatab.model.PlaybackInform
 alphatab.model.PlaybackInformation.__name__ = true;
 alphatab.model.PlaybackInformation.prototype = {
 	__class__: alphatab.model.PlaybackInformation
-}
+};
+alphatab.model.RepeatGroup = function() {
+	this.masterBars = new Array();
+	this.closings = new Array();
+	this.openings = new Array();
+	this.isClosed = false;
+};
+$hxClasses["alphatab.model.RepeatGroup"] = alphatab.model.RepeatGroup;
+alphatab.model.RepeatGroup.__name__ = true;
+alphatab.model.RepeatGroup.prototype = {
+	addMasterBar: function(masterBar) {
+		if(this.openings.length == 0) this.openings.push(masterBar);
+		this.masterBars.push(masterBar);
+		masterBar.repeatGroup = this;
+		if(masterBar.repeatCount > 0) {
+			this.closings.push(masterBar);
+			this.isClosed = true;
+		} else if(this.isClosed) {
+			this.isClosed = false;
+			this.openings.push(masterBar);
+		}
+	}
+	,__class__: alphatab.model.RepeatGroup
+};
 alphatab.model.Score = function() {
 	this.masterBars = new Array();
 	this.tracks = new Array();
+	this._currentRepeatGroup = new alphatab.model.RepeatGroup();
 };
 $hxClasses["alphatab.model.Score"] = alphatab.model.Score;
 alphatab.model.Score.__name__ = true;
 alphatab.model.Score.prototype = {
-	addTrack: function(track) {
-		track.score = this;
-		track.index = this.tracks.length;
-		this.tracks.push(track);
-	}
-	,addMasterBar: function(bar) {
+	addMasterBar: function(bar) {
 		bar.score = this;
 		bar.index = this.masterBars.length;
 		if(this.masterBars.length != 0) {
@@ -6016,18 +6322,25 @@ alphatab.model.Score.prototype = {
 			bar.previousMasterBar.nextMasterBar = bar;
 			bar.start = bar.previousMasterBar.start + bar.previousMasterBar.calculateDuration();
 		}
+		if(bar.isRepeatStart || this._currentRepeatGroup.isClosed && bar.alternateEndings <= 0) this._currentRepeatGroup = new alphatab.model.RepeatGroup();
+		this._currentRepeatGroup.addMasterBar(bar);
 		this.masterBars.push(bar);
 	}
+	,addTrack: function(track) {
+		track.score = this;
+		track.index = this.tracks.length;
+		this.tracks.push(track);
+	}
 	,__class__: alphatab.model.Score
-}
+};
 alphatab.model.Section = function() {
 };
 $hxClasses["alphatab.model.Section"] = alphatab.model.Section;
 alphatab.model.Section.__name__ = true;
 alphatab.model.Section.prototype = {
 	__class__: alphatab.model.Section
-}
-alphatab.model.SlideType = $hxClasses["alphatab.model.SlideType"] = { __ename__ : true, __constructs__ : ["None","Shift","Legato","IntoFromBelow","IntoFromAbove","OutUp","OutDown"] }
+};
+alphatab.model.SlideType = $hxClasses["alphatab.model.SlideType"] = { __ename__ : true, __constructs__ : ["None","Shift","Legato","IntoFromBelow","IntoFromAbove","OutUp","OutDown"] };
 alphatab.model.SlideType.None = ["None",0];
 alphatab.model.SlideType.None.toString = $estr;
 alphatab.model.SlideType.None.__enum__ = alphatab.model.SlideType;
@@ -6054,6 +6367,7 @@ alphatab.model.Track = function() {
 	this.bars = new Array();
 	this.chords = new haxe.ds.StringMap();
 	this.playbackInfo = new alphatab.model.PlaybackInformation();
+	this.color = new alphatab.platform.model.Color(200,0,0);
 };
 $hxClasses["alphatab.model.Track"] = alphatab.model.Track;
 alphatab.model.Track.__name__ = true;
@@ -6068,8 +6382,8 @@ alphatab.model.Track.prototype = {
 		this.bars.push(bar);
 	}
 	,__class__: alphatab.model.Track
-}
-alphatab.model.TripletFeel = $hxClasses["alphatab.model.TripletFeel"] = { __ename__ : true, __constructs__ : ["NoTripletFeel","Triplet16th","Triplet8th","Dotted16th","Dotted8th","Scottish16th","Scottish8th"] }
+};
+alphatab.model.TripletFeel = $hxClasses["alphatab.model.TripletFeel"] = { __ename__ : true, __constructs__ : ["NoTripletFeel","Triplet16th","Triplet8th","Dotted16th","Dotted8th","Scottish16th","Scottish8th"] };
 alphatab.model.TripletFeel.NoTripletFeel = ["NoTripletFeel",0];
 alphatab.model.TripletFeel.NoTripletFeel.toString = $estr;
 alphatab.model.TripletFeel.NoTripletFeel.__enum__ = alphatab.model.TripletFeel;
@@ -6099,9 +6413,9 @@ alphatab.model.Tuning = function(name,tuning,isStandard) {
 $hxClasses["alphatab.model.Tuning"] = alphatab.model.Tuning;
 alphatab.model.Tuning.__name__ = true;
 alphatab.model.Tuning.isTuning = function(name) {
-	var regex = alphatab.model.Tuning.TUNING_REGEX;
+	var regex = alphatab.model.Tuning.TuningRegex;
 	return regex.match(name);
-}
+};
 alphatab.model.Tuning.getTextForTuning = function(tuning,includeOctave) {
 	var octave = Math.floor(tuning / 12);
 	var note = tuning % 12;
@@ -6109,10 +6423,10 @@ alphatab.model.Tuning.getTextForTuning = function(tuning,includeOctave) {
 	var result = notes[note];
 	if(includeOctave) result += Std.string(octave);
 	return result;
-}
+};
 alphatab.model.Tuning.getTuningForText = function(str) {
 	var base = 0;
-	var regex = alphatab.model.Tuning.TUNING_REGEX;
+	var regex = alphatab.model.Tuning.TuningRegex;
 	if(regex.match(str.toLowerCase())) {
 		var note = regex.matched(1);
 		var octave = Std.parseInt(regex.matched(2));
@@ -6120,7 +6434,7 @@ alphatab.model.Tuning.getTuningForText = function(str) {
 		base += (octave + 1) * 12;
 	} else return -1;
 	return base;
-}
+};
 alphatab.model.Tuning.getPresetsFor = function(strings) {
 	if(alphatab.model.Tuning._sevenStrings == null) alphatab.model.Tuning.initialize();
 	if(strings == 7) return alphatab.model.Tuning._sevenStrings;
@@ -6128,7 +6442,7 @@ alphatab.model.Tuning.getPresetsFor = function(strings) {
 	if(strings == 5) return alphatab.model.Tuning._fiveStrings;
 	if(strings == 4) return alphatab.model.Tuning._fourStrings;
 	return new Array();
-}
+};
 alphatab.model.Tuning.initialize = function() {
 	alphatab.model.Tuning._sevenStrings = new Array();
 	alphatab.model.Tuning._sixStrings = new Array();
@@ -6183,7 +6497,7 @@ alphatab.model.Tuning.initialize = function() {
 	alphatab.model.Tuning._fourStrings.push(new alphatab.model.Tuning("Mandolin or Violin Tuning",[76,69,62,55],false));
 	alphatab.model.Tuning._fourStrings.push(new alphatab.model.Tuning("Viola Tuning",[69,62,55,48],false));
 	alphatab.model.Tuning._fourStrings.push(new alphatab.model.Tuning("Cello Tuning",[57,50,43,36],false));
-}
+};
 alphatab.model.Tuning.findTuning = function(strings) {
 	var tunings = alphatab.model.Tuning.getPresetsFor(strings.length);
 	var _g = 0;
@@ -6191,7 +6505,8 @@ alphatab.model.Tuning.findTuning = function(strings) {
 		var tuning = tunings[_g];
 		++_g;
 		var equals = true;
-		var _g2 = 0, _g1 = strings.length;
+		var _g2 = 0;
+		var _g1 = strings.length;
 		while(_g2 < _g1) {
 			var i = _g2++;
 			if(strings[i] != tuning.tuning[i]) {
@@ -6202,11 +6517,11 @@ alphatab.model.Tuning.findTuning = function(strings) {
 		if(equals) return tuning;
 	}
 	return null;
-}
+};
 alphatab.model.Tuning.prototype = {
 	__class__: alphatab.model.Tuning
-}
-alphatab.model.VibratoType = $hxClasses["alphatab.model.VibratoType"] = { __ename__ : true, __constructs__ : ["None","Slight","Wide"] }
+};
+alphatab.model.VibratoType = $hxClasses["alphatab.model.VibratoType"] = { __ename__ : true, __constructs__ : ["None","Slight","Wide"] };
 alphatab.model.VibratoType.None = ["None",0];
 alphatab.model.VibratoType.None.toString = $estr;
 alphatab.model.VibratoType.None.__enum__ = alphatab.model.VibratoType;
@@ -6222,8 +6537,10 @@ alphatab.model.Voice = function() {
 $hxClasses["alphatab.model.Voice"] = alphatab.model.Voice;
 alphatab.model.Voice.__name__ = true;
 alphatab.model.Voice.prototype = {
-	isEmpty: function() {
-		return this.beats.length == 0;
+	addBeat: function(beat) {
+		beat.voice = this;
+		beat.index = this.beats.length;
+		this.beats.push(beat);
 	}
 	,addGraceBeat: function(beat) {
 		if(this.beats.length == 0) {
@@ -6234,42 +6551,47 @@ alphatab.model.Voice.prototype = {
 		this.addBeat(beat);
 		this.addBeat(lastBeat);
 	}
-	,addBeat: function(beat) {
-		beat.voice = this;
-		beat.index = this.beats.length;
-		this.beats.push(beat);
+	,isEmpty: function() {
+		return this.beats.length == 0;
 	}
 	,__class__: alphatab.model.Voice
-}
-alphatab.platform.svg.FontSizes = function() { }
+};
+alphatab.platform.svg.FontSizes = function() { };
 $hxClasses["alphatab.platform.svg.FontSizes"] = alphatab.platform.svg.FontSizes;
 alphatab.platform.svg.FontSizes.__name__ = true;
 alphatab.platform.svg.FontSizes.measureString = function(s,f,size) {
 	var data;
 	var dataSize;
 	if(f == alphatab.platform.svg.SupportedFonts.TimesNewRoman) {
-		data = alphatab.platform.svg.FontSizes.TIMES_NEW_ROMAN_11PT;
+		data = alphatab.platform.svg.FontSizes.TimesNewRoman;
 		dataSize = 11;
 	} else if(f == alphatab.platform.svg.SupportedFonts.Arial) {
-		data = alphatab.platform.svg.FontSizes.ARIAL_11PT;
+		data = alphatab.platform.svg.FontSizes.Arial11Pt;
 		dataSize = 11;
 	} else {
 		data = [8];
 		dataSize = 11;
 	}
 	var stringSize = 0;
-	var _g1 = 0, _g = s.length;
+	var _g1 = 0;
+	var _g = s.length;
 	while(_g1 < _g) {
 		var i = _g1++;
-		var code = (Math.min(data.length - 1,HxOverrides.cca(s,i)) | 0) - alphatab.platform.svg.FontSizes.CONTROL_CHARS;
+		var code;
+		code = (function($this) {
+			var $r;
+			var x = Math.min(data.length - 1,HxOverrides.cca(s,i));
+			$r = x | 0;
+			return $r;
+		}(this)) - alphatab.platform.svg.FontSizes.ControlChars;
 		if(code >= 0) {
 			var charSize = data[code];
 			stringSize += data[code] * size / dataSize | 0;
 		}
 	}
 	return stringSize;
-}
-alphatab.platform.svg.SupportedFonts = $hxClasses["alphatab.platform.svg.SupportedFonts"] = { __ename__ : true, __constructs__ : ["TimesNewRoman","Arial"] }
+};
+alphatab.platform.svg.SupportedFonts = $hxClasses["alphatab.platform.svg.SupportedFonts"] = { __ename__ : true, __constructs__ : ["TimesNewRoman","Arial"] };
 alphatab.platform.svg.SupportedFonts.TimesNewRoman = ["TimesNewRoman",0];
 alphatab.platform.svg.SupportedFonts.TimesNewRoman.toString = $estr;
 alphatab.platform.svg.SupportedFonts.TimesNewRoman.__enum__ = alphatab.platform.svg.SupportedFonts;
@@ -6290,50 +6612,53 @@ alphatab.rendering.BarRendererBase = function(bar) {
 $hxClasses["alphatab.rendering.BarRendererBase"] = alphatab.rendering.BarRendererBase;
 alphatab.rendering.BarRendererBase.__name__ = true;
 alphatab.rendering.BarRendererBase.prototype = {
-	paint: function(cx,cy,canvas) {
-	}
-	,doLayout: function() {
-	}
-	,getBottomPadding: function() {
-		return 0;
-	}
-	,getTopPadding: function() {
-		return 0;
-	}
-	,finalizeRenderer: function(layout) {
-	}
-	,applySizes: function(sizes) {
-	}
-	,registerMaxSizes: function(sizes) {
-	}
-	,isLast: function() {
-		return this._bar.index == this._bar.track.bars.length - 1;
-	}
-	,isLastOfLine: function() {
-		return this.index == this.stave.barRenderers.length - 1;
-	}
-	,isFirstOfLine: function() {
-		return this.index == 0;
-	}
-	,getResources: function() {
-		return this.stave.staveGroup.layout.renderer.renderingResources;
-	}
-	,getLayout: function() {
-		return this.stave.staveGroup.layout;
-	}
-	,getScale: function() {
-		return this.stave.staveGroup.layout.renderer.scale;
-	}
-	,applyBarSpacing: function(spacing) {
+	registerOverflowTop: function(topOverflow) {
+		if(topOverflow > this.topOverflow) this.topOverflow = topOverflow;
 	}
 	,registerOverflowBottom: function(bottomOverflow) {
 		if(bottomOverflow > this.bottomOverflow) this.bottomOverflow = bottomOverflow;
 	}
-	,registerOverflowTop: function(topOverflow) {
-		if(topOverflow > this.topOverflow) this.topOverflow = topOverflow;
+	,applyBarSpacing: function(spacing) {
+	}
+	,getSettings: function() {
+		return this.stave.staveGroup.layout.renderer.settings;
+	}
+	,getScale: function() {
+		return this.stave.staveGroup.layout.renderer.settings.scale;
+	}
+	,getLayout: function() {
+		return this.stave.staveGroup.layout;
+	}
+	,getResources: function() {
+		return this.stave.staveGroup.layout.renderer.renderingResources;
+	}
+	,isFirstOfLine: function() {
+		return this.index == 0;
+	}
+	,isLastOfLine: function() {
+		return this.index == this.stave.barRenderers.length - 1;
+	}
+	,isLast: function() {
+		return this._bar.index == this._bar.track.bars.length - 1;
+	}
+	,registerMaxSizes: function(sizes) {
+	}
+	,applySizes: function(sizes) {
+	}
+	,finalizeRenderer: function(layout) {
+	}
+	,getTopPadding: function() {
+		return 0;
+	}
+	,getBottomPadding: function() {
+		return 0;
+	}
+	,doLayout: function() {
+	}
+	,paint: function(cx,cy,canvas) {
 	}
 	,__class__: alphatab.rendering.BarRendererBase
-}
+};
 alphatab.rendering.AlternateEndingsBarRenderer = function(bar) {
 	alphatab.rendering.BarRendererBase.call(this,bar);
 	var alternateEndings = bar.track.score.masterBars[bar.index].alternateEndings;
@@ -6348,27 +6673,9 @@ $hxClasses["alphatab.rendering.AlternateEndingsBarRenderer"] = alphatab.renderin
 alphatab.rendering.AlternateEndingsBarRenderer.__name__ = true;
 alphatab.rendering.AlternateEndingsBarRenderer.__super__ = alphatab.rendering.BarRendererBase;
 alphatab.rendering.AlternateEndingsBarRenderer.prototype = $extend(alphatab.rendering.BarRendererBase.prototype,{
-	paint: function(cx,cy,canvas) {
-		if(this._endings.length > 0) {
-			var res = this.stave.staveGroup.layout.renderer.renderingResources;
-			canvas.setColor(res.mainGlyphColor);
-			canvas.setFont(res.wordsFont);
-			canvas.moveTo(cx + this.x,cy + this.y + this.height);
-			canvas.lineTo(cx + this.x,cy + this.y);
-			canvas.lineTo(cx + this.x + this.width,cy + this.y);
-			canvas.stroke();
-			canvas.fillText(this._endingsString,cx + this.x + 3 * this.stave.staveGroup.layout.renderer.scale | 0,cy + this.y * this.stave.staveGroup.layout.renderer.scale | 0);
-		}
-	}
-	,applySizes: function(sizes) {
-		alphatab.rendering.BarRendererBase.prototype.applySizes.call(this,sizes);
-		this.width = sizes.fullWidth;
-	}
-	,getBottomPadding: function() {
-		return 0;
-	}
-	,getTopPadding: function() {
-		return 0;
+	finalizeRenderer: function(layout) {
+		alphatab.rendering.BarRendererBase.prototype.finalizeRenderer.call(this,layout);
+		this.isEmpty = this._endings.length == 0;
 	}
 	,doLayout: function() {
 		alphatab.rendering.BarRendererBase.prototype.doLayout.call(this);
@@ -6376,9 +6683,11 @@ alphatab.rendering.AlternateEndingsBarRenderer.prototype = $extend(alphatab.rend
 			this.stave.topSpacing = 5;
 			this.stave.bottomSpacing = 5;
 		}
-		this.height = this.stave.staveGroup.layout.renderer.renderingResources.wordsFont.getSize() | 0;
+		var x = this.stave.staveGroup.layout.renderer.renderingResources.wordsFont.getSize();
+		this.height = x | 0;
 		var endingsString = new StringBuf();
-		var _g = 0, _g1 = this._endings;
+		var _g = 0;
+		var _g1 = this._endings;
 		while(_g < _g1.length) {
 			var e = _g1[_g];
 			++_g;
@@ -6387,13 +6696,31 @@ alphatab.rendering.AlternateEndingsBarRenderer.prototype = $extend(alphatab.rend
 		}
 		this._endingsString = endingsString.b;
 	}
-	,finalizeRenderer: function(layout) {
-		alphatab.rendering.BarRendererBase.prototype.finalizeRenderer.call(this,layout);
-		this.isEmpty = this._endings.length == 0;
+	,getTopPadding: function() {
+		return 0;
+	}
+	,getBottomPadding: function() {
+		return 0;
+	}
+	,applySizes: function(sizes) {
+		alphatab.rendering.BarRendererBase.prototype.applySizes.call(this,sizes);
+		this.width = sizes.fullWidth;
+	}
+	,paint: function(cx,cy,canvas) {
+		if(this._endings.length > 0) {
+			var res = this.stave.staveGroup.layout.renderer.renderingResources;
+			canvas.setColor(res.mainGlyphColor);
+			canvas.setFont(res.wordsFont);
+			canvas.moveTo(cx + this.x,cy + this.y + this.height);
+			canvas.lineTo(cx + this.x,cy + this.y);
+			canvas.lineTo(cx + this.x + this.width,cy + this.y);
+			canvas.stroke();
+			canvas.fillText(this._endingsString,cx + this.x + 3 * this.stave.staveGroup.layout.renderer.settings.scale | 0,cy + this.y * this.stave.staveGroup.layout.renderer.settings.scale | 0);
+		}
 	}
 	,__class__: alphatab.rendering.AlternateEndingsBarRenderer
 });
-alphatab.rendering.EffectBarGlyphSizing = $hxClasses["alphatab.rendering.EffectBarGlyphSizing"] = { __ename__ : true, __constructs__ : ["SinglePreBeatOnly","SinglePreBeatToOnBeat","SinglePreBeatToPostBeat","SingleOnBeatOnly","SingleOnBeatToPostBeat","SinglePostBeatOnly","GroupedPreBeatOnly","GroupedPreBeatToOnBeat","GroupedPreBeatToPostBeat","GroupedOnBeatOnly","GroupedOnBeatToPostBeat","GroupedPostBeatOnly"] }
+alphatab.rendering.EffectBarGlyphSizing = $hxClasses["alphatab.rendering.EffectBarGlyphSizing"] = { __ename__ : true, __constructs__ : ["SinglePreBeatOnly","SinglePreBeatToOnBeat","SinglePreBeatToPostBeat","SingleOnBeatOnly","SingleOnBeatToPostBeat","SinglePostBeatOnly","GroupedPreBeatOnly","GroupedPreBeatToOnBeat","GroupedPreBeatToPostBeat","GroupedOnBeatOnly","GroupedOnBeatToPostBeat","GroupedPostBeatOnly"] };
 alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly = ["SinglePreBeatOnly",0];
 alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly.toString = $estr;
 alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly.__enum__ = alphatab.rendering.EffectBarGlyphSizing;
@@ -6433,174 +6760,194 @@ alphatab.rendering.EffectBarGlyphSizing.GroupedPostBeatOnly.__enum__ = alphatab.
 alphatab.rendering.GroupedBarRenderer = function(bar) {
 	alphatab.rendering.BarRendererBase.call(this,bar);
 	this._preBeatGlyphs = new Array();
-	this._voiceContainers = new haxe.ds.IntMap();
+	this._voiceContainers = new Array();
 	this._postBeatGlyphs = new Array();
 };
 $hxClasses["alphatab.rendering.GroupedBarRenderer"] = alphatab.rendering.GroupedBarRenderer;
 alphatab.rendering.GroupedBarRenderer.__name__ = true;
 alphatab.rendering.GroupedBarRenderer.__super__ = alphatab.rendering.BarRendererBase;
 alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.BarRendererBase.prototype,{
-	paintBackground: function(cx,cy,canvas) {
-	}
-	,paint: function(cx,cy,canvas) {
-		this.paintBackground(cx,cy,canvas);
-		var glyphStartX = this.getPreBeatGlyphStart();
-		var _g = 0, _g1 = this._preBeatGlyphs;
+	doLayout: function() {
+		this.createPreBeatGlyphs();
+		this.createBeatGlyphs();
+		this.createPostBeatGlyphs();
+		var _g = 0;
+		var _g1 = this._voiceContainers;
 		while(_g < _g1.length) {
-			var g = _g1[_g];
+			var c = _g1[_g];
 			++_g;
-			g.paint(cx + this.x + glyphStartX,cy + this.y,canvas);
+			c.doLayout();
 		}
-		glyphStartX = this.getBeatGlyphsStart();
-		var $it0 = this._voiceContainers.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
-			c.paint(cx + this.x + glyphStartX,cy + this.y,canvas);
-		}
-		glyphStartX = this.getPostBeatGlyphsStart();
-		var _g = 0, _g1 = this._postBeatGlyphs;
+		this.updateWidth();
+	}
+	,updateWidth: function() {
+		this.width = this.getPostBeatGlyphsStart();
+		if(this._postBeatGlyphs.length > 0) this.width += this._postBeatGlyphs[this._postBeatGlyphs.length - 1].x + this._postBeatGlyphs[this._postBeatGlyphs.length - 1].width;
+		var _g = 0;
+		var _g1 = this._voiceContainers;
 		while(_g < _g1.length) {
-			var g = _g1[_g];
+			var c = _g1[_g];
 			++_g;
-			g.paint(cx + this.x + glyphStartX,cy + this.y,canvas);
+			if(this._biggestVoiceContainer == null || c.width > this._biggestVoiceContainer.width) this._biggestVoiceContainer = c;
 		}
 	}
-	,finalizeRenderer: function(layout) {
-		var $it0 = this._voiceContainers.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
-			c.finalizeGlyph(layout);
+	,registerMaxSizes: function(sizes) {
+		var preSize = this.getBeatGlyphsStart();
+		if(sizes.getSize("Pre") < preSize) sizes.setSize("Pre",preSize);
+		var _g = 0;
+		var _g1 = this._voiceContainers;
+		while(_g < _g1.length) {
+			var c = _g1[_g];
+			++_g;
+			c.registerMaxSizes(sizes);
 		}
-	}
-	,applyBarSpacing: function(spacing) {
-		this.width += spacing;
-		var $it0 = this._voiceContainers.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
-			var toApply = spacing;
-			if(this._biggestVoiceContainer != null) toApply += this._biggestVoiceContainer.width - c.width;
-			c.applyGlyphSpacing(toApply);
-		}
-	}
-	,getPostBeatGlyphsStart: function() {
-		var start = this.getBeatGlyphsStart();
-		var offset = 0;
-		var $it0 = this._voiceContainers.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
-			if(c.width > offset) offset = c.width;
-		}
-		return start + offset;
-	}
-	,getBeatGlyphsStart: function() {
-		var start = this.getPreBeatGlyphStart();
-		if(this._preBeatGlyphs.length > 0) start += this._preBeatGlyphs[this._preBeatGlyphs.length - 1].x + this._preBeatGlyphs[this._preBeatGlyphs.length - 1].width;
-		return start;
-	}
-	,getPreBeatGlyphStart: function() {
-		return 0;
-	}
-	,createPostBeatGlyphs: function() {
-	}
-	,createBeatGlyphs: function() {
-	}
-	,createPreBeatGlyphs: function() {
-	}
-	,addPostBeatGlyph: function(g) {
-		this.addGlyph(this._postBeatGlyphs,g);
-	}
-	,getPostNotesPosition: function(voice,beat) {
-		return this.getOrCreateVoiceContainer(voice).beatGlyphs[beat].postNotes;
-	}
-	,getOnNotesPosition: function(voice,beat) {
-		return this.getOrCreateVoiceContainer(voice).beatGlyphs[beat].onNotes;
-	}
-	,getPreNotesPosition: function(voice,beat) {
-		return this.getOrCreateVoiceContainer(voice).beatGlyphs[beat].preNotes;
-	}
-	,getBeatContainer: function(voice,beat) {
-		return this.getOrCreateVoiceContainer(voice).beatGlyphs[beat];
-	}
-	,getOrCreateVoiceContainer: function(voiceIndex) {
-		var c;
-		if(!this._voiceContainers.exists(voiceIndex)) {
-			c = new alphatab.rendering.glyphs.VoiceContainerGlyph(0,0,voiceIndex);
-			c.renderer = this;
-			this._voiceContainers.set(voiceIndex,c);
-		} else c = this._voiceContainers.get(voiceIndex);
-		return c;
-	}
-	,addBeatGlyph: function(g) {
-		this.getOrCreateVoiceContainer(g.beat.voice.index).addGlyph(g);
-	}
-	,addPreBeatGlyph: function(g) {
-		this.addGlyph(this._preBeatGlyphs,g);
-	}
-	,addGlyph: function(c,g) {
-		this.isEmpty = false;
-		g.x = c.length == 0?0:c[c.length - 1].x + c[c.length - 1].width;
-		g.index = c.length;
-		g.renderer = this;
-		g.doLayout();
-		c.push(g);
+		var postSize;
+		if(this._postBeatGlyphs.length == 0) postSize = 0; else postSize = this._postBeatGlyphs[this._postBeatGlyphs.length - 1].x + this._postBeatGlyphs[this._postBeatGlyphs.length - 1].width;
+		if(sizes.getSize("Post") < postSize) sizes.setSize("Post",postSize);
+		if(sizes.fullWidth < this.width) sizes.fullWidth = this.width;
 	}
 	,applySizes: function(sizes) {
-		var preSize = sizes.getSize("PRE");
+		var preSize = sizes.getSize("Pre");
 		var preSizeDiff = preSize - this.getBeatGlyphsStart();
 		if(preSizeDiff > 0) this.addPreBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,preSizeDiff));
-		var $it0 = this._voiceContainers.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
+		var _g = 0;
+		var _g1 = this._voiceContainers;
+		while(_g < _g1.length) {
+			var c = _g1[_g];
+			++_g;
 			c.applySizes(sizes);
 		}
-		var postSize = sizes.getSize("POST");
+		var postSize = sizes.getSize("Post");
 		var postSizeDiff;
 		if(this._postBeatGlyphs.length == 0) postSizeDiff = 0; else postSizeDiff = postSize - (this._postBeatGlyphs[this._postBeatGlyphs.length - 1].x + this._postBeatGlyphs[this._postBeatGlyphs.length - 1].width);
 		if(postSizeDiff > 0) {
-			this._postBeatGlyphs.splice(0,0,new alphatab.rendering.glyphs.SpacingGlyph(0,0,postSizeDiff));
-			var _g1 = 0, _g = this._postBeatGlyphs.length;
+			var x = new alphatab.rendering.glyphs.SpacingGlyph(0,0,postSizeDiff);
+			this._postBeatGlyphs.splice(0,0,x);
+			var _g1 = 0;
+			var _g = this._postBeatGlyphs.length;
 			while(_g1 < _g) {
 				var i = _g1++;
 				var g = this._postBeatGlyphs[i];
-				g.x = i == 0?0:this._postBeatGlyphs[this._postBeatGlyphs.length - 1].x + this._postBeatGlyphs[this._postBeatGlyphs.length - 1].width;
+				if(i == 0) g.x = 0; else g.x = this._postBeatGlyphs[this._postBeatGlyphs.length - 1].x + this._postBeatGlyphs[this._postBeatGlyphs.length - 1].width;
 				g.index = i;
 				g.renderer = this;
 			}
 		}
 		this.updateWidth();
 	}
-	,registerMaxSizes: function(sizes) {
-		var preSize = this.getBeatGlyphsStart();
-		if(sizes.getSize("PRE") < preSize) sizes.setSize("PRE",preSize);
-		var $it0 = this._voiceContainers.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
-			c.registerMaxSizes(sizes);
-		}
-		var postSize;
-		if(this._postBeatGlyphs.length == 0) postSize = 0; else postSize = this._postBeatGlyphs[this._postBeatGlyphs.length - 1].x + this._postBeatGlyphs[this._postBeatGlyphs.length - 1].width;
-		if(sizes.getSize("POST") < postSize) sizes.setSize("POST",postSize);
-		if(sizes.fullWidth < this.width) sizes.fullWidth = this.width;
+	,addGlyph: function(c,g) {
+		this.isEmpty = false;
+		if(c.length == 0) g.x = 0; else g.x = c[c.length - 1].x + c[c.length - 1].width;
+		g.index = c.length;
+		g.renderer = this;
+		g.doLayout();
+		c.push(g);
 	}
-	,updateWidth: function() {
-		this.width = this.getPostBeatGlyphsStart();
-		if(this._postBeatGlyphs.length > 0) this.width += this._postBeatGlyphs[this._postBeatGlyphs.length - 1].x + this._postBeatGlyphs[this._postBeatGlyphs.length - 1].width;
-		var $it0 = this._voiceContainers.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
-			if(this._biggestVoiceContainer == null || c.width > this._biggestVoiceContainer.width) this._biggestVoiceContainer = c;
+	,addPreBeatGlyph: function(g) {
+		this.addGlyph(this._preBeatGlyphs,g);
+	}
+	,addBeatGlyph: function(g) {
+		this.getOrCreateVoiceContainer(g.beat.voice.index).addGlyph(g);
+	}
+	,getOrCreateVoiceContainer: function(voiceIndex) {
+		var c;
+		if(voiceIndex >= this._voiceContainers.length) {
+			c = new alphatab.rendering.glyphs.VoiceContainerGlyph(0,0,voiceIndex);
+			c.renderer = this;
+			this._voiceContainers[voiceIndex] = c;
+		} else c = this._voiceContainers[voiceIndex];
+		return c;
+	}
+	,getBeatContainer: function(voice,beat) {
+		return this.getOrCreateVoiceContainer(voice).beatGlyphs[beat];
+	}
+	,getPreNotesPosition: function(voice,beat) {
+		return this.getOrCreateVoiceContainer(voice).beatGlyphs[beat].preNotes;
+	}
+	,getOnNotesPosition: function(voice,beat) {
+		return this.getOrCreateVoiceContainer(voice).beatGlyphs[beat].onNotes;
+	}
+	,getPostNotesPosition: function(voice,beat) {
+		return this.getOrCreateVoiceContainer(voice).beatGlyphs[beat].postNotes;
+	}
+	,addPostBeatGlyph: function(g) {
+		this.addGlyph(this._postBeatGlyphs,g);
+	}
+	,createPreBeatGlyphs: function() {
+	}
+	,createBeatGlyphs: function() {
+	}
+	,createPostBeatGlyphs: function() {
+	}
+	,getPreBeatGlyphStart: function() {
+		return 0;
+	}
+	,getBeatGlyphsStart: function() {
+		var start = this.getPreBeatGlyphStart();
+		if(this._preBeatGlyphs.length > 0) start += this._preBeatGlyphs[this._preBeatGlyphs.length - 1].x + this._preBeatGlyphs[this._preBeatGlyphs.length - 1].width;
+		return start;
+	}
+	,getPostBeatGlyphsStart: function() {
+		var start = this.getBeatGlyphsStart();
+		var offset = 0;
+		var _g = 0;
+		var _g1 = this._voiceContainers;
+		while(_g < _g1.length) {
+			var c = _g1[_g];
+			++_g;
+			if(c.width > offset) offset = c.width;
+		}
+		return start + offset;
+	}
+	,applyBarSpacing: function(spacing) {
+		this.width += spacing;
+		var _g = 0;
+		var _g1 = this._voiceContainers;
+		while(_g < _g1.length) {
+			var c = _g1[_g];
+			++_g;
+			var toApply = spacing;
+			if(this._biggestVoiceContainer != null) toApply += this._biggestVoiceContainer.width - c.width;
+			c.applyGlyphSpacing(toApply);
 		}
 	}
-	,doLayout: function() {
-		this.createPreBeatGlyphs();
-		this.createBeatGlyphs();
-		this.createPostBeatGlyphs();
-		var $it0 = this._voiceContainers.iterator();
-		while( $it0.hasNext() ) {
-			var c = $it0.next();
-			c.doLayout();
+	,finalizeRenderer: function(layout) {
+		var _g = 0;
+		var _g1 = this._voiceContainers;
+		while(_g < _g1.length) {
+			var c = _g1[_g];
+			++_g;
+			c.finalizeGlyph(layout);
 		}
-		this.updateWidth();
+	}
+	,paint: function(cx,cy,canvas) {
+		this.paintBackground(cx,cy,canvas);
+		var glyphStartX = this.getPreBeatGlyphStart();
+		var _g = 0;
+		var _g1 = this._preBeatGlyphs;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.paint(cx + this.x + glyphStartX,cy + this.y,canvas);
+		}
+		glyphStartX = this.getBeatGlyphsStart();
+		var _g = 0;
+		var _g1 = this._voiceContainers;
+		while(_g < _g1.length) {
+			var c = _g1[_g];
+			++_g;
+			c.paint(cx + this.x + glyphStartX,cy + this.y,canvas);
+		}
+		glyphStartX = this.getPostBeatGlyphsStart();
+		var _g = 0;
+		var _g1 = this._postBeatGlyphs;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.paint(cx + this.x + glyphStartX,cy + this.y,canvas);
+		}
+	}
+	,paintBackground: function(cx,cy,canvas) {
 	}
 	,__class__: alphatab.rendering.GroupedBarRenderer
 });
@@ -6614,88 +6961,36 @@ $hxClasses["alphatab.rendering.EffectBarRenderer"] = alphatab.rendering.EffectBa
 alphatab.rendering.EffectBarRenderer.__name__ = true;
 alphatab.rendering.EffectBarRenderer.__super__ = alphatab.rendering.GroupedBarRenderer;
 alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.GroupedBarRenderer.prototype,{
-	paint: function(cx,cy,canvas) {
-		alphatab.rendering.GroupedBarRenderer.prototype.paint.call(this,cx,cy,canvas);
-		var glyphStart = this.getBeatGlyphsStart();
-		var _g = 0, _g1 = this._uniqueEffectGlyphs;
-		while(_g < _g1.length) {
-			var v = _g1[_g];
-			++_g;
-			var _g2 = 0;
-			while(_g2 < v.length) {
-				var g = v[_g2];
-				++_g2;
-				if(g.renderer == this) g.paint(cx + this.x + glyphStart,cy + this.y,canvas);
-			}
+	doLayout: function() {
+		alphatab.rendering.GroupedBarRenderer.prototype.doLayout.call(this);
+		if(this.index == 0) {
+			this.stave.topSpacing = 5;
+			this.stave.bottomSpacing = 5;
 		}
+		this.height = this._info.getHeight(this);
 	}
-	,paintBackground: function(cx,cy,canvas) {
-	}
-	,getBottomPadding: function() {
-		return 0;
-	}
-	,getTopPadding: function() {
-		return 0;
-	}
-	,createPostBeatGlyphs: function() {
-	}
-	,createOrResizeGlyph: function(sizing,b) {
-		switch( (sizing)[1] ) {
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-			var g = this._info.createNewGlyph(this,b);
-			g.renderer = this;
-			g.doLayout();
-			this._effectGlyphs[b.voice.index].set(b.index,g);
-			this._uniqueEffectGlyphs[b.voice.index].push(g);
-			break;
-		case 6:
-		case 7:
-		case 8:
-		case 9:
-		case 10:
-		case 11:
-			if(b.index > 0 || this.index > 0) {
-				var prevBeat = b.previousBeat;
-				if(this._info.shouldCreateGlyph(this,prevBeat)) {
-					var prevEffect;
-					if(b.index > 0) prevEffect = this._effectGlyphs[b.voice.index].get(prevBeat.index); else prevEffect = (js.Boot.__cast(this.stave.barRenderers[this.index - 1] , alphatab.rendering.EffectBarRenderer))._effectGlyphs[b.voice.index].get(prevBeat.index);
-					if(prevEffect == null) this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b); else this._effectGlyphs[b.voice.index].set(b.index,prevEffect);
-				} else this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b);
-			} else this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b);
-			break;
+	,finalizeRenderer: function(layout) {
+		alphatab.rendering.GroupedBarRenderer.prototype.finalizeRenderer.call(this,layout);
+		this.isEmpty = true;
+		var prevGlyph = null;
+		if(this.index > 0) {
+			var prevRenderer = this.stave.barRenderers[this.index - 1];
+			if(prevRenderer._lastBeat != null) prevGlyph = prevRenderer._effectGlyphs[0].get(prevRenderer._lastBeat.index);
 		}
-	}
-	,createVoiceGlyphs: function(v) {
-		var _g = 0, _g1 = v.beats;
-		while(_g < _g1.length) {
-			var b = _g1[_g];
-			++_g;
-			var container = new alphatab.rendering.glyphs.BeatContainerGlyph(b);
-			container.preNotes = new alphatab.rendering.glyphs.BeatGlyphBase();
-			container.onNotes = new alphatab.rendering.glyphs.BeatGlyphBase();
-			container.postNotes = new alphatab.rendering.glyphs.BeatGlyphBase();
-			this.addBeatGlyph(container);
-			if(this._info.shouldCreateGlyph(this,b)) this.createOrResizeGlyph(this._info.getSizingMode(),b);
-			this._lastBeat = b;
+		var $it0 = this._effectGlyphs[0].keys();
+		while( $it0.hasNext() ) {
+			var beatIndex = $it0.next();
+			var effect = this._effectGlyphs[0].get(beatIndex);
+			this.alignGlyph(this._info.getSizingMode(),beatIndex,0,prevGlyph);
+			prevGlyph = effect;
+			this.isEmpty = false;
 		}
-	}
-	,createBeatGlyphs: function() {
-		this._effectGlyphs.push(new haxe.ds.IntMap());
-		this._uniqueEffectGlyphs.push(new Array());
-		this.createVoiceGlyphs(this._bar.voices[0]);
-	}
-	,createPreBeatGlyphs: function() {
 	}
 	,alignGlyph: function(sizing,beatIndex,voiceIndex,prevGlyph) {
 		var g = this._effectGlyphs[voiceIndex].get(beatIndex);
 		var pos;
 		var container = this.getOrCreateVoiceContainer(voiceIndex).beatGlyphs[beatIndex];
-		switch( (sizing)[1] ) {
+		switch(sizing[1]) {
 		case 0:
 			pos = container.preNotes;
 			g.x = pos.x + container.x;
@@ -6732,8 +7027,10 @@ alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.Grou
 		case 6:
 			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,beatIndex,voiceIndex,prevGlyph); else {
 				pos = container.preNotes;
-				var posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
-				var gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
+				var posR;
+				posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
+				var gR;
+				gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
 				g.width = posR.x + posR.getBeatGlyphsStart() + container.x + pos.x + pos.width - (gR.x + gR.getBeatGlyphsStart() + g.x);
 				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo(container.beat);
 			}
@@ -6741,8 +7038,10 @@ alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.Grou
 		case 7:
 			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatToOnBeat,beatIndex,voiceIndex,prevGlyph); else {
 				pos = container.onNotes;
-				var posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
-				var gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
+				var posR;
+				posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
+				var gR;
+				gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
 				g.width = posR.x + posR.getBeatGlyphsStart() + container.x + pos.x + pos.width - (gR.x + gR.getBeatGlyphsStart() + g.x);
 				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo(container.beat);
 			}
@@ -6750,8 +7049,10 @@ alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.Grou
 		case 8:
 			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatToPostBeat,beatIndex,voiceIndex,prevGlyph); else {
 				pos = container.postNotes;
-				var posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
-				var gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
+				var posR;
+				posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
+				var gR;
+				gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
 				g.width = posR.x + posR.getBeatGlyphsStart() + container.x + pos.x + pos.width - (gR.x + gR.getBeatGlyphsStart() + g.x);
 				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo(container.beat);
 			}
@@ -6759,8 +7060,10 @@ alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.Grou
 		case 9:
 			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatOnly,beatIndex,voiceIndex,prevGlyph); else {
 				pos = container.onNotes;
-				var posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
-				var gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
+				var posR;
+				posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
+				var gR;
+				gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
 				g.width = posR.x + posR.getBeatGlyphsStart() + container.x + pos.x + pos.width - (gR.x + gR.getBeatGlyphsStart() + g.x);
 				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo(container.beat);
 			}
@@ -6768,8 +7071,10 @@ alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.Grou
 		case 10:
 			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatToPostBeat,beatIndex,voiceIndex,prevGlyph); else {
 				pos = container.postNotes;
-				var posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
-				var gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
+				var posR;
+				posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
+				var gR;
+				gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
 				g.width = posR.x + posR.getBeatGlyphsStart() + container.x + pos.x + pos.width - (gR.x + gR.getBeatGlyphsStart() + g.x);
 				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo(container.beat);
 			}
@@ -6777,38 +7082,84 @@ alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.Grou
 		case 11:
 			if(g != prevGlyph) this.alignGlyph(alphatab.rendering.EffectBarGlyphSizing.GroupedPostBeatOnly,beatIndex,voiceIndex,prevGlyph); else {
 				pos = container.postNotes;
-				var posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
-				var gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
+				var posR;
+				posR = js.Boot.__cast(pos.renderer , alphatab.rendering.EffectBarRenderer);
+				var gR;
+				gR = js.Boot.__cast(g.renderer , alphatab.rendering.EffectBarRenderer);
 				g.width = posR.x + posR.getBeatGlyphsStart() + container.x + pos.x + pos.width - (gR.x + gR.getBeatGlyphsStart() + g.x);
 				if(js.Boot.__instanceof(g,alphatab.rendering.glyphs.IMultiBeatEffectGlyph)) (js.Boot.__cast(g , alphatab.rendering.glyphs.IMultiBeatEffectGlyph)).expandedTo(container.beat);
 			}
 			break;
 		}
 	}
-	,finalizeRenderer: function(layout) {
-		alphatab.rendering.GroupedBarRenderer.prototype.finalizeRenderer.call(this,layout);
-		this.isEmpty = true;
-		var prevGlyph = null;
-		if(this.index > 0) {
-			var prevRenderer = js.Boot.__cast(this.stave.barRenderers[this.index - 1] , alphatab.rendering.EffectBarRenderer);
-			if(prevRenderer._lastBeat != null) prevGlyph = prevRenderer._effectGlyphs[0].get(prevRenderer._lastBeat.index);
-		}
-		var $it0 = this._effectGlyphs[0].keys();
-		while( $it0.hasNext() ) {
-			var beatIndex = $it0.next();
-			var effect = this._effectGlyphs[0].get(beatIndex);
-			this.alignGlyph(this._info.getSizingMode(),beatIndex,0,prevGlyph);
-			prevGlyph = effect;
-			this.isEmpty = false;
+	,createPreBeatGlyphs: function() {
+	}
+	,createBeatGlyphs: function() {
+		this._effectGlyphs.push(new haxe.ds.IntMap());
+		this._uniqueEffectGlyphs.push(new Array());
+		this.createVoiceGlyphs(this._bar.voices[0]);
+	}
+	,createVoiceGlyphs: function(v) {
+		var _g = 0;
+		var _g1 = v.beats;
+		while(_g < _g1.length) {
+			var b = _g1[_g];
+			++_g;
+			var container = new alphatab.rendering.glyphs.BeatContainerGlyph(b);
+			container.preNotes = new alphatab.rendering.glyphs.BeatGlyphBase();
+			container.onNotes = new alphatab.rendering.glyphs.BeatGlyphBase();
+			container.postNotes = new alphatab.rendering.glyphs.BeatGlyphBase();
+			this.addBeatGlyph(container);
+			if(this._info.shouldCreateGlyph(this,b)) this.createOrResizeGlyph(this._info.getSizingMode(),b);
+			this._lastBeat = b;
 		}
 	}
-	,doLayout: function() {
-		alphatab.rendering.GroupedBarRenderer.prototype.doLayout.call(this);
-		if(this.index == 0) {
-			this.stave.topSpacing = 5;
-			this.stave.bottomSpacing = 5;
+	,createOrResizeGlyph: function(sizing,b) {
+		switch(sizing[1]) {
+		case 0:case 1:case 2:case 3:case 4:case 5:
+			var g = this._info.createNewGlyph(this,b);
+			g.renderer = this;
+			g.doLayout();
+			this._effectGlyphs[b.voice.index].set(b.index,g);
+			this._uniqueEffectGlyphs[b.voice.index].push(g);
+			break;
+		case 6:case 7:case 8:case 9:case 10:case 11:
+			if(b.index > 0 || this.index > 0) {
+				var prevBeat = b.previousBeat;
+				if(this._info.shouldCreateGlyph(this,prevBeat)) {
+					var prevEffect;
+					if(b.index > 0) prevEffect = this._effectGlyphs[b.voice.index].get(prevBeat.index); else prevEffect = (js.Boot.__cast(this.stave.barRenderers[this.index - 1] , alphatab.rendering.EffectBarRenderer))._effectGlyphs[b.voice.index].get(prevBeat.index);
+					if(prevEffect == null || !this._info.canExpand(this,prevBeat,b)) this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b); else this._effectGlyphs[b.voice.index].set(b.index,prevEffect);
+				} else this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b);
+			} else this.createOrResizeGlyph(alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly,b);
+			break;
 		}
-		this.height = this._info.getHeight(this);
+	}
+	,createPostBeatGlyphs: function() {
+	}
+	,getTopPadding: function() {
+		return 0;
+	}
+	,getBottomPadding: function() {
+		return 0;
+	}
+	,paintBackground: function(cx,cy,canvas) {
+	}
+	,paint: function(cx,cy,canvas) {
+		alphatab.rendering.GroupedBarRenderer.prototype.paint.call(this,cx,cy,canvas);
+		var glyphStart = this.getBeatGlyphsStart();
+		var _g = 0;
+		var _g1 = this._uniqueEffectGlyphs;
+		while(_g < _g1.length) {
+			var v = _g1[_g];
+			++_g;
+			var _g2 = 0;
+			while(_g2 < v.length) {
+				var g = v[_g2];
+				++_g2;
+				if(g.renderer == this) g.paint(cx + this.x + glyphStart,cy + this.y,canvas);
+			}
+		}
 	}
 	,__class__: alphatab.rendering.EffectBarRenderer
 });
@@ -6819,6 +7170,7 @@ $hxClasses["alphatab.rendering.RenderingResources"] = alphatab.rendering.Renderi
 alphatab.rendering.RenderingResources.__name__ = true;
 alphatab.rendering.RenderingResources.prototype = {
 	init: function(scale) {
+		this.scale = scale;
 		var sansFont = "Arial";
 		var serifFont = "Georgia";
 		this.effectFont = new alphatab.platform.model.Font(serifFont,12 * scale,2);
@@ -6837,7 +7189,7 @@ alphatab.rendering.RenderingResources.prototype = {
 		this.mainGlyphColor = new alphatab.platform.model.Color(0,0,0);
 	}
 	,__class__: alphatab.rendering.RenderingResources
-}
+};
 alphatab.rendering.ScoreBarRenderer = function(bar) {
 	alphatab.rendering.GroupedBarRenderer.call(this,bar);
 	this.accidentalHelper = new alphatab.rendering.utils.AccidentalHelper();
@@ -6855,49 +7207,540 @@ alphatab.rendering.ScoreBarRenderer.paintSingleBar = function(canvas,x1,y1,x2,y2
 	canvas.lineTo(x1,y1 - size);
 	canvas.closePath();
 	canvas.fill();
-}
+};
 alphatab.rendering.ScoreBarRenderer.__super__ = alphatab.rendering.GroupedBarRenderer;
 alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.GroupedBarRenderer.prototype,{
-	paintBackground: function(cx,cy,canvas) {
-		var res = this.stave.staveGroup.layout.renderer.renderingResources;
-		canvas.setColor(res.staveLineColor);
-		var lineY = cy + this.y + this.getGlyphOverflow();
-		var startY = lineY;
+	getBeatDirection: function(beat) {
+		var g = this.getOrCreateVoiceContainer(beat.voice.index).beatGlyphs[beat.index].onNotes;
+		if(g != null) return g.noteHeads.beamingHelper.getDirection();
+		return alphatab.rendering.utils.BeamDirection.Up;
+	}
+	,getNoteX: function(note,onEnd) {
+		if(onEnd == null) onEnd = true;
+		var g = this.getOrCreateVoiceContainer(note.beat.voice.index).beatGlyphs[note.beat.index].onNotes;
+		if(g != null) return g.container.x + g.x + g.noteHeads.getNoteX(note,onEnd);
+		return 0;
+	}
+	,getNoteY: function(note) {
+		var beat = this.getOrCreateVoiceContainer(note.beat.voice.index).beatGlyphs[note.beat.index].onNotes;
+		if(beat != null) return beat.noteHeads.getNoteY(note);
+		return 0;
+	}
+	,getTopPadding: function() {
+		return this.getGlyphOverflow();
+	}
+	,getBottomPadding: function() {
+		return this.getGlyphOverflow();
+	}
+	,getLineOffset: function() {
+		return 9 * this.stave.staveGroup.layout.renderer.settings.scale;
+	}
+	,doLayout: function() {
+		alphatab.rendering.GroupedBarRenderer.prototype.doLayout.call(this);
+		this.height = (9 * this.stave.staveGroup.layout.renderer.settings.scale * 4 | 0) + this.getTopPadding() + this.getBottomPadding();
+		if(this.index == 0) {
+			this.stave.registerStaveTop(this.getGlyphOverflow());
+			this.stave.registerStaveBottom(this.height - this.getGlyphOverflow());
+		}
+		var top = this.getScoreY(0);
+		var bottom = this.getScoreY(8);
 		var _g = 0;
-		while(_g < 5) {
-			var i = _g++;
-			if(i > 0) lineY += 9 * this.stave.staveGroup.layout.renderer.scale | 0;
-			canvas.beginPath();
-			canvas.moveTo(cx + this.x,lineY);
-			canvas.lineTo(cx + this.x + this.width,lineY);
-			canvas.stroke();
+		var _g1 = this._beamHelpers;
+		while(_g < _g1.length) {
+			var v = _g1[_g];
+			++_g;
+			var _g2 = 0;
+			while(_g2 < v.length) {
+				var h = v[_g2];
+				++_g2;
+				var maxNoteY = this.getScoreY(this.getNoteLine(h.maxNote));
+				if(h.getDirection() == alphatab.rendering.utils.BeamDirection.Up) maxNoteY -= this.getStemSize(h.maxDuration);
+				if(maxNoteY < top) this.registerOverflowTop((function($this) {
+					var $r;
+					var x = Math.abs(maxNoteY);
+					$r = x | 0;
+					return $r;
+				}(this)));
+				var minNoteY = this.getScoreY(this.getNoteLine(h.minNote));
+				if(h.getDirection() == alphatab.rendering.utils.BeamDirection.Down) minNoteY += this.getStemSize(h.maxDuration);
+				if(minNoteY > bottom) this.registerOverflowBottom((function($this) {
+					var $r;
+					var x = Math.abs(minNoteY);
+					$r = x | 0;
+					return $r;
+				}(this)) - bottom);
+			}
 		}
 	}
-	,getGlyphOverflow: function() {
+	,paint: function(cx,cy,canvas) {
+		alphatab.rendering.GroupedBarRenderer.prototype.paint.call(this,cx,cy,canvas);
+		this.paintBeams(cx,cy,canvas);
+		this.paintTuplets(cx,cy,canvas);
+	}
+	,paintTuplets: function(cx,cy,canvas) {
+		var _g = 0;
+		var _g1 = this._tupletHelpers;
+		while(_g < _g1.length) {
+			var v = _g1[_g];
+			++_g;
+			var _g2 = 0;
+			while(_g2 < v.length) {
+				var h = v[_g2];
+				++_g2;
+				this.paintTupletHelper(cx + this.getBeatGlyphsStart(),cy,canvas,h);
+			}
+		}
+	}
+	,paintBeams: function(cx,cy,canvas) {
+		var _g = 0;
+		var _g1 = this._beamHelpers;
+		while(_g < _g1.length) {
+			var v = _g1[_g];
+			++_g;
+			var _g2 = 0;
+			while(_g2 < v.length) {
+				var h = v[_g2];
+				++_g2;
+				this.paintBeamHelper(cx + this.getBeatGlyphsStart(),cy,canvas,h);
+			}
+		}
+	}
+	,paintBeamHelper: function(cx,cy,canvas,h) {
+		if(h.beats.length == 1) this.paintFooter(cx,cy,canvas,h); else this.paintBar(cx,cy,canvas,h);
+	}
+	,paintTupletHelper: function(cx,cy,canvas,h) {
 		var res = this.stave.staveGroup.layout.renderer.renderingResources;
-		return res.tablatureFont.getSize() / 2 + res.tablatureFont.getSize() * 0.2 | 0;
+		var oldAlign = canvas.getTextAlign();
+		canvas.setTextAlign(alphatab.platform.model.TextAlign.Center);
+		if(h.beats.length == 1 || !(h.beats.length == h.tuplet)) {
+			var _g1 = 0;
+			var _g = h.beats.length;
+			while(_g1 < _g) {
+				var i = _g1++;
+				var beat = h.beats[i];
+				var beamingHelper = this._beamHelperLookup[h.voiceIndex].get(beat.index);
+				var direction = beamingHelper.getDirection();
+				var tupletX;
+				var x = beamingHelper.getBeatLineX(beat) + this.stave.staveGroup.layout.renderer.settings.scale;
+				tupletX = x | 0;
+				var tupletY = cy + this.y + this.calculateBeamY(beamingHelper,tupletX);
+				var offset;
+				if(direction == alphatab.rendering.utils.BeamDirection.Up) {
+					var x = res.effectFont.getSize() * 1.8;
+					offset = x | 0;
+				} else offset = -(3 * this.stave.staveGroup.layout.renderer.settings.scale | 0);
+				canvas.setFont(res.effectFont);
+				canvas.fillText(Std.string(h.tuplet),cx + this.x + tupletX,tupletY - offset);
+			}
+		} else {
+			var firstBeat = h.beats[0];
+			var lastBeat = h.beats[h.beats.length - 1];
+			var beamingHelper = this._beamHelperLookup[h.voiceIndex].get(firstBeat.index);
+			var direction = beamingHelper.getDirection();
+			var startX;
+			var x = beamingHelper.getBeatLineX(firstBeat) + this.stave.staveGroup.layout.renderer.settings.scale;
+			startX = x | 0;
+			var endX;
+			var x = beamingHelper.getBeatLineX(lastBeat) + this.stave.staveGroup.layout.renderer.settings.scale;
+			endX = x | 0;
+			canvas.setFont(res.effectFont);
+			var s = Std.string(h.tuplet);
+			var sw = canvas.measureText(s);
+			var sp = 3 * this.stave.staveGroup.layout.renderer.settings.scale | 0;
+			var middleX = (startX + endX) / 2 | 0;
+			var offset1X = middleX - sw / 2 - sp | 0;
+			var offset2X = middleX + sw / 2 + sp | 0;
+			var startY = this.calculateBeamY(beamingHelper,startX);
+			var offset1Y = this.calculateBeamY(beamingHelper,offset1X);
+			var middleY = this.calculateBeamY(beamingHelper,middleX);
+			var offset2Y = this.calculateBeamY(beamingHelper,offset2X);
+			var endY = this.calculateBeamY(beamingHelper,endX);
+			var offset = 10 * this.stave.staveGroup.layout.renderer.settings.scale | 0;
+			var size = 5 * this.stave.staveGroup.layout.renderer.settings.scale | 0;
+			if(direction == alphatab.rendering.utils.BeamDirection.Down) {
+				offset *= -1;
+				size *= -1;
+			}
+			canvas.beginPath();
+			canvas.moveTo(cx + this.x + startX,cy + this.y + startY - offset);
+			canvas.lineTo(cx + this.x + startX,cy + this.y + startY - offset - size);
+			canvas.lineTo(cx + this.x + offset1X,cy + this.y + offset1Y - offset - size);
+			canvas.stroke();
+			canvas.beginPath();
+			canvas.moveTo(cx + this.x + offset2X,cy + this.y + offset2Y - offset - size);
+			canvas.lineTo(cx + this.x + endX,cy + this.y + endY - offset - size);
+			canvas.lineTo(cx + this.x + endX,cy + this.y + endY - offset);
+			canvas.stroke();
+			canvas.fillText(s,cx + this.x + middleX,cy + this.y + middleY - offset - size - res.effectFont.getSize());
+		}
+		canvas.setTextAlign(oldAlign);
 	}
-	,getScoreY: function(steps,correction) {
-		if(correction == null) correction = 0;
-		return 9 * this.stave.staveGroup.layout.renderer.scale / 2 * steps + correction * this.stave.staveGroup.layout.renderer.scale | 0;
+	,getStemSize: function(duration) {
+		var size;
+		switch(duration[1]) {
+		case 1:
+			size = 6;
+			break;
+		case 2:
+			size = 6;
+			break;
+		case 3:
+			size = 6;
+			break;
+		case 4:
+			size = 6;
+			break;
+		case 5:
+			size = 7;
+			break;
+		case 6:
+			size = 8;
+			break;
+		default:
+			size = 0;
+		}
+		return this.getScoreY(size);
 	}
-	,getNoteLine: function(n) {
-		var value = n.beat.voice.bar.track.isPercussion?alphatab.rendering.utils.PercussionMapper.mapValue(n):n.realValue();
-		var ks = n.beat.voice.bar.getMasterBar().keySignature;
-		var clef = n.beat.voice.bar.clef;
-		var index = value % 12;
-		var octave = value / 12 | 0;
-		var steps = alphatab.rendering.ScoreBarRenderer.OCTAVE_STEPS[alphatab.model.ModelUtils.getClefIndex(clef)];
-		steps -= octave * 7;
-		steps -= ks > 0 || ks == 0?alphatab.rendering.ScoreBarRenderer.SHARP_NOTE_STEPS[index]:alphatab.rendering.ScoreBarRenderer.FLAT_NOTE_STEPS[index];
-		return steps + 1;
+	,calculateBeamY: function(h,x) {
+		var _g = this;
+		var correction = 4;
+		var stemSize = this.getStemSize(h.maxDuration);
+		return h.calculateBeamY(stemSize,this.stave.staveGroup.layout.renderer.settings.scale | 0,x,this.stave.staveGroup.layout.renderer.settings.scale,function(n) {
+			return _g.getScoreY(_g.getNoteLine(n),correction - 1);
+		});
+	}
+	,paintBar: function(cx,cy,canvas,h) {
+		var _g1 = 0;
+		var _g = h.beats.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var beat = h.beats[i];
+			var correction = 4;
+			var beatLineX;
+			var x = h.getBeatLineX(beat) + this.stave.staveGroup.layout.renderer.settings.scale;
+			beatLineX = x | 0;
+			var direction = h.getDirection();
+			var y1;
+			y1 = cy + this.y + (direction == alphatab.rendering.utils.BeamDirection.Up?this.getScoreY(this.getNoteLine(beat.minNote()),correction - 1):this.getScoreY(this.getNoteLine(beat.maxNote()),correction - 1));
+			var y2 = cy + this.y + this.calculateBeamY(h,beatLineX);
+			canvas.setColor(this.stave.staveGroup.layout.renderer.renderingResources.mainGlyphColor);
+			canvas.beginPath();
+			canvas.moveTo(cx + this.x + beatLineX | 0,y1);
+			canvas.lineTo(cx + this.x + beatLineX | 0,y2);
+			canvas.stroke();
+			var brokenBarOffset = 6 * this.stave.staveGroup.layout.renderer.settings.scale | 0;
+			var barSpacing = 6 * this.stave.staveGroup.layout.renderer.settings.scale | 0;
+			var barSize = 3 * this.stave.staveGroup.layout.renderer.settings.scale | 0;
+			var barCount = alphatab.model.ModelUtils.getDurationIndex(beat.duration) - 2;
+			var barStart = cy + this.y;
+			if(direction == alphatab.rendering.utils.BeamDirection.Down) barSpacing = -barSpacing;
+			var _g2 = 0;
+			while(_g2 < barCount) {
+				var barIndex = _g2++;
+				var barStartX;
+				var barEndX;
+				var barStartY;
+				var barEndY;
+				var barY = barStart + barIndex * barSpacing;
+				if(i < h.beats.length - 1) {
+					if(this.isFullBarJoin(beat,h.beats[i + 1],barIndex)) {
+						barStartX = beatLineX;
+						var x = h.getBeatLineX(h.beats[i + 1]) + this.stave.staveGroup.layout.renderer.settings.scale;
+						barEndX = x | 0;
+					} else if(i == 0 || !this.isFullBarJoin(h.beats[i - 1],beat,barIndex)) {
+						barStartX = beatLineX;
+						barEndX = barStartX + brokenBarOffset;
+					} else continue;
+					var x = barY + this.calculateBeamY(h,barStartX);
+					barStartY = x | 0;
+					var x = barY + this.calculateBeamY(h,barEndX);
+					barEndY = x | 0;
+					alphatab.rendering.ScoreBarRenderer.paintSingleBar(canvas,cx + this.x + barStartX,barStartY,cx + this.x + barEndX,barEndY,barSize);
+				} else if(i > 0 && !this.isFullBarJoin(beat,h.beats[i - 1],barIndex)) {
+					barStartX = beatLineX - brokenBarOffset;
+					barEndX = beatLineX;
+					var x = barY + this.calculateBeamY(h,barStartX);
+					barStartY = x | 0;
+					var x = barY + this.calculateBeamY(h,barEndX);
+					barEndY = x | 0;
+					alphatab.rendering.ScoreBarRenderer.paintSingleBar(canvas,cx + this.x + barStartX,barStartY,cx + this.x + barEndX,barEndY,barSize);
+				}
+			}
+		}
+	}
+	,isFullBarJoin: function(a,b,barIndex) {
+		return alphatab.model.ModelUtils.getDurationIndex(a.duration) - 2 - barIndex > 0 && alphatab.model.ModelUtils.getDurationIndex(b.duration) - 2 - barIndex > 0;
+	}
+	,paintFooter: function(cx,cy,canvas,h) {
+		var beat = h.beats[0];
+		if(beat.duration == alphatab.model.Duration.Whole) return;
+		var isGrace = beat.graceType != alphatab.model.GraceType.None;
+		var scaleMod;
+		if(isGrace) scaleMod = 0.7; else scaleMod = 1;
+		var stemSize = this.getStemSize(h.maxDuration);
+		var correction = 9 * scaleMod / 2 | 0;
+		var beatLineX;
+		var x = h.getBeatLineX(beat) + this.stave.staveGroup.layout.renderer.settings.scale;
+		beatLineX = x | 0;
+		var direction = h.getDirection();
+		var topY = this.getScoreY(this.getNoteLine(beat.maxNote()),correction);
+		var bottomY = this.getScoreY(this.getNoteLine(beat.minNote()),correction);
+		var beamY;
+		if(direction == alphatab.rendering.utils.BeamDirection.Down) {
+			bottomY += stemSize * scaleMod | 0;
+			beamY = bottomY;
+		} else {
+			topY -= stemSize * scaleMod | 0;
+			beamY = topY;
+		}
+		canvas.setColor(this.stave.staveGroup.layout.renderer.renderingResources.mainGlyphColor);
+		canvas.beginPath();
+		canvas.moveTo(cx + this.x + beatLineX | 0,cy + this.y + topY);
+		canvas.lineTo(cx + this.x + beatLineX | 0,cy + this.y + bottomY);
+		canvas.stroke();
+		if(isGrace) {
+			var graceSizeY = 15 * this.stave.staveGroup.layout.renderer.settings.scale;
+			var graceSizeX = 12 * this.stave.staveGroup.layout.renderer.settings.scale;
+			canvas.beginPath();
+			if(direction == alphatab.rendering.utils.BeamDirection.Down) {
+				canvas.moveTo(cx + this.x + beatLineX - graceSizeX / 2 | 0,cy + this.y + bottomY - graceSizeY);
+				canvas.lineTo(cx + this.x + beatLineX + graceSizeX / 2 | 0,cy + this.y + bottomY);
+			} else {
+				canvas.moveTo(cx + this.x + beatLineX - graceSizeX / 2 | 0,cy + this.y + topY + graceSizeY);
+				canvas.lineTo(cx + this.x + beatLineX + graceSizeX / 2 | 0,cy + this.y + topY);
+			}
+			canvas.stroke();
+		}
+		var gx = beatLineX | 0;
+		var glyph = new alphatab.rendering.glyphs.BeamGlyph(gx,beamY,beat.duration,direction,isGrace);
+		glyph.renderer = this;
+		glyph.doLayout();
+		glyph.paint(cx + this.x,cy + this.y,canvas);
+	}
+	,createPreBeatGlyphs: function() {
+		if(((function($this) {
+			var $r;
+			var _this = $this._bar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).isRepeatStart) this.addPreBeatGlyph(new alphatab.rendering.glyphs.RepeatOpenGlyph(0,0,1.5,3));
+		if(this.index == 0 || this._bar.clef != this._bar.previousBar.clef) {
+			var offset = 0;
+			var _g = this._bar.clef;
+			switch(_g[1]) {
+			case 0:
+				offset = 4;
+				break;
+			case 3:
+				offset = 4;
+				break;
+			case 1:
+				offset = 6;
+				break;
+			case 2:
+				offset = 4;
+				break;
+			case 4:
+				offset = 6;
+				break;
+			}
+			this.createStartSpacing();
+			this.addPreBeatGlyph(new alphatab.rendering.glyphs.ClefGlyph(0,this.getScoreY(offset),this._bar.clef));
+		}
+		if(this._bar.previousBar == null && ((function($this) {
+			var $r;
+			var _this = $this._bar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).keySignature != 0 || this._bar.previousBar != null && ((function($this) {
+			var $r;
+			var _this = $this._bar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).keySignature != ((function($this) {
+			var $r;
+			var _this = $this._bar.previousBar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).keySignature) {
+			this.createStartSpacing();
+			this.createKeySignatureGlyphs();
+		}
+		if(this._bar.previousBar == null || this._bar.previousBar != null && ((function($this) {
+			var $r;
+			var _this = $this._bar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).timeSignatureNumerator != ((function($this) {
+			var $r;
+			var _this = $this._bar.previousBar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).timeSignatureNumerator || this._bar.previousBar != null && ((function($this) {
+			var $r;
+			var _this = $this._bar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).timeSignatureDenominator != ((function($this) {
+			var $r;
+			var _this = $this._bar.previousBar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).timeSignatureDenominator) {
+			this.createStartSpacing();
+			this.createTimeSignatureGlyphs();
+		}
+		this.addPreBeatGlyph(new alphatab.rendering.glyphs.BarNumberGlyph(0,this.getScoreY(-1,-3),this._bar.index + 1,!this.stave.isFirstInAccolade));
+		if(this._bar.isEmpty()) this.addPreBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,30 * this.stave.staveGroup.layout.renderer.settings.scale | 0,false));
+	}
+	,createBeatGlyphs: function() {
+		this.createVoiceGlyphs(this._bar.voices[0]);
+	}
+	,createPostBeatGlyphs: function() {
+		if(((function($this) {
+			var $r;
+			var _this = $this._bar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).repeatCount > 0) {
+			this.addPostBeatGlyph(new alphatab.rendering.glyphs.RepeatCloseGlyph(this.x,0));
+			if(((function($this) {
+				var $r;
+				var _this = $this._bar;
+				$r = _this.track.score.masterBars[_this.index];
+				return $r;
+			}(this))).repeatCount > 2) {
+				var line;
+				if(this._bar.index == this._bar.track.bars.length - 1 || this.index == this.stave.barRenderers.length - 1) line = -1; else line = -4;
+				this.addPostBeatGlyph(new alphatab.rendering.glyphs.RepeatCountGlyph(0,this.getScoreY(line,-3),((function($this) {
+					var $r;
+					var _this = $this._bar;
+					$r = _this.track.score.masterBars[_this.index];
+					return $r;
+				}(this))).repeatCount));
+			}
+		} else if(((function($this) {
+			var $r;
+			var _this = $this._bar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).isDoubleBar) {
+			this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph());
+			this.addPostBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,3 * this.stave.staveGroup.layout.renderer.settings.scale | 0,false));
+			this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph());
+		} else if(this._bar.nextBar == null || !((function($this) {
+			var $r;
+			var _this = $this._bar.nextBar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).isRepeatStart) this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph(0,0,this._bar.index == this._bar.track.bars.length - 1));
+	}
+	,createStartSpacing: function() {
+		if(this._startSpacing) return;
+		this.addPreBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,2 * this.stave.staveGroup.layout.renderer.settings.scale | 0));
+		this._startSpacing = true;
+	}
+	,createKeySignatureGlyphs: function() {
+		var offsetClef = 0;
+		var currentKey = ((function($this) {
+			var $r;
+			var _this = $this._bar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).keySignature;
+		var previousKey;
+		if(this._bar.previousBar == null) previousKey = 0; else previousKey = ((function($this) {
+			var $r;
+			var _this = $this._bar.previousBar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).keySignature;
+		var _g = this._bar.clef;
+		switch(_g[1]) {
+		case 0:
+			offsetClef = 0;
+			break;
+		case 4:
+			offsetClef = 0;
+			break;
+		case 3:
+			offsetClef = 2;
+			break;
+		case 1:
+			offsetClef = -1;
+			break;
+		case 2:
+			offsetClef = 1;
+			break;
+		}
+		var naturalizeSymbols;
+		var x = Math.abs(previousKey);
+		naturalizeSymbols = x | 0;
+		var previousKeyPositions;
+		if(previousKey > 0) previousKeyPositions = alphatab.rendering.ScoreBarRenderer.SharpKsSteps; else previousKeyPositions = alphatab.rendering.ScoreBarRenderer.FlatKsSteps;
+		var _g = 0;
+		while(_g < naturalizeSymbols) {
+			var i = _g++;
+			this.addPreBeatGlyph(new alphatab.rendering.glyphs.NaturalizeGlyph(0,(function($this) {
+				var $r;
+				var x = $this.getScoreY(previousKeyPositions[i] + offsetClef);
+				$r = x | 0;
+				return $r;
+			}(this))));
+		}
+		var offsetSymbols;
+		if(currentKey <= 7) offsetSymbols = currentKey; else offsetSymbols = currentKey - 7;
+		if(currentKey > 0) {
+			var _g1 = 0;
+			var _g;
+			var x = Math.abs(currentKey);
+			_g = x | 0;
+			while(_g1 < _g) {
+				var i = _g1++;
+				this.addPreBeatGlyph(new alphatab.rendering.glyphs.SharpGlyph(0,(function($this) {
+					var $r;
+					var x = $this.getScoreY(alphatab.rendering.ScoreBarRenderer.SharpKsSteps[i] + offsetClef);
+					$r = x | 0;
+					return $r;
+				}(this))));
+			}
+		} else {
+			var _g1 = 0;
+			var _g;
+			var x = Math.abs(currentKey);
+			_g = x | 0;
+			while(_g1 < _g) {
+				var i = _g1++;
+				this.addPreBeatGlyph(new alphatab.rendering.glyphs.FlatGlyph(0,(function($this) {
+					var $r;
+					var x = $this.getScoreY(alphatab.rendering.ScoreBarRenderer.FlatKsSteps[i] + offsetClef);
+					$r = x | 0;
+					return $r;
+				}(this))));
+			}
+		}
+	}
+	,createTimeSignatureGlyphs: function() {
+		this.addPreBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,5 * this.stave.staveGroup.layout.renderer.settings.scale | 0));
+		this.addPreBeatGlyph(new alphatab.rendering.glyphs.TimeSignatureGlyph(0,0,((function($this) {
+			var $r;
+			var _this = $this._bar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).timeSignatureNumerator,((function($this) {
+			var $r;
+			var _this = $this._bar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).timeSignatureDenominator));
 	}
 	,createVoiceGlyphs: function(v) {
 		this._currentBeamHelper = null;
 		this._beamHelpers.push(new Array());
 		this._beamHelperLookup.push(new haxe.ds.IntMap());
 		this._tupletHelpers.push(new Array());
-		var _g = 0, _g1 = v.beats;
+		var _g = 0;
+		var _g1 = v.beats;
 		while(_g < _g1.length) {
 			var b = _g1[_g];
 			++_g;
@@ -6930,407 +7773,97 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 		}
 		this._currentBeamHelper = null;
 	}
-	,createTimeSignatureGlyphs: function() {
-		this.addPreBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,5 * this.stave.staveGroup.layout.renderer.scale | 0));
-		this.addPreBeatGlyph(new alphatab.rendering.glyphs.TimeSignatureGlyph(0,0,this._bar.getMasterBar().timeSignatureNumerator,this._bar.getMasterBar().timeSignatureDenominator));
+	,getNoteLine: function(n) {
+		var value;
+		if(n.beat.voice.bar.track.isPercussion) value = alphatab.rendering.utils.PercussionMapper.mapValue(n); else value = n.fret + n.beat.voice.bar.track.tuning[n.beat.voice.bar.track.tuning.length - (n.string - 1) - 1];
+		var ks = ((function($this) {
+			var $r;
+			var _this = n.beat.voice.bar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).keySignature;
+		var clef = n.beat.voice.bar.clef;
+		var index = value % 12;
+		var octave = value / 12 | 0;
+		var steps = alphatab.rendering.ScoreBarRenderer.OctaveSteps[alphatab.model.ModelUtils.getClefIndex(clef)];
+		steps -= octave * 7;
+		steps -= ks > 0 || ks == 0?alphatab.rendering.ScoreBarRenderer.SharpNoteSteps[index]:alphatab.rendering.ScoreBarRenderer.FLAT_NOTE_STEPS[index];
+		return steps + 1;
 	}
-	,createKeySignatureGlyphs: function() {
-		var offsetClef = 0;
-		var currentKey = this._bar.getMasterBar().keySignature;
-		var previousKey = this._bar.previousBar == null?0:this._bar.previousBar.getMasterBar().keySignature;
-		var _g = this;
-		switch( (_g._bar.clef)[1] ) {
-		case 0:
-			offsetClef = 0;
-			break;
-		case 4:
-			offsetClef = 0;
-			break;
-		case 3:
-			offsetClef = 2;
-			break;
-		case 1:
-			offsetClef = -1;
-			break;
-		case 2:
-			offsetClef = 1;
-			break;
-		}
-		var naturalizeSymbols = Math.abs(previousKey) | 0;
-		var previousKeyPositions = previousKey > 0?alphatab.rendering.ScoreBarRenderer.SHARP_KS_STEPS:alphatab.rendering.ScoreBarRenderer.FLAT_KS_STEPS;
-		var _g1 = 0;
-		while(_g1 < naturalizeSymbols) {
-			var i = _g1++;
-			this.addPreBeatGlyph(new alphatab.rendering.glyphs.NaturalizeGlyph(0,this.getScoreY(previousKeyPositions[i] + offsetClef) | 0));
-		}
-		var offsetSymbols = currentKey <= 7?currentKey:currentKey - 7;
-		if(currentKey > 0) {
-			var _g2 = 0, _g1 = Math.abs(currentKey) | 0;
-			while(_g2 < _g1) {
-				var i = _g2++;
-				this.addPreBeatGlyph(new alphatab.rendering.glyphs.SharpGlyph(0,this.getScoreY(alphatab.rendering.ScoreBarRenderer.SHARP_KS_STEPS[i] + offsetClef) | 0));
-			}
-		} else {
-			var _g2 = 0, _g1 = Math.abs(currentKey) | 0;
-			while(_g2 < _g1) {
-				var i = _g2++;
-				this.addPreBeatGlyph(new alphatab.rendering.glyphs.FlatGlyph(0,this.getScoreY(alphatab.rendering.ScoreBarRenderer.FLAT_KS_STEPS[i] + offsetClef) | 0));
-			}
-		}
+	,getScoreY: function(steps,correction) {
+		if(correction == null) correction = 0;
+		return 9 * this.stave.staveGroup.layout.renderer.settings.scale / 2 * steps + correction * this.stave.staveGroup.layout.renderer.settings.scale | 0;
 	}
-	,createStartSpacing: function() {
-		if(this._startSpacing) return;
-		this.addPreBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,2 * this.stave.staveGroup.layout.renderer.scale | 0));
-		this._startSpacing = true;
-	}
-	,createPostBeatGlyphs: function() {
-		if(this._bar.getMasterBar().repeatCount > 0) {
-			this.addPostBeatGlyph(new alphatab.rendering.glyphs.RepeatCloseGlyph(this.x,0));
-			if(this._bar.getMasterBar().repeatCount > 2) {
-				var line = this._bar.index == this._bar.track.bars.length - 1 || this.index == this.stave.barRenderers.length - 1?-1:-4;
-				this.addPostBeatGlyph(new alphatab.rendering.glyphs.RepeatCountGlyph(0,this.getScoreY(line,-3),this._bar.getMasterBar().repeatCount));
-			}
-		} else if(this._bar.getMasterBar().isDoubleBar) {
-			this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph());
-			this.addPostBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,3 * this.stave.staveGroup.layout.renderer.scale | 0,false));
-			this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph());
-		} else if(this._bar.nextBar == null || !this._bar.nextBar.getMasterBar().isRepeatStart) this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph(0,0,this._bar.index == this._bar.track.bars.length - 1));
-	}
-	,createBeatGlyphs: function() {
-		this.createVoiceGlyphs(this._bar.voices[0]);
-	}
-	,createPreBeatGlyphs: function() {
-		if(this._bar.getMasterBar().isRepeatStart) this.addPreBeatGlyph(new alphatab.rendering.glyphs.RepeatOpenGlyph(0,0,1.5,3));
-		if(this.index == 0 || this._bar.clef != this._bar.previousBar.clef) {
-			var offset = 0;
-			var _g = this;
-			switch( (_g._bar.clef)[1] ) {
-			case 0:
-				offset = 4;
-				break;
-			case 3:
-				offset = 4;
-				break;
-			case 1:
-				offset = 6;
-				break;
-			case 2:
-				offset = 4;
-				break;
-			case 4:
-				offset = 6;
-				break;
-			}
-			this.createStartSpacing();
-			this.addPreBeatGlyph(new alphatab.rendering.glyphs.ClefGlyph(0,this.getScoreY(offset),this._bar.clef));
-		}
-		if(this._bar.previousBar == null && this._bar.getMasterBar().keySignature != 0 || this._bar.previousBar != null && this._bar.getMasterBar().keySignature != this._bar.previousBar.getMasterBar().keySignature) {
-			this.createStartSpacing();
-			this.createKeySignatureGlyphs();
-		}
-		if(this._bar.previousBar == null || this._bar.previousBar != null && this._bar.getMasterBar().timeSignatureNumerator != this._bar.previousBar.getMasterBar().timeSignatureNumerator || this._bar.previousBar != null && this._bar.getMasterBar().timeSignatureDenominator != this._bar.previousBar.getMasterBar().timeSignatureDenominator) {
-			this.createStartSpacing();
-			this.createTimeSignatureGlyphs();
-		}
-		this.addPreBeatGlyph(new alphatab.rendering.glyphs.BarNumberGlyph(0,this.getScoreY(-1,-3),this._bar.index + 1,!this.stave.isFirstInAccolade));
-		if(this._bar.isEmpty()) this.addPreBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,30 * this.stave.staveGroup.layout.renderer.scale | 0,false));
-	}
-	,paintFooter: function(cx,cy,canvas,h) {
-		var beat = h.beats[0];
-		if(beat.duration == alphatab.model.Duration.Whole) return;
-		var isGrace = beat.graceType != alphatab.model.GraceType.None;
-		var scaleMod = isGrace?0.7:1;
-		var stemSize = this.getStemSize(h.maxDuration);
-		var correction = 9 * scaleMod / 2 | 0;
-		var beatLineX = h.getBeatLineX(beat) + this.stave.staveGroup.layout.renderer.scale | 0;
-		var direction = h.getDirection();
-		var topY = this.getScoreY(this.getNoteLine(beat.maxNote()),correction);
-		var bottomY = this.getScoreY(this.getNoteLine(beat.minNote()),correction);
-		var beamY;
-		if(direction == alphatab.rendering.utils.BeamDirection.Down) {
-			bottomY += stemSize * scaleMod | 0;
-			beamY = bottomY;
-		} else {
-			topY -= stemSize * scaleMod | 0;
-			beamY = topY;
-		}
-		canvas.setColor(this.stave.staveGroup.layout.renderer.renderingResources.mainGlyphColor);
-		canvas.beginPath();
-		canvas.moveTo(cx + this.x + beatLineX | 0,cy + this.y + topY);
-		canvas.lineTo(cx + this.x + beatLineX | 0,cy + this.y + bottomY);
-		canvas.stroke();
-		if(isGrace) {
-			var graceSizeY = 15 * this.stave.staveGroup.layout.renderer.scale;
-			var graceSizeX = 12 * this.stave.staveGroup.layout.renderer.scale;
-			canvas.beginPath();
-			if(direction == alphatab.rendering.utils.BeamDirection.Down) {
-				canvas.moveTo(cx + this.x + beatLineX - graceSizeX / 2 | 0,cy + this.y + bottomY - graceSizeY);
-				canvas.lineTo(cx + this.x + beatLineX + graceSizeX / 2 | 0,cy + this.y + bottomY);
-			} else {
-				canvas.moveTo(cx + this.x + beatLineX - graceSizeX / 2 | 0,cy + this.y + topY + graceSizeY);
-				canvas.lineTo(cx + this.x + beatLineX + graceSizeX / 2 | 0,cy + this.y + topY);
-			}
-			canvas.stroke();
-		}
-		var gx = beatLineX | 0;
-		var glyph = new alphatab.rendering.glyphs.BeamGlyph(gx,beamY,beat.duration,direction,isGrace);
-		glyph.renderer = this;
-		glyph.doLayout();
-		glyph.paint(cx + this.x,cy + this.y,canvas);
-	}
-	,isFullBarJoin: function(a,b,barIndex) {
-		return alphatab.model.ModelUtils.getDurationIndex(a.duration) - 2 - barIndex > 0 && alphatab.model.ModelUtils.getDurationIndex(b.duration) - 2 - barIndex > 0;
-	}
-	,paintBar: function(cx,cy,canvas,h) {
-		var _g1 = 0, _g = h.beats.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var beat = h.beats[i];
-			var correction = 4;
-			var beatLineX = h.getBeatLineX(beat) + this.stave.staveGroup.layout.renderer.scale | 0;
-			var direction = h.getDirection();
-			var y1 = cy + this.y + (direction == alphatab.rendering.utils.BeamDirection.Up?this.getScoreY(this.getNoteLine(beat.minNote()),correction - 1):this.getScoreY(this.getNoteLine(beat.maxNote()),correction - 1));
-			var y2 = cy + this.y + this.calculateBeamY(h,beatLineX);
-			canvas.setColor(this.stave.staveGroup.layout.renderer.renderingResources.mainGlyphColor);
-			canvas.beginPath();
-			canvas.moveTo(cx + this.x + beatLineX | 0,y1);
-			canvas.lineTo(cx + this.x + beatLineX | 0,y2);
-			canvas.stroke();
-			var brokenBarOffset = 6 * this.stave.staveGroup.layout.renderer.scale | 0;
-			var barSpacing = 6 * this.stave.staveGroup.layout.renderer.scale | 0;
-			var barSize = 3 * this.stave.staveGroup.layout.renderer.scale | 0;
-			var barCount = alphatab.model.ModelUtils.getDurationIndex(beat.duration) - 2;
-			var barStart = cy + this.y;
-			if(direction == alphatab.rendering.utils.BeamDirection.Down) barSpacing = -barSpacing;
-			var _g2 = 0;
-			while(_g2 < barCount) {
-				var barIndex = _g2++;
-				var barStartX;
-				var barEndX;
-				var barStartY;
-				var barEndY;
-				var barY = barStart + barIndex * barSpacing;
-				if(i < h.beats.length - 1) {
-					if(this.isFullBarJoin(beat,h.beats[i + 1],barIndex)) {
-						barStartX = beatLineX;
-						barEndX = h.getBeatLineX(h.beats[i + 1]) + this.stave.staveGroup.layout.renderer.scale | 0;
-					} else if(i == 0 || !this.isFullBarJoin(h.beats[i - 1],beat,barIndex)) {
-						barStartX = beatLineX;
-						barEndX = barStartX + brokenBarOffset;
-					} else continue;
-					barStartY = barY + this.calculateBeamY(h,barStartX) | 0;
-					barEndY = barY + this.calculateBeamY(h,barEndX) | 0;
-					alphatab.rendering.ScoreBarRenderer.paintSingleBar(canvas,cx + this.x + barStartX,barStartY,cx + this.x + barEndX,barEndY,barSize);
-				} else if(i > 0 && !this.isFullBarJoin(beat,h.beats[i - 1],barIndex)) {
-					barStartX = beatLineX - brokenBarOffset;
-					barEndX = beatLineX;
-					barStartY = barY + this.calculateBeamY(h,barStartX) | 0;
-					barEndY = barY + this.calculateBeamY(h,barEndX) | 0;
-					alphatab.rendering.ScoreBarRenderer.paintSingleBar(canvas,cx + this.x + barStartX,barStartY,cx + this.x + barEndX,barEndY,barSize);
-				}
-			}
-		}
-	}
-	,calculateBeamY: function(h,x) {
-		var _g = this;
-		var correction = 4;
-		var stemSize = this.getStemSize(h.maxDuration);
-		return h.calculateBeamY(stemSize,this.stave.staveGroup.layout.renderer.scale | 0,x,this.stave.staveGroup.layout.renderer.scale,function(n) {
-			return _g.getScoreY(_g.getNoteLine(n),correction - 1);
-		});
-	}
-	,getStemSize: function(duration) {
-		var size;
-		switch( (duration)[1] ) {
-		case 1:
-			size = 6;
-			break;
-		case 2:
-			size = 6;
-			break;
-		case 3:
-			size = 6;
-			break;
-		case 4:
-			size = 6;
-			break;
-		case 5:
-			size = 7;
-			break;
-		case 6:
-			size = 8;
-			break;
-		default:
-			size = 0;
-		}
-		return this.getScoreY(size);
-	}
-	,paintTupletHelper: function(cx,cy,canvas,h) {
+	,getGlyphOverflow: function() {
 		var res = this.stave.staveGroup.layout.renderer.renderingResources;
-		var oldAlign = canvas.getTextAlign();
-		canvas.setTextAlign(alphatab.platform.model.TextAlign.Center);
-		if(h.beats.length == 1 || !(h.beats.length == h.tuplet)) {
-			var _g1 = 0, _g = h.beats.length;
-			while(_g1 < _g) {
-				var i = _g1++;
-				var beat = h.beats[i];
-				var beamingHelper = this._beamHelperLookup[h.voiceIndex].get(beat.index);
-				var direction = beamingHelper.getDirection();
-				var tupletX = beamingHelper.getBeatLineX(beat) + this.stave.staveGroup.layout.renderer.scale | 0;
-				var tupletY = cy + this.y + this.calculateBeamY(beamingHelper,tupletX);
-				var offset = direction == alphatab.rendering.utils.BeamDirection.Up?res.effectFont.getSize() * 1.8 | 0:-(3 * this.stave.staveGroup.layout.renderer.scale | 0);
-				canvas.setFont(res.effectFont);
-				canvas.fillText(Std.string(h.tuplet),cx + this.x + tupletX,tupletY - offset);
-			}
-		} else {
-			var firstBeat = h.beats[0];
-			var lastBeat = h.beats[h.beats.length - 1];
-			var beamingHelper = this._beamHelperLookup[h.voiceIndex].get(firstBeat.index);
-			var direction = beamingHelper.getDirection();
-			var startX = beamingHelper.getBeatLineX(firstBeat) + this.stave.staveGroup.layout.renderer.scale | 0;
-			var endX = beamingHelper.getBeatLineX(lastBeat) + this.stave.staveGroup.layout.renderer.scale | 0;
-			canvas.setFont(res.effectFont);
-			var s = Std.string(h.tuplet);
-			var sw = canvas.measureText(s);
-			var sp = 3 * this.stave.staveGroup.layout.renderer.scale | 0;
-			var middleX = (startX + endX) / 2 | 0;
-			var offset1X = middleX - sw / 2 - sp | 0;
-			var offset2X = middleX + sw / 2 + sp | 0;
-			var startY = this.calculateBeamY(beamingHelper,startX);
-			var offset1Y = this.calculateBeamY(beamingHelper,offset1X);
-			var middleY = this.calculateBeamY(beamingHelper,middleX);
-			var offset2Y = this.calculateBeamY(beamingHelper,offset2X);
-			var endY = this.calculateBeamY(beamingHelper,endX);
-			var offset = 10 * this.stave.staveGroup.layout.renderer.scale | 0;
-			var size = 5 * this.stave.staveGroup.layout.renderer.scale | 0;
-			if(direction == alphatab.rendering.utils.BeamDirection.Down) {
-				offset *= -1;
-				size *= -1;
-			}
+		var x = res.tablatureFont.getSize() / 2 + res.tablatureFont.getSize() * 0.2;
+		return x | 0;
+	}
+	,paintBackground: function(cx,cy,canvas) {
+		var res = this.stave.staveGroup.layout.renderer.renderingResources;
+		canvas.setColor(res.staveLineColor);
+		var lineY = cy + this.y + this.getGlyphOverflow();
+		var startY = lineY;
+		var _g = 0;
+		while(_g < 5) {
+			var i = _g++;
+			if(i > 0) lineY += 9 * this.stave.staveGroup.layout.renderer.settings.scale | 0;
 			canvas.beginPath();
-			canvas.moveTo(cx + this.x + startX,cy + this.y + startY - offset);
-			canvas.lineTo(cx + this.x + startX,cy + this.y + startY - offset - size);
-			canvas.lineTo(cx + this.x + offset1X,cy + this.y + offset1Y - offset - size);
+			canvas.moveTo(cx + this.x,lineY);
+			canvas.lineTo(cx + this.x + this.width,lineY);
 			canvas.stroke();
-			canvas.beginPath();
-			canvas.lineTo(cx + this.x + offset2X,cy + this.y + offset2Y - offset - size);
-			canvas.lineTo(cx + this.x + endX,cy + this.y + endY - offset - size);
-			canvas.lineTo(cx + this.x + endX,cy + this.y + endY - offset);
-			canvas.stroke();
-			canvas.fillText(s,cx + this.x + middleX,cy + this.y + middleY - offset - size - res.effectFont.getSize());
 		}
-		canvas.setTextAlign(oldAlign);
-	}
-	,paintBeamHelper: function(cx,cy,canvas,h) {
-		if(h.beats.length == 1) this.paintFooter(cx,cy,canvas,h); else this.paintBar(cx,cy,canvas,h);
-	}
-	,paintBeams: function(cx,cy,canvas) {
-		var _g = 0, _g1 = this._beamHelpers;
-		while(_g < _g1.length) {
-			var v = _g1[_g];
-			++_g;
-			var _g2 = 0;
-			while(_g2 < v.length) {
-				var h = v[_g2];
-				++_g2;
-				this.paintBeamHelper(cx + this.getBeatGlyphsStart(),cy,canvas,h);
-			}
-		}
-	}
-	,paintTuplets: function(cx,cy,canvas) {
-		var _g = 0, _g1 = this._tupletHelpers;
-		while(_g < _g1.length) {
-			var v = _g1[_g];
-			++_g;
-			var _g2 = 0;
-			while(_g2 < v.length) {
-				var h = v[_g2];
-				++_g2;
-				this.paintTupletHelper(cx + this.getBeatGlyphsStart(),cy,canvas,h);
-			}
-		}
-	}
-	,paint: function(cx,cy,canvas) {
-		alphatab.rendering.GroupedBarRenderer.prototype.paint.call(this,cx,cy,canvas);
-		this.paintBeams(cx,cy,canvas);
-		this.paintTuplets(cx,cy,canvas);
-	}
-	,doLayout: function() {
-		alphatab.rendering.GroupedBarRenderer.prototype.doLayout.call(this);
-		this.height = (9 * this.stave.staveGroup.layout.renderer.scale * 4 | 0) + this.getTopPadding() + this.getBottomPadding();
-		if(this.index == 0) {
-			this.stave.registerStaveTop(this.getGlyphOverflow());
-			this.stave.registerStaveBottom(this.height - this.getGlyphOverflow());
-		}
-		var top = this.getScoreY(0);
-		var bottom = this.getScoreY(8);
-		var _g = 0, _g1 = this._beamHelpers;
-		while(_g < _g1.length) {
-			var v = _g1[_g];
-			++_g;
-			var _g2 = 0;
-			while(_g2 < v.length) {
-				var h = v[_g2];
-				++_g2;
-				var maxNoteY = this.getScoreY(this.getNoteLine(h.maxNote));
-				if(h.getDirection() == alphatab.rendering.utils.BeamDirection.Up) maxNoteY -= this.getStemSize(h.maxDuration);
-				if(maxNoteY < top) this.registerOverflowTop(Math.abs(maxNoteY) | 0);
-				var minNoteY = this.getScoreY(this.getNoteLine(h.minNote));
-				if(h.getDirection() == alphatab.rendering.utils.BeamDirection.Down) minNoteY += this.getStemSize(h.maxDuration);
-				if(minNoteY > bottom) this.registerOverflowBottom((Math.abs(minNoteY) | 0) - bottom);
-			}
-		}
-	}
-	,getLineOffset: function() {
-		return 9 * this.stave.staveGroup.layout.renderer.scale;
-	}
-	,getBottomPadding: function() {
-		return this.getGlyphOverflow();
-	}
-	,getTopPadding: function() {
-		return this.getGlyphOverflow();
-	}
-	,getNoteY: function(note) {
-		var beat = this.getOrCreateVoiceContainer(note.beat.voice.index).beatGlyphs[note.beat.index].onNotes;
-		if(beat != null) return beat.noteHeads.getNoteY(note);
-		return 0;
-	}
-	,getNoteX: function(note,onEnd) {
-		if(onEnd == null) onEnd = true;
-		var g = this.getOrCreateVoiceContainer(note.beat.voice.index).beatGlyphs[note.beat.index].onNotes;
-		if(g != null) return g.container.x + g.x + g.noteHeads.getNoteX(note,onEnd);
-		return 0;
-	}
-	,getBeatDirection: function(beat) {
-		var g = this.getOrCreateVoiceContainer(beat.voice.index).beatGlyphs[beat.index].onNotes;
-		if(g != null) return g.noteHeads.beamingHelper.getDirection();
-		return alphatab.rendering.utils.BeamDirection.Up;
 	}
 	,__class__: alphatab.rendering.ScoreBarRenderer
 });
 alphatab.rendering.ScoreRenderer = function(settings,param) {
 	this.settings = settings;
 	this._renderFinishedListeners = new Array();
+	this.renderingResources = new alphatab.rendering.RenderingResources(1);
 	if(settings.engine == null || !alphatab.Environment.renderEngines.exists(settings.engine)) this.canvas = (alphatab.Environment.renderEngines.get("default"))(param); else this.canvas = (alphatab.Environment.renderEngines.get(settings.engine))(param);
-	this.updateScale(1.0);
-	if(settings.layout == null || !alphatab.Environment.layoutEngines.exists(settings.layout.mode)) this.layout = (alphatab.Environment.layoutEngines.get("default"))(this); else this.layout = (alphatab.Environment.layoutEngines.get(settings.layout.mode))(this);
+	this.recreateLayout();
 };
 $hxClasses["alphatab.rendering.ScoreRenderer"] = alphatab.rendering.ScoreRenderer;
 alphatab.rendering.ScoreRenderer.__name__ = true;
 alphatab.rendering.ScoreRenderer.prototype = {
-	raiseRenderFinished: function() {
-		var _g = 0, _g1 = this._renderFinishedListeners;
-		while(_g < _g1.length) {
-			var l = _g1[_g];
-			++_g;
-			if(l != null) l();
+	recreateLayout: function() {
+		if(this._currentLayoutMode != this.settings.layout.mode) {
+			if(this.settings.layout == null || !alphatab.Environment.layoutEngines.exists(this.settings.layout.mode)) this.layout = (alphatab.Environment.layoutEngines.get("default"))(this); else this.layout = (alphatab.Environment.layoutEngines.get(this.settings.layout.mode))(this);
+			this._currentLayoutMode = this.settings.layout.mode;
 		}
 	}
-	,removeRenderFinishedListener: function(listener) {
-		HxOverrides.remove(this._renderFinishedListeners,listener);
+	,render: function(track) {
+		this.track = track;
+		this.invalidate();
 	}
-	,addRenderFinishedListener: function(listener) {
-		this._renderFinishedListeners.push(listener);
+	,invalidate: function() {
+		if(this.renderingResources.scale != this.settings.scale) {
+			this.renderingResources.init(this.settings.scale);
+			this.canvas.setLineWidth(this.settings.scale);
+		}
+		this.recreateLayout();
+		this.canvas.clear();
+		this.doLayout();
+		this.paintScore();
+		this.raiseRenderFinished();
+	}
+	,get_score: function() {
+		if(this.track == null) return null;
+		return this.track.score;
+	}
+	,doLayout: function() {
+		this.layout.doLayout();
+		this.canvas.setHeight((function($this) {
+			var $r;
+			var x = $this.layout.height + $this.renderingResources.copyrightFont.getSize() * 2;
+			$r = x | 0;
+			return $r;
+		}(this)));
+		this.canvas.setWidth(this.layout.width);
+	}
+	,paintScore: function() {
+		this.paintBackground();
+		this.layout.paintScore();
 	}
 	,paintBackground: function() {
 		var msg = "Rendered using alphaTab (http://www.alphaTab.net)";
@@ -7340,36 +7873,23 @@ alphatab.rendering.ScoreRenderer.prototype = {
 		var x = this.canvas.getWidth() / 2;
 		this.canvas.fillText(msg,x,this.canvas.getHeight() - this.renderingResources.copyrightFont.getSize() * 2);
 	}
-	,paintScore: function() {
-		this.paintBackground();
-		this.layout.paintScore();
+	,addRenderFinishedListener: function(listener) {
+		this._renderFinishedListeners.push(listener);
 	}
-	,doLayout: function() {
-		this.layout.doLayout();
-		this.canvas.setHeight(this.layout.height + this.renderingResources.copyrightFont.getSize() * 2 | 0);
-		this.canvas.setWidth(this.layout.width);
+	,removeRenderFinishedListener: function(listener) {
+		HxOverrides.remove(this._renderFinishedListeners,listener);
 	}
-	,get_score: function() {
-		if(this.track == null) return null;
-		return this.track.score;
-	}
-	,invalidate: function() {
-		this.canvas.clear();
-		this.doLayout();
-		this.paintScore();
-		this.raiseRenderFinished();
-	}
-	,render: function(track) {
-		this.track = track;
-		this.invalidate();
-	}
-	,updateScale: function(scale) {
-		this.scale = scale;
-		this.renderingResources = new alphatab.rendering.RenderingResources(scale);
-		this.canvas.setLineWidth(scale);
+	,raiseRenderFinished: function() {
+		var _g = 0;
+		var _g1 = this._renderFinishedListeners;
+		while(_g < _g1.length) {
+			var l = _g1[_g];
+			++_g;
+			if(l != null) l();
+		}
 	}
 	,__class__: alphatab.rendering.ScoreRenderer
-}
+};
 alphatab.rendering.TabBarRenderer = function(bar) {
 	alphatab.rendering.GroupedBarRenderer.call(this,bar);
 };
@@ -7377,57 +7897,50 @@ $hxClasses["alphatab.rendering.TabBarRenderer"] = alphatab.rendering.TabBarRende
 alphatab.rendering.TabBarRenderer.__name__ = true;
 alphatab.rendering.TabBarRenderer.__super__ = alphatab.rendering.GroupedBarRenderer;
 alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.GroupedBarRenderer.prototype,{
-	drawInfoGuide: function(canvas,cx,cy,y,c) {
-		canvas.setColor(c);
-		canvas.beginPath();
-		canvas.moveTo(cx + this.x,cy + this.y + y);
-		canvas.lineTo(cx + this.x + this.width,cy + this.y + y);
-		canvas.stroke();
+	getLineOffset: function() {
+		return 11 * this.stave.staveGroup.layout.renderer.settings.scale;
 	}
-	,paintBackground: function(cx,cy,canvas) {
-		var res = this.stave.staveGroup.layout.renderer.renderingResources;
-		canvas.setColor(res.staveLineColor);
-		var lineY = cy + this.y + this.getNumberOverflow();
-		var startY = lineY;
-		var _g1 = 0, _g = this._bar.track.tuning.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			if(i > 0) lineY += 11 * this.stave.staveGroup.layout.renderer.scale | 0;
-			canvas.beginPath();
-			canvas.moveTo(cx + this.x,lineY);
-			canvas.lineTo(cx + this.x + this.width,lineY);
-			canvas.stroke();
+	,getNoteX: function(note,onEnd) {
+		if(onEnd == null) onEnd = true;
+		var beat = this.getOrCreateVoiceContainer(note.beat.voice.index).beatGlyphs[note.beat.index].onNotes;
+		if(beat != null) return beat.container.x + beat.x + beat.noteNumbers.getNoteX(note,onEnd);
+		return this.getPostBeatGlyphsStart();
+	}
+	,getBeatX: function(beat) {
+		var bg = this.getOrCreateVoiceContainer(beat.voice.index).beatGlyphs[beat.index].preNotes;
+		if(bg != null) return bg.container.x + bg.x;
+		return 0;
+	}
+	,getNoteY: function(note) {
+		var beat = this.getOrCreateVoiceContainer(note.beat.voice.index).beatGlyphs[note.beat.index].onNotes;
+		if(beat != null) return beat.noteNumbers.getNoteY(note);
+		return 0;
+	}
+	,doLayout: function() {
+		alphatab.rendering.GroupedBarRenderer.prototype.doLayout.call(this);
+		this.height = (11 * this.stave.staveGroup.layout.renderer.settings.scale * (this._bar.track.tuning.length - 1) | 0) + this.getNumberOverflow() * 2;
+		if(this.index == 0) {
+			this.stave.registerStaveTop(this.getNumberOverflow());
+			this.stave.registerStaveBottom(this.height - this.getNumberOverflow());
 		}
 	}
-	,getNumberOverflow: function() {
-		var res = this.stave.staveGroup.layout.renderer.renderingResources;
-		return res.tablatureFont.getSize() / 2 + res.tablatureFont.getSize() * 0.2 | 0;
+	,createPreBeatGlyphs: function() {
+		if(((function($this) {
+			var $r;
+			var _this = $this._bar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).isRepeatStart) this.addPreBeatGlyph(new alphatab.rendering.glyphs.RepeatOpenGlyph(0,0,1.5,3));
+		if(this.index == 0) this.addPreBeatGlyph(new alphatab.rendering.glyphs.TabClefGlyph());
+		this.addPreBeatGlyph(new alphatab.rendering.glyphs.BarNumberGlyph(0,this.getTabY(-1,-3),this._bar.index + 1,!this.stave.isFirstInAccolade));
+		if(this._bar.isEmpty()) this.addPreBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,30 * this.stave.staveGroup.layout.renderer.settings.scale | 0,false));
 	}
-	,getTabY: function(line,correction) {
-		if(correction == null) correction = 0;
-		return 11 * this.stave.staveGroup.layout.renderer.scale * line + correction * this.stave.staveGroup.layout.renderer.scale | 0;
-	}
-	,getBottomPadding: function() {
-		return this.getNumberOverflow();
-	}
-	,getTopPadding: function() {
-		return this.getNumberOverflow();
-	}
-	,createPostBeatGlyphs: function() {
-		if(this._bar.getMasterBar().repeatCount > 0) {
-			this.addPostBeatGlyph(new alphatab.rendering.glyphs.RepeatCloseGlyph(this.x,0));
-			if(this._bar.getMasterBar().repeatCount > 2) {
-				var line = this._bar.index == this._bar.track.bars.length - 1 || this.index == this.stave.barRenderers.length - 1?-1:-4;
-				this.addPostBeatGlyph(new alphatab.rendering.glyphs.RepeatCountGlyph(0,this.getTabY(line,-3),this._bar.getMasterBar().repeatCount));
-			}
-		} else if(this._bar.getMasterBar().isDoubleBar) {
-			this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph());
-			this.addPostBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,3 * this.stave.staveGroup.layout.renderer.scale | 0,false));
-			this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph());
-		} else if(this._bar.nextBar == null || !this._bar.nextBar.getMasterBar().isRepeatStart) this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph(0,0,this._bar.index == this._bar.track.bars.length - 1));
+	,createBeatGlyphs: function() {
+		this.createVoiceGlyphs(this._bar.voices[0]);
 	}
 	,createVoiceGlyphs: function(v) {
-		var _g = 0, _g1 = v.beats;
+		var _g = 0;
+		var _g1 = v.beats;
 		while(_g < _g1.length) {
 			var b = _g1[_g];
 			++_g;
@@ -7438,41 +7951,82 @@ alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.Grouped
 			this.addBeatGlyph(container);
 		}
 	}
-	,createBeatGlyphs: function() {
-		this.createVoiceGlyphs(this._bar.voices[0]);
+	,createPostBeatGlyphs: function() {
+		if(((function($this) {
+			var $r;
+			var _this = $this._bar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).repeatCount > 0) {
+			this.addPostBeatGlyph(new alphatab.rendering.glyphs.RepeatCloseGlyph(this.x,0));
+			if(((function($this) {
+				var $r;
+				var _this = $this._bar;
+				$r = _this.track.score.masterBars[_this.index];
+				return $r;
+			}(this))).repeatCount > 2) {
+				var line;
+				if(this._bar.index == this._bar.track.bars.length - 1 || this.index == this.stave.barRenderers.length - 1) line = -1; else line = -4;
+				this.addPostBeatGlyph(new alphatab.rendering.glyphs.RepeatCountGlyph(0,this.getTabY(line,-3),((function($this) {
+					var $r;
+					var _this = $this._bar;
+					$r = _this.track.score.masterBars[_this.index];
+					return $r;
+				}(this))).repeatCount));
+			}
+		} else if(((function($this) {
+			var $r;
+			var _this = $this._bar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).isDoubleBar) {
+			this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph());
+			this.addPostBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,3 * this.stave.staveGroup.layout.renderer.settings.scale | 0,false));
+			this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph());
+		} else if(this._bar.nextBar == null || !((function($this) {
+			var $r;
+			var _this = $this._bar.nextBar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).isRepeatStart) this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph(0,0,this._bar.index == this._bar.track.bars.length - 1));
 	}
-	,createPreBeatGlyphs: function() {
-		if(this._bar.getMasterBar().isRepeatStart) this.addPreBeatGlyph(new alphatab.rendering.glyphs.RepeatOpenGlyph(0,0,1.5,3));
-		if(this.index == 0) this.addPreBeatGlyph(new alphatab.rendering.glyphs.TabClefGlyph());
-		this.addPreBeatGlyph(new alphatab.rendering.glyphs.BarNumberGlyph(0,this.getTabY(-1,-3),this._bar.index + 1,!this.stave.isFirstInAccolade));
-		if(this._bar.isEmpty()) this.addPreBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,30 * this.stave.staveGroup.layout.renderer.scale | 0,false));
+	,getTopPadding: function() {
+		return this.getNumberOverflow();
 	}
-	,doLayout: function() {
-		alphatab.rendering.GroupedBarRenderer.prototype.doLayout.call(this);
-		this.height = (11 * this.stave.staveGroup.layout.renderer.scale * (this._bar.track.tuning.length - 1) | 0) + this.getNumberOverflow() * 2;
-		if(this.index == 0) {
-			this.stave.registerStaveTop(this.getNumberOverflow());
-			this.stave.registerStaveBottom(this.height - this.getNumberOverflow());
+	,getBottomPadding: function() {
+		return this.getNumberOverflow();
+	}
+	,getTabY: function(line,correction) {
+		if(correction == null) correction = 0;
+		return 11 * this.stave.staveGroup.layout.renderer.settings.scale * line + correction * this.stave.staveGroup.layout.renderer.settings.scale | 0;
+	}
+	,getNumberOverflow: function() {
+		var res = this.stave.staveGroup.layout.renderer.renderingResources;
+		var x = res.tablatureFont.getSize() / 2 + res.tablatureFont.getSize() * 0.2;
+		return x | 0;
+	}
+	,paintBackground: function(cx,cy,canvas) {
+		var res = this.stave.staveGroup.layout.renderer.renderingResources;
+		canvas.setColor(res.staveLineColor);
+		var lineY = cy + this.y + this.getNumberOverflow();
+		var startY = lineY;
+		var _g1 = 0;
+		var _g = this._bar.track.tuning.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			if(i > 0) lineY += 11 * this.stave.staveGroup.layout.renderer.settings.scale | 0;
+			canvas.beginPath();
+			canvas.moveTo(cx + this.x,lineY);
+			canvas.lineTo(cx + this.x + this.width,lineY);
+			canvas.stroke();
 		}
 	}
-	,getNoteY: function(note) {
-		var beat = this.getOrCreateVoiceContainer(note.beat.voice.index).beatGlyphs[note.beat.index].onNotes;
-		if(beat != null) return beat.noteNumbers.getNoteY(note);
-		return 0;
-	}
-	,getBeatX: function(beat) {
-		var bg = this.getOrCreateVoiceContainer(beat.voice.index).beatGlyphs[beat.index].preNotes;
-		if(bg != null) return bg.container.x + bg.x;
-		return 0;
-	}
-	,getNoteX: function(note,onEnd) {
-		if(onEnd == null) onEnd = true;
-		var beat = this.getOrCreateVoiceContainer(note.beat.voice.index).beatGlyphs[note.beat.index].onNotes;
-		if(beat != null) return beat.container.x + beat.x + beat.noteNumbers.getNoteX(note,onEnd);
-		return this.getPostBeatGlyphsStart();
-	}
-	,getLineOffset: function() {
-		return 11 * this.stave.staveGroup.layout.renderer.scale;
+	,drawInfoGuide: function(canvas,cx,cy,y,c) {
+		canvas.setColor(c);
+		canvas.beginPath();
+		canvas.moveTo(cx + this.x,cy + this.y + y);
+		canvas.lineTo(cx + this.x + this.width,cy + this.y + y);
+		canvas.stroke();
 	}
 	,__class__: alphatab.rendering.TabBarRenderer
 });
@@ -7484,25 +8038,73 @@ $hxClasses["alphatab.rendering.effects.FingeringEffectInfo"] = alphatab.renderin
 alphatab.rendering.effects.FingeringEffectInfo.__name__ = true;
 alphatab.rendering.effects.FingeringEffectInfo.__super__ = alphatab.rendering.effects.NoteEffectInfoBase;
 alphatab.rendering.effects.FingeringEffectInfo.prototype = $extend(alphatab.rendering.effects.NoteEffectInfoBase.prototype,{
-	createNewGlyph: function(renderer,beat) {
-		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(0,0,this._lastCreateInfo.length + "fingering");
-	}
-	,getSizingMode: function() {
-		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatOnly;
-	}
-	,getHeight: function(renderer) {
-		return this._maxGlyphCount * (20 * renderer.stave.staveGroup.layout.renderer.scale | 0);
-	}
-	,shouldCreateGlyphForNote: function(renderer,note) {
-		return note.leftHandFinger != -1 && note.leftHandFinger != -2 || note.rightHandFinger != -1 && note.rightHandFinger != -2;
-	}
-	,shouldCreateGlyph: function(renderer,beat) {
+	shouldCreateGlyph: function(renderer,beat) {
 		var result = alphatab.rendering.effects.NoteEffectInfoBase.prototype.shouldCreateGlyph.call(this,renderer,beat);
 		if(this._lastCreateInfo.length > this._maxGlyphCount) this._maxGlyphCount = this._lastCreateInfo.length;
 		return result;
 	}
+	,shouldCreateGlyphForNote: function(renderer,note) {
+		return note.leftHandFinger != -1 && note.leftHandFinger != -2 || note.rightHandFinger != -1 && note.rightHandFinger != -2;
+	}
+	,getHeight: function(renderer) {
+		return this._maxGlyphCount * (20 * renderer.stave.staveGroup.layout.renderer.settings.scale | 0);
+	}
+	,getSizingMode: function() {
+		return alphatab.rendering.EffectBarGlyphSizing.SingleOnBeatOnly;
+	}
+	,createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(0,0,this._lastCreateInfo.length + "fingering");
+	}
 	,__class__: alphatab.rendering.effects.FingeringEffectInfo
 });
+alphatab.rendering.effects.TripletFeelEffectInfo = function() {
+};
+$hxClasses["alphatab.rendering.effects.TripletFeelEffectInfo"] = alphatab.rendering.effects.TripletFeelEffectInfo;
+alphatab.rendering.effects.TripletFeelEffectInfo.__name__ = true;
+alphatab.rendering.effects.TripletFeelEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
+alphatab.rendering.effects.TripletFeelEffectInfo.prototype = {
+	shouldCreateGlyph: function(renderer,beat) {
+		return beat.index == 0 && (((function($this) {
+			var $r;
+			var _this = beat.voice.bar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).index == 0 && ((function($this) {
+			var $r;
+			var _this = beat.voice.bar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).tripletFeel != alphatab.model.TripletFeel.NoTripletFeel) || ((function($this) {
+			var $r;
+			var _this = beat.voice.bar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).index > 0 && ((function($this) {
+			var $r;
+			var _this = beat.voice.bar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).tripletFeel != ((function($this) {
+			var $r;
+			var _this = beat.voice.bar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).previousMasterBar.tripletFeel;
+	}
+	,canExpand: function(renderer,from,to) {
+		return true;
+	}
+	,getHeight: function(renderer) {
+		return 20 * renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+	}
+	,getSizingMode: function() {
+		return alphatab.rendering.EffectBarGlyphSizing.SinglePreBeatOnly;
+	}
+	,createNewGlyph: function(renderer,beat) {
+		return new alphatab.rendering.glyphs.effects.DummyEffectGlyph(0,0,"TripletFeel");
+	}
+	,__class__: alphatab.rendering.effects.TripletFeelEffectInfo
+};
 alphatab.rendering.glyphs.AccentuationGlyph = function(x,y,accentuation) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
@@ -7512,8 +8114,14 @@ $hxClasses["alphatab.rendering.glyphs.AccentuationGlyph"] = alphatab.rendering.g
 alphatab.rendering.glyphs.AccentuationGlyph.__name__ = true;
 alphatab.rendering.glyphs.AccentuationGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.AccentuationGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
-	getSvg: function(accentuation) {
-		switch( (accentuation)[1] ) {
+	doLayout: function() {
+		this.width = 9 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+	}
+	,canScale: function() {
+		return false;
+	}
+	,getSvg: function(accentuation) {
+		switch(accentuation[1]) {
 		case 1:
 			return alphatab.rendering.glyphs.MusicFont.Accentuation;
 		case 2:
@@ -7522,47 +8130,44 @@ alphatab.rendering.glyphs.AccentuationGlyph.prototype = $extend(alphatab.renderi
 			return "";
 		}
 	}
-	,canScale: function() {
-		return false;
-	}
-	,doLayout: function() {
-		this.width = 9 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
-	}
 	,__class__: alphatab.rendering.glyphs.AccentuationGlyph
 });
 alphatab.rendering.glyphs.GlyphGroup = function(x,y,glyphs) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.Glyph.call(this,x,y);
-	this._glyphs = glyphs != null?glyphs:new Array();
+	if(glyphs != null) this._glyphs = glyphs; else this._glyphs = new Array();
 };
 $hxClasses["alphatab.rendering.glyphs.GlyphGroup"] = alphatab.rendering.glyphs.GlyphGroup;
 alphatab.rendering.glyphs.GlyphGroup.__name__ = true;
 alphatab.rendering.glyphs.GlyphGroup.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.GlyphGroup.prototype = $extend(alphatab.rendering.Glyph.prototype,{
-	paint: function(cx,cy,canvas) {
-		var _g = 0, _g1 = this._glyphs;
+	doLayout: function() {
+		var w = 0;
+		var _g = 0;
+		var _g1 = this._glyphs;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.renderer = this.renderer;
+			g.doLayout();
+			var x = Math.max(w,g.width);
+			w = x | 0;
+		}
+		this.width = w;
+	}
+	,addGlyph: function(g) {
+		this._glyphs.push(g);
+	}
+	,paint: function(cx,cy,canvas) {
+		var _g = 0;
+		var _g1 = this._glyphs;
 		while(_g < _g1.length) {
 			var g = _g1[_g];
 			++_g;
 			g.renderer = this.renderer;
 			g.paint(cx + this.x,cy + this.y,canvas);
 		}
-	}
-	,addGlyph: function(g) {
-		this._glyphs.push(g);
-	}
-	,doLayout: function() {
-		var w = 0;
-		var _g = 0, _g1 = this._glyphs;
-		while(_g < _g1.length) {
-			var g = _g1[_g];
-			++_g;
-			g.renderer = this.renderer;
-			g.doLayout();
-			w = Math.max(w,g.width) | 0;
-		}
-		this.width = w;
 	}
 	,__class__: alphatab.rendering.glyphs.GlyphGroup
 });
@@ -7582,8 +8187,9 @@ alphatab.rendering.glyphs.AccidentalGroupGlyph.prototype = $extend(alphatab.rend
 		});
 		var columns = new Array();
 		columns.push(-3000);
-		var accidentalSize = 21 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
-		var _g = 0, _g1 = this._glyphs;
+		var accidentalSize = 21 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+		var _g = 0;
+		var _g1 = this._glyphs;
 		while(_g < _g1.length) {
 			var g = _g1[_g];
 			++_g;
@@ -7597,9 +8203,10 @@ alphatab.rendering.glyphs.AccidentalGroupGlyph.prototype = $extend(alphatab.rend
 			g.x = gColumn;
 			columns[gColumn] = g.y + accidentalSize;
 		}
-		var columnWidth = 8 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		var columnWidth = 8 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 		if(this._glyphs.length == 0) this.width = 0; else this.width = columnWidth * columns.length;
-		var _g = 0, _g1 = this._glyphs;
+		var _g = 0;
+		var _g1 = this._glyphs;
 		while(_g < _g1.length) {
 			var g = _g1[_g];
 			++_g;
@@ -7620,20 +8227,20 @@ $hxClasses["alphatab.rendering.glyphs.BarNumberGlyph"] = alphatab.rendering.glyp
 alphatab.rendering.glyphs.BarNumberGlyph.__name__ = true;
 alphatab.rendering.glyphs.BarNumberGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.BarNumberGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
-	paint: function(cx,cy,canvas) {
+	doLayout: function() {
+		var scoreRenderer = this.renderer.stave.staveGroup.layout.renderer;
+		scoreRenderer.canvas.setFont(scoreRenderer.renderingResources.barNumberFont);
+		this.width = 10 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+	}
+	,canScale: function() {
+		return false;
+	}
+	,paint: function(cx,cy,canvas) {
 		if(this._hidden) return;
 		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
 		canvas.setColor(res.barNumberColor);
 		canvas.setFont(res.barNumberFont);
 		canvas.fillText(Std.string(this._number),cx + this.x,cy + this.y);
-	}
-	,canScale: function() {
-		return false;
-	}
-	,doLayout: function() {
-		var scoreRenderer = this.renderer.stave.staveGroup.layout.renderer;
-		scoreRenderer.canvas.setFont(scoreRenderer.renderingResources.barNumberFont);
-		this.width = this.renderer.stave.staveGroup.layout.renderer.canvas.measureText(Std.string(this._number)) + 3 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
 	,__class__: alphatab.rendering.glyphs.BarNumberGlyph
 });
@@ -7648,10 +8255,16 @@ $hxClasses["alphatab.rendering.glyphs.BarSeperatorGlyph"] = alphatab.rendering.g
 alphatab.rendering.glyphs.BarSeperatorGlyph.__name__ = true;
 alphatab.rendering.glyphs.BarSeperatorGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.BarSeperatorGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
-	paint: function(cx,cy,canvas) {
+	doLayout: function() {
+		this.width = (this._isLast?8:1) * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+	}
+	,canScale: function() {
+		return false;
+	}
+	,paint: function(cx,cy,canvas) {
 		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
 		canvas.setColor(res.barSeperatorColor);
-		var blockWidth = 4 * this.renderer.stave.staveGroup.layout.renderer.scale;
+		var blockWidth = 4 * this.renderer.stave.staveGroup.layout.renderer.settings.scale;
 		var top = cy + this.y + this.renderer.getTopPadding();
 		var bottom = cy + this.y + this.renderer.height - this.renderer.getBottomPadding();
 		var left = cx + this.x;
@@ -7661,15 +8274,9 @@ alphatab.rendering.glyphs.BarSeperatorGlyph.prototype = $extend(alphatab.renderi
 		canvas.lineTo(left,bottom);
 		canvas.stroke();
 		if(this._isLast) {
-			left += 3 * this.renderer.stave.staveGroup.layout.renderer.scale + 0.5;
+			left += 3 * this.renderer.stave.staveGroup.layout.renderer.settings.scale + 0.5;
 			canvas.fillRect(left,top,blockWidth,h);
 		}
-	}
-	,canScale: function() {
-		return false;
-	}
-	,doLayout: function() {
-		this.width = (this._isLast?8:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
 	,__class__: alphatab.rendering.glyphs.BarSeperatorGlyph
 });
@@ -7682,9 +8289,17 @@ $hxClasses["alphatab.rendering.glyphs.BeamGlyph"] = alphatab.rendering.glyphs.Be
 alphatab.rendering.glyphs.BeamGlyph.__name__ = true;
 alphatab.rendering.glyphs.BeamGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.BeamGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
-	getRestSvg: function(duration,direction,isGrace) {
+	getSvgScale: function(duration,direction,isGrace) {
+		var scale;
+		if(isGrace) scale = 0.7; else scale = 1;
+		if(direction == alphatab.rendering.utils.BeamDirection.Up) return scale; else return -1 * scale;
+	}
+	,doLayout: function() {
+		this.width = 0;
+	}
+	,getRestSvg: function(duration,direction,isGrace) {
 		if(isGrace) return alphatab.rendering.glyphs.MusicFont.FooterEighth;
-		switch( (duration)[1] ) {
+		switch(duration[1]) {
 		case 3:
 			return alphatab.rendering.glyphs.MusicFont.FooterEighth;
 		case 4:
@@ -7697,21 +8312,14 @@ alphatab.rendering.glyphs.BeamGlyph.prototype = $extend(alphatab.rendering.glyph
 			return "";
 		}
 	}
-	,doLayout: function() {
-		this.width = 0;
-	}
-	,getSvgScale: function(duration,direction,isGrace) {
-		var scale = isGrace?0.7:1;
-		if(direction == alphatab.rendering.utils.BeamDirection.Up) return scale; else return -1 * scale;
-	}
 	,__class__: alphatab.rendering.glyphs.BeamGlyph
 });
-alphatab.rendering.glyphs.ISupportsFinalize = function() { }
+alphatab.rendering.glyphs.ISupportsFinalize = function() { };
 $hxClasses["alphatab.rendering.glyphs.ISupportsFinalize"] = alphatab.rendering.glyphs.ISupportsFinalize;
 alphatab.rendering.glyphs.ISupportsFinalize.__name__ = true;
 alphatab.rendering.glyphs.ISupportsFinalize.prototype = {
 	__class__: alphatab.rendering.glyphs.ISupportsFinalize
-}
+};
 alphatab.rendering.glyphs.BeatContainerGlyph = function(beat) {
 	alphatab.rendering.Glyph.call(this,0,0);
 	this.beat = beat;
@@ -7722,19 +8330,44 @@ alphatab.rendering.glyphs.BeatContainerGlyph.__name__ = true;
 alphatab.rendering.glyphs.BeatContainerGlyph.__interfaces__ = [alphatab.rendering.glyphs.ISupportsFinalize];
 alphatab.rendering.glyphs.BeatContainerGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.BeatContainerGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
-	paint: function(cx,cy,canvas) {
-		this.preNotes.paint(cx + this.x,cy + this.y,canvas);
-		this.onNotes.paint(cx + this.x,cy + this.y,canvas);
-		this.postNotes.paint(cx + this.x,cy + this.y,canvas);
-		var _g = 0, _g1 = this.ties;
-		while(_g < _g1.length) {
-			var t = _g1[_g];
-			++_g;
-			t.renderer = this.renderer;
-			t.paint(cx,cy + this.y,canvas);
-		}
+	finalizeGlyph: function(layout) {
+		if(js.Boot.__instanceof(this.preNotes,alphatab.rendering.glyphs.ISupportsFinalize)) (js.Boot.__cast(this.preNotes , alphatab.rendering.glyphs.ISupportsFinalize)).finalizeGlyph(layout);
+		if(js.Boot.__instanceof(this.onNotes,alphatab.rendering.glyphs.ISupportsFinalize)) (js.Boot.__cast(this.onNotes , alphatab.rendering.glyphs.ISupportsFinalize)).finalizeGlyph(layout);
+		if(js.Boot.__instanceof(this.postNotes,alphatab.rendering.glyphs.ISupportsFinalize)) (js.Boot.__cast(this.postNotes , alphatab.rendering.glyphs.ISupportsFinalize)).finalizeGlyph(layout);
 	}
-	,createTies: function(n) {
+	,preNotesKey: function() {
+		return "PreNotes" + this.beat.voice.index;
+	}
+	,onNotesKey: function() {
+		return "OnNotes" + this.beat.voice.index;
+	}
+	,postNotesKey: function() {
+		return "PostNotes" + this.beat.voice.index;
+	}
+	,registerMaxSizes: function(sizes) {
+		if(sizes.getIndexedSize("PreNotes" + this.beat.voice.index,this.beat.start) < this.preNotes.width) sizes.setIndexedSize("PreNotes" + this.beat.voice.index,this.beat.start,this.preNotes.width);
+		if(sizes.getIndexedSize("OnNotes" + this.beat.voice.index,this.beat.start) < this.onNotes.width) sizes.setIndexedSize("OnNotes" + this.beat.voice.index,this.beat.start,this.onNotes.width);
+		if(sizes.getIndexedSize("PostNotes" + this.beat.voice.index,this.beat.start) < this.postNotes.width) sizes.setIndexedSize("PostNotes" + this.beat.voice.index,this.beat.start,this.postNotes.width);
+	}
+	,applySizes: function(sizes) {
+		var size;
+		var diff;
+		size = sizes.getIndexedSize("PreNotes" + this.beat.voice.index,this.beat.start);
+		diff = size - this.preNotes.width;
+		this.preNotes.x = 0;
+		if(diff > 0) this.preNotes.applyGlyphSpacing(diff);
+		size = sizes.getIndexedSize("OnNotes" + this.beat.voice.index,this.beat.start);
+		diff = size - this.onNotes.width;
+		this.onNotes.x = this.preNotes.x + this.preNotes.width;
+		if(diff > 0) this.onNotes.applyGlyphSpacing(diff);
+		size = sizes.getIndexedSize("PostNotes" + this.beat.voice.index,this.beat.start);
+		diff = size - this.postNotes.width;
+		this.postNotes.x = this.onNotes.x + this.onNotes.width;
+		if(diff > 0) this.postNotes.applyGlyphSpacing(diff);
+		this.width = this.calculateWidth();
+	}
+	,calculateWidth: function() {
+		return this.postNotes.x + this.postNotes.width;
 	}
 	,doLayout: function() {
 		this.preNotes.x = 0;
@@ -7756,44 +8389,20 @@ alphatab.rendering.glyphs.BeatContainerGlyph.prototype = $extend(alphatab.render
 		while(i >= 0) this.createTies(this.beat.notes[i--]);
 		this.width = this.calculateWidth();
 	}
-	,calculateWidth: function() {
-		return this.postNotes.x + this.postNotes.width;
+	,createTies: function(n) {
 	}
-	,applySizes: function(sizes) {
-		var size;
-		var diff;
-		size = sizes.getIndexedSize("PRE_NOTES" + this.beat.voice.index,this.beat.start);
-		diff = size - this.preNotes.width;
-		this.preNotes.x = 0;
-		if(diff > 0) this.preNotes.applyGlyphSpacing(diff);
-		size = sizes.getIndexedSize("ON_NOTES" + this.beat.voice.index,this.beat.start);
-		diff = size - this.onNotes.width;
-		this.onNotes.x = this.preNotes.x + this.preNotes.width;
-		if(diff > 0) this.onNotes.applyGlyphSpacing(diff);
-		size = sizes.getIndexedSize("POST_NOTES" + this.beat.voice.index,this.beat.start);
-		diff = size - this.postNotes.width;
-		this.postNotes.x = this.onNotes.x + this.onNotes.width;
-		if(diff > 0) this.postNotes.applyGlyphSpacing(diff);
-		this.width = this.calculateWidth();
-	}
-	,registerMaxSizes: function(sizes) {
-		if(sizes.getIndexedSize("PRE_NOTES" + this.beat.voice.index,this.beat.start) < this.preNotes.width) sizes.setIndexedSize("PRE_NOTES" + this.beat.voice.index,this.beat.start,this.preNotes.width);
-		if(sizes.getIndexedSize("ON_NOTES" + this.beat.voice.index,this.beat.start) < this.onNotes.width) sizes.setIndexedSize("ON_NOTES" + this.beat.voice.index,this.beat.start,this.onNotes.width);
-		if(sizes.getIndexedSize("POST_NOTES" + this.beat.voice.index,this.beat.start) < this.postNotes.width) sizes.setIndexedSize("POST_NOTES" + this.beat.voice.index,this.beat.start,this.postNotes.width);
-	}
-	,postNotesKey: function() {
-		return "POST_NOTES" + this.beat.voice.index;
-	}
-	,onNotesKey: function() {
-		return "ON_NOTES" + this.beat.voice.index;
-	}
-	,preNotesKey: function() {
-		return "PRE_NOTES" + this.beat.voice.index;
-	}
-	,finalizeGlyph: function(layout) {
-		if(js.Boot.__instanceof(this.preNotes,alphatab.rendering.glyphs.ISupportsFinalize)) (js.Boot.__cast(this.preNotes , alphatab.rendering.glyphs.ISupportsFinalize)).finalizeGlyph(layout);
-		if(js.Boot.__instanceof(this.onNotes,alphatab.rendering.glyphs.ISupportsFinalize)) (js.Boot.__cast(this.onNotes , alphatab.rendering.glyphs.ISupportsFinalize)).finalizeGlyph(layout);
-		if(js.Boot.__instanceof(this.postNotes,alphatab.rendering.glyphs.ISupportsFinalize)) (js.Boot.__cast(this.postNotes , alphatab.rendering.glyphs.ISupportsFinalize)).finalizeGlyph(layout);
+	,paint: function(cx,cy,canvas) {
+		this.preNotes.paint(cx + this.x,cy + this.y,canvas);
+		this.onNotes.paint(cx + this.x,cy + this.y,canvas);
+		this.postNotes.paint(cx + this.x,cy + this.y,canvas);
+		var _g = 0;
+		var _g1 = this.ties;
+		while(_g < _g1.length) {
+			var t = _g1[_g];
+			++_g;
+			t.renderer = this.renderer;
+			t.paint(cx,cy + this.y,canvas);
+		}
 	}
 	,__class__: alphatab.rendering.glyphs.BeatContainerGlyph
 });
@@ -7804,9 +8413,27 @@ $hxClasses["alphatab.rendering.glyphs.BeatGlyphBase"] = alphatab.rendering.glyph
 alphatab.rendering.glyphs.BeatGlyphBase.__name__ = true;
 alphatab.rendering.glyphs.BeatGlyphBase.__super__ = alphatab.rendering.glyphs.GlyphGroup;
 alphatab.rendering.glyphs.BeatGlyphBase.prototype = $extend(alphatab.rendering.glyphs.GlyphGroup.prototype,{
-	getBeatDurationWidth: function() {
-		var _g = this;
-		switch( (_g.container.beat.duration)[1] ) {
+	doLayout: function() {
+		var w = 0;
+		var _g = 0;
+		var _g1 = this._glyphs;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.x = w;
+			g.renderer = this.renderer;
+			g.doLayout();
+			w += g.width;
+		}
+		this.width = w;
+	}
+	,noteLoop: function(action) {
+		var i = this.container.beat.notes.length - 1;
+		while(i >= 0) action(this.container.beat.notes[i--]);
+	}
+	,getBeatDurationWidth: function() {
+		var _g = this.container.beat.duration;
+		switch(_g[1]) {
 		case 0:
 			return 103;
 		case 1:
@@ -7822,23 +8449,6 @@ alphatab.rendering.glyphs.BeatGlyphBase.prototype = $extend(alphatab.rendering.g
 		case 6:
 			return 11;
 		}
-	}
-	,noteLoop: function(action) {
-		var i = this.container.beat.notes.length - 1;
-		while(i >= 0) action(this.container.beat.notes[i--]);
-	}
-	,doLayout: function() {
-		var w = 0;
-		var _g = 0, _g1 = this._glyphs;
-		while(_g < _g1.length) {
-			var g = _g1[_g];
-			++_g;
-			g.x = w;
-			g.renderer = this.renderer;
-			g.doLayout();
-			w += g.width;
-		}
-		this.width = w;
 	}
 	,__class__: alphatab.rendering.glyphs.BeatGlyphBase
 });
@@ -7857,7 +8467,8 @@ alphatab.rendering.glyphs.BendGlyph.prototype = $extend(alphatab.rendering.Glyph
 		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
 		var dX = this.width / 60;
 		var maxValue = 0;
-		var _g1 = 0, _g = this._note.bendPoints.length;
+		var _g1 = 0;
+		var _g = this._note.bendPoints.length;
 		while(_g1 < _g) {
 			var i = _g1++;
 			if(this._note.bendPoints[i].value > maxValue) maxValue = this._note.bendPoints[i].value;
@@ -7866,7 +8477,8 @@ alphatab.rendering.glyphs.BendGlyph.prototype = $extend(alphatab.rendering.Glyph
 		var xx = cx + this.x;
 		var yy = cy + this.y + r.getNoteY(this._note);
 		canvas.beginPath();
-		var _g1 = 0, _g = this._note.bendPoints.length - 1;
+		var _g1 = 0;
+		var _g = this._note.bendPoints.length - 1;
 		while(_g1 < _g) {
 			var i = _g1++;
 			var firstPt = this._note.bendPoints[i];
@@ -7887,7 +8499,7 @@ alphatab.rendering.glyphs.BendGlyph.prototype = $extend(alphatab.rendering.Glyph
 				canvas.bezierCurveTo(hx,hy,x2,y2,x2,y2);
 				canvas.stroke();
 			}
-			var arrowSize = 6 * this.renderer.stave.staveGroup.layout.renderer.scale;
+			var arrowSize = 6 * this.renderer.stave.staveGroup.layout.renderer.settings.scale;
 			if(secondPt.value > firstPt.value) {
 				canvas.beginPath();
 				canvas.moveTo(x2,y2);
@@ -7921,7 +8533,8 @@ alphatab.rendering.glyphs.BendGlyph.prototype = $extend(alphatab.rendering.Glyph
 					if(!up) s = "-" + s;
 					canvas.setFont(res.tablatureFont);
 					var size = canvas.measureText(s);
-					var y = up?y2 - res.tablatureFont.getSize() - 2 * this.renderer.stave.staveGroup.layout.renderer.scale:y2 + 2 * this.renderer.stave.staveGroup.layout.renderer.scale;
+					var y;
+					if(up) y = y2 - res.tablatureFont.getSize() - 2 * this.renderer.stave.staveGroup.layout.renderer.settings.scale; else y = y2 + 2 * this.renderer.stave.staveGroup.layout.renderer.settings.scale;
 					var x = x2 - size / 2;
 					canvas.fillText(s,x,y);
 				}
@@ -7929,49 +8542,6 @@ alphatab.rendering.glyphs.BendGlyph.prototype = $extend(alphatab.rendering.Glyph
 		}
 	}
 	,__class__: alphatab.rendering.glyphs.BendGlyph
-});
-alphatab.rendering.glyphs.BrushGlyph = function(beat) {
-	alphatab.rendering.Glyph.call(this,0,0);
-	this._beat = beat;
-};
-$hxClasses["alphatab.rendering.glyphs.BrushGlyph"] = alphatab.rendering.glyphs.BrushGlyph;
-alphatab.rendering.glyphs.BrushGlyph.__name__ = true;
-alphatab.rendering.glyphs.BrushGlyph.__super__ = alphatab.rendering.Glyph;
-alphatab.rendering.glyphs.BrushGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
-	paint: function(cx,cy,canvas) {
-		var tabBarRenderer = this.renderer;
-		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
-		var startY = cy + this.y + (tabBarRenderer.getNoteY(this._beat.maxNote()) - res.tablatureFont.getSize() / 2 | 0);
-		var endY = cy + this.y + tabBarRenderer.getNoteY(this._beat.minNote()) + res.tablatureFont.getSize() / 2;
-		var arrowX = cx + this.x + this.width / 2 | 0;
-		var arrowSize = 8 * this.renderer.stave.staveGroup.layout.renderer.scale;
-		canvas.setColor(res.mainGlyphColor);
-		if(this._beat.brushType == alphatab.model.BrushType.BrushUp || this._beat.brushType == alphatab.model.BrushType.BrushDown) {
-			canvas.beginPath();
-			canvas.moveTo(arrowX,startY);
-			canvas.lineTo(arrowX,endY);
-			canvas.stroke();
-			if(this._beat.brushType == alphatab.model.BrushType.BrushUp) {
-				canvas.beginPath();
-				canvas.moveTo(arrowX,endY);
-				canvas.lineTo(arrowX + arrowSize / 2 | 0,endY - arrowSize | 0);
-				canvas.lineTo(arrowX - arrowSize / 2 | 0,endY - arrowSize | 0);
-				canvas.closePath();
-				canvas.fill();
-			} else {
-				canvas.beginPath();
-				canvas.moveTo(arrowX,startY);
-				canvas.lineTo(arrowX + arrowSize / 2 | 0,startY + arrowSize | 0);
-				canvas.lineTo(arrowX - arrowSize / 2 | 0,startY + arrowSize | 0);
-				canvas.closePath();
-				canvas.fill();
-			}
-		}
-	}
-	,doLayout: function() {
-		this.width = 10 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
-	}
-	,__class__: alphatab.rendering.glyphs.BrushGlyph
 });
 alphatab.rendering.glyphs.ChineseCymbalGlyph = function(x,y,isGrace) {
 	if(y == null) y = 0;
@@ -7983,11 +8553,11 @@ $hxClasses["alphatab.rendering.glyphs.ChineseCymbalGlyph"] = alphatab.rendering.
 alphatab.rendering.glyphs.ChineseCymbalGlyph.__name__ = true;
 alphatab.rendering.glyphs.ChineseCymbalGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.ChineseCymbalGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
-	canScale: function() {
-		return false;
+	doLayout: function() {
+		this.width = 9 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 	}
-	,doLayout: function() {
-		this.width = 9 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+	,canScale: function() {
+		return false;
 	}
 	,__class__: alphatab.rendering.glyphs.ChineseCymbalGlyph
 });
@@ -8001,16 +8571,16 @@ $hxClasses["alphatab.rendering.glyphs.CircleGlyph"] = alphatab.rendering.glyphs.
 alphatab.rendering.glyphs.CircleGlyph.__name__ = true;
 alphatab.rendering.glyphs.CircleGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.CircleGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
-	paint: function(cx,cy,canvas) {
-		canvas.beginPath();
-		canvas.circle(cx + this.x,cy + this.y,this._size);
-		canvas.fill();
+	doLayout: function() {
+		this.width = this._size + 3 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 	}
 	,canScale: function() {
 		return false;
 	}
-	,doLayout: function() {
-		this.width = this._size + 3 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+	,paint: function(cx,cy,canvas) {
+		canvas.beginPath();
+		canvas.circle(cx + this.x,cy + this.y,this._size);
+		canvas.fill();
 	}
 	,__class__: alphatab.rendering.glyphs.CircleGlyph
 });
@@ -8023,8 +8593,14 @@ $hxClasses["alphatab.rendering.glyphs.ClefGlyph"] = alphatab.rendering.glyphs.Cl
 alphatab.rendering.glyphs.ClefGlyph.__name__ = true;
 alphatab.rendering.glyphs.ClefGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.ClefGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
-	getClefSvg: function(clef) {
-		switch( (clef)[1] ) {
+	doLayout: function() {
+		this.width = 28 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+	}
+	,canScale: function() {
+		return false;
+	}
+	,getClefSvg: function(clef) {
+		switch(clef[1]) {
 		case 0:
 			return alphatab.rendering.glyphs.MusicFont.ClefNeutral;
 		case 1:
@@ -8037,14 +8613,18 @@ alphatab.rendering.glyphs.ClefGlyph.prototype = $extend(alphatab.rendering.glyph
 			return alphatab.rendering.glyphs.MusicFont.ClefG;
 		}
 	}
-	,canScale: function() {
-		return false;
-	}
-	,doLayout: function() {
-		this.width = 28 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
-	}
 	,__class__: alphatab.rendering.glyphs.ClefGlyph
 });
+alphatab.rendering.glyphs.CrescendoType = $hxClasses["alphatab.rendering.glyphs.CrescendoType"] = { __ename__ : true, __constructs__ : ["None","Crescendo","Decrescendo"] };
+alphatab.rendering.glyphs.CrescendoType.None = ["None",0];
+alphatab.rendering.glyphs.CrescendoType.None.toString = $estr;
+alphatab.rendering.glyphs.CrescendoType.None.__enum__ = alphatab.rendering.glyphs.CrescendoType;
+alphatab.rendering.glyphs.CrescendoType.Crescendo = ["Crescendo",1];
+alphatab.rendering.glyphs.CrescendoType.Crescendo.toString = $estr;
+alphatab.rendering.glyphs.CrescendoType.Crescendo.__enum__ = alphatab.rendering.glyphs.CrescendoType;
+alphatab.rendering.glyphs.CrescendoType.Decrescendo = ["Decrescendo",2];
+alphatab.rendering.glyphs.CrescendoType.Decrescendo.toString = $estr;
+alphatab.rendering.glyphs.CrescendoType.Decrescendo.__enum__ = alphatab.rendering.glyphs.CrescendoType;
 alphatab.rendering.glyphs.DeadNoteHeadGlyph = function(x,y,isGrace) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
@@ -8054,11 +8634,11 @@ $hxClasses["alphatab.rendering.glyphs.DeadNoteHeadGlyph"] = alphatab.rendering.g
 alphatab.rendering.glyphs.DeadNoteHeadGlyph.__name__ = true;
 alphatab.rendering.glyphs.DeadNoteHeadGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.DeadNoteHeadGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
-	canScale: function() {
-		return false;
+	doLayout: function() {
+		this.width = 9 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 	}
-	,doLayout: function() {
-		this.width = 9 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+	,canScale: function() {
+		return false;
 	}
 	,__class__: alphatab.rendering.glyphs.DeadNoteHeadGlyph
 });
@@ -8072,11 +8652,11 @@ $hxClasses["alphatab.rendering.glyphs.DiamondNoteHeadGlyph"] = alphatab.renderin
 alphatab.rendering.glyphs.DiamondNoteHeadGlyph.__name__ = true;
 alphatab.rendering.glyphs.DiamondNoteHeadGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.DiamondNoteHeadGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
-	canScale: function() {
-		return false;
+	doLayout: function() {
+		this.width = 9 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 	}
-	,doLayout: function() {
-		this.width = 9 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+	,canScale: function() {
+		return false;
 	}
 	,__class__: alphatab.rendering.glyphs.DiamondNoteHeadGlyph
 });
@@ -8090,7 +8670,25 @@ $hxClasses["alphatab.rendering.glyphs.DigitGlyph"] = alphatab.rendering.glyphs.D
 alphatab.rendering.glyphs.DigitGlyph.__name__ = true;
 alphatab.rendering.glyphs.DigitGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.DigitGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
-	getDigit: function(digit) {
+	doLayout: function() {
+		this.y += 7 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+		var x = this.getDigitWidth(this._digit) * this.renderer.stave.staveGroup.layout.renderer.settings.scale;
+		this.width = x | 0;
+	}
+	,canScale: function() {
+		return false;
+	}
+	,getDigitWidth: function(digit) {
+		switch(digit) {
+		case 0:case 2:case 3:case 4:case 5:case 6:case 7:case 8:case 9:
+			return 14;
+		case 1:
+			return 10;
+		default:
+			return 0;
+		}
+	}
+	,getDigit: function(digit) {
 		switch(digit) {
 		case 0:
 			return alphatab.rendering.glyphs.MusicFont.Num0;
@@ -8116,23 +8714,6 @@ alphatab.rendering.glyphs.DigitGlyph.prototype = $extend(alphatab.rendering.glyp
 			return "";
 		}
 	}
-	,getDigitWidth: function(digit) {
-		switch(digit) {
-		case 0:case 2:case 3:case 4:case 5:case 6:case 7:case 8:case 9:
-			return 14;
-		case 1:
-			return 10;
-		default:
-			return 0;
-		}
-	}
-	,canScale: function() {
-		return false;
-	}
-	,doLayout: function() {
-		this.y += 7 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
-		this.width = this.getDigitWidth(this._digit) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
-	}
 	,__class__: alphatab.rendering.glyphs.DigitGlyph
 });
 alphatab.rendering.glyphs.DrumSticksGlyph = function(x,y,isGrace) {
@@ -8145,11 +8726,11 @@ $hxClasses["alphatab.rendering.glyphs.DrumSticksGlyph"] = alphatab.rendering.gly
 alphatab.rendering.glyphs.DrumSticksGlyph.__name__ = true;
 alphatab.rendering.glyphs.DrumSticksGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.DrumSticksGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
-	canScale: function() {
-		return false;
+	doLayout: function() {
+		this.width = 9 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 	}
-	,doLayout: function() {
-		this.width = 9 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+	,canScale: function() {
+		return false;
 	}
 	,__class__: alphatab.rendering.glyphs.DrumSticksGlyph
 });
@@ -8164,11 +8745,11 @@ $hxClasses["alphatab.rendering.glyphs.FlatGlyph"] = alphatab.rendering.glyphs.Fl
 alphatab.rendering.glyphs.FlatGlyph.__name__ = true;
 alphatab.rendering.glyphs.FlatGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.FlatGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
-	canScale: function() {
-		return false;
+	doLayout: function() {
+		this.width = 8 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 	}
-	,doLayout: function() {
-		this.width = 8 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+	,canScale: function() {
+		return false;
 	}
 	,__class__: alphatab.rendering.glyphs.FlatGlyph
 });
@@ -8182,21 +8763,21 @@ $hxClasses["alphatab.rendering.glyphs.HiHatGlyph"] = alphatab.rendering.glyphs.H
 alphatab.rendering.glyphs.HiHatGlyph.__name__ = true;
 alphatab.rendering.glyphs.HiHatGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.HiHatGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
-	canScale: function() {
-		return false;
+	doLayout: function() {
+		this.width = 9 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 	}
-	,doLayout: function() {
-		this.width = 9 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+	,canScale: function() {
+		return false;
 	}
 	,__class__: alphatab.rendering.glyphs.HiHatGlyph
 });
-alphatab.rendering.glyphs.IMultiBeatEffectGlyph = function() { }
+alphatab.rendering.glyphs.IMultiBeatEffectGlyph = function() { };
 $hxClasses["alphatab.rendering.glyphs.IMultiBeatEffectGlyph"] = alphatab.rendering.glyphs.IMultiBeatEffectGlyph;
 alphatab.rendering.glyphs.IMultiBeatEffectGlyph.__name__ = true;
 alphatab.rendering.glyphs.IMultiBeatEffectGlyph.prototype = {
 	__class__: alphatab.rendering.glyphs.IMultiBeatEffectGlyph
-}
-alphatab.rendering.glyphs.MusicFont = function() { }
+};
+alphatab.rendering.glyphs.MusicFont = function() { };
 $hxClasses["alphatab.rendering.glyphs.MusicFont"] = alphatab.rendering.glyphs.MusicFont;
 alphatab.rendering.glyphs.MusicFont.__name__ = true;
 alphatab.rendering.glyphs.NaturalizeGlyph = function(x,y,isGrace) {
@@ -8210,11 +8791,11 @@ $hxClasses["alphatab.rendering.glyphs.NaturalizeGlyph"] = alphatab.rendering.gly
 alphatab.rendering.glyphs.NaturalizeGlyph.__name__ = true;
 alphatab.rendering.glyphs.NaturalizeGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.NaturalizeGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
-	canScale: function() {
-		return false;
+	doLayout: function() {
+		this.width = 8 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 	}
-	,doLayout: function() {
-		this.width = 8 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+	,canScale: function() {
+		return false;
 	}
 	,__class__: alphatab.rendering.glyphs.NaturalizeGlyph
 });
@@ -8228,8 +8809,14 @@ $hxClasses["alphatab.rendering.glyphs.NoteHeadGlyph"] = alphatab.rendering.glyph
 alphatab.rendering.glyphs.NoteHeadGlyph.__name__ = true;
 alphatab.rendering.glyphs.NoteHeadGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.NoteHeadGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
-	getNoteSvg: function(duration) {
-		switch( (duration)[1] ) {
+	doLayout: function() {
+		this.width = 9 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+	}
+	,canScale: function() {
+		return false;
+	}
+	,getNoteSvg: function(duration) {
+		switch(duration[1]) {
 		case 0:
 			return alphatab.rendering.glyphs.MusicFont.NoteWhole;
 		case 1:
@@ -8237,12 +8824,6 @@ alphatab.rendering.glyphs.NoteHeadGlyph.prototype = $extend(alphatab.rendering.g
 		default:
 			return alphatab.rendering.glyphs.MusicFont.NoteQuarter;
 		}
-	}
-	,canScale: function() {
-		return false;
-	}
-	,doLayout: function() {
-		this.width = 9 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
 	,__class__: alphatab.rendering.glyphs.NoteHeadGlyph
 });
@@ -8252,26 +8833,30 @@ alphatab.rendering.glyphs.NoteNumberGlyph = function(x,y,n,isGrace) {
 	alphatab.rendering.Glyph.call(this,x,y);
 	this._isGrace = isGrace;
 	if(!n.isTieDestination) {
-		this._noteString = n.isDead?"X":Std.string(n.fret);
+		if(n.isDead) this._noteString = "X"; else this._noteString = Std.string(n.fret);
 		if(n.isGhost) this._noteString = "(" + this._noteString + ")";
-	} else if(n.beat.index == 0) this._noteString = "(" + this._noteString + ")"; else this._noteString = "";
+	} else if(n.beat.index == 0) this._noteString = "(" + n.tieOrigin.fret + ")"; else this._noteString = "";
 };
 $hxClasses["alphatab.rendering.glyphs.NoteNumberGlyph"] = alphatab.rendering.glyphs.NoteNumberGlyph;
 alphatab.rendering.glyphs.NoteNumberGlyph.__name__ = true;
 alphatab.rendering.glyphs.NoteNumberGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.NoteNumberGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
-	paint: function(cx,cy,canvas) {
+	doLayout: function() {
+		var scoreRenderer = this.renderer.stave.staveGroup.layout.renderer;
+		if(this._isGrace) scoreRenderer.canvas.setFont(scoreRenderer.renderingResources.graceFont); else scoreRenderer.canvas.setFont(scoreRenderer.renderingResources.tablatureFont);
+		this.width = 10 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+	}
+	,calculateWidth: function() {
+		var x = this.renderer.stave.staveGroup.layout.renderer.canvas.measureText(this._noteString);
+		this.width = x | 0;
+	}
+	,paint: function(cx,cy,canvas) {
 		if(this._noteString != null) {
 			var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
 			canvas.setColor(res.mainGlyphColor);
 			if(this._isGrace) canvas.setFont(res.graceFont); else canvas.setFont(res.tablatureFont);
-			canvas.fillText(Std.string(this._noteString),cx + this.x + 0 * this.renderer.stave.staveGroup.layout.renderer.scale,cy + this.y);
+			canvas.fillText(Std.string(this._noteString),cx + this.x + 0 * this.renderer.stave.staveGroup.layout.renderer.settings.scale,cy + this.y);
 		}
-	}
-	,doLayout: function() {
-		var scoreRenderer = this.renderer.stave.staveGroup.layout.renderer;
-		if(this._isGrace) scoreRenderer.canvas.setFont(scoreRenderer.renderingResources.graceFont); else scoreRenderer.canvas.setFont(scoreRenderer.renderingResources.tablatureFont);
-		this.width = this.renderer.stave.staveGroup.layout.renderer.canvas.measureText(this._noteString) | 0;
 	}
 	,__class__: alphatab.rendering.glyphs.NoteNumberGlyph
 });
@@ -8283,7 +8868,10 @@ $hxClasses["alphatab.rendering.glyphs.NumberGlyph"] = alphatab.rendering.glyphs.
 alphatab.rendering.glyphs.NumberGlyph.__name__ = true;
 alphatab.rendering.glyphs.NumberGlyph.__super__ = alphatab.rendering.glyphs.GlyphGroup;
 alphatab.rendering.glyphs.NumberGlyph.prototype = $extend(alphatab.rendering.glyphs.GlyphGroup.prototype,{
-	doLayout: function() {
+	canScale: function() {
+		return false;
+	}
+	,doLayout: function() {
 		var i = this._number;
 		while(i > 0) {
 			var num = i % 10;
@@ -8293,7 +8881,8 @@ alphatab.rendering.glyphs.NumberGlyph.prototype = $extend(alphatab.rendering.gly
 		}
 		this._glyphs.reverse();
 		var cx = 0;
-		var _g = 0, _g1 = this._glyphs;
+		var _g = 0;
+		var _g1 = this._glyphs;
 		while(_g < _g1.length) {
 			var g = _g1[_g];
 			++_g;
@@ -8304,9 +8893,6 @@ alphatab.rendering.glyphs.NumberGlyph.prototype = $extend(alphatab.rendering.gly
 			cx += g.width;
 		}
 		this.width = cx;
-	}
-	,canScale: function() {
-		return false;
 	}
 	,__class__: alphatab.rendering.glyphs.NumberGlyph
 });
@@ -8319,35 +8905,41 @@ $hxClasses["alphatab.rendering.glyphs.RepeatCloseGlyph"] = alphatab.rendering.gl
 alphatab.rendering.glyphs.RepeatCloseGlyph.__name__ = true;
 alphatab.rendering.glyphs.RepeatCloseGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.RepeatCloseGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
-	paint: function(cx,cy,canvas) {
+	doLayout: function() {
+		var base;
+		if((function($this) {
+			var $r;
+			var _this = $this.renderer;
+			$r = _this._bar.index == _this._bar.track.bars.length - 1;
+			return $r;
+		}(this))) base = 11; else base = 13;
+		this.width = base * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+	}
+	,canScale: function() {
+		return false;
+	}
+	,paint: function(cx,cy,canvas) {
 		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
 		canvas.setColor(res.mainGlyphColor);
-		var blockWidth = 4 * this.renderer.stave.staveGroup.layout.renderer.scale;
+		var blockWidth = 4 * this.renderer.stave.staveGroup.layout.renderer.settings.scale;
 		var top = cy + this.y + this.renderer.getTopPadding();
 		var bottom = cy + this.y + this.renderer.height - this.renderer.getBottomPadding();
 		var left = cx + this.x;
 		var h = bottom - top;
-		var circleSize = 1.5 * this.renderer.stave.staveGroup.layout.renderer.scale;
+		var circleSize = 1.5 * this.renderer.stave.staveGroup.layout.renderer.settings.scale;
 		var middle = (top + bottom) / 2;
 		var dotOffset = 3;
 		canvas.beginPath();
 		canvas.circle(left,middle - circleSize * dotOffset,circleSize);
 		canvas.circle(left,middle + circleSize * dotOffset,circleSize);
 		canvas.fill();
-		left += 4 * this.renderer.stave.staveGroup.layout.renderer.scale;
+		left += 4 * this.renderer.stave.staveGroup.layout.renderer.settings.scale;
 		canvas.beginPath();
 		canvas.moveTo(left,top);
 		canvas.lineTo(left,bottom);
 		canvas.stroke();
-		left += 3 * this.renderer.stave.staveGroup.layout.renderer.scale + 0.5;
+		left += 3 * this.renderer.stave.staveGroup.layout.renderer.settings.scale + 0.5;
 		canvas.fillRect(left,top,blockWidth,h);
-	}
-	,canScale: function() {
-		return false;
-	}
-	,doLayout: function() {
-		var base = this.renderer.isLast()?11:13;
-		this.width = base * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
 	,__class__: alphatab.rendering.glyphs.RepeatCloseGlyph
 });
@@ -8361,19 +8953,21 @@ $hxClasses["alphatab.rendering.glyphs.RepeatCountGlyph"] = alphatab.rendering.gl
 alphatab.rendering.glyphs.RepeatCountGlyph.__name__ = true;
 alphatab.rendering.glyphs.RepeatCountGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.RepeatCountGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
-	paint: function(cx,cy,canvas) {
-		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
-		canvas.setColor(res.mainGlyphColor);
-		canvas.setFont(res.barNumberFont);
-		var s = "x" + Std.string(this._count);
-		var w = canvas.measureText(s) / 1.5 | 0;
-		canvas.fillText(s,cx + this.x - w,cy + this.y);
+	doLayout: function() {
+		this.width = 0;
 	}
 	,canScale: function() {
 		return false;
 	}
-	,doLayout: function() {
-		this.width = 0;
+	,paint: function(cx,cy,canvas) {
+		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
+		canvas.setColor(res.mainGlyphColor);
+		canvas.setFont(res.barNumberFont);
+		var s = "x" + Std.string(this._count);
+		var w;
+		var x = canvas.measureText(s) / 1.5;
+		w = x | 0;
+		canvas.fillText(s,cx + this.x - w,cy + this.y);
 	}
 	,__class__: alphatab.rendering.glyphs.RepeatCountGlyph
 });
@@ -8388,10 +8982,16 @@ $hxClasses["alphatab.rendering.glyphs.RepeatOpenGlyph"] = alphatab.rendering.gly
 alphatab.rendering.glyphs.RepeatOpenGlyph.__name__ = true;
 alphatab.rendering.glyphs.RepeatOpenGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.RepeatOpenGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
-	paint: function(cx,cy,canvas) {
+	doLayout: function() {
+		this.width = 13 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+	}
+	,canScale: function() {
+		return false;
+	}
+	,paint: function(cx,cy,canvas) {
 		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
 		canvas.setColor(res.mainGlyphColor);
-		var blockWidth = 4 * this.renderer.stave.staveGroup.layout.renderer.scale;
+		var blockWidth = 4 * this.renderer.stave.staveGroup.layout.renderer.settings.scale;
 		var top = cy + this.y + this.renderer.getTopPadding();
 		var bottom = cy + this.y + this.renderer.height - this.renderer.getBottomPadding();
 		var left = cx + this.x + 0.5;
@@ -8402,19 +9002,13 @@ alphatab.rendering.glyphs.RepeatOpenGlyph.prototype = $extend(alphatab.rendering
 		canvas.moveTo(left,top);
 		canvas.lineTo(left,bottom);
 		canvas.stroke();
-		left += 3 * this.renderer.stave.staveGroup.layout.renderer.scale;
-		var circleSize = this._circleSize * this.renderer.stave.staveGroup.layout.renderer.scale;
+		left += 3 * this.renderer.stave.staveGroup.layout.renderer.settings.scale;
+		var circleSize = this._circleSize * this.renderer.stave.staveGroup.layout.renderer.settings.scale;
 		var middle = (top + bottom) / 2;
 		canvas.beginPath();
 		canvas.circle(left,middle - circleSize * this._dotOffset,circleSize);
 		canvas.circle(left,middle + circleSize * this._dotOffset,circleSize);
 		canvas.fill();
-	}
-	,canScale: function() {
-		return false;
-	}
-	,doLayout: function() {
-		this.width = 13 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
 	,__class__: alphatab.rendering.glyphs.RepeatOpenGlyph
 });
@@ -8427,10 +9021,15 @@ $hxClasses["alphatab.rendering.glyphs.RestGlyph"] = alphatab.rendering.glyphs.Re
 alphatab.rendering.glyphs.RestGlyph.__name__ = true;
 alphatab.rendering.glyphs.RestGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.RestGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
-	getRestSvg: function(duration) {
-		switch( (duration)[1] ) {
-		case 0:
-		case 1:
+	doLayout: function() {
+		this.width = 9 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+	}
+	,canScale: function() {
+		return false;
+	}
+	,getRestSvg: function(duration) {
+		switch(duration[1]) {
+		case 0:case 1:
 			return alphatab.rendering.glyphs.MusicFont.RestWhole;
 		case 2:
 			return alphatab.rendering.glyphs.MusicFont.RestQuarter;
@@ -8444,12 +9043,6 @@ alphatab.rendering.glyphs.RestGlyph.prototype = $extend(alphatab.rendering.glyph
 			return alphatab.rendering.glyphs.MusicFont.RestSixtyFourth;
 		}
 	}
-	,canScale: function() {
-		return false;
-	}
-	,doLayout: function() {
-		this.width = 9 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
-	}
 	,__class__: alphatab.rendering.glyphs.RestGlyph
 });
 alphatab.rendering.glyphs.RideCymbalGlyph = function(x,y,isGrace) {
@@ -8462,11 +9055,11 @@ $hxClasses["alphatab.rendering.glyphs.RideCymbalGlyph"] = alphatab.rendering.gly
 alphatab.rendering.glyphs.RideCymbalGlyph.__name__ = true;
 alphatab.rendering.glyphs.RideCymbalGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.RideCymbalGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
-	canScale: function() {
-		return false;
+	doLayout: function() {
+		this.width = 9 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 	}
-	,doLayout: function() {
-		this.width = 9 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+	,canScale: function() {
+		return false;
 	}
 	,__class__: alphatab.rendering.glyphs.RideCymbalGlyph
 });
@@ -8503,29 +9096,12 @@ alphatab.rendering.glyphs.ScoreBeatGlyph.__name__ = true;
 alphatab.rendering.glyphs.ScoreBeatGlyph.__interfaces__ = [alphatab.rendering.glyphs.ISupportsFinalize];
 alphatab.rendering.glyphs.ScoreBeatGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
 alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
-	createNoteGlyph: function(n) {
-		var sr = js.Boot.__cast(this.renderer , alphatab.rendering.ScoreBarRenderer);
-		var noteHeadGlyph = this.createNoteHeadGlyph(n);
-		var line = sr.getNoteLine(n);
-		noteHeadGlyph.y = sr.getScoreY(line,-1);
-		this.noteHeads.addNoteGlyph(noteHeadGlyph,n,line);
-		if(n.isStaccato && !this.noteHeads.beatEffects.exists("STACCATO")) this.noteHeads.beatEffects.set("STACCATO",new alphatab.rendering.glyphs.CircleGlyph(0,0,1.5));
-		if(n.accentuated == alphatab.model.AccentuationType.Normal && !this.noteHeads.beatEffects.exists("ACCENT")) this.noteHeads.beatEffects.set("ACCENT",new alphatab.rendering.glyphs.AccentuationGlyph(0,0,alphatab.model.AccentuationType.Normal));
-		if(n.accentuated == alphatab.model.AccentuationType.Heavy && !this.noteHeads.beatEffects.exists("HACCENT")) this.noteHeads.beatEffects.set("HACCENT",new alphatab.rendering.glyphs.AccentuationGlyph(0,0,alphatab.model.AccentuationType.Heavy));
+	finalizeGlyph: function(layout) {
+		if(!this.container.beat.isRest()) this.noteHeads.updateBeamingHelper(this.container.x + this.x);
 	}
-	,createNoteHeadGlyph: function(n) {
-		var isGrace = this.container.beat.graceType != alphatab.model.GraceType.None;
-		if(n.beat.voice.bar.track.isPercussion) {
-			var normalKeys = [32,34,35,36,38,39,40,41,43,45,47,48,50,55,56,58,60,61];
-			var xKeys = [31,33,37,42,44,54,62,63,64,65,66];
-			var value = n.realValue();
-			if(value <= 30 || value >= 67 || Lambda.has(normalKeys,value)) return new alphatab.rendering.glyphs.NoteHeadGlyph(0,0,alphatab.model.Duration.Quarter,isGrace); else if(Lambda.has(xKeys,value)) return new alphatab.rendering.glyphs.DrumSticksGlyph(0,0,isGrace); else if(value == 46) return new alphatab.rendering.glyphs.HiHatGlyph(0,0,isGrace); else if(value == 49 || value == 57) return new alphatab.rendering.glyphs.DiamondNoteHeadGlyph(0,0,isGrace); else if(value == 52) return new alphatab.rendering.glyphs.ChineseCymbalGlyph(0,0,isGrace); else if(value == 51 || value == 53 || value == 59) return new alphatab.rendering.glyphs.RideCymbalGlyph(0,0,isGrace); else return new alphatab.rendering.glyphs.NoteHeadGlyph(0,0,alphatab.model.Duration.Quarter,isGrace);
-		}
-		if(n.isDead) return new alphatab.rendering.glyphs.DeadNoteHeadGlyph(0,0,isGrace); else if(n.harmonicType == alphatab.model.HarmonicType.None) return new alphatab.rendering.glyphs.NoteHeadGlyph(0,0,n.beat.duration,isGrace); else return new alphatab.rendering.glyphs.DiamondNoteHeadGlyph(0,0,isGrace);
-	}
-	,createBeatDot: function(n,group) {
-		var sr = js.Boot.__cast(this.renderer , alphatab.rendering.ScoreBarRenderer);
-		group.addGlyph(new alphatab.rendering.glyphs.CircleGlyph(0,sr.getScoreY(sr.getNoteLine(n),2 * this.renderer.stave.staveGroup.layout.renderer.scale | 0),1.5 * this.renderer.stave.staveGroup.layout.renderer.scale));
+	,applyGlyphSpacing: function(spacing) {
+		alphatab.rendering.glyphs.BeatGlyphBase.prototype.applyGlyphSpacing.call(this,spacing);
+		if(!this.container.beat.isRest()) this.noteHeads.updateBeamingHelper(this.container.x + this.x);
 	}
 	,doLayout: function() {
 		var _g = this;
@@ -8538,7 +9114,8 @@ alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.
 					_g.createNoteGlyph(n);
 				});
 				this.addGlyph(this.noteHeads);
-				var _g1 = 0, _g2 = this.container.beat.dots;
+				var _g1 = 0;
+				var _g2 = this.container.beat.dots;
 				while(_g1 < _g2) {
 					var i = _g1++;
 					var group = [new alphatab.rendering.glyphs.GlyphGroup()];
@@ -8552,8 +9129,8 @@ alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.
 			} else {
 				var line = 0;
 				var offset = 0;
-				var _g1 = this;
-				switch( (_g1.container.beat.duration)[1] ) {
+				var _g1 = this.container.beat.duration;
+				switch(_g1[1]) {
 				case 0:
 					line = 4;
 					break;
@@ -8577,7 +9154,8 @@ alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.
 					line = 8;
 					break;
 				}
-				var sr = js.Boot.__cast(this.renderer , alphatab.rendering.ScoreBarRenderer);
+				var sr;
+				sr = js.Boot.__cast(this.renderer , alphatab.rendering.ScoreBarRenderer);
 				var y = sr.getScoreY(line,offset);
 				this.addGlyph(new alphatab.rendering.glyphs.RestGlyph(0,y,this.container.beat.duration));
 			}
@@ -8585,12 +9163,31 @@ alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.
 		alphatab.rendering.glyphs.BeatGlyphBase.prototype.doLayout.call(this);
 		if(this.noteHeads != null) this.noteHeads.updateBeamingHelper(this.x);
 	}
-	,applyGlyphSpacing: function(spacing) {
-		alphatab.rendering.glyphs.BeatGlyphBase.prototype.applyGlyphSpacing.call(this,spacing);
-		if(!this.container.beat.isRest()) this.noteHeads.updateBeamingHelper(this.container.x + this.x);
+	,createBeatDot: function(n,group) {
+		var sr;
+		sr = js.Boot.__cast(this.renderer , alphatab.rendering.ScoreBarRenderer);
+		group.addGlyph(new alphatab.rendering.glyphs.CircleGlyph(0,sr.getScoreY(sr.getNoteLine(n),2 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0),1.5 * this.renderer.stave.staveGroup.layout.renderer.settings.scale));
 	}
-	,finalizeGlyph: function(layout) {
-		if(!this.container.beat.isRest()) this.noteHeads.updateBeamingHelper(this.container.x + this.x);
+	,createNoteHeadGlyph: function(n) {
+		var isGrace = this.container.beat.graceType != alphatab.model.GraceType.None;
+		if(n.beat.voice.bar.track.isPercussion) {
+			var normalKeys = [32,34,35,36,38,39,40,41,43,45,47,48,50,55,56,58,60,61];
+			var xKeys = [31,33,37,42,44,54,62,63,64,65,66];
+			var value = n.fret + n.beat.voice.bar.track.tuning[n.beat.voice.bar.track.tuning.length - (n.string - 1) - 1];
+			if(value <= 30 || value >= 67 || Lambda.has(normalKeys,value)) return new alphatab.rendering.glyphs.NoteHeadGlyph(0,0,alphatab.model.Duration.Quarter,isGrace); else if(Lambda.has(xKeys,value)) return new alphatab.rendering.glyphs.DrumSticksGlyph(0,0,isGrace); else if(value == 46) return new alphatab.rendering.glyphs.HiHatGlyph(0,0,isGrace); else if(value == 49 || value == 57) return new alphatab.rendering.glyphs.DiamondNoteHeadGlyph(0,0,isGrace); else if(value == 52) return new alphatab.rendering.glyphs.ChineseCymbalGlyph(0,0,isGrace); else if(value == 51 || value == 53 || value == 59) return new alphatab.rendering.glyphs.RideCymbalGlyph(0,0,isGrace); else return new alphatab.rendering.glyphs.NoteHeadGlyph(0,0,alphatab.model.Duration.Quarter,isGrace);
+		}
+		if(n.isDead) return new alphatab.rendering.glyphs.DeadNoteHeadGlyph(0,0,isGrace); else if(n.harmonicType == alphatab.model.HarmonicType.None) return new alphatab.rendering.glyphs.NoteHeadGlyph(0,0,n.beat.duration,isGrace); else return new alphatab.rendering.glyphs.DiamondNoteHeadGlyph(0,0,isGrace);
+	}
+	,createNoteGlyph: function(n) {
+		var sr;
+		sr = js.Boot.__cast(this.renderer , alphatab.rendering.ScoreBarRenderer);
+		var noteHeadGlyph = this.createNoteHeadGlyph(n);
+		var line = sr.getNoteLine(n);
+		noteHeadGlyph.y = sr.getScoreY(line,-1);
+		this.noteHeads.addNoteGlyph(noteHeadGlyph,n,line);
+		if(n.isStaccato && !this.noteHeads.beatEffects.exists("Staccato")) this.noteHeads.beatEffects.set("Staccato",new alphatab.rendering.glyphs.CircleGlyph(0,0,1.5));
+		if(n.accentuated == alphatab.model.AccentuationType.Normal && !this.noteHeads.beatEffects.exists("Accent")) this.noteHeads.beatEffects.set("Accent",new alphatab.rendering.glyphs.AccentuationGlyph(0,0,alphatab.model.AccentuationType.Normal));
+		if(n.accentuated == alphatab.model.AccentuationType.Heavy && !this.noteHeads.beatEffects.exists("HAccent")) this.noteHeads.beatEffects.set("HAccent",new alphatab.rendering.glyphs.AccentuationGlyph(0,0,alphatab.model.AccentuationType.Heavy));
 	}
 	,__class__: alphatab.rendering.glyphs.ScoreBeatGlyph
 });
@@ -8602,7 +9199,12 @@ alphatab.rendering.glyphs.ScoreBeatPostNotesGlyph.__name__ = true;
 alphatab.rendering.glyphs.ScoreBeatPostNotesGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
 alphatab.rendering.glyphs.ScoreBeatPostNotesGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
 	doLayout: function() {
-		this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,this.getBeatDurationWidth() * this.renderer.stave.staveGroup.layout.renderer.scale | 0));
+		this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,(function($this) {
+			var $r;
+			var x = $this.getBeatDurationWidth() * $this.renderer.stave.staveGroup.layout.renderer.settings.scale;
+			$r = x | 0;
+			return $r;
+		}(this))));
 		alphatab.rendering.glyphs.BeatGlyphBase.prototype.doLayout.call(this);
 	}
 	,__class__: alphatab.rendering.glyphs.ScoreBeatPostNotesGlyph
@@ -8614,12 +9216,39 @@ $hxClasses["alphatab.rendering.glyphs.ScoreBeatPreNotesGlyph"] = alphatab.render
 alphatab.rendering.glyphs.ScoreBeatPreNotesGlyph.__name__ = true;
 alphatab.rendering.glyphs.ScoreBeatPreNotesGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
 alphatab.rendering.glyphs.ScoreBeatPreNotesGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
-	createAccidentalGlyph: function(n,accidentals) {
-		var sr = js.Boot.__cast(this.renderer , alphatab.rendering.ScoreBarRenderer);
+	applyGlyphSpacing: function(spacing) {
+		alphatab.rendering.glyphs.BeatGlyphBase.prototype.applyGlyphSpacing.call(this,spacing);
+		var _g = 0;
+		var _g1 = this._glyphs;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.x += spacing;
+		}
+	}
+	,doLayout: function() {
+		var _g = this;
+		if(this.container.beat.brushType != alphatab.model.BrushType.None) {
+			this.addGlyph(new alphatab.rendering.glyphs.ScoreBrushGlyph(this.container.beat));
+			this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,4 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0));
+		}
+		if(!this.container.beat.isRest() && !this.container.beat.voice.bar.track.isPercussion) {
+			var accidentals = new alphatab.rendering.glyphs.AccidentalGroupGlyph(0,0);
+			this.noteLoop(function(n) {
+				_g.createAccidentalGlyph(n,accidentals);
+			});
+			this.addGlyph(accidentals);
+		}
+		this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,4 * (this.container.beat.graceType != alphatab.model.GraceType.None?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0,true));
+		alphatab.rendering.glyphs.BeatGlyphBase.prototype.doLayout.call(this);
+	}
+	,createAccidentalGlyph: function(n,accidentals) {
+		var sr;
+		sr = js.Boot.__cast(this.renderer , alphatab.rendering.ScoreBarRenderer);
 		var noteLine = sr.getNoteLine(n);
 		var accidental = sr.accidentalHelper.applyAccidental(n,noteLine);
 		var isGrace = this.container.beat.graceType != alphatab.model.GraceType.None;
-		switch( (accidental)[1] ) {
+		switch(accidental[1]) {
 		case 2:
 			accidentals.addGlyph(new alphatab.rendering.glyphs.SharpGlyph(0,sr.getScoreY(noteLine),isGrace));
 			break;
@@ -8632,28 +9261,65 @@ alphatab.rendering.glyphs.ScoreBeatPreNotesGlyph.prototype = $extend(alphatab.re
 		default:
 		}
 	}
-	,doLayout: function() {
-		var _g = this;
-		if(!this.container.beat.isRest() && !this.container.beat.voice.bar.track.isPercussion) {
-			var accidentals = new alphatab.rendering.glyphs.AccidentalGroupGlyph(0,0);
-			this.noteLoop(function(n) {
-				_g.createAccidentalGlyph(n,accidentals);
-			});
-			this.addGlyph(accidentals);
-		}
-		this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,4 * (this.container.beat.graceType != alphatab.model.GraceType.None?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0,true));
-		alphatab.rendering.glyphs.BeatGlyphBase.prototype.doLayout.call(this);
-	}
-	,applyGlyphSpacing: function(spacing) {
-		alphatab.rendering.glyphs.BeatGlyphBase.prototype.applyGlyphSpacing.call(this,spacing);
-		var _g = 0, _g1 = this._glyphs;
-		while(_g < _g1.length) {
-			var g = _g1[_g];
-			++_g;
-			g.x += spacing;
-		}
-	}
 	,__class__: alphatab.rendering.glyphs.ScoreBeatPreNotesGlyph
+});
+alphatab.rendering.glyphs.ScoreBrushGlyph = function(beat) {
+	alphatab.rendering.Glyph.call(this,0,0);
+	this._beat = beat;
+};
+$hxClasses["alphatab.rendering.glyphs.ScoreBrushGlyph"] = alphatab.rendering.glyphs.ScoreBrushGlyph;
+alphatab.rendering.glyphs.ScoreBrushGlyph.__name__ = true;
+alphatab.rendering.glyphs.ScoreBrushGlyph.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.ScoreBrushGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	doLayout: function() {
+		this.width = 10 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+	}
+	,paint: function(cx,cy,canvas) {
+		var scoreBarRenderer = this.renderer;
+		var lineSize = 9 * scoreBarRenderer.stave.staveGroup.layout.renderer.settings.scale;
+		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
+		var startY;
+		startY = cy + this.y + (function($this) {
+			var $r;
+			var x = scoreBarRenderer.getNoteY($this._beat.maxNote()) - lineSize / 2;
+			$r = x | 0;
+			return $r;
+		}(this));
+		var endY = cy + this.y + scoreBarRenderer.getNoteY(this._beat.minNote()) + lineSize;
+		var arrowX = cx + this.x + this.width / 2 | 0;
+		var arrowSize = 8 * this.renderer.stave.staveGroup.layout.renderer.settings.scale;
+		canvas.setColor(res.mainGlyphColor);
+		if(this._beat.brushType != alphatab.model.BrushType.None) {
+			if(this._beat.brushType == alphatab.model.BrushType.ArpeggioUp || this._beat.brushType == alphatab.model.BrushType.ArpeggioDown) {
+				var size = 15 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+				var steps = Math.floor(Math.abs(endY - startY) / size);
+				var _g = 0;
+				while(_g < steps) {
+					var i = _g++;
+					var arrow = new alphatab.rendering.glyphs.SvgGlyph(3 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0,0,alphatab.rendering.glyphs.MusicFont.WaveVertical,1,1);
+					arrow.renderer = this.renderer;
+					arrow.doLayout();
+					arrow.paint(cx + this.x,startY + i * size,canvas);
+				}
+			}
+			if(this._beat.brushType == alphatab.model.BrushType.ArpeggioUp) {
+				canvas.beginPath();
+				canvas.moveTo(arrowX,endY);
+				canvas.lineTo(arrowX + arrowSize / 2 | 0,endY - arrowSize | 0);
+				canvas.lineTo(arrowX - arrowSize / 2 | 0,endY - arrowSize | 0);
+				canvas.closePath();
+				canvas.fill();
+			} else if(this._beat.brushType == alphatab.model.BrushType.ArpeggioDown) {
+				canvas.beginPath();
+				canvas.moveTo(arrowX,startY);
+				canvas.lineTo(arrowX + arrowSize / 2 | 0,startY + arrowSize | 0);
+				canvas.lineTo(arrowX - arrowSize / 2 | 0,startY + arrowSize | 0);
+				canvas.closePath();
+				canvas.fill();
+			}
+		}
+	}
+	,__class__: alphatab.rendering.glyphs.ScoreBrushGlyph
 });
 alphatab.rendering.glyphs.ScoreNoteChordGlyph = function(x,y) {
 	if(y == null) y = 0;
@@ -8667,49 +9333,41 @@ $hxClasses["alphatab.rendering.glyphs.ScoreNoteChordGlyph"] = alphatab.rendering
 alphatab.rendering.glyphs.ScoreNoteChordGlyph.__name__ = true;
 alphatab.rendering.glyphs.ScoreNoteChordGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.ScoreNoteChordGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
-	paint: function(cx,cy,canvas) {
-		var scoreRenderer = this.renderer;
-		var effectY = this.beamingHelper.getDirection() == alphatab.rendering.utils.BeamDirection.Up?scoreRenderer.getScoreY(this.maxNote.line,13):scoreRenderer.getScoreY(this.minNote.line,-9);
-		var effectSpacing = this.beamingHelper.getDirection() == alphatab.rendering.utils.BeamDirection.Up?7 * this.renderer.stave.staveGroup.layout.renderer.scale | 0:-7 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
-		var $it0 = this.beatEffects.iterator();
-		while( $it0.hasNext() ) {
-			var g = $it0.next();
-			g.y = effectY;
-			g.x = this.width / 2 | 0;
-			g.paint(cx + this.x,cy + this.y,canvas);
-			effectY += effectSpacing;
+	getDirection: function() {
+		return this.beamingHelper.getDirection();
+	}
+	,getNoteX: function(note,onEnd) {
+		if(onEnd == null) onEnd = true;
+		if(this._noteLookup.exists(note.string)) {
+			var n = this._noteLookup.get(note.string);
+			var pos = this.x + n.x;
+			if(onEnd) pos += n.width;
+			return pos;
 		}
-		canvas.setColor(this.renderer.stave.staveGroup.layout.renderer.renderingResources.staveLineColor);
-		if(this.hasTopOverflow()) {
-			var l = -1;
-			while(l >= this.minNote.line) {
-				var lY = cy + this.y + scoreRenderer.getScoreY(l + 1,-1);
-				canvas.beginPath();
-				canvas.moveTo(cx + this.x,lY);
-				canvas.lineTo(cx + this.x + this.width,lY);
-				canvas.stroke();
-				l -= 2;
-			}
-		}
-		if(this.hasBottomOverflow()) {
-			var l = 11;
-			while(l <= this.maxNote.line) {
-				var lY = cy + this.y + scoreRenderer.getScoreY(l + 1,-1);
-				canvas.beginPath();
-				canvas.moveTo(cx + this.x,lY);
-				canvas.lineTo(cx + this.x + this.width,lY);
-				canvas.stroke();
-				l += 2;
-			}
-		}
-		if(this._tremoloPicking != null) this._tremoloPicking.paint(cx + this.x,cy + this.y,canvas);
-		var _g = 0, _g1 = this._infos;
-		while(_g < _g1.length) {
-			var g = _g1[_g];
-			++_g;
-			g.glyph.renderer = this.renderer;
-			g.glyph.paint(cx + this.x,cy + this.y,canvas);
-		}
+		return 0;
+	}
+	,getNoteY: function(note) {
+		if(this._noteLookup.exists(note.string)) return this.y + this._noteLookup.get(note.string).y;
+		return 0;
+	}
+	,addNoteGlyph: function(noteGlyph,note,noteLine) {
+		var info = { glyph : noteGlyph, line : noteLine};
+		this._infos.push(info);
+		this._noteLookup.set(note.string,noteGlyph);
+		if(this.minNote == null || this.minNote.line > info.line) this.minNote = info;
+		if(this.maxNote == null || this.maxNote.line < info.line) this.maxNote = info;
+	}
+	,canScale: function() {
+		return false;
+	}
+	,updateBeamingHelper: function(cx) {
+		this.beamingHelper.registerBeatLineX(this.beat,cx + this.x + this.upLineX,cx + this.x + this.downLineX);
+	}
+	,hasTopOverflow: function() {
+		return this.minNote != null && this.minNote.line < 0;
+	}
+	,hasBottomOverflow: function() {
+		return this.maxNote != null && this.maxNote.line > 8;
 	}
 	,doLayout: function() {
 		this._infos.sort(function(a,b) {
@@ -8721,7 +9379,8 @@ alphatab.rendering.glyphs.ScoreNoteChordGlyph.prototype = $extend(alphatab.rende
 		var lastLine = 0;
 		var anyDisplaced = false;
 		var w = 0;
-		var _g1 = 0, _g = this._infos.length;
+		var _g1 = 0;
+		var _g = this._infos.length;
 		while(_g1 < _g) {
 			var i = _g1++;
 			var g = this._infos[i].glyph;
@@ -8730,13 +9389,14 @@ alphatab.rendering.glyphs.ScoreNoteChordGlyph.prototype = $extend(alphatab.rende
 			g.x = padding;
 			if(i == 0) displacedX = g.width + padding; else if(Math.abs(lastLine - this._infos[i].line) <= 1) {
 				if(!lastDisplaced) {
-					g.x = displacedX - this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+					g.x = displacedX - this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 					anyDisplaced = true;
 					lastDisplaced = true;
 				} else lastDisplaced = false;
 			} else lastDisplaced = false;
 			lastLine = this._infos[i].line;
-			w = Math.max(w,g.x + g.width) | 0;
+			var x = Math.max(w,g.x + g.width);
+			w = x | 0;
 		}
 		if(anyDisplaced) {
 			this.upLineX = displacedX;
@@ -8753,63 +9413,77 @@ alphatab.rendering.glyphs.ScoreNoteChordGlyph.prototype = $extend(alphatab.rende
 		}
 		if(this.beat.tremoloSpeed != null) {
 			var offset;
-			var baseNote = this.beamingHelper.getDirection() == alphatab.rendering.utils.BeamDirection.Up?this.minNote:this.maxNote;
-			var tremoloX = this.beamingHelper.getDirection() == alphatab.rendering.utils.BeamDirection.Up?displacedX:0;
-			var _g = this;
-			switch( (_g.beat.tremoloSpeed)[1] ) {
+			var baseNote;
+			if(this.beamingHelper.getDirection() == alphatab.rendering.utils.BeamDirection.Up) baseNote = this.minNote; else baseNote = this.maxNote;
+			var tremoloX;
+			if(this.beamingHelper.getDirection() == alphatab.rendering.utils.BeamDirection.Up) tremoloX = displacedX; else tremoloX = 0;
+			var _g = this.beat.tremoloSpeed;
+			switch(_g[1]) {
 			case 5:
-				offset = this.beamingHelper.getDirection() == alphatab.rendering.utils.BeamDirection.Up?-15:10;
+				if(this.beamingHelper.getDirection() == alphatab.rendering.utils.BeamDirection.Up) offset = -15; else offset = 10;
 				break;
 			case 4:
-				offset = this.beamingHelper.getDirection() == alphatab.rendering.utils.BeamDirection.Up?-12:10;
+				if(this.beamingHelper.getDirection() == alphatab.rendering.utils.BeamDirection.Up) offset = -12; else offset = 10;
 				break;
 			case 3:
-				offset = this.beamingHelper.getDirection() == alphatab.rendering.utils.BeamDirection.Up?-10:10;
+				if(this.beamingHelper.getDirection() == alphatab.rendering.utils.BeamDirection.Up) offset = -10; else offset = 10;
 				break;
 			default:
-				offset = this.beamingHelper.getDirection() == alphatab.rendering.utils.BeamDirection.Up?-15:15;
+				if(this.beamingHelper.getDirection() == alphatab.rendering.utils.BeamDirection.Up) offset = -15; else offset = 15;
 			}
-			this._tremoloPicking = new alphatab.rendering.glyphs.TremoloPickingGlyph(tremoloX,baseNote.glyph.y + (offset * this.renderer.stave.staveGroup.layout.renderer.scale | 0),this.beat.tremoloSpeed);
+			this._tremoloPicking = new alphatab.rendering.glyphs.TremoloPickingGlyph(tremoloX,baseNote.glyph.y + (offset * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0),this.beat.tremoloSpeed);
 			this._tremoloPicking.renderer = this.renderer;
 			this._tremoloPicking.doLayout();
 		}
 		this.width = w + padding;
 	}
-	,hasBottomOverflow: function() {
-		return this.maxNote != null && this.maxNote.line > 8;
-	}
-	,hasTopOverflow: function() {
-		return this.minNote != null && this.minNote.line < 0;
-	}
-	,updateBeamingHelper: function(cx) {
-		this.beamingHelper.registerBeatLineX(this.beat,cx + this.x + this.upLineX,cx + this.x + this.downLineX);
-	}
-	,canScale: function() {
-		return false;
-	}
-	,addNoteGlyph: function(noteGlyph,note,noteLine) {
-		var info = { glyph : noteGlyph, line : noteLine};
-		this._infos.push(info);
-		this._noteLookup.set(note.string,noteGlyph);
-		if(this.minNote == null || this.minNote.line > info.line) this.minNote = info;
-		if(this.maxNote == null || this.maxNote.line < info.line) this.maxNote = info;
-	}
-	,getNoteY: function(note) {
-		if(this._noteLookup.exists(note.string)) return this.y + this._noteLookup.get(note.string).y;
-		return 0;
-	}
-	,getNoteX: function(note,onEnd) {
-		if(onEnd == null) onEnd = true;
-		if(this._noteLookup.exists(note.string)) {
-			var n = this._noteLookup.get(note.string);
-			var pos = this.x + n.x;
-			if(onEnd) pos += n.width;
-			return pos;
+	,paint: function(cx,cy,canvas) {
+		var scoreRenderer = this.renderer;
+		var effectY;
+		if(this.beamingHelper.getDirection() == alphatab.rendering.utils.BeamDirection.Up) effectY = scoreRenderer.getScoreY(this.maxNote.line,13); else effectY = scoreRenderer.getScoreY(this.minNote.line,-9);
+		var effectSpacing;
+		if(this.beamingHelper.getDirection() == alphatab.rendering.utils.BeamDirection.Up) effectSpacing = 7 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0; else effectSpacing = -7 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+		var $it0 = this.beatEffects.iterator();
+		while( $it0.hasNext() ) {
+			var g = $it0.next();
+			g.y = effectY;
+			g.x = this.width / 2 | 0;
+			g.paint(cx + this.x,cy + this.y,canvas);
+			effectY += effectSpacing;
 		}
-		return 0;
-	}
-	,getDirection: function() {
-		return this.beamingHelper.getDirection();
+		canvas.setColor(this.renderer.stave.staveGroup.layout.renderer.renderingResources.staveLineColor);
+		var linePadding = 3 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+		if(this.hasTopOverflow()) {
+			var l = -1;
+			while(l >= this.minNote.line) {
+				var lY = cy + this.y + scoreRenderer.getScoreY(l + 1,-1);
+				canvas.beginPath();
+				canvas.moveTo(cx + this.x - linePadding,lY);
+				canvas.lineTo(cx + this.x + this.width + linePadding,lY);
+				canvas.stroke();
+				l -= 2;
+			}
+		}
+		if(this.hasBottomOverflow()) {
+			var l = 11;
+			while(l <= this.maxNote.line) {
+				var lY = cy + this.y + scoreRenderer.getScoreY(l + 1,-1);
+				canvas.beginPath();
+				canvas.moveTo(cx + this.x - linePadding,lY);
+				canvas.lineTo(cx + this.x + this.width + linePadding,lY);
+				canvas.stroke();
+				l += 2;
+			}
+		}
+		if(this._tremoloPicking != null) this._tremoloPicking.paint(cx + this.x,cy + this.y,canvas);
+		var _g = 0;
+		var _g1 = this._infos;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.glyph.renderer = this.renderer;
+			g.glyph.paint(cx + this.x,cy + this.y,canvas);
+		}
 	}
 	,__class__: alphatab.rendering.glyphs.ScoreNoteChordGlyph
 });
@@ -8823,18 +9497,23 @@ $hxClasses["alphatab.rendering.glyphs.ScoreSlideLineGlyph"] = alphatab.rendering
 alphatab.rendering.glyphs.ScoreSlideLineGlyph.__name__ = true;
 alphatab.rendering.glyphs.ScoreSlideLineGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.ScoreSlideLineGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
-	paint: function(cx,cy,canvas) {
+	doLayout: function() {
+		this.width = 0;
+	}
+	,canScale: function() {
+		return false;
+	}
+	,paint: function(cx,cy,canvas) {
 		var r = this.renderer;
-		var sizeX = 12 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
-		var offsetX = this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		var sizeX = 12 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+		var offsetX = this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 		var startX;
 		var startY;
 		var endX;
 		var endY;
-		var _g = this;
-		switch( (_g._type)[1] ) {
-		case 1:
-		case 2:
+		var _g = this._type;
+		switch(_g[1]) {
+		case 1:case 2:
 			startX = cx + r.getNoteX(this._startNote,true) + offsetX;
 			startY = cy + r.getNoteY(this._startNote) + 4;
 			if(this._startNote.slideTarget != null) {
@@ -8878,12 +9557,6 @@ alphatab.rendering.glyphs.ScoreSlideLineGlyph.prototype = $extend(alphatab.rende
 		canvas.lineTo(endX,endY);
 		canvas.stroke();
 	}
-	,canScale: function() {
-		return false;
-	}
-	,doLayout: function() {
-		this.width = 0;
-	}
 	,__class__: alphatab.rendering.glyphs.ScoreSlideLineGlyph
 });
 alphatab.rendering.glyphs.TieGlyph = function(startNote,endNote,parent) {
@@ -8906,27 +9579,31 @@ alphatab.rendering.glyphs.TieGlyph.paintTie = function(canvas,scale,x1,y1,x2,y2,
 	}
 	var offset = 15 * scale;
 	var size = 4 * scale;
-	var normalVector = { x : y2 - y1, y : x2 - x1};
-	var length = Math.sqrt(normalVector.x * normalVector.x + normalVector.y * normalVector.y);
-	if(down) normalVector.x *= -1; else normalVector.y *= -1;
-	normalVector.x /= length;
-	normalVector.y /= length;
-	var center = { x : (x2 + x1) / 2, y : (y2 + y1) / 2};
-	var cp1 = { x : center.x + offset * normalVector.x, y : center.y + offset * normalVector.y};
-	var cp2 = { x : center.x + (offset - size) * normalVector.x, y : center.y + (offset - size) * normalVector.y};
+	var normalVector_x = y2 - y1;
+	var normalVector_y = x2 - x1;
+	var length = Math.sqrt(normalVector_x * normalVector_x + normalVector_y * normalVector_y);
+	if(down) normalVector_x *= -1; else normalVector_y *= -1;
+	normalVector_x /= length;
+	normalVector_y /= length;
+	var center_x = (x2 + x1) / 2;
+	var center_y = (y2 + y1) / 2;
+	var cp1_x = center_x + offset * normalVector_x;
+	var cp1_y = center_y + offset * normalVector_y;
+	var cp2_x = center_x + (offset - size) * normalVector_x;
+	var cp2_y = center_y + (offset - size) * normalVector_y;
 	canvas.beginPath();
 	canvas.moveTo(x1,y1);
-	canvas.quadraticCurveTo(cp1.x,cp1.y,x2,y2);
-	canvas.quadraticCurveTo(cp2.x,cp2.y,x1,y1);
+	canvas.quadraticCurveTo(cp1_x,cp1_y,x2,y2);
+	canvas.quadraticCurveTo(cp2_x,cp2_y,x1,y1);
 	canvas.closePath();
-}
+};
 alphatab.rendering.glyphs.TieGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.TieGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
-	canScale: function() {
-		return false;
-	}
-	,doLayout: function() {
+	doLayout: function() {
 		this.width = 0;
+	}
+	,canScale: function() {
+		return false;
 	}
 	,__class__: alphatab.rendering.glyphs.TieGlyph
 });
@@ -8938,13 +9615,16 @@ alphatab.rendering.glyphs.ScoreTieGlyph.__name__ = true;
 alphatab.rendering.glyphs.ScoreTieGlyph.__super__ = alphatab.rendering.glyphs.TieGlyph;
 alphatab.rendering.glyphs.ScoreTieGlyph.prototype = $extend(alphatab.rendering.glyphs.TieGlyph.prototype,{
 	paint: function(cx,cy,canvas) {
+		if(this._endNote == null || this._startNote.beat.index != this._endNote.beat.index) return;
 		var r = this.renderer;
 		var parent = this._parent;
 		var startX = cx + r.getNoteX(this._startNote);
-		var endX = this._endNote == null?cx + parent.x + parent.postNotes.x + parent.postNotes.width:cx + r.getNoteX(this._endNote,false);
+		var endX;
+		if(this._endNote == null) endX = cx + parent.x + parent.postNotes.x + parent.postNotes.width; else endX = cx + r.getNoteX(this._endNote,false);
 		var startY = cy + r.getNoteY(this._startNote) + 4.5;
-		var endY = this._endNote == null?startY:cy + r.getNoteY(this._endNote) + 4.5;
-		alphatab.rendering.glyphs.TieGlyph.paintTie(canvas,this.renderer.stave.staveGroup.layout.renderer.scale,startX,startY,endX,endY,r.getBeatDirection(this._startNote.beat) == alphatab.rendering.utils.BeamDirection.Down);
+		var endY;
+		if(this._endNote == null) endY = startY; else endY = cy + r.getNoteY(this._endNote) + 4.5;
+		alphatab.rendering.glyphs.TieGlyph.paintTie(canvas,this.renderer.stave.staveGroup.layout.renderer.settings.scale,startX,startY,endX,endY,r.getBeatDirection(this._startNote.beat) == alphatab.rendering.utils.BeamDirection.Down);
 		canvas.setColor(this.renderer.stave.staveGroup.layout.renderer.renderingResources.mainGlyphColor);
 		canvas.fill();
 	}
@@ -8961,11 +9641,11 @@ $hxClasses["alphatab.rendering.glyphs.SharpGlyph"] = alphatab.rendering.glyphs.S
 alphatab.rendering.glyphs.SharpGlyph.__name__ = true;
 alphatab.rendering.glyphs.SharpGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.SharpGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
-	canScale: function() {
-		return false;
+	doLayout: function() {
+		this.width = 8 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 	}
-	,doLayout: function() {
-		this.width = 8 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+	,canScale: function() {
+		return false;
 	}
 	,__class__: alphatab.rendering.glyphs.SharpGlyph
 });
@@ -9015,15 +9695,7 @@ $hxClasses["alphatab.rendering.glyphs.TabBeatGlyph"] = alphatab.rendering.glyphs
 alphatab.rendering.glyphs.TabBeatGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabBeatGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
 alphatab.rendering.glyphs.TabBeatGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
-	createNoteGlyph: function(n) {
-		var isGrace = this.container.beat.graceType != alphatab.model.GraceType.None;
-		var tr = js.Boot.__cast(this.renderer , alphatab.rendering.TabBarRenderer);
-		var noteNumberGlyph = new alphatab.rendering.glyphs.NoteNumberGlyph(0,0,n,isGrace);
-		var l = n.beat.voice.bar.track.tuning.length - n.string + 1;
-		noteNumberGlyph.y = tr.getTabY(l,-2);
-		this.noteNumbers.addNoteGlyph(noteNumberGlyph,n);
-	}
-	,doLayout: function() {
+	doLayout: function() {
 		var _g = this;
 		if(!this.container.beat.isRest()) {
 			this.noteNumbers = new alphatab.rendering.glyphs.TabNoteChordGlyph();
@@ -9032,11 +9704,12 @@ alphatab.rendering.glyphs.TabBeatGlyph.prototype = $extend(alphatab.rendering.gl
 				_g.createNoteGlyph(n);
 			});
 			this.addGlyph(this.noteNumbers);
-			if(this.container.beat.whammyBarPoints.length > 0 && !this.noteNumbers.beatEffects.exists("WHAMMY")) this.noteNumbers.beatEffects.set("WHAMMY",new alphatab.rendering.glyphs.WhammyBarGlyph(this.container.beat,this.container));
-			if(this.container.beat.tremoloSpeed != null && !this.noteNumbers.beatEffects.exists("TREMOLO")) this.noteNumbers.beatEffects.set("TREMOLO",new alphatab.rendering.glyphs.TremoloPickingGlyph(0,0,this.container.beat.tremoloSpeed));
+			if(this.container.beat.whammyBarPoints.length > 0 && !this.noteNumbers.beatEffects.exists("Whammy")) this.noteNumbers.beatEffects.set("Whammy",new alphatab.rendering.glyphs.WhammyBarGlyph(this.container.beat,this.container));
+			if(this.container.beat.tremoloSpeed != null && !this.noteNumbers.beatEffects.exists("Tremolo")) this.noteNumbers.beatEffects.set("Tremolo",new alphatab.rendering.glyphs.TremoloPickingGlyph(0,0,this.container.beat.tremoloSpeed));
 		}
 		var w = 0;
-		var _g1 = 0, _g11 = this._glyphs;
+		var _g1 = 0;
+		var _g11 = this._glyphs;
 		while(_g1 < _g11.length) {
 			var g = _g11[_g1];
 			++_g1;
@@ -9047,6 +9720,15 @@ alphatab.rendering.glyphs.TabBeatGlyph.prototype = $extend(alphatab.rendering.gl
 		}
 		this.width = w;
 	}
+	,createNoteGlyph: function(n) {
+		var isGrace = this.container.beat.graceType != alphatab.model.GraceType.None;
+		var tr;
+		tr = js.Boot.__cast(this.renderer , alphatab.rendering.TabBarRenderer);
+		var noteNumberGlyph = new alphatab.rendering.glyphs.NoteNumberGlyph(0,0,n,isGrace);
+		var l = n.beat.voice.bar.track.tuning.length - n.string + 1;
+		noteNumberGlyph.y = tr.getTabY(l,-2);
+		this.noteNumbers.addNoteGlyph(noteNumberGlyph,n);
+	}
 	,__class__: alphatab.rendering.glyphs.TabBeatGlyph
 });
 alphatab.rendering.glyphs.TabBeatPostNotesGlyph = function() {
@@ -9056,31 +9738,43 @@ $hxClasses["alphatab.rendering.glyphs.TabBeatPostNotesGlyph"] = alphatab.renderi
 alphatab.rendering.glyphs.TabBeatPostNotesGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabBeatPostNotesGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
 alphatab.rendering.glyphs.TabBeatPostNotesGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
-	createNoteGlyphs: function(n) {
-		if(n.trillFret >= 0) {
+	doLayout: function() {
+		var _g = this;
+		this.noteLoop(function(n) {
+			_g.createNoteGlyphs(n);
+		});
+		this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,(function($this) {
+			var $r;
+			var x = $this.getBeatDurationWidth() * $this.renderer.stave.staveGroup.layout.renderer.settings.scale;
+			$r = x | 0;
+			return $r;
+		}(this))));
+		alphatab.rendering.glyphs.BeatGlyphBase.prototype.doLayout.call(this);
+	}
+	,createNoteGlyphs: function(n) {
+		if(n.trillValue >= 0) {
+			this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,4 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0));
 			var trillNote = new alphatab.model.Note();
 			trillNote.isGhost = true;
-			trillNote.fret = n.trillFret;
+			trillNote.fret = n.trillValue - n.beat.voice.bar.track.tuning[n.beat.voice.bar.track.tuning.length - (n.string - 1) - 1];
 			trillNote.string = n.string;
-			var tr = js.Boot.__cast(this.renderer , alphatab.rendering.TabBarRenderer);
+			var tr;
+			tr = js.Boot.__cast(this.renderer , alphatab.rendering.TabBarRenderer);
 			var trillNumberGlyph = new alphatab.rendering.glyphs.NoteNumberGlyph(0,0,trillNote,true);
 			var l = n.beat.voice.bar.track.tuning.length - n.string;
 			trillNumberGlyph.y = tr.getTabY(l);
 			this.addGlyph(trillNumberGlyph);
 		}
 		if(n.bendPoints.length > 1) {
-			var bendHeight = 60 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+			var bendHeight = 60 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 			this.renderer.registerOverflowTop(bendHeight);
-			this.addGlyph(new alphatab.rendering.glyphs.BendGlyph(n,this.getBeatDurationWidth() * this.renderer.stave.staveGroup.layout.renderer.scale | 0,bendHeight));
+			this.addGlyph(new alphatab.rendering.glyphs.BendGlyph(n,(function($this) {
+				var $r;
+				var x = $this.getBeatDurationWidth() * $this.renderer.stave.staveGroup.layout.renderer.settings.scale;
+				$r = x | 0;
+				return $r;
+			}(this)),bendHeight));
 		}
-	}
-	,doLayout: function() {
-		var _g = this;
-		this.noteLoop(function(n) {
-			_g.createNoteGlyphs(n);
-		});
-		this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,this.getBeatDurationWidth() * this.renderer.stave.staveGroup.layout.renderer.scale | 0));
-		alphatab.rendering.glyphs.BeatGlyphBase.prototype.doLayout.call(this);
 	}
 	,__class__: alphatab.rendering.glyphs.TabBeatPostNotesGlyph
 });
@@ -9092,10 +9786,75 @@ alphatab.rendering.glyphs.TabBeatPreNotesGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabBeatPreNotesGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
 alphatab.rendering.glyphs.TabBeatPreNotesGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
 	doLayout: function() {
-		if(this.container.beat.brushType != alphatab.model.BrushType.None) this.addGlyph(new alphatab.rendering.glyphs.BrushGlyph(this.container.beat));
+		if(this.container.beat.brushType != alphatab.model.BrushType.None) {
+			this.addGlyph(new alphatab.rendering.glyphs.TabBrushGlyph(this.container.beat));
+			this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,4 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0));
+		}
 		alphatab.rendering.glyphs.BeatGlyphBase.prototype.doLayout.call(this);
 	}
 	,__class__: alphatab.rendering.glyphs.TabBeatPreNotesGlyph
+});
+alphatab.rendering.glyphs.TabBrushGlyph = function(beat) {
+	alphatab.rendering.Glyph.call(this,0,0);
+	this._beat = beat;
+};
+$hxClasses["alphatab.rendering.glyphs.TabBrushGlyph"] = alphatab.rendering.glyphs.TabBrushGlyph;
+alphatab.rendering.glyphs.TabBrushGlyph.__name__ = true;
+alphatab.rendering.glyphs.TabBrushGlyph.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.TabBrushGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	doLayout: function() {
+		this.width = 10 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+	}
+	,paint: function(cx,cy,canvas) {
+		var tabBarRenderer = this.renderer;
+		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
+		var startY;
+		startY = cy + this.y + (function($this) {
+			var $r;
+			var x = tabBarRenderer.getNoteY($this._beat.maxNote()) - res.tablatureFont.getSize() / 2;
+			$r = x | 0;
+			return $r;
+		}(this));
+		var endY = cy + this.y + tabBarRenderer.getNoteY(this._beat.minNote()) + res.tablatureFont.getSize() / 2;
+		var arrowX = cx + this.x + this.width / 2 | 0;
+		var arrowSize = 8 * this.renderer.stave.staveGroup.layout.renderer.settings.scale;
+		canvas.setColor(res.mainGlyphColor);
+		if(this._beat.brushType != alphatab.model.BrushType.None) {
+			if(this._beat.brushType == alphatab.model.BrushType.BrushUp || this._beat.brushType == alphatab.model.BrushType.BrushDown) {
+				canvas.beginPath();
+				canvas.moveTo(arrowX,startY);
+				canvas.lineTo(arrowX,endY);
+				canvas.stroke();
+			} else {
+				var size = 15 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+				var steps = Math.floor(Math.abs(endY - startY) / size);
+				var _g = 0;
+				while(_g < steps) {
+					var i = _g++;
+					var arrow = new alphatab.rendering.glyphs.SvgGlyph(3 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0,0,alphatab.rendering.glyphs.MusicFont.WaveVertical,1,1);
+					arrow.renderer = this.renderer;
+					arrow.doLayout();
+					arrow.paint(cx + this.x,startY + i * size,canvas);
+				}
+			}
+			if(this._beat.brushType == alphatab.model.BrushType.BrushUp || this._beat.brushType == alphatab.model.BrushType.ArpeggioUp) {
+				canvas.beginPath();
+				canvas.moveTo(arrowX,endY);
+				canvas.lineTo(arrowX + arrowSize / 2 | 0,endY - arrowSize | 0);
+				canvas.lineTo(arrowX - arrowSize / 2 | 0,endY - arrowSize | 0);
+				canvas.closePath();
+				canvas.fill();
+			} else {
+				canvas.beginPath();
+				canvas.moveTo(arrowX,startY);
+				canvas.lineTo(arrowX + arrowSize / 2 | 0,startY + arrowSize | 0);
+				canvas.lineTo(arrowX - arrowSize / 2 | 0,startY + arrowSize | 0);
+				canvas.closePath();
+				canvas.fill();
+			}
+		}
+	}
+	,__class__: alphatab.rendering.glyphs.TabBrushGlyph
 });
 alphatab.rendering.glyphs.TabClefGlyph = function() {
 	alphatab.rendering.Glyph.call(this,0,0);
@@ -9104,15 +9863,22 @@ $hxClasses["alphatab.rendering.glyphs.TabClefGlyph"] = alphatab.rendering.glyphs
 alphatab.rendering.glyphs.TabClefGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabClefGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.TabClefGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
-	paint: function(cx,cy,canvas) {
+	doLayout: function() {
+		this.width = 28 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+	}
+	,canScale: function() {
+		return false;
+	}
+	,paint: function(cx,cy,canvas) {
 		var tabBarRenderer = this.renderer;
 		var track = this.renderer.stave.staveGroup.layout.renderer.track;
 		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
-		var startY = cy + this.y + 10 * this.renderer.stave.staveGroup.layout.renderer.scale * 0.6;
+		var startY = cy + this.y + 10 * this.renderer.stave.staveGroup.layout.renderer.settings.scale * 0.6;
 		var endY = cy + this.y + tabBarRenderer.getTabY(track.tuning.length,-2);
 		var fontScale = 1;
 		var correction = 0;
-		switch(track.tuning.length) {
+		var _g = track.tuning.length;
+		switch(_g) {
 		case 4:
 			fontScale = 0.6;
 			break;
@@ -9136,14 +9902,8 @@ alphatab.rendering.glyphs.TabClefGlyph.prototype = $extend(alphatab.rendering.Gl
 		canvas.setFont(font);
 		canvas.setTextAlign(alphatab.platform.model.TextAlign.Center);
 		canvas.fillText("T",cx + this.x + (this.width / 2 | 0),startY);
-		canvas.fillText("A",cx + this.x + (this.width / 2 | 0),startY + font.getSize() - (correction * this.renderer.stave.staveGroup.layout.renderer.scale | 0));
-		canvas.fillText("B",cx + this.x + (this.width / 2 | 0),startY + (font.getSize() - (correction * this.renderer.stave.staveGroup.layout.renderer.scale | 0)) * 2);
-	}
-	,canScale: function() {
-		return false;
-	}
-	,doLayout: function() {
-		this.width = 28 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		canvas.fillText("A",cx + this.x + (this.width / 2 | 0),startY + font.getSize() - (correction * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0));
+		canvas.fillText("B",cx + this.x + (this.width / 2 | 0),startY + (font.getSize() - (correction * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0)) * 2);
 	}
 	,__class__: alphatab.rendering.glyphs.TabClefGlyph
 });
@@ -9159,10 +9919,61 @@ $hxClasses["alphatab.rendering.glyphs.TabNoteChordGlyph"] = alphatab.rendering.g
 alphatab.rendering.glyphs.TabNoteChordGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabNoteChordGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.TabNoteChordGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
-	paint: function(cx,cy,canvas) {
+	getNoteX: function(note,onEnd) {
+		if(onEnd == null) onEnd = true;
+		if(this._noteLookup.exists(note.string)) {
+			var n = this._noteLookup.get(note.string);
+			var pos = this.x + n.x + (0 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0);
+			if(onEnd) {
+				n.calculateWidth();
+				pos += n.width;
+			}
+			return pos;
+		}
+		return 0;
+	}
+	,getNoteY: function(note) {
+		if(this._noteLookup.exists(note.string)) return this.y + this._noteLookup.get(note.string).y;
+		return 0;
+	}
+	,doLayout: function() {
+		var w = 0;
+		var _g = 0;
+		var _g1 = this._notes;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.renderer = this.renderer;
+			g.doLayout();
+			if(g.width > w) w = g.width;
+		}
+		var tabRenderer = this.renderer;
+		var tabHeight = this.renderer.stave.staveGroup.layout.renderer.renderingResources.tablatureFont.getSize();
+		var effectY;
+		var x = this.getNoteY(this._minNote) + tabHeight / 2;
+		effectY = x | 0;
+		var effectSpacing = 7 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+		var $it0 = this.beatEffects.iterator();
+		while( $it0.hasNext() ) {
+			var g = $it0.next();
+			g.y = effectY;
+			g.x = this.width / 2 | 0;
+			g.renderer = this.renderer;
+			effectY += effectSpacing;
+			g.doLayout();
+		}
+		this.width = w;
+	}
+	,addNoteGlyph: function(noteGlyph,note) {
+		this._notes.push(noteGlyph);
+		this._noteLookup.set(note.string,noteGlyph);
+		if(this._minNote == null || note.string < this._minNote.string) this._minNote = note;
+	}
+	,paint: function(cx,cy,canvas) {
 		var old = canvas.getTextBaseline();
 		canvas.setTextBaseline(alphatab.model.TextBaseline.Middle);
-		var _g = 0, _g1 = this._notes;
+		var _g = 0;
+		var _g1 = this._notes;
 		while(_g < _g1.length) {
 			var g = _g1[_g];
 			++_g;
@@ -9176,50 +9987,6 @@ alphatab.rendering.glyphs.TabNoteChordGlyph.prototype = $extend(alphatab.renderi
 			g.paint(cx + this.x,cy + this.y,canvas);
 		}
 	}
-	,addNoteGlyph: function(noteGlyph,note) {
-		this._notes.push(noteGlyph);
-		this._noteLookup.set(note.string,noteGlyph);
-		if(this._minNote == null || note.string < this._minNote.string) this._minNote = note;
-	}
-	,doLayout: function() {
-		var w = 0;
-		var _g = 0, _g1 = this._notes;
-		while(_g < _g1.length) {
-			var g = _g1[_g];
-			++_g;
-			g.renderer = this.renderer;
-			g.doLayout();
-			if(g.width > w) w = g.width;
-		}
-		var tabRenderer = this.renderer;
-		var tabHeight = this.renderer.stave.staveGroup.layout.renderer.renderingResources.tablatureFont.getSize();
-		var effectY = this.getNoteY(this._minNote) + tabHeight / 2 | 0;
-		var effectSpacing = 7 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
-		var $it0 = this.beatEffects.iterator();
-		while( $it0.hasNext() ) {
-			var g = $it0.next();
-			g.y = effectY;
-			g.x = this.width / 2 | 0;
-			g.renderer = this.renderer;
-			effectY += effectSpacing;
-			g.doLayout();
-		}
-		this.width = w;
-	}
-	,getNoteY: function(note) {
-		if(this._noteLookup.exists(note.string)) return this.y + this._noteLookup.get(note.string).y;
-		return 0;
-	}
-	,getNoteX: function(note,onEnd) {
-		if(onEnd == null) onEnd = true;
-		if(this._noteLookup.exists(note.string)) {
-			var n = this._noteLookup.get(note.string);
-			var pos = this.x + n.x + (0 * this.renderer.stave.staveGroup.layout.renderer.scale | 0);
-			if(onEnd) pos += n.width;
-			return pos;
-		}
-		return 0;
-	}
 	,__class__: alphatab.rendering.glyphs.TabNoteChordGlyph
 });
 alphatab.rendering.glyphs.TabSlideLineGlyph = function(type,startNote,parent) {
@@ -9232,18 +9999,23 @@ $hxClasses["alphatab.rendering.glyphs.TabSlideLineGlyph"] = alphatab.rendering.g
 alphatab.rendering.glyphs.TabSlideLineGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabSlideLineGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.TabSlideLineGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
-	paint: function(cx,cy,canvas) {
+	doLayout: function() {
+		this.width = 0;
+	}
+	,canScale: function() {
+		return false;
+	}
+	,paint: function(cx,cy,canvas) {
 		var r = this.renderer;
-		var sizeX = 12 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
-		var sizeY = 3 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		var sizeX = 12 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+		var sizeY = 3 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 		var startX;
 		var startY;
 		var endX;
 		var endY;
-		var _g = this;
-		switch( (_g._type)[1] ) {
-		case 1:
-		case 2:
+		var _g = this._type;
+		switch(_g[1]) {
+		case 1:case 2:
 			var startOffsetY;
 			var endOffsetY;
 			if(this._startNote.slideTarget == null) {
@@ -9299,12 +10071,6 @@ alphatab.rendering.glyphs.TabSlideLineGlyph.prototype = $extend(alphatab.renderi
 		canvas.lineTo(endX,endY);
 		canvas.stroke();
 	}
-	,canScale: function() {
-		return false;
-	}
-	,doLayout: function() {
-		this.width = 0;
-	}
 	,__class__: alphatab.rendering.glyphs.TabSlideLineGlyph
 });
 alphatab.rendering.glyphs.TabTieGlyph = function(startNote,endNote,parent) {
@@ -9315,17 +10081,20 @@ alphatab.rendering.glyphs.TabTieGlyph.__name__ = true;
 alphatab.rendering.glyphs.TabTieGlyph.__super__ = alphatab.rendering.glyphs.TieGlyph;
 alphatab.rendering.glyphs.TabTieGlyph.prototype = $extend(alphatab.rendering.glyphs.TieGlyph.prototype,{
 	paint: function(cx,cy,canvas) {
+		if(this._endNote == null || this._startNote.beat.index != this._endNote.beat.index) return;
 		var r = this.renderer;
 		var parent = this._parent;
 		var res = r.stave.staveGroup.layout.renderer.renderingResources;
 		var startX = cx + r.getNoteX(this._startNote);
-		var endX = this._endNote == null?cx + parent.x + parent.postNotes.x + parent.postNotes.width:cx + r.getNoteX(this._endNote,false);
+		var endX;
+		if(this._endNote == null) endX = cx + parent.x + parent.postNotes.x + parent.postNotes.width; else endX = cx + r.getNoteX(this._endNote,false);
 		var down = this._startNote.string > 3;
 		var offset = res.tablatureFont.getSize() / 2;
 		if(down) offset *= -1;
 		var startY = cy + r.getNoteY(this._startNote) + offset;
-		var endY = this._endNote == null?startY:cy + r.getNoteY(this._endNote) + offset;
-		alphatab.rendering.glyphs.TieGlyph.paintTie(canvas,this.renderer.stave.staveGroup.layout.renderer.scale,startX,startY,endX,endY,this._startNote.string > 3);
+		var endY;
+		if(this._endNote == null) endY = startY; else endY = cy + r.getNoteY(this._endNote) + offset;
+		alphatab.rendering.glyphs.TieGlyph.paintTie(canvas,this.renderer.stave.staveGroup.layout.renderer.settings.scale,startX,startY,endX,endY,this._startNote.string > 3);
 		canvas.setColor(this.renderer.stave.staveGroup.layout.renderer.renderingResources.mainGlyphColor);
 		canvas.fill();
 	}
@@ -9340,21 +10109,22 @@ $hxClasses["alphatab.rendering.glyphs.TimeSignatureGlyph"] = alphatab.rendering.
 alphatab.rendering.glyphs.TimeSignatureGlyph.__name__ = true;
 alphatab.rendering.glyphs.TimeSignatureGlyph.__super__ = alphatab.rendering.glyphs.GlyphGroup;
 alphatab.rendering.glyphs.TimeSignatureGlyph.prototype = $extend(alphatab.rendering.glyphs.GlyphGroup.prototype,{
-	doLayout: function() {
+	canScale: function() {
+		return false;
+	}
+	,doLayout: function() {
 		var numerator = new alphatab.rendering.glyphs.NumberGlyph(0,0,this._numerator);
-		var denominator = new alphatab.rendering.glyphs.NumberGlyph(0,18 * this.renderer.stave.staveGroup.layout.renderer.scale | 0,this._denominator);
+		var denominator = new alphatab.rendering.glyphs.NumberGlyph(0,18 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0,this._denominator);
 		this._glyphs.push(numerator);
 		this._glyphs.push(denominator);
 		alphatab.rendering.glyphs.GlyphGroup.prototype.doLayout.call(this);
-		var _g = 0, _g1 = this._glyphs;
+		var _g = 0;
+		var _g1 = this._glyphs;
 		while(_g < _g1.length) {
 			var g = _g1[_g];
 			++_g;
 			g.x = (this.width - g.width) / 2 | 0;
 		}
-	}
-	,canScale: function() {
-		return false;
 	}
 	,__class__: alphatab.rendering.glyphs.TimeSignatureGlyph
 });
@@ -9367,8 +10137,14 @@ $hxClasses["alphatab.rendering.glyphs.TremoloPickingGlyph"] = alphatab.rendering
 alphatab.rendering.glyphs.TremoloPickingGlyph.__name__ = true;
 alphatab.rendering.glyphs.TremoloPickingGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.TremoloPickingGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
-	getSvg: function(duration) {
-		switch( (duration)[1] ) {
+	doLayout: function() {
+		this.width = 12 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+	}
+	,canScale: function() {
+		return false;
+	}
+	,getSvg: function(duration) {
+		switch(duration[1]) {
 		case 5:
 			return alphatab.rendering.glyphs.MusicFont.TremoloPickingThirtySecond;
 		case 4:
@@ -9378,12 +10154,6 @@ alphatab.rendering.glyphs.TremoloPickingGlyph.prototype = $extend(alphatab.rende
 		default:
 			return "";
 		}
-	}
-	,canScale: function() {
-		return false;
-	}
-	,doLayout: function() {
-		this.width = 12 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
 	,__class__: alphatab.rendering.glyphs.TremoloPickingGlyph
 });
@@ -9398,57 +10168,15 @@ $hxClasses["alphatab.rendering.glyphs.VoiceContainerGlyph"] = alphatab.rendering
 alphatab.rendering.glyphs.VoiceContainerGlyph.__name__ = true;
 alphatab.rendering.glyphs.VoiceContainerGlyph.__interfaces__ = [alphatab.rendering.glyphs.ISupportsFinalize];
 alphatab.rendering.glyphs.VoiceContainerGlyph.getKey = function(index) {
-	return "BEAT";
-}
+	return "Beat";
+};
 alphatab.rendering.glyphs.VoiceContainerGlyph.__super__ = alphatab.rendering.glyphs.GlyphGroup;
 alphatab.rendering.glyphs.VoiceContainerGlyph.prototype = $extend(alphatab.rendering.glyphs.GlyphGroup.prototype,{
-	paint: function(cx,cy,canvas) {
-		var _g = 0, _g1 = this.beatGlyphs;
-		while(_g < _g1.length) {
-			var g = _g1[_g];
-			++_g;
-			g.paint(cx + this.x,cy + this.y,canvas);
-		}
-	}
-	,finalizeGlyph: function(layout) {
-		var _g1 = 0, _g = this.beatGlyphs.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			this.beatGlyphs[i].finalizeGlyph(layout);
-		}
-	}
-	,doLayout: function() {
-	}
-	,addGlyph: function(g) {
-		g.x = this.beatGlyphs.length == 0?0:this.beatGlyphs[this.beatGlyphs.length - 1].x + this.beatGlyphs[this.beatGlyphs.length - 1].width;
-		g.index = this.beatGlyphs.length;
-		g.renderer = this.renderer;
-		g.doLayout();
-		this.beatGlyphs.push(g);
-		this.width = g.x + g.width;
-	}
-	,applySizes: function(sizes) {
-		this.width = 0;
-		var _g1 = 0, _g = this.beatGlyphs.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			this.beatGlyphs[i].x = i == 0?0:this.beatGlyphs[i - 1].x + this.beatGlyphs[i - 1].width;
-			this.beatGlyphs[i].applySizes(sizes);
-		}
-		if(this.beatGlyphs.length > 0) this.width = this.beatGlyphs[this.beatGlyphs.length - 1].x + this.beatGlyphs[this.beatGlyphs.length - 1].width;
-	}
-	,registerMaxSizes: function(sizes) {
-		var _g = 0, _g1 = this.beatGlyphs;
-		while(_g < _g1.length) {
-			var b = _g1[_g];
-			++_g;
-			b.registerMaxSizes(sizes);
-		}
-	}
-	,applyGlyphSpacing: function(spacing) {
+	applyGlyphSpacing: function(spacing) {
 		var glyphSpacing = spacing / this.beatGlyphs.length;
 		var gx = 0.0;
-		var _g1 = 0, _g = this.beatGlyphs.length;
+		var _g1 = 0;
+		var _g = this.beatGlyphs.length;
 		while(_g1 < _g) {
 			var i = _g1++;
 			var g = this.beatGlyphs[i];
@@ -9457,6 +10185,53 @@ alphatab.rendering.glyphs.VoiceContainerGlyph.prototype = $extend(alphatab.rende
 			g.applyGlyphSpacing(glyphSpacing | 0);
 		}
 		this.width = gx | 0;
+	}
+	,registerMaxSizes: function(sizes) {
+		var _g = 0;
+		var _g1 = this.beatGlyphs;
+		while(_g < _g1.length) {
+			var b = _g1[_g];
+			++_g;
+			b.registerMaxSizes(sizes);
+		}
+	}
+	,applySizes: function(sizes) {
+		this.width = 0;
+		var _g1 = 0;
+		var _g = this.beatGlyphs.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			if(i == 0) this.beatGlyphs[i].x = 0; else this.beatGlyphs[i].x = this.beatGlyphs[i - 1].x + this.beatGlyphs[i - 1].width;
+			this.beatGlyphs[i].applySizes(sizes);
+		}
+		if(this.beatGlyphs.length > 0) this.width = this.beatGlyphs[this.beatGlyphs.length - 1].x + this.beatGlyphs[this.beatGlyphs.length - 1].width;
+	}
+	,addGlyph: function(g) {
+		if(this.beatGlyphs.length == 0) g.x = 0; else g.x = this.beatGlyphs[this.beatGlyphs.length - 1].x + this.beatGlyphs[this.beatGlyphs.length - 1].width;
+		g.index = this.beatGlyphs.length;
+		g.renderer = this.renderer;
+		g.doLayout();
+		this.beatGlyphs.push(g);
+		this.width = g.x + g.width;
+	}
+	,doLayout: function() {
+	}
+	,finalizeGlyph: function(layout) {
+		var _g1 = 0;
+		var _g = this.beatGlyphs.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			this.beatGlyphs[i].finalizeGlyph(layout);
+		}
+	}
+	,paint: function(cx,cy,canvas) {
+		var _g = 0;
+		var _g1 = this.beatGlyphs;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.paint(cx + this.x,cy + this.y,canvas);
+		}
 	}
 	,__class__: alphatab.rendering.glyphs.VoiceContainerGlyph
 });
@@ -9469,20 +10244,59 @@ $hxClasses["alphatab.rendering.glyphs.WhammyBarGlyph"] = alphatab.rendering.glyp
 alphatab.rendering.glyphs.WhammyBarGlyph.__name__ = true;
 alphatab.rendering.glyphs.WhammyBarGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.WhammyBarGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
-	paint: function(cx,cy,canvas) {
+	doLayout: function() {
+		alphatab.rendering.Glyph.prototype.doLayout.call(this);
+		var minY = 0;
+		var maxY = 0;
+		var sizeY = 60 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+		if(this._beat.whammyBarPoints.length >= 2) {
+			var dy = sizeY / 24;
+			var _g1 = 0;
+			var _g = this._beat.whammyBarPoints.length;
+			while(_g1 < _g) {
+				var i = _g1++;
+				var pt = this._beat.whammyBarPoints[i];
+				var ptY = 0 - dy * pt.value | 0;
+				if(ptY > maxY) maxY = ptY;
+				if(ptY < minY) minY = ptY;
+			}
+		}
+		var tabBarRenderer = this.renderer;
+		var track = this.renderer.stave.staveGroup.layout.renderer.track;
+		var tabTop = tabBarRenderer.getTabY(0,-2);
+		var tabBottom = tabBarRenderer.getTabY(track.tuning.length,-2);
+		var absMinY = this.y + minY + tabTop;
+		var absMaxY = this.y + maxY - tabBottom;
+		if(absMinY < 0) tabBarRenderer.registerOverflowTop((function($this) {
+			var $r;
+			var x = Math.abs(absMinY);
+			$r = x | 0;
+			return $r;
+		}(this)));
+		if(absMaxY > 0) tabBarRenderer.registerOverflowBottom((function($this) {
+			var $r;
+			var x = Math.abs(absMaxY);
+			$r = x | 0;
+			return $r;
+		}(this)));
+		var height = tabBarRenderer.height;
+	}
+	,paint: function(cx,cy,canvas) {
 		var tabBarRenderer = this.renderer;
 		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
 		var startX = cx + this.x + this._parent.onNotes.width / 2;
-		var endX = this._beat.nextBeat == null || this._beat.voice != this._beat.nextBeat.voice?cx + this.x + this._parent.onNotes.width / 2 + this._parent.postNotes.width:cx + tabBarRenderer.getBeatX(this._beat.nextBeat);
+		var endX;
+		if(this._beat.nextBeat == null || this._beat.voice != this._beat.nextBeat.voice) endX = cx + this.x + this._parent.onNotes.width / 2 + this._parent.postNotes.width; else endX = cx + tabBarRenderer.getBeatX(this._beat.nextBeat);
 		var startY = cy + this.y;
-		var textOffset = 3 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
-		var sizeY = 60 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		var textOffset = 3 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+		var sizeY = 60 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 		canvas.setTextAlign(alphatab.platform.model.TextAlign.Center);
 		if(this._beat.whammyBarPoints.length >= 2) {
 			var dx = (endX - startX) / 60;
 			var dy = sizeY / 24;
 			canvas.beginPath();
-			var _g1 = 0, _g = this._beat.whammyBarPoints.length - 1;
+			var _g1 = 0;
+			var _g = this._beat.whammyBarPoints.length - 1;
 			while(_g1 < _g) {
 				var i = _g1++;
 				var pt1 = this._beat.whammyBarPoints[i];
@@ -9504,7 +10318,8 @@ alphatab.rendering.glyphs.WhammyBarGlyph.prototype = $extend(alphatab.rendering.
 					if(dv == 0.25) s += "1/4"; else if(dv == 0.5) s += "1/2"; else if(dv == 0.75) s += "3/4";
 					canvas.setFont(res.graceFont);
 					var size = canvas.measureText(s);
-					var sy = up?pt2Y - res.graceFont.getSize() - textOffset:pt2Y + textOffset;
+					var sy;
+					if(up) sy = pt2Y - res.graceFont.getSize() - textOffset; else sy = pt2Y + textOffset;
 					var sx = pt2X;
 					canvas.fillText(s,sx,sy);
 				}
@@ -9512,35 +10327,37 @@ alphatab.rendering.glyphs.WhammyBarGlyph.prototype = $extend(alphatab.rendering.
 			canvas.stroke();
 		}
 	}
-	,doLayout: function() {
-		alphatab.rendering.Glyph.prototype.doLayout.call(this);
-		var minY = 0;
-		var maxY = 0;
-		var sizeY = 60 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
-		if(this._beat.whammyBarPoints.length >= 2) {
-			var dy = sizeY / 24;
-			var _g1 = 0, _g = this._beat.whammyBarPoints.length;
-			while(_g1 < _g) {
-				var i = _g1++;
-				var pt = this._beat.whammyBarPoints[i];
-				var ptY = 0 - dy * pt.value | 0;
-				if(ptY > maxY) maxY = ptY;
-				if(ptY < minY) minY = ptY;
-			}
-		}
-		var tabBarRenderer = this.renderer;
-		var track = this.renderer.stave.staveGroup.layout.renderer.track;
-		var tabTop = tabBarRenderer.getTabY(0,-2);
-		var tabBottom = tabBarRenderer.getTabY(track.tuning.length,-2);
-		var absMinY = this.y + minY + tabTop;
-		var absMaxY = this.y + maxY - tabBottom;
-		if(absMinY < 0) tabBarRenderer.registerOverflowTop(Math.abs(absMinY) | 0);
-		if(absMaxY > 0) tabBarRenderer.registerOverflowBottom(Math.abs(absMaxY) | 0);
-		var height = tabBarRenderer.height;
-	}
 	,__class__: alphatab.rendering.glyphs.WhammyBarGlyph
 });
-alphatab.rendering.glyphs.effects = {}
+alphatab.rendering.glyphs.effects = {};
+alphatab.rendering.glyphs.effects.CrescendoGlyph = function(x,y,crescendo) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	alphatab.rendering.Glyph.call(this,x,y);
+	this._crescendo = crescendo;
+};
+$hxClasses["alphatab.rendering.glyphs.effects.CrescendoGlyph"] = alphatab.rendering.glyphs.effects.CrescendoGlyph;
+alphatab.rendering.glyphs.effects.CrescendoGlyph.__name__ = true;
+alphatab.rendering.glyphs.effects.CrescendoGlyph.__super__ = alphatab.rendering.Glyph;
+alphatab.rendering.glyphs.effects.CrescendoGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
+	paint: function(cx,cy,canvas) {
+		var height = 17 * this.renderer.stave.staveGroup.layout.renderer.settings.scale;
+		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
+		canvas.setColor(res.mainGlyphColor);
+		canvas.beginPath();
+		if(this._crescendo == alphatab.rendering.glyphs.CrescendoType.Crescendo) {
+			canvas.moveTo(cx + this.x + this.width,cy + this.y);
+			canvas.lineTo(cx + this.x,cy + this.y + (height / 2 | 0));
+			canvas.lineTo(cx + this.x + this.width,cy + this.y + height);
+		} else {
+			canvas.moveTo(cx + this.x,cy + this.y);
+			canvas.lineTo(cx + this.x + this.width,cy + this.y + (height / 2 | 0));
+			canvas.lineTo(cx + this.x,cy + this.y + height);
+		}
+		canvas.stroke();
+	}
+	,__class__: alphatab.rendering.glyphs.effects.CrescendoGlyph
+});
 alphatab.rendering.glyphs.effects.DummyEffectGlyph = function(x,y,s) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
@@ -9551,18 +10368,18 @@ $hxClasses["alphatab.rendering.glyphs.effects.DummyEffectGlyph"] = alphatab.rend
 alphatab.rendering.glyphs.effects.DummyEffectGlyph.__name__ = true;
 alphatab.rendering.glyphs.effects.DummyEffectGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.effects.DummyEffectGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
-	paint: function(cx,cy,canvas) {
-		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
-		canvas.setColor(res.mainGlyphColor);
-		canvas.strokeRect(cx + this.x,cy + this.y,this.width,20 * this.renderer.stave.staveGroup.layout.renderer.scale);
-		canvas.setFont(res.tablatureFont);
-		canvas.fillText(this._s,cx + this.x,cy + this.y);
+	doLayout: function() {
+		this.width = 20 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 	}
 	,canScale: function() {
 		return false;
 	}
-	,doLayout: function() {
-		this.width = 20 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+	,paint: function(cx,cy,canvas) {
+		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
+		canvas.setColor(res.mainGlyphColor);
+		canvas.strokeRect(cx + this.x,cy + this.y,this.width,20 * this.renderer.stave.staveGroup.layout.renderer.settings.scale);
+		canvas.setFont(res.tablatureFont);
+		canvas.fillText(this._s,cx + this.x,cy + this.y);
 	}
 	,__class__: alphatab.rendering.glyphs.effects.DummyEffectGlyph
 });
@@ -9576,27 +10393,12 @@ $hxClasses["alphatab.rendering.glyphs.effects.DynamicsGlyph"] = alphatab.renderi
 alphatab.rendering.glyphs.effects.DynamicsGlyph.__name__ = true;
 alphatab.rendering.glyphs.effects.DynamicsGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.effects.DynamicsGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
-	f: function() {
-		var f = new alphatab.rendering.glyphs.SvgGlyph(0,0,alphatab.rendering.glyphs.MusicFont.DynamicF,0.8,0.8);
-		f.width = 7 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
-		return f;
-	}
-	,m: function() {
-		var m = new alphatab.rendering.glyphs.SvgGlyph(0,0,alphatab.rendering.glyphs.MusicFont.DynamicM,0.8,0.8);
-		m.width = 7 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
-		return m;
-	}
-	,p: function() {
-		var p = new alphatab.rendering.glyphs.SvgGlyph(0,0,alphatab.rendering.glyphs.MusicFont.DynamicP,0.8,0.8);
-		p.width = 7 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
-		return p;
-	}
-	,paint: function(cx,cy,canvas) {
+	paint: function(cx,cy,canvas) {
 		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
 		canvas.setColor(res.mainGlyphColor);
 		var glyphs;
-		var _g = this;
-		switch( (_g._dynamics)[1] ) {
+		var _g = this._dynamics;
+		switch(_g[1]) {
 		case 0:
 			glyphs = [this.p(),this.p(),this.p()];
 			break;
@@ -9623,23 +10425,38 @@ alphatab.rendering.glyphs.effects.DynamicsGlyph.prototype = $extend(alphatab.ren
 			break;
 		}
 		var glyphWidth = 0;
-		var _g1 = 0;
-		while(_g1 < glyphs.length) {
-			var g = glyphs[_g1];
-			++_g1;
+		var _g = 0;
+		while(_g < glyphs.length) {
+			var g = glyphs[_g];
+			++_g;
 			glyphWidth += g.width;
 		}
 		var startX = (this.width - glyphWidth) / 2 | 0;
-		var _g1 = 0;
-		while(_g1 < glyphs.length) {
-			var g = glyphs[_g1];
-			++_g1;
+		var _g = 0;
+		while(_g < glyphs.length) {
+			var g = glyphs[_g];
+			++_g;
 			g.x = startX;
 			g.y = 0;
 			g.renderer = this.renderer;
 			g.paint(cx + this.x,cy + this.y,canvas);
 			startX += g.width;
 		}
+	}
+	,p: function() {
+		var p = new alphatab.rendering.glyphs.SvgGlyph(0,0,alphatab.rendering.glyphs.MusicFont.DynamicP,0.8,0.8);
+		p.width = 7 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+		return p;
+	}
+	,m: function() {
+		var m = new alphatab.rendering.glyphs.SvgGlyph(0,0,alphatab.rendering.glyphs.MusicFont.DynamicM,0.8,0.8);
+		m.width = 7 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+		return m;
+	}
+	,f: function() {
+		var f = new alphatab.rendering.glyphs.SvgGlyph(0,0,alphatab.rendering.glyphs.MusicFont.DynamicF,0.8,0.8);
+		f.width = 7 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+		return f;
 	}
 	,__class__: alphatab.rendering.glyphs.effects.DynamicsGlyph
 });
@@ -9653,7 +10470,7 @@ alphatab.rendering.glyphs.effects.FadeInGlyph.__name__ = true;
 alphatab.rendering.glyphs.effects.FadeInGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.effects.FadeInGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
-		var size = 6 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+		var size = 6 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 		canvas.beginPath();
 		canvas.moveTo(cx + this.x,cy + this.y);
 		canvas.quadraticCurveTo(cx + this.x + (this.width / 2 | 0),cy + this.y,cx + this.x + this.width,cy + this.y - size);
@@ -9674,37 +10491,44 @@ alphatab.rendering.glyphs.effects.LineRangedGlyph.__name__ = true;
 alphatab.rendering.glyphs.effects.LineRangedGlyph.__interfaces__ = [alphatab.rendering.glyphs.IMultiBeatEffectGlyph];
 alphatab.rendering.glyphs.effects.LineRangedGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.effects.LineRangedGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
-	paint: function(cx,cy,canvas) {
-		var step = 11 * this.renderer.stave.staveGroup.layout.renderer.scale;
+	expandedTo: function(beat) {
+		this._isExpanded = true;
+	}
+	,paint: function(cx,cy,canvas) {
+		var step = 11 * this.renderer.stave.staveGroup.layout.renderer.settings.scale;
 		var loops = Math.floor(Math.max(1,this.width / step));
 		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
 		canvas.setColor(res.mainGlyphColor);
 		canvas.setFont(res.effectFont);
+		canvas.setTextAlign(alphatab.platform.model.TextAlign.Left);
 		var textWidth = canvas.measureText(this._label);
 		canvas.fillText(this._label,cx + this.x,cy + this.y);
 		if(this._isExpanded) {
-			var lineSpacing = 3 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+			var lineSpacing = 3 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 			var startX = cx + this.x + textWidth + lineSpacing;
 			var endX = cx + this.x + this.width - lineSpacing - lineSpacing;
-			var lineY = cy + this.y + (8 * this.renderer.stave.staveGroup.layout.renderer.scale | 0);
-			var lineSize = 8 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
+			var lineY = cy + this.y + (8 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0);
+			var lineSize = 8 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
 			if(endX > startX) {
 				var lineX = startX;
-				canvas.beginPath();
 				while(lineX < endX) {
+					canvas.beginPath();
 					canvas.moveTo(lineX,lineY);
-					canvas.lineTo(Math.min(lineX + lineSize,endX) | 0,lineY);
+					canvas.lineTo((function($this) {
+						var $r;
+						var x = Math.min(lineX + lineSize,endX);
+						$r = x | 0;
+						return $r;
+					}(this)),lineY);
 					lineX += lineSize + lineSpacing;
+					canvas.stroke();
 				}
-				canvas.stroke();
-				canvas.moveTo(endX,lineY - (6 * this.renderer.stave.staveGroup.layout.renderer.scale | 0));
-				canvas.lineTo(endX,lineY + (6 * this.renderer.stave.staveGroup.layout.renderer.scale | 0));
+				canvas.beginPath();
+				canvas.moveTo(endX,lineY - (6 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0));
+				canvas.lineTo(endX,lineY + (6 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0));
 				canvas.stroke();
 			}
 		}
-	}
-	,expandedTo: function(beat) {
-		this._isExpanded = true;
 	}
 	,__class__: alphatab.rendering.glyphs.effects.LineRangedGlyph
 });
@@ -9717,8 +10541,14 @@ $hxClasses["alphatab.rendering.glyphs.effects.PickStrokeGlyph"] = alphatab.rende
 alphatab.rendering.glyphs.effects.PickStrokeGlyph.__name__ = true;
 alphatab.rendering.glyphs.effects.PickStrokeGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
 alphatab.rendering.glyphs.effects.PickStrokeGlyph.prototype = $extend(alphatab.rendering.glyphs.SvgGlyph.prototype,{
-	getNoteSvg: function(pickStroke) {
-		switch( (pickStroke)[1] ) {
+	doLayout: function() {
+		this.width = 9 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+	}
+	,canScale: function() {
+		return false;
+	}
+	,getNoteSvg: function(pickStroke) {
+		switch(pickStroke[1]) {
 		case 1:
 			return alphatab.rendering.glyphs.MusicFont.PickStrokeUp;
 		case 2:
@@ -9726,12 +10556,6 @@ alphatab.rendering.glyphs.effects.PickStrokeGlyph.prototype = $extend(alphatab.r
 		case 0:
 			return "";
 		}
-	}
-	,canScale: function() {
-		return false;
-	}
-	,doLayout: function() {
-		this.width = 9 * this.renderer.stave.staveGroup.layout.renderer.scale | 0;
 	}
 	,__class__: alphatab.rendering.glyphs.effects.PickStrokeGlyph
 });
@@ -9752,7 +10576,7 @@ alphatab.rendering.glyphs.effects.TempoGlyph.prototype = $extend(alphatab.render
 		var symbol = new alphatab.rendering.glyphs.SvgGlyph(0,0,alphatab.rendering.glyphs.MusicFont.Tempo,1,1);
 		symbol.renderer = this.renderer;
 		symbol.paint(cx + this.x,cy + this.y,canvas);
-		canvas.fillText("" + this._tempo,cx + this.x + (30 * this.renderer.stave.staveGroup.layout.renderer.scale | 0),cy + this.y + (7 * this.renderer.stave.staveGroup.layout.renderer.scale | 0));
+		canvas.fillText("" + this._tempo,cx + this.x + (30 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0),cy + this.y + (7 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0));
 	}
 	,__class__: alphatab.rendering.glyphs.effects.TempoGlyph
 });
@@ -9794,7 +10618,7 @@ alphatab.rendering.glyphs.effects.TrillGlyph.prototype = $extend(alphatab.render
 		canvas.fillText("tr",cx + this.x,cy + this.y);
 		var startX = textw;
 		var endX = this.width - startX;
-		var step = 11 * this.renderer.stave.staveGroup.layout.renderer.scale * this._scale;
+		var step = 11 * this.renderer.stave.staveGroup.layout.renderer.settings.scale * this._scale;
 		var loops = Math.floor(Math.max(1,(endX - startX) / step));
 		var loopX = startX | 0;
 		var _g = 0;
@@ -9802,7 +10626,12 @@ alphatab.rendering.glyphs.effects.TrillGlyph.prototype = $extend(alphatab.render
 			var i = _g++;
 			var glyph = new alphatab.rendering.glyphs.SvgGlyph(loopX,0,alphatab.rendering.glyphs.MusicFont.WaveHorizontal,this._scale,this._scale);
 			glyph.renderer = this.renderer;
-			glyph.paint(cx + this.x,cy + this.y + (res.markerFont.getSize() / 2 | 0),canvas);
+			glyph.paint(cx + this.x,cy + this.y + (function($this) {
+				var $r;
+				var x = res.markerFont.getSize() / 2;
+				$r = x | 0;
+				return $r;
+			}(this)),canvas);
 			loopX += Math.floor(step);
 		}
 	}
@@ -9820,7 +10649,7 @@ alphatab.rendering.glyphs.effects.VibratoGlyph.__name__ = true;
 alphatab.rendering.glyphs.effects.VibratoGlyph.__super__ = alphatab.rendering.Glyph;
 alphatab.rendering.glyphs.effects.VibratoGlyph.prototype = $extend(alphatab.rendering.Glyph.prototype,{
 	paint: function(cx,cy,canvas) {
-		var step = 11 * this.renderer.stave.staveGroup.layout.renderer.scale * this._scale;
+		var step = 11 * this.renderer.stave.staveGroup.layout.renderer.settings.scale * this._scale;
 		var loops = Math.floor(Math.max(1,this.width / step));
 		var loopX = 0;
 		var _g = 0;
@@ -9834,10 +10663,10 @@ alphatab.rendering.glyphs.effects.VibratoGlyph.prototype = $extend(alphatab.rend
 	}
 	,__class__: alphatab.rendering.glyphs.effects.VibratoGlyph
 });
-alphatab.rendering.layout.HeaderFooterElements = function() { }
+alphatab.rendering.layout.HeaderFooterElements = function() { };
 $hxClasses["alphatab.rendering.layout.HeaderFooterElements"] = alphatab.rendering.layout.HeaderFooterElements;
 alphatab.rendering.layout.HeaderFooterElements.__name__ = true;
-alphatab.rendering.staves = {}
+alphatab.rendering.staves = {};
 alphatab.rendering.staves.BarSizeInfo = function() {
 	this.sizes = new haxe.ds.StringMap();
 	this.fullWidth = 0;
@@ -9845,23 +10674,23 @@ alphatab.rendering.staves.BarSizeInfo = function() {
 $hxClasses["alphatab.rendering.staves.BarSizeInfo"] = alphatab.rendering.staves.BarSizeInfo;
 alphatab.rendering.staves.BarSizeInfo.__name__ = true;
 alphatab.rendering.staves.BarSizeInfo.prototype = {
-	setIndexedSize: function(key,index,size) {
-		if(!this.sizes.exists(key)) this.sizes.set(key,new Array());
-		this.sizes.get(key)[index] = size;
-	}
-	,getIndexedSize: function(key,index) {
-		if(this.sizes.exists(key) && index < this.sizes.get(key).length) return this.sizes.get(key)[index];
-		return 0;
+	setSize: function(key,size) {
+		this.sizes.set(key,[size]);
 	}
 	,getSize: function(key) {
 		if(this.sizes.exists(key)) return this.sizes.get(key)[0];
 		return 0;
 	}
-	,setSize: function(key,size) {
-		this.sizes.set(key,[size]);
+	,getIndexedSize: function(key,index) {
+		if(this.sizes.exists(key) && index < this.sizes.get(key).length) return this.sizes.get(key)[index];
+		return 0;
+	}
+	,setIndexedSize: function(key,index,size) {
+		if(!this.sizes.exists(key)) this.sizes.set(key,new Array());
+		this.sizes.get(key)[index] = size;
 	}
 	,__class__: alphatab.rendering.staves.BarSizeInfo
-}
+};
 alphatab.rendering.staves.Stave = function(barRendererFactory) {
 	this.barRenderers = new Array();
 	this._factory = barRendererFactory;
@@ -9873,63 +10702,14 @@ alphatab.rendering.staves.Stave = function(barRendererFactory) {
 $hxClasses["alphatab.rendering.staves.Stave"] = alphatab.rendering.staves.Stave;
 alphatab.rendering.staves.Stave.__name__ = true;
 alphatab.rendering.staves.Stave.prototype = {
-	paint: function(cx,cy,canvas) {
-		if(this.height == 0) return;
-		var _g = 0, _g1 = this.barRenderers;
-		while(_g < _g1.length) {
-			var r = _g1[_g];
-			++_g;
-			r.paint(cx + this.x,cy + this.y,canvas);
-		}
+	isInAccolade: function() {
+		return this._factory.isInAccolade;
 	}
-	,finalizeStave: function(layout) {
-		var x = 0;
-		this.height = 0;
-		var topOverflow = this.getTopOverflow();
-		var bottomOverflow = this.getBottomOverflow();
-		var isEmpty = true;
-		var _g1 = 0, _g = this.barRenderers.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			this.barRenderers[i].x = x;
-			this.barRenderers[i].y = this.topSpacing + topOverflow;
-			this.height = Math.max(this.height,this.barRenderers[i].height) | 0;
-			this.barRenderers[i].finalizeRenderer(layout);
-			x += this.barRenderers[i].width;
-			if(!this.barRenderers[i].isEmpty) isEmpty = false;
-		}
-		if(!isEmpty) this.height += this.topSpacing + topOverflow + bottomOverflow + this.bottomSpacing; else this.height = 0;
+	,registerStaveTop: function(offset) {
+		this.staveTop = offset;
 	}
-	,getBottomOverflow: function() {
-		var m = 0;
-		var _g = 0, _g1 = this.barRenderers;
-		while(_g < _g1.length) {
-			var r = _g1[_g];
-			++_g;
-			if(r.bottomOverflow > m) m = r.bottomOverflow;
-		}
-		return m;
-	}
-	,getTopOverflow: function() {
-		var m = 0;
-		var _g = 0, _g1 = this.barRenderers;
-		while(_g < _g1.length) {
-			var r = _g1[_g];
-			++_g;
-			if(r.topOverflow > m) m = r.topOverflow;
-		}
-		return m;
-	}
-	,applyBarSpacing: function(spacing) {
-		var _g = 0, _g1 = this.barRenderers;
-		while(_g < _g1.length) {
-			var b = _g1[_g];
-			++_g;
-			b.applyBarSpacing(spacing);
-		}
-	}
-	,revertLastBar: function() {
-		this.barRenderers.pop();
+	,registerStaveBottom: function(offset) {
+		this.staveBottom = offset;
 	}
 	,addBar: function(bar) {
 		var renderer = this._factory.create(bar);
@@ -9938,17 +10718,72 @@ alphatab.rendering.staves.Stave.prototype = {
 		renderer.doLayout();
 		this.barRenderers.push(renderer);
 	}
-	,registerStaveBottom: function(offset) {
-		this.staveBottom = offset;
+	,revertLastBar: function() {
+		this.barRenderers.pop();
 	}
-	,registerStaveTop: function(offset) {
-		this.staveTop = offset;
+	,applyBarSpacing: function(spacing) {
+		var _g = 0;
+		var _g1 = this.barRenderers;
+		while(_g < _g1.length) {
+			var b = _g1[_g];
+			++_g;
+			b.applyBarSpacing(spacing);
+		}
 	}
-	,isInAccolade: function() {
-		return this._factory.isInAccolade;
+	,getTopOverflow: function() {
+		var m = 0;
+		var _g = 0;
+		var _g1 = this.barRenderers;
+		while(_g < _g1.length) {
+			var r = _g1[_g];
+			++_g;
+			if(r.topOverflow > m) m = r.topOverflow;
+		}
+		return m;
+	}
+	,getBottomOverflow: function() {
+		var m = 0;
+		var _g = 0;
+		var _g1 = this.barRenderers;
+		while(_g < _g1.length) {
+			var r = _g1[_g];
+			++_g;
+			if(r.bottomOverflow > m) m = r.bottomOverflow;
+		}
+		return m;
+	}
+	,finalizeStave: function(layout) {
+		var x = 0;
+		this.height = 0;
+		var topOverflow = this.getTopOverflow();
+		var bottomOverflow = this.getBottomOverflow();
+		var isEmpty = true;
+		var _g1 = 0;
+		var _g = this.barRenderers.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			this.barRenderers[i].x = x;
+			this.barRenderers[i].y = this.topSpacing + topOverflow;
+			var x1 = Math.max(this.height,this.barRenderers[i].height);
+			this.height = x1 | 0;
+			this.barRenderers[i].finalizeRenderer(layout);
+			x += this.barRenderers[i].width;
+			if(!this.barRenderers[i].isEmpty) isEmpty = false;
+		}
+		if(!isEmpty) this.height += this.topSpacing + topOverflow + bottomOverflow + this.bottomSpacing; else this.height = 0;
+	}
+	,paint: function(cx,cy,canvas) {
+		if(this.height == 0) return;
+		var _g = 0;
+		var _g1 = this.barRenderers;
+		while(_g < _g1.length) {
+			var r = _g1[_g];
+			++_g;
+			r.paint(cx + this.x,cy + this.y,canvas);
+		}
 	}
 	,__class__: alphatab.rendering.staves.Stave
-}
+};
 alphatab.rendering.staves.StaveGroup = function() {
 	this.bars = new Array();
 	this.staves = new Array();
@@ -9957,19 +10792,77 @@ alphatab.rendering.staves.StaveGroup = function() {
 $hxClasses["alphatab.rendering.staves.StaveGroup"] = alphatab.rendering.staves.StaveGroup;
 alphatab.rendering.staves.StaveGroup.__name__ = true;
 alphatab.rendering.staves.StaveGroup.prototype = {
-	finalizeGroup: function(scoreLayout) {
-		var currentY = 0;
-		var _g1 = 0, _g = this.staves.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			this.staves[i].x = 0;
-			this.staves[i].y = currentY | 0;
-			this.staves[i].finalizeStave(scoreLayout);
-			currentY += this.staves[i].height;
+	getLastBarIndex: function() {
+		return this.bars[this.bars.length - 1].index;
+	}
+	,addBar: function(bar) {
+		this.bars.push(bar);
+		var maxSizes = new alphatab.rendering.staves.BarSizeInfo();
+		var _g = 0;
+		var _g1 = this.staves;
+		while(_g < _g1.length) {
+			var s = _g1[_g];
+			++_g;
+			s.addBar(bar);
+			s.barRenderers[s.barRenderers.length - 1].registerMaxSizes(maxSizes);
+		}
+		var realWidth = 0;
+		var _g = 0;
+		var _g1 = this.staves;
+		while(_g < _g1.length) {
+			var s = _g1[_g];
+			++_g;
+			s.barRenderers[s.barRenderers.length - 1].applySizes(maxSizes);
+			if(s.barRenderers[s.barRenderers.length - 1].width > realWidth) realWidth = s.barRenderers[s.barRenderers.length - 1].width;
+		}
+		this.width += realWidth;
+	}
+	,addStave: function(stave) {
+		stave.staveGroup = this;
+		stave.index = this.staves.length;
+		this.staves.push(stave);
+		if(this._firstStaveInAccolade == null && stave._factory.isInAccolade) {
+			this._firstStaveInAccolade = stave;
+			stave.isFirstInAccolade = true;
+		}
+		if(stave._factory.isInAccolade) {
+			if(this._lastStaveInAccolade != null) this._lastStaveInAccolade.isLastInAccolade = false;
+			this._lastStaveInAccolade = stave;
+			this._lastStaveInAccolade.isLastInAccolade = true;
 		}
 	}
+	,calculateHeight: function() {
+		return this.staves[this.staves.length - 1].y + this.staves[this.staves.length - 1].height;
+	}
+	,revertLastBar: function() {
+		if(this.bars.length > 1) {
+			this.bars.pop();
+			var w = 0;
+			var _g = 0;
+			var _g1 = this.staves;
+			while(_g < _g1.length) {
+				var s = _g1[_g];
+				++_g;
+				var x = Math.max(w,s.barRenderers[s.barRenderers.length - 1].width);
+				w = x | 0;
+				s.revertLastBar();
+			}
+			this.width -= w;
+		}
+	}
+	,applyBarSpacing: function(spacing) {
+		var _g = 0;
+		var _g1 = this.staves;
+		while(_g < _g1.length) {
+			var s = _g1[_g];
+			++_g;
+			s.applyBarSpacing(spacing);
+		}
+		this.width += this.bars.length * spacing;
+	}
 	,paint: function(cx,cy,canvas) {
-		var _g = 0, _g1 = this.staves;
+		var _g = 0;
+		var _g1 = this.staves;
 		while(_g < _g1.length) {
 			var s = _g1[_g];
 			++_g;
@@ -9985,7 +10878,7 @@ alphatab.rendering.staves.StaveGroup.prototype = {
 				canvas.moveTo(cx + this.x + this._firstStaveInAccolade.x,firstStart);
 				canvas.lineTo(cx + this.x + this._lastStaveInAccolade.x,lastEnd);
 				canvas.stroke();
-				var barSize = 3 * this.layout.renderer.scale | 0;
+				var barSize = 3 * this.layout.renderer.settings.scale | 0;
 				var barOffset = barSize;
 				var accoladeStart = firstStart - barSize * 4;
 				var accoladeEnd = lastEnd + barSize * 4;
@@ -10007,88 +10900,39 @@ alphatab.rendering.staves.StaveGroup.prototype = {
 			}
 		}
 	}
-	,applyBarSpacing: function(spacing) {
-		var _g = 0, _g1 = this.staves;
-		while(_g < _g1.length) {
-			var s = _g1[_g];
-			++_g;
-			s.applyBarSpacing(spacing);
+	,finalizeGroup: function(scoreLayout) {
+		var currentY = 0;
+		var _g1 = 0;
+		var _g = this.staves.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			this.staves[i].x = 0;
+			this.staves[i].y = currentY | 0;
+			this.staves[i].finalizeStave(scoreLayout);
+			currentY += this.staves[i].height;
 		}
-		this.width += this.bars.length * spacing;
-	}
-	,revertLastBar: function() {
-		if(this.bars.length > 1) {
-			this.bars.pop();
-			var w = 0;
-			var _g = 0, _g1 = this.staves;
-			while(_g < _g1.length) {
-				var s = _g1[_g];
-				++_g;
-				w = Math.max(w,s.barRenderers[s.barRenderers.length - 1].width) | 0;
-				s.revertLastBar();
-			}
-			this.width -= w;
-		}
-	}
-	,calculateHeight: function() {
-		return this.staves[this.staves.length - 1].y + this.staves[this.staves.length - 1].height;
-	}
-	,addStave: function(stave) {
-		stave.staveGroup = this;
-		stave.index = this.staves.length;
-		this.staves.push(stave);
-		if(this._firstStaveInAccolade == null && stave._factory.isInAccolade) {
-			this._firstStaveInAccolade = stave;
-			stave.isFirstInAccolade = true;
-		}
-		if(stave._factory.isInAccolade) {
-			if(this._lastStaveInAccolade != null) this._lastStaveInAccolade.isLastInAccolade = false;
-			this._lastStaveInAccolade = stave;
-			this._lastStaveInAccolade.isLastInAccolade = true;
-		}
-	}
-	,addBar: function(bar) {
-		this.bars.push(bar);
-		var maxSizes = new alphatab.rendering.staves.BarSizeInfo();
-		var _g = 0, _g1 = this.staves;
-		while(_g < _g1.length) {
-			var s = _g1[_g];
-			++_g;
-			s.addBar(bar);
-			s.barRenderers[s.barRenderers.length - 1].registerMaxSizes(maxSizes);
-		}
-		var realWidth = 0;
-		var _g = 0, _g1 = this.staves;
-		while(_g < _g1.length) {
-			var s = _g1[_g];
-			++_g;
-			s.barRenderers[s.barRenderers.length - 1].applySizes(maxSizes);
-			if(s.barRenderers[s.barRenderers.length - 1].width > realWidth) realWidth = s.barRenderers[s.barRenderers.length - 1].width;
-		}
-		this.width += realWidth;
-	}
-	,getLastBarIndex: function() {
-		return this.bars[this.bars.length - 1].index;
 	}
 	,__class__: alphatab.rendering.staves.StaveGroup
-}
-alphatab.rendering.utils = {}
+};
+alphatab.rendering.utils = {};
 alphatab.rendering.utils.AccidentalHelper = function() {
 	this._registeredAccidentals = new haxe.ds.IntMap();
 };
 $hxClasses["alphatab.rendering.utils.AccidentalHelper"] = alphatab.rendering.utils.AccidentalHelper;
 alphatab.rendering.utils.AccidentalHelper.__name__ = true;
 alphatab.rendering.utils.AccidentalHelper.prototype = {
-	getKeySignatureIndex: function(ks) {
-		return ks + 7;
-	}
-	,applyAccidental: function(note,noteLine) {
-		var noteValue = note.realValue();
-		var ks = note.beat.voice.bar.getMasterBar().keySignature;
+	applyAccidental: function(note,noteLine) {
+		var noteValue = note.fret + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1];
+		var ks = ((function($this) {
+			var $r;
+			var _this = note.beat.voice.bar;
+			$r = _this.track.score.masterBars[_this.index];
+			return $r;
+		}(this))).keySignature;
 		var ksi = ks + 7;
 		var index = noteValue % 12;
 		var octave = noteValue / 12 | 0;
-		var accidentalToSet = alphatab.rendering.utils.AccidentalHelper.ACCIDENTAL_NOTES[ksi][index];
+		var accidentalToSet = alphatab.rendering.utils.AccidentalHelper.AccidentalNotes[ksi][index];
 		var updateAccidental = true;
 		if(this._registeredAccidentals.exists(noteLine)) {
 			var registeredAccidental = this._registeredAccidentals.get(noteLine);
@@ -10102,16 +10946,19 @@ alphatab.rendering.utils.AccidentalHelper.prototype = {
 		}
 		return accidentalToSet;
 	}
+	,getKeySignatureIndex: function(ks) {
+		return ks + 7;
+	}
 	,__class__: alphatab.rendering.utils.AccidentalHelper
-}
-alphatab.rendering.utils.BeamDirection = $hxClasses["alphatab.rendering.utils.BeamDirection"] = { __ename__ : true, __constructs__ : ["Up","Down"] }
+};
+alphatab.rendering.utils.BeamDirection = $hxClasses["alphatab.rendering.utils.BeamDirection"] = { __ename__ : true, __constructs__ : ["Up","Down"] };
 alphatab.rendering.utils.BeamDirection.Up = ["Up",0];
 alphatab.rendering.utils.BeamDirection.Up.toString = $estr;
 alphatab.rendering.utils.BeamDirection.Up.__enum__ = alphatab.rendering.utils.BeamDirection;
 alphatab.rendering.utils.BeamDirection.Down = ["Down",1];
 alphatab.rendering.utils.BeamDirection.Down.toString = $estr;
 alphatab.rendering.utils.BeamDirection.Down.__enum__ = alphatab.rendering.utils.BeamDirection;
-alphatab.rendering.utils.BeamBarType = $hxClasses["alphatab.rendering.utils.BeamBarType"] = { __ename__ : true, __constructs__ : ["Full","PartLeft","PartRight"] }
+alphatab.rendering.utils.BeamBarType = $hxClasses["alphatab.rendering.utils.BeamBarType"] = { __ename__ : true, __constructs__ : ["Full","PartLeft","PartRight"] };
 alphatab.rendering.utils.BeamBarType.Full = ["Full",0];
 alphatab.rendering.utils.BeamBarType.Full.toString = $estr;
 alphatab.rendering.utils.BeamBarType.Full.__enum__ = alphatab.rendering.utils.BeamBarType;
@@ -10138,8 +10985,8 @@ alphatab.rendering.utils.BeamingHelper.canJoin = function(b1,b2) {
 	var start2 = b2.start;
 	if(!alphatab.rendering.utils.BeamingHelper.canJoinDuration(b1.duration) || !alphatab.rendering.utils.BeamingHelper.canJoinDuration(b2.duration)) return start1 == start2;
 	var divisionLength = 960;
-	var _g = m1.track.score.masterBars[m1.index];
-	switch(_g.timeSignatureDenominator) {
+	var _g = m1.track.score.masterBars[m1.index].timeSignatureDenominator;
+	switch(_g) {
 	case 8:
 		if(m1.track.score.masterBars[m1.index].timeSignatureNumerator % 3 == 0) divisionLength += Math.floor(480.);
 		break;
@@ -10147,54 +10994,36 @@ alphatab.rendering.utils.BeamingHelper.canJoin = function(b1,b2) {
 	var division1 = (divisionLength + start1) / divisionLength | 0;
 	var division2 = (divisionLength + start2) / divisionLength | 0;
 	return division1 == division2;
-}
+};
 alphatab.rendering.utils.BeamingHelper.calculateDivision = function(b,l) {
 	var start = 0;
-}
+};
 alphatab.rendering.utils.BeamingHelper.canJoinDuration = function(d) {
-	switch( (d)[1] ) {
-	case 0:
-	case 1:
-	case 2:
+	switch(d[1]) {
+	case 0:case 1:case 2:
 		return false;
 	default:
 		return true;
 	}
-}
+};
 alphatab.rendering.utils.BeamingHelper.prototype = {
-	calculateBeamY: function(stemSize,xCorrection,xPosition,scale,yPosition) {
-		var direction = this.getDirection();
-		if(this.beats.length == 1) {
-			if(this.getDirection() == alphatab.rendering.utils.BeamDirection.Up) return yPosition(this.maxNote) - stemSize; else return yPosition(this.minNote) + stemSize;
-		}
-		var maxDistance = 10 * scale | 0;
-		if(direction == alphatab.rendering.utils.BeamDirection.Down && this.minNote != this.firstMinNote && this.minNote != this.lastMinNote) return yPosition(this.minNote) + stemSize; else if(direction == alphatab.rendering.utils.BeamDirection.Up && this.maxNote != this.firstMaxNote && this.maxNote != this.lastMaxNote) return yPosition(this.maxNote) - stemSize;
-		var startX = this.getBeatLineX(this.firstMinNote.beat) + xCorrection;
-		var startY = direction == alphatab.rendering.utils.BeamDirection.Up?yPosition(this.firstMaxNote) - stemSize:yPosition(this.firstMinNote) + stemSize;
-		var endX = this.getBeatLineX(this.lastMaxNote.beat) + xCorrection;
-		var endY = direction == alphatab.rendering.utils.BeamDirection.Up?yPosition(this.lastMaxNote) - stemSize:yPosition(this.lastMinNote) + stemSize;
-		if(direction == alphatab.rendering.utils.BeamDirection.Down && startY > endY && startY - endY > maxDistance) endY = startY - maxDistance;
-		if(direction == alphatab.rendering.utils.BeamDirection.Down && endY > startY && endY - startY > maxDistance) startY = endY - maxDistance;
-		if(direction == alphatab.rendering.utils.BeamDirection.Up && startY < endY && endY - startY > maxDistance) endY = startY + maxDistance;
-		if(direction == alphatab.rendering.utils.BeamDirection.Up && endY < startY && startY - endY > maxDistance) startY = endY + maxDistance;
-		return (endY - startY) / (endX - startX) * (xPosition - startX) + startY | 0;
+	getValue: function(n) {
+		if(this._track.isPercussion) return alphatab.rendering.utils.PercussionMapper.mapValue(n); else return n.fret + n.beat.voice.bar.track.tuning[n.beat.voice.bar.track.tuning.length - (n.string - 1) - 1];
 	}
-	,checkNote: function(note) {
-		var value = note.realValue();
-		if(this.firstMinNote == null || note.beat.index < this.firstMinNote.beat.index) this.firstMinNote = note; else if(note.beat.index == this.firstMinNote.beat.index) {
-			if(note.realValue() < this.firstMinNote.realValue()) this.firstMinNote = note;
+	,getBeatLineX: function(beat) {
+		if(this._beatLineXPositions.exists(beat.index)) {
+			if(this.getDirection() == alphatab.rendering.utils.BeamDirection.Up) return this._beatLineXPositions.get(beat.index).up; else return this._beatLineXPositions.get(beat.index).down;
 		}
-		if(this.firstMaxNote == null || note.beat.index < this.firstMaxNote.beat.index) this.firstMaxNote = note; else if(note.beat.index == this.firstMaxNote.beat.index) {
-			if(note.realValue() > this.firstMaxNote.realValue()) this.firstMaxNote = note;
-		}
-		if(this.lastMinNote == null || note.beat.index > this.lastMinNote.beat.index) this.lastMinNote = note; else if(note.beat.index == this.lastMinNote.beat.index) {
-			if(note.realValue() < this.lastMinNote.realValue()) this.lastMinNote = note;
-		}
-		if(this.lastMaxNote == null || note.beat.index > this.lastMaxNote.beat.index) this.lastMaxNote = note; else if(note.beat.index == this.lastMaxNote.beat.index) {
-			if(note.realValue() > this.lastMaxNote.realValue()) this.lastMaxNote = note;
-		}
-		if(this.maxNote == null || value > this.maxNote.realValue()) this.maxNote = note;
-		if(this.minNote == null || value < this.minNote.realValue()) this.minNote = note;
+		return 0;
+	}
+	,registerBeatLineX: function(beat,up,down) {
+		this._beatLineXPositions.set(beat.index,{ up : up, down : down});
+	}
+	,getDirection: function() {
+		var avg;
+		var x = (this.getValue(this.maxNote) + this.getValue(this.minNote)) / 2;
+		avg = x | 0;
+		if(avg <= alphatab.rendering.utils.BeamingHelper.ScoreMiddleKeys[this._lastBeat.voice.bar.clef[1] - 1]) return alphatab.rendering.utils.BeamDirection.Up; else return alphatab.rendering.utils.BeamDirection.Down;
 	}
 	,checkBeat: function(beat) {
 		if(this.voice == null) this.voice = beat.voice;
@@ -10209,32 +11038,82 @@ alphatab.rendering.utils.BeamingHelper.prototype = {
 		}
 		return add;
 	}
-	,getDirection: function() {
-		var avg = (this.getValue(this.maxNote) + this.getValue(this.minNote)) / 2 | 0;
-		return avg <= alphatab.rendering.utils.BeamingHelper.SCORE_MIDDLE_KEYS[this._lastBeat.voice.bar.clef[1]]?alphatab.rendering.utils.BeamDirection.Up:alphatab.rendering.utils.BeamDirection.Down;
-	}
-	,registerBeatLineX: function(beat,up,down) {
-		this._beatLineXPositions.set(beat.index,{ up : up, down : down});
-	}
-	,getBeatLineX: function(beat) {
-		if(this._beatLineXPositions.exists(beat.index)) {
-			if(this.getDirection() == alphatab.rendering.utils.BeamDirection.Up) return this._beatLineXPositions.get(beat.index).up; else return this._beatLineXPositions.get(beat.index).down;
+	,checkNote: function(note) {
+		var value = note.fret + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1];
+		if(this.firstMinNote == null || note.beat.index < this.firstMinNote.beat.index) this.firstMinNote = note; else if(note.beat.index == this.firstMinNote.beat.index) {
+			if(note.fret + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1] < (function($this) {
+				var $r;
+				var _this = $this.firstMinNote;
+				$r = _this.fret + _this.beat.voice.bar.track.tuning[_this.beat.voice.bar.track.tuning.length - (_this.string - 1) - 1];
+				return $r;
+			}(this))) this.firstMinNote = note;
 		}
-		return 0;
+		if(this.firstMaxNote == null || note.beat.index < this.firstMaxNote.beat.index) this.firstMaxNote = note; else if(note.beat.index == this.firstMaxNote.beat.index) {
+			if(note.fret + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1] > (function($this) {
+				var $r;
+				var _this = $this.firstMaxNote;
+				$r = _this.fret + _this.beat.voice.bar.track.tuning[_this.beat.voice.bar.track.tuning.length - (_this.string - 1) - 1];
+				return $r;
+			}(this))) this.firstMaxNote = note;
+		}
+		if(this.lastMinNote == null || note.beat.index > this.lastMinNote.beat.index) this.lastMinNote = note; else if(note.beat.index == this.lastMinNote.beat.index) {
+			if(note.fret + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1] < (function($this) {
+				var $r;
+				var _this = $this.lastMinNote;
+				$r = _this.fret + _this.beat.voice.bar.track.tuning[_this.beat.voice.bar.track.tuning.length - (_this.string - 1) - 1];
+				return $r;
+			}(this))) this.lastMinNote = note;
+		}
+		if(this.lastMaxNote == null || note.beat.index > this.lastMaxNote.beat.index) this.lastMaxNote = note; else if(note.beat.index == this.lastMaxNote.beat.index) {
+			if(note.fret + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1] > (function($this) {
+				var $r;
+				var _this = $this.lastMaxNote;
+				$r = _this.fret + _this.beat.voice.bar.track.tuning[_this.beat.voice.bar.track.tuning.length - (_this.string - 1) - 1];
+				return $r;
+			}(this))) this.lastMaxNote = note;
+		}
+		if(this.maxNote == null || value > (function($this) {
+			var $r;
+			var _this = $this.maxNote;
+			$r = _this.fret + _this.beat.voice.bar.track.tuning[_this.beat.voice.bar.track.tuning.length - (_this.string - 1) - 1];
+			return $r;
+		}(this))) this.maxNote = note;
+		if(this.minNote == null || value < (function($this) {
+			var $r;
+			var _this = $this.minNote;
+			$r = _this.fret + _this.beat.voice.bar.track.tuning[_this.beat.voice.bar.track.tuning.length - (_this.string - 1) - 1];
+			return $r;
+		}(this))) this.minNote = note;
 	}
-	,getValue: function(n) {
-		if(this._track.isPercussion) return alphatab.rendering.utils.PercussionMapper.mapValue(n); else return n.realValue();
+	,calculateBeamY: function(stemSize,xCorrection,xPosition,scale,yPosition) {
+		var direction = this.getDirection();
+		if(this.beats.length == 1) {
+			if(this.getDirection() == alphatab.rendering.utils.BeamDirection.Up) return yPosition(this.maxNote) - stemSize; else return yPosition(this.minNote) + stemSize;
+		}
+		var maxDistance = 10 * scale | 0;
+		if(direction == alphatab.rendering.utils.BeamDirection.Down && this.minNote != this.firstMinNote && this.minNote != this.lastMinNote) return yPosition(this.minNote) + stemSize; else if(direction == alphatab.rendering.utils.BeamDirection.Up && this.maxNote != this.firstMaxNote && this.maxNote != this.lastMaxNote) return yPosition(this.maxNote) - stemSize;
+		var startX = this.getBeatLineX(this.firstMinNote.beat) + xCorrection;
+		var startY;
+		if(direction == alphatab.rendering.utils.BeamDirection.Up) startY = yPosition(this.firstMaxNote) - stemSize; else startY = yPosition(this.firstMinNote) + stemSize;
+		var endX = this.getBeatLineX(this.lastMaxNote.beat) + xCorrection;
+		var endY;
+		if(direction == alphatab.rendering.utils.BeamDirection.Up) endY = yPosition(this.lastMaxNote) - stemSize; else endY = yPosition(this.lastMinNote) + stemSize;
+		if(direction == alphatab.rendering.utils.BeamDirection.Down && startY > endY && startY - endY > maxDistance) endY = startY - maxDistance;
+		if(direction == alphatab.rendering.utils.BeamDirection.Down && endY > startY && endY - startY > maxDistance) startY = endY - maxDistance;
+		if(direction == alphatab.rendering.utils.BeamDirection.Up && startY < endY && endY - startY > maxDistance) endY = startY + maxDistance;
+		if(direction == alphatab.rendering.utils.BeamDirection.Up && endY < startY && startY - endY > maxDistance) startY = endY + maxDistance;
+		return (endY - startY) / (endX - startX) * (xPosition - startX) + startY | 0;
 	}
 	,__class__: alphatab.rendering.utils.BeamingHelper
-}
-alphatab.rendering.utils.PercussionMapper = function() { }
+};
+alphatab.rendering.utils.PercussionMapper = function() { };
 $hxClasses["alphatab.rendering.utils.PercussionMapper"] = alphatab.rendering.utils.PercussionMapper;
 alphatab.rendering.utils.PercussionMapper.__name__ = true;
 alphatab.rendering.utils.PercussionMapper.mapValue = function(n) {
-	var value = n.realValue();
+	var value = n.fret + n.beat.voice.bar.track.tuning[n.beat.voice.bar.track.tuning.length - (n.string - 1) - 1];
 	if(value == 61 || value == 66) return 50; else if(value == 60 || value == 65) return 52; else if(value >= 35 && value <= 36 || value == 44) return 53; else if(value == 41 || value == 64) return 55; else if(value == 43 || value == 62) return 57; else if(value == 45 || value == 63) return 59; else if(value == 47 || value == 54) return 62; else if(value == 48 || value == 56) return 64; else if(value == 50) return 65; else if(value == 42 || value == 46 || value >= 49 && value <= 53 || value == 57 || value == 59) return 67;
 	return 60;
-}
+};
 alphatab.rendering.utils.SvgPathParser = function(svg) {
 	this.svg = svg;
 };
@@ -10245,14 +11124,40 @@ alphatab.rendering.utils.SvgPathParser.isNumber = function(s,allowSign) {
 	if(s.length == 0) return false;
 	var c = HxOverrides.cca(s,0);
 	return allowSign && c == 45 || c >= 48 && c <= 57;
-}
+};
 alphatab.rendering.utils.SvgPathParser.isWhiteSpace = function(s) {
 	if(s.length == 0) return false;
 	var c = s.charAt(0);
 	return c == " " || c == "\t" || c == "\r" || c == "\n";
-}
+};
 alphatab.rendering.utils.SvgPathParser.prototype = {
-	nextToken: function() {
+	reset: function() {
+		this._currentIndex = 0;
+		this.nextToken();
+	}
+	,eof: function() {
+		return this._currentIndex >= this.svg.length;
+	}
+	,getString: function() {
+		var t = this.currentToken;
+		this.nextToken();
+		return t;
+	}
+	,getNumber: function() {
+		return Std.parseInt(this.getString());
+	}
+	,currentTokenIsNumber: function() {
+		return alphatab.rendering.utils.SvgPathParser.isNumber(this.currentToken);
+	}
+	,nextChar: function() {
+		if(this.eof()) return "";
+		return this.svg.charAt(this._currentIndex++);
+	}
+	,peekChar: function() {
+		if(this.eof()) return "";
+		return this.svg.charAt(this._currentIndex);
+	}
+	,nextToken: function() {
 		var token = new StringBuf();
 		var c;
 		var skipChar;
@@ -10265,41 +11170,16 @@ alphatab.rendering.utils.SvgPathParser.prototype = {
 			if(alphatab.rendering.utils.SvgPathParser.isNumber(c)) {
 				c = this.peekChar();
 				while(!this.eof() && (alphatab.rendering.utils.SvgPathParser.isNumber(c,false) || c == ".")) {
-					token.b += Std.string(this.nextChar());
+					var x = this.nextChar();
+					token.b += Std.string(x);
 					c = this.peekChar();
 				}
 			} else this.lastCommand = token.b;
 		}
 		this.currentToken = token.b;
 	}
-	,peekChar: function() {
-		if(this.eof()) return "";
-		return this.svg.charAt(this._currentIndex);
-	}
-	,nextChar: function() {
-		if(this.eof()) return "";
-		return this.svg.charAt(this._currentIndex++);
-	}
-	,currentTokenIsNumber: function() {
-		return alphatab.rendering.utils.SvgPathParser.isNumber(this.currentToken);
-	}
-	,getNumber: function() {
-		return Std.parseFloat(this.getString());
-	}
-	,getString: function() {
-		var t = this.currentToken;
-		this.nextToken();
-		return t;
-	}
-	,eof: function() {
-		return this._currentIndex >= this.svg.length;
-	}
-	,reset: function() {
-		this._currentIndex = 0;
-		this.nextToken();
-	}
 	,__class__: alphatab.rendering.utils.SvgPathParser
-}
+};
 alphatab.rendering.utils.TupletHelper = function(voice) {
 	this.voiceIndex = voice;
 	this.beats = new Array();
@@ -10307,21 +11187,21 @@ alphatab.rendering.utils.TupletHelper = function(voice) {
 $hxClasses["alphatab.rendering.utils.TupletHelper"] = alphatab.rendering.utils.TupletHelper;
 alphatab.rendering.utils.TupletHelper.__name__ = true;
 alphatab.rendering.utils.TupletHelper.prototype = {
-	check: function(beat) {
-		if(this.beats.length == 0) this.tuplet = beat.tupletNumerator; else if(beat.voice.index != this.voiceIndex || beat.tupletNumerator != this.tuplet || this.beats.length == this.tuplet || this._isFinished) return false;
-		this.beats.push(beat);
-		return true;
+	isFull: function() {
+		return this.beats.length == this.tuplet;
 	}
 	,finish: function() {
 		this._isFinished = true;
 	}
-	,isFull: function() {
-		return this.beats.length == this.tuplet;
+	,check: function(beat) {
+		if(this.beats.length == 0) this.tuplet = beat.tupletNumerator; else if(beat.voice.index != this.voiceIndex || beat.tupletNumerator != this.tuplet || this.beats.length == this.tuplet || this._isFinished) return false;
+		this.beats.push(beat);
+		return true;
 	}
 	,__class__: alphatab.rendering.utils.TupletHelper
-}
-alphatab.util = {}
-alphatab.util.Guid = function() { }
+};
+alphatab.util = {};
+alphatab.util.Guid = function() { };
 $hxClasses["alphatab.util.Guid"] = alphatab.util.Guid;
 alphatab.util.Guid.__name__ = true;
 alphatab.util.Guid.generate = function() {
@@ -10330,10 +11210,11 @@ alphatab.util.Guid.generate = function() {
 	while(_g < 32) {
 		var j = _g++;
 		if(j == 8 || j == 12 || j == 16 || j == 20) result.b += "-";
-		result.b += Std.string(StringTools.hex(Math.floor(Math.random() * 16)));
+		var x = StringTools.hex(Math.floor(Math.random() * 16));
+		result.b += Std.string(x);
 	}
 	return result.b.toUpperCase();
-}
+};
 alphatab.util.LazyVar = function(loader) {
 	this._loader = loader;
 };
@@ -10348,12 +11229,13 @@ alphatab.util.LazyVar.prototype = {
 		return this._val;
 	}
 	,__class__: alphatab.util.LazyVar
-}
-haxe.Resource = function() { }
+};
+haxe.Resource = function() { };
 $hxClasses["haxe.Resource"] = haxe.Resource;
 haxe.Resource.__name__ = true;
 haxe.Resource.getString = function(name) {
-	var _g = 0, _g1 = haxe.Resource.content;
+	var _g = 0;
+	var _g1 = haxe.Resource.content;
 	while(_g < _g1.length) {
 		var x = _g1[_g];
 		++_g;
@@ -10364,7 +11246,7 @@ haxe.Resource.getString = function(name) {
 		}
 	}
 	return null;
-}
+};
 haxe.Unserializer = function(buf) {
 	this.buf = buf;
 	this.length = buf.length;
@@ -10382,19 +11264,73 @@ $hxClasses["haxe.Unserializer"] = haxe.Unserializer;
 haxe.Unserializer.__name__ = true;
 haxe.Unserializer.initCodes = function() {
 	var codes = new Array();
-	var _g1 = 0, _g = haxe.Unserializer.BASE64.length;
+	var _g1 = 0;
+	var _g = haxe.Unserializer.BASE64.length;
 	while(_g1 < _g) {
 		var i = _g1++;
 		codes[haxe.Unserializer.BASE64.charCodeAt(i)] = i;
 	}
 	return codes;
-}
+};
 haxe.Unserializer.run = function(v) {
 	return new haxe.Unserializer(v).unserialize();
-}
+};
 haxe.Unserializer.prototype = {
-	unserialize: function() {
-		var _g = this.buf.charCodeAt(this.pos++);
+	setResolver: function(r) {
+		if(r == null) this.resolver = { resolveClass : function(_) {
+			return null;
+		}, resolveEnum : function(_) {
+			return null;
+		}}; else this.resolver = r;
+	}
+	,readDigits: function() {
+		var k = 0;
+		var s = false;
+		var fpos = this.pos;
+		while(true) {
+			var c = this.buf.charCodeAt(this.pos);
+			if(c != c) break;
+			if(c == 45) {
+				if(this.pos != fpos) break;
+				s = true;
+				this.pos++;
+				continue;
+			}
+			if(c < 48 || c > 57) break;
+			k = k * 10 + (c - 48);
+			this.pos++;
+		}
+		if(s) k *= -1;
+		return k;
+	}
+	,unserializeObject: function(o) {
+		while(true) {
+			if(this.pos >= this.length) throw "Invalid object";
+			if(this.buf.charCodeAt(this.pos) == 103) break;
+			var k = this.unserialize();
+			if(!js.Boot.__instanceof(k,String)) throw "Invalid object key";
+			var v = this.unserialize();
+			o[k] = v;
+		}
+		this.pos++;
+	}
+	,unserializeEnum: function(edecl,tag) {
+		if((function($this) {
+			var $r;
+			var p = $this.pos++;
+			$r = $this.buf.charCodeAt(p);
+			return $r;
+		}(this)) != 58) throw "Invalid enum format";
+		var nargs = this.readDigits();
+		if(nargs == 0) return Type.createEnum(edecl,tag);
+		var args = new Array();
+		while(nargs-- > 0) args.push(this.unserialize());
+		return Type.createEnum(edecl,tag,args);
+	}
+	,unserialize: function() {
+		var _g;
+		var p = this.pos++;
+		_g = this.buf.charCodeAt(p);
 		switch(_g) {
 		case 110:
 			return null;
@@ -10415,7 +11351,12 @@ haxe.Unserializer.prototype = {
 			return Std.parseFloat(HxOverrides.substr(this.buf,p1,this.pos - p1));
 		case 121:
 			var len = this.readDigits();
-			if(this.buf.charCodeAt(this.pos++) != 58 || this.length - this.pos < len) throw "Invalid string length";
+			if((function($this) {
+				var $r;
+				var p = $this.pos++;
+				$r = $this.buf.charCodeAt(p);
+				return $r;
+			}(this)) != 58 || this.length - this.pos < len) throw "Invalid string length";
 			var s = HxOverrides.substr(this.buf,this.pos,len);
 			this.pos += len;
 			s = StringTools.urlDecode(s);
@@ -10507,11 +11448,14 @@ haxe.Unserializer.prototype = {
 			var h = new haxe.ds.IntMap();
 			this.cache.push(h);
 			var buf = this.buf;
-			var c = this.buf.charCodeAt(this.pos++);
+			var c;
+			var p = this.pos++;
+			c = this.buf.charCodeAt(p);
 			while(c == 58) {
 				var i = this.readDigits();
 				h.set(i,this.unserialize());
-				c = this.buf.charCodeAt(this.pos++);
+				var p = this.pos++;
+				c = this.buf.charCodeAt(p);
 			}
 			if(c != 104) throw "Invalid IntMap format";
 			return h;
@@ -10526,14 +11470,21 @@ haxe.Unserializer.prototype = {
 			this.pos++;
 			return h;
 		case 118:
-			var d = HxOverrides.strDate(HxOverrides.substr(this.buf,this.pos,19));
+			var d;
+			var s = HxOverrides.substr(this.buf,this.pos,19);
+			d = HxOverrides.strDate(s);
 			this.cache.push(d);
 			this.pos += 19;
 			return d;
 		case 115:
 			var len = this.readDigits();
 			var buf = this.buf;
-			if(this.buf.charCodeAt(this.pos++) != 58 || this.length - this.pos < len) throw "Invalid bytes length";
+			if((function($this) {
+				var $r;
+				var p = $this.pos++;
+				$r = $this.buf.charCodeAt(p);
+				return $r;
+			}(this)) != 58 || this.length - this.pos < len) throw "Invalid bytes length";
 			var codes = haxe.Unserializer.CODES;
 			if(codes == null) {
 				codes = haxe.Unserializer.initCodes();
@@ -10541,26 +11492,67 @@ haxe.Unserializer.prototype = {
 			}
 			var i = this.pos;
 			var rest = len & 3;
-			var size = (len >> 2) * 3 + (rest >= 2?rest - 1:0);
+			var size;
+			size = (len >> 2) * 3 + (rest >= 2?rest - 1:0);
 			var max = i + (len - rest);
 			var bytes = haxe.io.Bytes.alloc(size);
 			var bpos = 0;
 			while(i < max) {
-				var c1 = codes[buf.charCodeAt(i++)];
-				var c2 = codes[buf.charCodeAt(i++)];
-				bytes.b[bpos++] = (c1 << 2 | c2 >> 4) & 255;
-				var c3 = codes[buf.charCodeAt(i++)];
-				bytes.b[bpos++] = (c2 << 4 | c3 >> 2) & 255;
-				var c4 = codes[buf.charCodeAt(i++)];
-				bytes.b[bpos++] = (c3 << 6 | c4) & 255;
+				var c1 = codes[(function($this) {
+					var $r;
+					var index = i++;
+					$r = buf.charCodeAt(index);
+					return $r;
+				}(this))];
+				var c2 = codes[(function($this) {
+					var $r;
+					var index = i++;
+					$r = buf.charCodeAt(index);
+					return $r;
+				}(this))];
+				var pos = bpos++;
+				bytes.b[pos] = (c1 << 2 | c2 >> 4) & 255;
+				var c3 = codes[(function($this) {
+					var $r;
+					var index = i++;
+					$r = buf.charCodeAt(index);
+					return $r;
+				}(this))];
+				var pos = bpos++;
+				bytes.b[pos] = (c2 << 4 | c3 >> 2) & 255;
+				var c4 = codes[(function($this) {
+					var $r;
+					var index = i++;
+					$r = buf.charCodeAt(index);
+					return $r;
+				}(this))];
+				var pos = bpos++;
+				bytes.b[pos] = (c3 << 6 | c4) & 255;
 			}
 			if(rest >= 2) {
-				var c1 = codes[buf.charCodeAt(i++)];
-				var c2 = codes[buf.charCodeAt(i++)];
-				bytes.b[bpos++] = (c1 << 2 | c2 >> 4) & 255;
+				var c1 = codes[(function($this) {
+					var $r;
+					var index = i++;
+					$r = buf.charCodeAt(index);
+					return $r;
+				}(this))];
+				var c2 = codes[(function($this) {
+					var $r;
+					var index = i++;
+					$r = buf.charCodeAt(index);
+					return $r;
+				}(this))];
+				var pos = bpos++;
+				bytes.b[pos] = (c1 << 2 | c2 >> 4) & 255;
 				if(rest == 3) {
-					var c3 = codes[buf.charCodeAt(i++)];
-					bytes.b[bpos++] = (c2 << 4 | c3 >> 2) & 255;
+					var c3 = codes[(function($this) {
+						var $r;
+						var index = i++;
+						$r = buf.charCodeAt(index);
+						return $r;
+					}(this))];
+					var pos = bpos++;
+					bytes.b[pos] = (c2 << 4 | c3 >> 2) & 255;
 				}
 			}
 			this.pos += len;
@@ -10573,61 +11565,20 @@ haxe.Unserializer.prototype = {
 			var o = Type.createEmptyInstance(cl);
 			this.cache.push(o);
 			o.hxUnserialize(this);
-			if(this.buf.charCodeAt(this.pos++) != 103) throw "Invalid custom data";
+			if((function($this) {
+				var $r;
+				var p = $this.pos++;
+				$r = $this.buf.charCodeAt(p);
+				return $r;
+			}(this)) != 103) throw "Invalid custom data";
 			return o;
 		default:
 		}
 		this.pos--;
 		throw "Invalid char " + this.buf.charAt(this.pos) + " at position " + this.pos;
 	}
-	,unserializeEnum: function(edecl,tag) {
-		if(this.buf.charCodeAt(this.pos++) != 58) throw "Invalid enum format";
-		var nargs = this.readDigits();
-		if(nargs == 0) return Type.createEnum(edecl,tag);
-		var args = new Array();
-		while(nargs-- > 0) args.push(this.unserialize());
-		return Type.createEnum(edecl,tag,args);
-	}
-	,unserializeObject: function(o) {
-		while(true) {
-			if(this.pos >= this.length) throw "Invalid object";
-			if(this.buf.charCodeAt(this.pos) == 103) break;
-			var k = this.unserialize();
-			if(!js.Boot.__instanceof(k,String)) throw "Invalid object key";
-			var v = this.unserialize();
-			o[k] = v;
-		}
-		this.pos++;
-	}
-	,readDigits: function() {
-		var k = 0;
-		var s = false;
-		var fpos = this.pos;
-		while(true) {
-			var c = this.buf.charCodeAt(this.pos);
-			if(c != c) break;
-			if(c == 45) {
-				if(this.pos != fpos) break;
-				s = true;
-				this.pos++;
-				continue;
-			}
-			if(c < 48 || c > 57) break;
-			k = k * 10 + (c - 48);
-			this.pos++;
-		}
-		if(s) k *= -1;
-		return k;
-	}
-	,setResolver: function(r) {
-		if(r == null) this.resolver = { resolveClass : function(_) {
-			return null;
-		}, resolveEnum : function(_) {
-			return null;
-		}}; else this.resolver = r;
-	}
 	,__class__: haxe.Unserializer
-}
+};
 haxe.ds.IntMap = function() {
 	this.h = { };
 };
@@ -10635,13 +11586,19 @@ $hxClasses["haxe.ds.IntMap"] = haxe.ds.IntMap;
 haxe.ds.IntMap.__name__ = true;
 haxe.ds.IntMap.__interfaces__ = [IMap];
 haxe.ds.IntMap.prototype = {
-	iterator: function() {
-		return { ref : this.h, it : this.keys(), hasNext : function() {
-			return this.it.hasNext();
-		}, next : function() {
-			var i = this.it.next();
-			return this.ref[i];
-		}};
+	set: function(key,value) {
+		this.h[key] = value;
+	}
+	,get: function(key) {
+		return this.h[key];
+	}
+	,exists: function(key) {
+		return this.h.hasOwnProperty(key);
+	}
+	,remove: function(key) {
+		if(!this.h.hasOwnProperty(key)) return false;
+		delete(this.h[key]);
+		return true;
 	}
 	,keys: function() {
 		var a = [];
@@ -10650,22 +11607,8 @@ haxe.ds.IntMap.prototype = {
 		}
 		return HxOverrides.iter(a);
 	}
-	,remove: function(key) {
-		if(!this.h.hasOwnProperty(key)) return false;
-		delete(this.h[key]);
-		return true;
-	}
-	,exists: function(key) {
-		return this.h.hasOwnProperty(key);
-	}
-	,get: function(key) {
-		return this.h[key];
-	}
-	,set: function(key,value) {
-		this.h[key] = value;
-	}
 	,__class__: haxe.ds.IntMap
-}
+};
 haxe.ds.ObjectMap = function() {
 	this.h = { };
 	this.h.__keys__ = { };
@@ -10675,12 +11618,13 @@ haxe.ds.ObjectMap.__name__ = true;
 haxe.ds.ObjectMap.__interfaces__ = [IMap];
 haxe.ds.ObjectMap.prototype = {
 	set: function(key,value) {
-		var id = key.__id__ != null?key.__id__:key.__id__ = ++haxe.ds.ObjectMap.count;
+		var id;
+		if(key.__id__ != null) id = key.__id__; else id = key.__id__ = ++haxe.ds.ObjectMap.count;
 		this.h[id] = value;
 		this.h.__keys__[id] = key;
 	}
 	,__class__: haxe.ds.ObjectMap
-}
+};
 haxe.io.Bytes = function(length,b) {
 	this.length = length;
 	this.b = b;
@@ -10695,10 +11639,11 @@ haxe.io.Bytes.alloc = function(length) {
 		a.push(0);
 	}
 	return new haxe.io.Bytes(length,a);
-}
+};
 haxe.io.Bytes.ofString = function(s) {
 	var a = new Array();
-	var _g1 = 0, _g = s.length;
+	var _g1 = 0;
+	var _g = s.length;
 	while(_g1 < _g) {
 		var i = _g1++;
 		var c = s.charCodeAt(i);
@@ -10717,13 +11662,32 @@ haxe.io.Bytes.ofString = function(s) {
 		}
 	}
 	return new haxe.io.Bytes(a.length,a);
-}
+};
 haxe.io.Bytes.ofData = function(b) {
 	return new haxe.io.Bytes(b.length,b);
-}
+};
 haxe.io.Bytes.prototype = {
-	toString: function() {
-		return this.readString(0,this.length);
+	blit: function(pos,src,srcpos,len) {
+		if(pos < 0 || srcpos < 0 || len < 0 || pos + len > this.length || srcpos + len > src.length) throw haxe.io.Error.OutsideBounds;
+		var b1 = this.b;
+		var b2 = src.b;
+		if(b1 == b2 && pos > srcpos) {
+			var i = len;
+			while(i > 0) {
+				i--;
+				b1[i + pos] = b2[i + srcpos];
+			}
+			return;
+		}
+		var _g = 0;
+		while(_g < len) {
+			var i = _g++;
+			b1[i + pos] = b2[i + srcpos];
+		}
+	}
+	,sub: function(pos,len) {
+		if(pos < 0 || len < 0 || pos + len > this.length) throw haxe.io.Error.OutsideBounds;
+		return new haxe.io.Bytes(len,this.b.slice(pos,pos + len));
 	}
 	,readString: function(pos,len) {
 		if(pos < 0 || len < 0 || pos + len > this.length) throw haxe.io.Error.OutsideBounds;
@@ -10748,30 +11712,11 @@ haxe.io.Bytes.prototype = {
 		}
 		return s;
 	}
-	,sub: function(pos,len) {
-		if(pos < 0 || len < 0 || pos + len > this.length) throw haxe.io.Error.OutsideBounds;
-		return new haxe.io.Bytes(len,this.b.slice(pos,pos + len));
-	}
-	,blit: function(pos,src,srcpos,len) {
-		if(pos < 0 || srcpos < 0 || len < 0 || pos + len > this.length || srcpos + len > src.length) throw haxe.io.Error.OutsideBounds;
-		var b1 = this.b;
-		var b2 = src.b;
-		if(b1 == b2 && pos > srcpos) {
-			var i = len;
-			while(i > 0) {
-				i--;
-				b1[i + pos] = b2[i + srcpos];
-			}
-			return;
-		}
-		var _g = 0;
-		while(_g < len) {
-			var i = _g++;
-			b1[i + pos] = b2[i + srcpos];
-		}
+	,toString: function() {
+		return this.readString(0,this.length);
 	}
 	,__class__: haxe.io.Bytes
-}
+};
 haxe.io.BytesBuffer = function() {
 	this.b = new Array();
 };
@@ -10783,18 +11728,8 @@ haxe.io.BytesBuffer.prototype = {
 		this.b = null;
 		return bytes;
 	}
-	,addBytes: function(src,pos,len) {
-		if(pos < 0 || len < 0 || pos + len > src.length) throw haxe.io.Error.OutsideBounds;
-		var b1 = this.b;
-		var b2 = src.b;
-		var _g1 = pos, _g = pos + len;
-		while(_g1 < _g) {
-			var i = _g1++;
-			this.b.push(b2[i]);
-		}
-	}
 	,__class__: haxe.io.BytesBuffer
-}
+};
 haxe.io.BytesInput = function(b,pos,len) {
 	if(pos == null) pos = 0;
 	if(len == null) len = b.length - pos;
@@ -10802,12 +11737,18 @@ haxe.io.BytesInput = function(b,pos,len) {
 	this.b = b.b;
 	this.pos = pos;
 	this.len = len;
+	this.totlen = len;
 };
 $hxClasses["haxe.io.BytesInput"] = haxe.io.BytesInput;
 haxe.io.BytesInput.__name__ = true;
 haxe.io.BytesInput.__super__ = haxe.io.Input;
 haxe.io.BytesInput.prototype = $extend(haxe.io.Input.prototype,{
-	readBytes: function(buf,pos,len) {
+	readByte: function() {
+		if(this.len == 0) throw new haxe.io.Eof();
+		this.len--;
+		return this.b[this.pos++];
+	}
+	,readBytes: function(buf,pos,len) {
 		if(pos < 0 || len < 0 || pos + len > buf.length) throw haxe.io.Error.OutsideBounds;
 		if(this.len == 0 && len > 0) throw new haxe.io.Eof();
 		if(this.len < len) len = this.len;
@@ -10822,29 +11763,14 @@ haxe.io.BytesInput.prototype = $extend(haxe.io.Input.prototype,{
 		this.len -= len;
 		return len;
 	}
-	,readByte: function() {
-		if(this.len == 0) throw new haxe.io.Eof();
-		this.len--;
-		return this.b[this.pos++];
-	}
 	,__class__: haxe.io.BytesInput
 });
-haxe.io.Output = function() { }
+haxe.io.Output = function() { };
 $hxClasses["haxe.io.Output"] = haxe.io.Output;
 haxe.io.Output.__name__ = true;
 haxe.io.Output.prototype = {
-	writeString: function(s) {
-		var b = haxe.io.Bytes.ofString(s);
-		this.writeFullBytes(b,0,b.length);
-	}
-	,writeFullBytes: function(s,pos,len) {
-		while(len > 0) {
-			var k = this.writeBytes(s,pos,len);
-			pos += k;
-			len -= k;
-		}
-	}
-	,flush: function() {
+	writeByte: function(c) {
+		throw "Not implemented";
 	}
 	,writeBytes: function(s,pos,len) {
 		var k = len;
@@ -10857,30 +11783,19 @@ haxe.io.Output.prototype = {
 		}
 		return len;
 	}
-	,writeByte: function(c) {
-		throw "Not implemented";
+	,writeFullBytes: function(s,pos,len) {
+		while(len > 0) {
+			var k = this.writeBytes(s,pos,len);
+			pos += k;
+			len -= k;
+		}
+	}
+	,writeString: function(s) {
+		var b = haxe.io.Bytes.ofString(s);
+		this.writeFullBytes(b,0,b.length);
 	}
 	,__class__: haxe.io.Output
-}
-haxe.io.BytesOutput = function() {
-	this.b = new haxe.io.BytesBuffer();
 };
-$hxClasses["haxe.io.BytesOutput"] = haxe.io.BytesOutput;
-haxe.io.BytesOutput.__name__ = true;
-haxe.io.BytesOutput.__super__ = haxe.io.Output;
-haxe.io.BytesOutput.prototype = $extend(haxe.io.Output.prototype,{
-	getBytes: function() {
-		return this.b.getBytes();
-	}
-	,writeBytes: function(buf,pos,len) {
-		this.b.addBytes(buf,pos,len);
-		return len;
-	}
-	,writeByte: function(c) {
-		this.b.b.push(c);
-	}
-	,__class__: haxe.io.BytesOutput
-});
 haxe.io.Eof = function() {
 };
 $hxClasses["haxe.io.Eof"] = haxe.io.Eof;
@@ -10890,8 +11805,8 @@ haxe.io.Eof.prototype = {
 		return "Eof";
 	}
 	,__class__: haxe.io.Eof
-}
-haxe.io.Error = $hxClasses["haxe.io.Error"] = { __ename__ : true, __constructs__ : ["Blocked","Overflow","OutsideBounds","Custom"] }
+};
+haxe.io.Error = $hxClasses["haxe.io.Error"] = { __ename__ : true, __constructs__ : ["Blocked","Overflow","OutsideBounds","Custom"] };
 haxe.io.Error.Blocked = ["Blocked",0];
 haxe.io.Error.Blocked.toString = $estr;
 haxe.io.Error.Blocked.__enum__ = haxe.io.Error;
@@ -10901,9 +11816,9 @@ haxe.io.Error.Overflow.__enum__ = haxe.io.Error;
 haxe.io.Error.OutsideBounds = ["OutsideBounds",2];
 haxe.io.Error.OutsideBounds.toString = $estr;
 haxe.io.Error.OutsideBounds.__enum__ = haxe.io.Error;
-haxe.io.Error.Custom = function(e) { var $x = ["Custom",3,e]; $x.__enum__ = haxe.io.Error; $x.toString = $estr; return $x; }
-haxe.xml = {}
-haxe.xml._Fast = {}
+haxe.io.Error.Custom = function(e) { var $x = ["Custom",3,e]; $x.__enum__ = haxe.io.Error; $x.toString = $estr; return $x; };
+haxe.xml = {};
+haxe.xml._Fast = {};
 haxe.xml._Fast.NodeAccess = function(x) {
 	this.__x = x;
 };
@@ -10911,7 +11826,7 @@ $hxClasses["haxe.xml._Fast.NodeAccess"] = haxe.xml._Fast.NodeAccess;
 haxe.xml._Fast.NodeAccess.__name__ = true;
 haxe.xml._Fast.NodeAccess.prototype = {
 	__class__: haxe.xml._Fast.NodeAccess
-}
+};
 haxe.xml._Fast.AttribAccess = function(x) {
 	this.__x = x;
 };
@@ -10925,7 +11840,7 @@ haxe.xml._Fast.AttribAccess.prototype = {
 		return v;
 	}
 	,__class__: haxe.xml._Fast.AttribAccess
-}
+};
 haxe.xml._Fast.HasAttribAccess = function(x) {
 	this.__x = x;
 };
@@ -10933,7 +11848,7 @@ $hxClasses["haxe.xml._Fast.HasAttribAccess"] = haxe.xml._Fast.HasAttribAccess;
 haxe.xml._Fast.HasAttribAccess.__name__ = true;
 haxe.xml._Fast.HasAttribAccess.prototype = {
 	__class__: haxe.xml._Fast.HasAttribAccess
-}
+};
 haxe.xml._Fast.HasNodeAccess = function(x) {
 	this.__x = x;
 };
@@ -10941,7 +11856,7 @@ $hxClasses["haxe.xml._Fast.HasNodeAccess"] = haxe.xml._Fast.HasNodeAccess;
 haxe.xml._Fast.HasNodeAccess.__name__ = true;
 haxe.xml._Fast.HasNodeAccess.prototype = {
 	__class__: haxe.xml._Fast.HasNodeAccess
-}
+};
 haxe.xml._Fast.NodeListAccess = function(x) {
 	this.__x = x;
 };
@@ -10949,7 +11864,7 @@ $hxClasses["haxe.xml._Fast.NodeListAccess"] = haxe.xml._Fast.NodeListAccess;
 haxe.xml._Fast.NodeListAccess.__name__ = true;
 haxe.xml._Fast.NodeListAccess.prototype = {
 	__class__: haxe.xml._Fast.NodeListAccess
-}
+};
 haxe.xml.Fast = function(x) {
 	if(x.nodeType != Xml.Document && x.nodeType != Xml.Element) throw "Invalid nodeType " + Std.string(x.nodeType);
 	this.x = x;
@@ -10963,15 +11878,15 @@ $hxClasses["haxe.xml.Fast"] = haxe.xml.Fast;
 haxe.xml.Fast.__name__ = true;
 haxe.xml.Fast.prototype = {
 	__class__: haxe.xml.Fast
-}
-haxe.xml.Parser = function() { }
+};
+haxe.xml.Parser = function() { };
 $hxClasses["haxe.xml.Parser"] = haxe.xml.Parser;
 haxe.xml.Parser.__name__ = true;
 haxe.xml.Parser.parse = function(str) {
 	var doc = Xml.createDocument();
 	haxe.xml.Parser.doParse(str,0,doc);
 	return doc;
-}
+};
 haxe.xml.Parser.doParse = function(str,p,parent) {
 	if(p == null) p = 0;
 	var xml = null;
@@ -11015,7 +11930,8 @@ haxe.xml.Parser.doParse = function(str,p,parent) {
 				state = 0;
 				next = 2;
 			} else if(c == 38) {
-				buf.addSub(str,start,p - start);
+				var len = p - start;
+				buf.b += len == null?HxOverrides.substr(str,start,null):HxOverrides.substr(str,start,len);
 				state = 18;
 				next = 13;
 				start = p + 1;
@@ -11190,15 +12106,21 @@ haxe.xml.Parser.doParse = function(str,p,parent) {
 			if(c == 59) {
 				var s = HxOverrides.substr(str,start,p - start);
 				if(s.charCodeAt(0) == 35) {
-					var i = s.charCodeAt(1) == 120?Std.parseInt("0" + HxOverrides.substr(s,1,s.length - 1)):Std.parseInt(HxOverrides.substr(s,1,s.length - 1));
-					buf.b += Std.string(String.fromCharCode(i));
-				} else if(!haxe.xml.Parser.escapes.exists(s)) buf.b += Std.string("&" + s + ";"); else buf.b += Std.string(haxe.xml.Parser.escapes.get(s));
+					var i;
+					if(s.charCodeAt(1) == 120) i = Std.parseInt("0" + HxOverrides.substr(s,1,s.length - 1)); else i = Std.parseInt(HxOverrides.substr(s,1,s.length - 1));
+					var x = String.fromCharCode(i);
+					buf.b += Std.string(x);
+				} else if(!haxe.xml.Parser.escapes.exists(s)) buf.b += Std.string("&" + s + ";"); else {
+					var x = haxe.xml.Parser.escapes.get(s);
+					buf.b += Std.string(x);
+				}
 				start = p + 1;
 				state = next;
 			}
 			break;
 		}
-		c = str.charCodeAt(++p);
+		var index = ++p;
+		c = str.charCodeAt(index);
 	}
 	if(state == 1) {
 		start = p;
@@ -11209,9 +12131,9 @@ haxe.xml.Parser.doParse = function(str,p,parent) {
 		return p;
 	}
 	throw "Unexpected end";
-}
-var js = {}
-js.Boot = function() { }
+};
+var js = {};
+js.Boot = function() { };
 $hxClasses["js.Boot"] = js.Boot;
 js.Boot.__name__ = true;
 js.Boot.__string_rec = function(o,s) {
@@ -11226,7 +12148,8 @@ js.Boot.__string_rec = function(o,s) {
 				if(o.length == 2) return o[0];
 				var str = o[0] + "(";
 				s += "\t";
-				var _g1 = 2, _g = o.length;
+				var _g1 = 2;
+				var _g = o.length;
 				while(_g1 < _g) {
 					var i = _g1++;
 					if(i != 2) str += "," + js.Boot.__string_rec(o[i],s); else str += js.Boot.__string_rec(o[i],s);
@@ -11259,7 +12182,7 @@ js.Boot.__string_rec = function(o,s) {
 		var str = "{\n";
 		s += "\t";
 		var hasp = o.hasOwnProperty != null;
-		for( var k in o ) { ;
+		for( var k in o ) {
 		if(hasp && !o.hasOwnProperty(k)) {
 			continue;
 		}
@@ -11279,13 +12202,14 @@ js.Boot.__string_rec = function(o,s) {
 	default:
 		return String(o);
 	}
-}
+};
 js.Boot.__interfLoop = function(cc,cl) {
 	if(cc == null) return false;
 	if(cc == cl) return true;
 	var intf = cc.__interfaces__;
 	if(intf != null) {
-		var _g1 = 0, _g = intf.length;
+		var _g1 = 0;
+		var _g = intf.length;
 		while(_g1 < _g) {
 			var i = _g1++;
 			var i1 = intf[i];
@@ -11293,7 +12217,7 @@ js.Boot.__interfLoop = function(cc,cl) {
 		}
 	}
 	return js.Boot.__interfLoop(cc.__super__,cl);
-}
+};
 js.Boot.__instanceof = function(o,cl) {
 	if(cl == null) return false;
 	switch(cl) {
@@ -11321,23 +12245,19 @@ js.Boot.__instanceof = function(o,cl) {
 		if(cl == Enum && o.__ename__ != null) return true;
 		return o.__enum__ == cl;
 	}
-}
+};
 js.Boot.__cast = function(o,t) {
 	if(js.Boot.__instanceof(o,t)) return o; else throw "Cannot cast " + Std.string(o) + " to " + Std.string(t);
-}
-js.Browser = function() { }
-$hxClasses["js.Browser"] = js.Browser;
-js.Browser.__name__ = true;
-function $iterator(o) { if( o instanceof Array ) return function() { return HxOverrides.iter(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; };
+};
+function $iterator(o) { if( o instanceof Array ) return function() { return HxOverrides.iter(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; }
 var $_, $fid = 0;
-function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; };
+function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; }
 if(Array.prototype.indexOf) HxOverrides.remove = function(a,o) {
 	var i = a.indexOf(o);
 	if(i == -1) return false;
 	a.splice(i,1);
 	return true;
 };
-Math.__name__ = ["Math"];
 Math.NaN = Number.NaN;
 Math.NEGATIVE_INFINITY = Number.NEGATIVE_INFINITY;
 Math.POSITIVE_INFINITY = Number.POSITIVE_INFINITY;
@@ -11397,9 +12317,6 @@ alphatab.Environment.layoutEngines.set("horizontal",function(r) {
 alphatab.Environment.staveFactories.set("marker",function(l) {
 	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.MarkerEffectInfo());
 });
-alphatab.Environment.staveFactories.set("triplet-feel",function(l) {
-	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.TripletFeelEffectInfo());
-});
 alphatab.Environment.staveFactories.set("tempo",function(l) {
 	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.TempoEffectInfo());
 });
@@ -11424,6 +12341,9 @@ alphatab.Environment.staveFactories.set("alternate-endings",function(l) {
 alphatab.Environment.staveFactories.set("score",function(l) {
 	return new alphatab.rendering.ScoreBarRendererFactory();
 });
+alphatab.Environment.staveFactories.set("crescendo",function(l) {
+	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.CrescendoEffectInfo());
+});
 alphatab.Environment.staveFactories.set("dynamics",function(l) {
 	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.DynamicsEffectInfo());
 });
@@ -11445,31 +12365,34 @@ alphatab.Environment.staveFactories.set("tab",function(l) {
 alphatab.Environment.staveFactories.set("pick-stroke",function(l) {
 	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.PickStrokeEffectInfo());
 });
-haxe.Resource.content = [{ name : "glyphs", data : "s61427:PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8%CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogICAgdmVyc2lvbj0iMS4xIiB4PSIwcHgiIHk9IjBweCIgd2lkdGg9IjEyODBweCIgaGVpZ2h0PSI4MDBweCIKCXZpZXdCb3g9IjAgMCAxMjgwIDgwMCIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgMTI4MCA4MDAiCj4KICAgIDxwYXRoIGlkPSJDbGVmRiIgZD0iTSA1NDUgLTgwMWMgLTUzIDQ5IC04MCAxMDkgLTgwIDE3OWMgMCAzMyA0IDY2IDEyIDk5YyA4IDMzIDM4IDU3IDg5IDc0YyA1MSAxNiAxMjUgMzEgMjIwIDQzYyA5NSAxMiAxNTkgNTMgMTkyIDEyNGMgMTYgMzcgMjQgOTkgMjQgMTg2YyAwIDk1IC00MyAxNjggLTEzMCAyMjBjIC04NiA1MSAtMTg2IDc3IC0yOTcgNzdjIC0xMjggMCAtMjI5IC0yOCAtMzAzIC04NmMgLTkxIC03MCAtMTM2IC0xNjkgLTEzNiAtMjk3YyAwIC0xMTUgMjMgLTIzNCA3MSAtMzU2YyA0NyAtMTIxIDExOCAtMjM0IDIxMyAtMzM3YyA3MCAtNzQgMTYzIC0xMjkgMjc5IC0xNjRjIDExNSAtMzUgMjMzIC01MiAzNTMgLTUyYyA0NSAwIDgzIDEgMTE0IDNjIDMxIDIgODEgOSAxNTEgMjFjIDI0MyA0NSA0NDQgMTc1IDYwMSAzOTBjIDE0NCAxOTggMjE3IDQwOSAyMTcgNjMyYyAwIDQxIC0yIDcyIC02IDkzYyAtMzMgMjgxIC0yMTkgNTgyIC01NTggOTA1YyAtMjcyIDI2MCAtNTkxIDQ5MyAtOTU0IDcwMGMgLTMzMCAxOTAgLTUyNyAyNzQgLTU4OSAyNTRsIC0xOCAtNjhjIDk1IC0zMyAxOTcgLTc4IDMwNiAtMTM2YyAxMDkgLTU3IDIxOCAtMTI0IDMyNSAtMTk4YyAyNzYgLTE5OCA0NzcgLTM4NCA2MDEgLTU1OGMgMTUyIC0yMTAgMjUyIC00NzEgMjk3IC03ODFjIDIwIC0xMjggMzEgLTIxMCAzMSAtMjQ4cyAwIC02OCAwIC05M2MgMCAtMzIyIC0xMDkgLTU1MSAtMzI4IC02ODhjIC05OSAtNTcgLTIwMCAtODYgLTMwMyAtODZjIC03OCAwIC0xNTQgMTUgLTIyNiA0NkMgNjQzIC04NzMgNTg2IC04MzggNTQ1IC04MDF6TSAyNTE3IC03ODNjIDY2IDAgMTIxIDIyIDE2NyA2OGMgNDUgNDUgNjggMTAxIDY4IDE2N2MgMCA2NiAtMjIgMTIxIC02OCAxNjdjIC00NSA0NSAtMTAxIDY4IC0xNjcgNjhjIC02NiAwIC0xMjIgLTIyIC0xNjcgLTY4YyAtNDUgLTQ1IC02OCAtMTAxIC02OCAtMTY3YyAwIC02NiAyMiAtMTIxIDY4IC0xNjdDIDIzOTUgLTc2MCAyNDUxIC03ODMgMjUxNyAtNzgzek0gMjUxNyA1NGMgNjYgMCAxMjEgMjIgMTY3IDY4YyA0NSA0NSA2OCAxMDEgNjggMTY3YyAwIDY2IC0yMiAxMjEgLTY4IDE2N2MgLTQ1IDQ1IC0xMDEgNjggLTE2NyA2OGMgLTY2IDAgLTEyMiAtMjIgLTE2NyAtNjhjIC00NSAtNDUgLTY4IC0xMDEgLTY4IC0xNjdjIDAgLTY2IDIyIC0xMjEgNjggLTE2N0MgMjM5NSA3NyAyNDUxIDU0IDI1MTcgNTQiIC8%CiAgICA8cGF0aCBpZD0iQ2xlZkMiIGQ9Ik0gMjYgMTczNlYgLTE5MjRoIDQ1OHYgMzY1OUggMjZ6TSA2NDEgMTczNlYgLTE5MjRoIDE1MHYgMzY1OUggNjQxek0gMTA5OSAxNTNjIC00MiAtNTMgLTg2IC0xMDAgLTEzMCAtMTQwYyAtNDQgLTQwIC05NSAtNzUgLTE1MyAtMTA2YyAxMDYgLTU4IDIwMCAtMTM1IDI3OSAtMjMzYyAxMTAgLTEzNSAxODAgLTI4OSAyMDggLTQ2MGMgMTcgMTI3IDQ2IDIxNiA4NyAyNjZjIDY1IDczIDE3MCAxMTAgMzEzIDExMGMgMTUwIDAgMjU5IC04MSAzMjQgLTI0NGMgNTAgLTEyNCA3NSAtMjkxIDc1IC01MDBjIDAgLTE5NyAtMjUgLTM1NSAtNzUgLTQ3MWMgLTY5IC0xNTUgLTE3OSAtMjMyIC0zMzAgLTIzMmMgLTg5IDAgLTE2NyAxOCAtMjM0IDU1YyAtNjcgMzYgLTEwMSA3MiAtMTAxIDEwN2MgMCAxOSAyMyAyNSA2OSAxN2MgNDYgLTcgOTcgNiAxNTMgNDNjIDU2IDM2IDg0IDg5IDg0IDE1OWMgMCA2OSAtMjMgMTI1IC02OSAxNjhjIC00NiA0MiAtMTA4IDYzIC0xODUgNjNjIC03MyAwIC0xMzggLTI0IC0xOTQgLTcyYyAtNTYgLTQ4IC04NCAtMTA1IC04NCAtMTcxYyAwIC0xMTIgNTYgLTIxMiAxNjggLTMwMWMgMTI3IC0xMDAgMjgyIC0xNTAgNDYzIC0xNTBjIDIyOCAwIDQxMiA3NCA1NTMgMjI0YyAxNDEgMTQ5IDIxMSAzMzQgMjExIDU1NWMgMCAyNDggLTg2IDQ1OCAtMjU4IDYzMWMgLTE3MiAxNzIgLTM4MSAyNTkgLTYyOSAyNTljIC01NyAwIC0xMDQgLTMgLTEzOSAtMTFjIC01NCAtMTkgLTk4IC0zNCAtMTMzIC00NmMgLTE1IDQ5IC00OCA5OSAtOTggMTQ5YyAtMTEgMTUgLTQ4IDQzIC0xMTAgODVjIDM4IDE5IDc1IDUyIDExMCA5OWMgNTAgNTAgODggMTA1IDExNSAxNjRjIDY1IC0zMSAxMTMgLTUwIDE0MiAtNTdjIDI4IC03IDcwIC0xMSAxMjQgLTExYyAyNDcgMCA0NTcgODUgNjI5IDI1N2MgMTcyIDE3MSAyNTggMzgwIDI1OCA2MjdjIDAgMjExIC03MyAzOTAgLTIxOSA1MzRjIC0xNDYgMTQ0IC0zMzIgMjE2IC01NTggMjE2YyAtMTgzIDAgLTMzNCAtNDcgLTQ1MyAtMTQyYyAtMTE4IC05NCAtMTc4IC0xOTggLTE3OCAtMzEwYyAwIC02OSAyOCAtMTI4IDg0IC0xNzZjIDU2IC00OCAxMjAgLTcyIDE5NCAtNzJjIDY5IDAgMTI5IDIzIDE3OSA2OWMgNTAgNDYgNzUgMTA0IDc1IDE3NGMgMCA2NSAtMjggMTE2IC04NCAxNTNjIC01NiAzNiAtMTA3IDUxIC0xNTMgNDNjIC00NiAtNyAtNjkgMCAtNjkgMjNjIDAgMjcgMzUgNjAgMTA2IDEwMWMgNzAgNDAgMTQ3IDYwIDIyOSA2MGMgMTUzIDAgMjY1IC03NyAzMzUgLTIzMWMgNTEgLTExMiA3NiAtMjY4IDc2IC00NjljIDAgLTIwMSAtMjUgLTM2MyAtNzUgLTQ4N2MgLTY1IC0xNjYgLTE3MiAtMjQ5IC0zMTkgLTI0OWMgLTE0MyAwIC0yNDIgMzAgLTI5OCA5MmMgLTU2IDYxIC05MyAxNTYgLTExMyAyODRDIDEyNzkgNDM1IDEyMTEgMjg2IDEwOTkgMTUzIiAvPgogICAgPHBhdGggaWQ9IlJlc3RUaGlydHlTZWNvbmQiIGQ9Ik0gNzE3IC0yMTk1YyA5MyAtMzAgMTc0IC0xMDQgMjQ0IC0yMjBjIDM4IC02NSA2NSAtMTI3IDgxIC0xODVsIDE0MCAtNjA0YyAtNjkgMTI4IC0xOTYgMTkxIC0zODEgMTkxYyAtNTAgMCAtMTA1IC03IC0xNjcgLTIzYyAtNjEgLTE1IC0xMTMgLTQ2IC0xNTUgLTkyYyAtNDIgLTQ2IC02MyAtMTA4IC02MyAtMTg1YyAwIC02NSAyMyAtMTIxIDY5IC0xNjhzIDEwNCAtNjkgMTczIC02OWMgNjUgMCAxMjMgMjUgMTczIDc1YyA1MCA1MCA3NSAxMDQgNzUgMTYyYyAwIDMxIC03IDYzIC0yMyA5OGMgLTE1IDM0IC00NCA2MyAtODYgODdjIDIzIDExIDQ4IDIxIDc1IDI4YyA3IDAgMjcgLTMgNTcgLTExYyA3MyAtMjMgMTQyIC04MCAyMDggLTE3MGMgNTcgLTkwIDExNSAtMTgwIDE3MyAtMjcwaCA0MGwgLTgxNiAzNTAzbCAtMTA3IDBsIDMxOCAtMTMxNmMgLTczIDEyOCAtMTk2IDE5MiAtMzY5IDE5MmMgLTE5IDAgLTM4IDAgLTU3IDBjIC0yNyAtMyAtNjggLTEzIC0xMjQgLTI4YyAtNTUgLTE1IC0xMDQgLTQ2IC0xNDcgLTkyYyAtNDIgLTQ2IC02MyAtMTA2IC02MyAtMTc5YyAwIC02NSAyMyAtMTIxIDY5IC0xNjhjIDQ2IC00NiAxMDYgLTY5IDE3OSAtNjljIDY1IDAgMTIyIDI0IDE3MCA3MmMgNDggNDggNzIgMTAzIDcyIDE2NWMgMCAzMCAtNyA2MyAtMjMgOThjIC0xNSAzNCAtNDQgNjMgLTg2IDg3YyA0NiAxNSA3MSAyMyA3NCAyM2MgNyAwIDI2IC0zIDU3IC0xMWMgOTIgLTI3IDE3OCAtMTA4IDI1OSAtMjQzYyAxMSAtMTkgMjYgLTUwIDQ2IC05M2wgMTYxIC02NjdjIC03MyAxMjggLTE5OCAxOTIgLTM3NSAxOTJjIC0zMCAwIC02MSAwIC05MiAwYyAtMzQgLTExIC01NyAtMTkgLTY5IC0yM2MgLTY5IC0xOSAtMTI1IC01MiAtMTY3IC05OGMgLTQyIC00NiAtNjMgLTEwNiAtNjMgLTE3OWMgMCAtNjkgMjMgLTEyNyA2OSAtMTc0cyAxMDYgLTY5IDE3OSAtNjljIDY1IDAgMTIyIDI0IDE3MCA3MmMgNDggNDggNzIgMTAzIDcyIDE2NWMgMCAzMSAtNyA2MyAtMjMgOThzIC00NCA2NSAtODYgOTJjIDIzIDcgNDYgMTUgNjkgMjNDIDY2NSAtMjE4NCA2ODYgLTIxODcgNzE3IC0yMTk1IiAvPgogICAgPHBhdGggaWQ9IlJlc3RRdWFydGVyIiBkPSJNIDI3MiAtMTY2OEwgOTc5IC04NTBjIC01NCAyMyAtMTM3IDExNCAtMjQ5IDI3MmMgLTEyNyAxNzcgLTE5MSAzMTMgLTE5MSA0MDVjIDAgMTEyIDM2IDIyNiAxMTAgMzQyYyA3MyAxMTUgMTYwIDIwNiAyNjAgMjcybCAtMzQgODFjIC0yMyAtMyAtNTYgLTcgLTEwMSAtMTFjIC00NCAtMyAtNzYgLTUgLTk1IC01YyAtMTA0IDAgLTE4MiA5IC0yMzQgMjhjIC01MiAxOSAtODggNDUgLTExMCA3OGMgLTIxIDMyIC0zMSA3MCAtMzEgMTEzYyAwIDgxIDQyIDE3NSAxMjcgMjg0YyA2OSA4OCAxMTUgMTM3IDEzOSAxNDVsIC0yOCA0NmMgLTI3IDcgLTEyMyAtNjEgLTI4OSAtMjA4YyAtMTg1IC0xNjIgLTI3OCAtMjk5IC0yNzggLTQxMWMgMCAtOTIgMzUgLTE2OCAxMDcgLTIyNmMgNzEgLTU3IDE1OSAtODcgMjYzIC04N2MgNTQgMCAxMDkgNyAxNjUgMjNjIDU1IDE1IDExMCA0MiAxNjUgODFsIC02NDIgLTgyOWMgNTQgLTMwIDEyMCAtMTA3IDE5OSAtMjI5YyA3OSAtMTIxIDEzOSAtMjM4IDE4MiAtMzUwYyA3IC0xNSAxMSAtNDIgMTEgLTgxYyAwIC05MiAtNDQgLTIxMCAtMTMzIC0zNTNjIC03MyAtMTE1IC0xMjEgLTE4MSAtMTQ0IC0xOTdIIDI3MiIgLz4KICAgIDxwYXRoIGlkPSJHcmFjZVVwIiBkPSJNIDU3MSAtMTY1OWggNTNjIDEyIDgzIDI5IDE1NCA1MCAyMTBjIDIxIDU2IDQ2IDEwNSA3NCAxNDVjIDI4IDQwIDcxIDkyIDEyOCAxNTZjIDU2IDYzIDEwMiAxMTggMTM4IDE2MmMgMTA1IDEzNSAxNTggMjc3IDE1OCA0MjRjIDAgMTUxIC02NCAzMzYgLTE5MyA1NTRoIC0zNWMgMTYgLTM3IDM1IC04MiA1NyAtMTMycyA0MCAtOTUgNTUgLTEzNnMgMjYgLTgxIDM1IC0xMjFzIDEyIC04MCAxMiAtMTE5YyAwIC02MiAtMTIgLTEyNSAtMzggLTE4OGMgLTI1IC02MyAtNjAgLTEyMSAtMTA2IC0xNzVjIC00NSAtNTMgLTk3IC05NyAtMTU1IC0xMzBzIC0xMTggLTUxIC0xODEgLTU1diAxMjQ1YyAwIDcwIC0yMSAxMzQgLTY1IDE4OWMgLTQzIDU1IC05OSA5NyAtMTY3IDEyN2MgLTY3IDI5IC0xMzUgNDQgLTIwMSA0NGMgLTY0IDAgLTExOCAtMTYgLTE2MCAtNDhjIC00MiAtMzIgLTYzIC03OSAtNjMgLTE0MGMgMCAtNjUgMjEgLTEyNiA2NCAtMTgxcyA5NyAtOTkgMTYzIC0xMzFjIDY1IC0zMiAxMjkgLTQ4IDE5MSAtNDhjIDg1IDAgMTQ3IDE2IDE4NCA1MFYgLTEwODJWIC0xNjU5IiAvPgogICAgPHBhdGggaWQ9IkdyYWNlRG93biIgZD0iTSAtMTcgMzM1YyAwIC02OSAyMyAtMTMxIDY5IC0xODZzIDEwMyAtOTggMTczIC0xMjhjIDY5IC0zMCAxMzcgLTQ1IDIwMyAtNDVjIDEzMyAwIDIwMyA2MyAyMTEgMTg5YyAwIDU0IC0yMSAxMTAgLTY1IDE2N2MgLTQzIDU2IC05OSAxMDMgLTE2OCAxMzlzIC0xMzggNTQgLTIwOCA1NGMgLTYzIDAgLTExOCAtMTQgLTE2NCAtNDR2IDExMDRjIDkwIC0xNSAxNzIgLTUwIDI0NCAtMTA2cyAxMjggLTEyMiAxNjggLTIwMGMgNDAgLTc4IDYwIC0xNTYgNjAgLTIzM2MgLTEgLTkxIC0xMyAtMTY5IC0zNCAtMjMzYyAtMjAgLTY0IC01NyAtMTU1IC0xMTAgLTI3MmwgMzQgLTEzYyAzNCA2MCA2NCAxMjIgOTEgMTg4YyAyNyA2NSA0OCAxMzEgNjQgMTk5cyAyMyAxMzMgMjMgMTk4YyAwIDk2IC0yMiAxODMgLTY4IDI1OWMgLTQ1IDc2IC0xMTMgMTY2IC0yMDMgMjY5YyAtODkgMTAzIC0xNTcgMTkzIC0yMDMgMjcxYyAtNDUgNzcgLTY4IDE2NSAtNjggMjY0aCAtNTBWIDMzNSIgLz4KICAgIDxwYXRoIGlkPSJUcmlsbCIgZD0iTSAxNTkgODYybCAxNDggLTQzMWggLTI5MWwgMzMgLTk3aCAyODhsIDYxIC0xOTZsIDE5MCAtMTM2aCA1NmwgLTExNCAzMzJjIDQwIDAgMTAwIC03IDE4MSAtMjJjIDgxIC0xNSAxNDMgLTIyIDE4NyAtMjJjIDI2IDAgNDUgNSA1NiAxNWMgMTEgMTAgMTYgMjkgMTYgNTdjIDAgOCAtMyAzNyAtMTEgODZjIDcyIC0xMDYgMTU1IC0xNjAgMjQ2IC0xNjBjIDcyIDggMTEwIDUwIDExNCAxMjZjIDAgNDIgLTkgNzMgLTI4IDkycyAtNDAgMjggLTY0IDI4YyAtNDggMCAtNzYgLTI5IC04NCAtODdjIDEwIC0yMiAxNiAtNDMgMTYgLTY0YyAwIC0xMSAtOSAtMTcgLTI4IC0xN2MgLTc4IDAgLTE0NyA4NiAtMjA3IDI2MGwgLTEzMSA0MDZoIC0xODVsIDM0IC05MmMgLTIxIDkgLTUzIDI2IC05NCA1MXMgLTc3IDQ0IC0xMDggNThzIC02NCAyMCAtMTAwIDIwYyAtNTAgMCAtOTUgLTEzIC0xMzMgLTQwYyAtMzggLTI3IC01OSAtNjMgLTYxIC0xMDdjIDEgLTcgMyAtMTggNSAtMzJTIDE1NyA4NjcgMTU5IDg2MnpNIDY1OCA4MzdsIDE0MCAtNDEyYyAwIC00IDAgLTkgMiAtMTZzIDIgLTEwIDIgLTExYyAwIC05IC03IC0xMyAtMjIgLTEzYyAtMzQgMCAtODEgNyAtMTQwIDIxcyAtMTA0IDIxIC0xMzYgMjFsIC0xNDIgNDIzYyAtNiAyMyAtMTIgNDQgLTE3IDY0YyAwIDI3IDE2IDQ0IDUwIDUwQyA0NDQgOTU4IDUzMiA5MTYgNjU4IDgzNyIgLz4KICAgIDxwYXRoIGlkPSJDbGVmRyIgZD0iTSAxNDMxIC0zMDcwYyA5NSAwIDE4NiAxMTQgMjcyIDM0NGMgODYgMjI5IDEyOSA0MzQgMTI5IDYxMmMgMCAyNDMgLTM2IDQ3MSAtMTA4IDY4NGMgLTEwMyAzMDAgLTI3MSA1NDUgLTUwNCA3MzVsIDEwOCA1NjRjIDY4IC0xNSAxMzIgLTIyIDE5MyAtMjJjIDI4NCAwIDUwNCAxMDkgNjU5IDMyOWMgMTMyIDE4NSAxOTkgNDEwIDE5OSA2NzVjIDAgMjA0IC02NSAzNzkgLTE5NSA1MjVjIC0xMzAgMTQ1IC0yOTkgMjQzIC01MDYgMjkybCAxNTQgODE2YyAwIDQ1IDAgNzcgMCA5NmMgMCAxNTIgLTU0IDI4MiAtMTYyIDM5MHMgLTI0NCAxODEgLTQwNyAyMTljIC0yNiA3IC02MiAxMSAtMTA4IDExYyAtMTU1IDAgLTI5NCAtNjIgLTQxNiAtMTg4YyAtMTIxIC0xMjUgLTE4MiAtMjUyIC0xODIgLTM4MWMgMCAtMjIgMSAtMzkgNSAtNTFjIDE4IC0xMDYgNjQgLTE5MSAxMzYgLTI1M2MgNzIgLTYyIDE2MSAtOTQgMjY3IC05NGMgMTAyIDAgMTkxIDM0IDI2NyAxMDJjIDc2IDY4IDExMyAxNTIgMTEzIDI1MGMgMCAxMDYgLTM1IDE5OCAtMTA1IDI3NmMgLTcwIDc3IC0xNjAgMTE2IC0yNzAgMTE2YyAtMjYgMCAtNDUgMCAtNTYgMGMgNDIgMzYgODIgNjMgMTIwIDgyYyA3MiAzNiAxNDMgNTQgMjEyIDU0YyAxMTQgMCAyMzUgLTYyIDM2MiAtMTg3YyA5NCAtOTggMTQyIC0yMTQgMTQyIC0zNDdjIDAgLTE5IC0xIC01NSAtMyAtMTA4bCAtMTM4IC03NzZjIC00OSAxMSAtMTA0IDE5IC0xNjUgMjNjIC02MSAzIC0xMjMgNSAtMTg4IDVjIC0zMzkgMCAtNjM1IC0xMjMgLTg4NiAtMzcwYyAtMjUxIC0yNDcgLTM3NyAtNTQzIC0zNzcgLTg4OWMgMCAtMTkzIDg3IC00MjkgMjYyIC03MDZjIDExNyAtMTg5IDI4NSAtNDAyIDUwMSAtNjM4YyAxNTkgLTE3NCAyNTQgLTI3MSAyODUgLTI5MGMgLTE5IC0zNyAtNDQgLTE0MiAtNzcgLTMxM2MgLTMyIC0xNzEgLTUyIC0yODQgLTU5IC0zMzljIC03IC01NSAtMTEgLTExMSAtMTEgLTE2OGMgMCAtMjM1IDU0IC00NzUgMTYzIC03MThDIDExNjQgLTI5NDggMTI4OSAtMzA3MCAxNDMxIC0zMDcwek0gMTI0NyAtMTI5bCAtOTYgLTUwN2MgLTQxIDMwIC0xMTYgMTA0IC0yMjIgMjIyYyAtMTA2IDExNyAtMTkwIDIxNiAtMjUxIDI5NmMgLTExMCAxNDAgLTE5NCAyNjkgLTI1MSAzODdjIC03NiAxNTUgLTExNCAzMDcgLTExNCA0NTVjIDAgNzkgMTEgMTU5IDM0IDIzOWMgNDkgMTY3IDE4MiAzMjYgNDAwIDQ3OGMgMTc1IDEyMSAzNjAgMTgyIDU1NCAxODJjIDUzIDAgOTYgLTMgMTI3IC0xMWMgMzAgLTcgODAgLTIzIDE1MCAtNDZsIC0yODEgLTEzNDNjIC0xNzggMjIgLTMxMiAxMDYgLTQwMyAyNTBjIC03MiAxMTMgLTEwNyAyMzcgLTEwNyAzNzBjIDAgMTQ0IDgwIDI4MSAyNDAgNDEwYyAxMzcgMTEwIDI0OCAxNjUgMzMyIDE2NWwgLTggMzljIC0xMDYgLTE1IC0yMjcgLTcwIC0zNjQgLTE2NGMgLTE4NiAtMTMyIC0yOTggLTI5MSAtMzM2IC00NzdjIC0xMSAtNTYgLTE3IC0xMTEgLTE3IC0xNjRjIDAgLTE4NSA1NiAtMzUxIDE2OCAtNDk2QyA5MTEgMTIgMTA2MCAtODMgMTI0NyAtMTI5ek0gMTY4NCAtMjMwNmMgLTE5IC0xMjUgLTM0IC0yMDEgLTQ2IC0yMjdjIC0zNCAtNzYgLTkyIC0xMTMgLTE3MiAtMTEzYyAtNzYgMCAtMTU3IDgyIC0yNDEgMjQ3YyAtODQgMTY1IC0xNDMgMzQ0IC0xNzggNTM4YyAtNyA0OSAtMSAxNTYgMTcgMzIyYyAxOSAxNjUgMzYgMjcyIDUyIDMyMmwgMTMyIC0xMTNjIDkxIC00NSAxOTcgLTE3NiAzMTUgLTM5M2MgODggLTE1OSAxMzIgLTMxMyAxMzIgLTQ2MUMgMTY5NSAtMjIxMyAxNjkyIC0yMjUzIDE2ODQgLTIzMDZ6TSAxMzg4IDIyNWwgMjYyIDEzMDRjIDE1NyAtMzcgMjgyIC0xMTQgMzc1IC0yMjljIDkyIC0xMTUgMTM4IC0yNTAgMTM4IC00MDVjIDAgLTMwIDAgLTUyIDAgLTY4YyAtMTkgLTE3NyAtOTMgLTMyMiAtMjI0IC00MzNjIC0xMzAgLTExMSAtMjgxIC0xNjcgLTQ1MyAtMTY3QyAxNDQzIDIyNSAxNDExIDIyNSAxMzg4IDIyNSIgLz4KICAgIDxwYXRoIGlkPSJOdW0wIiBkPSJNIDAgOTkxYyAwIC0yMzAgNDUgLTQyMiAxMzUgLTU3N2MgMTA0IC0xODMgMjUzIC0yNzUgNDQ4IC0yNzVjIDE4NyAwIDMzMyA5MSA0MzcgMjc1YyA4OSAxNTggMTM1IDM1MSAxMzUgNTc3YyAwIDIzMCAtNDMgNDIyIC0xMjkgNTc3YyAtMTA0IDE4MyAtMjUyIDI3NSAtNDQyIDI3NWMgLTE4NyAwIC0zMzQgLTkxIC00NDIgLTI3NUMgNDYgMTQxMSAwIDEyMTggMCA5OTF6TSA1ODMgMjMwYyAtMTAwIDAgLTE2OCA3MiAtMjAyIDIxOGMgLTM0IDE0NSAtNTEgMzI2IC01MSA1NDJjIDAgMjcwIDIzIDQ2NCA3MCA1ODNjIDQ2IDExOCAxMDggMTc4IDE4MyAxNzhjIDkzIDAgMTYyIC04OCAyMDUgLTI2NGMgMzIgLTEzMyA0OCAtMjk4IDQ4IC00OTZjIDAgLTI3MyAtMjMgLTQ2OCAtNzAgLTU4NUMgNzE5IDI4OCA2NTggMjMwIDU4MyAyMzAiIC8%CiAgICA8cGF0aCBpZD0iTnVtMSIgZD0iTSAzNDUgMTY4OFYgNDQwbCAtMjE2IDQxMGwgLTM3IC0zMmwgMjUzIC02ODVoIDM1MXYgMTU0OWMgMCAzMiAyNyA1NyA4MSA3NWMgMTggMyA0NiA4IDg2IDE2diA3NWggLTY4NXYgLTcwYyAzNSAtNyA2MiAtMTIgODEgLTE2QyAzMTYgMTc0NSAzNDUgMTcyMCAzNDUgMTY4OCIgLz4KICAgIDxwYXRoIGlkPSJOdW0yIiBkPSJNIDQyNyAyNTdjIC05MyAxMCAtMTUzIDM3IC0xNzggODFjIDcgMTQgMTQgMjcgMjEgMzdjIDY4IDAgMTE1IDcgMTQwIDIxYyA1NCAyOCA4MSA4NiA4MSAxNzJjIDAgNjEgLTIxIDExMyAtNjQgMTU2cyAtOTMgNjQgLTE1MSA2NGMgLTYxIDAgLTExMyAtMTkgLTE1NiAtNTljIC00MyAtMzkgLTY0IC05MSAtNjQgLTE1NmMgMCAtMTE4IDUwIC0yMjEgMTUxIC0zMDdjIDEwMCAtODYgMjE0IC0xMjkgMzQwIC0xMjljIDE2OSAwIDMxMSAzNiA0MjYgMTA4YyAxMzYgODYgMjA1IDIwMyAyMDUgMzUxYyAwIDEyOSAtNzggMjQ0IC0yMzYgMzQ1YyAtMTMyIDc1IC0yNjMgMTUzIC0zOTEgMjMyYyAtNzggNjEgLTE0NiAxMjkgLTIwNCAyMDVjIC0yNSAzNSAtNTAgNzMgLTc1IDExM2MgMTEwIC02NCAyMTEgLTk3IDMwMCAtOTdjIDY0IDAgMTMwIDE4IDE5OCA1NGMgMzkgMTggODcgNTIgMTQ1IDEwMmMgNDYgMzkgODIgNTkgMTA3IDU5YyA4MiAwIDEzNyAtMzUgMTY2IC0xMDVjIDcgLTIxIDEyIC01NyAxNiAtMTEwaCA0M2MgMCAxMjAgLTE4IDIxNiAtNTQgMjg4YyAtNTQgMTA2IC0xNDcgMTYwIC0yODAgMTYwYyAtMTAwIDAgLTIwNiAtMzcgLTMxNSAtMTEwYyAtMTA5IC03MyAtMjAwIC0xMTAgLTI3MiAtMTEwYyAtMTA4IDAgLTE3OCAyNyAtMjEwIDgxYyAtMTQgNjQgLTIzIDEwMiAtMjcgMTEzaCAtNzBjIDMgLTM2IDggLTcwIDE2IC0xMDJjIDcgLTMyIDI3IC03OSA1OSAtMTQwYyA0NiAtOTMgMTUxIC0yMjEgMzEzIC0zODNjIDMxMyAtMzEzIDQ2OSAtNTA1IDQ2OSAtNTc3QyA4NzYgMzc2IDcyNiAyNTcgNDI3IDI1NyIgLz4KICAgIDxwYXRoIGlkPSJOdW0zIiBkPSJNIDQxNCAxMDI0diAtNTljIDIxIDAgNDcgLTUgNzYgLTE2YyAxMTMgLTM5IDE5MyAtNzcgMjQwIC0xMTNjIDcyIC01NyAxMDkgLTEyOSAxMDkgLTIxNmMgMCAtMTExIC0zNSAtMjA0IC0xMDYgLTI3OGMgLTcwIC03MyAtMTQ5IC0xMTAgLTIzNyAtMTEwYyAtMTEyIDAgLTE5NCAzMiAtMjQ1IDk3YyAzIDE4IDggMzQgMTYgNDhjIDcyIDAgMTIwIDE2IDE0NSA0OGMgMjUgMzIgMzcgNzUgMzcgMTI5YyAwIDExOCAtNjYgMTc4IC0xOTkgMTc4YyAtNTcgMCAtMTAyIC0xNiAtMTM1IC00OGMgLTMyIC0zMiAtNDggLTg0IC00OCAtMTU2YyAwIC0xMjYgNDQgLTIyMyAxMzIgLTI5MWMgODggLTY4IDIzMSAtMTAyIDQyOSAtMTAyYyAxMzMgMCAyNTEgNDcgMzUzIDE0M2MgMTAyIDk1IDE1MyAyMTEgMTUzIDM0OGMgMCAxMDAgLTIxIDE3NyAtNjQgMjI5YyAtNDMgNTIgLTExMSA5OCAtMjA1IDEzN2MgODYgMzUgMTQ5IDc3IDE4OSAxMjRjIDU0IDY0IDgxIDE0NyA4MSAyNDhjIDAgMTMzIC01MSAyNDcgLTE1MyAzNDJjIC0xMDIgOTUgLTIyMCAxNDMgLTM1MyAxNDNjIC0xOTQgMCAtMzM2IC0zNCAtNDI2IC0xMDJjIC05MCAtNjggLTEzNSAtMTY1IC0xMzUgLTI5MWMgMCAtNzUgMTUgLTEyOCA0NSAtMTU5YyAzMCAtMzAgNzggLTQ1IDE0MyAtNDVjIDEyOSAwIDE5NCA1OSAxOTQgMTc4YyAwIDU3IC0xMiAxMDEgLTM3IDEzMmMgLTI1IDMwIC03NSA0NSAtMTUxIDQ1YyAzIDIxIDggNDUgMTYgNzBjIDYxIDQ2IDEzNSA3MCAyMjEgNzBjIDgyIDAgMTYwIC0zNiAyMzIgLTEwOGMgNzIgLTcyIDEwOCAtMTYzIDEwOCAtMjc1YyAwIC04MiAtMzYgLTE1MyAtMTA4IC0yMTBjIC01NCAtNDMgLTEzNSAtODIgLTI0MyAtMTE4TCA0MTQgMTAyNCIgLz4KICAgIDxwYXRoIGlkPSJOdW00IiBkPSJNIDg5NyAxMzNjIC04NiAxNDcgLTE3NCAyOTYgLTI2NCA0NDVjIC05MCAxNDkgLTE2MiAyNTggLTIxNiAzMjZsIC0zMDIgNDY5aCA0NDh2IC01NTZsIDM3OCAtMzE4diA4NzRoIDE2MnYgNzVoIC0xNjJjIDAgMzkgMCA4MSAyIDEyNGMgMSA0MyA2IDc4IDEzIDEwNWMgNyAyNyAzOSA1MyA5NyA3OGMgNyAzIDIzIDggNDggMTZ2IDc1aCAtNzEydiAtNzVjIDMyIC0xMCA1NSAtMTggNzAgLTIxYyA1NCAtMjEgODIgLTQzIDg2IC02NGMgMyAtMTggNiAtNTEgOCAtOTljIDEgLTQ4IDQgLTk0IDggLTEzN2ggLTU4OHYgLTc1YyAxNTggLTExMSAyNzkgLTI4OCAzNjEgLTUyOWMgNDMgLTIzNyA4OCAtNDc1IDEzNSAtNzEySCA4OTciIC8%CiAgICA8cGF0aCBpZD0iTnVtNSIgZD0iTSAxMjIgMTMzYyAxMCA3IDYzIDE4IDE1OSAzNWMgOTUgMTYgMTc3IDI0IDI0NSAyNGMgODkgMCAxNzEgLTUgMjQ1IC0xNmMgNzMgLTEwIDEzOSAtMjMgMTk3IC0zN2MgMCA2MSAtOCAxMTIgLTI0IDE1M2MgLTE2IDQxIC00NyA3OCAtOTQgMTEwYyAtMjEgMTQgLTYyIDI3IC0xMjEgMzdjIC01OSAxMCAtMTEyIDE2IC0xNTkgMTZjIC03MiAwIC0xNDUgLTUgLTIyMSAtMTZjIC03NSAtMTAgLTExNyAtMjEgLTEyNCAtMzJ2IDQ3NWMgOTMgLTEwNCAxOTcgLTE1NiAzMTMgLTE1NmMgMTU4IDAgMjg2IDQzIDM4MyAxMzBjIDk3IDg2IDE0NSAxOTggMTQ1IDMzNmMgMCAxNzMgLTYxIDMyNSAtMTgzIDQ1NWMgLTEyMiAxMzAgLTI2NiAxOTUgLTQzMiAxOTVjIC0zOSAwIC02OCAtMSAtODYgLTVjIC04NiAtMTQgLTE1NCAtNDMgLTIwNSAtODZjIC03MiAtNjEgLTEwOCAtMTU2IC0xMDggLTI4NmMgMCAtNjEgMTYgLTEwOSA0OCAtMTQ1YyAzMiAtMzYgODIgLTU0IDE1MSAtNTRjIDEzNiAwIDIwNSA2NCAyMDUgMTk0YyAwIDEwOCAtNDMgMTY5IC0xMjkgMTgzYyAtMjUgMTAgLTUwIDIzIC03NSAzN2MgMzIgMzIgNjggNTQgMTA4IDY3YyAzOSAxMiA3OSAxOCAxMTggMThjIDkzIDAgMTcwIC00NSAyMzIgLTEzNWMgNjEgLTkwIDkxIC0yMTkgOTEgLTM4NWMgMCAtMTEyIC0yNyAtMjA5IC04MSAtMjkwYyAtNTQgLTgxIC0xMjcgLTEyMiAtMjIxIC0xMjJjIC0xMTggMCAtMjEwIDU0IC0yNzUgMTYyaCAtMTAyViAxMzMiIC8%CiAgICA8cGF0aCBpZD0iTnVtNiIgZD0iTSA4NzEgMzA1YyAtNyAtMTEgLTEyIC0yMiAtMTYgLTM0YyAtNTcgLTUyIC0xMTggLTc5IC0xODMgLTc5YyAtMzIgMCAtNjMgNyAtOTEgMjFjIC02NCAzNiAtMTE0IDExMCAtMTQ4IDIyNGMgLTM0IDExMyAtNTEgMjI3IC01MSAzNDJjIDAgMTY1IDE5IDI1MyA1OSAyNjRjIDc1IC0xMDggMTg1IC0xNjIgMzMyIC0xNjJjIDExMCAwIDIwMSA1MiAyNzMgMTU2YyA2MCA4OSA5MSAxOTAgOTEgMzAyYyAwIDE1NCAtNDcgMjc4IC0xNDMgMzY5YyAtOTUgOTEgLTIxMyAxMzcgLTM1MyAxMzdjIC0xOTAgMCAtMzQxIC04OSAtNDUwIC0yNjdjIC0xMDkgLTE3OCAtMTY0IC0zODIgLTE2NCAtNjEyYyAwIC0yMDggNjQgLTM5OSAxOTQgLTU3MmMgMTI5IC0xNzIgMjc5IC0yNTkgNDQ4IC0yNTljIDE1OCAwIDI3MyA0OSAzNDUgMTQ3YyA1MCA2OSA3NSAxNDggNzUgMjM5YyAwIDU0IC0xOSAxMDMgLTU5IDE0N2MgLTM5IDQzIC03OSA2NSAtMTE4IDY1YyAtNjggMCAtMTIyIC0xNiAtMTYyIC00OGMgLTM5IC0zMiAtNTkgLTg2IC01OSAtMTYyYyAwIC02OCAyMSAtMTIxIDY0IC0xNTlDIDc5NSAzMzAgODM1IDMwOSA4NzEgMzA1ek0gODQ5IDEzOTFjIDAgLTEyOSAtOSAtMjIxIC0yNyAtMjc1YyAtMzIgLTkzIC05MSAtMTQwIC0xNzggLTE0MGMgLTgyIDAgLTEzNyAzOCAtMTY0IDExNmMgLTI3IDc3IC00MCAxNzcgLTQwIDI5OWMgMCAxMDggMTQgMTk5IDQzIDI3NWMgMjggNzUgODIgMTEzIDE2MiAxMTNjIDcyIDAgMTI0IC0zOSAxNTYgLTExOEMgODMzIDE1ODIgODQ5IDE0OTIgODQ5IDEzOTEiIC8%CiAgICA8cGF0aCBpZD0iTnVtNyIgZD0iTSAzMTMgMTg1MGMgMTAgLTg2IDIzIC0xNzIgMzcgLTI1OWMgNDMgLTE3MiAxMTggLTMxMyAyMjYgLTQyMWMgMTIyIC0xMTggMjE3IC0yMjEgMjg2IC0zMDdjIDkwIC0xMTEgMTQyIC0yMDEgMTU2IC0yNzBsIDI3IC0xMjRjIC00NiAzMCAtOTYgNTYgLTE0OCA3OWMgLTUyIDIyIC0xMDMgMzQgLTE1MyAzNGMgLTkzIDAgLTIwNiAtNDAgLTM0MCAtMTIyYyAtNjQgLTQwIC0xMjAgLTYxIC0xNjcgLTYxYyAtNTcgMCAtOTggMTcgLTEyMSA1MWMgLTIzIDM0IC00MiA2NSAtNTYgOTRoIC02NHYgLTM1NmggNTRjIDcgMjEgMTYgNDQgMjcgNjdjIDEwIDIzIDMwIDM1IDU5IDM1YyAyNSAwIDYyIC0xNiAxMTMgLTQ4YyAxMDggLTcyIDE4NSAtMTA4IDIzMiAtMTA4YyA3NSAwIDE0OSAyNiAyMjEgNzhjIDcyIDUyIDE0MCA3OCAyMDUgNzhjIDQ2IDAgODIgLTIyIDEwOCAtNjdjIDEwIC0xOCAxOSAtNDggMjcgLTg5aCA3MHYgMzQwYyAwIDEwNyAtMTcgMjA2IC01MiAyOTVjIC0xMCAyNSAtODcgMTU5IC0yMzEgNDAzYyAtMzUgNjQgLTYwIDE0MiAtNzYgMjM0YyAtMTUgOTEgLTIzIDE3OCAtMjMgMjYwYyAwIDExNCAwIDE3NSAwIDE4MkggMzEzIiAvPgogICAgPHBhdGggaWQ9Ik51bTgiIGQ9Ik0gNzk1IDkwNWMgNTcgMTggMTI2IDc3IDIwNSAxNzhjIDY0IDc5IDk3IDE1MSA5NyAyMTZjIDAgMTgzIC01NyAzMjQgLTE3MiA0MjFjIC05NyA4MiAtMjE0IDEyNCAtMzUxIDEyNGMgLTE1MSAwIC0yNzYgLTQ5IC0zNzUgLTE0OGMgLTk5IC05OSAtMTQ4IC0yMzEgLTE0OCAtMzk2YyAwIC02OCAzNCAtMTM4IDEwMiAtMjEwYyA1MCAtNTQgMTA2IC05MyAxNjcgLTExOGMgLTcyIC0zOSAtMTI3IC05NCAtMTY3IC0xNjRjIC0zOSAtNzAgLTU5IC0xNDQgLTU5IC0yMjRjIDAgLTEzNiA0OCAtMjQ0IDE0NSAtMzI0YyA5NyAtNzkgMjA4IC0xMTggMzM0IC0xMThjIDEzMyAwIDI0NSA0MCAzMzcgMTIxcyAxMzcgMTk1IDEzNyAzNDJjIDAgNTcgLTMyIDEyMCAtOTcgMTg5QyA5MDEgODQ1IDg0OSA4ODMgNzk1IDkwNXpNIDM4OSAxMDQwYyAtNTcgMjggLTEwMiA2MSAtMTM1IDk3YyAtNDYgNTQgLTcwIDExOCAtNzAgMTk0YyAwIDEwOCAzNSAyMDQgMTA2IDI4OGMgNzEgODQgMTY1IDEyNiAyODIgMTI2YyAxMDYgMCAxODUgLTI0IDIzOCAtNzJzIDc5IC0xMDMgNzkgLTE2NGMgMCAtMzkgLTI2IC04OCAtODAgLTE0NWMgLTUzIC01NyAtMTEyIC0xMDYgLTE3NiAtMTQ1YyAtNjQgLTM5IC0xMjQgLTgxIC0xNzkgLTEyNEMgNDM3IDEwNzkgNDE1IDEwNjEgMzg5IDEwNDB6TSA3MDggODM1YyA0NiAtMTggODkgLTUzIDEyNiAtMTA1YyAzNyAtNTIgNTYgLTEwNyA1NiAtMTY0YyAwIC0xMDAgLTI4IC0xODMgLTg2IC0yNDhjIC01NyAtNjQgLTEzNiAtOTcgLTIzNyAtOTdjIC03OSAwIC0xNDUgMjYgLTE5NyA3OGMgLTUyIDUyIC03OCAxMTIgLTc4IDE4MGMgMCAzNiAyNSA3NSA3NSAxMThjIDI1IDIxIDcyIDU0IDE0MyA5N2MgNzAgNDMgMTIxIDc3IDE1MyAxMDJDIDY3NiA4MDggNjkwIDgyMCA3MDggODM1IiAvPgogICAgPHBhdGggaWQ9Ik51bTkiIGQ9Ik0gMzMzIDE2ODJjIDMgMTAgOSAyMSAxNiAzMmMgNTcgNTAgMTE4IDc1IDE4MyA3NWMgMzIgMCA2MiAtNyA5MSAtMjFjIDY4IC0zNiAxMTcgLTEwNyAxNDggLTIxM2MgMzAgLTEwNiA0NSAtMjIyIDQ1IC0zNDhjIDAgLTE2OSAtMTggLTI1OSAtNTQgLTI3MGMgLTc1IDExMSAtMTg1IDE2NyAtMzI5IDE2N2MgLTExMSAwIC0yMDAgLTQ4IC0yNjcgLTE0NmMgLTY2IC05NyAtOTkgLTIwMiAtOTkgLTMxNWMgMCAtMTU1IDQ3IC0yNzkgMTQzIC0zNzJjIDk1IC05MiAyMTUgLTEzOCAzNTkgLTEzOGMgMTkwIDAgMzQzIDkzIDQ1OSAyODBjIDEwMCAxNjUgMTUxIDM2NSAxNTEgNTk5YyAwIDIwOCAtNjQgMzk5IC0xOTQgNTcycyAtMjc5IDI1OSAtNDQ4IDI1OWMgLTE1OCAwIC0yNzMgLTQ4IC0zNDUgLTE0NWMgLTUwIC02OCAtNzUgLTE0NyAtNzUgLTIzN2MgMCAtNTQgMTkgLTEwMiA1OSAtMTQ1YyAzOSAtNDMgODYgLTY0IDE0MCAtNjRjIDYxIDAgMTA5IDE2IDE0NSA0OGMgMzUgMzIgNTQgODYgNTQgMTYyYyAwIDY4IC0yNSAxMjQgLTc1IDE2N0MgNDA1IDE2NjEgMzY5IDE2NzkgMzMzIDE2ODJ6TSAzNTQgNTk0YyAwIDEzMCA4IDIyMiAyNyAyNzdjIDMyIDk0IDg5IDE0MSAxNzIgMTQxYyA4MiAwIDEzOCAtNDAgMTY3IC0xMjJjIDI4IC04MSA0MyAtMTgwIDQzIC0yOTZjIDAgLTExMiAtMTIgLTE5OSAtMzcgLTI2MWMgLTM2IC04NiAtOTMgLTEzMCAtMTcyIC0xMzBjIC03NSAwIC0xMjcgMzggLTE1NiAxMTRDIDM2OSAzOTMgMzU0IDQ4NiAzNTQgNTk0IiAvPgogICAgPHBhdGggaWQ9IlJlc3RTaXh0ZWVudGgiIGQ9Ik0gNDk0IC0xMjc1YyA3NiAtMjcgMTQ5IC05MSAyMTggLTE5MWMgMjMgLTMxIDUxIC04MSA4NiAtMTUxbCAxNjEgLTY2N2MgLTczIDEyOCAtMTk4IDE5MiAtMzc0IDE5MmMgLTMwIDAgLTYxIDAgLTkyIDBjIC0zNCAtMTEgLTU3IC0xOSAtNjkgLTIzYyAtNjkgLTE5IC0xMjUgLTUyIC0xNjcgLTk4YyAtNDIgLTQ2IC02MyAtMTA2IC02MyAtMTc5YyAwIC02OSAyMyAtMTI3IDY5IC0xNzRzIDEwNiAtNjkgMTc5IC02OWMgNjUgMCAxMjIgMjQgMTcwIDcyYyA0OCA0OCA3MiAxMDMgNzIgMTY1YyAwIDMxIC03IDYzIC0yMyA5OHMgLTQ0IDY1IC04NiA5MmMgMTkgNyA0MCAxNSA2MyAyM2MgMTUgMCAzOCAtNSA2OSAtMTdjIDczIC0yMyAxNDAgLTc5IDIwMiAtMTY3YyA2MSAtODggMTIxIC0xNzcgMTc5IC0yNjdoIDQwbCAtNjAyIDI1ODZsIC0xMDYgMGwgMzE4IC0xMzE2YyAtNzMgMTI4IC0xOTYgMTkyIC0zNjkgMTkyYyAtMTkgMCAtMzggMCAtNTcgMGMgLTI3IC0zIC02OCAtMTMgLTEyNCAtMjhjIC01NSAtMTUgLTEwNCAtNDYgLTE0NyAtOTJjIC00MiAtNDYgLTYzIC0xMDYgLTYzIC0xNzljIDAgLTY1IDIzIC0xMjEgNjkgLTE2OGMgNDYgLTQ2IDEwNiAtNjkgMTc5IC02OWMgNjUgMCAxMjIgMjQgMTcwIDcyYyA0OCA0OCA3MiAxMDMgNzIgMTY1YyAwIDMwIC03IDYzIC0yMyA5OGMgLTE1IDM0IC00NCA2MyAtODYgODdjIDQ1IDE1IDcyIDIzIDgwIDIzQyA0NjUgLTEyNjkgNDgyIC0xMjcxIDQ5NCAtMTI3NSIgLz4KICAgIDxwYXRoIGlkPSJSZXN0RWlnaHRoIiBkPSJNIDI0NyAtMTcyNWMgNjUgMCAxMjMgMjUgMTczIDc1YyA1MCA1MCA3NSAxMDQgNzUgMTYyYyAwIDI3IC05IDYwIC0yOCA5OGMgLTE5IDM4IC00OCA2OSAtODYgOTJjIDIzIDcgNDYgMTUgNjkgMjNjIDE1IDAgMzggLTUgNjkgLTE3YyA4OCAtMzEgMTc1IC0xMTMgMjYwIC0yNDZjIDM4IC02MiA3NyAtMTI1IDExNSAtMTg4aCA0MGwgLTM4MiAxNjcwbCAtMTEyIDBsIDMzMSAtMTMxNmMgLTczIDEyOCAtMTk4IDE5MSAtMzc1IDE5MWMgLTE5IDAgLTM4IDAgLTU3IDBjIC0yNyAtMyAtNjkgLTEzIC0xMjcgLTI4YyAtNTcgLTE1IC0xMDYgLTQ2IC0xNDcgLTkyYyAtNDAgLTQ2IC02MCAtMTA2IC02MCAtMTc5YyAwIC02OSAyMyAtMTI3IDY5IC0xNzRTIDE3OCAtMTcyNSAyNDcgLTE3MjUiIC8%CiAgICA8cGF0aCBpZD0iUmVzdFdob2xlIiBkPSJNIDEwNDYgNDQ1SCAtMjV2IC00NThoIDEwNzFWIDQ0NSIgLz4KICAgIDxwYXRoIGlkPSJOb3RlV2hvbGUiIGQ9Ik0gMCA0MzdjIDAgLTEwOSA0MCAtMTk3IDEyMSAtMjY1cyAxNzcgLTExNSAyOTAgLTE0M3MgMjE2IC00MSAzMTIgLTQxYyAxMDQgMCAyMTMgMTMgMzI4IDQxcyAyMTQgNzQgMjk4IDE0MXMgMTI4IDE1NiAxMzMgMjY2YyAwIDExMCAtNDAgMTk5IC0xMjEgMjY4cyAtMTc3IDExNyAtMjkwIDE0NXMgLTIxOSA0MyAtMzE5IDQzYyAtMTA3IDAgLTIxOCAtMTMgLTMzMiAtNDFzIC0yMTEgLTc1IC0yOTMgLTE0NFMgMiA1NTAgMCA0Mzd6TSA0NTAgMzYxYyA3IDEzMyA0NiAyNDMgMTE4IDMzMHMgMTU4IDEzMCAyNTkgMTMwYyA3NyAtOCAxMzEgLTM0IDE2MSAtNzdzIDQ0IC0xMTcgNDQgLTIyNGMgLTEwIC0xMzcgLTUxIC0yNDggLTEyMyAtMzMzcyAtMTU5IC0xMjcgLTI2MiAtMTI3YyAtNzIgMTEgLTEyMyAzNyAtMTUyIDc4UyA0NTAgMjUzIDQ1MCAzNjEiIC8%CiAgICA8cGF0aCBpZD0iTm90ZVF1YXJ0ZXIiIGQ9Ik0gNjU4IDgwMGMgLTEwOCA2NSAtMjE2IDk4IC0zMjQgOThjIC0xMTkgMCAtMjE2IC00MiAtMjg5IC0xMjdjIC01NCAtNTcgLTgxIC0xMjkgLTgxIC0yMTRjIDAgLTkyIDI5IC0xODMgODkgLTI3MmMgNTkgLTg4IDEzNiAtMTU4IDIyOCAtMjA4YyAxMTEgLTY5IDIyMyAtMTA0IDMzNSAtMTA0YyAxMDggMCAyMDAgMzYgMjc4IDExMGMgNTcgNTcgODYgMTMxIDg2IDIyMGMgMCA5MiAtMzEgMTg1IC05MiAyNzhDIDgyNyA2NzMgNzUwIDc0NiA2NTggODAwIiAvPgogICAgPHBhdGggaWQ9Ik5vdGVIYWxmIiBkPSJNIDY2OSA4MThjIC0xMDggNjUgLTIxNiA5OCAtMzI0IDk4YyAtMTE5IDAgLTIxNiAtNDIgLTI5MCAtMTI3YyAtNTQgLTU3IC04MSAtMTI5IC04MSAtMjE0YyAwIC05MiAyOSAtMTgzIDg5IC0yNzJjIDU5IC04OCAxMzYgLTE1OCAyMjkgLTIwOGMgMTEyIC02OSAyMjQgLTEwNCAzMzYgLTEwNGMgMTA4IDAgMjAwIDM2IDI3OCAxMTBjIDU3IDU3IDg3IDEzMSA4NyAyMjBjIDAgOTIgLTMxIDE4NSAtOTIgMjc4QyA4MzkgNjkxIDc2MiA3NjQgNjY5IDgxOHpNIDk1IDc1NGMgMTkgMjMgNTcgMzQgMTE1IDM0YyA2NSAwIDEzMiAtMTMgMjAwIC00MGMgNjcgLTI3IDEzNCAtNjQgMjAwIC0xMTNjIDY1IC00OCAxMjcgLTExOCAxODUgLTIwOHMgODcgLTE2OSA4NyAtMjM0YyAwIC0yMyAtNSAtNDQgLTE3IC02M2MgLTExIC0xNSAtMzQgLTIzIC02OSAtMjNjIC00NiAwIC0xMTMgMTggLTIwMCA1NWMgLTg3IDM2IC0xNjQgNzcgLTIzMSAxMjFjIC02NyA0NCAtMTMzIDExMCAtMTk3IDE5N3MgLTk1IDE1OSAtOTUgMjE3QyA3MiA3MjAgNzkgNzM5IDk1IDc1NCIgLz4KICAgIDxwYXRoIGlkPSJOb3RlRGVhZCIgZD0iTSA0ODIgMzQ1YyA0MiAtMTUgNzAgLTM4IDg0IC02OWMgMTMgLTMwIDIwIC0xMDIgMjAgLTIxNGMgMCAtMzAgMCAtNTAgMCAtNTdjIDAgLTMgMCAtNyAwIC0xMWggMzA3diAzMTNjIC0zMSAwIC01NCAwIC02OSAwYyAtMzggMCAtNzcgMSAtMTE1IDJjIC0zOCAyIC03MiA4IC0xMDEgMjBjIC0yOCAxMSAtNTEgMzggLTY2IDgxdiA4MWMgMTUgNDIgMzggNzAgNjkgODRjIDMwIDEzIDEwMiAyMCAyMTQgMjBjIDMwIDAgNTAgMCA1NyAwYyAzIDAgNyAwIDExIDB2IDMxM2ggLTMwN2MgMCAtMzEgMCAtNTQgMCAtNjljIDAgLTM4IC0xIC03NyAtMiAtMTE1YyAtMiAtMzggLTggLTcyIC0yMCAtMTAxYyAtMTEgLTI4IC0zOCAtNTEgLTgxIC02NmggLTEwNGMgLTQyIDE1IC03MCAzOCAtODQgNjljIC0xMyAzMCAtMjAgMTAyIC0yMCAyMTRjIDAgMzAgMCA1MCAwIDU3YyAwIDMgMCA3IDAgMTFoIC0zMDdWIDU5NWMgMzAgMCA1NCAwIDY5IDBjIDM4IDAgNzcgLTEgMTE1IC0yYyAzOCAtMiA3MiAtOCAxMDEgLTIwYyAyOCAtMTEgNTEgLTM4IDY2IC04MXYgLTgxYyAtMTUgLTQyIC0zOCAtNzAgLTY5IC04NGMgLTMxIC0xMyAtMTAyIC0yMCAtMjE0IC0yMGMgLTMxIDAgLTUwIDAgLTU3IDBjIC0zIDAgLTcgMCAtMTEgMHYgLTMxM2ggMzA3YyAwIDMxIDAgNTQgMCA2OWMgMCAzOCAwIDc3IDIgMTE1YyAxIDM4IDggNzIgMjAgMTAxYyAxMSAyOCAzOCA1MSA4MSA2NkggNDgyIiAvPgogICAgPHBhdGggaWQ9Ik5vdGVIYXJtb25pYyIgZD0iTSAxMTYgNDUzbCA0NTIgLTQ1MmMgMTA4IDEzMSAxOTcgMjIwIDI2NiAyNjZsIDI2MSAyMDJsIC00NDYgNDUyYyAtMzggLTQ2IC04MSAtOTAgLTEyNyAtMTMzYyAtNDYgLTQyIC05MCAtODUgLTEzMyAtMTI3YyAtNDIgLTQyIC05OCAtODkgLTE2OCAtMTM5QyAxODIgNDk2IDE0NyA0NzIgMTE2IDQ1MyIgLz4KICAgIDxwYXRoIGlkPSJOb3RlUmlkZUN5bWJhbCIgZD0iTSA5MTAsNDE3IEMgNzYzLDU2MSA2MTYsNjk1IDQ2OSw4NDAgMzg0LDY5MSAyNjEsNTc2IDEyNiw0NzMgNzksNDM4IDI5LDQwNyAtMjMsMzgyIDEyMiwyMzkgMjY3LDk2IDQxMiwtNDYgNTAyLDkyIDYyOCwyMDMgNzU0LDMxMCA4MDMsMzUwIDg1MywzODggOTEwLDQxNyB6IE0gNDY1LDY5NiBDIDU2MSw2MDIgNjU3LDUwOCA3NTMsNDE0IDY1NSwzNTIgNTc0LDI2OCA0OTIsMTg4IDQ2NCwxNTkgNDM4LDEyOCA0MTUsOTQgMzIwLDE5MSAyMjYsMjg4IDEzMSwzODQgYyAxMTMsNTUgMjAzLDE0NyAyODUsMjQxIDE3LDIyIDMzLDQ1IDQ4LDcwIHoiIC8%CiAgICA8cGF0aCBpZD0iTm90ZUhpSGF0IiBkPSJNIDQ4NCA2YyAtMjAxIC0yIC0zOTUgMTI2IC00NzEgMzEyIC03OSAxODIgLTM4IDQwOSAxMDEgNTUyIDEzNCAxNDQgMzU1IDE5NyA1NDAgMTI5IDE5MSAtNjUgMzMzIC0yNTMgMzQxIC00NTYgMTIgLTE5OSAtMTA0IC0zOTggLTI4MyAtNDg1IC03MCAtMzUgLTE0OCAtNTMgLTIyNyAtNTN6bSAwIDEwMWMgOTAgMCAxNzkgMzIgMjUwIDg4IC04MyA4MCAtMTY4IDE1OCAtMjUwIDI0MCAtODIgLTgyIC0xNjUgLTE2NSAtMjQ3IC0yNDcgNzAgLTUyIDE1OSAtODEgMjQ3IC04MXptIC0zMjIgMTU1YyA4MyA4MyAxNjcgMTY3IDI1MCAyNTAgLTg1IDg0IC0xNzIgMTY2IC0yNTcgMjUwIC0xMDAgLTEyNyAtMTEzIC0zMTUgLTI2IC00NTMgMTAgLTE2IDIxIC0zMyAzMyAtNDh6bSA2NDcgNmMgOTcgMTI0IDExMiAzMDYgMzMgNDQ0IC0xNCAyMyAtMzAgNjcgLTUyIDI0IC03NSAtNzUgLTE1MiAtMTQ5IC0yMjggLTIyNSA4MSAtODIgMTY1IC0xNjIgMjQ3IC0yNDR6bSAtMzI1IDMyMmMgODMgODMgMTcwIDE2NCAyNTQgMjQ3IC0xMjEgMTAxIC0zMDMgMTIxIC00NDIgNDQgLTIyIC0xNiAtODYgLTM1IC00MiAtNjEgNzYgLTc2IDE1MyAtMTUzIDIzMCAtMjMweiIgLz4KICAgIDxwYXRoIGlkPSJOb3RlU2lkZVN0aWNrIiBkPSJNIDAgMGMgLTI1IDI0IC01MSA0OCAtNzcgNzIgMTUxIDE1MSAzMDIgMzAyIDQ1NCA0NTQgLTE0NCAxNDIgLTI4OCAyODUgLTQzMyA0MjcgMjUgMjUgNTEgNTEgNzcgNzcgMTQyIC0xNDIgMjg1IC0yODUgNDI3IC00MjcgMTQ0IDE0MiAyODggMjg1IDQzMyA0MjcgMjUgLTI1IDUxIC01MSA3NyAtNzcgLTE0NCAtMTQyIC0yODggLTI4NSAtNDMzIC00MjcgMTUxIC0xNTEgMzAyIC0zMDIgNDU0IC00NTQgLTI1IC0yNCAtNTEgLTQ4IC03NyAtNzIgLTE1MSAxNDkgLTMwMiAyOTkgLTQ1NCA0NDkgLTE0OSAtMTQ5IC0yOTkgLTI5OSAtNDQ5IC00NDkiIC8%CiAgICA8cGF0aCBpZD0iTm90ZUhpSGF0SGFsZiIgZD0iTSA0NDkgMjJjIDE4NSAtMiAzNjQgMTE2IDQzNCAyODggNzMgMTY4IDM1IDM3NyAtOTMgNTA4IC0xMjMgMTMzIC0zMjcgMTgyIC00OTggMTE5IC0xNzYgLTYwIC0zMDcgLTIzMyAtMzE0IC00MjAgLTExIC0xODMgOTYgLTM2NiAyNjEgLTQ0NyA2NCAtMzIgMTM3IC00OSAyMDkgLTQ5em0gMCA5M2MgLTgyIDAgLTE2MyAzMCAtMjI4IDgxIDE3NyAxNzYgMzU0IDM1MiA1MzEgNTI4IDk5IC0xMjcgMTA0IC0zMTkgNyAtNDUwIC03MCAtOTggLTE4OSAtMTU5IC0zMTAgLTE1OHptIC0yOTYgMTUzYyAtNzUgOTMgLTEwMiAyMjMgLTY0IDMzOCA0NiAxNjAgMjA5IDI3OCAzNzcgMjY3IDc3IC0yIDE1MyAtMzAgMjE1IC03NyAtMTc2IC0xNzYgLTM1MiAtMzUyIC01MjggLTUyOHoiIC8%CiAgICA8cGF0aCBpZD0iTm90ZUNoaW5lc2VDeW1iYWwiIGQ9Ik0gNTAzIC00NTBsIDU3NyA1NzlsIC02NCA2NmwgLTUxNiAtNTE0bCAtNTEyIDUxMmwgLTY4IC02NEwgNTAzIC00NTB6TSA0OTkgNjAxbCAzMTYgMzE0bCAxNDUgLTE0M2wgLTMxNCAtMzE2bCAzMTYgLTMxMmwgLTE0MSAtMTQxbCAtMzE3IDMxOWwgLTMxNyAtMzIzbCAtMTM2IDEzNmwgMzE5IDMxOWwgLTMyNiAzMjZsIDE0MCAxNDBMIDQ5OSA2MDEiIC8%CiAgICA8cGF0aCBpZD0iRm9vdGVyRWlnaHRoIiBkPSJNIDkgMTAzMlYgLTloIDg3YyAyMCAxMzcgNDggMjUyIDgzIDM0NXMgNzUgMTcyIDEyMiAyMzhzIDExNiAxNTEgMjA5IDI1NXMgMTY4IDE5MyAyMjUgMjY1YyAxNzIgMjIxIDI1OSA0NTMgMjU5IDY5NWMgMCAyNDggLTEwNSA1NTAgLTMxNyA5MDdoIC01N2MgMjcgLTYyIDU4IC0xMzQgOTQgLTIxNnMgNjUgLTE1NiA5MCAtMjIzcyA0MyAtMTMzIDU3IC0xOTlzIDIxIC0xMzEgMjEgLTE5NmMgMCAtMTAyIC0yMCAtMjA0IC02MiAtMzA4cyAtOTkgLTE5OSAtMTc0IC0yODdzIC0xNTkgLTE1OSAtMjU0IC0yMTNzIC0xOTQgLTg0IC0yOTYgLTkwdiA2OEggOSIgLz4KICAgIDxwYXRoIGlkPSJGb290ZXJTaXh0ZWVudGgiIGQ9Ik0gOTQzIDE5MTJjIDYyIDEzNSA5NCAyODAgOTQgNDM1YyAwIDIwMiAtNjEgNDA0IC0xODMgNjA1aCAtNTdjIDEwOCAtMjMzIDE2MiAtNDMwIDE2MiAtNTkwYyAwIC0xMTcgLTI2IC0yMjAgLTc4IC0zMDljIC01MiAtODkgLTExOCAtMTY2IC0xOTggLTIzMGMgLTgwIC02NCAtMTg3IC0xMzcgLTMyMiAtMjIwcyAtMjIwIC0xMzYgLTI1NyAtMTYxdiA3MmggLTg2ViA4aCA4NmMgNiAxMDggMjggMjAwIDY1IDI3NnMgNzQgMTMzIDExMSAxNzBzIDEwOSAxMDYgMjE4IDIwNnMgMTkwIDE4NCAyNDUgMjUyYyA4NyAxMDkgMTUxIDIxNiAxOTEgMzE5cyA2MCAyMTIgNjAgMzI4QyA5OTQgMTY0OCA5NzcgMTc2NCA5NDMgMTkxMnpNIDg5NyAxODE1YyAwIC0xNyAwIC00MSAxIC03MnMgMSAtNTMgMSAtNjhjIDAgLTM2OSAtMjY2IC03MDEgLTc5OCAtOTk2YyAzIDEyMCAzMSAyMjkgODMgMzI3cyAxMzAgMTk5IDIzMyAzMDNzIDE5NSAxOTUgMjc2IDI3M0MgNzc2IDE2NTkgODQzIDE3MzcgODk3IDE4MTUiIC8%CiAgICA8cGF0aCBpZD0iRm9vdGVyVGhpcnR5U2Vjb25kIiBkPSJNIDE0IDE5OTBWIDEwaCA4N2MgMTEgMTIxIDM1IDIxNiA3MCAyODNjIDM1IDY2IDg5IDEzNCAxNjEgMjAyYyA3MiA2OCAxNzQgMTY0IDMwNyAyODhjIDIzNSAyMjYgMzUzIDQ5NCAzNTMgODAyYyAwIDEwNiAtMTQgMjExIC00MyAzMTdjIDI5IDkwIDQzIDE4NiA0MyAyODdjIDAgNzkgLTEyIDE3MSAtMzYgMjc0YyA1NyA3MyA4NiAxOTEgODYgMzUyYyAwIDExMiAtMTUgMjI2IC00NiAzNDJzIC03NiAyMTggLTEzNyAzMDhoIC01N2MgMTA4IC0yMjMgMTYyIC00MTggMTYyIC01ODJjIDAgLTEwNCAtMjAgLTE5OSAtNjIgLTI4NHMgLTk5IC0xNjMgLTE3MiAtMjMyYyAtNzMgLTY5IC0xNTMgLTEzMyAtMjM5IC0xOTJzIC0yMTUgLTE0MiAtMzg5IC0yNTF2IDY0SCAxNHpNIDEwOCAxMjkyYyA3IDExMyAzOSAyMTUgOTYgMzA1YyA1NiA4OSAxMjkgMTc2IDIxOCAyNTlzIDE3OSAxNjggMjczIDI1N2MgOTMgODggMTYwIDE2OCAxOTkgMjQwYyAyIC0xOSAzIC00OCAzIC04N0MgOTAwIDE5MDQgNjM2IDE1NzkgMTA4IDEyOTJ6TSAxMTUgNjY2YyAwIDEwNiAyMyAxOTcgNzEgMjcycyAxMjkgMTY2IDI0NyAyNzRzIDIwOSAxOTcgMjc2IDI2OHMgMTI5IDE2OCAxODcgMjg4YyA3IC00MiAxMCAtODMgMTAgLTEyMmMgMCAtMTQ2IC00MCAtMjgwIC0xMjAgLTQwMWMgLTgwIC0xMjEgLTE3MSAtMjIxIC0yNzMgLTMwMEMgNDExIDg2NyAyNzggNzc0IDExNSA2NjYiIC8%CiAgICA8cGF0aCBpZD0iRm9vdGVyU2l4dHlGb3VydGgiIGQ9Ik0gMjEgMjg1MVYgNTY0diAtNTU0aCA4NmMgMCAxNDAgMzIgMjU0IDk4IDM0MmMgNjUgODcgMTczIDIwMCAzMjIgMzM5cyAyNjEgMjcxIDMzNiA0MDBzIDExMyAyOTIgMTEzIDQ5MGMgMCA5NiAtMTIgMjA4IC0zNiAzMzhjIDQzIDgzIDY1IDE4OCA2NSAzMTZjIDAgMTIyIC0yMSAyMzcgLTY1IDM0NWMgNDggMTA5IDcyIDIyMyA3MiAzNDJjIDAgMTE3IC0yNCAyMjIgLTcyIDMxNmMgNTcgODUgODYgMjA1IDg2IDM2MGMgMCAyMTggLTUzIDQ0MyAtMTYxIDY3M2ggLTY1YyA5OCAtMjgwIDE0NyAtNDk4IDE0NyAtNjUyYyAwIC0xMTUgLTIyIC0yMTAgLTY1IC0yODRzIC05MyAtMTMwIC0xNDkgLTE3MGMgLTU2IC0zOSAtMTUzIC0xMDAgLTI5MSAtMTgzcyAtMjQ3IC0xNTYgLTMyNyAtMjIxbCAwIDg3TCAyMSAyODUxek0gMTA3IDIwMDFjIDAgMTIxIDI5IDIzMyA4OSAzMzZzIDEzOCAyMDMgMjM2IDMwMXMgMTkyIDE5MCAyODAgMjc4YyA4OCA4NyAxNDkgMTY2IDE4MSAyMzVjIDExIC02MCAxNyAtMTEyIDE3IC0xNTVjIDAgLTIxMiAtODEgLTQwNSAtMjQ0IC01NzhDIDUwNSAyMjQ2IDMxOCAyMTA2IDEwNyAyMDAxek0gMTE0IDY2OGMgMCAxMTkgMjIgMjE5IDY4IDMwMHMgMTI3IDE3NiAyNDUgMjg2YyAxMTggMTA5IDIwOCAxOTggMjcyIDI2NWMgNjMgNjYgMTI4IDE2MyAxOTUgMjkwYyA3IC00NiAxMCAtOTAgMTAgLTEzM2MgMCAtMTY2IC00MSAtMzEzIC0xMjQgLTQzOXMgLTE3NyAtMjI5IC0yODEgLTMwOEMgMzk1IDg0OCAyNjcgNzYyIDExNCA2Njh6TSAxMTQgMTMzOGMgMCAxMjMgMjQgMjI2IDczIDMwOXMgMTMzIDE3NiAyNTIgMjgycyAyMTEgMTkzIDI3OCAyNjNzIDEyOCAxNjQgMTgzIDI4M2MgOSAtNDUgMTQgLTk0IDE0IC0xNDdjIDAgLTEzOCAtMzkgLTI3MCAtMTE2IC0zOTVzIC0xNzcgLTIzNiAtMjk3IC0zMzRTIDI1MiAxNDEzIDExNCAxMzM4IiAvPgogICAgPHBhdGggaWQ9IlNpbWlsZU1hcmsiIGQ9Ik0gNDEzIDE4MDRsIC00NDYgM2wgMTgwNCAtMTgwNmwgNDQ5IC0zTCA0MTMgMTgwNHpNIDMzMSA0MzRjIDAgLTUzIDIwIC0xMDAgNjIgLTE0MmMgNDEgLTQxIDkxIC02MiAxNDggLTYycyAxMDQgMTkgMTQyIDU2YyAzOCAzOCA1NiA4NyA1NiAxNDhjIDAgNTYgLTE5IDEwNSAtNTkgMTQ1YyAtMzkgMzkgLTg4IDU5IC0xNDUgNTljIC01NiAwIC0xMDUgLTE5IC0xNDUgLTU5QyAzNTEgNTQwIDMzMSA0OTEgMzMxIDQzNHpNIDE0MzcgMTM4MGMgMCAtNTYgMTggLTEwNCA1NiAtMTQyYyAzNyAtMzcgODcgLTU2IDE0OCAtNTZjIDU2IDAgMTA0IDE5IDE0MiA1NmMgMzggMzggNTYgODUgNTYgMTQyYyAwIDU2IC0xOSAxMDQgLTU2IDE0MmMgLTM4IDM4IC04NyA1NiAtMTQ4IDU2YyAtNTYgMCAtMTA0IC0xOSAtMTQyIC01NkMgMTQ1NiAxNDg1IDE0MzcgMTQzNyAxNDM3IDEzODAiIC8%CiAgICA8cGF0aCBpZD0iU2ltaWxlTWFyazIiIGQ9Ik0gNDE0IDE4MThsIC00NDYgM2wgMTgwOSAtMTgwOWwgNDQ5IC02TCA0MTQgMTgxOHpNIDM0MCA0MzljIDAgLTU2IDE4IC0xMDQgNTYgLTE0MmMgMzcgLTM3IDg3IC01NiAxNDggLTU2YyA1NiAwIDEwNSAyMCAxNDUgNTljIDM5IDM5IDU5IDg4IDU5IDE0NWMgMCA1NiAtMTkgMTA0IC01NiAxNDJjIC0zOCAzOCAtODkgNTYgLTE1MyA1NmMgLTU2IDAgLTEwNCAtMTggLTE0MiAtNTZDIDM1OSA1NDkgMzQwIDUwMCAzNDAgNDM5ek0gMTE1MiAxODE1bCAtNDQ2IDNsIDE4MTIgLTE4MTJsIDQ0NiAtM0wgMTE1MiAxODE1ek0gMjE5MiAxMzkxYyAwIC01NiAxOCAtMTA0IDU2IC0xNDJjIDM4IC0zNyA4NyAtNTYgMTQ4IC01NmMgNTYgMCAxMDQgMTkgMTQyIDU2YyAzNyAzOCA1NiA4NSA1NiAxNDJjIDAgNTYgLTE5IDEwNCAtNTYgMTQyYyAtMzggMzggLTg3IDU2IC0xNDggNTZjIC01NiAwIC0xMDQgLTE5IC0xNDIgLTU2QyAyMjExIDE0OTUgMjE5MiAxNDQ4IDIxOTIgMTM5MSIgLz4KICAgIDxwYXRoIGlkPSJDb2RhIiBkPSJNIDY5NyAxNjg5diAyOTloIC03MnYgLTI5OWMgLTE4OSAwIC0zNDkgLTgxIC00NzggLTI0NGMgLTEyOSAtMTYzIC0xOTMgLTM0OSAtMTkzIC01NThoIC0yNDh2IC03M2ggMjQ4YyAwIC0yMTYgNjMgLTQwOSAxODkgLTU4MWMgMTI2IC0xNzEgMjg3IC0yNTcgNDgxIC0yNTd2IC0yNDhoIDcydiAyNDhjIDE4OSAwIDM0NSA4NCA0NjcgMjU0cyAxODIgMzY0IDE4MiA1ODVoIDI4NHYgNzNoIC0yODRjIDAgMjA5IC02MCAzOTUgLTE4MiA1NThDIDEwNDIgMTYwOCA4ODcgMTY4OSA2OTcgMTY4OXpNIDYyNCA4MTN2IC03MzdjIC0xMjYgMTQgLTIwOCA4OCAtMjQ0IDIyMmMgLTM2IDEzMyAtNTQgMzA1IC01NCA1MTRIIDYyNHpNIDMyNCA4ODZjIDAgMjYyIDI1IDQ0NSA3NiA1NDdzIDEyNSAxNTggMjIyIDE2N3YgLTcxNUggMzI0ek0gNjk3IDgxM2ggMjkyYyAwIC0yMjEgLTEyIC0zNzggLTM2IC00NzFjIC00MyAtMTY2IC0xMjkgLTI1NyAtMjU1IC0yNzJWIDgxM3pNIDk4OSA4ODZoIC0yOTJ2IDcxNWMgOTcgLTkgMTcwIC02NCAyMTkgLTE2NEMgOTY0IDEzMzggOTg5IDExNTQgOTg5IDg4NiIgLz4KICAgIDxwYXRoIGlkPSJTZWdubyIgZD0iTSA2MDQgMTE1MGMgLTE4MiAtMTEyIC0zMjQgLTIyMiAtNDI1IC0zMjljIC0xMjYgLTEzMSAtMTg5IC0yNTYgLTE4OSAtMzcyYyAwIC0xMTYgNDIgLTIxOCAxMjggLTMwNmMgODUgLTg3IDE5NCAtMTMxIDMyNyAtMTMxYyA5OCAwIDE5NiAzMiAyOTQgOTdjIDk4IDY0IDE0NyAxNDEgMTQ3IDIyOWMgMCA1NiAtOSAxMDQgLTI4IDE0MmMgLTE4IDM4IC01MCA1NiAtOTQgNTZjIC0xMDAgMCAtMTU1IC00NiAtMTY0IC0xMzdjIDAgLTE4IDggLTQ1IDI1IC04MGMgMTcgLTM0IDIxIC02MyAxMSAtODVjIC0yMiAtNjkgLTg2IC0xMDQgLTE5MiAtMTA0YyAtNjcgMCAtMTIzIDIwIC0xNjggNjFjIC00NCA0MCAtNjcgODQgLTY3IDEzMWMgMCAxMzUgNjQgMjQ4IDE5MyAzMzljIDI1IDE4IDE1NSA4OCAzOTIgMjA3bCA1NzEgLTg0M2wgMTQ4IDBsIC02MTEgOTAwYyAxOTYgMTIxIDMzNCAyMjMgNDE1IDMwNGMgMTE4IDExOCAxNzcgMjQ1IDE3NyAzNzljIDAgMTEyIC00MyAyMTQgLTEzMCAzMDRjIC04NiA5MCAtMTkzIDEzNiAtMzIwIDEzNmMgLTEwMiAwIC0yMDIgLTM0IC0zMDAgLTEwMmMgLTk3IC02OCAtMTQ2IC0xNTIgLTE0NiAtMjUxYyAwIC0zNyAxMyAtNzkgNDAgLTEyNWMgMjcgLTQ2IDU3IC02OSA5MyAtNjljIDQ3IDAgODIgMTIgMTA1IDM4YyAyMiAyNSAzOCA2NSA0NyAxMjBjIDYgMjIgMCA1MSAtMTYgODdjIC0xNyAzNiAtMjIgNjUgLTE2IDg3YyA5IDMxIDM1IDU2IDc4IDc1YyA0MiAxOCA5MSAyOCAxNDcgMjhjIDU4IDAgMTA1IC0yMSAxNDIgLTY1YyAzNiAtNDMgNTUgLTg5IDU1IC0xMzljIDAgLTEzOSAtODkgLTI2MyAtMjY5IC0zNzFjIC0xMzMgLTY4IC0yMzIgLTExNyAtMjk3IC0xNDhsIC01NDQgODEwbCAtMTUyIC0xTCA2MDQgMTE1MHpNIDIwMSAxMDkxYyAzNCAwIDY0IDExIDg5IDMycyAzNyA1MSAzNyA4OWMgMCAzNCAtMTIgNjQgLTM3IDg5YyAtMjUgMjUgLTU0IDM3IC04OSAzN2MgLTM0IDAgLTY0IC0xMiAtODkgLTM3YyAtMjUgLTI1IC0zNyAtNTQgLTM3IC04OUMgNzQgMTEzMSAxMTYgMTA5MSAyMDEgMTA5MXpNIDEyOTEgNjk2YyAzNCAwIDY0IDEyIDg5IDM3YyAyNSAyNSAzNyA1NCAzNyA4OWMgMCAzMSAtMTIgNTkgLTM3IDg0YyAtMjUgMjUgLTU0IDM3IC04OSAzN3MgLTYzIC0xMSAtODYgLTM1cyAtMzUgLTUyIC0zNSAtODdjIDAgLTM0IDEwIC02NCAzMiAtODlDIDEyMjQgNzA4IDEyNTMgNjk2IDEyOTEgNjk2IiAvPgogICAgPHBhdGggaWQ9Ik90dGF2YUFib3ZlIiBkPSJNIDQ4OCA1NjJjIDc4IDkgMTQ3IDQ1IDIwNiAxMTBjIDU5IDY0IDg4IDEzOCA4OCAyMjJjIDAgOTUgLTM5IDE3MSAtMTE4IDIyN2MgLTc4IDU1IC0xNzUgODMgLTI5MCA4M2MgLTExMiAwIC0yMDggLTI4IC0yODggLTg1YyAtODAgLTU2IC0xMjAgLTEzNCAtMTIwIC0yMzNjIDAgLTQxIDUgLTc3IDE1IC0xMDdjIDEwIC0yOSAyOSAtNjEgNTYgLTk0YyAyNyAtMzIgNzcgLTYyIDE0OSAtODljIDEyIC0zIDI4IC03IDQ5IC0xM2MgLTY5IC0xMiAtMTI3IC00OCAtMTcyIC0xMDdjIC00NSAtNTkgLTY4IC0xMjMgLTY4IC0xOTBjIDAgLTg4IDM3IC0xNjEgMTEzIC0yMTdzIDE1OCAtODQgMjQ5IC04NGMgOTYgMCAxODUgMjkgMjY1IDg3YyA4MCA1OCAxMjAgMTMxIDEyMCAyMjBjIDAgNzMgLTIyIDEzNCAtNjggMTgzYyAtMjQgMjQgLTYyIDQ3IC0xMTMgNjhDIDU0NyA1NDUgNTIxIDU1MyA0ODggNTYyek0gMjc5IDU4OGMgLTY2IDIxIC0xMTggNTcgLTE1NiAxMDhjIC0zNyA1MSAtNTYgMTEyIC01NiAxODFjIDAgNzIgMjcgMTQxIDgzIDIwNmMgNTYgNjUgMTMwIDk3IDIyNCA5N2MgOTAgMCAxNjYgLTM2IDIyNiAtMTA4YyA1MSAtNjAgNzcgLTEyNCA3NyAtMTkwYyAwIC01NCAtMjEgLTEwMSAtNjMgLTE0MGMgLTMwIC0yNyAtNjggLTQ5IC0xMTMgLTY4TCAyNzkgNTg4ek0gNDYwIDU0N2MgMTMwIC0zOSAxOTUgLTEyNyAxOTUgLTI2M2MgMCAtNjYgLTI1IC0xMjkgLTc3IC0xODhjIC01MSAtNTkgLTEyMiAtODggLTIxMyAtODhjIC04NyAwIC0xNTUgMjggLTIwMiA4NmMgLTQ3IDU3IC03MCAxMTkgLTcwIDE4NmMgMCAzNiAxNCA3MiA0MyAxMDhjIDI4IDM2IDY4IDYzIDEyMCA4MUwgNDYwIDU0N3pNIDg0MiAzMTFsIC0xMyAtOWwgNjggLTU4YyAyNCAtMjEgNTEgLTI4IDgxIC0yMmMgMjcgMyA0MCAyNCA0MCA2M2MgMCAzNiAtMTUgMTAwIC00NyAxOTJjIC0zMSA5MiAtNDcgMTQ5IC00NyAxNzBjIDAgMzMgMTMgNDYgNDAgNDBjIDQyIC0zIDk0IC00NyAxNTYgLTEzM2MgNjEgLTg2IDkzIC0xNTYgOTMgLTIxMWMgMCAtMTIgLTcgLTIyIC0yMiAtMzFjIC0xOCAtOSAtMjggLTE2IC0zMSAtMjJjIC0xNSAtMzAgLTcgLTQ5IDIyIC01OWMgMzAgLTEyIDUyIDkgNjggNjNjIDE4IDc1IC0xMiAxNjcgLTkzIDI3NGMgLTgwIDEwNyAtMTQ3IDE2MSAtMjAxIDE2MWMgLTU3IDAgLTg2IC0yNCAtODYgLTcyYyAwIC0xOCA0IC0zNyAxMyAtNTljIDkgLTIxIDIzIC02NSA0MyAtMTMzYyAxOSAtNjggMjkgLTEyMCAyOSAtMTU2YyAwIC0xNSAtMSAtMjUgLTQgLTMxYyAtOSAtMTggLTI0IC0xOSAtNDUgLTRMIDg0MiAzMTF6TSAxNjM2IDY4M2wgODEgLTY4bCAtNzIgODNjIC0xOCAxOSAtMzYgMjkgLTU0IDI5YyAtMTUgMCAtMjEgLTE1IC0xOCAtNDVsIDQwIC0xNjdjIC0zIDIxIC0yOCA1OSAtNzcgMTEzYyAtNTcgNjYgLTEwOSA5OSAtMTU0IDk5YyAtNjYgMCAtOTkgLTM5IC05OSAtMTE4YyAwIC03OCAyOCAtMTU5IDg2IC0yNDJjIDU3IC04MyAxMjIgLTEyNCAxOTUgLTEyNGMgMzkgMCA3NCAxNSAxMDQgNDVsIDkgLTQ1aCAzMWwgLTk1IDQwN2MgLTYgMTggLTcgMzAgLTQgMzZTIDE2MjEgNjkyIDE2MzYgNjgzek0gMTM4MiA2ODNjIDUxIDAgMTA3IC0zNyAxNjcgLTExMWMgMTggLTI0IDQzIC02MyA3NyAtMTE1bCAzMSAtMTM0YyAtMzMgLTM0IC02NiAtNTEgLTk5IC01MWMgLTU0IDAgLTEwNSA0MCAtMTUyIDEyMGMgLTQ2IDgwIC03MCAxNTQgLTcwIDIyMkMgMTMzNiA2NjAgMTM1MSA2ODMgMTM4MiA2ODMiIC8%CiAgICA8cGF0aCBpZD0iT3R0YXZhQmVsb3ciIGQ9Ik0gNDY5IDUyOWMgNzUgNiAxNDMgNDEgMjAyIDEwN2MgNTkgNjUgODggMTQxIDg4IDIyOWMgMCA5NyAtMzkgMTczIC0xMTggMjI5YyAtNzggNTYgLTE3NSA4NCAtMjkwIDg0YyAtMTEyIDAgLTIwOCAtMjggLTI4OCAtODZjIC04MCAtNTcgLTEyMCAtMTM2IC0xMjAgLTIzNmMgMCAtMzMgNiAtNjggMTggLTEwNGMgMTIgLTM2IDMxIC02OSA1NiAtOTdzIDY1IC01NSAxMjAgLTc5YyAxOCAtNiA0MyAtMTUgNzcgLTI3YyAtNjkgLTEyIC0xMjYgLTQ3IC0xNzAgLTEwNHMgLTY1IC0xMjEgLTY1IC0xOTFjIDAgLTg1IDM3IC0xNTYgMTEzIC0yMTRjIDc1IC01NyAxNTcgLTg2IDI0NSAtODZjIDkzIDAgMTgyIDI4IDI2NSA4NmMgODMgNTcgMTI0IDEzMCAxMjQgMjE4YyAwIDcyIC0yMiAxMzMgLTY4IDE4MmMgLTI0IDI0IC02MiA0NyAtMTEzIDY4QyA1MjggNTEyIDUwMiA1MjAgNDY5IDUyOXpNIDI1MSA1NjNjIC02NiAyMSAtMTE4IDU3IC0xNTQgMTA4YyAtMzYgNTEgLTU0IDExMiAtNTQgMTgxYyAwIDcyIDI3IDE0MSA4NCAyMDZjIDU1IDY1IDEzMCA5NyAyMjQgOTdjIDkzIDAgMTY5IC0zNiAyMjYgLTEwOGMgNDggLTYwIDcyIC0xMjQgNzIgLTE5MGMgMCAtNTEgLTIxIC05OCAtNjMgLTE0MGMgLTMwIC0zMCAtNjYgLTUyIC0xMDggLTY4TCAyNTEgNTYzek0gNDMyIDUyMmMgMTMwIC0zOSAxOTUgLTEyOCAxOTUgLTI2NWMgMCAtNjcgLTI1IC0xMzAgLTc3IC0xODljIC01MSAtNTkgLTEyMSAtODkgLTIwOCAtODljIC04NyAwIC0xNTUgMjkgLTIwMiA4OWMgLTQ3IDU5IC03MCAxMTkgLTcwIDE4MGMgMCAzNiAxMyA3NCA0MCAxMTJzIDY2IDY2IDExOCA4NEwgNDMyIDUyMnpNIDgyNyAyNjhoIC0xM2wgNjMgLTQ1YyAyNCAtMjcgNTIgLTM5IDg2IC0zNmMgMjQgMyAzNiAyMyAzNiA2MGMgMCAzNCAtMTUgOTggLTQ1IDE5MWMgLTMwIDkzIC00NSAxNTQgLTQ1IDE4MmMgMCAzNCAxMyA0OSA0MCA0NmMgNDIgLTMgOTQgLTQ5IDE1NiAtMTM4YyA2MSAtODkgOTMgLTE2MSA5MyAtMjE4YyAwIC0xMiAtMTAgLTI1IC0zMSAtMzdjIC0xNSAtNiAtMjIgLTEyIC0yMiAtMThjIC0xNSAtMzAgLTkgLTUwIDE4IC01OWMgMzMgLTEyIDU3IDkgNzIgNjRjIDE4IDc2IC0xMiAxNjggLTkzIDI3N2MgLTgwIDEwOCAtMTQ2IDE2MiAtMTk3IDE2MmMgLTYzIDAgLTk1IC0yOCAtOTUgLTg0YyAwIC04IDMgLTIyIDkgLTQwYyAxOCAtNDcgMzUgLTEwMiA1MiAtMTY0YyAxNiAtNjIgMjQgLTEwNSAyNCAtMTI5YyAwIC0xNyAtMyAtMjkgLTkgLTM1YyAtNiAtNiAtMTggLTQgLTM2IDRMIDgyNyAyNjh6TSAxNDEzIC0xM2wgLTcyIC05YyAyMyA2IDUzIDEgODkgLTE1YyAxMSAtMyAzMCAtMTUgNTMgLTM1bCAtMTMxIDQ0NGMgMzAgLTQ1IDY0IC04MSAxMDIgLTEwOGMgMzggLTI3IDc2IC00MCAxMTYgLTQwYyAzOSAwIDY4IDExIDg2IDM0YyAxOCAyMiAyNyA1NSAyNyA5OGMgMCA3OSAtMzAgMTU2IC05MCAyMzFjIC02MCA3NCAtMTM3IDExMiAtMjMxIDExMmMgLTMwIDAgLTU3IC04IC04MSAtMjRjIC0yNCAtMTYgLTMzIC0zNiAtMjcgLTYyTCAxNDEzIC0xM3pNIDEyOTQgNjM1YyAxNSAyMSA0MiAzMiA4MSAzMmMgNzggMCAxNDYgLTQyIDIwNCAtMTI4YyA0OCAtNzMgNzIgLTE0NSA3MiAtMjE1YyAwIC0zMCAtNyAtNTAgLTIyIC01OWMgLTE4IC05IC0zNiAtMTMgLTU0IC0xM2MgLTM2IDAgLTc3IDE3IC0xMjIgNTJjIC00NSAzNSAtODEgNzcgLTEwOCAxMjZMIDEyOTQgNjM1IiAvPgogICAgPHBhdGggaWQ9IlF1aW5kaWNlc2ltYUFib3ZlIiBkPSJNIDI0NSA5ODVWIDI3MHYgLTcyYyAtOSAtOCAtMzAgLTEzIC02MSAtMTNjIC0yNSAwIC00MiAxIC01MiA0bCAtOTkgMzFsIC00IC0yMmwgMzE3IC0xOTB2IDk4MGMgMCAzOSA2IDY4IDIwIDg4YyAxMyAxOSAzMSAzNCA1MiA0M2wgMTQ1IDQwdiA5aCAtNTMxbCAtNCAtMThsIDE0OSAtNDBjIDI0IC05IDQyIC0yNCA1NCAtNDVDIDI0MSAxMDUwIDI0NSAxMDI0IDI0NSA5ODV6TSA2ODUgMzM4YyA2MCAxNSAxMDUgMjcgMTM2IDM2YyA5NiAyNyAxNjcgNTMgMjEzIDc3YyAxNzUgODcgMjYzIDE5MiAyNjMgMzEzYyAwIDcyIC0xNSAxNDAgLTQ3IDIwNHMgLTcwIDExMSAtMTE1IDE0MmMgLTQ1IDMxIC04NyA1MyAtMTI0IDY1YyAtMzcgMTIgLTk0IDE4IC0xNzAgMThjIC02NiAwIC0xMjggLTEzIC0xODYgLTQwYyAtNTcgLTI3IC04NiAtNjMgLTg2IC0xMDhjIDAgLTI0IDE2IC0zNiA0OSAtMzZjIDE4IDAgNDEgNSA3MCAxNWMgMjggMTAgNjEgMzUgOTcgNzRjIDM2IDM5IDY5IDU5IDk5IDU5YyA5NiAwIDE3MCAtMzkgMjIyIC0xMThjIDQyIC02MyA2MyAtMTMxIDYzIC0yMDRjIDAgLTU3IC0xOCAtMTA4IC01NiAtMTUyYyAtMzcgLTQzIC03OSAtNzcgLTEyNCAtMTAyYyAtNDUgLTI0IC0xMjUgLTU0IC0yNDAgLTkwYyAtMzYgLTEyIC04NyAtMjcgLTE1NCAtNDVsIDE1NCAtNDI2aCA0MjZjIDM2IDAgNjUgLTQgODYgLTEzbCA0NSAtMzRsIDIyIC0yOWggOWwgLTEyNyAxOTVoIC00NDlMIDY4NSAzMzh6TSAxODA2IDU2MWggLTU5bCAxNDUgLTM2N2MgMCAtMTggMCAtMzAgMCAtMzZjIC02IC0yNyAtMjEgLTQyIC00NSAtNDVjIC0yNCAtMyAtNTEgMTMgLTgxIDUwYyAtMyA2IC05IDE2IC0xOCAzMWwgLTE0NSAzNjdoIC02OGwgMTU0IC0zNzljIC0zIC0xNSAtNCAtMjYgLTQgLTMyYyAtNiAtMjEgLTE4IC0zNCAtMzYgLTM3YyAtNDUgLTYgLTk4IDM0IC0xNTggMTIxYyAtOSAxMiAtMjEgMzQgLTM2IDY1aCAtMThjIDMwIC00NyA1NCAtODMgNzIgLTEwNmMgNTcgLTcxIDExMSAtMTA2IDE2MyAtMTA2YyAxOCAyIDM0IDE0IDUwIDM0YyAyIDUgOSAxNyAxOCAzNGMgOSAtMTcgMTYgLTI4IDIyIC0zNGMgMjQgLTIyIDYwIC0zNCAxMDggLTM0YyAxOCAwIDMzIDExIDQ1IDM0YyAyIDUgNyAxOCAxMyAzOGMgMTggLTIxIDMxIC0zNCA0MCAtNDBjIDM2IC0yNyA3NCAtMzcgMTEzIC0zMWMgMzAgNiA0OSAyNCA1OSA1NGMgMyA5IDYgMjUgOSA0OWwgLTEyMiAzMDRjIC0zIDE1IC00IDI1IC00IDMxYyAwIDkgNiAxMyAxOCAxM2MgMTggMCAzOSAtMTcgNjMgLTUyYyA2IC0xMSAxNiAtMjggMzEgLTUybCAxMyA0YyAtMTUgMjkgLTI3IDQ5IC0zNiA2MWMgLTMwIDQzIC01NiA2NSAtNzcgNjVjIC01MSAwIC03MSAtMjAgLTU5IC02MmwgMTIyIC0zMDZjIDAgLTE3IDAgLTI5IDAgLTM1YyAtNiAtMjMgLTIyIC0zNSAtNDkgLTM1cyAtNTEgMTAgLTcyIDMxYyAtNiA2IC0xNSAxOCAtMjcgMzZMIDE4MDYgNTYxek0gMjU1NSA1MjVsIDc3IC02M2wgLTcyIDczYyAtMTggMTcgLTM2IDI2IC01NCAyNmMgLTE1IDAgLTIxIC0xMiAtMTggLTM2bCA0MCAtMTU4YyAtNiAzMSAtNDMgNzggLTExMyAxMzhjIC00NSA0MCAtODQgNjAgLTExOCA2MGMgLTY2IDAgLTk5IC0zOCAtOTkgLTExNGMgMCAtNzkgMjggLTE1OCA4NiAtMjM1YyA1NyAtNzcgMTIyIC0xMTYgMTk1IC0xMTZjIDI0IDAgNDggNSA3MiAxNmMgNiAyIDE2IDkgMzEgMjBsIDkgLTM2aCAzMWwgLTk1IDM5NWMgLTYgMTggLTcgMzAgLTQgMzVDIDI1MjYgNTM1IDI1MzcgNTM0IDI1NTUgNTI1ek0gMjI5MiA1MjVjIDUxIDAgMTA4IC0zNSAxNzIgLTEwN2MgMjEgLTIzIDQ2IC02MSA3NyAtMTEybCAyNyAtMTM0YyAtMzAgLTI5IC02MyAtNDQgLTk5IC00NGMgLTU0IDAgLTEwNSAzOCAtMTUyIDExNmMgLTQ2IDc3IC03MCAxNDkgLTcwIDIxNUMgMjI0NiA1MDIgMjI2MiA1MjUgMjI5MiA1MjUiIC8%CiAgICA8cGF0aCBpZD0iUXVpbmRpY2VzaW1hQmVsb3ciIGQ9Ik0gMjQwMCAtMjAwQyAyMzc2IC0xODAgMjM1OCAtMTcwIDIzNDYgLTE2NkMgMjMxMCAtMTUwIDIyODAgLTE0NCAyMjU2IC0xNTBMIDIzMjggLTE0MUwgMjE2OCA0ODRDIDIxNjIgNTA5IDIxNzIgNTMwIDIxOTYgNTQ2QyAyMjIxIDU2MiAyMjQ3IDU3MSAyMjc4IDU3MUMgMjM3MSA1NzEgMjQ0OCA1MzQgMjUwOSA0NTlDIDI1NjkgMzg0IDI2MDAgMzA3IDI2MDAgMjI4QyAyNjAwIDE4NSAyNTkwIDE1MSAyNTcxIDEyOEMgMjU1MyAxMDUgMjUyNiA5MyAyNDg3IDkzQyAyNDQ4IDkzIDI0MDkgMTA3IDIzNzEgMTM0QyAyMzMzIDE2MSAyMjk5IDE5OCAyMjY4IDI0M0wgMjQwMCAtMjAwek0gMTMwMCAtNTdMIDEyNzggLTI5TCAxMjM0IDZDIDEyMTMgMTUgMTE4MyAyMSAxMTQ2IDIxTCA3MjEgMjFMIDU2NSA0NDZDIDYzMiA0NjQgNjg1IDQ4MSA3MjEgNDkzQyA4MzYgNTMwIDkxMyA1NjAgOTU5IDU4NEMgMTAwNCA2MDggMTA0NiA2NDAgMTA4NCA2ODRDIDExMjIgNzI4IDExNDMgNzgwIDExNDMgODM3QyAxMTQzIDkxMCAxMTIwIDk4MCAxMDc4IDEwNDNDIDEwMjYgMTEyMiA5NTMgMTE1OSA4NTYgMTE1OUMgODI1IDExNTkgNzkyIDExMzkgNzU2IDExMDBDIDcxOSAxMDYwIDY4NyAxMDM1IDY1OSAxMDI1QyA2MzAgMTAxNCA2MDUgMTAwOSA1ODcgMTAwOUMgNTU0IDEwMDkgNTM3IDEwMjIgNTM3IDEwNDZDIDUzNyAxMDkyIDU2NyAxMTI5IDYyNSAxMTU2QyA2ODIgMTE4MyA3NDIgMTE5NiA4MDkgMTE5NkMgODg0IDExOTYgOTQzIDExOTAgOTgxIDExNzhDIDEwMTggMTE2NiAxMDYwIDExNDQgMTEwNiAxMTEyQyAxMTUxIDEwODAgMTE5MCAxMDMyIDEyMjEgOTY4QyAxMjUzIDkwNSAxMjY4IDgzOCAxMjY4IDc2NUMgMTI2OCA2NDQgMTE4MSA1NDAgMTAwNiA0NTNDIDk2MCA0MjkgODkwIDQwMiA3OTMgMzc1QyA3NjMgMzY1IDcxNiAzNTIgNjU2IDMzN0wgNzM0IDE0MEwgMTE4NCAxNDBMIDEzMDkgLTU3TCAxMzAwIC01N3pNIDMxNSA2TCAwIDE5NkwgMyAyMjFMIDEwMyAxOTBDIDExMiAxODcgMTMwIDE4NCAxNTYgMTg0QyAxODcgMTg0IDIwNiAxODcgMjE1IDE5NkwgMjE1IDI2OEwgMjE1IDk4NEMgMjE1IDEwMjMgMjEyIDEwNTAgMjAzIDEwNjVDIDE5MSAxMDg2IDE3MSAxMTAwIDE0NiAxMTA5TCAwIDExNTBMIDMgMTE2OEwgNTM0IDExNjhMIDUzNCAxMTU5TCAzODcgMTExOEMgMzY2IDExMDkgMzUxIDEwOTQgMzM3IDEwNzVDIDMyMyAxMDU1IDMxNSAxMDI2IDMxNSA5ODdMIDMxNSA2ek0gMTY0MCA4NEMgMTU4OSA4NCAxNTM1IDExOSAxNDc4IDE5MEMgMTQ1OSAyMTQgMTQzNiAyNDkgMTQwNiAyOTZMIDE0MjUgMjk2QyAxNDQwIDI2NSAxNDUwIDI0NiAxNDU5IDIzNEMgMTUxOSAxNDcgMTU3MyAxMDYgMTYxOCAxMTJDIDE2MzYgMTE1IDE2NTAgMTI4IDE2NTYgMTUwQyAxNjU2IDE1NiAxNjU2IDE2NSAxNjU5IDE4MUwgMTUwNiA1NjJMIDE1NzEgNTYyTCAxNzE4IDE5M0MgMTcyNyAxNzggMTczNCAxNjggMTczNyAxNjJDIDE3NjcgMTI2IDE3OTQgMTA5IDE4MTggMTEyQyAxODQyIDExNSAxODU2IDEyOSAxODYyIDE1NkwgMTg2MiAxOTNMIDE3MTggNTYyTCAxNzc4IDU2MkwgMTkyMSAxOTNDIDE5MzMgMTc1IDE5NDMgMTYyIDE5NTAgMTU2QyAxOTcxIDEzNSAxOTk0IDEyNSAyMDIxIDEyNUMgMjA0OSAxMjUgMjA2NSAxMzggMjA3MSAxNjJMIDIwNzEgMTk2TCAxOTUwIDUwM0MgMTkzNyA1NDQgMTk1NyA1NjUgMjAwOSA1NjVDIDIwMzAgNTY1IDIwNTcgNTQzIDIwODcgNTAwQyAyMDk2IDQ4OCAyMTA2IDQ2NiAyMTIxIDQzN0wgMjEwOSA0MzRDIDIwOTQgNDU3IDIwODQgNDc1IDIwNzggNDg3QyAyMDUzIDUyMiAyMDMwIDUzNyAyMDEyIDUzN0MgMjAwMCA1MzcgMTk5NiA1MzQgMTk5NiA1MjVDIDE5OTYgNTE5IDE5OTcgNTA4IDIwMDAgNDkzTCAyMTIxIDE5MEMgMjExOCAxNjYgMjExNSAxNDkgMjExMiAxNDBDIDIxMDMgMTEwIDIwODMgOTAgMjA1MyA4NEMgMjAxMyA3OCAxOTc2IDg4IDE5NDAgMTE1QyAxOTMxIDEyMSAxOTE4IDEzNSAxOTAwIDE1NkMgMTg5MyAxMzYgMTg5MCAxMjQgMTg4NyAxMThDIDE4NzUgOTUgMTg1OCA4NCAxODQwIDg0QyAxNzkyIDg0IDE3NTUgOTYgMTczMSAxMThDIDE3MjUgMTI0IDE3MTggMTM2IDE3MDkgMTUzQyAxNzAwIDEzNiAxNjkzIDEyNCAxNjkwIDExOEMgMTY3NSA5OCAxNjU4IDg3IDE2NDAgODR6TSAyNDkwIDEyMUMgMjUwOCAxMjEgMjUyOCAxMjUgMjU0NiAxMzRDIDI1NjIgMTQzIDI1NjggMTYzIDI1NjggMTkzQyAyNTY4IDI2NCAyNTQ1IDMzNSAyNDk2IDQwOUMgMjQzOSA0OTUgMjM3MiA1MzcgMjI5MyA1MzdDIDIyNTQgNTM3IDIyMjQgNTI3IDIyMDkgNTA2TCAyMjU5IDMwMEMgMjI4NiAyNTEgMjMyMyAyMTAgMjM2OCAxNzVDIDI0MTQgMTM5IDI0NTQgMTIxIDI0OTAgMTIxeiIgLz4KICAgIDxwYXRoIGlkPSJGZXJtYXRhU2hvcnQiIGQ9Ik0gNjAgNjk0bCAtMTEwIDFsIDY2MCAtNzEzbCA2NTYgNzEzbCAtNjYgLTFsIC01NjIgLTYxMUwgNjAgNjk0ek0gNjYyIDQ4OGMgMjkgMCA1NCAxMCA3NCAzMHMgMzAgNDQgMzAgNzRjIDAgMjkgLTEwIDU0IC0zMCA3NHMgLTQ0IDMwIC03NCAzMGMgLTI5IDAgLTU0IC0xMCAtNzQgLTMwcyAtMzAgLTQ0IC0zMCAtNzRjIDAgLTI5IDEwIC01NCAzMCAtNzRTIDYzMyA0ODggNjYyIDQ4OCIgLz4KICAgIDxwYXRoIGlkPSJGZXJtYXRhTm9ybWFsIiBkPSJNIDg3MSAyMzBjIC0yMTYgMCAtNDA1IDY5IC01NjUgMjA5YyAtMTYwIDEzOSAtMjU1IDMxNyAtMjg0IDUzMWMgLTIgLTE2IC00IC0zMiAtNCAtNDhjIDAgLTIxIDAgLTM2IDAgLTQ0YyAwIC0yMjggODQgLTQyNyAyNTIgLTU5OWMgMTY4IC0xNzEgMzY4IC0yNTcgNjAwIC0yNTdjIDIyOSAwIDQyOSA4NCA1OTggMjU0YyAxNjkgMTY5IDI1NCAzNzAgMjU0IDYwM2MgMCA0MCAwIDcwIDAgOTJjIC0yNiAtMjE2IC0xMTkgLTM5NCAtMjc4IC01MzNDIDEyODMgMjk5IDEwOTMgMjMwIDg3MSAyMzB6TSA4NjkgNzY3YyAyOSAwIDU0IDEwIDc0IDMwcyAzMCA0NCAzMCA3NGMgMCAyOSAtOSA1MyAtMjggNzJjIC0xOCAxOCAtNDQgMjggLTc2IDI4YyAtMjYgMCAtNTAgLTkgLTcyIC0yOGMgLTIxIC0xOCAtMzIgLTQyIC0zMiAtNzJjIDAgLTI5IDEwIC01NCAzMCAtNzRTIDgzOSA3NjcgODY5IDc2NyIgLz4KICAgIDxwYXRoIGlkPSJGZXJtYXRhTG9uZyIgZD0iTSA1NSA3MDJoIC02OHYgLTcwNGggMTMxN3YgNzA0aCAtNjh2IC01MDBoIC0xMTgwViA3MDJ6TSA2NDcgNDk0YyAyOSAwIDU0IDEwIDc0IDMwcyAzMCA0NCAzMCA3NGMgMCAyOSAtMTAgNTQgLTMwIDc0cyAtNDQgMzAgLTc0IDMwYyAtMjkgMCAtNTQgLTEwIC03NCAtMzBzIC0zMCAtNDQgLTMwIC03NGMgMCAtMjkgMTAgLTU0IDMwIC03NFMgNjE4IDQ5NCA2NDcgNDk0IiAvPgogICAgPHBhdGggaWQ9IkR5bmFtaWNQIiBkPSJNIDQ0NyA4OTRsIC0xNDYgNDE1bCA5MiAwdiA1MGggLTM2NHYgLTUwaCA5M2wgMzEwIC03OTdjIDcgLTkgMTAgLTE2IDEwIC0yMWMgNyAtMTkgNyAtMzMgMCAtNDNjIC0xNCAtMTQgLTI3IC0yMSAtMzkgLTIxYyAtMzggMCAtODMgNDggLTEzMyAxNDRjIC0xNCAzMSAtMzQgNzkgLTYxIDE0NGggLTI1YyAyNiAtNzIgNDggLTEyNSA2NCAtMTU4YyA1NyAtMTA4IDExNiAtMTYyIDE3NiAtMTYyYyAxOSAwIDMzIDIgNDMgN2MgMTIgNCAyMSAxOCAyOCAzOWMgMiA3IDQgMTkgNyAzNmMgMTYgLTI2IDQ3IC01MiA5MCAtNzljIDQzIC0yNiA4OSAtMzkgMTM3IC0zOWMgMTkgMCA0NSA1IDc3IDE2YyAzMiAxMCA1OSAzNyA4MSA3OGMgMjEgNDEgMzIgODkgMzIgMTQxYyAwIDM1IC0yIDY0IC03IDg2YyAtNCAyMSAtMTMgNTAgLTI1IDg2YyAtMjYgNjQgLTcxIDEyMyAtMTMzIDE3N3MgLTExOSA4MCAtMTY5IDgwQyA1MjggMTAyNCA0ODEgOTgxIDQ0NyA4OTR6TSA3NTQgNDI1YyAtMzMgLTE0IC03MyA1IC0xMTkgNThjIC0zNiA0MyAtNjcgOTIgLTkzIDE0NWMgLTI2IDUzIC0zOSAxMTMgLTM5IDE4MWMgMCA0OCA5IDc4IDI4IDkwYyAyNiAxNCA2MiAwIDEwOCAtNDFjIDQ1IC00MiA4MSAtOTIgMTA4IC0xNTBjIDkgLTI0IDE5IC01NiAyOCAtOTZjIDkgLTQwIDE0IC03NCAxNCAtMTAzQyA3OTAgNDYyIDc3OCA0MzUgNzU0IDQyNSIgLz4KICAgIDxwYXRoIGlkPSJEeW5hbWljRiIgZD0iTSA5NTEgNDA2diAzOWggLTE5NGwgLTE4IDkwYyAtNDggMTk0IC05NyAzNDQgLTE0NyA0NDdjIC02NyAxNDEgLTE1NCAyNDUgLTI1OSAzMTBjIC0zMyAyMSAtNzcgMzIgLTEyOSAzMmMgLTc3IDAgLTEyNyAtMjEgLTE1MSAtNjRjIC0xNCAtMjYgLTIxIC01MSAtMjEgLTc1YyAwIC0zOCAxMyAtNzEgNDEgLTk3YyAyNyAtMjYgNTcgLTM3IDg4IC0zMmMgNTUgOSA4MyAzNiA4MyA3OWMgMCAxNiAtMyAzMiAtMTAgNDZjIC05IDMzIC0zMiA1NSAtNjggNjRjIC0xMiAyIC0xNiA3IC0xNCAxNGMgNCAxOSAyMiAyOCA1NCAyOGMgMTYgLTIgMzYgLTE0IDU3IC0zNmMgNyAtNyAyMiAtMjYgNDcgLTU3YyA1MiAtNzkgMTAyIC0yMDUgMTQ3IC0zNzhjIDE5IC03NyAzOCAtMTU0IDU3IC0yMzFsIDMyIC0xNDBoIC0xMzd2IC0zOWggMTQ0YyAtMTQgLTU1IDIxIC0xMzkgMTA4IC0yNTJjIDY1IC04NCAxNDQgLTEzOSAyMzggLTE2NmMgMjggLTcgNTcgLTEwIDg2IC0xMGMgNjAgMCAxMDkgMTUgMTQ4IDQ2YyAzOCAzMSA1NyA3MiA1NyAxMjJjIDAgNDggLTE0IDgxIC00MyA5OWMgLTI4IDE4IC01NiAyMSAtODMgOWMgLTMxIC0xNCAtNDYgLTM4IC00NiAtNzJjIDAgLTI4IDEwIC01MiAzMiAtNzJjIDcgLTcgMjIgLTEyIDQ2IC0xNGMgMjQgLTIgMzcgLTggMzkgLTE4YyA3IC0yOCAtMTYgLTQzIC03MiAtNDNjIC0zMyAwIC02NCA2IC05MyAxOGMgLTc3IDMzIC0xMzIgMTAyIC0xNjYgMjA1YyAtOSAzMyAtMjAgODMgLTMyIDE0OEggOTUxIiAvPgogICAgPHBhdGggaWQ9IkR5bmFtaWNNIiBkPSJNIDU1MyAxMDc2bCAtMTY1IDFsIDIwMSAtNTAyYyA3IC0xMiAxMSAtMjEgMTQgLTI4YyAxMiAtMjYgMTggLTQ1IDE4IC01N2MgMCAtMjEgLTggLTMzIC0yNSAtMzZjIC0zMSAtNyAtNjIgOSAtOTMgNTBjIC05IDEyIC0yMiAzMyAtMzkgNjVsIC0xOTkgNTA4bCAtMTY0IDBsIDIxMiAtNTAxYyA0IC0xMCA3IC0xNyA3IC0yMmMgNCAtMTkgNyAtMzcgNyAtNTJjIDAgLTE3IC0zIC0yOCAtMTAgLTMzYyAtOSAtMTAgLTIyIC0xNCAtMzkgLTE0YyAtNTAgMCAtMTE2IDYxIC0xOTggMTgzYyAtMTIgMTkgLTMwIDQ3IC01NCA4NGggLTE4YyA0MyAtNzMgNzggLTEyNiAxMDQgLTE2MGMgODYgLTEwNiAxNjUgLTE1NCAyMzggLTE0MmMgMTYgMiAzNyAyMSA2MSA1NmMgNyAxMCAxOCAyOCAzMiA1NmMgMTQgLTI2IDI4IC00NSA0MyAtNTdjIDQ1IC00MCAxMDEgLTYxIDE2NiAtNjFjIDMxIDAgNTQgMTkgNjggNTdjIDIgMTIgNiAzMiAxMCA2MWMgMjEgLTMwIDM5IC01MSA1NCAtNjJjIDQ4IC0zOSAxMDEgLTU2IDE1OCAtNDljIDU1IDcgODkgMzAgMTA0IDY5YyAyIDExIDMgMzAgMyA1NWwgLTE2MyA0MzdjIC0xMiAxOSAtMjAgMzIgLTIyIDM5YyAtNyAxNCAtNCAyMiA3IDI1YyAyMSAyIDU0IC0yMCA5NyAtNjhjIDE0IC0xNCAzNCAtMzkgNjEgLTc1aCAyMWMgLTMxIDQ0IC01NiA3OCAtNzUgMTAxYyAtNjIgNjcgLTEyNSAxMDEgLTE4OCAxMDFjIC0yNCAwIC00MyAtMTAgLTU3IC0zMmMgLTE0IC0yMSAtMTYgLTQzIC03IC02NWwgMTY5IC00MjljIDQgLTcgNiAtMTEgNiAtMTRjIDEwIC0yNiAxNiAtNDcgMTYgLTY0YyAwIC0yNiAtMTAgLTQwIC0zMiAtNDNjIC0yOCAtNyAtNTggOSAtODkgNTBjIC05IDEyIC0yMiAzMyAtMzkgNjRMIDU1MyAxMDc2IiAvPgogICAgPHBhdGggaWQ9IkFjY2VudHVhdGlvbiIgZD0iTSA3NDgsMjg2IEMgMzgyLDM2NSAxNiw0NDUgLTM1MCw1MjUgYyAwLC0yMyAwLC00NiAwLC02OSBDIC01OCw0MDAgMjM0LDM0NCA1MjYsMjg4IDIzMywyMzMgLTU4LDE3OCAtMzUxLDEyNCBjIDAsLTI0IDAsLTQ5IDAsLTc0IDM2Niw3OCA3MzIsMTU3IDEwOTksMjM2IHoiIC8%CiAgICA8cGF0aCBpZD0iSGVhdnlBY2NlbnR1YXRpb24iIGQ9Ik0gLTIyMyA5MDBMIC0yNzUgOTAwbCAzNDkgLTEwMDRsIDM1MyAxMDA0bCAtMTI4IDBsIC0yNjQgLTc1MEwgLTIyMyA5MDAiIC8%CiAgICA8cGF0aCBpZD0iV2F2ZUhvcml6b250YWwiIGQ9Ik0gMTM4MiAyMzBjIC00MyAzMiAtOTIgNjkgLTE0NiAxMTFzIC0xMDQgNzYgLTE0OSAxMDVjIC00NSAyOCAtODkgNTEgLTEzNCA2OHMgLTg2IDI2IC0xMjcgMjhjIC00NyAtNiAtODcgLTE5IC0xMTkgLTM4cyAtNzkgLTUxIC0xNDMgLTk4YyAtNjQgLTQ2IC0xMTcgLTgxIC0xNjAgLTEwMmMgLTQyIC0yMSAtOTAgLTMyIC0xNDEgLTMyYyAtNzkgMCAtMTc0IDU1IC0yODUgMTY2diAtMTEyYyAxMzIgLTExMCAyNDEgLTE5MyAzMjcgLTI0OXMgMTY2IC04MyAyNDQgLTgzYyA0OCAwIDkzIDExIDEzNCAzNGMgNDAgMjIgODggNTYgMTQ0IDEwMWMgNTUgNDQgMTAzIDc5IDE0MyAxMDNjIDQwIDI0IDg1IDM3IDEzNSA0MGMgODkgLTcgMTgyIC01NSAyNzggLTE0NlYgMjMwIiAvPgogICAgPHBhdGggaWQ9IldhdmVWZXJ0aWNhbCIgZD0iTSAxNjUgNGggNTBjIDQ3IDQ0IDg2IDg1IDExNSAxMjJzIDQzIDc1IDQzIDExNGMgMCAzMSAtOSA2MCAtMjggODVjIC0xOSAyNSAtNDcgNTUgLTg1IDg5cyAtNjYgNjQgLTg2IDkwYyAtMTkgMjYgLTMwIDU1IC0zMSA4OGggNWMgMCAzMSA5IDYwIDI3IDg2YyAxOCAyNSA0NiA1NiA4NCA5M3MgNjYgNjggODYgOTVjIDE5IDI3IDI4IDU3IDI4IDkyYyAwIDMzIC05IDYyIC0yOCA4OWMgLTE5IDI2IC00NyA1NyAtODUgOTJjIC0zNyAzNSAtNjUgNjQgLTg0IDg5YyAtMTggMjQgLTI3IDUxIC0yNyA4MmMgMCAxNyAyMiA1OSA2NyAxMjdoIC01MGMgLTU5IC01NyAtMTAwIC0xMDAgLTEyNCAtMTMwYyAtMjMgLTI5IC0zNSAtNjcgLTM1IC0xMTNjIDAgLTMzIDkgLTYyIDI3IC04NmMgMTggLTI0IDQ2IC01MyA4NSAtODdjIDM4IC0zMyA2NiAtNjMgODUgLTg4YyAxOCAtMjUgMjggLTU1IDI4IC05MWMgMCAtMTcgLTggLTM3IC0yNiAtNjFzIC00MiAtNTQgLTczIC04OWMgLTMxIC0zNSAtNTMgLTYwIC02NCAtNzVjIC00MSAtNjQgLTYxIC0xMDkgLTYxIC0xMzVjIDEgLTQwIDIwIC04MCA1NiAtMTE5YyAzNSAtMzggNzIgLTc3IDExMCAtMTE3YyAzOCAtMzkgNTggLTc2IDYwIC0xMTJjIDAgLTE4IC00IC0zNSAtMTMgLTUwQyAyMTAgNzIgMTkyIDQ0IDE2NSA0IiAvPgogICAgPHBhdGggaWQ9IlBpY2tTdHJva2VEb3duIiBkPSJNIDAgLTIwaCA4MTZ2IDg0NGggLTc0diAtNDc3aCAtNjcydiA0NzdIIDBWIC0yMCIgLz4KICAgIDxwYXRoIGlkPSJQaWNrU3Ryb2tlVXAiIGQ9Ik0gNTUxIC03TCAyODkgOTUwbCAtMjY0IC05NTZoIDY2bCAyMDIgNzU5bCAxOTMgLTc1OUggNTUxIiAvPgogICAgPHBhdGggaWQ9IlRyZW1vbG9QaWNraW5nVGhpcnR5U2Vjb25kIiBkPSJNIC00ODggNzg3diAtMjUwbCA5ODYgLTUwNXYgMjUzTCAtNDg4IDc4N3pNIC00ODggMTIwMHYgLTI1MGwgOTg2IC01MDV2IDI1M0wgLTQ4OCAxMjAwek0gLTQ4OCAxNjEydiAtMjUwbCA5ODYgLTUwNXYgMjYxTCAtNDg4IDE2MTIiIC8%CiAgICA8cGF0aCBpZD0iVHJlbW9sb1BpY2tpbmdTaXh0ZWVudGgiIGQ9Ik0gLTQ4OCA3ODd2IC0yNTBsIDk4NiAtNTA1diAyNTNMIC00ODggNzg3ek0gLTQ4OCAxMjAwdiAtMjUwbCA5ODYgLTUwNXYgMjUzTCAtNDg4IDEyMDAiIC8%CiAgICA8cGF0aCBpZD0iVHJlbW9sb1BpY2tpbmdFaWdodGgiIGQ9Ik0gLTQ4OCA3ODd2IC0yNTBsIDk4NiAtNTA1diAyNTNMIC00ODggNzg3IiAvPgogICAgPHBhdGggaWQ9IlVwcGVyTW9yZGVudCIgZD0iTSAxNiA3MTR2IC0xOTVsIDQyNSAtNDk0YyAzNCAtMjIgNTMgLTMzIDU2IC0zM2MgMTkgMCAzMyA2IDM5IDIwbCAzNDkgMzA2YyAxNyAxNyAzNiAyOCA1NiAzM2MgMTkgLTYgMzMgLTEyIDM5IC0xOWwgMjY0IC0zMDdjIDMzIC0yMiA1MyAtMzMgNTkgLTMzYyAxNyAwIDI5IDYgMzYgMjBsIDM0OSAzMDZjIDIwIDIxIDM5IDM0IDU1IDQwYyAyMCAtNyAzNCAtMTYgNDAgLTI2bCAyMjQgLTI2NHYgMTk0bCAtNDIyIDQ5NGMgLTMyIDIyIC01NCAzMyAtNjYgMzNjIC0xNSAwIC0yNiAtNiAtMzMgLTE5bCAtMzQ2IC0zMTBjIC0xNSAtMTUgLTM3IC0yMyAtNjYgLTIzYyAtMTYgMCAtMjYgMyAtMjkgOWwgLTI2NyAzMTBjIC0yNSAyMiAtNDYgMzMgLTYyIDMzYyAtMTQgMCAtMjUgLTYgLTMzIC0xOWwgLTM0NiAtMzEwYyAtMTggLTE5IC00MCAtMjkgLTY2IC0yOWMgLTE0IDAgLTI1IDUgLTMyIDE2TCAxNiA3MTQiIC8%CiAgICA8cGF0aCBpZD0iTG93ZXJNb3JkZW50IiBkPSJNIC0zNCA2NjR2IC0xOTVsIDM5OSAtNDU4YyAzNCAtMzcgNTggLTU2IDcyIC01NnMgNDEgMTggODIgNTZsIDM1MiAzMTB2IC02MDdoIDk5diA1MjVsIDE5MSAtMjI3YyAzOCAtNDEgNjIgLTYyIDcyIC02MmMgMTAgMCAzOCAxNiA4MiA1MGwgMjc3IDI0N2MgNjQgNTMgOTkgODAgMTAyIDgyYyAxMCAtMiAyNCAtMTUgNDMgLTM4YyAxOCAtMjMgMzMgLTM5IDQyIC01MGwgMTE1IC0xNDJ2IDE3OGwgLTM0OSA0MTJjIC0yNiAzNCAtNTEgNTIgLTc1IDUyYyAtMTIgMCAtNDAgLTE5IC04MyAtNTlsIC0yNTcgLTIzMGMgLTQ2IC00NiAtODMgLTY5IC0xMTEgLTY5YyAtNyAwIC0xMiAxIC0xNyA1YyAtNCAzIC05IDkgLTE2IDE3YyAtNiA4IC0xMSAxNCAtMTYgMTl2IDYwN2ggLTk5diAtNDkybCAtMTIxIDE0OWMgLTMxIDM0IC01NiA1MiAtNzUgNTJjIC03IDAgLTE1IC0yIC0yMiAtNmMgLTcgLTQgLTE4IC0xMiAtMzIgLTI1YyAtMTQgLTEyIC0yNSAtMjEgLTMzIC0yN2wgLTI5MCAtMjYzYyAtMzUgLTI4IC01NyAtNDIgLTY2IC00MmMgLTE1IDAgLTMzIDE0IC01NiA0MkwgLTM0IDY2NCIgLz4KICAgIDxwYXRoIGlkPSJUdXJuIiBkPSJNIDExNDEgNzM5YyAtMjAgLTE3IC02NSAtNTYgLTEzNiAtMTE1YyAtNzAgLTYwIC0xNDMgLTExNyAtMjE4IC0xNzJjIC03NSAtNTQgLTE1MCAtMTAwIC0yMjQgLTEzNmMgLTczIC0zNiAtMTQwIC01NCAtMTk5IC01NGMgLTc0IDYgLTEzOCA0NSAtMTkxIDExNXMgLTgyIDE0MyAtODUgMjE4YyA4IDExOSA3NyAxNzkgMjA4IDE3OWMgMTggMCAzMyAtMyA0NSAtOWMgMTEgLTYgMzEgLTIwIDU5IC00MGMgMjggLTIwIDUzIC0zNSA3NSAtNDVjIDIyIC05IDQ4IC0xNCA3OSAtMTRjIDg5IDAgMTQ2IDM5IDE3MCAxMTdjIDAgNzYgLTMxIDEzMiAtOTMgMTY5YyAtNjIgMzYgLTEyOSA1NSAtMjAyIDU1YyAtMTY1IC04IC0yOTAgLTUzIC0zNzMgLTEzNWMgLTgzIC04MiAtMTI0IC0xODIgLTEyNCAtMzAxYyAwIC04NSAyMiAtMTcxIDY3IC0yNTVjIDQ0IC04NCAxMDcgLTE1NSAxODkgLTIxM2MgODEgLTU3IDE3NCAtOTIgMjc5IC0xMDVjIDEzNyAwIDI2NyAyOSAzODggODljIDEyMSA1OSAyNDAgMTM3IDM1NiAyMzJjIDExNiA5NSAyMjkgMTg4IDMzNyAyNzhjIDQyIDM1IDk3IDY5IDE2NSAxMDFjIDY3IDMxIDEzMSA0NyAxOTEgNDdjIDkyIC01IDE2MiAtMzUgMjEwIC05MWMgNDcgLTU2IDcxIC0xMjEgNzEgLTE5NmMgMCAtNjQgLTE4IC0xMTkgLTU1IC0xNjJjIC0zNiAtNDMgLTg1IC02NSAtMTQ2IC02NWMgLTIxIDAgLTUwIDEyIC04OSAzOGMgLTM4IDI1IC02OCA0MyAtOTAgNTVjIC0yMiAxMSAtNTMgMTcgLTkzIDE3YyAtNDIgMCAtNzkgLTE0IC0xMTMgLTQ0YyAtMzMgLTI5IC01MCAtNjYgLTUwIC0xMTFjIDAgLTYwIDMxIC0xMDQgOTUgLTEzNGMgNjMgLTI5IDEzMCAtNDQgMjAwIC00NGMgMTAyIDAgMTkyIDI0IDI2OSA3MmMgNzYgNDggMTM1IDExMiAxNzUgMTkxYyA0MCA3OCA2MCAxNjEgNjAgMjQ5YyAwIDg3IC0yMCAxNjggLTYwIDI0M2MgLTQwIDc0IC0xMDEgMTM0IC0xODQgMTc5YyAtODIgNDUgLTE4NSA2OCAtMzA2IDY4YyAtMTE2IDAgLTIyNCAtMjIgLTMyMyAtNjZDIDEzNzUgODk0IDEyNjQgODI3IDExNDEgNzM5IiAvPgogICAgPHBhdGggaWQ9Ik9wZW5Ob3RlIiBkPSJNIDQ0MyA5MjJjIC0xMjQgMCAtMjI5IC00NSAtMzE1IC0xMzVzIC0xMjggLTE5NyAtMTI4IC0zMjJjIDAgLTEzMCA0MiAtMjM5IDEyNiAtMzI2YyA4NCAtODcgMTg5IC0xMzAgMzE2IC0xMzBjIDEyMiAwIDIyNSAzOSAzMTAgMTE4YyA4NCA3OCAxMzAgMTc3IDEzOCAyOTVjIDAgMTQ1IC00MSAyNjMgLTEyNSAzNTRTIDU3NSA5MTUgNDQzIDkyMnpNIDQyNiA5NmMgLTEwMSAwIC0xODIgMzUgLTI0NCAxMDdjIC02MSA3MSAtOTIgMTU4IC05MiAyNjBjIDAgMTAxIDMyIDE4NSA5OCAyNTJzIDE1MCAxMDAgMjU0IDEwMGMgMTEzIDAgMjAxIC0zNiAyNjQgLTEwOXMgOTQgLTE2OCA5NCAtMjg4QyA3ODAgMjA0IDY1NSA5NiA0MjYgOTYiIC8%CiAgICA8cGF0aCBpZD0iU3RvcHBlZE5vdGUiIGQ9Ik0gNDYyIDEwMDl2IC00NDloIC00NDV2IC0xMjJoIDQ0NVYgLTNoIDExOHYgNDQxaCA0NTJ2IDEyMmggLTQ1MnYgNDQ5SCA0NjIiIC8%CiAgICA8cGF0aCBpZD0iVGVtcG8iIGQ9Ik0gNTUwIDE1NzhWIDMwbCA0MyA4diAxNjc5YyAwIDg2IC00MSAxNjAgLTEyNCAyMjBzIC0xNzMgOTAgLTI3MiA5MGMgLTExNCAwIC0xODIgLTQ2IC0yMDMgLTEzOWMgMCAtODQgNDEgLTE2NCAxMjUgLTIzOXMgMTczIC0xMTIgMjcwIC0xMTJDIDQ1NyAxNTM5IDUxMCAxNTUyIDU1MCAxNTc4ek0gOTE0IDE2ODZ2IC03NmggNTQwdiA3NkggOTE0ek0gOTE0IDE4NTBoIDU0MHYgODBoIC01NDBWIDE4NTAiIC8%CiAgICA8cGF0aCBpZD0iQWNjaWRlbnRhbFNoYXJwIiBkPSJNIDQ4MiAtMjc1diAtNTc3aCA5M3YgNTQwbCAxMzUgLTU3diAzNDNsIC0xMzUgNTd2IDU1MWwgMTM1IC02MnYgMzQzbCAtMTM1IDU3diA1NjFoIC05M3YgLTUyNWwgLTIyMyA5M3YgNTY2aCAtOTN2IC01MzBsIC0xMzUgNTJ2IC0zNDNsIDEzNSAtNTJ2IC01NTFsIC0xMzUgNTd2IC0zNDhsIDEzNSAtNTJ2IC01NjFoIDkzdiA1MjVMIDQ4MiAtMjc1ek0gMjU4IDE1NnYgNTUxbCAyMjMgLTkzdiAtNTQ2TCAyNTggMTU2IiAvPgogICAgPHBhdGggaWQ9IkFjY2lkZW50YWxGbGF0IiBkPSJNIC0yMyAtMTI3M2ggOTN2IDEzMDBjIDQ4IC0yNyA4NiAtNDggMTE0IC02MmMgOTMgLTQxIDE3NiAtNjIgMjQ5IC02MmMgNTIgMCA5NyAxMyAxMzcgMzljIDM5IDI2IDcwIDcwIDkxIDEzMmMgMTAgMzEgMTUgNjIgMTUgOTNjIDAgMTAwIC01MCAyMDQgLTE1MCAzMTFjIC03MiA3NiAtMTU3IDE0MyAtMjU0IDIwMmMgLTQxIDI0IC05NyA2OSAtMTY2IDEzNWMgLTQ1IDQxIC04OCA4NCAtMTMwIDEyOVYgLTEyNzN6TSAzNjcgMTdjIC03IC0zIC0xMyAtNiAtMjAgLTEwYyAtMTcgLTYgLTMzIC0xMCAtNDYgLTEwYyAtMjcgMCAtNTkgNyAtOTMgMjNjIC0zNCAxNSAtNzkgNDYgLTEzNSA5MXYgNjQ0YyA2NSAtNjUgMTMxIC0xMzEgMTk3IC0xOTdjIDEyOCAtMTU2IDE5MiAtMjg0IDE5MiAtMzg0QyA0NjAgMTAzIDQyOSA1MSAzNjcgMTciIC8%CiAgICA8cGF0aCBpZD0iQWNjaWRlbnRhbE5hdHVyYWwiIGQ9Ik0gMzggNDcyViAtMTI4M2ggOTl2IDc5MmwgNDc4IC0xMzJ2IDE3MzhoIC05M3YgLTc3NUwgMzggNDcyek0gMTM3IDE4MGwgMzg1IC0xMDR2IC00MjlsIC0zODUgMTA0ViAxODAiIC8%CiAgICA8cGF0aCBpZD0iQ2xlZk5ldXRyYWwiIGQ9Ik0gOTE1IDE4ODd2IC0xODc1aCAzMzd2IDE4NzVIIDkxNXpNIDE0NzcgMTg4N3YgLTE4NzVoIDMzN3YgMTg3NUggMTQ3NyIgLz4KICAgIDxwYXRoIGlkPSJSZXN0U2l4dHlGb3VydGgiIGQ9Ik0gNzA1IC0yMjAyYyA3NyAtMjYgMTQ0IC03NyAyMDAgLTE1MGMgNTYgLTczIDEwMSAtMTc0IDEzNiAtMzA1bCAxMjcgLTU0N2MgLTY5IDEyNyAtMTk3IDE5MSAtMzgyIDE5MWMgLTQ2IDAgLTEwMCAtNyAtMTYyIC0yM2MgLTYxIC0xNSAtMTE0IC00NiAtMTU2IC05MmMgLTQyIC00NiAtNjMgLTEwOCAtNjMgLTE4NWMgMCAtNjUgMjMgLTEyMSA2OSAtMTY4YyA0NiAtNDYgMTA0IC02OSAxNzQgLTY5YyA2NSAwIDEyMyAyNSAxNzQgNzVjIDUwIDUwIDc1IDEwNCA3NSAxNjJjIDAgMzEgLTcgNjMgLTIzIDk4YyAtMTUgMzQgLTQ0IDYzIC04NyA4N2MgNDYgMTUgNzEgMjMgNzUgMjNjIDcgMCAyNyAtMyA1NyAtMTFjIDc3IC0yMyAxNDggLTgxIDIxMyAtMTc0YyA1MyAtNzMgODYgLTEzNyA5OCAtMTkxbCAxNTQgLTYzOGMgLTczIDEyOCAtMTk4IDE5MiAtMzc1IDE5MmMgLTMwIDAgLTYxIDAgLTkyIDBjIC0zNCAtMTEgLTU3IC0xOSAtNjkgLTIzYyAtNjkgLTE5IC0xMjUgLTUyIC0xNjcgLTk4YyAtNDIgLTQ2IC02MyAtMTA2IC02MyAtMTc5YyAwIC02OSAyMyAtMTI3IDY5IC0xNzRjIDQ2IC00NiAxMDQgLTY5IDE3NCAtNjlzIDEyOCAyNCAxNzYgNzJjIDQ4IDQ4IDcyIDEwMyA3MiAxNjVjIDAgMzEgLTcgNjMgLTIzIDk4YyAtMTUgMzQgLTQyIDY1IC04MSA5MmMgMTkgNyA0MCAxNSA2MyAyM2MgMTEgMCAzMiAtMyA2MyAtMTFjIDczIC0yMyAxNDAgLTgwIDIwMiAtMTY5YyA2MSAtODkgMTIxIC0xNzkgMTc5IC0yNzFsIDQxIDBsIC0xMDMyIDQ0MjVsIC0xMDcgMGwgMzE5IC0xMzE2YyAtNzMgMTI4IC0xOTYgMTkyIC0zNzAgMTkyYyAtMTkgMCAtMzggMCAtNTcgMGMgLTI3IC0zIC02OCAtMTMgLTEyNCAtMjhjIC01NSAtMTUgLTEwNSAtNDYgLTE0NyAtOTJjIC00MiAtNDYgLTYzIC0xMDYgLTYzIC0xNzljIDAgLTY1IDIzIC0xMjEgNjkgLTE2OGMgNDYgLTQ2IDEwNiAtNjkgMTc5IC02OWMgNjUgMCAxMjIgMjQgMTcxIDcyYyA0OCA0OCA3MiAxMDMgNzIgMTY1YyAwIDMwIC03IDYzIC0yMyA5OGMgLTE1IDM0IC00NCA2MyAtODcgODdjIDQ2IDE1IDcxIDIzIDc1IDIzYyA3IDAgMjYgLTMgNTcgLTExYyA3NiAtMjMgMTUwIC04MyAyMTkgLTE4MGMgNTcgLTc3IDg2IC0xMjkgODYgLTE1NmwgMTYxIC02NjdjIC03MyAxMjQgLTE5OCAxODYgLTM3NSAxODZjIC0zMCAwIC02MSAwIC05MiAwYyAtMzQgLTExIC01NyAtMTkgLTY5IC0yMmMgLTY5IC0xOSAtMTI1IC01MSAtMTY3IC05N2MgLTQyIC00NSAtNjMgLTEwNSAtNjMgLTE3N2MgMCAtNjggMjMgLTEyNiA2OSAtMTcyYyA0NiAtNDUgMTA2IC02OCAxNzkgLTY4YyA2NSAwIDEyMiAyMyAxNzEgNzFjIDQ4IDQ3IDcyIDEwMiA3MiAxNjNjIDAgMzAgLTcgNjMgLTIzIDk3YyAtMTUgMzQgLTQ0IDY1IC04NyA5MWMgMjMgNyA0NiAxNCA2OSAyMUMgNjUzIC0yMTkwIDY3NCAtMjE5NCA3MDUgLTIyMDIiIC8%CiAgICA8cGF0aCBpZD0iQWNjaWRlbnRhbERvdWJsZUZsYXQiIGQ9Ik0gNjcgMjVjIDUyIC0yNyA5MyAtNDggMTI0IC02MmMgMTAwIC00NSAxNzYgLTY3IDIyOCAtNjdjIDQ1IDAgOTUgMTIgMTUwIDM2ViAtMTI3NWggODh2IDEzMDBjIDQ4IC0yNyA4OCAtNDggMTE5IC02MmMgMTAwIC00NSAxODMgLTY3IDI0OSAtNjdjIDU1IDAgMTA0IDEzIDE0NSAzOWMgNDEgMjYgNzIgNzEgOTMgMTM3YyAxMCAzMSAxNSA2MiAxNSA5M2MgMCAxMDcgLTQ4IDIxMiAtMTQ1IDMxNmMgLTcyIDc5IC0xNjMgMTQzIC0yNzAgMTkyYyAtMzQgMTcgLTc4IDUyIC0xMzIgMTA0YyAtNTMgNTEgLTEwOCAxMDcgLTE2MyAxNjZ2IC01MjljIC0zOCA0NSAtNzIgODMgLTEwNCAxMTVjIC01NSA1NSAtMTIxIDEwMyAtMTk3IDE0MWMgLTQ1IDIwIC0xMDIgNjggLTE3MSAxNDFjIC00MSA0MSAtODEgODUgLTExOSAxMzFWIC0xMjc1aCA4OFYgMjV6TSAzNjkgMTVjIC03IC0zIC0xMyAtNiAtMjAgLTEwYyAtMTcgLTYgLTMzIC0xMCAtNDYgLTEwYyAtMzEgMCAtNjQgNyAtOTggMjNjIC0zNCAxNSAtNzkgNDYgLTEzNSA5MXYgNjQ0YyA2NSAtNjUgMTMxIC0xMzEgMTk3IC0xOTdjIDEzMSAtMTU5IDE5NyAtMjg3IDE5NyAtMzg0QyA0NjIgMTAxIDQzMSA0OSAzNjkgMTV6TSA5NjIgMTVjIC0zIC0zIC0xMiAtNiAtMjYgLTEwYyAtMjAgLTYgLTM2IC0xMCAtNDYgLTEwYyAtMzEgMCAtNjMgNyAtOTYgMjNjIC0zMyAxNSAtNzcgNDYgLTEzMiA5MXYgNjQ0YyA2NSAtNjUgMTMxIC0xMzEgMTk3IC0xOTdjIDEzMSAtMTU5IDE5NyAtMjg3IDE5NyAtMzg0QyAxMDU1IDEwMSAxMDI0IDQ5IDk2MiAxNSIgLz4KICAgIDxwYXRoIGlkPSJBY2NpZGVudGFsRG91YmxlU2hhcnAiIGQ9Ik0gMjIgMjQzYyAtMzIgLTMxIC00OCAtNjggLTQ4IC0xMTBjIDAgLTM4IDE1IC03MSA0NSAtOThjIDMwIC0yNyA2MyAtNDAgOTggLTQwYyAzOCAwIDcwIDE0IDk2IDQzYyA2NCA1NyAxMTYgMTI0IDE1OCAxOTljIDQxIDc1IDYyIDE0NiA2MiAyMTNjIC04MyAwIC0xNzIgLTMwIC0yNjggLTkxQyA5OSAzMTcgNTEgMjc4IDIyIDI0M3pNIDE4IDg3MmMgMjUgMjUgNTkgMzggMTAwIDM4YyAzOCAwIDcwIC0xNCA5NiAtNDNjIDQ0IC0zOCA4NiAtODYgMTI0IC0xNDRjIDY0IC05NiA5NiAtMTg3IDk2IC0yNzNjIC03MCAwIC0xNDAgMTggLTIxMSA1NWMgLTcwIDM2IC0xMzcgODcgLTIwMSAxNTFjIC0zMiAzMSAtNDggNzAgLTQ4IDExNUMgLTI2IDgxMCAtMTEgODQzIDE4IDg3MnpNIDg0OCAzMmMgLTI1IC0yNSAtNjAgLTM4IC0xMDUgLTM4YyAtNDEgMCAtNzYgMTYgLTEwNSA0OGMgLTU3IDY3IC05NCAxMTMgLTExMCAxMzljIC02MCA5NiAtOTEgMTg1IC05MSAyNjhjIDkyIDAgMTgyIC0yOCAyNjggLTg2YyA3OSAtNjcgMTI0IC0xMDUgMTM0IC0xMTVjIDMxIC0zMSA0OCAtNzIgNDggLTEyMEMgODg2IDk2IDg3NCA2NCA4NDggMzJ6TSA4MzggNjU2YyAzMSAzMSA0OCA3MCA0OCAxMTVjIDAgMzggLTE0IDcyIC00MyAxMDBzIC02MiA0MyAtMTAwIDQzYyAtMzggMCAtNzMgLTE2IC0xMDUgLTQ4YyAtNTEgLTU3IC04OCAtMTA1IC0xMTAgLTE0NGMgLTYwIC05NiAtOTEgLTE4NyAtOTEgLTI3M2MgMTA1IDAgMjExIDQxIDMxNiAxMjRDIDgwMyA2MjIgODMyIDY1MCA4MzggNjU2IiAvPgo8L3N2Zz4"},{ name : "mapping", data : "s531:IyBUaGlzIGZpbGUgY29udGFpbnMgdGhlIGFkanVzdG1lbnRzIGZvciBHbHlwaHMuc3ZnIGNyZWF0ZWQgd2l0aCB0aGUgZm9udC1jb252ZXJ0ZXIgdG9vbC4gKG1hbnVhbGx5KS4NCiMgVGhpcyB3YXMgZXhwb3J0ZWQgKGFmdGVyIGFkanVzdGluZykgdXNpbmc6IA0KIyAgICBmb3IodmFyIGkgPSAwOyBpIDwgTWFpbi5nbHlwaHMubGVuZ3RoOyBpKyspIHsgY29uc29sZS5sb2coaSArICI7IiArIE1haW4uZ2x5cGhzW2ldLm5hbWUgKyAiOyIgKyBNYWluLmdseXBoc1tpXS54ICsgIjsiICsgTWFpbi5nbHlwaHNbaV0ueSk7IH0gDQojIFRoaXMgbWFwcGluZyBjYW4gYmUgdXNlZCBmb3IgZnV0dXJlIGFkanVzdG1lbnRzIGJ5IHJlaW1wb3J0aW5nIHRoaXMgZGF0YSB0byB0aGUgTWFpbi5nbHlwaHMgYXJyYXk"}];
+haxe.Resource.content = [{ name : "glyphs", data : "s64702:PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8%DQo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiID4NCjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4NCjxwYXRoIGlkPSJDbGVmRiIgZD0iTSA1NDUgLTgwMWMgLTUzIDQ5IC04MCAxMDkgLTgwIDE3OWMgMCAzMyA0IDY2IDEyIDk5YyA4IDMzIDM4IDU3IDg5IDc0YyA1MSAxNiAxMjUgMzEgMjIwIDQzYyA5NSAxMiAxNTkgNTMgMTkyIDEyNGMgMTYgMzcgMjQgOTkgMjQgMTg2YyAwIDk1IC00MyAxNjggLTEzMCAyMjBjIC04NiA1MSAtMTg2IDc3IC0yOTcgNzdjIC0xMjggMCAtMjI5IC0yOCAtMzAzIC04NmMgLTkxIC03MCAtMTM2IC0xNjkgLTEzNiAtMjk3YyAwIC0xMTUgMjMgLTIzNCA3MSAtMzU2YyA0NyAtMTIxIDExOCAtMjM0IDIxMyAtMzM3YyA3MCAtNzQgMTYzIC0xMjkgMjc5IC0xNjRjIDExNSAtMzUgMjMzIC01MiAzNTMgLTUyYyA0NSAwIDgzIDEgMTE0IDNjIDMxIDIgODEgOSAxNTEgMjFjIDI0MyA0NSA0NDQgMTc1IDYwMSAzOTBjIDE0NCAxOTggMjE3IDQwOSAyMTcgNjMyYyAwIDQxIC0yIDcyIC02IDkzYyAtMzMgMjgxIC0yMTkgNTgyIC01NTggOTA1YyAtMjcyIDI2MCAtNTkxIDQ5MyAtOTU0IDcwMGMgLTMzMCAxOTAgLTUyNyAyNzQgLTU4OSAyNTRsIC0xOCAtNjhjIDk1IC0zMyAxOTcgLTc4IDMwNiAtMTM2YyAxMDkgLTU3IDIxOCAtMTI0IDMyNSAtMTk4YyAyNzYgLTE5OCA0NzcgLTM4NCA2MDEgLTU1OGMgMTUyIC0yMTAgMjUyIC00NzEgMjk3IC03ODFjIDIwIC0xMjggMzEgLTIxMCAzMSAtMjQ4cyAwIC02OCAwIC05M2MgMCAtMzIyIC0xMDkgLTU1MSAtMzI4IC02ODhjIC05OSAtNTcgLTIwMCAtODYgLTMwMyAtODZjIC03OCAwIC0xNTQgMTUgLTIyNiA0NkMgNjQzIC04NzMgNTg2IC04MzggNTQ1IC04MDF6TSAyNTE3IC03ODNjIDY2IDAgMTIxIDIyIDE2NyA2OGMgNDUgNDUgNjggMTAxIDY4IDE2N2MgMCA2NiAtMjIgMTIxIC02OCAxNjdjIC00NSA0NSAtMTAxIDY4IC0xNjcgNjhjIC02NiAwIC0xMjIgLTIyIC0xNjcgLTY4YyAtNDUgLTQ1IC02OCAtMTAxIC02OCAtMTY3YyAwIC02NiAyMiAtMTIxIDY4IC0xNjdDIDIzOTUgLTc2MCAyNDUxIC03ODMgMjUxNyAtNzgzek0gMjUxNyA1NGMgNjYgMCAxMjEgMjIgMTY3IDY4YyA0NSA0NSA2OCAxMDEgNjggMTY3YyAwIDY2IC0yMiAxMjEgLTY4IDE2N2MgLTQ1IDQ1IC0xMDEgNjggLTE2NyA2OGMgLTY2IDAgLTEyMiAtMjIgLTE2NyAtNjhjIC00NSAtNDUgLTY4IC0xMDEgLTY4IC0xNjdjIDAgLTY2IDIyIC0xMjEgNjggLTE2N0MgMjM5NSA3NyAyNDUxIDU0IDI1MTcgNTQiIC8%DQo8cGF0aCBpZD0iQ2xlZkMiIGQ9Ik0gMjYgMTczNlYgLTE5MjRoIDQ1OHYgMzY1OUggMjZ6TSA2NDEgMTczNlYgLTE5MjRoIDE1MHYgMzY1OUggNjQxek0gMTA5OSAxNTNjIC00MiAtNTMgLTg2IC0xMDAgLTEzMCAtMTQwYyAtNDQgLTQwIC05NSAtNzUgLTE1MyAtMTA2YyAxMDYgLTU4IDIwMCAtMTM1IDI3OSAtMjMzYyAxMTAgLTEzNSAxODAgLTI4OSAyMDggLTQ2MGMgMTcgMTI3IDQ2IDIxNiA4NyAyNjZjIDY1IDczIDE3MCAxMTAgMzEzIDExMGMgMTUwIDAgMjU5IC04MSAzMjQgLTI0NGMgNTAgLTEyNCA3NSAtMjkxIDc1IC01MDBjIDAgLTE5NyAtMjUgLTM1NSAtNzUgLTQ3MWMgLTY5IC0xNTUgLTE3OSAtMjMyIC0zMzAgLTIzMmMgLTg5IDAgLTE2NyAxOCAtMjM0IDU1YyAtNjcgMzYgLTEwMSA3MiAtMTAxIDEwN2MgMCAxOSAyMyAyNSA2OSAxN2MgNDYgLTcgOTcgNiAxNTMgNDNjIDU2IDM2IDg0IDg5IDg0IDE1OWMgMCA2OSAtMjMgMTI1IC02OSAxNjhjIC00NiA0MiAtMTA4IDYzIC0xODUgNjNjIC03MyAwIC0xMzggLTI0IC0xOTQgLTcyYyAtNTYgLTQ4IC04NCAtMTA1IC04NCAtMTcxYyAwIC0xMTIgNTYgLTIxMiAxNjggLTMwMWMgMTI3IC0xMDAgMjgyIC0xNTAgNDYzIC0xNTBjIDIyOCAwIDQxMiA3NCA1NTMgMjI0YyAxNDEgMTQ5IDIxMSAzMzQgMjExIDU1NWMgMCAyNDggLTg2IDQ1OCAtMjU4IDYzMWMgLTE3MiAxNzIgLTM4MSAyNTkgLTYyOSAyNTljIC01NyAwIC0xMDQgLTMgLTEzOSAtMTFjIC01NCAtMTkgLTk4IC0zNCAtMTMzIC00NmMgLTE1IDQ5IC00OCA5OSAtOTggMTQ5YyAtMTEgMTUgLTQ4IDQzIC0xMTAgODVjIDM4IDE5IDc1IDUyIDExMCA5OWMgNTAgNTAgODggMTA1IDExNSAxNjRjIDY1IC0zMSAxMTMgLTUwIDE0MiAtNTdjIDI4IC03IDcwIC0xMSAxMjQgLTExYyAyNDcgMCA0NTcgODUgNjI5IDI1N2MgMTcyIDE3MSAyNTggMzgwIDI1OCA2MjdjIDAgMjExIC03MyAzOTAgLTIxOSA1MzRjIC0xNDYgMTQ0IC0zMzIgMjE2IC01NTggMjE2YyAtMTgzIDAgLTMzNCAtNDcgLTQ1MyAtMTQyYyAtMTE4IC05NCAtMTc4IC0xOTggLTE3OCAtMzEwYyAwIC02OSAyOCAtMTI4IDg0IC0xNzZjIDU2IC00OCAxMjAgLTcyIDE5NCAtNzJjIDY5IDAgMTI5IDIzIDE3OSA2OWMgNTAgNDYgNzUgMTA0IDc1IDE3NGMgMCA2NSAtMjggMTE2IC04NCAxNTNjIC01NiAzNiAtMTA3IDUxIC0xNTMgNDNjIC00NiAtNyAtNjkgMCAtNjkgMjNjIDAgMjcgMzUgNjAgMTA2IDEwMWMgNzAgNDAgMTQ3IDYwIDIyOSA2MGMgMTUzIDAgMjY1IC03NyAzMzUgLTIzMWMgNTEgLTExMiA3NiAtMjY4IDc2IC00NjljIDAgLTIwMSAtMjUgLTM2MyAtNzUgLTQ4N2MgLTY1IC0xNjYgLTE3MiAtMjQ5IC0zMTkgLTI0OWMgLTE0MyAwIC0yNDIgMzAgLTI5OCA5MmMgLTU2IDYxIC05MyAxNTYgLTExMyAyODRDIDEyNzkgNDM1IDEyMTEgMjg2IDEwOTkgMTUzIiAvPg0KPHBhdGggaWQ9IlJlc3RUaGlydHlTZWNvbmQiIGQ9Ik0gNzE3IC0yMTk1YyA5MyAtMzAgMTc0IC0xMDQgMjQ0IC0yMjBjIDM4IC02NSA2NSAtMTI3IDgxIC0xODVsIDE0MCAtNjA0YyAtNjkgMTI4IC0xOTYgMTkxIC0zODEgMTkxYyAtNTAgMCAtMTA1IC03IC0xNjcgLTIzYyAtNjEgLTE1IC0xMTMgLTQ2IC0xNTUgLTkyYyAtNDIgLTQ2IC02MyAtMTA4IC02MyAtMTg1YyAwIC02NSAyMyAtMTIxIDY5IC0xNjhzIDEwNCAtNjkgMTczIC02OWMgNjUgMCAxMjMgMjUgMTczIDc1YyA1MCA1MCA3NSAxMDQgNzUgMTYyYyAwIDMxIC03IDYzIC0yMyA5OGMgLTE1IDM0IC00NCA2MyAtODYgODdjIDIzIDExIDQ4IDIxIDc1IDI4YyA3IDAgMjcgLTMgNTcgLTExYyA3MyAtMjMgMTQyIC04MCAyMDggLTE3MGMgNTcgLTkwIDExNSAtMTgwIDE3MyAtMjcwaCA0MGwgLTgxNiAzNTAzbCAtMTA3IDBsIDMxOCAtMTMxNmMgLTczIDEyOCAtMTk2IDE5MiAtMzY5IDE5MmMgLTE5IDAgLTM4IDAgLTU3IDBjIC0yNyAtMyAtNjggLTEzIC0xMjQgLTI4YyAtNTUgLTE1IC0xMDQgLTQ2IC0xNDcgLTkyYyAtNDIgLTQ2IC02MyAtMTA2IC02MyAtMTc5YyAwIC02NSAyMyAtMTIxIDY5IC0xNjhjIDQ2IC00NiAxMDYgLTY5IDE3OSAtNjljIDY1IDAgMTIyIDI0IDE3MCA3MmMgNDggNDggNzIgMTAzIDcyIDE2NWMgMCAzMCAtNyA2MyAtMjMgOThjIC0xNSAzNCAtNDQgNjMgLTg2IDg3YyA0NiAxNSA3MSAyMyA3NCAyM2MgNyAwIDI2IC0zIDU3IC0xMWMgOTIgLTI3IDE3OCAtMTA4IDI1OSAtMjQzYyAxMSAtMTkgMjYgLTUwIDQ2IC05M2wgMTYxIC02NjdjIC03MyAxMjggLTE5OCAxOTIgLTM3NSAxOTJjIC0zMCAwIC02MSAwIC05MiAwYyAtMzQgLTExIC01NyAtMTkgLTY5IC0yM2MgLTY5IC0xOSAtMTI1IC01MiAtMTY3IC05OGMgLTQyIC00NiAtNjMgLTEwNiAtNjMgLTE3OWMgMCAtNjkgMjMgLTEyNyA2OSAtMTc0cyAxMDYgLTY5IDE3OSAtNjljIDY1IDAgMTIyIDI0IDE3MCA3MmMgNDggNDggNzIgMTAzIDcyIDE2NWMgMCAzMSAtNyA2MyAtMjMgOThzIC00NCA2NSAtODYgOTJjIDIzIDcgNDYgMTUgNjkgMjNDIDY2NSAtMjE4NCA2ODYgLTIxODcgNzE3IC0yMTk1IiAvPg0KPHBhdGggaWQ9IlJlc3RRdWFydGVyIiBkPSJNIDI3MiAtMTY2OEwgOTc5IC04NTBjIC01NCAyMyAtMTM3IDExNCAtMjQ5IDI3MmMgLTEyNyAxNzcgLTE5MSAzMTMgLTE5MSA0MDVjIDAgMTEyIDM2IDIyNiAxMTAgMzQyYyA3MyAxMTUgMTYwIDIwNiAyNjAgMjcybCAtMzQgODFjIC0yMyAtMyAtNTYgLTcgLTEwMSAtMTFjIC00NCAtMyAtNzYgLTUgLTk1IC01YyAtMTA0IDAgLTE4MiA5IC0yMzQgMjhjIC01MiAxOSAtODggNDUgLTExMCA3OGMgLTIxIDMyIC0zMSA3MCAtMzEgMTEzYyAwIDgxIDQyIDE3NSAxMjcgMjg0YyA2OSA4OCAxMTUgMTM3IDEzOSAxNDVsIC0yOCA0NmMgLTI3IDcgLTEyMyAtNjEgLTI4OSAtMjA4YyAtMTg1IC0xNjIgLTI3OCAtMjk5IC0yNzggLTQxMWMgMCAtOTIgMzUgLTE2OCAxMDcgLTIyNmMgNzEgLTU3IDE1OSAtODcgMjYzIC04N2MgNTQgMCAxMDkgNyAxNjUgMjNjIDU1IDE1IDExMCA0MiAxNjUgODFsIC02NDIgLTgyOWMgNTQgLTMwIDEyMCAtMTA3IDE5OSAtMjI5YyA3OSAtMTIxIDEzOSAtMjM4IDE4MiAtMzUwYyA3IC0xNSAxMSAtNDIgMTEgLTgxYyAwIC05MiAtNDQgLTIxMCAtMTMzIC0zNTNjIC03MyAtMTE1IC0xMjEgLTE4MSAtMTQ0IC0xOTdIIDI3MiIgLz4NCjxwYXRoIGlkPSJHcmFjZVVwIiBkPSJNIDU3MSAtMTY1OWggNTNjIDEyIDgzIDI5IDE1NCA1MCAyMTBjIDIxIDU2IDQ2IDEwNSA3NCAxNDVjIDI4IDQwIDcxIDkyIDEyOCAxNTZjIDU2IDYzIDEwMiAxMTggMTM4IDE2MmMgMTA1IDEzNSAxNTggMjc3IDE1OCA0MjRjIDAgMTUxIC02NCAzMzYgLTE5MyA1NTRoIC0zNWMgMTYgLTM3IDM1IC04MiA1NyAtMTMycyA0MCAtOTUgNTUgLTEzNnMgMjYgLTgxIDM1IC0xMjFzIDEyIC04MCAxMiAtMTE5YyAwIC02MiAtMTIgLTEyNSAtMzggLTE4OGMgLTI1IC02MyAtNjAgLTEyMSAtMTA2IC0xNzVjIC00NSAtNTMgLTk3IC05NyAtMTU1IC0xMzBzIC0xMTggLTUxIC0xODEgLTU1diAxMjQ1YyAwIDcwIC0yMSAxMzQgLTY1IDE4OWMgLTQzIDU1IC05OSA5NyAtMTY3IDEyN2MgLTY3IDI5IC0xMzUgNDQgLTIwMSA0NGMgLTY0IDAgLTExOCAtMTYgLTE2MCAtNDhjIC00MiAtMzIgLTYzIC03OSAtNjMgLTE0MGMgMCAtNjUgMjEgLTEyNiA2NCAtMTgxcyA5NyAtOTkgMTYzIC0xMzFjIDY1IC0zMiAxMjkgLTQ4IDE5MSAtNDhjIDg1IDAgMTQ3IDE2IDE4NCA1MFYgLTEwODJWIC0xNjU5IiAvPg0KPHBhdGggaWQ9IkdyYWNlRG93biIgZD0iTSAtMTcgMzM1YyAwIC02OSAyMyAtMTMxIDY5IC0xODZzIDEwMyAtOTggMTczIC0xMjhjIDY5IC0zMCAxMzcgLTQ1IDIwMyAtNDVjIDEzMyAwIDIwMyA2MyAyMTEgMTg5YyAwIDU0IC0yMSAxMTAgLTY1IDE2N2MgLTQzIDU2IC05OSAxMDMgLTE2OCAxMzlzIC0xMzggNTQgLTIwOCA1NGMgLTYzIDAgLTExOCAtMTQgLTE2NCAtNDR2IDExMDRjIDkwIC0xNSAxNzIgLTUwIDI0NCAtMTA2cyAxMjggLTEyMiAxNjggLTIwMGMgNDAgLTc4IDYwIC0xNTYgNjAgLTIzM2MgLTEgLTkxIC0xMyAtMTY5IC0zNCAtMjMzYyAtMjAgLTY0IC01NyAtMTU1IC0xMTAgLTI3MmwgMzQgLTEzYyAzNCA2MCA2NCAxMjIgOTEgMTg4YyAyNyA2NSA0OCAxMzEgNjQgMTk5cyAyMyAxMzMgMjMgMTk4YyAwIDk2IC0yMiAxODMgLTY4IDI1OWMgLTQ1IDc2IC0xMTMgMTY2IC0yMDMgMjY5YyAtODkgMTAzIC0xNTcgMTkzIC0yMDMgMjcxYyAtNDUgNzcgLTY4IDE2NSAtNjggMjY0aCAtNTBWIDMzNSIgLz4NCjxwYXRoIGlkPSJUcmlsbCIgZD0iTSAxNTkgODYybCAxNDggLTQzMWggLTI5MWwgMzMgLTk3aCAyODhsIDYxIC0xOTZsIDE5MCAtMTM2aCA1NmwgLTExNCAzMzJjIDQwIDAgMTAwIC03IDE4MSAtMjJjIDgxIC0xNSAxNDMgLTIyIDE4NyAtMjJjIDI2IDAgNDUgNSA1NiAxNWMgMTEgMTAgMTYgMjkgMTYgNTdjIDAgOCAtMyAzNyAtMTEgODZjIDcyIC0xMDYgMTU1IC0xNjAgMjQ2IC0xNjBjIDcyIDggMTEwIDUwIDExNCAxMjZjIDAgNDIgLTkgNzMgLTI4IDkycyAtNDAgMjggLTY0IDI4YyAtNDggMCAtNzYgLTI5IC04NCAtODdjIDEwIC0yMiAxNiAtNDMgMTYgLTY0YyAwIC0xMSAtOSAtMTcgLTI4IC0xN2MgLTc4IDAgLTE0NyA4NiAtMjA3IDI2MGwgLTEzMSA0MDZoIC0xODVsIDM0IC05MmMgLTIxIDkgLTUzIDI2IC05NCA1MXMgLTc3IDQ0IC0xMDggNThzIC02NCAyMCAtMTAwIDIwYyAtNTAgMCAtOTUgLTEzIC0xMzMgLTQwYyAtMzggLTI3IC01OSAtNjMgLTYxIC0xMDdjIDEgLTcgMyAtMTggNSAtMzJTIDE1NyA4NjcgMTU5IDg2MnpNIDY1OCA4MzdsIDE0MCAtNDEyYyAwIC00IDAgLTkgMiAtMTZzIDIgLTEwIDIgLTExYyAwIC05IC03IC0xMyAtMjIgLTEzYyAtMzQgMCAtODEgNyAtMTQwIDIxcyAtMTA0IDIxIC0xMzYgMjFsIC0xNDIgNDIzYyAtNiAyMyAtMTIgNDQgLTE3IDY0YyAwIDI3IDE2IDQ0IDUwIDUwQyA0NDQgOTU4IDUzMiA5MTYgNjU4IDgzNyIgLz4NCjxwYXRoIGlkPSJDbGVmRyIgZD0iTSAxNDMxIC0zMDcwYyA5NSAwIDE4NiAxMTQgMjcyIDM0NGMgODYgMjI5IDEyOSA0MzQgMTI5IDYxMmMgMCAyNDMgLTM2IDQ3MSAtMTA4IDY4NGMgLTEwMyAzMDAgLTI3MSA1NDUgLTUwNCA3MzVsIDEwOCA1NjRjIDY4IC0xNSAxMzIgLTIyIDE5MyAtMjJjIDI4NCAwIDUwNCAxMDkgNjU5IDMyOWMgMTMyIDE4NSAxOTkgNDEwIDE5OSA2NzVjIDAgMjA0IC02NSAzNzkgLTE5NSA1MjVjIC0xMzAgMTQ1IC0yOTkgMjQzIC01MDYgMjkybCAxNTQgODE2YyAwIDQ1IDAgNzcgMCA5NmMgMCAxNTIgLTU0IDI4MiAtMTYyIDM5MHMgLTI0NCAxODEgLTQwNyAyMTljIC0yNiA3IC02MiAxMSAtMTA4IDExYyAtMTU1IDAgLTI5NCAtNjIgLTQxNiAtMTg4YyAtMTIxIC0xMjUgLTE4MiAtMjUyIC0xODIgLTM4MWMgMCAtMjIgMSAtMzkgNSAtNTFjIDE4IC0xMDYgNjQgLTE5MSAxMzYgLTI1M2MgNzIgLTYyIDE2MSAtOTQgMjY3IC05NGMgMTAyIDAgMTkxIDM0IDI2NyAxMDJjIDc2IDY4IDExMyAxNTIgMTEzIDI1MGMgMCAxMDYgLTM1IDE5OCAtMTA1IDI3NmMgLTcwIDc3IC0xNjAgMTE2IC0yNzAgMTE2YyAtMjYgMCAtNDUgMCAtNTYgMGMgNDIgMzYgODIgNjMgMTIwIDgyYyA3MiAzNiAxNDMgNTQgMjEyIDU0YyAxMTQgMCAyMzUgLTYyIDM2MiAtMTg3YyA5NCAtOTggMTQyIC0yMTQgMTQyIC0zNDdjIDAgLTE5IC0xIC01NSAtMyAtMTA4bCAtMTM4IC03NzZjIC00OSAxMSAtMTA0IDE5IC0xNjUgMjNjIC02MSAzIC0xMjMgNSAtMTg4IDVjIC0zMzkgMCAtNjM1IC0xMjMgLTg4NiAtMzcwYyAtMjUxIC0yNDcgLTM3NyAtNTQzIC0zNzcgLTg4OWMgMCAtMTkzIDg3IC00MjkgMjYyIC03MDZjIDExNyAtMTg5IDI4NSAtNDAyIDUwMSAtNjM4YyAxNTkgLTE3NCAyNTQgLTI3MSAyODUgLTI5MGMgLTE5IC0zNyAtNDQgLTE0MiAtNzcgLTMxM2MgLTMyIC0xNzEgLTUyIC0yODQgLTU5IC0zMzljIC03IC01NSAtMTEgLTExMSAtMTEgLTE2OGMgMCAtMjM1IDU0IC00NzUgMTYzIC03MThDIDExNjQgLTI5NDggMTI4OSAtMzA3MCAxNDMxIC0zMDcwek0gMTI0NyAtMTI5bCAtOTYgLTUwN2MgLTQxIDMwIC0xMTYgMTA0IC0yMjIgMjIyYyAtMTA2IDExNyAtMTkwIDIxNiAtMjUxIDI5NmMgLTExMCAxNDAgLTE5NCAyNjkgLTI1MSAzODdjIC03NiAxNTUgLTExNCAzMDcgLTExNCA0NTVjIDAgNzkgMTEgMTU5IDM0IDIzOWMgNDkgMTY3IDE4MiAzMjYgNDAwIDQ3OGMgMTc1IDEyMSAzNjAgMTgyIDU1NCAxODJjIDUzIDAgOTYgLTMgMTI3IC0xMWMgMzAgLTcgODAgLTIzIDE1MCAtNDZsIC0yODEgLTEzNDNjIC0xNzggMjIgLTMxMiAxMDYgLTQwMyAyNTBjIC03MiAxMTMgLTEwNyAyMzcgLTEwNyAzNzBjIDAgMTQ0IDgwIDI4MSAyNDAgNDEwYyAxMzcgMTEwIDI0OCAxNjUgMzMyIDE2NWwgLTggMzljIC0xMDYgLTE1IC0yMjcgLTcwIC0zNjQgLTE2NGMgLTE4NiAtMTMyIC0yOTggLTI5MSAtMzM2IC00NzdjIC0xMSAtNTYgLTE3IC0xMTEgLTE3IC0xNjRjIDAgLTE4NSA1NiAtMzUxIDE2OCAtNDk2QyA5MTEgMTIgMTA2MCAtODMgMTI0NyAtMTI5ek0gMTY4NCAtMjMwNmMgLTE5IC0xMjUgLTM0IC0yMDEgLTQ2IC0yMjdjIC0zNCAtNzYgLTkyIC0xMTMgLTE3MiAtMTEzYyAtNzYgMCAtMTU3IDgyIC0yNDEgMjQ3YyAtODQgMTY1IC0xNDMgMzQ0IC0xNzggNTM4YyAtNyA0OSAtMSAxNTYgMTcgMzIyYyAxOSAxNjUgMzYgMjcyIDUyIDMyMmwgMTMyIC0xMTNjIDkxIC00NSAxOTcgLTE3NiAzMTUgLTM5M2MgODggLTE1OSAxMzIgLTMxMyAxMzIgLTQ2MUMgMTY5NSAtMjIxMyAxNjkyIC0yMjUzIDE2ODQgLTIzMDZ6TSAxMzg4IDIyNWwgMjYyIDEzMDRjIDE1NyAtMzcgMjgyIC0xMTQgMzc1IC0yMjljIDkyIC0xMTUgMTM4IC0yNTAgMTM4IC00MDVjIDAgLTMwIDAgLTUyIDAgLTY4YyAtMTkgLTE3NyAtOTMgLTMyMiAtMjI0IC00MzNjIC0xMzAgLTExMSAtMjgxIC0xNjcgLTQ1MyAtMTY3QyAxNDQzIDIyNSAxNDExIDIyNSAxMzg4IDIyNSIgLz4NCjxwYXRoIGlkPSJOdW0wIiBkPSJNIDAgOTkxYyAwIC0yMzAgNDUgLTQyMiAxMzUgLTU3N2MgMTA0IC0xODMgMjUzIC0yNzUgNDQ4IC0yNzVjIDE4NyAwIDMzMyA5MSA0MzcgMjc1YyA4OSAxNTggMTM1IDM1MSAxMzUgNTc3YyAwIDIzMCAtNDMgNDIyIC0xMjkgNTc3YyAtMTA0IDE4MyAtMjUyIDI3NSAtNDQyIDI3NWMgLTE4NyAwIC0zMzQgLTkxIC00NDIgLTI3NUMgNDYgMTQxMSAwIDEyMTggMCA5OTF6TSA1ODMgMjMwYyAtMTAwIDAgLTE2OCA3MiAtMjAyIDIxOGMgLTM0IDE0NSAtNTEgMzI2IC01MSA1NDJjIDAgMjcwIDIzIDQ2NCA3MCA1ODNjIDQ2IDExOCAxMDggMTc4IDE4MyAxNzhjIDkzIDAgMTYyIC04OCAyMDUgLTI2NGMgMzIgLTEzMyA0OCAtMjk4IDQ4IC00OTZjIDAgLTI3MyAtMjMgLTQ2OCAtNzAgLTU4NUMgNzE5IDI4OCA2NTggMjMwIDU4MyAyMzAiIC8%DQo8cGF0aCBpZD0iTnVtMSIgZD0iTSAzNDUgMTY4OFYgNDQwbCAtMjE2IDQxMGwgLTM3IC0zMmwgMjUzIC02ODVoIDM1MXYgMTU0OWMgMCAzMiAyNyA1NyA4MSA3NWMgMTggMyA0NiA4IDg2IDE2diA3NWggLTY4NXYgLTcwYyAzNSAtNyA2MiAtMTIgODEgLTE2QyAzMTYgMTc0NSAzNDUgMTcyMCAzNDUgMTY4OCIgLz4NCjxwYXRoIGlkPSJOdW0yIiBkPSJNIDQyNyAyNTdjIC05MyAxMCAtMTUzIDM3IC0xNzggODFjIDcgMTQgMTQgMjcgMjEgMzdjIDY4IDAgMTE1IDcgMTQwIDIxYyA1NCAyOCA4MSA4NiA4MSAxNzJjIDAgNjEgLTIxIDExMyAtNjQgMTU2cyAtOTMgNjQgLTE1MSA2NGMgLTYxIDAgLTExMyAtMTkgLTE1NiAtNTljIC00MyAtMzkgLTY0IC05MSAtNjQgLTE1NmMgMCAtMTE4IDUwIC0yMjEgMTUxIC0zMDdjIDEwMCAtODYgMjE0IC0xMjkgMzQwIC0xMjljIDE2OSAwIDMxMSAzNiA0MjYgMTA4YyAxMzYgODYgMjA1IDIwMyAyMDUgMzUxYyAwIDEyOSAtNzggMjQ0IC0yMzYgMzQ1YyAtMTMyIDc1IC0yNjMgMTUzIC0zOTEgMjMyYyAtNzggNjEgLTE0NiAxMjkgLTIwNCAyMDVjIC0yNSAzNSAtNTAgNzMgLTc1IDExM2MgMTEwIC02NCAyMTEgLTk3IDMwMCAtOTdjIDY0IDAgMTMwIDE4IDE5OCA1NGMgMzkgMTggODcgNTIgMTQ1IDEwMmMgNDYgMzkgODIgNTkgMTA3IDU5YyA4MiAwIDEzNyAtMzUgMTY2IC0xMDVjIDcgLTIxIDEyIC01NyAxNiAtMTEwaCA0M2MgMCAxMjAgLTE4IDIxNiAtNTQgMjg4YyAtNTQgMTA2IC0xNDcgMTYwIC0yODAgMTYwYyAtMTAwIDAgLTIwNiAtMzcgLTMxNSAtMTEwYyAtMTA5IC03MyAtMjAwIC0xMTAgLTI3MiAtMTEwYyAtMTA4IDAgLTE3OCAyNyAtMjEwIDgxYyAtMTQgNjQgLTIzIDEwMiAtMjcgMTEzaCAtNzBjIDMgLTM2IDggLTcwIDE2IC0xMDJjIDcgLTMyIDI3IC03OSA1OSAtMTQwYyA0NiAtOTMgMTUxIC0yMjEgMzEzIC0zODNjIDMxMyAtMzEzIDQ2OSAtNTA1IDQ2OSAtNTc3QyA4NzYgMzc2IDcyNiAyNTcgNDI3IDI1NyIgLz4NCjxwYXRoIGlkPSJOdW0zIiBkPSJNIDQxNCAxMDI0diAtNTljIDIxIDAgNDcgLTUgNzYgLTE2YyAxMTMgLTM5IDE5MyAtNzcgMjQwIC0xMTNjIDcyIC01NyAxMDkgLTEyOSAxMDkgLTIxNmMgMCAtMTExIC0zNSAtMjA0IC0xMDYgLTI3OGMgLTcwIC03MyAtMTQ5IC0xMTAgLTIzNyAtMTEwYyAtMTEyIDAgLTE5NCAzMiAtMjQ1IDk3YyAzIDE4IDggMzQgMTYgNDhjIDcyIDAgMTIwIDE2IDE0NSA0OGMgMjUgMzIgMzcgNzUgMzcgMTI5YyAwIDExOCAtNjYgMTc4IC0xOTkgMTc4YyAtNTcgMCAtMTAyIC0xNiAtMTM1IC00OGMgLTMyIC0zMiAtNDggLTg0IC00OCAtMTU2YyAwIC0xMjYgNDQgLTIyMyAxMzIgLTI5MWMgODggLTY4IDIzMSAtMTAyIDQyOSAtMTAyYyAxMzMgMCAyNTEgNDcgMzUzIDE0M2MgMTAyIDk1IDE1MyAyMTEgMTUzIDM0OGMgMCAxMDAgLTIxIDE3NyAtNjQgMjI5YyAtNDMgNTIgLTExMSA5OCAtMjA1IDEzN2MgODYgMzUgMTQ5IDc3IDE4OSAxMjRjIDU0IDY0IDgxIDE0NyA4MSAyNDhjIDAgMTMzIC01MSAyNDcgLTE1MyAzNDJjIC0xMDIgOTUgLTIyMCAxNDMgLTM1MyAxNDNjIC0xOTQgMCAtMzM2IC0zNCAtNDI2IC0xMDJjIC05MCAtNjggLTEzNSAtMTY1IC0xMzUgLTI5MWMgMCAtNzUgMTUgLTEyOCA0NSAtMTU5YyAzMCAtMzAgNzggLTQ1IDE0MyAtNDVjIDEyOSAwIDE5NCA1OSAxOTQgMTc4YyAwIDU3IC0xMiAxMDEgLTM3IDEzMmMgLTI1IDMwIC03NSA0NSAtMTUxIDQ1YyAzIDIxIDggNDUgMTYgNzBjIDYxIDQ2IDEzNSA3MCAyMjEgNzBjIDgyIDAgMTYwIC0zNiAyMzIgLTEwOGMgNzIgLTcyIDEwOCAtMTYzIDEwOCAtMjc1YyAwIC04MiAtMzYgLTE1MyAtMTA4IC0yMTBjIC01NCAtNDMgLTEzNSAtODIgLTI0MyAtMTE4TCA0MTQgMTAyNCIgLz4NCjxwYXRoIGlkPSJOdW00IiBkPSJNIDg5NyAxMzNjIC04NiAxNDcgLTE3NCAyOTYgLTI2NCA0NDVjIC05MCAxNDkgLTE2MiAyNTggLTIxNiAzMjZsIC0zMDIgNDY5aCA0NDh2IC01NTZsIDM3OCAtMzE4diA4NzRoIDE2MnYgNzVoIC0xNjJjIDAgMzkgMCA4MSAyIDEyNGMgMSA0MyA2IDc4IDEzIDEwNWMgNyAyNyAzOSA1MyA5NyA3OGMgNyAzIDIzIDggNDggMTZ2IDc1aCAtNzEydiAtNzVjIDMyIC0xMCA1NSAtMTggNzAgLTIxYyA1NCAtMjEgODIgLTQzIDg2IC02NGMgMyAtMTggNiAtNTEgOCAtOTljIDEgLTQ4IDQgLTk0IDggLTEzN2ggLTU4OHYgLTc1YyAxNTggLTExMSAyNzkgLTI4OCAzNjEgLTUyOWMgNDMgLTIzNyA4OCAtNDc1IDEzNSAtNzEySCA4OTciIC8%DQo8cGF0aCBpZD0iTnVtNSIgZD0iTSAxMjIgMTMzYyAxMCA3IDYzIDE4IDE1OSAzNWMgOTUgMTYgMTc3IDI0IDI0NSAyNGMgODkgMCAxNzEgLTUgMjQ1IC0xNmMgNzMgLTEwIDEzOSAtMjMgMTk3IC0zN2MgMCA2MSAtOCAxMTIgLTI0IDE1M2MgLTE2IDQxIC00NyA3OCAtOTQgMTEwYyAtMjEgMTQgLTYyIDI3IC0xMjEgMzdjIC01OSAxMCAtMTEyIDE2IC0xNTkgMTZjIC03MiAwIC0xNDUgLTUgLTIyMSAtMTZjIC03NSAtMTAgLTExNyAtMjEgLTEyNCAtMzJ2IDQ3NWMgOTMgLTEwNCAxOTcgLTE1NiAzMTMgLTE1NmMgMTU4IDAgMjg2IDQzIDM4MyAxMzBjIDk3IDg2IDE0NSAxOTggMTQ1IDMzNmMgMCAxNzMgLTYxIDMyNSAtMTgzIDQ1NWMgLTEyMiAxMzAgLTI2NiAxOTUgLTQzMiAxOTVjIC0zOSAwIC02OCAtMSAtODYgLTVjIC04NiAtMTQgLTE1NCAtNDMgLTIwNSAtODZjIC03MiAtNjEgLTEwOCAtMTU2IC0xMDggLTI4NmMgMCAtNjEgMTYgLTEwOSA0OCAtMTQ1YyAzMiAtMzYgODIgLTU0IDE1MSAtNTRjIDEzNiAwIDIwNSA2NCAyMDUgMTk0YyAwIDEwOCAtNDMgMTY5IC0xMjkgMTgzYyAtMjUgMTAgLTUwIDIzIC03NSAzN2MgMzIgMzIgNjggNTQgMTA4IDY3YyAzOSAxMiA3OSAxOCAxMTggMThjIDkzIDAgMTcwIC00NSAyMzIgLTEzNWMgNjEgLTkwIDkxIC0yMTkgOTEgLTM4NWMgMCAtMTEyIC0yNyAtMjA5IC04MSAtMjkwYyAtNTQgLTgxIC0xMjcgLTEyMiAtMjIxIC0xMjJjIC0xMTggMCAtMjEwIDU0IC0yNzUgMTYyaCAtMTAyViAxMzMiIC8%DQo8cGF0aCBpZD0iTnVtNiIgZD0iTSA4NzEgMzA1YyAtNyAtMTEgLTEyIC0yMiAtMTYgLTM0YyAtNTcgLTUyIC0xMTggLTc5IC0xODMgLTc5YyAtMzIgMCAtNjMgNyAtOTEgMjFjIC02NCAzNiAtMTE0IDExMCAtMTQ4IDIyNGMgLTM0IDExMyAtNTEgMjI3IC01MSAzNDJjIDAgMTY1IDE5IDI1MyA1OSAyNjRjIDc1IC0xMDggMTg1IC0xNjIgMzMyIC0xNjJjIDExMCAwIDIwMSA1MiAyNzMgMTU2YyA2MCA4OSA5MSAxOTAgOTEgMzAyYyAwIDE1NCAtNDcgMjc4IC0xNDMgMzY5YyAtOTUgOTEgLTIxMyAxMzcgLTM1MyAxMzdjIC0xOTAgMCAtMzQxIC04OSAtNDUwIC0yNjdjIC0xMDkgLTE3OCAtMTY0IC0zODIgLTE2NCAtNjEyYyAwIC0yMDggNjQgLTM5OSAxOTQgLTU3MmMgMTI5IC0xNzIgMjc5IC0yNTkgNDQ4IC0yNTljIDE1OCAwIDI3MyA0OSAzNDUgMTQ3YyA1MCA2OSA3NSAxNDggNzUgMjM5YyAwIDU0IC0xOSAxMDMgLTU5IDE0N2MgLTM5IDQzIC03OSA2NSAtMTE4IDY1YyAtNjggMCAtMTIyIC0xNiAtMTYyIC00OGMgLTM5IC0zMiAtNTkgLTg2IC01OSAtMTYyYyAwIC02OCAyMSAtMTIxIDY0IC0xNTlDIDc5NSAzMzAgODM1IDMwOSA4NzEgMzA1ek0gODQ5IDEzOTFjIDAgLTEyOSAtOSAtMjIxIC0yNyAtMjc1YyAtMzIgLTkzIC05MSAtMTQwIC0xNzggLTE0MGMgLTgyIDAgLTEzNyAzOCAtMTY0IDExNmMgLTI3IDc3IC00MCAxNzcgLTQwIDI5OWMgMCAxMDggMTQgMTk5IDQzIDI3NWMgMjggNzUgODIgMTEzIDE2MiAxMTNjIDcyIDAgMTI0IC0zOSAxNTYgLTExOEMgODMzIDE1ODIgODQ5IDE0OTIgODQ5IDEzOTEiIC8%DQo8cGF0aCBpZD0iTnVtNyIgZD0iTSAzMTMgMTg1MGMgMTAgLTg2IDIzIC0xNzIgMzcgLTI1OWMgNDMgLTE3MiAxMTggLTMxMyAyMjYgLTQyMWMgMTIyIC0xMTggMjE3IC0yMjEgMjg2IC0zMDdjIDkwIC0xMTEgMTQyIC0yMDEgMTU2IC0yNzBsIDI3IC0xMjRjIC00NiAzMCAtOTYgNTYgLTE0OCA3OWMgLTUyIDIyIC0xMDMgMzQgLTE1MyAzNGMgLTkzIDAgLTIwNiAtNDAgLTM0MCAtMTIyYyAtNjQgLTQwIC0xMjAgLTYxIC0xNjcgLTYxYyAtNTcgMCAtOTggMTcgLTEyMSA1MWMgLTIzIDM0IC00MiA2NSAtNTYgOTRoIC02NHYgLTM1NmggNTRjIDcgMjEgMTYgNDQgMjcgNjdjIDEwIDIzIDMwIDM1IDU5IDM1YyAyNSAwIDYyIC0xNiAxMTMgLTQ4YyAxMDggLTcyIDE4NSAtMTA4IDIzMiAtMTA4YyA3NSAwIDE0OSAyNiAyMjEgNzhjIDcyIDUyIDE0MCA3OCAyMDUgNzhjIDQ2IDAgODIgLTIyIDEwOCAtNjdjIDEwIC0xOCAxOSAtNDggMjcgLTg5aCA3MHYgMzQwYyAwIDEwNyAtMTcgMjA2IC01MiAyOTVjIC0xMCAyNSAtODcgMTU5IC0yMzEgNDAzYyAtMzUgNjQgLTYwIDE0MiAtNzYgMjM0YyAtMTUgOTEgLTIzIDE3OCAtMjMgMjYwYyAwIDExNCAwIDE3NSAwIDE4MkggMzEzIiAvPg0KPHBhdGggaWQ9Ik51bTgiIGQ9Ik0gNzk1IDkwNWMgNTcgMTggMTI2IDc3IDIwNSAxNzhjIDY0IDc5IDk3IDE1MSA5NyAyMTZjIDAgMTgzIC01NyAzMjQgLTE3MiA0MjFjIC05NyA4MiAtMjE0IDEyNCAtMzUxIDEyNGMgLTE1MSAwIC0yNzYgLTQ5IC0zNzUgLTE0OGMgLTk5IC05OSAtMTQ4IC0yMzEgLTE0OCAtMzk2YyAwIC02OCAzNCAtMTM4IDEwMiAtMjEwYyA1MCAtNTQgMTA2IC05MyAxNjcgLTExOGMgLTcyIC0zOSAtMTI3IC05NCAtMTY3IC0xNjRjIC0zOSAtNzAgLTU5IC0xNDQgLTU5IC0yMjRjIDAgLTEzNiA0OCAtMjQ0IDE0NSAtMzI0YyA5NyAtNzkgMjA4IC0xMTggMzM0IC0xMThjIDEzMyAwIDI0NSA0MCAzMzcgMTIxcyAxMzcgMTk1IDEzNyAzNDJjIDAgNTcgLTMyIDEyMCAtOTcgMTg5QyA5MDEgODQ1IDg0OSA4ODMgNzk1IDkwNXpNIDM4OSAxMDQwYyAtNTcgMjggLTEwMiA2MSAtMTM1IDk3YyAtNDYgNTQgLTcwIDExOCAtNzAgMTk0YyAwIDEwOCAzNSAyMDQgMTA2IDI4OGMgNzEgODQgMTY1IDEyNiAyODIgMTI2YyAxMDYgMCAxODUgLTI0IDIzOCAtNzJzIDc5IC0xMDMgNzkgLTE2NGMgMCAtMzkgLTI2IC04OCAtODAgLTE0NWMgLTUzIC01NyAtMTEyIC0xMDYgLTE3NiAtMTQ1YyAtNjQgLTM5IC0xMjQgLTgxIC0xNzkgLTEyNEMgNDM3IDEwNzkgNDE1IDEwNjEgMzg5IDEwNDB6TSA3MDggODM1YyA0NiAtMTggODkgLTUzIDEyNiAtMTA1YyAzNyAtNTIgNTYgLTEwNyA1NiAtMTY0YyAwIC0xMDAgLTI4IC0xODMgLTg2IC0yNDhjIC01NyAtNjQgLTEzNiAtOTcgLTIzNyAtOTdjIC03OSAwIC0xNDUgMjYgLTE5NyA3OGMgLTUyIDUyIC03OCAxMTIgLTc4IDE4MGMgMCAzNiAyNSA3NSA3NSAxMThjIDI1IDIxIDcyIDU0IDE0MyA5N2MgNzAgNDMgMTIxIDc3IDE1MyAxMDJDIDY3NiA4MDggNjkwIDgyMCA3MDggODM1IiAvPg0KPHBhdGggaWQ9Ik51bTkiIGQ9Ik0gMzMzIDE2ODJjIDMgMTAgOSAyMSAxNiAzMmMgNTcgNTAgMTE4IDc1IDE4MyA3NWMgMzIgMCA2MiAtNyA5MSAtMjFjIDY4IC0zNiAxMTcgLTEwNyAxNDggLTIxM2MgMzAgLTEwNiA0NSAtMjIyIDQ1IC0zNDhjIDAgLTE2OSAtMTggLTI1OSAtNTQgLTI3MGMgLTc1IDExMSAtMTg1IDE2NyAtMzI5IDE2N2MgLTExMSAwIC0yMDAgLTQ4IC0yNjcgLTE0NmMgLTY2IC05NyAtOTkgLTIwMiAtOTkgLTMxNWMgMCAtMTU1IDQ3IC0yNzkgMTQzIC0zNzJjIDk1IC05MiAyMTUgLTEzOCAzNTkgLTEzOGMgMTkwIDAgMzQzIDkzIDQ1OSAyODBjIDEwMCAxNjUgMTUxIDM2NSAxNTEgNTk5YyAwIDIwOCAtNjQgMzk5IC0xOTQgNTcycyAtMjc5IDI1OSAtNDQ4IDI1OWMgLTE1OCAwIC0yNzMgLTQ4IC0zNDUgLTE0NWMgLTUwIC02OCAtNzUgLTE0NyAtNzUgLTIzN2MgMCAtNTQgMTkgLTEwMiA1OSAtMTQ1YyAzOSAtNDMgODYgLTY0IDE0MCAtNjRjIDYxIDAgMTA5IDE2IDE0NSA0OGMgMzUgMzIgNTQgODYgNTQgMTYyYyAwIDY4IC0yNSAxMjQgLTc1IDE2N0MgNDA1IDE2NjEgMzY5IDE2NzkgMzMzIDE2ODJ6TSAzNTQgNTk0YyAwIDEzMCA4IDIyMiAyNyAyNzdjIDMyIDk0IDg5IDE0MSAxNzIgMTQxYyA4MiAwIDEzOCAtNDAgMTY3IC0xMjJjIDI4IC04MSA0MyAtMTgwIDQzIC0yOTZjIDAgLTExMiAtMTIgLTE5OSAtMzcgLTI2MWMgLTM2IC04NiAtOTMgLTEzMCAtMTcyIC0xMzBjIC03NSAwIC0xMjcgMzggLTE1NiAxMTRDIDM2OSAzOTMgMzU0IDQ4NiAzNTQgNTk0IiAvPg0KPHBhdGggaWQ9IlJlc3RTaXh0ZWVudGgiIGQ9Ik0gNDk0IC0xMjc1YyA3NiAtMjcgMTQ5IC05MSAyMTggLTE5MWMgMjMgLTMxIDUxIC04MSA4NiAtMTUxbCAxNjEgLTY2N2MgLTczIDEyOCAtMTk4IDE5MiAtMzc0IDE5MmMgLTMwIDAgLTYxIDAgLTkyIDBjIC0zNCAtMTEgLTU3IC0xOSAtNjkgLTIzYyAtNjkgLTE5IC0xMjUgLTUyIC0xNjcgLTk4YyAtNDIgLTQ2IC02MyAtMTA2IC02MyAtMTc5YyAwIC02OSAyMyAtMTI3IDY5IC0xNzRzIDEwNiAtNjkgMTc5IC02OWMgNjUgMCAxMjIgMjQgMTcwIDcyYyA0OCA0OCA3MiAxMDMgNzIgMTY1YyAwIDMxIC03IDYzIC0yMyA5OHMgLTQ0IDY1IC04NiA5MmMgMTkgNyA0MCAxNSA2MyAyM2MgMTUgMCAzOCAtNSA2OSAtMTdjIDczIC0yMyAxNDAgLTc5IDIwMiAtMTY3YyA2MSAtODggMTIxIC0xNzcgMTc5IC0yNjdoIDQwbCAtNjAyIDI1ODZsIC0xMDYgMGwgMzE4IC0xMzE2YyAtNzMgMTI4IC0xOTYgMTkyIC0zNjkgMTkyYyAtMTkgMCAtMzggMCAtNTcgMGMgLTI3IC0zIC02OCAtMTMgLTEyNCAtMjhjIC01NSAtMTUgLTEwNCAtNDYgLTE0NyAtOTJjIC00MiAtNDYgLTYzIC0xMDYgLTYzIC0xNzljIDAgLTY1IDIzIC0xMjEgNjkgLTE2OGMgNDYgLTQ2IDEwNiAtNjkgMTc5IC02OWMgNjUgMCAxMjIgMjQgMTcwIDcyYyA0OCA0OCA3MiAxMDMgNzIgMTY1YyAwIDMwIC03IDYzIC0yMyA5OGMgLTE1IDM0IC00NCA2MyAtODYgODdjIDQ1IDE1IDcyIDIzIDgwIDIzQyA0NjUgLTEyNjkgNDgyIC0xMjcxIDQ5NCAtMTI3NSIgLz4NCjxwYXRoIGlkPSJSZXN0RWlnaHRoIiBkPSJNIDI0NyAtMTcyNWMgNjUgMCAxMjMgMjUgMTczIDc1YyA1MCA1MCA3NSAxMDQgNzUgMTYyYyAwIDI3IC05IDYwIC0yOCA5OGMgLTE5IDM4IC00OCA2OSAtODYgOTJjIDIzIDcgNDYgMTUgNjkgMjNjIDE1IDAgMzggLTUgNjkgLTE3YyA4OCAtMzEgMTc1IC0xMTMgMjYwIC0yNDZjIDM4IC02MiA3NyAtMTI1IDExNSAtMTg4aCA0MGwgLTM4MiAxNjcwbCAtMTEyIDBsIDMzMSAtMTMxNmMgLTczIDEyOCAtMTk4IDE5MSAtMzc1IDE5MWMgLTE5IDAgLTM4IDAgLTU3IDBjIC0yNyAtMyAtNjkgLTEzIC0xMjcgLTI4YyAtNTcgLTE1IC0xMDYgLTQ2IC0xNDcgLTkyYyAtNDAgLTQ2IC02MCAtMTA2IC02MCAtMTc5YyAwIC02OSAyMyAtMTI3IDY5IC0xNzRTIDE3OCAtMTcyNSAyNDcgLTE3MjUiIC8%DQo8cGF0aCBpZD0iUmVzdFdob2xlIiBkPSJNIDEwNDYgNDQ1SCAtMjV2IC00NThoIDEwNzFWIDQ0NSIgLz4NCjxwYXRoIGlkPSJOb3RlV2hvbGUiIGQ9Ik0gMCA0MzdjIDAgLTEwOSA0MCAtMTk3IDEyMSAtMjY1cyAxNzcgLTExNSAyOTAgLTE0M3MgMjE2IC00MSAzMTIgLTQxYyAxMDQgMCAyMTMgMTMgMzI4IDQxcyAyMTQgNzQgMjk4IDE0MXMgMTI4IDE1NiAxMzMgMjY2YyAwIDExMCAtNDAgMTk5IC0xMjEgMjY4cyAtMTc3IDExNyAtMjkwIDE0NXMgLTIxOSA0MyAtMzE5IDQzYyAtMTA3IDAgLTIxOCAtMTMgLTMzMiAtNDFzIC0yMTEgLTc1IC0yOTMgLTE0NFMgMiA1NTAgMCA0Mzd6TSA0NTAgMzYxYyA3IDEzMyA0NiAyNDMgMTE4IDMzMHMgMTU4IDEzMCAyNTkgMTMwYyA3NyAtOCAxMzEgLTM0IDE2MSAtNzdzIDQ0IC0xMTcgNDQgLTIyNGMgLTEwIC0xMzcgLTUxIC0yNDggLTEyMyAtMzMzcyAtMTU5IC0xMjcgLTI2MiAtMTI3YyAtNzIgMTEgLTEyMyAzNyAtMTUyIDc4UyA0NTAgMjUzIDQ1MCAzNjEiIC8%DQo8cGF0aCBpZD0iTm90ZVF1YXJ0ZXIiIGQ9Ik0gNjU4IDgwMGMgLTEwOCA2NSAtMjE2IDk4IC0zMjQgOThjIC0xMTkgMCAtMjE2IC00MiAtMjg5IC0xMjdjIC01NCAtNTcgLTgxIC0xMjkgLTgxIC0yMTRjIDAgLTkyIDI5IC0xODMgODkgLTI3MmMgNTkgLTg4IDEzNiAtMTU4IDIyOCAtMjA4YyAxMTEgLTY5IDIyMyAtMTA0IDMzNSAtMTA0YyAxMDggMCAyMDAgMzYgMjc4IDExMGMgNTcgNTcgODYgMTMxIDg2IDIyMGMgMCA5MiAtMzEgMTg1IC05MiAyNzhDIDgyNyA2NzMgNzUwIDc0NiA2NTggODAwIiAvPg0KPHBhdGggaWQ9Ik5vdGVIYWxmIiBkPSJNIDY2OSA4MThjIC0xMDggNjUgLTIxNiA5OCAtMzI0IDk4YyAtMTE5IDAgLTIxNiAtNDIgLTI5MCAtMTI3YyAtNTQgLTU3IC04MSAtMTI5IC04MSAtMjE0YyAwIC05MiAyOSAtMTgzIDg5IC0yNzJjIDU5IC04OCAxMzYgLTE1OCAyMjkgLTIwOGMgMTEyIC02OSAyMjQgLTEwNCAzMzYgLTEwNGMgMTA4IDAgMjAwIDM2IDI3OCAxMTBjIDU3IDU3IDg3IDEzMSA4NyAyMjBjIDAgOTIgLTMxIDE4NSAtOTIgMjc4QyA4MzkgNjkxIDc2MiA3NjQgNjY5IDgxOHpNIDk1IDc1NGMgMTkgMjMgNTcgMzQgMTE1IDM0YyA2NSAwIDEzMiAtMTMgMjAwIC00MGMgNjcgLTI3IDEzNCAtNjQgMjAwIC0xMTNjIDY1IC00OCAxMjcgLTExOCAxODUgLTIwOHMgODcgLTE2OSA4NyAtMjM0YyAwIC0yMyAtNSAtNDQgLTE3IC02M2MgLTExIC0xNSAtMzQgLTIzIC02OSAtMjNjIC00NiAwIC0xMTMgMTggLTIwMCA1NWMgLTg3IDM2IC0xNjQgNzcgLTIzMSAxMjFjIC02NyA0NCAtMTMzIDExMCAtMTk3IDE5N3MgLTk1IDE1OSAtOTUgMjE3QyA3MiA3MjAgNzkgNzM5IDk1IDc1NCIgLz4NCjxwYXRoIGlkPSJOb3RlRGVhZCIgZD0iTSA0ODIgMzQ1YyA0MiAtMTUgNzAgLTM4IDg0IC02OWMgMTMgLTMwIDIwIC0xMDIgMjAgLTIxNGMgMCAtMzAgMCAtNTAgMCAtNTdjIDAgLTMgMCAtNyAwIC0xMWggMzA3diAzMTNjIC0zMSAwIC01NCAwIC02OSAwYyAtMzggMCAtNzcgMSAtMTE1IDJjIC0zOCAyIC03MiA4IC0xMDEgMjBjIC0yOCAxMSAtNTEgMzggLTY2IDgxdiA4MWMgMTUgNDIgMzggNzAgNjkgODRjIDMwIDEzIDEwMiAyMCAyMTQgMjBjIDMwIDAgNTAgMCA1NyAwYyAzIDAgNyAwIDExIDB2IDMxM2ggLTMwN2MgMCAtMzEgMCAtNTQgMCAtNjljIDAgLTM4IC0xIC03NyAtMiAtMTE1YyAtMiAtMzggLTggLTcyIC0yMCAtMTAxYyAtMTEgLTI4IC0zOCAtNTEgLTgxIC02NmggLTEwNGMgLTQyIDE1IC03MCAzOCAtODQgNjljIC0xMyAzMCAtMjAgMTAyIC0yMCAyMTRjIDAgMzAgMCA1MCAwIDU3YyAwIDMgMCA3IDAgMTFoIC0zMDdWIDU5NWMgMzAgMCA1NCAwIDY5IDBjIDM4IDAgNzcgLTEgMTE1IC0yYyAzOCAtMiA3MiAtOCAxMDEgLTIwYyAyOCAtMTEgNTEgLTM4IDY2IC04MXYgLTgxYyAtMTUgLTQyIC0zOCAtNzAgLTY5IC04NGMgLTMxIC0xMyAtMTAyIC0yMCAtMjE0IC0yMGMgLTMxIDAgLTUwIDAgLTU3IDBjIC0zIDAgLTcgMCAtMTEgMHYgLTMxM2ggMzA3YyAwIDMxIDAgNTQgMCA2OWMgMCAzOCAwIDc3IDIgMTE1YyAxIDM4IDggNzIgMjAgMTAxYyAxMSAyOCAzOCA1MSA4MSA2NkggNDgyIiAvPg0KPHBhdGggaWQ9Ik5vdGVIYXJtb25pYyIgZD0iTSAxMTYgNDUzbCA0NTIgLTQ1MmMgMTA4IDEzMSAxOTcgMjIwIDI2NiAyNjZsIDI2MSAyMDJsIC00NDYgNDUyYyAtMzggLTQ2IC04MSAtOTAgLTEyNyAtMTMzYyAtNDYgLTQyIC05MCAtODUgLTEzMyAtMTI3YyAtNDIgLTQyIC05OCAtODkgLTE2OCAtMTM5QyAxODIgNDk2IDE0NyA0NzIgMTE2IDQ1MyIgLz4NCjxwYXRoIGlkPSJOb3RlUmlkZUN5bWJhbCIgZD0iTSA5MTAgNDE3QyA3NjMgNTYxIDYxNiA2OTUgNDY5IDg0MCAzODQgNjkxIDI2MSA1NzYgMTI2IDQ3MyA3OSA0MzggMjkgNDA3IC0yMyAzODIgMTIyIDIzOSAyNjcgOTYgNDEyIC00NiA1MDIgOTIgNjI4IDIwMyA3NTQgMzEwIDgwMyAzNTAgODUzIDM4OCA5MTAgNDE3ek0gNDY1IDY5NkMgNTYxIDYwMiA2NTcgNTA4IDc1MyA0MTQgNjU1IDM1MiA1NzQgMjY4IDQ5MiAxODggNDY0IDE1OSA0MzggMTI4IDQxNSA5NCAzMjAgMTkxIDIyNiAyODggMTMxIDM4NGMgMTEzIDU1IDIwMyAxNDcgMjg1IDI0MSAxNyAyMiAzMyA0NSA0OCA3MHoiIC8%DQo8cGF0aCBpZD0iTm90ZUhpSGF0IiBkPSJNIDQ4NCA2YyAtMjAxIC0yIC0zOTUgMTI2IC00NzEgMzEyIC03OSAxODIgLTM4IDQwOSAxMDEgNTUyIDEzNCAxNDQgMzU1IDE5NyA1NDAgMTI5IDE5MSAtNjUgMzMzIC0yNTMgMzQxIC00NTYgMTIgLTE5OSAtMTA0IC0zOTggLTI4MyAtNDg1IC03MCAtMzUgLTE0OCAtNTMgLTIyNyAtNTN6bSAwIDEwMWMgOTAgMCAxNzkgMzIgMjUwIDg4IC04MyA4MCAtMTY4IDE1OCAtMjUwIDI0MCAtODIgLTgyIC0xNjUgLTE2NSAtMjQ3IC0yNDcgNzAgLTUyIDE1OSAtODEgMjQ3IC04MXptIC0zMjIgMTU1YyA4MyA4MyAxNjcgMTY3IDI1MCAyNTAgLTg1IDg0IC0xNzIgMTY2IC0yNTcgMjUwIC0xMDAgLTEyNyAtMTEzIC0zMTUgLTI2IC00NTMgMTAgLTE2IDIxIC0zMyAzMyAtNDh6bSA2NDcgNmMgOTcgMTI0IDExMiAzMDYgMzMgNDQ0IC0xNCAyMyAtMzAgNjcgLTUyIDI0IC03NSAtNzUgLTE1MiAtMTQ5IC0yMjggLTIyNSA4MSAtODIgMTY1IC0xNjIgMjQ3IC0yNDR6bSAtMzI1IDMyMmMgODMgODMgMTcwIDE2NCAyNTQgMjQ3IC0xMjEgMTAxIC0zMDMgMTIxIC00NDIgNDQgLTIyIC0xNiAtODYgLTM1IC00MiAtNjEgNzYgLTc2IDE1MyAtMTUzIDIzMCAtMjMweiIgLz4NCjxwYXRoIGlkPSJOb3RlU2lkZVN0aWNrIiBkPSJNIDAgMGMgLTI1IDI0IC01MSA0OCAtNzcgNzIgMTUxIDE1MSAzMDIgMzAyIDQ1NCA0NTQgLTE0NCAxNDIgLTI4OCAyODUgLTQzMyA0MjcgMjUgMjUgNTEgNTEgNzcgNzcgMTQyIC0xNDIgMjg1IC0yODUgNDI3IC00MjcgMTQ0IDE0MiAyODggMjg1IDQzMyA0MjcgMjUgLTI1IDUxIC01MSA3NyAtNzcgLTE0NCAtMTQyIC0yODggLTI4NSAtNDMzIC00MjcgMTUxIC0xNTEgMzAyIC0zMDIgNDU0IC00NTQgLTI1IC0yNCAtNTEgLTQ4IC03NyAtNzIgLTE1MSAxNDkgLTMwMiAyOTkgLTQ1NCA0NDkgLTE0OSAtMTQ5IC0yOTkgLTI5OSAtNDQ5IC00NDkiIC8%DQo8cGF0aCBpZD0iTm90ZUhpSGF0SGFsZiIgZD0iTSA0NDkgMjJjIDE4NSAtMiAzNjQgMTE2IDQzNCAyODggNzMgMTY4IDM1IDM3NyAtOTMgNTA4IC0xMjMgMTMzIC0zMjcgMTgyIC00OTggMTE5IC0xNzYgLTYwIC0zMDcgLTIzMyAtMzE0IC00MjAgLTExIC0xODMgOTYgLTM2NiAyNjEgLTQ0NyA2NCAtMzIgMTM3IC00OSAyMDkgLTQ5em0gMCA5M2MgLTgyIDAgLTE2MyAzMCAtMjI4IDgxIDE3NyAxNzYgMzU0IDM1MiA1MzEgNTI4IDk5IC0xMjcgMTA0IC0zMTkgNyAtNDUwIC03MCAtOTggLTE4OSAtMTU5IC0zMTAgLTE1OHptIC0yOTYgMTUzYyAtNzUgOTMgLTEwMiAyMjMgLTY0IDMzOCA0NiAxNjAgMjA5IDI3OCAzNzcgMjY3IDc3IC0yIDE1MyAtMzAgMjE1IC03NyAtMTc2IC0xNzYgLTM1MiAtMzUyIC01MjggLTUyOHoiIC8%DQo8cGF0aCBpZD0iTm90ZUNoaW5lc2VDeW1iYWwiIGQ9Ik0gNTAzIC00NTBsIDU3NyA1NzlsIC02NCA2NmwgLTUxNiAtNTE0bCAtNTEyIDUxMmwgLTY4IC02NEwgNTAzIC00NTB6TSA0OTkgNjAxbCAzMTYgMzE0bCAxNDUgLTE0M2wgLTMxNCAtMzE2bCAzMTYgLTMxMmwgLTE0MSAtMTQxbCAtMzE3IDMxOWwgLTMxNyAtMzIzbCAtMTM2IDEzNmwgMzE5IDMxOWwgLTMyNiAzMjZsIDE0MCAxNDBMIDQ5OSA2MDEiIC8%DQo8cGF0aCBpZD0iRm9vdGVyVXBFaWdodGgiIGQ9Ik0gOSAxMDMyViAtOWggODdjIDIwIDEzNyA0OCAyNTIgODMgMzQ1cyA3NSAxNzIgMTIyIDIzOHMgMTE2IDE1MSAyMDkgMjU1cyAxNjggMTkzIDIyNSAyNjVjIDE3MiAyMjEgMjU5IDQ1MyAyNTkgNjk1YyAwIDI0OCAtMTA1IDU1MCAtMzE3IDkwN2ggLTU3YyAyNyAtNjIgNTggLTEzNCA5NCAtMjE2cyA2NSAtMTU2IDkwIC0yMjNzIDQzIC0xMzMgNTcgLTE5OXMgMjEgLTEzMSAyMSAtMTk2YyAwIC0xMDIgLTIwIC0yMDQgLTYyIC0zMDhzIC05OSAtMTk5IC0xNzQgLTI4N3MgLTE1OSAtMTU5IC0yNTQgLTIxM3MgLTE5NCAtODQgLTI5NiAtOTB2IDY4SCA5IiAvPg0KPHBhdGggaWQ9IkZvb3RlclVwU2l4dGVlbnRoIiBkPSJNIDk0MyAxOTEyYyA2MiAxMzUgOTQgMjgwIDk0IDQzNWMgMCAyMDIgLTYxIDQwNCAtMTgzIDYwNWggLTU3YyAxMDggLTIzMyAxNjIgLTQzMCAxNjIgLTU5MGMgMCAtMTE3IC0yNiAtMjIwIC03OCAtMzA5YyAtNTIgLTg5IC0xMTggLTE2NiAtMTk4IC0yMzBjIC04MCAtNjQgLTE4NyAtMTM3IC0zMjIgLTIyMHMgLTIyMCAtMTM2IC0yNTcgLTE2MXYgNzJoIC04NlYgOGggODZjIDYgMTA4IDI4IDIwMCA2NSAyNzZzIDc0IDEzMyAxMTEgMTcwcyAxMDkgMTA2IDIxOCAyMDZzIDE5MCAxODQgMjQ1IDI1MmMgODcgMTA5IDE1MSAyMTYgMTkxIDMxOXMgNjAgMjEyIDYwIDMyOEMgOTk0IDE2NDggOTc3IDE3NjQgOTQzIDE5MTJ6TSA4OTcgMTgxNWMgMCAtMTcgMCAtNDEgMSAtNzJzIDEgLTUzIDEgLTY4YyAwIC0zNjkgLTI2NiAtNzAxIC03OTggLTk5NmMgMyAxMjAgMzEgMjI5IDgzIDMyN3MgMTMwIDE5OSAyMzMgMzAzcyAxOTUgMTk1IDI3NiAyNzNDIDc3NiAxNjU5IDg0MyAxNzM3IDg5NyAxODE1IiAvPg0KPHBhdGggaWQ9IkZvb3RlclVwVGhpcnR5U2Vjb25kIiBkPSJNIDE0IDE5OTBWIDEwaCA4N2MgMTEgMTIxIDM1IDIxNiA3MCAyODNjIDM1IDY2IDg5IDEzNCAxNjEgMjAyYyA3MiA2OCAxNzQgMTY0IDMwNyAyODhjIDIzNSAyMjYgMzUzIDQ5NCAzNTMgODAyYyAwIDEwNiAtMTQgMjExIC00MyAzMTdjIDI5IDkwIDQzIDE4NiA0MyAyODdjIDAgNzkgLTEyIDE3MSAtMzYgMjc0YyA1NyA3MyA4NiAxOTEgODYgMzUyYyAwIDExMiAtMTUgMjI2IC00NiAzNDJzIC03NiAyMTggLTEzNyAzMDhoIC01N2MgMTA4IC0yMjMgMTYyIC00MTggMTYyIC01ODJjIDAgLTEwNCAtMjAgLTE5OSAtNjIgLTI4NHMgLTk5IC0xNjMgLTE3MiAtMjMyYyAtNzMgLTY5IC0xNTMgLTEzMyAtMjM5IC0xOTJzIC0yMTUgLTE0MiAtMzg5IC0yNTF2IDY0SCAxNHpNIDEwOCAxMjkyYyA3IDExMyAzOSAyMTUgOTYgMzA1YyA1NiA4OSAxMjkgMTc2IDIxOCAyNTlzIDE3OSAxNjggMjczIDI1N2MgOTMgODggMTYwIDE2OCAxOTkgMjQwYyAyIC0xOSAzIC00OCAzIC04N0MgOTAwIDE5MDQgNjM2IDE1NzkgMTA4IDEyOTJ6TSAxMTUgNjY2YyAwIDEwNiAyMyAxOTcgNzEgMjcycyAxMjkgMTY2IDI0NyAyNzRzIDIwOSAxOTcgMjc2IDI2OHMgMTI5IDE2OCAxODcgMjg4YyA3IC00MiAxMCAtODMgMTAgLTEyMmMgMCAtMTQ2IC00MCAtMjgwIC0xMjAgLTQwMWMgLTgwIC0xMjEgLTE3MSAtMjIxIC0yNzMgLTMwMEMgNDExIDg2NyAyNzggNzc0IDExNSA2NjYiIC8%DQo8cGF0aCBpZD0iRm9vdGVyVXBTaXh0eUZvdXJ0aCIgZD0iTSAyMSAyODUxViA1NjR2IC01NTRoIDg2YyAwIDE0MCAzMiAyNTQgOTggMzQyYyA2NSA4NyAxNzMgMjAwIDMyMiAzMzlzIDI2MSAyNzEgMzM2IDQwMHMgMTEzIDI5MiAxMTMgNDkwYyAwIDk2IC0xMiAyMDggLTM2IDMzOGMgNDMgODMgNjUgMTg4IDY1IDMxNmMgMCAxMjIgLTIxIDIzNyAtNjUgMzQ1YyA0OCAxMDkgNzIgMjIzIDcyIDM0MmMgMCAxMTcgLTI0IDIyMiAtNzIgMzE2YyA1NyA4NSA4NiAyMDUgODYgMzYwYyAwIDIxOCAtNTMgNDQzIC0xNjEgNjczaCAtNjVjIDk4IC0yODAgMTQ3IC00OTggMTQ3IC02NTJjIDAgLTExNSAtMjIgLTIxMCAtNjUgLTI4NHMgLTkzIC0xMzAgLTE0OSAtMTcwYyAtNTYgLTM5IC0xNTMgLTEwMCAtMjkxIC0xODNzIC0yNDcgLTE1NiAtMzI3IC0yMjFsIDAgODdMIDIxIDI4NTF6TSAxMDcgMjAwMWMgMCAxMjEgMjkgMjMzIDg5IDMzNnMgMTM4IDIwMyAyMzYgMzAxcyAxOTIgMTkwIDI4MCAyNzhjIDg4IDg3IDE0OSAxNjYgMTgxIDIzNWMgMTEgLTYwIDE3IC0xMTIgMTcgLTE1NWMgMCAtMjEyIC04MSAtNDA1IC0yNDQgLTU3OEMgNTA1IDIyNDYgMzE4IDIxMDYgMTA3IDIwMDF6TSAxMTQgNjY4YyAwIDExOSAyMiAyMTkgNjggMzAwcyAxMjcgMTc2IDI0NSAyODZjIDExOCAxMDkgMjA4IDE5OCAyNzIgMjY1YyA2MyA2NiAxMjggMTYzIDE5NSAyOTBjIDcgLTQ2IDEwIC05MCAxMCAtMTMzYyAwIC0xNjYgLTQxIC0zMTMgLTEyNCAtNDM5cyAtMTc3IC0yMjkgLTI4MSAtMzA4QyAzOTUgODQ4IDI2NyA3NjIgMTE0IDY2OHpNIDExNCAxMzM4YyAwIDEyMyAyNCAyMjYgNzMgMzA5cyAxMzMgMTc2IDI1MiAyODJzIDIxMSAxOTMgMjc4IDI2M3MgMTI4IDE2NCAxODMgMjgzYyA5IC00NSAxNCAtOTQgMTQgLTE0N2MgMCAtMTM4IC0zOSAtMjcwIC0xMTYgLTM5NXMgLTE3NyAtMjM2IC0yOTcgLTMzNFMgMjUyIDE0MTMgMTE0IDEzMzgiIC8%DQo8cGF0aCBpZD0iRm9vdGVyRG93bkVpZ2h0aCIgZD0iTSA5IC0xMDMyViA5aCA4N2MgMjAgLTEzNyA0OCAtMjUyIDgzIC0zNDVzIDc1IC0xNzIgMTIyIC0yMzhzIDExNiAtMTUxIDIwOSAtMjU1cyAxNjggLTE5MyAyMjUgLTI2NWMgMTcyIC0yMjEgMjU5IC00NTMgMjU5IC02OTVjIDAgLTI0OCAtMTA1IC01NTAgLTMxNyAtOTA3aCAtNTdjIDI3IDYyIDU4IDEzNCA5NCAyMTZzIDY1IDE1NiA5MCAyMjNzIDQzIDEzMyA1NyAxOTlzIDIxIDEzMSAyMSAxOTZjIDAgMTAyIC0yMCAyMDQgLTYyIDMwOHMgLTk5IDE5OSAtMTc0IDI4N3MgLTE1OSAxNTkgLTI1NCAyMTNzIC0xOTQgODQgLTI5NiA5MHYgNjhIIDkiIC8%DQo8cGF0aCBpZD0iRm9vdGVyRG93blNpeHRlZW50aCIgZD0iTSA5NDMgLTE5MTJjIDYyIC0xMzUgOTQgLTI4MCA5NCAtNDM1YyAwIC0yMDIgLTYxIC00MDQgLTE4MyAtNjA1aCAtNTdjIDEwOCAyMzMgMTYyIDQzMCAxNjIgNTkwYyAwIDExNyAtMjYgMjIwIC03OCAzMDljIC01MiA4OSAtMTE4IDE2NiAtMTk4IDIzMGMgLTgwIDY0IC0xODcgMTM3IC0zMjIgMjIwcyAtMjIwIDEzNiAtMjU3IDE2MXYgNzJoIC04NlYgLThoIDg2YyA2IC0xMDggMjggLTIwMCA2NSAtMjc2cyA3NCAtMTMzIDExMSAtMTcwcyAxMDkgLTEwNiAyMTggLTIwNnMgMTkwIC0xODQgMjQ1IC0yNTJjIDg3IC0xMDkgMTUxIC0yMTYgMTkxIC0zMTlzIDYwIC0yMTIgNjAgLTMyOEMgOTk0IC0xNjQ4IDk3NyAtMTc2NCA5NDMgLTE5MTJ6TSA4OTcgLTE4MTVjIDAgMTcgMCA0MSAxIDcycyAxIDUzIDEgNjhjIDAgMzY5IC0yNjYgNzAxIC03OTggOTk2YyAzIC0xMjAgMzEgLTIyOSA4MyAtMzI3cyAxMzAgLTE5OSAyMzMgLTMwM3MgMTk1IC0xOTUgMjc2IC0yNzNDIDc3NiAtMTY1OSA4NDMgLTE3MzcgODk3IC0xODE1IiAvPg0KPHBhdGggaWQ9IkZvb3RlckRvd25UaGlydHlTZWNvbmQiIGQ9Ik0gMTQgLTE5OTBWIC0xMGggODdjIDExIC0xMjEgMzUgLTIxNiA3MCAtMjgzYyAzNSAtNjYgODkgLTEzNCAxNjEgLTIwMmMgNzIgLTY4IDE3NCAtMTY0IDMwNyAtMjg4YyAyMzUgLTIyNiAzNTMgLTQ5NCAzNTMgLTgwMmMgMCAtMTA2IC0xNCAtMjExIC00MyAtMzE3YyAyOSAtOTAgNDMgLTE4NiA0MyAtMjg3YyAwIC03OSAtMTIgLTE3MSAtMzYgLTI3NGMgNTcgLTczIDg2IC0xOTEgODYgLTM1MmMgMCAtMTEyIC0xNSAtMjI2IC00NiAtMzQycyAtNzYgLTIxOCAtMTM3IC0zMDhoIC01N2MgMTA4IDIyMyAxNjIgNDE4IDE2MiA1ODJjIDAgMTA0IC0yMCAxOTkgLTYyIDI4NHMgLTk5IDE2MyAtMTcyIDIzMmMgLTczIDY5IC0xNTMgMTMzIC0yMzkgMTkycyAtMjE1IDE0MiAtMzg5IDI1MXYgNjRIIDE0ek0gMTA4IC0xMjkyYyA3IC0xMTMgMzkgLTIxNSA5NiAtMzA1YyA1NiAtODkgMTI5IC0xNzYgMjE4IC0yNTlzIDE3OSAtMTY4IDI3MyAtMjU3YyA5MyAtODggMTYwIC0xNjggMTk5IC0yNDBjIDIgMTkgMyA0OCAzIDg3QyA5MDAgLTE5MDQgNjM2IC0xNTc5IDEwOCAtMTI5MnpNIDExNSAtNjY2YyAwIC0xMDYgMjMgLTE5NyA3MSAtMjcycyAxMjkgLTE2NiAyNDcgLTI3NHMgMjA5IC0xOTcgMjc2IC0yNjhzIDEyOSAtMTY4IDE4NyAtMjg4YyA3IDQyIDEwIDgzIDEwIDEyMmMgMCAxNDYgLTQwIDI4MCAtMTIwIDQwMWMgLTgwIDEyMSAtMTcxIDIyMSAtMjczIDMwMEMgNDExIC04NjcgMjc4IC03NzQgMTE1IC02NjYiIC8%DQo8cGF0aCBpZD0iRm9vdGVyRG93blNpeHR5Rm91cnRoIiBkPSJNIDIxIC0yODUxViAtNTY0diAtNTU0aCA4NmMgMCAtMTQwIDMyIC0yNTQgOTggLTM0MmMgNjUgLTg3IDE3MyAtMjAwIDMyMiAtMzM5cyAyNjEgLTI3MSAzMzYgLTQwMHMgMTEzIC0yOTIgMTEzIC00OTBjIDAgLTk2IC0xMiAtMjA4IC0zNiAtMzM4YyA0MyAtODMgNjUgLTE4OCA2NSAtMzE2YyAwIC0xMjIgLTIxIC0yMzcgLTY1IC0zNDVjIDQ4IC0xMDkgNzIgLTIyMyA3MiAtMzQyYyAwIC0xMTcgLTI0IC0yMjIgLTcyIC0zMTZjIDU3IC04NSA4NiAtMjA1IDg2IC0zNjBjIDAgLTIxOCAtNTMgLTQ0MyAtMTYxIC02NzNoIC02NWMgOTggMjgwIDE0NyA0OTggMTQ3IDY1MmMgMCAxMTUgLTIyIDIxMCAtNjUgMjg0cyAtOTMgMTMwIC0xNDkgMTcwYyAtNTYgMzkgLTE1MyAxMDAgLTI5MSAxODNzIC0yNDcgMTU2IC0zMjcgMjIxbCAwIC04N0wgMjEgLTI4NTF6TSAxMDcgLTIwMDFjIDAgLTEyMSAyOSAtMjMzIDg5IC0zMzZzIDEzOCAtMjAzIDIzNiAtMzAxcyAxOTIgLTE5MCAyODAgLTI3OGMgODggLTg3IDE0OSAtMTY2IDE4MSAtMjM1YyAxMSA2MCAxNyAxMTIgMTcgMTU1YyAwIDIxMiAtODEgNDA1IC0yNDQgNTc4QyA1MDUgLTIyNDYgMzE4IC0yMTA2IDEwNyAtMjAwMXpNIDExNCAtNjY4YyAwIC0xMTkgMjIgLTIxOSA2OCAtMzAwcyAxMjcgLTE3NiAyNDUgLTI4NmMgMTE4IC0xMDkgMjA4IC0xOTggMjcyIC0yNjVjIDYzIC02NiAxMjggLTE2MyAxOTUgLTI5MGMgNyA0NiAxMCA5MCAxMCAxMzNjIDAgMTY2IC00MSAzMTMgLTEyNCA0MzlzIC0xNzcgMjI5IC0yODEgMzA4QyAzOTUgLTg0OCAyNjcgLTc2MiAxMTQgLTY2OHpNIDExNCAtMTMzOGMgMCAtMTIzIDI0IC0yMjYgNzMgLTMwOXMgMTMzIC0xNzYgMjUyIC0yODJzIDIxMSAtMTkzIDI3OCAtMjYzcyAxMjggLTE2NCAxODMgLTI4M2MgOSA0NSAxNCA5NCAxNCAxNDdjIDAgMTM4IC0zOSAyNzAgLTExNiAzOTVzIC0xNzcgMjM2IC0yOTcgMzM0UyAyNTIgLTE0MTMgMTE0IC0xMzM4IiAvPg0KPHBhdGggaWQ9IlNpbWlsZU1hcmsiIGQ9Ik0gNDEzIDE4MDRsIC00NDYgM2wgMTgwNCAtMTgwNmwgNDQ5IC0zTCA0MTMgMTgwNHpNIDMzMSA0MzRjIDAgLTUzIDIwIC0xMDAgNjIgLTE0MmMgNDEgLTQxIDkxIC02MiAxNDggLTYycyAxMDQgMTkgMTQyIDU2YyAzOCAzOCA1NiA4NyA1NiAxNDhjIDAgNTYgLTE5IDEwNSAtNTkgMTQ1YyAtMzkgMzkgLTg4IDU5IC0xNDUgNTljIC01NiAwIC0xMDUgLTE5IC0xNDUgLTU5QyAzNTEgNTQwIDMzMSA0OTEgMzMxIDQzNHpNIDE0MzcgMTM4MGMgMCAtNTYgMTggLTEwNCA1NiAtMTQyYyAzNyAtMzcgODcgLTU2IDE0OCAtNTZjIDU2IDAgMTA0IDE5IDE0MiA1NmMgMzggMzggNTYgODUgNTYgMTQyYyAwIDU2IC0xOSAxMDQgLTU2IDE0MmMgLTM4IDM4IC04NyA1NiAtMTQ4IDU2YyAtNTYgMCAtMTA0IC0xOSAtMTQyIC01NkMgMTQ1NiAxNDg1IDE0MzcgMTQzNyAxNDM3IDEzODAiIC8%DQo8cGF0aCBpZD0iU2ltaWxlTWFyazIiIGQ9Ik0gNDE0IDE4MThsIC00NDYgM2wgMTgwOSAtMTgwOWwgNDQ5IC02TCA0MTQgMTgxOHpNIDM0MCA0MzljIDAgLTU2IDE4IC0xMDQgNTYgLTE0MmMgMzcgLTM3IDg3IC01NiAxNDggLTU2YyA1NiAwIDEwNSAyMCAxNDUgNTljIDM5IDM5IDU5IDg4IDU5IDE0NWMgMCA1NiAtMTkgMTA0IC01NiAxNDJjIC0zOCAzOCAtODkgNTYgLTE1MyA1NmMgLTU2IDAgLTEwNCAtMTggLTE0MiAtNTZDIDM1OSA1NDkgMzQwIDUwMCAzNDAgNDM5ek0gMTE1MiAxODE1bCAtNDQ2IDNsIDE4MTIgLTE4MTJsIDQ0NiAtM0wgMTE1MiAxODE1ek0gMjE5MiAxMzkxYyAwIC01NiAxOCAtMTA0IDU2IC0xNDJjIDM4IC0zNyA4NyAtNTYgMTQ4IC01NmMgNTYgMCAxMDQgMTkgMTQyIDU2YyAzNyAzOCA1NiA4NSA1NiAxNDJjIDAgNTYgLTE5IDEwNCAtNTYgMTQyYyAtMzggMzggLTg3IDU2IC0xNDggNTZjIC01NiAwIC0xMDQgLTE5IC0xNDIgLTU2QyAyMjExIDE0OTUgMjE5MiAxNDQ4IDIxOTIgMTM5MSIgLz4NCjxwYXRoIGlkPSJDb2RhIiBkPSJNIDY5NyAxNjg5diAyOTloIC03MnYgLTI5OWMgLTE4OSAwIC0zNDkgLTgxIC00NzggLTI0NGMgLTEyOSAtMTYzIC0xOTMgLTM0OSAtMTkzIC01NThoIC0yNDh2IC03M2ggMjQ4YyAwIC0yMTYgNjMgLTQwOSAxODkgLTU4MWMgMTI2IC0xNzEgMjg3IC0yNTcgNDgxIC0yNTd2IC0yNDhoIDcydiAyNDhjIDE4OSAwIDM0NSA4NCA0NjcgMjU0cyAxODIgMzY0IDE4MiA1ODVoIDI4NHYgNzNoIC0yODRjIDAgMjA5IC02MCAzOTUgLTE4MiA1NThDIDEwNDIgMTYwOCA4ODcgMTY4OSA2OTcgMTY4OXpNIDYyNCA4MTN2IC03MzdjIC0xMjYgMTQgLTIwOCA4OCAtMjQ0IDIyMmMgLTM2IDEzMyAtNTQgMzA1IC01NCA1MTRIIDYyNHpNIDMyNCA4ODZjIDAgMjYyIDI1IDQ0NSA3NiA1NDdzIDEyNSAxNTggMjIyIDE2N3YgLTcxNUggMzI0ek0gNjk3IDgxM2ggMjkyYyAwIC0yMjEgLTEyIC0zNzggLTM2IC00NzFjIC00MyAtMTY2IC0xMjkgLTI1NyAtMjU1IC0yNzJWIDgxM3pNIDk4OSA4ODZoIC0yOTJ2IDcxNWMgOTcgLTkgMTcwIC02NCAyMTkgLTE2NEMgOTY0IDEzMzggOTg5IDExNTQgOTg5IDg4NiIgLz4NCjxwYXRoIGlkPSJTZWdubyIgZD0iTSA2MDQgMTE1MGMgLTE4MiAtMTEyIC0zMjQgLTIyMiAtNDI1IC0zMjljIC0xMjYgLTEzMSAtMTg5IC0yNTYgLTE4OSAtMzcyYyAwIC0xMTYgNDIgLTIxOCAxMjggLTMwNmMgODUgLTg3IDE5NCAtMTMxIDMyNyAtMTMxYyA5OCAwIDE5NiAzMiAyOTQgOTdjIDk4IDY0IDE0NyAxNDEgMTQ3IDIyOWMgMCA1NiAtOSAxMDQgLTI4IDE0MmMgLTE4IDM4IC01MCA1NiAtOTQgNTZjIC0xMDAgMCAtMTU1IC00NiAtMTY0IC0xMzdjIDAgLTE4IDggLTQ1IDI1IC04MGMgMTcgLTM0IDIxIC02MyAxMSAtODVjIC0yMiAtNjkgLTg2IC0xMDQgLTE5MiAtMTA0YyAtNjcgMCAtMTIzIDIwIC0xNjggNjFjIC00NCA0MCAtNjcgODQgLTY3IDEzMWMgMCAxMzUgNjQgMjQ4IDE5MyAzMzljIDI1IDE4IDE1NSA4OCAzOTIgMjA3bCA1NzEgLTg0M2wgMTQ4IDBsIC02MTEgOTAwYyAxOTYgMTIxIDMzNCAyMjMgNDE1IDMwNGMgMTE4IDExOCAxNzcgMjQ1IDE3NyAzNzljIDAgMTEyIC00MyAyMTQgLTEzMCAzMDRjIC04NiA5MCAtMTkzIDEzNiAtMzIwIDEzNmMgLTEwMiAwIC0yMDIgLTM0IC0zMDAgLTEwMmMgLTk3IC02OCAtMTQ2IC0xNTIgLTE0NiAtMjUxYyAwIC0zNyAxMyAtNzkgNDAgLTEyNWMgMjcgLTQ2IDU3IC02OSA5MyAtNjljIDQ3IDAgODIgMTIgMTA1IDM4YyAyMiAyNSAzOCA2NSA0NyAxMjBjIDYgMjIgMCA1MSAtMTYgODdjIC0xNyAzNiAtMjIgNjUgLTE2IDg3YyA5IDMxIDM1IDU2IDc4IDc1YyA0MiAxOCA5MSAyOCAxNDcgMjhjIDU4IDAgMTA1IC0yMSAxNDIgLTY1YyAzNiAtNDMgNTUgLTg5IDU1IC0xMzljIDAgLTEzOSAtODkgLTI2MyAtMjY5IC0zNzFjIC0xMzMgLTY4IC0yMzIgLTExNyAtMjk3IC0xNDhsIC01NDQgODEwbCAtMTUyIC0xTCA2MDQgMTE1MHpNIDIwMSAxMDkxYyAzNCAwIDY0IDExIDg5IDMycyAzNyA1MSAzNyA4OWMgMCAzNCAtMTIgNjQgLTM3IDg5YyAtMjUgMjUgLTU0IDM3IC04OSAzN2MgLTM0IDAgLTY0IC0xMiAtODkgLTM3YyAtMjUgLTI1IC0zNyAtNTQgLTM3IC04OUMgNzQgMTEzMSAxMTYgMTA5MSAyMDEgMTA5MXpNIDEyOTEgNjk2YyAzNCAwIDY0IDEyIDg5IDM3YyAyNSAyNSAzNyA1NCAzNyA4OWMgMCAzMSAtMTIgNTkgLTM3IDg0YyAtMjUgMjUgLTU0IDM3IC04OSAzN3MgLTYzIC0xMSAtODYgLTM1cyAtMzUgLTUyIC0zNSAtODdjIDAgLTM0IDEwIC02NCAzMiAtODlDIDEyMjQgNzA4IDEyNTMgNjk2IDEyOTEgNjk2IiAvPg0KPHBhdGggaWQ9Ik90dGF2YUFib3ZlIiBkPSJNIDQ4OCA1NjJjIDc4IDkgMTQ3IDQ1IDIwNiAxMTBjIDU5IDY0IDg4IDEzOCA4OCAyMjJjIDAgOTUgLTM5IDE3MSAtMTE4IDIyN2MgLTc4IDU1IC0xNzUgODMgLTI5MCA4M2MgLTExMiAwIC0yMDggLTI4IC0yODggLTg1YyAtODAgLTU2IC0xMjAgLTEzNCAtMTIwIC0yMzNjIDAgLTQxIDUgLTc3IDE1IC0xMDdjIDEwIC0yOSAyOSAtNjEgNTYgLTk0YyAyNyAtMzIgNzcgLTYyIDE0OSAtODljIDEyIC0zIDI4IC03IDQ5IC0xM2MgLTY5IC0xMiAtMTI3IC00OCAtMTcyIC0xMDdjIC00NSAtNTkgLTY4IC0xMjMgLTY4IC0xOTBjIDAgLTg4IDM3IC0xNjEgMTEzIC0yMTdzIDE1OCAtODQgMjQ5IC04NGMgOTYgMCAxODUgMjkgMjY1IDg3YyA4MCA1OCAxMjAgMTMxIDEyMCAyMjBjIDAgNzMgLTIyIDEzNCAtNjggMTgzYyAtMjQgMjQgLTYyIDQ3IC0xMTMgNjhDIDU0NyA1NDUgNTIxIDU1MyA0ODggNTYyek0gMjc5IDU4OGMgLTY2IDIxIC0xMTggNTcgLTE1NiAxMDhjIC0zNyA1MSAtNTYgMTEyIC01NiAxODFjIDAgNzIgMjcgMTQxIDgzIDIwNmMgNTYgNjUgMTMwIDk3IDIyNCA5N2MgOTAgMCAxNjYgLTM2IDIyNiAtMTA4YyA1MSAtNjAgNzcgLTEyNCA3NyAtMTkwYyAwIC01NCAtMjEgLTEwMSAtNjMgLTE0MGMgLTMwIC0yNyAtNjggLTQ5IC0xMTMgLTY4TCAyNzkgNTg4ek0gNDYwIDU0N2MgMTMwIC0zOSAxOTUgLTEyNyAxOTUgLTI2M2MgMCAtNjYgLTI1IC0xMjkgLTc3IC0xODhjIC01MSAtNTkgLTEyMiAtODggLTIxMyAtODhjIC04NyAwIC0xNTUgMjggLTIwMiA4NmMgLTQ3IDU3IC03MCAxMTkgLTcwIDE4NmMgMCAzNiAxNCA3MiA0MyAxMDhjIDI4IDM2IDY4IDYzIDEyMCA4MUwgNDYwIDU0N3pNIDg0MiAzMTFsIC0xMyAtOWwgNjggLTU4YyAyNCAtMjEgNTEgLTI4IDgxIC0yMmMgMjcgMyA0MCAyNCA0MCA2M2MgMCAzNiAtMTUgMTAwIC00NyAxOTJjIC0zMSA5MiAtNDcgMTQ5IC00NyAxNzBjIDAgMzMgMTMgNDYgNDAgNDBjIDQyIC0zIDk0IC00NyAxNTYgLTEzM2MgNjEgLTg2IDkzIC0xNTYgOTMgLTIxMWMgMCAtMTIgLTcgLTIyIC0yMiAtMzFjIC0xOCAtOSAtMjggLTE2IC0zMSAtMjJjIC0xNSAtMzAgLTcgLTQ5IDIyIC01OWMgMzAgLTEyIDUyIDkgNjggNjNjIDE4IDc1IC0xMiAxNjcgLTkzIDI3NGMgLTgwIDEwNyAtMTQ3IDE2MSAtMjAxIDE2MWMgLTU3IDAgLTg2IC0yNCAtODYgLTcyYyAwIC0xOCA0IC0zNyAxMyAtNTljIDkgLTIxIDIzIC02NSA0MyAtMTMzYyAxOSAtNjggMjkgLTEyMCAyOSAtMTU2YyAwIC0xNSAtMSAtMjUgLTQgLTMxYyAtOSAtMTggLTI0IC0xOSAtNDUgLTRMIDg0MiAzMTF6TSAxNjM2IDY4M2wgODEgLTY4bCAtNzIgODNjIC0xOCAxOSAtMzYgMjkgLTU0IDI5YyAtMTUgMCAtMjEgLTE1IC0xOCAtNDVsIDQwIC0xNjdjIC0zIDIxIC0yOCA1OSAtNzcgMTEzYyAtNTcgNjYgLTEwOSA5OSAtMTU0IDk5YyAtNjYgMCAtOTkgLTM5IC05OSAtMTE4YyAwIC03OCAyOCAtMTU5IDg2IC0yNDJjIDU3IC04MyAxMjIgLTEyNCAxOTUgLTEyNGMgMzkgMCA3NCAxNSAxMDQgNDVsIDkgLTQ1aCAzMWwgLTk1IDQwN2MgLTYgMTggLTcgMzAgLTQgMzZTIDE2MjEgNjkyIDE2MzYgNjgzek0gMTM4MiA2ODNjIDUxIDAgMTA3IC0zNyAxNjcgLTExMWMgMTggLTI0IDQzIC02MyA3NyAtMTE1bCAzMSAtMTM0YyAtMzMgLTM0IC02NiAtNTEgLTk5IC01MWMgLTU0IDAgLTEwNSA0MCAtMTUyIDEyMGMgLTQ2IDgwIC03MCAxNTQgLTcwIDIyMkMgMTMzNiA2NjAgMTM1MSA2ODMgMTM4MiA2ODMiIC8%DQo8cGF0aCBpZD0iT3R0YXZhQmVsb3ciIGQ9Ik0gNDY5IDUyOWMgNzUgNiAxNDMgNDEgMjAyIDEwN2MgNTkgNjUgODggMTQxIDg4IDIyOWMgMCA5NyAtMzkgMTczIC0xMTggMjI5YyAtNzggNTYgLTE3NSA4NCAtMjkwIDg0YyAtMTEyIDAgLTIwOCAtMjggLTI4OCAtODZjIC04MCAtNTcgLTEyMCAtMTM2IC0xMjAgLTIzNmMgMCAtMzMgNiAtNjggMTggLTEwNGMgMTIgLTM2IDMxIC02OSA1NiAtOTdzIDY1IC01NSAxMjAgLTc5YyAxOCAtNiA0MyAtMTUgNzcgLTI3YyAtNjkgLTEyIC0xMjYgLTQ3IC0xNzAgLTEwNHMgLTY1IC0xMjEgLTY1IC0xOTFjIDAgLTg1IDM3IC0xNTYgMTEzIC0yMTRjIDc1IC01NyAxNTcgLTg2IDI0NSAtODZjIDkzIDAgMTgyIDI4IDI2NSA4NmMgODMgNTcgMTI0IDEzMCAxMjQgMjE4YyAwIDcyIC0yMiAxMzMgLTY4IDE4MmMgLTI0IDI0IC02MiA0NyAtMTEzIDY4QyA1MjggNTEyIDUwMiA1MjAgNDY5IDUyOXpNIDI1MSA1NjNjIC02NiAyMSAtMTE4IDU3IC0xNTQgMTA4YyAtMzYgNTEgLTU0IDExMiAtNTQgMTgxYyAwIDcyIDI3IDE0MSA4NCAyMDZjIDU1IDY1IDEzMCA5NyAyMjQgOTdjIDkzIDAgMTY5IC0zNiAyMjYgLTEwOGMgNDggLTYwIDcyIC0xMjQgNzIgLTE5MGMgMCAtNTEgLTIxIC05OCAtNjMgLTE0MGMgLTMwIC0zMCAtNjYgLTUyIC0xMDggLTY4TCAyNTEgNTYzek0gNDMyIDUyMmMgMTMwIC0zOSAxOTUgLTEyOCAxOTUgLTI2NWMgMCAtNjcgLTI1IC0xMzAgLTc3IC0xODljIC01MSAtNTkgLTEyMSAtODkgLTIwOCAtODljIC04NyAwIC0xNTUgMjkgLTIwMiA4OWMgLTQ3IDU5IC03MCAxMTkgLTcwIDE4MGMgMCAzNiAxMyA3NCA0MCAxMTJzIDY2IDY2IDExOCA4NEwgNDMyIDUyMnpNIDgyNyAyNjhoIC0xM2wgNjMgLTQ1YyAyNCAtMjcgNTIgLTM5IDg2IC0zNmMgMjQgMyAzNiAyMyAzNiA2MGMgMCAzNCAtMTUgOTggLTQ1IDE5MWMgLTMwIDkzIC00NSAxNTQgLTQ1IDE4MmMgMCAzNCAxMyA0OSA0MCA0NmMgNDIgLTMgOTQgLTQ5IDE1NiAtMTM4YyA2MSAtODkgOTMgLTE2MSA5MyAtMjE4YyAwIC0xMiAtMTAgLTI1IC0zMSAtMzdjIC0xNSAtNiAtMjIgLTEyIC0yMiAtMThjIC0xNSAtMzAgLTkgLTUwIDE4IC01OWMgMzMgLTEyIDU3IDkgNzIgNjRjIDE4IDc2IC0xMiAxNjggLTkzIDI3N2MgLTgwIDEwOCAtMTQ2IDE2MiAtMTk3IDE2MmMgLTYzIDAgLTk1IC0yOCAtOTUgLTg0YyAwIC04IDMgLTIyIDkgLTQwYyAxOCAtNDcgMzUgLTEwMiA1MiAtMTY0YyAxNiAtNjIgMjQgLTEwNSAyNCAtMTI5YyAwIC0xNyAtMyAtMjkgLTkgLTM1YyAtNiAtNiAtMTggLTQgLTM2IDRMIDgyNyAyNjh6TSAxNDEzIC0xM2wgLTcyIC05YyAyMyA2IDUzIDEgODkgLTE1YyAxMSAtMyAzMCAtMTUgNTMgLTM1bCAtMTMxIDQ0NGMgMzAgLTQ1IDY0IC04MSAxMDIgLTEwOGMgMzggLTI3IDc2IC00MCAxMTYgLTQwYyAzOSAwIDY4IDExIDg2IDM0YyAxOCAyMiAyNyA1NSAyNyA5OGMgMCA3OSAtMzAgMTU2IC05MCAyMzFjIC02MCA3NCAtMTM3IDExMiAtMjMxIDExMmMgLTMwIDAgLTU3IC04IC04MSAtMjRjIC0yNCAtMTYgLTMzIC0zNiAtMjcgLTYyTCAxNDEzIC0xM3pNIDEyOTQgNjM1YyAxNSAyMSA0MiAzMiA4MSAzMmMgNzggMCAxNDYgLTQyIDIwNCAtMTI4YyA0OCAtNzMgNzIgLTE0NSA3MiAtMjE1YyAwIC0zMCAtNyAtNTAgLTIyIC01OWMgLTE4IC05IC0zNiAtMTMgLTU0IC0xM2MgLTM2IDAgLTc3IDE3IC0xMjIgNTJjIC00NSAzNSAtODEgNzcgLTEwOCAxMjZMIDEyOTQgNjM1IiAvPg0KPHBhdGggaWQ9IlF1aW5kaWNlc2ltYUFib3ZlIiBkPSJNIDI0NSA5ODVWIDI3MHYgLTcyYyAtOSAtOCAtMzAgLTEzIC02MSAtMTNjIC0yNSAwIC00MiAxIC01MiA0bCAtOTkgMzFsIC00IC0yMmwgMzE3IC0xOTB2IDk4MGMgMCAzOSA2IDY4IDIwIDg4YyAxMyAxOSAzMSAzNCA1MiA0M2wgMTQ1IDQwdiA5aCAtNTMxbCAtNCAtMThsIDE0OSAtNDBjIDI0IC05IDQyIC0yNCA1NCAtNDVDIDI0MSAxMDUwIDI0NSAxMDI0IDI0NSA5ODV6TSA2ODUgMzM4YyA2MCAxNSAxMDUgMjcgMTM2IDM2YyA5NiAyNyAxNjcgNTMgMjEzIDc3YyAxNzUgODcgMjYzIDE5MiAyNjMgMzEzYyAwIDcyIC0xNSAxNDAgLTQ3IDIwNHMgLTcwIDExMSAtMTE1IDE0MmMgLTQ1IDMxIC04NyA1MyAtMTI0IDY1YyAtMzcgMTIgLTk0IDE4IC0xNzAgMThjIC02NiAwIC0xMjggLTEzIC0xODYgLTQwYyAtNTcgLTI3IC04NiAtNjMgLTg2IC0xMDhjIDAgLTI0IDE2IC0zNiA0OSAtMzZjIDE4IDAgNDEgNSA3MCAxNWMgMjggMTAgNjEgMzUgOTcgNzRjIDM2IDM5IDY5IDU5IDk5IDU5YyA5NiAwIDE3MCAtMzkgMjIyIC0xMThjIDQyIC02MyA2MyAtMTMxIDYzIC0yMDRjIDAgLTU3IC0xOCAtMTA4IC01NiAtMTUyYyAtMzcgLTQzIC03OSAtNzcgLTEyNCAtMTAyYyAtNDUgLTI0IC0xMjUgLTU0IC0yNDAgLTkwYyAtMzYgLTEyIC04NyAtMjcgLTE1NCAtNDVsIDE1NCAtNDI2aCA0MjZjIDM2IDAgNjUgLTQgODYgLTEzbCA0NSAtMzRsIDIyIC0yOWggOWwgLTEyNyAxOTVoIC00NDlMIDY4NSAzMzh6TSAxODA2IDU2MWggLTU5bCAxNDUgLTM2N2MgMCAtMTggMCAtMzAgMCAtMzZjIC02IC0yNyAtMjEgLTQyIC00NSAtNDVjIC0yNCAtMyAtNTEgMTMgLTgxIDUwYyAtMyA2IC05IDE2IC0xOCAzMWwgLTE0NSAzNjdoIC02OGwgMTU0IC0zNzljIC0zIC0xNSAtNCAtMjYgLTQgLTMyYyAtNiAtMjEgLTE4IC0zNCAtMzYgLTM3YyAtNDUgLTYgLTk4IDM0IC0xNTggMTIxYyAtOSAxMiAtMjEgMzQgLTM2IDY1aCAtMThjIDMwIC00NyA1NCAtODMgNzIgLTEwNmMgNTcgLTcxIDExMSAtMTA2IDE2MyAtMTA2YyAxOCAyIDM0IDE0IDUwIDM0YyAyIDUgOSAxNyAxOCAzNGMgOSAtMTcgMTYgLTI4IDIyIC0zNGMgMjQgLTIyIDYwIC0zNCAxMDggLTM0YyAxOCAwIDMzIDExIDQ1IDM0YyAyIDUgNyAxOCAxMyAzOGMgMTggLTIxIDMxIC0zNCA0MCAtNDBjIDM2IC0yNyA3NCAtMzcgMTEzIC0zMWMgMzAgNiA0OSAyNCA1OSA1NGMgMyA5IDYgMjUgOSA0OWwgLTEyMiAzMDRjIC0zIDE1IC00IDI1IC00IDMxYyAwIDkgNiAxMyAxOCAxM2MgMTggMCAzOSAtMTcgNjMgLTUyYyA2IC0xMSAxNiAtMjggMzEgLTUybCAxMyA0YyAtMTUgMjkgLTI3IDQ5IC0zNiA2MWMgLTMwIDQzIC01NiA2NSAtNzcgNjVjIC01MSAwIC03MSAtMjAgLTU5IC02MmwgMTIyIC0zMDZjIDAgLTE3IDAgLTI5IDAgLTM1YyAtNiAtMjMgLTIyIC0zNSAtNDkgLTM1cyAtNTEgMTAgLTcyIDMxYyAtNiA2IC0xNSAxOCAtMjcgMzZMIDE4MDYgNTYxek0gMjU1NSA1MjVsIDc3IC02M2wgLTcyIDczYyAtMTggMTcgLTM2IDI2IC01NCAyNmMgLTE1IDAgLTIxIC0xMiAtMTggLTM2bCA0MCAtMTU4YyAtNiAzMSAtNDMgNzggLTExMyAxMzhjIC00NSA0MCAtODQgNjAgLTExOCA2MGMgLTY2IDAgLTk5IC0zOCAtOTkgLTExNGMgMCAtNzkgMjggLTE1OCA4NiAtMjM1YyA1NyAtNzcgMTIyIC0xMTYgMTk1IC0xMTZjIDI0IDAgNDggNSA3MiAxNmMgNiAyIDE2IDkgMzEgMjBsIDkgLTM2aCAzMWwgLTk1IDM5NWMgLTYgMTggLTcgMzAgLTQgMzVDIDI1MjYgNTM1IDI1MzcgNTM0IDI1NTUgNTI1ek0gMjI5MiA1MjVjIDUxIDAgMTA4IC0zNSAxNzIgLTEwN2MgMjEgLTIzIDQ2IC02MSA3NyAtMTEybCAyNyAtMTM0YyAtMzAgLTI5IC02MyAtNDQgLTk5IC00NGMgLTU0IDAgLTEwNSAzOCAtMTUyIDExNmMgLTQ2IDc3IC03MCAxNDkgLTcwIDIxNUMgMjI0NiA1MDIgMjI2MiA1MjUgMjI5MiA1MjUiIC8%DQo8cGF0aCBpZD0iUXVpbmRpY2VzaW1hQmVsb3ciIGQ9Ik0gMjQwMCAtMjAwQyAyMzc2IC0xODAgMjM1OCAtMTcwIDIzNDYgLTE2NkMgMjMxMCAtMTUwIDIyODAgLTE0NCAyMjU2IC0xNTBMIDIzMjggLTE0MUwgMjE2OCA0ODRDIDIxNjIgNTA5IDIxNzIgNTMwIDIxOTYgNTQ2QyAyMjIxIDU2MiAyMjQ3IDU3MSAyMjc4IDU3MUMgMjM3MSA1NzEgMjQ0OCA1MzQgMjUwOSA0NTlDIDI1NjkgMzg0IDI2MDAgMzA3IDI2MDAgMjI4QyAyNjAwIDE4NSAyNTkwIDE1MSAyNTcxIDEyOEMgMjU1MyAxMDUgMjUyNiA5MyAyNDg3IDkzQyAyNDQ4IDkzIDI0MDkgMTA3IDIzNzEgMTM0QyAyMzMzIDE2MSAyMjk5IDE5OCAyMjY4IDI0M0wgMjQwMCAtMjAwek0gMTMwMCAtNTdMIDEyNzggLTI5TCAxMjM0IDZDIDEyMTMgMTUgMTE4MyAyMSAxMTQ2IDIxTCA3MjEgMjFMIDU2NSA0NDZDIDYzMiA0NjQgNjg1IDQ4MSA3MjEgNDkzQyA4MzYgNTMwIDkxMyA1NjAgOTU5IDU4NEMgMTAwNCA2MDggMTA0NiA2NDAgMTA4NCA2ODRDIDExMjIgNzI4IDExNDMgNzgwIDExNDMgODM3QyAxMTQzIDkxMCAxMTIwIDk4MCAxMDc4IDEwNDNDIDEwMjYgMTEyMiA5NTMgMTE1OSA4NTYgMTE1OUMgODI1IDExNTkgNzkyIDExMzkgNzU2IDExMDBDIDcxOSAxMDYwIDY4NyAxMDM1IDY1OSAxMDI1QyA2MzAgMTAxNCA2MDUgMTAwOSA1ODcgMTAwOUMgNTU0IDEwMDkgNTM3IDEwMjIgNTM3IDEwNDZDIDUzNyAxMDkyIDU2NyAxMTI5IDYyNSAxMTU2QyA2ODIgMTE4MyA3NDIgMTE5NiA4MDkgMTE5NkMgODg0IDExOTYgOTQzIDExOTAgOTgxIDExNzhDIDEwMTggMTE2NiAxMDYwIDExNDQgMTEwNiAxMTEyQyAxMTUxIDEwODAgMTE5MCAxMDMyIDEyMjEgOTY4QyAxMjUzIDkwNSAxMjY4IDgzOCAxMjY4IDc2NUMgMTI2OCA2NDQgMTE4MSA1NDAgMTAwNiA0NTNDIDk2MCA0MjkgODkwIDQwMiA3OTMgMzc1QyA3NjMgMzY1IDcxNiAzNTIgNjU2IDMzN0wgNzM0IDE0MEwgMTE4NCAxNDBMIDEzMDkgLTU3TCAxMzAwIC01N3pNIDMxNSA2TCAwIDE5NkwgMyAyMjFMIDEwMyAxOTBDIDExMiAxODcgMTMwIDE4NCAxNTYgMTg0QyAxODcgMTg0IDIwNiAxODcgMjE1IDE5NkwgMjE1IDI2OEwgMjE1IDk4NEMgMjE1IDEwMjMgMjEyIDEwNTAgMjAzIDEwNjVDIDE5MSAxMDg2IDE3MSAxMTAwIDE0NiAxMTA5TCAwIDExNTBMIDMgMTE2OEwgNTM0IDExNjhMIDUzNCAxMTU5TCAzODcgMTExOEMgMzY2IDExMDkgMzUxIDEwOTQgMzM3IDEwNzVDIDMyMyAxMDU1IDMxNSAxMDI2IDMxNSA5ODdMIDMxNSA2ek0gMTY0MCA4NEMgMTU4OSA4NCAxNTM1IDExOSAxNDc4IDE5MEMgMTQ1OSAyMTQgMTQzNiAyNDkgMTQwNiAyOTZMIDE0MjUgMjk2QyAxNDQwIDI2NSAxNDUwIDI0NiAxNDU5IDIzNEMgMTUxOSAxNDcgMTU3MyAxMDYgMTYxOCAxMTJDIDE2MzYgMTE1IDE2NTAgMTI4IDE2NTYgMTUwQyAxNjU2IDE1NiAxNjU2IDE2NSAxNjU5IDE4MUwgMTUwNiA1NjJMIDE1NzEgNTYyTCAxNzE4IDE5M0MgMTcyNyAxNzggMTczNCAxNjggMTczNyAxNjJDIDE3NjcgMTI2IDE3OTQgMTA5IDE4MTggMTEyQyAxODQyIDExNSAxODU2IDEyOSAxODYyIDE1NkwgMTg2MiAxOTNMIDE3MTggNTYyTCAxNzc4IDU2MkwgMTkyMSAxOTNDIDE5MzMgMTc1IDE5NDMgMTYyIDE5NTAgMTU2QyAxOTcxIDEzNSAxOTk0IDEyNSAyMDIxIDEyNUMgMjA0OSAxMjUgMjA2NSAxMzggMjA3MSAxNjJMIDIwNzEgMTk2TCAxOTUwIDUwM0MgMTkzNyA1NDQgMTk1NyA1NjUgMjAwOSA1NjVDIDIwMzAgNTY1IDIwNTcgNTQzIDIwODcgNTAwQyAyMDk2IDQ4OCAyMTA2IDQ2NiAyMTIxIDQzN0wgMjEwOSA0MzRDIDIwOTQgNDU3IDIwODQgNDc1IDIwNzggNDg3QyAyMDUzIDUyMiAyMDMwIDUzNyAyMDEyIDUzN0MgMjAwMCA1MzcgMTk5NiA1MzQgMTk5NiA1MjVDIDE5OTYgNTE5IDE5OTcgNTA4IDIwMDAgNDkzTCAyMTIxIDE5MEMgMjExOCAxNjYgMjExNSAxNDkgMjExMiAxNDBDIDIxMDMgMTEwIDIwODMgOTAgMjA1MyA4NEMgMjAxMyA3OCAxOTc2IDg4IDE5NDAgMTE1QyAxOTMxIDEyMSAxOTE4IDEzNSAxOTAwIDE1NkMgMTg5MyAxMzYgMTg5MCAxMjQgMTg4NyAxMThDIDE4NzUgOTUgMTg1OCA4NCAxODQwIDg0QyAxNzkyIDg0IDE3NTUgOTYgMTczMSAxMThDIDE3MjUgMTI0IDE3MTggMTM2IDE3MDkgMTUzQyAxNzAwIDEzNiAxNjkzIDEyNCAxNjkwIDExOEMgMTY3NSA5OCAxNjU4IDg3IDE2NDAgODR6TSAyNDkwIDEyMUMgMjUwOCAxMjEgMjUyOCAxMjUgMjU0NiAxMzRDIDI1NjIgMTQzIDI1NjggMTYzIDI1NjggMTkzQyAyNTY4IDI2NCAyNTQ1IDMzNSAyNDk2IDQwOUMgMjQzOSA0OTUgMjM3MiA1MzcgMjI5MyA1MzdDIDIyNTQgNTM3IDIyMjQgNTI3IDIyMDkgNTA2TCAyMjU5IDMwMEMgMjI4NiAyNTEgMjMyMyAyMTAgMjM2OCAxNzVDIDI0MTQgMTM5IDI0NTQgMTIxIDI0OTAgMTIxeiIgLz4NCjxwYXRoIGlkPSJGZXJtYXRhU2hvcnQiIGQ9Ik0gNjAgNjk0bCAtMTEwIDFsIDY2MCAtNzEzbCA2NTYgNzEzbCAtNjYgLTFsIC01NjIgLTYxMUwgNjAgNjk0ek0gNjYyIDQ4OGMgMjkgMCA1NCAxMCA3NCAzMHMgMzAgNDQgMzAgNzRjIDAgMjkgLTEwIDU0IC0zMCA3NHMgLTQ0IDMwIC03NCAzMGMgLTI5IDAgLTU0IC0xMCAtNzQgLTMwcyAtMzAgLTQ0IC0zMCAtNzRjIDAgLTI5IDEwIC01NCAzMCAtNzRTIDYzMyA0ODggNjYyIDQ4OCIgLz4NCjxwYXRoIGlkPSJGZXJtYXRhTm9ybWFsIiBkPSJNIDg3MSAyMzBjIC0yMTYgMCAtNDA1IDY5IC01NjUgMjA5YyAtMTYwIDEzOSAtMjU1IDMxNyAtMjg0IDUzMWMgLTIgLTE2IC00IC0zMiAtNCAtNDhjIDAgLTIxIDAgLTM2IDAgLTQ0YyAwIC0yMjggODQgLTQyNyAyNTIgLTU5OWMgMTY4IC0xNzEgMzY4IC0yNTcgNjAwIC0yNTdjIDIyOSAwIDQyOSA4NCA1OTggMjU0YyAxNjkgMTY5IDI1NCAzNzAgMjU0IDYwM2MgMCA0MCAwIDcwIDAgOTJjIC0yNiAtMjE2IC0xMTkgLTM5NCAtMjc4IC01MzNDIDEyODMgMjk5IDEwOTMgMjMwIDg3MSAyMzB6TSA4NjkgNzY3YyAyOSAwIDU0IDEwIDc0IDMwcyAzMCA0NCAzMCA3NGMgMCAyOSAtOSA1MyAtMjggNzJjIC0xOCAxOCAtNDQgMjggLTc2IDI4YyAtMjYgMCAtNTAgLTkgLTcyIC0yOGMgLTIxIC0xOCAtMzIgLTQyIC0zMiAtNzJjIDAgLTI5IDEwIC01NCAzMCAtNzRTIDgzOSA3NjcgODY5IDc2NyIgLz4NCjxwYXRoIGlkPSJGZXJtYXRhTG9uZyIgZD0iTSA1NSA3MDJoIC02OHYgLTcwNGggMTMxN3YgNzA0aCAtNjh2IC01MDBoIC0xMTgwViA3MDJ6TSA2NDcgNDk0YyAyOSAwIDU0IDEwIDc0IDMwcyAzMCA0NCAzMCA3NGMgMCAyOSAtMTAgNTQgLTMwIDc0cyAtNDQgMzAgLTc0IDMwYyAtMjkgMCAtNTQgLTEwIC03NCAtMzBzIC0zMCAtNDQgLTMwIC03NGMgMCAtMjkgMTAgLTU0IDMwIC03NFMgNjE4IDQ5NCA2NDcgNDk0IiAvPg0KPHBhdGggaWQ9IkR5bmFtaWNQIiBkPSJNIDQ0NyA4OTRsIC0xNDYgNDE1bCA5MiAwdiA1MGggLTM2NHYgLTUwaCA5M2wgMzEwIC03OTdjIDcgLTkgMTAgLTE2IDEwIC0yMWMgNyAtMTkgNyAtMzMgMCAtNDNjIC0xNCAtMTQgLTI3IC0yMSAtMzkgLTIxYyAtMzggMCAtODMgNDggLTEzMyAxNDRjIC0xNCAzMSAtMzQgNzkgLTYxIDE0NGggLTI1YyAyNiAtNzIgNDggLTEyNSA2NCAtMTU4YyA1NyAtMTA4IDExNiAtMTYyIDE3NiAtMTYyYyAxOSAwIDMzIDIgNDMgN2MgMTIgNCAyMSAxOCAyOCAzOWMgMiA3IDQgMTkgNyAzNmMgMTYgLTI2IDQ3IC01MiA5MCAtNzljIDQzIC0yNiA4OSAtMzkgMTM3IC0zOWMgMTkgMCA0NSA1IDc3IDE2YyAzMiAxMCA1OSAzNyA4MSA3OGMgMjEgNDEgMzIgODkgMzIgMTQxYyAwIDM1IC0yIDY0IC03IDg2YyAtNCAyMSAtMTMgNTAgLTI1IDg2YyAtMjYgNjQgLTcxIDEyMyAtMTMzIDE3N3MgLTExOSA4MCAtMTY5IDgwQyA1MjggMTAyNCA0ODEgOTgxIDQ0NyA4OTR6TSA3NTQgNDI1YyAtMzMgLTE0IC03MyA1IC0xMTkgNThjIC0zNiA0MyAtNjcgOTIgLTkzIDE0NWMgLTI2IDUzIC0zOSAxMTMgLTM5IDE4MWMgMCA0OCA5IDc4IDI4IDkwYyAyNiAxNCA2MiAwIDEwOCAtNDFjIDQ1IC00MiA4MSAtOTIgMTA4IC0xNTBjIDkgLTI0IDE5IC01NiAyOCAtOTZjIDkgLTQwIDE0IC03NCAxNCAtMTAzQyA3OTAgNDYyIDc3OCA0MzUgNzU0IDQyNSIgLz4NCjxwYXRoIGlkPSJEeW5hbWljRiIgZD0iTSA5NTEgNDA2diAzOWggLTE5NGwgLTE4IDkwYyAtNDggMTk0IC05NyAzNDQgLTE0NyA0NDdjIC02NyAxNDEgLTE1NCAyNDUgLTI1OSAzMTBjIC0zMyAyMSAtNzcgMzIgLTEyOSAzMmMgLTc3IDAgLTEyNyAtMjEgLTE1MSAtNjRjIC0xNCAtMjYgLTIxIC01MSAtMjEgLTc1YyAwIC0zOCAxMyAtNzEgNDEgLTk3YyAyNyAtMjYgNTcgLTM3IDg4IC0zMmMgNTUgOSA4MyAzNiA4MyA3OWMgMCAxNiAtMyAzMiAtMTAgNDZjIC05IDMzIC0zMiA1NSAtNjggNjRjIC0xMiAyIC0xNiA3IC0xNCAxNGMgNCAxOSAyMiAyOCA1NCAyOGMgMTYgLTIgMzYgLTE0IDU3IC0zNmMgNyAtNyAyMiAtMjYgNDcgLTU3YyA1MiAtNzkgMTAyIC0yMDUgMTQ3IC0zNzhjIDE5IC03NyAzOCAtMTU0IDU3IC0yMzFsIDMyIC0xNDBoIC0xMzd2IC0zOWggMTQ0YyAtMTQgLTU1IDIxIC0xMzkgMTA4IC0yNTJjIDY1IC04NCAxNDQgLTEzOSAyMzggLTE2NmMgMjggLTcgNTcgLTEwIDg2IC0xMGMgNjAgMCAxMDkgMTUgMTQ4IDQ2YyAzOCAzMSA1NyA3MiA1NyAxMjJjIDAgNDggLTE0IDgxIC00MyA5OWMgLTI4IDE4IC01NiAyMSAtODMgOWMgLTMxIC0xNCAtNDYgLTM4IC00NiAtNzJjIDAgLTI4IDEwIC01MiAzMiAtNzJjIDcgLTcgMjIgLTEyIDQ2IC0xNGMgMjQgLTIgMzcgLTggMzkgLTE4YyA3IC0yOCAtMTYgLTQzIC03MiAtNDNjIC0zMyAwIC02NCA2IC05MyAxOGMgLTc3IDMzIC0xMzIgMTAyIC0xNjYgMjA1YyAtOSAzMyAtMjAgODMgLTMyIDE0OEggOTUxIiAvPg0KPHBhdGggaWQ9IkR5bmFtaWNNIiBkPSJNIDU1MyAxMDc2bCAtMTY1IDFsIDIwMSAtNTAyYyA3IC0xMiAxMSAtMjEgMTQgLTI4YyAxMiAtMjYgMTggLTQ1IDE4IC01N2MgMCAtMjEgLTggLTMzIC0yNSAtMzZjIC0zMSAtNyAtNjIgOSAtOTMgNTBjIC05IDEyIC0yMiAzMyAtMzkgNjVsIC0xOTkgNTA4bCAtMTY0IDBsIDIxMiAtNTAxYyA0IC0xMCA3IC0xNyA3IC0yMmMgNCAtMTkgNyAtMzcgNyAtNTJjIDAgLTE3IC0zIC0yOCAtMTAgLTMzYyAtOSAtMTAgLTIyIC0xNCAtMzkgLTE0YyAtNTAgMCAtMTE2IDYxIC0xOTggMTgzYyAtMTIgMTkgLTMwIDQ3IC01NCA4NGggLTE4YyA0MyAtNzMgNzggLTEyNiAxMDQgLTE2MGMgODYgLTEwNiAxNjUgLTE1NCAyMzggLTE0MmMgMTYgMiAzNyAyMSA2MSA1NmMgNyAxMCAxOCAyOCAzMiA1NmMgMTQgLTI2IDI4IC00NSA0MyAtNTdjIDQ1IC00MCAxMDEgLTYxIDE2NiAtNjFjIDMxIDAgNTQgMTkgNjggNTdjIDIgMTIgNiAzMiAxMCA2MWMgMjEgLTMwIDM5IC01MSA1NCAtNjJjIDQ4IC0zOSAxMDEgLTU2IDE1OCAtNDljIDU1IDcgODkgMzAgMTA0IDY5YyAyIDExIDMgMzAgMyA1NWwgLTE2MyA0MzdjIC0xMiAxOSAtMjAgMzIgLTIyIDM5YyAtNyAxNCAtNCAyMiA3IDI1YyAyMSAyIDU0IC0yMCA5NyAtNjhjIDE0IC0xNCAzNCAtMzkgNjEgLTc1aCAyMWMgLTMxIDQ0IC01NiA3OCAtNzUgMTAxYyAtNjIgNjcgLTEyNSAxMDEgLTE4OCAxMDFjIC0yNCAwIC00MyAtMTAgLTU3IC0zMmMgLTE0IC0yMSAtMTYgLTQzIC03IC02NWwgMTY5IC00MjljIDQgLTcgNiAtMTEgNiAtMTRjIDEwIC0yNiAxNiAtNDcgMTYgLTY0YyAwIC0yNiAtMTAgLTQwIC0zMiAtNDNjIC0yOCAtNyAtNTggOSAtODkgNTBjIC05IDEyIC0yMiAzMyAtMzkgNjRMIDU1MyAxMDc2IiAvPg0KPHBhdGggaWQ9IkFjY2VudHVhdGlvbiIgZD0iTSA3NDggMjg2QyAzODIgMzY1IDE2IDQ0NSAtMzUwIDUyNWMgMCAtMjMgMCAtNDYgMCAtNjlDIC01OCA0MDAgMjM0IDM0NCA1MjYgMjg4IDIzMyAyMzMgLTU4IDE3OCAtMzUxIDEyNGMgMCAtMjQgMCAtNDkgMCAtNzQgMzY2IDc4IDczMiAxNTcgMTA5OSAyMzZ6IiAvPg0KPHBhdGggaWQ9IkhlYXZ5QWNjZW50dWF0aW9uIiBkPSJNIC0yMjMgOTAwTCAtMjc1IDkwMGwgMzQ5IC0xMDA0bCAzNTMgMTAwNGwgLTEyOCAwbCAtMjY0IC03NTBMIC0yMjMgOTAwIiAvPg0KPHBhdGggaWQ9IldhdmVIb3Jpem9udGFsIiBkPSJNIDEzODIgMjMwYyAtNDMgMzIgLTkyIDY5IC0xNDYgMTExcyAtMTA0IDc2IC0xNDkgMTA1YyAtNDUgMjggLTg5IDUxIC0xMzQgNjhzIC04NiAyNiAtMTI3IDI4YyAtNDcgLTYgLTg3IC0xOSAtMTE5IC0zOHMgLTc5IC01MSAtMTQzIC05OGMgLTY0IC00NiAtMTE3IC04MSAtMTYwIC0xMDJjIC00MiAtMjEgLTkwIC0zMiAtMTQxIC0zMmMgLTc5IDAgLTE3NCA1NSAtMjg1IDE2NnYgLTExMmMgMTMyIC0xMTAgMjQxIC0xOTMgMzI3IC0yNDlzIDE2NiAtODMgMjQ0IC04M2MgNDggMCA5MyAxMSAxMzQgMzRjIDQwIDIyIDg4IDU2IDE0NCAxMDFjIDU1IDQ0IDEwMyA3OSAxNDMgMTAzYyA0MCAyNCA4NSAzNyAxMzUgNDBjIDg5IC03IDE4MiAtNTUgMjc4IC0xNDZWIDIzMCIgLz4NCjxwYXRoIGlkPSJXYXZlVmVydGljYWwiIGQ9Ik0gMTY1IDRoIDUwYyA0NyA0NCA4NiA4NSAxMTUgMTIycyA0MyA3NSA0MyAxMTRjIDAgMzEgLTkgNjAgLTI4IDg1YyAtMTkgMjUgLTQ3IDU1IC04NSA4OXMgLTY2IDY0IC04NiA5MGMgLTE5IDI2IC0zMCA1NSAtMzEgODhoIDVjIDAgMzEgOSA2MCAyNyA4NmMgMTggMjUgNDYgNTYgODQgOTNzIDY2IDY4IDg2IDk1YyAxOSAyNyAyOCA1NyAyOCA5MmMgMCAzMyAtOSA2MiAtMjggODljIC0xOSAyNiAtNDcgNTcgLTg1IDkyYyAtMzcgMzUgLTY1IDY0IC04NCA4OWMgLTE4IDI0IC0yNyA1MSAtMjcgODJjIDAgMTcgMjIgNTkgNjcgMTI3aCAtNTBjIC01OSAtNTcgLTEwMCAtMTAwIC0xMjQgLTEzMGMgLTIzIC0yOSAtMzUgLTY3IC0zNSAtMTEzYyAwIC0zMyA5IC02MiAyNyAtODZjIDE4IC0yNCA0NiAtNTMgODUgLTg3YyAzOCAtMzMgNjYgLTYzIDg1IC04OGMgMTggLTI1IDI4IC01NSAyOCAtOTFjIDAgLTE3IC04IC0zNyAtMjYgLTYxcyAtNDIgLTU0IC03MyAtODljIC0zMSAtMzUgLTUzIC02MCAtNjQgLTc1YyAtNDEgLTY0IC02MSAtMTA5IC02MSAtMTM1YyAxIC00MCAyMCAtODAgNTYgLTExOWMgMzUgLTM4IDcyIC03NyAxMTAgLTExN2MgMzggLTM5IDU4IC03NiA2MCAtMTEyYyAwIC0xOCAtNCAtMzUgLTEzIC01MEMgMjEwIDcyIDE5MiA0NCAxNjUgNCIgLz4NCjxwYXRoIGlkPSJQaWNrU3Ryb2tlRG93biIgZD0iTSAwIC0yMGggODE2diA4NDRoIC03NHYgLTQ3N2ggLTY3MnYgNDc3SCAwViAtMjAiIC8%DQo8cGF0aCBpZD0iUGlja1N0cm9rZVVwIiBkPSJNIDU1MSAtN0wgMjg5IDk1MGwgLTI2NCAtOTU2aCA2NmwgMjAyIDc1OWwgMTkzIC03NTlIIDU1MSIgLz4NCjxwYXRoIGlkPSJUcmVtb2xvUGlja2luZ1RoaXJ0eVNlY29uZCIgZD0iTSAtNDg4IDc4N3YgLTI1MGwgOTg2IC01MDV2IDI1M0wgLTQ4OCA3ODd6TSAtNDg4IDEyMDB2IC0yNTBsIDk4NiAtNTA1diAyNTNMIC00ODggMTIwMHpNIC00ODggMTYxMnYgLTI1MGwgOTg2IC01MDV2IDI2MUwgLTQ4OCAxNjEyIiAvPg0KPHBhdGggaWQ9IlRyZW1vbG9QaWNraW5nU2l4dGVlbnRoIiBkPSJNIC00ODggNzg3diAtMjUwbCA5ODYgLTUwNXYgMjUzTCAtNDg4IDc4N3pNIC00ODggMTIwMHYgLTI1MGwgOTg2IC01MDV2IDI1M0wgLTQ4OCAxMjAwIiAvPg0KPHBhdGggaWQ9IlRyZW1vbG9QaWNraW5nRWlnaHRoIiBkPSJNIC00ODggNzg3diAtMjUwbCA5ODYgLTUwNXYgMjUzTCAtNDg4IDc4NyIgLz4NCjxwYXRoIGlkPSJVcHBlck1vcmRlbnQiIGQ9Ik0gMTYgNzE0diAtMTk1bCA0MjUgLTQ5NGMgMzQgLTIyIDUzIC0zMyA1NiAtMzNjIDE5IDAgMzMgNiAzOSAyMGwgMzQ5IDMwNmMgMTcgMTcgMzYgMjggNTYgMzNjIDE5IC02IDMzIC0xMiAzOSAtMTlsIDI2NCAtMzA3YyAzMyAtMjIgNTMgLTMzIDU5IC0zM2MgMTcgMCAyOSA2IDM2IDIwbCAzNDkgMzA2YyAyMCAyMSAzOSAzNCA1NSA0MGMgMjAgLTcgMzQgLTE2IDQwIC0yNmwgMjI0IC0yNjR2IDE5NGwgLTQyMiA0OTRjIC0zMiAyMiAtNTQgMzMgLTY2IDMzYyAtMTUgMCAtMjYgLTYgLTMzIC0xOWwgLTM0NiAtMzEwYyAtMTUgLTE1IC0zNyAtMjMgLTY2IC0yM2MgLTE2IDAgLTI2IDMgLTI5IDlsIC0yNjcgMzEwYyAtMjUgMjIgLTQ2IDMzIC02MiAzM2MgLTE0IDAgLTI1IC02IC0zMyAtMTlsIC0zNDYgLTMxMGMgLTE4IC0xOSAtNDAgLTI5IC02NiAtMjljIC0xNCAwIC0yNSA1IC0zMiAxNkwgMTYgNzE0IiAvPg0KPHBhdGggaWQ9Ikxvd2VyTW9yZGVudCIgZD0iTSAtMzQgNjY0diAtMTk1bCAzOTkgLTQ1OGMgMzQgLTM3IDU4IC01NiA3MiAtNTZzIDQxIDE4IDgyIDU2bCAzNTIgMzEwdiAtNjA3aCA5OXYgNTI1bCAxOTEgLTIyN2MgMzggLTQxIDYyIC02MiA3MiAtNjJjIDEwIDAgMzggMTYgODIgNTBsIDI3NyAyNDdjIDY0IDUzIDk5IDgwIDEwMiA4MmMgMTAgLTIgMjQgLTE1IDQzIC0zOGMgMTggLTIzIDMzIC0zOSA0MiAtNTBsIDExNSAtMTQydiAxNzhsIC0zNDkgNDEyYyAtMjYgMzQgLTUxIDUyIC03NSA1MmMgLTEyIDAgLTQwIC0xOSAtODMgLTU5bCAtMjU3IC0yMzBjIC00NiAtNDYgLTgzIC02OSAtMTExIC02OWMgLTcgMCAtMTIgMSAtMTcgNWMgLTQgMyAtOSA5IC0xNiAxN2MgLTYgOCAtMTEgMTQgLTE2IDE5diA2MDdoIC05OXYgLTQ5MmwgLTEyMSAxNDljIC0zMSAzNCAtNTYgNTIgLTc1IDUyYyAtNyAwIC0xNSAtMiAtMjIgLTZjIC03IC00IC0xOCAtMTIgLTMyIC0yNWMgLTE0IC0xMiAtMjUgLTIxIC0zMyAtMjdsIC0yOTAgLTI2M2MgLTM1IC0yOCAtNTcgLTQyIC02NiAtNDJjIC0xNSAwIC0zMyAxNCAtNTYgNDJMIC0zNCA2NjQiIC8%DQo8cGF0aCBpZD0iVHVybiIgZD0iTSAxMTQxIDczOWMgLTIwIC0xNyAtNjUgLTU2IC0xMzYgLTExNWMgLTcwIC02MCAtMTQzIC0xMTcgLTIxOCAtMTcyYyAtNzUgLTU0IC0xNTAgLTEwMCAtMjI0IC0xMzZjIC03MyAtMzYgLTE0MCAtNTQgLTE5OSAtNTRjIC03NCA2IC0xMzggNDUgLTE5MSAxMTVzIC04MiAxNDMgLTg1IDIxOGMgOCAxMTkgNzcgMTc5IDIwOCAxNzljIDE4IDAgMzMgLTMgNDUgLTljIDExIC02IDMxIC0yMCA1OSAtNDBjIDI4IC0yMCA1MyAtMzUgNzUgLTQ1YyAyMiAtOSA0OCAtMTQgNzkgLTE0YyA4OSAwIDE0NiAzOSAxNzAgMTE3YyAwIDc2IC0zMSAxMzIgLTkzIDE2OWMgLTYyIDM2IC0xMjkgNTUgLTIwMiA1NWMgLTE2NSAtOCAtMjkwIC01MyAtMzczIC0xMzVjIC04MyAtODIgLTEyNCAtMTgyIC0xMjQgLTMwMWMgMCAtODUgMjIgLTE3MSA2NyAtMjU1YyA0NCAtODQgMTA3IC0xNTUgMTg5IC0yMTNjIDgxIC01NyAxNzQgLTkyIDI3OSAtMTA1YyAxMzcgMCAyNjcgMjkgMzg4IDg5YyAxMjEgNTkgMjQwIDEzNyAzNTYgMjMyYyAxMTYgOTUgMjI5IDE4OCAzMzcgMjc4YyA0MiAzNSA5NyA2OSAxNjUgMTAxYyA2NyAzMSAxMzEgNDcgMTkxIDQ3YyA5MiAtNSAxNjIgLTM1IDIxMCAtOTFjIDQ3IC01NiA3MSAtMTIxIDcxIC0xOTZjIDAgLTY0IC0xOCAtMTE5IC01NSAtMTYyYyAtMzYgLTQzIC04NSAtNjUgLTE0NiAtNjVjIC0yMSAwIC01MCAxMiAtODkgMzhjIC0zOCAyNSAtNjggNDMgLTkwIDU1YyAtMjIgMTEgLTUzIDE3IC05MyAxN2MgLTQyIDAgLTc5IC0xNCAtMTEzIC00NGMgLTMzIC0yOSAtNTAgLTY2IC01MCAtMTExYyAwIC02MCAzMSAtMTA0IDk1IC0xMzRjIDYzIC0yOSAxMzAgLTQ0IDIwMCAtNDRjIDEwMiAwIDE5MiAyNCAyNjkgNzJjIDc2IDQ4IDEzNSAxMTIgMTc1IDE5MWMgNDAgNzggNjAgMTYxIDYwIDI0OWMgMCA4NyAtMjAgMTY4IC02MCAyNDNjIC00MCA3NCAtMTAxIDEzNCAtMTg0IDE3OWMgLTgyIDQ1IC0xODUgNjggLTMwNiA2OGMgLTExNiAwIC0yMjQgLTIyIC0zMjMgLTY2QyAxMzc1IDg5NCAxMjY0IDgyNyAxMTQxIDczOSIgLz4NCjxwYXRoIGlkPSJPcGVuTm90ZSIgZD0iTSA0NDMgOTIyYyAtMTI0IDAgLTIyOSAtNDUgLTMxNSAtMTM1cyAtMTI4IC0xOTcgLTEyOCAtMzIyYyAwIC0xMzAgNDIgLTIzOSAxMjYgLTMyNmMgODQgLTg3IDE4OSAtMTMwIDMxNiAtMTMwYyAxMjIgMCAyMjUgMzkgMzEwIDExOGMgODQgNzggMTMwIDE3NyAxMzggMjk1YyAwIDE0NSAtNDEgMjYzIC0xMjUgMzU0UyA1NzUgOTE1IDQ0MyA5MjJ6TSA0MjYgOTZjIC0xMDEgMCAtMTgyIDM1IC0yNDQgMTA3YyAtNjEgNzEgLTkyIDE1OCAtOTIgMjYwYyAwIDEwMSAzMiAxODUgOTggMjUycyAxNTAgMTAwIDI1NCAxMDBjIDExMyAwIDIwMSAtMzYgMjY0IC0xMDlzIDk0IC0xNjggOTQgLTI4OEMgNzgwIDIwNCA2NTUgOTYgNDI2IDk2IiAvPg0KPHBhdGggaWQ9IlN0b3BwZWROb3RlIiBkPSJNIDQ2MiAxMDA5diAtNDQ5aCAtNDQ1diAtMTIyaCA0NDVWIC0zaCAxMTh2IDQ0MWggNDUydiAxMjJoIC00NTJ2IDQ0OUggNDYyIiAvPg0KPHBhdGggaWQ9IlRlbXBvIiBkPSJNIDU1MCAxNTc4ViAzMGwgNDMgOHYgMTY3OWMgMCA4NiAtNDEgMTYwIC0xMjQgMjIwcyAtMTczIDkwIC0yNzIgOTBjIC0xMTQgMCAtMTgyIC00NiAtMjAzIC0xMzljIDAgLTg0IDQxIC0xNjQgMTI1IC0yMzlzIDE3MyAtMTEyIDI3MCAtMTEyQyA0NTcgMTUzOSA1MTAgMTU1MiA1NTAgMTU3OHpNIDkxNCAxNjg2diAtNzZoIDU0MHYgNzZIIDkxNHpNIDkxNCAxODUwaCA1NDB2IDgwaCAtNTQwViAxODUwIiAvPg0KPHBhdGggaWQ9IkFjY2lkZW50YWxTaGFycCIgZD0iTSA0ODIgLTI3NXYgLTU3N2ggOTN2IDU0MGwgMTM1IC01N3YgMzQzbCAtMTM1IDU3diA1NTFsIDEzNSAtNjJ2IDM0M2wgLTEzNSA1N3YgNTYxaCAtOTN2IC01MjVsIC0yMjMgOTN2IDU2NmggLTkzdiAtNTMwbCAtMTM1IDUydiAtMzQzbCAxMzUgLTUydiAtNTUxbCAtMTM1IDU3diAtMzQ4bCAxMzUgLTUydiAtNTYxaCA5M3YgNTI1TCA0ODIgLTI3NXpNIDI1OCAxNTZ2IDU1MWwgMjIzIC05M3YgLTU0NkwgMjU4IDE1NiIgLz4NCjxwYXRoIGlkPSJBY2NpZGVudGFsRmxhdCIgZD0iTSAtMjMgLTEyNzNoIDkzdiAxMzAwYyA0OCAtMjcgODYgLTQ4IDExNCAtNjJjIDkzIC00MSAxNzYgLTYyIDI0OSAtNjJjIDUyIDAgOTcgMTMgMTM3IDM5YyAzOSAyNiA3MCA3MCA5MSAxMzJjIDEwIDMxIDE1IDYyIDE1IDkzYyAwIDEwMCAtNTAgMjA0IC0xNTAgMzExYyAtNzIgNzYgLTE1NyAxNDMgLTI1NCAyMDJjIC00MSAyNCAtOTcgNjkgLTE2NiAxMzVjIC00NSA0MSAtODggODQgLTEzMCAxMjlWIC0xMjczek0gMzY3IDE3YyAtNyAtMyAtMTMgLTYgLTIwIC0xMGMgLTE3IC02IC0zMyAtMTAgLTQ2IC0xMGMgLTI3IDAgLTU5IDcgLTkzIDIzYyAtMzQgMTUgLTc5IDQ2IC0xMzUgOTF2IDY0NGMgNjUgLTY1IDEzMSAtMTMxIDE5NyAtMTk3YyAxMjggLTE1NiAxOTIgLTI4NCAxOTIgLTM4NEMgNDYwIDEwMyA0MjkgNTEgMzY3IDE3IiAvPg0KPHBhdGggaWQ9IkFjY2lkZW50YWxOYXR1cmFsIiBkPSJNIDM4IDQ3MlYgLTEyODNoIDk5diA3OTJsIDQ3OCAtMTMydiAxNzM4aCAtOTN2IC03NzVMIDM4IDQ3MnpNIDEzNyAxODBsIDM4NSAtMTA0diAtNDI5bCAtMzg1IDEwNFYgMTgwIiAvPg0KPHBhdGggaWQ9IkNsZWZOZXV0cmFsIiBkPSJNIDkxNSAxODg3diAtMTg3NWggMzM3diAxODc1SCA5MTV6TSAxNDc3IDE4ODd2IC0xODc1aCAzMzd2IDE4NzVIIDE0NzciIC8%DQo8cGF0aCBpZD0iUmVzdFNpeHR5Rm91cnRoIiBkPSJNIDcwNSAtMjIwMmMgNzcgLTI2IDE0NCAtNzcgMjAwIC0xNTBjIDU2IC03MyAxMDEgLTE3NCAxMzYgLTMwNWwgMTI3IC01NDdjIC02OSAxMjcgLTE5NyAxOTEgLTM4MiAxOTFjIC00NiAwIC0xMDAgLTcgLTE2MiAtMjNjIC02MSAtMTUgLTExNCAtNDYgLTE1NiAtOTJjIC00MiAtNDYgLTYzIC0xMDggLTYzIC0xODVjIDAgLTY1IDIzIC0xMjEgNjkgLTE2OGMgNDYgLTQ2IDEwNCAtNjkgMTc0IC02OWMgNjUgMCAxMjMgMjUgMTc0IDc1YyA1MCA1MCA3NSAxMDQgNzUgMTYyYyAwIDMxIC03IDYzIC0yMyA5OGMgLTE1IDM0IC00NCA2MyAtODcgODdjIDQ2IDE1IDcxIDIzIDc1IDIzYyA3IDAgMjcgLTMgNTcgLTExYyA3NyAtMjMgMTQ4IC04MSAyMTMgLTE3NGMgNTMgLTczIDg2IC0xMzcgOTggLTE5MWwgMTU0IC02MzhjIC03MyAxMjggLTE5OCAxOTIgLTM3NSAxOTJjIC0zMCAwIC02MSAwIC05MiAwYyAtMzQgLTExIC01NyAtMTkgLTY5IC0yM2MgLTY5IC0xOSAtMTI1IC01MiAtMTY3IC05OGMgLTQyIC00NiAtNjMgLTEwNiAtNjMgLTE3OWMgMCAtNjkgMjMgLTEyNyA2OSAtMTc0YyA0NiAtNDYgMTA0IC02OSAxNzQgLTY5cyAxMjggMjQgMTc2IDcyYyA0OCA0OCA3MiAxMDMgNzIgMTY1YyAwIDMxIC03IDYzIC0yMyA5OGMgLTE1IDM0IC00MiA2NSAtODEgOTJjIDE5IDcgNDAgMTUgNjMgMjNjIDExIDAgMzIgLTMgNjMgLTExYyA3MyAtMjMgMTQwIC04MCAyMDIgLTE2OWMgNjEgLTg5IDEyMSAtMTc5IDE3OSAtMjcxbCA0MSAwbCAtMTAzMiA0NDI1bCAtMTA3IDBsIDMxOSAtMTMxNmMgLTczIDEyOCAtMTk2IDE5MiAtMzcwIDE5MmMgLTE5IDAgLTM4IDAgLTU3IDBjIC0yNyAtMyAtNjggLTEzIC0xMjQgLTI4YyAtNTUgLTE1IC0xMDUgLTQ2IC0xNDcgLTkyYyAtNDIgLTQ2IC02MyAtMTA2IC02MyAtMTc5YyAwIC02NSAyMyAtMTIxIDY5IC0xNjhjIDQ2IC00NiAxMDYgLTY5IDE3OSAtNjljIDY1IDAgMTIyIDI0IDE3MSA3MmMgNDggNDggNzIgMTAzIDcyIDE2NWMgMCAzMCAtNyA2MyAtMjMgOThjIC0xNSAzNCAtNDQgNjMgLTg3IDg3YyA0NiAxNSA3MSAyMyA3NSAyM2MgNyAwIDI2IC0zIDU3IC0xMWMgNzYgLTIzIDE1MCAtODMgMjE5IC0xODBjIDU3IC03NyA4NiAtMTI5IDg2IC0xNTZsIDE2MSAtNjY3YyAtNzMgMTI0IC0xOTggMTg2IC0zNzUgMTg2YyAtMzAgMCAtNjEgMCAtOTIgMGMgLTM0IC0xMSAtNTcgLTE5IC02OSAtMjJjIC02OSAtMTkgLTEyNSAtNTEgLTE2NyAtOTdjIC00MiAtNDUgLTYzIC0xMDUgLTYzIC0xNzdjIDAgLTY4IDIzIC0xMjYgNjkgLTE3MmMgNDYgLTQ1IDEwNiAtNjggMTc5IC02OGMgNjUgMCAxMjIgMjMgMTcxIDcxYyA0OCA0NyA3MiAxMDIgNzIgMTYzYyAwIDMwIC03IDYzIC0yMyA5N2MgLTE1IDM0IC00NCA2NSAtODcgOTFjIDIzIDcgNDYgMTQgNjkgMjFDIDY1MyAtMjE5MCA2NzQgLTIxOTQgNzA1IC0yMjAyIiAvPg0KPHBhdGggaWQ9IkFjY2lkZW50YWxEb3VibGVGbGF0IiBkPSJNIDY3IDI1YyA1MiAtMjcgOTMgLTQ4IDEyNCAtNjJjIDEwMCAtNDUgMTc2IC02NyAyMjggLTY3YyA0NSAwIDk1IDEyIDE1MCAzNlYgLTEyNzVoIDg4diAxMzAwYyA0OCAtMjcgODggLTQ4IDExOSAtNjJjIDEwMCAtNDUgMTgzIC02NyAyNDkgLTY3YyA1NSAwIDEwNCAxMyAxNDUgMzljIDQxIDI2IDcyIDcxIDkzIDEzN2MgMTAgMzEgMTUgNjIgMTUgOTNjIDAgMTA3IC00OCAyMTIgLTE0NSAzMTZjIC03MiA3OSAtMTYzIDE0MyAtMjcwIDE5MmMgLTM0IDE3IC03OCA1MiAtMTMyIDEwNGMgLTUzIDUxIC0xMDggMTA3IC0xNjMgMTY2diAtNTI5YyAtMzggNDUgLTcyIDgzIC0xMDQgMTE1YyAtNTUgNTUgLTEyMSAxMDMgLTE5NyAxNDFjIC00NSAyMCAtMTAyIDY4IC0xNzEgMTQxYyAtNDEgNDEgLTgxIDg1IC0xMTkgMTMxViAtMTI3NWggODhWIDI1ek0gMzY5IDE1YyAtNyAtMyAtMTMgLTYgLTIwIC0xMGMgLTE3IC02IC0zMyAtMTAgLTQ2IC0xMGMgLTMxIDAgLTY0IDcgLTk4IDIzYyAtMzQgMTUgLTc5IDQ2IC0xMzUgOTF2IDY0NGMgNjUgLTY1IDEzMSAtMTMxIDE5NyAtMTk3YyAxMzEgLTE1OSAxOTcgLTI4NyAxOTcgLTM4NEMgNDYyIDEwMSA0MzEgNDkgMzY5IDE1ek0gOTYyIDE1YyAtMyAtMyAtMTIgLTYgLTI2IC0xMGMgLTIwIC02IC0zNiAtMTAgLTQ2IC0xMGMgLTMxIDAgLTYzIDcgLTk2IDIzYyAtMzMgMTUgLTc3IDQ2IC0xMzIgOTF2IDY0NGMgNjUgLTY1IDEzMSAtMTMxIDE5NyAtMTk3YyAxMzEgLTE1OSAxOTcgLTI4NyAxOTcgLTM4NEMgMTA1NSAxMDEgMTAyNCA0OSA5NjIgMTUiIC8%DQo8cGF0aCBpZD0iQWNjaWRlbnRhbERvdWJsZVNoYXJwIiBkPSJNIDIyIDI0M2MgLTMyIC0zMSAtNDggLTY4IC00OCAtMTEwYyAwIC0zOCAxNSAtNzEgNDUgLTk4YyAzMCAtMjcgNjMgLTQwIDk4IC00MGMgMzggMCA3MCAxNCA5NiA0M2MgNjQgNTcgMTE2IDEyNCAxNTggMTk5YyA0MSA3NSA2MiAxNDYgNjIgMjEzYyAtODMgMCAtMTcyIC0zMCAtMjY4IC05MUMgOTkgMzE3IDUxIDI3OCAyMiAyNDN6TSAxOCA4NzJjIDI1IDI1IDU5IDM4IDEwMCAzOGMgMzggMCA3MCAtMTQgOTYgLTQzYyA0NCAtMzggODYgLTg2IDEyNCAtMTQ0YyA2NCAtOTYgOTYgLTE4NyA5NiAtMjczYyAtNzAgMCAtMTQwIDE4IC0yMTEgNTVjIC03MCAzNiAtMTM3IDg3IC0yMDEgMTUxYyAtMzIgMzEgLTQ4IDcwIC00OCAxMTVDIC0yNiA4MTAgLTExIDg0MyAxOCA4NzJ6TSA4NDggMzJjIC0yNSAtMjUgLTYwIC0zOCAtMTA1IC0zOGMgLTQxIDAgLTc2IDE2IC0xMDUgNDhjIC01NyA2NyAtOTQgMTEzIC0xMTAgMTM5YyAtNjAgOTYgLTkxIDE4NSAtOTEgMjY4YyA5MiAwIDE4MiAtMjggMjY4IC04NmMgNzkgLTY3IDEyNCAtMTA1IDEzNCAtMTE1YyAzMSAtMzEgNDggLTcyIDQ4IC0xMjBDIDg4NiA5NiA4NzQgNjQgODQ4IDMyek0gODM4IDY1NmMgMzEgMzEgNDggNzAgNDggMTE1YyAwIDM4IC0xNCA3MiAtNDMgMTAwcyAtNjIgNDMgLTEwMCA0M2MgLTM4IDAgLTczIC0xNiAtMTA1IC00OGMgLTUxIC01NyAtODggLTEwNSAtMTEwIC0xNDRjIC02MCAtOTYgLTkxIC0xODcgLTkxIC0yNzNjIDEwNSAwIDIxMSA0MSAzMTYgMTI0QyA4MDMgNjIyIDgzMiA2NTAgODM4IDY1NiIgLz4NCjwvc3ZnPg"}];
 var q = window.jQuery;
 js.JQuery = q;
-alphatab.platform.model.Font.STYLE_PLAIN = 0;
-alphatab.platform.model.Font.STYLE_BOLD = 1;
-alphatab.platform.model.Font.STYLE_ITALIC = 2;
-alphatab.rendering.layout.PageViewLayout.SCORE_INFOS = "scoreInfos";
-alphatab.rendering.layout.PageViewLayout.PAGE_PADDING = [20,20,20,20];
-alphatab.rendering.layout.PageViewLayout.WIDTH_ON_100 = 795;
+alphatab.platform.model.Font.StylePlain = 0;
+alphatab.platform.model.Font.StyleBold = 1;
+alphatab.platform.model.Font.StyleItalic = 2;
+alphatab.rendering.layout.PageViewLayout.ScoreInfos = "ScoreInfos";
+alphatab.rendering.layout.PageViewLayout.PagePadding = [40,40,40,40];
+alphatab.rendering.layout.PageViewLayout.WidthOn100 = 950;
 alphatab.rendering.layout.PageViewLayout.GroupSpacing = 20;
-alphatab.rendering.layout.HorizontalScreenLayout.PAGE_PADDING = [20,20,20,20];
+alphatab.rendering.layout.HorizontalScreenLayout.PagePadding = [20,20,20,20];
 alphatab.rendering.layout.HorizontalScreenLayout.GroupSpacing = 20;
-alphatab.audio.MidiUtils.QUARTER_TIME = 960;
-alphatab.importer.ScoreImporter.UNSUPPORTED_FORMAT = "unsupported file";
-alphatab.importer.AlphaTexImporter.EOF = String.fromCharCode(0);
-alphatab.importer.AlphaTexImporter.TRACK_CHANNELS = [0,1];
-alphatab.importer.Gp3To5Importer.VERSION_STRING = "FICHIER GUITAR PRO ";
-alphatab.importer.Gp3To5Importer.BEND_STEP = 25;
-alphatab.importer.GpxFileSystem.HEADER_BCFS = "BCFS";
-alphatab.importer.GpxFileSystem.HEADER_BCFZ = "BCFZ";
-alphatab.importer.GpxFileSystem.SCORE_GPIF = "score.gpif";
+alphatab.audio.MidiUtils.QuarterTime = 960;
+alphatab.audio.MidiUtils.PercussionChannel = 9;
+alphatab.audio.MidiUtils.MinVelocity = 15;
+alphatab.audio.MidiUtils.VelocityIncrement = 16;
+alphatab.importer.ScoreImporter.UnsupportedFormat = "unsupported file";
+alphatab.importer.AlphaTexImporter.Eof = String.fromCharCode(0);
+alphatab.importer.AlphaTexImporter.TrackChannels = [0,1];
+alphatab.importer.Gp3To5Importer.VersionString = "FICHIER GUITAR PRO ";
+alphatab.importer.Gp3To5Importer.BendStep = 25;
+alphatab.importer.GpxFileSystem.HeaderBcFs = "BCFS";
+alphatab.importer.GpxFileSystem.HeaderBcFz = "BCFZ";
+alphatab.importer.GpxFileSystem.ScoreGpif = "score.gpif";
 alphatab.importer.GpxParser.InvalidId = "-1";
 alphatab.importer.GpxParser.BendPointPositionFactor = 0.6;
 alphatab.importer.GpxParser.BendPointValueFactor = 0.04;
-alphatab.io.BitInput.BYTE_SIZE = 8;
+alphatab.io.BitInput.ByteSize = 8;
 alphatab.model.Beat.WhammyBarMaxPosition = 60;
 alphatab.model.Beat.WhammyBarMaxValue = 24;
 alphatab.model.BendPoint.MaxPosition = 60;
@@ -11482,24 +12405,24 @@ alphatab.model.Note.FingeringIndexFinger = 1;
 alphatab.model.Note.FingeringMiddleFinger = 2;
 alphatab.model.Note.FingeringAnnularFinger = 3;
 alphatab.model.Note.FingeringLittleFinger = 4;
-alphatab.model.Tuning.TUNING_REGEX = new EReg("([a-g]b?)([0-9])","i");
-alphatab.platform.svg.FontSizes.TIMES_NEW_ROMAN_11PT = [3,4,5,6,6,9,9,2,4,4,6,6,3,4,3,3,6,6,6,6,6,6,6,6,6,6,3,3,6,6,6,5,10,8,7,7,8,7,6,7,8,4,4,8,7,10,8,8,7,8,7,5,8,8,7,11,8,8,7,4,3,4,5,6,4,5,5,5,5,5,4,5,6,3,3,6,3,9,6,6,6,5,4,4,4,5,6,7,6,6,5,5,2,5,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,4,6,6,6,6,2,5,4,8,4,6,6,0,8,6,4,6,3,3,4,5,5,4,4,3,3,6,8,8,8,5,8,8,8,8,8,8,11,7,7,7,7,7,4,4,4,4,8,8,8,8,8,8,8,6,8,8,8,8,8,8,6,5,5,5,5,5,5,5,8,5,5,5,5,5,3,3,3,3,6,6,6,6,6,6,6,6,6,5,5,5,5,6,6];
-alphatab.platform.svg.FontSizes.ARIAL_11PT = [3,2,4,6,6,10,7,2,4,4,4,6,3,4,3,3,6,6,6,6,6,6,6,6,6,6,3,3,6,6,6,6,11,8,7,7,7,6,6,8,7,2,5,7,6,8,7,8,6,8,7,7,6,7,8,10,7,8,7,3,3,3,5,6,4,6,6,6,6,6,4,6,6,2,2,5,2,8,6,6,6,6,4,6,3,6,6,10,6,6,6,4,2,4,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,2,6,6,7,6,2,6,4,8,4,6,6,0,8,6,4,6,4,4,4,6,6,4,4,4,5,6,9,10,10,6,8,8,8,8,8,8,11,7,6,6,6,6,2,2,2,2,8,7,8,8,8,8,8,6,8,7,7,7,7,8,7,7,6,6,6,6,6,6,10,6,6,6,6,6,2,2,2,2,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6];
-alphatab.platform.svg.FontSizes.CONTROL_CHARS = 32;
+alphatab.model.Tuning.TuningRegex = new EReg("([a-g]b?)([0-9])","i");
+alphatab.platform.svg.FontSizes.TimesNewRoman = [3,4,5,6,6,9,9,2,4,4,6,6,3,4,3,3,6,6,6,6,6,6,6,6,6,6,3,3,6,6,6,5,10,8,7,7,8,7,6,7,8,4,4,8,7,10,8,8,7,8,7,5,8,8,7,11,8,8,7,4,3,4,5,6,4,5,5,5,5,5,4,5,6,3,3,6,3,9,6,6,6,5,4,4,4,5,6,7,6,6,5,5,2,5,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,4,6,6,6,6,2,5,4,8,4,6,6,0,8,6,4,6,3,3,4,5,5,4,4,3,3,6,8,8,8,5,8,8,8,8,8,8,11,7,7,7,7,7,4,4,4,4,8,8,8,8,8,8,8,6,8,8,8,8,8,8,6,5,5,5,5,5,5,5,8,5,5,5,5,5,3,3,3,3,6,6,6,6,6,6,6,6,6,5,5,5,5,6,6];
+alphatab.platform.svg.FontSizes.Arial11Pt = [3,2,4,6,6,10,7,2,4,4,4,6,3,4,3,3,6,6,6,6,6,6,6,6,6,6,3,3,6,6,6,6,11,8,7,7,7,6,6,8,7,2,5,7,6,8,7,8,6,8,7,7,6,7,8,10,7,8,7,3,3,3,5,6,4,6,6,6,6,6,4,6,6,2,2,5,2,8,6,6,6,6,4,6,3,6,6,10,6,6,6,4,2,4,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,2,6,6,7,6,2,6,4,8,4,6,6,0,8,6,4,6,4,4,4,6,6,4,4,4,5,6,9,10,10,6,8,8,8,8,8,8,11,7,6,6,6,6,2,2,2,2,8,7,8,8,8,8,8,6,8,7,7,7,7,8,7,7,6,6,6,6,6,6,10,6,6,6,6,6,2,2,2,2,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6];
+alphatab.platform.svg.FontSizes.ControlChars = 32;
 alphatab.rendering.AlternateEndingsBarRenderer.Padding = 3;
-alphatab.rendering.GroupedBarRenderer.KEY_SIZE_PRE = "PRE";
-alphatab.rendering.GroupedBarRenderer.KEY_SIZE_POST = "POST";
-alphatab.rendering.ScoreBarRenderer.STEPS_PER_OCTAVE = 7;
-alphatab.rendering.ScoreBarRenderer.OCTAVE_STEPS = [38,32,30,26,38];
-alphatab.rendering.ScoreBarRenderer.SHARP_NOTE_STEPS = [0,0,1,1,2,3,3,4,4,5,5,6];
+alphatab.rendering.GroupedBarRenderer.KeySizePre = "Pre";
+alphatab.rendering.GroupedBarRenderer.KeySizePost = "Post";
+alphatab.rendering.ScoreBarRenderer.StepsPerOctave = 7;
+alphatab.rendering.ScoreBarRenderer.OctaveSteps = [38,32,30,26,38];
+alphatab.rendering.ScoreBarRenderer.SharpNoteSteps = [0,0,1,1,2,3,3,4,4,5,5,6];
 alphatab.rendering.ScoreBarRenderer.FLAT_NOTE_STEPS = [0,1,1,2,2,3,4,4,5,5,6,6];
-alphatab.rendering.ScoreBarRenderer.SHARP_KS_STEPS = [1,4,0,3,6,2,5];
-alphatab.rendering.ScoreBarRenderer.FLAT_KS_STEPS = [5,2,6,3,7,4,8];
+alphatab.rendering.ScoreBarRenderer.SharpKsSteps = [1,4,0,3,6,2,5];
+alphatab.rendering.ScoreBarRenderer.FlatKsSteps = [5,2,6,3,7,4,8];
 alphatab.rendering.ScoreBarRenderer.LineSpacing = 8;
 alphatab.rendering.ScoreBarRenderer.NOTE_STEP_CORRECTION = 1;
 alphatab.rendering.TabBarRenderer.LineSpacing = 10;
-alphatab.rendering.glyphs.AccidentalGroupGlyph.NON_RESERVED = -3000;
-alphatab.rendering.glyphs.BeatContainerGlyph.PixelPerTick = 160 / 3840;
+alphatab.rendering.glyphs.AccidentalGroupGlyph.NonReserved = -3000;
+alphatab.rendering.glyphs.BeatContainerGlyph.PixelPerTick = 0.041666666666666664;
 alphatab.rendering.glyphs.ChineseCymbalGlyph.graceScale = 0.7;
 alphatab.rendering.glyphs.ChineseCymbalGlyph.noteHeadHeight = 9;
 alphatab.rendering.glyphs.DeadNoteHeadGlyph.noteHeadHeight = 9;
@@ -11557,7 +12480,7 @@ alphatab.rendering.glyphs.MusicFont.FermataLong = "M 55 702h -68v -704h 1317v 70
 alphatab.rendering.glyphs.MusicFont.DynamicP = "M 447 894l -146 415l 92 0v 50h -364v -50h 93l 310 -797c 7 -9 10 -16 10 -21c 7 -19 7 -33 0 -43c -14 -14 -27 -21 -39 -21c -38 0 -83 48 -133 144c -14 31 -34 79 -61 144h -25c 26 -72 48 -125 64 -158c 57 -108 116 -162 176 -162c 19 0 33 2 43 7c 12 4 21 18 28 39c 2 7 4 19 7 36c 16 -26 47 -52 90 -79c 43 -26 89 -39 137 -39c 19 0 45 5 77 16c 32 10 59 37 81 78c 21 41 32 89 32 141c 0 35 -2 64 -7 86c -4 21 -13 50 -25 86c -26 64 -71 123 -133 177s -119 80 -169 80C 528 1024 481 981 447 894zM 754 425c -33 -14 -73 5 -119 58c -36 43 -67 92 -93 145c -26 53 -39 113 -39 181c 0 48 9 78 28 90c 26 14 62 0 108 -41c 45 -42 81 -92 108 -150c 9 -24 19 -56 28 -96c 9 -40 14 -74 14 -103C 790 462 778 435 754 425";
 alphatab.rendering.glyphs.MusicFont.DynamicF = "M 951 406v 39h -194l -18 90c -48 194 -97 344 -147 447c -67 141 -154 245 -259 310c -33 21 -77 32 -129 32c -77 0 -127 -21 -151 -64c -14 -26 -21 -51 -21 -75c 0 -38 13 -71 41 -97c 27 -26 57 -37 88 -32c 55 9 83 36 83 79c 0 16 -3 32 -10 46c -9 33 -32 55 -68 64c -12 2 -16 7 -14 14c 4 19 22 28 54 28c 16 -2 36 -14 57 -36c 7 -7 22 -26 47 -57c 52 -79 102 -205 147 -378c 19 -77 38 -154 57 -231l 32 -140h -137v -39h 144c -14 -55 21 -139 108 -252c 65 -84 144 -139 238 -166c 28 -7 57 -10 86 -10c 60 0 109 15 148 46c 38 31 57 72 57 122c 0 48 -14 81 -43 99c -28 18 -56 21 -83 9c -31 -14 -46 -38 -46 -72c 0 -28 10 -52 32 -72c 7 -7 22 -12 46 -14c 24 -2 37 -8 39 -18c 7 -28 -16 -43 -72 -43c -33 0 -64 6 -93 18c -77 33 -132 102 -166 205c -9 33 -20 83 -32 148H 951";
 alphatab.rendering.glyphs.MusicFont.DynamicM = "M 553 1076l -165 1l 201 -502c 7 -12 11 -21 14 -28c 12 -26 18 -45 18 -57c 0 -21 -8 -33 -25 -36c -31 -7 -62 9 -93 50c -9 12 -22 33 -39 65l -199 508l -164 0l 212 -501c 4 -10 7 -17 7 -22c 4 -19 7 -37 7 -52c 0 -17 -3 -28 -10 -33c -9 -10 -22 -14 -39 -14c -50 0 -116 61 -198 183c -12 19 -30 47 -54 84h -18c 43 -73 78 -126 104 -160c 86 -106 165 -154 238 -142c 16 2 37 21 61 56c 7 10 18 28 32 56c 14 -26 28 -45 43 -57c 45 -40 101 -61 166 -61c 31 0 54 19 68 57c 2 12 6 32 10 61c 21 -30 39 -51 54 -62c 48 -39 101 -56 158 -49c 55 7 89 30 104 69c 2 11 3 30 3 55l -163 437c -12 19 -20 32 -22 39c -7 14 -4 22 7 25c 21 2 54 -20 97 -68c 14 -14 34 -39 61 -75h 21c -31 44 -56 78 -75 101c -62 67 -125 101 -188 101c -24 0 -43 -10 -57 -32c -14 -21 -16 -43 -7 -65l 169 -429c 4 -7 6 -11 6 -14c 10 -26 16 -47 16 -64c 0 -26 -10 -40 -32 -43c -28 -7 -58 9 -89 50c -9 12 -22 33 -39 64L 553 1076";
-alphatab.rendering.glyphs.MusicFont.Accentuation = "M 748 286L -350 525l 0 -27l 938 -208l -939 -208l 0 -32L 748 286";
+alphatab.rendering.glyphs.MusicFont.Accentuation = "M 748 286C 382 365 16 445 -350 525c 0 -23 0 -46 0 -69C -58 400 234 344 526 288 233 233 -58 178 -351 124c 0 -24 0 -49 0 -74 366 78 732 157 1099 236z";
 alphatab.rendering.glyphs.MusicFont.HeavyAccentuation = "M -223 900L -275 900l 349 -1004l 353 1004l -128 0l -264 -750L -223 900";
 alphatab.rendering.glyphs.MusicFont.WaveHorizontal = "M 1382 230c -43 32 -92 69 -146 111s -104 76 -149 105c -45 28 -89 51 -134 68s -86 26 -127 28c -47 -6 -87 -19 -119 -38s -79 -51 -143 -98c -64 -46 -117 -81 -160 -102c -42 -21 -90 -32 -141 -32c -79 0 -174 55 -285 166v -112c 132 -110 241 -193 327 -249s 166 -83 244 -83c 48 0 93 11 134 34c 40 22 88 56 144 101c 55 44 103 79 143 103c 40 24 85 37 135 40c 89 -7 182 -55 278 -146V 230";
 alphatab.rendering.glyphs.MusicFont.WaveVertical = "M 165 4h 50c 47 44 86 85 115 122s 43 75 43 114c 0 31 -9 60 -28 85c -19 25 -47 55 -85 89s -66 64 -86 90c -19 26 -30 55 -31 88h 5c 0 31 9 60 27 86c 18 25 46 56 84 93s 66 68 86 95c 19 27 28 57 28 92c 0 33 -9 62 -28 89c -19 26 -47 57 -85 92c -37 35 -65 64 -84 89c -18 24 -27 51 -27 82c 0 17 22 59 67 127h -50c -59 -57 -100 -100 -124 -130c -23 -29 -35 -67 -35 -113c 0 -33 9 -62 27 -86c 18 -24 46 -53 85 -87c 38 -33 66 -63 85 -88c 18 -25 28 -55 28 -91c 0 -17 -8 -37 -26 -61s -42 -54 -73 -89c -31 -35 -53 -60 -64 -75c -41 -64 -61 -109 -61 -135c 1 -40 20 -80 56 -119c 35 -38 72 -77 110 -117c 38 -39 58 -76 60 -112c 0 -18 -4 -35 -13 -50C 210 72 192 44 165 4";
@@ -11584,26 +12507,27 @@ alphatab.rendering.glyphs.NoteHeadGlyph.noteHeadHeight = 9;
 alphatab.rendering.glyphs.NoteNumberGlyph.Padding = 0;
 alphatab.rendering.glyphs.RideCymbalGlyph.graceScale = 0.7;
 alphatab.rendering.glyphs.RideCymbalGlyph.noteHeadHeight = 9;
-alphatab.rendering.glyphs.VoiceContainerGlyph.KEY_SIZE_BEAT = "BEAT";
+alphatab.rendering.glyphs.VoiceContainerGlyph.KeySizeBeat = "Beat";
 alphatab.rendering.glyphs.WhammyBarGlyph.WhammyMaxOffset = 60;
+alphatab.rendering.glyphs.effects.CrescendoGlyph.Height = 17;
 alphatab.rendering.glyphs.effects.DynamicsGlyph.GlyphScale = 0.8;
 alphatab.rendering.glyphs.effects.LineRangedGlyph.LineSpacing = 3;
 alphatab.rendering.glyphs.effects.LineRangedGlyph.LineTopPadding = 8;
 alphatab.rendering.glyphs.effects.LineRangedGlyph.LineTopOffset = 6;
 alphatab.rendering.glyphs.effects.LineRangedGlyph.LineSize = 8;
-alphatab.rendering.layout.HeaderFooterElements.NONE = 0;
-alphatab.rendering.layout.HeaderFooterElements.TITLE = 1;
-alphatab.rendering.layout.HeaderFooterElements.SUBTITLE = 2;
-alphatab.rendering.layout.HeaderFooterElements.ARTIST = 4;
-alphatab.rendering.layout.HeaderFooterElements.ALBUM = 8;
-alphatab.rendering.layout.HeaderFooterElements.WORDS = 16;
-alphatab.rendering.layout.HeaderFooterElements.MUSIC = 32;
-alphatab.rendering.layout.HeaderFooterElements.WORDS_AND_MUSIC = 64;
-alphatab.rendering.layout.HeaderFooterElements.COPYRIGHT = 128;
-alphatab.rendering.layout.HeaderFooterElements.PAGE_NUMBER = 256;
-alphatab.rendering.layout.HeaderFooterElements.ALL = 511;
-alphatab.rendering.utils.AccidentalHelper.ACCIDENTAL_NOTES = [[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural]];
-alphatab.rendering.utils.BeamingHelper.SCORE_MIDDLE_KEYS = [48,45,38,59];
+alphatab.rendering.layout.HeaderFooterElements.None = 0;
+alphatab.rendering.layout.HeaderFooterElements.Title = 1;
+alphatab.rendering.layout.HeaderFooterElements.SubTitle = 2;
+alphatab.rendering.layout.HeaderFooterElements.Artist = 4;
+alphatab.rendering.layout.HeaderFooterElements.Album = 8;
+alphatab.rendering.layout.HeaderFooterElements.Words = 16;
+alphatab.rendering.layout.HeaderFooterElements.Music = 32;
+alphatab.rendering.layout.HeaderFooterElements.WordsAndMusic = 64;
+alphatab.rendering.layout.HeaderFooterElements.Copyright = 128;
+alphatab.rendering.layout.HeaderFooterElements.PageNumber = 256;
+alphatab.rendering.layout.HeaderFooterElements.All = 511;
+alphatab.rendering.utils.AccidentalHelper.AccidentalNotes = [[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural]];
+alphatab.rendering.utils.BeamingHelper.ScoreMiddleKeys = [48,45,38,59];
 haxe.Unserializer.DEFAULT_RESOLVER = Type;
 haxe.Unserializer.BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%:";
 haxe.ds.ObjectMap.count = 0;
@@ -11619,16 +12543,5 @@ haxe.xml.Parser.escapes = (function($this) {
 	$r = h;
 	return $r;
 }(this));
-js.Browser.document = typeof window != "undefined" ? window.document : null;
 Main.main();
-function $hxExpose(src, path) {
-	var o = typeof window != "undefined" ? window : exports;
-	var parts = path.split(".");
-	for(var ii = 0; ii < parts.length-1; ++ii) {
-		var p = parts[ii];
-		if(typeof o[p] == "undefined") o[p] = {};
-		o = o[p];
-	}
-	o[parts[parts.length-1]] = src;
-}
-})();
+})(typeof window != "undefined" ? window : exports);

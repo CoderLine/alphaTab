@@ -42,7 +42,7 @@ class TabBeatGlyph extends BeatGlyphBase
         {
             //
             // Note numbers
-            noteNumbers = new TabNoteChordGlyph();
+            noteNumbers = new TabNoteChordGlyph(0, 0, container.beat.graceType != GraceType.None);
             noteNumbers.beat = container.beat;
             noteLoop( function(n) {
                 createNoteGlyph(n);

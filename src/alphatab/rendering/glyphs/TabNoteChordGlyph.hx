@@ -31,11 +31,12 @@ class TabNoteChordGlyph extends Glyph
     private var _notes:Array<NoteNumberGlyph>;
     private var _noteLookup:IntMap<NoteNumberGlyph>;
     private var _minNote:Note;
+    private var _isGrace:Bool;
     
     public var beat:Beat;
     public var beatEffects:StringMap<Glyph>;
     
-    public function new(x:Int = 0, y:Int = 0) 
+    public function new(x:Int = 0, y:Int = 0, isGrace:Bool) 
     {
         super(x, y);
         _notes = new Array<NoteNumberGlyph>();
@@ -107,8 +108,18 @@ class TabNoteChordGlyph extends Glyph
     
     public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
     {
+        var res = renderer.getResources();
         var old = canvas.getTextBaseline();
         canvas.setTextBaseline(TextBaseline.Middle);
+        canvas.setColor(res.mainGlyphColor);
+        if (_isGrace) 
+        {
+            canvas.setFont(res.graceFont);            
+        }
+        else
+        {
+            canvas.setFont(res.tablatureFont);
+        }
         for (g in _notes)
         {
             g.renderer = renderer;

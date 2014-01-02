@@ -38,13 +38,13 @@ class PickStrokeGlyph extends SvgGlyph
         return false;
     }
     
-    private function getNoteSvg(pickStroke:PickStrokeType) : String
+    private function getNoteSvg(pickStroke:PickStrokeType) 
     {
         switch(pickStroke)
         {
             case Up: return MusicFont.PickStrokeUp;
             case Down: return MusicFont.PickStrokeDown;
-            case None: return '';
+            case None: return null;
         }
     }
 }

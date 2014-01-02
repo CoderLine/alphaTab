@@ -61,34 +61,19 @@ class BeatContainerGlyph extends Glyph implements ISupportsFinalize
         }
     }
     
-    private inline function preNotesKey()
-    {
-        return "PreNotes" + beat.voice.index;
-    }
-    
-    private inline function onNotesKey()
-    {
-        return "OnNotes" + beat.voice.index;
-    }
-    
-    private inline function postNotesKey()
-    {
-        return "PostNotes" + beat.voice.index;
-    }
-    
     public function registerMaxSizes(sizes:BarSizeInfo)
     {
-        if (sizes.getIndexedSize(preNotesKey(), beat.start) < preNotes.width)
+        if (sizes.getPreNoteSize(beat.start) < preNotes.width)
         {
-            sizes.setIndexedSize(preNotesKey(), beat.start, preNotes.width);
+            sizes.setPreNoteSize(beat.start, preNotes.width);
         }      
-        if (sizes.getIndexedSize(onNotesKey(), beat.start) < onNotes.width)
+        if (sizes.getOnNoteSize(beat.start) < onNotes.width)
         {
-            sizes.setIndexedSize(onNotesKey(), beat.start, onNotes.width);
+            sizes.setOnNoteSize(beat.start, onNotes.width);
         }
-        if (sizes.getIndexedSize(postNotesKey(), beat.start) < postNotes.width)
+        if (sizes.getPostNoteSize(beat.start) < postNotes.width)
         {
-            sizes.setIndexedSize(postNotesKey(), beat.start, postNotes.width);
+            sizes.setPostNoteSize(beat.start, postNotes.width);
         }
     }
     
@@ -97,17 +82,17 @@ class BeatContainerGlyph extends Glyph implements ISupportsFinalize
         var size:Int;
         var diff:Int;
         
-        size = sizes.getIndexedSize(preNotesKey(), beat.start);
+        size = sizes.getPreNoteSize(beat.start);
         diff = size - preNotes.width;
         preNotes.x = 0;
         if (diff > 0) preNotes.applyGlyphSpacing(diff);
         
-        size = sizes.getIndexedSize(onNotesKey(), beat.start);
+        size = sizes.getOnNoteSize(beat.start);
         diff = size - onNotes.width;
         onNotes.x = preNotes.x + preNotes.width;
         if (diff > 0) onNotes.applyGlyphSpacing(diff);
         
-        size = sizes.getIndexedSize(postNotesKey(), beat.start);
+        size = sizes.getPostNoteSize(beat.start);
         diff = size - postNotes.width;
         postNotes.x = onNotes.x + onNotes.width;
         if (diff > 0) postNotes.applyGlyphSpacing(diff);

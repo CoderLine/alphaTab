@@ -36,7 +36,7 @@ class RestGlyph extends SvgGlyph
         return false;
     }
 
-    private function getRestSvg(duration:Duration) : String
+    private function getRestSvg(duration:Duration) 
     {
         switch(duration)
         {

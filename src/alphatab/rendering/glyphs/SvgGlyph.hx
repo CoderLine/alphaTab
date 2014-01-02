@@ -21,11 +21,13 @@ import alphatab.importer.ScoreLoader;
 import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
 import alphatab.rendering.Glyph;
+import alphatab.rendering.glyphs.LazySvg.SvgCommand;
 import alphatab.rendering.utils.SvgPathParser;
 
 class SvgGlyph extends Glyph
 {
-    private var _svg:SvgPathParser;
+    private var _svg:LazySvg;
+    private var _lastCmd:String;
     
     private var _currentX:Float;
     private var _currentY:Float;
@@ -39,22 +41,18 @@ class SvgGlyph extends Glyph
     private var _lastControlY:Float;
     
     // Minor tweaks for the new generated font
-    public function new(x:Int = 0, y:Int = 0, svg:String, 
+    public function new(x:Int = 0, y:Int = 0, svg:LazySvg, 
                         xScale:Float, yScale:Float)
     {
         super(x, y);
-        _svg = new SvgPathParser(svg);
+        _svg = svg;
         _xGlyphScale = xScale * 0.0099;
         _yGlyphScale = yScale * 0.0099;
     }
-    
-    public function getSvgData() : String
-    {
-        return _svg.svg;
-    }
-    
+        
     public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
     {
+        if (_svg == null) return;
         _xScale = _xGlyphScale * getScale();
         _yScale = _yGlyphScale * getScale();
         
@@ -63,35 +61,34 @@ class SvgGlyph extends Glyph
         
         var startX = x + cx;
         var startY = y + cy;
-        _svg.reset();
         _currentX = startX;
         _currentY = startY;
         canvas.setColor(new Color(0,0,0)); // todo: Resources
         canvas.beginPath();
         
-        while (!_svg.eof())
+        for (c in _svg.get())
         {
-            parseCommand(startX, startY, canvas);
+            parseCommand(startX, startY, canvas, c);
         }
         canvas.fill();
     }    
     
-    private function parseCommand(cx:Int, cy:Int, canvas:ICanvas) 
+    private function parseCommand(cx:Int, cy:Int, canvas:ICanvas, cmd:SvgCommand) 
     {
-        var command = _svg.getString();
         var canContinue:Bool; // reusable flag for shorthand curves
-        switch (command) 
+        var i:Int;
+        switch (cmd.cmd) 
         { 
             //
             // Moving
             // 
             case "M": // absolute moveto
-                _currentX = (cx + _svg.getNumber() * _xScale);
-                _currentY = (cy + _svg.getNumber() * _yScale); 
+                _currentX = (cx + cmd.numbers[0] * _xScale);
+                _currentY = (cy + cmd.numbers[1] * _yScale); 
                 canvas.moveTo(_currentX, _currentY);
             case "m": // relative moveto
-                _currentX += (_svg.getNumber() * _xScale);
-                _currentY += (_svg.getNumber() * _yScale); 
+                _currentX += (cmd.numbers[0] * _xScale);
+                _currentY += (cmd.numbers[1] * _yScale); 
                 canvas.moveTo(_currentX, _currentY);
                 
             //
@@ -104,156 +101,170 @@ class SvgGlyph extends Glyph
             // Lines
             //                 
             case "L": // absolute lineTo
-                do 
+                i = 0;
+                while(i < cmd.numbers.length)
                 {
-                    _currentX = (cx + _svg.getNumber() * _xScale); 
-                    _currentY = (cy + _svg.getNumber() * _yScale); 
+                    _currentX = (cx + cmd.numbers[i++] * _xScale); 
+                    _currentY = (cy + cmd.numbers[i++] * _yScale); 
                     canvas.lineTo(_currentX, _currentY);
-                } while (_svg.currentTokenIsNumber());
+                } 
             case "l": // relative lineTo
-                do 
+                i = 0;
+                while(i < cmd.numbers.length)
                 {
-                    _currentX += (_svg.getNumber() * _xScale); 
-                    _currentY += (_svg.getNumber() * _yScale); 
+                    _currentX += (cmd.numbers[i++] * _xScale); 
+                    _currentY += (cmd.numbers[i++] * _yScale); 
                     canvas.lineTo(_currentX, _currentY);
-                } while (_svg.currentTokenIsNumber());
+                } 
                 
             case "V": // absolute verticalTo
-                do 
+                i = 0;
+                while(i < cmd.numbers.length)
                 {
-                    _currentY = (cy + _svg.getNumber() * _yScale);
+                    _currentY = (cy + cmd.numbers[i++] * _yScale);
                     canvas.lineTo(_currentX, _currentY);
-                } while (_svg.currentTokenIsNumber());
+                } 
             case "v": // relative verticalTo
-                do 
+                i = 0;
+                while(i < cmd.numbers.length)
                 {
-                    _currentY += (_svg.getNumber() * _yScale);
+                    _currentY += (cmd.numbers[i++] * _yScale);
                     canvas.lineTo(_currentX, _currentY);
-                } while (_svg.currentTokenIsNumber());
+                } 
                 
             case "H": // absolute horizontalTo
-                do 
+                i = 0;
+                while(i < cmd.numbers.length)
                 {
-                    _currentX = (cx + _svg.getNumber() * _xScale);
+                    _currentX = (cx + cmd.numbers[i++] * _xScale);
                     canvas.lineTo(_currentX, _currentY);
-                } while (_svg.currentTokenIsNumber());
+                } 
             case "h": // relative horizontalTo
-                do 
+                i = 0;
+                while(i < cmd.numbers.length)
                 {
-                    _currentX += (_svg.getNumber() * _xScale);
+                    _currentX += (cmd.numbers[i++] * _xScale);
                     canvas.lineTo(_currentX, _currentY);
-                } while (_svg.currentTokenIsNumber());
+                } 
                 
             //
             // cubic bezier curves
             // 
             case "C": // absolute cubicTo
-                do 
+                i = 0;
+                while(i < cmd.numbers.length)
                 {
-                    var x1:Float = (cx + _svg.getNumber() * _xScale);
-                    var y1:Float = (cy + _svg.getNumber() * _yScale);
-                    var x2:Float = (cx + _svg.getNumber() * _xScale);
-                    var y2:Float = (cy + _svg.getNumber() * _yScale);
-                    var x3:Float = (cx + _svg.getNumber() * _xScale);
-                    var y3:Float = (cy + _svg.getNumber() * _yScale);
+                    var x1:Float = (cx + cmd.numbers[i++] * _xScale);
+                    var y1:Float = (cy + cmd.numbers[i++] * _yScale);
+                    var x2:Float = (cx + cmd.numbers[i++] * _xScale);
+                    var y2:Float = (cy + cmd.numbers[i++] * _yScale);
+                    var x3:Float = (cx + cmd.numbers[i++] * _xScale);
+                    var y3:Float = (cy + cmd.numbers[i++] * _yScale);
                     _lastControlX = x2;
                     _lastControlY = y2;
                     _currentX = x3;
                     _currentY = y3;
                     canvas.bezierCurveTo(x1, y1, x2, y2, x3, y3);
-                } while (_svg.currentTokenIsNumber());
+                } 
             case "c": // relative cubicTo
-                do {
-                    var x1:Float=  (_currentX + _svg.getNumber() * _xScale);
-                    var y1:Float = (_currentY + _svg.getNumber() * _yScale);
-                    var x2:Float = (_currentX + _svg.getNumber() * _xScale);
-                    var y2:Float = (_currentY + _svg.getNumber() * _yScale);
-                    var x3:Float = (_currentX + _svg.getNumber() * _xScale);
-                    var y3:Float = (_currentY + _svg.getNumber() * _yScale);
+                i = 0;
+                while (i < cmd.numbers.length)
+                {
+                    var x1:Float=  (_currentX + cmd.numbers[i++] * _xScale);
+                    var y1:Float = (_currentY + cmd.numbers[i++] * _yScale);
+                    var x2:Float = (_currentX + cmd.numbers[i++] * _xScale);
+                    var y2:Float = (_currentY + cmd.numbers[i++] * _yScale);
+                    var x3:Float = (_currentX + cmd.numbers[i++] * _xScale);
+                    var y3:Float = (_currentY + cmd.numbers[i++] * _yScale);
                     _lastControlX = x2;
                     _lastControlY = y2;
                     _currentX = x3;
                     _currentY = y3;
                     canvas.bezierCurveTo(x1, y1, x2, y2, x3, y3);
-                } while (_svg.currentTokenIsNumber());            
+                } 
                 
             case "S": // absolute shorthand cubicTo
-                do 
+                i = 0;
+                while(i < cmd.numbers.length)
                 {
-                    var x1:Float = (cx + _svg.getNumber() * _xScale);
-                    var y1:Float = (cy + _svg.getNumber() * _yScale);
-                    canContinue = _svg.lastCommand == "c" || _svg.lastCommand == "C" || _svg.lastCommand == "S" || _svg.lastCommand == "s" ;
+                    var x1:Float = (cx + cmd.numbers[i++] * _xScale);
+                    var y1:Float = (cy + cmd.numbers[i++] * _yScale);
+                    canContinue = _lastCmd == "c" || _lastCmd == "C" || _lastCmd == "S" || _lastCmd == "s" ;
                     var x2:Float = canContinue 
                                         ? _currentX + (_currentX - _lastControlX)
                                         : _currentX;
                     var y2:Float = canContinue
                                         ? _currentY + (_currentY - _lastControlY)
                                         : _currentY;
-                    var x3:Float = (cx + _svg.getNumber() * _xScale);
-                    var y3:Float = (cy + _svg.getNumber() * _yScale);
+                    var x3:Float = (cx + cmd.numbers[i++] * _xScale);
+                    var y3:Float = (cy + cmd.numbers[i++] * _yScale);
                     _lastControlX = x2;
                     _lastControlY = y2;
                     _currentX = x3;
                     _currentY = y3;
                     canvas.bezierCurveTo(x1, y1, x2, y2, x3, y3);
-                } while (_svg.currentTokenIsNumber());            
+                } 
             case "s": // relative shorthand cubicTo
-                do 
+                i = 0;
+                while(i < cmd.numbers.length)
                 {
-                    var x1:Float = (_currentX + _svg.getNumber() * _xScale);
-                    var y1:Float = (_currentY + _svg.getNumber() * _yScale);
-                    canContinue = _svg.lastCommand == "c" || _svg.lastCommand == "C" || _svg.lastCommand == "S" || _svg.lastCommand == "s" ;
+                    var x1:Float = (_currentX + cmd.numbers[i++] * _xScale);
+                    var y1:Float = (_currentY + cmd.numbers[i++] * _yScale);
+                    canContinue = _lastCmd == "c" || _lastCmd == "C" || _lastCmd == "S" || _lastCmd == "s" ;
                     var x2:Float = canContinue 
                                         ? _currentX + (_currentX - _lastControlX)
                                         : _currentX;
                     var y2:Float = canContinue
                                         ? _currentY + (_currentY - _lastControlY)
                                         : _currentY;
-                    var x3:Float = (_currentX + _svg.getNumber() * _xScale);
-                    var y3:Float = (_currentY + _svg.getNumber() * _yScale);
+                    var x3:Float = (_currentX + cmd.numbers[i++] * _xScale);
+                    var y3:Float = (_currentY + cmd.numbers[i++] * _yScale);
                     _lastControlX = x2;
                     _lastControlY = y2;
                     _currentX = x3;
                     _currentY = y3;
                     canvas.bezierCurveTo(x1, y1, x2, y2, x3, y3);
-                } while (_svg.currentTokenIsNumber());
+                } 
             
             //
             // quadratic bezier curves
             //
             case "Q": // absolute quadraticTo
-                do 
+                i = 0;
+                while(i < cmd.numbers.length)
                 {
-                    var x1:Float = (cx + _svg.getNumber() * _xScale);
-                    var y1:Float = (cy + _svg.getNumber() * _yScale);
-                    var x2:Float = (cx + _svg.getNumber() * _xScale);
-                    var y2:Float = (cy + _svg.getNumber() * _yScale);
+                    var x1:Float = (cx + cmd.numbers[i++] * _xScale);
+                    var y1:Float = (cy + cmd.numbers[i++] * _yScale);
+                    var x2:Float = (cx + cmd.numbers[i++] * _xScale);
+                    var y2:Float = (cy + cmd.numbers[i++] * _yScale);
                     _lastControlX = x1;
                     _lastControlY = y1;
                     _currentX = x2;
                     _currentY = y2;
                     canvas.quadraticCurveTo(x1, y1, x2, y2);
-                } while (_svg.currentTokenIsNumber());
+                } 
             case "q": // relative quadraticTo
-                do 
+                i = 0;
+                while(i < cmd.numbers.length)
                 {
-                    var x1:Float = (_currentX + _svg.getNumber() * _xScale);
-                    var y1:Float = (_currentY + _svg.getNumber() * _yScale);
-                    var x2:Float = (_currentX + _svg.getNumber() * _xScale);
-                    var y2:Float = (_currentY + _svg.getNumber() * _yScale);
+                    var x1:Float = (_currentX + cmd.numbers[i++] * _xScale);
+                    var y1:Float = (_currentY + cmd.numbers[i++] * _yScale);
+                    var x2:Float = (_currentX + cmd.numbers[i++] * _xScale);
+                    var y2:Float = (_currentY + cmd.numbers[i++] * _yScale);
                     _lastControlX = x1;
                     _lastControlY = y1;
                     _currentX = x2;
                     _currentY = y2;
                     canvas.quadraticCurveTo(x1, y1, x2, y2);
-                } while (_svg.currentTokenIsNumber());
+                } 
                 
             case "T": // absolute shorthand quadraticTo
-                do 
+                i = 0;
+                while(i < cmd.numbers.length)
                 {
-                    var x1:Float = (cx + _svg.getNumber() * _xScale);
-                    var y1:Float = (cy + _svg.getNumber() * _yScale);
-                    canContinue = _svg.lastCommand == "q" || _svg.lastCommand == "Q" || _svg.lastCommand == "t" || _svg.lastCommand == "T" ;
+                    var x1:Float = (cx + cmd.numbers[i++] * _xScale);
+                    var y1:Float = (cy + cmd.numbers[i++] * _yScale);
+                    canContinue = _lastCmd == "q" || _lastCmd == "Q" || _lastCmd == "t" || _lastCmd == "T" ;
                     var cpx:Float = canContinue 
                                         ? _currentX + (_currentX - _lastControlX)
                                         : _currentX;
@@ -265,16 +276,17 @@ class SvgGlyph extends Glyph
                     _lastControlX = cpx;
                     _lastControlY = cpy;
                     canvas.quadraticCurveTo(cpx, cpy, x1, y1);
-                } while (_svg.currentTokenIsNumber());
+                } 
             case "t": // relative shorthand quadraticTo
-                do 
+                i = 0;
+                while(i < cmd.numbers.length)
                 {
                 // TODO: buggy/incomplete
-                    var x1:Float = (_currentX + _svg.getNumber() * _xScale);
-                    var y1:Float = (_currentY + _svg.getNumber() * _yScale);
+                    var x1:Float = (_currentX + cmd.numbers[i++] * _xScale);
+                    var y1:Float = (_currentY + cmd.numbers[i++] * _yScale);
                     var cpx = _currentX + (_currentX - _lastControlX);
                     var cpy = _currentY + (_currentY - _lastControlY);
-                    canContinue = _svg.lastCommand == "q" || _svg.lastCommand == "Q" || _svg.lastCommand == "t" || _svg.lastCommand == "T" ;
+                    canContinue = _lastCmd == "q" || _lastCmd == "Q" || _lastCmd == "t" || _lastCmd == "T" ;
                     var cpx:Float = canContinue 
                                         ? _currentX + (_currentX - _lastControlX)
                                         : _currentX;
@@ -284,7 +296,8 @@ class SvgGlyph extends Glyph
                     _lastControlX = cpx;
                     _lastControlY = cpy;
                     canvas.quadraticCurveTo(cpx, cpy, x1, y1);
-                } while (_svg.currentTokenIsNumber());
+                } 
         }
+        _lastCmd = cmd.cmd;
     }
 }

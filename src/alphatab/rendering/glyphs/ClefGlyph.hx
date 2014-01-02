@@ -39,7 +39,7 @@ class ClefGlyph extends SvgGlyph
         return false;
     }
     
-    private function getClefSvg(clef:Clef) : String
+    private function getClefSvg(clef:Clef) 
     {
         switch(clef)
         {

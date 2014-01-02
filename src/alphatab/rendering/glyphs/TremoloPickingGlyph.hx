@@ -38,14 +38,14 @@ class TremoloPickingGlyph extends SvgGlyph
         return false;
     }
     
-    private function getSvg(duration:Duration) : String
+    private function getSvg(duration:Duration) 
     {
         switch(duration)
         {
             case ThirtySecond: return MusicFont.TremoloPickingThirtySecond;
             case Sixteenth: return MusicFont.TremoloPickingSixteenth;
             case Eighth: return MusicFont.TremoloPickingEighth;
-            default: return "";
+            default: return null;
         }
     }
 }

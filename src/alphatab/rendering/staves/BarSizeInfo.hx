@@ -17,6 +17,7 @@
  */
 package alphatab.rendering.staves;
 
+import haxe.ds.IntMap.IntMap;
 import haxe.ds.StringMap;
 
 /**
@@ -27,44 +28,63 @@ import haxe.ds.StringMap;
 class BarSizeInfo 
 {
     public var fullWidth:Int;
-    public var sizes:StringMap<Array<Int>>;
+    public var sizes:StringMap<Int>;
+    
+    public var preNoteSizes:IntMap<Int>;
+    public var onNoteSizes:IntMap<Int>;
+    public var postNoteSizes:IntMap<Int>;
+    
     
     public function new() 
     {
-        sizes = new StringMap<Array<Int>>();
+        sizes = new StringMap<Int>();
+        preNoteSizes = new IntMap<Int>();
+        onNoteSizes = new IntMap<Int>();
+        postNoteSizes = new IntMap<Int>();
         fullWidth = 0;
     }
     
     public function setSize(key:String, size:Int)
     {
-        sizes.set(key, [size]);
+        sizes.set(key, size);
     }
     
     public function getSize(key:String)
     {
-        if (sizes.exists(key))
-        {
-            return sizes.get(key)[0];
-        }
-        return 0;
+        var size = sizes.get(key);
+        return size == null ? 0 : size;
     }
     
-    public function getIndexedSize(key:String, index:Int)
+    public function getPreNoteSize(beat:Int) : Int
     {
-        if (sizes.exists(key) && index < sizes.get(key).length)
-        {
-            return sizes.get(key)[index];
-        }
-        return 0;
+        var size = preNoteSizes.get(beat);
+        return size == null ? 0 : size;
     }
     
-    public function setIndexedSize(key:String, index:Int, size:Int) 
+    public function getOnNoteSize(beat:Int) : Int
     {
-        if (!sizes.exists(key))
-        {
-            sizes.set(key, new Array<Int>());
-        }
-        
-        sizes.get(key)[index] = size;
+        var size = onNoteSizes.get(beat);
+        return size == null ? 0 : size;
+    }
+    
+    public function getPostNoteSize(beat:Int) : Int
+    {
+        var size = postNoteSizes.get(beat);
+        return size == null ? 0 : size;
+    }
+    
+    public inline function setPreNoteSize(beat:Int, value:Int) 
+    {
+        preNoteSizes.set(beat, value);
+    }
+    
+    public inline function setOnNoteSize(beat:Int, value:Int) 
+    {
+        onNoteSizes.set(beat, value);
+    }
+    
+    public inline function setPostNoteSize(beat:Int, value:Int) 
+    {
+        postNoteSizes.set(beat, value);
     }
 }

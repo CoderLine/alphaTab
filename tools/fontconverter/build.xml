@@ -33,9 +33,6 @@
             <arg value="-resource" />
             <arg value="font/Glyphs.svg@glyphs" />
             
-            <arg value="-resource" />
-            <arg value="font/Mapping.csv@mapping" />
-            
             <arg value="-js" />
             <arg value="${haxe.out}" />
         </exec>

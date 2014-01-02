@@ -45,19 +45,19 @@ class BeamGlyph extends SvgGlyph
         width = 0;
     }
     
-    private function getRestSvg(duration:Duration, direction:BeamDirection, isGrace:Bool) : String
+    private function getRestSvg(duration:Duration, direction:BeamDirection, isGrace:Bool) 
     {
         if (isGrace)
         {
-            return MusicFont.FooterEighth;
+            return MusicFont.FooterUpEighth;
         }
         switch(duration)
         {
-            case Eighth: return MusicFont.FooterEighth;
-            case Sixteenth: return MusicFont.FooterSixteenth;
-            case ThirtySecond: return MusicFont.FooterThirtySecond;
-            case SixtyFourth: return MusicFont.FooterSixtyFourth;
-            default: return "";
+            case Eighth: return MusicFont.FooterUpEighth;
+            case Sixteenth: return MusicFont.FooterUpSixteenth;
+            case ThirtySecond: return MusicFont.FooterUpThirtySecond;
+            case SixtyFourth: return MusicFont.FooterUpSixtyFourth;
+            default: return null;
         }
     }
 }

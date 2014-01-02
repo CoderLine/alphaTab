@@ -36,13 +36,13 @@ class AccentuationGlyph extends SvgGlyph
         return false;
     }
     
-    private function getSvg(accentuation:AccentuationType) : String
+    private function getSvg(accentuation:AccentuationType) 
     {
         switch(accentuation)
         {
             case Normal: return MusicFont.Accentuation;
             case Heavy: return MusicFont.HeavyAccentuation;
-            default: return "";
+            default: return null;
         }
     }
 }

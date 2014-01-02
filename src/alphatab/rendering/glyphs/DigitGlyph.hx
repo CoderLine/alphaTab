@@ -47,7 +47,7 @@ class DigitGlyph extends SvgGlyph
             default: return 0;
         }
     }    
-    private function getDigit(digit:Int) : String
+    private function getDigit(digit:Int) 
     {
         switch(digit)
         {
@@ -61,7 +61,7 @@ class DigitGlyph extends SvgGlyph
             case 7: return MusicFont.Num7;
             case 8: return MusicFont.Num8;
             case 9: return MusicFont.Num9;
-            default: return "";
+            default: return null;
         }
     }
 }

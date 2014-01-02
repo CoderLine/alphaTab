@@ -27,7 +27,7 @@ class NoteNumberGlyph extends Glyph
     public static inline var Padding = 0;
     private var _noteString:String;
     private var _isGrace:Bool;
-    
+
     public function new(x:Int = 0, y:Int = 0, n:Note, isGrace:Bool) 
     {
         super(x, y);
@@ -73,18 +73,6 @@ class NoteNumberGlyph extends Glyph
     {
         if (_noteString != null) 
         {
-            var res = renderer.getResources();
-            //canvas.setColor(new Color(200, 200, 0, 100));
-            //canvas.fillRect(cx + x, cy + y, width, 10);
-            canvas.setColor(res.mainGlyphColor);
-            if (_isGrace) 
-            {
-                canvas.setFont(res.graceFont);            
-            }
-            else
-            {
-                canvas.setFont(res.tablatureFont);
-            }
             canvas.fillText(Std.string(_noteString), cx + x + (Padding * getScale()), cy + y);
         }
     }    

@@ -42,7 +42,7 @@ class NoteHeadGlyph extends SvgGlyph
         return false;
     }
     
-    private function getNoteSvg(duration:Duration) : String
+    private function getNoteSvg(duration:Duration) 
     {
         switch(duration)
         {
