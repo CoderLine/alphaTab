@@ -45,6 +45,7 @@ _ReSharper*/
 /tools/gpx-decompress/test/*
 /tools/gpx-decompress/bin/*
 /private
+/release
 
 # temps
 .DS_Store 

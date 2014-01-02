@@ -161,6 +161,7 @@
     <Compile Include="src\alphatab\rendering\glyphs\HiHatGlyph.cs" />
     <Compile Include="src\alphatab\rendering\glyphs\IMultiBeatEffectGlyph.cs" />
     <Compile Include="src\alphatab\rendering\glyphs\ISupportsFinalize.cs" />
+    <Compile Include="src\alphatab\rendering\glyphs\LazySvg.cs" />
     <Compile Include="src\alphatab\rendering\glyphs\MusicFont.cs" />
     <Compile Include="src\alphatab\rendering\glyphs\NaturalizeGlyph.cs" />
     <Compile Include="src\alphatab\rendering\glyphs\NoteHeadGlyph.cs" />

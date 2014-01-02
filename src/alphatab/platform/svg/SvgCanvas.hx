@@ -70,7 +70,7 @@ class SvgCanvas implements ICanvas
             }
             stream.writeString('>\n');
         }
-        stream.writeString(_buffer.toString());
+        stream.writeString(_buffer);
         if (includeWrapper) 
         {
             stream.writeString('</svg>'); 
@@ -95,7 +95,7 @@ class SvgCanvas implements ICanvas
             }
             buf.add('>\n');
         }
-        buf.add(_buffer.toString());
+        buf.add(_buffer);
         if (includeWrapper) 
         {
             buf.add('</svg>'); 
@@ -281,7 +281,7 @@ class SvgCanvas implements ICanvas
     {
         if(!_currentPathIsEmpty) {
             _buffer += ('<path d="');
-            _buffer += (_currentPath.toString());
+            _buffer += (_currentPath);
             _buffer += ('" style="fill:');
             _buffer += (_color.toRgbaString());
             _buffer += ('" stroke="none"/>\n');
@@ -293,7 +293,7 @@ class SvgCanvas implements ICanvas
     {
         if(!_currentPathIsEmpty) {
             _buffer += ('<path d="');
-            _buffer += (_currentPath.toString());
+            _buffer += (_currentPath);
             _buffer += ('" style="stroke:');
             _buffer += (_color.toRgbaString());
             _buffer += ('; stroke-width:');

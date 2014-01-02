@@ -509,7 +509,7 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 			}
 			stream.writeString(">\n");
 		}
-		stream.writeString(this._buffer.toString());
+		stream.writeString(this._buffer);
 		if(includeWrapper) stream.writeString("</svg>");
 	}
 	,toSvg: function(includeWrapper,className) {
@@ -527,8 +527,7 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 			}
 			buf.b += ">\n";
 		}
-		var x = this._buffer.toString();
-		buf.b += Std.string(x);
+		buf.b += Std.string(this._buffer);
 		if(includeWrapper) buf.b += "</svg>";
 		return buf.b;
 	}
@@ -666,7 +665,7 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 	,fill: function() {
 		if(!this._currentPathIsEmpty) {
 			this._buffer += "<path d=\"";
-			this._buffer += this._currentPath.toString();
+			this._buffer += this._currentPath;
 			this._buffer += "\" style=\"fill:";
 			this._buffer += this._color.toRgbaString();
 			this._buffer += "\" stroke=\"none\"/>\n";
@@ -677,7 +676,7 @@ alphatab.platform.svg.SvgCanvas.prototype = {
 	,stroke: function() {
 		if(!this._currentPathIsEmpty) {
 			this._buffer += "<path d=\"";
-			this._buffer += this._currentPath.toString();
+			this._buffer += this._currentPath;
 			this._buffer += "\" style=\"stroke:";
 			this._buffer += this._color.toRgbaString();
 			this._buffer += "; stroke-width:";
