@@ -80,6 +80,33 @@ function changeEngine(newEngine) {
     $('#alphaTab').alphaTab('renderer').render(currentScore.tracks[0]);
 }
 
+function initializeTrackChooser() {
+    var currentTrack = $('#alphaTab').alphaTab('track');
+    var allTracks = currentTrack.score.tracks;
+
+    var list = $('#trackList');
+    list.empty();
+    
+    for(var i = 0; i < allTracks.length; i++) 
+    {
+        var track = allTracks[i];
+        var li = $('<li></li>');
+        list.append(li);
+        if(track == currentTrack) li.addClass('active');
+        
+        var a = $('<a></a>');
+        li.append(a);
+        a.attr('href', '#');
+        a.text(track.name);
+        a.data('track', track);
+        a.click(function(e) {
+           e.preventDefault();
+           $('#alphaTab').alphaTab('renderer').render($(this).data('track'));
+           $('#trackChooser').fadeOut();
+        });
+    }
+}
+
 $(document).ready(function() {
    /* accordion */
    var groups =  $('#settingsContent a');
@@ -148,8 +175,7 @@ $(document).ready(function() {
         return s.indexOf(suffix, this.length - suffix.length) !== -1;
     };
    
-   /* file reader */
-   // Check for the various File API support.
+    /* file reader */
     if (window.File && window.FileReader && window.FileList && window.Blob) {
         $('#openFileData').change(function(e) {
             var file = e.target.files[0];
@@ -169,4 +195,9 @@ $(document).ready(function() {
     else {
       $('#openFile').hide();
     }
+    
+    /* Track Chooser */
+    $('#tracks').click(function(e) { e.preventDefault(); initializeTrackChooser(); $('#trackChooser').fadeIn(); });
+    $('#trackChooser .shadow').click(function() { $('#trackChooser').fadeOut(); } );
+    
 });
