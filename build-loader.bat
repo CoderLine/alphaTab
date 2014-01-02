@@ -1,1 +1,0 @@
-ant -buildfile build.xml flash-loader
