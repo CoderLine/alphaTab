@@ -1,5 +1,8 @@
+![alphaTab](https://raw.github.com/CoderLine/alphaTab/master/logo.png "alphaTab")
+
 # About alphaTab
-alphaTab is an HTML5 music notation renderer written in Haxe. It allows you to embed rich music notation sheets into your website, and display them right in your browser without any third-party plugins needed. 
+alphaTab is a cross platform music notation and guitar tablature rendering library. 
+You can use alphaTab within your own website or application to load music sheets from files like Guitar Pro or use the built in markup named alphaTex.
 
 Website: http://www.alphatab.net
 
