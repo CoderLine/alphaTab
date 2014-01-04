@@ -30,7 +30,7 @@ and
 * play the displayed music sheet 
 
 # Platforms
-alphaTab is not only a JavaScript library. alphaTab can be used im many different platforms 
+alphaTab is not only a JavaScript library. alphaTab can be used in many different platforms 
 
 * HTML5/JS
 * Flash (future)
