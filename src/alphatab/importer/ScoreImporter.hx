@@ -68,6 +68,12 @@ class ScoreImporter
         // TODO[performance]: maybe we can cache this data during creation 
         for (t in score.tracks)
         {
+            if (t.shortName == null || t.shortName.length == 0)
+            {
+                t.shortName = t.name;
+                if (t.shortName.length > 10) t.shortName = t.shortName.substr(0, 10);
+            }
+
             if (!t.isPercussion)
             {
                 for (bar in t.bars)

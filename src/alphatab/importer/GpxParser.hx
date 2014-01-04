@@ -495,6 +495,8 @@ class GpxParser
                             case "Scottish8th": masterBar.tripletFeel = TripletFeel.Scottish8th;
                             case "Scottish16th": masterBar.tripletFeel = TripletFeel.Scottish16th;
                         }
+                    case "Key":
+                        masterBar.keySignature = Std.parseInt(getValue(findChildElement(c, "AccidentalCount")));
                 }
             }
         }
@@ -1096,8 +1098,19 @@ class GpxParser
                     {
                         bar.addVoice(_voiceById.get(voiceId));
                     }
+                    else
+                    {
+                        // invalid voice -> empty voice
+                        var voice = new Voice();
+                        bar.addVoice(voice);
+                        
+                        var beat = new Beat();
+                        beat.isEmpty = true;
+                        beat.duration = Duration.Quarter;
+                        voice.addBeat(beat);
+                    }
                 }
-            }
+            }            
         }
 
         // build tracks (not all, only those used by the score)
