@@ -18,10 +18,32 @@
 package alphatab.rendering.staves;
 
 import alphatab.model.Bar;
+import alphatab.model.MasterBar;
+import alphatab.model.Track;
 import alphatab.platform.ICanvas;
 import alphatab.platform.model.Color;
 import alphatab.rendering.BarRendererBase;
 import alphatab.rendering.layout.ScoreLayout;
+import alphatab.rendering.staves.StaveGroup.StaveTrackGroup;
+import haxe.ds.IntMap.IntMap;
+
+class StaveTrackGroup
+{
+    public var track:Track;
+    public var staveGroup:StaveGroup;
+    public var staves:Array<Stave>;
+    
+    public var firstStaveInAccolade:Stave;
+    public var lastStaveInAccolade:Stave;
+
+    
+    public function new(staveGroup:StaveGroup,track:Track)
+    {
+        this.staveGroup = staveGroup;
+        this.track = track;
+        staves = new Array<Stave>();
+    }
+}
 
 /**
  * A stave consists of a list of different staves and groups
@@ -29,11 +51,16 @@ import alphatab.rendering.layout.ScoreLayout;
  */
 class StaveGroup 
 {
+    private static inline var AccoladeLabelSpacing = 10;
     private var _firstStaveInAccolade:Stave;
     private var _lastStaveInAccolade:Stave;
     
     public var x:Int;
     public var y:Int;
+    public var index:Int;
+    
+    private var _accoladeSpacingCalculated:Bool;
+    public var accoladeSpacing:Int;
 
     /**
      * Indicates whether this line is full or not. If the line is full the
@@ -47,17 +74,23 @@ class StaveGroup
      */
     public var width:Int;
 
-    public var bars:Array<Bar>;
-    public var staves:Array<Stave>;
+    public var bars:Array<MasterBar>;
+    
+    public var staves:Array<StaveTrackGroup>;
+    private var _allStaves:Array<Stave>;
     
     public var layout:ScoreLayout;
     
     
     public function new() 
     {
-        bars = new Array<Bar>();
-        staves = new Array<Stave>();
+        bars = new Array<MasterBar>();
+        staves = new Array<StaveTrackGroup>();
+        _allStaves = new Array<Stave>();
         width = 0;
+        index = 0;
+        _accoladeSpacingCalculated = false;
+        accoladeSpacing = 0;
     }
     
     public inline function getLastBarIndex() : Int
@@ -65,21 +98,41 @@ class StaveGroup
         return bars[bars.length - 1].index;
     }
     
-    public function addBar(bar:Bar) : Void
+    public function addBars(tracks:Array<Track>, barIndex:Int) : Void
     {
-        bars.push(bar);
+        if (tracks.length == 0) return;
+        var score = tracks[0].score;
+        var masterBar = score.masterBars[barIndex];
+        bars.push(masterBar);
         
+        if (!_accoladeSpacingCalculated && index == 0)
+        {
+            _accoladeSpacingCalculated = true;
+            var canvas = layout.renderer.canvas;
+            var res = layout.renderer.renderingResources.effectFont;
+            canvas.setFont(res);
+            for (t in tracks)
+            {
+                accoladeSpacing = Std.int(Math.max(accoladeSpacing, canvas.measureText(t.shortName)));
+            }
+            accoladeSpacing += (2 * AccoladeLabelSpacing);
+            width += accoladeSpacing;
+        }
+                
         // add renderers
         var maxSizes = new BarSizeInfo();
-        for (s in staves)
+        for (g in staves)
         {
-            s.addBar(bar);
-            s.barRenderers[s.barRenderers.length - 1].registerMaxSizes(maxSizes);
+            for (s in g.staves)
+            {
+                s.addBar(g.track.bars[barIndex]);
+                s.barRenderers[s.barRenderers.length - 1].registerMaxSizes(maxSizes);
+            }
         }
         
         // ensure same widths of new renderer
         var realWidth:Int = 0;
-        for (s in staves)
+        for (s in _allStaves)
         {
             s.barRenderers[s.barRenderers.length - 1].applySizes(maxSizes);
             if (s.barRenderers[s.barRenderers.length - 1].width > realWidth)
@@ -87,31 +140,64 @@ class StaveGroup
                 realWidth = s.barRenderers[s.barRenderers.length - 1].width;
             }
         }
-    
+        
         width += realWidth;
     }
 
-    public function addStave(stave:Stave) 
+    private function getStaveTrackGroup(track:Track)
     {
-        stave.staveGroup = this;
-        stave.index = staves.length;
-        staves.push(stave);
-        if (_firstStaveInAccolade == null && stave.isInAccolade())
+        for (g in staves)
         {
-            _firstStaveInAccolade = stave;
-            stave.isFirstInAccolade = true;
+            if (g.track == track)
+            {
+                return g;
+            }
         }
+        return null;
+    }
+    
+    public function addStave(track:Track, stave:Stave) 
+    {
+        var group:StaveTrackGroup = getStaveTrackGroup(track);
+        if (group == null)
+        {
+            group = new StaveTrackGroup(this, track);
+            staves.push(group);
+        }
+       
+        stave.staveTrackGroup = group;
+        stave.staveGroup = this;
+        stave.index = _allStaves.length;
+        _allStaves.push(stave);
+        group.staves.push(stave);
+        
         if (stave.isInAccolade())
         {
+            if (_firstStaveInAccolade == null)
+            {
+                _firstStaveInAccolade = stave;
+                stave.isFirstInAccolade = true;
+            }    
+            if (group.firstStaveInAccolade == null)
+            {
+                group.firstStaveInAccolade = stave;
+            }            
+            if (_lastStaveInAccolade == null)
+            {
+                _lastStaveInAccolade = stave;
+                stave.isLastInAccolade = true;
+            }    
+            
             if (_lastStaveInAccolade != null) { _lastStaveInAccolade.isLastInAccolade = false; }
             _lastStaveInAccolade = stave;
             _lastStaveInAccolade.isLastInAccolade = true;
+            group.lastStaveInAccolade = stave;
         }
     }
     
     public function calculateHeight() : Int
     {
-        return staves[staves.length - 1].y + staves[staves.length - 1].height; 
+        return _allStaves[_allStaves.length - 1].y + _allStaves[_allStaves.length - 1].height; 
     }
     
     public function revertLastBar() : Void
@@ -120,7 +206,7 @@ class StaveGroup
         {
             bars.pop();
             var w = 0;
-            for (s in staves)
+            for (s in _allStaves)
             {
                 w = Std.int(Math.max(w, s.barRenderers[s.barRenderers.length - 1].width));
                 s.revertLastBar();
@@ -131,7 +217,7 @@ class StaveGroup
     
     public function applyBarSpacing(spacing:Int)
     {
-        for (s in staves)
+        for (s in _allStaves)
         {
             s.applyBarSpacing(spacing);
         }
@@ -140,7 +226,7 @@ class StaveGroup
     
     public function paint(cx:Int, cy:Int,  canvas:ICanvas)
     {
-        for (s in staves)
+        for (s in _allStaves)
         {
             s.paint(cx + x, cy + y, canvas);
         }
@@ -148,52 +234,74 @@ class StaveGroup
         var res = layout.renderer.renderingResources; 
         
         if (staves.length > 0)
-        {
+        {            
             //
             // Draw start grouping
             // 
             
             if (_firstStaveInAccolade != null && _lastStaveInAccolade != null)
             {
+                //
+                // draw grouping line for all staves
+                //
+
                 var firstStart = cy + y + _firstStaveInAccolade.y + _firstStaveInAccolade.staveTop + _firstStaveInAccolade.topSpacing + _firstStaveInAccolade.getTopOverflow();
                 var lastEnd = cy + y + _lastStaveInAccolade.y + _lastStaveInAccolade.topSpacing + _lastStaveInAccolade.getTopOverflow()
                                      + _lastStaveInAccolade.staveBottom;
+                                     
+                var acooladeX = cx + x + _firstStaveInAccolade.x;
                 
                 canvas.setColor(res.barSeperatorColor);
                 
                 canvas.beginPath();
-                canvas.moveTo(cx + x + _firstStaveInAccolade.x, firstStart);
-                canvas.lineTo(cx + x + _lastStaveInAccolade.x, lastEnd);
+                canvas.moveTo(acooladeX, firstStart);
+                canvas.lineTo(acooladeX, lastEnd);
                 canvas.stroke();
-                            
-                //
-                // Draw accolade
-                // 
-                
+            }
+            
+            //
+            // Draw accolade for each track group
+            // 
+            canvas.setFont(res.effectFont);
+            for (g in staves)
+            {                        
+                var firstStart = cy + y + g.firstStaveInAccolade.y + g.firstStaveInAccolade.staveTop + g.firstStaveInAccolade.topSpacing + g.firstStaveInAccolade.getTopOverflow();
+                var lastEnd = cy + y + g.lastStaveInAccolade.y + g.lastStaveInAccolade.topSpacing + g.lastStaveInAccolade.getTopOverflow()
+                                     + g.lastStaveInAccolade.staveBottom;
+                                     
+                var acooladeX = cx + x + g.firstStaveInAccolade.x;
+
                 var barSize:Int = Std.int(3 * layout.renderer.settings.scale);
                 var barOffset:Int = barSize;
                 
                 var accoladeStart = firstStart - (barSize*4);
                 var accoladeEnd = lastEnd + (barSize * 4);
                 
-                canvas.fillRect(cx + x - barOffset - barSize, accoladeStart, barSize, accoladeEnd - accoladeStart);
+                // text
+                if (index == 0)
+                {
+                    canvas.fillText(g.track.shortName, cx + x + (AccoladeLabelSpacing * layout.getScale()), firstStart);
+                }
                 
-                var spikeStartX = cx + x - barOffset - barSize;
-                var spikeEndX = cx + x + barSize * 2;
+                // rect
+                canvas.fillRect(acooladeX - barOffset - barSize, accoladeStart, barSize, accoladeEnd - accoladeStart);
+                
+                var spikeStartX = acooladeX - barOffset - barSize;
+                var spikeEndX = acooladeX + barSize * 2;
                 
                 // top spike
                 canvas.beginPath();
                 canvas.moveTo(spikeStartX, accoladeStart);
-                canvas.bezierCurveTo(spikeStartX, accoladeStart, x, accoladeStart, spikeEndX, accoladeStart - barSize);
-                canvas.bezierCurveTo(cx + x, accoladeStart + barSize, spikeStartX, accoladeStart + barSize, spikeStartX, accoladeStart + barSize);
+                canvas.bezierCurveTo(spikeStartX, accoladeStart, spikeStartX, accoladeStart, spikeEndX, accoladeStart - barSize);
+                canvas.bezierCurveTo(acooladeX, accoladeStart + barSize, spikeStartX, accoladeStart + barSize, spikeStartX, accoladeStart + barSize);
                 canvas.closePath();
                 canvas.fill();
                 
                 // bottom spike 
                 canvas.beginPath();
                 canvas.moveTo(spikeStartX, accoladeEnd);
-                canvas.bezierCurveTo(spikeStartX, accoladeEnd, x, accoladeEnd, spikeEndX, accoladeEnd + barSize);
-                canvas.bezierCurveTo(x, accoladeEnd - barSize, spikeStartX, accoladeEnd - barSize, spikeStartX, accoladeEnd - barSize);
+                canvas.bezierCurveTo(spikeStartX, accoladeEnd, acooladeX, accoladeEnd, spikeEndX, accoladeEnd + barSize);
+                canvas.bezierCurveTo(acooladeX, accoladeEnd - barSize, spikeStartX, accoladeEnd - barSize, spikeStartX, accoladeEnd - barSize);
                 canvas.closePath();
                 
                 canvas.fill();
@@ -204,12 +312,12 @@ class StaveGroup
     public function finalizeGroup(scoreLayout:ScoreLayout)
     {
         var currentY:Float = 0;
-        for (i in 0 ... staves.length)
+        for (i in 0 ... _allStaves.length)
         {
-            staves[i].x = 0;
-            staves[i].y = Std.int(currentY);
-            staves[i].finalizeStave(scoreLayout);
-            currentY += staves[i].height;
+            _allStaves[i].x = accoladeSpacing;
+            _allStaves[i].y = Std.int(currentY);
+            _allStaves[i].finalizeStave(scoreLayout);
+            currentY += _allStaves[i].height;
         }
     }
 }

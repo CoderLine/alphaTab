@@ -33,6 +33,11 @@ class CrescendoEffectInfo implements IEffectBarRendererInfo
     {       
     }
     
+    public function hideOnMultiTrack():Bool
+    {
+        return false;
+    }
+    
     public function shouldCreateGlyph(renderer : EffectBarRenderer, beat:Beat) : Bool
     {
         return beat.crescendo != CrescendoType.None;

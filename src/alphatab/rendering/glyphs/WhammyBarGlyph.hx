@@ -61,7 +61,7 @@ class WhammyBarGlyph extends Glyph
         //
         // calculate the overflow 
         var tabBarRenderer:TabBarRenderer = cast renderer;
-        var track = renderer.getLayout().renderer.track;
+        var track = renderer.bar.track;
         var tabTop = tabBarRenderer.getTabY(0, -2);
         var tabBottom = tabBarRenderer.getTabY(track.tuning.length, -2);
 

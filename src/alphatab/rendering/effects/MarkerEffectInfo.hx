@@ -31,6 +31,11 @@ class MarkerEffectInfo implements IEffectBarRendererInfo
     {       
     }
     
+    public function hideOnMultiTrack():Bool
+    {
+        return true;
+    }
+    
     public function shouldCreateGlyph(renderer : EffectBarRenderer, beat:Beat) : Bool
     {
         return beat.index == 0 && beat.voice.bar.getMasterBar().isSectionStart();

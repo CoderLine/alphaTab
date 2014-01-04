@@ -26,6 +26,13 @@ import alphatab.model.Beat;
 interface IEffectBarRendererInfo 
 {
     /**
+     * Gets a value indicating whether this effect bar renderer
+     * should only be added once on the first track if multiple tracks are rendered.
+     * (Example: this allows to render the tempo changes only once)
+     * @return true if this effect bar should only be created once for the first track, otherwise false.
+     */
+    function hideOnMultiTrack():Bool;
+    /**
      * Checks whether the given beat has the appropriate effect set and
      * needs a glyph creation 
      * @param renderer the renderer which requests for glyph creation

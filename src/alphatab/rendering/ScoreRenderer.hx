@@ -38,7 +38,7 @@ class ScoreRenderer
     private var _renderFinishedListeners:Array < Void->Void > ;
     public var canvas : ICanvas;
     public var score(get, null) : Score;
-    public var track : Track;
+    public var tracks : Array<Track>;
     
     private var _currentLayoutMode:String;
     public var layout : ScoreLayout;
@@ -81,19 +81,26 @@ class ScoreRenderer
     
     public function render(track:Track)
     {
-        this.track = track;
+        this.tracks = [track];
+        invalidate();
+    }
+    
+    public function renderMultiple(tracks:Array<Track>)
+    {
+        this.tracks = tracks;
         invalidate();
     }
     
     public function invalidate()
     {
+        if (tracks.length == 0) return;
         if (this.renderingResources.scale != this.settings.scale)
         {
             this.renderingResources.init(this.settings.scale);         
             canvas.setLineWidth(this.settings.scale);
         }
         recreateLayout();
-        canvas.clear();        
+        canvas.clear();   
         doLayout();
         paintScore();
         raiseRenderFinished();
@@ -101,11 +108,11 @@ class ScoreRenderer
     
     public function get_score() : Score
     {
-        if (track == null)
+        if (tracks == null || tracks.length == 0)
         {
             return null;
         }
-        return track.score;
+        return tracks[0].score;
     }
     
     private function doLayout()

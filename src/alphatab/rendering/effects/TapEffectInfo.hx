@@ -32,6 +32,11 @@ class TapEffectInfo implements IEffectBarRendererInfo
     {
     }
     
+    public function hideOnMultiTrack():Bool
+    {
+        return false;
+    }
+    
     public function shouldCreateGlyph(renderer : EffectBarRenderer, beat:Beat) : Bool
     {
         return (beat.slap || beat.pop || beat.tap);

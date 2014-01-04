@@ -990,12 +990,23 @@ alphatab.rendering.layout.ScoreLayout.prototype = {
 	,createEmptyStaveGroup: function() {
 		var group = new alphatab.rendering.staves.StaveGroup();
 		group.layout = this;
+		var isFirstTrack = true;
 		var _g = 0;
-		var _g1 = this.renderer.settings.staves;
+		var _g1 = this.renderer.tracks;
 		while(_g < _g1.length) {
-			var s = _g1[_g];
+			var track = _g1[_g];
 			++_g;
-			if(alphatab.Environment.staveFactories.exists(s.id)) group.addStave(new alphatab.rendering.staves.Stave((alphatab.Environment.staveFactories.get(s.id))(this)));
+			var _g2 = 0;
+			var _g3 = this.renderer.settings.staves;
+			while(_g2 < _g3.length) {
+				var s = _g3[_g2];
+				++_g2;
+				if(alphatab.Environment.staveFactories.exists(s.id)) {
+					var factory = (alphatab.Environment.staveFactories.get(s.id))(this);
+					if(isFirstTrack || !factory.hideOnMultiTrack) group.addStave(track,new alphatab.rendering.staves.Stave(factory));
+				}
+			}
+			isFirstTrack = false;
 		}
 		return group;
 	}
@@ -1010,15 +1021,16 @@ alphatab.rendering.layout.PageViewLayout.__super__ = alphatab.rendering.layout.S
 alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.layout.ScoreLayout.prototype,{
 	doLayout: function() {
 		this._groups = new Array();
+		var score = this.renderer.get_score();
 		var startIndex = this.renderer.settings.layout.get("start",1);
 		startIndex--;
-		var x = Math.min(this.renderer.track.bars.length - 1,Math.max(0,startIndex));
+		var x = Math.min(score.masterBars.length - 1,Math.max(0,startIndex));
 		startIndex = x | 0;
 		var currentBarIndex = startIndex;
-		var endBarIndex = this.renderer.settings.layout.get("count",this.renderer.track.bars.length);
-		if(endBarIndex < 0) endBarIndex = this.renderer.track.bars.length;
+		var endBarIndex = this.renderer.settings.layout.get("count",score.masterBars.length);
+		if(endBarIndex < 0) endBarIndex = score.masterBars.length;
 		endBarIndex = startIndex + endBarIndex - 1;
-		var x = Math.min(this.renderer.track.bars.length - 1,Math.max(0,endBarIndex));
+		var x = Math.min(score.masterBars.length - 1,Math.max(0,endBarIndex));
 		endBarIndex = x | 0;
 		var x = alphatab.rendering.layout.PageViewLayout.PagePadding[0];
 		var y = alphatab.rendering.layout.PageViewLayout.PagePadding[1];
@@ -1051,12 +1063,12 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 			if(!this.isNullOrEmpty(score.words) && (flags & 16) != 0) y += Math.floor(20 * scale);
 		}
 		y += Math.floor(20 * scale);
-		if(!this.renderer.track.isPercussion) {
-			var tuning = alphatab.model.Tuning.findTuning(this.renderer.track.tuning);
+		if(this.renderer.tracks.length == 1 && !this.renderer.tracks[0].isPercussion) {
+			var tuning = alphatab.model.Tuning.findTuning(this.renderer.tracks[0].tuning);
 			if(tuning != null) {
 				y += Math.floor(15 * scale);
 				if(!tuning.isStandard) {
-					var stringsPerColumn = Math.ceil(this.renderer.track.tuning.length / 2);
+					var stringsPerColumn = Math.ceil(this.renderer.tracks[0].tuning.length / 2);
 					y += stringsPerColumn * Math.floor(15 * scale);
 				}
 				y += Math.floor(15 * scale);
@@ -1125,22 +1137,22 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 			y += Math.floor(20 * scale);
 		}
 		y += Math.floor(20 * scale);
-		if(!this.renderer.track.isPercussion) {
+		if(this.renderer.tracks.length == 1 && !this.renderer.tracks[0].isPercussion) {
 			canvas.setTextAlign(alphatab.platform.model.TextAlign.Left);
-			var tuning = alphatab.model.Tuning.findTuning(this.renderer.track.tuning);
+			var tuning = alphatab.model.Tuning.findTuning(this.renderer.tracks[0].tuning);
 			if(tuning != null) {
 				canvas.setFont(res.effectFont);
 				canvas.fillText(tuning.name,x,y);
 				y += Math.floor(15 * scale);
 				if(!tuning.isStandard) {
-					var stringsPerColumn = Math.ceil(this.renderer.track.tuning.length / 2);
+					var stringsPerColumn = Math.ceil(this.renderer.tracks[0].tuning.length / 2);
 					var currentX = x;
 					var currentY = y;
 					var _g1 = 0;
-					var _g = this.renderer.track.tuning.length;
+					var _g = this.renderer.tracks[0].tuning.length;
 					while(_g1 < _g) {
 						var i = _g1++;
-						str = "(" + Std.string(i + 1) + ") = " + alphatab.model.Tuning.getTextForTuning(this.renderer.track.tuning[i],false);
+						str = "(" + Std.string(i + 1) + ") = " + alphatab.model.Tuning.getTextForTuning(this.renderer.tracks[0].tuning[i],false);
 						canvas.fillText(str,currentX,currentY);
 						currentY += Math.floor(15 * scale);
 						if(i == stringsPerColumn - 1) {
@@ -1167,14 +1179,14 @@ alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.
 	}
 	,createStaveGroup: function(currentBarIndex,endIndex) {
 		var group = this.createEmptyStaveGroup();
+		group.index = this._groups.length;
 		var barsPerRow = this.renderer.settings.layout.get("barsPerRow",-1);
 		var maxWidth = this.getMaxWidth();
 		var end = endIndex + 1;
 		var _g = currentBarIndex;
 		while(_g < end) {
 			var i = _g++;
-			var bar = this.renderer.track.bars[i];
-			group.addBar(bar);
+			group.addBars(this.renderer.tracks,i);
 			var groupIsFull = false;
 			if(barsPerRow == -1 && (group.width >= maxWidth && group.bars.length != 0)) groupIsFull = true; else if(group.bars.length == barsPerRow + 1) groupIsFull = true;
 			if(groupIsFull) {
@@ -1205,21 +1217,21 @@ alphatab.rendering.layout.HorizontalScreenLayout.__super__ = alphatab.rendering.
 alphatab.rendering.layout.HorizontalScreenLayout.prototype = $extend(alphatab.rendering.layout.ScoreLayout.prototype,{
 	doLayout: function() {
 		if(this.renderer.settings.staves.length == 0) return;
+		var score = this.renderer.get_score();
 		var startIndex = this.renderer.settings.layout.get("start",1);
 		startIndex--;
-		var x = Math.min(this.renderer.track.bars.length - 1,Math.max(0,startIndex));
+		var x = Math.min(score.masterBars.length - 1,Math.max(0,startIndex));
 		startIndex = x | 0;
 		var currentBarIndex = startIndex;
-		var endBarIndex = this.renderer.settings.layout.get("count",this.renderer.track.bars.length);
+		var endBarIndex = this.renderer.settings.layout.get("count",score.masterBars.length);
 		endBarIndex = startIndex + endBarIndex - 1;
-		var x = Math.min(this.renderer.track.bars.length - 1,Math.max(0,endBarIndex));
+		var x = Math.min(score.masterBars.length - 1,Math.max(0,endBarIndex));
 		endBarIndex = x | 0;
 		var x = alphatab.rendering.layout.HorizontalScreenLayout.PagePadding[0];
 		var y = alphatab.rendering.layout.HorizontalScreenLayout.PagePadding[1];
 		this._group = this.createEmptyStaveGroup();
 		while(currentBarIndex <= endBarIndex) {
-			var bar = this.renderer.track.bars[currentBarIndex];
-			this._group.addBar(bar);
+			this._group.addBars(this.renderer.tracks,currentBarIndex);
 			currentBarIndex++;
 		}
 		this._group.x = x;
@@ -1245,7 +1257,10 @@ alphatab.rendering.effects.MarkerEffectInfo = function() {
 alphatab.rendering.effects.MarkerEffectInfo.__name__ = true;
 alphatab.rendering.effects.MarkerEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.MarkerEffectInfo.prototype = {
-	shouldCreateGlyph: function(renderer,beat) {
+	hideOnMultiTrack: function() {
+		return true;
+	}
+	,shouldCreateGlyph: function(renderer,beat) {
 		return beat.index == 0 && ((function($this) {
 			var $r;
 			var _this = beat.voice.bar;
@@ -1274,6 +1289,7 @@ alphatab.rendering.effects.MarkerEffectInfo.prototype = {
 };
 alphatab.rendering.BarRendererFactory = function() {
 	this.isInAccolade = true;
+	this.hideOnMultiTrack = false;
 };
 alphatab.rendering.BarRendererFactory.__name__ = true;
 alphatab.rendering.BarRendererFactory.prototype = {
@@ -1286,6 +1302,7 @@ alphatab.rendering.EffectBarRendererFactory = function(info) {
 	alphatab.rendering.BarRendererFactory.call(this);
 	this.isInAccolade = false;
 	this._info = info;
+	this.hideOnMultiTrack = info.hideOnMultiTrack();
 };
 alphatab.rendering.EffectBarRendererFactory.__name__ = true;
 alphatab.rendering.EffectBarRendererFactory.__super__ = alphatab.rendering.BarRendererFactory;
@@ -1300,7 +1317,10 @@ alphatab.rendering.effects.TempoEffectInfo = function() {
 alphatab.rendering.effects.TempoEffectInfo.__name__ = true;
 alphatab.rendering.effects.TempoEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.TempoEffectInfo.prototype = {
-	shouldCreateGlyph: function(renderer,beat) {
+	hideOnMultiTrack: function() {
+		return true;
+	}
+	,shouldCreateGlyph: function(renderer,beat) {
 		return beat.index == 0 && (((function($this) {
 			var $r;
 			var _this = beat.voice.bar;
@@ -1339,7 +1359,10 @@ alphatab.rendering.effects.TextEffectInfo = function() {
 alphatab.rendering.effects.TextEffectInfo.__name__ = true;
 alphatab.rendering.effects.TextEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.TextEffectInfo.prototype = {
-	shouldCreateGlyph: function(renderer,beat) {
+	hideOnMultiTrack: function() {
+		return false;
+	}
+	,shouldCreateGlyph: function(renderer,beat) {
 		return beat.text != null && StringTools.trim(beat.text).length > 0;
 	}
 	,canExpand: function(renderer,from,to) {
@@ -1361,7 +1384,10 @@ alphatab.rendering.effects.ChordsEffectInfo = function() {
 alphatab.rendering.effects.ChordsEffectInfo.__name__ = true;
 alphatab.rendering.effects.ChordsEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.ChordsEffectInfo.prototype = {
-	shouldCreateGlyph: function(renderer,beat) {
+	hideOnMultiTrack: function() {
+		return false;
+	}
+	,shouldCreateGlyph: function(renderer,beat) {
 		return beat.chordId != null;
 	}
 	,canExpand: function(renderer,from,to) {
@@ -1383,7 +1409,10 @@ alphatab.rendering.effects.NoteEffectInfoBase = function() {
 alphatab.rendering.effects.NoteEffectInfoBase.__name__ = true;
 alphatab.rendering.effects.NoteEffectInfoBase.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.NoteEffectInfoBase.prototype = {
-	shouldCreateGlyph: function(renderer,beat) {
+	hideOnMultiTrack: function() {
+		return false;
+	}
+	,shouldCreateGlyph: function(renderer,beat) {
 		this._lastCreateInfo = new Array();
 		var _g = 0;
 		var _g1 = beat.notes;
@@ -1436,7 +1465,10 @@ alphatab.rendering.effects.BeatVibratoEffectInfo = function() {
 alphatab.rendering.effects.BeatVibratoEffectInfo.__name__ = true;
 alphatab.rendering.effects.BeatVibratoEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.BeatVibratoEffectInfo.prototype = {
-	shouldCreateGlyph: function(renderer,beat) {
+	hideOnMultiTrack: function() {
+		return false;
+	}
+	,shouldCreateGlyph: function(renderer,beat) {
 		return beat.vibrato != alphatab.model.VibratoType.None;
 	}
 	,canExpand: function(renderer,from,to) {
@@ -1501,7 +1533,10 @@ alphatab.rendering.effects.CrescendoEffectInfo = function() {
 alphatab.rendering.effects.CrescendoEffectInfo.__name__ = true;
 alphatab.rendering.effects.CrescendoEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.CrescendoEffectInfo.prototype = {
-	shouldCreateGlyph: function(renderer,beat) {
+	hideOnMultiTrack: function() {
+		return false;
+	}
+	,shouldCreateGlyph: function(renderer,beat) {
 		return beat.crescendo != alphatab.rendering.glyphs.CrescendoType.None;
 	}
 	,canExpand: function(renderer,from,to) {
@@ -1523,7 +1558,10 @@ alphatab.rendering.effects.DynamicsEffectInfo = function() {
 alphatab.rendering.effects.DynamicsEffectInfo.__name__ = true;
 alphatab.rendering.effects.DynamicsEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.DynamicsEffectInfo.prototype = {
-	shouldCreateGlyph: function(renderer,beat) {
+	hideOnMultiTrack: function() {
+		return false;
+	}
+	,shouldCreateGlyph: function(renderer,beat) {
 		return beat.index == 0 && beat.voice.bar.index == 0 || beat.previousBeat != null && beat.dynamicValue != beat.previousBeat.dynamicValue;
 	}
 	,canExpand: function(renderer,from,to) {
@@ -1545,7 +1583,10 @@ alphatab.rendering.effects.TapEffectInfo = function() {
 alphatab.rendering.effects.TapEffectInfo.__name__ = true;
 alphatab.rendering.effects.TapEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.TapEffectInfo.prototype = {
-	shouldCreateGlyph: function(renderer,beat) {
+	hideOnMultiTrack: function() {
+		return false;
+	}
+	,shouldCreateGlyph: function(renderer,beat) {
 		return beat.slap || beat.pop || beat.tap;
 	}
 	,canExpand: function(renderer,from,to) {
@@ -1570,7 +1611,10 @@ alphatab.rendering.effects.FadeInEffectInfo = function() {
 alphatab.rendering.effects.FadeInEffectInfo.__name__ = true;
 alphatab.rendering.effects.FadeInEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.FadeInEffectInfo.prototype = {
-	shouldCreateGlyph: function(renderer,beat) {
+	hideOnMultiTrack: function() {
+		return false;
+	}
+	,shouldCreateGlyph: function(renderer,beat) {
 		return beat.fadeIn;
 	}
 	,canExpand: function(renderer,from,to) {
@@ -1643,7 +1687,10 @@ alphatab.rendering.effects.PickStrokeEffectInfo = function() {
 alphatab.rendering.effects.PickStrokeEffectInfo.__name__ = true;
 alphatab.rendering.effects.PickStrokeEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.PickStrokeEffectInfo.prototype = {
-	shouldCreateGlyph: function(renderer,beat) {
+	hideOnMultiTrack: function() {
+		return false;
+	}
+	,shouldCreateGlyph: function(renderer,beat) {
 		return beat.pickStroke != alphatab.model.PickStrokeType.None;
 	}
 	,canExpand: function(renderer,from,to) {
@@ -1979,6 +2026,10 @@ alphatab.importer.ScoreImporter.prototype = {
 		while(_g < _g1.length) {
 			var t = _g1[_g];
 			++_g;
+			if(t.shortName == null || t.shortName.length == 0) {
+				t.shortName = t.name;
+				if(t.shortName.length > 10) t.shortName = HxOverrides.substr(t.shortName,0,10);
+			}
 			if(!t.isPercussion) {
 				var _g2 = 0;
 				var _g3 = t.bars;
@@ -4202,6 +4253,9 @@ alphatab.importer.GpxParser.prototype = {
 						break;
 					}
 					break;
+				case "Key":
+					masterBar.keySignature = Std.parseInt(this.getValue(this.findChildElement(c,"AccidentalCount")));
+					break;
 				}
 			}
 		}
@@ -4797,7 +4851,14 @@ alphatab.importer.GpxParser.prototype = {
 				while(_g < _g1.length) {
 					var voiceId = _g1[_g];
 					++_g;
-					if(voiceId != "-1") bar.addVoice(this._voiceById.get(voiceId));
+					if(voiceId != "-1") bar.addVoice(this._voiceById.get(voiceId)); else {
+						var voice = new alphatab.model.Voice();
+						bar.addVoice(voice);
+						var beat = new alphatab.model.Beat();
+						beat.isEmpty = true;
+						beat.duration = alphatab.model.Duration.Quarter;
+						voice.addBeat(beat);
+					}
 				}
 			}
 		}
@@ -5953,7 +6014,7 @@ alphatab.platform.svg.SupportedFonts.Arial = ["Arial",1];
 alphatab.platform.svg.SupportedFonts.Arial.toString = $estr;
 alphatab.platform.svg.SupportedFonts.Arial.__enum__ = alphatab.platform.svg.SupportedFonts;
 alphatab.rendering.BarRendererBase = function(bar) {
-	this._bar = bar;
+	this.bar = bar;
 	this.x = 0;
 	this.y = 0;
 	this.width = 0;
@@ -5992,7 +6053,7 @@ alphatab.rendering.BarRendererBase.prototype = {
 		return this.index == this.stave.barRenderers.length - 1;
 	}
 	,isLast: function() {
-		return this._bar.index == this._bar.track.bars.length - 1;
+		return this.bar.index == this.bar.track.bars.length - 1;
 	}
 	,registerMaxSizes: function(sizes) {
 	}
@@ -6447,7 +6508,7 @@ alphatab.rendering.EffectBarRenderer.prototype = $extend(alphatab.rendering.Grou
 	,createBeatGlyphs: function() {
 		this._effectGlyphs.push(new haxe.ds.IntMap());
 		this._uniqueEffectGlyphs.push(new Array());
-		this.createVoiceGlyphs(this._bar.voices[0]);
+		this.createVoiceGlyphs(this.bar.voices[0]);
 	}
 	,createVoiceGlyphs: function(v) {
 		var _g = 0;
@@ -6891,13 +6952,13 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 	,createPreBeatGlyphs: function() {
 		if(((function($this) {
 			var $r;
-			var _this = $this._bar;
+			var _this = $this.bar;
 			$r = _this.track.score.masterBars[_this.index];
 			return $r;
 		}(this))).isRepeatStart) this.addPreBeatGlyph(new alphatab.rendering.glyphs.RepeatOpenGlyph(0,0,1.5,3));
-		if(this.index == 0 || this._bar.clef != this._bar.previousBar.clef) {
+		if(this.index == 0 || this.bar.clef != this.bar.previousBar.clef) {
 			var offset = 0;
-			var _g = this._bar.clef;
+			var _g = this.bar.clef;
 			switch(_g[1]) {
 			case 0:
 				offset = 4;
@@ -6916,95 +6977,95 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 				break;
 			}
 			this.createStartSpacing();
-			this.addPreBeatGlyph(new alphatab.rendering.glyphs.ClefGlyph(0,this.getScoreY(offset),this._bar.clef));
+			this.addPreBeatGlyph(new alphatab.rendering.glyphs.ClefGlyph(0,this.getScoreY(offset),this.bar.clef));
 		}
-		if(this._bar.previousBar == null && ((function($this) {
+		if(this.bar.previousBar == null && ((function($this) {
 			var $r;
-			var _this = $this._bar;
+			var _this = $this.bar;
 			$r = _this.track.score.masterBars[_this.index];
 			return $r;
-		}(this))).keySignature != 0 || this._bar.previousBar != null && ((function($this) {
+		}(this))).keySignature != 0 || this.bar.previousBar != null && ((function($this) {
 			var $r;
-			var _this = $this._bar;
+			var _this = $this.bar;
 			$r = _this.track.score.masterBars[_this.index];
 			return $r;
 		}(this))).keySignature != ((function($this) {
 			var $r;
-			var _this = $this._bar.previousBar;
+			var _this = $this.bar.previousBar;
 			$r = _this.track.score.masterBars[_this.index];
 			return $r;
 		}(this))).keySignature) {
 			this.createStartSpacing();
 			this.createKeySignatureGlyphs();
 		}
-		if(this._bar.previousBar == null || this._bar.previousBar != null && ((function($this) {
+		if(this.bar.previousBar == null || this.bar.previousBar != null && ((function($this) {
 			var $r;
-			var _this = $this._bar;
+			var _this = $this.bar;
 			$r = _this.track.score.masterBars[_this.index];
 			return $r;
 		}(this))).timeSignatureNumerator != ((function($this) {
 			var $r;
-			var _this = $this._bar.previousBar;
+			var _this = $this.bar.previousBar;
 			$r = _this.track.score.masterBars[_this.index];
 			return $r;
-		}(this))).timeSignatureNumerator || this._bar.previousBar != null && ((function($this) {
+		}(this))).timeSignatureNumerator || this.bar.previousBar != null && ((function($this) {
 			var $r;
-			var _this = $this._bar;
+			var _this = $this.bar;
 			$r = _this.track.score.masterBars[_this.index];
 			return $r;
 		}(this))).timeSignatureDenominator != ((function($this) {
 			var $r;
-			var _this = $this._bar.previousBar;
+			var _this = $this.bar.previousBar;
 			$r = _this.track.score.masterBars[_this.index];
 			return $r;
 		}(this))).timeSignatureDenominator) {
 			this.createStartSpacing();
 			this.createTimeSignatureGlyphs();
 		}
-		this.addPreBeatGlyph(new alphatab.rendering.glyphs.BarNumberGlyph(0,this.getScoreY(-1,-3),this._bar.index + 1,!this.stave.isFirstInAccolade));
-		if(this._bar.isEmpty()) this.addPreBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,30 * this.stave.staveGroup.layout.renderer.settings.scale | 0,false));
+		this.addPreBeatGlyph(new alphatab.rendering.glyphs.BarNumberGlyph(0,this.getScoreY(-1,-3),this.bar.index + 1,!this.stave.isFirstInAccolade));
+		if(this.bar.isEmpty()) this.addPreBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,30 * this.stave.staveGroup.layout.renderer.settings.scale | 0,false));
 	}
 	,createBeatGlyphs: function() {
-		this.createVoiceGlyphs(this._bar.voices[0]);
+		this.createVoiceGlyphs(this.bar.voices[0]);
 	}
 	,createPostBeatGlyphs: function() {
 		if(((function($this) {
 			var $r;
-			var _this = $this._bar;
+			var _this = $this.bar;
 			$r = _this.track.score.masterBars[_this.index];
 			return $r;
 		}(this))).repeatCount > 0) {
 			this.addPostBeatGlyph(new alphatab.rendering.glyphs.RepeatCloseGlyph(this.x,0));
 			if(((function($this) {
 				var $r;
-				var _this = $this._bar;
+				var _this = $this.bar;
 				$r = _this.track.score.masterBars[_this.index];
 				return $r;
 			}(this))).repeatCount > 2) {
 				var line;
-				if(this._bar.index == this._bar.track.bars.length - 1 || this.index == this.stave.barRenderers.length - 1) line = -1; else line = -4;
+				if(this.bar.index == this.bar.track.bars.length - 1 || this.index == this.stave.barRenderers.length - 1) line = -1; else line = -4;
 				this.addPostBeatGlyph(new alphatab.rendering.glyphs.RepeatCountGlyph(0,this.getScoreY(line,-3),((function($this) {
 					var $r;
-					var _this = $this._bar;
+					var _this = $this.bar;
 					$r = _this.track.score.masterBars[_this.index];
 					return $r;
 				}(this))).repeatCount));
 			}
 		} else if(((function($this) {
 			var $r;
-			var _this = $this._bar;
+			var _this = $this.bar;
 			$r = _this.track.score.masterBars[_this.index];
 			return $r;
 		}(this))).isDoubleBar) {
 			this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph());
 			this.addPostBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,3 * this.stave.staveGroup.layout.renderer.settings.scale | 0,false));
 			this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph());
-		} else if(this._bar.nextBar == null || !((function($this) {
+		} else if(this.bar.nextBar == null || !((function($this) {
 			var $r;
-			var _this = $this._bar.nextBar;
+			var _this = $this.bar.nextBar;
 			$r = _this.track.score.masterBars[_this.index];
 			return $r;
-		}(this))).isRepeatStart) this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph(0,0,this._bar.index == this._bar.track.bars.length - 1));
+		}(this))).isRepeatStart) this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph(0,0,this.bar.index == this.bar.track.bars.length - 1));
 	}
 	,createStartSpacing: function() {
 		if(this._startSpacing) return;
@@ -7015,18 +7076,18 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 		var offsetClef = 0;
 		var currentKey = ((function($this) {
 			var $r;
-			var _this = $this._bar;
+			var _this = $this.bar;
 			$r = _this.track.score.masterBars[_this.index];
 			return $r;
 		}(this))).keySignature;
 		var previousKey;
-		if(this._bar.previousBar == null) previousKey = 0; else previousKey = ((function($this) {
+		if(this.bar.previousBar == null) previousKey = 0; else previousKey = ((function($this) {
 			var $r;
-			var _this = $this._bar.previousBar;
+			var _this = $this.bar.previousBar;
 			$r = _this.track.score.masterBars[_this.index];
 			return $r;
 		}(this))).keySignature;
-		var _g = this._bar.clef;
+		var _g = this.bar.clef;
 		switch(_g[1]) {
 		case 0:
 			offsetClef = 0;
@@ -7095,12 +7156,12 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 		this.addPreBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,5 * this.stave.staveGroup.layout.renderer.settings.scale | 0));
 		this.addPreBeatGlyph(new alphatab.rendering.glyphs.TimeSignatureGlyph(0,0,((function($this) {
 			var $r;
-			var _this = $this._bar;
+			var _this = $this.bar;
 			$r = _this.track.score.masterBars[_this.index];
 			return $r;
 		}(this))).timeSignatureNumerator,((function($this) {
 			var $r;
-			var _this = $this._bar;
+			var _this = $this.bar;
 			$r = _this.track.score.masterBars[_this.index];
 			return $r;
 		}(this))).timeSignatureDenominator));
@@ -7118,7 +7179,7 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 			var newBeamingHelper = false;
 			if(!b.isRest()) {
 				if(this._currentBeamHelper == null || !this._currentBeamHelper.checkBeat(b)) {
-					this._currentBeamHelper = new alphatab.rendering.utils.BeamingHelper(this._bar.track);
+					this._currentBeamHelper = new alphatab.rendering.utils.BeamingHelper(this.bar.track);
 					this._currentBeamHelper.checkBeat(b);
 					this._beamHelpers[v.index].push(this._currentBeamHelper);
 					newBeamingHelper = true;
@@ -7203,10 +7264,15 @@ alphatab.rendering.ScoreRenderer.prototype = {
 		}
 	}
 	,render: function(track) {
-		this.track = track;
+		this.tracks = [track];
+		this.invalidate();
+	}
+	,renderMultiple: function(tracks) {
+		this.tracks = tracks;
 		this.invalidate();
 	}
 	,invalidate: function() {
+		if(this.tracks.length == 0) return;
 		if(this.renderingResources.scale != this.settings.scale) {
 			this.renderingResources.init(this.settings.scale);
 			this.canvas.setLineWidth(this.settings.scale);
@@ -7218,8 +7284,8 @@ alphatab.rendering.ScoreRenderer.prototype = {
 		this.raiseRenderFinished();
 	}
 	,get_score: function() {
-		if(this.track == null) return null;
-		return this.track.score;
+		if(this.tracks == null || this.tracks.length == 0) return null;
+		return this.tracks[0].score;
 	}
 	,doLayout: function() {
 		this.layout.doLayout();
@@ -7287,7 +7353,7 @@ alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.Grouped
 	}
 	,doLayout: function() {
 		alphatab.rendering.GroupedBarRenderer.prototype.doLayout.call(this);
-		this.height = (11 * this.stave.staveGroup.layout.renderer.settings.scale * (this._bar.track.tuning.length - 1) | 0) + this.getNumberOverflow() * 2;
+		this.height = (11 * this.stave.staveGroup.layout.renderer.settings.scale * (this.bar.track.tuning.length - 1) | 0) + this.getNumberOverflow() * 2;
 		if(this.index == 0) {
 			this.stave.registerStaveTop(this.getNumberOverflow());
 			this.stave.registerStaveBottom(this.height - this.getNumberOverflow());
@@ -7296,16 +7362,16 @@ alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.Grouped
 	,createPreBeatGlyphs: function() {
 		if(((function($this) {
 			var $r;
-			var _this = $this._bar;
+			var _this = $this.bar;
 			$r = _this.track.score.masterBars[_this.index];
 			return $r;
 		}(this))).isRepeatStart) this.addPreBeatGlyph(new alphatab.rendering.glyphs.RepeatOpenGlyph(0,0,1.5,3));
 		if(this.index == 0) this.addPreBeatGlyph(new alphatab.rendering.glyphs.TabClefGlyph());
-		this.addPreBeatGlyph(new alphatab.rendering.glyphs.BarNumberGlyph(0,this.getTabY(-1,-3),this._bar.index + 1,!this.stave.isFirstInAccolade));
-		if(this._bar.isEmpty()) this.addPreBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,30 * this.stave.staveGroup.layout.renderer.settings.scale | 0,false));
+		this.addPreBeatGlyph(new alphatab.rendering.glyphs.BarNumberGlyph(0,this.getTabY(-1,-3),this.bar.index + 1,!this.stave.isFirstInAccolade));
+		if(this.bar.isEmpty()) this.addPreBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,30 * this.stave.staveGroup.layout.renderer.settings.scale | 0,false));
 	}
 	,createBeatGlyphs: function() {
-		this.createVoiceGlyphs(this._bar.voices[0]);
+		this.createVoiceGlyphs(this.bar.voices[0]);
 	}
 	,createVoiceGlyphs: function(v) {
 		var _g = 0;
@@ -7323,41 +7389,41 @@ alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.Grouped
 	,createPostBeatGlyphs: function() {
 		if(((function($this) {
 			var $r;
-			var _this = $this._bar;
+			var _this = $this.bar;
 			$r = _this.track.score.masterBars[_this.index];
 			return $r;
 		}(this))).repeatCount > 0) {
 			this.addPostBeatGlyph(new alphatab.rendering.glyphs.RepeatCloseGlyph(this.x,0));
 			if(((function($this) {
 				var $r;
-				var _this = $this._bar;
+				var _this = $this.bar;
 				$r = _this.track.score.masterBars[_this.index];
 				return $r;
 			}(this))).repeatCount > 2) {
 				var line;
-				if(this._bar.index == this._bar.track.bars.length - 1 || this.index == this.stave.barRenderers.length - 1) line = -1; else line = -4;
+				if(this.bar.index == this.bar.track.bars.length - 1 || this.index == this.stave.barRenderers.length - 1) line = -1; else line = -4;
 				this.addPostBeatGlyph(new alphatab.rendering.glyphs.RepeatCountGlyph(0,this.getTabY(line,-3),((function($this) {
 					var $r;
-					var _this = $this._bar;
+					var _this = $this.bar;
 					$r = _this.track.score.masterBars[_this.index];
 					return $r;
 				}(this))).repeatCount));
 			}
 		} else if(((function($this) {
 			var $r;
-			var _this = $this._bar;
+			var _this = $this.bar;
 			$r = _this.track.score.masterBars[_this.index];
 			return $r;
 		}(this))).isDoubleBar) {
 			this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph());
 			this.addPostBeatGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,3 * this.stave.staveGroup.layout.renderer.settings.scale | 0,false));
 			this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph());
-		} else if(this._bar.nextBar == null || !((function($this) {
+		} else if(this.bar.nextBar == null || !((function($this) {
 			var $r;
-			var _this = $this._bar.nextBar;
+			var _this = $this.bar.nextBar;
 			$r = _this.track.score.masterBars[_this.index];
 			return $r;
-		}(this))).isRepeatStart) this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph(0,0,this._bar.index == this._bar.track.bars.length - 1));
+		}(this))).isRepeatStart) this.addPostBeatGlyph(new alphatab.rendering.glyphs.BarSeperatorGlyph(0,0,this.bar.index == this.bar.track.bars.length - 1));
 	}
 	,getTopPadding: function() {
 		return this.getNumberOverflow();
@@ -7380,7 +7446,7 @@ alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.Grouped
 		var lineY = cy + this.y + this.getNumberOverflow();
 		var startY = lineY;
 		var _g1 = 0;
-		var _g = this._bar.track.tuning.length;
+		var _g = this.bar.track.tuning.length;
 		while(_g1 < _g) {
 			var i = _g1++;
 			if(i > 0) lineY += 11 * this.stave.staveGroup.layout.renderer.settings.scale | 0;
@@ -7430,7 +7496,10 @@ alphatab.rendering.effects.TripletFeelEffectInfo = function() {
 alphatab.rendering.effects.TripletFeelEffectInfo.__name__ = true;
 alphatab.rendering.effects.TripletFeelEffectInfo.__interfaces__ = [alphatab.rendering.IEffectBarRendererInfo];
 alphatab.rendering.effects.TripletFeelEffectInfo.prototype = {
-	shouldCreateGlyph: function(renderer,beat) {
+	hideOnMultiTrack: function() {
+		return true;
+	}
+	,shouldCreateGlyph: function(renderer,beat) {
 		return beat.index == 0 && (((function($this) {
 			var $r;
 			var _this = beat.voice.bar;
@@ -8611,7 +8680,7 @@ alphatab.rendering.glyphs.RepeatCloseGlyph.prototype = $extend(alphatab.renderin
 		if((function($this) {
 			var $r;
 			var _this = $this.renderer;
-			$r = _this._bar.index == _this._bar.track.bars.length - 1;
+			$r = _this.bar.index == _this.bar.track.bars.length - 1;
 			return $r;
 		}(this))) base = 11; else base = 13;
 		this.width = base * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
@@ -9551,7 +9620,7 @@ alphatab.rendering.glyphs.TabClefGlyph.prototype = $extend(alphatab.rendering.Gl
 	}
 	,paint: function(cx,cy,canvas) {
 		var tabBarRenderer = this.renderer;
-		var track = this.renderer.stave.staveGroup.layout.renderer.track;
+		var track = this.renderer.bar.track;
 		var res = this.renderer.stave.staveGroup.layout.renderer.renderingResources;
 		var startY = cy + this.y + 10 * this.renderer.stave.staveGroup.layout.renderer.settings.scale * 0.6;
 		var endY = cy + this.y + tabBarRenderer.getTabY(track.tuning.length,-2);
@@ -9938,7 +10007,7 @@ alphatab.rendering.glyphs.WhammyBarGlyph.prototype = $extend(alphatab.rendering.
 			}
 		}
 		var tabBarRenderer = this.renderer;
-		var track = this.renderer.stave.staveGroup.layout.renderer.track;
+		var track = this.renderer.bar.track;
 		var tabTop = tabBarRenderer.getTabY(0,-2);
 		var tabBottom = tabBarRenderer.getTabY(track.tuning.length,-2);
 		var absMinY = this.y + minY + tabTop;
@@ -10463,30 +10532,67 @@ alphatab.rendering.staves.Stave.prototype = {
 	}
 	,__class__: alphatab.rendering.staves.Stave
 };
+alphatab.rendering.staves.StaveTrackGroup = function(staveGroup,track) {
+	this.staveGroup = staveGroup;
+	this.track = track;
+	this.staves = new Array();
+};
+alphatab.rendering.staves.StaveTrackGroup.__name__ = true;
+alphatab.rendering.staves.StaveTrackGroup.prototype = {
+	__class__: alphatab.rendering.staves.StaveTrackGroup
+};
 alphatab.rendering.staves.StaveGroup = function() {
 	this.bars = new Array();
 	this.staves = new Array();
+	this._allStaves = new Array();
 	this.width = 0;
+	this.index = 0;
+	this._accoladeSpacingCalculated = false;
+	this.accoladeSpacing = 0;
 };
 alphatab.rendering.staves.StaveGroup.__name__ = true;
 alphatab.rendering.staves.StaveGroup.prototype = {
 	getLastBarIndex: function() {
 		return this.bars[this.bars.length - 1].index;
 	}
-	,addBar: function(bar) {
-		this.bars.push(bar);
+	,addBars: function(tracks,barIndex) {
+		if(tracks.length == 0) return;
+		var score = tracks[0].score;
+		var masterBar = score.masterBars[barIndex];
+		this.bars.push(masterBar);
+		if(!this._accoladeSpacingCalculated && this.index == 0) {
+			this._accoladeSpacingCalculated = true;
+			var canvas = this.layout.renderer.canvas;
+			var res = this.layout.renderer.renderingResources.effectFont;
+			canvas.setFont(res);
+			var _g = 0;
+			while(_g < tracks.length) {
+				var t = tracks[_g];
+				++_g;
+				var x = Math.max(this.accoladeSpacing,canvas.measureText(t.shortName));
+				this.accoladeSpacing = x | 0;
+			}
+			this.accoladeSpacing += 20;
+			this.width += this.accoladeSpacing;
+		}
 		var maxSizes = new alphatab.rendering.staves.BarSizeInfo();
 		var _g = 0;
 		var _g1 = this.staves;
 		while(_g < _g1.length) {
-			var s = _g1[_g];
+			var g = _g1[_g];
 			++_g;
-			s.addBar(bar);
-			s.barRenderers[s.barRenderers.length - 1].registerMaxSizes(maxSizes);
+			var _g2 = 0;
+			var _g3 = g.staves;
+			while(_g2 < _g3.length) {
+				var s = _g3[_g2];
+				++_g2;
+				s.addBar(g.track.bars[barIndex]);
+				s.barRenderers[s.barRenderers.length - 1].registerMaxSizes(maxSizes);
+			}
 		}
 		var realWidth = 0;
 		var _g = 0;
-		var _g1 = this.staves;
+		var _g1 = this._allStaves;
 		while(_g < _g1.length) {
 			var s = _g1[_g];
 			++_g;
@@ -10495,29 +10601,52 @@ alphatab.rendering.staves.StaveGroup.prototype = {
 		}
 		this.width += realWidth;
 	}
-	,addStave: function(stave) {
-		stave.staveGroup = this;
-		stave.index = this.staves.length;
-		this.staves.push(stave);
-		if(this._firstStaveInAccolade == null && stave._factory.isInAccolade) {
-			this._firstStaveInAccolade = stave;
-			stave.isFirstInAccolade = true;
+	,getStaveTrackGroup: function(track) {
+		var _g = 0;
+		var _g1 = this.staves;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			if(g.track == track) return g;
 		}
+		return null;
+	}
+	,addStave: function(track,stave) {
+		var group = this.getStaveTrackGroup(track);
+		if(group == null) {
+			group = new alphatab.rendering.staves.StaveTrackGroup(this,track);
+			this.staves.push(group);
+		}
+		stave.staveTrackGroup = group;
+		stave.staveGroup = this;
+		stave.index = this._allStaves.length;
+		this._allStaves.push(stave);
+		group.staves.push(stave);
 		if(stave._factory.isInAccolade) {
+			if(this._firstStaveInAccolade == null) {
+				this._firstStaveInAccolade = stave;
+				stave.isFirstInAccolade = true;
+			}
+			if(group.firstStaveInAccolade == null) group.firstStaveInAccolade = stave;
+			if(this._lastStaveInAccolade == null) {
+				this._lastStaveInAccolade = stave;
+				stave.isLastInAccolade = true;
+			}
 			if(this._lastStaveInAccolade != null) this._lastStaveInAccolade.isLastInAccolade = false;
 			this._lastStaveInAccolade = stave;
 			this._lastStaveInAccolade.isLastInAccolade = true;
+			group.lastStaveInAccolade = stave;
 		}
 	}
 	,calculateHeight: function() {
-		return this.staves[this.staves.length - 1].y + this.staves[this.staves.length - 1].height;
+		return this._allStaves[this._allStaves.length - 1].y + this._allStaves[this._allStaves.length - 1].height;
 	}
 	,revertLastBar: function() {
 		if(this.bars.length > 1) {
 			this.bars.pop();
 			var w = 0;
 			var _g = 0;
-			var _g1 = this.staves;
+			var _g1 = this._allStaves;
 			while(_g < _g1.length) {
 				var s = _g1[_g];
 				++_g;
@@ -10530,7 +10659,7 @@ alphatab.rendering.staves.StaveGroup.prototype = {
 	}
 	,applyBarSpacing: function(spacing) {
 		var _g = 0;
-		var _g1 = this.staves;
+		var _g1 = this._allStaves;
 		while(_g < _g1.length) {
 			var s = _g1[_g];
 			++_g;
@@ -10540,7 +10669,7 @@ alphatab.rendering.staves.StaveGroup.prototype = {
 	}
 	,paint: function(cx,cy,canvas) {
 		var _g = 0;
-		var _g1 = this.staves;
+		var _g1 = this._allStaves;
 		while(_g < _g1.length) {
 			var s = _g1[_g];
 			++_g;
@@ -10551,28 +10680,40 @@ alphatab.rendering.staves.StaveGroup.prototype = {
 			if(this._firstStaveInAccolade != null && this._lastStaveInAccolade != null) {
 				var firstStart = cy + this.y + this._firstStaveInAccolade.y + this._firstStaveInAccolade.staveTop + this._firstStaveInAccolade.topSpacing + this._firstStaveInAccolade.getTopOverflow();
 				var lastEnd = cy + this.y + this._lastStaveInAccolade.y + this._lastStaveInAccolade.topSpacing + this._lastStaveInAccolade.getTopOverflow() + this._lastStaveInAccolade.staveBottom;
+				var acooladeX = cx + this.x + this._firstStaveInAccolade.x;
 				canvas.setColor(res.barSeperatorColor);
 				canvas.beginPath();
-				canvas.moveTo(cx + this.x + this._firstStaveInAccolade.x,firstStart);
-				canvas.lineTo(cx + this.x + this._lastStaveInAccolade.x,lastEnd);
+				canvas.moveTo(acooladeX,firstStart);
+				canvas.lineTo(acooladeX,lastEnd);
 				canvas.stroke();
+			}
+			canvas.setFont(res.effectFont);
+			var _g = 0;
+			var _g1 = this.staves;
+			while(_g < _g1.length) {
+				var g = _g1[_g];
+				++_g;
+				var firstStart = cy + this.y + g.firstStaveInAccolade.y + g.firstStaveInAccolade.staveTop + g.firstStaveInAccolade.topSpacing + g.firstStaveInAccolade.getTopOverflow();
+				var lastEnd = cy + this.y + g.lastStaveInAccolade.y + g.lastStaveInAccolade.topSpacing + g.lastStaveInAccolade.getTopOverflow() + g.lastStaveInAccolade.staveBottom;
+				var acooladeX = cx + this.x + g.firstStaveInAccolade.x;
 				var barSize = 3 * this.layout.renderer.settings.scale | 0;
 				var barOffset = barSize;
 				var accoladeStart = firstStart - barSize * 4;
 				var accoladeEnd = lastEnd + barSize * 4;
-				canvas.fillRect(cx + this.x - barOffset - barSize,accoladeStart,barSize,accoladeEnd - accoladeStart);
-				var spikeStartX = cx + this.x - barOffset - barSize;
-				var spikeEndX = cx + this.x + barSize * 2;
+				if(this.index == 0) canvas.fillText(g.track.shortName,cx + this.x + 10 * this.layout.renderer.settings.scale,firstStart);
+				canvas.fillRect(acooladeX - barOffset - barSize,accoladeStart,barSize,accoladeEnd - accoladeStart);
+				var spikeStartX = acooladeX - barOffset - barSize;
+				var spikeEndX = acooladeX + barSize * 2;
 				canvas.beginPath();
 				canvas.moveTo(spikeStartX,accoladeStart);
-				canvas.bezierCurveTo(spikeStartX,accoladeStart,this.x,accoladeStart,spikeEndX,accoladeStart - barSize);
-				canvas.bezierCurveTo(cx + this.x,accoladeStart + barSize,spikeStartX,accoladeStart + barSize,spikeStartX,accoladeStart + barSize);
+				canvas.bezierCurveTo(spikeStartX,accoladeStart,spikeStartX,accoladeStart,spikeEndX,accoladeStart - barSize);
+				canvas.bezierCurveTo(acooladeX,accoladeStart + barSize,spikeStartX,accoladeStart + barSize,spikeStartX,accoladeStart + barSize);
 				canvas.closePath();
 				canvas.fill();
 				canvas.beginPath();
 				canvas.moveTo(spikeStartX,accoladeEnd);
-				canvas.bezierCurveTo(spikeStartX,accoladeEnd,this.x,accoladeEnd,spikeEndX,accoladeEnd + barSize);
-				canvas.bezierCurveTo(this.x,accoladeEnd - barSize,spikeStartX,accoladeEnd - barSize,spikeStartX,accoladeEnd - barSize);
+				canvas.bezierCurveTo(spikeStartX,accoladeEnd,acooladeX,accoladeEnd,spikeEndX,accoladeEnd + barSize);
+				canvas.bezierCurveTo(acooladeX,accoladeEnd - barSize,spikeStartX,accoladeEnd - barSize,spikeStartX,accoladeEnd - barSize);
 				canvas.closePath();
 				canvas.fill();
 			}
@@ -10581,13 +10722,13 @@ alphatab.rendering.staves.StaveGroup.prototype = {
 	,finalizeGroup: function(scoreLayout) {
 		var currentY = 0;
 		var _g1 = 0;
-		var _g = this.staves.length;
+		var _g = this._allStaves.length;
 		while(_g1 < _g) {
 			var i = _g1++;
-			this.staves[i].x = 0;
-			this.staves[i].y = currentY | 0;
-			this.staves[i].finalizeStave(scoreLayout);
-			currentY += this.staves[i].height;
+			this._allStaves[i].x = this.accoladeSpacing;
+			this._allStaves[i].y = currentY | 0;
+			this._allStaves[i].finalizeStave(scoreLayout);
+			currentY += this._allStaves[i].height;
 		}
 	}
 	,__class__: alphatab.rendering.staves.StaveGroup
@@ -11761,6 +11902,7 @@ alphatab.rendering.layout.HeaderFooterElements.WordsAndMusic = 64;
 alphatab.rendering.layout.HeaderFooterElements.Copyright = 128;
 alphatab.rendering.layout.HeaderFooterElements.PageNumber = 256;
 alphatab.rendering.layout.HeaderFooterElements.All = 511;
+alphatab.rendering.staves.StaveGroup.AccoladeLabelSpacing = 10;
 alphatab.rendering.utils.AccidentalHelper.AccidentalNotes = [[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Flat,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.None],[alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural,alphatab.model.AccidentalType.Sharp,alphatab.model.AccidentalType.Natural]];
 alphatab.rendering.utils.BeamingHelper.ScoreMiddleKeys = [48,45,38,59];
 haxe.xml.Parser.escapes = (function($this) {

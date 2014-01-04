@@ -40,14 +40,16 @@ class HorizontalScreenLayout extends ScoreLayout
     {
         if (renderer.settings.staves.length == 0) return;
         
+        var score = renderer.score;
+        
         var startIndex = renderer.settings.layout.get('start', 1);
         startIndex--; // map to array index
-        startIndex = Std.int(Math.min(renderer.track.bars.length - 1, Math.max(0, startIndex)));
+        startIndex = Std.int(Math.min(score.masterBars.length - 1, Math.max(0, startIndex)));
         var currentBarIndex = startIndex;
  
-        var endBarIndex = renderer.settings.layout.get('count', renderer.track.bars.length);
+        var endBarIndex = renderer.settings.layout.get('count', score.masterBars.length);
         endBarIndex = startIndex + endBarIndex - 1; // map count to array index
-        endBarIndex = Std.int(Math.min(renderer.track.bars.length - 1, Math.max(0, endBarIndex)));
+        endBarIndex = Std.int(Math.min(score.masterBars.length - 1, Math.max(0, endBarIndex)));
 
         var x = PagePadding[0];
         var y = PagePadding[1];
@@ -56,9 +58,7 @@ class HorizontalScreenLayout extends ScoreLayout
         
         while (currentBarIndex <= endBarIndex)
         {
-            var bar = renderer.track.bars[currentBarIndex];
-            _group.addBar(bar);
-            
+            _group.addBars(renderer.tracks, currentBarIndex);            
             currentBarIndex++;
         }        
         

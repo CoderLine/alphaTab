@@ -39,6 +39,8 @@ _ReSharper*/
 # Project Dirs
 /bin/cs/AlphaTab.Core/src/*
 /bin/cs/AlphaTab.Core/hxcs_build.txt
+/bin/js/test.html
+/bin/js/multistave.html
 /tmp
 /api
 /tools/fontconverter/font/*

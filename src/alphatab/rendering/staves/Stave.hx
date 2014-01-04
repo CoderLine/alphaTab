@@ -23,6 +23,7 @@ import alphatab.platform.model.Color;
 import alphatab.rendering.BarRendererBase;
 import alphatab.rendering.BarRendererFactory;
 import alphatab.rendering.layout.ScoreLayout;
+import alphatab.rendering.staves.StaveGroup.StaveTrackGroup;
 
 /**
  * A stave represents a single line within a StaveGroup. 
@@ -30,6 +31,7 @@ import alphatab.rendering.layout.ScoreLayout;
  */
 class Stave 
 {
+    public var staveTrackGroup:StaveTrackGroup;
     public var staveGroup:StaveGroup;
     
     private var _factory:BarRendererFactory;
@@ -135,6 +137,7 @@ class Stave
     {
         var x = 0; 
         height = 0;
+        
         var topOverflow = getTopOverflow();
         var bottomOverflow = getBottomOverflow();
         var isEmpty:Bool = true;

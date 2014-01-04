@@ -31,6 +31,11 @@ class DynamicsEffectInfo implements IEffectBarRendererInfo
     {       
     }
     
+    public function hideOnMultiTrack():Bool
+    {
+        return false;
+    }
+    
     public function shouldCreateGlyph(renderer : EffectBarRenderer, beat:Beat) : Bool
     {
         return (beat.index == 0 && beat.voice.bar.index == 0) || (beat.previousBeat != null && beat.dynamicValue != beat.previousBeat.dynamicValue);

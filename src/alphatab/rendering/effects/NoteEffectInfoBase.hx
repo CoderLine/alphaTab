@@ -31,6 +31,11 @@ class NoteEffectInfoBase implements IEffectBarRendererInfo
     {       
     }
     
+    public function hideOnMultiTrack():Bool
+    {
+        return false;
+    }
+    
     public function shouldCreateGlyph(renderer : EffectBarRenderer, beat:Beat) : Bool
     {
         _lastCreateInfo = new Array<Note>();

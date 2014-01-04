@@ -239,7 +239,7 @@ class EffectBarRenderer extends GroupedBarRenderer
             createVoiceGlyphs(v);
         }
 #else
-        createVoiceGlyphs(_bar.voices[0]);
+        createVoiceGlyphs(bar.voices[0]);
 #end
 
     }

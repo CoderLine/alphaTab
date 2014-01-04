@@ -30,6 +30,11 @@ class TempoEffectInfo implements IEffectBarRendererInfo
     public function new() 
     {       
     }
+     
+    public function hideOnMultiTrack():Bool
+    {
+        return true;
+    }
     
     public function shouldCreateGlyph(renderer : EffectBarRenderer, beat:Beat) : Bool
     {

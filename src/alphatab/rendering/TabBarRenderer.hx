@@ -88,7 +88,7 @@ class TabBarRenderer extends GroupedBarRenderer
     public override function doLayout()
     {
         super.doLayout();
-        height = Std.int(getLineOffset() * (_bar.track.tuning.length - 1)) + (getNumberOverflow() * 2);
+        height = Std.int(getLineOffset() * (bar.track.tuning.length - 1)) + (getNumberOverflow() * 2);
         if (index == 0)
         {
             stave.registerStaveTop(getNumberOverflow());
@@ -98,7 +98,7 @@ class TabBarRenderer extends GroupedBarRenderer
     
     private override function createPreBeatGlyphs():Void 
     {
-        if (_bar.getMasterBar().isRepeatStart)
+        if (bar.getMasterBar().isRepeatStart)
         {
             addPreBeatGlyph(new RepeatOpenGlyph(0, 0, 1.5, 3));
         }
@@ -109,9 +109,9 @@ class TabBarRenderer extends GroupedBarRenderer
             addPreBeatGlyph(new TabClefGlyph());
         }
          
-        addPreBeatGlyph(new BarNumberGlyph(0, getTabY( -1, -3), _bar.index + 1, !stave.isFirstInAccolade));
+        addPreBeatGlyph(new BarNumberGlyph(0, getTabY( -1, -3), bar.index + 1, !stave.isFirstInAccolade));
         
-        if (_bar.isEmpty())
+        if (bar.isEmpty())
         {
             addPreBeatGlyph(new SpacingGlyph(0, 0, Std.int(30 * getScale()), false));
         }
@@ -120,12 +120,12 @@ class TabBarRenderer extends GroupedBarRenderer
     private override function createBeatGlyphs():Void 
     {
 #if MULTIVOICE_SUPPORT
-        for (v in _bar.voices)
+        for (v in bar.voices)
         {
             createVoiceGlyphs(v);
         }
 #else
-        createVoiceGlyphs(_bar.voices[0]);
+        createVoiceGlyphs(bar.voices[0]);
 #end
     }
     
@@ -143,22 +143,22 @@ class TabBarRenderer extends GroupedBarRenderer
     
     private override function createPostBeatGlyphs():Void 
     {
-        if (_bar.getMasterBar().isRepeatEnd())
+        if (bar.getMasterBar().isRepeatEnd())
         {
             addPostBeatGlyph(new RepeatCloseGlyph(x, 0));
-            if (_bar.getMasterBar().repeatCount > 2)
+            if (bar.getMasterBar().repeatCount > 2)
             {
                 var line = isLast() || isLastOfLine() ? -1 : -4;
-                addPostBeatGlyph(new RepeatCountGlyph(0, getTabY(line, -3), _bar.getMasterBar().repeatCount));
+                addPostBeatGlyph(new RepeatCountGlyph(0, getTabY(line, -3), bar.getMasterBar().repeatCount));
             }
         }
-        else if (_bar.getMasterBar().isDoubleBar)
+        else if (bar.getMasterBar().isDoubleBar)
         {
             addPostBeatGlyph(new BarSeperatorGlyph());
             addPostBeatGlyph(new SpacingGlyph(0, 0, Std.int(3 * getScale()), false));
             addPostBeatGlyph(new BarSeperatorGlyph());
         }        
-        else if(_bar.nextBar == null || !_bar.nextBar.getMasterBar().isRepeatStart)
+        else if(bar.nextBar == null || !bar.nextBar.getMasterBar().isRepeatStart)
         {
             addPostBeatGlyph(new BarSeperatorGlyph(0,0,isLast()));
         }
@@ -204,7 +204,7 @@ class TabBarRenderer extends GroupedBarRenderer
         var lineY = cy + y + getNumberOverflow();
         
         var startY = lineY;
-        for (i in 0 ... _bar.track.tuning.length)
+        for (i in 0 ... bar.track.tuning.length)
         {
             if (i > 0) lineY += Std.int(getLineOffset());
             canvas.beginPath();

@@ -57,15 +57,17 @@ class PageViewLayout extends ScoreLayout
     {
         _groups = new Array<StaveGroup>();
         
+        var score = renderer.score;
+        
         var startIndex = renderer.settings.layout.get('start', 1);
         startIndex--; // map to array index
-        startIndex = Std.int(Math.min(renderer.track.bars.length - 1, Math.max(0, startIndex)));
+        startIndex = Std.int(Math.min(score.masterBars.length - 1, Math.max(0, startIndex)));
         var currentBarIndex = startIndex;
  
-        var endBarIndex = renderer.settings.layout.get('count', renderer.track.bars.length);
-        if (endBarIndex < 0) endBarIndex = renderer.track.bars.length;
+        var endBarIndex = renderer.settings.layout.get('count', score.masterBars.length);
+        if (endBarIndex < 0) endBarIndex = score.masterBars.length;
         endBarIndex = startIndex + endBarIndex - 1; // map count to array index
-        endBarIndex = Std.int(Math.min(renderer.track.bars.length - 1, Math.max(0, endBarIndex)));
+        endBarIndex = Std.int(Math.min(score.masterBars.length - 1, Math.max(0, endBarIndex)));
                 
         
         var x = PagePadding[0];
@@ -147,9 +149,9 @@ class PageViewLayout extends ScoreLayout
         y += Math.floor(20 * scale);
         
         // tuning info
-        if(!renderer.track.isPercussion)
+        if(renderer.tracks.length == 1 && !renderer.tracks[0].isPercussion)
         {
-            var tuning:Tuning = Tuning.findTuning(renderer.track.tuning);
+            var tuning:Tuning = Tuning.findTuning(renderer.tracks[0].tuning);
             if(tuning != null)
             {
                 // Name
@@ -158,7 +160,7 @@ class PageViewLayout extends ScoreLayout
                 if(!tuning.isStandard)
                 {
                     // Strings
-                    var stringsPerColumn = Math.ceil(renderer.track.tuning.length/2);
+                    var stringsPerColumn = Math.ceil(renderer.tracks[0].tuning.length/2);
                     y += stringsPerColumn * Math.floor(15*scale);
                 }
                 
@@ -169,7 +171,6 @@ class PageViewLayout extends ScoreLayout
         y += Math.floor(40 * scale);
         
         return y;
-
     }
     
     public override function paintScore():Void 
@@ -250,10 +251,10 @@ class PageViewLayout extends ScoreLayout
         y += Math.floor(20*scale);
         
         // tuning info
-        if(!renderer.track.isPercussion)
+        if(renderer.tracks.length == 1 && !renderer.tracks[0].isPercussion)
         {
             canvas.setTextAlign(TextAlign.Left);
-            var tuning:Tuning = Tuning.findTuning(renderer.track.tuning);
+            var tuning:Tuning = Tuning.findTuning(renderer.tracks[0].tuning);
             if(tuning != null)
             {
                 // Name
@@ -265,14 +266,14 @@ class PageViewLayout extends ScoreLayout
                 if(!tuning.isStandard)
                 {
                     // Strings
-                    var stringsPerColumn = Math.ceil(renderer.track.tuning.length/2);
+                    var stringsPerColumn = Math.ceil(renderer.tracks[0].tuning.length/2);
                     
                     var currentX = x;
                     var currentY = y;
                     
-                    for(i in 0 ... renderer.track.tuning.length)
+                    for(i in 0 ... renderer.tracks[0].tuning.length)
                     {
-                        str = "(" + Std.string(i + 1) + ") = " + Tuning.getTextForTuning(renderer.track.tuning[i], false);
+                        str = "(" + Std.string(i + 1) + ") = " + Tuning.getTextForTuning(renderer.tracks[0].tuning[i], false);
                         canvas.fillText(str, currentX, currentY);
                         currentY += Math.floor(15*scale);
                         if(i == stringsPerColumn - 1)
@@ -322,6 +323,7 @@ class PageViewLayout extends ScoreLayout
     private function createStaveGroup(currentBarIndex:Int, endIndex:Int) : StaveGroup
     {
         var group:StaveGroup = createEmptyStaveGroup();
+        group.index = _groups.length;
         
         var barsPerRow:Int = renderer.settings.layout.get("barsPerRow", -1);
                 
@@ -329,8 +331,7 @@ class PageViewLayout extends ScoreLayout
         var end = endIndex + 1;
         for (i in currentBarIndex ... end)
         {
-            var bar = renderer.track.bars[i];
-            group.addBar(bar);
+            group.addBars(renderer.tracks, i);
             
             var groupIsFull:Bool = false;
             

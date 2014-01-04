@@ -159,7 +159,6 @@ class GroupedBarRenderer extends BarRendererBase
         }
         
         updateWidth();
-        
     }
     
     private function addGlyph(c:Array<Glyph>, g:Glyph)

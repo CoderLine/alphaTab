@@ -40,11 +40,11 @@ class BarRendererBase
     public var topOverflow:Int;
     public var bottomOverflow:Int;
     
-    private var _bar:Bar;
+    public var bar:Bar;
 
     private function new(bar:Bar) 
     {
-        _bar = bar;
+        this.bar = bar;
         x = 0;
         y = 0;
         width = 0;
@@ -103,7 +103,7 @@ class BarRendererBase
     
     public inline function isLast() : Bool
     {
-        return _bar.index == _bar.track.bars.length - 1;
+        return bar.index == bar.track.bars.length - 1;
     }
     
     public function registerMaxSizes(sizes:BarSizeInfo)

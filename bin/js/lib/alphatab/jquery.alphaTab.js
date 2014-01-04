@@ -2,18 +2,47 @@
 {
     var api = {};
     
+    function buildTracksArray(value, score)
+    {
+        var tracks = [];
+            
+        // custom array
+        if($.isArray(value))
+        {
+            for(var i = 0; i < value.length; i++)
+            {
+                if(value[i] >= 0 && value[i] < score.tracks.length)
+                    tracks.push(score.tracks[value[i]]);
+            }
+        }
+        // single value
+        else if($.isNumeric(value) && value >= 0 && value < score.tracks.length)
+        {
+            tracks.push(score.tracks[value]);
+        }
+        // all tracks
+        else if($.isNumeric(value) && value == -1)
+        {
+            for(var i = 0; i < score.tracks.length; i++) 
+            {
+                tracks.push(score.tracks[i]);
+            }
+        }
+        // default
+        else
+        {
+            tracks.push(score.tracks[0]);
+        }
+        return tracks;
+    }
+    
     function scoreLoaded(context, score)
     {
         try
         {
             if(context.trigger) context.trigger('loaded', score);
             else if(context.element) $(context.element).trigger('loaded', score);
-			var trackIndex = context.settings.track;
-			if(trackIndex < 0 || trackIndex >= score.tracks.length)
-			{
-				trackIndex = 0;
-			}
-            context.renderer.render(score.tracks[trackIndex]);
+            context.renderer.renderMultiple(buildTracksArray(context.settings.tracks, score));
         }
         catch(e)
         {
@@ -40,19 +69,30 @@
                 context.element = this;
 				                
                 context.settings = alphatab.Settings.fromJson(options);
-                if(options && options.track) context.settings.track = options.track;
-                else if($this.data('track'))
+                if(options && options.tracks) context.settings.tracks = options.tracks;
+                else if($this.data('tracks'))
 				{
 					try
 					{
-						context.settings.track = parseInt($this.data('track'));
+                        var data = $this.data('tracks');
+                        if($.isArray(data))
+                        {
+                            context.settings.tracks = data;
+                        }
+                        else
+                        {
+                            context.settings.tracks = parseInt(data);
+                        }
 					}
 					catch(e)
 					{
-						context.settings.track = 0;
+						context.settings.tracks = 0;
 					}
 				}
-				else context.settings.track = 0;
+				else 
+                {
+                    context.settings.tracks = 0;
+                }
                 
                 var contents = $.trim($this.text());
                 $this.html('');
@@ -155,11 +195,11 @@
     /*
      * Open alphaTab file
      * @param {String} url the url to load the data via ajax
-     * @param {Number} track the track index to load initially 
+     * @param {Array} tracks the track indices to load initially 
      * @param {Function} success the callback function to call after successful track display
      * @param {Function} error the callback function to call after any error during loading or rendering
      */
-    function load( url, track, success, error ) 
+    function load( url, tracks, success, error ) 
     {
         var context = $(this).data('alphaTab');
         if(!context) { $.error('alphaTab not initialized!'); }
@@ -208,7 +248,7 @@
      * Switches the displayed track of the currently loaded song
      * @param {Number} track the index of the track to display
      */
-    function track( track ) 
+    function tracks( tracks ) 
     {
         var context = $(this).data('alphaTab');
         if(track) 
@@ -254,7 +294,7 @@
     api.init = init;
     api.load = load;
     api.tex = tex;
-    api.track = track;
+    api.tracks = tracks;
     api.score = score;
     api.renderer = renderer;
     

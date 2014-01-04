@@ -26,10 +26,12 @@ import alphatab.model.Bar;
 class BarRendererFactory 
 {
     public var isInAccolade:Bool;
+    public var hideOnMultiTrack:Bool;
     
     private function new() 
     {
         isInAccolade = true;
+        hideOnMultiTrack = false;
     }
     
     public function create(bar:Bar) : BarRendererBase

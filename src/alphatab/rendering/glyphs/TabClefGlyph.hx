@@ -46,7 +46,7 @@ class TabClefGlyph extends Glyph
     public override function paint(cx:Int, cy:Int, canvas:ICanvas):Void 
     {
         var tabBarRenderer:TabBarRenderer = cast renderer;
-        var track = renderer.getLayout().renderer.track;
+        var track = renderer.bar.track;
         var res = renderer.getResources();
         
         var startY = cy + y + TabBarRenderer.LineSpacing * getScale() * 0.6;

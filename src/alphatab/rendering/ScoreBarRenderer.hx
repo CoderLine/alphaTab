@@ -556,16 +556,16 @@ class ScoreBarRenderer extends GroupedBarRenderer
     
     private override function createPreBeatGlyphs():Void 
     {
-        if (_bar.getMasterBar().isRepeatStart)
+        if (bar.getMasterBar().isRepeatStart)
         {
             addPreBeatGlyph(new RepeatOpenGlyph(0, 0, 1.5, 3));
         }
         
         // Clef
-        if (isFirstOfLine() || _bar.clef != _bar.previousBar.clef)
+        if (isFirstOfLine() || bar.clef != bar.previousBar.clef)
         {
             var offset = 0;
-            switch(_bar.clef)
+            switch(bar.clef)
             {
                 case Neutral: offset = 4;
                 case F4: offset = 4;
@@ -574,30 +574,30 @@ class ScoreBarRenderer extends GroupedBarRenderer
                 case G2: offset = 6; 
             }
             createStartSpacing();
-            addPreBeatGlyph(new ClefGlyph(0, getScoreY(offset), _bar.clef));
+            addPreBeatGlyph(new ClefGlyph(0, getScoreY(offset), bar.clef));
         }
         
         // Key signature
-        if ( (_bar.previousBar == null && _bar.getMasterBar().keySignature != 0)
-            || (_bar.previousBar != null && _bar.getMasterBar().keySignature != _bar.previousBar.getMasterBar().keySignature))
+        if ( (bar.previousBar == null && bar.getMasterBar().keySignature != 0)
+            || (bar.previousBar != null && bar.getMasterBar().keySignature != bar.previousBar.getMasterBar().keySignature))
         {
             createStartSpacing();
             createKeySignatureGlyphs();
         }
         
         // Time Signature
-        if(  (_bar.previousBar == null)
-            || (_bar.previousBar != null && _bar.getMasterBar().timeSignatureNumerator != _bar.previousBar.getMasterBar().timeSignatureNumerator)
-            || (_bar.previousBar != null && _bar.getMasterBar().timeSignatureDenominator != _bar.previousBar.getMasterBar().timeSignatureDenominator)
+        if(  (bar.previousBar == null)
+            || (bar.previousBar != null && bar.getMasterBar().timeSignatureNumerator != bar.previousBar.getMasterBar().timeSignatureNumerator)
+            || (bar.previousBar != null && bar.getMasterBar().timeSignatureDenominator != bar.previousBar.getMasterBar().timeSignatureDenominator)
             )
         {
             createStartSpacing();
             createTimeSignatureGlyphs();
         }
 
-        addPreBeatGlyph(new BarNumberGlyph(0, getScoreY( -1, -3), _bar.index + 1, !stave.isFirstInAccolade));
+        addPreBeatGlyph(new BarNumberGlyph(0, getScoreY( -1, -3), bar.index + 1, !stave.isFirstInAccolade));
         
-        if (_bar.isEmpty())
+        if (bar.isEmpty())
         {
             addPreBeatGlyph(new SpacingGlyph(0, 0, Std.int(30 * getScale()), false));
         }        
@@ -606,33 +606,33 @@ class ScoreBarRenderer extends GroupedBarRenderer
     private override function createBeatGlyphs():Void 
     {
 #if MULTIVOICE_SUPPORT
-        for (v in _bar.voices)
+        for (v in bar.voices)
         {
             createVoiceGlyphs(v);
         }
 #else
-        createVoiceGlyphs(_bar.voices[0]);
+        createVoiceGlyphs(bar.voices[0]);
 #end
     }
     
     private override function createPostBeatGlyphs():Void 
     {
-        if (_bar.getMasterBar().isRepeatEnd())
+        if (bar.getMasterBar().isRepeatEnd())
         {
             addPostBeatGlyph(new RepeatCloseGlyph(x, 0));
-            if (_bar.getMasterBar().repeatCount > 2)
+            if (bar.getMasterBar().repeatCount > 2)
             {
                 var line = isLast() || isLastOfLine() ? -1 : -4;
-                addPostBeatGlyph(new RepeatCountGlyph(0, getScoreY(line, -3), _bar.getMasterBar().repeatCount));
+                addPostBeatGlyph(new RepeatCountGlyph(0, getScoreY(line, -3), bar.getMasterBar().repeatCount));
             }
         }
-        else if (_bar.getMasterBar().isDoubleBar)
+        else if (bar.getMasterBar().isDoubleBar)
         {
             addPostBeatGlyph(new BarSeperatorGlyph());
             addPostBeatGlyph(new SpacingGlyph(0, 0, Std.int(3 * getScale()), false));
             addPostBeatGlyph(new BarSeperatorGlyph());
         }        
-        else if(_bar.nextBar == null || !_bar.nextBar.getMasterBar().isRepeatStart)
+        else if(bar.nextBar == null || !bar.nextBar.getMasterBar().isRepeatStart)
         {
             addPostBeatGlyph(new BarSeperatorGlyph(0,0,isLast()));
         }
@@ -650,10 +650,10 @@ class ScoreBarRenderer extends GroupedBarRenderer
     private function createKeySignatureGlyphs()
     {
         var offsetClef:Int  = 0;
-        var currentKey:Int  = _bar.getMasterBar().keySignature;
-        var previousKey:Int  = _bar.previousBar == null ? 0 : _bar.previousBar.getMasterBar().keySignature;
+        var currentKey:Int  = bar.getMasterBar().keySignature;
+        var previousKey:Int  = bar.previousBar == null ? 0 : bar.previousBar.getMasterBar().keySignature;
         
-        switch (_bar.clef)
+        switch (bar.clef)
         {
             case Clef.Neutral:
                 offsetClef = 0;
@@ -701,7 +701,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
     private function createTimeSignatureGlyphs()
     {
         addPreBeatGlyph(new SpacingGlyph(0,0, Std.int(5 * getScale())));
-        addPreBeatGlyph(new TimeSignatureGlyph(0, 0, _bar.getMasterBar().timeSignatureNumerator, _bar.getMasterBar().timeSignatureDenominator));
+        addPreBeatGlyph(new TimeSignatureGlyph(0, 0, bar.getMasterBar().timeSignatureNumerator, bar.getMasterBar().timeSignatureDenominator));
     }
     
     private function createVoiceGlyphs(v:Voice)
@@ -720,7 +720,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
                 if (_currentBeamHelper == null || !_currentBeamHelper.checkBeat(b))
                 {
                     // if not possible, create the next beaming helper
-                    _currentBeamHelper = new BeamingHelper(_bar.track);
+                    _currentBeamHelper = new BeamingHelper(bar.track);
                     _currentBeamHelper.checkBeat(b);
                     _beamHelpers[v.index].push(_currentBeamHelper);
                     newBeamingHelper = true;

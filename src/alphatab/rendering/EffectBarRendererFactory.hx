@@ -27,6 +27,7 @@ class EffectBarRendererFactory extends BarRendererFactory
         super();
         isInAccolade = false;
         _info = info;
+        hideOnMultiTrack = info.hideOnMultiTrack();
     }
 
     public override function create(bar:Bar):BarRendererBase 

@@ -30,6 +30,11 @@ class BeatVibratoEffectInfo implements IEffectBarRendererInfo
 {
     public function new() 
     {       
+    }    
+    
+    public function hideOnMultiTrack():Bool
+    {
+        return false;
     }
     
     public function shouldCreateGlyph(renderer : EffectBarRenderer, beat:Beat) : Bool

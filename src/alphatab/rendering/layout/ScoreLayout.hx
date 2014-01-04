@@ -63,12 +63,21 @@ class ScoreLayout
         var group:StaveGroup = new StaveGroup();
         group.layout = this;
         
-        for (s in renderer.settings.staves)
-        {
-            if (Environment.staveFactories.exists(s.id))
+        var isFirstTrack = true;
+        for (track in renderer.tracks)
+        {               
+            for (s in renderer.settings.staves)
             {
-                group.addStave(new Stave(Environment.staveFactories.get(s.id)(this)));
+                if (Environment.staveFactories.exists(s.id))
+                {
+                    var factory = Environment.staveFactories.get(s.id)(this);
+                    if (isFirstTrack || !factory.hideOnMultiTrack)
+                    {
+                        group.addStave(track, new Stave(factory));
+                    }
+                }
             }
+            isFirstTrack = false;
         }
         return group;
     }
