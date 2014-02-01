@@ -38,7 +38,8 @@ class DynamicsEffectInfo implements IEffectBarRendererInfo
     
     public function shouldCreateGlyph(renderer : EffectBarRenderer, beat:Beat) : Bool
     {
-        return (beat.index == 0 && beat.voice.bar.index == 0) || (beat.previousBeat != null && beat.dynamicValue != beat.previousBeat.dynamicValue);
+        return beat.voice.index == 0 && 
+                ((beat.index == 0 && beat.voice.bar.index == 0) || (beat.previousBeat != null && beat.dynamicValue != beat.previousBeat.dynamicValue));
     }
     
     public function canExpand(renderer : EffectBarRenderer, from:Beat, to:Beat): Bool

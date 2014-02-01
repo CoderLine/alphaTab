@@ -85,13 +85,17 @@ class ScoreBeatGlyph extends BeatGlyphBase
                 //
                 // Note dots
                 //
-                for (i in 0 ... container.beat.dots)
+                if (container.beat.dots > 0)
                 {
-                    var group = new GlyphGroup();
-                    noteLoop( function (n) {
-                        createBeatDot(n, group);                    
-                    });
-                    addGlyph(group);
+                    addGlyph(new SpacingGlyph(0, 0, Std.int(5 * getScale()), false));
+                    for (i in 0 ... container.beat.dots)
+                    {
+                        var group = new GlyphGroup();
+                        noteLoop( function (n) {
+                            createBeatDot(n, group);                    
+                        });
+                        addGlyph(group);
+                    }
                 }
             }
             else

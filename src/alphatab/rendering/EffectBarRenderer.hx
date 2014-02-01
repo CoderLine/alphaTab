@@ -69,14 +69,14 @@ class EffectBarRenderer extends GroupedBarRenderer
         isEmpty = true;
         
 #if MULTIVOICE_SUPPORT
-        for (v in _bar.voices)
+        for (v in bar.voices)
         {
             var prevGlyph:Glyph = null;
             if (index > 0)
             {
                 // check if previous renderer had an effect on his last beat
                 // and use this as merging element
-                var prevRenderer:EffectBarRenderer = stave.barRenderers[index - 1];
+                var prevRenderer:EffectBarRenderer = cast stave.barRenderers[index - 1];
                 if (prevRenderer._lastBeat != null)
                 {
                     prevGlyph = prevRenderer._effectGlyphs[v.index].get(prevRenderer._lastBeat.index);
@@ -231,14 +231,16 @@ class EffectBarRenderer extends GroupedBarRenderer
 
     private override function createBeatGlyphs():Void 
     {
-        _effectGlyphs.push(new IntMap<Glyph>());
-        _uniqueEffectGlyphs.push(new Array<Glyph>());
 #if MULTIVOICE_SUPPORT
-        for (v in _bar.voices)
+        for (v in bar.voices)
         {
+            _effectGlyphs.push(new IntMap<Glyph>());
+            _uniqueEffectGlyphs.push(new Array<Glyph>());
             createVoiceGlyphs(v);
         }
 #else
+        _effectGlyphs.push(new IntMap<Glyph>());
+        _uniqueEffectGlyphs.push(new Array<Glyph>());
         createVoiceGlyphs(bar.voices[0]);
 #end
 

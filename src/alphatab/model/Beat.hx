@@ -217,4 +217,31 @@ class Beat
         }
         return null;
     }
+    
+    public function finish()
+    {
+        if (voice.bar.index == 0 && index == 0)
+        {
+            start = 0;
+            previousBeat = null;
+        }
+        else
+        {
+            if (index == 0)
+            {
+                previousBeat = voice.bar.previousBar.voices[voice.index].beats[voice.bar.previousBar.voices[voice.index].beats.length - 1];
+            }
+            else
+            {
+                previousBeat = voice.beats[index - 1];
+            }
+            previousBeat.nextBeat = this;
+            start = previousBeat.start + previousBeat.calculateDuration();
+        }
+        
+        for (n in notes)
+        {
+            n.finish();
+        }
+    }
 }

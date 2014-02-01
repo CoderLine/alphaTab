@@ -812,6 +812,13 @@ class ScoreBarRenderer extends GroupedBarRenderer
     public override function paintBackground(cx:Int, cy:Int, canvas:ICanvas)
     {
         var res = getResources();
+        
+        // var c = new Color(Std.int(Math.random() * 255), 
+        //                   Std.int(Math.random() * 255), 
+        //                   Std.int(Math.random() * 255),
+        //                   100);
+        // canvas.setColor(c);
+        // canvas.fillRect(cx + x, cy + y, width, height);
 
         //
         // draw string lines

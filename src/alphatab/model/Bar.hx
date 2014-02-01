@@ -16,6 +16,7 @@
  * License along with this library.
  */
 package alphatab.model;
+using alphatab.model.ModelUtils;
 
 /**
  * A bar is a single block within a track, also known as Measure.
@@ -30,6 +31,10 @@ class Bar
     
     public var track:Track;
     public var voices:Array<Voice>;
+    
+    public var minDuration:Null<Duration>;
+    public var maxDuration:Null<Duration>;
+
     
     public function new() 
     {
@@ -59,5 +64,21 @@ class Bar
             }
         }
         return true;
+    }
+    
+    public function finish()
+    {
+        for (v in voices)
+        {
+            v.finish();
+            if (v.minDuration == null || minDuration == null || minDuration.getDurationValue() > v.minDuration.getDurationValue())
+            {
+                minDuration = v.minDuration;
+            }
+            if (v.maxDuration == null || maxDuration == null || maxDuration.getDurationValue() < v.maxDuration.getDurationValue())
+            {
+                maxDuration = v.maxDuration;
+            }            
+        }
     }
 }

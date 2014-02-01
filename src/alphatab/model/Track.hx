@@ -42,6 +42,8 @@ class Track
     
     public function new() 
     {
+        name = "";
+        shortName = "";
         tuning = new Array<Int>();
         bars = new Array<Bar>();
         chords = new StringMap<Chord>();
@@ -59,6 +61,23 @@ class Track
             bar.previousBar.nextBar = bar;
         }
         bars.push(bar);
+    }
+    
+    public function finish()
+    {
+        if (shortName == null || shortName.length == 0)
+        {
+            shortName = name;
+            if (shortName.length > 10) shortName = shortName.substr(0, 10);
+        }
+
+        if (!isPercussion)
+        {
+            for (bar in bars)
+            {
+                bar.finish();
+            }
+        }
     }
     
 }

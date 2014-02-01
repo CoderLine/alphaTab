@@ -1562,7 +1562,7 @@ alphatab.rendering.effects.DynamicsEffectInfo.prototype = {
 		return false;
 	}
 	,shouldCreateGlyph: function(renderer,beat) {
-		return beat.index == 0 && beat.voice.bar.index == 0 || beat.previousBeat != null && beat.dynamicValue != beat.previousBeat.dynamicValue;
+		return beat.voice.index == 0 && (beat.index == 0 && beat.voice.bar.index == 0 || beat.previousBeat != null && beat.dynamicValue != beat.previousBeat.dynamicValue);
 	}
 	,canExpand: function(renderer,from,to) {
 		return true;
@@ -2019,93 +2019,6 @@ alphatab.importer.ScoreImporter.prototype = {
 	,readScore: function() {
 		return null;
 	}
-	,finish: function(score) {
-		var _g10 = this;
-		var _g = 0;
-		var _g1 = score.tracks;
-		while(_g < _g1.length) {
-			var t = _g1[_g];
-			++_g;
-			if(t.shortName == null || t.shortName.length == 0) {
-				t.shortName = t.name;
-				if(t.shortName.length > 10) t.shortName = HxOverrides.substr(t.shortName,0,10);
-			}
-			if(!t.isPercussion) {
-				var _g2 = 0;
-				var _g3 = t.bars;
-				while(_g2 < _g3.length) {
-					var bar = _g3[_g2];
-					++_g2;
-					var _g4 = 0;
-					var _g5 = bar.voices;
-					while(_g4 < _g5.length) {
-						var v = _g5[_g4];
-						++_g4;
-						var _g6 = 0;
-						var _g7 = v.beats;
-						while(_g6 < _g7.length) {
-							var beat = _g7[_g6];
-							++_g6;
-							if(beat.voice.bar.index == 0 && beat.index == 0) {
-								beat.start = 0;
-								beat.previousBeat = null;
-							} else {
-								if(beat.index == 0) beat.previousBeat = bar.previousBar.voices[v.index].beats[bar.previousBar.voices[v.index].beats.length - 1]; else beat.previousBeat = v.beats[beat.index - 1];
-								beat.previousBeat.nextBeat = beat;
-								beat.start = beat.previousBeat.start + beat.previousBeat.calculateDuration();
-							}
-							var _g8 = 0;
-							var _g9 = beat.notes;
-							while(_g8 < _g9.length) {
-								var n = [_g9[_g8]];
-								++_g8;
-								var nextNoteOnLine = new alphatab.util.LazyVar((function(n) {
-									return function() {
-										return _g10.nextNoteOnSameLine(n[0]);
-									};
-								})(n));
-								var prevNoteOnLine = new alphatab.util.LazyVar((function(n) {
-									return function() {
-										return _g10.previousNoteOnSameLine(n[0]);
-									};
-								})(n));
-								if(n[0].isTieDestination) {
-									if(prevNoteOnLine.getValue() == null) n[0].isTieDestination = false; else {
-										n[0].tieOrigin = prevNoteOnLine.getValue();
-										n[0].tieOrigin.isTieOrigin = true;
-										n[0].fret = n[0].tieOrigin.fret;
-									}
-								}
-								if(n[0].isHammerPullOrigin) {
-									if(nextNoteOnLine.getValue() == null) n[0].isHammerPullOrigin = false; else {
-										nextNoteOnLine.getValue().isHammerPullDestination = true;
-										nextNoteOnLine.getValue().hammerPullOrigin = n[0];
-									}
-								}
-								if(n[0].slideType != alphatab.model.SlideType.None) n[0].slideTarget = nextNoteOnLine.getValue();
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	,nextNoteOnSameLine: function(note) {
-		var nextBeat = note.beat.nextBeat;
-		while(nextBeat != null && nextBeat.voice.bar.index <= note.beat.voice.bar.index + 3) {
-			var noteOnString = nextBeat.getNoteOnString(note.string);
-			if(noteOnString != null) return noteOnString; else nextBeat = nextBeat.nextBeat;
-		}
-		return null;
-	}
-	,previousNoteOnSameLine: function(note) {
-		var previousBeat = note.beat.previousBeat;
-		while(previousBeat != null && previousBeat.voice.bar.index >= note.beat.voice.bar.index - 3) {
-			var noteOnString = previousBeat.getNoteOnString(note.string);
-			if(noteOnString != null) return noteOnString; else previousBeat = previousBeat.previousBeat;
-		}
-		return null;
-	}
 	,__class__: alphatab.importer.ScoreImporter
 };
 alphatab.importer.AlphaTexImporter = function() {
@@ -2129,7 +2042,7 @@ alphatab.importer.AlphaTexImporter.prototype = $extend(alphatab.importer.ScoreIm
 			this.nextChar();
 			this.newSy();
 			this.score();
-			this.finish(this._score);
+			this._score.finish();
 			return this._score;
 		} catch( e ) {
 			console.log(e);
@@ -2848,7 +2761,7 @@ alphatab.importer.Gp3To5Importer.prototype = $extend(alphatab.importer.ScoreImpo
 		this.readMasterBars();
 		this.readTracks();
 		this.readBars();
-		this.finish(this._score);
+		this._score.finish();
 		return this._score;
 	}
 	,readVersion: function() {
@@ -3842,7 +3755,7 @@ alphatab.importer.GpxImporter.prototype = $extend(alphatab.importer.ScoreImporte
 		fileSystem = null;
 		var parser = new alphatab.importer.GpxParser();
 		parser.parseXml(xml);
-		this.finish(parser.score);
+		parser.score.finish();
 		return parser.score;
 	}
 	,__class__: alphatab.importer.GpxImporter
@@ -5258,6 +5171,17 @@ alphatab.model.Bar.prototype = {
 		}
 		return true;
 	}
+	,finish: function() {
+		var _g = 0;
+		var _g1 = this.voices;
+		while(_g < _g1.length) {
+			var v = _g1[_g];
+			++_g;
+			v.finish();
+			if(v.minDuration == null || this.minDuration == null || alphatab.model.ModelUtils.getDurationValue(this.minDuration) > alphatab.model.ModelUtils.getDurationValue(v.minDuration)) this.minDuration = v.minDuration;
+			if(v.maxDuration == null || this.maxDuration == null || alphatab.model.ModelUtils.getDurationValue(this.maxDuration) < alphatab.model.ModelUtils.getDurationValue(v.maxDuration)) this.maxDuration = v.maxDuration;
+		}
+	}
 	,__class__: alphatab.model.Bar
 };
 alphatab.model.Beat = function() {
@@ -5395,6 +5319,23 @@ alphatab.model.Beat.prototype = {
 			if(n.string == string) return n;
 		}
 		return null;
+	}
+	,finish: function() {
+		if(this.voice.bar.index == 0 && this.index == 0) {
+			this.start = 0;
+			this.previousBeat = null;
+		} else {
+			if(this.index == 0) this.previousBeat = this.voice.bar.previousBar.voices[this.voice.index].beats[this.voice.bar.previousBar.voices[this.voice.index].beats.length - 1]; else this.previousBeat = this.voice.beats[this.index - 1];
+			this.previousBeat.nextBeat = this;
+			this.start = this.previousBeat.start + this.previousBeat.calculateDuration();
+		}
+		var _g = 0;
+		var _g1 = this.notes;
+		while(_g < _g1.length) {
+			var n = _g1[_g];
+			++_g;
+			n.finish();
+		}
 	}
 	,__class__: alphatab.model.Beat
 };
@@ -5636,6 +5577,22 @@ alphatab.model.Note = function() {
 	this.octave = -1;
 };
 alphatab.model.Note.__name__ = true;
+alphatab.model.Note.nextNoteOnSameLine = function(note) {
+	var nextBeat = note.beat.nextBeat;
+	while(nextBeat != null && nextBeat.voice.bar.index <= note.beat.voice.bar.index + 3) {
+		var noteOnString = nextBeat.getNoteOnString(note.string);
+		if(noteOnString != null) return noteOnString; else nextBeat = nextBeat.nextBeat;
+	}
+	return null;
+};
+alphatab.model.Note.previousNoteOnSameLine = function(note) {
+	var previousBeat = note.beat.previousBeat;
+	while(previousBeat != null && previousBeat.voice.bar.index >= note.beat.voice.bar.index - 3) {
+		var noteOnString = previousBeat.getNoteOnString(note.string);
+		if(noteOnString != null) return noteOnString; else previousBeat = previousBeat.previousBeat;
+	}
+	return null;
+};
 alphatab.model.Note.prototype = {
 	hasBend: function() {
 		return this.bendPoints.length > 1;
@@ -5686,6 +5643,29 @@ alphatab.model.Note.prototype = {
 	}
 	,realValue: function() {
 		return this.fret + this.beat.voice.bar.track.tuning[this.beat.voice.bar.track.tuning.length - (this.string - 1) - 1];
+	}
+	,finish: function() {
+		var _g = this;
+		var nextNoteOnLine = new alphatab.util.LazyVar(function() {
+			return alphatab.model.Note.nextNoteOnSameLine(_g);
+		});
+		var prevNoteOnLine = new alphatab.util.LazyVar(function() {
+			return alphatab.model.Note.previousNoteOnSameLine(_g);
+		});
+		if(this.isTieDestination) {
+			if(prevNoteOnLine.getValue() == null) this.isTieDestination = false; else {
+				this.tieOrigin = prevNoteOnLine.getValue();
+				this.tieOrigin.isTieOrigin = true;
+				this.fret = this.tieOrigin.fret;
+			}
+		}
+		if(this.isHammerPullOrigin) {
+			if(nextNoteOnLine.getValue() == null) this.isHammerPullOrigin = false; else {
+				nextNoteOnLine.getValue().isHammerPullDestination = true;
+				nextNoteOnLine.getValue().hammerPullOrigin = this;
+			}
+		}
+		if(this.slideType != alphatab.model.SlideType.None) this.slideTarget = nextNoteOnLine.getValue();
 	}
 	,__class__: alphatab.model.Note
 };
@@ -5751,6 +5731,15 @@ alphatab.model.Score.prototype = {
 		track.index = this.tracks.length;
 		this.tracks.push(track);
 	}
+	,finish: function() {
+		var _g = 0;
+		var _g1 = this.tracks;
+		while(_g < _g1.length) {
+			var t = _g1[_g];
+			++_g;
+			t.finish();
+		}
+	}
 	,__class__: alphatab.model.Score
 };
 alphatab.model.Section = function() {
@@ -5782,6 +5771,8 @@ alphatab.model.SlideType.OutDown = ["OutDown",6];
 alphatab.model.SlideType.OutDown.toString = $estr;
 alphatab.model.SlideType.OutDown.__enum__ = alphatab.model.SlideType;
 alphatab.model.Track = function() {
+	this.name = "";
+	this.shortName = "";
 	this.tuning = new Array();
 	this.bars = new Array();
 	this.chords = new haxe.ds.StringMap();
@@ -5798,6 +5789,21 @@ alphatab.model.Track.prototype = {
 			bar.previousBar.nextBar = bar;
 		}
 		this.bars.push(bar);
+	}
+	,finish: function() {
+		if(this.shortName == null || this.shortName.length == 0) {
+			this.shortName = this.name;
+			if(this.shortName.length > 10) this.shortName = HxOverrides.substr(this.shortName,0,10);
+		}
+		if(!this.isPercussion) {
+			var _g = 0;
+			var _g1 = this.bars;
+			while(_g < _g1.length) {
+				var bar = _g1[_g];
+				++_g;
+				bar.finish();
+			}
+		}
 	}
 	,__class__: alphatab.model.Track
 };
@@ -5969,6 +5975,17 @@ alphatab.model.Voice.prototype = {
 	}
 	,isEmpty: function() {
 		return this.beats.length == 0;
+	}
+	,finish: function() {
+		var _g = 0;
+		var _g1 = this.beats;
+		while(_g < _g1.length) {
+			var b = _g1[_g];
+			++_g;
+			b.finish();
+			if(this.minDuration == null || alphatab.model.ModelUtils.getDurationValue(this.minDuration) > alphatab.model.ModelUtils.getDurationValue(b.duration)) this.minDuration = b.duration;
+			if(this.maxDuration == null || alphatab.model.ModelUtils.getDurationValue(this.maxDuration) < alphatab.model.ModelUtils.getDurationValue(b.duration)) this.maxDuration = b.duration;
+		}
 	}
 	,__class__: alphatab.model.Voice
 };
@@ -8878,17 +8895,20 @@ alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.
 					_g.createNoteGlyph(n);
 				});
 				this.addGlyph(this.noteHeads);
-				var _g1 = 0;
-				var _g2 = this.container.beat.dots;
-				while(_g1 < _g2) {
-					var i = _g1++;
-					var group = [new alphatab.rendering.glyphs.GlyphGroup()];
-					this.noteLoop((function(group) {
-						return function(n) {
-							_g.createBeatDot(n,group[0]);
-						};
-					})(group));
-					this.addGlyph(group[0]);
+				if(this.container.beat.dots > 0) {
+					this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,5 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0,false));
+					var _g1 = 0;
+					var _g2 = this.container.beat.dots;
+					while(_g1 < _g2) {
+						var i = _g1++;
+						var group = [new alphatab.rendering.glyphs.GlyphGroup()];
+						this.noteLoop((function(group) {
+							return function(n) {
+								_g.createBeatDot(n,group[0]);
+							};
+						})(group));
+						this.addGlyph(group[0]);
+					}
 				}
 			} else {
 				var line = 0;
@@ -11794,7 +11814,7 @@ alphatab.rendering.ScoreBarRenderer.LineSpacing = 8;
 alphatab.rendering.ScoreBarRenderer.NOTE_STEP_CORRECTION = 1;
 alphatab.rendering.TabBarRenderer.LineSpacing = 10;
 alphatab.rendering.glyphs.AccidentalGroupGlyph.NonReserved = -3000;
-alphatab.rendering.glyphs.BeatContainerGlyph.PixelPerTick = 0.041666666666666664;
+alphatab.rendering.glyphs.BeatContainerGlyph.SizeTable = [82,43,30,22,18,14,14];
 alphatab.rendering.glyphs.ChineseCymbalGlyph.graceScale = 0.7;
 alphatab.rendering.glyphs.ChineseCymbalGlyph.noteHeadHeight = 9;
 alphatab.rendering.glyphs.DeadNoteHeadGlyph.noteHeadHeight = 9;

@@ -16,6 +16,7 @@
  * License along with this library.
  */
 package alphatab.model;
+using alphatab.model.ModelUtils;
 
 /**
  * A voice represents a group of beats 
@@ -27,6 +28,9 @@ class Voice
     
     public var bar:Bar;
     public var beats:Array<Beat>;
+    
+    public var minDuration:Null<Duration>;
+    public var maxDuration:Null<Duration>;
     
     public function new() 
     {
@@ -61,4 +65,20 @@ class Voice
     {
         return beats.length == 0;
     }    
+    
+    public function finish()
+    {
+        for (b in beats)
+        {
+            b.finish();
+            if (minDuration == null || minDuration.getDurationValue() > b.duration.getDurationValue())
+            {
+                minDuration = b.duration;
+            }
+            if (maxDuration == null || maxDuration.getDurationValue() < b.duration.getDurationValue())
+            {
+                maxDuration = b.duration;
+            }
+        }
+    }
 }

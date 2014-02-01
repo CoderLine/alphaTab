@@ -16,6 +16,7 @@
  * License along with this library.
  */
 package alphatab.model;
+import alphatab.util.LazyVar.LazyVar;
 
 /**
  * A note is a single played sound on a fretted instrument. 
@@ -172,4 +173,86 @@ class Note
     {
         return fret + stringTuning();
     }
+    
+    public function finish()
+    {
+        var nextNoteOnLine = new LazyVar<Note>(function() { return nextNoteOnSameLine(this); });
+        var prevNoteOnLine = new LazyVar<Note>(function() { return previousNoteOnSameLine(this); });
+        // connect ties
+        if (isTieDestination)
+        {                                    
+            if (prevNoteOnLine.getValue() == null)
+            {
+               isTieDestination = false;
+            }
+            else
+            {
+                tieOrigin = prevNoteOnLine.getValue();
+                tieOrigin.isTieOrigin = true;
+                fret = tieOrigin.fret;
+            }
+        }
+        
+        // set hammeron/pulloffs
+        if (isHammerPullOrigin)
+        {
+            if (nextNoteOnLine.getValue() == null)
+            {
+                isHammerPullOrigin = false;
+            }
+            else
+            {
+                nextNoteOnLine.getValue().isHammerPullDestination = true;
+                nextNoteOnLine.getValue().hammerPullOrigin = this;
+            }
+        }
+        
+        // set slides
+        if (slideType != SlideType.None)
+        {
+            slideTarget = nextNoteOnLine.getValue();
+        }
+    }
+    
+    private static function nextNoteOnSameLine(note:Note) : Note
+    {
+        var nextBeat:Beat = note.beat.nextBeat;
+        // keep searching in same bar
+        while (nextBeat != null && nextBeat.voice.bar.index <= note.beat.voice.bar.index + 3)
+        {
+            var noteOnString = nextBeat.getNoteOnString(note.string);
+            if (noteOnString != null)
+            {
+                return noteOnString;
+            }
+            else
+            {
+                nextBeat = nextBeat.nextBeat;
+            }
+        }
+        
+        return null;
+    }
+    
+    private static function previousNoteOnSameLine(note:Note) : Note
+    {
+        var previousBeat:Beat = note.beat.previousBeat;
+        
+        // keep searching in same bar
+        while (previousBeat != null && previousBeat.voice.bar.index >= note.beat.voice.bar.index - 3)
+        {
+            var noteOnString = previousBeat.getNoteOnString(note.string);
+            if (noteOnString != null)
+            {
+                return noteOnString;
+            }
+            else
+            {
+                previousBeat = previousBeat.previousBeat;
+            }
+        }
+        
+        return null;
+    }
+    
 }

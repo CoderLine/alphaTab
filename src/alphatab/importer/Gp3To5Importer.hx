@@ -165,7 +165,7 @@ class Gp3To5Importer extends ScoreImporter
         readTracks();
         readBars();
         
-        finish(_score);
+        _score.finish();
         
         return _score;
     }

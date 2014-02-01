@@ -26,12 +26,12 @@ import alphatab.rendering.Glyph;
 import alphatab.rendering.layout.ScoreLayout;
 import alphatab.rendering.staves.BarSizeInfo;
 
+using alphatab.model.ModelUtils;
+
 class BeatContainerGlyph extends Glyph implements ISupportsFinalize
 {
-    /**
-     * pixel / fullnote ticks
-     */
-    private static inline var PixelPerTick:Float = 160 / 3840;
+    private static var SizeTable = [82, 43, 30, 22, 18, 14, 14];
+
     public var beat:Beat;
     public var preNotes:BeatGlyphBase;
     public var onNotes:BeatGlyphBase;
@@ -103,7 +103,14 @@ class BeatContainerGlyph extends Glyph implements ISupportsFinalize
     private function calculateWidth() : Int
     {
 #if MULTIVOICE_SUPPORT
-        return Std.int(beat.calculateDuration() * PixelPerTick * getScale());
+        var index = beat.duration.getDurationIndex();
+        var minIndex = beat.voice.bar.minDuration.getDurationIndex();
+        var minDurationSize = SizeTable[minIndex];
+        while (index < minIndex)
+        {
+            minDurationSize *= 2;
+        }
+        return minDurationSize;
 #else 
         return postNotes.x + postNotes.width;
 #end        

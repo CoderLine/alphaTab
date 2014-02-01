@@ -108,4 +108,12 @@ class Score
         track.index = tracks.length;
         tracks.push(track);
     }
+    
+    public function finish()
+    {
+        for (t in tracks)
+        {
+            t.finish();
+        }
+    }
 }

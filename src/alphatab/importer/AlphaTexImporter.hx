@@ -76,7 +76,7 @@ class AlphaTexImporter extends ScoreImporter
             newSy();
             score();
            
-            finish(_score);
+            _score.finish();
             return _score;
         }
         catch (e:Dynamic)

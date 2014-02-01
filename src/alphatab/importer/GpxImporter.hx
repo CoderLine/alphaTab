@@ -52,7 +52,7 @@ class GpxImporter extends ScoreImporter
         var parser = new GpxParser();
         parser.parseXml(xml);
                 
-        finish(parser.score);
+        parser.score.finish();
         
         return parser.score;
     }
