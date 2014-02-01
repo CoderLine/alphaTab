@@ -59,6 +59,7 @@ import alphatab.rendering.glyphs.SvgGlyph;
 import alphatab.rendering.glyphs.TimeSignatureGlyph;
 import alphatab.rendering.glyphs.TremoloPickingGlyph;
 import alphatab.rendering.utils.AccidentalHelper;
+import alphatab.rendering.utils.BarHelpersGroup.BarHelpers;
 import alphatab.rendering.utils.BeamingHelper;
 import alphatab.rendering.utils.PercussionMapper;
 import alphatab.rendering.utils.TupletHelper;
@@ -105,23 +106,15 @@ class ScoreBarRenderer extends GroupedBarRenderer
      */
     private static var FlatKsSteps:Array<Int> = [ 5, 2, 6, 3, 7, 4, 8 ];
 
-    
     private static inline var LineSpacing = 8;
     public var accidentalHelper:AccidentalHelper;
-    private var _beamHelpers:Array<Array<BeamingHelper>>;
-    private var _beamHelperLookup:Array<IntMap<BeamingHelper>>;
-    private var _tupletHelpers:Array<Array<TupletHelper>>;
     
-    private var _currentBeamHelper:BeamingHelper;
-    private var _currentTupletHelper:TupletHelper;
+    private var _helpers:BarHelpers;
     
     public function new(bar:alphatab.model.Bar) 
     {
         super(bar);
         accidentalHelper = new AccidentalHelper();
-        _beamHelpers = new Array<Array<BeamingHelper>>();
-        _beamHelperLookup = new Array<IntMap<BeamingHelper>>();
-        _tupletHelpers = new Array<Array<TupletHelper>>();
     }
     
     public function getBeatDirection(beat:Beat) : BeamDirection
@@ -171,7 +164,9 @@ class ScoreBarRenderer extends GroupedBarRenderer
     
     public override function doLayout()
     {
+        _helpers = stave.staveGroup.helpers.helpers.get(bar.track.index).get(bar.index);
         super.doLayout();
+        
         height = Std.int(getLineOffset() * 4) + getTopPadding() + getBottomPadding();
         if (index == 0)
         {
@@ -182,7 +177,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
         var top = getScoreY(0);
         var bottom = getScoreY(8);
         
-        for (v in _beamHelpers)
+        for (v in _helpers.beamHelpers)
         {
             for (h in v)
             {
@@ -225,7 +220,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
     
     private function paintTuplets(cx:Int, cy:Int, canvas:ICanvas):Void
     {
-        for (v in _tupletHelpers)
+        for (v in _helpers.tupletHelpers)
         {
             for (h in v)
             {
@@ -236,7 +231,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
     
     private function paintBeams(cx:Int, cy:Int, canvas:ICanvas):Void
     {
-        for (v in _beamHelpers)
+        for (v in _helpers.beamHelpers)
         {
             for (h in v)
             {
@@ -269,7 +264,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
             for (i in 0 ... h.beats.length)
             {
                 var beat = h.beats[i];
-                var beamingHelper = _beamHelperLookup[h.voiceIndex].get(beat.index);
+                var beamingHelper = _helpers.beamHelperLookup[h.voiceIndex].get(beat.index);
                 var direction = beamingHelper.getDirection();
                 
                 var tupletX = Std.int(beamingHelper.getBeatLineX(beat) + getScale());
@@ -288,7 +283,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
             var firstBeat = h.beats[0];
             var lastBeat = h.beats[h.beats.length - 1];
             
-            var beamingHelper = _beamHelperLookup[h.voiceIndex].get(firstBeat.index);
+            var beamingHelper = _helpers.beamHelperLookup[h.voiceIndex].get(firstBeat.index);
             var direction = beamingHelper.getDirection();
             
             // 
@@ -706,60 +701,15 @@ class ScoreBarRenderer extends GroupedBarRenderer
     
     private function createVoiceGlyphs(v:Voice)
     {
-        _currentBeamHelper = null; // reset beams for each voice
-        _beamHelpers.push(new Array<BeamingHelper>());
-        _beamHelperLookup.push(new IntMap<BeamingHelper>());
-        _tupletHelpers.push(new Array<TupletHelper>());
-        
         for (b in v.beats)
         {
-            var newBeamingHelper = false;
-            if (!b.isRest())
-            {
-                // try to fit beam to current beamhelper
-                if (_currentBeamHelper == null || !_currentBeamHelper.checkBeat(b))
-                {
-                    // if not possible, create the next beaming helper
-                    _currentBeamHelper = new BeamingHelper(bar.track);
-                    _currentBeamHelper.checkBeat(b);
-                    _beamHelpers[v.index].push(_currentBeamHelper);
-                    newBeamingHelper = true;
-                }
-            }
-            
-            if (b.hasTuplet())
-            {
-                // try to fit tuplet to current tuplethelper
-                // TODO: register tuplet overflow
-                var previousBeat = b.previousBeat;
-                
-                // don't group if the previous beat isn't in the same voice
-                if (previousBeat != null && previousBeat.voice != b.voice) previousBeat = null;
-                
-                // if a new beaming helper was started, we close our tuplet grouping as well
-                if (newBeamingHelper && _currentTupletHelper != null)
-                {
-                    _currentTupletHelper.finish();
-                }
-                
-                if (previousBeat == null || _currentTupletHelper == null || !_currentTupletHelper.check(b))
-                {
-                    _currentTupletHelper = new TupletHelper(v.index);
-                    _currentTupletHelper.check(b);
-                    _tupletHelpers[v.index].push(_currentTupletHelper);
-                }
-            }
-            
             var container = new ScoreBeatContainerGlyph(b);
             container.preNotes = new ScoreBeatPreNotesGlyph();
             container.onNotes = new ScoreBeatGlyph();
-            cast(container.onNotes, ScoreBeatGlyph).beamingHelper = _currentBeamHelper;
+            cast(container.onNotes, ScoreBeatGlyph).beamingHelper = _helpers.beamHelperLookup[v.index].get(b.index);
             container.postNotes = new ScoreBeatPostNotesGlyph();
-            _beamHelperLookup[v.index].set(b.index, _currentBeamHelper);
             addBeatGlyph(container);
         }
-        
-        _currentBeamHelper = null;
     }
     
     // TODO[performance]: Maybe we should cache this (check profiler)

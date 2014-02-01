@@ -6643,9 +6643,6 @@ alphatab.rendering.RenderingResources.prototype = {
 alphatab.rendering.ScoreBarRenderer = function(bar) {
 	alphatab.rendering.GroupedBarRenderer.call(this,bar);
 	this.accidentalHelper = new alphatab.rendering.utils.AccidentalHelper();
-	this._beamHelpers = new Array();
-	this._beamHelperLookup = new Array();
-	this._tupletHelpers = new Array();
 };
 alphatab.rendering.ScoreBarRenderer.__name__ = true;
 alphatab.rendering.ScoreBarRenderer.paintSingleBar = function(canvas,x1,y1,x2,y2,size) {
@@ -6685,6 +6682,7 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 		return 9 * this.stave.staveGroup.layout.renderer.settings.scale;
 	}
 	,doLayout: function() {
+		this._helpers = this.stave.staveGroup.helpers.helpers.get(this.bar.track.index).get(this.bar.index);
 		alphatab.rendering.GroupedBarRenderer.prototype.doLayout.call(this);
 		this.height = (9 * this.stave.staveGroup.layout.renderer.settings.scale * 4 | 0) + this.getTopPadding() + this.getBottomPadding();
 		if(this.index == 0) {
@@ -6694,7 +6692,7 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 		var top = this.getScoreY(0);
 		var bottom = this.getScoreY(8);
 		var _g = 0;
-		var _g1 = this._beamHelpers;
+		var _g1 = this._helpers.beamHelpers;
 		while(_g < _g1.length) {
 			var v = _g1[_g];
 			++_g;
@@ -6728,7 +6726,7 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 	}
 	,paintTuplets: function(cx,cy,canvas) {
 		var _g = 0;
-		var _g1 = this._tupletHelpers;
+		var _g1 = this._helpers.tupletHelpers;
 		while(_g < _g1.length) {
 			var v = _g1[_g];
 			++_g;
@@ -6742,7 +6740,7 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 	}
 	,paintBeams: function(cx,cy,canvas) {
 		var _g = 0;
-		var _g1 = this._beamHelpers;
+		var _g1 = this._helpers.beamHelpers;
 		while(_g < _g1.length) {
 			var v = _g1[_g];
 			++_g;
@@ -6767,7 +6765,7 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 			while(_g1 < _g) {
 				var i = _g1++;
 				var beat = h.beats[i];
-				var beamingHelper = this._beamHelperLookup[h.voiceIndex].get(beat.index);
+				var beamingHelper = this._helpers.beamHelperLookup[h.voiceIndex].get(beat.index);
 				var direction = beamingHelper.getDirection();
 				var tupletX;
 				var x = beamingHelper.getBeatLineX(beat) + this.stave.staveGroup.layout.renderer.settings.scale;
@@ -6784,7 +6782,7 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 		} else {
 			var firstBeat = h.beats[0];
 			var lastBeat = h.beats[h.beats.length - 1];
-			var beamingHelper = this._beamHelperLookup[h.voiceIndex].get(firstBeat.index);
+			var beamingHelper = this._helpers.beamHelperLookup[h.voiceIndex].get(firstBeat.index);
 			var direction = beamingHelper.getDirection();
 			var startX;
 			var x = beamingHelper.getBeatLineX(firstBeat) + this.stave.staveGroup.layout.renderer.settings.scale;
@@ -7184,43 +7182,18 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 		}(this))).timeSignatureDenominator));
 	}
 	,createVoiceGlyphs: function(v) {
-		this._currentBeamHelper = null;
-		this._beamHelpers.push(new Array());
-		this._beamHelperLookup.push(new haxe.ds.IntMap());
-		this._tupletHelpers.push(new Array());
 		var _g = 0;
 		var _g1 = v.beats;
 		while(_g < _g1.length) {
 			var b = _g1[_g];
 			++_g;
-			var newBeamingHelper = false;
-			if(!b.isRest()) {
-				if(this._currentBeamHelper == null || !this._currentBeamHelper.checkBeat(b)) {
-					this._currentBeamHelper = new alphatab.rendering.utils.BeamingHelper(this.bar.track);
-					this._currentBeamHelper.checkBeat(b);
-					this._beamHelpers[v.index].push(this._currentBeamHelper);
-					newBeamingHelper = true;
-				}
-			}
-			if(!(b.tupletDenominator == -1 && b.tupletNumerator == -1) && !(b.tupletDenominator == 1 && b.tupletNumerator == 1)) {
-				var previousBeat = b.previousBeat;
-				if(previousBeat != null && previousBeat.voice != b.voice) previousBeat = null;
-				if(newBeamingHelper && this._currentTupletHelper != null) this._currentTupletHelper.finish();
-				if(previousBeat == null || this._currentTupletHelper == null || !this._currentTupletHelper.check(b)) {
-					this._currentTupletHelper = new alphatab.rendering.utils.TupletHelper(v.index);
-					this._currentTupletHelper.check(b);
-					this._tupletHelpers[v.index].push(this._currentTupletHelper);
-				}
-			}
 			var container = new alphatab.rendering.glyphs.ScoreBeatContainerGlyph(b);
 			container.preNotes = new alphatab.rendering.glyphs.ScoreBeatPreNotesGlyph();
 			container.onNotes = new alphatab.rendering.glyphs.ScoreBeatGlyph();
-			(js.Boot.__cast(container.onNotes , alphatab.rendering.glyphs.ScoreBeatGlyph)).beamingHelper = this._currentBeamHelper;
+			(js.Boot.__cast(container.onNotes , alphatab.rendering.glyphs.ScoreBeatGlyph)).beamingHelper = this._helpers.beamHelperLookup[v.index].get(b.index);
 			container.postNotes = new alphatab.rendering.glyphs.ScoreBeatPostNotesGlyph();
-			this._beamHelperLookup[v.index].set(b.index,this._currentBeamHelper);
 			this.addBeatGlyph(container);
 		}
-		this._currentBeamHelper = null;
 	}
 	,getNoteLine: function(n) {
 		var value;
@@ -10569,6 +10542,7 @@ alphatab.rendering.staves.StaveGroup = function() {
 	this.index = 0;
 	this._accoladeSpacingCalculated = false;
 	this.accoladeSpacing = 0;
+	this.helpers = new alphatab.rendering.utils.BarHelpersGroup();
 };
 alphatab.rendering.staves.StaveGroup.__name__ = true;
 alphatab.rendering.staves.StaveGroup.prototype = {
@@ -10580,6 +10554,7 @@ alphatab.rendering.staves.StaveGroup.prototype = {
 		var score = tracks[0].score;
 		var masterBar = score.masterBars[barIndex];
 		this.bars.push(masterBar);
+		this.helpers.buildHelpers(tracks,barIndex);
 		if(!this._accoladeSpacingCalculated && this.index == 0) {
 			this._accoladeSpacingCalculated = true;
 			var canvas = this.layout.renderer.canvas;
@@ -10788,6 +10763,74 @@ alphatab.rendering.utils.AccidentalHelper.prototype = {
 		return ks + 7;
 	}
 	,__class__: alphatab.rendering.utils.AccidentalHelper
+};
+alphatab.rendering.utils.BarHelpers = function(bar) {
+	this.beamHelpers = new Array();
+	this.beamHelperLookup = new Array();
+	this.tupletHelpers = new Array();
+	var currentBeamHelper = null;
+	var currentTupletHelper = null;
+	var _g = 0;
+	var _g1 = bar.voices;
+	while(_g < _g1.length) {
+		var v = _g1[_g];
+		++_g;
+		this.beamHelpers.push(new Array());
+		this.beamHelperLookup.push(new haxe.ds.IntMap());
+		this.tupletHelpers.push(new Array());
+		var _g2 = 0;
+		var _g3 = v.beats;
+		while(_g2 < _g3.length) {
+			var b = _g3[_g2];
+			++_g2;
+			var newBeamingHelper = false;
+			if(!b.isRest()) {
+				if(currentBeamHelper == null || !currentBeamHelper.checkBeat(b)) {
+					currentBeamHelper = new alphatab.rendering.utils.BeamingHelper(bar.track);
+					currentBeamHelper.checkBeat(b);
+					this.beamHelpers[v.index].push(currentBeamHelper);
+					newBeamingHelper = true;
+				}
+			}
+			if(!(b.tupletDenominator == -1 && b.tupletNumerator == -1) && !(b.tupletDenominator == 1 && b.tupletNumerator == 1)) {
+				var previousBeat = b.previousBeat;
+				if(previousBeat != null && previousBeat.voice != b.voice) previousBeat = null;
+				if(newBeamingHelper && currentTupletHelper != null) currentTupletHelper.finish();
+				if(previousBeat == null || currentTupletHelper == null || !currentTupletHelper.check(b)) {
+					currentTupletHelper = new alphatab.rendering.utils.TupletHelper(v.index);
+					currentTupletHelper.check(b);
+					this.tupletHelpers[v.index].push(currentTupletHelper);
+				}
+			}
+			this.beamHelperLookup[v.index].set(b.index,currentBeamHelper);
+		}
+		currentBeamHelper = null;
+		currentTupletHelper = null;
+	}
+};
+alphatab.rendering.utils.BarHelpers.__name__ = true;
+alphatab.rendering.utils.BarHelpers.prototype = {
+	__class__: alphatab.rendering.utils.BarHelpers
+};
+alphatab.rendering.utils.BarHelpersGroup = function() {
+	this.helpers = new haxe.ds.IntMap();
+};
+alphatab.rendering.utils.BarHelpersGroup.__name__ = true;
+alphatab.rendering.utils.BarHelpersGroup.prototype = {
+	buildHelpers: function(tracks,barIndex) {
+		var _g = 0;
+		while(_g < tracks.length) {
+			var t = tracks[_g];
+			++_g;
+			var h = this.helpers.get(t.index);
+			if(h == null) {
+				h = new haxe.ds.IntMap();
+				this.helpers.set(t.index,h);
+			}
+			if(h.get(barIndex) == null) h.set(barIndex,new alphatab.rendering.utils.BarHelpers(t.bars[barIndex]));
+		}
+	}
+	,__class__: alphatab.rendering.utils.BarHelpersGroup
 };
 alphatab.rendering.utils.BeamDirection = { __ename__ : true, __constructs__ : ["Up","Down"] };
 alphatab.rendering.utils.BeamDirection.Up = ["Up",0];

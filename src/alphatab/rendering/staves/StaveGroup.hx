@@ -25,6 +25,9 @@ import alphatab.platform.model.Color;
 import alphatab.rendering.BarRendererBase;
 import alphatab.rendering.layout.ScoreLayout;
 import alphatab.rendering.staves.StaveGroup.StaveTrackGroup;
+import alphatab.rendering.utils.BarHelpersGroup;
+import alphatab.rendering.utils.BeamingHelper;
+import alphatab.rendering.utils.TupletHelper;
 import haxe.ds.IntMap.IntMap;
 
 class StaveTrackGroup
@@ -80,7 +83,7 @@ class StaveGroup
     private var _allStaves:Array<Stave>;
     
     public var layout:ScoreLayout;
-    
+    public var helpers:BarHelpersGroup;
     
     public function new() 
     {
@@ -91,6 +94,8 @@ class StaveGroup
         index = 0;
         _accoladeSpacingCalculated = false;
         accoladeSpacing = 0;
+        
+        helpers = new BarHelpersGroup();
     }
     
     public inline function getLastBarIndex() : Int
@@ -105,6 +110,8 @@ class StaveGroup
         var masterBar = score.masterBars[barIndex];
         bars.push(masterBar);
         
+        helpers.buildHelpers(tracks, barIndex);
+        
         if (!_accoladeSpacingCalculated && index == 0)
         {
             _accoladeSpacingCalculated = true;
@@ -118,7 +125,7 @@ class StaveGroup
             accoladeSpacing += (2 * AccoladeLabelSpacing);
             width += accoladeSpacing;
         }
-                
+        
         // add renderers
         var maxSizes = new BarSizeInfo();
         for (g in staves)
