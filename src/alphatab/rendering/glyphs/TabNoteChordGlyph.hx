@@ -23,6 +23,7 @@ import alphatab.model.TextBaseline;
 import alphatab.platform.ICanvas;
 import alphatab.rendering.Glyph;
 import alphatab.rendering.TabBarRenderer;
+import alphatab.rendering.utils.BeamingHelper;
 import haxe.ds.IntMap;
 import haxe.ds.StringMap;
 
@@ -32,8 +33,10 @@ class TabNoteChordGlyph extends Glyph
     private var _noteLookup:IntMap<NoteNumberGlyph>;
     private var _minNote:Note;
     private var _isGrace:Bool;
+    private var _centerX:Int;
     
     public var beat:Beat;
+    public var beamingHelper:BeamingHelper;    
     public var beatEffects:StringMap<Glyph>;
     
     public function new(x:Int = 0, y:Int = 0, isGrace:Bool) 
@@ -96,6 +99,8 @@ class TabNoteChordGlyph extends Glyph
             g.doLayout();
         }
         
+        _centerX = 0;
+        
         width = w;
     }
     
@@ -132,4 +137,12 @@ class TabNoteChordGlyph extends Glyph
             g.paint(cx + x, cy + y, canvas);
         }
     }
+
+    public function updateBeamingHelper(cx:Int) : Void
+    { 
+        if (!beamingHelper.hasBeatLineX(beat))
+        {
+            beamingHelper.registerBeatLineX(beat, cx + x + _centerX, cx + x + _centerX);             
+        }
+    }    
 }

@@ -1707,6 +1707,28 @@ alphatab.rendering.effects.PickStrokeEffectInfo.prototype = {
 	}
 	,__class__: alphatab.rendering.effects.PickStrokeEffectInfo
 };
+if(!alphatab.rendering.utils) alphatab.rendering.utils = {};
+alphatab.rendering.utils.BeamDirection = { __ename__ : true, __constructs__ : ["Up","Down"] };
+alphatab.rendering.utils.BeamDirection.Up = ["Up",0];
+alphatab.rendering.utils.BeamDirection.Up.toString = $estr;
+alphatab.rendering.utils.BeamDirection.Up.__enum__ = alphatab.rendering.utils.BeamDirection;
+alphatab.rendering.utils.BeamDirection.Down = ["Down",1];
+alphatab.rendering.utils.BeamDirection.Down.toString = $estr;
+alphatab.rendering.utils.BeamDirection.Down.__enum__ = alphatab.rendering.utils.BeamDirection;
+alphatab.rendering.RhythmBarRendererFactory = function(direction) {
+	alphatab.rendering.BarRendererFactory.call(this);
+	this.isInAccolade = false;
+	this._direction = direction;
+	this.hideOnMultiTrack = false;
+};
+alphatab.rendering.RhythmBarRendererFactory.__name__ = true;
+alphatab.rendering.RhythmBarRendererFactory.__super__ = alphatab.rendering.BarRendererFactory;
+alphatab.rendering.RhythmBarRendererFactory.prototype = $extend(alphatab.rendering.BarRendererFactory.prototype,{
+	create: function(bar) {
+		return new alphatab.rendering.RhythmBarRenderer(bar,this._direction);
+	}
+	,__class__: alphatab.rendering.RhythmBarRendererFactory
+});
 alphatab.Environment = function() { };
 alphatab.Environment.__name__ = true;
 alphatab.Main = function() { };
@@ -6640,6 +6662,148 @@ alphatab.rendering.RenderingResources.prototype = {
 	}
 	,__class__: alphatab.rendering.RenderingResources
 };
+alphatab.rendering.RhythmBarRenderer = function(bar,direction) {
+	alphatab.rendering.GroupedBarRenderer.call(this,bar);
+	this._direction = direction;
+};
+alphatab.rendering.RhythmBarRenderer.__name__ = true;
+alphatab.rendering.RhythmBarRenderer.paintSingleBar = function(canvas,x1,y1,x2,y2,size) {
+	canvas.beginPath();
+	canvas.moveTo(x1,y1);
+	canvas.lineTo(x2,y2);
+	canvas.lineTo(x2,y2 - size);
+	canvas.lineTo(x1,y1 - size);
+	canvas.closePath();
+	canvas.fill();
+};
+alphatab.rendering.RhythmBarRenderer.__super__ = alphatab.rendering.GroupedBarRenderer;
+alphatab.rendering.RhythmBarRenderer.prototype = $extend(alphatab.rendering.GroupedBarRenderer.prototype,{
+	doLayout: function() {
+		this._helpers = this.stave.staveGroup.helpers.helpers.get(this.bar.track.index).get(this.bar.index);
+		alphatab.rendering.GroupedBarRenderer.prototype.doLayout.call(this);
+		this.height = 24 * this.stave.staveGroup.layout.renderer.settings.scale | 0;
+		this.isEmpty = false;
+	}
+	,createBeatGlyphs: function() {
+		this.createVoiceGlyphs(this.bar.voices[0]);
+	}
+	,createVoiceGlyphs: function(v) {
+		var _g = 0;
+		var _g1 = v.beats;
+		while(_g < _g1.length) {
+			var b = _g1[_g];
+			++_g;
+			var container = new alphatab.rendering.glyphs.BeatContainerGlyph(b);
+			container.preNotes = new alphatab.rendering.glyphs.BeatGlyphBase();
+			container.onNotes = new alphatab.rendering.glyphs.BeatGlyphBase();
+			container.postNotes = new alphatab.rendering.glyphs.BeatGlyphBase();
+			this.addBeatGlyph(container);
+		}
+	}
+	,paintBackground: function(cx,cy,canvas) {
+	}
+	,paint: function(cx,cy,canvas) {
+		alphatab.rendering.GroupedBarRenderer.prototype.paint.call(this,cx,cy,canvas);
+		var _g = 0;
+		var _g1 = this._helpers.beamHelpers;
+		while(_g < _g1.length) {
+			var v = _g1[_g];
+			++_g;
+			var _g2 = 0;
+			while(_g2 < v.length) {
+				var h = v[_g2];
+				++_g2;
+				this.paintBeamHelper(cx + this.getBeatGlyphsStart(),cy,canvas,h);
+			}
+		}
+	}
+	,paintBeamHelper: function(cx,cy,canvas,h) {
+		if(h.beats.length == 1) this.paintFooter(cx,cy,canvas,h); else this.paintBar(cx,cy,canvas,h);
+	}
+	,paintBar: function(cx,cy,canvas,h) {
+		var _g1 = 0;
+		var _g = h.beats.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var beat = h.beats[i];
+			if(h._beatLineXPositions.exists(beat.index)) {
+				var beatLineX;
+				var x = h.getBeatLineX(beat) + this.stave.staveGroup.layout.renderer.settings.scale;
+				beatLineX = x | 0;
+				var y1 = cy + this.y;
+				var y2 = cy + this.y + this.height;
+				canvas.setColor(this.stave.staveGroup.layout.renderer.renderingResources.mainGlyphColor);
+				canvas.beginPath();
+				canvas.moveTo(cx + this.x + beatLineX | 0,y1);
+				canvas.lineTo(cx + this.x + beatLineX | 0,y2);
+				canvas.stroke();
+				var brokenBarOffset = 6 * this.stave.staveGroup.layout.renderer.settings.scale | 0;
+				var barSpacing = 6 * this.stave.staveGroup.layout.renderer.settings.scale | 0;
+				var barSize = 3 * this.stave.staveGroup.layout.renderer.settings.scale | 0;
+				var barCount = alphatab.model.ModelUtils.getDurationIndex(beat.duration) - 2;
+				var barStart = cy + this.y;
+				if(this._direction == alphatab.rendering.utils.BeamDirection.Up) {
+					barSpacing = -barSpacing;
+					barStart += this.height;
+				}
+				var _g2 = 0;
+				while(_g2 < barCount) {
+					var barIndex = _g2++;
+					var barStartX;
+					var barEndX;
+					var barStartY;
+					var barEndY;
+					var barY = barStart + barIndex * barSpacing;
+					if(i < h.beats.length - 1) {
+						if(this.isFullBarJoin(beat,h.beats[i + 1],barIndex)) {
+							barStartX = beatLineX;
+							var x = h.getBeatLineX(h.beats[i + 1]) + this.stave.staveGroup.layout.renderer.settings.scale;
+							barEndX = x | 0;
+						} else if(i == 0 || !this.isFullBarJoin(h.beats[i - 1],beat,barIndex)) {
+							barStartX = beatLineX;
+							barEndX = barStartX + brokenBarOffset;
+						} else continue;
+						barStartY = barY | 0;
+						barEndY = barY | 0;
+						alphatab.rendering.RhythmBarRenderer.paintSingleBar(canvas,cx + this.x + barStartX,barStartY,cx + this.x + barEndX,barEndY,barSize);
+					} else if(i > 0 && !this.isFullBarJoin(beat,h.beats[i - 1],barIndex)) {
+						barStartX = beatLineX - brokenBarOffset;
+						barEndX = beatLineX;
+						barStartY = barY | 0;
+						barEndY = barY | 0;
+						alphatab.rendering.RhythmBarRenderer.paintSingleBar(canvas,cx + this.x + barStartX,barStartY,cx + this.x + barEndX,barEndY,barSize);
+					}
+				}
+			}
+		}
+	}
+	,paintFooter: function(cx,cy,canvas,h) {
+		var beat = h.beats[0];
+		if(beat.duration == alphatab.model.Duration.Whole) return;
+		var beatLineX;
+		var x = h.getBeatLineX(beat) + this.stave.staveGroup.layout.renderer.settings.scale;
+		beatLineX = x | 0;
+		var direction = h.getDirection();
+		var topY = 0;
+		var bottomY = this.height;
+		var beamY;
+		if(direction == alphatab.rendering.utils.BeamDirection.Down) beamY = bottomY; else beamY = topY;
+		canvas.setColor(this.stave.staveGroup.layout.renderer.renderingResources.mainGlyphColor);
+		canvas.beginPath();
+		canvas.moveTo(cx + this.x + beatLineX | 0,cy + this.y + topY);
+		canvas.lineTo(cx + this.x + beatLineX | 0,cy + this.y + bottomY);
+		canvas.stroke();
+		var gx = beatLineX | 0;
+		var glyph = new alphatab.rendering.glyphs.BeamGlyph(gx,beamY,beat.duration,direction,false);
+		glyph.renderer = this;
+		glyph.doLayout();
+		glyph.paint(cx + this.x,cy + this.y,canvas);
+	}
+	,isFullBarJoin: function(a,b,barIndex) {
+		return alphatab.model.ModelUtils.getDurationIndex(a.duration) - 2 - barIndex > 0 && alphatab.model.ModelUtils.getDurationIndex(b.duration) - 2 - barIndex > 0;
+	}
+	,__class__: alphatab.rendering.RhythmBarRenderer
+});
 alphatab.rendering.ScoreBarRenderer = function(bar) {
 	alphatab.rendering.GroupedBarRenderer.call(this,bar);
 	this.accidentalHelper = new alphatab.rendering.utils.AccidentalHelper();
@@ -7342,6 +7506,7 @@ alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.Grouped
 		return 0;
 	}
 	,doLayout: function() {
+		this._helpers = this.stave.staveGroup.helpers.helpers.get(this.bar.track.index).get(this.bar.index);
 		alphatab.rendering.GroupedBarRenderer.prototype.doLayout.call(this);
 		this.height = (11 * this.stave.staveGroup.layout.renderer.settings.scale * (this.bar.track.tuning.length - 1) | 0) + this.getNumberOverflow() * 2;
 		if(this.index == 0) {
@@ -7372,6 +7537,7 @@ alphatab.rendering.TabBarRenderer.prototype = $extend(alphatab.rendering.Grouped
 			var container = new alphatab.rendering.glyphs.TabBeatContainerGlyph(b);
 			container.preNotes = new alphatab.rendering.glyphs.TabBeatPreNotesGlyph();
 			container.onNotes = new alphatab.rendering.glyphs.TabBeatGlyph();
+			(js.Boot.__cast(container.onNotes , alphatab.rendering.glyphs.TabBeatGlyph)).beamingHelper = this._helpers.beamHelperLookup[v.index].get(b.index);
 			container.postNotes = new alphatab.rendering.glyphs.TabBeatPostNotesGlyph();
 			this.addBeatGlyph(container);
 		}
@@ -9165,24 +9331,25 @@ alphatab.rendering.glyphs.ScoreNoteChordGlyph.prototype = $extend(alphatab.rende
 			e.doLayout();
 		}
 		if(this.beat.tremoloSpeed != null) {
+			var direction = this.beamingHelper.getDirection();
 			var offset;
 			var baseNote;
-			if(this.beamingHelper.getDirection() == alphatab.rendering.utils.BeamDirection.Up) baseNote = this.minNote; else baseNote = this.maxNote;
+			if(direction == alphatab.rendering.utils.BeamDirection.Up) baseNote = this.minNote; else baseNote = this.maxNote;
 			var tremoloX;
-			if(this.beamingHelper.getDirection() == alphatab.rendering.utils.BeamDirection.Up) tremoloX = displacedX; else tremoloX = 0;
+			if(direction == alphatab.rendering.utils.BeamDirection.Up) tremoloX = displacedX; else tremoloX = 0;
 			var _g = this.beat.tremoloSpeed;
 			switch(_g[1]) {
 			case 5:
-				if(this.beamingHelper.getDirection() == alphatab.rendering.utils.BeamDirection.Up) offset = -15; else offset = 10;
+				if(direction == alphatab.rendering.utils.BeamDirection.Up) offset = -15; else offset = 10;
 				break;
 			case 4:
-				if(this.beamingHelper.getDirection() == alphatab.rendering.utils.BeamDirection.Up) offset = -12; else offset = 10;
+				if(direction == alphatab.rendering.utils.BeamDirection.Up) offset = -12; else offset = 10;
 				break;
 			case 3:
-				if(this.beamingHelper.getDirection() == alphatab.rendering.utils.BeamDirection.Up) offset = -10; else offset = 10;
+				if(direction == alphatab.rendering.utils.BeamDirection.Up) offset = -10; else offset = 10;
 				break;
 			default:
-				if(this.beamingHelper.getDirection() == alphatab.rendering.utils.BeamDirection.Up) offset = -15; else offset = 15;
+				if(direction == alphatab.rendering.utils.BeamDirection.Up) offset = -15; else offset = 15;
 			}
 			this._tremoloPicking = new alphatab.rendering.glyphs.TremoloPickingGlyph(tremoloX,baseNote.glyph.y + (offset * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0),this.beat.tremoloSpeed);
 			this._tremoloPicking.renderer = this.renderer;
@@ -9439,6 +9606,7 @@ alphatab.rendering.glyphs.TabBeatGlyph = function() {
 	alphatab.rendering.glyphs.BeatGlyphBase.call(this);
 };
 alphatab.rendering.glyphs.TabBeatGlyph.__name__ = true;
+alphatab.rendering.glyphs.TabBeatGlyph.__interfaces__ = [alphatab.rendering.glyphs.ISupportsFinalize];
 alphatab.rendering.glyphs.TabBeatGlyph.__super__ = alphatab.rendering.glyphs.BeatGlyphBase;
 alphatab.rendering.glyphs.TabBeatGlyph.prototype = $extend(alphatab.rendering.glyphs.BeatGlyphBase.prototype,{
 	doLayout: function() {
@@ -9446,6 +9614,7 @@ alphatab.rendering.glyphs.TabBeatGlyph.prototype = $extend(alphatab.rendering.gl
 		if(!this.container.beat.isRest()) {
 			this.noteNumbers = new alphatab.rendering.glyphs.TabNoteChordGlyph(0,0,this.container.beat.graceType != alphatab.model.GraceType.None);
 			this.noteNumbers.beat = this.container.beat;
+			this.noteNumbers.beamingHelper = this.beamingHelper;
 			this.noteLoop(function(n) {
 				_g.createNoteGlyph(n);
 			});
@@ -9465,6 +9634,13 @@ alphatab.rendering.glyphs.TabBeatGlyph.prototype = $extend(alphatab.rendering.gl
 			w += g.width;
 		}
 		this.width = w;
+	}
+	,finalizeGlyph: function(layout) {
+		if(!this.container.beat.isRest()) this.noteNumbers.updateBeamingHelper(this.container.x + this.x);
+	}
+	,applyGlyphSpacing: function(spacing) {
+		alphatab.rendering.glyphs.BeatGlyphBase.prototype.applyGlyphSpacing.call(this,spacing);
+		if(!this.container.beat.isRest()) this.noteNumbers.updateBeamingHelper(this.container.x + this.x);
 	}
 	,createNoteGlyph: function(n) {
 		var isGrace = this.container.beat.graceType != alphatab.model.GraceType.None;
@@ -9703,6 +9879,7 @@ alphatab.rendering.glyphs.TabNoteChordGlyph.prototype = $extend(alphatab.renderi
 			effectY += effectSpacing;
 			g.doLayout();
 		}
+		this._centerX = 0;
 		this.width = w;
 	}
 	,addNoteGlyph: function(noteGlyph,note) {
@@ -9730,6 +9907,9 @@ alphatab.rendering.glyphs.TabNoteChordGlyph.prototype = $extend(alphatab.renderi
 			var g = $it0.next();
 			g.paint(cx + this.x,cy + this.y,canvas);
 		}
+	}
+	,updateBeamingHelper: function(cx) {
+		if(!this.beamingHelper._beatLineXPositions.exists(this.beat.index)) this.beamingHelper.registerBeatLineX(this.beat,cx + this.x + this._centerX,cx + this.x + this._centerX);
 	}
 	,__class__: alphatab.rendering.glyphs.TabNoteChordGlyph
 });
@@ -10728,7 +10908,6 @@ alphatab.rendering.staves.StaveGroup.prototype = {
 	}
 	,__class__: alphatab.rendering.staves.StaveGroup
 };
-if(!alphatab.rendering.utils) alphatab.rendering.utils = {};
 alphatab.rendering.utils.AccidentalHelper = function() {
 	this._registeredAccidentals = new haxe.ds.IntMap();
 };
@@ -10832,13 +11011,6 @@ alphatab.rendering.utils.BarHelpersGroup.prototype = {
 	}
 	,__class__: alphatab.rendering.utils.BarHelpersGroup
 };
-alphatab.rendering.utils.BeamDirection = { __ename__ : true, __constructs__ : ["Up","Down"] };
-alphatab.rendering.utils.BeamDirection.Up = ["Up",0];
-alphatab.rendering.utils.BeamDirection.Up.toString = $estr;
-alphatab.rendering.utils.BeamDirection.Up.__enum__ = alphatab.rendering.utils.BeamDirection;
-alphatab.rendering.utils.BeamDirection.Down = ["Down",1];
-alphatab.rendering.utils.BeamDirection.Down.toString = $estr;
-alphatab.rendering.utils.BeamDirection.Down.__enum__ = alphatab.rendering.utils.BeamDirection;
 alphatab.rendering.utils.BeamBarType = { __ename__ : true, __constructs__ : ["Full","PartLeft","PartRight"] };
 alphatab.rendering.utils.BeamBarType.Full = ["Full",0];
 alphatab.rendering.utils.BeamBarType.Full.toString = $estr;
@@ -10895,6 +11067,9 @@ alphatab.rendering.utils.BeamingHelper.prototype = {
 			if(this.getDirection() == alphatab.rendering.utils.BeamDirection.Up) return this._beatLineXPositions.get(beat.index).up; else return this._beatLineXPositions.get(beat.index).down;
 		}
 		return 0;
+	}
+	,hasBeatLineX: function(beat) {
+		return this._beatLineXPositions.exists(beat.index);
 	}
 	,registerBeatLineX: function(beat,up,down) {
 		this._beatLineXPositions.set(beat.index,{ up : up, down : down});
@@ -11802,6 +11977,12 @@ alphatab.Environment.staveFactories.set("tab",function(l) {
 });
 alphatab.Environment.staveFactories.set("pick-stroke",function(l) {
 	return new alphatab.rendering.EffectBarRendererFactory(new alphatab.rendering.effects.PickStrokeEffectInfo());
+});
+alphatab.Environment.staveFactories.set("rhythm-up",function(l) {
+	return new alphatab.rendering.RhythmBarRendererFactory(alphatab.rendering.utils.BeamDirection.Up);
+});
+alphatab.Environment.staveFactories.set("rhythm-down",function(l) {
+	return new alphatab.rendering.RhythmBarRendererFactory(alphatab.rendering.utils.BeamDirection.Down);
 });
 alphatab.platform.model.Font.StylePlain = 0;
 alphatab.platform.model.Font.StyleBold = 1;

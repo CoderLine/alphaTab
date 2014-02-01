@@ -358,6 +358,28 @@
     <div id="tabs" class="group">
         <h1>Guitar Tabs</h1>
         
+        <h2>Rhythm </h2>
+        
+        <p>
+            If you only display guitar tablatures, it might be interesting to add
+            a rhythm stave to show the durations. You can do this either above or below
+            the tablature.
+        </p>
+        
+        <div id="alphaTabRhythmDown" data-file="files/features/Chords.gp5"></div>
+        <script type="text/javascript-lazy">
+            $('#alphaTabRhythmDown').alphaTab({
+                staves: ['rhythm-down', 'tab']
+            });
+        </script>      
+        
+        <div id="alphaTabRhythmUp" data-file="files/features/Chords.gp5"></div>
+        <script type="text/javascript-lazy">
+            $('#alphaTabRhythmUp').alphaTab({
+                staves: ['tab', 'rhythm-up']
+            });
+        </script>      
+        
         <h2>String Variations</h2>
         
         <p>

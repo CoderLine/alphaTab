@@ -167,6 +167,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
         _helpers = stave.staveGroup.helpers.helpers.get(bar.track.index).get(bar.index);
         super.doLayout();
         
+        
         height = Std.int(getLineOffset() * 4) + getTopPadding() + getBottomPadding();
         if (index == 0)
         {

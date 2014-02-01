@@ -243,7 +243,6 @@ class EffectBarRenderer extends GroupedBarRenderer
         _uniqueEffectGlyphs.push(new Array<Glyph>());
         createVoiceGlyphs(bar.voices[0]);
 #end
-
     }
     
     private function createVoiceGlyphs(v:Voice)

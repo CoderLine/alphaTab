@@ -36,6 +36,7 @@ import alphatab.rendering.glyphs.TabBeatGlyph;
 import alphatab.rendering.glyphs.TabBeatPreNotesGlyph;
 import alphatab.rendering.glyphs.TabBeatPostNotesGlyph;
 import alphatab.rendering.glyphs.TabClefGlyph;
+import alphatab.rendering.utils.BarHelpersGroup.BarHelpers;
 import haxe.ds.IntMap;
 
 /**
@@ -45,6 +46,8 @@ class TabBarRenderer extends GroupedBarRenderer
 {
     public static inline var LineSpacing = 10;
     
+    private var _helpers:BarHelpers;
+
     public function new(bar:Bar) 
     {
         super(bar);
@@ -87,6 +90,7 @@ class TabBarRenderer extends GroupedBarRenderer
     
     public override function doLayout()
     {
+        _helpers = stave.staveGroup.helpers.helpers.get(bar.track.index).get(bar.index);        
         super.doLayout();
         height = Std.int(getLineOffset() * (bar.track.tuning.length - 1)) + (getNumberOverflow() * 2);
         if (index == 0)
@@ -136,6 +140,7 @@ class TabBarRenderer extends GroupedBarRenderer
             var container = new TabBeatContainerGlyph(b);
             container.preNotes = new TabBeatPreNotesGlyph();
             container.onNotes = new TabBeatGlyph();
+            cast(container.onNotes, TabBeatGlyph).beamingHelper = _helpers.beamHelperLookup[v.index].get(b.index);
             container.postNotes = new TabBeatPostNotesGlyph();
             addBeatGlyph(container);
         }

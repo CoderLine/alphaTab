@@ -125,7 +125,7 @@ class BeamingHelper
     
     public function getBeatLineX(beat:Beat)
     {
-        if (_beatLineXPositions.exists(beat.index)) 
+        if (hasBeatLineX(beat))
         {
             if (getDirection() == BeamDirection.Up)
             {
@@ -137,6 +137,11 @@ class BeamingHelper
             }
         }
         return 0;
+    }
+    
+    public inline function hasBeatLineX(beat:Beat)
+    {
+        return _beatLineXPositions.exists(beat.index);
     }
     
     public function registerBeatLineX(beat:Beat, up:Int, down:Int)

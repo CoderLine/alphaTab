@@ -200,15 +200,16 @@ class ScoreNoteChordGlyph extends Glyph
         
         if (beat.isTremolo())
         {
+            var direction = beamingHelper.getDirection();
             var offset:Int;
-            var baseNote = beamingHelper.getDirection() == Up ? minNote : maxNote;
-            var tremoloX = beamingHelper.getDirection() == Up ? displacedX : 0;
+            var baseNote = direction == Up ? minNote : maxNote;
+            var tremoloX = direction == Up ? displacedX : 0;
             switch(beat.tremoloSpeed)
             {
-                case ThirtySecond: offset = beamingHelper.getDirection() == Up ? -15 : 10;
-                case Sixteenth: offset = beamingHelper.getDirection() == Up ? -12 : 10;
-                case Eighth: offset = beamingHelper.getDirection() == Up ? -10 : 10;
-                default: offset = beamingHelper.getDirection() == Up ? -15 : 15;
+                case ThirtySecond: offset = direction == Up ? -15 : 10;
+                case Sixteenth: offset = direction == Up ? -12 : 10;
+                case Eighth: offset = direction == Up ? -10 : 10;
+                default: offset = direction == Up ? -15 : 15;
             }
             
             _tremoloPicking = new TremoloPickingGlyph(tremoloX, baseNote.glyph.y + Std.int(offset * getScale()), beat.tremoloSpeed);

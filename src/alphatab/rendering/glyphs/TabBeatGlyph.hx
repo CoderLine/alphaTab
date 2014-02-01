@@ -24,11 +24,15 @@ import alphatab.model.Note;
 import alphatab.model.SlideType;
 import alphatab.platform.ICanvas;
 import alphatab.rendering.Glyph;
+import alphatab.rendering.layout.ScoreLayout;
 import alphatab.rendering.TabBarRenderer;
+import alphatab.rendering.utils.BeamingHelper;
 
 class TabBeatGlyph extends BeatGlyphBase
+                    implements ISupportsFinalize
 {
     public var noteNumbers : TabNoteChordGlyph;
+    public var beamingHelper:BeamingHelper;
 
     public function new() 
     {
@@ -44,6 +48,7 @@ class TabBeatGlyph extends BeatGlyphBase
             // Note numbers
             noteNumbers = new TabNoteChordGlyph(0, 0, container.beat.graceType != GraceType.None);
             noteNumbers.beat = container.beat;
+            noteNumbers.beamingHelper = beamingHelper;
             noteLoop( function(n) {
                 createNoteGlyph(n);
             });
@@ -75,6 +80,24 @@ class TabBeatGlyph extends BeatGlyphBase
         }    
         width = w;
     } 
+    
+    public function finalizeGlyph(layout:ScoreLayout)
+    {
+        if (!container.beat.isRest()) 
+        {
+            noteNumbers.updateBeamingHelper(container.x + x);
+        }
+    }
+    
+    public override function applyGlyphSpacing(spacing:Int):Void 
+    {
+        super.applyGlyphSpacing(spacing);
+        // TODO: we need to tell the beaming helper the position of rest beats
+        if (!container.beat.isRest()) 
+        {
+            noteNumbers.updateBeamingHelper(container.x + x);
+        }
+    }    
     
     private function createNoteGlyph(n:Note) 
     {

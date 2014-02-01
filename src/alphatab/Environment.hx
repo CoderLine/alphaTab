@@ -42,9 +42,11 @@ import alphatab.rendering.glyphs.effects.DummyEffectGlyph;
 import alphatab.rendering.layout.HorizontalScreenLayout;
 import alphatab.rendering.layout.PageViewLayout;
 import alphatab.rendering.layout.ScoreLayout;
+import alphatab.rendering.RhythmBarRendererFactory;
 import alphatab.rendering.ScoreBarRendererFactory;
 import alphatab.rendering.ScoreRenderer;
 import alphatab.rendering.TabBarRendererFactory;
+import alphatab.rendering.utils.BeamingHelper.BeamDirection;
 import haxe.ds.StringMap;
 
 /**
@@ -120,6 +122,8 @@ class Environment
         staveFactories.set("palm-mute", function(l) { return new EffectBarRendererFactory(new PalmMuteEffectInfo()); }); 
         staveFactories.set("tab", function(l) { return new TabBarRendererFactory(); } ); 
         staveFactories.set("pick-stroke", function(l) { return new EffectBarRendererFactory(new PickStrokeEffectInfo()); }); 
+        staveFactories.set("rhythm-up", function(l) { return new RhythmBarRendererFactory(BeamDirection.Up); }); 
+        staveFactories.set("rhythm-down", function(l) { return new RhythmBarRendererFactory(BeamDirection.Down); }); 
         // staveFactories.set("fingering", function(l) { return new EffectBarRendererFactory(new FingeringEffectInfo()); });   
     }
 }
