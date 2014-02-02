@@ -16,6 +16,8 @@
  * License along with this library.
  */
 package alphatab.audio.model;
+import haxe.io.BytesOutput;
+import haxe.io.Output;
 
 /**
  * Represents a single midi track. A midi track contains
@@ -142,5 +144,26 @@ class MidiTrack
                 }
             }
         }
+    }
+    
+    public function writeTo(out:Output)
+    {
+        out.bigEndian = true;
+        
+        // build track data first
+        var trackData = new BytesOutput();
+        var current = firstEvent;
+        while (current != null)
+        {
+            current.writeTo(trackData);
+            current = current.nextEvent;
+        }
+        
+        // magic number "MTrk" (0x4D54726B)
+        out.writeInt32(0x4D54726B);
+        // size as integer
+        var bytes = trackData.getBytes();
+        out.writeInt32(bytes.length);
+        out.write(bytes);
     }
 }

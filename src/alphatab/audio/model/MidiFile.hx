@@ -16,6 +16,8 @@
  * License along with this library.
  */
 package alphatab.audio.model;
+import alphatab.audio.MidiUtils;
+import haxe.io.Output;
 
 /**
  * A midi file consists of multiple tracks including a
@@ -48,5 +50,28 @@ class MidiFile
         track.file = this;
         tracks.push(track);
         return track;
+    }
+    
+    public function writeTo(out:Output)
+    {
+        out.bigEndian = true;
+        
+        // magic number "MThd" (0x4D546864)
+        out.writeInt32(0x4D546864);
+        
+        // Header Length 6 (0x00000006)
+        out.writeInt32(6);
+        
+        // format 
+        out.writeInt16(1);
+        
+        // number of tracks
+        out.writeInt16(tracks.length);
+        out.writeInt16(MidiUtils.QuarterTime);
+
+        for (t in tracks)
+        {
+            t.writeTo(out);            
+        }
     }
 }

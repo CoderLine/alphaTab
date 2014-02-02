@@ -118,21 +118,25 @@ class MidiFileHandler implements IMidiFileHandler
         meta.push(0xFF);
         meta.push(metaType & 0xFF);
 
+        // write var int 
         var v = data.length;
+        var n = 0;
         var array = [0, 0, 0, 0];
-        var count = 0;
-        
-        array[0] = (v & 0x7F) & 0xFF;
-        v = v >> 7;
-        
-        while (v > 0)
+        do
         {
-            count++;
-            array[count] = ((v & 0x7F) | 0x80) & 0xFF;
-            v = v >> 7;
+            array[n++] = (v & 0x7F) & 0xFF;
+            v >>= 7;
+        } while (v > 0);
+        
+        while (n > 0)
+        {
+            n--;
+            if (n > 0)
+                meta.push((array[n] | 0x80) & 0xFF);
+            else    
+                meta.push(array[n]);
         }
         
-        meta = meta.concat(array);
         meta = meta.concat(data); 
         
         return MidiMessage.fromArray(meta);

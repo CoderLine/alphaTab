@@ -2084,6 +2084,17 @@ alphatab.audio.generator.MidiFileGenerator.generateMidiFile = function(score) {
 	generator.generate();
 	return midiFile;
 };
+alphatab.audio.generator.MidiFileGenerator.toChannelShort = function(data) {
+	var value;
+	var x = Math.max(-32768,Math.min(32767,data * 8 - 1));
+	value = x | 0;
+	return (function($this) {
+		var $r;
+		var x = Math.max(value,-1);
+		$r = x | 0;
+		return $r;
+	}(this)) + 1;
+};
 alphatab.audio.generator.MidiFileGenerator.prototype = {
 	generate: function() {
 		var _g = 0;
@@ -2117,8 +2128,10 @@ alphatab.audio.generator.MidiFileGenerator.prototype = {
 		if(track.playbackInfo.primaryChannel != track.playbackInfo.secondaryChannel) this.generateChannel(track,track.playbackInfo.secondaryChannel,track.playbackInfo);
 	}
 	,generateChannel: function(track,channel,playbackInfo) {
-		this._handler.addControlChange(track.index,0,channel,7,playbackInfo.volume);
-		this._handler.addControlChange(track.index,0,channel,10,playbackInfo.balance);
+		var volume = alphatab.audio.generator.MidiFileGenerator.toChannelShort(playbackInfo.volume);
+		var balance = alphatab.audio.generator.MidiFileGenerator.toChannelShort(playbackInfo.balance);
+		this._handler.addControlChange(track.index,0,channel,7,volume);
+		this._handler.addControlChange(track.index,0,channel,10,balance);
 		this._handler.addControlChange(track.index,0,channel,11,127);
 		this._handler.addProgramChange(track.index,0,channel,playbackInfo.program);
 	}
@@ -2385,16 +2398,16 @@ alphatab.audio.generator.MidiFileHandler.buildMetaMessage = function(metaType,da
 	meta.push(255);
 	meta.push(metaType & 255);
 	var v = data.length;
+	var n = 0;
 	var array = [0,0,0,0];
-	var count = 0;
-	array[0] = v & 127 & 255;
-	v = v >> 7;
-	while(v > 0) {
-		count++;
-		array[count] = (v & 127 | 128) & 255;
-		v = v >> 7;
+	do {
+		array[n++] = v & 127 & 255;
+		v >>= 7;
+	} while(v > 0);
+	while(n > 0) {
+		n--;
+		if(n > 0) meta.push((array[n] | 128) & 255); else meta.push(array[n]);
 	}
-	meta = meta.concat(array);
 	meta = meta.concat(data);
 	return alphatab.audio.model.MidiMessage.fromArray(meta);
 };
@@ -2499,6 +2512,23 @@ alphatab.audio.model.MidiEvent.prototype = {
 	getDeltaTicks: function() {
 		if(this.previousEvent == null) return 0; else return this.tick - this.previousEvent.tick;
 	}
+	,writeTo: function(out) {
+		this.writeVariableInt(out,this.getDeltaTicks());
+		this.message.writeTo(out);
+	}
+	,writeVariableInt: function(out,value) {
+		var v = value;
+		var array = [0,0,0,0];
+		var n = 0;
+		do {
+			array[n++] = v & 127 & 255;
+			v >>= 7;
+		} while(v > 0);
+		while(n > 0) {
+			n--;
+			if(n > 0) out.writeByte(array[n] | 128); else out.writeByte(array[n]);
+		}
+	}
 	,__class__: alphatab.audio.model.MidiEvent
 };
 alphatab.audio.model.MidiFile = function() {
@@ -2512,6 +2542,21 @@ alphatab.audio.model.MidiFile.prototype = {
 		track.file = this;
 		this.tracks.push(track);
 		return track;
+	}
+	,writeTo: function(out) {
+		out.set_bigEndian(true);
+		out.writeInt32(1297377380);
+		out.writeInt32(6);
+		out.writeInt16(1);
+		out.writeInt16(this.tracks.length);
+		out.writeInt16(960);
+		var _g = 0;
+		var _g1 = this.tracks;
+		while(_g < _g1.length) {
+			var t = _g1[_g];
+			++_g;
+			t.writeTo(out);
+		}
 	}
 	,__class__: alphatab.audio.model.MidiFile
 };
@@ -2530,7 +2575,10 @@ alphatab.audio.model.MidiMessage.fromArray = function(data) {
 	return new alphatab.audio.model.MidiMessage(bytes);
 };
 alphatab.audio.model.MidiMessage.prototype = {
-	__class__: alphatab.audio.model.MidiMessage
+	writeTo: function(out) {
+		out.write(this.data);
+	}
+	,__class__: alphatab.audio.model.MidiMessage
 };
 alphatab.audio.model.MidiTrack = function() {
 };
@@ -2572,6 +2620,19 @@ alphatab.audio.model.MidiTrack.prototype = {
 				if(previous != null) previous.nextEvent = event; else this.firstEvent = event;
 			}
 		}
+	}
+	,writeTo: function(out) {
+		out.set_bigEndian(true);
+		var trackData = new haxe.io.BytesOutput();
+		var current = this.firstEvent;
+		while(current != null) {
+			current.writeTo(trackData);
+			current = current.nextEvent;
+		}
+		out.writeInt32(1297379947);
+		var bytes = trackData.getBytes();
+		out.writeInt32(bytes.length);
+		out.write(bytes);
 	}
 	,__class__: alphatab.audio.model.MidiTrack
 };
@@ -11652,7 +11713,7 @@ alphatab.rendering.utils.BeamingHelper.prototype = {
 	}
 	,checkNote: function(note) {
 		var value = note.fret + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1];
-		if(this.firstMinNote == null || note.beat.index < this.firstMinNote.beat.index) this.firstMinNote = note; else if(note.beat.index == this.firstMinNote.beat.index) {
+		if(this.firstMinNote == null || note.beat.index < this.firstMinNote.beat.index) this.firstMinNote = note; else if(note.beat.start == this.firstMinNote.beat.start) {
 			if(note.fret + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1] < (function($this) {
 				var $r;
 				var _this = $this.firstMinNote;
@@ -11660,7 +11721,7 @@ alphatab.rendering.utils.BeamingHelper.prototype = {
 				return $r;
 			}(this))) this.firstMinNote = note;
 		}
-		if(this.firstMaxNote == null || note.beat.index < this.firstMaxNote.beat.index) this.firstMaxNote = note; else if(note.beat.index == this.firstMaxNote.beat.index) {
+		if(this.firstMaxNote == null || note.beat.start < this.firstMaxNote.beat.start) this.firstMaxNote = note; else if(note.beat.start == this.firstMaxNote.beat.start) {
 			if(note.fret + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1] > (function($this) {
 				var $r;
 				var _this = $this.firstMaxNote;
@@ -11668,7 +11729,7 @@ alphatab.rendering.utils.BeamingHelper.prototype = {
 				return $r;
 			}(this))) this.firstMaxNote = note;
 		}
-		if(this.lastMinNote == null || note.beat.index > this.lastMinNote.beat.index) this.lastMinNote = note; else if(note.beat.index == this.lastMinNote.beat.index) {
+		if(this.lastMinNote == null || note.beat.start > this.lastMinNote.beat.start) this.lastMinNote = note; else if(note.beat.start == this.lastMinNote.beat.start) {
 			if(note.fret + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1] < (function($this) {
 				var $r;
 				var _this = $this.lastMinNote;
@@ -11676,7 +11737,7 @@ alphatab.rendering.utils.BeamingHelper.prototype = {
 				return $r;
 			}(this))) this.lastMinNote = note;
 		}
-		if(this.lastMaxNote == null || note.beat.index > this.lastMaxNote.beat.index) this.lastMaxNote = note; else if(note.beat.index == this.lastMaxNote.beat.index) {
+		if(this.lastMaxNote == null || note.beat.start > this.lastMaxNote.beat.start) this.lastMaxNote = note; else if(note.beat.start == this.lastMaxNote.beat.start) {
 			if(note.fret + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1] > (function($this) {
 				var $r;
 				var _this = $this.lastMaxNote;
@@ -12020,11 +12081,52 @@ haxe.io.Output.prototype = {
 		}
 		return len;
 	}
+	,set_bigEndian: function(b) {
+		this.bigEndian = b;
+		return b;
+	}
+	,write: function(s) {
+		var l = s.length;
+		var p = 0;
+		while(l > 0) {
+			var k = this.writeBytes(s,p,l);
+			if(k == 0) throw haxe.io.Error.Blocked;
+			p += k;
+			l -= k;
+		}
+	}
 	,writeFullBytes: function(s,pos,len) {
 		while(len > 0) {
 			var k = this.writeBytes(s,pos,len);
 			pos += k;
 			len -= k;
+		}
+	}
+	,writeInt16: function(x) {
+		if(x < -32768 || x >= 32768) throw haxe.io.Error.Overflow;
+		this.writeUInt16(x & 65535);
+	}
+	,writeUInt16: function(x) {
+		if(x < 0 || x >= 65536) throw haxe.io.Error.Overflow;
+		if(this.bigEndian) {
+			this.writeByte(x >> 8);
+			this.writeByte(x & 255);
+		} else {
+			this.writeByte(x & 255);
+			this.writeByte(x >> 8);
+		}
+	}
+	,writeInt32: function(x) {
+		if(this.bigEndian) {
+			this.writeByte(x >>> 24);
+			this.writeByte(x >> 16 & 255);
+			this.writeByte(x >> 8 & 255);
+			this.writeByte(x & 255);
+		} else {
+			this.writeByte(x & 255);
+			this.writeByte(x >> 8 & 255);
+			this.writeByte(x >> 16 & 255);
+			this.writeByte(x >>> 24);
 		}
 	}
 	,writeString: function(s) {
@@ -12033,6 +12135,33 @@ haxe.io.Output.prototype = {
 	}
 	,__class__: haxe.io.Output
 };
+haxe.io.BytesOutput = function() {
+	this.b = new haxe.io.BytesBuffer();
+};
+haxe.io.BytesOutput.__name__ = true;
+haxe.io.BytesOutput.__super__ = haxe.io.Output;
+haxe.io.BytesOutput.prototype = $extend(haxe.io.Output.prototype,{
+	writeByte: function(c) {
+		this.b.b.push(c);
+	}
+	,writeBytes: function(buf,pos,len) {
+		var _this = this.b;
+		if(pos < 0 || len < 0 || pos + len > buf.length) throw haxe.io.Error.OutsideBounds;
+		var b1 = _this.b;
+		var b2 = buf.b;
+		var _g1 = pos;
+		var _g = pos + len;
+		while(_g1 < _g) {
+			var i = _g1++;
+			_this.b.push(b2[i]);
+		}
+		return len;
+	}
+	,getBytes: function() {
+		return this.b.getBytes();
+	}
+	,__class__: haxe.io.BytesOutput
+});
 haxe.io.Eof = function() {
 };
 haxe.io.Eof.__name__ = true;

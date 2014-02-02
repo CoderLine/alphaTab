@@ -26,7 +26,6 @@ import alphatab.importer.ScoreLoader;
 import alphatab.rendering.ScoreRenderer;
 
 import alphatab.audio.generator.MidiFileGenerator;
-// import alphatab.audio.player.MidiPlayer;
 
 /**
  * This is the applications main class. (required by Haxe)

@@ -120,10 +120,18 @@ class MidiFileGenerator
     
     private function generateChannel(track:Track, channel:Int, playbackInfo:PlaybackInformation)
     {
-        _handler.addControlChange(track.index, 0, channel, MidiController.Volume, playbackInfo.volume);
-        _handler.addControlChange(track.index, 0, channel, MidiController.Balance, playbackInfo.balance);
+        var volume = toChannelShort(playbackInfo.volume);
+        var balance = toChannelShort(playbackInfo.balance);
+        _handler.addControlChange(track.index, 0, channel, MidiController.Volume, volume);
+        _handler.addControlChange(track.index, 0, channel, MidiController.Balance, balance);
         _handler.addControlChange(track.index, 0, channel, MidiController.Expression, 127); 
         _handler.addProgramChange(track.index, 0, channel, playbackInfo.program);
+    }
+    
+    private static function toChannelShort(data:Int): Int
+    {
+        var value:Int = Std.int(Math.max(-32768, Math.min(32767, (data*8)-1)));
+        return Std.int(Math.max(value, -1)) + 1;
     }
     
     //

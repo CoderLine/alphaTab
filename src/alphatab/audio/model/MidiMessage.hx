@@ -18,6 +18,7 @@
 package alphatab.audio.model;
 
 import haxe.io.Bytes;
+import haxe.io.Output;
 
 /**
  * Represents a midi message. 
@@ -34,6 +35,11 @@ class MidiMessage
     public function new(data:Bytes) 
     {
         this.data = data;
+    }
+    
+    public function writeTo(out:Output)
+    {
+        out.write(data);
     }
     
     public static function fromArray(data:Array<Int>)

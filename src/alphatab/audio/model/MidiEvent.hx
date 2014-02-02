@@ -16,6 +16,7 @@
  * License along with this library.
  */
 package alphatab.audio.model;
+import haxe.io.Output;
 
 /**
  * A midi event is a timed midi message. 
@@ -37,5 +38,42 @@ class MidiEvent
     public function getDeltaTicks()
     {
         return previousEvent == null ? 0 : tick - previousEvent.tick;
+    }
+    
+    #if (cs || java)
+    
+    public function writeToFile(path:String)
+    {
+        writeTo(sys.io.File.write(path, true));
+    }
+    
+    #end
+    
+    public function writeTo(out:Output)
+    {
+        writeVariableInt(out, getDeltaTicks());
+        message.writeTo(out);
+    }
+    
+    private function writeVariableInt(out:Output, value:Int)
+    {
+        var v = value;
+        var array = [0, 0, 0, 0];
+        
+        var n = 0;
+        do 
+        {
+            array[n++] = (v & 0x7F) & 0xFF;
+            v >>= 7;
+        } while (v > 0);
+        
+        while (n > 0)
+        {
+            n--;
+            if (n > 0)
+                out.writeByte(array[n] | 0x80);
+            else    
+                out.writeByte(array[n]);
+        }
     }
 }
