@@ -268,7 +268,7 @@
         }
         else
         {
-            return context.renderer.track;
+            return context.renderer.tracks;
         }
     }
     
@@ -278,7 +278,9 @@
     function score() 
     {
         var context = $(this).data('alphaTab');
-        return context.renderer.track.score;
+        if(context.renderer.tracks == null || context.renderer.tracks.length == 0)
+            return null;
+        return context.renderer.tracks[0].score;
     }
     
     /**

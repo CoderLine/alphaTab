@@ -216,7 +216,7 @@ class BeamingHelper
         {
             firstMinNote = note;
         }
-        else if (note.beat.index == firstMinNote.beat.index)
+        else if (note.beat.start == firstMinNote.beat.start)
         {
             if (note.realValue() < firstMinNote.realValue())
             {
@@ -225,11 +225,11 @@ class BeamingHelper
         }
         
         // detect the biggest note which is at the beginning of this group
-        if (firstMaxNote == null || note.beat.index < firstMaxNote.beat.index)
+        if (firstMaxNote == null || note.beat.start < firstMaxNote.beat.start)
         {
             firstMaxNote = note;
         }
-        else if (note.beat.index == firstMaxNote.beat.index)
+        else if (note.beat.start == firstMaxNote.beat.start)
         {
             if (note.realValue() > firstMaxNote.realValue())
             {
@@ -238,11 +238,11 @@ class BeamingHelper
         }
 
         // detect the smallest note which is at the end of this group
-        if (lastMinNote == null || note.beat.index > lastMinNote.beat.index)
+        if (lastMinNote == null || note.beat.start > lastMinNote.beat.start)
         {
             lastMinNote = note;
         }
-        else if (note.beat.index == lastMinNote.beat.index)
+        else if (note.beat.start == lastMinNote.beat.start)
         {
             if (note.realValue() < lastMinNote.realValue())
             {
@@ -250,11 +250,11 @@ class BeamingHelper
             }
         }
         // detect the biggest note which is at the end of this group
-        if (lastMaxNote == null || note.beat.index > lastMaxNote.beat.index)
+        if (lastMaxNote == null || note.beat.start > lastMaxNote.beat.start)
         {
             lastMaxNote = note;
         }
-        else if (note.beat.index == lastMaxNote.beat.index)
+        else if (note.beat.start == lastMaxNote.beat.start)
         {
             if (note.realValue() > lastMaxNote.realValue())
             {

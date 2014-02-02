@@ -67,6 +67,16 @@ Lambda.has = function(it,elt) {
 	}
 	return false;
 };
+Lambda.indexOf = function(it,v) {
+	var i = 0;
+	var $it0 = $iterator(it)();
+	while( $it0.hasNext() ) {
+		var v2 = $it0.next();
+		if(v == v2) return i;
+		i++;
+	}
+	return -1;
+};
 var IMap = function() { };
 IMap.__name__ = true;
 Math.__name__ = true;
@@ -81,6 +91,9 @@ Reflect.fields = function(o) {
 		}
 	}
 	return a;
+};
+Reflect.isFunction = function(f) {
+	return typeof(f) == "function" && !(f.__name__ || f.__ename__);
 };
 var Std = function() { };
 Std.__name__ = true;
@@ -143,6 +156,26 @@ StringTools.hex = function(n,digits) {
 	} while(n > 0);
 	if(digits != null) while(s.length < digits) s = "0" + s;
 	return s;
+};
+var Type = function() { };
+Type.__name__ = true;
+Type.allEnums = function(e) {
+	var all = [];
+	var cst = e.__constructs__;
+	var _g = 0;
+	while(_g < cst.length) {
+		var c = cst[_g];
+		++_g;
+		var v;
+		var v1 = null;
+		try {
+			v1 = e[c];
+		} catch( e1 ) {
+		}
+		v = v1;
+		if(!Reflect.isFunction(v)) all.push(v);
+	}
+	return all;
 };
 var XmlType = { __ename__ : true, __constructs__ : [] };
 var Xml = function() {
@@ -2022,6 +2055,525 @@ alphatab.audio.MidiUtils.applyTuplet = function(ticks,numerator,denominator) {
 };
 alphatab.audio.MidiUtils.dynamicToVelocity = function(dynamicValue) {
 	return 15 + dynamicValue[1] * 16;
+};
+if(!alphatab.audio.generator) alphatab.audio.generator = {};
+alphatab.audio.generator.IMidiFileHandler = function() { };
+alphatab.audio.generator.IMidiFileHandler.__name__ = true;
+alphatab.audio.generator.IMidiFileHandler.prototype = {
+	__class__: alphatab.audio.generator.IMidiFileHandler
+};
+alphatab.audio.generator.MidiFileGenerator = function(score,handler,metronomeTrack) {
+	this._score = score;
+	this._currentTempo = this._score.tempo;
+	this._handler = handler;
+	this._metronomeTrack = metronomeTrack;
+};
+alphatab.audio.generator.MidiFileGenerator.__name__ = true;
+alphatab.audio.generator.MidiFileGenerator.generateMidiFile = function(score) {
+	var midiFile = new alphatab.audio.model.MidiFile();
+	var _g1 = 0;
+	var _g = score.tracks.length + 2;
+	while(_g1 < _g) {
+		var i = _g1++;
+		midiFile.createTrack();
+	}
+	midiFile.infoTrack = midiFile.tracks.length - 2;
+	midiFile.metronomeTrack = midiFile.tracks.length - 1;
+	var handler = new alphatab.audio.generator.MidiFileHandler(midiFile);
+	var generator = new alphatab.audio.generator.MidiFileGenerator(score,handler,midiFile.metronomeTrack);
+	generator.generate();
+	return midiFile;
+};
+alphatab.audio.generator.MidiFileGenerator.prototype = {
+	generate: function() {
+		var _g = 0;
+		var _g1 = this._score.tracks;
+		while(_g < _g1.length) {
+			var track = _g1[_g];
+			++_g;
+			this.generateTrack(track);
+		}
+		var controller = new alphatab.audio.generator.MidiPlaybackController(this._score);
+		var previousMasterBar = null;
+		while(!(controller.index >= controller._score.masterBars.length)) {
+			var index = controller.index;
+			var repeatMove = controller.repeatMove;
+			controller.process();
+			if(controller.shouldPlay) {
+				this.generateMasterBar(this._score.masterBars[index],previousMasterBar,controller.repeatMove);
+				var _g = 0;
+				var _g1 = this._score.tracks;
+				while(_g < _g1.length) {
+					var track = _g1[_g];
+					++_g;
+					this.generateBar(track.bars[index],controller.repeatMove);
+				}
+			}
+			previousMasterBar = this._score.masterBars[index];
+		}
+	}
+	,generateTrack: function(track) {
+		this.generateChannel(track,track.playbackInfo.primaryChannel,track.playbackInfo);
+		if(track.playbackInfo.primaryChannel != track.playbackInfo.secondaryChannel) this.generateChannel(track,track.playbackInfo.secondaryChannel,track.playbackInfo);
+	}
+	,generateChannel: function(track,channel,playbackInfo) {
+		this._handler.addControlChange(track.index,0,channel,7,playbackInfo.volume);
+		this._handler.addControlChange(track.index,0,channel,10,playbackInfo.balance);
+		this._handler.addControlChange(track.index,0,channel,11,127);
+		this._handler.addProgramChange(track.index,0,channel,playbackInfo.program);
+	}
+	,generateMasterBar: function(masterBar,previousMasterBar,startMove) {
+		if(previousMasterBar == null || previousMasterBar.timeSignatureDenominator != masterBar.timeSignatureDenominator || previousMasterBar.timeSignatureNumerator != masterBar.timeSignatureNumerator) this._handler.addTimeSignature(masterBar.start + startMove,masterBar.timeSignatureNumerator,masterBar.timeSignatureDenominator);
+		if(previousMasterBar == null) {
+			this._handler.addTempo(masterBar.start + startMove,masterBar.score.tempo);
+			this._currentTempo = masterBar.score.tempo;
+		} else if(masterBar.tempoAutomation != null) {
+			this._handler.addTempo(masterBar.start + startMove,masterBar.tempoAutomation.value | 0);
+			this._currentTempo = masterBar.tempoAutomation.value | 0;
+		}
+		var start = masterBar.start + startMove;
+		var length = alphatab.audio.MidiUtils.valueToTicks(masterBar.timeSignatureDenominator);
+		var _g1 = 0;
+		var _g = masterBar.timeSignatureNumerator;
+		while(_g1 < _g) {
+			var i = _g1++;
+			this._handler.addNote(this._metronomeTrack,start,length,37,alphatab.model.DynamicValue.F,9);
+			start += length;
+		}
+	}
+	,generateBar: function(bar,startMove) {
+		var _g = 0;
+		var _g1 = bar.voices;
+		while(_g < _g1.length) {
+			var voice = _g1[_g];
+			++_g;
+			this.generateVoice(voice,startMove);
+		}
+	}
+	,generateVoice: function(voice,startMove) {
+		var _g = 0;
+		var _g1 = voice.beats;
+		while(_g < _g1.length) {
+			var b = _g1[_g];
+			++_g;
+			this.generateBeat(b,startMove);
+		}
+	}
+	,generateBeat: function(beat,startMove) {
+		var start = beat.start;
+		var duration = beat.calculateDuration();
+		var track = beat.voice.bar.track;
+		var _g = 0;
+		var _g1 = beat.automations;
+		while(_g < _g1.length) {
+			var automation = _g1[_g];
+			++_g;
+			this.generateAutomation(beat,automation,startMove);
+		}
+		if(beat.isRest()) this._handler.addRest(track.index,start + startMove,track.playbackInfo.primaryChannel); else {
+			var brushInfo = this.getBrushInfo(beat);
+			var _g = 0;
+			var _g1 = beat.notes;
+			while(_g < _g1.length) {
+				var n = _g1[_g];
+				++_g;
+				if(n.isTieDestination) continue;
+				this.generateNote(n,start,duration,startMove,brushInfo);
+			}
+		}
+	}
+	,generateNote: function(note,beatStart,beatDuration,startMove,brushInfo) {
+		var track = note.beat.voice.bar.track;
+		var noteKey = track.capo + (note.fret + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1]);
+		var noteStart = beatStart + startMove + brushInfo[note.string - 1];
+		var noteDuration = this.getNoteDuration(note,beatDuration) - brushInfo[note.string - 1];
+		var dynamicValue = this.getDynamicValue(note);
+		if(note.beat.fadeIn) this.generateFadeIn(note,noteStart,noteDuration,noteKey,dynamicValue);
+		if(note.trillValue >= 0 && !track.isPercussion) {
+			this.generateTrill(note,noteStart,noteDuration,noteKey,dynamicValue);
+			return;
+		}
+		if(note.beat.tremoloSpeed != null) {
+			this.generateTremoloPicking(note,noteStart,noteDuration,noteKey,dynamicValue);
+			return;
+		}
+		if(note.bendPoints.length > 1) this.generateBend(note,noteStart,noteDuration,noteKey,dynamicValue); else if(note.beat.whammyBarPoints.length > 0) this.generateWhammyBar(note,noteStart,noteDuration,noteKey,dynamicValue); else if(note.slideType != alphatab.model.SlideType.None) this.generateSlide(note,noteStart,noteDuration,noteKey,dynamicValue); else if(note.vibrato != alphatab.model.VibratoType.None) this.generateVibrato(note,noteStart,noteDuration,noteKey,dynamicValue);
+		if(note.harmonicType != alphatab.model.HarmonicType.None) this.generateHarmonic(note,noteStart,noteDuration,noteKey,dynamicValue);
+		this._handler.addNote(track.index,noteStart,noteDuration,noteKey,dynamicValue,track.playbackInfo.primaryChannel);
+	}
+	,getNoteDuration: function(note,beatDuration) {
+		var lastNoteEnd = note.beat.start - note.beat.calculateDuration();
+		var noteDuration = beatDuration;
+		var currentBeat = note.beat.nextBeat;
+		var letRingSuspend = false;
+		while(currentBeat != null) {
+			if(currentBeat.isRest()) return this.applyDurationEffects(note,noteDuration);
+			var letRing = currentBeat.voice == note.beat.voice && note.isLetRing;
+			var letRingApplied = false;
+			var noteOnSameString = currentBeat.getNoteOnString(note.string);
+			if(noteOnSameString != null) {
+				if(!noteOnSameString.isTieDestination) {
+					letRing = false;
+					letRingSuspend = true;
+					if(!noteOnSameString.isLetRing) return this.applyDurationEffects(note,noteDuration);
+				}
+				letRingApplied = true;
+				noteDuration += currentBeat.start - lastNoteEnd + noteOnSameString.beat.calculateDuration();
+				lastNoteEnd = currentBeat.start + currentBeat.calculateDuration();
+			}
+			if(letRing && !letRingApplied && !letRingSuspend) {
+				noteDuration += currentBeat.start - lastNoteEnd + currentBeat.calculateDuration();
+				lastNoteEnd = currentBeat.start + currentBeat.calculateDuration();
+			}
+			currentBeat = currentBeat.nextBeat;
+		}
+		return this.applyDurationEffects(note,noteDuration);
+	}
+	,applyDurationEffects: function(note,duration) {
+		if(note.isDead) return this.applyStaticDuration(30,duration);
+		if(note.isPalmMute) return this.applyStaticDuration(80,duration);
+		if(note.isStaccato) return duration / 2 | 0;
+		return duration;
+	}
+	,applyStaticDuration: function(duration,maximum) {
+		var value = this._currentTempo * duration / 60;
+		var x = Math.min(value,maximum);
+		return x | 0;
+	}
+	,getDynamicValue: function(note) {
+		var dynamicValue = note.dynamicValue;
+		var allDynamics = Type.allEnums(alphatab.model.DynamicValue);
+		var currentIndex = Lambda.indexOf(allDynamics,dynamicValue);
+		if(!note.beat.voice.bar.track.isPercussion && note.isHammerPullDestination) currentIndex--;
+		if(note.isGhost) currentIndex--;
+		var _g = note.accentuated;
+		switch(_g[1]) {
+		case 1:
+			currentIndex++;
+			break;
+		case 2:
+			currentIndex += 2;
+			break;
+		default:
+		}
+		return allDynamics[(function($this) {
+			var $r;
+			var x = Math.max(0,Math.min(allDynamics.length - 1,currentIndex));
+			$r = x | 0;
+			return $r;
+		}(this))];
+	}
+	,generateFadeIn: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
+	}
+	,generateHarmonic: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
+	}
+	,generateVibrato: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
+	}
+	,generateSlide: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
+	}
+	,generateWhammyBar: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
+	}
+	,generateBend: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
+	}
+	,generateTrill: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
+		var track = note.beat.voice.bar.track;
+		var trillKey = track.capo + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1] + (note.trillValue - note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1]);
+		var trillLength = alphatab.audio.MidiUtils.durationToTicks(note.trillSpeed);
+		var realKey = true;
+		var tick = noteStart;
+		while(tick + 10 < noteStart + noteDuration) {
+			if(tick + trillLength >= noteStart + noteDuration) trillLength = noteStart + noteDuration - tick;
+			this._handler.addNote(track.index,tick,trillLength,realKey?trillKey:noteKey,dynamicValue,track.playbackInfo.primaryChannel);
+			realKey = !realKey;
+			tick += trillLength;
+		}
+	}
+	,generateTremoloPicking: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
+		var track = note.beat.voice.bar.track;
+		var tpLength = alphatab.audio.MidiUtils.durationToTicks(note.beat.tremoloSpeed);
+		var tick = noteStart;
+		while(tick + 10 < noteStart + noteDuration) {
+			if(tick + tpLength >= noteStart + noteDuration) tpLength = noteStart + noteDuration - tick;
+			this._handler.addNote(track.index,tick,tpLength,noteKey,dynamicValue,track.playbackInfo.primaryChannel);
+			tick += tpLength;
+		}
+	}
+	,getBrushInfo: function(beat) {
+		var brushInfo = new Array();
+		var _g1 = 0;
+		var _g = beat.voice.bar.track.tuning.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			brushInfo.push(0);
+		}
+		if(beat.brushType != alphatab.model.BrushType.None) {
+			var stringUsed = 0;
+			var stringCount = 0;
+			var _g = 0;
+			var _g1 = beat.notes;
+			while(_g < _g1.length) {
+				var n = _g1[_g];
+				++_g;
+				if(n.isTieDestination) continue;
+				stringUsed |= 1 << n.string - 1;
+				stringCount++;
+			}
+			if(beat.notes.length > 0) {
+				var brushMove = 0;
+				var brushIncrement = this.getBrushIncrement(beat);
+				var _g1 = 0;
+				var _g = beat.voice.bar.track.tuning.length;
+				while(_g1 < _g) {
+					var i = _g1++;
+					var index;
+					if(beat.brushType == alphatab.model.BrushType.ArpeggioDown || beat.brushType == alphatab.model.BrushType.BrushDown) index = i; else index = brushInfo.length - 1 - i;
+					if((stringUsed & 1 << index) != 0) {
+						brushInfo[index] = brushMove;
+						brushMove = brushIncrement;
+					}
+				}
+			}
+		}
+		return brushInfo;
+	}
+	,getBrushIncrement: function(beat) {
+		if(beat.brushDuration == 0) return 0;
+		var duration = beat.calculateDuration();
+		if(duration == 0) return 0;
+		return duration / 8.0 * (4.0 / beat.brushDuration) | 0;
+	}
+	,generateAutomation: function(beat,automation,startMove) {
+		var _g = automation.type;
+		switch(_g[1]) {
+		case 2:
+			this._handler.addProgramChange(beat.voice.bar.track.index,beat.start + startMove,beat.voice.bar.track.playbackInfo.primaryChannel,automation.value | 0);
+			this._handler.addProgramChange(beat.voice.bar.track.index,beat.start + startMove,beat.voice.bar.track.playbackInfo.secondaryChannel,automation.value | 0);
+			break;
+		case 3:
+			this._handler.addControlChange(beat.voice.bar.track.index,beat.start + startMove,beat.voice.bar.track.playbackInfo.primaryChannel,10,automation.value | 0);
+			this._handler.addControlChange(beat.voice.bar.track.index,beat.start + startMove,beat.voice.bar.track.playbackInfo.secondaryChannel,10,automation.value | 0);
+			break;
+		case 1:
+			this._handler.addControlChange(beat.voice.bar.track.index,beat.start + startMove,beat.voice.bar.track.playbackInfo.primaryChannel,7,automation.value | 0);
+			this._handler.addControlChange(beat.voice.bar.track.index,beat.start + startMove,beat.voice.bar.track.playbackInfo.secondaryChannel,7,automation.value | 0);
+			break;
+		default:
+		}
+	}
+	,__class__: alphatab.audio.generator.MidiFileGenerator
+};
+alphatab.audio.generator.MidiFileHandler = function(midiFile) {
+	this._midiFile = midiFile;
+};
+alphatab.audio.generator.MidiFileHandler.__name__ = true;
+alphatab.audio.generator.MidiFileHandler.__interfaces__ = [alphatab.audio.generator.IMidiFileHandler];
+alphatab.audio.generator.MidiFileHandler.makeCommand = function(command,channel) {
+	return command & 240 | channel & 15;
+};
+alphatab.audio.generator.MidiFileHandler.fixValue = function(value) {
+	if(value < 0) return 0;
+	if(value > 127) return 127;
+	return value;
+};
+alphatab.audio.generator.MidiFileHandler.fixChannel = function(value) {
+	if(value < 0) return 0;
+	if(value > 15) return 15;
+	return value;
+};
+alphatab.audio.generator.MidiFileHandler.buildMetaMessage = function(metaType,data) {
+	var meta = new Array();
+	meta.push(255);
+	meta.push(metaType & 255);
+	var v = data.length;
+	var array = [0,0,0,0];
+	var count = 0;
+	array[0] = v & 127 & 255;
+	v = v >> 7;
+	while(v > 0) {
+		count++;
+		array[count] = (v & 127 | 128) & 255;
+		v = v >> 7;
+	}
+	meta = meta.concat(array);
+	meta = meta.concat(data);
+	return alphatab.audio.model.MidiMessage.fromArray(meta);
+};
+alphatab.audio.generator.MidiFileHandler.prototype = {
+	addEvent: function(track,tick,message) {
+		this._midiFile.tracks[track].addEvent(new alphatab.audio.model.MidiEvent(tick,message));
+	}
+	,addTimeSignature: function(tick,timeSignatureNumerator,timeSignatureDenominator) {
+		var denominatorIndex = 0;
+		while((timeSignatureDenominator = timeSignatureDenominator >> 1) > 0) denominatorIndex++;
+		this.addEvent(this._midiFile.infoTrack,tick,alphatab.audio.generator.MidiFileHandler.buildMetaMessage(88,[timeSignatureNumerator & 255,denominatorIndex & 255,48,8]));
+	}
+	,addRest: function(track,tick,channel) {
+		this.addEvent(track,tick,alphatab.audio.model.MidiMessage.fromArray([240,0,0,247]));
+	}
+	,addNote: function(track,start,length,key,dynamicValue,channel) {
+		var velocity = alphatab.audio.MidiUtils.dynamicToVelocity(dynamicValue);
+		this.addEvent(track,start,alphatab.audio.model.MidiMessage.fromArray([144 | channel & 15,alphatab.audio.generator.MidiFileHandler.fixValue(key),alphatab.audio.generator.MidiFileHandler.fixValue(velocity)]));
+		this.addEvent(track,start + length,alphatab.audio.model.MidiMessage.fromArray([128 | channel & 15,alphatab.audio.generator.MidiFileHandler.fixValue(key),alphatab.audio.generator.MidiFileHandler.fixValue(velocity)]));
+	}
+	,addControlChange: function(track,tick,channel,controller,value) {
+		this.addEvent(track,tick,alphatab.audio.model.MidiMessage.fromArray([176 | channel & 15,alphatab.audio.generator.MidiFileHandler.fixValue(controller),alphatab.audio.generator.MidiFileHandler.fixValue(value)]));
+	}
+	,addProgramChange: function(track,tick,channel,program) {
+		this.addEvent(track,tick,alphatab.audio.model.MidiMessage.fromArray([192 | channel & 15,alphatab.audio.generator.MidiFileHandler.fixValue(program)]));
+	}
+	,addTempo: function(tick,tempo) {
+		var tempoInUsq = 60000000 / tempo | 0;
+		this.addEvent(this._midiFile.infoTrack,tick,alphatab.audio.generator.MidiFileHandler.buildMetaMessage(81,[tempoInUsq >> 16 & 255,tempoInUsq >> 8 & 255,tempoInUsq & 255]));
+	}
+	,addBend: function(track,tick,channel,value) {
+		this.addEvent(track,tick,alphatab.audio.model.MidiMessage.fromArray([224 | channel & 15,0,alphatab.audio.generator.MidiFileHandler.fixValue(value)]));
+	}
+	,__class__: alphatab.audio.generator.MidiFileHandler
+};
+alphatab.audio.generator.MidiPlaybackController = function(score) {
+	this._score = score;
+	this.shouldPlay = true;
+	this.repeatMove = 0;
+	this.index = 0;
+};
+alphatab.audio.generator.MidiPlaybackController.__name__ = true;
+alphatab.audio.generator.MidiPlaybackController.prototype = {
+	finished: function() {
+		return this.index >= this._score.masterBars.length;
+	}
+	,process: function() {
+		var masterBar = this._score.masterBars[this.index];
+		if(!masterBar.repeatGroup.isClosed && masterBar.repeatGroup.openings[masterBar.repeatGroup.openings.length - 1] == masterBar) {
+			this._repeatStart = 0;
+			this._repeatNumber = 0;
+			this._repeatEnd = 0;
+			this._repeatOpen = false;
+		}
+		if(masterBar.isRepeatStart) {
+			this._repeatStartIndex = this.index;
+			this._repeatStart = masterBar.start;
+			this._repeatOpen = true;
+			if(this.index > this._lastIndex) {
+				this._repeatNumber = 0;
+				this._repeatAlternative = 0;
+			}
+		} else {
+			if(this._repeatAlternative == 0) this._repeatAlternative = masterBar.alternateEndings;
+			if(this._repeatOpen && this._repeatAlternative > 0 && (this._repeatAlternative & 1 << this._repeatNumber) == 0) {
+				this.repeatMove -= masterBar.calculateDuration();
+				if(masterBar.repeatCount > 0) this._repeatAlternative = 0;
+				this.shouldPlay = false;
+				this.index++;
+				return;
+			}
+		}
+		var x = Math.max(this._lastIndex,this.index);
+		this._lastIndex = x | 0;
+		if(this._repeatOpen && masterBar.repeatCount > 0) {
+			if(this._repeatNumber < masterBar.repeatCount || this._repeatAlternative > 0) {
+				this._repeatEnd = masterBar.start + masterBar.calculateDuration();
+				this.repeatMove += this._repeatEnd - this._repeatStart;
+				this.index = this._repeatStartIndex - 1;
+				this._repeatNumber++;
+			} else {
+				this._repeatStart = 0;
+				this._repeatNumber = 0;
+				this._repeatEnd = 0;
+				this._repeatOpen = false;
+			}
+			this._repeatAlternative = 0;
+		}
+		this.index++;
+	}
+	,__class__: alphatab.audio.generator.MidiPlaybackController
+};
+if(!alphatab.audio.model) alphatab.audio.model = {};
+alphatab.audio.model.MidiController = function() { };
+alphatab.audio.model.MidiController.__name__ = true;
+alphatab.audio.model.MidiEvent = function(tick,message) {
+	this.tick = tick;
+	this.message = message;
+};
+alphatab.audio.model.MidiEvent.__name__ = true;
+alphatab.audio.model.MidiEvent.prototype = {
+	getDeltaTicks: function() {
+		if(this.previousEvent == null) return 0; else return this.tick - this.previousEvent.tick;
+	}
+	,__class__: alphatab.audio.model.MidiEvent
+};
+alphatab.audio.model.MidiFile = function() {
+	this.tracks = new Array();
+};
+alphatab.audio.model.MidiFile.__name__ = true;
+alphatab.audio.model.MidiFile.prototype = {
+	createTrack: function() {
+		var track = new alphatab.audio.model.MidiTrack();
+		track.index = this.tracks.length;
+		track.file = this;
+		this.tracks.push(track);
+		return track;
+	}
+	,__class__: alphatab.audio.model.MidiFile
+};
+alphatab.audio.model.MidiMessage = function(data) {
+	this.data = data;
+};
+alphatab.audio.model.MidiMessage.__name__ = true;
+alphatab.audio.model.MidiMessage.fromArray = function(data) {
+	var bytes = haxe.io.Bytes.alloc(data.length);
+	var _g1 = 0;
+	var _g = data.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		bytes.b[i] = data[i] & 255;
+	}
+	return new alphatab.audio.model.MidiMessage(bytes);
+};
+alphatab.audio.model.MidiMessage.prototype = {
+	__class__: alphatab.audio.model.MidiMessage
+};
+alphatab.audio.model.MidiTrack = function() {
+};
+alphatab.audio.model.MidiTrack.__name__ = true;
+alphatab.audio.model.MidiTrack.prototype = {
+	addEvent: function(event) {
+		event.track = this;
+		if(this.firstEvent == null) {
+			this.firstEvent = event;
+			this.lastEvent = event;
+		} else if(this.lastEvent.tick <= event.tick) {
+			this.lastEvent.nextEvent = event;
+			event.previousEvent = this.lastEvent;
+			this.lastEvent = event;
+		} else if(this.firstEvent.tick > event.tick) {
+			event.nextEvent = this.firstEvent;
+			this.firstEvent.previousEvent = event;
+			this.firstEvent = event;
+		} else {
+			var firstDelta = event.tick - this.firstEvent.tick;
+			var lastDelta = this.lastEvent.tick - event.tick;
+			if(firstDelta < lastDelta) {
+				var previous = this.firstEvent;
+				while(previous != null && previous.nextEvent != null && previous.nextEvent.tick < event.tick) previous = previous.nextEvent;
+				if(previous == null) return;
+				var next = previous.nextEvent;
+				previous.nextEvent = event;
+				event.previousEvent = previous;
+				event.nextEvent = next;
+				if(next != null) next.previousEvent = event;
+			} else {
+				var next = this.lastEvent;
+				while(next != null && next.previousEvent != null && next.previousEvent.tick > event.tick) next = next.previousEvent;
+				if(next == null) return;
+				var previous = next.previousEvent;
+				next.previousEvent = event;
+				event.nextEvent = next;
+				event.previousEvent = previous;
+				if(previous != null) previous.nextEvent = event; else this.firstEvent = event;
+			}
+		}
+	}
+	,__class__: alphatab.audio.model.MidiTrack
 };
 if(!alphatab.importer) alphatab.importer = {};
 alphatab.importer.ScoreImporter = function() {
@@ -5344,7 +5896,12 @@ alphatab.model.Beat.prototype = {
 	}
 	,finish: function() {
 		if(this.voice.bar.index == 0 && this.index == 0) {
-			this.start = 0;
+			this.start = ((function($this) {
+				var $r;
+				var _this = $this.voice.bar;
+				$r = _this.track.score.masterBars[_this.index];
+				return $r;
+			}(this))).start;
 			this.previousBeat = null;
 		} else {
 			if(this.index == 0) this.previousBeat = this.voice.bar.previousBar.voices[this.voice.index].beats[this.voice.bar.previousBar.voices[this.voice.index].beats.length - 1]; else this.previousBeat = this.voice.beats[this.index - 1];
@@ -11997,6 +12554,22 @@ alphatab.audio.MidiUtils.QuarterTime = 960;
 alphatab.audio.MidiUtils.PercussionChannel = 9;
 alphatab.audio.MidiUtils.MinVelocity = 15;
 alphatab.audio.MidiUtils.VelocityIncrement = 16;
+alphatab.audio.generator.MidiFileHandler.DefaultMetronomeKey = 37;
+alphatab.audio.generator.MidiFileHandler.DefaultDurationDead = 30;
+alphatab.audio.generator.MidiFileHandler.DefaultDurationPalmMute = 80;
+alphatab.audio.generator.MidiFileHandler.RestMessage = 0;
+alphatab.audio.model.MidiController.AllNotesOff = 123;
+alphatab.audio.model.MidiController.Balance = 10;
+alphatab.audio.model.MidiController.Chorus = 93;
+alphatab.audio.model.MidiController.DataEntryLsb = 38;
+alphatab.audio.model.MidiController.DataEntryMsb = 6;
+alphatab.audio.model.MidiController.Expression = 11;
+alphatab.audio.model.MidiController.Phaser = 95;
+alphatab.audio.model.MidiController.Reverb = 91;
+alphatab.audio.model.MidiController.RpnLsb = 100;
+alphatab.audio.model.MidiController.RpnMsb = 101;
+alphatab.audio.model.MidiController.Tremolo = 92;
+alphatab.audio.model.MidiController.Volume = 7;
 alphatab.importer.ScoreImporter.UnsupportedFormat = "unsupported file";
 alphatab.importer.AlphaTexImporter.Eof = String.fromCharCode(0);
 alphatab.importer.AlphaTexImporter.TrackChannels = [0,1];

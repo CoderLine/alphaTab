@@ -222,7 +222,7 @@ class Beat
     {
         if (voice.bar.index == 0 && index == 0)
         {
-            start = 0;
+            start = voice.bar.getMasterBar().start;
             previousBeat = null;
         }
         else
