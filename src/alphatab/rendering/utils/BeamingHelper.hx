@@ -209,16 +209,16 @@ class BeamingHelper
     
     private function checkNote(note:Note)
     {
-        var value:Int = note.realValue();
+        var value:Int = getValue(note);
 
         // detect the smallest note which is at the beginning of this group
-        if (firstMinNote == null || note.beat.index  < firstMinNote.beat.index)
+        if (firstMinNote == null || note.beat.start  < firstMinNote.beat.start)
         {
             firstMinNote = note;
         }
         else if (note.beat.start == firstMinNote.beat.start)
         {
-            if (note.realValue() < firstMinNote.realValue())
+            if (value < getValue(firstMinNote))
             {
                 firstMinNote = note;
             }
@@ -231,7 +231,7 @@ class BeamingHelper
         }
         else if (note.beat.start == firstMaxNote.beat.start)
         {
-            if (note.realValue() > firstMaxNote.realValue())
+            if (value > getValue(firstMaxNote))
             {
                 firstMaxNote = note;
             }
@@ -244,7 +244,7 @@ class BeamingHelper
         }
         else if (note.beat.start == lastMinNote.beat.start)
         {
-            if (note.realValue() < lastMinNote.realValue())
+            if (value < getValue(lastMinNote))
             {
                 lastMinNote = note;
             }
@@ -256,17 +256,17 @@ class BeamingHelper
         }
         else if (note.beat.start == lastMaxNote.beat.start)
         {
-            if (note.realValue() > lastMaxNote.realValue())
+            if (value > getValue(lastMaxNote))
             {
                 lastMaxNote = note;
             }
         }
 
-        if (maxNote == null || value > maxNote.realValue())
+        if (maxNote == null || value > getValue(maxNote))
         {
             maxNote = note;
         }
-        if (minNote == null || value < minNote.realValue())
+        if (minNote == null || value < getValue(minNote))
         {
             minNote = note;
         }

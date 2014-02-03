@@ -79,7 +79,7 @@ class MidiFileHandler implements IMidiFileHandler
     
     public function addRest(track:Int, tick:Int, channel:Int)
     {
-        addEvent(track, tick, MidiMessage.fromArray([0xF0, 0x00, RestMessage, 0xF7]));
+        addEvent(track, tick, buildSysExMessage([RestMessage]));
     }
     
     public function addNote(track:Int, start:Int, length:Int, key:Int, dynamicValue:DynamicValue, channel:Int)
@@ -118,8 +118,14 @@ class MidiFileHandler implements IMidiFileHandler
         meta.push(0xFF);
         meta.push(metaType & 0xFF);
 
-        // write var int 
-        var v = data.length;
+        writeVarInt(meta, data.length);
+        meta = meta.concat(data); 
+        
+        return MidiMessage.fromArray(meta);
+    }
+ 
+    private static function writeVarInt(data:Array<Int>, v:Int)
+    {
         var n = 0;
         var array = [0, 0, 0, 0];
         do
@@ -132,15 +138,23 @@ class MidiFileHandler implements IMidiFileHandler
         {
             n--;
             if (n > 0)
-                meta.push((array[n] | 0x80) & 0xFF);
+                data.push((array[n] | 0x80) & 0xFF);
             else    
-                meta.push(array[n]);
+                data.push(array[n]);
         }
-        
-        meta = meta.concat(data); 
-        
-        return MidiMessage.fromArray(meta);
+        return n;
     }
-
-
+    
+    private static function buildSysExMessage(data:Array<Int>)
+    {
+        var sysex = new Array<Int>();
+        
+        sysex.push(0xF0); // status 
+        writeVarInt(sysex, data.length + 2); // write length of data
+        sysex.push(0x00); // manufacturer id
+        sysex = sysex.concat(data); // data
+        sysex.push(0xF7); // end of data
+        
+        return MidiMessage.fromArray(sysex);
+    }
 }

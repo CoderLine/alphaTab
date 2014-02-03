@@ -59,13 +59,13 @@ class MidiFileGenerator
     
     public static function generateMidiFile(score:Score) : MidiFile
     {
-        var midiFile =  new MidiFile();
-        // create score tracks + infotrack + metronometrack
-        for (i in 0 ... score.tracks.length + 2)
+        var midiFile = new MidiFile();
+        // create score tracks + metronometrack
+        for (i in 0 ... score.tracks.length + 1)
         {
             midiFile.createTrack();
         }
-        midiFile.infoTrack = midiFile.tracks.length - 2;
+        midiFile.infoTrack = 0;
         midiFile.metronomeTrack = midiFile.tracks.length - 1;
 
         var handler = new MidiFileHandler(midiFile);

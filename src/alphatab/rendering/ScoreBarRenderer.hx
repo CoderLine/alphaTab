@@ -266,6 +266,7 @@ class ScoreBarRenderer extends GroupedBarRenderer
             {
                 var beat = h.beats[i];
                 var beamingHelper = _helpers.beamHelperLookup[h.voiceIndex].get(beat.index);
+                if (beamingHelper == null) continue;
                 var direction = beamingHelper.getDirection();
                 
                 var tupletX = Std.int(beamingHelper.getBeatLineX(beat) + getScale());
@@ -285,61 +286,64 @@ class ScoreBarRenderer extends GroupedBarRenderer
             var lastBeat = h.beats[h.beats.length - 1];
             
             var beamingHelper = _helpers.beamHelperLookup[h.voiceIndex].get(firstBeat.index);
-            var direction = beamingHelper.getDirection();
-            
-            // 
-            // Calculate the overall area of the tuplet bracket
-            
-            var startX = Std.int(beamingHelper.getBeatLineX(firstBeat) + getScale());
-            var endX = Std.int(beamingHelper.getBeatLineX(lastBeat) + getScale());
-            
-            //
-            // Calculate how many space the text will need
-            canvas.setFont(res.effectFont);
-            var s = Std.string(h.tuplet);
-            var sw = canvas.measureText(s);
-            var sp = Std.int(3 * getScale());
-            
-            // 
-            // Calculate the offsets where to break the bracket
-            var middleX = Std.int((startX + endX) / 2);
-            var offset1X = Std.int(middleX - sw / 2 - sp);
-            var offset2X = Std.int(middleX + sw / 2 + sp);
-            
-            //
-            // calculate the y positions for our bracket
-            
-            var startY = calculateBeamY(beamingHelper, startX);
-            var offset1Y = calculateBeamY(beamingHelper, offset1X);
-            var middleY = calculateBeamY(beamingHelper, middleX);
-            var offset2Y = calculateBeamY(beamingHelper, offset2X);
-            var endY = calculateBeamY(beamingHelper, endX);
-            
-            var offset = Std.int(10 * getScale()); 
-            var size = Std.int(5 * getScale());
-            if (direction == Down)
+            if (beamingHelper != null)
             {
-                offset *= -1;
-                size *= -1;
+                var direction = beamingHelper.getDirection();
+                
+                // 
+                // Calculate the overall area of the tuplet bracket
+                
+                var startX = Std.int(beamingHelper.getBeatLineX(firstBeat) + getScale());
+                var endX = Std.int(beamingHelper.getBeatLineX(lastBeat) + getScale());
+                
+                //
+                // Calculate how many space the text will need
+                canvas.setFont(res.effectFont);
+                var s = Std.string(h.tuplet);
+                var sw = canvas.measureText(s);
+                var sp = Std.int(3 * getScale());
+                
+                // 
+                // Calculate the offsets where to break the bracket
+                var middleX = Std.int((startX + endX) / 2);
+                var offset1X = Std.int(middleX - sw / 2 - sp);
+                var offset2X = Std.int(middleX + sw / 2 + sp);
+                
+                //
+                // calculate the y positions for our bracket
+                
+                var startY = calculateBeamY(beamingHelper, startX);
+                var offset1Y = calculateBeamY(beamingHelper, offset1X);
+                var middleY = calculateBeamY(beamingHelper, middleX);
+                var offset2Y = calculateBeamY(beamingHelper, offset2X);
+                var endY = calculateBeamY(beamingHelper, endX);
+                
+                var offset = Std.int(10 * getScale()); 
+                var size = Std.int(5 * getScale());
+                if (direction == Down)
+                {
+                    offset *= -1;
+                    size *= -1;
+                }
+                
+                //
+                // draw the bracket
+                canvas.beginPath();
+                canvas.moveTo(cx + x + startX, cy + y + startY - offset);
+                canvas.lineTo(cx + x + startX, cy + y + startY - offset - size);
+                canvas.lineTo(cx + x + offset1X, cy + y + offset1Y - offset - size);
+                canvas.stroke();
+                
+                canvas.beginPath();
+                canvas.moveTo(cx + x + offset2X, cy + y + offset2Y - offset - size);
+                canvas.lineTo(cx + x + endX, cy + y + endY - offset - size); 
+                canvas.lineTo(cx + x + endX, cy + y + endY - offset); 
+                canvas.stroke();
+                
+                //
+                // Draw the string
+                canvas.fillText(s, cx + x + middleX, cy + y + middleY - offset - size - res.effectFont.getSize());
             }
-            
-            //
-            // draw the bracket
-            canvas.beginPath();
-            canvas.moveTo(cx + x + startX, cy + y + startY - offset);
-            canvas.lineTo(cx + x + startX, cy + y + startY - offset - size);
-            canvas.lineTo(cx + x + offset1X, cy + y + offset1Y - offset - size);
-            canvas.stroke();
-            
-            canvas.beginPath();
-            canvas.moveTo(cx + x + offset2X, cy + y + offset2Y - offset - size);
-            canvas.lineTo(cx + x + endX, cy + y + endY - offset - size); 
-            canvas.lineTo(cx + x + endX, cy + y + endY - offset); 
-            canvas.stroke();
-            
-            //
-            // Draw the string
-            canvas.fillText(s, cx + x + middleX, cy + y + middleY - offset - size - res.effectFont.getSize());
         }
         canvas.setTextAlign(oldAlign);
     }

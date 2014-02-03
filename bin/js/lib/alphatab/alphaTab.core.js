@@ -2072,12 +2072,12 @@ alphatab.audio.generator.MidiFileGenerator.__name__ = true;
 alphatab.audio.generator.MidiFileGenerator.generateMidiFile = function(score) {
 	var midiFile = new alphatab.audio.model.MidiFile();
 	var _g1 = 0;
-	var _g = score.tracks.length + 2;
+	var _g = score.tracks.length + 1;
 	while(_g1 < _g) {
 		var i = _g1++;
 		midiFile.createTrack();
 	}
-	midiFile.infoTrack = midiFile.tracks.length - 2;
+	midiFile.infoTrack = 0;
 	midiFile.metronomeTrack = midiFile.tracks.length - 1;
 	var handler = new alphatab.audio.generator.MidiFileHandler(midiFile);
 	var generator = new alphatab.audio.generator.MidiFileGenerator(score,handler,midiFile.metronomeTrack);
@@ -2397,7 +2397,11 @@ alphatab.audio.generator.MidiFileHandler.buildMetaMessage = function(metaType,da
 	var meta = new Array();
 	meta.push(255);
 	meta.push(metaType & 255);
-	var v = data.length;
+	alphatab.audio.generator.MidiFileHandler.writeVarInt(meta,data.length);
+	meta = meta.concat(data);
+	return alphatab.audio.model.MidiMessage.fromArray(meta);
+};
+alphatab.audio.generator.MidiFileHandler.writeVarInt = function(data,v) {
 	var n = 0;
 	var array = [0,0,0,0];
 	do {
@@ -2406,10 +2410,18 @@ alphatab.audio.generator.MidiFileHandler.buildMetaMessage = function(metaType,da
 	} while(v > 0);
 	while(n > 0) {
 		n--;
-		if(n > 0) meta.push((array[n] | 128) & 255); else meta.push(array[n]);
+		if(n > 0) data.push((array[n] | 128) & 255); else data.push(array[n]);
 	}
-	meta = meta.concat(data);
-	return alphatab.audio.model.MidiMessage.fromArray(meta);
+	return n;
+};
+alphatab.audio.generator.MidiFileHandler.buildSysExMessage = function(data) {
+	var sysex = new Array();
+	sysex.push(240);
+	alphatab.audio.generator.MidiFileHandler.writeVarInt(sysex,data.length + 2);
+	sysex.push(0);
+	sysex = sysex.concat(data);
+	sysex.push(247);
+	return alphatab.audio.model.MidiMessage.fromArray(sysex);
 };
 alphatab.audio.generator.MidiFileHandler.prototype = {
 	addEvent: function(track,tick,message) {
@@ -2421,7 +2433,7 @@ alphatab.audio.generator.MidiFileHandler.prototype = {
 		this.addEvent(this._midiFile.infoTrack,tick,alphatab.audio.generator.MidiFileHandler.buildMetaMessage(88,[timeSignatureNumerator & 255,denominatorIndex & 255,48,8]));
 	}
 	,addRest: function(track,tick,channel) {
-		this.addEvent(track,tick,alphatab.audio.model.MidiMessage.fromArray([240,0,0,247]));
+		this.addEvent(track,tick,alphatab.audio.generator.MidiFileHandler.buildSysExMessage([0]));
 	}
 	,addNote: function(track,start,length,key,dynamicValue,channel) {
 		var velocity = alphatab.audio.MidiUtils.dynamicToVelocity(dynamicValue);
@@ -6435,14 +6447,12 @@ alphatab.model.Track.prototype = {
 			this.shortName = this.name;
 			if(this.shortName.length > 10) this.shortName = HxOverrides.substr(this.shortName,0,10);
 		}
-		if(!this.isPercussion) {
-			var _g = 0;
-			var _g1 = this.bars;
-			while(_g < _g1.length) {
-				var bar = _g1[_g];
-				++_g;
-				bar.finish();
-			}
+		var _g = 0;
+		var _g1 = this.bars;
+		while(_g < _g1.length) {
+			var bar = _g1[_g];
+			++_g;
+			bar.finish();
 		}
 	}
 	,__class__: alphatab.model.Track
@@ -7548,6 +7558,7 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 				var i = _g1++;
 				var beat = h.beats[i];
 				var beamingHelper = this._helpers.beamHelperLookup[h.voiceIndex].get(beat.index);
+				if(beamingHelper == null) continue;
 				var direction = beamingHelper.getDirection();
 				var tupletX;
 				var x = beamingHelper.getBeatLineX(beat) + this.stave.staveGroup.layout.renderer.settings.scale;
@@ -7565,42 +7576,44 @@ alphatab.rendering.ScoreBarRenderer.prototype = $extend(alphatab.rendering.Group
 			var firstBeat = h.beats[0];
 			var lastBeat = h.beats[h.beats.length - 1];
 			var beamingHelper = this._helpers.beamHelperLookup[h.voiceIndex].get(firstBeat.index);
-			var direction = beamingHelper.getDirection();
-			var startX;
-			var x = beamingHelper.getBeatLineX(firstBeat) + this.stave.staveGroup.layout.renderer.settings.scale;
-			startX = x | 0;
-			var endX;
-			var x = beamingHelper.getBeatLineX(lastBeat) + this.stave.staveGroup.layout.renderer.settings.scale;
-			endX = x | 0;
-			canvas.setFont(res.effectFont);
-			var s = Std.string(h.tuplet);
-			var sw = canvas.measureText(s);
-			var sp = 3 * this.stave.staveGroup.layout.renderer.settings.scale | 0;
-			var middleX = (startX + endX) / 2 | 0;
-			var offset1X = middleX - sw / 2 - sp | 0;
-			var offset2X = middleX + sw / 2 + sp | 0;
-			var startY = this.calculateBeamY(beamingHelper,startX);
-			var offset1Y = this.calculateBeamY(beamingHelper,offset1X);
-			var middleY = this.calculateBeamY(beamingHelper,middleX);
-			var offset2Y = this.calculateBeamY(beamingHelper,offset2X);
-			var endY = this.calculateBeamY(beamingHelper,endX);
-			var offset = 10 * this.stave.staveGroup.layout.renderer.settings.scale | 0;
-			var size = 5 * this.stave.staveGroup.layout.renderer.settings.scale | 0;
-			if(direction == alphatab.rendering.utils.BeamDirection.Down) {
-				offset *= -1;
-				size *= -1;
+			if(beamingHelper != null) {
+				var direction = beamingHelper.getDirection();
+				var startX;
+				var x = beamingHelper.getBeatLineX(firstBeat) + this.stave.staveGroup.layout.renderer.settings.scale;
+				startX = x | 0;
+				var endX;
+				var x = beamingHelper.getBeatLineX(lastBeat) + this.stave.staveGroup.layout.renderer.settings.scale;
+				endX = x | 0;
+				canvas.setFont(res.effectFont);
+				var s = Std.string(h.tuplet);
+				var sw = canvas.measureText(s);
+				var sp = 3 * this.stave.staveGroup.layout.renderer.settings.scale | 0;
+				var middleX = (startX + endX) / 2 | 0;
+				var offset1X = middleX - sw / 2 - sp | 0;
+				var offset2X = middleX + sw / 2 + sp | 0;
+				var startY = this.calculateBeamY(beamingHelper,startX);
+				var offset1Y = this.calculateBeamY(beamingHelper,offset1X);
+				var middleY = this.calculateBeamY(beamingHelper,middleX);
+				var offset2Y = this.calculateBeamY(beamingHelper,offset2X);
+				var endY = this.calculateBeamY(beamingHelper,endX);
+				var offset = 10 * this.stave.staveGroup.layout.renderer.settings.scale | 0;
+				var size = 5 * this.stave.staveGroup.layout.renderer.settings.scale | 0;
+				if(direction == alphatab.rendering.utils.BeamDirection.Down) {
+					offset *= -1;
+					size *= -1;
+				}
+				canvas.beginPath();
+				canvas.moveTo(cx + this.x + startX,cy + this.y + startY - offset);
+				canvas.lineTo(cx + this.x + startX,cy + this.y + startY - offset - size);
+				canvas.lineTo(cx + this.x + offset1X,cy + this.y + offset1Y - offset - size);
+				canvas.stroke();
+				canvas.beginPath();
+				canvas.moveTo(cx + this.x + offset2X,cy + this.y + offset2Y - offset - size);
+				canvas.lineTo(cx + this.x + endX,cy + this.y + endY - offset - size);
+				canvas.lineTo(cx + this.x + endX,cy + this.y + endY - offset);
+				canvas.stroke();
+				canvas.fillText(s,cx + this.x + middleX,cy + this.y + middleY - offset - size - res.effectFont.getSize());
 			}
-			canvas.beginPath();
-			canvas.moveTo(cx + this.x + startX,cy + this.y + startY - offset);
-			canvas.lineTo(cx + this.x + startX,cy + this.y + startY - offset - size);
-			canvas.lineTo(cx + this.x + offset1X,cy + this.y + offset1Y - offset - size);
-			canvas.stroke();
-			canvas.beginPath();
-			canvas.moveTo(cx + this.x + offset2X,cy + this.y + offset2Y - offset - size);
-			canvas.lineTo(cx + this.x + endX,cy + this.y + endY - offset - size);
-			canvas.lineTo(cx + this.x + endX,cy + this.y + endY - offset);
-			canvas.stroke();
-			canvas.fillText(s,cx + this.x + middleX,cy + this.y + middleY - offset - size - res.effectFont.getSize());
 		}
 		canvas.setTextAlign(oldAlign);
 	}
@@ -11712,51 +11725,21 @@ alphatab.rendering.utils.BeamingHelper.prototype = {
 		return add;
 	}
 	,checkNote: function(note) {
-		var value = note.fret + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1];
-		if(this.firstMinNote == null || note.beat.index < this.firstMinNote.beat.index) this.firstMinNote = note; else if(note.beat.start == this.firstMinNote.beat.start) {
-			if(note.fret + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1] < (function($this) {
-				var $r;
-				var _this = $this.firstMinNote;
-				$r = _this.fret + _this.beat.voice.bar.track.tuning[_this.beat.voice.bar.track.tuning.length - (_this.string - 1) - 1];
-				return $r;
-			}(this))) this.firstMinNote = note;
+		var value = this.getValue(note);
+		if(this.firstMinNote == null || note.beat.start < this.firstMinNote.beat.start) this.firstMinNote = note; else if(note.beat.start == this.firstMinNote.beat.start) {
+			if(value < this.getValue(this.firstMinNote)) this.firstMinNote = note;
 		}
 		if(this.firstMaxNote == null || note.beat.start < this.firstMaxNote.beat.start) this.firstMaxNote = note; else if(note.beat.start == this.firstMaxNote.beat.start) {
-			if(note.fret + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1] > (function($this) {
-				var $r;
-				var _this = $this.firstMaxNote;
-				$r = _this.fret + _this.beat.voice.bar.track.tuning[_this.beat.voice.bar.track.tuning.length - (_this.string - 1) - 1];
-				return $r;
-			}(this))) this.firstMaxNote = note;
+			if(value > this.getValue(this.firstMaxNote)) this.firstMaxNote = note;
 		}
 		if(this.lastMinNote == null || note.beat.start > this.lastMinNote.beat.start) this.lastMinNote = note; else if(note.beat.start == this.lastMinNote.beat.start) {
-			if(note.fret + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1] < (function($this) {
-				var $r;
-				var _this = $this.lastMinNote;
-				$r = _this.fret + _this.beat.voice.bar.track.tuning[_this.beat.voice.bar.track.tuning.length - (_this.string - 1) - 1];
-				return $r;
-			}(this))) this.lastMinNote = note;
+			if(value < this.getValue(this.lastMinNote)) this.lastMinNote = note;
 		}
 		if(this.lastMaxNote == null || note.beat.start > this.lastMaxNote.beat.start) this.lastMaxNote = note; else if(note.beat.start == this.lastMaxNote.beat.start) {
-			if(note.fret + note.beat.voice.bar.track.tuning[note.beat.voice.bar.track.tuning.length - (note.string - 1) - 1] > (function($this) {
-				var $r;
-				var _this = $this.lastMaxNote;
-				$r = _this.fret + _this.beat.voice.bar.track.tuning[_this.beat.voice.bar.track.tuning.length - (_this.string - 1) - 1];
-				return $r;
-			}(this))) this.lastMaxNote = note;
+			if(value > this.getValue(this.lastMaxNote)) this.lastMaxNote = note;
 		}
-		if(this.maxNote == null || value > (function($this) {
-			var $r;
-			var _this = $this.maxNote;
-			$r = _this.fret + _this.beat.voice.bar.track.tuning[_this.beat.voice.bar.track.tuning.length - (_this.string - 1) - 1];
-			return $r;
-		}(this))) this.maxNote = note;
-		if(this.minNote == null || value < (function($this) {
-			var $r;
-			var _this = $this.minNote;
-			$r = _this.fret + _this.beat.voice.bar.track.tuning[_this.beat.voice.bar.track.tuning.length - (_this.string - 1) - 1];
-			return $r;
-		}(this))) this.minNote = note;
+		if(this.maxNote == null || value > this.getValue(this.maxNote)) this.maxNote = note;
+		if(this.minNote == null || value < this.getValue(this.minNote)) this.minNote = note;
 	}
 	,calculateBeamY: function(stemSize,xCorrection,xPosition,scale,yPosition) {
 		var direction = this.getDirection();

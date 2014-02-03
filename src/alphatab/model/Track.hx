@@ -71,12 +71,9 @@ class Track
             if (shortName.length > 10) shortName = shortName.substr(0, 10);
         }
 
-        if (!isPercussion)
+        for (bar in bars)
         {
-            for (bar in bars)
-            {
-                bar.finish();
-            }
+            bar.finish();
         }
     }
     

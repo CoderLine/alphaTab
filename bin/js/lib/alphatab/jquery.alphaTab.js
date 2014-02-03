@@ -251,14 +251,17 @@
     function tracks( tracks ) 
     {
         var context = $(this).data('alphaTab');
-        if(track) 
+        if(tracks) 
         {
-            var score = context.renderer.track.score;
-            if(track < 0 || track >= score.tracks.length) return;
+            // TODO: multiple tracks
+            if(context.renderer.tracks == null || context.renderer.tracks.length == 0)
+                return;
+            var score = context.renderer.tracks[0].score;
+            if(tracks < 0 || tracks >= score.tracks.length) return;
             
             try
             {
-                context.renderer.render(score.tracks[track]);
+                context.renderer.render(score.tracks[tracks]);
             }
             catch(e)
             {

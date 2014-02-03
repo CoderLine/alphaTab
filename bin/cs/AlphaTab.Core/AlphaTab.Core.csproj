@@ -50,7 +50,16 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\alphatab\audio\GeneralMidi.cs" />
+    <Compile Include="src\alphatab\audio\generator\IMidiFileHandler.cs" />
+    <Compile Include="src\alphatab\audio\generator\MidiFileGenerator.cs" />
+    <Compile Include="src\alphatab\audio\generator\MidiFileHandler.cs" />
+    <Compile Include="src\alphatab\audio\generator\MidiPlaybackController.cs" />
     <Compile Include="src\alphatab\audio\MidiUtils.cs" />
+    <Compile Include="src\alphatab\audio\model\MidiController.cs" />
+    <Compile Include="src\alphatab\audio\model\MidiEvent.cs" />
+    <Compile Include="src\alphatab\audio\model\MidiFile.cs" />
+    <Compile Include="src\alphatab\audio\model\MidiMessage.cs" />
+    <Compile Include="src\alphatab\audio\model\MidiTrack.cs" />
     <Compile Include="src\alphatab\Environment.cs" />
     <Compile Include="src\alphatab\importer\AlphaTexImporter.cs" />
     <Compile Include="src\alphatab\importer\AlphaTexSymbols.cs" />
@@ -204,6 +213,8 @@
     <Compile Include="src\alphatab\rendering\layout\PageViewLayout.cs" />
     <Compile Include="src\alphatab\rendering\layout\ScoreLayout.cs" />
     <Compile Include="src\alphatab\rendering\RenderingResources.cs" />
+    <Compile Include="src\alphatab\rendering\RhythmBarRenderer.cs" />
+    <Compile Include="src\alphatab\rendering\RhythmBarRendererFactory.cs" />
     <Compile Include="src\alphatab\rendering\ScoreBarRenderer.cs" />
     <Compile Include="src\alphatab\rendering\ScoreBarRendererFactory.cs" />
     <Compile Include="src\alphatab\rendering\ScoreRenderer.cs" />
@@ -213,6 +224,7 @@
     <Compile Include="src\alphatab\rendering\TabBarRenderer.cs" />
     <Compile Include="src\alphatab\rendering\TabBarRendererFactory.cs" />
     <Compile Include="src\alphatab\rendering\utils\AccidentalHelper.cs" />
+    <Compile Include="src\alphatab\rendering\utils\BarHelpersGroup.cs" />
     <Compile Include="src\alphatab\rendering\utils\BeamingHelper.cs" />
     <Compile Include="src\alphatab\rendering\utils\PercussionMapper.cs" />
     <Compile Include="src\alphatab\rendering\utils\SvgPathParser.cs" />
@@ -231,6 +243,7 @@
     <Compile Include="src\cs\internal\Runtime.cs" />
     <Compile Include="src\cs\internal\StringExt.cs" />
     <Compile Include="src\cs\io\NativeInput.cs" />
+    <Compile Include="src\cs\io\NativeOutput.cs" />
     <Compile Include="src\cs\Lib.cs" />
     <Compile Include="src\EReg.cs" />
     <Compile Include="src\haxe\ds\IntMap.cs" />
@@ -239,6 +252,7 @@
     <Compile Include="src\haxe\io\Bytes.cs" />
     <Compile Include="src\haxe\io\BytesBuffer.cs" />
     <Compile Include="src\haxe\io\BytesInput.cs" />
+    <Compile Include="src\haxe\io\BytesOutput.cs" />
     <Compile Include="src\haxe\io\Eof.cs" />
     <Compile Include="src\haxe\io\Error.cs" />
     <Compile Include="src\haxe\io\Input.cs" />
@@ -254,6 +268,7 @@
     <Compile Include="src\StringTools.cs" />
     <Compile Include="src\sys\io\File.cs" />
     <Compile Include="src\sys\io\FileInput.cs" />
+    <Compile Include="src\sys\io\FileOutput.cs" />
     <Compile Include="src\Type.cs" />
     <Compile Include="src\Xml.cs" />
     <Compile Include="Utils\ActionFunction.cs" />
