@@ -27,6 +27,7 @@ import alphatab.rendering.ScoreRenderer;
 import alphatab.rendering.staves.Stave;
 import alphatab.rendering.staves.StaveGroup;
 import alphatab.rendering.TabBarRendererFactory;
+import alphatab.rendering.utils.BoundingsLookup;
 
 /**
  * This is the base class for creating new layouting engines for the score renderer. 
@@ -50,6 +51,11 @@ class ScoreLayout
  
     public function paintScore() : Void
     {
+        
+    }
+    
+    public function buildBoundingsLookup(lookup:BoundingsLookup) 
+    { 
         
     }
     

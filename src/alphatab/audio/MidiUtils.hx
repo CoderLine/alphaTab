@@ -17,8 +17,12 @@
  */
 package alphatab.audio;
 
+import alphatab.audio.generator.MidiPlaybackController;
+import alphatab.audio.model.MidiTickLookup;
 import alphatab.model.Duration;
 import alphatab.model.DynamicValue;
+import alphatab.model.MasterBar;
+import alphatab.model.Score;
 using alphatab.model.ModelUtils;
 
 /**
@@ -89,5 +93,30 @@ class MidiUtils
         //     case FF:    return (MinVelocity + (6 * VelocityIncrement));
         //     case FFF:   return (MinVelocity + (7 * VelocityIncrement));
         // }
+    }
+    
+    public static function buildTickLookup(score:Score)
+    {
+        var lookup = new MidiTickLookup();
+        
+        var controller = new MidiPlaybackController(score);
+        var tick:Int = 0;
+        while (!controller.finished())
+        {
+            var index = controller.index;
+            var repeatMove = controller.repeatMove;
+            controller.process();
+            
+            if (controller.shouldPlay)
+            {
+                var bar = new BarTickLookup();
+                bar.bar = score.masterBars[index];
+                bar.start = controller.repeatMove + bar.bar.start;
+                bar.end = bar.start + bar.bar.calculateDuration();
+                lookup.bars.push(bar);
+            }
+        }
+        
+        return lookup;
     }
 }

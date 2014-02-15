@@ -41,3 +41,13 @@ body { text-align:center; font-family:Open Sans, Arial sans-serif; background:#F
 
 .samples { position:absolute; width: 800px;}
 .group { position: absolute; top: 50px; left: 0; right: 0; display:none;}
+
+.barCursor {
+    opacity: 0.25;
+    background:#FFF200;
+}
+
+.beatCursor {
+    opacity: 0.75;
+    background:#4040FF;
+}

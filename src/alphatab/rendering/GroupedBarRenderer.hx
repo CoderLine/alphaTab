@@ -29,6 +29,7 @@ import alphatab.rendering.glyphs.SpacingGlyph;
 import alphatab.rendering.glyphs.VoiceContainerGlyph;
 import alphatab.rendering.layout.ScoreLayout;
 import alphatab.rendering.staves.BarSizeInfo;
+import alphatab.rendering.utils.BoundingsLookup;
 import haxe.ds.IntMap;
 
 /**
@@ -325,5 +326,25 @@ class GroupedBarRenderer extends BarRendererBase
     public function paintBackground(cx:Int, cy:Int, canvas:ICanvas)
     {
         
+    }
+    
+    public override function buildBoundingsLookup(lookup:BoundingsLookup, y:Int, h:Int, x:Int)
+    {
+        super.buildBoundingsLookup(lookup, y, h, x);
+        var barLookup = lookup.bars[lookup.bars.length - 1];
+        var glyphStartX = getBeatGlyphsStart();
+        for (c in _voiceContainers)
+        {
+            for (bc in c.beatGlyphs)
+            {
+                var beatLookup = new BeatBoundings();
+                beatLookup.beat = bc.beat;
+                beatLookup.x = x + this.stave.x + this.x + glyphStartX + c.x + bc.x + bc.onNotes.x;
+                beatLookup.y = y;
+                beatLookup.h = h;
+                beatLookup.w = bc.onNotes.width;
+                barLookup.beats.push(beatLookup);                
+            }
+        }
     }
 }

@@ -1021,6 +1021,8 @@ alphatab.rendering.layout.ScoreLayout.prototype = {
 	,getScale: function() {
 		return this.renderer.settings.scale;
 	}
+	,buildBoundingsLookup: function(lookup) {
+	}
 	,paintScore: function() {
 	}
 	,doLayout: function() {
@@ -1034,7 +1036,15 @@ alphatab.rendering.layout.PageViewLayout = function(renderer) {
 alphatab.rendering.layout.PageViewLayout.__name__ = true;
 alphatab.rendering.layout.PageViewLayout.__super__ = alphatab.rendering.layout.ScoreLayout;
 alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.layout.ScoreLayout.prototype,{
-	getSheetWidth: function() {
+	buildBoundingsLookup: function(lookup) {
+		var _g = 0, _g1 = this._groups;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.buildBoundingsLookup(lookup);
+		}
+	}
+	,getSheetWidth: function() {
 		return Math.round(950 * this.renderer.settings.scale);
 	}
 	,getMaxWidth: function() {
@@ -1223,7 +1233,10 @@ alphatab.rendering.layout.HorizontalScreenLayout = function(renderer) {
 alphatab.rendering.layout.HorizontalScreenLayout.__name__ = true;
 alphatab.rendering.layout.HorizontalScreenLayout.__super__ = alphatab.rendering.layout.ScoreLayout;
 alphatab.rendering.layout.HorizontalScreenLayout.prototype = $extend(alphatab.rendering.layout.ScoreLayout.prototype,{
-	paintScore: function() {
+	buildBoundingsLookup: function(lookup) {
+		this._group.buildBoundingsLookup(lookup);
+	}
+	,paintScore: function() {
 		this._group.paint(0,0,this.renderer.canvas);
 	}
 	,doLayout: function() {
@@ -1976,6 +1989,24 @@ alphatab.audio.MidiUtils.applyTuplet = function(ticks,numerator,denominator) {
 alphatab.audio.MidiUtils.dynamicToVelocity = function(dynamicValue) {
 	return 15 + dynamicValue[1] * 16;
 }
+alphatab.audio.MidiUtils.buildTickLookup = function(score) {
+	var lookup = new alphatab.audio.model.MidiTickLookup();
+	var controller = new alphatab.audio.generator.MidiPlaybackController(score);
+	var tick = 0;
+	while(!(controller.index >= controller._score.masterBars.length)) {
+		var index = controller.index;
+		var repeatMove = controller.repeatMove;
+		controller.process();
+		if(controller.shouldPlay) {
+			var bar = new alphatab.audio.model.BarTickLookup();
+			bar.bar = score.masterBars[index];
+			bar.start = controller.repeatMove + bar.bar.start;
+			bar.end = bar.start + bar.bar.calculateDuration();
+			lookup.bars.push(bar);
+		}
+	}
+	return lookup;
+}
 if(!alphatab.audio.generator) alphatab.audio.generator = {}
 alphatab.audio.generator.IMidiFileHandler = function() { }
 alphatab.audio.generator.IMidiFileHandler.__name__ = true;
@@ -2481,6 +2512,44 @@ alphatab.audio.model.MidiMessage.prototype = {
 		out.write(this.data);
 	}
 	,__class__: alphatab.audio.model.MidiMessage
+}
+alphatab.audio.model.BarTickLookup = function() {
+};
+alphatab.audio.model.BarTickLookup.__name__ = true;
+alphatab.audio.model.BarTickLookup.prototype = {
+	__class__: alphatab.audio.model.BarTickLookup
+}
+alphatab.audio.model.MidiTickLookup = function() {
+	this.bars = new Array();
+};
+alphatab.audio.model.MidiTickLookup.__name__ = true;
+alphatab.audio.model.MidiTickLookup.prototype = {
+	findBar: function(tick) {
+		var bottom = 0;
+		var top = this.bars.length - 1;
+		while(bottom <= top) {
+			var middle = (top + bottom) / 2 | 0;
+			var bar = this.bars[middle];
+			if(tick >= bar.start && tick <= bar.end) return bar; else if(tick < bar.start) top = middle - 1; else bottom = middle + 1;
+		}
+		return null;
+	}
+	,findBeat: function(track,tick) {
+		var lookup = this.findBar(tick);
+		if(lookup == null) return null;
+		var masterBar = lookup.bar;
+		var bar = track.bars[masterBar.index];
+		tick = tick - lookup.start + masterBar.start;
+		var beat = null;
+		var _g = 0, _g1 = bar.voices[0].beats;
+		while(_g < _g1.length) {
+			var b = _g1[_g];
+			++_g;
+			if(beat == null || b.start <= tick) beat = b; else break;
+		}
+		return beat;
+	}
+	,__class__: alphatab.audio.model.MidiTickLookup
 }
 alphatab.audio.model.MidiTrack = function() {
 };
@@ -6485,7 +6554,16 @@ alphatab.rendering.BarRendererBase = function(bar) {
 };
 alphatab.rendering.BarRendererBase.__name__ = true;
 alphatab.rendering.BarRendererBase.prototype = {
-	paint: function(cx,cy,canvas) {
+	buildBoundingsLookup: function(lookup,y,h,x) {
+		var barLookup = new alphatab.rendering.utils.BarBoundings();
+		barLookup.bar = this.bar;
+		barLookup.y = y;
+		barLookup.h = h;
+		barLookup.x = x + this.stave.x + this.x;
+		barLookup.w = this.width;
+		lookup.bars.push(barLookup);
+	}
+	,paint: function(cx,cy,canvas) {
 	}
 	,doLayout: function() {
 	}
@@ -6636,7 +6714,29 @@ alphatab.rendering.GroupedBarRenderer = function(bar) {
 alphatab.rendering.GroupedBarRenderer.__name__ = true;
 alphatab.rendering.GroupedBarRenderer.__super__ = alphatab.rendering.BarRendererBase;
 alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.BarRendererBase.prototype,{
-	paintBackground: function(cx,cy,canvas) {
+	buildBoundingsLookup: function(lookup,y,h,x) {
+		alphatab.rendering.BarRendererBase.prototype.buildBoundingsLookup.call(this,lookup,y,h,x);
+		var barLookup = lookup.bars[lookup.bars.length - 1];
+		var glyphStartX = this.getBeatGlyphsStart();
+		var _g = 0, _g1 = this._voiceContainers;
+		while(_g < _g1.length) {
+			var c = _g1[_g];
+			++_g;
+			var _g2 = 0, _g3 = c.beatGlyphs;
+			while(_g2 < _g3.length) {
+				var bc = _g3[_g2];
+				++_g2;
+				var beatLookup = new alphatab.rendering.utils.BeatBoundings();
+				beatLookup.beat = bc.beat;
+				beatLookup.x = x + this.stave.x + this.x + glyphStartX + c.x + bc.x + bc.onNotes.x;
+				beatLookup.y = y;
+				beatLookup.h = h;
+				beatLookup.w = bc.onNotes.width;
+				barLookup.beats.push(beatLookup);
+			}
+		}
+	}
+	,paintBackground: function(cx,cy,canvas) {
 	}
 	,paint: function(cx,cy,canvas) {
 		this.paintBackground(cx,cy,canvas);
@@ -7652,7 +7752,12 @@ alphatab.rendering.ScoreRenderer = function(settings,param) {
 };
 alphatab.rendering.ScoreRenderer.__name__ = true;
 alphatab.rendering.ScoreRenderer.prototype = {
-	raiseRenderFinished: function() {
+	buildBoundingsLookup: function() {
+		var lookup = new alphatab.rendering.utils.BoundingsLookup();
+		this.layout.buildBoundingsLookup(lookup);
+		return lookup;
+	}
+	,raiseRenderFinished: function() {
 		var _g = 0, _g1 = this._renderFinishedListeners;
 		while(_g < _g1.length) {
 			var l = _g1[_g];
@@ -9469,22 +9574,20 @@ alphatab.rendering.glyphs.ScoreNoteChordGlyph.prototype = $extend(alphatab.rende
 			var offset;
 			var baseNote = direction == alphatab.rendering.utils.BeamDirection.Up?this.minNote:this.maxNote;
 			var tremoloX = direction == alphatab.rendering.utils.BeamDirection.Up?displacedX:0;
-			if(this.beat.tremoloSpeed != null) {
-				var speed = this.beat.tremoloSpeed;
-				switch( (speed)[1] ) {
-				case 5:
-					offset = direction == alphatab.rendering.utils.BeamDirection.Up?-15:10;
-					break;
-				case 4:
-					offset = direction == alphatab.rendering.utils.BeamDirection.Up?-12:10;
-					break;
-				case 3:
-					offset = direction == alphatab.rendering.utils.BeamDirection.Up?-10:10;
-					break;
-				default:
-					offset = direction == alphatab.rendering.utils.BeamDirection.Up?-15:15;
-				}
-			} else offset = direction == alphatab.rendering.utils.BeamDirection.Up?-15:15;
+			var _g = this;
+			switch( (_g.beat.tremoloSpeed)[1] ) {
+			case 5:
+				offset = direction == alphatab.rendering.utils.BeamDirection.Up?-15:10;
+				break;
+			case 4:
+				offset = direction == alphatab.rendering.utils.BeamDirection.Up?-12:10;
+				break;
+			case 3:
+				offset = direction == alphatab.rendering.utils.BeamDirection.Up?-10:10;
+				break;
+			default:
+				offset = direction == alphatab.rendering.utils.BeamDirection.Up?-15:15;
+			}
 			this._tremoloPicking = new alphatab.rendering.glyphs.TremoloPickingGlyph(tremoloX,baseNote.glyph.y + (offset * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0),this.beat.tremoloSpeed);
 			this._tremoloPicking.renderer = this.renderer;
 			this._tremoloPicking.doLayout();
@@ -10782,7 +10885,18 @@ alphatab.rendering.staves.StaveGroup = function() {
 };
 alphatab.rendering.staves.StaveGroup.__name__ = true;
 alphatab.rendering.staves.StaveGroup.prototype = {
-	finalizeGroup: function(scoreLayout) {
+	buildBoundingsLookup: function(lookup) {
+		var topY = this.y + this._firstStaveInAccolade.y;
+		var bottomY = this.y + this._lastStaveInAccolade.y + this._lastStaveInAccolade.height;
+		var h = bottomY - topY;
+		var _g = 0, _g1 = this._firstStaveInAccolade.barRenderers;
+		while(_g < _g1.length) {
+			var b = _g1[_g];
+			++_g;
+			b.buildBoundingsLookup(lookup,topY,h,this.x);
+		}
+	}
+	,finalizeGroup: function(scoreLayout) {
 		var currentY = 0;
 		var _g1 = 0, _g = this._allStaves.length;
 		while(_g1 < _g) {
@@ -11166,6 +11280,26 @@ alphatab.rendering.utils.BeamingHelper.prototype = {
 		if(this._track.isPercussion) return alphatab.rendering.utils.PercussionMapper.mapValue(n); else return n.fret + n.beat.voice.bar.track.tuning[n.beat.voice.bar.track.tuning.length - (n.string - 1) - 1];
 	}
 	,__class__: alphatab.rendering.utils.BeamingHelper
+}
+alphatab.rendering.utils.BeatBoundings = function() {
+};
+alphatab.rendering.utils.BeatBoundings.__name__ = true;
+alphatab.rendering.utils.BeatBoundings.prototype = {
+	__class__: alphatab.rendering.utils.BeatBoundings
+}
+alphatab.rendering.utils.BarBoundings = function() {
+	this.beats = new Array();
+};
+alphatab.rendering.utils.BarBoundings.__name__ = true;
+alphatab.rendering.utils.BarBoundings.prototype = {
+	__class__: alphatab.rendering.utils.BarBoundings
+}
+alphatab.rendering.utils.BoundingsLookup = function() {
+	this.bars = new Array();
+};
+alphatab.rendering.utils.BoundingsLookup.__name__ = true;
+alphatab.rendering.utils.BoundingsLookup.prototype = {
+	__class__: alphatab.rendering.utils.BoundingsLookup
 }
 alphatab.rendering.utils.PercussionMapper = function() { }
 alphatab.rendering.utils.PercussionMapper.__name__ = true;

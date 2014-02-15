@@ -27,6 +27,7 @@ import alphatab.rendering.layout.ScoreLayout;
 import alphatab.rendering.staves.StaveGroup.StaveTrackGroup;
 import alphatab.rendering.utils.BarHelpersGroup;
 import alphatab.rendering.utils.BeamingHelper;
+import alphatab.rendering.utils.BoundingsLookup;
 import alphatab.rendering.utils.TupletHelper;
 import haxe.ds.IntMap.IntMap;
 
@@ -325,6 +326,17 @@ class StaveGroup
             _allStaves[i].y = Std.int(currentY);
             _allStaves[i].finalizeStave(scoreLayout);
             currentY += _allStaves[i].height;
+        }
+    }
+    
+    public function buildBoundingsLookup(lookup:BoundingsLookup)
+    {
+        var topY = y + _firstStaveInAccolade.y;
+        var bottomY = y + _lastStaveInAccolade.y + _lastStaveInAccolade.height;
+        var h = bottomY - topY;
+        for (b in _firstStaveInAccolade.barRenderers)
+        {
+            b.buildBoundingsLookup(lookup, topY, h, x);
         }
     }
 }

@@ -30,6 +30,7 @@ import alphatab.rendering.BarRendererBase;
 import alphatab.rendering.RenderingResources;
 import alphatab.rendering.ScoreRenderer;
 import alphatab.rendering.staves.StaveGroup;
+import alphatab.rendering.utils.BoundingsLookup;
 
 /**
  * This layout arranges the bars into a fixed width and dynamic height region. 
@@ -371,4 +372,11 @@ class PageViewLayout extends ScoreLayout
         return Math.round(WidthOn100 * getScale());
     }
     
+    public override function buildBoundingsLookup(lookup:BoundingsLookup)
+    {
+        for (g in _groups)
+        {
+            g.buildBoundingsLookup(lookup);
+        }
+    }
 }

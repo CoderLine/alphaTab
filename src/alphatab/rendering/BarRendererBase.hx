@@ -22,6 +22,7 @@ import alphatab.platform.ICanvas;
 import alphatab.rendering.layout.ScoreLayout;
 import alphatab.rendering.staves.BarSizeInfo;
 import alphatab.rendering.staves.Stave;
+import alphatab.rendering.utils.BoundingsLookup;
 import alphatab.Settings;
 
 /**
@@ -146,5 +147,16 @@ class BarRendererBase
     
     public function paint(cx:Int, cy:Int, canvas:ICanvas)
     {
+    }
+    
+    public function buildBoundingsLookup(lookup:BoundingsLookup, y:Int, h:Int, x:Int)
+    {
+        var barLookup = new BarBoundings();
+        barLookup.bar = bar;
+        barLookup.y = y;
+        barLookup.h = h;
+        barLookup.x = x + this.stave.x + this.x;
+        barLookup.w = width;
+        lookup.bars.push(barLookup);
     }
 }
