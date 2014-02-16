@@ -179,7 +179,7 @@ class GpxParser
         {
             throw ScoreImporter.UnsupportedFormat;
         }
-            
+        
         buildModel();
     }
     
@@ -361,6 +361,7 @@ class GpxParser
                 }
             }
         }
+        
         _tracksById.set(trackId, track);
     }
     

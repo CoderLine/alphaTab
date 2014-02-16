@@ -49,27 +49,28 @@ class MidiFileGenerator
     private var _currentTempo:Int;
     private var _metronomeTrack:Int;
     
-    public function new(score:Score, handler:IMidiFileHandler, metronomeTrack:Int) 
+    public var generateMetronome:Bool;
+    
+    public function new(score:Score, handler:IMidiFileHandler, generateMetronome:Bool=false) 
     {
         _score = score;
         _currentTempo = _score.tempo;
         _handler = handler;
-        _metronomeTrack = metronomeTrack;
+        this.generateMetronome = generateMetronome;
     }
     
-    public static function generateMidiFile(score:Score) : MidiFile
+    public static function generateMidiFile(score:Score,generateMetronome:Bool=false) : MidiFile
     {
         var midiFile = new MidiFile();
         // create score tracks + metronometrack
-        for (i in 0 ... score.tracks.length + 1)
+        for (i in 0 ... score.tracks.length)
         {
             midiFile.createTrack();
         }
         midiFile.infoTrack = 0;
-        midiFile.metronomeTrack = midiFile.tracks.length - 1;
 
         var handler = new MidiFileHandler(midiFile);
-        var generator = new MidiFileGenerator(score, handler, midiFile.metronomeTrack);
+        var generator = new MidiFileGenerator(score, handler, generateMetronome);
         generator.generate();
         return midiFile;
     }
@@ -160,12 +161,15 @@ class MidiFileGenerator
         }
         
         // metronome
-        var start = masterBar.start + startMove;
-        var length = MidiUtils.valueToTicks(masterBar.timeSignatureDenominator);
-        for (i in 0 ... masterBar.timeSignatureNumerator)
+        if (generateMetronome)
         {
-            _handler.addNote(_metronomeTrack, start, length, MidiFileHandler.DefaultMetronomeKey, DynamicValue.F, MidiUtils.PercussionChannel);
-            start += length;
+            var start = masterBar.start + startMove;
+            var length = MidiUtils.valueToTicks(masterBar.timeSignatureDenominator);
+            for (i in 0 ... masterBar.timeSignatureNumerator)
+            {
+                _handler.addMetronome(start, length);
+                start += length;
+            }
         }
     }
     
@@ -226,7 +230,7 @@ class MidiFileGenerator
         var noteStart = beatStart + startMove + brushInfo[note.string - 1];
         var noteDuration = getNoteDuration(note, beatDuration) - brushInfo[note.string -1];
         var dynamicValue = getDynamicValue(note);
-        
+                
         // 
         // Fade in
         if (note.beat.fadeIn)
@@ -285,6 +289,9 @@ class MidiFileGenerator
     
     private function getNoteDuration(note:Note, beatDuration:Int)
     {
+        return applyDurationEffects(note, beatDuration);
+        // a bit buggy:
+        /*
         var lastNoteEnd = note.beat.start - note.beat.calculateDuration();
         var noteDuration = beatDuration;
         var currentBeat = note.beat.nextBeat;
@@ -339,7 +346,7 @@ class MidiFileGenerator
             currentBeat = currentBeat.nextBeat;
         }
         
-        return applyDurationEffects(note, noteDuration);
+        return applyDurationEffects(note, noteDuration);*/
     }
     
     private function applyDurationEffects(note:Note, duration:Int)
@@ -552,7 +559,7 @@ class MidiFileGenerator
                                             beat.voice.bar.track.playbackInfo.primaryChannel,
                                             MidiController.Volume,
                                             Std.int(automation.value));
-                _handler.addControlChange(beat.voice.bar.track.index, beat.start + startMove, 
+                _handler.addControlChange(beat.voice.bar.track.index,  beat.start + startMove, 
                                             beat.voice.bar.track.playbackInfo.secondaryChannel,
                                             MidiController.Volume,
                                             Std.int(automation.value));

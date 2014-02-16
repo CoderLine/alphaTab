@@ -2013,24 +2013,25 @@ alphatab.audio.generator.IMidiFileHandler.__name__ = true;
 alphatab.audio.generator.IMidiFileHandler.prototype = {
 	__class__: alphatab.audio.generator.IMidiFileHandler
 }
-alphatab.audio.generator.MidiFileGenerator = function(score,handler,metronomeTrack) {
+alphatab.audio.generator.MidiFileGenerator = function(score,handler,generateMetronome) {
+	if(generateMetronome == null) generateMetronome = false;
 	this._score = score;
 	this._currentTempo = this._score.tempo;
 	this._handler = handler;
-	this._metronomeTrack = metronomeTrack;
+	this.generateMetronome = generateMetronome;
 };
 alphatab.audio.generator.MidiFileGenerator.__name__ = true;
-alphatab.audio.generator.MidiFileGenerator.generateMidiFile = function(score) {
+alphatab.audio.generator.MidiFileGenerator.generateMidiFile = function(score,generateMetronome) {
+	if(generateMetronome == null) generateMetronome = false;
 	var midiFile = new alphatab.audio.model.MidiFile();
-	var _g1 = 0, _g = score.tracks.length + 1;
+	var _g1 = 0, _g = score.tracks.length;
 	while(_g1 < _g) {
 		var i = _g1++;
 		midiFile.createTrack();
 	}
 	midiFile.infoTrack = 0;
-	midiFile.metronomeTrack = midiFile.tracks.length - 1;
 	var handler = new alphatab.audio.generator.MidiFileHandler(midiFile);
-	var generator = new alphatab.audio.generator.MidiFileGenerator(score,handler,midiFile.metronomeTrack);
+	var generator = new alphatab.audio.generator.MidiFileGenerator(score,handler,generateMetronome);
 	generator.generate();
 	return midiFile;
 }
@@ -2159,32 +2160,7 @@ alphatab.audio.generator.MidiFileGenerator.prototype = {
 		return duration;
 	}
 	,getNoteDuration: function(note,beatDuration) {
-		var lastNoteEnd = note.beat.start - note.beat.calculateDuration();
-		var noteDuration = beatDuration;
-		var currentBeat = note.beat.nextBeat;
-		var letRingSuspend = false;
-		while(currentBeat != null) {
-			if(currentBeat.isRest()) return this.applyDurationEffects(note,noteDuration);
-			var letRing = currentBeat.voice == note.beat.voice && note.isLetRing;
-			var letRingApplied = false;
-			var noteOnSameString = currentBeat.getNoteOnString(note.string);
-			if(noteOnSameString != null) {
-				if(!noteOnSameString.isTieDestination) {
-					letRing = false;
-					letRingSuspend = true;
-					if(!noteOnSameString.isLetRing) return this.applyDurationEffects(note,noteDuration);
-				}
-				letRingApplied = true;
-				noteDuration += currentBeat.start - lastNoteEnd + noteOnSameString.beat.calculateDuration();
-				lastNoteEnd = currentBeat.start + currentBeat.calculateDuration();
-			}
-			if(letRing && !letRingApplied && !letRingSuspend) {
-				noteDuration += currentBeat.start - lastNoteEnd + currentBeat.calculateDuration();
-				lastNoteEnd = currentBeat.start + currentBeat.calculateDuration();
-			}
-			currentBeat = currentBeat.nextBeat;
-		}
-		return this.applyDurationEffects(note,noteDuration);
+		return this.applyDurationEffects(note,beatDuration);
 	}
 	,generateNote: function(note,beatStart,beatDuration,startMove,brushInfo) {
 		var track = note.beat.voice.bar.track;
@@ -2251,13 +2227,15 @@ alphatab.audio.generator.MidiFileGenerator.prototype = {
 			this._handler.addTempo(masterBar.start + startMove,masterBar.tempoAutomation.value | 0);
 			this._currentTempo = masterBar.tempoAutomation.value | 0;
 		}
-		var start = masterBar.start + startMove;
-		var length = alphatab.audio.MidiUtils.valueToTicks(masterBar.timeSignatureDenominator);
-		var _g1 = 0, _g = masterBar.timeSignatureNumerator;
-		while(_g1 < _g) {
-			var i = _g1++;
-			this._handler.addNote(this._metronomeTrack,start,length,37,alphatab.model.DynamicValue.F,9);
-			start += length;
+		if(this.generateMetronome) {
+			var start = masterBar.start + startMove;
+			var length = alphatab.audio.MidiUtils.valueToTicks(masterBar.timeSignatureDenominator);
+			var _g1 = 0, _g = masterBar.timeSignatureNumerator;
+			while(_g1 < _g) {
+				var i = _g1++;
+				this._handler.addMetronome(start,length);
+				start += length;
+			}
 		}
 	}
 	,generateChannel: function(track,channel,playbackInfo) {
@@ -2301,6 +2279,7 @@ alphatab.audio.generator.MidiFileGenerator.prototype = {
 }
 alphatab.audio.generator.MidiFileHandler = function(midiFile) {
 	this._midiFile = midiFile;
+	this._metronomeTrack = -1;
 };
 alphatab.audio.generator.MidiFileHandler.__name__ = true;
 alphatab.audio.generator.MidiFileHandler.__interfaces__ = [alphatab.audio.generator.IMidiFileHandler];
@@ -2348,7 +2327,14 @@ alphatab.audio.generator.MidiFileHandler.buildSysExMessage = function(data) {
 	return alphatab.audio.model.MidiMessage.fromArray(sysex);
 }
 alphatab.audio.generator.MidiFileHandler.prototype = {
-	addBend: function(track,tick,channel,value) {
+	addMetronome: function(tick,length) {
+		if(this._metronomeTrack == -1) {
+			this._midiFile.createTrack();
+			this._metronomeTrack = this._midiFile.tracks.length - 1;
+		}
+		this.addNote(this._metronomeTrack,tick,length,37,alphatab.model.DynamicValue.F,9);
+	}
+	,addBend: function(track,tick,channel,value) {
 		this.addEvent(track,tick,alphatab.audio.model.MidiMessage.fromArray([224 | channel & 15,0,alphatab.audio.generator.MidiFileHandler.fixValue(value)]));
 	}
 	,addTempo: function(tick,tempo) {
@@ -2530,7 +2516,7 @@ alphatab.audio.model.MidiTickLookup.prototype = {
 		while(bottom <= top) {
 			var middle = (top + bottom) / 2 | 0;
 			var bar = this.bars[middle];
-			if(tick >= bar.start && tick <= bar.end) return bar; else if(tick < bar.start) top = middle - 1; else bottom = middle + 1;
+			if(tick > bar.start && tick < bar.end || tick == bar.start || tick == bar.end) return bar; else if(tick < bar.start) top = middle - 1; else bottom = middle + 1;
 		}
 		return null;
 	}
@@ -3277,7 +3263,6 @@ alphatab.importer.AlphaTexImporter.prototype = $extend(alphatab.importer.ScoreIm
 			this._score.finish();
 			return this._score;
 		} catch( e ) {
-			console.log(e);
 			throw alphatab.importer.ScoreImporter.UnsupportedFormat;
 		}
 	}
@@ -5736,6 +5721,7 @@ alphatab.model.Beat = function() {
 	this.duration = alphatab.model.Duration.Quarter;
 	this.tremoloSpeed = null;
 	this.automations = new Array();
+	this.dots = 0;
 	this.start = 0;
 	this.tupletDenominator = -1;
 	this.tupletNumerator = -1;
@@ -5745,14 +5731,14 @@ alphatab.model.Beat = function() {
 alphatab.model.Beat.__name__ = true;
 alphatab.model.Beat.prototype = {
 	finish: function() {
-		if(this.voice.bar.index == 0 && this.index == 0) {
-			this.start = this.voice.bar.getMasterBar().start;
-			this.previousBeat = null;
-		} else {
-			if(this.index == 0) this.previousBeat = this.voice.bar.previousBar.voices[this.voice.index].beats[this.voice.bar.previousBar.voices[this.voice.index].beats.length - 1]; else this.previousBeat = this.voice.beats[this.index - 1];
+		if(this.voice.bar.index == 0 && this.index == 0) this.previousBeat = null; else if(this.index == 0) {
+			this.previousBeat = this.voice.bar.previousBar.voices[this.voice.index].beats[this.voice.bar.previousBar.voices[this.voice.index].beats.length - 1];
 			this.previousBeat.nextBeat = this;
-			this.start = this.previousBeat.start + this.previousBeat.calculateDuration();
+		} else {
+			this.previousBeat = this.voice.beats[this.index - 1];
+			this.previousBeat.nextBeat = this;
 		}
+		if(this.index == 0) this.start = this.voice.bar.getMasterBar().start; else this.start = this.previousBeat.start + this.previousBeat.calculateDuration();
 		var _g = 0, _g1 = this.notes;
 		while(_g < _g1.length) {
 			var n = _g1[_g];
@@ -5814,6 +5800,7 @@ alphatab.model.Beat.prototype = {
 			++_g;
 			beat.addNote(n.clone());
 		}
+		beat.dots = this.dots;
 		beat.chordId = this.chordId;
 		beat.brushType = this.brushType;
 		beat.vibrato = this.vibrato;
@@ -6204,6 +6191,9 @@ alphatab.model.PickStrokeType.Down = ["Down",2];
 alphatab.model.PickStrokeType.Down.toString = $estr;
 alphatab.model.PickStrokeType.Down.__enum__ = alphatab.model.PickStrokeType;
 alphatab.model.PlaybackInformation = function() {
+	this.volume = 15;
+	this.balance = 8;
+	this.port = 1;
 };
 alphatab.model.PlaybackInformation.__name__ = true;
 alphatab.model.PlaybackInformation.prototype = {

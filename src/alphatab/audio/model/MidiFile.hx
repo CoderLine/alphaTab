@@ -33,11 +33,6 @@ class MidiFile
      */
     public var infoTrack:Int;
     
-    /**
-     * Gets or sets the index of the track used as metronome.
-     */
-    public var metronomeTrack:Int;
-    
     public function new() 
     {
         tracks = new Array<MidiTrack>();

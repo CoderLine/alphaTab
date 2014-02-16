@@ -59,6 +59,7 @@
     <Compile Include="src\alphatab\audio\model\MidiEvent.cs" />
     <Compile Include="src\alphatab\audio\model\MidiFile.cs" />
     <Compile Include="src\alphatab\audio\model\MidiMessage.cs" />
+    <Compile Include="src\alphatab\audio\model\MidiTickLookup.cs" />
     <Compile Include="src\alphatab\audio\model\MidiTrack.cs" />
     <Compile Include="src\alphatab\Environment.cs" />
     <Compile Include="src\alphatab\importer\AlphaTexImporter.cs" />
@@ -226,6 +227,7 @@
     <Compile Include="src\alphatab\rendering\utils\AccidentalHelper.cs" />
     <Compile Include="src\alphatab\rendering\utils\BarHelpersGroup.cs" />
     <Compile Include="src\alphatab\rendering\utils\BeamingHelper.cs" />
+    <Compile Include="src\alphatab\rendering\utils\BoundingsLookup.cs" />
     <Compile Include="src\alphatab\rendering\utils\PercussionMapper.cs" />
     <Compile Include="src\alphatab\rendering\utils\SvgPathParser.cs" />
     <Compile Include="src\alphatab\rendering\utils\TupletHelper.cs" />

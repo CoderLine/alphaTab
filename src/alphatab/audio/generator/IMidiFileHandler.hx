@@ -30,4 +30,5 @@ interface IMidiFileHandler
     function addProgramChange(track:Int, tick:Int, channel:Int, program:Int) : Void;
     function addTempo(tick:Int, tempo:Int) : Void;
     function addBend(track:Int, tick:Int, channel:Int, value:Int) : Void;
+    function addMetronome(start:Int, length:Int) : Void;
 }

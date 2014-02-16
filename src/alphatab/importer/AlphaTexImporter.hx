@@ -81,7 +81,6 @@ class AlphaTexImporter extends ScoreImporter
         }
         catch (e:Dynamic)
         {
-            trace(e);
             throw ScoreImporter.UnsupportedFormat;
         }
     }

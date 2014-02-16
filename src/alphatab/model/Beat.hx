@@ -100,6 +100,7 @@ class Beat
         duration = Duration.Quarter;
         tremoloSpeed = null;
         automations = new Array<Automation>();
+        dots = 0;
         start = 0;        
         tupletDenominator = -1;
         tupletNumerator = -1;
@@ -118,6 +119,7 @@ class Beat
         {
             beat.addNote(n.clone());
         }
+        beat.dots = dots;
         beat.chordId = chordId;
         beat.brushType = brushType;
         beat.vibrato = vibrato;
@@ -220,22 +222,29 @@ class Beat
     
     public function finish()
     {
+        // chaining
         if (voice.bar.index == 0 && index == 0)
         {
-            start = voice.bar.getMasterBar().start;
-            previousBeat = null;
+            previousBeat = null; // very first beat
+        }
+        else if(index == 0)
+        {
+            previousBeat = voice.bar.previousBar.voices[voice.index].beats[voice.bar.previousBar.voices[voice.index].beats.length - 1];
+            previousBeat.nextBeat = this;
         }
         else
         {
-            if (index == 0)
-            {
-                previousBeat = voice.bar.previousBar.voices[voice.index].beats[voice.bar.previousBar.voices[voice.index].beats.length - 1];
-            }
-            else
-            {
-                previousBeat = voice.beats[index - 1];
-            }
+            previousBeat = voice.beats[index - 1];
             previousBeat.nextBeat = this;
+        }
+        
+        // start
+        if (index == 0)
+        {
+            start = voice.bar.getMasterBar().start;
+        }
+        else
+        {
             start = previousBeat.start + previousBeat.calculateDuration();
         }
         
