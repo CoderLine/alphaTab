@@ -22,7 +22,7 @@
         var output = new haxe.io.BytesOutput();
         midi.writeTo(output);
         var bytes = output.getBytes();
-        console.log(synth.loadMidiBytes(bytes.b));
+        synth.loadMidiBytes(bytes.b);
     }
     
     // extend the api
@@ -123,11 +123,11 @@
         
         if(context.cursorOptions.autoScroll)
         {
-            var scrollTop = cursorWrapper.offset().top + beatBoundings.bounds.y;
+            var padding = beatCursor.offset().top - beatBoundings.visualBounds.y;
+            var scrollTop = padding + beatBoundings.bounds.y + context.cursorOptions.scrollOffset;
             if(scrollTop != context.cursorOptions.lastScroll)
             {
                 context.cursorOptions.lastScroll = scrollTop;
-                console.log('scroll', scrollTop, context.cursorOptions.scrollSpeed);     
                 $(context.cursorOptions.scrollElement).animate({
                     scrollTop:scrollTop + 'px'
                 }, context.cursorOptions.scrollSpeed);

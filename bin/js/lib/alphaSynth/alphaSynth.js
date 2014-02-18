@@ -278,7 +278,7 @@ as.AlphaSynth.init = function(asRoot,swfObjectRoot) {
 }
 as.AlphaSynth.prototype = {
 	trigger: function(event) {
-		var args = Array.prototype.slice.call(arguments);;
+		var args = Array.prototype.slice.call(arguments);
 		switch(event) {
 		case "ready":
 			this.ready = true;
