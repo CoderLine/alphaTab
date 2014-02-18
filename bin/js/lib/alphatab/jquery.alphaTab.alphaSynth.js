@@ -1,16 +1,19 @@
 (function($) 
 {
+    var synth = as.AlphaSynth.instance;
+    
     function loadMidi(score) 
     {
         // invalid score
         if(score == null) return;
+        
         // alphaSynth not readyState yet
-        if(!as.AlphaSynth.isReady) 
+        if(!synth.ready) 
         {
-            $(document).on('alphaSynthReady', function() {
+            synth.on('ready', function() {
                 setTimeout(function() {
                     loadMidi(score);
-                }, 0); // enqueue call for later
+                }, 0);
             });            
             return;
         }        
@@ -19,7 +22,7 @@
         var output = new haxe.io.BytesOutput();
         midi.writeTo(output);
         var bytes = output.getBytes();
-        console.log(as.AlphaSynth.loadMidi(bytes.b));
+        console.log(synth.loadMidiBytes(bytes.b));
     }
     
     // extend the api
@@ -99,23 +102,37 @@
             cache = $(this).data('alphaSynthCursorCache');
         }
         
+        var cursorWrapper = $(this).data('cursors');
         var barCursor = $(this).data('barCursor');
         var beatCursor = $(this).data('beatCursor');
         
         var barBoundings = cache.bars[beat.voice.bar.index];
         var beatBoundings = barBoundings.beats[beat.index];
         barCursor.css({
-            top: barBoundings.y + 'px', 
-            left: barBoundings.x + 'px',
-            width: barBoundings.w + 'px',
-            height: barBoundings.h + 'px'
+            top: barBoundings.visualBounds.y + 'px', 
+            left: barBoundings.visualBounds.x + 'px',
+            width: barBoundings.visualBounds.w + 'px',
+            height: barBoundings.visualBounds.h + 'px'
         });
         beatCursor.css({
-            top: beatBoundings.y + 'px', 
-            left: beatBoundings.x + 'px',
+            top: beatBoundings.visualBounds.y + 'px', 
+            left: beatBoundings.visualBounds.x + 'px',
             width: context.cursorOptions.beatCursorWidth + 'px',
-            height: beatBoundings.h + 'px'
+            height: beatBoundings.visualBounds.h + 'px'
         });
+        
+        if(context.cursorOptions.autoScroll)
+        {
+            var scrollTop = cursorWrapper.offset().top + beatBoundings.bounds.y;
+            if(scrollTop != context.cursorOptions.lastScroll)
+            {
+                context.cursorOptions.lastScroll = scrollTop;
+                console.log('scroll', scrollTop, context.cursorOptions.scrollSpeed);     
+                $(context.cursorOptions.scrollElement).animate({
+                    scrollTop:scrollTop + 'px'
+                }, context.cursorOptions.scrollSpeed);
+            }
+        }
     };
     
     api.playerCursor = function(options) 
@@ -128,6 +145,8 @@
                 
         var defaults = {
             autoScroll: true,
+            scrollSpeed: 300,
+            scrollOffset: -30,
             scrollElement: 'html, body',
             scrollAdjustment: 0,
             beatCursorWidth: 3
@@ -146,6 +165,7 @@
         // required css styles
         $(this).css({position: 'relative'});
         $(this).data('cursorOptions', options);
+        $(this).data('cursors', cursorWrapper);
         $(this).data('barCursor', barCursor);
         $(this).data('beatCursor', beatCursor);
         cursorWrapper.css({position: 'absolute', "z-index": 1000, display: 'inline'});
@@ -172,9 +192,9 @@
         
         // cursor updating
         var self = this;
-        as.AlphaSynth.addPositionChangedListener(function(pos) {
+        synth.on('positionChanged', function(e, currentTime, endTime, currentTick, endTick) {
             setTimeout(function() {
-                api.playerCursorUpdateTick.apply(self, [pos.currentTick]);
+                api.playerCursorUpdateTick.apply(self, [currentTick]);
             }, 0); // enqueue cursor update for later to return ExternalInterface call
         });
     };

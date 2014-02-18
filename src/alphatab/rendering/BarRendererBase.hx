@@ -149,14 +149,14 @@ class BarRendererBase
     {
     }
     
-    public function buildBoundingsLookup(lookup:BoundingsLookup, y:Int, h:Int, x:Int)
+    public function  buildBoundingsLookup(lookup:BoundingsLookup, 
+            visualTop:Int, visualHeight:Int,
+            realTop:Int, realHeight:Int, x:Int)
     {
         var barLookup = new BarBoundings();
         barLookup.bar = bar;
-        barLookup.y = y;
-        barLookup.h = h;
-        barLookup.x = x + this.stave.x + this.x;
-        barLookup.w = width;
+        barLookup.visualBounds = new Bounds(x + this.stave.x + this.x, visualTop, width, visualHeight);
+        barLookup.bounds = new Bounds(x + this.stave.x + this.x, realTop, width, realHeight);
         lookup.bars.push(barLookup);
     }
 }

@@ -331,12 +331,16 @@ class StaveGroup
     
     public function buildBoundingsLookup(lookup:BoundingsLookup)
     {
-        var topY = y + _firstStaveInAccolade.y;
-        var bottomY = y + _lastStaveInAccolade.y + _lastStaveInAccolade.height;
-        var h = bottomY - topY;
+        var visualTop = y + _firstStaveInAccolade.y;
+        var visualBottom = y + _lastStaveInAccolade.y + _lastStaveInAccolade.height;
+        var realTop = y + _allStaves[0].y;
+        var realBottom = y + _allStaves[_allStaves.length - 1].y + _allStaves[_allStaves.length - 1].height;
+        
+        var visualHeight = visualBottom - visualTop;
+        var realHeight = realBottom - realTop;
         for (b in _firstStaveInAccolade.barRenderers)
         {
-            b.buildBoundingsLookup(lookup, topY, h, x);
+            b.buildBoundingsLookup(lookup, visualTop, visualHeight, realTop, realHeight, x);
         }
     }
 }

@@ -6544,13 +6544,11 @@ alphatab.rendering.BarRendererBase = function(bar) {
 };
 alphatab.rendering.BarRendererBase.__name__ = true;
 alphatab.rendering.BarRendererBase.prototype = {
-	buildBoundingsLookup: function(lookup,y,h,x) {
+	buildBoundingsLookup: function(lookup,visualTop,visualHeight,realTop,realHeight,x) {
 		var barLookup = new alphatab.rendering.utils.BarBoundings();
 		barLookup.bar = this.bar;
-		barLookup.y = y;
-		barLookup.h = h;
-		barLookup.x = x + this.stave.x + this.x;
-		barLookup.w = this.width;
+		barLookup.visualBounds = new alphatab.rendering.utils.Bounds(x + this.stave.x + this.x,visualTop,this.width,visualHeight);
+		barLookup.bounds = new alphatab.rendering.utils.Bounds(x + this.stave.x + this.x,realTop,this.width,realHeight);
 		lookup.bars.push(barLookup);
 	}
 	,paint: function(cx,cy,canvas) {
@@ -6704,10 +6702,12 @@ alphatab.rendering.GroupedBarRenderer = function(bar) {
 alphatab.rendering.GroupedBarRenderer.__name__ = true;
 alphatab.rendering.GroupedBarRenderer.__super__ = alphatab.rendering.BarRendererBase;
 alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.BarRendererBase.prototype,{
-	buildBoundingsLookup: function(lookup,y,h,x) {
-		alphatab.rendering.BarRendererBase.prototype.buildBoundingsLookup.call(this,lookup,y,h,x);
+	buildBoundingsLookup: function(lookup,visualTop,visualHeight,realTop,realHeight,x) {
+		alphatab.rendering.BarRendererBase.prototype.buildBoundingsLookup.call(this,lookup,visualTop,visualHeight,realTop,realHeight,x);
 		var barLookup = lookup.bars[lookup.bars.length - 1];
-		var glyphStartX = this.getBeatGlyphsStart();
+		var preBeatStart = this.getPreBeatGlyphStart();
+		var onBeatStart = this.getBeatGlyphsStart();
+		var postBeatStart = this.getPostBeatGlyphsStart();
 		var _g = 0, _g1 = this._voiceContainers;
 		while(_g < _g1.length) {
 			var c = _g1[_g];
@@ -6718,10 +6718,9 @@ alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.Bar
 				++_g2;
 				var beatLookup = new alphatab.rendering.utils.BeatBoundings();
 				beatLookup.beat = bc.beat;
-				beatLookup.x = x + this.stave.x + this.x + glyphStartX + c.x + bc.x + bc.onNotes.x;
-				beatLookup.y = y;
-				beatLookup.h = h;
-				beatLookup.w = bc.onNotes.width;
+				beatLookup.visualBounds = new alphatab.rendering.utils.Bounds(x + this.stave.x + this.x + onBeatStart + c.x + bc.x + bc.onNotes.x,visualTop,bc.onNotes.width,visualHeight);
+				beatLookup.bounds = new alphatab.rendering.utils.Bounds(x + this.stave.x + this.x + preBeatStart + c.x + bc.x + bc.onNotes.x,realTop,0,realHeight);
+				beatLookup.bounds.w = postBeatStart + bc.postNotes.width - beatLookup.visualBounds.x;
 				barLookup.beats.push(beatLookup);
 			}
 		}
@@ -10876,14 +10875,17 @@ alphatab.rendering.staves.StaveGroup = function() {
 alphatab.rendering.staves.StaveGroup.__name__ = true;
 alphatab.rendering.staves.StaveGroup.prototype = {
 	buildBoundingsLookup: function(lookup) {
-		var topY = this.y + this._firstStaveInAccolade.y;
-		var bottomY = this.y + this._lastStaveInAccolade.y + this._lastStaveInAccolade.height;
-		var h = bottomY - topY;
+		var visualTop = this.y + this._firstStaveInAccolade.y;
+		var visualBottom = this.y + this._lastStaveInAccolade.y + this._lastStaveInAccolade.height;
+		var realTop = this.y + this._allStaves[0].y;
+		var realBottom = this.y + this._allStaves[this._allStaves.length - 1].y + this._allStaves[this._allStaves.length - 1].height;
+		var visualHeight = visualBottom - visualTop;
+		var realHeight = realBottom - realTop;
 		var _g = 0, _g1 = this._firstStaveInAccolade.barRenderers;
 		while(_g < _g1.length) {
 			var b = _g1[_g];
 			++_g;
-			b.buildBoundingsLookup(lookup,topY,h,this.x);
+			b.buildBoundingsLookup(lookup,visualTop,visualHeight,realTop,realHeight,this.x);
 		}
 	}
 	,finalizeGroup: function(scoreLayout) {
@@ -11270,6 +11272,16 @@ alphatab.rendering.utils.BeamingHelper.prototype = {
 		if(this._track.isPercussion) return alphatab.rendering.utils.PercussionMapper.mapValue(n); else return n.fret + n.beat.voice.bar.track.tuning[n.beat.voice.bar.track.tuning.length - (n.string - 1) - 1];
 	}
 	,__class__: alphatab.rendering.utils.BeamingHelper
+}
+alphatab.rendering.utils.Bounds = function(x,y,w,h) {
+	this.x = x;
+	this.y = y;
+	this.w = w;
+	this.h = h;
+};
+alphatab.rendering.utils.Bounds.__name__ = true;
+alphatab.rendering.utils.Bounds.prototype = {
+	__class__: alphatab.rendering.utils.Bounds
 }
 alphatab.rendering.utils.BeatBoundings = function() {
 };
