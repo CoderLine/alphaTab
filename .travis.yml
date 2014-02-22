@@ -31,4 +31,3 @@ after_success:
   - git add -A 
   - git commit -m "Travis autobuild $TRAVIS_BUILD_NUMBER"
   - git push https://${GH_TOKEN}@github.com/CoderLine/alphaTab master
-  
