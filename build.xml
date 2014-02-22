@@ -94,7 +94,7 @@
     
 	<!-- Haxe Builds -->
 	<target name="js">
-		<delete file="${haxe-js}" />
+		<delete file="${haxe-js}" quiet="true" />
         <exec executable="haxe" failonerror="true">
             <arg value="-cp" />
             <arg value="${src}"/>
@@ -120,7 +120,7 @@
 	<!-- Haxe Builds -->
 	<target name="cs">
 		<mkdir dir="${haxe-cs}" />
-		<delete dir="${haxe-cs-core}/src" />
+		<delete dir="${haxe-cs-core}/src" quiet="true" />
         <exec executable="haxe" failonerror="true">
             <arg value="-cp" />
             <arg value="${src}"/>
@@ -148,7 +148,7 @@
 
     <property name="unit-tests-neko" location="${bin}/test/tests.n"/>
     <target name="test-neko">
-		<delete file="${unit-tests-neko}" />
+		<delete file="${unit-tests-neko}" quiet="true" />
         <exec executable="haxe" failonerror="true">
             <arg value="-cp" />
             <arg value="${src}"/>
@@ -175,7 +175,7 @@
     
    <property name="unit-tests-js" location="${bin}/test/tests.js"/>
     <target name="test-js">
-		<delete file="${unit-tests-js}" />
+		<delete file="${unit-tests-js}" quiet="true" />
         <exec executable="haxe" failonerror="true">
             <arg value="-cp" />
             <arg value="${src}"/>
