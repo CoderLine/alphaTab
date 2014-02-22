@@ -23,6 +23,8 @@ before_install:
   # Setup haxelib
   - mkdir -p ~/haxelib
   - haxelib setup ~/haxelib
+  # Debug
+  - ls -R bin/js
 
 # Actual build
 script:
