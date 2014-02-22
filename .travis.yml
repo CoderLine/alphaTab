@@ -3,9 +3,9 @@
 # Well, our language is Haxe but as I we use Ant for building
 # we choose Java. 
 language: java
-
-# Install Haxe before build
+  
 before_install:
+  # Install Haxe before build
   - sudo apt-get update                               
   - sudo apt-get install python-software-properties -y
   - sudo add-apt-repository ppa:eyecreate/haxe -y
@@ -13,8 +13,9 @@ before_install:
   - sudo apt-get install haxe -y --force-yes
   - mkdir ~/haxelib
   - haxelib setup ~/haxelib
+  # Install NPM Packages 
+  - npm install uglify-js -g
 
 # Actual build
 script:
-  - ant js      # JavaScript Build
-  - ant cs      # C# Build
+  - ant all
