@@ -1,30 +1,18 @@
 # Travis build file for alphaTab
-# Based on https://github.com/HaxePunk/HaxePunk/blob/dev/.travis.yml
 
 # Well, our language is Haxe but as I we use Ant for building
 # we choose Java. 
 language: java
-env: LD_LIBRARY_PATH=/usr/lib/neko
 
 # Install Haxe before build
 before_install:
-  - sudo apt-get install libgc1c2
-  # Install neko 2.0
-  - curl http://nekovm.org/_media/neko-2.0.0-linux64.tar.gz | tar xzf -
-  - sudo mv neko-2.0.0-linux /usr/lib/neko
-  - sudo cp /usr/lib/neko/neko /usr/bin/neko
-  - sudo cp /usr/lib/neko/nekoc /usr/bin/nekoc
-  - sudo cp /usr/lib/neko/nekotools /usr/bin/nekotools
-  # Install haxe 3.1 (thanks to openfl install script)
-  - curl http://haxe.org/file/haxe-3.0.1-linux64.tar.gz | tar xzf -
-  - sudo mv build /usr/lib/haxe
-  - sudo ln -s /usr/lib/haxe/haxe /usr/bin/haxe
-  - sudo ln -s /usr/lib/haxe/haxelib /usr/bin/haxelib
-  # Setup haxelib
-  - mkdir -p ~/haxelib
+  - sudo apt-get update                               
+  - sudo apt-get install python-software-properties -y
+  - sudo add-apt-repository ppa:eyecreate/haxe -y
+  - sudo apt-get update
+  - sudo apt-get install haxe -y --force-yes
+  - mkdir ~/haxelib
   - haxelib setup ~/haxelib
-  # Debug
-  - ls -R bin/js
 
 # Actual build
 script:
