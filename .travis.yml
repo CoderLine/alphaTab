@@ -19,3 +19,14 @@ before_install:
 # Actual build
 script:
   - ant all
+  
+# Push back rebuilt sources to repository
+env:
+  global:
+    secure: DqyPFy7GkX28pQv3Kqo9giS8z4tkPbczujP/u+sWMQa9EfBnRppsERMEvnbjyl6duzUhsnzde9EuCgJZQILO+6JKLsnqS1bAhrAZ5MIyGKA+mATxoqMDGpsKSbtiytE8oLLsLTUlQNIm41Fm7FlNmgqdxyj/imijrlujjDs3hH4=
+after_success: 
+  - git config --global user.name "travis-ci" 
+  - git config --global user.email "travis@travis-ci.org" 
+  - git add -A git commit -m 'Travis autobuild $TRAVIS_BUILD_NUMBER'
+  - git push https://${GH_TOKEN}@github.com/CoderLine/alphaTab master
+  
