@@ -20,7 +20,7 @@ install:
   - mkdir ~/haxelib                                    # create a folder for installing haxelib
   - haxelib setup ~/haxelib
   # - haxelib install hxcpp                              # install hxcpp to test C++ target
-  - mkdir bin                                          # create an output folder if needed
+  # - mkdir bin                                          # create an output folder if needed
   
 # Actual build
 script:
