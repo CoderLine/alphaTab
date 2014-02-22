@@ -15,7 +15,7 @@ before_install:
   - sudo cp /usr/lib/neko/neko /usr/bin/neko
   - sudo cp /usr/lib/neko/nekoc /usr/bin/nekoc
   - sudo cp /usr/lib/neko/nekotools /usr/bin/nekotools
-    # Install haxe 3.1 (thanks to openfl install script)
+  # Install haxe 3.1 (thanks to openfl install script)
   - curl http://haxe.org/file/haxe-3.0.1-linux64.tar.gz | tar xzf -
   - sudo mv build /usr/lib/haxe
   - sudo ln -s /usr/lib/haxe/haxe /usr/bin/haxe
@@ -23,8 +23,6 @@ before_install:
   # Setup haxelib
   - mkdir -p ~/haxelib
   - haxelib setup ~/haxelib
-  # Download dependencies
-  - ant tools
 
 # Actual build
 script:
