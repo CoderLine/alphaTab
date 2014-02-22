@@ -84,7 +84,7 @@
         Building All
     **************************************************************************-->
         
-    <target name="all" depends="js,cs">
+    <target name="all" depends="js-minify,cs">
     </target>
     
     <!--*************************************************************************
@@ -96,9 +96,13 @@
 	<property name="haxe-js" location="${lib-js}/alphaTab.core.js"/>
 	<property name="haxe-js-min" location="${lib-js}/alphaTab.core.min.js"/>
     
+    <condition property="uglify" value="uglifyjs.cmd" else="uglifyjs">
+        <os family="windows" />
+    </condition>
+
     <target name="minify">
-        <property environment="env"/>
-        <exec executable="uglifyjs.cmd" failonerror="true">
+        <echo message="Minifying ${file}" />
+        <exec executable="${uglify}" failonerror="true">
             <arg value="${file}" />
             
             <arg value="-o" />
@@ -124,6 +128,8 @@
             <arg value="-js" />
             <arg value="${haxe-js}" />
         </exec>
+	</target>	
+    <target name="js-minify" depends="js">
         <!-- Minimize JavaScripts -->
         <antcall target="minify">
             <param name="banner" value="${haxe-js}" />
@@ -134,7 +140,7 @@
             <param name="file" value="${lib-js}/jquery.alphaTab.js" />
             <param name="file-min" value="${lib-js}/jquery.alphaTab.min.js" />
         </antcall>
-	</target>	
+    </target>
 	
     <!--*************************************************************************
         Building C#
