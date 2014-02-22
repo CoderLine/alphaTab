@@ -334,9 +334,7 @@ class GroupedBarRenderer extends BarRendererBase
     {
         super.buildBoundingsLookup(lookup, visualTop, visualHeight, realTop, realHeight, x);
         var barLookup = lookup.bars[lookup.bars.length - 1];
-        var preBeatStart = getPreBeatGlyphStart();
-        var onBeatStart = getBeatGlyphsStart();
-        var postBeatStart = getPostBeatGlyphsStart();
+        var beatStart = getBeatGlyphsStart();
         for (c in _voiceContainers)
         {
             for (bc in c.beatGlyphs)
@@ -345,13 +343,12 @@ class GroupedBarRenderer extends BarRendererBase
                 beatLookup.beat = bc.beat;
                 // on beat bounding rectangle
                 beatLookup.visualBounds = new Bounds(
-                x + this.stave.x + this.x + onBeatStart + c.x + bc.x + bc.onNotes.x, visualTop,
+                x + this.stave.x + this.x + beatStart + c.x + bc.x + bc.onNotes.x, visualTop,
                 bc.onNotes.width, visualHeight);
                 // real beat boundings
                 beatLookup.bounds = new Bounds(
-                x + this.stave.x + this.x + preBeatStart + c.x + bc.x + bc.onNotes.x, realTop,
-                0, realHeight);
-                beatLookup.bounds.w = (postBeatStart + bc.postNotes.width) - beatLookup.visualBounds.x;
+                x + this.stave.x + this.x + beatStart + c.x + bc.x, realTop,
+                bc.width, realHeight);
                 barLookup.beats.push(beatLookup);                
             }
         }

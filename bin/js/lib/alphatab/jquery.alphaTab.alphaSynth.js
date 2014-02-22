@@ -69,6 +69,17 @@
         $(this).data('alphaSynthCursorCache', renderer.buildBoundingsLookup());
     };
     
+    api.getBeatAtPos = function(x, y) {
+        var cache = $(this).data('alphaSynthCursorCache');
+        if(!cache)
+        {
+            api.playerCursorUpdateCache.apply(this);
+            cache = $(this).data('alphaSynthCursorCache');
+        }
+        
+        return cache.getBeatAtPos(x, y);
+    };
+    
     api.playerCursorUpdateTick = function(tick) {
         var context = $(this).data('alphaTab');
         if(!context) { return; }
@@ -149,7 +160,8 @@
             scrollOffset: -30,
             scrollElement: 'html, body',
             scrollAdjustment: 0,
-            beatCursorWidth: 3
+            beatCursorWidth: 3,
+            handleClick: true
         };
         
         context.cursorOptions = $.extend(defaults, options);
@@ -197,6 +209,18 @@
                 api.playerCursorUpdateTick.apply(self, [currentTick]);
             }, 0); // enqueue cursor update for later to return ExternalInterface call
         });
+        
+        // click handling
+        if(context.cursorOptions.handleClick) {
+            $(cursorWrapper).click(function(e) {
+                var parentOffset = $(this).offset(); 
+                var relX = e.pageX - parentOffset.left;
+                var relY = e.pageY - parentOffset.top;
+                console.log(relX,relY);
+                var beat = api.getBeatAtPos.apply(self, [relX, relY]);
+                api.playerCursorUpdateBeat.apply(self, [beat]);
+            });
+        }
     };
 
 })(jQuery);

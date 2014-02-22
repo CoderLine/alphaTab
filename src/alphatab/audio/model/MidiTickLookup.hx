@@ -69,7 +69,7 @@ class MidiTickLookup
             var bar = bars[middle];
             
             // found?
-            if ((tick > bar.start && tick < bar.end) || tick == bar.start || tick == bar.end)
+            if (tick >= bar.start && tick <= bar.end)
             {
                 return bar;
             }            

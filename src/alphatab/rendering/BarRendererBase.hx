@@ -155,6 +155,8 @@ class BarRendererBase
     {
         var barLookup = new BarBoundings();
         barLookup.bar = bar;
+        barLookup.isFirstOfLine = isFirstOfLine();
+        barLookup.isLastOfLine = isLastOfLine();
         barLookup.visualBounds = new Bounds(x + this.stave.x + this.x, visualTop, width, visualHeight);
         barLookup.bounds = new Bounds(x + this.stave.x + this.x, realTop, width, realHeight);
         lookup.bars.push(barLookup);

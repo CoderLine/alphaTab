@@ -2516,7 +2516,7 @@ alphatab.audio.model.MidiTickLookup.prototype = {
 		while(bottom <= top) {
 			var middle = (top + bottom) / 2 | 0;
 			var bar = this.bars[middle];
-			if(tick > bar.start && tick < bar.end || tick == bar.start || tick == bar.end) return bar; else if(tick < bar.start) top = middle - 1; else bottom = middle + 1;
+			if(tick >= bar.start && tick <= bar.end) return bar; else if(tick < bar.start) top = middle - 1; else bottom = middle + 1;
 		}
 		return null;
 	}
@@ -6547,6 +6547,8 @@ alphatab.rendering.BarRendererBase.prototype = {
 	buildBoundingsLookup: function(lookup,visualTop,visualHeight,realTop,realHeight,x) {
 		var barLookup = new alphatab.rendering.utils.BarBoundings();
 		barLookup.bar = this.bar;
+		barLookup.isFirstOfLine = this.index == 0;
+		barLookup.isLastOfLine = this.index == this.stave.barRenderers.length - 1;
 		barLookup.visualBounds = new alphatab.rendering.utils.Bounds(x + this.stave.x + this.x,visualTop,this.width,visualHeight);
 		barLookup.bounds = new alphatab.rendering.utils.Bounds(x + this.stave.x + this.x,realTop,this.width,realHeight);
 		lookup.bars.push(barLookup);
@@ -6705,9 +6707,7 @@ alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.Bar
 	buildBoundingsLookup: function(lookup,visualTop,visualHeight,realTop,realHeight,x) {
 		alphatab.rendering.BarRendererBase.prototype.buildBoundingsLookup.call(this,lookup,visualTop,visualHeight,realTop,realHeight,x);
 		var barLookup = lookup.bars[lookup.bars.length - 1];
-		var preBeatStart = this.getPreBeatGlyphStart();
-		var onBeatStart = this.getBeatGlyphsStart();
-		var postBeatStart = this.getPostBeatGlyphsStart();
+		var beatStart = this.getBeatGlyphsStart();
 		var _g = 0, _g1 = this._voiceContainers;
 		while(_g < _g1.length) {
 			var c = _g1[_g];
@@ -6718,9 +6718,8 @@ alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.Bar
 				++_g2;
 				var beatLookup = new alphatab.rendering.utils.BeatBoundings();
 				beatLookup.beat = bc.beat;
-				beatLookup.visualBounds = new alphatab.rendering.utils.Bounds(x + this.stave.x + this.x + onBeatStart + c.x + bc.x + bc.onNotes.x,visualTop,bc.onNotes.width,visualHeight);
-				beatLookup.bounds = new alphatab.rendering.utils.Bounds(x + this.stave.x + this.x + preBeatStart + c.x + bc.x + bc.onNotes.x,realTop,0,realHeight);
-				beatLookup.bounds.w = postBeatStart + bc.postNotes.width - beatLookup.visualBounds.x;
+				beatLookup.visualBounds = new alphatab.rendering.utils.Bounds(x + this.stave.x + this.x + beatStart + c.x + bc.x + bc.onNotes.x,visualTop,bc.onNotes.width,visualHeight);
+				beatLookup.bounds = new alphatab.rendering.utils.Bounds(x + this.stave.x + this.x + beatStart + c.x + bc.x,realTop,bc.width,realHeight);
 				barLookup.beats.push(beatLookup);
 			}
 		}
@@ -9563,20 +9562,22 @@ alphatab.rendering.glyphs.ScoreNoteChordGlyph.prototype = $extend(alphatab.rende
 			var offset;
 			var baseNote = direction == alphatab.rendering.utils.BeamDirection.Up?this.minNote:this.maxNote;
 			var tremoloX = direction == alphatab.rendering.utils.BeamDirection.Up?displacedX:0;
-			var _g = this;
-			switch( (_g.beat.tremoloSpeed)[1] ) {
-			case 5:
-				offset = direction == alphatab.rendering.utils.BeamDirection.Up?-15:10;
-				break;
-			case 4:
-				offset = direction == alphatab.rendering.utils.BeamDirection.Up?-12:10;
-				break;
-			case 3:
-				offset = direction == alphatab.rendering.utils.BeamDirection.Up?-10:10;
-				break;
-			default:
-				offset = direction == alphatab.rendering.utils.BeamDirection.Up?-15:15;
-			}
+			if(this.beat.tremoloSpeed != null) {
+				var speed = this.beat.tremoloSpeed;
+				switch( (speed)[1] ) {
+				case 5:
+					offset = direction == alphatab.rendering.utils.BeamDirection.Up?-15:10;
+					break;
+				case 4:
+					offset = direction == alphatab.rendering.utils.BeamDirection.Up?-12:10;
+					break;
+				case 3:
+					offset = direction == alphatab.rendering.utils.BeamDirection.Up?-10:10;
+					break;
+				default:
+					offset = direction == alphatab.rendering.utils.BeamDirection.Up?-15:15;
+				}
+			} else offset = direction == alphatab.rendering.utils.BeamDirection.Up?-15:15;
 			this._tremoloPicking = new alphatab.rendering.glyphs.TremoloPickingGlyph(tremoloX,baseNote.glyph.y + (offset * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0),this.beat.tremoloSpeed);
 			this._tremoloPicking.renderer = this.renderer;
 			this._tremoloPicking.doLayout();
@@ -11294,14 +11295,36 @@ alphatab.rendering.utils.BarBoundings = function() {
 };
 alphatab.rendering.utils.BarBoundings.__name__ = true;
 alphatab.rendering.utils.BarBoundings.prototype = {
-	__class__: alphatab.rendering.utils.BarBoundings
+	findBeatAtPos: function(x) {
+		var index = 0;
+		while(index < this.beats.length - 1 && x > this.beats[index].bounds.x + this.beats[index].bounds.w) index++;
+		return this.beats[index].beat;
+	}
+	,__class__: alphatab.rendering.utils.BarBoundings
 }
 alphatab.rendering.utils.BoundingsLookup = function() {
 	this.bars = new Array();
 };
 alphatab.rendering.utils.BoundingsLookup.__name__ = true;
 alphatab.rendering.utils.BoundingsLookup.prototype = {
-	__class__: alphatab.rendering.utils.BoundingsLookup
+	getBeatAtPos: function(x,y) {
+		var bottom = 0;
+		var top = this.bars.length - 1;
+		var barIndex = -1;
+		while(bottom <= top) {
+			var middle = (top + bottom) / 2 | 0;
+			var bar = this.bars[middle];
+			if(y >= bar.bounds.y && y <= bar.bounds.y + bar.bounds.h) {
+				barIndex = middle;
+				break;
+			} else if(y < bar.bounds.y) top = middle - 1; else bottom = middle + 1;
+		}
+		if(barIndex == -1) return null;
+		var currentBar = this.bars[barIndex];
+		if(x < currentBar.bounds.x) while(barIndex > 0 && x < this.bars[barIndex].bounds.x && !this.bars[barIndex].isFirstOfLine) barIndex--; else while(barIndex < this.bars.length - 1 && x > this.bars[barIndex].bounds.x + this.bars[barIndex].bounds.w && !this.bars[barIndex].isLastOfLine) barIndex++;
+		return this.bars[barIndex].findBeatAtPos(x);
+	}
+	,__class__: alphatab.rendering.utils.BoundingsLookup
 }
 alphatab.rendering.utils.PercussionMapper = function() { }
 alphatab.rendering.utils.PercussionMapper.__name__ = true;
