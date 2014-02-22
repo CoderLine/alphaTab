@@ -1,0 +1,28 @@
+# Travis build file for alphaTab
+# Based on: http://blog.onthewings.net/2013/03/19/automated-unit-testing-for-haxe-project-using-travis-ci/
+
+# Well, our language is Haxe but as I we use Ant for building
+# we choose Java. 
+language: java
+install: ant deps
+
+# Install Haxe before build
+before_install:
+  - sudo apt-get update                                # run update before installing anything
+  - sudo apt-get install python-software-properties -y # for the next command
+  - sudo add-apt-repository ppa:eyecreate/haxe -y      # add the ubuntu ppa that contains haxe
+  - sudo apt-get update                                # pull info from ppa
+  - sudo apt-get install haxe -y                       # install haxe (and neko)
+  - sudo apt-get install gcc-multilib g++-multilib -y  # VM is 64bit but hxcpp builds 32bit
+
+# Setup Haxe 
+install:
+  - mkdir ~/haxelib                                    # create a folder for installing haxelib
+  - haxelib setup ~/haxelib
+  # - haxelib install hxcpp                              # install hxcpp to test C++ target
+  - mkdir bin                                          # create an output folder if needed
+  
+# Actual build
+script:
+  - ant js      # JavaScript Build
+  - ant cs      # C# Build
