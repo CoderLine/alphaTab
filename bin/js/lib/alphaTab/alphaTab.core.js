@@ -9469,20 +9469,22 @@ alphatab.rendering.glyphs.ScoreNoteChordGlyph.prototype = $extend(alphatab.rende
 			var offset;
 			var baseNote = direction == alphatab.rendering.utils.BeamDirection.Up?this.minNote:this.maxNote;
 			var tremoloX = direction == alphatab.rendering.utils.BeamDirection.Up?displacedX:0;
-			var _g = this;
-			switch( (_g.beat.tremoloSpeed)[1] ) {
-			case 5:
-				offset = direction == alphatab.rendering.utils.BeamDirection.Up?-15:10;
-				break;
-			case 4:
-				offset = direction == alphatab.rendering.utils.BeamDirection.Up?-12:10;
-				break;
-			case 3:
-				offset = direction == alphatab.rendering.utils.BeamDirection.Up?-10:10;
-				break;
-			default:
-				offset = direction == alphatab.rendering.utils.BeamDirection.Up?-15:15;
-			}
+			if(this.beat.tremoloSpeed != null) {
+				var speed = this.beat.tremoloSpeed;
+				switch( (speed)[1] ) {
+				case 5:
+					offset = direction == alphatab.rendering.utils.BeamDirection.Up?-15:10;
+					break;
+				case 4:
+					offset = direction == alphatab.rendering.utils.BeamDirection.Up?-12:10;
+					break;
+				case 3:
+					offset = direction == alphatab.rendering.utils.BeamDirection.Up?-10:10;
+					break;
+				default:
+					offset = direction == alphatab.rendering.utils.BeamDirection.Up?-15:15;
+				}
+			} else offset = direction == alphatab.rendering.utils.BeamDirection.Up?-15:15;
 			this._tremoloPicking = new alphatab.rendering.glyphs.TremoloPickingGlyph(tremoloX,baseNote.glyph.y + (offset * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0),this.beat.tremoloSpeed);
 			this._tremoloPicking.renderer = this.renderer;
 			this._tremoloPicking.doLayout();

@@ -18,6 +18,7 @@
 package alphatab.rendering.glyphs;
 
 import alphatab.model.Beat;
+import alphatab.model.Duration;
 import alphatab.model.Note;
 import alphatab.model.Voice;
 import alphatab.platform.ICanvas;
@@ -204,12 +205,20 @@ class ScoreNoteChordGlyph extends Glyph
             var offset:Int;
             var baseNote = direction == Up ? minNote : maxNote;
             var tremoloX = direction == Up ? displacedX : 0;
-            switch(beat.tremoloSpeed)
+            if (beat.tremoloSpeed != null)
             {
-                case ThirtySecond: offset = direction == Up ? -15 : 10;
-                case Sixteenth: offset = direction == Up ? -12 : 10;
-                case Eighth: offset = direction == Up ? -10 : 10;
-                default: offset = direction == Up ? -15 : 15;
+                var speed:Duration = beat.tremoloSpeed;
+                switch(speed)
+                {
+                    case ThirtySecond: offset = direction == Up ? -15 : 10;
+                    case Sixteenth: offset = direction == Up ? -12 : 10;
+                    case Eighth: offset = direction == Up ? -10 : 10;
+                    default: offset = direction == Up ? -15 : 15;
+                }
+            }
+            else
+            {
+                offset = direction == Up ? -15 : 15;
             }
             
             _tremoloPicking = new TremoloPickingGlyph(tremoloX, baseNote.glyph.y + Std.int(offset * getScale()), beat.tremoloSpeed);
