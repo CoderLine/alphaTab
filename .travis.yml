@@ -27,6 +27,7 @@ env:
 after_success: 
   - git config --global user.name "travis-ci" 
   - git config --global user.email "travis@travis-ci.org" 
+  - git status 
   - git add -A 
   - git commit -m 'Travis autobuild $TRAVIS_BUILD_NUMBER'
   - git push https://${GH_TOKEN}@github.com/CoderLine/alphaTab master
