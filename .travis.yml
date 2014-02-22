@@ -15,6 +15,8 @@ before_install:
   - haxelib setup ~/haxelib
   # Install NPM Packages 
   - npm install uglify-js -g
+  # Work on head
+  - git checkout master
 
 # Actual build
 script:
