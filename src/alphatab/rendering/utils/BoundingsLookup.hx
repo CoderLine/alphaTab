@@ -126,7 +126,5 @@ class BoundingsLookup
         // 
         // Find the matching beat within the bar
         return bars[barIndex].findBeatAtPos(x);
-        
     }
-    
 }

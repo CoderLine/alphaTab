@@ -216,9 +216,9 @@
                 var parentOffset = $(this).offset(); 
                 var relX = e.pageX - parentOffset.left;
                 var relY = e.pageY - parentOffset.top;
-                console.log(relX,relY);
                 var beat = api.getBeatAtPos.apply(self, [relX, relY]);
                 api.playerCursorUpdateBeat.apply(self, [beat]);
+                synth.setPositionTick(beat.start);
             });
         }
     };

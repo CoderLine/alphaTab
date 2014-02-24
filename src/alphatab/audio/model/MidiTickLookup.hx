@@ -27,8 +27,33 @@ class MidiTickLookup
         bars = new Array<BarTickLookup>();
     }
     
+    private var _lastBeat:Beat;
+    
     public function findBeat(track:Track, tick:Int) : Beat
     {
+        //
+        // some heuristics: try last found beat and it's next beat for lookup first
+        
+        // try last beat or next beat of last beat first
+        if (_lastBeat != null && _lastBeat.nextBeat != null && _lastBeat.voice.bar.track == track)
+        {
+            // check if tick is between _lastBeat and _lastBeat.nextBeat (still _lastBeat)
+            if (tick >= _lastBeat.start && tick < _lastBeat.nextBeat.start)
+            {
+                return _lastBeat;
+            }
+            
+            // we need a upper-next beat to check the nextbeat range 
+            if (_lastBeat.nextBeat.nextBeat != null && tick >= _lastBeat.nextBeat.start && tick < _lastBeat.nextBeat.nextBeat.start)
+            {
+                _lastBeat = _lastBeat.nextBeat;
+                return _lastBeat;
+            }
+        }
+        
+        //
+        // Global Search
+        
         // binary search within lookup
         var lookup = findBar(tick);
         if (lookup == null) return null;
@@ -55,7 +80,9 @@ class MidiTickLookup
             }
         }
         
-        return beat;
+        _lastBeat = beat;
+        
+        return _lastBeat;
     }
     
     private function findBar(tick:Int) : BarTickLookup

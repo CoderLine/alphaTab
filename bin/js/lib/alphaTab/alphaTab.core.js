@@ -2521,6 +2521,13 @@ alphatab.audio.model.MidiTickLookup.prototype = {
 		return null;
 	}
 	,findBeat: function(track,tick) {
+		if(this._lastBeat != null && this._lastBeat.nextBeat != null && this._lastBeat.voice.bar.track == track) {
+			if(tick >= this._lastBeat.start && tick < this._lastBeat.nextBeat.start) return this._lastBeat;
+			if(this._lastBeat.nextBeat.nextBeat != null && tick >= this._lastBeat.nextBeat.start && tick < this._lastBeat.nextBeat.nextBeat.start) {
+				this._lastBeat = this._lastBeat.nextBeat;
+				return this._lastBeat;
+			}
+		}
 		var lookup = this.findBar(tick);
 		if(lookup == null) return null;
 		var masterBar = lookup.bar;
@@ -2533,7 +2540,8 @@ alphatab.audio.model.MidiTickLookup.prototype = {
 			++_g;
 			if(beat == null || b.start <= tick) beat = b; else break;
 		}
-		return beat;
+		this._lastBeat = beat;
+		return this._lastBeat;
 	}
 	,__class__: alphatab.audio.model.MidiTickLookup
 }
