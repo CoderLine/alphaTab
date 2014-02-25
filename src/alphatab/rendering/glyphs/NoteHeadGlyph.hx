@@ -25,16 +25,22 @@ class NoteHeadGlyph extends SvgGlyph
     public static inline var noteHeadHeight = 9;
     
     private var _isGrace:Bool;
+    private var _duration:Duration;
 
     public function new(x:Int = 0, y:Int = 0, duration:Duration, isGrace:Bool)
     {
         super(x, y, getNoteSvg(duration), isGrace ? graceScale : 1, isGrace ? graceScale : 1);
         _isGrace = isGrace;
+        _duration = duration;
     }    
     
     public override function doLayout():Void 
     {
-        width = Std.int(9 * (_isGrace ? NoteHeadGlyph.graceScale : 1) * getScale());
+        switch(_duration)
+        {
+            case Whole: width = Std.int(14 * (_isGrace ? NoteHeadGlyph.graceScale : 1) * getScale());
+            default: width = Std.int(9 * (_isGrace ? NoteHeadGlyph.graceScale : 1) * getScale());
+        }
     }
     
     public override function canScale():Bool 

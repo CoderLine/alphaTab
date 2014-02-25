@@ -21,14 +21,21 @@ import alphatab.model.Duration;
 
 class RestGlyph extends SvgGlyph
 {
+    private var _duration:Duration;
     public function new(x:Int = 0, y:Int = 0, duration:Duration)
     {
         super(x, y, getRestSvg(duration), 1, 1);
+        _duration = duration;
     }        
         
     public override function doLayout():Void 
     {
-        width = Std.int(9 * getScale());
+        switch(_duration)
+        {
+            case Whole, Half, Quarter, Eighth, Sixteenth: width = Std.int(9 * getScale());
+            case ThirtySecond: width = Std.int(12 * getScale());
+            case SixtyFourth: width = Std.int(14 * getScale());
+        }
     }
     
     public override function canScale():Bool 

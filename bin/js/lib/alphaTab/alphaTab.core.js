@@ -8892,6 +8892,7 @@ alphatab.rendering.glyphs.NoteHeadGlyph = function(x,y,duration,isGrace) {
 	if(x == null) x = 0;
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,this.getNoteSvg(duration),isGrace?0.7:1,isGrace?0.7:1);
 	this._isGrace = isGrace;
+	this._duration = duration;
 };
 alphatab.rendering.glyphs.NoteHeadGlyph.__name__ = true;
 alphatab.rendering.glyphs.NoteHeadGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
@@ -8910,7 +8911,14 @@ alphatab.rendering.glyphs.NoteHeadGlyph.prototype = $extend(alphatab.rendering.g
 		return false;
 	}
 	,doLayout: function() {
-		this.width = 9 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+		var _g = this;
+		switch( (_g._duration)[1] ) {
+		case 0:
+			this.width = 14 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+			break;
+		default:
+			this.width = 9 * (this._isGrace?0.7:1) * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+		}
 	}
 	,__class__: alphatab.rendering.glyphs.NoteHeadGlyph
 });
@@ -9083,6 +9091,7 @@ alphatab.rendering.glyphs.RestGlyph = function(x,y,duration) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	alphatab.rendering.glyphs.SvgGlyph.call(this,x,y,this.getRestSvg(duration),1,1);
+	this._duration = duration;
 };
 alphatab.rendering.glyphs.RestGlyph.__name__ = true;
 alphatab.rendering.glyphs.RestGlyph.__super__ = alphatab.rendering.glyphs.SvgGlyph;
@@ -9108,7 +9117,22 @@ alphatab.rendering.glyphs.RestGlyph.prototype = $extend(alphatab.rendering.glyph
 		return false;
 	}
 	,doLayout: function() {
-		this.width = 9 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+		var _g = this;
+		switch( (_g._duration)[1] ) {
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+			this.width = 9 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+			break;
+		case 5:
+			this.width = 12 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+			break;
+		case 6:
+			this.width = 14 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0;
+			break;
+		}
 	}
 	,__class__: alphatab.rendering.glyphs.RestGlyph
 });
@@ -9180,12 +9204,13 @@ alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.
 		}
 		if(n.isDead) return new alphatab.rendering.glyphs.DeadNoteHeadGlyph(0,0,isGrace); else if(n.harmonicType == alphatab.model.HarmonicType.None) return new alphatab.rendering.glyphs.NoteHeadGlyph(0,0,n.beat.duration,isGrace); else return new alphatab.rendering.glyphs.DiamondNoteHeadGlyph(0,0,isGrace);
 	}
-	,createBeatDot: function(n,group) {
+	,createBeatDot: function(line,offset,group) {
 		var sr = js.Boot.__cast(this.renderer , alphatab.rendering.ScoreBarRenderer);
-		group.addGlyph(new alphatab.rendering.glyphs.CircleGlyph(0,sr.getScoreY(sr.getNoteLine(n),2 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0),1.5 * this.renderer.stave.staveGroup.layout.renderer.settings.scale));
+		group.addGlyph(new alphatab.rendering.glyphs.CircleGlyph(0,sr.getScoreY(line,offset + 2),1.5 * this.renderer.stave.staveGroup.layout.renderer.settings.scale));
 	}
 	,doLayout: function() {
 		var _g = this;
+		var sr = js.Boot.__cast(this.renderer , alphatab.rendering.ScoreBarRenderer);
 		if(!this.container.beat.isEmpty) {
 			if(!this.container.beat.isRest()) {
 				this.noteHeads = new alphatab.rendering.glyphs.ScoreNoteChordGlyph();
@@ -9203,43 +9228,67 @@ alphatab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphatab.rendering.
 						var group = [new alphatab.rendering.glyphs.GlyphGroup()];
 						this.noteLoop((function(group) {
 							return function(n) {
-								_g.createBeatDot(n,group[0]);
+								_g.createBeatDot(sr.getNoteLine(n),2,group[0]);
 							};
 						})(group));
 						this.addGlyph(group[0]);
 					}
 				}
 			} else {
+				var dotLine = 0;
 				var line = 0;
 				var offset = 0;
+				var dotOffset = 0;
 				var _g1 = this;
 				switch( (_g1.container.beat.duration)[1] ) {
 				case 0:
 					line = 4;
+					dotLine = 4;
 					break;
 				case 1:
 					line = 5;
+					dotLine = 5;
 					break;
 				case 2:
 					line = 7;
 					offset = -2;
+					dotLine = 4;
+					dotOffset = 3;
 					break;
 				case 3:
 					line = 8;
+					dotLine = 4;
+					dotOffset = 3;
 					break;
 				case 4:
-					line = 8;
+					line = 10;
+					dotLine = 4;
+					dotOffset = 3;
 					break;
 				case 5:
-					line = 8;
+					line = 10;
+					dotLine = 2;
+					dotOffset = 2;
 					break;
 				case 6:
-					line = 8;
+					line = 12;
+					dotLine = 2;
+					dotOffset = 2;
 					break;
 				}
-				var sr = js.Boot.__cast(this.renderer , alphatab.rendering.ScoreBarRenderer);
-				var y = sr.getScoreY(line,offset);
+				var sr1 = js.Boot.__cast(this.renderer , alphatab.rendering.ScoreBarRenderer);
+				var y = sr1.getScoreY(line,offset);
 				this.addGlyph(new alphatab.rendering.glyphs.RestGlyph(0,y,this.container.beat.duration));
+				if(this.container.beat.dots > 0) {
+					this.addGlyph(new alphatab.rendering.glyphs.SpacingGlyph(0,0,5 * this.renderer.stave.staveGroup.layout.renderer.settings.scale | 0,false));
+					var _g2 = 0, _g1 = this.container.beat.dots;
+					while(_g2 < _g1) {
+						var i = _g2++;
+						var group = new alphatab.rendering.glyphs.GlyphGroup();
+						this.createBeatDot(dotLine,dotOffset,group);
+						this.addGlyph(group);
+					}
+				}
 			}
 		}
 		alphatab.rendering.glyphs.BeatGlyphBase.prototype.doLayout.call(this);

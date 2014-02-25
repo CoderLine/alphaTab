@@ -67,6 +67,7 @@ class ScoreBeatGlyph extends BeatGlyphBase
     public override function doLayout():Void 
     {
         // create glyphs
+        var sr = cast(renderer, ScoreBarRenderer);
         if (!container.beat.isEmpty)
         {
             if (!container.beat.isRest())
@@ -92,7 +93,7 @@ class ScoreBeatGlyph extends BeatGlyphBase
                     {
                         var group = new GlyphGroup();
                         noteLoop( function (n) {
-                            createBeatDot(n, group);                    
+                            createBeatDot(sr.getNoteLine(n), 2, group);                    
                         });
                         addGlyph(group);
                     }
@@ -100,32 +101,60 @@ class ScoreBeatGlyph extends BeatGlyphBase
             }
             else
             {
+                var dotLine = 0;
                 var line = 0;
                 var offset = 0;
-            
+                var dotOffset = 0;
+                
                 switch(container.beat.duration)
                 {
                     case Whole:         
                         line = 4;
+                        dotLine = 4;
                     case Half:          
                         line = 5;
+                        dotLine = 5;
                     case Quarter:       
                         line = 7;
                         offset = -2;
+                        dotLine = 4;
+                        dotOffset = 3;
                     case Eighth:        
                         line = 8;
+                        dotLine = 4;
+                        dotOffset = 3;
                     case Sixteenth:     
-                        line = 8;
+                        line = 10;
+                        dotLine = 4;
+                        dotOffset = 3;
                     case ThirtySecond:  
-                        line = 8;
+                        line = 10;
+                        dotLine = 2;
+                        dotOffset = 2;
                     case SixtyFourth:   
-                        line = 8;
+                        line = 12;
+                        dotLine = 2;
+                        dotOffset = 2;
                 }
                 
                 var sr = cast(renderer, ScoreBarRenderer);
                 var y = sr.getScoreY(line, offset);
 
                 addGlyph(new RestGlyph(0, y, container.beat.duration));
+                
+                //
+                // Note dots
+                //
+                if (container.beat.dots > 0)
+                {
+                    addGlyph(new SpacingGlyph(0, 0, Std.int(5 * getScale()), false));
+                    for (i in 0 ... container.beat.dots)
+                    {
+                        var group = new GlyphGroup();
+                        createBeatDot(dotLine, dotOffset, group);
+                        addGlyph(group);
+                    }
+                }                
             }
         }
         
@@ -136,10 +165,10 @@ class ScoreBeatGlyph extends BeatGlyphBase
         }
     }
     
-    private function createBeatDot(n:Note, group:GlyphGroup)
+    private function createBeatDot(line:Int, offset:Int, group:GlyphGroup)
     {            
         var sr = cast(renderer, ScoreBarRenderer);
-        group.addGlyph(new CircleGlyph(0, sr.getScoreY(sr.getNoteLine(n), Std.int(2*getScale())), 1.5 * getScale()));
+        group.addGlyph(new CircleGlyph(0, sr.getScoreY(line, offset + 2), 1.5 * getScale()));
     }
     
     private function createNoteHeadGlyph(n:Note) : Glyph

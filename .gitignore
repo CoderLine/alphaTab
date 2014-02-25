@@ -40,6 +40,9 @@ _ReSharper*/
 /bin/cs/AlphaTab.Core/src/*
 /bin/cs/AlphaTab.Core/hxcs_build.txt
 /bin/js/test.html
+/bin/js/files/Test.gp5
+/bin/js/files/Test.gpif
+/bin/js/files/Test.gpx
 /bin/js/multistave.html
 /tmp
 /api
