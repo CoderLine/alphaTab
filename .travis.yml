@@ -25,11 +25,10 @@ script:
 # Push back rebuilt sources to repository
 env:
   global:
-    secure: DqyPFy7GkX28pQv3Kqo9giS8z4tkPbczujP/u+sWMQa9EfBnRppsERMEvnbjyl6duzUhsnzde9EuCgJZQILO+6JKLsnqS1bAhrAZ5MIyGKA+mATxoqMDGpsKSbtiytE8oLLsLTUlQNIm41Fm7FlNmgqdxyj/imijrlujjDs3hH4=
-after_success: 
+  secure: "Y56WPxLukArc3hrFCQ0s6E/SNHipt/e+6NoA5Vey3a1Gf1wOx6KoV7Vk1hcxs+8B3M8kuAJudocf/QdeZ2jFS68ImIJLWxbW81G8l6aoUZwHdUsYN4izbRkcXSp5TTqRE7dkIUdgwAm0uAt7dCOAOi0LTbjv6muN4zftBxP3LMg="after_success: 
   - git config --global user.name "travis-ci" 
   - git config --global user.email "travis@travis-ci.org" 
   - git status 
   - git add -A 
   - git commit -m "Travis autobuild $TRAVIS_BUILD_NUMBER"
-  - git push https://${GH_TOKEN}@github.com/CoderLine/alphaTab master
+  - git push -q https://${GH_TOKEN}@github.com/CoderLine/alphaTab master
