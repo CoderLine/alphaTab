@@ -1021,6 +1021,8 @@ alphatab.rendering.layout.ScoreLayout.prototype = {
 	,getScale: function() {
 		return this.renderer.settings.scale;
 	}
+	,buildBoundingsLookup: function(lookup) {
+	}
 	,paintScore: function() {
 	}
 	,doLayout: function() {
@@ -1034,7 +1036,15 @@ alphatab.rendering.layout.PageViewLayout = function(renderer) {
 alphatab.rendering.layout.PageViewLayout.__name__ = true;
 alphatab.rendering.layout.PageViewLayout.__super__ = alphatab.rendering.layout.ScoreLayout;
 alphatab.rendering.layout.PageViewLayout.prototype = $extend(alphatab.rendering.layout.ScoreLayout.prototype,{
-	getSheetWidth: function() {
+	buildBoundingsLookup: function(lookup) {
+		var _g = 0, _g1 = this._groups;
+		while(_g < _g1.length) {
+			var g = _g1[_g];
+			++_g;
+			g.buildBoundingsLookup(lookup);
+		}
+	}
+	,getSheetWidth: function() {
 		return Math.round(950 * this.renderer.settings.scale);
 	}
 	,getMaxWidth: function() {
@@ -1223,7 +1233,10 @@ alphatab.rendering.layout.HorizontalScreenLayout = function(renderer) {
 alphatab.rendering.layout.HorizontalScreenLayout.__name__ = true;
 alphatab.rendering.layout.HorizontalScreenLayout.__super__ = alphatab.rendering.layout.ScoreLayout;
 alphatab.rendering.layout.HorizontalScreenLayout.prototype = $extend(alphatab.rendering.layout.ScoreLayout.prototype,{
-	paintScore: function() {
+	buildBoundingsLookup: function(lookup) {
+		this._group.buildBoundingsLookup(lookup);
+	}
+	,paintScore: function() {
 		this._group.paint(0,0,this.renderer.canvas);
 	}
 	,doLayout: function() {
@@ -1976,30 +1989,49 @@ alphatab.audio.MidiUtils.applyTuplet = function(ticks,numerator,denominator) {
 alphatab.audio.MidiUtils.dynamicToVelocity = function(dynamicValue) {
 	return 15 + dynamicValue[1] * 16;
 }
+alphatab.audio.MidiUtils.buildTickLookup = function(score) {
+	var lookup = new alphatab.audio.model.MidiTickLookup();
+	var controller = new alphatab.audio.generator.MidiPlaybackController(score);
+	var tick = 0;
+	while(!(controller.index >= controller._score.masterBars.length)) {
+		var index = controller.index;
+		var repeatMove = controller.repeatMove;
+		controller.process();
+		if(controller.shouldPlay) {
+			var bar = new alphatab.audio.model.BarTickLookup();
+			bar.bar = score.masterBars[index];
+			bar.start = controller.repeatMove + bar.bar.start;
+			bar.end = bar.start + bar.bar.calculateDuration();
+			lookup.bars.push(bar);
+		}
+	}
+	return lookup;
+}
 if(!alphatab.audio.generator) alphatab.audio.generator = {}
 alphatab.audio.generator.IMidiFileHandler = function() { }
 alphatab.audio.generator.IMidiFileHandler.__name__ = true;
 alphatab.audio.generator.IMidiFileHandler.prototype = {
 	__class__: alphatab.audio.generator.IMidiFileHandler
 }
-alphatab.audio.generator.MidiFileGenerator = function(score,handler,metronomeTrack) {
+alphatab.audio.generator.MidiFileGenerator = function(score,handler,generateMetronome) {
+	if(generateMetronome == null) generateMetronome = false;
 	this._score = score;
 	this._currentTempo = this._score.tempo;
 	this._handler = handler;
-	this._metronomeTrack = metronomeTrack;
+	this.generateMetronome = generateMetronome;
 };
 alphatab.audio.generator.MidiFileGenerator.__name__ = true;
-alphatab.audio.generator.MidiFileGenerator.generateMidiFile = function(score) {
+alphatab.audio.generator.MidiFileGenerator.generateMidiFile = function(score,generateMetronome) {
+	if(generateMetronome == null) generateMetronome = false;
 	var midiFile = new alphatab.audio.model.MidiFile();
-	var _g1 = 0, _g = score.tracks.length + 1;
+	var _g1 = 0, _g = score.tracks.length;
 	while(_g1 < _g) {
 		var i = _g1++;
 		midiFile.createTrack();
 	}
 	midiFile.infoTrack = 0;
-	midiFile.metronomeTrack = midiFile.tracks.length - 1;
 	var handler = new alphatab.audio.generator.MidiFileHandler(midiFile);
-	var generator = new alphatab.audio.generator.MidiFileGenerator(score,handler,midiFile.metronomeTrack);
+	var generator = new alphatab.audio.generator.MidiFileGenerator(score,handler,generateMetronome);
 	generator.generate();
 	return midiFile;
 }
@@ -2128,32 +2160,7 @@ alphatab.audio.generator.MidiFileGenerator.prototype = {
 		return duration;
 	}
 	,getNoteDuration: function(note,beatDuration) {
-		var lastNoteEnd = note.beat.start - note.beat.calculateDuration();
-		var noteDuration = beatDuration;
-		var currentBeat = note.beat.nextBeat;
-		var letRingSuspend = false;
-		while(currentBeat != null) {
-			if(currentBeat.isRest()) return this.applyDurationEffects(note,noteDuration);
-			var letRing = currentBeat.voice == note.beat.voice && note.isLetRing;
-			var letRingApplied = false;
-			var noteOnSameString = currentBeat.getNoteOnString(note.string);
-			if(noteOnSameString != null) {
-				if(!noteOnSameString.isTieDestination) {
-					letRing = false;
-					letRingSuspend = true;
-					if(!noteOnSameString.isLetRing) return this.applyDurationEffects(note,noteDuration);
-				}
-				letRingApplied = true;
-				noteDuration += currentBeat.start - lastNoteEnd + noteOnSameString.beat.calculateDuration();
-				lastNoteEnd = currentBeat.start + currentBeat.calculateDuration();
-			}
-			if(letRing && !letRingApplied && !letRingSuspend) {
-				noteDuration += currentBeat.start - lastNoteEnd + currentBeat.calculateDuration();
-				lastNoteEnd = currentBeat.start + currentBeat.calculateDuration();
-			}
-			currentBeat = currentBeat.nextBeat;
-		}
-		return this.applyDurationEffects(note,noteDuration);
+		return this.applyDurationEffects(note,beatDuration);
 	}
 	,generateNote: function(note,beatStart,beatDuration,startMove,brushInfo) {
 		var track = note.beat.voice.bar.track;
@@ -2220,13 +2227,15 @@ alphatab.audio.generator.MidiFileGenerator.prototype = {
 			this._handler.addTempo(masterBar.start + startMove,masterBar.tempoAutomation.value | 0);
 			this._currentTempo = masterBar.tempoAutomation.value | 0;
 		}
-		var start = masterBar.start + startMove;
-		var length = alphatab.audio.MidiUtils.valueToTicks(masterBar.timeSignatureDenominator);
-		var _g1 = 0, _g = masterBar.timeSignatureNumerator;
-		while(_g1 < _g) {
-			var i = _g1++;
-			this._handler.addNote(this._metronomeTrack,start,length,37,alphatab.model.DynamicValue.F,9);
-			start += length;
+		if(this.generateMetronome) {
+			var start = masterBar.start + startMove;
+			var length = alphatab.audio.MidiUtils.valueToTicks(masterBar.timeSignatureDenominator);
+			var _g1 = 0, _g = masterBar.timeSignatureNumerator;
+			while(_g1 < _g) {
+				var i = _g1++;
+				this._handler.addMetronome(start,length);
+				start += length;
+			}
 		}
 	}
 	,generateChannel: function(track,channel,playbackInfo) {
@@ -2270,6 +2279,7 @@ alphatab.audio.generator.MidiFileGenerator.prototype = {
 }
 alphatab.audio.generator.MidiFileHandler = function(midiFile) {
 	this._midiFile = midiFile;
+	this._metronomeTrack = -1;
 };
 alphatab.audio.generator.MidiFileHandler.__name__ = true;
 alphatab.audio.generator.MidiFileHandler.__interfaces__ = [alphatab.audio.generator.IMidiFileHandler];
@@ -2317,7 +2327,14 @@ alphatab.audio.generator.MidiFileHandler.buildSysExMessage = function(data) {
 	return alphatab.audio.model.MidiMessage.fromArray(sysex);
 }
 alphatab.audio.generator.MidiFileHandler.prototype = {
-	addBend: function(track,tick,channel,value) {
+	addMetronome: function(tick,length) {
+		if(this._metronomeTrack == -1) {
+			this._midiFile.createTrack();
+			this._metronomeTrack = this._midiFile.tracks.length - 1;
+		}
+		this.addNote(this._metronomeTrack,tick,length,37,alphatab.model.DynamicValue.F,9);
+	}
+	,addBend: function(track,tick,channel,value) {
 		this.addEvent(track,tick,alphatab.audio.model.MidiMessage.fromArray([224 | channel & 15,0,alphatab.audio.generator.MidiFileHandler.fixValue(value)]));
 	}
 	,addTempo: function(tick,tempo) {
@@ -2481,6 +2498,52 @@ alphatab.audio.model.MidiMessage.prototype = {
 		out.write(this.data);
 	}
 	,__class__: alphatab.audio.model.MidiMessage
+}
+alphatab.audio.model.BarTickLookup = function() {
+};
+alphatab.audio.model.BarTickLookup.__name__ = true;
+alphatab.audio.model.BarTickLookup.prototype = {
+	__class__: alphatab.audio.model.BarTickLookup
+}
+alphatab.audio.model.MidiTickLookup = function() {
+	this.bars = new Array();
+};
+alphatab.audio.model.MidiTickLookup.__name__ = true;
+alphatab.audio.model.MidiTickLookup.prototype = {
+	findBar: function(tick) {
+		var bottom = 0;
+		var top = this.bars.length - 1;
+		while(bottom <= top) {
+			var middle = (top + bottom) / 2 | 0;
+			var bar = this.bars[middle];
+			if(tick >= bar.start && tick <= bar.end) return bar; else if(tick < bar.start) top = middle - 1; else bottom = middle + 1;
+		}
+		return null;
+	}
+	,findBeat: function(track,tick) {
+		if(this._lastBeat != null && this._lastBeat.nextBeat != null && this._lastBeat.voice.bar.track == track) {
+			if(tick >= this._lastBeat.start && tick < this._lastBeat.nextBeat.start) return this._lastBeat;
+			if(this._lastBeat.nextBeat.nextBeat != null && tick >= this._lastBeat.nextBeat.start && tick < this._lastBeat.nextBeat.nextBeat.start) {
+				this._lastBeat = this._lastBeat.nextBeat;
+				return this._lastBeat;
+			}
+		}
+		var lookup = this.findBar(tick);
+		if(lookup == null) return null;
+		var masterBar = lookup.bar;
+		var bar = track.bars[masterBar.index];
+		tick = tick - lookup.start + masterBar.start;
+		var beat = null;
+		var _g = 0, _g1 = bar.voices[0].beats;
+		while(_g < _g1.length) {
+			var b = _g1[_g];
+			++_g;
+			if(beat == null || b.start <= tick) beat = b; else break;
+		}
+		this._lastBeat = beat;
+		return this._lastBeat;
+	}
+	,__class__: alphatab.audio.model.MidiTickLookup
 }
 alphatab.audio.model.MidiTrack = function() {
 };
@@ -3208,7 +3271,6 @@ alphatab.importer.AlphaTexImporter.prototype = $extend(alphatab.importer.ScoreIm
 			this._score.finish();
 			return this._score;
 		} catch( e ) {
-			console.log(e);
 			throw alphatab.importer.ScoreImporter.UnsupportedFormat;
 		}
 	}
@@ -5667,6 +5729,7 @@ alphatab.model.Beat = function() {
 	this.duration = alphatab.model.Duration.Quarter;
 	this.tremoloSpeed = null;
 	this.automations = new Array();
+	this.dots = 0;
 	this.start = 0;
 	this.tupletDenominator = -1;
 	this.tupletNumerator = -1;
@@ -5676,14 +5739,14 @@ alphatab.model.Beat = function() {
 alphatab.model.Beat.__name__ = true;
 alphatab.model.Beat.prototype = {
 	finish: function() {
-		if(this.voice.bar.index == 0 && this.index == 0) {
-			this.start = this.voice.bar.getMasterBar().start;
-			this.previousBeat = null;
-		} else {
-			if(this.index == 0) this.previousBeat = this.voice.bar.previousBar.voices[this.voice.index].beats[this.voice.bar.previousBar.voices[this.voice.index].beats.length - 1]; else this.previousBeat = this.voice.beats[this.index - 1];
+		if(this.voice.bar.index == 0 && this.index == 0) this.previousBeat = null; else if(this.index == 0) {
+			this.previousBeat = this.voice.bar.previousBar.voices[this.voice.index].beats[this.voice.bar.previousBar.voices[this.voice.index].beats.length - 1];
 			this.previousBeat.nextBeat = this;
-			this.start = this.previousBeat.start + this.previousBeat.calculateDuration();
+		} else {
+			this.previousBeat = this.voice.beats[this.index - 1];
+			this.previousBeat.nextBeat = this;
 		}
+		if(this.index == 0) this.start = this.voice.bar.getMasterBar().start; else this.start = this.previousBeat.start + this.previousBeat.calculateDuration();
 		var _g = 0, _g1 = this.notes;
 		while(_g < _g1.length) {
 			var n = _g1[_g];
@@ -5745,6 +5808,7 @@ alphatab.model.Beat.prototype = {
 			++_g;
 			beat.addNote(n.clone());
 		}
+		beat.dots = this.dots;
 		beat.chordId = this.chordId;
 		beat.brushType = this.brushType;
 		beat.vibrato = this.vibrato;
@@ -6135,6 +6199,9 @@ alphatab.model.PickStrokeType.Down = ["Down",2];
 alphatab.model.PickStrokeType.Down.toString = $estr;
 alphatab.model.PickStrokeType.Down.__enum__ = alphatab.model.PickStrokeType;
 alphatab.model.PlaybackInformation = function() {
+	this.volume = 15;
+	this.balance = 8;
+	this.port = 1;
 };
 alphatab.model.PlaybackInformation.__name__ = true;
 alphatab.model.PlaybackInformation.prototype = {
@@ -6485,7 +6552,16 @@ alphatab.rendering.BarRendererBase = function(bar) {
 };
 alphatab.rendering.BarRendererBase.__name__ = true;
 alphatab.rendering.BarRendererBase.prototype = {
-	paint: function(cx,cy,canvas) {
+	buildBoundingsLookup: function(lookup,visualTop,visualHeight,realTop,realHeight,x) {
+		var barLookup = new alphatab.rendering.utils.BarBoundings();
+		barLookup.bar = this.bar;
+		barLookup.isFirstOfLine = this.index == 0;
+		barLookup.isLastOfLine = this.index == this.stave.barRenderers.length - 1;
+		barLookup.visualBounds = new alphatab.rendering.utils.Bounds(x + this.stave.x + this.x,visualTop,this.width,visualHeight);
+		barLookup.bounds = new alphatab.rendering.utils.Bounds(x + this.stave.x + this.x,realTop,this.width,realHeight);
+		lookup.bars.push(barLookup);
+	}
+	,paint: function(cx,cy,canvas) {
 	}
 	,doLayout: function() {
 	}
@@ -6636,7 +6712,27 @@ alphatab.rendering.GroupedBarRenderer = function(bar) {
 alphatab.rendering.GroupedBarRenderer.__name__ = true;
 alphatab.rendering.GroupedBarRenderer.__super__ = alphatab.rendering.BarRendererBase;
 alphatab.rendering.GroupedBarRenderer.prototype = $extend(alphatab.rendering.BarRendererBase.prototype,{
-	paintBackground: function(cx,cy,canvas) {
+	buildBoundingsLookup: function(lookup,visualTop,visualHeight,realTop,realHeight,x) {
+		alphatab.rendering.BarRendererBase.prototype.buildBoundingsLookup.call(this,lookup,visualTop,visualHeight,realTop,realHeight,x);
+		var barLookup = lookup.bars[lookup.bars.length - 1];
+		var beatStart = this.getBeatGlyphsStart();
+		var _g = 0, _g1 = this._voiceContainers;
+		while(_g < _g1.length) {
+			var c = _g1[_g];
+			++_g;
+			var _g2 = 0, _g3 = c.beatGlyphs;
+			while(_g2 < _g3.length) {
+				var bc = _g3[_g2];
+				++_g2;
+				var beatLookup = new alphatab.rendering.utils.BeatBoundings();
+				beatLookup.beat = bc.beat;
+				beatLookup.visualBounds = new alphatab.rendering.utils.Bounds(x + this.stave.x + this.x + beatStart + c.x + bc.x + bc.onNotes.x,visualTop,bc.onNotes.width,visualHeight);
+				beatLookup.bounds = new alphatab.rendering.utils.Bounds(x + this.stave.x + this.x + beatStart + c.x + bc.x,realTop,bc.width,realHeight);
+				barLookup.beats.push(beatLookup);
+			}
+		}
+	}
+	,paintBackground: function(cx,cy,canvas) {
 	}
 	,paint: function(cx,cy,canvas) {
 		this.paintBackground(cx,cy,canvas);
@@ -7652,7 +7748,12 @@ alphatab.rendering.ScoreRenderer = function(settings,param) {
 };
 alphatab.rendering.ScoreRenderer.__name__ = true;
 alphatab.rendering.ScoreRenderer.prototype = {
-	raiseRenderFinished: function() {
+	buildBoundingsLookup: function() {
+		var lookup = new alphatab.rendering.utils.BoundingsLookup();
+		this.layout.buildBoundingsLookup(lookup);
+		return lookup;
+	}
+	,raiseRenderFinished: function() {
 		var _g = 0, _g1 = this._renderFinishedListeners;
 		while(_g < _g1.length) {
 			var l = _g1[_g];
@@ -10831,7 +10932,21 @@ alphatab.rendering.staves.StaveGroup = function() {
 };
 alphatab.rendering.staves.StaveGroup.__name__ = true;
 alphatab.rendering.staves.StaveGroup.prototype = {
-	finalizeGroup: function(scoreLayout) {
+	buildBoundingsLookup: function(lookup) {
+		var visualTop = this.y + this._firstStaveInAccolade.y;
+		var visualBottom = this.y + this._lastStaveInAccolade.y + this._lastStaveInAccolade.height;
+		var realTop = this.y + this._allStaves[0].y;
+		var realBottom = this.y + this._allStaves[this._allStaves.length - 1].y + this._allStaves[this._allStaves.length - 1].height;
+		var visualHeight = visualBottom - visualTop;
+		var realHeight = realBottom - realTop;
+		var _g = 0, _g1 = this._firstStaveInAccolade.barRenderers;
+		while(_g < _g1.length) {
+			var b = _g1[_g];
+			++_g;
+			b.buildBoundingsLookup(lookup,visualTop,visualHeight,realTop,realHeight,this.x);
+		}
+	}
+	,finalizeGroup: function(scoreLayout) {
 		var currentY = 0;
 		var _g1 = 0, _g = this._allStaves.length;
 		while(_g1 < _g) {
@@ -11215,6 +11330,58 @@ alphatab.rendering.utils.BeamingHelper.prototype = {
 		if(this._track.isPercussion) return alphatab.rendering.utils.PercussionMapper.mapValue(n); else return n.fret + n.beat.voice.bar.track.tuning[n.beat.voice.bar.track.tuning.length - (n.string - 1) - 1];
 	}
 	,__class__: alphatab.rendering.utils.BeamingHelper
+}
+alphatab.rendering.utils.Bounds = function(x,y,w,h) {
+	this.x = x;
+	this.y = y;
+	this.w = w;
+	this.h = h;
+};
+alphatab.rendering.utils.Bounds.__name__ = true;
+alphatab.rendering.utils.Bounds.prototype = {
+	__class__: alphatab.rendering.utils.Bounds
+}
+alphatab.rendering.utils.BeatBoundings = function() {
+};
+alphatab.rendering.utils.BeatBoundings.__name__ = true;
+alphatab.rendering.utils.BeatBoundings.prototype = {
+	__class__: alphatab.rendering.utils.BeatBoundings
+}
+alphatab.rendering.utils.BarBoundings = function() {
+	this.beats = new Array();
+};
+alphatab.rendering.utils.BarBoundings.__name__ = true;
+alphatab.rendering.utils.BarBoundings.prototype = {
+	findBeatAtPos: function(x) {
+		var index = 0;
+		while(index < this.beats.length - 1 && x > this.beats[index].bounds.x + this.beats[index].bounds.w) index++;
+		return this.beats[index].beat;
+	}
+	,__class__: alphatab.rendering.utils.BarBoundings
+}
+alphatab.rendering.utils.BoundingsLookup = function() {
+	this.bars = new Array();
+};
+alphatab.rendering.utils.BoundingsLookup.__name__ = true;
+alphatab.rendering.utils.BoundingsLookup.prototype = {
+	getBeatAtPos: function(x,y) {
+		var bottom = 0;
+		var top = this.bars.length - 1;
+		var barIndex = -1;
+		while(bottom <= top) {
+			var middle = (top + bottom) / 2 | 0;
+			var bar = this.bars[middle];
+			if(y >= bar.bounds.y && y <= bar.bounds.y + bar.bounds.h) {
+				barIndex = middle;
+				break;
+			} else if(y < bar.bounds.y) top = middle - 1; else bottom = middle + 1;
+		}
+		if(barIndex == -1) return null;
+		var currentBar = this.bars[barIndex];
+		if(x < currentBar.bounds.x) while(barIndex > 0 && x < this.bars[barIndex].bounds.x && !this.bars[barIndex].isFirstOfLine) barIndex--; else while(barIndex < this.bars.length - 1 && x > this.bars[barIndex].bounds.x + this.bars[barIndex].bounds.w && !this.bars[barIndex].isLastOfLine) barIndex++;
+		return this.bars[barIndex].findBeatAtPos(x);
+	}
+	,__class__: alphatab.rendering.utils.BoundingsLookup
 }
 alphatab.rendering.utils.PercussionMapper = function() { }
 alphatab.rendering.utils.PercussionMapper.__name__ = true;

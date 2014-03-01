@@ -132,7 +132,6 @@
     <target name="js-minify" depends="js">
         <!-- Minimize JavaScripts -->
         <antcall target="minify">
-            <param name="banner" value="${haxe-js}" />
             <param name="file" value="${haxe-js}" />
             <param name="file-min" value="${haxe-js-min}" />
         </antcall>

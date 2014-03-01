@@ -320,7 +320,6 @@
     api.score = score;
     api.renderer = renderer;
     
-    
     $.fn.alphaTab = function(method) {
         if(api[method]) {
             return api[method].apply(this, Array.prototype.slice.call(arguments, 1));
@@ -332,6 +331,7 @@
             $.error('Method ' + method + ' does not exist on jQuery.alphaTab');
         }
     };   
+    $.fn.alphaTab.fn = api;
     
     $.alphaTab = {
         restore: function(selector) {

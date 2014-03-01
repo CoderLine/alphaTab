@@ -26,6 +26,7 @@ import alphatab.platform.model.TextAlign;
 import alphatab.rendering.layout.HorizontalScreenLayout;
 import alphatab.rendering.layout.PageViewLayout;
 import alphatab.rendering.layout.ScoreLayout;
+import alphatab.rendering.utils.BoundingsLookup;
 import alphatab.Settings;
 import haxe.ds.StringMap;
 
@@ -158,4 +159,10 @@ class ScoreRenderer
         }
     }
     
+    public function buildBoundingsLookup() 
+    { 
+        var lookup = new BoundingsLookup();
+        layout.buildBoundingsLookup(lookup);
+        return lookup;
+    }
 }

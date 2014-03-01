@@ -37,7 +37,9 @@ class PlaybackInformation
     
     public function new() 
     {
-        
+        volume = 15;
+        balance = 8;
+        port = 1;
     }
     
 }

@@ -18,6 +18,7 @@
 package alphatab.rendering.layout;
 
 import alphatab.rendering.staves.StaveGroup;
+import alphatab.rendering.utils.BoundingsLookup;
 
 /**
  * This layout arranges the bars all horizontally.
@@ -76,5 +77,9 @@ class HorizontalScreenLayout extends ScoreLayout
     {
         _group.paint(0, 0, renderer.canvas);
     }
-
+    
+    public override function buildBoundingsLookup(lookup:BoundingsLookup)
+    {
+        _group.buildBoundingsLookup(lookup);
+    }
 }

@@ -38,9 +38,12 @@ class MidiFileHandler implements IMidiFileHandler
     public static inline var RestMessage:Int = 0x00;
 
     private var _midiFile:MidiFile;
+    private var _metronomeTrack:Int;
+    
     public function new(midiFile:MidiFile) 
     {
         _midiFile = midiFile;
+        _metronomeTrack = -1;
     }
     
     private function addEvent(track:Int, tick:Int, message:MidiMessage) :Void
@@ -109,6 +112,16 @@ class MidiFileHandler implements IMidiFileHandler
     public function addBend(track:Int, tick:Int, channel:Int, value:Int)
     {
         addEvent(track, tick, MidiMessage.fromArray([makeCommand(0xE0, channel), 0, fixValue(value)]));
+    }
+    
+    public function addMetronome(tick:Int, length:Int)
+    {
+        if (_metronomeTrack == -1)
+        {
+            _midiFile.createTrack();
+            _metronomeTrack = _midiFile.tracks.length -1;
+        }
+        addNote(_metronomeTrack, tick, length, DefaultMetronomeKey, DynamicValue.F, MidiUtils.PercussionChannel);
     }
  
     private static function buildMetaMessage(metaType:Int, data:Array<Int>)
