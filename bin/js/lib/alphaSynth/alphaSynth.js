@@ -261,16 +261,22 @@ as.AlphaSynth.init = function(asRoot,swfObjectRoot) {
 	if(asRoot != "" && !StringTools.endsWith(asRoot,"/")) asRoot += "/";
 	if(swfObjectRoot != "" && !StringTools.endsWith(swfObjectRoot,"/")) swfObjectRoot += "/";
 	if(swf) {
-		var alphaSynth = js.Browser.document.getElementById("alphaSynthContainer");
-		if(alphaSynth != null) {
-			console.log("Skipped initialization, existing alphaSynthContainer found");
+		var supportsFlashWorkers = swf.hasFlashPlayerVersion("11.4");
+		if(supportsFlashWorkers) {
+			var alphaSynth = js.Browser.document.getElementById("alphaSynthContainer");
+			if(alphaSynth != null) {
+				console.log("Skipped initialization, existing alphaSynthContainer found");
+				return false;
+			}
+			alphaSynth = js.Browser.document.createElement("div");
+			alphaSynth.setAttribute("id","alphaSynthContainer");
+			js.Browser.document.body.appendChild(alphaSynth);
+			swf.embedSWF(asRoot + "alphaSynth.swf","alphaSynthContainer","1px","1px","11.4.0",swfObjectRoot + "expressInstall.swf",{ },{ },{ id : "AlphaSynth"});
+			return true;
+		} else {
+			console.log("Error initializing alphaSynth: unsupported flash player");
 			return false;
 		}
-		alphaSynth = js.Browser.document.createElement("div");
-		alphaSynth.setAttribute("id","alphaSynthContainer");
-		js.Browser.document.body.appendChild(alphaSynth);
-		swf.embedSWF(asRoot + "alphaSynth.swf","alphaSynthContainer","1px","1px","11.4.0",swfObjectRoot + "expressInstall.swf",{ },{ },{ id : "AlphaSynth"});
-		return true;
 	} else {
 		console.log("Error initializing alphaSynth: swfobject not found");
 		return false;
