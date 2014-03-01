@@ -270,15 +270,15 @@
         var context = $(this).data('alphaTab');
         if(tracks) 
         {
-            // TODO: multiple tracks
             if(context.renderer.tracks == null || context.renderer.tracks.length == 0)
                 return;
+
             var score = context.renderer.tracks[0].score;
-            if(tracks < 0 || tracks >= score.tracks.length) return;
+            var realTracks = buildTracksArray(tracks, score);
             
             try
             {
-                context.renderer.render(score.tracks[tracks]);
+                context.renderer.renderMultiple(realTracks);
             }
             catch(e)
             {

@@ -81,8 +81,10 @@ function changeEngine(newEngine) {
 }
 
 function initializeTrackChooser() {
-    var currentTrack = $('#alphaTab').alphaTab('track');
-    var allTracks = currentTrack.score.tracks;
+    var score = $('#alphaTab').alphaTab('score');
+    var currentTrack = $('#alphaTab').alphaTab('tracks');
+    currentTrack = (currentTrack.length == 0) ? null : currentTrack[0];
+    var allTracks = score.tracks;
 
     var list = $('#trackList');
     list.empty();
