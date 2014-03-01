@@ -27,6 +27,14 @@
     font-weight:bold;
 }
 
+#sfInfo {
+    position:absolute;
+    right:10px;
+    top:10px;
+    color:#FFF;
+    font-weight:bold;
+}
+
 button[disabled] {
     color:#929292;
 }
