@@ -1,0 +1,65 @@
+﻿using System.Collections.Generic;
+using System.IO;
+
+namespace AlphaTab.Audio.Model
+{
+    /// <summary>
+    /// A midi file consists of multiple tracks including a
+    /// info track for multi-track messages and a track for metronome ticks. 
+    /// </summary>
+    public class MidiFile
+    {
+        public List<MidiTrack> Tracks { get; set; }
+
+        /// <summary>
+        /// Gets or sets the index of the track used for midi events
+        /// affecting all tracks. (like the tempo)
+        /// </summary>
+        public int InfoTrack { get; set; }
+
+        public MidiFile()
+        {
+            Tracks = new List<MidiTrack>();
+        }
+
+        public MidiTrack CreateTrack()
+        {
+            var track = new MidiTrack();
+            track.Index = Tracks.Count;
+            track.File = this;
+            Tracks.Add(track);
+            return track;
+        }
+
+        public void WriteTo(Stream s)
+        {
+            byte[] b;
+        
+            // magic number "MThd" (0x4D546864)
+            b = new byte[]{0x4D, 0x54, 0x68, 0x64};
+            s.Write(b, 0, b.Length);
+        
+            // Header Length 6 (0x00000006)
+            b = new byte[]{0x00, 0x00, 0x00, 0x06};
+            s.Write(b, 0, b.Length);
+        
+            // format 
+            b = new byte[]{0x00, 0x01};
+            s.Write(b, 0, b.Length);
+
+            // number of tracks
+            short v = (short) Tracks.Count;
+            b = new []{(byte) ((v >> 8) & 0xFF) , (byte) (v & 0xFF)};
+            s.Write(b, 0, b.Length);
+
+            v = MidiUtils.QuarterTime;
+            b = new []{(byte) ((v >> 8) & 0xFF) , (byte) (v & 0xFF)};
+            s.Write(b, 0, b.Length);
+
+            foreach (var midiTrack in Tracks)
+            {
+                midiTrack.WriteTo(s);
+            }
+        }
+    }
+}

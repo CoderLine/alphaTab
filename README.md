@@ -36,7 +36,6 @@ and
 alphaTab is not only a JavaScript library. alphaTab can be used in many different platforms 
 
 * HTML5/JS
-* Flash (future)
+* C# (WinForms and WPF)
 * iOS (future)
-* C# (Gdi and WPF)
 * Java (future - Java2D and Android) 

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <!-- Styling of alphaTab -->
+    <style type="text/css">
+	.alphaTabSurface { box-shadow: 0 0 10px rgba(0,0,0,0.3); background:#FFF; border-radius:3px; }
+	</style>
+    
+    <!-- Including alphaTab -->
+    <script type="text/javascript" src="lib/alphatab/alphaTab.core.js"></script>
+    
+    <!-- IE8 support -->
+    <script type="text/javascript" src="lib/excanvas/excanvas.js"></script>
+
+    <!-- jQuery Plugin -->
+    <script type="text/javascript" src="lib/jquery/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="lib/alphatab/jquery.alphaTab.js"></script>
+
+    
+    <!-- Demo Styles and Scripts -->
+    <link rel="stylesheet" href="support/gh-buttons.css" />
+    <link rel="stylesheet" href="support/demo.css" />
+    <script type="text/javascript" src="support/demo.js"></script>
+    
+</head>
+<body>
+    <div id="tracks">
+    </div>
+    <div id="alphaTab" data-file="files/MultiTrack.gp5" data-tracks="[0,1]"></div>
+    <script type="text/javascript">
+        function resetTracks() {
+            var toRender = [];
+            var tracks = $('#alphaTab').alphaTab('renderer').tracks;
+            $('#tracks input').each(function() {
+                if($(this).is(':checked')) {
+                    toRender.push($(this).data('track'));
+                }
+            });
+            $('#alphaTab').alphaTab('renderer').renderMultiple(toRender);
+        }
+        $('#alphaTab').on('loaded', function(e,score) {
+            var tracks = $('#tracks');
+            tracks.empty();
+            for(var i = 0; i < score.tracks.length; i++) 
+            {
+                var input = $('<input />')
+                                .attr('type', 'checkbox')
+                                .attr('id', 'track_' + i)
+                                .data('track', score.tracks[i])
+                                .change(function() { resetTracks(); });
+                tracks.append(input);
+                var label = $('<label></label>')
+                                    .attr('for', 'track_' + i)
+                                    .text(score.tracks[i].name);
+                tracks.append(label);
+            }
+        });
+        $('#alphaTab').on('rendered', function() {
+            var tracks = $('#alphaTab').alphaTab('renderer').tracks;
+            $('#tracks input').each(function() {
+                var track = $(this).data('track');
+                var selected = false;
+                for(var i = 0; i < tracks.length; i++) {
+                    if(tracks[i] == track) {
+                        selected = true;
+                        break;
+                    }
+                }
+                        
+                $(this).prop('checked', selected);
+            });
+        });
+        $('#alphaTab').alphaTab({
+            layout: 'horizontal'
+        });
+    </script>
+</body>
+</html> 

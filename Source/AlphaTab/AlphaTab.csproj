@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C5C9CA45-D7BC-41F5-B9E1-97731858CE10}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>AlphaTab</RootNamespace>
+    <AssemblyName>AlphaTab</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;CSharp</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\AlphaTab.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;CSharp</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Audio\GeneralMidi.cs" />
+    <Compile Include="Audio\Generator\IMidiFileHandler.cs" />
+    <Compile Include="Audio\Generator\MidiFileGenerator.cs" />
+    <Compile Include="Audio\Generator\MidiFileHandler.cs" />
+    <Compile Include="Audio\Generator\MidiPlaybackController.cs" />
+    <Compile Include="Audio\Model\MidiFile.cs" />
+    <Compile Include="Audio\Model\MidiTickLookup.cs" />
+    <Compile Include="Audio\MidiUtils.cs" />
+    <Compile Include="Audio\Model\MidiController.cs" />
+    <Compile Include="Audio\Model\MidiEvent.cs" />
+    <Compile Include="Audio\Model\MidiMessage.cs" />
+    <Compile Include="Audio\Model\MidiTrack.cs" />
+    <Compile Include="Environment.cs" />
+    <Compile Include="Importer\AlphaTexException.cs" />
+    <Compile Include="Importer\AlphaTexImporter.cs" />
+    <Compile Include="Importer\AlphaTexSymbols.cs" />
+    <Compile Include="Importer\Gp3To5Importer.cs" />
+    <Compile Include="Importer\GpxFileSystem.cs" />
+    <Compile Include="Importer\GpxImporter.cs" />
+    <Compile Include="Importer\GpxParser.cs" />
+    <Compile Include="Importer\MixTableChange.cs" />
+    <Compile Include="Importer\NoCompatibleReaderFoundException.cs" />
+    <Compile Include="Importer\ScoreImporter.cs" />
+    <Compile Include="Importer\ScoreLoader.cs" />
+    <Compile Include="Importer\UnsupportedFormatException.cs" />
+    <Compile Include="IO\BitReader.cs" />
+    <Compile Include="Model\AccentuationType.cs" />
+    <Compile Include="Model\AccidentalType.cs" />
+    <Compile Include="Model\Automation.cs" />
+    <Compile Include="Model\AutomationType.cs" />
+    <Compile Include="Model\Bar.cs" />
+    <Compile Include="Model\Beat.cs" />
+    <Compile Include="Model\BendPoint.cs" />
+    <Compile Include="Model\BrushType.cs" />
+    <Compile Include="Model\Chord.cs" />
+    <Compile Include="Model\Clef.cs" />
+    <Compile Include="Model\CrescendoType.cs" />
+    <Compile Include="Model\Duration.cs" />
+    <Compile Include="Model\DynamicValue.cs" />
+    <Compile Include="Model\Fingers.cs" />
+    <Compile Include="Model\GraceType.cs" />
+    <Compile Include="Model\HarmonicType.cs" />
+    <Compile Include="Model\KeySignatureType.cs" />
+    <Compile Include="Model\MasterBar.cs" />
+    <Compile Include="Model\ModelUtils.cs" />
+    <Compile Include="Model\Note.cs" />
+    <Compile Include="Model\PickStrokeType.cs" />
+    <Compile Include="Model\PlaybackInformation.cs" />
+    <Compile Include="Model\RepeatGroup.cs" />
+    <Compile Include="Model\Score.cs" />
+    <Compile Include="Model\Section.cs" />
+    <Compile Include="Model\SlideType.cs" />
+    <Compile Include="Model\Track.cs" />
+    <Compile Include="Model\TripletFeel.cs" />
+    <Compile Include="Model\Tuning.cs" />
+    <Compile Include="Model\VibratoType.cs" />
+    <Compile Include="Model\Voice.cs" />
+    <Compile Include="Platform\CSharp\Wpf\AlphaTabCanvas.cs" />
+    <Compile Include="Platform\CSharp\WinForms\AlphaTabControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Platform\CSharp\CsFileLoader.cs" />
+    <Compile Include="Platform\CSharp\GdiCanvas.cs" />
+    <Compile Include="Platform\CSharp\Wpf\AlphaTabImage.cs" />
+    <Compile Include="Platform\ICanvas.cs" />
+    <Compile Include="Platform\IFileLoader.cs" />
+    <Compile Include="Platform\JavaScript\Html5Canvas.cs" />
+    <Compile Include="Platform\JavaScript\JsFileLoader.cs" />
+    <Compile Include="Platform\Model\Color.cs" />
+    <Compile Include="Platform\Model\Font.cs" />
+    <Compile Include="Platform\Model\TextAlign.cs" />
+    <Compile Include="Platform\Model\TextBaseline.cs" />
+    <Compile Include="Rendering\AlternateEndingsBarRenderer.cs" />
+    <Compile Include="Rendering\AlternateEndingsBarRendererFactory.cs" />
+    <Compile Include="Rendering\BarRendererBase.cs" />
+    <Compile Include="Rendering\BarRendererFactory.cs" />
+    <Compile Include="Rendering\EffectBarGlyphSizing.cs" />
+    <Compile Include="Rendering\EffectBarRenderer.cs" />
+    <Compile Include="Rendering\EffectBarRendererFactory.cs" />
+    <Compile Include="Rendering\Effects\BeatVibratoEffectInfo.cs" />
+    <Compile Include="Rendering\Effects\ChordsEffectInfo.cs" />
+    <Compile Include="Rendering\Effects\CrescendoEffectInfo.cs" />
+    <Compile Include="Rendering\Effects\DummyEffectGlyph.cs" />
+    <Compile Include="Rendering\Effects\DynamicsEffectInfo.cs" />
+    <Compile Include="Rendering\Effects\FadeInEffectInfo.cs" />
+    <Compile Include="Rendering\Effects\FingeringEffectInfo.cs" />
+    <Compile Include="Rendering\Effects\LetRingEffectInfo.cs" />
+    <Compile Include="Rendering\Effects\MarkerEffectInfo.cs" />
+    <Compile Include="Rendering\Effects\NoteEffectInfoBase.cs" />
+    <Compile Include="Rendering\Effects\NoteVibratoEffectInfo.cs" />
+    <Compile Include="Rendering\Effects\PalmMuteEffectInfo.cs" />
+    <Compile Include="Rendering\Effects\PickStrokeEffectInfo.cs" />
+    <Compile Include="Rendering\Effects\TapEffectInfo.cs" />
+    <Compile Include="Rendering\Effects\TempoEffectInfo.cs" />
+    <Compile Include="Rendering\Effects\TextEffectInfo.cs" />
+    <Compile Include="Rendering\Effects\TrillEffectInfo.cs" />
+    <Compile Include="Rendering\Effects\TripletFeelEffectInfo.cs" />
+    <Compile Include="Rendering\Glyphs\AccentuationGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\AccidentalGroupGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\BarNumberGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\BarSeperatorGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\BeamGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\BeatContainerGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\BeatGlyphBase.cs" />
+    <Compile Include="Rendering\Glyphs\BendGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\ChineseCymbalGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\CircleGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\ClefGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\CrescendoGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\DeadNoteHeadGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\DiamondNoteHeadGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\DigitGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\DrumSticksGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\DynamicsGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\FadeInGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\FlatGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\Glyph.cs" />
+    <Compile Include="Rendering\Glyphs\GlyphGroup.cs" />
+    <Compile Include="Rendering\Glyphs\HiHatGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\IMultiBeatEffectGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\ISupportsFinalize.cs" />
+    <Compile Include="Rendering\Glyphs\LazySvg.cs" />
+    <Compile Include="Rendering\Glyphs\LineRangedGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\MusicFont.cs" />
+    <Compile Include="Rendering\Glyphs\NaturalizeGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\NoteHeadGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\NoteNumberGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\NumberGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\PickStrokeGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\RepeatCloseGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\RepeatCountGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\RepeatOpenGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\RestGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\RideCymbalGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\ScoreBeatGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\ScoreBeatPostNotesGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\ScoreBeatPreNotesGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\ScoreBrushGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\ScoreNoteChordGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\ScoreSlideLineGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\ScoreTieGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\SharpGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\SpacingGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\SvgGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\TabBeatContainerGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\TabBeatGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\TabBeatPostNotesGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\TabBeatPreNotesGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\TabBrushGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\TabClefGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\TabNoteChordGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\TabSlideLineGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\TabTieGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\TempoGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\TextGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\TieGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\TimeSignatureGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\TremoloPickingGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\TrillGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\VibratoGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\VoiceContainerGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\WhammyBarGlyph.cs" />
+    <Compile Include="Rendering\GroupedBarRenderer.cs" />
+    <Compile Include="Rendering\IEffectBarRendererInfo.cs" />
+    <Compile Include="Rendering\Layout\HeaderFooterElements.cs" />
+    <Compile Include="Rendering\Layout\HorizontalScreenLayout.cs" />
+    <Compile Include="Rendering\Layout\PageViewLayout.cs" />
+    <Compile Include="Rendering\Layout\ScoreLayout.cs" />
+    <Compile Include="Rendering\RenderingResources.cs" />
+    <Compile Include="Rendering\RhythmBarRenderer.cs" />
+    <Compile Include="Rendering\RhythmBarRendererFactory.cs" />
+    <Compile Include="Rendering\ScoreBarRenderer.cs" />
+    <Compile Include="Rendering\ScoreBarRendererFactory.cs" />
+    <Compile Include="Rendering\ScoreBeatContainerGlyph.cs" />
+    <Compile Include="Rendering\ScoreRenderer.cs" />
+    <Compile Include="Rendering\Staves\BarSizeInfo.cs" />
+    <Compile Include="Rendering\Staves\Stave.cs" />
+    <Compile Include="Rendering\Staves\StaveGroup.cs" />
+    <Compile Include="Rendering\TabBarRenderer.cs" />
+    <Compile Include="Rendering\TabBarRendererFactory.cs" />
+    <Compile Include="Rendering\Utils\AccidentalHelper.cs" />
+    <Compile Include="Rendering\Utils\BarHelpersGroup.cs" />
+    <Compile Include="Rendering\Utils\BeamingHelper.cs" />
+    <Compile Include="Rendering\Utils\BoundingsLookup.cs" />
+    <Compile Include="Rendering\Utils\PercussionMapper.cs" />
+    <Compile Include="Rendering\Utils\SvgPathParser.cs" />
+    <Compile Include="Rendering\Utils\TupletHelper.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="Platform\Svg\FontSizes.cs" />
+    <Compile Include="Platform\Svg\SupportedFonts.cs" />
+    <Compile Include="Platform\Svg\SvgCanvas.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>echo Copying Result Files
+xcopy $(TargetPath) $(SolutionDir)Build\CSharp\
+xcopy $(TargetDir)$(TargetName).xml $(SolutionDir)Build\CSharp\</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
