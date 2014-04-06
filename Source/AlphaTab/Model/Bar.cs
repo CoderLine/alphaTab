@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using AlphaTab.Platform;
 
 namespace AlphaTab.Model
@@ -14,13 +15,21 @@ namespace AlphaTab.Model
             Clef = Clef.G2;
         }
 
+        [IntrinsicProperty]
         public int Index { get; set; }
+        [IntrinsicProperty]
         public Bar NextBar { get; set; }
+        [IntrinsicProperty]
         public Bar PreviousBar { get; set; }
+        [IntrinsicProperty]
         public Clef Clef { get; set; }
+        [IntrinsicProperty]
         public Track Track { get; set; }
+        [IntrinsicProperty]
         public List<Voice> Voices { get; set; }
+        [IntrinsicProperty]
         public Nullable<Duration> MinDuration { get; set; }
+        [IntrinsicProperty]
         public Nullable<Duration> MaxDuration { get; set; }
 
         public void AddVoice(Voice voice)

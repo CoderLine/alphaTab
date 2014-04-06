@@ -233,7 +233,7 @@
     <Compile Include="Rendering\RhythmBarRendererFactory.cs" />
     <Compile Include="Rendering\ScoreBarRenderer.cs" />
     <Compile Include="Rendering\ScoreBarRendererFactory.cs" />
-    <Compile Include="Rendering\ScoreBeatContainerGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\ScoreBeatContainerGlyph.cs" />
     <Compile Include="Rendering\ScoreRenderer.cs" />
     <Compile Include="Rendering\Staves\BarSizeInfo.cs" />
     <Compile Include="Rendering\Staves\Stave.cs" />

@@ -24,23 +24,23 @@
         // custom array
         if ($.isArray(value)) {
             for (var i = 0; i < value.length; i++) {
-                if (value[i] >= 0 && value[i] < score.get_tracks().length)
-                    tracks.push(score.get_tracks()[value[i]]);
+                if (value[i] >= 0 && value[i] < score.tracks.length)
+                    tracks.push(score.tracks[value[i]]);
             }
         }
             // single value
-        else if ($.isNumeric(value) && value >= 0 && value < score.get_tracks().length) {
-            tracks.push(score.get_tracks()[value]);
+        else if ($.isNumeric(value) && value >= 0 && value < score.tracks.length) {
+            tracks.push(score.tracks[value]);
         }
             // all tracks
         else if ($.isNumeric(value) && value == -1) {
-            for (var i = 0; i < score.get_tracks().length; i++) {
-                tracks.push(score.get_tracks()[i]);
+            for (var i = 0; i < score.tracks.length; i++) {
+                tracks.push(score.tracks[i]);
             }
         }
             // default
         else {
-            tracks.push(score.get_tracks()[0]);
+            tracks.push(score.tracks[0]);
         }
         return tracks;
     }
@@ -95,12 +95,12 @@
 
                 //
                 // Create context elements (wrapper, canvas etc)
-                if (context.settings.get_engine() == "html5" || context.settings.get_engine() == "default") {
+                if (context.settings.engine == "html5" || context.settings.engine == "default") {
                     // HACK: call createElement('canvas') once before. this ensures that the browser knows the element
                     document.createElement('canvas');
                     context.canvas = $(document.createElement('canvas'));
-                    $(context.canvas).attr("width", context.settings.get_width())
-                     .attr("height", context.settings.get_height())
+                    $(context.canvas).attr("width", context.settings.width)
+                     .attr("height", context.settings.height)
                      .addClass("alphaTabSurface");
                     $this.append(context.canvas);
                     context.canvas = context.canvas[0];
@@ -148,7 +148,7 @@
                     $this.trigger('rendered');
                 });
                 // in case of SVG we hook into the renderer to create the svg element after rendering
-                if (context.settings.get_engine() == "svg") {
+                if (context.settings.engine == "svg") {
                     context.renderer.add_renderFinished(function () {
                         var canvas = context.renderer.canvas;
                         context.canvas[0].innerHTML = canvas.toSvg(true, "alphaTabSurface");
@@ -227,10 +227,10 @@
     function tracks(tracks) {
         var context = $(this).data('alphaTab');
         if (tracks) {
-            if (context.renderer.get_tracks() == null || context.renderer.get_tracks().length == 0)
+            if (context.renderer.tracks == null || context.renderer.tracks.length == 0)
                 return;
 
-            var score = context.renderer.get_tracks()[0].score;
+            var score = context.renderer.tracks[0].score;
             var realTracks = buildTracksArray(tracks, score);
 
             try {
@@ -242,7 +242,7 @@
             }
         }
         else {
-            return context.renderer.get_tracks();
+            return context.renderer.tracks;
         }
     }
 
@@ -251,9 +251,9 @@
      */
     function score() {
         var context = $(this).data('alphaTab');
-        if (context.renderer.get_tracks() == null || context.renderer.get_tracks().length == 0)
+        if (context.renderer.tracks == null || context.renderer.tracks.length == 0)
             return null;
-        return context.renderer.get_tracks()[0].get_score();
+        return context.renderer.tracks[0].score;
     }
 
     /**

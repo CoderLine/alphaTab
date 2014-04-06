@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Xml;
 using AlphaTab.Model;
@@ -11,9 +12,13 @@ namespace AlphaTab.Importer
     /// </summary>
     public class GpxRhythm
     {
+        [IntrinsicProperty]
         public int Dots { get; set; }
+        [IntrinsicProperty]
         public int TupletDenominator { get; set; }
+        [IntrinsicProperty]
         public int TupletNumerator { get; set; }
+        [IntrinsicProperty]
         public Duration Value { get; set; }
 
         public GpxRhythm()
@@ -41,6 +46,7 @@ namespace AlphaTab.Importer
         /// </summary>
         private const float BendPointValueFactor = 12.0f / 300.0f;
 
+        [IntrinsicProperty]
         public Score Score { get; set; }
 
 

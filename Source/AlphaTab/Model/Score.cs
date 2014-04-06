@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace AlphaTab.Model
 {
@@ -14,57 +15,71 @@ namespace AlphaTab.Model
         /// <summary>
         /// The album of this song. 
         /// </summary>
+        [IntrinsicProperty]
         public string Album { get; set; }
 
         /// <summary>
         /// The artist who performs this song.
         /// </summary>
+        [IntrinsicProperty]
         public string Artist { get; set; }
 
         /// <summary>
         /// The owner of the copyright of this song. 
         /// </summary>
+        [IntrinsicProperty]
         public string Copyright { get; set; }
 
         /// <summary>
         /// Additional instructions
         /// </summary>
+        [IntrinsicProperty]
         public string Instructions { get; set; }
 
         /// <summary>
         /// The author of the music. 
         /// </summary>
+        [IntrinsicProperty]
         public string Music { get; set; }
 
         /// <summary>
         /// Some additional notes about the song. 
         /// </summary>
+        [IntrinsicProperty]
         public string Notices { get; set; }
 
         /// <summary>
         /// The subtitle of the song. 
         /// </summary>
+        [IntrinsicProperty]
         public string SubTitle { get; set; }
 
         /// <summary>
         /// The title of the song. 
         /// </summary>
+        [IntrinsicProperty]
         public string Title { get; set; }
 
         /// <summary>
         /// The author of the song lyrics
         /// </summary>
+        [IntrinsicProperty]
         public string Words { get; set; }
 
         /// <summary>
         /// The author of this tablature.
         /// </summary>
+        [IntrinsicProperty]
         public string Tab { get; set; }
 
+        [IntrinsicProperty]
         public int Tempo { get; set; }
+        [IntrinsicProperty]
         public string TempoLabel { get; set; }
 
+        [IntrinsicProperty]
         public List<MasterBar> MasterBars { get; set; }
+        [IntrinsicProperty]
         public List<Track> Tracks { get; set; }
 
         public Score()

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using AlphaTab.Platform;
 
 namespace AlphaTab.Model
@@ -9,11 +10,16 @@ namespace AlphaTab.Model
     /// </summary>
     public class Voice
     {
+        [IntrinsicProperty]
         public int Index { get; set; }
+        [IntrinsicProperty]
         public Bar Bar { get; set; }
+        [IntrinsicProperty]
         public List<Beat> Beats { get; set; }
 
+        [IntrinsicProperty]
         public Nullable<Duration> MinDuration { get; set; }
+        [IntrinsicProperty]
         public Nullable<Duration> MaxDuration { get; set; }
 
         public bool IsEmpty

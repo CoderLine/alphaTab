@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Platform.Model;
@@ -50,6 +51,8 @@ namespace AlphaTab.Rendering
         private const int LineSpacing = 8;
 
         private BarHelpers _helpers;
+
+        [IntrinsicProperty]
         public AccidentalHelper AccidentalHelper { get; set; }
 
         public ScoreBarRenderer(Bar bar)

@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace AlphaTab.Model
 {
     /// <summary>
@@ -5,10 +7,15 @@ namespace AlphaTab.Model
     /// </summary>
     public class Automation
     {
+        [IntrinsicProperty]
         public bool IsLinear { get; set; }
+        [IntrinsicProperty]
         public AutomationType Type { get; set; }
+        [IntrinsicProperty]
         public float Value { get; set; }
+        [IntrinsicProperty]
         public float RatioPosition { get; set; }
+        [IntrinsicProperty]
         public string Text { get; set; }
 
         public static Automation BuildTempoAutomation(bool isLinear, float ratioPosition, float value, int reference)

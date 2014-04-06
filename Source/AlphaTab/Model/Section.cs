@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace AlphaTab.Model
 {
     /// <summary>
@@ -6,7 +8,9 @@ namespace AlphaTab.Model
     /// </summary>
     public class Section
     {
+        [IntrinsicProperty]
         public string Marker { get; set; }
+        [IntrinsicProperty]
         public string Text { get; set; }
     }
 }

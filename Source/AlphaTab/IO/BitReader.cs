@@ -11,7 +11,7 @@
         private int _position; // the current bit position within the current byte
         private int _readBytes;
 
-        private Stream _source;
+        private readonly Stream _source;
 
         public BitReader(Stream source)
         {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace AlphaTab.Model
 {
@@ -10,40 +11,64 @@ namespace AlphaTab.Model
     /// </summary>
     public class Note
     {
+        [IntrinsicProperty]
         public AccentuationType Accentuated { get; set; }
+        [IntrinsicProperty]
         public List<BendPoint> BendPoints { get; set; }
         public bool HasBend { get { return BendPoints.Count > 0; } }
 
+        [IntrinsicProperty]
         public int Fret { get; set; }
+        [IntrinsicProperty]
         public int String { get; set; }
 
 
+        [IntrinsicProperty]
         public Note HammerPullOrigin { get; set; }
+        [IntrinsicProperty]
         public bool IsHammerPullDestination { get; set; }
+        [IntrinsicProperty]
         public bool IsHammerPullOrigin { get; set; }
 
+        [IntrinsicProperty]
         public float HarmonicValue { get; set; }
+        [IntrinsicProperty]
         public HarmonicType HarmonicType { get; set; }
 
+        [IntrinsicProperty]
         public bool IsGhost { get; set; }
+        [IntrinsicProperty]
         public bool IsLetRing { get; set; }
+        [IntrinsicProperty]
         public bool IsPalmMute { get; set; }
+        [IntrinsicProperty]
         public bool IsDead { get; set; }
+        [IntrinsicProperty]
         public bool IsStaccato { get; set; }
 
+        [IntrinsicProperty]
         public SlideType SlideType { get; set; }
+        [IntrinsicProperty]
         public Note SlideTarget { get; set; }
 
+        [IntrinsicProperty]
         public VibratoType Vibrato { get; set; }
 
+        [IntrinsicProperty]
         public Note TieOrigin { get; set; }
+        [IntrinsicProperty]
         public bool IsTieDestination { get; set; }
+        [IntrinsicProperty]
         public bool IsTieOrigin { get; set; }
 
+        [IntrinsicProperty]
         public Fingers LeftHandFinger { get; set; }
+        [IntrinsicProperty]
         public Fingers RightHandFinger { get; set; }
+        [IntrinsicProperty]
         public bool IsFingering { get; set; }
 
+        [IntrinsicProperty]
         public int TrillValue { get; set; }
         public int TrillFret
         {
@@ -60,15 +85,21 @@ namespace AlphaTab.Model
                 return TrillValue >= 0;
             }
         }
+        [IntrinsicProperty]
         public Duration TrillSpeed { get; set; }
 
+        [IntrinsicProperty]
         public double DurationPercent { get; set; }
 
+        [IntrinsicProperty]
         public bool SwapAccidentals { get; set; }
 
+        [IntrinsicProperty]
         public Beat Beat { get; set; }
+        [IntrinsicProperty]
         public DynamicValue Dynamic { get; set; }
 
+        [IntrinsicProperty]
         public int Octave { get; set; }
 
         public int StringTuning

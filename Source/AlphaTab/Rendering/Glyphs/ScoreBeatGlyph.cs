@@ -1,4 +1,5 @@
-﻿using AlphaTab.Model;
+﻿using System.Runtime.CompilerServices;
+using AlphaTab.Model;
 using AlphaTab.Rendering.Layout;
 using AlphaTab.Rendering.Utils;
 
@@ -6,9 +7,11 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class ScoreBeatGlyph : BeatGlyphBase, ISupportsFinalize
     {
+        [IntrinsicProperty]
         public ScoreNoteChordGlyph NoteHeads { get; set; }
+        [IntrinsicProperty]
         public RestGlyph RestGlyph { get; set; }
-
+        [IntrinsicProperty]
         public BeamingHelper BeamingHelper { get; set; }
 
         public void FinalizeGlyph(ScoreLayout layout)

@@ -1,4 +1,5 @@
-﻿using AlphaTab.IO;
+﻿using System.Runtime.CompilerServices;
+using AlphaTab.IO;
 
 namespace AlphaTab.Audio.Model
 {
@@ -7,11 +8,13 @@ namespace AlphaTab.Audio.Model
     /// </summary>
     public class MidiMessage
     {
+        [IntrinsicProperty]
         public MidiEvent Event { get; set; }
 
         /// <summary>
         /// The raw midi message data
         /// </summary>
+        [IntrinsicProperty]
         public ByteArray Data { get; set; }
 
         public MidiMessage(ByteArray data)

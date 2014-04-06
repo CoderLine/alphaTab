@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using AlphaTab.Platform;
 using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Layout;
@@ -15,7 +16,9 @@ namespace AlphaTab.Rendering.Glyphs
     {
         public const string KeySizeBeat = "Beat";
 
+        [IntrinsicProperty]
         public List<BeatContainerGlyph> BeatGlyphs { get; set; }
+        [IntrinsicProperty]
         public int VoiceIndex { get; set; }
 
         public VoiceContainerGlyph(int x, int y, int voiceIndex)

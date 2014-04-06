@@ -28,57 +28,57 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.LayoutSettings
 	var $AlphaTab_LayoutSettings = function() {
-		this.$1$ModeField = null;
+		this.mode = null;
 		this.additionalSettings = null;
 		this.additionalSettings = new (ss.makeGenericType(ss.Dictionary$2, [String, Object]))();
 	};
 	$AlphaTab_LayoutSettings.__typeName = 'AlphaTab.LayoutSettings';
 	$AlphaTab_LayoutSettings.get_defaults = function() {
 		var settings = new $AlphaTab_LayoutSettings();
-		settings.set_mode('page');
+		settings.mode = 'page';
 		return settings;
 	};
 	global.AlphaTab.LayoutSettings = $AlphaTab_LayoutSettings;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Settings
 	var $AlphaTab_Settings = function() {
-		this.$1$ScaleField = 0;
-		this.$1$WidthField = 0;
-		this.$1$HeightField = 0;
-		this.$1$EngineField = null;
-		this.$1$LayoutField = null;
-		this.$1$StavesField = null;
+		this.scale = 0;
+		this.width = 0;
+		this.height = 0;
+		this.engine = null;
+		this.layout = null;
+		this.staves = null;
 	};
 	$AlphaTab_Settings.__typeName = 'AlphaTab.Settings';
 	$AlphaTab_Settings.get_defaults = function() {
 		var settings = new $AlphaTab_Settings();
-		settings.set_scale(1);
-		settings.set_width(600);
-		settings.set_height(200);
-		settings.set_engine('default');
-		settings.set_layout($AlphaTab_LayoutSettings.get_defaults());
-		settings.set_staves([]);
-		ss.add(settings.get_staves(), new $AlphaTab_StaveSettings('marker'));
+		settings.scale = 1;
+		settings.width = 600;
+		settings.height = 200;
+		settings.engine = 'default';
+		settings.layout = $AlphaTab_LayoutSettings.get_defaults();
+		settings.staves = [];
+		ss.add(settings.staves, new $AlphaTab_StaveSettings('marker'));
 		//settings.staves.Add(new StaveSettings("triplet-feel"));
-		ss.add(settings.get_staves(), new $AlphaTab_StaveSettings('tempo'));
-		ss.add(settings.get_staves(), new $AlphaTab_StaveSettings('text'));
-		ss.add(settings.get_staves(), new $AlphaTab_StaveSettings('chords'));
-		ss.add(settings.get_staves(), new $AlphaTab_StaveSettings('trill'));
-		ss.add(settings.get_staves(), new $AlphaTab_StaveSettings('beat-vibrato'));
-		ss.add(settings.get_staves(), new $AlphaTab_StaveSettings('note-vibrato'));
-		ss.add(settings.get_staves(), new $AlphaTab_StaveSettings('alternate-endings'));
-		ss.add(settings.get_staves(), new $AlphaTab_StaveSettings('score'));
-		ss.add(settings.get_staves(), new $AlphaTab_StaveSettings('crescendo'));
-		ss.add(settings.get_staves(), new $AlphaTab_StaveSettings('dynamics'));
-		ss.add(settings.get_staves(), new $AlphaTab_StaveSettings('trill'));
-		ss.add(settings.get_staves(), new $AlphaTab_StaveSettings('beat-vibrato'));
-		ss.add(settings.get_staves(), new $AlphaTab_StaveSettings('note-vibrato'));
-		ss.add(settings.get_staves(), new $AlphaTab_StaveSettings('tap'));
-		ss.add(settings.get_staves(), new $AlphaTab_StaveSettings('fade-in'));
-		ss.add(settings.get_staves(), new $AlphaTab_StaveSettings('let-ring'));
-		ss.add(settings.get_staves(), new $AlphaTab_StaveSettings('palm-mute'));
-		ss.add(settings.get_staves(), new $AlphaTab_StaveSettings('tab'));
-		ss.add(settings.get_staves(), new $AlphaTab_StaveSettings('pick-stroke'));
+		ss.add(settings.staves, new $AlphaTab_StaveSettings('tempo'));
+		ss.add(settings.staves, new $AlphaTab_StaveSettings('text'));
+		ss.add(settings.staves, new $AlphaTab_StaveSettings('chords'));
+		ss.add(settings.staves, new $AlphaTab_StaveSettings('trill'));
+		ss.add(settings.staves, new $AlphaTab_StaveSettings('beat-vibrato'));
+		ss.add(settings.staves, new $AlphaTab_StaveSettings('note-vibrato'));
+		ss.add(settings.staves, new $AlphaTab_StaveSettings('alternate-endings'));
+		ss.add(settings.staves, new $AlphaTab_StaveSettings('score'));
+		ss.add(settings.staves, new $AlphaTab_StaveSettings('crescendo'));
+		ss.add(settings.staves, new $AlphaTab_StaveSettings('dynamics'));
+		ss.add(settings.staves, new $AlphaTab_StaveSettings('trill'));
+		ss.add(settings.staves, new $AlphaTab_StaveSettings('beat-vibrato'));
+		ss.add(settings.staves, new $AlphaTab_StaveSettings('note-vibrato'));
+		ss.add(settings.staves, new $AlphaTab_StaveSettings('tap'));
+		ss.add(settings.staves, new $AlphaTab_StaveSettings('fade-in'));
+		ss.add(settings.staves, new $AlphaTab_StaveSettings('let-ring'));
+		ss.add(settings.staves, new $AlphaTab_StaveSettings('palm-mute'));
+		ss.add(settings.staves, new $AlphaTab_StaveSettings('tab'));
+		ss.add(settings.staves, new $AlphaTab_StaveSettings('pick-stroke'));
 		//settings.staves.Add(new StaveSettings("fingering"));
 		return settings;
 	};
@@ -94,42 +94,42 @@
 			return settings;
 		}
 		if (ss.unbox('scale' in json)) {
-			settings.set_scale(ss.unbox(json.scale));
+			settings.scale = ss.unbox(json.scale);
 		}
 		if (ss.unbox('width' in json)) {
-			settings.set_width(ss.unbox(json.width));
+			settings.width = ss.unbox(json.width);
 		}
 		if (ss.unbox('height' in json)) {
-			settings.set_height(ss.unbox(json.height));
+			settings.height = ss.unbox(json.height);
 		}
 		if (ss.unbox('engine' in json)) {
-			settings.set_engine(json.engine);
+			settings.engine = json.engine;
 		}
 		if (ss.unbox('layout' in json)) {
 			if (ss.isInstanceOfType(json.layout, String)) {
-				settings.get_layout().set_mode(json.layout);
+				settings.layout.mode = json.layout;
 			}
 			else {
 				if (ss.unbox(json.layout.mode)) {
-					settings.get_layout().set_mode(json.layout.mode);
+					settings.layout.mode = json.layout.mode;
 				}
 				if (ss.unbox(json.layout.additionalSettings)) {
 					var keys = $AlphaTab_Settings.$jsonKeys(json.layout.additionalSettings);
 					for (var $t1 = 0; $t1 < keys.length; $t1++) {
 						var key = keys[$t1];
-						settings.get_layout().additionalSettings.set_item(key, json.layout.additionalSettings[key]);
+						settings.layout.additionalSettings.set_item(key, json.layout.additionalSettings[key]);
 					}
 				}
 			}
 		}
 		if (ss.unbox('staves' in json)) {
-			settings.set_staves([]);
+			settings.staves = [];
 			var keys1 = $AlphaTab_Settings.$jsonKeys(json.staves);
 			for (var $t2 = 0; $t2 < keys1.length; $t2++) {
 				var key1 = keys1[$t2];
 				var val = json.staves[key1];
 				if (ss.isInstanceOfType(val, String)) {
-					ss.add(settings.get_staves(), new $AlphaTab_StaveSettings(val));
+					ss.add(settings.staves, new $AlphaTab_StaveSettings(val));
 				}
 				else if (ss.unbox(val.id)) {
 					var staveSettings = new $AlphaTab_StaveSettings(val.id);
@@ -335,14 +335,14 @@
 		var lookup = new $AlphaTab_Audio_Model_MidiTickLookup();
 		var controller = new $AlphaTab_Audio_Generator_MidiPlaybackController(score);
 		while (!controller.get_finished()) {
-			var index = controller.get_index();
+			var index = controller.index;
 			controller.process();
-			if (controller.get_shouldPlay()) {
+			if (controller.shouldPlay) {
 				var bar = new $AlphaTab_Audio_Model_BarTickLookup();
-				bar.set_bar(score.get_masterBars()[index]);
-				bar.set_start(controller.get_repeatMove() + bar.get_bar().get_start());
-				bar.set_end(bar.get_start() + bar.get_bar().calculateDuration());
-				ss.add(lookup.get_bars(), bar);
+				bar.bar = score.masterBars[index];
+				bar.start = controller.repeatMove + bar.bar.start;
+				bar.end = bar.start + bar.bar.calculateDuration();
+				ss.add(lookup.bars, bar);
 			}
 		}
 		return lookup;
@@ -360,20 +360,20 @@
 		this.$_score = null;
 		this.$_handler = null;
 		this.$_currentTempo = 0;
-		this.$1$GenerateMetronomeField = false;
+		this.generateMetronome = false;
 		this.$_score = score;
-		this.$_currentTempo = this.$_score.get_tempo();
+		this.$_currentTempo = this.$_score.tempo;
 		this.$_handler = handler;
-		this.set_generateMetronome(generateMetronome);
+		this.generateMetronome = generateMetronome;
 	};
 	$AlphaTab_Audio_Generator_MidiFileGenerator.__typeName = 'AlphaTab.Audio.Generator.MidiFileGenerator';
 	$AlphaTab_Audio_Generator_MidiFileGenerator.generateMidiFile = function(score, generateMetronome) {
 		var midiFile = new $AlphaTab_Audio_Model_MidiFile();
 		// create score tracks + metronometrack
-		for (var i = 0; i < score.get_tracks().length; i++) {
+		for (var i = 0; i < score.tracks.length; i++) {
 			midiFile.createTrack();
 		}
-		midiFile.set_infoTrack(0);
+		midiFile.infoTrack = 0;
 		var handler = new $AlphaTab_Audio_Generator_MidiFileHandler(midiFile);
 		var generator = new $AlphaTab_Audio_Generator_MidiFileGenerator(score, handler, generateMetronome);
 		generator.generate();
@@ -450,20 +450,20 @@
 		this.$_repeatNumber = 0;
 		this.$_repeatEnd = 0;
 		this.$_repeatOpen = false;
-		this.$1$ShouldPlayField = false;
-		this.$1$RepeatMoveField = 0;
-		this.$1$IndexField = 0;
+		this.shouldPlay = false;
+		this.repeatMove = 0;
+		this.index = 0;
 		this.$_score = score;
-		this.set_shouldPlay(true);
+		this.shouldPlay = true;
 	};
 	$AlphaTab_Audio_Generator_MidiPlaybackController.__typeName = 'AlphaTab.Audio.Generator.MidiPlaybackController';
 	global.AlphaTab.Audio.Generator.MidiPlaybackController = $AlphaTab_Audio_Generator_MidiPlaybackController;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Audio.Model.BarTickLookup
 	var $AlphaTab_Audio_Model_BarTickLookup = function() {
-		this.$1$StartField = 0;
-		this.$1$EndField = 0;
-		this.$1$BarField = null;
+		this.start = 0;
+		this.end = 0;
+		this.bar = null;
 	};
 	$AlphaTab_Audio_Model_BarTickLookup.__typeName = 'AlphaTab.Audio.Model.BarTickLookup';
 	global.AlphaTab.Audio.Model.BarTickLookup = $AlphaTab_Audio_Model_BarTickLookup;
@@ -476,31 +476,31 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Audio.Model.MidiEvent
 	var $AlphaTab_Audio_Model_MidiEvent = function(tick, message) {
-		this.$1$TrackField = null;
-		this.$1$TickField = 0;
-		this.$1$MessageField = null;
-		this.$1$NextEventField = null;
-		this.$1$PreviousEventField = null;
-		this.set_tick(tick);
-		this.set_message(message);
+		this.track = null;
+		this.tick = 0;
+		this.message = null;
+		this.nextEvent = null;
+		this.previousEvent = null;
+		this.tick = tick;
+		this.message = message;
 	};
 	$AlphaTab_Audio_Model_MidiEvent.__typeName = 'AlphaTab.Audio.Model.MidiEvent';
 	global.AlphaTab.Audio.Model.MidiEvent = $AlphaTab_Audio_Model_MidiEvent;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Audio.Model.MidiFile
 	var $AlphaTab_Audio_Model_MidiFile = function() {
-		this.$1$TracksField = null;
-		this.$1$InfoTrackField = 0;
-		this.set_tracks([]);
+		this.tracks = null;
+		this.infoTrack = 0;
+		this.tracks = [];
 	};
 	$AlphaTab_Audio_Model_MidiFile.__typeName = 'AlphaTab.Audio.Model.MidiFile';
 	global.AlphaTab.Audio.Model.MidiFile = $AlphaTab_Audio_Model_MidiFile;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Audio.Model.MidiMessage
 	var $AlphaTab_Audio_Model_MidiMessage = function(data) {
-		this.$1$EventField = null;
-		this.$1$DataField = null;
-		this.set_data(data);
+		this.event = null;
+		this.data = null;
+		this.data = data;
 	};
 	$AlphaTab_Audio_Model_MidiMessage.__typeName = 'AlphaTab.Audio.Model.MidiMessage';
 	global.AlphaTab.Audio.Model.MidiMessage = $AlphaTab_Audio_Model_MidiMessage;
@@ -508,35 +508,35 @@
 	// AlphaTab.Audio.Model.MidiTickLookup
 	var $AlphaTab_Audio_Model_MidiTickLookup = function() {
 		this.$_lastBeat = null;
-		this.$1$BarsField = null;
-		this.set_bars([]);
+		this.bars = null;
+		this.bars = [];
 	};
 	$AlphaTab_Audio_Model_MidiTickLookup.__typeName = 'AlphaTab.Audio.Model.MidiTickLookup';
 	global.AlphaTab.Audio.Model.MidiTickLookup = $AlphaTab_Audio_Model_MidiTickLookup;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Audio.Model.MidiTrack
 	var $AlphaTab_Audio_Model_MidiTrack = function() {
-		this.$1$IndexField = 0;
-		this.$1$FileField = null;
-		this.$1$FirstEventField = null;
-		this.$1$LastEventField = null;
+		this.index = 0;
+		this.file = null;
+		this.firstEvent = null;
+		this.lastEvent = null;
 	};
 	$AlphaTab_Audio_Model_MidiTrack.__typeName = 'AlphaTab.Audio.Model.MidiTrack';
 	global.AlphaTab.Audio.Model.MidiTrack = $AlphaTab_Audio_Model_MidiTrack;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Importer.AlphaTexException
 	var $AlphaTab_Importer_AlphaTexException = function(position, nonTerm, expected, symbol, symbolData) {
-		this.$2$PositionField = 0;
-		this.$2$NonTermField = null;
-		this.$2$ExpectedField = 0;
-		this.$2$SymbolField = 0;
-		this.$2$SymbolDataField = null;
+		this.position = 0;
+		this.nonTerm = null;
+		this.expected = 0;
+		this.symbol = 0;
+		this.symbolData = null;
 		ss.Exception.call(this);
-		this.set_position(position);
-		this.set_nonTerm(nonTerm);
-		this.set_expected(expected);
-		this.set_symbol(symbol);
-		this.set_symbolData(symbolData);
+		this.position = position;
+		this.nonTerm = nonTerm;
+		this.expected = expected;
+		this.symbol = symbol;
+		this.symbolData = symbolData;
 	};
 	$AlphaTab_Importer_AlphaTexException.__typeName = 'AlphaTab.Importer.AlphaTexException';
 	global.AlphaTab.Importer.AlphaTexException = $AlphaTab_Importer_AlphaTexException;
@@ -613,21 +613,21 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Importer.GpxFile
 	var $AlphaTab_Importer_GpxFile = function() {
-		this.$1$FileNameField = null;
-		this.$1$FileSizeField = 0;
-		this.$1$DataField = null;
+		this.fileName = null;
+		this.fileSize = 0;
+		this.data = null;
 	};
 	$AlphaTab_Importer_GpxFile.__typeName = 'AlphaTab.Importer.GpxFile';
 	global.AlphaTab.Importer.GpxFile = $AlphaTab_Importer_GpxFile;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Importer.GpxFileSystem
 	var $AlphaTab_Importer_GpxFileSystem = function() {
-		this.$1$FileFilterField = null;
-		this.$1$FilesField = null;
-		this.set_files([]);
-		this.set_fileFilter(function(s) {
+		this.fileFilter = null;
+		this.files = null;
+		this.files = [];
+		this.fileFilter = function(s) {
 			return true;
-		});
+		};
 	};
 	$AlphaTab_Importer_GpxFileSystem.__typeName = 'AlphaTab.Importer.GpxFileSystem';
 	global.AlphaTab.Importer.GpxFileSystem = $AlphaTab_Importer_GpxFileSystem;
@@ -641,7 +641,7 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Importer.GpxParser
 	var $AlphaTab_Importer_GpxParser = function() {
-		this.$1$ScoreField = null;
+		this.score = null;
 		this.$_automations = null;
 		this.$_tracksMapping = null;
 		this.$_tracksById = null;
@@ -663,31 +663,31 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Importer.GpxRhythm
 	var $AlphaTab_Importer_GpxRhythm = function() {
-		this.$1$DotsField = 0;
-		this.$1$TupletDenominatorField = 0;
-		this.$1$TupletNumeratorField = 0;
-		this.$1$ValueField = 0;
-		this.set_tupletDenominator(1);
-		this.set_tupletNumerator(1);
-		this.set_value(4);
+		this.dots = 0;
+		this.tupletDenominator = 0;
+		this.tupletNumerator = 0;
+		this.value = 0;
+		this.tupletDenominator = 1;
+		this.tupletNumerator = 1;
+		this.value = 4;
 	};
 	$AlphaTab_Importer_GpxRhythm.__typeName = 'AlphaTab.Importer.GpxRhythm';
 	global.AlphaTab.Importer.GpxRhythm = $AlphaTab_Importer_GpxRhythm;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Importer.MixTableChange
 	var $AlphaTab_Importer_MixTableChange = function() {
-		this.$1$VolumeField = 0;
-		this.$1$BalanceField = 0;
-		this.$1$InstrumentField = 0;
-		this.$1$TempoNameField = null;
-		this.$1$TempoField = 0;
-		this.$1$DurationField = 0;
-		this.set_volume(-1);
-		this.set_balance(-1);
-		this.set_instrument(-1);
-		this.set_tempoName(null);
-		this.set_tempo(-1);
-		this.set_duration(0);
+		this.volume = 0;
+		this.balance = 0;
+		this.instrument = 0;
+		this.tempoName = null;
+		this.tempo = 0;
+		this.duration = 0;
+		this.volume = -1;
+		this.balance = -1;
+		this.instrument = -1;
+		this.tempoName = null;
+		this.tempo = -1;
+		this.duration = 0;
 	};
 	$AlphaTab_Importer_MixTableChange.__typeName = 'AlphaTab.Importer.MixTableChange';
 	global.AlphaTab.Importer.MixTableChange = $AlphaTab_Importer_MixTableChange;
@@ -890,11 +890,11 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Model.Automation
 	var $AlphaTab_Model_Automation = function() {
-		this.$1$IsLinearField = false;
-		this.$1$TypeField = 0;
-		this.$1$ValueField = 0;
-		this.$1$RatioPositionField = 0;
-		this.$1$TextField = null;
+		this.isLinear = false;
+		this.type = 0;
+		this.value = 0;
+		this.ratioPosition = 0;
+		this.text = null;
 	};
 	$AlphaTab_Model_Automation.__typeName = 'AlphaTab.Model.Automation';
 	$AlphaTab_Model_Automation.buildTempoAutomation = function(isLinear, ratioPosition, value, reference) {
@@ -903,10 +903,10 @@
 		}
 		var references = [1, 0.5, 1, 1.5, 2, 3];
 		var automation = new $AlphaTab_Model_Automation();
-		automation.set_type(0);
-		automation.set_isLinear(isLinear);
-		automation.set_ratioPosition(ratioPosition);
-		automation.set_value(value * references[reference]);
+		automation.type = 0;
+		automation.isLinear = isLinear;
+		automation.ratioPosition = ratioPosition;
+		automation.value = value * references[reference];
 		return automation;
 	};
 	global.AlphaTab.Model.Automation = $AlphaTab_Model_Automation;
@@ -919,78 +919,78 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Model.Bar
 	var $AlphaTab_Model_Bar = function() {
-		this.$1$IndexField = 0;
-		this.$1$NextBarField = null;
-		this.$1$PreviousBarField = null;
-		this.$1$ClefField = 0;
-		this.$1$TrackField = null;
-		this.$1$VoicesField = null;
-		this.$1$MinDurationField = null;
-		this.$1$MaxDurationField = null;
-		this.set_voices([]);
-		this.set_clef(4);
+		this.index = 0;
+		this.nextBar = null;
+		this.previousBar = null;
+		this.clef = 0;
+		this.track = null;
+		this.voices = null;
+		this.minDuration = null;
+		this.maxDuration = null;
+		this.voices = [];
+		this.clef = 4;
 	};
 	$AlphaTab_Model_Bar.__typeName = 'AlphaTab.Model.Bar';
 	global.AlphaTab.Model.Bar = $AlphaTab_Model_Bar;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Model.Beat
 	var $AlphaTab_Model_Beat = function() {
-		this.$1$PreviousBeatField = null;
-		this.$1$NextBeatField = null;
-		this.$1$IndexField = 0;
-		this.$1$VoiceField = null;
-		this.$1$NotesField = null;
-		this.$1$IsEmptyField = false;
+		this.previousBeat = null;
+		this.nextBeat = null;
+		this.index = 0;
+		this.voice = null;
+		this.notes = null;
+		this.isEmpty = false;
 		this.$_minNote = null;
 		this.$_maxNote = null;
-		this.$1$DurationField = 0;
-		this.$1$AutomationsField = null;
-		this.$1$DotsField = 0;
-		this.$1$FadeInField = false;
-		this.$1$LyricsField = null;
-		this.$1$PopField = false;
-		this.$1$HasRasgueadoField = false;
-		this.$1$SlapField = false;
-		this.$1$TapField = false;
-		this.$1$TextField = null;
-		this.$1$BrushTypeField = 0;
-		this.$1$BrushDurationField = 0;
-		this.$1$TupletDenominatorField = 0;
-		this.$1$TupletNumeratorField = 0;
-		this.$1$WhammyBarPointsField = null;
-		this.$1$VibratoField = 0;
-		this.$1$ChordIdField = null;
-		this.$1$GraceTypeField = 0;
-		this.$1$PickStrokeField = 0;
-		this.$1$TremoloSpeedField = null;
-		this.$1$CrescendoField = 0;
-		this.$1$StartField = 0;
-		this.$1$DynamicField = 0;
-		this.set_whammyBarPoints([]);
-		this.set_notes([]);
-		this.set_brushType(0);
-		this.set_vibrato(0);
-		this.set_graceType(0);
-		this.set_pickStroke(0);
-		this.set_duration(4);
-		this.set_tremoloSpeed(null);
-		this.set_automations([]);
-		this.set_dots(0);
-		this.set_start(0);
-		this.set_tupletDenominator(-1);
-		this.set_tupletNumerator(-1);
-		this.set_dynamic(5);
-		this.set_crescendo(0);
+		this.duration = 0;
+		this.automations = null;
+		this.dots = 0;
+		this.fadeIn = false;
+		this.lyrics = null;
+		this.pop = false;
+		this.hasRasgueado = false;
+		this.slap = false;
+		this.tap = false;
+		this.text = null;
+		this.brushType = 0;
+		this.brushDuration = 0;
+		this.tupletDenominator = 0;
+		this.tupletNumerator = 0;
+		this.whammyBarPoints = null;
+		this.vibrato = 0;
+		this.chordId = null;
+		this.graceType = 0;
+		this.pickStroke = 0;
+		this.tremoloSpeed = null;
+		this.crescendo = 0;
+		this.start = 0;
+		this.dynamic = 0;
+		this.whammyBarPoints = [];
+		this.notes = [];
+		this.brushType = 0;
+		this.vibrato = 0;
+		this.graceType = 0;
+		this.pickStroke = 0;
+		this.duration = 4;
+		this.tremoloSpeed = null;
+		this.automations = [];
+		this.dots = 0;
+		this.start = 0;
+		this.tupletDenominator = -1;
+		this.tupletNumerator = -1;
+		this.dynamic = 5;
+		this.crescendo = 0;
 	};
 	$AlphaTab_Model_Beat.__typeName = 'AlphaTab.Model.Beat';
 	global.AlphaTab.Model.Beat = $AlphaTab_Model_Beat;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Model.BendPoint
 	var $AlphaTab_Model_BendPoint = function(offset, value) {
-		this.$1$OffsetField = 0;
-		this.$1$ValueField = 0;
-		this.set_offset(offset);
-		this.set_value(value);
+		this.offset = 0;
+		this.value = 0;
+		this.offset = offset;
+		this.value = value;
 	};
 	$AlphaTab_Model_BendPoint.__typeName = 'AlphaTab.Model.BendPoint';
 	global.AlphaTab.Model.BendPoint = $AlphaTab_Model_BendPoint;
@@ -1003,10 +1003,10 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Model.Chord
 	var $AlphaTab_Model_Chord = function() {
-		this.$1$NameField = null;
-		this.$1$FirstFretField = 0;
-		this.$1$StringsField = null;
-		this.set_strings([]);
+		this.name = null;
+		this.firstFret = 0;
+		this.strings = null;
+		this.strings = [];
 	};
 	$AlphaTab_Model_Chord.__typeName = 'AlphaTab.Model.Chord';
 	global.AlphaTab.Model.Chord = $AlphaTab_Model_Chord;
@@ -1092,26 +1092,26 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Model.MasterBar
 	var $AlphaTab_Model_MasterBar = function() {
-		this.$1$AlternateEndingsField = 0;
-		this.$1$NextMasterBarField = null;
-		this.$1$PreviousMasterBarField = null;
-		this.$1$IndexField = 0;
-		this.$1$KeySignatureField = 0;
-		this.$1$IsDoubleBarField = false;
-		this.$1$IsRepeatStartField = false;
-		this.$1$RepeatCountField = 0;
-		this.$1$RepeatGroupField = null;
-		this.$1$TimeSignatureNumeratorField = 0;
-		this.$1$TimeSignatureDenominatorField = 0;
-		this.$1$TripletFeelField = 0;
-		this.$1$SectionField = null;
-		this.$1$TempoAutomationField = null;
-		this.$1$VolumeAutomationField = null;
-		this.$1$ScoreField = null;
-		this.$1$StartField = 0;
-		this.set_timeSignatureDenominator(4);
-		this.set_timeSignatureNumerator(4);
-		this.set_tripletFeel(0);
+		this.alternateEndings = 0;
+		this.nextMasterBar = null;
+		this.previousMasterBar = null;
+		this.index = 0;
+		this.keySignature = 0;
+		this.isDoubleBar = false;
+		this.isRepeatStart = false;
+		this.repeatCount = 0;
+		this.repeatGroup = null;
+		this.timeSignatureNumerator = 0;
+		this.timeSignatureDenominator = 0;
+		this.tripletFeel = 0;
+		this.section = null;
+		this.tempoAutomation = null;
+		this.volumeAutomation = null;
+		this.score = null;
+		this.start = 0;
+		this.timeSignatureDenominator = 4;
+		this.timeSignatureNumerator = 4;
+		this.tripletFeel = 0;
 	};
 	$AlphaTab_Model_MasterBar.__typeName = 'AlphaTab.Model.MasterBar';
 	global.AlphaTab.Model.MasterBar = $AlphaTab_Model_MasterBar;
@@ -1141,75 +1141,75 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Model.Note
 	var $AlphaTab_Model_Note = function() {
-		this.$1$AccentuatedField = 0;
-		this.$1$BendPointsField = null;
-		this.$1$FretField = 0;
-		this.$1$StringField = 0;
-		this.$1$HammerPullOriginField = null;
-		this.$1$IsHammerPullDestinationField = false;
-		this.$1$IsHammerPullOriginField = false;
-		this.$1$HarmonicValueField = 0;
-		this.$1$HarmonicTypeField = 0;
-		this.$1$IsGhostField = false;
-		this.$1$IsLetRingField = false;
-		this.$1$IsPalmMuteField = false;
-		this.$1$IsDeadField = false;
-		this.$1$IsStaccatoField = false;
-		this.$1$SlideTypeField = 0;
-		this.$1$SlideTargetField = null;
-		this.$1$VibratoField = 0;
-		this.$1$TieOriginField = null;
-		this.$1$IsTieDestinationField = false;
-		this.$1$IsTieOriginField = false;
-		this.$1$LeftHandFingerField = 0;
-		this.$1$RightHandFingerField = 0;
-		this.$1$IsFingeringField = false;
-		this.$1$TrillValueField = 0;
-		this.$1$TrillSpeedField = 0;
-		this.$1$DurationPercentField = 0;
-		this.$1$SwapAccidentalsField = false;
-		this.$1$BeatField = null;
-		this.$1$DynamicField = 0;
-		this.$1$OctaveField = 0;
-		this.set_bendPoints([]);
-		this.set_dynamic(5);
-		this.set_accentuated(0);
-		this.set_fret(-1);
-		this.set_harmonicType(0);
-		this.set_slideType(0);
-		this.set_vibrato(0);
-		this.set_leftHandFinger(-1);
-		this.set_rightHandFinger(-1);
-		this.set_trillValue(-1);
-		this.set_trillSpeed(32);
-		this.set_durationPercent(1);
-		this.set_octave(-1);
+		this.accentuated = 0;
+		this.bendPoints = null;
+		this.fret = 0;
+		this.string = 0;
+		this.hammerPullOrigin = null;
+		this.isHammerPullDestination = false;
+		this.isHammerPullOrigin = false;
+		this.harmonicValue = 0;
+		this.harmonicType = 0;
+		this.isGhost = false;
+		this.isLetRing = false;
+		this.isPalmMute = false;
+		this.isDead = false;
+		this.isStaccato = false;
+		this.slideType = 0;
+		this.slideTarget = null;
+		this.vibrato = 0;
+		this.tieOrigin = null;
+		this.isTieDestination = false;
+		this.isTieOrigin = false;
+		this.leftHandFinger = 0;
+		this.rightHandFinger = 0;
+		this.isFingering = false;
+		this.trillValue = 0;
+		this.trillSpeed = 0;
+		this.durationPercent = 0;
+		this.swapAccidentals = false;
+		this.beat = null;
+		this.dynamic = 0;
+		this.octave = 0;
+		this.bendPoints = [];
+		this.dynamic = 5;
+		this.accentuated = 0;
+		this.fret = -1;
+		this.harmonicType = 0;
+		this.slideType = 0;
+		this.vibrato = 0;
+		this.leftHandFinger = -1;
+		this.rightHandFinger = -1;
+		this.trillValue = -1;
+		this.trillSpeed = 32;
+		this.durationPercent = 1;
+		this.octave = -1;
 	};
 	$AlphaTab_Model_Note.__typeName = 'AlphaTab.Model.Note';
 	$AlphaTab_Model_Note.$nextNoteOnSameLine = function(note) {
-		var nextBeat = note.get_beat().get_nextBeat();
+		var nextBeat = note.beat.nextBeat;
 		// keep searching in same bar
-		while (ss.isValue(nextBeat) && nextBeat.get_voice().get_bar().get_index() <= note.get_beat().get_voice().get_bar().get_index() + $AlphaTab_Model_Note.$maxOffsetForSameLineSearch) {
-			var noteOnString = nextBeat.getNoteOnString(note.get_string());
+		while (ss.isValue(nextBeat) && nextBeat.voice.bar.index <= note.beat.voice.bar.index + $AlphaTab_Model_Note.$maxOffsetForSameLineSearch) {
+			var noteOnString = nextBeat.getNoteOnString(note.string);
 			if (ss.isValue(noteOnString)) {
 				return noteOnString;
 			}
 			else {
-				nextBeat = nextBeat.get_nextBeat();
+				nextBeat = nextBeat.nextBeat;
 			}
 		}
 		return null;
 	};
 	$AlphaTab_Model_Note.$previousNoteOnSameLine = function(note) {
-		var previousBeat = note.get_beat().get_previousBeat();
+		var previousBeat = note.beat.previousBeat;
 		// keep searching in same bar
-		while (ss.isValue(previousBeat) && previousBeat.get_voice().get_bar().get_index() >= note.get_beat().get_voice().get_bar().get_index() - $AlphaTab_Model_Note.$maxOffsetForSameLineSearch) {
-			var noteOnString = previousBeat.getNoteOnString(note.get_string());
+		while (ss.isValue(previousBeat) && previousBeat.voice.bar.index >= note.beat.voice.bar.index - $AlphaTab_Model_Note.$maxOffsetForSameLineSearch) {
+			var noteOnString = previousBeat.getNoteOnString(note.string);
 			if (ss.isValue(noteOnString)) {
 				return noteOnString;
 			}
 			else {
-				previousBeat = previousBeat.get_previousBeat();
+				previousBeat = previousBeat.previousBeat;
 			}
 		}
 		return null;
@@ -1224,31 +1224,31 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Model.PlaybackInformation
 	var $AlphaTab_Model_PlaybackInformation = function() {
-		this.$1$VolumeField = 0;
-		this.$1$BalanceField = 0;
-		this.$1$PortField = 0;
-		this.$1$ProgramField = 0;
-		this.$1$PrimaryChannelField = 0;
-		this.$1$SecondaryChannelField = 0;
-		this.$1$IsMuteField = false;
-		this.$1$IsSoloField = false;
-		this.set_volume(15);
-		this.set_balance(8);
-		this.set_port(1);
+		this.volume = 0;
+		this.balance = 0;
+		this.port = 0;
+		this.program = 0;
+		this.primaryChannel = 0;
+		this.secondaryChannel = 0;
+		this.isMute = false;
+		this.isSolo = false;
+		this.volume = 15;
+		this.balance = 8;
+		this.port = 1;
 	};
 	$AlphaTab_Model_PlaybackInformation.__typeName = 'AlphaTab.Model.PlaybackInformation';
 	global.AlphaTab.Model.PlaybackInformation = $AlphaTab_Model_PlaybackInformation;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Model.RepeatGroup
 	var $AlphaTab_Model_RepeatGroup = function() {
-		this.$1$MasterBarsField = null;
-		this.$1$OpeningsField = null;
-		this.$1$ClosingsField = null;
-		this.$1$IsClosedField = false;
-		this.set_masterBars([]);
-		this.set_openings([]);
-		this.set_closings([]);
-		this.set_isClosed(false);
+		this.masterBars = null;
+		this.openings = null;
+		this.closings = null;
+		this.isClosed = false;
+		this.masterBars = [];
+		this.openings = [];
+		this.closings = [];
+		this.isClosed = false;
 	};
 	$AlphaTab_Model_RepeatGroup.__typeName = 'AlphaTab.Model.RepeatGroup';
 	global.AlphaTab.Model.RepeatGroup = $AlphaTab_Model_RepeatGroup;
@@ -1256,22 +1256,22 @@
 	// AlphaTab.Model.Score
 	var $AlphaTab_Model_Score = function() {
 		this.$_currentRepeatGroup = null;
-		this.$1$AlbumField = null;
-		this.$1$ArtistField = null;
-		this.$1$CopyrightField = null;
-		this.$1$InstructionsField = null;
-		this.$1$MusicField = null;
-		this.$1$NoticesField = null;
-		this.$1$SubTitleField = null;
-		this.$1$TitleField = null;
-		this.$1$WordsField = null;
-		this.$1$TabField = null;
-		this.$1$TempoField = 0;
-		this.$1$TempoLabelField = null;
-		this.$1$MasterBarsField = null;
-		this.$1$TracksField = null;
-		this.set_masterBars([]);
-		this.set_tracks([]);
+		this.album = null;
+		this.artist = null;
+		this.copyright = null;
+		this.instructions = null;
+		this.music = null;
+		this.notices = null;
+		this.subTitle = null;
+		this.title = null;
+		this.words = null;
+		this.tab = null;
+		this.tempo = 0;
+		this.tempoLabel = null;
+		this.masterBars = null;
+		this.tracks = null;
+		this.masterBars = [];
+		this.tracks = [];
 		this.$_currentRepeatGroup = new $AlphaTab_Model_RepeatGroup();
 	};
 	$AlphaTab_Model_Score.__typeName = 'AlphaTab.Model.Score';
@@ -1279,8 +1279,8 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Model.Section
 	var $AlphaTab_Model_Section = function() {
-		this.$1$MarkerField = null;
-		this.$1$TextField = null;
+		this.marker = null;
+		this.text = null;
 	};
 	$AlphaTab_Model_Section.__typeName = 'AlphaTab.Model.Section';
 	global.AlphaTab.Model.Section = $AlphaTab_Model_Section;
@@ -1293,25 +1293,25 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Model.Track
 	var $AlphaTab_Model_Track = function() {
-		this.$1$CapoField = 0;
-		this.$1$IndexField = 0;
-		this.$1$NameField = null;
-		this.$1$ShortNameField = null;
-		this.$1$TuningField = null;
-		this.$1$TuningNameField = null;
-		this.$1$ColorField = null;
-		this.$1$PlaybackInfoField = null;
-		this.$1$IsPercussionField = false;
-		this.$1$ScoreField = null;
-		this.$1$BarsField = null;
-		this.$1$ChordsField = null;
-		this.set_name('');
-		this.set_shortName('');
-		this.set_tuning([]);
-		this.set_bars([]);
-		this.set_chords(new (ss.makeGenericType(ss.Dictionary$2, [String, $AlphaTab_Model_Chord]))());
-		this.set_playbackInfo(new $AlphaTab_Model_PlaybackInformation());
-		this.set_color(new $AlphaTab_Platform_Model_Color(200, 0, 0, 255));
+		this.capo = 0;
+		this.index = 0;
+		this.name = null;
+		this.shortName = null;
+		this.tuning = null;
+		this.tuningName = null;
+		this.color = null;
+		this.playbackInfo = null;
+		this.isPercussion = false;
+		this.score = null;
+		this.bars = null;
+		this.chords = null;
+		this.name = '';
+		this.shortName = '';
+		this.tuning = [];
+		this.bars = [];
+		this.chords = new (ss.makeGenericType(ss.Dictionary$2, [String, $AlphaTab_Model_Chord]))();
+		this.playbackInfo = new $AlphaTab_Model_PlaybackInformation();
+		this.color = new $AlphaTab_Platform_Model_Color(200, 0, 0, 255);
 	};
 	$AlphaTab_Model_Track.__typeName = 'AlphaTab.Model.Track';
 	global.AlphaTab.Model.Track = $AlphaTab_Model_Track;
@@ -1324,12 +1324,12 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Model.Tuning
 	var $AlphaTab_Model_Tuning = function(name, tuning, isStandard) {
-		this.$1$IsStandardField = false;
-		this.$1$NameField = null;
-		this.$1$TuningsField = null;
-		this.set_isStandard(isStandard);
-		this.set_name(name);
-		this.set_tunings(ss.arrayFromEnumerable(tuning));
+		this.isStandard = false;
+		this.name = null;
+		this.tunings = null;
+		this.isStandard = isStandard;
+		this.name = name;
+		this.tunings = ss.arrayFromEnumerable(tuning);
 	};
 	$AlphaTab_Model_Tuning.__typeName = 'AlphaTab.Model.Tuning';
 	$AlphaTab_Model_Tuning.isTuning = function(name) {
@@ -1495,7 +1495,7 @@
 			var tuning = tunings[$t1];
 			var equals = true;
 			for (var i = 0; i < strings.length; i++) {
-				if (strings[i] !== tuning.get_tunings()[i]) {
+				if (strings[i] !== tuning.tunings[i]) {
 					equals = false;
 					break;
 				}
@@ -1516,12 +1516,12 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Model.Voice
 	var $AlphaTab_Model_Voice = function() {
-		this.$1$IndexField = 0;
-		this.$1$BarField = null;
-		this.$1$BeatsField = null;
-		this.$1$MinDurationField = null;
-		this.$1$MaxDurationField = null;
-		this.set_beats([]);
+		this.index = 0;
+		this.bar = null;
+		this.beats = null;
+		this.minDuration = null;
+		this.maxDuration = null;
+		this.beats = [];
 	};
 	$AlphaTab_Model_Voice.__typeName = 'AlphaTab.Model.Voice';
 	global.AlphaTab.Model.Voice = $AlphaTab_Model_Voice;
@@ -1737,7 +1737,7 @@
 		this.$_endings = null;
 		this.$_endingsString = null;
 		$AlphaTab_Rendering_BarRendererBase.call(this, bar);
-		var alternateEndings = this.get_bar().get_masterBar().get_alternateEndings();
+		var alternateEndings = this.bar.get_masterBar().alternateEndings;
 		this.$_endings = [];
 		for (var i = 0; i < $AlphaTab_Model_MasterBar.maxAlternateEndings; i++) {
 			if ((alternateEndings & 1 << i) !== 0) {
@@ -1751,35 +1751,35 @@
 	// AlphaTab.Rendering.AlternateEndingsBarRendererFactory
 	var $AlphaTab_Rendering_AlternateEndingsBarRendererFactory = function() {
 		$AlphaTab_Rendering_BarRendererFactory.call(this);
-		this.set_isInAccolade(false);
+		this.isInAccolade = false;
 	};
 	$AlphaTab_Rendering_AlternateEndingsBarRendererFactory.__typeName = 'AlphaTab.Rendering.AlternateEndingsBarRendererFactory';
 	global.AlphaTab.Rendering.AlternateEndingsBarRendererFactory = $AlphaTab_Rendering_AlternateEndingsBarRendererFactory;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.BarRendererBase
 	var $AlphaTab_Rendering_BarRendererBase = function(bar) {
-		this.$1$StaveField = null;
-		this.$1$XField = 0;
-		this.$1$YField = 0;
-		this.$1$WidthField = 0;
-		this.$1$HeightField = 0;
-		this.$1$IndexField = 0;
-		this.$1$IsEmptyField = false;
-		this.$1$TopOverflowField = 0;
-		this.$1$BottomOverflowField = 0;
-		this.$1$BarField = null;
-		this.set_bar(bar);
-		this.set_isEmpty(true);
+		this.stave = null;
+		this.x = 0;
+		this.y = 0;
+		this.width = 0;
+		this.height = 0;
+		this.index = 0;
+		this.isEmpty = false;
+		this.topOverflow = 0;
+		this.bottomOverflow = 0;
+		this.bar = null;
+		this.bar = bar;
+		this.isEmpty = true;
 	};
 	$AlphaTab_Rendering_BarRendererBase.__typeName = 'AlphaTab.Rendering.BarRendererBase';
 	global.AlphaTab.Rendering.BarRendererBase = $AlphaTab_Rendering_BarRendererBase;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.BarRendererFactory
 	var $AlphaTab_Rendering_BarRendererFactory = function() {
-		this.$1$IsInAccoladeField = false;
-		this.$1$HideOnMultiTrackField = false;
-		this.set_isInAccolade(true);
-		this.set_hideOnMultiTrack(false);
+		this.isInAccolade = false;
+		this.hideOnMultiTrack = false;
+		this.isInAccolade = true;
+		this.hideOnMultiTrack = false;
 	};
 	$AlphaTab_Rendering_BarRendererFactory.__typeName = 'AlphaTab.Rendering.BarRendererFactory';
 	global.AlphaTab.Rendering.BarRendererFactory = $AlphaTab_Rendering_BarRendererFactory;
@@ -1809,8 +1809,8 @@
 		this.$_info = null;
 		$AlphaTab_Rendering_BarRendererFactory.call(this);
 		this.$_info = info;
-		this.set_isInAccolade(false);
-		this.set_hideOnMultiTrack(info.get_hideOnMultiTrack());
+		this.isInAccolade = false;
+		this.hideOnMultiTrack = info.get_hideOnMultiTrack();
 	};
 	$AlphaTab_Rendering_EffectBarRendererFactory.__typeName = 'AlphaTab.Rendering.EffectBarRendererFactory';
 	global.AlphaTab.Rendering.EffectBarRendererFactory = $AlphaTab_Rendering_EffectBarRendererFactory;
@@ -1837,21 +1837,21 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.RenderingResources
 	var $AlphaTab_Rendering_RenderingResources = function(scale) {
-		this.$1$CopyrightFontField = null;
-		this.$1$TitleFontField = null;
-		this.$1$SubTitleFontField = null;
-		this.$1$WordsFontField = null;
-		this.$1$EffectFontField = null;
-		this.$1$TablatureFontField = null;
-		this.$1$GraceFontField = null;
-		this.$1$StaveLineColorField = null;
-		this.$1$BarSeperatorColorField = null;
-		this.$1$BarNumberFontField = null;
-		this.$1$BarNumberColorField = null;
-		this.$1$MarkerFontField = null;
-		this.$1$TabClefFontField = null;
-		this.$1$MainGlyphColorField = null;
-		this.$1$ScaleField = 0;
+		this.copyrightFont = null;
+		this.titleFont = null;
+		this.subTitleFont = null;
+		this.wordsFont = null;
+		this.effectFont = null;
+		this.tablatureFont = null;
+		this.graceFont = null;
+		this.staveLineColor = null;
+		this.barSeperatorColor = null;
+		this.barNumberFont = null;
+		this.barNumberColor = null;
+		this.markerFont = null;
+		this.tabClefFont = null;
+		this.mainGlyphColor = null;
+		this.scale = 0;
 		this.init(scale);
 	};
 	$AlphaTab_Rendering_RenderingResources.__typeName = 'AlphaTab.Rendering.RenderingResources';
@@ -1881,8 +1881,8 @@
 		this.$_direction = 0;
 		$AlphaTab_Rendering_BarRendererFactory.call(this);
 		this.$_direction = direction;
-		this.set_isInAccolade(false);
-		this.set_hideOnMultiTrack(false);
+		this.isInAccolade = false;
+		this.hideOnMultiTrack = false;
 	};
 	$AlphaTab_Rendering_RhythmBarRendererFactory.__typeName = 'AlphaTab.Rendering.RhythmBarRendererFactory';
 	global.AlphaTab.Rendering.RhythmBarRendererFactory = $AlphaTab_Rendering_RhythmBarRendererFactory;
@@ -1890,10 +1890,10 @@
 	// AlphaTab.Rendering.ScoreBarRenderer
 	var $AlphaTab_Rendering_ScoreBarRenderer = function(bar) {
 		this.$_helpers = null;
-		this.$3$AccidentalHelperField = null;
+		this.accidentalHelper = null;
 		this.$_startSpacing = false;
 		$AlphaTab_Rendering_GroupedBarRenderer.call(this, bar);
-		this.set_accidentalHelper(new $AlphaTab_Rendering_Utils_AccidentalHelper());
+		this.accidentalHelper = new $AlphaTab_Rendering_Utils_AccidentalHelper();
 	};
 	$AlphaTab_Rendering_ScoreBarRenderer.__typeName = 'AlphaTab.Rendering.ScoreBarRenderer';
 	$AlphaTab_Rendering_ScoreBarRenderer.$paintSingleBar = function(canvas, x1, y1, x2, y2, size) {
@@ -1924,20 +1924,20 @@
 	// AlphaTab.Rendering.ScoreRenderer
 	var $AlphaTab_Rendering_ScoreRenderer = function(settings, param) {
 		this.$_currentLayoutMode = null;
-		this.$1$CanvasField = null;
-		this.$1$ScoreField = null;
-		this.$1$TracksField = null;
-		this.$1$LayoutField = null;
-		this.$1$RenderingResourcesField = null;
-		this.$1$SettingsField = null;
+		this.canvas = null;
+		this.score = null;
+		this.tracks = null;
+		this.layout = null;
+		this.renderingResources = null;
+		this.settings = null;
 		this.$1$RenderFinishedField = null;
-		this.set_settings(settings);
-		this.set_renderingResources(new $AlphaTab_Rendering_RenderingResources(1));
-		if (ss.isNullOrUndefined(settings.get_engine()) || !$AlphaTab_Environment.renderEngines.containsKey(settings.get_engine())) {
-			this.set_canvas($AlphaTab_Environment.renderEngines.get_item('default')(param));
+		this.settings = settings;
+		this.renderingResources = new $AlphaTab_Rendering_RenderingResources(1);
+		if (ss.isNullOrUndefined(settings.engine) || !$AlphaTab_Environment.renderEngines.containsKey(settings.engine)) {
+			this.canvas = $AlphaTab_Environment.renderEngines.get_item('default')(param);
 		}
 		else {
-			this.set_canvas($AlphaTab_Environment.renderEngines.get_item(settings.get_engine())(param));
+			this.canvas = $AlphaTab_Environment.renderEngines.get_item(settings.engine)(param);
 		}
 		this.$recreateLayout();
 	};
@@ -2165,14 +2165,14 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Glyphs.BeatContainerGlyph
 	var $AlphaTab_Rendering_Glyphs_BeatContainerGlyph = function(beat) {
-		this.$2$BeatField = null;
-		this.$2$PreNotesField = null;
-		this.$2$OnNotesField = null;
-		this.$2$PostNotesField = null;
-		this.$2$TiesField = null;
+		this.beat = null;
+		this.preNotes = null;
+		this.onNotes = null;
+		this.postNotes = null;
+		this.ties = null;
 		$AlphaTab_Rendering_Glyphs_Glyph.call(this, 0, 0);
-		this.set_beat(beat);
-		this.set_ties([]);
+		this.beat = beat;
+		this.ties = [];
 	};
 	$AlphaTab_Rendering_Glyphs_BeatContainerGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.BeatContainerGlyph';
 	global.AlphaTab.Rendering.Glyphs.BeatContainerGlyph = $AlphaTab_Rendering_Glyphs_BeatContainerGlyph;
@@ -2191,7 +2191,7 @@
 		this.$_height = 0;
 		$AlphaTab_Rendering_Glyphs_Glyph.call(this, 0, 0);
 		this.$_note = n;
-		this.set_width(width);
+		this.width = width;
 		this.$_height = height;
 	};
 	$AlphaTab_Rendering_Glyphs_BendGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.BendGlyph';
@@ -2353,13 +2353,13 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Glyphs.Glyph
 	var $AlphaTab_Rendering_Glyphs_Glyph = function(x, y) {
-		this.$1$IndexField = 0;
-		this.$1$XField = 0;
-		this.$1$YField = 0;
-		this.$1$WidthField = 0;
-		this.$1$RendererField = null;
-		this.set_x(x);
-		this.set_y(y);
+		this.index = 0;
+		this.x = 0;
+		this.y = 0;
+		this.width = 0;
+		this.renderer = null;
+		this.x = x;
+		this.y = y;
 	};
 	$AlphaTab_Rendering_Glyphs_Glyph.__typeName = 'AlphaTab.Rendering.Glyphs.Glyph';
 	global.AlphaTab.Rendering.Glyphs.Glyph = $AlphaTab_Rendering_Glyphs_Glyph;
@@ -2459,14 +2459,14 @@
 		$AlphaTab_Rendering_Glyphs_Glyph.call(this, x, y);
 		this.$_isGrace = isGrace;
 		this.$_isGrace = isGrace;
-		if (!n.get_isTieDestination()) {
-			this.$_noteString = (n.get_isDead() ? 'X' : n.get_fret().toString());
-			if (n.get_isGhost()) {
+		if (!n.isTieDestination) {
+			this.$_noteString = (n.isDead ? 'X' : n.fret.toString());
+			if (n.isGhost) {
 				this.$_noteString = '(' + this.$_noteString + ')';
 			}
 		}
-		else if (n.get_beat().get_index() === 0) {
-			this.$_noteString = '(' + n.get_tieOrigin().get_fret() + ')';
+		else if (n.beat.index === 0) {
+			this.$_noteString = '(' + n.tieOrigin.fret + ')';
 		}
 		else {
 			this.$_noteString = '';
@@ -2577,9 +2577,9 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Glyphs.ScoreBeatGlyph
 	var $AlphaTab_Rendering_Glyphs_ScoreBeatGlyph = function() {
-		this.$4$NoteHeadsField = null;
-		this.$4$RestGlyphField = null;
-		this.$4$BeamingHelperField = null;
+		this.noteHeads = null;
+		this.restGlyph = null;
+		this.beamingHelper = null;
 		$AlphaTab_Rendering_Glyphs_BeatGlyphBase.call(this);
 	};
 	$AlphaTab_Rendering_Glyphs_ScoreBeatGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.ScoreBeatGlyph';
@@ -2613,17 +2613,17 @@
 		this.$_infos = null;
 		this.$_noteLookup = null;
 		this.$_tremoloPicking = null;
-		this.$2$MinNoteField = null;
-		this.$2$MaxNoteField = null;
-		this.$2$SpacingChangedField = null;
-		this.$2$UpLineXField = 0;
-		this.$2$DownLineXField = 0;
-		this.$2$BeatEffectsField = null;
-		this.$2$BeatField = null;
-		this.$2$BeamingHelperField = null;
+		this.minNote = null;
+		this.maxNote = null;
+		this.spacingChanged = null;
+		this.upLineX = 0;
+		this.downLineX = 0;
+		this.beatEffects = null;
+		this.beat = null;
+		this.beamingHelper = null;
 		$AlphaTab_Rendering_Glyphs_Glyph.call(this, 0, 0);
 		this.$_infos = [];
-		this.set_beatEffects(new (ss.makeGenericType(ss.Dictionary$2, [String, $AlphaTab_Rendering_Glyphs_Glyph]))());
+		this.beatEffects = new (ss.makeGenericType(ss.Dictionary$2, [String, $AlphaTab_Rendering_Glyphs_Glyph]))();
 		this.$_noteLookup = new (ss.makeGenericType(ss.Dictionary$2, [ss.Int32, $AlphaTab_Rendering_Glyphs_Glyph]))();
 	};
 	$AlphaTab_Rendering_Glyphs_ScoreNoteChordGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.ScoreNoteChordGlyph';
@@ -2631,10 +2631,10 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Glyphs.ScoreNoteGlyphInfo
 	var $AlphaTab_Rendering_Glyphs_ScoreNoteGlyphInfo = function(glyph, line) {
-		this.$1$GlyphField = null;
-		this.$1$LineField = 0;
-		this.set_glyph(glyph);
-		this.set_line(line);
+		this.glyph = null;
+		this.line = 0;
+		this.glyph = glyph;
+		this.line = line;
 	};
 	$AlphaTab_Rendering_Glyphs_ScoreNoteGlyphInfo.__typeName = 'AlphaTab.Rendering.Glyphs.ScoreNoteGlyphInfo';
 	global.AlphaTab.Rendering.Glyphs.ScoreNoteGlyphInfo = $AlphaTab_Rendering_Glyphs_ScoreNoteGlyphInfo;
@@ -2673,7 +2673,7 @@
 		this.$_scaling = false;
 		$AlphaTab_Rendering_Glyphs_Glyph.call(this, x, y);
 		this.$_scaling = scaling;
-		this.set_width(width);
+		this.width = width;
 		this.$_scaling = scaling;
 	};
 	$AlphaTab_Rendering_Glyphs_SpacingGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.SpacingGlyph';
@@ -2681,8 +2681,8 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Glyphs.SvgCommand
 	var $AlphaTab_Rendering_Glyphs_SvgCommand = function() {
-		this.$1$CmdField = null;
-		this.$1$NumbersField = null;
+		this.cmd = null;
+		this.numbers = null;
 	};
 	$AlphaTab_Rendering_Glyphs_SvgCommand.__typeName = 'AlphaTab.Rendering.Glyphs.SvgCommand';
 	global.AlphaTab.Rendering.Glyphs.SvgCommand = $AlphaTab_Rendering_Glyphs_SvgCommand;
@@ -2760,13 +2760,13 @@
 		this.$_minNote = null;
 		this.$_isGrace = false;
 		this.$_centerX = 0;
-		this.$2$BeatField = null;
-		this.$2$BeamingHelperField = null;
-		this.$2$BeatEffectsField = null;
+		this.beat = null;
+		this.beamingHelper = null;
+		this.beatEffects = null;
 		$AlphaTab_Rendering_Glyphs_Glyph.call(this, x, y);
 		this.$_isGrace = isGrace;
 		this.$_notes = [];
-		this.set_beatEffects(new (ss.makeGenericType(ss.Dictionary$2, [String, $AlphaTab_Rendering_Glyphs_Glyph]))());
+		this.beatEffects = new (ss.makeGenericType(ss.Dictionary$2, [String, $AlphaTab_Rendering_Glyphs_Glyph]))();
 		this.$_noteLookup = new (ss.makeGenericType(ss.Dictionary$2, [ss.Int32, $AlphaTab_Rendering_Glyphs_NoteNumberGlyph]))();
 	};
 	$AlphaTab_Rendering_Glyphs_TabNoteChordGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.TabNoteChordGlyph';
@@ -2921,11 +2921,11 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Glyphs.VoiceContainerGlyph
 	var $AlphaTab_Rendering_Glyphs_VoiceContainerGlyph = function(x, y, voiceIndex) {
-		this.$3$BeatGlyphsField = null;
-		this.$3$VoiceIndexField = 0;
+		this.beatGlyphs = null;
+		this.voiceIndex = 0;
 		$AlphaTab_Rendering_Glyphs_GlyphGroup.call(this, x, y, null);
-		this.set_beatGlyphs([]);
-		this.set_voiceIndex(voiceIndex);
+		this.beatGlyphs = [];
+		this.voiceIndex = voiceIndex;
 	};
 	$AlphaTab_Rendering_Glyphs_VoiceContainerGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.VoiceContainerGlyph';
 	global.AlphaTab.Rendering.Glyphs.VoiceContainerGlyph = $AlphaTab_Rendering_Glyphs_VoiceContainerGlyph;
@@ -2966,52 +2966,52 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Layout.ScoreLayout
 	var $AlphaTab_Rendering_Layout_ScoreLayout = function(renderer) {
-		this.$1$RendererField = null;
-		this.$1$WidthField = 0;
-		this.$1$HeightField = 0;
-		this.set_renderer(renderer);
+		this.renderer = null;
+		this.width = 0;
+		this.height = 0;
+		this.renderer = renderer;
 	};
 	$AlphaTab_Rendering_Layout_ScoreLayout.__typeName = 'AlphaTab.Rendering.Layout.ScoreLayout';
 	global.AlphaTab.Rendering.Layout.ScoreLayout = $AlphaTab_Rendering_Layout_ScoreLayout;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Staves.BarSizeInfo
 	var $AlphaTab_Rendering_Staves_BarSizeInfo = function() {
-		this.$1$FullWidthField = 0;
-		this.$1$SizesField = null;
-		this.$1$PreNoteSizesField = null;
-		this.$1$OnNoteSizesField = null;
-		this.$1$PostNoteSizesField = null;
-		this.set_sizes(new (ss.makeGenericType(ss.Dictionary$2, [String, ss.Int32]))());
-		this.set_preNoteSizes(new (ss.makeGenericType(ss.Dictionary$2, [ss.Int32, ss.Int32]))());
-		this.set_onNoteSizes(new (ss.makeGenericType(ss.Dictionary$2, [ss.Int32, ss.Int32]))());
-		this.set_postNoteSizes(new (ss.makeGenericType(ss.Dictionary$2, [ss.Int32, ss.Int32]))());
-		this.set_fullWidth(0);
+		this.fullWidth = 0;
+		this.sizes = null;
+		this.preNoteSizes = null;
+		this.onNoteSizes = null;
+		this.postNoteSizes = null;
+		this.sizes = new (ss.makeGenericType(ss.Dictionary$2, [String, ss.Int32]))();
+		this.preNoteSizes = new (ss.makeGenericType(ss.Dictionary$2, [ss.Int32, ss.Int32]))();
+		this.onNoteSizes = new (ss.makeGenericType(ss.Dictionary$2, [ss.Int32, ss.Int32]))();
+		this.postNoteSizes = new (ss.makeGenericType(ss.Dictionary$2, [ss.Int32, ss.Int32]))();
+		this.fullWidth = 0;
 	};
 	$AlphaTab_Rendering_Staves_BarSizeInfo.__typeName = 'AlphaTab.Rendering.Staves.BarSizeInfo';
 	global.AlphaTab.Rendering.Staves.BarSizeInfo = $AlphaTab_Rendering_Staves_BarSizeInfo;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Staves.Stave
 	var $AlphaTab_Rendering_Staves_Stave = function(factory) {
-		this.$1$StaveTrackGroupField = null;
-		this.$1$StaveGroupField = null;
 		this.$_factory = null;
-		this.$1$BarRenderersField = null;
-		this.$1$XField = 0;
-		this.$1$YField = 0;
-		this.$1$HeightField = 0;
-		this.$1$IndexField = 0;
-		this.$1$StaveTopField = 0;
-		this.$1$TopSpacingField = 0;
-		this.$1$BottomSpacingField = 0;
-		this.$1$StaveBottomField = 0;
-		this.$1$IsFirstInAccoladeField = false;
-		this.$1$IsLastInAccoladeField = false;
-		this.set_barRenderers([]);
+		this.staveTrackGroup = null;
+		this.staveGroup = null;
+		this.barRenderers = null;
+		this.x = 0;
+		this.y = 0;
+		this.height = 0;
+		this.index = 0;
+		this.staveTop = 0;
+		this.topSpacing = 0;
+		this.bottomSpacing = 0;
+		this.staveBottom = 0;
+		this.isFirstInAccolade = false;
+		this.isLastInAccolade = false;
+		this.barRenderers = [];
 		this.$_factory = factory;
-		this.set_topSpacing(10);
-		this.set_bottomSpacing(10);
-		this.set_staveTop(0);
-		this.set_staveBottom(0);
+		this.topSpacing = 10;
+		this.bottomSpacing = 10;
+		this.staveTop = 0;
+		this.staveBottom = 0;
 	};
 	$AlphaTab_Rendering_Staves_Stave.__typeName = 'AlphaTab.Rendering.Staves.Stave';
 	global.AlphaTab.Rendering.Staves.Stave = $AlphaTab_Rendering_Staves_Stave;
@@ -3020,40 +3020,40 @@
 	var $AlphaTab_Rendering_Staves_StaveGroup = function() {
 		this.$_firstStaveInAccolade = null;
 		this.$_lastStaveInAccolade = null;
-		this.$1$XField = 0;
-		this.$1$YField = 0;
-		this.$1$IndexField = 0;
+		this.x = 0;
+		this.y = 0;
+		this.index = 0;
 		this.$_accoladeSpacingCalculated = false;
-		this.$1$AccoladeSpacingField = 0;
-		this.$1$IsFullField = false;
-		this.$1$WidthField = 0;
-		this.$1$MasterBarsField = null;
-		this.$1$StavesField = null;
+		this.accoladeSpacing = 0;
+		this.isFull = false;
+		this.width = 0;
+		this.masterBars = null;
+		this.staves = null;
 		this.$_allStaves = null;
-		this.$1$LayoutField = null;
-		this.$1$HelpersField = null;
-		this.set_masterBars([]);
-		this.set_staves([]);
+		this.layout = null;
+		this.helpers = null;
+		this.masterBars = [];
+		this.staves = [];
 		this.$_allStaves = [];
-		this.set_width(0);
-		this.set_index(0);
+		this.width = 0;
+		this.index = 0;
 		this.$_accoladeSpacingCalculated = false;
-		this.set_accoladeSpacing(0);
-		this.set_helpers(new $AlphaTab_Rendering_Utils_BarHelpersGroup());
+		this.accoladeSpacing = 0;
+		this.helpers = new $AlphaTab_Rendering_Utils_BarHelpersGroup();
 	};
 	$AlphaTab_Rendering_Staves_StaveGroup.__typeName = 'AlphaTab.Rendering.Staves.StaveGroup';
 	global.AlphaTab.Rendering.Staves.StaveGroup = $AlphaTab_Rendering_Staves_StaveGroup;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Staves.StaveTrackGroup
 	var $AlphaTab_Rendering_Staves_StaveTrackGroup = function(staveGroup, track) {
-		this.$1$TrackField = null;
-		this.$1$StaveGroupField = null;
-		this.$1$StavesField = null;
-		this.$1$FirstStaveInAccoladeField = null;
-		this.$1$LastStaveInAccoladeField = null;
-		this.set_staveGroup(staveGroup);
-		this.set_track(track);
-		this.set_staves([]);
+		this.track = null;
+		this.staveGroup = null;
+		this.staves = null;
+		this.firstStaveInAccolade = null;
+		this.lastStaveInAccolade = null;
+		this.staveGroup = staveGroup;
+		this.track = track;
+		this.staves = [];
 	};
 	$AlphaTab_Rendering_Staves_StaveTrackGroup.__typeName = 'AlphaTab.Rendering.Staves.StaveTrackGroup';
 	global.AlphaTab.Rendering.Staves.StaveTrackGroup = $AlphaTab_Rendering_Staves_StaveTrackGroup;
@@ -3068,53 +3068,51 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Utils.BarBoundings
 	var $AlphaTab_Rendering_Utils_BarBoundings = function() {
-		this.$1$IsFirstOfLineField = false;
-		this.$1$IsLastOfLineField = false;
-		this.$1$BarField = null;
-		this.$1$BoundsField = null;
-		this.$1$VisualBoundsField = null;
-		this.$1$BeatsField = null;
-		this.set_beats([]);
+		this.isFirstOfLine = false;
+		this.isLastOfLine = false;
+		this.bar = null;
+		this.bounds = null;
+		this.visualBounds = null;
+		this.beats = null;
+		this.beats = [];
 	};
 	$AlphaTab_Rendering_Utils_BarBoundings.__typeName = 'AlphaTab.Rendering.Utils.BarBoundings';
 	global.AlphaTab.Rendering.Utils.BarBoundings = $AlphaTab_Rendering_Utils_BarBoundings;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Utils.BarHelpers
 	var $AlphaTab_Rendering_Utils_BarHelpers = function(bar) {
-		this.$1$BeamHelpersField = null;
-		this.$1$BeamHelperLookupField = null;
-		this.$1$TupletHelpersField = null;
-		this.set_beamHelpers([]);
-		this.set_beamHelperLookup([]);
-		this.set_tupletHelpers([]);
+		this.beamHelpers = null;
+		this.beamHelperLookup = null;
+		this.tupletHelpers = null;
+		this.beamHelpers = [];
+		this.beamHelperLookup = [];
+		this.tupletHelpers = [];
 		var currentBeamHelper = null;
 		var currentTupletHelper = null;
-		var $t1 = bar.get_voices();
-		for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-			var v = $t1[$t2];
-			ss.add(this.get_beamHelpers(), []);
-			ss.add(this.get_beamHelperLookup(), new (ss.makeGenericType(ss.Dictionary$2, [ss.Int32, $AlphaTab_Rendering_Utils_BeamingHelper]))());
-			ss.add(this.get_tupletHelpers(), []);
-			var $t3 = v.get_beats();
-			for (var $t4 = 0; $t4 < $t3.length; $t4++) {
-				var b = $t3[$t4];
+		for (var $t1 = 0; $t1 < bar.voices.length; $t1++) {
+			var v = bar.voices[$t1];
+			ss.add(this.beamHelpers, []);
+			ss.add(this.beamHelperLookup, new (ss.makeGenericType(ss.Dictionary$2, [ss.Int32, $AlphaTab_Rendering_Utils_BeamingHelper]))());
+			ss.add(this.tupletHelpers, []);
+			for (var $t2 = 0; $t2 < v.beats.length; $t2++) {
+				var b = v.beats[$t2];
 				var newBeamingHelper = false;
 				if (!b.get_isRest()) {
 					// try to fit beam to current beamhelper
 					if (ss.isNullOrUndefined(currentBeamHelper) || !currentBeamHelper.checkBeat(b)) {
 						// if not possible, create the next beaming helper
-						currentBeamHelper = new $AlphaTab_Rendering_Utils_BeamingHelper(bar.get_track());
+						currentBeamHelper = new $AlphaTab_Rendering_Utils_BeamingHelper(bar.track);
 						currentBeamHelper.checkBeat(b);
-						ss.add(this.get_beamHelpers()[v.get_index()], currentBeamHelper);
+						ss.add(this.beamHelpers[v.index], currentBeamHelper);
 						newBeamingHelper = true;
 					}
 				}
 				if (b.get_hasTuplet()) {
 					// try to fit tuplet to current tuplethelper
 					// TODO: register tuplet overflow
-					var previousBeat = b.get_previousBeat();
+					var previousBeat = b.previousBeat;
 					// don't group if the previous beat isn't in the same voice
-					if (ss.isValue(previousBeat) && !ss.referenceEquals(previousBeat.get_voice(), b.get_voice())) {
+					if (ss.isValue(previousBeat) && !ss.referenceEquals(previousBeat.voice, b.voice)) {
 						previousBeat = null;
 					}
 					// if a new beaming helper was started, we close our tuplet grouping as well
@@ -3122,12 +3120,12 @@
 						currentTupletHelper.finish();
 					}
 					if (ss.isNullOrUndefined(previousBeat) || ss.isNullOrUndefined(currentTupletHelper) || !currentTupletHelper.check(b)) {
-						currentTupletHelper = new $AlphaTab_Rendering_Utils_TupletHelper(v.get_index());
+						currentTupletHelper = new $AlphaTab_Rendering_Utils_TupletHelper(v.index);
 						currentTupletHelper.check(b);
-						ss.add(this.get_tupletHelpers()[v.get_index()], currentTupletHelper);
+						ss.add(this.tupletHelpers[v.index], currentTupletHelper);
 					}
 				}
-				this.get_beamHelperLookup()[v.get_index()].set_item(b.get_index(), currentBeamHelper);
+				this.beamHelperLookup[v.index].set_item(b.index, currentBeamHelper);
 			}
 			currentBeamHelper = null;
 			currentTupletHelper = null;
@@ -3138,8 +3136,8 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Utils.BarHelpersGroup
 	var $AlphaTab_Rendering_Utils_BarHelpersGroup = function() {
-		this.$1$HelpersField = null;
-		this.set_helpers(new (ss.makeGenericType(ss.Dictionary$2, [ss.Int32, ss.makeGenericType(ss.Dictionary$2, [ss.Int32, $AlphaTab_Rendering_Utils_BarHelpers])]))());
+		this.helpers = null;
+		this.helpers = new (ss.makeGenericType(ss.Dictionary$2, [ss.Int32, ss.makeGenericType(ss.Dictionary$2, [ss.Int32, $AlphaTab_Rendering_Utils_BarHelpers])]))();
 	};
 	$AlphaTab_Rendering_Utils_BarHelpersGroup.__typeName = 'AlphaTab.Rendering.Utils.BarHelpersGroup';
 	global.AlphaTab.Rendering.Utils.BarHelpersGroup = $AlphaTab_Rendering_Utils_BarHelpersGroup;
@@ -3161,19 +3159,19 @@
 		this.$_lastBeat = null;
 		this.$_track = null;
 		this.$_beatLineXPositions = null;
-		this.$1$VoiceField = null;
-		this.$1$BeatsField = null;
-		this.$1$MaxDurationField = 0;
-		this.$1$FirstMinNoteField = null;
-		this.$1$FirstMaxNoteField = null;
-		this.$1$LastMinNoteField = null;
-		this.$1$LastMaxNoteField = null;
-		this.$1$MinNoteField = null;
-		this.$1$MaxNoteField = null;
+		this.voice = null;
+		this.beats = null;
+		this.maxDuration = 0;
+		this.firstMinNote = null;
+		this.firstMaxNote = null;
+		this.lastMinNote = null;
+		this.lastMaxNote = null;
+		this.minNote = null;
+		this.maxNote = null;
 		this.$_track = track;
-		this.set_beats([]);
+		this.beats = [];
 		this.$_beatLineXPositions = new (ss.makeGenericType(ss.Dictionary$2, [ss.Int32, $AlphaTab_Rendering_Utils_BeatLinePositions]))();
-		this.set_maxDuration(1);
+		this.maxDuration = 1;
 	};
 	$AlphaTab_Rendering_Utils_BeamingHelper.__typeName = 'AlphaTab.Rendering.Utils.BeamingHelper';
 	$AlphaTab_Rendering_Utils_BeamingHelper.$canJoin = function(b1, b2) {
@@ -3181,25 +3179,25 @@
 		if (ss.isNullOrUndefined(b1) || ss.isNullOrUndefined(b2) || b1.get_isRest() || b2.get_isRest()) {
 			return false;
 		}
-		var m1 = b1.get_voice().get_bar();
-		var m2 = b1.get_voice().get_bar();
+		var m1 = b1.voice.bar;
+		var m2 = b1.voice.bar;
 		// only join on same measure
 		if (!ss.referenceEquals(m1, m2)) {
 			return false;
 		}
 		// get times of those voices and check if the times 
 		// are in the same division
-		var start1 = b1.get_start();
-		var start2 = b2.get_start();
+		var start1 = b1.start;
+		var start2 = b2.start;
 		// we can only join 8th, 16th, 32th and 64th voices
-		if (!$AlphaTab_Rendering_Utils_BeamingHelper.$canJoinDuration(b1.get_duration()) || !$AlphaTab_Rendering_Utils_BeamingHelper.$canJoinDuration(b2.get_duration())) {
+		if (!$AlphaTab_Rendering_Utils_BeamingHelper.$canJoinDuration(b1.duration) || !$AlphaTab_Rendering_Utils_BeamingHelper.$canJoinDuration(b2.duration)) {
 			return start1 === start2;
 		}
 		// TODO: create more rules for automatic beaming
 		var divisionLength = $AlphaTab_Audio_MidiUtils.quarterTime;
-		switch (m1.get_masterBar().get_timeSignatureDenominator()) {
+		switch (m1.get_masterBar().timeSignatureDenominator) {
 			case 8: {
-				if (m1.get_masterBar().get_timeSignatureNumerator() % 3 === 0) {
+				if (m1.get_masterBar().timeSignatureNumerator % 3 === 0) {
 					divisionLength += 480;
 				}
 				break;
@@ -3226,41 +3224,41 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Utils.BeatBoundings
 	var $AlphaTab_Rendering_Utils_BeatBoundings = function() {
-		this.$1$BeatField = null;
-		this.$1$BoundsField = null;
-		this.$1$VisualBoundsField = null;
+		this.beat = null;
+		this.bounds = null;
+		this.visualBounds = null;
 	};
 	$AlphaTab_Rendering_Utils_BeatBoundings.__typeName = 'AlphaTab.Rendering.Utils.BeatBoundings';
 	global.AlphaTab.Rendering.Utils.BeatBoundings = $AlphaTab_Rendering_Utils_BeatBoundings;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Utils.BeatLinePositions
 	var $AlphaTab_Rendering_Utils_BeatLinePositions = function(up, down) {
-		this.$1$UpField = 0;
-		this.$1$DownField = 0;
-		this.set_up(up);
-		this.set_down(down);
+		this.up = 0;
+		this.down = 0;
+		this.up = up;
+		this.down = down;
 	};
 	$AlphaTab_Rendering_Utils_BeatLinePositions.__typeName = 'AlphaTab.Rendering.Utils.BeatLinePositions';
 	global.AlphaTab.Rendering.Utils.BeatLinePositions = $AlphaTab_Rendering_Utils_BeatLinePositions;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Utils.BoundingsLookup
 	var $AlphaTab_Rendering_Utils_BoundingsLookup = function() {
-		this.$1$BarsField = null;
-		this.set_bars([]);
+		this.bars = null;
+		this.bars = [];
 	};
 	$AlphaTab_Rendering_Utils_BoundingsLookup.__typeName = 'AlphaTab.Rendering.Utils.BoundingsLookup';
 	global.AlphaTab.Rendering.Utils.BoundingsLookup = $AlphaTab_Rendering_Utils_BoundingsLookup;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Utils.Bounds
 	var $AlphaTab_Rendering_Utils_Bounds = function(x, y, w, h) {
-		this.$1$XField = 0;
-		this.$1$YField = 0;
-		this.$1$WField = 0;
-		this.$1$HField = 0;
-		this.set_x(x);
-		this.set_y(y);
-		this.set_w(w);
-		this.set_h(h);
+		this.x = 0;
+		this.y = 0;
+		this.w = 0;
+		this.h = 0;
+		this.x = x;
+		this.y = y;
+		this.w = w;
+		this.h = h;
 	};
 	$AlphaTab_Rendering_Utils_Bounds.__typeName = 'AlphaTab.Rendering.Utils.Bounds';
 	global.AlphaTab.Rendering.Utils.Bounds = $AlphaTab_Rendering_Utils_Bounds;
@@ -3308,10 +3306,10 @@
 	// AlphaTab.Rendering.Utils.SvgPathParser
 	var $AlphaTab_Rendering_Utils_SvgPathParser = function(svg) {
 		this.$_currentIndex = 0;
-		this.$1$SvgField = null;
-		this.$1$LastCommandField = null;
-		this.$1$CurrentTokenField = null;
-		this.set_svg(svg);
+		this.svg = null;
+		this.lastCommand = null;
+		this.currentToken = null;
+		this.svg = svg;
 	};
 	$AlphaTab_Rendering_Utils_SvgPathParser.__typeName = 'AlphaTab.Rendering.Utils.SvgPathParser';
 	$AlphaTab_Rendering_Utils_SvgPathParser.$isStringNumber = function(s, allowSign) {
@@ -3332,22 +3330,16 @@
 	// AlphaTab.Rendering.Utils.TupletHelper
 	var $AlphaTab_Rendering_Utils_TupletHelper = function(voice) {
 		this.$_isFinished = false;
-		this.$1$BeatsField = null;
-		this.$1$VoiceIndexField = 0;
-		this.$1$TupletField = 0;
-		this.set_voiceIndex(voice);
-		this.set_beats([]);
+		this.beats = null;
+		this.voiceIndex = 0;
+		this.tuplet = 0;
+		this.voiceIndex = voice;
+		this.beats = [];
 	};
 	$AlphaTab_Rendering_Utils_TupletHelper.__typeName = 'AlphaTab.Rendering.Utils.TupletHelper';
 	global.AlphaTab.Rendering.Utils.TupletHelper = $AlphaTab_Rendering_Utils_TupletHelper;
 	ss.initClass($AlphaTab_Environment, $asm, {});
 	ss.initClass($AlphaTab_LayoutSettings, $asm, {
-		get_mode: function() {
-			return this.$1$ModeField;
-		},
-		set_mode: function(value) {
-			this.$1$ModeField = value;
-		},
 		get: function(T) {
 			return function(key, def) {
 				if (this.additionalSettings.containsKey(key)) {
@@ -3357,151 +3349,102 @@
 			};
 		}
 	});
-	ss.initClass($AlphaTab_Settings, $asm, {
-		get_scale: function() {
-			return this.$1$ScaleField;
-		},
-		set_scale: function(value) {
-			this.$1$ScaleField = value;
-		},
-		get_width: function() {
-			return this.$1$WidthField;
-		},
-		set_width: function(value) {
-			this.$1$WidthField = value;
-		},
-		get_height: function() {
-			return this.$1$HeightField;
-		},
-		set_height: function(value) {
-			this.$1$HeightField = value;
-		},
-		get_engine: function() {
-			return this.$1$EngineField;
-		},
-		set_engine: function(value) {
-			this.$1$EngineField = value;
-		},
-		get_layout: function() {
-			return this.$1$LayoutField;
-		},
-		set_layout: function(value) {
-			this.$1$LayoutField = value;
-		},
-		get_staves: function() {
-			return this.$1$StavesField;
-		},
-		set_staves: function(value) {
-			this.$1$StavesField = value;
-		}
-	});
+	ss.initClass($AlphaTab_Settings, $asm, {});
 	ss.initClass($AlphaTab_StaveSettings, $asm, {});
 	ss.initClass($AlphaTab_Audio_GeneralMidi, $asm, {});
 	ss.initClass($AlphaTab_Audio_MidiUtils, $asm, {});
 	ss.initInterface($AlphaTab_Audio_Generator_IMidiFileHandler, $asm, { addTimeSignature: null, addRest: null, addNote: null, addControlChange: null, addProgramChange: null, addTempo: null, addBend: null, addMetronome: null });
 	ss.initClass($AlphaTab_Audio_Generator_MidiFileGenerator, $asm, {
-		get_generateMetronome: function() {
-			return this.$1$GenerateMetronomeField;
-		},
-		set_generateMetronome: function(value) {
-			this.$1$GenerateMetronomeField = value;
-		},
 		generate: function() {
 			// initialize tracks
-			var $t1 = this.$_score.get_tracks();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var track = $t1[$t2];
+			for (var $t1 = 0; $t1 < this.$_score.tracks.length; $t1++) {
+				var track = this.$_score.tracks[$t1];
 				this.$generateTrack(track);
 			}
 			var controller = new $AlphaTab_Audio_Generator_MidiPlaybackController(this.$_score);
 			var previousMasterBar = null;
 			// store the previous played bar for repeats
 			while (!controller.get_finished()) {
-				var index = controller.get_index();
+				var index = controller.index;
 				controller.process();
-				if (controller.get_shouldPlay()) {
-					this.$generateMasterBar(this.$_score.get_masterBars()[index], previousMasterBar, controller.get_repeatMove());
-					var $t3 = this.$_score.get_tracks();
-					for (var $t4 = 0; $t4 < $t3.length; $t4++) {
-						var track1 = $t3[$t4];
-						this.generateBar(track1.get_bars()[index], controller.get_repeatMove());
+				if (controller.shouldPlay) {
+					this.$generateMasterBar(this.$_score.masterBars[index], previousMasterBar, controller.repeatMove);
+					for (var $t2 = 0; $t2 < this.$_score.tracks.length; $t2++) {
+						var track1 = this.$_score.tracks[$t2];
+						this.generateBar(track1.bars[index], controller.repeatMove);
 					}
 				}
-				previousMasterBar = this.$_score.get_masterBars()[index];
+				previousMasterBar = this.$_score.masterBars[index];
 			}
 		},
 		$generateTrack: function(track) {
 			// channel
-			this.$generateChannel(track, track.get_playbackInfo().get_primaryChannel(), track.get_playbackInfo());
-			if (track.get_playbackInfo().get_primaryChannel() !== track.get_playbackInfo().get_secondaryChannel()) {
-				this.$generateChannel(track, track.get_playbackInfo().get_secondaryChannel(), track.get_playbackInfo());
+			this.$generateChannel(track, track.playbackInfo.primaryChannel, track.playbackInfo);
+			if (track.playbackInfo.primaryChannel !== track.playbackInfo.secondaryChannel) {
+				this.$generateChannel(track, track.playbackInfo.secondaryChannel, track.playbackInfo);
 			}
 		},
 		$generateChannel: function(track, channel, playbackInfo) {
-			var volume = $AlphaTab_Audio_Generator_MidiFileGenerator.$toChannelShort(playbackInfo.get_volume());
-			var balance = $AlphaTab_Audio_Generator_MidiFileGenerator.$toChannelShort(playbackInfo.get_balance());
-			this.$_handler.addControlChange(track.get_index(), 0, channel, 7, volume);
-			this.$_handler.addControlChange(track.get_index(), 0, channel, 10, balance);
-			this.$_handler.addControlChange(track.get_index(), 0, channel, 11, 127);
-			this.$_handler.addProgramChange(track.get_index(), 0, channel, playbackInfo.get_program());
+			var volume = $AlphaTab_Audio_Generator_MidiFileGenerator.$toChannelShort(playbackInfo.volume);
+			var balance = $AlphaTab_Audio_Generator_MidiFileGenerator.$toChannelShort(playbackInfo.balance);
+			this.$_handler.addControlChange(track.index, 0, channel, 7, volume);
+			this.$_handler.addControlChange(track.index, 0, channel, 10, balance);
+			this.$_handler.addControlChange(track.index, 0, channel, 11, 127);
+			this.$_handler.addProgramChange(track.index, 0, channel, playbackInfo.program);
 		},
 		$generateMasterBar: function(masterBar, previousMasterBar, startMove) {
 			// time signature
-			if (ss.isNullOrUndefined(previousMasterBar) || previousMasterBar.get_timeSignatureDenominator() !== masterBar.get_timeSignatureDenominator() || previousMasterBar.get_timeSignatureNumerator() !== masterBar.get_timeSignatureNumerator()) {
-				this.$_handler.addTimeSignature(masterBar.get_start() + startMove, masterBar.get_timeSignatureNumerator(), masterBar.get_timeSignatureDenominator());
+			if (ss.isNullOrUndefined(previousMasterBar) || previousMasterBar.timeSignatureDenominator !== masterBar.timeSignatureDenominator || previousMasterBar.timeSignatureNumerator !== masterBar.timeSignatureNumerator) {
+				this.$_handler.addTimeSignature(masterBar.start + startMove, masterBar.timeSignatureNumerator, masterBar.timeSignatureDenominator);
 			}
 			// tempo
 			if (ss.isNullOrUndefined(previousMasterBar)) {
-				this.$_handler.addTempo(masterBar.get_start() + startMove, masterBar.get_score().get_tempo());
-				this.$_currentTempo = masterBar.get_score().get_tempo();
+				this.$_handler.addTempo(masterBar.start + startMove, masterBar.score.tempo);
+				this.$_currentTempo = masterBar.score.tempo;
 			}
-			else if (ss.isValue(masterBar.get_tempoAutomation())) {
-				this.$_handler.addTempo(masterBar.get_start() + startMove, ss.Int32.trunc(masterBar.get_tempoAutomation().get_value()));
-				this.$_currentTempo = ss.Int32.trunc(masterBar.get_tempoAutomation().get_value());
+			else if (ss.isValue(masterBar.tempoAutomation)) {
+				this.$_handler.addTempo(masterBar.start + startMove, ss.Int32.trunc(masterBar.tempoAutomation.value));
+				this.$_currentTempo = ss.Int32.trunc(masterBar.tempoAutomation.value);
 			}
 			// metronome
-			if (this.get_generateMetronome()) {
-				var start = masterBar.get_start() + startMove;
-				var length = $AlphaTab_Audio_MidiUtils.valueToTicks(masterBar.get_timeSignatureDenominator());
-				for (var i = 0; i < masterBar.get_timeSignatureNumerator(); i++) {
+			if (this.generateMetronome) {
+				var start = masterBar.start + startMove;
+				var length = $AlphaTab_Audio_MidiUtils.valueToTicks(masterBar.timeSignatureDenominator);
+				for (var i = 0; i < masterBar.timeSignatureNumerator; i++) {
 					this.$_handler.addMetronome(start, length);
 					start += length;
 				}
 			}
 		},
 		generateBar: function(bar, startMove) {
-			var $t1 = bar.get_voices();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var voice = $t1[$t2];
+			for (var $t1 = 0; $t1 < bar.voices.length; $t1++) {
+				var voice = bar.voices[$t1];
 				this.$generateVoice(voice, startMove);
 			}
 		},
 		$generateVoice: function(voice, startMove) {
-			var $t1 = voice.get_beats();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var beat = $t1[$t2];
+			for (var $t1 = 0; $t1 < voice.beats.length; $t1++) {
+				var beat = voice.beats[$t1];
 				this.$generateBeat(beat, startMove);
 			}
 		},
 		$generateBeat: function(beat, startMove) {
 			// TODO: take care of tripletfeel 
-			var start = beat.get_start();
+			var start = beat.start;
 			var duration = beat.calculateDuration();
-			var track = beat.get_voice().get_bar().get_track();
-			var $t1 = beat.get_automations();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var automation = $t1[$t2];
+			var track = beat.voice.bar.track;
+			for (var $t1 = 0; $t1 < beat.automations.length; $t1++) {
+				var automation = beat.automations[$t1];
 				this.$generateAutomation(beat, automation, startMove);
 			}
 			if (beat.get_isRest()) {
-				this.$_handler.addRest(track.get_index(), start + startMove, track.get_playbackInfo().get_primaryChannel());
+				this.$_handler.addRest(track.index, start + startMove, track.playbackInfo.primaryChannel);
 			}
 			else {
 				var brushInfo = this.$getBrushInfo(beat);
-				var $t3 = beat.get_notes();
-				for (var $t4 = 0; $t4 < $t3.length; $t4++) {
-					var n = $t3[$t4];
-					if (n.get_isTieDestination()) {
+				for (var $t2 = 0; $t2 < beat.notes.length; $t2++) {
+					var n = beat.notes[$t2];
+					if (n.isTieDestination) {
 						continue;
 					}
 					this.$generateNote(n, start, duration, startMove, brushInfo);
@@ -3509,27 +3452,27 @@
 			}
 		},
 		$generateNote: function(note, beatStart, beatDuration, startMove, brushInfo) {
-			var track = note.get_beat().get_voice().get_bar().get_track();
-			var noteKey = track.get_capo() + note.get_realValue();
-			var noteStart = beatStart + startMove + brushInfo[note.get_string() - 1];
-			var noteDuration = this.$getNoteDuration(note, beatDuration) - brushInfo[note.get_string() - 1];
+			var track = note.beat.voice.bar.track;
+			var noteKey = track.capo + note.get_realValue();
+			var noteStart = beatStart + startMove + brushInfo[note.string - 1];
+			var noteDuration = this.$getNoteDuration(note, beatDuration) - brushInfo[note.string - 1];
 			var dynamicValue = this.$getDynamicValue(note);
 			// 
 			// Fade in
-			if (note.get_beat().get_fadeIn()) {
+			if (note.beat.fadeIn) {
 				this.$generateFadeIn(note, noteStart, noteDuration, noteKey, dynamicValue);
 			}
 			// TODO: grace notes?
 			//
 			// Trill
-			if (note.get_isTrill() && !track.get_isPercussion()) {
+			if (note.get_isTrill() && !track.isPercussion) {
 				this.$generateTrill(note, noteStart, noteDuration, noteKey, dynamicValue);
 				// no further generation needed
 				return;
 			}
 			//
 			// Tremolo Picking
-			if (note.get_beat().get_isTremolo()) {
+			if (note.beat.get_isTremolo()) {
 				this.$generateTremoloPicking(note, noteStart, noteDuration, noteKey, dynamicValue);
 				// no further generation needed
 				return;
@@ -3539,21 +3482,21 @@
 			if (note.get_hasBend()) {
 				this.$generateBend(note, noteStart, noteDuration, noteKey, dynamicValue);
 			}
-			else if (note.get_beat().get_hasWhammyBar()) {
+			else if (note.beat.get_hasWhammyBar()) {
 				this.$generateWhammyBar(note, noteStart, noteDuration, noteKey, dynamicValue);
 			}
-			else if (note.get_slideType() !== 0) {
+			else if (note.slideType !== 0) {
 				this.$generateSlide(note, noteStart, noteDuration, noteKey, dynamicValue);
 			}
-			else if (note.get_vibrato() !== 0) {
+			else if (note.vibrato !== 0) {
 				this.$generateVibrato(note, noteStart, noteDuration, noteKey, dynamicValue);
 			}
 			//
 			// Harmonics
-			if (note.get_harmonicType() !== 0) {
+			if (note.harmonicType !== 0) {
 				this.$generateHarmonic(note, noteStart, noteDuration, noteKey, dynamicValue);
 			}
-			this.$_handler.addNote(track.get_index(), noteStart, noteDuration, noteKey, dynamicValue, track.get_playbackInfo().get_primaryChannel());
+			this.$_handler.addNote(track.index, noteStart, noteDuration, noteKey, dynamicValue, track.playbackInfo.primaryChannel);
 		},
 		$getNoteDuration: function(note, beatDuration) {
 			return this.$applyDurationEffects(note, beatDuration);
@@ -3670,13 +3613,13 @@
 			//            return applyDurationEffects(note, noteDuration);
 		},
 		$applyDurationEffects: function(note, duration) {
-			if (note.get_isDead()) {
+			if (note.isDead) {
 				return this.$applyStaticDuration($AlphaTab_Audio_Generator_MidiFileHandler.defaultDurationDead, duration);
 			}
-			if (note.get_isPalmMute()) {
+			if (note.isPalmMute) {
 				return this.$applyStaticDuration($AlphaTab_Audio_Generator_MidiFileHandler.defaultDurationPalmMute, duration);
 			}
-			if (note.get_isStaccato()) {
+			if (note.isStaccato) {
 				return ss.Int32.div(duration, 2);
 			}
 			return duration;
@@ -3686,17 +3629,17 @@
 			return Math.min(value, maximum);
 		},
 		$getDynamicValue: function(note) {
-			var dynamicValue = note.get_dynamic();
+			var dynamicValue = note.dynamic;
 			// more silent on hammer destination
-			if (!note.get_beat().get_voice().get_bar().get_track().get_isPercussion() && note.get_isHammerPullDestination()) {
+			if (!note.beat.voice.bar.track.isPercussion && note.isHammerPullDestination) {
 				dynamicValue--;
 			}
 			// more silent on ghost notes
-			if (note.get_isGhost()) {
+			if (note.isGhost) {
 				dynamicValue--;
 			}
 			// louder on accent
-			switch (note.get_accentuated()) {
+			switch (note.accentuated) {
 				case 1: {
 					dynamicValue++;
 					break;
@@ -3727,9 +3670,9 @@
 			// TODO 
 		},
 		$generateTrill: function(note, noteStart, noteDuration, noteKey, dynamicValue) {
-			var track = note.get_beat().get_voice().get_bar().get_track();
-			var trillKey = track.get_capo() + note.get_stringTuning() + note.get_trillFret();
-			var trillLength = $AlphaTab_Audio_MidiUtils.toTicks(note.get_trillSpeed());
+			var track = note.beat.voice.bar.track;
+			var trillKey = track.capo + note.get_stringTuning() + note.get_trillFret();
+			var trillLength = $AlphaTab_Audio_MidiUtils.toTicks(note.trillSpeed);
 			var realKey = true;
 			var tick = noteStart;
 			while (tick + 10 < noteStart + noteDuration) {
@@ -3737,46 +3680,45 @@
 				if (tick + trillLength >= noteStart + noteDuration) {
 					trillLength = noteStart + noteDuration - tick;
 				}
-				this.$_handler.addNote(track.get_index(), tick, trillLength, (realKey ? trillKey : noteKey), dynamicValue, track.get_playbackInfo().get_primaryChannel());
+				this.$_handler.addNote(track.index, tick, trillLength, (realKey ? trillKey : noteKey), dynamicValue, track.playbackInfo.primaryChannel);
 				realKey = !realKey;
 				tick += trillLength;
 			}
 		},
 		$generateTremoloPicking: function(note, noteStart, noteDuration, noteKey, dynamicValue) {
-			var track = note.get_beat().get_voice().get_bar().get_track();
-			var tpLength = $AlphaTab_Audio_MidiUtils.toTicks(note.get_beat().get_tremoloSpeed().get_value());
+			var track = note.beat.voice.bar.track;
+			var tpLength = $AlphaTab_Audio_MidiUtils.toTicks(note.beat.tremoloSpeed.get_value());
 			var tick = noteStart;
 			while (tick + 10 < noteStart + noteDuration) {
 				// only the rest on last trill play
 				if (tick + tpLength >= noteStart + noteDuration) {
 					tpLength = noteStart + noteDuration - tick;
 				}
-				this.$_handler.addNote(track.get_index(), tick, tpLength, noteKey, dynamicValue, track.get_playbackInfo().get_primaryChannel());
+				this.$_handler.addNote(track.index, tick, tpLength, noteKey, dynamicValue, track.playbackInfo.primaryChannel);
 				tick += tpLength;
 			}
 		},
 		$getBrushInfo: function(beat) {
-			var brushInfo = new Array(beat.get_voice().get_bar().get_track().get_tuning().length);
-			if (beat.get_brushType() !== 0) {
+			var brushInfo = new Array(beat.voice.bar.track.tuning.length);
+			if (beat.brushType !== 0) {
 				// 
 				// calculate the number of  
 				// a mask where the single bits indicate the strings used
 				var stringUsed = 0;
-				var $t1 = beat.get_notes();
-				for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-					var n = $t1[$t2];
-					if (n.get_isTieDestination()) {
+				for (var $t1 = 0; $t1 < beat.notes.length; $t1++) {
+					var n = beat.notes[$t1];
+					if (n.isTieDestination) {
 						continue;
 					}
-					stringUsed |= 1 << n.get_string() - 1;
+					stringUsed |= 1 << n.string - 1;
 				}
 				//
 				// calculate time offset for all strings
-				if (beat.get_notes().length > 0) {
+				if (beat.notes.length > 0) {
 					var brushMove = 0;
 					var brushIncrement = this.$getBrushIncrement(beat);
-					for (var i = 0; i < beat.get_voice().get_bar().get_track().get_tuning().length; i++) {
-						var index = ((beat.get_brushType() === 4 || beat.get_brushType() === 2) ? i : (brushInfo.length - 1 - i));
+					for (var i = 0; i < beat.voice.bar.track.tuning.length; i++) {
+						var index = ((beat.brushType === 4 || beat.brushType === 2) ? i : (brushInfo.length - 1 - i));
 						if ((stringUsed & 1 << index) !== 0) {
 							brushInfo[index] = brushMove;
 							brushMove = brushIncrement;
@@ -3787,30 +3729,30 @@
 			return brushInfo;
 		},
 		$getBrushIncrement: function(beat) {
-			if (beat.get_brushDuration() === 0) {
+			if (beat.brushDuration === 0) {
 				return 0;
 			}
 			var duration = beat.calculateDuration();
 			if (duration === 0) {
 				return 0;
 			}
-			return ss.Int32.trunc(duration / 8 * (4 / beat.get_brushDuration()));
+			return ss.Int32.trunc(duration / 8 * (4 / beat.brushDuration));
 		},
 		$generateAutomation: function(beat, automation, startMove) {
-			switch (automation.get_type()) {
+			switch (automation.type) {
 				case 2: {
-					this.$_handler.addProgramChange(beat.get_voice().get_bar().get_track().get_index(), beat.get_start() + startMove, beat.get_voice().get_bar().get_track().get_playbackInfo().get_primaryChannel(), ss.Int32.trunc(automation.get_value()));
-					this.$_handler.addProgramChange(beat.get_voice().get_bar().get_track().get_index(), beat.get_start() + startMove, beat.get_voice().get_bar().get_track().get_playbackInfo().get_secondaryChannel(), ss.Int32.trunc(automation.get_value()));
+					this.$_handler.addProgramChange(beat.voice.bar.track.index, beat.start + startMove, beat.voice.bar.track.playbackInfo.primaryChannel, ss.Int32.trunc(automation.value));
+					this.$_handler.addProgramChange(beat.voice.bar.track.index, beat.start + startMove, beat.voice.bar.track.playbackInfo.secondaryChannel, ss.Int32.trunc(automation.value));
 					break;
 				}
 				case 3: {
-					this.$_handler.addControlChange(beat.get_voice().get_bar().get_track().get_index(), beat.get_start() + startMove, beat.get_voice().get_bar().get_track().get_playbackInfo().get_primaryChannel(), 10, ss.Int32.trunc(automation.get_value()));
-					this.$_handler.addControlChange(beat.get_voice().get_bar().get_track().get_index(), beat.get_start() + startMove, beat.get_voice().get_bar().get_track().get_playbackInfo().get_secondaryChannel(), 10, ss.Int32.trunc(automation.get_value()));
+					this.$_handler.addControlChange(beat.voice.bar.track.index, beat.start + startMove, beat.voice.bar.track.playbackInfo.primaryChannel, 10, ss.Int32.trunc(automation.value));
+					this.$_handler.addControlChange(beat.voice.bar.track.index, beat.start + startMove, beat.voice.bar.track.playbackInfo.secondaryChannel, 10, ss.Int32.trunc(automation.value));
 					break;
 				}
 				case 1: {
-					this.$_handler.addControlChange(beat.get_voice().get_bar().get_track().get_index(), beat.get_start() + startMove, beat.get_voice().get_bar().get_track().get_playbackInfo().get_primaryChannel(), 7, ss.Int32.trunc(automation.get_value()));
-					this.$_handler.addControlChange(beat.get_voice().get_bar().get_track().get_index(), beat.get_start() + startMove, beat.get_voice().get_bar().get_track().get_playbackInfo().get_secondaryChannel(), 7, ss.Int32.trunc(automation.get_value()));
+					this.$_handler.addControlChange(beat.voice.bar.track.index, beat.start + startMove, beat.voice.bar.track.playbackInfo.primaryChannel, 7, ss.Int32.trunc(automation.value));
+					this.$_handler.addControlChange(beat.voice.bar.track.index, beat.start + startMove, beat.voice.bar.track.playbackInfo.secondaryChannel, 7, ss.Int32.trunc(automation.value));
 					break;
 				}
 			}
@@ -3818,7 +3760,7 @@
 	});
 	ss.initClass($AlphaTab_Audio_Generator_MidiFileHandler, $asm, {
 		$addEvent: function(track, tick, message) {
-			this.$_midiFile.get_tracks()[track].addEvent(new $AlphaTab_Audio_Model_MidiEvent(tick, message));
+			this.$_midiFile.tracks[track].addEvent(new $AlphaTab_Audio_Model_MidiEvent(tick, message));
 		},
 		$makeCommand: function(command, channel) {
 			return command & 240 | channel & 15;
@@ -3828,7 +3770,7 @@
 			while ((timeSignatureDenominator = timeSignatureDenominator >> 1) > 0) {
 				denominatorIndex++;
 			}
-			this.$addEvent(this.$_midiFile.get_infoTrack(), tick, $AlphaTab_Audio_Generator_MidiFileHandler.$buildMetaMessage(88, [timeSignatureNumerator & 255, denominatorIndex & 255, 48, 8]));
+			this.$addEvent(this.$_midiFile.infoTrack, tick, $AlphaTab_Audio_Generator_MidiFileHandler.$buildMetaMessage(88, [timeSignatureNumerator & 255, denominatorIndex & 255, 48, 8]));
 		},
 		addRest: function(track, tick, channel) {
 			this.$addEvent(track, tick, $AlphaTab_Audio_Generator_MidiFileHandler.$buildSysExMessage([0]));
@@ -3847,7 +3789,7 @@
 		addTempo: function(tick, tempo) {
 			// bpm -> microsecond per quarter note
 			var tempoInUsq = ss.Int32.div(60000000, tempo);
-			this.$addEvent(this.$_midiFile.get_infoTrack(), tick, $AlphaTab_Audio_Generator_MidiFileHandler.$buildMetaMessage(81, [tempoInUsq >> 16 & 255, tempoInUsq >> 8 & 255, tempoInUsq & 255]));
+			this.$addEvent(this.$_midiFile.infoTrack, tick, $AlphaTab_Audio_Generator_MidiFileHandler.$buildMetaMessage(81, [tempoInUsq >> 16 & 255, tempoInUsq >> 8 & 255, tempoInUsq & 255]));
 		},
 		addBend: function(track, tick, channel, value) {
 			this.$addEvent(track, tick, new $AlphaTab_Audio_Model_MidiMessage(new $AlphaTab_IO_ByteArray([this.$makeCommand(224, channel), 0, $AlphaTab_Audio_Generator_MidiFileHandler.$fixValue(value)])));
@@ -3855,72 +3797,54 @@
 		addMetronome: function(start, length) {
 			if (this.$_metronomeTrack === -1) {
 				this.$_midiFile.createTrack();
-				this.$_metronomeTrack = this.$_midiFile.get_tracks().length - 1;
+				this.$_metronomeTrack = this.$_midiFile.tracks.length - 1;
 			}
 			this.addNote(this.$_metronomeTrack, start, length, 37, 5, 9);
 		}
 	}, null, [$AlphaTab_Audio_Generator_IMidiFileHandler]);
 	ss.initClass($AlphaTab_Audio_Generator_MidiPlaybackController, $asm, {
-		get_shouldPlay: function() {
-			return this.$1$ShouldPlayField;
-		},
-		set_shouldPlay: function(value) {
-			this.$1$ShouldPlayField = value;
-		},
-		get_repeatMove: function() {
-			return this.$1$RepeatMoveField;
-		},
-		set_repeatMove: function(value) {
-			this.$1$RepeatMoveField = value;
-		},
-		get_index: function() {
-			return this.$1$IndexField;
-		},
-		set_index: function(value) {
-			this.$1$IndexField = value;
-		},
 		get_finished: function() {
-			return this.get_index() >= this.$_score.get_masterBars().length;
+			return this.index >= this.$_score.masterBars.length;
 		},
 		process: function() {
-			var masterBar = this.$_score.get_masterBars()[this.get_index()];
+			var masterBar = this.$_score.masterBars[this.index];
 			// if the repeat group wasn't closed we reset the repeating 
 			// on the last group opening
-			if (!masterBar.get_repeatGroup().get_isClosed() && ss.referenceEquals(masterBar.get_repeatGroup().get_openings()[masterBar.get_repeatGroup().get_openings().length - 1], masterBar)) {
+			if (!masterBar.repeatGroup.isClosed && ss.referenceEquals(masterBar.repeatGroup.openings[masterBar.repeatGroup.openings.length - 1], masterBar)) {
 				this.$_repeatStart = 0;
 				this.$_repeatNumber = 0;
 				this.$_repeatEnd = 0;
 				this.$_repeatOpen = false;
 			}
-			if (masterBar.get_isRepeatStart()) {
-				this.$_repeatStartIndex = this.get_index();
-				this.$_repeatStart = masterBar.get_start();
+			if (masterBar.isRepeatStart) {
+				this.$_repeatStartIndex = this.index;
+				this.$_repeatStart = masterBar.start;
 				this.$_repeatOpen = true;
-				if (this.get_index() > this.$_lastIndex) {
+				if (this.index > this.$_lastIndex) {
 					this.$_repeatNumber = 0;
 					this.$_repeatAlternative = 0;
 				}
 			}
 			else {
 				if (this.$_repeatAlternative === 0) {
-					this.$_repeatAlternative = masterBar.get_alternateEndings();
+					this.$_repeatAlternative = masterBar.alternateEndings;
 				}
 				if (this.$_repeatOpen && this.$_repeatAlternative > 0 && (this.$_repeatAlternative & 1 << this.$_repeatNumber) === 0) {
-					this.set_repeatMove(this.get_repeatMove() - masterBar.calculateDuration());
-					if (masterBar.get_repeatCount() > 0) {
+					this.repeatMove -= masterBar.calculateDuration();
+					if (masterBar.repeatCount > 0) {
 						this.$_repeatAlternative = 0;
 					}
-					this.set_shouldPlay(false);
-					this.set_index(this.get_index() + 1);
+					this.shouldPlay = false;
+					this.index++;
 					return;
 				}
 			}
-			this.$_lastIndex = Math.max(this.$_lastIndex, this.get_index());
-			if (this.$_repeatOpen && masterBar.get_repeatCount() > 0) {
-				if (this.$_repeatNumber < masterBar.get_repeatCount() || this.$_repeatAlternative > 0) {
-					this.$_repeatEnd = masterBar.get_start() + masterBar.calculateDuration();
-					this.set_repeatMove(this.get_repeatMove() + (this.$_repeatEnd - this.$_repeatStart));
-					this.set_index(this.$_repeatStartIndex - 1);
+			this.$_lastIndex = Math.max(this.$_lastIndex, this.index);
+			if (this.$_repeatOpen && masterBar.repeatCount > 0) {
+				if (this.$_repeatNumber < masterBar.repeatCount || this.$_repeatAlternative > 0) {
+					this.$_repeatEnd = masterBar.start + masterBar.calculateDuration();
+					this.repeatMove += this.$_repeatEnd - this.$_repeatStart;
+					this.index = this.$_repeatStartIndex - 1;
 					this.$_repeatNumber++;
 				}
 				else {
@@ -3931,67 +3855,18 @@
 				}
 				this.$_repeatAlternative = 0;
 			}
-			this.set_index(this.get_index() + 1);
+			this.index++;
 		}
 	});
-	ss.initClass($AlphaTab_Audio_Model_BarTickLookup, $asm, {
-		get_start: function() {
-			return this.$1$StartField;
-		},
-		set_start: function(value) {
-			this.$1$StartField = value;
-		},
-		get_end: function() {
-			return this.$1$EndField;
-		},
-		set_end: function(value) {
-			this.$1$EndField = value;
-		},
-		get_bar: function() {
-			return this.$1$BarField;
-		},
-		set_bar: function(value) {
-			this.$1$BarField = value;
-		}
-	});
+	ss.initClass($AlphaTab_Audio_Model_BarTickLookup, $asm, {});
 	ss.initEnum($AlphaTab_Audio_Model_MidiController, $asm, { allNotesOff: 123, balance: 10, chorus: 93, dataEntryLsb: 38, dataEntryMsb: 6, expression: 11, phaser: 95, reverb: 91, rpnLsb: 100, rpnMsb: 101, tremolo: 92, volume: 7 });
 	ss.initClass($AlphaTab_Audio_Model_MidiEvent, $asm, {
-		get_track: function() {
-			return this.$1$TrackField;
-		},
-		set_track: function(value) {
-			this.$1$TrackField = value;
-		},
-		get_tick: function() {
-			return this.$1$TickField;
-		},
-		set_tick: function(value) {
-			this.$1$TickField = value;
-		},
-		get_message: function() {
-			return this.$1$MessageField;
-		},
-		set_message: function(value) {
-			this.$1$MessageField = value;
-		},
-		get_nextEvent: function() {
-			return this.$1$NextEventField;
-		},
-		set_nextEvent: function(value) {
-			this.$1$NextEventField = value;
-		},
-		get_previousEvent: function() {
-			return this.$1$PreviousEventField;
-		},
-		set_previousEvent: function(value) {
-			this.$1$PreviousEventField = value;
-		},
 		get_deltaTicks: function() {
-			return (ss.isNullOrUndefined(this.get_previousEvent()) ? 0 : (this.get_tick() - this.get_previousEvent().get_tick()));
+			return (ss.isNullOrUndefined(this.previousEvent) ? 0 : (this.tick - this.previousEvent.tick));
 		},
 		writeTo: function(s) {
 			this.$writeVariableInt(s, this.get_deltaTicks());
-			this.get_message().writeTo(s);
+			this.message.writeTo(s);
 		},
 		$writeVariableInt: function(s, value) {
 			var array = new $AlphaTab_IO_ByteArray.$ctor1(4);
@@ -4012,23 +3887,11 @@
 		}
 	});
 	ss.initClass($AlphaTab_Audio_Model_MidiFile, $asm, {
-		get_tracks: function() {
-			return this.$1$TracksField;
-		},
-		set_tracks: function(value) {
-			this.$1$TracksField = value;
-		},
-		get_infoTrack: function() {
-			return this.$1$InfoTrackField;
-		},
-		set_infoTrack: function(value) {
-			this.$1$InfoTrackField = value;
-		},
 		createTrack: function() {
 			var track = new $AlphaTab_Audio_Model_MidiTrack();
-			track.set_index(this.get_tracks().length);
-			track.set_file(this);
-			ss.add(this.get_tracks(), track);
+			track.index = this.tracks.length;
+			track.file = this;
+			ss.add(this.tracks, track);
 			return track;
 		},
 		writeTo: function(s) {
@@ -4043,55 +3906,36 @@
 			b = new $AlphaTab_IO_ByteArray([0, 1]);
 			s.write(b, 0, b.get_length());
 			// number of tracks
-			var v = this.get_tracks().length;
+			var v = this.tracks.length;
 			b = new $AlphaTab_IO_ByteArray([v >> 8 & 255, v & 255]);
 			s.write(b, 0, b.get_length());
 			v = 960;
 			b = new $AlphaTab_IO_ByteArray([v >> 8 & 255, v & 255]);
 			s.write(b, 0, b.get_length());
-			var $t1 = this.get_tracks();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var midiTrack = $t1[$t2];
+			for (var $t1 = 0; $t1 < this.tracks.length; $t1++) {
+				var midiTrack = this.tracks[$t1];
 				midiTrack.writeTo(s);
 			}
 		}
 	});
 	ss.initClass($AlphaTab_Audio_Model_MidiMessage, $asm, {
-		get_event: function() {
-			return this.$1$EventField;
-		},
-		set_event: function(value) {
-			this.$1$EventField = value;
-		},
-		get_data: function() {
-			return this.$1$DataField;
-		},
-		set_data: function(value) {
-			this.$1$DataField = value;
-		},
 		writeTo: function(s) {
-			s.write(this.get_data(), 0, this.get_data().get_length());
+			s.write(this.data, 0, this.data.get_length());
 		}
 	});
 	ss.initClass($AlphaTab_Audio_Model_MidiTickLookup, $asm, {
-		get_bars: function() {
-			return this.$1$BarsField;
-		},
-		set_bars: function(value) {
-			this.$1$BarsField = value;
-		},
 		findBeat: function(track, tick) {
 			//
 			// some heuristics: try last found beat and it's next beat for lookup first
 			// try last beat or next beat of last beat first
-			if (ss.isValue(this.$_lastBeat) && ss.isValue(this.$_lastBeat.get_nextBeat()) && ss.referenceEquals(this.$_lastBeat.get_voice().get_bar().get_track(), track)) {
+			if (ss.isValue(this.$_lastBeat) && ss.isValue(this.$_lastBeat.nextBeat) && ss.referenceEquals(this.$_lastBeat.voice.bar.track, track)) {
 				// check if tick is between _lastBeat and _lastBeat.nextBeat (still _lastBeat)
-				if (tick >= this.$_lastBeat.get_start() && tick < this.$_lastBeat.get_nextBeat().get_start()) {
+				if (tick >= this.$_lastBeat.start && tick < this.$_lastBeat.nextBeat.start) {
 					return this.$_lastBeat;
 				}
 				// we need a upper-next beat to check the nextbeat range 
-				if (ss.isValue(this.$_lastBeat.get_nextBeat().get_nextBeat()) && tick >= this.$_lastBeat.get_nextBeat().get_start() && tick < this.$_lastBeat.get_nextBeat().get_nextBeat().get_start()) {
-					this.$_lastBeat = this.$_lastBeat.get_nextBeat();
+				if (ss.isValue(this.$_lastBeat.nextBeat.nextBeat) && tick >= this.$_lastBeat.nextBeat.start && tick < this.$_lastBeat.nextBeat.nextBeat.start) {
+					this.$_lastBeat = this.$_lastBeat.nextBeat;
 					return this.$_lastBeat;
 				}
 			}
@@ -4102,18 +3946,18 @@
 			if (ss.isNullOrUndefined(lookup)) {
 				return null;
 			}
-			var masterBar = lookup.get_bar();
-			var bar = track.get_bars()[masterBar.get_index()];
+			var masterBar = lookup.bar;
+			var bar = track.bars[masterBar.index];
 			// remap tick to initial bar start
-			tick = tick - lookup.get_start() + masterBar.get_start();
+			tick = tick - lookup.start + masterBar.start;
 			// linear search beat within beats
 			var beat = null;
-			var $t1 = bar.get_voices()[0].get_beats();
+			var $t1 = bar.voices[0].beats;
 			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
 				var b = $t1[$t2];
 				// we search for the first beat which 
 				// starts after the tick. 
-				if (ss.isNullOrUndefined(beat) || b.get_start() <= tick) {
+				if (ss.isNullOrUndefined(beat) || b.start <= tick) {
 					beat = b;
 				}
 				else {
@@ -4125,16 +3969,16 @@
 		},
 		$findBar: function(tick) {
 			var bottom = 0;
-			var top = this.get_bars().length - 1;
+			var top = this.bars.length - 1;
 			while (bottom <= top) {
 				var middle = ss.Int32.div(top + bottom, 2);
-				var bar = this.get_bars()[middle];
+				var bar = this.bars[middle];
 				// found?
-				if (tick >= bar.get_start() && tick <= bar.get_end()) {
+				if (tick >= bar.start && tick <= bar.end) {
 					return bar;
 				}
 				// search in lower half 
-				if (tick < bar.get_start()) {
+				if (tick < bar.start) {
 					top = middle - 1;
 				}
 				else {
@@ -4145,106 +3989,82 @@
 		}
 	});
 	ss.initClass($AlphaTab_Audio_Model_MidiTrack, $asm, {
-		get_index: function() {
-			return this.$1$IndexField;
-		},
-		set_index: function(value) {
-			this.$1$IndexField = value;
-		},
-		get_file: function() {
-			return this.$1$FileField;
-		},
-		set_file: function(value) {
-			this.$1$FileField = value;
-		},
-		get_firstEvent: function() {
-			return this.$1$FirstEventField;
-		},
-		set_firstEvent: function(value) {
-			this.$1$FirstEventField = value;
-		},
-		get_lastEvent: function() {
-			return this.$1$LastEventField;
-		},
-		set_lastEvent: function(value) {
-			this.$1$LastEventField = value;
-		},
 		addEvent: function(e) {
-			e.set_track(this);
+			e.track = this;
 			// first entry 
-			if (ss.isNullOrUndefined(this.get_firstEvent())) {
+			if (ss.isNullOrUndefined(this.firstEvent)) {
 				// first and last e
-				this.set_firstEvent(e);
-				this.set_lastEvent(e);
+				this.firstEvent = e;
+				this.lastEvent = e;
 			}
 			else {
 				// is the e after the last one?
-				if (this.get_lastEvent().get_tick() <= e.get_tick()) {
+				if (this.lastEvent.tick <= e.tick) {
 					// make the new e the last one
-					this.get_lastEvent().set_nextEvent(e);
-					e.set_previousEvent(this.get_lastEvent());
-					this.set_lastEvent(e);
+					this.lastEvent.nextEvent = e;
+					e.previousEvent = this.lastEvent;
+					this.lastEvent = e;
 				}
-				else if (this.get_firstEvent().get_tick() > e.get_tick()) {
+				else if (this.firstEvent.tick > e.tick) {
 					// make the new e the new head
-					e.set_nextEvent(this.get_firstEvent());
-					this.get_firstEvent().set_previousEvent(e);
-					this.set_firstEvent(e);
+					e.nextEvent = this.firstEvent;
+					this.firstEvent.previousEvent = e;
+					this.firstEvent = e;
 				}
 				else {
 					// we assume equal tick distribution and search for
 					// the lesser distance,
 					// start inserting on first e or last e?
 					// use smaller delta 
-					var firstDelta = e.get_tick() - this.get_firstEvent().get_tick();
-					var lastDelta = this.get_lastEvent().get_tick() - e.get_tick();
+					var firstDelta = e.tick - this.firstEvent.tick;
+					var lastDelta = this.lastEvent.tick - e.tick;
 					if (firstDelta < lastDelta) {
 						// search position from start to end
-						var previous = this.get_firstEvent();
+						var previous = this.firstEvent;
 						// as long the upcoming e is still before 
 						// the new one
-						while (ss.isValue(previous) && ss.isValue(previous.get_nextEvent()) && previous.get_nextEvent().get_tick() < e.get_tick()) {
+						while (ss.isValue(previous) && ss.isValue(previous.nextEvent) && previous.nextEvent.tick < e.tick) {
 							// we're moving to the next e 
-							previous = previous.get_nextEvent();
+							previous = previous.nextEvent;
 						}
 						if (ss.isNullOrUndefined(previous)) {
 							return;
 						}
 						// insert after the found element
-						var next = previous.get_nextEvent();
+						var next = previous.nextEvent;
 						// update previous
-						previous.set_nextEvent(e);
+						previous.nextEvent = e;
 						// update new
-						e.set_previousEvent(previous);
-						e.set_nextEvent(next);
+						e.previousEvent = previous;
+						e.nextEvent = next;
 						// update next
 						if (ss.isValue(next)) {
-							next.set_previousEvent(e);
+							next.previousEvent = e;
 						}
 					}
 					else {
 						// search position from end to start
-						var next1 = this.get_lastEvent();
+						var next1 = this.lastEvent;
 						// as long the previous e is after the new one
-						while (ss.isValue(next1) && ss.isValue(next1.get_previousEvent()) && next1.get_previousEvent().get_tick() > e.get_tick()) {
+						while (ss.isValue(next1) && ss.isValue(next1.previousEvent) && next1.previousEvent.tick > e.tick) {
 							// we're moving to previous e
-							next1 = next1.get_previousEvent();
+							next1 = next1.previousEvent;
 						}
 						if (ss.isNullOrUndefined(next1)) {
 							return;
 						}
-						var previous1 = next1.get_previousEvent();
+						var previous1 = next1.previousEvent;
 						// update next
-						next1.set_previousEvent(e);
+						next1.previousEvent = e;
 						// update new
-						e.set_nextEvent(next1);
-						e.set_previousEvent(previous1);
+						e.nextEvent = next1;
+						e.previousEvent = previous1;
 						// update previous
 						if (ss.isValue(previous1)) {
-							previous1.set_nextEvent(e);
+							previous1.nextEvent = e;
 						}
 						else {
-							this.set_firstEvent(e);
+							this.firstEvent = e;
 						}
 					}
 				}
@@ -4253,10 +4073,10 @@
 		writeTo: function(s) {
 			// build track data first
 			var trackData = new $AlphaTab_IO_MemoryStream();
-			var current = this.get_firstEvent();
+			var current = this.firstEvent;
 			while (ss.isValue(current)) {
 				current.writeTo(trackData);
-				current = current.get_nextEvent();
+				current = current.nextEvent;
 			}
 			// magic number "MTrk" (0x4D54726B)
 			var b = new $AlphaTab_IO_ByteArray([77, 84, 114, 107]);
@@ -4270,41 +4090,11 @@
 		}
 	});
 	ss.initClass($AlphaTab_Importer_AlphaTexException, $asm, {
-		get_position: function() {
-			return this.$2$PositionField;
-		},
-		set_position: function(value) {
-			this.$2$PositionField = value;
-		},
-		get_nonTerm: function() {
-			return this.$2$NonTermField;
-		},
-		set_nonTerm: function(value) {
-			this.$2$NonTermField = value;
-		},
-		get_expected: function() {
-			return this.$2$ExpectedField;
-		},
-		set_expected: function(value) {
-			this.$2$ExpectedField = value;
-		},
-		get_symbol: function() {
-			return this.$2$SymbolField;
-		},
-		set_symbol: function(value) {
-			this.$2$SymbolField = value;
-		},
-		get_symbolData: function() {
-			return this.$2$SymbolDataField;
-		},
-		set_symbolData: function(value) {
-			this.$2$SymbolDataField = value;
-		},
 		get_message: function() {
-			if (ss.isNullOrUndefined(this.get_symbolData())) {
-				return this.get_position() + ': Error on block ' + this.get_nonTerm() + ', expected a ' + this.get_expected() + ' found a ' + this.get_symbol();
+			if (ss.isNullOrUndefined(this.symbolData)) {
+				return this.position + ': Error on block ' + this.nonTerm + ', expected a ' + this.expected + ' found a ' + this.symbol;
 			}
-			return this.get_position() + ': Error on block ' + this.get_nonTerm() + ', invalid value: ' + this.get_symbolData();
+			return this.position + ': Error on block ' + this.nonTerm + ', invalid value: ' + this.symbolData;
 		}
 	}, ss.Exception);
 	ss.initClass($AlphaTab_Importer_ScoreImporter, $asm, {
@@ -4337,13 +4127,13 @@
 		},
 		$createDefaultScore: function() {
 			this.$_score = new $AlphaTab_Model_Score();
-			this.$_score.set_tempo(120);
-			this.$_score.set_tempoLabel('');
+			this.$_score.tempo = 120;
+			this.$_score.tempoLabel = '';
 			this.$_track = new $AlphaTab_Model_Track();
-			this.$_track.get_playbackInfo().set_program(25);
-			this.$_track.get_playbackInfo().set_primaryChannel($AlphaTab_Importer_AlphaTexImporter.$trackChannels[0]);
-			this.$_track.get_playbackInfo().set_secondaryChannel($AlphaTab_Importer_AlphaTexImporter.$trackChannels[1]);
-			this.$_track.set_tuning($AlphaTab_Model_Tuning.getPresetsFor(6)[0].get_tunings());
+			this.$_track.playbackInfo.program = 25;
+			this.$_track.playbackInfo.primaryChannel = $AlphaTab_Importer_AlphaTexImporter.$trackChannels[0];
+			this.$_track.playbackInfo.secondaryChannel = $AlphaTab_Importer_AlphaTexImporter.$trackChannels[1];
+			this.$_track.tuning = $AlphaTab_Model_Tuning.getPresetsFor(6)[0].tunings;
 			this.$_score.addTrack(this.$_track);
 		},
 		$parseClef: function(str) {
@@ -4588,7 +4378,7 @@
 				if (ss.equals(this.$_syData, 'title')) {
 					this.$newSy();
 					if (this.$_sy === 5) {
-						this.$_score.set_title(this.$_syData.toString());
+						this.$_score.title = this.$_syData.toString();
 					}
 					else {
 						this.$error('title', 5, true);
@@ -4599,7 +4389,7 @@
 				else if (ss.equals(this.$_syData, 'subtitle')) {
 					this.$newSy();
 					if (this.$_sy === 5) {
-						this.$_score.set_subTitle(this.$_syData.toString());
+						this.$_score.subTitle = this.$_syData.toString();
 					}
 					else {
 						this.$error('subtitle', 5, true);
@@ -4610,7 +4400,7 @@
 				else if (ss.equals(this.$_syData, 'artist')) {
 					this.$newSy();
 					if (this.$_sy === 5) {
-						this.$_score.set_artist(this.$_syData.toString());
+						this.$_score.artist = this.$_syData.toString();
 					}
 					else {
 						this.$error('artist', 5, true);
@@ -4621,7 +4411,7 @@
 				else if (ss.equals(this.$_syData, 'album')) {
 					this.$newSy();
 					if (this.$_sy === 5) {
-						this.$_score.set_album(this.$_syData.toString());
+						this.$_score.album = this.$_syData.toString();
 					}
 					else {
 						this.$error('album', 5, true);
@@ -4632,7 +4422,7 @@
 				else if (ss.equals(this.$_syData, 'words')) {
 					this.$newSy();
 					if (this.$_sy === 5) {
-						this.$_score.set_words(this.$_syData.toString());
+						this.$_score.words = this.$_syData.toString();
 					}
 					else {
 						this.$error('words', 5, true);
@@ -4643,7 +4433,7 @@
 				else if (ss.equals(this.$_syData, 'music')) {
 					this.$newSy();
 					if (this.$_sy === 5) {
-						this.$_score.set_music(this.$_syData.toString());
+						this.$_score.music = this.$_syData.toString();
 					}
 					else {
 						this.$error('music', 5, true);
@@ -4654,7 +4444,7 @@
 				else if (ss.equals(this.$_syData, 'copyright')) {
 					this.$newSy();
 					if (this.$_sy === 5) {
-						this.$_score.set_copyright(this.$_syData.toString());
+						this.$_score.copyright = this.$_syData.toString();
 					}
 					else {
 						this.$error('copyright', 5, true);
@@ -4665,7 +4455,7 @@
 				else if (ss.equals(this.$_syData, 'tempo')) {
 					this.$newSy();
 					if (this.$_sy === 2) {
-						this.$_score.set_tempo(ss.unbox(this.$_syData));
+						this.$_score.tempo = ss.unbox(this.$_syData);
 					}
 					else {
 						this.$error('tempo', 2, true);
@@ -4676,7 +4466,7 @@
 				else if (ss.equals(this.$_syData, 'capo')) {
 					this.$newSy();
 					if (this.$_sy === 2) {
-						this.$_track.set_capo(ss.unbox(this.$_syData));
+						this.$_track.capo = ss.unbox(this.$_syData);
 					}
 					else {
 						this.$error('capo', 2, true);
@@ -4687,9 +4477,9 @@
 				else if (ss.equals(this.$_syData, 'tuning')) {
 					this.$newSy();
 					if (this.$_sy === 6) {
-						this.$_track.set_tuning([]);
+						this.$_track.tuning = [];
 						do {
-							ss.add(this.$_track.get_tuning(), this.$parseTuning(this.$_syData.toString()));
+							ss.add(this.$_track.tuning, this.$parseTuning(this.$_syData.toString()));
 							this.$newSy();
 						} while (this.$_sy === 6);
 					}
@@ -4703,7 +4493,7 @@
 					if (this.$_sy === 2) {
 						var instrument = ss.unbox(this.$_syData);
 						if (instrument >= 0 && instrument <= 128) {
-							this.$_track.get_playbackInfo().set_program(ss.unbox(this.$_syData));
+							this.$_track.playbackInfo.program = ss.unbox(this.$_syData);
 						}
 						else {
 							this.$error('instrument', 2, false);
@@ -4711,7 +4501,7 @@
 					}
 					else if (this.$_sy === 5) {
 						var instrumentName = this.$_syData.toString();
-						this.$_track.get_playbackInfo().set_program($AlphaTab_Audio_GeneralMidi.getValue(instrumentName));
+						this.$_track.playbackInfo.program = $AlphaTab_Audio_GeneralMidi.getValue(instrumentName);
 					}
 					else {
 						this.$error('instrument', 2, true);
@@ -4746,11 +4536,11 @@
 			this.$_score.addMasterBar(master);
 			var bar = new $AlphaTab_Model_Bar();
 			this.$_track.addBar(bar);
-			if (master.get_index() > 0) {
-				master.set_keySignature(master.get_previousMasterBar().get_keySignature());
-				master.set_timeSignatureDenominator(master.get_previousMasterBar().get_timeSignatureDenominator());
-				master.set_timeSignatureNumerator(master.get_previousMasterBar().get_timeSignatureNumerator());
-				bar.set_clef(bar.get_previousBar().get_clef());
+			if (master.index > 0) {
+				master.keySignature = master.previousMasterBar.keySignature;
+				master.timeSignatureDenominator = master.previousMasterBar.timeSignatureDenominator;
+				master.timeSignatureNumerator = master.previousMasterBar.timeSignatureNumerator;
+				bar.clef = bar.previousBar.clef;
 			}
 			this.$barMeta(bar);
 			var voice = new $AlphaTab_Model_Voice();
@@ -4833,7 +4623,7 @@
 				this.$newSy();
 			}
 			else {
-				beat.set_duration(this.$_currentDuration);
+				beat.duration = this.$_currentDuration;
 			}
 			// beat multiplier (repeat beat n times)
 			var beatRepeat = 1;
@@ -4871,42 +4661,42 @@
 		},
 		$applyBeatEffect: function(beat) {
 			if (ss.equals(this.$_syData, 'f')) {
-				beat.set_fadeIn(true);
+				beat.fadeIn = true;
 				this.$newSy();
 				return true;
 			}
 			if (ss.equals(this.$_syData, 'v')) {
-				beat.set_vibrato(1);
+				beat.vibrato = 1;
 				this.$newSy();
 				return true;
 			}
 			if (ss.equals(this.$_syData, 's')) {
-				beat.set_slap(true);
+				beat.slap = true;
 				this.$newSy();
 				return true;
 			}
 			if (ss.equals(this.$_syData, 'p')) {
-				beat.set_pop(true);
+				beat.pop = true;
 				this.$newSy();
 				return true;
 			}
 			if (ss.equals(this.$_syData, 'dd')) {
-				beat.set_dots(2);
+				beat.dots = 2;
 				this.$newSy();
 				return true;
 			}
 			if (ss.equals(this.$_syData, 'd')) {
-				beat.set_dots(1);
+				beat.dots = 1;
 				this.$newSy();
 				return true;
 			}
 			if (ss.equals(this.$_syData, 'su')) {
-				beat.set_pickStroke(1);
+				beat.pickStroke = 1;
 				this.$newSy();
 				return true;
 			}
 			if (ss.equals(this.$_syData, 'sd')) {
-				beat.set_pickStroke(2);
+				beat.pickStroke = 2;
 				this.$newSy();
 				return true;
 			}
@@ -4919,43 +4709,43 @@
 				var tuplet = ss.unbox(this.$_syData);
 				switch (tuplet) {
 					case 3: {
-						beat.set_tupletDenominator(3);
-						beat.set_tupletNumerator(2);
+						beat.tupletDenominator = 3;
+						beat.tupletNumerator = 2;
 						break;
 					}
 					case 5: {
-						beat.set_tupletDenominator(5);
-						beat.set_tupletNumerator(4);
+						beat.tupletDenominator = 5;
+						beat.tupletNumerator = 4;
 						break;
 					}
 					case 6: {
-						beat.set_tupletDenominator(6);
-						beat.set_tupletNumerator(4);
+						beat.tupletDenominator = 6;
+						beat.tupletNumerator = 4;
 						break;
 					}
 					case 7: {
-						beat.set_tupletDenominator(7);
-						beat.set_tupletNumerator(4);
+						beat.tupletDenominator = 7;
+						beat.tupletNumerator = 4;
 						break;
 					}
 					case 9: {
-						beat.set_tupletDenominator(9);
-						beat.set_tupletNumerator(8);
+						beat.tupletDenominator = 9;
+						beat.tupletNumerator = 8;
 						break;
 					}
 					case 10: {
-						beat.set_tupletDenominator(10);
-						beat.set_tupletNumerator(8);
+						beat.tupletDenominator = 10;
+						beat.tupletNumerator = 8;
 						break;
 					}
 					case 11: {
-						beat.set_tupletDenominator(11);
-						beat.set_tupletNumerator(8);
+						beat.tupletDenominator = 11;
+						beat.tupletNumerator = 8;
 						break;
 					}
 					case 12: {
-						beat.set_tupletDenominator(12);
-						beat.set_tupletNumerator(8);
+						beat.tupletDenominator = 12;
+						beat.tupletNumerator = 8;
 						break;
 					}
 				}
@@ -4976,18 +4766,18 @@
 						this.$error('tremolobar-effect', 2, true);
 						return false;
 					}
-					ss.add(beat.get_whammyBarPoints(), new $AlphaTab_Model_BendPoint(0, ss.unbox(this.$_syData)));
+					ss.add(beat.whammyBarPoints, new $AlphaTab_Model_BendPoint(0, ss.unbox(this.$_syData)));
 					this.$newSy();
 				}
-				while (beat.get_whammyBarPoints().length > 60) {
-					ss.removeAt(beat.get_whammyBarPoints(), beat.get_whammyBarPoints().length - 1);
+				while (beat.whammyBarPoints.length > 60) {
+					ss.removeAt(beat.whammyBarPoints, beat.whammyBarPoints.length - 1);
 				}
 				// set positions
-				var count = beat.get_whammyBarPoints().length;
+				var count = beat.whammyBarPoints.length;
 				var step = ss.Int32.div(60, count);
 				var i = 0;
 				while (i < count) {
-					beat.get_whammyBarPoints()[i].set_offset(Math.min(60, i * step));
+					beat.whammyBarPoints[i].offset = Math.min(60, i * step);
 					i++;
 				}
 				this.$_allowNegatives = false;
@@ -5019,7 +4809,7 @@
 				this.$error('note-string', 2, true);
 			}
 			var string = ss.unbox(this.$_syData);
-			if (string < 1 || string > this.$_track.get_tuning().length) {
+			if (string < 1 || string > this.$_track.tuning.length) {
 				this.$error('note-string', 2, false);
 			}
 			this.$newSy();
@@ -5028,11 +4818,11 @@
 			var note = new $AlphaTab_Model_Note();
 			this.$noteEffects(note);
 			// create note
-			note.set_string(this.$_track.get_tuning().length - (string - 1));
-			note.set_isDead(isDead);
-			note.set_isTieDestination(isTie);
+			note.string = this.$_track.tuning.length - (string - 1);
+			note.isDead = isDead;
+			note.isTieDestination = isTie;
 			if (!isTie) {
-				note.set_fret(fret);
+				note.fret = fret;
 			}
 			beat.addNote(note);
 		},
@@ -5056,18 +4846,18 @@
 							this.$error('bend-effect-value', 2, true);
 						}
 						var bendValue = ss.unbox(this.$_syData);
-						ss.add(note.get_bendPoints(), new $AlphaTab_Model_BendPoint(0, Math.abs(bendValue)));
+						ss.add(note.bendPoints, new $AlphaTab_Model_BendPoint(0, Math.abs(bendValue)));
 						this.$newSy();
 					}
-					while (note.get_bendPoints().length > 60) {
-						ss.removeAt(note.get_bendPoints(), note.get_bendPoints().length - 1);
+					while (note.bendPoints.length > 60) {
+						ss.removeAt(note.bendPoints, note.bendPoints.length - 1);
 					}
 					// set positions
-					var count = note.get_bendPoints().length;
+					var count = note.bendPoints.length;
 					var step = ss.Int32.div(60, count);
 					var i = 0;
 					while (i < count) {
-						note.get_bendPoints()[i].set_offset(Math.min(60, i * step));
+						note.bendPoints[i].offset = Math.min(60, i * step);
 						i++;
 					}
 					if (this.$_sy !== 8) {
@@ -5076,34 +4866,34 @@
 					this.$newSy();
 				}
 				else if (syData === 'nh') {
-					note.set_harmonicType(1);
+					note.harmonicType = 1;
 					this.$newSy();
 				}
 				else if (syData === 'ah') {
 					// todo: Artificial Key
-					note.set_harmonicType(2);
+					note.harmonicType = 2;
 					this.$newSy();
 				}
 				else if (syData === 'th') {
 					// todo: store tapped fret in data
-					note.set_harmonicType(4);
+					note.harmonicType = 4;
 					this.$newSy();
 				}
 				else if (syData === 'ph') {
-					note.set_harmonicType(3);
+					note.harmonicType = 3;
 					this.$newSy();
 				}
 				else if (syData === 'sh') {
-					note.set_harmonicType(5);
+					note.harmonicType = 5;
 					this.$newSy();
 				}
 				else if (syData === 'gr') {
 					this.$newSy();
 					if (ss.equals(this.$_syData, 'ob')) {
-						note.get_beat().set_graceType(1);
+						note.beat.graceType = 1;
 					}
 					else {
-						note.get_beat().set_graceType(2);
+						note.beat.graceType = 2;
 					}
 					// \gr fret duration transition
 					this.$newSy();
@@ -5137,8 +4927,8 @@
 						}
 						this.$newSy();
 					}
-					note.set_trillValue(fret + note.get_stringTuning());
-					note.set_trillSpeed(duration);
+					note.trillValue = fret + note.get_stringTuning();
+					note.trillSpeed = duration;
 				}
 				else if (syData === 'tp') {
 					this.$newSy();
@@ -5164,49 +4954,49 @@
 						}
 						this.$newSy();
 					}
-					note.get_beat().set_tremoloSpeed(new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [$AlphaTab_Model_Duration]))(duration1));
+					note.beat.tremoloSpeed = new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [$AlphaTab_Model_Duration]))(duration1);
 				}
 				else if (syData === 'v') {
 					this.$newSy();
-					note.set_vibrato(1);
+					note.vibrato = 1;
 				}
 				else if (syData === 'sl') {
 					this.$newSy();
-					note.set_slideType(2);
+					note.slideType = 2;
 				}
 				else if (syData === 'ss') {
 					this.$newSy();
-					note.set_slideType(1);
+					note.slideType = 1;
 				}
 				else if (syData === 'h') {
 					this.$newSy();
-					note.set_isHammerPullOrigin(true);
+					note.isHammerPullOrigin = true;
 				}
 				else if (syData === 'g') {
 					this.$newSy();
-					note.set_isGhost(true);
+					note.isGhost = true;
 				}
 				else if (syData === 'ac') {
 					this.$newSy();
-					note.set_accentuated(1);
+					note.accentuated = 1;
 				}
 				else if (syData === 'hac') {
 					this.$newSy();
-					note.set_accentuated(2);
+					note.accentuated = 2;
 				}
 				else if (syData === 'pm') {
 					this.$newSy();
-					note.set_isPalmMute(true);
+					note.isPalmMute = true;
 				}
 				else if (syData === 'st') {
 					this.$newSy();
-					note.set_isStaccato(true);
+					note.isStaccato = true;
 				}
 				else if (syData === 'lr') {
 					this.$newSy();
-					note.set_isLetRing(true);
+					note.isLetRing = true;
 				}
-				else if (this.$applyBeatEffect(note.get_beat())) {
+				else if (this.$applyBeatEffect(note.beat)) {
 					// Success
 				}
 				else {
@@ -5254,36 +5044,36 @@
 					if (this.$_sy !== 2) {
 						this.$error('timesignature-numerator', 2, true);
 					}
-					master.set_timeSignatureNumerator(ss.unbox(this.$_syData));
+					master.timeSignatureNumerator = ss.unbox(this.$_syData);
 					this.$newSy();
 					if (this.$_sy !== 2) {
 						this.$error('timesignature-denominator', 2, true);
 					}
-					master.set_timeSignatureDenominator(ss.unbox(this.$_syData));
+					master.timeSignatureDenominator = ss.unbox(this.$_syData);
 				}
 				else if (ss.equals(this.$_syData, 'ro')) {
-					master.set_isRepeatStart(true);
+					master.isRepeatStart = true;
 				}
 				else if (ss.equals(this.$_syData, 'rc')) {
 					this.$newSy();
 					if (this.$_sy !== 2) {
 						this.$error('repeatclose', 2, true);
 					}
-					master.set_repeatCount(ss.unbox(this.$_syData) - 1);
+					master.repeatCount = ss.unbox(this.$_syData) - 1;
 				}
 				else if (ss.equals(this.$_syData, 'ks')) {
 					this.$newSy();
 					if (this.$_sy !== 5) {
 						this.$error('keysignature', 5, true);
 					}
-					master.set_keySignature(this.$parseKeySignature(this.$_syData.toString()));
+					master.keySignature = this.$parseKeySignature(this.$_syData.toString());
 				}
 				else if (ss.equals(this.$_syData, 'clef')) {
 					this.$newSy();
 					if (this.$_sy !== 5 && this.$_sy !== 6) {
 						this.$error('clef', 5, true);
 					}
-					bar.set_clef(this.$parseClef(this.$_syData.toString()));
+					bar.clef = this.$parseClef(this.$_syData.toString());
 				}
 				else {
 					this.$error('measure-effects', 5, false);
@@ -5318,10 +5108,10 @@
 			// page setup since GP5
 			if (this.$_versionNumber >= 500) {
 				this.readPageSetup();
-				this.$_score.set_tempoLabel(this.readStringIntByte());
+				this.$_score.tempoLabel = this.readStringIntByte();
 			}
 			// tempo stuff
-			this.$_score.set_tempo(this.readInt32());
+			this.$_score.tempo = this.readInt32();
 			if (this.$_versionNumber >= 510) {
 				this.readBool();
 				// hide tempo?
@@ -5378,15 +5168,15 @@
 			this.$_versionNumber = 100 * parseInt(version.substr(0, dot)) + parseInt(version.substring(dot + 1));
 		},
 		readScoreInformation: function() {
-			this.$_score.set_title(this.readStringIntUnused());
-			this.$_score.set_subTitle(this.readStringIntUnused());
-			this.$_score.set_artist(this.readStringIntUnused());
-			this.$_score.set_album(this.readStringIntUnused());
-			this.$_score.set_words(this.readStringIntUnused());
-			this.$_score.set_music(((this.$_versionNumber >= 500) ? this.readStringIntUnused() : this.$_score.get_words()));
-			this.$_score.set_copyright(this.readStringIntUnused());
-			this.$_score.set_tab(this.readStringIntUnused());
-			this.$_score.set_instructions(this.readStringIntUnused());
+			this.$_score.title = this.readStringIntUnused();
+			this.$_score.subTitle = this.readStringIntUnused();
+			this.$_score.artist = this.readStringIntUnused();
+			this.$_score.album = this.readStringIntUnused();
+			this.$_score.words = this.readStringIntUnused();
+			this.$_score.music = ((this.$_versionNumber >= 500) ? this.readStringIntUnused() : this.$_score.words);
+			this.$_score.copyright = this.readStringIntUnused();
+			this.$_score.tab = this.readStringIntUnused();
+			this.$_score.instructions = this.readStringIntUnused();
 			var noticeLines = this.readInt32();
 			var notice = new ss.StringBuilder();
 			for (var i = 0; i < noticeLines; i++) {
@@ -5395,7 +5185,7 @@
 				}
 				notice.append(this.readStringIntUnused());
 			}
-			this.$_score.set_notices(notice.toString());
+			this.$_score.notices = notice.toString();
 		},
 		readLyrics: function() {
 			this.$_lyrics = [];
@@ -5433,11 +5223,11 @@
 			this.$_playbackInfos = [];
 			for (var i = 0; i < 64; i++) {
 				var info = new $AlphaTab_Model_PlaybackInformation();
-				info.set_primaryChannel(i);
-				info.set_secondaryChannel(i);
-				info.set_program(this.readInt32());
-				info.set_volume(this._data.readByte());
-				info.set_balance(this._data.readByte());
+				info.primaryChannel = i;
+				info.secondaryChannel = i;
+				info.program = this.readInt32();
+				info.volume = this._data.readByte();
+				info.balance = this._data.readByte();
 				this.skip(6);
 				ss.add(this.$_playbackInfos, info);
 			}
@@ -5449,36 +5239,36 @@
 		},
 		readMasterBar: function() {
 			var previousMasterBar = null;
-			if (this.$_score.get_masterBars().length > 0) {
-				previousMasterBar = this.$_score.get_masterBars()[this.$_score.get_masterBars().length - 1];
+			if (this.$_score.masterBars.length > 0) {
+				previousMasterBar = this.$_score.masterBars[this.$_score.masterBars.length - 1];
 			}
 			var newMasterBar = new $AlphaTab_Model_MasterBar();
 			var flags = this._data.readByte();
 			// time signature
 			if ((flags & 1) !== 0) {
-				newMasterBar.set_timeSignatureNumerator(this._data.readByte());
+				newMasterBar.timeSignatureNumerator = this._data.readByte();
 			}
 			else if (ss.isValue(previousMasterBar)) {
-				newMasterBar.set_timeSignatureNumerator(previousMasterBar.get_timeSignatureNumerator());
+				newMasterBar.timeSignatureNumerator = previousMasterBar.timeSignatureNumerator;
 			}
 			if ((flags & 2) !== 0) {
-				newMasterBar.set_timeSignatureDenominator(this._data.readByte());
+				newMasterBar.timeSignatureDenominator = this._data.readByte();
 			}
 			else if (ss.isValue(previousMasterBar)) {
-				newMasterBar.set_timeSignatureDenominator(previousMasterBar.get_timeSignatureDenominator());
+				newMasterBar.timeSignatureDenominator = previousMasterBar.timeSignatureDenominator;
 			}
 			// repeatings
-			newMasterBar.set_isRepeatStart((flags & 4) !== 0);
+			newMasterBar.isRepeatStart = (flags & 4) !== 0;
 			if ((flags & 8) !== 0) {
-				newMasterBar.set_repeatCount(((this.$_versionNumber >= 500) ? this._data.readByte() : 1));
+				newMasterBar.repeatCount = ((this.$_versionNumber >= 500) ? this._data.readByte() : 1);
 			}
 			// marker
 			if ((flags & 32) !== 0) {
 				var section = new $AlphaTab_Model_Section();
-				section.set_text(this.readStringIntByte());
-				section.set_marker('');
+				section.text = this.readStringIntByte();
+				section.marker = '';
 				this.readColor();
-				newMasterBar.set_section(section);
+				newMasterBar.section = section;
 			}
 			// alternate endings
 			if ((flags & 16) !== 0) {
@@ -5492,10 +5282,10 @@
 							break;
 						}
 						// found the opening?
-						if (currentMasterBar.get_isRepeatStart()) {
+						if (currentMasterBar.isRepeatStart) {
 							break;
 						}
-						existentAlternatives |= currentMasterBar.get_alternateEndings();
+						existentAlternatives |= currentMasterBar.alternateEndings;
 					}
 					// now calculate the alternative for this bar
 					var repeatAlternative = 0;
@@ -5507,47 +5297,47 @@
 							repeatAlternative |= repeating;
 						}
 					}
-					newMasterBar.set_alternateEndings(repeatAlternative);
+					newMasterBar.alternateEndings = repeatAlternative;
 				}
 				else {
-					newMasterBar.set_alternateEndings(this._data.readByte());
+					newMasterBar.alternateEndings = this._data.readByte();
 				}
 			}
 			// keysignature
 			if ((flags & 64) !== 0) {
-				newMasterBar.set_keySignature(this.$readSignedByte());
+				newMasterBar.keySignature = this.$readSignedByte();
 				this._data.readByte();
 				// keysignature type
 			}
 			else if (ss.isValue(previousMasterBar)) {
-				newMasterBar.set_keySignature(previousMasterBar.get_keySignature());
+				newMasterBar.keySignature = previousMasterBar.keySignature;
 			}
 			if (this.$_versionNumber >= 500 && (flags & 3) !== 0) {
 				this.skip(4);
 			}
 			// better alternate ending mask in GP5
 			if (this.$_versionNumber >= 500 && (flags & 16) === 0) {
-				newMasterBar.set_alternateEndings(this._data.readByte());
+				newMasterBar.alternateEndings = this._data.readByte();
 			}
 			// tripletfeel
 			if (this.$_versionNumber >= 500) {
 				var tripletFeel = this._data.readByte();
 				switch (tripletFeel) {
 					case 1: {
-						newMasterBar.set_tripletFeel(2);
+						newMasterBar.tripletFeel = 2;
 						break;
 					}
 					case 2: {
-						newMasterBar.set_tripletFeel(1);
+						newMasterBar.tripletFeel = 1;
 						break;
 					}
 				}
 				this._data.readByte();
 			}
 			else {
-				newMasterBar.set_tripletFeel(this.$_globalTripletFeel);
+				newMasterBar.tripletFeel = this.$_globalTripletFeel;
 			}
-			newMasterBar.set_isDoubleBar((flags & 128) !== 0);
+			newMasterBar.isDoubleBar = (flags & 128) !== 0;
 			this.$_score.addMasterBar(newMasterBar);
 		},
 		readTracks: function() {
@@ -5559,13 +5349,13 @@
 			var newTrack = new $AlphaTab_Model_Track();
 			this.$_score.addTrack(newTrack);
 			var flags = this._data.readByte();
-			newTrack.set_name(this.readStringByteLength(40));
-			newTrack.set_isPercussion((flags & 1) !== 0);
+			newTrack.name = this.readStringByteLength(40);
+			newTrack.isPercussion = (flags & 1) !== 0;
 			var stringCount = this.readInt32();
 			for (var i = 0; i < 7; i++) {
 				var tuning = this.readInt32();
 				if (stringCount > i) {
-					ss.add(newTrack.get_tuning(), tuning);
+					ss.add(newTrack.tuning, tuning);
 				}
 			}
 			var port = this.readInt32();
@@ -5575,14 +5365,14 @@
 			// Fretcount
 			if (index >= 0 && index < this.$_playbackInfos.length) {
 				var info = this.$_playbackInfos[index];
-				info.set_port(port);
-				info.set_isSolo((flags & 16) !== 0);
-				info.set_isMute((flags & 32) !== 0);
-				info.set_secondaryChannel(effectChannel);
-				newTrack.set_playbackInfo(info);
+				info.port = port;
+				info.isSolo = (flags & 16) !== 0;
+				info.isMute = (flags & 32) !== 0;
+				info.secondaryChannel = effectChannel;
+				newTrack.playbackInfo = info;
 			}
-			newTrack.set_capo(this.readInt32());
-			newTrack.set_color(this.readColor());
+			newTrack.capo = this.readInt32();
+			newTrack.color = this.readColor();
 			if (this.$_versionNumber >= 500) {
 				// flags for 
 				//  0x01 -> show tablature
@@ -5605,14 +5395,14 @@
 		readBars: function() {
 			for (var i = 0; i < this.$_barCount; i++) {
 				for (var t = 0; t < this.$_trackCount; t++) {
-					this.readBar(this.$_score.get_tracks()[t]);
+					this.readBar(this.$_score.tracks[t]);
 				}
 			}
 		},
 		readBar: function(track) {
 			var newBar = new $AlphaTab_Model_Bar();
-			if (track.get_isPercussion()) {
-				newBar.set_clef(0);
+			if (track.isPercussion) {
+				newBar.clef = 0;
 			}
 			track.addBar(newBar);
 			var voiceCount = 1;
@@ -5639,63 +5429,63 @@
 			var newBeat = new $AlphaTab_Model_Beat();
 			var flags = this._data.readByte();
 			if ((flags & 1) !== 0) {
-				newBeat.set_dots(1);
+				newBeat.dots = 1;
 			}
 			if ((flags & 64) !== 0) {
 				var type = this._data.readByte();
-				newBeat.set_isEmpty((type & 2) === 0);
+				newBeat.isEmpty = (type & 2) === 0;
 			}
 			voice.addBeat(newBeat);
 			var duration = this.$readSignedByte();
 			switch (duration) {
 				case -2: {
-					newBeat.set_duration(1);
+					newBeat.duration = 1;
 					break;
 				}
 				case -1: {
-					newBeat.set_duration(2);
+					newBeat.duration = 2;
 					break;
 				}
 				case 0: {
-					newBeat.set_duration(4);
+					newBeat.duration = 4;
 					break;
 				}
 				case 1: {
-					newBeat.set_duration(8);
+					newBeat.duration = 8;
 					break;
 				}
 				case 2: {
-					newBeat.set_duration(16);
+					newBeat.duration = 16;
 					break;
 				}
 				case 3: {
-					newBeat.set_duration(32);
+					newBeat.duration = 32;
 					break;
 				}
 				case 4: {
-					newBeat.set_duration(64);
+					newBeat.duration = 64;
 					break;
 				}
 				default: {
-					newBeat.set_duration(4);
+					newBeat.duration = 4;
 					break;
 				}
 			}
 			if ((flags & 32) !== 0) {
-				newBeat.set_tupletNumerator(this.readInt32());
-				switch (newBeat.get_tupletNumerator()) {
+				newBeat.tupletNumerator = this.readInt32();
+				switch (newBeat.tupletNumerator) {
 					case 1: {
-						newBeat.set_tupletDenominator(1);
+						newBeat.tupletDenominator = 1;
 						break;
 					}
 					case 3: {
-						newBeat.set_tupletDenominator(2);
+						newBeat.tupletDenominator = 2;
 						break;
 					}
 					case 5:
 					case 6:
 					case 7: {
-						newBeat.set_tupletDenominator(4);
+						newBeat.tupletDenominator = 4;
 						break;
 					}
 					case 9:
@@ -5703,7 +5493,7 @@
 					case 11:
 					case 12:
 					case 13: {
-						newBeat.set_tupletDenominator(8);
+						newBeat.tupletDenominator = 8;
 						break;
 					}
 					case 2:
@@ -5712,8 +5502,8 @@
 						break;
 					}
 					default: {
-						newBeat.set_tupletNumerator(1);
-						newBeat.set_tupletDenominator(1);
+						newBeat.tupletNumerator = 1;
+						newBeat.tupletDenominator = 1;
 						break;
 					}
 				}
@@ -5722,7 +5512,7 @@
 				this.readChord(newBeat);
 			}
 			if ((flags & 4) !== 0) {
-				newBeat.set_text(this.readStringIntUnused());
+				newBeat.text = this.readStringIntUnused();
 			}
 			if ((flags & 8) !== 0) {
 				this.readBeatEffects(newBeat);
@@ -5732,7 +5522,7 @@
 			}
 			var stringFlags = this._data.readByte();
 			for (var i = 6; i >= 0; i--) {
-				if ((stringFlags & 1 << i) !== 0 && 6 - i < track.get_tuning().length) {
+				if ((stringFlags & 1 << i) !== 0 && 6 - i < track.tuning.length) {
 					this.readNote(track, bar, voice, newBeat, 6 - i);
 				}
 			}
@@ -5749,13 +5539,13 @@
 			var chordId = ss.Guid.newGuid();
 			if (this.$_versionNumber >= 500) {
 				this.skip(17);
-				chord.set_name(this.readStringByteLength(21));
+				chord.name = this.readStringByteLength(21);
 				this.skip(4);
-				chord.set_firstFret(this.readInt32());
+				chord.firstFret = this.readInt32();
 				for (var i = 0; i < 7; i++) {
 					var fret = this.readInt32();
-					if (i < chord.get_strings().length) {
-						ss.add(chord.get_strings(), fret);
+					if (i < chord.strings.length) {
+						ss.add(chord.strings, fret);
 					}
 				}
 				this.skip(32);
@@ -5772,17 +5562,17 @@
 					// Diminished/Augmented (4)
 					// Add (1)
 					this.skip(16);
-					chord.set_name(this.readStringByteLength(21));
+					chord.name = this.readStringByteLength(21);
 					// Unused (2)
 					// Fifth (1)
 					// Ninth (1)
 					// Eleventh (1)
 					this.skip(4);
-					chord.set_firstFret(this.readInt32());
+					chord.firstFret = this.readInt32();
 					for (var i1 = 0; i1 < 7; i1++) {
 						var fret1 = this.readInt32();
-						if (i1 < chord.get_strings().length) {
-							ss.add(chord.get_strings(), fret1);
+						if (i1 < chord.strings.length) {
+							ss.add(chord.strings, fret1);
 						}
 					}
 					// number of barres (1)
@@ -5798,11 +5588,11 @@
 				else {
 					// unknown
 					this.skip(25);
-					chord.set_name(this.readStringByteLength(34));
-					chord.set_firstFret(this.readInt32());
+					chord.name = this.readStringByteLength(34);
+					chord.firstFret = this.readInt32();
 					for (var i2 = 0; i2 < 6; i2++) {
 						var fret2 = this.readInt32();
-						ss.add(chord.get_strings(), fret2);
+						ss.add(chord.strings, fret2);
 					}
 					// unknown
 					this.skip(36);
@@ -5810,20 +5600,20 @@
 			}
 			else {
 				var strings = ((this.$_versionNumber >= 406) ? 7 : 6);
-				chord.set_name(this.readStringIntByte());
-				chord.set_firstFret(this.readInt32());
-				if (chord.get_firstFret() > 0) {
+				chord.name = this.readStringIntByte();
+				chord.firstFret = this.readInt32();
+				if (chord.firstFret > 0) {
 					for (var i3 = 0; i3 < strings; i3++) {
 						var fret3 = this.readInt32();
-						if (i3 < chord.get_strings().length) {
-							ss.add(chord.get_strings(), fret3);
+						if (i3 < chord.strings.length) {
+							ss.add(chord.strings, fret3);
 						}
 					}
 				}
 			}
-			if (!ss.isNullOrEmptyString(chord.get_name())) {
-				beat.set_chordId(chordId.toString());
-				beat.get_voice().get_bar().get_track().get_chords().set_item(beat.get_chordId(), chord);
+			if (!ss.isNullOrEmptyString(chord.name)) {
+				beat.chordId = chordId.toString();
+				beat.voice.bar.track.chords.set_item(beat.chordId, chord);
 			}
 		},
 		readBeatEffects: function(beat) {
@@ -5832,24 +5622,24 @@
 			if (this.$_versionNumber >= 400) {
 				flags2 = this._data.readByte();
 			}
-			beat.set_fadeIn((flags & 16) !== 0);
+			beat.fadeIn = (flags & 16) !== 0;
 			if ((flags & 1) !== 0 || (flags & 2) !== 0) {
-				beat.set_vibrato(1);
+				beat.vibrato = 1;
 			}
-			beat.set_hasRasgueado((flags2 & 1) !== 0);
+			beat.hasRasgueado = (flags2 & 1) !== 0;
 			if ((flags & 32) !== 0 && this.$_versionNumber >= 400) {
 				var slapPop = this.$readSignedByte();
 				switch (slapPop) {
 					case 1: {
-						beat.set_tap(true);
+						beat.tap = true;
 						break;
 					}
 					case 2: {
-						beat.set_slap(true);
+						beat.slap = true;
 						break;
 					}
 					case 3: {
-						beat.set_pop(true);
+						beat.pop = true;
 						break;
 					}
 				}
@@ -5858,15 +5648,15 @@
 				var slapPop1 = this.$readSignedByte();
 				switch (slapPop1) {
 					case 1: {
-						beat.set_tap(true);
+						beat.tap = true;
 						break;
 					}
 					case 2: {
-						beat.set_slap(true);
+						beat.slap = true;
 						break;
 					}
 					case 3: {
-						beat.set_pop(true);
+						beat.pop = true;
 						break;
 					}
 				}
@@ -5887,26 +5677,26 @@
 					strokeDown = this._data.readByte();
 				}
 				if (strokeUp > 0) {
-					beat.set_brushType(1);
-					beat.set_brushDuration($AlphaTab_Importer_Gp3To5Importer.$toStrokeValue(strokeUp));
+					beat.brushType = 1;
+					beat.brushDuration = $AlphaTab_Importer_Gp3To5Importer.$toStrokeValue(strokeUp);
 				}
 				else if (strokeDown > 0) {
-					beat.set_brushType(2);
-					beat.set_brushDuration($AlphaTab_Importer_Gp3To5Importer.$toStrokeValue(strokeDown));
+					beat.brushType = 2;
+					beat.brushDuration = $AlphaTab_Importer_Gp3To5Importer.$toStrokeValue(strokeDown);
 				}
 			}
 			if ((flags2 & 2) !== 0) {
 				switch (this.$readSignedByte()) {
 					case 0: {
-						beat.set_pickStroke(0);
+						beat.pickStroke = 0;
 						break;
 					}
 					case 1: {
-						beat.set_pickStroke(1);
+						beat.pickStroke = 1;
 						break;
 					}
 					case 2: {
-						beat.set_pickStroke(2);
+						beat.pickStroke = 2;
 						break;
 					}
 				}
@@ -5921,38 +5711,38 @@
 			if (pointCount > 0) {
 				for (var i = 0; i < pointCount; i++) {
 					var point = new $AlphaTab_Model_BendPoint(0, 0);
-					point.set_offset(this.readInt32());
+					point.offset = this.readInt32();
 					// 0...60
-					point.set_value(ss.Int32.div(this.readInt32(), $AlphaTab_Importer_Gp3To5Importer.$bendStep));
+					point.value = ss.Int32.div(this.readInt32(), $AlphaTab_Importer_Gp3To5Importer.$bendStep);
 					// 0..12 (amount of quarters)
 					this.readBool();
 					// vibrato
-					ss.add(beat.get_whammyBarPoints(), point);
+					ss.add(beat.whammyBarPoints, point);
 				}
 			}
 		},
 		readMixTableChange: function(beat) {
 			var tableChange = new $AlphaTab_Importer_MixTableChange();
-			tableChange.set_instrument(this._data.readByte());
+			tableChange.instrument = this._data.readByte();
 			if (this.$_versionNumber >= 500) {
 				this.skip(16);
 				// Rse Info 
 			}
-			tableChange.set_volume(this.$readSignedByte());
-			tableChange.set_balance(this.$readSignedByte());
+			tableChange.volume = this.$readSignedByte();
+			tableChange.balance = this.$readSignedByte();
 			var chorus = this.$readSignedByte();
 			var reverb = this.$readSignedByte();
 			var phaser = this.$readSignedByte();
 			var tremolo = this.$readSignedByte();
 			if (this.$_versionNumber >= 500) {
-				tableChange.set_tempoName(this.readStringIntByte());
+				tableChange.tempoName = this.readStringIntByte();
 			}
-			tableChange.set_tempo(this.readInt32());
+			tableChange.tempo = this.readInt32();
 			// durations
-			if (tableChange.get_volume() >= 0) {
+			if (tableChange.volume >= 0) {
 				this._data.readByte();
 			}
-			if (tableChange.get_balance() >= 0) {
+			if (tableChange.balance >= 0) {
 				this._data.readByte();
 			}
 			if (chorus >= 0) {
@@ -5967,8 +5757,8 @@
 			if (tremolo >= 0) {
 				this._data.readByte();
 			}
-			if (tableChange.get_tempo() >= 0) {
-				tableChange.set_duration(this.$readSignedByte());
+			if (tableChange.tempo >= 0) {
+				tableChange.duration = this.$readSignedByte();
 				if (this.$_versionNumber >= 510) {
 					this._data.readByte();
 					// hideTempo (bool)
@@ -5987,34 +5777,34 @@
 				this.readStringIntByte();
 				this.readStringIntByte();
 			}
-			if (tableChange.get_volume() >= 0) {
+			if (tableChange.volume >= 0) {
 				var volumeAutomation = new $AlphaTab_Model_Automation();
-				volumeAutomation.set_isLinear(true);
-				volumeAutomation.set_type(1);
-				volumeAutomation.set_value(tableChange.get_volume());
-				ss.add(beat.get_automations(), volumeAutomation);
+				volumeAutomation.isLinear = true;
+				volumeAutomation.type = 1;
+				volumeAutomation.value = tableChange.volume;
+				ss.add(beat.automations, volumeAutomation);
 			}
-			if (tableChange.get_balance() >= 0) {
+			if (tableChange.balance >= 0) {
 				var balanceAutomation = new $AlphaTab_Model_Automation();
-				balanceAutomation.set_isLinear(true);
-				balanceAutomation.set_type(3);
-				balanceAutomation.set_value(tableChange.get_balance());
-				ss.add(beat.get_automations(), balanceAutomation);
+				balanceAutomation.isLinear = true;
+				balanceAutomation.type = 3;
+				balanceAutomation.value = tableChange.balance;
+				ss.add(beat.automations, balanceAutomation);
 			}
-			if (tableChange.get_instrument() >= 0) {
+			if (tableChange.instrument >= 0) {
 				var instrumentAutomation = new $AlphaTab_Model_Automation();
-				instrumentAutomation.set_isLinear(true);
-				instrumentAutomation.set_type(2);
-				instrumentAutomation.set_value(tableChange.get_instrument());
-				ss.add(beat.get_automations(), instrumentAutomation);
+				instrumentAutomation.isLinear = true;
+				instrumentAutomation.type = 2;
+				instrumentAutomation.value = tableChange.instrument;
+				ss.add(beat.automations, instrumentAutomation);
 			}
-			if (tableChange.get_tempo() >= 0) {
+			if (tableChange.tempo >= 0) {
 				var tempoAutomation = new $AlphaTab_Model_Automation();
-				tempoAutomation.set_isLinear(true);
-				tempoAutomation.set_type(0);
-				tempoAutomation.set_value(tableChange.get_tempo());
-				ss.add(beat.get_automations(), tempoAutomation);
-				beat.get_voice().get_bar().get_masterBar().set_tempoAutomation(tempoAutomation);
+				tempoAutomation.isLinear = true;
+				tempoAutomation.type = 0;
+				tempoAutomation.value = tableChange.tempo;
+				ss.add(beat.automations, tempoAutomation);
+				beat.voice.bar.get_masterBar().tempoAutomation = tempoAutomation;
 			}
 		},
 		$readSignedByte: function() {
@@ -6026,43 +5816,43 @@
 		},
 		readNote: function(track, bar, voice, beat, stringIndex) {
 			var newNote = new $AlphaTab_Model_Note();
-			newNote.set_string(track.get_tuning().length - stringIndex);
+			newNote.string = track.tuning.length - stringIndex;
 			var flags = this._data.readByte();
 			if ((flags & 2) !== 0) {
-				newNote.set_accentuated(2);
+				newNote.accentuated = 2;
 			}
 			else if ((flags & 64) !== 0) {
-				newNote.set_accentuated(1);
+				newNote.accentuated = 1;
 			}
-			newNote.set_isGhost((flags & 4) !== 0);
+			newNote.isGhost = (flags & 4) !== 0;
 			if ((flags & 32) !== 0) {
 				var noteType = this._data.readByte();
 				if (noteType === 3) {
-					newNote.set_isDead(true);
+					newNote.isDead = true;
 				}
 				else if (noteType === 2) {
-					newNote.set_isTieDestination(true);
+					newNote.isTieDestination = true;
 				}
 			}
 			if ((flags & 16) !== 0) {
 				var dynamicNumber = this.$readSignedByte();
-				newNote.set_dynamic(this.toDynamicValue(dynamicNumber));
-				beat.set_dynamic(newNote.get_dynamic());
+				newNote.dynamic = this.toDynamicValue(dynamicNumber);
+				beat.dynamic = newNote.dynamic;
 			}
 			if ((flags & 32) !== 0) {
-				newNote.set_fret(this.$readSignedByte());
+				newNote.fret = this.$readSignedByte();
 			}
 			if ((flags & 128) !== 0) {
-				newNote.set_leftHandFinger(this.$readSignedByte());
-				newNote.set_rightHandFinger(this.$readSignedByte());
-				newNote.set_isFingering(true);
+				newNote.leftHandFinger = this.$readSignedByte();
+				newNote.rightHandFinger = this.$readSignedByte();
+				newNote.isFingering = true;
 			}
 			if (this.$_versionNumber >= 500) {
 				if ((flags & 1) !== 0) {
-					newNote.set_durationPercent(this.readDouble());
+					newNote.durationPercent = this.readDouble();
 				}
 				var flags2 = this._data.readByte();
-				newNote.set_swapAccidentals((flags2 & 2) !== 0);
+				newNote.swapAccidentals = (flags2 & 2) !== 0;
 			}
 			beat.addNote(newNote);
 			if ((flags & 8) !== 0) {
@@ -6120,7 +5910,7 @@
 			}
 			else if (this.$_versionNumber < 400) {
 				if ((flags & 4) !== 0) {
-					note.set_slideType(1);
+					note.slideType = 1;
 				}
 			}
 			if ((flags2 & 16) !== 0) {
@@ -6128,23 +5918,23 @@
 			}
 			else if (this.$_versionNumber < 400) {
 				if ((flags & 4) !== 0) {
-					note.set_harmonicType(1);
-					note.set_harmonicValue(this.deltaFretToHarmonicValue(note.get_fret()));
+					note.harmonicType = 1;
+					note.harmonicValue = this.deltaFretToHarmonicValue(note.fret);
 				}
 				if ((flags & 8) !== 0) {
-					note.set_harmonicType(2);
+					note.harmonicType = 2;
 				}
 			}
 			if ((flags2 & 32) !== 0) {
 				this.readTrill(note);
 			}
-			note.set_isLetRing((flags & 8) !== 0);
-			note.set_isHammerPullOrigin((flags & 2) !== 0);
+			note.isLetRing = (flags & 8) !== 0;
+			note.isHammerPullOrigin = (flags & 2) !== 0;
 			if ((flags2 & 64) !== 0) {
-				note.set_vibrato(1);
+				note.vibrato = 1;
 			}
-			note.set_isPalmMute((flags2 & 2) !== 0);
-			note.set_isStaccato((flags2 & 1) !== 0);
+			note.isPalmMute = (flags2 & 2) !== 0;
+			note.isStaccato = (flags2 & 1) !== 0;
 		},
 		readBend: function(note) {
 			this._data.readByte();
@@ -6155,23 +5945,23 @@
 			if (pointCount > 0) {
 				for (var i = 0; i < pointCount; i++) {
 					var point = new $AlphaTab_Model_BendPoint(0, 0);
-					point.set_offset(this.readInt32());
+					point.offset = this.readInt32();
 					// 0...60
-					point.set_value(ss.Int32.div(this.readInt32(), $AlphaTab_Importer_Gp3To5Importer.$bendStep));
+					point.value = ss.Int32.div(this.readInt32(), $AlphaTab_Importer_Gp3To5Importer.$bendStep);
 					// 0..12 (amount of quarters)
 					this.readBool();
 					// vibrato
-					ss.add(note.get_bendPoints(), point);
+					ss.add(note.bendPoints, point);
 				}
 			}
 		},
 		readGrace: function(voice, note) {
 			var graceBeat = new $AlphaTab_Model_Beat();
 			var graceNote = new $AlphaTab_Model_Note();
-			graceNote.set_string(note.get_string());
-			graceNote.set_fret(this.$readSignedByte());
-			graceBeat.set_duration(32);
-			graceBeat.set_dynamic(this.toDynamicValue(this.$readSignedByte()));
+			graceNote.string = note.string;
+			graceNote.fret = this.$readSignedByte();
+			graceBeat.duration = 32;
+			graceBeat.dynamic = this.toDynamicValue(this.$readSignedByte());
 			var transition = this.$readSignedByte();
 			switch (transition) {
 				case 0: {
@@ -6179,8 +5969,8 @@
 					break;
 				}
 				case 1: {
-					graceNote.set_slideType(2);
-					graceNote.set_slideTarget(note);
+					graceNote.slideType = 2;
+					graceNote.slideTarget = note;
 					break;
 				}
 				case 2: {
@@ -6189,22 +5979,22 @@
 				}
 				case 3: {
 					// hammer
-					graceNote.set_isHammerPullOrigin(true);
-					note.set_isHammerPullDestination(true);
-					note.set_hammerPullOrigin(graceNote);
+					graceNote.isHammerPullOrigin = true;
+					note.isHammerPullDestination = true;
+					note.hammerPullOrigin = graceNote;
 					break;
 				}
 			}
-			graceNote.set_dynamic(graceBeat.get_dynamic());
+			graceNote.dynamic = graceBeat.dynamic;
 			this.skip(1);
 			// duration
 			if (this.$_versionNumber < 500) {
-				graceBeat.set_graceType(2);
+				graceBeat.graceType = 2;
 			}
 			else {
 				var flags = this._data.readByte();
-				graceNote.set_isDead((flags & 1) !== 0);
-				graceBeat.set_graceType((((flags & 2) !== 0) ? 1 : 2));
+				graceNote.isDead = (flags & 1) !== 0;
+				graceBeat.graceType = (((flags & 2) !== 0) ? 1 : 2);
 			}
 			graceBeat.addNote(graceNote);
 			voice.addGraceBeat(graceBeat);
@@ -6213,15 +6003,15 @@
 			var speed = this._data.readByte();
 			switch (speed) {
 				case 1: {
-					beat.set_tremoloSpeed(new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [$AlphaTab_Model_Duration]))(8));
+					beat.tremoloSpeed = new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [$AlphaTab_Model_Duration]))(8);
 					break;
 				}
 				case 2: {
-					beat.set_tremoloSpeed(new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [$AlphaTab_Model_Duration]))(16));
+					beat.tremoloSpeed = new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [$AlphaTab_Model_Duration]))(16);
 					break;
 				}
 				case 3: {
-					beat.set_tremoloSpeed(new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [$AlphaTab_Model_Duration]))(32));
+					beat.tremoloSpeed = new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [$AlphaTab_Model_Duration]))(32);
 					break;
 				}
 			}
@@ -6231,31 +6021,31 @@
 				var type = this.$readSignedByte();
 				switch (type) {
 					case 1: {
-						note.set_slideType(1);
+						note.slideType = 1;
 						break;
 					}
 					case 2: {
-						note.set_slideType(2);
+						note.slideType = 2;
 						break;
 					}
 					case 4: {
-						note.set_slideType(6);
+						note.slideType = 6;
 						break;
 					}
 					case 8: {
-						note.set_slideType(5);
+						note.slideType = 5;
 						break;
 					}
 					case 16: {
-						note.set_slideType(3);
+						note.slideType = 3;
 						break;
 					}
 					case 32: {
-						note.set_slideType(4);
+						note.slideType = 4;
 						break;
 					}
 					default: {
-						note.set_slideType(0);
+						note.slideType = 0;
 						break;
 					}
 				}
@@ -6264,31 +6054,31 @@
 				var type1 = this.$readSignedByte();
 				switch (type1) {
 					case 1: {
-						note.set_slideType(1);
+						note.slideType = 1;
 						break;
 					}
 					case 2: {
-						note.set_slideType(2);
+						note.slideType = 2;
 						break;
 					}
 					case 3: {
-						note.set_slideType(6);
+						note.slideType = 6;
 						break;
 					}
 					case 4: {
-						note.set_slideType(5);
+						note.slideType = 5;
 						break;
 					}
 					case -1: {
-						note.set_slideType(3);
+						note.slideType = 3;
 						break;
 					}
 					case -2: {
-						note.set_slideType(4);
+						note.slideType = 4;
 						break;
 					}
 					default: {
-						note.set_slideType(0);
+						note.slideType = 0;
 						break;
 					}
 				}
@@ -6299,8 +6089,8 @@
 			if (this.$_versionNumber >= 500) {
 				switch (type) {
 					case 1: {
-						note.set_harmonicType(1);
-						note.set_harmonicValue(this.deltaFretToHarmonicValue(note.get_fret()));
+						note.harmonicType = 1;
+						note.harmonicValue = this.deltaFretToHarmonicValue(note.fret);
 						break;
 					}
 					case 2: {
@@ -6308,23 +6098,23 @@
 						var harmonicTone = this._data.readByte();
 						var harmonicKey = this._data.readByte();
 						var harmonicOctaveOffset = this._data.readByte();
-						note.set_harmonicType(2);
+						note.harmonicType = 2;
 						// ReSharper restore UnusedVariable
 						break;
 					}
 					case 3: {
-						note.set_harmonicType(4);
-						note.set_harmonicValue(this.deltaFretToHarmonicValue(this._data.readByte()));
+						note.harmonicType = 4;
+						note.harmonicValue = this.deltaFretToHarmonicValue(this._data.readByte());
 						break;
 					}
 					case 4: {
-						note.set_harmonicType(3);
-						note.set_harmonicValue(12);
+						note.harmonicType = 3;
+						note.harmonicValue = 12;
 						break;
 					}
 					case 5: {
-						note.set_harmonicType(5);
-						note.set_harmonicValue(12);
+						note.harmonicType = 5;
+						note.harmonicValue = 12;
 						break;
 					}
 				}
@@ -6332,31 +6122,31 @@
 			else if (this.$_versionNumber >= 400) {
 				switch (type) {
 					case 1: {
-						note.set_harmonicType(1);
+						note.harmonicType = 1;
 						break;
 					}
 					case 3: {
-						note.set_harmonicType(4);
+						note.harmonicType = 4;
 						break;
 					}
 					case 4: {
-						note.set_harmonicType(3);
+						note.harmonicType = 3;
 						break;
 					}
 					case 5: {
-						note.set_harmonicType(5);
+						note.harmonicType = 5;
 						break;
 					}
 					case 15: {
-						note.set_harmonicType(2);
+						note.harmonicType = 2;
 						break;
 					}
 					case 17: {
-						note.set_harmonicType(2);
+						note.harmonicType = 2;
 						break;
 					}
 					case 22: {
-						note.set_harmonicType(2);
+						note.harmonicType = 2;
 						break;
 					}
 				}
@@ -6401,18 +6191,18 @@
 			}
 		},
 		readTrill: function(note) {
-			note.set_trillValue(this._data.readByte() + note.get_stringTuning());
+			note.trillValue = this._data.readByte() + note.get_stringTuning();
 			switch (this._data.readByte()) {
 				case 1: {
-					note.set_trillSpeed(16);
+					note.trillSpeed = 16;
 					break;
 				}
 				case 2: {
-					note.set_trillSpeed(32);
+					note.trillSpeed = 32;
 					break;
 				}
 				case 3: {
-					note.set_trillSpeed(64);
+					note.trillSpeed = 64;
 					break;
 				}
 			}
@@ -6484,39 +6274,8 @@
 			this._data.seek(count, 1);
 		}
 	}, $AlphaTab_Importer_ScoreImporter);
-	ss.initClass($AlphaTab_Importer_GpxFile, $asm, {
-		get_fileName: function() {
-			return this.$1$FileNameField;
-		},
-		set_fileName: function(value) {
-			this.$1$FileNameField = value;
-		},
-		get_fileSize: function() {
-			return this.$1$FileSizeField;
-		},
-		set_fileSize: function(value) {
-			this.$1$FileSizeField = value;
-		},
-		get_data: function() {
-			return this.$1$DataField;
-		},
-		set_data: function(value) {
-			this.$1$DataField = value;
-		}
-	});
+	ss.initClass($AlphaTab_Importer_GpxFile, $asm, {});
 	ss.initClass($AlphaTab_Importer_GpxFileSystem, $asm, {
-		get_fileFilter: function() {
-			return this.$1$FileFilterField;
-		},
-		set_fileFilter: function(value) {
-			this.$1$FileFilterField = value;
-		},
-		get_files: function() {
-			return this.$1$FilesField;
-		},
-		set_files: function(value) {
-			this.$1$FilesField = value;
-		},
 		load: function(s) {
 			var src = new $AlphaTab_IO_BitReader(s);
 			this.$readBlock(src);
@@ -6607,12 +6366,12 @@
 					//    0x94  |   int[]  |  n*4byte | Indices of the sector containing the data (end is marked with 0)
 					// The sectors marked at 0x94 are absolutely positioned ( 1*0x1000 is sector 1, 2*0x1000 is sector 2,...)
 					var file = new $AlphaTab_Importer_GpxFile();
-					file.set_fileName(this.$getString(data, offset + 4, 127));
-					file.set_fileSize(this.$getInteger(data, offset + 140));
+					file.fileName = this.$getString(data, offset + 4, 127);
+					file.fileSize = this.$getInteger(data, offset + 140);
 					// store file if needed
-					var storeFile = ss.staticEquals(this.get_fileFilter(), null) || this.get_fileFilter()(file.get_fileName());
+					var storeFile = ss.staticEquals(this.fileFilter, null) || this.fileFilter(file.fileName);
 					if (storeFile) {
-						ss.add(this.get_files(), file);
+						ss.add(this.files, file);
 					}
 					// we need to iterate the blocks because we need to move after the last datasector
 					var dataPointerOffset = offset + 148;
@@ -6621,7 +6380,7 @@
 					var sectorCount = 0;
 					// we're keeping count so we can calculate the offset of the array item
 					// as long we have data blocks we need to iterate them, 
-					var fileData = (storeFile ? new $AlphaTab_IO_MemoryStream.$ctor2(file.get_fileSize()) : null);
+					var fileData = (storeFile ? new $AlphaTab_IO_MemoryStream.$ctor2(file.fileSize) : null);
 					while ((sector = this.$getInteger(data, dataPointerOffset + 4 * sectorCount++)) !== 0) {
 						// the next file entry starts after the last data sector so we 
 						// move the offset along
@@ -6633,10 +6392,10 @@
 					}
 					if (storeFile) {
 						// trim data to filesize if needed
-						file.set_data(new $AlphaTab_IO_ByteArray.$ctor1(Math.min(file.get_fileSize(), fileData.get_length())));
+						file.data = new $AlphaTab_IO_ByteArray.$ctor1(Math.min(file.fileSize, fileData.get_length()));
 						// we can use the getBuffer here because we are intelligent and know not to read the empty data.
 						var raw = fileData.toArray();
-						$AlphaTab_Platform_Std.blockCopy(raw, 0, file.get_data(), 0, file.get_data().get_length());
+						$AlphaTab_Platform_Std.blockCopy(raw, 0, file.data, 0, file.data.get_length());
 					}
 				}
 				// let's move to the next sector
@@ -6664,35 +6423,29 @@
 			// at first we need to load the binary file system 
 			// from the GPX container
 			var fileSystem = new $AlphaTab_Importer_GpxFileSystem();
-			fileSystem.set_fileFilter(function(s) {
+			fileSystem.fileFilter = function(s) {
 				return ss.referenceEquals(s, $AlphaTab_Importer_GpxFileSystem.scoreGpif);
-			});
+			};
 			fileSystem.load(this._data);
 			// convert data to string
 			var xml = new ss.StringBuilder();
-			var data = fileSystem.get_files()[0].get_data();
+			var data = fileSystem.files[0].data;
 			for (var i = 0; i < data.get_length(); i++) {
 				xml.appendChar(data.get_item(i));
 			}
 			// lets set the fileSystem to null, maybe the garbage collector will come along
 			// and kick the fileSystem binary data before we finish parsing
-			fileSystem.set_files(null);
+			fileSystem.files = null;
 			fileSystem = null;
 			// the score.gpif file within this filesystem stores
 			// the score information as XML we need to parse.
 			var parser = new $AlphaTab_Importer_GpxParser();
 			parser.parseXml(xml.toString());
-			parser.get_score().finish();
-			return parser.get_score();
+			parser.score.finish();
+			return parser.score;
 		}
 	}, $AlphaTab_Importer_ScoreImporter);
 	ss.initClass($AlphaTab_Importer_GpxParser, $asm, {
-		get_score: function() {
-			return this.$1$ScoreField;
-		},
-		set_score: function(value) {
-			this.$1$ScoreField = value;
-		},
 		parseXml: function(xml) {
 			this.$_automations = new (ss.makeGenericType(ss.Dictionary$2, [String, Array]))();
 			this.$_tracksMapping = [];
@@ -6723,7 +6476,7 @@
 			// - at first we read all model elements and store them by ID in a lookup table
 			// - after that we need to join up the information. 
 			if (root.localName === 'GPIF') {
-				this.set_score(new $AlphaTab_Model_Score());
+				this.score = new $AlphaTab_Model_Score();
 				// parse all children
 				for (var $t1 = 0; $t1 < root.childNodes.length; $t1++) {
 					var n = root.childNodes[$t1];
@@ -6780,42 +6533,42 @@
 				if (c.nodeType === 1) {
 					switch (c.localName) {
 						case 'Title': {
-							this.get_score().set_title(this.$getValue(c.firstChild));
+							this.score.title = this.$getValue(c.firstChild);
 							break;
 						}
 						case 'SubTitle': {
-							this.get_score().set_subTitle(this.$getValue(c.firstChild));
+							this.score.subTitle = this.$getValue(c.firstChild);
 							break;
 						}
 						case 'Artist': {
-							this.get_score().set_artist(this.$getValue(c.firstChild));
+							this.score.artist = this.$getValue(c.firstChild);
 							break;
 						}
 						case 'Album': {
-							this.get_score().set_album(this.$getValue(c.firstChild));
+							this.score.album = this.$getValue(c.firstChild);
 							break;
 						}
 						case 'Words': {
-							this.get_score().set_words(this.$getValue(c.firstChild));
+							this.score.words = this.$getValue(c.firstChild);
 							break;
 						}
 						case 'Music': {
-							this.get_score().set_music(this.$getValue(c.firstChild));
+							this.score.music = this.$getValue(c.firstChild);
 							break;
 						}
 						case 'WordsAndMusic': {
 							if (ss.isValue(c.firstChild) && c.firstChild.toString() !== '') {
-								this.get_score().set_words(this.$getValue(c.firstChild));
-								this.get_score().set_music(this.$getValue(c.firstChild));
+								this.score.words = this.$getValue(c.firstChild);
+								this.score.music = this.$getValue(c.firstChild);
 							}
 							break;
 						}
 						case 'Copyright': {
-							this.get_score().set_copyright(this.$getValue(c.firstChild));
+							this.score.copyright = this.$getValue(c.firstChild);
 							break;
 						}
 						case 'Tabber': {
-							this.get_score().set_tab(this.$getValue(c.firstChild));
+							this.score.tab = this.$getValue(c.firstChild);
 							break;
 						}
 					}
@@ -6904,7 +6657,7 @@
 				}
 			}
 			if (ss.isValue(automation)) {
-				automation.set_text(text);
+				automation.text = text;
 			}
 			if (ss.isValue(barId)) {
 				if (!this.$_automations.containsKey(barId)) {
@@ -6934,11 +6687,11 @@
 				if (c.nodeType === 1) {
 					switch (c.localName) {
 						case 'Name': {
-							track.set_name(this.$getValue(c));
+							track.name = this.$getValue(c);
 							break;
 						}
 						case 'ShortName': {
-							track.set_shortName(this.$getValue(c));
+							track.shortName = this.$getValue(c);
 							break;
 						}
 						case 'Properties': {
@@ -6951,8 +6704,8 @@
 						}
 						case 'PlaybackState': {
 							var state = this.$getValue(c);
-							track.get_playbackInfo().set_isSolo(state === 'Solo');
-							track.get_playbackInfo().set_isMute(state === 'Mute');
+							track.playbackInfo.isSolo = state === 'Solo';
+							track.playbackInfo.isMute = state === 'Mute';
 							break;
 						}
 					}
@@ -6977,8 +6730,8 @@
 		$parseDiagramItem: function(track, node) {
 			var chord = new $AlphaTab_Model_Chord();
 			var chordId = node.attributes['id'].value;
-			chord.set_name(node.attributes['name'].value);
-			track.get_chords().set_item(chordId, chord);
+			chord.name = node.attributes['name'].value;
+			track.chords.set_item(chordId, chord);
 		},
 		$findChildElement: function(node, name) {
 			for (var $t1 = 0; $t1 < node.childNodes.length; $t1++) {
@@ -7011,7 +6764,7 @@
 					for (var i = 0; i < tuning.length; i++) {
 						tuning[tuning.length - 1 - i] = $AlphaTab_Platform_Std.parseInt(tuningParts[i]);
 					}
-					track.set_tuning(ss.arrayClone(tuning));
+					track.tuning = ss.arrayClone(tuning);
 					break;
 				}
 				case 'DiagramCollection': {
@@ -7019,18 +6772,18 @@
 					break;
 				}
 				case 'CapoFret': {
-					track.set_capo($AlphaTab_Platform_Std.parseInt(this.$getValue(this.$findChildElement(node, 'Fret'))));
+					track.capo = $AlphaTab_Platform_Std.parseInt(this.$getValue(this.$findChildElement(node, 'Fret')));
 					break;
 				}
 			}
 		},
 		$parseGeneralMidi: function(track, node) {
 			var e = node;
-			track.get_playbackInfo().set_port($AlphaTab_Platform_Std.parseInt(this.$getValue(this.$findChildElement(node, 'Port'))));
-			track.get_playbackInfo().set_program($AlphaTab_Platform_Std.parseInt(this.$getValue(this.$findChildElement(node, 'Program'))));
-			track.get_playbackInfo().set_primaryChannel($AlphaTab_Platform_Std.parseInt(this.$getValue(this.$findChildElement(node, 'PrimaryChannel'))));
-			track.get_playbackInfo().set_secondaryChannel($AlphaTab_Platform_Std.parseInt(this.$getValue(this.$findChildElement(node, 'SecondaryChannel'))));
-			track.set_isPercussion(ss.isValue(e.attributes['table']) && e.attributes['table'].value === 'Percussion');
+			track.playbackInfo.port = $AlphaTab_Platform_Std.parseInt(this.$getValue(this.$findChildElement(node, 'Port')));
+			track.playbackInfo.program = $AlphaTab_Platform_Std.parseInt(this.$getValue(this.$findChildElement(node, 'Program')));
+			track.playbackInfo.primaryChannel = $AlphaTab_Platform_Std.parseInt(this.$getValue(this.$findChildElement(node, 'PrimaryChannel')));
+			track.playbackInfo.secondaryChannel = $AlphaTab_Platform_Std.parseInt(this.$getValue(this.$findChildElement(node, 'SecondaryChannel')));
+			track.isPercussion = ss.isValue(e.attributes['table']) && e.attributes['table'].value === 'Percussion';
 		},
 		$parseMasterBarsNode: function(node) {
 			for (var $t1 = 0; $t1 < node.childNodes.length; $t1++) {
@@ -7054,26 +6807,26 @@
 					switch (c.localName) {
 						case 'Time': {
 							var timeParts = this.$getValue(c).split(String.fromCharCode(47));
-							masterBar.set_timeSignatureNumerator($AlphaTab_Platform_Std.parseInt(timeParts[0]));
-							masterBar.set_timeSignatureDenominator($AlphaTab_Platform_Std.parseInt(timeParts[1]));
+							masterBar.timeSignatureNumerator = $AlphaTab_Platform_Std.parseInt(timeParts[0]);
+							masterBar.timeSignatureDenominator = $AlphaTab_Platform_Std.parseInt(timeParts[1]);
 							break;
 						}
 						case 'DoubleBar': {
-							masterBar.set_isDoubleBar(true);
+							masterBar.isDoubleBar = true;
 							break;
 						}
 						case 'Section': {
-							masterBar.set_section(new $AlphaTab_Model_Section());
-							masterBar.get_section().set_marker(this.$getValue(this.$findChildElement(c, 'Letter')));
-							masterBar.get_section().set_text(this.$getValue(this.$findChildElement(c, 'Text')));
+							masterBar.section = new $AlphaTab_Model_Section();
+							masterBar.section.marker = this.$getValue(this.$findChildElement(c, 'Letter'));
+							masterBar.section.text = this.$getValue(this.$findChildElement(c, 'Text'));
 							break;
 						}
 						case 'Repeat': {
 							if (e.attributes['start'].value.toLowerCase() === 'true') {
-								masterBar.set_isRepeatStart(true);
+								masterBar.isRepeatStart = true;
 							}
 							if (e.attributes['end'].value.toLowerCase() === 'true' && ss.isValue(e.attributes['count'].value)) {
-								masterBar.set_repeatCount($AlphaTab_Platform_Std.parseInt(e.attributes['count'].value));
+								masterBar.repeatCount = $AlphaTab_Platform_Std.parseInt(e.attributes['count'].value);
 							}
 							break;
 						}
@@ -7083,7 +6836,7 @@
 							for (var k = 0; k < alternateEndings.length; k++) {
 								i |= 1 << -1 + $AlphaTab_Platform_Std.parseInt(alternateEndings[i]);
 							}
-							masterBar.set_alternateEndings(i);
+							masterBar.alternateEndings = i;
 							break;
 						}
 						case 'Bars': {
@@ -7093,38 +6846,38 @@
 						case 'TripletFeel': {
 							switch (this.$getValue(c)) {
 								case 'NoTripletFeel': {
-									masterBar.set_tripletFeel(0);
+									masterBar.tripletFeel = 0;
 									break;
 								}
 								case 'Triplet8th': {
-									masterBar.set_tripletFeel(2);
+									masterBar.tripletFeel = 2;
 									break;
 								}
 								case 'Triplet16th': {
-									masterBar.set_tripletFeel(1);
+									masterBar.tripletFeel = 1;
 									break;
 								}
 								case 'Dotted8th': {
-									masterBar.set_tripletFeel(4);
+									masterBar.tripletFeel = 4;
 									break;
 								}
 								case 'Dotted16th': {
-									masterBar.set_tripletFeel(3);
+									masterBar.tripletFeel = 3;
 									break;
 								}
 								case 'Scottish8th': {
-									masterBar.set_tripletFeel(6);
+									masterBar.tripletFeel = 6;
 									break;
 								}
 								case 'Scottish16th': {
-									masterBar.set_tripletFeel(5);
+									masterBar.tripletFeel = 5;
 									break;
 								}
 							}
 							break;
 						}
 						case 'Key': {
-							masterBar.set_keySignature($AlphaTab_Platform_Std.parseInt(this.$getValue(this.$findChildElement(c, 'AccidentalCount'))));
+							masterBar.keySignature = $AlphaTab_Platform_Std.parseInt(this.$getValue(this.$findChildElement(c, 'AccidentalCount')));
 							break;
 						}
 					}
@@ -7159,23 +6912,23 @@
 						case 'Clef': {
 							switch (this.$getValue(c)) {
 								case 'Neutral': {
-									bar.set_clef(0);
+									bar.clef = 0;
 									break;
 								}
 								case 'G2': {
-									bar.set_clef(4);
+									bar.clef = 4;
 									break;
 								}
 								case 'F4': {
-									bar.set_clef(3);
+									bar.clef = 3;
 									break;
 								}
 								case 'C4': {
-									bar.set_clef(2);
+									bar.clef = 2;
 									break;
 								}
 								case 'C3': {
-									bar.set_clef(1);
+									bar.clef = 1;
 									break;
 								}
 							}
@@ -7246,39 +6999,39 @@
 						}
 						case 'Fadding': {
 							if (this.$getValue(c) === 'FadeIn') {
-								beat.set_fadeIn(true);
+								beat.fadeIn = true;
 							}
 							break;
 						}
 						case 'Tremolo': {
 							switch (this.$getValue(c)) {
 								case '1/2': {
-									beat.set_tremoloSpeed(new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [$AlphaTab_Model_Duration]))(8));
+									beat.tremoloSpeed = new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [$AlphaTab_Model_Duration]))(8);
 									break;
 								}
 								case '1/4': {
-									beat.set_tremoloSpeed(new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [$AlphaTab_Model_Duration]))(16));
+									beat.tremoloSpeed = new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [$AlphaTab_Model_Duration]))(16);
 									break;
 								}
 								case '1/8': {
-									beat.set_tremoloSpeed(new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [$AlphaTab_Model_Duration]))(32));
+									beat.tremoloSpeed = new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [$AlphaTab_Model_Duration]))(32);
 									break;
 								}
 							}
 							break;
 						}
 						case 'Chord': {
-							beat.set_chordId(this.$getValue(c));
+							beat.chordId = this.$getValue(c);
 							break;
 						}
 						case 'Hairpin': {
 							switch (this.$getValue(c)) {
 								case 'Crescendo': {
-									beat.set_crescendo(1);
+									beat.crescendo = 1;
 									break;
 								}
 								case 'Decrescendo': {
-									beat.set_crescendo(2);
+									beat.crescendo = 2;
 									break;
 								}
 							}
@@ -7286,10 +7039,10 @@
 						}
 						case 'Arpeggio': {
 							if (this.$getValue(c) === 'Up') {
-								beat.set_brushType(3);
+								beat.brushType = 3;
 							}
 							else {
-								beat.set_brushType(4);
+								beat.brushType = 4;
 							}
 							break;
 						}
@@ -7298,41 +7051,41 @@
 							break;
 						}
 						case 'FreeText': {
-							beat.set_text(this.$getValue(c));
+							beat.text = this.$getValue(c);
 							break;
 						}
 						case 'Dynamic': {
 							switch (this.$getValue(c)) {
 								case 'PPP': {
-									beat.set_dynamic(0);
+									beat.dynamic = 0;
 									break;
 								}
 								case 'PP': {
-									beat.set_dynamic(1);
+									beat.dynamic = 1;
 									break;
 								}
 								case 'P': {
-									beat.set_dynamic(2);
+									beat.dynamic = 2;
 									break;
 								}
 								case 'MP': {
-									beat.set_dynamic(3);
+									beat.dynamic = 3;
 									break;
 								}
 								case 'MF': {
-									beat.set_dynamic(4);
+									beat.dynamic = 4;
 									break;
 								}
 								case 'F': {
-									beat.set_dynamic(5);
+									beat.dynamic = 5;
 									break;
 								}
 								case 'FF': {
-									beat.set_dynamic(6);
+									beat.dynamic = 6;
 									break;
 								}
 								case 'FFF': {
-									beat.set_dynamic(7);
+									beat.dynamic = 7;
 									break;
 								}
 							}
@@ -7341,11 +7094,11 @@
 						case 'GraceNotes': {
 							switch (this.$getValue(c)) {
 								case 'OnBeat': {
-									beat.set_graceType(1);
+									beat.graceType = 1;
 									break;
 								}
 								case 'BeforeBeat': {
-									beat.set_graceType(2);
+									beat.graceType = 2;
 									break;
 								}
 							}
@@ -7373,42 +7126,42 @@
 							switch (name) {
 								case 'Brush': {
 									if (this.$getValue(this.$findChildElement(c, 'Direction')) === 'Up') {
-										beat.set_brushType(1);
+										beat.brushType = 1;
 									}
 									else {
-										beat.set_brushType(2);
+										beat.brushType = 2;
 									}
 									break;
 								}
 								case 'PickStroke': {
 									if (this.$getValue(this.$findChildElement(c, 'Direction')) === 'Up') {
-										beat.set_pickStroke(1);
+										beat.pickStroke = 1;
 									}
 									else {
-										beat.set_pickStroke(2);
+										beat.pickStroke = 2;
 									}
 									break;
 								}
 								case 'Slapped': {
 									if (ss.isValue(this.$findChildElement(c, 'Enable'))) {
-										beat.set_slap(true);
+										beat.slap = true;
 									}
 									break;
 								}
 								case 'Popped': {
 									if (ss.isValue(this.$findChildElement(c, 'Enable'))) {
-										beat.set_pop(true);
+										beat.pop = true;
 									}
 									break;
 								}
 								case 'VibratoWTremBar': {
 									switch (this.$getValue(this.$findChildElement(c, 'Strength'))) {
 										case 'Wide': {
-											beat.set_vibrato(2);
+											beat.vibrato = 2;
 											break;
 										}
 										case 'Slight': {
-											beat.set_vibrato(1);
+											beat.vibrato = 1;
 											break;
 										}
 									}
@@ -7423,14 +7176,14 @@
 									if (ss.isNullOrUndefined(whammyOrigin)) {
 										whammyOrigin = new $AlphaTab_Model_BendPoint(0, 0);
 									}
-									whammyOrigin.set_value(ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointValueFactor));
+									whammyOrigin.value = ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointValueFactor);
 									break;
 								}
 								case 'WhammyBarOriginOffset': {
 									if (ss.isNullOrUndefined(whammyOrigin)) {
 										whammyOrigin = new $AlphaTab_Model_BendPoint(0, 0);
 									}
-									whammyOrigin.set_offset(ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointPositionFactor));
+									whammyOrigin.offset = ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointPositionFactor);
 									break;
 								}
 								case 'WhammyBarMiddleValue': {
@@ -7449,14 +7202,14 @@
 									if (ss.isNullOrUndefined(whammyDestination)) {
 										whammyDestination = new $AlphaTab_Model_BendPoint($AlphaTab_Model_BendPoint.maxPosition, 0);
 									}
-									whammyDestination.set_value(ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointValueFactor));
+									whammyDestination.value = ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointValueFactor);
 									break;
 								}
 								case 'WhammyBarDestinationOffset': {
 									if (ss.isNullOrUndefined(whammyDestination)) {
 										whammyDestination = new $AlphaTab_Model_BendPoint(0, 0);
 									}
-									whammyDestination.set_offset(ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointPositionFactor));
+									whammyDestination.offset = ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointPositionFactor);
 									break;
 								}
 							}
@@ -7484,7 +7237,7 @@
 					ss.add(whammy, new $AlphaTab_Model_BendPoint(30, whammyMiddleValue.get_value()));
 				}
 				ss.add(whammy, whammyDestination);
-				beat.set_whammyBarPoints(whammy);
+				beat.whammyBarPoints = whammy;
 			}
 		},
 		$parseNotes: function(node) {
@@ -7514,49 +7267,49 @@
 						}
 						case 'AntiAccent': {
 							if (this.$getValue(c).toLowerCase() === 'normal') {
-								note.set_isGhost(true);
+								note.isGhost = true;
 							}
 							break;
 						}
 						case 'LetRing': {
-							note.set_isLetRing(true);
+							note.isLetRing = true;
 							break;
 						}
 						case 'Trill': {
-							note.set_trillValue($AlphaTab_Platform_Std.parseInt(this.$getValue(c)));
-							note.set_trillSpeed(16);
+							note.trillValue = $AlphaTab_Platform_Std.parseInt(this.$getValue(c));
+							note.trillSpeed = 16;
 							break;
 						}
 						case 'Accent': {
 							var accentFlags = $AlphaTab_Platform_Std.parseInt(this.$getValue(c));
 							if ((accentFlags & 1) !== 0) {
-								note.set_isStaccato(true);
+								note.isStaccato = true;
 							}
 							if ((accentFlags & 4) !== 0) {
-								note.set_accentuated(2);
+								note.accentuated = 2;
 							}
 							if ((accentFlags & 8) !== 0) {
-								note.set_accentuated(1);
+								note.accentuated = 1;
 							}
 							break;
 						}
 						case 'Tie': {
 							if (e.attributes['origin'].value.toLowerCase() === 'true') {
-								note.set_isTieOrigin(true);
+								note.isTieOrigin = true;
 							}
 							if (e.attributes['destination'].value.toLowerCase() === 'true') {
-								note.set_isTieDestination(true);
+								note.isTieDestination = true;
 							}
 							break;
 						}
 						case 'Vibrato': {
 							switch (this.$getValue(c)) {
 								case 'Slight': {
-									note.set_vibrato(1);
+									note.vibrato = 1;
 									break;
 								}
 								case 'Wide': {
-									note.set_vibrato(2);
+									note.vibrato = 2;
 									break;
 								}
 							}
@@ -7583,11 +7336,11 @@
 							var name = e.attributes['name'].value;
 							switch (name) {
 								case 'String': {
-									note.set_string($AlphaTab_Platform_Std.parseInt(this.$getValue(this.$findChildElement(c, 'String'))) + 1);
+									note.string = $AlphaTab_Platform_Std.parseInt(this.$getValue(this.$findChildElement(c, 'String'))) + 1;
 									break;
 								}
 								case 'Fret': {
-									note.set_fret($AlphaTab_Platform_Std.parseInt(this.$getValue(this.$findChildElement(c, 'Fret'))));
+									note.fret = $AlphaTab_Platform_Std.parseInt(this.$getValue(this.$findChildElement(c, 'Fret')));
 									break;
 								}
 								case 'Tapped': {
@@ -7599,31 +7352,31 @@
 									if (ss.isValue(htype)) {
 										switch (this.$getValue(htype)) {
 											case 'NoHarmonic': {
-												note.set_harmonicType(0);
+												note.harmonicType = 0;
 												break;
 											}
 											case 'Natural': {
-												note.set_harmonicType(1);
+												note.harmonicType = 1;
 												break;
 											}
 											case 'Artificial': {
-												note.set_harmonicType(2);
+												note.harmonicType = 2;
 												break;
 											}
 											case 'Pinch': {
-												note.set_harmonicType(3);
+												note.harmonicType = 3;
 												break;
 											}
 											case 'Tap': {
-												note.set_harmonicType(4);
+												note.harmonicType = 4;
 												break;
 											}
 											case 'Semi': {
-												note.set_harmonicType(5);
+												note.harmonicType = 5;
 												break;
 											}
 											case 'Feedback': {
-												note.set_harmonicType(6);
+												note.harmonicType = 6;
 												break;
 											}
 										}
@@ -7633,18 +7386,18 @@
 								case 'HarmonicFret': {
 									var hfret = this.$findChildElement(c, 'HFret');
 									if (ss.isValue(hfret)) {
-										note.set_harmonicValue($AlphaTab_Platform_Std.parseFloat(this.$getValue(hfret)));
+										note.harmonicValue = $AlphaTab_Platform_Std.parseFloat(this.$getValue(hfret));
 									}
 									break;
 								}
 								case 'PalmMuted': {
 									if (ss.isValue(this.$findChildElement(c, 'Enable'))) {
-										note.set_isPalmMute(true);
+										note.isPalmMute = true;
 									}
 									break;
 								}
 								case 'Octave': {
-									note.set_octave($AlphaTab_Platform_Std.parseInt(this.$getValue(this.$findChildElement(c, 'Number'))));
+									note.octave = $AlphaTab_Platform_Std.parseInt(this.$getValue(this.$findChildElement(c, 'Number')));
 									break;
 								}
 								case 'Bended': {
@@ -7655,14 +7408,14 @@
 									if (ss.isNullOrUndefined(bendOrigin)) {
 										bendOrigin = new $AlphaTab_Model_BendPoint(0, 0);
 									}
-									bendOrigin.set_value(ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointValueFactor));
+									bendOrigin.value = ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointValueFactor);
 									break;
 								}
 								case 'BendOriginOffset': {
 									if (ss.isNullOrUndefined(bendOrigin)) {
 										bendOrigin = new $AlphaTab_Model_BendPoint(0, 0);
 									}
-									bendOrigin.set_offset(ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointPositionFactor));
+									bendOrigin.offset = ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointPositionFactor);
 									break;
 								}
 								case 'BendMiddleValue': {
@@ -7681,19 +7434,19 @@
 									if (ss.isNullOrUndefined(bendDestination)) {
 										bendDestination = new $AlphaTab_Model_BendPoint($AlphaTab_Model_BendPoint.maxPosition, 0);
 									}
-									bendDestination.set_value(ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointValueFactor));
+									bendDestination.value = ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointValueFactor);
 									break;
 								}
 								case 'BendDestinationOffset': {
 									if (ss.isNullOrUndefined(bendDestination)) {
 										bendDestination = new $AlphaTab_Model_BendPoint(0, 0);
 									}
-									bendDestination.set_offset(ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointPositionFactor));
+									bendDestination.offset = ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointPositionFactor);
 									break;
 								}
 								case 'HopoOrigin': {
 									if (ss.isValue(this.$findChildElement(c, 'Enable'))) {
-										note.set_isHammerPullOrigin(true);
+										note.isHammerPullOrigin = true;
 									}
 									break;
 								}
@@ -7704,22 +7457,22 @@
 									//     note.isHammerPullDestination = true;
 									var slideFlags = $AlphaTab_Platform_Std.parseInt(this.$getValue(this.$findChildElement(c, 'Flags')));
 									if ((slideFlags & 1) !== 0) {
-										note.set_slideType(1);
+										note.slideType = 1;
 									}
 									if ((slideFlags & 2) !== 0) {
-										note.set_slideType(2);
+										note.slideType = 2;
 									}
 									if ((slideFlags & 4) !== 0) {
-										note.set_slideType(6);
+										note.slideType = 6;
 									}
 									if ((slideFlags & 8) !== 0) {
-										note.set_slideType(5);
+										note.slideType = 5;
 									}
 									if ((slideFlags & 16) !== 0) {
-										note.set_slideType(3);
+										note.slideType = 3;
 									}
 									if ((slideFlags & 32) !== 0) {
-										note.set_slideType(4);
+										note.slideType = 4;
 									}
 									break;
 								}
@@ -7748,7 +7501,7 @@
 					ss.add(bend, new $AlphaTab_Model_BendPoint(30, bendMiddleValue.get_value()));
 				}
 				ss.add(bend, bendDestination);
-				note.set_bendPoints(bend);
+				note.bendPoints = bend;
 			}
 		},
 		$parseRhythms: function(node) {
@@ -7775,31 +7528,31 @@
 						case 'NoteValue': {
 							switch (this.$getValue(c)) {
 								case 'Whole': {
-									rhythm.set_value(1);
+									rhythm.value = 1;
 									break;
 								}
 								case 'Half': {
-									rhythm.set_value(2);
+									rhythm.value = 2;
 									break;
 								}
 								case 'Quarter': {
-									rhythm.set_value(4);
+									rhythm.value = 4;
 									break;
 								}
 								case 'Eighth': {
-									rhythm.set_value(8);
+									rhythm.value = 8;
 									break;
 								}
 								case '16th': {
-									rhythm.set_value(16);
+									rhythm.value = 16;
 									break;
 								}
 								case '32nd': {
-									rhythm.set_value(32);
+									rhythm.value = 32;
 									break;
 								}
 								case '64th': {
-									rhythm.set_value(64);
+									rhythm.value = 64;
 									// case "128th":
 									// case "256th":
 									break;
@@ -7808,12 +7561,12 @@
 							break;
 						}
 						case 'PrimaryTuplet': {
-							rhythm.set_tupletNumerator($AlphaTab_Platform_Std.parseInt(e.attributes['num'].value));
-							rhythm.set_tupletDenominator($AlphaTab_Platform_Std.parseInt(e.attributes['den'].value));
+							rhythm.tupletNumerator = $AlphaTab_Platform_Std.parseInt(e.attributes['num'].value);
+							rhythm.tupletDenominator = $AlphaTab_Platform_Std.parseInt(e.attributes['den'].value);
 							break;
 						}
 						case 'AugmentationDot': {
-							rhythm.set_dots($AlphaTab_Platform_Std.parseInt(e.attributes['cound'].value));
+							rhythm.dots = $AlphaTab_Platform_Std.parseInt(e.attributes['cound'].value);
 							break;
 						}
 					}
@@ -7842,10 +7595,10 @@
 					var rhythmId = this.$_rhythmOfBeat.get_item(beatId);
 					var rhythm = this.$_rhythmById.get_item(rhythmId);
 					// set beat duration
-					beat.set_duration(rhythm.get_value());
-					beat.set_dots(rhythm.get_dots());
-					beat.set_tupletNumerator(rhythm.get_tupletNumerator());
-					beat.set_tupletDenominator(rhythm.get_tupletDenominator());
+					beat.duration = rhythm.value;
+					beat.dots = rhythm.dots;
+					beat.tupletNumerator = rhythm.tupletNumerator;
+					beat.tupletDenominator = rhythm.tupletDenominator;
 					// add notes to beat
 					if (this.$_notesOfBeat.containsKey(beatId)) {
 						var $t2 = this.$_notesOfBeat.get_item(beatId);
@@ -7854,7 +7607,7 @@
 							if (!ss.referenceEquals(noteId, $AlphaTab_Importer_GpxParser.$invalidId)) {
 								beat.addNote(this.$_noteById.get_item(noteId));
 								if (this.$_tappedNotes.containsKey(noteId)) {
-									beat.set_tap(true);
+									beat.tap = true;
 								}
 							}
 						}
@@ -7906,8 +7659,8 @@
 								var voice1 = new $AlphaTab_Model_Voice();
 								bar.addVoice(voice1);
 								var beat1 = new $AlphaTab_Model_Beat();
-								beat1.set_isEmpty(true);
-								beat1.set_duration(4);
+								beat1.isEmpty = true;
+								beat1.duration = 4;
 								voice1.addBeat(beat1);
 							}
 						}
@@ -7922,7 +7675,7 @@
 			for (var $t10 = 0; $t10 < this.$_tracksMapping.length; $t10++) {
 				var trackId = this.$_tracksMapping[$t10];
 				var track = this.$_tracksById.get_item(trackId);
-				this.get_score().addTrack(track);
+				this.score.addTrack(track);
 				// iterate all bar definitions for the masterbars
 				// and add the correct bar to the track
 				for (var $t11 = 0; $t11 < this.$_barsOfMasterBar.length; $t11++) {
@@ -7940,14 +7693,13 @@
 				while ($t12.moveNext()) {
 					var barId2 = $t12.current();
 					var bar1 = this.$_barsById.get_item(barId2);
-					var $t13 = bar1.get_voices();
-					for (var $t14 = 0; $t14 < $t13.length; $t14++) {
-						var v = $t13[$t14];
-						if (v.get_beats().length > 0) {
-							var $t15 = this.$_automations.get_item(barId2);
-							for (var $t16 = 0; $t16 < $t15.length; $t16++) {
-								var automation = $t15[$t16];
-								ss.add(v.get_beats()[0].get_automations(), automation);
+					for (var $t13 = 0; $t13 < bar1.voices.length; $t13++) {
+						var v = bar1.voices[$t13];
+						if (v.beats.length > 0) {
+							var $t14 = this.$_automations.get_item(barId2);
+							for (var $t15 = 0; $t15 < $t14.length; $t15++) {
+								var automation = $t14[$t15];
+								ss.add(v.beats[0].automations, automation);
 							}
 						}
 					}
@@ -7957,98 +7709,36 @@
 				$t12.dispose();
 			}
 			// build score
-			for (var $t17 = 0; $t17 < this.$_masterBars.length; $t17++) {
-				var masterBar = this.$_masterBars[$t17];
-				this.get_score().addMasterBar(masterBar);
+			for (var $t16 = 0; $t16 < this.$_masterBars.length; $t16++) {
+				var masterBar = this.$_masterBars[$t16];
+				this.score.addMasterBar(masterBar);
 			}
 			// build automations
-			var $t18 = ss.getEnumerator(this.$_automations.get_keys());
+			var $t17 = ss.getEnumerator(this.$_automations.get_keys());
 			try {
-				while ($t18.moveNext()) {
-					var barId3 = $t18.current();
+				while ($t17.moveNext()) {
+					var barId3 = $t17.current();
 					var automations = this.$_automations.get_item(barId3);
 					var bar2 = this.$_barsById.get_item(barId3);
-					for (var $t19 = 0; $t19 < automations.length; $t19++) {
-						var automation1 = automations[$t19];
-						if (automation1.get_type() === 0) {
+					for (var $t18 = 0; $t18 < automations.length; $t18++) {
+						var automation1 = automations[$t18];
+						if (automation1.type === 0) {
 							if (barId3 === '0') {
-								this.get_score().set_tempo(ss.Int32.trunc(automation1.get_value()));
-								this.get_score().set_tempoLabel(automation1.get_text());
+								this.score.tempo = ss.Int32.trunc(automation1.value);
+								this.score.tempoLabel = automation1.text;
 							}
-							bar2.get_masterBar().set_tempoAutomation(automation1);
+							bar2.get_masterBar().tempoAutomation = automation1;
 						}
 					}
 				}
 			}
 			finally {
-				$t18.dispose();
+				$t17.dispose();
 			}
 		}
 	});
-	ss.initClass($AlphaTab_Importer_GpxRhythm, $asm, {
-		get_dots: function() {
-			return this.$1$DotsField;
-		},
-		set_dots: function(value) {
-			this.$1$DotsField = value;
-		},
-		get_tupletDenominator: function() {
-			return this.$1$TupletDenominatorField;
-		},
-		set_tupletDenominator: function(value) {
-			this.$1$TupletDenominatorField = value;
-		},
-		get_tupletNumerator: function() {
-			return this.$1$TupletNumeratorField;
-		},
-		set_tupletNumerator: function(value) {
-			this.$1$TupletNumeratorField = value;
-		},
-		get_value: function() {
-			return this.$1$ValueField;
-		},
-		set_value: function(value) {
-			this.$1$ValueField = value;
-		}
-	});
-	ss.initClass($AlphaTab_Importer_MixTableChange, $asm, {
-		get_volume: function() {
-			return this.$1$VolumeField;
-		},
-		set_volume: function(value) {
-			this.$1$VolumeField = value;
-		},
-		get_balance: function() {
-			return this.$1$BalanceField;
-		},
-		set_balance: function(value) {
-			this.$1$BalanceField = value;
-		},
-		get_instrument: function() {
-			return this.$1$InstrumentField;
-		},
-		set_instrument: function(value) {
-			this.$1$InstrumentField = value;
-		},
-		get_tempoName: function() {
-			return this.$1$TempoNameField;
-		},
-		set_tempoName: function(value) {
-			this.$1$TempoNameField = value;
-		},
-		get_tempo: function() {
-			return this.$1$TempoField;
-		},
-		set_tempo: function(value) {
-			this.$1$TempoField = value;
-		},
-		get_duration: function() {
-			return this.$1$DurationField;
-		},
-		set_duration: function(value) {
-			this.$1$DurationField = value;
-		}
-	});
+	ss.initClass($AlphaTab_Importer_GpxRhythm, $asm, {});
+	ss.initClass($AlphaTab_Importer_MixTableChange, $asm, {});
 	ss.initClass($AlphaTab_Importer_NoCompatibleReaderFoundException, $asm, {}, ss.Exception);
 	ss.initClass($AlphaTab_Importer_ScoreLoader, $asm, {});
 	ss.initClass($AlphaTab_Importer_UnsupportedFormatException, $asm, {}, ss.Exception);
@@ -8287,106 +7977,27 @@
 	ss.initEnum($AlphaTab_Model_AccentuationType, $asm, { none: 0, normal: 1, heavy: 2 });
 	ss.initEnum($AlphaTab_Model_AccidentalType, $asm, { none: 0, natural: 1, sharp: 2, flat: 3 });
 	ss.initClass($AlphaTab_Model_Automation, $asm, {
-		get_isLinear: function() {
-			return this.$1$IsLinearField;
-		},
-		set_isLinear: function(value) {
-			this.$1$IsLinearField = value;
-		},
-		get_type: function() {
-			return this.$1$TypeField;
-		},
-		set_type: function(value) {
-			this.$1$TypeField = value;
-		},
-		get_value: function() {
-			return this.$1$ValueField;
-		},
-		set_value: function(value) {
-			this.$1$ValueField = value;
-		},
-		get_ratioPosition: function() {
-			return this.$1$RatioPositionField;
-		},
-		set_ratioPosition: function(value) {
-			this.$1$RatioPositionField = value;
-		},
-		get_text: function() {
-			return this.$1$TextField;
-		},
-		set_text: function(value) {
-			this.$1$TextField = value;
-		},
 		clone: function() {
 			var a = new $AlphaTab_Model_Automation();
-			a.set_isLinear(this.get_isLinear());
-			a.set_type(this.get_type());
-			a.set_value(this.get_value());
+			a.isLinear = this.isLinear;
+			a.type = this.type;
+			a.value = this.value;
 			return a;
 		}
 	});
 	ss.initEnum($AlphaTab_Model_AutomationType, $asm, { tempo: 0, volume: 1, instrument: 2, balance: 3 });
 	ss.initClass($AlphaTab_Model_Bar, $asm, {
-		get_index: function() {
-			return this.$1$IndexField;
-		},
-		set_index: function(value) {
-			this.$1$IndexField = value;
-		},
-		get_nextBar: function() {
-			return this.$1$NextBarField;
-		},
-		set_nextBar: function(value) {
-			this.$1$NextBarField = value;
-		},
-		get_previousBar: function() {
-			return this.$1$PreviousBarField;
-		},
-		set_previousBar: function(value) {
-			this.$1$PreviousBarField = value;
-		},
-		get_clef: function() {
-			return this.$1$ClefField;
-		},
-		set_clef: function(value) {
-			this.$1$ClefField = value;
-		},
-		get_track: function() {
-			return this.$1$TrackField;
-		},
-		set_track: function(value) {
-			this.$1$TrackField = value;
-		},
-		get_voices: function() {
-			return this.$1$VoicesField;
-		},
-		set_voices: function(value) {
-			this.$1$VoicesField = value;
-		},
-		get_minDuration: function() {
-			return this.$1$MinDurationField;
-		},
-		set_minDuration: function(value) {
-			this.$1$MinDurationField = value;
-		},
-		get_maxDuration: function() {
-			return this.$1$MaxDurationField;
-		},
-		set_maxDuration: function(value) {
-			this.$1$MaxDurationField = value;
-		},
 		addVoice: function(voice) {
-			voice.set_bar(this);
-			voice.set_index(this.get_voices().length);
-			ss.add(this.get_voices(), voice);
+			voice.bar = this;
+			voice.index = this.voices.length;
+			ss.add(this.voices, voice);
 		},
 		get_masterBar: function() {
-			return this.get_track().get_score().get_masterBars()[this.get_index()];
+			return this.track.score.masterBars[this.index];
 		},
 		get_isEmpty: function() {
-			var $t1 = this.get_voices();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var voice = $t1[$t2];
+			for (var $t1 = 0; $t1 < this.voices.length; $t1++) {
+				var voice = this.voices[$t1];
 				if (!voice.get_isEmpty()) {
 					return false;
 				}
@@ -8394,56 +8005,19 @@
 			return true;
 		},
 		finish: function() {
-			var $t1 = this.get_voices();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var voice = $t1[$t2];
+			for (var $t1 = 0; $t1 < this.voices.length; $t1++) {
+				var voice = this.voices[$t1];
 				voice.finish();
-				if (ss.isNullOrUndefined(voice.get_minDuration()) || ss.isNullOrUndefined(this.get_minDuration()) || this.get_minDuration().get_value() > voice.get_minDuration().get_value()) {
-					this.set_minDuration(voice.get_minDuration());
+				if (ss.isNullOrUndefined(voice.minDuration) || ss.isNullOrUndefined(this.minDuration) || this.minDuration.get_value() > voice.minDuration.get_value()) {
+					this.minDuration = voice.minDuration;
 				}
-				if (ss.isNullOrUndefined(voice.get_maxDuration()) || ss.isNullOrUndefined(this.get_maxDuration()) || this.get_maxDuration().get_value() > voice.get_maxDuration().get_value()) {
-					this.set_minDuration(voice.get_maxDuration());
+				if (ss.isNullOrUndefined(voice.maxDuration) || ss.isNullOrUndefined(this.maxDuration) || this.maxDuration.get_value() > voice.maxDuration.get_value()) {
+					this.minDuration = voice.maxDuration;
 				}
 			}
 		}
 	});
 	ss.initClass($AlphaTab_Model_Beat, $asm, {
-		get_previousBeat: function() {
-			return this.$1$PreviousBeatField;
-		},
-		set_previousBeat: function(value) {
-			this.$1$PreviousBeatField = value;
-		},
-		get_nextBeat: function() {
-			return this.$1$NextBeatField;
-		},
-		set_nextBeat: function(value) {
-			this.$1$NextBeatField = value;
-		},
-		get_index: function() {
-			return this.$1$IndexField;
-		},
-		set_index: function(value) {
-			this.$1$IndexField = value;
-		},
-		get_voice: function() {
-			return this.$1$VoiceField;
-		},
-		set_voice: function(value) {
-			this.$1$VoiceField = value;
-		},
-		get_notes: function() {
-			return this.$1$NotesField;
-		},
-		set_notes: function(value) {
-			this.$1$NotesField = value;
-		},
-		get_isEmpty: function() {
-			return this.$1$IsEmptyField;
-		},
-		set_isEmpty: function(value) {
-			this.$1$IsEmptyField = value;
-		},
 		get_minNote: function() {
 			if (ss.isNullOrUndefined(this.$_minNote)) {
 				this.refreshNotes();
@@ -8456,220 +8030,78 @@
 			}
 			return this.$_maxNote;
 		},
-		get_duration: function() {
-			return this.$1$DurationField;
-		},
-		set_duration: function(value) {
-			this.$1$DurationField = value;
-		},
 		get_isRest: function() {
-			return this.get_notes().length === 0;
-		},
-		get_automations: function() {
-			return this.$1$AutomationsField;
-		},
-		set_automations: function(value) {
-			this.$1$AutomationsField = value;
-		},
-		get_dots: function() {
-			return this.$1$DotsField;
-		},
-		set_dots: function(value) {
-			this.$1$DotsField = value;
-		},
-		get_fadeIn: function() {
-			return this.$1$FadeInField;
-		},
-		set_fadeIn: function(value) {
-			this.$1$FadeInField = value;
-		},
-		get_lyrics: function() {
-			return this.$1$LyricsField;
-		},
-		set_lyrics: function(value) {
-			this.$1$LyricsField = value;
-		},
-		get_pop: function() {
-			return this.$1$PopField;
-		},
-		set_pop: function(value) {
-			this.$1$PopField = value;
-		},
-		get_hasRasgueado: function() {
-			return this.$1$HasRasgueadoField;
-		},
-		set_hasRasgueado: function(value) {
-			this.$1$HasRasgueadoField = value;
-		},
-		get_slap: function() {
-			return this.$1$SlapField;
-		},
-		set_slap: function(value) {
-			this.$1$SlapField = value;
-		},
-		get_tap: function() {
-			return this.$1$TapField;
-		},
-		set_tap: function(value) {
-			this.$1$TapField = value;
-		},
-		get_text: function() {
-			return this.$1$TextField;
-		},
-		set_text: function(value) {
-			this.$1$TextField = value;
-		},
-		get_brushType: function() {
-			return this.$1$BrushTypeField;
-		},
-		set_brushType: function(value) {
-			this.$1$BrushTypeField = value;
-		},
-		get_brushDuration: function() {
-			return this.$1$BrushDurationField;
-		},
-		set_brushDuration: function(value) {
-			this.$1$BrushDurationField = value;
-		},
-		get_tupletDenominator: function() {
-			return this.$1$TupletDenominatorField;
-		},
-		set_tupletDenominator: function(value) {
-			this.$1$TupletDenominatorField = value;
-		},
-		get_tupletNumerator: function() {
-			return this.$1$TupletNumeratorField;
-		},
-		set_tupletNumerator: function(value) {
-			this.$1$TupletNumeratorField = value;
+			return this.notes.length === 0;
 		},
 		get_hasTuplet: function() {
-			return !(this.get_tupletDenominator() === -1 && this.get_tupletNumerator() === -1) && !(this.get_tupletDenominator() === 1 && this.get_tupletNumerator() === 1);
-		},
-		get_whammyBarPoints: function() {
-			return this.$1$WhammyBarPointsField;
-		},
-		set_whammyBarPoints: function(value) {
-			this.$1$WhammyBarPointsField = value;
+			return !(this.tupletDenominator === -1 && this.tupletNumerator === -1) && !(this.tupletDenominator === 1 && this.tupletNumerator === 1);
 		},
 		get_hasWhammyBar: function() {
-			return this.get_whammyBarPoints().length > 0;
-		},
-		get_vibrato: function() {
-			return this.$1$VibratoField;
-		},
-		set_vibrato: function(value) {
-			this.$1$VibratoField = value;
-		},
-		get_chordId: function() {
-			return this.$1$ChordIdField;
-		},
-		set_chordId: function(value) {
-			this.$1$ChordIdField = value;
+			return this.whammyBarPoints.length > 0;
 		},
 		get_hasChord: function() {
-			return ss.isValue(this.get_chordId());
+			return ss.isValue(this.chordId);
 		},
 		get_chord: function() {
-			return this.get_voice().get_bar().get_track().get_chords().get_item(this.get_chordId());
-		},
-		get_graceType: function() {
-			return this.$1$GraceTypeField;
-		},
-		set_graceType: function(value) {
-			this.$1$GraceTypeField = value;
-		},
-		get_pickStroke: function() {
-			return this.$1$PickStrokeField;
-		},
-		set_pickStroke: function(value) {
-			this.$1$PickStrokeField = value;
+			return this.voice.bar.track.chords.get_item(this.chordId);
 		},
 		get_isTremolo: function() {
-			return ss.isValue(this.get_tremoloSpeed());
-		},
-		get_tremoloSpeed: function() {
-			return this.$1$TremoloSpeedField;
-		},
-		set_tremoloSpeed: function(value) {
-			this.$1$TremoloSpeedField = value;
-		},
-		get_crescendo: function() {
-			return this.$1$CrescendoField;
-		},
-		set_crescendo: function(value) {
-			this.$1$CrescendoField = value;
-		},
-		get_start: function() {
-			return this.$1$StartField;
-		},
-		set_start: function(value) {
-			this.$1$StartField = value;
-		},
-		get_dynamic: function() {
-			return this.$1$DynamicField;
-		},
-		set_dynamic: function(value) {
-			this.$1$DynamicField = value;
+			return ss.isValue(this.tremoloSpeed);
 		},
 		clone: function() {
 			var beat = new $AlphaTab_Model_Beat();
-			var $t1 = this.get_whammyBarPoints();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var b = $t1[$t2];
-				ss.add(beat.get_whammyBarPoints(), b.clone());
+			for (var $t1 = 0; $t1 < this.whammyBarPoints.length; $t1++) {
+				var b = this.whammyBarPoints[$t1];
+				ss.add(beat.whammyBarPoints, b.clone());
 			}
-			var $t3 = this.get_notes();
-			for (var $t4 = 0; $t4 < $t3.length; $t4++) {
-				var n = $t3[$t4];
+			for (var $t2 = 0; $t2 < this.notes.length; $t2++) {
+				var n = this.notes[$t2];
 				beat.addNote(n.clone());
 			}
-			beat.set_dots(this.get_dots());
-			beat.set_chordId(this.get_chordId());
-			beat.set_brushType(this.get_brushType());
-			beat.set_vibrato(this.get_vibrato());
-			beat.set_graceType(this.get_graceType());
-			beat.set_pickStroke(this.get_pickStroke());
-			beat.set_duration(this.get_duration());
-			beat.set_tremoloSpeed(this.get_tremoloSpeed());
-			beat.set_text(this.get_text());
-			beat.set_fadeIn(this.get_fadeIn());
-			beat.set_tap(this.get_tap());
-			beat.set_slap(this.get_slap());
-			beat.set_pop(this.get_pop());
-			var $t5 = this.get_automations();
-			for (var $t6 = 0; $t6 < $t5.length; $t6++) {
-				var a = $t5[$t6];
-				ss.add(beat.get_automations(), a.clone());
+			beat.dots = this.dots;
+			beat.chordId = this.chordId;
+			beat.brushType = this.brushType;
+			beat.vibrato = this.vibrato;
+			beat.graceType = this.graceType;
+			beat.pickStroke = this.pickStroke;
+			beat.duration = this.duration;
+			beat.tremoloSpeed = this.tremoloSpeed;
+			beat.text = this.text;
+			beat.fadeIn = this.fadeIn;
+			beat.tap = this.tap;
+			beat.slap = this.slap;
+			beat.pop = this.pop;
+			for (var $t3 = 0; $t3 < this.automations.length; $t3++) {
+				var a = this.automations[$t3];
+				ss.add(beat.automations, a.clone());
 			}
-			beat.set_start(this.get_start());
-			beat.set_tupletDenominator(this.get_tupletDenominator());
-			beat.set_tupletNumerator(this.get_tupletNumerator());
-			beat.set_dynamic(this.get_dynamic());
-			beat.set_crescendo(this.get_crescendo());
+			beat.start = this.start;
+			beat.tupletDenominator = this.tupletDenominator;
+			beat.tupletNumerator = this.tupletNumerator;
+			beat.dynamic = this.dynamic;
+			beat.crescendo = this.crescendo;
 			return beat;
 		},
 		calculateDuration: function() {
-			var ticks = $AlphaTab_Audio_MidiUtils.toTicks(this.get_duration());
-			if (this.get_dots() === 2) {
+			var ticks = $AlphaTab_Audio_MidiUtils.toTicks(this.duration);
+			if (this.dots === 2) {
 				ticks = $AlphaTab_Audio_MidiUtils.applyDot(ticks, true);
 			}
-			else if (this.get_dots() === 1) {
+			else if (this.dots === 1) {
 				ticks = $AlphaTab_Audio_MidiUtils.applyDot(ticks, false);
 			}
-			if (this.get_tupletDenominator() > 0 && this.get_tupletNumerator() >= 0) {
-				ticks = $AlphaTab_Audio_MidiUtils.applyTuplet(ticks, this.get_tupletNumerator(), this.get_tupletDenominator());
+			if (this.tupletDenominator > 0 && this.tupletNumerator >= 0) {
+				ticks = $AlphaTab_Audio_MidiUtils.applyTuplet(ticks, this.tupletNumerator, this.tupletDenominator);
 			}
 			return ticks;
 		},
 		addNote: function(note) {
-			note.set_beat(this);
-			ss.add(this.get_notes(), note);
+			note.beat = this;
+			ss.add(this.notes, note);
 		},
 		refreshNotes: function() {
-			var $t1 = this.get_notes();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var note = $t1[$t2];
+			for (var $t1 = 0; $t1 < this.notes.length; $t1++) {
+				var note = this.notes[$t1];
 				if (ss.isNullOrUndefined(this.$_minNote) || note.get_realValue() < this.$_minNote.get_realValue()) {
 					this.$_minNote = note;
 				}
@@ -8679,20 +8111,18 @@
 			}
 		},
 		getAutomation: function(type) {
-			var $t1 = this.get_automations();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var automation = $t1[$t2];
-				if (automation.get_type() === type) {
+			for (var $t1 = 0; $t1 < this.automations.length; $t1++) {
+				var automation = this.automations[$t1];
+				if (automation.type === type) {
 					return automation;
 				}
 			}
 			return null;
 		},
 		getNoteOnString: function(string) {
-			var $t1 = this.get_notes();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var note = $t1[$t2];
-				if (note.get_string() === string) {
+			for (var $t1 = 0; $t1 < this.notes.length; $t1++) {
+				var note = this.notes[$t1];
+				if (note.string === string) {
 					return note;
 				}
 			}
@@ -8700,60 +8130,28 @@
 		},
 		finish: function() {
 			// start
-			if (this.get_index() === 0) {
-				this.set_start(this.get_voice().get_bar().get_masterBar().get_start());
+			if (this.index === 0) {
+				this.start = this.voice.bar.get_masterBar().start;
 			}
 			else {
-				this.set_start(this.get_previousBeat().get_start() + this.get_previousBeat().calculateDuration());
+				this.start = this.previousBeat.start + this.previousBeat.calculateDuration();
 			}
-			var $t1 = this.get_notes();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var note = $t1[$t2];
+			for (var $t1 = 0; $t1 < this.notes.length; $t1++) {
+				var note = this.notes[$t1];
 				note.finish();
 			}
 		}
 	});
 	ss.initClass($AlphaTab_Model_BendPoint, $asm, {
-		get_offset: function() {
-			return this.$1$OffsetField;
-		},
-		set_offset: function(value) {
-			this.$1$OffsetField = value;
-		},
-		get_value: function() {
-			return this.$1$ValueField;
-		},
-		set_value: function(value) {
-			this.$1$ValueField = value;
-		},
 		clone: function() {
 			var point = new $AlphaTab_Model_BendPoint(0, 0);
-			point.set_offset(this.get_offset());
-			point.set_value(this.get_value());
+			point.offset = this.offset;
+			point.value = this.value;
 			return point;
 		}
 	});
 	ss.initEnum($AlphaTab_Model_BrushType, $asm, { none: 0, brushUp: 1, brushDown: 2, arpeggioUp: 3, arpeggioDown: 4 });
-	ss.initClass($AlphaTab_Model_Chord, $asm, {
-		get_name: function() {
-			return this.$1$NameField;
-		},
-		set_name: function(value) {
-			this.$1$NameField = value;
-		},
-		get_firstFret: function() {
-			return this.$1$FirstFretField;
-		},
-		set_firstFret: function(value) {
-			this.$1$FirstFretField = value;
-		},
-		get_strings: function() {
-			return this.$1$StringsField;
-		},
-		set_strings: function(value) {
-			this.$1$StringsField = value;
-		}
-	});
+	ss.initClass($AlphaTab_Model_Chord, $asm, {});
 	ss.initEnum($AlphaTab_Model_Clef, $asm, { neutral: 0, c3: 1, c4: 2, f4: 3, g2: 4 });
 	ss.initEnum($AlphaTab_Model_CrescendoType, $asm, { none: 0, crescendo: 1, decrescendo: 2 });
 	ss.initEnum($AlphaTab_Model_Duration, $asm, { whole: 1, half: 2, quarter: 4, eighth: 8, sixteenth: 16, thirtySecond: 32, sixtyFourth: 64 });
@@ -8763,346 +8161,63 @@
 	ss.initEnum($AlphaTab_Model_HarmonicType, $asm, { none: 0, natural: 1, artificial: 2, pinch: 3, tap: 4, semi: 5, feedback: 6 });
 	ss.initEnum($AlphaTab_Model_KeySignatureType, $asm, { major: 0, minor: 1 });
 	ss.initClass($AlphaTab_Model_MasterBar, $asm, {
-		get_alternateEndings: function() {
-			return this.$1$AlternateEndingsField;
-		},
-		set_alternateEndings: function(value) {
-			this.$1$AlternateEndingsField = value;
-		},
-		get_nextMasterBar: function() {
-			return this.$1$NextMasterBarField;
-		},
-		set_nextMasterBar: function(value) {
-			this.$1$NextMasterBarField = value;
-		},
-		get_previousMasterBar: function() {
-			return this.$1$PreviousMasterBarField;
-		},
-		set_previousMasterBar: function(value) {
-			this.$1$PreviousMasterBarField = value;
-		},
-		get_index: function() {
-			return this.$1$IndexField;
-		},
-		set_index: function(value) {
-			this.$1$IndexField = value;
-		},
-		get_keySignature: function() {
-			return this.$1$KeySignatureField;
-		},
-		set_keySignature: function(value) {
-			this.$1$KeySignatureField = value;
-		},
-		get_isDoubleBar: function() {
-			return this.$1$IsDoubleBarField;
-		},
-		set_isDoubleBar: function(value) {
-			this.$1$IsDoubleBarField = value;
-		},
-		get_isRepeatStart: function() {
-			return this.$1$IsRepeatStartField;
-		},
-		set_isRepeatStart: function(value) {
-			this.$1$IsRepeatStartField = value;
-		},
 		get_isRepeatEnd: function() {
-			return this.get_repeatCount() > 0;
-		},
-		get_repeatCount: function() {
-			return this.$1$RepeatCountField;
-		},
-		set_repeatCount: function(value) {
-			this.$1$RepeatCountField = value;
-		},
-		get_repeatGroup: function() {
-			return this.$1$RepeatGroupField;
-		},
-		set_repeatGroup: function(value) {
-			this.$1$RepeatGroupField = value;
-		},
-		get_timeSignatureNumerator: function() {
-			return this.$1$TimeSignatureNumeratorField;
-		},
-		set_timeSignatureNumerator: function(value) {
-			this.$1$TimeSignatureNumeratorField = value;
-		},
-		get_timeSignatureDenominator: function() {
-			return this.$1$TimeSignatureDenominatorField;
-		},
-		set_timeSignatureDenominator: function(value) {
-			this.$1$TimeSignatureDenominatorField = value;
-		},
-		get_tripletFeel: function() {
-			return this.$1$TripletFeelField;
-		},
-		set_tripletFeel: function(value) {
-			this.$1$TripletFeelField = value;
-		},
-		get_section: function() {
-			return this.$1$SectionField;
-		},
-		set_section: function(value) {
-			this.$1$SectionField = value;
+			return this.repeatCount > 0;
 		},
 		get_isSectionStart: function() {
-			return ss.isValue(this.get_section());
-		},
-		get_tempoAutomation: function() {
-			return this.$1$TempoAutomationField;
-		},
-		set_tempoAutomation: function(value) {
-			this.$1$TempoAutomationField = value;
-		},
-		get_volumeAutomation: function() {
-			return this.$1$VolumeAutomationField;
-		},
-		set_volumeAutomation: function(value) {
-			this.$1$VolumeAutomationField = value;
-		},
-		get_score: function() {
-			return this.$1$ScoreField;
-		},
-		set_score: function(value) {
-			this.$1$ScoreField = value;
-		},
-		get_start: function() {
-			return this.$1$StartField;
-		},
-		set_start: function(value) {
-			this.$1$StartField = value;
+			return ss.isValue(this.section);
 		},
 		calculateDuration: function() {
-			return this.get_timeSignatureNumerator() * $AlphaTab_Audio_MidiUtils.valueToTicks(this.get_timeSignatureDenominator());
+			return this.timeSignatureNumerator * $AlphaTab_Audio_MidiUtils.valueToTicks(this.timeSignatureDenominator);
 		}
 	});
 	ss.initClass($AlphaTab_Model_ModelUtils, $asm, {});
 	ss.initClass($AlphaTab_Model_Note, $asm, {
-		get_accentuated: function() {
-			return this.$1$AccentuatedField;
-		},
-		set_accentuated: function(value) {
-			this.$1$AccentuatedField = value;
-		},
-		get_bendPoints: function() {
-			return this.$1$BendPointsField;
-		},
-		set_bendPoints: function(value) {
-			this.$1$BendPointsField = value;
-		},
 		get_hasBend: function() {
-			return this.get_bendPoints().length > 0;
-		},
-		get_fret: function() {
-			return this.$1$FretField;
-		},
-		set_fret: function(value) {
-			this.$1$FretField = value;
-		},
-		get_string: function() {
-			return this.$1$StringField;
-		},
-		set_string: function(value) {
-			this.$1$StringField = value;
-		},
-		get_hammerPullOrigin: function() {
-			return this.$1$HammerPullOriginField;
-		},
-		set_hammerPullOrigin: function(value) {
-			this.$1$HammerPullOriginField = value;
-		},
-		get_isHammerPullDestination: function() {
-			return this.$1$IsHammerPullDestinationField;
-		},
-		set_isHammerPullDestination: function(value) {
-			this.$1$IsHammerPullDestinationField = value;
-		},
-		get_isHammerPullOrigin: function() {
-			return this.$1$IsHammerPullOriginField;
-		},
-		set_isHammerPullOrigin: function(value) {
-			this.$1$IsHammerPullOriginField = value;
-		},
-		get_harmonicValue: function() {
-			return this.$1$HarmonicValueField;
-		},
-		set_harmonicValue: function(value) {
-			this.$1$HarmonicValueField = value;
-		},
-		get_harmonicType: function() {
-			return this.$1$HarmonicTypeField;
-		},
-		set_harmonicType: function(value) {
-			this.$1$HarmonicTypeField = value;
-		},
-		get_isGhost: function() {
-			return this.$1$IsGhostField;
-		},
-		set_isGhost: function(value) {
-			this.$1$IsGhostField = value;
-		},
-		get_isLetRing: function() {
-			return this.$1$IsLetRingField;
-		},
-		set_isLetRing: function(value) {
-			this.$1$IsLetRingField = value;
-		},
-		get_isPalmMute: function() {
-			return this.$1$IsPalmMuteField;
-		},
-		set_isPalmMute: function(value) {
-			this.$1$IsPalmMuteField = value;
-		},
-		get_isDead: function() {
-			return this.$1$IsDeadField;
-		},
-		set_isDead: function(value) {
-			this.$1$IsDeadField = value;
-		},
-		get_isStaccato: function() {
-			return this.$1$IsStaccatoField;
-		},
-		set_isStaccato: function(value) {
-			this.$1$IsStaccatoField = value;
-		},
-		get_slideType: function() {
-			return this.$1$SlideTypeField;
-		},
-		set_slideType: function(value) {
-			this.$1$SlideTypeField = value;
-		},
-		get_slideTarget: function() {
-			return this.$1$SlideTargetField;
-		},
-		set_slideTarget: function(value) {
-			this.$1$SlideTargetField = value;
-		},
-		get_vibrato: function() {
-			return this.$1$VibratoField;
-		},
-		set_vibrato: function(value) {
-			this.$1$VibratoField = value;
-		},
-		get_tieOrigin: function() {
-			return this.$1$TieOriginField;
-		},
-		set_tieOrigin: function(value) {
-			this.$1$TieOriginField = value;
-		},
-		get_isTieDestination: function() {
-			return this.$1$IsTieDestinationField;
-		},
-		set_isTieDestination: function(value) {
-			this.$1$IsTieDestinationField = value;
-		},
-		get_isTieOrigin: function() {
-			return this.$1$IsTieOriginField;
-		},
-		set_isTieOrigin: function(value) {
-			this.$1$IsTieOriginField = value;
-		},
-		get_leftHandFinger: function() {
-			return this.$1$LeftHandFingerField;
-		},
-		set_leftHandFinger: function(value) {
-			this.$1$LeftHandFingerField = value;
-		},
-		get_rightHandFinger: function() {
-			return this.$1$RightHandFingerField;
-		},
-		set_rightHandFinger: function(value) {
-			this.$1$RightHandFingerField = value;
-		},
-		get_isFingering: function() {
-			return this.$1$IsFingeringField;
-		},
-		set_isFingering: function(value) {
-			this.$1$IsFingeringField = value;
-		},
-		get_trillValue: function() {
-			return this.$1$TrillValueField;
-		},
-		set_trillValue: function(value) {
-			this.$1$TrillValueField = value;
+			return this.bendPoints.length > 0;
 		},
 		get_trillFret: function() {
-			return this.get_trillValue() - this.get_stringTuning();
+			return this.trillValue - this.get_stringTuning();
 		},
 		get_isTrill: function() {
-			return this.get_trillValue() >= 0;
-		},
-		get_trillSpeed: function() {
-			return this.$1$TrillSpeedField;
-		},
-		set_trillSpeed: function(value) {
-			this.$1$TrillSpeedField = value;
-		},
-		get_durationPercent: function() {
-			return this.$1$DurationPercentField;
-		},
-		set_durationPercent: function(value) {
-			this.$1$DurationPercentField = value;
-		},
-		get_swapAccidentals: function() {
-			return this.$1$SwapAccidentalsField;
-		},
-		set_swapAccidentals: function(value) {
-			this.$1$SwapAccidentalsField = value;
-		},
-		get_beat: function() {
-			return this.$1$BeatField;
-		},
-		set_beat: function(value) {
-			this.$1$BeatField = value;
-		},
-		get_dynamic: function() {
-			return this.$1$DynamicField;
-		},
-		set_dynamic: function(value) {
-			this.$1$DynamicField = value;
-		},
-		get_octave: function() {
-			return this.$1$OctaveField;
-		},
-		set_octave: function(value) {
-			this.$1$OctaveField = value;
+			return this.trillValue >= 0;
 		},
 		get_stringTuning: function() {
-			return this.get_beat().get_voice().get_bar().get_track().get_tuning()[this.get_beat().get_voice().get_bar().get_track().get_tuning().length - (this.get_string() - 1) - 1];
+			return this.beat.voice.bar.track.tuning[this.beat.voice.bar.track.tuning.length - (this.string - 1) - 1];
 		},
 		get_realValue: function() {
-			return this.get_fret() + this.get_stringTuning();
+			return this.fret + this.get_stringTuning();
 		},
 		clone: function() {
 			var n = new $AlphaTab_Model_Note();
-			var $t1 = this.get_bendPoints();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var p = $t1[$t2];
-				ss.add(n.get_bendPoints(), p.clone());
+			for (var $t1 = 0; $t1 < this.bendPoints.length; $t1++) {
+				var p = this.bendPoints[$t1];
+				ss.add(n.bendPoints, p.clone());
 			}
-			n.set_dynamic(this.get_dynamic());
-			n.set_accentuated(this.get_accentuated());
-			n.set_fret(this.get_fret());
-			n.set_isGhost(this.get_isGhost());
-			n.set_string(this.get_string());
-			n.set_isHammerPullDestination(this.get_isHammerPullDestination());
-			n.set_isHammerPullOrigin(this.get_isHammerPullOrigin());
-			n.set_harmonicValue(this.get_harmonicValue());
-			n.set_harmonicType(this.get_harmonicType());
-			n.set_isLetRing(this.get_isLetRing());
-			n.set_isPalmMute(this.get_isPalmMute());
-			n.set_isDead(this.get_isDead());
-			n.set_slideType(this.get_slideType());
-			n.set_vibrato(this.get_vibrato());
-			n.set_isStaccato(this.get_isStaccato());
-			n.set_isTieOrigin(this.get_isTieOrigin());
-			n.set_isTieDestination(this.get_isTieDestination());
-			n.set_leftHandFinger(this.get_leftHandFinger());
-			n.set_rightHandFinger(this.get_rightHandFinger());
-			n.set_isFingering(this.get_isFingering());
-			n.set_swapAccidentals(this.get_swapAccidentals());
-			n.set_trillValue(this.get_trillValue());
-			n.set_trillSpeed(this.get_trillSpeed());
-			n.set_durationPercent(this.get_durationPercent());
+			n.dynamic = this.dynamic;
+			n.accentuated = this.accentuated;
+			n.fret = this.fret;
+			n.isGhost = this.isGhost;
+			n.string = this.string;
+			n.isHammerPullDestination = this.isHammerPullDestination;
+			n.isHammerPullOrigin = this.isHammerPullOrigin;
+			n.harmonicValue = this.harmonicValue;
+			n.harmonicType = this.harmonicType;
+			n.isLetRing = this.isLetRing;
+			n.isPalmMute = this.isPalmMute;
+			n.isDead = this.isDead;
+			n.slideType = this.slideType;
+			n.vibrato = this.vibrato;
+			n.isStaccato = this.isStaccato;
+			n.isTieOrigin = this.isTieOrigin;
+			n.isTieDestination = this.isTieDestination;
+			n.leftHandFinger = this.leftHandFinger;
+			n.rightHandFinger = this.rightHandFinger;
+			n.isFingering = this.isFingering;
+			n.swapAccidentals = this.swapAccidentals;
+			n.trillValue = this.trillValue;
+			n.trillSpeed = this.trillSpeed;
+			n.durationPercent = this.durationPercent;
 			return n;
 		},
 		finish: function() {
@@ -9113,448 +8228,154 @@
 				return $AlphaTab_Model_Note.$previousNoteOnSameLine(this);
 			}));
 			// connect ties
-			if (this.get_isTieDestination()) {
+			if (this.isTieDestination) {
 				if (ss.isNullOrUndefined(prevNoteOnLine.value())) {
-					this.set_isTieDestination(false);
+					this.isTieDestination = false;
 				}
 				else {
-					this.set_tieOrigin(prevNoteOnLine.value());
-					this.get_tieOrigin().set_isTieOrigin(true);
-					this.set_fret(this.get_tieOrigin().get_fret());
+					this.tieOrigin = prevNoteOnLine.value();
+					this.tieOrigin.isTieOrigin = true;
+					this.fret = this.tieOrigin.fret;
 				}
 			}
 			// set hammeron/pulloffs
-			if (this.get_isHammerPullOrigin()) {
+			if (this.isHammerPullOrigin) {
 				if (ss.isNullOrUndefined(nextNoteOnLine.value())) {
-					this.set_isHammerPullOrigin(false);
+					this.isHammerPullOrigin = false;
 				}
 				else {
-					nextNoteOnLine.value().set_isHammerPullDestination(true);
-					nextNoteOnLine.value().set_hammerPullOrigin(this);
+					nextNoteOnLine.value().isHammerPullDestination = true;
+					nextNoteOnLine.value().hammerPullOrigin = this;
 				}
 			}
 			// set slides
-			if (this.get_slideType() !== 0) {
-				this.set_slideTarget(nextNoteOnLine.value());
+			if (this.slideType !== 0) {
+				this.slideTarget = nextNoteOnLine.value();
 			}
 		}
 	});
 	ss.initEnum($AlphaTab_Model_PickStrokeType, $asm, { none: 0, up: 1, down: 2 });
-	ss.initClass($AlphaTab_Model_PlaybackInformation, $asm, {
-		get_volume: function() {
-			return this.$1$VolumeField;
-		},
-		set_volume: function(value) {
-			this.$1$VolumeField = value;
-		},
-		get_balance: function() {
-			return this.$1$BalanceField;
-		},
-		set_balance: function(value) {
-			this.$1$BalanceField = value;
-		},
-		get_port: function() {
-			return this.$1$PortField;
-		},
-		set_port: function(value) {
-			this.$1$PortField = value;
-		},
-		get_program: function() {
-			return this.$1$ProgramField;
-		},
-		set_program: function(value) {
-			this.$1$ProgramField = value;
-		},
-		get_primaryChannel: function() {
-			return this.$1$PrimaryChannelField;
-		},
-		set_primaryChannel: function(value) {
-			this.$1$PrimaryChannelField = value;
-		},
-		get_secondaryChannel: function() {
-			return this.$1$SecondaryChannelField;
-		},
-		set_secondaryChannel: function(value) {
-			this.$1$SecondaryChannelField = value;
-		},
-		get_isMute: function() {
-			return this.$1$IsMuteField;
-		},
-		set_isMute: function(value) {
-			this.$1$IsMuteField = value;
-		},
-		get_isSolo: function() {
-			return this.$1$IsSoloField;
-		},
-		set_isSolo: function(value) {
-			this.$1$IsSoloField = value;
-		}
-	});
+	ss.initClass($AlphaTab_Model_PlaybackInformation, $asm, {});
 	ss.initClass($AlphaTab_Model_RepeatGroup, $asm, {
-		get_masterBars: function() {
-			return this.$1$MasterBarsField;
-		},
-		set_masterBars: function(value) {
-			this.$1$MasterBarsField = value;
-		},
-		get_openings: function() {
-			return this.$1$OpeningsField;
-		},
-		set_openings: function(value) {
-			this.$1$OpeningsField = value;
-		},
-		get_closings: function() {
-			return this.$1$ClosingsField;
-		},
-		set_closings: function(value) {
-			this.$1$ClosingsField = value;
-		},
-		get_isClosed: function() {
-			return this.$1$IsClosedField;
-		},
-		set_isClosed: function(value) {
-			this.$1$IsClosedField = value;
-		},
 		addMasterBar: function(masterBar) {
-			if (this.get_openings().length === 0) {
-				ss.add(this.get_openings(), masterBar);
+			if (this.openings.length === 0) {
+				ss.add(this.openings, masterBar);
 			}
-			ss.add(this.get_masterBars(), masterBar);
-			masterBar.set_repeatGroup(this);
+			ss.add(this.masterBars, masterBar);
+			masterBar.repeatGroup = this;
 			if (masterBar.get_isRepeatEnd()) {
-				ss.add(this.get_closings(), masterBar);
-				this.set_isClosed(true);
+				ss.add(this.closings, masterBar);
+				this.isClosed = true;
 			}
-			else if (this.get_isClosed()) {
-				this.set_isClosed(false);
-				ss.add(this.get_openings(), masterBar);
+			else if (this.isClosed) {
+				this.isClosed = false;
+				ss.add(this.openings, masterBar);
 			}
 		}
 	});
 	ss.initClass($AlphaTab_Model_Score, $asm, {
-		get_album: function() {
-			return this.$1$AlbumField;
-		},
-		set_album: function(value) {
-			this.$1$AlbumField = value;
-		},
-		get_artist: function() {
-			return this.$1$ArtistField;
-		},
-		set_artist: function(value) {
-			this.$1$ArtistField = value;
-		},
-		get_copyright: function() {
-			return this.$1$CopyrightField;
-		},
-		set_copyright: function(value) {
-			this.$1$CopyrightField = value;
-		},
-		get_instructions: function() {
-			return this.$1$InstructionsField;
-		},
-		set_instructions: function(value) {
-			this.$1$InstructionsField = value;
-		},
-		get_music: function() {
-			return this.$1$MusicField;
-		},
-		set_music: function(value) {
-			this.$1$MusicField = value;
-		},
-		get_notices: function() {
-			return this.$1$NoticesField;
-		},
-		set_notices: function(value) {
-			this.$1$NoticesField = value;
-		},
-		get_subTitle: function() {
-			return this.$1$SubTitleField;
-		},
-		set_subTitle: function(value) {
-			this.$1$SubTitleField = value;
-		},
-		get_title: function() {
-			return this.$1$TitleField;
-		},
-		set_title: function(value) {
-			this.$1$TitleField = value;
-		},
-		get_words: function() {
-			return this.$1$WordsField;
-		},
-		set_words: function(value) {
-			this.$1$WordsField = value;
-		},
-		get_tab: function() {
-			return this.$1$TabField;
-		},
-		set_tab: function(value) {
-			this.$1$TabField = value;
-		},
-		get_tempo: function() {
-			return this.$1$TempoField;
-		},
-		set_tempo: function(value) {
-			this.$1$TempoField = value;
-		},
-		get_tempoLabel: function() {
-			return this.$1$TempoLabelField;
-		},
-		set_tempoLabel: function(value) {
-			this.$1$TempoLabelField = value;
-		},
-		get_masterBars: function() {
-			return this.$1$MasterBarsField;
-		},
-		set_masterBars: function(value) {
-			this.$1$MasterBarsField = value;
-		},
-		get_tracks: function() {
-			return this.$1$TracksField;
-		},
-		set_tracks: function(value) {
-			this.$1$TracksField = value;
-		},
 		addMasterBar: function(bar) {
-			bar.set_score(this);
-			bar.set_index(this.get_masterBars().length);
-			if (this.get_masterBars().length !== 0) {
-				bar.set_previousMasterBar(this.get_masterBars()[this.get_masterBars().length - 1]);
-				bar.get_previousMasterBar().set_nextMasterBar(bar);
-				bar.set_start(bar.get_previousMasterBar().get_start() + bar.get_previousMasterBar().calculateDuration());
+			bar.score = this;
+			bar.index = this.masterBars.length;
+			if (this.masterBars.length !== 0) {
+				bar.previousMasterBar = this.masterBars[this.masterBars.length - 1];
+				bar.previousMasterBar.nextMasterBar = bar;
+				bar.start = bar.previousMasterBar.start + bar.previousMasterBar.calculateDuration();
 			}
 			// if the group is closed only the next upcoming header can
 			// reopen the group in case of a repeat alternative, so we 
 			// remove the current group 
-			if (bar.get_isRepeatStart() || this.$_currentRepeatGroup.get_isClosed() && bar.get_alternateEndings() <= 0) {
+			if (bar.isRepeatStart || this.$_currentRepeatGroup.isClosed && bar.alternateEndings <= 0) {
 				this.$_currentRepeatGroup = new $AlphaTab_Model_RepeatGroup();
 			}
 			this.$_currentRepeatGroup.addMasterBar(bar);
-			ss.add(this.get_masterBars(), bar);
+			ss.add(this.masterBars, bar);
 		},
 		addTrack: function(track) {
-			track.set_score(this);
-			track.set_index(this.get_tracks().length);
-			ss.add(this.get_tracks(), track);
+			track.score = this;
+			track.index = this.tracks.length;
+			ss.add(this.tracks, track);
 		},
 		finish: function() {
-			var $t1 = this.get_tracks();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var track = $t1[$t2];
+			for (var $t1 = 0; $t1 < this.tracks.length; $t1++) {
+				var track = this.tracks[$t1];
 				track.finish();
 			}
 		}
 	});
-	ss.initClass($AlphaTab_Model_Section, $asm, {
-		get_marker: function() {
-			return this.$1$MarkerField;
-		},
-		set_marker: function(value) {
-			this.$1$MarkerField = value;
-		},
-		get_text: function() {
-			return this.$1$TextField;
-		},
-		set_text: function(value) {
-			this.$1$TextField = value;
-		}
-	});
+	ss.initClass($AlphaTab_Model_Section, $asm, {});
 	ss.initEnum($AlphaTab_Model_SlideType, $asm, { none: 0, shift: 1, legato: 2, intoFromBelow: 3, intoFromAbove: 4, outUp: 5, outDown: 6 });
 	ss.initClass($AlphaTab_Model_Track, $asm, {
-		get_capo: function() {
-			return this.$1$CapoField;
-		},
-		set_capo: function(value) {
-			this.$1$CapoField = value;
-		},
-		get_index: function() {
-			return this.$1$IndexField;
-		},
-		set_index: function(value) {
-			this.$1$IndexField = value;
-		},
-		get_name: function() {
-			return this.$1$NameField;
-		},
-		set_name: function(value) {
-			this.$1$NameField = value;
-		},
-		get_shortName: function() {
-			return this.$1$ShortNameField;
-		},
-		set_shortName: function(value) {
-			this.$1$ShortNameField = value;
-		},
-		get_tuning: function() {
-			return this.$1$TuningField;
-		},
-		set_tuning: function(value) {
-			this.$1$TuningField = value;
-		},
-		get_tuningName: function() {
-			return this.$1$TuningNameField;
-		},
-		set_tuningName: function(value) {
-			this.$1$TuningNameField = value;
-		},
-		get_color: function() {
-			return this.$1$ColorField;
-		},
-		set_color: function(value) {
-			this.$1$ColorField = value;
-		},
-		get_playbackInfo: function() {
-			return this.$1$PlaybackInfoField;
-		},
-		set_playbackInfo: function(value) {
-			this.$1$PlaybackInfoField = value;
-		},
-		get_isPercussion: function() {
-			return this.$1$IsPercussionField;
-		},
-		set_isPercussion: function(value) {
-			this.$1$IsPercussionField = value;
-		},
-		get_score: function() {
-			return this.$1$ScoreField;
-		},
-		set_score: function(value) {
-			this.$1$ScoreField = value;
-		},
-		get_bars: function() {
-			return this.$1$BarsField;
-		},
-		set_bars: function(value) {
-			this.$1$BarsField = value;
-		},
-		get_chords: function() {
-			return this.$1$ChordsField;
-		},
-		set_chords: function(value) {
-			this.$1$ChordsField = value;
-		},
 		addBar: function(bar) {
-			bar.set_track(this);
-			bar.set_index(this.get_bars().length);
-			if (this.get_bars().length > 0) {
-				bar.set_previousBar(this.get_bars()[this.get_bars().length - 1]);
-				bar.get_previousBar().set_nextBar(bar);
+			bar.track = this;
+			bar.index = this.bars.length;
+			if (this.bars.length > 0) {
+				bar.previousBar = this.bars[this.bars.length - 1];
+				bar.previousBar.nextBar = bar;
 			}
-			ss.add(this.get_bars(), bar);
+			ss.add(this.bars, bar);
 		},
 		finish: function() {
-			if (ss.isNullOrEmptyString(this.get_shortName())) {
-				this.set_shortName(this.get_name());
-				if (this.get_shortName().length > $AlphaTab_Model_Track.$shortNameMaxLength) {
-					this.set_shortName(this.get_shortName().substr(0, $AlphaTab_Model_Track.$shortNameMaxLength));
+			if (ss.isNullOrEmptyString(this.shortName)) {
+				this.shortName = this.name;
+				if (this.shortName.length > $AlphaTab_Model_Track.$shortNameMaxLength) {
+					this.shortName = this.shortName.substr(0, $AlphaTab_Model_Track.$shortNameMaxLength);
 				}
 			}
-			var $t1 = this.get_bars();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var bar = $t1[$t2];
+			for (var $t1 = 0; $t1 < this.bars.length; $t1++) {
+				var bar = this.bars[$t1];
 				bar.finish();
 			}
 		}
 	});
 	ss.initEnum($AlphaTab_Model_TripletFeel, $asm, { noTripletFeel: 0, triplet16th: 1, triplet8th: 2, dotted16th: 3, dotted8th: 4, scottish16th: 5, scottish8th: 6 });
-	ss.initClass($AlphaTab_Model_Tuning, $asm, {
-		get_isStandard: function() {
-			return this.$1$IsStandardField;
-		},
-		set_isStandard: function(value) {
-			this.$1$IsStandardField = value;
-		},
-		get_name: function() {
-			return this.$1$NameField;
-		},
-		set_name: function(value) {
-			this.$1$NameField = value;
-		},
-		get_tunings: function() {
-			return this.$1$TuningsField;
-		},
-		set_tunings: function(value) {
-			this.$1$TuningsField = value;
-		}
-	});
+	ss.initClass($AlphaTab_Model_Tuning, $asm, {});
 	ss.initEnum($AlphaTab_Model_VibratoType, $asm, { none: 0, slight: 1, wide: 2 });
 	ss.initClass($AlphaTab_Model_Voice, $asm, {
-		get_index: function() {
-			return this.$1$IndexField;
-		},
-		set_index: function(value) {
-			this.$1$IndexField = value;
-		},
-		get_bar: function() {
-			return this.$1$BarField;
-		},
-		set_bar: function(value) {
-			this.$1$BarField = value;
-		},
-		get_beats: function() {
-			return this.$1$BeatsField;
-		},
-		set_beats: function(value) {
-			this.$1$BeatsField = value;
-		},
-		get_minDuration: function() {
-			return this.$1$MinDurationField;
-		},
-		set_minDuration: function(value) {
-			this.$1$MinDurationField = value;
-		},
-		get_maxDuration: function() {
-			return this.$1$MaxDurationField;
-		},
-		set_maxDuration: function(value) {
-			this.$1$MaxDurationField = value;
-		},
 		get_isEmpty: function() {
-			return this.get_beats().length === 0;
+			return this.beats.length === 0;
 		},
 		addBeat: function(beat) {
 			// chaining
-			if (this.get_bar().get_index() === 0 && this.get_beats().length === 0) {
-				beat.set_previousBeat(null);
+			if (this.bar.index === 0 && this.beats.length === 0) {
+				beat.previousBeat = null;
 				// very first beat
 			}
-			else if (this.get_beats().length === 0) {
-				var previousVoice = this.get_bar().get_previousBar().get_voices()[this.get_index()];
-				beat.set_previousBeat(previousVoice.get_beats()[previousVoice.get_beats().length - 1]);
-				beat.get_previousBeat().set_nextBeat(beat);
+			else if (this.beats.length === 0) {
+				var previousVoice = this.bar.previousBar.voices[this.index];
+				beat.previousBeat = previousVoice.beats[previousVoice.beats.length - 1];
+				beat.previousBeat.nextBeat = beat;
 			}
 			else {
-				beat.set_previousBeat(this.get_beats()[this.get_beats().length - 1]);
-				beat.get_previousBeat().set_nextBeat(beat);
+				beat.previousBeat = this.beats[this.beats.length - 1];
+				beat.previousBeat.nextBeat = beat;
 			}
-			beat.set_voice(this);
-			beat.set_index(this.get_beats().length);
-			ss.add(this.get_beats(), beat);
+			beat.voice = this;
+			beat.index = this.beats.length;
+			ss.add(this.beats, beat);
 		},
 		addGraceBeat: function(beat) {
-			if (this.get_beats().length === 0) {
+			if (this.beats.length === 0) {
 				this.addBeat(beat);
 				return;
 			}
 			// remove last beat
-			var lastBeat = this.get_beats()[this.get_beats().length - 1];
-			ss.removeAt(this.get_beats(), this.get_beats().length - 1);
+			var lastBeat = this.beats[this.beats.length - 1];
+			ss.removeAt(this.beats, this.beats.length - 1);
 			// insert grace beat
 			this.addBeat(beat);
 			// reinsert last beat
 			this.addBeat(lastBeat);
 		},
 		finish: function() {
-			var $t1 = this.get_beats();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var beat = $t1[$t2];
+			for (var $t1 = 0; $t1 < this.beats.length; $t1++) {
+				var beat = this.beats[$t1];
 				beat.finish();
-				if (ss.isNullOrUndefined(this.get_minDuration()) || this.get_minDuration().get_value() > beat.get_duration()) {
-					this.set_minDuration(new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [$AlphaTab_Model_Duration]))(beat.get_duration()));
+				if (ss.isNullOrUndefined(this.minDuration) || this.minDuration.get_value() > beat.duration) {
+					this.minDuration = new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [$AlphaTab_Model_Duration]))(beat.duration);
 				}
-				if (ss.isNullOrUndefined(this.get_maxDuration()) || this.get_maxDuration().get_value() < beat.get_duration()) {
-					this.set_maxDuration(new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [$AlphaTab_Model_Duration]))(beat.get_duration()));
+				if (ss.isNullOrUndefined(this.maxDuration) || this.maxDuration.get_value() < beat.duration) {
+					this.maxDuration = new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [$AlphaTab_Model_Duration]))(beat.duration);
 				}
 			}
 		}
@@ -10155,98 +8976,38 @@
 		}
 	}, null, [$AlphaTab_Platform_ICanvas]);
 	ss.initClass($AlphaTab_Rendering_BarRendererBase, $asm, {
-		get_stave: function() {
-			return this.$1$StaveField;
-		},
-		set_stave: function(value) {
-			this.$1$StaveField = value;
-		},
-		get_x: function() {
-			return this.$1$XField;
-		},
-		set_x: function(value) {
-			this.$1$XField = value;
-		},
-		get_y: function() {
-			return this.$1$YField;
-		},
-		set_y: function(value) {
-			this.$1$YField = value;
-		},
-		get_width: function() {
-			return this.$1$WidthField;
-		},
-		set_width: function(value) {
-			this.$1$WidthField = value;
-		},
-		get_height: function() {
-			return this.$1$HeightField;
-		},
-		set_height: function(value) {
-			this.$1$HeightField = value;
-		},
-		get_index: function() {
-			return this.$1$IndexField;
-		},
-		set_index: function(value) {
-			this.$1$IndexField = value;
-		},
-		get_isEmpty: function() {
-			return this.$1$IsEmptyField;
-		},
-		set_isEmpty: function(value) {
-			this.$1$IsEmptyField = value;
-		},
-		get_topOverflow: function() {
-			return this.$1$TopOverflowField;
-		},
-		set_topOverflow: function(value) {
-			this.$1$TopOverflowField = value;
-		},
-		get_bottomOverflow: function() {
-			return this.$1$BottomOverflowField;
-		},
-		set_bottomOverflow: function(value) {
-			this.$1$BottomOverflowField = value;
-		},
-		get_bar: function() {
-			return this.$1$BarField;
-		},
-		set_bar: function(value) {
-			this.$1$BarField = value;
-		},
 		registerOverflowTop: function(topOverflow) {
-			if (topOverflow > this.get_topOverflow()) {
-				this.set_topOverflow(topOverflow);
+			if (topOverflow > this.topOverflow) {
+				this.topOverflow = topOverflow;
 			}
 		},
 		registerOverflowBottom: function(bottomOverflow) {
-			if (bottomOverflow > this.get_bottomOverflow()) {
-				this.set_bottomOverflow(bottomOverflow);
+			if (bottomOverflow > this.bottomOverflow) {
+				this.bottomOverflow = bottomOverflow;
 			}
 		},
 		applyBarSpacing: function(spacing) {
 		},
 		get_resources: function() {
-			return this.get_layout().get_renderer().get_renderingResources();
+			return this.get_layout().renderer.renderingResources;
 		},
 		get_layout: function() {
-			return this.get_stave().get_staveGroup().get_layout();
+			return this.stave.staveGroup.layout;
 		},
 		get_settings: function() {
-			return this.get_layout().get_renderer().get_settings();
+			return this.get_layout().renderer.settings;
 		},
 		get_scale: function() {
-			return this.get_settings().get_scale();
+			return this.get_settings().scale;
 		},
 		get_isFirstOfLine: function() {
-			return this.get_index() === 0;
+			return this.index === 0;
 		},
 		get_isLastOfLine: function() {
-			return this.get_index() === this.get_stave().get_barRenderers().length - 1;
+			return this.index === this.stave.barRenderers.length - 1;
 		},
 		get_isLast: function() {
-			return this.get_bar().get_index() === this.get_stave().get_barRenderers().length - 1;
+			return this.bar.index === this.stave.barRenderers.length - 1;
 		},
 		registerMaxSizes: function(sizes) {
 		},
@@ -10266,26 +9027,26 @@
 		},
 		buildBoundingsLookup: function(lookup, visualTop, visualHeight, realTop, realHeight, x) {
 			var barLookup = new $AlphaTab_Rendering_Utils_BarBoundings();
-			barLookup.set_bar(this.get_bar());
-			barLookup.set_isFirstOfLine(this.get_isFirstOfLine());
-			barLookup.set_isLastOfLine(this.get_isLastOfLine());
-			barLookup.set_visualBounds(new $AlphaTab_Rendering_Utils_Bounds(x + this.get_stave().get_x() + this.get_x(), visualTop, this.get_width(), visualHeight));
-			barLookup.set_bounds(new $AlphaTab_Rendering_Utils_Bounds(x + this.get_stave().get_x() + this.get_x(), realTop, this.get_width(), realHeight));
-			ss.add(lookup.get_bars(), barLookup);
+			barLookup.bar = this.bar;
+			barLookup.isFirstOfLine = this.get_isFirstOfLine();
+			barLookup.isLastOfLine = this.get_isLastOfLine();
+			barLookup.visualBounds = new $AlphaTab_Rendering_Utils_Bounds(x + this.stave.x + this.x, visualTop, this.width, visualHeight);
+			barLookup.bounds = new $AlphaTab_Rendering_Utils_Bounds(x + this.stave.x + this.x, realTop, this.width, realHeight);
+			ss.add(lookup.bars, barLookup);
 		}
 	});
 	ss.initClass($AlphaTab_Rendering_AlternateEndingsBarRenderer, $asm, {
 		finalizeRenderer: function(layout) {
 			$AlphaTab_Rendering_BarRendererBase.prototype.finalizeRenderer.call(this, layout);
-			this.set_isEmpty(this.$_endings.length === 0);
+			this.isEmpty = this.$_endings.length === 0;
 		},
 		doLayout: function() {
 			$AlphaTab_Rendering_BarRendererBase.prototype.doLayout.call(this);
-			if (this.get_index() === 0) {
-				this.get_stave().set_topSpacing(5);
-				this.get_stave().set_bottomSpacing(4);
+			if (this.index === 0) {
+				this.stave.topSpacing = 5;
+				this.stave.bottomSpacing = 4;
 			}
-			this.set_height(ss.Int32.trunc(this.get_resources().get_wordsFont().get_size()));
+			this.height = ss.Int32.trunc(this.get_resources().wordsFont.get_size());
 			var endingsStrings = new ss.StringBuilder();
 			for (var $t1 = 0; $t1 < this.$_endings.length; $t1++) {
 				var e = this.$_endings[$t1];
@@ -10302,36 +9063,22 @@
 		},
 		applySizes: function(sizes) {
 			$AlphaTab_Rendering_BarRendererBase.prototype.applySizes.call(this, sizes);
-			this.set_width(sizes.get_fullWidth());
+			this.width = sizes.fullWidth;
 		},
 		paint: function(cx, cy, canvas) {
 			if (this.$_endings.length > 0) {
 				var res = this.get_resources();
-				canvas.set_color(res.get_mainGlyphColor());
-				canvas.set_font(res.get_wordsFont());
-				canvas.moveTo(cx + this.get_x(), cy + this.get_y() + this.get_height());
-				canvas.lineTo(cx + this.get_x(), cy + this.get_y());
-				canvas.lineTo(cx + this.get_x() + this.get_width(), cy + this.get_y());
+				canvas.set_color(res.mainGlyphColor);
+				canvas.set_font(res.wordsFont);
+				canvas.moveTo(cx + this.x, cy + this.y + this.height);
+				canvas.lineTo(cx + this.x, cy + this.y);
+				canvas.lineTo(cx + this.x + this.width, cy + this.y);
 				canvas.stroke();
-				canvas.fillText(this.$_endingsString, cx + this.get_x() + 3 * this.get_scale(), cy + this.get_y() * this.get_scale());
+				canvas.fillText(this.$_endingsString, cx + this.x + 3 * this.get_scale(), cy + this.y * this.get_scale());
 			}
 		}
 	}, $AlphaTab_Rendering_BarRendererBase);
-	ss.initClass($AlphaTab_Rendering_BarRendererFactory, $asm, {
-		get_isInAccolade: function() {
-			return this.$1$IsInAccoladeField;
-		},
-		set_isInAccolade: function(value) {
-			this.$1$IsInAccoladeField = value;
-		},
-		get_hideOnMultiTrack: function() {
-			return this.$1$HideOnMultiTrackField;
-		},
-		set_hideOnMultiTrack: function(value) {
-			this.$1$HideOnMultiTrackField = value;
-		},
-		create: null
-	});
+	ss.initClass($AlphaTab_Rendering_BarRendererFactory, $asm, { create: null });
 	ss.initClass($AlphaTab_Rendering_AlternateEndingsBarRendererFactory, $asm, {
 		create: function(bar) {
 			return new $AlphaTab_Rendering_AlternateEndingsBarRenderer(bar);
@@ -10356,15 +9103,15 @@
 			this.$updateWidth();
 		},
 		$updateWidth: function() {
-			this.set_width(this.get_postBeatGlyphsStart());
+			this.width = this.get_postBeatGlyphsStart();
 			if (this.$_postBeatGlyphs.length > 0) {
-				this.set_width(this.get_width() + (this.$_postBeatGlyphs[this.$_postBeatGlyphs.length - 1].get_x() + this.$_postBeatGlyphs[this.$_postBeatGlyphs.length - 1].get_width()));
+				this.width += this.$_postBeatGlyphs[this.$_postBeatGlyphs.length - 1].x + this.$_postBeatGlyphs[this.$_postBeatGlyphs.length - 1].width;
 			}
 			var $t1 = ss.getEnumerator(this.$_voiceContainers.get_values());
 			try {
 				while ($t1.moveNext()) {
 					var c = $t1.current();
-					if (ss.isNullOrUndefined(this.$_biggestVoiceContainer) || c.get_width() > this.$_biggestVoiceContainer.get_width()) {
+					if (ss.isNullOrUndefined(this.$_biggestVoiceContainer) || c.width > this.$_biggestVoiceContainer.width) {
 						this.$_biggestVoiceContainer = c;
 					}
 				}
@@ -10393,13 +9140,13 @@
 				postSize = 0;
 			}
 			else {
-				postSize = this.$_postBeatGlyphs[this.$_postBeatGlyphs.length - 1].get_x() + this.$_postBeatGlyphs[this.$_postBeatGlyphs.length - 1].get_width();
+				postSize = this.$_postBeatGlyphs[this.$_postBeatGlyphs.length - 1].x + this.$_postBeatGlyphs[this.$_postBeatGlyphs.length - 1].width;
 			}
 			if (sizes.getSize($AlphaTab_Rendering_GroupedBarRenderer.keySizePost) < postSize) {
 				sizes.setSize($AlphaTab_Rendering_GroupedBarRenderer.keySizePost, postSize);
 			}
-			if (sizes.get_fullWidth() < this.get_width()) {
-				sizes.set_fullWidth(this.get_width());
+			if (sizes.fullWidth < this.width) {
+				sizes.fullWidth = this.width;
 			}
 		},
 		applySizes: function(sizes) {
@@ -10428,24 +9175,24 @@
 				postSizeDiff = 0;
 			}
 			else {
-				postSizeDiff = postSize - (this.$_postBeatGlyphs[this.$_postBeatGlyphs.length - 1].get_x() + this.$_postBeatGlyphs[this.$_postBeatGlyphs.length - 1].get_width());
+				postSizeDiff = postSize - (this.$_postBeatGlyphs[this.$_postBeatGlyphs.length - 1].x + this.$_postBeatGlyphs[this.$_postBeatGlyphs.length - 1].width);
 			}
 			if (postSizeDiff > 0) {
 				ss.insert(this.$_postBeatGlyphs, 0, new $AlphaTab_Rendering_Glyphs_SpacingGlyph(0, 0, postSizeDiff, true));
 				for (var i = 0; i < this.$_postBeatGlyphs.length; i++) {
 					var g = this.$_postBeatGlyphs[i];
-					g.set_x(((i === 0) ? 0 : (this.$_postBeatGlyphs[this.$_postBeatGlyphs.length - 1].get_x() + this.$_postBeatGlyphs[this.$_postBeatGlyphs.length - 1].get_width())));
-					g.set_index(i);
-					g.set_renderer(this);
+					g.x = ((i === 0) ? 0 : (this.$_postBeatGlyphs[this.$_postBeatGlyphs.length - 1].x + this.$_postBeatGlyphs[this.$_postBeatGlyphs.length - 1].width));
+					g.index = i;
+					g.renderer = this;
 				}
 			}
 			this.$updateWidth();
 		},
 		$addGlyph: function(c, g) {
-			this.set_isEmpty(false);
-			g.set_x(((c.length === 0) ? 0 : (c[c.length - 1].get_x() + c[c.length - 1].get_width())));
-			g.set_index(c.length);
-			g.set_renderer(this);
+			this.isEmpty = false;
+			g.x = ((c.length === 0) ? 0 : (c[c.length - 1].x + c[c.length - 1].width));
+			g.index = c.length;
+			g.renderer = this;
 			g.doLayout();
 			ss.add(c, g);
 		},
@@ -10453,13 +9200,13 @@
 			this.$addGlyph(this.$_preBeatGlyphs, g);
 		},
 		addBeatGlyph: function(g) {
-			this.$getOrCreateVoiceContainer(g.get_beat().get_voice().get_index()).addGlyph(g);
+			this.$getOrCreateVoiceContainer(g.beat.voice.index).addGlyph(g);
 		},
 		$getOrCreateVoiceContainer: function(voiceIndex) {
 			var c;
 			if (voiceIndex >= this.$_voiceContainers.get_count()) {
 				c = new $AlphaTab_Rendering_Glyphs_VoiceContainerGlyph(0, 0, voiceIndex);
-				c.set_renderer(this);
+				c.renderer = this;
 				this.$_voiceContainers.set_item(voiceIndex, c);
 			}
 			else {
@@ -10468,16 +9215,16 @@
 			return c;
 		},
 		getBeatContainer: function(voice, beat) {
-			return this.$getOrCreateVoiceContainer(voice).get_beatGlyphs()[beat];
+			return this.$getOrCreateVoiceContainer(voice).beatGlyphs[beat];
 		},
 		getPreNotesPosition: function(voice, beat) {
-			return this.getBeatContainer(voice, beat).get_preNotes();
+			return this.getBeatContainer(voice, beat).preNotes;
 		},
 		getOnNotesPosition: function(voice, beat) {
-			return this.getBeatContainer(voice, beat).get_onNotes();
+			return this.getBeatContainer(voice, beat).onNotes;
 		},
 		getPostNotesPosition: function(voice, beat) {
-			return this.getBeatContainer(voice, beat).get_postNotes();
+			return this.getBeatContainer(voice, beat).postNotes;
 		},
 		addPostBeatGlyph: function(g) {
 			this.$addGlyph(this.$_postBeatGlyphs, g);
@@ -10494,7 +9241,7 @@
 		get_beatGlyphsStart: function() {
 			var start = this.get_preBeatGlyphStart();
 			if (this.$_preBeatGlyphs.length > 0) {
-				start += this.$_preBeatGlyphs[this.$_preBeatGlyphs.length - 1].get_x() + this.$_preBeatGlyphs[this.$_preBeatGlyphs.length - 1].get_width();
+				start += this.$_preBeatGlyphs[this.$_preBeatGlyphs.length - 1].x + this.$_preBeatGlyphs[this.$_preBeatGlyphs.length - 1].width;
 			}
 			return start;
 		},
@@ -10505,8 +9252,8 @@
 			try {
 				while ($t1.moveNext()) {
 					var c = $t1.current();
-					if (c.get_width() > offset) {
-						offset = c.get_width();
+					if (c.width > offset) {
+						offset = c.width;
 					}
 					//if (c.beatGlyphs.length > 0)
 					//{
@@ -10527,7 +9274,7 @@
 			var width = 0;
 			for (var $t1 = 0; $t1 < this.$_postBeatGlyphs.length; $t1++) {
 				var c = this.$_postBeatGlyphs[$t1];
-				var x = c.get_x() + c.get_width();
+				var x = c.x + c.width;
 				if (x > width) {
 					width = x;
 				}
@@ -10535,14 +9282,14 @@
 			return width;
 		},
 		applyBarSpacing: function(spacing) {
-			this.set_width(this.get_width() + spacing);
+			this.width += spacing;
 			var $t1 = ss.getEnumerator(this.$_voiceContainers.get_values());
 			try {
 				while ($t1.moveNext()) {
 					var c = $t1.current();
 					var toApply = spacing;
 					if (ss.isValue(this.$_biggestVoiceContainer)) {
-						toApply += this.$_biggestVoiceContainer.get_width() - c.get_width();
+						toApply += this.$_biggestVoiceContainer.width - c.width;
 					}
 					c.applyGlyphSpacing(toApply);
 				}
@@ -10568,45 +9315,44 @@
 			var glyphStartX = this.get_preBeatGlyphStart();
 			for (var $t1 = 0; $t1 < this.$_preBeatGlyphs.length; $t1++) {
 				var g = this.$_preBeatGlyphs[$t1];
-				g.paint(cx + this.get_x() + glyphStartX, cy + this.get_y(), canvas);
+				g.paint(cx + this.x + glyphStartX, cy + this.y, canvas);
 			}
 			glyphStartX = this.get_beatGlyphsStart();
 			var $t2 = ss.getEnumerator(this.$_voiceContainers.get_values());
 			try {
 				while ($t2.moveNext()) {
 					var c = $t2.current();
-					c.paint(cx + this.get_x() + glyphStartX, cy + this.get_y(), canvas);
+					c.paint(cx + this.x + glyphStartX, cy + this.y, canvas);
 				}
 			}
 			finally {
 				$t2.dispose();
 			}
-			glyphStartX = this.get_width() - this.get_postBeatGlyphsWidth();
+			glyphStartX = this.width - this.get_postBeatGlyphsWidth();
 			for (var $t3 = 0; $t3 < this.$_postBeatGlyphs.length; $t3++) {
 				var g1 = this.$_postBeatGlyphs[$t3];
-				g1.paint(cx + this.get_x() + glyphStartX, cy + this.get_y(), canvas);
+				g1.paint(cx + this.x + glyphStartX, cy + this.y, canvas);
 			}
 		},
 		paintBackground: function(cx, cy, canvas) {
 		},
 		buildBoundingsLookup: function(lookup, visualTop, visualHeight, realTop, realHeight, x) {
 			$AlphaTab_Rendering_BarRendererBase.prototype.buildBoundingsLookup.call(this, lookup, visualTop, visualHeight, realTop, realHeight, x);
-			var barLookup = lookup.get_bars()[lookup.get_bars().length - 1];
+			var barLookup = lookup.bars[lookup.bars.length - 1];
 			var beatStart = this.get_beatGlyphsStart();
 			var $t1 = ss.getEnumerator(this.$_voiceContainers.get_values());
 			try {
 				while ($t1.moveNext()) {
 					var c = $t1.current();
-					var $t2 = c.get_beatGlyphs();
-					for (var $t3 = 0; $t3 < $t2.length; $t3++) {
-						var bc = $t2[$t3];
+					for (var $t2 = 0; $t2 < c.beatGlyphs.length; $t2++) {
+						var bc = c.beatGlyphs[$t2];
 						var beatLookup = new $AlphaTab_Rendering_Utils_BeatBoundings();
-						beatLookup.set_beat(bc.get_beat());
+						beatLookup.beat = bc.beat;
 						// on beat bounding rectangle
-						beatLookup.set_visualBounds(new $AlphaTab_Rendering_Utils_Bounds(x + this.get_stave().get_x() + this.get_x() + beatStart + c.get_x() + bc.get_x() + bc.get_onNotes().get_x(), visualTop, bc.get_onNotes().get_width(), visualHeight));
+						beatLookup.visualBounds = new $AlphaTab_Rendering_Utils_Bounds(x + this.stave.x + this.x + beatStart + c.x + bc.x + bc.onNotes.x, visualTop, bc.onNotes.width, visualHeight);
 						// real beat boundings
-						beatLookup.set_bounds(new $AlphaTab_Rendering_Utils_Bounds(x + this.get_stave().get_x() + this.get_x() + beatStart + c.get_x() + bc.get_x(), realTop, bc.get_width(), realHeight));
-						ss.add(barLookup.get_beats(), beatLookup);
+						beatLookup.bounds = new $AlphaTab_Rendering_Utils_Bounds(x + this.stave.x + this.x + beatStart + c.x + bc.x, realTop, bc.width, realHeight);
+						ss.add(barLookup.beats, beatLookup);
 					}
 				}
 			}
@@ -10618,23 +9364,23 @@
 	ss.initClass($AlphaTab_Rendering_EffectBarRenderer, $asm, {
 		doLayout: function() {
 			$AlphaTab_Rendering_GroupedBarRenderer.prototype.doLayout.call(this);
-			if (this.get_index() === 0) {
-				this.get_stave().set_topSpacing(5);
-				this.get_stave().set_bottomSpacing(5);
+			if (this.index === 0) {
+				this.stave.topSpacing = 5;
+				this.stave.bottomSpacing = 5;
 			}
-			this.set_height(this.$_info.getHeight(this));
+			this.height = this.$_info.getHeight(this);
 		},
 		finalizeRenderer: function(layout) {
 			$AlphaTab_Rendering_GroupedBarRenderer.prototype.finalizeRenderer.call(this, layout);
 			// after all layouting and sizing place and size the effect glyphs
-			this.set_isEmpty(true);
+			this.isEmpty = true;
 			var prevGlyph = null;
-			if (this.get_index() > 0) {
+			if (this.index > 0) {
 				// check if previous renderer had an effect on his last beat
 				// and use this as merging element
-				var prevRenderer = this.get_stave().get_barRenderers()[this.get_index() - 1];
-				if (ss.isValue(prevRenderer.$_lastBeat) && prevRenderer.$_effectGlyphs[0].containsKey(prevRenderer.$_lastBeat.get_index())) {
-					prevGlyph = prevRenderer.$_effectGlyphs[0].get_item(prevRenderer.$_lastBeat.get_index());
+				var prevRenderer = this.stave.barRenderers[this.index - 1];
+				if (ss.isValue(prevRenderer.$_lastBeat) && prevRenderer.$_effectGlyphs[0].containsKey(prevRenderer.$_lastBeat.index)) {
+					prevGlyph = prevRenderer.$_effectGlyphs[0].get_item(prevRenderer.$_lastBeat.index);
 				}
 			}
 			var $t1 = ss.getEnumerator(this.$_effectGlyphs[0].get_keys());
@@ -10644,7 +9390,7 @@
 					var effect = this.$_effectGlyphs[0].get_item(beatIndex);
 					this.$alignGlyph(this.$_info.get_sizingMode(), beatIndex, 0, prevGlyph);
 					prevGlyph = effect;
-					this.set_isEmpty(false);
+					this.isEmpty = false;
 				}
 			}
 			finally {
@@ -10657,42 +9403,42 @@
 			var container = this.getBeatContainer(voiceIndex, beatIndex);
 			switch (sizing) {
 				case 0: {
-					pos = container.get_preNotes();
-					g.set_x(pos.get_x() + container.get_x());
-					g.set_width(pos.get_width());
+					pos = container.preNotes;
+					g.x = pos.x + container.x;
+					g.width = pos.width;
 					break;
 				}
 				case 1: {
-					pos = container.get_preNotes();
-					g.set_x(pos.get_x() + container.get_x());
-					pos = container.get_onNotes();
-					g.set_width(pos.get_x() + container.get_x() + pos.get_width() - g.get_x());
+					pos = container.preNotes;
+					g.x = pos.x + container.x;
+					pos = container.onNotes;
+					g.width = pos.x + container.x + pos.width - g.x;
 					break;
 				}
 				case 2: {
-					pos = container.get_preNotes();
-					g.set_x(pos.get_x() + container.get_x());
-					pos = container.get_postNotes();
-					g.set_width(pos.get_x() + container.get_x() + pos.get_width() - g.get_x());
+					pos = container.preNotes;
+					g.x = pos.x + container.x;
+					pos = container.postNotes;
+					g.width = pos.x + container.x + pos.width - g.x;
 					break;
 				}
 				case 3: {
-					pos = container.get_onNotes();
-					g.set_x(pos.get_x() + container.get_x());
-					g.set_width(pos.get_width());
+					pos = container.onNotes;
+					g.x = pos.x + container.x;
+					g.width = pos.width;
 					break;
 				}
 				case 4: {
-					pos = container.get_onNotes();
-					g.set_x(pos.get_x() + container.get_x());
-					pos = container.get_postNotes();
-					g.set_width(pos.get_x() + container.get_x() + pos.get_width() - g.get_x());
+					pos = container.onNotes;
+					g.x = pos.x + container.x;
+					pos = container.postNotes;
+					g.width = pos.x + container.x + pos.width - g.x;
 					break;
 				}
 				case 5: {
-					pos = container.get_postNotes();
-					g.set_x(pos.get_x() + container.get_x());
-					g.set_width(pos.get_width());
+					pos = container.postNotes;
+					g.x = pos.x + container.x;
+					g.width = pos.width;
 					break;
 				}
 				case 6: {
@@ -10700,12 +9446,12 @@
 						this.$alignGlyph(0, beatIndex, voiceIndex, prevGlyph);
 					}
 					else {
-						pos = container.get_preNotes();
-						var posR = pos.get_renderer();
-						var gR = g.get_renderer();
-						g.set_width(posR.get_x() + posR.get_beatGlyphsStart() + container.get_x() + pos.get_x() + pos.get_width() - (gR.get_x() + gR.get_beatGlyphsStart() + g.get_x()));
+						pos = container.preNotes;
+						var posR = pos.renderer;
+						var gR = g.renderer;
+						g.width = posR.x + posR.get_beatGlyphsStart() + container.x + pos.x + pos.width - (gR.x + gR.get_beatGlyphsStart() + g.x);
 						if (ss.isInstanceOfType(g, $AlphaTab_Rendering_Glyphs_IMultiBeatEffectGlyph)) {
-							g.expandTo(container.get_beat());
+							g.expandTo(container.beat);
 						}
 					}
 					break;
@@ -10715,12 +9461,12 @@
 						this.$alignGlyph(1, beatIndex, voiceIndex, prevGlyph);
 					}
 					else {
-						pos = container.get_onNotes();
-						var posR1 = pos.get_renderer();
-						var gR1 = g.get_renderer();
-						g.set_width(posR1.get_x() + posR1.get_beatGlyphsStart() + container.get_x() + pos.get_x() + pos.get_width() - (gR1.get_x() + gR1.get_beatGlyphsStart() + g.get_x()));
+						pos = container.onNotes;
+						var posR1 = pos.renderer;
+						var gR1 = g.renderer;
+						g.width = posR1.x + posR1.get_beatGlyphsStart() + container.x + pos.x + pos.width - (gR1.x + gR1.get_beatGlyphsStart() + g.x);
 						if (ss.isInstanceOfType(g, $AlphaTab_Rendering_Glyphs_IMultiBeatEffectGlyph)) {
-							g.expandTo(container.get_beat());
+							g.expandTo(container.beat);
 						}
 					}
 					break;
@@ -10730,12 +9476,12 @@
 						this.$alignGlyph(2, beatIndex, voiceIndex, prevGlyph);
 					}
 					else {
-						pos = container.get_postNotes();
-						var posR2 = pos.get_renderer();
-						var gR2 = g.get_renderer();
-						g.set_width(posR2.get_x() + posR2.get_beatGlyphsStart() + container.get_x() + pos.get_x() + pos.get_width() - (gR2.get_x() + gR2.get_beatGlyphsStart() + g.get_x()));
+						pos = container.postNotes;
+						var posR2 = pos.renderer;
+						var gR2 = g.renderer;
+						g.width = posR2.x + posR2.get_beatGlyphsStart() + container.x + pos.x + pos.width - (gR2.x + gR2.get_beatGlyphsStart() + g.x);
 						if (ss.isInstanceOfType(g, $AlphaTab_Rendering_Glyphs_IMultiBeatEffectGlyph)) {
-							g.expandTo(container.get_beat());
+							g.expandTo(container.beat);
 						}
 					}
 					break;
@@ -10745,12 +9491,12 @@
 						this.$alignGlyph(3, beatIndex, voiceIndex, prevGlyph);
 					}
 					else {
-						pos = container.get_onNotes();
-						var posR3 = pos.get_renderer();
-						var gR3 = g.get_renderer();
-						g.set_width(posR3.get_x() + posR3.get_beatGlyphsStart() + container.get_x() + pos.get_x() + pos.get_width() - (gR3.get_x() + gR3.get_beatGlyphsStart() + g.get_x()));
+						pos = container.onNotes;
+						var posR3 = pos.renderer;
+						var gR3 = g.renderer;
+						g.width = posR3.x + posR3.get_beatGlyphsStart() + container.x + pos.x + pos.width - (gR3.x + gR3.get_beatGlyphsStart() + g.x);
 						if (ss.isInstanceOfType(g, $AlphaTab_Rendering_Glyphs_IMultiBeatEffectGlyph)) {
-							g.expandTo(container.get_beat());
+							g.expandTo(container.beat);
 						}
 					}
 					break;
@@ -10760,12 +9506,12 @@
 						this.$alignGlyph(4, beatIndex, voiceIndex, prevGlyph);
 					}
 					else {
-						pos = container.get_postNotes();
-						var posR4 = pos.get_renderer();
-						var gR4 = g.get_renderer();
-						g.set_width(posR4.get_x() + posR4.get_beatGlyphsStart() + container.get_x() + pos.get_x() + pos.get_width() - (gR4.get_x() + gR4.get_beatGlyphsStart() + g.get_x()));
+						pos = container.postNotes;
+						var posR4 = pos.renderer;
+						var gR4 = g.renderer;
+						g.width = posR4.x + posR4.get_beatGlyphsStart() + container.x + pos.x + pos.width - (gR4.x + gR4.get_beatGlyphsStart() + g.x);
 						if (ss.isInstanceOfType(g, $AlphaTab_Rendering_Glyphs_IMultiBeatEffectGlyph)) {
-							g.expandTo(container.get_beat());
+							g.expandTo(container.beat);
 						}
 					}
 					break;
@@ -10775,12 +9521,12 @@
 						this.$alignGlyph(11, beatIndex, voiceIndex, prevGlyph);
 					}
 					else {
-						pos = container.get_postNotes();
-						var posR5 = pos.get_renderer();
-						var gR5 = g.get_renderer();
-						g.set_width(posR5.get_x() + posR5.get_beatGlyphsStart() + container.get_x() + pos.get_x() + pos.get_width() - (gR5.get_x() + gR5.get_beatGlyphsStart() + g.get_x()));
+						pos = container.postNotes;
+						var posR5 = pos.renderer;
+						var gR5 = g.renderer;
+						g.width = posR5.x + posR5.get_beatGlyphsStart() + container.x + pos.x + pos.width - (gR5.x + gR5.get_beatGlyphsStart() + g.x);
 						if (ss.isInstanceOfType(g, $AlphaTab_Rendering_Glyphs_IMultiBeatEffectGlyph)) {
-							g.expandTo(container.get_beat());
+							g.expandTo(container.beat);
 						}
 					}
 					break;
@@ -10792,18 +9538,17 @@
 		createBeatGlyphs: function() {
 			ss.add(this.$_effectGlyphs, new (ss.makeGenericType(ss.Dictionary$2, [ss.Int32, $AlphaTab_Rendering_Glyphs_Glyph]))());
 			ss.add(this.$_uniqueEffectGlyphs, []);
-			this.$createVoiceGlyphs(this.get_bar().get_voices()[0]);
+			this.$createVoiceGlyphs(this.bar.voices[0]);
 		},
 		$createVoiceGlyphs: function(v) {
-			var $t1 = v.get_beats();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var b = $t1[$t2];
+			for (var $t1 = 0; $t1 < v.beats.length; $t1++) {
+				var b = v.beats[$t1];
 				// we create empty glyphs as alignment references and to get the 
 				// effect bar sized
 				var container = new $AlphaTab_Rendering_Glyphs_BeatContainerGlyph(b);
-				container.set_preNotes(new $AlphaTab_Rendering_Glyphs_BeatGlyphBase());
-				container.set_onNotes(new $AlphaTab_Rendering_Glyphs_BeatGlyphBase());
-				container.set_postNotes(new $AlphaTab_Rendering_Glyphs_BeatGlyphBase());
+				container.preNotes = new $AlphaTab_Rendering_Glyphs_BeatGlyphBase();
+				container.onNotes = new $AlphaTab_Rendering_Glyphs_BeatGlyphBase();
+				container.postNotes = new $AlphaTab_Rendering_Glyphs_BeatGlyphBase();
 				this.addBeatGlyph(container);
 				if (this.$_info.shouldCreateGlyph(this, b)) {
 					this.$createOrResizeGlyph(this.$_info.get_sizingMode(), b);
@@ -10820,10 +9565,10 @@
 				case 4:
 				case 5: {
 					var g = this.$_info.createNewGlyph(this, b);
-					g.set_renderer(this);
+					g.renderer = this;
 					g.doLayout();
-					this.$_effectGlyphs[b.get_voice().get_index()].set_item(b.get_index(), g);
-					ss.add(this.$_uniqueEffectGlyphs[b.get_voice().get_index()], g);
+					this.$_effectGlyphs[b.voice.index].set_item(b.index, g);
+					ss.add(this.$_uniqueEffectGlyphs[b.voice.index], g);
 					break;
 				}
 				case 6:
@@ -10832,23 +9577,23 @@
 				case 9:
 				case 10:
 				case 11: {
-					if (b.get_index() > 0 || this.get_index() > 0) {
+					if (b.index > 0 || this.index > 0) {
 						// check if the previous beat also had this effect
-						var prevBeat = b.get_previousBeat();
+						var prevBeat = b.previousBeat;
 						if (this.$_info.shouldCreateGlyph(this, prevBeat)) {
 							// expand the previous effect
 							var prevEffect;
-							if (b.get_index() > 0) {
-								prevEffect = this.$_effectGlyphs[b.get_voice().get_index()].get_item(prevBeat.get_index());
+							if (b.index > 0) {
+								prevEffect = this.$_effectGlyphs[b.voice.index].get_item(prevBeat.index);
 							}
 							else {
-								prevEffect = this.get_stave().get_barRenderers()[this.get_index() - 1].$_effectGlyphs[b.get_voice().get_index()].get_item(prevBeat.get_index());
+								prevEffect = this.stave.barRenderers[this.index - 1].$_effectGlyphs[b.voice.index].get_item(prevBeat.index);
 							}
 							if (ss.isNullOrUndefined(prevEffect) || !this.$_info.canExpand(this, prevBeat, b)) {
 								this.$createOrResizeGlyph(0, b);
 							}
 							else {
-								this.$_effectGlyphs[b.get_voice().get_index()].set_item(b.get_index(), prevEffect);
+								this.$_effectGlyphs[b.voice.index].set_item(b.index, prevEffect);
 							}
 						}
 						else {
@@ -10881,8 +9626,8 @@
 				var v = this.$_uniqueEffectGlyphs[$t1];
 				for (var $t2 = 0; $t2 < v.length; $t2++) {
 					var g = v[$t2];
-					if (ss.referenceEquals(g.get_renderer(), this)) {
-						g.paint(cx + this.get_x() + glyphStart, cy + this.get_y(), canvas);
+					if (ss.referenceEquals(g.renderer, this)) {
+						g.paint(cx + this.x + glyphStart, cy + this.y, canvas);
 					}
 				}
 			}
@@ -10895,136 +9640,45 @@
 	}, $AlphaTab_Rendering_BarRendererFactory);
 	ss.initInterface($AlphaTab_Rendering_IEffectBarRendererInfo, $asm, { get_hideOnMultiTrack: null, shouldCreateGlyph: null, get_sizingMode: null, getHeight: null, createNewGlyph: null, canExpand: null });
 	ss.initClass($AlphaTab_Rendering_RenderingResources, $asm, {
-		get_copyrightFont: function() {
-			return this.$1$CopyrightFontField;
-		},
-		set_copyrightFont: function(value) {
-			this.$1$CopyrightFontField = value;
-		},
-		get_titleFont: function() {
-			return this.$1$TitleFontField;
-		},
-		set_titleFont: function(value) {
-			this.$1$TitleFontField = value;
-		},
-		get_subTitleFont: function() {
-			return this.$1$SubTitleFontField;
-		},
-		set_subTitleFont: function(value) {
-			this.$1$SubTitleFontField = value;
-		},
-		get_wordsFont: function() {
-			return this.$1$WordsFontField;
-		},
-		set_wordsFont: function(value) {
-			this.$1$WordsFontField = value;
-		},
-		get_effectFont: function() {
-			return this.$1$EffectFontField;
-		},
-		set_effectFont: function(value) {
-			this.$1$EffectFontField = value;
-		},
-		get_tablatureFont: function() {
-			return this.$1$TablatureFontField;
-		},
-		set_tablatureFont: function(value) {
-			this.$1$TablatureFontField = value;
-		},
-		get_graceFont: function() {
-			return this.$1$GraceFontField;
-		},
-		set_graceFont: function(value) {
-			this.$1$GraceFontField = value;
-		},
-		get_staveLineColor: function() {
-			return this.$1$StaveLineColorField;
-		},
-		set_staveLineColor: function(value) {
-			this.$1$StaveLineColorField = value;
-		},
-		get_barSeperatorColor: function() {
-			return this.$1$BarSeperatorColorField;
-		},
-		set_barSeperatorColor: function(value) {
-			this.$1$BarSeperatorColorField = value;
-		},
-		get_barNumberFont: function() {
-			return this.$1$BarNumberFontField;
-		},
-		set_barNumberFont: function(value) {
-			this.$1$BarNumberFontField = value;
-		},
-		get_barNumberColor: function() {
-			return this.$1$BarNumberColorField;
-		},
-		set_barNumberColor: function(value) {
-			this.$1$BarNumberColorField = value;
-		},
-		get_markerFont: function() {
-			return this.$1$MarkerFontField;
-		},
-		set_markerFont: function(value) {
-			this.$1$MarkerFontField = value;
-		},
-		get_tabClefFont: function() {
-			return this.$1$TabClefFontField;
-		},
-		set_tabClefFont: function(value) {
-			this.$1$TabClefFontField = value;
-		},
-		get_mainGlyphColor: function() {
-			return this.$1$MainGlyphColorField;
-		},
-		set_mainGlyphColor: function(value) {
-			this.$1$MainGlyphColorField = value;
-		},
-		get_scale: function() {
-			return this.$1$ScaleField;
-		},
-		set_scale: function(value) {
-			this.$1$ScaleField = value;
-		},
 		init: function(scale) {
-			this.set_scale(scale);
+			this.scale = scale;
 			var sansFont = 'Arial';
 			var serifFont = 'Georgia';
-			this.set_effectFont(new $AlphaTab_Platform_Model_Font(serifFont, 12 * scale, 2));
-			this.set_copyrightFont(new $AlphaTab_Platform_Model_Font(sansFont, 12 * scale, 1));
-			this.set_titleFont(new $AlphaTab_Platform_Model_Font(serifFont, 32 * scale, 0));
-			this.set_subTitleFont(new $AlphaTab_Platform_Model_Font(serifFont, 20 * scale, 0));
-			this.set_wordsFont(new $AlphaTab_Platform_Model_Font(serifFont, 15 * scale, 0));
-			this.set_tablatureFont(new $AlphaTab_Platform_Model_Font(sansFont, 13 * scale, 0));
-			this.set_graceFont(new $AlphaTab_Platform_Model_Font(sansFont, 11 * scale, 0));
-			this.set_staveLineColor(new $AlphaTab_Platform_Model_Color(165, 165, 165, 255));
-			this.set_barSeperatorColor(new $AlphaTab_Platform_Model_Color(34, 34, 17, 255));
-			this.set_barNumberFont(new $AlphaTab_Platform_Model_Font(sansFont, 11 * scale, 0));
-			this.set_barNumberColor(new $AlphaTab_Platform_Model_Color(200, 0, 0, 255));
-			this.set_markerFont(new $AlphaTab_Platform_Model_Font(serifFont, 14 * scale, 1));
-			this.set_tabClefFont(new $AlphaTab_Platform_Model_Font(sansFont, 18 * scale, 1));
-			this.set_mainGlyphColor(new $AlphaTab_Platform_Model_Color(0, 0, 0, 255));
+			this.effectFont = new $AlphaTab_Platform_Model_Font(serifFont, 12 * scale, 2);
+			this.copyrightFont = new $AlphaTab_Platform_Model_Font(sansFont, 12 * scale, 1);
+			this.titleFont = new $AlphaTab_Platform_Model_Font(serifFont, 32 * scale, 0);
+			this.subTitleFont = new $AlphaTab_Platform_Model_Font(serifFont, 20 * scale, 0);
+			this.wordsFont = new $AlphaTab_Platform_Model_Font(serifFont, 15 * scale, 0);
+			this.tablatureFont = new $AlphaTab_Platform_Model_Font(sansFont, 13 * scale, 0);
+			this.graceFont = new $AlphaTab_Platform_Model_Font(sansFont, 11 * scale, 0);
+			this.staveLineColor = new $AlphaTab_Platform_Model_Color(165, 165, 165, 255);
+			this.barSeperatorColor = new $AlphaTab_Platform_Model_Color(34, 34, 17, 255);
+			this.barNumberFont = new $AlphaTab_Platform_Model_Font(sansFont, 11 * scale, 0);
+			this.barNumberColor = new $AlphaTab_Platform_Model_Color(200, 0, 0, 255);
+			this.markerFont = new $AlphaTab_Platform_Model_Font(serifFont, 14 * scale, 1);
+			this.tabClefFont = new $AlphaTab_Platform_Model_Font(sansFont, 18 * scale, 1);
+			this.mainGlyphColor = new $AlphaTab_Platform_Model_Color(0, 0, 0, 255);
 		}
 	});
 	ss.initClass($AlphaTab_Rendering_RhythmBarRenderer, $asm, {
 		doLayout: function() {
-			this.$_helpers = this.get_stave().get_staveGroup().get_helpers().get_helpers().get_item(this.get_bar().get_track().get_index()).get_item(this.get_bar().get_index());
+			this.$_helpers = this.stave.staveGroup.helpers.helpers.get_item(this.bar.track.index).get_item(this.bar.index);
 			$AlphaTab_Rendering_GroupedBarRenderer.prototype.doLayout.call(this);
-			this.set_height(ss.Int32.trunc(24 * this.get_scale()));
-			this.set_isEmpty(false);
+			this.height = ss.Int32.trunc(24 * this.get_scale());
+			this.isEmpty = false;
 		},
 		createBeatGlyphs: function() {
-			this.$createVoiceGlyphs(this.get_bar().get_voices()[0]);
+			this.$createVoiceGlyphs(this.bar.voices[0]);
 		},
 		$createVoiceGlyphs: function(voice) {
-			var $t1 = voice.get_beats();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var b = $t1[$t2];
+			for (var $t1 = 0; $t1 < voice.beats.length; $t1++) {
+				var b = voice.beats[$t1];
 				// we create empty glyphs as alignment references and to get the 
 				// effect bar sized
 				var container = new $AlphaTab_Rendering_Glyphs_BeatContainerGlyph(b);
-				container.set_preNotes(new $AlphaTab_Rendering_Glyphs_BeatGlyphBase());
-				container.set_onNotes(new $AlphaTab_Rendering_Glyphs_BeatGlyphBase());
-				container.set_postNotes(new $AlphaTab_Rendering_Glyphs_BeatGlyphBase());
+				container.preNotes = new $AlphaTab_Rendering_Glyphs_BeatGlyphBase();
+				container.onNotes = new $AlphaTab_Rendering_Glyphs_BeatGlyphBase();
+				container.postNotes = new $AlphaTab_Rendering_Glyphs_BeatGlyphBase();
 				this.addBeatGlyph(container);
 			}
 		},
@@ -11032,18 +9686,17 @@
 		},
 		paint: function(cx, cy, canvas) {
 			$AlphaTab_Rendering_GroupedBarRenderer.prototype.paint.call(this, cx, cy, canvas);
-			var $t1 = this.$_helpers.get_beamHelpers();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var v = $t1[$t2];
-				for (var $t3 = 0; $t3 < v.length; $t3++) {
-					var h = v[$t3];
+			for (var $t1 = 0; $t1 < this.$_helpers.beamHelpers.length; $t1++) {
+				var v = this.$_helpers.beamHelpers[$t1];
+				for (var $t2 = 0; $t2 < v.length; $t2++) {
+					var h = v[$t2];
 					this.$paintBeamHelper(cx + this.get_beatGlyphsStart(), cy, canvas, h);
 				}
 			}
 		},
 		$paintBeamHelper: function(cx, cy, canvas, h) {
 			// check if we need to paint simple footer
-			if (h.get_beats().length === 1) {
+			if (h.beats.length === 1) {
 				this.$paintFooter(cx, cy, canvas, h);
 			}
 			else {
@@ -11051,28 +9704,28 @@
 			}
 		},
 		$paintBar: function(cx, cy, canvas, h) {
-			for (var i = 0; i < h.get_beats().length; i++) {
-				var beat = h.get_beats()[i];
+			for (var i = 0; i < h.beats.length; i++) {
+				var beat = h.beats[i];
 				if (h.hasBeatLineX(beat)) {
 					//
 					// draw line 
 					//
 					var beatLineX = ss.Int32.trunc(h.getBeatLineX(beat) + this.get_scale());
-					var y1 = cy + this.get_y();
-					var y2 = cy + this.get_y() + this.get_height();
-					canvas.set_color(this.get_resources().get_mainGlyphColor());
+					var y1 = cy + this.y;
+					var y2 = cy + this.y + this.height;
+					canvas.set_color(this.get_resources().mainGlyphColor);
 					canvas.beginPath();
-					canvas.moveTo(cx + this.get_x() + beatLineX, y1);
-					canvas.lineTo(cx + this.get_x() + beatLineX, y2);
+					canvas.moveTo(cx + this.x + beatLineX, y1);
+					canvas.lineTo(cx + this.x + beatLineX, y2);
 					canvas.stroke();
 					var brokenBarOffset = 6 * this.get_scale();
 					var barSpacing = 6 * this.get_scale();
 					var barSize = 3 * this.get_scale();
-					var barCount = $AlphaTab_Model_ModelUtils.getIndex(beat.get_duration()) - 2;
-					var barStart = cy + this.get_y();
+					var barCount = $AlphaTab_Model_ModelUtils.getIndex(beat.duration) - 2;
+					var barStart = cy + this.y;
 					if (this.$_direction === 0) {
 						barSpacing = -barSpacing;
-						barStart += this.get_height();
+						barStart += this.height;
 					}
 					for (var barIndex = 0; barIndex < barCount; barIndex++) {
 						var barStartX;
@@ -11083,13 +9736,13 @@
 						// 
 						// Bar to Next?
 						//
-						if (i < h.get_beats().length - 1) {
+						if (i < h.beats.length - 1) {
 							// full bar?
-							if (this.$isFullBarJoin(beat, h.get_beats()[i + 1], barIndex)) {
+							if (this.$isFullBarJoin(beat, h.beats[i + 1], barIndex)) {
 								barStartX = beatLineX;
-								barEndX = h.getBeatLineX(h.get_beats()[i + 1]) + this.get_scale();
+								barEndX = h.getBeatLineX(h.beats[i + 1]) + this.get_scale();
 							}
-							else if (i === 0 || !this.$isFullBarJoin(h.get_beats()[i - 1], beat, barIndex)) {
+							else if (i === 0 || !this.$isFullBarJoin(h.beats[i - 1], beat, barIndex)) {
 								barStartX = beatLineX;
 								barEndX = barStartX + brokenBarOffset;
 							}
@@ -11098,22 +9751,22 @@
 							}
 							barStartY = barY;
 							barEndY = barY;
-							$AlphaTab_Rendering_RhythmBarRenderer.$paintSingleBar(canvas, cx + this.get_x() + barStartX, barStartY, cx + this.get_x() + barEndX, barEndY, barSize);
+							$AlphaTab_Rendering_RhythmBarRenderer.$paintSingleBar(canvas, cx + this.x + barStartX, barStartY, cx + this.x + barEndX, barEndY, barSize);
 						}
-						else if (i > 0 && !this.$isFullBarJoin(beat, h.get_beats()[i - 1], barIndex)) {
+						else if (i > 0 && !this.$isFullBarJoin(beat, h.beats[i - 1], barIndex)) {
 							barStartX = beatLineX - brokenBarOffset;
 							barEndX = beatLineX;
 							barStartY = barY;
 							barEndY = barY;
-							$AlphaTab_Rendering_RhythmBarRenderer.$paintSingleBar(canvas, cx + this.get_x() + barStartX, barStartY, cx + this.get_x() + barEndX, barEndY, barSize);
+							$AlphaTab_Rendering_RhythmBarRenderer.$paintSingleBar(canvas, cx + this.x + barStartX, barStartY, cx + this.x + barEndX, barEndY, barSize);
 						}
 					}
 				}
 			}
 		},
 		$paintFooter: function(cx, cy, canvas, h) {
-			var beat = h.get_beats()[0];
-			if (beat.get_duration() === 1) {
+			var beat = h.beats[0];
+			if (beat.duration === 1) {
 				return;
 			}
 			//
@@ -11122,23 +9775,23 @@
 			var beatLineX = h.getBeatLineX(beat) + this.get_scale();
 			var direction = h.get_direction();
 			var topY = 0;
-			var bottomY = this.get_height();
+			var bottomY = this.height;
 			var beamY = ((direction === 1) ? bottomY : topY);
-			canvas.set_color(this.get_resources().get_mainGlyphColor());
+			canvas.set_color(this.get_resources().mainGlyphColor);
 			canvas.beginPath();
-			canvas.moveTo(cx + this.get_x() + beatLineX, cy + this.get_y() + topY);
-			canvas.lineTo(cx + this.get_x() + beatLineX, cy + this.get_y() + bottomY);
+			canvas.moveTo(cx + this.x + beatLineX, cy + this.y + topY);
+			canvas.lineTo(cx + this.x + beatLineX, cy + this.y + bottomY);
 			canvas.stroke();
 			//
 			// Draw beam 
 			//
-			var glyph = new $AlphaTab_Rendering_Glyphs_BeamGlyph(ss.Int32.trunc(beatLineX), beamY, beat.get_duration(), direction, false);
-			glyph.set_renderer(this);
+			var glyph = new $AlphaTab_Rendering_Glyphs_BeamGlyph(ss.Int32.trunc(beatLineX), beamY, beat.duration, direction, false);
+			glyph.renderer = this;
 			glyph.doLayout();
-			glyph.paint(cx + this.get_x(), cy + this.get_y(), canvas);
+			glyph.paint(cx + this.x, cy + this.y, canvas);
 		},
 		$isFullBarJoin: function(a, b, barIndex) {
-			return $AlphaTab_Model_ModelUtils.getIndex(a.get_duration()) - 2 - barIndex > 0 && $AlphaTab_Model_ModelUtils.getIndex(b.get_duration()) - 2 - barIndex > 0;
+			return $AlphaTab_Model_ModelUtils.getIndex(a.duration) - 2 - barIndex > 0 && $AlphaTab_Model_ModelUtils.getIndex(b.duration) - 2 - barIndex > 0;
 		}
 	}, $AlphaTab_Rendering_GroupedBarRenderer);
 	ss.initClass($AlphaTab_Rendering_RhythmBarRendererFactory, $asm, {
@@ -11147,30 +9800,24 @@
 		}
 	}, $AlphaTab_Rendering_BarRendererFactory);
 	ss.initClass($AlphaTab_Rendering_ScoreBarRenderer, $asm, {
-		get_accidentalHelper: function() {
-			return this.$3$AccidentalHelperField;
-		},
-		set_accidentalHelper: function(value) {
-			this.$3$AccidentalHelperField = value;
-		},
 		getBeatDirection: function(beat) {
-			var g = this.getOnNotesPosition(beat.get_voice().get_index(), beat.get_index());
+			var g = this.getOnNotesPosition(beat.voice.index, beat.index);
 			if (ss.isValue(g)) {
-				return g.get_noteHeads().get_direction();
+				return g.noteHeads.get_direction();
 			}
 			return 0;
 		},
 		getNoteX: function(note, onEnd) {
-			var g = this.getOnNotesPosition(note.get_beat().get_voice().get_index(), note.get_beat().get_index());
+			var g = this.getOnNotesPosition(note.beat.voice.index, note.beat.index);
 			if (ss.isValue(g)) {
-				return g.get_container().get_x() + g.get_x() + g.get_noteHeads().getNoteX(note, onEnd);
+				return g.get_container().x + g.x + g.noteHeads.getNoteX(note, onEnd);
 			}
 			return 0;
 		},
 		getNoteY: function(note) {
-			var beat = this.getOnNotesPosition(note.get_beat().get_voice().get_index(), note.get_beat().get_index());
+			var beat = this.getOnNotesPosition(note.beat.voice.index, note.beat.index);
 			if (ss.isValue(beat)) {
-				return beat.get_noteHeads().getNoteY(note);
+				return beat.noteHeads.getNoteY(note);
 			}
 			return 0;
 		},
@@ -11184,26 +9831,25 @@
 			return 9 * this.get_scale();
 		},
 		doLayout: function() {
-			this.$_helpers = this.get_stave().get_staveGroup().get_helpers().get_helpers().get_item(this.get_bar().get_track().get_index()).get_item(this.get_bar().get_index());
+			this.$_helpers = this.stave.staveGroup.helpers.helpers.get_item(this.bar.track.index).get_item(this.bar.index);
 			$AlphaTab_Rendering_GroupedBarRenderer.prototype.doLayout.call(this);
-			this.set_height(ss.Int32.trunc(this.get_lineOffset() * 4) + this.get_topPadding() + this.get_bottomPadding());
-			if (this.get_index() === 0) {
-				this.get_stave().registerStaveTop(this.get_$glyphOverflow());
-				this.get_stave().registerStaveBottom(this.get_height() - this.get_$glyphOverflow());
+			this.height = ss.Int32.trunc(this.get_lineOffset() * 4) + this.get_topPadding() + this.get_bottomPadding();
+			if (this.index === 0) {
+				this.stave.registerStaveTop(this.get_$glyphOverflow());
+				this.stave.registerStaveBottom(this.height - this.get_$glyphOverflow());
 			}
 			var top = this.getScoreY(0, 0);
 			var bottom = this.getScoreY(8, 0);
-			var $t1 = this.$_helpers.get_beamHelpers();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var v = $t1[$t2];
-				for (var $t3 = 0; $t3 < v.length; $t3++) {
-					var h = v[$t3];
+			for (var $t1 = 0; $t1 < this.$_helpers.beamHelpers.length; $t1++) {
+				var v = this.$_helpers.beamHelpers[$t1];
+				for (var $t2 = 0; $t2 < v.length; $t2++) {
+					var h = v[$t2];
 					//
 					// max note (highest) -> top overflow
 					// 
-					var maxNoteY = this.getScoreY(this.getNoteLine(h.get_maxNote()), 0);
+					var maxNoteY = this.getScoreY(this.getNoteLine(h.maxNote), 0);
 					if (h.get_direction() === 0) {
-						maxNoteY -= this.$getStemSize(h.get_maxDuration());
+						maxNoteY -= this.$getStemSize(h.maxDuration);
 					}
 					if (maxNoteY < top) {
 						this.registerOverflowTop(Math.abs(maxNoteY));
@@ -11211,9 +9857,9 @@
 					//
 					// min note (lowest) -> bottom overflow
 					//
-					var minNoteY = this.getScoreY(this.getNoteLine(h.get_minNote()), 0);
+					var minNoteY = this.getScoreY(this.getNoteLine(h.minNote), 0);
 					if (h.get_direction() === 1) {
-						minNoteY += this.$getStemSize(h.get_maxDuration());
+						minNoteY += this.$getStemSize(h.maxDuration);
 					}
 					if (minNoteY > bottom) {
 						this.registerOverflowBottom(Math.abs(minNoteY) - bottom);
@@ -11227,28 +9873,26 @@
 			this.$paintTuplets(cx, cy, canvas);
 		},
 		$paintTuplets: function(cx, cy, canvas) {
-			var $t1 = this.$_helpers.get_tupletHelpers();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var v = $t1[$t2];
-				for (var $t3 = 0; $t3 < v.length; $t3++) {
-					var h = v[$t3];
+			for (var $t1 = 0; $t1 < this.$_helpers.tupletHelpers.length; $t1++) {
+				var v = this.$_helpers.tupletHelpers[$t1];
+				for (var $t2 = 0; $t2 < v.length; $t2++) {
+					var h = v[$t2];
 					this.$paintTupletHelper(cx + this.get_beatGlyphsStart(), cy, canvas, h);
 				}
 			}
 		},
 		$paintBeams: function(cx, cy, canvas) {
-			var $t1 = this.$_helpers.get_beamHelpers();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var v = $t1[$t2];
-				for (var $t3 = 0; $t3 < v.length; $t3++) {
-					var h = v[$t3];
+			for (var $t1 = 0; $t1 < this.$_helpers.beamHelpers.length; $t1++) {
+				var v = this.$_helpers.beamHelpers[$t1];
+				for (var $t2 = 0; $t2 < v.length; $t2++) {
+					var h = v[$t2];
 					this.$paintBeamHelper(cx + this.get_beatGlyphsStart(), cy, canvas, h);
 				}
 			}
 		},
 		$paintBeamHelper: function(cx, cy, canvas, h) {
 			// check if we need to paint simple footer
-			if (h.get_beats().length === 1) {
+			if (h.beats.length === 1) {
 				this.$paintFooter(cx, cy, canvas, h);
 			}
 			else {
@@ -11260,25 +9904,25 @@
 			var oldAlign = canvas.get_textAlign();
 			canvas.set_textAlign(1);
 			// check if we need to paint simple footer
-			if (h.get_beats().length === 1 || !h.get_isFull()) {
-				for (var i = 0; i < h.get_beats().length; i++) {
-					var beat = h.get_beats()[i];
-					var beamingHelper = this.$_helpers.get_beamHelperLookup()[h.get_voiceIndex()].get_item(beat.get_index());
+			if (h.beats.length === 1 || !h.get_isFull()) {
+				for (var i = 0; i < h.beats.length; i++) {
+					var beat = h.beats[i];
+					var beamingHelper = this.$_helpers.beamHelperLookup[h.voiceIndex].get_item(beat.index);
 					if (ss.isNullOrUndefined(beamingHelper)) {
 						continue;
 					}
 					var direction = beamingHelper.get_direction();
 					var tupletX = ss.Int32.trunc(beamingHelper.getBeatLineX(beat) + this.get_scale());
-					var tupletY = cy + this.get_y() + this.$calculateBeamY(beamingHelper, tupletX);
-					var offset = ((direction === 0) ? ss.Int32.trunc(res.get_effectFont().get_size() * 1.79999995231628) : -ss.Int32.trunc(3 * this.get_scale()));
-					canvas.set_font(res.get_effectFont());
-					canvas.fillText(h.get_tuplet().toString(), cx + this.get_x() + tupletX, tupletY - offset);
+					var tupletY = cy + this.y + this.$calculateBeamY(beamingHelper, tupletX);
+					var offset = ((direction === 0) ? ss.Int32.trunc(res.effectFont.get_size() * 1.79999995231628) : -ss.Int32.trunc(3 * this.get_scale()));
+					canvas.set_font(res.effectFont);
+					canvas.fillText(h.tuplet.toString(), cx + this.x + tupletX, tupletY - offset);
 				}
 			}
 			else {
-				var firstBeat = h.get_beats()[0];
-				var lastBeat = h.get_beats()[h.get_beats().length - 1];
-				var beamingHelper1 = this.$_helpers.get_beamHelperLookup()[h.get_voiceIndex()].get_item(firstBeat.get_index());
+				var firstBeat = h.beats[0];
+				var lastBeat = h.beats[h.beats.length - 1];
+				var beamingHelper1 = this.$_helpers.beamHelperLookup[h.voiceIndex].get_item(firstBeat.index);
 				if (ss.isValue(beamingHelper1)) {
 					var direction1 = beamingHelper1.get_direction();
 					// 
@@ -11287,8 +9931,8 @@
 					var endX = ss.Int32.trunc(beamingHelper1.getBeatLineX(lastBeat) + this.get_scale());
 					//
 					// Calculate how many space the text will need
-					canvas.set_font(res.get_effectFont());
-					var s = h.get_tuplet().toString();
+					canvas.set_font(res.effectFont);
+					var s = h.tuplet.toString();
 					var sw = canvas.measureText(s);
 					var sp = ss.Int32.trunc(3 * this.get_scale());
 					// 
@@ -11312,18 +9956,18 @@
 					//
 					// draw the bracket
 					canvas.beginPath();
-					canvas.moveTo(cx + this.get_x() + startX, cy + this.get_y() + startY - offset1);
-					canvas.lineTo(cx + this.get_x() + startX, cy + this.get_y() + startY - offset1 - size);
-					canvas.lineTo(cx + this.get_x() + offset1X, cy + this.get_y() + offset1Y - offset1 - size);
+					canvas.moveTo(cx + this.x + startX, cy + this.y + startY - offset1);
+					canvas.lineTo(cx + this.x + startX, cy + this.y + startY - offset1 - size);
+					canvas.lineTo(cx + this.x + offset1X, cy + this.y + offset1Y - offset1 - size);
 					canvas.stroke();
 					canvas.beginPath();
-					canvas.moveTo(cx + this.get_x() + offset2X, cy + this.get_y() + offset2Y - offset1 - size);
-					canvas.lineTo(cx + this.get_x() + endX, cy + this.get_y() + endY - offset1 - size);
-					canvas.lineTo(cx + this.get_x() + endX, cy + this.get_y() + endY - offset1);
+					canvas.moveTo(cx + this.x + offset2X, cy + this.y + offset2Y - offset1 - size);
+					canvas.lineTo(cx + this.x + endX, cy + this.y + endY - offset1 - size);
+					canvas.lineTo(cx + this.x + endX, cy + this.y + endY - offset1);
 					canvas.stroke();
 					//
 					// Draw the string
-					canvas.fillText(s, cx + this.get_x() + middleX, cy + this.get_y() + middleY - offset1 - size - res.get_effectFont().get_size());
+					canvas.fillText(s, cx + this.x + middleX, cy + this.y + middleY - offset1 - size - res.effectFont.get_size());
 				}
 			}
 			canvas.set_textAlign(oldAlign);
@@ -11364,32 +10008,32 @@
 		},
 		$calculateBeamY: function(h, x) {
 			var correction = 4;
-			var stemSize = this.$getStemSize(h.get_maxDuration());
+			var stemSize = this.$getStemSize(h.maxDuration);
 			return h.calculateBeamY(stemSize, ss.Int32.trunc(this.get_scale()), x, this.get_scale(), ss.mkdel(this, function(n) {
 				return this.getScoreY(this.getNoteLine(n), correction - 1);
 			}));
 		},
 		$paintBar: function(cx, cy, canvas, h) {
-			for (var i = 0; i < h.get_beats().length; i++) {
-				var beat = h.get_beats()[i];
+			for (var i = 0; i < h.beats.length; i++) {
+				var beat = h.beats[i];
 				var correction = 4;
 				//
 				// draw line 
 				//
 				var beatLineX = ss.Int32.trunc(h.getBeatLineX(beat) + this.get_scale());
 				var direction = h.get_direction();
-				var y1 = cy + this.get_y() + ((direction === 0) ? this.getScoreY(this.getNoteLine(beat.get_minNote()), correction - 1) : this.getScoreY(this.getNoteLine(beat.get_maxNote()), correction - 1));
-				var y2 = cy + this.get_y() + this.$calculateBeamY(h, beatLineX);
-				canvas.set_color(this.get_layout().get_renderer().get_renderingResources().get_mainGlyphColor());
+				var y1 = cy + this.y + ((direction === 0) ? this.getScoreY(this.getNoteLine(beat.get_minNote()), correction - 1) : this.getScoreY(this.getNoteLine(beat.get_maxNote()), correction - 1));
+				var y2 = cy + this.y + this.$calculateBeamY(h, beatLineX);
+				canvas.set_color(this.get_layout().renderer.renderingResources.mainGlyphColor);
 				canvas.beginPath();
-				canvas.moveTo(cx + this.get_x() + beatLineX, y1);
-				canvas.lineTo(cx + this.get_x() + beatLineX, y2);
+				canvas.moveTo(cx + this.x + beatLineX, y1);
+				canvas.lineTo(cx + this.x + beatLineX, y2);
 				canvas.stroke();
 				var brokenBarOffset = ss.Int32.trunc(6 * this.get_scale());
 				var barSpacing = ss.Int32.trunc(6 * this.get_scale());
 				var barSize = ss.Int32.trunc(3 * this.get_scale());
-				var barCount = $AlphaTab_Model_ModelUtils.getIndex(beat.get_duration()) - 2;
-				var barStart = cy + this.get_y();
+				var barCount = $AlphaTab_Model_ModelUtils.getIndex(beat.duration) - 2;
+				var barStart = cy + this.y;
 				if (direction === 1) {
 					barSpacing = -barSpacing;
 				}
@@ -11402,13 +10046,13 @@
 					// 
 					// Bar to Next?
 					//
-					if (i < h.get_beats().length - 1) {
+					if (i < h.beats.length - 1) {
 						// full bar?
-						if (this.$isFullBarJoin(beat, h.get_beats()[i + 1], barIndex)) {
+						if (this.$isFullBarJoin(beat, h.beats[i + 1], barIndex)) {
 							barStartX = beatLineX;
-							barEndX = ss.Int32.trunc(h.getBeatLineX(h.get_beats()[i + 1]) + this.get_scale());
+							barEndX = ss.Int32.trunc(h.getBeatLineX(h.beats[i + 1]) + this.get_scale());
 						}
-						else if (i === 0 || !this.$isFullBarJoin(h.get_beats()[i - 1], beat, barIndex)) {
+						else if (i === 0 || !this.$isFullBarJoin(h.beats[i - 1], beat, barIndex)) {
 							barStartX = beatLineX;
 							barEndX = barStartX + brokenBarOffset;
 						}
@@ -11417,32 +10061,32 @@
 						}
 						barStartY = barY + this.$calculateBeamY(h, barStartX);
 						barEndY = barY + this.$calculateBeamY(h, barEndX);
-						$AlphaTab_Rendering_ScoreBarRenderer.$paintSingleBar(canvas, cx + this.get_x() + barStartX, barStartY, cx + this.get_x() + barEndX, barEndY, barSize);
+						$AlphaTab_Rendering_ScoreBarRenderer.$paintSingleBar(canvas, cx + this.x + barStartX, barStartY, cx + this.x + barEndX, barEndY, barSize);
 					}
-					else if (i > 0 && !this.$isFullBarJoin(beat, h.get_beats()[i - 1], barIndex)) {
+					else if (i > 0 && !this.$isFullBarJoin(beat, h.beats[i - 1], barIndex)) {
 						barStartX = beatLineX - brokenBarOffset;
 						barEndX = beatLineX;
 						barStartY = barY + this.$calculateBeamY(h, barStartX);
 						barEndY = barY + this.$calculateBeamY(h, barEndX);
-						$AlphaTab_Rendering_ScoreBarRenderer.$paintSingleBar(canvas, cx + this.get_x() + barStartX, barStartY, cx + this.get_x() + barEndX, barEndY, barSize);
+						$AlphaTab_Rendering_ScoreBarRenderer.$paintSingleBar(canvas, cx + this.x + barStartX, barStartY, cx + this.x + barEndX, barEndY, barSize);
 					}
 				}
 			}
 		},
 		$isFullBarJoin: function(a, b, barIndex) {
-			return $AlphaTab_Model_ModelUtils.getIndex(a.get_duration()) - 2 - barIndex > 0 && $AlphaTab_Model_ModelUtils.getIndex(b.get_duration()) - 2 - barIndex > 0;
+			return $AlphaTab_Model_ModelUtils.getIndex(a.duration) - 2 - barIndex > 0 && $AlphaTab_Model_ModelUtils.getIndex(b.duration) - 2 - barIndex > 0;
 		},
 		$paintFooter: function(cx, cy, canvas, h) {
-			var beat = h.get_beats()[0];
-			if (beat.get_duration() === 1) {
+			var beat = h.beats[0];
+			if (beat.duration === 1) {
 				return;
 			}
-			var isGrace = beat.get_graceType() !== 0;
+			var isGrace = beat.graceType !== 0;
 			var scaleMod = (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1);
 			//
 			// draw line 
 			//
-			var stemSize = this.$getStemSize(h.get_maxDuration());
+			var stemSize = this.$getStemSize(h.maxDuration);
 			var correction = ss.Int32.trunc(9 * scaleMod / 2);
 			var beatLineX = ss.Int32.trunc(h.getBeatLineX(beat) + this.get_scale());
 			var direction = h.get_direction();
@@ -11457,41 +10101,41 @@
 				topY -= ss.Int32.trunc(stemSize * scaleMod);
 				beamY = topY;
 			}
-			canvas.set_color(this.get_layout().get_renderer().get_renderingResources().get_mainGlyphColor());
+			canvas.set_color(this.get_layout().renderer.renderingResources.mainGlyphColor);
 			canvas.beginPath();
-			canvas.moveTo(cx + this.get_x() + beatLineX, cy + this.get_y() + topY);
-			canvas.lineTo(cx + this.get_x() + beatLineX, cy + this.get_y() + bottomY);
+			canvas.moveTo(cx + this.x + beatLineX, cy + this.y + topY);
+			canvas.lineTo(cx + this.x + beatLineX, cy + this.y + bottomY);
 			canvas.stroke();
 			if (isGrace) {
 				var graceSizeY = 15 * this.get_scale();
 				var graceSizeX = 12 * this.get_scale();
 				canvas.beginPath();
 				if (direction === 1) {
-					canvas.moveTo(ss.Int32.trunc(cx + this.get_x() + beatLineX - graceSizeX / 2), cy + this.get_y() + bottomY - graceSizeY);
-					canvas.lineTo(ss.Int32.trunc(cx + this.get_x() + beatLineX + graceSizeX / 2), cy + this.get_y() + bottomY);
+					canvas.moveTo(ss.Int32.trunc(cx + this.x + beatLineX - graceSizeX / 2), cy + this.y + bottomY - graceSizeY);
+					canvas.lineTo(ss.Int32.trunc(cx + this.x + beatLineX + graceSizeX / 2), cy + this.y + bottomY);
 				}
 				else {
-					canvas.moveTo(cx + this.get_x() + beatLineX - graceSizeX / 2, cy + this.get_y() + topY + graceSizeY);
-					canvas.lineTo(cx + this.get_x() + beatLineX + graceSizeX / 2, cy + this.get_y() + topY);
+					canvas.moveTo(cx + this.x + beatLineX - graceSizeX / 2, cy + this.y + topY + graceSizeY);
+					canvas.lineTo(cx + this.x + beatLineX + graceSizeX / 2, cy + this.y + topY);
 				}
 				canvas.stroke();
 			}
 			//
 			// Draw beam 
 			//
-			var glyph = new $AlphaTab_Rendering_Glyphs_BeamGlyph(beatLineX, beamY, beat.get_duration(), direction, isGrace);
-			glyph.set_renderer(this);
+			var glyph = new $AlphaTab_Rendering_Glyphs_BeamGlyph(beatLineX, beamY, beat.duration, direction, isGrace);
+			glyph.renderer = this;
 			glyph.doLayout();
-			glyph.paint(cx + this.get_x(), cy + this.get_y(), canvas);
+			glyph.paint(cx + this.x, cy + this.y, canvas);
 		},
 		createPreBeatGlyphs: function() {
-			if (this.get_bar().get_masterBar().get_isRepeatStart()) {
+			if (this.bar.get_masterBar().isRepeatStart) {
 				this.addPreBeatGlyph(new $AlphaTab_Rendering_Glyphs_RepeatOpenGlyph(0, 0, 1.5, 3));
 			}
 			// Clef
-			if (this.get_isFirstOfLine() || this.get_bar().get_clef() !== this.get_bar().get_previousBar().get_clef()) {
+			if (this.get_isFirstOfLine() || this.bar.clef !== this.bar.previousBar.clef) {
 				var offset = 0;
-				switch (this.get_bar().get_clef()) {
+				switch (this.bar.clef) {
 					case 0: {
 						offset = 4;
 						break;
@@ -11514,40 +10158,40 @@
 					}
 				}
 				this.$createStartSpacing();
-				this.addPreBeatGlyph(new $AlphaTab_Rendering_Glyphs_ClefGlyph(0, this.getScoreY(offset, 0), this.get_bar().get_clef()));
+				this.addPreBeatGlyph(new $AlphaTab_Rendering_Glyphs_ClefGlyph(0, this.getScoreY(offset, 0), this.bar.clef));
 			}
 			// Key signature
-			if (ss.isNullOrUndefined(this.get_bar().get_previousBar()) && this.get_bar().get_masterBar().get_keySignature() !== 0 || ss.isValue(this.get_bar().get_previousBar()) && this.get_bar().get_masterBar().get_keySignature() !== this.get_bar().get_previousBar().get_masterBar().get_keySignature()) {
+			if (ss.isNullOrUndefined(this.bar.previousBar) && this.bar.get_masterBar().keySignature !== 0 || ss.isValue(this.bar.previousBar) && this.bar.get_masterBar().keySignature !== this.bar.previousBar.get_masterBar().keySignature) {
 				this.$createStartSpacing();
 				this.$createKeySignatureGlyphs();
 			}
 			// Time Signature
-			if (ss.isNullOrUndefined(this.get_bar().get_previousBar()) || ss.isValue(this.get_bar().get_previousBar()) && this.get_bar().get_masterBar().get_timeSignatureNumerator() !== this.get_bar().get_previousBar().get_masterBar().get_timeSignatureNumerator() || ss.isValue(this.get_bar().get_previousBar()) && this.get_bar().get_masterBar().get_timeSignatureDenominator() !== this.get_bar().get_previousBar().get_masterBar().get_timeSignatureDenominator()) {
+			if (ss.isNullOrUndefined(this.bar.previousBar) || ss.isValue(this.bar.previousBar) && this.bar.get_masterBar().timeSignatureNumerator !== this.bar.previousBar.get_masterBar().timeSignatureNumerator || ss.isValue(this.bar.previousBar) && this.bar.get_masterBar().timeSignatureDenominator !== this.bar.previousBar.get_masterBar().timeSignatureDenominator) {
 				this.$createStartSpacing();
 				this.$createTimeSignatureGlyphs();
 			}
-			this.addPreBeatGlyph(new $AlphaTab_Rendering_Glyphs_BarNumberGlyph(0, this.getScoreY(-1, -3), this.get_bar().get_index() + 1, !this.get_stave().get_isFirstInAccolade()));
-			if (this.get_bar().get_isEmpty()) {
+			this.addPreBeatGlyph(new $AlphaTab_Rendering_Glyphs_BarNumberGlyph(0, this.getScoreY(-1, -3), this.bar.index + 1, !this.stave.isFirstInAccolade));
+			if (this.bar.get_isEmpty()) {
 				this.addPreBeatGlyph(new $AlphaTab_Rendering_Glyphs_SpacingGlyph(0, 0, ss.Int32.trunc(30 * this.get_scale()), false));
 			}
 		},
 		createBeatGlyphs: function() {
-			this.$createVoiceGlyphs(this.get_bar().get_voices()[0]);
+			this.$createVoiceGlyphs(this.bar.voices[0]);
 		},
 		createPostBeatGlyphs: function() {
-			if (this.get_bar().get_masterBar().get_isRepeatEnd()) {
-				this.addPostBeatGlyph(new $AlphaTab_Rendering_Glyphs_RepeatCloseGlyph(this.get_x(), 0));
-				if (this.get_bar().get_masterBar().get_repeatCount() > 2) {
+			if (this.bar.get_masterBar().get_isRepeatEnd()) {
+				this.addPostBeatGlyph(new $AlphaTab_Rendering_Glyphs_RepeatCloseGlyph(this.x, 0));
+				if (this.bar.get_masterBar().repeatCount > 2) {
 					var line = ((this.get_isLast() || this.get_isLastOfLine()) ? -1 : -4);
-					this.addPostBeatGlyph(new $AlphaTab_Rendering_Glyphs_RepeatCountGlyph(0, this.getScoreY(line, -3), this.get_bar().get_masterBar().get_repeatCount()));
+					this.addPostBeatGlyph(new $AlphaTab_Rendering_Glyphs_RepeatCountGlyph(0, this.getScoreY(line, -3), this.bar.get_masterBar().repeatCount));
 				}
 			}
-			else if (this.get_bar().get_masterBar().get_isDoubleBar()) {
+			else if (this.bar.get_masterBar().isDoubleBar) {
 				this.addPostBeatGlyph(new $AlphaTab_Rendering_Glyphs_BarSeperatorGlyph(0, 0, false));
 				this.addPostBeatGlyph(new $AlphaTab_Rendering_Glyphs_SpacingGlyph(0, 0, ss.Int32.trunc(3 * this.get_scale()), false));
 				this.addPostBeatGlyph(new $AlphaTab_Rendering_Glyphs_BarSeperatorGlyph(0, 0, false));
 			}
-			else if (ss.isNullOrUndefined(this.get_bar().get_nextBar()) || !this.get_bar().get_nextBar().get_masterBar().get_isRepeatStart()) {
+			else if (ss.isNullOrUndefined(this.bar.nextBar) || !this.bar.nextBar.get_masterBar().isRepeatStart) {
 				this.addPostBeatGlyph(new $AlphaTab_Rendering_Glyphs_BarSeperatorGlyph(0, 0, this.get_isLast()));
 			}
 		},
@@ -11560,9 +10204,9 @@
 		},
 		$createKeySignatureGlyphs: function() {
 			var offsetClef = 0;
-			var currentKey = this.get_bar().get_masterBar().get_keySignature();
-			var previousKey = (ss.isNullOrUndefined(this.get_bar().get_previousBar()) ? 0 : this.get_bar().get_previousBar().get_masterBar().get_keySignature());
-			switch (this.get_bar().get_clef()) {
+			var currentKey = this.bar.get_masterBar().keySignature;
+			var previousKey = (ss.isNullOrUndefined(this.bar.previousBar) ? 0 : this.bar.previousBar.get_masterBar().keySignature);
+			switch (this.bar.clef) {
 				case 0: {
 					offsetClef = 0;
 					break;
@@ -11608,24 +10252,23 @@
 		},
 		$createTimeSignatureGlyphs: function() {
 			this.addPreBeatGlyph(new $AlphaTab_Rendering_Glyphs_SpacingGlyph(0, 0, ss.Int32.trunc(5 * this.get_scale()), true));
-			this.addPreBeatGlyph(new $AlphaTab_Rendering_Glyphs_TimeSignatureGlyph(0, 0, this.get_bar().get_masterBar().get_timeSignatureNumerator(), this.get_bar().get_masterBar().get_timeSignatureDenominator()));
+			this.addPreBeatGlyph(new $AlphaTab_Rendering_Glyphs_TimeSignatureGlyph(0, 0, this.bar.get_masterBar().timeSignatureNumerator, this.bar.get_masterBar().timeSignatureDenominator));
 		},
 		$createVoiceGlyphs: function(v) {
-			var $t1 = v.get_beats();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var b = $t1[$t2];
+			for (var $t1 = 0; $t1 < v.beats.length; $t1++) {
+				var b = v.beats[$t1];
 				var container = new $AlphaTab_Rendering_ScoreBeatContainerGlyph(b);
-				container.set_preNotes(new $AlphaTab_Rendering_Glyphs_ScoreBeatPreNotesGlyph());
-				container.set_onNotes(new $AlphaTab_Rendering_Glyphs_ScoreBeatGlyph());
-				container.get_onNotes().set_beamingHelper(this.$_helpers.get_beamHelperLookup()[v.get_index()].get_item(b.get_index()));
-				container.set_postNotes(new $AlphaTab_Rendering_Glyphs_ScoreBeatPostNotesGlyph());
+				container.preNotes = new $AlphaTab_Rendering_Glyphs_ScoreBeatPreNotesGlyph();
+				container.onNotes = new $AlphaTab_Rendering_Glyphs_ScoreBeatGlyph();
+				container.onNotes.beamingHelper = this.$_helpers.beamHelperLookup[v.index].get_item(b.index);
+				container.postNotes = new $AlphaTab_Rendering_Glyphs_ScoreBeatPostNotesGlyph();
 				this.addBeatGlyph(container);
 			}
 		},
 		getNoteLine: function(n) {
-			var value = (n.get_beat().get_voice().get_bar().get_track().get_isPercussion() ? $AlphaTab_Rendering_Utils_PercussionMapper.mapValue(n) : n.get_realValue());
-			var ks = n.get_beat().get_voice().get_bar().get_masterBar().get_keySignature();
-			var clef = n.get_beat().get_voice().get_bar().get_clef();
+			var value = (n.beat.voice.bar.track.isPercussion ? $AlphaTab_Rendering_Utils_PercussionMapper.mapValue(n) : n.get_realValue());
+			var ks = n.beat.voice.bar.get_masterBar().keySignature;
+			var clef = n.beat.voice.bar.clef;
 			var index = value % 12;
 			var octave = ss.Int32.div(value, 12);
 			// Initial Position
@@ -11643,7 +10286,7 @@
 		},
 		get_$glyphOverflow: function() {
 			var res = this.get_resources();
-			return ss.Int32.trunc(res.get_tablatureFont().get_size() / 2 + res.get_tablatureFont().get_size() * 0.2);
+			return ss.Int32.trunc(res.tablatureFont.get_size() / 2 + res.tablatureFont.get_size() * 0.2);
 		},
 		paintBackground: function(cx, cy, canvas) {
 			var res = this.get_resources();
@@ -11656,15 +10299,15 @@
 			//
 			// draw string lines
 			//
-			canvas.set_color(res.get_staveLineColor());
-			var lineY = cy + this.get_y() + this.get_$glyphOverflow();
+			canvas.set_color(res.staveLineColor);
+			var lineY = cy + this.y + this.get_$glyphOverflow();
 			for (var i = 0; i < 5; i++) {
 				if (i > 0) {
 					lineY += ss.Int32.trunc(this.get_lineOffset());
 				}
 				canvas.beginPath();
-				canvas.moveTo(cx + this.get_x(), lineY);
-				canvas.lineTo(cx + this.get_x() + this.get_width(), lineY);
+				canvas.moveTo(cx + this.x, lineY);
+				canvas.lineTo(cx + this.x + this.width, lineY);
 				canvas.stroke();
 			}
 		}
@@ -11675,46 +10318,16 @@
 		}
 	}, $AlphaTab_Rendering_BarRendererFactory);
 	ss.initClass($AlphaTab_Rendering_Glyphs_Glyph, $asm, {
-		get_index: function() {
-			return this.$1$IndexField;
-		},
-		set_index: function(value) {
-			this.$1$IndexField = value;
-		},
-		get_x: function() {
-			return this.$1$XField;
-		},
-		set_x: function(value) {
-			this.$1$XField = value;
-		},
-		get_y: function() {
-			return this.$1$YField;
-		},
-		set_y: function(value) {
-			this.$1$YField = value;
-		},
-		get_width: function() {
-			return this.$1$WidthField;
-		},
-		set_width: function(value) {
-			this.$1$WidthField = value;
-		},
-		get_renderer: function() {
-			return this.$1$RendererField;
-		},
-		set_renderer: function(value) {
-			this.$1$RendererField = value;
-		},
 		applyGlyphSpacing: function(spacing) {
 			if (this.get_canScale()) {
-				this.set_width(this.get_width() + spacing);
+				this.width += spacing;
 			}
 		},
 		get_canScale: function() {
 			return true;
 		},
 		get_scale: function() {
-			return this.get_renderer().get_scale();
+			return this.renderer.get_scale();
 		},
 		doLayout: function() {
 		},
@@ -11723,105 +10336,75 @@
 	});
 	ss.initInterface($AlphaTab_Rendering_Glyphs_ISupportsFinalize, $asm, { finalizeGlyph: null });
 	ss.initClass($AlphaTab_Rendering_Glyphs_BeatContainerGlyph, $asm, {
-		get_beat: function() {
-			return this.$2$BeatField;
-		},
-		set_beat: function(value) {
-			this.$2$BeatField = value;
-		},
-		get_preNotes: function() {
-			return this.$2$PreNotesField;
-		},
-		set_preNotes: function(value) {
-			this.$2$PreNotesField = value;
-		},
-		get_onNotes: function() {
-			return this.$2$OnNotesField;
-		},
-		set_onNotes: function(value) {
-			this.$2$OnNotesField = value;
-		},
-		get_postNotes: function() {
-			return this.$2$PostNotesField;
-		},
-		set_postNotes: function(value) {
-			this.$2$PostNotesField = value;
-		},
-		get_ties: function() {
-			return this.$2$TiesField;
-		},
-		set_ties: function(value) {
-			this.$2$TiesField = value;
-		},
 		finalizeGlyph: function(layout) {
-			if (ss.isInstanceOfType(this.get_preNotes(), $AlphaTab_Rendering_Glyphs_ISupportsFinalize)) {
-				this.get_preNotes().finalizeGlyph(layout);
+			if (ss.isInstanceOfType(this.preNotes, $AlphaTab_Rendering_Glyphs_ISupportsFinalize)) {
+				this.preNotes.finalizeGlyph(layout);
 			}
-			if (ss.isInstanceOfType(this.get_onNotes(), $AlphaTab_Rendering_Glyphs_ISupportsFinalize)) {
-				this.get_onNotes().finalizeGlyph(layout);
+			if (ss.isInstanceOfType(this.onNotes, $AlphaTab_Rendering_Glyphs_ISupportsFinalize)) {
+				this.onNotes.finalizeGlyph(layout);
 			}
-			if (ss.isInstanceOfType(this.get_postNotes(), $AlphaTab_Rendering_Glyphs_ISupportsFinalize)) {
-				this.get_postNotes().finalizeGlyph(layout);
+			if (ss.isInstanceOfType(this.postNotes, $AlphaTab_Rendering_Glyphs_ISupportsFinalize)) {
+				this.postNotes.finalizeGlyph(layout);
 			}
 		},
 		registerMaxSizes: function(sizes) {
-			if (sizes.getPreNoteSize(this.get_beat().get_start()) < this.get_preNotes().get_width()) {
-				sizes.setPreNoteSize(this.get_beat().get_start(), this.get_preNotes().get_width());
+			if (sizes.getPreNoteSize(this.beat.start) < this.preNotes.width) {
+				sizes.setPreNoteSize(this.beat.start, this.preNotes.width);
 			}
-			if (sizes.getOnNoteSize(this.get_beat().get_start()) < this.get_onNotes().get_width()) {
-				sizes.setOnNoteSize(this.get_beat().get_start(), this.get_onNotes().get_width());
+			if (sizes.getOnNoteSize(this.beat.start) < this.onNotes.width) {
+				sizes.setOnNoteSize(this.beat.start, this.onNotes.width);
 			}
-			if (sizes.getPostNoteSize(this.get_beat().get_start()) < this.get_postNotes().get_width()) {
-				sizes.setPostNoteSize(this.get_beat().get_start(), this.get_postNotes().get_width());
+			if (sizes.getPostNoteSize(this.beat.start) < this.postNotes.width) {
+				sizes.setPostNoteSize(this.beat.start, this.postNotes.width);
 			}
 		},
 		applySizes: function(sizes) {
 			var size;
 			var diff;
-			size = sizes.getPreNoteSize(this.get_beat().get_start());
-			diff = size - this.get_preNotes().get_width();
-			this.get_preNotes().set_x(0);
+			size = sizes.getPreNoteSize(this.beat.start);
+			diff = size - this.preNotes.width;
+			this.preNotes.x = 0;
 			if (diff > 0) {
-				this.get_preNotes().applyGlyphSpacing(diff);
+				this.preNotes.applyGlyphSpacing(diff);
 			}
-			size = sizes.getOnNoteSize(this.get_beat().get_start());
-			diff = size - this.get_onNotes().get_width();
-			this.get_onNotes().set_x(this.get_preNotes().get_x() + this.get_preNotes().get_width());
+			size = sizes.getOnNoteSize(this.beat.start);
+			diff = size - this.onNotes.width;
+			this.onNotes.x = this.preNotes.x + this.preNotes.width;
 			if (diff > 0) {
-				this.get_onNotes().applyGlyphSpacing(diff);
+				this.onNotes.applyGlyphSpacing(diff);
 			}
-			size = sizes.getPostNoteSize(this.get_beat().get_start());
-			diff = size - this.get_postNotes().get_width();
-			this.get_postNotes().set_x(this.get_onNotes().get_x() + this.get_onNotes().get_width());
+			size = sizes.getPostNoteSize(this.beat.start);
+			diff = size - this.postNotes.width;
+			this.postNotes.x = this.onNotes.x + this.onNotes.width;
 			if (diff > 0) {
-				this.get_postNotes().applyGlyphSpacing(diff);
+				this.postNotes.applyGlyphSpacing(diff);
 			}
-			this.set_width(this.$calculateWidth());
+			this.width = this.$calculateWidth();
 		},
 		$calculateWidth: function() {
-			return this.get_postNotes().get_x() + this.get_postNotes().get_width();
+			return this.postNotes.x + this.postNotes.width;
 		},
 		doLayout: function() {
-			this.get_preNotes().set_x(0);
-			this.get_preNotes().set_index(0);
-			this.get_preNotes().set_renderer(this.get_renderer());
-			this.get_preNotes().set_container(this);
-			this.get_preNotes().doLayout();
-			this.get_onNotes().set_x(this.get_preNotes().get_x() + this.get_preNotes().get_width());
-			this.get_onNotes().set_index(1);
-			this.get_onNotes().set_renderer(this.get_renderer());
-			this.get_onNotes().set_container(this);
-			this.get_onNotes().doLayout();
-			this.get_postNotes().set_x(this.get_onNotes().get_x() + this.get_onNotes().get_width());
-			this.get_postNotes().set_index(2);
-			this.get_postNotes().set_renderer(this.get_renderer());
-			this.get_postNotes().set_container(this);
-			this.get_postNotes().doLayout();
-			var i = this.get_beat().get_notes().length - 1;
+			this.preNotes.x = 0;
+			this.preNotes.index = 0;
+			this.preNotes.renderer = this.renderer;
+			this.preNotes.set_container(this);
+			this.preNotes.doLayout();
+			this.onNotes.x = this.preNotes.x + this.preNotes.width;
+			this.onNotes.index = 1;
+			this.onNotes.renderer = this.renderer;
+			this.onNotes.set_container(this);
+			this.onNotes.doLayout();
+			this.postNotes.x = this.onNotes.x + this.onNotes.width;
+			this.postNotes.index = 2;
+			this.postNotes.renderer = this.renderer;
+			this.postNotes.set_container(this);
+			this.postNotes.doLayout();
+			var i = this.beat.notes.length - 1;
 			while (i >= 0) {
-				this.createTies(this.get_beat().get_notes()[i--]);
+				this.createTies(this.beat.notes[i--]);
 			}
-			this.set_width(this.$calculateWidth());
+			this.width = this.$calculateWidth();
 		},
 		createTies: function(n) {
 		},
@@ -11831,141 +10414,104 @@
 			// canvas.Font = new Font("Arial", 10);
 			// canvas.Color = new Color(0, 0, 0);
 			// canvas.FillText(Beat.Voice.Index + ":" + Beat.Index, cx + X, cy + Y + 15 * Beat.Voice.Index);
-			this.get_preNotes().paint(cx + this.get_x(), cy + this.get_y(), canvas);
+			this.preNotes.paint(cx + this.x, cy + this.y, canvas);
 			//canvas.Color = new Color(200, 0, 0, 100);
 			//canvas.FillRect(cx + X + PreNotes.X, cy + Y + PreNotes.Y, PreNotes.Width, 10);
-			this.get_onNotes().paint(cx + this.get_x(), cy + this.get_y(), canvas);
+			this.onNotes.paint(cx + this.x, cy + this.y, canvas);
 			//canvas.Color new Color(0, 200, 0, 100);
 			//canvas.FillRect(cx + X + OnNotes.X, cy + Y + OnNotes.Y + 10, OnNotes.Width, 10);
-			this.get_postNotes().paint(cx + this.get_x(), cy + this.get_y(), canvas);
+			this.postNotes.paint(cx + this.x, cy + this.y, canvas);
 			//canvas.Color = new Color(0, 0, 200, 100);
 			//canvas.FillRect(cx + X + PostNotes.X, cy + Y + PostNotes.Y + 20, PostNotes.Width, 10);
-			var $t1 = this.get_ties();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var t = $t1[$t2];
-				t.set_renderer(this.get_renderer());
-				t.paint(cx, cy + this.get_y(), canvas);
+			for (var $t1 = 0; $t1 < this.ties.length; $t1++) {
+				var t = this.ties[$t1];
+				t.renderer = this.renderer;
+				t.paint(cx, cy + this.y, canvas);
 			}
 		}
 	}, $AlphaTab_Rendering_Glyphs_Glyph, [$AlphaTab_Rendering_Glyphs_ISupportsFinalize]);
 	ss.initClass($AlphaTab_Rendering_ScoreBeatContainerGlyph, $asm, {
 		createTies: function(n) {
 			// create a tie if any effect requires it
-			if (n.get_isTieDestination() && ss.isValue(n.get_tieOrigin())) {
-				var tie = new $AlphaTab_Rendering_Glyphs_ScoreTieGlyph(n.get_tieOrigin(), n, this);
-				ss.add(this.get_ties(), tie);
+			if (n.isTieDestination && ss.isValue(n.tieOrigin)) {
+				var tie = new $AlphaTab_Rendering_Glyphs_ScoreTieGlyph(n.tieOrigin, n, this);
+				ss.add(this.ties, tie);
 			}
-			else if (n.get_isHammerPullDestination()) {
-				var tie1 = new $AlphaTab_Rendering_Glyphs_ScoreTieGlyph(n.get_hammerPullOrigin(), n, this);
-				ss.add(this.get_ties(), tie1);
+			else if (n.isHammerPullDestination) {
+				var tie1 = new $AlphaTab_Rendering_Glyphs_ScoreTieGlyph(n.hammerPullOrigin, n, this);
+				ss.add(this.ties, tie1);
 			}
-			else if (n.get_slideType() === 2) {
-				var tie2 = new $AlphaTab_Rendering_Glyphs_ScoreTieGlyph(n, n.get_slideTarget(), this);
-				ss.add(this.get_ties(), tie2);
+			else if (n.slideType === 2) {
+				var tie2 = new $AlphaTab_Rendering_Glyphs_ScoreTieGlyph(n, n.slideTarget, this);
+				ss.add(this.ties, tie2);
 			}
 			// TODO: depending on the type we have other positioning
 			// we should place glyphs in the preNotesGlyph or postNotesGlyph if needed
-			if (n.get_slideType() !== 0) {
-				var l = new $AlphaTab_Rendering_Glyphs_ScoreSlideLineGlyph(n.get_slideType(), n, this);
-				ss.add(this.get_ties(), l);
+			if (n.slideType !== 0) {
+				var l = new $AlphaTab_Rendering_Glyphs_ScoreSlideLineGlyph(n.slideType, n, this);
+				ss.add(this.ties, l);
 			}
 		}
 	}, $AlphaTab_Rendering_Glyphs_BeatContainerGlyph, [$AlphaTab_Rendering_Glyphs_ISupportsFinalize]);
 	ss.initClass($AlphaTab_Rendering_ScoreRenderer, $asm, {
-		get_canvas: function() {
-			return this.$1$CanvasField;
-		},
-		set_canvas: function(value) {
-			this.$1$CanvasField = value;
-		},
-		get_score: function() {
-			return this.$1$ScoreField;
-		},
-		set_score: function(value) {
-			this.$1$ScoreField = value;
-		},
-		get_tracks: function() {
-			return this.$1$TracksField;
-		},
-		set_tracks: function(value) {
-			this.$1$TracksField = value;
-		},
-		get_layout: function() {
-			return this.$1$LayoutField;
-		},
-		set_layout: function(value) {
-			this.$1$LayoutField = value;
-		},
-		get_renderingResources: function() {
-			return this.$1$RenderingResourcesField;
-		},
-		set_renderingResources: function(value) {
-			this.$1$RenderingResourcesField = value;
-		},
-		get_settings: function() {
-			return this.$1$SettingsField;
-		},
-		set_settings: function(value) {
-			this.$1$SettingsField = value;
-		},
 		$recreateLayout: function() {
-			if (!ss.referenceEquals(this.$_currentLayoutMode, this.get_settings().get_layout().get_mode())) {
-				if (ss.isNullOrUndefined(this.get_settings().get_layout()) || !$AlphaTab_Environment.layoutEngines.containsKey(this.get_settings().get_layout().get_mode())) {
-					this.set_layout($AlphaTab_Environment.layoutEngines.get_item('default')(this));
+			if (!ss.referenceEquals(this.$_currentLayoutMode, this.settings.layout.mode)) {
+				if (ss.isNullOrUndefined(this.settings.layout) || !$AlphaTab_Environment.layoutEngines.containsKey(this.settings.layout.mode)) {
+					this.layout = $AlphaTab_Environment.layoutEngines.get_item('default')(this);
 				}
 				else {
-					this.set_layout($AlphaTab_Environment.layoutEngines.get_item(this.get_settings().get_layout().get_mode())(this));
+					this.layout = $AlphaTab_Environment.layoutEngines.get_item(this.settings.layout.mode)(this);
 				}
-				this.$_currentLayoutMode = this.get_settings().get_layout().get_mode();
+				this.$_currentLayoutMode = this.settings.layout.mode;
 			}
 		},
 		render: function(track) {
-			this.set_score(track.get_score());
-			this.set_tracks([]);
-			ss.add(this.get_tracks(), track);
+			this.score = track.score;
+			this.tracks = [];
+			ss.add(this.tracks, track);
 			this.invalidate();
 		},
 		renderMultiple: function(tracks) {
 			if (tracks.length === 0) {
-				this.set_score(null);
+				this.score = null;
 			}
 			else {
-				this.set_score(tracks[0].get_score());
+				this.score = tracks[0].score;
 			}
-			this.set_tracks(tracks);
+			this.tracks = tracks;
 			this.invalidate();
 		},
 		invalidate: function() {
-			if (this.get_tracks().length === 0) {
+			if (this.tracks.length === 0) {
 				return;
 			}
-			if (this.get_renderingResources().get_scale() !== this.get_settings().get_scale()) {
-				this.get_renderingResources().init(this.get_settings().get_scale());
-				this.get_canvas().set_lineWidth(this.get_settings().get_scale());
+			if (this.renderingResources.scale !== this.settings.scale) {
+				this.renderingResources.init(this.settings.scale);
+				this.canvas.set_lineWidth(this.settings.scale);
 			}
 			this.$recreateLayout();
-			this.get_canvas().clear();
+			this.canvas.clear();
 			this.$doLayout();
 			this.$paintScore();
 			this.onRenderFinished();
 		},
 		$doLayout: function() {
-			this.get_layout().doLayout();
-			this.get_canvas().set_height(ss.Int32.trunc(this.get_layout().get_height() + this.get_renderingResources().get_copyrightFont().get_size() * 2));
-			this.get_canvas().set_width(this.get_layout().get_width());
+			this.layout.doLayout();
+			this.canvas.set_height(ss.Int32.trunc(this.layout.height + this.renderingResources.copyrightFont.get_size() * 2));
+			this.canvas.set_width(this.layout.width);
 		},
 		$paintScore: function() {
 			this.paintBackground();
-			this.get_layout().paintScore();
+			this.layout.paintScore();
 		},
 		paintBackground: function() {
 			// attention, you are not allowed to remove change this notice within any version of this library without permission!
 			var msg = 'Rendered using alphaTab (http://www.alphaTab.net)';
-			this.get_canvas().set_color(new $AlphaTab_Platform_Model_Color(62, 62, 62, 255));
-			this.get_canvas().set_font(this.get_renderingResources().get_copyrightFont());
-			this.get_canvas().set_textAlign(1);
-			var x = ss.Int32.div(this.get_canvas().get_width(), 2);
-			this.get_canvas().fillText(msg, x, this.get_canvas().get_height() - this.get_renderingResources().get_copyrightFont().get_size() * 2);
+			this.canvas.set_color(new $AlphaTab_Platform_Model_Color(62, 62, 62, 255));
+			this.canvas.set_font(this.renderingResources.copyrightFont);
+			this.canvas.set_textAlign(1);
+			var x = ss.Int32.div(this.canvas.get_width(), 2);
+			this.canvas.fillText(msg, x, this.canvas.get_height() - this.renderingResources.copyrightFont.get_size() * 2);
 		},
 		add_renderFinished: function(value) {
 			this.$1$RenderFinishedField = ss.delegateCombine(this.$1$RenderFinishedField, value);
@@ -11981,7 +10527,7 @@
 		},
 		buildBoundingsLookup: function() {
 			var lookup = new $AlphaTab_Rendering_Utils_BoundingsLookup();
-			this.get_layout().buildBoundingsLookup(lookup);
+			this.layout.buildBoundingsLookup(lookup);
 			return lookup;
 		}
 	});
@@ -11990,77 +10536,76 @@
 			return 11 * this.get_scale();
 		},
 		getNoteX: function(note, onEnd) {
-			var beat = this.getOnNotesPosition(note.get_beat().get_voice().get_index(), note.get_beat().get_index());
+			var beat = this.getOnNotesPosition(note.beat.voice.index, note.beat.index);
 			if (ss.isValue(beat)) {
-				return beat.get_container().get_x() + beat.get_x() + beat.get_noteNumbers().getNoteX(note, onEnd);
+				return beat.get_container().x + beat.x + beat.get_noteNumbers().getNoteX(note, onEnd);
 			}
 			return this.get_postBeatGlyphsStart();
 		},
 		getBeatX: function(beat) {
-			var bg = this.getPreNotesPosition(beat.get_voice().get_index(), beat.get_index());
+			var bg = this.getPreNotesPosition(beat.voice.index, beat.index);
 			if (ss.isValue(bg)) {
-				return bg.get_container().get_x() + bg.get_x();
+				return bg.get_container().x + bg.x;
 			}
 			return 0;
 		},
 		getNoteY: function(note) {
-			var beat = this.getOnNotesPosition(note.get_beat().get_voice().get_index(), note.get_beat().get_index());
+			var beat = this.getOnNotesPosition(note.beat.voice.index, note.beat.index);
 			if (ss.isValue(beat)) {
 				return beat.get_noteNumbers().getNoteY(note);
 			}
 			return 0;
 		},
 		doLayout: function() {
-			this.$_helpers = this.get_stave().get_staveGroup().get_helpers().get_helpers().get_item(this.get_bar().get_track().get_index()).get_item(this.get_bar().get_index());
+			this.$_helpers = this.stave.staveGroup.helpers.helpers.get_item(this.bar.track.index).get_item(this.bar.index);
 			$AlphaTab_Rendering_GroupedBarRenderer.prototype.doLayout.call(this);
-			this.set_height(ss.Int32.trunc(this.get_$lineOffset() * (this.get_bar().get_track().get_tuning().length - 1)) + this.get_numberOverflow() * 2);
-			if (this.get_index() === 0) {
-				this.get_stave().registerStaveTop(this.get_numberOverflow());
-				this.get_stave().registerStaveBottom(this.get_height() - this.get_numberOverflow());
+			this.height = ss.Int32.trunc(this.get_$lineOffset() * (this.bar.track.tuning.length - 1)) + this.get_numberOverflow() * 2;
+			if (this.index === 0) {
+				this.stave.registerStaveTop(this.get_numberOverflow());
+				this.stave.registerStaveBottom(this.height - this.get_numberOverflow());
 			}
 		},
 		createPreBeatGlyphs: function() {
-			if (this.get_bar().get_masterBar().get_isRepeatStart()) {
+			if (this.bar.get_masterBar().isRepeatStart) {
 				this.addPreBeatGlyph(new $AlphaTab_Rendering_Glyphs_RepeatOpenGlyph(0, 0, 1.5, 3));
 			}
 			// Clef
 			if (this.get_isFirstOfLine()) {
 				this.addPreBeatGlyph(new $AlphaTab_Rendering_Glyphs_TabClefGlyph(0, 0));
 			}
-			this.addPreBeatGlyph(new $AlphaTab_Rendering_Glyphs_BarNumberGlyph(0, this.getTabY(-1, -3), this.get_bar().get_index() + 1, !this.get_stave().get_isFirstInAccolade()));
-			if (this.get_bar().get_isEmpty()) {
+			this.addPreBeatGlyph(new $AlphaTab_Rendering_Glyphs_BarNumberGlyph(0, this.getTabY(-1, -3), this.bar.index + 1, !this.stave.isFirstInAccolade));
+			if (this.bar.get_isEmpty()) {
 				this.addPreBeatGlyph(new $AlphaTab_Rendering_Glyphs_SpacingGlyph(0, 0, ss.Int32.trunc(30 * this.get_scale()), false));
 			}
 		},
 		createBeatGlyphs: function() {
-			this.$createVoiceGlyphs(this.get_bar().get_voices()[0]);
+			this.$createVoiceGlyphs(this.bar.voices[0]);
 		},
 		$createVoiceGlyphs: function(v) {
-			var $t1 = v.get_beats();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var b = $t1[$t2];
+			for (var $t1 = 0; $t1 < v.beats.length; $t1++) {
+				var b = v.beats[$t1];
 				var container = new $AlphaTab_Rendering_Glyphs_TabBeatContainerGlyph(b);
-				container.set_preNotes(new $AlphaTab_Rendering_Glyphs_TabBeatPreNotesGlyph());
-				container.set_onNotes(new $AlphaTab_Rendering_Glyphs_TabBeatGlyph());
-				container.get_onNotes().set_beamingHelper(this.$_helpers.get_beamHelperLookup()[v.get_index()].get_item(b.get_index()));
-				container.set_postNotes(new $AlphaTab_Rendering_Glyphs_TabBeatPostNotesGlyph());
+				container.preNotes = new $AlphaTab_Rendering_Glyphs_TabBeatPreNotesGlyph();
+				container.onNotes = new $AlphaTab_Rendering_Glyphs_TabBeatGlyph();
+				container.onNotes.set_beamingHelper(this.$_helpers.beamHelperLookup[v.index].get_item(b.index));
+				container.postNotes = new $AlphaTab_Rendering_Glyphs_TabBeatPostNotesGlyph();
 				this.addBeatGlyph(container);
 			}
 		},
 		createPostBeatGlyphs: function() {
-			if (this.get_bar().get_masterBar().get_isRepeatEnd()) {
-				this.addPostBeatGlyph(new $AlphaTab_Rendering_Glyphs_RepeatCloseGlyph(this.get_x(), 0));
-				if (this.get_bar().get_masterBar().get_repeatCount() > 2) {
+			if (this.bar.get_masterBar().get_isRepeatEnd()) {
+				this.addPostBeatGlyph(new $AlphaTab_Rendering_Glyphs_RepeatCloseGlyph(this.x, 0));
+				if (this.bar.get_masterBar().repeatCount > 2) {
 					var line = ((this.get_isLast() || this.get_isLastOfLine()) ? -1 : -4);
-					this.addPostBeatGlyph(new $AlphaTab_Rendering_Glyphs_RepeatCountGlyph(0, this.getTabY(line, -3), this.get_bar().get_masterBar().get_repeatCount()));
+					this.addPostBeatGlyph(new $AlphaTab_Rendering_Glyphs_RepeatCountGlyph(0, this.getTabY(line, -3), this.bar.get_masterBar().repeatCount));
 				}
 			}
-			else if (this.get_bar().get_masterBar().get_isDoubleBar()) {
+			else if (this.bar.get_masterBar().isDoubleBar) {
 				this.addPostBeatGlyph(new $AlphaTab_Rendering_Glyphs_BarSeperatorGlyph(0, 0, false));
 				this.addPostBeatGlyph(new $AlphaTab_Rendering_Glyphs_SpacingGlyph(0, 0, ss.Int32.trunc(3 * this.get_scale()), false));
 				this.addPostBeatGlyph(new $AlphaTab_Rendering_Glyphs_BarSeperatorGlyph(0, 0, false));
 			}
-			else if (ss.isNullOrUndefined(this.get_bar().get_nextBar()) || !this.get_bar().get_nextBar().get_masterBar().get_isRepeatStart()) {
+			else if (ss.isNullOrUndefined(this.bar.nextBar) || !this.bar.nextBar.get_masterBar().isRepeatStart) {
 				this.addPostBeatGlyph(new $AlphaTab_Rendering_Glyphs_BarSeperatorGlyph(0, 0, this.get_isLast()));
 			}
 		},
@@ -12075,22 +10620,22 @@
 		},
 		get_numberOverflow: function() {
 			var res = this.get_resources();
-			return ss.Int32.trunc(res.get_tablatureFont().get_size() / 2 + res.get_tablatureFont().get_size() * 0.2);
+			return ss.Int32.trunc(res.tablatureFont.get_size() / 2 + res.tablatureFont.get_size() * 0.2);
 		},
 		paintBackground: function(cx, cy, canvas) {
 			var res = this.get_resources();
 			//
 			// draw string lines
 			//
-			canvas.set_color(res.get_staveLineColor());
-			var lineY = cy + this.get_y() + this.get_numberOverflow();
-			for (var i = 0; i < this.get_bar().get_track().get_tuning().length; i++) {
+			canvas.set_color(res.staveLineColor);
+			var lineY = cy + this.y + this.get_numberOverflow();
+			for (var i = 0; i < this.bar.track.tuning.length; i++) {
 				if (i > 0) {
 					lineY += ss.Int32.trunc(this.get_$lineOffset());
 				}
 				canvas.beginPath();
-				canvas.moveTo(cx + this.get_x(), lineY);
-				canvas.lineTo(cx + this.get_x() + this.get_width(), lineY);
+				canvas.moveTo(cx + this.x, lineY);
+				canvas.lineTo(cx + this.x + this.width, lineY);
 				canvas.stroke();
 			}
 			// Info guides for debugging
@@ -12110,7 +10655,7 @@
 			return false;
 		},
 		shouldCreateGlyph: function(renderer, beat) {
-			return beat.get_vibrato() !== 0;
+			return beat.vibrato !== 0;
 		},
 		get_sizingMode: function() {
 			return 10;
@@ -12139,7 +10684,7 @@
 			return ss.Int32.trunc(20 * renderer.get_scale());
 		},
 		createNewGlyph: function(renderer, beat) {
-			return new $AlphaTab_Rendering_Glyphs_TextGlyph(0, 0, beat.get_chord().get_name(), renderer.get_resources().get_effectFont());
+			return new $AlphaTab_Rendering_Glyphs_TextGlyph(0, 0, beat.get_chord().name, renderer.get_resources().effectFont);
 		},
 		canExpand: function(renderer, from, to) {
 			return true;
@@ -12150,7 +10695,7 @@
 			return false;
 		},
 		shouldCreateGlyph: function(renderer, beat) {
-			return beat.get_crescendo() !== 0;
+			return beat.crescendo !== 0;
 		},
 		get_sizingMode: function() {
 			return 8;
@@ -12159,25 +10704,25 @@
 			return ss.Int32.trunc(17 * renderer.get_scale());
 		},
 		createNewGlyph: function(renderer, beat) {
-			return new $AlphaTab_Rendering_Glyphs_CrescendoGlyph(0, 0, beat.get_crescendo());
+			return new $AlphaTab_Rendering_Glyphs_CrescendoGlyph(0, 0, beat.crescendo);
 		},
 		canExpand: function(renderer, from, to) {
-			return from.get_crescendo() === to.get_crescendo();
+			return from.crescendo === to.crescendo;
 		}
 	}, null, [$AlphaTab_Rendering_IEffectBarRendererInfo]);
 	ss.initClass($AlphaTab_Rendering_Effects_DummyEffectGlyph, $asm, {
 		doLayout: function() {
-			this.set_width(ss.Int32.trunc(20 * this.get_scale()));
+			this.width = ss.Int32.trunc(20 * this.get_scale());
 		},
 		get_canScale: function() {
 			return false;
 		},
 		paint: function(cx, cy, canvas) {
-			var res = this.get_renderer().get_resources();
-			canvas.set_color(res.get_mainGlyphColor());
-			canvas.strokeRect(cx + this.get_x(), cy + this.get_y(), this.get_width(), 20 * this.get_scale());
-			canvas.set_font(res.get_tablatureFont());
-			canvas.fillText(this.$_s, cx + this.get_x(), cy + this.get_y());
+			var res = this.renderer.get_resources();
+			canvas.set_color(res.mainGlyphColor);
+			canvas.strokeRect(cx + this.x, cy + this.y, this.width, 20 * this.get_scale());
+			canvas.set_font(res.tablatureFont);
+			canvas.fillText(this.$_s, cx + this.x, cy + this.y);
 		}
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Effects_DynamicsEffectInfo, $asm, {
@@ -12185,7 +10730,7 @@
 			return false;
 		},
 		shouldCreateGlyph: function(renderer, beat) {
-			return beat.get_voice().get_index() === 0 && (beat.get_index() === 0 && beat.get_voice().get_bar().get_index() === 0 || ss.isValue(beat.get_previousBeat()) && beat.get_dynamic() !== beat.get_previousBeat().get_dynamic());
+			return beat.voice.index === 0 && (beat.index === 0 && beat.voice.bar.index === 0 || ss.isValue(beat.previousBeat) && beat.dynamic !== beat.previousBeat.dynamic);
 		},
 		get_sizingMode: function() {
 			return 3;
@@ -12194,7 +10739,7 @@
 			return ss.Int32.trunc(15 * renderer.get_scale());
 		},
 		createNewGlyph: function(renderer, beat) {
-			return new $AlphaTab_Rendering_Glyphs_DynamicsGlyph(0, 0, beat.get_dynamic());
+			return new $AlphaTab_Rendering_Glyphs_DynamicsGlyph(0, 0, beat.dynamic);
 		},
 		canExpand: function(renderer, from, to) {
 			return true;
@@ -12205,7 +10750,7 @@
 			return false;
 		},
 		shouldCreateGlyph: function(renderer, beat) {
-			return beat.get_fadeIn();
+			return beat.fadeIn;
 		},
 		get_sizingMode: function() {
 			return 3;
@@ -12226,9 +10771,8 @@
 		},
 		shouldCreateGlyph: function(renderer, beat) {
 			this.lastCreateInfo = [];
-			var $t1 = beat.get_notes();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var n = $t1[$t2];
+			for (var $t1 = 0; $t1 < beat.notes.length; $t1++) {
+				var n = beat.notes[$t1];
 				if (this.shouldCreateGlyphForNote(renderer, n)) {
 					ss.add(this.lastCreateInfo, n);
 				}
@@ -12252,7 +10796,7 @@
 			return result;
 		},
 		shouldCreateGlyphForNote: function(renderer, note) {
-			return note.get_leftHandFinger() !== -1 && note.get_leftHandFinger() !== -2 || note.get_rightHandFinger() !== -1 && note.get_rightHandFinger() !== -2;
+			return note.leftHandFinger !== -1 && note.leftHandFinger !== -2 || note.rightHandFinger !== -1 && note.rightHandFinger !== -2;
 		},
 		getHeight: function(renderer) {
 			return this.$_maxGlyphCount * ss.Int32.trunc(20 * renderer.get_scale());
@@ -12266,7 +10810,7 @@
 	}, $AlphaTab_Rendering_Effects_NoteEffectInfoBase, [$AlphaTab_Rendering_IEffectBarRendererInfo]);
 	ss.initClass($AlphaTab_Rendering_Effects_LetRingEffectInfo, $asm, {
 		shouldCreateGlyphForNote: function(renderer, note) {
-			return note.get_isLetRing();
+			return note.isLetRing;
 		},
 		getHeight: function(renderer) {
 			return ss.Int32.trunc(15 * renderer.get_scale());
@@ -12283,7 +10827,7 @@
 			return true;
 		},
 		shouldCreateGlyph: function(renderer, beat) {
-			return beat.get_index() === 0 && beat.get_voice().get_bar().get_masterBar().get_isSectionStart();
+			return beat.index === 0 && beat.voice.bar.get_masterBar().get_isSectionStart();
 		},
 		get_sizingMode: function() {
 			return 0;
@@ -12292,7 +10836,7 @@
 			return ss.Int32.trunc(20 * renderer.get_scale());
 		},
 		createNewGlyph: function(renderer, beat) {
-			return new $AlphaTab_Rendering_Glyphs_TextGlyph(0, 0, beat.get_voice().get_bar().get_masterBar().get_section().get_text(), renderer.get_resources().get_markerFont());
+			return new $AlphaTab_Rendering_Glyphs_TextGlyph(0, 0, beat.voice.bar.get_masterBar().section.text, renderer.get_resources().markerFont);
 		},
 		canExpand: function(renderer, from, to) {
 			return true;
@@ -12300,7 +10844,7 @@
 	}, null, [$AlphaTab_Rendering_IEffectBarRendererInfo]);
 	ss.initClass($AlphaTab_Rendering_Effects_NoteVibratoEffectInfo, $asm, {
 		shouldCreateGlyphForNote: function(renderer, note) {
-			return note.get_vibrato() !== 0 || note.get_isTieDestination() && note.get_tieOrigin().get_vibrato() !== 0;
+			return note.vibrato !== 0 || note.isTieDestination && note.tieOrigin.vibrato !== 0;
 		},
 		getHeight: function(renderer) {
 			return ss.Int32.trunc(15 * renderer.get_scale());
@@ -12314,7 +10858,7 @@
 	}, $AlphaTab_Rendering_Effects_NoteEffectInfoBase, [$AlphaTab_Rendering_IEffectBarRendererInfo]);
 	ss.initClass($AlphaTab_Rendering_Effects_PalmMuteEffectInfo, $asm, {
 		shouldCreateGlyphForNote: function(renderer, note) {
-			return note.get_isPalmMute();
+			return note.isPalmMute;
 		},
 		getHeight: function(renderer) {
 			return ss.Int32.trunc(20 * renderer.get_scale());
@@ -12331,7 +10875,7 @@
 			return false;
 		},
 		shouldCreateGlyph: function(renderer, beat) {
-			return beat.get_pickStroke() !== 0;
+			return beat.pickStroke !== 0;
 		},
 		get_sizingMode: function() {
 			return 3;
@@ -12340,7 +10884,7 @@
 			return ss.Int32.trunc(20 * renderer.get_scale());
 		},
 		createNewGlyph: function(renderer, beat) {
-			return new $AlphaTab_Rendering_Glyphs_PickStrokeGlyph(0, 0, beat.get_pickStroke());
+			return new $AlphaTab_Rendering_Glyphs_PickStrokeGlyph(0, 0, beat.pickStroke);
 		},
 		canExpand: function(renderer, from, to) {
 			return true;
@@ -12351,7 +10895,7 @@
 			return false;
 		},
 		shouldCreateGlyph: function(renderer, beat) {
-			return beat.get_slap() || beat.get_pop() || beat.get_tap();
+			return beat.slap || beat.pop || beat.tap;
 		},
 		get_sizingMode: function() {
 			return 3;
@@ -12361,13 +10905,13 @@
 		},
 		createNewGlyph: function(renderer, beat) {
 			var res = renderer.get_resources();
-			if (beat.get_slap()) {
-				return new $AlphaTab_Rendering_Glyphs_TextGlyph(0, 0, 'S', res.get_effectFont());
+			if (beat.slap) {
+				return new $AlphaTab_Rendering_Glyphs_TextGlyph(0, 0, 'S', res.effectFont);
 			}
-			if (beat.get_pop()) {
-				return new $AlphaTab_Rendering_Glyphs_TextGlyph(0, 0, 'P', res.get_effectFont());
+			if (beat.pop) {
+				return new $AlphaTab_Rendering_Glyphs_TextGlyph(0, 0, 'P', res.effectFont);
 			}
-			return new $AlphaTab_Rendering_Glyphs_TextGlyph(0, 0, 'T', res.get_effectFont());
+			return new $AlphaTab_Rendering_Glyphs_TextGlyph(0, 0, 'T', res.effectFont);
 		},
 		canExpand: function(renderer, from, to) {
 			return true;
@@ -12378,7 +10922,7 @@
 			return true;
 		},
 		shouldCreateGlyph: function(renderer, beat) {
-			return beat.get_index() === 0 && (ss.isValue(beat.get_voice().get_bar().get_masterBar().get_tempoAutomation()) || beat.get_voice().get_bar().get_index() === 0);
+			return beat.index === 0 && (ss.isValue(beat.voice.bar.get_masterBar().tempoAutomation) || beat.voice.bar.index === 0);
 		},
 		get_sizingMode: function() {
 			return 0;
@@ -12388,11 +10932,11 @@
 		},
 		createNewGlyph: function(renderer, beat) {
 			var tempo;
-			if (ss.isValue(beat.get_voice().get_bar().get_masterBar().get_tempoAutomation())) {
-				tempo = ss.Int32.trunc(beat.get_voice().get_bar().get_masterBar().get_tempoAutomation().get_value());
+			if (ss.isValue(beat.voice.bar.get_masterBar().tempoAutomation)) {
+				tempo = ss.Int32.trunc(beat.voice.bar.get_masterBar().tempoAutomation.value);
 			}
 			else {
-				tempo = beat.get_voice().get_bar().get_track().get_score().get_tempo();
+				tempo = beat.voice.bar.track.score.tempo;
 			}
 			return new $AlphaTab_Rendering_Glyphs_TempoGlyph(0, 0, tempo);
 		},
@@ -12405,7 +10949,7 @@
 			return false;
 		},
 		shouldCreateGlyph: function(renderer, beat) {
-			return !$AlphaTab_Platform_Std.isNullOrWhiteSpace(beat.get_text());
+			return !$AlphaTab_Platform_Std.isNullOrWhiteSpace(beat.text);
 		},
 		get_sizingMode: function() {
 			return 3;
@@ -12414,7 +10958,7 @@
 			return ss.Int32.trunc(20 * renderer.get_scale());
 		},
 		createNewGlyph: function(renderer, beat) {
-			return new $AlphaTab_Rendering_Glyphs_TextGlyph(0, 0, beat.get_text(), renderer.get_resources().get_effectFont());
+			return new $AlphaTab_Rendering_Glyphs_TextGlyph(0, 0, beat.text, renderer.get_resources().effectFont);
 		},
 		canExpand: function(renderer, from, to) {
 			return true;
@@ -12439,7 +10983,7 @@
 			return true;
 		},
 		shouldCreateGlyph: function(renderer, beat) {
-			return beat.get_index() === 0 && (beat.get_voice().get_bar().get_masterBar().get_index() === 0 && beat.get_voice().get_bar().get_masterBar().get_tripletFeel() !== 0) || beat.get_voice().get_bar().get_masterBar().get_index() > 0 && beat.get_voice().get_bar().get_masterBar().get_tripletFeel() !== beat.get_voice().get_bar().get_masterBar().get_previousMasterBar().get_tripletFeel();
+			return beat.index === 0 && (beat.voice.bar.get_masterBar().index === 0 && beat.voice.bar.get_masterBar().tripletFeel !== 0) || beat.voice.bar.get_masterBar().index > 0 && beat.voice.bar.get_masterBar().tripletFeel !== beat.voice.bar.get_masterBar().previousMasterBar.tripletFeel;
 		},
 		get_sizingMode: function() {
 			return 3;
@@ -12461,10 +11005,10 @@
 			}
 			this.$_xScale = this.$_xGlyphScale * this.get_scale();
 			this.$_yScale = this.$_yGlyphScale * this.get_scale();
-			var res = this.get_renderer().get_resources();
-			canvas.set_color(res.get_mainGlyphColor());
-			var startX = this.get_x() + cx;
-			var startY = this.get_y() + cy;
+			var res = this.renderer.get_resources();
+			canvas.set_color(res.mainGlyphColor);
+			var startX = this.x + cx;
+			var startY = this.y + cy;
 			this.$_currentX = startX;
 			this.$_currentY = startY;
 			canvas.set_color(new $AlphaTab_Platform_Model_Color(0, 0, 0, 255));
@@ -12481,18 +11025,18 @@
 			var canContinue;
 			// reusable flag for shorthand curves
 			var i;
-			switch (cmd.get_cmd()) {
+			switch (cmd.cmd) {
 				case 'M': {
 					// absolute moveto
-					this.$_currentX = cx + cmd.get_numbers()[0] * this.$_xScale;
-					this.$_currentY = cy + cmd.get_numbers()[1] * this.$_yScale;
+					this.$_currentX = cx + cmd.numbers[0] * this.$_xScale;
+					this.$_currentY = cy + cmd.numbers[1] * this.$_yScale;
 					canvas.moveTo(this.$_currentX, this.$_currentY);
 					break;
 				}
 				case 'm': {
 					// relative moveto
-					this.$_currentX += cmd.get_numbers()[0] * this.$_xScale;
-					this.$_currentY += cmd.get_numbers()[1] * this.$_yScale;
+					this.$_currentX += cmd.numbers[0] * this.$_xScale;
+					this.$_currentY += cmd.numbers[1] * this.$_yScale;
 					canvas.moveTo(this.$_currentX, this.$_currentY);
 					break;
 				}
@@ -12504,9 +11048,9 @@
 				case 'L': {
 					// absolute lineTo
 					i = 0;
-					while (i < cmd.get_numbers().length) {
-						this.$_currentX = cx + cmd.get_numbers()[i++] * this.$_xScale;
-						this.$_currentY = cy + cmd.get_numbers()[i++] * this.$_yScale;
+					while (i < cmd.numbers.length) {
+						this.$_currentX = cx + cmd.numbers[i++] * this.$_xScale;
+						this.$_currentY = cy + cmd.numbers[i++] * this.$_yScale;
 						canvas.lineTo(this.$_currentX, this.$_currentY);
 					}
 					break;
@@ -12514,9 +11058,9 @@
 				case 'l': {
 					// relative lineTo
 					i = 0;
-					while (i < cmd.get_numbers().length) {
-						this.$_currentX += cmd.get_numbers()[i++] * this.$_xScale;
-						this.$_currentY += cmd.get_numbers()[i++] * this.$_yScale;
+					while (i < cmd.numbers.length) {
+						this.$_currentX += cmd.numbers[i++] * this.$_xScale;
+						this.$_currentY += cmd.numbers[i++] * this.$_yScale;
 						canvas.lineTo(this.$_currentX, this.$_currentY);
 					}
 					break;
@@ -12524,8 +11068,8 @@
 				case 'V': {
 					// absolute verticalTo
 					i = 0;
-					while (i < cmd.get_numbers().length) {
-						this.$_currentY = cy + cmd.get_numbers()[i++] * this.$_yScale;
+					while (i < cmd.numbers.length) {
+						this.$_currentY = cy + cmd.numbers[i++] * this.$_yScale;
 						canvas.lineTo(this.$_currentX, this.$_currentY);
 					}
 					break;
@@ -12533,8 +11077,8 @@
 				case 'v': {
 					// relative verticalTo
 					i = 0;
-					while (i < cmd.get_numbers().length) {
-						this.$_currentY += cmd.get_numbers()[i++] * this.$_yScale;
+					while (i < cmd.numbers.length) {
+						this.$_currentY += cmd.numbers[i++] * this.$_yScale;
 						canvas.lineTo(this.$_currentX, this.$_currentY);
 					}
 					break;
@@ -12542,8 +11086,8 @@
 				case 'H': {
 					// absolute horizontalTo
 					i = 0;
-					while (i < cmd.get_numbers().length) {
-						this.$_currentX = cx + cmd.get_numbers()[i++] * this.$_xScale;
+					while (i < cmd.numbers.length) {
+						this.$_currentX = cx + cmd.numbers[i++] * this.$_xScale;
 						canvas.lineTo(this.$_currentX, this.$_currentY);
 					}
 					break;
@@ -12551,8 +11095,8 @@
 				case 'h': {
 					// relative horizontalTo
 					i = 0;
-					while (i < cmd.get_numbers().length) {
-						this.$_currentX += cmd.get_numbers()[i++] * this.$_xScale;
+					while (i < cmd.numbers.length) {
+						this.$_currentX += cmd.numbers[i++] * this.$_xScale;
 						canvas.lineTo(this.$_currentX, this.$_currentY);
 					}
 					break;
@@ -12560,13 +11104,13 @@
 				case 'C': {
 					// absolute cubicTo
 					i = 0;
-					while (i < cmd.get_numbers().length) {
-						var x1 = cx + cmd.get_numbers()[i++] * this.$_xScale;
-						var y1 = cy + cmd.get_numbers()[i++] * this.$_yScale;
-						var x2 = cx + cmd.get_numbers()[i++] * this.$_xScale;
-						var y2 = cy + cmd.get_numbers()[i++] * this.$_yScale;
-						var x3 = cx + cmd.get_numbers()[i++] * this.$_xScale;
-						var y3 = cy + cmd.get_numbers()[i++] * this.$_yScale;
+					while (i < cmd.numbers.length) {
+						var x1 = cx + cmd.numbers[i++] * this.$_xScale;
+						var y1 = cy + cmd.numbers[i++] * this.$_yScale;
+						var x2 = cx + cmd.numbers[i++] * this.$_xScale;
+						var y2 = cy + cmd.numbers[i++] * this.$_yScale;
+						var x3 = cx + cmd.numbers[i++] * this.$_xScale;
+						var y3 = cy + cmd.numbers[i++] * this.$_yScale;
 						this.$_lastControlX = x2;
 						this.$_lastControlY = y2;
 						this.$_currentX = x3;
@@ -12578,13 +11122,13 @@
 				case 'c': {
 					// relative cubicTo
 					i = 0;
-					while (i < cmd.get_numbers().length) {
-						var x11 = this.$_currentX + cmd.get_numbers()[i++] * this.$_xScale;
-						var y11 = this.$_currentY + cmd.get_numbers()[i++] * this.$_yScale;
-						var x21 = this.$_currentX + cmd.get_numbers()[i++] * this.$_xScale;
-						var y21 = this.$_currentY + cmd.get_numbers()[i++] * this.$_yScale;
-						var x31 = this.$_currentX + cmd.get_numbers()[i++] * this.$_xScale;
-						var y31 = this.$_currentY + cmd.get_numbers()[i++] * this.$_yScale;
+					while (i < cmd.numbers.length) {
+						var x11 = this.$_currentX + cmd.numbers[i++] * this.$_xScale;
+						var y11 = this.$_currentY + cmd.numbers[i++] * this.$_yScale;
+						var x21 = this.$_currentX + cmd.numbers[i++] * this.$_xScale;
+						var y21 = this.$_currentY + cmd.numbers[i++] * this.$_yScale;
+						var x31 = this.$_currentX + cmd.numbers[i++] * this.$_xScale;
+						var y31 = this.$_currentY + cmd.numbers[i++] * this.$_yScale;
 						this.$_lastControlX = x21;
 						this.$_lastControlY = y21;
 						this.$_currentX = x31;
@@ -12596,14 +11140,14 @@
 				case 'S': {
 					// absolute shorthand cubicTo
 					i = 0;
-					while (i < cmd.get_numbers().length) {
-						var x12 = cx + cmd.get_numbers()[i++] * this.$_xScale;
-						var y12 = cy + cmd.get_numbers()[i++] * this.$_yScale;
+					while (i < cmd.numbers.length) {
+						var x12 = cx + cmd.numbers[i++] * this.$_xScale;
+						var y12 = cy + cmd.numbers[i++] * this.$_yScale;
 						canContinue = this.$_lastCmd === 'c' || this.$_lastCmd === 'C' || this.$_lastCmd === 'S' || this.$_lastCmd === 's';
 						var x22 = (canContinue ? (this.$_currentX + (this.$_currentX - this.$_lastControlX)) : this.$_currentX);
 						var y22 = (canContinue ? (this.$_currentY + (this.$_currentY - this.$_lastControlY)) : this.$_currentY);
-						var x32 = cx + cmd.get_numbers()[i++] * this.$_xScale;
-						var y32 = cy + cmd.get_numbers()[i++] * this.$_yScale;
+						var x32 = cx + cmd.numbers[i++] * this.$_xScale;
+						var y32 = cy + cmd.numbers[i++] * this.$_yScale;
 						this.$_lastControlX = x22;
 						this.$_lastControlY = y22;
 						this.$_currentX = x32;
@@ -12615,14 +11159,14 @@
 				case 's': {
 					// relative shorthand cubicTo
 					i = 0;
-					while (i < cmd.get_numbers().length) {
-						var x13 = this.$_currentX + cmd.get_numbers()[i++] * this.$_xScale;
-						var y13 = this.$_currentY + cmd.get_numbers()[i++] * this.$_yScale;
+					while (i < cmd.numbers.length) {
+						var x13 = this.$_currentX + cmd.numbers[i++] * this.$_xScale;
+						var y13 = this.$_currentY + cmd.numbers[i++] * this.$_yScale;
 						canContinue = this.$_lastCmd === 'c' || this.$_lastCmd === 'C' || this.$_lastCmd === 'S' || this.$_lastCmd === 's';
 						var x23 = (canContinue ? (this.$_currentX + (this.$_currentX - this.$_lastControlX)) : this.$_currentX);
 						var y23 = (canContinue ? (this.$_currentY + (this.$_currentY - this.$_lastControlY)) : this.$_currentY);
-						var x33 = this.$_currentX + cmd.get_numbers()[i++] * this.$_xScale;
-						var y33 = this.$_currentY + cmd.get_numbers()[i++] * this.$_yScale;
+						var x33 = this.$_currentX + cmd.numbers[i++] * this.$_xScale;
+						var y33 = this.$_currentY + cmd.numbers[i++] * this.$_yScale;
 						this.$_lastControlX = x23;
 						this.$_lastControlY = y23;
 						this.$_currentX = x33;
@@ -12634,11 +11178,11 @@
 				case 'Q': {
 					// absolute quadraticTo
 					i = 0;
-					while (i < cmd.get_numbers().length) {
-						var x14 = cx + cmd.get_numbers()[i++] * this.$_xScale;
-						var y14 = cy + cmd.get_numbers()[i++] * this.$_yScale;
-						var x24 = cx + cmd.get_numbers()[i++] * this.$_xScale;
-						var y24 = cy + cmd.get_numbers()[i++] * this.$_yScale;
+					while (i < cmd.numbers.length) {
+						var x14 = cx + cmd.numbers[i++] * this.$_xScale;
+						var y14 = cy + cmd.numbers[i++] * this.$_yScale;
+						var x24 = cx + cmd.numbers[i++] * this.$_xScale;
+						var y24 = cy + cmd.numbers[i++] * this.$_yScale;
 						this.$_lastControlX = x14;
 						this.$_lastControlY = y14;
 						this.$_currentX = x24;
@@ -12650,11 +11194,11 @@
 				case 'q': {
 					// relative quadraticTo
 					i = 0;
-					while (i < cmd.get_numbers().length) {
-						var x15 = this.$_currentX + cmd.get_numbers()[i++] * this.$_xScale;
-						var y15 = this.$_currentY + cmd.get_numbers()[i++] * this.$_yScale;
-						var x25 = this.$_currentX + cmd.get_numbers()[i++] * this.$_xScale;
-						var y25 = this.$_currentY + cmd.get_numbers()[i++] * this.$_yScale;
+					while (i < cmd.numbers.length) {
+						var x15 = this.$_currentX + cmd.numbers[i++] * this.$_xScale;
+						var y15 = this.$_currentY + cmd.numbers[i++] * this.$_yScale;
+						var x25 = this.$_currentX + cmd.numbers[i++] * this.$_xScale;
+						var y25 = this.$_currentY + cmd.numbers[i++] * this.$_yScale;
 						this.$_lastControlX = x15;
 						this.$_lastControlY = y15;
 						this.$_currentX = x25;
@@ -12666,9 +11210,9 @@
 				case 'T': {
 					// absolute shorthand quadraticTo
 					i = 0;
-					while (i < cmd.get_numbers().length) {
-						var x16 = cx + cmd.get_numbers()[i++] * this.$_xScale;
-						var y16 = cy + cmd.get_numbers()[i++] * this.$_yScale;
+					while (i < cmd.numbers.length) {
+						var x16 = cx + cmd.numbers[i++] * this.$_xScale;
+						var y16 = cy + cmd.numbers[i++] * this.$_yScale;
 						canContinue = this.$_lastCmd === 'q' || this.$_lastCmd === 'Q' || this.$_lastCmd === 't' || this.$_lastCmd === 'T';
 						var cpx = (canContinue ? (this.$_currentX + (this.$_currentX - this.$_lastControlX)) : this.$_currentX);
 						var cpy = (canContinue ? (this.$_currentY + (this.$_currentY - this.$_lastControlY)) : this.$_currentY);
@@ -12683,10 +11227,10 @@
 				case 't': {
 					// relative shorthand quadraticTo
 					i = 0;
-					while (i < cmd.get_numbers().length) {
+					while (i < cmd.numbers.length) {
 						// TODO: buggy/incomplete
-						var x17 = this.$_currentX + cmd.get_numbers()[i++] * this.$_xScale;
-						var y17 = this.$_currentY + cmd.get_numbers()[i++] * this.$_yScale;
+						var x17 = this.$_currentX + cmd.numbers[i++] * this.$_xScale;
+						var y17 = this.$_currentY + cmd.numbers[i++] * this.$_yScale;
 						canContinue = this.$_lastCmd === 'q' || this.$_lastCmd === 'Q' || this.$_lastCmd === 't' || this.$_lastCmd === 'T';
 						var cpx1 = (canContinue ? (this.$_currentX + (this.$_currentX - this.$_lastControlX)) : this.$_currentX);
 						var cpy1 = (canContinue ? (this.$_currentY + (this.$_currentY - this.$_lastControlY)) : this.$_currentY);
@@ -12697,12 +11241,12 @@
 					break;
 				}
 			}
-			this.$_lastCmd = cmd.get_cmd();
+			this.$_lastCmd = cmd.cmd;
 		}
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_AccentuationGlyph, $asm, {
 		doLayout: function() {
-			this.set_width(ss.Int32.trunc(9 * this.get_scale()));
+			this.width = ss.Int32.trunc(9 * this.get_scale());
 		},
 		get_canScale: function() {
 			return false;
@@ -12713,11 +11257,11 @@
 			var w = 0;
 			for (var $t1 = 0; $t1 < this.glyphs.length; $t1++) {
 				var g = this.glyphs[$t1];
-				g.set_renderer(this.get_renderer());
+				g.renderer = this.renderer;
 				g.doLayout();
-				w = Math.max(w, g.get_width());
+				w = Math.max(w, g.width);
 			}
-			this.set_width(w);
+			this.width = w;
 		},
 		addGlyph: function(g) {
 			ss.add(this.glyphs, g);
@@ -12725,8 +11269,8 @@
 		paint: function(cx, cy, canvas) {
 			for (var $t1 = 0; $t1 < this.glyphs.length; $t1++) {
 				var g = this.glyphs[$t1];
-				g.set_renderer(this.get_renderer());
-				g.paint(cx + this.get_x(), cy + this.get_y(), canvas);
+				g.renderer = this.renderer;
+				g.paint(cx + this.x, cy + this.y, canvas);
 			}
 		}
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
@@ -12736,7 +11280,7 @@
 			// Determine Columns for accidentals
 			//
 			this.glyphs.sort(function(a, b) {
-				return ss.compare(a.get_y(), b.get_y());
+				return ss.compare(a.y, b.y);
 			});
 			// defines the reserved y position of the columns
 			var columns = [];
@@ -12744,12 +11288,12 @@
 			var accidentalSize = ss.Int32.trunc(21 * this.get_scale());
 			for (var $t1 = 0; $t1 < this.glyphs.length; $t1++) {
 				var g = this.glyphs[$t1];
-				g.set_renderer(this.get_renderer());
+				g.renderer = this.renderer;
 				g.doLayout();
 				// find column where glyph fits into
 				// as long the glyph does not fit into the current column
 				var gColumn = 0;
-				while (columns[gColumn] > g.get_y()) {
+				while (columns[gColumn] > g.y) {
 					// move to next column
 					gColumn++;
 					// and create the new column if needed
@@ -12758,30 +11302,30 @@
 					}
 				}
 				// temporary save column as X
-				g.set_x(gColumn);
-				columns[gColumn] = g.get_y() + accidentalSize;
+				g.x = gColumn;
+				columns[gColumn] = g.y + accidentalSize;
 			}
 			//
 			// Place accidentals in columns
 			//
 			var columnWidth = ss.Int32.trunc(8 * this.get_scale());
 			if (this.glyphs.length === 0) {
-				this.set_width(0);
+				this.width = 0;
 			}
 			else {
-				this.set_width(columnWidth * columns.length);
+				this.width = columnWidth * columns.length;
 			}
 			for (var $t2 = 0; $t2 < this.glyphs.length; $t2++) {
 				var g1 = this.glyphs[$t2];
-				g1.set_x(this.get_width() - (g1.get_x() + 1) * columnWidth);
+				g1.x = this.width - (g1.x + 1) * columnWidth;
 			}
 		}
 	}, $AlphaTab_Rendering_Glyphs_GlyphGroup);
 	ss.initClass($AlphaTab_Rendering_Glyphs_BarNumberGlyph, $asm, {
 		doLayout: function() {
-			var scoreRenderer = this.get_renderer().get_layout().get_renderer();
-			scoreRenderer.get_canvas().set_font(scoreRenderer.get_renderingResources().get_barNumberFont());
-			this.set_width(ss.Int32.trunc(10 * this.get_scale()));
+			var scoreRenderer = this.renderer.get_layout().renderer;
+			scoreRenderer.canvas.set_font(scoreRenderer.renderingResources.barNumberFont);
+			this.width = ss.Int32.trunc(10 * this.get_scale());
 		},
 		get_canScale: function() {
 			return false;
@@ -12790,26 +11334,26 @@
 			if (this.$_hidden) {
 				return;
 			}
-			var res = this.get_renderer().get_resources();
-			canvas.set_color(res.get_barNumberColor());
-			canvas.set_font(res.get_barNumberFont());
-			canvas.fillText(this.$_number.toString(), cx + this.get_x(), cy + this.get_y());
+			var res = this.renderer.get_resources();
+			canvas.set_color(res.barNumberColor);
+			canvas.set_font(res.barNumberFont);
+			canvas.fillText(this.$_number.toString(), cx + this.x, cy + this.y);
 		}
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_BarSeperatorGlyph, $asm, {
 		doLayout: function() {
-			this.set_width(ss.Int32.trunc((this.$_isLast ? 8 : 1) * this.get_scale()));
+			this.width = ss.Int32.trunc((this.$_isLast ? 8 : 1) * this.get_scale());
 		},
 		get_canScale: function() {
 			return false;
 		},
 		paint: function(cx, cy, canvas) {
-			var res = this.get_renderer().get_resources();
-			canvas.set_color(res.get_barSeperatorColor());
+			var res = this.renderer.get_resources();
+			canvas.set_color(res.barSeperatorColor);
 			var blockWidth = 4 * this.get_scale();
-			var top = cy + this.get_y() + this.get_renderer().get_topPadding();
-			var bottom = cy + this.get_y() + this.get_renderer().get_height() - this.get_renderer().get_bottomPadding();
-			var left = cx + this.get_x();
+			var top = cy + this.y + this.renderer.get_topPadding();
+			var bottom = cy + this.y + this.renderer.height - this.renderer.get_bottomPadding();
+			var left = cx + this.x;
 			var h = bottom - top;
 			// line
 			canvas.beginPath();
@@ -12825,7 +11369,7 @@
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_BeamGlyph, $asm, {
 		doLayout: function() {
-			this.set_width(0);
+			this.width = 0;
 		}
 	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_BeatGlyphBase, $asm, {
@@ -12840,20 +11384,20 @@
 			var w = 0;
 			for (var $t1 = 0; $t1 < this.glyphs.length; $t1++) {
 				var g = this.glyphs[$t1];
-				g.set_x(w);
-				g.set_renderer(this.get_renderer());
+				g.x = w;
+				g.renderer = this.renderer;
 				g.doLayout();
-				w += g.get_width();
+				w += g.width;
 			}
-			this.set_width(w);
+			this.width = w;
 		},
 		noteLoop: function(action) {
-			for (var i = this.get_container().get_beat().get_notes().length - 1; i >= 0; i--) {
-				action(this.get_container().get_beat().get_notes()[i]);
+			for (var i = this.get_container().beat.notes.length - 1; i >= 0; i--) {
+				action(this.get_container().beat.notes[i]);
 			}
 		},
 		get_beatDurationWidth: function() {
-			switch (this.get_container().get_beat().get_duration()) {
+			switch (this.get_container().beat.duration) {
 				case 1: {
 					return 103;
 				}
@@ -12883,32 +11427,32 @@
 	}, $AlphaTab_Rendering_Glyphs_GlyphGroup);
 	ss.initClass($AlphaTab_Rendering_Glyphs_BendGlyph, $asm, {
 		paint: function(cx, cy, canvas) {
-			var r = this.get_renderer();
-			var res = this.get_renderer().get_resources();
+			var r = this.renderer;
+			var res = this.renderer.get_resources();
 			// calculate offsets per step
-			var dX = ss.Int32.div(this.get_width(), $AlphaTab_Model_BendPoint.maxPosition);
+			var dX = ss.Int32.div(this.width, $AlphaTab_Model_BendPoint.maxPosition);
 			var maxValue = 0;
-			for (var i = 0; i < this.$_note.get_bendPoints().length; i++) {
-				if (this.$_note.get_bendPoints()[i].get_value() > maxValue) {
-					maxValue = this.$_note.get_bendPoints()[i].get_value();
+			for (var i = 0; i < this.$_note.bendPoints.length; i++) {
+				if (this.$_note.bendPoints[i].value > maxValue) {
+					maxValue = this.$_note.bendPoints[i].value;
 				}
 			}
 			var dY = ss.Int32.div(this.$_height, maxValue);
-			var xx = cx + this.get_x();
-			var yy = cy + this.get_y() + r.getNoteY(this.$_note);
+			var xx = cx + this.x;
+			var yy = cy + this.y + r.getNoteY(this.$_note);
 			canvas.beginPath();
-			for (var i1 = 0; i1 < this.$_note.get_bendPoints().length - 1; i1++) {
-				var firstPt = this.$_note.get_bendPoints()[i1];
-				var secondPt = this.$_note.get_bendPoints()[i1 + 1];
+			for (var i1 = 0; i1 < this.$_note.bendPoints.length - 1; i1++) {
+				var firstPt = this.$_note.bendPoints[i1];
+				var secondPt = this.$_note.bendPoints[i1 + 1];
 				// don't draw a line if there's no offset and it's the last point
-				if (firstPt.get_value() === secondPt.get_value() && i1 === this.$_note.get_bendPoints().length - 2) {
+				if (firstPt.value === secondPt.value && i1 === this.$_note.bendPoints.length - 2) {
 					continue;
 				}
-				var x1 = xx + dX * firstPt.get_offset();
-				var y1 = yy - dY * firstPt.get_value();
-				var x2 = xx + dX * secondPt.get_offset();
-				var y2 = yy - dY * secondPt.get_value();
-				if (firstPt.get_value() === secondPt.get_value()) {
+				var x1 = xx + dX * firstPt.offset;
+				var y1 = yy - dY * firstPt.value;
+				var x2 = xx + dX * secondPt.offset;
+				var y2 = yy - dY * secondPt.value;
+				if (firstPt.value === secondPt.value) {
 					// draw horizontal line
 					canvas.moveTo(x1, y1);
 					canvas.lineTo(x2, y2);
@@ -12917,14 +11461,14 @@
 				else {
 					// draw bezier lien from first to second point
 					var hx = x1 + (x2 - x1);
-					var hy = yy - dY * firstPt.get_value();
+					var hy = yy - dY * firstPt.value;
 					canvas.moveTo(x1, y1);
 					canvas.bezierCurveTo(hx, hy, x2, y2, x2, y2);
 					canvas.stroke();
 				}
 				// what type of arrow? (up/down)
 				var arrowSize = 6 * this.get_scale();
-				if (secondPt.get_value() > firstPt.get_value()) {
+				if (secondPt.value > firstPt.value) {
 					canvas.beginPath();
 					canvas.moveTo(x2, y2);
 					canvas.lineTo(x2 - arrowSize * 0.5, y2 + arrowSize);
@@ -12932,7 +11476,7 @@
 					canvas.closePath();
 					canvas.fill();
 				}
-				else if (secondPt.get_value() !== firstPt.get_value()) {
+				else if (secondPt.value !== firstPt.value) {
 					canvas.beginPath();
 					canvas.moveTo(x2, y2);
 					canvas.lineTo(x2 - arrowSize * 0.5, y2 - arrowSize);
@@ -12941,8 +11485,8 @@
 					canvas.fill();
 				}
 				canvas.stroke();
-				if (secondPt.get_value() !== 0) {
-					var dV = secondPt.get_value() - firstPt.get_value();
+				if (secondPt.value !== 0) {
+					var dV = secondPt.value - firstPt.value;
 					var up = dV > 0;
 					dV = Math.abs(dV);
 					// calculate label
@@ -12965,9 +11509,9 @@
 							s = '-' + s;
 						}
 						// draw label
-						canvas.set_font(res.get_tablatureFont());
+						canvas.set_font(res.tablatureFont);
 						var size = canvas.measureText(s);
-						var y = (up ? (y2 - res.get_tablatureFont().get_size() - 2 * this.get_scale()) : (y2 + 2 * this.get_scale()));
+						var y = (up ? (y2 - res.tablatureFont.get_size() - 2 * this.get_scale()) : (y2 + 2 * this.get_scale()));
 						var x = x2 - size / 2;
 						canvas.fillText(s, x, y);
 					}
@@ -12977,7 +11521,7 @@
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_ChineseCymbalGlyph, $asm, {
 		doLayout: function() {
-			this.set_width(ss.Int32.trunc(9 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale()));
+			this.width = ss.Int32.trunc(9 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale());
 		},
 		get_canScale: function() {
 			return false;
@@ -12985,20 +11529,20 @@
 	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_CircleGlyph, $asm, {
 		doLayout: function() {
-			this.set_width(ss.Int32.trunc(this.$_size + 3 * this.get_scale()));
+			this.width = ss.Int32.trunc(this.$_size + 3 * this.get_scale());
 		},
 		get_canScale: function() {
 			return false;
 		},
 		paint: function(cx, cy, canvas) {
 			canvas.beginPath();
-			canvas.circle(cx + this.get_x(), cy + this.get_y(), this.$_size);
+			canvas.circle(cx + this.x, cy + this.y, this.$_size);
 			canvas.fill();
 		}
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_ClefGlyph, $asm, {
 		doLayout: function() {
-			this.set_width(ss.Int32.trunc(28 * this.get_scale()));
+			this.width = ss.Int32.trunc(28 * this.get_scale());
 		},
 		get_canScale: function() {
 			return false;
@@ -13007,25 +11551,25 @@
 	ss.initClass($AlphaTab_Rendering_Glyphs_CrescendoGlyph, $asm, {
 		paint: function(cx, cy, canvas) {
 			var height = 17 * this.get_scale();
-			var res = this.get_renderer().get_resources();
-			canvas.set_color(res.get_mainGlyphColor());
+			var res = this.renderer.get_resources();
+			canvas.set_color(res.mainGlyphColor);
 			canvas.beginPath();
 			if (this.$_crescendo === 1) {
-				canvas.moveTo(cx + this.get_x() + this.get_width(), cy + this.get_y());
-				canvas.lineTo(cx + this.get_x(), cy + this.get_y() + height / 2);
-				canvas.lineTo(cx + this.get_x() + this.get_width(), cy + this.get_y() + height);
+				canvas.moveTo(cx + this.x + this.width, cy + this.y);
+				canvas.lineTo(cx + this.x, cy + this.y + height / 2);
+				canvas.lineTo(cx + this.x + this.width, cy + this.y + height);
 			}
 			else {
-				canvas.moveTo(cx + this.get_x(), cy + this.get_y());
-				canvas.lineTo(cx + this.get_x() + this.get_width(), cy + this.get_y() + height / 2);
-				canvas.lineTo(cx + this.get_x(), cy + this.get_y() + height);
+				canvas.moveTo(cx + this.x, cy + this.y);
+				canvas.lineTo(cx + this.x + this.width, cy + this.y + height / 2);
+				canvas.lineTo(cx + this.x, cy + this.y + height);
 			}
 			canvas.stroke();
 		}
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_DeadNoteHeadGlyph, $asm, {
 		doLayout: function() {
-			this.set_width(ss.Int32.trunc(9 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale()));
+			this.width = ss.Int32.trunc(9 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale());
 		},
 		get_canScale: function() {
 			return false;
@@ -13033,7 +11577,7 @@
 	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_DiamondNoteHeadGlyph, $asm, {
 		doLayout: function() {
-			this.set_width(ss.Int32.trunc(9 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale()));
+			this.width = ss.Int32.trunc(9 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale());
 		},
 		get_canScale: function() {
 			return false;
@@ -13041,8 +11585,8 @@
 	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_DigitGlyph, $asm, {
 		doLayout: function() {
-			this.set_y(this.get_y() + ss.Int32.trunc(7 * this.get_scale()));
-			this.set_width(ss.Int32.trunc(this.$getDigitWidth(this.$_digit) * this.get_scale()));
+			this.y += ss.Int32.trunc(7 * this.get_scale());
+			this.width = ss.Int32.trunc(this.$getDigitWidth(this.$_digit) * this.get_scale());
 		},
 		$getDigitWidth: function(digit) {
 			switch (digit) {
@@ -13071,7 +11615,7 @@
 	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_DrumSticksGlyph, $asm, {
 		doLayout: function() {
-			this.set_width(ss.Int32.trunc(9 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale()));
+			this.width = ss.Int32.trunc(9 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale());
 		},
 		get_canScale: function() {
 			return false;
@@ -13079,8 +11623,8 @@
 	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_DynamicsGlyph, $asm, {
 		paint: function(cx, cy, canvas) {
-			var res = this.get_renderer().get_resources();
-			canvas.set_color(res.get_mainGlyphColor());
+			var res = this.renderer.get_resources();
+			canvas.set_color(res.mainGlyphColor);
 			var glyphs;
 			switch (this.$_dynamics) {
 				case 0: {
@@ -13122,31 +11666,31 @@
 			var glyphWidth = 0;
 			for (var $t1 = 0; $t1 < glyphs.length; $t1++) {
 				var g = glyphs[$t1];
-				glyphWidth += g.get_width();
+				glyphWidth += g.width;
 			}
-			var startX = ss.Int32.div(this.get_width() - glyphWidth, 2);
+			var startX = ss.Int32.div(this.width - glyphWidth, 2);
 			for (var $t2 = 0; $t2 < glyphs.length; $t2++) {
 				var g1 = glyphs[$t2];
-				g1.set_x(startX);
-				g1.set_y(0);
-				g1.set_renderer(this.get_renderer());
-				g1.paint(cx + this.get_x(), cy + this.get_y(), canvas);
-				startX += g1.get_width();
+				g1.x = startX;
+				g1.y = 0;
+				g1.renderer = this.renderer;
+				g1.paint(cx + this.x, cy + this.y, canvas);
+				startX += g1.width;
 			}
 		},
 		get_$p: function() {
 			var p = new $AlphaTab_Rendering_Glyphs_SvgGlyph(0, 0, $AlphaTab_Rendering_Glyphs_MusicFont.dynamicP, $AlphaTab_Rendering_Glyphs_DynamicsGlyph.$glyphScale, $AlphaTab_Rendering_Glyphs_DynamicsGlyph.$glyphScale);
-			p.set_width(ss.Int32.trunc(7 * this.get_scale()));
+			p.width = ss.Int32.trunc(7 * this.get_scale());
 			return p;
 		},
 		get_$m: function() {
 			var m = new $AlphaTab_Rendering_Glyphs_SvgGlyph(0, 0, $AlphaTab_Rendering_Glyphs_MusicFont.dynamicM, $AlphaTab_Rendering_Glyphs_DynamicsGlyph.$glyphScale, $AlphaTab_Rendering_Glyphs_DynamicsGlyph.$glyphScale);
-			m.set_width(ss.Int32.trunc(7 * this.get_scale()));
+			m.width = ss.Int32.trunc(7 * this.get_scale());
 			return m;
 		},
 		get_$f: function() {
 			var f = new $AlphaTab_Rendering_Glyphs_SvgGlyph(0, 0, $AlphaTab_Rendering_Glyphs_MusicFont.dynamicF, $AlphaTab_Rendering_Glyphs_DynamicsGlyph.$glyphScale, $AlphaTab_Rendering_Glyphs_DynamicsGlyph.$glyphScale);
-			f.set_width(ss.Int32.trunc(7 * this.get_scale()));
+			f.width = ss.Int32.trunc(7 * this.get_scale());
 			return f;
 		}
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
@@ -13154,16 +11698,16 @@
 		paint: function(cx, cy, canvas) {
 			var size = ss.Int32.trunc(6 * this.get_scale());
 			canvas.beginPath();
-			canvas.moveTo(cx + this.get_x(), cy + this.get_y());
-			canvas.quadraticCurveTo(cx + this.get_x() + ss.Int32.div(this.get_width(), 2), cy + this.get_y(), cx + this.get_x() + this.get_width(), cy + this.get_y() - size);
-			canvas.moveTo(cx + this.get_x(), cy + this.get_y());
-			canvas.quadraticCurveTo(cx + this.get_x() + ss.Int32.div(this.get_width(), 2), cy + this.get_y(), cx + this.get_x() + this.get_width(), cy + this.get_y() + size);
+			canvas.moveTo(cx + this.x, cy + this.y);
+			canvas.quadraticCurveTo(cx + this.x + ss.Int32.div(this.width, 2), cy + this.y, cx + this.x + this.width, cy + this.y - size);
+			canvas.moveTo(cx + this.x, cy + this.y);
+			canvas.quadraticCurveTo(cx + this.x + ss.Int32.div(this.width, 2), cy + this.y, cx + this.x + this.width, cy + this.y + size);
 			canvas.stroke();
 		}
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_FlatGlyph, $asm, {
 		doLayout: function() {
-			this.set_width(ss.Int32.trunc(8 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale()));
+			this.width = ss.Int32.trunc(8 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale());
 		},
 		get_canScale: function() {
 			return false;
@@ -13171,7 +11715,7 @@
 	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_HiHatGlyph, $asm, {
 		doLayout: function() {
-			this.set_width(ss.Int32.trunc(9 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale()));
+			this.width = ss.Int32.trunc(9 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale());
 		},
 		get_canScale: function() {
 			return false;
@@ -13192,20 +11736,20 @@
 			while (!parser.get_eof()) {
 				var command = new $AlphaTab_Rendering_Glyphs_SvgCommand();
 				ss.add(this.$_parsed, command);
-				command.set_cmd(parser.getString());
-				switch (command.get_cmd()) {
+				command.cmd = parser.getString();
+				switch (command.cmd) {
 					case 'M': {
 						// absolute moveto
-						command.set_numbers([]);
-						ss.add(command.get_numbers(), parser.getNumber());
-						ss.add(command.get_numbers(), parser.getNumber());
+						command.numbers = [];
+						ss.add(command.numbers, parser.getNumber());
+						ss.add(command.numbers, parser.getNumber());
 						break;
 					}
 					case 'm': {
 						// relative moveto
-						command.set_numbers([]);
-						ss.add(command.get_numbers(), parser.getNumber());
-						ss.add(command.get_numbers(), parser.getNumber());
+						command.numbers = [];
+						ss.add(command.numbers, parser.getNumber());
+						ss.add(command.numbers, parser.getNumber());
 						break;
 					}
 					case 'Z':
@@ -13214,139 +11758,139 @@
 					}
 					case 'L': {
 						// absolute lineTo
-						command.set_numbers([]);
+						command.numbers = [];
 						do {
-							ss.add(command.get_numbers(), parser.getNumber());
-							ss.add(command.get_numbers(), parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
 					case 'l': {
 						// relative lineTo
-						command.set_numbers([]);
+						command.numbers = [];
 						do {
-							ss.add(command.get_numbers(), parser.getNumber());
-							ss.add(command.get_numbers(), parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
 					case 'V': {
 						// absolute verticalTo
-						command.set_numbers([]);
+						command.numbers = [];
 						do {
-							ss.add(command.get_numbers(), parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
 					case 'v': {
 						// relative verticalTo
-						command.set_numbers([]);
+						command.numbers = [];
 						do {
-							ss.add(command.get_numbers(), parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
 					case 'H': {
 						// absolute horizontalTo
-						command.set_numbers([]);
+						command.numbers = [];
 						do {
-							ss.add(command.get_numbers(), parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
 					case 'h': {
 						// relative horizontalTo
-						command.set_numbers([]);
+						command.numbers = [];
 						do {
-							ss.add(command.get_numbers(), parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
 					case 'C': {
 						// absolute cubicTo
-						command.set_numbers([]);
+						command.numbers = [];
 						do {
-							ss.add(command.get_numbers(), parser.getNumber());
-							ss.add(command.get_numbers(), parser.getNumber());
-							ss.add(command.get_numbers(), parser.getNumber());
-							ss.add(command.get_numbers(), parser.getNumber());
-							ss.add(command.get_numbers(), parser.getNumber());
-							ss.add(command.get_numbers(), parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
 					case 'c': {
 						// relative cubicTo
-						command.set_numbers([]);
+						command.numbers = [];
 						do {
-							ss.add(command.get_numbers(), parser.getNumber());
-							ss.add(command.get_numbers(), parser.getNumber());
-							ss.add(command.get_numbers(), parser.getNumber());
-							ss.add(command.get_numbers(), parser.getNumber());
-							ss.add(command.get_numbers(), parser.getNumber());
-							ss.add(command.get_numbers(), parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
 					case 'S': {
 						// absolute shorthand cubicTo
-						command.set_numbers([]);
+						command.numbers = [];
 						do {
-							ss.add(command.get_numbers(), parser.getNumber());
-							ss.add(command.get_numbers(), parser.getNumber());
-							ss.add(command.get_numbers(), parser.getNumber());
-							ss.add(command.get_numbers(), parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
 					case 's': {
 						// relative shorthand cubicTo
-						command.set_numbers([]);
+						command.numbers = [];
 						do {
-							ss.add(command.get_numbers(), parser.getNumber());
-							ss.add(command.get_numbers(), parser.getNumber());
-							ss.add(command.get_numbers(), parser.getNumber());
-							ss.add(command.get_numbers(), parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
 					case 'Q': {
 						// absolute quadraticTo
-						command.set_numbers([]);
+						command.numbers = [];
 						do {
-							ss.add(command.get_numbers(), parser.getNumber());
-							ss.add(command.get_numbers(), parser.getNumber());
-							ss.add(command.get_numbers(), parser.getNumber());
-							ss.add(command.get_numbers(), parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
 					case 'q': {
 						// relative quadraticTo
-						command.set_numbers([]);
+						command.numbers = [];
 						do {
-							ss.add(command.get_numbers(), parser.getNumber());
-							ss.add(command.get_numbers(), parser.getNumber());
-							ss.add(command.get_numbers(), parser.getNumber());
-							ss.add(command.get_numbers(), parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
 					case 'T': {
 						// absolute shorthand quadraticTo
-						command.set_numbers([]);
+						command.numbers = [];
 						do {
-							ss.add(command.get_numbers(), parser.getNumber());
-							ss.add(command.get_numbers(), parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
 					case 't': {
 						// relative shorthand quadraticTo
-						command.set_numbers([]);
+						command.numbers = [];
 						do {
-							ss.add(command.get_numbers(), parser.getNumber());
-							ss.add(command.get_numbers(), parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
+							ss.add(command.numbers, parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
@@ -13362,18 +11906,18 @@
 		},
 		paint: function(cx, cy, canvas) {
 			var step = 11 * this.get_scale();
-			var res = this.get_renderer().get_resources();
-			canvas.set_color(res.get_mainGlyphColor());
-			canvas.set_font(res.get_effectFont());
+			var res = this.renderer.get_resources();
+			canvas.set_color(res.mainGlyphColor);
+			canvas.set_font(res.effectFont);
 			canvas.set_textAlign(0);
 			var textWidth = canvas.measureText(this.$_label);
-			canvas.fillText(this.$_label, cx + this.get_x(), cy + this.get_y());
+			canvas.fillText(this.$_label, cx + this.x, cy + this.y);
 			// check if we need lines
 			if (this.$_isExpanded) {
 				var lineSpacing = 3 * this.get_scale();
-				var startX = cx + this.get_x() + textWidth + lineSpacing;
-				var endX = cx + this.get_x() + this.get_width() - lineSpacing - lineSpacing;
-				var lineY = cy + this.get_y() + 8 * this.get_scale();
+				var startX = cx + this.x + textWidth + lineSpacing;
+				var endX = cx + this.x + this.width - lineSpacing - lineSpacing;
+				var lineY = cy + this.y + 8 * this.get_scale();
 				var lineSize = 8 * this.get_scale();
 				if (endX > startX) {
 					var lineX = startX;
@@ -13395,7 +11939,7 @@
 	ss.initClass($AlphaTab_Rendering_Glyphs_MusicFont, $asm, {});
 	ss.initClass($AlphaTab_Rendering_Glyphs_NaturalizeGlyph, $asm, {
 		doLayout: function() {
-			this.set_width(ss.Int32.trunc(8 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale()));
+			this.width = ss.Int32.trunc(8 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale());
 		},
 		get_canScale: function() {
 			return false;
@@ -13405,11 +11949,11 @@
 		doLayout: function() {
 			switch (this.$_duration) {
 				case 1: {
-					this.set_width(ss.Int32.trunc(14 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale()));
+					this.width = ss.Int32.trunc(14 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale());
 					break;
 				}
 				default: {
-					this.set_width(ss.Int32.trunc(9 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale()));
+					this.width = ss.Int32.trunc(9 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale());
 					break;
 				}
 			}
@@ -13420,16 +11964,16 @@
 	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_NoteNumberGlyph, $asm, {
 		doLayout: function() {
-			var scoreRenderer = this.get_renderer().get_layout().get_renderer();
-			scoreRenderer.get_canvas().set_font((this.$_isGrace ? scoreRenderer.get_renderingResources().get_graceFont() : scoreRenderer.get_renderingResources().get_tablatureFont()));
-			this.set_width(ss.Int32.trunc(10 * this.get_scale()));
+			var scoreRenderer = this.renderer.get_layout().renderer;
+			scoreRenderer.canvas.set_font((this.$_isGrace ? scoreRenderer.renderingResources.graceFont : scoreRenderer.renderingResources.tablatureFont));
+			this.width = ss.Int32.trunc(10 * this.get_scale());
 		},
 		calculateWidth: function() {
-			this.set_width(ss.Int32.trunc(this.get_renderer().get_layout().get_renderer().get_canvas().measureText(this.$_noteString)));
+			this.width = ss.Int32.trunc(this.renderer.get_layout().renderer.canvas.measureText(this.$_noteString));
 		},
 		paint: function(cx, cy, canvas) {
 			if (ss.isValue(this.$_noteString)) {
-				canvas.fillText(this.$_noteString.toLowerCase(), cx + this.get_x() + 0 * this.get_scale(), cy + this.get_y());
+				canvas.fillText(this.$_noteString.toLowerCase(), cx + this.x + 0 * this.get_scale(), cy + this.y);
 			}
 		}
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
@@ -13449,18 +11993,18 @@
 			var cx = 0;
 			for (var $t1 = 0; $t1 < this.glyphs.length; $t1++) {
 				var g = this.glyphs[$t1];
-				g.set_x(cx);
-				g.set_y(0);
-				g.set_renderer(this.get_renderer());
+				g.x = cx;
+				g.y = 0;
+				g.renderer = this.renderer;
 				g.doLayout();
-				cx += g.get_width();
+				cx += g.width;
 			}
-			this.set_width(cx);
+			this.width = cx;
 		}
 	}, $AlphaTab_Rendering_Glyphs_GlyphGroup);
 	ss.initClass($AlphaTab_Rendering_Glyphs_PickStrokeGlyph, $asm, {
 		doLayout: function() {
-			this.set_width(ss.Int32.trunc(9 * this.get_scale()));
+			this.width = ss.Int32.trunc(9 * this.get_scale());
 		},
 		get_canScale: function() {
 			return false;
@@ -13468,18 +12012,18 @@
 	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_RepeatCloseGlyph, $asm, {
 		doLayout: function() {
-			this.set_width(ss.Int32.trunc((this.get_renderer().get_isLast() ? 11 : 13) * this.get_scale()));
+			this.width = ss.Int32.trunc((this.renderer.get_isLast() ? 11 : 13) * this.get_scale());
 		},
 		get_canScale: function() {
 			return false;
 		},
 		paint: function(cx, cy, canvas) {
-			var res = this.get_renderer().get_resources();
-			canvas.set_color(res.get_mainGlyphColor());
+			var res = this.renderer.get_resources();
+			canvas.set_color(res.mainGlyphColor);
 			var blockWidth = 4 * this.get_scale();
-			var top = cy + this.get_y() + this.get_renderer().get_topPadding();
-			var bottom = cy + this.get_y() + this.get_renderer().get_height() - this.get_renderer().get_bottomPadding();
-			var left = cx + this.get_x();
+			var top = cy + this.y + this.renderer.get_topPadding();
+			var bottom = cy + this.y + this.renderer.height - this.renderer.get_bottomPadding();
+			var left = cx + this.x;
 			var h = bottom - top;
 			//circles 
 			var circleSize = 1.5 * this.get_scale();
@@ -13502,34 +12046,34 @@
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_RepeatCountGlyph, $asm, {
 		doLayout: function() {
-			this.set_width(0);
+			this.width = 0;
 		},
 		get_canScale: function() {
 			return false;
 		},
 		paint: function(cx, cy, canvas) {
-			var res = this.get_renderer().get_resources();
-			canvas.set_color(res.get_mainGlyphColor());
-			canvas.set_font(res.get_barNumberFont());
+			var res = this.renderer.get_resources();
+			canvas.set_color(res.mainGlyphColor);
+			canvas.set_font(res.barNumberFont);
 			var s = 'x' + this.$_count;
 			var w = ss.Int32.trunc(canvas.measureText(s) / 1.5);
-			canvas.fillText(s, cx + this.get_x() - w, cy + this.get_y());
+			canvas.fillText(s, cx + this.x - w, cy + this.y);
 		}
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_RepeatOpenGlyph, $asm, {
 		doLayout: function() {
-			this.set_width(ss.Int32.trunc(13 * this.get_scale()));
+			this.width = ss.Int32.trunc(13 * this.get_scale());
 		},
 		get_canScale: function() {
 			return false;
 		},
 		paint: function(cx, cy, canvas) {
-			var res = this.get_renderer().get_resources();
-			canvas.set_color(res.get_mainGlyphColor());
+			var res = this.renderer.get_resources();
+			canvas.set_color(res.mainGlyphColor);
 			var blockWidth = 4 * this.get_scale();
-			var top = cy + this.get_y() + this.get_renderer().get_topPadding();
-			var bottom = cy + this.get_y() + this.get_renderer().get_height() - this.get_renderer().get_bottomPadding();
-			var left = cx + this.get_x() + 0.5;
+			var top = cy + this.y + this.renderer.get_topPadding();
+			var bottom = cy + this.y + this.renderer.height - this.renderer.get_bottomPadding();
+			var left = cx + this.x + 0.5;
 			// big bar
 			var h = bottom - top;
 			canvas.fillRect(left, top, blockWidth, h);
@@ -13557,15 +12101,15 @@
 				case 4:
 				case 8:
 				case 16: {
-					this.set_width(ss.Int32.trunc(9 * this.get_scale()));
+					this.width = ss.Int32.trunc(9 * this.get_scale());
 					break;
 				}
 				case 32: {
-					this.set_width(ss.Int32.trunc(12 * this.get_scale()));
+					this.width = ss.Int32.trunc(12 * this.get_scale());
 					break;
 				}
 				case 64: {
-					this.set_width(ss.Int32.trunc(14 * this.get_scale()));
+					this.width = ss.Int32.trunc(14 * this.get_scale());
 					break;
 				}
 			}
@@ -13576,62 +12120,44 @@
 	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_RideCymbalGlyph, $asm, {
 		doLayout: function() {
-			this.set_width(ss.Int32.trunc(9 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale()));
+			this.width = ss.Int32.trunc(9 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale());
 		},
 		get_canScale: function() {
 			return false;
 		}
 	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_ScoreBeatGlyph, $asm, {
-		get_noteHeads: function() {
-			return this.$4$NoteHeadsField;
-		},
-		set_noteHeads: function(value) {
-			this.$4$NoteHeadsField = value;
-		},
-		get_restGlyph: function() {
-			return this.$4$RestGlyphField;
-		},
-		set_restGlyph: function(value) {
-			this.$4$RestGlyphField = value;
-		},
-		get_beamingHelper: function() {
-			return this.$4$BeamingHelperField;
-		},
-		set_beamingHelper: function(value) {
-			this.$4$BeamingHelperField = value;
-		},
 		finalizeGlyph: function(layout) {
-			if (!this.get_container().get_beat().get_isRest()) {
-				this.get_noteHeads().updateBeamingHelper(this.get_container().get_x() + this.get_x());
+			if (!this.get_container().beat.get_isRest()) {
+				this.noteHeads.updateBeamingHelper(this.get_container().x + this.x);
 			}
 		},
 		applyGlyphSpacing: function(spacing) {
 			$AlphaTab_Rendering_Glyphs_Glyph.prototype.applyGlyphSpacing.call(this, spacing);
 			// TODO: we need to tell the beaming helper the position of rest beats
-			if (!this.get_container().get_beat().get_isRest()) {
-				this.get_noteHeads().updateBeamingHelper(this.get_container().get_x() + this.get_x());
+			if (!this.get_container().beat.get_isRest()) {
+				this.noteHeads.updateBeamingHelper(this.get_container().x + this.x);
 			}
 		},
 		doLayout: function() {
 			// create glyphs
-			var sr = this.get_renderer();
-			if (!this.get_container().get_beat().get_isEmpty()) {
-				if (!this.get_container().get_beat().get_isRest()) {
+			var sr = this.renderer;
+			if (!this.get_container().beat.isEmpty) {
+				if (!this.get_container().beat.get_isRest()) {
 					//
 					// Note heads
 					//
-					this.set_noteHeads(new $AlphaTab_Rendering_Glyphs_ScoreNoteChordGlyph());
-					this.get_noteHeads().set_beat(this.get_container().get_beat());
-					this.get_noteHeads().set_beamingHelper(this.get_beamingHelper());
+					this.noteHeads = new $AlphaTab_Rendering_Glyphs_ScoreNoteChordGlyph();
+					this.noteHeads.beat = this.get_container().beat;
+					this.noteHeads.beamingHelper = this.beamingHelper;
 					this.noteLoop(ss.mkdel(this, this.$createNoteGlyph));
-					this.addGlyph(this.get_noteHeads());
+					this.addGlyph(this.noteHeads);
 					//
 					// Note dots
 					//
-					if (this.get_container().get_beat().get_dots() > 0) {
+					if (this.get_container().beat.dots > 0) {
 						this.addGlyph(new $AlphaTab_Rendering_Glyphs_SpacingGlyph(0, 0, ss.Int32.trunc(5 * this.get_scale()), false));
-						for (var i = 0; i < this.get_container().get_beat().get_dots(); i++) {
+						for (var i = 0; i < this.get_container().beat.dots; i++) {
 							var group = { $: new $AlphaTab_Rendering_Glyphs_GlyphGroup(0, 0, null) };
 							this.noteLoop(ss.mkdel({ group: group, $this: this }, function(n) {
 								this.$this.$createBeatDot(sr.getNoteLine(n), 2, this.group.$);
@@ -13645,7 +12171,7 @@
 					var line = 0;
 					var offset = 0;
 					var dotOffset = 0;
-					switch (this.get_container().get_beat().get_duration()) {
+					switch (this.get_container().beat.duration) {
 						case 1: {
 							line = 4;
 							dotLine = 4;
@@ -13689,13 +12215,13 @@
 						}
 					}
 					var y = sr.getScoreY(line, offset);
-					this.addGlyph(new $AlphaTab_Rendering_Glyphs_RestGlyph(0, y, this.get_container().get_beat().get_duration()));
+					this.addGlyph(new $AlphaTab_Rendering_Glyphs_RestGlyph(0, y, this.get_container().beat.duration));
 					//
 					// Note dots
 					//
-					if (this.get_container().get_beat().get_dots() > 0) {
+					if (this.get_container().beat.dots > 0) {
 						this.addGlyph(new $AlphaTab_Rendering_Glyphs_SpacingGlyph(0, 0, ss.Int32.trunc(5 * this.get_scale()), false));
-						for (var i1 = 0; i1 < this.get_container().get_beat().get_dots(); i1++) {
+						for (var i1 = 0; i1 < this.get_container().beat.dots; i1++) {
 							var group1 = new $AlphaTab_Rendering_Glyphs_GlyphGroup(0, 0, null);
 							this.$createBeatDot(dotLine, dotOffset, group1);
 							this.addGlyph(group1);
@@ -13704,17 +12230,17 @@
 				}
 			}
 			$AlphaTab_Rendering_Glyphs_BeatGlyphBase.prototype.doLayout.call(this);
-			if (ss.isValue(this.get_noteHeads())) {
-				this.get_noteHeads().updateBeamingHelper(this.get_x());
+			if (ss.isValue(this.noteHeads)) {
+				this.noteHeads.updateBeamingHelper(this.x);
 			}
 		},
 		$createBeatDot: function(line, offset, group) {
-			var sr = this.get_renderer();
+			var sr = this.renderer;
 			group.addGlyph(new $AlphaTab_Rendering_Glyphs_CircleGlyph(0, sr.getScoreY(line, offset + 2), 1.5 * this.get_scale()));
 		},
 		$createNoteHeadGlyph: function(n) {
-			var isGrace = this.get_container().get_beat().get_graceType() !== 0;
-			if (n.get_beat().get_voice().get_bar().get_track().get_isPercussion()) {
+			var isGrace = this.get_container().beat.graceType !== 0;
+			if (n.beat.voice.bar.track.isPercussion) {
 				var normalKeys = new (ss.makeGenericType($AlphaTab_Model_HashSet$1, [ss.Int32]))([32, 34, 35, 36, 38, 39, 40, 41, 43, 45, 47, 48, 50, 55, 56, 58, 60, 61]);
 				var xKeys = new (ss.makeGenericType($AlphaTab_Model_HashSet$1, [ss.Int32]))([31, 33, 37, 42, 44, 54, 62, 63, 64, 65, 66]);
 				var value = n.get_realValue();
@@ -13738,29 +12264,29 @@
 				}
 				return new $AlphaTab_Rendering_Glyphs_NoteHeadGlyph(0, 0, 4, isGrace);
 			}
-			if (n.get_isDead()) {
+			if (n.isDead) {
 				return new $AlphaTab_Rendering_Glyphs_DeadNoteHeadGlyph(0, 0, isGrace);
 			}
-			if (n.get_harmonicType() === 0) {
-				return new $AlphaTab_Rendering_Glyphs_NoteHeadGlyph(0, 0, n.get_beat().get_duration(), isGrace);
+			if (n.harmonicType === 0) {
+				return new $AlphaTab_Rendering_Glyphs_NoteHeadGlyph(0, 0, n.beat.duration, isGrace);
 			}
 			return new $AlphaTab_Rendering_Glyphs_DiamondNoteHeadGlyph(0, 0, isGrace);
 		},
 		$createNoteGlyph: function(n) {
-			var sr = this.get_renderer();
+			var sr = this.renderer;
 			var noteHeadGlyph = this.$createNoteHeadGlyph(n);
 			// calculate y position
 			var line = sr.getNoteLine(n);
-			noteHeadGlyph.set_y(sr.getScoreY(line, -1));
-			this.get_noteHeads().addNoteGlyph(noteHeadGlyph, n, line);
-			if (n.get_isStaccato() && !this.get_noteHeads().get_beatEffects().containsKey('Staccato')) {
-				this.get_noteHeads().get_beatEffects().set_item('Staccato', new $AlphaTab_Rendering_Glyphs_CircleGlyph(0, 0, 1.5));
+			noteHeadGlyph.y = sr.getScoreY(line, -1);
+			this.noteHeads.addNoteGlyph(noteHeadGlyph, n, line);
+			if (n.isStaccato && !this.noteHeads.beatEffects.containsKey('Staccato')) {
+				this.noteHeads.beatEffects.set_item('Staccato', new $AlphaTab_Rendering_Glyphs_CircleGlyph(0, 0, 1.5));
 			}
-			if (n.get_accentuated() === 1 && !this.get_noteHeads().get_beatEffects().containsKey('Accent')) {
-				this.get_noteHeads().get_beatEffects().set_item('Accent', new $AlphaTab_Rendering_Glyphs_AccentuationGlyph(0, 0, 1));
+			if (n.accentuated === 1 && !this.noteHeads.beatEffects.containsKey('Accent')) {
+				this.noteHeads.beatEffects.set_item('Accent', new $AlphaTab_Rendering_Glyphs_AccentuationGlyph(0, 0, 1));
 			}
-			if (n.get_accentuated() === 2 && !this.get_noteHeads().get_beatEffects().containsKey('HAccent')) {
-				this.get_noteHeads().get_beatEffects().set_item('HAccent', new $AlphaTab_Rendering_Glyphs_AccentuationGlyph(0, 0, 2));
+			if (n.accentuated === 2 && !this.noteHeads.beatEffects.containsKey('HAccent')) {
+				this.noteHeads.beatEffects.set_item('HAccent', new $AlphaTab_Rendering_Glyphs_AccentuationGlyph(0, 0, 2));
 			}
 		}
 	}, $AlphaTab_Rendering_Glyphs_BeatGlyphBase, [$AlphaTab_Rendering_Glyphs_ISupportsFinalize]);
@@ -13776,15 +12302,15 @@
 			// add spacing at the beginning, this way the elements are closer to the note head
 			for (var $t1 = 0; $t1 < this.glyphs.length; $t1++) {
 				var g = this.glyphs[$t1];
-				g.set_x(g.get_x() + spacing);
+				g.x += spacing;
 			}
 		},
 		doLayout: function() {
-			if (this.get_container().get_beat().get_brushType() !== 0) {
-				this.addGlyph(new $AlphaTab_Rendering_Glyphs_ScoreBrushGlyph(this.get_container().get_beat()));
+			if (this.get_container().beat.brushType !== 0) {
+				this.addGlyph(new $AlphaTab_Rendering_Glyphs_ScoreBrushGlyph(this.get_container().beat));
 				this.addGlyph(new $AlphaTab_Rendering_Glyphs_SpacingGlyph(0, 0, ss.Int32.trunc(4 * this.get_scale()), true));
 			}
-			if (!this.get_container().get_beat().get_isRest() && !this.get_container().get_beat().get_voice().get_bar().get_track().get_isPercussion()) {
+			if (!this.get_container().beat.get_isRest() && !this.get_container().beat.voice.bar.track.isPercussion) {
 				var accidentals = new $AlphaTab_Rendering_Glyphs_AccidentalGroupGlyph();
 				this.noteLoop(ss.mkdel(this, function(n) {
 					this.$createAccidentalGlyph(n, accidentals);
@@ -13792,14 +12318,14 @@
 				this.addGlyph(accidentals);
 			}
 			// a small padding
-			this.addGlyph(new $AlphaTab_Rendering_Glyphs_SpacingGlyph(0, 0, ss.Int32.trunc(4 * ((this.get_container().get_beat().get_graceType() !== 0) ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale()), true));
+			this.addGlyph(new $AlphaTab_Rendering_Glyphs_SpacingGlyph(0, 0, ss.Int32.trunc(4 * ((this.get_container().beat.graceType !== 0) ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale()), true));
 			$AlphaTab_Rendering_Glyphs_BeatGlyphBase.prototype.doLayout.call(this);
 		},
 		$createAccidentalGlyph: function(n, accidentals) {
-			var sr = this.get_renderer();
+			var sr = this.renderer;
 			var noteLine = sr.getNoteLine(n);
-			var accidental = sr.get_accidentalHelper().applyAccidental(n, noteLine);
-			var isGrace = this.get_container().get_beat().get_graceType() !== 0;
+			var accidental = sr.accidentalHelper.applyAccidental(n, noteLine);
+			var isGrace = this.get_container().beat.graceType !== 0;
 			switch (accidental) {
 				case 2: {
 					accidentals.addGlyph(new $AlphaTab_Rendering_Glyphs_SharpGlyph(0, sr.getScoreY(noteLine, 0), isGrace));
@@ -13818,29 +12344,29 @@
 	}, $AlphaTab_Rendering_Glyphs_BeatGlyphBase);
 	ss.initClass($AlphaTab_Rendering_Glyphs_ScoreBrushGlyph, $asm, {
 		doLayout: function() {
-			this.set_width(ss.Int32.trunc(10 * this.get_scale()));
+			this.width = ss.Int32.trunc(10 * this.get_scale());
 		},
 		paint: function(cx, cy, canvas) {
-			var scoreBarRenderer = this.get_renderer();
+			var scoreBarRenderer = this.renderer;
 			var lineSize = scoreBarRenderer.get_lineOffset();
-			var res = this.get_renderer().get_resources();
-			var startY = cy + this.get_y() + ss.Int32.trunc(scoreBarRenderer.getNoteY(this.$_beat.get_maxNote()) - lineSize / 2);
-			var endY = cy + this.get_y() + scoreBarRenderer.getNoteY(this.$_beat.get_minNote()) + lineSize;
-			var arrowX = cx + this.get_x() + ss.Int32.div(this.get_width(), 2);
+			var res = this.renderer.get_resources();
+			var startY = cy + this.y + ss.Int32.trunc(scoreBarRenderer.getNoteY(this.$_beat.get_maxNote()) - lineSize / 2);
+			var endY = cy + this.y + scoreBarRenderer.getNoteY(this.$_beat.get_minNote()) + lineSize;
+			var arrowX = cx + this.x + ss.Int32.div(this.width, 2);
 			var arrowSize = 8 * this.get_scale();
-			canvas.set_color(res.get_mainGlyphColor());
-			if (this.$_beat.get_brushType() !== 0) {
-				if (this.$_beat.get_brushType() === 3 || this.$_beat.get_brushType() === 4) {
+			canvas.set_color(res.mainGlyphColor);
+			if (this.$_beat.brushType !== 0) {
+				if (this.$_beat.brushType === 3 || this.$_beat.brushType === 4) {
 					var size = ss.Int32.trunc(15 * this.get_scale());
 					var steps = ss.Int32.trunc(Math.abs(endY - startY) / size);
 					for (var i = 0; i < steps; i++) {
 						var arrow = new $AlphaTab_Rendering_Glyphs_SvgGlyph(ss.Int32.trunc(3 * this.get_scale()), 0, $AlphaTab_Rendering_Glyphs_MusicFont.waveVertical, 1, 1);
-						arrow.set_renderer(this.get_renderer());
+						arrow.renderer = this.renderer;
 						arrow.doLayout();
-						arrow.paint(cx + this.get_x(), startY + i * size, canvas);
+						arrow.paint(cx + this.x, startY + i * size, canvas);
 					}
 				}
-				if (this.$_beat.get_brushType() === 3) {
+				if (this.$_beat.brushType === 3) {
 					canvas.beginPath();
 					canvas.moveTo(arrowX, endY);
 					canvas.lineTo(ss.Int32.trunc(arrowX + arrowSize / 2), ss.Int32.trunc(endY - arrowSize));
@@ -13848,7 +12374,7 @@
 					canvas.closePath();
 					canvas.fill();
 				}
-				else if (this.$_beat.get_brushType() === 4) {
+				else if (this.$_beat.brushType === 4) {
 					canvas.beginPath();
 					canvas.moveTo(arrowX, startY);
 					canvas.lineTo(ss.Int32.trunc(arrowX + arrowSize / 2), ss.Int32.trunc(startY + arrowSize));
@@ -13860,100 +12386,52 @@
 		}
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_ScoreNoteChordGlyph, $asm, {
-		get_minNote: function() {
-			return this.$2$MinNoteField;
-		},
-		set_minNote: function(value) {
-			this.$2$MinNoteField = value;
-		},
-		get_maxNote: function() {
-			return this.$2$MaxNoteField;
-		},
-		set_maxNote: function(value) {
-			this.$2$MaxNoteField = value;
-		},
-		get_spacingChanged: function() {
-			return this.$2$SpacingChangedField;
-		},
-		set_spacingChanged: function(value) {
-			this.$2$SpacingChangedField = value;
-		},
-		get_upLineX: function() {
-			return this.$2$UpLineXField;
-		},
-		set_upLineX: function(value) {
-			this.$2$UpLineXField = value;
-		},
-		get_downLineX: function() {
-			return this.$2$DownLineXField;
-		},
-		set_downLineX: function(value) {
-			this.$2$DownLineXField = value;
-		},
-		get_beatEffects: function() {
-			return this.$2$BeatEffectsField;
-		},
-		set_beatEffects: function(value) {
-			this.$2$BeatEffectsField = value;
-		},
-		get_beat: function() {
-			return this.$2$BeatField;
-		},
-		set_beat: function(value) {
-			this.$2$BeatField = value;
-		},
-		get_beamingHelper: function() {
-			return this.$2$BeamingHelperField;
-		},
-		set_beamingHelper: function(value) {
-			this.$2$BeamingHelperField = value;
-		},
 		get_direction: function() {
-			return this.get_beamingHelper().get_direction();
+			return this.beamingHelper.get_direction();
 		},
 		getNoteX: function(note, onEnd) {
-			if (this.$_noteLookup.containsKey(note.get_string())) {
-				var n = this.$_noteLookup.get_item(note.get_string());
-				var pos = this.get_x() + n.get_x();
+			if (this.$_noteLookup.containsKey(note.string)) {
+				var n = this.$_noteLookup.get_item(note.string);
+				var pos = this.x + n.x;
 				if (onEnd) {
-					pos += n.get_width();
+					pos += n.width;
 				}
 				return pos;
 			}
 			return 0;
 		},
 		getNoteY: function(note) {
-			if (this.$_noteLookup.containsKey(note.get_string())) {
-				return this.get_y() + this.$_noteLookup.get_item(note.get_string()).get_y();
+			if (this.$_noteLookup.containsKey(note.string)) {
+				return this.y + this.$_noteLookup.get_item(note.string).y;
 			}
 			return 0;
 		},
 		addNoteGlyph: function(noteGlyph, note, noteLine) {
 			var info = new $AlphaTab_Rendering_Glyphs_ScoreNoteGlyphInfo(noteGlyph, noteLine);
 			ss.add(this.$_infos, info);
-			this.$_noteLookup.set_item(note.get_string(), noteGlyph);
-			if (ss.isNullOrUndefined(this.get_minNote()) || this.get_minNote().get_line() > info.get_line()) {
-				this.set_minNote(info);
+			this.$_noteLookup.set_item(note.string, noteGlyph);
+			if (ss.isNullOrUndefined(this.minNote) || this.minNote.line > info.line) {
+				this.minNote = info;
 			}
-			if (ss.isNullOrUndefined(this.get_maxNote()) || this.get_maxNote().get_line() < info.get_line()) {
-				this.set_maxNote(info);
+			if (ss.isNullOrUndefined(this.maxNote) || this.maxNote.line < info.line) {
+				this.maxNote = info;
 			}
 		},
 		get_canScale: function() {
 			return false;
 		},
 		updateBeamingHelper: function(cx) {
-			this.get_beamingHelper().registerBeatLineX(this.get_beat(), cx + this.get_x() + this.get_upLineX(), cx + this.get_x() + this.get_downLineX());
+			this.beamingHelper.registerBeatLineX(this.beat, cx + this.x + this.upLineX, cx + this.x + this.downLineX);
 		},
 		get_hasTopOverflow: function() {
-			return ss.isValue(this.get_minNote()) && this.get_minNote().get_line() < 0;
+			return ss.isValue(this.minNote) && this.minNote.line < 0;
 		},
 		get_hasBottomOverflow: function() {
-			return ss.isValue(this.get_maxNote()) && this.get_maxNote().get_line() > 8;
+			return ss.isValue(this.maxNote) && this.maxNote.line > 8;
 		},
 		doLayout: function() {
 			this.$_infos.sort(function(a, b) {
-				return ss.compare(a.get_line(), b.get_line());
+				return ss.compare(a.line, b.line);
 			});
 			var padding = 0;
 			// Std.int(4 * getScale());
@@ -13963,19 +12441,19 @@
 			var anyDisplaced = false;
 			var w = 0;
 			for (var i = 0; i < this.$_infos.length; i++) {
-				var g = this.$_infos[i].get_glyph();
-				g.set_renderer(this.get_renderer());
+				var g = this.$_infos[i].glyph;
+				g.renderer = this.renderer;
 				g.doLayout();
-				g.set_x(padding);
+				g.x = padding;
 				if (i === 0) {
-					displacedX = g.get_width() + padding;
+					displacedX = g.width + padding;
 				}
 				else {
 					// check if note needs to be repositioned
-					if (Math.abs(lastLine - this.$_infos[i].get_line()) <= 1) {
+					if (Math.abs(lastLine - this.$_infos[i].line) <= 1) {
 						// reposition if needed
 						if (!lastDisplaced) {
-							g.set_x(ss.Int32.trunc(displacedX - this.get_scale()));
+							g.x = ss.Int32.trunc(displacedX - this.get_scale());
 							anyDisplaced = true;
 							lastDisplaced = true;
 							// let next iteration know we are displace now
@@ -13989,35 +12467,35 @@
 						lastDisplaced = false;
 					}
 				}
-				lastLine = this.$_infos[i].get_line();
-				w = Math.max(w, g.get_x() + g.get_width());
+				lastLine = this.$_infos[i].line;
+				w = Math.max(w, g.x + g.width);
 			}
 			if (anyDisplaced) {
-				this.set_upLineX(displacedX);
-				this.set_downLineX(displacedX);
+				this.upLineX = displacedX;
+				this.downLineX = displacedX;
 			}
 			else {
-				this.set_upLineX(w);
-				this.set_downLineX(padding);
+				this.upLineX = w;
+				this.downLineX = padding;
 			}
-			var $t1 = ss.getEnumerator(this.get_beatEffects().get_values());
+			var $t1 = ss.getEnumerator(this.beatEffects.get_values());
 			try {
 				while ($t1.moveNext()) {
 					var e = $t1.current();
-					e.set_renderer(this.get_renderer());
+					e.renderer = this.renderer;
 					e.doLayout();
 				}
 			}
 			finally {
 				$t1.dispose();
 			}
-			if (this.get_beat().get_isTremolo()) {
-				var direction = this.get_beamingHelper().get_direction();
+			if (this.beat.get_isTremolo()) {
+				var direction = this.beamingHelper.get_direction();
 				var offset;
-				var baseNote = ((direction === 0) ? this.get_minNote() : this.get_maxNote());
+				var baseNote = ((direction === 0) ? this.minNote : this.maxNote);
 				var tremoloX = ((direction === 0) ? displacedX : 0);
-				if (ss.isValue(this.get_beat().get_tremoloSpeed())) {
-					var speed = this.get_beat().get_tremoloSpeed().get_value();
+				if (ss.isValue(this.beat.tremoloSpeed)) {
+					var speed = this.beat.tremoloSpeed.get_value();
 					switch (speed) {
 						case 32: {
 							offset = ((direction === 0) ? -15 : 10);
@@ -14040,92 +12518,79 @@
 				else {
 					offset = ((direction === 0) ? -15 : 15);
 				}
-				this.$_tremoloPicking = new $AlphaTab_Rendering_Glyphs_TremoloPickingGlyph(tremoloX, baseNote.get_glyph().get_y() + ss.Int32.trunc(offset * this.get_scale()), this.get_beat().get_tremoloSpeed().get_value());
-				this.$_tremoloPicking.set_renderer(this.get_renderer());
+				this.$_tremoloPicking = new $AlphaTab_Rendering_Glyphs_TremoloPickingGlyph(tremoloX, baseNote.glyph.y + ss.Int32.trunc(offset * this.get_scale()), this.beat.tremoloSpeed.get_value());
+				this.$_tremoloPicking.renderer = this.renderer;
 				this.$_tremoloPicking.doLayout();
 			}
-			this.set_width(w + padding);
+			this.width = w + padding;
 		},
 		paint: function(cx, cy, canvas) {
-			var scoreRenderer = this.get_renderer();
+			var scoreRenderer = this.renderer;
 			//
 			// Note Effects only painted once
 			//
-			var effectY = ((this.get_beamingHelper().get_direction() === 0) ? scoreRenderer.getScoreY(this.get_maxNote().get_line(), 13) : scoreRenderer.getScoreY(this.get_minNote().get_line(), -9));
+			var effectY = ((this.beamingHelper.get_direction() === 0) ? scoreRenderer.getScoreY(this.maxNote.line, 13) : scoreRenderer.getScoreY(this.minNote.line, -9));
 			// TODO: take care of actual glyph height
-			var effectSpacing = ((this.get_beamingHelper().get_direction() === 0) ? ss.Int32.trunc(7 * this.get_scale()) : ss.Int32.trunc(-7 * this.get_scale()));
-			var $t1 = ss.getEnumerator(this.get_beatEffects().get_values());
+			var effectSpacing = ((this.beamingHelper.get_direction() === 0) ? ss.Int32.trunc(7 * this.get_scale()) : ss.Int32.trunc(-7 * this.get_scale()));
+			var $t1 = ss.getEnumerator(this.beatEffects.get_values());
 			try {
 				while ($t1.moveNext()) {
 					var g = $t1.current();
-					g.set_y(effectY);
-					g.set_x(ss.Int32.div(this.get_width(), 2));
-					g.paint(cx + this.get_x(), cy + this.get_y(), canvas);
+					g.y = effectY;
+					g.x = ss.Int32.div(this.width, 2);
+					g.paint(cx + this.x, cy + this.y, canvas);
 					effectY += effectSpacing;
 				}
 			}
 			finally {
 				$t1.dispose();
 			}
-			canvas.set_color(this.get_renderer().get_layout().get_renderer().get_renderingResources().get_staveLineColor());
+			canvas.set_color(this.renderer.get_layout().renderer.renderingResources.staveLineColor);
 			// TODO: Take care of beateffects in overflow
 			var linePadding = ss.Int32.trunc(3 * this.get_scale());
 			if (this.get_hasTopOverflow()) {
 				var l = -1;
-				while (l >= this.get_minNote().get_line()) {
+				while (l >= this.minNote.line) {
 					// + 1 Because we want to place the line in the center of the note, not at the top
-					var lY = cy + this.get_y() + scoreRenderer.getScoreY(l + 1, -1);
+					var lY = cy + this.y + scoreRenderer.getScoreY(l + 1, -1);
 					canvas.beginPath();
-					canvas.moveTo(cx + this.get_x() - linePadding, lY);
-					canvas.lineTo(cx + this.get_x() + this.get_width() + linePadding, lY);
+					canvas.moveTo(cx + this.x - linePadding, lY);
+					canvas.lineTo(cx + this.x + this.width + linePadding, lY);
 					canvas.stroke();
 					l -= 2;
 				}
 			}
 			if (this.get_hasBottomOverflow()) {
 				var l1 = 11;
-				while (l1 <= this.get_maxNote().get_line()) {
-					var lY1 = cy + this.get_y() + scoreRenderer.getScoreY(l1 + 1, -1);
+				while (l1 <= this.maxNote.line) {
+					var lY1 = cy + this.y + scoreRenderer.getScoreY(l1 + 1, -1);
 					canvas.beginPath();
-					canvas.moveTo(cx + this.get_x() - linePadding, lY1);
-					canvas.lineTo(cx + this.get_x() + this.get_width() + linePadding, lY1);
+					canvas.moveTo(cx + this.x - linePadding, lY1);
+					canvas.lineTo(cx + this.x + this.width + linePadding, lY1);
 					canvas.stroke();
 					l1 += 2;
 				}
 			}
 			if (ss.isValue(this.$_tremoloPicking)) {
-				this.$_tremoloPicking.paint(cx + this.get_x(), cy + this.get_y(), canvas);
+				this.$_tremoloPicking.paint(cx + this.x, cy + this.y, canvas);
 			}
 			for (var $t2 = 0; $t2 < this.$_infos.length; $t2++) {
 				var g1 = this.$_infos[$t2];
-				g1.get_glyph().set_renderer(this.get_renderer());
-				g1.get_glyph().paint(cx + this.get_x(), cy + this.get_y(), canvas);
+				g1.glyph.renderer = this.renderer;
+				g1.glyph.paint(cx + this.x, cy + this.y, canvas);
 			}
 		}
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
-	ss.initClass($AlphaTab_Rendering_Glyphs_ScoreNoteGlyphInfo, $asm, {
-		get_glyph: function() {
-			return this.$1$GlyphField;
-		},
-		set_glyph: function(value) {
-			this.$1$GlyphField = value;
-		},
-		get_line: function() {
-			return this.$1$LineField;
-		},
-		set_line: function(value) {
-			this.$1$LineField = value;
-		}
-	});
+	ss.initClass($AlphaTab_Rendering_Glyphs_ScoreNoteGlyphInfo, $asm, {});
 	ss.initClass($AlphaTab_Rendering_Glyphs_ScoreSlideLineGlyph, $asm, {
 		doLayout: function() {
-			this.set_width(0);
+			this.width = 0;
 		},
 		get_canScale: function() {
 			return false;
 		},
 		paint: function(cx, cy, canvas) {
-			var r = this.get_renderer();
+			var r = this.renderer;
 			var sizeX = ss.Int32.trunc(12 * this.get_scale());
 			var offsetX = ss.Int32.trunc(1 * this.get_scale());
 			var startX;
@@ -14137,12 +12602,12 @@
 				case 2: {
 					startX = cx + r.getNoteX(this.$_startNote, true) + offsetX;
 					startY = cy + r.getNoteY(this.$_startNote) + 4;
-					if (ss.isValue(this.$_startNote.get_slideTarget())) {
-						endX = cx + r.getNoteX(this.$_startNote.get_slideTarget(), false) - offsetX;
-						endY = cy + r.getNoteY(this.$_startNote.get_slideTarget()) + 4;
+					if (ss.isValue(this.$_startNote.slideTarget)) {
+						endX = cx + r.getNoteX(this.$_startNote.slideTarget, false) - offsetX;
+						endY = cy + r.getNoteY(this.$_startNote.slideTarget) + 4;
 					}
 					else {
-						endX = cx + this.$_parent.get_x() + this.$_parent.get_postNotes().get_x() + this.$_parent.get_postNotes().get_width();
+						endX = cx + this.$_parent.x + this.$_parent.postNotes.x + this.$_parent.postNotes.width;
 						endY = startY;
 					}
 					break;
@@ -14179,7 +12644,7 @@
 					return;
 				}
 			}
-			canvas.set_color(this.get_renderer().get_layout().get_renderer().get_renderingResources().get_mainGlyphColor());
+			canvas.set_color(this.renderer.get_layout().renderer.renderingResources.mainGlyphColor);
 			canvas.beginPath();
 			canvas.moveTo(startX, startY);
 			canvas.lineTo(endX, endY);
@@ -14188,7 +12653,7 @@
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_TieGlyph, $asm, {
 		doLayout: function() {
-			this.set_width(0);
+			this.width = 0;
 		},
 		get_canScale: function() {
 			return false;
@@ -14196,23 +12661,23 @@
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_ScoreTieGlyph, $asm, {
 		paint: function(cx, cy, canvas) {
-			if (ss.isNullOrUndefined(this.endNote) || this.startNote.get_beat().get_index() !== this.endNote.get_beat().get_index()) {
+			if (ss.isNullOrUndefined(this.endNote) || this.startNote.beat.index !== this.endNote.beat.index) {
 				return;
 			}
-			var r = this.get_renderer();
+			var r = this.renderer;
 			var parent = this.parent;
 			var startX = cx + r.getNoteX(this.startNote, true);
-			var endX = (ss.isNullOrUndefined(this.endNote) ? (cx + parent.get_x() + parent.get_postNotes().get_x() + parent.get_postNotes().get_width()) : (cx + r.getNoteX(this.endNote, false)));
+			var endX = (ss.isNullOrUndefined(this.endNote) ? (cx + parent.x + parent.postNotes.x + parent.postNotes.width) : (cx + r.getNoteX(this.endNote, false)));
 			var startY = cy + r.getNoteY(this.startNote) + 4;
 			var endY = (ss.isNullOrUndefined(this.endNote) ? startY : (cy + r.getNoteY(this.endNote) + 4));
-			$AlphaTab_Rendering_Glyphs_TieGlyph.paintTie(canvas, this.get_scale(), startX, startY, endX, endY, r.getBeatDirection(this.startNote.get_beat()) === 1);
-			canvas.set_color(this.get_renderer().get_layout().get_renderer().get_renderingResources().get_mainGlyphColor());
+			$AlphaTab_Rendering_Glyphs_TieGlyph.paintTie(canvas, this.get_scale(), startX, startY, endX, endY, r.getBeatDirection(this.startNote.beat) === 1);
+			canvas.set_color(this.renderer.get_layout().renderer.renderingResources.mainGlyphColor);
 			canvas.fill();
 		}
 	}, $AlphaTab_Rendering_Glyphs_TieGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_SharpGlyph, $asm, {
 		doLayout: function() {
-			this.set_width(ss.Int32.trunc(8 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale()));
+			this.width = ss.Int32.trunc(8 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale());
 		},
 		get_canScale: function() {
 			return false;
@@ -14223,33 +12688,20 @@
 			return this.$_scaling;
 		}
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
-	ss.initClass($AlphaTab_Rendering_Glyphs_SvgCommand, $asm, {
-		get_cmd: function() {
-			return this.$1$CmdField;
-		},
-		set_cmd: function(value) {
-			this.$1$CmdField = value;
-		},
-		get_numbers: function() {
-			return this.$1$NumbersField;
-		},
-		set_numbers: function(value) {
-			this.$1$NumbersField = value;
-		}
-	});
+	ss.initClass($AlphaTab_Rendering_Glyphs_SvgCommand, $asm, {});
 	ss.initClass($AlphaTab_Rendering_Glyphs_TabBeatContainerGlyph, $asm, {
 		createTies: function(n) {
-			if (n.get_isHammerPullDestination() && ss.isValue(n.get_hammerPullOrigin())) {
-				var tie = new $AlphaTab_Rendering_Glyphs_TabTieGlyph(n.get_hammerPullOrigin(), n, this);
-				ss.add(this.get_ties(), tie);
+			if (n.isHammerPullDestination && ss.isValue(n.hammerPullOrigin)) {
+				var tie = new $AlphaTab_Rendering_Glyphs_TabTieGlyph(n.hammerPullOrigin, n, this);
+				ss.add(this.ties, tie);
 			}
-			else if (n.get_slideType() === 2) {
-				var tie1 = new $AlphaTab_Rendering_Glyphs_TabTieGlyph(n, n.get_slideTarget(), this);
-				ss.add(this.get_ties(), tie1);
+			else if (n.slideType === 2) {
+				var tie1 = new $AlphaTab_Rendering_Glyphs_TabTieGlyph(n, n.slideTarget, this);
+				ss.add(this.ties, tie1);
 			}
-			if (n.get_slideType() !== 0) {
-				var l = new $AlphaTab_Rendering_Glyphs_TabSlideLineGlyph(n.get_slideType(), n, this);
-				ss.add(this.get_ties(), l);
+			if (n.slideType !== 0) {
+				var l = new $AlphaTab_Rendering_Glyphs_TabSlideLineGlyph(n.slideType, n, this);
+				ss.add(this.ties, l);
 			}
 		}
 	}, $AlphaTab_Rendering_Glyphs_BeatContainerGlyph, [$AlphaTab_Rendering_Glyphs_ISupportsFinalize]);
@@ -14268,54 +12720,54 @@
 		},
 		doLayout: function() {
 			// create glyphs
-			if (!this.get_container().get_beat().get_isRest()) {
+			if (!this.get_container().beat.get_isRest()) {
 				//
 				// Note numbers
-				this.set_noteNumbers(new $AlphaTab_Rendering_Glyphs_TabNoteChordGlyph(0, 0, this.get_container().get_beat().get_graceType() !== 0));
-				this.get_noteNumbers().set_beat(this.get_container().get_beat());
-				this.get_noteNumbers().set_beamingHelper(this.get_beamingHelper());
+				this.set_noteNumbers(new $AlphaTab_Rendering_Glyphs_TabNoteChordGlyph(0, 0, this.get_container().beat.graceType !== 0));
+				this.get_noteNumbers().beat = this.get_container().beat;
+				this.get_noteNumbers().beamingHelper = this.get_beamingHelper();
 				this.noteLoop(ss.mkdel(this, this.$createNoteGlyph));
 				this.addGlyph(this.get_noteNumbers());
 				//
 				// Whammy Bar
-				if (this.get_container().get_beat().get_hasWhammyBar() && !this.get_noteNumbers().get_beatEffects().containsKey('Whammy')) {
-					this.get_noteNumbers().get_beatEffects().set_item('Whammy', new $AlphaTab_Rendering_Glyphs_WhammyBarGlyph(this.get_container().get_beat(), this.get_container()));
+				if (this.get_container().beat.get_hasWhammyBar() && !this.get_noteNumbers().beatEffects.containsKey('Whammy')) {
+					this.get_noteNumbers().beatEffects.set_item('Whammy', new $AlphaTab_Rendering_Glyphs_WhammyBarGlyph(this.get_container().beat, this.get_container()));
 				}
 				//
 				// Tremolo Picking
-				if (this.get_container().get_beat().get_isTremolo() && !this.get_noteNumbers().get_beatEffects().containsKey('Tremolo')) {
-					this.get_noteNumbers().get_beatEffects().set_item('Tremolo', new $AlphaTab_Rendering_Glyphs_TremoloPickingGlyph(0, 0, this.get_container().get_beat().get_tremoloSpeed().get_value()));
+				if (this.get_container().beat.get_isTremolo() && !this.get_noteNumbers().beatEffects.containsKey('Tremolo')) {
+					this.get_noteNumbers().beatEffects.set_item('Tremolo', new $AlphaTab_Rendering_Glyphs_TremoloPickingGlyph(0, 0, this.get_container().beat.tremoloSpeed.get_value()));
 				}
 			}
 			// left to right layout
 			var w = 0;
 			for (var $t1 = 0; $t1 < this.glyphs.length; $t1++) {
 				var g = this.glyphs[$t1];
-				g.set_x(w);
-				g.set_renderer(this.get_renderer());
+				g.x = w;
+				g.renderer = this.renderer;
 				g.doLayout();
-				w += g.get_width();
+				w += g.width;
 			}
-			this.set_width(w);
+			this.width = w;
 		},
 		finalizeGlyph: function(layout) {
-			if (!this.get_container().get_beat().get_isRest()) {
-				this.get_noteNumbers().updateBeamingHelper(this.get_container().get_x() + this.get_x());
+			if (!this.get_container().beat.get_isRest()) {
+				this.get_noteNumbers().updateBeamingHelper(this.get_container().x + this.x);
 			}
 		},
 		applyGlyphSpacing: function(spacing) {
 			$AlphaTab_Rendering_Glyphs_Glyph.prototype.applyGlyphSpacing.call(this, spacing);
 			// TODO: we need to tell the beaming helper the position of rest beats
-			if (!this.get_container().get_beat().get_isRest()) {
-				this.get_noteNumbers().updateBeamingHelper(this.get_container().get_x() + this.get_x());
+			if (!this.get_container().beat.get_isRest()) {
+				this.get_noteNumbers().updateBeamingHelper(this.get_container().x + this.x);
 			}
 		},
 		$createNoteGlyph: function(n) {
-			var isGrace = this.get_container().get_beat().get_graceType() !== 0;
-			var tr = this.get_renderer();
+			var isGrace = this.get_container().beat.graceType !== 0;
+			var tr = this.renderer;
 			var noteNumberGlyph = new $AlphaTab_Rendering_Glyphs_NoteNumberGlyph(0, 0, n, isGrace);
-			var l = n.get_beat().get_voice().get_bar().get_track().get_tuning().length - n.get_string() + 1;
-			noteNumberGlyph.set_y(tr.getTabY(l, -2));
+			var l = n.beat.voice.bar.track.tuning.length - n.string + 1;
+			noteNumberGlyph.y = tr.getTabY(l, -2);
 			this.get_noteNumbers().addNoteGlyph(noteNumberGlyph, n);
 		}
 	}, $AlphaTab_Rendering_Glyphs_BeatGlyphBase, [$AlphaTab_Rendering_Glyphs_ISupportsFinalize]);
@@ -14330,26 +12782,26 @@
 			if (n.get_isTrill()) {
 				this.addGlyph(new $AlphaTab_Rendering_Glyphs_SpacingGlyph(0, 0, ss.Int32.trunc(4 * this.get_scale()), true));
 				var trillNote = new $AlphaTab_Model_Note();
-				trillNote.set_isGhost(true);
-				trillNote.set_fret(n.get_trillFret());
-				trillNote.set_string(n.get_string());
-				var tr = this.get_renderer();
+				trillNote.isGhost = true;
+				trillNote.fret = n.get_trillFret();
+				trillNote.string = n.string;
+				var tr = this.renderer;
 				var trillNumberGlyph = new $AlphaTab_Rendering_Glyphs_NoteNumberGlyph(0, 0, trillNote, true);
-				var l = n.get_beat().get_voice().get_bar().get_track().get_tuning().length - n.get_string();
-				trillNumberGlyph.set_y(tr.getTabY(l, 0));
+				var l = n.beat.voice.bar.track.tuning.length - n.string;
+				trillNumberGlyph.y = tr.getTabY(l, 0);
 				this.addGlyph(trillNumberGlyph);
 			}
 			if (n.get_hasBend()) {
 				var bendHeight = ss.Int32.trunc(60 * this.get_scale());
-				this.get_renderer().registerOverflowTop(bendHeight);
+				this.renderer.registerOverflowTop(bendHeight);
 				this.addGlyph(new $AlphaTab_Rendering_Glyphs_BendGlyph(n, ss.Int32.trunc(this.get_beatDurationWidth() * this.get_scale()), bendHeight));
 			}
 		}
 	}, $AlphaTab_Rendering_Glyphs_BeatGlyphBase);
 	ss.initClass($AlphaTab_Rendering_Glyphs_TabBeatPreNotesGlyph, $asm, {
 		doLayout: function() {
-			if (this.get_container().get_beat().get_brushType() !== 0) {
-				this.addGlyph(new $AlphaTab_Rendering_Glyphs_TabBrushGlyph(this.get_container().get_beat()));
+			if (this.get_container().beat.brushType !== 0) {
+				this.addGlyph(new $AlphaTab_Rendering_Glyphs_TabBrushGlyph(this.get_container().beat));
 				this.addGlyph(new $AlphaTab_Rendering_Glyphs_SpacingGlyph(0, 0, ss.Int32.trunc(4 * this.get_scale()), true));
 			}
 			$AlphaTab_Rendering_Glyphs_BeatGlyphBase.prototype.doLayout.call(this);
@@ -14357,18 +12809,18 @@
 	}, $AlphaTab_Rendering_Glyphs_BeatGlyphBase);
 	ss.initClass($AlphaTab_Rendering_Glyphs_TabBrushGlyph, $asm, {
 		doLayout: function() {
-			this.set_width(ss.Int32.trunc(10 * this.get_scale()));
+			this.width = ss.Int32.trunc(10 * this.get_scale());
 		},
 		paint: function(cx, cy, canvas) {
-			var tabBarRenderer = this.get_renderer();
-			var res = this.get_renderer().get_resources();
-			var startY = cy + this.get_x() + ss.Int32.trunc(tabBarRenderer.getNoteY(this.$_beat.get_maxNote()) - res.get_tablatureFont().get_size() / 2);
-			var endY = cy + this.get_y() + tabBarRenderer.getNoteY(this.$_beat.get_minNote()) + res.get_tablatureFont().get_size() / 2;
-			var arrowX = cx + this.get_x() + ss.Int32.div(this.get_width(), 2);
+			var tabBarRenderer = this.renderer;
+			var res = this.renderer.get_resources();
+			var startY = cy + this.x + ss.Int32.trunc(tabBarRenderer.getNoteY(this.$_beat.get_maxNote()) - res.tablatureFont.get_size() / 2);
+			var endY = cy + this.y + tabBarRenderer.getNoteY(this.$_beat.get_minNote()) + res.tablatureFont.get_size() / 2;
+			var arrowX = cx + this.x + ss.Int32.div(this.width, 2);
 			var arrowSize = 8 * this.get_scale();
-			canvas.set_color(res.get_mainGlyphColor());
-			if (this.$_beat.get_brushType() !== 0) {
-				if (this.$_beat.get_brushType() === 1 || this.$_beat.get_brushType() === 2) {
+			canvas.set_color(res.mainGlyphColor);
+			if (this.$_beat.brushType !== 0) {
+				if (this.$_beat.brushType === 1 || this.$_beat.brushType === 2) {
 					canvas.beginPath();
 					canvas.moveTo(arrowX, startY);
 					canvas.lineTo(arrowX, endY);
@@ -14379,12 +12831,12 @@
 					var steps = ss.Int32.trunc(Math.abs(endY - startY) / size);
 					for (var i = 0; i < steps; i++) {
 						var arrow = new $AlphaTab_Rendering_Glyphs_SvgGlyph(ss.Int32.trunc(3 * this.get_scale()), 0, $AlphaTab_Rendering_Glyphs_MusicFont.waveVertical, 1, 1);
-						arrow.set_renderer(this.get_renderer());
+						arrow.renderer = this.renderer;
 						arrow.doLayout();
-						arrow.paint(cx + this.get_x(), startY + i * size, canvas);
+						arrow.paint(cx + this.x, startY + i * size, canvas);
 					}
 				}
-				if (this.$_beat.get_brushType() === 1 || this.$_beat.get_brushType() === 3) {
+				if (this.$_beat.brushType === 1 || this.$_beat.brushType === 3) {
 					canvas.beginPath();
 					canvas.moveTo(arrowX, endY);
 					canvas.lineTo(arrowX + arrowSize / 2, endY - arrowSize);
@@ -14405,21 +12857,21 @@
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_TabClefGlyph, $asm, {
 		doLayout: function() {
-			this.set_width(ss.Int32.trunc(28 * this.get_scale()));
+			this.width = ss.Int32.trunc(28 * this.get_scale());
 		},
 		get_canScale: function() {
 			return false;
 		},
 		paint: function(cx, cy, canvas) {
 			//TabBarRenderer tabBarRenderer = (TabBarRenderer)Renderer;
-			var track = this.get_renderer().get_bar().get_track();
-			var res = this.get_renderer().get_resources();
-			var startY = cy + this.get_y() + 10 * this.get_scale() * 0.600000023841858;
+			var track = this.renderer.bar.track;
+			var res = this.renderer.get_resources();
+			var startY = cy + this.y + 10 * this.get_scale() * 0.600000023841858;
 			//var endY = cy + Y + tabBarRenderer.GetTabY(track.Tuning.Count, -2);
 			// TODO: Find a more generic way of calculating the font size but for now this works.
 			var fontScale = 1;
 			var correction = 0;
-			switch (track.get_tuning().length) {
+			switch (track.tuning.length) {
 				case 4: {
 					fontScale = 0.600000023841858;
 					break;
@@ -14442,50 +12894,32 @@
 					break;
 				}
 			}
-			var font = res.get_tabClefFont().clone();
+			var font = res.tabClefFont.clone();
 			font.set_size(font.get_size() * fontScale);
-			canvas.set_color(res.get_mainGlyphColor());
+			canvas.set_color(res.mainGlyphColor);
 			canvas.set_font(font);
 			canvas.set_textAlign(1);
-			canvas.fillText('T', cx + this.get_x() + ss.Int32.div(this.get_width(), 2), startY);
-			canvas.fillText('A', cx + this.get_x() + ss.Int32.div(this.get_width(), 2), startY + font.get_size() - correction * this.get_scale());
-			canvas.fillText('B', cx + this.get_x() + ss.Int32.div(this.get_width(), 2), startY + (font.get_size() - correction * this.get_scale()) * 2);
+			canvas.fillText('T', cx + this.x + ss.Int32.div(this.width, 2), startY);
+			canvas.fillText('A', cx + this.x + ss.Int32.div(this.width, 2), startY + font.get_size() - correction * this.get_scale());
+			canvas.fillText('B', cx + this.x + ss.Int32.div(this.width, 2), startY + (font.get_size() - correction * this.get_scale()) * 2);
 		}
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_TabNoteChordGlyph, $asm, {
-		get_beat: function() {
-			return this.$2$BeatField;
-		},
-		set_beat: function(value) {
-			this.$2$BeatField = value;
-		},
-		get_beamingHelper: function() {
-			return this.$2$BeamingHelperField;
-		},
-		set_beamingHelper: function(value) {
-			this.$2$BeamingHelperField = value;
-		},
-		get_beatEffects: function() {
-			return this.$2$BeatEffectsField;
-		},
-		set_beatEffects: function(value) {
-			this.$2$BeatEffectsField = value;
-		},
 		getNoteX: function(note, onEnd) {
-			if (this.$_noteLookup.containsKey(note.get_string())) {
-				var n = this.$_noteLookup.get_item(note.get_string());
-				var pos = this.get_x() + n.get_x() + ss.Int32.trunc(0 * this.get_scale());
+			if (this.$_noteLookup.containsKey(note.string)) {
+				var n = this.$_noteLookup.get_item(note.string);
+				var pos = this.x + n.x + ss.Int32.trunc(0 * this.get_scale());
 				if (onEnd) {
 					n.calculateWidth();
-					pos += n.get_width();
+					pos += n.width;
 				}
 				return pos;
 			}
 			return 0;
 		},
 		getNoteY: function(note) {
-			if (this.$_noteLookup.containsKey(note.get_string())) {
-				return this.get_y() + this.$_noteLookup.get_item(note.get_string()).get_y();
+			if (this.$_noteLookup.containsKey(note.string)) {
+				return this.y + this.$_noteLookup.get_item(note.string).y;
 			}
 			return 0;
 		},
@@ -14493,23 +12927,23 @@
 			var w = 0;
 			for (var $t1 = 0; $t1 < this.$_notes.length; $t1++) {
 				var g = this.$_notes[$t1];
-				g.set_renderer(this.get_renderer());
+				g.renderer = this.renderer;
 				g.doLayout();
-				if (g.get_width() > w) {
-					w = g.get_width();
+				if (g.width > w) {
+					w = g.width;
 				}
 			}
-			var tabHeight = this.get_renderer().get_resources().get_tablatureFont().get_size();
+			var tabHeight = this.renderer.get_resources().tablatureFont.get_size();
 			var effectY = ss.Int32.trunc(this.getNoteY(this.$_minNote) + tabHeight / 2);
 			// TODO: take care of actual glyph height
 			var effectSpacing = ss.Int32.trunc(7 * this.get_scale());
-			var $t2 = ss.getEnumerator(this.get_beatEffects().get_values());
+			var $t2 = ss.getEnumerator(this.beatEffects.get_values());
 			try {
 				while ($t2.moveNext()) {
 					var g1 = $t2.current();
-					g1.set_y(effectY);
-					g1.set_x(ss.Int32.div(this.get_width(), 2));
-					g1.set_renderer(this.get_renderer());
+					g1.y = effectY;
+					g1.x = ss.Int32.div(this.width, 2);
+					g1.renderer = this.renderer;
 					effectY += effectSpacing;
 					g1.doLayout();
 				}
@@ -14518,32 +12952,32 @@
 				$t2.dispose();
 			}
 			this.$_centerX = 0;
-			this.set_width(w);
+			this.width = w;
 		},
 		addNoteGlyph: function(noteGlyph, note) {
 			ss.add(this.$_notes, noteGlyph);
-			this.$_noteLookup.set_item(note.get_string(), noteGlyph);
-			if (ss.isNullOrUndefined(this.$_minNote) || note.get_string() < this.$_minNote.get_string()) {
+			this.$_noteLookup.set_item(note.string, noteGlyph);
+			if (ss.isNullOrUndefined(this.$_minNote) || note.string < this.$_minNote.string) {
 				this.$_minNote = note;
 			}
 		},
 		paint: function(cx, cy, canvas) {
-			var res = this.get_renderer().get_resources();
+			var res = this.renderer.get_resources();
 			var old = canvas.get_textBaseline();
 			canvas.set_textBaseline(2);
-			canvas.set_color(res.get_mainGlyphColor());
-			canvas.set_font((this.$_isGrace ? res.get_graceFont() : res.get_tablatureFont()));
+			canvas.set_color(res.mainGlyphColor);
+			canvas.set_font((this.$_isGrace ? res.graceFont : res.tablatureFont));
 			for (var $t1 = 0; $t1 < this.$_notes.length; $t1++) {
 				var g = this.$_notes[$t1];
-				g.set_renderer(this.get_renderer());
-				g.paint(cx + this.get_x(), cy + this.get_y(), canvas);
+				g.renderer = this.renderer;
+				g.paint(cx + this.x, cy + this.y, canvas);
 			}
 			canvas.set_textBaseline(old);
-			var $t2 = ss.getEnumerator(this.get_beatEffects().get_values());
+			var $t2 = ss.getEnumerator(this.beatEffects.get_values());
 			try {
 				while ($t2.moveNext()) {
 					var g1 = $t2.current();
-					g1.paint(cx + this.get_x(), cy + this.get_y(), canvas);
+					g1.paint(cx + this.x, cy + this.y, canvas);
 				}
 			}
 			finally {
@@ -14551,20 +12985,20 @@
 			}
 		},
 		updateBeamingHelper: function(cx) {
-			if (!this.get_beamingHelper().hasBeatLineX(this.get_beat())) {
-				this.get_beamingHelper().registerBeatLineX(this.get_beat(), cx + this.get_x() + this.$_centerX, cx + this.get_x() + this.$_centerX);
+			if (!this.beamingHelper.hasBeatLineX(this.beat)) {
+				this.beamingHelper.registerBeatLineX(this.beat, cx + this.x + this.$_centerX, cx + this.x + this.$_centerX);
 			}
 		}
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_TabSlideLineGlyph, $asm, {
 		doLayout: function() {
-			this.set_width(0);
+			this.width = 0;
 		},
 		get_canScale: function() {
 			return false;
 		},
 		paint: function(cx, cy, canvas) {
-			var r = this.get_renderer();
+			var r = this.renderer;
 			var sizeX = ss.Int32.trunc(12 * this.get_scale());
 			var sizeY = ss.Int32.trunc(3 * this.get_scale());
 			var startX;
@@ -14576,11 +13010,11 @@
 				case 2: {
 					var startOffsetY;
 					var endOffsetY;
-					if (ss.isNullOrUndefined(this.$_startNote.get_slideTarget())) {
+					if (ss.isNullOrUndefined(this.$_startNote.slideTarget)) {
 						startOffsetY = 0;
 						endOffsetY = 0;
 					}
-					else if (this.$_startNote.get_slideTarget().get_fret() > this.$_startNote.get_fret()) {
+					else if (this.$_startNote.slideTarget.fret > this.$_startNote.fret) {
 						startOffsetY = sizeY;
 						endOffsetY = sizeY * -1;
 					}
@@ -14590,12 +13024,12 @@
 					}
 					startX = cx + r.getNoteX(this.$_startNote, true);
 					startY = cy + r.getNoteY(this.$_startNote) + startOffsetY;
-					if (ss.isValue(this.$_startNote.get_slideTarget())) {
-						endX = cx + r.getNoteX(this.$_startNote.get_slideTarget(), false);
-						endY = cy + r.getNoteY(this.$_startNote.get_slideTarget()) + endOffsetY;
+					if (ss.isValue(this.$_startNote.slideTarget)) {
+						endX = cx + r.getNoteX(this.$_startNote.slideTarget, false);
+						endY = cy + r.getNoteY(this.$_startNote.slideTarget) + endOffsetY;
 					}
 					else {
-						endX = cx + this.$_parent.get_x() + this.$_parent.get_postNotes().get_x() + this.$_parent.get_postNotes().get_width();
+						endX = cx + this.$_parent.x + this.$_parent.postNotes.x + this.$_parent.postNotes.width;
 						endY = startY;
 					}
 					break;
@@ -14632,7 +13066,7 @@
 					return;
 				}
 			}
-			canvas.set_color(this.get_renderer().get_layout().get_renderer().get_renderingResources().get_mainGlyphColor());
+			canvas.set_color(this.renderer.get_layout().renderer.renderingResources.mainGlyphColor);
 			canvas.beginPath();
 			canvas.moveTo(startX, startY);
 			canvas.lineTo(endX, endY);
@@ -14641,45 +13075,45 @@
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_TabTieGlyph, $asm, {
 		paint: function(cx, cy, canvas) {
-			if (ss.isNullOrUndefined(this.endNote) || this.startNote.get_beat().get_index() !== this.endNote.get_beat().get_index()) {
+			if (ss.isNullOrUndefined(this.endNote) || this.startNote.beat.index !== this.endNote.beat.index) {
 				return;
 			}
-			var r = this.get_renderer();
+			var r = this.renderer;
 			var parent = this.parent;
 			var res = r.get_resources();
 			var startX = cx + r.getNoteX(this.startNote, true);
-			var endX = (ss.isNullOrUndefined(this.endNote) ? (cx + parent.get_x() + parent.get_postNotes().get_x() + parent.get_postNotes().get_width()) : (cx + r.getNoteX(this.endNote, false)));
-			var down = this.startNote.get_string() > 3;
-			var offset = res.get_tablatureFont().get_size() / 2;
+			var endX = (ss.isNullOrUndefined(this.endNote) ? (cx + parent.x + parent.postNotes.x + parent.postNotes.width) : (cx + r.getNoteX(this.endNote, false)));
+			var down = this.startNote.string > 3;
+			var offset = res.tablatureFont.get_size() / 2;
 			if (down) {
 				offset *= -1;
 			}
 			var startY = cy + r.getNoteY(this.startNote) + offset;
 			var endY = (ss.isNullOrUndefined(this.endNote) ? startY : (cy + r.getNoteY(this.endNote) + offset));
-			$AlphaTab_Rendering_Glyphs_TieGlyph.paintTie(canvas, this.get_scale(), startX, startY, endX, endY, this.startNote.get_string() > 3);
-			canvas.set_color(this.get_renderer().get_layout().get_renderer().get_renderingResources().get_mainGlyphColor());
+			$AlphaTab_Rendering_Glyphs_TieGlyph.paintTie(canvas, this.get_scale(), startX, startY, endX, endY, this.startNote.string > 3);
+			canvas.set_color(this.renderer.get_layout().renderer.renderingResources.mainGlyphColor);
 			canvas.fill();
 		}
 	}, $AlphaTab_Rendering_Glyphs_TieGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_TempoGlyph, $asm, {
 		paint: function(cx, cy, canvas) {
-			var res = this.get_renderer().get_resources();
-			canvas.set_font(res.get_markerFont());
-			canvas.set_color(res.get_mainGlyphColor());
+			var res = this.renderer.get_resources();
+			canvas.set_font(res.markerFont);
+			canvas.set_color(res.mainGlyphColor);
 			var symbol = new $AlphaTab_Rendering_Glyphs_SvgGlyph(0, 0, $AlphaTab_Rendering_Glyphs_MusicFont.tempo, 1, 1);
-			symbol.set_renderer(this.get_renderer());
-			symbol.paint(cx + this.get_x(), cy + this.get_y(), canvas);
-			canvas.fillText('' + this.$_tempo, cx + this.get_x() + 30 * this.get_scale(), cy + this.get_x() + 7 * this.get_scale());
+			symbol.renderer = this.renderer;
+			symbol.paint(cx + this.x, cy + this.y, canvas);
+			canvas.fillText('' + this.$_tempo, cx + this.x + 30 * this.get_scale(), cy + this.x + 7 * this.get_scale());
 		}
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_TextGlyph, $asm, {
 		paint: function(cx, cy, canvas) {
-			var res = this.get_renderer().get_resources();
+			var res = this.renderer.get_resources();
 			canvas.set_font(this.$_font);
-			canvas.set_color(res.get_mainGlyphColor());
+			canvas.set_color(res.mainGlyphColor);
 			var old = canvas.get_textAlign();
 			canvas.set_textAlign(0);
-			canvas.fillText(this.$_text, cx + this.get_x(), cy + this.get_y());
+			canvas.fillText(this.$_text, cx + this.x, cy + this.y);
 			canvas.set_textAlign(old);
 		}
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
@@ -14695,13 +13129,13 @@
 			$AlphaTab_Rendering_Glyphs_GlyphGroup.prototype.doLayout.call(this);
 			for (var $t1 = 0; $t1 < this.glyphs.length; $t1++) {
 				var g = this.glyphs[$t1];
-				g.set_x(ss.Int32.div(this.get_width() - g.get_width(), 2));
+				g.x = ss.Int32.div(this.width - g.width, 2);
 			}
 		}
 	}, $AlphaTab_Rendering_Glyphs_GlyphGroup);
 	ss.initClass($AlphaTab_Rendering_Glyphs_TremoloPickingGlyph, $asm, {
 		doLayout: function() {
-			this.set_width(ss.Int32.trunc(12 * this.get_scale()));
+			this.width = ss.Int32.trunc(12 * this.get_scale());
 		},
 		get_canScale: function() {
 			return false;
@@ -14709,20 +13143,20 @@
 	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_TrillGlyph, $asm, {
 		paint: function(cx, cy, canvas) {
-			var res = this.get_renderer().get_resources();
-			canvas.set_font(res.get_markerFont());
-			canvas.set_color(res.get_mainGlyphColor());
+			var res = this.renderer.get_resources();
+			canvas.set_font(res.markerFont);
+			canvas.set_color(res.mainGlyphColor);
 			var textw = canvas.measureText('tr');
-			canvas.fillText('tr', cx + this.get_x(), cy + this.get_y());
+			canvas.fillText('tr', cx + this.x, cy + this.y);
 			var startX = textw;
-			var endX = this.get_width() - startX;
+			var endX = this.width - startX;
 			var step = 11 * this.get_scale() * this.$_scale;
 			var loops = ss.Int32.trunc(Math.max(1, (endX - startX) / step));
 			var loopX = ss.Int32.trunc(startX);
 			for (var i = 0; i < loops; i++) {
 				var glyph = new $AlphaTab_Rendering_Glyphs_SvgGlyph(loopX, 0, $AlphaTab_Rendering_Glyphs_MusicFont.waveHorizontal, this.$_scale, this.$_scale);
-				glyph.set_renderer(this.get_renderer());
-				glyph.paint(cx + this.get_x(), cy + this.get_y() + ss.Int32.trunc(res.get_markerFont().get_size() / 2), canvas);
+				glyph.renderer = this.renderer;
+				glyph.paint(cx + this.x, cy + this.y + ss.Int32.trunc(res.markerFont.get_size() / 2), canvas);
 				loopX += ss.Int32.trunc(step);
 			}
 		}
@@ -14730,82 +13164,66 @@
 	ss.initClass($AlphaTab_Rendering_Glyphs_VibratoGlyph, $asm, {
 		paint: function(cx, cy, canvas) {
 			var step = 11 * this.get_scale() * this.$_scale;
-			var loops = ss.Int32.trunc(Math.max(1, this.get_width() / step));
+			var loops = ss.Int32.trunc(Math.max(1, this.width / step));
 			var loopX = 0;
 			for (var i = 0; i < loops; i++) {
 				var glyph = new $AlphaTab_Rendering_Glyphs_SvgGlyph(loopX, 0, $AlphaTab_Rendering_Glyphs_MusicFont.waveHorizontal, this.$_scale, this.$_scale);
-				glyph.set_renderer(this.get_renderer());
-				glyph.paint(cx + this.get_x(), cy + this.get_y(), canvas);
+				glyph.renderer = this.renderer;
+				glyph.paint(cx + this.x, cy + this.y, canvas);
 				loopX += ss.Int32.trunc(step);
 			}
 		}
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_VoiceContainerGlyph, $asm, {
-		get_beatGlyphs: function() {
-			return this.$3$BeatGlyphsField;
-		},
-		set_beatGlyphs: function(value) {
-			this.$3$BeatGlyphsField = value;
-		},
-		get_voiceIndex: function() {
-			return this.$3$VoiceIndexField;
-		},
-		set_voiceIndex: function(value) {
-			this.$3$VoiceIndexField = value;
-		},
 		applyGlyphSpacing: function(spacing) {
-			var glyphSpacing = ss.Int32.div(spacing, this.get_beatGlyphs().length);
+			var glyphSpacing = ss.Int32.div(spacing, this.beatGlyphs.length);
 			var gx = 0;
-			var $t1 = this.get_beatGlyphs();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var g = $t1[$t2];
-				g.set_x(ss.Int32.trunc(gx));
-				gx += g.get_width() + glyphSpacing;
+			for (var $t1 = 0; $t1 < this.beatGlyphs.length; $t1++) {
+				var g = this.beatGlyphs[$t1];
+				g.x = ss.Int32.trunc(gx);
+				gx += g.width + glyphSpacing;
 				g.applyGlyphSpacing(glyphSpacing);
 			}
-			this.set_width(ss.Int32.trunc(gx));
+			this.width = ss.Int32.trunc(gx);
 		},
 		registerMaxSizes: function(sizes) {
-			var $t1 = this.get_beatGlyphs();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var b = $t1[$t2];
+			for (var $t1 = 0; $t1 < this.beatGlyphs.length; $t1++) {
+				var b = this.beatGlyphs[$t1];
 				b.registerMaxSizes(sizes);
 			}
 		},
 		applySizes: function(sizes) {
-			this.set_width(0);
-			for (var i = 0; i < this.get_beatGlyphs().length; i++) {
-				this.get_beatGlyphs()[i].set_x(((i === 0) ? 0 : (this.get_beatGlyphs()[i - 1].get_x() + this.get_beatGlyphs()[i - 1].get_width())));
-				this.get_beatGlyphs()[i].applySizes(sizes);
+			this.width = 0;
+			for (var i = 0; i < this.beatGlyphs.length; i++) {
+				this.beatGlyphs[i].x = ((i === 0) ? 0 : (this.beatGlyphs[i - 1].x + this.beatGlyphs[i - 1].width));
+				this.beatGlyphs[i].applySizes(sizes);
 			}
-			if (this.get_beatGlyphs().length > 0) {
-				this.set_width(this.get_beatGlyphs()[this.get_beatGlyphs().length - 1].get_x() + this.get_beatGlyphs()[this.get_beatGlyphs().length - 1].get_width());
+			if (this.beatGlyphs.length > 0) {
+				this.width = this.beatGlyphs[this.beatGlyphs.length - 1].x + this.beatGlyphs[this.beatGlyphs.length - 1].width;
 			}
 		},
 		addGlyph: function(g) {
-			g.set_x(((this.get_beatGlyphs().length === 0) ? 0 : (this.get_beatGlyphs()[this.get_beatGlyphs().length - 1].get_x() + this.get_beatGlyphs()[this.get_beatGlyphs().length - 1].get_width())));
-			g.set_index(this.get_beatGlyphs().length);
-			g.set_renderer(this.get_renderer());
+			g.x = ((this.beatGlyphs.length === 0) ? 0 : (this.beatGlyphs[this.beatGlyphs.length - 1].x + this.beatGlyphs[this.beatGlyphs.length - 1].width));
+			g.index = this.beatGlyphs.length;
+			g.renderer = this.renderer;
 			g.doLayout();
-			ss.add(this.get_beatGlyphs(), g);
-			this.set_width(g.get_x() + g.get_width());
+			ss.add(this.beatGlyphs, g);
+			this.width = g.x + g.width;
 		},
 		doLayout: function() {
 		},
 		finalizeGlyph: function(layout) {
-			var $t1 = this.get_beatGlyphs();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var b = $t1[$t2];
+			for (var $t1 = 0; $t1 < this.beatGlyphs.length; $t1++) {
+				var b = this.beatGlyphs[$t1];
 				b.finalizeGlyph(layout);
 			}
 		},
 		paint: function(cx, cy, canvas) {
 			//canvas.Color = new Color((byte) Random.Next(255), (byte) Random.Next(255), (byte) Random.Next(255), 128);
 			//canvas.FillRect(cx + X, cy + Y, Width, 100);
-			var $t1 = this.get_beatGlyphs();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var g = $t1[$t2];
-				g.paint(cx + this.get_x(), cy + this.get_y(), canvas);
+			for (var $t1 = 0; $t1 < this.beatGlyphs.length; $t1++) {
+				var g = this.beatGlyphs[$t1];
+				g.paint(cx + this.x, cy + this.y, canvas);
 			}
 		}
 	}, $AlphaTab_Rendering_Glyphs_GlyphGroup, [$AlphaTab_Rendering_Glyphs_ISupportsFinalize]);
@@ -14817,12 +13235,11 @@
 			var minY = 0;
 			var maxY = 0;
 			var sizeY = ss.Int32.trunc(60 * this.get_scale());
-			if (this.$_beat.get_whammyBarPoints().length >= 2) {
+			if (this.$_beat.whammyBarPoints.length >= 2) {
 				var dy = ss.Int32.div(sizeY, $AlphaTab_Model_Beat.whammyBarMaxValue);
-				var $t1 = this.$_beat.get_whammyBarPoints();
-				for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-					var pt = $t1[$t2];
-					var ptY = 0 - dy * pt.get_value();
+				for (var $t1 = 0; $t1 < this.$_beat.whammyBarPoints.length; $t1++) {
+					var pt = this.$_beat.whammyBarPoints[$t1];
+					var ptY = 0 - dy * pt.value;
 					if (ptY > maxY) {
 						maxY = ptY;
 					}
@@ -14833,12 +13250,12 @@
 			}
 			//
 			// calculate the overflow 
-			var tabBarRenderer = this.get_renderer();
-			var track = this.get_renderer().get_bar().get_track();
+			var tabBarRenderer = this.renderer;
+			var track = this.renderer.bar.track;
 			var tabTop = tabBarRenderer.getTabY(0, -2);
-			var tabBottom = tabBarRenderer.getTabY(track.get_tuning().length, -2);
-			var absMinY = this.get_y() + minY + tabTop;
-			var absMaxY = this.get_y() + maxY - tabBottom;
+			var tabBottom = tabBarRenderer.getTabY(track.tuning.length, -2);
+			var absMinY = this.y + minY + tabTop;
+			var absMaxY = this.y + maxY - tabBottom;
 			if (absMinY < 0) {
 				tabBarRenderer.registerOverflowTop(Math.abs(absMinY));
 			}
@@ -14847,33 +13264,33 @@
 			}
 		},
 		paint: function(cx, cy, canvas) {
-			var tabBarRenderer = this.get_renderer();
-			var res = this.get_renderer().get_resources();
-			var startX = cx + this.get_x() + ss.Int32.div(this.$_parent.get_onNotes().get_width(), 2);
-			var endX = ((ss.isNullOrUndefined(this.$_beat.get_nextBeat()) || !ss.referenceEquals(this.$_beat.get_voice(), this.$_beat.get_nextBeat().get_voice())) ? (cx + this.get_x() + ss.Int32.div(this.$_parent.get_onNotes().get_width(), 2) + this.$_parent.get_postNotes().get_width()) : (cx + tabBarRenderer.getBeatX(this.$_beat.get_nextBeat())));
-			var startY = cy + this.get_x();
+			var tabBarRenderer = this.renderer;
+			var res = this.renderer.get_resources();
+			var startX = cx + this.x + ss.Int32.div(this.$_parent.onNotes.width, 2);
+			var endX = ((ss.isNullOrUndefined(this.$_beat.nextBeat) || !ss.referenceEquals(this.$_beat.voice, this.$_beat.nextBeat.voice)) ? (cx + this.x + ss.Int32.div(this.$_parent.onNotes.width, 2) + this.$_parent.postNotes.width) : (cx + tabBarRenderer.getBeatX(this.$_beat.nextBeat)));
+			var startY = cy + this.x;
 			var textOffset = ss.Int32.trunc(3 * this.get_scale());
 			var sizeY = ss.Int32.trunc(60 * this.get_scale());
 			canvas.set_textAlign(1);
-			if (this.$_beat.get_whammyBarPoints().length >= 2) {
+			if (this.$_beat.whammyBarPoints.length >= 2) {
 				var dx = ss.Int32.div(endX - startX, $AlphaTab_Model_Beat.whammyBarMaxPosition);
 				var dy = ss.Int32.div(sizeY, $AlphaTab_Model_Beat.whammyBarMaxValue);
 				canvas.beginPath();
-				for (var i = 0; i < this.$_beat.get_whammyBarPoints().length - 1; i++) {
-					var pt1 = this.$_beat.get_whammyBarPoints()[i];
-					var pt2 = this.$_beat.get_whammyBarPoints()[i + 1];
-					if (pt1.get_value() === pt2.get_value() && i === this.$_beat.get_whammyBarPoints().length - 2) {
+				for (var i = 0; i < this.$_beat.whammyBarPoints.length - 1; i++) {
+					var pt1 = this.$_beat.whammyBarPoints[i];
+					var pt2 = this.$_beat.whammyBarPoints[i + 1];
+					if (pt1.value === pt2.value && i === this.$_beat.whammyBarPoints.length - 2) {
 						continue;
 					}
-					var pt1X = startX + dx * pt1.get_offset();
-					var pt1Y = startY - dy * pt1.get_value();
-					var pt2X = startX + dx * pt2.get_offset();
-					var pt2Y = startY - dy * pt2.get_value();
+					var pt1X = startX + dx * pt1.offset;
+					var pt1Y = startY - dy * pt1.value;
+					var pt2X = startX + dx * pt2.offset;
+					var pt2Y = startY - dy * pt2.value;
 					canvas.moveTo(pt1X, pt1Y);
 					canvas.lineTo(pt2X, pt2Y);
-					if (pt2.get_value() !== 0) {
-						var dv = pt2.get_value() / 4;
-						var up = pt2.get_value() - pt1.get_value() >= 0;
+					if (pt2.value !== 0) {
+						var dv = pt2.value / 4;
+						var up = pt2.value - pt1.value >= 0;
 						var s = '';
 						if (dv < 0) {
 							s += '-';
@@ -14891,9 +13308,9 @@
 						else if (dv === 0.75) {
 							s += '3/4';
 						}
-						canvas.set_font(res.get_graceFont());
+						canvas.set_font(res.graceFont);
 						//var size = canvas.MeasureText(s);
-						var sy = (up ? (pt2Y - res.get_graceFont().get_size() - textOffset) : (pt2Y + textOffset));
+						var sy = (up ? (pt2Y - res.graceFont.get_size() - textOffset) : (pt2Y + textOffset));
 						var sx = pt2X;
 						canvas.fillText(s, sx, sy);
 					}
@@ -14904,43 +13321,23 @@
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initEnum($AlphaTab_Rendering_Layout_HeaderFooterElements, $asm, { none: 0, title: 1, subTitle: 2, artist: 4, album: 8, words: 16, music: 32, wordsAndMusic: 64, copyright: 128, pageNumber: 256, all: 511 });
 	ss.initClass($AlphaTab_Rendering_Layout_ScoreLayout, $asm, {
-		get_renderer: function() {
-			return this.$1$RendererField;
-		},
-		set_renderer: function(value) {
-			this.$1$RendererField = value;
-		},
-		get_width: function() {
-			return this.$1$WidthField;
-		},
-		set_width: function(value) {
-			this.$1$WidthField = value;
-		},
-		get_height: function() {
-			return this.$1$HeightField;
-		},
-		set_height: function(value) {
-			this.$1$HeightField = value;
-		},
 		doLayout: null,
 		paintScore: null,
 		buildBoundingsLookup: null,
 		get_scale: function() {
-			return this.get_renderer().get_settings().get_scale();
+			return this.renderer.settings.scale;
 		},
 		createEmptyStaveGroup: function() {
 			var group = new $AlphaTab_Rendering_Staves_StaveGroup();
-			group.set_layout(this);
+			group.layout = this;
 			var isFirstTrack = true;
-			var $t1 = this.get_renderer().get_tracks();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var track = $t1[$t2];
-				var $t3 = this.get_renderer().get_settings().get_staves();
-				for (var $t4 = 0; $t4 < $t3.length; $t4++) {
-					var s = $t3[$t4];
+			for (var $t1 = 0; $t1 < this.renderer.tracks.length; $t1++) {
+				var track = this.renderer.tracks[$t1];
+				for (var $t2 = 0; $t2 < this.renderer.settings.staves.length; $t2++) {
+					var s = this.renderer.settings.staves[$t2];
 					if ($AlphaTab_Environment.staveFactories.containsKey(s.id)) {
 						var factory = $AlphaTab_Environment.staveFactories.get_item(s.id)(this);
-						if (isFirstTrack || !factory.get_hideOnMultiTrack()) {
+						if (isFirstTrack || !factory.hideOnMultiTrack) {
 							group.addStave(track, new $AlphaTab_Rendering_Staves_Stave(factory));
 						}
 					}
@@ -14952,37 +13349,35 @@
 	});
 	ss.initClass($AlphaTab_Rendering_Layout_HorizontalScreenLayout, $asm, {
 		doLayout: function() {
-			if (this.get_renderer().get_settings().get_staves().length === 0) {
+			if (this.renderer.settings.staves.length === 0) {
 				return;
 			}
-			var score = this.get_renderer().get_score();
-			var $t1 = this.get_renderer().get_settings().get_layout();
-			var startIndex = $t1.get(ss.Int32).call($t1, 'start', 1);
+			var score = this.renderer.score;
+			var startIndex = this.renderer.settings.layout.get(ss.Int32).call(this.renderer.settings.layout, 'start', 1);
 			startIndex--;
 			// map to array index
-			startIndex = Math.min(score.get_masterBars().length - 1, Math.max(0, startIndex));
+			startIndex = Math.min(score.masterBars.length - 1, Math.max(0, startIndex));
 			var currentBarIndex = startIndex;
-			var $t2 = this.get_renderer().get_settings().get_layout();
-			var endBarIndex = $t2.get(ss.Int32).call($t2, 'count', score.get_masterBars().length);
+			var endBarIndex = this.renderer.settings.layout.get(ss.Int32).call(this.renderer.settings.layout, 'count', score.masterBars.length);
 			endBarIndex = startIndex + endBarIndex - 1;
 			// map count to array index
-			endBarIndex = Math.min(score.get_masterBars().length - 1, Math.max(0, endBarIndex));
+			endBarIndex = Math.min(score.masterBars.length - 1, Math.max(0, endBarIndex));
 			var x = $AlphaTab_Rendering_Layout_HorizontalScreenLayout.pagePadding[0];
 			var y = $AlphaTab_Rendering_Layout_HorizontalScreenLayout.pagePadding[1];
 			this.$_group = this.createEmptyStaveGroup();
 			while (currentBarIndex <= endBarIndex) {
-				this.$_group.addBars(this.get_renderer().get_tracks(), currentBarIndex);
+				this.$_group.addBars(this.renderer.tracks, currentBarIndex);
 				currentBarIndex++;
 			}
-			this.$_group.set_x(x);
-			this.$_group.set_y(y);
+			this.$_group.x = x;
+			this.$_group.y = y;
 			this.$_group.finalizeGroup(this);
 			y += this.$_group.get_height() + ss.Int32.trunc(20 * this.get_scale());
-			this.set_height(y + $AlphaTab_Rendering_Layout_HorizontalScreenLayout.pagePadding[3]);
-			this.set_width(this.$_group.get_x() + this.$_group.get_width() + $AlphaTab_Rendering_Layout_HorizontalScreenLayout.pagePadding[2]);
+			this.height = y + $AlphaTab_Rendering_Layout_HorizontalScreenLayout.pagePadding[3];
+			this.width = this.$_group.x + this.$_group.width + $AlphaTab_Rendering_Layout_HorizontalScreenLayout.pagePadding[2];
 		},
 		paintScore: function() {
-			this.$_group.paint(0, 0, this.get_renderer().get_canvas());
+			this.$_group.paint(0, 0, this.renderer.canvas);
 		},
 		buildBoundingsLookup: function(lookup) {
 			this.$_group.buildBoundingsLookup(lookup);
@@ -14991,85 +13386,81 @@
 	ss.initClass($AlphaTab_Rendering_Layout_PageViewLayout, $asm, {
 		doLayout: function() {
 			this.$_groups = [];
-			var score = this.get_renderer().get_score();
-			var $t1 = this.get_renderer().get_settings().get_layout();
-			var startIndex = $t1.get(ss.Int32).call($t1, 'start', 1);
+			var score = this.renderer.score;
+			var startIndex = this.renderer.settings.layout.get(ss.Int32).call(this.renderer.settings.layout, 'start', 1);
 			startIndex--;
 			// map to array index
-			startIndex = Math.min(score.get_masterBars().length - 1, Math.max(0, startIndex));
+			startIndex = Math.min(score.masterBars.length - 1, Math.max(0, startIndex));
 			var currentBarIndex = startIndex;
-			var $t2 = this.get_renderer().get_settings().get_layout();
-			var endBarIndex = $t2.get(ss.Int32).call($t2, 'count', score.get_masterBars().length);
+			var endBarIndex = this.renderer.settings.layout.get(ss.Int32).call(this.renderer.settings.layout, 'count', score.masterBars.length);
 			if (endBarIndex < 0) {
-				endBarIndex = score.get_masterBars().length;
+				endBarIndex = score.masterBars.length;
 			}
 			endBarIndex = startIndex + endBarIndex - 1;
 			// map count to array index
-			endBarIndex = Math.min(score.get_masterBars().length - 1, Math.max(0, endBarIndex));
+			endBarIndex = Math.min(score.masterBars.length - 1, Math.max(0, endBarIndex));
 			var x = $AlphaTab_Rendering_Layout_PageViewLayout.pagePadding[0];
 			var y = $AlphaTab_Rendering_Layout_PageViewLayout.pagePadding[1];
 			y = this.$doScoreInfoLayout(y);
-			var $t3 = this.get_renderer().get_settings().get_layout();
-			var autoSize = $t3.get(Boolean).call($t3, 'autoSize', true);
-			if (autoSize || this.get_renderer().get_settings().get_width() <= 0) {
-				this.set_width(ss.Int32.trunc(950 * this.get_scale()));
+			var autoSize = this.renderer.settings.layout.get(Boolean).call(this.renderer.settings.layout, 'autoSize', true);
+			if (autoSize || this.renderer.settings.width <= 0) {
+				this.width = ss.Int32.trunc(950 * this.get_scale());
 			}
 			else {
-				this.set_width(this.get_renderer().get_settings().get_width());
+				this.width = this.renderer.settings.width;
 			}
-			if (this.get_renderer().get_settings().get_staves().length > 0) {
+			if (this.renderer.settings.staves.length > 0) {
 				while (currentBarIndex <= endBarIndex) {
 					var group = this.$createStaveGroup(currentBarIndex, endBarIndex);
 					ss.add(this.$_groups, group);
-					group.set_x(x);
-					group.set_y(y);
+					group.x = x;
+					group.y = y;
 					this.$fitGroup(group);
 					group.finalizeGroup(this);
 					y += group.get_height() + ss.Int32.trunc(20 * this.get_scale());
 					currentBarIndex = group.get_lastBarIndex() + 1;
 				}
 			}
-			this.set_height(y + $AlphaTab_Rendering_Layout_PageViewLayout.pagePadding[3]);
+			this.height = y + $AlphaTab_Rendering_Layout_PageViewLayout.pagePadding[3];
 		},
 		$doScoreInfoLayout: function(y) {
 			// TODO: Check if it's a good choice to provide the complete flags as setting
-			var $t1 = this.get_renderer().get_settings().get_layout();
-			var flags = ($t1.get(Boolean).call($t1, 'hideInfo', false) ? 0 : 511);
-			var score = this.get_renderer().get_score();
+			var flags = (this.renderer.settings.layout.get(Boolean).call(this.renderer.settings.layout, 'hideInfo', false) ? 0 : 511);
+			var score = this.renderer.score;
 			var scale = this.get_scale();
-			if (!ss.isNullOrEmptyString(score.get_title()) && (flags & 1) !== 0) {
+			if (!ss.isNullOrEmptyString(score.title) && (flags & 1) !== 0) {
 				y += ss.Int32.trunc(35 * scale);
 			}
-			if (!ss.isNullOrEmptyString(score.get_subTitle()) && (flags & 2) !== 0) {
+			if (!ss.isNullOrEmptyString(score.subTitle) && (flags & 2) !== 0) {
 				y += ss.Int32.trunc(20 * scale);
 			}
-			if (!ss.isNullOrEmptyString(score.get_artist()) && (flags & 4) !== 0) {
+			if (!ss.isNullOrEmptyString(score.artist) && (flags & 4) !== 0) {
 				y += ss.Int32.trunc(20 * scale);
 			}
-			if (!ss.isNullOrEmptyString(score.get_album()) && (flags & 8) !== 0) {
+			if (!ss.isNullOrEmptyString(score.album) && (flags & 8) !== 0) {
 				y += ss.Int32.trunc(20 * scale);
 			}
-			if (!ss.isNullOrEmptyString(score.get_music()) && ss.referenceEquals(score.get_music(), score.get_words()) && (flags & 64) !== 0) {
+			if (!ss.isNullOrEmptyString(score.music) && ss.referenceEquals(score.music, score.words) && (flags & 64) !== 0) {
 				y += ss.Int32.trunc(20 * scale);
 			}
 			else {
-				if (!ss.isNullOrEmptyString(score.get_music()) && (flags & 32) !== 0) {
+				if (!ss.isNullOrEmptyString(score.music) && (flags & 32) !== 0) {
 					y += ss.Int32.trunc(20 * scale);
 				}
-				if (!ss.isNullOrEmptyString(score.get_words()) && (flags & 16) !== 0) {
+				if (!ss.isNullOrEmptyString(score.words) && (flags & 16) !== 0) {
 					y += ss.Int32.trunc(20 * scale);
 				}
 			}
 			y += ss.Int32.trunc(20 * scale);
 			// tuning info
-			if (this.get_renderer().get_tracks().length === 1 && !this.get_renderer().get_tracks()[0].get_isPercussion()) {
-				var tuning = $AlphaTab_Model_Tuning.findTuning(this.get_renderer().get_tracks()[0].get_tuning());
+			if (this.renderer.tracks.length === 1 && !this.renderer.tracks[0].isPercussion) {
+				var tuning = $AlphaTab_Model_Tuning.findTuning(this.renderer.tracks[0].tuning);
 				if (ss.isValue(tuning)) {
 					// Name
 					y += ss.Int32.trunc(15 * scale);
-					if (!tuning.get_isStandard()) {
+					if (!tuning.isStandard) {
 						// Strings
-						var stringsPerColumn = Math.ceil(this.get_renderer().get_tracks()[0].get_tuning().length / 2);
+						var stringsPerColumn = Math.ceil(this.renderer.tracks[0].tuning.length / 2);
 						y += ss.Int32.trunc(stringsPerColumn * ss.Int32.trunc(15 * scale));
 					}
 					y += ss.Int32.trunc(15 * scale);
@@ -15084,72 +13475,71 @@
 			y = this.$paintScoreInfo(x, y);
 			for (var $t1 = 0; $t1 < this.$_groups.length; $t1++) {
 				var g = this.$_groups[$t1];
-				g.paint(0, 0, this.get_renderer().get_canvas());
+				g.paint(0, 0, this.renderer.canvas);
 			}
 		},
 		$drawCentered: function(text, font, y) {
-			this.get_renderer().get_canvas().set_font(font);
-			this.get_renderer().get_canvas().fillText(text, this.get_width() / 2, y);
+			this.renderer.canvas.set_font(font);
+			this.renderer.canvas.fillText(text, this.width / 2, y);
 		},
 		$paintScoreInfo: function(x, y) {
-			var $t1 = this.get_renderer().get_settings().get_layout();
-			var flags = ($t1.get(Boolean).call($t1, 'hideInfo', false) ? 0 : 511);
-			var score = this.get_renderer().get_score();
+			var flags = (this.renderer.settings.layout.get(Boolean).call(this.renderer.settings.layout, 'hideInfo', false) ? 0 : 511);
+			var score = this.renderer.score;
 			var scale = this.get_scale();
-			var canvas = this.get_renderer().get_canvas();
-			var res = this.get_renderer().get_renderingResources();
+			var canvas = this.renderer.canvas;
+			var res = this.renderer.renderingResources;
 			canvas.set_color(new $AlphaTab_Platform_Model_Color(0, 0, 0, 255));
 			canvas.set_textAlign(1);
 			var str;
-			if (!ss.isNullOrEmptyString(score.get_title()) && (flags & 1) !== 0) {
-				this.$drawCentered(score.get_title(), res.get_titleFont(), y);
+			if (!ss.isNullOrEmptyString(score.title) && (flags & 1) !== 0) {
+				this.$drawCentered(score.title, res.titleFont, y);
 				y += ss.Int32.trunc(35 * scale);
 			}
-			if (!ss.isNullOrEmptyString(score.get_subTitle()) && (flags & 2) !== 0) {
-				this.$drawCentered(score.get_subTitle(), res.get_subTitleFont(), y);
+			if (!ss.isNullOrEmptyString(score.subTitle) && (flags & 2) !== 0) {
+				this.$drawCentered(score.subTitle, res.subTitleFont, y);
 				y += ss.Int32.trunc(20 * scale);
 			}
-			if (!ss.isNullOrEmptyString(score.get_artist()) && (flags & 4) !== 0) {
-				this.$drawCentered(score.get_artist(), res.get_subTitleFont(), y);
+			if (!ss.isNullOrEmptyString(score.artist) && (flags & 4) !== 0) {
+				this.$drawCentered(score.artist, res.subTitleFont, y);
 				y += ss.Int32.trunc(20 * scale);
 			}
-			if (!ss.isNullOrEmptyString(score.get_album()) && (flags & 8) !== 0) {
-				this.$drawCentered(score.get_album(), res.get_subTitleFont(), y);
+			if (!ss.isNullOrEmptyString(score.album) && (flags & 8) !== 0) {
+				this.$drawCentered(score.album, res.subTitleFont, y);
 				y += ss.Int32.trunc(20 * scale);
 			}
-			if (!ss.isNullOrEmptyString(score.get_music()) && ss.referenceEquals(score.get_music(), score.get_words()) && (flags & 64) !== 0) {
-				this.$drawCentered('Music and Words by ' + score.get_words(), res.get_wordsFont(), y);
+			if (!ss.isNullOrEmptyString(score.music) && ss.referenceEquals(score.music, score.words) && (flags & 64) !== 0) {
+				this.$drawCentered('Music and Words by ' + score.words, res.wordsFont, y);
 				y += ss.Int32.trunc(20 * scale);
 			}
 			else {
-				canvas.set_font(res.get_wordsFont());
-				if (!ss.isNullOrEmptyString(score.get_music()) && (flags & 32) !== 0) {
+				canvas.set_font(res.wordsFont);
+				if (!ss.isNullOrEmptyString(score.music) && (flags & 32) !== 0) {
 					canvas.set_textAlign(2);
-					canvas.fillText('Music by ' + score.get_music(), this.get_width() - $AlphaTab_Rendering_Layout_PageViewLayout.pagePadding[2], y);
+					canvas.fillText('Music by ' + score.music, this.width - $AlphaTab_Rendering_Layout_PageViewLayout.pagePadding[2], y);
 				}
-				if (!ss.isNullOrEmptyString(score.get_words()) && (flags & 16) !== 0) {
+				if (!ss.isNullOrEmptyString(score.words) && (flags & 16) !== 0) {
 					canvas.set_textAlign(0);
-					canvas.fillText('Words by ' + score.get_music(), x, y);
+					canvas.fillText('Words by ' + score.music, x, y);
 				}
 				y += ss.Int32.trunc(20 * scale);
 			}
 			y += ss.Int32.trunc(20 * scale);
 			// tuning info
-			if (this.get_renderer().get_tracks().length === 1 && !this.get_renderer().get_tracks()[0].get_isPercussion()) {
+			if (this.renderer.tracks.length === 1 && !this.renderer.tracks[0].isPercussion) {
 				canvas.set_textAlign(0);
-				var tuning = $AlphaTab_Model_Tuning.findTuning(this.get_renderer().get_tracks()[0].get_tuning());
+				var tuning = $AlphaTab_Model_Tuning.findTuning(this.renderer.tracks[0].tuning);
 				if (ss.isValue(tuning)) {
 					// Name
-					canvas.set_font(res.get_effectFont());
-					canvas.fillText(tuning.get_name(), x, y);
+					canvas.set_font(res.effectFont);
+					canvas.fillText(tuning.name, x, y);
 					y += ss.Int32.trunc(15 * scale);
-					if (!tuning.get_isStandard()) {
+					if (!tuning.isStandard) {
 						// Strings
-						var stringsPerColumn = Math.ceil(this.get_renderer().get_tracks()[0].get_tuning().length / 2);
+						var stringsPerColumn = Math.ceil(this.renderer.tracks[0].tuning.length / 2);
 						var currentX = x;
 						var currentY = y;
-						for (var i = 0; i < this.get_renderer().get_tracks()[0].get_tuning().length; i++) {
-							str = '(' + (i + 1) + ') = ' + $AlphaTab_Model_Tuning.getTextForTuning(this.get_renderer().get_tracks()[0].get_tuning()[i], false);
+						for (var i = 0; i < this.renderer.tracks[0].tuning.length; i++) {
+							str = '(' + (i + 1) + ') = ' + $AlphaTab_Model_Tuning.getTextForTuning(this.renderer.tracks[0].tuning[i], false);
 							canvas.fillText(str, currentX, currentY);
 							currentY += ss.Int32.trunc(15 * scale);
 							if (i === stringsPerColumn - 1) {
@@ -15167,46 +13557,44 @@
 		$fitGroup: function(group) {
 			// calculate additional space for each bar (can be negative!)
 			var barSpace = 0;
-			var freeSpace = this.get_$maxWidth() - group.get_width();
-			if (freeSpace !== 0 && group.get_masterBars().length > 0) {
-				barSpace = ss.Int32.div(freeSpace, group.get_masterBars().length);
+			var freeSpace = this.get_$maxWidth() - group.width;
+			if (freeSpace !== 0 && group.masterBars.length > 0) {
+				barSpace = ss.Int32.div(freeSpace, group.masterBars.length);
 			}
-			if (group.get_isFull() || barSpace < 0) {
+			if (group.isFull || barSpace < 0) {
 				// add it to the measures
 				group.applyBarSpacing(barSpace);
 			}
-			this.set_width(Math.max(this.get_width(), group.get_width()));
+			this.width = Math.max(this.width, group.width);
 		},
 		$createStaveGroup: function(currentBarIndex, endIndex) {
 			var group = this.createEmptyStaveGroup();
-			group.set_index(this.$_groups.length);
-			var $t1 = this.get_renderer().get_settings().get_layout();
-			var barsPerRow = $t1.get(ss.Int32).call($t1, 'barsPerRow', -1);
+			group.index = this.$_groups.length;
+			var barsPerRow = this.renderer.settings.layout.get(ss.Int32).call(this.renderer.settings.layout, 'barsPerRow', -1);
 			var maxWidth = this.get_$maxWidth();
 			var end = endIndex + 1;
 			for (var i = currentBarIndex; i < end; i++) {
-				group.addBars(this.get_renderer().get_tracks(), i);
+				group.addBars(this.renderer.tracks, i);
 				var groupIsFull = false;
 				// can bar placed in this line?
-				if (barsPerRow === -1 && (group.get_width() >= maxWidth && group.get_masterBars().length !== 0)) {
+				if (barsPerRow === -1 && (group.width >= maxWidth && group.masterBars.length !== 0)) {
 					groupIsFull = true;
 				}
-				else if (group.get_masterBars().length === barsPerRow + 1) {
+				else if (group.masterBars.length === barsPerRow + 1) {
 					groupIsFull = true;
 				}
 				if (groupIsFull) {
 					group.revertLastBar();
-					group.set_isFull(true);
+					group.isFull = true;
 					return group;
 				}
-				group.set_x(0);
+				group.x = 0;
 			}
 			return group;
 		},
 		get_$maxWidth: function() {
-			var $t1 = this.get_renderer().get_settings().get_layout();
-			var autoSize = $t1.get(Boolean).call($t1, 'autoSize', true);
-			var width = (autoSize ? this.get_$sheetWidth() : this.get_renderer().get_settings().get_width());
+			var autoSize = this.renderer.settings.layout.get(Boolean).call(this.renderer.settings.layout, 'autoSize', true);
+			var width = (autoSize ? this.get_$sheetWidth() : this.renderer.settings.width);
 			return width - $AlphaTab_Rendering_Layout_PageViewLayout.pagePadding[0] - $AlphaTab_Rendering_Layout_PageViewLayout.pagePadding[2];
 		},
 		get_$sheetWidth: function() {
@@ -15220,346 +13608,171 @@
 		}
 	}, $AlphaTab_Rendering_Layout_ScoreLayout);
 	ss.initClass($AlphaTab_Rendering_Staves_BarSizeInfo, $asm, {
-		get_fullWidth: function() {
-			return this.$1$FullWidthField;
-		},
-		set_fullWidth: function(value) {
-			this.$1$FullWidthField = value;
-		},
-		get_sizes: function() {
-			return this.$1$SizesField;
-		},
-		set_sizes: function(value) {
-			this.$1$SizesField = value;
-		},
-		get_preNoteSizes: function() {
-			return this.$1$PreNoteSizesField;
-		},
-		set_preNoteSizes: function(value) {
-			this.$1$PreNoteSizesField = value;
-		},
-		get_onNoteSizes: function() {
-			return this.$1$OnNoteSizesField;
-		},
-		set_onNoteSizes: function(value) {
-			this.$1$OnNoteSizesField = value;
-		},
-		get_postNoteSizes: function() {
-			return this.$1$PostNoteSizesField;
-		},
-		set_postNoteSizes: function(value) {
-			this.$1$PostNoteSizesField = value;
-		},
 		setSize: function(key, size) {
-			this.get_sizes().set_item(key, size);
+			this.sizes.set_item(key, size);
 		},
 		getSize: function(key) {
-			if (this.get_sizes().containsKey(key)) {
-				return this.get_sizes().get_item(key);
+			if (this.sizes.containsKey(key)) {
+				return this.sizes.get_item(key);
 			}
 			return 0;
 		},
 		getPreNoteSize: function(beat) {
-			if (this.get_preNoteSizes().containsKey(beat)) {
-				return this.get_preNoteSizes().get_item(beat);
+			if (this.preNoteSizes.containsKey(beat)) {
+				return this.preNoteSizes.get_item(beat);
 			}
 			return 0;
 		},
 		getOnNoteSize: function(beat) {
-			if (this.get_onNoteSizes().containsKey(beat)) {
-				return this.get_onNoteSizes().get_item(beat);
+			if (this.onNoteSizes.containsKey(beat)) {
+				return this.onNoteSizes.get_item(beat);
 			}
 			return 0;
 		},
 		getPostNoteSize: function(beat) {
-			if (this.get_postNoteSizes().containsKey(beat)) {
-				return this.get_postNoteSizes().get_item(beat);
+			if (this.postNoteSizes.containsKey(beat)) {
+				return this.postNoteSizes.get_item(beat);
 			}
 			return 0;
 		},
 		setPreNoteSize: function(beat, size) {
-			this.get_preNoteSizes().set_item(beat, size);
+			this.preNoteSizes.set_item(beat, size);
 		},
 		setOnNoteSize: function(beat, size) {
-			this.get_onNoteSizes().set_item(beat, size);
+			this.onNoteSizes.set_item(beat, size);
 		},
 		setPostNoteSize: function(beat, size) {
-			this.get_postNoteSizes().set_item(beat, size);
+			this.postNoteSizes.set_item(beat, size);
 		}
 	});
 	ss.initClass($AlphaTab_Rendering_Staves_Stave, $asm, {
-		get_staveTrackGroup: function() {
-			return this.$1$StaveTrackGroupField;
-		},
-		set_staveTrackGroup: function(value) {
-			this.$1$StaveTrackGroupField = value;
-		},
-		get_staveGroup: function() {
-			return this.$1$StaveGroupField;
-		},
-		set_staveGroup: function(value) {
-			this.$1$StaveGroupField = value;
-		},
-		get_barRenderers: function() {
-			return this.$1$BarRenderersField;
-		},
-		set_barRenderers: function(value) {
-			this.$1$BarRenderersField = value;
-		},
-		get_x: function() {
-			return this.$1$XField;
-		},
-		set_x: function(value) {
-			this.$1$XField = value;
-		},
-		get_y: function() {
-			return this.$1$YField;
-		},
-		set_y: function(value) {
-			this.$1$YField = value;
-		},
-		get_height: function() {
-			return this.$1$HeightField;
-		},
-		set_height: function(value) {
-			this.$1$HeightField = value;
-		},
-		get_index: function() {
-			return this.$1$IndexField;
-		},
-		set_index: function(value) {
-			this.$1$IndexField = value;
-		},
-		get_staveTop: function() {
-			return this.$1$StaveTopField;
-		},
-		set_staveTop: function(value) {
-			this.$1$StaveTopField = value;
-		},
-		get_topSpacing: function() {
-			return this.$1$TopSpacingField;
-		},
-		set_topSpacing: function(value) {
-			this.$1$TopSpacingField = value;
-		},
-		get_bottomSpacing: function() {
-			return this.$1$BottomSpacingField;
-		},
-		set_bottomSpacing: function(value) {
-			this.$1$BottomSpacingField = value;
-		},
-		get_staveBottom: function() {
-			return this.$1$StaveBottomField;
-		},
-		set_staveBottom: function(value) {
-			this.$1$StaveBottomField = value;
-		},
-		get_isFirstInAccolade: function() {
-			return this.$1$IsFirstInAccoladeField;
-		},
-		set_isFirstInAccolade: function(value) {
-			this.$1$IsFirstInAccoladeField = value;
-		},
-		get_isLastInAccolade: function() {
-			return this.$1$IsLastInAccoladeField;
-		},
-		set_isLastInAccolade: function(value) {
-			this.$1$IsLastInAccoladeField = value;
-		},
 		get_isInAccolade: function() {
-			return this.$_factory.get_isInAccolade();
+			return this.$_factory.isInAccolade;
 		},
 		registerStaveTop: function(offset) {
-			this.set_staveTop(offset);
+			this.staveTop = offset;
 		},
 		registerStaveBottom: function(offset) {
-			this.set_staveBottom(offset);
+			this.staveBottom = offset;
 		},
 		addBar: function(bar) {
 			var renderer = this.$_factory.create(bar);
-			renderer.set_stave(this);
-			renderer.set_index(this.get_barRenderers().length);
+			renderer.stave = this;
+			renderer.index = this.barRenderers.length;
 			renderer.doLayout();
-			ss.add(this.get_barRenderers(), renderer);
+			ss.add(this.barRenderers, renderer);
 		},
 		revertLastBar: function() {
-			ss.removeAt(this.get_barRenderers(), this.get_barRenderers().length - 1);
+			ss.removeAt(this.barRenderers, this.barRenderers.length - 1);
 		},
 		applyBarSpacing: function(spacing) {
-			var $t1 = this.get_barRenderers();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var b = $t1[$t2];
+			for (var $t1 = 0; $t1 < this.barRenderers.length; $t1++) {
+				var b = this.barRenderers[$t1];
 				b.applyBarSpacing(spacing);
 			}
 		},
 		get_topOverflow: function() {
 			var m = 0;
-			var $t1 = this.get_barRenderers();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var r = $t1[$t2];
-				if (r.get_topOverflow() > m) {
-					m = r.get_topOverflow();
+			for (var $t1 = 0; $t1 < this.barRenderers.length; $t1++) {
+				var r = this.barRenderers[$t1];
+				if (r.topOverflow > m) {
+					m = r.topOverflow;
 				}
 			}
 			return m;
 		},
 		get_bottomOverflow: function() {
 			var m = 0;
-			var $t1 = this.get_barRenderers();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var r = $t1[$t2];
-				if (r.get_bottomOverflow() > m) {
-					m = r.get_bottomOverflow();
+			for (var $t1 = 0; $t1 < this.barRenderers.length; $t1++) {
+				var r = this.barRenderers[$t1];
+				if (r.bottomOverflow > m) {
+					m = r.bottomOverflow;
 				}
 			}
 			return m;
 		},
 		finalizeStave: function(layout) {
 			var x = 0;
-			this.set_height(0);
+			this.height = 0;
 			var topOverflow = this.get_topOverflow();
 			var bottomOverflow = this.get_bottomOverflow();
 			var isEmpty = true;
-			for (var i = 0; i < this.get_barRenderers().length; i++) {
-				this.get_barRenderers()[i].set_x(x);
-				this.get_barRenderers()[i].set_y(this.get_topSpacing() + topOverflow);
-				this.set_height(Math.max(this.get_height(), this.get_barRenderers()[i].get_height()));
-				this.get_barRenderers()[i].finalizeRenderer(layout);
-				x += this.get_barRenderers()[i].get_width();
-				if (!this.get_barRenderers()[i].get_isEmpty()) {
+			for (var i = 0; i < this.barRenderers.length; i++) {
+				this.barRenderers[i].x = x;
+				this.barRenderers[i].y = this.topSpacing + topOverflow;
+				this.height = Math.max(this.height, this.barRenderers[i].height);
+				this.barRenderers[i].finalizeRenderer(layout);
+				x += this.barRenderers[i].width;
+				if (!this.barRenderers[i].isEmpty) {
 					isEmpty = false;
 				}
 			}
 			if (!isEmpty) {
-				this.set_height(this.get_height() + (this.get_topSpacing() + topOverflow + bottomOverflow + this.get_bottomSpacing()));
+				this.height += this.topSpacing + topOverflow + bottomOverflow + this.bottomSpacing;
 			}
 			else {
-				this.set_height(0);
+				this.height = 0;
 			}
 		},
 		paint: function(cx, cy, canvas) {
-			if (this.get_height() === 0) {
+			if (this.height === 0) {
 				return;
 			}
-			var $t1 = this.get_barRenderers();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var r = $t1[$t2];
-				r.paint(cx + this.get_x(), cy + this.get_y(), canvas);
+			for (var $t1 = 0; $t1 < this.barRenderers.length; $t1++) {
+				var r = this.barRenderers[$t1];
+				r.paint(cx + this.x, cy + this.y, canvas);
 			}
 		}
 	});
 	ss.initClass($AlphaTab_Rendering_Staves_StaveGroup, $asm, {
-		get_x: function() {
-			return this.$1$XField;
-		},
-		set_x: function(value) {
-			this.$1$XField = value;
-		},
-		get_y: function() {
-			return this.$1$YField;
-		},
-		set_y: function(value) {
-			this.$1$YField = value;
-		},
-		get_index: function() {
-			return this.$1$IndexField;
-		},
-		set_index: function(value) {
-			this.$1$IndexField = value;
-		},
-		get_accoladeSpacing: function() {
-			return this.$1$AccoladeSpacingField;
-		},
-		set_accoladeSpacing: function(value) {
-			this.$1$AccoladeSpacingField = value;
-		},
-		get_isFull: function() {
-			return this.$1$IsFullField;
-		},
-		set_isFull: function(value) {
-			this.$1$IsFullField = value;
-		},
-		get_width: function() {
-			return this.$1$WidthField;
-		},
-		set_width: function(value) {
-			this.$1$WidthField = value;
-		},
-		get_masterBars: function() {
-			return this.$1$MasterBarsField;
-		},
-		set_masterBars: function(value) {
-			this.$1$MasterBarsField = value;
-		},
-		get_staves: function() {
-			return this.$1$StavesField;
-		},
-		set_staves: function(value) {
-			this.$1$StavesField = value;
-		},
-		get_layout: function() {
-			return this.$1$LayoutField;
-		},
-		set_layout: function(value) {
-			this.$1$LayoutField = value;
-		},
-		get_helpers: function() {
-			return this.$1$HelpersField;
-		},
-		set_helpers: function(value) {
-			this.$1$HelpersField = value;
-		},
 		get_lastBarIndex: function() {
-			return this.get_masterBars()[this.get_masterBars().length - 1].get_index();
+			return this.masterBars[this.masterBars.length - 1].index;
 		},
 		addBars: function(tracks, barIndex) {
 			if (tracks.length === 0) {
 				return;
 			}
-			var score = tracks[0].get_score();
-			var masterBar = score.get_masterBars()[barIndex];
-			ss.add(this.get_masterBars(), masterBar);
-			this.get_helpers().buildHelpers(tracks, barIndex);
-			if (!this.$_accoladeSpacingCalculated && this.get_index() === 0) {
+			var score = tracks[0].score;
+			var masterBar = score.masterBars[barIndex];
+			ss.add(this.masterBars, masterBar);
+			this.helpers.buildHelpers(tracks, barIndex);
+			if (!this.$_accoladeSpacingCalculated && this.index === 0) {
 				this.$_accoladeSpacingCalculated = true;
-				var canvas = this.get_layout().get_renderer().get_canvas();
-				var res = this.get_layout().get_renderer().get_renderingResources().get_effectFont();
+				var canvas = this.layout.renderer.canvas;
+				var res = this.layout.renderer.renderingResources.effectFont;
 				canvas.set_font(res);
 				for (var $t1 = 0; $t1 < tracks.length; $t1++) {
 					var t = tracks[$t1];
-					this.set_accoladeSpacing(ss.Int32.trunc(Math.max(this.get_accoladeSpacing(), canvas.measureText(t.get_shortName()))));
+					this.accoladeSpacing = ss.Int32.trunc(Math.max(this.accoladeSpacing, canvas.measureText(t.shortName)));
 				}
-				this.set_accoladeSpacing(this.get_accoladeSpacing() + 20);
-				this.set_width(this.get_width() + this.get_accoladeSpacing());
+				this.accoladeSpacing += 20;
+				this.width += this.accoladeSpacing;
 			}
 			// add renderers
 			var maxSizes = new $AlphaTab_Rendering_Staves_BarSizeInfo();
-			var $t2 = this.get_staves();
-			for (var $t3 = 0; $t3 < $t2.length; $t3++) {
-				var g = $t2[$t3];
-				var $t4 = g.get_staves();
-				for (var $t5 = 0; $t5 < $t4.length; $t5++) {
-					var s = $t4[$t5];
-					s.addBar(g.get_track().get_bars()[barIndex]);
-					s.get_barRenderers()[s.get_barRenderers().length - 1].registerMaxSizes(maxSizes);
+			for (var $t2 = 0; $t2 < this.staves.length; $t2++) {
+				var g = this.staves[$t2];
+				for (var $t3 = 0; $t3 < g.staves.length; $t3++) {
+					var s = g.staves[$t3];
+					s.addBar(g.track.bars[barIndex]);
+					s.barRenderers[s.barRenderers.length - 1].registerMaxSizes(maxSizes);
 				}
 			}
 			// ensure same widths of new renderer
 			var realWidth = 0;
-			for (var $t6 = 0; $t6 < this.$_allStaves.length; $t6++) {
-				var s1 = this.$_allStaves[$t6];
-				s1.get_barRenderers()[s1.get_barRenderers().length - 1].applySizes(maxSizes);
-				if (s1.get_barRenderers()[s1.get_barRenderers().length - 1].get_width() > realWidth) {
-					realWidth = s1.get_barRenderers()[s1.get_barRenderers().length - 1].get_width();
+			for (var $t4 = 0; $t4 < this.$_allStaves.length; $t4++) {
+				var s1 = this.$_allStaves[$t4];
+				s1.barRenderers[s1.barRenderers.length - 1].applySizes(maxSizes);
+				if (s1.barRenderers[s1.barRenderers.length - 1].width > realWidth) {
+					realWidth = s1.barRenderers[s1.barRenderers.length - 1].width;
 				}
 			}
-			this.set_width(this.get_width() + realWidth);
+			this.width += realWidth;
 		},
 		$getStaveTrackGroup: function(track) {
-			var $t1 = this.get_staves();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var g = $t1[$t2];
-				if (ss.referenceEquals(g.get_track(), track)) {
+			for (var $t1 = 0; $t1 < this.staves.length; $t1++) {
+				var g = this.staves[$t1];
+				if (ss.referenceEquals(g.track, track)) {
 					return g;
 				}
 			}
@@ -15569,46 +13782,46 @@
 			var group = this.$getStaveTrackGroup(track);
 			if (ss.isNullOrUndefined(group)) {
 				group = new $AlphaTab_Rendering_Staves_StaveTrackGroup(this, track);
-				ss.add(this.get_staves(), group);
+				ss.add(this.staves, group);
 			}
-			stave.set_staveTrackGroup(group);
-			stave.set_staveGroup(this);
-			stave.set_index(this.$_allStaves.length);
+			stave.staveTrackGroup = group;
+			stave.staveGroup = this;
+			stave.index = this.$_allStaves.length;
 			ss.add(this.$_allStaves, stave);
-			ss.add(group.get_staves(), stave);
+			ss.add(group.staves, stave);
 			if (stave.get_isInAccolade()) {
 				if (ss.isNullOrUndefined(this.$_firstStaveInAccolade)) {
 					this.$_firstStaveInAccolade = stave;
-					stave.set_isFirstInAccolade(true);
+					stave.isFirstInAccolade = true;
 				}
-				if (ss.isNullOrUndefined(group.get_firstStaveInAccolade())) {
-					group.set_firstStaveInAccolade(stave);
+				if (ss.isNullOrUndefined(group.firstStaveInAccolade)) {
+					group.firstStaveInAccolade = stave;
 				}
 				if (ss.isNullOrUndefined(this.$_lastStaveInAccolade)) {
 					this.$_lastStaveInAccolade = stave;
-					stave.set_isLastInAccolade(true);
+					stave.isLastInAccolade = true;
 				}
 				if (ss.isValue(this.$_lastStaveInAccolade)) {
-					this.$_lastStaveInAccolade.set_isLastInAccolade(false);
+					this.$_lastStaveInAccolade.isLastInAccolade = false;
 				}
 				this.$_lastStaveInAccolade = stave;
-				this.$_lastStaveInAccolade.set_isLastInAccolade(true);
-				group.set_lastStaveInAccolade(stave);
+				this.$_lastStaveInAccolade.isLastInAccolade = true;
+				group.lastStaveInAccolade = stave;
 			}
 		},
 		get_height: function() {
-			return this.$_allStaves[this.$_allStaves.length - 1].get_y() + this.$_allStaves[this.$_allStaves.length - 1].get_height();
+			return this.$_allStaves[this.$_allStaves.length - 1].y + this.$_allStaves[this.$_allStaves.length - 1].height;
 		},
 		revertLastBar: function() {
-			if (this.get_masterBars().length > 1) {
-				ss.removeAt(this.get_masterBars(), this.get_masterBars().length - 1);
+			if (this.masterBars.length > 1) {
+				ss.removeAt(this.masterBars, this.masterBars.length - 1);
 				var w = 0;
 				for (var $t1 = 0; $t1 < this.$_allStaves.length; $t1++) {
 					var s = this.$_allStaves[$t1];
-					w = Math.max(w, s.get_barRenderers()[s.get_barRenderers().length - 1].get_width());
+					w = Math.max(w, s.barRenderers[s.barRenderers.length - 1].width);
 					s.revertLastBar();
 				}
-				this.set_width(this.get_width() - w);
+				this.width -= w;
 			}
 		},
 		applyBarSpacing: function(spacing) {
@@ -15616,15 +13829,15 @@
 				var s = this.$_allStaves[$t1];
 				s.applyBarSpacing(spacing);
 			}
-			this.set_width(this.get_width() + this.get_masterBars().length * spacing);
+			this.width += this.masterBars.length * spacing;
 		},
 		paint: function(cx, cy, canvas) {
 			for (var $t1 = 0; $t1 < this.$_allStaves.length; $t1++) {
 				var s = this.$_allStaves[$t1];
-				s.paint(cx + this.get_x(), cy + this.get_y(), canvas);
+				s.paint(cx + this.x, cy + this.y, canvas);
 			}
-			var res = this.get_layout().get_renderer().get_renderingResources();
-			if (this.get_staves().length > 0) {
+			var res = this.layout.renderer.renderingResources;
+			if (this.staves.length > 0) {
 				//
 				// Draw start grouping
 				// 
@@ -15632,10 +13845,10 @@
 					//
 					// draw grouping line for all staves
 					//
-					var firstStart = cy + this.get_y() + this.$_firstStaveInAccolade.get_y() + this.$_firstStaveInAccolade.get_staveTop() + this.$_firstStaveInAccolade.get_topSpacing() + this.$_firstStaveInAccolade.get_topOverflow();
-					var lastEnd = cy + this.get_y() + this.$_lastStaveInAccolade.get_y() + this.$_lastStaveInAccolade.get_topSpacing() + this.$_lastStaveInAccolade.get_topOverflow() + this.$_lastStaveInAccolade.get_staveBottom();
-					var acooladeX = cx + this.get_x() + this.$_firstStaveInAccolade.get_x();
-					canvas.set_color(res.get_barSeperatorColor());
+					var firstStart = cy + this.y + this.$_firstStaveInAccolade.y + this.$_firstStaveInAccolade.staveTop + this.$_firstStaveInAccolade.topSpacing + this.$_firstStaveInAccolade.get_topOverflow();
+					var lastEnd = cy + this.y + this.$_lastStaveInAccolade.y + this.$_lastStaveInAccolade.topSpacing + this.$_lastStaveInAccolade.get_topOverflow() + this.$_lastStaveInAccolade.staveBottom;
+					var acooladeX = cx + this.x + this.$_firstStaveInAccolade.x;
+					canvas.set_color(res.barSeperatorColor);
 					canvas.beginPath();
 					canvas.moveTo(acooladeX, firstStart);
 					canvas.lineTo(acooladeX, lastEnd);
@@ -15644,20 +13857,19 @@
 				//
 				// Draw accolade for each track group
 				// 
-				canvas.set_font(res.get_effectFont());
-				var $t2 = this.get_staves();
-				for (var $t3 = 0; $t3 < $t2.length; $t3++) {
-					var g = $t2[$t3];
-					var firstStart1 = cy + this.get_y() + g.get_firstStaveInAccolade().get_y() + g.get_firstStaveInAccolade().get_staveTop() + g.get_firstStaveInAccolade().get_topSpacing() + g.get_firstStaveInAccolade().get_topOverflow();
-					var lastEnd1 = cy + this.get_y() + g.get_lastStaveInAccolade().get_y() + g.get_lastStaveInAccolade().get_topSpacing() + g.get_lastStaveInAccolade().get_topOverflow() + g.get_lastStaveInAccolade().get_staveBottom();
-					var acooladeX1 = cx + this.get_x() + g.get_firstStaveInAccolade().get_x();
-					var barSize = ss.Int32.trunc(3 * this.get_layout().get_renderer().get_settings().get_scale());
+				canvas.set_font(res.effectFont);
+				for (var $t2 = 0; $t2 < this.staves.length; $t2++) {
+					var g = this.staves[$t2];
+					var firstStart1 = cy + this.y + g.firstStaveInAccolade.y + g.firstStaveInAccolade.staveTop + g.firstStaveInAccolade.topSpacing + g.firstStaveInAccolade.get_topOverflow();
+					var lastEnd1 = cy + this.y + g.lastStaveInAccolade.y + g.lastStaveInAccolade.topSpacing + g.lastStaveInAccolade.get_topOverflow() + g.lastStaveInAccolade.staveBottom;
+					var acooladeX1 = cx + this.x + g.firstStaveInAccolade.x;
+					var barSize = ss.Int32.trunc(3 * this.layout.renderer.settings.scale);
 					var barOffset = barSize;
 					var accoladeStart = firstStart1 - barSize * 4;
 					var accoladeEnd = lastEnd1 + barSize * 4;
 					// text
-					if (this.get_index() === 0) {
-						canvas.fillText(g.get_track().get_shortName(), cx + this.get_x() + 10 * this.get_layout().get_scale(), firstStart1);
+					if (this.index === 0) {
+						canvas.fillText(g.track.shortName, cx + this.x + 10 * this.layout.get_scale(), firstStart1);
 					}
 					// rect
 					canvas.fillRect(acooladeX1 - barOffset - barSize, accoladeStart, barSize, accoladeEnd - accoladeStart);
@@ -15683,63 +13895,31 @@
 		finalizeGroup: function(scoreLayout) {
 			var currentY = 0;
 			for (var i = 0; i < this.$_allStaves.length; i++) {
-				this.$_allStaves[i].set_x(this.get_accoladeSpacing());
-				this.$_allStaves[i].set_y(ss.Int32.trunc(currentY));
+				this.$_allStaves[i].x = this.accoladeSpacing;
+				this.$_allStaves[i].y = ss.Int32.trunc(currentY);
 				this.$_allStaves[i].finalizeStave(scoreLayout);
-				currentY += this.$_allStaves[i].get_height();
+				currentY += this.$_allStaves[i].height;
 			}
 		},
 		buildBoundingsLookup: function(lookup) {
-			var visualTop = this.get_y() + this.$_firstStaveInAccolade.get_y();
-			var visualBottom = this.get_y() + this.$_lastStaveInAccolade.get_y() + this.$_lastStaveInAccolade.get_height();
-			var realTop = this.get_y() + this.$_allStaves[0].get_y();
-			var realBottom = this.get_y() + this.$_allStaves[this.$_allStaves.length - 1].get_y() + this.$_allStaves[this.$_allStaves.length - 1].get_height();
+			var visualTop = this.y + this.$_firstStaveInAccolade.y;
+			var visualBottom = this.y + this.$_lastStaveInAccolade.y + this.$_lastStaveInAccolade.height;
+			var realTop = this.y + this.$_allStaves[0].y;
+			var realBottom = this.y + this.$_allStaves[this.$_allStaves.length - 1].y + this.$_allStaves[this.$_allStaves.length - 1].height;
 			var visualHeight = visualBottom - visualTop;
 			var realHeight = realBottom - realTop;
-			var $t1 = this.$_firstStaveInAccolade.get_barRenderers();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var b = $t1[$t2];
-				b.buildBoundingsLookup(lookup, visualTop, visualHeight, realTop, realHeight, this.get_x());
+			for (var $t1 = 0; $t1 < this.$_firstStaveInAccolade.barRenderers.length; $t1++) {
+				var b = this.$_firstStaveInAccolade.barRenderers[$t1];
+				b.buildBoundingsLookup(lookup, visualTop, visualHeight, realTop, realHeight, this.x);
 			}
 		}
 	});
-	ss.initClass($AlphaTab_Rendering_Staves_StaveTrackGroup, $asm, {
-		get_track: function() {
-			return this.$1$TrackField;
-		},
-		set_track: function(value) {
-			this.$1$TrackField = value;
-		},
-		get_staveGroup: function() {
-			return this.$1$StaveGroupField;
-		},
-		set_staveGroup: function(value) {
-			this.$1$StaveGroupField = value;
-		},
-		get_staves: function() {
-			return this.$1$StavesField;
-		},
-		set_staves: function(value) {
-			this.$1$StavesField = value;
-		},
-		get_firstStaveInAccolade: function() {
-			return this.$1$FirstStaveInAccoladeField;
-		},
-		set_firstStaveInAccolade: function(value) {
-			this.$1$FirstStaveInAccoladeField = value;
-		},
-		get_lastStaveInAccolade: function() {
-			return this.$1$LastStaveInAccoladeField;
-		},
-		set_lastStaveInAccolade: function(value) {
-			this.$1$LastStaveInAccoladeField = value;
-		}
-	});
+	ss.initClass($AlphaTab_Rendering_Staves_StaveTrackGroup, $asm, {});
 	ss.initClass($AlphaTab_Rendering_Utils_AccidentalHelper, $asm, {
 		applyAccidental: function(note, noteLine) {
 			// TODO: we need to check for note.swapAccidentals 
 			var noteValue = note.get_realValue();
-			var ks = note.get_beat().get_voice().get_bar().get_masterBar().get_keySignature();
+			var ks = note.beat.voice.bar.get_masterBar().keySignature;
 			var ksi = ks + 7;
 			var index = noteValue % 12;
 			//var octave = (noteValue / 12);
@@ -15771,91 +13951,30 @@
 		}
 	});
 	ss.initClass($AlphaTab_Rendering_Utils_BarBoundings, $asm, {
-		get_isFirstOfLine: function() {
-			return this.$1$IsFirstOfLineField;
-		},
-		set_isFirstOfLine: function(value) {
-			this.$1$IsFirstOfLineField = value;
-		},
-		get_isLastOfLine: function() {
-			return this.$1$IsLastOfLineField;
-		},
-		set_isLastOfLine: function(value) {
-			this.$1$IsLastOfLineField = value;
-		},
-		get_bar: function() {
-			return this.$1$BarField;
-		},
-		set_bar: function(value) {
-			this.$1$BarField = value;
-		},
-		get_bounds: function() {
-			return this.$1$BoundsField;
-		},
-		set_bounds: function(value) {
-			this.$1$BoundsField = value;
-		},
-		get_visualBounds: function() {
-			return this.$1$VisualBoundsField;
-		},
-		set_visualBounds: function(value) {
-			this.$1$VisualBoundsField = value;
-		},
-		get_beats: function() {
-			return this.$1$BeatsField;
-		},
-		set_beats: function(value) {
-			this.$1$BeatsField = value;
-		},
 		findBeatAtPos: function(x) {
 			var index = 0;
 			// move right as long we didn't pass our x-pos
-			while (index < this.get_beats().length - 1 && x > this.get_beats()[index].get_bounds().get_x() + this.get_beats()[index].get_bounds().get_w()) {
+			while (index < this.beats.length - 1 && x > this.beats[index].bounds.x + this.beats[index].bounds.w) {
 				index++;
 			}
-			return this.get_beats()[index].get_beat();
+			return this.beats[index].beat;
 		}
 	});
-	ss.initClass($AlphaTab_Rendering_Utils_BarHelpers, $asm, {
-		get_beamHelpers: function() {
-			return this.$1$BeamHelpersField;
-		},
-		set_beamHelpers: function(value) {
-			this.$1$BeamHelpersField = value;
-		},
-		get_beamHelperLookup: function() {
-			return this.$1$BeamHelperLookupField;
-		},
-		set_beamHelperLookup: function(value) {
-			this.$1$BeamHelperLookupField = value;
-		},
-		get_tupletHelpers: function() {
-			return this.$1$TupletHelpersField;
-		},
-		set_tupletHelpers: function(value) {
-			this.$1$TupletHelpersField = value;
-		}
-	});
+	ss.initClass($AlphaTab_Rendering_Utils_BarHelpers, $asm, {});
 	ss.initClass($AlphaTab_Rendering_Utils_BarHelpersGroup, $asm, {
-		get_helpers: function() {
-			return this.$1$HelpersField;
-		},
-		set_helpers: function(value) {
-			this.$1$HelpersField = value;
-		},
 		buildHelpers: function(tracks, barIndex) {
 			for (var $t1 = 0; $t1 < tracks.length; $t1++) {
 				var t = tracks[$t1];
 				var h;
-				if (!this.get_helpers().containsKey(t.get_index())) {
+				if (!this.helpers.containsKey(t.index)) {
 					h = new (ss.makeGenericType(ss.Dictionary$2, [ss.Int32, $AlphaTab_Rendering_Utils_BarHelpers]))();
-					this.get_helpers().set_item(t.get_index(), h);
+					this.helpers.set_item(t.index, h);
 				}
 				else {
-					h = this.get_helpers().get_item(t.get_index());
+					h = this.helpers.get_item(t.index);
 				}
 				if (!h.containsKey(barIndex)) {
-					h.set_item(barIndex, new $AlphaTab_Rendering_Utils_BarHelpers(t.get_bars()[barIndex]));
+					h.set_item(barIndex, new $AlphaTab_Rendering_Utils_BarHelpers(t.bars[barIndex]));
 				}
 			}
 		}
@@ -15863,62 +13982,8 @@
 	ss.initEnum($AlphaTab_Rendering_Utils_BeamBarType, $asm, { full: 0, partLeft: 1, partRight: 2 });
 	ss.initEnum($AlphaTab_Rendering_Utils_BeamDirection, $asm, { up: 0, down: 1 });
 	ss.initClass($AlphaTab_Rendering_Utils_BeamingHelper, $asm, {
-		get_voice: function() {
-			return this.$1$VoiceField;
-		},
-		set_voice: function(value) {
-			this.$1$VoiceField = value;
-		},
-		get_beats: function() {
-			return this.$1$BeatsField;
-		},
-		set_beats: function(value) {
-			this.$1$BeatsField = value;
-		},
-		get_maxDuration: function() {
-			return this.$1$MaxDurationField;
-		},
-		set_maxDuration: function(value) {
-			this.$1$MaxDurationField = value;
-		},
-		get_firstMinNote: function() {
-			return this.$1$FirstMinNoteField;
-		},
-		set_firstMinNote: function(value) {
-			this.$1$FirstMinNoteField = value;
-		},
-		get_firstMaxNote: function() {
-			return this.$1$FirstMaxNoteField;
-		},
-		set_firstMaxNote: function(value) {
-			this.$1$FirstMaxNoteField = value;
-		},
-		get_lastMinNote: function() {
-			return this.$1$LastMinNoteField;
-		},
-		set_lastMinNote: function(value) {
-			this.$1$LastMinNoteField = value;
-		},
-		get_lastMaxNote: function() {
-			return this.$1$LastMaxNoteField;
-		},
-		set_lastMaxNote: function(value) {
-			this.$1$LastMaxNoteField = value;
-		},
-		get_minNote: function() {
-			return this.$1$MinNoteField;
-		},
-		set_minNote: function(value) {
-			this.$1$MinNoteField = value;
-		},
-		get_maxNote: function() {
-			return this.$1$MaxNoteField;
-		},
-		set_maxNote: function(value) {
-			this.$1$MaxNoteField = value;
-		},
 		$getValue: function(n) {
-			if (this.$_track.get_isPercussion()) {
+			if (this.$_track.isPercussion) {
 				return $AlphaTab_Rendering_Utils_PercussionMapper.mapValue(n);
 			}
 			else {
@@ -15928,33 +13993,33 @@
 		getBeatLineX: function(beat) {
 			if (this.hasBeatLineX(beat)) {
 				if (this.get_direction() === 0) {
-					return this.$_beatLineXPositions.get_item(beat.get_index()).get_up();
+					return this.$_beatLineXPositions.get_item(beat.index).up;
 				}
-				return this.$_beatLineXPositions.get_item(beat.get_index()).get_down();
+				return this.$_beatLineXPositions.get_item(beat.index).down;
 			}
 			return 0;
 		},
 		hasBeatLineX: function(beat) {
-			return this.$_beatLineXPositions.containsKey(beat.get_index());
+			return this.$_beatLineXPositions.containsKey(beat.index);
 		},
 		registerBeatLineX: function(beat, up, down) {
-			this.$_beatLineXPositions.set_item(beat.get_index(), new $AlphaTab_Rendering_Utils_BeatLinePositions(up, down));
+			this.$_beatLineXPositions.set_item(beat.index, new $AlphaTab_Rendering_Utils_BeatLinePositions(up, down));
 		},
 		get_direction: function() {
 			// multivoice handling
 			// the average key is used for determination
 			//      key lowerequal than middle line -> up
 			//      key higher than middle line -> down
-			var avg = ss.Int32.div(this.$getValue(this.get_maxNote()) + this.$getValue(this.get_minNote()), 2);
-			return ((avg <= $AlphaTab_Rendering_Utils_BeamingHelper.$scoreMiddleKeys[this.$_lastBeat.get_voice().get_bar().get_clef() - 1]) ? 0 : 1);
+			var avg = ss.Int32.div(this.$getValue(this.maxNote) + this.$getValue(this.minNote), 2);
+			return ((avg <= $AlphaTab_Rendering_Utils_BeamingHelper.$scoreMiddleKeys[this.$_lastBeat.voice.bar.clef - 1]) ? 0 : 1);
 		},
 		checkBeat: function(beat) {
-			if (ss.isNullOrUndefined(this.get_voice())) {
-				this.set_voice(beat.get_voice());
+			if (ss.isNullOrUndefined(this.voice)) {
+				this.voice = beat.voice;
 			}
 			// allow adding if there are no beats yet
 			var add = false;
-			if (this.get_beats().length === 0) {
+			if (this.beats.length === 0) {
 				add = true;
 			}
 			else if ($AlphaTab_Rendering_Utils_BeamingHelper.$canJoin(this.$_lastBeat, beat)) {
@@ -15962,11 +14027,11 @@
 			}
 			if (add) {
 				this.$_lastBeat = beat;
-				ss.add(this.get_beats(), beat);
+				ss.add(this.beats, beat);
 				this.$checkNote(beat.get_minNote());
 				this.$checkNote(beat.get_maxNote());
-				if (this.get_maxDuration() < beat.get_duration()) {
-					this.set_maxDuration(beat.get_duration());
+				if (this.maxDuration < beat.duration) {
+					this.maxDuration = beat.duration;
 				}
 			}
 			return add;
@@ -15974,72 +14039,72 @@
 		$checkNote: function(note) {
 			var value = this.$getValue(note);
 			// detect the smallest note which is at the beginning of this group
-			if (ss.isNullOrUndefined(this.get_firstMinNote()) || note.get_beat().get_start() < this.get_firstMinNote().get_beat().get_start()) {
-				this.set_firstMinNote(note);
+			if (ss.isNullOrUndefined(this.firstMinNote) || note.beat.start < this.firstMinNote.beat.start) {
+				this.firstMinNote = note;
 			}
-			else if (note.get_beat().get_start() === this.get_firstMinNote().get_beat().get_start()) {
-				if (value < this.$getValue(this.get_firstMinNote())) {
-					this.set_firstMinNote(note);
+			else if (note.beat.start === this.firstMinNote.beat.start) {
+				if (value < this.$getValue(this.firstMinNote)) {
+					this.firstMinNote = note;
 				}
 			}
 			// detect the biggest note which is at the beginning of this group
-			if (ss.isNullOrUndefined(this.get_firstMaxNote()) || note.get_beat().get_start() < this.get_firstMaxNote().get_beat().get_start()) {
-				this.set_firstMaxNote(note);
+			if (ss.isNullOrUndefined(this.firstMaxNote) || note.beat.start < this.firstMaxNote.beat.start) {
+				this.firstMaxNote = note;
 			}
-			else if (note.get_beat().get_start() === this.get_firstMaxNote().get_beat().get_start()) {
-				if (value > this.$getValue(this.get_firstMaxNote())) {
-					this.set_firstMaxNote(note);
+			else if (note.beat.start === this.firstMaxNote.beat.start) {
+				if (value > this.$getValue(this.firstMaxNote)) {
+					this.firstMaxNote = note;
 				}
 			}
 			// detect the smallest note which is at the end of this group
-			if (ss.isNullOrUndefined(this.get_lastMinNote()) || note.get_beat().get_start() > this.get_lastMinNote().get_beat().get_start()) {
-				this.set_lastMinNote(note);
+			if (ss.isNullOrUndefined(this.lastMinNote) || note.beat.start > this.lastMinNote.beat.start) {
+				this.lastMinNote = note;
 			}
-			else if (note.get_beat().get_start() === this.get_lastMinNote().get_beat().get_start()) {
-				if (value < this.$getValue(this.get_lastMinNote())) {
-					this.set_lastMinNote(note);
+			else if (note.beat.start === this.lastMinNote.beat.start) {
+				if (value < this.$getValue(this.lastMinNote)) {
+					this.lastMinNote = note;
 				}
 			}
 			// detect the biggest note which is at the end of this group
-			if (ss.isNullOrUndefined(this.get_lastMaxNote()) || note.get_beat().get_start() > this.get_lastMaxNote().get_beat().get_start()) {
-				this.set_lastMaxNote(note);
+			if (ss.isNullOrUndefined(this.lastMaxNote) || note.beat.start > this.lastMaxNote.beat.start) {
+				this.lastMaxNote = note;
 			}
-			else if (note.get_beat().get_start() === this.get_lastMaxNote().get_beat().get_start()) {
-				if (value > this.$getValue(this.get_lastMaxNote())) {
-					this.set_lastMaxNote(note);
+			else if (note.beat.start === this.lastMaxNote.beat.start) {
+				if (value > this.$getValue(this.lastMaxNote)) {
+					this.lastMaxNote = note;
 				}
 			}
-			if (ss.isNullOrUndefined(this.get_maxNote()) || value > this.$getValue(this.get_maxNote())) {
-				this.set_maxNote(note);
+			if (ss.isNullOrUndefined(this.maxNote) || value > this.$getValue(this.maxNote)) {
+				this.maxNote = note;
 			}
-			if (ss.isNullOrUndefined(this.get_minNote()) || value < this.$getValue(this.get_minNote())) {
-				this.set_minNote(note);
+			if (ss.isNullOrUndefined(this.minNote) || value < this.$getValue(this.minNote)) {
+				this.minNote = note;
 			}
 		},
 		calculateBeamY: function(stemSize, xCorrection, xPosition, scale, yPosition) {
 			// create a line between the min and max note of the group
 			var direction = this.get_direction();
-			if (this.get_beats().length === 1) {
+			if (this.beats.length === 1) {
 				if (direction === 0) {
-					return yPosition(this.get_maxNote()) - stemSize;
+					return yPosition(this.maxNote) - stemSize;
 				}
-				return yPosition(this.get_minNote()) + stemSize;
+				return yPosition(this.minNote) + stemSize;
 			}
 			// we use the min/max notes to place the beam along their real position        
 			// we only want a maximum of 10 offset for their gradient
 			var maxDistance = 10 * scale;
 			// if the min note is not first or last, we can align notes directly to the position
 			// of the min note
-			if (direction === 1 && !ss.referenceEquals(this.get_minNote(), this.get_firstMinNote()) && !ss.referenceEquals(this.get_minNote(), this.get_lastMinNote())) {
-				return yPosition(this.get_minNote()) + stemSize;
+			if (direction === 1 && !ss.referenceEquals(this.minNote, this.firstMinNote) && !ss.referenceEquals(this.minNote, this.lastMinNote)) {
+				return yPosition(this.minNote) + stemSize;
 			}
-			if (direction === 0 && !ss.referenceEquals(this.get_maxNote(), this.get_firstMaxNote()) && !ss.referenceEquals(this.get_maxNote(), this.get_lastMaxNote())) {
-				return yPosition(this.get_maxNote()) - stemSize;
+			if (direction === 0 && !ss.referenceEquals(this.maxNote, this.firstMaxNote) && !ss.referenceEquals(this.maxNote, this.lastMaxNote)) {
+				return yPosition(this.maxNote) - stemSize;
 			}
-			var startX = this.getBeatLineX(this.get_firstMinNote().get_beat()) + xCorrection;
-			var startY = ((direction === 0) ? (yPosition(this.get_firstMaxNote()) - stemSize) : (yPosition(this.get_firstMinNote()) + stemSize));
-			var endX = this.getBeatLineX(this.get_lastMaxNote().get_beat()) + xCorrection;
-			var endY = ((direction === 0) ? (yPosition(this.get_lastMaxNote()) - stemSize) : (yPosition(this.get_lastMinNote()) + stemSize));
+			var startX = this.getBeatLineX(this.firstMinNote.beat) + xCorrection;
+			var startY = ((direction === 0) ? (yPosition(this.firstMaxNote) - stemSize) : (yPosition(this.firstMinNote) + stemSize));
+			var endX = this.getBeatLineX(this.lastMaxNote.beat) + xCorrection;
+			var endY = ((direction === 0) ? (yPosition(this.lastMaxNote) - stemSize) : (yPosition(this.lastMinNote) + stemSize));
 			// ensure the maxDistance
 			if (direction === 1 && startY > endY && startY - endY > maxDistance) {
 				endY = startY - maxDistance;
@@ -16058,63 +14123,25 @@
 			return ss.Int32.trunc((endY - startY) / (endX - startX) * (xPosition - startX) + startY);
 		}
 	});
-	ss.initClass($AlphaTab_Rendering_Utils_BeatBoundings, $asm, {
-		get_beat: function() {
-			return this.$1$BeatField;
-		},
-		set_beat: function(value) {
-			this.$1$BeatField = value;
-		},
-		get_bounds: function() {
-			return this.$1$BoundsField;
-		},
-		set_bounds: function(value) {
-			this.$1$BoundsField = value;
-		},
-		get_visualBounds: function() {
-			return this.$1$VisualBoundsField;
-		},
-		set_visualBounds: function(value) {
-			this.$1$VisualBoundsField = value;
-		}
-	});
-	ss.initClass($AlphaTab_Rendering_Utils_BeatLinePositions, $asm, {
-		get_up: function() {
-			return this.$1$UpField;
-		},
-		set_up: function(value) {
-			this.$1$UpField = value;
-		},
-		get_down: function() {
-			return this.$1$DownField;
-		},
-		set_down: function(value) {
-			this.$1$DownField = value;
-		}
-	});
+	ss.initClass($AlphaTab_Rendering_Utils_BeatBoundings, $asm, {});
+	ss.initClass($AlphaTab_Rendering_Utils_BeatLinePositions, $asm, {});
 	ss.initClass($AlphaTab_Rendering_Utils_BoundingsLookup, $asm, {
-		get_bars: function() {
-			return this.$1$BarsField;
-		},
-		set_bars: function(value) {
-			this.$1$BarsField = value;
-		},
 		getBeatAtPos: function(x, y) {
 			//
 			// find a bar which matches in y-axis
 			var bottom = 0;
-			var top = this.get_bars().length - 1;
+			var top = this.bars.length - 1;
 			var barIndex = -1;
 			while (bottom <= top) {
 				var middle = ss.Int32.div(top + bottom, 2);
-				var bar = this.get_bars()[middle];
+				var bar = this.bars[middle];
 				// found?
-				if (y >= bar.get_bounds().get_y() && y <= bar.get_bounds().get_y() + bar.get_bounds().get_h()) {
+				if (y >= bar.bounds.y && y <= bar.bounds.y + bar.bounds.h) {
 					barIndex = middle;
 					break;
 				}
 				// search in lower half 
-				if (y < bar.get_bounds().get_y()) {
+				if (y < bar.bounds.y) {
 					top = middle - 1;
 				}
 				else {
@@ -16127,80 +14154,37 @@
 			}
 			// 
 			// Find the matching bar in the row
-			var currentBar = this.get_bars()[barIndex];
+			var currentBar = this.bars[barIndex];
 			// clicked before bar
-			if (x < currentBar.get_bounds().get_x()) {
+			if (x < currentBar.bounds.x) {
 				// we move left till we either pass our x-position or are at the beginning of the line/score
-				while (barIndex > 0 && x < this.get_bars()[barIndex].get_bounds().get_x() && !this.get_bars()[barIndex].get_isFirstOfLine()) {
+				while (barIndex > 0 && x < this.bars[barIndex].bounds.x && !this.bars[barIndex].isFirstOfLine) {
 					barIndex--;
 				}
 			}
 			else {
 				// we move right till we either pass our our x-position or are at the end of the line/score
-				while (barIndex < this.get_bars().length - 1 && x > this.get_bars()[barIndex].get_bounds().get_x() + this.get_bars()[barIndex].get_bounds().get_w() && !this.get_bars()[barIndex].get_isLastOfLine()) {
+				while (barIndex < this.bars.length - 1 && x > this.bars[barIndex].bounds.x + this.bars[barIndex].bounds.w && !this.bars[barIndex].isLastOfLine) {
 					barIndex++;
 				}
 			}
 			// 
 			// Find the matching beat within the bar
-			return this.get_bars()[barIndex].findBeatAtPos(x);
+			return this.bars[barIndex].findBeatAtPos(x);
 		}
 	});
-	ss.initClass($AlphaTab_Rendering_Utils_Bounds, $asm, {
-		get_x: function() {
-			return this.$1$XField;
-		},
-		set_x: function(value) {
-			this.$1$XField = value;
-		},
-		get_y: function() {
-			return this.$1$YField;
-		},
-		set_y: function(value) {
-			this.$1$YField = value;
-		},
-		get_w: function() {
-			return this.$1$WField;
-		},
-		set_w: function(value) {
-			this.$1$WField = value;
-		},
-		get_h: function() {
-			return this.$1$HField;
-		},
-		set_h: function(value) {
-			this.$1$HField = value;
-		}
-	});
+	ss.initClass($AlphaTab_Rendering_Utils_Bounds, $asm, {});
 	ss.initClass($AlphaTab_Rendering_Utils_PercussionMapper, $asm, {});
 	ss.initClass($AlphaTab_Rendering_Utils_SvgPathParser, $asm, {
-		get_svg: function() {
-			return this.$1$SvgField;
-		},
-		set_svg: function(value) {
-			this.$1$SvgField = value;
-		},
-		get_lastCommand: function() {
-			return this.$1$LastCommandField;
-		},
-		set_lastCommand: function(value) {
-			this.$1$LastCommandField = value;
-		},
-		get_currentToken: function() {
-			return this.$1$CurrentTokenField;
-		},
-		set_currentToken: function(value) {
-			this.$1$CurrentTokenField = value;
-		},
 		reset: function() {
 			this.$_currentIndex = 0;
 			this.nextToken();
 		},
 		get_eof: function() {
-			return this.$_currentIndex >= this.get_svg().length;
+			return this.$_currentIndex >= this.svg.length;
 		},
 		getString: function() {
-			var t = this.get_currentToken();
+			var t = this.currentToken;
 			this.nextToken();
 			return t;
 		},
@@ -16208,19 +14192,19 @@
 			return parseInt(this.getString());
 		},
 		get_currentTokenIsNumber: function() {
-			return $AlphaTab_Rendering_Utils_SvgPathParser.$isStringNumber(this.get_currentToken(), true);
+			return $AlphaTab_Rendering_Utils_SvgPathParser.$isStringNumber(this.currentToken, true);
 		},
 		nextChar: function() {
 			if (this.get_eof()) {
 				return 0;
 			}
-			return this.get_svg().charCodeAt(this.$_currentIndex++);
+			return this.svg.charCodeAt(this.$_currentIndex++);
 		},
 		peekChar: function() {
 			if (this.get_eof()) {
 				return 0;
 			}
-			return this.get_svg().charCodeAt(this.$_currentIndex);
+			return this.svg.charCodeAt(this.$_currentIndex);
 		},
 		nextToken: function() {
 			var token = new ss.StringBuilder();
@@ -16244,45 +14228,27 @@
 					}
 				}
 				else {
-					this.set_lastCommand(token.toString());
+					this.lastCommand = token.toString();
 				}
 			}
-			this.set_currentToken(token.toString());
+			this.currentToken = token.toString();
 		}
 	});
 	ss.initClass($AlphaTab_Rendering_Utils_TupletHelper, $asm, {
-		get_beats: function() {
-			return this.$1$BeatsField;
-		},
-		set_beats: function(value) {
-			this.$1$BeatsField = value;
-		},
-		get_voiceIndex: function() {
-			return this.$1$VoiceIndexField;
-		},
-		set_voiceIndex: function(value) {
-			this.$1$VoiceIndexField = value;
-		},
-		get_tuplet: function() {
-			return this.$1$TupletField;
-		},
-		set_tuplet: function(value) {
-			this.$1$TupletField = value;
-		},
 		get_isFull: function() {
-			return this.get_beats().length === this.get_tuplet();
+			return this.beats.length === this.tuplet;
 		},
 		finish: function() {
 			this.$_isFinished = true;
 		},
 		check: function(beat) {
-			if (this.get_beats().length === 0) {
-				this.set_tuplet(beat.get_tupletNumerator());
+			if (this.beats.length === 0) {
+				this.tuplet = beat.tupletNumerator;
 			}
-			else if (beat.get_voice().get_index() !== this.get_voiceIndex() || beat.get_tupletNumerator() !== this.get_tuplet() || this.get_isFull() || this.$_isFinished) {
+			else if (beat.voice.index !== this.voiceIndex || beat.tupletNumerator !== this.tuplet || this.get_isFull() || this.$_isFinished) {
 				return false;
 			}
-			ss.add(this.get_beats(), beat);
+			ss.add(this.beats, beat);
 			return true;
 		}
 	});

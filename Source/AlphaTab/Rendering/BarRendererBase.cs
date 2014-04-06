@@ -1,4 +1,5 @@
-﻿using AlphaTab.Model;
+﻿using System.Runtime.CompilerServices;
+using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Rendering.Layout;
 using AlphaTab.Rendering.Staves;
@@ -11,17 +12,27 @@ namespace AlphaTab.Rendering
     /// </summary>
     public class BarRendererBase
     {
+        [IntrinsicProperty]
         public Stave Stave { get; set; }
+        [IntrinsicProperty]
         public int X { get; set; }
+        [IntrinsicProperty]
         public int Y { get; set; }
+        [IntrinsicProperty]
         public int Width { get; set; }
+        [IntrinsicProperty]
         public int Height { get; set; }
+        [IntrinsicProperty]
         public int Index { get; set; }
+        [IntrinsicProperty]
         public bool IsEmpty { get; set; }
 
+        [IntrinsicProperty]
         public int TopOverflow { get; set; }
+        [IntrinsicProperty]
         public int BottomOverflow { get; set; }
 
+        [IntrinsicProperty]
         public Bar Bar { get; set; }
 
         public BarRendererBase(Bar bar)

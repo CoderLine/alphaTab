@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace AlphaTab.Rendering.Utils
 {
@@ -9,8 +10,11 @@ namespace AlphaTab.Rendering.Utils
     {
         private int _currentIndex;
 
+        [IntrinsicProperty]
         public string Svg { get; set; }
+        [IntrinsicProperty]
         public string LastCommand { get; set; }
+        [IntrinsicProperty]
         public string CurrentToken { get; set; }
 
         public SvgPathParser(string svg)

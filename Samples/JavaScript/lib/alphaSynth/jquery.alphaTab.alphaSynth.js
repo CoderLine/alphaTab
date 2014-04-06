@@ -117,25 +117,25 @@
         var barCursor = $(this).data('barCursor');
         var beatCursor = $(this).data('beatCursor');
         
-        var barBoundings = cache.get_bars()[beat.get_voice().get_bar().get_index()];
-        var beatBoundings = barBoundings.get_beats()[beat.get_index()];
+        var barBoundings = cache.bars[beat.voice.bar.index];
+        var beatBoundings = barBoundings.beats[beat.index];
         barCursor.css({
-            top: barBoundings.get_visualBounds().get_y() + 'px', 
-            left: barBoundings.get_visualBounds().get_x() + 'px',
-            width: barBoundings.get_visualBounds().get_w() + 'px',
-            height: barBoundings.get_visualBounds().get_h() + 'px'
+            top: barBoundings.visualBounds.y + 'px', 
+            left: barBoundings.visualBounds.x + 'px',
+            width: barBoundings.visualBounds.w + 'px',
+            height: barBoundings.visualBounds.h + 'px'
         });
         beatCursor.css({
-            top: beatBoundings.get_visualBounds().get_y() + 'px', 
-            left: beatBoundings.get_visualBounds().get_x() + 'px',
+            top: beatBoundings.visualBounds.y + 'px', 
+            left: beatBoundings.visualBounds.x + 'px',
             width: context.cursorOptions.beatCursorWidth + 'px',
-            height: beatBoundings.get_visualBounds().get_h() + 'px'
+            height: beatBoundings.visualBounds.h + 'px'
         });
         
         if(context.cursorOptions.autoScroll)
         {
-            var padding = beatCursor.offset().top - beatBoundings.get_visualBounds().get_y();
-            var scrollTop = padding + beatBoundings.get_bounds().get_y() + context.cursorOptions.scrollOffset;
+            var padding = beatCursor.offset().top - beatBoundings.visualBounds.y;
+            var scrollTop = padding + beatBoundings.bounds.y + context.cursorOptions.scrollOffset;
             if(scrollTop != context.cursorOptions.lastScroll)
             {
                 context.cursorOptions.lastScroll = scrollTop;
@@ -218,7 +218,7 @@
                 var relY = e.pageY - parentOffset.top;
                 var beat = api.getBeatAtPos.apply(self, [relX, relY]);
                 api.playerCursorUpdateBeat.apply(self, [beat]);
-                synth.setPositionTick(beat.get_start());
+                synth.setPositionTick(beat.start);
             });
         }
     };

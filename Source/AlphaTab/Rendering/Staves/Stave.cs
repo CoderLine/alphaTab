@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Rendering.Layout;
@@ -12,15 +13,23 @@ namespace AlphaTab.Rendering.Staves
     /// </summary>
     public class Stave
     {
+        private BarRendererFactory _factory;
+
+        [IntrinsicProperty]
         public StaveTrackGroup StaveTrackGroup { get; set; }
+        [IntrinsicProperty]
         public StaveGroup StaveGroup { get; set; }
 
-        private BarRendererFactory _factory;
+        [IntrinsicProperty]
         public List<BarRendererBase> BarRenderers { get; set; }
 
+        [IntrinsicProperty]
         public int X { get; set; }
+        [IntrinsicProperty]
         public int Y { get; set; }
+        [IntrinsicProperty]
         public int Height { get; set; }
+        [IntrinsicProperty]
         public int Index { get; set; }
 
         /// <summary>
@@ -28,17 +37,23 @@ namespace AlphaTab.Rendering.Staves
         /// stave contents actually start. Used for grouping 
         /// using a accolade
         /// </summary>
+        [IntrinsicProperty]
         public int StaveTop { get; set; }
+        [IntrinsicProperty]
         public int TopSpacing { get; set; }
+        [IntrinsicProperty]
         public int BottomSpacing { get; set; }
         /// <summary>
         /// This is the visual offset from top where the
         /// stave contents actually ends. Used for grouping 
         /// using a accolade
         /// </summary>
+        [IntrinsicProperty]
         public int StaveBottom { get; set; }
 
+        [IntrinsicProperty]
         public bool IsFirstInAccolade { get; set; }
+        [IntrinsicProperty]
         public bool IsLastInAccolade { get; set; }
 
         public Stave(BarRendererFactory factory)

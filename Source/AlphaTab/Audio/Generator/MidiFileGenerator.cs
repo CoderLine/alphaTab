@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using AlphaTab.Audio.Model;
 using AlphaTab.Model;
 
@@ -13,6 +14,7 @@ namespace AlphaTab.Audio.Generator
         private readonly IMidiFileHandler _handler;
         private int _currentTempo;
 
+        [IntrinsicProperty]
         public bool GenerateMetronome { get; set; }
 
         public MidiFileGenerator(Score score, IMidiFileHandler handler, bool generateMetronome = false)

@@ -1,11 +1,14 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
     public class SvgCommand
     {
+        [IntrinsicProperty]
         public string Cmd { get; set; }
+        [IntrinsicProperty]
         public List<int> Numbers { get; set; }
     }
 

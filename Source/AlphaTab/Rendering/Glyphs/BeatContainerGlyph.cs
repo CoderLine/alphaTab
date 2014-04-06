@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Rendering.Layout;
@@ -10,10 +11,15 @@ namespace AlphaTab.Rendering.Glyphs
     {
         //private static readonly int[] SizeTable = { 82, 43, 30, 22, 18, 14, 14 };
 
+        [IntrinsicProperty]
         public Beat Beat { get; set; }
+        [IntrinsicProperty]
         public BeatGlyphBase PreNotes { get; set; }
+        [IntrinsicProperty]
         public BeatGlyphBase OnNotes { get; set; }
+        [IntrinsicProperty]
         public BeatGlyphBase PostNotes { get; set; }
+        [IntrinsicProperty]
         public List<Glyph> Ties { get; set; }
 
         public BeatContainerGlyph(Beat beat)

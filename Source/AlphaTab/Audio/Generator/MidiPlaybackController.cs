@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using AlphaTab.Model;
 
 namespace AlphaTab.Audio.Generator
@@ -15,8 +16,11 @@ namespace AlphaTab.Audio.Generator
         private int _repeatEnd;
         private bool _repeatOpen;
 
+        [IntrinsicProperty]
         public bool ShouldPlay { get; set; }
+        [IntrinsicProperty]
         public int RepeatMove { get; set; }
+        [IntrinsicProperty]
         public int Index { get; set; }
 
         public bool Finished

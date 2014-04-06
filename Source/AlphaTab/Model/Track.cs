@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Model
@@ -9,20 +10,33 @@ namespace AlphaTab.Model
     public class Track
     {
         private const int ShortNameMaxLength = 10;
+
+        [IntrinsicProperty]
         public int Capo { get; set; }
+        [IntrinsicProperty]
         public int Index { get; set; }
+        [IntrinsicProperty]
         public string Name { get; set; }
+        [IntrinsicProperty]
         public string ShortName { get; set; }
+        [IntrinsicProperty]
         public List<int> Tuning { get; set; }
+        [IntrinsicProperty]
         public string TuningName { get; set; }
+        [IntrinsicProperty]
         public Color Color { get; set; }
 
+        [IntrinsicProperty]
         public PlaybackInformation PlaybackInfo { get; set; }
+        [IntrinsicProperty]
         public bool IsPercussion { get; set; }
 
+        [IntrinsicProperty]
         public Score Score { get; set; }
+        [IntrinsicProperty]
         public List<Bar> Bars { get; set; }
 
+        [IntrinsicProperty]
         public Dictionary<string, Chord> Chords { get; set; }
 
         public Track()

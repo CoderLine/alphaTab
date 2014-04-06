@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 using AlphaTab.IO;
 using AlphaTab.Platform;
@@ -12,8 +13,11 @@ namespace AlphaTab.Importer
     /// </summary>
     public class GpxFile
     {
+        [IntrinsicProperty]
         public string FileName { get; set; }
+        [IntrinsicProperty]
         public int FileSize { get; set; }
+        [IntrinsicProperty]
         public ByteArray Data { get; set; }
     }
 
@@ -33,11 +37,13 @@ namespace AlphaTab.Importer
         /// whether this file will be available after loading. 
         /// This way we can reduce the amount of memory we store.
         /// </summary>
+        [IntrinsicProperty]
         public Func<string, bool> FileFilter { get; set; }
 
         /// <summary>
         /// Gets the list of files stored in this FileSystem.
         /// </summary>
+        [IntrinsicProperty]
         public List<GpxFile> Files { get; set; }
 
         /// <summary>

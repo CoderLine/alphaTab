@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using AlphaTab.Audio;
 using AlphaTab.Platform;
 
@@ -13,12 +14,18 @@ namespace AlphaTab.Model
         public const int WhammyBarMaxPosition = 60;
         public const int WhammyBarMaxValue = 24;
 
+        [IntrinsicProperty]
         public Beat PreviousBeat { get; set; }
+        [IntrinsicProperty]
         public Beat NextBeat { get; set; }
+        [IntrinsicProperty]
         public int Index { get; set; }
 
+        [IntrinsicProperty]
         public Voice Voice { get; set; }
+        [IntrinsicProperty]
         public List<Note> Notes { get; set; }
+        [IntrinsicProperty]
         public bool IsEmpty { get; set; }
 
         private Note _minNote;
@@ -49,6 +56,7 @@ namespace AlphaTab.Model
             }
         }
 
+        [IntrinsicProperty]
         public Duration Duration { get; set; }
 
         public bool IsRest
@@ -59,21 +67,34 @@ namespace AlphaTab.Model
             }
         }
 
+        [IntrinsicProperty]
         public List<Automation> Automations { get; set; }
 
+        [IntrinsicProperty]
         public int Dots { get; set; }
+        [IntrinsicProperty]
         public bool FadeIn { get; set; }
+        [IntrinsicProperty]
         public List<string> Lyrics { get; set; }
+        [IntrinsicProperty]
         public bool Pop { get; set; }
+        [IntrinsicProperty]
         public bool HasRasgueado { get; set; }
+        [IntrinsicProperty]
         public bool Slap { get; set; }
+        [IntrinsicProperty]
         public bool Tap { get; set; }
+        [IntrinsicProperty]
         public string Text { get; set; }
 
+        [IntrinsicProperty]
         public BrushType BrushType { get; set; }
+        [IntrinsicProperty]
         public int BrushDuration { get; set; }
 
+        [IntrinsicProperty]
         public int TupletDenominator { get; set; }
+        [IntrinsicProperty]
         public int TupletNumerator { get; set; }
 
         public bool HasTuplet
@@ -85,6 +106,7 @@ namespace AlphaTab.Model
             }
         }
 
+        [IntrinsicProperty]
         public List<BendPoint> WhammyBarPoints { get; set; }
 
         public bool HasWhammyBar
@@ -92,7 +114,9 @@ namespace AlphaTab.Model
             get { return WhammyBarPoints.Count > 0; }
         }
 
+        [IntrinsicProperty]
         public VibratoType Vibrato { get; set; }
+        [IntrinsicProperty]
         public string ChordId { get; set; }
         public bool HasChord
         {
@@ -107,7 +131,9 @@ namespace AlphaTab.Model
             }
         }
 
+        [IntrinsicProperty]
         public GraceType GraceType { get; set; }
+        [IntrinsicProperty]
         public PickStrokeType PickStroke { get; set; }
 
         public bool IsTremolo
@@ -115,13 +141,17 @@ namespace AlphaTab.Model
             get { return TremoloSpeed != null; }
         }
 
+        [IntrinsicProperty]
         public Nullable<Duration> TremoloSpeed { get; set; }
+        [IntrinsicProperty]
         public CrescendoType Crescendo { get; set; }
 
         /// <summary>
         /// The timeline position of the voice within the current bar. (unit: midi ticks)
         /// </summary>
+        [IntrinsicProperty]
         public int Start { get; set; }
+        [IntrinsicProperty]
         public DynamicValue Dynamic { get; set; }
 
         public Beat()

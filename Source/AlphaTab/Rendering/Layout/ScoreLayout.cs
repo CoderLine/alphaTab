@@ -1,4 +1,5 @@
-﻿using AlphaTab.Rendering.Staves;
+﻿using System.Runtime.CompilerServices;
+using AlphaTab.Rendering.Staves;
 using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Layout
@@ -8,9 +9,12 @@ namespace AlphaTab.Rendering.Layout
     /// </summary>
     abstract public class ScoreLayout
     {
+        [IntrinsicProperty]
         public ScoreRenderer Renderer { get; set; }
 
+        [IntrinsicProperty]
         public int Width { get; set; }
+        [IntrinsicProperty]
         public int Height { get; set; }
 
         protected ScoreLayout(ScoreRenderer renderer)

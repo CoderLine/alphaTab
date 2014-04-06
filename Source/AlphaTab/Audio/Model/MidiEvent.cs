@@ -1,4 +1,5 @@
-﻿using AlphaTab.IO;
+﻿using System.Runtime.CompilerServices;
+using AlphaTab.IO;
 
 namespace AlphaTab.Audio.Model
 {
@@ -7,10 +8,15 @@ namespace AlphaTab.Audio.Model
     /// </summary>
     public class MidiEvent
     {
+        [IntrinsicProperty]
         public MidiTrack Track { get; set; }
+        [IntrinsicProperty]
         public int Tick { get; set; }
+        [IntrinsicProperty]
         public MidiMessage Message { get; set; }
+        [IntrinsicProperty]
         public MidiEvent NextEvent { get; set; }
+        [IntrinsicProperty]
         public MidiEvent PreviousEvent { get; set; }
 
         public int DeltaTicks

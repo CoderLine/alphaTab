@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using AlphaTab.Audio;
 using AlphaTab.Model;
 
@@ -32,7 +33,9 @@ namespace AlphaTab.Rendering.Utils
 
     public class BeatLinePositions
     {
+        [IntrinsicProperty]
         public int Up { get; set; }
+        [IntrinsicProperty]
         public int Down { get; set; }
 
         public BeatLinePositions(int up, int down)
@@ -57,38 +60,47 @@ namespace AlphaTab.Rendering.Utils
         /// </summary>
         private readonly Dictionary<int, BeatLinePositions> _beatLineXPositions;
 
+        [IntrinsicProperty]
         public Voice Voice { get; set; }
+        [IntrinsicProperty]
         public List<Beat> Beats { get; set; }
+        [IntrinsicProperty]
         public Duration MaxDuration { get; set; }
 
         /// <summary>
         /// the first min note within this group
         /// </summary>
+        [IntrinsicProperty]
         public Note FirstMinNote { get; set; }
 
         /// <summary>
         /// the first max note within this group
         /// </summary>
+        [IntrinsicProperty]
         public Note FirstMaxNote { get; set; }
 
         /// <summary>
         /// the last min note within this group
         /// </summary>
+        [IntrinsicProperty]
         public Note LastMinNote { get; set; }
 
         /// <summary>
         /// the last max note within this group
         /// </summary>
+        [IntrinsicProperty]
         public Note LastMaxNote { get; set; }
 
         /// <summary>
         /// the overall min note within this group
         /// </summary>
+        [IntrinsicProperty]
         public Note MinNote { get; set; }
 
         /// <summary>
         /// the overall max note within this group
         /// </summary>
+        [IntrinsicProperty]
         public Note MaxNote { get; set; }
 
 

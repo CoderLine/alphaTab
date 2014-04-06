@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Utils
@@ -8,8 +8,11 @@ namespace AlphaTab.Rendering.Utils
     {
         private bool _isFinished;
 
+        [IntrinsicProperty]
         public List<Beat> Beats { get; set; }
+        [IntrinsicProperty]
         public int VoiceIndex { get; set; }
+        [IntrinsicProperty]
         public int Tuplet { get; set; }
 
         public TupletHelper(int voice)

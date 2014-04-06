@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace AlphaTab.Model
 {
     /// <summary>
@@ -9,7 +11,9 @@ namespace AlphaTab.Model
         public const int MaxPosition = 60;
         public const int MaxValue = 12;
 
+        [IntrinsicProperty]
         public int Offset { get; set; }
+        [IntrinsicProperty]
         public int Value { get; set; }
 
         public BendPoint(int offset = 0, int value = 0)

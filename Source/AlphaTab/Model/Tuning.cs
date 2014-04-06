@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using AlphaTab.Platform;
 
@@ -238,8 +239,11 @@ namespace AlphaTab.Model
             return null;
         }
 
+        [IntrinsicProperty]
         public bool IsStandard { get; set; }
+        [IntrinsicProperty]
         public string Name { get; set; }
+        [IntrinsicProperty]
         public List<int> Tunings { get; set; }
 
         public Tuning(string name, IEnumerable<int> tuning, bool isStandard) 

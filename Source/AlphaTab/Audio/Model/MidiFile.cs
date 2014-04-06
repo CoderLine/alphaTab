@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using AlphaTab.IO;
 
 namespace AlphaTab.Audio.Model
@@ -9,12 +10,14 @@ namespace AlphaTab.Audio.Model
     /// </summary>
     public class MidiFile
     {
+        [IntrinsicProperty]
         public List<MidiTrack> Tracks { get; set; }
 
         /// <summary>
         /// Gets or sets the index of the track used for midi events
         /// affecting all tracks. (like the tempo)
         /// </summary>
+        [IntrinsicProperty]
         public int InfoTrack { get; set; }
 
         public MidiFile()

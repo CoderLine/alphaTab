@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace AlphaTab
 {
@@ -11,16 +12,19 @@ namespace AlphaTab
         /// <summary>
         /// Sets the zoom level of the rendered notation
         /// </summary>
+        [IntrinsicProperty]
         public float Scale { get; set; }
 
         /// <summary>
         /// The initial size of the canvas during loading or the width when {@see autoSize} set to false
         /// </summary>
+        [IntrinsicProperty]
         public int Width { get; set; }
 
         /// <summary>
         /// The initial size of the canvas during loading or the fixed height on some layouts. 
         /// </summary>
+        [IntrinsicProperty]
         public int Height { get; set; }
 
         /// <summary>
@@ -31,16 +35,19 @@ namespace AlphaTab
         ///  <li><strong>svg</strong> -  SVG </li>
         /// </ul>
         /// </summary>
+        [IntrinsicProperty]
         public string Engine { get; set; }
 
         /// <summary>
         /// The layout specific settings
         /// </summary>
+        [IntrinsicProperty]
         public LayoutSettings Layout { get; set; }
 
         /// <summary>
         /// The staves to create for each row.
         /// </summary>
+        [IntrinsicProperty]
         public List<StaveSettings> Staves { get; set; }
 
         public static Settings Defaults
@@ -180,6 +187,7 @@ namespace AlphaTab
         ///  <li><strong>horizontal</strong> - Bars are aligned horizontally in one row</li>
         /// </ul>
         /// </summary>
+        [IntrinsicProperty]
         public string Mode { get; set; }
 
         /// <summary>
@@ -198,7 +206,8 @@ namespace AlphaTab
         ///  <li><strong>count</strong> - The amount of bars to render overall, <em>-1 for all till the end</em>  (integer, default:-1)</li>
         /// </ul>
         /// </summary>
-        public Dictionary<string, object> AdditionalSettings;
+        [IntrinsicProperty]
+        public Dictionary<string, object> AdditionalSettings { get; set; }
 
         public T Get<T>(string key, T def)
         {
@@ -250,7 +259,8 @@ namespace AlphaTab
         ///  <li><strong>fingering</strong> - Renders finger indicators</li>
         /// </ul>
         /// </summary>
-        public string Id;
+        [IntrinsicProperty]
+        public string Id { get; set; }
 
         /// <summary>
         /// Additional stave specific settings
@@ -259,7 +269,8 @@ namespace AlphaTab
         ///  <li><strong>rhythm</strong> - Renders rhythm beams to tablature notes</li>
         /// </ul>
         /// </summary>
-        public Dictionary<string, object> AdditionalSettings;
+        [IntrinsicProperty]
+        public Dictionary<string, object> AdditionalSettings { get; set; }
 
         public StaveSettings(string id)
         {

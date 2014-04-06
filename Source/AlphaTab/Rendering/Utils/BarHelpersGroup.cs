@@ -1,12 +1,16 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Utils
 {
     public class BarHelpers
     {
+        [IntrinsicProperty]
         public List<List<BeamingHelper>> BeamHelpers { get; set; }
+        [IntrinsicProperty]
         public List<Dictionary<int, BeamingHelper>> BeamHelperLookup { get; set; }
+        [IntrinsicProperty]
         public List<List<TupletHelper>> TupletHelpers { get; set; }
 
         public BarHelpers(Bar bar)
@@ -79,7 +83,8 @@ namespace AlphaTab.Rendering.Utils
     /// </summary>
     public class BarHelpersGroup
     {
-        public Dictionary<int,Dictionary<int,BarHelpers>> Helpers { get; set; }
+        [IntrinsicProperty]
+        public Dictionary<int, Dictionary<int, BarHelpers>> Helpers { get; set; }
 
         public BarHelpersGroup()
         {

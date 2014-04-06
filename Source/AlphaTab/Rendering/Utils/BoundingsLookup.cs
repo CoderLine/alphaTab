@@ -1,13 +1,18 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Utils
 {
     public class Bounds
     {
+        [IntrinsicProperty]
         public int X { get; set; }
+        [IntrinsicProperty]
         public int Y { get; set; }
+        [IntrinsicProperty]
         public int W { get; set; }
+        [IntrinsicProperty]
         public int H { get; set; }
 
         public Bounds(int x, int y, int w, int h)
@@ -21,19 +26,28 @@ namespace AlphaTab.Rendering.Utils
 
     public class BeatBoundings
     {
+        [IntrinsicProperty]
         public Beat Beat { get; set; }
+        [IntrinsicProperty]
         public Bounds Bounds { get; set; }
+        [IntrinsicProperty]
         public Bounds VisualBounds { get; set; }
     }
 
     public class BarBoundings
     {
+        [IntrinsicProperty]
         public bool IsFirstOfLine { get; set; }
+        [IntrinsicProperty]
         public bool IsLastOfLine { get; set; }
+        [IntrinsicProperty]
         public Bar Bar { get; set; }
+        [IntrinsicProperty]
         public Bounds Bounds { get; set; }
+        [IntrinsicProperty]
         public Bounds VisualBounds { get; set; }
 
+        [IntrinsicProperty]
         public List<BeatBoundings> Beats { get; set; }
 
         public BarBoundings()
@@ -56,6 +70,7 @@ namespace AlphaTab.Rendering.Utils
 
     public class BoundingsLookup
     {
+        [IntrinsicProperty]
         public List<BarBoundings> Bars { get; set; }
 
         public BoundingsLookup()

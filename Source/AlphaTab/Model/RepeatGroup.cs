@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace AlphaTab.Model
 {
@@ -10,21 +11,25 @@ namespace AlphaTab.Model
         /// <summary>
         /// All masterbars repeated within this group
         /// </summary>
+        [IntrinsicProperty]
         public List<MasterBar> MasterBars { get; set; }
 
         /// <summary>
         /// a list of masterbars which open the group. 
         /// </summary>
+        [IntrinsicProperty]
         public List<MasterBar> Openings { get; set; }
 
         /// <summary>
         /// a list of masterbars which close the group. 
         /// </summary>
+        [IntrinsicProperty]
         public List<MasterBar> Closings { get; set; }
 
         /// <summary>
         ///  true if the repeat group was closed well
         /// </summary>
+        [IntrinsicProperty]
         public bool IsClosed { get; set; }
 
         public RepeatGroup()

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Platform.Model;
@@ -14,8 +15,11 @@ namespace AlphaTab.Rendering.Glyphs
         private readonly bool _isGrace;
         private int _centerX;
 
+        [IntrinsicProperty]
         public Beat Beat { get; set; }
+        [IntrinsicProperty]
         public BeamingHelper BeamingHelper { get; set; }
+        [IntrinsicProperty]
         public Dictionary<string, Glyph> BeatEffects { get; set; }
 
         public TabNoteChordGlyph(int x, int y, bool isGrace)

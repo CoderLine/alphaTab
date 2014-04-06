@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace AlphaTab.Model
 {
@@ -7,8 +8,11 @@ namespace AlphaTab.Model
     /// </summary>
     public class Chord
     {
+        [IntrinsicProperty]
         public string Name { get; set; }
+        [IntrinsicProperty]
         public int FirstFret { get; set; }
+        [IntrinsicProperty]
         public List<int> Strings { get; set; }
 
         public Chord()

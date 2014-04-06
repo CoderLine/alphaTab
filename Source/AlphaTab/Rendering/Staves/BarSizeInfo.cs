@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace AlphaTab.Rendering.Staves
 {
@@ -9,11 +10,16 @@ namespace AlphaTab.Rendering.Staves
     /// </summary>
     public class BarSizeInfo
     {
+        [IntrinsicProperty]
         public int FullWidth { get; set; }
+        [IntrinsicProperty]
         public Dictionary<string, int> Sizes { get; set; }
 
+        [IntrinsicProperty]
         public Dictionary<int, int> PreNoteSizes { get; set; }
+        [IntrinsicProperty]
         public Dictionary<int, int> OnNoteSizes { get; set; }
+        [IntrinsicProperty]
         public Dictionary<int, int> PostNoteSizes { get; set; }
 
         public BarSizeInfo()

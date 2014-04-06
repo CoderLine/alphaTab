@@ -1198,7 +1198,6 @@
             The staves to create for each row.
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "F:AlphaTab.LayoutSettings.AdditionalSettings" -->
         <member name="P:AlphaTab.LayoutSettings.Mode">
             <summary>
             The layouting mode used to arrange the the notation.
@@ -1208,7 +1207,8 @@
             </ul>
             </summary>
         </member>
-        <member name="F:AlphaTab.StaveSettings.Id">
+        <!-- Badly formed XML comment ignored for member "P:AlphaTab.LayoutSettings.AdditionalSettings" -->
+        <member name="P:AlphaTab.StaveSettings.Id">
             <summary>
             The stave identifier.
             Default Staves: 
@@ -1233,7 +1233,7 @@
             </ul>
             </summary>
         </member>
-        <member name="F:AlphaTab.StaveSettings.AdditionalSettings">
+        <member name="P:AlphaTab.StaveSettings.AdditionalSettings">
             <summary>
             Additional stave specific settings
             <strong>id=tab</strong>
