@@ -4,7 +4,7 @@
     {
         private readonly bool _isGrace;
 
-        public NaturalizeGlyph(int x = 0, int y = 0, bool isGrace = false)
+        public NaturalizeGlyph(int x, int y, bool isGrace = false)
             : base(x, y, MusicFont.AccidentalNatural, isGrace ? NoteHeadGlyph.GraceScale : 1, isGrace ? NoteHeadGlyph.GraceScale : 1)
         {
             _isGrace = isGrace;

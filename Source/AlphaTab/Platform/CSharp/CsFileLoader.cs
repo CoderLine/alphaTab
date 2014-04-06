@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AlphaTab.IO;
+#if CSharp
+using System;
 using System.IO;
 
 namespace AlphaTab.Platform.CSharp
@@ -8,12 +10,12 @@ namespace AlphaTab.Platform.CSharp
     /// </summary>
     public class CsFileLoader : IFileLoader
     {
-        public byte[] LoadBinary(string path)
+        public ByteArray LoadBinary(string path)
         {
-            return File.ReadAllBytes(path);
+            return new ByteArray(File.ReadAllBytes(path));
         }
 
-        public void LoadBinaryAsync(string path, Action<byte[]> success, Action<Exception> error)
+        public void LoadBinaryAsync(string path, Action<ByteArray> success, Action<Exception> error)
         {
             try
             {
@@ -26,3 +28,4 @@ namespace AlphaTab.Platform.CSharp
         }
     }
 }
+#endif

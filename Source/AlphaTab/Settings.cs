@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace AlphaTab
 {
@@ -88,15 +89,16 @@ namespace AlphaTab
             }
         }
 
+#if JavaScript
+        [System.Runtime.CompilerServices.InlineCodeAttribute("{property} in {json}")]
         private static bool JsonExists(dynamic json, string property)
         {
-            // return untyped __js__("property in json");
             return false;
         }
 
         private static string[] JsonKeys(dynamic json)
         {
-            return new string[0];
+            return Object.Keys(json);
         }
 
         public static Settings fromJson(dynamic json)
@@ -125,7 +127,8 @@ namespace AlphaTab
                     if (json.layout.mode) settings.Layout.Mode = json.layout.mode;
                     if (json.layout.additionalSettings)
                     {
-                        foreach (var key in JsonKeys(json.layout.additionalSettings))
+                        string[] keys = JsonKeys(json.layout.additionalSettings);
+                        foreach (var key in keys)
                         {
                             settings.Layout.AdditionalSettings[key] = json.layout.additionalSettings[key];
                         }
@@ -136,7 +139,8 @@ namespace AlphaTab
             if (JsonExists(json, "staves"))
             {
                 settings.Staves = new List<StaveSettings>();
-                foreach (var key in JsonKeys(json.staves))
+                string[] keys = JsonKeys(json.staves);
+                foreach (var key in keys)
                 {
                     var val = json.staves[key];
                     if (val is string)
@@ -150,7 +154,8 @@ namespace AlphaTab
                             var staveSettings = new StaveSettings(val.id);
                             if (val.additionalSettings)
                             {
-                                foreach (var key2 in JsonKeys(val.additionalSettings))
+                                string[] keys2 = JsonKeys(val.additionalSettings);
+                                foreach (var key2 in keys2)
                                 {
                                     staveSettings.AdditionalSettings[key2] = val.additionalSettings[key2];
                                 }
@@ -162,6 +167,8 @@ namespace AlphaTab
 
             return settings;
         }
+#endif
+
     }
 
     public class LayoutSettings

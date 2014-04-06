@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using AlphaTab.Platform;
-using AlphaTab.Platform.CSharp;
 using AlphaTab.Platform.Svg;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Effects;
@@ -29,32 +28,20 @@ namespace AlphaTab
             LayoutEngines = new Dictionary<string, Func<ScoreRenderer, ScoreLayout>>();
             StaveFactories = new Dictionary<string, Func<ScoreLayout, BarRendererFactory>>();
 
-            // default render engines
-            RenderEngines["default"] = d =>
-#if JavaScript
-                new Html5Canvas(d);
-#elif CSharp
- new GdiCanvas();
-#endif
-
-#if JavaScript
-            RenderEngines["html5"] = d => new Html5Canvas(d); 
-#elif CSharp
-            RenderEngines["gdi"] = d => new GdiCanvas();
+#if CSharp
+            RenderEngines["default"] = d => new AlphaTab.Platform.CSharp.GdiCanvas();
+            RenderEngines["gdi"] = d => new AlphaTab.Platform.CSharp.GdiCanvas();
+            FileLoaders["default"] = () => new AlphaTab.Platform.CSharp.CsFileLoader();
+#elif JavaScript
+            RenderEngines["default"] = d => new AlphaTab.Platform.JavaScript.Html5Canvas(d);
+            RenderEngines["html5"] = d => new AlphaTab.Platform.JavaScript.Html5Canvas(d);
+            FileLoaders["default"] = () =>new AlphaTab.Platform.JavaScript.JsFileLoader();
+#else 
+#error Unsupported Platform 
 #endif
 
             RenderEngines["svg"] = d => new SvgCanvas();
 
-            // default file loaders
-            FileLoaders["default"] = () =>
-#if JavaScript
-                new JsFileLoader();
-                
-#elif CSharp
- new CsFileLoader();
-#else
-#error Unsupported Platform
-#endif
 
             // default layout engines
             LayoutEngines["default"] = r => new PageViewLayout(r);

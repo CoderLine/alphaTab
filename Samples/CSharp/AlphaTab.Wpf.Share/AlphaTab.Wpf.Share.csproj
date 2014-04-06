@@ -68,20 +68,16 @@
     <None Include="Readme.md" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AlphaTab.Core\AlphaTab.Core.csproj">
-      <Project>{A3A01A41-EE58-4C99-867B-D88D2512F72F}</Project>
-      <Name>AlphaTab.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Source\AlphaTab\AlphaTab.csproj">
-      <Project>{C5C9CA45-D7BC-41F5-B9E1-97731858CE10}</Project>
-      <Name>AlphaTab</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Page Include="ScoreInfoWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Source\AlphaTab\AlphaTab.csproj">
+      <Project>{c5c9ca45-d7bc-41f5-b9e1-97731858ce10}</Project>
+      <Name>AlphaTab</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

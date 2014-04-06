@@ -37,6 +37,7 @@ namespace AlphaTab.Rendering.Glyphs
         public BeamingHelper BeamingHelper { get; set; }
 
         public ScoreNoteChordGlyph()
+            : base(0, 0)
         {
             _infos = new List<ScoreNoteGlyphInfo>();
             BeatEffects = new Dictionary<string, Glyph>();
@@ -191,7 +192,7 @@ namespace AlphaTab.Rendering.Glyphs
                 int offset;
                 var baseNote = direction == BeamDirection.Up ? MinNote : MaxNote;
                 var tremoloX = direction == BeamDirection.Up ? displacedX : 0;
-                if (Beat.TremoloSpeed.HasValue)
+                if (Beat.TremoloSpeed != null)
                 {
                     var speed = Beat.TremoloSpeed.Value;
                     switch (speed)
@@ -214,7 +215,7 @@ namespace AlphaTab.Rendering.Glyphs
                     offset = direction == BeamDirection.Up ? -15 : 15;
                 }
 
-                _tremoloPicking = new TremoloPickingGlyph(tremoloX, baseNote.Glyph.Y + (int)(offset * Scale), Beat.TremoloSpeed.GetValueOrDefault());
+                _tremoloPicking = new TremoloPickingGlyph(tremoloX, baseNote.Glyph.Y + (int)(offset * Scale), Beat.TremoloSpeed.Value);
                 _tremoloPicking.Renderer = Renderer;
                 _tremoloPicking.DoLayout();
             }

@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace AlphaTab.IO
+﻿namespace AlphaTab.IO
 {
     /// <summary>
     /// This utility public class allows bitwise reading of a stream
@@ -27,9 +25,9 @@ namespace AlphaTab.IO
             return ReadBits(ByteSize);
         }
 
-        public byte[] ReadBytes(int count)
+        public ByteArray ReadBytes(int count)
         {
-            byte[] bytes = new byte[count];
+            ByteArray bytes = new ByteArray(count);
             for (int i = 0; i < count; i++)
             {
                 bytes[i] = (byte) ReadByte();
@@ -77,7 +75,7 @@ namespace AlphaTab.IO
             return value;
         }
 
-        public byte[] ReadAll()
+        public ByteArray ReadAll()
         {
             var all = new MemoryStream();
             try

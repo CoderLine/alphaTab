@@ -7,7 +7,7 @@ namespace AlphaTab.Rendering.Glyphs
     {
         private readonly float _scale;
 
-        public TrillGlyph(int x = 0, int y = 0, float scale = 0.9f)
+        public TrillGlyph(int x, int y, float scale = 0.9f)
             : base(x, y)
         {
             _scale = scale;

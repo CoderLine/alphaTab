@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
+using AlphaTab.IO;
 using AlphaTab.Model;
 using AlphaTab.Platform.Model;
 
@@ -28,7 +28,7 @@ namespace AlphaTab.Importer
         public override Score ReadScore()
         {
             ReadVersion();
-            
+
             _score = new Score();
 
             // basic song info
@@ -70,10 +70,12 @@ namespace AlphaTab.Importer
                 ReadBool(); // hide tempo?
             }
             // keysignature and octave
-            /* var keySignature = */ ReadInt32();
+            /* var keySignature = */
+            ReadInt32();
             if (_versionNumber >= 400)
             {
-                /* octave = */ _data.ReadByte();
+                /* octave = */
+                _data.ReadByte();
             }
 
             ReadPlaybackInfos();
@@ -312,7 +314,7 @@ namespace AlphaTab.Importer
             // keysignature
             if ((flags & 0x40) != 0)
             {
-                newMasterBar.KeySignature = _data.ReadByte();
+                newMasterBar.KeySignature = ReadSignedByte();
                 _data.ReadByte(); // keysignature type
             }
             else if (previousMasterBar != null)
@@ -493,7 +495,7 @@ namespace AlphaTab.Importer
             }
             voice.AddBeat(newBeat);
 
-            var duration = (sbyte)((byte)_data.ReadByte());
+            var duration = ReadSignedByte();
             switch (duration)
             {
                 case -2:
@@ -565,7 +567,7 @@ namespace AlphaTab.Importer
             {
                 newBeat.Text = ReadStringIntUnused();
             }
-            
+
             if ((flags & 0x08) != 0)
             {
                 ReadBeatEffects(newBeat);
@@ -718,7 +720,7 @@ namespace AlphaTab.Importer
 
             if ((flags & 0x20) != 0 && _versionNumber >= 400)
             {
-                var slapPop = _data.ReadByte();
+                var slapPop = ReadSignedByte();
                 switch (slapPop)
                 {
                     case 1:
@@ -734,7 +736,7 @@ namespace AlphaTab.Importer
             }
             else if ((flags & 0x20) != 0)
             {
-                var slapPop = _data.ReadByte();
+                var slapPop = ReadSignedByte();
                 switch (slapPop)
                 {
                     case 1:
@@ -785,7 +787,7 @@ namespace AlphaTab.Importer
 
             if ((flags2 & 0x02) != 0)
             {
-                switch (_data.ReadByte())
+                switch (ReadSignedByte())
                 {
                     case 0:
                         beat.PickStroke = PickStrokeType.None;
@@ -847,12 +849,12 @@ namespace AlphaTab.Importer
             {
                 Skip(16); // Rse Info 
             }
-            tableChange.Volume = unchecked((sbyte)(byte)_data.ReadByte());
-            tableChange.Balance = unchecked((sbyte)(byte)_data.ReadByte());
-            var chorus = unchecked((sbyte)(byte)_data.ReadByte());
-            var reverb = unchecked((sbyte)(byte)_data.ReadByte());
-            var phaser = unchecked((sbyte)(byte)_data.ReadByte());
-            var tremolo = unchecked((sbyte)(byte)_data.ReadByte());
+            tableChange.Volume = ReadSignedByte();
+            tableChange.Balance = ReadSignedByte();
+            var chorus = ReadSignedByte();
+            var reverb = ReadSignedByte();
+            var phaser = ReadSignedByte();
+            var tremolo = ReadSignedByte();
             if (_versionNumber >= 500)
             {
                 tableChange.TempoName = ReadStringIntByte();
@@ -892,7 +894,7 @@ namespace AlphaTab.Importer
 
             if (tableChange.Tempo >= 0)
             {
-                tableChange.Duration = (sbyte)(byte)_data.ReadByte();
+                tableChange.Duration = ReadSignedByte();
                 if (_versionNumber >= 510)
                 {
                     _data.ReadByte(); // hideTempo (bool)
@@ -955,6 +957,17 @@ namespace AlphaTab.Importer
             }
         }
 
+        private sbyte ReadSignedByte()
+        {
+#if CSharp
+            return unchecked((sbyte)(byte)_data.ReadByte());
+#elif JavaScript
+            var n = _data.ReadByte();
+		    if(n >= 128) return (sbyte)(n - 256);
+		    return (sbyte)n;
+#endif
+        }
+
         public void ReadNote(Track track, Bar bar, Voice voice, Beat beat, int stringIndex)
         {
             var newNote = new Note();
@@ -986,20 +999,20 @@ namespace AlphaTab.Importer
 
             if ((flags & 0x10) != 0)
             {
-                var dynamicNumber = (sbyte)(byte)_data.ReadByte();
+                var dynamicNumber = ReadSignedByte();
                 newNote.Dynamic = ToDynamicValue(dynamicNumber);
                 beat.Dynamic = newNote.Dynamic;
             }
 
             if ((flags & 0x20) != 0)
             {
-                newNote.Fret = _data.ReadByte();
+                newNote.Fret = ReadSignedByte();
             }
 
             if ((flags & 0x80) != 0)
             {
-                newNote.LeftHandFinger = (Fingers)((sbyte)(byte)_data.ReadByte());
-                newNote.RightHandFinger = (Fingers)((sbyte)(byte)_data.ReadByte());
+                newNote.LeftHandFinger = (Fingers) ReadSignedByte();
+                newNote.RightHandFinger = (Fingers) ReadSignedByte();
                 newNote.IsFingering = true;
             }
 
@@ -1137,10 +1150,10 @@ namespace AlphaTab.Importer
             var graceBeat = new Beat();
             var graceNote = new Note();
             graceNote.String = note.String;
-            graceNote.Fret = _data.ReadByte();
+            graceNote.Fret = ReadSignedByte();
             graceBeat.Duration = Duration.ThirtySecond;
-            graceBeat.Dynamic = ToDynamicValue(_data.ReadByte());
-            var transition = _data.ReadByte();
+            graceBeat.Dynamic = ToDynamicValue(ReadSignedByte());
+            var transition = ReadSignedByte();
             switch (transition)
             {
                 case 0: // none
@@ -1181,13 +1194,13 @@ namespace AlphaTab.Importer
             switch (speed)
             {
                 case 1:
-                    beat.TremoloSpeed = Duration.Eighth;
+                    beat.TremoloSpeed = new Platform.Nullable<Duration>(Duration.Eighth);
                     break;
                 case 2:
-                    beat.TremoloSpeed = Duration.Sixteenth;
+                    beat.TremoloSpeed = new Platform.Nullable<Duration>(Duration.Sixteenth);
                     break;
                 case 3:
-                    beat.TremoloSpeed = Duration.ThirtySecond;
+                    beat.TremoloSpeed = new Platform.Nullable<Duration>(Duration.ThirtySecond);
                     break;
             }
         }
@@ -1196,7 +1209,7 @@ namespace AlphaTab.Importer
         {
             if (_versionNumber >= 500)
             {
-                var type = (sbyte)_data.ReadByte();
+                var type = ReadSignedByte();
                 switch (type)
                 {
                     case 1:
@@ -1224,7 +1237,7 @@ namespace AlphaTab.Importer
             }
             else
             {
-                var type = (sbyte)_data.ReadByte();
+                var type = ReadSignedByte();
                 switch (type)
                 {
                     case 1:
@@ -1264,12 +1277,12 @@ namespace AlphaTab.Importer
                         note.HarmonicValue = DeltaFretToHarmonicValue(note.Fret);
                         break;
                     case 2:
-// ReSharper disable UnusedVariable
+                        // ReSharper disable UnusedVariable
                         var harmonicTone = _data.ReadByte();
                         var harmonicKey = _data.ReadByte();
                         var harmonicOctaveOffset = _data.ReadByte();
                         note.HarmonicType = HarmonicType.Artificial;
-// ReSharper restore UnusedVariable
+                        // ReSharper restore UnusedVariable
                         break;
                     // TODO: how to calculate the harmonic value? 
                     case 3:
@@ -1365,9 +1378,10 @@ namespace AlphaTab.Importer
             }
         }
 
+        // TODO: use native features to convert byte array to double
         public double ReadDouble()
         {
-            byte[] bytes = new byte[8];
+            var bytes = new ByteArray(8);
             _data.Read(bytes, 0, bytes.Length);
 
             var sign = 1 - ((bytes[0] >> 7) << 1); // sign = bit 0
@@ -1378,7 +1392,7 @@ namespace AlphaTab.Importer
             return sign * (1.0 + Math.Pow(2, -52) * sig) * Math.Pow(2, exp);
         }
 
-        public int GetDoubleSig(byte[] bytes)
+        public int GetDoubleSig(ByteArray bytes)
         {
             return (int)((((bytes[1] & 0xF) << 16) | (bytes[2] << 8) | bytes[3]) * 4294967296.0 +
                    (bytes[4] >> 7) * 2147483648 +
@@ -1443,13 +1457,13 @@ namespace AlphaTab.Importer
 
         public string ReadString(int length)
         {
-            byte[] b = new byte[length];
+            ByteArray b = new ByteArray(length);
             _data.Read(b, 0, b.Length);
 
             var s = new StringBuilder();
-            foreach (byte i in b)
+            for (int i = 0; i < b.Length; i++)
             {
-                s.Append((char)i);
+                s.Append((char)b[i]);
             }
             return s.ToString();
         }

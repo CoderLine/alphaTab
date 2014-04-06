@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Text;
 using AlphaTab.IO;
+using AlphaTab.Platform;
 
 namespace AlphaTab.Importer
 {
@@ -13,7 +14,7 @@ namespace AlphaTab.Importer
     {
         public string FileName { get; set; }
         public int FileSize { get; set; }
-        public byte[] Data { get; set; }
+        public ByteArray Data { get; set; }
     }
 
     /// <summary>
@@ -77,10 +78,10 @@ namespace AlphaTab.Importer
         /// <param name="src">the bitInput to read the data from</param>
         /// <param name="skipHeader">true if the header should NOT be included in the result byteset, otherwise false</param>
         /// <returns>the decompressed byte data. if skipHeader is set to false the BCFS header is included.</returns>
-        public byte[] Decompress(BitReader src, bool skipHeader = false)
+        public ByteArray Decompress(BitReader src, bool skipHeader = false)
         {
             var uncompressed = new MemoryStream();
-            byte[] buffer;
+            ByteArray buffer;
             var expectedLength = GetInteger(src.ReadBytes(4), 0);
 
             try
@@ -126,8 +127,8 @@ namespace AlphaTab.Importer
             buffer = uncompressed.GetBuffer();
             var resultOffset = skipHeader ? 4 : 0;
             var resultSize = uncompressed.Length - resultOffset;
-            byte[] result = new byte[resultSize];
-            Buffer.BlockCopy(buffer, resultOffset, result, 0, (int)resultSize);
+            var result = new ByteArray((int)resultSize);
+            Std.BlockCopy(buffer, resultOffset, result, 0, (int)resultSize);
             return result;
         }
 
@@ -159,7 +160,7 @@ namespace AlphaTab.Importer
         /// Reads an uncompressed data block into the model.
         /// </summary>
         /// <param name="data">the data store to read from.</param>
-        private void ReadUncompressedBlock(byte[] data)
+        private void ReadUncompressedBlock(ByteArray data)
         {
             // the uncompressed block contains a list of filesystem entires
             // as long we have data we will try to read more entries
@@ -224,10 +225,10 @@ namespace AlphaTab.Importer
                     if (storeFile)
                     {
                         // trim data to filesize if needed
-                        file.Data = new byte[Math.Min(file.FileSize, fileData.Length)];
+                        file.Data = new ByteArray((int)Math.Min(file.FileSize, fileData.Length));
                         // we can use the getBuffer here because we are intelligent and know not to read the empty data.
-                        byte[] raw = fileData.ToArray();
-                        Buffer.BlockCopy(raw, 0, file.Data, 0, file.Data.Length);
+                        ByteArray raw = fileData.ToArray();
+                        Std.BlockCopy(raw, 0, file.Data, 0, file.Data.Length);
                     }
                 }
 
@@ -243,16 +244,16 @@ namespace AlphaTab.Importer
         /// <param name="offset">the offset to start reading from</param>
         /// <param name="length">the max length to read</param>
         /// <returns>the ascii string read from the datasource.</returns>
-        private string GetString(byte[] data, int offset, int length)
+        private string GetString(ByteArray data, int offset, int length)
         {
-            var buf = "";
+            var buf = new StringBuilder();
             for (int i = 0; i < length; i++)
             {
                 var code = data[offset + i] & 0xFF;
                 if (code == 0) break; // zero terminated string
-                buf += (char)(code);
+                buf.Append((char)(code));
             }
-            return buf;
+            return buf.ToString();
         }
 
         /// <summary>
@@ -261,7 +262,7 @@ namespace AlphaTab.Importer
         /// <param name="data">the data source to read from </param>
         /// <param name="offset">offset the offset to start reading from</param>
         /// <returns></returns>
-        private int GetInteger(byte[] data, int offset)
+        private int GetInteger(ByteArray data, int offset)
         {
             return (data[offset + 3] << 24) | (data[offset + 2] << 16) | (data[offset + 1] << 8) | data[offset];
         }

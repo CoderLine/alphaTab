@@ -17,6 +17,7 @@ namespace AlphaTab.Rendering.Glyphs
         public List<Glyph> Ties { get; set; }
 
         public BeatContainerGlyph(Beat beat)
+            : base(0, 0)
         {
             Beat = beat;
             Ties = new List<Glyph>();
@@ -133,7 +134,7 @@ namespace AlphaTab.Rendering.Glyphs
             // canvas.Font = new Font("Arial", 10);
             // canvas.Color = new Color(0, 0, 0);
             // canvas.FillText(Beat.Voice.Index + ":" + Beat.Index, cx + X, cy + Y + 15 * Beat.Voice.Index);
-        
+
             PreNotes.Paint(cx + X, cy + Y, canvas);
             //canvas.Color = new Color(200, 0, 0, 100);
             //canvas.FillRect(cx + X + PreNotes.X, cy + Y + PreNotes.Y, PreNotes.Width, 10);
@@ -145,7 +146,7 @@ namespace AlphaTab.Rendering.Glyphs
             PostNotes.Paint(cx + X, cy + Y, canvas);
             //canvas.Color = new Color(0, 0, 200, 100);
             //canvas.FillRect(cx + X + PostNotes.X, cy + Y + PostNotes.Y + 20, PostNotes.Width, 10);
-        
+
             foreach (var t in Ties)
             {
                 t.Renderer = Renderer;

@@ -4,7 +4,7 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class RepeatCloseGlyph : Glyph
     {
-        public RepeatCloseGlyph(int x = 0, int y = 0)
+        public RepeatCloseGlyph(int x, int y)
             : base(x, y)
         {
         }

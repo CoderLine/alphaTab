@@ -13,6 +13,7 @@ namespace AlphaTab.Rendering.Glyphs
         private readonly BeatContainerGlyph _parent;
 
         public WhammyBarGlyph(Beat beat, BeatContainerGlyph parent)
+            : base(0, 0)
         {
             _beat = beat;
             _parent = parent;

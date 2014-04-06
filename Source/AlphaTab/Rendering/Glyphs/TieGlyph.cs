@@ -11,6 +11,7 @@ namespace AlphaTab.Rendering.Glyphs
         protected Glyph Parent;
 
         public TieGlyph(Note startNote, Note endNote, Glyph parent)
+            : base(0, 0)
         {
             StartNote = startNote;
             EndNote = endNote;

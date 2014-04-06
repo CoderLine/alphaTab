@@ -1,4 +1,5 @@
 ﻿using AlphaTab.Model;
+using AlphaTab.Platform;
 using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
@@ -8,7 +9,7 @@ namespace AlphaTab.Rendering.Effects
         public bool HideOnMultiTrack { get { return false; } }
         public bool ShouldCreateGlyph(EffectBarRenderer renderer, Beat beat)
         {
-            return !string.IsNullOrWhiteSpace(beat.Text);
+            return !beat.Text.IsNullOrWhiteSpace();
         }
 
         public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeatOnly; } }

@@ -6,12 +6,18 @@ namespace AlphaTab.Rendering.Glyphs
     {
         private const int NonReserved = -3000;
 
+        public AccidentalGroupGlyph()
+            : base(0, 0, null)
+        {
+
+        }
+
         public override void DoLayout()
         {
             //
             // Determine Columns for accidentals
             //
-            Glyphs.Sort((a, b) => b.Y.CompareTo(a.Y));
+            Glyphs.Sort((a, b) => a.Y.CompareTo(b.Y));
 
             // defines the reserved y position of the columns
             var columns = new List<int>();

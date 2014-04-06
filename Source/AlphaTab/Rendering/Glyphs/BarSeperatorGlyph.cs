@@ -6,7 +6,7 @@ namespace AlphaTab.Rendering.Glyphs
     {
         private readonly bool _isLast;
 
-        public BarSeperatorGlyph(int x = 0, int y = 0, bool isLast = false)
+        public BarSeperatorGlyph(int x, int y, bool isLast = false)
             : base(x, y)
         {
             _isLast = isLast;

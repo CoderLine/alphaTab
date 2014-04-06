@@ -4,7 +4,8 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class TabBeatContainerGlyph : BeatContainerGlyph
     {
-        public TabBeatContainerGlyph(Beat beat) : base(beat)
+        public TabBeatContainerGlyph(Beat beat)
+            : base(beat)
         {
         }
 

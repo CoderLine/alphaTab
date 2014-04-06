@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using AlphaTab.Platform;
 
 namespace AlphaTab.Model
 {
@@ -12,8 +13,8 @@ namespace AlphaTab.Model
         public Bar Bar { get; set; }
         public List<Beat> Beats { get; set; }
 
-        public Duration? MinDuration { get; set; }
-        public Duration? MaxDuration { get; set; }
+        public Nullable<Duration> MinDuration { get; set; }
+        public Nullable<Duration> MaxDuration { get; set; }
 
         public bool IsEmpty
         {
@@ -74,13 +75,13 @@ namespace AlphaTab.Model
             foreach (var beat in Beats)
             {
                 beat.Finish();
-                if (!MinDuration.HasValue || MinDuration.Value > beat.Duration)
+                if (MinDuration == null || MinDuration.Value > beat.Duration)
                 {
-                    MinDuration = beat.Duration;
+                    MinDuration = new Nullable<Duration>(beat.Duration);
                 }
-                if (!MaxDuration.HasValue || MaxDuration.Value < beat.Duration)
+                if (MaxDuration == null || MaxDuration.Value < beat.Duration)
                 {
-                    MaxDuration = beat.Duration;
+                    MaxDuration = new Nullable<Duration>(beat.Duration);
                 }
             }
         }

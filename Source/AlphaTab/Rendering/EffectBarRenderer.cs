@@ -273,6 +273,7 @@ namespace AlphaTab.Rendering
                 case EffectBarGlyphSizing.GroupedPreBeatToOnBeat:
                 case EffectBarGlyphSizing.GroupedPreBeatToPostBeat:
                 case EffectBarGlyphSizing.GroupedOnBeatOnly:
+                case EffectBarGlyphSizing.GroupedOnBeatToPostBeat:
                 case EffectBarGlyphSizing.GroupedPostBeatOnly:
                     if (b.Index > 0 || Index > 0)
                     {

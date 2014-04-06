@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using AlphaTab.Platform;
 
 namespace AlphaTab.Model
 {
@@ -8,7 +9,12 @@ namespace AlphaTab.Model
     /// </summary>
     public class Tuning
     {
+#if CSharp
         public static Regex TuningRegex = new Regex("([a-g]b?)([0-9])", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+#elif JavaScript
+        public static Regex TuningRegex = new Regex("([a-g]b?)([0-9])", "i");
+#endif
+
 
         private static List<Tuning> _sevenStrings;
         private static List<Tuning> _sixStrings;
@@ -22,7 +28,11 @@ namespace AlphaTab.Model
         /// <returns></returns>
         public static bool IsTuning(string name)
         {
+#if CSharp
             return TuningRegex.IsMatch(name);
+#elif JavaScript
+            return TuningRegex.Exec(name) != null;
+#endif
         }
 
         public static string GetTextForTuning(int tuning, bool includeOctave)
@@ -43,11 +53,25 @@ namespace AlphaTab.Model
         public static int GetTuningForText(string str)
         {
             var b = 0;
+            string note = null;
+            int octave = 0;
+#if CSharp
             Match m = TuningRegex.Match(str.ToLower());
             if (m.Success)
             {
-                var note = m.Groups[1].Value;
-                var octave = int.Parse(m.Groups[2].Value);
+                note = m.Groups[1].Value;
+                octave = Std.ParseInt(m.Groups[2].Value);
+            }
+#elif JavaScript
+            var m = TuningRegex.Exec(str.ToLower());
+            if(m != null) 
+            {
+                note = m[1];
+                octave = Std.ParseInt(m[2]);
+            }
+#endif
+            if (!note.IsNullOrWhiteSpace())
+            {
                 switch (note)
                 {
                     case "c":

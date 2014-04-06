@@ -14,7 +14,7 @@ namespace AlphaTab.Rendering.Glyphs
         public int Width { get; set; }
         public BarRendererBase Renderer { get; set; }
 
-        public Glyph(int x = 0, int y = 0)
+        public Glyph(int x, int y)
         {
             X = x;
             Y = y;

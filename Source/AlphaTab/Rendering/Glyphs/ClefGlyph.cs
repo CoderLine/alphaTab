@@ -5,7 +5,7 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class ClefGlyph : SvgGlyph
     {
-        public ClefGlyph(int x = 0, int y = 0, Clef clef = Clef.C3)
+        public ClefGlyph(int x, int y, Clef clef)
             : base(x, y, GetClefSvg(clef), 1, 1)
         {
         }

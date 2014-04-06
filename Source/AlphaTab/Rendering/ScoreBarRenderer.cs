@@ -222,7 +222,7 @@ namespace AlphaTab.Rendering
                                 : -(int)(3 * Scale);
 
                     canvas.Font = res.EffectFont;
-                    canvas.FillText(h.Tuplet.ToString(CultureInfo.InvariantCulture), cx + X + tupletX, tupletY - offset);
+                    canvas.FillText(h.Tuplet.ToString(), cx + X + tupletX, tupletY - offset);
                 }
             }
             else
@@ -244,7 +244,7 @@ namespace AlphaTab.Rendering
                     //
                     // Calculate how many space the text will need
                     canvas.Font = res.EffectFont;
-                    var s = h.Tuplet.ToString(CultureInfo.InvariantCulture);
+                    var s = h.Tuplet.ToString();
                     var sw = canvas.MeasureText(s);
                     var sp = (int)(3 * Scale);
 
@@ -570,9 +570,9 @@ namespace AlphaTab.Rendering
             }
             else if (Bar.MasterBar.IsDoubleBar)
             {
-                AddPostBeatGlyph(new BarSeperatorGlyph());
+                AddPostBeatGlyph(new BarSeperatorGlyph(0, 0));
                 AddPostBeatGlyph(new SpacingGlyph(0, 0, (int)(3 * Scale), false));
-                AddPostBeatGlyph(new BarSeperatorGlyph());
+                AddPostBeatGlyph(new BarSeperatorGlyph(0, 0));
             }
             else if (Bar.NextBar == null || !Bar.NextBar.MasterBar.IsRepeatStart)
             {

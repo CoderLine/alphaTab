@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using AlphaTab.Platform;
+using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Layout;
 using AlphaTab.Rendering.Staves;
 
@@ -16,8 +18,8 @@ namespace AlphaTab.Rendering.Glyphs
         public List<BeatContainerGlyph> BeatGlyphs { get; set; }
         public int VoiceIndex { get; set; }
 
-        public VoiceContainerGlyph(int x = 0, int y = 0, int voiceIndex = 0)
-            : base(x, y)
+        public VoiceContainerGlyph(int x, int y, int voiceIndex)
+            : base(x, y, null)
         {
             BeatGlyphs = new List<BeatContainerGlyph>();
             VoiceIndex = voiceIndex;
@@ -83,8 +85,11 @@ namespace AlphaTab.Rendering.Glyphs
             }
         }
 
+        //private static Random Random = new Random();
         public override void Paint(int cx, int cy, ICanvas canvas)
         {
+            //canvas.Color = new Color((byte) Random.Next(255), (byte) Random.Next(255), (byte) Random.Next(255), 128);
+            //canvas.FillRect(cx + X, cy + Y, Width, 100);
             foreach (var g in BeatGlyphs)
             {
                 g.Paint(cx + X, cy + Y, canvas);

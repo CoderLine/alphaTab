@@ -236,7 +236,7 @@
             Creates a new GpxFileSystem instance
             </summary>
         </member>
-        <member name="M:AlphaTab.Importer.GpxFileSystem.Load(System.IO.Stream)">
+        <member name="M:AlphaTab.Importer.GpxFileSystem.Load(AlphaTab.IO.Stream)">
             <summary>
             Load a complete FileSystem to the memory.
             </summary>
@@ -267,13 +267,13 @@
             <param name="data">the data source</param>
             <returns></returns>
         </member>
-        <member name="M:AlphaTab.Importer.GpxFileSystem.ReadUncompressedBlock(System.Byte[])">
+        <member name="M:AlphaTab.Importer.GpxFileSystem.ReadUncompressedBlock(AlphaTab.IO.ByteArray)">
             <summary>
             Reads an uncompressed data block into the model.
             </summary>
             <param name="data">the data store to read from.</param>
         </member>
-        <member name="M:AlphaTab.Importer.GpxFileSystem.GetString(System.Byte[],System.Int32,System.Int32)">
+        <member name="M:AlphaTab.Importer.GpxFileSystem.GetString(AlphaTab.IO.ByteArray,System.Int32,System.Int32)">
             <summary>
             Reads a zeroterminated ascii string from the given source
             </summary>
@@ -282,7 +282,7 @@
             <param name="length">the max length to read</param>
             <returns>the ascii string read from the datasource.</returns>
         </member>
-        <member name="M:AlphaTab.Importer.GpxFileSystem.GetInteger(System.Byte[],System.Int32)">
+        <member name="M:AlphaTab.Importer.GpxFileSystem.GetInteger(AlphaTab.IO.ByteArray,System.Int32)">
             <summary>
             Reads an 4 byte signed integer from the given source
             </summary>
@@ -674,18 +674,6 @@
         <member name="T:AlphaTab.Platform.ICanvas">
             <summary>
             This is the base public interface for canvas implementations on different plattforms.
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Platform.JavaScript.Html5Canvas">
-            <summary>
-            A canvas implementation for HTML5 canvas
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Platform.JavaScript.JsFileLoader">
-            <summary>
-            This is a fileloader implementation for JavaScript.
-            It uses a ajax request in case of modern browsers like Firefox or Chrome. 
-            For IE a VBScript is used to load a binary stream. 
             </summary>
         </member>
         <member name="T:AlphaTab.Platform.Model.Font">

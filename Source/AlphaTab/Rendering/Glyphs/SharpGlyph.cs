@@ -4,7 +4,7 @@
     {
         private readonly bool _isGrace;
 
-        public SharpGlyph(int x = 0, int y = 0, bool isGrace = false)
+        public SharpGlyph(int x, int y, bool isGrace = false)
             : base(x, y, MusicFont.AccidentalSharp, isGrace ? NoteHeadGlyph.GraceScale : 1, isGrace ? NoteHeadGlyph.GraceScale : 1)
         {
             _isGrace = isGrace;

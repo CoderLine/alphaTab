@@ -1,0 +1,6 @@
+[submodule "Compiler/SaltarelleCompiler"]
+	path = Compiler/SaltarelleCompiler
+	url = git@github.com:erik-kallen/SaltarelleCompiler.git
+[submodule "Compiler/SaltarelleWeb"]
+	path = Compiler/SaltarelleWeb
+	url = git@github.com:erik-kallen/SaltarelleWeb.git

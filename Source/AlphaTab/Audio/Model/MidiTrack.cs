@@ -1,4 +1,4 @@
-﻿using System.IO;
+﻿using AlphaTab.IO;
 
 namespace AlphaTab.Audio.Model
 {
@@ -137,17 +137,17 @@ namespace AlphaTab.Audio.Model
             }
         
             // magic number "MTrk" (0x4D54726B)
-            byte[] b = {0x4D, 0x54, 0x72, 0x6B};
+            var b = new ByteArray(0x4D, 0x54, 0x72, 0x6B);
             s.Write(b, 0, b.Length);
 
             // size as integer
             var data = trackData.ToArray();
             var l = data.Length;
-            b = new []
-            {
+            b = new ByteArray
+            (
               (byte)((l >> 24) & 0xFF), (byte)((l >> 16) & 0xFF),
               (byte)((l >> 8) & 0xFF), (byte)((l >> 0) & 0xFF)
-            };
+            );
             s.Write(b, 0, b.Length);
             s.Write(data, 0, data.Length);
         }

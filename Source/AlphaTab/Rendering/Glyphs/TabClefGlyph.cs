@@ -5,6 +5,11 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class TabClefGlyph : Glyph
     {
+        public TabClefGlyph(int x, int y) 
+            : base(x, y)
+        {
+        }
+
         public override void DoLayout()
         {
             Width = (int)(28 * Scale);

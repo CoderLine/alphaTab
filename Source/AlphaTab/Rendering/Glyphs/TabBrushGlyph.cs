@@ -9,6 +9,7 @@ namespace AlphaTab.Rendering.Glyphs
         private readonly Beat _beat;
 
         public TabBrushGlyph(Beat beat)
+            : base(0, 0)
         {
             _beat = beat;
         }

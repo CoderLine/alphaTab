@@ -32,7 +32,7 @@ namespace AlphaTab.Rendering
             TabBeatGlyph beat = (TabBeatGlyph)GetOnNotesPosition(note.Beat.Voice.Index, note.Beat.Index);
             if (beat != null)
             {
-                return beat.Container.X + beat.X + beat.noteNumbers.GetNoteX(note, onEnd);
+                return beat.Container.X + beat.X + beat.NoteNumbers.GetNoteX(note, onEnd);
             }
             return PostBeatGlyphsStart;
         }
@@ -52,7 +52,7 @@ namespace AlphaTab.Rendering
             TabBeatGlyph beat = (TabBeatGlyph)GetOnNotesPosition(note.Beat.Voice.Index, note.Beat.Index);
             if (beat != null)
             {
-                return beat.noteNumbers.GetNoteY(note);
+                return beat.NoteNumbers.GetNoteY(note);
             }
             return 0;
         }
@@ -79,7 +79,7 @@ namespace AlphaTab.Rendering
             // Clef
             if (IsFirstOfLine)
             {
-                AddPreBeatGlyph(new TabClefGlyph());
+                AddPreBeatGlyph(new TabClefGlyph(0, 0));
             }
 
             AddPreBeatGlyph(new BarNumberGlyph(0, GetTabY(-1, -3), Bar.Index + 1, !Stave.IsFirstInAccolade));
@@ -119,7 +119,7 @@ namespace AlphaTab.Rendering
         {
             if (Bar.MasterBar.IsRepeatEnd)
             {
-                AddPostBeatGlyph(new RepeatCloseGlyph(X));
+                AddPostBeatGlyph(new RepeatCloseGlyph(X, 0));
                 if (Bar.MasterBar.RepeatCount > 2)
                 {
                     var line = IsLast || IsLastOfLine ? -1 : -4;
@@ -128,9 +128,9 @@ namespace AlphaTab.Rendering
             }
             else if (Bar.MasterBar.IsDoubleBar)
             {
-                AddPostBeatGlyph(new BarSeperatorGlyph());
+                AddPostBeatGlyph(new BarSeperatorGlyph(0, 0));
                 AddPostBeatGlyph(new SpacingGlyph(0, 0, (int)(3 * Scale), false));
-                AddPostBeatGlyph(new BarSeperatorGlyph());
+                AddPostBeatGlyph(new BarSeperatorGlyph(0, 0));
             }
             else if (Bar.NextBar == null || !Bar.NextBar.MasterBar.IsRepeatStart)
             {

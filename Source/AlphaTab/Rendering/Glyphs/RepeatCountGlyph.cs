@@ -6,7 +6,7 @@ namespace AlphaTab.Rendering.Glyphs
     {
         private readonly int _count;
 
-        public RepeatCountGlyph(int x = 0, int y = 0, int count = 1) : base(x, y)
+        public RepeatCountGlyph(int x, int y, int count) : base(x, y)
         {
             _count = count;
         }

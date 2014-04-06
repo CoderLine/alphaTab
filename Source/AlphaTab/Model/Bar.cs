@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using AlphaTab.Platform;
 
 namespace AlphaTab.Model
 {
@@ -19,8 +20,8 @@ namespace AlphaTab.Model
         public Clef Clef { get; set; }
         public Track Track { get; set; }
         public List<Voice> Voices { get; set; }
-        public Duration? MinDuration { get; set; }
-        public Duration? MaxDuration { get; set; }
+        public Nullable<Duration> MinDuration { get; set; }
+        public Nullable<Duration> MaxDuration { get; set; }
 
         public void AddVoice(Voice voice)
         {
@@ -59,11 +60,11 @@ namespace AlphaTab.Model
             foreach (var voice in Voices)
             {
                 voice.Finish();
-                if (!voice.MinDuration.HasValue || !MinDuration.HasValue || MinDuration.Value > voice.MinDuration.Value)
+                if (voice.MinDuration == null || MinDuration == null || MinDuration.Value > voice.MinDuration.Value)
                 {
                     MinDuration = voice.MinDuration;
                 }
-                if (!voice.MaxDuration.HasValue || !MaxDuration.HasValue || MaxDuration.Value > voice.MaxDuration.Value)
+                if (voice.MaxDuration == null || MaxDuration == null || MaxDuration.Value > voice.MaxDuration.Value)
                 {
                     MinDuration = voice.MaxDuration;
                 }

@@ -261,6 +261,21 @@ namespace AlphaTab.Rendering
             }
         }
 
+        public int PostBeatGlyphsWidth
+        {
+            get
+            {
+                var width = 0;
+                foreach (var c in _postBeatGlyphs)
+                {
+                    var x = c.X + c.Width;
+                    if (x > width)
+                        width = x;
+                }
+                return width;
+            }
+        }
+
         public override void ApplyBarSpacing(int spacing)
         {
             Width += spacing;
@@ -300,7 +315,7 @@ namespace AlphaTab.Rendering
                 c.Paint(cx + X + glyphStartX, cy + Y, canvas);
             }
 
-            glyphStartX = PostBeatGlyphsStart;
+            glyphStartX = Width - PostBeatGlyphsWidth;
             foreach (var g in _postBeatGlyphs)
             {
                 g.Paint(cx + X + glyphStartX, cy + Y, canvas);
@@ -317,7 +332,7 @@ namespace AlphaTab.Rendering
                 int realTop, int realHeight, int x)
         {
             base.BuildBoundingsLookup(lookup, visualTop, visualHeight, realTop, realHeight, x);
-            var barLookup = lookup.Bars[lookup.Bars.Count - 11];
+            var barLookup = lookup.Bars[lookup.Bars.Count - 1];
             var beatStart = BeatGlyphsStart;
             foreach (var c in _voiceContainers.Values)
             {

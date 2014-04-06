@@ -18,7 +18,7 @@ namespace AlphaTab.Rendering.Glyphs
             _isGrace = isGrace;
             if (!n.IsTieDestination)
             {
-                _noteString = n.IsDead ? "X" : n.Fret.ToString(CultureInfo.InvariantCulture);
+                _noteString = n.IsDead ? "X" : n.Fret.ToString();
                 if (n.IsGhost)
                 {
                     _noteString = "(" + _noteString + ")";
@@ -52,7 +52,7 @@ namespace AlphaTab.Rendering.Glyphs
         {
             if (_noteString != null)
             {
-                canvas.FillText(_noteString.ToLower(CultureInfo.InvariantCulture), cx + X + (Padding * Scale), cy + Y);
+                canvas.FillText(_noteString.ToLower(), cx + X + (Padding * Scale), cy + Y);
             }
         }
     }

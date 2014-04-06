@@ -4,7 +4,7 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class FadeInGlyph : Glyph
     {
-        public FadeInGlyph(int x = 0, int y = 0)
+        public FadeInGlyph(int x , int y)
             : base(x, y)
         {
         }

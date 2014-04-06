@@ -1,4 +1,5 @@
 ﻿using System;
+using AlphaTab.IO;
 
 namespace AlphaTab.Platform
 {
@@ -8,7 +9,7 @@ namespace AlphaTab.Platform
     /// </summary>
     public interface IFileLoader
     {
-        byte[] LoadBinary(string path);
-        void LoadBinaryAsync(string path, Action<byte[]> success, Action<Exception> error);
+        ByteArray LoadBinary(string path);
+        void LoadBinaryAsync(string path, Action<ByteArray> success, Action<Exception> error);
     }
 }

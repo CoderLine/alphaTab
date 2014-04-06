@@ -1,4 +1,4 @@
-﻿using System.IO;
+﻿using AlphaTab.IO;
 
 namespace AlphaTab.Audio.Model
 {
@@ -35,7 +35,7 @@ namespace AlphaTab.Audio.Model
 
         private void WriteVariableInt(Stream s, int value)
         {
-            var array = new byte[] { 0, 0, 0, 0 };
+            var array = new ByteArray(4);
 
             var n = 0;
             do

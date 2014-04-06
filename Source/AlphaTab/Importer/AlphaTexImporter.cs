@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using AlphaTab.Audio;
 using AlphaTab.Model;
 
@@ -216,11 +217,11 @@ namespace AlphaTab.Importer
                 else if (_ch == '"' || _ch == '\'')
                 {
                     NextChar();
-                    var s = "";
+                    var s = new StringBuilder();
                     _sy = AlphaTexSymbols.String;
                     while (_ch != '"' && _ch != '\'' && _ch != Eof)
                     {
-                        s += _ch;
+                        s.Append(_ch);
                         NextChar();
                     }
                     _syData = s;
@@ -370,13 +371,13 @@ namespace AlphaTab.Importer
         /// <returns>the read string.</returns>
         private string ReadName()
         {
-            var str = "";
+            var str = new StringBuilder();
             do
             {
-                str += _ch;
+                str.Append(_ch);
                 NextChar();
             } while (IsLetter(_ch) || IsDigit(_ch));
-            return str;
+            return str.ToString();
         }
 
         /// <summary>
@@ -385,13 +386,13 @@ namespace AlphaTab.Importer
         /// <returns>the read number.</returns>
         private int ReadNumber()
         {
-            var str = "";
+            var str = new StringBuilder();
             do
             {
-                str += _ch;
+                str.Append(_ch);
                 NextChar();
             } while (IsDigit(_ch));
-            return int.Parse(str);
+            return int.Parse(str.ToString());
         }
 
         #region Recursive Decent Parser
@@ -907,9 +908,9 @@ namespace AlphaTab.Importer
                     NewSy();
                 }
 
-                if (beat.WhammyBarPoints.Count > 60)
+                while (beat.WhammyBarPoints.Count > 60)
                 {
-                    beat.WhammyBarPoints = beat.WhammyBarPoints.GetRange(0, 60);
+                    beat.WhammyBarPoints.RemoveAt(beat.WhammyBarPoints.Count - 1);
                 }
 
                 // set positions
@@ -1013,9 +1014,9 @@ namespace AlphaTab.Importer
                         NewSy();
                     }
 
-                    if (note.BendPoints.Count > 60)
+                    while (note.BendPoints.Count > 60)
                     {
-                        note.BendPoints = note.BendPoints.GetRange(0, 60);
+                        note.BendPoints.RemoveAt(note.BendPoints.Count - 1);
                     }
 
                     // set positions
@@ -1133,7 +1134,7 @@ namespace AlphaTab.Importer
                         }
                         NewSy();
                     }
-                    note.Beat.TremoloSpeed = duration;
+                    note.Beat.TremoloSpeed = new Platform.Nullable<Duration>(duration);
                 }
                 else if (syData == "v")
                 {

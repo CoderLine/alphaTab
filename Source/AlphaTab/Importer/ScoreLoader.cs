@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO;
+using AlphaTab.IO;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 
@@ -22,14 +22,21 @@ namespace AlphaTab.Importer
             IFileLoader loader = Environment.FileLoaders["default"]();
             loader.LoadBinaryAsync(path, data =>
             {
+                Score score = null;
                 try
                 {
-                    success(LoadScoreFromBytes(data));
+                    score = LoadScoreFromBytes(data);
                 }
                 catch (Exception e)
                 {
                     error(e);
                 }
+
+                if (score != null)
+                {
+                    success(LoadScoreFromBytes(data));
+                }
+
             }, error);
         }
 
@@ -46,7 +53,7 @@ namespace AlphaTab.Importer
             return LoadScoreFromBytes(data);
         }
 
-        public static Score LoadScoreFromBytes(byte[] data)
+        public static Score LoadScoreFromBytes(ByteArray data)
         {
             var importers = ScoreImporter.BuildImporters();
 

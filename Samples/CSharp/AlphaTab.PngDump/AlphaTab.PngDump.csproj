@@ -50,7 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Source\AlphaTab\AlphaTab.csproj">
-      <Project>{C5C9CA45-D7BC-41F5-B9E1-97731858CE10}</Project>
+      <Project>{c5c9ca45-d7bc-41f5-b9e1-97731858ce10}</Project>
       <Name>AlphaTab</Name>
     </ProjectReference>
   </ItemGroup>

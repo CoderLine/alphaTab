@@ -421,7 +421,7 @@ namespace AlphaTab.Audio.Generator
         private void GenerateTremoloPicking(Note note, int noteStart, int noteDuration, int noteKey, DynamicValue dynamicValue)
         {
             var track = note.Beat.Voice.Bar.Track;
-            var tpLength = note.Beat.TremoloSpeed.GetValueOrDefault().ToTicks();
+            var tpLength = note.Beat.TremoloSpeed.Value.ToTicks();
             var tick = noteStart;
             while (tick + 10 < (noteStart + noteDuration))
             {

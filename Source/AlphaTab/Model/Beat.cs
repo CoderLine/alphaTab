@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using AlphaTab.Audio;
+using AlphaTab.Platform;
 
 namespace AlphaTab.Model
 {
@@ -111,10 +112,10 @@ namespace AlphaTab.Model
 
         public bool IsTremolo
         {
-            get { return TremoloSpeed.HasValue; }
+            get { return TremoloSpeed != null; }
         }
 
-        public Duration? TremoloSpeed { get; set; }
+        public Nullable<Duration> TremoloSpeed { get; set; }
         public CrescendoType Crescendo { get; set; }
 
         /// <summary>

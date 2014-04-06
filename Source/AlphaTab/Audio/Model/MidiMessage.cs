@@ -1,4 +1,4 @@
-﻿using System.IO;
+﻿using AlphaTab.IO;
 
 namespace AlphaTab.Audio.Model
 {
@@ -12,9 +12,9 @@ namespace AlphaTab.Audio.Model
         /// <summary>
         /// The raw midi message data
         /// </summary>
-        public byte[] Data { get; set; }
+        public ByteArray Data { get; set; }
 
-        public MidiMessage(byte[] data)
+        public MidiMessage(ByteArray data)
         {
             Data = data;
         }

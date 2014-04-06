@@ -9,7 +9,7 @@ namespace AlphaTab.Rendering.Glyphs
             if (Container.Beat.BrushType != BrushType.None)
             {
                 AddGlyph(new TabBrushGlyph(Container.Beat));
-                AddGlyph(new SpacingGlyph(0, 0, (int)(4 * Scale)));
+                AddGlyph(new SpacingGlyph(0, 0, (int)(4 * Scale), true));
             }
             base.DoLayout();
         }

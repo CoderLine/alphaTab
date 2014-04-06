@@ -12,7 +12,7 @@ namespace AlphaTab.Rendering.Glyphs
     {
         protected List<Glyph> Glyphs;
 
-        public GlyphGroup(int x = 0, int y = 0, List<Glyph> glyphs = null)
+        public GlyphGroup(int x, int y, List<Glyph> glyphs)
             :base(x,y)
         {
             Glyphs = glyphs ?? new List<Glyph>();

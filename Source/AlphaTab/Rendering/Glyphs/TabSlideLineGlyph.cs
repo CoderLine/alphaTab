@@ -10,6 +10,7 @@ namespace AlphaTab.Rendering.Glyphs
         private readonly BeatContainerGlyph _parent;
 
         public TabSlideLineGlyph(SlideType type, Note startNote, BeatContainerGlyph parent)
+            : base(0, 0)
         {
             _type = type;
             _startNote = startNote;

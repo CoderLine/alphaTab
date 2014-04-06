@@ -7,7 +7,7 @@ namespace AlphaTab.Rendering.Glyphs
         private readonly int _dotOffset;
         private readonly float _circleSize;
 
-        public RepeatOpenGlyph(int x = 0, int y = 0, float circleSize = 0, int dotOffset = 0)
+        public RepeatOpenGlyph(int x, int y, float circleSize, int dotOffset)
             : base(x, y)
         {
             _dotOffset = dotOffset;

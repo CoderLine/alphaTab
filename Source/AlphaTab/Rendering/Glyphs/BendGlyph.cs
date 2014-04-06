@@ -10,6 +10,7 @@ namespace AlphaTab.Rendering.Glyphs
         private readonly int _height;
 
         public BendGlyph(Note n, int width, int height)
+            : base(0, 0)
         {
             _note = n;
             Width = width;

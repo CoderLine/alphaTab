@@ -22,7 +22,7 @@ namespace AlphaTab.Rendering.Effects
 
         public override Glyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
         {
-            return new TrillGlyph();
+            return new TrillGlyph(0, 0);
         }
     }
 }

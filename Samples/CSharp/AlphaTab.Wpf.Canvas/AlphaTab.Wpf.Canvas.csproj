@@ -95,13 +95,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Source\AlphaTab\AlphaTab.csproj">
+      <Project>{C5C9CA45-D7BC-41F5-B9E1-97731858CE10}</Project>
+      <Name>AlphaTab</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AlphaTab.Wpf.Share\AlphaTab.Wpf.Share.csproj">
       <Project>{0204D916-F0C3-41E2-9D81-B13D41D9F748}</Project>
       <Name>AlphaTab.Wpf.Share</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Source\AlphaTab\AlphaTab.csproj">
-      <Project>{c5c9ca45-d7bc-41f5-b9e1-97731858ce10}</Project>
-      <Name>AlphaTab</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿#if CSharp
+using System.Windows;
 using System.Windows.Controls;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
@@ -72,3 +73,4 @@ namespace AlphaTab.Platform.CSharp
 
     }
 }
+#endif

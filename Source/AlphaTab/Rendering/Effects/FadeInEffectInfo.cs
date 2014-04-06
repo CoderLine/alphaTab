@@ -19,7 +19,7 @@ namespace AlphaTab.Rendering.Effects
 
         public Glyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
         {
-            return new FadeInGlyph();
+            return new FadeInGlyph(0, 0);
         }
 
         public bool CanExpand(EffectBarRenderer renderer, Beat @from, Beat to)

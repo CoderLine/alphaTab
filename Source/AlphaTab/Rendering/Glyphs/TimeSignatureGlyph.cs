@@ -6,7 +6,7 @@
         private readonly int _denominator;
 
         public TimeSignatureGlyph(int x, int y, int numerator, int denominator)
-            : base(x, y)
+            : base(x, y, null)
         {
             _numerator = numerator;
             _denominator = denominator;

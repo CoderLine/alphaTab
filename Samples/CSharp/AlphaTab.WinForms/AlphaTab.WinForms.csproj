@@ -113,12 +113,6 @@
     <None Include="Resources\folder_page_white.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Source\AlphaTab\AlphaTab.csproj">
-      <Project>{C5C9CA45-D7BC-41F5-B9E1-97731858CE10}</Project>
-      <Name>AlphaTab</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\information.png" />
   </ItemGroup>
   <ItemGroup>
@@ -129,6 +123,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\control_stop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Source\AlphaTab\AlphaTab.csproj">
+      <Project>{c5c9ca45-d7bc-41f5-b9e1-97731858ce10}</Project>
+      <Name>AlphaTab</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

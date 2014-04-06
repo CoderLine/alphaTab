@@ -8,7 +8,7 @@ namespace AlphaTab.Rendering.Glyphs
         private readonly int _number;
         private readonly bool _hidden;
 
-        public BarNumberGlyph(int x, int y, int number, bool hidden = false)
+        public BarNumberGlyph(int x, int y, int number, bool hidden)
             : base(x, y)
         {
             _number = number;
@@ -37,7 +37,7 @@ namespace AlphaTab.Rendering.Glyphs
             canvas.Color = res.BarNumberColor;
             canvas.Font = res.BarNumberFont;
 
-            canvas.FillText(_number.ToString(CultureInfo.InvariantCulture), cx + X, cy + Y);
+            canvas.FillText(_number.ToString(), cx + X, cy + Y);
         }
     }
 }

@@ -4,7 +4,8 @@
     {
         private readonly int _number;
 
-        public NumberGlyph(int x = 0, int y = 0, int number = 0) : base(x, y)
+        public NumberGlyph(int x, int y, int number)
+            : base(x, y, null)
         {
             _number = number;
         }
@@ -21,11 +22,11 @@
             {
                 var num = i % 10;
                 var gl = new DigitGlyph(0, 0, num);
-                Glyphs.Add(gl);        
+                Glyphs.Add(gl);
                 i = i / 10;
             }
             Glyphs.Reverse();
-        
+
             var cx = 0;
             foreach (var g in Glyphs)
             {
@@ -34,7 +35,7 @@
                 g.Renderer = Renderer;
                 g.DoLayout();
                 cx += g.Width;
-            }    
+            }
             Width = cx;
         }
     }

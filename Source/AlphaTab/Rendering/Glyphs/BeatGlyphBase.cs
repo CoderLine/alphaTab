@@ -7,6 +7,10 @@ namespace AlphaTab.Rendering.Glyphs
     {
         public BeatContainerGlyph Container { get; set; }
 
+        public BeatGlyphBase()
+            : base(0, 0, null)
+        {
+        }
 
         public override void DoLayout()
         {
