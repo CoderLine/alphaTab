@@ -10174,15 +10174,9 @@
 	ss.initInterface($AlphaTab_Rendering_Glyphs_ISupportsFinalize, $asm, { finalizeGlyph: null });
 	ss.initClass($AlphaTab_Rendering_Glyphs_BeatContainerGlyph, $asm, {
 		finalizeGlyph: function(layout) {
-			if (ss.isInstanceOfType(this.preNotes, $AlphaTab_Rendering_Glyphs_ISupportsFinalize)) {
-				this.preNotes.finalizeGlyph(layout);
-			}
-			if (ss.isInstanceOfType(this.onNotes, $AlphaTab_Rendering_Glyphs_ISupportsFinalize)) {
-				this.onNotes.finalizeGlyph(layout);
-			}
-			if (ss.isInstanceOfType(this.postNotes, $AlphaTab_Rendering_Glyphs_ISupportsFinalize)) {
-				this.postNotes.finalizeGlyph(layout);
-			}
+			this.preNotes.finalizeGlyph(layout);
+			this.onNotes.finalizeGlyph(layout);
+			this.postNotes.finalizeGlyph(layout);
 		},
 		registerMaxSizes: function(sizes) {
 			if (sizes.getPreNoteSize(this.beat.start) < this.preNotes.width) {
@@ -11254,8 +11248,10 @@
 					throw new ss.ArgumentOutOfRangeException();
 				}
 			}
+		},
+		finalizeGlyph: function(layout) {
 		}
-	}, $AlphaTab_Rendering_Glyphs_GlyphGroup);
+	}, $AlphaTab_Rendering_Glyphs_GlyphGroup, [$AlphaTab_Rendering_Glyphs_ISupportsFinalize]);
 	ss.initClass($AlphaTab_Rendering_Glyphs_BendGlyph, $asm, {
 		paint: function(cx, cy, canvas) {
 			var r = this.renderer;
@@ -12118,7 +12114,7 @@
 			this.addGlyph(new $AlphaTab_Rendering_Glyphs_SpacingGlyph(0, 0, ss.Int32.trunc(this.get_beatDurationWidth() * this.get_scale()), true));
 			$AlphaTab_Rendering_Glyphs_BeatGlyphBase.prototype.doLayout.call(this);
 		}
-	}, $AlphaTab_Rendering_Glyphs_BeatGlyphBase);
+	}, $AlphaTab_Rendering_Glyphs_BeatGlyphBase, [$AlphaTab_Rendering_Glyphs_ISupportsFinalize]);
 	ss.initClass($AlphaTab_Rendering_Glyphs_ScoreBeatPreNotesGlyph, $asm, {
 		applyGlyphSpacing: function(spacing) {
 			$AlphaTab_Rendering_Glyphs_Glyph.prototype.applyGlyphSpacing.call(this, spacing);
@@ -12163,7 +12159,7 @@
 				}
 			}
 		}
-	}, $AlphaTab_Rendering_Glyphs_BeatGlyphBase);
+	}, $AlphaTab_Rendering_Glyphs_BeatGlyphBase, [$AlphaTab_Rendering_Glyphs_ISupportsFinalize]);
 	ss.initClass($AlphaTab_Rendering_Glyphs_ScoreBrushGlyph, $asm, {
 		doLayout: function() {
 			this.width = ss.Int32.trunc(10 * this.get_scale());
@@ -12618,7 +12614,7 @@
 				this.addGlyph(new $AlphaTab_Rendering_Glyphs_BendGlyph(n, ss.Int32.trunc(this.get_beatDurationWidth() * this.get_scale()), bendHeight));
 			}
 		}
-	}, $AlphaTab_Rendering_Glyphs_BeatGlyphBase);
+	}, $AlphaTab_Rendering_Glyphs_BeatGlyphBase, [$AlphaTab_Rendering_Glyphs_ISupportsFinalize]);
 	ss.initClass($AlphaTab_Rendering_Glyphs_TabBeatPreNotesGlyph, $asm, {
 		doLayout: function() {
 			if (this.get_container().beat.brushType !== 0) {
@@ -12627,7 +12623,7 @@
 			}
 			$AlphaTab_Rendering_Glyphs_BeatGlyphBase.prototype.doLayout.call(this);
 		}
-	}, $AlphaTab_Rendering_Glyphs_BeatGlyphBase);
+	}, $AlphaTab_Rendering_Glyphs_BeatGlyphBase, [$AlphaTab_Rendering_Glyphs_ISupportsFinalize]);
 	ss.initClass($AlphaTab_Rendering_Glyphs_TabBrushGlyph, $asm, {
 		doLayout: function() {
 			this.width = ss.Int32.trunc(10 * this.get_scale());

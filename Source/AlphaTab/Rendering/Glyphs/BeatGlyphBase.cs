@@ -1,9 +1,10 @@
 ﻿using System;
 using AlphaTab.Model;
+using AlphaTab.Rendering.Layout;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class BeatGlyphBase : GlyphGroup
+    public class BeatGlyphBase : GlyphGroup, ISupportsFinalize
     {
         public BeatContainerGlyph Container { get; set; }
 
@@ -59,6 +60,11 @@ namespace AlphaTab.Rendering.Glyphs
                         throw new ArgumentOutOfRangeException();
                 }
             }
+        }
+
+        public virtual void FinalizeGlyph(ScoreLayout layout)
+        {
+            
         }
     }
 }

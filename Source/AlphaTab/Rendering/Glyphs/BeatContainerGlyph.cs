@@ -32,18 +32,9 @@ namespace AlphaTab.Rendering.Glyphs
 
         public void FinalizeGlyph(ScoreLayout layout)
         {
-            if (PreNotes is ISupportsFinalize)
-            {
-                ((ISupportsFinalize)PreNotes).FinalizeGlyph(layout);
-            }
-            if (OnNotes is ISupportsFinalize)
-            {
-                ((ISupportsFinalize)OnNotes).FinalizeGlyph(layout);
-            }
-            if (PostNotes is ISupportsFinalize)
-            {
-                ((ISupportsFinalize)PostNotes).FinalizeGlyph(layout);
-            }
+            PreNotes.FinalizeGlyph(layout);
+            OnNotes.FinalizeGlyph(layout);
+            PostNotes.FinalizeGlyph(layout);
         }
 
         public void RegisterMaxSizes(BarSizeInfo sizes)
