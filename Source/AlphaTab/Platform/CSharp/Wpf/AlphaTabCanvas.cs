@@ -4,7 +4,7 @@ using System.Windows.Controls;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
 
-namespace AlphaTab.Platform.CSharp
+namespace AlphaTab.Platform.CSharp.Wpf
 {
     public class AlphaTabCanvas : Canvas
     {

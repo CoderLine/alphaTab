@@ -1,4 +1,5 @@
-﻿#if CSharp
+﻿using System.Runtime.InteropServices;
+#if CSharp
 using System;
 using System.Drawing;
 using System.Windows;
@@ -65,17 +66,27 @@ namespace AlphaTab.Platform.CSharp.Wpf
             remove { RemoveHandler(RenderFinishedEvent, value); }
         }
 
-        // This method raises the Tap event 
+        [DllImport("gdi32.dll")]
+        private static extern bool DeleteObject(IntPtr hObject);
+
         protected virtual void OnRenderFinished()
         {
             using (Bitmap bitmap = ((GdiCanvas)_renderer.Canvas).Image)
             {
-                Source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
-                    bitmap.GetHbitmap(),
-                    IntPtr.Zero, Int32Rect.Empty,
-                    BitmapSizeOptions.FromWidthAndHeight(bitmap.Width, bitmap.Height));
-                Width = bitmap.Width;
-                Height = bitmap.Height;
+                IntPtr hBitmap = bitmap.GetHbitmap();
+                try
+                {
+                    Source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+                        hBitmap,
+                        IntPtr.Zero, Int32Rect.Empty,
+                        BitmapSizeOptions.FromWidthAndHeight(bitmap.Width, bitmap.Height));
+                    Width = bitmap.Width;
+                    Height = bitmap.Height;
+                }
+                finally
+                {
+                    DeleteObject(hBitmap);
+                }
             }
 
             RoutedEventArgs newEventArgs = new RoutedEventArgs(RenderFinishedEvent);

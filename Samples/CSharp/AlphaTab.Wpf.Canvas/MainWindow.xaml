@@ -4,6 +4,7 @@
         xmlns:controls="clr-namespace:AlphaTab.Wpf.Share.Controls;assembly=AlphaTab.Wpf.Share"
         xmlns:converter="clr-namespace:AlphaTab.Wpf.Share.Converter;assembly=AlphaTab.Wpf.Share"
         xmlns:cSharp="clr-namespace:AlphaTab.Platform.CSharp;assembly=AlphaTab"
+        xmlns:wpf="clr-namespace:AlphaTab.Platform.CSharp.Wpf;assembly=AlphaTab"
         Title="{Binding ScoreTitle,StringFormat={}AlphaTab - {0}}" Height="800" Width="600" WindowState="Maximized">
     <Grid Background="#4b4c4c">
         <Grid.RowDefinitions>
@@ -36,7 +37,7 @@
                 <!-- The Background of the tablature -->
                 <Border VerticalAlignment="Top" Background="#F5F5F5" Name="TablatureContainer">
                     <!-- The Actual AlphaTab control with a binding to a track -->
-                    <cSharp:AlphaTabCanvas Name="TablatureControl" Track="{Binding CurrentTrack}" RenderFinished="OnRenderFinished" />
+                    <wpf:AlphaTabCanvas Name="TablatureControl" Track="{Binding CurrentTrack}" RenderFinished="OnRenderFinished" />
                 </Border>
             </Grid>
         </ScrollViewer>

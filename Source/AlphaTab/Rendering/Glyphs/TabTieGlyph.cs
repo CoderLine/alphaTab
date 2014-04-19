@@ -12,14 +12,20 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void Paint(int cx, int cy, ICanvas canvas)
         {
-            if (EndNote == null || StartNote.Beat.Index != EndNote.Beat.Index) return;
+            if (EndNote == null) return;
+
             TabBarRenderer r = (TabBarRenderer)Renderer;
+
+            // check if the bar renderer of the next bar is on the same stave line
+            bool isOnSameLine = r.Stave.StaveGroup.MasterBars.Contains(EndNote.Beat.Voice.Bar.MasterBar);
+            Note endNote = isOnSameLine ? EndNote : null;
+
             TabBeatContainerGlyph parent = (TabBeatContainerGlyph)Parent;
             var res = r.Resources;
-            var startX = cx + r.GetNoteX(StartNote);
-            var endX = EndNote == null
+            var startX = cx + r.GetNoteX(StartNote, false);
+            var endX = endNote == null
                         ? cx + parent.X + parent.PostNotes.X + parent.PostNotes.Width  // end of beat container
-                        : cx + r.GetNoteX(EndNote, false);
+                        : cx + r.GetNoteX(endNote, false);
 
             var down = StartNote.String > 3;
             var offset = (res.TablatureFont.Size / 2);
@@ -29,7 +35,7 @@ namespace AlphaTab.Rendering.Glyphs
             }
 
             var startY = cy + r.GetNoteY(StartNote) + offset;
-            var endY = EndNote == null ? startY : cy + r.GetNoteY(EndNote) + offset;
+            var endY = endNote == null ? startY : cy + r.GetNoteY(endNote) + offset;
 
             PaintTie(canvas, Scale, startX, startY, endX, endY, StartNote.String > 3);
 

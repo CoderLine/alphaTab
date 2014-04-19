@@ -12668,15 +12668,17 @@
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_ScoreTieGlyph, $asm, {
 		paint: function(cx, cy, canvas) {
-			if (ss.isNullOrUndefined(this.endNote) || this.startNote.beat.index !== this.endNote.beat.index) {
+			if (ss.isNullOrUndefined(this.endNote)) {
 				return;
 			}
 			var r = this.renderer;
+			var isOnSameLine = ss.contains(r.stave.staveGroup.masterBars, this.endNote.beat.voice.bar.get_masterBar());
+			var endNote = (isOnSameLine ? this.endNote : null);
 			var parent = this.parent;
 			var startX = cx + r.getNoteX(this.startNote, true);
-			var endX = (ss.isNullOrUndefined(this.endNote) ? (cx + parent.x + parent.postNotes.x + parent.postNotes.width) : (cx + r.getNoteX(this.endNote, false)));
+			var endX = (ss.isNullOrUndefined(endNote) ? (cx + parent.x + parent.postNotes.x + parent.postNotes.width) : (cx + r.getNoteX(endNote, false)));
 			var startY = cy + r.getNoteY(this.startNote) + 4;
-			var endY = (ss.isNullOrUndefined(this.endNote) ? startY : (cy + r.getNoteY(this.endNote) + 4));
+			var endY = (ss.isNullOrUndefined(endNote) ? startY : (cy + r.getNoteY(endNote) + 4));
 			$AlphaTab_Rendering_Glyphs_TieGlyph.paintTie(canvas, this.get_scale(), startX, startY, endX, endY, r.getBeatDirection(this.startNote.beat) === 1);
 			canvas.set_color(this.renderer.get_layout().renderer.renderingResources.mainGlyphColor);
 			canvas.fill();
@@ -13082,21 +13084,24 @@
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_TabTieGlyph, $asm, {
 		paint: function(cx, cy, canvas) {
-			if (ss.isNullOrUndefined(this.endNote) || this.startNote.beat.index !== this.endNote.beat.index) {
+			if (ss.isNullOrUndefined(this.endNote)) {
 				return;
 			}
 			var r = this.renderer;
+			// check if the bar renderer of the next bar is on the same stave line
+			var isOnSameLine = ss.contains(r.stave.staveGroup.masterBars, this.endNote.beat.voice.bar.get_masterBar());
+			var endNote = (isOnSameLine ? this.endNote : null);
 			var parent = this.parent;
 			var res = r.get_resources();
-			var startX = cx + r.getNoteX(this.startNote, true);
-			var endX = (ss.isNullOrUndefined(this.endNote) ? (cx + parent.x + parent.postNotes.x + parent.postNotes.width) : (cx + r.getNoteX(this.endNote, false)));
+			var startX = cx + r.getNoteX(this.startNote, false);
+			var endX = (ss.isNullOrUndefined(endNote) ? (cx + parent.x + parent.postNotes.x + parent.postNotes.width) : (cx + r.getNoteX(endNote, false)));
 			var down = this.startNote.string > 3;
 			var offset = res.tablatureFont.get_size() / 2;
 			if (down) {
 				offset *= -1;
 			}
 			var startY = cy + r.getNoteY(this.startNote) + offset;
-			var endY = (ss.isNullOrUndefined(this.endNote) ? startY : (cy + r.getNoteY(this.endNote) + offset));
+			var endY = (ss.isNullOrUndefined(endNote) ? startY : (cy + r.getNoteY(endNote) + offset));
 			$AlphaTab_Rendering_Glyphs_TieGlyph.paintTie(canvas, this.get_scale(), startX, startY, endX, endY, this.startNote.string > 3);
 			canvas.set_color(this.renderer.get_layout().renderer.renderingResources.mainGlyphColor);
 			canvas.fill();
