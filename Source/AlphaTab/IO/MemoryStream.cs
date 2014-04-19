@@ -105,6 +105,15 @@ namespace AlphaTab.IO
         {
         }
 
+        public override int ReadByte()
+        {
+            int n = _length - _position;
+            if (n <= 0)
+                return -1;
+
+            return _buffer[_position++];
+        }
+
         public override int Read(ByteArray buffer, int offset, int count)
         {
             int n = _length - _position;

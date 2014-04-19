@@ -7904,6 +7904,13 @@
 		},
 		flush: function() {
 		},
+		readByte: function() {
+			var n = this.$_length - this.$_position;
+			if (n <= 0) {
+				return -1;
+			}
+			return this.$_buffer.get_item(this.$_position++);
+		},
 		read: function(buffer, offset, count) {
 			var n = this.$_length - this.$_position;
 			if (n > count) {
