@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Rendering.Glyphs;
@@ -13,16 +14,16 @@ namespace AlphaTab.Rendering
     public class EffectBarRenderer : GroupedBarRenderer
     {
         private IEffectBarRendererInfo _info;
-        private List<List<Glyph>> _uniqueEffectGlyphs;
-        private List<Dictionary<int, Glyph>> _effectGlyphs;
+        private FastList<FastList<Glyph>> _uniqueEffectGlyphs;
+        private FastList<FastDictionary<int, Glyph>> _effectGlyphs;
         private Beat _lastBeat;
 
         public EffectBarRenderer(Bar bar, IEffectBarRendererInfo info)
             : base(bar)
         {
             _info = info;
-            _uniqueEffectGlyphs = new List<List<Glyph>>();
-            _effectGlyphs = new List<Dictionary<int, Glyph>>();
+            _uniqueEffectGlyphs = new FastList<FastList<Glyph>>();
+            _effectGlyphs = new FastList<FastDictionary<int, Glyph>>();
         }
 
         public override void DoLayout()
@@ -79,8 +80,9 @@ namespace AlphaTab.Rendering
                     prevGlyph = prevRenderer._effectGlyphs[0][prevRenderer._lastBeat.Index];
                 }
             }
-            foreach (var beatIndex in _effectGlyphs[0].Keys)
+            foreach (var key in _effectGlyphs[0].Keys)
             {
+                int beatIndex = Std.ParseInt(key);
                 Glyph effect = _effectGlyphs[0][beatIndex];
 
                 AlignGlyph(_info.SizingMode, beatIndex, 0, prevGlyph);
@@ -221,20 +223,21 @@ namespace AlphaTab.Rendering
             foreach (var v in Bar.Voices)
             {
                 _effectGlyphs.Add(new Dictionary<int, Glyph>());
-                _uniqueEffectGlyphs.Add(new List<Glyph>());
+                _uniqueEffectGlyphs.Add(new FastList<Glyph>());
                 CreateVoiceGlyphs(v);
             }
 #else
-            _effectGlyphs.Add(new Dictionary<int, Glyph>());
-            _uniqueEffectGlyphs.Add(new List<Glyph>());
+            _effectGlyphs.Add(new FastDictionary<int, Glyph>());
+            _uniqueEffectGlyphs.Add(new FastList<Glyph>());
             CreateVoiceGlyphs(Bar.Voices[0]);
 #endif
         }
 
         private void CreateVoiceGlyphs(Voice v)
         {
-            foreach (var b in v.Beats)
+            for (int i = 0; i < v.Beats.Count; i++)
             {
+                var b = v.Beats[i];
                 // we create empty glyphs as alignment references and to get the 
                 // effect bar sized
                 var container = new BeatContainerGlyph(b);
@@ -343,10 +346,12 @@ namespace AlphaTab.Rendering
 
             var glyphStart = BeatGlyphsStart;
 
-            foreach (var v in _uniqueEffectGlyphs)
+            for (int i = 0; i < _uniqueEffectGlyphs.Count; i++)
             {
-                foreach (var g in v)
+                var v = _uniqueEffectGlyphs[i];
+                for (int j = 0; j < v.Count; j++)
                 {
+                    var g = v[j];
                     if (g.Renderer == this)
                     {
                         g.Paint(cx + X + glyphStart, cy + Y, canvas);

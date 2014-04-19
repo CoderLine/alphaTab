@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using AlphaTab.Collections;
 using AlphaTab.IO;
 
 namespace AlphaTab.Audio.Model
@@ -11,7 +12,7 @@ namespace AlphaTab.Audio.Model
     public class MidiFile
     {
         [IntrinsicProperty]
-        public List<MidiTrack> Tracks { get; set; }
+        public FastList<MidiTrack> Tracks { get; set; }
 
         /// <summary>
         /// Gets or sets the index of the track used for midi events
@@ -22,7 +23,7 @@ namespace AlphaTab.Audio.Model
 
         public MidiFile()
         {
-            Tracks = new List<MidiTrack>();
+            Tracks = new FastList<MidiTrack>();
         }
 
         public MidiTrack CreateTrack()
@@ -59,9 +60,9 @@ namespace AlphaTab.Audio.Model
             b = new ByteArray((byte) ((v >> 8) & 0xFF), (byte) (v & 0xFF));
             s.Write(b, 0, b.Length);
 
-            foreach (var midiTrack in Tracks)
+            for (int i = 0; i < Tracks.Count; i++)
             {
-                midiTrack.WriteTo(s);
+                Tracks[i].WriteTo(s);
             }
         }
     }

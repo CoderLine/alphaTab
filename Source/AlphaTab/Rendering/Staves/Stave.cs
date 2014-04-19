@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Rendering.Layout;
@@ -14,6 +14,7 @@ namespace AlphaTab.Rendering.Staves
     public class Stave
     {
         private BarRendererFactory _factory;
+        private FastDictionary<int, BarRendererBase> _barRendererLookup;
 
         [IntrinsicProperty]
         public StaveTrackGroup StaveTrackGroup { get; set; }
@@ -21,7 +22,7 @@ namespace AlphaTab.Rendering.Staves
         public StaveGroup StaveGroup { get; set; }
 
         [IntrinsicProperty]
-        public List<BarRendererBase> BarRenderers { get; set; }
+        public FastList<BarRendererBase> BarRenderers { get; set; }
 
         [IntrinsicProperty]
         public int X { get; set; }
@@ -58,7 +59,8 @@ namespace AlphaTab.Rendering.Staves
 
         public Stave(BarRendererFactory factory)
         {
-            BarRenderers = new List<BarRendererBase>();
+            BarRenderers = new FastList<BarRendererBase>();
+            _barRendererLookup = new FastDictionary<int, BarRendererBase>();
             _factory = factory;
             TopSpacing = 10;
             BottomSpacing = 10;
@@ -91,6 +93,7 @@ namespace AlphaTab.Rendering.Staves
             renderer.Index = BarRenderers.Count;
             renderer.DoLayout();
             BarRenderers.Add(renderer);
+            _barRendererLookup[bar.Index] = renderer;
         }
 
         public void RevertLastBar()
@@ -100,9 +103,9 @@ namespace AlphaTab.Rendering.Staves
 
         public void ApplyBarSpacing(int spacing)
         {
-            foreach (var b in BarRenderers)
+            for (int i = 0; i < BarRenderers.Count; i++)
             {
-                b.ApplyBarSpacing(spacing);
+                BarRenderers[i].ApplyBarSpacing(spacing);
             }
         }
 
@@ -111,8 +114,9 @@ namespace AlphaTab.Rendering.Staves
             get
             {
                 var m = 0;
-                foreach (var r in BarRenderers)
+                for (int i = 0; i < BarRenderers.Count; i++)
                 {
+                    var r = BarRenderers[i];
                     if (r.TopOverflow > m)
                     {
                         m = r.TopOverflow;
@@ -127,8 +131,9 @@ namespace AlphaTab.Rendering.Staves
             get
             {
                 var m = 0;
-                foreach (var r in BarRenderers)
+                for (int i = 0; i < BarRenderers.Count; i++)
                 {
+                    var r = BarRenderers[i];
                     if (r.BottomOverflow > m)
                     {
                         m = r.BottomOverflow;
@@ -172,10 +177,17 @@ namespace AlphaTab.Rendering.Staves
         public void Paint(int cx, int cy, ICanvas canvas)
         {
             if (Height == 0) return;
-            foreach (var r in BarRenderers)
+            for (int i = 0; i < BarRenderers.Count; i++)
             {
-                r.Paint(cx + X, cy + Y, canvas);
+                BarRenderers[i].Paint(cx + X, cy + Y, canvas);
             }
+        }
+
+        public BarRendererBase GetRendererForBar(int index)
+        {
+            if (_barRendererLookup.ContainsKey(index))
+                return _barRendererLookup[index];
+            return null;
         }
     }
 }

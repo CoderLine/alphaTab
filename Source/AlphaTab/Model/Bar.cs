@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using AlphaTab.Platform;
+using AlphaTab.Collections;
 
 namespace AlphaTab.Model
 {
@@ -11,7 +11,7 @@ namespace AlphaTab.Model
     {
         public Bar()
         {
-            Voices = new List<Voice>();
+            Voices = new FastList<Voice>();
             Clef = Clef.G2;
         }
 
@@ -26,11 +26,11 @@ namespace AlphaTab.Model
         [IntrinsicProperty]
         public Track Track { get; set; }
         [IntrinsicProperty]
-        public List<Voice> Voices { get; set; }
+        public FastList<Voice> Voices { get; set; }
         [IntrinsicProperty]
-        public Nullable<Duration> MinDuration { get; set; }
+        public Duration? MinDuration { get; set; }
         [IntrinsicProperty]
-        public Nullable<Duration> MaxDuration { get; set; }
+        public Duration? MaxDuration { get; set; }
 
         public void AddVoice(Voice voice)
         {
@@ -52,9 +52,9 @@ namespace AlphaTab.Model
         {
             get
             {
-                foreach (var voice in Voices)
+                for (int i = 0; i < Voices.Count; i++)
                 {
-                    if (!voice.IsEmpty)
+                    if (!Voices[i].IsEmpty)
                     {
                         return false;
                     }
@@ -66,8 +66,9 @@ namespace AlphaTab.Model
 
         public void Finish()
         {
-            foreach (var voice in Voices)
+            for (int i = 0; i < Voices.Count; i++)
             {
+                var voice = Voices[i];
                 voice.Finish();
                 if (voice.MinDuration == null || MinDuration == null || MinDuration.Value > voice.MinDuration.Value)
                 {

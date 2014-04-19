@@ -26,9 +26,10 @@
             Glyphs.Add(denominator);
 
             base.DoLayout();
-        
-            foreach (var g in Glyphs)
+
+            for (int i = 0; i < Glyphs.Count; i++)
             {
+                var g = Glyphs[i];
                 g.X = (Width - g.Width) / 2;
             }
         }

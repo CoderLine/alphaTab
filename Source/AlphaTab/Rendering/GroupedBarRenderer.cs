@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Rendering.Glyphs;
@@ -19,18 +20,18 @@ namespace AlphaTab.Rendering
         public const string KeySizePre = "Pre";
         public const string KeySizePost = "Post";
 
-        private readonly List<Glyph> _preBeatGlyphs;
-        private readonly Dictionary<int, VoiceContainerGlyph> _voiceContainers;
-        private readonly List<Glyph> _postBeatGlyphs;
+        private readonly FastList<Glyph> _preBeatGlyphs;
+        private readonly FastDictionary<int, VoiceContainerGlyph> _voiceContainers;
+        private readonly FastList<Glyph> _postBeatGlyphs;
 
         private VoiceContainerGlyph _biggestVoiceContainer;
 
         public GroupedBarRenderer(Bar bar)
             : base(bar)
         {
-            _preBeatGlyphs = new List<Glyph>();
-            _voiceContainers = new Dictionary<int, VoiceContainerGlyph>();
-            _postBeatGlyphs = new List<Glyph>();
+            _preBeatGlyphs = new FastList<Glyph>();
+            _voiceContainers = new FastDictionary<int, VoiceContainerGlyph>();
+            _postBeatGlyphs = new FastList<Glyph>();
         }
 
         public override void DoLayout()
@@ -138,7 +139,7 @@ namespace AlphaTab.Rendering
             UpdateWidth();
         }
 
-        private void AddGlyph(List<Glyph> c, Glyph g)
+        private void AddGlyph(FastList<Glyph> c, Glyph g)
         {
             IsEmpty = false;
             g.X = c.Count == 0 ? 0 : (c[c.Count - 1].X + c[c.Count - 1].Width);
@@ -266,8 +267,9 @@ namespace AlphaTab.Rendering
             get
             {
                 var width = 0;
-                foreach (var c in _postBeatGlyphs)
+                for (int i = 0; i < _postBeatGlyphs.Count; i++)
                 {
+                    var c = _postBeatGlyphs[i];
                     var x = c.X + c.Width;
                     if (x > width)
                         width = x;
@@ -304,8 +306,9 @@ namespace AlphaTab.Rendering
             PaintBackground(cx, cy, canvas);
 
             var glyphStartX = PreBeatGlyphStart;
-            foreach (var g in _preBeatGlyphs)
+            for (int i = 0; i < _preBeatGlyphs.Count; i++)
             {
+                var g = _preBeatGlyphs[i];
                 g.Paint(cx + X + glyphStartX, cy + Y, canvas);
             }
 
@@ -316,8 +319,9 @@ namespace AlphaTab.Rendering
             }
 
             glyphStartX = Width - PostBeatGlyphsWidth;
-            foreach (var g in _postBeatGlyphs)
+            for (int i = 0; i < _postBeatGlyphs.Count; i++)
             {
+                var g = _postBeatGlyphs[i];
                 g.Paint(cx + X + glyphStartX, cy + Y, canvas);
             }
         }
@@ -336,8 +340,9 @@ namespace AlphaTab.Rendering
             var beatStart = BeatGlyphsStart;
             foreach (var c in _voiceContainers.Values)
             {
-                foreach (var bc in c.BeatGlyphs)
+                for (int i = 0; i < c.BeatGlyphs.Count; i++)
                 {
+                    var bc = c.BeatGlyphs[i];
                     var beatLookup = new BeatBoundings();
                     beatLookup.Beat = bc.Beat;
                     // on beat bounding rectangle

@@ -15,21 +15,35 @@ namespace AlphaTab.Rendering.Glyphs
         {
             if (EndNote == null) return;
 
-            ScoreBarRenderer r = (ScoreBarRenderer)Renderer;
+            ScoreBarRenderer glyphRenderer = (ScoreBarRenderer)Renderer;
 
-            bool isOnSameLine = r.Stave.StaveGroup.MasterBars.Contains(EndNote.Beat.Voice.Bar.MasterBar);
-            Note endNote = isOnSameLine ? EndNote : null;
+            ScoreBarRenderer startNoteRenderer =
+                    (ScoreBarRenderer) glyphRenderer.Stave.GetRendererForBar(StartNote.Beat.Voice.Bar.Index);
+            ScoreBarRenderer endNoteRenderer =
+                    (ScoreBarRenderer) glyphRenderer.Stave.GetRendererForBar(EndNote.Beat.Voice.Bar.Index);
+
+            // TODO: expand tie to next bar if possible
+            Note endNote;
+            if (startNoteRenderer != endNoteRenderer) 
+            {
+                endNote = null;
+                endNoteRenderer = startNoteRenderer;
+            }
+            else
+            {
+                endNote = EndNote;
+            }
 
             BeatContainerGlyph parent = (BeatContainerGlyph)Parent;
-            var startX = cx + r.GetNoteX(StartNote);
+            var startX = cx + startNoteRenderer.GetNoteX(StartNote);
             var endX = endNote == null
                         ? cx + parent.X + parent.PostNotes.X + parent.PostNotes.Width  // end of beat container
-                        : cx + r.GetNoteX(endNote, false);
+                        : cx + endNoteRenderer.GetNoteX(endNote, false);
 
-            var startY = cy + r.GetNoteY(StartNote) + (NoteHeadGlyph.NoteHeadHeight / 2);
-            var endY = endNote == null ? startY : cy + r.GetNoteY(endNote) + (NoteHeadGlyph.NoteHeadHeight / 2);
+            var startY = cy + startNoteRenderer.GetNoteY(StartNote) + (NoteHeadGlyph.NoteHeadHeight / 2);
+            var endY = endNote == null ? startY : cy + endNoteRenderer.GetNoteY(endNote) + (NoteHeadGlyph.NoteHeadHeight / 2);
 
-            PaintTie(canvas, Scale, startX, startY, endX, endY, r.GetBeatDirection(StartNote.Beat) == BeamDirection.Down);
+            PaintTie(canvas, Scale, startX, startY, endX, endY, startNoteRenderer.GetBeatDirection(StartNote.Beat) == BeamDirection.Down);
 
             canvas.Color = Renderer.Layout.Renderer.RenderingResources.MainGlyphColor;
             canvas.Fill();

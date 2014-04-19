@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using AlphaTab.Audio.Model;
+using AlphaTab.Collections;
 using AlphaTab.IO;
 using AlphaTab.Model;
 
@@ -103,7 +104,7 @@ namespace AlphaTab.Audio.Generator
 
         private static MidiMessage BuildMetaMessage(int metaType, params byte[] data)
         {
-            var meta = new List<byte>();
+            var meta = new FastList<byte>();
 
             meta.Add(0xFF);
             meta.Add((byte)(metaType & 0xFF));
@@ -115,7 +116,7 @@ namespace AlphaTab.Audio.Generator
             return new MidiMessage(new ByteArray(meta.ToArray()));
         }
 
-        private static void WriteVarInt(List<byte> data, int v)
+        private static void WriteVarInt(FastList<byte> data, int v)
         {
             var n = 0;
             var array = new ByteArray(4);
@@ -137,7 +138,7 @@ namespace AlphaTab.Audio.Generator
 
         private static MidiMessage BuildSysExMessage(byte[] data)
         {
-            var sysex = new List<byte>();
+            var sysex = new FastList<byte>();
 
             sysex.Add(0xF0); // status 
             WriteVarInt(sysex, data.Length + 2); // write length of data

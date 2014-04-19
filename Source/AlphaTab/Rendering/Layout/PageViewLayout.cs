@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Staves;
@@ -17,17 +18,17 @@ namespace AlphaTab.Rendering.Layout
         public const int WidthOn100 = 950;
         public const int GroupSpacing = 20;
 
-        private List<StaveGroup> _groups;
+        private FastList<StaveGroup> _groups;
 
         public PageViewLayout(ScoreRenderer renderer)
             : base(renderer)
         {
-            _groups = new List<StaveGroup>();
+            _groups = new FastList<StaveGroup>();
         }
 
         public override void DoLayout()
         {
-            _groups = new List<StaveGroup>();
+            _groups = new FastList<StaveGroup>();
 
             var score = Renderer.Score;
 
@@ -121,7 +122,7 @@ namespace AlphaTab.Rendering.Layout
             y += (int)(20 * scale);
 
             // tuning info
-            if (Renderer.Tracks.Count == 1 && !Renderer.Tracks[0].IsPercussion)
+            if (Renderer.Tracks.Length == 1 && !Renderer.Tracks[0].IsPercussion)
             {
                 var tuning = Tuning.FindTuning(Renderer.Tracks[0].Tuning);
                 if (tuning != null)
@@ -152,9 +153,9 @@ namespace AlphaTab.Rendering.Layout
 
             y = PaintScoreInfo(x, y);
 
-            foreach (var g in _groups)
+            for (int i = 0; i < _groups.Count; i++)
             {
-                g.Paint(0, 0, Renderer.Canvas);
+                _groups[i].Paint(0, 0, Renderer.Canvas);
             }
         }
 
@@ -221,7 +222,7 @@ namespace AlphaTab.Rendering.Layout
             y += (int)(20 * scale);
 
             // tuning info
-            if (Renderer.Tracks.Count == 1 && !Renderer.Tracks[0].IsPercussion)
+            if (Renderer.Tracks.Length == 1 && !Renderer.Tracks[0].IsPercussion)
             {
                 canvas.TextAlign = TextAlign.Left;
                 var tuning = Tuning.FindTuning(Renderer.Tracks[0].Tuning);
@@ -343,9 +344,9 @@ namespace AlphaTab.Rendering.Layout
     
         public override void BuildBoundingsLookup(BoundingsLookup lookup)
         {
-            foreach (var g in _groups)
+            for (int i = 0; i < _groups.Count; i++)
             {
-                g.BuildBoundingsLookup(lookup);
+                _groups[i].BuildBoundingsLookup(lookup);
             }
         }
     }

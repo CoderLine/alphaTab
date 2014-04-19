@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Platform.Model;
@@ -22,7 +23,7 @@ namespace AlphaTab.Rendering
         [IntrinsicProperty]
         public Score Score { get; set; }
         [IntrinsicProperty]
-        public List<Track> Tracks { get; set; }
+        public Track[] Tracks { get; set; }
 
         [IntrinsicProperty]
         public ScoreLayout Layout { get; set; }
@@ -66,14 +67,13 @@ namespace AlphaTab.Rendering
         public void Render(Track track)
         {
             Score = track.Score;
-            Tracks = new List<Track>();
-            Tracks.Add(track);
+            Tracks = new []{track};
             Invalidate();
         }
 
-        public void RenderMultiple(List<Track> tracks)
+        public void RenderMultiple(Track[] tracks)
         {
-            if (tracks.Count == 0)
+            if (tracks.Length == 0)
             {
                 Score = null;
             }
@@ -89,7 +89,7 @@ namespace AlphaTab.Rendering
 
         public void Invalidate()
         {
-            if (Tracks.Count == 0) return;
+            if (Tracks.Length == 0) return;
             if (RenderingResources.Scale != Settings.Scale)
             {
                 RenderingResources.Init(Settings.Scale);

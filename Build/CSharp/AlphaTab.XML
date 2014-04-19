@@ -4,6 +4,18 @@
         <name>AlphaTab</name>
     </assembly>
     <members>
+        <member name="T:AlphaTab.Collections.FastDictionary`2">
+            <summary>
+            This is an improved dictionary which is also optimized for the JavaScript platform. 
+            </summary>
+            <typeparam name="TKey"></typeparam>
+            <typeparam name="TValue"></typeparam>
+        </member>
+        <member name="T:AlphaTab.Collections.FastList`1">
+            <summary>
+            This is an improved list which is also optimized for the JavaScript platform. 
+            </summary>
+        </member>
         <member name="T:AlphaTab.Audio.GeneralMidi">
             <summary>
             This public class provides names for all general midi instruments.

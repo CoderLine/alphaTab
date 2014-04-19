@@ -39,8 +39,9 @@ namespace AlphaTab.Rendering.Glyphs
 
             // left to right layout
             var w = 0;
-            foreach (var g in Glyphs)
+            for (int i = 0; i < Glyphs.Count; i++)
             {
+                var g = Glyphs[i];
                 g.X = w;
                 g.Renderer = Renderer;
                 g.DoLayout();

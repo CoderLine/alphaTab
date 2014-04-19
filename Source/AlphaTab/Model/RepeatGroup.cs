@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using AlphaTab.Collections;
 
 namespace AlphaTab.Model
 {
@@ -12,19 +13,19 @@ namespace AlphaTab.Model
         /// All masterbars repeated within this group
         /// </summary>
         [IntrinsicProperty]
-        public List<MasterBar> MasterBars { get; set; }
+        public FastList<MasterBar> MasterBars { get; set; }
 
         /// <summary>
         /// a list of masterbars which open the group. 
         /// </summary>
         [IntrinsicProperty]
-        public List<MasterBar> Openings { get; set; }
+        public FastList<MasterBar> Openings { get; set; }
 
         /// <summary>
         /// a list of masterbars which close the group. 
         /// </summary>
         [IntrinsicProperty]
-        public List<MasterBar> Closings { get; set; }
+        public FastList<MasterBar> Closings { get; set; }
 
         /// <summary>
         ///  true if the repeat group was closed well
@@ -34,9 +35,9 @@ namespace AlphaTab.Model
 
         public RepeatGroup()
         {
-            MasterBars = new List<MasterBar>();
-            Openings = new List<MasterBar>();
-            Closings = new List<MasterBar>();
+            MasterBars = new FastList<MasterBar>();
+            Openings = new FastList<MasterBar>();
+            Closings = new FastList<MasterBar>();
             IsClosed = false;
         }
 

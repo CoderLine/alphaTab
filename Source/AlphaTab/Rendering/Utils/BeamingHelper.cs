@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using AlphaTab.Audio;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Utils
@@ -58,12 +59,12 @@ namespace AlphaTab.Rendering.Utils
         /// <summary>
         /// stores the X-positions for beat indices
         /// </summary>
-        private readonly Dictionary<int, BeatLinePositions> _beatLineXPositions;
+        private readonly FastDictionary<int, BeatLinePositions> _beatLineXPositions;
 
         [IntrinsicProperty]
         public Voice Voice { get; set; }
         [IntrinsicProperty]
-        public List<Beat> Beats { get; set; }
+        public FastList<Beat> Beats { get; set; }
         [IntrinsicProperty]
         public Duration MaxDuration { get; set; }
 
@@ -108,8 +109,8 @@ namespace AlphaTab.Rendering.Utils
         {
             _track = track;
 
-            Beats = new List<Beat>();
-            _beatLineXPositions = new Dictionary<int, BeatLinePositions>();
+            Beats = new FastList<Beat>();
+            _beatLineXPositions = new FastDictionary<int, BeatLinePositions>();
             MaxDuration = Duration.Whole;
         }
 

@@ -5,6 +5,7 @@
 	global.AlphaTab.Audio = global.AlphaTab.Audio || {};
 	global.AlphaTab.Audio.Generator = global.AlphaTab.Audio.Generator || {};
 	global.AlphaTab.Audio.Model = global.AlphaTab.Audio.Model || {};
+	global.AlphaTab.Collections = global.AlphaTab.Collections || {};
 	global.AlphaTab.Importer = global.AlphaTab.Importer || {};
 	global.AlphaTab.IO = global.AlphaTab.IO || {};
 	global.AlphaTab.Model = global.AlphaTab.Model || {};
@@ -18,7 +19,7 @@
 	global.AlphaTab.Rendering.Layout = global.AlphaTab.Rendering.Layout || {};
 	global.AlphaTab.Rendering.Staves = global.AlphaTab.Rendering.Staves || {};
 	global.AlphaTab.Rendering.Utils = global.AlphaTab.Rendering.Utils || {};
-	ss.initAssembly($asm, 'Attributes');
+	ss.initAssembly($asm, 'FastDictionary');
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Environment
 	var $AlphaTab_Environment = function() {
@@ -30,7 +31,7 @@
 	var $AlphaTab_LayoutSettings = function() {
 		this.mode = null;
 		this.additionalSettings = null;
-		this.additionalSettings = new (ss.makeGenericType(ss.Dictionary$2, [String, Object]))();
+		this.additionalSettings = {};
 	};
 	$AlphaTab_LayoutSettings.__typeName = 'AlphaTab.LayoutSettings';
 	$AlphaTab_LayoutSettings.get_defaults = function() {
@@ -58,32 +59,29 @@
 		settings.engine = 'default';
 		settings.layout = $AlphaTab_LayoutSettings.get_defaults();
 		settings.staves = [];
-		ss.add(settings.staves, new $AlphaTab_StaveSettings('marker'));
+		settings.staves.push(new $AlphaTab_StaveSettings('marker'));
 		//settings.staves.Add(new StaveSettings("triplet-feel"));
-		ss.add(settings.staves, new $AlphaTab_StaveSettings('tempo'));
-		ss.add(settings.staves, new $AlphaTab_StaveSettings('text'));
-		ss.add(settings.staves, new $AlphaTab_StaveSettings('chords'));
-		ss.add(settings.staves, new $AlphaTab_StaveSettings('trill'));
-		ss.add(settings.staves, new $AlphaTab_StaveSettings('beat-vibrato'));
-		ss.add(settings.staves, new $AlphaTab_StaveSettings('note-vibrato'));
-		ss.add(settings.staves, new $AlphaTab_StaveSettings('alternate-endings'));
-		ss.add(settings.staves, new $AlphaTab_StaveSettings('score'));
-		ss.add(settings.staves, new $AlphaTab_StaveSettings('crescendo'));
-		ss.add(settings.staves, new $AlphaTab_StaveSettings('dynamics'));
-		ss.add(settings.staves, new $AlphaTab_StaveSettings('trill'));
-		ss.add(settings.staves, new $AlphaTab_StaveSettings('beat-vibrato'));
-		ss.add(settings.staves, new $AlphaTab_StaveSettings('note-vibrato'));
-		ss.add(settings.staves, new $AlphaTab_StaveSettings('tap'));
-		ss.add(settings.staves, new $AlphaTab_StaveSettings('fade-in'));
-		ss.add(settings.staves, new $AlphaTab_StaveSettings('let-ring'));
-		ss.add(settings.staves, new $AlphaTab_StaveSettings('palm-mute'));
-		ss.add(settings.staves, new $AlphaTab_StaveSettings('tab'));
-		ss.add(settings.staves, new $AlphaTab_StaveSettings('pick-stroke'));
+		settings.staves.push(new $AlphaTab_StaveSettings('tempo'));
+		settings.staves.push(new $AlphaTab_StaveSettings('text'));
+		settings.staves.push(new $AlphaTab_StaveSettings('chords'));
+		settings.staves.push(new $AlphaTab_StaveSettings('trill'));
+		settings.staves.push(new $AlphaTab_StaveSettings('beat-vibrato'));
+		settings.staves.push(new $AlphaTab_StaveSettings('note-vibrato'));
+		settings.staves.push(new $AlphaTab_StaveSettings('alternate-endings'));
+		settings.staves.push(new $AlphaTab_StaveSettings('score'));
+		settings.staves.push(new $AlphaTab_StaveSettings('crescendo'));
+		settings.staves.push(new $AlphaTab_StaveSettings('dynamics'));
+		settings.staves.push(new $AlphaTab_StaveSettings('trill'));
+		settings.staves.push(new $AlphaTab_StaveSettings('beat-vibrato'));
+		settings.staves.push(new $AlphaTab_StaveSettings('note-vibrato'));
+		settings.staves.push(new $AlphaTab_StaveSettings('tap'));
+		settings.staves.push(new $AlphaTab_StaveSettings('fade-in'));
+		settings.staves.push(new $AlphaTab_StaveSettings('let-ring'));
+		settings.staves.push(new $AlphaTab_StaveSettings('palm-mute'));
+		settings.staves.push(new $AlphaTab_StaveSettings('tab'));
+		settings.staves.push(new $AlphaTab_StaveSettings('pick-stroke'));
 		//settings.staves.Add(new StaveSettings("fingering"));
 		return settings;
-	};
-	$AlphaTab_Settings.$jsonKeys = function(json) {
-		return Object.keys(json);
 	};
 	$AlphaTab_Settings.fromJson = function(json) {
 		if (ss.isInstanceOfType(json, $AlphaTab_Settings)) {
@@ -114,30 +112,30 @@
 					settings.layout.mode = json.layout.mode;
 				}
 				if (ss.unbox(json.layout.additionalSettings)) {
-					var keys = $AlphaTab_Settings.$jsonKeys(json.layout.additionalSettings);
+					var keys = Object.keys(json.layout.additionalSettings);
 					for (var $t1 = 0; $t1 < keys.length; $t1++) {
 						var key = keys[$t1];
-						settings.layout.additionalSettings.set_item(key, json.layout.additionalSettings[key]);
+						settings.layout.additionalSettings[key] = json.layout.additionalSettings[key];
 					}
 				}
 			}
 		}
 		if (ss.unbox('staves' in json)) {
 			settings.staves = [];
-			var keys1 = $AlphaTab_Settings.$jsonKeys(json.staves);
+			var keys1 = Object.keys(json.staves);
 			for (var $t2 = 0; $t2 < keys1.length; $t2++) {
 				var key1 = keys1[$t2];
 				var val = json.staves[key1];
 				if (ss.isInstanceOfType(val, String)) {
-					ss.add(settings.staves, new $AlphaTab_StaveSettings(val));
+					settings.staves.push(new $AlphaTab_StaveSettings(val));
 				}
 				else if (ss.unbox(val.id)) {
 					var staveSettings = new $AlphaTab_StaveSettings(val.id);
 					if (ss.unbox(val.additionalSettings)) {
-						var keys2 = $AlphaTab_Settings.$jsonKeys(val.additionalSettings);
+						var keys2 = Object.keys(val.additionalSettings);
 						for (var $t3 = 0; $t3 < keys2.length; $t3++) {
 							var key2 = keys2[$t3];
-							staveSettings.additionalSettings.set_item(key2, val.additionalSettings[key2]);
+							staveSettings.additionalSettings[key2] = val.additionalSettings[key2];
 						}
 					}
 				}
@@ -152,7 +150,7 @@
 		this.id = null;
 		this.additionalSettings = null;
 		this.id = id;
-		this.additionalSettings = new (ss.makeGenericType(ss.Dictionary$2, [String, Object]))();
+		this.additionalSettings = {};
 	};
 	$AlphaTab_StaveSettings.__typeName = 'AlphaTab.StaveSettings';
 	global.AlphaTab.StaveSettings = $AlphaTab_StaveSettings;
@@ -163,138 +161,138 @@
 	$AlphaTab_Audio_GeneralMidi.__typeName = 'AlphaTab.Audio.GeneralMidi';
 	$AlphaTab_Audio_GeneralMidi.getValue = function(name) {
 		if (ss.isNullOrUndefined($AlphaTab_Audio_GeneralMidi.$_values)) {
-			$AlphaTab_Audio_GeneralMidi.$_values = new (ss.makeGenericType(ss.Dictionary$2, [String, ss.Int32]))();
-			$AlphaTab_Audio_GeneralMidi.$_values.add('acousticgrandpiano', 0);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('brightacousticpiano', 1);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('electricgrandpiano', 2);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('honkytonkpiano', 3);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('electricpiano1', 4);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('electricpiano2', 5);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('harpsichord', 6);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('clavinet', 7);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('celesta', 8);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('glockenspiel', 9);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('musicbox', 10);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('vibraphone', 11);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('marimba', 12);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('xylophone', 13);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('tubularbells', 14);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('dulcimer', 15);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('drawbarorgan', 16);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('percussiveorgan', 17);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('rockorgan', 18);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('churchorgan', 19);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('reedorgan', 20);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('accordion', 21);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('harmonica', 22);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('tangoaccordion', 23);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('acousticguitarnylon', 24);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('acousticguitarsteel', 25);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('electricguitarjazz', 26);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('electricguitarclean', 27);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('electricguitarmuted', 28);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('overdrivenguitar', 29);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('distortionguitar', 30);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('guitarharmonics', 31);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('acousticbass', 32);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('electricbassfinger', 33);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('electricbasspick', 34);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('fretlessbass', 35);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('slapbass1', 36);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('slapbass2', 37);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('synthbass1', 38);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('synthbass2', 39);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('violin', 40);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('viola', 41);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('cello', 42);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('contrabass', 43);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('tremolostrings', 44);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('pizzicatostrings', 45);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('orchestralharp', 46);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('timpani', 47);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('stringensemble1', 48);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('stringensemble2', 49);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('synthstrings1', 50);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('synthstrings2', 51);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('choiraahs', 52);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('voiceoohs', 53);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('synthvoice', 54);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('orchestrahit', 55);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('trumpet', 56);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('trombone', 57);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('tuba', 58);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('mutedtrumpet', 59);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('frenchhorn', 60);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('brasssection', 61);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('synthbrass1', 62);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('synthbrass2', 63);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('sopranosax', 64);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('altosax', 65);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('tenorsax', 66);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('baritonesax', 67);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('oboe', 68);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('englishhorn', 69);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('bassoon', 70);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('clarinet', 71);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('piccolo', 72);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('flute', 73);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('recorder', 74);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('panflute', 75);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('blownbottle', 76);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('shakuhachi', 77);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('whistle', 78);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('ocarina', 79);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('lead1square', 80);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('lead2sawtooth', 81);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('lead3calliope', 82);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('lead4chiff', 83);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('lead5charang', 84);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('lead6voice', 85);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('lead7fifths', 86);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('lead8bassandlead', 87);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('pad1newage', 88);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('pad2warm', 89);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('pad3polysynth', 90);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('pad4choir', 91);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('pad5bowed', 92);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('pad6metallic', 93);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('pad7halo', 94);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('pad8sweep', 95);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('fx1rain', 96);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('fx2soundtrack', 97);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('fx3crystal', 98);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('fx4atmosphere', 99);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('fx5brightness', 100);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('fx6goblins', 101);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('fx7echoes', 102);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('fx8scifi', 103);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('sitar', 104);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('banjo', 105);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('shamisen', 106);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('koto', 107);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('kalimba', 108);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('bagpipe', 109);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('fiddle', 110);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('shanai', 111);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('tinklebell', 112);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('agogo', 113);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('steeldrums', 114);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('woodblock', 115);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('taikodrum', 116);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('melodictom', 117);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('synthdrum', 118);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('reversecymbal', 119);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('guitarfretnoise', 120);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('breathnoise', 121);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('seashore', 122);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('birdtweet', 123);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('telephonering', 124);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('helicopter', 125);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('applause', 126);
-			$AlphaTab_Audio_GeneralMidi.$_values.add('gunshot', 127);
+			$AlphaTab_Audio_GeneralMidi.$_values = {};
+			$AlphaTab_Audio_GeneralMidi.$_values['acousticgrandpiano'] = 0;
+			$AlphaTab_Audio_GeneralMidi.$_values['brightacousticpiano'] = 1;
+			$AlphaTab_Audio_GeneralMidi.$_values['electricgrandpiano'] = 2;
+			$AlphaTab_Audio_GeneralMidi.$_values['honkytonkpiano'] = 3;
+			$AlphaTab_Audio_GeneralMidi.$_values['electricpiano1'] = 4;
+			$AlphaTab_Audio_GeneralMidi.$_values['electricpiano2'] = 5;
+			$AlphaTab_Audio_GeneralMidi.$_values['harpsichord'] = 6;
+			$AlphaTab_Audio_GeneralMidi.$_values['clavinet'] = 7;
+			$AlphaTab_Audio_GeneralMidi.$_values['celesta'] = 8;
+			$AlphaTab_Audio_GeneralMidi.$_values['glockenspiel'] = 9;
+			$AlphaTab_Audio_GeneralMidi.$_values['musicbox'] = 10;
+			$AlphaTab_Audio_GeneralMidi.$_values['vibraphone'] = 11;
+			$AlphaTab_Audio_GeneralMidi.$_values['marimba'] = 12;
+			$AlphaTab_Audio_GeneralMidi.$_values['xylophone'] = 13;
+			$AlphaTab_Audio_GeneralMidi.$_values['tubularbells'] = 14;
+			$AlphaTab_Audio_GeneralMidi.$_values['dulcimer'] = 15;
+			$AlphaTab_Audio_GeneralMidi.$_values['drawbarorgan'] = 16;
+			$AlphaTab_Audio_GeneralMidi.$_values['percussiveorgan'] = 17;
+			$AlphaTab_Audio_GeneralMidi.$_values['rockorgan'] = 18;
+			$AlphaTab_Audio_GeneralMidi.$_values['churchorgan'] = 19;
+			$AlphaTab_Audio_GeneralMidi.$_values['reedorgan'] = 20;
+			$AlphaTab_Audio_GeneralMidi.$_values['accordion'] = 21;
+			$AlphaTab_Audio_GeneralMidi.$_values['harmonica'] = 22;
+			$AlphaTab_Audio_GeneralMidi.$_values['tangoaccordion'] = 23;
+			$AlphaTab_Audio_GeneralMidi.$_values['acousticguitarnylon'] = 24;
+			$AlphaTab_Audio_GeneralMidi.$_values['acousticguitarsteel'] = 25;
+			$AlphaTab_Audio_GeneralMidi.$_values['electricguitarjazz'] = 26;
+			$AlphaTab_Audio_GeneralMidi.$_values['electricguitarclean'] = 27;
+			$AlphaTab_Audio_GeneralMidi.$_values['electricguitarmuted'] = 28;
+			$AlphaTab_Audio_GeneralMidi.$_values['overdrivenguitar'] = 29;
+			$AlphaTab_Audio_GeneralMidi.$_values['distortionguitar'] = 30;
+			$AlphaTab_Audio_GeneralMidi.$_values['guitarharmonics'] = 31;
+			$AlphaTab_Audio_GeneralMidi.$_values['acousticbass'] = 32;
+			$AlphaTab_Audio_GeneralMidi.$_values['electricbassfinger'] = 33;
+			$AlphaTab_Audio_GeneralMidi.$_values['electricbasspick'] = 34;
+			$AlphaTab_Audio_GeneralMidi.$_values['fretlessbass'] = 35;
+			$AlphaTab_Audio_GeneralMidi.$_values['slapbass1'] = 36;
+			$AlphaTab_Audio_GeneralMidi.$_values['slapbass2'] = 37;
+			$AlphaTab_Audio_GeneralMidi.$_values['synthbass1'] = 38;
+			$AlphaTab_Audio_GeneralMidi.$_values['synthbass2'] = 39;
+			$AlphaTab_Audio_GeneralMidi.$_values['violin'] = 40;
+			$AlphaTab_Audio_GeneralMidi.$_values['viola'] = 41;
+			$AlphaTab_Audio_GeneralMidi.$_values['cello'] = 42;
+			$AlphaTab_Audio_GeneralMidi.$_values['contrabass'] = 43;
+			$AlphaTab_Audio_GeneralMidi.$_values['tremolostrings'] = 44;
+			$AlphaTab_Audio_GeneralMidi.$_values['pizzicatostrings'] = 45;
+			$AlphaTab_Audio_GeneralMidi.$_values['orchestralharp'] = 46;
+			$AlphaTab_Audio_GeneralMidi.$_values['timpani'] = 47;
+			$AlphaTab_Audio_GeneralMidi.$_values['stringensemble1'] = 48;
+			$AlphaTab_Audio_GeneralMidi.$_values['stringensemble2'] = 49;
+			$AlphaTab_Audio_GeneralMidi.$_values['synthstrings1'] = 50;
+			$AlphaTab_Audio_GeneralMidi.$_values['synthstrings2'] = 51;
+			$AlphaTab_Audio_GeneralMidi.$_values['choiraahs'] = 52;
+			$AlphaTab_Audio_GeneralMidi.$_values['voiceoohs'] = 53;
+			$AlphaTab_Audio_GeneralMidi.$_values['synthvoice'] = 54;
+			$AlphaTab_Audio_GeneralMidi.$_values['orchestrahit'] = 55;
+			$AlphaTab_Audio_GeneralMidi.$_values['trumpet'] = 56;
+			$AlphaTab_Audio_GeneralMidi.$_values['trombone'] = 57;
+			$AlphaTab_Audio_GeneralMidi.$_values['tuba'] = 58;
+			$AlphaTab_Audio_GeneralMidi.$_values['mutedtrumpet'] = 59;
+			$AlphaTab_Audio_GeneralMidi.$_values['frenchhorn'] = 60;
+			$AlphaTab_Audio_GeneralMidi.$_values['brasssection'] = 61;
+			$AlphaTab_Audio_GeneralMidi.$_values['synthbrass1'] = 62;
+			$AlphaTab_Audio_GeneralMidi.$_values['synthbrass2'] = 63;
+			$AlphaTab_Audio_GeneralMidi.$_values['sopranosax'] = 64;
+			$AlphaTab_Audio_GeneralMidi.$_values['altosax'] = 65;
+			$AlphaTab_Audio_GeneralMidi.$_values['tenorsax'] = 66;
+			$AlphaTab_Audio_GeneralMidi.$_values['baritonesax'] = 67;
+			$AlphaTab_Audio_GeneralMidi.$_values['oboe'] = 68;
+			$AlphaTab_Audio_GeneralMidi.$_values['englishhorn'] = 69;
+			$AlphaTab_Audio_GeneralMidi.$_values['bassoon'] = 70;
+			$AlphaTab_Audio_GeneralMidi.$_values['clarinet'] = 71;
+			$AlphaTab_Audio_GeneralMidi.$_values['piccolo'] = 72;
+			$AlphaTab_Audio_GeneralMidi.$_values['flute'] = 73;
+			$AlphaTab_Audio_GeneralMidi.$_values['recorder'] = 74;
+			$AlphaTab_Audio_GeneralMidi.$_values['panflute'] = 75;
+			$AlphaTab_Audio_GeneralMidi.$_values['blownbottle'] = 76;
+			$AlphaTab_Audio_GeneralMidi.$_values['shakuhachi'] = 77;
+			$AlphaTab_Audio_GeneralMidi.$_values['whistle'] = 78;
+			$AlphaTab_Audio_GeneralMidi.$_values['ocarina'] = 79;
+			$AlphaTab_Audio_GeneralMidi.$_values['lead1square'] = 80;
+			$AlphaTab_Audio_GeneralMidi.$_values['lead2sawtooth'] = 81;
+			$AlphaTab_Audio_GeneralMidi.$_values['lead3calliope'] = 82;
+			$AlphaTab_Audio_GeneralMidi.$_values['lead4chiff'] = 83;
+			$AlphaTab_Audio_GeneralMidi.$_values['lead5charang'] = 84;
+			$AlphaTab_Audio_GeneralMidi.$_values['lead6voice'] = 85;
+			$AlphaTab_Audio_GeneralMidi.$_values['lead7fifths'] = 86;
+			$AlphaTab_Audio_GeneralMidi.$_values['lead8bassandlead'] = 87;
+			$AlphaTab_Audio_GeneralMidi.$_values['pad1newage'] = 88;
+			$AlphaTab_Audio_GeneralMidi.$_values['pad2warm'] = 89;
+			$AlphaTab_Audio_GeneralMidi.$_values['pad3polysynth'] = 90;
+			$AlphaTab_Audio_GeneralMidi.$_values['pad4choir'] = 91;
+			$AlphaTab_Audio_GeneralMidi.$_values['pad5bowed'] = 92;
+			$AlphaTab_Audio_GeneralMidi.$_values['pad6metallic'] = 93;
+			$AlphaTab_Audio_GeneralMidi.$_values['pad7halo'] = 94;
+			$AlphaTab_Audio_GeneralMidi.$_values['pad8sweep'] = 95;
+			$AlphaTab_Audio_GeneralMidi.$_values['fx1rain'] = 96;
+			$AlphaTab_Audio_GeneralMidi.$_values['fx2soundtrack'] = 97;
+			$AlphaTab_Audio_GeneralMidi.$_values['fx3crystal'] = 98;
+			$AlphaTab_Audio_GeneralMidi.$_values['fx4atmosphere'] = 99;
+			$AlphaTab_Audio_GeneralMidi.$_values['fx5brightness'] = 100;
+			$AlphaTab_Audio_GeneralMidi.$_values['fx6goblins'] = 101;
+			$AlphaTab_Audio_GeneralMidi.$_values['fx7echoes'] = 102;
+			$AlphaTab_Audio_GeneralMidi.$_values['fx8scifi'] = 103;
+			$AlphaTab_Audio_GeneralMidi.$_values['sitar'] = 104;
+			$AlphaTab_Audio_GeneralMidi.$_values['banjo'] = 105;
+			$AlphaTab_Audio_GeneralMidi.$_values['shamisen'] = 106;
+			$AlphaTab_Audio_GeneralMidi.$_values['koto'] = 107;
+			$AlphaTab_Audio_GeneralMidi.$_values['kalimba'] = 108;
+			$AlphaTab_Audio_GeneralMidi.$_values['bagpipe'] = 109;
+			$AlphaTab_Audio_GeneralMidi.$_values['fiddle'] = 110;
+			$AlphaTab_Audio_GeneralMidi.$_values['shanai'] = 111;
+			$AlphaTab_Audio_GeneralMidi.$_values['tinklebell'] = 112;
+			$AlphaTab_Audio_GeneralMidi.$_values['agogo'] = 113;
+			$AlphaTab_Audio_GeneralMidi.$_values['steeldrums'] = 114;
+			$AlphaTab_Audio_GeneralMidi.$_values['woodblock'] = 115;
+			$AlphaTab_Audio_GeneralMidi.$_values['taikodrum'] = 116;
+			$AlphaTab_Audio_GeneralMidi.$_values['melodictom'] = 117;
+			$AlphaTab_Audio_GeneralMidi.$_values['synthdrum'] = 118;
+			$AlphaTab_Audio_GeneralMidi.$_values['reversecymbal'] = 119;
+			$AlphaTab_Audio_GeneralMidi.$_values['guitarfretnoise'] = 120;
+			$AlphaTab_Audio_GeneralMidi.$_values['breathnoise'] = 121;
+			$AlphaTab_Audio_GeneralMidi.$_values['seashore'] = 122;
+			$AlphaTab_Audio_GeneralMidi.$_values['birdtweet'] = 123;
+			$AlphaTab_Audio_GeneralMidi.$_values['telephonering'] = 124;
+			$AlphaTab_Audio_GeneralMidi.$_values['helicopter'] = 125;
+			$AlphaTab_Audio_GeneralMidi.$_values['applause'] = 126;
+			$AlphaTab_Audio_GeneralMidi.$_values['gunshot'] = 127;
 		}
 		name = ss.replaceAllString(name.toLowerCase(), ' ', '');
-		return ($AlphaTab_Audio_GeneralMidi.$_values.containsKey(name) ? $AlphaTab_Audio_GeneralMidi.$_values.get_item(name) : 0);
+		return ($AlphaTab_Audio_GeneralMidi.$_values.hasOwnProperty(name) ? $AlphaTab_Audio_GeneralMidi.$_values[name] : 0);
 	};
 	global.AlphaTab.Audio.GeneralMidi = $AlphaTab_Audio_GeneralMidi;
 	////////////////////////////////////////////////////////////////////////////////
@@ -342,7 +340,7 @@
 				bar.bar = score.masterBars[index];
 				bar.start = controller.repeatMove + bar.bar.start;
 				bar.end = bar.start + bar.bar.calculateDuration();
-				ss.add(lookup.bars, bar);
+				lookup.bars.push(bar);
 			}
 		}
 		return lookup;
@@ -401,11 +399,11 @@
 	};
 	$AlphaTab_Audio_Generator_MidiFileHandler.$buildMetaMessage = function(metaType, data) {
 		var meta = [];
-		ss.add(meta, 255);
-		ss.add(meta, metaType & 255);
+		meta.push(255);
+		meta.push(metaType & 255);
 		$AlphaTab_Audio_Generator_MidiFileHandler.$writeVarInt(meta, data.length);
-		ss.arrayAddRange(meta, data);
-		return new $AlphaTab_Audio_Model_MidiMessage(new $AlphaTab_IO_ByteArray(Array.prototype.slice.call(meta)));
+		meta = meta.concat(data);
+		return new $AlphaTab_Audio_Model_MidiMessage(new $AlphaTab_IO_ByteArray(meta.slice(0)));
 	};
 	$AlphaTab_Audio_Generator_MidiFileHandler.$writeVarInt = function(data, v) {
 		var n = 0;
@@ -417,26 +415,26 @@
 		while (n > 0) {
 			n--;
 			if (n > 0) {
-				ss.add(data, (array.get_item(n) | 128) & 255);
+				data.push((array.get_item(n) | 128) & 255);
 			}
 			else {
-				ss.add(data, array.get_item(n));
+				data.push(array.get_item(n));
 			}
 		}
 	};
 	$AlphaTab_Audio_Generator_MidiFileHandler.$buildSysExMessage = function(data) {
 		var sysex = [];
-		ss.add(sysex, 240);
+		sysex.push(240);
 		// status 
 		$AlphaTab_Audio_Generator_MidiFileHandler.$writeVarInt(sysex, data.length + 2);
 		// write length of data
-		ss.add(sysex, 0);
+		sysex.push(0);
 		// manufacturer id
-		ss.arrayAddRange(sysex, data);
+		sysex = sysex.concat(data);
 		// data
-		ss.add(sysex, 247);
+		sysex.push(247);
 		// end of data
-		return new $AlphaTab_Audio_Model_MidiMessage(new $AlphaTab_IO_ByteArray(Array.prototype.slice.call(sysex)));
+		return new $AlphaTab_Audio_Model_MidiMessage(new $AlphaTab_IO_ByteArray(sysex.slice(0)));
 	};
 	global.AlphaTab.Audio.Generator.MidiFileHandler = $AlphaTab_Audio_Generator_MidiFileHandler;
 	////////////////////////////////////////////////////////////////////////////////
@@ -523,6 +521,17 @@
 	};
 	$AlphaTab_Audio_Model_MidiTrack.__typeName = 'AlphaTab.Audio.Model.MidiTrack';
 	global.AlphaTab.Audio.Model.MidiTrack = $AlphaTab_Audio_Model_MidiTrack;
+	////////////////////////////////////////////////////////////////////////////////
+	// AlphaTab.Collections.FastDictionaryExtensions
+	var $AlphaTab_Collections_FastDictionaryExtensions = function() {
+	};
+	$AlphaTab_Collections_FastDictionaryExtensions.__typeName = 'AlphaTab.Collections.FastDictionaryExtensions';
+	$AlphaTab_Collections_FastDictionaryExtensions.getValues = function(store) {
+		return Object.keys(store).map(function(k) {
+			return store[k];
+		});
+	};
+	global.AlphaTab.Collections.FastDictionaryExtensions = $AlphaTab_Collections_FastDictionaryExtensions;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Importer.AlphaTexException
 	var $AlphaTab_Importer_AlphaTexException = function(position, nonTerm, expected, symbol, symbolData) {
@@ -714,7 +723,7 @@
 	};
 	$AlphaTab_Importer_ScoreLoader.__typeName = 'AlphaTab.Importer.ScoreLoader';
 	$AlphaTab_Importer_ScoreLoader.loadScoreAsync = function(path, success, error) {
-		var loader = $AlphaTab_Environment.fileLoaders.get_item('default')();
+		var loader = $AlphaTab_Environment.fileLoaders['default']();
 		loader.loadBinaryAsync(path, function(data) {
 			var score = null;
 			try {
@@ -730,7 +739,7 @@
 		}, error);
 	};
 	$AlphaTab_Importer_ScoreLoader.loadScore = function(path) {
-		var loader = $AlphaTab_Environment.fileLoaders.get_item('default')();
+		var loader = $AlphaTab_Environment.fileLoaders['default']();
 		var data = loader.loadBinary(path);
 		return $AlphaTab_Importer_ScoreLoader.loadScoreFromBytes(data);
 	};
@@ -1053,37 +1062,6 @@
 	$AlphaTab_Model_HarmonicType.__typeName = 'AlphaTab.Model.HarmonicType';
 	global.AlphaTab.Model.HarmonicType = $AlphaTab_Model_HarmonicType;
 	////////////////////////////////////////////////////////////////////////////////
-	// AlphaTab.Model.HashSet
-	var $AlphaTab_Model_HashSet$1 = function(T) {
-		var $type = function(values) {
-			this.$_dictionary = null;
-			this.$_dictionary = new (ss.makeGenericType(ss.Dictionary$2, [T, Boolean]))();
-			var $t1 = ss.getEnumerator(values);
-			try {
-				while ($t1.moveNext()) {
-					var value = $t1.current();
-					this.$_dictionary.set_item(value, true);
-				}
-			}
-			finally {
-				$t1.dispose();
-			}
-		};
-		ss.registerGenericClassInstance($type, $AlphaTab_Model_HashSet$1, [T], {
-			contains: function(value) {
-				return this.$_dictionary.containsKey(value);
-			}
-		}, function() {
-			return null;
-		}, function() {
-			return [];
-		});
-		return $type;
-	};
-	$AlphaTab_Model_HashSet$1.__typeName = 'AlphaTab.Model.HashSet$1';
-	ss.initGenericClass($AlphaTab_Model_HashSet$1, $asm, 1);
-	global.AlphaTab.Model.HashSet$1 = $AlphaTab_Model_HashSet$1;
-	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Model.KeySignatureType
 	var $AlphaTab_Model_KeySignatureType = function() {
 	};
@@ -1145,9 +1123,9 @@
 		this.bendPoints = null;
 		this.fret = 0;
 		this.string = 0;
-		this.hammerPullOrigin = null;
-		this.isHammerPullDestination = false;
 		this.isHammerPullOrigin = false;
+		this.hammerPullOrigin = null;
+		this.hammerPullDestination = null;
 		this.harmonicValue = 0;
 		this.harmonicType = 0;
 		this.isGhost = false;
@@ -1309,7 +1287,7 @@
 		this.shortName = '';
 		this.tuning = [];
 		this.bars = [];
-		this.chords = new (ss.makeGenericType(ss.Dictionary$2, [String, $AlphaTab_Model_Chord]))();
+		this.chords = {};
 		this.playbackInfo = new $AlphaTab_Model_PlaybackInformation();
 		this.color = new $AlphaTab_Platform_Model_Color(200, 0, 0, 255);
 	};
@@ -1329,7 +1307,8 @@
 		this.tunings = null;
 		this.isStandard = isStandard;
 		this.name = name;
-		this.tunings = ss.arrayFromEnumerable(tuning);
+		this.tunings = [];
+		this.tunings = this.tunings.concat(tuning);
 	};
 	$AlphaTab_Model_Tuning.__typeName = 'AlphaTab.Model.Tuning';
 	$AlphaTab_Model_Tuning.isTuning = function(name) {
@@ -1439,60 +1418,60 @@
 		$AlphaTab_Model_Tuning.$_sixStrings = [];
 		$AlphaTab_Model_Tuning.$_fiveStrings = [];
 		$AlphaTab_Model_Tuning.$_fourStrings = [];
-		ss.add($AlphaTab_Model_Tuning.$_sevenStrings, new $AlphaTab_Model_Tuning('Guitar 7 strings', [64, 59, 55, 50, 45, 40, 35], true));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Standard Tuning', [64, 59, 55, 50, 45, 40], true));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Tune down � step', [63, 58, 54, 49, 44, 39], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Tune down 1 step', [62, 57, 53, 48, 43, 38], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Tune down 2 step', [60, 55, 51, 46, 41, 36], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Dropped D Tuning', [64, 59, 55, 50, 45, 38], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Dropped D Tuning variant', [64, 57, 55, 50, 45, 38], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Double Dropped D Tuning', [62, 59, 55, 50, 45, 38], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Dropped E Tuning', [66, 61, 57, 52, 47, 40], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Dropped C Tuning', [62, 57, 53, 48, 43, 36], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Open C Tuning', [64, 60, 55, 48, 43, 36], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Open Cm Tuning', [63, 60, 55, 48, 43, 36], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Open C6 Tuning', [64, 57, 55, 48, 43, 36], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Open Cmaj7 Tuning', [64, 59, 55, 52, 43, 36], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Open D Tuning', [62, 57, 54, 50, 45, 38], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Open Dm Tuning', [62, 57, 53, 50, 45, 38], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Open D5 Tuning', [62, 57, 50, 50, 45, 38], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Open D6 Tuning', [62, 59, 54, 50, 45, 38], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Open Dsus4 Tuning', [62, 57, 55, 50, 45, 38], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Open E Tuning', [64, 59, 56, 52, 47, 40], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Open Em Tuning', [64, 59, 55, 52, 47, 40], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Open Esus11 Tuning', [64, 59, 55, 52, 45, 40], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Open F Tuning', [65, 60, 53, 48, 45, 41], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Open G Tuning', [62, 59, 55, 50, 43, 38], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Open Gm Tuning', [62, 58, 55, 50, 43, 38], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Open G6 Tuning', [64, 59, 55, 50, 43, 38], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Open Gsus4 Tuning', [62, 60, 55, 50, 43, 38], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Open A Tuning', [64, 61, 57, 52, 45, 40], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Open Am Tuning', [64, 60, 57, 52, 45, 40], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Guitar Nashville Tuning', [64, 59, 67, 62, 57, 52], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Bass 6 Strings Tuning', [48, 43, 38, 33, 28, 23], false));
-		ss.add($AlphaTab_Model_Tuning.$_sixStrings, new $AlphaTab_Model_Tuning('Lute or Vihuela Tuning', [64, 59, 54, 50, 45, 40], false));
-		ss.add($AlphaTab_Model_Tuning.$_fiveStrings, new $AlphaTab_Model_Tuning('Bass 5 Strings Tuning', [43, 38, 33, 28, 23], true));
-		ss.add($AlphaTab_Model_Tuning.$_fiveStrings, new $AlphaTab_Model_Tuning('Banjo Dropped C Tuning', [62, 59, 55, 48, 67], false));
-		ss.add($AlphaTab_Model_Tuning.$_fiveStrings, new $AlphaTab_Model_Tuning('Banjo Open D Tuning', [62, 57, 54, 50, 69], false));
-		ss.add($AlphaTab_Model_Tuning.$_fiveStrings, new $AlphaTab_Model_Tuning('Banjo Open G Tuning', [62, 59, 55, 50, 67], false));
-		ss.add($AlphaTab_Model_Tuning.$_fiveStrings, new $AlphaTab_Model_Tuning('Banjo G Minor Tuning', [62, 58, 55, 50, 67], false));
-		ss.add($AlphaTab_Model_Tuning.$_fiveStrings, new $AlphaTab_Model_Tuning('Banjo G Modal Tuning', [62, 57, 55, 50, 67], false));
-		ss.add($AlphaTab_Model_Tuning.$_fourStrings, new $AlphaTab_Model_Tuning('Bass Standard Tuning', [43, 38, 33, 28], true));
-		ss.add($AlphaTab_Model_Tuning.$_fourStrings, new $AlphaTab_Model_Tuning('Bass Tune down � step', [42, 37, 32, 27], false));
-		ss.add($AlphaTab_Model_Tuning.$_fourStrings, new $AlphaTab_Model_Tuning('Bass Tune down 1 step', [41, 36, 31, 26], false));
-		ss.add($AlphaTab_Model_Tuning.$_fourStrings, new $AlphaTab_Model_Tuning('Bass Tune down 2 step', [39, 34, 29, 24], false));
-		ss.add($AlphaTab_Model_Tuning.$_fourStrings, new $AlphaTab_Model_Tuning('Bass Dropped D Tuning', [43, 38, 33, 26], false));
-		ss.add($AlphaTab_Model_Tuning.$_fourStrings, new $AlphaTab_Model_Tuning('Ukulele C Tuning', [45, 40, 36, 43], false));
-		ss.add($AlphaTab_Model_Tuning.$_fourStrings, new $AlphaTab_Model_Tuning('Ukulele G Tuning', [52, 47, 43, 38], false));
-		ss.add($AlphaTab_Model_Tuning.$_fourStrings, new $AlphaTab_Model_Tuning('Mandolin Standard Tuning', [64, 57, 50, 43], false));
-		ss.add($AlphaTab_Model_Tuning.$_fourStrings, new $AlphaTab_Model_Tuning('Mandolin or Violin Tuning', [76, 69, 62, 55], false));
-		ss.add($AlphaTab_Model_Tuning.$_fourStrings, new $AlphaTab_Model_Tuning('Viola Tuning', [69, 62, 55, 48], false));
-		ss.add($AlphaTab_Model_Tuning.$_fourStrings, new $AlphaTab_Model_Tuning('Cello Tuning', [57, 50, 43, 36], false));
+		$AlphaTab_Model_Tuning.$_sevenStrings.push(new $AlphaTab_Model_Tuning('Guitar 7 strings', [64, 59, 55, 50, 45, 40, 35], true));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Standard Tuning', [64, 59, 55, 50, 45, 40], true));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Tune down � step', [63, 58, 54, 49, 44, 39], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Tune down 1 step', [62, 57, 53, 48, 43, 38], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Tune down 2 step', [60, 55, 51, 46, 41, 36], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Dropped D Tuning', [64, 59, 55, 50, 45, 38], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Dropped D Tuning variant', [64, 57, 55, 50, 45, 38], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Double Dropped D Tuning', [62, 59, 55, 50, 45, 38], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Dropped E Tuning', [66, 61, 57, 52, 47, 40], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Dropped C Tuning', [62, 57, 53, 48, 43, 36], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Open C Tuning', [64, 60, 55, 48, 43, 36], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Open Cm Tuning', [63, 60, 55, 48, 43, 36], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Open C6 Tuning', [64, 57, 55, 48, 43, 36], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Open Cmaj7 Tuning', [64, 59, 55, 52, 43, 36], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Open D Tuning', [62, 57, 54, 50, 45, 38], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Open Dm Tuning', [62, 57, 53, 50, 45, 38], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Open D5 Tuning', [62, 57, 50, 50, 45, 38], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Open D6 Tuning', [62, 59, 54, 50, 45, 38], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Open Dsus4 Tuning', [62, 57, 55, 50, 45, 38], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Open E Tuning', [64, 59, 56, 52, 47, 40], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Open Em Tuning', [64, 59, 55, 52, 47, 40], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Open Esus11 Tuning', [64, 59, 55, 52, 45, 40], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Open F Tuning', [65, 60, 53, 48, 45, 41], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Open G Tuning', [62, 59, 55, 50, 43, 38], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Open Gm Tuning', [62, 58, 55, 50, 43, 38], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Open G6 Tuning', [64, 59, 55, 50, 43, 38], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Open Gsus4 Tuning', [62, 60, 55, 50, 43, 38], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Open A Tuning', [64, 61, 57, 52, 45, 40], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Open Am Tuning', [64, 60, 57, 52, 45, 40], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Guitar Nashville Tuning', [64, 59, 67, 62, 57, 52], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Bass 6 Strings Tuning', [48, 43, 38, 33, 28, 23], false));
+		$AlphaTab_Model_Tuning.$_sixStrings.push(new $AlphaTab_Model_Tuning('Lute or Vihuela Tuning', [64, 59, 54, 50, 45, 40], false));
+		$AlphaTab_Model_Tuning.$_fiveStrings.push(new $AlphaTab_Model_Tuning('Bass 5 Strings Tuning', [43, 38, 33, 28, 23], true));
+		$AlphaTab_Model_Tuning.$_fiveStrings.push(new $AlphaTab_Model_Tuning('Banjo Dropped C Tuning', [62, 59, 55, 48, 67], false));
+		$AlphaTab_Model_Tuning.$_fiveStrings.push(new $AlphaTab_Model_Tuning('Banjo Open D Tuning', [62, 57, 54, 50, 69], false));
+		$AlphaTab_Model_Tuning.$_fiveStrings.push(new $AlphaTab_Model_Tuning('Banjo Open G Tuning', [62, 59, 55, 50, 67], false));
+		$AlphaTab_Model_Tuning.$_fiveStrings.push(new $AlphaTab_Model_Tuning('Banjo G Minor Tuning', [62, 58, 55, 50, 67], false));
+		$AlphaTab_Model_Tuning.$_fiveStrings.push(new $AlphaTab_Model_Tuning('Banjo G Modal Tuning', [62, 57, 55, 50, 67], false));
+		$AlphaTab_Model_Tuning.$_fourStrings.push(new $AlphaTab_Model_Tuning('Bass Standard Tuning', [43, 38, 33, 28], true));
+		$AlphaTab_Model_Tuning.$_fourStrings.push(new $AlphaTab_Model_Tuning('Bass Tune down � step', [42, 37, 32, 27], false));
+		$AlphaTab_Model_Tuning.$_fourStrings.push(new $AlphaTab_Model_Tuning('Bass Tune down 1 step', [41, 36, 31, 26], false));
+		$AlphaTab_Model_Tuning.$_fourStrings.push(new $AlphaTab_Model_Tuning('Bass Tune down 2 step', [39, 34, 29, 24], false));
+		$AlphaTab_Model_Tuning.$_fourStrings.push(new $AlphaTab_Model_Tuning('Bass Dropped D Tuning', [43, 38, 33, 26], false));
+		$AlphaTab_Model_Tuning.$_fourStrings.push(new $AlphaTab_Model_Tuning('Ukulele C Tuning', [45, 40, 36, 43], false));
+		$AlphaTab_Model_Tuning.$_fourStrings.push(new $AlphaTab_Model_Tuning('Ukulele G Tuning', [52, 47, 43, 38], false));
+		$AlphaTab_Model_Tuning.$_fourStrings.push(new $AlphaTab_Model_Tuning('Mandolin Standard Tuning', [64, 57, 50, 43], false));
+		$AlphaTab_Model_Tuning.$_fourStrings.push(new $AlphaTab_Model_Tuning('Mandolin or Violin Tuning', [76, 69, 62, 55], false));
+		$AlphaTab_Model_Tuning.$_fourStrings.push(new $AlphaTab_Model_Tuning('Viola Tuning', [69, 62, 55, 48], false));
+		$AlphaTab_Model_Tuning.$_fourStrings.push(new $AlphaTab_Model_Tuning('Cello Tuning', [57, 50, 43, 36], false));
 	};
 	$AlphaTab_Model_Tuning.findTuning = function(strings) {
 		var tunings = $AlphaTab_Model_Tuning.getPresetsFor(strings.length);
-		for (var $t1 = 0; $t1 < tunings.length; $t1++) {
-			var tuning = tunings[$t1];
+		for (var t = 0; t < tunings.length; t++) {
+			var tuning = tunings[t];
 			var equals = true;
 			for (var i = 0; i < strings.length; i++) {
 				if (strings[i] !== tuning.tunings[i]) {
@@ -1537,30 +1516,6 @@
 	};
 	$AlphaTab_Platform_IFileLoader.__typeName = 'AlphaTab.Platform.IFileLoader';
 	global.AlphaTab.Platform.IFileLoader = $AlphaTab_Platform_IFileLoader;
-	////////////////////////////////////////////////////////////////////////////////
-	// AlphaTab.Platform.Nullable
-	var $AlphaTab_Platform_Nullable$1 = function(T) {
-		var $type = function(value) {
-			this.$1$ValueField = ss.getDefaultValue(T);
-			this.set_value(value);
-		};
-		ss.registerGenericClassInstance($type, $AlphaTab_Platform_Nullable$1, [T], {
-			get_value: function() {
-				return this.$1$ValueField;
-			},
-			set_value: function(value) {
-				this.$1$ValueField = value;
-			}
-		}, function() {
-			return null;
-		}, function() {
-			return [];
-		});
-		return $type;
-	};
-	$AlphaTab_Platform_Nullable$1.__typeName = 'AlphaTab.Platform.Nullable$1';
-	ss.initGenericClass($AlphaTab_Platform_Nullable$1, $asm, 1);
-	global.AlphaTab.Platform.Nullable$1 = $AlphaTab_Platform_Nullable$1;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Platform.Std
 	var $AlphaTab_Platform_Std = function() {
@@ -1741,7 +1696,7 @@
 		this.$_endings = [];
 		for (var i = 0; i < $AlphaTab_Model_MasterBar.maxAlternateEndings; i++) {
 			if ((alternateEndings & 1 << i) !== 0) {
-				ss.add(this.$_endings, i);
+				this.$_endings.push(i);
 			}
 		}
 	};
@@ -1823,7 +1778,7 @@
 		this.$_biggestVoiceContainer = null;
 		$AlphaTab_Rendering_BarRendererBase.call(this, bar);
 		this.$_preBeatGlyphs = [];
-		this.$_voiceContainers = new (ss.makeGenericType(ss.Dictionary$2, [ss.Int32, $AlphaTab_Rendering_Glyphs_VoiceContainerGlyph]))();
+		this.$_voiceContainers = {};
 		this.$_postBeatGlyphs = [];
 	};
 	$AlphaTab_Rendering_GroupedBarRenderer.__typeName = 'AlphaTab.Rendering.GroupedBarRenderer';
@@ -1933,11 +1888,11 @@
 		this.$1$RenderFinishedField = null;
 		this.settings = settings;
 		this.renderingResources = new $AlphaTab_Rendering_RenderingResources(1);
-		if (ss.isNullOrUndefined(settings.engine) || !$AlphaTab_Environment.renderEngines.containsKey(settings.engine)) {
-			this.canvas = $AlphaTab_Environment.renderEngines.get_item('default')(param);
+		if (ss.isNullOrUndefined(settings.engine) || !$AlphaTab_Environment.renderEngines.hasOwnProperty(settings.engine)) {
+			this.canvas = $AlphaTab_Environment.renderEngines['default'](param);
 		}
 		else {
-			this.canvas = $AlphaTab_Environment.renderEngines.get_item(settings.engine)(param);
+			this.canvas = $AlphaTab_Environment.renderEngines[settings.engine](param);
 		}
 		this.$recreateLayout();
 	};
@@ -2623,8 +2578,8 @@
 		this.beamingHelper = null;
 		$AlphaTab_Rendering_Glyphs_Glyph.call(this, 0, 0);
 		this.$_infos = [];
-		this.beatEffects = new (ss.makeGenericType(ss.Dictionary$2, [String, $AlphaTab_Rendering_Glyphs_Glyph]))();
-		this.$_noteLookup = new (ss.makeGenericType(ss.Dictionary$2, [ss.Int32, $AlphaTab_Rendering_Glyphs_Glyph]))();
+		this.beatEffects = {};
+		this.$_noteLookup = {};
 	};
 	$AlphaTab_Rendering_Glyphs_ScoreNoteChordGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.ScoreNoteChordGlyph';
 	global.AlphaTab.Rendering.Glyphs.ScoreNoteChordGlyph = $AlphaTab_Rendering_Glyphs_ScoreNoteChordGlyph;
@@ -2766,8 +2721,8 @@
 		$AlphaTab_Rendering_Glyphs_Glyph.call(this, x, y);
 		this.$_isGrace = isGrace;
 		this.$_notes = [];
-		this.beatEffects = new (ss.makeGenericType(ss.Dictionary$2, [String, $AlphaTab_Rendering_Glyphs_Glyph]))();
-		this.$_noteLookup = new (ss.makeGenericType(ss.Dictionary$2, [ss.Int32, $AlphaTab_Rendering_Glyphs_NoteNumberGlyph]))();
+		this.beatEffects = {};
+		this.$_noteLookup = {};
 	};
 	$AlphaTab_Rendering_Glyphs_TabNoteChordGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.TabNoteChordGlyph';
 	global.AlphaTab.Rendering.Glyphs.TabNoteChordGlyph = $AlphaTab_Rendering_Glyphs_TabNoteChordGlyph;
@@ -2981,10 +2936,10 @@
 		this.preNoteSizes = null;
 		this.onNoteSizes = null;
 		this.postNoteSizes = null;
-		this.sizes = new (ss.makeGenericType(ss.Dictionary$2, [String, ss.Int32]))();
-		this.preNoteSizes = new (ss.makeGenericType(ss.Dictionary$2, [ss.Int32, ss.Int32]))();
-		this.onNoteSizes = new (ss.makeGenericType(ss.Dictionary$2, [ss.Int32, ss.Int32]))();
-		this.postNoteSizes = new (ss.makeGenericType(ss.Dictionary$2, [ss.Int32, ss.Int32]))();
+		this.sizes = {};
+		this.preNoteSizes = {};
+		this.onNoteSizes = {};
+		this.postNoteSizes = {};
 		this.fullWidth = 0;
 	};
 	$AlphaTab_Rendering_Staves_BarSizeInfo.__typeName = 'AlphaTab.Rendering.Staves.BarSizeInfo';
@@ -2993,6 +2948,7 @@
 	// AlphaTab.Rendering.Staves.Stave
 	var $AlphaTab_Rendering_Staves_Stave = function(factory) {
 		this.$_factory = null;
+		this.$_barRendererLookup = null;
 		this.staveTrackGroup = null;
 		this.staveGroup = null;
 		this.barRenderers = null;
@@ -3007,6 +2963,7 @@
 		this.isFirstInAccolade = false;
 		this.isLastInAccolade = false;
 		this.barRenderers = [];
+		this.$_barRendererLookup = {};
 		this.$_factory = factory;
 		this.topSpacing = 10;
 		this.bottomSpacing = 10;
@@ -3061,7 +3018,7 @@
 	// AlphaTab.Rendering.Utils.AccidentalHelper
 	var $AlphaTab_Rendering_Utils_AccidentalHelper = function() {
 		this.$_registeredAccidentals = null;
-		this.$_registeredAccidentals = new (ss.makeGenericType(ss.Dictionary$2, [ss.Int32, $AlphaTab_Model_AccidentalType]))();
+		this.$_registeredAccidentals = {};
 	};
 	$AlphaTab_Rendering_Utils_AccidentalHelper.__typeName = 'AlphaTab.Rendering.Utils.AccidentalHelper';
 	global.AlphaTab.Rendering.Utils.AccidentalHelper = $AlphaTab_Rendering_Utils_AccidentalHelper;
@@ -3089,13 +3046,13 @@
 		this.tupletHelpers = [];
 		var currentBeamHelper = null;
 		var currentTupletHelper = null;
-		for (var $t1 = 0; $t1 < bar.voices.length; $t1++) {
-			var v = bar.voices[$t1];
-			ss.add(this.beamHelpers, []);
-			ss.add(this.beamHelperLookup, new (ss.makeGenericType(ss.Dictionary$2, [ss.Int32, $AlphaTab_Rendering_Utils_BeamingHelper]))());
-			ss.add(this.tupletHelpers, []);
-			for (var $t2 = 0; $t2 < v.beats.length; $t2++) {
-				var b = v.beats[$t2];
+		for (var i = 0; i < bar.voices.length; i++) {
+			var v = bar.voices[i];
+			this.beamHelpers.push([]);
+			this.beamHelperLookup.push({});
+			this.tupletHelpers.push([]);
+			for (var j = 0; j < v.beats.length; j++) {
+				var b = v.beats[j];
 				var newBeamingHelper = false;
 				if (!b.get_isRest()) {
 					// try to fit beam to current beamhelper
@@ -3103,7 +3060,7 @@
 						// if not possible, create the next beaming helper
 						currentBeamHelper = new $AlphaTab_Rendering_Utils_BeamingHelper(bar.track);
 						currentBeamHelper.checkBeat(b);
-						ss.add(this.beamHelpers[v.index], currentBeamHelper);
+						this.beamHelpers[v.index].push(currentBeamHelper);
 						newBeamingHelper = true;
 					}
 				}
@@ -3122,10 +3079,10 @@
 					if (ss.isNullOrUndefined(previousBeat) || ss.isNullOrUndefined(currentTupletHelper) || !currentTupletHelper.check(b)) {
 						currentTupletHelper = new $AlphaTab_Rendering_Utils_TupletHelper(v.index);
 						currentTupletHelper.check(b);
-						ss.add(this.tupletHelpers[v.index], currentTupletHelper);
+						this.tupletHelpers[v.index].push(currentTupletHelper);
 					}
 				}
-				this.beamHelperLookup[v.index].set_item(b.index, currentBeamHelper);
+				this.beamHelperLookup[v.index][b.index] = currentBeamHelper;
 			}
 			currentBeamHelper = null;
 			currentTupletHelper = null;
@@ -3137,7 +3094,7 @@
 	// AlphaTab.Rendering.Utils.BarHelpersGroup
 	var $AlphaTab_Rendering_Utils_BarHelpersGroup = function() {
 		this.helpers = null;
-		this.helpers = new (ss.makeGenericType(ss.Dictionary$2, [ss.Int32, ss.makeGenericType(ss.Dictionary$2, [ss.Int32, $AlphaTab_Rendering_Utils_BarHelpers])]))();
+		this.helpers = {};
 	};
 	$AlphaTab_Rendering_Utils_BarHelpersGroup.__typeName = 'AlphaTab.Rendering.Utils.BarHelpersGroup';
 	global.AlphaTab.Rendering.Utils.BarHelpersGroup = $AlphaTab_Rendering_Utils_BarHelpersGroup;
@@ -3170,7 +3127,7 @@
 		this.maxNote = null;
 		this.$_track = track;
 		this.beats = [];
-		this.$_beatLineXPositions = new (ss.makeGenericType(ss.Dictionary$2, [ss.Int32, $AlphaTab_Rendering_Utils_BeatLinePositions]))();
+		this.$_beatLineXPositions = {};
 		this.maxDuration = 1;
 	};
 	$AlphaTab_Rendering_Utils_BeamingHelper.__typeName = 'AlphaTab.Rendering.Utils.BeamingHelper';
@@ -3342,8 +3299,8 @@
 	ss.initClass($AlphaTab_LayoutSettings, $asm, {
 		get: function(T) {
 			return function(key, def) {
-				if (this.additionalSettings.containsKey(key)) {
-					return this.additionalSettings.get_item(key);
+				if (this.additionalSettings.hasOwnProperty(key)) {
+					return this.additionalSettings[key];
 				}
 				return def;
 			};
@@ -3357,9 +3314,8 @@
 	ss.initClass($AlphaTab_Audio_Generator_MidiFileGenerator, $asm, {
 		generate: function() {
 			// initialize tracks
-			for (var $t1 = 0; $t1 < this.$_score.tracks.length; $t1++) {
-				var track = this.$_score.tracks[$t1];
-				this.$generateTrack(track);
+			for (var i = 0; i < this.$_score.tracks.length; i++) {
+				this.$generateTrack(this.$_score.tracks[i]);
 			}
 			var controller = new $AlphaTab_Audio_Generator_MidiPlaybackController(this.$_score);
 			var previousMasterBar = null;
@@ -3369,9 +3325,8 @@
 				controller.process();
 				if (controller.shouldPlay) {
 					this.$generateMasterBar(this.$_score.masterBars[index], previousMasterBar, controller.repeatMove);
-					for (var $t2 = 0; $t2 < this.$_score.tracks.length; $t2++) {
-						var track1 = this.$_score.tracks[$t2];
-						this.generateBar(track1.bars[index], controller.repeatMove);
+					for (var i1 = 0; i1 < this.$_score.tracks.length; i1++) {
+						this.generateBar(this.$_score.tracks[i1].bars[index], controller.repeatMove);
 					}
 				}
 				previousMasterBar = this.$_score.masterBars[index];
@@ -3417,15 +3372,13 @@
 			}
 		},
 		generateBar: function(bar, startMove) {
-			for (var $t1 = 0; $t1 < bar.voices.length; $t1++) {
-				var voice = bar.voices[$t1];
-				this.$generateVoice(voice, startMove);
+			for (var i = 0; i < bar.voices.length; i++) {
+				this.$generateVoice(bar.voices[i], startMove);
 			}
 		},
 		$generateVoice: function(voice, startMove) {
-			for (var $t1 = 0; $t1 < voice.beats.length; $t1++) {
-				var beat = voice.beats[$t1];
-				this.$generateBeat(beat, startMove);
+			for (var i = 0; i < voice.beats.length; i++) {
+				this.$generateBeat(voice.beats[i], startMove);
 			}
 		},
 		$generateBeat: function(beat, startMove) {
@@ -3433,17 +3386,16 @@
 			var start = beat.start;
 			var duration = beat.calculateDuration();
 			var track = beat.voice.bar.track;
-			for (var $t1 = 0; $t1 < beat.automations.length; $t1++) {
-				var automation = beat.automations[$t1];
-				this.$generateAutomation(beat, automation, startMove);
+			for (var i = 0; i < beat.automations.length; i++) {
+				this.$generateAutomation(beat, beat.automations[i], startMove);
 			}
 			if (beat.get_isRest()) {
 				this.$_handler.addRest(track.index, start + startMove, track.playbackInfo.primaryChannel);
 			}
 			else {
 				var brushInfo = this.$getBrushInfo(beat);
-				for (var $t2 = 0; $t2 < beat.notes.length; $t2++) {
-					var n = beat.notes[$t2];
+				for (var i1 = 0; i1 < beat.notes.length; i1++) {
+					var n = beat.notes[i1];
 					if (n.isTieDestination) {
 						continue;
 					}
@@ -3631,7 +3583,7 @@
 		$getDynamicValue: function(note) {
 			var dynamicValue = note.dynamic;
 			// more silent on hammer destination
-			if (!note.beat.voice.bar.track.isPercussion && note.isHammerPullDestination) {
+			if (!note.beat.voice.bar.track.isPercussion && ss.isValue(note.hammerPullOrigin)) {
 				dynamicValue--;
 			}
 			// more silent on ghost notes
@@ -3687,7 +3639,7 @@
 		},
 		$generateTremoloPicking: function(note, noteStart, noteDuration, noteKey, dynamicValue) {
 			var track = note.beat.voice.bar.track;
-			var tpLength = $AlphaTab_Audio_MidiUtils.toTicks(note.beat.tremoloSpeed.get_value());
+			var tpLength = $AlphaTab_Audio_MidiUtils.toTicks(ss.unbox(note.beat.tremoloSpeed));
 			var tick = noteStart;
 			while (tick + 10 < noteStart + noteDuration) {
 				// only the rest on last trill play
@@ -3705,8 +3657,8 @@
 				// calculate the number of  
 				// a mask where the single bits indicate the strings used
 				var stringUsed = 0;
-				for (var $t1 = 0; $t1 < beat.notes.length; $t1++) {
-					var n = beat.notes[$t1];
+				for (var i = 0; i < beat.notes.length; i++) {
+					var n = beat.notes[i];
 					if (n.isTieDestination) {
 						continue;
 					}
@@ -3717,8 +3669,8 @@
 				if (beat.notes.length > 0) {
 					var brushMove = 0;
 					var brushIncrement = this.$getBrushIncrement(beat);
-					for (var i = 0; i < beat.voice.bar.track.tuning.length; i++) {
-						var index = ((beat.brushType === 4 || beat.brushType === 2) ? i : (brushInfo.length - 1 - i));
+					for (var i1 = 0; i1 < beat.voice.bar.track.tuning.length; i1++) {
+						var index = ((beat.brushType === 4 || beat.brushType === 2) ? i1 : (brushInfo.length - 1 - i1));
 						if ((stringUsed & 1 << index) !== 0) {
 							brushInfo[index] = brushMove;
 							brushMove = brushIncrement;
@@ -3891,7 +3843,7 @@
 			var track = new $AlphaTab_Audio_Model_MidiTrack();
 			track.index = this.tracks.length;
 			track.file = this;
-			ss.add(this.tracks, track);
+			this.tracks.push(track);
 			return track;
 		},
 		writeTo: function(s) {
@@ -3912,9 +3864,8 @@
 			v = 960;
 			b = new $AlphaTab_IO_ByteArray([v >> 8 & 255, v & 255]);
 			s.write(b, 0, b.get_length());
-			for (var $t1 = 0; $t1 < this.tracks.length; $t1++) {
-				var midiTrack = this.tracks[$t1];
-				midiTrack.writeTo(s);
+			for (var i = 0; i < this.tracks.length; i++) {
+				this.tracks[i].writeTo(s);
 			}
 		}
 	});
@@ -3952,9 +3903,8 @@
 			tick = tick - lookup.start + masterBar.start;
 			// linear search beat within beats
 			var beat = null;
-			var $t1 = bar.voices[0].beats;
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var b = $t1[$t2];
+			for (var i = 0; i < bar.voices[0].beats.length; i++) {
+				var b = bar.voices[0].beats[i];
 				// we search for the first beat which 
 				// starts after the tick. 
 				if (ss.isNullOrUndefined(beat) || b.start <= tick) {
@@ -4089,6 +4039,7 @@
 			s.write(data, 0, data.get_length());
 		}
 	});
+	ss.initClass($AlphaTab_Collections_FastDictionaryExtensions, $asm, {});
 	ss.initClass($AlphaTab_Importer_AlphaTexException, $asm, {
 		get_message: function() {
 			if (ss.isNullOrUndefined(this.symbolData)) {
@@ -4479,7 +4430,7 @@
 					if (this.$_sy === 6) {
 						this.$_track.tuning = [];
 						do {
-							ss.add(this.$_track.tuning, this.$parseTuning(this.$_syData.toString()));
+							this.$_track.tuning.push(this.$parseTuning(this.$_syData.toString()));
 							this.$newSy();
 						} while (this.$_sy === 6);
 					}
@@ -4766,11 +4717,11 @@
 						this.$error('tremolobar-effect', 2, true);
 						return false;
 					}
-					ss.add(beat.whammyBarPoints, new $AlphaTab_Model_BendPoint(0, ss.unbox(this.$_syData)));
+					beat.whammyBarPoints.push(new $AlphaTab_Model_BendPoint(0, ss.unbox(this.$_syData)));
 					this.$newSy();
 				}
 				while (beat.whammyBarPoints.length > 60) {
-					ss.removeAt(beat.whammyBarPoints, beat.whammyBarPoints.length - 1);
+					beat.whammyBarPoints.splice(beat.whammyBarPoints.length - 1, 1);
 				}
 				// set positions
 				var count = beat.whammyBarPoints.length;
@@ -4846,11 +4797,11 @@
 							this.$error('bend-effect-value', 2, true);
 						}
 						var bendValue = ss.unbox(this.$_syData);
-						ss.add(note.bendPoints, new $AlphaTab_Model_BendPoint(0, Math.abs(bendValue)));
+						note.bendPoints.push(new $AlphaTab_Model_BendPoint(0, Math.abs(bendValue)));
 						this.$newSy();
 					}
 					while (note.bendPoints.length > 60) {
-						ss.removeAt(note.bendPoints, note.bendPoints.length - 1);
+						note.bendPoints.splice(note.bendPoints.length - 1, 1);
 					}
 					// set positions
 					var count = note.bendPoints.length;
@@ -4954,7 +4905,7 @@
 						}
 						this.$newSy();
 					}
-					note.beat.tremoloSpeed = new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [$AlphaTab_Model_Duration]))(duration1);
+					note.beat.tremoloSpeed = duration1;
 				}
 				else if (syData === 'v') {
 					this.$newSy();
@@ -5192,8 +5143,8 @@
 			this.$_lyricsIndex = [];
 			this.readInt32();
 			for (var i = 0; i < 5; i++) {
-				ss.add(this.$_lyricsIndex, this.readInt32() - 1);
-				ss.add(this.$_lyrics, this.readStringInt());
+				this.$_lyricsIndex.push(this.readInt32() - 1);
+				this.$_lyrics.push(this.readStringInt());
 			}
 		},
 		readPageSetup: function() {
@@ -5229,7 +5180,7 @@
 				info.volume = this._data.readByte();
 				info.balance = this._data.readByte();
 				this.skip(6);
-				ss.add(this.$_playbackInfos, info);
+				this.$_playbackInfos.push(info);
 			}
 		},
 		readMasterBars: function() {
@@ -5355,7 +5306,7 @@
 			for (var i = 0; i < 7; i++) {
 				var tuning = this.readInt32();
 				if (stringCount > i) {
-					ss.add(newTrack.tuning, tuning);
+					newTrack.tuning.push(tuning);
 				}
 			}
 			var port = this.readInt32();
@@ -5545,7 +5496,7 @@
 				for (var i = 0; i < 7; i++) {
 					var fret = this.readInt32();
 					if (i < chord.strings.length) {
-						ss.add(chord.strings, fret);
+						chord.strings.push(fret);
 					}
 				}
 				this.skip(32);
@@ -5572,7 +5523,7 @@
 					for (var i1 = 0; i1 < 7; i1++) {
 						var fret1 = this.readInt32();
 						if (i1 < chord.strings.length) {
-							ss.add(chord.strings, fret1);
+							chord.strings.push(fret1);
 						}
 					}
 					// number of barres (1)
@@ -5592,7 +5543,7 @@
 					chord.firstFret = this.readInt32();
 					for (var i2 = 0; i2 < 6; i2++) {
 						var fret2 = this.readInt32();
-						ss.add(chord.strings, fret2);
+						chord.strings.push(fret2);
 					}
 					// unknown
 					this.skip(36);
@@ -5606,14 +5557,14 @@
 					for (var i3 = 0; i3 < strings; i3++) {
 						var fret3 = this.readInt32();
 						if (i3 < chord.strings.length) {
-							ss.add(chord.strings, fret3);
+							chord.strings.push(fret3);
 						}
 					}
 				}
 			}
 			if (!ss.isNullOrEmptyString(chord.name)) {
 				beat.chordId = chordId.toString();
-				beat.voice.bar.track.chords.set_item(beat.chordId, chord);
+				beat.voice.bar.track.chords[beat.chordId] = chord;
 			}
 		},
 		readBeatEffects: function(beat) {
@@ -5717,7 +5668,7 @@
 					// 0..12 (amount of quarters)
 					this.readBool();
 					// vibrato
-					ss.add(beat.whammyBarPoints, point);
+					beat.whammyBarPoints.push(point);
 				}
 			}
 		},
@@ -5782,28 +5733,28 @@
 				volumeAutomation.isLinear = true;
 				volumeAutomation.type = 1;
 				volumeAutomation.value = tableChange.volume;
-				ss.add(beat.automations, volumeAutomation);
+				beat.automations.push(volumeAutomation);
 			}
 			if (tableChange.balance >= 0) {
 				var balanceAutomation = new $AlphaTab_Model_Automation();
 				balanceAutomation.isLinear = true;
 				balanceAutomation.type = 3;
 				balanceAutomation.value = tableChange.balance;
-				ss.add(beat.automations, balanceAutomation);
+				beat.automations.push(balanceAutomation);
 			}
 			if (tableChange.instrument >= 0) {
 				var instrumentAutomation = new $AlphaTab_Model_Automation();
 				instrumentAutomation.isLinear = true;
 				instrumentAutomation.type = 2;
 				instrumentAutomation.value = tableChange.instrument;
-				ss.add(beat.automations, instrumentAutomation);
+				beat.automations.push(instrumentAutomation);
 			}
 			if (tableChange.tempo >= 0) {
 				var tempoAutomation = new $AlphaTab_Model_Automation();
 				tempoAutomation.isLinear = true;
 				tempoAutomation.type = 0;
 				tempoAutomation.value = tableChange.tempo;
-				ss.add(beat.automations, tempoAutomation);
+				beat.automations.push(tempoAutomation);
 				beat.voice.bar.get_masterBar().tempoAutomation = tempoAutomation;
 			}
 		},
@@ -5951,7 +5902,7 @@
 					// 0..12 (amount of quarters)
 					this.readBool();
 					// vibrato
-					ss.add(note.bendPoints, point);
+					note.bendPoints.push(point);
 				}
 			}
 		},
@@ -5980,8 +5931,6 @@
 				case 3: {
 					// hammer
 					graceNote.isHammerPullOrigin = true;
-					note.isHammerPullDestination = true;
-					note.hammerPullOrigin = graceNote;
 					break;
 				}
 			}
@@ -6003,15 +5952,15 @@
 			var speed = this._data.readByte();
 			switch (speed) {
 				case 1: {
-					beat.tremoloSpeed = new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [$AlphaTab_Model_Duration]))(8);
+					beat.tremoloSpeed = 8;
 					break;
 				}
 				case 2: {
-					beat.tremoloSpeed = new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [$AlphaTab_Model_Duration]))(16);
+					beat.tremoloSpeed = 16;
 					break;
 				}
 				case 3: {
-					beat.tremoloSpeed = new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [$AlphaTab_Model_Duration]))(32);
+					beat.tremoloSpeed = 32;
 					break;
 				}
 			}
@@ -6235,11 +6184,9 @@
 			return this._data.readByte() !== 0;
 		},
 		readInt32: function() {
-			var ch1 = this._data.readByte();
-			var ch2 = this._data.readByte();
-			var ch3 = this._data.readByte();
-			var ch4 = this._data.readByte();
-			return ch1 | ch2 << 8 | ch3 << 16 | ch4 << 24;
+			var bytes = new $AlphaTab_IO_ByteArray.$ctor1(4);
+			this._data.read(bytes, 0, 4);
+			return bytes.get_item(0) | bytes.get_item(1) << 8 | bytes.get_item(2) << 16 | bytes.get_item(3) << 24;
 		},
 		readStringIntUnused: function() {
 			this.skip(4);
@@ -6371,7 +6318,7 @@
 					// store file if needed
 					var storeFile = ss.staticEquals(this.fileFilter, null) || this.fileFilter(file.fileName);
 					if (storeFile) {
-						ss.add(this.files, file);
+						this.files.push(file);
 					}
 					// we need to iterate the blocks because we need to move after the last datasector
 					var dataPointerOffset = offset + 148;
@@ -6447,21 +6394,21 @@
 	}, $AlphaTab_Importer_ScoreImporter);
 	ss.initClass($AlphaTab_Importer_GpxParser, $asm, {
 		parseXml: function(xml) {
-			this.$_automations = new (ss.makeGenericType(ss.Dictionary$2, [String, Array]))();
+			this.$_automations = {};
 			this.$_tracksMapping = [];
-			this.$_tracksById = new (ss.makeGenericType(ss.Dictionary$2, [String, $AlphaTab_Model_Track]))();
+			this.$_tracksById = {};
 			this.$_masterBars = [];
 			this.$_barsOfMasterBar = [];
-			this.$_voicesOfBar = new (ss.makeGenericType(ss.Dictionary$2, [String, Array]))();
-			this.$_barsById = new (ss.makeGenericType(ss.Dictionary$2, [String, $AlphaTab_Model_Bar]))();
-			this.$_voiceById = new (ss.makeGenericType(ss.Dictionary$2, [String, $AlphaTab_Model_Voice]))();
-			this.$_beatsOfVoice = new (ss.makeGenericType(ss.Dictionary$2, [String, Array]))();
-			this.$_beatById = new (ss.makeGenericType(ss.Dictionary$2, [String, $AlphaTab_Model_Beat]))();
-			this.$_rhythmOfBeat = new (ss.makeGenericType(ss.Dictionary$2, [String, String]))();
-			this.$_rhythmById = new (ss.makeGenericType(ss.Dictionary$2, [String, $AlphaTab_Importer_GpxRhythm]))();
-			this.$_notesOfBeat = new (ss.makeGenericType(ss.Dictionary$2, [String, Array]))();
-			this.$_noteById = new (ss.makeGenericType(ss.Dictionary$2, [String, $AlphaTab_Model_Note]))();
-			this.$_tappedNotes = new (ss.makeGenericType(ss.Dictionary$2, [String, Boolean]))();
+			this.$_voicesOfBar = {};
+			this.$_barsById = {};
+			this.$_voiceById = {};
+			this.$_beatsOfVoice = {};
+			this.$_beatById = {};
+			this.$_rhythmOfBeat = {};
+			this.$_rhythmById = {};
+			this.$_notesOfBeat = {};
+			this.$_noteById = {};
+			this.$_tappedNotes = {};
 			var dom;
 			dom = ss.parseXml(xml);
 			this.$parseDom(dom);
@@ -6660,10 +6607,10 @@
 				automation.text = text;
 			}
 			if (ss.isValue(barId)) {
-				if (!this.$_automations.containsKey(barId)) {
-					this.$_automations.set_item(barId, []);
+				if (!this.$_automations.hasOwnProperty(barId)) {
+					this.$_automations[barId] = [];
 				}
-				ss.add(this.$_automations.get_item(barId), automation);
+				this.$_automations[barId].push(automation);
 			}
 		},
 		$parseTracksNode: function(node) {
@@ -6711,7 +6658,7 @@
 					}
 				}
 			}
-			this.$_tracksById.set_item(trackId, track);
+			this.$_tracksById[trackId] = track;
 		},
 		$parseDiagramCollection: function(track, node) {
 			var items = this.$findChildElement(node, 'Items');
@@ -6731,7 +6678,7 @@
 			var chord = new $AlphaTab_Model_Chord();
 			var chordId = node.attributes['id'].value;
 			chord.name = node.attributes['name'].value;
-			track.chords.set_item(chordId, chord);
+			track.chords[chordId] = chord;
 		},
 		$findChildElement: function(node, name) {
 			for (var $t1 = 0; $t1 < node.childNodes.length; $t1++) {
@@ -6764,7 +6711,8 @@
 					for (var i = 0; i < tuning.length; i++) {
 						tuning[tuning.length - 1 - i] = $AlphaTab_Platform_Std.parseInt(tuningParts[i]);
 					}
-					track.tuning = ss.arrayClone(tuning);
+					track.tuning = [];
+					track.tuning = track.tuning.concat(tuning);
 					break;
 				}
 				case 'DiagramCollection': {
@@ -6840,7 +6788,7 @@
 							break;
 						}
 						case 'Bars': {
-							ss.add(this.$_barsOfMasterBar, this.$getValue(c).split(String.fromCharCode(32)));
+							this.$_barsOfMasterBar.push(this.$getValue(c).split(String.fromCharCode(32)));
 							break;
 						}
 						case 'TripletFeel': {
@@ -6883,7 +6831,7 @@
 					}
 				}
 			}
-			ss.add(this.$_masterBars, masterBar);
+			this.$_masterBars.push(masterBar);
 		},
 		$parseBars: function(node) {
 			for (var $t1 = 0; $t1 < node.childNodes.length; $t1++) {
@@ -6906,7 +6854,7 @@
 				if (c.nodeType === 1) {
 					switch (c.localName) {
 						case 'Voices': {
-							this.$_voicesOfBar.set_item(barId, this.$getValue(c).split(String.fromCharCode(32)));
+							this.$_voicesOfBar[barId] = this.$getValue(c).split(String.fromCharCode(32));
 							break;
 						}
 						case 'Clef': {
@@ -6937,7 +6885,7 @@
 					}
 				}
 			}
-			this.$_barsById.set_item(barId, bar);
+			this.$_barsById[barId] = bar;
 		},
 		$parseVoices: function(node) {
 			for (var $t1 = 0; $t1 < node.childNodes.length; $t1++) {
@@ -6960,13 +6908,13 @@
 				if (c.nodeType === 1) {
 					switch (c.localName) {
 						case 'Beats': {
-							this.$_beatsOfVoice.set_item(voiceId, this.$getValue(c).split(String.fromCharCode(32)));
+							this.$_beatsOfVoice[voiceId] = this.$getValue(c).split(String.fromCharCode(32));
 							break;
 						}
 					}
 				}
 			}
-			this.$_voiceById.set_item(voiceId, voice);
+			this.$_voiceById[voiceId] = voice;
 		},
 		$parseBeats: function(node) {
 			for (var $t1 = 0; $t1 < node.childNodes.length; $t1++) {
@@ -6990,11 +6938,11 @@
 					var e = c;
 					switch (c.localName) {
 						case 'Notes': {
-							this.$_notesOfBeat.set_item(beatId, this.$getValue(c).split(String.fromCharCode(32)));
+							this.$_notesOfBeat[beatId] = this.$getValue(c).split(String.fromCharCode(32));
 							break;
 						}
 						case 'Rhythm': {
-							this.$_rhythmOfBeat.set_item(beatId, e.attributes['ref'].value);
+							this.$_rhythmOfBeat[beatId] = e.attributes['ref'].value;
 							break;
 						}
 						case 'Fadding': {
@@ -7006,15 +6954,15 @@
 						case 'Tremolo': {
 							switch (this.$getValue(c)) {
 								case '1/2': {
-									beat.tremoloSpeed = new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [$AlphaTab_Model_Duration]))(8);
+									beat.tremoloSpeed = 8;
 									break;
 								}
 								case '1/4': {
-									beat.tremoloSpeed = new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [$AlphaTab_Model_Duration]))(16);
+									beat.tremoloSpeed = 16;
 									break;
 								}
 								case '1/8': {
-									beat.tremoloSpeed = new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [$AlphaTab_Model_Duration]))(32);
+									beat.tremoloSpeed = 32;
 									break;
 								}
 							}
@@ -7107,7 +7055,7 @@
 					}
 				}
 			}
-			this.$_beatById.set_item(beatId, beat);
+			this.$_beatById[beatId] = beat;
 		},
 		$parseBeatProperties: function(node, beat) {
 			var isWhammy = false;
@@ -7187,15 +7135,15 @@
 									break;
 								}
 								case 'WhammyBarMiddleValue': {
-									whammyMiddleValue = new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [ss.Int32]))(ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointValueFactor));
+									whammyMiddleValue = ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointValueFactor);
 									break;
 								}
 								case 'WhammyBarMiddleOffset1': {
-									whammyMiddleOffset1 = new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [ss.Int32]))(ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointPositionFactor));
+									whammyMiddleOffset1 = ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointPositionFactor);
 									break;
 								}
 								case 'WhammyBarMiddleOffset2': {
-									whammyMiddleOffset2 = new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [ss.Int32]))(ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointPositionFactor));
+									whammyMiddleOffset2 = ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointPositionFactor);
 									break;
 								}
 								case 'WhammyBarDestinationValue': {
@@ -7226,17 +7174,17 @@
 					whammyDestination = new $AlphaTab_Model_BendPoint($AlphaTab_Model_BendPoint.maxPosition, 0);
 				}
 				var whammy = [];
-				ss.add(whammy, whammyOrigin);
+				whammy.push(whammyOrigin);
 				if (ss.isValue(whammyMiddleOffset1) && ss.isValue(whammyMiddleValue)) {
-					ss.add(whammy, new $AlphaTab_Model_BendPoint(whammyMiddleOffset1.get_value(), whammyMiddleValue.get_value()));
+					whammy.push(new $AlphaTab_Model_BendPoint(ss.unbox(whammyMiddleOffset1), ss.unbox(whammyMiddleValue)));
 				}
 				if (ss.isValue(whammyMiddleOffset2) && ss.isValue(whammyMiddleValue)) {
-					ss.add(whammy, new $AlphaTab_Model_BendPoint(whammyMiddleOffset2.get_value(), whammyMiddleValue.get_value()));
+					whammy.push(new $AlphaTab_Model_BendPoint(ss.unbox(whammyMiddleOffset2), ss.unbox(whammyMiddleValue)));
 				}
 				if (ss.isNullOrUndefined(whammyMiddleOffset1) && ss.isNullOrUndefined(whammyMiddleOffset2) && ss.isValue(whammyMiddleValue)) {
-					ss.add(whammy, new $AlphaTab_Model_BendPoint(30, whammyMiddleValue.get_value()));
+					whammy.push(new $AlphaTab_Model_BendPoint(30, ss.unbox(whammyMiddleValue)));
 				}
-				ss.add(whammy, whammyDestination);
+				whammy.push(whammyDestination);
 				beat.whammyBarPoints = whammy;
 			}
 		},
@@ -7318,7 +7266,7 @@
 					}
 				}
 			}
-			this.$_noteById.set_item(noteId, note);
+			this.$_noteById[noteId] = note;
 		},
 		$parseNoteProperties: function(node, note, noteId) {
 			var isBended = false;
@@ -7344,7 +7292,7 @@
 									break;
 								}
 								case 'Tapped': {
-									this.$_tappedNotes.set_item(noteId, true);
+									this.$_tappedNotes[noteId] = true;
 									break;
 								}
 								case 'HarmonicType': {
@@ -7419,15 +7367,15 @@
 									break;
 								}
 								case 'BendMiddleValue': {
-									bendMiddleValue = new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [ss.Int32]))(ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointValueFactor));
+									bendMiddleValue = ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointValueFactor);
 									break;
 								}
 								case 'BendMiddleOffset1': {
-									bendMiddleOffset1 = new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [ss.Int32]))(ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointPositionFactor));
+									bendMiddleOffset1 = ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointPositionFactor);
 									break;
 								}
 								case 'BendMiddleOffset2': {
-									bendMiddleOffset2 = new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [ss.Int32]))(ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointPositionFactor));
+									bendMiddleOffset2 = ss.Int32.trunc($AlphaTab_Platform_Std.parseFloat(this.$getValue(this.$findChildElement(c, 'Float'))) * $AlphaTab_Importer_GpxParser.$bendPointPositionFactor);
 									break;
 								}
 								case 'BendDestinationValue': {
@@ -7490,17 +7438,17 @@
 					bendDestination = new $AlphaTab_Model_BendPoint($AlphaTab_Model_BendPoint.maxPosition, 0);
 				}
 				var bend = [];
-				ss.add(bend, bendOrigin);
+				bend.push(bendOrigin);
 				if (ss.isValue(bendMiddleOffset1) && ss.isValue(bendMiddleValue)) {
-					ss.add(bend, new $AlphaTab_Model_BendPoint(bendMiddleOffset1.get_value(), bendMiddleValue.get_value()));
+					bend.push(new $AlphaTab_Model_BendPoint(ss.unbox(bendMiddleOffset1), ss.unbox(bendMiddleValue)));
 				}
 				if (ss.isValue(bendMiddleOffset2) && ss.isValue(bendMiddleValue)) {
-					ss.add(bend, new $AlphaTab_Model_BendPoint(bendMiddleOffset2.get_value(), bendMiddleValue.get_value()));
+					bend.push(new $AlphaTab_Model_BendPoint(ss.unbox(bendMiddleOffset2), ss.unbox(bendMiddleValue)));
 				}
 				if (ss.isNullOrUndefined(bendMiddleOffset1) && ss.isNullOrUndefined(bendMiddleOffset2) && ss.isValue(bendMiddleValue)) {
-					ss.add(bend, new $AlphaTab_Model_BendPoint(30, bendMiddleValue.get_value()));
+					bend.push(new $AlphaTab_Model_BendPoint(30, ss.unbox(bendMiddleValue)));
 				}
-				ss.add(bend, bendDestination);
+				bend.push(bendDestination);
 				note.bendPoints = bend;
 			}
 		},
@@ -7572,7 +7520,7 @@
 					}
 				}
 			}
-			this.$_rhythmById.set_item(rhythmId, rhythm);
+			this.$_rhythmById[rhythmId] = rhythm;
 		},
 		$getValue: function(n) {
 			if (n.nodeType === 1 || n.nodeType === 9) {
@@ -7587,153 +7535,127 @@
 		},
 		$buildModel: function() {
 			// build beats
-			var $t1 = ss.getEnumerator(this.$_beatById.get_keys());
-			try {
-				while ($t1.moveNext()) {
-					var beatId = $t1.current();
-					var beat = this.$_beatById.get_item(beatId);
-					var rhythmId = this.$_rhythmOfBeat.get_item(beatId);
-					var rhythm = this.$_rhythmById.get_item(rhythmId);
-					// set beat duration
-					beat.duration = rhythm.value;
-					beat.dots = rhythm.dots;
-					beat.tupletNumerator = rhythm.tupletNumerator;
-					beat.tupletDenominator = rhythm.tupletDenominator;
-					// add notes to beat
-					if (this.$_notesOfBeat.containsKey(beatId)) {
-						var $t2 = this.$_notesOfBeat.get_item(beatId);
-						for (var $t3 = 0; $t3 < $t2.length; $t3++) {
-							var noteId = $t2[$t3];
-							if (!ss.referenceEquals(noteId, $AlphaTab_Importer_GpxParser.$invalidId)) {
-								beat.addNote(this.$_noteById.get_item(noteId));
-								if (this.$_tappedNotes.containsKey(noteId)) {
-									beat.tap = true;
-								}
+			var $t1 = Object.keys(this.$_beatById);
+			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+				var beatId = $t1[$t2];
+				var beat = this.$_beatById[beatId];
+				var rhythmId = this.$_rhythmOfBeat[beatId];
+				var rhythm = this.$_rhythmById[rhythmId];
+				// set beat duration
+				beat.duration = rhythm.value;
+				beat.dots = rhythm.dots;
+				beat.tupletNumerator = rhythm.tupletNumerator;
+				beat.tupletDenominator = rhythm.tupletDenominator;
+				// add notes to beat
+				if (this.$_notesOfBeat.hasOwnProperty(beatId)) {
+					var $t3 = this.$_notesOfBeat[beatId];
+					for (var $t4 = 0; $t4 < $t3.length; $t4++) {
+						var noteId = $t3[$t4];
+						if (!ss.referenceEquals(noteId, $AlphaTab_Importer_GpxParser.$invalidId)) {
+							beat.addNote(this.$_noteById[noteId]);
+							if (this.$_tappedNotes.hasOwnProperty(noteId)) {
+								beat.tap = true;
 							}
 						}
 					}
 				}
-			}
-			finally {
-				$t1.dispose();
 			}
 			// build voices
-			var $t4 = ss.getEnumerator(this.$_voiceById.get_keys());
-			try {
-				while ($t4.moveNext()) {
-					var voiceId = $t4.current();
-					var voice = this.$_voiceById.get_item(voiceId);
-					if (this.$_beatsOfVoice.containsKey(voiceId)) {
-						// add beats to voices
-						var $t5 = this.$_beatsOfVoice.get_item(voiceId);
-						for (var $t6 = 0; $t6 < $t5.length; $t6++) {
-							var beatId1 = $t5[$t6];
-							if (!ss.referenceEquals(beatId1, $AlphaTab_Importer_GpxParser.$invalidId)) {
-								// important! we clone the beat because beats get reused
-								// in gp6, our model needs to have unique beats.
-								voice.addBeat(this.$_beatById.get_item(beatId1).clone());
-							}
+			var $t5 = Object.keys(this.$_voiceById);
+			for (var $t6 = 0; $t6 < $t5.length; $t6++) {
+				var voiceId = $t5[$t6];
+				var voice = this.$_voiceById[voiceId];
+				if (this.$_beatsOfVoice.hasOwnProperty(voiceId)) {
+					// add beats to voices
+					var $t7 = this.$_beatsOfVoice[voiceId];
+					for (var $t8 = 0; $t8 < $t7.length; $t8++) {
+						var beatId1 = $t7[$t8];
+						if (!ss.referenceEquals(beatId1, $AlphaTab_Importer_GpxParser.$invalidId)) {
+							// important! we clone the beat because beats get reused
+							// in gp6, our model needs to have unique beats.
+							voice.addBeat(this.$_beatById[beatId1].clone());
 						}
 					}
 				}
-			}
-			finally {
-				$t4.dispose();
 			}
 			// build bars
-			var $t7 = ss.getEnumerator(this.$_barsById.get_keys());
-			try {
-				while ($t7.moveNext()) {
-					var barId = $t7.current();
-					var bar = this.$_barsById.get_item(barId);
-					if (this.$_voicesOfBar.containsKey(barId)) {
-						// add voices to bars
-						var $t8 = this.$_voicesOfBar.get_item(barId);
-						for (var $t9 = 0; $t9 < $t8.length; $t9++) {
-							var voiceId1 = $t8[$t9];
-							if (!ss.referenceEquals(voiceId1, $AlphaTab_Importer_GpxParser.$invalidId)) {
-								bar.addVoice(this.$_voiceById.get_item(voiceId1));
-							}
-							else {
-								// invalid voice -> empty voice
-								var voice1 = new $AlphaTab_Model_Voice();
-								bar.addVoice(voice1);
-								var beat1 = new $AlphaTab_Model_Beat();
-								beat1.isEmpty = true;
-								beat1.duration = 4;
-								voice1.addBeat(beat1);
-							}
+			var $t9 = Object.keys(this.$_barsById);
+			for (var $t10 = 0; $t10 < $t9.length; $t10++) {
+				var barId = $t9[$t10];
+				var bar = this.$_barsById[barId];
+				if (this.$_voicesOfBar.hasOwnProperty(barId)) {
+					// add voices to bars
+					var $t11 = this.$_voicesOfBar[barId];
+					for (var $t12 = 0; $t12 < $t11.length; $t12++) {
+						var voiceId1 = $t11[$t12];
+						if (!ss.referenceEquals(voiceId1, $AlphaTab_Importer_GpxParser.$invalidId)) {
+							bar.addVoice(this.$_voiceById[voiceId1]);
+						}
+						else {
+							// invalid voice -> empty voice
+							var voice1 = new $AlphaTab_Model_Voice();
+							bar.addVoice(voice1);
+							var beat1 = new $AlphaTab_Model_Beat();
+							beat1.isEmpty = true;
+							beat1.duration = 4;
+							voice1.addBeat(beat1);
 						}
 					}
 				}
-			}
-			finally {
-				$t7.dispose();
 			}
 			// build tracks (not all, only those used by the score)
 			var trackIndex = 0;
-			for (var $t10 = 0; $t10 < this.$_tracksMapping.length; $t10++) {
-				var trackId = this.$_tracksMapping[$t10];
-				var track = this.$_tracksById.get_item(trackId);
+			for (var $t13 = 0; $t13 < this.$_tracksMapping.length; $t13++) {
+				var trackId = this.$_tracksMapping[$t13];
+				var track = this.$_tracksById[trackId];
 				this.score.addTrack(track);
 				// iterate all bar definitions for the masterbars
 				// and add the correct bar to the track
-				for (var $t11 = 0; $t11 < this.$_barsOfMasterBar.length; $t11++) {
-					var barIds = this.$_barsOfMasterBar[$t11];
+				for (var i = 0; i < this.$_barsOfMasterBar.length; i++) {
+					var barIds = this.$_barsOfMasterBar[i];
 					var barId1 = barIds[trackIndex];
 					if (!ss.referenceEquals(barId1, $AlphaTab_Importer_GpxParser.$invalidId)) {
-						track.addBar(this.$_barsById.get_item(barId1));
+						track.addBar(this.$_barsById[barId1]);
 					}
 				}
 				trackIndex++;
 			}
 			// build automations
-			var $t12 = ss.getEnumerator(this.$_automations.get_keys());
-			try {
-				while ($t12.moveNext()) {
-					var barId2 = $t12.current();
-					var bar1 = this.$_barsById.get_item(barId2);
-					for (var $t13 = 0; $t13 < bar1.voices.length; $t13++) {
-						var v = bar1.voices[$t13];
-						if (v.beats.length > 0) {
-							var $t14 = this.$_automations.get_item(barId2);
-							for (var $t15 = 0; $t15 < $t14.length; $t15++) {
-								var automation = $t14[$t15];
-								ss.add(v.beats[0].automations, automation);
-							}
+			var $t14 = Object.keys(this.$_automations);
+			for (var $t15 = 0; $t15 < $t14.length; $t15++) {
+				var barId2 = $t14[$t15];
+				var bar1 = this.$_barsById[barId2];
+				for (var i1 = 0; i1 < bar1.voices.length; i1++) {
+					var v = bar1.voices[i1];
+					if (v.beats.length > 0) {
+						for (var j = 0; j < this.$_automations[barId2].length; j++) {
+							var automation = this.$_automations[barId2][j];
+							v.beats[0].automations.push(automation);
 						}
 					}
 				}
 			}
-			finally {
-				$t12.dispose();
-			}
 			// build score
-			for (var $t16 = 0; $t16 < this.$_masterBars.length; $t16++) {
-				var masterBar = this.$_masterBars[$t16];
+			for (var i2 = 0; i2 < this.$_masterBars.length; i2++) {
+				var masterBar = this.$_masterBars[i2];
 				this.score.addMasterBar(masterBar);
 			}
 			// build automations
-			var $t17 = ss.getEnumerator(this.$_automations.get_keys());
-			try {
-				while ($t17.moveNext()) {
-					var barId3 = $t17.current();
-					var automations = this.$_automations.get_item(barId3);
-					var bar2 = this.$_barsById.get_item(barId3);
-					for (var $t18 = 0; $t18 < automations.length; $t18++) {
-						var automation1 = automations[$t18];
-						if (automation1.type === 0) {
-							if (barId3 === '0') {
-								this.score.tempo = ss.Int32.trunc(automation1.value);
-								this.score.tempoLabel = automation1.text;
-							}
-							bar2.get_masterBar().tempoAutomation = automation1;
+			var $t16 = Object.keys(this.$_automations);
+			for (var $t17 = 0; $t17 < $t16.length; $t17++) {
+				var barId3 = $t16[$t17];
+				var automations = this.$_automations[barId3];
+				var bar2 = this.$_barsById[barId3];
+				for (var i3 = 0; i3 < automations.length; i3++) {
+					var automation1 = automations[i3];
+					if (automation1.type === 0) {
+						if (barId3 === '0') {
+							this.score.tempo = ss.Int32.trunc(automation1.value);
+							this.score.tempoLabel = automation1.text;
 						}
+						bar2.get_masterBar().tempoAutomation = automation1;
 					}
 				}
-			}
-			finally {
-				$t17.dispose();
 			}
 		}
 	});
@@ -7997,28 +7919,27 @@
 		addVoice: function(voice) {
 			voice.bar = this;
 			voice.index = this.voices.length;
-			ss.add(this.voices, voice);
+			this.voices.push(voice);
 		},
 		get_masterBar: function() {
 			return this.track.score.masterBars[this.index];
 		},
 		get_isEmpty: function() {
-			for (var $t1 = 0; $t1 < this.voices.length; $t1++) {
-				var voice = this.voices[$t1];
-				if (!voice.get_isEmpty()) {
+			for (var i = 0; i < this.voices.length; i++) {
+				if (!this.voices[i].get_isEmpty()) {
 					return false;
 				}
 			}
 			return true;
 		},
 		finish: function() {
-			for (var $t1 = 0; $t1 < this.voices.length; $t1++) {
-				var voice = this.voices[$t1];
+			for (var i = 0; i < this.voices.length; i++) {
+				var voice = this.voices[i];
 				voice.finish();
-				if (ss.isNullOrUndefined(voice.minDuration) || ss.isNullOrUndefined(this.minDuration) || this.minDuration.get_value() > voice.minDuration.get_value()) {
+				if (ss.isNullOrUndefined(voice.minDuration) || ss.isNullOrUndefined(this.minDuration) || ss.unbox(this.minDuration) > ss.unbox(voice.minDuration)) {
 					this.minDuration = voice.minDuration;
 				}
-				if (ss.isNullOrUndefined(voice.maxDuration) || ss.isNullOrUndefined(this.maxDuration) || this.maxDuration.get_value() > voice.maxDuration.get_value()) {
+				if (ss.isNullOrUndefined(voice.maxDuration) || ss.isNullOrUndefined(this.maxDuration) || ss.unbox(this.maxDuration) > ss.unbox(voice.maxDuration)) {
 					this.minDuration = voice.maxDuration;
 				}
 			}
@@ -8050,20 +7971,18 @@
 			return ss.isValue(this.chordId);
 		},
 		get_chord: function() {
-			return this.voice.bar.track.chords.get_item(this.chordId);
+			return this.voice.bar.track.chords[this.chordId];
 		},
 		get_isTremolo: function() {
 			return ss.isValue(this.tremoloSpeed);
 		},
 		clone: function() {
 			var beat = new $AlphaTab_Model_Beat();
-			for (var $t1 = 0; $t1 < this.whammyBarPoints.length; $t1++) {
-				var b = this.whammyBarPoints[$t1];
-				ss.add(beat.whammyBarPoints, b.clone());
+			for (var i = 0; i < this.whammyBarPoints.length; i++) {
+				beat.whammyBarPoints.push(this.whammyBarPoints[i].clone());
 			}
-			for (var $t2 = 0; $t2 < this.notes.length; $t2++) {
-				var n = this.notes[$t2];
-				beat.addNote(n.clone());
+			for (var i1 = 0; i1 < this.notes.length; i1++) {
+				beat.addNote(this.notes[i1].clone());
 			}
 			beat.dots = this.dots;
 			beat.chordId = this.chordId;
@@ -8078,9 +7997,8 @@
 			beat.tap = this.tap;
 			beat.slap = this.slap;
 			beat.pop = this.pop;
-			for (var $t3 = 0; $t3 < this.automations.length; $t3++) {
-				var a = this.automations[$t3];
-				ss.add(beat.automations, a.clone());
+			for (var i2 = 0; i2 < this.automations.length; i2++) {
+				beat.automations.push(this.automations[i2].clone());
 			}
 			beat.start = this.start;
 			beat.tupletDenominator = this.tupletDenominator;
@@ -8104,11 +8022,11 @@
 		},
 		addNote: function(note) {
 			note.beat = this;
-			ss.add(this.notes, note);
+			this.notes.push(note);
 		},
 		refreshNotes: function() {
-			for (var $t1 = 0; $t1 < this.notes.length; $t1++) {
-				var note = this.notes[$t1];
+			for (var i = 0; i < this.notes.length; i++) {
+				var note = this.notes[i];
 				if (ss.isNullOrUndefined(this.$_minNote) || note.get_realValue() < this.$_minNote.get_realValue()) {
 					this.$_minNote = note;
 				}
@@ -8118,8 +8036,8 @@
 			}
 		},
 		getAutomation: function(type) {
-			for (var $t1 = 0; $t1 < this.automations.length; $t1++) {
-				var automation = this.automations[$t1];
+			for (var i = 0; i < this.automations.length; i++) {
+				var automation = this.automations[i];
 				if (automation.type === type) {
 					return automation;
 				}
@@ -8127,8 +8045,8 @@
 			return null;
 		},
 		getNoteOnString: function(string) {
-			for (var $t1 = 0; $t1 < this.notes.length; $t1++) {
-				var note = this.notes[$t1];
+			for (var i = 0; i < this.notes.length; i++) {
+				var note = this.notes[i];
 				if (note.string === string) {
 					return note;
 				}
@@ -8143,9 +8061,8 @@
 			else {
 				this.start = this.previousBeat.start + this.previousBeat.calculateDuration();
 			}
-			for (var $t1 = 0; $t1 < this.notes.length; $t1++) {
-				var note = this.notes[$t1];
-				note.finish();
+			for (var i = 0; i < this.notes.length; i++) {
+				this.notes[i].finish();
 			}
 		}
 	});
@@ -8197,16 +8114,16 @@
 		},
 		clone: function() {
 			var n = new $AlphaTab_Model_Note();
-			for (var $t1 = 0; $t1 < this.bendPoints.length; $t1++) {
-				var p = this.bendPoints[$t1];
-				ss.add(n.bendPoints, p.clone());
+			for (var i = 0; i < this.bendPoints.length; i++) {
+				n.bendPoints.push(this.bendPoints[i].clone());
 			}
 			n.dynamic = this.dynamic;
 			n.accentuated = this.accentuated;
 			n.fret = this.fret;
 			n.isGhost = this.isGhost;
 			n.string = this.string;
-			n.isHammerPullDestination = this.isHammerPullDestination;
+			n.hammerPullDestination = this.hammerPullDestination;
+			n.hammerPullOrigin = this.hammerPullOrigin;
 			n.isHammerPullOrigin = this.isHammerPullOrigin;
 			n.harmonicValue = this.harmonicValue;
 			n.harmonicType = this.harmonicType;
@@ -8251,8 +8168,8 @@
 					this.isHammerPullOrigin = false;
 				}
 				else {
-					nextNoteOnLine.value().isHammerPullDestination = true;
-					nextNoteOnLine.value().hammerPullOrigin = this;
+					this.hammerPullDestination = nextNoteOnLine.value();
+					this.hammerPullDestination.hammerPullOrigin = this;
 				}
 			}
 			// set slides
@@ -8266,17 +8183,17 @@
 	ss.initClass($AlphaTab_Model_RepeatGroup, $asm, {
 		addMasterBar: function(masterBar) {
 			if (this.openings.length === 0) {
-				ss.add(this.openings, masterBar);
+				this.openings.push(masterBar);
 			}
-			ss.add(this.masterBars, masterBar);
+			this.masterBars.push(masterBar);
 			masterBar.repeatGroup = this;
 			if (masterBar.get_isRepeatEnd()) {
-				ss.add(this.closings, masterBar);
+				this.closings.push(masterBar);
 				this.isClosed = true;
 			}
 			else if (this.isClosed) {
 				this.isClosed = false;
-				ss.add(this.openings, masterBar);
+				this.openings.push(masterBar);
 			}
 		}
 	});
@@ -8296,17 +8213,16 @@
 				this.$_currentRepeatGroup = new $AlphaTab_Model_RepeatGroup();
 			}
 			this.$_currentRepeatGroup.addMasterBar(bar);
-			ss.add(this.masterBars, bar);
+			this.masterBars.push(bar);
 		},
 		addTrack: function(track) {
 			track.score = this;
 			track.index = this.tracks.length;
-			ss.add(this.tracks, track);
+			this.tracks.push(track);
 		},
 		finish: function() {
-			for (var $t1 = 0; $t1 < this.tracks.length; $t1++) {
-				var track = this.tracks[$t1];
-				track.finish();
+			for (var i = 0; i < this.tracks.length; i++) {
+				this.tracks[i].finish();
 			}
 		}
 	});
@@ -8320,7 +8236,7 @@
 				bar.previousBar = this.bars[this.bars.length - 1];
 				bar.previousBar.nextBar = bar;
 			}
-			ss.add(this.bars, bar);
+			this.bars.push(bar);
 		},
 		finish: function() {
 			if (ss.isNullOrEmptyString(this.shortName)) {
@@ -8329,9 +8245,8 @@
 					this.shortName = this.shortName.substr(0, $AlphaTab_Model_Track.$shortNameMaxLength);
 				}
 			}
-			for (var $t1 = 0; $t1 < this.bars.length; $t1++) {
-				var bar = this.bars[$t1];
-				bar.finish();
+			for (var i = 0; i < this.bars.length; i++) {
+				this.bars[i].finish();
 			}
 		}
 	});
@@ -8359,7 +8274,7 @@
 			}
 			beat.voice = this;
 			beat.index = this.beats.length;
-			ss.add(this.beats, beat);
+			this.beats.push(beat);
 		},
 		addGraceBeat: function(beat) {
 			if (this.beats.length === 0) {
@@ -8368,21 +8283,21 @@
 			}
 			// remove last beat
 			var lastBeat = this.beats[this.beats.length - 1];
-			ss.removeAt(this.beats, this.beats.length - 1);
+			this.beats.splice(this.beats.length - 1, 1);
 			// insert grace beat
 			this.addBeat(beat);
 			// reinsert last beat
 			this.addBeat(lastBeat);
 		},
 		finish: function() {
-			for (var $t1 = 0; $t1 < this.beats.length; $t1++) {
-				var beat = this.beats[$t1];
+			for (var i = 0; i < this.beats.length; i++) {
+				var beat = this.beats[i];
 				beat.finish();
-				if (ss.isNullOrUndefined(this.minDuration) || this.minDuration.get_value() > beat.duration) {
-					this.minDuration = new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [$AlphaTab_Model_Duration]))(beat.duration);
+				if (ss.isNullOrUndefined(this.minDuration) || ss.unbox(this.minDuration) > beat.duration) {
+					this.minDuration = beat.duration;
 				}
-				if (ss.isNullOrUndefined(this.maxDuration) || this.maxDuration.get_value() < beat.duration) {
-					this.maxDuration = new (ss.makeGenericType($AlphaTab_Platform_Nullable$1, [$AlphaTab_Model_Duration]))(beat.duration);
+				if (ss.isNullOrUndefined(this.maxDuration) || ss.unbox(this.maxDuration) < beat.duration) {
+					this.maxDuration = beat.duration;
 				}
 			}
 		}
@@ -9039,7 +8954,7 @@
 			barLookup.isLastOfLine = this.get_isLastOfLine();
 			barLookup.visualBounds = new $AlphaTab_Rendering_Utils_Bounds(x + this.stave.x + this.x, visualTop, this.width, visualHeight);
 			barLookup.bounds = new $AlphaTab_Rendering_Utils_Bounds(x + this.stave.x + this.x, realTop, this.width, realHeight);
-			ss.add(lookup.bars, barLookup);
+			lookup.bars.push(barLookup);
 		}
 	});
 	ss.initClass($AlphaTab_Rendering_AlternateEndingsBarRenderer, $asm, {
@@ -9055,9 +8970,8 @@
 			}
 			this.height = ss.Int32.trunc(this.get_resources().wordsFont.get_size());
 			var endingsStrings = new ss.StringBuilder();
-			for (var $t1 = 0; $t1 < this.$_endings.length; $t1++) {
-				var e = this.$_endings[$t1];
-				endingsStrings.append(e + 1);
+			for (var i = 0; i < this.$_endings.length; i++) {
+				endingsStrings.append(this.$_endings[i] + 1);
 				endingsStrings.append('. ');
 			}
 			this.$_endingsString = endingsStrings.toString();
@@ -9097,15 +9011,10 @@
 			this.createPreBeatGlyphs();
 			this.createBeatGlyphs();
 			this.createPostBeatGlyphs();
-			var $t1 = ss.getEnumerator(this.$_voiceContainers.get_values());
-			try {
-				while ($t1.moveNext()) {
-					var c = $t1.current();
-					c.doLayout();
-				}
-			}
-			finally {
-				$t1.dispose();
+			var $t1 = $AlphaTab_Collections_FastDictionaryExtensions.getValues(this.$_voiceContainers);
+			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+				var c = $t1[$t2];
+				c.doLayout();
 			}
 			this.$updateWidth();
 		},
@@ -9114,17 +9023,12 @@
 			if (this.$_postBeatGlyphs.length > 0) {
 				this.width += this.$_postBeatGlyphs[this.$_postBeatGlyphs.length - 1].x + this.$_postBeatGlyphs[this.$_postBeatGlyphs.length - 1].width;
 			}
-			var $t1 = ss.getEnumerator(this.$_voiceContainers.get_values());
-			try {
-				while ($t1.moveNext()) {
-					var c = $t1.current();
-					if (ss.isNullOrUndefined(this.$_biggestVoiceContainer) || c.width > this.$_biggestVoiceContainer.width) {
-						this.$_biggestVoiceContainer = c;
-					}
+			var $t1 = $AlphaTab_Collections_FastDictionaryExtensions.getValues(this.$_voiceContainers);
+			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+				var c = $t1[$t2];
+				if (ss.isNullOrUndefined(this.$_biggestVoiceContainer) || c.width > this.$_biggestVoiceContainer.width) {
+					this.$_biggestVoiceContainer = c;
 				}
-			}
-			finally {
-				$t1.dispose();
 			}
 		},
 		registerMaxSizes: function(sizes) {
@@ -9132,15 +9036,10 @@
 			if (sizes.getSize($AlphaTab_Rendering_GroupedBarRenderer.keySizePre) < preSize) {
 				sizes.setSize($AlphaTab_Rendering_GroupedBarRenderer.keySizePre, preSize);
 			}
-			var $t1 = ss.getEnumerator(this.$_voiceContainers.get_values());
-			try {
-				while ($t1.moveNext()) {
-					var c = $t1.current();
-					c.registerMaxSizes(sizes);
-				}
-			}
-			finally {
-				$t1.dispose();
+			var $t1 = $AlphaTab_Collections_FastDictionaryExtensions.getValues(this.$_voiceContainers);
+			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+				var c = $t1[$t2];
+				c.registerMaxSizes(sizes);
 			}
 			var postSize;
 			if (this.$_postBeatGlyphs.length === 0) {
@@ -9165,15 +9064,10 @@
 				this.addPreBeatGlyph(new $AlphaTab_Rendering_Glyphs_SpacingGlyph(0, 0, preSizeDiff, true));
 			}
 			// on beat glyphs we apply the glyph spacing
-			var $t1 = ss.getEnumerator(this.$_voiceContainers.get_values());
-			try {
-				while ($t1.moveNext()) {
-					var c = $t1.current();
-					c.applySizes(sizes);
-				}
-			}
-			finally {
-				$t1.dispose();
+			var $t1 = $AlphaTab_Collections_FastDictionaryExtensions.getValues(this.$_voiceContainers);
+			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+				var c = $t1[$t2];
+				c.applySizes(sizes);
 			}
 			// on the post glyphs we add the spacing before all other glyphs
 			var postSize = sizes.getSize($AlphaTab_Rendering_GroupedBarRenderer.keySizePost);
@@ -9185,7 +9079,7 @@
 				postSizeDiff = postSize - (this.$_postBeatGlyphs[this.$_postBeatGlyphs.length - 1].x + this.$_postBeatGlyphs[this.$_postBeatGlyphs.length - 1].width);
 			}
 			if (postSizeDiff > 0) {
-				ss.insert(this.$_postBeatGlyphs, 0, new $AlphaTab_Rendering_Glyphs_SpacingGlyph(0, 0, postSizeDiff, true));
+				this.$_postBeatGlyphs.splice(0, 0, new $AlphaTab_Rendering_Glyphs_SpacingGlyph(0, 0, postSizeDiff, true));
 				for (var i = 0; i < this.$_postBeatGlyphs.length; i++) {
 					var g = this.$_postBeatGlyphs[i];
 					g.x = ((i === 0) ? 0 : (this.$_postBeatGlyphs[this.$_postBeatGlyphs.length - 1].x + this.$_postBeatGlyphs[this.$_postBeatGlyphs.length - 1].width));
@@ -9201,7 +9095,7 @@
 			g.index = c.length;
 			g.renderer = this;
 			g.doLayout();
-			ss.add(c, g);
+			c.push(g);
 		},
 		addPreBeatGlyph: function(g) {
 			this.$addGlyph(this.$_preBeatGlyphs, g);
@@ -9211,13 +9105,13 @@
 		},
 		$getOrCreateVoiceContainer: function(voiceIndex) {
 			var c;
-			if (voiceIndex >= this.$_voiceContainers.get_count()) {
+			if (voiceIndex >= Object.keys(this.$_voiceContainers).length) {
 				c = new $AlphaTab_Rendering_Glyphs_VoiceContainerGlyph(0, 0, voiceIndex);
 				c.renderer = this;
-				this.$_voiceContainers.set_item(voiceIndex, c);
+				this.$_voiceContainers[voiceIndex] = c;
 			}
 			else {
-				c = this.$_voiceContainers.get_item(voiceIndex);
+				c = this.$_voiceContainers[voiceIndex];
 			}
 			return c;
 		},
@@ -9255,32 +9149,27 @@
 		get_postBeatGlyphsStart: function() {
 			var start = this.get_beatGlyphsStart();
 			var offset = 0;
-			var $t1 = ss.getEnumerator(this.$_voiceContainers.get_values());
-			try {
-				while ($t1.moveNext()) {
-					var c = $t1.current();
-					if (c.width > offset) {
-						offset = c.width;
-					}
-					//if (c.beatGlyphs.length > 0)
-					//{
-					//    var coff = c.beatGlyphs[c.beatGlyphs.length - 1].x + c.beatGlyphs[c.beatGlyphs.length - 1].width;
-					//    if (coff > offset)
-					//    {
-					//        offset = coff;
-					//    }
-					//}
+			var $t1 = $AlphaTab_Collections_FastDictionaryExtensions.getValues(this.$_voiceContainers);
+			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+				var c = $t1[$t2];
+				if (c.width > offset) {
+					offset = c.width;
 				}
-			}
-			finally {
-				$t1.dispose();
+				//if (c.beatGlyphs.length > 0)
+				//{
+				//    var coff = c.beatGlyphs[c.beatGlyphs.length - 1].x + c.beatGlyphs[c.beatGlyphs.length - 1].width;
+				//    if (coff > offset)
+				//    {
+				//        offset = coff;
+				//    }
+				//}
 			}
 			return start + offset;
 		},
 		get_postBeatGlyphsWidth: function() {
 			var width = 0;
-			for (var $t1 = 0; $t1 < this.$_postBeatGlyphs.length; $t1++) {
-				var c = this.$_postBeatGlyphs[$t1];
+			for (var i = 0; i < this.$_postBeatGlyphs.length; i++) {
+				var c = this.$_postBeatGlyphs[i];
 				var x = c.x + c.width;
 				if (x > width) {
 					width = x;
@@ -9290,54 +9179,39 @@
 		},
 		applyBarSpacing: function(spacing) {
 			this.width += spacing;
-			var $t1 = ss.getEnumerator(this.$_voiceContainers.get_values());
-			try {
-				while ($t1.moveNext()) {
-					var c = $t1.current();
-					var toApply = spacing;
-					if (ss.isValue(this.$_biggestVoiceContainer)) {
-						toApply += this.$_biggestVoiceContainer.width - c.width;
-					}
-					c.applyGlyphSpacing(toApply);
+			var $t1 = $AlphaTab_Collections_FastDictionaryExtensions.getValues(this.$_voiceContainers);
+			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+				var c = $t1[$t2];
+				var toApply = spacing;
+				if (ss.isValue(this.$_biggestVoiceContainer)) {
+					toApply += this.$_biggestVoiceContainer.width - c.width;
 				}
-			}
-			finally {
-				$t1.dispose();
+				c.applyGlyphSpacing(toApply);
 			}
 		},
 		finalizeRenderer: function(layout) {
-			var $t1 = ss.getEnumerator(this.$_voiceContainers.get_values());
-			try {
-				while ($t1.moveNext()) {
-					var c = $t1.current();
-					c.finalizeGlyph(layout);
-				}
-			}
-			finally {
-				$t1.dispose();
+			var $t1 = $AlphaTab_Collections_FastDictionaryExtensions.getValues(this.$_voiceContainers);
+			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+				var c = $t1[$t2];
+				c.finalizeGlyph(layout);
 			}
 		},
 		paint: function(cx, cy, canvas) {
 			this.paintBackground(cx, cy, canvas);
 			var glyphStartX = this.get_preBeatGlyphStart();
-			for (var $t1 = 0; $t1 < this.$_preBeatGlyphs.length; $t1++) {
-				var g = this.$_preBeatGlyphs[$t1];
+			for (var i = 0; i < this.$_preBeatGlyphs.length; i++) {
+				var g = this.$_preBeatGlyphs[i];
 				g.paint(cx + this.x + glyphStartX, cy + this.y, canvas);
 			}
 			glyphStartX = this.get_beatGlyphsStart();
-			var $t2 = ss.getEnumerator(this.$_voiceContainers.get_values());
-			try {
-				while ($t2.moveNext()) {
-					var c = $t2.current();
-					c.paint(cx + this.x + glyphStartX, cy + this.y, canvas);
-				}
-			}
-			finally {
-				$t2.dispose();
+			var $t1 = $AlphaTab_Collections_FastDictionaryExtensions.getValues(this.$_voiceContainers);
+			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+				var c = $t1[$t2];
+				c.paint(cx + this.x + glyphStartX, cy + this.y, canvas);
 			}
 			glyphStartX = this.width - this.get_postBeatGlyphsWidth();
-			for (var $t3 = 0; $t3 < this.$_postBeatGlyphs.length; $t3++) {
-				var g1 = this.$_postBeatGlyphs[$t3];
+			for (var i1 = 0; i1 < this.$_postBeatGlyphs.length; i1++) {
+				var g1 = this.$_postBeatGlyphs[i1];
 				g1.paint(cx + this.x + glyphStartX, cy + this.y, canvas);
 			}
 		},
@@ -9347,24 +9221,19 @@
 			$AlphaTab_Rendering_BarRendererBase.prototype.buildBoundingsLookup.call(this, lookup, visualTop, visualHeight, realTop, realHeight, x);
 			var barLookup = lookup.bars[lookup.bars.length - 1];
 			var beatStart = this.get_beatGlyphsStart();
-			var $t1 = ss.getEnumerator(this.$_voiceContainers.get_values());
-			try {
-				while ($t1.moveNext()) {
-					var c = $t1.current();
-					for (var $t2 = 0; $t2 < c.beatGlyphs.length; $t2++) {
-						var bc = c.beatGlyphs[$t2];
-						var beatLookup = new $AlphaTab_Rendering_Utils_BeatBoundings();
-						beatLookup.beat = bc.beat;
-						// on beat bounding rectangle
-						beatLookup.visualBounds = new $AlphaTab_Rendering_Utils_Bounds(x + this.stave.x + this.x + beatStart + c.x + bc.x + bc.onNotes.x, visualTop, bc.onNotes.width, visualHeight);
-						// real beat boundings
-						beatLookup.bounds = new $AlphaTab_Rendering_Utils_Bounds(x + this.stave.x + this.x + beatStart + c.x + bc.x, realTop, bc.width, realHeight);
-						ss.add(barLookup.beats, beatLookup);
-					}
+			var $t1 = $AlphaTab_Collections_FastDictionaryExtensions.getValues(this.$_voiceContainers);
+			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+				var c = $t1[$t2];
+				for (var i = 0; i < c.beatGlyphs.length; i++) {
+					var bc = c.beatGlyphs[i];
+					var beatLookup = new $AlphaTab_Rendering_Utils_BeatBoundings();
+					beatLookup.beat = bc.beat;
+					// on beat bounding rectangle
+					beatLookup.visualBounds = new $AlphaTab_Rendering_Utils_Bounds(x + this.stave.x + this.x + beatStart + c.x + bc.x + bc.onNotes.x, visualTop, bc.onNotes.width, visualHeight);
+					// real beat boundings
+					beatLookup.bounds = new $AlphaTab_Rendering_Utils_Bounds(x + this.stave.x + this.x + beatStart + c.x + bc.x, realTop, bc.width, realHeight);
+					barLookup.beats.push(beatLookup);
 				}
-			}
-			finally {
-				$t1.dispose();
 			}
 		}
 	}, $AlphaTab_Rendering_BarRendererBase);
@@ -9386,26 +9255,22 @@
 				// check if previous renderer had an effect on his last beat
 				// and use this as merging element
 				var prevRenderer = this.stave.barRenderers[this.index - 1];
-				if (ss.isValue(prevRenderer.$_lastBeat) && prevRenderer.$_effectGlyphs[0].containsKey(prevRenderer.$_lastBeat.index)) {
-					prevGlyph = prevRenderer.$_effectGlyphs[0].get_item(prevRenderer.$_lastBeat.index);
+				if (ss.isValue(prevRenderer.$_lastBeat) && prevRenderer.$_effectGlyphs[0].hasOwnProperty(prevRenderer.$_lastBeat.index)) {
+					prevGlyph = prevRenderer.$_effectGlyphs[0][prevRenderer.$_lastBeat.index];
 				}
 			}
-			var $t1 = ss.getEnumerator(this.$_effectGlyphs[0].get_keys());
-			try {
-				while ($t1.moveNext()) {
-					var beatIndex = $t1.current();
-					var effect = this.$_effectGlyphs[0].get_item(beatIndex);
-					this.$alignGlyph(this.$_info.get_sizingMode(), beatIndex, 0, prevGlyph);
-					prevGlyph = effect;
-					this.isEmpty = false;
-				}
-			}
-			finally {
-				$t1.dispose();
+			var $t1 = Object.keys(this.$_effectGlyphs[0]);
+			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+				var key = $t1[$t2];
+				var beatIndex = $AlphaTab_Platform_Std.parseInt(key);
+				var effect = this.$_effectGlyphs[0][beatIndex];
+				this.$alignGlyph(this.$_info.get_sizingMode(), beatIndex, 0, prevGlyph);
+				prevGlyph = effect;
+				this.isEmpty = false;
 			}
 		},
 		$alignGlyph: function(sizing, beatIndex, voiceIndex, prevGlyph) {
-			var g = this.$_effectGlyphs[voiceIndex].get_item(beatIndex);
+			var g = this.$_effectGlyphs[voiceIndex][beatIndex];
 			var pos;
 			var container = this.getBeatContainer(voiceIndex, beatIndex);
 			switch (sizing) {
@@ -9543,13 +9408,13 @@
 		createPreBeatGlyphs: function() {
 		},
 		createBeatGlyphs: function() {
-			ss.add(this.$_effectGlyphs, new (ss.makeGenericType(ss.Dictionary$2, [ss.Int32, $AlphaTab_Rendering_Glyphs_Glyph]))());
-			ss.add(this.$_uniqueEffectGlyphs, []);
+			this.$_effectGlyphs.push({});
+			this.$_uniqueEffectGlyphs.push([]);
 			this.$createVoiceGlyphs(this.bar.voices[0]);
 		},
 		$createVoiceGlyphs: function(v) {
-			for (var $t1 = 0; $t1 < v.beats.length; $t1++) {
-				var b = v.beats[$t1];
+			for (var i = 0; i < v.beats.length; i++) {
+				var b = v.beats[i];
 				// we create empty glyphs as alignment references and to get the 
 				// effect bar sized
 				var container = new $AlphaTab_Rendering_Glyphs_BeatContainerGlyph(b);
@@ -9574,8 +9439,8 @@
 					var g = this.$_info.createNewGlyph(this, b);
 					g.renderer = this;
 					g.doLayout();
-					this.$_effectGlyphs[b.voice.index].set_item(b.index, g);
-					ss.add(this.$_uniqueEffectGlyphs[b.voice.index], g);
+					this.$_effectGlyphs[b.voice.index][b.index] = g;
+					this.$_uniqueEffectGlyphs[b.voice.index].push(g);
 					break;
 				}
 				case 6:
@@ -9591,16 +9456,16 @@
 							// expand the previous effect
 							var prevEffect;
 							if (b.index > 0) {
-								prevEffect = this.$_effectGlyphs[b.voice.index].get_item(prevBeat.index);
+								prevEffect = this.$_effectGlyphs[b.voice.index][prevBeat.index];
 							}
 							else {
-								prevEffect = this.stave.barRenderers[this.index - 1].$_effectGlyphs[b.voice.index].get_item(prevBeat.index);
+								prevEffect = this.stave.barRenderers[this.index - 1].$_effectGlyphs[b.voice.index][prevBeat.index];
 							}
 							if (ss.isNullOrUndefined(prevEffect) || !this.$_info.canExpand(this, prevBeat, b)) {
 								this.$createOrResizeGlyph(0, b);
 							}
 							else {
-								this.$_effectGlyphs[b.voice.index].set_item(b.index, prevEffect);
+								this.$_effectGlyphs[b.voice.index][b.index] = prevEffect;
 							}
 						}
 						else {
@@ -9629,10 +9494,10 @@
 			// canvas.setColor(new Color(0, 0, 200, 100));
 			// canvas.fillRect(cx + x, cy + y, width, height);
 			var glyphStart = this.get_beatGlyphsStart();
-			for (var $t1 = 0; $t1 < this.$_uniqueEffectGlyphs.length; $t1++) {
-				var v = this.$_uniqueEffectGlyphs[$t1];
-				for (var $t2 = 0; $t2 < v.length; $t2++) {
-					var g = v[$t2];
+			for (var i = 0; i < this.$_uniqueEffectGlyphs.length; i++) {
+				var v = this.$_uniqueEffectGlyphs[i];
+				for (var j = 0; j < v.length; j++) {
+					var g = v[j];
 					if (ss.referenceEquals(g.renderer, this)) {
 						g.paint(cx + this.x + glyphStart, cy + this.y, canvas);
 					}
@@ -9669,7 +9534,7 @@
 	});
 	ss.initClass($AlphaTab_Rendering_RhythmBarRenderer, $asm, {
 		doLayout: function() {
-			this.$_helpers = this.stave.staveGroup.helpers.helpers.get_item(this.bar.track.index).get_item(this.bar.index);
+			this.$_helpers = this.stave.staveGroup.helpers.helpers[this.bar.track.index][this.bar.index];
 			$AlphaTab_Rendering_GroupedBarRenderer.prototype.doLayout.call(this);
 			this.height = ss.Int32.trunc(24 * this.get_scale());
 			this.isEmpty = false;
@@ -9678,8 +9543,8 @@
 			this.$createVoiceGlyphs(this.bar.voices[0]);
 		},
 		$createVoiceGlyphs: function(voice) {
-			for (var $t1 = 0; $t1 < voice.beats.length; $t1++) {
-				var b = voice.beats[$t1];
+			for (var i = 0; i < voice.beats.length; i++) {
+				var b = voice.beats[i];
 				// we create empty glyphs as alignment references and to get the 
 				// effect bar sized
 				var container = new $AlphaTab_Rendering_Glyphs_BeatContainerGlyph(b);
@@ -9693,11 +9558,10 @@
 		},
 		paint: function(cx, cy, canvas) {
 			$AlphaTab_Rendering_GroupedBarRenderer.prototype.paint.call(this, cx, cy, canvas);
-			for (var $t1 = 0; $t1 < this.$_helpers.beamHelpers.length; $t1++) {
-				var v = this.$_helpers.beamHelpers[$t1];
-				for (var $t2 = 0; $t2 < v.length; $t2++) {
-					var h = v[$t2];
-					this.$paintBeamHelper(cx + this.get_beatGlyphsStart(), cy, canvas, h);
+			for (var i = 0; i < this.$_helpers.beamHelpers.length; i++) {
+				var v = this.$_helpers.beamHelpers[i];
+				for (var j = 0; j < v.length; j++) {
+					this.$paintBeamHelper(cx + this.get_beatGlyphsStart(), cy, canvas, v[j]);
 				}
 			}
 		},
@@ -9838,7 +9702,7 @@
 			return 9 * this.get_scale();
 		},
 		doLayout: function() {
-			this.$_helpers = this.stave.staveGroup.helpers.helpers.get_item(this.bar.track.index).get_item(this.bar.index);
+			this.$_helpers = this.stave.staveGroup.helpers.helpers[this.bar.track.index][this.bar.index];
 			$AlphaTab_Rendering_GroupedBarRenderer.prototype.doLayout.call(this);
 			this.height = ss.Int32.trunc(this.get_lineOffset() * 4) + this.get_topPadding() + this.get_bottomPadding();
 			if (this.index === 0) {
@@ -9847,10 +9711,10 @@
 			}
 			var top = this.getScoreY(0, 0);
 			var bottom = this.getScoreY(8, 0);
-			for (var $t1 = 0; $t1 < this.$_helpers.beamHelpers.length; $t1++) {
-				var v = this.$_helpers.beamHelpers[$t1];
-				for (var $t2 = 0; $t2 < v.length; $t2++) {
-					var h = v[$t2];
+			for (var i = 0; i < this.$_helpers.beamHelpers.length; i++) {
+				var v = this.$_helpers.beamHelpers[i];
+				for (var j = 0; j < v.length; j++) {
+					var h = v[j];
 					//
 					// max note (highest) -> top overflow
 					// 
@@ -9880,19 +9744,19 @@
 			this.$paintTuplets(cx, cy, canvas);
 		},
 		$paintTuplets: function(cx, cy, canvas) {
-			for (var $t1 = 0; $t1 < this.$_helpers.tupletHelpers.length; $t1++) {
-				var v = this.$_helpers.tupletHelpers[$t1];
-				for (var $t2 = 0; $t2 < v.length; $t2++) {
-					var h = v[$t2];
+			for (var i = 0; i < this.$_helpers.tupletHelpers.length; i++) {
+				var v = this.$_helpers.tupletHelpers[i];
+				for (var j = 0; j < v.length; j++) {
+					var h = v[j];
 					this.$paintTupletHelper(cx + this.get_beatGlyphsStart(), cy, canvas, h);
 				}
 			}
 		},
 		$paintBeams: function(cx, cy, canvas) {
-			for (var $t1 = 0; $t1 < this.$_helpers.beamHelpers.length; $t1++) {
-				var v = this.$_helpers.beamHelpers[$t1];
-				for (var $t2 = 0; $t2 < v.length; $t2++) {
-					var h = v[$t2];
+			for (var i = 0; i < this.$_helpers.beamHelpers.length; i++) {
+				var v = this.$_helpers.beamHelpers[i];
+				for (var j = 0; j < v.length; j++) {
+					var h = v[j];
 					this.$paintBeamHelper(cx + this.get_beatGlyphsStart(), cy, canvas, h);
 				}
 			}
@@ -9914,7 +9778,7 @@
 			if (h.beats.length === 1 || !h.get_isFull()) {
 				for (var i = 0; i < h.beats.length; i++) {
 					var beat = h.beats[i];
-					var beamingHelper = this.$_helpers.beamHelperLookup[h.voiceIndex].get_item(beat.index);
+					var beamingHelper = this.$_helpers.beamHelperLookup[h.voiceIndex][beat.index];
 					if (ss.isNullOrUndefined(beamingHelper)) {
 						continue;
 					}
@@ -9929,7 +9793,7 @@
 			else {
 				var firstBeat = h.beats[0];
 				var lastBeat = h.beats[h.beats.length - 1];
-				var beamingHelper1 = this.$_helpers.beamHelperLookup[h.voiceIndex].get_item(firstBeat.index);
+				var beamingHelper1 = this.$_helpers.beamHelperLookup[h.voiceIndex][firstBeat.index];
 				if (ss.isValue(beamingHelper1)) {
 					var direction1 = beamingHelper1.get_direction();
 					// 
@@ -10262,12 +10126,12 @@
 			this.addPreBeatGlyph(new $AlphaTab_Rendering_Glyphs_TimeSignatureGlyph(0, 0, this.bar.get_masterBar().timeSignatureNumerator, this.bar.get_masterBar().timeSignatureDenominator));
 		},
 		$createVoiceGlyphs: function(v) {
-			for (var $t1 = 0; $t1 < v.beats.length; $t1++) {
-				var b = v.beats[$t1];
+			for (var i = 0; i < v.beats.length; i++) {
+				var b = v.beats[i];
 				var container = new $AlphaTab_Rendering_ScoreBeatContainerGlyph(b);
 				container.preNotes = new $AlphaTab_Rendering_Glyphs_ScoreBeatPreNotesGlyph();
 				container.onNotes = new $AlphaTab_Rendering_Glyphs_ScoreBeatGlyph();
-				container.onNotes.beamingHelper = this.$_helpers.beamHelperLookup[v.index].get_item(b.index);
+				container.onNotes.beamingHelper = this.$_helpers.beamHelperLookup[v.index][b.index];
 				container.postNotes = new $AlphaTab_Rendering_Glyphs_ScoreBeatPostNotesGlyph();
 				this.addBeatGlyph(container);
 			}
@@ -10430,8 +10294,8 @@
 			this.postNotes.paint(cx + this.x, cy + this.y, canvas);
 			//canvas.Color = new Color(0, 0, 200, 100);
 			//canvas.FillRect(cx + X + PostNotes.X, cy + Y + PostNotes.Y + 20, PostNotes.Width, 10);
-			for (var $t1 = 0; $t1 < this.ties.length; $t1++) {
-				var t = this.ties[$t1];
+			for (var i = 0; i < this.ties.length; i++) {
+				var t = this.ties[i];
 				t.renderer = this.renderer;
 				t.paint(cx, cy + this.y, canvas);
 			}
@@ -10442,40 +10306,39 @@
 			// create a tie if any effect requires it
 			if (n.isTieDestination && ss.isValue(n.tieOrigin)) {
 				var tie = new $AlphaTab_Rendering_Glyphs_ScoreTieGlyph(n.tieOrigin, n, this);
-				ss.add(this.ties, tie);
+				this.ties.push(tie);
 			}
-			else if (n.isHammerPullDestination) {
-				var tie1 = new $AlphaTab_Rendering_Glyphs_ScoreTieGlyph(n.hammerPullOrigin, n, this);
-				ss.add(this.ties, tie1);
+			else if (n.isHammerPullOrigin) {
+				var tie1 = new $AlphaTab_Rendering_Glyphs_ScoreTieGlyph(n, n.hammerPullDestination, this);
+				this.ties.push(tie1);
 			}
 			else if (n.slideType === 2) {
 				var tie2 = new $AlphaTab_Rendering_Glyphs_ScoreTieGlyph(n, n.slideTarget, this);
-				ss.add(this.ties, tie2);
+				this.ties.push(tie2);
 			}
 			// TODO: depending on the type we have other positioning
 			// we should place glyphs in the preNotesGlyph or postNotesGlyph if needed
 			if (n.slideType !== 0) {
 				var l = new $AlphaTab_Rendering_Glyphs_ScoreSlideLineGlyph(n.slideType, n, this);
-				ss.add(this.ties, l);
+				this.ties.push(l);
 			}
 		}
 	}, $AlphaTab_Rendering_Glyphs_BeatContainerGlyph, [$AlphaTab_Rendering_Glyphs_ISupportsFinalize]);
 	ss.initClass($AlphaTab_Rendering_ScoreRenderer, $asm, {
 		$recreateLayout: function() {
 			if (!ss.referenceEquals(this.$_currentLayoutMode, this.settings.layout.mode)) {
-				if (ss.isNullOrUndefined(this.settings.layout) || !$AlphaTab_Environment.layoutEngines.containsKey(this.settings.layout.mode)) {
-					this.layout = $AlphaTab_Environment.layoutEngines.get_item('default')(this);
+				if (ss.isNullOrUndefined(this.settings.layout) || !$AlphaTab_Environment.layoutEngines.hasOwnProperty(this.settings.layout.mode)) {
+					this.layout = $AlphaTab_Environment.layoutEngines['default'](this);
 				}
 				else {
-					this.layout = $AlphaTab_Environment.layoutEngines.get_item(this.settings.layout.mode)(this);
+					this.layout = $AlphaTab_Environment.layoutEngines[this.settings.layout.mode](this);
 				}
 				this.$_currentLayoutMode = this.settings.layout.mode;
 			}
 		},
 		render: function(track) {
 			this.score = track.score;
-			this.tracks = [];
-			ss.add(this.tracks, track);
+			this.tracks = [track];
 			this.invalidate();
 		},
 		renderMultiple: function(tracks) {
@@ -10564,7 +10427,7 @@
 			return 0;
 		},
 		doLayout: function() {
-			this.$_helpers = this.stave.staveGroup.helpers.helpers.get_item(this.bar.track.index).get_item(this.bar.index);
+			this.$_helpers = this.stave.staveGroup.helpers.helpers[this.bar.track.index][this.bar.index];
 			$AlphaTab_Rendering_GroupedBarRenderer.prototype.doLayout.call(this);
 			this.height = ss.Int32.trunc(this.get_$lineOffset() * (this.bar.track.tuning.length - 1)) + this.get_numberOverflow() * 2;
 			if (this.index === 0) {
@@ -10589,12 +10452,12 @@
 			this.$createVoiceGlyphs(this.bar.voices[0]);
 		},
 		$createVoiceGlyphs: function(v) {
-			for (var $t1 = 0; $t1 < v.beats.length; $t1++) {
-				var b = v.beats[$t1];
+			for (var i = 0; i < v.beats.length; i++) {
+				var b = v.beats[i];
 				var container = new $AlphaTab_Rendering_Glyphs_TabBeatContainerGlyph(b);
 				container.preNotes = new $AlphaTab_Rendering_Glyphs_TabBeatPreNotesGlyph();
 				container.onNotes = new $AlphaTab_Rendering_Glyphs_TabBeatGlyph();
-				container.onNotes.set_beamingHelper(this.$_helpers.beamHelperLookup[v.index].get_item(b.index));
+				container.onNotes.set_beamingHelper(this.$_helpers.beamHelperLookup[v.index][b.index]);
 				container.postNotes = new $AlphaTab_Rendering_Glyphs_TabBeatPostNotesGlyph();
 				this.addBeatGlyph(container);
 			}
@@ -10778,10 +10641,10 @@
 		},
 		shouldCreateGlyph: function(renderer, beat) {
 			this.lastCreateInfo = [];
-			for (var $t1 = 0; $t1 < beat.notes.length; $t1++) {
-				var n = beat.notes[$t1];
+			for (var i = 0; i < beat.notes.length; i++) {
+				var n = beat.notes[i];
 				if (this.shouldCreateGlyphForNote(renderer, n)) {
-					ss.add(this.lastCreateInfo, n);
+					this.lastCreateInfo.push(n);
 				}
 			}
 			return this.lastCreateInfo.length > 0;
@@ -11021,10 +10884,8 @@
 			canvas.set_color(new $AlphaTab_Platform_Model_Color(0, 0, 0, 255));
 			// todo: Resources
 			canvas.beginPath();
-			var $t1 = this.$_svg.get_commands();
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var c = $t1[$t2];
-				this.$parseCommand(startX, startY, canvas, c);
+			for (var i = 0; i < this.$_svg.get_commands().length; i++) {
+				this.$parseCommand(startX, startY, canvas, this.$_svg.get_commands()[i]);
 			}
 			canvas.fill();
 		},
@@ -11262,8 +11123,8 @@
 	ss.initClass($AlphaTab_Rendering_Glyphs_GlyphGroup, $asm, {
 		doLayout: function() {
 			var w = 0;
-			for (var $t1 = 0; $t1 < this.glyphs.length; $t1++) {
-				var g = this.glyphs[$t1];
+			for (var i = 0; i < this.glyphs.length; i++) {
+				var g = this.glyphs[i];
 				g.renderer = this.renderer;
 				g.doLayout();
 				w = Math.max(w, g.width);
@@ -11271,11 +11132,11 @@
 			this.width = w;
 		},
 		addGlyph: function(g) {
-			ss.add(this.glyphs, g);
+			this.glyphs.push(g);
 		},
 		paint: function(cx, cy, canvas) {
-			for (var $t1 = 0; $t1 < this.glyphs.length; $t1++) {
-				var g = this.glyphs[$t1];
+			for (var i = 0; i < this.glyphs.length; i++) {
+				var g = this.glyphs[i];
 				g.renderer = this.renderer;
 				g.paint(cx + this.x, cy + this.y, canvas);
 			}
@@ -11291,10 +11152,10 @@
 			});
 			// defines the reserved y position of the columns
 			var columns = [];
-			ss.add(columns, $AlphaTab_Rendering_Glyphs_AccidentalGroupGlyph.$nonReserved);
+			columns.push($AlphaTab_Rendering_Glyphs_AccidentalGroupGlyph.$nonReserved);
 			var accidentalSize = ss.Int32.trunc(21 * this.get_scale());
-			for (var $t1 = 0; $t1 < this.glyphs.length; $t1++) {
-				var g = this.glyphs[$t1];
+			for (var i = 0; i < this.glyphs.length; i++) {
+				var g = this.glyphs[i];
 				g.renderer = this.renderer;
 				g.doLayout();
 				// find column where glyph fits into
@@ -11305,7 +11166,7 @@
 					gColumn++;
 					// and create the new column if needed
 					if (gColumn === columns.length) {
-						ss.add(columns, $AlphaTab_Rendering_Glyphs_AccidentalGroupGlyph.$nonReserved);
+						columns.push($AlphaTab_Rendering_Glyphs_AccidentalGroupGlyph.$nonReserved);
 					}
 				}
 				// temporary save column as X
@@ -11322,8 +11183,8 @@
 			else {
 				this.width = columnWidth * columns.length;
 			}
-			for (var $t2 = 0; $t2 < this.glyphs.length; $t2++) {
-				var g1 = this.glyphs[$t2];
+			for (var i1 = 0; i1 < this.glyphs.length; i1++) {
+				var g1 = this.glyphs[i1];
 				g1.x = this.width - (g1.x + 1) * columnWidth;
 			}
 		}
@@ -11389,8 +11250,8 @@
 		doLayout: function() {
 			// left to right layout
 			var w = 0;
-			for (var $t1 = 0; $t1 < this.glyphs.length; $t1++) {
-				var g = this.glyphs[$t1];
+			for (var i = 0; i < this.glyphs.length; i++) {
+				var g = this.glyphs[i];
 				g.x = w;
 				g.renderer = this.renderer;
 				g.doLayout();
@@ -11742,21 +11603,21 @@
 			this.$_parsed = [];
 			while (!parser.get_eof()) {
 				var command = new $AlphaTab_Rendering_Glyphs_SvgCommand();
-				ss.add(this.$_parsed, command);
+				this.$_parsed.push(command);
 				command.cmd = parser.getString();
 				switch (command.cmd) {
 					case 'M': {
 						// absolute moveto
 						command.numbers = [];
-						ss.add(command.numbers, parser.getNumber());
-						ss.add(command.numbers, parser.getNumber());
+						command.numbers.push(parser.getNumber());
+						command.numbers.push(parser.getNumber());
 						break;
 					}
 					case 'm': {
 						// relative moveto
 						command.numbers = [];
-						ss.add(command.numbers, parser.getNumber());
-						ss.add(command.numbers, parser.getNumber());
+						command.numbers.push(parser.getNumber());
+						command.numbers.push(parser.getNumber());
 						break;
 					}
 					case 'Z':
@@ -11767,8 +11628,8 @@
 						// absolute lineTo
 						command.numbers = [];
 						do {
-							ss.add(command.numbers, parser.getNumber());
-							ss.add(command.numbers, parser.getNumber());
+							command.numbers.push(parser.getNumber());
+							command.numbers.push(parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
@@ -11776,8 +11637,8 @@
 						// relative lineTo
 						command.numbers = [];
 						do {
-							ss.add(command.numbers, parser.getNumber());
-							ss.add(command.numbers, parser.getNumber());
+							command.numbers.push(parser.getNumber());
+							command.numbers.push(parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
@@ -11785,7 +11646,7 @@
 						// absolute verticalTo
 						command.numbers = [];
 						do {
-							ss.add(command.numbers, parser.getNumber());
+							command.numbers.push(parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
@@ -11793,7 +11654,7 @@
 						// relative verticalTo
 						command.numbers = [];
 						do {
-							ss.add(command.numbers, parser.getNumber());
+							command.numbers.push(parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
@@ -11801,7 +11662,7 @@
 						// absolute horizontalTo
 						command.numbers = [];
 						do {
-							ss.add(command.numbers, parser.getNumber());
+							command.numbers.push(parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
@@ -11809,7 +11670,7 @@
 						// relative horizontalTo
 						command.numbers = [];
 						do {
-							ss.add(command.numbers, parser.getNumber());
+							command.numbers.push(parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
@@ -11817,12 +11678,12 @@
 						// absolute cubicTo
 						command.numbers = [];
 						do {
-							ss.add(command.numbers, parser.getNumber());
-							ss.add(command.numbers, parser.getNumber());
-							ss.add(command.numbers, parser.getNumber());
-							ss.add(command.numbers, parser.getNumber());
-							ss.add(command.numbers, parser.getNumber());
-							ss.add(command.numbers, parser.getNumber());
+							command.numbers.push(parser.getNumber());
+							command.numbers.push(parser.getNumber());
+							command.numbers.push(parser.getNumber());
+							command.numbers.push(parser.getNumber());
+							command.numbers.push(parser.getNumber());
+							command.numbers.push(parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
@@ -11830,12 +11691,12 @@
 						// relative cubicTo
 						command.numbers = [];
 						do {
-							ss.add(command.numbers, parser.getNumber());
-							ss.add(command.numbers, parser.getNumber());
-							ss.add(command.numbers, parser.getNumber());
-							ss.add(command.numbers, parser.getNumber());
-							ss.add(command.numbers, parser.getNumber());
-							ss.add(command.numbers, parser.getNumber());
+							command.numbers.push(parser.getNumber());
+							command.numbers.push(parser.getNumber());
+							command.numbers.push(parser.getNumber());
+							command.numbers.push(parser.getNumber());
+							command.numbers.push(parser.getNumber());
+							command.numbers.push(parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
@@ -11843,10 +11704,10 @@
 						// absolute shorthand cubicTo
 						command.numbers = [];
 						do {
-							ss.add(command.numbers, parser.getNumber());
-							ss.add(command.numbers, parser.getNumber());
-							ss.add(command.numbers, parser.getNumber());
-							ss.add(command.numbers, parser.getNumber());
+							command.numbers.push(parser.getNumber());
+							command.numbers.push(parser.getNumber());
+							command.numbers.push(parser.getNumber());
+							command.numbers.push(parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
@@ -11854,10 +11715,10 @@
 						// relative shorthand cubicTo
 						command.numbers = [];
 						do {
-							ss.add(command.numbers, parser.getNumber());
-							ss.add(command.numbers, parser.getNumber());
-							ss.add(command.numbers, parser.getNumber());
-							ss.add(command.numbers, parser.getNumber());
+							command.numbers.push(parser.getNumber());
+							command.numbers.push(parser.getNumber());
+							command.numbers.push(parser.getNumber());
+							command.numbers.push(parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
@@ -11865,10 +11726,10 @@
 						// absolute quadraticTo
 						command.numbers = [];
 						do {
-							ss.add(command.numbers, parser.getNumber());
-							ss.add(command.numbers, parser.getNumber());
-							ss.add(command.numbers, parser.getNumber());
-							ss.add(command.numbers, parser.getNumber());
+							command.numbers.push(parser.getNumber());
+							command.numbers.push(parser.getNumber());
+							command.numbers.push(parser.getNumber());
+							command.numbers.push(parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
@@ -11876,10 +11737,10 @@
 						// relative quadraticTo
 						command.numbers = [];
 						do {
-							ss.add(command.numbers, parser.getNumber());
-							ss.add(command.numbers, parser.getNumber());
-							ss.add(command.numbers, parser.getNumber());
-							ss.add(command.numbers, parser.getNumber());
+							command.numbers.push(parser.getNumber());
+							command.numbers.push(parser.getNumber());
+							command.numbers.push(parser.getNumber());
+							command.numbers.push(parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
@@ -11887,8 +11748,8 @@
 						// absolute shorthand quadraticTo
 						command.numbers = [];
 						do {
-							ss.add(command.numbers, parser.getNumber());
-							ss.add(command.numbers, parser.getNumber());
+							command.numbers.push(parser.getNumber());
+							command.numbers.push(parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
@@ -11896,8 +11757,8 @@
 						// relative shorthand quadraticTo
 						command.numbers = [];
 						do {
-							ss.add(command.numbers, parser.getNumber());
-							ss.add(command.numbers, parser.getNumber());
+							command.numbers.push(parser.getNumber());
+							command.numbers.push(parser.getNumber());
 						} while (parser.get_currentTokenIsNumber());
 						break;
 					}
@@ -11993,13 +11854,13 @@
 			while (i > 0) {
 				var num = i % 10;
 				var gl = new $AlphaTab_Rendering_Glyphs_DigitGlyph(0, 0, num);
-				ss.add(this.glyphs, gl);
+				this.glyphs.push(gl);
 				i = ss.Int32.div(i, 10);
 			}
 			this.glyphs.reverse();
 			var cx = 0;
-			for (var $t1 = 0; $t1 < this.glyphs.length; $t1++) {
-				var g = this.glyphs[$t1];
+			for (var j = 0; j < this.glyphs.length; j++) {
+				var g = this.glyphs[j];
 				g.x = cx;
 				g.y = 0;
 				g.renderer = this.renderer;
@@ -12248,13 +12109,11 @@
 		$createNoteHeadGlyph: function(n) {
 			var isGrace = this.get_container().beat.graceType !== 0;
 			if (n.beat.voice.bar.track.isPercussion) {
-				var normalKeys = new (ss.makeGenericType($AlphaTab_Model_HashSet$1, [ss.Int32]))([32, 34, 35, 36, 38, 39, 40, 41, 43, 45, 47, 48, 50, 55, 56, 58, 60, 61]);
-				var xKeys = new (ss.makeGenericType($AlphaTab_Model_HashSet$1, [ss.Int32]))([31, 33, 37, 42, 44, 54, 62, 63, 64, 65, 66]);
 				var value = n.get_realValue();
-				if (value <= 30 || value >= 67 || normalKeys.contains(value)) {
+				if (value <= 30 || value >= 67 || $AlphaTab_Rendering_Glyphs_ScoreBeatGlyph.$normalKeys.hasOwnProperty(value)) {
 					return new $AlphaTab_Rendering_Glyphs_NoteHeadGlyph(0, 0, 4, isGrace);
 				}
-				if (xKeys.contains(value)) {
+				if ($AlphaTab_Rendering_Glyphs_ScoreBeatGlyph.$xKeys.hasOwnProperty(value)) {
 					return new $AlphaTab_Rendering_Glyphs_DrumSticksGlyph(0, 0, isGrace);
 				}
 				if (value === 46) {
@@ -12286,14 +12145,14 @@
 			var line = sr.getNoteLine(n);
 			noteHeadGlyph.y = sr.getScoreY(line, -1);
 			this.noteHeads.addNoteGlyph(noteHeadGlyph, n, line);
-			if (n.isStaccato && !this.noteHeads.beatEffects.containsKey('Staccato')) {
-				this.noteHeads.beatEffects.set_item('Staccato', new $AlphaTab_Rendering_Glyphs_CircleGlyph(0, 0, 1.5));
+			if (n.isStaccato && !this.noteHeads.beatEffects.hasOwnProperty('Staccato')) {
+				this.noteHeads.beatEffects['Staccato'] = new $AlphaTab_Rendering_Glyphs_CircleGlyph(0, 0, 1.5);
 			}
-			if (n.accentuated === 1 && !this.noteHeads.beatEffects.containsKey('Accent')) {
-				this.noteHeads.beatEffects.set_item('Accent', new $AlphaTab_Rendering_Glyphs_AccentuationGlyph(0, 0, 1));
+			if (n.accentuated === 1 && !this.noteHeads.beatEffects.hasOwnProperty('Accent')) {
+				this.noteHeads.beatEffects['Accent'] = new $AlphaTab_Rendering_Glyphs_AccentuationGlyph(0, 0, 1);
 			}
-			if (n.accentuated === 2 && !this.noteHeads.beatEffects.containsKey('HAccent')) {
-				this.noteHeads.beatEffects.set_item('HAccent', new $AlphaTab_Rendering_Glyphs_AccentuationGlyph(0, 0, 2));
+			if (n.accentuated === 2 && !this.noteHeads.beatEffects.hasOwnProperty('HAccent')) {
+				this.noteHeads.beatEffects['HAccent'] = new $AlphaTab_Rendering_Glyphs_AccentuationGlyph(0, 0, 2);
 			}
 		}
 	}, $AlphaTab_Rendering_Glyphs_BeatGlyphBase, [$AlphaTab_Rendering_Glyphs_ISupportsFinalize]);
@@ -12307,9 +12166,8 @@
 		applyGlyphSpacing: function(spacing) {
 			$AlphaTab_Rendering_Glyphs_Glyph.prototype.applyGlyphSpacing.call(this, spacing);
 			// add spacing at the beginning, this way the elements are closer to the note head
-			for (var $t1 = 0; $t1 < this.glyphs.length; $t1++) {
-				var g = this.glyphs[$t1];
-				g.x += spacing;
+			for (var i = 0; i < this.glyphs.length; i++) {
+				this.glyphs[i].x += spacing;
 			}
 		},
 		doLayout: function() {
@@ -12397,8 +12255,8 @@
 			return this.beamingHelper.get_direction();
 		},
 		getNoteX: function(note, onEnd) {
-			if (this.$_noteLookup.containsKey(note.string)) {
-				var n = this.$_noteLookup.get_item(note.string);
+			if (this.$_noteLookup.hasOwnProperty(note.string)) {
+				var n = this.$_noteLookup[note.string];
 				var pos = this.x + n.x;
 				if (onEnd) {
 					pos += n.width;
@@ -12408,15 +12266,15 @@
 			return 0;
 		},
 		getNoteY: function(note) {
-			if (this.$_noteLookup.containsKey(note.string)) {
-				return this.y + this.$_noteLookup.get_item(note.string).y;
+			if (this.$_noteLookup.hasOwnProperty(note.string)) {
+				return this.y + this.$_noteLookup[note.string].y;
 			}
 			return 0;
 		},
 		addNoteGlyph: function(noteGlyph, note, noteLine) {
 			var info = new $AlphaTab_Rendering_Glyphs_ScoreNoteGlyphInfo(noteGlyph, noteLine);
-			ss.add(this.$_infos, info);
-			this.$_noteLookup.set_item(note.string, noteGlyph);
+			this.$_infos.push(info);
+			this.$_noteLookup[note.string] = noteGlyph;
 			if (ss.isNullOrUndefined(this.minNote) || this.minNote.line > info.line) {
 				this.minNote = info;
 			}
@@ -12485,16 +12343,11 @@
 				this.upLineX = w;
 				this.downLineX = padding;
 			}
-			var $t1 = ss.getEnumerator(this.beatEffects.get_values());
-			try {
-				while ($t1.moveNext()) {
-					var e = $t1.current();
-					e.renderer = this.renderer;
-					e.doLayout();
-				}
-			}
-			finally {
-				$t1.dispose();
+			var $t1 = $AlphaTab_Collections_FastDictionaryExtensions.getValues(this.beatEffects);
+			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+				var e = $t1[$t2];
+				e.renderer = this.renderer;
+				e.doLayout();
 			}
 			if (this.beat.get_isTremolo()) {
 				var direction = this.beamingHelper.get_direction();
@@ -12502,7 +12355,7 @@
 				var baseNote = ((direction === 0) ? this.minNote : this.maxNote);
 				var tremoloX = ((direction === 0) ? displacedX : 0);
 				if (ss.isValue(this.beat.tremoloSpeed)) {
-					var speed = this.beat.tremoloSpeed.get_value();
+					var speed = ss.unbox(this.beat.tremoloSpeed);
 					switch (speed) {
 						case 32: {
 							offset = ((direction === 0) ? -15 : 10);
@@ -12525,7 +12378,7 @@
 				else {
 					offset = ((direction === 0) ? -15 : 15);
 				}
-				this.$_tremoloPicking = new $AlphaTab_Rendering_Glyphs_TremoloPickingGlyph(tremoloX, baseNote.glyph.y + ss.Int32.trunc(offset * this.get_scale()), this.beat.tremoloSpeed.get_value());
+				this.$_tremoloPicking = new $AlphaTab_Rendering_Glyphs_TremoloPickingGlyph(tremoloX, baseNote.glyph.y + ss.Int32.trunc(offset * this.get_scale()), ss.unbox(this.beat.tremoloSpeed));
 				this.$_tremoloPicking.renderer = this.renderer;
 				this.$_tremoloPicking.doLayout();
 			}
@@ -12539,18 +12392,13 @@
 			var effectY = ((this.beamingHelper.get_direction() === 0) ? scoreRenderer.getScoreY(this.maxNote.line, 13) : scoreRenderer.getScoreY(this.minNote.line, -9));
 			// TODO: take care of actual glyph height
 			var effectSpacing = ((this.beamingHelper.get_direction() === 0) ? ss.Int32.trunc(7 * this.get_scale()) : ss.Int32.trunc(-7 * this.get_scale()));
-			var $t1 = ss.getEnumerator(this.beatEffects.get_values());
-			try {
-				while ($t1.moveNext()) {
-					var g = $t1.current();
-					g.y = effectY;
-					g.x = ss.Int32.div(this.width, 2);
-					g.paint(cx + this.x, cy + this.y, canvas);
-					effectY += effectSpacing;
-				}
-			}
-			finally {
-				$t1.dispose();
+			var $t1 = $AlphaTab_Collections_FastDictionaryExtensions.getValues(this.beatEffects);
+			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+				var g = $t1[$t2];
+				g.y = effectY;
+				g.x = ss.Int32.div(this.width, 2);
+				g.paint(cx + this.x, cy + this.y, canvas);
+				effectY += effectSpacing;
 			}
 			canvas.set_color(this.renderer.get_layout().renderer.renderingResources.staveLineColor);
 			// TODO: Take care of beateffects in overflow
@@ -12581,8 +12429,8 @@
 			if (ss.isValue(this.$_tremoloPicking)) {
 				this.$_tremoloPicking.paint(cx + this.x, cy + this.y, canvas);
 			}
-			for (var $t2 = 0; $t2 < this.$_infos.length; $t2++) {
-				var g1 = this.$_infos[$t2];
+			for (var i = 0; i < this.$_infos.length; i++) {
+				var g1 = this.$_infos[i];
 				g1.glyph.renderer = this.renderer;
 				g1.glyph.paint(cx + this.x, cy + this.y, canvas);
 			}
@@ -12671,15 +12519,24 @@
 			if (ss.isNullOrUndefined(this.endNote)) {
 				return;
 			}
-			var r = this.renderer;
-			var isOnSameLine = ss.contains(r.stave.staveGroup.masterBars, this.endNote.beat.voice.bar.get_masterBar());
-			var endNote = (isOnSameLine ? this.endNote : null);
+			var glyphRenderer = this.renderer;
+			var startNoteRenderer = glyphRenderer.stave.getRendererForBar(this.startNote.beat.voice.bar.index);
+			var endNoteRenderer = glyphRenderer.stave.getRendererForBar(this.endNote.beat.voice.bar.index);
+			// TODO: expand tie to next bar if possible
+			var endNote;
+			if (!ss.referenceEquals(startNoteRenderer, endNoteRenderer)) {
+				endNote = null;
+				endNoteRenderer = startNoteRenderer;
+			}
+			else {
+				endNote = this.endNote;
+			}
 			var parent = this.parent;
-			var startX = cx + r.getNoteX(this.startNote, true);
-			var endX = (ss.isNullOrUndefined(endNote) ? (cx + parent.x + parent.postNotes.x + parent.postNotes.width) : (cx + r.getNoteX(endNote, false)));
-			var startY = cy + r.getNoteY(this.startNote) + 4;
-			var endY = (ss.isNullOrUndefined(endNote) ? startY : (cy + r.getNoteY(endNote) + 4));
-			$AlphaTab_Rendering_Glyphs_TieGlyph.paintTie(canvas, this.get_scale(), startX, startY, endX, endY, r.getBeatDirection(this.startNote.beat) === 1);
+			var startX = cx + startNoteRenderer.getNoteX(this.startNote, true);
+			var endX = (ss.isNullOrUndefined(endNote) ? (cx + parent.x + parent.postNotes.x + parent.postNotes.width) : (cx + endNoteRenderer.getNoteX(endNote, false)));
+			var startY = cy + startNoteRenderer.getNoteY(this.startNote) + 4;
+			var endY = (ss.isNullOrUndefined(endNote) ? startY : (cy + endNoteRenderer.getNoteY(endNote) + 4));
+			$AlphaTab_Rendering_Glyphs_TieGlyph.paintTie(canvas, this.get_scale(), startX, startY, endX, endY, startNoteRenderer.getBeatDirection(this.startNote.beat) === 1);
 			canvas.set_color(this.renderer.get_layout().renderer.renderingResources.mainGlyphColor);
 			canvas.fill();
 		}
@@ -12700,17 +12557,17 @@
 	ss.initClass($AlphaTab_Rendering_Glyphs_SvgCommand, $asm, {});
 	ss.initClass($AlphaTab_Rendering_Glyphs_TabBeatContainerGlyph, $asm, {
 		createTies: function(n) {
-			if (n.isHammerPullDestination && ss.isValue(n.hammerPullOrigin)) {
-				var tie = new $AlphaTab_Rendering_Glyphs_TabTieGlyph(n.hammerPullOrigin, n, this);
-				ss.add(this.ties, tie);
+			if (n.isHammerPullOrigin) {
+				var tie = new $AlphaTab_Rendering_Glyphs_TabTieGlyph(n, n.hammerPullDestination, this);
+				this.ties.push(tie);
 			}
 			else if (n.slideType === 2) {
 				var tie1 = new $AlphaTab_Rendering_Glyphs_TabTieGlyph(n, n.slideTarget, this);
-				ss.add(this.ties, tie1);
+				this.ties.push(tie1);
 			}
 			if (n.slideType !== 0) {
 				var l = new $AlphaTab_Rendering_Glyphs_TabSlideLineGlyph(n.slideType, n, this);
-				ss.add(this.ties, l);
+				this.ties.push(l);
 			}
 		}
 	}, $AlphaTab_Rendering_Glyphs_BeatContainerGlyph, [$AlphaTab_Rendering_Glyphs_ISupportsFinalize]);
@@ -12739,19 +12596,19 @@
 				this.addGlyph(this.get_noteNumbers());
 				//
 				// Whammy Bar
-				if (this.get_container().beat.get_hasWhammyBar() && !this.get_noteNumbers().beatEffects.containsKey('Whammy')) {
-					this.get_noteNumbers().beatEffects.set_item('Whammy', new $AlphaTab_Rendering_Glyphs_WhammyBarGlyph(this.get_container().beat, this.get_container()));
+				if (this.get_container().beat.get_hasWhammyBar() && !this.get_noteNumbers().beatEffects.hasOwnProperty('Whammy')) {
+					this.get_noteNumbers().beatEffects['Whammy'] = new $AlphaTab_Rendering_Glyphs_WhammyBarGlyph(this.get_container().beat, this.get_container());
 				}
 				//
 				// Tremolo Picking
-				if (this.get_container().beat.get_isTremolo() && !this.get_noteNumbers().beatEffects.containsKey('Tremolo')) {
-					this.get_noteNumbers().beatEffects.set_item('Tremolo', new $AlphaTab_Rendering_Glyphs_TremoloPickingGlyph(0, 0, this.get_container().beat.tremoloSpeed.get_value()));
+				if (this.get_container().beat.get_isTremolo() && !this.get_noteNumbers().beatEffects.hasOwnProperty('Tremolo')) {
+					this.get_noteNumbers().beatEffects['Tremolo'] = new $AlphaTab_Rendering_Glyphs_TremoloPickingGlyph(0, 0, ss.unbox(this.get_container().beat.tremoloSpeed));
 				}
 			}
 			// left to right layout
 			var w = 0;
-			for (var $t1 = 0; $t1 < this.glyphs.length; $t1++) {
-				var g = this.glyphs[$t1];
+			for (var i = 0; i < this.glyphs.length; i++) {
+				var g = this.glyphs[i];
 				g.x = w;
 				g.renderer = this.renderer;
 				g.doLayout();
@@ -12915,8 +12772,8 @@
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_TabNoteChordGlyph, $asm, {
 		getNoteX: function(note, onEnd) {
-			if (this.$_noteLookup.containsKey(note.string)) {
-				var n = this.$_noteLookup.get_item(note.string);
+			if (this.$_noteLookup.hasOwnProperty(note.string)) {
+				var n = this.$_noteLookup[note.string];
 				var pos = this.x + n.x + ss.Int32.trunc(0 * this.get_scale());
 				if (onEnd) {
 					n.calculateWidth();
@@ -12927,15 +12784,15 @@
 			return 0;
 		},
 		getNoteY: function(note) {
-			if (this.$_noteLookup.containsKey(note.string)) {
-				return this.y + this.$_noteLookup.get_item(note.string).y;
+			if (this.$_noteLookup.hasOwnProperty(note.string)) {
+				return this.y + this.$_noteLookup[note.string].y;
 			}
 			return 0;
 		},
 		doLayout: function() {
 			var w = 0;
-			for (var $t1 = 0; $t1 < this.$_notes.length; $t1++) {
-				var g = this.$_notes[$t1];
+			for (var i = 0; i < this.$_notes.length; i++) {
+				var g = this.$_notes[i];
 				g.renderer = this.renderer;
 				g.doLayout();
 				if (g.width > w) {
@@ -12946,26 +12803,21 @@
 			var effectY = ss.Int32.trunc(this.getNoteY(this.$_minNote) + tabHeight / 2);
 			// TODO: take care of actual glyph height
 			var effectSpacing = ss.Int32.trunc(7 * this.get_scale());
-			var $t2 = ss.getEnumerator(this.beatEffects.get_values());
-			try {
-				while ($t2.moveNext()) {
-					var g1 = $t2.current();
-					g1.y = effectY;
-					g1.x = ss.Int32.div(this.width, 2);
-					g1.renderer = this.renderer;
-					effectY += effectSpacing;
-					g1.doLayout();
-				}
-			}
-			finally {
-				$t2.dispose();
+			var $t1 = $AlphaTab_Collections_FastDictionaryExtensions.getValues(this.beatEffects);
+			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+				var g1 = $t1[$t2];
+				g1.y = effectY;
+				g1.x = ss.Int32.div(this.width, 2);
+				g1.renderer = this.renderer;
+				effectY += effectSpacing;
+				g1.doLayout();
 			}
 			this.$_centerX = 0;
 			this.width = w;
 		},
 		addNoteGlyph: function(noteGlyph, note) {
-			ss.add(this.$_notes, noteGlyph);
-			this.$_noteLookup.set_item(note.string, noteGlyph);
+			this.$_notes.push(noteGlyph);
+			this.$_noteLookup[note.string] = noteGlyph;
 			if (ss.isNullOrUndefined(this.$_minNote) || note.string < this.$_minNote.string) {
 				this.$_minNote = note;
 			}
@@ -12976,21 +12828,16 @@
 			canvas.set_textBaseline(2);
 			canvas.set_color(res.mainGlyphColor);
 			canvas.set_font((this.$_isGrace ? res.graceFont : res.tablatureFont));
-			for (var $t1 = 0; $t1 < this.$_notes.length; $t1++) {
-				var g = this.$_notes[$t1];
+			for (var i = 0; i < this.$_notes.length; i++) {
+				var g = this.$_notes[i];
 				g.renderer = this.renderer;
 				g.paint(cx + this.x, cy + this.y, canvas);
 			}
 			canvas.set_textBaseline(old);
-			var $t2 = ss.getEnumerator(this.beatEffects.get_values());
-			try {
-				while ($t2.moveNext()) {
-					var g1 = $t2.current();
-					g1.paint(cx + this.x, cy + this.y, canvas);
-				}
-			}
-			finally {
-				$t2.dispose();
+			var $t1 = $AlphaTab_Collections_FastDictionaryExtensions.getValues(this.beatEffects);
+			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+				var g1 = $t1[$t2];
+				g1.paint(cx + this.x, cy + this.y, canvas);
 			}
 		},
 		updateBeamingHelper: function(cx) {
@@ -13087,21 +12934,29 @@
 			if (ss.isNullOrUndefined(this.endNote)) {
 				return;
 			}
-			var r = this.renderer;
-			// check if the bar renderer of the next bar is on the same stave line
-			var isOnSameLine = ss.contains(r.stave.staveGroup.masterBars, this.endNote.beat.voice.bar.get_masterBar());
-			var endNote = (isOnSameLine ? this.endNote : null);
+			var glyphRenderer = this.renderer;
+			var startNoteRenderer = glyphRenderer.stave.getRendererForBar(this.startNote.beat.voice.bar.index);
+			var endNoteRenderer = glyphRenderer.stave.getRendererForBar(this.endNote.beat.voice.bar.index);
+			// TODO: expand tie to next bar if possible
+			var endNote;
+			if (!ss.referenceEquals(startNoteRenderer, endNoteRenderer)) {
+				endNote = null;
+				endNoteRenderer = startNoteRenderer;
+			}
+			else {
+				endNote = this.endNote;
+			}
 			var parent = this.parent;
-			var res = r.get_resources();
-			var startX = cx + r.getNoteX(this.startNote, false);
-			var endX = (ss.isNullOrUndefined(endNote) ? (cx + parent.x + parent.postNotes.x + parent.postNotes.width) : (cx + r.getNoteX(endNote, false)));
+			var res = glyphRenderer.get_resources();
+			var startX = cx + startNoteRenderer.getNoteX(this.startNote, false);
+			var endX = (ss.isNullOrUndefined(endNote) ? (cx + parent.x + parent.postNotes.x + parent.postNotes.width) : (cx + endNoteRenderer.getNoteX(endNote, false)));
 			var down = this.startNote.string > 3;
 			var offset = res.tablatureFont.get_size() / 2;
 			if (down) {
 				offset *= -1;
 			}
-			var startY = cy + r.getNoteY(this.startNote) + offset;
-			var endY = (ss.isNullOrUndefined(endNote) ? startY : (cy + r.getNoteY(endNote) + offset));
+			var startY = cy + startNoteRenderer.getNoteY(this.startNote) + offset;
+			var endY = (ss.isNullOrUndefined(endNote) ? startY : (cy + endNoteRenderer.getNoteY(endNote) + offset));
 			$AlphaTab_Rendering_Glyphs_TieGlyph.paintTie(canvas, this.get_scale(), startX, startY, endX, endY, this.startNote.string > 3);
 			canvas.set_color(this.renderer.get_layout().renderer.renderingResources.mainGlyphColor);
 			canvas.fill();
@@ -13136,11 +12991,11 @@
 		doLayout: function() {
 			var numerator = new $AlphaTab_Rendering_Glyphs_NumberGlyph(0, 0, this.$_numerator);
 			var denominator = new $AlphaTab_Rendering_Glyphs_NumberGlyph(0, ss.Int32.trunc(18 * this.get_scale()), this.$_denominator);
-			ss.add(this.glyphs, numerator);
-			ss.add(this.glyphs, denominator);
+			this.glyphs.push(numerator);
+			this.glyphs.push(denominator);
 			$AlphaTab_Rendering_Glyphs_GlyphGroup.prototype.doLayout.call(this);
-			for (var $t1 = 0; $t1 < this.glyphs.length; $t1++) {
-				var g = this.glyphs[$t1];
+			for (var i = 0; i < this.glyphs.length; i++) {
+				var g = this.glyphs[i];
 				g.x = ss.Int32.div(this.width - g.width, 2);
 			}
 		}
@@ -13190,8 +13045,8 @@
 		applyGlyphSpacing: function(spacing) {
 			var glyphSpacing = ss.Int32.div(spacing, this.beatGlyphs.length);
 			var gx = 0;
-			for (var $t1 = 0; $t1 < this.beatGlyphs.length; $t1++) {
-				var g = this.beatGlyphs[$t1];
+			for (var i = 0; i < this.beatGlyphs.length; i++) {
+				var g = this.beatGlyphs[i];
 				g.x = ss.Int32.trunc(gx);
 				gx += g.width + glyphSpacing;
 				g.applyGlyphSpacing(glyphSpacing);
@@ -13199,8 +13054,8 @@
 			this.width = ss.Int32.trunc(gx);
 		},
 		registerMaxSizes: function(sizes) {
-			for (var $t1 = 0; $t1 < this.beatGlyphs.length; $t1++) {
-				var b = this.beatGlyphs[$t1];
+			for (var i = 0; i < this.beatGlyphs.length; i++) {
+				var b = this.beatGlyphs[i];
 				b.registerMaxSizes(sizes);
 			}
 		},
@@ -13219,23 +13074,21 @@
 			g.index = this.beatGlyphs.length;
 			g.renderer = this.renderer;
 			g.doLayout();
-			ss.add(this.beatGlyphs, g);
+			this.beatGlyphs.push(g);
 			this.width = g.x + g.width;
 		},
 		doLayout: function() {
 		},
 		finalizeGlyph: function(layout) {
-			for (var $t1 = 0; $t1 < this.beatGlyphs.length; $t1++) {
-				var b = this.beatGlyphs[$t1];
-				b.finalizeGlyph(layout);
+			for (var i = 0; i < this.beatGlyphs.length; i++) {
+				this.beatGlyphs[i].finalizeGlyph(layout);
 			}
 		},
 		paint: function(cx, cy, canvas) {
 			//canvas.Color = new Color((byte) Random.Next(255), (byte) Random.Next(255), (byte) Random.Next(255), 128);
 			//canvas.FillRect(cx + X, cy + Y, Width, 100);
-			for (var $t1 = 0; $t1 < this.beatGlyphs.length; $t1++) {
-				var g = this.beatGlyphs[$t1];
-				g.paint(cx + this.x, cy + this.y, canvas);
+			for (var i = 0; i < this.beatGlyphs.length; i++) {
+				this.beatGlyphs[i].paint(cx + this.x, cy + this.y, canvas);
 			}
 		}
 	}, $AlphaTab_Rendering_Glyphs_GlyphGroup, [$AlphaTab_Rendering_Glyphs_ISupportsFinalize]);
@@ -13249,8 +13102,8 @@
 			var sizeY = ss.Int32.trunc(60 * this.get_scale());
 			if (this.$_beat.whammyBarPoints.length >= 2) {
 				var dy = ss.Int32.div(sizeY, $AlphaTab_Model_Beat.whammyBarMaxValue);
-				for (var $t1 = 0; $t1 < this.$_beat.whammyBarPoints.length; $t1++) {
-					var pt = this.$_beat.whammyBarPoints[$t1];
+				for (var i = 0; i < this.$_beat.whammyBarPoints.length; i++) {
+					var pt = this.$_beat.whammyBarPoints[i];
 					var ptY = 0 - dy * pt.value;
 					if (ptY > maxY) {
 						maxY = ptY;
@@ -13343,12 +13196,12 @@
 			var group = new $AlphaTab_Rendering_Staves_StaveGroup();
 			group.layout = this;
 			var isFirstTrack = true;
-			for (var $t1 = 0; $t1 < this.renderer.tracks.length; $t1++) {
-				var track = this.renderer.tracks[$t1];
-				for (var $t2 = 0; $t2 < this.renderer.settings.staves.length; $t2++) {
-					var s = this.renderer.settings.staves[$t2];
-					if ($AlphaTab_Environment.staveFactories.containsKey(s.id)) {
-						var factory = $AlphaTab_Environment.staveFactories.get_item(s.id)(this);
+			for (var i = 0; i < this.renderer.tracks.length; i++) {
+				var track = this.renderer.tracks[i];
+				for (var j = 0; j < this.renderer.settings.staves.length; j++) {
+					var s = this.renderer.settings.staves[j];
+					if ($AlphaTab_Environment.staveFactories.hasOwnProperty(s.id)) {
+						var factory = $AlphaTab_Environment.staveFactories[s.id](this);
 						if (isFirstTrack || !factory.hideOnMultiTrack) {
 							group.addStave(track, new $AlphaTab_Rendering_Staves_Stave(factory));
 						}
@@ -13424,7 +13277,7 @@
 			if (this.renderer.settings.staves.length > 0) {
 				while (currentBarIndex <= endBarIndex) {
 					var group = this.$createStaveGroup(currentBarIndex, endBarIndex);
-					ss.add(this.$_groups, group);
+					this.$_groups.push(group);
 					group.x = x;
 					group.y = y;
 					this.$fitGroup(group);
@@ -13485,9 +13338,8 @@
 			var x = $AlphaTab_Rendering_Layout_PageViewLayout.pagePadding[0];
 			var y = $AlphaTab_Rendering_Layout_PageViewLayout.pagePadding[1];
 			y = this.$paintScoreInfo(x, y);
-			for (var $t1 = 0; $t1 < this.$_groups.length; $t1++) {
-				var g = this.$_groups[$t1];
-				g.paint(0, 0, this.renderer.canvas);
+			for (var i = 0; i < this.$_groups.length; i++) {
+				this.$_groups[i].paint(0, 0, this.renderer.canvas);
 			}
 		},
 		$drawCentered: function(text, font, y) {
@@ -13613,48 +13465,47 @@
 			return ss.Int32.trunc(950 * this.get_scale());
 		},
 		buildBoundingsLookup: function(lookup) {
-			for (var $t1 = 0; $t1 < this.$_groups.length; $t1++) {
-				var g = this.$_groups[$t1];
-				g.buildBoundingsLookup(lookup);
+			for (var i = 0; i < this.$_groups.length; i++) {
+				this.$_groups[i].buildBoundingsLookup(lookup);
 			}
 		}
 	}, $AlphaTab_Rendering_Layout_ScoreLayout);
 	ss.initClass($AlphaTab_Rendering_Staves_BarSizeInfo, $asm, {
 		setSize: function(key, size) {
-			this.sizes.set_item(key, size);
+			this.sizes[key] = size;
 		},
 		getSize: function(key) {
-			if (this.sizes.containsKey(key)) {
-				return this.sizes.get_item(key);
+			if (this.sizes.hasOwnProperty(key)) {
+				return this.sizes[key];
 			}
 			return 0;
 		},
 		getPreNoteSize: function(beat) {
-			if (this.preNoteSizes.containsKey(beat)) {
-				return this.preNoteSizes.get_item(beat);
+			if (this.preNoteSizes.hasOwnProperty(beat)) {
+				return this.preNoteSizes[beat];
 			}
 			return 0;
 		},
 		getOnNoteSize: function(beat) {
-			if (this.onNoteSizes.containsKey(beat)) {
-				return this.onNoteSizes.get_item(beat);
+			if (this.onNoteSizes.hasOwnProperty(beat)) {
+				return this.onNoteSizes[beat];
 			}
 			return 0;
 		},
 		getPostNoteSize: function(beat) {
-			if (this.postNoteSizes.containsKey(beat)) {
-				return this.postNoteSizes.get_item(beat);
+			if (this.postNoteSizes.hasOwnProperty(beat)) {
+				return this.postNoteSizes[beat];
 			}
 			return 0;
 		},
 		setPreNoteSize: function(beat, size) {
-			this.preNoteSizes.set_item(beat, size);
+			this.preNoteSizes[beat] = size;
 		},
 		setOnNoteSize: function(beat, size) {
-			this.onNoteSizes.set_item(beat, size);
+			this.onNoteSizes[beat] = size;
 		},
 		setPostNoteSize: function(beat, size) {
-			this.postNoteSizes.set_item(beat, size);
+			this.postNoteSizes[beat] = size;
 		}
 	});
 	ss.initClass($AlphaTab_Rendering_Staves_Stave, $asm, {
@@ -13672,21 +13523,21 @@
 			renderer.stave = this;
 			renderer.index = this.barRenderers.length;
 			renderer.doLayout();
-			ss.add(this.barRenderers, renderer);
+			this.barRenderers.push(renderer);
+			this.$_barRendererLookup[bar.index] = renderer;
 		},
 		revertLastBar: function() {
-			ss.removeAt(this.barRenderers, this.barRenderers.length - 1);
+			this.barRenderers.splice(this.barRenderers.length - 1, 1);
 		},
 		applyBarSpacing: function(spacing) {
-			for (var $t1 = 0; $t1 < this.barRenderers.length; $t1++) {
-				var b = this.barRenderers[$t1];
-				b.applyBarSpacing(spacing);
+			for (var i = 0; i < this.barRenderers.length; i++) {
+				this.barRenderers[i].applyBarSpacing(spacing);
 			}
 		},
 		get_topOverflow: function() {
 			var m = 0;
-			for (var $t1 = 0; $t1 < this.barRenderers.length; $t1++) {
-				var r = this.barRenderers[$t1];
+			for (var i = 0; i < this.barRenderers.length; i++) {
+				var r = this.barRenderers[i];
 				if (r.topOverflow > m) {
 					m = r.topOverflow;
 				}
@@ -13695,8 +13546,8 @@
 		},
 		get_bottomOverflow: function() {
 			var m = 0;
-			for (var $t1 = 0; $t1 < this.barRenderers.length; $t1++) {
-				var r = this.barRenderers[$t1];
+			for (var i = 0; i < this.barRenderers.length; i++) {
+				var r = this.barRenderers[i];
 				if (r.bottomOverflow > m) {
 					m = r.bottomOverflow;
 				}
@@ -13730,10 +13581,15 @@
 			if (this.height === 0) {
 				return;
 			}
-			for (var $t1 = 0; $t1 < this.barRenderers.length; $t1++) {
-				var r = this.barRenderers[$t1];
-				r.paint(cx + this.x, cy + this.y, canvas);
+			for (var i = 0; i < this.barRenderers.length; i++) {
+				this.barRenderers[i].paint(cx + this.x, cy + this.y, canvas);
 			}
+		},
+		getRendererForBar: function(index) {
+			if (this.$_barRendererLookup.hasOwnProperty(index)) {
+				return this.$_barRendererLookup[index];
+			}
+			return null;
 		}
 	});
 	ss.initClass($AlphaTab_Rendering_Staves_StaveGroup, $asm, {
@@ -13746,34 +13602,33 @@
 			}
 			var score = tracks[0].score;
 			var masterBar = score.masterBars[barIndex];
-			ss.add(this.masterBars, masterBar);
+			this.masterBars.push(masterBar);
 			this.helpers.buildHelpers(tracks, barIndex);
 			if (!this.$_accoladeSpacingCalculated && this.index === 0) {
 				this.$_accoladeSpacingCalculated = true;
 				var canvas = this.layout.renderer.canvas;
 				var res = this.layout.renderer.renderingResources.effectFont;
 				canvas.set_font(res);
-				for (var $t1 = 0; $t1 < tracks.length; $t1++) {
-					var t = tracks[$t1];
-					this.accoladeSpacing = ss.Int32.trunc(Math.max(this.accoladeSpacing, canvas.measureText(t.shortName)));
+				for (var i = 0; i < tracks.length; i++) {
+					this.accoladeSpacing = ss.Int32.trunc(Math.max(this.accoladeSpacing, canvas.measureText(tracks[i].shortName)));
 				}
 				this.accoladeSpacing += 20;
 				this.width += this.accoladeSpacing;
 			}
 			// add renderers
 			var maxSizes = new $AlphaTab_Rendering_Staves_BarSizeInfo();
-			for (var $t2 = 0; $t2 < this.staves.length; $t2++) {
-				var g = this.staves[$t2];
-				for (var $t3 = 0; $t3 < g.staves.length; $t3++) {
-					var s = g.staves[$t3];
+			for (var i1 = 0; i1 < this.staves.length; i1++) {
+				var g = this.staves[i1];
+				for (var j = 0; j < g.staves.length; j++) {
+					var s = g.staves[j];
 					s.addBar(g.track.bars[barIndex]);
 					s.barRenderers[s.barRenderers.length - 1].registerMaxSizes(maxSizes);
 				}
 			}
 			// ensure same widths of new renderer
 			var realWidth = 0;
-			for (var $t4 = 0; $t4 < this.$_allStaves.length; $t4++) {
-				var s1 = this.$_allStaves[$t4];
+			for (var i2 = 0; i2 < this.$_allStaves.length; i2++) {
+				var s1 = this.$_allStaves[i2];
 				s1.barRenderers[s1.barRenderers.length - 1].applySizes(maxSizes);
 				if (s1.barRenderers[s1.barRenderers.length - 1].width > realWidth) {
 					realWidth = s1.barRenderers[s1.barRenderers.length - 1].width;
@@ -13782,8 +13637,8 @@
 			this.width += realWidth;
 		},
 		$getStaveTrackGroup: function(track) {
-			for (var $t1 = 0; $t1 < this.staves.length; $t1++) {
-				var g = this.staves[$t1];
+			for (var i = 0; i < this.staves.length; i++) {
+				var g = this.staves[i];
 				if (ss.referenceEquals(g.track, track)) {
 					return g;
 				}
@@ -13794,13 +13649,13 @@
 			var group = this.$getStaveTrackGroup(track);
 			if (ss.isNullOrUndefined(group)) {
 				group = new $AlphaTab_Rendering_Staves_StaveTrackGroup(this, track);
-				ss.add(this.staves, group);
+				this.staves.push(group);
 			}
 			stave.staveTrackGroup = group;
 			stave.staveGroup = this;
 			stave.index = this.$_allStaves.length;
-			ss.add(this.$_allStaves, stave);
-			ss.add(group.staves, stave);
+			this.$_allStaves.push(stave);
+			group.staves.push(stave);
 			if (stave.get_isInAccolade()) {
 				if (ss.isNullOrUndefined(this.$_firstStaveInAccolade)) {
 					this.$_firstStaveInAccolade = stave;
@@ -13826,10 +13681,10 @@
 		},
 		revertLastBar: function() {
 			if (this.masterBars.length > 1) {
-				ss.removeAt(this.masterBars, this.masterBars.length - 1);
+				this.masterBars.splice(this.masterBars.length - 1, 1);
 				var w = 0;
-				for (var $t1 = 0; $t1 < this.$_allStaves.length; $t1++) {
-					var s = this.$_allStaves[$t1];
+				for (var i = 0; i < this.$_allStaves.length; i++) {
+					var s = this.$_allStaves[i];
 					w = Math.max(w, s.barRenderers[s.barRenderers.length - 1].width);
 					s.revertLastBar();
 				}
@@ -13837,16 +13692,14 @@
 			}
 		},
 		applyBarSpacing: function(spacing) {
-			for (var $t1 = 0; $t1 < this.$_allStaves.length; $t1++) {
-				var s = this.$_allStaves[$t1];
-				s.applyBarSpacing(spacing);
+			for (var i = 0; i < this.$_allStaves.length; i++) {
+				this.$_allStaves[i].applyBarSpacing(spacing);
 			}
 			this.width += this.masterBars.length * spacing;
 		},
 		paint: function(cx, cy, canvas) {
-			for (var $t1 = 0; $t1 < this.$_allStaves.length; $t1++) {
-				var s = this.$_allStaves[$t1];
-				s.paint(cx + this.x, cy + this.y, canvas);
+			for (var i = 0; i < this.$_allStaves.length; i++) {
+				this.$_allStaves[i].paint(cx + this.x, cy + this.y, canvas);
 			}
 			var res = this.layout.renderer.renderingResources;
 			if (this.staves.length > 0) {
@@ -13870,8 +13723,8 @@
 				// Draw accolade for each track group
 				// 
 				canvas.set_font(res.effectFont);
-				for (var $t2 = 0; $t2 < this.staves.length; $t2++) {
-					var g = this.staves[$t2];
+				for (var i1 = 0; i1 < this.staves.length; i1++) {
+					var g = this.staves[i1];
 					var firstStart1 = cy + this.y + g.firstStaveInAccolade.y + g.firstStaveInAccolade.staveTop + g.firstStaveInAccolade.topSpacing + g.firstStaveInAccolade.get_topOverflow();
 					var lastEnd1 = cy + this.y + g.lastStaveInAccolade.y + g.lastStaveInAccolade.topSpacing + g.lastStaveInAccolade.get_topOverflow() + g.lastStaveInAccolade.staveBottom;
 					var acooladeX1 = cx + this.x + g.firstStaveInAccolade.x;
@@ -13920,9 +13773,8 @@
 			var realBottom = this.y + this.$_allStaves[this.$_allStaves.length - 1].y + this.$_allStaves[this.$_allStaves.length - 1].height;
 			var visualHeight = visualBottom - visualTop;
 			var realHeight = realBottom - realTop;
-			for (var $t1 = 0; $t1 < this.$_firstStaveInAccolade.barRenderers.length; $t1++) {
-				var b = this.$_firstStaveInAccolade.barRenderers[$t1];
-				b.buildBoundingsLookup(lookup, visualTop, visualHeight, realTop, realHeight, this.x);
+			for (var i = 0; i < this.$_firstStaveInAccolade.barRenderers.length; i++) {
+				this.$_firstStaveInAccolade.barRenderers[i].buildBoundingsLookup(lookup, visualTop, visualHeight, realTop, realHeight, this.x);
 			}
 		}
 	});
@@ -13939,8 +13791,8 @@
 			// if there is already an accidental registered, we check if we 
 			// have a new accidental
 			var updateAccidental = true;
-			if (this.$_registeredAccidentals.containsKey(noteLine)) {
-				var registeredAccidental = this.$_registeredAccidentals.get_item(noteLine);
+			if (this.$_registeredAccidentals.hasOwnProperty(noteLine)) {
+				var registeredAccidental = this.$_registeredAccidentals[noteLine];
 				// we only need to do anything if we are changing the accidental
 				if (registeredAccidental === accidentalToSet) {
 					// we set the accidental to none, as the accidental is already set by a previous note
@@ -13953,10 +13805,10 @@
 			}
 			if (updateAccidental) {
 				if (accidentalToSet === 0 || accidentalToSet === 1) {
-					this.$_registeredAccidentals.remove(noteLine);
+					delete this.$_registeredAccidentals[noteLine];
 				}
 				else {
-					this.$_registeredAccidentals.set_item(noteLine, accidentalToSet);
+					this.$_registeredAccidentals[noteLine] = accidentalToSet;
 				}
 			}
 			return accidentalToSet;
@@ -13975,18 +13827,18 @@
 	ss.initClass($AlphaTab_Rendering_Utils_BarHelpers, $asm, {});
 	ss.initClass($AlphaTab_Rendering_Utils_BarHelpersGroup, $asm, {
 		buildHelpers: function(tracks, barIndex) {
-			for (var $t1 = 0; $t1 < tracks.length; $t1++) {
-				var t = tracks[$t1];
+			for (var i = 0; i < tracks.length; i++) {
+				var t = tracks[i];
 				var h;
-				if (!this.helpers.containsKey(t.index)) {
-					h = new (ss.makeGenericType(ss.Dictionary$2, [ss.Int32, $AlphaTab_Rendering_Utils_BarHelpers]))();
-					this.helpers.set_item(t.index, h);
+				if (!this.helpers.hasOwnProperty(t.index)) {
+					h = {};
+					this.helpers[t.index] = h;
 				}
 				else {
-					h = this.helpers.get_item(t.index);
+					h = this.helpers[t.index];
 				}
-				if (!h.containsKey(barIndex)) {
-					h.set_item(barIndex, new $AlphaTab_Rendering_Utils_BarHelpers(t.bars[barIndex]));
+				if (!h.hasOwnProperty(barIndex)) {
+					h[barIndex] = new $AlphaTab_Rendering_Utils_BarHelpers(t.bars[barIndex]);
 				}
 			}
 		}
@@ -14005,17 +13857,17 @@
 		getBeatLineX: function(beat) {
 			if (this.hasBeatLineX(beat)) {
 				if (this.get_direction() === 0) {
-					return this.$_beatLineXPositions.get_item(beat.index).up;
+					return this.$_beatLineXPositions[beat.index].up;
 				}
-				return this.$_beatLineXPositions.get_item(beat.index).down;
+				return this.$_beatLineXPositions[beat.index].down;
 			}
 			return 0;
 		},
 		hasBeatLineX: function(beat) {
-			return this.$_beatLineXPositions.containsKey(beat.index);
+			return this.$_beatLineXPositions.hasOwnProperty(beat.index);
 		},
 		registerBeatLineX: function(beat, up, down) {
-			this.$_beatLineXPositions.set_item(beat.index, new $AlphaTab_Rendering_Utils_BeatLinePositions(up, down));
+			this.$_beatLineXPositions[beat.index] = new $AlphaTab_Rendering_Utils_BeatLinePositions(up, down);
 		},
 		get_direction: function() {
 			// multivoice handling
@@ -14039,7 +13891,7 @@
 			}
 			if (add) {
 				this.$_lastBeat = beat;
-				ss.add(this.beats, beat);
+				this.beats.push(beat);
 				this.$checkNote(beat.get_minNote());
 				this.$checkNote(beat.get_maxNote());
 				if (this.maxDuration < beat.duration) {
@@ -14260,7 +14112,7 @@
 			else if (beat.voice.index !== this.voiceIndex || beat.tupletNumerator !== this.tuplet || this.get_isFull() || this.$_isFinished) {
 				return false;
 			}
-			ss.add(this.beats, beat);
+			this.beats.push(beat);
 			return true;
 		}
 	});
@@ -14363,6 +14215,20 @@
 	$AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale = 0.699999988079071;
 	$AlphaTab_Rendering_Glyphs_NoteHeadGlyph.noteHeadHeight = 9;
 	$AlphaTab_Rendering_Glyphs_AccidentalGroupGlyph.$nonReserved = -3000;
+	$AlphaTab_Rendering_Glyphs_ScoreBeatGlyph.$normalKeys = null;
+	$AlphaTab_Rendering_Glyphs_ScoreBeatGlyph.$xKeys = null;
+	$AlphaTab_Rendering_Glyphs_ScoreBeatGlyph.$normalKeys = {};
+	var $t1 = [32, 34, 35, 36, 38, 39, 40, 41, 43, 45, 47, 48, 50, 55, 56, 58, 60, 61];
+	for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+		var i = $t1[$t2];
+		$AlphaTab_Rendering_Glyphs_ScoreBeatGlyph.$normalKeys[i] = true;
+	}
+	$AlphaTab_Rendering_Glyphs_ScoreBeatGlyph.$xKeys = {};
+	var $t3 = [31, 33, 37, 42, 44, 54, 62, 63, 64, 65, 66];
+	for (var $t4 = 0; $t4 < $t3.length; $t4++) {
+		var i1 = $t3[$t4];
+		$AlphaTab_Rendering_Glyphs_ScoreBeatGlyph.$xKeys[i1] = true;
+	}
 	$AlphaTab_Rendering_Utils_AccidentalHelper.$accidentalNotes = [[1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1], [1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1], [0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1], [0, 0, 1, 0, 1, 0, 3, 1, 0, 1, 0, 1], [0, 3, 1, 0, 1, 0, 3, 1, 0, 1, 0, 1], [0, 3, 1, 0, 1, 0, 3, 1, 3, 1, 0, 1], [0, 3, 1, 3, 1, 0, 3, 1, 3, 1, 0, 1], [0, 2, 0, 2, 0, 0, 2, 0, 2, 0, 2, 0], [0, 2, 0, 2, 0, 1, 2, 0, 2, 0, 2, 0], [1, 2, 0, 2, 0, 1, 2, 0, 2, 0, 2, 0], [1, 2, 0, 2, 0, 1, 2, 1, 2, 0, 2, 0], [1, 2, 1, 2, 0, 1, 2, 1, 2, 0, 2, 0], [1, 2, 1, 2, 0, 1, 2, 1, 2, 1, 2, 0], [1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 2, 0], [1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 2, 1]];
 	$AlphaTab_Rendering_ScoreBarRenderer.$stepsPerOctave = 7;
 	$AlphaTab_Rendering_ScoreBarRenderer.$octaveSteps = [38, 32, 30, 26, 38];
@@ -14378,10 +14244,10 @@
 	$AlphaTab_Rendering_Glyphs_LineRangedGlyph.$lineTopPadding = 8;
 	$AlphaTab_Rendering_Glyphs_LineRangedGlyph.$lineTopOffset = 6;
 	$AlphaTab_Rendering_Glyphs_LineRangedGlyph.$lineSize = 8;
-	$AlphaTab_Rendering_Glyphs_NoteNumberGlyph.padding = 0;
 	$AlphaTab_Model_Beat.whammyBarMaxPosition = 60;
 	$AlphaTab_Model_Beat.whammyBarMaxValue = 24;
 	$AlphaTab_Rendering_Glyphs_WhammyBarGlyph.$whammyMaxOffset = 60;
+	$AlphaTab_Rendering_Glyphs_NoteNumberGlyph.padding = 0;
 	$AlphaTab_Model_Note.$maxOffsetForSameLineSearch = 3;
 	$AlphaTab_Model_BendPoint.maxPosition = 60;
 	$AlphaTab_Model_BendPoint.maxValue = 12;
@@ -14395,91 +14261,91 @@
 	$AlphaTab_Environment.fileLoaders = null;
 	$AlphaTab_Environment.layoutEngines = null;
 	$AlphaTab_Environment.staveFactories = null;
-	$AlphaTab_Environment.renderEngines = new (ss.makeGenericType(ss.Dictionary$2, [String, Function]))();
-	$AlphaTab_Environment.fileLoaders = new (ss.makeGenericType(ss.Dictionary$2, [String, Function]))();
-	$AlphaTab_Environment.layoutEngines = new (ss.makeGenericType(ss.Dictionary$2, [String, Function]))();
-	$AlphaTab_Environment.staveFactories = new (ss.makeGenericType(ss.Dictionary$2, [String, Function]))();
-	$AlphaTab_Environment.renderEngines.set_item('default', function(d) {
+	$AlphaTab_Environment.renderEngines = {};
+	$AlphaTab_Environment.fileLoaders = {};
+	$AlphaTab_Environment.layoutEngines = {};
+	$AlphaTab_Environment.staveFactories = {};
+	$AlphaTab_Environment.renderEngines['default'] = function(d) {
 		return new $AlphaTab_Platform_JavaScript_Html5Canvas(d);
-	});
-	$AlphaTab_Environment.renderEngines.set_item('html5', function(d1) {
+	};
+	$AlphaTab_Environment.renderEngines['html5'] = function(d1) {
 		return new $AlphaTab_Platform_JavaScript_Html5Canvas(d1);
-	});
-	$AlphaTab_Environment.fileLoaders.set_item('default', function() {
+	};
+	$AlphaTab_Environment.fileLoaders['default'] = function() {
 		return new $AlphaTab_Platform_JavaScript_JsFileLoader();
-	});
-	$AlphaTab_Environment.renderEngines.set_item('svg', function(d2) {
+	};
+	$AlphaTab_Environment.renderEngines['svg'] = function(d2) {
 		return new $AlphaTab_Platform_Svg_SvgCanvas();
-	});
+	};
 	// default layout engines
-	$AlphaTab_Environment.layoutEngines.set_item('default', function(r) {
+	$AlphaTab_Environment.layoutEngines['default'] = function(r) {
 		return new $AlphaTab_Rendering_Layout_PageViewLayout(r);
-	});
-	$AlphaTab_Environment.layoutEngines.set_item('page', function(r1) {
+	};
+	$AlphaTab_Environment.layoutEngines['page'] = function(r1) {
 		return new $AlphaTab_Rendering_Layout_PageViewLayout(r1);
-	});
-	$AlphaTab_Environment.layoutEngines.set_item('horizontal', function(r2) {
+	};
+	$AlphaTab_Environment.layoutEngines['horizontal'] = function(r2) {
 		return new $AlphaTab_Rendering_Layout_HorizontalScreenLayout(r2);
-	});
+	};
 	// default staves 
-	$AlphaTab_Environment.staveFactories.set_item('marker', function(l) {
+	$AlphaTab_Environment.staveFactories['marker'] = function(l) {
 		return new $AlphaTab_Rendering_EffectBarRendererFactory(new $AlphaTab_Rendering_Effects_MarkerEffectInfo());
-	});
+	};
 	//staveFactories.set("triplet-feel", functionl { return new EffectBarRendererFactory(new TripletFeelEffectInfo()); });
-	$AlphaTab_Environment.staveFactories.set_item('tempo', function(l1) {
+	$AlphaTab_Environment.staveFactories['tempo'] = function(l1) {
 		return new $AlphaTab_Rendering_EffectBarRendererFactory(new $AlphaTab_Rendering_Effects_TempoEffectInfo());
-	});
-	$AlphaTab_Environment.staveFactories.set_item('text', function(l2) {
+	};
+	$AlphaTab_Environment.staveFactories['text'] = function(l2) {
 		return new $AlphaTab_Rendering_EffectBarRendererFactory(new $AlphaTab_Rendering_Effects_TextEffectInfo());
-	});
-	$AlphaTab_Environment.staveFactories.set_item('chords', function(l3) {
+	};
+	$AlphaTab_Environment.staveFactories['chords'] = function(l3) {
 		return new $AlphaTab_Rendering_EffectBarRendererFactory(new $AlphaTab_Rendering_Effects_ChordsEffectInfo());
-	});
-	$AlphaTab_Environment.staveFactories.set_item('trill', function(l4) {
+	};
+	$AlphaTab_Environment.staveFactories['trill'] = function(l4) {
 		return new $AlphaTab_Rendering_EffectBarRendererFactory(new $AlphaTab_Rendering_Effects_TrillEffectInfo());
-	});
-	$AlphaTab_Environment.staveFactories.set_item('beat-vibrato', function(l5) {
+	};
+	$AlphaTab_Environment.staveFactories['beat-vibrato'] = function(l5) {
 		return new $AlphaTab_Rendering_EffectBarRendererFactory(new $AlphaTab_Rendering_Effects_BeatVibratoEffectInfo());
-	});
-	$AlphaTab_Environment.staveFactories.set_item('note-vibrato', function(l6) {
+	};
+	$AlphaTab_Environment.staveFactories['note-vibrato'] = function(l6) {
 		return new $AlphaTab_Rendering_EffectBarRendererFactory(new $AlphaTab_Rendering_Effects_NoteVibratoEffectInfo());
-	});
-	$AlphaTab_Environment.staveFactories.set_item('alternate-endings', function(l7) {
+	};
+	$AlphaTab_Environment.staveFactories['alternate-endings'] = function(l7) {
 		return new $AlphaTab_Rendering_AlternateEndingsBarRendererFactory();
-	});
-	$AlphaTab_Environment.staveFactories.set_item('score', function(l8) {
+	};
+	$AlphaTab_Environment.staveFactories['score'] = function(l8) {
 		return new $AlphaTab_Rendering_ScoreBarRendererFactory();
-	});
-	$AlphaTab_Environment.staveFactories.set_item('crescendo', function(l9) {
+	};
+	$AlphaTab_Environment.staveFactories['crescendo'] = function(l9) {
 		return new $AlphaTab_Rendering_EffectBarRendererFactory(new $AlphaTab_Rendering_Effects_CrescendoEffectInfo());
-	});
-	$AlphaTab_Environment.staveFactories.set_item('dynamics', function(l10) {
+	};
+	$AlphaTab_Environment.staveFactories['dynamics'] = function(l10) {
 		return new $AlphaTab_Rendering_EffectBarRendererFactory(new $AlphaTab_Rendering_Effects_DynamicsEffectInfo());
-	});
-	$AlphaTab_Environment.staveFactories.set_item('tap', function(l11) {
+	};
+	$AlphaTab_Environment.staveFactories['tap'] = function(l11) {
 		return new $AlphaTab_Rendering_EffectBarRendererFactory(new $AlphaTab_Rendering_Effects_TapEffectInfo());
-	});
-	$AlphaTab_Environment.staveFactories.set_item('fade-in', function(l12) {
+	};
+	$AlphaTab_Environment.staveFactories['fade-in'] = function(l12) {
 		return new $AlphaTab_Rendering_EffectBarRendererFactory(new $AlphaTab_Rendering_Effects_FadeInEffectInfo());
-	});
-	$AlphaTab_Environment.staveFactories.set_item('let-ring', function(l13) {
+	};
+	$AlphaTab_Environment.staveFactories['let-ring'] = function(l13) {
 		return new $AlphaTab_Rendering_EffectBarRendererFactory(new $AlphaTab_Rendering_Effects_LetRingEffectInfo());
-	});
-	$AlphaTab_Environment.staveFactories.set_item('palm-mute', function(l14) {
+	};
+	$AlphaTab_Environment.staveFactories['palm-mute'] = function(l14) {
 		return new $AlphaTab_Rendering_EffectBarRendererFactory(new $AlphaTab_Rendering_Effects_PalmMuteEffectInfo());
-	});
-	$AlphaTab_Environment.staveFactories.set_item('tab', function(l15) {
+	};
+	$AlphaTab_Environment.staveFactories['tab'] = function(l15) {
 		return new $AlphaTab_Rendering_TabBarRendererFactory();
-	});
-	$AlphaTab_Environment.staveFactories.set_item('pick-stroke', function(l16) {
+	};
+	$AlphaTab_Environment.staveFactories['pick-stroke'] = function(l16) {
 		return new $AlphaTab_Rendering_EffectBarRendererFactory(new $AlphaTab_Rendering_Effects_PickStrokeEffectInfo());
-	});
-	$AlphaTab_Environment.staveFactories.set_item('rhythm-up', function(l17) {
+	};
+	$AlphaTab_Environment.staveFactories['rhythm-up'] = function(l17) {
 		return new $AlphaTab_Rendering_RhythmBarRendererFactory(0);
-	});
-	$AlphaTab_Environment.staveFactories.set_item('rhythm-down', function(l18) {
+	};
+	$AlphaTab_Environment.staveFactories['rhythm-down'] = function(l18) {
 		return new $AlphaTab_Rendering_RhythmBarRendererFactory(1);
-	});
+	};
 	// staveFactories.set("fingering", functionl { return new EffectBarRendererFactory(new FingeringEffectInfo()); });   
 	$AlphaTab_Audio_GeneralMidi.$_values = null;
 	$AlphaTab_Audio_Generator_MidiFileHandler.defaultMetronomeKey = 37;

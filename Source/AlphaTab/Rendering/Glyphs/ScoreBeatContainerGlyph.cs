@@ -17,9 +17,9 @@ namespace AlphaTab.Rendering
                 var tie = new ScoreTieGlyph(n.TieOrigin, n, this);
                 Ties.Add(tie);
             }
-            else if (n.IsHammerPullDestination)
+            else if (n.IsHammerPullOrigin)
             {
-                var tie = new ScoreTieGlyph(n.HammerPullOrigin, n, this);
+                var tie = new ScoreTieGlyph(n, n.HammerPullDestination, this);
                 Ties.Add(tie);
             }
             else if (n.SlideType == SlideType.Legato)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using AlphaTab.Audio;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 
 namespace AlphaTab.Importer
@@ -539,7 +540,7 @@ namespace AlphaTab.Importer
                     NewSy();
                     if (_sy == AlphaTexSymbols.Tuning) // we require at least one tuning
                     {
-                        _track.Tuning = new List<int>();
+                        _track.Tuning = new FastList<int>();
                         do
                         {
                             _track.Tuning.Add(ParseTuning(_syData.ToString()));
@@ -1134,7 +1135,7 @@ namespace AlphaTab.Importer
                         }
                         NewSy();
                     }
-                    note.Beat.TremoloSpeed = new Platform.Nullable<Duration>(duration);
+                    note.Beat.TremoloSpeed = duration;
                 }
                 else if (syData == "v")
                 {

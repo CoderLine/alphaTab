@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using AlphaTab.Collections;
 
 namespace AlphaTab.Rendering.Glyphs
 {
@@ -20,12 +21,13 @@ namespace AlphaTab.Rendering.Glyphs
             Glyphs.Sort((a, b) => a.Y.CompareTo(b.Y));
 
             // defines the reserved y position of the columns
-            var columns = new List<int>();
+            var columns = new FastList<int>();
             columns.Add(NonReserved);
 
             var accidentalSize = (int)(21 * Scale);
-            foreach (var g in Glyphs)
+            for (int i = 0; i < Glyphs.Count; i++)
             {
+                var g = Glyphs[i];
                 g.Renderer = Renderer;
                 g.DoLayout();
 
@@ -63,8 +65,9 @@ namespace AlphaTab.Rendering.Glyphs
                 Width = columnWidth * columns.Count;
             }
 
-            foreach (var g in Glyphs)
+            for (int i = 0; i < Glyphs.Count; i++)
             {
+                var g = Glyphs[i];
                 g.X = Width - ((g.X + 1) * columnWidth);
             }
         }

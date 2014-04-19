@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 
 namespace AlphaTab.Audio.Model
@@ -19,11 +20,11 @@ namespace AlphaTab.Audio.Model
         private Beat _lastBeat;
 
         [IntrinsicProperty]
-        public List<BarTickLookup> Bars { get; set; }
+        public FastList<BarTickLookup> Bars { get; set; }
 
         public MidiTickLookup()
         {
-            Bars = new List<BarTickLookup>();
+            Bars = new FastList<BarTickLookup>();
         }
 
         public Beat FindBeat(Track track, int tick)
@@ -63,8 +64,9 @@ namespace AlphaTab.Audio.Model
 
             // linear search beat within beats
             Beat beat = null;
-            foreach (var b in bar.Voices[0].Beats)
+            for (int i = 0; i < bar.Voices[0].Beats.Count; i++)
             {
+                var b = bar.Voices[0].Beats[i];
                 // we search for the first beat which 
                 // starts after the tick. 
                 if (beat == null || b.Start <= tick)

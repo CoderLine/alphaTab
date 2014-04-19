@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Rendering.Utils;
@@ -23,8 +24,8 @@ namespace AlphaTab.Rendering.Glyphs
 
     public class ScoreNoteChordGlyph : Glyph
     {
-        private readonly List<ScoreNoteGlyphInfo> _infos;
-        private readonly Dictionary<int, Glyph> _noteLookup;
+        private readonly FastList<ScoreNoteGlyphInfo> _infos;
+        private readonly FastDictionary<int, Glyph> _noteLookup;
         private Glyph _tremoloPicking;
 
         [IntrinsicProperty]
@@ -40,7 +41,7 @@ namespace AlphaTab.Rendering.Glyphs
         public int DownLineX { get; set; }
 
         [IntrinsicProperty]
-        public Dictionary<string, Glyph> BeatEffects { get; set; }
+        public FastDictionary<string, Glyph> BeatEffects { get; set; }
 
         [IntrinsicProperty]
         public Beat Beat { get; set; }
@@ -50,9 +51,9 @@ namespace AlphaTab.Rendering.Glyphs
         public ScoreNoteChordGlyph()
             : base(0, 0)
         {
-            _infos = new List<ScoreNoteGlyphInfo>();
-            BeatEffects = new Dictionary<string, Glyph>();
-            _noteLookup = new Dictionary<int, Glyph>();
+            _infos = new FastList<ScoreNoteGlyphInfo>();
+            BeatEffects = new FastDictionary<string, Glyph>();
+            _noteLookup = new FastDictionary<int, Glyph>();
         }
 
         public BeamDirection Direction
@@ -292,8 +293,9 @@ namespace AlphaTab.Rendering.Glyphs
 
             if (_tremoloPicking != null)
                 _tremoloPicking.Paint(cx + X, cy + Y, canvas);
-            foreach (var g in _infos)
+            for (int i = 0; i < _infos.Count; i++)
             {
+                var g = _infos[i];
                 g.Glyph.Renderer = Renderer;
                 g.Glyph.Paint(cx + X, cy + Y, canvas);
             }

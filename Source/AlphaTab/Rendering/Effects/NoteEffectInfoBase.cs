@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Rendering.Glyphs;
 
@@ -6,14 +7,15 @@ namespace AlphaTab.Rendering.Effects
 {
     abstract public class NoteEffectInfoBase : IEffectBarRendererInfo
     {
-        protected List<Note> LastCreateInfo;
+        protected FastList<Note> LastCreateInfo;
 
         public bool HideOnMultiTrack { get { return false; } }
         public virtual bool ShouldCreateGlyph(EffectBarRenderer renderer, Beat beat)
         {
-            LastCreateInfo = new List<Note>();
-            foreach (var n in beat.Notes)
+            LastCreateInfo = new FastList<Note>();
+            for (int i = 0; i < beat.Notes.Count; i++)
             {
+                var n = beat.Notes[i];
                 if (ShouldCreateGlyphForNote(renderer, n))
                 {
                     LastCreateInfo.Add(n);

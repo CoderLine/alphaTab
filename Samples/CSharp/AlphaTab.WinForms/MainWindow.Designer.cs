@@ -1,5 +1,4 @@
-﻿using AlphaTab.Platform.CSharp;
-using AlphaTab.Platform.CSharp.WinForms;
+﻿using AlphaTab.Platform.CSharp.WinForms;
 
 namespace AlphaTab.Gdi
 {

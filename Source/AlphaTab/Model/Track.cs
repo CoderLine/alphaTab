@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using AlphaTab.Collections;
 using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Model
@@ -20,7 +21,7 @@ namespace AlphaTab.Model
         [IntrinsicProperty]
         public string ShortName { get; set; }
         [IntrinsicProperty]
-        public List<int> Tuning { get; set; }
+        public FastList<int> Tuning { get; set; }
         [IntrinsicProperty]
         public string TuningName { get; set; }
         [IntrinsicProperty]
@@ -34,18 +35,18 @@ namespace AlphaTab.Model
         [IntrinsicProperty]
         public Score Score { get; set; }
         [IntrinsicProperty]
-        public List<Bar> Bars { get; set; }
+        public FastList<Bar> Bars { get; set; }
 
         [IntrinsicProperty]
-        public Dictionary<string, Chord> Chords { get; set; }
+        public FastDictionary<string, Chord> Chords { get; set; }
 
         public Track()
         {
             Name = "";
             ShortName = "";
-            Tuning = new List<int>();
-            Bars = new List<Bar>();
-            Chords = new Dictionary<string, Chord>();
+            Tuning = new FastList<int>();
+            Bars = new FastList<Bar>();
+            Chords = new FastDictionary<string, Chord>();
             PlaybackInfo = new PlaybackInformation();
             Color = new Color(200, 0, 0);
         }
@@ -71,9 +72,9 @@ namespace AlphaTab.Model
                     ShortName = ShortName.Substring(0, ShortNameMaxLength);
             }
 
-            foreach (Bar bar in Bars)
+            for (int i = 0; i < Bars.Count; i++)
             {
-                bar.Finish();
+                Bars[i].Finish();
             }
         }
     }

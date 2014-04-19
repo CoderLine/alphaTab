@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Rendering.Layout;
@@ -14,14 +15,14 @@ namespace AlphaTab.Rendering
     {
         private const int Padding = 3;
 
-        private readonly List<int> _endings;
+        private readonly FastList<int> _endings;
         private string _endingsString;
 
         public AlternateEndingsBarRenderer(Bar bar)
             : base(bar)
         {
             var alternateEndings = Bar.MasterBar.AlternateEndings;
-            _endings = new List<int>();
+            _endings = new FastList<int>();
             for (int i = 0; i < MasterBar.MaxAlternateEndings; i++)
             {
                 if ((alternateEndings & (0x01 << i)) != 0)
@@ -48,9 +49,9 @@ namespace AlphaTab.Rendering
             Height = (int)(Resources.WordsFont.Size);
 
             var endingsStrings = new StringBuilder();
-            foreach (var e in _endings)
+            for (int i = 0; i < _endings.Count; i++)
             {
-                endingsStrings.Append(e + 1);
+                endingsStrings.Append(_endings[i] + 1);
                 endingsStrings.Append(". ");
             }
             _endingsString = endingsStrings.ToString();

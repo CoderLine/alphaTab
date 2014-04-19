@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Platform.Model;
@@ -9,8 +10,8 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class TabNoteChordGlyph : Glyph
     {
-        private readonly List<NoteNumberGlyph> _notes;
-        private readonly Dictionary<int, NoteNumberGlyph> _noteLookup;
+        private readonly FastList<NoteNumberGlyph> _notes;
+        private readonly FastDictionary<int, NoteNumberGlyph> _noteLookup;
         private Note _minNote;
         private readonly bool _isGrace;
         private int _centerX;
@@ -20,15 +21,15 @@ namespace AlphaTab.Rendering.Glyphs
         [IntrinsicProperty]
         public BeamingHelper BeamingHelper { get; set; }
         [IntrinsicProperty]
-        public Dictionary<string, Glyph> BeatEffects { get; set; }
+        public FastDictionary<string, Glyph> BeatEffects { get; set; }
 
         public TabNoteChordGlyph(int x, int y, bool isGrace)
             : base(x, y)
         {
             _isGrace = isGrace;
-            _notes = new List<NoteNumberGlyph>();
-            BeatEffects = new Dictionary<string, Glyph>();
-            _noteLookup = new Dictionary<int, NoteNumberGlyph>();
+            _notes = new FastList<NoteNumberGlyph>();
+            BeatEffects = new FastDictionary<string, Glyph>();
+            _noteLookup = new FastDictionary<int, NoteNumberGlyph>();
         }
 
         public int GetNoteX(Note note, bool onEnd = true)
@@ -59,8 +60,9 @@ namespace AlphaTab.Rendering.Glyphs
         public override void DoLayout()
         {
             var w = 0;
-            foreach (var g in _notes)
+            for (int i = 0; i < _notes.Count; i++)
             {
+                var g = _notes[i];
                 g.Renderer = Renderer;
                 g.DoLayout();
                 if (g.Width > w)
@@ -101,8 +103,9 @@ namespace AlphaTab.Rendering.Glyphs
             canvas.TextBaseline = TextBaseline.Middle;
             canvas.Color = res.MainGlyphColor;
             canvas.Font = _isGrace ? res.GraceFont : res.TablatureFont;
-            foreach (var g in _notes)
+            for (int i = 0; i < _notes.Count; i++)
             {
+                var g = _notes[i];
                 g.Renderer = Renderer;
                 g.Paint(cx + X, cy + Y, canvas);
             }

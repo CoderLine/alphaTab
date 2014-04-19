@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using AlphaTab.Collections;
 
 namespace AlphaTab.Model
 {
@@ -78,14 +79,14 @@ namespace AlphaTab.Model
         public string TempoLabel { get; set; }
 
         [IntrinsicProperty]
-        public List<MasterBar> MasterBars { get; set; }
+        public FastList<MasterBar> MasterBars { get; set; }
         [IntrinsicProperty]
-        public List<Track> Tracks { get; set; }
+        public FastList<Track> Tracks { get; set; }
 
         public Score()
         {
-            MasterBars = new List<MasterBar>();
-            Tracks = new List<Track>();
+            MasterBars = new FastList<MasterBar>();
+            Tracks = new FastList<Track>();
             _currentRepeatGroup = new RepeatGroup();
         }
 
@@ -120,9 +121,9 @@ namespace AlphaTab.Model
 
         public void Finish()
         {
-            foreach (Track track in Tracks)
+            for (int i = 0; i < Tracks.Count; i++)
             {
-                track.Finish();
+                Tracks[i].Finish();
             }
         }
 

@@ -44,9 +44,9 @@ namespace AlphaTab.Audio.Generator
         public void Generate()
         {
             // initialize tracks
-            foreach (Track track in _score.Tracks)
+            for (int i = 0; i < _score.Tracks.Count; i++)
             {
-                GenerateTrack(track);
+                GenerateTrack(_score.Tracks[i]);
             }
 
             var controller = new MidiPlaybackController(_score);
@@ -60,9 +60,9 @@ namespace AlphaTab.Audio.Generator
                 {
                     GenerateMasterBar(_score.MasterBars[index], previousMasterBar, controller.RepeatMove);
 
-                    foreach (Track track in _score.Tracks)
+                    for (int i = 0; i < _score.Tracks.Count; i++)
                     {
-                        GenerateBar(track.Bars[index], controller.RepeatMove);
+                        GenerateBar(_score.Tracks[i].Bars[index], controller.RepeatMove);
                     }
                 }
 
@@ -143,17 +143,17 @@ namespace AlphaTab.Audio.Generator
 
         public void GenerateBar(Bar bar, int startMove)
         {
-            foreach (var voice in bar.Voices)
+            for (int i = 0; i < bar.Voices.Count; i++)
             {
-                GenerateVoice(voice, startMove);
+                GenerateVoice(bar.Voices[i], startMove);
             }
         }
 
         private void GenerateVoice(Voice voice, int startMove)
         {
-            foreach (var beat in voice.Beats)
+            for (int i = 0; i < voice.Beats.Count; i++)
             {
-                GenerateBeat(beat, startMove);
+                GenerateBeat(voice.Beats[i], startMove);
             }
         }
 
@@ -165,9 +165,9 @@ namespace AlphaTab.Audio.Generator
 
             var track = beat.Voice.Bar.Track;
 
-            foreach (var automation in beat.Automations)
+            for (int i = 0; i < beat.Automations.Count; i++)
             {
-                GenerateAutomation(beat, automation, startMove);
+                GenerateAutomation(beat, beat.Automations[i], startMove);
             }
 
             if (beat.IsRest)
@@ -178,8 +178,9 @@ namespace AlphaTab.Audio.Generator
             {
                 var brushInfo = GetBrushInfo(beat);
 
-                foreach (var n in beat.Notes)
+                for (int i = 0; i < beat.Notes.Count; i++)
                 {
+                    var n = beat.Notes[i];
                     if (n.IsTieDestination) continue;
 
                     GenerateNote(n, start, duration, startMove, brushInfo);
@@ -341,7 +342,7 @@ namespace AlphaTab.Audio.Generator
             var dynamicValue = note.Dynamic;
 
             // more silent on hammer destination
-            if (!note.Beat.Voice.Bar.Track.IsPercussion && note.IsHammerPullDestination)
+            if (!note.Beat.Voice.Bar.Track.IsPercussion && note.HammerPullOrigin != null)
             {
                 dynamicValue--;
             }
@@ -449,8 +450,9 @@ namespace AlphaTab.Audio.Generator
                 // a mask where the single bits indicate the strings used
                 var stringUsed = 0;
 
-                foreach (var n in beat.Notes)
+                for (int i = 0; i < beat.Notes.Count; i++)
                 {
+                    var n = beat.Notes[i];
                     if (n.IsTieDestination) continue;
                     stringUsed |= 0x01 << (n.String - 1);
                 }

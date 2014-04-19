@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Runtime.CompilerServices;
 using AlphaTab.Model;
 using AlphaTab.Platform;
@@ -125,10 +124,12 @@ namespace AlphaTab.Rendering
             var top = GetScoreY(0);
             var bottom = GetScoreY(8);
 
-            foreach (var v in _helpers.BeamHelpers)
+            for (int i = 0; i < _helpers.BeamHelpers.Count; i++)
             {
-                foreach (var h in v)
+                var v = _helpers.BeamHelpers[i];
+                for (int j = 0; j < v.Count; j++)
                 {
+                    var h = v[j];
                     //
                     // max note (highest) -> top overflow
                     // 
@@ -169,10 +170,12 @@ namespace AlphaTab.Rendering
 
         private void PaintTuplets(int cx, int cy, ICanvas canvas)
         {
-            foreach (var v in _helpers.TupletHelpers)
+            for (int i = 0; i < _helpers.TupletHelpers.Count; i++)
             {
-                foreach (var h in v)
+                var v = _helpers.TupletHelpers[i];
+                for (int j = 0; j < v.Count; j++)
                 {
+                    var h = v[j];
                     PaintTupletHelper(cx + BeatGlyphsStart, cy, canvas, h);
                 }
             }
@@ -180,10 +183,12 @@ namespace AlphaTab.Rendering
 
         private void PaintBeams(int cx, int cy, ICanvas canvas)
         {
-            foreach (var v in _helpers.BeamHelpers)
+            for (int i = 0; i < _helpers.BeamHelpers.Count; i++)
             {
-                foreach (var h in v)
+                var v = _helpers.BeamHelpers[i];
+                for (int j = 0; j < v.Count; j++)
                 {
+                    var h = v[j];
                     PaintBeamHelper(cx + BeatGlyphsStart, cy, canvas, h);
                 }
             }
@@ -655,8 +660,9 @@ namespace AlphaTab.Rendering
 
         private void CreateVoiceGlyphs(Voice v)
         {
-            foreach (var b in v.Beats)
+            for (int i = 0; i < v.Beats.Count; i++)
             {
+                var b = v.Beats[i];
                 var container = new ScoreBeatContainerGlyph(b);
                 container.PreNotes = new ScoreBeatPreNotesGlyph();
                 container.OnNotes = new ScoreBeatGlyph();

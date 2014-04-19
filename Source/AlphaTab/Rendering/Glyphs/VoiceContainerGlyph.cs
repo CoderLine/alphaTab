@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using AlphaTab.Collections;
+using AlphaTab.Model;
 using AlphaTab.Platform;
-using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Layout;
 using AlphaTab.Rendering.Staves;
 
@@ -17,14 +17,14 @@ namespace AlphaTab.Rendering.Glyphs
         public const string KeySizeBeat = "Beat";
 
         [IntrinsicProperty]
-        public List<BeatContainerGlyph> BeatGlyphs { get; set; }
+        public FastList<BeatContainerGlyph> BeatGlyphs { get; set; }
         [IntrinsicProperty]
         public int VoiceIndex { get; set; }
 
         public VoiceContainerGlyph(int x, int y, int voiceIndex)
             : base(x, y, null)
         {
-            BeatGlyphs = new List<BeatContainerGlyph>();
+            BeatGlyphs = new FastList<BeatContainerGlyph>();
             VoiceIndex = voiceIndex;
         }
 
@@ -32,8 +32,9 @@ namespace AlphaTab.Rendering.Glyphs
         {
             var glyphSpacing = spacing / BeatGlyphs.Count;
             var gx = 0.0;
-            foreach (var g in BeatGlyphs)
+            for (int i = 0; i < BeatGlyphs.Count; i++)
             {
+                var g = BeatGlyphs[i];
                 g.X = (int)(gx);
                 gx += g.Width + glyphSpacing;
                 g.ApplyGlyphSpacing(glyphSpacing);
@@ -43,8 +44,9 @@ namespace AlphaTab.Rendering.Glyphs
 
         public void RegisterMaxSizes(BarSizeInfo sizes)
         {
-            foreach (var b in BeatGlyphs)
+            for (int i = 0; i < BeatGlyphs.Count; i++)
             {
+                var b = BeatGlyphs[i];
                 b.RegisterMaxSizes(sizes);
             }
         }
@@ -82,9 +84,9 @@ namespace AlphaTab.Rendering.Glyphs
 
         public void FinalizeGlyph(ScoreLayout layout)
         {
-            foreach (var b in BeatGlyphs)
+            for (int i = 0; i < BeatGlyphs.Count; i++)
             {
-                b.FinalizeGlyph(layout);
+                BeatGlyphs[i].FinalizeGlyph(layout);
             }
         }
 
@@ -93,9 +95,9 @@ namespace AlphaTab.Rendering.Glyphs
         {
             //canvas.Color = new Color((byte) Random.Next(255), (byte) Random.Next(255), (byte) Random.Next(255), 128);
             //canvas.FillRect(cx + X, cy + Y, Width, 100);
-            foreach (var g in BeatGlyphs)
+            for (int i = 0; i < BeatGlyphs.Count; i++)
             {
-                g.Paint(cx + X, cy + Y, canvas);
+                BeatGlyphs[i].Paint(cx + X, cy + Y, canvas);
             }
         }
     }

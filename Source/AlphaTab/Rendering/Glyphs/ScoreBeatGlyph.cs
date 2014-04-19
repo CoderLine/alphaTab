@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Rendering.Layout;
 using AlphaTab.Rendering.Utils;
@@ -141,20 +142,35 @@ namespace AlphaTab.Rendering.Glyphs
             group.AddGlyph(new CircleGlyph(0, sr.GetScoreY(line, offset + 2), 1.5f * Scale));
         }
 
+        private static readonly FastDictionary<int, bool> NormalKeys;
+        private static readonly FastDictionary<int, bool> XKeys;
+
+        static ScoreBeatGlyph()
+        {
+            NormalKeys = new FastDictionary<int, bool>();
+            foreach (var i in new[] { 32, 34, 35, 36, 38, 39, 40, 41, 43, 45, 47, 48, 50, 55, 56, 58, 60, 61 })
+            {
+                NormalKeys[i] = true;
+            }
+            XKeys = new FastDictionary<int, bool>();
+            foreach (var i in new[] { 31, 33, 37, 42, 44, 54, 62, 63, 64, 65, 66 })
+            {
+                XKeys[i] = true;
+            }
+        }
+
         private Glyph CreateNoteHeadGlyph(Note n)
         {
             var isGrace = Container.Beat.GraceType != GraceType.None;
             if (n.Beat.Voice.Bar.Track.IsPercussion)
             {
-                HashSet<int> normalKeys = new HashSet<int>(new[] { 32, 34, 35, 36, 38, 39, 40, 41, 43, 45, 47, 48, 50, 55, 56, 58, 60, 61 });
-                HashSet<int> xKeys = new HashSet<int>(new[] { 31, 33, 37, 42, 44, 54, 62, 63, 64, 65, 66 });
                 var value = n.RealValue;
 
-                if (value <= 30 || value >= 67 || normalKeys.Contains(value))
+                if (value <= 30 || value >= 67 || NormalKeys.ContainsKey(value))
                 {
                     return new NoteHeadGlyph(0, 0, Duration.Quarter, isGrace);
                 }
-                if (xKeys.Contains(value))
+                if (XKeys.ContainsKey(value))
                 {
                     return new DrumSticksGlyph(0, 0, isGrace);
                 }

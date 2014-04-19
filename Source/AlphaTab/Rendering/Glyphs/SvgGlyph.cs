@@ -43,9 +43,9 @@ namespace AlphaTab.Rendering.Glyphs
             canvas.Color = new Color(0, 0, 0); // todo: Resources
             canvas.BeginPath();
 
-            foreach (var c in _svg.Commands)
+            for (int i = 0; i < _svg.Commands.Count; i++)
             {
-                ParseCommand(startX, startY, canvas, c);
+                ParseCommand(startX, startY, canvas, _svg.Commands[i]);
             }
             canvas.Fill();
         }

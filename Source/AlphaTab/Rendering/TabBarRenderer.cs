@@ -104,8 +104,9 @@ namespace AlphaTab.Rendering
 
         private void CreateVoiceGlyphs(Voice v)
         {
-            foreach (Beat b in v.Beats)
+            for (int i = 0; i < v.Beats.Count; i++)
             {
+                var b = v.Beats[i];
                 var container = new TabBeatContainerGlyph(b);
                 container.PreNotes = new TabBeatPreNotesGlyph();
                 container.OnNotes = new TabBeatGlyph();

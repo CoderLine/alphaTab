@@ -1,6 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using AlphaTab.Platform;
+using AlphaTab.Collections;
 
 namespace AlphaTab.Model
 {
@@ -15,12 +16,12 @@ namespace AlphaTab.Model
         [IntrinsicProperty]
         public Bar Bar { get; set; }
         [IntrinsicProperty]
-        public List<Beat> Beats { get; set; }
+        public FastList<Beat> Beats { get; set; }
 
         [IntrinsicProperty]
-        public Nullable<Duration> MinDuration { get; set; }
+        public Duration? MinDuration { get; set; }
         [IntrinsicProperty]
-        public Nullable<Duration> MaxDuration { get; set; }
+        public Duration? MaxDuration { get; set; }
 
         public bool IsEmpty
         {
@@ -32,7 +33,7 @@ namespace AlphaTab.Model
 
         public Voice()
         {
-            Beats = new List<Beat>();
+            Beats = new FastList<Beat>();
         }
 
         public void AddBeat(Beat beat)
@@ -78,16 +79,17 @@ namespace AlphaTab.Model
 
         public void Finish()
         {
-            foreach (var beat in Beats)
+            for (int i = 0; i < Beats.Count; i++)
             {
+                var beat = Beats[i];
                 beat.Finish();
                 if (MinDuration == null || MinDuration.Value > beat.Duration)
                 {
-                    MinDuration = new Nullable<Duration>(beat.Duration);
+                    MinDuration = beat.Duration;
                 }
                 if (MaxDuration == null || MaxDuration.Value < beat.Duration)
                 {
-                    MaxDuration = new Nullable<Duration>(beat.Duration);
+                    MaxDuration = beat.Duration;
                 }
             }
         }

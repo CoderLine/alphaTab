@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Xml;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 
@@ -50,46 +51,46 @@ namespace AlphaTab.Importer
         public Score Score { get; set; }
 
 
-        private Dictionary<string, List<Automation>> _automations;
+        private FastDictionary<string, FastList<Automation>> _automations;
         private string[] _tracksMapping;
-        private Dictionary<string, Track> _tracksById; // contains tracks by their id
+        private FastDictionary<string, Track> _tracksById; // contains tracks by their id
 
-        private List<MasterBar> _masterBars; // contains all masterbars in correct order
-        private List<string[]> _barsOfMasterBar; // contains ids of bars placed at this masterbar over all tracks (sequencially)
+        private FastList<MasterBar> _masterBars; // contains all masterbars in correct order
+        private FastList<string[]> _barsOfMasterBar; // contains ids of bars placed at this masterbar over all tracks (sequencially)
 
-        private Dictionary<string, Bar> _barsById; // contains bars by their id
-        private Dictionary<string, string[]> _voicesOfBar; // contains ids of voices stored in a bar (key = bar id)
+        private FastDictionary<string, Bar> _barsById; // contains bars by their id
+        private FastDictionary<string, string[]> _voicesOfBar; // contains ids of voices stored in a bar (key = bar id)
 
-        private Dictionary<string, Voice> _voiceById; // contains voices by their id
-        private Dictionary<string, string[]> _beatsOfVoice; // contains ids of beats stored in a voice (key = voice id) 
+        private FastDictionary<string, Voice> _voiceById; // contains voices by their id
+        private FastDictionary<string, string[]> _beatsOfVoice; // contains ids of beats stored in a voice (key = voice id) 
 
-        private Dictionary<string, string> _rhythmOfBeat; // contains ids of rhythm used by a beat (key = beat id)
-        private Dictionary<string, Beat> _beatById; // contains beats by their id
+        private FastDictionary<string, string> _rhythmOfBeat; // contains ids of rhythm used by a beat (key = beat id)
+        private FastDictionary<string, Beat> _beatById; // contains beats by their id
 
-        private Dictionary<string, GpxRhythm> _rhythmById; // contains rhythms by their id
+        private FastDictionary<string, GpxRhythm> _rhythmById; // contains rhythms by their id
 
-        private Dictionary<string, Note> _noteById; // contains notes by their id
-        private Dictionary<string, string[]> _notesOfBeat; // contains ids of notes stored in a beat (key = beat id);
-        private Dictionary<string, bool> _tappedNotes; // contains a flag indicating whether a note is tapped (key = note id);
+        private FastDictionary<string, Note> _noteById; // contains notes by their id
+        private FastDictionary<string, string[]> _notesOfBeat; // contains ids of notes stored in a beat (key = beat id);
+        private FastDictionary<string, bool> _tappedNotes; // contains a flag indicating whether a note is tapped (key = note id);
 
 
         public void ParseXml(string xml)
         {
-            _automations = new Dictionary<string, List<Automation>>();
+            _automations = new FastDictionary<string, FastList<Automation>>();
             _tracksMapping = new string[0];
-            _tracksById = new Dictionary<string, Track>();
-            _masterBars = new List<MasterBar>();
-            _barsOfMasterBar = new List<string[]>();
-            _voicesOfBar = new Dictionary<string, string[]>();
-            _barsById = new Dictionary<string, Bar>();
-            _voiceById = new Dictionary<string, Voice>();
-            _beatsOfVoice = new Dictionary<string, string[]>();
-            _beatById = new Dictionary<string, Beat>();
-            _rhythmOfBeat = new Dictionary<string, string>();
-            _rhythmById = new Dictionary<string, GpxRhythm>();
-            _notesOfBeat = new Dictionary<string, string[]>();
-            _noteById = new Dictionary<string, Note>();
-            _tappedNotes = new Dictionary<string, bool>();
+            _tracksById = new FastDictionary<string, Track>();
+            _masterBars = new FastList<MasterBar>();
+            _barsOfMasterBar = new FastList<string[]>();
+            _voicesOfBar = new FastDictionary<string, string[]>();
+            _barsById = new FastDictionary<string, Bar>();
+            _voiceById = new FastDictionary<string, Voice>();
+            _beatsOfVoice = new FastDictionary<string, string[]>();
+            _beatById = new FastDictionary<string, Beat>();
+            _rhythmOfBeat = new FastDictionary<string, string>();
+            _rhythmById = new FastDictionary<string, GpxRhythm>();
+            _notesOfBeat = new FastDictionary<string, string[]>();
+            _noteById = new FastDictionary<string, Note>();
+            _tappedNotes = new FastDictionary<string, bool>();
 
             XmlDocument dom;
 #if CSharp
@@ -308,7 +309,7 @@ namespace AlphaTab.Importer
             {
                 if (!_automations.ContainsKey(barId))
                 {
-                    _automations[barId] = new List<Automation>();
+                    _automations[barId] = new FastList<Automation>();
                 }
                 _automations[barId].Add(automation);
             }
@@ -435,7 +436,8 @@ namespace AlphaTab.Importer
                     {
                         tuning[tuning.Length - 1 - i] = Std.ParseInt(tuningParts[i]);
                     }
-                    track.Tuning = new List<int>(tuning);
+                    track.Tuning = new FastList<int>();
+                    track.Tuning.AddRange(tuning);
                     break;
                 case "DiagramCollection":
                     ParseDiagramCollection(track, node);
@@ -710,13 +712,13 @@ namespace AlphaTab.Importer
                             switch (GetValue(c))
                             {
                                 case "1/2":
-                                    beat.TremoloSpeed = new Nullable<Duration>(Duration.Eighth);
+                                    beat.TremoloSpeed = Duration.Eighth;
                                     break;
                                 case "1/4":
-                                    beat.TremoloSpeed = new Nullable<Duration>(Duration.Sixteenth);
+                                    beat.TremoloSpeed = Duration.Sixteenth;
                                     break;
                                 case "1/8":
-                                    beat.TremoloSpeed = new Nullable<Duration>(Duration.ThirtySecond);
+                                    beat.TremoloSpeed = Duration.ThirtySecond;
                                     break;
                             }
                             break;
@@ -802,9 +804,9 @@ namespace AlphaTab.Importer
         {
             bool isWhammy = false;
             BendPoint whammyOrigin = null;
-            Nullable<int> whammyMiddleValue = null;
-            Nullable<int> whammyMiddleOffset1 = null;
-            Nullable<int> whammyMiddleOffset2 = null;
+            int? whammyMiddleValue = null;
+            int? whammyMiddleOffset1 = null;
+            int? whammyMiddleOffset2 = null;
             BendPoint whammyDestination = null;
 
             foreach (XmlNode c in node.ChildNodes)
@@ -877,17 +879,14 @@ namespace AlphaTab.Importer
                                     break;
 
                                 case "WhammyBarMiddleValue":
-                                    whammyMiddleValue = new Nullable<int>(
-                                        (int)(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointValueFactor));
+                                    whammyMiddleValue = (int)(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointValueFactor);
                                     break;
 
                                 case "WhammyBarMiddleOffset1":
-                                    whammyMiddleOffset1 = new Nullable<int>(
-                                        (int)(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointPositionFactor));
+                                    whammyMiddleOffset1 = (int)(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointPositionFactor);
                                     break;
                                 case "WhammyBarMiddleOffset2":
-                                    whammyMiddleOffset2 =new Nullable<int>(
-                                        (int) (Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointPositionFactor));
+                                    whammyMiddleOffset2 = (int) (Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointPositionFactor);
                                     break;
 
                                 case "WhammyBarDestinationValue":
@@ -914,7 +913,7 @@ namespace AlphaTab.Importer
             {
                 if (whammyOrigin == null) whammyOrigin = new BendPoint();
                 if (whammyDestination == null) whammyDestination = new BendPoint(BendPoint.MaxPosition);
-                var whammy = new List<BendPoint>();
+                var whammy = new FastList<BendPoint>();
                 whammy.Add(whammyOrigin);
                 if (whammyMiddleOffset1 != null && whammyMiddleValue != null)
                 {
@@ -1023,9 +1022,9 @@ namespace AlphaTab.Importer
         {
             bool isBended = false;
             BendPoint bendOrigin = null;
-            Nullable<int> bendMiddleValue = null;
-            Nullable<int> bendMiddleOffset1 = null;
-            Nullable<int> bendMiddleOffset2 = null;
+            int? bendMiddleValue = null;
+            int? bendMiddleOffset1 = null;
+            int? bendMiddleOffset2 = null;
             BendPoint bendDestination = null;
 
             foreach (XmlNode c in node.ChildNodes)
@@ -1110,14 +1109,14 @@ namespace AlphaTab.Importer
                                     break;
 
                                 case "BendMiddleValue":
-                                    bendMiddleValue = new Nullable<int>((int)(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointValueFactor));
+                                    bendMiddleValue = (int)(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointValueFactor);
                                     break;
 
                                 case "BendMiddleOffset1":
-                                    bendMiddleOffset1 = new Nullable<int>((int)(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointPositionFactor));
+                                    bendMiddleOffset1 = (int)(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointPositionFactor);
                                     break;
                                 case "BendMiddleOffset2":
-                                    bendMiddleOffset2 = new Nullable<int>((int)(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointPositionFactor));
+                                    bendMiddleOffset2 = (int)(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointPositionFactor);
                                     break;
 
                                 case "BendDestinationValue":
@@ -1163,7 +1162,7 @@ namespace AlphaTab.Importer
             {
                 if (bendOrigin == null) bendOrigin = new BendPoint();
                 if (bendDestination == null) bendDestination = new BendPoint(BendPoint.MaxPosition);
-                var bend = new List<BendPoint>();
+                var bend = new FastList<BendPoint>();
                 bend.Add(bendOrigin);
                 if (bendMiddleOffset1 != null && bendMiddleValue != null)
                 {
@@ -1364,8 +1363,9 @@ namespace AlphaTab.Importer
             
                 // iterate all bar definitions for the masterbars
                 // and add the correct bar to the track
-                foreach (var barIds in _barsOfMasterBar)
+                for (int i = 0; i < _barsOfMasterBar.Count; i++)
                 {
+                    var barIds = _barsOfMasterBar[i];
                     var barId = barIds[trackIndex];
                     if (barId != InvalidId)
                     {
@@ -1380,12 +1380,14 @@ namespace AlphaTab.Importer
             foreach (var barId in _automations.Keys)
             {
                 var bar = _barsById[barId];
-                foreach (var v in bar.Voices)
+                for (int i = 0; i < bar.Voices.Count; i++)
                 {
+                    var v = bar.Voices[i];
                     if (v.Beats.Count > 0)
                     {
-                        foreach (var automation in _automations[barId])
+                        for (int j = 0; j < _automations[barId].Count; j++)
                         {
+                            var automation = _automations[barId][j];
                             v.Beats[0].Automations.Add(automation);
                         }
                     }
@@ -1393,8 +1395,9 @@ namespace AlphaTab.Importer
             } 
 
              // build score
-            foreach (var masterBar in _masterBars)
+            for (int i = 0; i < _masterBars.Count; i++)
             {
+                var masterBar = _masterBars[i];
                 Score.AddMasterBar(masterBar);
             }
 
@@ -1403,8 +1406,9 @@ namespace AlphaTab.Importer
             {
                 var automations = _automations[barId];
                 var bar = _barsById[barId];
-                foreach (var automation in automations)
+                for (int i = 0; i < automations.Count; i++)
                 {
+                    var automation = automations[i];
                     if (automation.Type == AutomationType.Tempo)
                     {
                         if (barId == "0") // // TODO find the correct first bar id

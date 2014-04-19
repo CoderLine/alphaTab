@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using AlphaTab.Collections;
 
 namespace AlphaTab.Model
 {
@@ -13,11 +14,11 @@ namespace AlphaTab.Model
         [IntrinsicProperty]
         public int FirstFret { get; set; }
         [IntrinsicProperty]
-        public List<int> Strings { get; set; }
+        public FastList<int> Strings { get; set; }
 
         public Chord()
         {
-            Strings = new List<int>();
+            Strings = new FastList<int>();
         }
     }
 }

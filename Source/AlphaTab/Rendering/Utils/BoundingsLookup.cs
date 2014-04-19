@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Utils
@@ -48,11 +49,11 @@ namespace AlphaTab.Rendering.Utils
         public Bounds VisualBounds { get; set; }
 
         [IntrinsicProperty]
-        public List<BeatBoundings> Beats { get; set; }
+        public FastList<BeatBoundings> Beats { get; set; }
 
         public BarBoundings()
         {
-            Beats = new List<BeatBoundings>();
+            Beats = new FastList<BeatBoundings>();
         }
 
         public Beat FindBeatAtPos(int x)
@@ -71,11 +72,11 @@ namespace AlphaTab.Rendering.Utils
     public class BoundingsLookup
     {
         [IntrinsicProperty]
-        public List<BarBoundings> Bars { get; set; }
+        public FastList<BarBoundings> Bars { get; set; }
 
         public BoundingsLookup()
         {
-            Bars = new List<BarBoundings>();
+            Bars = new FastList<BarBoundings>();
         }
 
         public Beat GetBeatAtPos(int x, int y)

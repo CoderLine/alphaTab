@@ -1,6 +1,4 @@
-﻿using System;
-using System.Runtime;
-using AlphaTab.Platform;
+﻿using AlphaTab.Platform;
 
 namespace AlphaTab.IO
 {

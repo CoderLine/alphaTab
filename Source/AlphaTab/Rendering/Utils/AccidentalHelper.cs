@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Utils
@@ -35,11 +36,11 @@ namespace AlphaTab.Rendering.Utils
         /// this int-hash stores the registered accidentals for
         /// all octaves and notes within an octave. 
         /// </summary>
-        private readonly Dictionary<int, AccidentalType> _registeredAccidentals;
+        private readonly FastDictionary<int, AccidentalType> _registeredAccidentals;
 
         public AccidentalHelper()
         {
-            _registeredAccidentals = new Dictionary<int, AccidentalType>();
+            _registeredAccidentals = new FastDictionary<int, AccidentalType>();
         }
 
         /// <summary>

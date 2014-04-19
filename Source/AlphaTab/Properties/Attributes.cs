@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace System.Runtime.CompilerServices
+﻿namespace System.Runtime.CompilerServices
 {
 #if CSharp
     [AttributeUsage(AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
@@ -59,6 +57,22 @@ namespace System.Runtime.CompilerServices
         public string GeneratedMethodName { get; set; }
         public string NonVirtualCode { get; set; }
         public string NonExpandedFormCode { get; set; }
+    }
+
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface | AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
+    public sealed class IncludeGenericArgumentsAttribute : Attribute
+    {
+        public IncludeGenericArgumentsAttribute()
+        {
+            Include = true;
+        }
+
+        public IncludeGenericArgumentsAttribute(bool include)
+        {
+            Include = include;
+        }
+
+        public bool Include { get; private set; }
     }
 #endif
 }

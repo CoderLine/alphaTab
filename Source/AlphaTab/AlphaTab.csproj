@@ -48,6 +48,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\FastDictionary.cs" />
+    <Compile Include="Collections\FastList.cs" />
     <Compile Include="Properties\Attributes.cs" />
     <Compile Include="Audio\GeneralMidi.cs" />
     <Compile Include="Audio\Generator\IMidiFileHandler.cs" />
@@ -99,7 +101,6 @@
     <Compile Include="Model\Fingers.cs" />
     <Compile Include="Model\GraceType.cs" />
     <Compile Include="Model\HarmonicType.cs" />
-    <Compile Include="Model\HashSet.cs" />
     <Compile Include="Model\KeySignatureType.cs" />
     <Compile Include="Model\MasterBar.cs" />
     <Compile Include="Model\ModelUtils.cs" />
@@ -130,7 +131,6 @@
     <Compile Include="Platform\Model\Font.cs" />
     <Compile Include="Platform\Model\TextAlign.cs" />
     <Compile Include="Platform\Model\TextBaseline.cs" />
-    <Compile Include="Platform\Nullable.cs" />
     <Compile Include="Platform\Std.cs" />
     <Compile Include="Rendering\AlternateEndingsBarRenderer.cs" />
     <Compile Include="Rendering\AlternateEndingsBarRendererFactory.cs" />

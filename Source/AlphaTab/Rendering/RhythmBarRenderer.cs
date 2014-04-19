@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Rendering.Glyphs;
@@ -39,8 +40,9 @@ namespace AlphaTab.Rendering
 
         private void CreateVoiceGlyphs(Voice voice)
         {
-            foreach (var b in voice.Beats)
+            for (int i = 0; i < voice.Beats.Count; i++)
             {
+                var b = voice.Beats[i];
                 // we create empty glyphs as alignment references and to get the 
                 // effect bar sized
                 var container = new BeatContainerGlyph(b);
@@ -59,11 +61,12 @@ namespace AlphaTab.Rendering
         {
             base.Paint(cx, cy, canvas);
 
-            foreach (List<BeamingHelper> v in _helpers.BeamHelpers)
+            for (int i = 0; i < _helpers.BeamHelpers.Count; i++)
             {
-                foreach (BeamingHelper h in v)
+                var v = _helpers.BeamHelpers[i];
+                for (int j = 0; j < v.Count; j++)
                 {
-                    PaintBeamHelper(cx + BeatGlyphsStart, cy, canvas, h);
+                    PaintBeamHelper(cx + BeatGlyphsStart, cy, canvas, v[j]);
                 }
             }
         }

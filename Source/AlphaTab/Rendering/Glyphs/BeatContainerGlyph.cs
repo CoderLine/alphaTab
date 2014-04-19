@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Rendering.Layout;
@@ -20,13 +21,13 @@ namespace AlphaTab.Rendering.Glyphs
         [IntrinsicProperty]
         public BeatGlyphBase PostNotes { get; set; }
         [IntrinsicProperty]
-        public List<Glyph> Ties { get; set; }
+        public FastList<Glyph> Ties { get; set; }
 
         public BeatContainerGlyph(Beat beat)
             : base(0, 0)
         {
             Beat = beat;
-            Ties = new List<Glyph>();
+            Ties = new FastList<Glyph>();
         }
 
         public void FinalizeGlyph(ScoreLayout layout)
@@ -153,8 +154,9 @@ namespace AlphaTab.Rendering.Glyphs
             //canvas.Color = new Color(0, 0, 200, 100);
             //canvas.FillRect(cx + X + PostNotes.X, cy + Y + PostNotes.Y + 20, PostNotes.Width, 10);
 
-            foreach (var t in Ties)
+            for (int i = 0; i < Ties.Count; i++)
             {
+                var t = Ties[i];
                 t.Renderer = Renderer;
                 t.Paint(cx, cy + Y, canvas);
             }

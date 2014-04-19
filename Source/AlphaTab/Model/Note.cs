@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using AlphaTab.Collections;
 
 namespace AlphaTab.Model
 {
@@ -14,7 +15,7 @@ namespace AlphaTab.Model
         [IntrinsicProperty]
         public AccentuationType Accentuated { get; set; }
         [IntrinsicProperty]
-        public List<BendPoint> BendPoints { get; set; }
+        public FastList<BendPoint> BendPoints { get; set; }
         public bool HasBend { get { return BendPoints.Count > 0; } }
 
         [IntrinsicProperty]
@@ -22,13 +23,12 @@ namespace AlphaTab.Model
         [IntrinsicProperty]
         public int String { get; set; }
 
-
+        [IntrinsicProperty]
+        public bool IsHammerPullOrigin { get; set; }
         [IntrinsicProperty]
         public Note HammerPullOrigin { get; set; }
         [IntrinsicProperty]
-        public bool IsHammerPullDestination { get; set; }
-        [IntrinsicProperty]
-        public bool IsHammerPullOrigin { get; set; }
+        public Note HammerPullDestination { get; set; }
 
         [IntrinsicProperty]
         public float HarmonicValue { get; set; }
@@ -120,7 +120,7 @@ namespace AlphaTab.Model
 
         public Note()
         {
-            BendPoints = new List<BendPoint>();
+            BendPoints = new FastList<BendPoint>();
             Dynamic = DynamicValue.F;
 
             Accentuated = AccentuationType.None;
@@ -141,16 +141,17 @@ namespace AlphaTab.Model
         public Note Clone()
         {
             var n = new Note();
-            foreach (var p in BendPoints)
+            for (int i = 0; i < BendPoints.Count; i++)
             {
-                n.BendPoints.Add(p.Clone());
+                n.BendPoints.Add(BendPoints[i].Clone());
             }
             n.Dynamic = Dynamic;
             n.Accentuated = Accentuated;
             n.Fret = Fret;
             n.IsGhost = IsGhost;
             n.String = String;
-            n.IsHammerPullDestination = IsHammerPullDestination;
+            n.HammerPullDestination = HammerPullDestination;
+            n.HammerPullOrigin = HammerPullOrigin;
             n.IsHammerPullOrigin = IsHammerPullOrigin;
             n.HarmonicValue = HarmonicValue;
             n.HarmonicType = HarmonicType;
@@ -202,8 +203,8 @@ namespace AlphaTab.Model
                 }
                 else
                 {
-                    nextNoteOnLine.Value.IsHammerPullDestination = true;
-                    nextNoteOnLine.Value.HammerPullOrigin = this;
+                    HammerPullDestination = nextNoteOnLine.Value;
+                    HammerPullDestination.HammerPullOrigin = this;
                 }
             }
 

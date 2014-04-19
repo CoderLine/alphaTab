@@ -14,18 +14,32 @@ namespace AlphaTab.Rendering.Glyphs
         {
             if (EndNote == null) return;
 
-            TabBarRenderer r = (TabBarRenderer)Renderer;
+            TabBarRenderer glyphRenderer = (TabBarRenderer)Renderer;
 
-            // check if the bar renderer of the next bar is on the same stave line
-            bool isOnSameLine = r.Stave.StaveGroup.MasterBars.Contains(EndNote.Beat.Voice.Bar.MasterBar);
-            Note endNote = isOnSameLine ? EndNote : null;
+            TabBarRenderer startNoteRenderer =
+                (TabBarRenderer)glyphRenderer.Stave.GetRendererForBar(StartNote.Beat.Voice.Bar.Index);
+            TabBarRenderer endNoteRenderer =
+                (TabBarRenderer)glyphRenderer.Stave.GetRendererForBar(EndNote.Beat.Voice.Bar.Index);
+
+
+            // TODO: expand tie to next bar if possible
+            Note endNote;
+            if (startNoteRenderer != endNoteRenderer)
+            {
+                endNote = null;
+                endNoteRenderer = startNoteRenderer;
+            }
+            else
+            {
+                endNote = EndNote;
+            }
 
             TabBeatContainerGlyph parent = (TabBeatContainerGlyph)Parent;
-            var res = r.Resources;
-            var startX = cx + r.GetNoteX(StartNote, false);
+            var res = glyphRenderer.Resources;
+            var startX = cx + startNoteRenderer.GetNoteX(StartNote, false);
             var endX = endNote == null
                         ? cx + parent.X + parent.PostNotes.X + parent.PostNotes.Width  // end of beat container
-                        : cx + r.GetNoteX(endNote, false);
+                        : cx + endNoteRenderer.GetNoteX(endNote, false);
 
             var down = StartNote.String > 3;
             var offset = (res.TablatureFont.Size / 2);
@@ -34,8 +48,8 @@ namespace AlphaTab.Rendering.Glyphs
                 offset *= -1;
             }
 
-            var startY = cy + r.GetNoteY(StartNote) + offset;
-            var endY = endNote == null ? startY : cy + r.GetNoteY(endNote) + offset;
+            var startY = cy + startNoteRenderer.GetNoteY(StartNote) + offset;
+            var endY = endNote == null ? startY : cy + endNoteRenderer.GetNoteY(endNote) + offset;
 
             PaintTie(canvas, Scale, startX, startY, endX, endY, StartNote.String > 3);
 

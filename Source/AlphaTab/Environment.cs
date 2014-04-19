@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using AlphaTab.Collections;
 using AlphaTab.Platform;
 using AlphaTab.Platform.Svg;
 using AlphaTab.Rendering;
@@ -16,17 +17,17 @@ namespace AlphaTab
     /// </summary>
     public class Environment
     {
-        public static Dictionary<string, Func<object, ICanvas>> RenderEngines;
-        public static Dictionary<string, Func<IFileLoader>> FileLoaders;
-        public static Dictionary<string, Func<ScoreRenderer, ScoreLayout>> LayoutEngines;
-        public static Dictionary<string, Func<ScoreLayout, BarRendererFactory>> StaveFactories;
+        public static FastDictionary<string, Func<object, ICanvas>> RenderEngines;
+        public static FastDictionary<string, Func<IFileLoader>> FileLoaders;
+        public static FastDictionary<string, Func<ScoreRenderer, ScoreLayout>> LayoutEngines;
+        public static FastDictionary<string, Func<ScoreLayout, BarRendererFactory>> StaveFactories;
 
         static Environment()
         {
-            RenderEngines = new Dictionary<string, Func<object, ICanvas>>();
-            FileLoaders = new Dictionary<string, Func<IFileLoader>>();
-            LayoutEngines = new Dictionary<string, Func<ScoreRenderer, ScoreLayout>>();
-            StaveFactories = new Dictionary<string, Func<ScoreLayout, BarRendererFactory>>();
+            RenderEngines = new FastDictionary<string, Func<object, ICanvas>>();
+            FileLoaders = new FastDictionary<string, Func<IFileLoader>>();
+            LayoutEngines = new FastDictionary<string, Func<ScoreRenderer, ScoreLayout>>();
+            StaveFactories = new FastDictionary<string, Func<ScoreLayout, BarRendererFactory>>();
 
 #if CSharp
             RenderEngines["default"] = d => new AlphaTab.Platform.CSharp.GdiCanvas();

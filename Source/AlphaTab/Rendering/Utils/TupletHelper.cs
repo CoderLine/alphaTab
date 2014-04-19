@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Utils
@@ -9,7 +10,7 @@ namespace AlphaTab.Rendering.Utils
         private bool _isFinished;
 
         [IntrinsicProperty]
-        public List<Beat> Beats { get; set; }
+        public FastList<Beat> Beats { get; set; }
         [IntrinsicProperty]
         public int VoiceIndex { get; set; }
         [IntrinsicProperty]
@@ -18,7 +19,7 @@ namespace AlphaTab.Rendering.Utils
         public TupletHelper(int voice)
         {
             VoiceIndex = voice;
-            Beats = new List<Beat>();
+            Beats = new FastList<Beat>();
         }
 
         public bool IsFull

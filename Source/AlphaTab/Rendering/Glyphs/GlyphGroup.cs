@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using AlphaTab.Collections;
 using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
@@ -10,20 +10,21 @@ namespace AlphaTab.Rendering.Glyphs
     /// </summary>
     public class GlyphGroup : Glyph
     {
-        protected List<Glyph> Glyphs;
+        protected FastList<Glyph> Glyphs;
 
-        public GlyphGroup(int x, int y, List<Glyph> glyphs)
+        public GlyphGroup(int x, int y, FastList<Glyph> glyphs)
             :base(x,y)
         {
-            Glyphs = glyphs ?? new List<Glyph>();
+            Glyphs = glyphs ?? new FastList<Glyph>();
 
         }
 
         public override void DoLayout()
         {
             var w = 0;
-            foreach (var g in Glyphs)
+            for (int i = 0; i < Glyphs.Count; i++)
             {
+                var g = Glyphs[i];
                 g.Renderer = Renderer;
                 g.DoLayout();
                 w = Math.Max(w, g.Width);
@@ -38,8 +39,9 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void Paint(int cx, int cy, ICanvas canvas)
         {
-            foreach (var g in Glyphs)
+            for (int i = 0; i < Glyphs.Count; i++)
             {
+                var g = Glyphs[i];
                 g.Renderer = Renderer;
                 g.Paint(cx + X, cy + Y, canvas);
             }

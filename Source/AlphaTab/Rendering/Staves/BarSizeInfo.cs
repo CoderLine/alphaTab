@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using AlphaTab.Collections;
 
 namespace AlphaTab.Rendering.Staves
 {
@@ -13,21 +14,21 @@ namespace AlphaTab.Rendering.Staves
         [IntrinsicProperty]
         public int FullWidth { get; set; }
         [IntrinsicProperty]
-        public Dictionary<string, int> Sizes { get; set; }
+        public FastDictionary<string, int> Sizes { get; set; }
 
         [IntrinsicProperty]
-        public Dictionary<int, int> PreNoteSizes { get; set; }
+        public FastDictionary<int, int> PreNoteSizes { get; set; }
         [IntrinsicProperty]
-        public Dictionary<int, int> OnNoteSizes { get; set; }
+        public FastDictionary<int, int> OnNoteSizes { get; set; }
         [IntrinsicProperty]
-        public Dictionary<int, int> PostNoteSizes { get; set; }
+        public FastDictionary<int, int> PostNoteSizes { get; set; }
 
         public BarSizeInfo()
         {
-            Sizes = new Dictionary<string, int>();
-            PreNoteSizes = new Dictionary<int, int>();
-            OnNoteSizes = new Dictionary<int, int>();
-            PostNoteSizes = new Dictionary<int, int>();
+            Sizes = new FastDictionary<string, int>();
+            PreNoteSizes = new FastDictionary<int, int>();
+            OnNoteSizes = new FastDictionary<int, int>();
+            PostNoteSizes = new FastDictionary<int, int>();
             FullWidth = 0;
         }
 

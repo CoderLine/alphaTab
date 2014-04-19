@@ -40,10 +40,12 @@ namespace AlphaTab.Rendering.Layout
             group.Layout = this;
         
             var isFirstTrack = true;
-            foreach (var track in Renderer.Tracks)
-            {               
-                foreach (var s in Renderer.Settings.Staves)
+            for (int i = 0; i < Renderer.Tracks.Length; i++)
+            {
+                var track = Renderer.Tracks[i];
+                for (int j = 0; j < Renderer.Settings.Staves.Count; j++)
                 {
+                    var s = Renderer.Settings.Staves[j];
                     if (Environment.StaveFactories.ContainsKey(s.Id))
                     {
                         var factory = Environment.StaveFactories[s.Id](this);

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Utils
@@ -7,29 +8,31 @@ namespace AlphaTab.Rendering.Utils
     public class BarHelpers
     {
         [IntrinsicProperty]
-        public List<List<BeamingHelper>> BeamHelpers { get; set; }
+        public FastList<FastList<BeamingHelper>> BeamHelpers { get; set; }
         [IntrinsicProperty]
-        public List<Dictionary<int, BeamingHelper>> BeamHelperLookup { get; set; }
+        public FastList<FastDictionary<int, BeamingHelper>> BeamHelperLookup { get; set; }
         [IntrinsicProperty]
-        public List<List<TupletHelper>> TupletHelpers { get; set; }
+        public FastList<FastList<TupletHelper>> TupletHelpers { get; set; }
 
         public BarHelpers(Bar bar)
         {
-            BeamHelpers = new List<List<BeamingHelper>>();
-            BeamHelperLookup = new List<Dictionary<int, BeamingHelper>>();
-            TupletHelpers = new List<List<TupletHelper>>();
+            BeamHelpers = new FastList<FastList<BeamingHelper>>();
+            BeamHelperLookup = new FastList<FastDictionary<int, BeamingHelper>>();
+            TupletHelpers = new FastList<FastList<TupletHelper>>();
 
             BeamingHelper currentBeamHelper = null;
             TupletHelper currentTupletHelper = null;
 
-            foreach (var v in bar.Voices)
+            for (int i = 0; i < bar.Voices.Count; i++)
             {
-                BeamHelpers.Add(new List<BeamingHelper>());
-                BeamHelperLookup.Add(new Dictionary<int, BeamingHelper>());
-                TupletHelpers.Add(new List<TupletHelper>());
+                var v = bar.Voices[i];
+                BeamHelpers.Add(new FastList<BeamingHelper>());
+                BeamHelperLookup.Add(new FastDictionary<int, BeamingHelper>());
+                TupletHelpers.Add(new FastList<TupletHelper>());
 
-                foreach (var b in v.Beats)
+                for (int j = 0; j < v.Beats.Count; j++)
                 {
+                    var b = v.Beats[j];
                     var newBeamingHelper = false;
 
                     if (!b.IsRest)
@@ -84,21 +87,22 @@ namespace AlphaTab.Rendering.Utils
     public class BarHelpersGroup
     {
         [IntrinsicProperty]
-        public Dictionary<int, Dictionary<int, BarHelpers>> Helpers { get; set; }
+        public FastDictionary<int, FastDictionary<int, BarHelpers>> Helpers { get; set; }
 
         public BarHelpersGroup()
         {
-            Helpers = new Dictionary<int, Dictionary<int, BarHelpers>>();
+            Helpers = new FastDictionary<int, FastDictionary<int, BarHelpers>>();
         }
 
-        public void BuildHelpers(List<Track> tracks, int barIndex)
+        public void BuildHelpers(Track[] tracks, int barIndex)
         {
-            foreach (var t in tracks)
+            for (int i = 0; i < tracks.Length; i++)
             {
-                Dictionary<int, BarHelpers> h;
+                var t = tracks[i];
+                FastDictionary<int, BarHelpers> h;
                 if (!Helpers.ContainsKey(t.Index))
                 {
-                    h = new Dictionary<int, BarHelpers>();
+                    h = new FastDictionary<int, BarHelpers>();
                     Helpers[t.Index] = h;
                 }
                 else

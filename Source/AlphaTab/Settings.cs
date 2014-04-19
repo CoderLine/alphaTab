@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using AlphaTab.Collections;
 
 namespace AlphaTab
 {
@@ -48,7 +48,7 @@ namespace AlphaTab
         /// The staves to create for each row.
         /// </summary>
         [IntrinsicProperty]
-        public List<StaveSettings> Staves { get; set; }
+        public FastList<StaveSettings> Staves { get; set; }
 
         public static Settings Defaults
         {
@@ -63,7 +63,7 @@ namespace AlphaTab
 
                 settings.Layout = LayoutSettings.Defaults;
 
-                settings.Staves = new List<StaveSettings>();
+                settings.Staves = new FastList<StaveSettings>();
 
                 settings.Staves.Add(new StaveSettings("marker"));
                 //settings.staves.Add(new StaveSettings("triplet-feel"));
@@ -103,9 +103,10 @@ namespace AlphaTab
             return false;
         }
 
+        [InlineCode("Object.keys({json})")]
         private static string[] JsonKeys(dynamic json)
         {
-            return Object.Keys(json);
+            return null;
         }
 
         public static Settings fromJson(dynamic json)
@@ -145,7 +146,7 @@ namespace AlphaTab
 
             if (JsonExists(json, "staves"))
             {
-                settings.Staves = new List<StaveSettings>();
+                settings.Staves = new FastList<StaveSettings>();
                 string[] keys = JsonKeys(json.staves);
                 foreach (var key in keys)
                 {
@@ -207,7 +208,7 @@ namespace AlphaTab
         /// </ul>
         /// </summary>
         [IntrinsicProperty]
-        public Dictionary<string, object> AdditionalSettings { get; set; }
+        public FastDictionary<string, object> AdditionalSettings { get; set; }
 
         public T Get<T>(string key, T def)
         {
@@ -220,7 +221,7 @@ namespace AlphaTab
 
         public LayoutSettings()
         {
-            AdditionalSettings = new Dictionary<string, object>();
+            AdditionalSettings = new FastDictionary<string, object>();
         }
 
         public static LayoutSettings Defaults
@@ -270,12 +271,12 @@ namespace AlphaTab
         /// </ul>
         /// </summary>
         [IntrinsicProperty]
-        public Dictionary<string, object> AdditionalSettings { get; set; }
+        public FastDictionary<string, object> AdditionalSettings { get; set; }
 
         public StaveSettings(string id)
         {
             Id = id;
-            AdditionalSettings = new Dictionary<string, object>();
+            AdditionalSettings = new FastDictionary<string, object>();
         }
     }
 }

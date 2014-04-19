@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
+using AlphaTab.Collections;
 using AlphaTab.IO;
 using AlphaTab.Platform;
 
@@ -44,14 +45,14 @@ namespace AlphaTab.Importer
         /// Gets the list of files stored in this FileSystem.
         /// </summary>
         [IntrinsicProperty]
-        public List<GpxFile> Files { get; set; }
+        public FastList<GpxFile> Files { get; set; }
 
         /// <summary>
         /// Creates a new GpxFileSystem instance
         /// </summary>
         public GpxFileSystem()
         {
-            Files = new List<GpxFile>();
+            Files = new FastList<GpxFile>();
             FileFilter = s => true;
         }
 

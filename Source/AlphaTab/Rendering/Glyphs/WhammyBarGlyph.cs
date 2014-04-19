@@ -32,8 +32,9 @@ namespace AlphaTab.Rendering.Glyphs
             if (_beat.WhammyBarPoints.Count >= 2)
             {
                 var dy = sizeY / Beat.WhammyBarMaxValue;
-                foreach (var pt in _beat.WhammyBarPoints)
+                for (int i = 0; i < _beat.WhammyBarPoints.Count; i++)
                 {
+                    var pt = _beat.WhammyBarPoints[i];
                     var ptY = 0 - (dy * pt.Value);
                     if (ptY > maxY) maxY = ptY;
                     if (ptY < minY) minY = ptY;

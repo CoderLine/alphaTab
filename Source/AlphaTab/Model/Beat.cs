@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using AlphaTab.Audio;
-using AlphaTab.Platform;
+using AlphaTab.Collections;
 
 namespace AlphaTab.Model
 {
@@ -24,7 +24,7 @@ namespace AlphaTab.Model
         [IntrinsicProperty]
         public Voice Voice { get; set; }
         [IntrinsicProperty]
-        public List<Note> Notes { get; set; }
+        public FastList<Note> Notes { get; set; }
         [IntrinsicProperty]
         public bool IsEmpty { get; set; }
 
@@ -68,14 +68,14 @@ namespace AlphaTab.Model
         }
 
         [IntrinsicProperty]
-        public List<Automation> Automations { get; set; }
+        public FastList<Automation> Automations { get; set; }
 
         [IntrinsicProperty]
         public int Dots { get; set; }
         [IntrinsicProperty]
         public bool FadeIn { get; set; }
         [IntrinsicProperty]
-        public List<string> Lyrics { get; set; }
+        public FastList<string> Lyrics { get; set; }
         [IntrinsicProperty]
         public bool Pop { get; set; }
         [IntrinsicProperty]
@@ -107,7 +107,7 @@ namespace AlphaTab.Model
         }
 
         [IntrinsicProperty]
-        public List<BendPoint> WhammyBarPoints { get; set; }
+        public FastList<BendPoint> WhammyBarPoints { get; set; }
 
         public bool HasWhammyBar
         {
@@ -142,7 +142,7 @@ namespace AlphaTab.Model
         }
 
         [IntrinsicProperty]
-        public Nullable<Duration> TremoloSpeed { get; set; }
+        public Duration? TremoloSpeed { get; set; }
         [IntrinsicProperty]
         public CrescendoType Crescendo { get; set; }
 
@@ -156,15 +156,15 @@ namespace AlphaTab.Model
 
         public Beat()
         {
-            WhammyBarPoints = new List<BendPoint>();
-            Notes = new List<Note>();
+            WhammyBarPoints = new FastList<BendPoint>();
+            Notes = new FastList<Note>();
             BrushType = BrushType.None;
             Vibrato = VibratoType.None;
             GraceType = GraceType.None;
             PickStroke = PickStrokeType.None;
             Duration = Duration.Quarter;
             TremoloSpeed = null;
-            Automations = new List<Automation>();
+            Automations = new FastList<Automation>();
             Dots = 0;
             Start = 0;
             TupletDenominator = -1;
@@ -176,13 +176,13 @@ namespace AlphaTab.Model
         public Beat Clone()
         {
             var beat = new Beat();
-            foreach (var b in WhammyBarPoints)
+            for (int i = 0; i < WhammyBarPoints.Count; i++)
             {
-                beat.WhammyBarPoints.Add(b.Clone());
+                beat.WhammyBarPoints.Add(WhammyBarPoints[i].Clone());
             }
-            foreach (var n in Notes)
+            for (int i = 0; i < Notes.Count; i++)
             {
-                beat.AddNote(n.Clone());
+                beat.AddNote(Notes[i].Clone());
             }
             beat.Dots = Dots;
             beat.ChordId = ChordId;
@@ -197,9 +197,9 @@ namespace AlphaTab.Model
             beat.Tap = Tap;
             beat.Slap = Slap;
             beat.Pop = Pop;
-            foreach (var a in Automations)
+            for (int i = 0; i < Automations.Count; i++)
             {
-                beat.Automations.Add(a.Clone());
+                beat.Automations.Add(Automations[i].Clone());
             }
             beat.Start = Start;
             beat.TupletDenominator = TupletDenominator;
@@ -242,8 +242,9 @@ namespace AlphaTab.Model
 
         public void RefreshNotes()
         {
-            foreach (var note in Notes)
+            for (int i = 0; i < Notes.Count; i++)
             {
+                var note = Notes[i];
                 if (_minNote == null || note.RealValue < _minNote.RealValue)
                 {
                     _minNote = note;
@@ -257,8 +258,9 @@ namespace AlphaTab.Model
 
         public Automation GetAutomation(AutomationType type)
         {
-            foreach (var automation in Automations)
+            for (int i = 0; i < Automations.Count; i++)
             {
+                var automation = Automations[i];
                 if (automation.Type == type)
                 {
                     return automation;
@@ -269,8 +271,9 @@ namespace AlphaTab.Model
 
         public Note GetNoteOnString(int @string)
         {
-            foreach (var note in Notes)
+            for (int i = 0; i < Notes.Count; i++)
             {
+                var note = Notes[i];
                 if (note.String == @string)
                 {
                     return note;
@@ -291,9 +294,9 @@ namespace AlphaTab.Model
                 Start = PreviousBeat.Start + PreviousBeat.CalculateDuration();
             }
 
-            foreach (Note note in Notes)
+            for (int i = 0; i < Notes.Count; i++)
             {
-                note.Finish();
+                Notes[i].Finish();
             }
         }
     }

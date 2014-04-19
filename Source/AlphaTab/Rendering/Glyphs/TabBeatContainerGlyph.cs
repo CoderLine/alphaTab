@@ -11,9 +11,9 @@ namespace AlphaTab.Rendering.Glyphs
 
         protected override void CreateTies(Note n)
         {
-            if (n.IsHammerPullDestination && n.HammerPullOrigin != null)
+            if (n.IsHammerPullOrigin)
             {
-                var tie = new TabTieGlyph(n.HammerPullOrigin, n, this);
+                var tie = new TabTieGlyph(n, n.HammerPullDestination, this);
                 Ties.Add(tie);
             }
             else if (n.SlideType == SlideType.Legato)

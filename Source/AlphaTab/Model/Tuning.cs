@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using AlphaTab.Collections;
 using AlphaTab.Platform;
 
 namespace AlphaTab.Model
@@ -17,10 +18,10 @@ namespace AlphaTab.Model
 #endif
 
 
-        private static List<Tuning> _sevenStrings;
-        private static List<Tuning> _sixStrings;
-        private static List<Tuning> _fiveStrings;
-        private static List<Tuning> _fourStrings;
+        private static FastList<Tuning> _sevenStrings;
+        private static FastList<Tuning> _sixStrings;
+        private static FastList<Tuning> _fiveStrings;
+        private static FastList<Tuning> _fourStrings;
 
         /// <summary>
         /// Checks if the given string is a tuning inticator.
@@ -126,7 +127,7 @@ namespace AlphaTab.Model
             return b;
         }
 
-        public static List<Tuning> GetPresetsFor(int stringCount)
+        public static FastList<Tuning> GetPresetsFor(int stringCount)
         {
             if (_sevenStrings == null)
             {
@@ -149,15 +150,15 @@ namespace AlphaTab.Model
             {
                 return _fourStrings;
             }
-            return new List<Tuning>();
+            return new FastList<Tuning>();
         }
 
         private static void Initialize()
         {
-            _sevenStrings = new List<Tuning>();
-            _sixStrings = new List<Tuning>();
-            _fiveStrings = new List<Tuning>();
-            _fourStrings = new List<Tuning>();
+            _sevenStrings = new FastList<Tuning>();
+            _sixStrings = new FastList<Tuning>();
+            _fiveStrings = new FastList<Tuning>();
+            _fourStrings = new FastList<Tuning>();
 
             _sevenStrings.Add(new Tuning("Guitar 7 strings", new[] { 64, 59, 55, 50, 45, 40, 35 }, true));
 
@@ -215,11 +216,12 @@ namespace AlphaTab.Model
             _fourStrings.Add(new Tuning("Cello Tuning", new[] { 57, 50, 43, 36 }, false));
         }
 
-        public static Tuning FindTuning(List<int> strings)
+        public static Tuning FindTuning(FastList<int> strings)
         {
             var tunings = GetPresetsFor(strings.Count);
-            foreach (Tuning tuning in tunings)
+            for (int t = 0; t < tunings.Count; t++)
             {
+                var tuning = tunings[t];
                 var equals = true;
                 for (int i = 0; i < strings.Count; i++)
                 {
@@ -244,13 +246,14 @@ namespace AlphaTab.Model
         [IntrinsicProperty]
         public string Name { get; set; }
         [IntrinsicProperty]
-        public List<int> Tunings { get; set; }
+        public FastList<int> Tunings { get; set; }
 
-        public Tuning(string name, IEnumerable<int> tuning, bool isStandard) 
+        public Tuning(string name, int[] tuning, bool isStandard) 
         {
             IsStandard = isStandard;
             Name = name;
-            Tunings = new List<int>(tuning);
+            Tunings = new FastList<int>();
+            Tunings.AddRange(tuning);
         }
     }
 }

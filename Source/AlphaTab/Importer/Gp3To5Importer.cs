@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using AlphaTab.Collections;
 using AlphaTab.IO;
 using AlphaTab.Model;
 using AlphaTab.Platform.Model;
@@ -17,13 +18,13 @@ namespace AlphaTab.Importer
 
         private TripletFeel _globalTripletFeel;
 
-        private List<int> _lyricsIndex;
-        private List<string> _lyrics;
+        private FastList<int> _lyricsIndex;
+        private FastList<string> _lyrics;
 
         private int _barCount;
         private int _trackCount;
 
-        private List<PlaybackInformation> _playbackInfos;
+        private FastList<PlaybackInformation> _playbackInfos;
 
         public override Score ReadScore()
         {
@@ -159,8 +160,8 @@ namespace AlphaTab.Importer
 
         public void ReadLyrics()
         {
-            _lyrics = new List<string>();
-            _lyricsIndex = new List<int>();
+            _lyrics = new FastList<string>();
+            _lyricsIndex = new FastList<int>();
 
             ReadInt32();
             for (int i = 0; i < 5; i++)
@@ -198,7 +199,7 @@ namespace AlphaTab.Importer
 
         public void ReadPlaybackInfos()
         {
-            _playbackInfos = new List<PlaybackInformation>();
+            _playbackInfos = new FastList<PlaybackInformation>();
             for (int i = 0; i < 64; i++)
             {
                 PlaybackInformation info = new PlaybackInformation();
@@ -1166,8 +1167,6 @@ namespace AlphaTab.Importer
                     break;
                 case 3: // hammer
                     graceNote.IsHammerPullOrigin = true;
-                    note.IsHammerPullDestination = true;
-                    note.HammerPullOrigin = graceNote;
                     break;
             }
             graceNote.Dynamic = graceBeat.Dynamic;
@@ -1194,13 +1193,13 @@ namespace AlphaTab.Importer
             switch (speed)
             {
                 case 1:
-                    beat.TremoloSpeed = new Platform.Nullable<Duration>(Duration.Eighth);
+                    beat.TremoloSpeed = Duration.Eighth;
                     break;
                 case 2:
-                    beat.TremoloSpeed = new Platform.Nullable<Duration>(Duration.Sixteenth);
+                    beat.TremoloSpeed = Duration.Sixteenth;
                     break;
                 case 3:
-                    beat.TremoloSpeed = new Platform.Nullable<Duration>(Duration.ThirtySecond);
+                    beat.TremoloSpeed = Duration.ThirtySecond;
                     break;
             }
         }
@@ -1416,11 +1415,9 @@ namespace AlphaTab.Importer
 
         public int ReadInt32()
         {
-            int ch1 = _data.ReadByte();
-            int ch2 = _data.ReadByte();
-            int ch3 = _data.ReadByte();
-            int ch4 = _data.ReadByte();
-            return ch1 | ch2 << 8 | ch3 << 16 | ch4 << 24;
+            var bytes = new ByteArray(4);
+            _data.Read(bytes, 0, 4);
+            return bytes[0] | bytes[1] << 8 | bytes[2] << 16 | bytes[3] << 24;
         }
 
         /// <summary>
