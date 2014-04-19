@@ -1,8 +1,9 @@
-﻿using AlphaTab.Platform;
+﻿using AlphaTab.Model;
+using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class FadeInGlyph : Glyph
+    public class FadeInGlyph : EffectGlyph
     {
         public FadeInGlyph(int x , int y)
             : base(x, y)

@@ -17,7 +17,7 @@ namespace AlphaTab.Rendering.Effects
             return (int)(CrescendoGlyph.Height * renderer.Scale);
         }
 
-        public Glyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
+        public EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
         {
             return new CrescendoGlyph(0, 0, beat.Crescendo);
         }

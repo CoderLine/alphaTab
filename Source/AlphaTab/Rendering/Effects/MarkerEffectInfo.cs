@@ -17,7 +17,7 @@ namespace AlphaTab.Rendering.Effects
             return (int)(20 * renderer.Scale);
         }
 
-        public Glyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
+        public EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
         {
             return new TextGlyph(0, 0, beat.Voice.Bar.MasterBar.Section.Text, renderer.Resources.MarkerFont);
         }

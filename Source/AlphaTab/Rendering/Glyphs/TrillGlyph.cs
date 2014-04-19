@@ -1,9 +1,10 @@
 ﻿using System;
+using AlphaTab.Model;
 using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TrillGlyph : Glyph
+    public class TrillGlyph : EffectGlyph
     {
         private readonly float _scale;
 

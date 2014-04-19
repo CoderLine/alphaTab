@@ -1,9 +1,10 @@
-﻿using AlphaTab.Platform;
+﻿using AlphaTab.Model;
+using AlphaTab.Platform;
 using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TextGlyph : Glyph
+    public class TextGlyph : EffectGlyph
     {
         private readonly string _text;
         private readonly Font _font;
@@ -17,8 +18,6 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void Paint(int cx, int cy, ICanvas canvas)
         {
-            var res = Renderer.Resources;
-
             canvas.Font = _font;
             var old = canvas.TextAlign;
             canvas.TextAlign = TextAlign.Left;

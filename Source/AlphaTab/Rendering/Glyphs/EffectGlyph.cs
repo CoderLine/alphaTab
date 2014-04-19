@@ -6,8 +6,16 @@ namespace AlphaTab.Rendering.Glyphs
     /// Effect-Glyphs implementing this public interface get notified
     /// as they are expanded over multiple beats.
     /// </summary>
-    public interface IMultiBeatEffectGlyph
+    public class EffectGlyph : Glyph
     {
-        void ExpandTo(Beat beat);
+        protected EffectGlyph(int x, int y)
+            : base(x, y)
+        {
+        }
+
+        public virtual void ExpandTo(Beat beat)
+        {
+            
+        }
     }
 }

@@ -17,7 +17,7 @@ namespace AlphaTab.Rendering.Effects
             return (int)(20 * renderer.Scale);
         }
 
-        public Glyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
+        public EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
         {
             var res = renderer.Resources;
             if (beat.Slap)

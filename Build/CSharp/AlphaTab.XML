@@ -808,6 +808,12 @@
             </summary>
             <returns>the sizing mode to apply to the glyphs during layout</returns>
         </member>
+        <member name="T:AlphaTab.Rendering.Glyphs.EffectGlyph">
+            <summary>
+            Effect-Glyphs implementing this public interface get notified
+            as they are expanded over multiple beats.
+            </summary>
+        </member>
         <member name="T:AlphaTab.Rendering.Glyphs.Glyph">
             <summary>
             A glyph is a single symbol which can be added to a GlyphBarRenderer for automated
@@ -818,12 +824,6 @@
             <summary>
             This glyph allows to group several other glyphs to be
             drawn at the same x position
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Rendering.Glyphs.IMultiBeatEffectGlyph">
-            <summary>
-            Effect-Glyphs implementing this public interface get notified
-            as they are expanded over multiple beats.
             </summary>
         </member>
         <member name="T:AlphaTab.Rendering.Glyphs.LazySvg">

@@ -30,7 +30,7 @@ namespace AlphaTab.Rendering.Effects
             get { return EffectBarGlyphSizing.SingleOnBeatOnly; }
         }
 
-        public override Glyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
+        public override EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
         {
             return new DummyEffectGlyph(0, 0, LastCreateInfo.Count + "fingering");
         }

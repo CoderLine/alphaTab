@@ -3,7 +3,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class CrescendoGlyph : Glyph
+    public class CrescendoGlyph : EffectGlyph
     {
         public const int Height = 17;
 
@@ -18,7 +18,6 @@ namespace AlphaTab.Rendering.Glyphs
         public override void Paint(int cx, int cy, ICanvas canvas)
         {
             var height = Height * Scale;
-            var res = Renderer.Resources;
             canvas.BeginPath();
             if (_crescendo == CrescendoType.Crescendo)
             {

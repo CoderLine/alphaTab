@@ -3,7 +3,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class DynamicsGlyph : Glyph
+    public class DynamicsGlyph : EffectGlyph
     {
         private const float GlyphScale = 0.8f;
 
@@ -17,8 +17,6 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void Paint(int cx, int cy, ICanvas canvas)
         {
-            var res = Renderer.Resources;
-
             Glyph[] glyphs;
 
             switch (_dynamics)

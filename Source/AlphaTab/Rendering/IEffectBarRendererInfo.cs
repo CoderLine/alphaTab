@@ -44,7 +44,7 @@ namespace AlphaTab.Rendering
         /// <param name="renderer">the renderer which requests for glyph creation</param>
         /// <param name="beat">the beat storing the data</param>
         /// <returns>the glyph which needs to be added to the renderer</returns>
-        Glyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat);
+        EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat);
     
         /// <summary>
         /// Checks whether an effect glyph can be expanded to a particular beat.

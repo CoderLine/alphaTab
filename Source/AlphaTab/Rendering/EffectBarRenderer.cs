@@ -14,16 +14,16 @@ namespace AlphaTab.Rendering
     public class EffectBarRenderer : GroupedBarRenderer
     {
         private IEffectBarRendererInfo _info;
-        private FastList<FastList<Glyph>> _uniqueEffectGlyphs;
-        private FastList<FastDictionary<int, Glyph>> _effectGlyphs;
+        private FastList<FastList<EffectGlyph>> _uniqueEffectGlyphs;
+        private FastList<FastDictionary<int, EffectGlyph>> _effectGlyphs;
         private Beat _lastBeat;
 
         public EffectBarRenderer(Bar bar, IEffectBarRendererInfo info)
             : base(bar)
         {
             _info = info;
-            _uniqueEffectGlyphs = new FastList<FastList<Glyph>>();
-            _effectGlyphs = new FastList<FastDictionary<int, Glyph>>();
+            _uniqueEffectGlyphs = new FastList<FastList<EffectGlyph>>();
+            _effectGlyphs = new FastList<FastDictionary<int, EffectGlyph>>();
         }
 
         public override void DoLayout()
@@ -69,7 +69,7 @@ namespace AlphaTab.Rendering
             
         }
 #else
-            Glyph prevGlyph = null;
+            EffectGlyph prevGlyph = null;
             if (Index > 0)
             {
                 // check if previous renderer had an effect on his last beat
@@ -83,7 +83,7 @@ namespace AlphaTab.Rendering
             foreach (var key in _effectGlyphs[0].Keys)
             {
                 int beatIndex = Std.ParseInt(key);
-                Glyph effect = _effectGlyphs[0][beatIndex];
+                EffectGlyph effect = _effectGlyphs[0][beatIndex];
 
                 AlignGlyph(_info.SizingMode, beatIndex, 0, prevGlyph);
 
@@ -93,9 +93,9 @@ namespace AlphaTab.Rendering
 #endif
         }
 
-        private void AlignGlyph(EffectBarGlyphSizing sizing, int beatIndex, int voiceIndex, Glyph prevGlyph)
+        private void AlignGlyph(EffectBarGlyphSizing sizing, int beatIndex, int voiceIndex, EffectGlyph prevGlyph)
         {
-            Glyph g = _effectGlyphs[voiceIndex][beatIndex];
+            EffectGlyph g = _effectGlyphs[voiceIndex][beatIndex];
             Glyph pos;
             var container = GetBeatContainer(voiceIndex, beatIndex);
             switch (sizing)
@@ -147,7 +147,7 @@ namespace AlphaTab.Rendering
                         var posR = (EffectBarRenderer)pos.Renderer;
                         var gR = (EffectBarRenderer)g.Renderer;
                         g.Width = (posR.X + posR.BeatGlyphsStart + container.X + pos.X + pos.Width) - (gR.X + gR.BeatGlyphsStart + g.X);
-                        if (g is IMultiBeatEffectGlyph) ((IMultiBeatEffectGlyph)g).ExpandTo(container.Beat);
+                        g.ExpandTo(container.Beat);
                     }
                     break;
 
@@ -159,7 +159,7 @@ namespace AlphaTab.Rendering
                         var posR = (EffectBarRenderer)pos.Renderer;
                         var gR = (EffectBarRenderer)g.Renderer;
                         g.Width = (posR.X + posR.BeatGlyphsStart + container.X + pos.X + pos.Width) - (gR.X + gR.BeatGlyphsStart + g.X);
-                        if (g is IMultiBeatEffectGlyph) ((IMultiBeatEffectGlyph)g).ExpandTo(container.Beat);
+                        g.ExpandTo(container.Beat);
                     }
                     break;
 
@@ -171,7 +171,7 @@ namespace AlphaTab.Rendering
                         var posR = (EffectBarRenderer)pos.Renderer;
                         var gR = (EffectBarRenderer)g.Renderer;
                         g.Width = (posR.X + posR.BeatGlyphsStart + container.X + pos.X + pos.Width) - (gR.X + gR.BeatGlyphsStart + g.X);
-                        if (g is IMultiBeatEffectGlyph) ((IMultiBeatEffectGlyph)g).ExpandTo(container.Beat);
+                        g.ExpandTo(container.Beat);
                     }
                     break;
 
@@ -183,7 +183,7 @@ namespace AlphaTab.Rendering
                         var posR = (EffectBarRenderer)pos.Renderer;
                         var gR = (EffectBarRenderer)g.Renderer;
                         g.Width = (posR.X + posR.BeatGlyphsStart + container.X + pos.X + pos.Width) - (gR.X + gR.BeatGlyphsStart + g.X);
-                        if (g is IMultiBeatEffectGlyph) ((IMultiBeatEffectGlyph)g).ExpandTo(container.Beat);
+                        g.ExpandTo(container.Beat);
                     }
                     break;
 
@@ -195,7 +195,7 @@ namespace AlphaTab.Rendering
                         var posR = (EffectBarRenderer)pos.Renderer;
                         var gR = (EffectBarRenderer)g.Renderer;
                         g.Width = (posR.X + posR.BeatGlyphsStart + container.X + pos.X + pos.Width) - (gR.X + gR.BeatGlyphsStart + g.X);
-                        if (g is IMultiBeatEffectGlyph) ((IMultiBeatEffectGlyph)g).ExpandTo(container.Beat);
+                        g.ExpandTo(container.Beat);
                     }
                     break;
 
@@ -207,7 +207,7 @@ namespace AlphaTab.Rendering
                         var posR = (EffectBarRenderer)pos.Renderer;
                         var gR = (EffectBarRenderer)g.Renderer;
                         g.Width = (posR.X + posR.BeatGlyphsStart + container.X + pos.X + pos.Width) - (gR.X + gR.BeatGlyphsStart + g.X);
-                        if (g is IMultiBeatEffectGlyph) ((IMultiBeatEffectGlyph)g).ExpandTo(container.Beat);
+                        g.ExpandTo(container.Beat);
                     }
                     break;
             }
@@ -222,13 +222,13 @@ namespace AlphaTab.Rendering
 #if MULTIVOICE_SUPPORT
             foreach (var v in Bar.Voices)
             {
-                _effectGlyphs.Add(new Dictionary<int, Glyph>());
-                _uniqueEffectGlyphs.Add(new FastList<Glyph>());
+                _effectGlyphs.Add(new Dictionary<int, EffectGlyph>());
+                _uniqueEffectGlyphs.Add(new FastList<EffectGlyph>());
                 CreateVoiceGlyphs(v);
             }
 #else
-            _effectGlyphs.Add(new FastDictionary<int, Glyph>());
-            _uniqueEffectGlyphs.Add(new FastList<Glyph>());
+            _effectGlyphs.Add(new FastDictionary<int, EffectGlyph>());
+            _uniqueEffectGlyphs.Add(new FastList<EffectGlyph>());
             CreateVoiceGlyphs(Bar.Voices[0]);
 #endif
         }
@@ -285,7 +285,7 @@ namespace AlphaTab.Rendering
                         if (_info.ShouldCreateGlyph(this, prevBeat))
                         {
                             // expand the previous effect
-                            Glyph prevEffect;
+                            EffectGlyph prevEffect;
                             if (b.Index > 0)
                             {
                                 prevEffect = _effectGlyphs[b.Voice.Index][prevBeat.Index];

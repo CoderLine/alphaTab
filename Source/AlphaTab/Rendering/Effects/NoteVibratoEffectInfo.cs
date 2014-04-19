@@ -20,7 +20,7 @@ namespace AlphaTab.Rendering.Effects
             get { return EffectBarGlyphSizing.GroupedOnBeatToPostBeat; }
         }
 
-        public override Glyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
+        public override EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
         {
             return new VibratoGlyph(0, (int)(5 * renderer.Scale));
         }

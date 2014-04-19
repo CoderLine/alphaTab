@@ -3,7 +3,7 @@ using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class SvgGlyph : Glyph
+    public class SvgGlyph : EffectGlyph
     {
         private readonly LazySvg _svg;
         private string _lastCmd;

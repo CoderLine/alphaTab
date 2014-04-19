@@ -1,9 +1,10 @@
 ﻿using System;
+using AlphaTab.Model;
 using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class VibratoGlyph : Glyph
+    public class VibratoGlyph : EffectGlyph
     {
         private readonly float _scale;
 

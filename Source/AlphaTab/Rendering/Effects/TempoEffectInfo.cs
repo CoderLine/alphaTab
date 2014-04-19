@@ -17,7 +17,7 @@ namespace AlphaTab.Rendering.Effects
             return (int)(25 * renderer.Scale);
         }
 
-        public Glyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
+        public EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
         {
             int tempo;
             if (beat.Voice.Bar.MasterBar.TempoAutomation != null)

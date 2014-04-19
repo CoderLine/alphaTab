@@ -179,7 +179,7 @@
     <Compile Include="Rendering\Glyphs\Glyph.cs" />
     <Compile Include="Rendering\Glyphs\GlyphGroup.cs" />
     <Compile Include="Rendering\Glyphs\HiHatGlyph.cs" />
-    <Compile Include="Rendering\Glyphs\IMultiBeatEffectGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\EffectGlyph.cs" />
     <Compile Include="Rendering\Glyphs\ISupportsFinalize.cs" />
     <Compile Include="Rendering\Glyphs\LazySvg.cs" />
     <Compile Include="Rendering\Glyphs\LineRangedGlyph.cs" />

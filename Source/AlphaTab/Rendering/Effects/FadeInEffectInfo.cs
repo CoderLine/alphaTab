@@ -17,7 +17,7 @@ namespace AlphaTab.Rendering.Effects
             return (int)(20 * renderer.Scale);
         }
 
-        public Glyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
+        public EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
         {
             return new FadeInGlyph(0, 0);
         }

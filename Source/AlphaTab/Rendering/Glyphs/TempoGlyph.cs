@@ -1,8 +1,9 @@
-﻿using AlphaTab.Platform;
+﻿using AlphaTab.Model;
+using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TempoGlyph : Glyph
+    public class TempoGlyph : EffectGlyph
     {
         private readonly int _tempo;
 

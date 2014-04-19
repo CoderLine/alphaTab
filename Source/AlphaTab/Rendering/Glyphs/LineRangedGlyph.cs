@@ -5,7 +5,7 @@ using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class LineRangedGlyph : Glyph, IMultiBeatEffectGlyph
+    public class LineRangedGlyph : EffectGlyph
     {
         private const int LineSpacing = 3;
         private const int LineTopPadding = 8;
@@ -20,7 +20,7 @@ namespace AlphaTab.Rendering.Glyphs
             _label = label;
         }
 
-        public void ExpandTo(Beat beat)
+        public override void ExpandTo(Beat beat)
         {
             _isExpanded = true;
         }

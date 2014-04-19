@@ -17,7 +17,7 @@ namespace AlphaTab.Rendering.Effects
             return (int)(17 * renderer.Scale);
         }
 
-        public Glyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
+        public EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
         {
             return new VibratoGlyph(0, (int)(5 * renderer.Scale), 1.15f);
         }

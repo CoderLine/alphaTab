@@ -20,7 +20,7 @@ namespace AlphaTab.Rendering.Effects
             get { return EffectBarGlyphSizing.SingleOnBeatToPostBeat; }
         }
 
-        public override Glyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
+        public override EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
         {
             return new TrillGlyph(0, 0);
         }

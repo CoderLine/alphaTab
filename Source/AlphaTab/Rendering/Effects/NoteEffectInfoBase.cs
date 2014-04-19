@@ -28,7 +28,7 @@ namespace AlphaTab.Rendering.Effects
 
         public abstract EffectBarGlyphSizing SizingMode { get; }
         public abstract int GetHeight(EffectBarRenderer renderer);
-        public abstract Glyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat);
+        public abstract EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat);
 
         public virtual bool CanExpand(EffectBarRenderer renderer, Beat @from, Beat to)
         {

@@ -1,9 +1,10 @@
-﻿using AlphaTab.Platform;
+﻿using AlphaTab.Model;
+using AlphaTab.Platform;
 using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class DummyEffectGlyph : Glyph
+    public class DummyEffectGlyph : EffectGlyph
     {
         private readonly string _s;
 
