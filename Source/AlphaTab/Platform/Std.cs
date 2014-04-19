@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using AlphaTab.IO;
 
 namespace AlphaTab.Platform
@@ -10,9 +11,9 @@ namespace AlphaTab.Platform
         {
             float f;
 #if CSharp
-            if (!float.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out f))
+            if (!Single.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out f))
             {
-                f = float.NaN;
+                f = Single.NaN;
             }
 #elif JavaScript
             double d = double.Parse(s);
@@ -32,7 +33,7 @@ namespace AlphaTab.Platform
         {
             int f;
 #if CSharp
-            if (!int.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out f))
+            if (!Int32.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out f))
             {
                 f = 0;
             }
@@ -46,7 +47,7 @@ namespace AlphaTab.Platform
         }
 
 
-        [System.Runtime.CompilerServices.InlineCodeAttribute("{dst}.set({src}.subarray({srcOffset}, {srcOffset} + {count}), {dstOffset})")]
+        [InlineCode("{dst}.set({src}.subarray({srcOffset}, {srcOffset} + {count}), {dstOffset})")]
         public static void BlockCopy(ByteArray src, int srcOffset, ByteArray dst, int dstOffset, int count)
         {
             Buffer.BlockCopy(src.Data, srcOffset, dst.Data, dstOffset, count);
@@ -55,10 +56,33 @@ namespace AlphaTab.Platform
         public static bool IsNullOrWhiteSpace(this string s)
         {
 #if CSharp
-            return string.IsNullOrWhiteSpace(s);
+            return String.IsNullOrWhiteSpace(s);
 #elif JavaScript
             return s == null || s.Trim().Length == 0;
 #endif
+        }
+
+        [InlineCode("String.fromCharCode({c})")]
+        public static string StringFromCharCode(int c)
+        {
+            return ((char) c).ToString();
+        }
+
+        public static bool IsStringNumber(string s, bool allowSign = true)
+        {
+            if (s.Length == 0) return false;
+            var c = s[0];
+            return IsCharNumber(c, allowSign);
+        }
+
+        public static bool IsCharNumber(int c, bool allowSign = true)
+        {
+            return (allowSign && c == 0x2D) || (c >= 0x30 && c <= 0x39);
+        }
+
+        public static bool IsWhiteSpace(int c)
+        {
+            return c == 0x20 || c == 0x0B || c == 0x0D || c == 0x0A;
         }
     }
 }

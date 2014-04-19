@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
-using System.Text;
+using AlphaTab.Collections;
+using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Utils
 {
@@ -52,19 +53,19 @@ namespace AlphaTab.Rendering.Utils
         {
             get
             {
-                return IsStringNumber(CurrentToken);
+                return Std.IsStringNumber(CurrentToken);
             }
         }
 
-        public char NextChar()
+        public int NextChar()
         {
-            if (Eof) return '\0';
+            if (Eof) return 0;
             return Svg[_currentIndex++];
         }
 
-        public char PeekChar()
+        public int PeekChar()
         {
-            if (Eof) return '\0';
+            if (Eof) return 0;
             return Svg[_currentIndex];
         }
 
@@ -72,26 +73,26 @@ namespace AlphaTab.Rendering.Utils
         {
             var token = new StringBuilder();
 
-            char c;
+            int c;
             bool skipChar;
 
             // skip leading spaces and separators
             do
             {
                 c = NextChar();
-                skipChar = IsWhiteSpace(c) || c == ',';
+                skipChar = Std.IsWhiteSpace(c) || c == ',';
             } while (!Eof && skipChar);
 
             // read token itself 
             if (!Eof || !skipChar)
             {
-                token.Append(c);
-                if (IsCharNumber(c)) // do we have a number?
+                token.AppendChar(c);
+                if (Std.IsCharNumber(c)) // do we have a number?
                 {
                     c = PeekChar(); // get first upcoming character
-                    while (!Eof && (IsCharNumber(c, false) || c == '.')) // while we have number characters add them 
+                    while (!Eof && (Std.IsCharNumber(c, false) || c == '.')) // while we have number characters add them 
                     {
-                        token.Append(NextChar());
+                        token.AppendChar(NextChar());
                         // peek next character for check
                         c = PeekChar();
                     }
@@ -103,23 +104,6 @@ namespace AlphaTab.Rendering.Utils
             }
 
             CurrentToken = token.ToString();
-        }
-
-        private static bool IsStringNumber(string s, bool allowSign = true)
-        {
-            if (s.Length == 0) return false;
-            var c = s[0];
-            return IsCharNumber(c, allowSign);
-        }
-
-        private static bool IsCharNumber(char c, bool allowSign = true)
-        {
-            return (allowSign && c == 0x2D) || (c >= 0x30 && c <= 0x39);
-        }
-
-        private static bool IsWhiteSpace(char c)
-        {
-            return c == ' ' || c == '\t' || c == '\r' || c == '\n';
         }
     }
 }

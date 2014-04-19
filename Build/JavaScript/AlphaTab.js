@@ -533,6 +533,14 @@
 	};
 	global.AlphaTab.Collections.FastDictionaryExtensions = $AlphaTab_Collections_FastDictionaryExtensions;
 	////////////////////////////////////////////////////////////////////////////////
+	// AlphaTab.Collections.StringBuilder
+	var $AlphaTab_Collections_StringBuilder = function() {
+		this.$_sb = null;
+		this.$_sb = '';
+	};
+	$AlphaTab_Collections_StringBuilder.__typeName = 'AlphaTab.Collections.StringBuilder';
+	global.AlphaTab.Collections.StringBuilder = $AlphaTab_Collections_StringBuilder;
+	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Importer.AlphaTexException
 	var $AlphaTab_Importer_AlphaTexException = function(position, nonTerm, expected, symbol, symbolData) {
 		this.position = 0;
@@ -563,10 +571,9 @@
 		$AlphaTab_Importer_ScoreImporter.call(this);
 	};
 	$AlphaTab_Importer_AlphaTexImporter.__typeName = 'AlphaTab.Importer.AlphaTexImporter';
-	$AlphaTab_Importer_AlphaTexImporter.$isLetter = function(ch) {
-		var code = ch;
+	$AlphaTab_Importer_AlphaTexImporter.$isLetter = function(code) {
 		// no control characters, whitespaces, numbers or dots
-		return !$AlphaTab_Importer_AlphaTexImporter.$isTerminal(ch) && (code >= 33 && code <= 47 || code >= 58 && code <= 126 || code > 128);
+		return !$AlphaTab_Importer_AlphaTexImporter.$isTerminal(code) && (code >= 33 && code <= 47 || code >= 58 && code <= 126 || code > 128);
 		// Unicode Symbols
 	};
 	$AlphaTab_Importer_AlphaTexImporter.$isTerminal = function(ch) {
@@ -1528,6 +1535,19 @@
 	};
 	$AlphaTab_Platform_Std.isNullOrWhiteSpace = function(s) {
 		return ss.isNullOrUndefined(s) || s.trim().length === 0;
+	};
+	$AlphaTab_Platform_Std.isStringNumber = function(s, allowSign) {
+		if (s.length === 0) {
+			return false;
+		}
+		var c = s.charCodeAt(0);
+		return $AlphaTab_Platform_Std.isCharNumber(c, allowSign);
+	};
+	$AlphaTab_Platform_Std.isCharNumber = function(c, allowSign) {
+		return allowSign && c === 45 || c >= 48 && c <= 57;
+	};
+	$AlphaTab_Platform_Std.isWhiteSpace = function(c) {
+		return c === 32 || c === 11 || c === 13 || c === 10;
 	};
 	global.AlphaTab.Platform.Std = $AlphaTab_Platform_Std;
 	////////////////////////////////////////////////////////////////////////////////
@@ -3254,19 +3274,6 @@
 		this.svg = svg;
 	};
 	$AlphaTab_Rendering_Utils_SvgPathParser.__typeName = 'AlphaTab.Rendering.Utils.SvgPathParser';
-	$AlphaTab_Rendering_Utils_SvgPathParser.$isStringNumber = function(s, allowSign) {
-		if (s.length === 0) {
-			return false;
-		}
-		var c = s.charCodeAt(0);
-		return $AlphaTab_Rendering_Utils_SvgPathParser.$isCharNumber(c, allowSign);
-	};
-	$AlphaTab_Rendering_Utils_SvgPathParser.$isCharNumber = function(c, allowSign) {
-		return allowSign && c === 45 || c >= 48 && c <= 57;
-	};
-	$AlphaTab_Rendering_Utils_SvgPathParser.$isWhiteSpace = function(c) {
-		return c === 32 || c === 9 || c === 13 || c === 10;
-	};
 	global.AlphaTab.Rendering.Utils.SvgPathParser = $AlphaTab_Rendering_Utils_SvgPathParser;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Utils.TupletHelper
@@ -3282,13 +3289,11 @@
 	global.AlphaTab.Rendering.Utils.TupletHelper = $AlphaTab_Rendering_Utils_TupletHelper;
 	ss.initClass($AlphaTab_Environment, $asm, {});
 	ss.initClass($AlphaTab_LayoutSettings, $asm, {
-		get: function(T) {
-			return function(key, def) {
-				if (this.additionalSettings.hasOwnProperty(key)) {
-					return this.additionalSettings[key];
-				}
-				return def;
-			};
+		get: function(key, def) {
+			if (this.additionalSettings.hasOwnProperty(key)) {
+				return this.additionalSettings[key];
+			}
+			return def;
 		}
 	});
 	ss.initClass($AlphaTab_Settings, $asm, {});
@@ -4025,6 +4030,20 @@
 		}
 	});
 	ss.initClass($AlphaTab_Collections_FastDictionaryExtensions, $asm, {});
+	ss.initClass($AlphaTab_Collections_StringBuilder, $asm, {
+		append: function(s) {
+			this.$_sb += s;
+		},
+		appendChar: function(i) {
+			this.append(String.fromCharCode(i));
+		},
+		appendLine: function() {
+			this.append('\r\n');
+		},
+		toString: function() {
+			return this.$_sb;
+		}
+	});
 	ss.initClass($AlphaTab_Importer_AlphaTexException, $asm, {
 		get_message: function() {
 			if (ss.isNullOrUndefined(this.symbolData)) {
@@ -4157,10 +4176,10 @@
 		$nextChar: function() {
 			var b = this._data.readByte();
 			if (b === -1) {
-				this.$_ch = $AlphaTab_Importer_AlphaTexImporter.$eof;
+				this.$_ch = 0;
 			}
 			else {
-				this.$_ch = this._data.readByte();
+				this.$_ch = b;
 				this.$_curChPos++;
 			}
 		},
@@ -4203,7 +4222,7 @@
 				}
 				else if (this.$_ch === 34 || this.$_ch === 39) {
 					this.$nextChar();
-					var s = new ss.StringBuilder();
+					var s = new $AlphaTab_Collections_StringBuilder();
 					this.$_sy = 5;
 					while (this.$_ch !== 34 && this.$_ch !== 39 && this.$_ch !== 0) {
 						s.appendChar(this.$_ch);
@@ -4283,13 +4302,12 @@
 				}
 			} while (this.$_sy === 0);
 		},
-		$isDigit: function(ch) {
-			var code = ch;
-			return code >= 48 && code <= 57 || ch === 45 && this.$_allowNegatives;
+		$isDigit: function(code) {
+			return code >= 48 && code <= 57 || code === 45 && this.$_allowNegatives;
 			// allow - if negatives
 		},
 		$readName: function() {
-			var str = new ss.StringBuilder();
+			var str = new $AlphaTab_Collections_StringBuilder();
 			do {
 				str.appendChar(this.$_ch);
 				this.$nextChar();
@@ -4297,7 +4315,7 @@
 			return str.toString();
 		},
 		$readNumber: function() {
-			var str = new ss.StringBuilder();
+			var str = new $AlphaTab_Collections_StringBuilder();
 			do {
 				str.appendChar(this.$_ch);
 				this.$nextChar();
@@ -5114,7 +5132,7 @@
 			this.$_score.tab = this.readStringIntUnused();
 			this.$_score.instructions = this.readStringIntUnused();
 			var noticeLines = this.readInt32();
-			var notice = new ss.StringBuilder();
+			var notice = new $AlphaTab_Collections_StringBuilder();
 			for (var i = 0; i < noticeLines; i++) {
 				if (i > 0) {
 					notice.appendLine();
@@ -6188,7 +6206,7 @@
 		readString: function(length) {
 			var b = new Uint8Array(length);
 			this._data.read(b, 0, b.length);
-			var s = new ss.StringBuilder();
+			var s = new $AlphaTab_Collections_StringBuilder();
 			for (var i = 0; i < b.length; i++) {
 				s.appendChar(b[i]);
 			}
@@ -6335,7 +6353,7 @@
 			}
 		},
 		$getString: function(data, offset, length) {
-			var buf = new ss.StringBuilder();
+			var buf = new $AlphaTab_Collections_StringBuilder();
 			for (var i = 0; i < length; i++) {
 				var code = data[offset + i] & 255;
 				if (code === 0) {
@@ -6360,7 +6378,7 @@
 			};
 			fileSystem.load(this._data);
 			// convert data to string
-			var xml = new ss.StringBuilder();
+			var xml = new $AlphaTab_Collections_StringBuilder();
 			var data = fileSystem.files[0].data;
 			for (var i = 0; i < data.length; i++) {
 				xml.appendChar(data[i]);
@@ -7509,7 +7527,7 @@
 		},
 		$getValue: function(n) {
 			if (n.nodeType === 1 || n.nodeType === 9) {
-				var txt = new ss.StringBuilder();
+				var txt = new $AlphaTab_Collections_StringBuilder();
 				for (var $t1 = 0; $t1 < n.childNodes.length; $t1++) {
 					var childNode = n.childNodes[$t1];
 					txt.append(this.$getValue(childNode));
@@ -8569,7 +8587,7 @@
 			return new $AlphaTab_Platform_Model_Font(this.get_family(), this.get_size(), this.get_style());
 		},
 		toCssString: function() {
-			var buf = new ss.StringBuilder();
+			var buf = new $AlphaTab_Collections_StringBuilder();
 			if (this.get_isBold()) {
 				buf.append('bold ');
 			}
@@ -8633,7 +8651,7 @@
 			this.$1$TextBaselineField = value;
 		},
 		toSvg: function(includeWrapper, className) {
-			var buf = new ss.StringBuilder();
+			var buf = new $AlphaTab_Collections_StringBuilder();
 			if (includeWrapper) {
 				buf.append('<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="');
 				buf.append(this.get_width());
@@ -8939,7 +8957,7 @@
 				this.stave.bottomSpacing = 4;
 			}
 			this.height = ss.Int32.trunc(this.get_resources().wordsFont.get_size());
-			var endingsStrings = new ss.StringBuilder();
+			var endingsStrings = new $AlphaTab_Collections_StringBuilder();
 			for (var i = 0; i < this.$_endings.length; i++) {
 				endingsStrings.append(this.$_endings[i] + 1);
 				endingsStrings.append('. ');
@@ -13150,12 +13168,12 @@
 				return;
 			}
 			var score = this.renderer.score;
-			var startIndex = this.renderer.settings.layout.get(ss.Int32).call(this.renderer.settings.layout, 'start', 1);
+			var startIndex = this.renderer.settings.layout.get('start', 1);
 			startIndex--;
 			// map to array index
 			startIndex = Math.min(score.masterBars.length - 1, Math.max(0, startIndex));
 			var currentBarIndex = startIndex;
-			var endBarIndex = this.renderer.settings.layout.get(ss.Int32).call(this.renderer.settings.layout, 'count', score.masterBars.length);
+			var endBarIndex = this.renderer.settings.layout.get('count', score.masterBars.length);
 			endBarIndex = startIndex + endBarIndex - 1;
 			// map count to array index
 			endBarIndex = Math.min(score.masterBars.length - 1, Math.max(0, endBarIndex));
@@ -13185,12 +13203,12 @@
 		doLayout: function() {
 			this.$_groups = [];
 			var score = this.renderer.score;
-			var startIndex = this.renderer.settings.layout.get(ss.Int32).call(this.renderer.settings.layout, 'start', 1);
+			var startIndex = this.renderer.settings.layout.get('start', 1);
 			startIndex--;
 			// map to array index
 			startIndex = Math.min(score.masterBars.length - 1, Math.max(0, startIndex));
 			var currentBarIndex = startIndex;
-			var endBarIndex = this.renderer.settings.layout.get(ss.Int32).call(this.renderer.settings.layout, 'count', score.masterBars.length);
+			var endBarIndex = this.renderer.settings.layout.get('count', score.masterBars.length);
 			if (endBarIndex < 0) {
 				endBarIndex = score.masterBars.length;
 			}
@@ -13200,7 +13218,7 @@
 			var x = $AlphaTab_Rendering_Layout_PageViewLayout.pagePadding[0];
 			var y = $AlphaTab_Rendering_Layout_PageViewLayout.pagePadding[1];
 			y = this.$doScoreInfoLayout(y);
-			var autoSize = this.renderer.settings.layout.get(Boolean).call(this.renderer.settings.layout, 'autoSize', true);
+			var autoSize = this.renderer.settings.layout.get('autoSize', true);
 			if (autoSize || this.renderer.settings.width <= 0) {
 				this.width = ss.Int32.trunc(950 * this.get_scale());
 			}
@@ -13223,7 +13241,7 @@
 		},
 		$doScoreInfoLayout: function(y) {
 			// TODO: Check if it's a good choice to provide the complete flags as setting
-			var flags = (this.renderer.settings.layout.get(Boolean).call(this.renderer.settings.layout, 'hideInfo', false) ? 0 : 511);
+			var flags = (this.renderer.settings.layout.get('hideInfo', false) ? 0 : 511);
 			var score = this.renderer.score;
 			var scale = this.get_scale();
 			if (!ss.isNullOrEmptyString(score.title) && (flags & 1) !== 0) {
@@ -13281,7 +13299,7 @@
 			this.renderer.canvas.fillText(text, this.width / 2, y);
 		},
 		$paintScoreInfo: function(x, y) {
-			var flags = (this.renderer.settings.layout.get(Boolean).call(this.renderer.settings.layout, 'hideInfo', false) ? 0 : 511);
+			var flags = (this.renderer.settings.layout.get('hideInfo', false) ? 0 : 511);
 			var score = this.renderer.score;
 			var scale = this.get_scale();
 			var canvas = this.renderer.canvas;
@@ -13368,7 +13386,7 @@
 		$createStaveGroup: function(currentBarIndex, endIndex) {
 			var group = this.createEmptyStaveGroup();
 			group.index = this.$_groups.length;
-			var barsPerRow = this.renderer.settings.layout.get(ss.Int32).call(this.renderer.settings.layout, 'barsPerRow', -1);
+			var barsPerRow = this.renderer.settings.layout.get('barsPerRow', -1);
 			var maxWidth = this.get_$maxWidth();
 			var end = endIndex + 1;
 			for (var i = currentBarIndex; i < end; i++) {
@@ -13391,7 +13409,7 @@
 			return group;
 		},
 		get_$maxWidth: function() {
-			var autoSize = this.renderer.settings.layout.get(Boolean).call(this.renderer.settings.layout, 'autoSize', true);
+			var autoSize = this.renderer.settings.layout.get('autoSize', true);
 			var width = (autoSize ? this.get_$sheetWidth() : this.renderer.settings.width);
 			return width - $AlphaTab_Rendering_Layout_PageViewLayout.pagePadding[0] - $AlphaTab_Rendering_Layout_PageViewLayout.pagePadding[2];
 		},
@@ -13990,7 +14008,7 @@
 			return parseInt(this.getString());
 		},
 		get_currentTokenIsNumber: function() {
-			return $AlphaTab_Rendering_Utils_SvgPathParser.$isStringNumber(this.currentToken, true);
+			return $AlphaTab_Platform_Std.isStringNumber(this.currentToken, true);
 		},
 		nextChar: function() {
 			if (this.get_eof()) {
@@ -14005,21 +14023,21 @@
 			return this.svg.charCodeAt(this.$_currentIndex);
 		},
 		nextToken: function() {
-			var token = new ss.StringBuilder();
+			var token = new $AlphaTab_Collections_StringBuilder();
 			var c;
 			var skipChar;
 			// skip leading spaces and separators
 			do {
 				c = this.nextChar();
-				skipChar = $AlphaTab_Rendering_Utils_SvgPathParser.$isWhiteSpace(c) || c === 44;
+				skipChar = $AlphaTab_Platform_Std.isWhiteSpace(c) || c === 44;
 			} while (!this.get_eof() && skipChar);
 			// read token itself 
 			if (!this.get_eof() || !skipChar) {
 				token.appendChar(c);
-				if ($AlphaTab_Rendering_Utils_SvgPathParser.$isCharNumber(c, true)) {
+				if ($AlphaTab_Platform_Std.isCharNumber(c, true)) {
 					c = this.peekChar();
 					// get first upcoming character
-					while (!this.get_eof() && ($AlphaTab_Rendering_Utils_SvgPathParser.$isCharNumber(c, false) || c === 46)) {
+					while (!this.get_eof() && ($AlphaTab_Platform_Std.isCharNumber(c, false) || c === 46)) {
 						token.appendChar(this.nextChar());
 						// peek next character for check
 						c = this.peekChar();

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Text;
 using AlphaTab.Collections;
 using AlphaTab.IO;
 using AlphaTab.Platform;
@@ -258,7 +257,7 @@ namespace AlphaTab.Importer
             {
                 var code = data[offset + i] & 0xFF;
                 if (code == 0) break; // zero terminated string
-                buf.Append((char)(code));
+                buf.AppendChar(code);
             }
             return buf.ToString();
         }

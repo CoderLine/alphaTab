@@ -210,6 +210,7 @@ namespace AlphaTab
         [IntrinsicProperty]
         public FastDictionary<string, object> AdditionalSettings { get; set; }
 
+        [IncludeGenericArguments(false)]
         public T Get<T>(string key, T def)
         {
             if (AdditionalSettings.ContainsKey(key))

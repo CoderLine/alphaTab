@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text;
+using AlphaTab.Collections;
 
 namespace AlphaTab.Platform.Model
 {

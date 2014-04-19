@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿using AlphaTab.Collections;
 using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Platform.Svg

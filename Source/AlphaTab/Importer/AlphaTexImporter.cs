@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using AlphaTab.Audio;
 using AlphaTab.Collections;
 using AlphaTab.Model;
@@ -18,7 +17,7 @@ namespace AlphaTab.Importer
         private Score _score;
         private Track _track;
 
-        private char _ch;
+        private int _ch;
         private int _curChPos;
 
         private AlphaTexSymbols _sy;
@@ -157,7 +156,7 @@ namespace AlphaTab.Importer
             }
             else
             {
-                _ch = (char)_data.ReadByte();
+                _ch = b;
                 _curChPos++;
             }
         }
@@ -222,7 +221,7 @@ namespace AlphaTab.Importer
                     _sy = AlphaTexSymbols.String;
                     while (_ch != '"' && _ch != '\'' && _ch != Eof)
                     {
-                        s.Append(_ch);
+                        s.AppendChar(_ch);
                         NextChar();
                     }
                     _syData = s;
@@ -323,12 +322,10 @@ namespace AlphaTab.Importer
         /// </summary>
         /// <param name="ch">the character</param>
         /// <returns>true if the given character is a letter, otherwise false.</returns>
-        private static bool IsLetter(char ch)
+        private static bool IsLetter(int code)
         {
-            var code = (int)ch;
-
             // no control characters, whitespaces, numbers or dots
-            return !IsTerminal(ch) && (
+            return !IsTerminal(code) && (
                     (code >= 0x21 && code <= 0x2F) ||
                     (code >= 0x3A && code <= 0x7E) ||
                     (code > 0x80)); /* Unicode Symbols */
@@ -339,7 +336,7 @@ namespace AlphaTab.Importer
         /// </summary>
         /// <param name="ch">the character</param>
         /// <returns>true if the given character is a terminal, otherwise false.</returns>
-        private static bool IsTerminal(char ch)
+        private static bool IsTerminal(int ch)
         {
             return ch == '.' ||
                    ch == '{' ||
@@ -359,11 +356,10 @@ namespace AlphaTab.Importer
         /// </summary>
         /// <param name="ch">the character</param>
         /// <returns>true if the given character is a digit, otherwise false.</returns>
-        private bool IsDigit(char ch)
+        private bool IsDigit(int code)
         {
-            var code = (int)ch;
             return (code >= 0x30 && code <= 0x39) || /*0-9*/
-                    (ch == '-' && _allowNegatives); // allow - if negatives
+                    (code == '-' && _allowNegatives); // allow - if negatives
         }
 
         /// <summary>
@@ -375,7 +371,7 @@ namespace AlphaTab.Importer
             var str = new StringBuilder();
             do
             {
-                str.Append(_ch);
+                str.AppendChar(_ch);
                 NextChar();
             } while (IsLetter(_ch) || IsDigit(_ch));
             return str.ToString();
@@ -390,7 +386,7 @@ namespace AlphaTab.Importer
             var str = new StringBuilder();
             do
             {
-                str.Append(_ch);
+                str.AppendChar(_ch);
                 NextChar();
             } while (IsDigit(_ch));
             return int.Parse(str.ToString());

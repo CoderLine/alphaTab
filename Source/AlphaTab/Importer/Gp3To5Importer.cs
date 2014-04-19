@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using AlphaTab.Collections;
 using AlphaTab.IO;
 using AlphaTab.Model;
@@ -1460,7 +1459,7 @@ namespace AlphaTab.Importer
             var s = new StringBuilder();
             for (int i = 0; i < b.Length; i++)
             {
-                s.Append((char)b[i]);
+                s.AppendChar(b[i]);
             }
             return s.ToString();
         }

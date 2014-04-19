@@ -1,5 +1,6 @@
-﻿using System.Text;
+﻿using AlphaTab.Collections;
 using AlphaTab.Model;
+using AlphaTab.Platform;
 
 namespace AlphaTab.Importer
 {
@@ -21,7 +22,7 @@ namespace AlphaTab.Importer
             var data = fileSystem.Files[0].Data;
             for (int i = 0; i < data.Length; i++)
             {
-                xml.Append((char) data[i]);
+                xml.AppendChar(data[i]);
             }
             // lets set the fileSystem to null, maybe the garbage collector will come along
             // and kick the fileSystem binary data before we finish parsing

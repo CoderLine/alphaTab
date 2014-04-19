@@ -160,7 +160,7 @@
             Reads the next terminal symbol.
             </summary>
         </member>
-        <member name="M:AlphaTab.Importer.AlphaTexImporter.IsLetter(System.Char)">
+        <member name="M:AlphaTab.Importer.AlphaTexImporter.IsLetter(System.Int32)">
             <summary>
             Checks if the given character is a letter.
             (no control characters, whitespaces, numbers or dots)
@@ -168,14 +168,14 @@
             <param name="ch">the character</param>
             <returns>true if the given character is a letter, otherwise false.</returns>
         </member>
-        <member name="M:AlphaTab.Importer.AlphaTexImporter.IsTerminal(System.Char)">
+        <member name="M:AlphaTab.Importer.AlphaTexImporter.IsTerminal(System.Int32)">
             <summary>
             Checks if the given charater is a non terminal.
             </summary>
             <param name="ch">the character</param>
             <returns>true if the given character is a terminal, otherwise false.</returns>
         </member>
-        <member name="M:AlphaTab.Importer.AlphaTexImporter.IsDigit(System.Char)">
+        <member name="M:AlphaTab.Importer.AlphaTexImporter.IsDigit(System.Int32)">
             <summary>
             Checks if the given character is a digit. 
             </summary>
