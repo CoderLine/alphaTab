@@ -20,7 +20,6 @@ namespace AlphaTab.Rendering.Glyphs
             var res = Renderer.Resources;
 
             canvas.Font = _font;
-            canvas.Color = res.MainGlyphColor;
             var old = canvas.TextAlign;
             canvas.TextAlign = TextAlign.Left;
             canvas.FillText(_text, cx + X, cy + Y);

@@ -33,14 +33,10 @@ namespace AlphaTab.Rendering.Glyphs
             _xScale = _xGlyphScale * Scale;
             _yScale = _yGlyphScale * Scale;
 
-            var res = Renderer.Resources;
-            canvas.Color = res.MainGlyphColor;
-
             var startX = X + cx;
             var startY = Y + cy;
             _currentX = startX;
             _currentY = startY;
-            canvas.Color = new Color(0, 0, 0); // todo: Resources
             canvas.BeginPath();
 
             for (int i = 0; i < _svg.Commands.Count; i++)

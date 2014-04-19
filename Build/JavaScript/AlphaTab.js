@@ -1790,6 +1790,7 @@
 		this.tabClefFont = null;
 		this.mainGlyphColor = null;
 		this.scale = 0;
+		this.scoreInfoColor = null;
 		this.init(scale);
 	};
 	$AlphaTab_Rendering_RenderingResources.__typeName = 'AlphaTab.Rendering.RenderingResources';
@@ -8957,7 +8958,6 @@
 		paint: function(cx, cy, canvas) {
 			if (this.$_endings.length > 0) {
 				var res = this.get_resources();
-				canvas.set_color(res.mainGlyphColor);
 				canvas.set_font(res.wordsFont);
 				canvas.moveTo(cx + this.x, cy + this.y + this.height);
 				canvas.lineTo(cx + this.x, cy + this.y);
@@ -9497,6 +9497,7 @@
 			this.barNumberColor = new $AlphaTab_Platform_Model_Color(200, 0, 0, 255);
 			this.markerFont = new $AlphaTab_Platform_Model_Font(serifFont, 14 * scale, 1);
 			this.tabClefFont = new $AlphaTab_Platform_Model_Font(sansFont, 18 * scale, 1);
+			this.scoreInfoColor = new $AlphaTab_Platform_Model_Color(0, 0, 0, 255);
 			this.mainGlyphColor = new $AlphaTab_Platform_Model_Color(0, 0, 0, 255);
 		}
 	});
@@ -9552,7 +9553,6 @@
 					var beatLineX = ss.Int32.trunc(h.getBeatLineX(beat) + this.get_scale());
 					var y1 = cy + this.y;
 					var y2 = cy + this.y + this.height;
-					canvas.set_color(this.get_resources().mainGlyphColor);
 					canvas.beginPath();
 					canvas.moveTo(cx + this.x + beatLineX, y1);
 					canvas.lineTo(cx + this.x + beatLineX, y2);
@@ -9616,7 +9616,6 @@
 			var topY = 0;
 			var bottomY = this.height;
 			var beamY = ((direction === 1) ? bottomY : topY);
-			canvas.set_color(this.get_resources().mainGlyphColor);
 			canvas.beginPath();
 			canvas.moveTo(cx + this.x + beatLineX, cy + this.y + topY);
 			canvas.lineTo(cx + this.x + beatLineX, cy + this.y + bottomY);
@@ -9863,7 +9862,6 @@
 				var direction = h.get_direction();
 				var y1 = cy + this.y + ((direction === 0) ? this.getScoreY(this.getNoteLine(beat.get_minNote()), correction - 1) : this.getScoreY(this.getNoteLine(beat.get_maxNote()), correction - 1));
 				var y2 = cy + this.y + this.$calculateBeamY(h, beatLineX);
-				canvas.set_color(this.get_layout().renderer.renderingResources.mainGlyphColor);
 				canvas.beginPath();
 				canvas.moveTo(cx + this.x + beatLineX, y1);
 				canvas.lineTo(cx + this.x + beatLineX, y2);
@@ -9940,7 +9938,6 @@
 				topY -= ss.Int32.trunc(stemSize * scaleMod);
 				beamY = topY;
 			}
-			canvas.set_color(this.get_layout().renderer.renderingResources.mainGlyphColor);
 			canvas.beginPath();
 			canvas.moveTo(cx + this.x + beatLineX, cy + this.y + topY);
 			canvas.lineTo(cx + this.x + beatLineX, cy + this.y + bottomY);
@@ -10149,6 +10146,7 @@
 				canvas.lineTo(cx + this.x + this.width, lineY);
 				canvas.stroke();
 			}
+			canvas.set_color(res.mainGlyphColor);
 		}
 	}, $AlphaTab_Rendering_GroupedBarRenderer);
 	ss.initClass($AlphaTab_Rendering_ScoreBarRendererFactory, $asm, {
@@ -10476,6 +10474,7 @@
 				canvas.lineTo(cx + this.x + this.width, lineY);
 				canvas.stroke();
 			}
+			canvas.set_color(res.mainGlyphColor);
 			// Info guides for debugging
 			//DrawInfoGuide(canvas, cx, cy, 0, new Color(255, 0, 0)); // top
 			//DrawInfoGuide(canvas, cx, cy, stave.StaveTop, new Color(0, 255, 0)); // stavetop
@@ -10843,14 +10842,10 @@
 			}
 			this.$_xScale = this.$_xGlyphScale * this.get_scale();
 			this.$_yScale = this.$_yGlyphScale * this.get_scale();
-			var res = this.renderer.get_resources();
-			canvas.set_color(res.mainGlyphColor);
 			var startX = this.x + cx;
 			var startY = this.y + cy;
 			this.$_currentX = startX;
 			this.$_currentY = startY;
-			canvas.set_color(new $AlphaTab_Platform_Model_Color(0, 0, 0, 255));
-			// todo: Resources
 			canvas.beginPath();
 			for (var i = 0; i < this.$_svg.get_commands().length; i++) {
 				this.$parseCommand(startX, startY, canvas, this.$_svg.get_commands()[i]);
@@ -11174,6 +11169,7 @@
 			canvas.set_color(res.barNumberColor);
 			canvas.set_font(res.barNumberFont);
 			canvas.fillText(this.$_number.toString(), cx + this.x, cy + this.y);
+			canvas.set_color(res.mainGlyphColor);
 		}
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_BarSeperatorGlyph, $asm, {
@@ -11185,7 +11181,6 @@
 		},
 		paint: function(cx, cy, canvas) {
 			var res = this.renderer.get_resources();
-			canvas.set_color(res.barSeperatorColor);
 			var blockWidth = 4 * this.get_scale();
 			var top = cy + this.y + this.renderer.get_topPadding();
 			var bottom = cy + this.y + this.renderer.height - this.renderer.get_bottomPadding();
@@ -11388,7 +11383,6 @@
 		paint: function(cx, cy, canvas) {
 			var height = 17 * this.get_scale();
 			var res = this.renderer.get_resources();
-			canvas.set_color(res.mainGlyphColor);
 			canvas.beginPath();
 			if (this.$_crescendo === 1) {
 				canvas.moveTo(cx + this.x + this.width, cy + this.y);
@@ -11460,7 +11454,6 @@
 	ss.initClass($AlphaTab_Rendering_Glyphs_DynamicsGlyph, $asm, {
 		paint: function(cx, cy, canvas) {
 			var res = this.renderer.get_resources();
-			canvas.set_color(res.mainGlyphColor);
 			var glyphs;
 			switch (this.$_dynamics) {
 				case 0: {
@@ -11743,7 +11736,6 @@
 		paint: function(cx, cy, canvas) {
 			var step = 11 * this.get_scale();
 			var res = this.renderer.get_resources();
-			canvas.set_color(res.mainGlyphColor);
 			canvas.set_font(res.effectFont);
 			canvas.set_textAlign(0);
 			var textWidth = canvas.measureText(this.$_label);
@@ -11855,7 +11847,6 @@
 		},
 		paint: function(cx, cy, canvas) {
 			var res = this.renderer.get_resources();
-			canvas.set_color(res.mainGlyphColor);
 			var blockWidth = 4 * this.get_scale();
 			var top = cy + this.y + this.renderer.get_topPadding();
 			var bottom = cy + this.y + this.renderer.height - this.renderer.get_bottomPadding();
@@ -11889,7 +11880,6 @@
 		},
 		paint: function(cx, cy, canvas) {
 			var res = this.renderer.get_resources();
-			canvas.set_color(res.mainGlyphColor);
 			canvas.set_font(res.barNumberFont);
 			var s = 'x' + this.$_count;
 			var w = ss.Int32.trunc(canvas.measureText(s) / 1.5);
@@ -11905,7 +11895,6 @@
 		},
 		paint: function(cx, cy, canvas) {
 			var res = this.renderer.get_resources();
-			canvas.set_color(res.mainGlyphColor);
 			var blockWidth = 4 * this.get_scale();
 			var top = cy + this.y + this.renderer.get_topPadding();
 			var bottom = cy + this.y + this.renderer.height - this.renderer.get_bottomPadding();
@@ -12187,7 +12176,6 @@
 			var endY = cy + this.y + scoreBarRenderer.getNoteY(this.$_beat.get_minNote()) + lineSize;
 			var arrowX = cx + this.x + ss.Int32.div(this.width, 2);
 			var arrowSize = 8 * this.get_scale();
-			canvas.set_color(res.mainGlyphColor);
 			if (this.$_beat.brushType !== 0) {
 				if (this.$_beat.brushType === 3 || this.$_beat.brushType === 4) {
 					var size = ss.Int32.trunc(15 * this.get_scale());
@@ -12394,6 +12382,7 @@
 					l1 += 2;
 				}
 			}
+			canvas.set_color(this.renderer.get_layout().renderer.renderingResources.mainGlyphColor);
 			if (ss.isValue(this.$_tremoloPicking)) {
 				this.$_tremoloPicking.paint(cx + this.x, cy + this.y, canvas);
 			}
@@ -12467,7 +12456,6 @@
 					return;
 				}
 			}
-			canvas.set_color(this.renderer.get_layout().renderer.renderingResources.mainGlyphColor);
 			canvas.beginPath();
 			canvas.moveTo(startX, startY);
 			canvas.lineTo(endX, endY);
@@ -12505,7 +12493,6 @@
 			var startY = cy + startNoteRenderer.getNoteY(this.startNote) + 4;
 			var endY = (ss.isNullOrUndefined(endNote) ? startY : (cy + endNoteRenderer.getNoteY(endNote) + 4));
 			$AlphaTab_Rendering_Glyphs_TieGlyph.paintTie(canvas, this.get_scale(), startX, startY, endX, endY, startNoteRenderer.getBeatDirection(this.startNote.beat) === 1);
-			canvas.set_color(this.renderer.get_layout().renderer.renderingResources.mainGlyphColor);
 			canvas.fill();
 		}
 	}, $AlphaTab_Rendering_Glyphs_TieGlyph);
@@ -12652,7 +12639,6 @@
 			var endY = cy + this.y + tabBarRenderer.getNoteY(this.$_beat.get_minNote()) + res.tablatureFont.get_size() / 2;
 			var arrowX = cx + this.x + ss.Int32.div(this.width, 2);
 			var arrowSize = 8 * this.get_scale();
-			canvas.set_color(res.mainGlyphColor);
 			if (this.$_beat.brushType !== 0) {
 				if (this.$_beat.brushType === 1 || this.$_beat.brushType === 2) {
 					canvas.beginPath();
@@ -12730,7 +12716,6 @@
 			}
 			var font = res.tabClefFont.clone();
 			font.set_size(font.get_size() * fontScale);
-			canvas.set_color(res.mainGlyphColor);
 			canvas.set_font(font);
 			canvas.set_textAlign(1);
 			canvas.fillText('T', cx + this.x + ss.Int32.div(this.width, 2), startY);
@@ -12794,7 +12779,6 @@
 			var res = this.renderer.get_resources();
 			var old = canvas.get_textBaseline();
 			canvas.set_textBaseline(2);
-			canvas.set_color(res.mainGlyphColor);
 			canvas.set_font((this.$_isGrace ? res.graceFont : res.tablatureFont));
 			for (var i = 0; i < this.$_notes.length; i++) {
 				var g = this.$_notes[i];
@@ -12890,7 +12874,6 @@
 					return;
 				}
 			}
-			canvas.set_color(this.renderer.get_layout().renderer.renderingResources.mainGlyphColor);
 			canvas.beginPath();
 			canvas.moveTo(startX, startY);
 			canvas.lineTo(endX, endY);
@@ -12926,7 +12909,6 @@
 			var startY = cy + startNoteRenderer.getNoteY(this.startNote) + offset;
 			var endY = (ss.isNullOrUndefined(endNote) ? startY : (cy + endNoteRenderer.getNoteY(endNote) + offset));
 			$AlphaTab_Rendering_Glyphs_TieGlyph.paintTie(canvas, this.get_scale(), startX, startY, endX, endY, this.startNote.string > 3);
-			canvas.set_color(this.renderer.get_layout().renderer.renderingResources.mainGlyphColor);
 			canvas.fill();
 		}
 	}, $AlphaTab_Rendering_Glyphs_TieGlyph);
@@ -12934,7 +12916,6 @@
 		paint: function(cx, cy, canvas) {
 			var res = this.renderer.get_resources();
 			canvas.set_font(res.markerFont);
-			canvas.set_color(res.mainGlyphColor);
 			var symbol = new $AlphaTab_Rendering_Glyphs_SvgGlyph(0, 0, $AlphaTab_Rendering_Glyphs_MusicFont.tempo, 1, 1);
 			symbol.renderer = this.renderer;
 			symbol.paint(cx + this.x, cy + this.y, canvas);
@@ -12945,7 +12926,6 @@
 		paint: function(cx, cy, canvas) {
 			var res = this.renderer.get_resources();
 			canvas.set_font(this.$_font);
-			canvas.set_color(res.mainGlyphColor);
 			var old = canvas.get_textAlign();
 			canvas.set_textAlign(0);
 			canvas.fillText(this.$_text, cx + this.x, cy + this.y);
@@ -12980,7 +12960,6 @@
 		paint: function(cx, cy, canvas) {
 			var res = this.renderer.get_resources();
 			canvas.set_font(res.markerFont);
-			canvas.set_color(res.mainGlyphColor);
 			var textw = canvas.measureText('tr');
 			canvas.fillText('tr', cx + this.x, cy + this.y);
 			var startX = textw;
@@ -13210,6 +13189,7 @@
 			this.width = this.$_group.x + this.$_group.width + $AlphaTab_Rendering_Layout_HorizontalScreenLayout.pagePadding[2];
 		},
 		paintScore: function() {
+			this.renderer.canvas.set_color(this.renderer.renderingResources.mainGlyphColor);
 			this.$_group.paint(0, 0, this.renderer.canvas);
 		},
 		buildBoundingsLookup: function(lookup) {
@@ -13306,6 +13286,7 @@
 			var x = $AlphaTab_Rendering_Layout_PageViewLayout.pagePadding[0];
 			var y = $AlphaTab_Rendering_Layout_PageViewLayout.pagePadding[1];
 			y = this.$paintScoreInfo(x, y);
+			this.renderer.canvas.set_color(this.renderer.renderingResources.mainGlyphColor);
 			for (var i = 0; i < this.$_groups.length; i++) {
 				this.$_groups[i].paint(0, 0, this.renderer.canvas);
 			}
@@ -13320,7 +13301,7 @@
 			var scale = this.get_scale();
 			var canvas = this.renderer.canvas;
 			var res = this.renderer.renderingResources;
-			canvas.set_color(new $AlphaTab_Platform_Model_Color(0, 0, 0, 255));
+			canvas.set_color(res.scoreInfoColor);
 			canvas.set_textAlign(1);
 			var str;
 			if (!ss.isNullOrEmptyString(score.title) && (flags & 1) !== 0) {

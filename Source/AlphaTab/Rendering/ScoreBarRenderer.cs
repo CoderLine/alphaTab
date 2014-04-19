@@ -346,7 +346,6 @@ namespace AlphaTab.Rendering
 
                 var y2 = cy + Y + CalculateBeamY(h, beatLineX);
 
-                canvas.Color = Layout.Renderer.RenderingResources.MainGlyphColor;
                 canvas.BeginPath();
                 canvas.MoveTo(cx + X + beatLineX, y1);
                 canvas.LineTo(cx + X + beatLineX, y2);
@@ -468,7 +467,6 @@ namespace AlphaTab.Rendering
                 beamY = topY;
             }
 
-            canvas.Color = Layout.Renderer.RenderingResources.MainGlyphColor;
             canvas.BeginPath();
             canvas.MoveTo(cx + X + beatLineX, cy + Y + topY);
             canvas.LineTo(cx + X + beatLineX, cy + Y + bottomY);
@@ -748,6 +746,8 @@ namespace AlphaTab.Rendering
                 canvas.LineTo(cx + X + Width, lineY);
                 canvas.Stroke();
             }
+
+            canvas.Color = res.MainGlyphColor;
         }
     }
 }

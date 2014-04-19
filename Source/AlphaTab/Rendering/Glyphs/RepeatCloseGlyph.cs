@@ -22,7 +22,6 @@ namespace AlphaTab.Rendering.Glyphs
         public override void Paint(int cx, int cy, ICanvas canvas)
         {
             var res = Renderer.Resources;
-            canvas.Color = res.MainGlyphColor;
 
             var blockWidth = 4*Scale;
 

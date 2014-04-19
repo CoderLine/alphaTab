@@ -100,7 +100,6 @@ namespace AlphaTab.Rendering
                     var y1 = cy + Y;
                     var y2 = cy + Y + Height;
 
-                    canvas.Color = Resources.MainGlyphColor;
                     canvas.BeginPath();
                     canvas.MoveTo(cx + X + beatLineX, y1);
                     canvas.LineTo(cx + X + beatLineX, y2);
@@ -191,7 +190,6 @@ namespace AlphaTab.Rendering
 
             int beamY = direction == BeamDirection.Down ? bottomY : topY;
 
-            canvas.Color = Resources.MainGlyphColor;
             canvas.BeginPath();
             canvas.MoveTo(cx + X + beatLineX, cy + Y + topY);
             canvas.LineTo(cx + X + beatLineX, cy + Y + bottomY);

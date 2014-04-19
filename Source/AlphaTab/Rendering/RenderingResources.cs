@@ -45,6 +45,9 @@ namespace AlphaTab.Rendering
         [IntrinsicProperty]
         public float Scale { get; set; }
 
+        [IntrinsicProperty]
+        public Color ScoreInfoColor { get; set; }
+
         public RenderingResources(float scale)
         {
             Init(scale);
@@ -76,6 +79,7 @@ namespace AlphaTab.Rendering
             MarkerFont = new Font(serifFont, 14 * scale, FontStyle.Bold);
             TabClefFont = new Font(sansFont, 18 * scale, FontStyle.Bold);
         
+            ScoreInfoColor = new Color(0,0,0);
             MainGlyphColor = new Color(0,0,0);
         }
     }

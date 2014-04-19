@@ -191,6 +191,8 @@ namespace AlphaTab.Rendering
                 canvas.Stroke();
             }
 
+            canvas.Color = res.MainGlyphColor;
+
             // Info guides for debugging
 
             //DrawInfoGuide(canvas, cx, cy, 0, new Color(255, 0, 0)); // top

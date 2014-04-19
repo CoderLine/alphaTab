@@ -28,7 +28,6 @@ namespace AlphaTab.Rendering.Glyphs
             var arrowX = cx + X + Width / 2;
             var arrowSize = 8 * Scale;
 
-            canvas.Color = res.MainGlyphColor;
             if (_beat.BrushType != BrushType.None)
             {
                 if (_beat.BrushType == BrushType.BrushUp || _beat.BrushType == BrushType.BrushDown)

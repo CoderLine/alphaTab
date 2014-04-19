@@ -153,6 +153,7 @@ namespace AlphaTab.Rendering.Layout
 
             y = PaintScoreInfo(x, y);
 
+            Renderer.Canvas.Color = Renderer.RenderingResources.MainGlyphColor;
             for (int i = 0; i < _groups.Count; i++)
             {
                 _groups[i].Paint(0, 0, Renderer.Canvas);
@@ -174,7 +175,7 @@ namespace AlphaTab.Rendering.Layout
             var canvas = Renderer.Canvas;
             var res = Renderer.RenderingResources;
 
-            canvas.Color = new Color(0, 0, 0);
+            canvas.Color = res.ScoreInfoColor;
             canvas.TextAlign = TextAlign.Center;
 
             string str;

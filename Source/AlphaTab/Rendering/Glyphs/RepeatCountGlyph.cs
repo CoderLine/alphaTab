@@ -24,7 +24,6 @@ namespace AlphaTab.Rendering.Glyphs
         public override void Paint(int cx, int cy, ICanvas canvas)
         {
             var res = Renderer.Resources;
-            canvas.Color = res.MainGlyphColor;
             canvas.Font = res.BarNumberFont;
 
             var s = "x" + _count;

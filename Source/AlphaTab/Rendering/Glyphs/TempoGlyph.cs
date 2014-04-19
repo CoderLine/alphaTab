@@ -16,7 +16,6 @@ namespace AlphaTab.Rendering.Glyphs
         {
             var res = Renderer.Resources;
             canvas.Font = res.MarkerFont;
-            canvas.Color = res.MainGlyphColor;
 
             var symbol = new SvgGlyph(0, 0, MusicFont.Tempo, 1, 1);
             symbol.Renderer = Renderer;

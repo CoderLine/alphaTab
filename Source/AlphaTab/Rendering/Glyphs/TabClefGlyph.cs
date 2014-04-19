@@ -55,7 +55,6 @@ namespace AlphaTab.Rendering.Glyphs
             var font = res.TabClefFont.Clone();
             font.Size = font.Size * fontScale;
 
-            canvas.Color = res.MainGlyphColor;
             canvas.Font = font;
             canvas.TextAlign = TextAlign.Center;
 

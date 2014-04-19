@@ -101,7 +101,6 @@ namespace AlphaTab.Rendering.Glyphs
             var res = Renderer.Resources;
             var old = canvas.TextBaseline;
             canvas.TextBaseline = TextBaseline.Middle;
-            canvas.Color = res.MainGlyphColor;
             canvas.Font = _isGrace ? res.GraceFont : res.TablatureFont;
             for (int i = 0; i < _notes.Count; i++)
             {

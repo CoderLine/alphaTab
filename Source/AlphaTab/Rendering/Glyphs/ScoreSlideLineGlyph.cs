@@ -84,7 +84,6 @@ namespace AlphaTab.Rendering.Glyphs
                     return;
             }
 
-            canvas.Color = Renderer.Layout.Renderer.RenderingResources.MainGlyphColor;
             canvas.BeginPath();
             canvas.MoveTo(startX, startY);
             canvas.LineTo(endX, endY);

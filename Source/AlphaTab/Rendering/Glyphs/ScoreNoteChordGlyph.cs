@@ -291,6 +291,8 @@ namespace AlphaTab.Rendering.Glyphs
                 }
             }
 
+            canvas.Color = Renderer.Layout.Renderer.RenderingResources.MainGlyphColor;
+            
             if (_tremoloPicking != null)
                 _tremoloPicking.Paint(cx + X, cy + Y, canvas);
             for (int i = 0; i < _infos.Count; i++)

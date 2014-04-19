@@ -18,7 +18,6 @@ namespace AlphaTab.Rendering.Glyphs
             var res = Renderer.Resources;
 
             canvas.Font = res.MarkerFont;
-            canvas.Color = res.MainGlyphColor;
 
             var textw = canvas.MeasureText("tr");
             canvas.FillText("tr", cx + X, cy + Y);

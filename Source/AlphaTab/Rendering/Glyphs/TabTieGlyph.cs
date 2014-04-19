@@ -53,7 +53,6 @@ namespace AlphaTab.Rendering.Glyphs
 
             PaintTie(canvas, Scale, startX, startY, endX, endY, StartNote.String > 3);
 
-            canvas.Color = Renderer.Layout.Renderer.RenderingResources.MainGlyphColor;
             canvas.Fill();
         }
 

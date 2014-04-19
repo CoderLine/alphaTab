@@ -37,6 +37,8 @@ namespace AlphaTab.Rendering.Glyphs
             canvas.Font = res.BarNumberFont;
 
             canvas.FillText(_number.ToString(), cx + X, cy + Y);
+
+            canvas.Color = res.MainGlyphColor;
         }
     }
 }

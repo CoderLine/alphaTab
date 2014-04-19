@@ -19,7 +19,6 @@ namespace AlphaTab.Rendering.Glyphs
         {
             var height = Height * Scale;
             var res = Renderer.Resources;
-            canvas.Color = res.MainGlyphColor;
             canvas.BeginPath();
             if (_crescendo == CrescendoType.Crescendo)
             {

@@ -45,7 +45,6 @@ namespace AlphaTab.Rendering.Glyphs
 
             PaintTie(canvas, Scale, startX, startY, endX, endY, startNoteRenderer.GetBeatDirection(StartNote.Beat) == BeamDirection.Down);
 
-            canvas.Color = Renderer.Layout.Renderer.RenderingResources.MainGlyphColor;
             canvas.Fill();
         }
     }

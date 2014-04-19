@@ -78,7 +78,6 @@ namespace AlphaTab.Rendering
             if (_endings.Count > 0)
             {
                 var res = Resources;
-                canvas.Color = res.MainGlyphColor;
                 canvas.Font = res.WordsFont;
                 canvas.MoveTo(cx + X, cy + Y + Height);
                 canvas.LineTo(cx + X, cy + Y);

@@ -30,7 +30,6 @@ namespace AlphaTab.Rendering.Glyphs
             float step = 11 * Scale;
 
             var res = Renderer.Resources;
-            canvas.Color = res.MainGlyphColor;
             canvas.Font = res.EffectFont;
             canvas.TextAlign = TextAlign.Left;
             var textWidth = canvas.MeasureText(_label);

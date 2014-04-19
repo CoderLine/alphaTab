@@ -58,6 +58,7 @@ namespace AlphaTab.Rendering.Layout
 
         public override void PaintScore()
         {
+            Renderer.Canvas.Color = Renderer.RenderingResources.MainGlyphColor;
             _group.Paint(0, 0, Renderer.Canvas);
         }
 
