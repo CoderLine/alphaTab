@@ -2,6 +2,10 @@
 
 namespace AlphaTab.IO
 {
+    [IncludeGenericArguments(false)]
+    [IgnoreNamespace]
+    [Imported(ObeysTypeSystem = true)]
+    [ScriptName("Uint8Array")]
     public class ByteArray 
     {
         private readonly byte[] _data;
@@ -14,43 +18,28 @@ namespace AlphaTab.IO
             }
         }
 
+        [InlineCode("new Uint8Array({size})")]
         public ByteArray(int size)
         {
-            _data = NewByteArray(size);
+            _data = new byte[size];
         }
 
+        [InlineCode("new Uint8Array({data})")]
         public ByteArray(params byte[] data)
         {
-#if CSharp
             _data = data;
-#elif JavaScript
-            _data = NewByteArray(data.Length);
-            CopyFromArray(_data, data);
-#endif
-        }
-
-#if JavaScript
-        [InlineCode("{dst}.set({src})")]
-        private static void CopyFromArray(byte[] dst, byte[] src)
-        {
-
-        }
-#endif
-
-        [InlineCode("new Uint8Array({size})")]
-        private byte[] NewByteArray(int size)
-        {
-            return new byte[size];
         }
 
         public int Length
         {
+            [InlineCode("{this}.length")]
             get
             {
                 return _data.Length;
             }
         }
 
+        [IntrinsicProperty]
         public byte this[int index]
         {
             get

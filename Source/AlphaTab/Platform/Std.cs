@@ -45,20 +45,11 @@ namespace AlphaTab.Platform
             return f;
         }
 
-        
+
+        [System.Runtime.CompilerServices.InlineCodeAttribute("{dst}.set({src}.subarray({srcOffset}, {srcOffset} + {count}), {dstOffset})")]
         public static void BlockCopy(ByteArray src, int srcOffset, ByteArray dst, int dstOffset, int count)
         {
-            InternalBlockCopy(src.Data, srcOffset, dst.Data, dstOffset, count);
-        }
-
-#if JavaScript
-        [System.Runtime.CompilerServices.InlineCodeAttribute("{dst}.set({src}.subarray({srcOffset}, {srcOffset} + {count}), {dstOffset})")]
-#endif
-        private static void InternalBlockCopy(byte[] src, int srcOffset, byte[] dst, int dstOffset, int count)
-        {
-#if CSharp
-            Buffer.BlockCopy(src, srcOffset, dst, dstOffset, count);
-#endif
+            Buffer.BlockCopy(src.Data, srcOffset, dst.Data, dstOffset, count);
         }
 
         public static bool IsNullOrWhiteSpace(this string s)
