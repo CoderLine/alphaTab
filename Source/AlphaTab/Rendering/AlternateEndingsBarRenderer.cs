@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using AlphaTab.Collections;
+﻿using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Rendering.Layout;

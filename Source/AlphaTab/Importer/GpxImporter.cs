@@ -1,6 +1,5 @@
 ﻿using AlphaTab.Collections;
 using AlphaTab.Model;
-using AlphaTab.Platform;
 
 namespace AlphaTab.Importer
 {

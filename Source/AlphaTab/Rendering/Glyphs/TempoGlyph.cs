@@ -1,5 +1,4 @@
-﻿using AlphaTab.Model;
-using AlphaTab.Platform;
+﻿using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {

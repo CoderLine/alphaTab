@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using AlphaTab.Collections;
 using AlphaTab.Platform;
 using AlphaTab.Platform.Svg;

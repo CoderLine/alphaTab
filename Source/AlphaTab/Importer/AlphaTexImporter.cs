@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using AlphaTab.Audio;
 using AlphaTab.Collections;
 using AlphaTab.Model;
