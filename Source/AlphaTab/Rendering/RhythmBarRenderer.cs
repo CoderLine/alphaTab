@@ -38,7 +38,7 @@ namespace AlphaTab.Rendering
 
         private void CreateVoiceGlyphs(Voice voice)
         {
-            for (int i = 0; i < voice.Beats.Count; i++)
+            for (int i = 0, j = voice.Beats.Count; i < j; i++)
             {
                 var b = voice.Beats[i];
                 // we create empty glyphs as alignment references and to get the 
@@ -59,12 +59,12 @@ namespace AlphaTab.Rendering
         {
             base.Paint(cx, cy, canvas);
 
-            for (int i = 0; i < _helpers.BeamHelpers.Count; i++)
+            for (int i = 0, j = _helpers.BeamHelpers.Count; i < j; i++)
             {
                 var v = _helpers.BeamHelpers[i];
-                for (int j = 0; j < v.Count; j++)
+                for (int k = 0, l = v.Count; k < l; k++)
                 {
-                    PaintBeamHelper(cx + BeatGlyphsStart, cy, canvas, v[j]);
+                    PaintBeamHelper(cx + BeatGlyphsStart, cy, canvas, v[k]);
                 }
             }
         }
@@ -85,7 +85,7 @@ namespace AlphaTab.Rendering
 
         private void PaintBar(int cx, int cy, ICanvas canvas, BeamingHelper h)
         {
-            for (int i = 0; i < h.Beats.Count; i++)
+            for (int i = 0, j = h.Beats.Count; i < j; i++)
             {
                 var beat = h.Beats[i];
 

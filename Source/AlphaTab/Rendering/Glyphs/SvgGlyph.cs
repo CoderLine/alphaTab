@@ -38,7 +38,7 @@ namespace AlphaTab.Rendering.Glyphs
             _currentY = startY;
             canvas.BeginPath();
 
-            for (int i = 0; i < _svg.Commands.Count; i++)
+            for (int i = 0, j = _svg.Commands.Count; i < j; i++)
             {
                 ParseCommand(startX, startY, canvas, _svg.Commands[i]);
             }

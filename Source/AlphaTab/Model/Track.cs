@@ -71,7 +71,7 @@ namespace AlphaTab.Model
                     ShortName = ShortName.Substring(0, ShortNameMaxLength);
             }
 
-            for (int i = 0; i < Bars.Count; i++)
+            for (int i = 0, j = Bars.Count; i < j; i++)
             {
                 Bars[i].Finish();
             }

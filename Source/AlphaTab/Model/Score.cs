@@ -120,7 +120,7 @@ namespace AlphaTab.Model
 
         public void Finish()
         {
-            for (int i = 0; i < Tracks.Count; i++)
+            for (int i = 0, j = Tracks.Count; i < j; i++)
             {
                 Tracks[i].Finish();
             }

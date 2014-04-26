@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using AlphaTab.Platform;
 
 namespace AlphaTab.Collections
 {
@@ -59,19 +61,15 @@ namespace AlphaTab.Collections
             }
         }
 
-        public TValue[] Values
+        public IEnumerable<TValue> Values
         {
-            [InlineCode("{$AlphaTab.Collections.FastDictionaryExtensions}.getValues({this})")]
+            [InlineCode("{this}")]
             get
             {
-#if JavaScript
-                return null;
-#else
-                return _store.Values.ToArray();
-#endif
+                return _store.Values;
             }
         }
-        
+
         public int Count
         {
             [InlineCode("Object.keys({this}).length")]

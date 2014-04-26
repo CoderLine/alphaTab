@@ -30,7 +30,7 @@ namespace AlphaTab.Rendering.Glyphs
         {
             var glyphSpacing = spacing / BeatGlyphs.Count;
             var gx = 0.0;
-            for (int i = 0; i < BeatGlyphs.Count; i++)
+            for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
             {
                 var g = BeatGlyphs[i];
                 g.X = (int)(gx);
@@ -42,7 +42,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public void RegisterMaxSizes(BarSizeInfo sizes)
         {
-            for (int i = 0; i < BeatGlyphs.Count; i++)
+            for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
             {
                 var b = BeatGlyphs[i];
                 b.RegisterMaxSizes(sizes);
@@ -52,7 +52,7 @@ namespace AlphaTab.Rendering.Glyphs
         public void ApplySizes(BarSizeInfo sizes)
         {
             Width = 0;
-            for (int i = 0; i < BeatGlyphs.Count; i++)
+            for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
             {
                 BeatGlyphs[i].X = (i == 0) ? 0 : BeatGlyphs[i - 1].X + BeatGlyphs[i - 1].Width;
                 BeatGlyphs[i].ApplySizes(sizes);
@@ -82,7 +82,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public void FinalizeGlyph(ScoreLayout layout)
         {
-            for (int i = 0; i < BeatGlyphs.Count; i++)
+            for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
             {
                 BeatGlyphs[i].FinalizeGlyph(layout);
             }
@@ -93,7 +93,7 @@ namespace AlphaTab.Rendering.Glyphs
         {
             //canvas.Color = new Color((byte) Random.Next(255), (byte) Random.Next(255), (byte) Random.Next(255), 128);
             //canvas.FillRect(cx + X, cy + Y, Width, 100);
-            for (int i = 0; i < BeatGlyphs.Count; i++)
+            for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
             {
                 BeatGlyphs[i].Paint(cx + X, cy + Y, canvas);
             }

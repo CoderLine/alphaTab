@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using AlphaTab.IO;
@@ -67,6 +68,25 @@ namespace AlphaTab.Platform
         {
             return ((char) c).ToString();
         }
+
+        public static void Foreach<T>(IEnumerable<T> e, Action<T> c)
+        {
+#if CSharp
+            foreach (var t in e)
+            {
+                c(t);
+            }
+#elif JavaScript
+            JsForeach(e, c);
+#endif
+        }
+
+#if JavaScript
+        [InlineCode("for ( var t in {e} ) {c}({e}[t]);")]
+        private static void JsForeach<T>(IEnumerable<T> e, Action<T> c)
+        {
+        }
+#endif
 
         public static bool IsStringNumber(string s, bool allowSign = true)
         {

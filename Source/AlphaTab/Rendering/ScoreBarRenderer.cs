@@ -124,12 +124,12 @@ namespace AlphaTab.Rendering
             var top = GetScoreY(0);
             var bottom = GetScoreY(8);
 
-            for (int i = 0; i < _helpers.BeamHelpers.Count; i++)
+            for (int i = 0, j = _helpers.BeamHelpers.Count; i < j; i++)
             {
                 var v = _helpers.BeamHelpers[i];
-                for (int j = 0; j < v.Count; j++)
+                for (int k = 0, l = v.Count; k < l; k++)
                 {
-                    var h = v[j];
+                    var h = v[k];
                     //
                     // max note (highest) -> top overflow
                     // 
@@ -170,12 +170,12 @@ namespace AlphaTab.Rendering
 
         private void PaintTuplets(int cx, int cy, ICanvas canvas)
         {
-            for (int i = 0; i < _helpers.TupletHelpers.Count; i++)
+            for (int i = 0, j = _helpers.TupletHelpers.Count; i < j; i++)
             {
                 var v = _helpers.TupletHelpers[i];
-                for (int j = 0; j < v.Count; j++)
+                for (int k = 0, l = v.Count; k < l; k++)
                 {
-                    var h = v[j];
+                    var h = v[k];
                     PaintTupletHelper(cx + BeatGlyphsStart, cy, canvas, h);
                 }
             }
@@ -183,12 +183,12 @@ namespace AlphaTab.Rendering
 
         private void PaintBeams(int cx, int cy, ICanvas canvas)
         {
-            for (int i = 0; i < _helpers.BeamHelpers.Count; i++)
+            for (int i = 0, j = _helpers.BeamHelpers.Count; i < j; i++)
             {
                 var v = _helpers.BeamHelpers[i];
-                for (int j = 0; j < v.Count; j++)
+                for (int k = 0, l = v.Count; k < l; k++)
                 {
-                    var h = v[j];
+                    var h = v[k];
                     PaintBeamHelper(cx + BeatGlyphsStart, cy, canvas, h);
                 }
             }
@@ -216,7 +216,7 @@ namespace AlphaTab.Rendering
             // check if we need to paint simple footer
             if (h.Beats.Count == 1 || !h.IsFull)
             {
-                for (var i = 0; i < h.Beats.Count; i++)
+                for (int i = 0, j = h.Beats.Count; i < j; i++)
                 {
                     var beat = h.Beats[i];
                     var beamingHelper = _helpers.BeamHelperLookup[h.VoiceIndex][beat.Index];
@@ -328,7 +328,7 @@ namespace AlphaTab.Rendering
 
         private void PaintBar(int cx, int cy, ICanvas canvas, BeamingHelper h)
         {
-            for (var i = 0; i < h.Beats.Count; i++)
+            for (int i = 0, j = h.Beats.Count; i < j; i++)
             {
                 var beat = h.Beats[i];
 
@@ -659,7 +659,7 @@ namespace AlphaTab.Rendering
 
         private void CreateVoiceGlyphs(Voice v)
         {
-            for (int i = 0; i < v.Beats.Count; i++)
+            for (int i = 0, j = v.Beats.Count; i < j; i++)
             {
                 var b = v.Beats[i];
                 var container = new ScoreBeatContainerGlyph(b);

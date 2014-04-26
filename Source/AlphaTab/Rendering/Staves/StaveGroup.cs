@@ -124,12 +124,12 @@ namespace AlphaTab.Rendering.Staves
 
             // add renderers
             var maxSizes = new BarSizeInfo();
-            for (int i = 0; i < Staves.Count; i++)
+            for (int i = 0, j = Staves.Count; i < j; i++)
             {
                 var g = Staves[i];
-                for (int j = 0; j < g.Staves.Count; j++)
+                for (int k = 0, l = g.Staves.Count; k < l; k++)
                 {
-                    var s = g.Staves[j];
+                    var s = g.Staves[k];
                     s.AddBar(g.Track.Bars[barIndex]);
                     s.BarRenderers[s.BarRenderers.Count - 1].RegisterMaxSizes(maxSizes);
                 }
@@ -137,7 +137,7 @@ namespace AlphaTab.Rendering.Staves
 
             // ensure same widths of new renderer
             var realWidth = 0;
-            for (int i = 0; i < _allStaves.Count; i++)
+            for (int i = 0, j = _allStaves.Count; i < j; i++)
             {
                 var s = _allStaves[i];
                 s.BarRenderers[s.BarRenderers.Count - 1].ApplySizes(maxSizes);
@@ -152,7 +152,7 @@ namespace AlphaTab.Rendering.Staves
 
         private StaveTrackGroup GetStaveTrackGroup(Track track)
         {
-            for (int i = 0; i < Staves.Count; i++)
+            for (int i = 0, j = Staves.Count; i < j; i++)
             {
                 var g = Staves[i];
                 if (g.Track == track)
@@ -216,7 +216,7 @@ namespace AlphaTab.Rendering.Staves
             {
                 MasterBars.RemoveAt(MasterBars.Count - 1);
                 var w = 0;
-                for (int i = 0; i < _allStaves.Count; i++)
+                for (int i = 0, j = _allStaves.Count; i < j; i++)
                 {
                     var s = _allStaves[i];
                     w = Math.Max(w, s.BarRenderers[s.BarRenderers.Count - 1].Width);
@@ -228,7 +228,7 @@ namespace AlphaTab.Rendering.Staves
 
         public void ApplyBarSpacing(int spacing)
         {
-            for (int i = 0; i < _allStaves.Count; i++)
+            for (int i = 0, j = _allStaves.Count; i < j; i++)
             {
                 _allStaves[i].ApplyBarSpacing(spacing);
             }
@@ -237,7 +237,7 @@ namespace AlphaTab.Rendering.Staves
 
         public void Paint(int cx, int cy, ICanvas canvas)
         {
-            for (int i = 0; i < _allStaves.Count; i++)
+            for (int i = 0, j = _allStaves.Count; i < j; i++)
             {
                 _allStaves[i].Paint(cx + X, cy + Y, canvas);
             }
@@ -274,7 +274,7 @@ namespace AlphaTab.Rendering.Staves
                 // Draw accolade for each track group
                 // 
                 canvas.Font = res.EffectFont;
-                for (int i = 0; i < Staves.Count; i++)
+                for (int i = 0, j = Staves.Count; i < j; i++)
                 {
                     var g = Staves[i];
                     var firstStart = cy + Y + g.FirstStaveInAccolade.Y + g.FirstStaveInAccolade.StaveTop + g.FirstStaveInAccolade.TopSpacing + g.FirstStaveInAccolade.TopOverflow;
@@ -324,7 +324,7 @@ namespace AlphaTab.Rendering.Staves
         public void FinalizeGroup(ScoreLayout scoreLayout)
         {
             float currentY = 0;
-            for (int i = 0; i < _allStaves.Count; i++)
+            for (int i = 0, j = _allStaves.Count; i < j; i++)
             {
                 _allStaves[i].X = AccoladeSpacing;
                 _allStaves[i].Y = (int)(currentY);
@@ -342,7 +342,7 @@ namespace AlphaTab.Rendering.Staves
 
             var visualHeight = visualBottom - visualTop;
             var realHeight = realBottom - realTop;
-            for (int i = 0; i < _firstStaveInAccolade.BarRenderers.Count; i++)
+            for (int i = 0, j = _firstStaveInAccolade.BarRenderers.Count; i < j; i++)
             {
                 _firstStaveInAccolade.BarRenderers[i].BuildBoundingsLookup(lookup, visualTop, visualHeight, realTop, realHeight, X);
             }

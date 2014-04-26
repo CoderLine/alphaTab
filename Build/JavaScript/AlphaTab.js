@@ -368,7 +368,7 @@
 	$AlphaTab_Audio_Generator_MidiFileGenerator.generateMidiFile = function(score, generateMetronome) {
 		var midiFile = new $AlphaTab_Audio_Model_MidiFile();
 		// create score tracks + metronometrack
-		for (var i = 0; i < score.tracks.length; i++) {
+		for (var i = 0, j = score.tracks.length; i < j; i++) {
 			midiFile.createTrack();
 		}
 		midiFile.infoTrack = 0;
@@ -1481,10 +1481,10 @@
 	};
 	$AlphaTab_Model_Tuning.findTuning = function(strings) {
 		var tunings = $AlphaTab_Model_Tuning.getPresetsFor(strings.length);
-		for (var t = 0; t < tunings.length; t++) {
+		for (var t = 0, tc = tunings.length; t < tc; t++) {
 			var tuning = tunings[t];
 			var equals = true;
-			for (var i = 0; i < strings.length; i++) {
+			for (var i = 0, j = strings.length; i < j; i++) {
 				if (strings[i] !== tuning.tunings[i]) {
 					equals = false;
 					break;
@@ -1552,6 +1552,13 @@
 	};
 	$AlphaTab_Platform_Std.isNullOrWhiteSpace = function(s) {
 		return ss.isNullOrUndefined(s) || s.trim().length === 0;
+	};
+	$AlphaTab_Platform_Std.foreach = function(T) {
+		return function(e, c) {
+			for (var t in e) {
+				c(e[t]);
+			}
+		};
 	};
 	$AlphaTab_Platform_Std.isStringNumber = function(s, allowSign) {
 		if (s.length === 0) {
@@ -3067,13 +3074,13 @@
 		this.tupletHelpers = [];
 		var currentBeamHelper = null;
 		var currentTupletHelper = null;
-		for (var i = 0; i < bar.voices.length; i++) {
+		for (var i = 0, j = bar.voices.length; i < j; i++) {
 			var v = bar.voices[i];
 			this.beamHelpers.push([]);
 			this.beamHelperLookup.push({});
 			this.tupletHelpers.push([]);
-			for (var j = 0; j < v.beats.length; j++) {
-				var b = v.beats[j];
+			for (var k = 0, l = v.beats.length; k < l; k++) {
+				var b = v.beats[k];
 				var newBeamingHelper = false;
 				if (!b.get_isRest()) {
 					// try to fit beam to current beamhelper
@@ -3320,7 +3327,7 @@
 	ss.initClass($AlphaTab_Audio_Generator_MidiFileGenerator, $asm, {
 		generate: function() {
 			// initialize tracks
-			for (var i = 0; i < this.$_score.tracks.length; i++) {
+			for (var i = 0, j = this.$_score.tracks.length; i < j; i++) {
 				this.$generateTrack(this.$_score.tracks[i]);
 			}
 			var controller = new $AlphaTab_Audio_Generator_MidiPlaybackController(this.$_score);
@@ -3331,7 +3338,7 @@
 				controller.process();
 				if (controller.shouldPlay) {
 					this.$generateMasterBar(this.$_score.masterBars[index], previousMasterBar, controller.repeatMove);
-					for (var i1 = 0; i1 < this.$_score.tracks.length; i1++) {
+					for (var i1 = 0, j1 = this.$_score.tracks.length; i1 < j1; i1++) {
 						this.generateBar(this.$_score.tracks[i1].bars[index], controller.repeatMove);
 					}
 				}
@@ -3378,12 +3385,12 @@
 			}
 		},
 		generateBar: function(bar, startMove) {
-			for (var i = 0; i < bar.voices.length; i++) {
+			for (var i = 0, j = bar.voices.length; i < j; i++) {
 				this.$generateVoice(bar.voices[i], startMove);
 			}
 		},
 		$generateVoice: function(voice, startMove) {
-			for (var i = 0; i < voice.beats.length; i++) {
+			for (var i = 0, j = voice.beats.length; i < j; i++) {
 				this.$generateBeat(voice.beats[i], startMove);
 			}
 		},
@@ -3392,7 +3399,7 @@
 			var start = beat.start;
 			var duration = beat.calculateDuration();
 			var track = beat.voice.bar.track;
-			for (var i = 0; i < beat.automations.length; i++) {
+			for (var i = 0, j = beat.automations.length; i < j; i++) {
 				this.$generateAutomation(beat, beat.automations[i], startMove);
 			}
 			if (beat.get_isRest()) {
@@ -3400,7 +3407,7 @@
 			}
 			else {
 				var brushInfo = this.$getBrushInfo(beat);
-				for (var i1 = 0; i1 < beat.notes.length; i1++) {
+				for (var i1 = 0, j1 = beat.notes.length; i1 < j1; i1++) {
 					var n = beat.notes[i1];
 					if (n.isTieDestination) {
 						continue;
@@ -3663,7 +3670,7 @@
 				// calculate the number of  
 				// a mask where the single bits indicate the strings used
 				var stringUsed = 0;
-				for (var i = 0; i < beat.notes.length; i++) {
+				for (var i = 0, j = beat.notes.length; i < j; i++) {
 					var n = beat.notes[i];
 					if (n.isTieDestination) {
 						continue;
@@ -3675,7 +3682,7 @@
 				if (beat.notes.length > 0) {
 					var brushMove = 0;
 					var brushIncrement = this.$getBrushIncrement(beat);
-					for (var i1 = 0; i1 < beat.voice.bar.track.tuning.length; i1++) {
+					for (var i1 = 0, j1 = beat.voice.bar.track.tuning.length; i1 < j1; i1++) {
 						var index = ((beat.brushType === 4 || beat.brushType === 2) ? i1 : (brushInfo.length - 1 - i1));
 						if ((stringUsed & 1 << index) !== 0) {
 							brushInfo[index] = brushMove;
@@ -3870,7 +3877,7 @@
 			v = 960;
 			b = new Uint8Array([v >> 8 & 255, v & 255]);
 			s.write(b, 0, b.length);
-			for (var i = 0; i < this.tracks.length; i++) {
+			for (var i = 0, j = this.tracks.length; i < j; i++) {
 				this.tracks[i].writeTo(s);
 			}
 		}
@@ -3909,7 +3916,7 @@
 			tick = tick - lookup.start + masterBar.start;
 			// linear search beat within beats
 			var beat = null;
-			for (var i = 0; i < bar.voices[0].beats.length; i++) {
+			for (var i = 0, j = bar.voices[0].beats.length; i < j; i++) {
 				var b = bar.voices[0].beats[i];
 				// we search for the first beat which 
 				// starts after the tick. 
@@ -7636,7 +7643,7 @@
 				this.score.addTrack(track);
 				// iterate all bar definitions for the masterbars
 				// and add the correct bar to the track
-				for (var i = 0; i < this.$_barsOfMasterBar.length; i++) {
+				for (var i = 0, j = this.$_barsOfMasterBar.length; i < j; i++) {
 					var barIds = this.$_barsOfMasterBar[i];
 					var barId1 = barIds[trackIndex];
 					if (!ss.referenceEquals(barId1, $AlphaTab_Importer_GpxParser.$invalidId)) {
@@ -7650,18 +7657,18 @@
 			for (var $t15 = 0; $t15 < $t14.length; $t15++) {
 				var barId2 = $t14[$t15];
 				var bar1 = this.$_barsById[barId2];
-				for (var i1 = 0; i1 < bar1.voices.length; i1++) {
+				for (var i1 = 0, j1 = bar1.voices.length; i1 < j1; i1++) {
 					var v = bar1.voices[i1];
 					if (v.beats.length > 0) {
-						for (var j = 0; j < this.$_automations[barId2].length; j++) {
-							var automation = this.$_automations[barId2][j];
+						for (var k = 0, l = this.$_automations[barId2].length; k < l; k++) {
+							var automation = this.$_automations[barId2][k];
 							v.beats[0].automations.push(automation);
 						}
 					}
 				}
 			}
 			// build score
-			for (var i2 = 0; i2 < this.$_masterBars.length; i2++) {
+			for (var i2 = 0, j2 = this.$_masterBars.length; i2 < j2; i2++) {
 				var masterBar = this.$_masterBars[i2];
 				this.score.addMasterBar(masterBar);
 			}
@@ -7671,7 +7678,7 @@
 				var barId3 = $t16[$t17];
 				var automations = this.$_automations[barId3];
 				var bar2 = this.$_barsById[barId3];
-				for (var i3 = 0; i3 < automations.length; i3++) {
+				for (var i3 = 0, j3 = automations.length; i3 < j3; i3++) {
 					var automation1 = automations[i3];
 					if (automation1.type === 0) {
 						if (barId3 === '0') {
@@ -7935,7 +7942,7 @@
 			return this.track.score.masterBars[this.index];
 		},
 		get_isEmpty: function() {
-			for (var i = 0; i < this.voices.length; i++) {
+			for (var i = 0, j = this.voices.length; i < j; i++) {
 				if (!this.voices[i].get_isEmpty()) {
 					return false;
 				}
@@ -7943,7 +7950,7 @@
 			return true;
 		},
 		finish: function() {
-			for (var i = 0; i < this.voices.length; i++) {
+			for (var i = 0, j = this.voices.length; i < j; i++) {
 				var voice = this.voices[i];
 				voice.finish();
 				if (ss.isNullOrUndefined(voice.minDuration) || ss.isNullOrUndefined(this.minDuration) || ss.unbox(this.minDuration) > ss.unbox(voice.minDuration)) {
@@ -7988,10 +7995,10 @@
 		},
 		clone: function() {
 			var beat = new $AlphaTab_Model_Beat();
-			for (var i = 0; i < this.whammyBarPoints.length; i++) {
+			for (var i = 0, j = this.whammyBarPoints.length; i < j; i++) {
 				beat.whammyBarPoints.push(this.whammyBarPoints[i].clone());
 			}
-			for (var i1 = 0; i1 < this.notes.length; i1++) {
+			for (var i1 = 0, j1 = this.notes.length; i1 < j1; i1++) {
 				beat.addNote(this.notes[i1].clone());
 			}
 			beat.dots = this.dots;
@@ -8007,7 +8014,7 @@
 			beat.tap = this.tap;
 			beat.slap = this.slap;
 			beat.pop = this.pop;
-			for (var i2 = 0; i2 < this.automations.length; i2++) {
+			for (var i2 = 0, j2 = this.automations.length; i2 < j2; i2++) {
 				beat.automations.push(this.automations[i2].clone());
 			}
 			beat.start = this.start;
@@ -8035,7 +8042,7 @@
 			this.notes.push(note);
 		},
 		refreshNotes: function() {
-			for (var i = 0; i < this.notes.length; i++) {
+			for (var i = 0, j = this.notes.length; i < j; i++) {
 				var note = this.notes[i];
 				if (ss.isNullOrUndefined(this.$_minNote) || note.get_realValue() < this.$_minNote.get_realValue()) {
 					this.$_minNote = note;
@@ -8046,7 +8053,7 @@
 			}
 		},
 		getAutomation: function(type) {
-			for (var i = 0; i < this.automations.length; i++) {
+			for (var i = 0, j = this.automations.length; i < j; i++) {
 				var automation = this.automations[i];
 				if (automation.type === type) {
 					return automation;
@@ -8055,7 +8062,7 @@
 			return null;
 		},
 		getNoteOnString: function(string) {
-			for (var i = 0; i < this.notes.length; i++) {
+			for (var i = 0, j = this.notes.length; i < j; i++) {
 				var note = this.notes[i];
 				if (note.string === string) {
 					return note;
@@ -8071,7 +8078,7 @@
 			else {
 				this.start = this.previousBeat.start + this.previousBeat.calculateDuration();
 			}
-			for (var i = 0; i < this.notes.length; i++) {
+			for (var i = 0, j = this.notes.length; i < j; i++) {
 				this.notes[i].finish();
 			}
 		}
@@ -8131,7 +8138,7 @@
 		clone: function() {
 			var n = new $AlphaTab_Model_Note();
 			n.accentuated = this.accentuated;
-			for (var i = 0; i < this.bendPoints.length; i++) {
+			for (var i = 0, j = this.bendPoints.length; i < j; i++) {
 				n.bendPoints.push(this.bendPoints[i].clone());
 			}
 			n.fret = this.fret;
@@ -8241,7 +8248,7 @@
 			this.tracks.push(track);
 		},
 		finish: function() {
-			for (var i = 0; i < this.tracks.length; i++) {
+			for (var i = 0, j = this.tracks.length; i < j; i++) {
 				this.tracks[i].finish();
 			}
 		}
@@ -8265,7 +8272,7 @@
 					this.shortName = this.shortName.substr(0, $AlphaTab_Model_Track.$shortNameMaxLength);
 				}
 			}
-			for (var i = 0; i < this.bars.length; i++) {
+			for (var i = 0, j = this.bars.length; i < j; i++) {
 				this.bars[i].finish();
 			}
 		}
@@ -8318,7 +8325,7 @@
 			this.addBeat(lastBeat);
 		},
 		finish: function() {
-			for (var i = 0; i < this.beats.length; i++) {
+			for (var i = 0, j = this.beats.length; i < j; i++) {
 				var beat = this.beats[i];
 				this.$chain(beat);
 				beat.finish();
@@ -8999,7 +9006,7 @@
 			}
 			this.height = ss.Int32.trunc(this.get_resources().wordsFont.get_size());
 			var endingsStrings = new $AlphaTab_Collections_StringBuilder();
-			for (var i = 0; i < this.$_endings.length; i++) {
+			for (var i = 0, j = this.$_endings.length; i < j; i++) {
 				endingsStrings.append(this.$_endings[i] + 1);
 				endingsStrings.append('. ');
 			}
@@ -9044,11 +9051,9 @@
 			this.createPreBeatGlyphs();
 			this.createBeatGlyphs();
 			this.createPostBeatGlyphs();
-			var $t1 = $AlphaTab_Collections_FastDictionaryExtensions.getValues(this.$_voiceContainers);
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var c = $t1[$t2];
+			$AlphaTab_Platform_Std.foreach($AlphaTab_Rendering_Glyphs_VoiceContainerGlyph).call(null, this.$_voiceContainers, function(c) {
 				c.doLayout();
-			}
+			});
 			this.$updateWidth();
 		},
 		$updateWidth: function() {
@@ -9056,24 +9061,20 @@
 			if (this.$_postBeatGlyphs.length > 0) {
 				this.width += this.$_postBeatGlyphs[this.$_postBeatGlyphs.length - 1].x + this.$_postBeatGlyphs[this.$_postBeatGlyphs.length - 1].width;
 			}
-			var $t1 = $AlphaTab_Collections_FastDictionaryExtensions.getValues(this.$_voiceContainers);
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var c = $t1[$t2];
+			$AlphaTab_Platform_Std.foreach($AlphaTab_Rendering_Glyphs_VoiceContainerGlyph).call(null, this.$_voiceContainers, ss.mkdel(this, function(c) {
 				if (ss.isNullOrUndefined(this.$_biggestVoiceContainer) || c.width > this.$_biggestVoiceContainer.width) {
 					this.$_biggestVoiceContainer = c;
 				}
-			}
+			}));
 		},
 		registerMaxSizes: function(sizes) {
 			var preSize = this.get_beatGlyphsStart();
 			if (sizes.getSize($AlphaTab_Rendering_GroupedBarRenderer.keySizePre) < preSize) {
 				sizes.setSize($AlphaTab_Rendering_GroupedBarRenderer.keySizePre, preSize);
 			}
-			var $t1 = $AlphaTab_Collections_FastDictionaryExtensions.getValues(this.$_voiceContainers);
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var c = $t1[$t2];
+			$AlphaTab_Platform_Std.foreach($AlphaTab_Rendering_Glyphs_VoiceContainerGlyph).call(null, this.$_voiceContainers, function(c) {
 				c.registerMaxSizes(sizes);
-			}
+			});
 			var postSize;
 			if (this.$_postBeatGlyphs.length === 0) {
 				postSize = 0;
@@ -9097,11 +9098,9 @@
 				this.addPreBeatGlyph(new $AlphaTab_Rendering_Glyphs_SpacingGlyph(0, 0, preSizeDiff, true));
 			}
 			// on beat glyphs we apply the glyph spacing
-			var $t1 = $AlphaTab_Collections_FastDictionaryExtensions.getValues(this.$_voiceContainers);
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var c = $t1[$t2];
+			$AlphaTab_Platform_Std.foreach($AlphaTab_Rendering_Glyphs_VoiceContainerGlyph).call(null, this.$_voiceContainers, function(c) {
 				c.applySizes(sizes);
-			}
+			});
 			// on the post glyphs we add the spacing before all other glyphs
 			var postSize = sizes.getSize($AlphaTab_Rendering_GroupedBarRenderer.keySizePost);
 			var postSizeDiff;
@@ -9182,9 +9181,7 @@
 		get_postBeatGlyphsStart: function() {
 			var start = this.get_beatGlyphsStart();
 			var offset = 0;
-			var $t1 = $AlphaTab_Collections_FastDictionaryExtensions.getValues(this.$_voiceContainers);
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var c = $t1[$t2];
+			$AlphaTab_Platform_Std.foreach($AlphaTab_Rendering_Glyphs_VoiceContainerGlyph).call(null, this.$_voiceContainers, function(c) {
 				if (c.width > offset) {
 					offset = c.width;
 				}
@@ -9196,12 +9193,12 @@
 				//        offset = coff;
 				//    }
 				//}
-			}
+			});
 			return start + offset;
 		},
 		get_postBeatGlyphsWidth: function() {
 			var width = 0;
-			for (var i = 0; i < this.$_postBeatGlyphs.length; i++) {
+			for (var i = 0, j = this.$_postBeatGlyphs.length; i < j; i++) {
 				var c = this.$_postBeatGlyphs[i];
 				var x = c.x + c.width;
 				if (x > width) {
@@ -9212,38 +9209,32 @@
 		},
 		applyBarSpacing: function(spacing) {
 			this.width += spacing;
-			var $t1 = $AlphaTab_Collections_FastDictionaryExtensions.getValues(this.$_voiceContainers);
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var c = $t1[$t2];
+			$AlphaTab_Platform_Std.foreach($AlphaTab_Rendering_Glyphs_VoiceContainerGlyph).call(null, this.$_voiceContainers, ss.mkdel(this, function(c) {
 				var toApply = spacing;
 				if (ss.isValue(this.$_biggestVoiceContainer)) {
 					toApply += this.$_biggestVoiceContainer.width - c.width;
 				}
 				c.applyGlyphSpacing(toApply);
-			}
+			}));
 		},
 		finalizeRenderer: function(layout) {
-			var $t1 = $AlphaTab_Collections_FastDictionaryExtensions.getValues(this.$_voiceContainers);
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var c = $t1[$t2];
+			$AlphaTab_Platform_Std.foreach($AlphaTab_Rendering_Glyphs_VoiceContainerGlyph).call(null, this.$_voiceContainers, function(c) {
 				c.finalizeGlyph(layout);
-			}
+			});
 		},
 		paint: function(cx, cy, canvas) {
 			this.paintBackground(cx, cy, canvas);
 			var glyphStartX = this.get_preBeatGlyphStart();
-			for (var i = 0; i < this.$_preBeatGlyphs.length; i++) {
+			for (var i = 0, j = this.$_preBeatGlyphs.length; i < j; i++) {
 				var g = this.$_preBeatGlyphs[i];
 				g.paint(cx + this.x + glyphStartX, cy + this.y, canvas);
 			}
 			glyphStartX = this.get_beatGlyphsStart();
-			var $t1 = $AlphaTab_Collections_FastDictionaryExtensions.getValues(this.$_voiceContainers);
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var c = $t1[$t2];
+			$AlphaTab_Platform_Std.foreach($AlphaTab_Rendering_Glyphs_VoiceContainerGlyph).call(null, this.$_voiceContainers, ss.mkdel(this, function(c) {
 				c.paint(cx + this.x + glyphStartX, cy + this.y, canvas);
-			}
+			}));
 			glyphStartX = this.width - this.get_postBeatGlyphsWidth();
-			for (var i1 = 0; i1 < this.$_postBeatGlyphs.length; i1++) {
+			for (var i1 = 0, j1 = this.$_postBeatGlyphs.length; i1 < j1; i1++) {
 				var g1 = this.$_postBeatGlyphs[i1];
 				g1.paint(cx + this.x + glyphStartX, cy + this.y, canvas);
 			}
@@ -9254,10 +9245,8 @@
 			$AlphaTab_Rendering_BarRendererBase.prototype.buildBoundingsLookup.call(this, lookup, visualTop, visualHeight, realTop, realHeight, x);
 			var barLookup = lookup.bars[lookup.bars.length - 1];
 			var beatStart = this.get_beatGlyphsStart();
-			var $t1 = $AlphaTab_Collections_FastDictionaryExtensions.getValues(this.$_voiceContainers);
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var c = $t1[$t2];
-				for (var i = 0; i < c.beatGlyphs.length; i++) {
+			$AlphaTab_Platform_Std.foreach($AlphaTab_Rendering_Glyphs_VoiceContainerGlyph).call(null, this.$_voiceContainers, ss.mkdel(this, function(c) {
+				for (var i = 0, j = c.beatGlyphs.length; i < j; i++) {
 					var bc = c.beatGlyphs[i];
 					var beatLookup = new $AlphaTab_Rendering_Utils_BeatBoundings();
 					beatLookup.beat = bc.beat;
@@ -9267,7 +9256,7 @@
 					beatLookup.bounds = new $AlphaTab_Rendering_Utils_Bounds(x + this.stave.x + this.x + beatStart + c.x + bc.x, realTop, bc.width, realHeight);
 					barLookup.beats.push(beatLookup);
 				}
-			}
+			}));
 		}
 	}, $AlphaTab_Rendering_BarRendererBase);
 	ss.initClass($AlphaTab_Rendering_EffectBarRenderer, $asm, {
@@ -9434,7 +9423,7 @@
 			this.$createVoiceGlyphs(this.bar.voices[0]);
 		},
 		$createVoiceGlyphs: function(v) {
-			for (var i = 0; i < v.beats.length; i++) {
+			for (var i = 0, j = v.beats.length; i < j; i++) {
 				var b = v.beats[i];
 				// we create empty glyphs as alignment references and to get the 
 				// effect bar sized
@@ -9519,10 +9508,10 @@
 			// canvas.setColor(new Color(0, 0, 200, 100));
 			// canvas.fillRect(cx + x, cy + y, width, height);
 			var glyphStart = this.get_beatGlyphsStart();
-			for (var i = 0; i < this.$_uniqueEffectGlyphs.length; i++) {
+			for (var i = 0, j = this.$_uniqueEffectGlyphs.length; i < j; i++) {
 				var v = this.$_uniqueEffectGlyphs[i];
-				for (var j = 0; j < v.length; j++) {
-					var g = v[j];
+				for (var k = 0, l = v.length; k < l; k++) {
+					var g = v[k];
 					if (ss.referenceEquals(g.renderer, this)) {
 						g.paint(cx + this.x + glyphStart, cy + this.y, canvas);
 					}
@@ -9569,7 +9558,7 @@
 			this.$createVoiceGlyphs(this.bar.voices[0]);
 		},
 		$createVoiceGlyphs: function(voice) {
-			for (var i = 0; i < voice.beats.length; i++) {
+			for (var i = 0, j = voice.beats.length; i < j; i++) {
 				var b = voice.beats[i];
 				// we create empty glyphs as alignment references and to get the 
 				// effect bar sized
@@ -9584,10 +9573,10 @@
 		},
 		paint: function(cx, cy, canvas) {
 			$AlphaTab_Rendering_GroupedBarRenderer.prototype.paint.call(this, cx, cy, canvas);
-			for (var i = 0; i < this.$_helpers.beamHelpers.length; i++) {
+			for (var i = 0, j = this.$_helpers.beamHelpers.length; i < j; i++) {
 				var v = this.$_helpers.beamHelpers[i];
-				for (var j = 0; j < v.length; j++) {
-					this.$paintBeamHelper(cx + this.get_beatGlyphsStart(), cy, canvas, v[j]);
+				for (var k = 0, l = v.length; k < l; k++) {
+					this.$paintBeamHelper(cx + this.get_beatGlyphsStart(), cy, canvas, v[k]);
 				}
 			}
 		},
@@ -9604,7 +9593,7 @@
 			}
 		},
 		$paintBar: function(cx, cy, canvas, h) {
-			for (var i = 0; i < h.beats.length; i++) {
+			for (var i = 0, j = h.beats.length; i < j; i++) {
 				var beat = h.beats[i];
 				if (h.hasBeatLineX(beat)) {
 					//
@@ -9738,10 +9727,10 @@
 			}
 			var top = this.getScoreY(0, 0);
 			var bottom = this.getScoreY(8, 0);
-			for (var i = 0; i < this.$_helpers.beamHelpers.length; i++) {
+			for (var i = 0, j = this.$_helpers.beamHelpers.length; i < j; i++) {
 				var v = this.$_helpers.beamHelpers[i];
-				for (var j = 0; j < v.length; j++) {
-					var h = v[j];
+				for (var k = 0, l = v.length; k < l; k++) {
+					var h = v[k];
 					//
 					// max note (highest) -> top overflow
 					// 
@@ -9771,19 +9760,19 @@
 			this.$paintTuplets(cx, cy, canvas);
 		},
 		$paintTuplets: function(cx, cy, canvas) {
-			for (var i = 0; i < this.$_helpers.tupletHelpers.length; i++) {
+			for (var i = 0, j = this.$_helpers.tupletHelpers.length; i < j; i++) {
 				var v = this.$_helpers.tupletHelpers[i];
-				for (var j = 0; j < v.length; j++) {
-					var h = v[j];
+				for (var k = 0, l = v.length; k < l; k++) {
+					var h = v[k];
 					this.$paintTupletHelper(cx + this.get_beatGlyphsStart(), cy, canvas, h);
 				}
 			}
 		},
 		$paintBeams: function(cx, cy, canvas) {
-			for (var i = 0; i < this.$_helpers.beamHelpers.length; i++) {
+			for (var i = 0, j = this.$_helpers.beamHelpers.length; i < j; i++) {
 				var v = this.$_helpers.beamHelpers[i];
-				for (var j = 0; j < v.length; j++) {
-					var h = v[j];
+				for (var k = 0, l = v.length; k < l; k++) {
+					var h = v[k];
 					this.$paintBeamHelper(cx + this.get_beatGlyphsStart(), cy, canvas, h);
 				}
 			}
@@ -9806,7 +9795,7 @@
 			canvas.set_textAlign(1);
 			// check if we need to paint simple footer
 			if (h.beats.length === 1 || !h.get_isFull()) {
-				for (var i = 0; i < h.beats.length; i++) {
+				for (var i = 0, j = h.beats.length; i < j; i++) {
 					var beat = h.beats[i];
 					var beamingHelper = this.$_helpers.beamHelperLookup[h.voiceIndex][beat.index];
 					if (ss.isNullOrUndefined(beamingHelper)) {
@@ -9915,7 +9904,7 @@
 			}));
 		},
 		$paintBar: function(cx, cy, canvas, h) {
-			for (var i = 0; i < h.beats.length; i++) {
+			for (var i = 0, j = h.beats.length; i < j; i++) {
 				var beat = h.beats[i];
 				var correction = 4;
 				//
@@ -10154,7 +10143,7 @@
 			this.addPreBeatGlyph(new $AlphaTab_Rendering_Glyphs_TimeSignatureGlyph(0, 0, this.bar.get_masterBar().timeSignatureNumerator, this.bar.get_masterBar().timeSignatureDenominator));
 		},
 		$createVoiceGlyphs: function(v) {
-			for (var i = 0; i < v.beats.length; i++) {
+			for (var i = 0, j = v.beats.length; i < j; i++) {
 				var b = v.beats[i];
 				var container = new $AlphaTab_Rendering_ScoreBeatContainerGlyph(b);
 				container.preNotes = new $AlphaTab_Rendering_Glyphs_ScoreBeatPreNotesGlyph();
@@ -10317,7 +10306,7 @@
 			this.postNotes.paint(cx + this.x, cy + this.y, canvas);
 			//canvas.Color = new Color(0, 0, 200, 100);
 			//canvas.FillRect(cx + X + PostNotes.X, cy + Y + PostNotes.Y + 20, PostNotes.Width, 10);
-			for (var i = 0; i < this.ties.length; i++) {
+			for (var i = 0, j = this.ties.length; i < j; i++) {
 				var t = this.ties[i];
 				t.renderer = this.renderer;
 				t.paint(cx, cy + this.y, canvas);
@@ -10475,7 +10464,7 @@
 			this.$createVoiceGlyphs(this.bar.voices[0]);
 		},
 		$createVoiceGlyphs: function(v) {
-			for (var i = 0; i < v.beats.length; i++) {
+			for (var i = 0, j = v.beats.length; i < j; i++) {
 				var b = v.beats[i];
 				var container = new $AlphaTab_Rendering_Glyphs_TabBeatContainerGlyph(b);
 				container.preNotes = new $AlphaTab_Rendering_Glyphs_TabBeatPreNotesGlyph();
@@ -10522,7 +10511,7 @@
 			//
 			canvas.set_color(res.staveLineColor);
 			var lineY = cy + this.y + this.get_numberOverflow();
-			for (var i = 0; i < this.bar.track.tuning.length; i++) {
+			for (var i = 0, j = this.bar.track.tuning.length; i < j; i++) {
 				if (i > 0) {
 					lineY += ss.Int32.trunc(this.get_$lineOffset());
 				}
@@ -10672,7 +10661,7 @@
 		},
 		shouldCreateGlyph: function(renderer, beat) {
 			this.lastCreateInfo = [];
-			for (var i = 0; i < beat.notes.length; i++) {
+			for (var i = 0, j = beat.notes.length; i < j; i++) {
 				var n = beat.notes[i];
 				if (this.shouldCreateGlyphForNote(renderer, n)) {
 					this.lastCreateInfo.push(n);
@@ -10911,7 +10900,7 @@
 			this.$_currentX = startX;
 			this.$_currentY = startY;
 			canvas.beginPath();
-			for (var i = 0; i < this.$_svg.get_commands().length; i++) {
+			for (var i = 0, j = this.$_svg.get_commands().length; i < j; i++) {
 				this.$parseCommand(startX, startY, canvas, this.$_svg.get_commands()[i]);
 			}
 			canvas.fill();
@@ -11154,7 +11143,7 @@
 				return;
 			}
 			var w = 0;
-			for (var i = 0; i < this.glyphs.length; i++) {
+			for (var i = 0, j = this.glyphs.length; i < j; i++) {
 				var g = this.glyphs[i];
 				g.renderer = this.renderer;
 				g.doLayout();
@@ -11172,7 +11161,7 @@
 			if (ss.isNullOrUndefined(this.glyphs) || this.glyphs.length === 0) {
 				return;
 			}
-			for (var i = 0; i < this.glyphs.length; i++) {
+			for (var i = 0, j = this.glyphs.length; i < j; i++) {
 				var g = this.glyphs[i];
 				g.renderer = this.renderer;
 				g.paint(cx + this.x, cy + this.y, canvas);
@@ -11195,7 +11184,7 @@
 			var columns = [];
 			columns.push($AlphaTab_Rendering_Glyphs_AccidentalGroupGlyph.$nonReserved);
 			var accidentalSize = ss.Int32.trunc(21 * this.get_scale());
-			for (var i = 0; i < this.glyphs.length; i++) {
+			for (var i = 0, j = this.glyphs.length; i < j; i++) {
 				var g = this.glyphs[i];
 				g.renderer = this.renderer;
 				g.doLayout();
@@ -11224,7 +11213,7 @@
 			else {
 				this.width = columnWidth * columns.length;
 			}
-			for (var i1 = 0; i1 < this.glyphs.length; i1++) {
+			for (var i1 = 0, j1 = this.glyphs.length; i1 < j1; i1++) {
 				var g1 = this.glyphs[i1];
 				g1.x = this.width - (g1.x + 1) * columnWidth;
 			}
@@ -11290,7 +11279,7 @@
 			// left to right layout
 			var w = 0;
 			if (ss.isValue(this.glyphs)) {
-				for (var i = 0; i < this.glyphs.length; i++) {
+				for (var i = 0, j = this.glyphs.length; i < j; i++) {
 					var g = this.glyphs[i];
 					g.x = w;
 					g.renderer = this.renderer;
@@ -11343,7 +11332,7 @@
 			// calculate offsets per step
 			var dX = ss.Int32.div(this.width, $AlphaTab_Model_BendPoint.maxPosition);
 			var maxValue = 0;
-			for (var i = 0; i < this.$_note.bendPoints.length; i++) {
+			for (var i = 0, j = this.$_note.bendPoints.length; i < j; i++) {
 				if (this.$_note.bendPoints[i].value > maxValue) {
 					maxValue = this.$_note.bendPoints[i].value;
 				}
@@ -11352,7 +11341,7 @@
 			var xx = cx + this.x;
 			var yy = cy + this.y + r.getNoteY(this.$_note);
 			canvas.beginPath();
-			for (var i1 = 0; i1 < this.$_note.bendPoints.length - 1; i1++) {
+			for (var i1 = 0, j1 = this.$_note.bendPoints.length - 1; i1 < j1; i1++) {
 				var firstPt = this.$_note.bendPoints[i1];
 				var secondPt = this.$_note.bendPoints[i1 + 1];
 				// don't draw a line if there's no offset and it's the last point
@@ -11894,7 +11883,7 @@
 			}
 			this.glyphs.reverse();
 			var cx = 0;
-			for (var j = 0; j < this.glyphs.length; j++) {
+			for (var j = 0, k = this.glyphs.length; j < k; j++) {
 				var g = this.glyphs[j];
 				g.x = cx;
 				g.y = 0;
@@ -12201,7 +12190,7 @@
 				return;
 			}
 			// add spacing at the beginning, this way the elements are closer to the note head
-			for (var i = 0; i < this.glyphs.length; i++) {
+			for (var i = 0, j = this.glyphs.length; i < j; i++) {
 				this.glyphs[i].x += spacing;
 			}
 		},
@@ -12339,7 +12328,7 @@
 			var lastLine = 0;
 			var anyDisplaced = false;
 			var w = 0;
-			for (var i = 0; i < this.$_infos.length; i++) {
+			for (var i = 0, j = this.$_infos.length; i < j; i++) {
 				var g = this.$_infos[i].glyph;
 				g.renderer = this.renderer;
 				g.doLayout();
@@ -12377,12 +12366,10 @@
 				this.upLineX = w;
 				this.downLineX = padding;
 			}
-			var $t1 = $AlphaTab_Collections_FastDictionaryExtensions.getValues(this.beatEffects);
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var e = $t1[$t2];
+			$AlphaTab_Platform_Std.foreach($AlphaTab_Rendering_Glyphs_Glyph).call(null, this.beatEffects, ss.mkdel(this, function(e) {
 				e.renderer = this.renderer;
 				e.doLayout();
-			}
+			}));
 			if (this.beat.get_isTremolo()) {
 				var direction = this.beamingHelper.get_direction();
 				var offset;
@@ -12426,14 +12413,12 @@
 			var effectY = ((this.beamingHelper.get_direction() === 0) ? scoreRenderer.getScoreY(this.maxNote.line, 13) : scoreRenderer.getScoreY(this.minNote.line, -9));
 			// TODO: take care of actual glyph height
 			var effectSpacing = ((this.beamingHelper.get_direction() === 0) ? ss.Int32.trunc(7 * this.get_scale()) : ss.Int32.trunc(-7 * this.get_scale()));
-			var $t1 = $AlphaTab_Collections_FastDictionaryExtensions.getValues(this.beatEffects);
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var g = $t1[$t2];
+			$AlphaTab_Platform_Std.foreach($AlphaTab_Rendering_Glyphs_Glyph).call(null, this.beatEffects, ss.mkdel(this, function(g) {
 				g.y = effectY;
 				g.x = ss.Int32.div(this.width, 2);
 				g.paint(cx + this.x, cy + this.y, canvas);
 				effectY += effectSpacing;
-			}
+			}));
 			canvas.set_color(this.renderer.get_layout().renderer.renderingResources.staveLineColor);
 			// TODO: Take care of beateffects in overflow
 			var linePadding = ss.Int32.trunc(3 * this.get_scale());
@@ -12464,7 +12449,7 @@
 			if (ss.isValue(this.$_tremoloPicking)) {
 				this.$_tremoloPicking.paint(cx + this.x, cy + this.y, canvas);
 			}
-			for (var i = 0; i < this.$_infos.length; i++) {
+			for (var i = 0, j = this.$_infos.length; i < j; i++) {
 				var g1 = this.$_infos[i];
 				g1.glyph.renderer = this.renderer;
 				g1.glyph.paint(cx + this.x, cy + this.y, canvas);
@@ -12643,7 +12628,7 @@
 				return;
 			}
 			var w = 0;
-			for (var i = 0; i < this.glyphs.length; i++) {
+			for (var i = 0, j = this.glyphs.length; i < j; i++) {
 				var g = this.glyphs[i];
 				g.x = w;
 				g.renderer = this.renderer;
@@ -12827,7 +12812,7 @@
 		},
 		doLayout: function() {
 			var w = 0;
-			for (var i = 0; i < this.$_notes.length; i++) {
+			for (var i = 0, j = this.$_notes.length; i < j; i++) {
 				var g = this.$_notes[i];
 				g.renderer = this.renderer;
 				g.doLayout();
@@ -12839,15 +12824,13 @@
 			var effectY = ss.Int32.trunc(this.getNoteY(this.$_minNote) + tabHeight / 2);
 			// TODO: take care of actual glyph height
 			var effectSpacing = ss.Int32.trunc(7 * this.get_scale());
-			var $t1 = $AlphaTab_Collections_FastDictionaryExtensions.getValues(this.beatEffects);
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var g1 = $t1[$t2];
+			$AlphaTab_Platform_Std.foreach($AlphaTab_Rendering_Glyphs_Glyph).call(null, this.beatEffects, ss.mkdel(this, function(g1) {
 				g1.y = effectY;
 				g1.x = ss.Int32.div(this.width, 2);
 				g1.renderer = this.renderer;
 				effectY += effectSpacing;
 				g1.doLayout();
-			}
+			}));
 			this.$_centerX = 0;
 			this.width = w;
 		},
@@ -12863,17 +12846,15 @@
 			var old = canvas.get_textBaseline();
 			canvas.set_textBaseline(2);
 			canvas.set_font((this.$_isGrace ? res.graceFont : res.tablatureFont));
-			for (var i = 0; i < this.$_notes.length; i++) {
+			for (var i = 0, j = this.$_notes.length; i < j; i++) {
 				var g = this.$_notes[i];
 				g.renderer = this.renderer;
 				g.paint(cx + this.x, cy + this.y, canvas);
 			}
 			canvas.set_textBaseline(old);
-			var $t1 = $AlphaTab_Collections_FastDictionaryExtensions.getValues(this.beatEffects);
-			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-				var g1 = $t1[$t2];
+			$AlphaTab_Platform_Std.foreach($AlphaTab_Rendering_Glyphs_Glyph).call(null, this.beatEffects, ss.mkdel(this, function(g1) {
 				g1.paint(cx + this.x, cy + this.y, canvas);
-			}
+			}));
 		},
 		updateBeamingHelper: function(cx) {
 			if (!this.beamingHelper.hasBeatLineX(this.beat)) {
@@ -13024,7 +13005,7 @@
 			this.addGlyph(numerator);
 			this.addGlyph(denominator);
 			$AlphaTab_Rendering_Glyphs_GlyphGroup.prototype.doLayout.call(this);
-			for (var i = 0; i < this.glyphs.length; i++) {
+			for (var i = 0, j = this.glyphs.length; i < j; i++) {
 				var g = this.glyphs[i];
 				g.x = ss.Int32.div(this.width - g.width, 2);
 			}
@@ -13074,7 +13055,7 @@
 		applyGlyphSpacing: function(spacing) {
 			var glyphSpacing = ss.Int32.div(spacing, this.beatGlyphs.length);
 			var gx = 0;
-			for (var i = 0; i < this.beatGlyphs.length; i++) {
+			for (var i = 0, j = this.beatGlyphs.length; i < j; i++) {
 				var g = this.beatGlyphs[i];
 				g.x = ss.Int32.trunc(gx);
 				gx += g.width + glyphSpacing;
@@ -13083,14 +13064,14 @@
 			this.width = ss.Int32.trunc(gx);
 		},
 		registerMaxSizes: function(sizes) {
-			for (var i = 0; i < this.beatGlyphs.length; i++) {
+			for (var i = 0, j = this.beatGlyphs.length; i < j; i++) {
 				var b = this.beatGlyphs[i];
 				b.registerMaxSizes(sizes);
 			}
 		},
 		applySizes: function(sizes) {
 			this.width = 0;
-			for (var i = 0; i < this.beatGlyphs.length; i++) {
+			for (var i = 0, j = this.beatGlyphs.length; i < j; i++) {
 				this.beatGlyphs[i].x = ((i === 0) ? 0 : (this.beatGlyphs[i - 1].x + this.beatGlyphs[i - 1].width));
 				this.beatGlyphs[i].applySizes(sizes);
 			}
@@ -13109,14 +13090,14 @@
 		doLayout: function() {
 		},
 		finalizeGlyph: function(layout) {
-			for (var i = 0; i < this.beatGlyphs.length; i++) {
+			for (var i = 0, j = this.beatGlyphs.length; i < j; i++) {
 				this.beatGlyphs[i].finalizeGlyph(layout);
 			}
 		},
 		paint: function(cx, cy, canvas) {
 			//canvas.Color = new Color((byte) Random.Next(255), (byte) Random.Next(255), (byte) Random.Next(255), 128);
 			//canvas.FillRect(cx + X, cy + Y, Width, 100);
-			for (var i = 0; i < this.beatGlyphs.length; i++) {
+			for (var i = 0, j = this.beatGlyphs.length; i < j; i++) {
 				this.beatGlyphs[i].paint(cx + this.x, cy + this.y, canvas);
 			}
 		}
@@ -13131,7 +13112,7 @@
 			var sizeY = ss.Int32.trunc(60 * this.get_scale());
 			if (this.$_beat.whammyBarPoints.length >= 2) {
 				var dy = ss.Int32.div(sizeY, $AlphaTab_Model_Beat.whammyBarMaxValue);
-				for (var i = 0; i < this.$_beat.whammyBarPoints.length; i++) {
+				for (var i = 0, j = this.$_beat.whammyBarPoints.length; i < j; i++) {
 					var pt = this.$_beat.whammyBarPoints[i];
 					var ptY = 0 - dy * pt.value;
 					if (ptY > maxY) {
@@ -13171,7 +13152,7 @@
 				var dx = ss.Int32.div(endX - startX, $AlphaTab_Model_Beat.whammyBarMaxPosition);
 				var dy = ss.Int32.div(sizeY, $AlphaTab_Model_Beat.whammyBarMaxValue);
 				canvas.beginPath();
-				for (var i = 0; i < this.$_beat.whammyBarPoints.length - 1; i++) {
+				for (var i = 0, j = this.$_beat.whammyBarPoints.length - 1; i < j; i++) {
 					var pt1 = this.$_beat.whammyBarPoints[i];
 					var pt2 = this.$_beat.whammyBarPoints[i + 1];
 					if (pt1.value === pt2.value && i === this.$_beat.whammyBarPoints.length - 2) {
@@ -13373,7 +13354,7 @@
 			y = this.$paintScoreInfo(x, y);
 			this.renderer.canvas.set_color(this.renderer.renderingResources.mainGlyphColor);
 			this.renderer.canvas.set_textAlign(0);
-			for (var i = 0; i < this.$_groups.length; i++) {
+			for (var i = 0, j = this.$_groups.length; i < j; i++) {
 				this.$_groups[i].paint(0, 0, this.renderer.canvas);
 			}
 		},
@@ -13437,7 +13418,7 @@
 						var stringsPerColumn = Math.ceil(this.renderer.tracks[0].tuning.length / 2);
 						var currentX = x;
 						var currentY = y;
-						for (var i = 0; i < this.renderer.tracks[0].tuning.length; i++) {
+						for (var i = 0, j = this.renderer.tracks[0].tuning.length; i < j; i++) {
 							str = '(' + (i + 1) + ') = ' + $AlphaTab_Model_Tuning.getTextForTuning(this.renderer.tracks[0].tuning[i], false);
 							canvas.fillText(str, currentX, currentY);
 							currentY += ss.Int32.trunc(15 * scale);
@@ -13500,7 +13481,7 @@
 			return ss.Int32.trunc(950 * this.get_scale());
 		},
 		buildBoundingsLookup: function(lookup) {
-			for (var i = 0; i < this.$_groups.length; i++) {
+			for (var i = 0, j = this.$_groups.length; i < j; i++) {
 				this.$_groups[i].buildBoundingsLookup(lookup);
 			}
 		}
@@ -13565,13 +13546,13 @@
 			this.barRenderers.splice(this.barRenderers.length - 1, 1);
 		},
 		applyBarSpacing: function(spacing) {
-			for (var i = 0; i < this.barRenderers.length; i++) {
+			for (var i = 0, j = this.barRenderers.length; i < j; i++) {
 				this.barRenderers[i].applyBarSpacing(spacing);
 			}
 		},
 		get_topOverflow: function() {
 			var m = 0;
-			for (var i = 0; i < this.barRenderers.length; i++) {
+			for (var i = 0, j = this.barRenderers.length; i < j; i++) {
 				var r = this.barRenderers[i];
 				if (r.topOverflow > m) {
 					m = r.topOverflow;
@@ -13581,7 +13562,7 @@
 		},
 		get_bottomOverflow: function() {
 			var m = 0;
-			for (var i = 0; i < this.barRenderers.length; i++) {
+			for (var i = 0, j = this.barRenderers.length; i < j; i++) {
 				var r = this.barRenderers[i];
 				if (r.bottomOverflow > m) {
 					m = r.bottomOverflow;
@@ -13616,7 +13597,7 @@
 			if (this.height === 0) {
 				return;
 			}
-			for (var i = 0; i < this.barRenderers.length; i++) {
+			for (var i = 0, j = this.barRenderers.length; i < j; i++) {
 				this.barRenderers[i].paint(cx + this.x, cy + this.y, canvas);
 			}
 		},
@@ -13652,17 +13633,17 @@
 			}
 			// add renderers
 			var maxSizes = new $AlphaTab_Rendering_Staves_BarSizeInfo();
-			for (var i1 = 0; i1 < this.staves.length; i1++) {
+			for (var i1 = 0, j = this.staves.length; i1 < j; i1++) {
 				var g = this.staves[i1];
-				for (var j = 0; j < g.staves.length; j++) {
-					var s = g.staves[j];
+				for (var k = 0, l = g.staves.length; k < l; k++) {
+					var s = g.staves[k];
 					s.addBar(g.track.bars[barIndex]);
 					s.barRenderers[s.barRenderers.length - 1].registerMaxSizes(maxSizes);
 				}
 			}
 			// ensure same widths of new renderer
 			var realWidth = 0;
-			for (var i2 = 0; i2 < this.$_allStaves.length; i2++) {
+			for (var i2 = 0, j1 = this.$_allStaves.length; i2 < j1; i2++) {
 				var s1 = this.$_allStaves[i2];
 				s1.barRenderers[s1.barRenderers.length - 1].applySizes(maxSizes);
 				if (s1.barRenderers[s1.barRenderers.length - 1].width > realWidth) {
@@ -13672,7 +13653,7 @@
 			this.width += realWidth;
 		},
 		$getStaveTrackGroup: function(track) {
-			for (var i = 0; i < this.staves.length; i++) {
+			for (var i = 0, j = this.staves.length; i < j; i++) {
 				var g = this.staves[i];
 				if (ss.referenceEquals(g.track, track)) {
 					return g;
@@ -13718,7 +13699,7 @@
 			if (this.masterBars.length > 1) {
 				this.masterBars.splice(this.masterBars.length - 1, 1);
 				var w = 0;
-				for (var i = 0; i < this.$_allStaves.length; i++) {
+				for (var i = 0, j = this.$_allStaves.length; i < j; i++) {
 					var s = this.$_allStaves[i];
 					w = Math.max(w, s.barRenderers[s.barRenderers.length - 1].width);
 					s.revertLastBar();
@@ -13727,13 +13708,13 @@
 			}
 		},
 		applyBarSpacing: function(spacing) {
-			for (var i = 0; i < this.$_allStaves.length; i++) {
+			for (var i = 0, j = this.$_allStaves.length; i < j; i++) {
 				this.$_allStaves[i].applyBarSpacing(spacing);
 			}
 			this.width += this.masterBars.length * spacing;
 		},
 		paint: function(cx, cy, canvas) {
-			for (var i = 0; i < this.$_allStaves.length; i++) {
+			for (var i = 0, j = this.$_allStaves.length; i < j; i++) {
 				this.$_allStaves[i].paint(cx + this.x, cy + this.y, canvas);
 			}
 			var res = this.layout.renderer.renderingResources;
@@ -13758,7 +13739,7 @@
 				// Draw accolade for each track group
 				// 
 				canvas.set_font(res.effectFont);
-				for (var i1 = 0; i1 < this.staves.length; i1++) {
+				for (var i1 = 0, j1 = this.staves.length; i1 < j1; i1++) {
 					var g = this.staves[i1];
 					var firstStart1 = cy + this.y + g.firstStaveInAccolade.y + g.firstStaveInAccolade.staveTop + g.firstStaveInAccolade.topSpacing + g.firstStaveInAccolade.get_topOverflow();
 					var lastEnd1 = cy + this.y + g.lastStaveInAccolade.y + g.lastStaveInAccolade.topSpacing + g.lastStaveInAccolade.get_topOverflow() + g.lastStaveInAccolade.staveBottom;
@@ -13794,7 +13775,7 @@
 		},
 		finalizeGroup: function(scoreLayout) {
 			var currentY = 0;
-			for (var i = 0; i < this.$_allStaves.length; i++) {
+			for (var i = 0, j = this.$_allStaves.length; i < j; i++) {
 				this.$_allStaves[i].x = this.accoladeSpacing;
 				this.$_allStaves[i].y = ss.Int32.trunc(currentY);
 				this.$_allStaves[i].finalizeStave(scoreLayout);
@@ -13808,7 +13789,7 @@
 			var realBottom = this.y + this.$_allStaves[this.$_allStaves.length - 1].y + this.$_allStaves[this.$_allStaves.length - 1].height;
 			var visualHeight = visualBottom - visualTop;
 			var realHeight = realBottom - realTop;
-			for (var i = 0; i < this.$_firstStaveInAccolade.barRenderers.length; i++) {
+			for (var i = 0, j = this.$_firstStaveInAccolade.barRenderers.length; i < j; i++) {
 				this.$_firstStaveInAccolade.barRenderers[i].buildBoundingsLookup(lookup, visualTop, visualHeight, realTop, realHeight, this.x);
 			}
 		}

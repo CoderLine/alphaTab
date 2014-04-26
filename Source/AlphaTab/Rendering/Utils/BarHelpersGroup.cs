@@ -22,16 +22,16 @@ namespace AlphaTab.Rendering.Utils
             BeamingHelper currentBeamHelper = null;
             TupletHelper currentTupletHelper = null;
 
-            for (int i = 0; i < bar.Voices.Count; i++)
+            for (int i = 0, j = bar.Voices.Count; i < j; i++)
             {
                 var v = bar.Voices[i];
                 BeamHelpers.Add(new FastList<BeamingHelper>());
                 BeamHelperLookup.Add(new FastDictionary<int, BeamingHelper>());
                 TupletHelpers.Add(new FastList<TupletHelper>());
 
-                for (int j = 0; j < v.Beats.Count; j++)
+                for (int k = 0, l = v.Beats.Count; k < l; k++)
                 {
-                    var b = v.Beats[j];
+                    var b = v.Beats[k];
                     var newBeamingHelper = false;
 
                     if (!b.IsRest)

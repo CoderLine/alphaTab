@@ -29,7 +29,7 @@ namespace AlphaTab.Rendering.Glyphs
             columns.Add(NonReserved);
 
             var accidentalSize = (int)(21 * Scale);
-            for (int i = 0; i < Glyphs.Count; i++)
+            for (int i = 0, j = Glyphs.Count; i < j; i++)
             {
                 var g = Glyphs[i];
                 g.Renderer = Renderer;
@@ -69,7 +69,7 @@ namespace AlphaTab.Rendering.Glyphs
                 Width = columnWidth * columns.Count;
             }
 
-            for (int i = 0; i < Glyphs.Count; i++)
+            for (int i = 0, j = Glyphs.Count; i < j; i++)
             {
                 var g = Glyphs[i];
                 g.X = Width - ((g.X + 1) * columnWidth);

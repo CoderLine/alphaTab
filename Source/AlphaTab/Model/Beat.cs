@@ -175,11 +175,11 @@ namespace AlphaTab.Model
         public Beat Clone()
         {
             var beat = new Beat();
-            for (int i = 0; i < WhammyBarPoints.Count; i++)
+            for (int i = 0, j = WhammyBarPoints.Count; i < j; i++)
             {
                 beat.WhammyBarPoints.Add(WhammyBarPoints[i].Clone());
             }
-            for (int i = 0; i < Notes.Count; i++)
+            for (int i = 0, j = Notes.Count; i < j; i++)
             {
                 beat.AddNote(Notes[i].Clone());
             }
@@ -196,7 +196,7 @@ namespace AlphaTab.Model
             beat.Tap = Tap;
             beat.Slap = Slap;
             beat.Pop = Pop;
-            for (int i = 0; i < Automations.Count; i++)
+            for (int i = 0, j = Automations.Count; i < j; i++)
             {
                 beat.Automations.Add(Automations[i].Clone());
             }
@@ -241,7 +241,7 @@ namespace AlphaTab.Model
 
         public void RefreshNotes()
         {
-            for (int i = 0; i < Notes.Count; i++)
+            for (int i = 0, j = Notes.Count; i < j; i++)
             {
                 var note = Notes[i];
                 if (_minNote == null || note.RealValue < _minNote.RealValue)
@@ -257,7 +257,7 @@ namespace AlphaTab.Model
 
         public Automation GetAutomation(AutomationType type)
         {
-            for (int i = 0; i < Automations.Count; i++)
+            for (int i = 0, j = Automations.Count; i < j; i++)
             {
                 var automation = Automations[i];
                 if (automation.Type == type)
@@ -270,7 +270,7 @@ namespace AlphaTab.Model
 
         public Note GetNoteOnString(int @string)
         {
-            for (int i = 0; i < Notes.Count; i++)
+            for (int i = 0, j = Notes.Count; i < j; i++)
             {
                 var note = Notes[i];
                 if (note.String == @string)
@@ -293,7 +293,7 @@ namespace AlphaTab.Model
                 Start = PreviousBeat.Start + PreviousBeat.CalculateDuration();
             }
 
-            for (int i = 0; i < Notes.Count; i++)
+            for (int i = 0, j = Notes.Count; i < j; i++)
             {
                 Notes[i].Finish();
             }

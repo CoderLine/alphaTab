@@ -154,7 +154,7 @@ namespace AlphaTab.Rendering.Layout
 
             Renderer.Canvas.Color = Renderer.RenderingResources.MainGlyphColor;
             Renderer.Canvas.TextAlign = TextAlign.Left;
-            for (int i = 0; i < _groups.Count; i++)
+            for (int i = 0, j = _groups.Count; i < j; i++)
             {
                 _groups[i].Paint(0, 0, Renderer.Canvas);
             }
@@ -243,7 +243,7 @@ namespace AlphaTab.Rendering.Layout
                         var currentX = x;
                         var currentY = y;
 
-                        for (var i = 0; i < Renderer.Tracks[0].Tuning.Count; i++)
+                        for (int i = 0, j = Renderer.Tracks[0].Tuning.Count; i < j; i++)
                         {
                             str = "(" + (i + 1) + ") = " + Tuning.GetTextForTuning(Renderer.Tracks[0].Tuning[i], false);
                             canvas.FillText(str, currentX, currentY);
@@ -345,7 +345,7 @@ namespace AlphaTab.Rendering.Layout
     
         public override void BuildBoundingsLookup(BoundingsLookup lookup)
         {
-            for (int i = 0; i < _groups.Count; i++)
+            for (int i = 0, j = _groups.Count; i < j; i++)
             {
                 _groups[i].BuildBoundingsLookup(lookup);
             }

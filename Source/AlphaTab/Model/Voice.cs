@@ -86,7 +86,7 @@ namespace AlphaTab.Model
 
         public void Finish()
         {
-            for (int i = 0; i < Beats.Count; i++)
+            for (int i = 0, j = Beats.Count; i < j; i++)
             {
                 var beat = Beats[i];
                 Chain(beat);

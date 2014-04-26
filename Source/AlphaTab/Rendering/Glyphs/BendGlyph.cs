@@ -24,7 +24,7 @@ namespace AlphaTab.Rendering.Glyphs
             // calculate offsets per step
             var dX = Width / BendPoint.MaxPosition;
             var maxValue = 0;
-            for (var i = 0; i < _note.BendPoints.Count; i++)
+            for (int i = 0, j = _note.BendPoints.Count; i < j; i++)
             {
                 if (_note.BendPoints[i].Value > maxValue)
                 {
@@ -38,7 +38,7 @@ namespace AlphaTab.Rendering.Glyphs
             var yy = cy + Y + r.GetNoteY(_note);
 
             canvas.BeginPath();
-            for (var i = 0; i < _note.BendPoints.Count - 1; i++)
+            for (int i = 0, j = _note.BendPoints.Count - 1; i < j; i++)
             {
                 var firstPt = _note.BendPoints[i];
                 var secondPt = _note.BendPoints[i + 1];

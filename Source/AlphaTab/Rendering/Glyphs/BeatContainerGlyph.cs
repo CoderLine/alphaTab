@@ -144,7 +144,7 @@ namespace AlphaTab.Rendering.Glyphs
             //canvas.Color = new Color(0, 0, 200, 100);
             //canvas.FillRect(cx + X + PostNotes.X, cy + Y + PostNotes.Y + 20, PostNotes.Width, 10);
 
-            for (int i = 0; i < Ties.Count; i++)
+            for (int i = 0, j = Ties.Count; i < j; i++)
             {
                 var t = Ties[i];
                 t.Renderer = Renderer;

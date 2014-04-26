@@ -63,7 +63,7 @@ namespace AlphaTab.Audio.Model
 
             // linear search beat within beats
             Beat beat = null;
-            for (int i = 0; i < bar.Voices[0].Beats.Count; i++)
+            for (int i = 0, j = bar.Voices[0].Beats.Count; i < j; i++)
             {
                 var b = bar.Voices[0].Beats[i];
                 // we search for the first beat which 

@@ -59,7 +59,7 @@ namespace AlphaTab.Rendering.Glyphs
         public override void DoLayout()
         {
             var w = 0;
-            for (int i = 0; i < _notes.Count; i++)
+            for (int i = 0, j = _notes.Count; i < j; i++)
             {
                 var g = _notes[i];
                 g.Renderer = Renderer;
@@ -74,14 +74,14 @@ namespace AlphaTab.Rendering.Glyphs
             var effectY = (int)(GetNoteY(_minNote) + tabHeight / 2);
             // TODO: take care of actual glyph height
             var effectSpacing = (int)(7 * Scale);
-            foreach (var g in BeatEffects.Values)
+            Std.Foreach(BeatEffects.Values, g =>
             {
                 g.Y = effectY;
                 g.X = Width / 2;
                 g.Renderer = Renderer;
                 effectY += effectSpacing;
                 g.DoLayout();
-            }
+            });
 
             _centerX = 0;
 
@@ -101,7 +101,7 @@ namespace AlphaTab.Rendering.Glyphs
             var old = canvas.TextBaseline;
             canvas.TextBaseline = TextBaseline.Middle;
             canvas.Font = _isGrace ? res.GraceFont : res.TablatureFont;
-            for (int i = 0; i < _notes.Count; i++)
+            for (int i = 0, j = _notes.Count; i < j; i++)
             {
                 var g = _notes[i];
                 g.Renderer = Renderer;
@@ -109,10 +109,7 @@ namespace AlphaTab.Rendering.Glyphs
             }
             canvas.TextBaseline = old;
 
-            foreach (var g in BeatEffects.Values)
-            {
-                g.Paint(cx + X, cy + Y, canvas);
-            }
+            Std.Foreach(BeatEffects.Values, g => g.Paint(cx + X, cy + Y, canvas));
         }
 
         public void UpdateBeamingHelper(int cx)

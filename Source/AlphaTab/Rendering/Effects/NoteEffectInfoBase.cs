@@ -12,7 +12,7 @@ namespace AlphaTab.Rendering.Effects
         public virtual bool ShouldCreateGlyph(EffectBarRenderer renderer, Beat beat)
         {
             LastCreateInfo = new FastList<Note>();
-            for (int i = 0; i < beat.Notes.Count; i++)
+            for (int i = 0, j = beat.Notes.Count; i < j; i++)
             {
                 var n = beat.Notes[i];
                 if (ShouldCreateGlyphForNote(renderer, n))

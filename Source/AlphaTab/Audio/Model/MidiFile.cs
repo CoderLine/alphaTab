@@ -59,7 +59,7 @@ namespace AlphaTab.Audio.Model
             b = new ByteArray((byte) ((v >> 8) & 0xFF), (byte) (v & 0xFF));
             s.Write(b, 0, b.Length);
 
-            for (int i = 0; i < Tracks.Count; i++)
+            for (int i = 0, j = Tracks.Count; i < j; i++)
             {
                 Tracks[i].WriteTo(s);
             }

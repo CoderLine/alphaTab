@@ -148,7 +148,7 @@ namespace AlphaTab.Model
             var n = new Note();
             
             n.Accentuated = Accentuated;
-            for (int i = 0; i < BendPoints.Count; i++)
+            for (int i = 0, j = BendPoints.Count; i < j; i++)
             {
                 n.BendPoints.Add(BendPoints[i].Clone());
             }

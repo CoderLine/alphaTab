@@ -29,7 +29,7 @@ namespace Alphatab.PngDump
             ScoreRenderer renderer = new ScoreRenderer(settings, null);
 
             // iterate tracks
-            for (int i = 0; i < score.Tracks.Count; i++)
+            for (int i = 0, j = score.Tracks.Count; i < j; i++)
             {
                 Track track = score.Tracks[i];
 

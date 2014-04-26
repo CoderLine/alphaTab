@@ -234,7 +234,7 @@ namespace AlphaTab.Rendering
 
         private void CreateVoiceGlyphs(Voice v)
         {
-            for (int i = 0; i < v.Beats.Count; i++)
+            for (int i = 0, j = v.Beats.Count; i < j; i++)
             {
                 var b = v.Beats[i];
                 // we create empty glyphs as alignment references and to get the 
@@ -350,12 +350,12 @@ namespace AlphaTab.Rendering
 
             var glyphStart = BeatGlyphsStart;
 
-            for (int i = 0; i < _uniqueEffectGlyphs.Count; i++)
+            for (int i = 0, j = _uniqueEffectGlyphs.Count; i < j; i++)
             {
                 var v = _uniqueEffectGlyphs[i];
-                for (int j = 0; j < v.Count; j++)
+                for (int k = 0, l = v.Count; k < l; k++)
                 {
-                    var g = v[j];
+                    var g = v[k];
                     if (g.Renderer == this)
                     {
                         g.Paint(cx + X + glyphStart, cy + Y, canvas);

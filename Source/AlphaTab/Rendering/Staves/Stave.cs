@@ -103,7 +103,7 @@ namespace AlphaTab.Rendering.Staves
 
         public void ApplyBarSpacing(int spacing)
         {
-            for (int i = 0; i < BarRenderers.Count; i++)
+            for (int i = 0, j = BarRenderers.Count; i < j; i++)
             {
                 BarRenderers[i].ApplyBarSpacing(spacing);
             }
@@ -114,7 +114,7 @@ namespace AlphaTab.Rendering.Staves
             get
             {
                 var m = 0;
-                for (int i = 0; i < BarRenderers.Count; i++)
+                for (int i = 0, j = BarRenderers.Count; i < j; i++)
                 {
                     var r = BarRenderers[i];
                     if (r.TopOverflow > m)
@@ -131,7 +131,7 @@ namespace AlphaTab.Rendering.Staves
             get
             {
                 var m = 0;
-                for (int i = 0; i < BarRenderers.Count; i++)
+                for (int i = 0, j = BarRenderers.Count; i < j; i++)
                 {
                     var r = BarRenderers[i];
                     if (r.BottomOverflow > m)
@@ -177,7 +177,7 @@ namespace AlphaTab.Rendering.Staves
         public void Paint(int cx, int cy, ICanvas canvas)
         {
             if (Height == 0) return;
-            for (int i = 0; i < BarRenderers.Count; i++)
+            for (int i = 0, j = BarRenderers.Count; i < j; i++)
             {
                 BarRenderers[i].Paint(cx + X, cy + Y, canvas);
             }

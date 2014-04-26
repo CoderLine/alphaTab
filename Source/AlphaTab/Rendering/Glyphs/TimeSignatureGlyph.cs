@@ -27,7 +27,7 @@
 
             base.DoLayout();
 
-            for (int i = 0; i < Glyphs.Count; i++)
+            for (int i = 0, j = Glyphs.Count; i < j; i++)
             {
                 var g = Glyphs[i];
                 g.X = (Width - g.Width) / 2;

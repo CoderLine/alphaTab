@@ -28,7 +28,7 @@
             Glyphs.Reverse();
 
             var cx = 0;
-            for (int j = 0; j < Glyphs.Count; j++)
+            for (int j = 0, k = Glyphs.Count; j < k; j++)
             {
                 var g = Glyphs[j];
                 g.X = cx;

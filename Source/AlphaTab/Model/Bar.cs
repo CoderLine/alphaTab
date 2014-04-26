@@ -51,7 +51,7 @@ namespace AlphaTab.Model
         {
             get
             {
-                for (int i = 0; i < Voices.Count; i++)
+                for (int i = 0, j = Voices.Count; i < j; i++)
                 {
                     if (!Voices[i].IsEmpty)
                     {
@@ -65,7 +65,7 @@ namespace AlphaTab.Model
 
         public void Finish()
         {
-            for (int i = 0; i < Voices.Count; i++)
+            for (int i = 0, j = Voices.Count; i < j; i++)
             {
                 var voice = Voices[i];
                 voice.Finish();

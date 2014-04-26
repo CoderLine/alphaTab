@@ -9,7 +9,7 @@ namespace AlphaTab.Rendering.Glyphs
             base.ApplyGlyphSpacing(spacing);
             if (Glyphs == null) return;
             // add spacing at the beginning, this way the elements are closer to the note head
-            for (int i = 0; i < Glyphs.Count; i++)
+            for (int i = 0, j = Glyphs.Count; i < j; i++)
             {
                 Glyphs[i].X += spacing;
             }

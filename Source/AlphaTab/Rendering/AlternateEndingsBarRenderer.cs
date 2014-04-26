@@ -47,7 +47,7 @@ namespace AlphaTab.Rendering
             Height = (int)(Resources.WordsFont.Size);
 
             var endingsStrings = new StringBuilder();
-            for (int i = 0; i < _endings.Count; i++)
+            for (int i = 0, j = _endings.Count; i < j; i++)
             {
                 endingsStrings.Append(_endings[i] + 1);
                 endingsStrings.Append(". ");

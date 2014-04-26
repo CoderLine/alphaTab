@@ -141,7 +141,7 @@ namespace AlphaTab.Rendering.Glyphs
             var anyDisplaced = false;
 
             var w = 0;
-            for (var i = 0; i < _infos.Count; i++)
+            for (int i = 0, j = _infos.Count; i < j; i++)
             {
                 var g = _infos[i].Glyph;
                 g.Renderer = Renderer;
@@ -191,11 +191,11 @@ namespace AlphaTab.Rendering.Glyphs
                 DownLineX = padding;
             }
 
-            foreach (var e in BeatEffects.Values)
+            Std.Foreach(BeatEffects.Values, e =>
             {
                 e.Renderer = Renderer;
                 e.DoLayout();
-            }
+            });
 
             if (Beat.IsTremolo)
             {
@@ -248,13 +248,14 @@ namespace AlphaTab.Rendering.Glyphs
             var effectSpacing = (BeamingHelper.Direction == BeamDirection.Up)
                             ? (int)(7 * Scale)
                             : (int)(-7 * Scale);
-            foreach (var g in BeatEffects.Values)
+
+            Std.Foreach(BeatEffects.Values, g =>
             {
                 g.Y = effectY;
                 g.X = Width / 2;
                 g.Paint(cx + X, cy + Y, canvas);
                 effectY += effectSpacing;
-            }
+            });
 
             canvas.Color = Renderer.Layout.Renderer.RenderingResources.StaveLineColor;
 
@@ -291,10 +292,10 @@ namespace AlphaTab.Rendering.Glyphs
             }
 
             canvas.Color = Renderer.Layout.Renderer.RenderingResources.MainGlyphColor;
-            
+
             if (_tremoloPicking != null)
                 _tremoloPicking.Paint(cx + X, cy + Y, canvas);
-            for (int i = 0; i < _infos.Count; i++)
+            for (int i = 0, j = _infos.Count; i < j; i++)
             {
                 var g = _infos[i];
                 g.Glyph.Renderer = Renderer;

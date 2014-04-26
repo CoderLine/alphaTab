@@ -231,11 +231,11 @@ namespace AlphaTab.Model
         public static Tuning FindTuning(FastList<int> strings)
         {
             var tunings = GetPresetsFor(strings.Count);
-            for (int t = 0; t < tunings.Count; t++)
+            for (int t = 0, tc = tunings.Count; t < tc; t++)
             {
                 var tuning = tunings[t];
                 var equals = true;
-                for (int i = 0; i < strings.Count; i++)
+                for (int i = 0, j = strings.Count; i < j; i++)
                 {
                     if (strings[i] != tuning.Tunings[i])
                     {

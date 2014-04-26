@@ -1365,7 +1365,7 @@ namespace AlphaTab.Importer
             
                 // iterate all bar definitions for the masterbars
                 // and add the correct bar to the track
-                for (int i = 0; i < _barsOfMasterBar.Count; i++)
+                for (int i = 0, j = _barsOfMasterBar.Count; i < j; i++)
                 {
                     var barIds = _barsOfMasterBar[i];
                     var barId = barIds[trackIndex];
@@ -1382,14 +1382,14 @@ namespace AlphaTab.Importer
             foreach (var barId in _automations.Keys)
             {
                 var bar = _barsById[barId];
-                for (int i = 0; i < bar.Voices.Count; i++)
+                for (int i = 0, j = bar.Voices.Count; i < j; i++)
                 {
                     var v = bar.Voices[i];
                     if (v.Beats.Count > 0)
                     {
-                        for (int j = 0; j < _automations[barId].Count; j++)
+                        for (int k = 0, l = _automations[barId].Count; k < l; k++)
                         {
-                            var automation = _automations[barId][j];
+                            var automation = _automations[barId][k];
                             v.Beats[0].Automations.Add(automation);
                         }
                     }
@@ -1397,7 +1397,7 @@ namespace AlphaTab.Importer
             } 
 
              // build score
-            for (int i = 0; i < _masterBars.Count; i++)
+            for (int i = 0, j = _masterBars.Count; i < j; i++)
             {
                 var masterBar = _masterBars[i];
                 Score.AddMasterBar(masterBar);
@@ -1408,7 +1408,7 @@ namespace AlphaTab.Importer
             {
                 var automations = _automations[barId];
                 var bar = _barsById[barId];
-                for (int i = 0; i < automations.Count; i++)
+                for (int i = 0, j = automations.Count; i < j; i++)
                 {
                     var automation = automations[i];
                     if (automation.Type == AutomationType.Tempo)

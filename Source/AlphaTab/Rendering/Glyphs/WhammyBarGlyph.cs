@@ -32,7 +32,7 @@ namespace AlphaTab.Rendering.Glyphs
             if (_beat.WhammyBarPoints.Count >= 2)
             {
                 var dy = sizeY / Beat.WhammyBarMaxValue;
-                for (int i = 0; i < _beat.WhammyBarPoints.Count; i++)
+                for (int i = 0, j = _beat.WhammyBarPoints.Count; i < j; i++)
                 {
                     var pt = _beat.WhammyBarPoints[i];
                     var ptY = 0 - (dy * pt.Value);
@@ -78,7 +78,7 @@ namespace AlphaTab.Rendering.Glyphs
                 var dy = sizeY / Beat.WhammyBarMaxValue;
 
                 canvas.BeginPath();
-                for (int i = 0; i < _beat.WhammyBarPoints.Count - 1; i++)
+                for (int i = 0, j = _beat.WhammyBarPoints.Count - 1; i < j; i++)
                 {
                     var pt1 = _beat.WhammyBarPoints[i];
                     var pt2 = _beat.WhammyBarPoints[i + 1];

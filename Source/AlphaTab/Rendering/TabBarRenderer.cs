@@ -104,7 +104,7 @@ namespace AlphaTab.Rendering
 
         private void CreateVoiceGlyphs(Voice v)
         {
-            for (int i = 0; i < v.Beats.Count; i++)
+            for (int i = 0, j = v.Beats.Count; i < j; i++)
             {
                 var b = v.Beats[i];
                 var container = new TabBeatContainerGlyph(b);
@@ -182,7 +182,7 @@ namespace AlphaTab.Rendering
             canvas.Color = res.StaveLineColor;
             var lineY = cy + Y + NumberOverflow;
 
-            for (var i = 0; i < Bar.Track.Tuning.Count; i++)
+            for (int i = 0, j = Bar.Track.Tuning.Count; i < j; i++)
             {
                 if (i > 0) lineY += (int)LineOffset;
                 canvas.BeginPath();

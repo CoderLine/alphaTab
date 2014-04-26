@@ -26,7 +26,7 @@ namespace AlphaTab.Rendering.Glyphs
             }
 
             var w = 0;
-            for (int i = 0; i < Glyphs.Count; i++)
+            for (int i = 0, j = Glyphs.Count; i < j; i++)
             {
                 var g = Glyphs[i];
                 g.Renderer = Renderer;
@@ -45,7 +45,7 @@ namespace AlphaTab.Rendering.Glyphs
         public override void Paint(int cx, int cy, ICanvas canvas)
         {
             if (Glyphs == null || Glyphs.Count == 0) return;
-            for (int i = 0; i < Glyphs.Count; i++)
+            for (int i = 0, j = Glyphs.Count; i < j; i++)
             {
                 var g = Glyphs[i];
                 g.Renderer = Renderer;
