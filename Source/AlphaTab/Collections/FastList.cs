@@ -86,5 +86,12 @@ namespace AlphaTab.Collections
         {
             _store.Reverse();
         }
+
+#if CSharp
+        public int FindIndex(Predicate<T> predicate)
+        {
+            return _store.FindIndex(predicate);
+        }
+#endif 
     }
 }

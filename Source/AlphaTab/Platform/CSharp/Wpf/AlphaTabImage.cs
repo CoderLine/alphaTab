@@ -44,6 +44,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         public AlphaTabImage()
         {
+            SnapsToDevicePixels = true;
             var settings = Settings.Defaults;
             settings.Engine = "gdi";
             Settings = settings;

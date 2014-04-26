@@ -70,7 +70,7 @@ namespace AlphaTab.Importer
             _track.PlaybackInfo.Program = 25;
             _track.PlaybackInfo.PrimaryChannel = TrackChannels[0];
             _track.PlaybackInfo.SecondaryChannel = TrackChannels[1];
-            _track.Tuning = Tuning.GetPresetsFor(6)[0].Tunings;
+            _track.Tuning = Tuning.GetDefaultTuningFor(6).Tunings;
 
             _score.AddTrack(_track);
         }

@@ -7,6 +7,11 @@ namespace AlphaTab.Rendering
     /// </summary>
     public class TabBarRendererFactory : BarRendererFactory
     {
+        public override bool CanCreate(Track track)
+        {
+            return track.Tuning.Count > 0;
+        }
+
         public override BarRendererBase Create(Bar bar)
         {
             return new TabBarRenderer(bar);

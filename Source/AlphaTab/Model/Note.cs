@@ -101,12 +101,16 @@ namespace AlphaTab.Model
 
         [IntrinsicProperty]
         public int Octave { get; set; }
+        [IntrinsicProperty]
+        public int Tone { get; set; }
 
         public int StringTuning
         {
             get
             {
-                return Beat.Voice.Bar.Track.Tuning[Beat.Voice.Bar.Track.Tuning.Count - (String - 1) - 1];
+                if (Beat.Voice.Bar.Track.Tuning.Count > 0)
+                    return Beat.Voice.Bar.Track.Tuning[Beat.Voice.Bar.Track.Tuning.Count - (String - 1) - 1];
+                return 0;
             }
         }
 
@@ -114,6 +118,8 @@ namespace AlphaTab.Model
         {
             get
             {
+                if (Fret == -1)
+                    return Octave * 12 + Tone;
                 return Fret + StringTuning;
             }
         }
@@ -141,35 +147,40 @@ namespace AlphaTab.Model
         public Note Clone()
         {
             var n = new Note();
+            
+            n.Accentuated = Accentuated;
             for (int i = 0; i < BendPoints.Count; i++)
             {
                 n.BendPoints.Add(BendPoints[i].Clone());
             }
-            n.Dynamic = Dynamic;
-            n.Accentuated = Accentuated;
             n.Fret = Fret;
-            n.IsGhost = IsGhost;
             n.String = String;
-            n.HammerPullDestination = HammerPullDestination;
-            n.HammerPullOrigin = HammerPullOrigin;
             n.IsHammerPullOrigin = IsHammerPullOrigin;
+            n.HammerPullOrigin = HammerPullOrigin;
+            n.HammerPullDestination = HammerPullDestination;
             n.HarmonicValue = HarmonicValue;
             n.HarmonicType = HarmonicType;
+            n.IsGhost = IsGhost;
             n.IsLetRing = IsLetRing;
             n.IsPalmMute = IsPalmMute;
             n.IsDead = IsDead;
-            n.SlideType = SlideType;
-            n.Vibrato = Vibrato;
             n.IsStaccato = IsStaccato;
-            n.IsTieOrigin = IsTieOrigin;
+            n.SlideType = SlideType;
+            n.SlideTarget = SlideTarget;
+            n.Vibrato = Vibrato;
+            n.TieOrigin = TieOrigin;
             n.IsTieDestination = IsTieDestination;
+            n.IsTieOrigin = IsTieOrigin;
             n.LeftHandFinger = LeftHandFinger;
             n.RightHandFinger = RightHandFinger;
             n.IsFingering = IsFingering;
-            n.SwapAccidentals = SwapAccidentals;
             n.TrillValue = TrillValue;
             n.TrillSpeed = TrillSpeed;
             n.DurationPercent = DurationPercent;
+            n.SwapAccidentals = SwapAccidentals;
+            n.Dynamic = Dynamic;
+            n.Octave = Octave;
+            n.Tone = Tone;
 
             return n;
         }

@@ -32,7 +32,7 @@ namespace AlphaTab.Rendering.Glyphs
                 }
             }
 
-            var dY = _height / maxValue;
+            var dY = maxValue == 0 ? 0 : _height / maxValue;
 
             var xx = cx + X;
             var yy = cy + Y + r.GetNoteY(_note);

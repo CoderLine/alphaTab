@@ -39,24 +39,33 @@ namespace AlphaTab.Model
         public void AddBeat(Beat beat)
         {
             // chaining
-            if (Bar.Index == 0 && Beats.Count == 0)
+            beat.Voice = this;
+            beat.Index = Beats.Count;
+            Chain(beat);
+            Beats.Add(beat);
+        }
+
+        private void Chain(Beat beat)
+        {
+            if (Bar == null) return;
+            if (Bar.Index == 0 && beat.Index == 0)
             {
-                beat.PreviousBeat = null; // very first beat
+                // very first beat
+                beat.PreviousBeat = null; 
             }
-            else if (Beats.Count == 0)
+            else if (beat.Index == 0)
             {
+                // first beat of bar
                 var previousVoice = Bar.PreviousBar.Voices[Index];
                 beat.PreviousBeat = previousVoice.Beats[previousVoice.Beats.Count - 1];
                 beat.PreviousBeat.NextBeat = beat;
             }
             else
             {
-                beat.PreviousBeat = Beats[Beats.Count - 1];
+                // other beats of bar
+                beat.PreviousBeat = Beats[beat.Index - 1];
                 beat.PreviousBeat.NextBeat = beat;
             }
-            beat.Voice = this;
-            beat.Index = Beats.Count;
-            Beats.Add(beat);
         }
 
         public void AddGraceBeat(Beat beat)
@@ -82,6 +91,7 @@ namespace AlphaTab.Model
             for (int i = 0; i < Beats.Count; i++)
             {
                 var beat = Beats[i];
+                Chain(beat);
                 beat.Finish();
                 if (MinDuration == null || MinDuration.Value > beat.Duration)
                 {

@@ -49,7 +49,7 @@ namespace AlphaTab.Rendering.Layout
                     if (Environment.StaveFactories.ContainsKey(s.Id))
                     {
                         var factory = Environment.StaveFactories[s.Id](this);
-                        if (isFirstTrack || !factory.HideOnMultiTrack)
+                        if (factory.CanCreate(track) && (isFirstTrack || !factory.HideOnMultiTrack))
                         {
                             group.AddStave(track, new Stave(factory));
                         }

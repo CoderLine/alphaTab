@@ -24,6 +24,9 @@
 *.sdf
 *.opensdf
 *.unsuccessfulbuild
+*.psess
+*.etl
+*.vspx
 ipch/
 obj/
 [Dd]ebug*/

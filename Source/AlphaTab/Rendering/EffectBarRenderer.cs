@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Windows.Controls;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
@@ -285,14 +286,19 @@ namespace AlphaTab.Rendering
                         if (_info.ShouldCreateGlyph(this, prevBeat))
                         {
                             // expand the previous effect
-                            EffectGlyph prevEffect;
-                            if (b.Index > 0)
+                            EffectGlyph prevEffect = null;
+                            if (b.Index > 0 && _effectGlyphs[b.Voice.Index].ContainsKey(prevBeat.Index))
                             {
                                 prevEffect = _effectGlyphs[b.Voice.Index][prevBeat.Index];
                             }
-                            else
+                            else if(Index > 0)
                             {
-                                prevEffect = ((EffectBarRenderer)(Stave.BarRenderers[Index - 1]))._effectGlyphs[b.Voice.Index][prevBeat.Index];
+                                var previousRenderer = ((EffectBarRenderer) (Stave.BarRenderers[Index - 1]));
+                                var voiceGlyphs = previousRenderer._effectGlyphs[b.Voice.Index];
+                                if (voiceGlyphs.ContainsKey(prevBeat.Index))
+                                {
+                                    prevEffect = voiceGlyphs[prevBeat.Index];
+                                }
                             }
 
                             if (prevEffect == null || !_info.CanExpand(this, prevBeat, b))

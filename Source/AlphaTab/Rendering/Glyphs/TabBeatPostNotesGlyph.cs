@@ -31,7 +31,7 @@ namespace AlphaTab.Rendering.Glyphs
                 AddGlyph(trillNumberGlyph);
             }
 
-            if (n.HasBend)
+            if (n.HasBend && n.Beat.GraceType != GraceType.None)
             {
                 var bendHeight = (int)(60 * Scale);
                 Renderer.RegisterOverflowTop(bendHeight);

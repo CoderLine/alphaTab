@@ -19,6 +19,10 @@ namespace AlphaTab.Rendering
             HideOnMultiTrack = false;
         }
 
+        public virtual bool CanCreate(Track track)
+        {
+            return true;
+        }
         public abstract BarRendererBase Create(Bar bar);
     }
 }

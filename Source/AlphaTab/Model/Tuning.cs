@@ -22,6 +22,7 @@ namespace AlphaTab.Model
         private static FastList<Tuning> _sixStrings;
         private static FastList<Tuning> _fiveStrings;
         private static FastList<Tuning> _fourStrings;
+        private static FastDictionary<int, Tuning> _defaultTunings; 
 
         /// <summary>
         /// Checks if the given string is a tuning inticator.
@@ -127,6 +128,18 @@ namespace AlphaTab.Model
             return b;
         }
 
+        public static Tuning GetDefaultTuningFor(int stringCount)
+        {
+            if (_sevenStrings == null)
+            {
+                Initialize();
+            }
+
+            if (_defaultTunings.ContainsKey(stringCount))
+                return _defaultTunings[stringCount];
+            return null;
+        }
+
         public static FastList<Tuning> GetPresetsFor(int stringCount)
         {
             if (_sevenStrings == null)
@@ -134,21 +147,16 @@ namespace AlphaTab.Model
                 Initialize();
             }
 
-            if (stringCount == 7)
+            switch (stringCount)
             {
-                return _sevenStrings;
-            }
-            if (stringCount == 6)
-            {
-                return _sixStrings;
-            }
-            if (stringCount == 5)
-            {
-                return _fiveStrings;
-            }
-            if (stringCount == 4)
-            {
-                return _fourStrings;
+                case 7:
+                    return _sevenStrings;
+                case 6:
+                    return _sixStrings;
+                case 5:
+                    return _fiveStrings;
+                case 4:
+                    return _fourStrings;
             }
             return new FastList<Tuning>();
         }
@@ -159,10 +167,13 @@ namespace AlphaTab.Model
             _sixStrings = new FastList<Tuning>();
             _fiveStrings = new FastList<Tuning>();
             _fourStrings = new FastList<Tuning>();
+            _defaultTunings = new FastDictionary<int, Tuning>();
 
-            _sevenStrings.Add(new Tuning("Guitar 7 strings", new[] { 64, 59, 55, 50, 45, 40, 35 }, true));
+            _defaultTunings[7] = new Tuning("Guitar 7 strings", new[] {64, 59, 55, 50, 45, 40, 35}, true);
+            _sevenStrings.Add(_defaultTunings[7]);
 
-            _sixStrings.Add(new Tuning("Guitar Standard Tuning", new[] { 64, 59, 55, 50, 45, 40 }, true));
+            _defaultTunings[6] = new Tuning("Guitar Standard Tuning", new[] { 64, 59, 55, 50, 45, 40 }, true);
+            _sixStrings.Add(_defaultTunings[6]);
 
             _sixStrings.Add(new Tuning("Guitar Tune down ½ step", new[] { 63, 58, 54, 49, 44, 39 }, false));
             _sixStrings.Add(new Tuning("Guitar Tune down 1 step", new[] { 62, 57, 53, 48, 43, 38 }, false));
@@ -196,14 +207,16 @@ namespace AlphaTab.Model
             _sixStrings.Add(new Tuning("Bass 6 Strings Tuning", new[] { 48, 43, 38, 33, 28, 23 }, false));
             _sixStrings.Add(new Tuning("Lute or Vihuela Tuning", new[] { 64, 59, 54, 50, 45, 40 }, false));
 
-            _fiveStrings.Add(new Tuning("Bass 5 Strings Tuning", new[] { 43, 38, 33, 28, 23 }, true));
+            _defaultTunings[5] = new Tuning("Bass 5 Strings Tuning", new[] { 43, 38, 33, 28, 23 }, true);
+            _fiveStrings.Add(_defaultTunings[5]);
             _fiveStrings.Add(new Tuning("Banjo Dropped C Tuning", new[] { 62, 59, 55, 48, 67 }, false));
             _fiveStrings.Add(new Tuning("Banjo Open D Tuning", new[] { 62, 57, 54, 50, 69 }, false));
             _fiveStrings.Add(new Tuning("Banjo Open G Tuning", new[] { 62, 59, 55, 50, 67 }, false));
             _fiveStrings.Add(new Tuning("Banjo G Minor Tuning", new[] { 62, 58, 55, 50, 67 }, false));
             _fiveStrings.Add(new Tuning("Banjo G Modal Tuning", new[] { 62, 57, 55, 50, 67 }, false));
 
-            _fourStrings.Add(new Tuning("Bass Standard Tuning", new[] { 43, 38, 33, 28 }, true));
+            _defaultTunings[4] = new Tuning("Bass Standard Tuning", new[] { 43, 38, 33, 28 }, true);
+            _fourStrings.Add(_defaultTunings[4]);
             _fourStrings.Add(new Tuning("Bass Tune down ½ step", new[] { 42, 37, 32, 27 }, false));
             _fourStrings.Add(new Tuning("Bass Tune down 1 step", new[] { 41, 36, 31, 26 }, false));
             _fourStrings.Add(new Tuning("Bass Tune down 2 step", new[] { 39, 34, 29, 24 }, false));

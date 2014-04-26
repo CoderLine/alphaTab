@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Xml;
+using AlphaTab.Audio;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
@@ -1092,7 +1093,10 @@ namespace AlphaTab.Importer
                                 // case "Variation": 
                                 // case "Tone": 
                                 case "Octave":
-                                    note.Octave = Std.ParseInt(GetValue(FindChildElement(c, "Number")));
+                                    note.Octave = Std.ParseInt(GetValue(FindChildElement(c, "Number"))) - 1;
+                                    break;
+                                case "Tone":
+                                    note.Tone = Std.ParseInt(GetValue(FindChildElement(c, "Step")));
                                     break;
                                 case "Bended":
                                     isBended = true;
@@ -1136,6 +1140,7 @@ namespace AlphaTab.Importer
                                 // NOTE: gets automatically calculated 
                                 // if (FindChildElement(node, "Enable") != null)
                                 //     note.isHammerPullDestination = true;
+                                    break;
                                 case "Slide":
                                     var slideFlags = Std.ParseInt(GetValue(FindChildElement(c, "Flags")));
                                     if ((slideFlags & 0x01) != 0)
@@ -1243,7 +1248,7 @@ namespace AlphaTab.Importer
                             rhythm.TupletDenominator = Std.ParseInt(e.Attributes["den"].Value);
                             break;
                         case "AugmentationDot":
-                            rhythm.Dots = Std.ParseInt(e.Attributes["cound"].Value);
+                            rhythm.Dots = Std.ParseInt(e.Attributes["count"].Value);
                             break;
                     }
                 }

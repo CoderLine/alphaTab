@@ -50,7 +50,7 @@ namespace AlphaTab.Rendering.Glyphs
             Width = w;
         }
 
-        public void FinalizeGlyph(ScoreLayout layout)
+        public override void FinalizeGlyph(ScoreLayout layout)
         {
             if (!Container.Beat.IsRest)
             {

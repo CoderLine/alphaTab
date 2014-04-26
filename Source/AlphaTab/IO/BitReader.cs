@@ -50,7 +50,7 @@
         public int ReadBitsReversed(int count)
         {
             var bits = 0;
-            for (int i = count - 1; i >= 0; i--)
+            for (int i = 0; i < count; i++)
             {
                 bits |= (ReadBit() << i);
             }

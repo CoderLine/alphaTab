@@ -54,6 +54,7 @@
     <Compile Include="Importer\Gp4ImporterTest.cs" />
     <Compile Include="Importer\Gp5ImporterTest.cs" />
     <Compile Include="Importer\GpImporterTestBase.cs" />
+    <Compile Include="Importer\GpxImporterTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -63,6 +64,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="TestFiles\Compressed.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="TestFiles\Effects.gp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

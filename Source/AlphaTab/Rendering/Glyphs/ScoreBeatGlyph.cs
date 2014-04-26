@@ -15,7 +15,7 @@ namespace AlphaTab.Rendering.Glyphs
         [IntrinsicProperty]
         public BeamingHelper BeamingHelper { get; set; }
 
-        public void FinalizeGlyph(ScoreLayout layout)
+        public override void FinalizeGlyph(ScoreLayout layout)
         {
             if (!Container.Beat.IsRest)
             {

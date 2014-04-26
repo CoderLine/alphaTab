@@ -60,9 +60,9 @@ namespace AlphaTab.Importer
             Score score = null;
             using (MemoryStream ms = new MemoryStream(data))
             {
-                ms.Seek(0, SeekOrigin.Begin);
                 foreach (var importer in importers)
                 {
+                    ms.Seek(0, SeekOrigin.Begin);
                     try
                     {
                         importer.Init(ms);

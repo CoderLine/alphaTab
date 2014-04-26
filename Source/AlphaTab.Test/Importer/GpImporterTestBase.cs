@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
 using AlphaTab.Importer;
+using AlphaTab.IO;
 using AlphaTab.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MemoryStream = AlphaTab.IO.MemoryStream;
 
 namespace AlphaTab.Test.Importer
 {
@@ -15,7 +17,7 @@ namespace AlphaTab.Test.Importer
             return PrepareImporterWithBytes(buffer);
         }
 
-        internal Gp3To5Importer PrepareImporterWithBytes(byte[] buffer)
+        internal Gp3To5Importer PrepareImporterWithBytes(ByteArray buffer)
         {
             var readerBase = new Gp3To5Importer();
             readerBase.Init(new MemoryStream(buffer));
@@ -134,14 +136,14 @@ namespace AlphaTab.Test.Importer
             Assert.IsTrue(score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[2].IsHammerPullOrigin);
             Assert.IsTrue(score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[3].IsHammerPullOrigin);
 
-            Assert.AreEqual(false, score.Tracks[0].Bars[0].Voices[0].Beats[1].Notes[0].IsHammerPullDestination);
-            Assert.IsTrue(score.Tracks[0].Bars[0].Voices[0].Beats[1].Notes[1].IsHammerPullDestination);
-            Assert.IsTrue(score.Tracks[0].Bars[0].Voices[0].Beats[1].Notes[2].IsHammerPullDestination);
-            Assert.IsTrue(score.Tracks[0].Bars[0].Voices[0].Beats[1].Notes[3].IsHammerPullDestination);
+            Assert.IsNull(score.Tracks[0].Bars[0].Voices[0].Beats[1].Notes[0].HammerPullOrigin);
+            Assert.IsNotNull(score.Tracks[0].Bars[0].Voices[0].Beats[1].Notes[1].HammerPullOrigin);
+            Assert.IsNotNull(score.Tracks[0].Bars[0].Voices[0].Beats[1].Notes[2].HammerPullOrigin);
+            Assert.IsNotNull(score.Tracks[0].Bars[0].Voices[0].Beats[1].Notes[3].HammerPullOrigin);
 
             Assert.IsTrue(score.Tracks[0].Bars[1].Voices[0].Beats[0].Notes[0].IsHammerPullOrigin);
             Assert.IsTrue(score.Tracks[0].Bars[1].Voices[0].Beats[1].Notes[0].IsHammerPullOrigin);
-            Assert.IsTrue(score.Tracks[0].Bars[1].Voices[0].Beats[2].Notes[0].IsHammerPullDestination);
+            Assert.IsNotNull(score.Tracks[0].Bars[1].Voices[0].Beats[2].Notes[0].HammerPullOrigin);
         }
 
         protected void CheckBend(Score score)

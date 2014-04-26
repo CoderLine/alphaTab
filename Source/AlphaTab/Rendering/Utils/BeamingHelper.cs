@@ -324,6 +324,8 @@ namespace AlphaTab.Rendering.Utils
 
             // get the y position of the given beat on this curve
 
+            if (startX == endX) return (int)startY;
+
             // y(x)  = ( (y2 - y1) / (x2 - x1) )  * (x - x1) + y1;
             return (int)(((endY - startY) / (endX - startX)) * (xPosition - startX) + startY);
         }
@@ -332,7 +334,7 @@ namespace AlphaTab.Rendering.Utils
         private static bool CanJoin(Beat b1, Beat b2)
         {
             // is this a voice we can join with?
-            if (b1 == null || b2 == null || b1.IsRest || b2.IsRest)
+            if (b1 == null || b2 == null || b1.IsRest || b2.IsRest || b1.GraceType != GraceType.None || b2.GraceType != GraceType.None)
             {
                 return false;
             }

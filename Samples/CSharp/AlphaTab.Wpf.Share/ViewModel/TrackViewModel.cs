@@ -147,8 +147,9 @@ namespace AlphaTab.Wpf.Share.ViewModel
                 for (int voiceI = 0; voiceI < bar.Voices.Count && (!_usedBars[barI]); voiceI++)
                 {
                     Voice voice = bar.Voices[voiceI];
-                    foreach (Beat b in voice.Beats)
+                    for (int i = 0; i < voice.Beats.Count; i++)
                     {
+                        var b = voice.Beats[i];
                         if (!b.IsRest)
                         {
                             _usedBars[barI] = true;
