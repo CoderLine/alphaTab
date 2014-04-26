@@ -6,7 +6,7 @@
         private readonly int _denominator;
 
         public TimeSignatureGlyph(int x, int y, int numerator, int denominator)
-            : base(x, y, null)
+            : base(x, y)
         {
             _numerator = numerator;
             _denominator = denominator;
@@ -22,8 +22,8 @@
             var numerator = new NumberGlyph(0, 0, _numerator);
             var denominator = new NumberGlyph(0, (int)(18 * Scale), _denominator);
 
-            Glyphs.Add(numerator);
-            Glyphs.Add(denominator);
+            AddGlyph(numerator);
+            AddGlyph(denominator);
 
             base.DoLayout();
 

@@ -35,10 +35,6 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
-            var scoreRenderer = Renderer.Layout.Renderer;
-            scoreRenderer.Canvas.Font = _isGrace
-                ? scoreRenderer.RenderingResources.GraceFont
-                : scoreRenderer.RenderingResources.TablatureFont;
             Width = (int)(10 * Scale);
         }
 

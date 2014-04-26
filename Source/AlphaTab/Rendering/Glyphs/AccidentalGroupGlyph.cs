@@ -8,13 +8,18 @@ namespace AlphaTab.Rendering.Glyphs
         private const int NonReserved = -3000;
 
         public AccidentalGroupGlyph()
-            : base(0, 0, null)
+            : base(0, 0)
         {
 
         }
 
         public override void DoLayout()
         {
+            if (Glyphs == null)
+            {
+                Width = 0;
+                return;
+            }
             //
             // Determine Columns for accidentals
             //

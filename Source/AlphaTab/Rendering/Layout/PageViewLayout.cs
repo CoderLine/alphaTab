@@ -154,6 +154,7 @@ namespace AlphaTab.Rendering.Layout
             y = PaintScoreInfo(x, y);
 
             Renderer.Canvas.Color = Renderer.RenderingResources.MainGlyphColor;
+            Renderer.Canvas.TextAlign = TextAlign.Left;
             for (int i = 0; i < _groups.Count; i++)
             {
                 _groups[i].Paint(0, 0, Renderer.Canvas);

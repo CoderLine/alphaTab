@@ -38,6 +38,7 @@ namespace AlphaTab.Rendering.Glyphs
             }
 
             // left to right layout
+            if (Glyphs == null) return;
             var w = 0;
             for (int i = 0; i < Glyphs.Count; i++)
             {

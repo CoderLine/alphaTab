@@ -9,7 +9,7 @@ namespace AlphaTab.Rendering.Glyphs
         public BeatContainerGlyph Container { get; set; }
 
         public BeatGlyphBase()
-            : base(0, 0, null)
+            : base(0, 0)
         {
         }
 
@@ -17,13 +17,16 @@ namespace AlphaTab.Rendering.Glyphs
         {
             // left to right layout
             var w = 0;
-            for (int i = 0; i < Glyphs.Count; i++)
+            if (Glyphs != null)
             {
-                var g = Glyphs[i];
-                g.X = w;
-                g.Renderer = Renderer;
-                g.DoLayout();
-                w += g.Width;
+                for (int i = 0; i < Glyphs.Count; i++)
+                {
+                    var g = Glyphs[i];
+                    g.X = w;
+                    g.Renderer = Renderer;
+                    g.DoLayout();
+                    w += g.Width;
+                }
             }
             Width = w;
         }
@@ -64,7 +67,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public virtual void FinalizeGlyph(ScoreLayout layout)
         {
-            
+
         }
     }
 }

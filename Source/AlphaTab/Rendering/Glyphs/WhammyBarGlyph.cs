@@ -70,6 +70,7 @@ namespace AlphaTab.Rendering.Glyphs
 
             var sizeY = (int)(WhammyMaxOffset * Scale);
 
+            var old = canvas.TextAlign;
             canvas.TextAlign = TextAlign.Center;
             if (_beat.WhammyBarPoints.Count >= 2)
             {
@@ -123,6 +124,7 @@ namespace AlphaTab.Rendering.Glyphs
                 }
                 canvas.Stroke();
             }
+            canvas.TextAlign = old;
         }
     }
 }

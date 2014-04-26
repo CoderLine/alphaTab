@@ -5,7 +5,7 @@
         private readonly int _number;
 
         public NumberGlyph(int x, int y, int number)
-            : base(x, y, null)
+            : base(x, y)
         {
             _number = number;
         }
@@ -22,7 +22,7 @@
             {
                 var num = i % 10;
                 var gl = new DigitGlyph(0, 0, num);
-                Glyphs.Add(gl);
+                AddGlyph(gl);
                 i = i / 10;
             }
             Glyphs.Reverse();

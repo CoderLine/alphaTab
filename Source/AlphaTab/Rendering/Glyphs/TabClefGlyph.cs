@@ -56,11 +56,13 @@ namespace AlphaTab.Rendering.Glyphs
             font.Size = font.Size * fontScale;
 
             canvas.Font = font;
+            var old = canvas.TextAlign;
             canvas.TextAlign = TextAlign.Center;
 
             canvas.FillText("T", cx + X + Width / 2, startY);
             canvas.FillText("A", cx + X + Width / 2, startY + font.Size - (correction * Scale));
             canvas.FillText("B", cx + X + Width / 2, startY + (font.Size - (correction * Scale)) * 2);
+            canvas.TextAlign = old;
         }
     }
 }

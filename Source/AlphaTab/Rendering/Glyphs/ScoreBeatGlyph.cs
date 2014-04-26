@@ -58,7 +58,7 @@ namespace AlphaTab.Rendering.Glyphs
                         AddGlyph(new SpacingGlyph(0, 0, (int)(5 * Scale), false));
                         for (var i = 0; i < Container.Beat.Dots; i++)
                         {
-                            var group = new GlyphGroup(0, 0, null);
+                            var group = new GlyphGroup(0, 0);
                             NoteLoop(n => CreateBeatDot(sr.GetNoteLine(n), 2, group));
                             AddGlyph(group);
                         }
@@ -121,7 +121,7 @@ namespace AlphaTab.Rendering.Glyphs
                         AddGlyph(new SpacingGlyph(0, 0, (int)(5 * Scale), false));
                         for (var i = 0; i < Container.Beat.Dots; i++)
                         {
-                            var group = new GlyphGroup(0, 0, null);
+                            var group = new GlyphGroup(0, 0);
                             CreateBeatDot(dotLine, dotOffset, group);
                             AddGlyph(group);
                         }

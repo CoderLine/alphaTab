@@ -12,15 +12,19 @@ namespace AlphaTab.Rendering.Glyphs
     {
         protected FastList<Glyph> Glyphs;
 
-        public GlyphGroup(int x, int y, FastList<Glyph> glyphs)
+        public GlyphGroup(int x, int y)
             :base(x,y)
         {
-            Glyphs = glyphs ?? new FastList<Glyph>();
-
         }
 
         public override void DoLayout()
         {
+            if (Glyphs == null || Glyphs.Count == 0)
+            {
+                Width = 0;
+                return;
+            }
+
             var w = 0;
             for (int i = 0; i < Glyphs.Count; i++)
             {
@@ -34,11 +38,13 @@ namespace AlphaTab.Rendering.Glyphs
 
         public virtual void AddGlyph(Glyph g)
         {
+            if (Glyphs == null) Glyphs = new FastList<Glyph>();
             Glyphs.Add(g);
         }
 
         public override void Paint(int cx, int cy, ICanvas canvas)
         {
+            if (Glyphs == null || Glyphs.Count == 0) return;
             for (int i = 0; i < Glyphs.Count; i++)
             {
                 var g = Glyphs[i];

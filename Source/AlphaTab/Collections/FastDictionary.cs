@@ -77,7 +77,7 @@ namespace AlphaTab.Collections
             [InlineCode("Object.keys({this}).length")]
             get
             {
-                return Keys.Length;
+                return _store.Count;
             }
         }
 

@@ -16,8 +16,6 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
-            var scoreRenderer = Renderer.Layout.Renderer;
-            scoreRenderer.Canvas.Font = scoreRenderer.RenderingResources.BarNumberFont;
             Width = (int)(10 * Scale);
         }
 

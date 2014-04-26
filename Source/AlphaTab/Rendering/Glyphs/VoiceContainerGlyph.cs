@@ -22,7 +22,7 @@ namespace AlphaTab.Rendering.Glyphs
         public int VoiceIndex { get; set; }
 
         public VoiceContainerGlyph(int x, int y, int voiceIndex)
-            : base(x, y, null)
+            : base(x, y)
         {
             BeatGlyphs = new FastList<BeatContainerGlyph>();
             VoiceIndex = voiceIndex;

@@ -1,4 +1,5 @@
 ﻿using System;
+using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Staves;
 using AlphaTab.Rendering.Utils;
 
@@ -59,6 +60,7 @@ namespace AlphaTab.Rendering.Layout
         public override void PaintScore()
         {
             Renderer.Canvas.Color = Renderer.RenderingResources.MainGlyphColor;
+            Renderer.Canvas.TextAlign = TextAlign.Left;
             _group.Paint(0, 0, Renderer.Canvas);
         }
 
