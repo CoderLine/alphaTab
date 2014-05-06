@@ -28,7 +28,7 @@ namespace AlphaTab.Rendering.Glyphs
                     w += g.Width;
                 }
             }
-            Width = w;
+            Width = (int)(w * Renderer.Settings.Layout.Get("spacingScale", 1.0f));
         }
 
         protected void NoteLoop(Action<Note> action)

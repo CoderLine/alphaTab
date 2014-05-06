@@ -196,6 +196,7 @@ namespace AlphaTab
         /// <ul>
         ///  <li><strong>autoSize</strong> - Whether the width of the canvas should be automatically determined by the used layout. (bool, default:true)</li>
         ///  <li><strong>barsPerRow</strong> - Limit the displayed bars per row, <em>-1 for sized based limit<em> (integer, default:-1)</li>
+        ///  <li><strong>spacingScale</strong> - Control how closely glyphs are spaced (float, default:1.0f)</li>
         ///  <li><strong>start</strong> - The bar start index to start layouting with (integer: default: 0)</li>
         ///  <li><strong>count</strong> - The amount of bars to render overall, <em>-1 for all till the end</em>  (integer, default:-1)</li>
         ///  <li><strong>hideInfo</strong> - Render the song information or not (boolean, default:true)</li>
