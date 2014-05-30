@@ -27,7 +27,7 @@ namespace AlphaTab.Rendering
             }
         }
 
-        public int GetNoteX(Note note, bool onEnd = true)
+        public override int GetNoteX(Note note, bool onEnd = true)
         {
             TabBeatGlyph beat = (TabBeatGlyph)GetOnNotesPosition(note.Beat.Voice.Index, note.Beat.Index);
             if (beat != null)
@@ -47,7 +47,7 @@ namespace AlphaTab.Rendering
             return 0;
         }
 
-        public int GetNoteY(Note note)
+        public override int GetNoteY(Note note)
         {
             TabBeatGlyph beat = (TabBeatGlyph)GetOnNotesPosition(note.Beat.Voice.Index, note.Beat.Index);
             if (beat != null)

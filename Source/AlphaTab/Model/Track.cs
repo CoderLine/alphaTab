@@ -52,14 +52,15 @@ namespace AlphaTab.Model
 
         public void AddBar(Bar bar)
         {
+            var bars = Bars;
             bar.Track = this;
             bar.Index = Bars.Count;
-            if (Bars.Count > 0)
+            if (bars.Count > 0)
             {
-                bar.PreviousBar = Bars[Bars.Count - 1];
+                bar.PreviousBar = bars[bars.Count - 1];
                 bar.PreviousBar.NextBar = bar;
             }
-            Bars.Add(bar);
+            bars.Add(bar);
         }
 
         public void Finish()

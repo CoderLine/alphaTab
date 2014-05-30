@@ -36,6 +36,8 @@ namespace AlphaTab.Audio.Generator
             _score = score;
 
             ShouldPlay = true;
+            RepeatMove = 0;
+            Index = 0;
         }
 
         public void Process()

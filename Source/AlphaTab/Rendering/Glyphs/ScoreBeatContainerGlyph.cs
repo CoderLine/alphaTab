@@ -12,9 +12,17 @@ namespace AlphaTab.Rendering
         protected override void CreateTies(Note n)
         {
             // create a tie if any effect requires it
-            if (n.IsTieDestination && n.TieOrigin != null)
+
+            // NOTE: we create 2 tie glyphs if we have a line break inbetween 
+            // the two notes
+            if (n.IsTieOrigin) 
             {
-                var tie = new ScoreTieGlyph(n.TieOrigin, n, this);
+                var tie = new ScoreTieGlyph(n, n.TieDestination, this);
+                Ties.Add(tie);
+            }
+            if (n.IsTieDestination)
+            {
+                var tie = new ScoreTieGlyph(n.TieOrigin, n, this, true);
                 Ties.Add(tie);
             }
             else if (n.IsHammerPullOrigin)

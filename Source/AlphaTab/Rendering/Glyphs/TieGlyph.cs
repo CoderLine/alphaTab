@@ -1,6 +1,7 @@
 ﻿using System;
 using AlphaTab.Model;
 using AlphaTab.Platform;
+using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
@@ -9,13 +10,15 @@ namespace AlphaTab.Rendering.Glyphs
         protected Note StartNote;
         protected Note EndNote;
         protected Glyph Parent;
+        private readonly bool _forEnd;
 
-        public TieGlyph(Note startNote, Note endNote, Glyph parent)
+        public TieGlyph(Note startNote, Note endNote, Glyph parent, bool forEnd)
             : base(0, 0)
         {
             StartNote = startNote;
             EndNote = endNote;
             Parent = parent;
+            _forEnd = forEnd;
         }
 
         public override void DoLayout()
@@ -27,6 +30,78 @@ namespace AlphaTab.Rendering.Glyphs
         {
             get { return false; }
         }
+
+        public override void Paint(int cx, int cy, ICanvas canvas)
+        {
+            if (EndNote == null) return;
+
+            GroupedBarRenderer startNoteRenderer =
+                    (GroupedBarRenderer)Renderer.Layout.GetRendererForBar(Renderer.Stave.StaveId, StartNote.Beat.Voice.Bar.Index);
+            GroupedBarRenderer endNoteRenderer =
+                    (GroupedBarRenderer)Renderer.Layout.GetRendererForBar(Renderer.Stave.StaveId, EndNote.Beat.Voice.Bar.Index);
+
+            int startX = 0;
+            int endX = 0;
+
+            int startY = 0;
+            int endY = 0;
+
+            bool shouldDraw = false;
+            BeatContainerGlyph parent = (BeatContainerGlyph)Parent;
+
+            // if we are on the tie start, we check if we 
+            // either can draw till the end note, or we just can draw till the bar end
+            if (!_forEnd)
+            {
+                // bar break or line break: to bar end
+                if (startNoteRenderer != endNoteRenderer)
+                {
+                    // TODO: expand tie to next bar if possible, currently we draw a tie till the 
+                    // bar end if we have different bars
+
+                    startX = cx + startNoteRenderer.GetNoteX(StartNote);
+                    endX = cx + parent.X + parent.PostNotes.X + parent.PostNotes.Width;
+
+                    startY = cy + startNoteRenderer.GetNoteY(StartNote) + (NoteHeadGlyph.NoteHeadHeight / 2);
+                    endY = startY;
+                }
+                else
+                {
+                    startX = cx + startNoteRenderer.GetNoteX(StartNote);
+                    endX = cx + endNoteRenderer.GetNoteX(EndNote, false);
+
+                    startY = cy + startNoteRenderer.GetNoteY(StartNote) + (NoteHeadGlyph.NoteHeadHeight / 2);
+                    endY = cy + endNoteRenderer.GetNoteY(EndNote) + (NoteHeadGlyph.NoteHeadHeight / 2);
+                }
+                shouldDraw = true;
+            }
+            // if we draw for the tie end, we only draw a tie if we had a line break between start and end
+            // in this case there will be a tie from bar start to the note
+            else if (startNoteRenderer.Stave != endNoteRenderer.Stave)
+            {
+                startX = cx;
+                endX = cx + startNoteRenderer.GetNoteX(EndNote);
+
+                startY = cy + startNoteRenderer.GetNoteY(EndNote) + (NoteHeadGlyph.NoteHeadHeight / 2);
+                endY = startY;
+
+                shouldDraw = true;
+            }
+
+            if (shouldDraw)
+            {
+                PaintTie(canvas, Scale, startX, startY, endX, endY,
+                    GetBeamDirection(StartNote, startNoteRenderer) == BeamDirection.Down);
+
+                canvas.Fill();
+            }
+        }
+
+        protected virtual BeamDirection GetBeamDirection(Note note, BarRendererBase noteRenderer)
+        {
+            return BeamDirection.Down;
+        }
+
 
         /// <summary>
         /// paints a tie between the two given points

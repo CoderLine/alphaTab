@@ -453,6 +453,8 @@
 		this.index = 0;
 		this.$_score = score;
 		this.shouldPlay = true;
+		this.repeatMove = 0;
+		this.index = 0;
 	};
 	$AlphaTab_Audio_Generator_MidiPlaybackController.__typeName = 'AlphaTab.Audio.Generator.MidiPlaybackController';
 	global.AlphaTab.Audio.Generator.MidiPlaybackController = $AlphaTab_Audio_Generator_MidiPlaybackController;
@@ -1131,6 +1133,7 @@
 		this.slideTarget = null;
 		this.vibrato = 0;
 		this.tieOrigin = null;
+		this.tieDestination = null;
 		this.isTieDestination = false;
 		this.isTieOrigin = false;
 		this.leftHandFinger = 0;
@@ -2636,8 +2639,8 @@
 	global.AlphaTab.Rendering.Glyphs.ScoreSlideLineGlyph = $AlphaTab_Rendering_Glyphs_ScoreSlideLineGlyph;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Glyphs.ScoreTieGlyph
-	var $AlphaTab_Rendering_Glyphs_ScoreTieGlyph = function(startNote, endNote, parent) {
-		$AlphaTab_Rendering_Glyphs_TieGlyph.call(this, startNote, endNote, parent);
+	var $AlphaTab_Rendering_Glyphs_ScoreTieGlyph = function(startNote, endNote, parent, forEnd) {
+		$AlphaTab_Rendering_Glyphs_TieGlyph.call(this, startNote, endNote, parent, forEnd);
 	};
 	$AlphaTab_Rendering_Glyphs_ScoreTieGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.ScoreTieGlyph';
 	global.AlphaTab.Rendering.Glyphs.ScoreTieGlyph = $AlphaTab_Rendering_Glyphs_ScoreTieGlyph;
@@ -2769,8 +2772,8 @@
 	global.AlphaTab.Rendering.Glyphs.TabSlideLineGlyph = $AlphaTab_Rendering_Glyphs_TabSlideLineGlyph;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Glyphs.TabTieGlyph
-	var $AlphaTab_Rendering_Glyphs_TabTieGlyph = function(startNote, endNote, parent) {
-		$AlphaTab_Rendering_Glyphs_TieGlyph.call(this, startNote, endNote, parent);
+	var $AlphaTab_Rendering_Glyphs_TabTieGlyph = function(startNote, endNote, parent, forEnd) {
+		$AlphaTab_Rendering_Glyphs_TieGlyph.call(this, startNote, endNote, parent, forEnd);
 	};
 	$AlphaTab_Rendering_Glyphs_TabTieGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.TabTieGlyph';
 	global.AlphaTab.Rendering.Glyphs.TabTieGlyph = $AlphaTab_Rendering_Glyphs_TabTieGlyph;
@@ -2796,14 +2799,16 @@
 	global.AlphaTab.Rendering.Glyphs.TextGlyph = $AlphaTab_Rendering_Glyphs_TextGlyph;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Glyphs.TieGlyph
-	var $AlphaTab_Rendering_Glyphs_TieGlyph = function(startNote, endNote, parent) {
+	var $AlphaTab_Rendering_Glyphs_TieGlyph = function(startNote, endNote, parent, forEnd) {
 		this.startNote = null;
 		this.endNote = null;
 		this.parent = null;
+		this.$_forEnd = false;
 		$AlphaTab_Rendering_Glyphs_Glyph.call(this, 0, 0);
 		this.startNote = startNote;
 		this.endNote = endNote;
 		this.parent = parent;
+		this.$_forEnd = forEnd;
 	};
 	$AlphaTab_Rendering_Glyphs_TieGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.TieGlyph';
 	$AlphaTab_Rendering_Glyphs_TieGlyph.paintTie = function(canvas, scale, x1, y1, x2, y2, down) {
@@ -2949,10 +2954,12 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Layout.ScoreLayout
 	var $AlphaTab_Rendering_Layout_ScoreLayout = function(renderer) {
+		this.$_barRendererLookup = null;
 		this.renderer = null;
 		this.width = 0;
 		this.height = 0;
 		this.renderer = renderer;
+		this.$_barRendererLookup = {};
 	};
 	$AlphaTab_Rendering_Layout_ScoreLayout.__typeName = 'AlphaTab.Rendering.Layout.ScoreLayout';
 	global.AlphaTab.Rendering.Layout.ScoreLayout = $AlphaTab_Rendering_Layout_ScoreLayout;
@@ -2974,9 +2981,8 @@
 	global.AlphaTab.Rendering.Staves.BarSizeInfo = $AlphaTab_Rendering_Staves_BarSizeInfo;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Staves.Stave
-	var $AlphaTab_Rendering_Staves_Stave = function(factory) {
+	var $AlphaTab_Rendering_Staves_Stave = function(staveId, factory) {
 		this.$_factory = null;
-		this.$_barRendererLookup = null;
 		this.staveTrackGroup = null;
 		this.staveGroup = null;
 		this.barRenderers = null;
@@ -2984,6 +2990,7 @@
 		this.y = 0;
 		this.height = 0;
 		this.index = 0;
+		this.staveId = null;
 		this.staveTop = 0;
 		this.topSpacing = 0;
 		this.bottomSpacing = 0;
@@ -2991,7 +2998,7 @@
 		this.isFirstInAccolade = false;
 		this.isLastInAccolade = false;
 		this.barRenderers = [];
-		this.$_barRendererLookup = {};
+		this.staveId = staveId;
 		this.$_factory = factory;
 		this.topSpacing = 10;
 		this.bottomSpacing = 10;
@@ -8186,6 +8193,7 @@
 				else {
 					this.tieOrigin = prevNoteOnLine.value();
 					this.tieOrigin.isTieOrigin = true;
+					this.tieOrigin.tieDestination = this;
 					this.fret = this.tieOrigin.fret;
 				}
 			}
@@ -8257,13 +8265,14 @@
 	ss.initEnum($AlphaTab_Model_SlideType, $asm, { none: 0, shift: 1, legato: 2, intoFromBelow: 3, intoFromAbove: 4, outUp: 5, outDown: 6 });
 	ss.initClass($AlphaTab_Model_Track, $asm, {
 		addBar: function(bar) {
+			var bars = this.bars;
 			bar.track = this;
 			bar.index = this.bars.length;
-			if (this.bars.length > 0) {
-				bar.previousBar = this.bars[this.bars.length - 1];
+			if (bars.length > 0) {
+				bar.previousBar = bars[bars.length - 1];
 				bar.previousBar.nextBar = bar;
 			}
-			this.bars.push(bar);
+			bars.push(bar);
 		},
 		finish: function() {
 			if (ss.isNullOrEmptyString(this.shortName)) {
@@ -9066,6 +9075,12 @@
 					this.$_biggestVoiceContainer = c;
 				}
 			}));
+		},
+		getNoteX: function(note, onEnd) {
+			return 0;
+		},
+		getNoteY: function(note) {
+			return 0;
 		},
 		registerMaxSizes: function(sizes) {
 			var preSize = this.get_beatGlyphsStart();
@@ -10316,17 +10331,23 @@
 	ss.initClass($AlphaTab_Rendering_ScoreBeatContainerGlyph, $asm, {
 		createTies: function(n) {
 			// create a tie if any effect requires it
-			if (n.isTieDestination && ss.isValue(n.tieOrigin)) {
-				var tie = new $AlphaTab_Rendering_Glyphs_ScoreTieGlyph(n.tieOrigin, n, this);
+			// NOTE: we create 2 tie glyphs if we have a line break inbetween 
+			// the two notes
+			if (n.isTieOrigin) {
+				var tie = new $AlphaTab_Rendering_Glyphs_ScoreTieGlyph(n, n.tieDestination, this, false);
 				this.ties.push(tie);
 			}
-			else if (n.isHammerPullOrigin) {
-				var tie1 = new $AlphaTab_Rendering_Glyphs_ScoreTieGlyph(n, n.hammerPullDestination, this);
+			if (n.isTieDestination) {
+				var tie1 = new $AlphaTab_Rendering_Glyphs_ScoreTieGlyph(n.tieOrigin, n, this, true);
 				this.ties.push(tie1);
 			}
-			else if (n.slideType === 2) {
-				var tie2 = new $AlphaTab_Rendering_Glyphs_ScoreTieGlyph(n, n.slideTarget, this);
+			else if (n.isHammerPullOrigin) {
+				var tie2 = new $AlphaTab_Rendering_Glyphs_ScoreTieGlyph(n, n.hammerPullDestination, this, false);
 				this.ties.push(tie2);
+			}
+			else if (n.slideType === 2) {
+				var tie3 = new $AlphaTab_Rendering_Glyphs_ScoreTieGlyph(n, n.slideTarget, this, false);
+				this.ties.push(tie3);
 			}
 			// TODO: depending on the type we have other positioning
 			// we should place glyphs in the preNotesGlyph or postNotesGlyph if needed
@@ -12531,32 +12552,58 @@
 		},
 		get_canScale: function() {
 			return false;
-		}
-	}, $AlphaTab_Rendering_Glyphs_Glyph);
-	ss.initClass($AlphaTab_Rendering_Glyphs_ScoreTieGlyph, $asm, {
+		},
 		paint: function(cx, cy, canvas) {
 			if (ss.isNullOrUndefined(this.endNote)) {
 				return;
 			}
-			var glyphRenderer = this.renderer;
-			var startNoteRenderer = glyphRenderer.stave.getRendererForBar(this.startNote.beat.voice.bar.index);
-			var endNoteRenderer = glyphRenderer.stave.getRendererForBar(this.endNote.beat.voice.bar.index);
-			// TODO: expand tie to next bar if possible
-			var endNote;
-			if (!ss.referenceEquals(startNoteRenderer, endNoteRenderer)) {
-				endNote = null;
-				endNoteRenderer = startNoteRenderer;
-			}
-			else {
-				endNote = this.endNote;
-			}
+			var startNoteRenderer = this.renderer.get_layout().getRendererForBar(this.renderer.stave.staveId, this.startNote.beat.voice.bar.index);
+			var endNoteRenderer = this.renderer.get_layout().getRendererForBar(this.renderer.stave.staveId, this.endNote.beat.voice.bar.index);
+			var startX = 0;
+			var endX = 0;
+			var startY = 0;
+			var endY = 0;
+			var shouldDraw = false;
 			var parent = this.parent;
-			var startX = cx + startNoteRenderer.getNoteX(this.startNote, true);
-			var endX = (ss.isNullOrUndefined(endNote) ? (cx + parent.x + parent.postNotes.x + parent.postNotes.width) : (cx + endNoteRenderer.getNoteX(endNote, false)));
-			var startY = cy + startNoteRenderer.getNoteY(this.startNote) + 4;
-			var endY = (ss.isNullOrUndefined(endNote) ? startY : (cy + endNoteRenderer.getNoteY(endNote) + 4));
-			$AlphaTab_Rendering_Glyphs_TieGlyph.paintTie(canvas, this.get_scale(), startX, startY, endX, endY, startNoteRenderer.getBeatDirection(this.startNote.beat) === 1);
-			canvas.fill();
+			// if we are on the tie start, we check if we 
+			// either can draw till the end note, or we just can draw till the bar end
+			if (!this.$_forEnd) {
+				// bar break or line break: to bar end
+				if (!ss.referenceEquals(startNoteRenderer, endNoteRenderer)) {
+					// TODO: expand tie to next bar if possible, currently we draw a tie till the 
+					// bar end if we have different bars
+					startX = cx + startNoteRenderer.getNoteX(this.startNote, true);
+					endX = cx + parent.x + parent.postNotes.x + parent.postNotes.width;
+					startY = cy + startNoteRenderer.getNoteY(this.startNote) + 4;
+					endY = startY;
+				}
+				else {
+					startX = cx + startNoteRenderer.getNoteX(this.startNote, true);
+					endX = cx + endNoteRenderer.getNoteX(this.endNote, false);
+					startY = cy + startNoteRenderer.getNoteY(this.startNote) + 4;
+					endY = cy + endNoteRenderer.getNoteY(this.endNote) + 4;
+				}
+				shouldDraw = true;
+			}
+			else if (!ss.referenceEquals(startNoteRenderer.stave, endNoteRenderer.stave)) {
+				startX = cx;
+				endX = cx + startNoteRenderer.getNoteX(this.endNote, true);
+				startY = cy + startNoteRenderer.getNoteY(this.endNote) + 4;
+				endY = startY;
+				shouldDraw = true;
+			}
+			if (shouldDraw) {
+				$AlphaTab_Rendering_Glyphs_TieGlyph.paintTie(canvas, this.get_scale(), startX, startY, endX, endY, this.getBeamDirection(this.startNote, startNoteRenderer) === 1);
+				canvas.fill();
+			}
+		},
+		getBeamDirection: function(note, noteRenderer) {
+			return 1;
+		}
+	}, $AlphaTab_Rendering_Glyphs_Glyph);
+	ss.initClass($AlphaTab_Rendering_Glyphs_ScoreTieGlyph, $asm, {
+		getBeamDirection: function(note, noteRenderer) {
+			return noteRenderer.getBeatDirection(note.beat);
 		}
 	}, $AlphaTab_Rendering_Glyphs_TieGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_SharpGlyph, $asm, {
@@ -12576,11 +12623,11 @@
 	ss.initClass($AlphaTab_Rendering_Glyphs_TabBeatContainerGlyph, $asm, {
 		createTies: function(n) {
 			if (n.isHammerPullOrigin) {
-				var tie = new $AlphaTab_Rendering_Glyphs_TabTieGlyph(n, n.hammerPullDestination, this);
+				var tie = new $AlphaTab_Rendering_Glyphs_TabTieGlyph(n, n.hammerPullDestination, this, false);
 				this.ties.push(tie);
 			}
 			else if (n.slideType === 2) {
-				var tie1 = new $AlphaTab_Rendering_Glyphs_TabTieGlyph(n, n.slideTarget, this);
+				var tie1 = new $AlphaTab_Rendering_Glyphs_TabTieGlyph(n, n.slideTarget, this, false);
 				this.ties.push(tie1);
 			}
 			if (n.slideType !== 0) {
@@ -12945,35 +12992,8 @@
 		}
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_TabTieGlyph, $asm, {
-		paint: function(cx, cy, canvas) {
-			if (ss.isNullOrUndefined(this.endNote)) {
-				return;
-			}
-			var glyphRenderer = this.renderer;
-			var startNoteRenderer = glyphRenderer.stave.getRendererForBar(this.startNote.beat.voice.bar.index);
-			var endNoteRenderer = glyphRenderer.stave.getRendererForBar(this.endNote.beat.voice.bar.index);
-			// TODO: expand tie to next bar if possible
-			var endNote;
-			if (!ss.referenceEquals(startNoteRenderer, endNoteRenderer)) {
-				endNote = null;
-				endNoteRenderer = startNoteRenderer;
-			}
-			else {
-				endNote = this.endNote;
-			}
-			var parent = this.parent;
-			var res = glyphRenderer.get_resources();
-			var startX = cx + startNoteRenderer.getNoteX(this.startNote, false);
-			var endX = (ss.isNullOrUndefined(endNote) ? (cx + parent.x + parent.postNotes.x + parent.postNotes.width) : (cx + endNoteRenderer.getNoteX(endNote, false)));
-			var down = this.startNote.string > 3;
-			var offset = res.tablatureFont.get_size() / 2;
-			if (down) {
-				offset *= -1;
-			}
-			var startY = cy + startNoteRenderer.getNoteY(this.startNote) + offset;
-			var endY = (ss.isNullOrUndefined(endNote) ? startY : (cy + endNoteRenderer.getNoteY(endNote) + offset));
-			$AlphaTab_Rendering_Glyphs_TieGlyph.paintTie(canvas, this.get_scale(), startX, startY, endX, endY, this.startNote.string > 3);
-			canvas.fill();
+		getBeamDirection: function(note, noteRenderer) {
+			return ((this.startNote.string > 3) ? 1 : 0);
 		}
 	}, $AlphaTab_Rendering_Glyphs_TieGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_TempoGlyph, $asm, {
@@ -13215,13 +13235,25 @@
 					if ($AlphaTab_Environment.staveFactories.hasOwnProperty(s.id)) {
 						var factory = $AlphaTab_Environment.staveFactories[s.id](this);
 						if (factory.canCreate(track) && (isFirstTrack || !factory.hideOnMultiTrack)) {
-							group.addStave(track, new $AlphaTab_Rendering_Staves_Stave(factory));
+							group.addStave(track, new $AlphaTab_Rendering_Staves_Stave(s.id, factory));
 						}
 					}
 				}
 				isFirstTrack = false;
 			}
 			return group;
+		},
+		registerBarRenderer: function(key, index, renderer) {
+			if (!this.$_barRendererLookup.hasOwnProperty(key)) {
+				this.$_barRendererLookup[key] = {};
+			}
+			this.$_barRendererLookup[key][index] = renderer;
+		},
+		getRendererForBar: function(key, index) {
+			if (this.$_barRendererLookup.hasOwnProperty(key) && this.$_barRendererLookup[key].hasOwnProperty(index)) {
+				return this.$_barRendererLookup[key][index];
+			}
+			return null;
 		}
 	});
 	ss.initClass($AlphaTab_Rendering_Layout_HorizontalScreenLayout, $asm, {
@@ -13540,7 +13572,7 @@
 			renderer.index = this.barRenderers.length;
 			renderer.doLayout();
 			this.barRenderers.push(renderer);
-			this.$_barRendererLookup[bar.index] = renderer;
+			this.staveGroup.layout.registerBarRenderer(this.staveId, bar.index, renderer);
 		},
 		revertLastBar: function() {
 			this.barRenderers.splice(this.barRenderers.length - 1, 1);
@@ -13600,12 +13632,6 @@
 			for (var i = 0, j = this.barRenderers.length; i < j; i++) {
 				this.barRenderers[i].paint(cx + this.x, cy + this.y, canvas);
 			}
-		},
-		getRendererForBar: function(index) {
-			if (this.$_barRendererLookup.hasOwnProperty(index)) {
-				return this.$_barRendererLookup[index];
-			}
-			return null;
 		}
 	});
 	ss.initClass($AlphaTab_Rendering_Staves_StaveGroup, $asm, {

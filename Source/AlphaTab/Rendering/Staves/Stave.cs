@@ -14,7 +14,6 @@ namespace AlphaTab.Rendering.Staves
     public class Stave
     {
         private BarRendererFactory _factory;
-        private FastDictionary<int, BarRendererBase> _barRendererLookup;
 
         [IntrinsicProperty]
         public StaveTrackGroup StaveTrackGroup { get; set; }
@@ -32,6 +31,10 @@ namespace AlphaTab.Rendering.Staves
         public int Height { get; set; }
         [IntrinsicProperty]
         public int Index { get; set; }
+        [IntrinsicProperty]
+        public string StaveId { get; private set; }
+
+
 
         /// <summary>
         /// This is the visual offset from top where the
@@ -57,10 +60,10 @@ namespace AlphaTab.Rendering.Staves
         [IntrinsicProperty]
         public bool IsLastInAccolade { get; set; }
 
-        public Stave(BarRendererFactory factory)
+        public Stave(string staveId, BarRendererFactory factory)
         {
             BarRenderers = new FastList<BarRendererBase>();
-            _barRendererLookup = new FastDictionary<int, BarRendererBase>();
+            StaveId = staveId;
             _factory = factory;
             TopSpacing = 10;
             BottomSpacing = 10;
@@ -93,7 +96,7 @@ namespace AlphaTab.Rendering.Staves
             renderer.Index = BarRenderers.Count;
             renderer.DoLayout();
             BarRenderers.Add(renderer);
-            _barRendererLookup[bar.Index] = renderer;
+            StaveGroup.Layout.RegisterBarRenderer(StaveId, bar.Index, renderer);
         }
 
         public void RevertLastBar()
@@ -181,13 +184,6 @@ namespace AlphaTab.Rendering.Staves
             {
                 BarRenderers[i].Paint(cx + X, cy + Y, canvas);
             }
-        }
-
-        public BarRendererBase GetRendererForBar(int index)
-        {
-            if (_barRendererLookup.ContainsKey(index))
-                return _barRendererLookup[index];
-            return null;
         }
     }
 }

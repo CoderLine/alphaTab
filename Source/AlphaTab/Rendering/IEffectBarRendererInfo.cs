@@ -24,20 +24,20 @@ namespace AlphaTab.Rendering
         /// <param name="beat">the beat storing the data</param>
         /// <returns>true if the beat has the effect set, otherwise false.</returns>
         bool ShouldCreateGlyph(EffectBarRenderer renderer, Beat beat);
-    
+
         /// <summary>
         /// Gets the sizing mode of the glyphs created by this info.
         /// </summary>
         /// <returns>the sizing mode to apply to the glyphs during layout</returns>
         EffectBarGlyphSizing SizingMode { get; }
-    
+
         /// <summary>
         /// Gets the height of that this effect needs
         /// </summary>
         /// <param name="renderer">the renderer</param>
         /// <returns>the height needed by this effect</returns>
         int GetHeight(EffectBarRenderer renderer);
-    
+
         /// <summary>
         /// Creates a new effect glyph for the given beat. 
         /// </summary>
@@ -45,7 +45,7 @@ namespace AlphaTab.Rendering
         /// <param name="beat">the beat storing the data</param>
         /// <returns>the glyph which needs to be added to the renderer</returns>
         EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat);
-    
+
         /// <summary>
         /// Checks whether an effect glyph can be expanded to a particular beat.
         /// </summary>

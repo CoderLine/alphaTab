@@ -31,7 +31,7 @@ namespace AlphaTab.Rendering
         /// The step offsets of the notes within an octave in case of for sharp keysignatures
         /// </summary>
         private static readonly int[] SharpNoteSteps = { 0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6 };
-
+        
         /// <summary>
         /// The step offsets of the notes within an octave in case of for flat keysignatures
         /// </summary>
@@ -70,7 +70,7 @@ namespace AlphaTab.Rendering
             return BeamDirection.Up;
         }
 
-        public int GetNoteX(Note note, bool onEnd = true)
+        public override int GetNoteX(Note note, bool onEnd = true)
         {
             ScoreBeatGlyph g = (ScoreBeatGlyph)GetOnNotesPosition(note.Beat.Voice.Index, note.Beat.Index);
             if (g != null)
@@ -80,7 +80,7 @@ namespace AlphaTab.Rendering
             return 0;
         }
 
-        public int GetNoteY(Note note)
+        public override int GetNoteY(Note note)
         {
             ScoreBeatGlyph beat = (ScoreBeatGlyph)GetOnNotesPosition(note.Beat.Voice.Index, note.Beat.Index);
             if (beat != null)

@@ -52,7 +52,7 @@
             context.renderer.renderMultiple(buildTracksArray(context.settings.tracks, score));
         }
         catch (e) {
-            $.error(e);
+            console.error(e);
         }
     }
 
@@ -168,7 +168,7 @@
                         scoreLoaded(context, score);
                     },
                     function (error) {
-                        $.error(error);
+                        console.error(error);
                     });
                 }
             }
@@ -177,21 +177,38 @@
 
     /*
      * Open alphaTab file
-     * @param {String} url the url to load the data via ajax
-     * @param {Array} tracks the track indices to load initially 
-     * @param {Function} success the callback function to call after successful track display
-     * @param {Function} error the callback function to call after any error during loading or rendering
+     * @param {String|ArrayBuffer} data the url to load the data via ajax or the ArrayBuffer storing the data
      */
-    function load(url, tracks, success, error) {
+    function load(data) {
         var context = $(this).data('alphaTab');
-        if (!context) { $.error('alphaTab not initialized!'); }
-        AlphaTab.Importer.ScoreLoader.loadScoreAsync(url,
-        function (score) {
-            scoreLoaded(context, score);
-        },
-        function (error) {
-            $.error(error);
-        });
+        if (!context) { console.error('alphaTab not initialized!'); }
+        if(data.constructor == ArrayBuffer) {
+            try {
+                var score = AlphaTab.Importer.ScoreLoader.loadScoreFromBytes(new Uint8Array(data));
+                scoreLoaded(context, score);
+            }
+            catch(e) {
+                console.error(e);
+            }            
+        }
+        if(data.constructor == Uint8Array) {
+            try {
+                var score = AlphaTab.Importer.ScoreLoader.loadScoreFromBytes(data);
+                scoreLoaded(context, score);
+            }
+            catch(e) {
+                console.error(e);
+            }            
+        }
+        else if(typeof(data) == 'string') {
+            AlphaTab.Importer.ScoreLoader.loadScoreAsync(url,
+            function (score) {
+                scoreLoaded(context, score);
+            },
+            function (error) {
+                console.error(error);
+            });
+        }
     }
 
     /**
@@ -202,7 +219,7 @@
      */
     function tex(content, success, error) {
         var context = $(this).data('alphaTab');
-        if (!context) { $.error('alphaTab not initialized!'); }
+        if (!context) { console.error('alphaTab not initialized!'); }
 
         var score = null;
         try {
@@ -212,7 +229,7 @@
             score = parser.readScore();
         }
         catch (e) {
-            $.error(e);
+            console.error(e);
         }
 
         if (score != null) {a
@@ -238,7 +255,7 @@
             }
             catch (e) {
                 if (e instanceof Error) throw e;
-                else $.error(e);
+                else console.error(e);
             }
         }
         else {
@@ -280,7 +297,7 @@
             return api.init.apply(this, arguments);
         }
         else {
-            $.error('Method ' + method + ' does not exist on jQuery.alphaTab');
+            console.error('Method ' + method + ' does not exist on jQuery.alphaTab');
         }
     };
     $.fn.alphaTab.fn = api;

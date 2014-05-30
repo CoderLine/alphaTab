@@ -56,6 +56,8 @@ namespace AlphaTab.Model
         [IntrinsicProperty]
         public Note TieOrigin { get; set; }
         [IntrinsicProperty]
+        public Note TieDestination { get; set; }
+        [IntrinsicProperty]
         public bool IsTieDestination { get; set; }
         [IntrinsicProperty]
         public bool IsTieOrigin { get; set; }
@@ -200,6 +202,7 @@ namespace AlphaTab.Model
                 {
                     TieOrigin = prevNoteOnLine.Value;
                     TieOrigin.IsTieOrigin = true;
+                    TieOrigin.TieDestination = this;
                     Fret = TieOrigin.Fret;
                 }
             }

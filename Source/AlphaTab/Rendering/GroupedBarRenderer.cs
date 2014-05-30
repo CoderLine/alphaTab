@@ -14,7 +14,7 @@ namespace AlphaTab.Rendering
     ///  - BeatGlyphs : Each of those glyphs represents one beat. They are aligned left to right.
     ///  - PostBeatGlyphs : Those glyphs are aligned left to right after the last beat glyph
     /// </summary>
-    public class GroupedBarRenderer : BarRendererBase
+    public abstract class GroupedBarRenderer : BarRendererBase
     {
         public const string KeySizePre = "Pre";
         public const string KeySizePost = "Post";
@@ -57,6 +57,17 @@ namespace AlphaTab.Rendering
                 }
             });
         }
+
+        public virtual int GetNoteX(Note note, bool onEnd = true)
+        {
+            return 0;
+        }
+
+        public virtual int GetNoteY(Note note)
+        {
+            return 0;
+        }
+
 
         public override void RegisterMaxSizes(BarSizeInfo sizes)
         {

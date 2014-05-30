@@ -22,7 +22,7 @@
         var ms = new AlphaTab.IO.MemoryStream();
         midi.writeTo(ms);
         var bytes = ms.toArray();
-        synth.loadMidiBytesData(bytes.get_data());
+        synth.loadMidiBytesData(bytes);
     }
     
     // extend the api
@@ -31,7 +31,7 @@
     api.autoPlayer = function() 
     {
         var context = $(this).data('alphaTab');
-        if(!context) { $.error('alphaTab not initialized!'); }
+        if(!context) { console.error('alphaTab not initialized!'); }
         
         $(this).on('loaded', function(e, score) {
             loadMidi(score);
@@ -44,7 +44,7 @@
     api.playerLoad = function() 
     {
         var context = $(this).data('alphaTab');
-        if(!context) { $.error('alphaTab not initialized!'); }
+        if(!context) { console.error('alphaTab not initialized!'); }
         loadMidi(api.score.apply(this));
     };
     
@@ -180,7 +180,7 @@
         $(this).data('cursors', cursorWrapper);
         $(this).data('barCursor', barCursor);
         $(this).data('beatCursor', beatCursor);
-        cursorWrapper.css({position: 'absolute', "z-index": 1000, display: 'inline'});
+        cursorWrapper.css({position: 'absolute', "z-index": 1000, display: 'inline', 'pointer-events': 'none'});
         barCursor.css({position: 'absolute'});
         beatCursor.css({position: 'absolute'});
         
@@ -212,7 +212,7 @@
         
         // click handling
         if(context.cursorOptions.handleClick) {
-            $(cursorWrapper).click(function(e) {
+            $(context.canvas).click(function(e) {
                 var parentOffset = $(this).offset(); 
                 var relX = e.pageX - parentOffset.left;
                 var relY = e.pageY - parentOffset.top;

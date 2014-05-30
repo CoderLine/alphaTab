@@ -79,6 +79,7 @@ namespace AlphaTab.Rendering
                     prevGlyph = prevRenderer._effectGlyphs[0][prevRenderer._lastBeat.Index];
                 }
             }
+
             foreach (var key in _effectGlyphs[0].Keys)
             {
                 int beatIndex = Std.ParseInt(key);
