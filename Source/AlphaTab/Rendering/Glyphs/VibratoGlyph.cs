@@ -21,9 +21,7 @@ namespace AlphaTab.Rendering.Glyphs
             var loopX = 0;
             for (var i = 0; i < loops; i++)
             {
-                var glyph = new SvgGlyph(loopX, 0, MusicFont.WaveHorizontal, _scale, _scale);
-                glyph.Renderer = Renderer;
-                glyph.Paint(cx + X, cy + Y, canvas);
+                canvas.FillMusicFontSymbol(cx + X + loopX, cy +Y, _scale, MusicFontSymbol.WaveHorizontal);
                 loopX += (int)step;
             }
         }

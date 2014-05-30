@@ -24,9 +24,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void Paint(int cx, int cy, ICanvas canvas)
         {
-            canvas.BeginPath();
-            canvas.Circle(cx + X, cy + Y, _size);
-            canvas.Fill();
+            canvas.FillCircle(cx + X, cy + Y, _size);
         }
     }
 }

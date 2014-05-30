@@ -1,8 +1,9 @@
 ﻿using AlphaTab.Platform;
+using AlphaTab.Rendering.Glyphs;
 
-namespace AlphaTab.Rendering.Glyphs
+namespace AlphaTab.Rendering.Utils
 {
-    public class SvgGlyph : EffectGlyph
+    public class SvgRenderer
     {
         private readonly LazySvg _svg;
         private string _lastCmd;
@@ -18,22 +19,21 @@ namespace AlphaTab.Rendering.Glyphs
         private float _lastControlX;
         private float _lastControlY;
 
-        public SvgGlyph(int x, int y, LazySvg svg, float xScale, float yScale)
-            : base(x, y)
+        public SvgRenderer(LazySvg svg, float xScale, float yScale)
         {
             _svg = svg;
             _xGlyphScale = xScale * 0.0099f;
             _yGlyphScale = yScale * 0.0099f;
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public void Paint(float x, float y, IPathCanvas canvas)
         {
             if (_svg == null) return;
-            _xScale = _xGlyphScale * Scale;
-            _yScale = _yGlyphScale * Scale;
+            _xScale = _xGlyphScale;
+            _yScale = _yGlyphScale;
 
-            var startX = X + cx;
-            var startY = Y + cy;
+            var startX = x;
+            var startY = y;
             _currentX = startX;
             _currentY = startY;
             canvas.BeginPath();
@@ -45,7 +45,7 @@ namespace AlphaTab.Rendering.Glyphs
             canvas.Fill();
         }
 
-        private void ParseCommand(int cx, int cy, ICanvas canvas, SvgCommand cmd)
+        private void ParseCommand(float cx, float cy, IPathCanvas canvas, SvgCommand cmd)
         {
             bool canContinue; // reusable flag for shorthand curves
             int i;

@@ -1531,6 +1531,12 @@
 	$AlphaTab_Platform_IFileLoader.__typeName = 'AlphaTab.Platform.IFileLoader';
 	global.AlphaTab.Platform.IFileLoader = $AlphaTab_Platform_IFileLoader;
 	////////////////////////////////////////////////////////////////////////////////
+	// AlphaTab.Platform.IPathCanvas
+	var $AlphaTab_Platform_IPathCanvas = function() {
+	};
+	$AlphaTab_Platform_IPathCanvas.__typeName = 'AlphaTab.Platform.IPathCanvas';
+	global.AlphaTab.Platform.IPathCanvas = $AlphaTab_Platform_IPathCanvas;
+	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Platform.Std
 	var $AlphaTab_Platform_Std = function() {
 	};
@@ -1659,9 +1665,16 @@
 	var $AlphaTab_Platform_Svg_FontSizes = function() {
 	};
 	$AlphaTab_Platform_Svg_FontSizes.__typeName = 'AlphaTab.Platform.Svg.FontSizes';
-	$AlphaTab_Platform_Svg_FontSizes.measureString = function(s, f, size) {
+	$AlphaTab_Platform_Svg_FontSizes.measureString = function(s, f, size, style) {
 		var data;
 		var dataSize;
+		var factor = 1;
+		if ((style & 2) !== 0) {
+			factor *= 1.20000004768372;
+		}
+		if ((style & 1) !== 0) {
+			factor *= 1.20000004768372;
+		}
 		if (f === 0) {
 			data = $AlphaTab_Platform_Svg_FontSizes.timesNewRoman;
 			dataSize = 11;
@@ -1681,7 +1694,7 @@
 				stringSize += ss.Int32.trunc(data[code] * size / dataSize);
 			}
 		}
-		return stringSize;
+		return stringSize * factor;
 	};
 	global.AlphaTab.Platform.Svg.FontSizes = $AlphaTab_Platform_Svg_FontSizes;
 	////////////////////////////////////////////////////////////////////////////////
@@ -1917,6 +1930,7 @@
 		this.renderingResources = null;
 		this.settings = null;
 		this.$1$RenderFinishedField = null;
+		this.$1$PostRenderFinishedField = null;
 		this.settings = settings;
 		this.renderingResources = new $AlphaTab_Rendering_RenderingResources(1);
 		if (ss.isNullOrUndefined(settings.engine) || !$AlphaTab_Environment.renderEngines.hasOwnProperty(settings.engine)) {
@@ -2065,19 +2079,19 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Glyphs.AccentuationGlyph
 	var $AlphaTab_Rendering_Glyphs_AccentuationGlyph = function(x, y, accentuation) {
-		$AlphaTab_Rendering_Glyphs_SvgGlyph.call(this, x, y, $AlphaTab_Rendering_Glyphs_AccentuationGlyph.$getSvg(accentuation), 1, 1);
+		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, 1, $AlphaTab_Rendering_Glyphs_AccentuationGlyph.$getSymbol(accentuation));
 	};
 	$AlphaTab_Rendering_Glyphs_AccentuationGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.AccentuationGlyph';
-	$AlphaTab_Rendering_Glyphs_AccentuationGlyph.$getSvg = function(accentuation) {
+	$AlphaTab_Rendering_Glyphs_AccentuationGlyph.$getSymbol = function(accentuation) {
 		switch (accentuation) {
 			case 0: {
-				return null;
+				return -1;
 			}
 			case 1: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.accentuation;
+				return 53;
 			}
 			case 2: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.heavyAccentuation;
+				return 54;
 			}
 			default: {
 				throw new ss.ArgumentOutOfRangeException('accentuation');
@@ -2115,35 +2129,52 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Glyphs.BeamGlyph
 	var $AlphaTab_Rendering_Glyphs_BeamGlyph = function(x, y, duration, direction, isGrace) {
-		$AlphaTab_Rendering_Glyphs_SvgGlyph.call(this, x, y, $AlphaTab_Rendering_Glyphs_BeamGlyph.$getRestSvg(duration, isGrace), (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), $AlphaTab_Rendering_Glyphs_BeamGlyph.$getSvgScale(direction, isGrace));
+		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), $AlphaTab_Rendering_Glyphs_BeamGlyph.$getSymbol(duration, direction, isGrace));
 	};
 	$AlphaTab_Rendering_Glyphs_BeamGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.BeamGlyph';
-	$AlphaTab_Rendering_Glyphs_BeamGlyph.$getSvgScale = function(direction, isGrace) {
-		var scale = (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1);
+	$AlphaTab_Rendering_Glyphs_BeamGlyph.$getSymbol = function(duration, direction, isGrace) {
 		if (direction === 0) {
-			return 1 * scale;
+			if (isGrace) {
+				return 31;
+			}
+			switch (duration) {
+				case 8: {
+					return 31;
+				}
+				case 16: {
+					return 32;
+				}
+				case 32: {
+					return 33;
+				}
+				case 64: {
+					return 34;
+				}
+				default: {
+					return 31;
+				}
+			}
 		}
-		return -1 * scale;
-	};
-	$AlphaTab_Rendering_Glyphs_BeamGlyph.$getRestSvg = function(duration, isGrace) {
-		if (isGrace) {
-			return $AlphaTab_Rendering_Glyphs_MusicFont.footerUpEighth;
-		}
-		switch (duration) {
-			case 8: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.footerUpEighth;
+		else {
+			if (isGrace) {
+				return 35;
 			}
-			case 16: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.footerUpSixteenth;
-			}
-			case 32: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.footerUpThirtySecond;
-			}
-			case 64: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.footerUpSixtyFourth;
-			}
-			default: {
-				return null;
+			switch (duration) {
+				case 8: {
+					return 35;
+				}
+				case 16: {
+					return 36;
+				}
+				case 32: {
+					return 37;
+				}
+				case 64: {
+					return 38;
+				}
+				default: {
+					return 35;
+				}
 			}
 		}
 	};
@@ -2186,7 +2217,7 @@
 	// AlphaTab.Rendering.Glyphs.ChineseCymbalGlyph
 	var $AlphaTab_Rendering_Glyphs_ChineseCymbalGlyph = function(x, y, isGrace) {
 		this.$_isGrace = false;
-		$AlphaTab_Rendering_Glyphs_SvgGlyph.call(this, x, y, $AlphaTab_Rendering_Glyphs_MusicFont.noteHarmonic, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1));
+		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), 25);
 		this.$_isGrace = isGrace;
 	};
 	$AlphaTab_Rendering_Glyphs_ChineseCymbalGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.ChineseCymbalGlyph';
@@ -2203,25 +2234,25 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Glyphs.ClefGlyph
 	var $AlphaTab_Rendering_Glyphs_ClefGlyph = function(x, y, clef) {
-		$AlphaTab_Rendering_Glyphs_SvgGlyph.call(this, x, y, $AlphaTab_Rendering_Glyphs_ClefGlyph.$getClefSvg(clef), 1, 1);
+		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, 1, $AlphaTab_Rendering_Glyphs_ClefGlyph.$getSymbol(clef));
 	};
 	$AlphaTab_Rendering_Glyphs_ClefGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.ClefGlyph';
-	$AlphaTab_Rendering_Glyphs_ClefGlyph.$getClefSvg = function(clef) {
+	$AlphaTab_Rendering_Glyphs_ClefGlyph.$getSymbol = function(clef) {
 		switch (clef) {
 			case 0: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.clefNeutral;
+				return 71;
 			}
 			case 1: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.clefC;
+				return 1;
 			}
 			case 2: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.clefC;
+				return 1;
 			}
 			case 3: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.clefF;
+				return 0;
 			}
 			case 4: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.clefG;
+				return 7;
 			}
 			default: {
 				throw new ss.ArgumentOutOfRangeException('clef');
@@ -2242,7 +2273,7 @@
 	// AlphaTab.Rendering.Glyphs.DeadNoteHeadGlyph
 	var $AlphaTab_Rendering_Glyphs_DeadNoteHeadGlyph = function(x, y, isGrace) {
 		this.$_isGrace = false;
-		$AlphaTab_Rendering_Glyphs_SvgGlyph.call(this, x, y, $AlphaTab_Rendering_Glyphs_MusicFont.noteDead, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1));
+		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), 24);
 		this.$_isGrace = isGrace;
 	};
 	$AlphaTab_Rendering_Glyphs_DeadNoteHeadGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.DeadNoteHeadGlyph';
@@ -2251,7 +2282,7 @@
 	// AlphaTab.Rendering.Glyphs.DiamondNoteHeadGlyph
 	var $AlphaTab_Rendering_Glyphs_DiamondNoteHeadGlyph = function(x, y, isGrace) {
 		this.$_isGrace = false;
-		$AlphaTab_Rendering_Glyphs_SvgGlyph.call(this, x, y, $AlphaTab_Rendering_Glyphs_MusicFont.noteHarmonic, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1));
+		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), 25);
 		this.$_isGrace = isGrace;
 	};
 	$AlphaTab_Rendering_Glyphs_DiamondNoteHeadGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.DiamondNoteHeadGlyph';
@@ -2260,44 +2291,44 @@
 	// AlphaTab.Rendering.Glyphs.DigitGlyph
 	var $AlphaTab_Rendering_Glyphs_DigitGlyph = function(x, y, digit) {
 		this.$_digit = 0;
-		$AlphaTab_Rendering_Glyphs_SvgGlyph.call(this, x, y, $AlphaTab_Rendering_Glyphs_DigitGlyph.$getDigit(digit), 1, 1);
+		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, 1, $AlphaTab_Rendering_Glyphs_DigitGlyph.$getSymbol(digit));
 		this.$_digit = digit;
 	};
 	$AlphaTab_Rendering_Glyphs_DigitGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.DigitGlyph';
-	$AlphaTab_Rendering_Glyphs_DigitGlyph.$getDigit = function(digit) {
+	$AlphaTab_Rendering_Glyphs_DigitGlyph.$getSymbol = function(digit) {
 		switch (digit) {
 			case 0: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.num0;
+				return 8;
 			}
 			case 1: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.num1;
+				return 9;
 			}
 			case 2: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.num2;
+				return 10;
 			}
 			case 3: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.num3;
+				return 11;
 			}
 			case 4: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.num4;
+				return 12;
 			}
 			case 5: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.num5;
+				return 13;
 			}
 			case 6: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.num6;
+				return 14;
 			}
 			case 7: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.num7;
+				return 15;
 			}
 			case 8: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.num8;
+				return 16;
 			}
 			case 9: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.num9;
+				return 17;
 			}
 			default: {
-				return null;
+				return -1;
 			}
 		}
 	};
@@ -2306,7 +2337,7 @@
 	// AlphaTab.Rendering.Glyphs.DrumSticksGlyph
 	var $AlphaTab_Rendering_Glyphs_DrumSticksGlyph = function(x, y, isGrace) {
 		this.$_isGrace = false;
-		$AlphaTab_Rendering_Glyphs_SvgGlyph.call(this, x, y, $AlphaTab_Rendering_Glyphs_MusicFont.noteSideStick, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1));
+		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), 28);
 		this.$_isGrace = isGrace;
 	};
 	$AlphaTab_Rendering_Glyphs_DrumSticksGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.DrumSticksGlyph';
@@ -2338,7 +2369,7 @@
 	// AlphaTab.Rendering.Glyphs.FlatGlyph
 	var $AlphaTab_Rendering_Glyphs_FlatGlyph = function(x, y, isGrace) {
 		this.$_isGrace = false;
-		$AlphaTab_Rendering_Glyphs_SvgGlyph.call(this, x, y, $AlphaTab_Rendering_Glyphs_MusicFont.accidentalFlat, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1));
+		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), 69);
 		this.$_isGrace = isGrace;
 	};
 	$AlphaTab_Rendering_Glyphs_FlatGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.FlatGlyph';
@@ -2368,7 +2399,7 @@
 	// AlphaTab.Rendering.Glyphs.HiHatGlyph
 	var $AlphaTab_Rendering_Glyphs_HiHatGlyph = function(x, y, isGrace) {
 		this.$_isGrace = false;
-		$AlphaTab_Rendering_Glyphs_SvgGlyph.call(this, x, y, $AlphaTab_Rendering_Glyphs_MusicFont.noteHiHat, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1));
+		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), 27);
 		this.$_isGrace = isGrace;
 	};
 	$AlphaTab_Rendering_Glyphs_HiHatGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.HiHatGlyph';
@@ -2405,10 +2436,27 @@
 	$AlphaTab_Rendering_Glyphs_MusicFont.__typeName = 'AlphaTab.Rendering.Glyphs.MusicFont';
 	global.AlphaTab.Rendering.Glyphs.MusicFont = $AlphaTab_Rendering_Glyphs_MusicFont;
 	////////////////////////////////////////////////////////////////////////////////
+	// AlphaTab.Rendering.Glyphs.MusicFontGlyph
+	var $AlphaTab_Rendering_Glyphs_MusicFontGlyph = function(x, y, scale, symbol) {
+		this.$_scale = 0;
+		this.$_symbol = 0;
+		$AlphaTab_Rendering_Glyphs_EffectGlyph.call(this, x, y);
+		this.$_scale = scale;
+		this.$_symbol = symbol;
+	};
+	$AlphaTab_Rendering_Glyphs_MusicFontGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.MusicFontGlyph';
+	global.AlphaTab.Rendering.Glyphs.MusicFontGlyph = $AlphaTab_Rendering_Glyphs_MusicFontGlyph;
+	////////////////////////////////////////////////////////////////////////////////
+	// AlphaTab.Rendering.Glyphs.MusicFontSymbol
+	var $AlphaTab_Rendering_Glyphs_MusicFontSymbol = function() {
+	};
+	$AlphaTab_Rendering_Glyphs_MusicFontSymbol.__typeName = 'AlphaTab.Rendering.Glyphs.MusicFontSymbol';
+	global.AlphaTab.Rendering.Glyphs.MusicFontSymbol = $AlphaTab_Rendering_Glyphs_MusicFontSymbol;
+	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Glyphs.NaturalizeGlyph
 	var $AlphaTab_Rendering_Glyphs_NaturalizeGlyph = function(x, y, isGrace) {
 		this.$_isGrace = false;
-		$AlphaTab_Rendering_Glyphs_SvgGlyph.call(this, x, y, $AlphaTab_Rendering_Glyphs_MusicFont.accidentalNatural, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1));
+		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), 70);
 		this.$_isGrace = isGrace;
 	};
 	$AlphaTab_Rendering_Glyphs_NaturalizeGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.NaturalizeGlyph';
@@ -2418,21 +2466,21 @@
 	var $AlphaTab_Rendering_Glyphs_NoteHeadGlyph = function(x, y, duration, isGrace) {
 		this.$_isGrace = false;
 		this.$_duration = 0;
-		$AlphaTab_Rendering_Glyphs_SvgGlyph.call(this, x, y, $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.$getNoteSvg(duration), (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1));
+		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.$getSymbol(duration));
 		this.$_isGrace = isGrace;
 		this.$_duration = duration;
 	};
 	$AlphaTab_Rendering_Glyphs_NoteHeadGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.NoteHeadGlyph';
-	$AlphaTab_Rendering_Glyphs_NoteHeadGlyph.$getNoteSvg = function(duration) {
+	$AlphaTab_Rendering_Glyphs_NoteHeadGlyph.$getSymbol = function(duration) {
 		switch (duration) {
 			case 1: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.noteWhole;
+				return 21;
 			}
 			case 2: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.noteHalf;
+				return 23;
 			}
 			default: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.noteQuarter;
+				return 22;
 			}
 		}
 	};
@@ -2472,19 +2520,19 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Glyphs.PickStrokeGlyph
 	var $AlphaTab_Rendering_Glyphs_PickStrokeGlyph = function(x, y, pickStroke) {
-		$AlphaTab_Rendering_Glyphs_SvgGlyph.call(this, x, y, $AlphaTab_Rendering_Glyphs_PickStrokeGlyph.$getNoteSvg(pickStroke), 1, 1);
+		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, 1, $AlphaTab_Rendering_Glyphs_PickStrokeGlyph.$getSymbol(pickStroke));
 	};
 	$AlphaTab_Rendering_Glyphs_PickStrokeGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.PickStrokeGlyph';
-	$AlphaTab_Rendering_Glyphs_PickStrokeGlyph.$getNoteSvg = function(pickStroke) {
+	$AlphaTab_Rendering_Glyphs_PickStrokeGlyph.$getSymbol = function(pickStroke) {
 		switch (pickStroke) {
 			case 1: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.pickStrokeUp;
+				return 58;
 			}
 			case 2: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.pickStrokeDown;
+				return 57;
 			}
 			default: {
-				return null;
+				return -1;
 			}
 		}
 	};
@@ -2520,30 +2568,30 @@
 	// AlphaTab.Rendering.Glyphs.RestGlyph
 	var $AlphaTab_Rendering_Glyphs_RestGlyph = function(x, y, duration) {
 		this.$_duration = 0;
-		$AlphaTab_Rendering_Glyphs_SvgGlyph.call(this, x, y, $AlphaTab_Rendering_Glyphs_RestGlyph.$getRestSVg(duration), 1, 1);
+		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, 1, $AlphaTab_Rendering_Glyphs_RestGlyph.$getSymbol(duration));
 		this.$_duration = duration;
 	};
 	$AlphaTab_Rendering_Glyphs_RestGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.RestGlyph';
-	$AlphaTab_Rendering_Glyphs_RestGlyph.$getRestSVg = function(duration) {
+	$AlphaTab_Rendering_Glyphs_RestGlyph.$getSymbol = function(duration) {
 		switch (duration) {
 			case 1:
 			case 2: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.restWhole;
+				return 20;
 			}
 			case 4: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.restQuarter;
+				return 3;
 			}
 			case 8: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.restEighth;
+				return 19;
 			}
 			case 16: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.restSixteenth;
+				return 18;
 			}
 			case 32: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.restThirtySecond;
+				return 2;
 			}
 			case 64: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.restSixtyFourth;
+				return 72;
 			}
 			default: {
 				throw new ss.ArgumentOutOfRangeException('duration');
@@ -2555,7 +2603,7 @@
 	// AlphaTab.Rendering.Glyphs.RideCymbalGlyph
 	var $AlphaTab_Rendering_Glyphs_RideCymbalGlyph = function(x, y, isGrace) {
 		this.$_isGrace = false;
-		$AlphaTab_Rendering_Glyphs_SvgGlyph.call(this, x, y, $AlphaTab_Rendering_Glyphs_MusicFont.noteRideCymbal, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1));
+		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), 26);
 		this.$_isGrace = isGrace;
 	};
 	$AlphaTab_Rendering_Glyphs_RideCymbalGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.RideCymbalGlyph';
@@ -2648,7 +2696,7 @@
 	// AlphaTab.Rendering.Glyphs.SharpGlyph
 	var $AlphaTab_Rendering_Glyphs_SharpGlyph = function(x, y, isGrace) {
 		this.$_isGrace = false;
-		$AlphaTab_Rendering_Glyphs_SvgGlyph.call(this, x, y, $AlphaTab_Rendering_Glyphs_MusicFont.accidentalSharp, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1));
+		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), 68);
 		this.$_isGrace = isGrace;
 	};
 	$AlphaTab_Rendering_Glyphs_SharpGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.SharpGlyph';
@@ -2672,26 +2720,6 @@
 	};
 	$AlphaTab_Rendering_Glyphs_SvgCommand.__typeName = 'AlphaTab.Rendering.Glyphs.SvgCommand';
 	global.AlphaTab.Rendering.Glyphs.SvgCommand = $AlphaTab_Rendering_Glyphs_SvgCommand;
-	////////////////////////////////////////////////////////////////////////////////
-	// AlphaTab.Rendering.Glyphs.SvgGlyph
-	var $AlphaTab_Rendering_Glyphs_SvgGlyph = function(x, y, svg, xScale, yScale) {
-		this.$_svg = null;
-		this.$_lastCmd = null;
-		this.$_currentX = 0;
-		this.$_currentY = 0;
-		this.$_xScale = 0;
-		this.$_yScale = 0;
-		this.$_xGlyphScale = 0;
-		this.$_yGlyphScale = 0;
-		this.$_lastControlX = 0;
-		this.$_lastControlY = 0;
-		$AlphaTab_Rendering_Glyphs_EffectGlyph.call(this, x, y);
-		this.$_svg = svg;
-		this.$_xGlyphScale = xScale * 0.00989999994635582;
-		this.$_yGlyphScale = yScale * 0.00989999994635582;
-	};
-	$AlphaTab_Rendering_Glyphs_SvgGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.SvgGlyph';
-	global.AlphaTab.Rendering.Glyphs.SvgGlyph = $AlphaTab_Rendering_Glyphs_SvgGlyph;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Glyphs.TabBeatContainerGlyph
 	var $AlphaTab_Rendering_Glyphs_TabBeatContainerGlyph = function(beat) {
@@ -2868,22 +2896,22 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Glyphs.TremoloPickingGlyph
 	var $AlphaTab_Rendering_Glyphs_TremoloPickingGlyph = function(x, y, duration) {
-		$AlphaTab_Rendering_Glyphs_SvgGlyph.call(this, x, y, $AlphaTab_Rendering_Glyphs_TremoloPickingGlyph.$getSvg(duration), 1, 1);
+		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, 1, $AlphaTab_Rendering_Glyphs_TremoloPickingGlyph.$getSymbol(duration));
 	};
 	$AlphaTab_Rendering_Glyphs_TremoloPickingGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.TremoloPickingGlyph';
-	$AlphaTab_Rendering_Glyphs_TremoloPickingGlyph.$getSvg = function(duration) {
+	$AlphaTab_Rendering_Glyphs_TremoloPickingGlyph.$getSymbol = function(duration) {
 		switch (duration) {
 			case 32: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.tremoloPickingThirtySecond;
+				return 59;
 			}
 			case 16: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.tremoloPickingSixteenth;
+				return 60;
 			}
 			case 8: {
-				return $AlphaTab_Rendering_Glyphs_MusicFont.tremoloPickingEighth;
+				return 61;
 			}
 			default: {
-				return null;
+				return -1;
 			}
 		}
 	};
@@ -3305,6 +3333,25 @@
 	};
 	$AlphaTab_Rendering_Utils_SvgPathParser.__typeName = 'AlphaTab.Rendering.Utils.SvgPathParser';
 	global.AlphaTab.Rendering.Utils.SvgPathParser = $AlphaTab_Rendering_Utils_SvgPathParser;
+	////////////////////////////////////////////////////////////////////////////////
+	// AlphaTab.Rendering.Utils.SvgRenderer
+	var $AlphaTab_Rendering_Utils_SvgRenderer = function(svg, xScale, yScale) {
+		this.$_svg = null;
+		this.$_lastCmd = null;
+		this.$_currentX = 0;
+		this.$_currentY = 0;
+		this.$_xScale = 0;
+		this.$_yScale = 0;
+		this.$_xGlyphScale = 0;
+		this.$_yGlyphScale = 0;
+		this.$_lastControlX = 0;
+		this.$_lastControlY = 0;
+		this.$_svg = svg;
+		this.$_xGlyphScale = xScale * 0.00989999994635582;
+		this.$_yGlyphScale = yScale * 0.00989999994635582;
+	};
+	$AlphaTab_Rendering_Utils_SvgRenderer.__typeName = 'AlphaTab.Rendering.Utils.SvgRenderer';
+	global.AlphaTab.Rendering.Utils.SvgRenderer = $AlphaTab_Rendering_Utils_SvgRenderer;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.Utils.TupletHelper
 	var $AlphaTab_Rendering_Utils_TupletHelper = function(voice) {
@@ -8347,7 +8394,8 @@
 			}
 		}
 	});
-	ss.initInterface($AlphaTab_Platform_ICanvas, $asm, { get_width: null, set_width: null, get_height: null, set_height: null, get_color: null, set_color: null, get_lineWidth: null, set_lineWidth: null, clear: null, fillRect: null, strokeRect: null, beginPath: null, closePath: null, moveTo: null, lineTo: null, quadraticCurveTo: null, bezierCurveTo: null, rect: null, circle: null, fill: null, stroke: null, get_font: null, set_font: null, get_textAlign: null, set_textAlign: null, get_textBaseline: null, set_textBaseline: null, fillText: null, measureText: null });
+	ss.initInterface($AlphaTab_Platform_IPathCanvas, $asm, { beginPath: null, closePath: null, fill: null, stroke: null, moveTo: null, lineTo: null, bezierCurveTo: null, quadraticCurveTo: null });
+	ss.initInterface($AlphaTab_Platform_ICanvas, $asm, { get_width: null, set_width: null, get_height: null, set_height: null, get_color: null, set_color: null, get_lineWidth: null, set_lineWidth: null, clear: null, fillRect: null, strokeRect: null, fillCircle: null, get_font: null, set_font: null, get_textAlign: null, set_textAlign: null, get_textBaseline: null, set_textBaseline: null, fillText: null, measureText: null, fillMusicFontSymbol: null }, [$AlphaTab_Platform_IPathCanvas]);
 	ss.initInterface($AlphaTab_Platform_IFileLoader, $asm, { loadBinary: null, loadBinaryAsync: null });
 	ss.initClass($AlphaTab_Platform_Std, $asm, {});
 	ss.initClass($AlphaTab_Platform_JavaScript_Html5Canvas, $asm, {
@@ -8415,11 +8463,9 @@
 		bezierCurveTo: function(cp1x, cp1y, cp2x, cp2y, x, y) {
 			this.$_context.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y);
 		},
-		circle: function(x, y, radius) {
+		fillCircle: function(x, y, radius) {
 			this.$_context.arc(x, y, radius, 0, Math.PI * 2, true);
-		},
-		rect: function(x, y, w, h) {
-			this.$_context.rect(x, y, w, h);
+			this.fill();
 		},
 		fill: function() {
 			this.$_context.fill();
@@ -8503,8 +8549,15 @@
 		},
 		measureText: function(text) {
 			return this.$_context.measureText(text).width;
+		},
+		fillMusicFontSymbol: function(x, y, scale, symbol) {
+			if (symbol === -1) {
+				return;
+			}
+			var glyph = new $AlphaTab_Rendering_Utils_SvgRenderer($AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.get_item(symbol), scale, scale);
+			glyph.paint(x, y, this);
 		}
-	}, null, [$AlphaTab_Platform_ICanvas]);
+	}, null, [$AlphaTab_Platform_IPathCanvas, $AlphaTab_Platform_ICanvas]);
 	ss.initClass($AlphaTab_Platform_JavaScript_JsFileLoader, $asm, {
 		loadBinary: function(path) {
 			var ie = $AlphaTab_Platform_JavaScript_JsFileLoader.getIEVersion();
@@ -8735,9 +8788,9 @@
 		},
 		fillRect: function(x, y, w, h) {
 			this.$_buffer += '<rect x="';
-			this.$_buffer += x;
+			this.$_buffer += x - 0.5;
 			this.$_buffer += '" y="';
-			this.$_buffer += y;
+			this.$_buffer += y - 0.5;
 			this.$_buffer += '" width="';
 			this.$_buffer += w;
 			this.$_buffer += '" height="';
@@ -8748,9 +8801,9 @@
 		},
 		strokeRect: function(x, y, w, h) {
 			this.$_buffer += '<rect x="';
-			this.$_buffer += x;
+			this.$_buffer += x - 0.5;
 			this.$_buffer += '" y="';
-			this.$_buffer += y;
+			this.$_buffer += y - 0.5;
 			this.$_buffer += '" width="';
 			this.$_buffer += w;
 			this.$_buffer += '" height="';
@@ -8768,16 +8821,16 @@
 		},
 		moveTo: function(x, y) {
 			this.$_currentPath += ' M';
-			this.$_currentPath += x;
+			this.$_currentPath += x - 0.5;
 			this.$_currentPath += ',';
-			this.$_currentPath += y;
+			this.$_currentPath += y - 0.5;
 		},
 		lineTo: function(x, y) {
 			this.$_currentPathIsEmpty = false;
 			this.$_currentPath += ' L';
-			this.$_currentPath += x;
+			this.$_currentPath += x - 0.5;
 			this.$_currentPath += ',';
-			this.$_currentPath += y;
+			this.$_currentPath += y - 0.5;
 		},
 		quadraticCurveTo: function(cpx, cpy, x, y) {
 			this.$_currentPathIsEmpty = false;
@@ -8805,7 +8858,7 @@
 			this.$_currentPath += ',';
 			this.$_currentPath += y;
 		},
-		circle: function(x, y, radius) {
+		fillCircle: function(x, y, radius) {
 			this.$_currentPathIsEmpty = false;
 			// 
 			// M0,250 A1,1 0 0,0 500,250 A1,1 0 0,0 0,250 z
@@ -8822,26 +8875,7 @@
 			this.$_currentPath += ',';
 			this.$_currentPath += y;
 			this.$_currentPath += ' z';
-		},
-		rect: function(x, y, w, h) {
-			this.$_currentPathIsEmpty = false;
-			this.$_currentPath += ' M';
-			this.$_currentPath += x;
-			this.$_currentPath += ',';
-			this.$_currentPath += y;
-			this.$_currentPath += ' L';
-			this.$_currentPath += x + w;
-			this.$_currentPath += ',';
-			this.$_currentPath += y;
-			this.$_currentPath += ' ';
-			this.$_currentPath += x + w;
-			this.$_currentPath += ',';
-			this.$_currentPath += y + h;
-			this.$_currentPath += ' ';
-			this.$_currentPath += x;
-			this.$_currentPath += ',';
-			this.$_currentPath += y + h;
-			this.$_currentPath += ' z';
+			this.fill();
 		},
 		fill: function() {
 			if (!this.$_currentPathIsEmpty) {
@@ -8939,9 +8973,16 @@
 			if (this.get_font().get_family().indexOf('Times') !== -1) {
 				font = 0;
 			}
-			return $AlphaTab_Platform_Svg_FontSizes.measureString(text, font, this.get_font().get_size());
+			return $AlphaTab_Platform_Svg_FontSizes.measureString(text, font, this.get_font().get_size(), this.get_font().get_style());
+		},
+		fillMusicFontSymbol: function(x, y, scale, symbol) {
+			if (symbol === -1) {
+				return;
+			}
+			var glyph = new $AlphaTab_Rendering_Utils_SvgRenderer($AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.get_item(symbol), scale, scale);
+			glyph.paint(x, y, this);
 		}
-	}, null, [$AlphaTab_Platform_ICanvas]);
+	}, null, [$AlphaTab_Platform_IPathCanvas, $AlphaTab_Platform_ICanvas]);
 	ss.initClass($AlphaTab_Rendering_BarRendererBase, $asm, {
 		registerOverflowTop: function(topOverflow) {
 			if (topOverflow > this.topOverflow) {
@@ -10397,6 +10438,7 @@
 			this.$doLayout();
 			this.$paintScore();
 			this.onRenderFinished();
+			this.onPostRenderFinished();
 		},
 		$doLayout: function() {
 			this.layout.doLayout();
@@ -10424,6 +10466,18 @@
 		},
 		onRenderFinished: function() {
 			var handler = this.$1$RenderFinishedField;
+			if (!ss.staticEquals(handler, null)) {
+				handler();
+			}
+		},
+		add_postRenderFinished: function(value) {
+			this.$1$PostRenderFinishedField = ss.delegateCombine(this.$1$PostRenderFinishedField, value);
+		},
+		remove_postRenderFinished: function(value) {
+			this.$1$PostRenderFinishedField = ss.delegateRemove(this.$1$PostRenderFinishedField, value);
+		},
+		onPostRenderFinished: function() {
+			var handler = this.$1$PostRenderFinishedField;
 			if (!ss.staticEquals(handler, null)) {
 				handler();
 			}
@@ -10909,244 +10963,9 @@
 			return true;
 		}
 	}, null, [$AlphaTab_Rendering_IEffectBarRendererInfo]);
-	ss.initClass($AlphaTab_Rendering_Glyphs_SvgGlyph, $asm, {
+	ss.initClass($AlphaTab_Rendering_Glyphs_MusicFontGlyph, $asm, {
 		paint: function(cx, cy, canvas) {
-			if (ss.isNullOrUndefined(this.$_svg)) {
-				return;
-			}
-			this.$_xScale = this.$_xGlyphScale * this.get_scale();
-			this.$_yScale = this.$_yGlyphScale * this.get_scale();
-			var startX = this.x + cx;
-			var startY = this.y + cy;
-			this.$_currentX = startX;
-			this.$_currentY = startY;
-			canvas.beginPath();
-			for (var i = 0, j = this.$_svg.get_commands().length; i < j; i++) {
-				this.$parseCommand(startX, startY, canvas, this.$_svg.get_commands()[i]);
-			}
-			canvas.fill();
-		},
-		$parseCommand: function(cx, cy, canvas, cmd) {
-			var canContinue;
-			// reusable flag for shorthand curves
-			var i;
-			switch (cmd.cmd) {
-				case 'M': {
-					// absolute moveto
-					this.$_currentX = cx + cmd.numbers[0] * this.$_xScale;
-					this.$_currentY = cy + cmd.numbers[1] * this.$_yScale;
-					canvas.moveTo(this.$_currentX, this.$_currentY);
-					break;
-				}
-				case 'm': {
-					// relative moveto
-					this.$_currentX += cmd.numbers[0] * this.$_xScale;
-					this.$_currentY += cmd.numbers[1] * this.$_yScale;
-					canvas.moveTo(this.$_currentX, this.$_currentY);
-					break;
-				}
-				case 'Z':
-				case 'z': {
-					canvas.closePath();
-					break;
-				}
-				case 'L': {
-					// absolute lineTo
-					i = 0;
-					while (i < cmd.numbers.length) {
-						this.$_currentX = cx + cmd.numbers[i++] * this.$_xScale;
-						this.$_currentY = cy + cmd.numbers[i++] * this.$_yScale;
-						canvas.lineTo(this.$_currentX, this.$_currentY);
-					}
-					break;
-				}
-				case 'l': {
-					// relative lineTo
-					i = 0;
-					while (i < cmd.numbers.length) {
-						this.$_currentX += cmd.numbers[i++] * this.$_xScale;
-						this.$_currentY += cmd.numbers[i++] * this.$_yScale;
-						canvas.lineTo(this.$_currentX, this.$_currentY);
-					}
-					break;
-				}
-				case 'V': {
-					// absolute verticalTo
-					i = 0;
-					while (i < cmd.numbers.length) {
-						this.$_currentY = cy + cmd.numbers[i++] * this.$_yScale;
-						canvas.lineTo(this.$_currentX, this.$_currentY);
-					}
-					break;
-				}
-				case 'v': {
-					// relative verticalTo
-					i = 0;
-					while (i < cmd.numbers.length) {
-						this.$_currentY += cmd.numbers[i++] * this.$_yScale;
-						canvas.lineTo(this.$_currentX, this.$_currentY);
-					}
-					break;
-				}
-				case 'H': {
-					// absolute horizontalTo
-					i = 0;
-					while (i < cmd.numbers.length) {
-						this.$_currentX = cx + cmd.numbers[i++] * this.$_xScale;
-						canvas.lineTo(this.$_currentX, this.$_currentY);
-					}
-					break;
-				}
-				case 'h': {
-					// relative horizontalTo
-					i = 0;
-					while (i < cmd.numbers.length) {
-						this.$_currentX += cmd.numbers[i++] * this.$_xScale;
-						canvas.lineTo(this.$_currentX, this.$_currentY);
-					}
-					break;
-				}
-				case 'C': {
-					// absolute cubicTo
-					i = 0;
-					while (i < cmd.numbers.length) {
-						var x1 = cx + cmd.numbers[i++] * this.$_xScale;
-						var y1 = cy + cmd.numbers[i++] * this.$_yScale;
-						var x2 = cx + cmd.numbers[i++] * this.$_xScale;
-						var y2 = cy + cmd.numbers[i++] * this.$_yScale;
-						var x3 = cx + cmd.numbers[i++] * this.$_xScale;
-						var y3 = cy + cmd.numbers[i++] * this.$_yScale;
-						this.$_lastControlX = x2;
-						this.$_lastControlY = y2;
-						this.$_currentX = x3;
-						this.$_currentY = y3;
-						canvas.bezierCurveTo(x1, y1, x2, y2, x3, y3);
-					}
-					break;
-				}
-				case 'c': {
-					// relative cubicTo
-					i = 0;
-					while (i < cmd.numbers.length) {
-						var x11 = this.$_currentX + cmd.numbers[i++] * this.$_xScale;
-						var y11 = this.$_currentY + cmd.numbers[i++] * this.$_yScale;
-						var x21 = this.$_currentX + cmd.numbers[i++] * this.$_xScale;
-						var y21 = this.$_currentY + cmd.numbers[i++] * this.$_yScale;
-						var x31 = this.$_currentX + cmd.numbers[i++] * this.$_xScale;
-						var y31 = this.$_currentY + cmd.numbers[i++] * this.$_yScale;
-						this.$_lastControlX = x21;
-						this.$_lastControlY = y21;
-						this.$_currentX = x31;
-						this.$_currentY = y31;
-						canvas.bezierCurveTo(x11, y11, x21, y21, x31, y31);
-					}
-					break;
-				}
-				case 'S': {
-					// absolute shorthand cubicTo
-					i = 0;
-					while (i < cmd.numbers.length) {
-						var x12 = cx + cmd.numbers[i++] * this.$_xScale;
-						var y12 = cy + cmd.numbers[i++] * this.$_yScale;
-						canContinue = this.$_lastCmd === 'c' || this.$_lastCmd === 'C' || this.$_lastCmd === 'S' || this.$_lastCmd === 's';
-						var x22 = (canContinue ? (this.$_currentX + (this.$_currentX - this.$_lastControlX)) : this.$_currentX);
-						var y22 = (canContinue ? (this.$_currentY + (this.$_currentY - this.$_lastControlY)) : this.$_currentY);
-						var x32 = cx + cmd.numbers[i++] * this.$_xScale;
-						var y32 = cy + cmd.numbers[i++] * this.$_yScale;
-						this.$_lastControlX = x22;
-						this.$_lastControlY = y22;
-						this.$_currentX = x32;
-						this.$_currentY = y32;
-						canvas.bezierCurveTo(x12, y12, x22, y22, x32, y32);
-					}
-					break;
-				}
-				case 's': {
-					// relative shorthand cubicTo
-					i = 0;
-					while (i < cmd.numbers.length) {
-						var x13 = this.$_currentX + cmd.numbers[i++] * this.$_xScale;
-						var y13 = this.$_currentY + cmd.numbers[i++] * this.$_yScale;
-						canContinue = this.$_lastCmd === 'c' || this.$_lastCmd === 'C' || this.$_lastCmd === 'S' || this.$_lastCmd === 's';
-						var x23 = (canContinue ? (this.$_currentX + (this.$_currentX - this.$_lastControlX)) : this.$_currentX);
-						var y23 = (canContinue ? (this.$_currentY + (this.$_currentY - this.$_lastControlY)) : this.$_currentY);
-						var x33 = this.$_currentX + cmd.numbers[i++] * this.$_xScale;
-						var y33 = this.$_currentY + cmd.numbers[i++] * this.$_yScale;
-						this.$_lastControlX = x23;
-						this.$_lastControlY = y23;
-						this.$_currentX = x33;
-						this.$_currentY = y33;
-						canvas.bezierCurveTo(x13, y13, x23, y23, x33, y33);
-					}
-					break;
-				}
-				case 'Q': {
-					// absolute quadraticTo
-					i = 0;
-					while (i < cmd.numbers.length) {
-						var x14 = cx + cmd.numbers[i++] * this.$_xScale;
-						var y14 = cy + cmd.numbers[i++] * this.$_yScale;
-						var x24 = cx + cmd.numbers[i++] * this.$_xScale;
-						var y24 = cy + cmd.numbers[i++] * this.$_yScale;
-						this.$_lastControlX = x14;
-						this.$_lastControlY = y14;
-						this.$_currentX = x24;
-						this.$_currentY = y24;
-						canvas.quadraticCurveTo(x14, y14, x24, y24);
-					}
-					break;
-				}
-				case 'q': {
-					// relative quadraticTo
-					i = 0;
-					while (i < cmd.numbers.length) {
-						var x15 = this.$_currentX + cmd.numbers[i++] * this.$_xScale;
-						var y15 = this.$_currentY + cmd.numbers[i++] * this.$_yScale;
-						var x25 = this.$_currentX + cmd.numbers[i++] * this.$_xScale;
-						var y25 = this.$_currentY + cmd.numbers[i++] * this.$_yScale;
-						this.$_lastControlX = x15;
-						this.$_lastControlY = y15;
-						this.$_currentX = x25;
-						this.$_currentY = y25;
-						canvas.quadraticCurveTo(x15, y15, x25, y25);
-					}
-					break;
-				}
-				case 'T': {
-					// absolute shorthand quadraticTo
-					i = 0;
-					while (i < cmd.numbers.length) {
-						var x16 = cx + cmd.numbers[i++] * this.$_xScale;
-						var y16 = cy + cmd.numbers[i++] * this.$_yScale;
-						canContinue = this.$_lastCmd === 'q' || this.$_lastCmd === 'Q' || this.$_lastCmd === 't' || this.$_lastCmd === 'T';
-						var cpx = (canContinue ? (this.$_currentX + (this.$_currentX - this.$_lastControlX)) : this.$_currentX);
-						var cpy = (canContinue ? (this.$_currentY + (this.$_currentY - this.$_lastControlY)) : this.$_currentY);
-						this.$_currentX = x16;
-						this.$_currentY = y16;
-						this.$_lastControlX = cpx;
-						this.$_lastControlY = cpy;
-						canvas.quadraticCurveTo(cpx, cpy, x16, y16);
-					}
-					break;
-				}
-				case 't': {
-					// relative shorthand quadraticTo
-					i = 0;
-					while (i < cmd.numbers.length) {
-						// TODO: buggy/incomplete
-						var x17 = this.$_currentX + cmd.numbers[i++] * this.$_xScale;
-						var y17 = this.$_currentY + cmd.numbers[i++] * this.$_yScale;
-						canContinue = this.$_lastCmd === 'q' || this.$_lastCmd === 'Q' || this.$_lastCmd === 't' || this.$_lastCmd === 'T';
-						var cpx1 = (canContinue ? (this.$_currentX + (this.$_currentX - this.$_lastControlX)) : this.$_currentX);
-						var cpy1 = (canContinue ? (this.$_currentY + (this.$_currentY - this.$_lastControlY)) : this.$_currentY);
-						this.$_lastControlX = cpx1;
-						this.$_lastControlY = cpy1;
-						canvas.quadraticCurveTo(cpx1, cpy1, x17, y17);
-					}
-					break;
-				}
-			}
-			this.$_lastCmd = cmd.cmd;
+			canvas.fillMusicFontSymbol(cx + this.x, cy + this.y, this.$_scale * this.get_scale(), this.$_symbol);
 		}
 	}, $AlphaTab_Rendering_Glyphs_EffectGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_AccentuationGlyph, $asm, {
@@ -11156,7 +10975,7 @@
 		get_canScale: function() {
 			return false;
 		}
-	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
+	}, $AlphaTab_Rendering_Glyphs_MusicFontGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_GlyphGroup, $asm, {
 		doLayout: function() {
 			if (ss.isNullOrUndefined(this.glyphs) || this.glyphs.length === 0) {
@@ -11288,7 +11107,7 @@
 		doLayout: function() {
 			this.width = 0;
 		}
-	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
+	}, $AlphaTab_Rendering_Glyphs_MusicFontGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_BeatGlyphBase, $asm, {
 		get_container: function() {
 			return this.$3$ContainerField;
@@ -11447,7 +11266,7 @@
 		get_canScale: function() {
 			return false;
 		}
-	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
+	}, $AlphaTab_Rendering_Glyphs_MusicFontGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_CircleGlyph, $asm, {
 		doLayout: function() {
 			this.width = ss.Int32.trunc(this.$_size + 3 * this.get_scale());
@@ -11456,9 +11275,7 @@
 			return false;
 		},
 		paint: function(cx, cy, canvas) {
-			canvas.beginPath();
-			canvas.circle(cx + this.x, cy + this.y, this.$_size);
-			canvas.fill();
+			canvas.fillCircle(cx + this.x, cy + this.y, this.$_size);
 		}
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_ClefGlyph, $asm, {
@@ -11468,7 +11285,7 @@
 		get_canScale: function() {
 			return false;
 		}
-	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
+	}, $AlphaTab_Rendering_Glyphs_MusicFontGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_CrescendoGlyph, $asm, {
 		paint: function(cx, cy, canvas) {
 			var height = 17 * this.get_scale();
@@ -11493,7 +11310,7 @@
 		get_canScale: function() {
 			return false;
 		}
-	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
+	}, $AlphaTab_Rendering_Glyphs_MusicFontGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_DiamondNoteHeadGlyph, $asm, {
 		doLayout: function() {
 			this.width = ss.Int32.trunc(9 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale());
@@ -11501,7 +11318,7 @@
 		get_canScale: function() {
 			return false;
 		}
-	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
+	}, $AlphaTab_Rendering_Glyphs_MusicFontGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_DigitGlyph, $asm, {
 		doLayout: function() {
 			this.y += ss.Int32.trunc(7 * this.get_scale());
@@ -11531,7 +11348,7 @@
 		get_canScale: function() {
 			return false;
 		}
-	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
+	}, $AlphaTab_Rendering_Glyphs_MusicFontGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_DrumSticksGlyph, $asm, {
 		doLayout: function() {
 			this.width = ss.Int32.trunc(9 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale());
@@ -11539,7 +11356,7 @@
 		get_canScale: function() {
 			return false;
 		}
-	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
+	}, $AlphaTab_Rendering_Glyphs_MusicFontGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_DynamicsGlyph, $asm, {
 		paint: function(cx, cy, canvas) {
 			var glyphs;
@@ -11596,17 +11413,17 @@
 			}
 		},
 		get_$p: function() {
-			var p = new $AlphaTab_Rendering_Glyphs_SvgGlyph(0, 0, $AlphaTab_Rendering_Glyphs_MusicFont.dynamicP, $AlphaTab_Rendering_Glyphs_DynamicsGlyph.$glyphScale, $AlphaTab_Rendering_Glyphs_DynamicsGlyph.$glyphScale);
+			var p = new $AlphaTab_Rendering_Glyphs_MusicFontGlyph(0, 0, $AlphaTab_Rendering_Glyphs_DynamicsGlyph.$glyphScale, 50);
 			p.width = ss.Int32.trunc(7 * this.get_scale());
 			return p;
 		},
 		get_$m: function() {
-			var m = new $AlphaTab_Rendering_Glyphs_SvgGlyph(0, 0, $AlphaTab_Rendering_Glyphs_MusicFont.dynamicM, $AlphaTab_Rendering_Glyphs_DynamicsGlyph.$glyphScale, $AlphaTab_Rendering_Glyphs_DynamicsGlyph.$glyphScale);
+			var m = new $AlphaTab_Rendering_Glyphs_MusicFontGlyph(0, 0, $AlphaTab_Rendering_Glyphs_DynamicsGlyph.$glyphScale, 52);
 			m.width = ss.Int32.trunc(7 * this.get_scale());
 			return m;
 		},
 		get_$f: function() {
-			var f = new $AlphaTab_Rendering_Glyphs_SvgGlyph(0, 0, $AlphaTab_Rendering_Glyphs_MusicFont.dynamicF, $AlphaTab_Rendering_Glyphs_DynamicsGlyph.$glyphScale, $AlphaTab_Rendering_Glyphs_DynamicsGlyph.$glyphScale);
+			var f = new $AlphaTab_Rendering_Glyphs_MusicFontGlyph(0, 0, $AlphaTab_Rendering_Glyphs_DynamicsGlyph.$glyphScale, 51);
 			f.width = ss.Int32.trunc(7 * this.get_scale());
 			return f;
 		}
@@ -11629,7 +11446,7 @@
 		get_canScale: function() {
 			return false;
 		}
-	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
+	}, $AlphaTab_Rendering_Glyphs_MusicFontGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_HiHatGlyph, $asm, {
 		doLayout: function() {
 			this.width = ss.Int32.trunc(9 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale());
@@ -11637,7 +11454,7 @@
 		get_canScale: function() {
 			return false;
 		}
-	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
+	}, $AlphaTab_Rendering_Glyphs_MusicFontGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_LazySvg, $asm, {
 		get_commands: function() {
 			if (ss.isNullOrUndefined(this.$_parsed)) {
@@ -11852,6 +11669,7 @@
 		}
 	}, $AlphaTab_Rendering_Glyphs_EffectGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_MusicFont, $asm, {});
+	ss.initEnum($AlphaTab_Rendering_Glyphs_MusicFontSymbol, $asm, { none: -1, clefF: 0, clefC: 1, restThirtySecond: 2, restQuarter: 3, graceUp: 4, graceDown: 5, trill: 6, clefG: 7, num0: 8, num1: 9, num2: 10, num3: 11, num4: 12, num5: 13, num6: 14, num7: 15, num8: 16, num9: 17, restSixteenth: 18, restEighth: 19, restWhole: 20, noteWhole: 21, noteQuarter: 22, noteHalf: 23, noteDead: 24, noteHarmonic: 25, noteRideCymbal: 26, noteHiHat: 27, noteSideStick: 28, noteHiHatHalf: 29, noteChineseCymbal: 30, footerUpEighth: 31, footerUpSixteenth: 32, footerUpThirtySecond: 33, footerUpSixtyFourth: 34, footerDownEighth: 35, footerDownSixteenth: 36, footerDownThirtySecond: 37, footerDownSixtyFourth: 38, simileMark: 39, simileMark2: 40, coda: 41, segno: 42, ottavaAbove: 43, ottavaBelow: 44, quindicesimaAbove: 45, quindicesimaBelow: 46, fermataShort: 47, fermataNormal: 48, fermataLong: 49, dynamicP: 50, dynamicF: 51, dynamicM: 52, accentuation: 53, heavyAccentuation: 54, waveHorizontal: 55, waveVertical: 56, pickStrokeDown: 57, pickStrokeUp: 58, tremoloPickingThirtySecond: 59, tremoloPickingSixteenth: 60, tremoloPickingEighth: 61, upperMordent: 62, lowerMordent: 63, turn: 64, openNote: 65, stoppedNote: 66, tempo: 67, accidentalSharp: 68, accidentalFlat: 69, accidentalNatural: 70, clefNeutral: 71, restSixtyFourth: 72, accidentalDoubleFlat: 73, accidentalDoubleSharp: 74 });
 	ss.initClass($AlphaTab_Rendering_Glyphs_NaturalizeGlyph, $asm, {
 		doLayout: function() {
 			this.width = ss.Int32.trunc(8 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale());
@@ -11859,7 +11677,7 @@
 		get_canScale: function() {
 			return false;
 		}
-	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
+	}, $AlphaTab_Rendering_Glyphs_MusicFontGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_NoteHeadGlyph, $asm, {
 		doLayout: function() {
 			switch (this.$_duration) {
@@ -11876,7 +11694,7 @@
 		get_canScale: function() {
 			return false;
 		}
-	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
+	}, $AlphaTab_Rendering_Glyphs_MusicFontGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_NoteNumberGlyph, $asm, {
 		doLayout: function() {
 			this.width = ss.Int32.trunc(10 * this.get_scale());
@@ -11922,7 +11740,7 @@
 		get_canScale: function() {
 			return false;
 		}
-	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
+	}, $AlphaTab_Rendering_Glyphs_MusicFontGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_RepeatCloseGlyph, $asm, {
 		doLayout: function() {
 			this.width = ss.Int32.trunc((this.renderer.get_isLast() ? 11 : 13) * this.get_scale());
@@ -11941,10 +11759,8 @@
 			var circleSize = 1.5 * this.get_scale();
 			var middle = ss.Int32.div(top + bottom, 2);
 			var dotOffset = 3;
-			canvas.beginPath();
-			canvas.circle(left, middle - circleSize * 3, circleSize);
-			canvas.circle(left, middle + circleSize * 3, circleSize);
-			canvas.fill();
+			canvas.fillCircle(left, middle - circleSize * 3, circleSize);
+			canvas.fillCircle(left, middle + circleSize * 3, circleSize);
 			// line
 			left += 4 * this.get_scale();
 			canvas.beginPath();
@@ -11997,10 +11813,8 @@
 			left += 3 * this.get_scale();
 			var circleSize = this.$_circleSize * this.get_scale();
 			var middle = ss.Int32.div(top + bottom, 2);
-			canvas.beginPath();
-			canvas.circle(left, middle - circleSize * this.$_dotOffset, circleSize);
-			canvas.circle(left, middle + circleSize * this.$_dotOffset, circleSize);
-			canvas.fill();
+			canvas.fillCircle(left, middle - circleSize * this.$_dotOffset, circleSize);
+			canvas.fillCircle(left, middle + circleSize * this.$_dotOffset, circleSize);
 		}
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_RestGlyph, $asm, {
@@ -12027,7 +11841,7 @@
 		get_canScale: function() {
 			return false;
 		}
-	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
+	}, $AlphaTab_Rendering_Glyphs_MusicFontGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_RideCymbalGlyph, $asm, {
 		doLayout: function() {
 			this.width = ss.Int32.trunc(9 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale());
@@ -12035,7 +11849,7 @@
 		get_canScale: function() {
 			return false;
 		}
-	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
+	}, $AlphaTab_Rendering_Glyphs_MusicFontGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_ScoreBeatGlyph, $asm, {
 		finalizeGlyph: function(layout) {
 			if (!this.get_container().beat.get_isRest()) {
@@ -12269,10 +12083,7 @@
 					var size = ss.Int32.trunc(15 * this.get_scale());
 					var steps = ss.Int32.trunc(Math.abs(endY - startY) / size);
 					for (var i = 0; i < steps; i++) {
-						var arrow = new $AlphaTab_Rendering_Glyphs_SvgGlyph(ss.Int32.trunc(3 * this.get_scale()), 0, $AlphaTab_Rendering_Glyphs_MusicFont.waveVertical, 1, 1);
-						arrow.renderer = this.renderer;
-						arrow.doLayout();
-						arrow.paint(cx + this.x, startY + i * size, canvas);
+						canvas.fillMusicFontSymbol(cx + this.x + ss.Int32.trunc(3 * this.get_scale()), 1, startY + i * size, 56);
 					}
 				}
 				if (this.$_beat.brushType === 3) {
@@ -12613,7 +12424,7 @@
 		get_canScale: function() {
 			return false;
 		}
-	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
+	}, $AlphaTab_Rendering_Glyphs_MusicFontGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_SpacingGlyph, $asm, {
 		get_canScale: function() {
 			return this.$_scaling;
@@ -12763,10 +12574,7 @@
 					var size = ss.Int32.trunc(15 * this.get_scale());
 					var steps = ss.Int32.trunc(Math.abs(endY - startY) / size);
 					for (var i = 0; i < steps; i++) {
-						var arrow = new $AlphaTab_Rendering_Glyphs_SvgGlyph(ss.Int32.trunc(3 * this.get_scale()), 0, $AlphaTab_Rendering_Glyphs_MusicFont.waveVertical, 1, 1);
-						arrow.renderer = this.renderer;
-						arrow.doLayout();
-						arrow.paint(cx + this.x, startY + i * size, canvas);
+						canvas.fillMusicFontSymbol(cx + this.x + ss.Int32.trunc(3 * this.get_scale()), 1, startY + i * size, 56);
 					}
 				}
 				if (this.$_beat.brushType === 1 || this.$_beat.brushType === 3) {
@@ -13000,9 +12808,7 @@
 		paint: function(cx, cy, canvas) {
 			var res = this.renderer.get_resources();
 			canvas.set_font(res.markerFont);
-			var symbol = new $AlphaTab_Rendering_Glyphs_SvgGlyph(0, 0, $AlphaTab_Rendering_Glyphs_MusicFont.tempo, 1, 1);
-			symbol.renderer = this.renderer;
-			symbol.paint(cx + this.x, cy + this.y, canvas);
+			canvas.fillMusicFontSymbol(cx + this.x, cy + this.y, 1, 67);
 			canvas.fillText('' + this.$_tempo, cx + this.x + 30 * this.get_scale(), cy + this.x + 7 * this.get_scale());
 		}
 	}, $AlphaTab_Rendering_Glyphs_EffectGlyph);
@@ -13038,7 +12844,7 @@
 		get_canScale: function() {
 			return false;
 		}
-	}, $AlphaTab_Rendering_Glyphs_SvgGlyph);
+	}, $AlphaTab_Rendering_Glyphs_MusicFontGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_TrillGlyph, $asm, {
 		paint: function(cx, cy, canvas) {
 			var res = this.renderer.get_resources();
@@ -13051,9 +12857,7 @@
 			var loops = ss.Int32.trunc(Math.max(1, (endX - startX) / step));
 			var loopX = ss.Int32.trunc(startX);
 			for (var i = 0; i < loops; i++) {
-				var glyph = new $AlphaTab_Rendering_Glyphs_SvgGlyph(loopX, 0, $AlphaTab_Rendering_Glyphs_MusicFont.waveHorizontal, this.$_scale, this.$_scale);
-				glyph.renderer = this.renderer;
-				glyph.paint(cx + this.x, cy + this.y + ss.Int32.trunc(res.markerFont.get_size() / 2), canvas);
+				canvas.fillMusicFontSymbol(cx + this.x + loopX, cy + this.y, this.$_scale, 55);
 				loopX += ss.Int32.trunc(step);
 			}
 		}
@@ -13064,9 +12868,7 @@
 			var loops = ss.Int32.trunc(Math.max(1, this.width / step));
 			var loopX = 0;
 			for (var i = 0; i < loops; i++) {
-				var glyph = new $AlphaTab_Rendering_Glyphs_SvgGlyph(loopX, 0, $AlphaTab_Rendering_Glyphs_MusicFont.waveHorizontal, this.$_scale, this.$_scale);
-				glyph.renderer = this.renderer;
-				glyph.paint(cx + this.x, cy + this.y, canvas);
+				canvas.fillMusicFontSymbol(cx + this.x + loopX, cy + this.y, this.$_scale, 55);
 				loopX += ss.Int32.trunc(step);
 			}
 		}
@@ -14143,6 +13945,246 @@
 			this.currentToken = token.toString();
 		}
 	});
+	ss.initClass($AlphaTab_Rendering_Utils_SvgRenderer, $asm, {
+		paint: function(x, y, canvas) {
+			if (ss.isNullOrUndefined(this.$_svg)) {
+				return;
+			}
+			this.$_xScale = this.$_xGlyphScale;
+			this.$_yScale = this.$_yGlyphScale;
+			var startX = x;
+			var startY = y;
+			this.$_currentX = startX;
+			this.$_currentY = startY;
+			canvas.beginPath();
+			for (var i = 0, j = this.$_svg.get_commands().length; i < j; i++) {
+				this.$parseCommand(startX, startY, canvas, this.$_svg.get_commands()[i]);
+			}
+			canvas.fill();
+		},
+		$parseCommand: function(cx, cy, canvas, cmd) {
+			var canContinue;
+			// reusable flag for shorthand curves
+			var i;
+			switch (cmd.cmd) {
+				case 'M': {
+					// absolute moveto
+					this.$_currentX = cx + cmd.numbers[0] * this.$_xScale;
+					this.$_currentY = cy + cmd.numbers[1] * this.$_yScale;
+					canvas.moveTo(this.$_currentX, this.$_currentY);
+					break;
+				}
+				case 'm': {
+					// relative moveto
+					this.$_currentX += cmd.numbers[0] * this.$_xScale;
+					this.$_currentY += cmd.numbers[1] * this.$_yScale;
+					canvas.moveTo(this.$_currentX, this.$_currentY);
+					break;
+				}
+				case 'Z':
+				case 'z': {
+					canvas.closePath();
+					break;
+				}
+				case 'L': {
+					// absolute lineTo
+					i = 0;
+					while (i < cmd.numbers.length) {
+						this.$_currentX = cx + cmd.numbers[i++] * this.$_xScale;
+						this.$_currentY = cy + cmd.numbers[i++] * this.$_yScale;
+						canvas.lineTo(this.$_currentX, this.$_currentY);
+					}
+					break;
+				}
+				case 'l': {
+					// relative lineTo
+					i = 0;
+					while (i < cmd.numbers.length) {
+						this.$_currentX += cmd.numbers[i++] * this.$_xScale;
+						this.$_currentY += cmd.numbers[i++] * this.$_yScale;
+						canvas.lineTo(this.$_currentX, this.$_currentY);
+					}
+					break;
+				}
+				case 'V': {
+					// absolute verticalTo
+					i = 0;
+					while (i < cmd.numbers.length) {
+						this.$_currentY = cy + cmd.numbers[i++] * this.$_yScale;
+						canvas.lineTo(this.$_currentX, this.$_currentY);
+					}
+					break;
+				}
+				case 'v': {
+					// relative verticalTo
+					i = 0;
+					while (i < cmd.numbers.length) {
+						this.$_currentY += cmd.numbers[i++] * this.$_yScale;
+						canvas.lineTo(this.$_currentX, this.$_currentY);
+					}
+					break;
+				}
+				case 'H': {
+					// absolute horizontalTo
+					i = 0;
+					while (i < cmd.numbers.length) {
+						this.$_currentX = cx + cmd.numbers[i++] * this.$_xScale;
+						canvas.lineTo(this.$_currentX, this.$_currentY);
+					}
+					break;
+				}
+				case 'h': {
+					// relative horizontalTo
+					i = 0;
+					while (i < cmd.numbers.length) {
+						this.$_currentX += cmd.numbers[i++] * this.$_xScale;
+						canvas.lineTo(this.$_currentX, this.$_currentY);
+					}
+					break;
+				}
+				case 'C': {
+					// absolute cubicTo
+					i = 0;
+					while (i < cmd.numbers.length) {
+						var x1 = cx + cmd.numbers[i++] * this.$_xScale;
+						var y1 = cy + cmd.numbers[i++] * this.$_yScale;
+						var x2 = cx + cmd.numbers[i++] * this.$_xScale;
+						var y2 = cy + cmd.numbers[i++] * this.$_yScale;
+						var x3 = cx + cmd.numbers[i++] * this.$_xScale;
+						var y3 = cy + cmd.numbers[i++] * this.$_yScale;
+						this.$_lastControlX = x2;
+						this.$_lastControlY = y2;
+						this.$_currentX = x3;
+						this.$_currentY = y3;
+						canvas.bezierCurveTo(x1, y1, x2, y2, x3, y3);
+					}
+					break;
+				}
+				case 'c': {
+					// relative cubicTo
+					i = 0;
+					while (i < cmd.numbers.length) {
+						var x11 = this.$_currentX + cmd.numbers[i++] * this.$_xScale;
+						var y11 = this.$_currentY + cmd.numbers[i++] * this.$_yScale;
+						var x21 = this.$_currentX + cmd.numbers[i++] * this.$_xScale;
+						var y21 = this.$_currentY + cmd.numbers[i++] * this.$_yScale;
+						var x31 = this.$_currentX + cmd.numbers[i++] * this.$_xScale;
+						var y31 = this.$_currentY + cmd.numbers[i++] * this.$_yScale;
+						this.$_lastControlX = x21;
+						this.$_lastControlY = y21;
+						this.$_currentX = x31;
+						this.$_currentY = y31;
+						canvas.bezierCurveTo(x11, y11, x21, y21, x31, y31);
+					}
+					break;
+				}
+				case 'S': {
+					// absolute shorthand cubicTo
+					i = 0;
+					while (i < cmd.numbers.length) {
+						var x12 = cx + cmd.numbers[i++] * this.$_xScale;
+						var y12 = cy + cmd.numbers[i++] * this.$_yScale;
+						canContinue = this.$_lastCmd === 'c' || this.$_lastCmd === 'C' || this.$_lastCmd === 'S' || this.$_lastCmd === 's';
+						var x22 = (canContinue ? (this.$_currentX + (this.$_currentX - this.$_lastControlX)) : this.$_currentX);
+						var y22 = (canContinue ? (this.$_currentY + (this.$_currentY - this.$_lastControlY)) : this.$_currentY);
+						var x32 = cx + cmd.numbers[i++] * this.$_xScale;
+						var y32 = cy + cmd.numbers[i++] * this.$_yScale;
+						this.$_lastControlX = x22;
+						this.$_lastControlY = y22;
+						this.$_currentX = x32;
+						this.$_currentY = y32;
+						canvas.bezierCurveTo(x12, y12, x22, y22, x32, y32);
+					}
+					break;
+				}
+				case 's': {
+					// relative shorthand cubicTo
+					i = 0;
+					while (i < cmd.numbers.length) {
+						var x13 = this.$_currentX + cmd.numbers[i++] * this.$_xScale;
+						var y13 = this.$_currentY + cmd.numbers[i++] * this.$_yScale;
+						canContinue = this.$_lastCmd === 'c' || this.$_lastCmd === 'C' || this.$_lastCmd === 'S' || this.$_lastCmd === 's';
+						var x23 = (canContinue ? (this.$_currentX + (this.$_currentX - this.$_lastControlX)) : this.$_currentX);
+						var y23 = (canContinue ? (this.$_currentY + (this.$_currentY - this.$_lastControlY)) : this.$_currentY);
+						var x33 = this.$_currentX + cmd.numbers[i++] * this.$_xScale;
+						var y33 = this.$_currentY + cmd.numbers[i++] * this.$_yScale;
+						this.$_lastControlX = x23;
+						this.$_lastControlY = y23;
+						this.$_currentX = x33;
+						this.$_currentY = y33;
+						canvas.bezierCurveTo(x13, y13, x23, y23, x33, y33);
+					}
+					break;
+				}
+				case 'Q': {
+					// absolute quadraticTo
+					i = 0;
+					while (i < cmd.numbers.length) {
+						var x14 = cx + cmd.numbers[i++] * this.$_xScale;
+						var y14 = cy + cmd.numbers[i++] * this.$_yScale;
+						var x24 = cx + cmd.numbers[i++] * this.$_xScale;
+						var y24 = cy + cmd.numbers[i++] * this.$_yScale;
+						this.$_lastControlX = x14;
+						this.$_lastControlY = y14;
+						this.$_currentX = x24;
+						this.$_currentY = y24;
+						canvas.quadraticCurveTo(x14, y14, x24, y24);
+					}
+					break;
+				}
+				case 'q': {
+					// relative quadraticTo
+					i = 0;
+					while (i < cmd.numbers.length) {
+						var x15 = this.$_currentX + cmd.numbers[i++] * this.$_xScale;
+						var y15 = this.$_currentY + cmd.numbers[i++] * this.$_yScale;
+						var x25 = this.$_currentX + cmd.numbers[i++] * this.$_xScale;
+						var y25 = this.$_currentY + cmd.numbers[i++] * this.$_yScale;
+						this.$_lastControlX = x15;
+						this.$_lastControlY = y15;
+						this.$_currentX = x25;
+						this.$_currentY = y25;
+						canvas.quadraticCurveTo(x15, y15, x25, y25);
+					}
+					break;
+				}
+				case 'T': {
+					// absolute shorthand quadraticTo
+					i = 0;
+					while (i < cmd.numbers.length) {
+						var x16 = cx + cmd.numbers[i++] * this.$_xScale;
+						var y16 = cy + cmd.numbers[i++] * this.$_yScale;
+						canContinue = this.$_lastCmd === 'q' || this.$_lastCmd === 'Q' || this.$_lastCmd === 't' || this.$_lastCmd === 'T';
+						var cpx = (canContinue ? (this.$_currentX + (this.$_currentX - this.$_lastControlX)) : this.$_currentX);
+						var cpy = (canContinue ? (this.$_currentY + (this.$_currentY - this.$_lastControlY)) : this.$_currentY);
+						this.$_currentX = x16;
+						this.$_currentY = y16;
+						this.$_lastControlX = cpx;
+						this.$_lastControlY = cpy;
+						canvas.quadraticCurveTo(cpx, cpy, x16, y16);
+					}
+					break;
+				}
+				case 't': {
+					// relative shorthand quadraticTo
+					i = 0;
+					while (i < cmd.numbers.length) {
+						// TODO: buggy/incomplete
+						var x17 = this.$_currentX + cmd.numbers[i++] * this.$_xScale;
+						var y17 = this.$_currentY + cmd.numbers[i++] * this.$_yScale;
+						canContinue = this.$_lastCmd === 'q' || this.$_lastCmd === 'Q' || this.$_lastCmd === 't' || this.$_lastCmd === 'T';
+						var cpx1 = (canContinue ? (this.$_currentX + (this.$_currentX - this.$_lastControlX)) : this.$_currentX);
+						var cpy1 = (canContinue ? (this.$_currentY + (this.$_currentY - this.$_lastControlY)) : this.$_currentY);
+						this.$_lastControlX = cpx1;
+						this.$_lastControlY = cpy1;
+						canvas.quadraticCurveTo(cpx1, cpy1, x17, y17);
+					}
+					break;
+				}
+			}
+			this.$_lastCmd = cmd.cmd;
+		}
+	});
 	ss.initClass($AlphaTab_Rendering_Utils_TupletHelper, $asm, {
 		get_isFull: function() {
 			return this.beats.length === this.tuplet;
@@ -14166,21 +14208,6 @@
 	$AlphaTab_Platform_Svg_FontSizes.timesNewRoman = new Uint8Array([3, 4, 5, 6, 6, 9, 9, 2, 4, 4, 6, 6, 3, 4, 3, 3, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 3, 3, 6, 6, 6, 5, 10, 8, 7, 7, 8, 7, 6, 7, 8, 4, 4, 8, 7, 10, 8, 8, 7, 8, 7, 5, 8, 8, 7, 11, 8, 8, 7, 4, 3, 4, 5, 6, 4, 5, 5, 5, 5, 5, 4, 5, 6, 3, 3, 6, 3, 9, 6, 6, 6, 5, 4, 4, 4, 5, 6, 7, 6, 6, 5, 5, 2, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 4, 6, 6, 6, 6, 2, 5, 4, 8, 4, 6, 6, 0, 8, 6, 4, 6, 3, 3, 4, 5, 5, 4, 4, 3, 3, 6, 8, 8, 8, 5, 8, 8, 8, 8, 8, 8, 11, 7, 7, 7, 7, 7, 4, 4, 4, 4, 8, 8, 8, 8, 8, 8, 8, 6, 8, 8, 8, 8, 8, 8, 6, 5, 5, 5, 5, 5, 5, 5, 8, 5, 5, 5, 5, 5, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6, 6, 6, 6, 5, 5, 5, 5, 6, 6]);
 	$AlphaTab_Platform_Svg_FontSizes.arial11Pt = new Uint8Array([3, 2, 4, 6, 6, 10, 7, 2, 4, 4, 4, 6, 3, 4, 3, 3, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 3, 3, 6, 6, 6, 6, 11, 8, 7, 7, 7, 6, 6, 8, 7, 2, 5, 7, 6, 8, 7, 8, 6, 8, 7, 7, 6, 7, 8, 10, 7, 8, 7, 3, 3, 3, 5, 6, 4, 6, 6, 6, 6, 6, 4, 6, 6, 2, 2, 5, 2, 8, 6, 6, 6, 6, 4, 6, 3, 6, 6, 10, 6, 6, 6, 4, 2, 4, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 2, 6, 6, 7, 6, 2, 6, 4, 8, 4, 6, 6, 0, 8, 6, 4, 6, 4, 4, 4, 6, 6, 4, 4, 4, 5, 6, 9, 10, 10, 6, 8, 8, 8, 8, 8, 8, 11, 7, 6, 6, 6, 6, 2, 2, 2, 2, 8, 7, 8, 8, 8, 8, 8, 6, 8, 7, 7, 7, 7, 8, 7, 7, 6, 6, 6, 6, 6, 6, 10, 6, 6, 6, 6, 6, 2, 2, 2, 2, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
 	$AlphaTab_Platform_Svg_FontSizes.controlChars = 32;
-	$AlphaTab_Model_Tuning.tuningRegex = new RegExp('([a-g]b?)([0-9])', 'i');
-	$AlphaTab_Model_Tuning.$_sevenStrings = null;
-	$AlphaTab_Model_Tuning.$_sixStrings = null;
-	$AlphaTab_Model_Tuning.$_fiveStrings = null;
-	$AlphaTab_Model_Tuning.$_fourStrings = null;
-	$AlphaTab_Model_Tuning.$_defaultTunings = null;
-	$AlphaTab_Audio_MidiUtils.quarterTime = 960;
-	$AlphaTab_Audio_MidiUtils.percussionChannel = 9;
-	$AlphaTab_Audio_MidiUtils.$minVelocity = 15;
-	$AlphaTab_Audio_MidiUtils.$velocityIncrement = 16;
-	$AlphaTab_Rendering_Utils_BeamingHelper.$scoreMiddleKeys = [48, 45, 38, 59];
-	$AlphaTab_Rendering_Staves_StaveGroup.$accoladeLabelSpacing = 10;
-	$AlphaTab_Rendering_Glyphs_VoiceContainerGlyph.keySizeBeat = 'Beat';
-	$AlphaTab_Rendering_GroupedBarRenderer.keySizePre = 'Pre';
-	$AlphaTab_Rendering_GroupedBarRenderer.keySizePost = 'Post';
 	$AlphaTab_Rendering_Glyphs_MusicFont.clefF = new $AlphaTab_Rendering_Glyphs_LazySvg('M 545 -801c -53 49 -80 109 -80 179c 0 33 4 66 12 99c 8 33 38 57 89 74c 51 16 125 31 220 43c 95 12 159 53 192 124c 16 37 24 99 24 186c 0 95 -43 168 -130 220c -86 51 -186 77 -297 77c -128 0 -229 -28 -303 -86c -91 -70 -136 -169 -136 -297c 0 -115 23 -234 71 -356c 47 -121 118 -234 213 -337c 70 -74 163 -129 279 -164c 115 -35 233 -52 353 -52c 45 0 83 1 114 3c 31 2 81 9 151 21c 243 45 444 175 601 390c 144 198 217 409 217 632c 0 41 -2 72 -6 93c -33 281 -219 582 -558 905c -272 260 -591 493 -954 700c -330 190 -527 274 -589 254l -18 -68c 95 -33 197 -78 306 -136c 109 -57 218 -124 325 -198c 276 -198 477 -384 601 -558c 152 -210 252 -471 297 -781c 20 -128 31 -210 31 -248s 0 -68 0 -93c 0 -322 -109 -551 -328 -688c -99 -57 -200 -86 -303 -86c -78 0 -154 15 -226 46C 643 -873 586 -838 545 -801zM 2517 -783c 66 0 121 22 167 68c 45 45 68 101 68 167c 0 66 -22 121 -68 167c -45 45 -101 68 -167 68c -66 0 -122 -22 -167 -68c -45 -45 -68 -101 -68 -167c 0 -66 22 -121 68 -167C 2395 -760 2451 -783 2517 -783zM 2517 54c 66 0 121 22 167 68c 45 45 68 101 68 167c 0 66 -22 121 -68 167c -45 45 -101 68 -167 68c -66 0 -122 -22 -167 -68c -45 -45 -68 -101 -68 -167c 0 -66 22 -121 68 -167C 2395 77 2451 54 2517 54');
 	$AlphaTab_Rendering_Glyphs_MusicFont.clefC = new $AlphaTab_Rendering_Glyphs_LazySvg('M 26 1736V -1924h 458v 3659H 26zM 641 1736V -1924h 150v 3659H 641zM 1099 153c -42 -53 -86 -100 -130 -140c -44 -40 -95 -75 -153 -106c 106 -58 200 -135 279 -233c 110 -135 180 -289 208 -460c 17 127 46 216 87 266c 65 73 170 110 313 110c 150 0 259 -81 324 -244c 50 -124 75 -291 75 -500c 0 -197 -25 -355 -75 -471c -69 -155 -179 -232 -330 -232c -89 0 -167 18 -234 55c -67 36 -101 72 -101 107c 0 19 23 25 69 17c 46 -7 97 6 153 43c 56 36 84 89 84 159c 0 69 -23 125 -69 168c -46 42 -108 63 -185 63c -73 0 -138 -24 -194 -72c -56 -48 -84 -105 -84 -171c 0 -112 56 -212 168 -301c 127 -100 282 -150 463 -150c 228 0 412 74 553 224c 141 149 211 334 211 555c 0 248 -86 458 -258 631c -172 172 -381 259 -629 259c -57 0 -104 -3 -139 -11c -54 -19 -98 -34 -133 -46c -15 49 -48 99 -98 149c -11 15 -48 43 -110 85c 38 19 75 52 110 99c 50 50 88 105 115 164c 65 -31 113 -50 142 -57c 28 -7 70 -11 124 -11c 247 0 457 85 629 257c 172 171 258 380 258 627c 0 211 -73 390 -219 534c -146 144 -332 216 -558 216c -183 0 -334 -47 -453 -142c -118 -94 -178 -198 -178 -310c 0 -69 28 -128 84 -176c 56 -48 120 -72 194 -72c 69 0 129 23 179 69c 50 46 75 104 75 174c 0 65 -28 116 -84 153c -56 36 -107 51 -153 43c -46 -7 -69 0 -69 23c 0 27 35 60 106 101c 70 40 147 60 229 60c 153 0 265 -77 335 -231c 51 -112 76 -268 76 -469c 0 -201 -25 -363 -75 -487c -65 -166 -172 -249 -319 -249c -143 0 -242 30 -298 92c -56 61 -93 156 -113 284C 1279 435 1211 286 1099 153');
 	$AlphaTab_Rendering_Glyphs_MusicFont.restThirtySecond = new $AlphaTab_Rendering_Glyphs_LazySvg('M 717 -2195c 93 -30 174 -104 244 -220c 38 -65 65 -127 81 -185l 140 -604c -69 128 -196 191 -381 191c -50 0 -105 -7 -167 -23c -61 -15 -113 -46 -155 -92c -42 -46 -63 -108 -63 -185c 0 -65 23 -121 69 -168s 104 -69 173 -69c 65 0 123 25 173 75c 50 50 75 104 75 162c 0 31 -7 63 -23 98c -15 34 -44 63 -86 87c 23 11 48 21 75 28c 7 0 27 -3 57 -11c 73 -23 142 -80 208 -170c 57 -90 115 -180 173 -270h 40l -816 3503l -107 0l 318 -1316c -73 128 -196 192 -369 192c -19 0 -38 0 -57 0c -27 -3 -68 -13 -124 -28c -55 -15 -104 -46 -147 -92c -42 -46 -63 -106 -63 -179c 0 -65 23 -121 69 -168c 46 -46 106 -69 179 -69c 65 0 122 24 170 72c 48 48 72 103 72 165c 0 30 -7 63 -23 98c -15 34 -44 63 -86 87c 46 15 71 23 74 23c 7 0 26 -3 57 -11c 92 -27 178 -108 259 -243c 11 -19 26 -50 46 -93l 161 -667c -73 128 -198 192 -375 192c -30 0 -61 0 -92 0c -34 -11 -57 -19 -69 -23c -69 -19 -125 -52 -167 -98c -42 -46 -63 -106 -63 -179c 0 -69 23 -127 69 -174s 106 -69 179 -69c 65 0 122 24 170 72c 48 48 72 103 72 165c 0 31 -7 63 -23 98s -44 65 -86 92c 23 7 46 15 69 23C 665 -2184 686 -2187 717 -2195');
@@ -14256,6 +14283,98 @@
 	$AlphaTab_Rendering_Glyphs_MusicFont.restSixtyFourth = new $AlphaTab_Rendering_Glyphs_LazySvg('M 705 -2202c 77 -26 144 -77 200 -150c 56 -73 101 -174 136 -305l 127 -547c -69 127 -197 191 -382 191c -46 0 -100 -7 -162 -23c -61 -15 -114 -46 -156 -92c -42 -46 -63 -108 -63 -185c 0 -65 23 -121 69 -168c 46 -46 104 -69 174 -69c 65 0 123 25 174 75c 50 50 75 104 75 162c 0 31 -7 63 -23 98c -15 34 -44 63 -87 87c 46 15 71 23 75 23c 7 0 27 -3 57 -11c 77 -23 148 -81 213 -174c 53 -73 86 -137 98 -191l 154 -638c -73 128 -198 192 -375 192c -30 0 -61 0 -92 0c -34 -11 -57 -19 -69 -23c -69 -19 -125 -52 -167 -98c -42 -46 -63 -106 -63 -179c 0 -69 23 -127 69 -174c 46 -46 104 -69 174 -69s 128 24 176 72c 48 48 72 103 72 165c 0 31 -7 63 -23 98c -15 34 -42 65 -81 92c 19 7 40 15 63 23c 11 0 32 -3 63 -11c 73 -23 140 -80 202 -169c 61 -89 121 -179 179 -271l 41 0l -1032 4425l -107 0l 319 -1316c -73 128 -196 192 -370 192c -19 0 -38 0 -57 0c -27 -3 -68 -13 -124 -28c -55 -15 -105 -46 -147 -92c -42 -46 -63 -106 -63 -179c 0 -65 23 -121 69 -168c 46 -46 106 -69 179 -69c 65 0 122 24 171 72c 48 48 72 103 72 165c 0 30 -7 63 -23 98c -15 34 -44 63 -87 87c 46 15 71 23 75 23c 7 0 26 -3 57 -11c 76 -23 150 -83 219 -180c 57 -77 86 -129 86 -156l 161 -667c -73 124 -198 186 -375 186c -30 0 -61 0 -92 0c -34 -11 -57 -19 -69 -22c -69 -19 -125 -51 -167 -97c -42 -45 -63 -105 -63 -177c 0 -68 23 -126 69 -172c 46 -45 106 -68 179 -68c 65 0 122 23 171 71c 48 47 72 102 72 163c 0 30 -7 63 -23 97c -15 34 -44 65 -87 91c 23 7 46 14 69 21C 653 -2190 674 -2194 705 -2202');
 	$AlphaTab_Rendering_Glyphs_MusicFont.accidentalDoubleFlat = new $AlphaTab_Rendering_Glyphs_LazySvg('M 67 25c 52 -27 93 -48 124 -62c 100 -45 176 -67 228 -67c 45 0 95 12 150 36V -1275h 88v 1300c 48 -27 88 -48 119 -62c 100 -45 183 -67 249 -67c 55 0 104 13 145 39c 41 26 72 71 93 137c 10 31 15 62 15 93c 0 107 -48 212 -145 316c -72 79 -163 143 -270 192c -34 17 -78 52 -132 104c -53 51 -108 107 -163 166v -529c -38 45 -72 83 -104 115c -55 55 -121 103 -197 141c -45 20 -102 68 -171 141c -41 41 -81 85 -119 131V -1275h 88V 25zM 369 15c -7 -3 -13 -6 -20 -10c -17 -6 -33 -10 -46 -10c -31 0 -64 7 -98 23c -34 15 -79 46 -135 91v 644c 65 -65 131 -131 197 -197c 131 -159 197 -287 197 -384C 462 101 431 49 369 15zM 962 15c -3 -3 -12 -6 -26 -10c -20 -6 -36 -10 -46 -10c -31 0 -63 7 -96 23c -33 15 -77 46 -132 91v 644c 65 -65 131 -131 197 -197c 131 -159 197 -287 197 -384C 1055 101 1024 49 962 15');
 	$AlphaTab_Rendering_Glyphs_MusicFont.accidentalDoubleSharp = new $AlphaTab_Rendering_Glyphs_LazySvg('M 22 243c -32 -31 -48 -68 -48 -110c 0 -38 15 -71 45 -98c 30 -27 63 -40 98 -40c 38 0 70 14 96 43c 64 57 116 124 158 199c 41 75 62 146 62 213c -83 0 -172 -30 -268 -91C 99 317 51 278 22 243zM 18 872c 25 25 59 38 100 38c 38 0 70 -14 96 -43c 44 -38 86 -86 124 -144c 64 -96 96 -187 96 -273c -70 0 -140 18 -211 55c -70 36 -137 87 -201 151c -32 31 -48 70 -48 115C -26 810 -11 843 18 872zM 848 32c -25 -25 -60 -38 -105 -38c -41 0 -76 16 -105 48c -57 67 -94 113 -110 139c -60 96 -91 185 -91 268c 92 0 182 -28 268 -86c 79 -67 124 -105 134 -115c 31 -31 48 -72 48 -120C 886 96 874 64 848 32zM 838 656c 31 31 48 70 48 115c 0 38 -14 72 -43 100s -62 43 -100 43c -38 0 -73 -16 -105 -48c -51 -57 -88 -105 -110 -144c -60 -96 -91 -187 -91 -273c 105 0 211 41 316 124C 803 622 832 650 838 656');
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup = null;
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup = new (ss.makeGenericType(ss.Dictionary$2, [$AlphaTab_Rendering_Glyphs_MusicFontSymbol, $AlphaTab_Rendering_Glyphs_LazySvg]))();
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(0, $AlphaTab_Rendering_Glyphs_MusicFont.clefF);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(1, $AlphaTab_Rendering_Glyphs_MusicFont.clefC);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(2, $AlphaTab_Rendering_Glyphs_MusicFont.restThirtySecond);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(3, $AlphaTab_Rendering_Glyphs_MusicFont.restQuarter);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(4, $AlphaTab_Rendering_Glyphs_MusicFont.graceUp);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(5, $AlphaTab_Rendering_Glyphs_MusicFont.graceDown);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(6, $AlphaTab_Rendering_Glyphs_MusicFont.trill);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(7, $AlphaTab_Rendering_Glyphs_MusicFont.clefG);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(8, $AlphaTab_Rendering_Glyphs_MusicFont.num0);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(9, $AlphaTab_Rendering_Glyphs_MusicFont.num1);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(10, $AlphaTab_Rendering_Glyphs_MusicFont.num2);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(11, $AlphaTab_Rendering_Glyphs_MusicFont.num3);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(12, $AlphaTab_Rendering_Glyphs_MusicFont.num4);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(13, $AlphaTab_Rendering_Glyphs_MusicFont.num5);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(14, $AlphaTab_Rendering_Glyphs_MusicFont.num6);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(15, $AlphaTab_Rendering_Glyphs_MusicFont.num7);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(16, $AlphaTab_Rendering_Glyphs_MusicFont.num8);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(17, $AlphaTab_Rendering_Glyphs_MusicFont.num9);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(18, $AlphaTab_Rendering_Glyphs_MusicFont.restSixteenth);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(19, $AlphaTab_Rendering_Glyphs_MusicFont.restEighth);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(20, $AlphaTab_Rendering_Glyphs_MusicFont.restWhole);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(21, $AlphaTab_Rendering_Glyphs_MusicFont.noteWhole);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(22, $AlphaTab_Rendering_Glyphs_MusicFont.noteQuarter);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(23, $AlphaTab_Rendering_Glyphs_MusicFont.noteHalf);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(24, $AlphaTab_Rendering_Glyphs_MusicFont.noteDead);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(25, $AlphaTab_Rendering_Glyphs_MusicFont.noteHarmonic);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(26, $AlphaTab_Rendering_Glyphs_MusicFont.noteRideCymbal);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(27, $AlphaTab_Rendering_Glyphs_MusicFont.noteHiHat);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(28, $AlphaTab_Rendering_Glyphs_MusicFont.noteSideStick);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(29, $AlphaTab_Rendering_Glyphs_MusicFont.noteHiHatHalf);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(30, $AlphaTab_Rendering_Glyphs_MusicFont.noteChineseCymbal);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(31, $AlphaTab_Rendering_Glyphs_MusicFont.footerUpEighth);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32, $AlphaTab_Rendering_Glyphs_MusicFont.footerUpSixteenth);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(33, $AlphaTab_Rendering_Glyphs_MusicFont.footerUpThirtySecond);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(34, $AlphaTab_Rendering_Glyphs_MusicFont.footerUpSixtyFourth);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(35, $AlphaTab_Rendering_Glyphs_MusicFont.footerDownEighth);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(36, $AlphaTab_Rendering_Glyphs_MusicFont.footerDownSixteenth);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(37, $AlphaTab_Rendering_Glyphs_MusicFont.footerDownThirtySecond);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(38, $AlphaTab_Rendering_Glyphs_MusicFont.footerDownSixtyFourth);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(39, $AlphaTab_Rendering_Glyphs_MusicFont.simileMark);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(40, $AlphaTab_Rendering_Glyphs_MusicFont.simileMark2);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(41, $AlphaTab_Rendering_Glyphs_MusicFont.coda);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(42, $AlphaTab_Rendering_Glyphs_MusicFont.segno);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(43, $AlphaTab_Rendering_Glyphs_MusicFont.ottavaAbove);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(44, $AlphaTab_Rendering_Glyphs_MusicFont.ottavaBelow);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(45, $AlphaTab_Rendering_Glyphs_MusicFont.quindicesimaAbove);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(46, $AlphaTab_Rendering_Glyphs_MusicFont.quindicesimaBelow);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(47, $AlphaTab_Rendering_Glyphs_MusicFont.fermataShort);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(48, $AlphaTab_Rendering_Glyphs_MusicFont.fermataNormal);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(49, $AlphaTab_Rendering_Glyphs_MusicFont.fermataLong);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(50, $AlphaTab_Rendering_Glyphs_MusicFont.dynamicP);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(51, $AlphaTab_Rendering_Glyphs_MusicFont.dynamicF);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(52, $AlphaTab_Rendering_Glyphs_MusicFont.dynamicM);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(53, $AlphaTab_Rendering_Glyphs_MusicFont.accentuation);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(54, $AlphaTab_Rendering_Glyphs_MusicFont.heavyAccentuation);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(55, $AlphaTab_Rendering_Glyphs_MusicFont.waveHorizontal);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(56, $AlphaTab_Rendering_Glyphs_MusicFont.waveVertical);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(57, $AlphaTab_Rendering_Glyphs_MusicFont.pickStrokeDown);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(58, $AlphaTab_Rendering_Glyphs_MusicFont.pickStrokeUp);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(59, $AlphaTab_Rendering_Glyphs_MusicFont.tremoloPickingThirtySecond);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(60, $AlphaTab_Rendering_Glyphs_MusicFont.tremoloPickingSixteenth);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(61, $AlphaTab_Rendering_Glyphs_MusicFont.tremoloPickingEighth);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(62, $AlphaTab_Rendering_Glyphs_MusicFont.upperMordent);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(63, $AlphaTab_Rendering_Glyphs_MusicFont.lowerMordent);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(64, $AlphaTab_Rendering_Glyphs_MusicFont.turn);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(65, $AlphaTab_Rendering_Glyphs_MusicFont.openNote);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(66, $AlphaTab_Rendering_Glyphs_MusicFont.stoppedNote);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(67, $AlphaTab_Rendering_Glyphs_MusicFont.tempo);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(68, $AlphaTab_Rendering_Glyphs_MusicFont.accidentalSharp);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(69, $AlphaTab_Rendering_Glyphs_MusicFont.accidentalFlat);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(70, $AlphaTab_Rendering_Glyphs_MusicFont.accidentalNatural);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(71, $AlphaTab_Rendering_Glyphs_MusicFont.clefNeutral);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(72, $AlphaTab_Rendering_Glyphs_MusicFont.restSixtyFourth);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(73, $AlphaTab_Rendering_Glyphs_MusicFont.accidentalDoubleFlat);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(74, $AlphaTab_Rendering_Glyphs_MusicFont.accidentalDoubleSharp);
+	$AlphaTab_Model_Tuning.tuningRegex = new RegExp('([a-g]b?)([0-9])', 'i');
+	$AlphaTab_Model_Tuning.$_sevenStrings = null;
+	$AlphaTab_Model_Tuning.$_sixStrings = null;
+	$AlphaTab_Model_Tuning.$_fiveStrings = null;
+	$AlphaTab_Model_Tuning.$_fourStrings = null;
+	$AlphaTab_Model_Tuning.$_defaultTunings = null;
+	$AlphaTab_Audio_MidiUtils.quarterTime = 960;
+	$AlphaTab_Audio_MidiUtils.percussionChannel = 9;
+	$AlphaTab_Audio_MidiUtils.$minVelocity = 15;
+	$AlphaTab_Audio_MidiUtils.$velocityIncrement = 16;
+	$AlphaTab_Rendering_Utils_BeamingHelper.$scoreMiddleKeys = [48, 45, 38, 59];
+	$AlphaTab_Rendering_Staves_StaveGroup.$accoladeLabelSpacing = 10;
+	$AlphaTab_Rendering_Glyphs_VoiceContainerGlyph.keySizeBeat = 'Beat';
+	$AlphaTab_Rendering_GroupedBarRenderer.keySizePre = 'Pre';
+	$AlphaTab_Rendering_GroupedBarRenderer.keySizePost = 'Post';
 	$AlphaTab_Model_MasterBar.maxAlternateEndings = 8;
 	$AlphaTab_Rendering_AlternateEndingsBarRenderer.$padding = 3;
 	$AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale = 0.699999988079071;
@@ -14312,7 +14431,7 @@
 	$AlphaTab_Environment.layoutEngines = {};
 	$AlphaTab_Environment.staveFactories = {};
 	$AlphaTab_Environment.renderEngines['default'] = function(d) {
-		return new $AlphaTab_Platform_JavaScript_Html5Canvas(d);
+		return new $AlphaTab_Platform_Svg_SvgCanvas();
 	};
 	$AlphaTab_Environment.renderEngines['html5'] = function(d1) {
 		return new $AlphaTab_Platform_JavaScript_Html5Canvas(d1);

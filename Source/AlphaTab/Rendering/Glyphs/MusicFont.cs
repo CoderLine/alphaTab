@@ -1,4 +1,6 @@
-﻿namespace AlphaTab.Rendering.Glyphs
+﻿using System.Collections.Generic;
+
+namespace AlphaTab.Rendering.Glyphs
 {
     /// <summary>
     /// This public class contains SVG path data for musical symbols
@@ -82,5 +84,86 @@
         public static readonly LazySvg AccidentalDoubleFlat = new LazySvg("M 67 25c 52 -27 93 -48 124 -62c 100 -45 176 -67 228 -67c 45 0 95 12 150 36V -1275h 88v 1300c 48 -27 88 -48 119 -62c 100 -45 183 -67 249 -67c 55 0 104 13 145 39c 41 26 72 71 93 137c 10 31 15 62 15 93c 0 107 -48 212 -145 316c -72 79 -163 143 -270 192c -34 17 -78 52 -132 104c -53 51 -108 107 -163 166v -529c -38 45 -72 83 -104 115c -55 55 -121 103 -197 141c -45 20 -102 68 -171 141c -41 41 -81 85 -119 131V -1275h 88V 25zM 369 15c -7 -3 -13 -6 -20 -10c -17 -6 -33 -10 -46 -10c -31 0 -64 7 -98 23c -34 15 -79 46 -135 91v 644c 65 -65 131 -131 197 -197c 131 -159 197 -287 197 -384C 462 101 431 49 369 15zM 962 15c -3 -3 -12 -6 -26 -10c -20 -6 -36 -10 -46 -10c -31 0 -63 7 -96 23c -33 15 -77 46 -132 91v 644c 65 -65 131 -131 197 -197c 131 -159 197 -287 197 -384C 1055 101 1024 49 962 15");
         public static readonly LazySvg AccidentalDoubleSharp = new LazySvg("M 22 243c -32 -31 -48 -68 -48 -110c 0 -38 15 -71 45 -98c 30 -27 63 -40 98 -40c 38 0 70 14 96 43c 64 57 116 124 158 199c 41 75 62 146 62 213c -83 0 -172 -30 -268 -91C 99 317 51 278 22 243zM 18 872c 25 25 59 38 100 38c 38 0 70 -14 96 -43c 44 -38 86 -86 124 -144c 64 -96 96 -187 96 -273c -70 0 -140 18 -211 55c -70 36 -137 87 -201 151c -32 31 -48 70 -48 115C -26 810 -11 843 18 872zM 848 32c -25 -25 -60 -38 -105 -38c -41 0 -76 16 -105 48c -57 67 -94 113 -110 139c -60 96 -91 185 -91 268c 92 0 182 -28 268 -86c 79 -67 124 -105 134 -115c 31 -31 48 -72 48 -120C 886 96 874 64 848 32zM 838 656c 31 31 48 70 48 115c 0 38 -14 72 -43 100s -62 43 -100 43c -38 0 -73 -16 -105 -48c -51 -57 -88 -105 -110 -144c -60 -96 -91 -187 -91 -273c 105 0 211 41 316 124C 803 622 832 650 838 656");
 
+        public static readonly Dictionary<MusicFontSymbol, LazySvg> SymbolLookup;
+
+        static MusicFont()
+        {
+            SymbolLookup = new Dictionary<MusicFontSymbol, LazySvg>();
+            SymbolLookup[MusicFontSymbol.ClefF] = ClefF;
+            SymbolLookup[MusicFontSymbol.ClefC] = ClefC;
+            SymbolLookup[MusicFontSymbol.RestThirtySecond] = RestThirtySecond;
+            SymbolLookup[MusicFontSymbol.RestQuarter] = RestQuarter;
+            SymbolLookup[MusicFontSymbol.GraceUp] = GraceUp;
+            SymbolLookup[MusicFontSymbol.GraceDown] = GraceDown;
+            SymbolLookup[MusicFontSymbol.Trill] = Trill;
+            SymbolLookup[MusicFontSymbol.ClefG] = ClefG;
+            SymbolLookup[MusicFontSymbol.Num0] = Num0;
+            SymbolLookup[MusicFontSymbol.Num1] = Num1;
+            SymbolLookup[MusicFontSymbol.Num2] = Num2;
+            SymbolLookup[MusicFontSymbol.Num3] = Num3;
+            SymbolLookup[MusicFontSymbol.Num4] = Num4;
+            SymbolLookup[MusicFontSymbol.Num5] = Num5;
+            SymbolLookup[MusicFontSymbol.Num6] = Num6;
+            SymbolLookup[MusicFontSymbol.Num7] = Num7;
+            SymbolLookup[MusicFontSymbol.Num8] = Num8;
+            SymbolLookup[MusicFontSymbol.Num9] = Num9;
+            SymbolLookup[MusicFontSymbol.RestSixteenth] = RestSixteenth;
+            SymbolLookup[MusicFontSymbol.RestEighth] = RestEighth;
+            SymbolLookup[MusicFontSymbol.RestWhole] = RestWhole;
+            SymbolLookup[MusicFontSymbol.NoteWhole] = NoteWhole;
+            SymbolLookup[MusicFontSymbol.NoteQuarter] = NoteQuarter;
+            SymbolLookup[MusicFontSymbol.NoteHalf] = NoteHalf;
+            SymbolLookup[MusicFontSymbol.NoteDead] = NoteDead;
+            SymbolLookup[MusicFontSymbol.NoteHarmonic] = NoteHarmonic;
+            SymbolLookup[MusicFontSymbol.NoteRideCymbal] = NoteRideCymbal;
+            SymbolLookup[MusicFontSymbol.NoteHiHat] = NoteHiHat;
+            SymbolLookup[MusicFontSymbol.NoteSideStick] = NoteSideStick;
+            SymbolLookup[MusicFontSymbol.NoteHiHatHalf] = NoteHiHatHalf;
+            SymbolLookup[MusicFontSymbol.NoteChineseCymbal] = NoteChineseCymbal;
+            SymbolLookup[MusicFontSymbol.FooterUpEighth] = FooterUpEighth;
+            SymbolLookup[MusicFontSymbol.FooterUpSixteenth] = FooterUpSixteenth;
+            SymbolLookup[MusicFontSymbol.FooterUpThirtySecond] = FooterUpThirtySecond;
+            SymbolLookup[MusicFontSymbol.FooterUpSixtyFourth] = FooterUpSixtyFourth;
+            SymbolLookup[MusicFontSymbol.FooterDownEighth] = FooterDownEighth;
+            SymbolLookup[MusicFontSymbol.FooterDownSixteenth] = FooterDownSixteenth;
+            SymbolLookup[MusicFontSymbol.FooterDownThirtySecond] = FooterDownThirtySecond;
+            SymbolLookup[MusicFontSymbol.FooterDownSixtyFourth] = FooterDownSixtyFourth;
+            SymbolLookup[MusicFontSymbol.SimileMark] = SimileMark;
+            SymbolLookup[MusicFontSymbol.SimileMark2] = SimileMark2;
+            SymbolLookup[MusicFontSymbol.Coda] = Coda;
+            SymbolLookup[MusicFontSymbol.Segno] = Segno;
+            SymbolLookup[MusicFontSymbol.OttavaAbove] = OttavaAbove;
+            SymbolLookup[MusicFontSymbol.OttavaBelow] = OttavaBelow;
+            SymbolLookup[MusicFontSymbol.QuindicesimaAbove] = QuindicesimaAbove;
+            SymbolLookup[MusicFontSymbol.QuindicesimaBelow] = QuindicesimaBelow;
+            SymbolLookup[MusicFontSymbol.FermataShort] = FermataShort;
+            SymbolLookup[MusicFontSymbol.FermataNormal] = FermataNormal;
+            SymbolLookup[MusicFontSymbol.FermataLong] = FermataLong;
+            SymbolLookup[MusicFontSymbol.DynamicP] = DynamicP;
+            SymbolLookup[MusicFontSymbol.DynamicF] = DynamicF;
+            SymbolLookup[MusicFontSymbol.DynamicM] = DynamicM;
+            SymbolLookup[MusicFontSymbol.Accentuation] = Accentuation;
+            SymbolLookup[MusicFontSymbol.HeavyAccentuation] = HeavyAccentuation;
+            SymbolLookup[MusicFontSymbol.WaveHorizontal] = WaveHorizontal;
+            SymbolLookup[MusicFontSymbol.WaveVertical] = WaveVertical;
+            SymbolLookup[MusicFontSymbol.PickStrokeDown] = PickStrokeDown;
+            SymbolLookup[MusicFontSymbol.PickStrokeUp] = PickStrokeUp;
+            SymbolLookup[MusicFontSymbol.TremoloPickingThirtySecond] = TremoloPickingThirtySecond;
+            SymbolLookup[MusicFontSymbol.TremoloPickingSixteenth] = TremoloPickingSixteenth;
+            SymbolLookup[MusicFontSymbol.TremoloPickingEighth] = TremoloPickingEighth;
+            SymbolLookup[MusicFontSymbol.UpperMordent] = UpperMordent;
+            SymbolLookup[MusicFontSymbol.LowerMordent] = LowerMordent;
+            SymbolLookup[MusicFontSymbol.Turn] = Turn;
+            SymbolLookup[MusicFontSymbol.OpenNote] = OpenNote;
+            SymbolLookup[MusicFontSymbol.StoppedNote] = StoppedNote;
+            SymbolLookup[MusicFontSymbol.Tempo] = Tempo;
+            SymbolLookup[MusicFontSymbol.AccidentalSharp] = AccidentalSharp;
+            SymbolLookup[MusicFontSymbol.AccidentalFlat] = AccidentalFlat;
+            SymbolLookup[MusicFontSymbol.AccidentalNatural] = AccidentalNatural;
+            SymbolLookup[MusicFontSymbol.ClefNeutral] = ClefNeutral;
+            SymbolLookup[MusicFontSymbol.RestSixtyFourth] = RestSixtyFourth;
+            SymbolLookup[MusicFontSymbol.AccidentalDoubleFlat] = AccidentalDoubleFlat;
+            SymbolLookup[MusicFontSymbol.AccidentalDoubleSharp] = AccidentalDoubleSharp;
+        }
     }
 }

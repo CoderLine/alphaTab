@@ -1,0 +1,23 @@
+@font-face {
+	font-family: 'alphaTab';
+	src:url('font/alphaTab.eot');
+	src: url('font/alphaTab.eot?#iefix') format('embedded-opentype'),
+		url('font/alphaTab.woff') format('woff'),
+        url('font/alphaTab.ttf') format('truetype'),
+        url('font/alphaTab.svg#alphaTab') format('svg')
+    ;
+	font-weight: normal;
+	font-style: normal;
+}
+
+/* force immediate web font loading */
+body:before {
+    content: ' ';
+    font-family: alphaTab;
+    position:absolute;
+    visibility: hidden;
+    top:-100px;
+}
+.alphaTabSurface {
+    font-family: alphaTab;
+}

@@ -1,11 +1,11 @@
 ﻿namespace AlphaTab.Rendering.Glyphs
 {
-    public class NaturalizeGlyph : SvgGlyph
+    public class NaturalizeGlyph : MusicFontGlyph
     {
         private readonly bool _isGrace;
 
         public NaturalizeGlyph(int x, int y, bool isGrace = false)
-            : base(x, y, MusicFont.AccidentalNatural, isGrace ? NoteHeadGlyph.GraceScale : 1, isGrace ? NoteHeadGlyph.GraceScale : 1)
+            : base(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, MusicFontSymbol.AccidentalNatural)
         {
             _isGrace = isGrace;
         }

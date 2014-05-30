@@ -1,11 +1,11 @@
 ﻿namespace AlphaTab.Rendering.Glyphs
 {
-    public class DeadNoteHeadGlyph : SvgGlyph
+    public class DeadNoteHeadGlyph : MusicFontGlyph
     {
         private readonly bool _isGrace;
 
         public DeadNoteHeadGlyph(int x, int y, bool isGrace)
-            : base(x, y, MusicFont.NoteDead, isGrace ? NoteHeadGlyph.GraceScale : 1, isGrace ? NoteHeadGlyph.GraceScale : 1)
+            : base(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, MusicFontSymbol.NoteDead)
         {
             _isGrace = isGrace;
         }

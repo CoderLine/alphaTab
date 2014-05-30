@@ -3,10 +3,10 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class ClefGlyph : SvgGlyph
+    public class ClefGlyph : MusicFontGlyph
     {
         public ClefGlyph(int x, int y, Clef clef)
-            : base(x, y, GetClefSvg(clef), 1, 1)
+            : base(x, y, 1, GetSymbol(clef))
         {
         }
 
@@ -20,20 +20,20 @@ namespace AlphaTab.Rendering.Glyphs
             get { return false; }
         }
 
-        private static LazySvg GetClefSvg(Clef clef)
+        private static MusicFontSymbol GetSymbol(Clef clef)
         {
             switch (clef)
             {
                 case Clef.Neutral:
-                    return MusicFont.ClefNeutral;
+                    return MusicFontSymbol.ClefNeutral;
                 case Clef.C3:
-                    return MusicFont.ClefC;
+                    return MusicFontSymbol.ClefC;
                 case Clef.C4:
-                    return MusicFont.ClefC;
+                    return MusicFontSymbol.ClefC;
                 case Clef.F4:
-                    return MusicFont.ClefF;
+                    return MusicFontSymbol.ClefF;
                 case Clef.G2:
-                    return MusicFont.ClefG;
+                    return MusicFontSymbol.ClefG;
                 default:
                     throw new ArgumentOutOfRangeException("clef");
             }

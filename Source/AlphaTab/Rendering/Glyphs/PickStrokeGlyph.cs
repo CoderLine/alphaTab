@@ -2,10 +2,10 @@
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class PickStrokeGlyph : SvgGlyph
+    public class PickStrokeGlyph : MusicFontGlyph
     {
         public PickStrokeGlyph(int x, int y, PickStrokeType pickStroke)
-            : base(x, y, GetNoteSvg(pickStroke), 1, 1)
+            : base(x, y, 1, GetSymbol(pickStroke))
         {
         }
 
@@ -19,13 +19,13 @@ namespace AlphaTab.Rendering.Glyphs
             get { return false; }
         }
 
-        private static LazySvg GetNoteSvg(PickStrokeType pickStroke)
+        private static MusicFontSymbol GetSymbol(PickStrokeType pickStroke)
         {
             switch (pickStroke)
             {
-                case PickStrokeType.Up: return MusicFont.PickStrokeUp;
-                case PickStrokeType.Down: return MusicFont.PickStrokeDown;
-                default: return null;
+                case PickStrokeType.Up: return MusicFontSymbol.PickStrokeUp;
+                case PickStrokeType.Down: return MusicFontSymbol.PickStrokeDown;
+                default: return MusicFontSymbol.None;
             }
         }
     }

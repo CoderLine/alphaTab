@@ -34,10 +34,9 @@ namespace AlphaTab.Rendering.Glyphs
             var circleSize = 1.5f*Scale;
             var middle = (top + bottom) / 2;
             const int dotOffset = 3;
-            canvas.BeginPath();
-            canvas.Circle(left, middle - (circleSize * dotOffset), circleSize);
-            canvas.Circle(left, middle + (circleSize * dotOffset), circleSize);
-            canvas.Fill();
+
+            canvas.FillCircle(left, middle - (circleSize * dotOffset), circleSize);
+            canvas.FillCircle(left, middle + (circleSize * dotOffset), circleSize);
         
             // line
             left += (4 * Scale);

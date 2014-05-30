@@ -95,7 +95,7 @@
 
                 //
                 // Create context elements (wrapper, canvas etc)
-                if (context.settings.engine == "html5" || context.settings.engine == "default") {
+                if (context.settings.engine == "html5") {
                     // HACK: call createElement('canvas') once before. this ensures that the browser knows the element
                     document.createElement('canvas');
                     context.canvas = $(document.createElement('canvas'));
@@ -135,7 +135,7 @@
                     }
                 }
                 else {
-                    context.canvas = $('<div class="alphaTabCanvasWrapper"></div>');
+                    context.canvas = $('<div class="alphaTabSurface"></div>');
                     $this.append(context.canvas);
                 }
 
@@ -147,13 +147,19 @@
                 context.renderer.add_renderFinished(function () {
                     $this.trigger('rendered');
                 });
+                context.renderer.add_postRenderFinished(function () {
+                    $this.trigger('post-rendered');
+                });
                 // in case of SVG we hook into the renderer to create the svg element after rendering
-                if (context.settings.engine == "svg") {
-                    context.renderer.add_renderFinished(function () {
-                        var canvas = context.renderer.canvas;
-                        context.canvas[0].innerHTML = canvas.toSvg(true, "alphaTabSurface");
-                    });
-                }
+                context.renderer.add_renderFinished(function () {
+                    var canvas = context.renderer.canvas;
+                    if (canvas.toSvg) {
+                        context.canvas[0].innerHTML = canvas.toSvg(true, "alphaTabSurfaceSvg");
+                        context.canvas.width(canvas.get_width());
+                        context.canvas.height(canvas.get_height());
+                    }
+
+                });
 
                 $this.data('alphaTab', context);
 
@@ -182,25 +188,25 @@
     function load(data) {
         var context = $(this).data('alphaTab');
         if (!context) { console.error('alphaTab not initialized!'); }
-        if(data.constructor == ArrayBuffer) {
+        if (data.constructor == ArrayBuffer) {
             try {
                 var score = AlphaTab.Importer.ScoreLoader.loadScoreFromBytes(new Uint8Array(data));
                 scoreLoaded(context, score);
             }
-            catch(e) {
+            catch (e) {
                 console.error(e);
-            }            
+            }
         }
-        if(data.constructor == Uint8Array) {
+        if (data.constructor == Uint8Array) {
             try {
                 var score = AlphaTab.Importer.ScoreLoader.loadScoreFromBytes(data);
                 scoreLoaded(context, score);
             }
-            catch(e) {
+            catch (e) {
                 console.error(e);
-            }            
+            }
         }
-        else if(typeof(data) == 'string') {
+        else if (typeof (data) == 'string') {
             AlphaTab.Importer.ScoreLoader.loadScoreAsync(url,
             function (score) {
                 scoreLoaded(context, score);
@@ -232,7 +238,8 @@
             console.error(e);
         }
 
-        if (score != null) {a
+        if (score != null) {
+            a
             scoreLoaded(context, score);
         }
     }

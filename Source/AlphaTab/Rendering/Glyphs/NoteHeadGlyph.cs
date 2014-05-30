@@ -2,7 +2,7 @@
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class NoteHeadGlyph : SvgGlyph
+    public class NoteHeadGlyph : MusicFontGlyph
     {
         public const float GraceScale = 0.7f;
         public const int NoteHeadHeight = 9;
@@ -11,7 +11,7 @@ namespace AlphaTab.Rendering.Glyphs
         private readonly Duration _duration;
 
         public NoteHeadGlyph(int x, int y, Duration duration, bool isGrace)
-            : base(x, y, GetNoteSvg(duration), isGrace ? GraceScale : 1, isGrace ? GraceScale : 1)
+            : base(x, y, isGrace ? GraceScale : 1, GetSymbol(duration))
         {
             _isGrace = isGrace;
             _duration = duration;
@@ -38,16 +38,16 @@ namespace AlphaTab.Rendering.Glyphs
             }
         }
 
-        private static LazySvg GetNoteSvg(Duration duration)
+        private static MusicFontSymbol GetSymbol(Duration duration)
         {
             switch (duration)
             {
                 case Duration.Whole:
-                    return MusicFont.NoteWhole;
+                    return MusicFontSymbol.NoteWhole;
                 case Duration.Half:
-                    return MusicFont.NoteHalf;
+                    return MusicFontSymbol.NoteHalf;
                 default:
-                    return MusicFont.NoteQuarter;
+                    return MusicFontSymbol.NoteQuarter;
             }
         }
     }

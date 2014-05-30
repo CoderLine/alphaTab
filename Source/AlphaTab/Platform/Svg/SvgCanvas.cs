@@ -1,12 +1,14 @@
 ﻿using AlphaTab.Collections;
 using AlphaTab.Platform.Model;
+using AlphaTab.Rendering.Glyphs;
+using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Platform.Svg
 {
     /// <summary>
     ///  A canvas implementation storing SVG data
     /// </summary>
-    public class SvgCanvas : ICanvas
+    public class SvgCanvas : ICanvas, IPathCanvas
     {
         private string _buffer;
         private string _currentPath;
@@ -70,9 +72,9 @@ namespace AlphaTab.Platform.Svg
         public void FillRect(float x, float y, float w, float h)
         {
             _buffer += "<rect x=\"";
-            _buffer += x;
+            _buffer += x - 0.5f;
             _buffer += "\" y=\"";
-            _buffer += y;
+            _buffer += y - 0.5f;
             _buffer += "\" width=\"";
             _buffer += w;
             _buffer += "\" height=\"";
@@ -85,9 +87,9 @@ namespace AlphaTab.Platform.Svg
         public void StrokeRect(float x, float y, float w, float h)
         {
             _buffer += "<rect x=\"";
-            _buffer += x;
+            _buffer += x - 0.5f;
             _buffer += "\" y=\"";
-            _buffer += y;
+            _buffer += y - 0.5f;
             _buffer += "\" width=\"";
             _buffer += w;
             _buffer += "\" height=\"";
@@ -112,18 +114,18 @@ namespace AlphaTab.Platform.Svg
         public void MoveTo(float x, float y)
         {
             _currentPath += " M";
-            _currentPath += x;
+            _currentPath += x - 0.5f;
             _currentPath += ",";
-            _currentPath += y;
+            _currentPath += y - 0.5f;
         }
 
         public void LineTo(float x, float y)
         {
             _currentPathIsEmpty = false;
             _currentPath += " L";
-            _currentPath += x;
+            _currentPath += x - 0.5f;
             _currentPath += ",";
-            _currentPath += y;
+            _currentPath += y - 0.5f;
         }
 
         public void QuadraticCurveTo(float cpx, float cpy, float x, float y)
@@ -156,7 +158,7 @@ namespace AlphaTab.Platform.Svg
             _currentPath += y;
         }
 
-        public void Circle(float x, float y, float radius)
+        public void FillCircle(float x, float y, float radius)
         {
             _currentPathIsEmpty = false;
             // 
@@ -177,32 +179,8 @@ namespace AlphaTab.Platform.Svg
             _currentPath += y;
 
             _currentPath += " z";
-        }
 
-        public void Rect(float x, float y, float w, float h)
-        {
-            _currentPathIsEmpty = false;
-            _currentPath += " M";
-            _currentPath += x;
-            _currentPath += ",";
-            _currentPath += y;
-
-            _currentPath += " L";
-
-            _currentPath += x + w;
-            _currentPath += ",";
-            _currentPath += y;
-            _currentPath += " ";
-
-            _currentPath += x + w;
-            _currentPath += ",";
-            _currentPath += y + h;
-            _currentPath += " ";
-
-            _currentPath += x;
-            _currentPath += ",";
-            _currentPath += y + h;
-            _currentPath += " z";
+            Fill();
         }
 
         public void Fill()
@@ -296,7 +274,18 @@ namespace AlphaTab.Platform.Svg
             {
                 font = SupportedFonts.TimesNewRoman;
             }
-            return FontSizes.MeasureString(text, font, Font.Size);
+            return FontSizes.MeasureString(text, font, Font.Size, Font.Style);
+        }
+
+        public void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol)
+        {
+            if (symbol == MusicFontSymbol.None)
+            {
+                return;
+            }
+
+            SvgRenderer glyph = new SvgRenderer(MusicFont.SymbolLookup[symbol], scale, scale);
+            glyph.Paint(x, y, this);
         }
     }
 }

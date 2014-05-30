@@ -1,11 +1,11 @@
 ﻿namespace AlphaTab.Rendering.Glyphs
 {
-    public class DiamondNoteHeadGlyph : SvgGlyph
+    public class DiamondNoteHeadGlyph : MusicFontGlyph
     {
         private readonly bool _isGrace;
 
         public DiamondNoteHeadGlyph(int x, int y, bool isGrace)
-            : base(x, y, MusicFont.NoteHarmonic, isGrace ? NoteHeadGlyph.GraceScale : 1, isGrace ? NoteHeadGlyph.GraceScale : 1)
+            : base(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, MusicFontSymbol.NoteHarmonic)
         {
             _isGrace = isGrace;
         }

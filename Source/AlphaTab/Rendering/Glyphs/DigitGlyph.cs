@@ -1,11 +1,11 @@
 ﻿namespace AlphaTab.Rendering.Glyphs
 {
-    public class DigitGlyph : SvgGlyph
+    public class DigitGlyph : MusicFontGlyph
     {
         private readonly int _digit;
 
         public DigitGlyph(int x, int y, int digit)
-            : base(x, y, GetDigit(digit), 1, 1)
+            : base(x, y, 1, GetSymbol(digit))
         {
             _digit = digit;
         }
@@ -42,36 +42,33 @@
             get { return false; }
         }
 
-        private static LazySvg GetDigit(int digit)
+        private static MusicFontSymbol GetSymbol(int digit)
         {
             switch (digit)
             {
                 case 0:
-                    return MusicFont.Num0;
+                    return MusicFontSymbol.Num0;
                 case 1:
-                    return MusicFont.Num1;
+                    return MusicFontSymbol.Num1;
                 case 2:
-                    return MusicFont.Num2;
+                    return MusicFontSymbol.Num2;
                 case 3:
-                    return MusicFont.Num3;
+                    return MusicFontSymbol.Num3;
                 case 4:
-                    return MusicFont.Num4;
+                    return MusicFontSymbol.Num4;
                 case 5:
-                    return MusicFont.Num5;
+                    return MusicFontSymbol.Num5;
                 case 6:
-                    return MusicFont.Num6;
+                    return MusicFontSymbol.Num6;
                 case 7:
-                    return MusicFont.Num7;
+                    return MusicFontSymbol.Num7;
                 case 8:
-                    return MusicFont.Num8;
+                    return MusicFontSymbol.Num8;
                 case 9:
-                    return MusicFont.Num9;
+                    return MusicFontSymbol.Num9;
                 default:
-                    return null;
+                    return MusicFontSymbol.None;
             }
         }
-
-
-
     }
 }

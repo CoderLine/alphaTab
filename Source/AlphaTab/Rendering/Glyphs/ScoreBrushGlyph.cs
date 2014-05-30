@@ -37,11 +37,7 @@ namespace AlphaTab.Rendering.Glyphs
                     var steps = (int)(Math.Abs(endY - startY) / size);
                     for (var i = 0; i < steps; i++)
                     {
-                        var arrow = new SvgGlyph((int)(3 * Scale), 0, MusicFont.WaveVertical, 1, 1);
-                        arrow.Renderer = Renderer;
-                        arrow.DoLayout();
-
-                        arrow.Paint(cx + X, startY + (i * size), canvas);
+                        canvas.FillMusicFontSymbol(cx + X + ((int)(3 * Scale)), 1, startY + (i * size), MusicFontSymbol.WaveVertical);
                     }
                 }
 

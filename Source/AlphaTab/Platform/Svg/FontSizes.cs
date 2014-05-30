@@ -1,5 +1,6 @@
 ﻿using System;
 using AlphaTab.IO;
+using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Platform.Svg
 {
@@ -16,10 +17,19 @@ namespace AlphaTab.Platform.Svg
         public const int ControlChars = 0x20;
 
 
-        public static float MeasureString(string s, SupportedFonts f, float size)
+        public static float MeasureString(string s, SupportedFonts f, float size, FontStyle style)
         {
             ByteArray data;
             int dataSize;
+            float factor = 1;
+            if ((style & FontStyle.Italic) != 0)
+            {
+                factor *= 1.2f;
+            }
+            if ((style & FontStyle.Bold) != 0)
+            {
+                factor *= 1.2f;
+            }
 
             if (f == SupportedFonts.TimesNewRoman)
             {
@@ -48,7 +58,7 @@ namespace AlphaTab.Platform.Svg
                 }
             }
 
-            return stringSize;
+            return stringSize*factor;
         }
     }
 }

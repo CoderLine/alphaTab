@@ -1,11 +1,11 @@
 ﻿namespace AlphaTab.Rendering.Glyphs
 {
-    public class ChineseCymbalGlyph : SvgGlyph
+    public class ChineseCymbalGlyph : MusicFontGlyph
     {
         private readonly bool _isGrace;
 
         public ChineseCymbalGlyph(int x, int y, bool isGrace)
-            : base(x, y, MusicFont.NoteHarmonic, isGrace ? NoteHeadGlyph.GraceScale : 1, isGrace ? NoteHeadGlyph.GraceScale : 1)
+            : base(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, MusicFontSymbol.NoteHarmonic)
         {
             _isGrace = isGrace;
         }

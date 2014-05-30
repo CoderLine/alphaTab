@@ -2,14 +2,15 @@
 using System;
 using System.Html;
 using AlphaTab.Platform.Model;
-
+using AlphaTab.Rendering.Utils;
+using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Platform.JavaScript
 {
     /// <summary>
     /// A canvas implementation for HTML5 canvas
     /// </summary>
-    public class Html5Canvas : ICanvas
+    public class Html5Canvas : ICanvas, IPathCanvas
     {
         private readonly CanvasElement _canvas;
         private System.Html.Media.Graphics.CanvasRenderingContext2D _context;
@@ -37,7 +38,6 @@ namespace AlphaTab.Platform.JavaScript
         }
 
         public int Height
-
         {
             get { return _canvas.Height; }
             set
@@ -124,14 +124,10 @@ namespace AlphaTab.Platform.JavaScript
             _context.BezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y);
         }
 
-        public void Circle(float x, float y, float radius)
+        public void FillCircle(float x, float y, float radius)
         {
             _context.Arc(x, y, radius, 0, Math.PI * 2, true);
-        }
-
-        public void Rect(float x, float y, float w, float h)
-        {
-            _context.Rect(x, y, w, h);
+            Fill();
         }
 
         public void Fill()
@@ -228,6 +224,17 @@ namespace AlphaTab.Platform.JavaScript
         public float MeasureText(string text)
         {
             return (float)_context.MeasureText(text).Width;
+        }
+
+        public void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol)
+        {
+            if (symbol == MusicFontSymbol.None)
+            {
+                return;
+            }
+            
+            SvgRenderer glyph = new SvgRenderer(MusicFont.SymbolLookup[symbol], scale, scale);
+            glyph.Paint(x, y, this);
         }
     }
 }

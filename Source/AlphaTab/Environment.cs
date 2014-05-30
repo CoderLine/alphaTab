@@ -33,11 +33,11 @@ namespace AlphaTab
             RenderEngines["gdi"] = d => new AlphaTab.Platform.CSharp.GdiCanvas();
             FileLoaders["default"] = () => new AlphaTab.Platform.CSharp.CsFileLoader();
 #elif JavaScript
-            RenderEngines["default"] = d => new AlphaTab.Platform.JavaScript.Html5Canvas(d);
+            RenderEngines["default"] = d => new SvgCanvas();
             RenderEngines["html5"] = d => new AlphaTab.Platform.JavaScript.Html5Canvas(d);
             FileLoaders["default"] = () =>new AlphaTab.Platform.JavaScript.JsFileLoader();
-#else 
-#error Unsupported Platform 
+#else
+#error Unsupported Platform
 #endif
 
             RenderEngines["svg"] = d => new SvgCanvas();

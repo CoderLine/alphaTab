@@ -2,12 +2,11 @@
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TremoloPickingGlyph : SvgGlyph
+    public class TremoloPickingGlyph : MusicFontGlyph
     {
         public TremoloPickingGlyph(int x, int y, Duration duration)
-            : base(x, y, GetSvg(duration), 1, 1)
+            : base(x, y, 1, GetSymbol(duration))
         {
-
         }
 
         public override void DoLayout()
@@ -20,18 +19,18 @@ namespace AlphaTab.Rendering.Glyphs
             get { return false; }
         }
 
-        private static LazySvg GetSvg(Duration duration)
+        private static MusicFontSymbol GetSymbol(Duration duration)
         {
             switch (duration)
             {
                 case Duration.ThirtySecond:
-                    return MusicFont.TremoloPickingThirtySecond;
+                    return MusicFontSymbol.TremoloPickingThirtySecond;
                 case Duration.Sixteenth:
-                    return MusicFont.TremoloPickingSixteenth;
+                    return MusicFontSymbol.TremoloPickingSixteenth;
                 case Duration.Eighth:
-                    return MusicFont.TremoloPickingEighth;
+                    return MusicFontSymbol.TremoloPickingEighth;
                 default:
-                    return null;
+                    return MusicFontSymbol.None;
             }
         }
     }

@@ -3,23 +3,23 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class AccentuationGlyph : SvgGlyph
+    public class AccentuationGlyph : MusicFontGlyph
     {
         public AccentuationGlyph(int x, int y, AccentuationType accentuation)
-            : base(x, y, GetSvg(accentuation), 1, 1)
+            : base(x, y, 1, GetSymbol(accentuation))
         {
         }
 
-        private static LazySvg GetSvg(AccentuationType accentuation)
+        private static MusicFontSymbol GetSymbol(AccentuationType accentuation)
         {
             switch (accentuation)
             {
                 case AccentuationType.None:
-                    return null;
+                    return MusicFontSymbol.None;
                 case AccentuationType.Normal:
-                    return MusicFont.Accentuation;
+                    return MusicFontSymbol.Accentuation;
                 case AccentuationType.Heavy:
-                    return MusicFont.HeavyAccentuation;
+                    return MusicFontSymbol.HeavyAccentuation;
                 default:
                     throw new ArgumentOutOfRangeException("accentuation");
             }

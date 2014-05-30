@@ -1,5 +1,6 @@
 ﻿using System;
 using AlphaTab.Platform;
+using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
@@ -30,9 +31,7 @@ namespace AlphaTab.Rendering.Glyphs
             var loopX = (int)startX;
             for (var i = 0; i < loops; i++)
             {
-                var glyph = new SvgGlyph(loopX, 0, MusicFont.WaveHorizontal, _scale, _scale);
-                glyph.Renderer = Renderer;
-                glyph.Paint(cx + X, cy + Y + (int)(res.MarkerFont.Size / 2), canvas);
+                canvas.FillMusicFontSymbol(cx + X + loopX, cy + Y, _scale, MusicFontSymbol.WaveHorizontal);
                 loopX += (int)step;
             }
         }

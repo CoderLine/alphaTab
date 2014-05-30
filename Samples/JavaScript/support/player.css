@@ -17,6 +17,7 @@
     background:#2E2E2E;
     padding:10px;
     z-index:2000;
+    text-align:center;
 }
 
 #loadingInfo {

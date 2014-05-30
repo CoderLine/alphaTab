@@ -3,33 +3,33 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class RestGlyph : SvgGlyph
+    public class RestGlyph : MusicFontGlyph
     {
         private readonly Duration _duration;
 
         public RestGlyph(int x, int y, Duration duration)
-            : base(x, y, GetRestSVg(duration), 1, 1)
+            : base(x, y, 1, GetSymbol(duration))
         {
             _duration = duration;
         }
 
-        private static LazySvg GetRestSVg(Duration duration)
+        private static MusicFontSymbol GetSymbol(Duration duration)
         {
             switch (duration)
             {
                 case Duration.Whole:
                 case Duration.Half:
-                    return MusicFont.RestWhole;
+                    return MusicFontSymbol.RestWhole;
                 case Duration.Quarter:
-                    return MusicFont.RestQuarter;
+                    return MusicFontSymbol.RestQuarter;
                 case Duration.Eighth:
-                    return MusicFont.RestEighth;
+                    return MusicFontSymbol.RestEighth;
                 case Duration.Sixteenth:
-                    return MusicFont.RestSixteenth;
+                    return MusicFontSymbol.RestSixteenth;
                 case Duration.ThirtySecond:
-                    return MusicFont.RestThirtySecond;
+                    return MusicFontSymbol.RestThirtySecond;
                 case Duration.SixtyFourth:
-                    return MusicFont.RestSixtyFourth;
+                    return MusicFontSymbol.RestSixtyFourth;
                 default:
                     throw new ArgumentOutOfRangeException("duration");
             }
@@ -59,7 +59,5 @@ namespace AlphaTab.Rendering.Glyphs
         {
             get { return false; }
         }
-
-
     }
 }

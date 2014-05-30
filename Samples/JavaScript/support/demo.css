@@ -1,4 +1,8 @@
-body { text-align:center; font-family:Open Sans, Arial sans-serif; background:#F5F6F7; padding:10px; }
+body { font-family:Open Sans, Arial sans-serif; background:#F5F6F7; padding:10px; }
+#alphaTab {
+    display: table;
+    margin: 0 auto;
+}
 
 ::-webkit-scrollbar-track
 {

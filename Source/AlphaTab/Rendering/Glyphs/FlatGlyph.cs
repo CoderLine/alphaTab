@@ -1,11 +1,11 @@
 ﻿namespace AlphaTab.Rendering.Glyphs
 {
-    public class FlatGlyph : SvgGlyph
+    public class FlatGlyph : MusicFontGlyph
     {
         private readonly bool _isGrace;
 
         public FlatGlyph(int x, int y, bool isGrace = false)
-            : base(x, y, MusicFont.AccidentalFlat, isGrace ? NoteHeadGlyph.GraceScale : 1, isGrace ? NoteHeadGlyph.GraceScale : 1)
+            : base(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, MusicFontSymbol.AccidentalFlat)
         {
             _isGrace = isGrace;
         }

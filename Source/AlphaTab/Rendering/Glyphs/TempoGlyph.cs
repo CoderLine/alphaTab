@@ -17,10 +17,7 @@ namespace AlphaTab.Rendering.Glyphs
             var res = Renderer.Resources;
             canvas.Font = res.MarkerFont;
 
-            var symbol = new SvgGlyph(0, 0, MusicFont.Tempo, 1, 1);
-            symbol.Renderer = Renderer;
-            symbol.Paint(cx + X, cy + Y, canvas);
-
+            canvas.FillMusicFontSymbol(cx+ X, cy + Y, 1, MusicFontSymbol.Tempo);
             canvas.FillText("" + _tempo, cx + X + (30 * Scale), cy + X + (7 * Scale));
         }
     }

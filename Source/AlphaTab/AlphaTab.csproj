@@ -185,6 +185,8 @@
     <Compile Include="Rendering\Glyphs\LazySvg.cs" />
     <Compile Include="Rendering\Glyphs\LineRangedGlyph.cs" />
     <Compile Include="Rendering\Glyphs\MusicFont.cs" />
+    <Compile Include="Rendering\Glyphs\MusicFontGlyph.cs" />
+    <Compile Include="Rendering\Glyphs\MusicFontSymbol.cs" />
     <Compile Include="Rendering\Glyphs\NaturalizeGlyph.cs" />
     <Compile Include="Rendering\Glyphs\NoteHeadGlyph.cs" />
     <Compile Include="Rendering\Glyphs\NoteNumberGlyph.cs" />
@@ -204,7 +206,6 @@
     <Compile Include="Rendering\Glyphs\ScoreTieGlyph.cs" />
     <Compile Include="Rendering\Glyphs\SharpGlyph.cs" />
     <Compile Include="Rendering\Glyphs\SpacingGlyph.cs" />
-    <Compile Include="Rendering\Glyphs\SvgGlyph.cs" />
     <Compile Include="Rendering\Glyphs\TabBeatContainerGlyph.cs" />
     <Compile Include="Rendering\Glyphs\TabBeatGlyph.cs" />
     <Compile Include="Rendering\Glyphs\TabBeatPostNotesGlyph.cs" />
@@ -247,6 +248,7 @@
     <Compile Include="Rendering\Utils\BoundingsLookup.cs" />
     <Compile Include="Rendering\Utils\PercussionMapper.cs" />
     <Compile Include="Rendering\Utils\SvgPathParser.cs" />
+    <Compile Include="Rendering\Utils\SvgRenderer.cs" />
     <Compile Include="Rendering\Utils\TupletHelper.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Platform\Svg\FontSizes.cs" />

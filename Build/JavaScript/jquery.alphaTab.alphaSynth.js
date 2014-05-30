@@ -192,7 +192,7 @@
         // Hook into events
         
         // we need to update our position caches if we render a tablature
-        $(this).on('rendered', function(e, score) {
+        $(this).on('post-rendered', function(e, score) {
             api.playerCursorUpdateCache.apply(this);
             cursorWrapper.css({position: 'absolute', "z-index": 1000, 
                 width: surface.width(), height: surface.height()});
@@ -213,7 +213,7 @@
         // click handling
         if(context.cursorOptions.handleClick) {
             $(context.canvas).click(function(e) {
-                var parentOffset = $(this).offset(); 
+                var parentOffset = $(this).offset();
                 var relX = e.pageX - parentOffset.left;
                 var relY = e.pageY - parentOffset.top;
                 var beat = api.getBeatAtPos.apply(self, [relX, relY]);

@@ -72,7 +72,7 @@ namespace AlphaTab.Rendering.Glyphs
         {
             get
             {
-                var p = new SvgGlyph(0, 0, MusicFont.DynamicP, GlyphScale, GlyphScale);
+                var p = new MusicFontGlyph(0, 0, GlyphScale, MusicFontSymbol.DynamicP);
                 p.Width = (int)(7 * Scale);
                 return p;
             }
@@ -82,7 +82,7 @@ namespace AlphaTab.Rendering.Glyphs
         {
             get
             {
-                var m = new SvgGlyph(0, 0, MusicFont.DynamicM, GlyphScale, GlyphScale);
+                var m = new MusicFontGlyph(0, 0, GlyphScale, MusicFontSymbol.DynamicM);
                 m.Width = (int)(7 * Scale);
                 return m;
             }
@@ -92,7 +92,7 @@ namespace AlphaTab.Rendering.Glyphs
         {
             get
             {
-                var f = new SvgGlyph(0, 0, MusicFont.DynamicF, GlyphScale, GlyphScale);
+                var f = new MusicFontGlyph(0, 0, GlyphScale, MusicFontSymbol.DynamicF);
                 f.Width = (int)(7 * Scale);
                 return f;
             }

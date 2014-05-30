@@ -98,6 +98,7 @@ namespace AlphaTab.Rendering
             DoLayout();
             PaintScore();
             OnRenderFinished();
+            OnPostRenderFinished();
         }
 
 
@@ -130,6 +131,13 @@ namespace AlphaTab.Rendering
         protected virtual void OnRenderFinished()
         {
             Action handler = RenderFinished;
+            if (handler != null) handler();
+        }
+
+        public event Action PostRenderFinished;
+        protected virtual void OnPostRenderFinished()
+        {
+            Action handler = PostRenderFinished;
             if (handler != null) handler();
         }
 

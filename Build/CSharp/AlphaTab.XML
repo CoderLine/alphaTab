@@ -688,6 +688,11 @@
             This is the base public interface for canvas implementations on different plattforms.
             </summary>
         </member>
+        <member name="T:AlphaTab.Platform.IPathCanvas">
+            <summary>
+            This is the path drawing API for canvas implementations
+            </summary>
+        </member>
         <member name="T:AlphaTab.Platform.Model.Font">
             <summary>
             This container public class can store the definition for a font and it's style.

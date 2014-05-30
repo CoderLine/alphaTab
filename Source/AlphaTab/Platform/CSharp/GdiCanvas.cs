@@ -1,4 +1,6 @@
-﻿#if CSharp
+﻿using AlphaTab.Rendering.Glyphs;
+using AlphaTab.Rendering.Utils;
+#if CSharp
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -14,7 +16,7 @@ using GdiColor = System.Drawing.Color;
 
 namespace AlphaTab.Platform.CSharp
 {
-    public class GdiCanvas : ICanvas
+    public class GdiCanvas : ICanvas, IPathCanvas
     {
         private Bitmap _image;
         private int _width;
@@ -272,22 +274,14 @@ namespace AlphaTab.Platform.CSharp
             _currentY = y;
         }
 
-        public void Circle(float x, float y, float radius)
+        public void FillCircle(float x, float y, float radius)
         {
             _currentPath.StartFigure();
             _currentPath.AddEllipse(x - radius, y - radius, radius * 2, radius * 2);
             _currentPath.CloseFigure();
             _currentX = x;
             _currentY = y;
-        }
-
-        public void Rect(float x, float y, float w, float h)
-        {
-            _currentPath.StartFigure();
-            _currentPath.AddRectangle(new RectangleF(x, y, w, h));
-            _currentPath.CloseFigure();
-            _currentX = x;
-            _currentY = y;
+            Fill();
         }
 
         public void Fill()
@@ -312,6 +306,17 @@ namespace AlphaTab.Platform.CSharp
         public float MeasureText(string text)
         {
             return _graphics.MeasureString(text, _font).Width;
+        }
+
+        public void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol)
+        {
+            if (symbol == MusicFontSymbol.None)
+            {
+                return;
+            }
+
+            SvgRenderer glyph = new SvgRenderer(MusicFont.SymbolLookup[symbol], scale, scale);
+            glyph.Paint(x, y, this);
         }
     }
 }
