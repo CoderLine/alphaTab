@@ -1,4 +1,5 @@
 ﻿using AlphaTab.Platform.Model;
+using AlphaTab.Rendering;
 using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Platform
@@ -10,6 +11,7 @@ namespace AlphaTab.Platform
     {
         int Width { get; set; }
         int Height { get; set; }
+        RenderingResources Resources { get; set; }
 
         Color Color { get; set; }
 

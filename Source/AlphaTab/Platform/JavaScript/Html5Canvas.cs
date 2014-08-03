@@ -2,6 +2,7 @@
 using System;
 using System.Html;
 using AlphaTab.Platform.Model;
+using AlphaTab.Rendering;
 using AlphaTab.Rendering.Utils;
 using AlphaTab.Rendering.Glyphs;
 
@@ -16,6 +17,8 @@ namespace AlphaTab.Platform.JavaScript
         private System.Html.Media.Graphics.CanvasRenderingContext2D _context;
         private Color _color;
         private Font _font;
+
+        public RenderingResources Resources { get; set; }
 
         public Html5Canvas(dynamic dom)
         {

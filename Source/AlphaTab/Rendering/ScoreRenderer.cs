@@ -93,6 +93,7 @@ namespace AlphaTab.Rendering
                 RenderingResources.Init(Settings.Scale);
                 Canvas.LineWidth = Settings.Scale;
             }
+            Canvas.Resources = RenderingResources;
             RecreateLayout();
             Canvas.Clear();
             DoLayout();

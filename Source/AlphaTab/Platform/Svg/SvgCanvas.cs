@@ -1,5 +1,7 @@
-﻿using AlphaTab.Collections;
+﻿using System;
+using AlphaTab.Collections;
 using AlphaTab.Platform.Model;
+using AlphaTab.Rendering;
 using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Rendering.Utils;
 
@@ -21,6 +23,7 @@ namespace AlphaTab.Platform.Svg
         public Font Font { get; set; }
         public TextAlign TextAlign { get; set; }
         public TextBaseline TextBaseline { get; set; }
+        public RenderingResources Resources { get; set; }
 
         public SvgCanvas()
         {
@@ -284,8 +287,28 @@ namespace AlphaTab.Platform.Svg
                 return;
             }
 
-            SvgRenderer glyph = new SvgRenderer(MusicFont.SymbolLookup[symbol], scale, scale);
-            glyph.Paint(x, y, this);
+            _buffer += "<text x=\"";
+            _buffer += x;
+            _buffer += "\" y=\"";
+            _buffer += y + GetSvgBaseLineOffset();
+            _buffer += "\" style=\"font:";
+            _buffer += Resources.MusicFont.ToCssString();
+            _buffer += "; fill:";
+            _buffer += Color.ToRgbaString();
+            _buffer += ";\" ";
+            _buffer += " dominant-baseline=\"top\" text-anchor=\"start\"";
+            _buffer += ">&#x";
+            _buffer += Std.ToHexString((int)symbol);
+            _buffer += ";</text>\n";
+
+
+            //if (symbol == MusicFontSymbol.None)
+            //{
+            //    return;
+            //}
+
+            //SvgRenderer glyph = new SvgRenderer(MusicFont.SymbolLookup[symbol], scale, scale);
+            //glyph.Paint(x, y, this);
         }
     }
 }

@@ -135,10 +135,12 @@ namespace AlphaTab.Audio.Model
             // build track data first
             var trackData = new MemoryStream();
             var current = FirstEvent;
+            int count = 0;
             while (current != null)
             {
                 current.WriteTo(trackData);
                 current = current.NextEvent;
+                count ++;
             }
         
             // magic number "MTrk" (0x4D54726B)

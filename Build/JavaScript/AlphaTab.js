@@ -1582,6 +1582,15 @@
 	$AlphaTab_Platform_Std.isWhiteSpace = function(c) {
 		return c === 32 || c === 11 || c === 13 || c === 10;
 	};
+	$AlphaTab_Platform_Std.toHexString = function(n) {
+		var s = '';
+		var hexChars = '0123456789ABCDEF';
+		do {
+			s = String.fromCharCode(hexChars.charCodeAt(n & 15)) + s;
+			n >>= 4;
+		} while (n > 0);
+		return s;
+	};
 	global.AlphaTab.Platform.Std = $AlphaTab_Platform_Std;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Platform.JavaScript.Html5Canvas
@@ -1590,6 +1599,7 @@
 		this.$_context = null;
 		this.$_color = null;
 		this.$_font = null;
+		this.$1$ResourcesField = null;
 		this.$_canvas = dom;
 		this.$_context = this.$_canvas.getContext('2d');
 		this.$_context.textBaseline = 'top';
@@ -1716,6 +1726,7 @@
 		this.$1$FontField = null;
 		this.$1$TextAlignField = 0;
 		this.$1$TextBaselineField = 0;
+		this.$1$ResourcesField = null;
 		this.$_buffer = '';
 		this.$_currentPath = '';
 		this.$_currentPathIsEmpty = true;
@@ -1835,6 +1846,7 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.RenderingResources
 	var $AlphaTab_Rendering_RenderingResources = function(scale) {
+		this.musicFont = null;
 		this.copyrightFont = null;
 		this.titleFont = null;
 		this.subTitleFont = null;
@@ -2088,10 +2100,10 @@
 				return -1;
 			}
 			case 1: {
-				return 53;
+				return 32821;
 			}
 			case 2: {
-				return 54;
+				return 32822;
 			}
 			default: {
 				throw new ss.ArgumentOutOfRangeException('accentuation');
@@ -2135,45 +2147,45 @@
 	$AlphaTab_Rendering_Glyphs_BeamGlyph.$getSymbol = function(duration, direction, isGrace) {
 		if (direction === 0) {
 			if (isGrace) {
-				return 31;
+				return 32799;
 			}
 			switch (duration) {
 				case 8: {
-					return 31;
+					return 32799;
 				}
 				case 16: {
-					return 32;
+					return 32800;
 				}
 				case 32: {
-					return 33;
+					return 32801;
 				}
 				case 64: {
-					return 34;
+					return 32802;
 				}
 				default: {
-					return 31;
+					return 32799;
 				}
 			}
 		}
 		else {
 			if (isGrace) {
-				return 35;
+				return 32803;
 			}
 			switch (duration) {
 				case 8: {
-					return 35;
+					return 32803;
 				}
 				case 16: {
-					return 36;
+					return 32804;
 				}
 				case 32: {
-					return 37;
+					return 32805;
 				}
 				case 64: {
-					return 38;
+					return 32806;
 				}
 				default: {
-					return 35;
+					return 32803;
 				}
 			}
 		}
@@ -2217,7 +2229,7 @@
 	// AlphaTab.Rendering.Glyphs.ChineseCymbalGlyph
 	var $AlphaTab_Rendering_Glyphs_ChineseCymbalGlyph = function(x, y, isGrace) {
 		this.$_isGrace = false;
-		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), 25);
+		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), 32793);
 		this.$_isGrace = isGrace;
 	};
 	$AlphaTab_Rendering_Glyphs_ChineseCymbalGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.ChineseCymbalGlyph';
@@ -2240,19 +2252,19 @@
 	$AlphaTab_Rendering_Glyphs_ClefGlyph.$getSymbol = function(clef) {
 		switch (clef) {
 			case 0: {
-				return 71;
+				return 32839;
 			}
 			case 1: {
-				return 1;
+				return 32769;
 			}
 			case 2: {
-				return 1;
+				return 32769;
 			}
 			case 3: {
-				return 0;
+				return 32768;
 			}
 			case 4: {
-				return 7;
+				return 32775;
 			}
 			default: {
 				throw new ss.ArgumentOutOfRangeException('clef');
@@ -2273,7 +2285,7 @@
 	// AlphaTab.Rendering.Glyphs.DeadNoteHeadGlyph
 	var $AlphaTab_Rendering_Glyphs_DeadNoteHeadGlyph = function(x, y, isGrace) {
 		this.$_isGrace = false;
-		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), 24);
+		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), 32792);
 		this.$_isGrace = isGrace;
 	};
 	$AlphaTab_Rendering_Glyphs_DeadNoteHeadGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.DeadNoteHeadGlyph';
@@ -2282,7 +2294,7 @@
 	// AlphaTab.Rendering.Glyphs.DiamondNoteHeadGlyph
 	var $AlphaTab_Rendering_Glyphs_DiamondNoteHeadGlyph = function(x, y, isGrace) {
 		this.$_isGrace = false;
-		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), 25);
+		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), 32793);
 		this.$_isGrace = isGrace;
 	};
 	$AlphaTab_Rendering_Glyphs_DiamondNoteHeadGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.DiamondNoteHeadGlyph';
@@ -2298,34 +2310,34 @@
 	$AlphaTab_Rendering_Glyphs_DigitGlyph.$getSymbol = function(digit) {
 		switch (digit) {
 			case 0: {
-				return 8;
+				return 32776;
 			}
 			case 1: {
-				return 9;
+				return 32777;
 			}
 			case 2: {
-				return 10;
+				return 32778;
 			}
 			case 3: {
-				return 11;
+				return 32779;
 			}
 			case 4: {
-				return 12;
+				return 32780;
 			}
 			case 5: {
-				return 13;
+				return 32781;
 			}
 			case 6: {
-				return 14;
+				return 32782;
 			}
 			case 7: {
-				return 15;
+				return 32783;
 			}
 			case 8: {
-				return 16;
+				return 32784;
 			}
 			case 9: {
-				return 17;
+				return 32785;
 			}
 			default: {
 				return -1;
@@ -2337,7 +2349,7 @@
 	// AlphaTab.Rendering.Glyphs.DrumSticksGlyph
 	var $AlphaTab_Rendering_Glyphs_DrumSticksGlyph = function(x, y, isGrace) {
 		this.$_isGrace = false;
-		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), 28);
+		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), 32796);
 		this.$_isGrace = isGrace;
 	};
 	$AlphaTab_Rendering_Glyphs_DrumSticksGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.DrumSticksGlyph';
@@ -2369,7 +2381,7 @@
 	// AlphaTab.Rendering.Glyphs.FlatGlyph
 	var $AlphaTab_Rendering_Glyphs_FlatGlyph = function(x, y, isGrace) {
 		this.$_isGrace = false;
-		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), 69);
+		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), 32837);
 		this.$_isGrace = isGrace;
 	};
 	$AlphaTab_Rendering_Glyphs_FlatGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.FlatGlyph';
@@ -2399,7 +2411,7 @@
 	// AlphaTab.Rendering.Glyphs.HiHatGlyph
 	var $AlphaTab_Rendering_Glyphs_HiHatGlyph = function(x, y, isGrace) {
 		this.$_isGrace = false;
-		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), 27);
+		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), 32795);
 		this.$_isGrace = isGrace;
 	};
 	$AlphaTab_Rendering_Glyphs_HiHatGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.HiHatGlyph';
@@ -2456,7 +2468,7 @@
 	// AlphaTab.Rendering.Glyphs.NaturalizeGlyph
 	var $AlphaTab_Rendering_Glyphs_NaturalizeGlyph = function(x, y, isGrace) {
 		this.$_isGrace = false;
-		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), 70);
+		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), 32838);
 		this.$_isGrace = isGrace;
 	};
 	$AlphaTab_Rendering_Glyphs_NaturalizeGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.NaturalizeGlyph';
@@ -2474,13 +2486,13 @@
 	$AlphaTab_Rendering_Glyphs_NoteHeadGlyph.$getSymbol = function(duration) {
 		switch (duration) {
 			case 1: {
-				return 21;
+				return 32789;
 			}
 			case 2: {
-				return 23;
+				return 32791;
 			}
 			default: {
-				return 22;
+				return 32790;
 			}
 		}
 	};
@@ -2526,10 +2538,10 @@
 	$AlphaTab_Rendering_Glyphs_PickStrokeGlyph.$getSymbol = function(pickStroke) {
 		switch (pickStroke) {
 			case 1: {
-				return 58;
+				return 32826;
 			}
 			case 2: {
-				return 57;
+				return 32825;
 			}
 			default: {
 				return -1;
@@ -2576,22 +2588,22 @@
 		switch (duration) {
 			case 1:
 			case 2: {
-				return 20;
+				return 32788;
 			}
 			case 4: {
-				return 3;
+				return 32771;
 			}
 			case 8: {
-				return 19;
+				return 32787;
 			}
 			case 16: {
-				return 18;
+				return 32786;
 			}
 			case 32: {
-				return 2;
+				return 32770;
 			}
 			case 64: {
-				return 72;
+				return 32840;
 			}
 			default: {
 				throw new ss.ArgumentOutOfRangeException('duration');
@@ -2603,7 +2615,7 @@
 	// AlphaTab.Rendering.Glyphs.RideCymbalGlyph
 	var $AlphaTab_Rendering_Glyphs_RideCymbalGlyph = function(x, y, isGrace) {
 		this.$_isGrace = false;
-		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), 26);
+		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), 32794);
 		this.$_isGrace = isGrace;
 	};
 	$AlphaTab_Rendering_Glyphs_RideCymbalGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.RideCymbalGlyph';
@@ -2696,7 +2708,7 @@
 	// AlphaTab.Rendering.Glyphs.SharpGlyph
 	var $AlphaTab_Rendering_Glyphs_SharpGlyph = function(x, y, isGrace) {
 		this.$_isGrace = false;
-		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), 68);
+		$AlphaTab_Rendering_Glyphs_MusicFontGlyph.call(this, x, y, (isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1), 32836);
 		this.$_isGrace = isGrace;
 	};
 	$AlphaTab_Rendering_Glyphs_SharpGlyph.__typeName = 'AlphaTab.Rendering.Glyphs.SharpGlyph';
@@ -2902,13 +2914,13 @@
 	$AlphaTab_Rendering_Glyphs_TremoloPickingGlyph.$getSymbol = function(duration) {
 		switch (duration) {
 			case 32: {
-				return 59;
+				return 32827;
 			}
 			case 16: {
-				return 60;
+				return 32828;
 			}
 			case 8: {
-				return 61;
+				return 32829;
 			}
 			default: {
 				return -1;
@@ -4091,9 +4103,11 @@
 			// build track data first
 			var trackData = new $AlphaTab_IO_MemoryStream();
 			var current = this.firstEvent;
+			var count = 0;
 			while (ss.isValue(current)) {
 				current.writeTo(trackData);
 				current = current.nextEvent;
+				count++;
 			}
 			// magic number "MTrk" (0x4D54726B)
 			var b = new Uint8Array([77, 84, 114, 107]);
@@ -8395,10 +8409,16 @@
 		}
 	});
 	ss.initInterface($AlphaTab_Platform_IPathCanvas, $asm, { beginPath: null, closePath: null, fill: null, stroke: null, moveTo: null, lineTo: null, bezierCurveTo: null, quadraticCurveTo: null });
-	ss.initInterface($AlphaTab_Platform_ICanvas, $asm, { get_width: null, set_width: null, get_height: null, set_height: null, get_color: null, set_color: null, get_lineWidth: null, set_lineWidth: null, clear: null, fillRect: null, strokeRect: null, fillCircle: null, get_font: null, set_font: null, get_textAlign: null, set_textAlign: null, get_textBaseline: null, set_textBaseline: null, fillText: null, measureText: null, fillMusicFontSymbol: null }, [$AlphaTab_Platform_IPathCanvas]);
+	ss.initInterface($AlphaTab_Platform_ICanvas, $asm, { get_width: null, set_width: null, get_height: null, set_height: null, get_resources: null, set_resources: null, get_color: null, set_color: null, get_lineWidth: null, set_lineWidth: null, clear: null, fillRect: null, strokeRect: null, fillCircle: null, get_font: null, set_font: null, get_textAlign: null, set_textAlign: null, get_textBaseline: null, set_textBaseline: null, fillText: null, measureText: null, fillMusicFontSymbol: null }, [$AlphaTab_Platform_IPathCanvas]);
 	ss.initInterface($AlphaTab_Platform_IFileLoader, $asm, { loadBinary: null, loadBinaryAsync: null });
 	ss.initClass($AlphaTab_Platform_Std, $asm, {});
 	ss.initClass($AlphaTab_Platform_JavaScript_Html5Canvas, $asm, {
+		get_resources: function() {
+			return this.$1$ResourcesField;
+		},
+		set_resources: function(value) {
+			this.$1$ResourcesField = value;
+		},
 		get_width: function() {
 			return this.$_canvas.width;
 		},
@@ -8760,6 +8780,12 @@
 		set_textBaseline: function(value) {
 			this.$1$TextBaselineField = value;
 		},
+		get_resources: function() {
+			return this.$1$ResourcesField;
+		},
+		set_resources: function(value) {
+			this.$1$ResourcesField = value;
+		},
 		toSvg: function(includeWrapper, className) {
 			var buf = new $AlphaTab_Collections_StringBuilder();
 			if (includeWrapper) {
@@ -8979,8 +9005,25 @@
 			if (symbol === -1) {
 				return;
 			}
-			var glyph = new $AlphaTab_Rendering_Utils_SvgRenderer($AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.get_item(symbol), scale, scale);
-			glyph.paint(x, y, this);
+			this.$_buffer += '<text x="';
+			this.$_buffer += x;
+			this.$_buffer += '" y="';
+			this.$_buffer += y + this.$getSvgBaseLineOffset();
+			this.$_buffer += '" style="font:';
+			this.$_buffer += this.get_resources().musicFont.toCssString();
+			this.$_buffer += '; fill:';
+			this.$_buffer += this.get_color().toRgbaString();
+			this.$_buffer += ';" ';
+			this.$_buffer += ' dominant-baseline="top" text-anchor="start"';
+			this.$_buffer += '">&#x';
+			this.$_buffer += $AlphaTab_Platform_Std.toHexString(symbol);
+			this.$_buffer += ';</text>\n';
+			//if (symbol == MusicFontSymbol.None)
+			//{
+			//    return;
+			//}
+			//SvgRenderer glyph = new SvgRenderer(MusicFont.SymbolLookup[symbol], scale, scale);
+			//glyph.Paint(x, y, this);
 		}
 	}, null, [$AlphaTab_Platform_IPathCanvas, $AlphaTab_Platform_ICanvas]);
 	ss.initClass($AlphaTab_Rendering_BarRendererBase, $asm, {
@@ -9584,8 +9627,10 @@
 	ss.initClass($AlphaTab_Rendering_RenderingResources, $asm, {
 		init: function(scale) {
 			this.scale = scale;
+			var musicFont = 'alphaTab';
 			var sansFont = 'Arial';
 			var serifFont = 'Georgia';
+			this.musicFont = new $AlphaTab_Platform_Model_Font(musicFont, 11 * scale, 0);
 			this.effectFont = new $AlphaTab_Platform_Model_Font(serifFont, 12 * scale, 2);
 			this.copyrightFont = new $AlphaTab_Platform_Model_Font(sansFont, 12 * scale, 1);
 			this.titleFont = new $AlphaTab_Platform_Model_Font(serifFont, 32 * scale, 0);
@@ -10433,6 +10478,7 @@
 				this.renderingResources.init(this.settings.scale);
 				this.canvas.set_lineWidth(this.settings.scale);
 			}
+			this.canvas.set_resources(this.renderingResources);
 			this.$recreateLayout();
 			this.canvas.clear();
 			this.$doLayout();
@@ -11413,17 +11459,17 @@
 			}
 		},
 		get_$p: function() {
-			var p = new $AlphaTab_Rendering_Glyphs_MusicFontGlyph(0, 0, $AlphaTab_Rendering_Glyphs_DynamicsGlyph.$glyphScale, 50);
+			var p = new $AlphaTab_Rendering_Glyphs_MusicFontGlyph(0, 0, $AlphaTab_Rendering_Glyphs_DynamicsGlyph.$glyphScale, 32818);
 			p.width = ss.Int32.trunc(7 * this.get_scale());
 			return p;
 		},
 		get_$m: function() {
-			var m = new $AlphaTab_Rendering_Glyphs_MusicFontGlyph(0, 0, $AlphaTab_Rendering_Glyphs_DynamicsGlyph.$glyphScale, 52);
+			var m = new $AlphaTab_Rendering_Glyphs_MusicFontGlyph(0, 0, $AlphaTab_Rendering_Glyphs_DynamicsGlyph.$glyphScale, 32820);
 			m.width = ss.Int32.trunc(7 * this.get_scale());
 			return m;
 		},
 		get_$f: function() {
-			var f = new $AlphaTab_Rendering_Glyphs_MusicFontGlyph(0, 0, $AlphaTab_Rendering_Glyphs_DynamicsGlyph.$glyphScale, 51);
+			var f = new $AlphaTab_Rendering_Glyphs_MusicFontGlyph(0, 0, $AlphaTab_Rendering_Glyphs_DynamicsGlyph.$glyphScale, 32819);
 			f.width = ss.Int32.trunc(7 * this.get_scale());
 			return f;
 		}
@@ -11669,7 +11715,7 @@
 		}
 	}, $AlphaTab_Rendering_Glyphs_EffectGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_MusicFont, $asm, {});
-	ss.initEnum($AlphaTab_Rendering_Glyphs_MusicFontSymbol, $asm, { none: -1, clefF: 0, clefC: 1, restThirtySecond: 2, restQuarter: 3, graceUp: 4, graceDown: 5, trill: 6, clefG: 7, num0: 8, num1: 9, num2: 10, num3: 11, num4: 12, num5: 13, num6: 14, num7: 15, num8: 16, num9: 17, restSixteenth: 18, restEighth: 19, restWhole: 20, noteWhole: 21, noteQuarter: 22, noteHalf: 23, noteDead: 24, noteHarmonic: 25, noteRideCymbal: 26, noteHiHat: 27, noteSideStick: 28, noteHiHatHalf: 29, noteChineseCymbal: 30, footerUpEighth: 31, footerUpSixteenth: 32, footerUpThirtySecond: 33, footerUpSixtyFourth: 34, footerDownEighth: 35, footerDownSixteenth: 36, footerDownThirtySecond: 37, footerDownSixtyFourth: 38, simileMark: 39, simileMark2: 40, coda: 41, segno: 42, ottavaAbove: 43, ottavaBelow: 44, quindicesimaAbove: 45, quindicesimaBelow: 46, fermataShort: 47, fermataNormal: 48, fermataLong: 49, dynamicP: 50, dynamicF: 51, dynamicM: 52, accentuation: 53, heavyAccentuation: 54, waveHorizontal: 55, waveVertical: 56, pickStrokeDown: 57, pickStrokeUp: 58, tremoloPickingThirtySecond: 59, tremoloPickingSixteenth: 60, tremoloPickingEighth: 61, upperMordent: 62, lowerMordent: 63, turn: 64, openNote: 65, stoppedNote: 66, tempo: 67, accidentalSharp: 68, accidentalFlat: 69, accidentalNatural: 70, clefNeutral: 71, restSixtyFourth: 72, accidentalDoubleFlat: 73, accidentalDoubleSharp: 74 });
+	ss.initEnum($AlphaTab_Rendering_Glyphs_MusicFontSymbol, $asm, { none: -1, clefF: 32768, clefC: 32769, restThirtySecond: 32770, restQuarter: 32771, graceUp: 32772, graceDown: 32773, trill: 32774, clefG: 32775, num0: 32776, num1: 32777, num2: 32778, num3: 32779, num4: 32780, num5: 32781, num6: 32782, num7: 32783, num8: 32784, num9: 32785, restSixteenth: 32786, restEighth: 32787, restWhole: 32788, noteWhole: 32789, noteQuarter: 32790, noteHalf: 32791, noteDead: 32792, noteHarmonic: 32793, noteRideCymbal: 32794, noteHiHat: 32795, noteSideStick: 32796, noteHiHatHalf: 32797, noteChineseCymbal: 32798, footerUpEighth: 32799, footerUpSixteenth: 32800, footerUpThirtySecond: 32801, footerUpSixtyFourth: 32802, footerDownEighth: 32803, footerDownSixteenth: 32804, footerDownThirtySecond: 32805, footerDownSixtyFourth: 32806, simileMark: 32807, simileMark2: 32808, coda: 32809, segno: 32810, ottavaAbove: 32811, ottavaBelow: 32812, quindicesimaAbove: 32813, quindicesimaBelow: 32814, fermataShort: 32815, fermataNormal: 32816, fermataLong: 32817, dynamicP: 32818, dynamicF: 32819, dynamicM: 32820, accentuation: 32821, heavyAccentuation: 32822, waveHorizontal: 32823, waveVertical: 32824, pickStrokeDown: 32825, pickStrokeUp: 32826, tremoloPickingThirtySecond: 32827, tremoloPickingSixteenth: 32828, tremoloPickingEighth: 32829, upperMordent: 32830, lowerMordent: 32831, turn: 32832, openNote: 32833, stoppedNote: 32834, tempo: 32835, accidentalSharp: 32836, accidentalFlat: 32837, accidentalNatural: 32838, clefNeutral: 32839, restSixtyFourth: 32840, accidentalDoubleFlat: 32841, accidentalDoubleSharp: 32842 });
 	ss.initClass($AlphaTab_Rendering_Glyphs_NaturalizeGlyph, $asm, {
 		doLayout: function() {
 			this.width = ss.Int32.trunc(8 * (this.$_isGrace ? $AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale : 1) * this.get_scale());
@@ -12083,7 +12129,7 @@
 					var size = ss.Int32.trunc(15 * this.get_scale());
 					var steps = ss.Int32.trunc(Math.abs(endY - startY) / size);
 					for (var i = 0; i < steps; i++) {
-						canvas.fillMusicFontSymbol(cx + this.x + ss.Int32.trunc(3 * this.get_scale()), 1, startY + i * size, 56);
+						canvas.fillMusicFontSymbol(cx + this.x + ss.Int32.trunc(3 * this.get_scale()), 1, startY + i * size, 32824);
 					}
 				}
 				if (this.$_beat.brushType === 3) {
@@ -12574,7 +12620,7 @@
 					var size = ss.Int32.trunc(15 * this.get_scale());
 					var steps = ss.Int32.trunc(Math.abs(endY - startY) / size);
 					for (var i = 0; i < steps; i++) {
-						canvas.fillMusicFontSymbol(cx + this.x + ss.Int32.trunc(3 * this.get_scale()), 1, startY + i * size, 56);
+						canvas.fillMusicFontSymbol(cx + this.x + ss.Int32.trunc(3 * this.get_scale()), 1, startY + i * size, 32824);
 					}
 				}
 				if (this.$_beat.brushType === 1 || this.$_beat.brushType === 3) {
@@ -12808,7 +12854,7 @@
 		paint: function(cx, cy, canvas) {
 			var res = this.renderer.get_resources();
 			canvas.set_font(res.markerFont);
-			canvas.fillMusicFontSymbol(cx + this.x, cy + this.y, 1, 67);
+			canvas.fillMusicFontSymbol(cx + this.x, cy + this.y, 1, 32835);
 			canvas.fillText('' + this.$_tempo, cx + this.x + 30 * this.get_scale(), cy + this.x + 7 * this.get_scale());
 		}
 	}, $AlphaTab_Rendering_Glyphs_EffectGlyph);
@@ -12857,7 +12903,7 @@
 			var loops = ss.Int32.trunc(Math.max(1, (endX - startX) / step));
 			var loopX = ss.Int32.trunc(startX);
 			for (var i = 0; i < loops; i++) {
-				canvas.fillMusicFontSymbol(cx + this.x + loopX, cy + this.y, this.$_scale, 55);
+				canvas.fillMusicFontSymbol(cx + this.x + loopX, cy + this.y, this.$_scale, 32823);
 				loopX += ss.Int32.trunc(step);
 			}
 		}
@@ -12868,7 +12914,7 @@
 			var loops = ss.Int32.trunc(Math.max(1, this.width / step));
 			var loopX = 0;
 			for (var i = 0; i < loops; i++) {
-				canvas.fillMusicFontSymbol(cx + this.x + loopX, cy + this.y, this.$_scale, 55);
+				canvas.fillMusicFontSymbol(cx + this.x + loopX, cy + this.y, this.$_scale, 32823);
 				loopX += ss.Int32.trunc(step);
 			}
 		}
@@ -14285,81 +14331,81 @@
 	$AlphaTab_Rendering_Glyphs_MusicFont.accidentalDoubleSharp = new $AlphaTab_Rendering_Glyphs_LazySvg('M 22 243c -32 -31 -48 -68 -48 -110c 0 -38 15 -71 45 -98c 30 -27 63 -40 98 -40c 38 0 70 14 96 43c 64 57 116 124 158 199c 41 75 62 146 62 213c -83 0 -172 -30 -268 -91C 99 317 51 278 22 243zM 18 872c 25 25 59 38 100 38c 38 0 70 -14 96 -43c 44 -38 86 -86 124 -144c 64 -96 96 -187 96 -273c -70 0 -140 18 -211 55c -70 36 -137 87 -201 151c -32 31 -48 70 -48 115C -26 810 -11 843 18 872zM 848 32c -25 -25 -60 -38 -105 -38c -41 0 -76 16 -105 48c -57 67 -94 113 -110 139c -60 96 -91 185 -91 268c 92 0 182 -28 268 -86c 79 -67 124 -105 134 -115c 31 -31 48 -72 48 -120C 886 96 874 64 848 32zM 838 656c 31 31 48 70 48 115c 0 38 -14 72 -43 100s -62 43 -100 43c -38 0 -73 -16 -105 -48c -51 -57 -88 -105 -110 -144c -60 -96 -91 -187 -91 -273c 105 0 211 41 316 124C 803 622 832 650 838 656');
 	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup = null;
 	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup = new (ss.makeGenericType(ss.Dictionary$2, [$AlphaTab_Rendering_Glyphs_MusicFontSymbol, $AlphaTab_Rendering_Glyphs_LazySvg]))();
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(0, $AlphaTab_Rendering_Glyphs_MusicFont.clefF);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(1, $AlphaTab_Rendering_Glyphs_MusicFont.clefC);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(2, $AlphaTab_Rendering_Glyphs_MusicFont.restThirtySecond);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(3, $AlphaTab_Rendering_Glyphs_MusicFont.restQuarter);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(4, $AlphaTab_Rendering_Glyphs_MusicFont.graceUp);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(5, $AlphaTab_Rendering_Glyphs_MusicFont.graceDown);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(6, $AlphaTab_Rendering_Glyphs_MusicFont.trill);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(7, $AlphaTab_Rendering_Glyphs_MusicFont.clefG);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(8, $AlphaTab_Rendering_Glyphs_MusicFont.num0);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(9, $AlphaTab_Rendering_Glyphs_MusicFont.num1);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(10, $AlphaTab_Rendering_Glyphs_MusicFont.num2);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(11, $AlphaTab_Rendering_Glyphs_MusicFont.num3);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(12, $AlphaTab_Rendering_Glyphs_MusicFont.num4);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(13, $AlphaTab_Rendering_Glyphs_MusicFont.num5);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(14, $AlphaTab_Rendering_Glyphs_MusicFont.num6);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(15, $AlphaTab_Rendering_Glyphs_MusicFont.num7);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(16, $AlphaTab_Rendering_Glyphs_MusicFont.num8);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(17, $AlphaTab_Rendering_Glyphs_MusicFont.num9);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(18, $AlphaTab_Rendering_Glyphs_MusicFont.restSixteenth);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(19, $AlphaTab_Rendering_Glyphs_MusicFont.restEighth);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(20, $AlphaTab_Rendering_Glyphs_MusicFont.restWhole);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(21, $AlphaTab_Rendering_Glyphs_MusicFont.noteWhole);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(22, $AlphaTab_Rendering_Glyphs_MusicFont.noteQuarter);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(23, $AlphaTab_Rendering_Glyphs_MusicFont.noteHalf);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(24, $AlphaTab_Rendering_Glyphs_MusicFont.noteDead);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(25, $AlphaTab_Rendering_Glyphs_MusicFont.noteHarmonic);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(26, $AlphaTab_Rendering_Glyphs_MusicFont.noteRideCymbal);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(27, $AlphaTab_Rendering_Glyphs_MusicFont.noteHiHat);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(28, $AlphaTab_Rendering_Glyphs_MusicFont.noteSideStick);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(29, $AlphaTab_Rendering_Glyphs_MusicFont.noteHiHatHalf);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(30, $AlphaTab_Rendering_Glyphs_MusicFont.noteChineseCymbal);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(31, $AlphaTab_Rendering_Glyphs_MusicFont.footerUpEighth);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32, $AlphaTab_Rendering_Glyphs_MusicFont.footerUpSixteenth);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(33, $AlphaTab_Rendering_Glyphs_MusicFont.footerUpThirtySecond);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(34, $AlphaTab_Rendering_Glyphs_MusicFont.footerUpSixtyFourth);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(35, $AlphaTab_Rendering_Glyphs_MusicFont.footerDownEighth);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(36, $AlphaTab_Rendering_Glyphs_MusicFont.footerDownSixteenth);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(37, $AlphaTab_Rendering_Glyphs_MusicFont.footerDownThirtySecond);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(38, $AlphaTab_Rendering_Glyphs_MusicFont.footerDownSixtyFourth);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(39, $AlphaTab_Rendering_Glyphs_MusicFont.simileMark);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(40, $AlphaTab_Rendering_Glyphs_MusicFont.simileMark2);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(41, $AlphaTab_Rendering_Glyphs_MusicFont.coda);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(42, $AlphaTab_Rendering_Glyphs_MusicFont.segno);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(43, $AlphaTab_Rendering_Glyphs_MusicFont.ottavaAbove);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(44, $AlphaTab_Rendering_Glyphs_MusicFont.ottavaBelow);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(45, $AlphaTab_Rendering_Glyphs_MusicFont.quindicesimaAbove);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(46, $AlphaTab_Rendering_Glyphs_MusicFont.quindicesimaBelow);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(47, $AlphaTab_Rendering_Glyphs_MusicFont.fermataShort);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(48, $AlphaTab_Rendering_Glyphs_MusicFont.fermataNormal);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(49, $AlphaTab_Rendering_Glyphs_MusicFont.fermataLong);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(50, $AlphaTab_Rendering_Glyphs_MusicFont.dynamicP);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(51, $AlphaTab_Rendering_Glyphs_MusicFont.dynamicF);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(52, $AlphaTab_Rendering_Glyphs_MusicFont.dynamicM);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(53, $AlphaTab_Rendering_Glyphs_MusicFont.accentuation);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(54, $AlphaTab_Rendering_Glyphs_MusicFont.heavyAccentuation);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(55, $AlphaTab_Rendering_Glyphs_MusicFont.waveHorizontal);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(56, $AlphaTab_Rendering_Glyphs_MusicFont.waveVertical);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(57, $AlphaTab_Rendering_Glyphs_MusicFont.pickStrokeDown);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(58, $AlphaTab_Rendering_Glyphs_MusicFont.pickStrokeUp);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(59, $AlphaTab_Rendering_Glyphs_MusicFont.tremoloPickingThirtySecond);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(60, $AlphaTab_Rendering_Glyphs_MusicFont.tremoloPickingSixteenth);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(61, $AlphaTab_Rendering_Glyphs_MusicFont.tremoloPickingEighth);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(62, $AlphaTab_Rendering_Glyphs_MusicFont.upperMordent);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(63, $AlphaTab_Rendering_Glyphs_MusicFont.lowerMordent);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(64, $AlphaTab_Rendering_Glyphs_MusicFont.turn);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(65, $AlphaTab_Rendering_Glyphs_MusicFont.openNote);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(66, $AlphaTab_Rendering_Glyphs_MusicFont.stoppedNote);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(67, $AlphaTab_Rendering_Glyphs_MusicFont.tempo);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(68, $AlphaTab_Rendering_Glyphs_MusicFont.accidentalSharp);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(69, $AlphaTab_Rendering_Glyphs_MusicFont.accidentalFlat);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(70, $AlphaTab_Rendering_Glyphs_MusicFont.accidentalNatural);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(71, $AlphaTab_Rendering_Glyphs_MusicFont.clefNeutral);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(72, $AlphaTab_Rendering_Glyphs_MusicFont.restSixtyFourth);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(73, $AlphaTab_Rendering_Glyphs_MusicFont.accidentalDoubleFlat);
-	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(74, $AlphaTab_Rendering_Glyphs_MusicFont.accidentalDoubleSharp);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32768, $AlphaTab_Rendering_Glyphs_MusicFont.clefF);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32769, $AlphaTab_Rendering_Glyphs_MusicFont.clefC);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32770, $AlphaTab_Rendering_Glyphs_MusicFont.restThirtySecond);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32771, $AlphaTab_Rendering_Glyphs_MusicFont.restQuarter);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32772, $AlphaTab_Rendering_Glyphs_MusicFont.graceUp);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32773, $AlphaTab_Rendering_Glyphs_MusicFont.graceDown);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32774, $AlphaTab_Rendering_Glyphs_MusicFont.trill);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32775, $AlphaTab_Rendering_Glyphs_MusicFont.clefG);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32776, $AlphaTab_Rendering_Glyphs_MusicFont.num0);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32777, $AlphaTab_Rendering_Glyphs_MusicFont.num1);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32778, $AlphaTab_Rendering_Glyphs_MusicFont.num2);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32779, $AlphaTab_Rendering_Glyphs_MusicFont.num3);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32780, $AlphaTab_Rendering_Glyphs_MusicFont.num4);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32781, $AlphaTab_Rendering_Glyphs_MusicFont.num5);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32782, $AlphaTab_Rendering_Glyphs_MusicFont.num6);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32783, $AlphaTab_Rendering_Glyphs_MusicFont.num7);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32784, $AlphaTab_Rendering_Glyphs_MusicFont.num8);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32785, $AlphaTab_Rendering_Glyphs_MusicFont.num9);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32786, $AlphaTab_Rendering_Glyphs_MusicFont.restSixteenth);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32787, $AlphaTab_Rendering_Glyphs_MusicFont.restEighth);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32788, $AlphaTab_Rendering_Glyphs_MusicFont.restWhole);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32789, $AlphaTab_Rendering_Glyphs_MusicFont.noteWhole);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32790, $AlphaTab_Rendering_Glyphs_MusicFont.noteQuarter);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32791, $AlphaTab_Rendering_Glyphs_MusicFont.noteHalf);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32792, $AlphaTab_Rendering_Glyphs_MusicFont.noteDead);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32793, $AlphaTab_Rendering_Glyphs_MusicFont.noteHarmonic);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32794, $AlphaTab_Rendering_Glyphs_MusicFont.noteRideCymbal);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32795, $AlphaTab_Rendering_Glyphs_MusicFont.noteHiHat);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32796, $AlphaTab_Rendering_Glyphs_MusicFont.noteSideStick);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32797, $AlphaTab_Rendering_Glyphs_MusicFont.noteHiHatHalf);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32798, $AlphaTab_Rendering_Glyphs_MusicFont.noteChineseCymbal);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32799, $AlphaTab_Rendering_Glyphs_MusicFont.footerUpEighth);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32800, $AlphaTab_Rendering_Glyphs_MusicFont.footerUpSixteenth);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32801, $AlphaTab_Rendering_Glyphs_MusicFont.footerUpThirtySecond);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32802, $AlphaTab_Rendering_Glyphs_MusicFont.footerUpSixtyFourth);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32803, $AlphaTab_Rendering_Glyphs_MusicFont.footerDownEighth);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32804, $AlphaTab_Rendering_Glyphs_MusicFont.footerDownSixteenth);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32805, $AlphaTab_Rendering_Glyphs_MusicFont.footerDownThirtySecond);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32806, $AlphaTab_Rendering_Glyphs_MusicFont.footerDownSixtyFourth);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32807, $AlphaTab_Rendering_Glyphs_MusicFont.simileMark);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32808, $AlphaTab_Rendering_Glyphs_MusicFont.simileMark2);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32809, $AlphaTab_Rendering_Glyphs_MusicFont.coda);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32810, $AlphaTab_Rendering_Glyphs_MusicFont.segno);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32811, $AlphaTab_Rendering_Glyphs_MusicFont.ottavaAbove);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32812, $AlphaTab_Rendering_Glyphs_MusicFont.ottavaBelow);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32813, $AlphaTab_Rendering_Glyphs_MusicFont.quindicesimaAbove);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32814, $AlphaTab_Rendering_Glyphs_MusicFont.quindicesimaBelow);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32815, $AlphaTab_Rendering_Glyphs_MusicFont.fermataShort);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32816, $AlphaTab_Rendering_Glyphs_MusicFont.fermataNormal);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32817, $AlphaTab_Rendering_Glyphs_MusicFont.fermataLong);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32818, $AlphaTab_Rendering_Glyphs_MusicFont.dynamicP);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32819, $AlphaTab_Rendering_Glyphs_MusicFont.dynamicF);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32820, $AlphaTab_Rendering_Glyphs_MusicFont.dynamicM);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32821, $AlphaTab_Rendering_Glyphs_MusicFont.accentuation);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32822, $AlphaTab_Rendering_Glyphs_MusicFont.heavyAccentuation);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32823, $AlphaTab_Rendering_Glyphs_MusicFont.waveHorizontal);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32824, $AlphaTab_Rendering_Glyphs_MusicFont.waveVertical);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32825, $AlphaTab_Rendering_Glyphs_MusicFont.pickStrokeDown);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32826, $AlphaTab_Rendering_Glyphs_MusicFont.pickStrokeUp);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32827, $AlphaTab_Rendering_Glyphs_MusicFont.tremoloPickingThirtySecond);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32828, $AlphaTab_Rendering_Glyphs_MusicFont.tremoloPickingSixteenth);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32829, $AlphaTab_Rendering_Glyphs_MusicFont.tremoloPickingEighth);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32830, $AlphaTab_Rendering_Glyphs_MusicFont.upperMordent);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32831, $AlphaTab_Rendering_Glyphs_MusicFont.lowerMordent);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32832, $AlphaTab_Rendering_Glyphs_MusicFont.turn);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32833, $AlphaTab_Rendering_Glyphs_MusicFont.openNote);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32834, $AlphaTab_Rendering_Glyphs_MusicFont.stoppedNote);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32835, $AlphaTab_Rendering_Glyphs_MusicFont.tempo);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32836, $AlphaTab_Rendering_Glyphs_MusicFont.accidentalSharp);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32837, $AlphaTab_Rendering_Glyphs_MusicFont.accidentalFlat);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32838, $AlphaTab_Rendering_Glyphs_MusicFont.accidentalNatural);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32839, $AlphaTab_Rendering_Glyphs_MusicFont.clefNeutral);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32840, $AlphaTab_Rendering_Glyphs_MusicFont.restSixtyFourth);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32841, $AlphaTab_Rendering_Glyphs_MusicFont.accidentalDoubleFlat);
+	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32842, $AlphaTab_Rendering_Glyphs_MusicFont.accidentalDoubleSharp);
 	$AlphaTab_Model_Tuning.tuningRegex = new RegExp('([a-g]b?)([0-9])', 'i');
 	$AlphaTab_Model_Tuning.$_sevenStrings = null;
 	$AlphaTab_Model_Tuning.$_sixStrings = null;

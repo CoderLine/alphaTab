@@ -66,7 +66,7 @@ namespace AlphaTab.Platform
         [InlineCode("String.fromCharCode({c})")]
         public static string StringFromCharCode(int c)
         {
-            return ((char) c).ToString();
+            return ((char)c).ToString();
         }
 
         public static void Foreach<T>(IEnumerable<T> e, Action<T> c)
@@ -103,6 +103,18 @@ namespace AlphaTab.Platform
         public static bool IsWhiteSpace(int c)
         {
             return c == 0x20 || c == 0x0B || c == 0x0D || c == 0x0A;
+        }
+
+        public static string ToHexString(int n)
+        {
+            var s = "";
+            const string hexChars = "0123456789ABCDEF";
+            do
+            {
+                s = StringFromCharCode((int)hexChars[(n & 15)]) + s;
+                n >>= 4;
+            } while (n > 0);
+            return s;
         }
     }
 }

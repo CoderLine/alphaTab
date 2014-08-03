@@ -1,11 +1,12 @@
 @font-face {
 	font-family: 'alphaTab';
-	src:url('font/alphaTab.eot');
-	src: url('font/alphaTab.eot?#iefix') format('embedded-opentype'),
-		url('font/alphaTab.woff') format('woff'),
-        url('font/alphaTab.ttf') format('truetype'),
-        url('font/alphaTab.svg#alphaTab') format('svg')
-    ;
+	src: url('Font/alphaTab.woff') format('woff');
+	/*src:url('Font/alphaTab.eot');
+	src: url('Font/alphaTab.eot?#iefix') format('embedded-opentype'),
+		url('Font/alphaTab.woff') format('woff'),
+        url('Font/alphaTab.ttf') format('truetype'),
+        url('Font/alphaTab.svg#alphaTab') format('svg')
+    ;*/
 	font-weight: normal;
 	font-style: normal;
 }

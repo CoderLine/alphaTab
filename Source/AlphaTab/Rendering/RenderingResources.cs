@@ -9,6 +9,8 @@ namespace AlphaTab.Rendering
     public class RenderingResources
     {
         [IntrinsicProperty]
+        public Font MusicFont { get; set; }
+        [IntrinsicProperty]
         public Font CopyrightFont { get; set; }
         [IntrinsicProperty]
         public Font TitleFont { get; set; }
@@ -57,9 +59,12 @@ namespace AlphaTab.Rendering
         { 
             Scale = scale;
         
+            const string musicFont = "alphaTab";
             const string sansFont = "Arial";
             const string serifFont = "Georgia";
         
+            MusicFont = new Font(musicFont, 11 * scale);
+
             EffectFont = new Font(serifFont, 12 * scale, FontStyle.Italic);
             CopyrightFont = new Font(sansFont, 12 * scale, FontStyle.Bold);
         

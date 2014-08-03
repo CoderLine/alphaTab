@@ -1,4 +1,5 @@
-﻿using AlphaTab.Rendering.Glyphs;
+﻿using AlphaTab.Rendering;
+using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Rendering.Utils;
 #if CSharp
 using System;
@@ -38,6 +39,8 @@ namespace AlphaTab.Platform.CSharp
         private SolidBrush _brush;
         private Pen _pen;
         private GdiColor _color;
+
+        public RenderingResources Resources { get; set; }
 
         public int Width
         {
