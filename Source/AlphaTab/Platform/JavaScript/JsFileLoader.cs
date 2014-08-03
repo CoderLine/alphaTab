@@ -161,8 +161,8 @@ namespace AlphaTab.Platform.JavaScript
                         }
                     }
                 };
-                xhr.ResponseType = XmlHttpRequestResponseType.Arraybuffer;
                 xhr.Open("GET", path, true);
+                xhr.ResponseType = XmlHttpRequestResponseType.Arraybuffer;
                 xhr.Send();
             }
         }

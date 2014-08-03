@@ -1224,7 +1224,7 @@
             </ul>
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "P:AlphaTab.LayoutSettings.AdditionalSettings" -->
+        <!-- Ungültiger XML-Kommentar wurde für den Member "P:AlphaTab.LayoutSettings.AdditionalSettings" ignoriert -->
         <member name="P:AlphaTab.StaveSettings.Id">
             <summary>
             The stave identifier.

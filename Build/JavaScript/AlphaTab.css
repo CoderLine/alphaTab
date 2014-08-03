@@ -1,6 +1,7 @@
 @font-face {
 	font-family: 'alphaTab';
-	src: url('Font/alphaTab.woff') format('woff');
+	src: url('Font/alphaTab.svg#alphaTab') format('svg'),
+        url('Font/alphaTab.woff') format('woff');
 	/*src:url('Font/alphaTab.eot');
 	src: url('Font/alphaTab.eot?#iefix') format('embedded-opentype'),
 		url('Font/alphaTab.woff') format('woff'),

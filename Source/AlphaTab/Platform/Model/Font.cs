@@ -62,7 +62,7 @@ namespace AlphaTab.Platform.Model
             }
 
             buf.Append(Size);
-            buf.Append("px");
+            buf.Append("px ");
             buf.Append("'");
             buf.Append(Family);
             buf.Append("'");

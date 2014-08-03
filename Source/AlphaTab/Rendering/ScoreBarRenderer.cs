@@ -360,6 +360,7 @@ namespace AlphaTab.Rendering
                 if (direction == BeamDirection.Down)
                 {
                     barSpacing = -barSpacing;
+                    barSize = -barSize;
                 }
 
                 for (var barIndex = 0; barIndex < barCount; barIndex++)
@@ -424,8 +425,8 @@ namespace AlphaTab.Rendering
             canvas.BeginPath();
             canvas.MoveTo(x1, y1);
             canvas.LineTo(x2, y2);
-            canvas.LineTo(x2, y2 - size);
-            canvas.LineTo(x1, y1 - size);
+            canvas.LineTo(x2, y2 + size);
+            canvas.LineTo(x1, y1 + size);
             canvas.ClosePath();
             canvas.Fill();
         }

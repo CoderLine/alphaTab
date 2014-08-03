@@ -1911,8 +1911,8 @@
 		canvas.beginPath();
 		canvas.moveTo(x1, y1);
 		canvas.lineTo(x2, y2);
-		canvas.lineTo(x2, y2 - size);
-		canvas.lineTo(x1, y1 - size);
+		canvas.lineTo(x2, y2 + size);
+		canvas.lineTo(x1, y1 + size);
 		canvas.closePath();
 		canvas.fill();
 	};
@@ -8665,8 +8665,8 @@
 						}
 					}
 				});
-				xhr.responseType = 'arraybuffer';
 				xhr.open('GET', path, true);
+				xhr.responseType = 'arraybuffer';
 				xhr.send();
 			}
 		}
@@ -8725,7 +8725,7 @@
 				buf.append('italic ');
 			}
 			buf.append(this.get_size());
-			buf.append('px');
+			buf.append('px ');
 			buf.append("'");
 			buf.append(this.get_family());
 			buf.append("'");
@@ -9015,7 +9015,7 @@
 			this.$_buffer += this.get_color().toRgbaString();
 			this.$_buffer += ';" ';
 			this.$_buffer += ' dominant-baseline="top" text-anchor="start"';
-			this.$_buffer += '">&#x';
+			this.$_buffer += '>&#x';
 			this.$_buffer += $AlphaTab_Platform_Std.toHexString(symbol);
 			this.$_buffer += ';</text>\n';
 			//if (symbol == MusicFontSymbol.None)
@@ -10026,6 +10026,7 @@
 				var barStart = cy + this.y;
 				if (direction === 1) {
 					barSpacing = -barSpacing;
+					barSize = -barSize;
 				}
 				for (var barIndex = 0; barIndex < barCount; barIndex++) {
 					var barStartX;
