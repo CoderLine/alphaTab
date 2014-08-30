@@ -33,7 +33,7 @@ namespace AlphaTab.Platform.JavaScript
             {
                 tracksData = options.tracks;
             }
-            else if (element.Dataset["tracks"] != null)
+            else if (element.Dataset != null && element.Dataset["tracks"] != null)
             {
                 tracksData = element.Dataset["tracks"];
             }
@@ -69,8 +69,8 @@ namespace AlphaTab.Platform.JavaScript
             #region Renderer Setup
 
             Renderer = new ScoreRenderer(settings, _canvasElement);
-            Renderer.RenderFinished += () => _element.DispatchEvent(new Event("renderer"));
-            Renderer.PostRenderFinished += () => _element.DispatchEvent(new Event("post-rendered"));
+            Renderer.RenderFinished += () => TriggerEvent("rendered");
+            Renderer.PostRenderFinished += () => TriggerEvent("post-rendered");
             Renderer.RenderFinished += () =>
             {
                 if (Renderer.Canvas is SvgCanvas)
@@ -89,7 +89,7 @@ namespace AlphaTab.Platform.JavaScript
             {
                 Tex(contents);
             }
-            else if (!string.IsNullOrEmpty(_element.Dataset["file"]))
+            else if (_element.Dataset != null && !string.IsNullOrEmpty(_element.Dataset["file"]))
             {
                 Load(_element.Dataset["file"]);
             }
@@ -213,12 +213,20 @@ namespace AlphaTab.Platform.JavaScript
         public void ScoreLoaded(Score score)
         {
             Score = score;
-            _element.DispatchEvent(new CustomEvent("loaded", new CustomEventInit()
-            {
-                Detail = score
-            }));
-
+            TriggerEvent("loaded", score);
             Render();
+        }
+
+        private void TriggerEvent(string name, object details = null)
+        {
+            dynamic e = Document.CreateEvent("CustomEvent");
+            e.initCustomEvent(name, false, false, details);
+            _element.DispatchEvent(e);
+
+            //_element.DispatchEvent(new CustomEvent(name, new CustomEventInit()
+            //{
+            //    Detail = details
+            //}));
         }
 
         private void Render()

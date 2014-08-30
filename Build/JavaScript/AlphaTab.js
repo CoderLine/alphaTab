@@ -1614,7 +1614,7 @@
 		if (!!(ss.isValue(options) && options.tracks)) {
 			tracksData = options.tracks;
 		}
-		else if (ss.isValue(element.dataset['tracks'])) {
+		else if (ss.isValue(element.dataset) && ss.isValue(element.dataset['tracks'])) {
 			tracksData = element.dataset['tracks'];
 		}
 		else {
@@ -1634,10 +1634,10 @@
 		element.appendChild(this.$_canvasElement);
 		this.renderer = new $AlphaTab_Rendering_ScoreRenderer(settings, this.$_canvasElement);
 		this.renderer.add_renderFinished(ss.mkdel(this, function() {
-			this.$_element.dispatchEvent(new Event('renderer'));
+			this.$triggerEvent('rendered', null);
 		}));
 		this.renderer.add_postRenderFinished(ss.mkdel(this, function() {
-			this.$_element.dispatchEvent(new Event('post-rendered'));
+			this.$triggerEvent('post-rendered', null);
 		}));
 		this.renderer.add_renderFinished(ss.mkdel(this, function() {
 			if (ss.isInstanceOfType(this.renderer.canvas, $AlphaTab_Platform_Svg_SvgCanvas)) {
@@ -1649,7 +1649,7 @@
 		if (!ss.isNullOrEmptyString(contents)) {
 			this.tex(contents);
 		}
-		else if (!ss.isNullOrEmptyString(this.$_element.dataset['file'])) {
+		else if (ss.isValue(this.$_element.dataset) && !ss.isNullOrEmptyString(this.$_element.dataset['file'])) {
 			this.$load(this.$_element.dataset['file']);
 		}
 	};
@@ -8614,8 +8614,17 @@
 		},
 		scoreLoaded: function(score) {
 			this.score = score;
-			this.$_element.dispatchEvent(new CustomEvent('loaded', { detail: score }));
+			this.$triggerEvent('loaded', score);
 			this.$render();
+		},
+		$triggerEvent: function(name, details) {
+			var e = document.createEvent('CustomEvent');
+			e.initCustomEvent(name, false, false, details);
+			this.$_element.dispatchEvent(ss.cast(e, Event));
+			//_element.DispatchEvent(new CustomEvent(name, new CustomEventInit()
+			//{
+			//    Detail = details
+			//}));
 		},
 		$render: function() {
 			if (ss.isValue(this.renderer)) {
