@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Collections.TypedArrays;
+using System.Runtime.CompilerServices;
 
 namespace AlphaTab.IO
 {
@@ -19,6 +20,13 @@ namespace AlphaTab.IO
         public ByteArray(params byte[] data)
         {
         }
+
+        [InlineCode("new Uint8Array({data})")]
+        public ByteArray(ArrayBuffer data)
+        {
+        }
+
+
 
         public int Length
         {

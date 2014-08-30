@@ -62,9 +62,12 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets')" />
   <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets')" />
   <PropertyGroup>
-    <PostBuildEvent>uglifyjs "$(TargetDir)$(TargetName).js" -o "$(TargetDir)$(TargetName).min.js" -c
-xcopy "$(TargetDir)$(TargetName).js" "$(SolutionDir)Build\JavaScript" /s /i /y
-xcopy "$(TargetDir)$(TargetName).min.js" "$(SolutionDir)Build\JavaScript" /s /i /y</PostBuildEvent>
+    <PostBuildEvent>echo Copying JavaScript
+xcopy "$(TargetDir)$(TargetName).js" "$(SolutionDir)Build\JavaScript" /i /Y
+echo Minifying JavaScript
+uglifyjs "$(TargetDir)$(TargetName).js" -o "$(TargetDir)$(TargetName).min.js" -c
+echo Copying minimzed JavaScript
+xcopy "$(TargetDir)$(TargetName).min.js" "$(SolutionDir)Build\JavaScript" /i /Y</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

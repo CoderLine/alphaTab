@@ -16,309 +16,80 @@
  * License along with this library.
  */
 (function ($) {
-    var api = {};
 
-    function buildTracksArray(value, score) {
-        var tracks = [];
-
-        // custom array
-        if ($.isArray(value)) {
-            for (var i = 0; i < value.length; i++) {
-                if (value[i] >= 0 && value[i] < score.tracks.length)
-                    tracks.push(score.tracks[value[i]]);
+    var api = {
+        init: function(options) {
+            var $this = $(this);
+            var context = $this.data('alphaTab');
+            if (!context) {
+                var ctx = new AlphaTab.Platform.JavaScript.JsApi(this, options);
+                $this.data('alphaTab', ctx);
             }
-        }
-            // single value
-        else if ($.isNumeric(value) && value >= 0 && value < score.tracks.length) {
-            tracks.push(score.tracks[value]);
-        }
-            // all tracks
-        else if ($.isNumeric(value) && value == -1) {
-            for (var i = 0; i < score.tracks.length; i++) {
-                tracks.push(score.tracks[i]);
+        }, 
+        
+        tex: function(contents) {
+            var context = $(this).data('alphaTab');
+            if (!context) { console.error('alphaTab not initialized!'); }
+            context.tex(contents);
+        },
+        
+        tracks: function(tracks) {
+            var context = $(this).data('alphaTab');
+            if (!context) { console.error('alphaTab not initialized!'); }
+            if(tracks) {
+                context.setTracks(tracks, true);
             }
-        }
-            // default
-        else {
-            tracks.push(score.tracks[0]);
-        }
-        return tracks;
-    }
-
-    function scoreLoaded(context, score) {
-        try {
-            if (context.trigger) context.trigger('loaded', score);
-            else if (context.element) $(context.element).trigger('loaded', score);
-            context.renderer.renderMultiple(buildTracksArray(context.settings.tracks, score));
-        }
-        catch (e) {
-            console.error(e);
-        }
-    }
-
-    /*
-     * alphaTab initialization
-     */
-    function init(options) {
-        return this.each(function () {
-            // check for reinitialize
-            var $this = $(this),
-                data = $this.data('alphaTab');
-            if (!data) {
-                //
-                // Settings
-                var context = {};
-                context.element = this;
-
-                context.settings = AlphaTab.Settings.fromJson(options);
-                if (options && options.tracks) context.settings.tracks = options.tracks;
-                else if ($this.data('tracks')) {
-                    try {
-                        var data = $this.data('tracks');
-                        if ($.isArray(data)) {
-                            context.settings.tracks = data;
-                        }
-                        else {
-                            context.settings.tracks = parseInt(data);
-                        }
-                    }
-                    catch (e) {
-                        context.settings.tracks = 0;
-                    }
-                }
-                else {
-                    context.settings.tracks = 0;
-                }
-
-                var contents = $.trim($this.text());
-                $this.html('');
-
-                //
-                // Create context elements (wrapper, canvas etc)
-                if (context.settings.engine == "html5") {
-                    // HACK: call createElement('canvas') once before. this ensures that the browser knows the element
-                    document.createElement('canvas');
-                    context.canvas = $(document.createElement('canvas'));
-                    $(context.canvas).attr("width", context.settings.width)
-                     .attr("height", context.settings.height)
-                     .addClass("alphaTabSurface");
-                    $this.append(context.canvas);
-                    context.canvas = context.canvas[0];
-
-                    var ie = AlphaTab.Platform.JavaScript.JsFileLoader.getIEVersion();
-                    if (ie >= 0 && ie < 9) {
-                        var fixElement_ = function (el) {
-                            // in IE before version 5.5 we would need to add HTML: to the tag name
-                            // but we do not care about IE before version 6
-                            var outerHTML = el.outerHTML;
-
-                            var newEl = el.ownerDocument.createElement(outerHTML);
-                            // if the tag is still open IE has created the children as siblings and
-                            // it has also created a tag with the name "/FOO"
-                            if (outerHTML.slice(-2) != "/>") {
-                                var tagName = "/" + el.tagName;
-                                var ns;
-                                // remove content
-                                while ((ns = el.nextSibling) && ns.tagName != tagName) {
-                                    ns.removeNode();
-                                }
-                                // remove the incorrect closing tag
-                                if (ns) {
-                                    ns.removeNode();
-                                }
-                            }
-                            el.parentNode.replaceChild(newEl, el);
-                            return newEl;
-                        };
-
-                        context.canvas = G_vmlCanvasManager.initElement(fixElement_(context.canvas));
-                    }
-                }
-                else {
-                    context.canvas = $('<div class="alphaTabSurface notranslate"></div>');
-                    $this.append(context.canvas);
-                }
-
-
-
-                //
-                // Renderer setup
-                context.renderer = new AlphaTab.Rendering.ScoreRenderer(context.settings, context.canvas);
-                context.renderer.add_renderFinished(function () {
-                    $this.trigger('rendered');
-                });
-                context.renderer.add_postRenderFinished(function () {
-                    $this.trigger('post-rendered');
-                });
-                // in case of SVG we hook into the renderer to create the svg element after rendering
-                context.renderer.add_renderFinished(function () {
-                    var canvas = context.renderer.canvas;
-                    if (canvas.toSvg) {
-                        context.canvas[0].innerHTML = canvas.toSvg(true, "alphaTabSurfaceSvg");
-                        context.canvas.width(canvas.get_width());
-                        context.canvas.height(canvas.get_height());
-                    }
-
-                });
-
-                $this.data('alphaTab', context);
-
-                //
-                // Load default data
-                if (contents != "") {
-                    api.tex.apply(this, [contents]);
-                }
-                else if ($this.data('file') != '' && $this.data('file') != null) {
-                    AlphaTab.Importer.ScoreLoader.loadScoreAsync($this.data('file'),
-                    function (score) {
-                        scoreLoaded(context, score);
-                    },
-                    function (error) {
-                        console.error(error);
-                    });
-                }
+            else {
+                return context.get_tracks();
             }
-        });
-    }
-
-    /*
-     * Open alphaTab file
-     * @param {String|ArrayBuffer} data the url to load the data via ajax or the ArrayBuffer storing the data
-     */
-    function load(data) {
-        var context = $(this).data('alphaTab');
-        if (!context) { console.error('alphaTab not initialized!'); }
-        if (data.constructor == ArrayBuffer) {
-            try {
-                var score = AlphaTab.Importer.ScoreLoader.loadScoreFromBytes(new Uint8Array(data));
-                scoreLoaded(context, score);
+        },
+        
+        score: function() {
+            var context = $(this).data('alphaTab');
+            if (!context) { console.error('alphaTab not initialized!'); }
+            if(tracks) {
+                context.scoreLoaded(score);
             }
-            catch (e) {
-                console.error(e);
+            else {
+                return context.score;
             }
+        },
+        
+        renderer: function(e) {
+            var context = $(this).data('alphaTab');
+            if (!context) { console.error('alphaTab not initialized!'); }
+            return context.renderer;
         }
-        if (data.constructor == Uint8Array) {
-            try {
-                var score = AlphaTab.Importer.ScoreLoader.loadScoreFromBytes(data);
-                scoreLoaded(context, score);
-            }
-            catch (e) {
-                console.error(e);
-            }
-        }
-        else if (typeof (data) == 'string') {
-            AlphaTab.Importer.ScoreLoader.loadScoreAsync(url,
-            function (score) {
-                scoreLoaded(context, score);
-            },
-            function (error) {
-                console.error(error);
-            });
-        }
-    }
-
-    /**
-     * Load alphaTex source
-     * @param {String} content the alphaTex source code to load
-     * @param {Function} success the callback function to call after successful track display
-     * @param {Function} error the callback function to call after any error during loading or rendering
-     */
-    function tex(content, success, error) {
-        var context = $(this).data('alphaTab');
-        if (!context) { console.error('alphaTab not initialized!'); }
-
-        var score = null;
-        try {
-            var parser = new AlphaTab.Importer.AlphaTexImporter();
-            var data = new AlphaTab.IO.StringStream(content);
-            parser.init(data);
-            score = parser.readScore();
-        }
-        catch (e) {
-            console.error(e);
-        }
-
-        if (score != null) {
-            a
-            scoreLoaded(context, score);
-        }
-    }
-
-    /**
-     * Switches the displayed track of the currently loaded song
-     * @param {Number} track the index of the track to display
-     */
-    function tracks(tracks) {
-        var context = $(this).data('alphaTab');
-        if (tracks) {
-            if (context.renderer.tracks == null || context.renderer.tracks.length == 0)
-                return;
-
-            var score = context.renderer.tracks[0].score;
-            var realTracks = buildTracksArray(tracks, score);
-
-            try {
-                context.renderer.renderMultiple(realTracks);
-            }
-            catch (e) {
-                if (e instanceof Error) throw e;
-                else console.error(e);
-            }
-        }
-        else {
-            return context.renderer.tracks;
-        }
-    }
-
-    /**
-     * Get the currently loaded score
-     */
-    function score() {
-        var context = $(this).data('alphaTab');
-        if (context.renderer.tracks == null || context.renderer.tracks.length == 0)
-            return null;
-        return context.renderer.tracks[0].score;
-    }
-
-    /**
-     * Get the ScoreRenderer used for display
-     */
-    function renderer() {
-        var context = $(this).data('alphaTab');
-        return context.renderer;
-    }
-
-    // expose API
-    api.init = init;
-    api.load = load;
-    api.tex = tex;
-    api.tracks = tracks;
-    api.score = score;
-    api.renderer = renderer;
-
-    $.fn.alphaTab = function (method) {
+    };
+        
+    var apiExec = function(method, args) {
+        method = method || 'init';
         if (api[method]) {
-            return api[method].apply(this, Array.prototype.slice.call(arguments, 1));
-        }
-        else if (typeof method === 'object' || !method) {
-            return api.init.apply(this, arguments);
+            return api[method].apply(this, args);
         }
         else {
             console.error('Method ' + method + ' does not exist on jQuery.alphaTab');
         }
     };
-    $.fn.alphaTab.fn = api;
-
-    $.alphaTab = {
-        restore: function (selector) {
-            $(selector).empty().removeData('alphaTab');
+       
+    $.fn.alphaTab = function (method) {        
+        // if only a single element is affected, we use this
+        if(this.length == 1) {
+            return apiExec.call(this[0], method, Array.prototype.slice.call(arguments, 1));
+        }
+        // if multiple elements are affected we provide chaining
+        else {
+            return this.each(function() {
+                apiExec.call(this, method, Array.prototype.slice.call(arguments, 1));
+            });
         }
     };
-
+    
+    // allow plugins to add methods
+    $.fn.alphaTab.fn = api;
+  
+    
 })(jQuery);
-
-
-
 
 /**
  * VB Loader For IE 

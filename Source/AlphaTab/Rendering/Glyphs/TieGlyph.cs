@@ -10,6 +10,7 @@ namespace AlphaTab.Rendering.Glyphs
         protected Note StartNote;
         protected Note EndNote;
         protected Glyph Parent;
+        protected int YOffset;
         private readonly bool _forEnd;
 
         public TieGlyph(Note startNote, Note endNote, Glyph parent, bool forEnd)
@@ -62,7 +63,7 @@ namespace AlphaTab.Rendering.Glyphs
                     startX = cx + startNoteRenderer.GetNoteX(StartNote);
                     endX = cx + parent.X + parent.PostNotes.X + parent.PostNotes.Width;
 
-                    startY = cy + startNoteRenderer.GetNoteY(StartNote) + (NoteHeadGlyph.NoteHeadHeight / 2);
+                    startY = cy + startNoteRenderer.GetNoteY(StartNote) + YOffset;
                     endY = startY;
                 }
                 else
@@ -70,8 +71,8 @@ namespace AlphaTab.Rendering.Glyphs
                     startX = cx + startNoteRenderer.GetNoteX(StartNote);
                     endX = cx + endNoteRenderer.GetNoteX(EndNote, false);
 
-                    startY = cy + startNoteRenderer.GetNoteY(StartNote) + (NoteHeadGlyph.NoteHeadHeight / 2);
-                    endY = cy + endNoteRenderer.GetNoteY(EndNote) + (NoteHeadGlyph.NoteHeadHeight / 2);
+                    startY = cy + startNoteRenderer.GetNoteY(StartNote) + YOffset;
+                    endY = cy + endNoteRenderer.GetNoteY(EndNote) + YOffset;
                 }
                 shouldDraw = true;
             }
@@ -82,7 +83,7 @@ namespace AlphaTab.Rendering.Glyphs
                 startX = cx;
                 endX = cx + startNoteRenderer.GetNoteX(EndNote);
 
-                startY = cy + startNoteRenderer.GetNoteY(EndNote) + (NoteHeadGlyph.NoteHeadHeight / 2);
+                startY = cy + startNoteRenderer.GetNoteY(EndNote) + YOffset;
                 endY = startY;
 
                 shouldDraw = true;

@@ -10,6 +10,12 @@ namespace AlphaTab.Rendering.Glyphs
         {
         }
 
+        public override void DoLayout()
+        {
+            base.DoLayout();
+            YOffset = (NoteHeadGlyph.NoteHeadHeight/2);
+        }
+
         protected override BeamDirection GetBeamDirection(Note note, BarRendererBase noteRenderer)
         {
             return ((ScoreBarRenderer)noteRenderer).GetBeatDirection(note.Beat);

@@ -1576,6 +1576,13 @@
 		} while (n > 0);
 		return s;
 	};
+	$AlphaTab_Platform_Std.stringToByteArray = function(contents) {
+		var byteArray = new Uint8Array(contents.length);
+		for (var i = 0; i < contents.length; i++) {
+			byteArray[i] = contents.charCodeAt(i);
+		}
+		return byteArray;
+	};
 	global.AlphaTab.Platform.Std = $AlphaTab_Platform_Std;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Platform.JavaScript.Html5Canvas
@@ -1593,7 +1600,58 @@
 	global.AlphaTab.Platform.JavaScript.Html5Canvas = $AlphaTab_Platform_JavaScript_Html5Canvas;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Platform.JavaScript.JsApi
-	var $AlphaTab_Platform_JavaScript_JsApi = function() {
+	var $AlphaTab_Platform_JavaScript_JsApi = function(element, options) {
+		this.$_element = null;
+		this.$_canvasElement = null;
+		this.$_tracks = null;
+		this.renderer = null;
+		this.score = null;
+		this.$_element = element;
+		// load settings
+		var settings = ss.cast($AlphaTab_Settings.fromJson(options), $AlphaTab_Settings);
+		// get track data to parse
+		var tracksData;
+		if (!!(ss.isValue(options) && options.tracks)) {
+			tracksData = options.tracks;
+		}
+		else if (ss.isValue(element.dataset['tracks'])) {
+			tracksData = element.dataset['tracks'];
+		}
+		else {
+			tracksData = [0];
+		}
+		this.setTracks(tracksData, false);
+		// get load contents
+		var contents = element.textContent.trim();
+		element.innerHTML = '';
+		if (settings.engine === 'html5') {
+			this.$_canvasElement = document.createElement('canvas');
+		}
+		else {
+			this.$_canvasElement = document.createElement('div');
+		}
+		this.$_canvasElement.className = 'alphaTabSurface';
+		element.appendChild(this.$_canvasElement);
+		this.renderer = new $AlphaTab_Rendering_ScoreRenderer(settings, this.$_canvasElement);
+		this.renderer.add_renderFinished(ss.mkdel(this, function() {
+			this.$_element.dispatchEvent(new Event('renderer'));
+		}));
+		this.renderer.add_postRenderFinished(ss.mkdel(this, function() {
+			this.$_element.dispatchEvent(new Event('post-rendered'));
+		}));
+		this.renderer.add_renderFinished(ss.mkdel(this, function() {
+			if (ss.isInstanceOfType(this.renderer.canvas, $AlphaTab_Platform_Svg_SvgCanvas)) {
+				this.$_canvasElement.innerHTML = ss.cast(this.renderer.canvas, $AlphaTab_Platform_Svg_SvgCanvas).toSvg(true, 'alphaTabSurfaceSvg');
+				this.$_canvasElement.style.width = this.renderer.canvas.get_width() + 'px';
+				this.$_canvasElement.style.height = this.renderer.canvas.get_height() + 'px';
+			}
+		}));
+		if (!ss.isNullOrEmptyString(contents)) {
+			this.tex(contents);
+		}
+		else if (!ss.isNullOrEmptyString(this.$_element.dataset['file'])) {
+			this.$load(this.$_element.dataset['file']);
+		}
 	};
 	$AlphaTab_Platform_JavaScript_JsApi.__typeName = 'AlphaTab.Platform.JavaScript.JsApi';
 	global.AlphaTab.Platform.JavaScript.JsApi = $AlphaTab_Platform_JavaScript_JsApi;
@@ -2834,6 +2892,7 @@
 		this.startNote = null;
 		this.endNote = null;
 		this.parent = null;
+		this.yOffset = 0;
 		this.$_forEnd = false;
 		$AlphaTab_Rendering_Glyphs_Glyph.call(this, 0, 0);
 		this.startNote = startNote;
@@ -8476,7 +8535,94 @@
 			glyph.paint(x, y, this);
 		}
 	}, null, [$AlphaTab_Platform_IPathCanvas, $AlphaTab_Platform_ICanvas]);
-	ss.initClass($AlphaTab_Platform_JavaScript_JsApi, $asm, {});
+	ss.initClass($AlphaTab_Platform_JavaScript_JsApi, $asm, {
+		get_tracks: function() {
+			var tracks = [];
+			for (var $t1 = 0; $t1 < this.$_tracks.length; $t1++) {
+				var track = this.$_tracks[$t1];
+				if (track >= 0 && track < this.score.tracks.length) {
+					tracks.push(this.score.tracks[track]);
+				}
+			}
+			return tracks.slice(0);
+		},
+		$load: function(data) {
+			try {
+				if (ss.isInstanceOfType(data, ArrayBuffer)) {
+					this.scoreLoaded($AlphaTab_Importer_ScoreLoader.loadScoreFromBytes(new Uint8Array(ss.cast(data, ArrayBuffer))));
+				}
+				else if (ss.isInstanceOfType(data, Uint8Array)) {
+					// ReSharper disable once PossibleInvalidCastException
+					this.scoreLoaded($AlphaTab_Importer_ScoreLoader.loadScoreFromBytes(ss.cast(data, Uint8Array)));
+				}
+				else if (ss.isInstanceOfType(data, String)) {
+					$AlphaTab_Importer_ScoreLoader.loadScoreAsync(ss.cast(data, String), ss.mkdel(this, this.scoreLoaded), function($t1) {
+						console.error($t1);
+					});
+				}
+			}
+			catch ($t2) {
+				var e = ss.Exception.wrap($t2);
+				console.error(e);
+			}
+		},
+		tex: function(contents) {
+			try {
+				var parser = new $AlphaTab_Importer_AlphaTexImporter();
+				var data = new $AlphaTab_IO_ByteBuffer.$ctor1($AlphaTab_Platform_Std.stringToByteArray(contents));
+				parser.init(data);
+				this.scoreLoaded(parser.readScore());
+			}
+			catch ($t1) {
+				var e = ss.Exception.wrap($t1);
+				console.error(e);
+			}
+		},
+		setTracks: function(tracksData, render) {
+			var tracks = [];
+			// decode string
+			if (ss.isInstanceOfType(tracksData, String)) {
+				try {
+					tracksData = JSON.parse(ss.cast(tracksData, String));
+				}
+				catch ($t1) {
+					tracksData = [0];
+				}
+			}
+			// decode array
+			if (ss.isInstanceOfType(tracksData, ss.Int32)) {
+				tracks.push(ss.unbox(ss.cast(tracksData, ss.Int32)));
+			}
+			else if (!!tracksData.length) {
+				for (var i = 0; !!(i < tracksData.length); i++) {
+					var value;
+					if (ss.isInstanceOfType(tracksData[i], ss.Int32)) {
+						value = ss.unbox(ss.cast(tracksData[i], ss.Int32));
+					}
+					else {
+						value = ss.unbox(ss.cast($AlphaTab_Platform_Std.parseInt(ss.cast(tracksData[i].ToString(), String)), ss.Int32));
+					}
+					if (value >= 0) {
+						tracks.push(value);
+					}
+				}
+			}
+			this.$_tracks = tracks.slice(0);
+			if (render) {
+				this.$render();
+			}
+		},
+		scoreLoaded: function(score) {
+			this.score = score;
+			this.$_element.dispatchEvent(new CustomEvent('loaded', { detail: score }));
+			this.$render();
+		},
+		$render: function() {
+			if (ss.isValue(this.renderer)) {
+				this.renderer.renderMultiple(this.get_tracks());
+			}
+		}
+	});
 	ss.initClass($AlphaTab_Platform_JavaScript_JsFileLoader, $asm, {
 		loadBinary: function(path) {
 			var ie = $AlphaTab_Platform_JavaScript_JsFileLoader.getIEVersion();
@@ -12331,21 +12477,21 @@
 					// bar end if we have different bars
 					startX = cx + startNoteRenderer.getNoteX(this.startNote, true);
 					endX = cx + parent.x + parent.postNotes.x + parent.postNotes.width;
-					startY = cy + startNoteRenderer.getNoteY(this.startNote) + 4;
+					startY = cy + startNoteRenderer.getNoteY(this.startNote) + this.yOffset;
 					endY = startY;
 				}
 				else {
 					startX = cx + startNoteRenderer.getNoteX(this.startNote, true);
 					endX = cx + endNoteRenderer.getNoteX(this.endNote, false);
-					startY = cy + startNoteRenderer.getNoteY(this.startNote) + 4;
-					endY = cy + endNoteRenderer.getNoteY(this.endNote) + 4;
+					startY = cy + startNoteRenderer.getNoteY(this.startNote) + this.yOffset;
+					endY = cy + endNoteRenderer.getNoteY(this.endNote) + this.yOffset;
 				}
 				shouldDraw = true;
 			}
 			else if (!ss.referenceEquals(startNoteRenderer.stave, endNoteRenderer.stave)) {
 				startX = cx;
 				endX = cx + startNoteRenderer.getNoteX(this.endNote, true);
-				startY = cy + startNoteRenderer.getNoteY(this.endNote) + 4;
+				startY = cy + startNoteRenderer.getNoteY(this.endNote) + this.yOffset;
 				endY = startY;
 				shouldDraw = true;
 			}
@@ -12359,6 +12505,10 @@
 		}
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_ScoreTieGlyph, $asm, {
+		doLayout: function() {
+			$AlphaTab_Rendering_Glyphs_TieGlyph.prototype.doLayout.call(this);
+			this.yOffset = 4;
+		},
 		getBeamDirection: function(note, noteRenderer) {
 			return ss.cast(noteRenderer, $AlphaTab_Rendering_ScoreBarRenderer).getBeatDirection(note.beat);
 		}
