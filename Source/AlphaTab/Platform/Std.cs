@@ -6,88 +6,8 @@ using AlphaTab.IO;
 
 namespace AlphaTab.Platform
 {
-    public static class Std
+    public static partial class Std
     {
-        public static float ParseFloat(string s)
-        {
-            float f;
-#if CSharp
-            if (!Single.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out f))
-            {
-                f = Single.NaN;
-            }
-#elif JavaScript
-            double d = double.Parse(s);
-            if(double.IsNaN(d)) 
-            {
-                f = float.NaN;
-            }
-            else
-            {
-                f = (float)d;
-            }
-#endif
-            return f;
-        }
-
-        public static int ParseInt(string s)
-        {
-            int f;
-#if CSharp
-            if (!Int32.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out f))
-            {
-                f = 0;
-            }
-#elif JavaScript
-            if (!int.TryParse(s, out f))
-            {
-                f = 0;
-            }
-#endif
-            return f;
-        }
-
-
-        [InlineCode("{dst}.set({src}.subarray({srcOffset}, {srcOffset} + {count}), {dstOffset})")]
-        public static void BlockCopy(ByteArray src, int srcOffset, ByteArray dst, int dstOffset, int count)
-        {
-            Buffer.BlockCopy(src.Data, srcOffset, dst.Data, dstOffset, count);
-        }
-
-        public static bool IsNullOrWhiteSpace(this string s)
-        {
-#if CSharp
-            return String.IsNullOrWhiteSpace(s);
-#elif JavaScript
-            return s == null || s.Trim().Length == 0;
-#endif
-        }
-
-        [InlineCode("String.fromCharCode({c})")]
-        public static string StringFromCharCode(int c)
-        {
-            return ((char)c).ToString();
-        }
-
-        public static void Foreach<T>(IEnumerable<T> e, Action<T> c)
-        {
-#if CSharp
-            foreach (var t in e)
-            {
-                c(t);
-            }
-#elif JavaScript
-            JsForeach(e, c);
-#endif
-        }
-
-#if JavaScript
-        [InlineCode("for ( var t in {e} ) {c}({e}[t]);")]
-        private static void JsForeach<T>(IEnumerable<T> e, Action<T> c)
-        {
-        }
-#endif
-
         public static bool IsStringNumber(string s, bool allowSign = true)
         {
             if (s.Length == 0) return false;

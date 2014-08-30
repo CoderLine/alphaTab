@@ -2,6 +2,7 @@
 using AlphaTab.Collections;
 using AlphaTab.IO;
 using AlphaTab.Model;
+using AlphaTab.Platform;
 
 namespace AlphaTab.Audio.Generator
 {

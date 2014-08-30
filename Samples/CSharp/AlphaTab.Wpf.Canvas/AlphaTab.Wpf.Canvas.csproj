@@ -95,9 +95,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Source\AlphaTab\AlphaTab.csproj">
-      <Project>{C5C9CA45-D7BC-41F5-B9E1-97731858CE10}</Project>
-      <Name>AlphaTab</Name>
+    <ProjectReference Include="..\..\..\Source\AlphaTab.CSharp\AlphaTab.CSharp.csproj">
+      <Project>{aba04ebe-36b2-469d-a025-16ba6131818e}</Project>
+      <Name>AlphaTab.CSharp</Name>
     </ProjectReference>
     <ProjectReference Include="..\AlphaTab.Wpf.Share\AlphaTab.Wpf.Share.csproj">
       <Project>{0204D916-F0C3-41E2-9D81-B13D41D9F748}</Project>

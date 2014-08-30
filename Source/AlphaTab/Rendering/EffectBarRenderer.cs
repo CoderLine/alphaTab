@@ -222,7 +222,7 @@ namespace AlphaTab.Rendering
 #if MULTIVOICE_SUPPORT
             foreach (var v in Bar.Voices)
             {
-                _effectGlyphs.Add(new Dictionary<int, EffectGlyph>());
+                _effectGlyphs.Add(new FastDictionary<int, EffectGlyph>());
                 _uniqueEffectGlyphs.Add(new FastList<EffectGlyph>());
                 CreateVoiceGlyphs(v);
             }

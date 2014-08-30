@@ -58,21 +58,19 @@ namespace AlphaTab.Importer
             var importers = ScoreImporter.BuildImporters();
 
             Score score = null;
-            using (MemoryStream ms = new MemoryStream(data))
+            ByteBuffer bb = new ByteBuffer(data);
+            foreach (var importer in importers)
             {
-                foreach (var importer in importers)
+                bb.Reset();
+                try
                 {
-                    ms.Seek(0, SeekOrigin.Begin);
-                    try
-                    {
-                        importer.Init(ms);
-                        score = importer.ReadScore();
-                        break;
-                    }
-                    catch (UnsupportedFormatException)
-                    {
-                        // ignore unsupported format
-                    }
+                    importer.Init(bb);
+                    score = importer.ReadScore();
+                    break;
+                }
+                catch (UnsupportedFormatException)
+                {
+                    // ignore unsupported format
                 }
             }
 

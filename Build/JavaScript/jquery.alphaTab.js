@@ -135,7 +135,7 @@
                     }
                 }
                 else {
-                    context.canvas = $('<div class="alphaTabSurface"></div>');
+                    context.canvas = $('<div class="alphaTabSurface notranslate"></div>');
                     $this.append(context.canvas);
                 }
 

@@ -33,13 +33,13 @@ namespace AlphaTab.Audio.Model
             Message = message;
         }
 
-        public void WriteTo(Stream s)
+        public void WriteTo(IWriteable s)
         {
             WriteVariableInt(s, DeltaTicks);
             Message.WriteTo(s);
         }
 
-        private void WriteVariableInt(Stream s, int value)
+        private void WriteVariableInt(IWriteable s, int value)
         {
             var array = new ByteArray(4);
 

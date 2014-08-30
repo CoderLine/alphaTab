@@ -5,7 +5,6 @@
 	global.AlphaTab.Audio = global.AlphaTab.Audio || {};
 	global.AlphaTab.Audio.Generator = global.AlphaTab.Audio.Generator || {};
 	global.AlphaTab.Audio.Model = global.AlphaTab.Audio.Model || {};
-	global.AlphaTab.Collections = global.AlphaTab.Collections || {};
 	global.AlphaTab.Importer = global.AlphaTab.Importer || {};
 	global.AlphaTab.IO = global.AlphaTab.IO || {};
 	global.AlphaTab.Model = global.AlphaTab.Model || {};
@@ -19,12 +18,23 @@
 	global.AlphaTab.Rendering.Layout = global.AlphaTab.Rendering.Layout || {};
 	global.AlphaTab.Rendering.Staves = global.AlphaTab.Rendering.Staves || {};
 	global.AlphaTab.Rendering.Utils = global.AlphaTab.Rendering.Utils || {};
-	ss.initAssembly($asm, 'FastDictionary');
+	ss.initAssembly($asm, 'AlphaTab');
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Environment
 	var $AlphaTab_Environment = function() {
 	};
 	$AlphaTab_Environment.__typeName = 'AlphaTab.Environment';
+	$AlphaTab_Environment.$platformInit = function() {
+		$AlphaTab_Environment.renderEngines['default'] = function(d) {
+			return new $AlphaTab_Platform_Svg_SvgCanvas();
+		};
+		$AlphaTab_Environment.renderEngines['html5'] = function(d1) {
+			return new $AlphaTab_Platform_JavaScript_Html5Canvas(d1);
+		};
+		$AlphaTab_Environment.fileLoaders['default'] = function() {
+			return new $AlphaTab_Platform_JavaScript_JsFileLoader();
+		};
+	};
 	global.AlphaTab.Environment = $AlphaTab_Environment;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.LayoutSettings
@@ -51,6 +61,66 @@
 		this.staves = null;
 	};
 	$AlphaTab_Settings.__typeName = 'AlphaTab.Settings';
+	$AlphaTab_Settings.fromJson = function(json) {
+		if (ss.isInstanceOfType(json, $AlphaTab_Settings)) {
+			return ss.cast(json, $AlphaTab_Settings);
+		}
+		var settings = $AlphaTab_Settings.get_defaults();
+		if (!!!json) {
+			return settings;
+		}
+		if (!!('scale' in json)) {
+			settings.scale = ss.unbox(ss.cast(json.scale, Number));
+		}
+		if (!!('width' in json)) {
+			settings.width = ss.unbox(ss.cast(json.width, ss.Int32));
+		}
+		if (!!('height' in json)) {
+			settings.height = ss.unbox(ss.cast(json.height, ss.Int32));
+		}
+		if (!!('engine' in json)) {
+			settings.engine = ss.cast(json.engine, String);
+		}
+		if (!!('layout' in json)) {
+			if (ss.isInstanceOfType(json.layout, String)) {
+				settings.layout.mode = ss.cast(json.layout, String);
+			}
+			else {
+				if (!!json.layout.mode) {
+					settings.layout.mode = ss.cast(json.layout.mode, String);
+				}
+				if (!!json.layout.additionalSettings) {
+					var keys = ss.cast(Object.keys(json.layout.additionalSettings), Array);
+					for (var $t1 = 0; $t1 < keys.length; $t1++) {
+						var key = keys[$t1];
+						settings.layout.additionalSettings[key] = json.layout.additionalSettings[key];
+					}
+				}
+			}
+		}
+		if (!!('staves' in json)) {
+			settings.staves = [];
+			var keys1 = ss.cast(Object.keys(json.staves), Array);
+			for (var $t2 = 0; $t2 < keys1.length; $t2++) {
+				var key1 = keys1[$t2];
+				var val = json.staves[key1];
+				if (ss.isInstanceOfType(val, String)) {
+					settings.staves.push(new $AlphaTab_StaveSettings(ss.cast(val, String)));
+				}
+				else if (!!val.id) {
+					var staveSettings = new $AlphaTab_StaveSettings(ss.cast(val.id, String));
+					if (!!val.additionalSettings) {
+						var keys2 = ss.cast(Object.keys(val.additionalSettings), Array);
+						for (var $t3 = 0; $t3 < keys2.length; $t3++) {
+							var key2 = keys2[$t3];
+							staveSettings.additionalSettings[key2] = val.additionalSettings[key2];
+						}
+					}
+				}
+			}
+		}
+		return settings;
+	};
 	$AlphaTab_Settings.get_defaults = function() {
 		var settings = new $AlphaTab_Settings();
 		settings.scale = 1;
@@ -81,66 +151,6 @@
 		settings.staves.push(new $AlphaTab_StaveSettings('tab'));
 		settings.staves.push(new $AlphaTab_StaveSettings('pick-stroke'));
 		//settings.staves.Add(new StaveSettings("fingering"));
-		return settings;
-	};
-	$AlphaTab_Settings.fromJson = function(json) {
-		if (ss.isInstanceOfType(json, $AlphaTab_Settings)) {
-			return json;
-		}
-		var settings = $AlphaTab_Settings.get_defaults();
-		if (!json) {
-			return settings;
-		}
-		if (ss.unbox('scale' in json)) {
-			settings.scale = ss.unbox(json.scale);
-		}
-		if (ss.unbox('width' in json)) {
-			settings.width = ss.unbox(json.width);
-		}
-		if (ss.unbox('height' in json)) {
-			settings.height = ss.unbox(json.height);
-		}
-		if (ss.unbox('engine' in json)) {
-			settings.engine = json.engine;
-		}
-		if (ss.unbox('layout' in json)) {
-			if (ss.isInstanceOfType(json.layout, String)) {
-				settings.layout.mode = json.layout;
-			}
-			else {
-				if (ss.unbox(json.layout.mode)) {
-					settings.layout.mode = json.layout.mode;
-				}
-				if (ss.unbox(json.layout.additionalSettings)) {
-					var keys = Object.keys(json.layout.additionalSettings);
-					for (var $t1 = 0; $t1 < keys.length; $t1++) {
-						var key = keys[$t1];
-						settings.layout.additionalSettings[key] = json.layout.additionalSettings[key];
-					}
-				}
-			}
-		}
-		if (ss.unbox('staves' in json)) {
-			settings.staves = [];
-			var keys1 = Object.keys(json.staves);
-			for (var $t2 = 0; $t2 < keys1.length; $t2++) {
-				var key1 = keys1[$t2];
-				var val = json.staves[key1];
-				if (ss.isInstanceOfType(val, String)) {
-					settings.staves.push(new $AlphaTab_StaveSettings(val));
-				}
-				else if (ss.unbox(val.id)) {
-					var staveSettings = new $AlphaTab_StaveSettings(val.id);
-					if (ss.unbox(val.additionalSettings)) {
-						var keys2 = Object.keys(val.additionalSettings);
-						for (var $t3 = 0; $t3 < keys2.length; $t3++) {
-							var key2 = keys2[$t3];
-							staveSettings.additionalSettings[key2] = val.additionalSettings[key2];
-						}
-					}
-				}
-			}
-		}
 		return settings;
 	};
 	global.AlphaTab.Settings = $AlphaTab_Settings;
@@ -524,25 +534,6 @@
 	$AlphaTab_Audio_Model_MidiTrack.__typeName = 'AlphaTab.Audio.Model.MidiTrack';
 	global.AlphaTab.Audio.Model.MidiTrack = $AlphaTab_Audio_Model_MidiTrack;
 	////////////////////////////////////////////////////////////////////////////////
-	// AlphaTab.Collections.FastDictionaryExtensions
-	var $AlphaTab_Collections_FastDictionaryExtensions = function() {
-	};
-	$AlphaTab_Collections_FastDictionaryExtensions.__typeName = 'AlphaTab.Collections.FastDictionaryExtensions';
-	$AlphaTab_Collections_FastDictionaryExtensions.getValues = function(store) {
-		return Object.keys(store).map(function(k) {
-			return store[k];
-		});
-	};
-	global.AlphaTab.Collections.FastDictionaryExtensions = $AlphaTab_Collections_FastDictionaryExtensions;
-	////////////////////////////////////////////////////////////////////////////////
-	// AlphaTab.Collections.StringBuilder
-	var $AlphaTab_Collections_StringBuilder = function() {
-		this.$_sb = null;
-		this.$_sb = '';
-	};
-	$AlphaTab_Collections_StringBuilder.__typeName = 'AlphaTab.Collections.StringBuilder';
-	global.AlphaTab.Collections.StringBuilder = $AlphaTab_Collections_StringBuilder;
-	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Importer.AlphaTexException
 	var $AlphaTab_Importer_AlphaTexException = function(position, nonTerm, expected, symbol, symbolData) {
 		this.position = 0;
@@ -755,31 +746,22 @@
 	$AlphaTab_Importer_ScoreLoader.loadScoreFromBytes = function(data) {
 		var importers = $AlphaTab_Importer_ScoreImporter.buildImporters();
 		var score = null;
-		{
-			var ms = new $AlphaTab_IO_MemoryStream.$ctor1(data);
+		var bb = new $AlphaTab_IO_ByteBuffer.$ctor1(data);
+		for (var $t1 = 0; $t1 < importers.length; $t1++) {
+			var importer = importers[$t1];
+			bb.reset();
 			try {
-				for (var $t1 = 0; $t1 < importers.length; $t1++) {
-					var importer = importers[$t1];
-					ms.seek(0, 0);
-					try {
-						importer.init(ms);
-						score = importer.readScore();
-						break;
-					}
-					catch ($t2) {
-						$t2 = ss.Exception.wrap($t2);
-						if (ss.isInstanceOfType($t2, $AlphaTab_Importer_UnsupportedFormatException)) {
-							// ignore unsupported format
-						}
-						else {
-							throw $t2;
-						}
-					}
-				}
+				importer.init(bb);
+				score = importer.readScore();
+				break;
 			}
-			finally {
-				if (ss.isValue(ms)) {
-					ms.dispose();
+			catch ($t2) {
+				$t2 = ss.Exception.wrap($t2);
+				if (ss.isInstanceOfType($t2, $AlphaTab_Importer_UnsupportedFormatException)) {
+					// ignore unsupported format
+				}
+				else {
+					throw $t2;
 				}
 			}
 		}
@@ -797,89 +779,65 @@
 	$AlphaTab_Importer_UnsupportedFormatException.__typeName = 'AlphaTab.Importer.UnsupportedFormatException';
 	global.AlphaTab.Importer.UnsupportedFormatException = $AlphaTab_Importer_UnsupportedFormatException;
 	////////////////////////////////////////////////////////////////////////////////
-	// AlphaTab.IO.EndOfStreamException
-	var $AlphaTab_IO_$EndOfStreamException = function() {
+	// AlphaTab.IO.EndOfReaderException
+	var $AlphaTab_IO_$EndOfReaderException = function() {
 		ss.Exception.call(this);
 	};
-	$AlphaTab_IO_$EndOfStreamException.__typeName = 'AlphaTab.IO.$EndOfStreamException';
-	////////////////////////////////////////////////////////////////////////////////
-	// AlphaTab.IO.IOException
-	var $AlphaTab_IO_$IOException = function(message) {
-		ss.Exception.call(this, message);
-	};
-	$AlphaTab_IO_$IOException.__typeName = 'AlphaTab.IO.$IOException';
+	$AlphaTab_IO_$EndOfReaderException.__typeName = 'AlphaTab.IO.$EndOfReaderException';
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.IO.BitReader
 	var $AlphaTab_IO_BitReader = function(source) {
 		this.$_currentByte = 0;
 		this.$_position = 0;
-		this.$_readBytes = 0;
 		this.$_source = null;
 		this.$_source = source;
-		this.$_readBytes = 0;
 		this.$_position = $AlphaTab_IO_BitReader.$byteSize;
 		// to ensure a byte is read on beginning
 	};
 	$AlphaTab_IO_BitReader.__typeName = 'AlphaTab.IO.BitReader';
 	global.AlphaTab.IO.BitReader = $AlphaTab_IO_BitReader;
 	////////////////////////////////////////////////////////////////////////////////
+	// AlphaTab.IO.ByteBuffer
+	var $AlphaTab_IO_ByteBuffer = function() {
+		$AlphaTab_IO_ByteBuffer.$ctor2.call(this, 0);
+	};
+	$AlphaTab_IO_ByteBuffer.__typeName = 'AlphaTab.IO.ByteBuffer';
+	$AlphaTab_IO_ByteBuffer.$ctor2 = function(capacity) {
+		this.$_buffer = null;
+		this.$_position = 0;
+		this.$_length = 0;
+		this.$_capacity = 0;
+		this.$_buffer = new Uint8Array(capacity);
+		this.$_capacity = capacity;
+	};
+	$AlphaTab_IO_ByteBuffer.$ctor1 = function(buffer) {
+		this.$_buffer = null;
+		this.$_position = 0;
+		this.$_length = 0;
+		this.$_capacity = 0;
+		this.$_buffer = buffer;
+		this.$_length = this.$_capacity = buffer.length;
+	};
+	global.AlphaTab.IO.ByteBuffer = $AlphaTab_IO_ByteBuffer;
+	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.IO.FileLoadException
-	var $AlphaTab_IO_FileLoadException = function(s) {
-		ss.Exception.call(this, s);
+	var $AlphaTab_IO_FileLoadException = function(message) {
+		ss.Exception.call(this, message);
 	};
 	$AlphaTab_IO_FileLoadException.__typeName = 'AlphaTab.IO.FileLoadException';
 	global.AlphaTab.IO.FileLoadException = $AlphaTab_IO_FileLoadException;
 	////////////////////////////////////////////////////////////////////////////////
-	// AlphaTab.IO.MemoryStream
-	var $AlphaTab_IO_MemoryStream = function() {
-		$AlphaTab_IO_MemoryStream.$ctor2.call(this, 0);
+	// AlphaTab.IO.IReadable
+	var $AlphaTab_IO_IReadable = function() {
 	};
-	$AlphaTab_IO_MemoryStream.__typeName = 'AlphaTab.IO.MemoryStream';
-	$AlphaTab_IO_MemoryStream.$ctor2 = function(capacity) {
-		this.$_buffer = null;
-		this.$_position = 0;
-		this.$_length = 0;
-		this.$_capacity = 0;
-		$AlphaTab_IO_Stream.call(this);
-		this.$_buffer = new Uint8Array(capacity);
-		this.$_capacity = capacity;
-	};
-	$AlphaTab_IO_MemoryStream.$ctor1 = function(buffer) {
-		this.$_buffer = null;
-		this.$_position = 0;
-		this.$_length = 0;
-		this.$_capacity = 0;
-		$AlphaTab_IO_Stream.call(this);
-		this.$_buffer = buffer;
-		this.$_length = this.$_capacity = buffer.length;
-	};
-	global.AlphaTab.IO.MemoryStream = $AlphaTab_IO_MemoryStream;
+	$AlphaTab_IO_IReadable.__typeName = 'AlphaTab.IO.IReadable';
+	global.AlphaTab.IO.IReadable = $AlphaTab_IO_IReadable;
 	////////////////////////////////////////////////////////////////////////////////
-	// AlphaTab.IO.SeekOrigin
-	var $AlphaTab_IO_SeekOrigin = function() {
+	// AlphaTab.IO.IWriteable
+	var $AlphaTab_IO_IWriteable = function() {
 	};
-	$AlphaTab_IO_SeekOrigin.__typeName = 'AlphaTab.IO.SeekOrigin';
-	global.AlphaTab.IO.SeekOrigin = $AlphaTab_IO_SeekOrigin;
-	////////////////////////////////////////////////////////////////////////////////
-	// AlphaTab.IO.Stream
-	var $AlphaTab_IO_Stream = function() {
-	};
-	$AlphaTab_IO_Stream.__typeName = 'AlphaTab.IO.Stream';
-	global.AlphaTab.IO.Stream = $AlphaTab_IO_Stream;
-	////////////////////////////////////////////////////////////////////////////////
-	// AlphaTab.IO.StringStream
-	var $AlphaTab_IO_StringStream = function(s) {
-		$AlphaTab_IO_MemoryStream.$ctor1.call(this, $AlphaTab_IO_StringStream.$getBytes(s));
-	};
-	$AlphaTab_IO_StringStream.__typeName = 'AlphaTab.IO.StringStream';
-	$AlphaTab_IO_StringStream.$getBytes = function(s) {
-		var data = new Uint8Array(s.length);
-		for (var i = 0; i < s.length; i++) {
-			data[i] = s.charCodeAt(i);
-		}
-		return data;
-	};
-	global.AlphaTab.IO.StringStream = $AlphaTab_IO_StringStream;
+	$AlphaTab_IO_IWriteable.__typeName = 'AlphaTab.IO.IWriteable';
+	global.AlphaTab.IO.IWriteable = $AlphaTab_IO_IWriteable;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Model.AccentuationType
 	var $AlphaTab_Model_AccentuationType = function() {
@@ -1309,9 +1267,6 @@
 		this.tunings = this.tunings.concat(tuning);
 	};
 	$AlphaTab_Model_Tuning.__typeName = 'AlphaTab.Model.Tuning';
-	$AlphaTab_Model_Tuning.isTuning = function(name) {
-		return ss.isValue($AlphaTab_Model_Tuning.tuningRegex.exec(name));
-	};
 	$AlphaTab_Model_Tuning.getTextForTuning = function(tuning, includeOctave) {
 		var octave = ss.Int32.div(tuning, 12);
 		var note = tuning % 12;
@@ -1321,77 +1276,6 @@
 			result += octave;
 		}
 		return result;
-	};
-	$AlphaTab_Model_Tuning.getTuningForText = function(str) {
-		var b = 0;
-		var note = null;
-		var octave = 0;
-		var m = $AlphaTab_Model_Tuning.tuningRegex.exec(str.toLowerCase());
-		if (ss.isValue(m)) {
-			note = m[1];
-			octave = $AlphaTab_Platform_Std.parseInt(m[2]);
-		}
-		if (!$AlphaTab_Platform_Std.isNullOrWhiteSpace(note)) {
-			switch (note) {
-				case 'c': {
-					b = 0;
-					break;
-				}
-				case 'db': {
-					b = 1;
-					break;
-				}
-				case 'd': {
-					b = 2;
-					break;
-				}
-				case 'eb': {
-					b = 3;
-					break;
-				}
-				case 'e': {
-					b = 4;
-					break;
-				}
-				case 'f': {
-					b = 5;
-					break;
-				}
-				case 'gb': {
-					b = 6;
-					break;
-				}
-				case 'g': {
-					b = 7;
-					break;
-				}
-				case 'ab': {
-					b = 8;
-					break;
-				}
-				case 'a': {
-					b = 9;
-					break;
-				}
-				case 'bb': {
-					b = 10;
-					break;
-				}
-				case 'b': {
-					b = 11;
-					break;
-				}
-				default: {
-					return -1;
-				}
-			}
-			// add octaves
-			b += (octave + 1) * 12;
-		}
-		else {
-			return -1;
-		}
-		return b;
 	};
 	$AlphaTab_Model_Tuning.getDefaultTuningFor = function(stringCount) {
 		if (ss.isNullOrUndefined($AlphaTab_Model_Tuning.$_sevenStrings)) {
@@ -1501,6 +1385,86 @@
 	};
 	global.AlphaTab.Model.Tuning = $AlphaTab_Model_Tuning;
 	////////////////////////////////////////////////////////////////////////////////
+	// AlphaTab.Model.TuningParser
+	var $AlphaTab_Model_TuningParser = function() {
+	};
+	$AlphaTab_Model_TuningParser.__typeName = 'AlphaTab.Model.TuningParser';
+	$AlphaTab_Model_TuningParser.isTuning = function(name) {
+		return ss.isValue($AlphaTab_Model_TuningParser.tuningRegex.exec(name));
+	};
+	$AlphaTab_Model_TuningParser.getTuningForText = function(str) {
+		var b = 0;
+		var note = null;
+		var octave = 0;
+		var m = $AlphaTab_Model_TuningParser.tuningRegex.exec(str.toLowerCase());
+		if (ss.isValue(m)) {
+			note = m[1];
+			octave = $AlphaTab_Platform_Std.parseInt(m[2]);
+		}
+		if (!$AlphaTab_Platform_Std.isNullOrWhiteSpace(note)) {
+			switch (note) {
+				case 'c': {
+					b = 0;
+					break;
+				}
+				case 'db': {
+					b = 1;
+					break;
+				}
+				case 'd': {
+					b = 2;
+					break;
+				}
+				case 'eb': {
+					b = 3;
+					break;
+				}
+				case 'e': {
+					b = 4;
+					break;
+				}
+				case 'f': {
+					b = 5;
+					break;
+				}
+				case 'gb': {
+					b = 6;
+					break;
+				}
+				case 'g': {
+					b = 7;
+					break;
+				}
+				case 'ab': {
+					b = 8;
+					break;
+				}
+				case 'a': {
+					b = 9;
+					break;
+				}
+				case 'bb': {
+					b = 10;
+					break;
+				}
+				case 'b': {
+					b = 11;
+					break;
+				}
+				default: {
+					return -1;
+				}
+			}
+			// add octaves
+			b += (octave + 1) * 12;
+		}
+		else {
+			return -1;
+		}
+		return b;
+	};
+	global.AlphaTab.Model.TuningParser = $AlphaTab_Model_TuningParser;
+	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Model.VibratoType
 	var $AlphaTab_Model_VibratoType = function() {
 	};
@@ -1569,6 +1533,27 @@
 			}
 		};
 	};
+	$AlphaTab_Platform_Std.loadXml = function(xml) {
+		return ss.parseXml(xml);
+	};
+	$AlphaTab_Platform_Std.getNodeValue = function(n) {
+		if (n.nodeType === 1 || n.nodeType === 9) {
+			var txt = [];
+			for (var $t1 = 0; $t1 < n.childNodes.length; $t1++) {
+				var childNode = n.childNodes[$t1];
+				txt.push($AlphaTab_Platform_Std.getNodeValue(childNode));
+			}
+			return txt.join('').trim();
+		}
+		return n.nodeValue;
+	};
+	$AlphaTab_Platform_Std.readSignedByte = function(readable) {
+		var n = readable.readByte();
+		if (n >= 128) {
+			return n - 256;
+		}
+		return n;
+	};
 	$AlphaTab_Platform_Std.isStringNumber = function(s, allowSign) {
 		if (s.length === 0) {
 			return false;
@@ -1600,12 +1585,18 @@
 		this.$_color = null;
 		this.$_font = null;
 		this.$1$ResourcesField = null;
-		this.$_canvas = dom;
-		this.$_context = this.$_canvas.getContext('2d');
+		this.$_canvas = ss.cast(dom, ss.isValue(dom) && (ss.isInstanceOfType(dom, Element) && dom.tagName === 'CANVAS'));
+		this.$_context = ss.cast(this.$_canvas.getContext('2d'), CanvasRenderingContext2D);
 		this.$_context.textBaseline = 'top';
 	};
 	$AlphaTab_Platform_JavaScript_Html5Canvas.__typeName = 'AlphaTab.Platform.JavaScript.Html5Canvas';
 	global.AlphaTab.Platform.JavaScript.Html5Canvas = $AlphaTab_Platform_JavaScript_Html5Canvas;
+	////////////////////////////////////////////////////////////////////////////////
+	// AlphaTab.Platform.JavaScript.JsApi
+	var $AlphaTab_Platform_JavaScript_JsApi = function() {
+	};
+	$AlphaTab_Platform_JavaScript_JsApi.__typeName = 'AlphaTab.Platform.JavaScript.JsApi';
+	global.AlphaTab.Platform.JavaScript.JsApi = $AlphaTab_Platform_JavaScript_JsApi;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Platform.JavaScript.JsFileLoader
 	var $AlphaTab_Platform_JavaScript_JsFileLoader = function() {
@@ -3378,11 +3369,13 @@
 	global.AlphaTab.Rendering.Utils.TupletHelper = $AlphaTab_Rendering_Utils_TupletHelper;
 	ss.initClass($AlphaTab_Environment, $asm, {});
 	ss.initClass($AlphaTab_LayoutSettings, $asm, {
-		get: function(key, def) {
-			if (this.additionalSettings.hasOwnProperty(key)) {
-				return this.additionalSettings[key];
-			}
-			return def;
+		get: function(T) {
+			return function(key, def) {
+				if (this.additionalSettings.hasOwnProperty(key)) {
+					return ss.cast(this.additionalSettings[key], T);
+				}
+				return def;
+			};
 		}
 	});
 	ss.initClass($AlphaTab_Settings, $asm, {});
@@ -4101,7 +4094,7 @@
 		},
 		writeTo: function(s) {
 			// build track data first
-			var trackData = new $AlphaTab_IO_MemoryStream();
+			var trackData = new $AlphaTab_IO_ByteBuffer();
 			var current = this.firstEvent;
 			var count = 0;
 			while (ss.isValue(current)) {
@@ -4118,21 +4111,6 @@
 			b = new Uint8Array([l >> 24 & 255, l >> 16 & 255, l >> 8 & 255, l >> 0 & 255]);
 			s.write(b, 0, b.length);
 			s.write(data, 0, data.length);
-		}
-	});
-	ss.initClass($AlphaTab_Collections_FastDictionaryExtensions, $asm, {});
-	ss.initClass($AlphaTab_Collections_StringBuilder, $asm, {
-		append: function(s) {
-			this.$_sb += s;
-		},
-		appendChar: function(i) {
-			this.append(String.fromCharCode(i));
-		},
-		appendLine: function() {
-			this.append('\r\n');
-		},
-		toString: function() {
-			return this.$_sb;
 		}
 	});
 	ss.initClass($AlphaTab_Importer_AlphaTexException, $asm, {
@@ -4258,7 +4236,7 @@
 			}
 		},
 		$parseTuning: function(str) {
-			var tuning = $AlphaTab_Model_Tuning.getTuningForText(str);
+			var tuning = $AlphaTab_Model_TuningParser.getTuningForText(str);
 			if (tuning < 0) {
 				this.$error('tuning-value', 5, false);
 			}
@@ -4313,10 +4291,10 @@
 				}
 				else if (this.$_ch === 34 || this.$_ch === 39) {
 					this.$nextChar();
-					var s = new $AlphaTab_Collections_StringBuilder();
+					var s = [];
 					this.$_sy = 5;
 					while (this.$_ch !== 34 && this.$_ch !== 39 && this.$_ch !== 0) {
-						s.appendChar(this.$_ch);
+						s.push(String.fromCharCode(this.$_ch));
 						this.$nextChar();
 					}
 					this.$_syData = s;
@@ -4379,7 +4357,7 @@
 				}
 				else if ($AlphaTab_Importer_AlphaTexImporter.$isLetter(this.$_ch)) {
 					var name1 = this.$readName();
-					if ($AlphaTab_Model_Tuning.isTuning(name1)) {
+					if ($AlphaTab_Model_TuningParser.isTuning(name1)) {
 						this.$_sy = 6;
 						this.$_syData = name1.toLowerCase();
 					}
@@ -4398,20 +4376,20 @@
 			// allow - if negatives
 		},
 		$readName: function() {
-			var str = new $AlphaTab_Collections_StringBuilder();
+			var str = [];
 			do {
-				str.appendChar(this.$_ch);
+				str.push(String.fromCharCode(this.$_ch));
 				this.$nextChar();
 			} while ($AlphaTab_Importer_AlphaTexImporter.$isLetter(this.$_ch) || this.$isDigit(this.$_ch));
-			return str.toString();
+			return str.join('');
 		},
 		$readNumber: function() {
-			var str = new $AlphaTab_Collections_StringBuilder();
+			var str = [];
 			do {
-				str.appendChar(this.$_ch);
+				str.push(String.fromCharCode(this.$_ch));
 				this.$nextChar();
 			} while (this.$isDigit(this.$_ch));
-			return parseInt(str.toString());
+			return parseInt(str.join(''));
 		},
 		$score: function() {
 			this.$metaData();
@@ -4500,7 +4478,7 @@
 				else if (ss.equals(this.$_syData, 'tempo')) {
 					this.$newSy();
 					if (this.$_sy === 2) {
-						this.$_score.tempo = ss.unbox(this.$_syData);
+						this.$_score.tempo = ss.unbox(ss.cast(this.$_syData, ss.Int32));
 					}
 					else {
 						this.$error('tempo', 2, true);
@@ -4511,7 +4489,7 @@
 				else if (ss.equals(this.$_syData, 'capo')) {
 					this.$newSy();
 					if (this.$_sy === 2) {
-						this.$_track.capo = ss.unbox(this.$_syData);
+						this.$_track.capo = ss.unbox(ss.cast(this.$_syData, ss.Int32));
 					}
 					else {
 						this.$error('capo', 2, true);
@@ -4536,9 +4514,9 @@
 				else if (ss.equals(this.$_syData, 'instrument')) {
 					this.$newSy();
 					if (this.$_sy === 2) {
-						var instrument = ss.unbox(this.$_syData);
+						var instrument = ss.unbox(ss.cast(this.$_syData, ss.Int32));
 						if (instrument >= 0 && instrument <= 128) {
-							this.$_track.playbackInfo.program = ss.unbox(this.$_syData);
+							this.$_track.playbackInfo.program = ss.unbox(ss.cast(this.$_syData, ss.Int32));
 						}
 						else {
 							this.$error('instrument', 2, false);
@@ -4601,7 +4579,7 @@
 				if (this.$_sy !== 2) {
 					this.$error('duration', 2, true);
 				}
-				var duration = ss.unbox(this.$_syData);
+				var duration = ss.unbox(ss.cast(this.$_syData, ss.Int32));
 				switch (duration) {
 					case 1:
 					case 2:
@@ -4610,7 +4588,7 @@
 					case 16:
 					case 32:
 					case 64: {
-						this.$_currentDuration = this.$parseDuration(ss.unbox(this.$_syData));
+						this.$_currentDuration = this.$parseDuration(ss.unbox(ss.cast(this.$_syData, ss.Int32)));
 						break;
 					}
 					default: {
@@ -4648,7 +4626,7 @@
 				if (this.$_sy !== 2) {
 					this.$error('duration', 2, true);
 				}
-				var duration1 = ss.unbox(this.$_syData);
+				var duration1 = ss.unbox(ss.cast(this.$_syData, ss.Int32));
 				switch (duration1) {
 					case 1:
 					case 2:
@@ -4657,7 +4635,7 @@
 					case 16:
 					case 32:
 					case 64: {
-						this.$_currentDuration = this.$parseDuration(ss.unbox(this.$_syData));
+						this.$_currentDuration = this.$parseDuration(ss.unbox(ss.cast(this.$_syData, ss.Int32)));
 						break;
 					}
 					default: {
@@ -4679,7 +4657,7 @@
 					this.$error('multiplier', 2, true);
 				}
 				else {
-					beatRepeat = ss.unbox(this.$_syData);
+					beatRepeat = ss.unbox(ss.cast(this.$_syData, ss.Int32));
 				}
 				this.$newSy();
 			}
@@ -4751,7 +4729,7 @@
 					this.$error('tuplet', 2, true);
 					return false;
 				}
-				var tuplet = ss.unbox(this.$_syData);
+				var tuplet = ss.unbox(ss.cast(this.$_syData, ss.Int32));
 				switch (tuplet) {
 					case 3: {
 						beat.tupletDenominator = 3;
@@ -4811,7 +4789,7 @@
 						this.$error('tremolobar-effect', 2, true);
 						return false;
 					}
-					beat.whammyBarPoints.push(new $AlphaTab_Model_BendPoint(0, ss.unbox(this.$_syData)));
+					beat.whammyBarPoints.push(new $AlphaTab_Model_BendPoint(0, ss.unbox(ss.cast(this.$_syData, ss.Int32))));
 					this.$newSy();
 				}
 				while (beat.whammyBarPoints.length > 60) {
@@ -4842,7 +4820,7 @@
 			}
 			var isDead = this.$_syData.toString().toLowerCase() === 'x';
 			var isTie = this.$_syData.toString().toLowerCase() === '-';
-			var fret = ss.unbox(((isDead || isTie) ? 0 : this.$_syData));
+			var fret = ss.unbox(ss.cast(((isDead || isTie) ? 0 : this.$_syData), ss.Int32));
 			this.$newSy();
 			// Fret done
 			if (this.$_sy !== 4) {
@@ -4853,7 +4831,7 @@
 			if (this.$_sy !== 2) {
 				this.$error('note-string', 2, true);
 			}
-			var string = ss.unbox(this.$_syData);
+			var string = ss.unbox(ss.cast(this.$_syData, ss.Int32));
 			if (string < 1 || string > this.$_track.tuning.length) {
 				this.$error('note-string', 2, false);
 			}
@@ -4890,7 +4868,7 @@
 						if (this.$_sy !== 2) {
 							this.$error('bend-effect-value', 2, true);
 						}
-						var bendValue = ss.unbox(this.$_syData);
+						var bendValue = ss.unbox(ss.cast(this.$_syData, ss.Int32));
 						note.bendPoints.push(new $AlphaTab_Model_BendPoint(0, Math.abs(bendValue)));
 						this.$newSy();
 					}
@@ -4948,11 +4926,11 @@
 					if (this.$_sy !== 2) {
 						this.$error('trill-effect', 2, true);
 					}
-					var fret = ss.unbox(this.$_syData);
+					var fret = ss.unbox(ss.cast(this.$_syData, ss.Int32));
 					this.$newSy();
 					var duration = 16;
 					if (this.$_sy === 2) {
-						switch (ss.unbox(this.$_syData)) {
+						switch (ss.unbox(ss.cast(this.$_syData, ss.Int32))) {
 							case 16: {
 								duration = 16;
 								break;
@@ -4979,7 +4957,7 @@
 					this.$newSy();
 					var duration1 = 8;
 					if (this.$_sy === 2) {
-						switch (ss.unbox(this.$_syData)) {
+						switch (ss.unbox(ss.cast(this.$_syData, ss.Int32))) {
 							case 8: {
 								duration1 = 8;
 								break;
@@ -5089,12 +5067,12 @@
 					if (this.$_sy !== 2) {
 						this.$error('timesignature-numerator', 2, true);
 					}
-					master.timeSignatureNumerator = ss.unbox(this.$_syData);
+					master.timeSignatureNumerator = ss.unbox(ss.cast(this.$_syData, ss.Int32));
 					this.$newSy();
 					if (this.$_sy !== 2) {
 						this.$error('timesignature-denominator', 2, true);
 					}
-					master.timeSignatureDenominator = ss.unbox(this.$_syData);
+					master.timeSignatureDenominator = ss.unbox(ss.cast(this.$_syData, ss.Int32));
 				}
 				else if (ss.equals(this.$_syData, 'ro')) {
 					master.isRepeatStart = true;
@@ -5104,7 +5082,7 @@
 					if (this.$_sy !== 2) {
 						this.$error('repeatclose', 2, true);
 					}
-					master.repeatCount = ss.unbox(this.$_syData) - 1;
+					master.repeatCount = ss.unbox(ss.cast(this.$_syData, ss.Int32)) - 1;
 				}
 				else if (ss.equals(this.$_syData, 'ks')) {
 					this.$newSy();
@@ -5148,7 +5126,7 @@
 				// master effect (4)
 				// master equalizer (10)
 				// master equalizer preset (1)
-				this.skip(19);
+				this._data.skip(19);
 			}
 			// page setup since GP5
 			if (this.$_versionNumber >= 500) {
@@ -5190,9 +5168,9 @@
 				// "Da Segno Segno al Fine" bar index (2)
 				// "Da Coda" bar index (2)
 				// "Da Double Coda" bar index (2)
-				this.skip(38);
+				this._data.skip(38);
 				// unknown (4)
-				this.skip(4);
+				this._data.skip(4);
 			}
 			// contents
 			this.$_barCount = this.readInt32();
@@ -5223,14 +5201,14 @@
 			this.$_score.tab = this.readStringIntUnused();
 			this.$_score.instructions = this.readStringIntUnused();
 			var noticeLines = this.readInt32();
-			var notice = new $AlphaTab_Collections_StringBuilder();
+			var notice = [];
 			for (var i = 0; i < noticeLines; i++) {
 				if (i > 0) {
-					notice.appendLine();
+					notice.push('\r\n');
 				}
-				notice.append(this.readStringIntUnused());
+				notice.push(this.readStringIntUnused());
 			}
-			this.$_score.notices = notice.toString();
+			this.$_score.notices = notice.join('');
 		},
 		readLyrics: function() {
 			this.$_lyrics = [];
@@ -5250,7 +5228,7 @@
 			// Padding Bottom (4)
 			// Size Proportion(4)
 			// Header and Footer display flags (2)
-			this.skip(30);
+			this._data.skip(30);
 			// title format
 			// subtitle format
 			// artist format
@@ -5273,7 +5251,7 @@
 				info.program = this.readInt32();
 				info.volume = this._data.readByte();
 				info.balance = this._data.readByte();
-				this.skip(6);
+				this._data.skip(6);
 				this.$_playbackInfos.push(info);
 			}
 		},
@@ -5350,7 +5328,7 @@
 			}
 			// keysignature
 			if ((flags & 64) !== 0) {
-				newMasterBar.keySignature = this.$readSignedByte();
+				newMasterBar.keySignature = $AlphaTab_Platform_Std.readSignedByte(this._data);
 				this._data.readByte();
 				// keysignature type
 			}
@@ -5358,7 +5336,7 @@
 				newMasterBar.keySignature = previousMasterBar.keySignature;
 			}
 			if (this.$_versionNumber >= 500 && (flags & 3) !== 0) {
-				this.skip(4);
+				this._data.skip(4);
 			}
 			// better alternate ending mask in GP5
 			if (this.$_versionNumber >= 500 && (flags & 16) === 0) {
@@ -5406,7 +5384,7 @@
 			var port = this.readInt32();
 			var index = this.readInt32() - 1;
 			var effectChannel = this.readInt32() - 1;
-			this.skip(4);
+			this._data.skip(4);
 			// Fretcount
 			if (index >= 0 && index < this.$_playbackInfos.length) {
 				var info = this.$_playbackInfos[index];
@@ -5428,11 +5406,11 @@
 				//  0x04 -> auto brush
 				this._data.readByte();
 				// unknown
-				this.skip(43);
+				this._data.skip(43);
 			}
 			// unknown
 			if (this.$_versionNumber >= 510) {
-				this.skip(4);
+				this._data.skip(4);
 				this.readStringIntByte();
 				this.readStringIntByte();
 			}
@@ -5481,7 +5459,7 @@
 				newBeat.isEmpty = (type & 2) === 0;
 			}
 			voice.addBeat(newBeat);
-			var duration = this.$readSignedByte();
+			var duration = $AlphaTab_Platform_Std.readSignedByte(this._data);
 			switch (duration) {
 				case -2: {
 					newBeat.duration = 1;
@@ -5583,9 +5561,9 @@
 			var chord = new $AlphaTab_Model_Chord();
 			var chordId = ss.Guid.newGuid();
 			if (this.$_versionNumber >= 500) {
-				this.skip(17);
+				this._data.skip(17);
 				chord.name = this.readStringByteLength(21);
-				this.skip(4);
+				this._data.skip(4);
 				chord.firstFret = this.readInt32();
 				for (var i = 0; i < 7; i++) {
 					var fret = this.readInt32();
@@ -5593,7 +5571,7 @@
 						chord.strings.push(fret);
 					}
 				}
-				this.skip(32);
+				this._data.skip(32);
 			}
 			else if (this._data.readByte() !== 0) {
 				// gp4
@@ -5606,13 +5584,13 @@
 					// Bass (4)
 					// Diminished/Augmented (4)
 					// Add (1)
-					this.skip(16);
+					this._data.skip(16);
 					chord.name = this.readStringByteLength(21);
 					// Unused (2)
 					// Fifth (1)
 					// Ninth (1)
 					// Eleventh (1)
-					this.skip(4);
+					this._data.skip(4);
 					chord.firstFret = this.readInt32();
 					for (var i1 = 0; i1 < 7; i1++) {
 						var fret1 = this.readInt32();
@@ -5628,11 +5606,11 @@
 					// Fingering (7)
 					// Show Diagram Fingering (1)
 					// ??
-					this.skip(32);
+					this._data.skip(32);
 				}
 				else {
 					// unknown
-					this.skip(25);
+					this._data.skip(25);
 					chord.name = this.readStringByteLength(34);
 					chord.firstFret = this.readInt32();
 					for (var i2 = 0; i2 < 6; i2++) {
@@ -5640,7 +5618,7 @@
 						chord.strings.push(fret2);
 					}
 					// unknown
-					this.skip(36);
+					this._data.skip(36);
 				}
 			}
 			else {
@@ -5673,7 +5651,7 @@
 			}
 			beat.hasRasgueado = (flags2 & 1) !== 0;
 			if ((flags & 32) !== 0 && this.$_versionNumber >= 400) {
-				var slapPop = this.$readSignedByte();
+				var slapPop = $AlphaTab_Platform_Std.readSignedByte(this._data);
 				switch (slapPop) {
 					case 1: {
 						beat.tap = true;
@@ -5690,7 +5668,7 @@
 				}
 			}
 			else if ((flags & 32) !== 0) {
-				var slapPop1 = this.$readSignedByte();
+				var slapPop1 = $AlphaTab_Platform_Std.readSignedByte(this._data);
 				switch (slapPop1) {
 					case 1: {
 						beat.tap = true;
@@ -5705,7 +5683,7 @@
 						break;
 					}
 				}
-				this.skip(4);
+				this._data.skip(4);
 			}
 			if ((flags2 & 4) !== 0) {
 				this.readTremoloBarEffect(beat);
@@ -5731,7 +5709,7 @@
 				}
 			}
 			if ((flags2 & 2) !== 0) {
-				switch (this.$readSignedByte()) {
+				switch ($AlphaTab_Platform_Std.readSignedByte(this._data)) {
 					case 0: {
 						beat.pickStroke = 0;
 						break;
@@ -5770,15 +5748,15 @@
 			var tableChange = new $AlphaTab_Importer_MixTableChange();
 			tableChange.instrument = this._data.readByte();
 			if (this.$_versionNumber >= 500) {
-				this.skip(16);
+				this._data.skip(16);
 				// Rse Info 
 			}
-			tableChange.volume = this.$readSignedByte();
-			tableChange.balance = this.$readSignedByte();
-			var chorus = this.$readSignedByte();
-			var reverb = this.$readSignedByte();
-			var phaser = this.$readSignedByte();
-			var tremolo = this.$readSignedByte();
+			tableChange.volume = $AlphaTab_Platform_Std.readSignedByte(this._data);
+			tableChange.balance = $AlphaTab_Platform_Std.readSignedByte(this._data);
+			var chorus = $AlphaTab_Platform_Std.readSignedByte(this._data);
+			var reverb = $AlphaTab_Platform_Std.readSignedByte(this._data);
+			var phaser = $AlphaTab_Platform_Std.readSignedByte(this._data);
+			var tremolo = $AlphaTab_Platform_Std.readSignedByte(this._data);
 			if (this.$_versionNumber >= 500) {
 				tableChange.tempoName = this.readStringIntByte();
 			}
@@ -5803,7 +5781,7 @@
 				this._data.readByte();
 			}
 			if (tableChange.tempo >= 0) {
-				tableChange.duration = this.$readSignedByte();
+				tableChange.duration = $AlphaTab_Platform_Std.readSignedByte(this._data);
 				if (this.$_versionNumber >= 510) {
 					this._data.readByte();
 					// hideTempo (bool)
@@ -5852,13 +5830,6 @@
 				beat.voice.bar.get_masterBar().tempoAutomation = tempoAutomation;
 			}
 		},
-		$readSignedByte: function() {
-			var n = this._data.readByte();
-			if (n >= 128) {
-				return n - 256;
-			}
-			return n;
-		},
 		readNote: function(track, bar, voice, beat, stringIndex) {
 			var newNote = new $AlphaTab_Model_Note();
 			newNote.string = track.tuning.length - stringIndex;
@@ -5880,16 +5851,16 @@
 				}
 			}
 			if ((flags & 16) !== 0) {
-				var dynamicNumber = this.$readSignedByte();
+				var dynamicNumber = $AlphaTab_Platform_Std.readSignedByte(this._data);
 				newNote.dynamic = this.toDynamicValue(dynamicNumber);
 				beat.dynamic = newNote.dynamic;
 			}
 			if ((flags & 32) !== 0) {
-				newNote.fret = this.$readSignedByte();
+				newNote.fret = $AlphaTab_Platform_Std.readSignedByte(this._data);
 			}
 			if ((flags & 128) !== 0) {
-				newNote.leftHandFinger = this.$readSignedByte();
-				newNote.rightHandFinger = this.$readSignedByte();
+				newNote.leftHandFinger = $AlphaTab_Platform_Std.readSignedByte(this._data);
+				newNote.rightHandFinger = $AlphaTab_Platform_Std.readSignedByte(this._data);
 				newNote.isFingering = true;
 			}
 			if (this.$_versionNumber >= 500) {
@@ -6004,10 +5975,10 @@
 			var graceBeat = new $AlphaTab_Model_Beat();
 			var graceNote = new $AlphaTab_Model_Note();
 			graceNote.string = note.string;
-			graceNote.fret = this.$readSignedByte();
+			graceNote.fret = $AlphaTab_Platform_Std.readSignedByte(this._data);
 			graceBeat.duration = 32;
-			graceBeat.dynamic = this.toDynamicValue(this.$readSignedByte());
-			var transition = this.$readSignedByte();
+			graceBeat.dynamic = this.toDynamicValue($AlphaTab_Platform_Std.readSignedByte(this._data));
+			var transition = $AlphaTab_Platform_Std.readSignedByte(this._data);
 			switch (transition) {
 				case 0: {
 					// none
@@ -6029,7 +6000,7 @@
 				}
 			}
 			graceNote.dynamic = graceBeat.dynamic;
-			this.skip(1);
+			this._data.skip(1);
 			// duration
 			if (this.$_versionNumber < 500) {
 				graceBeat.graceType = 2;
@@ -6061,7 +6032,7 @@
 		},
 		readSlide: function(note) {
 			if (this.$_versionNumber >= 500) {
-				var type = this.$readSignedByte();
+				var type = $AlphaTab_Platform_Std.readSignedByte(this._data);
 				switch (type) {
 					case 1: {
 						note.slideType = 1;
@@ -6094,7 +6065,7 @@
 				}
 			}
 			else {
-				var type1 = this.$readSignedByte();
+				var type1 = $AlphaTab_Platform_Std.readSignedByte(this._data);
 				switch (type1) {
 					case 1: {
 						note.slideType = 1;
@@ -6270,7 +6241,7 @@
 			var r = this._data.readByte();
 			var g = this._data.readByte();
 			var b = this._data.readByte();
-			this.skip(1);
+			this._data.skip(1);
 			// alpha?
 			return new $AlphaTab_Platform_Model_Color(r, g, b, 255);
 		},
@@ -6283,7 +6254,7 @@
 			return bytes[0] | bytes[1] << 8 | bytes[2] << 16 | bytes[3] << 24;
 		},
 		readStringIntUnused: function() {
-			this.skip(4);
+			this._data.skip(4);
 			return this.readString(this._data.readByte());
 		},
 		readStringInt: function() {
@@ -6297,22 +6268,19 @@
 		readString: function(length) {
 			var b = new Uint8Array(length);
 			this._data.read(b, 0, b.length);
-			var s = new $AlphaTab_Collections_StringBuilder();
+			var s = [];
 			for (var i = 0; i < b.length; i++) {
-				s.appendChar(b[i]);
+				s.push(String.fromCharCode(b[i]));
 			}
-			return s.toString();
+			return s.join('');
 		},
 		readStringByteLength: function(length) {
 			var stringLength = this._data.readByte();
 			var s = this.readString(stringLength);
 			if (stringLength < length) {
-				this.skip(length - stringLength);
+				this._data.skip(length - stringLength);
 			}
 			return s;
-		},
-		skip: function(count) {
-			this._data.seek(count, 1);
 		}
 	}, $AlphaTab_Importer_ScoreImporter);
 	ss.initClass($AlphaTab_Importer_GpxFile, $asm, {});
@@ -6325,7 +6293,7 @@
 			return this.$getString(src.readBytes(4), 0, 4);
 		},
 		decompress: function(src, skipHeader) {
-			var uncompressed = new $AlphaTab_IO_MemoryStream();
+			var uncompressed = new $AlphaTab_IO_ByteBuffer();
 			var buffer;
 			var expectedLength = this.$getInteger(src.readBytes(4), 0);
 			try {
@@ -6358,7 +6326,7 @@
 			}
 			catch ($t1) {
 				$t1 = ss.Exception.wrap($t1);
-				if (ss.isInstanceOfType($t1, $AlphaTab_IO_$EndOfStreamException)) {
+				if (ss.isInstanceOfType($t1, $AlphaTab_IO_$EndOfReaderException)) {
 				}
 				else {
 					throw $t1;
@@ -6421,7 +6389,7 @@
 					var sectorCount = 0;
 					// we're keeping count so we can calculate the offset of the array item
 					// as long we have data blocks we need to iterate them, 
-					var fileData = (storeFile ? new $AlphaTab_IO_MemoryStream.$ctor2(file.fileSize) : null);
+					var fileData = (storeFile ? new $AlphaTab_IO_ByteBuffer.$ctor2(file.fileSize) : null);
 					while ((sector = this.$getInteger(data, dataPointerOffset + 4 * sectorCount++)) !== 0) {
 						// the next file entry starts after the last data sector so we 
 						// move the offset along
@@ -6444,16 +6412,16 @@
 			}
 		},
 		$getString: function(data, offset, length) {
-			var buf = new $AlphaTab_Collections_StringBuilder();
+			var buf = [];
 			for (var i = 0; i < length; i++) {
 				var code = data[offset + i] & 255;
 				if (code === 0) {
 					break;
 				}
 				// zero terminated string
-				buf.appendChar(code);
+				buf.push(String.fromCharCode(code));
 			}
-			return buf.toString();
+			return buf.join('');
 		},
 		$getInteger: function(data, offset) {
 			return data[offset + 3] << 24 | data[offset + 2] << 16 | data[offset + 1] << 8 | data[offset];
@@ -6469,10 +6437,10 @@
 			};
 			fileSystem.load(this._data);
 			// convert data to string
-			var xml = new $AlphaTab_Collections_StringBuilder();
+			var xml = [];
 			var data = fileSystem.files[0].data;
 			for (var i = 0; i < data.length; i++) {
-				xml.appendChar(data[i]);
+				xml.push(String.fromCharCode(data[i]));
 			}
 			// lets set the fileSystem to null, maybe the garbage collector will come along
 			// and kick the fileSystem binary data before we finish parsing
@@ -6481,7 +6449,7 @@
 			// the score.gpif file within this filesystem stores
 			// the score information as XML we need to parse.
 			var parser = new $AlphaTab_Importer_GpxParser();
-			parser.parseXml(xml.toString());
+			parser.parseXml(xml.join(''));
 			parser.score.finish();
 			return parser.score;
 		}
@@ -6503,8 +6471,7 @@
 			this.$_notesOfBeat = {};
 			this.$_noteById = {};
 			this.$_tappedNotes = {};
-			var dom;
-			dom = ss.parseXml(xml);
+			var dom = $AlphaTab_Platform_Std.loadXml(xml);
 			this.$parseDom(dom);
 		},
 		$parseDom: function(dom) {
@@ -6713,7 +6680,7 @@
 				if (c.nodeType === 1) {
 					switch (c.localName) {
 						case 'Track': {
-							this.$parseTrack(c);
+							this.$parseTrack(ss.cast(c, Element));
 							break;
 						}
 					}
@@ -6761,7 +6728,7 @@
 				if (c.nodeType === 1) {
 					switch (c.localName) {
 						case 'Item': {
-							this.$parseDiagramItem(track, c);
+							this.$parseDiagramItem(track, ss.cast(c, Element));
 							break;
 						}
 					}
@@ -6789,7 +6756,7 @@
 				if (c.nodeType === 1) {
 					switch (c.localName) {
 						case 'Property': {
-							this.$parseTrackProperty(track, c);
+							this.$parseTrackProperty(track, ss.cast(c, Element));
 							break;
 						}
 					}
@@ -6820,7 +6787,7 @@
 			}
 		},
 		$parseGeneralMidi: function(track, node) {
-			var e = node;
+			var e = ss.cast(node, Element);
 			track.playbackInfo.port = $AlphaTab_Platform_Std.parseInt(this.$getValue(this.$findChildElement(node, 'Port')));
 			track.playbackInfo.program = $AlphaTab_Platform_Std.parseInt(this.$getValue(this.$findChildElement(node, 'Program')));
 			track.playbackInfo.primaryChannel = $AlphaTab_Platform_Std.parseInt(this.$getValue(this.$findChildElement(node, 'PrimaryChannel')));
@@ -6845,7 +6812,7 @@
 			for (var $t1 = 0; $t1 < node.childNodes.length; $t1++) {
 				var c = node.childNodes[$t1];
 				if (c.nodeType === 1) {
-					var e = c;
+					var e = ss.cast(c, Element);
 					switch (c.localName) {
 						case 'Time': {
 							var timeParts = this.$getValue(c).split(String.fromCharCode(47));
@@ -6933,7 +6900,7 @@
 				if (c.nodeType === 1) {
 					switch (c.localName) {
 						case 'Bar': {
-							this.$parseBar(c);
+							this.$parseBar(ss.cast(c, Element));
 							break;
 						}
 					}
@@ -6987,7 +6954,7 @@
 				if (c.nodeType === 1) {
 					switch (c.localName) {
 						case 'Voice': {
-							this.$parseVoice(c);
+							this.$parseVoice(ss.cast(c, Element));
 							break;
 						}
 					}
@@ -7016,7 +6983,7 @@
 				if (c.nodeType === 1) {
 					switch (c.localName) {
 						case 'Beat': {
-							this.$parseBeat(c);
+							this.$parseBeat(ss.cast(c, Element));
 							break;
 						}
 					}
@@ -7029,7 +6996,7 @@
 			for (var $t1 = 0; $t1 < node.childNodes.length; $t1++) {
 				var c = node.childNodes[$t1];
 				if (c.nodeType === 1) {
-					var e = c;
+					var e = ss.cast(c, Element);
 					switch (c.localName) {
 						case 'Notes': {
 							this.$_notesOfBeat[beatId] = this.$getValue(c).split(String.fromCharCode(32));
@@ -7161,7 +7128,7 @@
 			for (var $t1 = 0; $t1 < node.childNodes.length; $t1++) {
 				var c = node.childNodes[$t1];
 				if (c.nodeType === 1) {
-					var e = c;
+					var e = ss.cast(c, Element);
 					switch (c.localName) {
 						case 'Property': {
 							var name = e.attributes['name'].value;
@@ -7288,7 +7255,7 @@
 				if (c.nodeType === 1) {
 					switch (c.localName) {
 						case 'Note': {
-							this.$parseNote(c);
+							this.$parseNote(ss.cast(c, Element));
 							break;
 						}
 					}
@@ -7301,7 +7268,7 @@
 			for (var $t1 = 0; $t1 < node.childNodes.length; $t1++) {
 				var c = node.childNodes[$t1];
 				if (c.nodeType === 1) {
-					var e = c;
+					var e = ss.cast(c, Element);
 					switch (c.localName) {
 						case 'Properties': {
 							this.$parseNoteProperties(c, note, noteId);
@@ -7372,7 +7339,7 @@
 			for (var $t1 = 0; $t1 < node.childNodes.length; $t1++) {
 				var c = node.childNodes[$t1];
 				if (c.nodeType === 1) {
-					var e = c;
+					var e = ss.cast(c, Element);
 					switch (c.localName) {
 						case 'Property': {
 							var name = e.attributes['name'].value;
@@ -7558,7 +7525,7 @@
 				if (c.nodeType === 1) {
 					switch (c.localName) {
 						case 'Rhythm': {
-							this.$parseRhythm(c);
+							this.$parseRhythm(ss.cast(c, Element));
 							break;
 						}
 					}
@@ -7571,7 +7538,7 @@
 			for (var $t1 = 0; $t1 < node.childNodes.length; $t1++) {
 				var c = node.childNodes[$t1];
 				if (c.nodeType === 1) {
-					var e = c;
+					var e = ss.cast(c, Element);
 					switch (c.localName) {
 						case 'NoteValue': {
 							switch (this.$getValue(c)) {
@@ -7623,15 +7590,7 @@
 			this.$_rhythmById[rhythmId] = rhythm;
 		},
 		$getValue: function(n) {
-			if (n.nodeType === 1 || n.nodeType === 9) {
-				var txt = new $AlphaTab_Collections_StringBuilder();
-				for (var $t1 = 0; $t1 < n.childNodes.length; $t1++) {
-					var childNode = n.childNodes[$t1];
-					txt.append(this.$getValue(childNode));
-				}
-				return txt.toString().trim();
-			}
-			return n.nodeValue;
+			return $AlphaTab_Platform_Std.getNodeValue(n);
 		},
 		$buildModel: function() {
 			// build beats
@@ -7764,8 +7723,7 @@
 	ss.initClass($AlphaTab_Importer_NoCompatibleReaderFoundException, $asm, {}, ss.Exception);
 	ss.initClass($AlphaTab_Importer_ScoreLoader, $asm, {});
 	ss.initClass($AlphaTab_Importer_UnsupportedFormatException, $asm, {}, ss.Exception);
-	ss.initClass($AlphaTab_IO_$EndOfStreamException, $asm, {}, ss.Exception);
-	ss.initClass($AlphaTab_IO_$IOException, $asm, {}, ss.Exception);
+	ss.initClass($AlphaTab_IO_$EndOfReaderException, $asm, {}, ss.Exception);
 	ss.initClass($AlphaTab_IO_BitReader, $asm, {
 		readByte: function() {
 			return this.readBits($AlphaTab_IO_BitReader.$byteSize);
@@ -7798,9 +7756,8 @@
 			if (this.$_position >= $AlphaTab_IO_BitReader.$byteSize) {
 				this.$_currentByte = this.$_source.readByte();
 				if (this.$_currentByte === -1) {
-					throw new $AlphaTab_IO_$EndOfStreamException();
+					throw new $AlphaTab_IO_$EndOfReaderException();
 				}
-				this.$_readBytes++;
 				this.$_position = 0;
 			}
 			// shift the desired byte to the least significant bit and  
@@ -7810,7 +7767,7 @@
 			return value;
 		},
 		readAll: function() {
-			var all = new $AlphaTab_IO_MemoryStream();
+			var all = new $AlphaTab_IO_ByteBuffer();
 			try {
 				while (true) {
 					all.writeByte(this.readByte());
@@ -7818,7 +7775,7 @@
 			}
 			catch ($t1) {
 				$t1 = ss.Exception.wrap($t1);
-				if (ss.isInstanceOfType($t1, $AlphaTab_IO_$EndOfStreamException)) {
+				if (ss.isInstanceOfType($t1, $AlphaTab_IO_$EndOfReaderException)) {
 				}
 				else {
 					throw $t1;
@@ -7827,39 +7784,22 @@
 			return all.toArray();
 		}
 	});
-	ss.initClass($AlphaTab_IO_FileLoadException, $asm, {}, ss.Exception);
-	ss.initClass($AlphaTab_IO_Stream, $asm, {
-		close: function() {
-			this.dispose$1(true);
+	ss.initInterface($AlphaTab_IO_IWriteable, $asm, { writeByte: null, write: null });
+	ss.initInterface($AlphaTab_IO_IReadable, $asm, { reset: null, skip: null, readByte: null, read: null });
+	ss.initClass($AlphaTab_IO_ByteBuffer, $asm, {
+		get_length: function() {
+			return this.$_length;
 		},
-		dispose: function() {
-			this.close();
+		getBuffer: function() {
+			return this.$_buffer;
 		},
-		dispose$1: function(disposing) {
+		reset: function() {
+			this.$_position = 0;
 		},
-		seek: null,
-		flush: null,
-		write: null,
-		writeByte: function(value) {
-			var buffer = new Uint8Array(1);
-			buffer[0] = value;
-			this.write(buffer, 0, 1);
+		skip: function(offset) {
+			this.$_position += offset;
 		},
-		read: null,
-		readByte: function() {
-			var buffer = new Uint8Array(1);
-			var r = this.read(buffer, 0, 1);
-			if (r === 0) {
-				return -1;
-			}
-			return buffer[0];
-		}
-	}, null, [ss.IDisposable]);
-	ss.initClass($AlphaTab_IO_MemoryStream, $asm, {
-		get_capacity: function() {
-			return this.$_capacity;
-		},
-		set_capacity: function(value) {
+		$setCapacity: function(value) {
 			if (value !== this.$_capacity) {
 				if (value > 0) {
 					var newBuffer = new Uint8Array(value);
@@ -7873,43 +7813,6 @@
 				}
 				this.$_capacity = value;
 			}
-		},
-		get_length: function() {
-			return this.$_length;
-		},
-		getBuffer: function() {
-			return this.$_buffer;
-		},
-		seek: function(offset, loc) {
-			switch (loc) {
-				case 0: {
-					var tempPosition = offset;
-					if (offset < 0 || tempPosition < 0) {
-						throw new $AlphaTab_IO_$IOException('cannot seek before begin of stream');
-					}
-					this.$_position = tempPosition;
-					break;
-				}
-				case 1: {
-					var tempPosition1 = this.$_position + offset;
-					if (this.$_position + offset < 0 || tempPosition1 < 0) {
-						throw new $AlphaTab_IO_$IOException('cannot seek before begin of stream');
-					}
-					this.$_position = tempPosition1;
-					break;
-				}
-				case 2: {
-					var tempPosition2 = this.$_length + offset;
-					if (this.$_length + offset < 0 || tempPosition2 < 0) {
-						throw new $AlphaTab_IO_$IOException('cannot seek before begin of stream');
-					}
-					this.$_position = tempPosition2;
-					break;
-				}
-			}
-			return this.$_position;
-		},
-		flush: function() {
 		},
 		readByte: function() {
 			var n = this.$_length - this.$_position;
@@ -7938,12 +7841,13 @@
 			this.$_position += n;
 			return n;
 		},
+		writeByte: function(value) {
+			var buffer = new Uint8Array(1);
+			buffer[0] = value;
+			this.write(buffer, 0, 1);
+		},
 		write: function(buffer, offset, count) {
 			var i = this.$_position + count;
-			// Check for overflow
-			if (i < 0) {
-				throw new $AlphaTab_IO_$IOException('Stream overflow, too much bytes in stream');
-			}
 			if (i > this.$_length) {
 				if (i > this.$_capacity) {
 					this.$ensureCapacity(i);
@@ -7962,10 +7866,6 @@
 			this.$_position = i;
 		},
 		$ensureCapacity: function(value) {
-			// Check for overflow
-			if (value < 0) {
-				throw new $AlphaTab_IO_$IOException('Stream overflow, too much bytes in stream');
-			}
 			if (value > this.$_capacity) {
 				var newCapacity = value;
 				if (newCapacity < 256) {
@@ -7974,20 +7874,17 @@
 				if (newCapacity < this.$_capacity * 2) {
 					newCapacity = this.$_capacity * 2;
 				}
-				this.set_capacity(newCapacity);
-				return true;
+				this.$setCapacity(newCapacity);
 			}
-			return false;
 		},
 		toArray: function() {
 			var copy = new Uint8Array(this.$_length);
 			copy.set(this.$_buffer.subarray(0, 0 + this.$_length), 0);
 			return copy;
 		}
-	}, $AlphaTab_IO_Stream, [ss.IDisposable]);
-	$AlphaTab_IO_MemoryStream.$ctor2.prototype = $AlphaTab_IO_MemoryStream.$ctor1.prototype = $AlphaTab_IO_MemoryStream.prototype;
-	ss.initEnum($AlphaTab_IO_SeekOrigin, $asm, { begin: 0, current: 1, end: 2 });
-	ss.initClass($AlphaTab_IO_StringStream, $asm, {}, $AlphaTab_IO_MemoryStream, [ss.IDisposable]);
+	}, null, [$AlphaTab_IO_IWriteable, $AlphaTab_IO_IReadable]);
+	$AlphaTab_IO_ByteBuffer.$ctor2.prototype = $AlphaTab_IO_ByteBuffer.$ctor1.prototype = $AlphaTab_IO_ByteBuffer.prototype;
+	ss.initClass($AlphaTab_IO_FileLoadException, $asm, {}, ss.Exception);
 	ss.initEnum($AlphaTab_Model_AccentuationType, $asm, { none: 0, normal: 1, heavy: 2 });
 	ss.initEnum($AlphaTab_Model_AccidentalType, $asm, { none: 0, natural: 1, sharp: 2, flat: 3 });
 	ss.initClass($AlphaTab_Model_Automation, $asm, {
@@ -8349,6 +8246,7 @@
 	});
 	ss.initEnum($AlphaTab_Model_TripletFeel, $asm, { noTripletFeel: 0, triplet16th: 1, triplet8th: 2, dotted16th: 3, dotted8th: 4, scottish16th: 5, scottish8th: 6 });
 	ss.initClass($AlphaTab_Model_Tuning, $asm, {});
+	ss.initClass($AlphaTab_Model_TuningParser, $asm, {});
 	ss.initEnum($AlphaTab_Model_VibratoType, $asm, { none: 0, slight: 1, wide: 2 });
 	ss.initClass($AlphaTab_Model_Voice, $asm, {
 		get_isEmpty: function() {
@@ -8425,7 +8323,7 @@
 		set_width: function(value) {
 			var lineWidth = this.$_context.lineWidth;
 			this.$_canvas.width = value;
-			this.$_context = this.$_canvas.getContext('2d');
+			this.$_context = ss.cast(this.$_canvas.getContext('2d'), CanvasRenderingContext2D);
 			this.$_context.textBaseline = 'top';
 			this.$_context.lineWidth = lineWidth;
 		},
@@ -8435,7 +8333,7 @@
 		set_height: function(value) {
 			var lineWidth = this.$_context.lineWidth;
 			this.$_canvas.height = value;
-			this.$_context = this.$_canvas.getContext('2d');
+			this.$_context = ss.cast(this.$_canvas.getContext('2d'), CanvasRenderingContext2D);
 			this.$_context.textBaseline = 'top';
 			this.$_context.lineWidth = lineWidth;
 		},
@@ -8578,6 +8476,7 @@
 			glyph.paint(x, y, this);
 		}
 	}, null, [$AlphaTab_Platform_IPathCanvas, $AlphaTab_Platform_ICanvas]);
+	ss.initClass($AlphaTab_Platform_JavaScript_JsApi, $asm, {});
 	ss.initClass($AlphaTab_Platform_JavaScript_JsFileLoader, $asm, {
 		loadBinary: function(path) {
 			var ie = $AlphaTab_Platform_JavaScript_JsFileLoader.getIEVersion();
@@ -8588,8 +8487,8 @@
 				// decode byte array to string
 				var data = new ss.StringBuilder();
 				var i = 0;
-				while (ss.unbox(i < fileContents.length - 1)) {
-					data.appendChar(ss.unbox(fileContents[i]));
+				while (!!(i < fileContents.length - 1)) {
+					data.appendChar(ss.unbox(ss.cast(fileContents[i], ss.Int32)));
 					i++;
 				}
 				var reader = $AlphaTab_Platform_JavaScript_JsFileLoader.$getBytesFromString(data.toString());
@@ -8630,8 +8529,8 @@
 				// decode byte array to string
 				var data = new ss.StringBuilder();
 				var i = 0;
-				while (ss.unbox(i < fileContents.length - 1)) {
-					data.appendChar(ss.unbox(fileContents[i]));
+				while (!!(i < fileContents.length - 1)) {
+					data.appendChar(ss.unbox(ss.cast(fileContents[i], ss.Int32)));
 					i++;
 				}
 				var reader = $AlphaTab_Platform_JavaScript_JsFileLoader.$getBytesFromString(data.toString());
@@ -8717,19 +8616,19 @@
 			return new $AlphaTab_Platform_Model_Font(this.get_family(), this.get_size(), this.get_style());
 		},
 		toCssString: function() {
-			var buf = new $AlphaTab_Collections_StringBuilder();
+			var buf = [];
 			if (this.get_isBold()) {
-				buf.append('bold ');
+				buf.push('bold ');
 			}
 			if (this.get_isItalic()) {
-				buf.append('italic ');
+				buf.push('italic ');
 			}
-			buf.append(this.get_size());
-			buf.append('px ');
-			buf.append("'");
-			buf.append(this.get_family());
-			buf.append("'");
-			return buf.toString();
+			buf.push(this.get_size());
+			buf.push('px ');
+			buf.push("'");
+			buf.push(this.get_family());
+			buf.push("'");
+			return buf.join('');
 		}
 	});
 	ss.initEnum($AlphaTab_Platform_Model_FontStyle, $asm, { plain: 0, bold: 1, italic: 2 });
@@ -8787,25 +8686,25 @@
 			this.$1$ResourcesField = value;
 		},
 		toSvg: function(includeWrapper, className) {
-			var buf = new $AlphaTab_Collections_StringBuilder();
+			var buf = [];
 			if (includeWrapper) {
-				buf.append('<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="');
-				buf.append(this.get_width());
-				buf.append('px" height="');
-				buf.append(this.get_height());
-				buf.append('px"');
+				buf.push('<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="');
+				buf.push(this.get_width());
+				buf.push('px" height="');
+				buf.push(this.get_height());
+				buf.push('px"');
 				if (ss.isValue(className)) {
-					buf.append(' class="');
-					buf.append(className);
-					buf.append('"');
+					buf.push(' class="');
+					buf.push(className);
+					buf.push('"');
 				}
-				buf.append('>\n');
+				buf.push('>\n');
 			}
-			buf.append(this.$_buffer);
+			buf.push(this.$_buffer);
 			if (includeWrapper) {
-				buf.append('</svg>');
+				buf.push('</svg>');
 			}
-			return buf.toString();
+			return buf.join('');
 		},
 		clear: function() {
 			this.$_buffer = '';
@@ -9098,12 +8997,12 @@
 				this.stave.bottomSpacing = 4;
 			}
 			this.height = ss.Int32.trunc(this.get_resources().wordsFont.get_size());
-			var endingsStrings = new $AlphaTab_Collections_StringBuilder();
+			var endingsStrings = [];
 			for (var i = 0, j = this.$_endings.length; i < j; i++) {
-				endingsStrings.append(this.$_endings[i] + 1);
-				endingsStrings.append('. ');
+				endingsStrings.push(this.$_endings[i] + 1);
+				endingsStrings.push('. ');
 			}
-			this.$_endingsString = endingsStrings.toString();
+			this.$_endingsString = endingsStrings.join('');
 		},
 		get_topPadding: function() {
 			return 0;
@@ -9375,7 +9274,7 @@
 			if (this.index > 0) {
 				// check if previous renderer had an effect on his last beat
 				// and use this as merging element
-				var prevRenderer = this.stave.barRenderers[this.index - 1];
+				var prevRenderer = ss.cast(this.stave.barRenderers[this.index - 1], $AlphaTab_Rendering_EffectBarRenderer);
 				if (ss.isValue(prevRenderer.$_lastBeat) && prevRenderer.$_effectGlyphs[0].hasOwnProperty(prevRenderer.$_lastBeat.index)) {
 					prevGlyph = prevRenderer.$_effectGlyphs[0][prevRenderer.$_lastBeat.index];
 				}
@@ -9440,8 +9339,8 @@
 					}
 					else {
 						pos = container.preNotes;
-						var posR = pos.renderer;
-						var gR = g.renderer;
+						var posR = ss.cast(pos.renderer, $AlphaTab_Rendering_EffectBarRenderer);
+						var gR = ss.cast(g.renderer, $AlphaTab_Rendering_EffectBarRenderer);
 						g.width = posR.x + posR.get_beatGlyphsStart() + container.x + pos.x + pos.width - (gR.x + gR.get_beatGlyphsStart() + g.x);
 						g.expandTo(container.beat);
 					}
@@ -9453,8 +9352,8 @@
 					}
 					else {
 						pos = container.onNotes;
-						var posR1 = pos.renderer;
-						var gR1 = g.renderer;
+						var posR1 = ss.cast(pos.renderer, $AlphaTab_Rendering_EffectBarRenderer);
+						var gR1 = ss.cast(g.renderer, $AlphaTab_Rendering_EffectBarRenderer);
 						g.width = posR1.x + posR1.get_beatGlyphsStart() + container.x + pos.x + pos.width - (gR1.x + gR1.get_beatGlyphsStart() + g.x);
 						g.expandTo(container.beat);
 					}
@@ -9466,8 +9365,8 @@
 					}
 					else {
 						pos = container.postNotes;
-						var posR2 = pos.renderer;
-						var gR2 = g.renderer;
+						var posR2 = ss.cast(pos.renderer, $AlphaTab_Rendering_EffectBarRenderer);
+						var gR2 = ss.cast(g.renderer, $AlphaTab_Rendering_EffectBarRenderer);
 						g.width = posR2.x + posR2.get_beatGlyphsStart() + container.x + pos.x + pos.width - (gR2.x + gR2.get_beatGlyphsStart() + g.x);
 						g.expandTo(container.beat);
 					}
@@ -9479,8 +9378,8 @@
 					}
 					else {
 						pos = container.onNotes;
-						var posR3 = pos.renderer;
-						var gR3 = g.renderer;
+						var posR3 = ss.cast(pos.renderer, $AlphaTab_Rendering_EffectBarRenderer);
+						var gR3 = ss.cast(g.renderer, $AlphaTab_Rendering_EffectBarRenderer);
 						g.width = posR3.x + posR3.get_beatGlyphsStart() + container.x + pos.x + pos.width - (gR3.x + gR3.get_beatGlyphsStart() + g.x);
 						g.expandTo(container.beat);
 					}
@@ -9492,8 +9391,8 @@
 					}
 					else {
 						pos = container.postNotes;
-						var posR4 = pos.renderer;
-						var gR4 = g.renderer;
+						var posR4 = ss.cast(pos.renderer, $AlphaTab_Rendering_EffectBarRenderer);
+						var gR4 = ss.cast(g.renderer, $AlphaTab_Rendering_EffectBarRenderer);
 						g.width = posR4.x + posR4.get_beatGlyphsStart() + container.x + pos.x + pos.width - (gR4.x + gR4.get_beatGlyphsStart() + g.x);
 						g.expandTo(container.beat);
 					}
@@ -9505,8 +9404,8 @@
 					}
 					else {
 						pos = container.postNotes;
-						var posR5 = pos.renderer;
-						var gR5 = g.renderer;
+						var posR5 = ss.cast(pos.renderer, $AlphaTab_Rendering_EffectBarRenderer);
+						var gR5 = ss.cast(g.renderer, $AlphaTab_Rendering_EffectBarRenderer);
 						g.width = posR5.x + posR5.get_beatGlyphsStart() + container.x + pos.x + pos.width - (gR5.x + gR5.get_beatGlyphsStart() + g.x);
 						g.expandTo(container.beat);
 					}
@@ -9568,7 +9467,7 @@
 								prevEffect = this.$_effectGlyphs[b.voice.index][prevBeat.index];
 							}
 							else if (this.index > 0) {
-								var previousRenderer = this.stave.barRenderers[this.index - 1];
+								var previousRenderer = ss.cast(this.stave.barRenderers[this.index - 1], $AlphaTab_Rendering_EffectBarRenderer);
 								var voiceGlyphs = previousRenderer.$_effectGlyphs[b.voice.index];
 								if (voiceGlyphs.hasOwnProperty(prevBeat.index)) {
 									prevEffect = voiceGlyphs[prevBeat.index];
@@ -9789,21 +9688,21 @@
 	}, $AlphaTab_Rendering_BarRendererFactory);
 	ss.initClass($AlphaTab_Rendering_ScoreBarRenderer, $asm, {
 		getBeatDirection: function(beat) {
-			var g = this.getOnNotesPosition(beat.voice.index, beat.index);
+			var g = ss.cast(this.getOnNotesPosition(beat.voice.index, beat.index), $AlphaTab_Rendering_Glyphs_ScoreBeatGlyph);
 			if (ss.isValue(g)) {
 				return g.noteHeads.get_direction();
 			}
 			return 0;
 		},
 		getNoteX: function(note, onEnd) {
-			var g = this.getOnNotesPosition(note.beat.voice.index, note.beat.index);
+			var g = ss.cast(this.getOnNotesPosition(note.beat.voice.index, note.beat.index), $AlphaTab_Rendering_Glyphs_ScoreBeatGlyph);
 			if (ss.isValue(g)) {
 				return g.get_container().x + g.x + g.noteHeads.getNoteX(note, onEnd);
 			}
 			return 0;
 		},
 		getNoteY: function(note) {
-			var beat = this.getOnNotesPosition(note.beat.voice.index, note.beat.index);
+			var beat = ss.cast(this.getOnNotesPosition(note.beat.voice.index, note.beat.index), $AlphaTab_Rendering_Glyphs_ScoreBeatGlyph);
 			if (ss.isValue(beat)) {
 				return beat.noteHeads.getNoteY(note);
 			}
@@ -10250,7 +10149,7 @@
 				var container = new $AlphaTab_Rendering_ScoreBeatContainerGlyph(b);
 				container.preNotes = new $AlphaTab_Rendering_Glyphs_ScoreBeatPreNotesGlyph();
 				container.onNotes = new $AlphaTab_Rendering_Glyphs_ScoreBeatGlyph();
-				container.onNotes.beamingHelper = this.$_helpers.beamHelperLookup[v.index][b.index];
+				ss.cast(container.onNotes, $AlphaTab_Rendering_Glyphs_ScoreBeatGlyph).beamingHelper = this.$_helpers.beamHelperLookup[v.index][b.index];
 				container.postNotes = new $AlphaTab_Rendering_Glyphs_ScoreBeatPostNotesGlyph();
 				this.addBeatGlyph(container);
 			}
@@ -10540,21 +10439,21 @@
 			return 11 * this.get_scale();
 		},
 		getNoteX: function(note, onEnd) {
-			var beat = this.getOnNotesPosition(note.beat.voice.index, note.beat.index);
+			var beat = ss.cast(this.getOnNotesPosition(note.beat.voice.index, note.beat.index), $AlphaTab_Rendering_Glyphs_TabBeatGlyph);
 			if (ss.isValue(beat)) {
 				return beat.get_container().x + beat.x + beat.get_noteNumbers().getNoteX(note, onEnd);
 			}
 			return this.get_postBeatGlyphsStart();
 		},
 		getBeatX: function(beat) {
-			var bg = this.getPreNotesPosition(beat.voice.index, beat.index);
+			var bg = ss.cast(this.getPreNotesPosition(beat.voice.index, beat.index), $AlphaTab_Rendering_Glyphs_TabBeatGlyph);
 			if (ss.isValue(bg)) {
 				return bg.get_container().x + bg.x;
 			}
 			return 0;
 		},
 		getNoteY: function(note) {
-			var beat = this.getOnNotesPosition(note.beat.voice.index, note.beat.index);
+			var beat = ss.cast(this.getOnNotesPosition(note.beat.voice.index, note.beat.index), $AlphaTab_Rendering_Glyphs_TabBeatGlyph);
 			if (ss.isValue(beat)) {
 				return beat.get_noteNumbers().getNoteY(note);
 			}
@@ -10591,7 +10490,7 @@
 				var container = new $AlphaTab_Rendering_Glyphs_TabBeatContainerGlyph(b);
 				container.preNotes = new $AlphaTab_Rendering_Glyphs_TabBeatPreNotesGlyph();
 				container.onNotes = new $AlphaTab_Rendering_Glyphs_TabBeatGlyph();
-				container.onNotes.set_beamingHelper(this.$_helpers.beamHelperLookup[v.index][b.index]);
+				ss.cast(container.onNotes, $AlphaTab_Rendering_Glyphs_TabBeatGlyph).set_beamingHelper(this.$_helpers.beamHelperLookup[v.index][b.index]);
 				container.postNotes = new $AlphaTab_Rendering_Glyphs_TabBeatPostNotesGlyph();
 				this.addBeatGlyph(container);
 			}
@@ -11214,7 +11113,7 @@
 	}, $AlphaTab_Rendering_Glyphs_GlyphGroup, [$AlphaTab_Rendering_Glyphs_ISupportsFinalize]);
 	ss.initClass($AlphaTab_Rendering_Glyphs_BendGlyph, $asm, {
 		paint: function(cx, cy, canvas) {
-			var r = this.renderer;
+			var r = ss.cast(this.renderer, $AlphaTab_Rendering_TabBarRenderer);
 			var res = this.renderer.get_resources();
 			// calculate offsets per step
 			var dX = ss.Int32.div(this.width, $AlphaTab_Model_BendPoint.maxPosition);
@@ -11912,7 +11811,7 @@
 		},
 		doLayout: function() {
 			// create glyphs
-			var sr = this.renderer;
+			var sr = ss.cast(this.renderer, $AlphaTab_Rendering_ScoreBarRenderer);
 			if (!this.get_container().beat.isEmpty) {
 				if (!this.get_container().beat.get_isRest()) {
 					//
@@ -12006,7 +11905,7 @@
 			}
 		},
 		$createBeatDot: function(line, offset, group) {
-			var sr = this.renderer;
+			var sr = ss.cast(this.renderer, $AlphaTab_Rendering_ScoreBarRenderer);
 			group.addGlyph(new $AlphaTab_Rendering_Glyphs_CircleGlyph(0, sr.getScoreY(line, offset + 2), 1.5 * this.get_scale()));
 		},
 		$createNoteHeadGlyph: function(n) {
@@ -12042,7 +11941,7 @@
 			return new $AlphaTab_Rendering_Glyphs_DiamondNoteHeadGlyph(0, 0, isGrace);
 		},
 		$createNoteGlyph: function(n) {
-			var sr = this.renderer;
+			var sr = ss.cast(this.renderer, $AlphaTab_Rendering_ScoreBarRenderer);
 			var noteHeadGlyph = this.$createNoteHeadGlyph(n);
 			// calculate y position
 			var line = sr.getNoteLine(n);
@@ -12093,7 +11992,7 @@
 			$AlphaTab_Rendering_Glyphs_BeatGlyphBase.prototype.doLayout.call(this);
 		},
 		$createAccidentalGlyph: function(n, accidentals) {
-			var sr = this.renderer;
+			var sr = ss.cast(this.renderer, $AlphaTab_Rendering_ScoreBarRenderer);
 			var noteLine = sr.getNoteLine(n);
 			var accidental = sr.accidentalHelper.applyAccidental(n, noteLine);
 			var isGrace = this.get_container().beat.graceType !== 0;
@@ -12118,7 +12017,7 @@
 			this.width = ss.Int32.trunc(10 * this.get_scale());
 		},
 		paint: function(cx, cy, canvas) {
-			var scoreBarRenderer = this.renderer;
+			var scoreBarRenderer = ss.cast(this.renderer, $AlphaTab_Rendering_ScoreBarRenderer);
 			var lineSize = scoreBarRenderer.get_lineOffset();
 			var res = this.renderer.get_resources();
 			var startY = cy + this.y + ss.Int32.trunc(scoreBarRenderer.getNoteY(this.$_beat.get_maxNote()) - lineSize / 2);
@@ -12285,7 +12184,7 @@
 			this.width = w + padding;
 		},
 		paint: function(cx, cy, canvas) {
-			var scoreRenderer = this.renderer;
+			var scoreRenderer = ss.cast(this.renderer, $AlphaTab_Rendering_ScoreBarRenderer);
 			//
 			// Note Effects only painted once
 			//
@@ -12344,7 +12243,7 @@
 			return false;
 		},
 		paint: function(cx, cy, canvas) {
-			var r = this.renderer;
+			var r = ss.cast(this.renderer, $AlphaTab_Rendering_ScoreBarRenderer);
 			var sizeX = ss.Int32.trunc(12 * this.get_scale());
 			var offsetX = ss.Int32.trunc(1 * this.get_scale());
 			var startX;
@@ -12415,14 +12314,14 @@
 			if (ss.isNullOrUndefined(this.endNote)) {
 				return;
 			}
-			var startNoteRenderer = this.renderer.get_layout().getRendererForBar(this.renderer.stave.staveId, this.startNote.beat.voice.bar.index);
-			var endNoteRenderer = this.renderer.get_layout().getRendererForBar(this.renderer.stave.staveId, this.endNote.beat.voice.bar.index);
+			var startNoteRenderer = ss.cast(this.renderer.get_layout().getRendererForBar(this.renderer.stave.staveId, this.startNote.beat.voice.bar.index), $AlphaTab_Rendering_GroupedBarRenderer);
+			var endNoteRenderer = ss.cast(this.renderer.get_layout().getRendererForBar(this.renderer.stave.staveId, this.endNote.beat.voice.bar.index), $AlphaTab_Rendering_GroupedBarRenderer);
 			var startX = 0;
 			var endX = 0;
 			var startY = 0;
 			var endY = 0;
 			var shouldDraw = false;
-			var parent = this.parent;
+			var parent = ss.cast(this.parent, $AlphaTab_Rendering_Glyphs_BeatContainerGlyph);
 			// if we are on the tie start, we check if we 
 			// either can draw till the end note, or we just can draw till the bar end
 			if (!this.$_forEnd) {
@@ -12461,7 +12360,7 @@
 	}, $AlphaTab_Rendering_Glyphs_Glyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_ScoreTieGlyph, $asm, {
 		getBeamDirection: function(note, noteRenderer) {
-			return noteRenderer.getBeatDirection(note.beat);
+			return ss.cast(noteRenderer, $AlphaTab_Rendering_ScoreBarRenderer).getBeatDirection(note.beat);
 		}
 	}, $AlphaTab_Rendering_Glyphs_TieGlyph);
 	ss.initClass($AlphaTab_Rendering_Glyphs_SharpGlyph, $asm, {
@@ -12556,7 +12455,7 @@
 		},
 		$createNoteGlyph: function(n) {
 			var isGrace = this.get_container().beat.graceType !== 0;
-			var tr = this.renderer;
+			var tr = ss.cast(this.renderer, $AlphaTab_Rendering_TabBarRenderer);
 			var noteNumberGlyph = new $AlphaTab_Rendering_Glyphs_NoteNumberGlyph(0, 0, n, isGrace);
 			var l = n.beat.voice.bar.track.tuning.length - n.string + 1;
 			noteNumberGlyph.y = tr.getTabY(l, -2);
@@ -12577,7 +12476,7 @@
 				trillNote.isGhost = true;
 				trillNote.fret = n.get_trillFret();
 				trillNote.string = n.string;
-				var tr = this.renderer;
+				var tr = ss.cast(this.renderer, $AlphaTab_Rendering_TabBarRenderer);
 				var trillNumberGlyph = new $AlphaTab_Rendering_Glyphs_NoteNumberGlyph(0, 0, trillNote, true);
 				var l = n.beat.voice.bar.track.tuning.length - n.string;
 				trillNumberGlyph.y = tr.getTabY(l, 0);
@@ -12604,7 +12503,7 @@
 			this.width = ss.Int32.trunc(10 * this.get_scale());
 		},
 		paint: function(cx, cy, canvas) {
-			var tabBarRenderer = this.renderer;
+			var tabBarRenderer = ss.cast(this.renderer, $AlphaTab_Rendering_TabBarRenderer);
 			var res = this.renderer.get_resources();
 			var startY = cy + this.x + ss.Int32.trunc(tabBarRenderer.getNoteY(this.$_beat.get_maxNote()) - res.tablatureFont.get_size() / 2);
 			var endY = cy + this.y + tabBarRenderer.getNoteY(this.$_beat.get_minNote()) + res.tablatureFont.get_size() / 2;
@@ -12772,7 +12671,7 @@
 			return false;
 		},
 		paint: function(cx, cy, canvas) {
-			var r = this.renderer;
+			var r = ss.cast(this.renderer, $AlphaTab_Rendering_TabBarRenderer);
 			var sizeX = ss.Int32.trunc(12 * this.get_scale());
 			var sizeY = ss.Int32.trunc(3 * this.get_scale());
 			var startX;
@@ -12953,7 +12852,7 @@
 			g.index = this.beatGlyphs.length;
 			g.renderer = this.renderer;
 			g.doLayout();
-			this.beatGlyphs.push(g);
+			this.beatGlyphs.push(ss.cast(g, $AlphaTab_Rendering_Glyphs_BeatContainerGlyph));
 			this.width = g.x + g.width;
 		},
 		doLayout: function() {
@@ -12994,7 +12893,7 @@
 			}
 			//
 			// calculate the overflow 
-			var tabBarRenderer = this.renderer;
+			var tabBarRenderer = ss.cast(this.renderer, $AlphaTab_Rendering_TabBarRenderer);
 			var track = this.renderer.bar.track;
 			var tabTop = tabBarRenderer.getTabY(0, -2);
 			var tabBottom = tabBarRenderer.getTabY(track.tuning.length, -2);
@@ -13008,7 +12907,7 @@
 			}
 		},
 		paint: function(cx, cy, canvas) {
-			var tabBarRenderer = this.renderer;
+			var tabBarRenderer = ss.cast(this.renderer, $AlphaTab_Rendering_TabBarRenderer);
 			var res = this.renderer.get_resources();
 			var startX = cx + this.x + ss.Int32.div(this.$_parent.onNotes.width, 2);
 			var endX = ((ss.isNullOrUndefined(this.$_beat.nextBeat) || !ss.referenceEquals(this.$_beat.voice, this.$_beat.nextBeat.voice)) ? (cx + this.x + ss.Int32.div(this.$_parent.onNotes.width, 2) + this.$_parent.postNotes.width) : (cx + tabBarRenderer.getBeatX(this.$_beat.nextBeat)));
@@ -13111,12 +13010,12 @@
 				return;
 			}
 			var score = this.renderer.score;
-			var startIndex = this.renderer.settings.layout.get('start', 1);
+			var startIndex = this.renderer.settings.layout.get(ss.Int32).call(this.renderer.settings.layout, 'start', 1);
 			startIndex--;
 			// map to array index
 			startIndex = Math.min(score.masterBars.length - 1, Math.max(0, startIndex));
 			var currentBarIndex = startIndex;
-			var endBarIndex = this.renderer.settings.layout.get('count', score.masterBars.length);
+			var endBarIndex = this.renderer.settings.layout.get(ss.Int32).call(this.renderer.settings.layout, 'count', score.masterBars.length);
 			endBarIndex = startIndex + endBarIndex - 1;
 			// map count to array index
 			endBarIndex = Math.min(score.masterBars.length - 1, Math.max(0, endBarIndex));
@@ -13147,12 +13046,12 @@
 		doLayout: function() {
 			this.$_groups = [];
 			var score = this.renderer.score;
-			var startIndex = this.renderer.settings.layout.get('start', 1);
+			var startIndex = this.renderer.settings.layout.get(ss.Int32).call(this.renderer.settings.layout, 'start', 1);
 			startIndex--;
 			// map to array index
 			startIndex = Math.min(score.masterBars.length - 1, Math.max(0, startIndex));
 			var currentBarIndex = startIndex;
-			var endBarIndex = this.renderer.settings.layout.get('count', score.masterBars.length);
+			var endBarIndex = this.renderer.settings.layout.get(ss.Int32).call(this.renderer.settings.layout, 'count', score.masterBars.length);
 			if (endBarIndex < 0) {
 				endBarIndex = score.masterBars.length;
 			}
@@ -13162,7 +13061,7 @@
 			var x = $AlphaTab_Rendering_Layout_PageViewLayout.pagePadding[0];
 			var y = $AlphaTab_Rendering_Layout_PageViewLayout.pagePadding[1];
 			y = this.$doScoreInfoLayout(y);
-			var autoSize = this.renderer.settings.layout.get('autoSize', true);
+			var autoSize = this.renderer.settings.layout.get(Boolean).call(this.renderer.settings.layout, 'autoSize', true);
 			if (autoSize || this.renderer.settings.width <= 0) {
 				this.width = ss.Int32.trunc(950 * this.get_scale());
 			}
@@ -13185,7 +13084,7 @@
 		},
 		$doScoreInfoLayout: function(y) {
 			// TODO: Check if it's a good choice to provide the complete flags as setting
-			var flags = (this.renderer.settings.layout.get('hideInfo', false) ? 0 : 511);
+			var flags = (this.renderer.settings.layout.get(Boolean).call(this.renderer.settings.layout, 'hideInfo', false) ? 0 : 511);
 			var score = this.renderer.score;
 			var scale = this.get_scale();
 			if (!ss.isNullOrEmptyString(score.title) && (flags & 1) !== 0) {
@@ -13244,7 +13143,7 @@
 			this.renderer.canvas.fillText(text, this.width / 2, y);
 		},
 		$paintScoreInfo: function(x, y) {
-			var flags = (this.renderer.settings.layout.get('hideInfo', false) ? 0 : 511);
+			var flags = (this.renderer.settings.layout.get(Boolean).call(this.renderer.settings.layout, 'hideInfo', false) ? 0 : 511);
 			var score = this.renderer.score;
 			var scale = this.get_scale();
 			var canvas = this.renderer.canvas;
@@ -13331,7 +13230,7 @@
 		$createStaveGroup: function(currentBarIndex, endIndex) {
 			var group = this.createEmptyStaveGroup();
 			group.index = this.$_groups.length;
-			var barsPerRow = this.renderer.settings.layout.get('barsPerRow', -1);
+			var barsPerRow = this.renderer.settings.layout.get(ss.Int32).call(this.renderer.settings.layout, 'barsPerRow', -1);
 			var maxWidth = this.get_$maxWidth();
 			var end = endIndex + 1;
 			for (var i = currentBarIndex; i < end; i++) {
@@ -13354,7 +13253,7 @@
 			return group;
 		},
 		get_$maxWidth: function() {
-			var autoSize = this.renderer.settings.layout.get('autoSize', true);
+			var autoSize = this.renderer.settings.layout.get(Boolean).call(this.renderer.settings.layout, 'autoSize', true);
 			var width = (autoSize ? this.get_$sheetWidth() : this.renderer.settings.width);
 			return width - $AlphaTab_Rendering_Layout_PageViewLayout.pagePadding[0] - $AlphaTab_Rendering_Layout_PageViewLayout.pagePadding[2];
 		},
@@ -13965,7 +13864,7 @@
 			return this.svg.charCodeAt(this.$_currentIndex);
 		},
 		nextToken: function() {
-			var token = new $AlphaTab_Collections_StringBuilder();
+			var token = [];
 			var c;
 			var skipChar;
 			// skip leading spaces and separators
@@ -13975,21 +13874,21 @@
 			} while (!this.get_eof() && skipChar);
 			// read token itself 
 			if (!this.get_eof() || !skipChar) {
-				token.appendChar(c);
+				token.push(String.fromCharCode(c));
 				if ($AlphaTab_Platform_Std.isCharNumber(c, true)) {
 					c = this.peekChar();
 					// get first upcoming character
 					while (!this.get_eof() && ($AlphaTab_Platform_Std.isCharNumber(c, false) || c === 46)) {
-						token.appendChar(this.nextChar());
+						token.push(String.fromCharCode(this.nextChar()));
 						// peek next character for check
 						c = this.peekChar();
 					}
 				}
 				else {
-					this.lastCommand = token.toString();
+					this.lastCommand = token.join('');
 				}
 			}
-			this.currentToken = token.toString();
+			this.currentToken = token.join('');
 		}
 	});
 	ss.initClass($AlphaTab_Rendering_Utils_SvgRenderer, $asm, {
@@ -14407,7 +14306,6 @@
 	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32840, $AlphaTab_Rendering_Glyphs_MusicFont.restSixtyFourth);
 	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32841, $AlphaTab_Rendering_Glyphs_MusicFont.accidentalDoubleFlat);
 	$AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.set_item(32842, $AlphaTab_Rendering_Glyphs_MusicFont.accidentalDoubleSharp);
-	$AlphaTab_Model_Tuning.tuningRegex = new RegExp('([a-g]b?)([0-9])', 'i');
 	$AlphaTab_Model_Tuning.$_sevenStrings = null;
 	$AlphaTab_Model_Tuning.$_sixStrings = null;
 	$AlphaTab_Model_Tuning.$_fiveStrings = null;
@@ -14427,6 +14325,7 @@
 	$AlphaTab_Rendering_Glyphs_NoteHeadGlyph.graceScale = 0.699999988079071;
 	$AlphaTab_Rendering_Glyphs_NoteHeadGlyph.noteHeadHeight = 9;
 	$AlphaTab_Rendering_Glyphs_AccidentalGroupGlyph.$nonReserved = -3000;
+	$AlphaTab_Rendering_Utils_AccidentalHelper.$accidentalNotes = [[1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1], [1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1], [0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1], [0, 0, 1, 0, 1, 0, 3, 1, 0, 1, 0, 1], [0, 3, 1, 0, 1, 0, 3, 1, 0, 1, 0, 1], [0, 3, 1, 0, 1, 0, 3, 1, 3, 1, 0, 1], [0, 3, 1, 3, 1, 0, 3, 1, 3, 1, 0, 1], [0, 2, 0, 2, 0, 0, 2, 0, 2, 0, 2, 0], [0, 2, 0, 2, 0, 1, 2, 0, 2, 0, 2, 0], [1, 2, 0, 2, 0, 1, 2, 0, 2, 0, 2, 0], [1, 2, 0, 2, 0, 1, 2, 1, 2, 0, 2, 0], [1, 2, 1, 2, 0, 1, 2, 1, 2, 0, 2, 0], [1, 2, 1, 2, 0, 1, 2, 1, 2, 1, 2, 0], [1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 2, 0], [1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 2, 1]];
 	$AlphaTab_Rendering_Glyphs_ScoreBeatGlyph.$normalKeys = null;
 	$AlphaTab_Rendering_Glyphs_ScoreBeatGlyph.$xKeys = null;
 	$AlphaTab_Rendering_Glyphs_ScoreBeatGlyph.$normalKeys = {};
@@ -14441,7 +14340,6 @@
 		var i1 = $t3[$t4];
 		$AlphaTab_Rendering_Glyphs_ScoreBeatGlyph.$xKeys[i1] = true;
 	}
-	$AlphaTab_Rendering_Utils_AccidentalHelper.$accidentalNotes = [[1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1], [1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1], [0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1], [0, 0, 1, 0, 1, 0, 3, 1, 0, 1, 0, 1], [0, 3, 1, 0, 1, 0, 3, 1, 0, 1, 0, 1], [0, 3, 1, 0, 1, 0, 3, 1, 3, 1, 0, 1], [0, 3, 1, 3, 1, 0, 3, 1, 3, 1, 0, 1], [0, 2, 0, 2, 0, 0, 2, 0, 2, 0, 2, 0], [0, 2, 0, 2, 0, 1, 2, 0, 2, 0, 2, 0], [1, 2, 0, 2, 0, 1, 2, 0, 2, 0, 2, 0], [1, 2, 0, 2, 0, 1, 2, 1, 2, 0, 2, 0], [1, 2, 1, 2, 0, 1, 2, 1, 2, 0, 2, 0], [1, 2, 1, 2, 0, 1, 2, 1, 2, 1, 2, 0], [1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 2, 0], [1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 2, 1]];
 	$AlphaTab_Rendering_ScoreBarRenderer.$stepsPerOctave = 7;
 	$AlphaTab_Rendering_ScoreBarRenderer.$octaveSteps = [38, 32, 30, 26, 38];
 	$AlphaTab_Rendering_ScoreBarRenderer.$sharpNoteSteps = [0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6];
@@ -14458,11 +14356,11 @@
 	$AlphaTab_Rendering_Glyphs_LineRangedGlyph.$lineSize = 8;
 	$AlphaTab_Model_Beat.whammyBarMaxPosition = 60;
 	$AlphaTab_Model_Beat.whammyBarMaxValue = 24;
-	$AlphaTab_Rendering_Glyphs_WhammyBarGlyph.$whammyMaxOffset = 60;
 	$AlphaTab_Rendering_Glyphs_NoteNumberGlyph.padding = 0;
 	$AlphaTab_Model_Note.$maxOffsetForSameLineSearch = 3;
 	$AlphaTab_Model_BendPoint.maxPosition = 60;
 	$AlphaTab_Model_BendPoint.maxValue = 12;
+	$AlphaTab_Rendering_Glyphs_WhammyBarGlyph.$whammyMaxOffset = 60;
 	$AlphaTab_Rendering_TabBarRenderer.lineSpacing = 10;
 	$AlphaTab_Rendering_Layout_HorizontalScreenLayout.pagePadding = [20, 20, 20, 20];
 	$AlphaTab_Rendering_Layout_HorizontalScreenLayout.groupSpacing = 20;
@@ -14477,16 +14375,8 @@
 	$AlphaTab_Environment.fileLoaders = {};
 	$AlphaTab_Environment.layoutEngines = {};
 	$AlphaTab_Environment.staveFactories = {};
-	$AlphaTab_Environment.renderEngines['default'] = function(d) {
-		return new $AlphaTab_Platform_Svg_SvgCanvas();
-	};
-	$AlphaTab_Environment.renderEngines['html5'] = function(d1) {
-		return new $AlphaTab_Platform_JavaScript_Html5Canvas(d1);
-	};
-	$AlphaTab_Environment.fileLoaders['default'] = function() {
-		return new $AlphaTab_Platform_JavaScript_JsFileLoader();
-	};
-	$AlphaTab_Environment.renderEngines['svg'] = function(d2) {
+	$AlphaTab_Environment.$platformInit();
+	$AlphaTab_Environment.renderEngines['svg'] = function(d) {
 		return new $AlphaTab_Platform_Svg_SvgCanvas();
 	};
 	// default layout engines
@@ -14565,6 +14455,7 @@
 	$AlphaTab_Audio_Generator_MidiFileHandler.defaultDurationPalmMute = 80;
 	$AlphaTab_Audio_Generator_MidiFileHandler.restMessage = 0;
 	$AlphaTab_Model_Track.$shortNameMaxLength = 10;
+	$AlphaTab_Model_TuningParser.tuningRegex = new RegExp('([a-g]b?)([0-9])', 'i');
 	$AlphaTab_IO_BitReader.$byteSize = 8;
 	$AlphaTab_Importer_GpxFileSystem.headerBcFs = 'BCFS';
 	$AlphaTab_Importer_GpxFileSystem.headerBcFz = 'BCFZ';

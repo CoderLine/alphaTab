@@ -14,7 +14,7 @@ namespace AlphaTab
     /// alphaTab looks for information like available layout engines
     /// staves etc.
     /// </summary>
-    public class Environment
+    public partial class Environment
     {
         public static FastDictionary<string, Func<object, ICanvas>> RenderEngines;
         public static FastDictionary<string, Func<IFileLoader>> FileLoaders;
@@ -28,17 +28,7 @@ namespace AlphaTab
             LayoutEngines = new FastDictionary<string, Func<ScoreRenderer, ScoreLayout>>();
             StaveFactories = new FastDictionary<string, Func<ScoreLayout, BarRendererFactory>>();
 
-#if CSharp
-            RenderEngines["default"] = d => new AlphaTab.Platform.CSharp.GdiCanvas();
-            RenderEngines["gdi"] = d => new AlphaTab.Platform.CSharp.GdiCanvas();
-            FileLoaders["default"] = () => new AlphaTab.Platform.CSharp.CsFileLoader();
-#elif JavaScript
-            RenderEngines["default"] = d => new SvgCanvas();
-            RenderEngines["html5"] = d => new AlphaTab.Platform.JavaScript.Html5Canvas(d);
-            FileLoaders["default"] = () =>new AlphaTab.Platform.JavaScript.JsFileLoader();
-#else
-#error Unsupported Platform
-#endif
+            PlatformInit();
 
             RenderEngines["svg"] = d => new SvgCanvas();
 

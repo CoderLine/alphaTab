@@ -130,10 +130,10 @@ namespace AlphaTab.Audio.Model
             }
         }
 
-        public void WriteTo(Stream s)
+        public void WriteTo(IWriteable s)
         {
             // build track data first
-            var trackData = new MemoryStream();
+            var trackData = new ByteBuffer();
             var current = FirstEvent;
             int count = 0;
             while (current != null)

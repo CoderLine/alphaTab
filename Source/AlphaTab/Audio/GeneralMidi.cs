@@ -1,4 +1,5 @@
 ﻿using AlphaTab.Collections;
+using AlphaTab.Platform;
 
 namespace AlphaTab.Audio
 {

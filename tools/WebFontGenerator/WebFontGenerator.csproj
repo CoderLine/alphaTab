@@ -56,9 +56,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Source\AlphaTab\AlphaTab.csproj">
-      <Project>{c5c9ca45-d7bc-41f5-b9e1-97731858ce10}</Project>
-      <Name>AlphaTab</Name>
+    <ProjectReference Include="..\..\Source\AlphaTab.CSharp\AlphaTab.CSharp.csproj">
+      <Project>{aba04ebe-36b2-469d-a025-16ba6131818e}</Project>
+      <Name>AlphaTab.CSharp</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

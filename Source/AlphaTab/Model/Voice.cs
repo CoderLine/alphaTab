@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using AlphaTab.Collections;
+using AlphaTab.Platform;
 
 namespace AlphaTab.Model
 {

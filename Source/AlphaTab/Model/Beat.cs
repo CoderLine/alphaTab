@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using AlphaTab.Audio;
 using AlphaTab.Collections;
+using AlphaTab.Platform;
 
 namespace AlphaTab.Model
 {

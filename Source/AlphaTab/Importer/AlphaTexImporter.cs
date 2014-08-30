@@ -2,6 +2,7 @@
 using AlphaTab.Audio;
 using AlphaTab.Collections;
 using AlphaTab.Model;
+using AlphaTab.Platform;
 
 namespace AlphaTab.Importer
 {
@@ -135,7 +136,7 @@ namespace AlphaTab.Importer
         /// <returns>the tuning value.</returns>
         private int ParseTuning(String str)
         {
-            var tuning = Tuning.GetTuningForText(str);
+            var tuning = TuningParser.GetTuningForText(str);
             if (tuning < 0)
             {
                 Error("tuning-value", AlphaTexSymbols.String, false);
@@ -297,7 +298,7 @@ namespace AlphaTab.Importer
                 else if (IsLetter(_ch))
                 {
                     var name = ReadName();
-                    if (Tuning.IsTuning(name))
+                    if (TuningParser.IsTuning(name))
                     {
                         _sy = AlphaTexSymbols.Tuning;
                         _syData = name.ToLower();

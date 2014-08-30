@@ -51,6 +51,7 @@
     <Compile Include="Collections\FastDictionary.cs" />
     <Compile Include="Collections\FastList.cs" />
     <Compile Include="Collections\StringBuilder.cs" />
+    <Compile Include="Platform\JavaScript\JsApi.cs" />
     <Compile Include="Properties\Attributes.cs" />
     <Compile Include="Audio\GeneralMidi.cs" />
     <Compile Include="Audio\Generator\IMidiFileHandler.cs" />

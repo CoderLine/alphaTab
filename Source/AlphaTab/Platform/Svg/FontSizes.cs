@@ -16,7 +16,6 @@ namespace AlphaTab.Platform.Svg
 
         public const int ControlChars = 0x20;
 
-
         public static float MeasureString(string s, SupportedFonts f, float size, FontStyle style)
         {
             ByteArray data;

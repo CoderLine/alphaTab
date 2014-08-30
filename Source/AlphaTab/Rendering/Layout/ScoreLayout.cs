@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using AlphaTab.Collections;
+using AlphaTab.Platform;
 using AlphaTab.Rendering.Staves;
 using AlphaTab.Rendering.Utils;
 

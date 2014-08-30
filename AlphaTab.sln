@@ -32,8 +32,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Build\JavaScript\jquery.alphaTab.js = Build\JavaScript\jquery.alphaTab.js
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlphaTab", "Source\AlphaTab\AlphaTab.csproj", "{C5C9CA45-D7BC-41F5-B9E1-97731858CE10}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{49FB227C-950C-49E1-8740-0ABBC3FF2942}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebFontGenerator", "Tools\WebFontGenerator\WebFontGenerator.csproj", "{A3F4711F-F386-43DD-8E6E-E7CE8B1F0B4C}"
@@ -42,7 +40,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FontGlyphExtractor", "Tools
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Base64ToFile", "Tools\Base64ToFile\Base64ToFile.csproj", "{29979A58-2622-4B55-890C-115D245F591B}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "AlphaTab", "Source\AlphaTab\AlphaTab.shproj", "{8083B3BC-0681-47F2-9FBF-A5C96107F538}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlphaTab.CSharp", "Source\AlphaTab.CSharp\AlphaTab.CSharp.csproj", "{ABA04EBE-36B2-469D-A025-16BA6131818E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlphaTab.JavaScript", "Source\AlphaTab.JavaScript\AlphaTab.JavaScript.csproj", "{5CFB12FE-A2FC-4688-ACB8-D68C2849F456}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Source\AlphaTab\AlphaTab.projitems*{aba04ebe-36b2-469d-a025-16ba6131818e}*SharedItemsImports = 4
+		Source\AlphaTab\AlphaTab.projitems*{8083b3bc-0681-47f2-9fbf-a5c96107f538}*SharedItemsImports = 13
+		Source\AlphaTab\AlphaTab.projitems*{5cfb12fe-a2fc-4688-acb8-d68c2849f456}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -84,10 +93,6 @@ Global
 		{0204D916-F0C3-41E2-9D81-B13D41D9F748}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0204D916-F0C3-41E2-9D81-B13D41D9F748}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0204D916-F0C3-41E2-9D81-B13D41D9F748}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C5C9CA45-D7BC-41F5-B9E1-97731858CE10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C5C9CA45-D7BC-41F5-B9E1-97731858CE10}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C5C9CA45-D7BC-41F5-B9E1-97731858CE10}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C5C9CA45-D7BC-41F5-B9E1-97731858CE10}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A3F4711F-F386-43DD-8E6E-E7CE8B1F0B4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A3F4711F-F386-43DD-8E6E-E7CE8B1F0B4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3F4711F-F386-43DD-8E6E-E7CE8B1F0B4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -100,6 +105,14 @@ Global
 		{29979A58-2622-4B55-890C-115D245F591B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{29979A58-2622-4B55-890C-115D245F591B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{29979A58-2622-4B55-890C-115D245F591B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABA04EBE-36B2-469D-A025-16BA6131818E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABA04EBE-36B2-469D-A025-16BA6131818E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABA04EBE-36B2-469D-A025-16BA6131818E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABA04EBE-36B2-469D-A025-16BA6131818E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CFB12FE-A2FC-4688-ACB8-D68C2849F456}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CFB12FE-A2FC-4688-ACB8-D68C2849F456}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CFB12FE-A2FC-4688-ACB8-D68C2849F456}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CFB12FE-A2FC-4688-ACB8-D68C2849F456}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

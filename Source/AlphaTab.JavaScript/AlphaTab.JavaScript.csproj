@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5CFB12FE-A2FC-4688-ACB8-D68C2849F456}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>AlphaTab</RootNamespace>
+    <AssemblyName>AlphaTab</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <NoStdLib>True</NoStdLib>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;JavaScript</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Collections\FastDictionary.cs" />
+    <Compile Include="Collections\FastList.cs" />
+    <Compile Include="Collections\StringBuilder.cs" />
+    <Compile Include="Environment.cs" />
+    <Compile Include="IO\ByteArray.cs" />
+    <Compile Include="Model\TuningParser.cs" />
+    <Compile Include="Platform\JavaScript\Html5Canvas.cs" />
+    <Compile Include="Platform\JavaScript\JsApi.cs" />
+    <Compile Include="Platform\JavaScript\JsFileLoader.cs" />
+    <Compile Include="Platform\Std.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib">
+      <HintPath>$(SolutionDir)packages\Saltarelle.Runtime.2.5.0\tools\Assemblies\mscorlib.dll</HintPath>
+    </Reference>
+    <Reference Include="Saltarelle.Web">
+      <HintPath>..\packages\Saltarelle.Web.3.1.0\lib\Saltarelle.Web.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <Import Project="..\Source\AlphaTab\AlphaTab.projitems" Label="Shared" Condition="Exists('..\Source\AlphaTab\AlphaTab.projitems')" />
+  <Import Project="..\AlphaTab\AlphaTab.projitems" Label="Shared" Condition="Exists('..\AlphaTab\AlphaTab.projitems')" />
+  <Import Project="..\AlphaTab\AlphaTab.projitems" Label="Shared" Condition="Exists('..\AlphaTab\AlphaTab.projitems')" />
+  <Import Project="..\AlphaTab\AlphaTab.projitems" Label="Shared" Condition="Exists('..\AlphaTab\AlphaTab.projitems')" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets')" />
+  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets')" />
+  <PropertyGroup>
+    <PostBuildEvent>uglifyjs "$(TargetDir)$(TargetName).js" -o "$(TargetDir)$(TargetName).min.js" -c
+xcopy "$(TargetDir)$(TargetName).js" "$(SolutionDir)Build\JavaScript" /s /i /y
+xcopy "$(TargetDir)$(TargetName).min.js" "$(SolutionDir)Build\JavaScript" /s /i /y</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

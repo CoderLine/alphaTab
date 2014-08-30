@@ -59,7 +59,7 @@ namespace AlphaTab.Importer
         /// </summary>
         /// <param name="s">the binary source to read from.</param>
         /// <returns></returns>
-        public void Load(Stream s)
+        public void Load(IReadable s)
         {
             var src = new BitReader(s);
             ReadBlock(src);
@@ -85,7 +85,7 @@ namespace AlphaTab.Importer
         /// <returns>the decompressed byte data. if skipHeader is set to false the BCFS header is included.</returns>
         public ByteArray Decompress(BitReader src, bool skipHeader = false)
         {
-            var uncompressed = new MemoryStream();
+            var uncompressed = new ByteBuffer();
             ByteArray buffer;
             var expectedLength = GetInteger(src.ReadBytes(4), 0);
 
@@ -125,7 +125,7 @@ namespace AlphaTab.Importer
                     }
                 }
             }
-            catch (EndOfStreamException)
+            catch (EndOfReaderException)
             {
             }
 
@@ -213,7 +213,7 @@ namespace AlphaTab.Importer
                     var sectorCount = 0; // we're keeping count so we can calculate the offset of the array item
 
                     // as long we have data blocks we need to iterate them, 
-                    var fileData = storeFile ? new MemoryStream(file.FileSize) : null;
+                    var fileData = storeFile ? new ByteBuffer(file.FileSize) : null;
                     while ((sector = GetInteger(data, (dataPointerOffset + (4 * (sectorCount++))))) != 0)
                     {
                         // the next file entry starts after the last data sector so we 

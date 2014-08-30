@@ -9,14 +9,12 @@
 
         private int _currentByte; // the currently read byte
         private int _position; // the current bit position within the current byte
-        private int _readBytes;
 
-        private readonly Stream _source;
+        private readonly IReadable _source;
 
-        public BitReader(Stream source)
+        public BitReader(IReadable source)
         {
             _source = source;
-            _readBytes = 0;
             _position = ByteSize; // to ensure a byte is read on beginning
         }
 
@@ -63,8 +61,7 @@
             if (_position >= ByteSize)
             {
                 _currentByte = _source.ReadByte();
-                if (_currentByte == -1) throw new EndOfStreamException();
-                _readBytes++;
+                if (_currentByte == -1) throw new EndOfReaderException();
                 _position = 0;
             }
         
@@ -77,7 +74,7 @@
 
         public ByteArray ReadAll()
         {
-            var all = new MemoryStream();
+            var all = new ByteBuffer();
             try
             {
                 while (true)
@@ -85,7 +82,7 @@
                     all.WriteByte((byte) ReadByte());
                 }
             }
-            catch (EndOfStreamException)
+            catch (EndOfReaderException)
             {
             }
             return all.ToArray();

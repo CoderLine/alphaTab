@@ -22,7 +22,7 @@ namespace AlphaTab.Audio.Model
             Data = data;
         }
 
-        public void WriteTo(Stream s)
+        public void WriteTo(IWriteable s)
         {
             s.Write(Data, 0, Data.Length);
         }

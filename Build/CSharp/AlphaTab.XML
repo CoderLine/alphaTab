@@ -4,16 +4,39 @@
         <name>AlphaTab</name>
     </assembly>
     <members>
-        <member name="T:AlphaTab.Collections.FastDictionary`2">
+        <member name="T:AlphaTab.Environment">
             <summary>
-            This is an improved dictionary which is also optimized for the JavaScript platform. 
+            This public class represents the global alphaTab environment where
+            alphaTab looks for information like available layout engines
+            staves etc.
             </summary>
-            <typeparam name="TKey"></typeparam>
-            <typeparam name="TValue"></typeparam>
         </member>
-        <member name="T:AlphaTab.Collections.FastList`1">
+        <member name="M:AlphaTab.Model.TuningParser.IsTuning(System.String)">
             <summary>
-            This is an improved list which is also optimized for the JavaScript platform. 
+            Checks if the given string is a tuning inticator.
+            </summary>Checks if the given string is a tuning inticator.
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="T:AlphaTab.Platform.CSharp.CsFileLoader">
+            <summary>
+            This file loader loads binary files using the native apis
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Platform.IFileLoader">
+            <summary>
+            This is the public interface which file loaders need to implement for providing 
+            files on different plattforms. 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Platform.ICanvas">
+            <summary>
+            This is the base public interface for canvas implementations on different plattforms.
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Platform.IPathCanvas">
+            <summary>
+            This is the path drawing API for canvas implementations
             </summary>
         </member>
         <member name="T:AlphaTab.Audio.GeneralMidi">
@@ -35,18 +58,6 @@
             <summary>
             This handler is responsible for writing midi events
             to a MidiFile object.
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Audio.Model.MidiFile">
-            <summary>
-            A midi file consists of multiple tracks including a
-            info track for multi-track messages and a track for metronome ticks. 
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Audio.Model.MidiFile.InfoTrack">
-            <summary>
-            Gets or sets the index of the track used for midi events
-            affecting all tracks. (like the tempo)
             </summary>
         </member>
         <member name="F:AlphaTab.Audio.MidiUtils.QuarterTime">
@@ -84,6 +95,18 @@
             A midi event is a timed midi message. 
             </summary>
         </member>
+        <member name="T:AlphaTab.Audio.Model.MidiFile">
+            <summary>
+            A midi file consists of multiple tracks including a
+            info track for multi-track messages and a track for metronome ticks. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Model.MidiFile.InfoTrack">
+            <summary>
+            Gets or sets the index of the track used for midi events
+            affecting all tracks. (like the tempo)
+            </summary>
+        </member>
         <member name="T:AlphaTab.Audio.Model.MidiMessage">
             <summary>
             Represents a midi message. 
@@ -99,13 +122,6 @@
             Represents a single midi track. A midi track contains
             a linked list of midi es and supports sorted inserting of 
             midi es into this track.
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Environment">
-            <summary>
-            This public class represents the global alphaTab environment where
-            alphaTab looks for information like available layout engines
-            staves etc.
             </summary>
         </member>
         <member name="T:AlphaTab.Importer.AlphaTexImporter">
@@ -248,7 +264,7 @@
             Creates a new GpxFileSystem instance
             </summary>
         </member>
-        <member name="M:AlphaTab.Importer.GpxFileSystem.Load(AlphaTab.IO.Stream)">
+        <member name="M:AlphaTab.Importer.GpxFileSystem.Load(AlphaTab.IO.IReadable)">
             <summary>
             Load a complete FileSystem to the memory.
             </summary>
@@ -654,13 +670,6 @@
             This public class represents a predefined string tuning.
             </summary>
         </member>
-        <member name="M:AlphaTab.Model.Tuning.IsTuning(System.String)">
-            <summary>
-            Checks if the given string is a tuning inticator.
-            </summary>Checks if the given string is a tuning inticator.
-            <param name="name"></param>
-            <returns></returns>
-        </member>
         <member name="T:AlphaTab.Model.VibratoType">
             <summary>
             This public enum lists all vibrato types that can be performed.
@@ -670,27 +679,6 @@
             <summary>
             A voice represents a group of beats 
             that can be played during a bar. 
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Platform.CSharp.CsFileLoader">
-            <summary>
-            This file loader loads binary files using the native apis
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Platform.IFileLoader">
-            <summary>
-            This is the public interface which file loaders need to implement for providing 
-            files on different plattforms. 
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Platform.ICanvas">
-            <summary>
-            This is the base public interface for canvas implementations on different plattforms.
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Platform.IPathCanvas">
-            <summary>
-            This is the path drawing API for canvas implementations
             </summary>
         </member>
         <member name="T:AlphaTab.Platform.Model.Font">
@@ -706,6 +694,21 @@
         <member name="T:AlphaTab.Platform.Model.TextBaseline">
             <summary>
             This public enum lists all base line modes
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Platform.Svg.FontSizes">
+            <summary>
+            This public class stores text widths for several fonts and allows width calculation 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Platform.Svg.SupportedFonts">
+            <summary>
+            The supported fonts by the FontSizes public class
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Platform.Svg.SvgCanvas">
+            <summary>
+             A canvas implementation storing SVG data
             </summary>
         </member>
         <member name="T:AlphaTab.Rendering.AlternateEndingsBarRenderer">
@@ -1224,7 +1227,7 @@
             </ul>
             </summary>
         </member>
-        <!-- Ungültiger XML-Kommentar wurde für den Member "P:AlphaTab.LayoutSettings.AdditionalSettings" ignoriert -->
+        <!-- Badly formed XML comment ignored for member "P:AlphaTab.LayoutSettings.AdditionalSettings" -->
         <member name="P:AlphaTab.StaveSettings.Id">
             <summary>
             The stave identifier.
@@ -1257,21 +1260,6 @@
             <ul>
              <li><strong>rhythm</strong> - Renders rhythm beams to tablature notes</li>
             </ul>
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Platform.Svg.FontSizes">
-            <summary>
-            This public class stores text widths for several fonts and allows width calculation 
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Platform.Svg.SupportedFonts">
-            <summary>
-            The supported fonts by the FontSizes public class
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Platform.Svg.SvgCanvas">
-            <summary>
-             A canvas implementation storing SVG data
             </summary>
         </member>
     </members>

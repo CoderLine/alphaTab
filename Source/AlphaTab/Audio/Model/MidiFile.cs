@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using AlphaTab.Collections;
 using AlphaTab.IO;
+using AlphaTab.Platform;
 
 namespace AlphaTab.Audio.Model
 {
@@ -34,7 +35,7 @@ namespace AlphaTab.Audio.Model
             return track;
         }
 
-        public void WriteTo(Stream s)
+        public void WriteTo(IWriteable s)
         {
             ByteArray b;
         

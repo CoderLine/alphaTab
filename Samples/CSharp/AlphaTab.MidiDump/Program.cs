@@ -3,6 +3,7 @@ using System.IO;
 using AlphaTab.Audio.Generator;
 using AlphaTab.Audio.Model;
 using AlphaTab.Importer;
+using AlphaTab.IO;
 using AlphaTab.Model;
 
 namespace AlphaTab.MidiDump
@@ -25,7 +26,7 @@ namespace AlphaTab.MidiDump
 
             // write midi file
             string path = Path.ChangeExtension(args[0], "mid");
-            using (FileStream fs = File.OpenWrite(path))
+            using (var fs = new StreamWrapper(File.OpenWrite(path)))
             {
                 file.WriteTo(fs);
             }

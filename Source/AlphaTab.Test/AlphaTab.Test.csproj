@@ -58,12 +58,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AlphaTab\AlphaTab.csproj">
-      <Project>{c5c9ca45-d7bc-41f5-b9e1-97731858ce10}</Project>
-      <Name>AlphaTab</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="TestFiles\Compressed.gpx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

@@ -90,13 +90,7 @@ namespace AlphaTab.Importer
             _noteById = new FastDictionary<string, Note>();
             _tappedNotes = new FastDictionary<string, bool>();
 
-            XmlDocument dom;
-#if CSharp
-            dom = new XmlDocument();
-            dom.LoadXml(xml);
-#elif JavaScript
-            dom = XmlDocumentParser.Parse(xml);
-#endif
+            XmlDocument dom = Std.LoadXml(xml);
             ParseDom(dom);
         }
 
@@ -1257,20 +1251,7 @@ namespace AlphaTab.Importer
 
         private string GetValue(XmlNode n)
         {
-            if (n.NodeType == XmlNodeType.Element || n.NodeType == XmlNodeType.Document)
-            {
-                var txt = new StringBuilder();
-                foreach (XmlNode childNode in n.ChildNodes)
-                {
-                    txt.Append(GetValue(childNode));
-                }
-                return txt.ToString().Trim();
-            }
-#if CSharp
-            return n.Value;
-#elif JavaScript
-            return n.NodeValue;
-#endif
+            return Std.GetNodeValue(n);
         }
 
         #endregion

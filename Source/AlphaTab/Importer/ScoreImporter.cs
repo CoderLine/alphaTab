@@ -9,7 +9,7 @@ namespace AlphaTab.Importer
     /// </summary>
     abstract public class ScoreImporter
     {
-        protected MemoryStream _data;
+        protected IReadable _data;
 
         /**
          * Gets all default ScoreImporters
@@ -25,7 +25,7 @@ namespace AlphaTab.Importer
             };
         }
 
-        public virtual void Init(MemoryStream data)
+        public virtual void Init(IReadable data)
         {
             _data = data;
         }

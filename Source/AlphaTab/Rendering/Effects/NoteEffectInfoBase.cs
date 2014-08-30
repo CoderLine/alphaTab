@@ -1,5 +1,6 @@
 ﻿using AlphaTab.Collections;
 using AlphaTab.Model;
+using AlphaTab.Platform;
 using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
