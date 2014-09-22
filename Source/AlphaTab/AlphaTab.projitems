@@ -71,6 +71,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Model\Tuning.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\VibratoType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Voice.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Platform\ICanvas.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\IFileLoader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Model\Color.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Model\Font.cs" />
@@ -78,7 +79,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Model\TextBaseline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Std.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Svg\FontSizes.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Platform\Svg\ICanvas.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Svg\SupportedFonts.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Svg\SvgCanvas.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\AlternateEndingsBarRenderer.cs" />
