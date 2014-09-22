@@ -239,7 +239,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\AlphaTab.CSharp\AlphaTab.CSharp.csproj">
+      <Project>{aba04ebe-36b2-469d-a025-16ba6131818e}</Project>
+      <Name>AlphaTab.CSharp</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

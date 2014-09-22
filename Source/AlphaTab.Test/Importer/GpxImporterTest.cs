@@ -4,7 +4,6 @@ using System.IO;
 using AlphaTab.Importer;
 using AlphaTab.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MemoryStream = AlphaTab.IO.MemoryStream;
 
 namespace AlphaTab.Test.Importer
 {
@@ -25,7 +24,7 @@ namespace AlphaTab.Test.Importer
         internal GpxImporter PrepareImporterWithBytes(ByteArray buffer)
         {
             var readerBase = new GpxImporter();
-            readerBase.Init(new MemoryStream(buffer));
+            readerBase.Init(new StreamWrapper(new MemoryStream(buffer.Data)));
             return readerBase;
         }
 
@@ -33,7 +32,7 @@ namespace AlphaTab.Test.Importer
         public void TestFileSystemCompressed()
         {
             GpxFileSystem fileSystem = new GpxFileSystem();
-            fileSystem.Load(new MemoryStream(Load("Compressed.gpx")));
+            fileSystem.Load(new StreamWrapper(new MemoryStream(Load("Compressed.gpx").Data)));
 
             string[] names = {"score.gpif", "misc.xml", "BinaryStylesheet", "PartConfiguration", "LayoutConfiguration"};
             int[] sizes = {8488, 130, 12204, 20, 12};

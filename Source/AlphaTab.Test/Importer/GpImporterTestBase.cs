@@ -4,7 +4,6 @@ using AlphaTab.Importer;
 using AlphaTab.IO;
 using AlphaTab.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MemoryStream = AlphaTab.IO.MemoryStream;
 
 namespace AlphaTab.Test.Importer
 {
@@ -20,7 +19,7 @@ namespace AlphaTab.Test.Importer
         internal Gp3To5Importer PrepareImporterWithBytes(ByteArray buffer)
         {
             var readerBase = new Gp3To5Importer();
-            readerBase.Init(new MemoryStream(buffer));
+            readerBase.Init(new StreamWrapper(new MemoryStream(buffer.Data)));
             return readerBase;
         }
 
