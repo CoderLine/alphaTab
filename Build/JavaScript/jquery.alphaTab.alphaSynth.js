@@ -19,7 +19,7 @@
         }        
         
         var midi = AlphaTab.Audio.Generator.MidiFileGenerator.generateMidiFile(score);
-        var ms = new AlphaTab.IO.MemoryStream();
+        var ms = new AlphaTab.IO.ByteBuffer();
         midi.writeTo(ms);
         var bytes = ms.toArray();
         synth.loadMidiBytesData(bytes);
@@ -33,8 +33,8 @@
         var context = $(this).data('alphaTab');
         if(!context) { console.error('alphaTab not initialized!'); }
         
-        $(this).on('loaded', function(e, score) {
-            loadMidi(score);
+        $(this).on('loaded', function(e) {
+            loadMidi(e.originalEvent.detail);
         });
         
         // initial load
