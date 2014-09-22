@@ -497,10 +497,13 @@ namespace AlphaTab.Rendering
             //
             // Draw beam 
             //
-            var glyph = new BeamGlyph(beatLineX, beamY, beat.Duration, direction, isGrace);
-            glyph.Renderer = this;
-            glyph.DoLayout();
-            glyph.Paint(cx + X, cy + Y, canvas);
+            if (beat.Duration > Duration.Quarter)
+            {
+                var glyph = new BeamGlyph(beatLineX, beamY, beat.Duration, direction, isGrace);
+                glyph.Renderer = this;
+                glyph.DoLayout();
+                glyph.Paint(cx + X, cy + Y, canvas);
+            }
         }
 
 

@@ -10189,10 +10189,12 @@
 			//
 			// Draw beam 
 			//
-			var glyph = new $AlphaTab_Rendering_Glyphs_BeamGlyph(beatLineX, beamY, beat.duration, direction, isGrace);
-			glyph.renderer = this;
-			glyph.doLayout();
-			glyph.paint(cx + this.x, cy + this.y, canvas);
+			if (beat.duration > 4) {
+				var glyph = new $AlphaTab_Rendering_Glyphs_BeamGlyph(beatLineX, beamY, beat.duration, direction, isGrace);
+				glyph.renderer = this;
+				glyph.doLayout();
+				glyph.paint(cx + this.x, cy + this.y, canvas);
+			}
 		},
 		createPreBeatGlyphs: function() {
 			if (this.bar.get_masterBar().isRepeatStart) {
