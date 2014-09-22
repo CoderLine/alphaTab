@@ -14,7 +14,7 @@ namespace AlphaTab.Platform
         {
             float f;
             double d = double.Parse(s);
-            if(double.IsNaN(d)) 
+            if (double.IsNaN(d))
             {
                 f = float.NaN;
             }
@@ -85,6 +85,48 @@ namespace AlphaTab.Platform
             var n = readable.ReadByte();
             if (n >= 128) return (sbyte)(n - 256);
             return (sbyte)n;
+        }
+
+        public static string ToString(ByteArray data)
+        {
+            var s = new StringBuilder();
+            int i = 0;
+            while (i < data.Length)
+            {
+                var c = data[i++];
+                if (c < 0x80)
+                {
+                    if (c == 0) break;
+                    s.AppendChar(c);
+                }
+                else if (c < 0xE0)
+                {
+                    s.AppendChar(((c & 0x3F) << 6) | (data[i++] & 0x7F));
+                }
+                else if (c < 0xF0)
+                {
+                    s.AppendChar(((c & 0x1F) << 12) | ((data[i++] & 0x7F) << 6) | (data[i++] & 0x7F));
+                }
+                else
+                {
+                    var u = ((c & 0x0F) << 18) | ((data[i++] & 0x7F) << 12) |
+                            ((data[i++] & 0x7F) << 6) | (data[i++] & 0x7F);
+                    s.AppendChar((u >> 18) + 0xD7C0);
+                    s.AppendChar((u & 0x3FF) | 0xDC00);
+                }
+            }
+            return s.ToString();
+        }
+
+
+        public static ByteArray StringToByteArray(string contents)
+        {
+            var byteArray = new ByteArray(contents.Length);
+            for (int i = 0; i < contents.Length; i++)
+            {
+                byteArray[i] = (byte)contents.CharCodeAt(i);
+            }
+            return byteArray;
         }
     }
 }

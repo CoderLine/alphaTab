@@ -287,19 +287,19 @@ namespace AlphaTab.Platform.Svg
                 return;
             }
 
-            _buffer += "<text x=\"";
-            _buffer += x;
-            _buffer += "\" y=\"";
-            _buffer += y + GetSvgBaseLineOffset();
-            _buffer += "\" style=\"font:";
-            _buffer += Resources.MusicFont.ToCssString();
-            _buffer += "; fill:";
-            _buffer += Color.ToRgbaString();
-            _buffer += ";\" ";
-            _buffer += " dominant-baseline=\"top\" text-anchor=\"start\"";
-            _buffer += ">&#x";
-            _buffer += Std.ToHexString((int)symbol);
-            _buffer += ";</text>\n";
+            //_buffer += "<text x=\"";
+            //_buffer += x;
+            //_buffer += "\" y=\"";
+            //_buffer += y + GetSvgBaseLineOffset();
+            //_buffer += "\" style=\"font:";
+            //_buffer += Resources.MusicFont.ToCssString();
+            //_buffer += "; fill:";
+            //_buffer += Color.ToRgbaString();
+            //_buffer += ";\" ";
+            //_buffer += " dominant-baseline=\"top\" text-anchor=\"start\"";
+            //_buffer += ">&#x";
+            //_buffer += Std.ToHexString((int)symbol);
+            //_buffer += ";</text>\n";
 
 
             //if (symbol == MusicFontSymbol.None)
@@ -307,8 +307,8 @@ namespace AlphaTab.Platform.Svg
             //    return;
             //}
 
-            //SvgRenderer glyph = new SvgRenderer(MusicFont.SymbolLookup[symbol], scale, scale);
-            //glyph.Paint(x, y, this);
+            SvgRenderer glyph = new SvgRenderer(MusicFont.SymbolLookup[symbol], scale, scale);
+            glyph.Paint(x, y, this);
         }
     }
 }

@@ -36,15 +36,5 @@ namespace AlphaTab.Platform
             } while (n > 0);
             return s;
         }
-
-        public static ByteArray StringToByteArray(string contents)
-        {
-            var byteArray = new ByteArray(contents.Length);
-            for (int i = 0; i < contents.Length; i++)
-            {
-                byteArray[i] = (byte) contents.CharCodeAt(i);
-            }
-            return byteArray;
-        }
     }
 }

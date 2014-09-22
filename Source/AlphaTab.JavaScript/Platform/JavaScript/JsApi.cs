@@ -33,7 +33,7 @@ namespace AlphaTab.Platform.JavaScript
             {
                 tracksData = options.tracks;
             }
-            else if (element.Dataset != null && element.Dataset["tracks"] != null)
+            else if (element != null && element.Dataset != null && element.Dataset["tracks"] != null)
             {
                 tracksData = element.Dataset["tracks"];
             }
@@ -46,25 +46,31 @@ namespace AlphaTab.Platform.JavaScript
 
             #endregion
 
-            // get load contents
-            var contents = element.InnerText.Trim();
-            element.InnerHTML = "";
-
-            #region Create context elements (wrapper, canvas etc)
-
-            if (settings.Engine == "html5")
+            string contents = "";
+            if (element != null)
             {
-                _canvasElement = Document.CreateElement("canvas");
-            }
-            else
-            {
-                _canvasElement = Document.CreateElement("div");
-            }
+                // get load contents
 
-            _canvasElement.ClassName = "alphaTabSurface";
-            element.AppendChild(_canvasElement);
+                contents = element.InnerText.Trim();
+                element.InnerHTML = "";
+          
+                #region Create context elements (wrapper, canvas etc)
 
-            #endregion
+                if (settings.Engine == "html5")
+                {
+                    _canvasElement = Document.CreateElement("canvas");
+                }
+                else
+                {
+                    _canvasElement = Document.CreateElement("div");
+                }
+
+                _canvasElement.ClassName = "alphaTabSurface";
+                element.AppendChild(_canvasElement);
+
+                #endregion
+
+            }
 
             #region Renderer Setup
 
@@ -73,7 +79,7 @@ namespace AlphaTab.Platform.JavaScript
             Renderer.PostRenderFinished += () => TriggerEvent("post-rendered");
             Renderer.RenderFinished += () =>
             {
-                if (Renderer.Canvas is SvgCanvas)
+                if (_canvasElement != null && Renderer.Canvas is SvgCanvas)
                 {
                     _canvasElement.InnerHTML = ((SvgCanvas)Renderer.Canvas).ToSvg(true, "alphaTabSurfaceSvg");
                     _canvasElement.Style.Width = Renderer.Canvas.Width + "px";
@@ -89,7 +95,7 @@ namespace AlphaTab.Platform.JavaScript
             {
                 Tex(contents);
             }
-            else if (_element.Dataset != null && !string.IsNullOrEmpty(_element.Dataset["file"]))
+            else if (_element != null && _element.Dataset != null && !string.IsNullOrEmpty(_element.Dataset["file"]))
             {
                 Load(_element.Dataset["file"]);
             }
@@ -117,11 +123,16 @@ namespace AlphaTab.Platform.JavaScript
                     }
                 }
 
+                if (tracks.Count == 0 && Score.Tracks.Count > 0)
+                {
+                    tracks.Add(Score.Tracks[0]);
+                }
+
                 return tracks.ToArray();
             }
         }
 
-        private void Load(object data)
+        public void Load(object data)
         {
             try
             {
@@ -219,17 +230,15 @@ namespace AlphaTab.Platform.JavaScript
 
         private void TriggerEvent(string name, object details = null)
         {
-            dynamic e = Document.CreateEvent("CustomEvent");
-            e.initCustomEvent(name, false, false, details);
-            _element.DispatchEvent(e);
-
-            //_element.DispatchEvent(new CustomEvent(name, new CustomEventInit()
-            //{
-            //    Detail = details
-            //}));
+            if (_element != null)
+            {
+                dynamic e = Document.CreateEvent("CustomEvent");
+                e.initCustomEvent(name, false, false, details);
+                _element.DispatchEvent(e);
+            }
         }
 
-        private void Render()
+        public void Render()
         {
             if (Renderer != null)
             {
@@ -242,4 +251,5 @@ namespace AlphaTab.Platform.JavaScript
         {
         }
     }
+
 }

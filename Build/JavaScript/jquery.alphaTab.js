@@ -32,7 +32,13 @@
             if (!context) { console.error('alphaTab not initialized!'); }
             context.tex(contents);
         },
-        
+         
+        load: function(data) {
+            var context = $(this).data('alphaTab');
+            if (!context) { console.error('alphaTab not initialized!'); }
+            context.load(data);
+        },
+       
         tracks: function(tracks) {
             var context = $(this).data('alphaTab');
             if (!context) { console.error('alphaTab not initialized!'); }
@@ -44,7 +50,7 @@
             }
         },
         
-        score: function() {
+        score: function(score) {
             var context = $(this).data('alphaTab');
             if (!context) { console.error('alphaTab not initialized!'); }
             if(tracks) {
@@ -87,7 +93,6 @@
     
     // allow plugins to add methods
     $.fn.alphaTab.fn = api;
-  
     
 })(jQuery);
 

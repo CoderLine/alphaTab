@@ -1554,6 +1554,38 @@
 		}
 		return n;
 	};
+	$AlphaTab_Platform_Std.toString = function(data) {
+		var s = [];
+		var i = 0;
+		while (i < data.length) {
+			var c = data[i++];
+			if (c < 128) {
+				if (c === 0) {
+					break;
+				}
+				s.push(String.fromCharCode(c));
+			}
+			else if (c < 224) {
+				s.push(String.fromCharCode((c & 63) << 6 | data[i++] & 127));
+			}
+			else if (c < 240) {
+				s.push(String.fromCharCode((c & 31) << 12 | (data[i++] & 127) << 6 | data[i++] & 127));
+			}
+			else {
+				var u = (c & 15) << 18 | (data[i++] & 127) << 12 | (data[i++] & 127) << 6 | data[i++] & 127;
+				s.push(String.fromCharCode((u >> 18) + 55232));
+				s.push(String.fromCharCode(u & 1023 | 56320));
+			}
+		}
+		return s.join('');
+	};
+	$AlphaTab_Platform_Std.stringToByteArray = function(contents) {
+		var byteArray = new Uint8Array(contents.length);
+		for (var i = 0; i < contents.length; i++) {
+			byteArray[i] = contents.charCodeAt(i);
+		}
+		return byteArray;
+	};
 	$AlphaTab_Platform_Std.isStringNumber = function(s, allowSign) {
 		if (s.length === 0) {
 			return false;
@@ -1575,13 +1607,6 @@
 			n >>= 4;
 		} while (n > 0);
 		return s;
-	};
-	$AlphaTab_Platform_Std.stringToByteArray = function(contents) {
-		var byteArray = new Uint8Array(contents.length);
-		for (var i = 0; i < contents.length; i++) {
-			byteArray[i] = contents.charCodeAt(i);
-		}
-		return byteArray;
 	};
 	global.AlphaTab.Platform.Std = $AlphaTab_Platform_Std;
 	////////////////////////////////////////////////////////////////////////////////
@@ -1614,24 +1639,27 @@
 		if (!!(ss.isValue(options) && options.tracks)) {
 			tracksData = options.tracks;
 		}
-		else if (ss.isValue(element.dataset) && ss.isValue(element.dataset['tracks'])) {
+		else if (ss.isValue(element) && ss.isValue(element.dataset) && ss.isValue(element.dataset['tracks'])) {
 			tracksData = element.dataset['tracks'];
 		}
 		else {
 			tracksData = [0];
 		}
 		this.setTracks(tracksData, false);
-		// get load contents
-		var contents = element.textContent.trim();
-		element.innerHTML = '';
-		if (settings.engine === 'html5') {
-			this.$_canvasElement = document.createElement('canvas');
+		var contents = '';
+		if (ss.isValue(element)) {
+			// get load contents
+			contents = element.textContent.trim();
+			element.innerHTML = '';
+			if (settings.engine === 'html5') {
+				this.$_canvasElement = document.createElement('canvas');
+			}
+			else {
+				this.$_canvasElement = document.createElement('div');
+			}
+			this.$_canvasElement.className = 'alphaTabSurface';
+			element.appendChild(this.$_canvasElement);
 		}
-		else {
-			this.$_canvasElement = document.createElement('div');
-		}
-		this.$_canvasElement.className = 'alphaTabSurface';
-		element.appendChild(this.$_canvasElement);
 		this.renderer = new $AlphaTab_Rendering_ScoreRenderer(settings, this.$_canvasElement);
 		this.renderer.add_renderFinished(ss.mkdel(this, function() {
 			this.$triggerEvent('rendered', null);
@@ -1640,7 +1668,7 @@
 			this.$triggerEvent('post-rendered', null);
 		}));
 		this.renderer.add_renderFinished(ss.mkdel(this, function() {
-			if (ss.isInstanceOfType(this.renderer.canvas, $AlphaTab_Platform_Svg_SvgCanvas)) {
+			if (ss.isValue(this.$_canvasElement) && ss.isInstanceOfType(this.renderer.canvas, $AlphaTab_Platform_Svg_SvgCanvas)) {
 				this.$_canvasElement.innerHTML = ss.cast(this.renderer.canvas, $AlphaTab_Platform_Svg_SvgCanvas).toSvg(true, 'alphaTabSurfaceSvg');
 				this.$_canvasElement.style.width = this.renderer.canvas.get_width() + 'px';
 				this.$_canvasElement.style.height = this.renderer.canvas.get_height() + 'px';
@@ -1649,8 +1677,8 @@
 		if (!ss.isNullOrEmptyString(contents)) {
 			this.tex(contents);
 		}
-		else if (ss.isValue(this.$_element.dataset) && !ss.isNullOrEmptyString(this.$_element.dataset['file'])) {
-			this.$load(this.$_element.dataset['file']);
+		else if (ss.isValue(this.$_element) && ss.isValue(this.$_element.dataset) && !ss.isNullOrEmptyString(this.$_element.dataset['file'])) {
+			this.load(this.$_element.dataset['file']);
 		}
 	};
 	$AlphaTab_Platform_JavaScript_JsApi.__typeName = 'AlphaTab.Platform.JavaScript.JsApi';
@@ -6327,11 +6355,7 @@
 		readString: function(length) {
 			var b = new Uint8Array(length);
 			this._data.read(b, 0, b.length);
-			var s = [];
-			for (var i = 0; i < b.length; i++) {
-				s.push(String.fromCharCode(b[i]));
-			}
-			return s.join('');
+			return $AlphaTab_Platform_Std.toString(b);
 		},
 		readStringByteLength: function(length) {
 			var stringLength = this._data.readByte();
@@ -6496,11 +6520,8 @@
 			};
 			fileSystem.load(this._data);
 			// convert data to string
-			var xml = [];
 			var data = fileSystem.files[0].data;
-			for (var i = 0; i < data.length; i++) {
-				xml.push(String.fromCharCode(data[i]));
-			}
+			var xml = $AlphaTab_Platform_Std.toString(data);
 			// lets set the fileSystem to null, maybe the garbage collector will come along
 			// and kick the fileSystem binary data before we finish parsing
 			fileSystem.files = null;
@@ -6508,7 +6529,7 @@
 			// the score.gpif file within this filesystem stores
 			// the score information as XML we need to parse.
 			var parser = new $AlphaTab_Importer_GpxParser();
-			parser.parseXml(xml.join(''));
+			parser.parseXml(xml);
 			parser.score.finish();
 			return parser.score;
 		}
@@ -8544,9 +8565,12 @@
 					tracks.push(this.score.tracks[track]);
 				}
 			}
+			if (tracks.length === 0 && this.score.tracks.length > 0) {
+				tracks.push(this.score.tracks[0]);
+			}
 			return tracks.slice(0);
 		},
-		$load: function(data) {
+		load: function(data) {
 			try {
 				if (ss.isInstanceOfType(data, ArrayBuffer)) {
 					this.scoreLoaded($AlphaTab_Importer_ScoreLoader.loadScoreFromBytes(new Uint8Array(ss.cast(data, ArrayBuffer))));
@@ -8609,24 +8633,22 @@
 			}
 			this.$_tracks = tracks.slice(0);
 			if (render) {
-				this.$render();
+				this.render();
 			}
 		},
 		scoreLoaded: function(score) {
 			this.score = score;
 			this.$triggerEvent('loaded', score);
-			this.$render();
+			this.render();
 		},
 		$triggerEvent: function(name, details) {
-			var e = document.createEvent('CustomEvent');
-			e.initCustomEvent(name, false, false, details);
-			this.$_element.dispatchEvent(ss.cast(e, Event));
-			//_element.DispatchEvent(new CustomEvent(name, new CustomEventInit()
-			//{
-			//    Detail = details
-			//}));
+			if (ss.isValue(this.$_element)) {
+				var e = document.createEvent('CustomEvent');
+				e.initCustomEvent(name, false, false, details);
+				this.$_element.dispatchEvent(ss.cast(e, Event));
+			}
 		},
-		$render: function() {
+		render: function() {
 			if (ss.isValue(this.renderer)) {
 				this.renderer.renderMultiple(this.get_tracks());
 			}
@@ -9059,25 +9081,25 @@
 			if (symbol === -1) {
 				return;
 			}
-			this.$_buffer += '<text x="';
-			this.$_buffer += x;
-			this.$_buffer += '" y="';
-			this.$_buffer += y + this.$getSvgBaseLineOffset();
-			this.$_buffer += '" style="font:';
-			this.$_buffer += this.get_resources().musicFont.toCssString();
-			this.$_buffer += '; fill:';
-			this.$_buffer += this.get_color().toRgbaString();
-			this.$_buffer += ';" ';
-			this.$_buffer += ' dominant-baseline="top" text-anchor="start"';
-			this.$_buffer += '>&#x';
-			this.$_buffer += $AlphaTab_Platform_Std.toHexString(symbol);
-			this.$_buffer += ';</text>\n';
+			//_buffer += "<text x=\"";
+			//_buffer += x;
+			//_buffer += "\" y=\"";
+			//_buffer += y + GetSvgBaseLineOffset();
+			//_buffer += "\" style=\"font:";
+			//_buffer += Resources.MusicFont.ToCssString();
+			//_buffer += "; fill:";
+			//_buffer += Color.ToRgbaString();
+			//_buffer += ";\" ";
+			//_buffer += " dominant-baseline=\"top\" text-anchor=\"start\"";
+			//_buffer += ">&#x";
+			//_buffer += Std.ToHexString((int)symbol);
+			//_buffer += ";</text>\n";
 			//if (symbol == MusicFontSymbol.None)
 			//{
 			//    return;
 			//}
-			//SvgRenderer glyph = new SvgRenderer(MusicFont.SymbolLookup[symbol], scale, scale);
-			//glyph.Paint(x, y, this);
+			var glyph = new $AlphaTab_Rendering_Utils_SvgRenderer($AlphaTab_Rendering_Glyphs_MusicFont.symbolLookup.get_item(symbol), scale, scale);
+			glyph.paint(x, y, this);
 		}
 	}, null, [$AlphaTab_Platform_IPathCanvas, $AlphaTab_Platform_ICanvas]);
 	ss.initClass($AlphaTab_Rendering_BarRendererBase, $asm, {

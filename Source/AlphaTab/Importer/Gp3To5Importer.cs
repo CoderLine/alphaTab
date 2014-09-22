@@ -1444,13 +1444,7 @@ namespace AlphaTab.Importer
         {
             ByteArray b = new ByteArray(length);
             _data.Read(b, 0, b.Length);
-
-            var s = new StringBuilder();
-            for (int i = 0; i < b.Length; i++)
-            {
-                s.AppendChar(b[i]);
-            }
-            return s.ToString();
+            return Std.ToString(b);
         }
 
         /// <summary>

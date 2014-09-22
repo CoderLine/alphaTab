@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
-using AlphaTab.Collections;
 using AlphaTab.IO;
+using StringBuilder = AlphaTab.Collections.StringBuilder;
 
 namespace AlphaTab.Platform
 {
@@ -81,6 +82,11 @@ namespace AlphaTab.Platform
         public static sbyte ReadSignedByte(this IReadable readable)
         {
             return unchecked((sbyte)(byte)readable.ReadByte());
+        }
+
+        public static string ToString(ByteArray data)
+        {
+            return Encoding.UTF8.GetString(data.Data);
         }
     }
 }

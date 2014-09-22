@@ -1,5 +1,6 @@
 ﻿using AlphaTab.Collections;
 using AlphaTab.Model;
+using AlphaTab.Platform;
 
 namespace AlphaTab.Importer
 {
@@ -17,12 +18,9 @@ namespace AlphaTab.Importer
             fileSystem.Load(_data);
 
             // convert data to string
-            var xml = new StringBuilder();
             var data = fileSystem.Files[0].Data;
-            for (int i = 0; i < data.Length; i++)
-            {
-                xml.AppendChar(data[i]);
-            }
+            var xml = Std.ToString(data);
+
             // lets set the fileSystem to null, maybe the garbage collector will come along
             // and kick the fileSystem binary data before we finish parsing
             fileSystem.Files = null;
@@ -31,7 +29,7 @@ namespace AlphaTab.Importer
             // the score.gpif file within this filesystem stores
             // the score information as XML we need to parse.
             var parser = new GpxParser();
-            parser.ParseXml(xml.ToString());
+            parser.ParseXml(xml);
 
             parser.Score.Finish();
 
