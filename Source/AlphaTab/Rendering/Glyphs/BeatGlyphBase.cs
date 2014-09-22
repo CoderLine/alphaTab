@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using AlphaTab.Model;
 using AlphaTab.Rendering.Layout;
 
@@ -6,6 +7,7 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class BeatGlyphBase : GlyphGroup, ISupportsFinalize
     {
+        [IntrinsicProperty]
         public BeatContainerGlyph Container { get; set; }
 
         public BeatGlyphBase()

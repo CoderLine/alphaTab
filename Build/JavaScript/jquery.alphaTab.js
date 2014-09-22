@@ -53,7 +53,7 @@
         score: function(score) {
             var context = $(this).data('alphaTab');
             if (!context) { console.error('alphaTab not initialized!'); }
-            if(tracks) {
+            if(score) {
                 context.scoreLoaded(score);
             }
             else {

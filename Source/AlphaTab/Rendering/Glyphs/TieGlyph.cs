@@ -81,9 +81,9 @@ namespace AlphaTab.Rendering.Glyphs
             else if (startNoteRenderer.Stave != endNoteRenderer.Stave)
             {
                 startX = cx;
-                endX = cx + startNoteRenderer.GetNoteX(EndNote);
+                endX = cx + endNoteRenderer.GetNoteX(EndNote);
 
-                startY = cy + startNoteRenderer.GetNoteY(EndNote) + YOffset;
+                startY = cy + endNoteRenderer.GetNoteY(EndNote) + YOffset;
                 endY = startY;
 
                 shouldDraw = true;
