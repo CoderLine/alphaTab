@@ -25,12 +25,6 @@ namespace AlphaTab.Model
     /// </summary>
     public class Bar
     {
-        public Bar()
-        {
-            Voices = new FastList<Voice>();
-            Clef = Clef.G2;
-        }
-
         [IntrinsicProperty]
         public int Index { get; set; }
         [IntrinsicProperty]
@@ -47,6 +41,18 @@ namespace AlphaTab.Model
         public Duration? MinDuration { get; set; }
         [IntrinsicProperty]
         public Duration? MaxDuration { get; set; }
+        
+        public Bar()
+        {
+            Voices = new FastList<Voice>();
+            Clef = Clef.G2;
+        }
+
+        public static void CopyTo(Bar src, Bar dst)
+        {
+            dst.Index = src.Index;
+            dst.Clef = src.Clef;
+        }
 
         public void AddVoice(Voice voice)
         {

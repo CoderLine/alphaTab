@@ -162,44 +162,42 @@ namespace AlphaTab.Model
             Octave = -1;
         }
 
+        public static void CopyTo(Note src, Note dst)
+        {
+            dst.Accentuated = src.Accentuated;
+            dst.Fret = src.Fret;
+            dst.String = src.String;
+            dst.IsHammerPullOrigin = src.IsHammerPullOrigin;
+            dst.HarmonicValue = src.HarmonicValue;
+            dst.HarmonicType = src.HarmonicType;
+            dst.IsGhost = src.IsGhost;
+            dst.IsLetRing = src.IsLetRing;
+            dst.IsPalmMute = src.IsPalmMute;
+            dst.IsDead = src.IsDead;
+            dst.IsStaccato = src.IsStaccato;
+            dst.SlideType = src.SlideType;
+            dst.Vibrato = src.Vibrato;
+            dst.IsTieDestination = src.IsTieDestination;
+            dst.LeftHandFinger = src.LeftHandFinger;
+            dst.RightHandFinger = src.RightHandFinger;
+            dst.IsFingering = src.IsFingering;
+            dst.TrillValue = src.TrillValue;
+            dst.TrillSpeed = src.TrillSpeed;
+            dst.DurationPercent = src.DurationPercent;
+            dst.SwapAccidentals = src.SwapAccidentals;
+            dst.Dynamic = src.Dynamic;
+            dst.Octave = src.Octave;
+            dst.Tone = src.Tone;
+        }
+
         public Note Clone()
         {
             var n = new Note();
-            
-            n.Accentuated = Accentuated;
+            CopyTo(this, n);
             for (int i = 0, j = BendPoints.Count; i < j; i++)
             {
                 n.BendPoints.Add(BendPoints[i].Clone());
             }
-            n.Fret = Fret;
-            n.String = String;
-            n.IsHammerPullOrigin = IsHammerPullOrigin;
-            n.HammerPullOrigin = HammerPullOrigin;
-            n.HammerPullDestination = HammerPullDestination;
-            n.HarmonicValue = HarmonicValue;
-            n.HarmonicType = HarmonicType;
-            n.IsGhost = IsGhost;
-            n.IsLetRing = IsLetRing;
-            n.IsPalmMute = IsPalmMute;
-            n.IsDead = IsDead;
-            n.IsStaccato = IsStaccato;
-            n.SlideType = SlideType;
-            n.SlideTarget = SlideTarget;
-            n.Vibrato = Vibrato;
-            n.TieOrigin = TieOrigin;
-            n.IsTieDestination = IsTieDestination;
-            n.IsTieOrigin = IsTieOrigin;
-            n.LeftHandFinger = LeftHandFinger;
-            n.RightHandFinger = RightHandFinger;
-            n.IsFingering = IsFingering;
-            n.TrillValue = TrillValue;
-            n.TrillSpeed = TrillSpeed;
-            n.DurationPercent = DurationPercent;
-            n.SwapAccidentals = SwapAccidentals;
-            n.Dynamic = Dynamic;
-            n.Octave = Octave;
-            n.Tone = Tone;
-
             return n;
         }
 

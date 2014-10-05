@@ -84,6 +84,21 @@ namespace AlphaTab.Model
             TimeSignatureNumerator = 4;
             TripletFeel = TripletFeel.NoTripletFeel;
         }
+
+        public static void CopyTo(MasterBar src, MasterBar dst)
+        {
+            dst.AlternateEndings = src.AlternateEndings;
+            dst.Index = src.Index;
+            dst.KeySignature = src.KeySignature;
+            dst.IsDoubleBar = src.IsDoubleBar;
+            dst.IsRepeatStart = src.IsRepeatStart;
+            dst.RepeatCount = src.RepeatCount;
+            dst.TimeSignatureNumerator = src.TimeSignatureNumerator;
+            dst.TimeSignatureDenominator = src.TimeSignatureDenominator;
+            dst.TripletFeel = src.TripletFeel;
+            dst.Start = src.Start;
+        }
+         
         /// <summary>
         /// Calculates the time spent in this bar. (unit: midi ticks)
         /// </summary>

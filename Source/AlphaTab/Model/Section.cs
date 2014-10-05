@@ -27,7 +27,14 @@ namespace AlphaTab.Model
     {
         [IntrinsicProperty]
         public string Marker { get; set; }
+
         [IntrinsicProperty]
         public string Text { get; set; }
+
+        public static void CopyTo(Section src, Section dst)
+        {
+            dst.Marker = src.Marker;
+            dst.Text = src.Text;
+        }
     }
 }

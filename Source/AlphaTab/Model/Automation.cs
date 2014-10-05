@@ -48,12 +48,19 @@ namespace AlphaTab.Model
             return automation;
         }
 
+        public static void CopyTo(Automation src, Automation dst)
+        {
+            dst.IsLinear = src.IsLinear;
+            dst.RatioPosition = src.RatioPosition;
+            dst.Text = src.Text;
+            dst.Type = src.Type;
+            dst.Value = src.Value;
+        }
+
         public Automation Clone()
         {
             var a = new Automation();
-            a.IsLinear = IsLinear;
-            a.Type = Type;
-            a.Value = Value;
+            CopyTo(this, a);
             return a;
         }
     }

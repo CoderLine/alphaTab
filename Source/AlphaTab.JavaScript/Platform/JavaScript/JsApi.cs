@@ -92,15 +92,15 @@ namespace AlphaTab.Platform.JavaScript
             #region Renderer Setup
 
             Renderer = new ScoreRenderer(settings, _canvasElement);
-            Renderer.RenderFinished += () => TriggerEvent("rendered");
+            Renderer.RenderFinished += o => TriggerEvent("rendered");
             Renderer.PostRenderFinished += () => TriggerEvent("post-rendered");
-            Renderer.RenderFinished += () =>
+            Renderer.RenderFinished += result =>
             {
-                if (_canvasElement != null && Renderer.Canvas is SvgCanvas)
+                if (Renderer.IsSvg)
                 {
-                    _canvasElement.InnerHTML = ((SvgCanvas)Renderer.Canvas).ToSvg(true, "alphaTabSurfaceSvg");
-                    _canvasElement.Style.Width = Renderer.Canvas.Width + "px";
-                    _canvasElement.Style.Height = Renderer.Canvas.Height + "px";
+                    _canvasElement.InnerHTML = result.RenderResult.ToString();
+                    _canvasElement.Style.Width = result.Width + "px";
+                    _canvasElement.Style.Height = result.Height + "px";
                 }
             };
 
@@ -121,7 +121,7 @@ namespace AlphaTab.Platform.JavaScript
         }
 
         [IntrinsicProperty]
-        public ScoreRenderer Renderer { get; private set; }
+        public IScoreRenderer Renderer { get; private set; }
 
         [IntrinsicProperty]
         public Score Score { get; set; }

@@ -15,24 +15,28 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System.Collections.Generic;
 
-namespace AlphaTab.Collections
+using System;
+using System.Runtime.CompilerServices;
+using AlphaTab.Model;
+
+namespace AlphaTab.Rendering
 {
-    public class FastList<T> : List<T>
+    public interface IScoreRenderer
     {
-        public FastList()
-        {
-            
-        }
+        bool IsSvg { get; }
+        event Action<RenderFinishedEventArgs> RenderFinished;
+        event Action PostRenderFinished;
+        void RenderMultiple(Track[] tracks);
+    }
 
-        private FastList(IEnumerable<T> collection) : base(collection)
-        {
-        }
-
-        public FastList<T> Clone()
-        {
-            return new FastList<T>(this);
-        }
+    public class RenderFinishedEventArgs
+    {
+        [IntrinsicProperty]
+        public int Width { get; set; }
+        [IntrinsicProperty]
+        public int Height { get; set; }
+        [IntrinsicProperty]
+        public object RenderResult { get; set; }
     }
 }

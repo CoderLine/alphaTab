@@ -36,6 +36,7 @@
     <Compile Include="Collections\StringBuilder.cs" />
     <Compile Include="Environment.cs" />
     <Compile Include="IO\ByteArray.cs" />
+    <Compile Include="Model\JsonConverter.cs" />
     <Compile Include="Model\TuningParser.cs" />
     <Compile Include="Platform\JavaScript\Html5Canvas.cs" />
     <Compile Include="Platform\JavaScript\JsApi.cs" />

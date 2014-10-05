@@ -20,6 +20,7 @@ using System.Runtime.CompilerServices;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Platform.Model;
+using AlphaTab.Platform.Svg;
 using AlphaTab.Rendering.Layout;
 using AlphaTab.Rendering.Utils;
 
@@ -29,9 +30,14 @@ namespace AlphaTab.Rendering
     /// This is the main wrapper of the rendering engine which 
     /// can render a single track of a score object into a notation sheet.
     /// </summary>
-    public class ScoreRenderer
+    public class ScoreRenderer : IScoreRenderer
     {
         private string _currentLayoutMode;
+
+        public bool IsSvg
+        {
+            get { return Canvas is SvgCanvas; }
+        }
 
         [IntrinsicProperty]
         public ICanvas Canvas { get; set; }
@@ -115,7 +121,12 @@ namespace AlphaTab.Rendering
             Canvas.Clear();
             DoLayout();
             PaintScore();
-            OnRenderFinished();
+            OnRenderFinished(new RenderFinishedEventArgs
+            {
+                Height = Layout.Height,
+                Width = Layout.Width,
+                RenderResult = Canvas.RenderResult 
+            });
             OnPostRenderFinished();
         }
 
@@ -145,11 +156,12 @@ namespace AlphaTab.Rendering
             Canvas.FillText(msg, x, Canvas.Height - (RenderingResources.CopyrightFont.Size * 2));
         }
 
-        public event Action RenderFinished;
-        protected virtual void OnRenderFinished()
+
+        public event Action<RenderFinishedEventArgs> RenderFinished;
+        protected virtual void OnRenderFinished(RenderFinishedEventArgs e)
         {
-            Action handler = RenderFinished;
-            if (handler != null) handler();
+            Action<RenderFinishedEventArgs> handler = RenderFinished;
+            if (handler != null) handler(e);
         }
 
         public event Action PostRenderFinished;

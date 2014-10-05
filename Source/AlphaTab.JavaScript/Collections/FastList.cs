@@ -89,5 +89,11 @@ namespace AlphaTab.Collections
         public void Reverse()
         {
         }
+
+        [InlineCode("{this}.slice()")]
+        public FastList<T> Clone()
+        {
+            return null;
+        }
     }
 }

@@ -36,5 +36,12 @@ namespace AlphaTab.Model
         {
             Strings = new FastList<int>();
         }
+
+        public static void CopyTo(Chord src, Chord dst)
+        {
+            dst.FirstFret = src.FirstFret;
+            dst.Name = src.Name;
+            dst.Strings = src.Strings.Clone();
+        }
     }
 }

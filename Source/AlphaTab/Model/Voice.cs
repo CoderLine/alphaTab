@@ -51,6 +51,11 @@ namespace AlphaTab.Model
             Beats = new FastList<Beat>();
         }
 
+        public static void CopyTo(Voice src, Voice dst)
+        {
+            dst.Index = src.Index;
+        }
+
         public void AddBeat(Beat beat)
         {
             // chaining

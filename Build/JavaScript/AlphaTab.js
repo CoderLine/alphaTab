@@ -872,6 +872,13 @@
 		automation.value = value * references[reference];
 		return automation;
 	};
+	$AlphaTab_Model_Automation.copyTo = function(src, dst) {
+		dst.isLinear = src.isLinear;
+		dst.ratioPosition = src.ratioPosition;
+		dst.text = src.text;
+		dst.type = src.type;
+		dst.value = src.value;
+	};
 	global.AlphaTab.Model.Automation = $AlphaTab_Model_Automation;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Model.AutomationType
@@ -894,6 +901,10 @@
 		this.clef = 4;
 	};
 	$AlphaTab_Model_Bar.__typeName = 'AlphaTab.Model.Bar';
+	$AlphaTab_Model_Bar.copyTo = function(src, dst) {
+		dst.index = src.index;
+		dst.clef = src.clef;
+	};
 	global.AlphaTab.Model.Bar = $AlphaTab_Model_Bar;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Model.Beat
@@ -946,6 +957,31 @@
 		this.crescendo = 0;
 	};
 	$AlphaTab_Model_Beat.__typeName = 'AlphaTab.Model.Beat';
+	$AlphaTab_Model_Beat.copyTo = function(src, dst) {
+		dst.index = src.index;
+		dst.isEmpty = src.isEmpty;
+		dst.duration = src.duration;
+		dst.dots = src.dots;
+		dst.fadeIn = src.fadeIn;
+		dst.lyrics = src.lyrics.slice();
+		dst.pop = src.pop;
+		dst.hasRasgueado = src.hasRasgueado;
+		dst.slap = src.slap;
+		dst.tap = src.tap;
+		dst.text = src.text;
+		dst.brushType = src.brushType;
+		dst.brushDuration = src.brushDuration;
+		dst.tupletDenominator = src.tupletDenominator;
+		dst.tupletNumerator = src.tupletNumerator;
+		dst.vibrato = src.vibrato;
+		dst.chordId = src.chordId;
+		dst.graceType = src.graceType;
+		dst.pickStroke = src.pickStroke;
+		dst.tremoloSpeed = src.tremoloSpeed;
+		dst.crescendo = src.crescendo;
+		dst.start = src.start;
+		dst.dynamic = src.dynamic;
+	};
 	global.AlphaTab.Model.Beat = $AlphaTab_Model_Beat;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Model.BendPoint
@@ -956,6 +992,10 @@
 		this.value = value;
 	};
 	$AlphaTab_Model_BendPoint.__typeName = 'AlphaTab.Model.BendPoint';
+	$AlphaTab_Model_BendPoint.copyTo = function(src, dst) {
+		dst.offset = src.offset;
+		dst.value = src.value;
+	};
 	global.AlphaTab.Model.BendPoint = $AlphaTab_Model_BendPoint;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Model.BrushType
@@ -972,6 +1012,11 @@
 		this.strings = [];
 	};
 	$AlphaTab_Model_Chord.__typeName = 'AlphaTab.Model.Chord';
+	$AlphaTab_Model_Chord.copyTo = function(src, dst) {
+		dst.firstFret = src.firstFret;
+		dst.name = src.name;
+		dst.strings = src.strings.slice();
+	};
 	global.AlphaTab.Model.Chord = $AlphaTab_Model_Chord;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Model.Clef
@@ -1016,6 +1061,12 @@
 	$AlphaTab_Model_HarmonicType.__typeName = 'AlphaTab.Model.HarmonicType';
 	global.AlphaTab.Model.HarmonicType = $AlphaTab_Model_HarmonicType;
 	////////////////////////////////////////////////////////////////////////////////
+	// AlphaTab.Model.JsonConverter
+	var $AlphaTab_Model_JsonConverter = function() {
+	};
+	$AlphaTab_Model_JsonConverter.__typeName = 'AlphaTab.Model.JsonConverter';
+	global.AlphaTab.Model.JsonConverter = $AlphaTab_Model_JsonConverter;
+	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Model.KeySignatureType
 	var $AlphaTab_Model_KeySignatureType = function() {
 	};
@@ -1046,6 +1097,18 @@
 		this.tripletFeel = 0;
 	};
 	$AlphaTab_Model_MasterBar.__typeName = 'AlphaTab.Model.MasterBar';
+	$AlphaTab_Model_MasterBar.copyTo = function(src, dst) {
+		dst.alternateEndings = src.alternateEndings;
+		dst.index = src.index;
+		dst.keySignature = src.keySignature;
+		dst.isDoubleBar = src.isDoubleBar;
+		dst.isRepeatStart = src.isRepeatStart;
+		dst.repeatCount = src.repeatCount;
+		dst.timeSignatureNumerator = src.timeSignatureNumerator;
+		dst.timeSignatureDenominator = src.timeSignatureDenominator;
+		dst.tripletFeel = src.tripletFeel;
+		dst.start = src.start;
+	};
 	global.AlphaTab.Model.MasterBar = $AlphaTab_Model_MasterBar;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Model.ModelUtils
@@ -1120,6 +1183,32 @@
 		this.octave = -1;
 	};
 	$AlphaTab_Model_Note.__typeName = 'AlphaTab.Model.Note';
+	$AlphaTab_Model_Note.copyTo = function(src, dst) {
+		dst.accentuated = src.accentuated;
+		dst.fret = src.fret;
+		dst.string = src.string;
+		dst.isHammerPullOrigin = src.isHammerPullOrigin;
+		dst.harmonicValue = src.harmonicValue;
+		dst.harmonicType = src.harmonicType;
+		dst.isGhost = src.isGhost;
+		dst.isLetRing = src.isLetRing;
+		dst.isPalmMute = src.isPalmMute;
+		dst.isDead = src.isDead;
+		dst.isStaccato = src.isStaccato;
+		dst.slideType = src.slideType;
+		dst.vibrato = src.vibrato;
+		dst.isTieDestination = src.isTieDestination;
+		dst.leftHandFinger = src.leftHandFinger;
+		dst.rightHandFinger = src.rightHandFinger;
+		dst.isFingering = src.isFingering;
+		dst.trillValue = src.trillValue;
+		dst.trillSpeed = src.trillSpeed;
+		dst.durationPercent = src.durationPercent;
+		dst.swapAccidentals = src.swapAccidentals;
+		dst.dynamic = src.dynamic;
+		dst.octave = src.octave;
+		dst.tone = src.tone;
+	};
 	$AlphaTab_Model_Note.$nextNoteOnSameLine = function(note) {
 		var nextBeat = note.beat.nextBeat;
 		// keep searching in same bar
@@ -1171,6 +1260,16 @@
 		this.port = 1;
 	};
 	$AlphaTab_Model_PlaybackInformation.__typeName = 'AlphaTab.Model.PlaybackInformation';
+	$AlphaTab_Model_PlaybackInformation.copyTo = function(src, dst) {
+		dst.volume = src.volume;
+		dst.balance = src.balance;
+		dst.port = src.port;
+		dst.program = src.program;
+		dst.primaryChannel = src.primaryChannel;
+		dst.secondaryChannel = src.secondaryChannel;
+		dst.isMute = src.isMute;
+		dst.isSolo = src.isSolo;
+	};
 	global.AlphaTab.Model.PlaybackInformation = $AlphaTab_Model_PlaybackInformation;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Model.RepeatGroup
@@ -1209,6 +1308,20 @@
 		this.$_currentRepeatGroup = new $AlphaTab_Model_RepeatGroup();
 	};
 	$AlphaTab_Model_Score.__typeName = 'AlphaTab.Model.Score';
+	$AlphaTab_Model_Score.copyTo = function(src, dst) {
+		dst.album = src.album;
+		dst.artist = src.artist;
+		dst.copyright = src.copyright;
+		dst.instructions = src.instructions;
+		dst.music = src.music;
+		dst.notices = src.notices;
+		dst.subTitle = src.subTitle;
+		dst.title = src.title;
+		dst.words = src.words;
+		dst.tab = src.tab;
+		dst.tempo = src.tempo;
+		dst.tempoLabel = src.tempoLabel;
+	};
 	global.AlphaTab.Model.Score = $AlphaTab_Model_Score;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Model.Section
@@ -1217,6 +1330,10 @@
 		this.text = null;
 	};
 	$AlphaTab_Model_Section.__typeName = 'AlphaTab.Model.Section';
+	$AlphaTab_Model_Section.copyTo = function(src, dst) {
+		dst.marker = src.marker;
+		dst.text = src.text;
+	};
 	global.AlphaTab.Model.Section = $AlphaTab_Model_Section;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Model.SlideType
@@ -1248,6 +1365,14 @@
 		this.color = new $AlphaTab_Platform_Model_Color(200, 0, 0, 255);
 	};
 	$AlphaTab_Model_Track.__typeName = 'AlphaTab.Model.Track';
+	$AlphaTab_Model_Track.copyTo = function(src, dst) {
+		dst.capo = src.capo;
+		dst.index = src.index;
+		dst.shortName = src.shortName;
+		dst.tuning = src.tuning.slice();
+		dst.color = new $AlphaTab_Platform_Model_Color(src.color.get_r(), src.color.get_g(), src.color.get_b(), src.color.get_a());
+		dst.isPercussion = src.isPercussion;
+	};
 	global.AlphaTab.Model.Track = $AlphaTab_Model_Track;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Model.TripletFeel
@@ -1481,6 +1606,9 @@
 		this.beats = [];
 	};
 	$AlphaTab_Model_Voice.__typeName = 'AlphaTab.Model.Voice';
+	$AlphaTab_Model_Voice.copyTo = function(src, dst) {
+		dst.index = src.index;
+	};
 	global.AlphaTab.Model.Voice = $AlphaTab_Model_Voice;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Platform.ICanvas
@@ -1661,17 +1789,17 @@
 			element.appendChild(this.$_canvasElement);
 		}
 		this.renderer = new $AlphaTab_Rendering_ScoreRenderer(settings, this.$_canvasElement);
-		this.renderer.add_renderFinished(ss.mkdel(this, function() {
+		this.renderer.add_renderFinished(ss.mkdel(this, function(o) {
 			this.$triggerEvent('rendered', null);
 		}));
 		this.renderer.add_postRenderFinished(ss.mkdel(this, function() {
 			this.$triggerEvent('post-rendered', null);
 		}));
-		this.renderer.add_renderFinished(ss.mkdel(this, function() {
-			if (ss.isValue(this.$_canvasElement) && ss.isInstanceOfType(this.renderer.canvas, $AlphaTab_Platform_Svg_SvgCanvas)) {
-				this.$_canvasElement.innerHTML = ss.cast(this.renderer.canvas, $AlphaTab_Platform_Svg_SvgCanvas).toSvg(true, 'alphaTabSurfaceSvg');
-				this.$_canvasElement.style.width = this.renderer.canvas.get_width() + 'px';
-				this.$_canvasElement.style.height = this.renderer.canvas.get_height() + 'px';
+		this.renderer.add_renderFinished(ss.mkdel(this, function(result) {
+			if (this.renderer.get_isSvg()) {
+				this.$_canvasElement.innerHTML = result.renderResult.toString();
+				this.$_canvasElement.style.width = result.width + 'px';
+				this.$_canvasElement.style.height = result.height + 'px';
 			}
 		}));
 		if (!ss.isNullOrEmptyString(contents)) {
@@ -1920,6 +2048,21 @@
 	};
 	$AlphaTab_Rendering_IEffectBarRendererInfo.__typeName = 'AlphaTab.Rendering.IEffectBarRendererInfo';
 	global.AlphaTab.Rendering.IEffectBarRendererInfo = $AlphaTab_Rendering_IEffectBarRendererInfo;
+	////////////////////////////////////////////////////////////////////////////////
+	// AlphaTab.Rendering.IScoreRenderer
+	var $AlphaTab_Rendering_IScoreRenderer = function() {
+	};
+	$AlphaTab_Rendering_IScoreRenderer.__typeName = 'AlphaTab.Rendering.IScoreRenderer';
+	global.AlphaTab.Rendering.IScoreRenderer = $AlphaTab_Rendering_IScoreRenderer;
+	////////////////////////////////////////////////////////////////////////////////
+	// AlphaTab.Rendering.RenderFinishedEventArgs
+	var $AlphaTab_Rendering_RenderFinishedEventArgs = function() {
+		this.width = 0;
+		this.height = 0;
+		this.renderResult = null;
+	};
+	$AlphaTab_Rendering_RenderFinishedEventArgs.__typeName = 'AlphaTab.Rendering.RenderFinishedEventArgs';
+	global.AlphaTab.Rendering.RenderFinishedEventArgs = $AlphaTab_Rendering_RenderFinishedEventArgs;
 	////////////////////////////////////////////////////////////////////////////////
 	// AlphaTab.Rendering.RenderingResources
 	var $AlphaTab_Rendering_RenderingResources = function(scale) {
@@ -7970,9 +8113,7 @@
 	ss.initClass($AlphaTab_Model_Automation, $asm, {
 		clone: function() {
 			var a = new $AlphaTab_Model_Automation();
-			a.isLinear = this.isLinear;
-			a.type = this.type;
-			a.value = this.value;
+			$AlphaTab_Model_Automation.copyTo(this, a);
 			return a;
 		}
 	});
@@ -8046,27 +8187,10 @@
 			for (var i1 = 0, j1 = this.notes.length; i1 < j1; i1++) {
 				beat.addNote(this.notes[i1].clone());
 			}
-			beat.dots = this.dots;
-			beat.chordId = this.chordId;
-			beat.brushType = this.brushType;
-			beat.vibrato = this.vibrato;
-			beat.graceType = this.graceType;
-			beat.pickStroke = this.pickStroke;
-			beat.duration = this.duration;
-			beat.tremoloSpeed = this.tremoloSpeed;
-			beat.text = this.text;
-			beat.fadeIn = this.fadeIn;
-			beat.tap = this.tap;
-			beat.slap = this.slap;
-			beat.pop = this.pop;
+			$AlphaTab_Model_Beat.copyTo(this, beat);
 			for (var i2 = 0, j2 = this.automations.length; i2 < j2; i2++) {
 				beat.automations.push(this.automations[i2].clone());
 			}
-			beat.start = this.start;
-			beat.tupletDenominator = this.tupletDenominator;
-			beat.tupletNumerator = this.tupletNumerator;
-			beat.dynamic = this.dynamic;
-			beat.crescendo = this.crescendo;
 			return beat;
 		},
 		calculateDuration: function() {
@@ -8131,8 +8255,7 @@
 	ss.initClass($AlphaTab_Model_BendPoint, $asm, {
 		clone: function() {
 			var point = new $AlphaTab_Model_BendPoint(0, 0);
-			point.offset = this.offset;
-			point.value = this.value;
+			$AlphaTab_Model_BendPoint.copyTo(this, point);
 			return point;
 		}
 	});
@@ -8145,6 +8268,173 @@
 	ss.initEnum($AlphaTab_Model_Fingers, $asm, { unknown: -2, noOrDead: -1, thumb: 0, indexFinger: 1, middleFinger: 2, annularFinger: 3, littleFinger: 4 });
 	ss.initEnum($AlphaTab_Model_GraceType, $asm, { none: 0, onBeat: 1, beforeBeat: 2 });
 	ss.initEnum($AlphaTab_Model_HarmonicType, $asm, { none: 0, natural: 1, artificial: 2, pinch: 3, tap: 4, semi: 5, feedback: 6 });
+	ss.initClass($AlphaTab_Model_JsonConverter, $asm, {
+		scoreToJsObject: function(score) {
+			var score2 = ss.cast({}, $AlphaTab_Model_Score);
+			$AlphaTab_Model_Score.copyTo(score, score2);
+			score2.masterBars = [];
+			score2.tracks = [];
+			for (var i = 0; i < score.masterBars.length; i++) {
+				var masterBar = score.masterBars[i];
+				var masterBar2 = ss.cast({}, $AlphaTab_Model_MasterBar);
+				$AlphaTab_Model_MasterBar.copyTo(masterBar, masterBar2);
+				if (ss.isValue(masterBar.tempoAutomation)) {
+					masterBar2.tempoAutomation = ss.cast({}, $AlphaTab_Model_Automation);
+					$AlphaTab_Model_Automation.copyTo(masterBar.tempoAutomation, masterBar2.tempoAutomation);
+				}
+				if (ss.isValue(masterBar.volumeAutomation)) {
+					masterBar2.volumeAutomation = ss.cast({}, $AlphaTab_Model_Automation);
+					$AlphaTab_Model_Automation.copyTo(masterBar.volumeAutomation, masterBar2.volumeAutomation);
+				}
+				if (ss.isValue(masterBar.section)) {
+					masterBar2.section = ss.cast({}, $AlphaTab_Model_Section);
+					$AlphaTab_Model_Section.copyTo(masterBar.section, masterBar2.section);
+				}
+				score2.masterBars.push(masterBar2);
+			}
+			for (var t = 0; t < score.tracks.length; t++) {
+				var track = score.tracks[t];
+				var track2 = ss.cast({}, $AlphaTab_Model_Track);
+				$AlphaTab_Model_Track.copyTo(track, track2);
+				track2.playbackInfo = ss.cast({}, $AlphaTab_Model_PlaybackInformation);
+				$AlphaTab_Model_PlaybackInformation.copyTo(track.playbackInfo, track2.playbackInfo);
+				track2.chords = {};
+				var $t1 = Object.keys(track.chords);
+				for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+					var key = $t1[$t2];
+					var chord = track.chords[key];
+					var chord2 = ss.cast({}, $AlphaTab_Model_Chord);
+					$AlphaTab_Model_Chord.copyTo(chord, chord2);
+					track2.chords[key] = chord;
+				}
+				track2.bars = [];
+				for (var b = 0; b < track.bars.length; b++) {
+					var bar = track.bars[b];
+					var bar2 = ss.cast({}, $AlphaTab_Model_Bar);
+					$AlphaTab_Model_Bar.copyTo(bar, bar2);
+					bar2.voices = [];
+					for (var v = 0; v < bar.voices.length; v++) {
+						var voice = bar.voices[v];
+						var voice2 = ss.cast({}, $AlphaTab_Model_Voice);
+						$AlphaTab_Model_Voice.copyTo(voice, voice2);
+						voice2.beats = [];
+						for (var bb = 0; bb < voice.beats.length; bb++) {
+							var beat = voice.beats[bb];
+							var beat2 = ss.cast({}, $AlphaTab_Model_Beat);
+							$AlphaTab_Model_Beat.copyTo(beat, beat2);
+							beat2.automations = [];
+							for (var a = 0; a < beat.automations.length; a++) {
+								var automation = {};
+								$AlphaTab_Model_Automation.copyTo(beat.automations[a], ss.cast(automation, $AlphaTab_Model_Automation));
+								beat2.automations.push(ss.cast(automation, $AlphaTab_Model_Automation));
+							}
+							beat2.whammyBarPoints = [];
+							for (var i1 = 0; i1 < beat.whammyBarPoints.length; i1++) {
+								var point = {};
+								$AlphaTab_Model_BendPoint.copyTo(beat.whammyBarPoints[i1], ss.cast(point, $AlphaTab_Model_BendPoint));
+								beat2.whammyBarPoints.push(ss.cast(point, $AlphaTab_Model_BendPoint));
+							}
+							beat2.notes = [];
+							for (var n = 0; n < beat.notes.length; n++) {
+								var note = beat.notes[n];
+								var note2 = ss.cast({}, $AlphaTab_Model_Note);
+								$AlphaTab_Model_Note.copyTo(note, note2);
+								note2.bendPoints = [];
+								for (var i2 = 0; i2 < note.bendPoints.length; i2++) {
+									var point1 = {};
+									$AlphaTab_Model_BendPoint.copyTo(note.bendPoints[i2], ss.cast(point1, $AlphaTab_Model_BendPoint));
+									note2.bendPoints.push(ss.cast(point1, $AlphaTab_Model_BendPoint));
+								}
+								beat2.notes.push(note2);
+							}
+							voice2.beats.push(beat2);
+						}
+						bar.voices.push(voice2);
+					}
+					track.bars.push(bar2);
+				}
+				score.tracks.push(track2);
+			}
+			return score;
+		},
+		jsObjectToScore: function(score) {
+			var score2 = new $AlphaTab_Model_Score();
+			$AlphaTab_Model_Score.copyTo(score, score2);
+			for (var i = 0; i < score.masterBars.length; i++) {
+				var masterBar = score.masterBars[i];
+				var masterBar2 = new $AlphaTab_Model_MasterBar();
+				$AlphaTab_Model_MasterBar.copyTo(masterBar, masterBar2);
+				if (ss.isValue(masterBar.tempoAutomation)) {
+					masterBar2.tempoAutomation = new $AlphaTab_Model_Automation();
+					$AlphaTab_Model_Automation.copyTo(masterBar.tempoAutomation, masterBar2.tempoAutomation);
+				}
+				if (ss.isValue(masterBar.volumeAutomation)) {
+					masterBar2.volumeAutomation = new $AlphaTab_Model_Automation();
+					$AlphaTab_Model_Automation.copyTo(masterBar.volumeAutomation, masterBar2.volumeAutomation);
+				}
+				if (ss.isValue(masterBar.section)) {
+					masterBar2.section = new $AlphaTab_Model_Section();
+					$AlphaTab_Model_Section.copyTo(masterBar.section, masterBar2.section);
+				}
+				score2.addMasterBar(masterBar2);
+			}
+			for (var t = 0; t < score.tracks.length; t++) {
+				var track = score.tracks[t];
+				var track2 = new $AlphaTab_Model_Track();
+				$AlphaTab_Model_Track.copyTo(track, track2);
+				score2.addTrack(track2);
+				$AlphaTab_Model_PlaybackInformation.copyTo(track.playbackInfo, track2.playbackInfo);
+				var $t1 = Object.keys(track.chords);
+				for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+					var key = $t1[$t2];
+					var chord = track.chords[key];
+					var chord2 = new $AlphaTab_Model_Chord();
+					$AlphaTab_Model_Chord.copyTo(chord, chord2);
+					track2.chords[key] = chord;
+				}
+				for (var b = 0; b < track.bars.length; b++) {
+					var bar = track.bars[b];
+					var bar2 = new $AlphaTab_Model_Bar();
+					$AlphaTab_Model_Bar.copyTo(bar, bar2);
+					track2.addBar(bar2);
+					for (var v = 0; v < bar.voices.length; v++) {
+						var voice = bar.voices[v];
+						var voice2 = new $AlphaTab_Model_Voice();
+						$AlphaTab_Model_Voice.copyTo(voice, voice2);
+						bar2.addVoice(voice2);
+						for (var bb = 0; bb < voice.beats.length; bb++) {
+							var beat = voice.beats[bb];
+							var beat2 = new $AlphaTab_Model_Beat();
+							$AlphaTab_Model_Beat.copyTo(beat, beat2);
+							voice.addBeat(beat2);
+							for (var a = 0; a < beat.automations.length; a++) {
+								var automation = new $AlphaTab_Model_Automation();
+								$AlphaTab_Model_Automation.copyTo(beat.automations[a], automation);
+								beat2.automations.push(automation);
+							}
+							for (var i1 = 0; i1 < beat.whammyBarPoints.length; i1++) {
+								var point = new $AlphaTab_Model_BendPoint(0, 0);
+								$AlphaTab_Model_BendPoint.copyTo(beat.whammyBarPoints[i1], point);
+								beat2.whammyBarPoints.push(point);
+							}
+							for (var n = 0; n < beat.notes.length; n++) {
+								var note = beat.notes[n];
+								var note2 = new $AlphaTab_Model_Note();
+								$AlphaTab_Model_Note.copyTo(note, note2);
+								beat2.addNote(note);
+								for (var i2 = 0; i2 < note.bendPoints.length; i2++) {
+									var point1 = new $AlphaTab_Model_BendPoint(0, 0);
+									$AlphaTab_Model_BendPoint.copyTo(note.bendPoints[i2], point1);
+									note2.bendPoints.push(point1);
+								}
+							}
+						}
+					}
+				}
+			}
+			return score;
+		}
+	});
 	ss.initEnum($AlphaTab_Model_KeySignatureType, $asm, { major: 0, minor: 1 });
 	ss.initClass($AlphaTab_Model_MasterBar, $asm, {
 		get_isRepeatEnd: function() {
@@ -8182,38 +8472,10 @@
 		},
 		clone: function() {
 			var n = new $AlphaTab_Model_Note();
-			n.accentuated = this.accentuated;
+			$AlphaTab_Model_Note.copyTo(this, n);
 			for (var i = 0, j = this.bendPoints.length; i < j; i++) {
 				n.bendPoints.push(this.bendPoints[i].clone());
 			}
-			n.fret = this.fret;
-			n.string = this.string;
-			n.isHammerPullOrigin = this.isHammerPullOrigin;
-			n.hammerPullOrigin = this.hammerPullOrigin;
-			n.hammerPullDestination = this.hammerPullDestination;
-			n.harmonicValue = this.harmonicValue;
-			n.harmonicType = this.harmonicType;
-			n.isGhost = this.isGhost;
-			n.isLetRing = this.isLetRing;
-			n.isPalmMute = this.isPalmMute;
-			n.isDead = this.isDead;
-			n.isStaccato = this.isStaccato;
-			n.slideType = this.slideType;
-			n.slideTarget = this.slideTarget;
-			n.vibrato = this.vibrato;
-			n.tieOrigin = this.tieOrigin;
-			n.isTieDestination = this.isTieDestination;
-			n.isTieOrigin = this.isTieOrigin;
-			n.leftHandFinger = this.leftHandFinger;
-			n.rightHandFinger = this.rightHandFinger;
-			n.isFingering = this.isFingering;
-			n.trillValue = this.trillValue;
-			n.trillSpeed = this.trillSpeed;
-			n.durationPercent = this.durationPercent;
-			n.swapAccidentals = this.swapAccidentals;
-			n.dynamic = this.dynamic;
-			n.octave = this.octave;
-			n.tone = this.tone;
 			return n;
 		},
 		finish: function() {
@@ -8387,7 +8649,7 @@
 		}
 	});
 	ss.initInterface($AlphaTab_Platform_IPathCanvas, $asm, { beginPath: null, closePath: null, fill: null, stroke: null, moveTo: null, lineTo: null, bezierCurveTo: null, quadraticCurveTo: null });
-	ss.initInterface($AlphaTab_Platform_ICanvas, $asm, { get_width: null, set_width: null, get_height: null, set_height: null, get_resources: null, set_resources: null, get_color: null, set_color: null, get_lineWidth: null, set_lineWidth: null, clear: null, fillRect: null, strokeRect: null, fillCircle: null, get_font: null, set_font: null, get_textAlign: null, set_textAlign: null, get_textBaseline: null, set_textBaseline: null, fillText: null, measureText: null, fillMusicFontSymbol: null }, [$AlphaTab_Platform_IPathCanvas]);
+	ss.initInterface($AlphaTab_Platform_ICanvas, $asm, { get_width: null, set_width: null, get_height: null, set_height: null, get_resources: null, set_resources: null, get_color: null, set_color: null, get_lineWidth: null, set_lineWidth: null, clear: null, fillRect: null, strokeRect: null, fillCircle: null, get_font: null, set_font: null, get_textAlign: null, set_textAlign: null, get_textBaseline: null, set_textBaseline: null, fillText: null, measureText: null, fillMusicFontSymbol: null, get_renderResult: null }, [$AlphaTab_Platform_IPathCanvas]);
 	ss.initInterface($AlphaTab_Platform_IFileLoader, $asm, { loadBinary: null, loadBinaryAsync: null });
 	ss.initClass($AlphaTab_Platform_Std, $asm, {});
 	ss.initClass($AlphaTab_Platform_JavaScript_Html5Canvas, $asm, {
@@ -8396,6 +8658,9 @@
 		},
 		set_resources: function(value) {
 			this.$1$ResourcesField = value;
+		},
+		get_renderResult: function() {
+			return this.$_canvas;
 		},
 		get_width: function() {
 			return this.$_canvas.width;
@@ -8861,6 +9126,9 @@
 		},
 		set_resources: function(value) {
 			this.$1$ResourcesField = value;
+		},
+		get_renderResult: function() {
+			return this.toSvg(true, 'alphaTabSurfaceSvg');
 		},
 		toSvg: function(includeWrapper, className) {
 			var buf = [];
@@ -9700,6 +9968,8 @@
 		}
 	}, $AlphaTab_Rendering_BarRendererFactory);
 	ss.initInterface($AlphaTab_Rendering_IEffectBarRendererInfo, $asm, { get_hideOnMultiTrack: null, shouldCreateGlyph: null, get_sizingMode: null, getHeight: null, createNewGlyph: null, canExpand: null });
+	ss.initInterface($AlphaTab_Rendering_IScoreRenderer, $asm, { get_isSvg: null, add_renderFinished: null, remove_renderFinished: null, add_postRenderFinished: null, remove_postRenderFinished: null, renderMultiple: null });
+	ss.initClass($AlphaTab_Rendering_RenderFinishedEventArgs, $asm, {});
 	ss.initClass($AlphaTab_Rendering_RenderingResources, $asm, {
 		init: function(scale) {
 			this.scale = scale;
@@ -10523,6 +10793,9 @@
 		}
 	}, $AlphaTab_Rendering_Glyphs_BeatContainerGlyph, [$AlphaTab_Rendering_Glyphs_ISupportsFinalize]);
 	ss.initClass($AlphaTab_Rendering_ScoreRenderer, $asm, {
+		get_isSvg: function() {
+			return ss.isInstanceOfType(this.canvas, $AlphaTab_Platform_Svg_SvgCanvas);
+		},
 		$recreateLayout: function() {
 			if (!ss.referenceEquals(this.$_currentLayoutMode, this.settings.layout.mode)) {
 				if (ss.isNullOrUndefined(this.settings.layout) || !$AlphaTab_Environment.layoutEngines.hasOwnProperty(this.settings.layout.mode)) {
@@ -10562,7 +10835,11 @@
 			this.canvas.clear();
 			this.$doLayout();
 			this.$paintScore();
-			this.onRenderFinished();
+			var $t1 = new $AlphaTab_Rendering_RenderFinishedEventArgs();
+			$t1.height = this.layout.height;
+			$t1.width = this.layout.width;
+			$t1.renderResult = this.canvas.get_renderResult();
+			this.onRenderFinished($t1);
 			this.onPostRenderFinished();
 		},
 		$doLayout: function() {
@@ -10589,10 +10866,10 @@
 		remove_renderFinished: function(value) {
 			this.$1$RenderFinishedField = ss.delegateRemove(this.$1$RenderFinishedField, value);
 		},
-		onRenderFinished: function() {
+		onRenderFinished: function(e) {
 			var handler = this.$1$RenderFinishedField;
 			if (!ss.staticEquals(handler, null)) {
-				handler();
+				handler(e);
 			}
 		},
 		add_postRenderFinished: function(value) {
@@ -10612,7 +10889,7 @@
 			this.layout.buildBoundingsLookup(lookup);
 			return lookup;
 		}
-	});
+	}, null, [$AlphaTab_Rendering_IScoreRenderer]);
 	ss.initClass($AlphaTab_Rendering_TabBarRenderer, $asm, {
 		get_$lineOffset: function() {
 			return 11 * this.get_scale();

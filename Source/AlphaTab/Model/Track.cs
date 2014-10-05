@@ -67,6 +67,16 @@ namespace AlphaTab.Model
             Color = new Color(200, 0, 0);
         }
 
+        public static void CopyTo(Track src, Track dst)
+        {
+            dst.Capo = src.Capo;
+            dst.Index = src.Index;
+            dst.ShortName = src.ShortName;
+            dst.Tuning = src.Tuning.Clone();
+            dst.Color = new Color(src.Color.R, src.Color.G, src.Color.B, src.Color.A);
+            dst.IsPercussion = src.IsPercussion;
+
+        }
         public void AddBar(Bar bar)
         {
             var bars = Bars;

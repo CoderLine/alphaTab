@@ -39,11 +39,16 @@ namespace AlphaTab.Model
             Value = value;
         }
 
+        public static void CopyTo(BendPoint src, BendPoint dst)
+        {
+            dst.Offset = src.Offset;
+            dst.Value = src.Value;
+        }
+
         public BendPoint Clone()
         {
             var point = new BendPoint();
-            point.Offset = Offset;
-            point.Value = Value;
+            CopyTo(this, point);
             return point;
         }
     }

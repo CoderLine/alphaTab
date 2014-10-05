@@ -36,6 +36,11 @@ namespace AlphaTab.Platform.JavaScript
 
         public RenderingResources Resources { get; set; }
 
+        public object RenderResult
+        {
+            get { return _canvas; }
+        }
+
         public Html5Canvas(dynamic dom)
         {
             _canvas = dom;

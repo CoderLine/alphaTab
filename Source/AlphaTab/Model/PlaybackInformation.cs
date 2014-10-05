@@ -50,5 +50,17 @@ namespace AlphaTab.Model
             Balance = 8;
             Port = 1;
         }
+
+        public static void CopyTo(PlaybackInformation src, PlaybackInformation dst)
+        {
+            dst.Volume = src.Volume;
+            dst.Balance = src.Balance;
+            dst.Port = src.Port;
+            dst.Program = src.Program;
+            dst.PrimaryChannel = src.PrimaryChannel;
+            dst.SecondaryChannel = src.SecondaryChannel;
+            dst.IsMute = src.IsMute;
+            dst.IsSolo = src.IsSolo;
+        }
     }
 }

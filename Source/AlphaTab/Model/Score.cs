@@ -106,6 +106,22 @@ namespace AlphaTab.Model
             _currentRepeatGroup = new RepeatGroup();
         }
 
+        public static void CopyTo(Score src, Score dst)
+        {
+            dst.Album = src.Album;
+            dst.Artist = src.Artist;
+            dst.Copyright = src.Copyright;
+            dst.Instructions = src.Instructions;
+            dst.Music = src.Music;
+            dst.Notices = src.Notices;
+            dst.SubTitle = src.SubTitle;
+            dst.Title = src.Title;
+            dst.Words = src.Words;
+            dst.Tab = src.Tab;
+            dst.Tempo = src.Tempo;
+            dst.TempoLabel = src.TempoLabel;
+        }
+
         public void AddMasterBar(MasterBar bar)
         {
             bar.Score = this;
@@ -127,6 +143,7 @@ namespace AlphaTab.Model
             _currentRepeatGroup.AddMasterBar(bar);
             MasterBars.Add(bar);
         }
+
 
         public void AddTrack(Track track)
         {

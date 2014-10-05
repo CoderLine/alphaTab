@@ -41,6 +41,11 @@ namespace AlphaTab.Platform.Svg
         public TextBaseline TextBaseline { get; set; }
         public RenderingResources Resources { get; set; }
 
+        public object RenderResult
+        {
+            get { return ToSvg(true, "alphaTabSurfaceSvg"); }
+        }
+
         public SvgCanvas()
         {
             _buffer = "";

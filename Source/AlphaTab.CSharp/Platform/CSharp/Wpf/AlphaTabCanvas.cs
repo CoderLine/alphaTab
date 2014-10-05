@@ -79,7 +79,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
         }
 
         // This method raises the Tap event 
-        protected virtual void OnRenderFinished()
+        protected virtual void OnRenderFinished(RenderFinishedEventArgs e)
         {
             RoutedEventArgs newEventArgs = new RoutedEventArgs(RenderFinishedEvent);
             RaiseEvent(newEventArgs);

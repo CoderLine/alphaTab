@@ -189,6 +189,33 @@ namespace AlphaTab.Model
             Crescendo = CrescendoType.None;
         }
 
+        public static void CopyTo(Beat src, Beat dst)
+        {
+            dst.Index = src.Index;
+            dst.IsEmpty = src.IsEmpty;
+            dst.Duration = src.Duration;
+            dst.Dots = src.Dots;
+            dst.FadeIn = src.FadeIn;
+            dst.Lyrics = src.Lyrics.Clone();
+            dst.Pop = src.Pop;
+            dst.HasRasgueado = src.HasRasgueado;
+            dst.Slap = src.Slap;
+            dst.Tap = src.Tap;
+            dst.Text = src.Text;
+            dst.BrushType = src.BrushType;
+            dst.BrushDuration = src.BrushDuration;
+            dst.TupletDenominator = src.TupletDenominator;
+            dst.TupletNumerator = src.TupletNumerator;
+            dst.Vibrato = src.Vibrato;
+            dst.ChordId = src.ChordId;
+            dst.GraceType = src.GraceType;
+            dst.PickStroke = src.PickStroke;
+            dst.TremoloSpeed = src.TremoloSpeed;
+            dst.Crescendo = src.Crescendo;
+            dst.Start = src.Start;
+            dst.Dynamic = src.Dynamic;
+        }
+
         public Beat Clone()
         {
             var beat = new Beat();
@@ -200,29 +227,11 @@ namespace AlphaTab.Model
             {
                 beat.AddNote(Notes[i].Clone());
             }
-            beat.Dots = Dots;
-            beat.ChordId = ChordId;
-            beat.BrushType = BrushType;
-            beat.Vibrato = Vibrato;
-            beat.GraceType = GraceType;
-            beat.PickStroke = PickStroke;
-            beat.Duration = Duration;
-            beat.TremoloSpeed = TremoloSpeed;
-            beat.Text = Text;
-            beat.FadeIn = FadeIn;
-            beat.Tap = Tap;
-            beat.Slap = Slap;
-            beat.Pop = Pop;
+            CopyTo(this, beat);
             for (int i = 0, j = Automations.Count; i < j; i++)
             {
                 beat.Automations.Add(Automations[i].Clone());
             }
-            beat.Start = Start;
-            beat.TupletDenominator = TupletDenominator;
-            beat.TupletNumerator = TupletNumerator;
-            beat.Dynamic = Dynamic;
-            beat.Crescendo = Crescendo;
-
             return beat;
         }
 

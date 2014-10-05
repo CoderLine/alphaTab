@@ -36,7 +36,11 @@ if(!isWorker) {
                                 delete ctx.tracksCallback;
                             break;
                             case 'score':
-                                ctx.scoreCallback(cmd.score);
+                                ctx.scoreCallback(AlphaTab.Model.JsObjectToScore(cmd.score));
+                                delete ctx.scoreCallback;
+                            break;
+                            case 'rendered':
+                                ctx.scoreCallback(AlphaTab.Model.JsObjectToScore(cmd.score));
                                 delete ctx.scoreCallback;
                             break;
                         }
@@ -93,7 +97,7 @@ if(!isWorker) {
                 else {
                     context.postMessage({
                         cmd: 'score',
-                        score: score
+                        score: AlphaTab.Model.JsonConverter.ScoreToJsObject(score)
                     });
                 }
             },
@@ -178,12 +182,12 @@ else {
             
             case 'score':
                 if(msg.score) {
-                    api.scoreLoaded(msg.score);
+                    api.scoreLoaded(AlphaTab.Model.JsonConverter.JsObjectToScore(msg.score));
                 }
                 else {
                     self.postMessage({
                         cmd: 'score',
-                        error: api.score
+                        error: AlphaTab.Model.JsonConverter.ScoreToJsObject(api.score)
                     });
                 }            
             break;      

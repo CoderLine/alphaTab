@@ -90,9 +90,9 @@ namespace AlphaTab.Platform.CSharp.WinForms
         #region RenderFinished
 
         public event EventHandler RenderFinished;
-        protected virtual void OnRenderFinished()
+        protected virtual void OnRenderFinished(RenderFinishedEventArgs e)
         {
-            _bitmap = ((GdiCanvas) _renderer.Canvas).Image;
+            _bitmap = (Bitmap) e.RenderResult;
             Size = _bitmap.Size;
 
             EventHandler handler = RenderFinished;

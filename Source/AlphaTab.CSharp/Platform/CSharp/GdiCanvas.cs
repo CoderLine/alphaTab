@@ -92,6 +92,11 @@ namespace AlphaTab.Platform.CSharp
             }
         }
 
+        public object RenderResult
+        {
+            get { return Image; }
+        }
+
 
         public Color Color
         {

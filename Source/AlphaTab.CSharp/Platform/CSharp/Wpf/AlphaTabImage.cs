@@ -86,9 +86,9 @@ namespace AlphaTab.Platform.CSharp.Wpf
         [DllImport("gdi32.dll")]
         private static extern bool DeleteObject(IntPtr hObject);
 
-        protected virtual void OnRenderFinished()
+        protected virtual void OnRenderFinished(RenderFinishedEventArgs e)
         {
-            using (Bitmap bitmap = ((GdiCanvas)_renderer.Canvas).Image)
+            using (Bitmap bitmap = (Bitmap) e.RenderResult)
             {
                 IntPtr hBitmap = bitmap.GetHbitmap();
                 try
