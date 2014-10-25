@@ -29,12 +29,9 @@ namespace AlphaTab.Importer
     /// </summary>
     public class GpxFile
     {
-        [IntrinsicProperty]
         public string FileName { get; set; }
-        [IntrinsicProperty]
         public int FileSize { get; set; }
-        [IntrinsicProperty]
-        public ByteArray Data { get; set; }
+        public byte[] Data { get; set; }
     }
 
     /// <summary>
@@ -53,13 +50,11 @@ namespace AlphaTab.Importer
         /// whether this file will be available after loading. 
         /// This way we can reduce the amount of memory we store.
         /// </summary>
-        [IntrinsicProperty]
         public Func<string, bool> FileFilter { get; set; }
 
         /// <summary>
         /// Gets the list of files stored in this FileSystem.
         /// </summary>
-        [IntrinsicProperty]
         public FastList<GpxFile> Files { get; set; }
 
         /// <summary>
@@ -100,10 +95,10 @@ namespace AlphaTab.Importer
         /// <param name="src">the bitInput to read the data from</param>
         /// <param name="skipHeader">true if the header should NOT be included in the result byteset, otherwise false</param>
         /// <returns>the decompressed byte data. if skipHeader is set to false the BCFS header is included.</returns>
-        public ByteArray Decompress(BitReader src, bool skipHeader = false)
+        public byte[] Decompress(BitReader src, bool skipHeader = false)
         {
-            var uncompressed = new ByteBuffer();
-            ByteArray buffer;
+            var uncompressed = ByteBuffer.Empty();
+            byte[] buffer;
             var expectedLength = GetInteger(src.ReadBytes(4), 0);
 
             try
@@ -149,7 +144,7 @@ namespace AlphaTab.Importer
             buffer = uncompressed.GetBuffer();
             var resultOffset = skipHeader ? 4 : 0;
             var resultSize = uncompressed.Length - resultOffset;
-            var result = new ByteArray((int)resultSize);
+            var result = new byte[(int)resultSize];
             Std.BlockCopy(buffer, resultOffset, result, 0, (int)resultSize);
             return result;
         }
@@ -182,7 +177,7 @@ namespace AlphaTab.Importer
         /// Reads an uncompressed data block into the model.
         /// </summary>
         /// <param name="data">the data store to read from.</param>
-        private void ReadUncompressedBlock(ByteArray data)
+        private void ReadUncompressedBlock(byte[] data)
         {
             // the uncompressed block contains a list of filesystem entires
             // as long we have data we will try to read more entries
@@ -230,7 +225,7 @@ namespace AlphaTab.Importer
                     var sectorCount = 0; // we're keeping count so we can calculate the offset of the array item
 
                     // as long we have data blocks we need to iterate them, 
-                    var fileData = storeFile ? new ByteBuffer(file.FileSize) : null;
+                    var fileData = storeFile ? ByteBuffer.WithCapactiy(file.FileSize) : null;
                     while ((sector = GetInteger(data, (dataPointerOffset + (4 * (sectorCount++))))) != 0)
                     {
                         // the next file entry starts after the last data sector so we 
@@ -247,9 +242,9 @@ namespace AlphaTab.Importer
                     if (storeFile)
                     {
                         // trim data to filesize if needed
-                        file.Data = new ByteArray((int)Math.Min(file.FileSize, fileData.Length));
+                        file.Data = new byte[(int)Math.Min(file.FileSize, fileData.Length)];
                         // we can use the getBuffer here because we are intelligent and know not to read the empty data.
-                        ByteArray raw = fileData.ToArray();
+                        byte[] raw = fileData.ToArray();
                         Std.BlockCopy(raw, 0, file.Data, 0, file.Data.Length);
                     }
                 }
@@ -266,7 +261,7 @@ namespace AlphaTab.Importer
         /// <param name="offset">the offset to start reading from</param>
         /// <param name="length">the max length to read</param>
         /// <returns>the ascii string read from the datasource.</returns>
-        private string GetString(ByteArray data, int offset, int length)
+        private string GetString(byte[] data, int offset, int length)
         {
             var buf = new StringBuilder();
             for (int i = 0; i < length; i++)
@@ -284,7 +279,7 @@ namespace AlphaTab.Importer
         /// <param name="data">the data source to read from </param>
         /// <param name="offset">offset the offset to start reading from</param>
         /// <returns></returns>
-        private int GetInteger(ByteArray data, int offset)
+        private int GetInteger(byte[] data, int offset)
         {
             return (data[offset + 3] << 24) | (data[offset + 2] << 16) | (data[offset + 1] << 8) | data[offset];
         }

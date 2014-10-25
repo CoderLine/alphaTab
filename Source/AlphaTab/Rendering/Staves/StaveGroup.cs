@@ -27,16 +27,11 @@ namespace AlphaTab.Rendering.Staves
 {
     public class StaveTrackGroup
     {
-        [IntrinsicProperty]
         public Track Track { get; set; }
-        [IntrinsicProperty]
         public StaveGroup StaveGroup { get; set; }
-        [IntrinsicProperty]
         public FastList<Stave> Staves { get; set; }
 
-        [IntrinsicProperty]
         public Stave FirstStaveInAccolade { get; set; }
-        [IntrinsicProperty]
         public Stave LastStaveInAccolade { get; set; }
 
         public StaveTrackGroup(StaveGroup staveGroup, Track track)
@@ -58,15 +53,11 @@ namespace AlphaTab.Rendering.Staves
         private Stave _firstStaveInAccolade;
         private Stave _lastStaveInAccolade;
 
-        [IntrinsicProperty]
         public int X { get; set; }
-        [IntrinsicProperty]
         public int Y { get; set; }
-        [IntrinsicProperty]
         public int Index { get; set; }
 
         private bool _accoladeSpacingCalculated;
-        [IntrinsicProperty]
         public int AccoladeSpacing { get; set; }
 
         /// <summary>
@@ -74,25 +65,19 @@ namespace AlphaTab.Rendering.Staves
         /// bars can be aligned to the maximum width. If the line is not full 
         /// the bars will not get stretched.
         /// </summary>
-        [IntrinsicProperty]
         public bool IsFull { get; set; }
 
         /// <summary>
         /// The width that the content bars actually need
         /// </summary>
-        [IntrinsicProperty]
         public int Width { get; set; }
 
-        [IntrinsicProperty]
         public FastList<MasterBar> MasterBars { get; set; }
 
-        [IntrinsicProperty]
         public FastList<StaveTrackGroup> Staves { get; set; }
         private FastList<Stave> _allStaves;
 
-        [IntrinsicProperty]
         public ScoreLayout Layout { get; set; }
-        [IntrinsicProperty]
         public BarHelpersGroup Helpers { get; set; }
 
         public StaveGroup()

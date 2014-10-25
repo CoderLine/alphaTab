@@ -31,6 +31,7 @@ ipch/
 obj/
 [Dd]ebug*/
 [Rr]elease*/
+res/
 Ankh.NoLoad
 
 #Tooling

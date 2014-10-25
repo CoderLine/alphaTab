@@ -25,21 +25,13 @@ namespace AlphaTab.Model
     /// </summary>
     public class Bar
     {
-        [IntrinsicProperty]
         public int Index { get; set; }
-        [IntrinsicProperty]
         public Bar NextBar { get; set; }
-        [IntrinsicProperty]
         public Bar PreviousBar { get; set; }
-        [IntrinsicProperty]
         public Clef Clef { get; set; }
-        [IntrinsicProperty]
         public Track Track { get; set; }
-        [IntrinsicProperty]
         public FastList<Voice> Voices { get; set; }
-        [IntrinsicProperty]
         public Duration? MinDuration { get; set; }
-        [IntrinsicProperty]
         public Duration? MaxDuration { get; set; }
         
         public Bar()

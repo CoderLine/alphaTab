@@ -25,9 +25,7 @@ namespace AlphaTab.Rendering
     /// </summary>
     abstract public class BarRendererFactory
     {
-        [IntrinsicProperty]
         public bool IsInAccolade { get; set; }
-        [IntrinsicProperty]
         public bool HideOnMultiTrack { get; set; }
 
         protected BarRendererFactory()

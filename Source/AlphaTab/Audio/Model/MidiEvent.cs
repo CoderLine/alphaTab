@@ -25,15 +25,10 @@ namespace AlphaTab.Audio.Model
     /// </summary>
     public class MidiEvent
     {
-        [IntrinsicProperty]
         public MidiTrack Track { get; set; }
-        [IntrinsicProperty]
         public int Tick { get; set; }
-        [IntrinsicProperty]
         public MidiMessage Message { get; set; }
-        [IntrinsicProperty]
         public MidiEvent NextEvent { get; set; }
-        [IntrinsicProperty]
         public MidiEvent PreviousEvent { get; set; }
 
         public int DeltaTicks
@@ -58,7 +53,7 @@ namespace AlphaTab.Audio.Model
 
         private void WriteVariableInt(IWriteable s, int value)
         {
-            var array = new ByteArray(4);
+            var array = new byte[4];
 
             var n = 0;
             do

@@ -1,0 +1,3 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <UsingTask TaskName="Skc" AssemblyFile="$(SkcToolPath)SharpKit.Compiler.Java.MsBuild.dll"/>
+</Project>

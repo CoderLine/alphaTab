@@ -32,11 +32,8 @@ namespace AlphaTab.Rendering.Glyphs
         private readonly bool _isGrace;
         private int _centerX;
 
-        [IntrinsicProperty]
         public Beat Beat { get; set; }
-        [IntrinsicProperty]
         public BeamingHelper BeamingHelper { get; set; }
-        [IntrinsicProperty]
         public FastDictionary<string, Glyph> BeatEffects { get; set; }
 
         public TabNoteChordGlyph(int x, int y, bool isGrace)

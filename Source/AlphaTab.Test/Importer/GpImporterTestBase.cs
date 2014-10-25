@@ -33,10 +33,10 @@ namespace AlphaTab.Test.Importer
             return PrepareImporterWithBytes(buffer);
         }
 
-        internal Gp3To5Importer PrepareImporterWithBytes(ByteArray buffer)
+        internal Gp3To5Importer PrepareImporterWithBytes(byte[] buffer)
         {
             var readerBase = new Gp3To5Importer();
-            readerBase.Init(new StreamWrapper(new MemoryStream(buffer.Data)));
+            readerBase.Init(new StreamWrapper(new MemoryStream(buffer)));
             return readerBase;
         }
 

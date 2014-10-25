@@ -23,11 +23,8 @@ namespace AlphaTab.Audio.Model
 {
     public class BarTickLookup
     {
-        [IntrinsicProperty]
         public int Start { get; set; }
-        [IntrinsicProperty]
         public int End { get; set; }
-        [IntrinsicProperty]
         public MasterBar Bar { get; set; }
     }
 
@@ -35,7 +32,6 @@ namespace AlphaTab.Audio.Model
     {
         private Beat _lastBeat;
 
-        [IntrinsicProperty]
         public FastList<BarTickLookup> Bars { get; set; }
 
         public MidiTickLookup()

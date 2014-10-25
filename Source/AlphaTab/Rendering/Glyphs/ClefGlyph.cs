@@ -52,7 +52,7 @@ namespace AlphaTab.Rendering.Glyphs
                 case Clef.G2:
                     return MusicFontSymbol.ClefG;
                 default:
-                    throw new ArgumentOutOfRangeException("clef");
+                    return MusicFontSymbol.None;
             }
         }
     }

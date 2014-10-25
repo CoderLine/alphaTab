@@ -28,6 +28,7 @@ namespace AlphaTab.Platform
     {
         int Width { get; set; }
         int Height { get; set; }
+
         RenderingResources Resources { get; set; }
 
         Color Color { get; set; }

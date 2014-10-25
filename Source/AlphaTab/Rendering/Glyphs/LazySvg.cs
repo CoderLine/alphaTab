@@ -23,9 +23,7 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class SvgCommand
     {
-        [IntrinsicProperty]
         public string Cmd { get; set; }
-        [IntrinsicProperty]
         public FastList<int> Numbers { get; set; }
     }
 

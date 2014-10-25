@@ -25,11 +25,8 @@ namespace AlphaTab.Model
     /// </summary>
     public class Chord
     {
-        [IntrinsicProperty]
         public string Name { get; set; }
-        [IntrinsicProperty]
         public int FirstFret { get; set; }
-        [IntrinsicProperty]
         public FastList<int> Strings { get; set; }
 
         public Chord()

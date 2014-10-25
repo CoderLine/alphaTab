@@ -27,16 +27,11 @@ namespace AlphaTab.Rendering.Staves
     /// </summary>
     public class BarSizeInfo
     {
-        [IntrinsicProperty]
         public int FullWidth { get; set; }
-        [IntrinsicProperty]
         public FastDictionary<string, int> Sizes { get; set; }
 
-        [IntrinsicProperty]
         public FastDictionary<int, int> PreNoteSizes { get; set; }
-        [IntrinsicProperty]
         public FastDictionary<int, int> OnNoteSizes { get; set; }
-        [IntrinsicProperty]
         public FastDictionary<int, int> PostNoteSizes { get; set; }
 
         public BarSizeInfo()

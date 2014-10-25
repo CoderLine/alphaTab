@@ -50,7 +50,6 @@
     <Compile Include="Collections\FastList.cs" />
     <Compile Include="Collections\StringBuilder.cs" />
     <Compile Include="Environment.cs" />
-    <Compile Include="IO\ByteArray.cs" />
     <Compile Include="IO\StreamWrapper.cs" />
     <Compile Include="Model\TuningParser.cs" />
     <Compile Include="Platform\CSharp\CsFileLoader.cs" />
@@ -62,7 +61,6 @@
     <Compile Include="Platform\CSharp\Wpf\AlphaTabImage.cs" />
     <Compile Include="Platform\Std.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Attributes.cs" />
   </ItemGroup>
   <Import Project="..\Source\AlphaTab\AlphaTab.projitems" Label="Shared" Condition="Exists('..\Source\AlphaTab\AlphaTab.projitems')" />
   <Import Project="..\AlphaTab\AlphaTab.projitems" Label="Shared" Condition="Exists('..\AlphaTab\AlphaTab.projitems')" />

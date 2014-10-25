@@ -148,7 +148,7 @@ namespace AlphaTab.Importer
             version = version.Substring(VersionString.Length + 1);
             int dot = version.IndexOf('.');
 
-            _versionNumber = (100 * int.Parse(version.Substring(0, dot))) + int.Parse(version.Substring(dot + 1));
+            _versionNumber = (100 * Std.ParseInt(version.Substring(0, dot))) + Std.ParseInt(version.Substring(dot + 1));
         }
 
         public void ReadScoreInformation()
@@ -1385,7 +1385,7 @@ namespace AlphaTab.Importer
         // TODO: use native features to convert byte array to double
         public double ReadDouble()
         {
-            var bytes = new ByteArray(8);
+            var bytes = new byte[8];
             _data.Read(bytes, 0, bytes.Length);
 
             var sign = 1 - ((bytes[0] >> 7) << 1); // sign = bit 0
@@ -1396,7 +1396,7 @@ namespace AlphaTab.Importer
             return sign * (1.0 + Math.Pow(2, -52) * sig) * Math.Pow(2, exp);
         }
 
-        public int GetDoubleSig(ByteArray bytes)
+        public int GetDoubleSig(byte[] bytes)
         {
             return (int)((((bytes[1] & 0xF) << 16) | (bytes[2] << 8) | bytes[3]) * 4294967296.0 +
                    (bytes[4] >> 7) * 2147483648 +
@@ -1420,7 +1420,7 @@ namespace AlphaTab.Importer
 
         public int ReadInt32()
         {
-            var bytes = new ByteArray(4);
+            var bytes = new byte[4];
             _data.Read(bytes, 0, 4);
             return bytes[0] | bytes[1] << 8 | bytes[2] << 16 | bytes[3] << 24;
         }
@@ -1459,7 +1459,7 @@ namespace AlphaTab.Importer
 
         public string ReadString(int length)
         {
-            ByteArray b = new ByteArray(length);
+            byte[] b = new byte[length];
             _data.Read(b, 0, b.Length);
             return Std.ToString(b);
         }

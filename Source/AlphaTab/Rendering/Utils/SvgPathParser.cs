@@ -28,11 +28,8 @@ namespace AlphaTab.Rendering.Utils
     {
         private int _currentIndex;
 
-        [IntrinsicProperty]
         public string Svg { get; set; }
-        [IntrinsicProperty]
         public string LastCommand { get; set; }
-        [IntrinsicProperty]
         public string CurrentToken { get; set; }
 
         public SvgPathParser(string svg)
@@ -63,7 +60,7 @@ namespace AlphaTab.Rendering.Utils
 
         public int GetNumber()
         {
-            return int.Parse(GetString());
+            return Std.ParseInt(GetString());
         }
 
         public bool CurrentTokenIsNumber
@@ -97,7 +94,7 @@ namespace AlphaTab.Rendering.Utils
             do
             {
                 c = NextChar();
-                skipChar = Std.IsWhiteSpace(c) || c == ',';
+                skipChar = Std.IsWhiteSpace(c) || c == 0x20;
             } while (!Eof && skipChar);
 
             // read token itself 
@@ -107,7 +104,7 @@ namespace AlphaTab.Rendering.Utils
                 if (Std.IsCharNumber(c)) // do we have a number?
                 {
                     c = PeekChar(); // get first upcoming character
-                    while (!Eof && (Std.IsCharNumber(c, false) || c == '.')) // while we have number characters add them 
+                    while (!Eof && (Std.IsCharNumber(c, false) || c == 0x2E)) // while we have number characters add them 
                     {
                         token.AppendChar(NextChar());
                         // peek next character for check

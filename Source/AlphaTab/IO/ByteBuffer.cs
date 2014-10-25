@@ -21,7 +21,7 @@ namespace AlphaTab.IO
 {
     public partial class ByteBuffer : IWriteable, IReadable
     {
-        private ByteArray _buffer;
+        private byte[] _buffer;
         private int _position;
         private int _length;
         private int _capacity;
@@ -34,26 +34,35 @@ namespace AlphaTab.IO
             }
         }
 
-        public virtual ByteArray GetBuffer()
+        public virtual byte[] GetBuffer()
         {
             return _buffer;
         }
 
-        public ByteBuffer()
-            : this(0)
+
+        public static ByteBuffer Empty()
         {
+            return WithCapactiy(0);
         }
 
-        public ByteBuffer(int capacity)
+        public static ByteBuffer WithCapactiy(int capacity)
         {
-            _buffer = new ByteArray(capacity);
-            _capacity = capacity;
+            ByteBuffer buffer = new ByteBuffer();
+            buffer._buffer = new byte[capacity];
+            buffer._capacity = capacity;
+            return buffer;
         }
 
-        public ByteBuffer(ByteArray buffer)
+        public static ByteBuffer FromBuffer(byte[] data)
         {
-            _buffer = buffer;
-            _length = _capacity = buffer.Length;
+            ByteBuffer buffer = new ByteBuffer();
+            buffer._buffer = data;
+            buffer._capacity = buffer._length = data.Length;
+            return buffer;
+        }
+
+        private ByteBuffer()
+        {
         }
 
         public void Reset()
@@ -72,7 +81,7 @@ namespace AlphaTab.IO
             {
                 if (value > 0)
                 {
-                    var newBuffer = new ByteArray(value);
+                    var newBuffer = new byte[value];
                     if (_length > 0) Std.BlockCopy(_buffer, 0, newBuffer, 0, _length);
                     _buffer = newBuffer;
                 }
@@ -93,7 +102,7 @@ namespace AlphaTab.IO
             return _buffer[_position++];
         }
 
-        public int Read(ByteArray buffer, int offset, int count)
+        public int Read(byte[] buffer, int offset, int count)
         {
             int n = _length - _position;
             if (n > count) n = count;
@@ -115,15 +124,15 @@ namespace AlphaTab.IO
 
         public void WriteByte(byte value)
         {
-            ByteArray buffer = new ByteArray(1);
+            byte[] buffer = new byte[1];
             buffer[0] = value;
             Write(buffer, 0, 1);
         }
 
-        public void Write(ByteArray buffer, int offset, int count)
+        public void Write(byte[] buffer, int offset, int count)
         {
             int i = _position + count;
-            
+
             if (i > _length)
             {
                 if (i > _capacity)
@@ -156,9 +165,9 @@ namespace AlphaTab.IO
             }
         }
 
-        public virtual ByteArray ToArray()
+        public virtual byte[] ToArray()
         {
-            ByteArray copy = new ByteArray(_length);
+            byte[] copy = new byte[_length];
             Std.BlockCopy(_buffer, 0, copy, 0, _length);
             return copy;
         }

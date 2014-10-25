@@ -5,6 +5,8 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using AlphaTab.Collections;
 using AlphaTab.IO;
+using SharpKit.Html;
+using SharpKit.JavaScript;
 
 namespace AlphaTab.Platform
 {
@@ -12,31 +14,16 @@ namespace AlphaTab.Platform
     {
         public static float ParseFloat(string s)
         {
-            float f;
-            double d = double.Parse(s);
-            if (double.IsNaN(d))
-            {
-                f = float.NaN;
-            }
-            else
-            {
-                f = (float)d;
-            }
-            return f;
+            return JsContext.parseFloat(s);
         }
 
         public static int ParseInt(string s)
         {
-            int f;
-            if (!int.TryParse(s, out f))
-            {
-                f = 0;
-            }
-            return f;
+            return JsContext.parseInt(s);
         }
 
-        [InlineCode("{dst}.set({src}.subarray({srcOffset}, {srcOffset} + {count}), {dstOffset})")]
-        public static void BlockCopy(ByteArray src, int srcOffset, ByteArray dst, int dstOffset, int count)
+        [JsMethod(InlineCodeExpression = "dst.set(src.subarray(srcOffset, srcOffset + count), dstOffset)")]
+        public static void BlockCopy(byte[] src, int srcOffset, byte[] dst, int dstOffset, int count)
         {
         }
 
@@ -45,25 +32,22 @@ namespace AlphaTab.Platform
             return s == null || s.Trim().Length == 0;
         }
 
-        [InlineCode("String.fromCharCode({c})")]
+        [JsMethod(InlineCodeExpression = "String.fromCharCode(c)")]
         public static string StringFromCharCode(int c)
         {
             return "";
         }
 
+        [JsMethod(Code = "for ( var t in e ) { c(e[t]); }")]
         public static void Foreach<T>(IEnumerable<T> e, Action<T> c)
-        {
-            JsForeach(e, c);
-        }
-
-        [InlineCode("for ( var t in {e} ) {c}({e}[t]);")]
-        private static void JsForeach<T>(IEnumerable<T> e, Action<T> c)
         {
         }
 
         public static XmlDocument LoadXml(string xml)
         {
-            return XmlDocumentParser.Parse(xml);
+            XmlDocument document = new XmlDocument();
+            document.LoadXml(xml);
+            return document;
         }
 
         public static string GetNodeValue(XmlNode n)
@@ -77,7 +61,7 @@ namespace AlphaTab.Platform
                 }
                 return txt.ToString().Trim();
             }
-            return n.NodeValue;
+            return n.Value;
         }
 
         public static sbyte ReadSignedByte(this IReadable readable)
@@ -87,7 +71,7 @@ namespace AlphaTab.Platform
             return (sbyte)n;
         }
 
-        public static string ToString(ByteArray data)
+        public static string ToString(byte[] data)
         {
             var s = new StringBuilder();
             int i = 0;
@@ -118,15 +102,26 @@ namespace AlphaTab.Platform
             return s.ToString();
         }
 
-
-        public static ByteArray StringToByteArray(string contents)
+        [JsMethod(InlineCodeExpression = "(value instanceof T)", Export = false)]
+        public static bool InstanceOf<T>(object value)
         {
-            var byteArray = new ByteArray(contents.Length);
+            return true;
+        }
+
+        public static byte[] StringToByteArray(string contents)
+        {
+            var byteArray = new byte[contents.Length];
             for (int i = 0; i < contents.Length; i++)
             {
-                byteArray[i] = (byte)contents.CharCodeAt(i);
+                byteArray[i] = (byte)contents[i];
             }
             return byteArray;
+        }
+
+        [JsMethod(InlineCodeExpression = "new Uint8Array(data)", Export = false)]
+        public static byte[] ArrayBufferToByteArray(ArrayBuffer data)
+        {
+            return null;
         }
     }
 }

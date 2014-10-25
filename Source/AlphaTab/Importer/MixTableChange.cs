@@ -24,17 +24,11 @@ namespace AlphaTab.Importer
     /// </summary>
     public class MixTableChange
     {
-        [IntrinsicProperty]
         public int Volume { get; set; }
-        [IntrinsicProperty]
         public int Balance { get; set; }
-        [IntrinsicProperty]
         public int Instrument { get; set; }
-        [IntrinsicProperty]
         public string TempoName { get; set; }
-        [IntrinsicProperty]
         public int Tempo { get; set; }
-        [IntrinsicProperty]
         public int Duration { get; set; }
     
         public MixTableChange()

@@ -25,10 +25,8 @@ namespace AlphaTab.Model
     /// </summary>
     public class Section
     {
-        [IntrinsicProperty]
         public string Marker { get; set; }
 
-        [IntrinsicProperty]
         public string Text { get; set; }
 
         public static void CopyTo(Section src, Section dst)

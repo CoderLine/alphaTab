@@ -15,36 +15,34 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System.Runtime.CompilerServices;
+using SharpKit.JavaScript;
 
 namespace AlphaTab.Collections
 {
-    [IgnoreNamespace]
-    [Imported(ObeysTypeSystem = true)]
-    [ScriptName("Array")]
+    [JsType(Mode = JsMode.Prototype, Name = "Array", Export = false)]
     public class StringBuilder
     {
-        [InlineCode("[]")]
+        [JsMethod(Code = "[]")]
         public StringBuilder()
         {
         }
 
-        [ScriptName("push")]
+        [JsMethod(InlineCodeExpression = "this.push(s)", Export = false)]
         public void Append(object s)
         {
         }
 
-        [InlineCode("{this}.push(String.fromCharCode({i}))")]
+        [JsMethod(InlineCodeExpression = "this.push(String.fromCharCode(i))", Export = false)]
         public void AppendChar(int i)
         {
         }
 
-        [InlineCode("{this}.push('\\r\\n')")]
+        [JsMethod(InlineCodeExpression = "this.push('\\r\\n')", Export = false)]
         public void AppendLine()
         {
         }
 
-        [InlineCode("{this}.join('')")]
+        [JsMethod(InlineCodeExpression = "this.join('')", Export = false)]
         public new string ToString()
         {
             return "";

@@ -23,11 +23,8 @@ namespace AlphaTab.Rendering.Utils
 {
     public class BarHelpers
     {
-        [IntrinsicProperty]
         public FastList<FastList<BeamingHelper>> BeamHelpers { get; set; }
-        [IntrinsicProperty]
         public FastList<FastDictionary<int, BeamingHelper>> BeamHelperLookup { get; set; }
-        [IntrinsicProperty]
         public FastList<FastList<TupletHelper>> TupletHelpers { get; set; }
 
         public BarHelpers(Bar bar)
@@ -102,7 +99,6 @@ namespace AlphaTab.Rendering.Utils
     /// </summary>
     public class BarHelpersGroup
     {
-        [IntrinsicProperty]
         public FastDictionary<int, FastDictionary<int, BarHelpers>> Helpers { get; set; }
 
         public BarHelpersGroup()

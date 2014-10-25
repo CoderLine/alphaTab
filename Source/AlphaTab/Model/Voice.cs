@@ -26,16 +26,11 @@ namespace AlphaTab.Model
     /// </summary>
     public class Voice
     {
-        [IntrinsicProperty]
         public int Index { get; set; }
-        [IntrinsicProperty]
         public Bar Bar { get; set; }
-        [IntrinsicProperty]
         public FastList<Beat> Beats { get; set; }
 
-        [IntrinsicProperty]
         public Duration? MinDuration { get; set; }
-        [IntrinsicProperty]
         public Duration? MaxDuration { get; set; }
 
         public bool IsEmpty

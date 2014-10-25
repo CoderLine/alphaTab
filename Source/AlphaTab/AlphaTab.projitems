@@ -200,5 +200,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\SvgRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\TupletHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Settings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\Lazy.cs" />
   </ItemGroup>
 </Project>

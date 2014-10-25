@@ -68,7 +68,6 @@ namespace AlphaTab.Rendering
 
         private BarHelpers _helpers;
 
-        [IntrinsicProperty]
         public AccidentalHelper AccidentalHelper { get; set; }
 
         public ScoreBarRenderer(Bar bar)

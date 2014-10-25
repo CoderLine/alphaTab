@@ -48,7 +48,7 @@ namespace AlphaTab.Rendering.Glyphs
                 case Duration.SixtyFourth:
                     return MusicFontSymbol.RestSixtyFourth;
                 default:
-                    throw new ArgumentOutOfRangeException("duration");
+                    return MusicFontSymbol.None;
             }
         }
 

@@ -25,11 +25,8 @@ namespace AlphaTab.Rendering.Utils
     {
         private bool _isFinished;
 
-        [IntrinsicProperty]
         public FastList<Beat> Beats { get; set; }
-        [IntrinsicProperty]
         public int VoiceIndex { get; set; }
-        [IntrinsicProperty]
         public int Tuplet { get; set; }
 
         public TupletHelper(int voice)

@@ -295,13 +295,13 @@
             <param name="data">the data source</param>
             <returns></returns>
         </member>
-        <member name="M:AlphaTab.Importer.GpxFileSystem.ReadUncompressedBlock(AlphaTab.IO.ByteArray)">
+        <member name="M:AlphaTab.Importer.GpxFileSystem.ReadUncompressedBlock(System.Byte[])">
             <summary>
             Reads an uncompressed data block into the model.
             </summary>
             <param name="data">the data store to read from.</param>
         </member>
-        <member name="M:AlphaTab.Importer.GpxFileSystem.GetString(AlphaTab.IO.ByteArray,System.Int32,System.Int32)">
+        <member name="M:AlphaTab.Importer.GpxFileSystem.GetString(System.Byte[],System.Int32,System.Int32)">
             <summary>
             Reads a zeroterminated ascii string from the given source
             </summary>
@@ -310,7 +310,7 @@
             <param name="length">the max length to read</param>
             <returns>the ascii string read from the datasource.</returns>
         </member>
-        <member name="M:AlphaTab.Importer.GpxFileSystem.GetInteger(AlphaTab.IO.ByteArray,System.Int32)">
+        <member name="M:AlphaTab.Importer.GpxFileSystem.GetInteger(System.Byte[],System.Int32)">
             <summary>
             Reads an 4 byte signed integer from the given source
             </summary>

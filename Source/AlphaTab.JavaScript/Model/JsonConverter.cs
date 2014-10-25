@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using AlphaTab.Collections;
+using SharpKit.JavaScript;
 
 namespace AlphaTab.Model
 {
@@ -93,7 +94,7 @@ namespace AlphaTab.Model
                             beat2.Automations = new FastList<Automation>();
                             for (int a = 0; a < beat.Automations.Count; a++)
                             {
-                                var automation = NewObject();
+                                Automation automation = NewObject();
                                 Automation.CopyTo(beat.Automations[a], automation);
                                 beat2.Automations.Add(automation);
                             }
@@ -101,7 +102,7 @@ namespace AlphaTab.Model
                             beat2.WhammyBarPoints = new FastList<BendPoint>();
                             for (int i = 0; i < beat.WhammyBarPoints.Count; i++)
                             {
-                                var point = NewObject();
+                                BendPoint point = NewObject();
                                 BendPoint.CopyTo(beat.WhammyBarPoints[i], point);
                                 beat2.WhammyBarPoints.Add(point);
                             }
@@ -118,7 +119,7 @@ namespace AlphaTab.Model
                                 note2.BendPoints = new FastList<BendPoint>();
                                 for (int i = 0; i < note.BendPoints.Count; i++)
                                 {
-                                    var point = NewObject();
+                                    BendPoint point = NewObject();
                                     BendPoint.CopyTo(note.BendPoints[i], point);
                                     note2.BendPoints.Add(point);
                                 }
@@ -277,7 +278,7 @@ namespace AlphaTab.Model
             return score;
         }
 
-        [InlineCode("{{}}")]
+        [JsMethod(InlineCodeExpression = "{}")]
         private dynamic NewObject()
         {
             return null;

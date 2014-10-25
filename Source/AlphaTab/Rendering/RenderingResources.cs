@@ -25,46 +25,29 @@ namespace AlphaTab.Rendering
     /// </summary>
     public class RenderingResources
     {
-        [IntrinsicProperty]
         public Font MusicFont { get; set; }
-        [IntrinsicProperty]
         public Font CopyrightFont { get; set; }
-        [IntrinsicProperty]
         public Font TitleFont { get; set; }
-        [IntrinsicProperty]
         public Font SubTitleFont { get; set; }
-        [IntrinsicProperty]
         public Font WordsFont { get; set; }
-        [IntrinsicProperty]
         public Font EffectFont { get; set; }
 
-        [IntrinsicProperty]
         public Font TablatureFont { get; set; }
-        [IntrinsicProperty]
         public Font GraceFont { get; set; }
 
-        [IntrinsicProperty]
         public Color StaveLineColor { get; set; }
-        [IntrinsicProperty]
         public Color BarSeperatorColor { get; set; }
 
-        [IntrinsicProperty]
         public Font BarNumberFont { get; set; }
-        [IntrinsicProperty]
         public Color BarNumberColor { get; set; }
 
-        [IntrinsicProperty]
         public Font MarkerFont { get; set; }
-        [IntrinsicProperty]
         public Font TabClefFont { get; set; }
 
-        [IntrinsicProperty]
         public Color MainGlyphColor { get; set; }
 
-        [IntrinsicProperty]
         public float Scale { get; set; }
 
-        [IntrinsicProperty]
         public Color ScoreInfoColor { get; set; }
 
         public RenderingResources(float scale)

@@ -31,9 +31,7 @@ namespace AlphaTab.Rendering.Glyphs
     {
         public const string KeySizeBeat = "Beat";
 
-        [IntrinsicProperty]
         public FastList<BeatContainerGlyph> BeatGlyphs { get; set; }
-        [IntrinsicProperty]
         public int VoiceIndex { get; set; }
 
         public VoiceContainerGlyph(int x, int y, int voiceIndex)

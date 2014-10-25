@@ -26,7 +26,7 @@ namespace AlphaTab.Platform
     /// </summary>
     public interface IFileLoader
     {
-        ByteArray LoadBinary(string path);
-        void LoadBinaryAsync(string path, Action<ByteArray> success, Action<Exception> error);
+        byte[] LoadBinary(string path);
+        void LoadBinaryAsync(string path, Action<byte[]> success, Action<Exception> error);
     }
 }

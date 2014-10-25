@@ -17,80 +17,81 @@
  */
 using System;
 using System.Runtime.CompilerServices;
+using SharpKit.JavaScript;
 
 namespace AlphaTab.Collections
 {
     /// <summary>
     /// This is an improved list which is also optimized for the JavaScript platform. 
     /// </summary>
-    [IncludeGenericArguments(false)]
-    [IgnoreNamespace]
-    [Imported(ObeysTypeSystem = true)]
-    [ScriptName("Array")]
+    [JsType(Mode = JsMode.Prototype, Name = "Array", Export = false, IgnoreGenericTypeArguments = true)]
     public class FastList<T>
     {
-        [InlineCode("[]")]
+        [JsMethod(InlineCode = "[]")]
         public FastList()
         {
         }
 
         public int Count
         {
-            [InlineCode("{this}.length")]
+            [JsMethod(InlineCodeExpression = "this.length", Export = false)]
             get
             {
                 return 0;
             }
         }
 
-        [IntrinsicProperty]
+        [JsProperty(NativeIndexer = true)]
         public T this[int index]
         {
+            [JsMethod(Export = false)]
             get
             {
                 return default(T);
             }
+            [JsMethod(Export = false)]
             set
             {
             }
         }
 
-        [ScriptName("push")]
+        [JsMethod(InlineCodeExpression = "this.push(item)", Export = false)]
         public void Add(T item)
         {
         }
 
-        [InlineCode("({this} = {this}.concat({data}))")]
+        [JsMethod(InlineCodeExpression = "this = this.concat(data)", Export = false)]
         public void AddRange(T[] data)
         {
         }
 
-        [InlineCode("{this}.slice(0)")]
+        [JsMethod(InlineCodeExpression = "this.slice(0)", Export = false)]
         public T[] ToArray()
         {
             return null;
         }
 
-        [InlineCode("{this}.splice({index}, 1)")]
+        [JsMethod(InlineCodeExpression = "this.splice(index, 1)", Export = false)]
         public void RemoveAt(int index)
         {
         }
 
-        [InlineCode("{this}.sort({func})")]
+        [JsMethod(InlineCodeExpression = "this.sort(func)", Export = false)]
         public void Sort(Comparison<T> func)
         {
         }
 
-        [InlineCode("{this}.splice({index}, 0, {item})")]
+        [JsMethod(InlineCodeExpression = "this.splice(index, 0, item)", Export = false)]
         public void Insert(int index, T item)
         {
         }
 
+        [JsMethod(InlineCodeExpression = "this.reverse()", Export = false)]
         public void Reverse()
         {
         }
 
-        [InlineCode("{this}.slice()")]
+        [JsMethod(InlineCodeExpression = "this.slice()", Export = false)]
         public FastList<T> Clone()
         {
             return null;

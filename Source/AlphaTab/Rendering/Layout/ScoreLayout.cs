@@ -29,12 +29,9 @@ namespace AlphaTab.Rendering.Layout
     {
         private readonly FastDictionary<string, FastDictionary<int, BarRendererBase>> _barRendererLookup;
 
-        [IntrinsicProperty]
         public ScoreRenderer Renderer { get; set; }
 
-        [IntrinsicProperty]
         public int Width { get; set; }
-        [IntrinsicProperty]
         public int Height { get; set; }
 
         protected ScoreLayout(ScoreRenderer renderer)

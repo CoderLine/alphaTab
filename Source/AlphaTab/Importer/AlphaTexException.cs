@@ -22,15 +22,10 @@ namespace AlphaTab.Importer
 {
     public class AlphaTexException : Exception
     {
-        [IntrinsicProperty]
         public int Position { get; set; }
-        [IntrinsicProperty]
         public string NonTerm { get; set; }
-        [IntrinsicProperty]
         public AlphaTexSymbols Expected { get; set; }
-        [IntrinsicProperty]
         public AlphaTexSymbols Symbol { get; set; }
-        [IntrinsicProperty]
         public object SymbolData { get; set; }
 
         public override string Message

@@ -27,7 +27,7 @@ namespace AlphaTab.Test.Importer
     [TestClass]
     public class GpxImporterTest
     {
-        internal ByteArray Load(string name)
+        internal byte[] Load(string name)
         {
             const string path = "TestFiles";
             return Environment.FileLoaders["default"]().LoadBinary(Path.Combine(path, name));
@@ -38,10 +38,10 @@ namespace AlphaTab.Test.Importer
             return PrepareImporterWithBytes(Load(name));
         }
 
-        internal GpxImporter PrepareImporterWithBytes(ByteArray buffer)
+        internal GpxImporter PrepareImporterWithBytes(byte[] buffer)
         {
             var readerBase = new GpxImporter();
-            readerBase.Init(new StreamWrapper(new MemoryStream(buffer.Data)));
+            readerBase.Init(new StreamWrapper(new MemoryStream(buffer)));
             return readerBase;
         }
 
@@ -49,7 +49,7 @@ namespace AlphaTab.Test.Importer
         public void TestFileSystemCompressed()
         {
             GpxFileSystem fileSystem = new GpxFileSystem();
-            fileSystem.Load(new StreamWrapper(new MemoryStream(Load("Compressed.gpx").Data)));
+            fileSystem.Load(new StreamWrapper(new MemoryStream(Load("Compressed.gpx"))));
 
             string[] names = {"score.gpif", "misc.xml", "BinaryStylesheet", "PartConfiguration", "LayoutConfiguration"};
             int[] sizes = {8488, 130, 12204, 20, 12};

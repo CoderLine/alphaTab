@@ -32,11 +32,8 @@ namespace AlphaTab.Rendering
 
     public class RenderFinishedEventArgs
     {
-        [IntrinsicProperty]
         public int Width { get; set; }
-        [IntrinsicProperty]
         public int Height { get; set; }
-        [IntrinsicProperty]
         public object RenderResult { get; set; }
     }
 }

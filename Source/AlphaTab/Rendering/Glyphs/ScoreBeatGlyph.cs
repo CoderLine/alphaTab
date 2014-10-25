@@ -25,11 +25,8 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class ScoreBeatGlyph : BeatGlyphBase, ISupportsFinalize
     {
-        [IntrinsicProperty]
         public ScoreNoteChordGlyph NoteHeads { get; set; }
-        [IntrinsicProperty]
         public RestGlyph RestGlyph { get; set; }
-        [IntrinsicProperty]
         public BeamingHelper BeamingHelper { get; set; }
 
         public override void FinalizeGlyph(ScoreLayout layout)
@@ -164,16 +161,20 @@ namespace AlphaTab.Rendering.Glyphs
 
         static ScoreBeatGlyph()
         {
+            // ReSharper disable ForCanBeConvertedToForeach
             NormalKeys = new FastDictionary<int, bool>();
-            foreach (var i in new[] { 32, 34, 35, 36, 38, 39, 40, 41, 43, 45, 47, 48, 50, 55, 56, 58, 60, 61 })
+            int[] normalKeyNotes = new int[] { 32, 34, 35, 36, 38, 39, 40, 41, 43, 45, 47, 48, 50, 55, 56, 58, 60, 61 };
+            for (int i = 0; i < normalKeyNotes.Length; i++)
             {
-                NormalKeys[i] = true;
+                NormalKeys[normalKeyNotes[i]] = true;
             }
             XKeys = new FastDictionary<int, bool>();
-            foreach (var i in new[] { 31, 33, 37, 42, 44, 54, 62, 63, 64, 65, 66 })
+            int[] xKeyNotes = new int[] { 31, 33, 37, 42, 44, 54, 62, 63, 64, 65, 66 };
+            for (int i = 0; i < xKeyNotes.Length; i++)
             {
-                XKeys[i] = true;
+                XKeys[xKeyNotes[i]] = true;
             }
+            // ReSharper restore ForCanBeConvertedToForeach
         }
 
         private Glyph CreateNoteHeadGlyph(Note n)

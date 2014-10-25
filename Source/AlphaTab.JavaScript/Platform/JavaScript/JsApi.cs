@@ -16,23 +16,21 @@
  * License along with this library.
  */
 using System;
-using System.Collections.TypedArrays;
-using System.Html;
-using System.Runtime.CompilerServices;
-using System.Serialization;
 using AlphaTab.Collections;
 using AlphaTab.Importer;
 using AlphaTab.IO;
 using AlphaTab.Model;
 using AlphaTab.Platform.Svg;
 using AlphaTab.Rendering;
+using SharpKit.Html;
+using SharpKit.JavaScript;
 
 namespace AlphaTab.Platform.JavaScript
 {
-    public class JsApi
+    public class JsApi : HtmlContext
     {
         private readonly HtmlElement _element;
-        private readonly Element _canvasElement;
+        private readonly HtmlElement _canvasElement;
         private int[] _tracks;
 
         public JsApi(HtmlElement element, dynamic options)
@@ -50,10 +48,10 @@ namespace AlphaTab.Platform.JavaScript
             {
                 tracksData = options.tracks;
             }
-            else if (element != null && element.Dataset != null && element.Dataset["tracks"] != null)
-            {
-                tracksData = element.Dataset["tracks"];
-            }
+            //else if (element != null && element.dataset != null && element.dataset["tracks"] != null)
+            //{
+            //    tracksData = element.dataset["tracks"];
+            //}
             else
             {
                 tracksData = new[] { 0 };
@@ -68,22 +66,22 @@ namespace AlphaTab.Platform.JavaScript
             {
                 // get load contents
 
-                contents = element.InnerText.Trim();
-                element.InnerHTML = "";
-          
+                contents = ((string)element.innerText).Trim();
+                element.innerHTML = "";
+
                 #region Create context elements (wrapper, canvas etc)
 
                 if (settings.Engine == "html5")
                 {
-                    _canvasElement = Document.CreateElement("canvas");
+                    _canvasElement = (HtmlElement)document.createElement("canvas");
                 }
                 else
                 {
-                    _canvasElement = Document.CreateElement("div");
+                    _canvasElement = (HtmlElement)document.createElement("div");
                 }
 
-                _canvasElement.ClassName = "alphaTabSurface";
-                element.AppendChild(_canvasElement);
+                _canvasElement.className = "alphaTabSurface";
+                element.appendChild(_canvasElement);
 
                 #endregion
 
@@ -98,9 +96,9 @@ namespace AlphaTab.Platform.JavaScript
             {
                 if (Renderer.IsSvg)
                 {
-                    _canvasElement.InnerHTML = result.RenderResult.ToString();
-                    _canvasElement.Style.Width = result.Width + "px";
-                    _canvasElement.Style.Height = result.Height + "px";
+                    _canvasElement.innerHTML = result.RenderResult.ToString();
+                    _canvasElement.style.width = result.Width + "px";
+                    _canvasElement.style.height = result.Height + "px";
                 }
             };
 
@@ -108,22 +106,21 @@ namespace AlphaTab.Platform.JavaScript
 
             #region Load Default Data
 
+            dynamic dataset = _element.dataset;
+
             if (!string.IsNullOrEmpty(contents))
             {
                 Tex(contents);
             }
-            else if (_element != null && _element.Dataset != null && !string.IsNullOrEmpty(_element.Dataset["file"]))
+            else if (_element != null && _element.dataset != null && !string.IsNullOrEmpty(dataset["file"]))
             {
-                Load(_element.Dataset["file"]);
+                Load(dataset["file"]);
             }
 
             #endregion
         }
 
-        [IntrinsicProperty]
         public IScoreRenderer Renderer { get; private set; }
-
-        [IntrinsicProperty]
         public Score Score { get; set; }
 
         public Track[] Tracks
@@ -153,23 +150,22 @@ namespace AlphaTab.Platform.JavaScript
         {
             try
             {
-                if (data is ArrayBuffer)
+                if (Std.InstanceOf<ArrayBuffer>(data))
                 {
-                    ScoreLoaded(ScoreLoader.LoadScoreFromBytes(new ByteArray((ArrayBuffer)data)));
+                    ScoreLoaded(ScoreLoader.LoadScoreFromBytes(Std.ArrayBufferToByteArray((ArrayBuffer)data)));
                 }
-                else if (data is Uint8Array)
+                else if (Std.InstanceOf<Uint8Array>(data))
                 {
-                    // ReSharper disable once PossibleInvalidCastException
-                    ScoreLoaded(ScoreLoader.LoadScoreFromBytes((ByteArray)data));
+                    ScoreLoaded(ScoreLoader.LoadScoreFromBytes((byte[])data));
                 }
-                else if (data is string)
+                else if (JsTypeOf(data) == JsTypes.@string)
                 {
-                    ScoreLoader.LoadScoreAsync((string)data, ScoreLoaded, LogError);
+                    ScoreLoader.LoadScoreAsync((string)data, ScoreLoaded, e => console.error(e));
                 }
             }
             catch (Exception e)
             {
-                LogError(e);
+                console.error(e);
             }
         }
 
@@ -178,13 +174,13 @@ namespace AlphaTab.Platform.JavaScript
             try
             {
                 var parser = new AlphaTexImporter();
-                var data = new ByteBuffer(Std.StringToByteArray(contents));
+                var data = ByteBuffer.FromBuffer(Std.StringToByteArray(contents));
                 parser.Init(data);
                 ScoreLoaded(parser.ReadScore());
             }
             catch (Exception e)
             {
-                LogError(e);
+                console.error(e);
             }
         }
 
@@ -193,11 +189,11 @@ namespace AlphaTab.Platform.JavaScript
             FastList<int> tracks = new FastList<int>();
 
             // decode string
-            if (tracksData is string)
+            if (JsTypeOf(tracksData) == JsTypes.@string)
             {
                 try
                 {
-                    tracksData = Json.Parse((string)tracksData);
+                    tracksData = JSON.parse((string)tracksData);
                 }
                 catch
                 {
@@ -206,16 +202,16 @@ namespace AlphaTab.Platform.JavaScript
             }
 
             // decode array
-            if (tracksData is int)
+            if (JsTypeOf(tracksData) == JsTypes.number)
             {
-                tracks.Add((int) tracksData);
+                tracks.Add((int)tracksData);
             }
             else if (tracksData.length)
             {
                 for (var i = 0; i < tracksData.length; i++)
                 {
                     int value;
-                    if (tracksData[i] is int)
+                    if (JsTypeOf(tracksData[i]) == JsTypes.number)
                     {
                         value = (int)tracksData[i];
                     }
@@ -249,9 +245,9 @@ namespace AlphaTab.Platform.JavaScript
         {
             if (_element != null)
             {
-                dynamic e = Document.CreateEvent("CustomEvent");
+                dynamic e = document.createEvent("CustomEvent");
                 e.initCustomEvent(name, false, false, details);
-                _element.DispatchEvent(e);
+                _element.dispatchEvent(e);
             }
         }
 
@@ -261,11 +257,6 @@ namespace AlphaTab.Platform.JavaScript
             {
                 Renderer.RenderMultiple(Tracks);
             }
-        }
-
-        [InlineCode("console.error({message})")]
-        private void LogError(object message)
-        {
         }
     }
 

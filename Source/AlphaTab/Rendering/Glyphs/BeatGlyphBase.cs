@@ -24,7 +24,6 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class BeatGlyphBase : GlyphGroup, ISupportsFinalize
     {
-        [IntrinsicProperty]
         public BeatContainerGlyph Container { get; set; }
 
         public BeatGlyphBase()
@@ -79,7 +78,7 @@ namespace AlphaTab.Rendering.Glyphs
                     case Duration.SixtyFourth:
                         return 11;
                     default:
-                        throw new ArgumentOutOfRangeException();
+                        return 11;
                 }
             }
         }

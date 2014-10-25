@@ -103,6 +103,7 @@ namespace AlphaTab.Gdi
             h = 0; // default to black
             s = 0;
             l = 0;
+
             v = System.Math.Max(r, g);
             v = System.Math.Max(v, b);
             m = System.Math.Min(r, g);

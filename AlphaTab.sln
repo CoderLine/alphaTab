@@ -45,9 +45,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlphaTab.CSharp", "Source\A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlphaTab.JavaScript", "Source\AlphaTab.JavaScript\AlphaTab.JavaScript.csproj", "{5CFB12FE-A2FC-4688-ACB8-D68C2849F456}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlphaTab.Java", "Source\AlphaTab.Java\AlphaTab.Java.csproj", "{137EEB3C-6E6D-4498-B59A-F6E376F2DBCB}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Source\AlphaTab\AlphaTab.projitems*{aba04ebe-36b2-469d-a025-16ba6131818e}*SharedItemsImports = 4
+		Source\AlphaTab\AlphaTab.projitems*{137eeb3c-6e6d-4498-b59a-f6e376f2dbcb}*SharedItemsImports = 4
 		Source\AlphaTab\AlphaTab.projitems*{8083b3bc-0681-47f2-9fbf-a5c96107f538}*SharedItemsImports = 13
 		Source\AlphaTab\AlphaTab.projitems*{5cfb12fe-a2fc-4688-acb8-d68c2849f456}*SharedItemsImports = 4
 	EndGlobalSection
@@ -112,6 +115,10 @@ Global
 		{5CFB12FE-A2FC-4688-ACB8-D68C2849F456}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5CFB12FE-A2FC-4688-ACB8-D68C2849F456}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5CFB12FE-A2FC-4688-ACB8-D68C2849F456}.Release|Any CPU.Build.0 = Release|Any CPU
+		{137EEB3C-6E6D-4498-B59A-F6E376F2DBCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{137EEB3C-6E6D-4498-B59A-F6E376F2DBCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{137EEB3C-6E6D-4498-B59A-F6E376F2DBCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{137EEB3C-6E6D-4498-B59A-F6E376F2DBCB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

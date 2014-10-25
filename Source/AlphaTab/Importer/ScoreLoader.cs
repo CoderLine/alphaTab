@@ -70,12 +70,12 @@ namespace AlphaTab.Importer
             return LoadScoreFromBytes(data);
         }
 
-        public static Score LoadScoreFromBytes(ByteArray data)
+        public static Score LoadScoreFromBytes(byte[] data)
         {
             var importers = ScoreImporter.BuildImporters();
 
             Score score = null;
-            ByteBuffer bb = new ByteBuffer(data);
+            ByteBuffer bb = ByteBuffer.FromBuffer(data);
             foreach (var importer in importers)
             {
                 bb.Reset();
@@ -85,9 +85,12 @@ namespace AlphaTab.Importer
                     score = importer.ReadScore();
                     break;
                 }
-                catch (UnsupportedFormatException)
+                catch (Exception e)
                 {
-                    // ignore unsupported format
+                    if (!Std.InstanceOf<UnsupportedFormatException>(e))
+                    {
+                        throw e;
+                    }
                 }
             }
 

@@ -173,11 +173,8 @@ namespace AlphaTab.Model
             return null;
         }
 
-        [IntrinsicProperty]
         public bool IsStandard { get; set; }
-        [IntrinsicProperty]
         public string Name { get; set; }
-        [IntrinsicProperty]
         public FastList<int> Tunings { get; set; }
 
         public Tuning(string name, int[] tuning, bool isStandard) 

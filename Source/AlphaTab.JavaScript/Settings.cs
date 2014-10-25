@@ -17,6 +17,8 @@
  */
 using System.Runtime.CompilerServices;
 using AlphaTab.Collections;
+using AlphaTab.Platform;
+using SharpKit.JavaScript;
 
 namespace AlphaTab
 {
@@ -25,13 +27,13 @@ namespace AlphaTab
     /// </summary>
     public partial class Settings
     {
-        [InlineCodeAttribute("{property} in {json}")]
+        [JsMethod(InlineCodeExpression = "property in json", Export = false)]
         private static bool JsonExists(dynamic json, string property)
         {
             return false;
         }
 
-        [InlineCode("Object.keys({json})")]
+        [JsMethod(InlineCodeExpression = "Object.keys(json)", Export = false)]
         private static string[] JsonKeys(dynamic json)
         {
             return null;
@@ -39,7 +41,7 @@ namespace AlphaTab
 
         public static Settings FromJson(dynamic json)
         {
-            if (json is Settings)
+            if (Std.InstanceOf<Settings>(json))
             {
                 return (Settings)json;
             }
@@ -54,7 +56,7 @@ namespace AlphaTab
 
             if (JsonExists(json, "layout"))
             {
-                if (json.layout is string)
+                if (JsContext.@typeof(json.layout) == "string")
                 {
                     settings.Layout.Mode = json.layout;
                 }
@@ -79,7 +81,7 @@ namespace AlphaTab
                 foreach (var key in keys)
                 {
                     var val = json.staves[key];
-                    if (val is string)
+                    if (JsContext.@typeof(val) == "string")
                     {
                         settings.Staves.Add(new StaveSettings(val));
                     }

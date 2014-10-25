@@ -38,7 +38,7 @@ namespace AlphaTab.Rendering.Glyphs
                 case AccentuationType.Heavy:
                     return MusicFontSymbol.HeavyAccentuation;
                 default:
-                    throw new ArgumentOutOfRangeException("accentuation");
+                    return MusicFontSymbol.None;
             }
         }
 

@@ -44,9 +44,9 @@ namespace AlphaTab.IO
             return _stream.ReadByte();
         }
 
-        public int Read(ByteArray buffer, int offset, int count)
+        public int Read(byte[] buffer, int offset, int count)
         {
-            return _stream.Read(buffer.Data, offset, count);
+            return _stream.Read(buffer, offset, count);
         }
 
         public void WriteByte(byte value)
@@ -54,9 +54,9 @@ namespace AlphaTab.IO
             _stream.WriteByte(value);
         }
 
-        public void Write(ByteArray buffer, int offset, int count)
+        public void Write(byte[] buffer, int offset, int count)
         {
-            _stream.Write(buffer.Data, offset, count);
+            _stream.Write(buffer, offset, count);
         }
 
         public void Dispose()

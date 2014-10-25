@@ -25,16 +25,14 @@ namespace AlphaTab.Audio.Model
     /// </summary>
     public class MidiMessage
     {
-        [IntrinsicProperty]
         public MidiEvent Event { get; set; }
 
         /// <summary>
         /// The raw midi message data
         /// </summary>
-        [IntrinsicProperty]
-        public ByteArray Data { get; set; }
+        public byte[] Data { get; set; }
 
-        public MidiMessage(ByteArray data)
+        public MidiMessage(byte[] data)
         {
             Data = data;
         }

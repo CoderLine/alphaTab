@@ -16,11 +16,11 @@
  * License along with this library.
  */
 using System;
-using System.Html;
 using AlphaTab.Platform.Model;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Utils;
 using AlphaTab.Rendering.Glyphs;
+using SharpKit.Html;
 
 namespace AlphaTab.Platform.JavaScript
 {
@@ -29,8 +29,8 @@ namespace AlphaTab.Platform.JavaScript
     /// </summary>
     public class Html5Canvas : ICanvas, IPathCanvas
     {
-        private readonly CanvasElement _canvas;
-        private System.Html.Media.Graphics.CanvasRenderingContext2D _context;
+        private readonly HtmlCanvasElement _canvas;
+        private CanvasRenderingContext2D _context;
         private Color _color;
         private Font _font;
 
@@ -44,33 +44,33 @@ namespace AlphaTab.Platform.JavaScript
         public Html5Canvas(dynamic dom)
         {
             _canvas = dom;
-            _context = (System.Html.Media.Graphics.CanvasRenderingContext2D)_canvas.GetContext("2d");
-            _context.TextBaseline = System.Html.Media.Graphics.TextBaseline.Top;
+            _context = (CanvasRenderingContext2D)_canvas.getContext("2d");
+            _context.textBaseline = "top";
         }
 
         public int Width
         {
-            get { return _canvas.Width; }
+            get { return _canvas.width; }
             set
             {
-                var lineWidth = _context.LineWidth;
-                _canvas.Width = value;
-                _context = (System.Html.Media.Graphics.CanvasRenderingContext2D)_canvas.GetContext("2d");
-                _context.TextBaseline = System.Html.Media.Graphics.TextBaseline.Top;
-                _context.LineWidth = lineWidth;
+                var lineWidth = _context.lineWidth;
+                _canvas.width = value;
+                _context = (CanvasRenderingContext2D)_canvas.getContext("2d");
+                _context.textBaseline = "top";
+                _context.lineWidth = lineWidth;
             }
         }
 
         public int Height
         {
-            get { return _canvas.Height; }
+            get { return _canvas.height; }
             set
             {
-                var lineWidth = _context.LineWidth;
-                _canvas.Height = value;
-                _context = (System.Html.Media.Graphics.CanvasRenderingContext2D)_canvas.GetContext("2d");
-                _context.TextBaseline = System.Html.Media.Graphics.TextBaseline.Top;
-                _context.LineWidth = lineWidth;
+                var lineWidth = _context.lineWidth;
+                _canvas.height = value;
+                _context = (CanvasRenderingContext2D)_canvas.getContext("2d");
+                _context.textBaseline = "top";
+                _context.lineWidth = lineWidth;
             }
         }
 
@@ -83,8 +83,8 @@ namespace AlphaTab.Platform.JavaScript
             set
             {
                 _color = value;
-                _context.StrokeStyle = value.ToRgbaString();
-                _context.FillStyle = value.ToRgbaString();
+                _context.strokeStyle = value.ToRgbaString();
+                _context.fillStyle = value.ToRgbaString();
             }
         }
 
@@ -92,76 +92,76 @@ namespace AlphaTab.Platform.JavaScript
         {
             get
             {
-                return (float)_context.LineWidth;
+                return (float)_context.lineWidth;
             }
             set
             {
-                _context.LineWidth = value;
+                _context.lineWidth = value;
             }
         }
 
         public void Clear()
         {
-            var lineWidth = _context.LineWidth;
-            _canvas.Width = _canvas.Width;
-            _context.LineWidth = lineWidth;
+            var lineWidth = _context.lineWidth;
+            _canvas.width = _canvas.width;
+            _context.lineWidth = lineWidth;
             // this._context.clearRect(0,0,_width, _height);
         }
 
         public void FillRect(float x, float y, float w, float h)
         {
-            _context.FillRect(x - 0.5, y - 0.5, w, h);
+            _context.fillRect(x - 0.5, y - 0.5, w, h);
         }
 
         public void StrokeRect(float x, float y, float w, float h)
         {
-            _context.StrokeRect(x - 0.5, y - 0.5, w, h);
+            _context.strokeRect(x - 0.5, y - 0.5, w, h);
         }
 
         public void BeginPath()
         {
-            _context.BeginPath();
+            _context.beginPath();
         }
 
         public void ClosePath()
         {
-            _context.ClosePath();
+            _context.closePath();
         }
 
         public void MoveTo(float x, float y)
         {
-            _context.MoveTo(x - 0.5, y - 0.5);
+            _context.moveTo(x - 0.5, y - 0.5);
         }
 
         public void LineTo(float x, float y)
         {
-            _context.LineTo(x - 0.5, y - 0.5);
+            _context.lineTo(x - 0.5, y - 0.5);
         }
 
         public void QuadraticCurveTo(float cpx, float cpy, float x, float y)
         {
-            _context.QuadraticCurveTo(cpx, cpy, x, y);
+            _context.quadraticCurveTo(cpx, cpy, x, y);
         }
 
         public void BezierCurveTo(float cp1x, float cp1y, float cp2x, float cp2y, float x, float y)
         {
-            _context.BezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y);
+            _context.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y);
         }
 
         public void FillCircle(float x, float y, float radius)
         {
-            _context.Arc(x, y, radius, 0, Math.PI * 2, true);
+            _context.arc(x, y, radius, 0, Math.PI * 2, true);
             Fill();
         }
 
         public void Fill()
         {
-            _context.Fill();
+            _context.fill();
         }
 
         public void Stroke()
         {
-            _context.Stroke();
+            _context.stroke();
         }
 
         public Font Font
@@ -170,7 +170,7 @@ namespace AlphaTab.Platform.JavaScript
             set
             {
                 _font = value;
-                _context.Font = value.ToCssString();
+                _context.font = value.ToCssString();
             }
         }
 
@@ -178,13 +178,13 @@ namespace AlphaTab.Platform.JavaScript
         {
             get
             {
-                switch (_context.TextAlign)
+                switch (_context.textAlign)
                 {
-                    case System.Html.Media.Graphics.TextAlign.Left:
+                    case "left":
                         return TextAlign.Left;
-                    case System.Html.Media.Graphics.TextAlign.Center:
+                    case "center":
                         return TextAlign.Center;
-                    case System.Html.Media.Graphics.TextAlign.Right:
+                    case "right":
                         return TextAlign.Right;
                     default:
                         return TextAlign.Left;
@@ -195,13 +195,13 @@ namespace AlphaTab.Platform.JavaScript
                 switch (value)
                 {
                     case TextAlign.Left:
-                        _context.TextAlign = System.Html.Media.Graphics.TextAlign.Left;
+                        _context.textAlign = "left";
                         break;
                     case TextAlign.Center:
-                        _context.TextAlign = System.Html.Media.Graphics.TextAlign.Center;
+                        _context.textAlign = "center";
                         break;
                     case TextAlign.Right:
-                        _context.TextAlign = System.Html.Media.Graphics.TextAlign.Right;
+                        _context.textAlign = "right";
                         break;
                 }
             }
@@ -211,13 +211,13 @@ namespace AlphaTab.Platform.JavaScript
         {
             get
             {
-                switch (_context.TextBaseline)
+                switch (_context.textBaseline)
                 {
-                    case System.Html.Media.Graphics.TextBaseline.Top:
+                    case "top":
                         return TextBaseline.Top;
-                    case System.Html.Media.Graphics.TextBaseline.Middle:
+                    case "middel":
                         return TextBaseline.Middle;
-                    case System.Html.Media.Graphics.TextBaseline.Bottom:
+                    case "bottom":
                         return TextBaseline.Bottom;
                     default:
                         return TextBaseline.Top;
@@ -228,13 +228,13 @@ namespace AlphaTab.Platform.JavaScript
                 switch (value)
                 {
                     case TextBaseline.Top:
-                        _context.TextBaseline = System.Html.Media.Graphics.TextBaseline.Top;
+                        _context.textBaseline = "top";
                         break;
                     case TextBaseline.Middle:
-                        _context.TextBaseline = System.Html.Media.Graphics.TextBaseline.Middle;
+                        _context.textBaseline = "middle";
                         break;
                     case TextBaseline.Bottom:
-                        _context.TextBaseline = System.Html.Media.Graphics.TextBaseline.Bottom;
+                        _context.textBaseline = "bottom";
                         break;
                 }
             }
@@ -242,12 +242,12 @@ namespace AlphaTab.Platform.JavaScript
 
         public void FillText(string text, float x, float y)
         {
-            _context.FillText(text, x, y);
+            _context.fillText(text, x, y);
         }
 
         public float MeasureText(string text)
         {
-            return (float)_context.MeasureText(text).Width;
+            return (float)_context.measureText(text).width;
         }
 
         public void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol)

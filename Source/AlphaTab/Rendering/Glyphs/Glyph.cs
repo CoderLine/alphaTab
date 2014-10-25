@@ -26,15 +26,10 @@ namespace AlphaTab.Rendering.Glyphs
     /// </summary>
     public class Glyph
     {
-        [IntrinsicProperty]
         public int Index { get; set; }
-        [IntrinsicProperty]
         public int X { get; set; }
-        [IntrinsicProperty]
         public int Y { get; set; }
-        [IntrinsicProperty]
         public int Width { get; set; }
-        [IntrinsicProperty]
         public BarRendererBase Renderer { get; set; }
 
         public Glyph(int x, int y)

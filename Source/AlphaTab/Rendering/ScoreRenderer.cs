@@ -39,19 +39,13 @@ namespace AlphaTab.Rendering
             get { return Canvas is SvgCanvas; }
         }
 
-        [IntrinsicProperty]
         public ICanvas Canvas { get; set; }
-        [IntrinsicProperty]
         public Score Score { get; set; }
-        [IntrinsicProperty]
         public Track[] Tracks { get; set; }
 
-        [IntrinsicProperty]
         public ScoreLayout Layout { get; set; }
 
-        [IntrinsicProperty]
         public RenderingResources RenderingResources { get; set; }
-        [IntrinsicProperty]
         public Settings Settings { get; set; }
 
         public ScoreRenderer(Settings settings, object param)
@@ -123,8 +117,8 @@ namespace AlphaTab.Rendering
             PaintScore();
             OnRenderFinished(new RenderFinishedEventArgs
             {
-                Height = Layout.Height,
-                Width = Layout.Width,
+                Height = Canvas.Height,
+                Width = Canvas.Width,
                 RenderResult = Canvas.RenderResult 
             });
             OnPostRenderFinished();

@@ -78,19 +78,19 @@ namespace AlphaTab.Audio.Generator
         {
             var velocity = MidiUtils.DynamicToVelocity(dynamicValue);
             AddEvent(track, start,
-                new MidiMessage(new ByteArray(MakeCommand(0x90, channel), FixValue(key), FixValue((byte)velocity))));
+                new MidiMessage(new[] { MakeCommand(0x90, channel), FixValue(key), FixValue((byte)velocity) }));
             AddEvent(track, start + length,
-                new MidiMessage(new ByteArray(MakeCommand(0x80, channel), FixValue(key), FixValue((byte)velocity))));
+                new MidiMessage(new[] { MakeCommand(0x80, channel), FixValue(key), FixValue((byte)velocity) }));
         }
 
         public void AddControlChange(int track, int tick, byte channel, byte controller, byte value)
         {
-            AddEvent(track, tick, new MidiMessage(new ByteArray(MakeCommand(0xB0, channel), FixValue(controller), FixValue(value))));
+            AddEvent(track, tick, new MidiMessage(new[] { MakeCommand(0xB0, channel), FixValue(controller), FixValue(value) }));
         }
 
         public void AddProgramChange(int track, int tick, byte channel, byte program)
         {
-            AddEvent(track, tick, new MidiMessage(new ByteArray(MakeCommand(0xC0, channel), FixValue(program))));
+            AddEvent(track, tick, new MidiMessage(new[] { MakeCommand(0xC0, channel), FixValue(program) }));
         }
 
         public void AddTempo(int tick, int tempo)
@@ -104,7 +104,7 @@ namespace AlphaTab.Audio.Generator
 
         public void AddBend(int track, int tick, byte channel, byte value)
         {
-            AddEvent(track, tick, new MidiMessage(new ByteArray(MakeCommand(0xE0, channel), 0, FixValue(value))));
+            AddEvent(track, tick, new MidiMessage(new byte[] { MakeCommand(0xE0, channel), 0, FixValue(value) }));
         }
 
         public void AddMetronome(int start, int length)
@@ -129,13 +129,13 @@ namespace AlphaTab.Audio.Generator
 
             meta.AddRange(data);
 
-            return new MidiMessage(new ByteArray(meta.ToArray()));
+            return new MidiMessage(meta.ToArray());
         }
 
         private static void WriteVarInt(FastList<byte> data, int v)
         {
             var n = 0;
-            var array = new ByteArray(4);
+            var array = new byte[4];
             do
             {
                 array[n++] = (byte)((v & 0x7F) & 0xFF);
@@ -162,7 +162,7 @@ namespace AlphaTab.Audio.Generator
             sysex.AddRange(data); // data
             sysex.Add(0xF7); // end of data
 
-            return new MidiMessage(new ByteArray(sysex.ToArray()));
+            return new MidiMessage(sysex.ToArray());
         }
 
     }

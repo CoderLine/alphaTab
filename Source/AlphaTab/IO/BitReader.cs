@@ -15,6 +15,9 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using System.Collections.Specialized;
+
 namespace AlphaTab.IO
 {
     /// <summary>
@@ -40,9 +43,9 @@ namespace AlphaTab.IO
             return ReadBits(ByteSize);
         }
 
-        public ByteArray ReadBytes(int count)
+        public byte[] ReadBytes(int count)
         {
-            ByteArray bytes = new ByteArray(count);
+            byte[] bytes = new byte[count];
             for (int i = 0; i < count; i++)
             {
                 bytes[i] = (byte) ReadByte();
@@ -89,9 +92,9 @@ namespace AlphaTab.IO
             return value;
         }
 
-        public ByteArray ReadAll()
+        public byte[] ReadAll()
         {
-            var all = new ByteBuffer();
+            var all = ByteBuffer.Empty();
             try
             {
                 while (true)

@@ -26,9 +26,7 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class ScoreNoteGlyphInfo
     {
-        [IntrinsicProperty]
         public Glyph Glyph { get; set; }
-        [IntrinsicProperty]
         public int Line { get; set; }
 
         public ScoreNoteGlyphInfo(Glyph glyph, int line)
@@ -44,24 +42,16 @@ namespace AlphaTab.Rendering.Glyphs
         private readonly FastDictionary<int, Glyph> _noteLookup;
         private Glyph _tremoloPicking;
 
-        [IntrinsicProperty]
         public ScoreNoteGlyphInfo MinNote { get; set; }
-        [IntrinsicProperty]
         public ScoreNoteGlyphInfo MaxNote { get; set; }
 
-        [IntrinsicProperty]
         public Action SpacingChanged { get; set; }
-        [IntrinsicProperty]
         public int UpLineX { get; set; }
-        [IntrinsicProperty]
         public int DownLineX { get; set; }
 
-        [IntrinsicProperty]
         public FastDictionary<string, Glyph> BeatEffects { get; set; }
 
-        [IntrinsicProperty]
         public Beat Beat { get; set; }
-        [IntrinsicProperty]
         public BeamingHelper BeamingHelper { get; set; }
 
         public ScoreNoteChordGlyph()

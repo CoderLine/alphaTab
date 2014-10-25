@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using System.Windows.Navigation;
 using System.Xml;
 using AlphaTab.IO;
 using StringBuilder = AlphaTab.Collections.StringBuilder;
@@ -51,9 +52,9 @@ namespace AlphaTab.Platform
             return f;
         }
 
-        public static void BlockCopy(ByteArray src, int srcOffset, ByteArray dst, int dstOffset, int count)
+        public static void BlockCopy(byte[] src, int srcOffset, byte[] dst, int dstOffset, int count)
         {
-            Buffer.BlockCopy(src.Data, srcOffset, dst.Data, dstOffset, count);
+            Buffer.BlockCopy(src, srcOffset, dst, dstOffset, count);
         }
 
         public static bool IsNullOrWhiteSpace(this string s)
@@ -100,9 +101,14 @@ namespace AlphaTab.Platform
             return unchecked((sbyte)(byte)readable.ReadByte());
         }
 
-        public static string ToString(ByteArray data)
+        public static string ToString(byte[] data)
         {
-            return Encoding.UTF8.GetString(data.Data);
+            return Encoding.UTF8.GetString(data);
+        }
+
+        public static bool InstanceOf<T>(object value)
+        {
+            return value is T;
         }
     }
 }

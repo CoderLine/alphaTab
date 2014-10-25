@@ -15,57 +15,43 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System.Collections.TypedArrays;
-using System.Runtime.CompilerServices;
+using SharpKit.Html;
+using SharpKit.JavaScript;
 
 namespace AlphaTab.IO
 {
-    [IncludeGenericArguments(false)]
-    [IgnoreNamespace]
-    [Imported(ObeysTypeSystem = true)]
-    [ScriptName("Uint8Array")]
-    public partial class ByteArray
-    {
-        // ReSharper disable UnusedParameter.Local
+    //[JsType(Mode = JsMode.Prototype, Name = "Uint8Array", Export = false, PropertiesAsFields = true)]
+    //public class ByteArray
+    //{
+    //    // ReSharper disable UnusedParameter.Local
 
-        [InlineCode("new Uint8Array({size})")]
-        public ByteArray(int size)
-        {
-        }
+    //    public ByteArray(int length)
+    //    {
+    //    }
 
-        [InlineCode("new Uint8Array({data})")]
-        public ByteArray(params byte[] data)
-        {
-        }
+    //    public ByteArray(byte[] data)
+    //    {
+    //    }
 
-        [InlineCode("new Uint8Array({data})")]
-        public ByteArray(ArrayBuffer data)
-        {
-        }
+    //    public ByteArray(ArrayBuffer data)
+    //    {
+    //    }
 
+    //    [JsField(Name = "length")]
+    //    public readonly int Length;
 
+    //    [JsProperty(NativeIndexer = true)]
+    //    public byte this[int index]
+    //    {
+    //        get
+    //        {
+    //            return 0;
+    //        }
+    //        set
+    //        {
+    //        }
+    //    }
 
-        public int Length
-        {
-            [InlineCode("{this}.length")]
-            get
-            {
-                return 0;
-            }
-        }
-
-        [IntrinsicProperty]
-        public byte this[int index]
-        {
-            get
-            {
-                return 0;
-            }
-            set
-            {
-            }
-        }
-
-        // ReSharper restore UnusedParameter.Local
-    }
+    //    // ReSharper restore UnusedParameter.Local
+    //}
 }

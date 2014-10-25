@@ -9,9 +9,8 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AlphaTab</RootNamespace>
     <AssemblyName>AlphaTab</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <NoStdLib>True</NoStdLib>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,6 +20,8 @@
     <DefineConstants>TRACE;DEBUG;JavaScript</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\AlphaTab.XML</DocumentationFile>
+    <NoWarn>1591,1572,1571,1573,1587,1570</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -46,29 +47,27 @@
     <Compile Include="Settings.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="SharpKit.Html, Version=1.0.0.0, Culture=neutral, PublicKeyToken=2575297a09c47a96, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\SharpKit\SharpKit.Html.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpKit.JavaScript, Version=1.5.0.0, Culture=neutral, PublicKeyToken=2575297a09c47a96, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\SharpKit\SharpKit.JavaScript.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="mscorlib">
-      <HintPath>$(SolutionDir)packages\Saltarelle.Runtime.2.5.0\tools\Assemblies\mscorlib.dll</HintPath>
-    </Reference>
-    <Reference Include="Saltarelle.Web">
-      <HintPath>..\packages\Saltarelle.Web.3.1.0\lib\Saltarelle.Web.dll</HintPath>
-    </Reference>
+    <None Include="CopyAndMinify.bat" />
   </ItemGroup>
-  <Import Project="..\Source\AlphaTab\AlphaTab.projitems" Label="Shared" Condition="Exists('..\Source\AlphaTab\AlphaTab.projitems')" />
   <Import Project="..\AlphaTab\AlphaTab.projitems" Label="Shared" Condition="Exists('..\AlphaTab\AlphaTab.projitems')" />
-  <Import Project="..\AlphaTab\AlphaTab.projitems" Label="Shared" Condition="Exists('..\AlphaTab\AlphaTab.projitems')" />
-  <Import Project="..\AlphaTab\AlphaTab.projitems" Label="Shared" Condition="Exists('..\AlphaTab\AlphaTab.projitems')" />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets')" />
-  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets')" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)SharpKit\SharpKit.Compiler.JavaScript.targets" />
   <PropertyGroup>
-    <PostBuildEvent>echo Copying JavaScript
-xcopy "$(TargetDir)$(TargetName).js" "$(SolutionDir)Build\JavaScript" /i /Y
-echo Minifying JavaScript
-uglifyjs "$(TargetDir)$(TargetName).js" -o "$(TargetDir)$(TargetName).min.js" -c
-echo Copying minimzed JavaScript
-xcopy "$(TargetDir)$(TargetName).min.js" "$(SolutionDir)Build\JavaScript" /i /Y</PostBuildEvent>
+    <PostBuildEvent>cd $(ProjectDir)
+call CopyAndMinify.bat "$(ProjectDir)" "$(SolutionDir)"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

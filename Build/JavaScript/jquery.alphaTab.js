@@ -30,23 +30,23 @@
         tex: function(contents) {
             var context = $(this).data('alphaTab');
             if (!context) { console.error('alphaTab not initialized!'); }
-            context.tex(contents);
+            context.Tex(contents);
         },
          
         load: function(data) {
             var context = $(this).data('alphaTab');
             if (!context) { console.error('alphaTab not initialized!'); }
-            context.load(data);
+            context.Load(data);
         },
        
         tracks: function(tracks) {
             var context = $(this).data('alphaTab');
             if (!context) { console.error('alphaTab not initialized!'); }
             if(tracks) {
-                context.setTracks(tracks, true);
+                context.SetTracks(tracks, true);
             }
             else {
-                return context.get_tracks();
+                return context.getTracks();
             }
         },
         
@@ -54,17 +54,17 @@
             var context = $(this).data('alphaTab');
             if (!context) { console.error('alphaTab not initialized!'); }
             if(score) {
-                context.scoreLoaded(score);
+                context.ScoreLoaded(score);
             }
             else {
-                return context.score;
+                return context.Score;
             }
         },
         
         renderer: function(e) {
             var context = $(this).data('alphaTab');
             if (!context) { console.error('alphaTab not initialized!'); }
-            return context.renderer;
+            return context.Renderer;
         }
     };
         

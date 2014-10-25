@@ -15,48 +15,37 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
 namespace AlphaTab.IO
 {
-    public partial class ByteArray
-    {
-        private readonly byte[] _data;
+    //public class ByteArray
+    //{
+    //    private readonly java.nio.ByteBuffer _buffer;
 
-        public byte[] Data
-        {
-            get
-            {
-                return _data;
-            }
-        }
+    //    public java.nio.ByteBuffer Buffer
+    //    {
+    //        get { return _buffer; }
+    //    }
 
-        public ByteArray(int size)
-        {
-            _data = new byte[size];
-        }
+    //    public ByteArray(int length)
+    //    {
+    //        _buffer = java.nio.ByteBuffer.allocate(length);
+    //    }
 
-        public ByteArray(params byte[] data)
-        {
-            _data = data;
-        }
+    //    public ByteArray(byte[] data)
+    //    {
+    //        _buffer = java.nio.ByteBuffer.wrap(data);
+    //    }
 
-        public int Length
-        {
-            get
-            {
-                return _data.Length;
-            }
-        }
+    //    public int Length
+    //    {
+    //        get { return _buffer.capacity(); }
+    //    }
 
-        public byte this[int index]
-        {
-            get
-            {
-                return _data[index];
-            }
-            set
-            {
-                _data[index] = value;
-            }
-        }
-    }
+    //    public byte this[int index]
+    //    {
+    //        get { return _buffer.get(index); }
+    //        set { _buffer.put(index, value); }
+    //    }
+    //}
 }

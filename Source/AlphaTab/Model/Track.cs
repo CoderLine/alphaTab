@@ -28,32 +28,20 @@ namespace AlphaTab.Model
     {
         private const int ShortNameMaxLength = 10;
 
-        [IntrinsicProperty]
         public int Capo { get; set; }
-        [IntrinsicProperty]
         public int Index { get; set; }
-        [IntrinsicProperty]
         public string Name { get; set; }
-        [IntrinsicProperty]
         public string ShortName { get; set; }
-        [IntrinsicProperty]
         public FastList<int> Tuning { get; set; }
-        [IntrinsicProperty]
         public string TuningName { get; set; }
-        [IntrinsicProperty]
         public Color Color { get; set; }
 
-        [IntrinsicProperty]
         public PlaybackInformation PlaybackInfo { get; set; }
-        [IntrinsicProperty]
         public bool IsPercussion { get; set; }
 
-        [IntrinsicProperty]
         public Score Score { get; set; }
-        [IntrinsicProperty]
         public FastList<Bar> Bars { get; set; }
 
-        [IntrinsicProperty]
         public FastDictionary<string, Chord> Chords { get; set; }
 
         public Track()
