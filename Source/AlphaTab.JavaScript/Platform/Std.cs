@@ -123,5 +123,17 @@ namespace AlphaTab.Platform
         {
             return null;
         }
+
+        private static string S4()
+        {
+            JsNumber num = JsMath.floor((1 + JsMath.random()) * 0x10000);
+            return num.toString(16).substring(1);
+        }
+
+        public static string NewGuid()
+        {
+            return S4() + S4() + '-' + S4() + '-' + S4() + '-' +
+                      S4() + '-' + S4() + S4() + S4();
+        }
     }
 }

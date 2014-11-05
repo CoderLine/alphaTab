@@ -618,7 +618,7 @@ namespace AlphaTab.Importer
         public void ReadChord(Beat beat)
         {
             var chord = new Chord();
-            var chordId = Guid.NewGuid();
+            var chordId = Std.NewGuid();
             if (_versionNumber >= 500)
             {
                 _data.Skip(17);
@@ -714,7 +714,7 @@ namespace AlphaTab.Importer
 
             if (!string.IsNullOrEmpty(chord.Name))
             {
-                beat.ChordId = chordId.ToString();
+                beat.ChordId = chordId;
                 beat.Voice.Bar.Track.Chords[beat.ChordId] = chord;
             }
         }

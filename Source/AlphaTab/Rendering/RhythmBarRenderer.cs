@@ -126,7 +126,7 @@ namespace AlphaTab.Rendering
                     var barSize = (3 * Scale);
                     var barCount = beat.Duration.GetIndex() - 2;
                     var barStart = cy + Y;
-                    if (_direction == BeamDirection.Up)
+                    if (_direction == BeamDirection.Down)
                     {
                         barSpacing = -barSpacing;
                         barStart += Height;
@@ -199,12 +199,11 @@ namespace AlphaTab.Rendering
             //
 
             var beatLineX = h.GetBeatLineX(beat) + Scale;
-            var direction = h.Direction;
 
             const int topY = 0;
             var bottomY = Height;
 
-            int beamY = direction == BeamDirection.Down ? bottomY : topY;
+            int beamY = _direction == BeamDirection.Down ? bottomY : topY;
 
             canvas.BeginPath();
             canvas.MoveTo(cx + X + beatLineX, cy + Y + topY);
@@ -215,7 +214,7 @@ namespace AlphaTab.Rendering
             //
             // Draw beam 
             //
-            var glyph = new BeamGlyph((int)beatLineX, beamY, beat.Duration, direction, false);
+            var glyph = new BeamGlyph((int)beatLineX, beamY, beat.Duration, _direction, false);
             glyph.Renderer = this;
             glyph.DoLayout();
             glyph.Paint(cx + X, cy + Y, canvas);

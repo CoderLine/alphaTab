@@ -373,8 +373,8 @@ namespace AlphaTab.Rendering.Utils
             }
 
             // check if they are on the same division 
-            var division1 = ((divisionLength + start1) / divisionLength);
-            var division2 = ((divisionLength + start2) / divisionLength);
+            var division1 = ((divisionLength + start1) / divisionLength) | 0;
+            var division2 = ((divisionLength + start2) / divisionLength) | 0;
 
             return division1 == division2;
         }

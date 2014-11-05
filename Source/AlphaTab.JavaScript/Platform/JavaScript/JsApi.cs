@@ -36,6 +36,7 @@ namespace AlphaTab.Platform.JavaScript
         public JsApi(HtmlElement element, dynamic options)
         {
             _element = element;
+            dynamic dataset = _element.dataset;
 
             // load settings
             Settings settings = Settings.FromJson(options);
@@ -48,10 +49,10 @@ namespace AlphaTab.Platform.JavaScript
             {
                 tracksData = options.tracks;
             }
-            //else if (element != null && element.dataset != null && element.dataset["tracks"] != null)
-            //{
-            //    tracksData = element.dataset["tracks"];
-            //}
+            else if (element != null && element.dataset != null && dataset["tracks"] != null)
+            {
+                tracksData = dataset["tracks"];
+            }
             else
             {
                 tracksData = new[] { 0 };
@@ -105,8 +106,6 @@ namespace AlphaTab.Platform.JavaScript
             #endregion
 
             #region Load Default Data
-
-            dynamic dataset = _element.dataset;
 
             if (!string.IsNullOrEmpty(contents))
             {

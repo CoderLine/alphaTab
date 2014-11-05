@@ -9,11 +9,8 @@
 	</style>
     
     <!-- Including alphaTab -->
-    <script type="text/javascript" src="../../Build/JavaScript/mscorlib.js"></script>
     <script type="text/javascript" src="../../Build/JavaScript/AlphaTab.js"></script>
-    
-    <!-- IE8 support -->
-    <script type="text/javascript" src="lib/excanvas/excanvas.js"></script>
+    <link rel="stylesheet" href="../../Build/JavaScript/AlphaTab.css" />
 
     <!-- jQuery Plugin -->
     <script type="text/javascript" src="lib/jquery/jquery-1.10.2.min.js"></script>
@@ -59,19 +56,19 @@
         Loading...        
     </div>
     <script type="text/javascript-lazy">
-        var score = alphatab.importer.ScoreLoader.loadScoreAsync($('#alphaTabScore').data('file'), 
+        var score = AlphaTab.Importer.ScoreLoader.LoadScoreAsync($('#alphaTabScore').data('file'), 
         function(score) {
             var info = jQuery('#alphaTabScore');
             info.html('');
-            info.append('<p><b>Title:</b> '+score.title+'</p>');
-            info.append('<p><b>Subtitle:</b> '+score.subtitle+'</p>');
-            info.append('<p><b>Album:</b> '+score.album+'</p>');
-            info.append('<p><b>Tempo:</b> '+score.tempo+'</p>');
-            info.append('<p><b>Bars:</b> '+score.masterBars.length+'</p>');
-            info.append('<p><b>Tracks:</b> ('+score.tracks.length+')</p>');
+            info.append('<p><b>Title:</b> '+score.Title+'</p>');
+            info.append('<p><b>Subtitle:</b> '+score.Subtitle+'</p>');
+            info.append('<p><b>Album:</b> '+score.Album+'</p>');
+            info.append('<p><b>Tempo:</b> '+score.Tempo+'</p>');
+            info.append('<p><b>Bars:</b> '+score.MasterBars.length+'</p>');
+            info.append('<p><b>Tracks:</b> ('+score.Tracks.length+')</p>');
             var tracks = $('<ul></ul>');
-            for(var i = 0; i < score.tracks.length; i++) {
-                tracks.append('<li>'+score.tracks[i].name+'</li>');
+            for(var i = 0; i < score.Tracks.length; i++) {
+                tracks.append('<li>'+score.Tracks[i].Name+'</li>');
             }
             info.append(tracks);
         },
@@ -166,7 +163,7 @@
         });
     </script>
     
-    <h2>Multi Track</h2>
+    <!-- <h2>Multi Track</h2>
     
     <p>
         You want to render multiple tracks at once. No Problem
@@ -177,7 +174,7 @@
         $('#alphaTabPageMuliTrack').alphaTab({
             layout: 'page'
         });
-    </script>
+    </script> -->
     
     <h2>Page Layout (custom width)</h2>
     

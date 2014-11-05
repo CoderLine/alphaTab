@@ -19,7 +19,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
-using System.Windows.Navigation;
 using System.Xml;
 using AlphaTab.IO;
 using StringBuilder = AlphaTab.Collections.StringBuilder;
@@ -109,6 +108,11 @@ namespace AlphaTab.Platform
         public static bool InstanceOf<T>(object value)
         {
             return value is T;
+        }
+
+        public static string NewGuid()
+        {
+            return Guid.NewGuid().ToString();
         }
     }
 }

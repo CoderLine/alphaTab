@@ -74,8 +74,8 @@ namespace AlphaTab
             StaveFactories["palm-mute"] = l => new EffectBarRendererFactory(new PalmMuteEffectInfo());
             StaveFactories["tab"] = l => new TabBarRendererFactory();
             StaveFactories["pick-stroke"] = l => new EffectBarRendererFactory(new PickStrokeEffectInfo());
-            StaveFactories["rhythm-up"] = l => new RhythmBarRendererFactory(BeamDirection.Up);
-            StaveFactories["rhythm-down"] = l => new RhythmBarRendererFactory(BeamDirection.Down);
+            StaveFactories["rhythm-up"] = l => new RhythmBarRendererFactory(BeamDirection.Down);
+            StaveFactories["rhythm-down"] = l => new RhythmBarRendererFactory(BeamDirection.Up);
             // staveFactories.set("fingering", functionl { return new EffectBarRendererFactory(new FingeringEffectInfo()); });   
         }
     }

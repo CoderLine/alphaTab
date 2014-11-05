@@ -15,6 +15,9 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using System;
+
 namespace AlphaTab.Platform
 {
     public static partial class Std

@@ -69,7 +69,10 @@
     };
         
     var apiExec = function(method, args) {
-        method = method || 'init';
+        if(typeof(method) != "string") {
+            args = [method];
+            method = 'init';
+        }
         if (api[method]) {
             return api[method].apply(this, args);
         }

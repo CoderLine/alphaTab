@@ -270,10 +270,10 @@ $StaticConstructor(function (){
         return new AlphaTab.Rendering.EffectBarRendererFactory(new AlphaTab.Rendering.Effects.PickStrokeEffectInfo());
     };
     AlphaTab.Environment.StaveFactories["rhythm-up"] = function (l){
-        return new AlphaTab.Rendering.RhythmBarRendererFactory(AlphaTab.Rendering.Utils.BeamDirection.Up);
+        return new AlphaTab.Rendering.RhythmBarRendererFactory(AlphaTab.Rendering.Utils.BeamDirection.Down);
     };
     AlphaTab.Environment.StaveFactories["rhythm-down"] = function (l){
-        return new AlphaTab.Rendering.RhythmBarRendererFactory(AlphaTab.Rendering.Utils.BeamDirection.Down);
+        return new AlphaTab.Rendering.RhythmBarRendererFactory(AlphaTab.Rendering.Utils.BeamDirection.Up);
     };
     // staveFactories.set("fingering", functionl { return new EffectBarRendererFactory(new FingeringEffectInfo()); });   
 });
@@ -680,12 +680,16 @@ AlphaTab.Platform.JavaScript.JsApi = function (element, options){
     this.Renderer = null;
     this.Score = null;
     this._element = element;
+    var dataset = this._element.dataset;
     // load settings
     var settings = AlphaTab.Settings.FromJson(options);
     // get track data to parse
     var tracksData;
     if (options != null && options.tracks){
         tracksData = options.tracks;
+    }
+    else if (element != null && element.dataset != null && dataset["tracks"] != null){
+        tracksData = dataset["tracks"];
     }
     else {
         tracksData = new Int32Array([0]);
@@ -719,7 +723,6 @@ AlphaTab.Platform.JavaScript.JsApi = function (element, options){
             this._canvasElement.style.height = result.Height + "px";
         }
     }));
-    var dataset = this._element.dataset;
     if (!((contents==null)||(contents.length==0))){
         this.Tex(contents);
     }
@@ -1008,6 +1011,13 @@ AlphaTab.Platform.Std.StringToByteArray = function (contents){
         byteArray[i] = contents.charCodeAt(i);
     }
     return byteArray;
+};
+AlphaTab.Platform.Std.S4 = function (){
+    var num = Math.floor((1 + Math.random()) * 65536);
+    return num.toString(16).substring(1);
+};
+AlphaTab.Platform.Std.NewGuid = function (){
+    return AlphaTab.Platform.Std.S4() + AlphaTab.Platform.Std.S4() + "-" + AlphaTab.Platform.Std.S4() + "-" + AlphaTab.Platform.Std.S4() + "-" + AlphaTab.Platform.Std.S4() + "-" + AlphaTab.Platform.Std.S4() + AlphaTab.Platform.Std.S4() + AlphaTab.Platform.Std.S4();
 };
 AlphaTab.Platform.Std.IsStringNumber = function (s, allowSign){
     if (s.length == 0)
@@ -3578,7 +3588,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
     },
     ReadChord: function (beat){
         var chord = new AlphaTab.Model.Chord();
-        var chordId = System.Guid.NewGuid();
+        var chordId = AlphaTab.Platform.Std.NewGuid();
         if (this._versionNumber >= 500){
             this._data.Skip(17);
             chord.Name = this.ReadStringByteLength(21);
@@ -3656,7 +3666,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
             }
         }
         if (!((chord.Name==null)||(chord.Name.length==0))){
-            beat.ChordId = chordId.toString();
+            beat.ChordId = chordId;
             beat.Voice.Bar.Track.Chords[beat.ChordId] = chord;
         }
     },
@@ -11661,7 +11671,7 @@ AlphaTab.Rendering.RhythmBarRenderer.prototype = {
                 var barSize = (3 * this.get_Scale());
                 var barCount = AlphaTab.Model.ModelUtils.GetIndex(beat.Duration) - 2;
                 var barStart = cy + this.Y;
-                if (this._direction == AlphaTab.Rendering.Utils.BeamDirection.Up){
+                if (this._direction == AlphaTab.Rendering.Utils.BeamDirection.Down){
                     barSpacing = -barSpacing;
                     barStart += this.Height;
                 }
@@ -11711,10 +11721,9 @@ AlphaTab.Rendering.RhythmBarRenderer.prototype = {
         // draw line 
         //
         var beatLineX = h.GetBeatLineX(beat) + this.get_Scale();
-        var direction = h.get_Direction();
         var topY = 0;
         var bottomY = this.Height;
-        var beamY = direction == AlphaTab.Rendering.Utils.BeamDirection.Down ? bottomY : topY;
+        var beamY = this._direction == AlphaTab.Rendering.Utils.BeamDirection.Down ? bottomY : topY;
         canvas.BeginPath();
         canvas.MoveTo(cx + this.X + beatLineX, cy + this.Y + topY);
         canvas.LineTo(cx + this.X + beatLineX, cy + this.Y + bottomY);
@@ -11722,7 +11731,7 @@ AlphaTab.Rendering.RhythmBarRenderer.prototype = {
         //
         // Draw beam 
         //
-        var glyph = new AlphaTab.Rendering.Glyphs.BeamGlyph(beatLineX, beamY, beat.Duration, direction, false);
+        var glyph = new AlphaTab.Rendering.Glyphs.BeamGlyph(beatLineX, beamY, beat.Duration, this._direction, false);
         glyph.Renderer = this;
         glyph.DoLayout();
         glyph.Paint(cx + this.X, cy + this.Y, canvas);
@@ -13234,8 +13243,8 @@ AlphaTab.Rendering.Utils.BeamingHelper.CanJoin = function (b1, b2){
             break;
     }
     // check if they are on the same division 
-    var division1 = ((divisionLength + start1) / divisionLength);
-    var division2 = ((divisionLength + start2) / divisionLength);
+    var division1 = ((divisionLength + start1) / divisionLength) | 0;
+    var division2 = ((divisionLength + start2) / divisionLength) | 0;
     return division1 == division2;
 };
 AlphaTab.Rendering.Utils.BeamingHelper.CanJoinDuration = function (d){
