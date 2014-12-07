@@ -21,18 +21,22 @@ namespace AlphaTab.Platform.Model
 {
     public class Color
     {
-        private readonly int _value;
-
         public Color(byte r, byte g, byte b, byte a = 0xFF)
         {
-            _value = (a << 24) | (r << 16) | (g << 8) | b;
+            Raw = (a << 24) | (r << 16) | (g << 8) | b;
+        }
+
+        public int Raw
+        {
+            get;
+            set;
         }
 
         public byte A
         {
             get
             {
-                return (byte)((_value >> 24) & 0xFF);
+                return (byte)((Raw >> 24) & 0xFF);
             }
         }
 
@@ -40,7 +44,7 @@ namespace AlphaTab.Platform.Model
         {
             get
             {
-                return (byte)((_value >> 16) & 0xFF);
+                return (byte)((Raw >> 16) & 0xFF);
             }
         }
 
@@ -48,7 +52,7 @@ namespace AlphaTab.Platform.Model
         {
             get
             {
-                return (byte)((_value >> 8) & 0xFF);
+                return (byte)((Raw >> 8) & 0xFF);
             }
         }
 
@@ -56,13 +60,13 @@ namespace AlphaTab.Platform.Model
         {
             get
             {
-                return (byte)(_value & 0xFF);
+                return (byte)(Raw & 0xFF);
             }
         }
 
         public String ToRgbaString()
         {
-            return "rgba(" + R + "," + G + "," + B + "," + (A/255.0) + ")";
+            return "rgba(" + R + "," + G + "," + B + "," + (A / 255.0) + ")";
         }
     }
 }

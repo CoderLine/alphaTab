@@ -167,7 +167,7 @@ namespace AlphaTab.Model
             dst.Duration = src.Duration;
             dst.Dots = src.Dots;
             dst.FadeIn = src.FadeIn;
-            dst.Lyrics = src.Lyrics.Clone();
+            dst.Lyrics = src.Lyrics == null ? null : src.Lyrics.Clone();
             dst.Pop = src.Pop;
             dst.HasRasgueado = src.HasRasgueado;
             dst.Slap = src.Slap;

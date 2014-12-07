@@ -307,6 +307,7 @@ AlphaTab.Model.JsonConverter.prototype = {
         for (var t = 0; t < score.Tracks.length; t++){
             var track = score.Tracks[t];
             var track2 = {};
+            track2.Color = {};
             AlphaTab.Model.Track.CopyTo(track, track2);
             track2.PlaybackInfo = {};
             AlphaTab.Model.PlaybackInformation.CopyTo(track.PlaybackInfo, track2.PlaybackInfo);
@@ -359,13 +360,13 @@ AlphaTab.Model.JsonConverter.prototype = {
                         }
                         voice2.Beats.push(beat2);
                     }
-                    bar.Voices.push(voice2);
+                    bar2.Voices.push(voice2);
                 }
-                track.Bars.push(bar2);
+                track2.Bars.push(bar2);
             }
-            score.Tracks.push(track2);
+            score2.Tracks.push(track2);
         }
-        return score;
+        return score2;
     },
     JsObjectToScore: function (score){
         var score2 = new AlphaTab.Model.Score();
@@ -398,7 +399,7 @@ AlphaTab.Model.JsonConverter.prototype = {
                 var chord = track.Chords[key];
                 var chord2 = new AlphaTab.Model.Chord();
                 AlphaTab.Model.Chord.CopyTo(chord, chord2);
-                track2.Chords[key] = chord;
+                track2.Chords[key] = chord2;
             }
             for (var b = 0; b < track.Bars.length; b++){
                 var bar = track.Bars[b];
@@ -414,7 +415,7 @@ AlphaTab.Model.JsonConverter.prototype = {
                         var beat = voice.Beats[bb];
                         var beat2 = new AlphaTab.Model.Beat();
                         AlphaTab.Model.Beat.CopyTo(beat, beat2);
-                        voice.AddBeat(beat2);
+                        voice2.AddBeat(beat2);
                         for (var a = 0; a < beat.Automations.length; a++){
                             var automation = new AlphaTab.Model.Automation();
                             AlphaTab.Model.Automation.CopyTo(beat.Automations[a], automation);
@@ -429,7 +430,7 @@ AlphaTab.Model.JsonConverter.prototype = {
                             var note = beat.Notes[n];
                             var note2 = new AlphaTab.Model.Note();
                             AlphaTab.Model.Note.CopyTo(note, note2);
-                            beat2.AddNote(note);
+                            beat2.AddNote(note2);
                             for (var i = 0; i < note.BendPoints.length; i++){
                                 var point = new AlphaTab.Model.BendPoint(0, 0);
                                 AlphaTab.Model.BendPoint.CopyTo(note.BendPoints[i], point);
@@ -440,7 +441,8 @@ AlphaTab.Model.JsonConverter.prototype = {
                 }
             }
         }
-        return score;
+        score2.Finish();
+        return score2;
     },
     NewObject: function (){
         return null;
@@ -6057,7 +6059,7 @@ AlphaTab.Model.Beat.CopyTo = function (src, dst){
     dst.Duration = src.Duration;
     dst.Dots = src.Dots;
     dst.FadeIn = src.FadeIn;
-    dst.Lyrics = src.Lyrics.slice();
+    dst.Lyrics = src.Lyrics == null ? null : src.Lyrics.slice();
     dst.Pop = src.Pop;
     dst.HasRasgueado = src.HasRasgueado;
     dst.Slap = src.Slap;
@@ -6593,7 +6595,7 @@ AlphaTab.Model.Track.CopyTo = function (src, dst){
     dst.Index = src.Index;
     dst.ShortName = src.ShortName;
     dst.Tuning = src.Tuning.slice();
-    dst.Color = new AlphaTab.Platform.Model.Color(src.Color.get_R(), src.Color.get_G(), src.Color.get_B(), src.Color.get_A());
+    dst.Color.Raw = src.Color.Raw;
     dst.IsPercussion = src.IsPercussion;
 };
 AlphaTab.Model.TripletFeel = {
@@ -6807,21 +6809,21 @@ AlphaTab.Model.Voice.CopyTo = function (src, dst){
 };
 AlphaTab.Platform.Model = AlphaTab.Platform.Model || {};
 AlphaTab.Platform.Model.Color = function (r, g, b, a){
-    this._value = 0;
-    this._value = (a << 24) | (r << 16) | (g << 8) | b;
+    this.Raw = 0;
+    this.Raw = (a << 24) | (r << 16) | (g << 8) | b;
 };
 AlphaTab.Platform.Model.Color.prototype = {
     get_A: function (){
-        return ((this._value >> 24) & 255);
+        return ((this.Raw >> 24) & 255);
     },
     get_R: function (){
-        return ((this._value >> 16) & 255);
+        return ((this.Raw >> 16) & 255);
     },
     get_G: function (){
-        return ((this._value >> 8) & 255);
+        return ((this.Raw >> 8) & 255);
     },
     get_B: function (){
-        return (this._value & 255);
+        return (this.Raw & 255);
     },
     ToRgbaString: function (){
         return "rgba(" + this.get_R() + "," + this.get_G() + "," + this.get_B() + "," + (this.get_A() / 255) + ")";

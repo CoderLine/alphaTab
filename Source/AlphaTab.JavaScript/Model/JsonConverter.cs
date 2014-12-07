@@ -50,6 +50,7 @@ namespace AlphaTab.Model
             {
                 var track = score.Tracks[t];
                 Track track2 = NewObject();
+                track2.Color = NewObject();
                 Track.CopyTo(track, track2);
 
                 track2.PlaybackInfo = NewObject();
@@ -134,27 +135,27 @@ namespace AlphaTab.Model
 
                         #endregion
 
-                        bar.Voices.Add(voice2);
+                        bar2.Voices.Add(voice2);
                     }
 
                     #endregion
 
-                    track.Bars.Add(bar2);
+                    track2.Bars.Add(bar2);
                 }
                 
                 #endregion
 
-                score.Tracks.Add(track2);
+                score2.Tracks.Add(track2);
             }
 
             #endregion
 
-            return score;
+            return score2;
         }
 
         public Score JsObjectToScore(Score score)
         {
-            Score score2 = new Score();
+            var score2 = new Score();
             Score.CopyTo(score, score2);
 
             #region MasterBars
@@ -200,7 +201,7 @@ namespace AlphaTab.Model
                     var chord = track.Chords[key];
                     var chord2 = new Chord();
                     Chord.CopyTo(chord, chord2);
-                    track2.Chords[key] = chord;
+                    track2.Chords[key] = chord2;
                 }
 
                 #region Bars
@@ -228,7 +229,7 @@ namespace AlphaTab.Model
                             var beat = voice.Beats[bb];
                             var beat2 = new Beat();
                             Beat.CopyTo(beat, beat2);
-                            voice.AddBeat(beat2);
+                            voice2.AddBeat(beat2);
 
                             for (int a = 0; a < beat.Automations.Count; a++)
                             {
@@ -249,9 +250,9 @@ namespace AlphaTab.Model
                             for (int n = 0; n < beat.Notes.Count; n++)
                             {
                                 var note = beat.Notes[n];
-                                Note note2 = new Note();
+                                var note2 = new Note();
                                 Note.CopyTo(note, note2);
-                                beat2.AddNote(note);
+                                beat2.AddNote(note2);
 
                                 for (int i = 0; i < note.BendPoints.Count; i++)
                                 {
@@ -275,7 +276,8 @@ namespace AlphaTab.Model
 
             #endregion
 
-            return score;
+            score2.Finish();
+            return score2;
         }
 
         [JsMethod(InlineCodeExpression = "{}")]

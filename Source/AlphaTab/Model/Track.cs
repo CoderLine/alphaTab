@@ -61,9 +61,8 @@ namespace AlphaTab.Model
             dst.Index = src.Index;
             dst.ShortName = src.ShortName;
             dst.Tuning = src.Tuning.Clone();
-            dst.Color = new Color(src.Color.R, src.Color.G, src.Color.B, src.Color.A);
+            dst.Color.Raw = src.Color.Raw;
             dst.IsPercussion = src.IsPercussion;
-
         }
         public void AddBar(Bar bar)
         {
