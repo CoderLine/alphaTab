@@ -6,9 +6,6 @@ You can use alphaTab within your own website or application to load music sheets
 
 Website: http://www.alphatab.net
 
-[![Build Status](https://travis-ci.org/CoderLine/alphaTab.png?branch=master)](https://travis-ci.org/CoderLine/alphaTab)
-
-
 # Features
 alphaTab can
 
