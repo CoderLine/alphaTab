@@ -61,6 +61,7 @@ _ReSharper*/
 *.bak
 ~*
 *.lock
+SharpKit/prms.txt
 
 #NuGet
 packages/*
