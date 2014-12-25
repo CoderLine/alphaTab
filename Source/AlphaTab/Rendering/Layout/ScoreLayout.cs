@@ -69,7 +69,7 @@ namespace AlphaTab.Rendering.Layout
                         var factory = Environment.StaveFactories[s.Id](this);
                         if (factory.CanCreate(track) && (isFirstTrack || !factory.HideOnMultiTrack))
                         {
-                            group.AddStave(track, new Stave(s.Id, factory));
+                            group.AddStave(track, new Stave(s.Id, factory, s.AdditionalSettings));
                         }
                     }
                 }

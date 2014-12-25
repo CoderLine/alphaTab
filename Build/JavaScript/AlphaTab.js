@@ -700,7 +700,9 @@ AlphaTab.Platform.JavaScript.JsApi = function (element, options){
     var contents = "";
     if (element != null){
         // get load contents
-        contents = (element.innerText).trim();
+        if (element.innerText){
+            contents = (element.innerText).trim();
+        }
         element.innerHTML = "";
         if (settings.Engine == "html5"){
             this._canvasElement = document.createElement("canvas");
@@ -1098,6 +1100,7 @@ AlphaTab.Settings.FromJson = function (json){
                             staveSettings.AdditionalSettings[key2] = val.additionalSettings[key2];
                         }
                     }
+                    settings.Staves.push(staveSettings);
                 }
             }
         }
@@ -11258,7 +11261,7 @@ AlphaTab.Rendering.Layout.ScoreLayout.prototype = {
                 if (AlphaTab.Environment.StaveFactories.hasOwnProperty(s.Id)){
                     var factory = AlphaTab.Environment.StaveFactories[s.Id](this);
                     if (factory.CanCreate(track) && (isFirstTrack || !factory.HideOnMultiTrack)){
-                        group.AddStave(track, new AlphaTab.Rendering.Staves.Stave(s.Id, factory));
+                        group.AddStave(track, new AlphaTab.Rendering.Staves.Stave(s.Id, factory, s.AdditionalSettings));
                     }
                 }
             }
@@ -11613,7 +11616,7 @@ AlphaTab.Rendering.RhythmBarRenderer.prototype = {
     DoLayout: function (){
         this._helpers = this.Stave.StaveGroup.Helpers.Helpers[this.Bar.Track.Index][this.Bar.Index];
         AlphaTab.Rendering.GroupedBarRenderer.prototype.DoLayout.call(this);
-        this.Height = (24 * this.get_Scale());
+        this.Height = (this.Stave.GetSetting("rhythm-height", 24) * this.get_Scale());
         this.IsEmpty = false;
     },
     CreateBeatGlyphs: function (){
@@ -11646,8 +11649,9 @@ AlphaTab.Rendering.RhythmBarRenderer.prototype = {
     PaintBeamHelper: function (cx, cy, canvas, h){
         if (h.Beats[0].GraceType != AlphaTab.Model.GraceType.None)
             return;
+        var useBeams = this.Stave.GetSetting("use-beams", false);
         // check if we need to paint simple footer
-        if (h.Beats.length == 1){
+        if (useBeams && h.Beats.length == 1){
             this.PaintFooter(cx, cy, canvas, h);
         }
         else {
@@ -11684,9 +11688,16 @@ AlphaTab.Rendering.RhythmBarRenderer.prototype = {
                     var barEndY;
                     var barY = barStart + (barIndex * barSpacing);
                     // 
-                    // Bar to Next?
+                    // Broken Bar to Next
                     //
-                    if (i < h.Beats.length - 1){
+                    if (h.Beats.length == 1){
+                        barStartX = beatLineX;
+                        barEndX = beatLineX + brokenBarOffset;
+                        barStartY = barY;
+                        barEndY = barY;
+                        AlphaTab.Rendering.RhythmBarRenderer.PaintSingleBar(canvas, cx + this.X + barStartX, barStartY, cx + this.X + barEndX, barEndY, barSize);
+                    }
+                    else if (i < h.Beats.length - 1){
                         // full bar?
                         if (this.IsFullBarJoin(beat, h.Beats[i + 1], barIndex)){
                             barStartX = beatLineX;
@@ -11754,6 +11765,7 @@ AlphaTab.Rendering.RhythmBarRenderer.PaintSingleBar = function (canvas, x1, y1, 
 $Inherit(AlphaTab.Rendering.RhythmBarRenderer, AlphaTab.Rendering.GroupedBarRenderer);
 AlphaTab.Rendering.RhythmBarRendererFactory = function (direction){
     this._direction = AlphaTab.Rendering.Utils.BeamDirection.Up;
+    this._height = 0;
     AlphaTab.Rendering.BarRendererFactory.call(this);
     this._direction = direction;
     this.IsInAccolade = false;
@@ -12467,8 +12479,9 @@ AlphaTab.Rendering.Staves.BarSizeInfo.prototype = {
         this.PostNoteSizes[beat] = size;
     }
 };
-AlphaTab.Rendering.Staves.Stave = function (staveId, factory){
+AlphaTab.Rendering.Staves.Stave = function (staveId, factory, settings){
     this._factory = null;
+    this._settings = null;
     this.StaveTrackGroup = null;
     this.StaveGroup = null;
     this.BarRenderers = null;
@@ -12486,12 +12499,19 @@ AlphaTab.Rendering.Staves.Stave = function (staveId, factory){
     this.BarRenderers = [];
     this.StaveId = staveId;
     this._factory = factory;
+    this._settings = settings;
     this.TopSpacing = 10;
     this.BottomSpacing = 10;
     this.StaveTop = 0;
     this.StaveBottom = 0;
 };
 AlphaTab.Rendering.Staves.Stave.prototype = {
+    GetSetting: function (key, def){
+        if (this._settings.hasOwnProperty(key)){
+            return (this._settings[key]);
+        }
+        return def;
+    },
     get_IsInAccolade: function (){
         return this._factory.IsInAccolade;
     },

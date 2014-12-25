@@ -31,6 +31,7 @@ namespace AlphaTab.Rendering.Staves
     public class Stave
     {
         private BarRendererFactory _factory;
+        private readonly FastDictionary<string, object> _settings;
 
         public StaveTrackGroup StaveTrackGroup { get; set; }
         public StaveGroup StaveGroup { get; set; }
@@ -63,16 +64,27 @@ namespace AlphaTab.Rendering.Staves
         public bool IsFirstInAccolade { get; set; }
         public bool IsLastInAccolade { get; set; }
 
-        public Stave(string staveId, BarRendererFactory factory)
+        public Stave(string staveId, BarRendererFactory factory, FastDictionary<string, object> settings)
         {
             BarRenderers = new FastList<BarRendererBase>();
             StaveId = staveId;
             _factory = factory;
+            _settings = settings;
             TopSpacing = 10;
             BottomSpacing = 10;
             StaveTop = 0;
             StaveBottom = 0;
         }
+
+        public T GetSetting<T>(string key, T def)
+        {
+            if (_settings.ContainsKey(key))
+            {
+                return (T)(_settings[key]);
+            }
+            return def;
+        }
+
 
         public bool IsInAccolade
         {

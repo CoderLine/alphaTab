@@ -23,6 +23,7 @@ namespace AlphaTab.Rendering
     public class RhythmBarRendererFactory : BarRendererFactory
     {
         private readonly BeamDirection _direction;
+        private readonly int _height;
 
         public RhythmBarRendererFactory(BeamDirection direction)
         {

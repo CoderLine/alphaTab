@@ -37,7 +37,7 @@ namespace AlphaTab.Rendering
         {
             _helpers = Stave.StaveGroup.Helpers.Helpers[Bar.Track.Index][Bar.Index];
             base.DoLayout();
-            Height = (int)(24 * Scale);
+            Height = (int)(Stave.GetSetting("rhythm-height", 24) * Scale);
             IsEmpty = false;
         }
 
@@ -89,8 +89,9 @@ namespace AlphaTab.Rendering
         private void PaintBeamHelper(int cx, int cy, ICanvas canvas, BeamingHelper h)
         {
             if (h.Beats[0].GraceType != GraceType.None) return;
+            var useBeams = Stave.GetSetting("use-beams", false);
             // check if we need to paint simple footer
-            if (h.Beats.Count == 1)
+            if (useBeams && h.Beats.Count == 1)
             {
                 PaintFooter(cx, cy, canvas, h);
             }
@@ -143,9 +144,20 @@ namespace AlphaTab.Rendering
                         var barY = barStart + (barIndex * barSpacing);
 
                         // 
+                        // Broken Bar to Next
+                        //
+                        if (h.Beats.Count == 1)
+                        {
+                            barStartX = beatLineX;
+                            barEndX = beatLineX + brokenBarOffset;
+                            barStartY = barY;
+                            barEndY = barY;
+                            PaintSingleBar(canvas, cx + X + barStartX, barStartY, cx + X + barEndX, barEndY, barSize);
+                        }
+                        // 
                         // Bar to Next?
                         //
-                        if (i < h.Beats.Count - 1)
+                        else if (i < h.Beats.Count - 1)
                         {
                             // full bar?
                             if (IsFullBarJoin(beat, h.Beats[i + 1], barIndex))

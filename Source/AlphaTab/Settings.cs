@@ -185,6 +185,11 @@ namespace AlphaTab
         ///  <li><strong>tab</strong> - Renders guitar tablature</li>
         ///  <li><strong>fingering</strong> - Renders finger indicators</li>
         /// </ul>
+        /// Additional Staves:
+        /// <ul>
+        ///   <li><strong>rhythm-down</strong> - Renders rhythm bars that point downwards</li>
+        ///   <li><strong>rhythm-up</strong> - Renders rhythm bars that point upwards</li>
+        /// </ul>
         /// </summary>
         public string Id { get; set; }
 

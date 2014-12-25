@@ -378,6 +378,38 @@
             });
         </script>      
         
+        <h2>Rhythm Height</h2>
+        
+        <p>
+            You might want to reduce the height of the rhythm stave. 
+        </p>
+        
+        <div id="alphaTabRhythmHeight" data-file="files/features/Chords.gp5"></div>
+        <script type="text/javascript-lazy">
+            $('#alphaTabRhythmHeight').alphaTab({
+                staves: [
+                    {id: 'rhythm-down', additionalSettings: {'rhythm-height': 10 } },
+                    'tab'
+                ]
+            });
+        </script>      
+        
+        <h2>Rhythm With Beams</h2>
+        
+        <p>
+            If you prefer beams instead of bars for single notes you can have that too. 
+        </p>
+        
+        <div id="alphaTabRhythmBeam" data-file="files/features/Chords.gp5"></div>
+        <script type="text/javascript-lazy">
+            $('#alphaTabRhythmBeam').alphaTab({
+                staves: [
+                    {id: 'rhythm-down', additionalSettings: {'use-beams': true } },
+                    'tab'
+                ]
+            });
+        </script>      
+        
         <h2>String Variations</h2>
         
         <p>

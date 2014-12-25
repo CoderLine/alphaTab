@@ -18,6 +18,7 @@
 using System.Runtime.CompilerServices;
 using AlphaTab.Collections;
 using AlphaTab.Platform;
+using AlphaTab.Rendering.Staves;
 using SharpKit.JavaScript;
 
 namespace AlphaTab
@@ -98,6 +99,7 @@ namespace AlphaTab
                                     staveSettings.AdditionalSettings[key2] = val.additionalSettings[key2];
                                 }
                             }
+                            settings.Staves.Add(staveSettings);
                         }
                     }
                 }

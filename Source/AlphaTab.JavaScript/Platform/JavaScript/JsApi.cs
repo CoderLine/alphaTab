@@ -67,7 +67,10 @@ namespace AlphaTab.Platform.JavaScript
             {
                 // get load contents
 
-                contents = ((string)element.innerText).Trim();
+                if (element.innerText.As<JsBoolean>())
+                {
+                    contents = (element.innerText.As<string>()).Trim();
+                }
                 element.innerHTML = "";
 
                 #region Create context elements (wrapper, canvas etc)

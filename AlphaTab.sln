@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{B124E22D-BC49-4254-A641-37F1FD2B58F8}"
 EndProject
@@ -136,8 +136,5 @@ Global
 		{A3F4711F-F386-43DD-8E6E-E7CE8B1F0B4C} = {49FB227C-950C-49E1-8740-0ABBC3FF2942}
 		{D67B7435-D59C-40C6-B888-9DDD32740C98} = {49FB227C-950C-49E1-8740-0ABBC3FF2942}
 		{29979A58-2622-4B55-890C-115D245F591B} = {49FB227C-950C-49E1-8740-0ABBC3FF2942}
-	EndGlobalSection
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal
