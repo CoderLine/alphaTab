@@ -3,6 +3,7 @@ using System.Reflection;
 using AlphaTab.Audio.Generator;
 using AlphaTab.IO;
 using AlphaTab.Platform;
+using AlphaTab.Platform.JavaScript;
 using AlphaTab.Platform.Svg;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Glyphs;
@@ -77,11 +78,19 @@ using SharpKit.JavaScript;
 
 [assembly: JsMethod(TargetType = typeof(Nullable<>), TargetMethod = "get_Value", InlineCodeExpression = "this")]
 
-[assembly: JsProperty(TargetType = typeof(ICanvas), TargetProperty = "Width", NativeField = true)]
-[assembly: JsProperty(TargetType = typeof(ICanvas), TargetProperty = "Height", NativeField = true)]
-[assembly: JsProperty(TargetType = typeof(ICanvas), TargetProperty = "Resources", NativeField = true)]
-[assembly: JsProperty(TargetType = typeof(ICanvas), TargetProperty = "Color", NativeField = true)]
-[assembly: JsProperty(TargetType = typeof(ICanvas), TargetProperty = "LineWidth", NativeField = true)]
-[assembly: JsProperty(TargetType = typeof(ICanvas), TargetProperty = "Font", NativeField = true)]
-[assembly: JsProperty(TargetType = typeof(ICanvas), TargetProperty = "TextAlign", NativeField = true)]
-[assembly: JsProperty(TargetType = typeof(ICanvas), TargetProperty = "TextBaseline", NativeField = true)]
+[assembly: JsType(Mode = JsMode.Prototype, TargetType = typeof(Html5Canvas),
+                    AutomaticPropertiesAsFields = false,
+                    Export = true,
+                    IgnoreGenericTypeArguments = true,
+                    IgnoreGenericMethodArguments = true,
+                    OmitCasts = true
+                    )]
+
+[assembly: JsType(Mode = JsMode.Prototype, TargetType = typeof(SvgCanvas),
+                    AutomaticPropertiesAsFields = false,
+                    Export = true,
+                    IgnoreGenericTypeArguments = true,
+                    IgnoreGenericMethodArguments = true,
+                    OmitCasts = true
+                    )]
+

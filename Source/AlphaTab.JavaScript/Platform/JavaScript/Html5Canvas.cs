@@ -55,6 +55,7 @@ namespace AlphaTab.Platform.JavaScript
             {
                 var lineWidth = _context.lineWidth;
                 _canvas.width = value;
+                _canvas.style.width = value + "px";
                 _context = (CanvasRenderingContext2D)_canvas.getContext("2d");
                 _context.textBaseline = "top";
                 _context.lineWidth = lineWidth;
@@ -68,6 +69,7 @@ namespace AlphaTab.Platform.JavaScript
             {
                 var lineWidth = _context.lineWidth;
                 _canvas.height = value;
+                _canvas.style.height = value + "px";
                 _context = (CanvasRenderingContext2D)_canvas.getContext("2d");
                 _context.textBaseline = "top";
                 _context.lineWidth = lineWidth;
