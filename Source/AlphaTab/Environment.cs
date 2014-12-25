@@ -18,6 +18,7 @@
 using System;
 using AlphaTab.Collections;
 using AlphaTab.Platform;
+using AlphaTab.Platform.JavaScript;
 using AlphaTab.Platform.Svg;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Effects;

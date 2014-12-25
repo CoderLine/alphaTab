@@ -18,30 +18,22 @@
 (function ($) {
 
     var api = {
-        init: function(options) {
-            var $this = $(this);
-            var context = $this.data('alphaTab');
+        init: function(element, context, options) {
             if (!context) {
-                var ctx = new AlphaTab.Platform.JavaScript.JsApi(this, options);
-                $this.data('alphaTab', ctx);
+                context = new AlphaTab.Platform.JavaScript.JsApi(element[0], options);
+                element.data('alphaTab', context);
             }
         }, 
         
-        tex: function(contents) {
-            var context = $(this).data('alphaTab');
-            if (!context) { console.error('alphaTab not initialized!'); }
-            context.Tex(contents);
+        tex: function(element, context, tex) {
+            context.Tex(tex);
         },
          
-        load: function(data) {
-            var context = $(this).data('alphaTab');
-            if (!context) { console.error('alphaTab not initialized!'); }
-            context.Load(data);
+        load: function(element, context, file) {
+            context.Load(file);
         },
        
-        tracks: function(tracks) {
-            var context = $(this).data('alphaTab');
-            if (!context) { console.error('alphaTab not initialized!'); }
+        tracks: function(element, context, tracks) {
             if(tracks) {
                 context.SetTracks(tracks, true);
             }
@@ -50,9 +42,7 @@
             }
         },
         
-        score: function(score) {
-            var context = $(this).data('alphaTab');
-            if (!context) { console.error('alphaTab not initialized!'); }
+        score: function(element, context, score) {
             if(score) {
                 context.ScoreLoaded(score);
             }
@@ -61,20 +51,26 @@
             }
         },
         
-        renderer: function(e) {
-            var context = $(this).data('alphaTab');
-            if (!context) { console.error('alphaTab not initialized!'); }
+        renderer: function(element, context) {
             return context.Renderer;
         }
     };
         
-    var apiExec = function(method, args) {
+    var apiExec = function(element, method, args) {
         if(typeof(method) != "string") {
             args = [method];
             method = 'init';
         }
+        
+        var $element = $(element);
+        var context = $(element).data('alphaTab');
+        if (method != 'init' && !context) { 
+            throw new Error('alphaTab not initialized!'); 
+        }
+                
         if (api[method]) {
-            return api[method].apply(this, args);
+            var realArgs = [ $element, context ].concat(args);
+            return api[method].apply(this, realArgs);
         }
         else {
             console.error('Method ' + method + ' does not exist on jQuery.alphaTab');
@@ -84,12 +80,12 @@
     $.fn.alphaTab = function (method) {        
         // if only a single element is affected, we use this
         if(this.length == 1) {
-            return apiExec.call(this[0], method, Array.prototype.slice.call(arguments, 1));
+            return apiExec(this[0], method, Array.prototype.slice.call(arguments, 1));
         }
         // if multiple elements are affected we provide chaining
         else {
             return this.each(function() {
-                apiExec.call(this, method, Array.prototype.slice.call(arguments, 1));
+                apiExec(this, method, Array.prototype.slice.call(arguments, 1));
             });
         }
     };
