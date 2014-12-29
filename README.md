@@ -19,15 +19,15 @@ and
 * render guitar tablatures
 * render a huge amount of effects 
 
+and
+
+* play the displayed music sheet using HTML5 and Flash
+
 # Planned Features
 alphaTab will 
 
 * load MusicXml Files
 * load PowerTab files
-
-and
-
-* play the displayed music sheet 
 
 # Platforms
 alphaTab is not only a JavaScript library. alphaTab can be used in many different platforms 
