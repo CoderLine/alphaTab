@@ -47,7 +47,7 @@ namespace AlphaTab.Rendering
         /// The step offsets of the notes within an octave in case of for sharp keysignatures
         /// </summary>
         private static readonly int[] SharpNoteSteps = { 0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6 };
-        
+
         /// <summary>
         /// The step offsets of the notes within an octave in case of for flat keysignatures
         /// </summary>
@@ -298,15 +298,15 @@ namespace AlphaTab.Rendering
                     //
                     // draw the bracket
                     canvas.BeginPath();
-                    canvas.MoveTo(cx + X + startX, cy + Y + startY - offset);
-                    canvas.LineTo(cx + X + startX, cy + Y + startY - offset - size);
-                    canvas.LineTo(cx + X + offset1X, cy + Y + offset1Y - offset - size);
+                    canvas.MoveTo(cx + X + startX, (int)(cy + Y + startY - offset));
+                    canvas.LineTo(cx + X + startX, (int)(cy + Y + startY - offset - size));
+                    canvas.LineTo(cx + X + offset1X, (int)(cy + Y + offset1Y - offset - size));
                     canvas.Stroke();
 
                     canvas.BeginPath();
-                    canvas.MoveTo(cx + X + offset2X, cy + Y + offset2Y - offset - size);
-                    canvas.LineTo(cx + X + endX, cy + Y + endY - offset - size);
-                    canvas.LineTo(cx + X + endX, cy + Y + endY - offset);
+                    canvas.MoveTo(cx + X + offset2X, (int)(cy + Y + offset2Y - offset - size));
+                    canvas.LineTo(cx + X + endX, (int)(cy + Y + endY - offset - size));
+                    canvas.LineTo(cx + X + endX, (int)(cy + Y + endY - offset));
                     canvas.Stroke();
 
                     //
@@ -762,8 +762,8 @@ namespace AlphaTab.Rendering
             {
                 if (i > 0) lineY += LineOffset;
                 canvas.BeginPath();
-                canvas.MoveTo(cx + X, lineY);
-                canvas.LineTo(cx + X + Width, lineY);
+                canvas.MoveTo(cx + X, (int)lineY);
+                canvas.LineTo(cx + X + Width, (int)lineY);
                 canvas.Stroke();
             }
 

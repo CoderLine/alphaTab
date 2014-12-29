@@ -42,7 +42,7 @@ namespace AlphaTab.Rendering.Glyphs
             var res = Renderer.Resources;
             var startY = cy + X + (tabBarRenderer.GetNoteY(_beat.MaxNote) - res.TablatureFont.Size / 2);
             var endY = cy + Y + tabBarRenderer.GetNoteY(_beat.MinNote) + res.TablatureFont.Size / 2;
-            var arrowX = cx + X + Width / 2;
+            var arrowX = (int)(cx + X + Width / 2);
             var arrowSize = 8 * Scale;
 
             if (_beat.BrushType != BrushType.None)

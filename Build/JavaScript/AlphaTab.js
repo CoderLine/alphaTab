@@ -8507,7 +8507,7 @@ AlphaTab.Rendering.Glyphs.BarSeperatorGlyph.prototype = {
         var blockWidth = 4 * this.get_Scale();
         var top = cy + this.Y + this.Renderer.get_TopPadding();
         var bottom = cy + this.Y + this.Renderer.Height - this.Renderer.get_BottomPadding();
-        var left = cx + this.X;
+        var left = ((cx + this.X)) | 0;
         var h = bottom - top;
         // line
         canvas.BeginPath();
@@ -8516,7 +8516,7 @@ AlphaTab.Rendering.Glyphs.BarSeperatorGlyph.prototype = {
         canvas.Stroke();
         if (this._isLast){
             // big bar
-            left += (3 * this.get_Scale()) + 0.5;
+            left += (((3 * this.get_Scale()) + 0.5)) | 0;
             canvas.FillRect(left, top, blockWidth, h);
         }
     }
@@ -9307,14 +9307,14 @@ AlphaTab.Rendering.Glyphs.LineRangedGlyph.prototype = {
                 var lineX = startX;
                 while (lineX < endX){
                     canvas.BeginPath();
-                    canvas.MoveTo(lineX, lineY);
-                    canvas.LineTo(Math.min(lineX + lineSize, endX), lineY);
+                    canvas.MoveTo(lineX, lineY | 0);
+                    canvas.LineTo(Math.min(lineX + lineSize, endX), lineY | 0);
                     lineX += lineSize + lineSpacing;
                     canvas.Stroke();
                 }
                 canvas.BeginPath();
-                canvas.MoveTo(endX, lineY - 6 * this.get_Scale());
-                canvas.LineTo(endX, lineY + 6 * this.get_Scale());
+                canvas.MoveTo(endX, ((lineY - 6 * this.get_Scale())) | 0);
+                canvas.LineTo(endX, ((lineY + 6 * this.get_Scale())) | 0);
                 canvas.Stroke();
             }
         }
@@ -10724,7 +10724,7 @@ AlphaTab.Rendering.Glyphs.TabBrushGlyph.prototype = {
         var res = this.Renderer.get_Resources();
         var startY = cy + this.X + (tabBarRenderer.GetNoteY(this._beat.get_MaxNote()) - res.TablatureFont.Size / 2);
         var endY = cy + this.Y + tabBarRenderer.GetNoteY(this._beat.get_MinNote()) + res.TablatureFont.Size / 2;
-        var arrowX = cx + this.X + this.Width / 2;
+        var arrowX = ((cx + this.X + this.Width / 2)) | 0;
         var arrowSize = 8 * this.get_Scale();
         if (this._beat.BrushType != AlphaTab.Model.BrushType.None){
             if (this._beat.BrushType == AlphaTab.Model.BrushType.BrushUp || this._beat.BrushType == AlphaTab.Model.BrushType.BrushDown){
@@ -11988,14 +11988,14 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
                 //
                 // draw the bracket
                 canvas.BeginPath();
-                canvas.MoveTo(cx + this.X + startX, cy + this.Y + startY - offset);
-                canvas.LineTo(cx + this.X + startX, cy + this.Y + startY - offset - size);
-                canvas.LineTo(cx + this.X + offset1X, cy + this.Y + offset1Y - offset - size);
+                canvas.MoveTo(cx + this.X + startX, ((cy + this.Y + startY - offset)) | 0);
+                canvas.LineTo(cx + this.X + startX, ((cy + this.Y + startY - offset - size)) | 0);
+                canvas.LineTo(cx + this.X + offset1X, ((cy + this.Y + offset1Y - offset - size)) | 0);
                 canvas.Stroke();
                 canvas.BeginPath();
-                canvas.MoveTo(cx + this.X + offset2X, cy + this.Y + offset2Y - offset - size);
-                canvas.LineTo(cx + this.X + endX, cy + this.Y + endY - offset - size);
-                canvas.LineTo(cx + this.X + endX, cy + this.Y + endY - offset);
+                canvas.MoveTo(cx + this.X + offset2X, ((cy + this.Y + offset2Y - offset - size)) | 0);
+                canvas.LineTo(cx + this.X + endX, ((cy + this.Y + endY - offset - size)) | 0);
+                canvas.LineTo(cx + this.X + endX, ((cy + this.Y + endY - offset)) | 0);
                 canvas.Stroke();
                 //
                 // Draw the string
@@ -12321,8 +12321,8 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
             if (i > 0)
                 lineY += this.get_LineOffset();
             canvas.BeginPath();
-            canvas.MoveTo(cx + this.X, lineY);
-            canvas.LineTo(cx + this.X + this.Width, lineY);
+            canvas.MoveTo(cx + this.X, lineY | 0);
+            canvas.LineTo(cx + this.X + this.Width, lineY | 0);
             canvas.Stroke();
         }
         canvas.set_Color(res.MainGlyphColor);
@@ -12963,8 +12963,8 @@ AlphaTab.Rendering.TabBarRenderer.prototype = {
             if (i > 0)
                 lineY += this.get_LineOffset();
             canvas.BeginPath();
-            canvas.MoveTo(cx + this.X, lineY);
-            canvas.LineTo(cx + this.X + this.Width, lineY);
+            canvas.MoveTo(cx + this.X, lineY | 0);
+            canvas.LineTo(cx + this.X + this.Width, lineY | 0);
             canvas.Stroke();
         }
         canvas.set_Color(res.MainGlyphColor);

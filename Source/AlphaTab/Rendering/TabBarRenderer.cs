@@ -203,8 +203,8 @@ namespace AlphaTab.Rendering
             {
                 if (i > 0) lineY += LineOffset;
                 canvas.BeginPath();
-                canvas.MoveTo(cx + X, lineY);
-                canvas.LineTo(cx + X + Width, lineY);
+                canvas.MoveTo(cx + X, (int)lineY);
+                canvas.LineTo(cx + X + Width, (int)lineY);
                 canvas.Stroke();
             }
 

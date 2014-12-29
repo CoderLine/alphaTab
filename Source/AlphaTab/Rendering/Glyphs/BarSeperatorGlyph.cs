@@ -45,7 +45,7 @@ namespace AlphaTab.Rendering.Glyphs
 
             var top = cy + Y + Renderer.TopPadding;
             var bottom = cy + Y + Renderer.Height - Renderer.BottomPadding;
-            var left = cx + X;
+            var left = (int)(cx + X);
             var h = bottom - top;
 
             // line
@@ -57,7 +57,7 @@ namespace AlphaTab.Rendering.Glyphs
             if (_isLast)
             {
                 // big bar
-                left += (3 * Scale) + 0.5f;
+                left += (int)((3 * Scale) + 0.5f);
                 canvas.FillRect(left, top, blockWidth, h);
             }
         }

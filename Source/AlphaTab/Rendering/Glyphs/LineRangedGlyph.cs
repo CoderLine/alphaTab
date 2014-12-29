@@ -65,14 +65,14 @@ namespace AlphaTab.Rendering.Glyphs
                     while (lineX < endX)
                     {
                         canvas.BeginPath();
-                        canvas.MoveTo(lineX, lineY);
-                        canvas.LineTo(Math.Min(lineX + lineSize, endX), lineY);
+                        canvas.MoveTo(lineX, (int)lineY);
+                        canvas.LineTo(Math.Min(lineX + lineSize, endX), (int)lineY);
                         lineX += lineSize + lineSpacing;
                         canvas.Stroke();
                     }
                     canvas.BeginPath();
-                    canvas.MoveTo(endX, lineY - LineTopOffset * Scale);
-                    canvas.LineTo(endX, lineY + LineTopOffset * Scale);
+                    canvas.MoveTo(endX, (int)(lineY - LineTopOffset * Scale));
+                    canvas.LineTo(endX, (int)(lineY + LineTopOffset * Scale));
                     canvas.Stroke();
 
                 }
