@@ -433,6 +433,7 @@ AlphaSynth.Main.AlphaSynthWebAudioOutput = function (){
     this._audioNode = null;
     this._circularBuffer = null;
     this._finished = false;
+    this._seekTime = null;
     this._startTime = 0;
     this._pauseStart = 0;
     this._pauseTime = 0;
@@ -458,7 +459,12 @@ AlphaSynth.Main.AlphaSynthWebAudioOutput.prototype = {
     Play: function (){
         this.RequestBuffers();
         this._finished = false;
-        if (this._paused){
+        if (this._seekTime != null){
+            this._startTime = ((this._context.currentTime * 1000 - this._seekTime)) | 0;
+            this._pauseTime = 0;
+            this._paused = false;
+        }
+        else if (this._paused){
             this._paused = false;
             this._pauseTime += ((this._context.currentTime * 1000 - this._pauseStart)) | 0;
         }
@@ -493,8 +499,7 @@ AlphaSynth.Main.AlphaSynthWebAudioOutput.prototype = {
         this._audioNode.disconnect(0);
     },
     Seek: function (position){
-        this._startTime = ((this._context.currentTime * 1000 - position)) | 0;
-        this._pauseTime = 0;
+        this._seekTime = position;
     },
     SequencerFinished: function (){
         this._finished = true;
