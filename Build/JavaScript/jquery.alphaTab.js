@@ -89,7 +89,11 @@
             });
         }
     };
-    
+    $.alphaTab = {
+        restore: function(selector) {
+            $(selector).empty().removeData('alphaTab');
+        }
+    };
     // allow plugins to add methods
     $.fn.alphaTab.fn = api;
     

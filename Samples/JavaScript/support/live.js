@@ -1,4 +1,4 @@
-var settings = alphatab.Settings.defaults();
+var settings = AlphaTab.Settings.get_Defaults();
 var currentScore = null;
 
 function highlightEngine(engine) {
@@ -14,8 +14,8 @@ function highlightEngine(engine) {
 
 function openFile(bytes) {
     try {
-        currentScore = alphatab.importer.ScoreLoader.loadScoreFromBytes(haxe.io.Bytes.ofData(new Uint8Array(bytes)));
-        $('#alphaTab').alphaTab('renderer').render(currentScore.tracks[0]);
+        currentScore = AlphaTab.Importer.ScoreLoader.LoadScoreFromBytes(new Uint8Array(bytes));
+        $('#alphaTab').alphaTab('renderer').Render(currentScore.Tracks[0]);
     }
     catch(e) {
         alert('Error opening the file');
@@ -24,67 +24,67 @@ function openFile(bytes) {
 }
 
 function updateSettings() {
-    settings.scale = parseFloat($('#zoom').val());
-    settings.layout.mode = $('#layoutMode').val();
-    settings.layout.additionalSettings.set('autoSize', $('#autoSize').is(':checked'));
-    settings.width = parseInt($('#width').val());
-    switch(settings.layout.mode) 
+    settings.Scale = parseFloat($('#zoom').val());
+    settings.Layout.Mode = $('#layoutMode').val();
+    settings.Layout.AdditionalSettings['autoSize'] = $('#autoSize').is(':checked');
+    settings.Width = parseInt($('#width').val());
+    switch(settings.Layout.Mode) 
     {
         case 'page':
-            settings.layout.additionalSettings.set('start', parseInt($('#startBarPage').val()))
-            settings.layout.additionalSettings.set('count', parseInt($('#barCountPage').val()));
+            settings.Layout.AdditionalSettings['start'] = parseInt($('#startBarPage').val())
+            settings.Layout.AdditionalSettings['count'] = parseInt($('#barCountPage').val());
             break;
         case 'horizontal':
-            settings.layout.additionalSettings.set('start', parseInt($('#startBarHorizontal').val()))
-            settings.layout.additionalSettings.set('count', parseInt($('#barCountHorizontal').val()));
+            settings.Layout.AdditionalSettings['start'] = parseInt($('#startBarHorizontal').val())
+            settings.Layout.AdditionalSettings['count'] = parseInt($('#barCountHorizontal').val());
             break;
     }
-    settings.layout.additionalSettings.set('hideInfo', $('#hideInfo').is(':checked'));
-    settings.layout.additionalSettings.set('barsPerRow', parseInt($('#barsPerRow').val()));
-    settings.staves = new Array();
+    settings.Layout.AdditionalSettings['hideInfo'] = $('#hideInfo').is(':checked');
+    settings.Layout.AdditionalSettings['barsPerRow'] = parseInt($('#barsPerRow').val());
+    settings.Staves = new Array();
     $('input[name=staves]').each(function() {
        if($(this).is(':checked')) {
-           settings.staves.push(new alphatab.StaveSettings($(this).val()));
+           settings.Staves.push(new AlphaTab.StaveSettings($(this).val()));
        }
     });
-    $('#alphaTab').alphaTab('renderer').invalidate();
+    $('#alphaTab').alphaTab('renderer').Invalidate();
 }
 
 function updateUi() {
-    $('#zoom option[value="'+settings.scale+'"]').attr('selected', true);
-    highlightEngine(settings.engine);
-    $('#layoutMode option[value="'+settings.layout.mode+'"]').attr('selected', true);
-    $('#autoSize').attr('checked', settings.layout.get('autoSize', true));
+    $('#zoom option[value="'+settings.Scale+'"]').attr('selected', true);
+    highlightEngine(settings.Engine);
+    $('#layoutMode option[value="'+settings.Layout.Mode+'"]').attr('selected', true);
+    $('#autoSize').attr('checked', settings.Layout.Get('autoSize', true));
     $('#autoSize').trigger('change');
-    $('#width').val(settings.width);
-    $('#startBarPage').val(settings.layout.get('start', 1));
-    $('#barCountPage').val(settings.layout.get('count', -1));
-    $('#hideInfo').attr('checked', settings.layout.get('hideInfo', false));
-    $('#startBarHorizontal').val(settings.layout.get('start', 1));
-    $('#barCountHorizontal').val(settings.layout.get('count', -1));
-    $('#barsPerRow').val(settings.layout.get('barsPerRow', -1));
+    $('#width').val(settings.Width);
+    $('#startBarPage').val(settings.Layout.Get('start', 1));
+    $('#barCountPage').val(settings.Layout.Get('count', -1));
+    $('#hideInfo').attr('checked', settings.Layout.Get('hideInfo', false));
+    $('#startBarHorizontal').val(settings.Layout.Get('start', 1));
+    $('#barCountHorizontal').val(settings.Layout.Get('count', -1));
+    $('#barsPerRow').val(settings.Layout.Get('barsPerRow', -1));
     $('#layoutMode').trigger('change');
     
-    for(i in settings.staves) {
-        $('input[name="staves"][value="'+settings.staves[i].id+'"]').attr('checked', true);
+    for(i in settings.Staves) {
+        $('input[name="staves"][value="'+settings.Staves[i].Id+'"]').attr('checked', true);
     }
 }
 
 
 function changeEngine(newEngine) {
-    if(newEngine == settings.engine) return;
-    settings.engine = newEngine;
+    if(newEngine == settings.Engine) return;
+    settings.Engine = newEngine;
     highlightEngine(newEngine);
     $.alphaTab.restore('#alphaTab');
     $('#alphaTab').alphaTab(settings);  
-    $('#alphaTab').alphaTab('renderer').render(currentScore.tracks[0]);
+    $('#alphaTab').alphaTab('renderer').Render(currentScore.Tracks[0]);
 }
 
 function initializeTrackChooser() {
     var score = $('#alphaTab').alphaTab('score');
     var currentTrack = $('#alphaTab').alphaTab('tracks');
     currentTrack = (currentTrack.length == 0) ? null : currentTrack[0];
-    var allTracks = score.tracks;
+    var allTracks = score.Tracks;
 
     var list = $('#trackList');
     list.empty();
@@ -99,11 +99,11 @@ function initializeTrackChooser() {
         var a = $('<a></a>');
         li.append(a);
         a.attr('href', '#');
-        a.text(track.name);
+        a.text(track.Name);
         a.data('track', track);
         a.click(function(e) {
            e.preventDefault();
-           $('#alphaTab').alphaTab('renderer').render($(this).data('track'));
+           $('#alphaTab').alphaTab('renderer').Render($(this).data('track'));
            $('#trackChooser').fadeOut();
         });
     }
@@ -162,7 +162,7 @@ $(document).ready(function() {
        updateSettings();
    });
    
-   settings.engine = "html5";
+   settings.Engine = "svg";
    updateUi();
 
     $('#alphaTab').on('loaded', function(e, score) {

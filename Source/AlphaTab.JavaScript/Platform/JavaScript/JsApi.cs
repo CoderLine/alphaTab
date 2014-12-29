@@ -55,7 +55,7 @@ namespace AlphaTab.Platform.JavaScript
             }
             else
             {
-                tracksData = new[] { 0 };
+                tracksData = 0;
             }
 
             SetTracks(tracksData, false);

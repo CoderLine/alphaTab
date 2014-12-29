@@ -702,7 +702,7 @@ AlphaTab.Platform.JavaScript.JsApi = function (element, options){
         tracksData = dataset["tracks"];
     }
     else {
-        tracksData = new Int32Array([0]);
+        tracksData = 0;
     }
     this.SetTracks(tracksData, false);
     var contents = "";
