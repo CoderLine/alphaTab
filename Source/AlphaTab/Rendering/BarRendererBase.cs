@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System.Runtime.CompilerServices;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Rendering.Layout;
@@ -30,15 +29,15 @@ namespace AlphaTab.Rendering
     public class BarRendererBase
     {
         public Stave Stave { get; set; }
-        public int X { get; set; }
-        public int Y { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float Width { get; set; }
+        public float Height { get; set; }
         public int Index { get; set; }
         public bool IsEmpty { get; set; }
 
-        public int TopOverflow { get; set; }
-        public int BottomOverflow { get; set; }
+        public float TopOverflow { get; set; }
+        public float BottomOverflow { get; set; }
 
         public Bar Bar { get; set; }
 
@@ -48,19 +47,19 @@ namespace AlphaTab.Rendering
             IsEmpty = true;
         }
 
-        public void RegisterOverflowTop(int topOverflow)
+        public void RegisterOverflowTop(float topOverflow)
         {
             if (topOverflow > TopOverflow)
                 TopOverflow = topOverflow;
         }
-        public void RegisterOverflowBottom(int bottomOverflow)
+        public void RegisterOverflowBottom(float bottomOverflow)
         {
             if (bottomOverflow > BottomOverflow)
                 BottomOverflow = bottomOverflow;
         }
 
 
-        public virtual void ApplyBarSpacing(int spacing)
+        public virtual void ApplyBarSpacing(float spacing)
         {
 
         }
@@ -141,7 +140,7 @@ namespace AlphaTab.Rendering
         /// Can be used to specify where i.E. the score lines of the notation start.
         /// </summary>
         /// <returns></returns>
-        public virtual int TopPadding
+        public virtual float TopPadding
         {
             get
             {
@@ -153,7 +152,7 @@ namespace AlphaTab.Rendering
         /// Gets the bottom padding for the main content of the renderer. 
         /// Can be used to specify where i.E. the score lines of the notation end.
         /// </summary>
-        public virtual int BottomPadding
+        public virtual float BottomPadding
         {
             get
             {
@@ -166,12 +165,12 @@ namespace AlphaTab.Rendering
 
         }
 
-        public virtual void Paint(int cx, int cy, ICanvas canvas)
+        public virtual void Paint(float cx, float cy, ICanvas canvas)
         {
 
         }
 
-        public virtual void BuildBoundingsLookup(BoundingsLookup lookup, int visualTop, int visualHeight, int realTop, int realHeight, int x)
+        public virtual void BuildBoundingsLookup(BoundingsLookup lookup, float visualTop, float visualHeight, float realTop, float realHeight, float x)
         {
             var barLookup = new BarBoundings();
             barLookup.Bar = Bar;

@@ -16,7 +16,6 @@
  * License along with this library.
  */
 using System;
-using AlphaTab.IO;
 
 namespace AlphaTab.Platform
 {

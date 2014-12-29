@@ -16,7 +16,6 @@
  * License along with this library.
  */
 using System;
-using System.Runtime.CompilerServices;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
@@ -38,9 +37,9 @@ namespace AlphaTab.Rendering.Staves
 
         public FastList<BarRendererBase> BarRenderers { get; set; }
 
-        public int X { get; set; }
-        public int Y { get; set; }
-        public int Height { get; set; }
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float Height { get; set; }
         public int Index { get; set; }
         public string StaveId { get; private set; }
 
@@ -51,15 +50,15 @@ namespace AlphaTab.Rendering.Staves
         /// stave contents actually start. Used for grouping 
         /// using a accolade
         /// </summary>
-        public int StaveTop { get; set; }
-        public int TopSpacing { get; set; }
-        public int BottomSpacing { get; set; }
+        public float StaveTop { get; set; }
+        public float TopSpacing { get; set; }
+        public float BottomSpacing { get; set; }
         /// <summary>
         /// This is the visual offset from top where the
         /// stave contents actually ends. Used for grouping 
         /// using a accolade
         /// </summary>
-        public int StaveBottom { get; set; }
+        public float StaveBottom { get; set; }
 
         public bool IsFirstInAccolade { get; set; }
         public bool IsLastInAccolade { get; set; }
@@ -94,12 +93,12 @@ namespace AlphaTab.Rendering.Staves
             }
         }
 
-        public void RegisterStaveTop(int offset)
+        public void RegisterStaveTop(float offset)
         {
             StaveTop = offset;
         }
 
-        public void RegisterStaveBottom(int offset)
+        public void RegisterStaveBottom(float offset)
         {
             StaveBottom = offset;
         }
@@ -119,7 +118,7 @@ namespace AlphaTab.Rendering.Staves
             BarRenderers.RemoveAt(BarRenderers.Count - 1);
         }
 
-        public void ApplyBarSpacing(int spacing)
+        public void ApplyBarSpacing(float spacing)
         {
             for (int i = 0, j = BarRenderers.Count; i < j; i++)
             {
@@ -127,11 +126,11 @@ namespace AlphaTab.Rendering.Staves
             }
         }
 
-        public int TopOverflow
+        public float TopOverflow
         {
             get
             {
-                var m = 0;
+                var m = 0f;
                 for (int i = 0, j = BarRenderers.Count; i < j; i++)
                 {
                     var r = BarRenderers[i];
@@ -144,11 +143,11 @@ namespace AlphaTab.Rendering.Staves
             }
         }
 
-        public int BottomOverflow
+        public float BottomOverflow
         {
             get
             {
-                var m = 0;
+                var m = 0f;
                 for (int i = 0, j = BarRenderers.Count; i < j; i++)
                 {
                     var r = BarRenderers[i];
@@ -163,7 +162,7 @@ namespace AlphaTab.Rendering.Staves
 
         public void FinalizeStave(ScoreLayout layout)
         {
-            var x = 0;
+            var x = 0f;
             Height = 0;
 
             var topOverflow = TopOverflow;
@@ -173,7 +172,7 @@ namespace AlphaTab.Rendering.Staves
             {
                 BarRenderers[i].X = x;
                 BarRenderers[i].Y = TopSpacing + topOverflow;
-                Height = (int)(Math.Max(Height, BarRenderers[i].Height));
+                Height = Math.Max(Height, BarRenderers[i].Height);
                 BarRenderers[i].FinalizeRenderer(layout);
                 x += BarRenderers[i].Width;
                 if (!BarRenderers[i].IsEmpty)
@@ -192,7 +191,7 @@ namespace AlphaTab.Rendering.Staves
             }
         }
 
-        public void Paint(int cx, int cy, ICanvas canvas)
+        public void Paint(float cx, float cy, ICanvas canvas)
         {
             if (Height == 0) return;
             for (int i = 0, j = BarRenderers.Count; i < j; i++)

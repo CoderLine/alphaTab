@@ -21,7 +21,7 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class ScoreBeatPreNotesGlyph : BeatGlyphBase
     {
-        public override void ApplyGlyphSpacing(int spacing)
+        public override void ApplyGlyphSpacing(float spacing)
         {
             base.ApplyGlyphSpacing(spacing);
             if (Glyphs == null) return;
@@ -37,7 +37,7 @@ namespace AlphaTab.Rendering.Glyphs
             if (Container.Beat.BrushType != BrushType.None)
             {
                 AddGlyph(new ScoreBrushGlyph(Container.Beat));
-                AddGlyph(new SpacingGlyph(0, 0, (int)(4 * Scale)));
+                AddGlyph(new SpacingGlyph(0, 0, 4 * Scale));
             }
 
             if (!Container.Beat.IsRest && !Container.Beat.Voice.Bar.Track.IsPercussion)
@@ -48,7 +48,7 @@ namespace AlphaTab.Rendering.Glyphs
             }
 
             // a small padding
-            AddGlyph(new SpacingGlyph(0, 0, (int)(4 * (Container.Beat.GraceType != GraceType.None ? NoteHeadGlyph.GraceScale : 1) * Scale)));
+            AddGlyph(new SpacingGlyph(0, 0, 4 * (Container.Beat.GraceType != GraceType.None ? NoteHeadGlyph.GraceScale : 1) * Scale));
 
             base.DoLayout();
         }
@@ -61,13 +61,13 @@ namespace AlphaTab.Rendering.Glyphs
             var isGrace = Container.Beat.GraceType != GraceType.None;
             switch (accidental)
             {
-                case AccidentalType.Sharp: 
+                case AccidentalType.Sharp:
                     accidentals.AddGlyph(new SharpGlyph(0, sr.GetScoreY(noteLine), isGrace));
                     break;
-                case AccidentalType.Flat: 
+                case AccidentalType.Flat:
                     accidentals.AddGlyph(new FlatGlyph(0, sr.GetScoreY(noteLine), isGrace));
                     break;
-                case AccidentalType.Natural: 
+                case AccidentalType.Natural:
                     accidentals.AddGlyph(new NaturalizeGlyph(0, sr.GetScoreY(noteLine + 1), isGrace));
                     break;
             }

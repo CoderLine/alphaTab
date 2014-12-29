@@ -26,7 +26,7 @@ namespace AlphaTab.Rendering.Glyphs
             // note specific effects
             NoteLoop(CreateNoteGlyphs);
 
-            AddGlyph(new SpacingGlyph(0, 0, (int)(BeatDurationWidth * Scale)));
+            AddGlyph(new SpacingGlyph(0, 0, BeatDurationWidth * Scale));
 
             base.DoLayout();
         }
@@ -35,7 +35,7 @@ namespace AlphaTab.Rendering.Glyphs
         {
             if (n.IsTrill)
             {
-                AddGlyph(new SpacingGlyph(0, 0, (int)(4 * Scale)));
+                AddGlyph(new SpacingGlyph(0, 0, 4 * Scale));
                 var trillNote = new Note();
                 trillNote.IsGhost = true;
                 trillNote.Fret = n.TrillFret;
@@ -50,9 +50,9 @@ namespace AlphaTab.Rendering.Glyphs
 
             if (n.HasBend && n.Beat.GraceType != GraceType.None)
             {
-                var bendHeight = (int)(60 * Scale);
+                var bendHeight = 60 * Scale;
                 Renderer.RegisterOverflowTop(bendHeight);
-                AddGlyph(new BendGlyph(n, (int)(BeatDurationWidth * Scale), bendHeight));
+                AddGlyph(new BendGlyph(n, BeatDurationWidth * Scale, bendHeight));
             }
         }
     }

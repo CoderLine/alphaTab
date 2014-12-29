@@ -37,7 +37,7 @@ namespace AlphaTab.Rendering
         {
             _helpers = Stave.StaveGroup.Helpers.Helpers[Bar.Track.Index][Bar.Index];
             base.DoLayout();
-            Height = (int)(Stave.GetSetting("rhythm-height", 24) * Scale);
+            Height = Stave.GetSetting("rhythm-height", 24) * Scale;
             IsEmpty = false;
         }
 
@@ -68,11 +68,11 @@ namespace AlphaTab.Rendering
             }
         }
 
-        protected override void PaintBackground(int cx, int cy, ICanvas canvas)
+        protected override void PaintBackground(float cx, float cy, ICanvas canvas)
         {
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
             base.Paint(cx, cy, canvas);
 
@@ -86,7 +86,7 @@ namespace AlphaTab.Rendering
             }
         }
 
-        private void PaintBeamHelper(int cx, int cy, ICanvas canvas, BeamingHelper h)
+        private void PaintBeamHelper(float cx, float cy, ICanvas canvas, BeamingHelper h)
         {
             if (h.Beats[0].GraceType != GraceType.None) return;
             var useBeams = Stave.GetSetting("use-beams", false);
@@ -101,7 +101,7 @@ namespace AlphaTab.Rendering
             }
         }
 
-        private void PaintBar(int cx, int cy, ICanvas canvas, BeamingHelper h)
+        private void PaintBar(float cx, float cy, ICanvas canvas, BeamingHelper h)
         {
             for (int i = 0, j = h.Beats.Count; i < j; i++)
             {
@@ -112,7 +112,7 @@ namespace AlphaTab.Rendering
                     //
                     // draw line 
                     //
-                    var beatLineX = (int)(h.GetBeatLineX(beat) + Scale);
+                    var beatLineX = h.GetBeatLineX(beat) + Scale;
 
                     var y1 = cy + Y;
                     var y2 = cy + Y + Height;
@@ -197,7 +197,7 @@ namespace AlphaTab.Rendering
             }
         }
 
-        private void PaintFooter(int cx, int cy, ICanvas canvas, BeamingHelper h)
+        private void PaintFooter(float cx, float cy, ICanvas canvas, BeamingHelper h)
         {
             var beat = h.Beats[0];
 
@@ -212,10 +212,10 @@ namespace AlphaTab.Rendering
 
             var beatLineX = h.GetBeatLineX(beat) + Scale;
 
-            const int topY = 0;
+            const float topY = 0;
             var bottomY = Height;
 
-            int beamY = _direction == BeamDirection.Down ? bottomY : topY;
+            float beamY = _direction == BeamDirection.Down ? bottomY : topY;
 
             canvas.BeginPath();
             canvas.MoveTo(cx + X + beatLineX, cy + Y + topY);
@@ -226,7 +226,7 @@ namespace AlphaTab.Rendering
             //
             // Draw beam 
             //
-            var glyph = new BeamGlyph((int)beatLineX, beamY, beat.Duration, _direction, false);
+            var glyph = new BeamGlyph(beatLineX, beamY, beat.Duration, _direction, false);
             glyph.Renderer = this;
             glyph.DoLayout();
             glyph.Paint(cx + X, cy + Y, canvas);

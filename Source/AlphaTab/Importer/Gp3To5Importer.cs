@@ -17,7 +17,6 @@
  */
 using System;
 using AlphaTab.Collections;
-using AlphaTab.IO;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Platform.Model;

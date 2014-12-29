@@ -36,7 +36,7 @@ using SharpKit.JavaScript;
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
 
-[assembly: JsExport(ExportComments = true, OmitSharpKitHeaderComment = true, ForceOmitCasts = true)]
+[assembly: JsExport(ExportComments = true, OmitSharpKitHeaderComment = true, ForceOmitCasts = true, ForceIntegers = true)]
 // Export all Types
 [assembly: JsType(Mode = JsMode.Prototype,
                     AutomaticPropertiesAsFields = true,

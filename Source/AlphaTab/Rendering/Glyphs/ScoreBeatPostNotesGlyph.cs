@@ -21,7 +21,7 @@ namespace AlphaTab.Rendering.Glyphs
     {
         public override void DoLayout()
         {
-            AddGlyph(new SpacingGlyph(0, 0, (int)(BeatDurationWidth * Scale)));
+            AddGlyph(new SpacingGlyph(0, 0, BeatDurationWidth * Scale));
             base.DoLayout();
         }
     }

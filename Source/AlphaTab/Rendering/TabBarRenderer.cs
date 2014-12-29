@@ -27,7 +27,7 @@ namespace AlphaTab.Rendering
     /// </summary>
     public class TabBarRenderer : GroupedBarRenderer
     {
-        public const int LineSpacing = 10;
+        public const float LineSpacing = 10;
 
         private BarHelpers _helpers;
 
@@ -44,9 +44,9 @@ namespace AlphaTab.Rendering
             }
         }
 
-        public override int GetNoteX(Note note, bool onEnd = true)
+        public override float GetNoteX(Note note, bool onEnd = true)
         {
-            TabBeatGlyph beat = (TabBeatGlyph)GetOnNotesPosition(note.Beat.Voice.Index, note.Beat.Index);
+            var beat = (TabBeatGlyph)GetOnNotesPosition(note.Beat.Voice.Index, note.Beat.Index);
             if (beat != null)
             {
                 return beat.Container.X + beat.X + beat.NoteNumbers.GetNoteX(note, onEnd);
@@ -54,9 +54,9 @@ namespace AlphaTab.Rendering
             return PostBeatGlyphsStart;
         }
 
-        public int GetBeatX(Beat beat)
+        public float GetBeatX(Beat beat)
         {
-            TabBeatGlyph bg = (TabBeatGlyph)GetPreNotesPosition(beat.Voice.Index, beat.Index);
+            var bg = (TabBeatGlyph)GetPreNotesPosition(beat.Voice.Index, beat.Index);
             if (bg != null)
             {
                 return bg.Container.X + bg.X;
@@ -64,9 +64,9 @@ namespace AlphaTab.Rendering
             return 0;
         }
 
-        public override int GetNoteY(Note note)
+        public override float GetNoteY(Note note)
         {
-            TabBeatGlyph beat = (TabBeatGlyph)GetOnNotesPosition(note.Beat.Voice.Index, note.Beat.Index);
+            var beat = (TabBeatGlyph)GetOnNotesPosition(note.Beat.Voice.Index, note.Beat.Index);
             if (beat != null)
             {
                 return beat.NoteNumbers.GetNoteY(note);
@@ -78,7 +78,7 @@ namespace AlphaTab.Rendering
         {
             _helpers = Stave.StaveGroup.Helpers.Helpers[Bar.Track.Index][Bar.Index];
             base.DoLayout();
-            Height = (int)(LineOffset * (Bar.Track.Tuning.Count - 1)) + (NumberOverflow * 2);
+            Height = LineOffset * (Bar.Track.Tuning.Count - 1) + (NumberOverflow * 2);
             if (Index == 0)
             {
                 Stave.RegisterStaveTop(NumberOverflow);
@@ -103,7 +103,7 @@ namespace AlphaTab.Rendering
 
             if (Bar.IsEmpty)
             {
-                AddPreBeatGlyph(new SpacingGlyph(0, 0, (int)(30 * Scale), false));
+                AddPreBeatGlyph(new SpacingGlyph(0, 0, 30 * Scale, false));
             }
         }
 
@@ -147,7 +147,7 @@ namespace AlphaTab.Rendering
             else if (Bar.MasterBar.IsDoubleBar)
             {
                 AddPostBeatGlyph(new BarSeperatorGlyph(0, 0));
-                AddPostBeatGlyph(new SpacingGlyph(0, 0, (int)(3 * Scale), false));
+                AddPostBeatGlyph(new SpacingGlyph(0, 0, 3 * Scale, false));
                 AddPostBeatGlyph(new BarSeperatorGlyph(0, 0));
             }
             else if (Bar.NextBar == null || !Bar.NextBar.MasterBar.IsRepeatStart)
@@ -156,12 +156,12 @@ namespace AlphaTab.Rendering
             }
         }
 
-        public override int TopPadding
+        public override float TopPadding
         {
             get { return NumberOverflow; }
         }
 
-        public override int BottomPadding
+        public override float BottomPadding
         {
             get { return NumberOverflow; }
         }
@@ -172,24 +172,24 @@ namespace AlphaTab.Rendering
         /// <param name="line">the amount of steps while 2 steps are one line</param>
         /// <param name="correction"></param>
         /// <returns></returns>
-        public int GetTabY(int line, int correction = 0)
+        public float GetTabY(int line, float correction = 0)
         {
-            return (int)((LineOffset * line) + (correction * Scale));
+            return (LineOffset * line) + (correction * Scale);
         }
 
         /// <summary>
         /// gets the padding needed to place numbers within the bounding box
         /// </summary>
-        public int NumberOverflow
+        public float NumberOverflow
         {
             get
             {
                 var res = Resources;
-                return (int)((res.TablatureFont.Size / 2) + (res.TablatureFont.Size * 0.2));
+                return (res.TablatureFont.Size / 2) + (res.TablatureFont.Size * 0.2f);
             }
         }
 
-        protected override void PaintBackground(int cx, int cy, ICanvas canvas)
+        protected override void PaintBackground(float cx, float cy, ICanvas canvas)
         {
             var res = Resources;
 
@@ -201,7 +201,7 @@ namespace AlphaTab.Rendering
 
             for (int i = 0, j = Bar.Track.Tuning.Count; i < j; i++)
             {
-                if (i > 0) lineY += (int)LineOffset;
+                if (i > 0) lineY += LineOffset;
                 canvas.BeginPath();
                 canvas.MoveTo(cx + X, lineY);
                 canvas.LineTo(cx + X + Width, lineY);

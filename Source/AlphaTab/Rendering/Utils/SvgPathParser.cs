@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System.Runtime.CompilerServices;
+
 using AlphaTab.Collections;
 using AlphaTab.Platform;
 
@@ -58,9 +58,9 @@ namespace AlphaTab.Rendering.Utils
             return t;
         }
 
-        public int GetNumber()
+        public float GetNumber()
         {
-            return Std.ParseInt(GetString());
+            return Std.ParseFloat(GetString());
         }
 
         public bool CurrentTokenIsNumber

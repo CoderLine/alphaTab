@@ -21,7 +21,7 @@ namespace AlphaTab.Rendering.Glyphs
     {
         private readonly int _number;
 
-        public NumberGlyph(int x, int y, int number)
+        public NumberGlyph(float x, float y, int number)
             : base(x, y)
         {
             _number = number;
@@ -44,7 +44,7 @@ namespace AlphaTab.Rendering.Glyphs
             }
             Glyphs.Reverse();
 
-            var cx = 0;
+            var cx = 0f;
             for (int j = 0, k = Glyphs.Count; j < k; j++)
             {
                 var g = Glyphs[j];

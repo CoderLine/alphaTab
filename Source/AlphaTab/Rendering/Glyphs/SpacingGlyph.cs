@@ -24,7 +24,7 @@ namespace AlphaTab.Rendering.Glyphs
     {
         private readonly bool _scaling;
 
-        public SpacingGlyph(int x, int y, int width, bool scaling = true)
+        public SpacingGlyph(float x, float y, float width, bool scaling = true)
             : base(x, y)
         {
             _scaling = scaling;

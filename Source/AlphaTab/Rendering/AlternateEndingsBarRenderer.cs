@@ -28,7 +28,7 @@ namespace AlphaTab.Rendering
     /// </summary>
     public class AlternateEndingsBarRenderer : BarRendererBase
     {
-        private const int Padding = 3;
+        private const float Padding = 3;
 
         private readonly FastList<int> _endings;
         private string _endingsString;
@@ -38,7 +38,7 @@ namespace AlphaTab.Rendering
         {
             var alternateEndings = Bar.MasterBar.AlternateEndings;
             _endings = new FastList<int>();
-            for (int i = 0; i < MasterBar.MaxAlternateEndings; i++)
+            for (var i = 0; i < MasterBar.MaxAlternateEndings; i++)
             {
                 if ((alternateEndings & (0x01 << i)) != 0)
                 {
@@ -61,7 +61,7 @@ namespace AlphaTab.Rendering
                 Stave.TopSpacing = 5;
                 Stave.BottomSpacing = 4;
             }
-            Height = (int)(Resources.WordsFont.Size);
+            Height = Resources.WordsFont.Size;
 
             var endingsStrings = new StringBuilder();
             for (int i = 0, j = _endings.Count; i < j; i++)
@@ -72,12 +72,12 @@ namespace AlphaTab.Rendering
             _endingsString = endingsStrings.ToString();
         }
 
-        public override int TopPadding
+        public override float TopPadding
         {
             get { return 0; }
         }
 
-        public override int BottomPadding
+        public override float BottomPadding
         {
             get { return 0; }
         }
@@ -88,7 +88,7 @@ namespace AlphaTab.Rendering
             Width = sizes.FullWidth;
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
             if (_endings.Count > 0)
             {

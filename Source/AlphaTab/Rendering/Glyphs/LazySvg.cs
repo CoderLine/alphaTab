@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System.Runtime.CompilerServices;
+
 using AlphaTab.Collections;
 using AlphaTab.Rendering.Utils;
 
@@ -24,7 +24,7 @@ namespace AlphaTab.Rendering.Glyphs
     public class SvgCommand
     {
         public string Cmd { get; set; }
-        public FastList<int> Numbers { get; set; }
+        public FastList<float> Numbers { get; set; }
     }
 
     /// <summary>
@@ -68,12 +68,12 @@ namespace AlphaTab.Rendering.Glyphs
                     // Moving
                     // 
                     case "M": // absolute moveto
-                        command.Numbers = new FastList<int>();
+                        command.Numbers = new FastList<float>();
                         command.Numbers.Add(parser.GetNumber());
                         command.Numbers.Add(parser.GetNumber());
                         break;
                     case "m": // relative moveto
-                        command.Numbers = new FastList<int>();
+                        command.Numbers = new FastList<float>();
                         command.Numbers.Add(parser.GetNumber());
                         command.Numbers.Add(parser.GetNumber());
                         break;
@@ -87,7 +87,7 @@ namespace AlphaTab.Rendering.Glyphs
                     // Lines
                     //                 
                     case "L": // absolute lineTo
-                        command.Numbers = new FastList<int>();
+                        command.Numbers = new FastList<float>();
                         do 
                         {
                             command.Numbers.Add(parser.GetNumber());
@@ -95,7 +95,7 @@ namespace AlphaTab.Rendering.Glyphs
                         } while (parser.CurrentTokenIsNumber);
                         break;
                     case "l": // relative lineTo
-                        command.Numbers = new FastList<int>();
+                        command.Numbers = new FastList<float>();
                         do 
                         {
                             command.Numbers.Add(parser.GetNumber()); 
@@ -104,14 +104,14 @@ namespace AlphaTab.Rendering.Glyphs
                         break;
 
                     case "V": // absolute verticalTo
-                        command.Numbers = new FastList<int>();
+                        command.Numbers = new FastList<float>();
                         do 
                         {
                             command.Numbers.Add(parser.GetNumber());
                         } while (parser.CurrentTokenIsNumber);
                         break;
                     case "v": // relative verticalTo
-                        command.Numbers = new FastList<int>();
+                        command.Numbers = new FastList<float>();
                         do 
                         {
                             command.Numbers.Add(parser.GetNumber());
@@ -119,14 +119,14 @@ namespace AlphaTab.Rendering.Glyphs
                         break;
 
                     case "H": // absolute horizontalTo
-                        command.Numbers = new FastList<int>();
+                        command.Numbers = new FastList<float>();
                         do 
                         {
                             command.Numbers.Add(parser.GetNumber());
                         } while (parser.CurrentTokenIsNumber);
                         break;
                     case "h": // relative horizontalTo
-                        command.Numbers = new FastList<int>();
+                        command.Numbers = new FastList<float>();
                         do 
                         {
                             command.Numbers.Add(parser.GetNumber());
@@ -137,7 +137,7 @@ namespace AlphaTab.Rendering.Glyphs
                     // cubic bezier curves
                     // 
                     case "C": // absolute cubicTo
-                        command.Numbers = new FastList<int>();
+                        command.Numbers = new FastList<float>();
                         do 
                         {
                            command.Numbers.Add(parser.GetNumber());
@@ -149,7 +149,7 @@ namespace AlphaTab.Rendering.Glyphs
                         } while (parser.CurrentTokenIsNumber);
                         break;
                     case "c": // relative cubicTo
-                        command.Numbers = new FastList<int>();
+                        command.Numbers = new FastList<float>();
                         do {
                            command.Numbers.Add(parser.GetNumber());
                            command.Numbers.Add(parser.GetNumber());
@@ -161,7 +161,7 @@ namespace AlphaTab.Rendering.Glyphs
                         break;
 
                     case "S": // absolute shorthand cubicTo
-                        command.Numbers = new FastList<int>();
+                        command.Numbers = new FastList<float>();
                         do 
                         {
                             command.Numbers.Add(parser.GetNumber());
@@ -171,7 +171,7 @@ namespace AlphaTab.Rendering.Glyphs
                         } while (parser.CurrentTokenIsNumber);
                         break;
                     case "s": // relative shorthand cubicTo
-                        command.Numbers = new FastList<int>();
+                        command.Numbers = new FastList<float>();
                         do 
                         {
                             command.Numbers.Add(parser.GetNumber());
@@ -185,7 +185,7 @@ namespace AlphaTab.Rendering.Glyphs
                     // quadratic bezier curves
                     //
                     case "Q": // absolute quadraticTo
-                        command.Numbers = new FastList<int>();
+                        command.Numbers = new FastList<float>();
                         do 
                         {
                             command.Numbers.Add(parser.GetNumber());
@@ -195,7 +195,7 @@ namespace AlphaTab.Rendering.Glyphs
                         } while (parser.CurrentTokenIsNumber);
                         break;
                     case "q": // relative quadraticTo
-                        command.Numbers = new FastList<int>();
+                        command.Numbers = new FastList<float>();
                         do 
                         {
                             command.Numbers.Add(parser.GetNumber());
@@ -206,7 +206,7 @@ namespace AlphaTab.Rendering.Glyphs
                         break;
 
                     case "T": // absolute shorthand quadraticTo
-                        command.Numbers = new FastList<int>();
+                        command.Numbers = new FastList<float>();
                         do 
                         {
                             command.Numbers.Add(parser.GetNumber());
@@ -214,7 +214,7 @@ namespace AlphaTab.Rendering.Glyphs
                         } while (parser.CurrentTokenIsNumber);
                         break;
                     case "t": // relative shorthand quadraticTo
-                        command.Numbers = new FastList<int>();
+                        command.Numbers = new FastList<float>();
                         do 
                         {
                             command.Numbers.Add(parser.GetNumber());

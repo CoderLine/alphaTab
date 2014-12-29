@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System.Runtime.CompilerServices;
+
 using AlphaTab.Collections;
 
 namespace AlphaTab.Rendering.Staves
@@ -27,28 +27,28 @@ namespace AlphaTab.Rendering.Staves
     /// </summary>
     public class BarSizeInfo
     {
-        public int FullWidth { get; set; }
-        public FastDictionary<string, int> Sizes { get; set; }
+        public float FullWidth { get; set; }
+        public FastDictionary<string, float> Sizes { get; set; }
 
-        public FastDictionary<int, int> PreNoteSizes { get; set; }
-        public FastDictionary<int, int> OnNoteSizes { get; set; }
-        public FastDictionary<int, int> PostNoteSizes { get; set; }
+        public FastDictionary<int, float> PreNoteSizes { get; set; }
+        public FastDictionary<int, float> OnNoteSizes { get; set; }
+        public FastDictionary<int, float> PostNoteSizes { get; set; }
 
         public BarSizeInfo()
         {
-            Sizes = new FastDictionary<string, int>();
-            PreNoteSizes = new FastDictionary<int, int>();
-            OnNoteSizes = new FastDictionary<int, int>();
-            PostNoteSizes = new FastDictionary<int, int>();
+            Sizes = new FastDictionary<string, float>();
+            PreNoteSizes = new FastDictionary<int, float>();
+            OnNoteSizes = new FastDictionary<int, float>();
+            PostNoteSizes = new FastDictionary<int, float>();
             FullWidth = 0;
         }
 
-        public void SetSize(string key, int size)
+        public void SetSize(string key, float size)
         {
             Sizes[key] = size;
         }
 
-        public int GetSize(string key)
+        public float GetSize(string key)
         {
             if (Sizes.ContainsKey(key))
             {
@@ -57,7 +57,7 @@ namespace AlphaTab.Rendering.Staves
             return 0;
         }
 
-        public int GetPreNoteSize(int beat)
+        public float GetPreNoteSize(int beat)
         {
             if (PreNoteSizes.ContainsKey(beat))
             {
@@ -66,7 +66,7 @@ namespace AlphaTab.Rendering.Staves
             return 0;
         }
 
-        public int GetOnNoteSize(int beat)
+        public float GetOnNoteSize(int beat)
         {
             if (OnNoteSizes.ContainsKey(beat))
             {
@@ -75,7 +75,7 @@ namespace AlphaTab.Rendering.Staves
             return 0;
         }
 
-        public int GetPostNoteSize(int beat)
+        public float GetPostNoteSize(int beat)
         {
             if (PostNoteSizes.ContainsKey(beat))
             {
@@ -84,17 +84,17 @@ namespace AlphaTab.Rendering.Staves
             return 0;
         }
 
-        public void SetPreNoteSize(int beat, int size)
+        public void SetPreNoteSize(int beat, float size)
         {
             PreNoteSizes[beat] = size;
         }
 
-        public void SetOnNoteSize(int beat, int size)
+        public void SetOnNoteSize(int beat, float size)
         {
             OnNoteSizes[beat] = size;
         }
 
-        public void SetPostNoteSize(int beat, int size)
+        public void SetPostNoteSize(int beat, float size)
         {
             PostNoteSizes[beat] = size;
         }

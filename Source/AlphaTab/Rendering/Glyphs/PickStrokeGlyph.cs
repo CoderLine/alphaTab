@@ -21,14 +21,14 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class PickStrokeGlyph : MusicFontGlyph
     {
-        public PickStrokeGlyph(int x, int y, PickStrokeType pickStroke)
+        public PickStrokeGlyph(float x, float y, PickStrokeType pickStroke)
             : base(x, y, 1, GetSymbol(pickStroke))
         {
         }
 
         public override void DoLayout()
         {
-            Width = (int)(9 * Scale);
+            Width = 9 * Scale;
         }
 
         public override bool CanScale

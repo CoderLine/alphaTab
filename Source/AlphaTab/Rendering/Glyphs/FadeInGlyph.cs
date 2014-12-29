@@ -21,14 +21,14 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class FadeInGlyph : EffectGlyph
     {
-        public FadeInGlyph(int x , int y)
+        public FadeInGlyph(float x, float y)
             : base(x, y)
         {
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            var size = (int)(6 * Scale);
+            var size = 6 * Scale;
 
             canvas.BeginPath();
             canvas.MoveTo(cx + X, cy + Y);

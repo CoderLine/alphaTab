@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System.Runtime.CompilerServices;
+
 using System.Xml;
 using AlphaTab.Collections;
 using AlphaTab.Model;

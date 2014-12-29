@@ -24,22 +24,22 @@ namespace AlphaTab.Rendering.Glyphs
     {
         private readonly float _scale;
 
-        public VibratoGlyph(int x, int y, float scale = 0.9f)
+        public VibratoGlyph(float x, float y, float scale = 0.9f)
             : base(x, y)
         {
             _scale = scale;
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            float step = 11 * Scale * _scale;
-            int loops = (int)Math.Max(1, (Width / step));
+            var step = 11 * Scale * _scale;
+            var loops = Math.Max(1, (Width / step));
 
-            var loopX = 0;
+            var loopX = 0f;
             for (var i = 0; i < loops; i++)
             {
                 canvas.FillMusicFontSymbol(cx + X + loopX, cy +Y, _scale, MusicFontSymbol.WaveHorizontal);
-                loopX += (int)step;
+                loopX += step;
             }
         }
     }

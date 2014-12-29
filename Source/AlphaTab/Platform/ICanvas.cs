@@ -26,8 +26,8 @@ namespace AlphaTab.Platform
     /// </summary>
     public interface ICanvas : IPathCanvas
     {
-        int Width { get; set; }
-        int Height { get; set; }
+        float Width { get; set; }
+        float Height { get; set; }
 
         RenderingResources Resources { get; set; }
 

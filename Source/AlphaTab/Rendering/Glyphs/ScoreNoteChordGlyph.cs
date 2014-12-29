@@ -16,7 +16,6 @@
  * License along with this library.
  */
 using System;
-using System.Runtime.CompilerServices;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
@@ -46,8 +45,8 @@ namespace AlphaTab.Rendering.Glyphs
         public ScoreNoteGlyphInfo MaxNote { get; set; }
 
         public Action SpacingChanged { get; set; }
-        public int UpLineX { get; set; }
-        public int DownLineX { get; set; }
+        public float UpLineX { get; set; }
+        public float DownLineX { get; set; }
 
         public FastDictionary<string, Glyph> BeatEffects { get; set; }
 
@@ -70,7 +69,7 @@ namespace AlphaTab.Rendering.Glyphs
             }
         }
 
-        public int GetNoteX(Note note, bool onEnd = true)
+        public float GetNoteX(Note note, bool onEnd = true)
         {
             if (_noteLookup.ContainsKey(note.String))
             {
@@ -85,7 +84,7 @@ namespace AlphaTab.Rendering.Glyphs
             return 0;
         }
 
-        public int GetNoteY(Note note)
+        public float GetNoteY(Note note)
         {
             if (_noteLookup.ContainsKey(note.String))
             {
@@ -114,7 +113,7 @@ namespace AlphaTab.Rendering.Glyphs
             get { return false; }
         }
 
-        public void UpdateBeamingHelper(int cx)
+        public void UpdateBeamingHelper(float cx)
         {
             BeamingHelper.RegisterBeatLineX(Beat, cx + X + UpLineX, cx + X + DownLineX);
         }
@@ -141,13 +140,13 @@ namespace AlphaTab.Rendering.Glyphs
 
             const int padding = 0; // Std.int(4 * getScale());
 
-            var displacedX = 0;
+            var displacedX = 0f;
 
             var lastDisplaced = false;
             var lastLine = 0;
             var anyDisplaced = false;
 
-            var w = 0;
+            var w = 0f;
             for (int i = 0, j = _infos.Count; i < j; i++)
             {
                 var g = _infos[i].Glyph;
@@ -168,7 +167,7 @@ namespace AlphaTab.Rendering.Glyphs
                         // reposition if needed
                         if (!lastDisplaced)
                         {
-                            g.X = (int)(displacedX - (Scale));
+                            g.X = displacedX - (Scale);
                             anyDisplaced = true;
                             lastDisplaced = true; // let next iteration know we are displace now
                         }
@@ -233,7 +232,7 @@ namespace AlphaTab.Rendering.Glyphs
                     offset = direction == BeamDirection.Up ? -15 : 15;
                 }
 
-                _tremoloPicking = new TremoloPickingGlyph(tremoloX, baseNote.Glyph.Y + (int)(offset * Scale), Beat.TremoloSpeed.Value);
+                _tremoloPicking = new TremoloPickingGlyph(tremoloX, baseNote.Glyph.Y + offset * Scale, Beat.TremoloSpeed.Value);
                 _tremoloPicking.Renderer = Renderer;
                 _tremoloPicking.DoLayout();
             }
@@ -241,7 +240,7 @@ namespace AlphaTab.Rendering.Glyphs
             Width = w + padding;
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
             var scoreRenderer = (ScoreBarRenderer)Renderer;
 
@@ -249,12 +248,12 @@ namespace AlphaTab.Rendering.Glyphs
             // Note Effects only painted once
             //
             var effectY = BeamingHelper.Direction == BeamDirection.Up
-                            ? scoreRenderer.GetScoreY(MaxNote.Line, (int)(1.5f * NoteHeadGlyph.NoteHeadHeight))
-                            : scoreRenderer.GetScoreY(MinNote.Line, (int)(-1.0f * NoteHeadGlyph.NoteHeadHeight));
+                            ? scoreRenderer.GetScoreY(MaxNote.Line, 1.5f * NoteHeadGlyph.NoteHeadHeight)
+                            : scoreRenderer.GetScoreY(MinNote.Line, -1.0f * NoteHeadGlyph.NoteHeadHeight);
             // TODO: take care of actual glyph height
             var effectSpacing = (BeamingHelper.Direction == BeamDirection.Up)
-                            ? (int)(7 * Scale)
-                            : (int)(-7 * Scale);
+                            ? 7 * Scale
+                            : -7 * Scale;
 
             Std.Foreach(BeatEffects.Values, g =>
             {
@@ -268,7 +267,7 @@ namespace AlphaTab.Rendering.Glyphs
 
             // TODO: Take care of beateffects in overflow
 
-            var linePadding = (int)(3 * Scale);
+            var linePadding = 3 * Scale;
             if (HasTopOverflow)
             {
                 var l = -1;

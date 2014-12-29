@@ -29,8 +29,8 @@ namespace AlphaTab.Rendering.Glyphs
     {
         protected FastList<Glyph> Glyphs;
 
-        public GlyphGroup(int x, int y)
-            :base(x,y)
+        public GlyphGroup(float x, float y)
+            : base(x, y)
         {
         }
 
@@ -42,7 +42,7 @@ namespace AlphaTab.Rendering.Glyphs
                 return;
             }
 
-            var w = 0;
+            var w = 0f;
             for (int i = 0, j = Glyphs.Count; i < j; i++)
             {
                 var g = Glyphs[i];
@@ -59,7 +59,7 @@ namespace AlphaTab.Rendering.Glyphs
             Glyphs.Add(g);
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
             if (Glyphs == null || Glyphs.Count == 0) return;
             for (int i = 0, j = Glyphs.Count; i < j; i++)

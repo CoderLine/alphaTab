@@ -29,14 +29,14 @@ namespace AlphaTab.Rendering.Effects
         }
 
         public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.GroupedOnBeatToPostBeat; } }
-        public int GetHeight(EffectBarRenderer renderer)
+        public float GetHeight(EffectBarRenderer renderer)
         {
-            return (int)(17 * renderer.Scale);
+            return 17 * renderer.Scale;
         }
 
         public EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
         {
-            return new VibratoGlyph(0, (int)(5 * renderer.Scale), 1.15f);
+            return new VibratoGlyph(0, 5 * renderer.Scale, 1.15f);
         }
 
         public bool CanExpand(EffectBarRenderer renderer, Beat @from, Beat to)

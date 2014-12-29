@@ -26,13 +26,13 @@ namespace AlphaTab.Rendering.Glyphs
 
         private readonly DynamicValue _dynamics;
 
-        public DynamicsGlyph(int x, int y, DynamicValue dynamics)
+        public DynamicsGlyph(float x, float y, DynamicValue dynamics)
             : base(x, y)
         {
             _dynamics = dynamics;
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
             Glyph[] glyphs;
 
@@ -66,7 +66,7 @@ namespace AlphaTab.Rendering.Glyphs
                     return;
             }
 
-            var glyphWidth = 0;
+            var glyphWidth = 0f;
             foreach (var g in glyphs)
             {
                 glyphWidth += g.Width;
@@ -90,7 +90,7 @@ namespace AlphaTab.Rendering.Glyphs
             get
             {
                 var p = new MusicFontGlyph(0, 0, GlyphScale, MusicFontSymbol.DynamicP);
-                p.Width = (int)(7 * Scale);
+                p.Width = 7 * Scale;
                 return p;
             }
         }
@@ -100,7 +100,7 @@ namespace AlphaTab.Rendering.Glyphs
             get
             {
                 var m = new MusicFontGlyph(0, 0, GlyphScale, MusicFontSymbol.DynamicM);
-                m.Width = (int)(7 * Scale);
+                m.Width = 7 * Scale;
                 return m;
             }
         }
@@ -110,7 +110,7 @@ namespace AlphaTab.Rendering.Glyphs
             get
             {
                 var f = new MusicFontGlyph(0, 0, GlyphScale, MusicFontSymbol.DynamicF);
-                f.Width = (int)(7 * Scale);
+                f.Width = 7 * Scale;
                 return f;
             }
         }

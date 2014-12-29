@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System.Runtime.CompilerServices;
+
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
@@ -30,13 +30,13 @@ namespace AlphaTab.Rendering.Glyphs
         private readonly FastDictionary<int, NoteNumberGlyph> _noteLookup;
         private Note _minNote;
         private readonly bool _isGrace;
-        private int _centerX;
+        private float _centerX;
 
         public Beat Beat { get; set; }
         public BeamingHelper BeamingHelper { get; set; }
         public FastDictionary<string, Glyph> BeatEffects { get; set; }
 
-        public TabNoteChordGlyph(int x, int y, bool isGrace)
+        public TabNoteChordGlyph(float x, float y, bool isGrace)
             : base(x, y)
         {
             _isGrace = isGrace;
@@ -45,12 +45,12 @@ namespace AlphaTab.Rendering.Glyphs
             _noteLookup = new FastDictionary<int, NoteNumberGlyph>();
         }
 
-        public int GetNoteX(Note note, bool onEnd = true)
+        public float GetNoteX(Note note, bool onEnd = true)
         {
             if (_noteLookup.ContainsKey(note.String))
             {
                 var n = _noteLookup[note.String];
-                var pos = X + n.X + (int)(NoteNumberGlyph.Padding * Scale);
+                var pos = X + n.X;
                 if (onEnd)
                 {
                     n.CalculateWidth();
@@ -61,7 +61,7 @@ namespace AlphaTab.Rendering.Glyphs
             return 0;
         }
 
-        public int GetNoteY(Note note)
+        public float GetNoteY(Note note)
         {
             if (_noteLookup.ContainsKey(note.String))
             {
@@ -72,7 +72,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
-            var w = 0;
+            var w = 0f;
             for (int i = 0, j = _notes.Count; i < j; i++)
             {
                 var g = _notes[i];
@@ -85,9 +85,9 @@ namespace AlphaTab.Rendering.Glyphs
             }
 
             var tabHeight = Renderer.Resources.TablatureFont.Size;
-            var effectY = (int)(GetNoteY(_minNote) + tabHeight / 2);
+            var effectY = GetNoteY(_minNote) + tabHeight / 2;
             // TODO: take care of actual glyph height
-            var effectSpacing = (int)(7 * Scale);
+            var effectSpacing = 7 * Scale;
             Std.Foreach(BeatEffects.Values, g =>
             {
                 g.Y = effectY;
@@ -109,7 +109,7 @@ namespace AlphaTab.Rendering.Glyphs
             if (_minNote == null || note.String < _minNote.String) _minNote = note;
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
             var res = Renderer.Resources;
             var old = canvas.TextBaseline;
@@ -126,7 +126,7 @@ namespace AlphaTab.Rendering.Glyphs
             Std.Foreach(BeatEffects.Values, g => g.Paint(cx + X, cy + Y, canvas));
         }
 
-        public void UpdateBeamingHelper(int cx)
+        public void UpdateBeamingHelper(float cx)
         {
             if (!BeamingHelper.HasBeatLineX(Beat))
             {

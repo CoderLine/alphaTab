@@ -23,7 +23,7 @@ namespace AlphaTab.Rendering.Glyphs
     {
         private readonly bool _isLast;
 
-        public BarSeperatorGlyph(int x, int y, bool isLast = false)
+        public BarSeperatorGlyph(float x, float y, bool isLast = false)
             : base(x, y)
         {
             _isLast = isLast;
@@ -31,7 +31,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
-            Width = (int)((_isLast ? 8 : 1) * Scale);
+            Width = (_isLast ? 8 : 1) * Scale;
         }
 
         public override bool CanScale
@@ -39,15 +39,13 @@ namespace AlphaTab.Rendering.Glyphs
             get { return false; }
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            var res = Renderer.Resources;
-
             var blockWidth = 4 * Scale;
 
             var top = cy + Y + Renderer.TopPadding;
             var bottom = cy + Y + Renderer.Height - Renderer.BottomPadding;
-            float left = cx + X;
+            var left = cx + X;
             var h = bottom - top;
 
             // line

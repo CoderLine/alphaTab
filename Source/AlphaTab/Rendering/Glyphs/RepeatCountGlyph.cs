@@ -23,7 +23,8 @@ namespace AlphaTab.Rendering.Glyphs
     {
         private readonly int _count;
 
-        public RepeatCountGlyph(int x, int y, int count) : base(x, y)
+        public RepeatCountGlyph(float x, float y, int count)
+            : base(x, y)
         {
             _count = count;
         }
@@ -38,13 +39,13 @@ namespace AlphaTab.Rendering.Glyphs
             get { return false; }
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
             var res = Renderer.Resources;
             canvas.Font = res.BarNumberFont;
 
             var s = "x" + _count;
-            var w = (int) (canvas.MeasureText(s)/1.5);
+            var w = canvas.MeasureText(s)/1.5f;
             canvas.FillText(s, cx + X - w, cy + Y);
         }
     }

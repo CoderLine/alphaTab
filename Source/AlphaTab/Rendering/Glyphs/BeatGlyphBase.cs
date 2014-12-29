@@ -16,7 +16,6 @@
  * License along with this library.
  */
 using System;
-using System.Runtime.CompilerServices;
 using AlphaTab.Model;
 using AlphaTab.Rendering.Layout;
 
@@ -34,7 +33,7 @@ namespace AlphaTab.Rendering.Glyphs
         public override void DoLayout()
         {
             // left to right layout
-            var w = 0;
+            var w = 0f;
             if (Glyphs != null)
             {
                 for (int i = 0, j = Glyphs.Count; i < j; i++)
@@ -57,7 +56,7 @@ namespace AlphaTab.Rendering.Glyphs
             }
         }
 
-        protected int BeatDurationWidth
+        protected float BeatDurationWidth
         {
             get
             {

@@ -24,13 +24,14 @@ namespace AlphaTab.Rendering.Glyphs
         private readonly float _scale;
         private readonly MusicFontSymbol _symbol;
 
-        public MusicFontGlyph(int x, int y, float scale, MusicFontSymbol symbol) : base(x, y)
+        public MusicFontGlyph(float x, float y, float scale, MusicFontSymbol symbol)
+            : base(x, y)
         {
             _scale = scale;
             _symbol = symbol;
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
             canvas.FillMusicFontSymbol(cx + X, cy + Y, _scale*Scale, _symbol);
         }

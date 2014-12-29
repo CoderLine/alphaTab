@@ -16,7 +16,6 @@
  * License along with this library.
  */
 using System;
-using System.Runtime.CompilerServices;
 using AlphaTab.Collections;
 using AlphaTab.IO;
 using AlphaTab.Platform;

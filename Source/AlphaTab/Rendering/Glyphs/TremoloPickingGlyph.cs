@@ -21,14 +21,14 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class TremoloPickingGlyph : MusicFontGlyph
     {
-        public TremoloPickingGlyph(int x, int y, Duration duration)
+        public TremoloPickingGlyph(float x, float y, Duration duration)
             : base(x, y, 1, GetSymbol(duration))
         {
         }
 
         public override void DoLayout()
         {
-            Width = (int)(12 * Scale);
+            Width = 12 * Scale;
         }
 
         public override bool CanScale

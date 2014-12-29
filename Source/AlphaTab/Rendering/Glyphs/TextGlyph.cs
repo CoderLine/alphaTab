@@ -25,14 +25,14 @@ namespace AlphaTab.Rendering.Glyphs
         private readonly string _text;
         private readonly Font _font;
 
-        public TextGlyph(int x, int y, string text, Font font)
+        public TextGlyph(float x, float y, string text, Font font)
             : base(x, y)
         {
             _text = text;
             _font = font;
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
             canvas.Font = _font;
             var old = canvas.TextAlign;

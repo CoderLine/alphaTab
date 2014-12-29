@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System.Runtime.CompilerServices;
+
 using AlphaTab.Collections;
 using AlphaTab.Platform;
 using AlphaTab.Rendering.Layout;
@@ -34,25 +34,25 @@ namespace AlphaTab.Rendering.Glyphs
         public FastList<BeatContainerGlyph> BeatGlyphs { get; set; }
         public int VoiceIndex { get; set; }
 
-        public VoiceContainerGlyph(int x, int y, int voiceIndex)
+        public VoiceContainerGlyph(float x, float y, int voiceIndex)
             : base(x, y)
         {
             BeatGlyphs = new FastList<BeatContainerGlyph>();
             VoiceIndex = voiceIndex;
         }
 
-        public override void ApplyGlyphSpacing(int spacing)
+        public override void ApplyGlyphSpacing(float spacing)
         {
             var glyphSpacing = spacing / BeatGlyphs.Count;
-            var gx = 0.0;
+            var gx = 0.0f;
             for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
             {
                 var g = BeatGlyphs[i];
-                g.X = (int)(gx);
+                g.X = gx;
                 gx += g.Width + glyphSpacing;
                 g.ApplyGlyphSpacing(glyphSpacing);
             }
-            Width = (int)(gx);
+            Width = gx;
         }
 
         public void RegisterMaxSizes(BarSizeInfo sizes)
@@ -104,7 +104,7 @@ namespace AlphaTab.Rendering.Glyphs
         }
 
         //private static Random Random = new Random();
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
             //canvas.Color = new Color((byte) Random.Next(255), (byte) Random.Next(255), (byte) Random.Next(255), 128);
             //canvas.FillRect(cx + X, cy + Y, Width, 100);

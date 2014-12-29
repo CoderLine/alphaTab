@@ -48,13 +48,13 @@ namespace AlphaTab.Platform.JavaScript
             _context.textBaseline = "top";
         }
 
-        public int Width
+        public float Width
         {
             get { return _canvas.width; }
             set
             {
                 var lineWidth = _context.lineWidth;
-                _canvas.width = value;
+                _canvas.width = (int) value;
                 _canvas.style.width = value + "px";
                 _context = (CanvasRenderingContext2D)_canvas.getContext("2d");
                 _context.textBaseline = "top";
@@ -62,13 +62,13 @@ namespace AlphaTab.Platform.JavaScript
             }
         }
 
-        public int Height
+        public float Height
         {
             get { return _canvas.height; }
             set
             {
                 var lineWidth = _context.lineWidth;
-                _canvas.height = value;
+                _canvas.height = (int) value;
                 _canvas.style.height = value + "px";
                 _context = (CanvasRenderingContext2D)_canvas.getContext("2d");
                 _context.textBaseline = "top";

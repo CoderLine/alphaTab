@@ -16,7 +16,6 @@
  * License along with this library.
  */
 using System;
-using AlphaTab.IO;
 using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Platform.Svg
@@ -63,14 +62,14 @@ namespace AlphaTab.Platform.Svg
                 dataSize = 11;
             }
 
-            var stringSize = 0;
+            var stringSize = 0f;
 
             for (int i = 0; i < s.Length; i++)
             {
                 var code = Math.Min(data.Length - 1, s[i] - ControlChars);
                 if (code >= 0)
                 {
-                    stringSize += (int)((data[code] * size) / dataSize);
+                    stringSize += ((data[code] * size) / dataSize);
                 }
             }
 

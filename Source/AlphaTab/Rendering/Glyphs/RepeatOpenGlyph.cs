@@ -21,10 +21,10 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class RepeatOpenGlyph : Glyph
     {
-        private readonly int _dotOffset;
+        private readonly float _dotOffset;
         private readonly float _circleSize;
 
-        public RepeatOpenGlyph(int x, int y, float circleSize, int dotOffset)
+        public RepeatOpenGlyph(float x, float y, float circleSize, float dotOffset)
             : base(x, y)
         {
             _dotOffset = dotOffset;
@@ -33,7 +33,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
-            Width = (int)(13 * Scale);
+            Width = 13 * Scale;
         }
 
         public override bool CanScale
@@ -41,15 +41,13 @@ namespace AlphaTab.Rendering.Glyphs
             get { return false; }
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            var res = Renderer.Resources;
-
             var blockWidth = 4 * Scale;
 
             var top = cy + Y + Renderer.TopPadding;
             var bottom = cy + Y + Renderer.Height - Renderer.BottomPadding;
-            float left = cx + X + 0.5f;
+            var left = cx + X + 0.5f;
             // big bar
             var h = bottom - top;
             canvas.FillRect(left, top, blockWidth, h);

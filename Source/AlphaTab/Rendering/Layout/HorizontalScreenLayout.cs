@@ -28,8 +28,8 @@ namespace AlphaTab.Rendering.Layout
     public class HorizontalScreenLayout : ScoreLayout
     {
         // left top right bottom
-        public static readonly int[] PagePadding = { 20, 20, 20, 20 };
-        public const int GroupSpacing = 20;
+        public static readonly float[] PagePadding = { 20, 20, 20, 20 };
+        public const float GroupSpacing = 20;
 
         private StaveGroup _group;
 
@@ -69,7 +69,7 @@ namespace AlphaTab.Rendering.Layout
         
             _group.FinalizeGroup(this);
         
-            y += _group.Height + (int)(GroupSpacing * Scale);
+            y += _group.Height + (GroupSpacing * Scale);
             Height = y + PagePadding[3];
             Width = _group.X + _group.Width + PagePadding[2];
         }

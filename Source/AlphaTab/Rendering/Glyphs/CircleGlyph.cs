@@ -23,7 +23,7 @@ namespace AlphaTab.Rendering.Glyphs
     {
         private readonly float _size;
 
-        public CircleGlyph(int x, int y, float size)
+        public CircleGlyph(float x, float y, float size)
             : base(x, y)
         {
             _size = size;
@@ -31,7 +31,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
-            Width = (int)(_size + (3 * Scale));
+            Width = _size + (3 * Scale);
         }
 
         public override bool CanScale
@@ -39,7 +39,7 @@ namespace AlphaTab.Rendering.Glyphs
             get { return false; }
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
             canvas.FillCircle(cx + X, cy + Y, _size);
         }

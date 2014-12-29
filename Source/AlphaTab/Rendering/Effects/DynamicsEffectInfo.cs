@@ -30,9 +30,9 @@ namespace AlphaTab.Rendering.Effects
         }
 
         public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeatOnly; } }
-        public int GetHeight(EffectBarRenderer renderer)
+        public float GetHeight(EffectBarRenderer renderer)
         {
-            return (int)(15 * renderer.Scale);
+            return 15 * renderer.Scale;
         }
 
         public EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)

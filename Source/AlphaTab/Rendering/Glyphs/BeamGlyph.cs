@@ -22,12 +22,11 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class BeamGlyph : MusicFontGlyph
     {
-        public BeamGlyph(int x, int y, Duration duration, BeamDirection direction, bool isGrace)
+        public BeamGlyph(float x, float y, Duration duration, BeamDirection direction, bool isGrace)
             : base(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, GetSymbol(duration, direction, isGrace))
         {
         }
-
-
+        
         public override void DoLayout()
         {
             Width = 0;

@@ -33,14 +33,14 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
-            Width = (int)(10 * Scale);
+            Width = 10 * Scale;
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            TabBarRenderer tabBarRenderer = (TabBarRenderer)Renderer;
+            var tabBarRenderer = (TabBarRenderer)Renderer;
             var res = Renderer.Resources;
-            var startY = cy + X + (int)(tabBarRenderer.GetNoteY(_beat.MaxNote) - res.TablatureFont.Size / 2);
+            var startY = cy + X + (tabBarRenderer.GetNoteY(_beat.MaxNote) - res.TablatureFont.Size / 2);
             var endY = cy + Y + tabBarRenderer.GetNoteY(_beat.MinNote) + res.TablatureFont.Size / 2;
             var arrowX = cx + X + Width / 2;
             var arrowSize = 8 * Scale;
@@ -56,11 +56,11 @@ namespace AlphaTab.Rendering.Glyphs
                 }
                 else
                 {
-                    var size = (int)(15 * Scale);
-                    var steps = (int)(Math.Abs(endY - startY) / size);
+                    var size = 15 * Scale;
+                    var steps = Math.Abs(endY - startY) / size;
                     for (var i = 0; i < steps; i++)
                     {
-                        canvas.FillMusicFontSymbol(cx + X + ((int)(3 * Scale)), 1, startY + (i * size), MusicFontSymbol.WaveVertical);
+                        canvas.FillMusicFontSymbol(cx + X + (3 * Scale), 1, startY + (i * size), MusicFontSymbol.WaveVertical);
                     }
                 }
 

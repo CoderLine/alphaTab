@@ -16,7 +16,6 @@
  * License along with this library.
  */
 using System;
-using System.Runtime.CompilerServices;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Platform.Model;
@@ -128,7 +127,7 @@ namespace AlphaTab.Rendering
         private void DoLayout()
         {
             Layout.DoLayout();
-            Canvas.Height = (int)(Layout.Height + (RenderingResources.CopyrightFont.Size * 2));
+            Canvas.Height = Layout.Height + (RenderingResources.CopyrightFont.Size * 2);
             Canvas.Width = Layout.Width;
         }
 

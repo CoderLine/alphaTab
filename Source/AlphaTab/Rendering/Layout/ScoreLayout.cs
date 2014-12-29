@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System.Runtime.CompilerServices;
+
 using AlphaTab.Collections;
 using AlphaTab.Rendering.Staves;
 using AlphaTab.Rendering.Utils;
@@ -31,8 +31,8 @@ namespace AlphaTab.Rendering.Layout
 
         public ScoreRenderer Renderer { get; set; }
 
-        public int Width { get; set; }
-        public int Height { get; set; }
+        public float Width { get; set; }
+        public float Height { get; set; }
 
         protected ScoreLayout(ScoreRenderer renderer)
         {
@@ -58,10 +58,10 @@ namespace AlphaTab.Rendering.Layout
             group.Layout = this;
 
             var isFirstTrack = true;
-            for (int i = 0; i < Renderer.Tracks.Length; i++)
+            for (var i = 0; i < Renderer.Tracks.Length; i++)
             {
                 var track = Renderer.Tracks[i];
-                for (int j = 0; j < Renderer.Settings.Staves.Count; j++)
+                for (var j = 0; j < Renderer.Settings.Staves.Count; j++)
                 {
                     var s = Renderer.Settings.Staves[j];
                     if (Environment.StaveFactories.ContainsKey(s.Id))

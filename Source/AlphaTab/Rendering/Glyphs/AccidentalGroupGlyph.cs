@@ -42,10 +42,10 @@ namespace AlphaTab.Rendering.Glyphs
             Glyphs.Sort((a, b) => a.Y.CompareTo(b.Y));
 
             // defines the reserved y position of the columns
-            var columns = new FastList<int>();
+            var columns = new FastList<float>();
             columns.Add(NonReserved);
 
-            var accidentalSize = (int)(21 * Scale);
+            var accidentalSize = 21 * Scale;
             for (int i = 0, j = Glyphs.Count; i < j; i++)
             {
                 var g = Glyphs[i];
@@ -76,7 +76,7 @@ namespace AlphaTab.Rendering.Glyphs
             //
             // Place accidentals in columns
             //
-            var columnWidth = (int)(8 * Scale);
+            var columnWidth = 8 * Scale;
             if (Glyphs.Count == 0)
             {
                 Width = 0;

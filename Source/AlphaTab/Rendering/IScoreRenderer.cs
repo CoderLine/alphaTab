@@ -17,7 +17,6 @@
  */
 
 using System;
-using System.Runtime.CompilerServices;
 using AlphaTab.Model;
 
 namespace AlphaTab.Rendering
@@ -32,8 +31,8 @@ namespace AlphaTab.Rendering
 
     public class RenderFinishedEventArgs
     {
-        public int Width { get; set; }
-        public int Height { get; set; }
+        public float Width { get; set; }
+        public float Height { get; set; }
         public object RenderResult { get; set; }
     }
 }

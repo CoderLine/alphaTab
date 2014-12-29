@@ -53,7 +53,7 @@ namespace AlphaTab.Rendering
         /// </summary>
         /// <param name="renderer">the renderer</param>
         /// <returns>the height needed by this effect</returns>
-        int GetHeight(EffectBarRenderer renderer);
+        float GetHeight(EffectBarRenderer renderer);
 
         /// <summary>
         /// Creates a new effect glyph for the given beat. 

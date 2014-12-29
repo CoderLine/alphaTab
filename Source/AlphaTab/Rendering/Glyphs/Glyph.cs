@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System.Runtime.CompilerServices;
+
 using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
@@ -27,18 +27,18 @@ namespace AlphaTab.Rendering.Glyphs
     public class Glyph
     {
         public int Index { get; set; }
-        public int X { get; set; }
-        public int Y { get; set; }
-        public int Width { get; set; }
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float Width { get; set; }
         public BarRendererBase Renderer { get; set; }
 
-        public Glyph(int x, int y)
+        public Glyph(float x, float y)
         {
             X = x;
             Y = y;
         }
 
-        public virtual void ApplyGlyphSpacing(int spacing)
+        public virtual void ApplyGlyphSpacing(float spacing)
         {
             if (CanScale)
             {
@@ -67,7 +67,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         }
 
-        public virtual void Paint(int cx, int cy, ICanvas canvas)
+        public virtual void Paint(float cx, float cy, ICanvas canvas)
         {
         }
     }

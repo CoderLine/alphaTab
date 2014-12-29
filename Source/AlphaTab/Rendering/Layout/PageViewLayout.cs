@@ -30,9 +30,9 @@ namespace AlphaTab.Rendering.Layout
     public class PageViewLayout : ScoreLayout
     {
         // left top right bottom
-        public static readonly int[] PagePadding = { 40, 40, 40, 40 };
-        public const int WidthOn100 = 950;
-        public const int GroupSpacing = 20;
+        public static readonly float[] PagePadding = { 40, 40, 40, 40 };
+        public const float WidthOn100 = 950;
+        public const float GroupSpacing = 20;
 
         private FastList<StaveGroup> _groups;
 
@@ -67,7 +67,7 @@ namespace AlphaTab.Rendering.Layout
             var autoSize = Renderer.Settings.Layout.Get("autoSize", true);
             if (autoSize || Renderer.Settings.Width <= 0)
             {
-                Width = (int)(WidthOn100 * Scale);
+                Width = WidthOn100 * Scale;
             }
             else
             {
@@ -87,7 +87,7 @@ namespace AlphaTab.Rendering.Layout
                     FitGroup(group);
                     group.FinalizeGroup(this);
 
-                    y += group.Height + (int)(GroupSpacing * Scale);
+                    y += group.Height + (GroupSpacing * Scale);
 
                     currentBarIndex = group.LastBarIndex + 1;
                 }
@@ -96,7 +96,7 @@ namespace AlphaTab.Rendering.Layout
             Height = y + PagePadding[3];
         }
 
-        private int DoScoreInfoLayout(int y)
+        private float DoScoreInfoLayout(float y)
         {
             // TODO: Check if it's a good choice to provide the complete flags as setting
             HeaderFooterElements flags = Renderer.Settings.Layout.Get("hideInfo", false) ? HeaderFooterElements.None : HeaderFooterElements.All;
@@ -105,37 +105,37 @@ namespace AlphaTab.Rendering.Layout
 
             if (!string.IsNullOrEmpty(score.Title) && (flags & HeaderFooterElements.Title) != 0)
             {
-                y += (int)(35 * scale);
+                y += (35 * scale);
             }
             if (!string.IsNullOrEmpty(score.SubTitle) && (flags & HeaderFooterElements.SubTitle) != 0)
             {
-                y += (int)(20 * scale);
+                y += (20 * scale);
             }
             if (!string.IsNullOrEmpty(score.Artist) && (flags & HeaderFooterElements.Artist) != 0)
             {
-                y += (int)(20 * scale);
+                y += (20 * scale);
             }
             if (!string.IsNullOrEmpty(score.Album) && (flags & HeaderFooterElements.Album) != 0)
             {
-                y += (int)(20 * scale);
+                y += (20 * scale);
             }
             if (!string.IsNullOrEmpty(score.Music) && score.Music == score.Words && (flags & HeaderFooterElements.WordsAndMusic) != 0)
             {
-                y += (int)(20 * scale);
+                y += (20 * scale);
             }
             else
             {
                 if (!string.IsNullOrEmpty(score.Music) && (flags & HeaderFooterElements.Music) != 0)
                 {
-                    y += (int)(20 * scale);
+                    y += (20 * scale);
                 }
                 if (!string.IsNullOrEmpty(score.Words) && (flags & HeaderFooterElements.Words) != 0)
                 {
-                    y += (int)(20 * scale);
+                    y += (20 * scale);
                 }
             }
 
-            y += (int)(20 * scale);
+            y += (20 * scale);
 
             // tuning info
             if (Renderer.Tracks.Length == 1 && !Renderer.Tracks[0].IsPercussion)
@@ -144,20 +144,20 @@ namespace AlphaTab.Rendering.Layout
                 if (tuning != null)
                 {
                     // Name
-                    y += (int)(15 * scale);
+                    y += (15 * scale);
 
                     if (!tuning.IsStandard)
                     {
                         // Strings
-                        var stringsPerColumn = Math.Ceiling(Renderer.Tracks[0].Tuning.Count / 2.0);
-                        y += (int)(stringsPerColumn * (int)(15 * scale));
+                        var stringsPerColumn = (int)Math.Ceiling(Renderer.Tracks[0].Tuning.Count / 2.0);
+                        y += (stringsPerColumn * (15 * scale));
                     }
 
-                    y += (int)(15 * scale);
+                    y += (15 * scale);
                 }
             }
 
-            y += (int)(40 * scale);
+            y += (40 * scale);
 
             return y;
         }
@@ -177,13 +177,13 @@ namespace AlphaTab.Rendering.Layout
             }
         }
 
-        private void DrawCentered(string text, Font font, int y)
+        private void DrawCentered(string text, Font font, float y)
         {
             Renderer.Canvas.Font = font;
             Renderer.Canvas.FillText(text, Width / 2.0f, y);
         }
 
-        private int PaintScoreInfo(int x, int y)
+        private float PaintScoreInfo(float x, float y)
         {
             HeaderFooterElements flags = Renderer.Settings.Layout.Get("hideInfo", false) ? HeaderFooterElements.None : HeaderFooterElements.All;
             var score = Renderer.Score;
@@ -199,27 +199,27 @@ namespace AlphaTab.Rendering.Layout
             if (!string.IsNullOrEmpty(score.Title) && (flags & HeaderFooterElements.Title) != 0)
             {
                 DrawCentered(score.Title, res.TitleFont, y);
-                y += (int)(35 * scale);
+                y += (35 * scale);
             }
             if (!string.IsNullOrEmpty(score.SubTitle) && (flags & HeaderFooterElements.SubTitle) != 0)
             {
                 DrawCentered(score.SubTitle, res.SubTitleFont, y);
-                y += (int)(20 * scale);
+                y += (20 * scale);
             }
             if (!string.IsNullOrEmpty(score.Artist) && (flags & HeaderFooterElements.Artist) != 0)
             {
                 DrawCentered(score.Artist, res.SubTitleFont, y);
-                y += (int)(20 * scale);
+                y += (20 * scale);
             }
             if (!string.IsNullOrEmpty(score.Album) && (flags & HeaderFooterElements.Album) != 0)
             {
                 DrawCentered(score.Album, res.SubTitleFont, y);
-                y += (int)(20 * scale);
+                y += (20 * scale);
             }
             if (!string.IsNullOrEmpty(score.Music) && score.Music == score.Words && (flags & HeaderFooterElements.WordsAndMusic) != 0)
             {
                 DrawCentered("Music and Words by " + score.Words, res.WordsFont, y);
-                y += (int)(20 * scale);
+                y += (20 * scale);
             }
             else
             {
@@ -234,10 +234,10 @@ namespace AlphaTab.Rendering.Layout
                     canvas.TextAlign = TextAlign.Left;
                     canvas.FillText("Words by " + score.Music, x, y);
                 }
-                y += (int)(20 * scale);
+                y += (20 * scale);
             }
 
-            y += (int)(20 * scale);
+            y += (20 * scale);
 
             // tuning info
             if (Renderer.Tracks.Length == 1 && !Renderer.Tracks[0].IsPercussion)
@@ -250,12 +250,12 @@ namespace AlphaTab.Rendering.Layout
                     canvas.Font = res.EffectFont;
                     canvas.FillText(tuning.Name, x, y);
 
-                    y += (int)(15 * scale);
+                    y += (15 * scale);
 
                     if (!tuning.IsStandard)
                     {
                         // Strings
-                        var stringsPerColumn = Math.Ceiling(Renderer.Tracks[0].Tuning.Count / 2.0);
+                        var stringsPerColumn = (int)Math.Ceiling(Renderer.Tracks[0].Tuning.Count / 2.0);
 
                         var currentX = x;
                         var currentY = y;
@@ -264,19 +264,19 @@ namespace AlphaTab.Rendering.Layout
                         {
                             str = "(" + (i + 1) + ") = " + Tuning.GetTextForTuning(Renderer.Tracks[0].Tuning[i], false);
                             canvas.FillText(str, currentX, currentY);
-                            currentY += (int)(15 * scale);
+                            currentY += (15 * scale);
                             if (i == stringsPerColumn - 1)
                             {
                                 currentY = y;
-                                currentX += (int)(43 * scale);
+                                currentX += (43 * scale);
                             }
                         }
 
-                        y += (int)(stringsPerColumn * (int)(15 * scale));
+                        y += (stringsPerColumn * (15 * scale));
                     }
                 }
             }
-            y += (int)(25 * scale);
+            y += 25 * scale;
             return y;
         }
 
@@ -286,40 +286,40 @@ namespace AlphaTab.Rendering.Layout
         private void FitGroup(StaveGroup group)
         {
             // calculate additional space for each bar (can be negative!)
-            int barSpace = 0;
-            var freeSpace = MaxWidth - group.Width;
-       
-            if (freeSpace != 0 && group.MasterBars.Count > 0) 
+            float barSpace = 0f;
+            float freeSpace = MaxWidth - group.Width;
+
+            if (freeSpace != 0 && group.MasterBars.Count > 0)
             {
                 barSpace = freeSpace / group.MasterBars.Count;
             }
-        
-            if(group.IsFull || barSpace < 0) 
+
+            if (group.IsFull || barSpace < 0)
             {
                 // add it to the measures
                 group.ApplyBarSpacing(barSpace);
             }
-        
-            Width = Math.Max(Width, group.Width);    
+
+            Width = Math.Max(Width, group.Width);
         }
 
-        private StaveGroup CreateStaveGroup(int currentBarIndex, int endIndex) 
+        private StaveGroup CreateStaveGroup(int currentBarIndex, int endIndex)
         {
             var group = CreateEmptyStaveGroup();
             group.Index = _groups.Count;
-        
+
             var barsPerRow = Renderer.Settings.Layout.Get("barsPerRow", -1);
-                
+
             var maxWidth = MaxWidth;
             var end = endIndex + 1;
             for (int i = currentBarIndex; i < end; i++)
             {
                 group.AddBars(Renderer.Tracks, i);
-            
+
                 var groupIsFull = false;
-            
+
                 // can bar placed in this line?
-                if ( barsPerRow == -1 && ((group.Width) >= maxWidth && group.MasterBars.Count != 0))
+                if (barsPerRow == -1 && ((group.Width) >= maxWidth && group.MasterBars.Count != 0))
                 {
                     groupIsFull = true;
                 }
@@ -327,21 +327,21 @@ namespace AlphaTab.Rendering.Layout
                 {
                     groupIsFull = true;
                 }
-            
+
                 if (groupIsFull)
                 {
                     group.RevertLastBar();
                     group.IsFull = true;
                     return group;
                 }
-            
+
                 group.X = 0;
             }
-        
+
             return group;
         }
 
-        private int MaxWidth
+        private float MaxWidth
         {
             get
             {
@@ -352,14 +352,14 @@ namespace AlphaTab.Rendering.Layout
         }
 
 
-        private int SheetWidth
+        private float SheetWidth
         {
             get
             {
-               return (int)(WidthOn100 * Scale);
+                return (WidthOn100 * Scale);
             }
         }
-    
+
         public override void BuildBoundingsLookup(BoundingsLookup lookup)
         {
             for (int i = 0, j = _groups.Count; i < j; i++)

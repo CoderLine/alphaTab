@@ -15,21 +15,21 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System;
+
 using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
     public class ClefGlyph : MusicFontGlyph
     {
-        public ClefGlyph(int x, int y, Clef clef)
+        public ClefGlyph(float x, float y, Clef clef)
             : base(x, y, 1, GetSymbol(clef))
         {
         }
 
         public override void DoLayout()
         {
-            Width = (int)(28 * Scale);
+            Width = 28 * Scale;
         }
 
         public override bool CanScale

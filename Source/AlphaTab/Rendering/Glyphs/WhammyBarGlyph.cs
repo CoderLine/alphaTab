@@ -24,7 +24,7 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class WhammyBarGlyph : Glyph
     {
-        private const int WhammyMaxOffset = 60;
+        private const float WhammyMaxOffset = 60;
 
         private readonly Beat _beat;
         private readonly BeatContainerGlyph _parent;
@@ -42,10 +42,10 @@ namespace AlphaTab.Rendering.Glyphs
 
             // 
             // Calculate the min and max offsets
-            var minY = 0;
-            var maxY = 0;
+            var minY = 0f;
+            var maxY = 0f;
 
-            var sizeY = (int)(WhammyMaxOffset * Scale);
+            var sizeY = WhammyMaxOffset * Scale;
             if (_beat.WhammyBarPoints.Count >= 2)
             {
                 var dy = sizeY / Beat.WhammyBarMaxValue;
@@ -60,7 +60,7 @@ namespace AlphaTab.Rendering.Glyphs
 
             //
             // calculate the overflow 
-            TabBarRenderer tabBarRenderer = (TabBarRenderer)Renderer;
+            var tabBarRenderer = (TabBarRenderer)Renderer;
             var track = Renderer.Bar.Track;
             var tabTop = tabBarRenderer.GetTabY(0, -2);
             var tabBottom = tabBarRenderer.GetTabY(track.Tuning.Count, -2);
@@ -74,18 +74,18 @@ namespace AlphaTab.Rendering.Glyphs
                 tabBarRenderer.RegisterOverflowBottom(Math.Abs(absMaxY));
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            TabBarRenderer tabBarRenderer = (TabBarRenderer)Renderer;
+            var tabBarRenderer = (TabBarRenderer)Renderer;
             var res = Renderer.Resources;
             var startX = cx + X + _parent.OnNotes.Width / 2;
             var endX = _beat.NextBeat == null || _beat.Voice != _beat.NextBeat.Voice
                     ? cx + X + _parent.OnNotes.Width / 2 + _parent.PostNotes.Width
                     : cx + tabBarRenderer.GetBeatX(_beat.NextBeat);
             var startY = cy + X;
-            var textOffset = (int)(3 * Scale);
+            var textOffset = 3 * Scale;
 
-            var sizeY = (int)(WhammyMaxOffset * Scale);
+            var sizeY = WhammyMaxOffset * Scale;
 
             var old = canvas.TextAlign;
             canvas.TextAlign = TextAlign.Center;
@@ -119,7 +119,7 @@ namespace AlphaTab.Rendering.Glyphs
                         if (dv < 0) s += "-";
 
                         if (dv >= 1 || dv <= -1)
-                            s += ((int)(Math.Abs(dv))) + " ";
+                            s += Math.Abs(dv) + " ";
 
                         dv -= (int)dv;
                         if (dv == 0.25)

@@ -1,2847 +1,6442 @@
-(function () { "use strict";
-var $hxClasses = {},$estr = function() { return js.Boot.__string_rec(this,''); };
-function $extend(from, fields) {
-	function inherit() {}; inherit.prototype = from; var proto = new inherit();
-	for (var name in fields) proto[name] = fields[name];
-	if( fields.toString !== Object.prototype.toString ) proto.toString = fields.toString;
-	return proto;
-}
-var HxOverrides = function() { }
-$hxClasses["HxOverrides"] = HxOverrides;
-HxOverrides.__name__ = ["HxOverrides"];
-HxOverrides.dateStr = function(date) {
-	var m = date.getMonth() + 1;
-	var d = date.getDate();
-	var h = date.getHours();
-	var mi = date.getMinutes();
-	var s = date.getSeconds();
-	return date.getFullYear() + "-" + (m < 10?"0" + m:"" + m) + "-" + (d < 10?"0" + d:"" + d) + " " + (h < 10?"0" + h:"" + h) + ":" + (mi < 10?"0" + mi:"" + mi) + ":" + (s < 10?"0" + s:"" + s);
-}
-HxOverrides.strDate = function(s) {
-	switch(s.length) {
-	case 8:
-		var k = s.split(":");
-		var d = new Date();
-		d.setTime(0);
-		d.setUTCHours(k[0]);
-		d.setUTCMinutes(k[1]);
-		d.setUTCSeconds(k[2]);
-		return d;
-	case 10:
-		var k = s.split("-");
-		return new Date(k[0],k[1] - 1,k[2],0,0,0);
-	case 19:
-		var k = s.split(" ");
-		var y = k[0].split("-");
-		var t = k[1].split(":");
-		return new Date(y[0],y[1] - 1,y[2],t[0],t[1],t[2]);
-	default:
-		throw "Invalid date format : " + s;
-	}
-}
-HxOverrides.cca = function(s,index) {
-	var x = s.charCodeAt(index);
-	if(x != x) return undefined;
-	return x;
-}
-HxOverrides.substr = function(s,pos,len) {
-	if(pos != null && pos != 0 && len != null && len < 0) return "";
-	if(len == null) len = s.length;
-	if(pos < 0) {
-		pos = s.length + pos;
-		if(pos < 0) pos = 0;
-	} else if(len < 0) len = s.length + len - pos;
-	return s.substr(pos,len);
-}
-HxOverrides.remove = function(a,obj) {
-	var i = 0;
-	var l = a.length;
-	while(i < l) {
-		if(a[i] == obj) {
-			a.splice(i,1);
-			return true;
-		}
-		i++;
-	}
-	return false;
-}
-HxOverrides.iter = function(a) {
-	return { cur : 0, arr : a, hasNext : function() {
-		return this.cur < this.arr.length;
-	}, next : function() {
-		return this.arr[this.cur++];
-	}};
-}
-var List = function() {
-	this.length = 0;
-};
-$hxClasses["List"] = List;
-List.__name__ = ["List"];
-List.prototype = {
-	iterator: function() {
-		return { h : this.h, hasNext : function() {
-			return this.h != null;
-		}, next : function() {
-			if(this.h == null) return null;
-			var x = this.h[0];
-			this.h = this.h[1];
-			return x;
-		}};
-	}
-	,add: function(item) {
-		var x = [item];
-		if(this.h == null) this.h = x; else this.q[1] = x;
-		this.q = x;
-		this.length++;
-	}
-	,__class__: List
-}
-var IMap = function() { }
-$hxClasses["IMap"] = IMap;
-IMap.__name__ = ["IMap"];
-IMap.prototype = {
-	__class__: IMap
-}
-var Reflect = function() { }
-$hxClasses["Reflect"] = Reflect;
-Reflect.__name__ = ["Reflect"];
-Reflect.hasField = function(o,field) {
-	return Object.prototype.hasOwnProperty.call(o,field);
-}
-Reflect.field = function(o,field) {
-	var v = null;
-	try {
-		v = o[field];
-	} catch( e ) {
-	}
-	return v;
-}
-Reflect.fields = function(o) {
-	var a = [];
-	if(o != null) {
-		var hasOwnProperty = Object.prototype.hasOwnProperty;
-		for( var f in o ) {
-		if(f != "__id__" && f != "hx__closures__" && hasOwnProperty.call(o,f)) a.push(f);
-		}
-	}
-	return a;
-}
-Reflect.isFunction = function(f) {
-	return typeof(f) == "function" && !(f.__name__ || f.__ename__);
-}
-Reflect.deleteField = function(o,field) {
-	if(!Reflect.hasField(o,field)) return false;
-	delete(o[field]);
-	return true;
-}
-var Std = function() { }
-$hxClasses["Std"] = Std;
-Std.__name__ = ["Std"];
-Std.string = function(s) {
-	return js.Boot.__string_rec(s,"");
-}
-Std.parseFloat = function(x) {
-	return parseFloat(x);
-}
-var StringBuf = function() {
-	this.b = "";
-};
-$hxClasses["StringBuf"] = StringBuf;
-StringBuf.__name__ = ["StringBuf"];
-StringBuf.prototype = {
-	__class__: StringBuf
-}
-var StringTools = function() { }
-$hxClasses["StringTools"] = StringTools;
-StringTools.__name__ = ["StringTools"];
-StringTools.urlEncode = function(s) {
-	return encodeURIComponent(s);
-}
-StringTools.urlDecode = function(s) {
-	return decodeURIComponent(s.split("+").join(" "));
-}
-StringTools.endsWith = function(s,end) {
-	var elen = end.length;
-	var slen = s.length;
-	return slen >= elen && HxOverrides.substr(s,slen - elen,elen) == end;
-}
-StringTools.lpad = function(s,c,l) {
-	if(c.length <= 0) return s;
-	while(s.length < l) s = c + s;
-	return s;
-}
-var ValueType = $hxClasses["ValueType"] = { __ename__ : ["ValueType"], __constructs__ : ["TNull","TInt","TFloat","TBool","TObject","TFunction","TClass","TEnum","TUnknown"] }
-ValueType.TNull = ["TNull",0];
-ValueType.TNull.toString = $estr;
-ValueType.TNull.__enum__ = ValueType;
-ValueType.TInt = ["TInt",1];
-ValueType.TInt.toString = $estr;
-ValueType.TInt.__enum__ = ValueType;
-ValueType.TFloat = ["TFloat",2];
-ValueType.TFloat.toString = $estr;
-ValueType.TFloat.__enum__ = ValueType;
-ValueType.TBool = ["TBool",3];
-ValueType.TBool.toString = $estr;
-ValueType.TBool.__enum__ = ValueType;
-ValueType.TObject = ["TObject",4];
-ValueType.TObject.toString = $estr;
-ValueType.TObject.__enum__ = ValueType;
-ValueType.TFunction = ["TFunction",5];
-ValueType.TFunction.toString = $estr;
-ValueType.TFunction.__enum__ = ValueType;
-ValueType.TClass = function(c) { var $x = ["TClass",6,c]; $x.__enum__ = ValueType; $x.toString = $estr; return $x; }
-ValueType.TEnum = function(e) { var $x = ["TEnum",7,e]; $x.__enum__ = ValueType; $x.toString = $estr; return $x; }
-ValueType.TUnknown = ["TUnknown",8];
-ValueType.TUnknown.toString = $estr;
-ValueType.TUnknown.__enum__ = ValueType;
-var Type = function() { }
-$hxClasses["Type"] = Type;
-Type.__name__ = ["Type"];
-Type.getClass = function(o) {
-	if(o == null) return null;
-	return o.__class__;
-}
-Type.getClassName = function(c) {
-	var a = c.__name__;
-	return a.join(".");
-}
-Type.getEnumName = function(e) {
-	var a = e.__ename__;
-	return a.join(".");
-}
-Type.resolveClass = function(name) {
-	var cl = $hxClasses[name];
-	if(cl == null || !cl.__name__) return null;
-	return cl;
-}
-Type.resolveEnum = function(name) {
-	var e = $hxClasses[name];
-	if(e == null || !e.__ename__) return null;
-	return e;
-}
-Type.createEmptyInstance = function(cl) {
-	function empty() {}; empty.prototype = cl.prototype;
-	return new empty();
-}
-Type.createEnum = function(e,constr,params) {
-	var f = Reflect.field(e,constr);
-	if(f == null) throw "No such constructor " + constr;
-	if(Reflect.isFunction(f)) {
-		if(params == null) throw "Constructor " + constr + " need parameters";
-		return f.apply(e,params);
-	}
-	if(params != null && params.length != 0) throw "Constructor " + constr + " does not need parameters";
-	return f;
-}
-Type.getEnumConstructs = function(e) {
-	var a = e.__constructs__;
-	return a.slice();
-}
-Type["typeof"] = function(v) {
-	var _g = typeof(v);
-	switch(_g) {
-	case "boolean":
-		return ValueType.TBool;
-	case "string":
-		return ValueType.TClass(String);
-	case "number":
-		if(Math.ceil(v) == v % 2147483648.0) return ValueType.TInt;
-		return ValueType.TFloat;
-	case "object":
-		if(v == null) return ValueType.TNull;
-		var e = v.__enum__;
-		if(e != null) return ValueType.TEnum(e);
-		var c = v.__class__;
-		if(c != null) return ValueType.TClass(c);
-		return ValueType.TObject;
-	case "function":
-		if(v.__name__ || v.__ename__) return ValueType.TObject;
-		return ValueType.TFunction;
-	case "undefined":
-		return ValueType.TNull;
-	default:
-		return ValueType.TUnknown;
-	}
-}
-Type.enumConstructor = function(e) {
-	return e[0];
-}
-Type.enumParameters = function(e) {
-	return e.slice(2);
-}
-var XmlType = $hxClasses["XmlType"] = { __ename__ : ["XmlType"], __constructs__ : [] }
-var Xml = function() { }
-$hxClasses["Xml"] = Xml;
-Xml.__name__ = ["Xml"];
-var as = {}
-as.bank = {}
-as.bank.components = {}
-as.bank.components.GeneratorStateEnum = function() { }
-$hxClasses["as.bank.components.GeneratorStateEnum"] = as.bank.components.GeneratorStateEnum;
-as.bank.components.GeneratorStateEnum.__name__ = ["as","bank","components","GeneratorStateEnum"];
-as.bank.components.EnvelopeStateEnum = function() { }
-$hxClasses["as.bank.components.EnvelopeStateEnum"] = as.bank.components.EnvelopeStateEnum;
-as.bank.components.EnvelopeStateEnum.__name__ = ["as","bank","components","EnvelopeStateEnum"];
-as.bank.components.LfoStateEnum = function() { }
-$hxClasses["as.bank.components.LfoStateEnum"] = as.bank.components.LfoStateEnum;
-as.bank.components.LfoStateEnum.__name__ = ["as","bank","components","LfoStateEnum"];
-as.bank.components.WaveformEnum = function() { }
-$hxClasses["as.bank.components.WaveformEnum"] = as.bank.components.WaveformEnum;
-as.bank.components.WaveformEnum.__name__ = ["as","bank","components","WaveformEnum"];
-as.bank.components.InterpolationEnum = function() { }
-$hxClasses["as.bank.components.InterpolationEnum"] = as.bank.components.InterpolationEnum;
-as.bank.components.InterpolationEnum.__name__ = ["as","bank","components","InterpolationEnum"];
-as.bank.components.LoopModeEnum = function() { }
-$hxClasses["as.bank.components.LoopModeEnum"] = as.bank.components.LoopModeEnum;
-as.bank.components.LoopModeEnum.__name__ = ["as","bank","components","LoopModeEnum"];
-as.bank.components.FilterTypeEnum = function() { }
-$hxClasses["as.bank.components.FilterTypeEnum"] = as.bank.components.FilterTypeEnum;
-as.bank.components.FilterTypeEnum.__name__ = ["as","bank","components","FilterTypeEnum"];
-as.ds = {}
-as.ds.CircularSampleBuffer = function(size) {
-	this._buffer = new Float32Array(size);
-	this._writePosition = 0;
-	this._readPosition = 0;
-	this._sampleCount = 0;
-	as.platform.TypeUtils.clearSampleArray(this._buffer);
-};
-$hxClasses["as.ds.CircularSampleBuffer"] = as.ds.CircularSampleBuffer;
-as.ds.CircularSampleBuffer.__name__ = ["as","ds","CircularSampleBuffer"];
-as.ds.CircularSampleBuffer.prototype = {
-	read: function(data,offset,count) {
-		if(count > this._sampleCount) count = this._sampleCount;
-		var samplesRead = 0;
-		var readToEnd = Math.min(this._buffer.length - this._readPosition,count) | 0;
-		var srcPos = this._readPosition;
-		data.set(this._buffer.subarray(srcPos,srcPos + readToEnd),offset);
-		samplesRead += readToEnd;
-		this._readPosition += readToEnd;
-		this._readPosition %= this._buffer.length;
-		if(samplesRead < count) {
-			var srcPos = this._readPosition;
-			data.set(this._buffer.subarray(srcPos,srcPos + (count - samplesRead)),offset + samplesRead);
-			this._readPosition += count - samplesRead;
-			samplesRead = count;
-		}
-		this._sampleCount -= samplesRead;
-		return samplesRead;
-	}
-	,write: function(data,offset,count) {
-		var samplesWritten = 0;
-		if(count > this._buffer.length - this._sampleCount) count = this._buffer.length - this._sampleCount;
-		var writeToEnd = Math.min(this._buffer.length - this._writePosition,count) | 0;
-		this._buffer.set(data.subarray(offset,offset + writeToEnd),this._writePosition);
-		this._writePosition += writeToEnd;
-		this._writePosition %= this._buffer.length;
-		samplesWritten += writeToEnd;
-		if(samplesWritten < count) {
-			var srcPos = offset + samplesWritten;
-			this._buffer.set(data.subarray(srcPos,srcPos + (count - samplesWritten)),this._writePosition);
-			this._writePosition += count - samplesWritten;
-			samplesWritten = count;
-		}
-		this._sampleCount += samplesWritten;
-		return samplesWritten;
-	}
-	,clear: function() {
-		this._readPosition = 0;
-		this._writePosition = 0;
-		this._sampleCount = 0;
-		this._buffer = new Float32Array(this._buffer.length);
-		as.platform.TypeUtils.clearSampleArray(this._buffer);
-	}
-	,get_count: function() {
-		return this._sampleCount;
-	}
-	,__class__: as.ds.CircularSampleBuffer
-}
-as.ds._FixedArray = {}
-as.ds._FixedArray.FixedArray_Impl_ = function() { }
-$hxClasses["as.ds._FixedArray.FixedArray_Impl_"] = as.ds._FixedArray.FixedArray_Impl_;
-as.ds._FixedArray.FixedArray_Impl_.__name__ = ["as","ds","_FixedArray","FixedArray_Impl_"];
-as.ds._FixedArray.FixedArray_Impl_._new = function(length) {
-	return new Array(length);
-}
-as.ds._FixedArray.FixedArray_Impl_.get = function(this1,index) {
-	return this1[index];
-}
-as.ds._FixedArray.FixedArray_Impl_.set = function(this1,index,val) {
-	return this1[index] = val;
-}
-as.ds._FixedArray.FixedArray_Impl_.clone = function(this1) {
-	return this1.slice(0);
-}
-as.ds._FixedArray.FixedArray_Impl_.get_length = function(this1) {
-	return this1.length;
-}
-as.ds._FixedArray.FixedArray_Impl_.blit = function(src,srcPos,dest,destPos,len) {
-	haxe.ds._Vector.Vector_Impl_.blit(src,srcPos,dest,destPos,len);
-}
-as.ds._FixedArray.FixedArray_Impl_.fromArrayCopy = function(array) {
-	return (function($this) {
-		var $r;
-		var vec = new Array(array.length);
-		{
-			var _g1 = 0, _g = array.length;
-			while(_g1 < _g) {
-				var i = _g1++;
-				vec[i] = array[i];
-			}
-		}
-		$r = vec;
-		return $r;
-	}(this));
-}
-as.ds._FixedArray.FixedArray_Impl_.serialize = function(v) {
-	var s = new haxe.Serializer();
-	s.serialize(v.length);
-	var _g1 = 0, _g = v.length;
-	while(_g1 < _g) {
-		var i = _g1++;
-		s.serialize(v[i]);
-	}
-	return s.toString();
-}
-as.ds._FixedArray.FixedArray_Impl_.unserialize = function(data) {
-	var s = new haxe.Unserializer(data);
-	var length = s.unserialize();
-	var v = new Array(length);
-	var _g = 0;
-	while(_g < length) {
-		var i = _g++;
-		var val = s.unserialize();
-		v[i] = val;
-	}
-	return v;
-}
-as.ds._SampleArray = {}
-as.ds._SampleArray.SampleArray_Impl_ = function() { }
-$hxClasses["as.ds._SampleArray.SampleArray_Impl_"] = as.ds._SampleArray.SampleArray_Impl_;
-as.ds._SampleArray.SampleArray_Impl_.__name__ = ["as","ds","_SampleArray","SampleArray_Impl_"];
-as.ds._SampleArray.SampleArray_Impl_._new = function(length) {
-	return new Float32Array(length);
-}
-as.ds._SampleArray.SampleArray_Impl_.get = function(this1,index) {
-	return this1[index];
-}
-as.ds._SampleArray.SampleArray_Impl_.set = function(this1,index,val) {
-	return this1[index] = val;
-}
-as.ds._SampleArray.SampleArray_Impl_.get_length = function(this1) {
-	return this1.length;
-}
-as.ds._SampleArray.SampleArray_Impl_.toData = function(this1) {
-	return this1;
-}
-as.ds._SampleArray.SampleArray_Impl_.blit = function(src,srcPos,dest,destPos,len) {
-	dest.set(src.subarray(srcPos,srcPos + len),destPos);
-}
-as.ds._SampleArray.SampleArray_Impl_.fromArrayCopy = function(array) {
-	return new Float32Array(array);
-}
-as.ds._SampleArray.SampleArray_Impl_.serialize = function(v) {
-	var s = new haxe.Serializer();
-	s.serialize(v.length);
-	var _g1 = 0, _g = v.length;
-	while(_g1 < _g) {
-		var i = _g1++;
-		s.serialize(v[i]);
-	}
-	return s.toString();
-}
-as.ds._SampleArray.SampleArray_Impl_.unserialize = function(data) {
-	var s = new haxe.Unserializer(data);
-	var length = s.unserialize();
-	var v = new Float32Array(length);
-	var _g = 0;
-	while(_g < length) {
-		var i = _g++;
-		var val = s.unserialize();
-		v[i] = val;
-	}
-	return v;
-}
-var mconsole = {}
-mconsole.Printer = function() { }
-$hxClasses["mconsole.Printer"] = mconsole.Printer;
-mconsole.Printer.__name__ = ["mconsole","Printer"];
-mconsole.Printer.prototype = {
-	__class__: mconsole.Printer
-}
-as.log = {}
-as.log.LevelPrinter = function(target) {
-	this._target = target;
-	this.level = as.log.LevelPrinter.logLevelToInt(mconsole.LogLevel.log);
-};
-$hxClasses["as.log.LevelPrinter"] = as.log.LevelPrinter;
-as.log.LevelPrinter.__name__ = ["as","log","LevelPrinter"];
-as.log.LevelPrinter.__interfaces__ = [mconsole.Printer];
-as.log.LevelPrinter.logLevelToInt = function(level) {
-	switch( (level)[1] ) {
-	case 4:
-		return 4;
-	case 3:
-		return 3;
-	case 1:
-		return 2;
-	case 2:
-		return 1;
-	case 0:
-		return 0;
-	}
-}
-as.log.LevelPrinter.prototype = {
-	printLine: function(level,message) {
-		this._target(level,message);
-	}
-	,print: function(level,params,indent,pos) {
-		var intLevel = as.log.LevelPrinter.logLevelToInt(level);
-		if(intLevel < this.level) return;
-		params = params.slice();
-		var _g1 = 0, _g = params.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			params[i] = Std.string(params[i]);
-		}
-		var message = params.join(", ");
-		var nextPosition = "@ " + pos.className + "." + pos.methodName;
-		var nextLineNumber = Std.string(pos.lineNumber);
-		var lineColumn = "";
-		var emptyLineColumn = "";
-		if(nextPosition != this._position) this._target(intLevel,nextPosition);
-		emptyLineColumn = StringTools.lpad(""," ",5);
-		if(nextPosition != this._position || nextLineNumber != this._lineNumber) lineColumn = StringTools.lpad("L" + nextLineNumber," ",6) + ": "; else lineColumn = emptyLineColumn;
-		this._position = nextPosition;
-		this._lineNumber = nextLineNumber;
-		var indent1 = StringTools.lpad(""," ",indent * 2);
-		message = lineColumn + indent1 + message;
-		message = message.split("\n").join("\n" + emptyLineColumn + indent1);
-		this._target(intLevel,message);
-	}
-	,__class__: as.log.LevelPrinter
-}
-as.main = {}
-as.main.IAlphaSynth = function() { }
-$hxClasses["as.main.IAlphaSynth"] = as.main.IAlphaSynth;
-as.main.IAlphaSynth.__name__ = ["as","main","IAlphaSynth"];
-as.main.IAlphaSynth.prototype = {
-	__class__: as.main.IAlphaSynth
-}
-as.main.IAlphaSynthAsync = function() { }
-$hxClasses["as.main.IAlphaSynthAsync"] = as.main.IAlphaSynthAsync;
-as.main.IAlphaSynthAsync.__name__ = ["as","main","IAlphaSynthAsync"];
-as.main.IAlphaSynthAsync.__interfaces__ = [as.main.IAlphaSynth];
-as.main.IAlphaSynthAsync.prototype = {
-	__class__: as.main.IAlphaSynthAsync
-}
-as.main.AlphaSynthJs = function() {
-	this.AlphaSynthId = "AlphaSynth";
-};
-$hxClasses["as.main.AlphaSynthJs"] = as.main.AlphaSynthJs;
-$hxExpose(as.main.AlphaSynthJs, "as.AlphaSynth");
-as.main.AlphaSynthJs.__name__ = ["as","main","AlphaSynthJs"];
-as.main.AlphaSynthJs.__interfaces__ = [as.main.IAlphaSynthAsync];
-as.main.AlphaSynthJs.main = function() {
-	mconsole.Console.hasConsole = false;
-	mconsole.Console.start();
-	mconsole.Console.removePrinter(mconsole.Console.defaultPrinter);
-	mconsole.Console.addPrinter(as.main.AlphaSynthJs._printer = new as.log.LevelPrinter(as.main.AlphaSynthJs.log));
-	as.main.AlphaSynthJs.instance = new as.main.AlphaSynthJs();
-}
-as.main.AlphaSynthJs.log = function(level,message) {
-	var console = window.console;
-	switch(level) {
-	case 0:
-		console.log(message);
-		break;
-	case 1:
-		console.debug(message);
-		break;
-	case 2:
-		console.info(message);
-		break;
-	case 3:
-		console.warn(message);
-		break;
-	case 4:
-		console.error(message);
-		break;
-	}
-}
-as.main.AlphaSynthJs.init = function(asRoot,swfObjectRoot) {
-	if(swfObjectRoot == null) swfObjectRoot = "";
-	var swf = swfobject;
-	var supportsWebAudio = !!window.ScriptProcessorNode;
-	var supportsWebWorkers = !!window.Worker;
-	var supportsFlashWorkers = swf.hasFlashPlayerVersion("11.4");
-	if(supportsWebAudio) {
-		if(mconsole.Console.hasConsole) mconsole.Console.callConsole("debug",["Will use webworkers for synthesizing and web audio api for playback"]);
-		mconsole.Console.print(mconsole.LogLevel.debug,["Will use webworkers for synthesizing and web audio api for playback"],{ fileName : "AlphaSynthJs.hx", lineNumber : 195, className : "as.main.AlphaSynthJs", methodName : "init"});
-		var result = as.main.webworker.webaudio.AlphaSynthJsPlayerApi.init(asRoot);
-		if(result) {
-			as.main.AlphaSynthJs.instance.realInstance = new as.main.webworker.webaudio.AlphaSynthJsPlayerApi();
-			as.main.AlphaSynthJs.instance.startup();
-		}
-		return result;
-	} else if(supportsWebWorkers) {
-		if(mconsole.Console.hasConsole) mconsole.Console.callConsole("debug",["Will use webworkers for synthesizing and flash for playback"]);
-		mconsole.Console.print(mconsole.LogLevel.debug,["Will use webworkers for synthesizing and flash for playback"],{ fileName : "AlphaSynthJs.hx", lineNumber : 206, className : "as.main.AlphaSynthJs", methodName : "init"});
-		var result = as.main.webworker.flash.AlphaSynthFlashPlayerApi.init(asRoot,swfObjectRoot);
-		if(result) {
-			as.main.AlphaSynthJs.instance.realInstance = new as.main.webworker.flash.AlphaSynthFlashPlayerApi();
-			as.main.AlphaSynthJs.instance.startup();
-		}
-		return result;
-	} else if(supportsFlashWorkers) {
-		if(mconsole.Console.hasConsole) mconsole.Console.callConsole("debug",["Will use flash for synthesizing and playback"]);
-		mconsole.Console.print(mconsole.LogLevel.debug,["Will use flash for synthesizing and playback"],{ fileName : "AlphaSynthJs.hx", lineNumber : 217, className : "as.main.AlphaSynthJs", methodName : "init"});
-		var result = as.main.flash.AlphaSynthFlashApi.init(asRoot,swfObjectRoot);
-		if(result) {
-			as.main.AlphaSynthJs.instance.realInstance = new as.main.flash.AlphaSynthFlashApi();
-			as.main.AlphaSynthJs.instance.startup();
-		}
-		return result;
-	} else {
-		mconsole.Console.error("Incompatible browser",null,{ fileName : "AlphaSynthJs.hx", lineNumber : 228, className : "as.main.AlphaSynthJs", methodName : "init"});
-		return false;
-	}
-}
-as.main.AlphaSynthJs.prototype = {
-	on: function(events,fn) {
-		if(this.realInstance == null) return;
-		this.realInstance.on(events,fn);
-		if(events == "ready" && this.ready) fn();
-	}
-	,setLogLevel: function(level) {
-		as.main.AlphaSynthJs._printer.level = level;
-		if(this.realInstance == null) return;
-		this.realInstance.setLogLevel(level);
-	}
-	,loadMidiBytesData: function(data) {
-		this.loadMidiBytes(haxe.io.Bytes.ofData(data));
-	}
-	,loadMidiBytes: function(data) {
-		if(this.realInstance == null) return;
-		this.realInstance.loadMidiBytes(data);
-	}
-	,loadMidiData: function(data) {
-		if(this.realInstance == null) return;
-		this.realInstance.loadMidiData(data);
-	}
-	,loadMidiUrl: function(url) {
-		if(this.realInstance == null) return;
-		this.realInstance.loadMidiUrl(url);
-	}
-	,loadSoundFontData: function(data) {
-		if(this.realInstance == null) return;
-		this.realInstance.loadSoundFontData(data);
-	}
-	,loadSoundFontUrl: function(url) {
-		if(this.realInstance == null) return;
-		this.realInstance.loadSoundFontUrl(url);
-	}
-	,setPositionTime: function(millis) {
-		if(this.realInstance == null) return;
-		this.realInstance.setPositionTime(millis);
-	}
-	,setPositionTick: function(tick) {
-		if(this.realInstance == null) return;
-		this.realInstance.setPositionTick(tick);
-	}
-	,stop: function() {
-		if(this.realInstance == null) return;
-		this.realInstance.stop();
-	}
-	,playPause: function() {
-		if(this.realInstance == null) return;
-		this.realInstance.playPause();
-	}
-	,pause: function() {
-		if(this.realInstance == null) return;
-		this.realInstance.pause();
-	}
-	,play: function() {
-		if(this.realInstance == null) return;
-		this.realInstance.play();
-	}
-	,isMidiLoaded: function() {
-		if(this.realInstance == null) return;
-		this.realInstance.isMidiLoaded();
-	}
-	,isSoundFontLoaded: function() {
-		if(this.realInstance == null) return;
-		this.realInstance.isSoundFontLoaded();
-	}
-	,getState: function() {
-		if(this.realInstance == null) return;
-		this.realInstance.getState();
-	}
-	,isReadyForPlay: function() {
-		if(this.realInstance == null) return;
-		this.realInstance.isReadyForPlay();
-	}
-	,startup: function() {
-		var _g = this;
-		this.realInstance.on("ready",function() {
-			_g.ready = true;
-		});
-		this.realInstance.startup();
-	}
-	,__class__: as.main.AlphaSynthJs
-}
-as.main.flash = {}
-as.main.flash.AlphaSynthFlashApi = function() {
-	this.AlphaSynthId = "AlphaSynth";
-	var ctx = new haxe.remoting.Context();
-	ctx.addObject("JsAlphaSynth",this);
-	this._flash = haxe.remoting.ExternalConnection.flashConnect("default",this.AlphaSynthId,ctx);
-	this._events = new js.JQuery("<span></span>");
-};
-$hxClasses["as.main.flash.AlphaSynthFlashApi"] = as.main.flash.AlphaSynthFlashApi;
-as.main.flash.AlphaSynthFlashApi.__name__ = ["as","main","flash","AlphaSynthFlashApi"];
-as.main.flash.AlphaSynthFlashApi.__interfaces__ = [as.main.IAlphaSynthAsync];
-as.main.flash.AlphaSynthFlashApi.init = function(asRoot,swfObjectRoot) {
-	if(swfObjectRoot == null) swfObjectRoot = "";
-	var swf = swfobject;
-	if(asRoot != "" && !StringTools.endsWith(asRoot,"/")) asRoot += "/";
-	if(swfObjectRoot != "" && !StringTools.endsWith(swfObjectRoot,"/")) swfObjectRoot += "/";
-	if(swf) {
-		var alphaSynth = js.Browser.document.getElementById("alphaSynthContainer");
-		if(alphaSynth != null) {
-			haxe.Log.trace("Skipped initialization, existing alphaSynthContainer found",{ fileName : "AlphaSynthFlashApi.hx", lineNumber : 188, className : "as.main.flash.AlphaSynthFlashApi", methodName : "init"});
-			return false;
-		}
-		alphaSynth = js.Browser.document.createElement("div");
-		alphaSynth.setAttribute("id","alphaSynthContainer");
-		js.Browser.document.body.appendChild(alphaSynth);
-		swf.embedSWF(asRoot + "alphaSynthFull.swf","alphaSynthContainer","1px","1px","11.4.0",swfObjectRoot + "expressInstall.swf",{ },{ allowScriptAccess : "always"},{ id : "AlphaSynth"});
-		return true;
-	} else {
-		haxe.Log.trace("Error initializing alphaSynth: swfobject not found",{ fileName : "AlphaSynthFlashApi.hx", lineNumber : 209, className : "as.main.flash.AlphaSynthFlashApi", methodName : "init"});
-		return false;
-	}
-}
-as.main.flash.AlphaSynthFlashApi.prototype = {
-	trigger: function(event) {
-		var args = Array.prototype.slice.call(arguments);
-		switch(event) {
-		case "log":
-			this.log(args[1],args[2]);
-			break;
-		}
-		var events = this._events;
-		events.trigger(event, args.splice(1));
-	}
-	,log: function(level,message) {
-		var console = window.console;
-		switch(level) {
-		case 0:
-			console.log(message);
-			break;
-		case 1:
-			console.debug(message);
-			break;
-		case 2:
-			console.info(message);
-			break;
-		case 3:
-			console.warn(message);
-			break;
-		case 4:
-			console.error(message);
-			break;
-		}
-	}
-	,on: function(events,fn) {
-		this._events.on(events,fn);
-	}
-	,setLogLevel: function(level) {
-		this._flash.resolve("FlashAlphaSynth").resolve("setLogLevel").call([level]);
-	}
-	,isMidiLoaded: function() {
-		var v = this._flash.resolve("FlashAlphaSynth").resolve("isMidiLoaded").call([]);
-		this._events.trigger('isMidiLoaded', [v]);
-	}
-	,isSoundFontLoaded: function() {
-		var v = this._flash.resolve("FlashAlphaSynth").resolve("isSoundFontLoaded").call([]);
-		this._events.trigger('isSoundFontLoaded', [v]);
-	}
-	,getState: function() {
-		var v = this._flash.resolve("FlashAlphaSynth").resolve("getState").call([]);
-		this._events.trigger('getState', [v]);
-	}
-	,loadMidiData: function(data) {
-		this._flash.resolve("FlashAlphaSynth").resolve("loadMidiData").call([data]);
-	}
-	,loadMidiUrl: function(url) {
-		this._flash.resolve("FlashAlphaSynth").resolve("loadMidiUrl").call([url]);
-	}
-	,loadMidiBytes: function(data) {
-		var data1 = haxe.Serializer.run(haxe.io.Bytes.ofData(data));
-		this.loadMidiData(data1);
-	}
-	,loadSoundFontData: function(data) {
-		this._flash.resolve("FlashAlphaSynth").resolve("loadSoundFontData").call([data]);
-	}
-	,loadSoundFontUrl: function(url) {
-		this._flash.resolve("FlashAlphaSynth").resolve("loadSoundFontUrl").call([url]);
-	}
-	,setPositionTime: function(millis) {
-		this._flash.resolve("FlashAlphaSynth").resolve("setPositionTime").call([millis]);
-	}
-	,setPositionTick: function(tick) {
-		this._flash.resolve("FlashAlphaSynth").resolve("setPositionTick").call([tick]);
-	}
-	,stop: function() {
-		this._flash.resolve("FlashAlphaSynth").resolve("stop").call([]);
-	}
-	,playPause: function() {
-		this._flash.resolve("FlashAlphaSynth").resolve("playPause").call([]);
-	}
-	,pause: function() {
-		this._flash.resolve("FlashAlphaSynth").resolve("pause").call([]);
-	}
-	,play: function() {
-		this._flash.resolve("FlashAlphaSynth").resolve("play").call([]);
-	}
-	,isReadyForPlay: function() {
-		var v = this._flash.resolve("FlashAlphaSynth").resolve("isReadyForPlay").call([]);
-		this._events.trigger('isReadyForPlay', [v]);
-	}
-	,startup: function() {
-	}
-	,__class__: as.main.flash.AlphaSynthFlashApi
-}
-as.main.webworker = {}
-as.main.webworker.flash = {}
-as.main.webworker.flash.AlphaSynthFlashPlayerApi = function() {
-	var ctx = new haxe.remoting.Context();
-	ctx.addObject("JsAlphaSynth",this);
-	this._flash = haxe.remoting.ExternalConnection.flashConnect("default","AlphaSynth",ctx);
-	this._events = new js.JQuery("<span></span>");
-};
-$hxClasses["as.main.webworker.flash.AlphaSynthFlashPlayerApi"] = as.main.webworker.flash.AlphaSynthFlashPlayerApi;
-as.main.webworker.flash.AlphaSynthFlashPlayerApi.__name__ = ["as","main","webworker","flash","AlphaSynthFlashPlayerApi"];
-as.main.webworker.flash.AlphaSynthFlashPlayerApi.__interfaces__ = [as.main.IAlphaSynthAsync];
-as.main.webworker.flash.AlphaSynthFlashPlayerApi.init = function(asRoot,swfObjectRoot) {
-	if(swfObjectRoot == null) swfObjectRoot = "";
-	var swf = swfobject;
-	if(asRoot != "" && !StringTools.endsWith(asRoot,"/")) asRoot += "/";
-	if(swfObjectRoot != "" && !StringTools.endsWith(swfObjectRoot,"/")) swfObjectRoot += "/";
-	if(swf) {
-		var alphaSynth = js.Browser.document.getElementById("alphaSynthContainer");
-		if(alphaSynth != null) {
-			haxe.Log.trace("Skipped initialization, existing alphaSynthContainer found",{ fileName : "AlphaSynthFlashPlayerApi.hx", lineNumber : 249, className : "as.main.webworker.flash.AlphaSynthFlashPlayerApi", methodName : "init"});
-			return false;
-		}
-		alphaSynth = js.Browser.document.createElement("div");
-		alphaSynth.setAttribute("id","alphaSynthContainer");
-		js.Browser.document.body.appendChild(alphaSynth);
-		js.Browser.window.AlphaSynthWorker = new Worker(asRoot + "alphaSynthWorker.js");
-		swf.embedSWF(asRoot + "alphaSynthPlayer.swf","alphaSynthContainer","1px","1px","11.0.0",swfObjectRoot + "expressInstall.swf",{ },{ allowScriptAccess : "always"},{ id : "AlphaSynth"});
-		return true;
-	} else {
-		haxe.Log.trace("Error initializing alphaSynth: swfobject not found",{ fileName : "AlphaSynthFlashPlayerApi.hx", lineNumber : 275, className : "as.main.webworker.flash.AlphaSynthFlashPlayerApi", methodName : "init"});
-		return false;
-	}
-}
-as.main.webworker.flash.AlphaSynthFlashPlayerApi.prototype = {
-	log: function(level,message) {
-		var console = window.console;
-		switch(level) {
-		case 0:
-			console.log(message);
-			break;
-		case 1:
-			console.debug(message);
-			break;
-		case 2:
-			console.info(message);
-			break;
-		case 3:
-			console.warn(message);
-			break;
-		case 4:
-			console.error(message);
-			break;
-		}
-	}
-	,playerPositionChanged: function(pos) {
-		this._synth.postMessage({ cmd : "playerPositionChanged", pos : pos});
-	}
-	,playerFinished: function() {
-		this._synth.postMessage({ cmd : "playerFinished"});
-	}
-	,playerSampleRequest: function() {
-		this._synth.postMessage({ cmd : "playerSampleRequest"});
-	}
-	,playerReady: function() {
-		this._synth = js.Browser.window.AlphaSynthWorker;
-		this._synth.addEventListener("message",$bind(this,this.handleWorkerMessage),false);
-		this._synth.postMessage({ cmd : "playerReady"});
-		this._events.trigger('ready');
-	}
-	,on: function(events,fn) {
-		this._events.on(events,fn);
-	}
-	,handleWorkerMessage: function(e) {
-		var data = e.data;
-		switch(data.cmd) {
-		case "isReadyForPlay":
-			this._events.trigger(data.cmd, [data.value]);
-			break;
-		case "getState":
-			this._events.trigger(data.cmd, [data.value]);
-			break;
-		case "isSoundFontLoaded":
-			this._events.trigger(data.cmd, [data.value]);
-			break;
-		case "isMidiLoaded":
-			this._events.trigger(data.cmd, [data.value]);
-			break;
-		case "positionChanged":
-			this._events.trigger(data.cmd, [data.currentTime, data.endTime, data.currentTick, data.endTick]);
-			break;
-		case "playerStateChanged":
-			this._events.trigger(data.cmd, [data.state]);
-			break;
-		case "finished":
-			this._events.trigger(data.cmd);
-			break;
-		case "soundFontLoad":
-			this._events.trigger(data.cmd, [data.loaded, data.full]);
-			break;
-		case "soundFontLoaded":
-			this._events.trigger(data.cmd);
-			break;
-		case "soundFontLoadFailed":
-			this._events.trigger(data.cmd);
-			break;
-		case "midiLoad":
-			this._events.trigger(data.cmd, [data.loaded, data.full]);
-			break;
-		case "midiFileLoaded":
-			this._events.trigger(data.cmd);
-			break;
-		case "midiFileLoadFailed":
-			this._events.trigger(data.cmd);
-			break;
-		case "readyForPlay":
-			this._events.trigger(data.cmd, data.value);
-			break;
-		case "log":
-			this.log(data.level,data.message);
-			break;
-		case "playerSequencerFinished":
-			this._flash.resolve("FlashAlphaSynth").resolve("sequencerFinished").call([]);
-			break;
-		case "playerAddSamples":
-			this._flash.resolve("FlashAlphaSynth").resolve("addSamples").call([(function($this) {
-				var $r;
-				var v = data.samples;
-				var s = new haxe.Serializer();
-				s.serialize(v.length);
-				{
-					var _g1 = 0, _g = v.length;
-					while(_g1 < _g) {
-						var i = _g1++;
-						s.serialize(v[i]);
-					}
-				}
-				$r = s.toString();
-				return $r;
-			}(this))]);
-			break;
-		case "playerPlay":
-			this._flash.resolve("FlashAlphaSynth").resolve("play").call([]);
-			break;
-		case "playerPause":
-			this._flash.resolve("FlashAlphaSynth").resolve("pause").call([]);
-			break;
-		case "playerStop":
-			this._flash.resolve("FlashAlphaSynth").resolve("stop").call([]);
-			break;
-		case "playerSeek":
-			this._flash.resolve("FlashAlphaSynth").resolve("seek").call([data.pos]);
-			break;
-		}
-	}
-	,qualifyURL: function(url) {
-		var img = js.Browser.document.createElement("img");
-		img.onerror = function(e) {
-		};
-		img.src = url;
-		url = img.src;
-		img.src = null;
-		return url;
-	}
-	,setLogLevel: function(level) {
-		this._synth.postMessage({ cmd : "setLogLevel", level : level});
-	}
-	,isMidiLoaded: function() {
-		this._synth.postMessage({ cmd : "isMidiLoaded"});
-	}
-	,isSoundFontLoaded: function() {
-		this._synth.postMessage({ cmd : "isSoundFontLoaded"});
-	}
-	,getState: function() {
-		this._synth.postMessage({ cmd : "getState"});
-	}
-	,loadMidiData: function(data) {
-		this._synth.postMessage({ cmd : "loadMidiData", data : data});
-	}
-	,loadMidiUrl: function(url) {
-		this._synth.postMessage({ cmd : "loadMidiUrl", url : this.qualifyURL(url)});
-	}
-	,loadMidiBytes: function(data) {
-		this._synth.postMessage({ cmd : "loadMidiBytes", data : data});
-	}
-	,loadSoundFontData: function(data) {
-		this._synth.postMessage({ cmd : "loadSoundFontData", data : data});
-	}
-	,loadSoundFontUrl: function(url) {
-		this._synth.postMessage({ cmd : "loadSoundFontUrl", url : this.qualifyURL(url)});
-	}
-	,setPositionTime: function(millis) {
-		this._synth.postMessage({ cmd : "setPositionTime", time : millis});
-	}
-	,setPositionTick: function(tick) {
-		this._synth.postMessage({ cmd : "setPositionTick", tick : tick});
-	}
-	,stop: function() {
-		this._synth.postMessage({ cmd : "stop"});
-	}
-	,playPause: function() {
-		this._synth.postMessage({ cmd : "playPause"});
-	}
-	,pause: function() {
-		this._synth.postMessage({ cmd : "pause"});
-	}
-	,play: function() {
-		this._synth.postMessage({ cmd : "play"});
-	}
-	,isReadyForPlay: function() {
-		this._synth.postMessage({ cmd : "isReadyForPlay"});
-	}
-	,startup: function() {
-	}
-	,__class__: as.main.webworker.flash.AlphaSynthFlashPlayerApi
-}
-as.main.webworker.webaudio = {}
-as.main.webworker.webaudio.AlphaSynthJsPlayer = function() {
-	this._finished = false;
-	this._circularBuffer = new as.ds.CircularSampleBuffer(40960);
-	window.AudioContext = window.AudioContext || window.webkitAudioContext;
-	this._context = new AudioContext();
-	this._buffer = this._context.createBuffer(2,4096,44100);
-	this._audioNode = this._context.createScriptProcessor(4096,0,2);
-	this._audioNode.onaudioprocess = $bind(this,this.generateSound);
-};
-$hxClasses["as.main.webworker.webaudio.AlphaSynthJsPlayer"] = as.main.webworker.webaudio.AlphaSynthJsPlayer;
-as.main.webworker.webaudio.AlphaSynthJsPlayer.__name__ = ["as","main","webworker","webaudio","AlphaSynthJsPlayer"];
-as.main.webworker.webaudio.AlphaSynthJsPlayer.prototype = {
-	generateSound: function(e) {
-		var left = e.outputBuffer.getChannelData(0);
-		var right = e.outputBuffer.getChannelData(1);
-		var samples = left.length + right.length;
-		if(this._circularBuffer._sampleCount < samples) {
-			if(this._finished) {
-				if(this.finished != null) this.finished();
-				this.stop();
-			} else {
-				this._pauseTime += 4096000 / 88200 | 0;
-				haxe.Log.trace("buffering " + this._pauseTime,{ fileName : "AlphaSynthJsPlayer.hx", lineNumber : 161, className : "as.main.webworker.webaudio.AlphaSynthJsPlayer", methodName : "generateSound"});
-			}
+var $StaticConstructors = [];
+var $StaticConstructor = function(f) { 
+    $StaticConstructors.push(f);  
+};  
+
+if (typeof ($Inherit) == 'undefined') {
+	var $Inherit = function (ce, ce2) {
+
+		if (typeof (Object.getOwnPropertyNames) == 'undefined') {
+
+			for (var p in ce2.prototype)
+				if (typeof (ce.prototype[p]) == 'undefined' || ce.prototype[p] == Object.prototype[p])
+					ce.prototype[p] = ce2.prototype[p];
+			for (var p in ce2)
+				if (typeof (ce[p]) == 'undefined')
+					ce[p] = ce2[p];
+			ce.$baseCtor = ce2;
+
 		} else {
-			var buffer = new Float32Array(samples);
-			this._circularBuffer.read(buffer,0,buffer.length);
-			var s = 0;
-			var _g1 = 0, _g = left.length;
-			while(_g1 < _g) {
-				var i = _g1++;
-				left[i] = buffer[s++];
-				right[i] = buffer[s++];
-			}
+
+			var props = Object.getOwnPropertyNames(ce2.prototype);
+			for (var i = 0; i < props.length; i++)
+				if (typeof (Object.getOwnPropertyDescriptor(ce.prototype, props[i])) == 'undefined')
+					Object.defineProperty(ce.prototype, props[i], Object.getOwnPropertyDescriptor(ce2.prototype, props[i]));
+
+			for (var p in ce2)
+				if (typeof (ce[p]) == 'undefined')
+					ce[p] = ce2[p];
+			ce.$baseCtor = ce2;
+
 		}
-		if(this.positionChanged != null) this.positionChanged(this._context.currentTime * 1000 - this._startTime - this._pauseTime - 4096000 / 88200 | 0);
-		if(!this._finished) this.requestBuffers();
+
 	}
-	,calcPosition: function() {
-		return this._context.currentTime * 1000 - this._startTime - this._pauseTime - 4096000 / 88200;
-	}
-	,requestBuffers: function() {
-		var count = 20480.;
-		if(this._circularBuffer._sampleCount < count) {
-			var _g = 0;
-			while(_g < 5) {
-				var i = _g++;
-				if(this.requestBuffer != null) this.requestBuffer();
-			}
-		}
-	}
-	,addSamples: function(f) {
-		this._circularBuffer.write(f,0,f.length);
-	}
-	,finish: function() {
-		this._finished = true;
-	}
-	,seek: function(position) {
-		this._startTime = this._context.currentTime * 1000 - position | 0;
-		this._pauseTime = 0;
-	}
-	,stop: function() {
-		this._finished = true;
-		this._paused = false;
-		this._source.stop();
-		this._source = null;
-		this._circularBuffer.clear();
-		this._audioNode.disconnect();
-	}
-	,pause: function() {
-		this._source.stop();
-		this._source = null;
-		this._paused = true;
-		this._pauseStart = this._context.currentTime * 1000 | 0;
-		this._audioNode.disconnect();
-	}
-	,play: function() {
-		this.requestBuffers();
-		this._finished = false;
-		if(this._paused) {
-			this._paused = false;
-			this._pauseTime += this._context.currentTime * 1000 - this._pauseStart | 0;
-		} else {
-			this._startTime = this._context.currentTime * 1000 | 0;
-			this._pauseTime = 0;
-		}
-		this._source = this._context.createBufferSource();
-		this._source.buffer = this._buffer;
-		this._source.loop = true;
-		this._source.connect(this._audioNode);
-		this._source.start(0);
-		this._audioNode.connect(this._context.destination);
-	}
-	,__class__: as.main.webworker.webaudio.AlphaSynthJsPlayer
-}
-as.main.webworker.webaudio.AlphaSynthJsPlayerApi = function() {
-	this._player = new as.main.webworker.webaudio.AlphaSynthJsPlayer();
-	this._player.positionChanged = $bind(this,this.playerPositionChanged);
-	this._player.requestBuffer = $bind(this,this.playerSampleRequest);
-	this._player.finished = $bind(this,this.playerFinished);
-	this._events = new js.JQuery("<span></span>");
 };
-$hxClasses["as.main.webworker.webaudio.AlphaSynthJsPlayerApi"] = as.main.webworker.webaudio.AlphaSynthJsPlayerApi;
-as.main.webworker.webaudio.AlphaSynthJsPlayerApi.__name__ = ["as","main","webworker","webaudio","AlphaSynthJsPlayerApi"];
-as.main.webworker.webaudio.AlphaSynthJsPlayerApi.__interfaces__ = [as.main.IAlphaSynthAsync];
-as.main.webworker.webaudio.AlphaSynthJsPlayerApi.init = function(asRoot) {
-	if(asRoot != "" && !StringTools.endsWith(asRoot,"/")) asRoot += "/";
-	js.Browser.window.AlphaSynthWorker = new Worker(asRoot + "alphaSynthWorker.js");
-	return true;
+
+if (typeof($CreateException)=='undefined') 
+{
+    var $CreateException = function(ex, error) 
+    {
+        if(error==null)
+            error = new Error();
+        if(ex==null)
+            ex = new System.Exception.ctor();       
+        error.message = ex.message;
+        for (var p in ex)
+           error[p] = ex[p];
+        return error;
+    }
 }
-as.main.webworker.webaudio.AlphaSynthJsPlayerApi.prototype = {
-	log: function(level,message) {
-		var console = window.console;
-		switch(level) {
-		case 0:
-			console.log(message);
-			break;
-		case 1:
-			console.debug(message);
-			break;
-		case 2:
-			console.info(message);
-			break;
-		case 3:
-			console.warn(message);
-			break;
-		case 4:
-			console.error(message);
-			break;
-		}
-	}
-	,playerPositionChanged: function(pos) {
-		this._synth.postMessage({ cmd : "playerPositionChanged", pos : pos});
-	}
-	,playerFinished: function() {
-		this._synth.postMessage({ cmd : "playerFinished"});
-	}
-	,playerSampleRequest: function() {
-		this._synth.postMessage({ cmd : "playerSampleRequest"});
-	}
-	,playerReady: function() {
-		this._synth = js.Browser.window.AlphaSynthWorker;
-		this._synth.addEventListener("message",$bind(this,this.handleWorkerMessage),false);
-		this._synth.postMessage({ cmd : "playerReady"});
-		this._events.trigger('ready');
-	}
-	,on: function(events,fn) {
-		this._events.on(events,fn);
-	}
-	,handleWorkerMessage: function(e) {
-		var data = e.data;
-		switch(data.cmd) {
-		case "isReadyForPlay":
-			this._events.trigger(data.cmd, [data.value]);
-			break;
-		case "getState":
-			this._events.trigger(data.cmd, [data.value]);
-			break;
-		case "isSoundFontLoaded":
-			this._events.trigger(data.cmd, [data.value]);
-			break;
-		case "isMidiLoaded":
-			this._events.trigger(data.cmd, [data.value]);
-			break;
-		case "positionChanged":
-			this._events.trigger(data.cmd, [data.currentTime, data.endTime, data.currentTick, data.endTick]);
-			break;
-		case "playerStateChanged":
-			this._events.trigger(data.cmd, [data.state]);
-			break;
-		case "finished":
-			this._events.trigger(data.cmd);
-			break;
-		case "soundFontLoad":
-			this._events.trigger(data.cmd, [data.loaded, data.full]);
-			break;
-		case "soundFontLoaded":
-			this._events.trigger(data.cmd);
-			break;
-		case "soundFontLoadFailed":
-			this._events.trigger(data.cmd);
-			break;
-		case "midiLoad":
-			this._events.trigger(data.cmd, [data.loaded, data.full]);
-			break;
-		case "midiFileLoaded":
-			this._events.trigger(data.cmd);
-			break;
-		case "midiFileLoadFailed":
-			this._events.trigger(data.cmd);
-			break;
-		case "readyForPlay":
-			this._events.trigger(data.cmd, data.value);
-			break;
-		case "log":
-			this.log(data.level,data.message);
-			break;
-		case "playerSequencerFinished":
-			this._player.finish();
-			break;
-		case "playerAddSamples":
-			this._player.addSamples(data.samples);
-			break;
-		case "playerPlay":
-			this._player.play();
-			break;
-		case "playerPause":
-			this._player.pause();
-			break;
-		case "playerStop":
-			this._player.stop();
-			break;
-		case "playerSeek":
-			this._player.seek(data.pos);
-			break;
-		}
-	}
-	,qualifyURL: function(url) {
-		var img = js.Browser.document.createElement("img");
-		img.onerror = function(e) {
-		};
-		img.src = url;
-		url = img.src;
-		img.src = null;
-		return url;
-	}
-	,setLogLevel: function(level) {
-		this._synth.postMessage({ cmd : "setLogLevel", level : level});
-	}
-	,isMidiLoaded: function() {
-		this._synth.postMessage({ cmd : "isMidiLoaded"});
-	}
-	,isSoundFontLoaded: function() {
-		this._synth.postMessage({ cmd : "isSoundFontLoaded"});
-	}
-	,getState: function() {
-		this._synth.postMessage({ cmd : "getState"});
-	}
-	,loadMidiData: function(data) {
-		this._synth.postMessage({ cmd : "loadMidiData", data : data});
-	}
-	,loadMidiUrl: function(url) {
-		this._synth.postMessage({ cmd : "loadMidiUrl", url : this.qualifyURL(url)});
-	}
-	,loadMidiBytes: function(data) {
-		this._synth.postMessage({ cmd : "loadMidiData", data : haxe.Serializer.run(data)});
-	}
-	,loadSoundFontData: function(data) {
-		this._synth.postMessage({ cmd : "loadSoundFontData", data : data});
-	}
-	,loadSoundFontUrl: function(url) {
-		this._synth.postMessage({ cmd : "loadSoundFontUrl", url : this.qualifyURL(url)});
-	}
-	,setPositionTime: function(millis) {
-		this._synth.postMessage({ cmd : "setPositionTime", time : millis});
-	}
-	,setPositionTick: function(tick) {
-		this._synth.postMessage({ cmd : "setPositionTick", tick : tick});
-	}
-	,stop: function() {
-		this._synth.postMessage({ cmd : "stop"});
-	}
-	,playPause: function() {
-		this._synth.postMessage({ cmd : "playPause"});
-	}
-	,pause: function() {
-		this._synth.postMessage({ cmd : "pause"});
-	}
-	,play: function() {
-		this._synth.postMessage({ cmd : "play"});
-	}
-	,isReadyForPlay: function() {
-		this._synth.postMessage({ cmd : "isReadyForPlay"});
-	}
-	,startup: function() {
-		this.playerReady();
-	}
-	,__class__: as.main.webworker.webaudio.AlphaSynthJsPlayerApi
+
+if (typeof($CreateDelegate)=='undefined'){
+    if(typeof($iKey)=='undefined') var $iKey = 0;
+    if(typeof($pKey)=='undefined') var $pKey = String.fromCharCode(1);
+    var $CreateDelegate = function(target, func){
+        if (target == null || func == null) 
+            return func;
+        if(func.target==target && func.func==func)
+            return func;
+        if (target.$delegateCache == null)
+            target.$delegateCache = {};
+        if (func.$key == null)
+            func.$key = $pKey + String(++$iKey);
+        var delegate;
+        if(target.$delegateCache!=null)
+            delegate = target.$delegateCache[func.$key];
+        if (delegate == null){
+            delegate = function(){
+                return func.apply(target, arguments);
+            };
+            delegate.func = func;
+            delegate.target = target;
+            delegate.isDelegate = true;
+            if(target.$delegateCache!=null)
+                target.$delegateCache[func.$key] = delegate;
+        }
+        return delegate;
+    }
 }
-as.platform = {}
-as.platform.TypeUtils = function() { }
-$hxClasses["as.platform.TypeUtils"] = as.platform.TypeUtils;
-as.platform.TypeUtils.__name__ = ["as","platform","TypeUtils"];
-as.platform.TypeUtils.clearIntArray = function(a) {
-	var _g1 = 0, _g = a.length;
-	while(_g1 < _g) {
-		var i = _g1++;
-		a[i] = 0;
-	}
+
+if (typeof ($CreateAnonymousDelegate) == 'undefined') {
+    var $CreateAnonymousDelegate = function (target, func) {
+        if (target == null || func == null)
+            return func;
+        var delegate = function () {
+            return func.apply(target, arguments);
+        };
+        delegate.func = func;
+        delegate.target = target;
+        delegate.isDelegate = true;
+        return delegate;
+    }
 }
-as.platform.TypeUtils.clearShortArray = function(a) {
-	var _g1 = 0, _g = a.length;
-	while(_g1 < _g) {
-		var i = _g1++;
-		a[i] = 0;
-	}
-}
-as.platform.TypeUtils.clearSampleArray = function(a) {
-	var _g1 = 0, _g = a.length;
-	while(_g1 < _g) {
-		var i = _g1++;
-		a[i] = 0.0;
-	}
-}
-as.platform.TypeUtils.clearObjectArray = function(a) {
-	var _g1 = 0, _g = a.length;
-	while(_g1 < _g) {
-		var i = _g1++;
-		a[i] = null;
-	}
-}
-as.platform.TypeUtils.ToInt8 = function(v) {
-	return ((v & 255) >> 7) * -256 + (v & 255);
-}
-as.platform.TypeUtils.ToUInt8 = function(v) {
-	return v & 255;
-}
-as.platform.TypeUtils.ToInt16 = function(v) {
-	return ((v & 65535) >> 15) * -65536 + (v & 65535);
-}
-as.platform.TypeUtils.ToUInt16 = function(v) {
-	return v & 65535;
-}
-as.platform.TypeUtils.byteArrayFromArray = function(array) {
-	var bytes = haxe.io.Bytes.alloc(array.length);
-	var _g1 = 0, _g = array.length;
-	while(_g1 < _g) {
-		var i = _g1++;
-		bytes.b[i] = array[i] & 255;
-	}
-	return bytes;
-}
-as.player = {}
-as.player.SynthPlayerState = $hxClasses["as.player.SynthPlayerState"] = { __ename__ : ["as","player","SynthPlayerState"], __constructs__ : ["Stopped","Playing","Paused"] }
-as.player.SynthPlayerState.Stopped = ["Stopped",0];
-as.player.SynthPlayerState.Stopped.toString = $estr;
-as.player.SynthPlayerState.Stopped.__enum__ = as.player.SynthPlayerState;
-as.player.SynthPlayerState.Playing = ["Playing",1];
-as.player.SynthPlayerState.Playing.toString = $estr;
-as.player.SynthPlayerState.Playing.__enum__ = as.player.SynthPlayerState;
-as.player.SynthPlayerState.Paused = ["Paused",2];
-as.player.SynthPlayerState.Paused.toString = $estr;
-as.player.SynthPlayerState.Paused.__enum__ = as.player.SynthPlayerState;
-as.util = {}
-as.util.SynthConstants = function() { }
-$hxClasses["as.util.SynthConstants"] = as.util.SynthConstants;
-as.util.SynthConstants.__name__ = ["as","util","SynthConstants"];
-var haxe = {}
-haxe.StackItem = $hxClasses["haxe.StackItem"] = { __ename__ : ["haxe","StackItem"], __constructs__ : ["CFunction","Module","FilePos","Method","Lambda"] }
-haxe.StackItem.CFunction = ["CFunction",0];
-haxe.StackItem.CFunction.toString = $estr;
-haxe.StackItem.CFunction.__enum__ = haxe.StackItem;
-haxe.StackItem.Module = function(m) { var $x = ["Module",1,m]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
-haxe.StackItem.FilePos = function(s,file,line) { var $x = ["FilePos",2,s,file,line]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
-haxe.StackItem.Method = function(classname,method) { var $x = ["Method",3,classname,method]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
-haxe.StackItem.Lambda = function(v) { var $x = ["Lambda",4,v]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
-haxe.CallStack = function() { }
-$hxClasses["haxe.CallStack"] = haxe.CallStack;
-haxe.CallStack.__name__ = ["haxe","CallStack"];
-haxe.CallStack.callStack = function() {
-	var oldValue = Error.prepareStackTrace;
-	Error.prepareStackTrace = function(error,callsites) {
-		var stack = [];
-		var _g = 0;
-		while(_g < callsites.length) {
-			var site = callsites[_g];
-			++_g;
-			var method = null;
-			var fullName = site.getFunctionName();
-			if(fullName != null) {
-				var idx = fullName.lastIndexOf(".");
-				if(idx >= 0) {
-					var className = HxOverrides.substr(fullName,0,idx);
-					var methodName = HxOverrides.substr(fullName,idx + 1,null);
-					method = haxe.StackItem.Method(className,methodName);
-				}
-			}
-			stack.push(haxe.StackItem.FilePos(method,site.getFileName(),site.getLineNumber()));
-		}
-		return stack;
-	};
-	var a = haxe.CallStack.makeStack(new Error().stack);
-	a.shift();
-	Error.prepareStackTrace = oldValue;
-	return a;
-}
-haxe.CallStack.makeStack = function(s) {
-	if(typeof(s) == "string") {
-		var stack = s.split("\n");
-		var m = [];
-		var _g = 0;
-		while(_g < stack.length) {
-			var line = stack[_g];
-			++_g;
-			m.push(haxe.StackItem.Module(line));
-		}
-		return m;
-	} else return s;
-}
-haxe.Log = function() { }
-$hxClasses["haxe.Log"] = haxe.Log;
-haxe.Log.__name__ = ["haxe","Log"];
-haxe.Log.trace = function(v,infos) {
-	js.Boot.__trace(v,infos);
-}
-haxe.Serializer = function() {
-	this.buf = new StringBuf();
-	this.cache = new Array();
-	this.useCache = haxe.Serializer.USE_CACHE;
-	this.useEnumIndex = haxe.Serializer.USE_ENUM_INDEX;
-	this.shash = new haxe.ds.StringMap();
-	this.scount = 0;
+
+var Int16Array = Int16Array || Array;
+var Uint8Array = Uint8Array || Array;
+var Int32Array = Int32Array || Array;
+function $CombineDelegates(del1,del2)
+{
+    if(del1 == null)
+        return del2;
+    if(del2 == null)
+        return del1;
+    var del=$CreateMulticastDelegateFunction();
+    del.delegates = [];
+    if(del1.isMulticastDelegate)
+    {
+        for(var i=0;i < del1.delegates.length;i++)
+            del.delegates.push(del1.delegates[i]);
+    }
+    else
+    {
+        del.delegates.push(del1);
+    }
+    if(del2.isMulticastDelegate)
+    {
+        for(var i=0;i < del2.delegates.length;i++)
+            del.delegates.push(del2.delegates[i]);
+    }
+    else
+    {
+        del.delegates.push(del2);
+    }
+    return del;
 };
-$hxClasses["haxe.Serializer"] = haxe.Serializer;
-haxe.Serializer.__name__ = ["haxe","Serializer"];
-haxe.Serializer.run = function(v) {
-	var s = new haxe.Serializer();
-	s.serialize(v);
-	return s.toString();
-}
-haxe.Serializer.prototype = {
-	serializeException: function(e) {
-		this.buf.b += "x";
-		this.serialize(e);
-	}
-	,serialize: function(v) {
-		var _g = Type["typeof"](v);
-		var $e = (_g);
-		switch( $e[1] ) {
-		case 0:
-			this.buf.b += "n";
-			break;
-		case 1:
-			if(v == 0) {
-				this.buf.b += "z";
-				return;
-			}
-			this.buf.b += "i";
-			this.buf.b += Std.string(v);
-			break;
-		case 2:
-			if(Math.isNaN(v)) this.buf.b += "k"; else if(!Math.isFinite(v)) this.buf.b += Std.string(v < 0?"m":"p"); else {
-				this.buf.b += "d";
-				this.buf.b += Std.string(v);
-			}
-			break;
-		case 3:
-			this.buf.b += Std.string(v?"t":"f");
-			break;
-		case 6:
-			var c = $e[2];
-			if(c == String) {
-				this.serializeString(v);
-				return;
-			}
-			if(this.useCache && this.serializeRef(v)) return;
-			switch(c) {
-			case Array:
-				var ucount = 0;
-				this.buf.b += "a";
-				var l = v.length;
-				var _g1 = 0;
-				while(_g1 < l) {
-					var i = _g1++;
-					if(v[i] == null) ucount++; else {
-						if(ucount > 0) {
-							if(ucount == 1) this.buf.b += "n"; else {
-								this.buf.b += "u";
-								this.buf.b += Std.string(ucount);
-							}
-							ucount = 0;
-						}
-						this.serialize(v[i]);
-					}
-				}
-				if(ucount > 0) {
-					if(ucount == 1) this.buf.b += "n"; else {
-						this.buf.b += "u";
-						this.buf.b += Std.string(ucount);
-					}
-				}
-				this.buf.b += "h";
-				break;
-			case List:
-				this.buf.b += "l";
-				var v1 = v;
-				var $it0 = v1.iterator();
-				while( $it0.hasNext() ) {
-					var i = $it0.next();
-					this.serialize(i);
-				}
-				this.buf.b += "h";
-				break;
-			case Date:
-				var d = v;
-				this.buf.b += "v";
-				this.buf.b += Std.string(HxOverrides.dateStr(d));
-				break;
-			case haxe.ds.StringMap:
-				this.buf.b += "b";
-				var v1 = v;
-				var $it1 = v1.keys();
-				while( $it1.hasNext() ) {
-					var k = $it1.next();
-					this.serializeString(k);
-					this.serialize(v1.get(k));
-				}
-				this.buf.b += "h";
-				break;
-			case haxe.ds.IntMap:
-				this.buf.b += "q";
-				var v1 = v;
-				var $it2 = v1.keys();
-				while( $it2.hasNext() ) {
-					var k = $it2.next();
-					this.buf.b += ":";
-					this.buf.b += Std.string(k);
-					this.serialize(v1.get(k));
-				}
-				this.buf.b += "h";
-				break;
-			case haxe.ds.ObjectMap:
-				this.buf.b += "M";
-				var v1 = v;
-				var $it3 = v1.keys();
-				while( $it3.hasNext() ) {
-					var k = $it3.next();
-					var id = Reflect.field(k,"__id__");
-					Reflect.deleteField(k,"__id__");
-					this.serialize(k);
-					k.__id__ = id;
-					this.serialize(v1.h[k.__id__]);
-				}
-				this.buf.b += "h";
-				break;
-			case haxe.io.Bytes:
-				var v1 = v;
-				var i = 0;
-				var max = v1.length - 2;
-				var charsBuf = new StringBuf();
-				var b64 = haxe.Serializer.BASE64;
-				while(i < max) {
-					var b1 = v1.b[i++];
-					var b2 = v1.b[i++];
-					var b3 = v1.b[i++];
-					charsBuf.b += Std.string(b64.charAt(b1 >> 2));
-					charsBuf.b += Std.string(b64.charAt((b1 << 4 | b2 >> 4) & 63));
-					charsBuf.b += Std.string(b64.charAt((b2 << 2 | b3 >> 6) & 63));
-					charsBuf.b += Std.string(b64.charAt(b3 & 63));
-				}
-				if(i == max) {
-					var b1 = v1.b[i++];
-					var b2 = v1.b[i++];
-					charsBuf.b += Std.string(b64.charAt(b1 >> 2));
-					charsBuf.b += Std.string(b64.charAt((b1 << 4 | b2 >> 4) & 63));
-					charsBuf.b += Std.string(b64.charAt(b2 << 2 & 63));
-				} else if(i == max + 1) {
-					var b1 = v1.b[i++];
-					charsBuf.b += Std.string(b64.charAt(b1 >> 2));
-					charsBuf.b += Std.string(b64.charAt(b1 << 4 & 63));
-				}
-				var chars = charsBuf.b;
-				this.buf.b += "s";
-				this.buf.b += Std.string(chars.length);
-				this.buf.b += ":";
-				this.buf.b += Std.string(chars);
-				break;
-			default:
-				this.cache.pop();
-				if(v.hxSerialize != null) {
-					this.buf.b += "C";
-					this.serializeString(Type.getClassName(c));
-					this.cache.push(v);
-					v.hxSerialize(this);
-					this.buf.b += "g";
-				} else {
-					this.buf.b += "c";
-					this.serializeString(Type.getClassName(c));
-					this.cache.push(v);
-					this.serializeFields(v);
-				}
-			}
-			break;
-		case 4:
-			if(this.useCache && this.serializeRef(v)) return;
-			this.buf.b += "o";
-			this.serializeFields(v);
-			break;
-		case 7:
-			var e = $e[2];
-			if(this.useCache && this.serializeRef(v)) return;
-			this.cache.pop();
-			this.buf.b += Std.string(this.useEnumIndex?"j":"w");
-			this.serializeString(Type.getEnumName(e));
-			if(this.useEnumIndex) {
-				this.buf.b += ":";
-				this.buf.b += Std.string(v[1]);
-			} else this.serializeString(v[0]);
-			this.buf.b += ":";
-			var l = v.length;
-			this.buf.b += Std.string(l - 2);
-			var _g1 = 2;
-			while(_g1 < l) {
-				var i = _g1++;
-				this.serialize(v[i]);
-			}
-			this.cache.push(v);
-			break;
-		case 5:
-			throw "Cannot serialize function";
-			break;
-		default:
-			throw "Cannot serialize " + Std.string(v);
-		}
-	}
-	,serializeFields: function(v) {
-		var _g = 0, _g1 = Reflect.fields(v);
-		while(_g < _g1.length) {
-			var f = _g1[_g];
-			++_g;
-			this.serializeString(f);
-			this.serialize(Reflect.field(v,f));
-		}
-		this.buf.b += "g";
-	}
-	,serializeRef: function(v) {
-		var vt = typeof(v);
-		var _g1 = 0, _g = this.cache.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var ci = this.cache[i];
-			if(typeof(ci) == vt && ci == v) {
-				this.buf.b += "r";
-				this.buf.b += Std.string(i);
-				return true;
-			}
-		}
-		this.cache.push(v);
-		return false;
-	}
-	,serializeString: function(s) {
-		var x = this.shash.get(s);
-		if(x != null) {
-			this.buf.b += "R";
-			this.buf.b += Std.string(x);
-			return;
-		}
-		this.shash.set(s,this.scount++);
-		this.buf.b += "y";
-		s = StringTools.urlEncode(s);
-		this.buf.b += Std.string(s.length);
-		this.buf.b += ":";
-		this.buf.b += Std.string(s);
-	}
-	,toString: function() {
-		return this.buf.b;
-	}
-	,__class__: haxe.Serializer
-}
-haxe.Timer = function() { }
-$hxClasses["haxe.Timer"] = haxe.Timer;
-haxe.Timer.__name__ = ["haxe","Timer"];
-haxe.Timer.stamp = function() {
-	return new Date().getTime() / 1000;
-}
-haxe.Unserializer = function(buf) {
-	this.buf = buf;
-	this.length = buf.length;
-	this.pos = 0;
-	this.scache = new Array();
-	this.cache = new Array();
-	var r = haxe.Unserializer.DEFAULT_RESOLVER;
-	if(r == null) {
-		r = Type;
-		haxe.Unserializer.DEFAULT_RESOLVER = r;
-	}
-	this.setResolver(r);
+
+function $CreateMulticastDelegateFunction()
+{
+    var del2 = null;
+    
+    var del=function()
+    {
+        var x=undefined;
+        for(var i=0;i < del2.delegates.length;i++)
+        {
+            var del3=del2.delegates[i];
+            x = del3.apply(null,arguments);
+        }
+        return x;
+    };
+    del.isMulticastDelegate = true;
+    del2 = del;   
+    
+    return del;
 };
-$hxClasses["haxe.Unserializer"] = haxe.Unserializer;
-haxe.Unserializer.__name__ = ["haxe","Unserializer"];
-haxe.Unserializer.initCodes = function() {
-	var codes = new Array();
-	var _g1 = 0, _g = haxe.Unserializer.BASE64.length;
-	while(_g1 < _g) {
-		var i = _g1++;
-		codes[haxe.Unserializer.BASE64.charCodeAt(i)] = i;
-	}
-	return codes;
-}
-haxe.Unserializer.prototype = {
-	unserialize: function() {
-		var _g = this.buf.charCodeAt(this.pos++);
-		switch(_g) {
-		case 110:
-			return null;
-		case 116:
-			return true;
-		case 102:
-			return false;
-		case 122:
-			return 0;
-		case 105:
-			return this.readDigits();
-		case 100:
-			var p1 = this.pos;
-			while(true) {
-				var c = this.buf.charCodeAt(this.pos);
-				if(c >= 43 && c < 58 || c == 101 || c == 69) this.pos++; else break;
-			}
-			return Std.parseFloat(HxOverrides.substr(this.buf,p1,this.pos - p1));
-		case 121:
-			var len = this.readDigits();
-			if(this.buf.charCodeAt(this.pos++) != 58 || this.length - this.pos < len) throw "Invalid string length";
-			var s = HxOverrides.substr(this.buf,this.pos,len);
-			this.pos += len;
-			s = StringTools.urlDecode(s);
-			this.scache.push(s);
-			return s;
-		case 107:
-			return Math.NaN;
-		case 109:
-			return Math.NEGATIVE_INFINITY;
-		case 112:
-			return Math.POSITIVE_INFINITY;
-		case 97:
-			var buf = this.buf;
-			var a = new Array();
-			this.cache.push(a);
-			while(true) {
-				var c = this.buf.charCodeAt(this.pos);
-				if(c == 104) {
-					this.pos++;
-					break;
-				}
-				if(c == 117) {
-					this.pos++;
-					var n = this.readDigits();
-					a[a.length + n - 1] = null;
-				} else a.push(this.unserialize());
-			}
-			return a;
-		case 111:
-			var o = { };
-			this.cache.push(o);
-			this.unserializeObject(o);
-			return o;
-		case 114:
-			var n = this.readDigits();
-			if(n < 0 || n >= this.cache.length) throw "Invalid reference";
-			return this.cache[n];
-		case 82:
-			var n = this.readDigits();
-			if(n < 0 || n >= this.scache.length) throw "Invalid string reference";
-			return this.scache[n];
-		case 120:
-			throw this.unserialize();
-			break;
-		case 99:
-			var name = this.unserialize();
-			var cl = this.resolver.resolveClass(name);
-			if(cl == null) throw "Class not found " + name;
-			var o = Type.createEmptyInstance(cl);
-			this.cache.push(o);
-			this.unserializeObject(o);
-			return o;
-		case 119:
-			var name = this.unserialize();
-			var edecl = this.resolver.resolveEnum(name);
-			if(edecl == null) throw "Enum not found " + name;
-			var e = this.unserializeEnum(edecl,this.unserialize());
-			this.cache.push(e);
-			return e;
-		case 106:
-			var name = this.unserialize();
-			var edecl = this.resolver.resolveEnum(name);
-			if(edecl == null) throw "Enum not found " + name;
-			this.pos++;
-			var index = this.readDigits();
-			var tag = Type.getEnumConstructs(edecl)[index];
-			if(tag == null) throw "Unknown enum index " + name + "@" + index;
-			var e = this.unserializeEnum(edecl,tag);
-			this.cache.push(e);
-			return e;
-		case 108:
-			var l = new List();
-			this.cache.push(l);
-			var buf = this.buf;
-			while(this.buf.charCodeAt(this.pos) != 104) l.add(this.unserialize());
-			this.pos++;
-			return l;
-		case 98:
-			var h = new haxe.ds.StringMap();
-			this.cache.push(h);
-			var buf = this.buf;
-			while(this.buf.charCodeAt(this.pos) != 104) {
-				var s = this.unserialize();
-				h.set(s,this.unserialize());
-			}
-			this.pos++;
-			return h;
-		case 113:
-			var h = new haxe.ds.IntMap();
-			this.cache.push(h);
-			var buf = this.buf;
-			var c = this.buf.charCodeAt(this.pos++);
-			while(c == 58) {
-				var i = this.readDigits();
-				h.set(i,this.unserialize());
-				c = this.buf.charCodeAt(this.pos++);
-			}
-			if(c != 104) throw "Invalid IntMap format";
-			return h;
-		case 77:
-			var h = new haxe.ds.ObjectMap();
-			this.cache.push(h);
-			var buf = this.buf;
-			while(this.buf.charCodeAt(this.pos) != 104) {
-				var s = this.unserialize();
-				h.set(s,this.unserialize());
-			}
-			this.pos++;
-			return h;
-		case 118:
-			var d = HxOverrides.strDate(HxOverrides.substr(this.buf,this.pos,19));
-			this.cache.push(d);
-			this.pos += 19;
-			return d;
-		case 115:
-			var len = this.readDigits();
-			var buf = this.buf;
-			if(this.buf.charCodeAt(this.pos++) != 58 || this.length - this.pos < len) throw "Invalid bytes length";
-			var codes = haxe.Unserializer.CODES;
-			if(codes == null) {
-				codes = haxe.Unserializer.initCodes();
-				haxe.Unserializer.CODES = codes;
-			}
-			var i = this.pos;
-			var rest = len & 3;
-			var size = (len >> 2) * 3 + (rest >= 2?rest - 1:0);
-			var max = i + (len - rest);
-			var bytes = haxe.io.Bytes.alloc(size);
-			var bpos = 0;
-			while(i < max) {
-				var c1 = codes[buf.charCodeAt(i++)];
-				var c2 = codes[buf.charCodeAt(i++)];
-				bytes.b[bpos++] = (c1 << 2 | c2 >> 4) & 255;
-				var c3 = codes[buf.charCodeAt(i++)];
-				bytes.b[bpos++] = (c2 << 4 | c3 >> 2) & 255;
-				var c4 = codes[buf.charCodeAt(i++)];
-				bytes.b[bpos++] = (c3 << 6 | c4) & 255;
-			}
-			if(rest >= 2) {
-				var c1 = codes[buf.charCodeAt(i++)];
-				var c2 = codes[buf.charCodeAt(i++)];
-				bytes.b[bpos++] = (c1 << 2 | c2 >> 4) & 255;
-				if(rest == 3) {
-					var c3 = codes[buf.charCodeAt(i++)];
-					bytes.b[bpos++] = (c2 << 4 | c3 >> 2) & 255;
-				}
-			}
-			this.pos += len;
-			this.cache.push(bytes);
-			return bytes;
-		case 67:
-			var name = this.unserialize();
-			var cl = this.resolver.resolveClass(name);
-			if(cl == null) throw "Class not found " + name;
-			var o = Type.createEmptyInstance(cl);
-			this.cache.push(o);
-			o.hxUnserialize(this);
-			if(this.buf.charCodeAt(this.pos++) != 103) throw "Invalid custom data";
-			return o;
-		default:
-		}
-		this.pos--;
-		throw "Invalid char " + this.buf.charAt(this.pos) + " at position " + this.pos;
-	}
-	,unserializeEnum: function(edecl,tag) {
-		if(this.buf.charCodeAt(this.pos++) != 58) throw "Invalid enum format";
-		var nargs = this.readDigits();
-		if(nargs == 0) return Type.createEnum(edecl,tag);
-		var args = new Array();
-		while(nargs-- > 0) args.push(this.unserialize());
-		return Type.createEnum(edecl,tag,args);
-	}
-	,unserializeObject: function(o) {
-		while(true) {
-			if(this.pos >= this.length) throw "Invalid object";
-			if(this.buf.charCodeAt(this.pos) == 103) break;
-			var k = this.unserialize();
-			if(!js.Boot.__instanceof(k,String)) throw "Invalid object key";
-			var v = this.unserialize();
-			o[k] = v;
-		}
-		this.pos++;
-	}
-	,readDigits: function() {
-		var k = 0;
-		var s = false;
-		var fpos = this.pos;
-		while(true) {
-			var c = this.buf.charCodeAt(this.pos);
-			if(c != c) break;
-			if(c == 45) {
-				if(this.pos != fpos) break;
-				s = true;
-				this.pos++;
-				continue;
-			}
-			if(c < 48 || c > 57) break;
-			k = k * 10 + (c - 48);
-			this.pos++;
-		}
-		if(s) k *= -1;
-		return k;
-	}
-	,setResolver: function(r) {
-		if(r == null) this.resolver = { resolveClass : function(_) {
-			return null;
-		}, resolveEnum : function(_) {
-			return null;
-		}}; else this.resolver = r;
-	}
-	,__class__: haxe.Unserializer
-}
-haxe.ds = {}
-haxe.ds.IntMap = function() {
-	this.h = { };
+
+function $RemoveDelegate(delOriginal,delToRemove)
+{
+    if(delToRemove == null || delOriginal == null)
+        return delOriginal;
+    if(delOriginal.isMulticastDelegate)
+    {
+        if(delToRemove.isMulticastDelegate)
+            throw new Error("Multicast to multicast delegate removal is not implemented yet");
+        var del=$CreateMulticastDelegateFunction();
+        for(var i=0;i < delOriginal.delegates.length;i++)
+        {
+            var del2=delOriginal.delegates[i];
+            if(del2 != delToRemove)
+            {
+                if(del.delegates == null)
+                    del.delegates = [];
+                del.delegates.push(del2);
+            }
+        }
+        if(del.delegates == null)
+            return null;
+        if(del.delegates.length == 1)
+            return del.delegates[0];
+        return del;
+    }
+    else
+    {
+        if(delToRemove.isMulticastDelegate)
+            throw new Error("single to multicast delegate removal is not supported");
+        if(delOriginal == delToRemove)
+            return null;
+        return delOriginal;
+    }
 };
-$hxClasses["haxe.ds.IntMap"] = haxe.ds.IntMap;
-haxe.ds.IntMap.__name__ = ["haxe","ds","IntMap"];
-haxe.ds.IntMap.__interfaces__ = [IMap];
-haxe.ds.IntMap.prototype = {
-	keys: function() {
-		var a = [];
-		for( var key in this.h ) {
-		if(this.h.hasOwnProperty(key)) a.push(key | 0);
-		}
-		return HxOverrides.iter(a);
-	}
-	,get: function(key) {
-		return this.h[key];
-	}
-	,set: function(key,value) {
-		this.h[key] = value;
-	}
-	,__class__: haxe.ds.IntMap
-}
-haxe.ds.ObjectMap = function() {
-	this.h = { };
-	this.h.__keys__ = { };
+
+var Float32Array = Float32Array || Array;
+
+var AlphaSynth = AlphaSynth || {};
+AlphaSynth.Main = AlphaSynth.Main || {};
+AlphaSynth.Main.AlphaSynthApi = function (asRoot, swfObjectRoot){
+    this.RealInstance = null;
+    this.Ready = false;
+    this.ReadyForPlay = false;
+    // var swf = SwfObject;
+    var supportsWebAudio = !!window.ScriptProcessorNode;
+    var supportsWebWorkers = !!window.Worker;
+    var forceFlash = !!window.ForceFlash;
+    if (asRoot == ""){
+        asRoot = window["AsRoot"].toString();
+    }
+    if (swfObjectRoot == ""){
+        swfObjectRoot = window["SwfObjectRoot"].toString();
+    }
+    if (((swfObjectRoot==null)||(swfObjectRoot.length==0))){
+        swfObjectRoot = asRoot;
+    }
+    if (supportsWebAudio && !forceFlash){
+        AlphaSynth.Util.Logger.Info("Will use webworkers for synthesizing and web audio api for playback");
+        this.RealInstance = new AlphaSynth.Main.AlphaSynthWebWorkerApi(asRoot);
+    }
+    else if (supportsWebWorkers){
+        AlphaSynth.Util.Logger.Info("Will use webworkers for synthesizing and flash for playback");
+        this.RealInstance = new AlphaSynth.Main.AlphaSynthFlashPlayerApi(asRoot, swfObjectRoot);
+    }
+    else {
+        AlphaSynth.Util.Logger.Error("Incompatible browser");
+        throw $CreateException(new System.Exception.ctor$$String("Incompatible browser"), new Error());
+    }
+    this.RealInstance.Startup();
 };
-$hxClasses["haxe.ds.ObjectMap"] = haxe.ds.ObjectMap;
-haxe.ds.ObjectMap.__name__ = ["haxe","ds","ObjectMap"];
-haxe.ds.ObjectMap.__interfaces__ = [IMap];
-haxe.ds.ObjectMap.prototype = {
-	keys: function() {
-		var a = [];
-		for( var key in this.h.__keys__ ) {
-		if(this.h.hasOwnProperty(key)) a.push(this.h.__keys__[key]);
-		}
-		return HxOverrides.iter(a);
-	}
-	,get: function(key) {
-		return this.h[key.__id__];
-	}
-	,set: function(key,value) {
-		var id = key.__id__ != null?key.__id__:key.__id__ = ++haxe.ds.ObjectMap.count;
-		this.h[id] = value;
-		this.h.__keys__[id] = key;
-	}
-	,__class__: haxe.ds.ObjectMap
-}
-haxe.ds.StringMap = function() {
-	this.h = { };
+AlphaSynth.Main.AlphaSynthApi.prototype = {
+    Startup: function (){
+        this.RealInstance.On("ready", $CreateAnonymousDelegate(this, function (){
+            this.Ready = true;
+        }));
+        this.RealInstance.On("readyForPlay", $CreateAnonymousDelegate(this, function (){
+            this.ReadyForPlay = true;
+        }));
+        this.RealInstance.Startup();
+    },
+    IsReadyForPlay: function (){
+        if (this.RealInstance == null)
+            return;
+        this.RealInstance.IsReadyForPlay();
+    },
+    GetMasterVolume: function (){
+        if (this.RealInstance == null)
+            return;
+        this.RealInstance.GetMasterVolume();
+    },
+    SetMasterVolume: function (volume){
+        if (this.RealInstance == null)
+            return;
+        this.RealInstance.SetMasterVolume(volume);
+    },
+    GetState: function (){
+        if (this.RealInstance == null)
+            return;
+        this.RealInstance.GetState();
+    },
+    IsSoundFontLoaded: function (){
+        if (this.RealInstance == null)
+            return;
+        this.RealInstance.IsSoundFontLoaded();
+    },
+    IsMidiLoaded: function (){
+        if (this.RealInstance == null)
+            return;
+        this.RealInstance.IsMidiLoaded();
+    },
+    Play: function (){
+        if (this.RealInstance == null)
+            return;
+        this.RealInstance.Play();
+    },
+    Pause: function (){
+        if (this.RealInstance == null)
+            return;
+        this.RealInstance.Pause();
+    },
+    PlayPause: function (){
+        if (this.RealInstance == null)
+            return;
+        this.RealInstance.PlayPause();
+    },
+    Stop: function (){
+        if (this.RealInstance == null)
+            return;
+        this.RealInstance.Stop();
+    },
+    SetPositionTick: function (tick){
+        if (this.RealInstance == null)
+            return;
+        this.RealInstance.SetPositionTick(tick);
+    },
+    SetPositionTime: function (millis){
+        if (this.RealInstance == null)
+            return;
+        this.RealInstance.SetPositionTime(millis);
+    },
+    LoadSoundFontUrl: function (url){
+        if (this.RealInstance == null)
+            return;
+        this.RealInstance.LoadSoundFontUrl(url);
+    },
+    LoadSoundFontBytes: function (data){
+        if (this.RealInstance == null)
+            return;
+        this.RealInstance.LoadSoundFontBytes(data);
+    },
+    LoadMidiUrl: function (url){
+        if (this.RealInstance == null)
+            return;
+        this.RealInstance.LoadMidiUrl(url);
+    },
+    LoadMidiBytes: function (data){
+        if (this.RealInstance == null)
+            return;
+        this.RealInstance.LoadMidiBytes(data);
+    },
+    SetLogLevel: function (level){
+        AlphaSynth.Util.Logger.LogLevel = level;
+        if (this.RealInstance == null)
+            return;
+        this.RealInstance.SetLogLevel(level);
+    },
+    On: function (events, fn){
+        if (this.RealInstance == null)
+            return;
+        this.RealInstance.On(events, fn);
+        if (events == "readyForPlay" && this.Ready){
+            fn();
+        }
+    }
 };
-$hxClasses["haxe.ds.StringMap"] = haxe.ds.StringMap;
-haxe.ds.StringMap.__name__ = ["haxe","ds","StringMap"];
-haxe.ds.StringMap.__interfaces__ = [IMap];
-haxe.ds.StringMap.prototype = {
-	keys: function() {
-		var a = [];
-		for( var key in this.h ) {
-		if(this.h.hasOwnProperty(key)) a.push(key.substr(1));
-		}
-		return HxOverrides.iter(a);
-	}
-	,remove: function(key) {
-		key = "$" + key;
-		if(!this.h.hasOwnProperty(key)) return false;
-		delete(this.h[key]);
-		return true;
-	}
-	,exists: function(key) {
-		return this.h.hasOwnProperty("$" + key);
-	}
-	,get: function(key) {
-		return this.h["$" + key];
-	}
-	,set: function(key,value) {
-		this.h["$" + key] = value;
-	}
-	,__class__: haxe.ds.StringMap
-}
-haxe.ds._Vector = {}
-haxe.ds._Vector.Vector_Impl_ = function() { }
-$hxClasses["haxe.ds._Vector.Vector_Impl_"] = haxe.ds._Vector.Vector_Impl_;
-haxe.ds._Vector.Vector_Impl_.__name__ = ["haxe","ds","_Vector","Vector_Impl_"];
-haxe.ds._Vector.Vector_Impl_.blit = function(src,srcPos,dest,destPos,len) {
-	var _g = 0;
-	while(_g < len) {
-		var i = _g++;
-		dest[destPos + i] = src[srcPos + i];
-	}
-}
-haxe.io = {}
-haxe.io.Bytes = function(length,b) {
-	this.length = length;
-	this.b = b;
-};
-$hxClasses["haxe.io.Bytes"] = haxe.io.Bytes;
-haxe.io.Bytes.__name__ = ["haxe","io","Bytes"];
-haxe.io.Bytes.alloc = function(length) {
-	var a = new Array();
-	var _g = 0;
-	while(_g < length) {
-		var i = _g++;
-		a.push(0);
-	}
-	return new haxe.io.Bytes(length,a);
-}
-haxe.io.Bytes.ofData = function(b) {
-	return new haxe.io.Bytes(b.length,b);
-}
-haxe.io.Bytes.prototype = {
-	__class__: haxe.io.Bytes
-}
-haxe.remoting = {}
-haxe.remoting.Connection = function() { }
-$hxClasses["haxe.remoting.Connection"] = haxe.remoting.Connection;
-haxe.remoting.Connection.__name__ = ["haxe","remoting","Connection"];
-haxe.remoting.Connection.prototype = {
-	__class__: haxe.remoting.Connection
-}
-haxe.remoting.Context = function() {
-	this.objects = new haxe.ds.StringMap();
-};
-$hxClasses["haxe.remoting.Context"] = haxe.remoting.Context;
-haxe.remoting.Context.__name__ = ["haxe","remoting","Context"];
-haxe.remoting.Context.prototype = {
-	call: function(path,params) {
-		if(path.length < 2) throw "Invalid path '" + path.join(".") + "'";
-		var inf = this.objects.get(path[0]);
-		if(inf == null) throw "No such object " + path[0];
-		var o = inf.obj;
-		var m = Reflect.field(o,path[1]);
-		if(path.length > 2) {
-			if(!inf.rec) throw "Can't access " + path.join(".");
-			var _g1 = 2, _g = path.length;
-			while(_g1 < _g) {
-				var i = _g1++;
-				o = m;
-				m = Reflect.field(o,path[i]);
-			}
-		}
-		if(!Reflect.isFunction(m)) throw "No such method " + path.join(".");
-		return m.apply(o,params);
-	}
-	,addObject: function(name,obj,recursive) {
-		this.objects.set(name,{ obj : obj, rec : recursive});
-	}
-	,__class__: haxe.remoting.Context
-}
-haxe.remoting.ExternalConnection = function(data,path) {
-	this.__data = data;
-	this.__path = path;
-};
-$hxClasses["haxe.remoting.ExternalConnection"] = haxe.remoting.ExternalConnection;
-$hxExpose(haxe.remoting.ExternalConnection, "haxe.remoting.ExternalConnection");
-haxe.remoting.ExternalConnection.__name__ = ["haxe","remoting","ExternalConnection"];
-haxe.remoting.ExternalConnection.__interfaces__ = [haxe.remoting.Connection];
-haxe.remoting.ExternalConnection.doCall = function(name,path,params) {
-	try {
-		var cnx = haxe.remoting.ExternalConnection.connections.get(name);
-		if(cnx == null) throw "Unknown connection : " + name;
-		if(cnx.__data.ctx == null) throw "No context shared for the connection " + name;
-		var params1 = new haxe.Unserializer(params).unserialize();
-		var ret = cnx.__data.ctx.call(path.split("."),params1);
-		var s = new haxe.Serializer();
-		s.serialize(ret);
-		return s.toString() + "#";
-	} catch( e ) {
-		var s = new haxe.Serializer();
-		s.serializeException(e);
-		return s.toString();
-	}
-}
-haxe.remoting.ExternalConnection.flashConnect = function(name,flashObjectID,ctx) {
-	var cnx = new haxe.remoting.ExternalConnection({ ctx : ctx, name : name, flash : flashObjectID},[]);
-	haxe.remoting.ExternalConnection.connections.set(name,cnx);
-	return cnx;
-}
-haxe.remoting.ExternalConnection.prototype = {
-	call: function(params) {
-		var s = new haxe.Serializer();
-		s.serialize(params);
-		var params1 = s.toString();
-		var data = null;
-		var fobj = window.document[this.__data.flash];
-		if(fobj == null) fobj = window.document.getElementById(this.__data.flash);
-		if(fobj == null) throw "Could not find flash object '" + this.__data.flash + "'";
-		try {
-			data = fobj.externalRemotingCall(this.__data.name,this.__path.join("."),params1);
-		} catch( e ) {
-		}
-		if(data == null) {
-			var domain, pageDomain;
-			try {
-				domain = fobj.src.split("/")[2];
-				pageDomain = js.Browser.window.location.host;
-			} catch( e ) {
-				domain = null;
-				pageDomain = null;
-			}
-			if(domain != pageDomain) throw "ExternalConnection call failure : SWF need allowDomain('" + pageDomain + "')";
-			throw "Call failure : ExternalConnection is not " + "initialized in Flash";
-		}
-		return new haxe.Unserializer(data).unserialize();
-	}
-	,resolve: function(field) {
-		var e = new haxe.remoting.ExternalConnection(this.__data,this.__path.slice());
-		e.__path.push(field);
-		return e;
-	}
-	,__class__: haxe.remoting.ExternalConnection
-}
-var js = {}
-js.Boot = function() { }
-$hxClasses["js.Boot"] = js.Boot;
-js.Boot.__name__ = ["js","Boot"];
-js.Boot.__unhtml = function(s) {
-	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
-}
-js.Boot.__trace = function(v,i) {
-	var msg = i != null?i.fileName + ":" + i.lineNumber + ": ":"";
-	msg += js.Boot.__string_rec(v,"");
-	if(i != null && i.customParams != null) {
-		var _g = 0, _g1 = i.customParams;
-		while(_g < _g1.length) {
-			var v1 = _g1[_g];
-			++_g;
-			msg += "," + js.Boot.__string_rec(v1,"");
-		}
-	}
-	var d;
-	if(typeof(document) != "undefined" && (d = document.getElementById("haxe:trace")) != null) d.innerHTML += js.Boot.__unhtml(msg) + "<br/>"; else if(typeof(console) != "undefined" && console.log != null) console.log(msg);
-}
-js.Boot.__string_rec = function(o,s) {
-	if(o == null) return "null";
-	if(s.length >= 5) return "<...>";
-	var t = typeof(o);
-	if(t == "function" && (o.__name__ || o.__ename__)) t = "object";
-	switch(t) {
-	case "object":
-		if(o instanceof Array) {
-			if(o.__enum__) {
-				if(o.length == 2) return o[0];
-				var str = o[0] + "(";
-				s += "\t";
-				var _g1 = 2, _g = o.length;
-				while(_g1 < _g) {
-					var i = _g1++;
-					if(i != 2) str += "," + js.Boot.__string_rec(o[i],s); else str += js.Boot.__string_rec(o[i],s);
-				}
-				return str + ")";
-			}
-			var l = o.length;
-			var i;
-			var str = "[";
-			s += "\t";
-			var _g = 0;
-			while(_g < l) {
-				var i1 = _g++;
-				str += (i1 > 0?",":"") + js.Boot.__string_rec(o[i1],s);
-			}
-			str += "]";
-			return str;
-		}
-		var tostr;
-		try {
-			tostr = o.toString;
-		} catch( e ) {
-			return "???";
-		}
-		if(tostr != null && tostr != Object.toString) {
-			var s2 = o.toString();
-			if(s2 != "[object Object]") return s2;
-		}
-		var k = null;
-		var str = "{\n";
-		s += "\t";
-		var hasp = o.hasOwnProperty != null;
-		for( var k in o ) { ;
-		if(hasp && !o.hasOwnProperty(k)) {
-			continue;
-		}
-		if(k == "prototype" || k == "__class__" || k == "__super__" || k == "__interfaces__" || k == "__properties__") {
-			continue;
-		}
-		if(str.length != 2) str += ", \n";
-		str += s + k + " : " + js.Boot.__string_rec(o[k],s);
-		}
-		s = s.substring(1);
-		str += "\n" + s + "}";
-		return str;
-	case "function":
-		return "<function>";
-	case "string":
-		return o;
-	default:
-		return String(o);
-	}
-}
-js.Boot.__interfLoop = function(cc,cl) {
-	if(cc == null) return false;
-	if(cc == cl) return true;
-	var intf = cc.__interfaces__;
-	if(intf != null) {
-		var _g1 = 0, _g = intf.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var i1 = intf[i];
-			if(i1 == cl || js.Boot.__interfLoop(i1,cl)) return true;
-		}
-	}
-	return js.Boot.__interfLoop(cc.__super__,cl);
-}
-js.Boot.__instanceof = function(o,cl) {
-	if(cl == null) return false;
-	switch(cl) {
-	case Int:
-		return (o|0) === o;
-	case Float:
-		return typeof(o) == "number";
-	case Bool:
-		return typeof(o) == "boolean";
-	case String:
-		return typeof(o) == "string";
-	case Dynamic:
-		return true;
-	default:
-		if(o != null) {
-			if(typeof(cl) == "function") {
-				if(o instanceof cl) {
-					if(cl == Array) return o.__enum__ == null;
-					return true;
-				}
-				if(js.Boot.__interfLoop(o.__class__,cl)) return true;
-			}
-		} else return false;
-		if(cl == Class && o.__name__ != null) return true;
-		if(cl == Enum && o.__ename__ != null) return true;
-		return o.__enum__ == cl;
-	}
-}
-js.Browser = function() { }
-$hxClasses["js.Browser"] = js.Browser;
-js.Browser.__name__ = ["js","Browser"];
-mconsole.PrinterBase = function() {
-	this.printPosition = true;
-	this.printLineNumbers = true;
-};
-$hxClasses["mconsole.PrinterBase"] = mconsole.PrinterBase;
-mconsole.PrinterBase.__name__ = ["mconsole","PrinterBase"];
-mconsole.PrinterBase.prototype = {
-	printLine: function(color,line,pos) {
-		throw "method not implemented in ConsolePrinterBase";
-	}
-	,print: function(level,params,indent,pos) {
-		params = params.slice();
-		var _g1 = 0, _g = params.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			params[i] = Std.string(params[i]);
-		}
-		var message = params.join(", ");
-		var nextPosition = "@ " + pos.className + "." + pos.methodName;
-		var nextLineNumber = Std.string(pos.lineNumber);
-		var lineColumn = "";
-		var emptyLineColumn = "";
-		if(this.printPosition) {
-			if(nextPosition != this.position) this.printLine(mconsole.ConsoleColor.none,nextPosition,pos);
-		}
-		if(this.printLineNumbers) {
-			emptyLineColumn = StringTools.lpad(""," ",5);
-			if(nextPosition != this.position || nextLineNumber != this.lineNumber) lineColumn = StringTools.lpad(nextLineNumber," ",4) + " "; else lineColumn = emptyLineColumn;
-		}
-		this.position = nextPosition;
-		this.lineNumber = nextLineNumber;
-		var color = (function($this) {
-			var $r;
-			switch( (level)[1] ) {
-			case 0:
-				$r = mconsole.ConsoleColor.white;
-				break;
-			case 1:
-				$r = mconsole.ConsoleColor.blue;
-				break;
-			case 2:
-				$r = mconsole.ConsoleColor.green;
-				break;
-			case 3:
-				$r = mconsole.ConsoleColor.yellow;
-				break;
-			case 4:
-				$r = mconsole.ConsoleColor.red;
-				break;
-			}
-			return $r;
-		}(this));
-		var indent1 = StringTools.lpad(""," ",indent * 2);
-		message = lineColumn + indent1 + message;
-		message = message.split("\n").join("\n" + emptyLineColumn + indent1);
-		this.printLine(color,message,pos);
-	}
-	,__class__: mconsole.PrinterBase
-}
-mconsole.ConsoleView = function() {
-	mconsole.PrinterBase.call(this);
-	this.atBottom = true;
-	this.projectHome = "D:\\Dev\\AlphaTab\\alphaSynth/";
-	var document = js.Browser.document;
-	this.element = document.createElement("pre");
-	this.element.id = "console";
-	var style = document.createElement("style");
-	this.element.appendChild(style);
-	var rules = document.createTextNode("#console {\n\tfont-family:monospace;\n\tbackground-color:#002B36;\n\tbackground-color:rgba(0%,16.9%,21.2%,0.95);\n\tpadding:8px;\n\theight:600px;\n\tmax-height:600px;\n\toverflow-y:scroll;\n\tposition:absolute;\n\tleft:0px;\n\ttop:0px;\n\tright:0px;\n\tmargin:0px;\n\tz-index:10000;\n}\n#console a { text-decoration:none; }\n#console a:hover div { background-color:#063642 }\n#console a div span { display:none; float:right; color:white; }\n#console a:hover div span { display:block; }");
-	style.type = "text/css";
-	if(style.styleSheet) style.styleSheet.cssText = rules.nodeValue; else style.appendChild(rules);
-	var me = this;
-	this.element.onscroll = function(e) {
-		me.updateScroll();
-	};
-};
-$hxClasses["mconsole.ConsoleView"] = mconsole.ConsoleView;
-mconsole.ConsoleView.__name__ = ["mconsole","ConsoleView"];
-mconsole.ConsoleView.__interfaces__ = [mconsole.Printer];
-mconsole.ConsoleView.__super__ = mconsole.PrinterBase;
-mconsole.ConsoleView.prototype = $extend(mconsole.PrinterBase.prototype,{
-	remove: function() {
-		js.Browser.document.body.removeChild(this.element);
-	}
-	,attach: function() {
-		js.Browser.document.body.appendChild(this.element);
-	}
-	,printLine: function(color,line,pos) {
-		var style = (function($this) {
-			var $r;
-			switch( (color)[1] ) {
-			case 0:
-				$r = "#839496";
-				break;
-			case 1:
-				$r = "#ffffff";
-				break;
-			case 2:
-				$r = "#248bd2";
-				break;
-			case 3:
-				$r = "#859900";
-				break;
-			case 4:
-				$r = "#b58900";
-				break;
-			case 5:
-				$r = "#dc322f";
-				break;
-			}
-			return $r;
-		}(this));
-		var file = pos.fileName + ":" + pos.lineNumber;
-		var fileName = pos.className.split(".").join("/") + ".hx";
-		var link = "";
-		this.element.innerHTML = this.element.innerHTML + "<a" + link + "><div style='color:" + style + "'>" + line + "<span>" + file + "</span></div></a>";
-		if(this.atBottom) this.element.scrollTop = this.element.scrollHeight;
-	}
-	,updateScroll: function() {
-		this.atBottom = this.element.scrollTop - (this.element.scrollHeight - this.element.clientHeight) == 0;
-	}
-	,__class__: mconsole.ConsoleView
+$StaticConstructor(function (){
+    AlphaSynth.Main.AlphaSynthApi.AlphaSynthId = "AlphaSynth";
 });
-mconsole.Console = function() { }
-$hxClasses["mconsole.Console"] = mconsole.Console;
-mconsole.Console.__name__ = ["mconsole","Console"];
-mconsole.Console.start = function() {
-	if(mconsole.Console.running) return;
-	mconsole.Console.running = true;
-	mconsole.Console.previousTrace = haxe.Log.trace;
-	haxe.Log.trace = mconsole.Console.haxeTrace;
-	if(mconsole.Console.hasConsole) {
-	} else {
-	}
-}
-mconsole.Console.stop = function() {
-	if(!mconsole.Console.running) return;
-	mconsole.Console.running = false;
-	haxe.Log.trace = mconsole.Console.previousTrace;
-	mconsole.Console.previousTrace = null;
-}
-mconsole.Console.addPrinter = function(printer) {
-	mconsole.Console.removePrinter(printer);
-	mconsole.Console.printers.push(printer);
-}
-mconsole.Console.removePrinter = function(printer) {
-	HxOverrides.remove(mconsole.Console.printers,printer);
-}
-mconsole.Console.haxeTrace = function(value,pos) {
-	var params = pos.customParams;
-	if(params == null) params = []; else pos.customParams = null;
-	var level = (function($this) {
-		var $r;
-		switch(value) {
-		case "log":
-			$r = mconsole.LogLevel.log;
-			break;
-		case "warn":
-			$r = mconsole.LogLevel.warn;
-			break;
-		case "info":
-			$r = mconsole.LogLevel.info;
-			break;
-		case "debug":
-			$r = mconsole.LogLevel.debug;
-			break;
-		case "error":
-			$r = mconsole.LogLevel.error;
-			break;
-		default:
-			$r = (function($this) {
-				var $r;
-				params.unshift(value);
-				$r = mconsole.LogLevel.log;
-				return $r;
-			}($this));
-		}
-		return $r;
-	}(this));
-	if(mconsole.Console.hasConsole) mconsole.Console.callConsole(Std.string(level),params);
-	mconsole.Console.print(level,params,pos);
-}
-mconsole.Console.print = function(level,params,pos) {
-	var _g = 0, _g1 = mconsole.Console.printers;
-	while(_g < _g1.length) {
-		var printer = _g1[_g];
-		++_g;
-		printer.print(level,params,mconsole.Console.groupDepth,pos);
-	}
-}
-mconsole.Console.log = function(message,pos) {
-	if(mconsole.Console.hasConsole) mconsole.Console.callConsole("log",[message]);
-	mconsole.Console.print(mconsole.LogLevel.log,[message],pos);
-}
-mconsole.Console.info = function(message,pos) {
-	if(mconsole.Console.hasConsole) mconsole.Console.callConsole("info",[message]);
-	mconsole.Console.print(mconsole.LogLevel.info,[message],pos);
-}
-mconsole.Console.debug = function(message,pos) {
-	if(mconsole.Console.hasConsole) mconsole.Console.callConsole("debug",[message]);
-	mconsole.Console.print(mconsole.LogLevel.debug,[message],pos);
-}
-mconsole.Console.warn = function(message,pos) {
-	if(mconsole.Console.hasConsole) mconsole.Console.callConsole("warn",[message]);
-	mconsole.Console.print(mconsole.LogLevel.warn,[message],pos);
-}
-mconsole.Console.error = function(message,stack,pos) {
-	if(stack == null) stack = haxe.CallStack.callStack();
-	var stackTrace = stack.length > 0?"\n" + mconsole.StackHelper.toString(stack):"";
-	if(mconsole.Console.hasConsole) mconsole.Console.callConsole("error",[message]);
-	mconsole.Console.print(mconsole.LogLevel.error,["Error: " + Std.string(message) + stackTrace],pos);
-}
-mconsole.Console.trace = function(pos) {
-	if(mconsole.Console.hasConsole) mconsole.Console.callConsole("trace",[]);
-	var stack = mconsole.StackHelper.toString(haxe.CallStack.callStack());
-	mconsole.Console.print(mconsole.LogLevel.error,["Stack trace:\n" + stack],pos);
-}
-mconsole.Console.assert = function(expression,message,pos) {
-	if(mconsole.Console.hasConsole) mconsole.Console.callConsole("assert",[expression,message]);
-	if(!expression) {
-		var stack = mconsole.StackHelper.toString(haxe.CallStack.callStack());
-		mconsole.Console.print(mconsole.LogLevel.error,["Assertion failed: " + Std.string(message) + "\n" + stack],pos);
-		throw message;
-	}
-}
-mconsole.Console.count = function(title,pos) {
-	if(mconsole.Console.hasConsole) mconsole.Console.callConsole("count",[title]);
-	var position = pos.fileName + ":" + pos.lineNumber;
-	var count = mconsole.Console.counts.exists(position)?mconsole.Console.counts.get(position) + 1:1;
-	mconsole.Console.counts.set(position,count);
-	mconsole.Console.print(mconsole.LogLevel.log,[title + ": " + count],pos);
-}
-mconsole.Console.group = function(message,pos) {
-	if(mconsole.Console.hasConsole) mconsole.Console.callConsole("group",[message]);
-	mconsole.Console.print(mconsole.LogLevel.log,[message],pos);
-	mconsole.Console.groupDepth += 1;
-}
-mconsole.Console.groupEnd = function(pos) {
-	if(mconsole.Console.hasConsole) mconsole.Console.callConsole("groupEnd",[]);
-	if(mconsole.Console.groupDepth > 0) mconsole.Console.groupDepth -= 1;
-}
-mconsole.Console.time = function(name,pos) {
-	if(mconsole.Console.hasConsole) mconsole.Console.callConsole("time",[name]);
-	mconsole.Console.times.set(name,haxe.Timer.stamp());
-}
-mconsole.Console.timeEnd = function(name,pos) {
-	if(mconsole.Console.hasConsole) mconsole.Console.callConsole("timeEnd",[name]);
-	if(mconsole.Console.times.exists(name)) {
-		mconsole.Console.print(mconsole.LogLevel.log,[name + ": " + ((haxe.Timer.stamp() - mconsole.Console.times.get(name)) * 1000 | 0) + "ms"],pos);
-		mconsole.Console.times.remove(name);
-	}
-}
-mconsole.Console.markTimeline = function(label,pos) {
-	if(mconsole.Console.hasConsole) mconsole.Console.callConsole("markTimeline",[label]);
-}
-mconsole.Console.profile = function(title,pos) {
-	if(mconsole.Console.hasConsole) mconsole.Console.callConsole("profile",[title]);
-}
-mconsole.Console.profileEnd = function(title,pos) {
-	if(mconsole.Console.hasConsole) mconsole.Console.callConsole("profileEnd",[title]);
-}
-mconsole.Console.enterDebugger = function() {
-	debugger;
-}
-mconsole.Console.detectConsole = function() {
-	if(console != null && console[mconsole.Console.dirxml] == null) mconsole.Console.dirxml = "log";
-	return console != undefined && console.log != undefined && console.warn != undefined;
-}
-mconsole.Console.callConsole = function(method,params) {
-	if(console[method] != null) {
-		if(method == "log" && js.Boot.__instanceof(params[0],Xml)) method = mconsole.Console.dirxml;
-		if(console[method].apply != null) console[method].apply(console,mconsole.Console.toConsoleValues(params)); else if(Function.prototype.bind != null) Function.prototype.bind.call(console[method],console).apply(console,mconsole.Console.toConsoleValues(params));
-	}
-}
-mconsole.Console.toConsoleValues = function(params) {
-	var _g1 = 0, _g = params.length;
-	while(_g1 < _g) {
-		var i = _g1++;
-		params[i] = mconsole.Console.toConsoleValue(params[i]);
-	}
-	return params;
-}
-mconsole.Console.toConsoleValue = function(value) {
-	var typeClass = Type.getClass(value);
-	var typeName = typeClass == null?"":Type.getClassName(typeClass);
-	if(typeName == "Xml") {
-		var parser = new DOMParser();
-		return parser.parseFromString(value.toString(),"text/xml").firstChild;
-	} else if(typeName == "Map" || typeName == "StringMap" || typeName == "IntMap") {
-		var $native = { };
-		var map = value;
-		var $it0 = map.keys();
-		while( $it0.hasNext() ) {
-			var key = $it0.next();
-			$native[Std.string(key)] = mconsole.Console.toConsoleValue(map.get(key));
-		}
-		return $native;
-	} else {
-		var _g = Type["typeof"](value);
-		var $e = (_g);
-		switch( $e[1] ) {
-		case 7:
-			var e = $e[2];
-			var $native = [];
-			var name = Type.getEnumName(e) + "." + Type.enumConstructor(value);
-			var params = Type.enumParameters(value);
-			if(params.length > 0) {
-				$native.push(name + "(");
-				var _g2 = 0, _g1 = params.length;
-				while(_g2 < _g1) {
-					var i = _g2++;
-					$native.push(mconsole.Console.toConsoleValue(params[i]));
-				}
-				$native.push(")");
-			} else return [name];
-			return $native;
-		default:
-		}
-		if(typeName == "Array" || typeName == "List" || typeName == "haxe.FastList") {
-			var $native = [];
-			var iterable = value;
-			var $it1 = $iterator(iterable)();
-			while( $it1.hasNext() ) {
-				var i = $it1.next();
-				$native.push(mconsole.Console.toConsoleValue(i));
-			}
-			return $native;
-		}
-	}
-	return value;
-}
-mconsole.ConsoleMacro = function() { }
-$hxClasses["mconsole.ConsoleMacro"] = mconsole.ConsoleMacro;
-mconsole.ConsoleMacro.__name__ = ["mconsole","ConsoleMacro"];
-mconsole.LogLevel = $hxClasses["mconsole.LogLevel"] = { __ename__ : ["mconsole","LogLevel"], __constructs__ : ["log","info","debug","warn","error"] }
-mconsole.LogLevel.log = ["log",0];
-mconsole.LogLevel.log.toString = $estr;
-mconsole.LogLevel.log.__enum__ = mconsole.LogLevel;
-mconsole.LogLevel.info = ["info",1];
-mconsole.LogLevel.info.toString = $estr;
-mconsole.LogLevel.info.__enum__ = mconsole.LogLevel;
-mconsole.LogLevel.debug = ["debug",2];
-mconsole.LogLevel.debug.toString = $estr;
-mconsole.LogLevel.debug.__enum__ = mconsole.LogLevel;
-mconsole.LogLevel.warn = ["warn",3];
-mconsole.LogLevel.warn.toString = $estr;
-mconsole.LogLevel.warn.__enum__ = mconsole.LogLevel;
-mconsole.LogLevel.error = ["error",4];
-mconsole.LogLevel.error.toString = $estr;
-mconsole.LogLevel.error.__enum__ = mconsole.LogLevel;
-mconsole.ConsoleColor = $hxClasses["mconsole.ConsoleColor"] = { __ename__ : ["mconsole","ConsoleColor"], __constructs__ : ["none","white","blue","green","yellow","red"] }
-mconsole.ConsoleColor.none = ["none",0];
-mconsole.ConsoleColor.none.toString = $estr;
-mconsole.ConsoleColor.none.__enum__ = mconsole.ConsoleColor;
-mconsole.ConsoleColor.white = ["white",1];
-mconsole.ConsoleColor.white.toString = $estr;
-mconsole.ConsoleColor.white.__enum__ = mconsole.ConsoleColor;
-mconsole.ConsoleColor.blue = ["blue",2];
-mconsole.ConsoleColor.blue.toString = $estr;
-mconsole.ConsoleColor.blue.__enum__ = mconsole.ConsoleColor;
-mconsole.ConsoleColor.green = ["green",3];
-mconsole.ConsoleColor.green.toString = $estr;
-mconsole.ConsoleColor.green.__enum__ = mconsole.ConsoleColor;
-mconsole.ConsoleColor.yellow = ["yellow",4];
-mconsole.ConsoleColor.yellow.toString = $estr;
-mconsole.ConsoleColor.yellow.__enum__ = mconsole.ConsoleColor;
-mconsole.ConsoleColor.red = ["red",5];
-mconsole.ConsoleColor.red.toString = $estr;
-mconsole.ConsoleColor.red.__enum__ = mconsole.ConsoleColor;
-mconsole.StackHelper = function() { }
-$hxClasses["mconsole.StackHelper"] = mconsole.StackHelper;
-mconsole.StackHelper.__name__ = ["mconsole","StackHelper"];
-mconsole.StackHelper.createFilters = function() {
-	var filters = new haxe.ds.StringMap();
-	filters.set("@ mconsole.ConsoleRedirect.haxeTrace:59",true);
-	return filters;
-}
-mconsole.StackHelper.toString = function(stack) {
-	return "null";
-}
-mconsole.StackItemHelper = function() { }
-$hxClasses["mconsole.StackItemHelper"] = mconsole.StackItemHelper;
-mconsole.StackItemHelper.__name__ = ["mconsole","StackItemHelper"];
-mconsole.StackItemHelper.toString = function(item,isFirst) {
-	if(isFirst == null) isFirst = false;
-	return (function($this) {
-		var $r;
-		var $e = (item);
-		switch( $e[1] ) {
-		case 1:
-			var module = $e[2];
-			$r = module;
-			break;
-		case 3:
-			var method = $e[3], className = $e[2];
-			$r = className + "." + method;
-			break;
-		case 4:
-			var v = $e[2];
-			$r = "Lambda(" + v + ")";
-			break;
-		case 2:
-			var line = $e[4], file = $e[3], s = $e[2];
-			$r = (s == null?file.split("::").join(".") + ":" + line:mconsole.StackItemHelper.toString(s)) + ":" + line;
-			break;
-		case 0:
-			$r = "(anonymous function)";
-			break;
-		}
-		return $r;
-	}(this));
-}
-function $iterator(o) { if( o instanceof Array ) return function() { return HxOverrides.iter(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; };
-var $_, $fid = 0;
-function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; };
-if(Array.prototype.indexOf) HxOverrides.remove = function(a,o) {
-	var i = a.indexOf(o);
-	if(i == -1) return false;
-	a.splice(i,1);
-	return true;
+AlphaSynth.Main.AlphaSynthFlashOutput = function (asRoot, swfObjectRoot){
+    this._asRoot = null;
+    this._swfObjectRoot = null;
+    this._id = null;
+    this._swfId = null;
+    this._swfContainer = null;
+    this.SampleRequest = null;
+    this.Finished = null;
+    this.PositionChanged = null;
+    this.ReadyChanged = null;
+    this._asRoot = asRoot;
+    this._swfObjectRoot = swfObjectRoot;
 };
-Math.__name__ = ["Math"];
-Math.NaN = Number.NaN;
-Math.NEGATIVE_INFINITY = Number.NEGATIVE_INFINITY;
-Math.POSITIVE_INFINITY = Number.POSITIVE_INFINITY;
-$hxClasses.Math = Math;
-Math.isFinite = function(i) {
-	return isFinite(i);
+AlphaSynth.Main.AlphaSynthFlashOutput.prototype = {
+    Open: function (){
+        this._id = "alphaSynthFlashPlayer" + AlphaSynth.Main.AlphaSynthFlashOutput.NextId;
+        this._swfId = this._id + "swf";
+        AlphaSynth.Main.AlphaSynthFlashOutput.Lookup[this._id] = this;
+        AlphaSynth.Main.AlphaSynthFlashOutput.NextId++;
+        this._swfContainer = document.createElement("div");
+        this._swfContainer.className = "alphaSynthFlashPlayer";
+        this._swfContainer.setAttribute("id", this._id);
+        document.body.appendChild(this._swfContainer);
+        var swf =  swfobject;
+        var embedSwf = swf["embedSWF"];
+        embedSwf(this._asRoot + "AlphaSynth.FlashOutput.swf", this._id, "1px", "1px", "9.0.0", this._swfObjectRoot + "expressInstall.swf", {
+            id: this._id,
+            sampleRate: 44100
+        }, {
+            allowScriptAccess: "always"
+        }, {
+            id: this._swfId
+        });
+    },
+    SequencerFinished: function (){
+        document.getElementById(this._swfId).AlphaSynthSequencerFinished();
+    },
+    AddSamples: function (samples){
+        var uint8 = new Uint8Array(samples.buffer);
+        var b64 =  window.btoa(String.fromCharCode.apply(null, uint8));
+        document.getElementById(this._swfId).AlphaSynthAddSamples(b64);
+    },
+    Play: function (){
+        document.getElementById(this._swfId).AlphaSynthPlay();
+    },
+    Pause: function (){
+        document.getElementById(this._swfId).AlphaSynthPause();
+    },
+    Stop: function (){
+        document.getElementById(this._swfId).AlphaSynthStop();
+    },
+    Seek: function (position){
+        document.getElementById(this._swfId).AlphaSynthSeek(position);
+    },
+    add_SampleRequest: function (value){
+        this.SampleRequest = $CombineDelegates(this.SampleRequest, value);
+    },
+    remove_SampleRequest: function (value){
+        this.SampleRequest = $RemoveDelegate(this.SampleRequest, value);
+    },
+    add_Finished: function (value){
+        this.Finished = $CombineDelegates(this.Finished, value);
+    },
+    remove_Finished: function (value){
+        this.Finished = $RemoveDelegate(this.Finished, value);
+    },
+    add_PositionChanged: function (value){
+        this.PositionChanged = $CombineDelegates(this.PositionChanged, value);
+    },
+    remove_PositionChanged: function (value){
+        this.PositionChanged = $RemoveDelegate(this.PositionChanged, value);
+    },
+    add_ReadyChanged: function (value){
+        this.ReadyChanged = $CombineDelegates(this.ReadyChanged, value);
+    },
+    remove_ReadyChanged: function (value){
+        this.ReadyChanged = $RemoveDelegate(this.ReadyChanged, value);
+    }
 };
-Math.isNaN = function(i) {
-	return isNaN(i);
+$StaticConstructor(function (){
+    AlphaSynth.Main.AlphaSynthFlashOutput.Id = "alphaSynthFlashPlayer";
+    AlphaSynth.Main.AlphaSynthFlashOutput.Lookup = null;
+    AlphaSynth.Main.AlphaSynthFlashOutput.NextId = 0;
+    AlphaSynth.Main.AlphaSynthFlashOutput.Lookup = {};
+});
+AlphaSynth.Main.AlphaSynthFlashOutput.OnSampleRequest = function (id){
+    if (AlphaSynth.Main.AlphaSynthFlashOutput.Lookup.hasOwnProperty(id) && AlphaSynth.Main.AlphaSynthFlashOutput.Lookup[id].SampleRequest != null){
+        AlphaSynth.Main.AlphaSynthFlashOutput.Lookup[id].SampleRequest();
+    }
 };
-String.prototype.__class__ = $hxClasses.String = String;
-String.__name__ = ["String"];
-Array.prototype.__class__ = $hxClasses.Array = Array;
-Array.__name__ = ["Array"];
-Date.prototype.__class__ = $hxClasses.Date = Date;
-Date.__name__ = ["Date"];
-var Int = $hxClasses.Int = { __name__ : ["Int"]};
-var Dynamic = $hxClasses.Dynamic = { __name__ : ["Dynamic"]};
-var Float = $hxClasses.Float = Number;
-Float.__name__ = ["Float"];
-var Bool = $hxClasses.Bool = Boolean;
-Bool.__ename__ = ["Bool"];
-var Class = $hxClasses.Class = { __name__ : ["Class"]};
-var Enum = { };
-Xml.Element = "element";
-Xml.PCData = "pcdata";
-Xml.CData = "cdata";
-Xml.Comment = "comment";
-Xml.DocType = "doctype";
-Xml.ProcessingInstruction = "processingInstruction";
-Xml.Document = "document";
-as.platform.TypeUtils.IsLittleEndian = true;
-var q = window.jQuery;
-js.JQuery = q;
-as.bank.components.GeneratorStateEnum.PreLoop = 0;
-as.bank.components.GeneratorStateEnum.Loop = 1;
-as.bank.components.GeneratorStateEnum.PostLoop = 2;
-as.bank.components.GeneratorStateEnum.Finished = 3;
-as.bank.components.EnvelopeStateEnum.Delay = 0;
-as.bank.components.EnvelopeStateEnum.Attack = 1;
-as.bank.components.EnvelopeStateEnum.Hold = 2;
-as.bank.components.EnvelopeStateEnum.Decay = 3;
-as.bank.components.EnvelopeStateEnum.Sustain = 4;
-as.bank.components.EnvelopeStateEnum.Release = 5;
-as.bank.components.EnvelopeStateEnum.None = 6;
-as.bank.components.LfoStateEnum.Delay = 0;
-as.bank.components.LfoStateEnum.Sustain = 1;
-as.bank.components.WaveformEnum.Sine = 0;
-as.bank.components.WaveformEnum.Square = 1;
-as.bank.components.WaveformEnum.Saw = 2;
-as.bank.components.WaveformEnum.Triangle = 3;
-as.bank.components.WaveformEnum.SampleData = 4;
-as.bank.components.WaveformEnum.WhiteNoise = 5;
-as.bank.components.InterpolationEnum.None = 0;
-as.bank.components.InterpolationEnum.Linear = 1;
-as.bank.components.InterpolationEnum.Cosine = 2;
-as.bank.components.InterpolationEnum.CubicSpline = 3;
-as.bank.components.InterpolationEnum.Sinc = 4;
-as.bank.components.LoopModeEnum.NoLoop = 0;
-as.bank.components.LoopModeEnum.OneShot = 1;
-as.bank.components.LoopModeEnum.Continuous = 2;
-as.bank.components.LoopModeEnum.LoopUntilNoteOff = 3;
-as.bank.components.FilterTypeEnum.None = 0;
-as.bank.components.FilterTypeEnum.BiquadLowpass = 1;
-as.bank.components.FilterTypeEnum.BiquadHighpass = 2;
-as.bank.components.FilterTypeEnum.OnePoleLowpass = 3;
-as.log.LevelPrinter.MinLogLevel = 0;
-as.log.LevelPrinter.MaxLogLevel = 5;
-as.main.webworker.flash.AlphaSynthFlashPlayerApi.AlphaSynthId = "AlphaSynth";
-as.main.webworker.flash.AlphaSynthFlashPlayerApi.AlphaSynthWorkerId = "AlphaSynthWorker";
-as.main.webworker.webaudio.AlphaSynthJsPlayer.BufferSize = 4096;
-as.main.webworker.webaudio.AlphaSynthJsPlayer.Latency = 4096000 / 88200;
-as.main.webworker.webaudio.AlphaSynthJsPlayer.BufferCount = 10;
-as.main.webworker.webaudio.AlphaSynthJsPlayerApi.AlphaSynthWorkerId = "AlphaSynthWorker";
-as.platform.TypeUtils.IntMax = 2147483647;
-as.util.SynthConstants.InterpolationMode = 1;
-as.util.SynthConstants.SampleRate = 44100;
-as.util.SynthConstants.TwoPi = 2.0 * Math.PI;
-as.util.SynthConstants.HalfPi = Math.PI / 2.0;
-as.util.SynthConstants.InverseSqrtOfTwo = 0.707106781186;
-as.util.SynthConstants.DefaultLfoFrequency = 8.0;
-as.util.SynthConstants.DefaultModDepth = 100;
-as.util.SynthConstants.DefaultPolyphony = 40;
-as.util.SynthConstants.MinPolyphony = 5;
-as.util.SynthConstants.MaxPolyphony = 250;
-as.util.SynthConstants.DefaultBlockSize = 64;
-as.util.SynthConstants.MaxBufferSize = 0.05;
-as.util.SynthConstants.MinBufferSize = 0.001;
-as.util.SynthConstants.DenormLimit = 1e-38;
-as.util.SynthConstants.NonAudible = 1e-5;
-as.util.SynthConstants.SincWidth = 16;
-as.util.SynthConstants.SincResolution = 64;
-as.util.SynthConstants.MaxVoiceComponents = 4;
-as.util.SynthConstants.DefaultChannelCount = 16;
-as.util.SynthConstants.DefaultKeyCount = 128;
-haxe.Serializer.USE_CACHE = false;
-haxe.Serializer.USE_ENUM_INDEX = false;
-haxe.Serializer.BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%:";
-haxe.Unserializer.DEFAULT_RESOLVER = Type;
-haxe.Unserializer.BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%:";
-haxe.ds.ObjectMap.count = 0;
-haxe.remoting.ExternalConnection.connections = new haxe.ds.StringMap();
-js.Browser.window = typeof window != "undefined" ? window : null;
-js.Browser.document = typeof window != "undefined" ? window.document : null;
-mconsole.ConsoleView.CONSOLE_STYLES = "#console {\n\tfont-family:monospace;\n\tbackground-color:#002B36;\n\tbackground-color:rgba(0%,16.9%,21.2%,0.95);\n\tpadding:8px;\n\theight:600px;\n\tmax-height:600px;\n\toverflow-y:scroll;\n\tposition:absolute;\n\tleft:0px;\n\ttop:0px;\n\tright:0px;\n\tmargin:0px;\n\tz-index:10000;\n}\n#console a { text-decoration:none; }\n#console a:hover div { background-color:#063642 }\n#console a div span { display:none; float:right; color:white; }\n#console a:hover div span { display:block; }";
-mconsole.Console.defaultPrinter = new mconsole.ConsoleView();
-mconsole.Console.printers = [mconsole.Console.defaultPrinter];
-mconsole.Console.groupDepth = 0;
-mconsole.Console.times = new haxe.ds.StringMap();
-mconsole.Console.counts = new haxe.ds.StringMap();
-mconsole.Console.running = false;
-mconsole.Console.dirxml = "dirxml";
-mconsole.Console.hasConsole = mconsole.Console.detectConsole();
-mconsole.ConsoleMacro.__meta__ = { obj : { IgnoreCover : null}};
-mconsole.StackHelper.filters = mconsole.StackHelper.createFilters();
-as.main.AlphaSynthJs.main();
-function $hxExpose(src, path) {
-	var o = typeof window != "undefined" ? window : exports;
-	var parts = path.split(".");
-	for(var ii = 0; ii < parts.length-1; ++ii) {
-		var p = parts[ii];
-		if(typeof o[p] == "undefined") o[p] = {};
-		o = o[p];
-	}
-	o[parts[parts.length-1]] = src;
+AlphaSynth.Main.AlphaSynthFlashOutput.OnFinished = function (id){
+    if (AlphaSynth.Main.AlphaSynthFlashOutput.Lookup.hasOwnProperty(id) && AlphaSynth.Main.AlphaSynthFlashOutput.Lookup[id].Finished != null){
+        AlphaSynth.Main.AlphaSynthFlashOutput.Lookup[id].Finished();
+    }
+};
+AlphaSynth.Main.AlphaSynthFlashOutput.OnPositionChanged = function (id, position){
+    if (AlphaSynth.Main.AlphaSynthFlashOutput.Lookup.hasOwnProperty(id) && AlphaSynth.Main.AlphaSynthFlashOutput.Lookup[id].PositionChanged != null){
+        AlphaSynth.Main.AlphaSynthFlashOutput.Lookup[id].PositionChanged(position);
+    }
+};
+AlphaSynth.Main.AlphaSynthFlashOutput.OnReadyChanged = function (id, isReady){
+    if (AlphaSynth.Main.AlphaSynthFlashOutput.Lookup.hasOwnProperty(id) && AlphaSynth.Main.AlphaSynthFlashOutput.Lookup[id].ReadyChanged != null){
+        AlphaSynth.Main.AlphaSynthFlashOutput.Lookup[id].ReadyChanged(isReady);
+    }
+};
+AlphaSynth.Main.AlphaSynthWebAudioOutput = function (){
+    this._context = null;
+    this._buffer = null;
+    this._source = null;
+    this._audioNode = null;
+    this._circularBuffer = null;
+    this._finished = false;
+    this._startTime = 0;
+    this._pauseStart = 0;
+    this._pauseTime = 0;
+    this._paused = false;
+    this.SampleRequest = null;
+    this.Finished = null;
+    this.PositionChanged = null;
+    this.ReadyChanged = null;
+};
+AlphaSynth.Main.AlphaSynthWebAudioOutput.prototype = {
+    Open: function (){
+        this._finished = false;
+        this._circularBuffer = new AlphaSynth.Ds.CircularSampleBuffer(40960);
+         window.AudioContext = window.AudioContext || window.webkitAudioContext;
+        this._context = new AudioContext();
+        // create an empty buffer source (silence)
+        this._buffer = this._context.createBuffer(2, 4096, 44100);
+        // create a script processor node which will replace the silence with the generated audio
+        this._audioNode = this._context.createScriptProcessor(4096, 0, 2);
+        this._audioNode.onaudioprocess = $CreateDelegate(this, this.GenerateSound);
+        this.OnReadyChanged(true);
+    },
+    Play: function (){
+        this.RequestBuffers();
+        this._finished = false;
+        if (this._paused){
+            this._paused = false;
+            this._pauseTime += ((this._context.currentTime * 1000 - this._pauseStart)) | 0;
+        }
+        else {
+            this._startTime = ((this._context.currentTime * 1000)) | 0;
+            this._pauseTime = 0;
+        }
+        this._source = this._context.createBufferSource();
+        this._source.buffer = this._buffer;
+        this._source.loop = true;
+        this._source.connect(this._audioNode, 0, 0);
+        this._source.start(0);
+        this._audioNode.connect(this._context.destination, 0, 0);
+    },
+    Pause: function (){
+        if (this._source != null){
+            this._source.stop(0);
+        }
+        this._source = null;
+        this._paused = true;
+        this._pauseStart = ((this._context.currentTime * 1000)) | 0;
+        this._audioNode.disconnect(0);
+    },
+    Stop: function (){
+        this._finished = true;
+        this._paused = false;
+        if (this._source != null){
+            this._source.stop(0);
+        }
+        this._source = null;
+        this._circularBuffer.Clear();
+        this._audioNode.disconnect(0);
+    },
+    Seek: function (position){
+        this._startTime = ((this._context.currentTime * 1000 - position)) | 0;
+        this._pauseTime = 0;
+    },
+    SequencerFinished: function (){
+        this._finished = true;
+    },
+    AddSamples: function (f){
+        this._circularBuffer.Write(f, 0, f.length);
+    },
+    RequestBuffers: function (){
+        // if we fall under the half of buffers
+        // we request one half
+        var count = 20480;
+        if (this._circularBuffer.get_Count() < count && this.SampleRequest != null){
+            for (var i = 0; i < 5; i++){
+                this.SampleRequest();
+            }
+        }
+    },
+    CalcPosition: function (){
+        return (this._context.currentTime * 1000 - this._startTime - this._pauseTime - 46);
+    },
+    GenerateSound: function (e){
+        var ae = e;
+        var left = ae.outputBuffer.getChannelData(0);
+        var right = ae.outputBuffer.getChannelData(1);
+        var samples = left.length + right.length;
+        if (this._circularBuffer.get_Count() < samples){
+            if (this._finished){
+                if (this.Finished != null)
+                    this.Finished();
+                this.Stop();
+            }
+            else {
+                // when buffering we count it as pause time
+                this._pauseTime += 46;
+            }
+        }
+        else {
+            var buffer = new Float32Array(samples);
+            this._circularBuffer.Read(buffer, 0, buffer.length);
+            var s = 0;
+            for (var i = 0; i < left.length; i++){
+                left[i] = buffer[s++];
+                right[i] = buffer[s++];
+            }
+        }
+        if (this.PositionChanged != null){
+            this.PositionChanged(((this.CalcPosition())) | 0);
+        }
+        if (!this._finished){
+            this.RequestBuffers();
+        }
+    },
+    add_SampleRequest: function (value){
+        this.SampleRequest = $CombineDelegates(this.SampleRequest, value);
+    },
+    remove_SampleRequest: function (value){
+        this.SampleRequest = $RemoveDelegate(this.SampleRequest, value);
+    },
+    add_Finished: function (value){
+        this.Finished = $CombineDelegates(this.Finished, value);
+    },
+    remove_Finished: function (value){
+        this.Finished = $RemoveDelegate(this.Finished, value);
+    },
+    add_PositionChanged: function (value){
+        this.PositionChanged = $CombineDelegates(this.PositionChanged, value);
+    },
+    remove_PositionChanged: function (value){
+        this.PositionChanged = $RemoveDelegate(this.PositionChanged, value);
+    },
+    add_ReadyChanged: function (value){
+        this.ReadyChanged = $CombineDelegates(this.ReadyChanged, value);
+    },
+    remove_ReadyChanged: function (value){
+        this.ReadyChanged = $RemoveDelegate(this.ReadyChanged, value);
+    },
+    OnReadyChanged: function (isReady){
+        var handler = this.ReadyChanged;
+        if (handler != null)
+            handler(isReady);
+    }
+};
+$StaticConstructor(function (){
+    AlphaSynth.Main.AlphaSynthWebAudioOutput.BufferSize = 4096;
+    AlphaSynth.Main.AlphaSynthWebAudioOutput.Latency = 46;
+    AlphaSynth.Main.AlphaSynthWebAudioOutput.BufferCount = 10;
+});
+AlphaSynth.Main.AlphaSynthWebWorker = function (main){
+    this._player = null;
+    this._main = null;
+    this._main = main;
+    this._main.addEventListener("message", $CreateDelegate(this, this.HandleMessage), false);
+    this._player = new AlphaSynth.Player.SynthPlayer();
+    this._player.add_PositionChanged($CreateDelegate(this, this.OnPositionChanged));
+    this._player.add_PlayerStateChanged($CreateDelegate(this, this.OnPlayerStateChanged));
+    this._player.add_Finished($CreateDelegate(this, this.OnFinished));
+    this._player.add_SoundFontLoad($CreateDelegate(this, this.OnSoundFontLoad));
+    this._player.add_SoundFontLoaded($CreateDelegate(this, this.OnSoundFontLoaded));
+    this._player.add_SoundFontLoadFailed($CreateDelegate(this, this.OnSoundFontLoadFailed));
+    this._player.add_MidiLoad($CreateDelegate(this, this.OnMidiLoad));
+    this._player.add_MidiLoaded($CreateDelegate(this, this.OnMidiLoaded));
+    this._player.add_MidiLoadFailed($CreateDelegate(this, this.OnMidiLoadFailed));
+    this._player.add_ReadyForPlay($CreateDelegate(this, this.OnReadyForPlay));
+    this.OnReady();
+};
+AlphaSynth.Main.AlphaSynthWebWorker.prototype = {
+    HandleMessage: function (e){
+        var data = e.data;
+        var cmd = data["cmd"];
+        switch (cmd){
+            case "play":
+                this.Play();
+                break;
+            case "pause":
+                this.Pause();
+                break;
+            case "isReadyForPlay":
+                this._main.postMessage({
+    cmd: "isReadyForPlay",
+    value: this.IsReadyForPlay()
 }
-})();
+);
+                break;
+            case "getMasterVolume":
+                this._main.postMessage({
+    cmd: "getMasterVolume",
+    value: this._player.get_MasterVolume()
+}
+);
+                break;
+            case "setMasterVolume":
+                this._player.set_MasterVolume(data["value"]);
+                break;
+            case "playPause":
+                this.PlayPause();
+                break;
+            case "stop":
+                this.Stop();
+                break;
+            case "setPositionTick":
+                this.SetPositionTick(data["tick"]);
+                break;
+            case "setPositionTime":
+                this.SetPositionTime(data["time"]);
+                break;
+            case "loadSoundFontUrl":
+                this.LoadSoundFontUrl(data["url"]);
+                break;
+            case "loadSoundFontBytes":
+                this.LoadSoundFontBytes(data["data"]);
+                break;
+            case "loadMidiUrl":
+                this.LoadMidiUrl(data["url"]);
+                break;
+            case "loadMidiBytes":
+                this.LoadMidiBytes(data["data"]);
+                break;
+            case "getState":
+                this._main.postMessage({
+    cmd: "getState",
+    value: this.GetState()
+}
+);
+                break;
+            case "isSoundFontLoaded":
+                this._main.postMessage({
+    cmd: "isSoundFontLoaded",
+    value: this.IsSoundFontLoaded()
+}
+);
+                break;
+            case "isMidiLoaded":
+                this._main.postMessage({
+    cmd: "isMidiLoaded",
+    value: this.IsMidiLoaded()
+}
+);
+                break;
+            case "setLogLevel":
+                this.SetLogLevel(data["level"]);
+                break;
+        }
+    },
+    IsReadyForPlay: function (){
+        return this._player.get_IsReady();
+    },
+    Play: function (){
+        this._player.Play();
+    },
+    Pause: function (){
+        this._player.Pause();
+    },
+    PlayPause: function (){
+        this._player.PlayPause();
+    },
+    Stop: function (){
+        this._player.Stop();
+    },
+    SetPositionTick: function (tick){
+        this._player.set_TickPosition(tick);
+    },
+    SetPositionTime: function (millis){
+        this._player.set_TimePosition(millis);
+    },
+    LoadSoundFontUrl: function (url){
+        this._player.LoadSoundFontUrl(url);
+    },
+    LoadSoundFontBytes: function (data){
+        this._player.LoadSoundFontBytes(data);
+    },
+    LoadMidiUrl: function (url){
+        this._player.LoadMidiUrl(url);
+    },
+    LoadMidiBytes: function (data){
+        this._player.LoadMidiBytes(data);
+    },
+    GetState: function (){
+        return this._player.State;
+    },
+    IsSoundFontLoaded: function (){
+        return this._player.IsSoundFontLoaded;
+    },
+    IsMidiLoaded: function (){
+        return this._player.IsMidiLoaded;
+    },
+    GetMasterVolume: function (){
+        return this._player.get_MasterVolume();
+    },
+    SetMasterVolume: function (volume){
+        this._player.set_MasterVolume(volume);
+    },
+    OnReady: function (){
+        this._main.postMessage({
+    cmd: "ready"
+}
+);
+    },
+    OnPositionChanged: function (sender, e){
+        this._main.postMessage({
+    cmd: "positionChanged",
+    currentTime: e.CurrentTime,
+    endTime: e.EndTime,
+    currentTick: e.CurrentTick,
+    endTick: e.EndTick
+}
+);
+    },
+    OnPlayerStateChanged: function (sender, e){
+        this._main.postMessage({
+    cmd: "playerStateChanged",
+    state: e.State
+}
+);
+    },
+    OnFinished: function (sender, e){
+        this._main.postMessage({
+    cmd: "finished"
+}
+);
+    },
+    OnSoundFontLoad: function (sender, e){
+        this._main.postMessage({
+    cmd: "soundFontLoad",
+    loaded: e.Loaded,
+    total: e.Total
+}
+);
+    },
+    OnSoundFontLoaded: function (sender, e){
+        this._main.postMessage({
+    cmd: "soundFontLoaded"
+}
+);
+    },
+    OnSoundFontLoadFailed: function (sender, e){
+        this._main.postMessage({
+    cmd: "soundFontLoadFailed"
+}
+);
+    },
+    OnMidiLoad: function (sender, e){
+        this._main.postMessage({
+    cmd: "midiLoad",
+    loaded: e.Loaded,
+    total: e.Total
+}
+);
+    },
+    OnMidiLoaded: function (sender, e){
+        this._main.postMessage({
+    cmd: "midiFileLoaded"
+}
+);
+    },
+    OnMidiLoadFailed: function (sender, e){
+        this._main.postMessage({
+    cmd: "midiFileLoadFailed"
+}
+);
+    },
+    OnReadyForPlay: function (sender, e){
+        this._main.postMessage({
+    cmd: "readyForPlay",
+    value: this.IsReadyForPlay()
+}
+);
+    },
+    SendLog: function (level, s){
+        this._main.postMessage({
+    cmd: "log",
+    level: level,
+    message: s
+}
+);
+    },
+    SetLogLevel: function (level){
+        AlphaSynth.Util.Logger.LogLevel = level;
+    }
+};
+AlphaSynth.Main.AlphaSynthWebWorkerApiBase = function (player, asRoot){
+    this._asRoot = null;
+    this._synth = null;
+    this._player = null;
+    this._isPlayerReady = false;
+    this._isWorkerReady = false;
+    this._events = null;
+    this._asRoot = asRoot;
+    this._player = player;
+    this._player.add_ReadyChanged($CreateDelegate(this, this.PlayerReadyChanged));
+    this._player.add_PositionChanged($CreateDelegate(this, this.PlayerPositionChanged));
+    this._player.add_SampleRequest($CreateDelegate(this, this.PlayerSampleRequest));
+    this._player.add_Finished($CreateDelegate(this, this.PlayerFinished));
+    this._events = {};
+    if (asRoot != "" && !asRoot.indexOf("/")==(asRoot.length-"/".length)){
+        asRoot += "/";
+    }
+    this._asRoot = asRoot;
+    // create web worker
+    this._synth = new Worker(asRoot + "AlphaSynth.worker.js");
+};
+AlphaSynth.Main.AlphaSynthWebWorkerApiBase.prototype = {
+    Startup: function (){
+        // start player
+        this._player.Open();
+        // start worker
+        this._synth.addEventListener("message", $CreateDelegate(this, this.HandleWorkerMessage), false);
+        var root = new Array();
+        root.push(window.location.protocol);
+        root.push("//");
+        root.push(window.location.hostname);
+        if (window.location.port){
+            root.push(":");
+            root.push(window.location.port);
+        }
+        root.push(this._asRoot);
+        this._synth.postMessage({
+            cmd: "playerReady",
+            root: root.join('')
+        });
+    },
+    IsReadyForPlay: function (){
+        this._synth.postMessage({
+            cmd: "isReadyForPlay"
+        });
+    },
+    Play: function (){
+        this._synth.postMessage({
+            cmd: "play"
+        });
+    },
+    Pause: function (){
+        this._synth.postMessage({
+            cmd: "pause"
+        });
+    },
+    PlayPause: function (){
+        this._synth.postMessage({
+            cmd: "playPause"
+        });
+    },
+    Stop: function (){
+        this._synth.postMessage({
+            cmd: "stop"
+        });
+    },
+    SetPositionTick: function (tick){
+        this._synth.postMessage({
+            cmd: "setPositionTick",
+            tick: tick
+        });
+    },
+    SetPositionTime: function (millis){
+        this._synth.postMessage({
+            cmd: "setPositionTime",
+            time: millis
+        });
+    },
+    LoadSoundFontUrl: function (url){
+        this._synth.postMessage({
+            cmd: "loadSoundFontUrl",
+            url: AlphaSynth.Main.AlphaSynthWebWorkerApiBase.QualifyUrl(url)
+        });
+    },
+    LoadSoundFontBytes: function (data){
+        this._synth.postMessage({
+            cmd: "loadSoundFontBytes",
+            data: data
+        });
+    },
+    LoadMidiUrl: function (url){
+        this._synth.postMessage({
+            cmd: "loadMidiUrl",
+            url: AlphaSynth.Main.AlphaSynthWebWorkerApiBase.QualifyUrl(url)
+        });
+    },
+    LoadMidiBytes: function (data){
+        this._synth.postMessage({
+            cmd: "loadMidiBytes",
+            data: data
+        });
+    },
+    GetState: function (){
+        this._synth.postMessage({
+            cmd: "getState"
+        });
+    },
+    GetMasterVolume: function (){
+        this._synth.postMessage({
+            cmd: "getMasterVolume"
+        });
+    },
+    SetMasterVolume: function (volume){
+        this._synth.postMessage({
+            cmd: "setMasterVolume",
+            value: volume
+        });
+    },
+    IsSoundFontLoaded: function (){
+        this._synth.postMessage({
+            cmd: "isSoundFontLoaded"
+        });
+    },
+    IsMidiLoaded: function (){
+        this._synth.postMessage({
+            cmd: "isMidiLoaded"
+        });
+    },
+    SetLogLevel: function (level){
+        this._synth.postMessage({
+            cmd: "setLogLevel",
+            level: level
+        });
+    },
+    HandleWorkerMessage: function (e){
+        var data = e.data;
+        var cmd = data["cmd"];
+        switch (cmd){
+            case "isReadyForPlay":
+            case "getState":
+            case "getMasterVolume":
+            case "isSoundFontLoaded":
+            case "isMidiLoaded":
+                this.TriggerEvent(cmd, [data["value"]]);
+                break;
+            case "ready":
+                this._isWorkerReady = true;
+                this.CheckForReadyState();
+                break;
+            case "positionChanged":
+                this.TriggerEvent(cmd, [data["currentTime"], data["endTime"], data["currentTick"], data["endTick"]]);
+                break;
+            case "playerStateChanged":
+                this.TriggerEvent(cmd, [data["state"]]);
+                break;
+            case "finished":
+                this.TriggerEvent(cmd, null);
+                break;
+            case "soundFontLoad":
+                this.TriggerEvent(cmd, [data["loaded"], data["total"]]);
+                break;
+            case "soundFontLoaded":
+                this.TriggerEvent(cmd, null);
+                break;
+            case "soundFontLoadFailed":
+                this.TriggerEvent(cmd, null);
+                break;
+            case "midiLoad":
+                this.TriggerEvent(cmd, [data["loaded"], data["total"]]);
+                break;
+            case "midiFileLoaded":
+                this.TriggerEvent(cmd, null);
+                break;
+            case "midiFileLoadFailed":
+                this.TriggerEvent(cmd, null);
+                break;
+            case "readyForPlay":
+                this.TriggerEvent(cmd, [data["value"]]);
+                break;
+            case "log":
+                this.Log(data["level"], data["message"]);
+                break;
+            case "playerSequencerFinished":
+                this._player.SequencerFinished();
+                break;
+            case "playerAddSamples":
+                this._player.AddSamples(data["samples"]);
+                break;
+            case "playerPlay":
+                this._player.Play();
+                break;
+            case "playerPause":
+                this._player.Pause();
+                break;
+            case "playerStop":
+                this._player.Stop();
+                break;
+            case "playerSeek":
+                this._player.Seek(data["pos"]);
+                break;
+        }
+    },
+    CheckForReadyState: function (){
+        this.TriggerEvent("ready", [(this._isWorkerReady && this._isPlayerReady)]);
+    },
+    PlayerReadyChanged: function (isReady){
+        this._isPlayerReady = isReady;
+        this.CheckForReadyState();
+    },
+    On: function (events, action){
+        if (!this._events.hasOwnProperty(events)){
+            this._events[events] = [];
+        }
+        this._events[events].push(action);
+    },
+    TriggerEvent: function (name, args){
+        var events = this._events[name];
+        if (events != null){
+            for (var i = 0; i < events.length; i++){
+                events[i].apply(null, args);
+            }
+        }
+    },
+    PlayerSampleRequest: function (){
+        this._synth.postMessage({
+            cmd: "playerSampleRequest"
+        });
+    },
+    PlayerFinished: function (){
+        this._synth.postMessage({
+            cmd: "playerFinished"
+        });
+    },
+    PlayerPositionChanged: function (pos){
+        this._synth.postMessage({
+            cmd: "playerPositionChanged",
+            pos: pos
+        });
+    },
+    Log: function (level, message){
+        switch (level){
+            case AlphaSynth.Util.LogLevel.None:
+                console.log(message);
+                break;
+            case AlphaSynth.Util.LogLevel.Debug:
+                console.debug(message);
+                break;
+            case AlphaSynth.Util.LogLevel.Info:
+                console.info(message);
+                break;
+            case AlphaSynth.Util.LogLevel.Warning:
+                console.warn(message);
+                break;
+            case AlphaSynth.Util.LogLevel.Error:
+                console.error(message);
+                break;
+        }
+    }
+};
+AlphaSynth.Main.AlphaSynthWebWorkerApiBase.QualifyUrl = function (url){
+    var img = document.createElement("img");
+    img.onerror = function (e){
+    };
+    img.src = url;
+    url = img.src;
+    img.src = null;
+    return url;
+};
+AlphaSynth.Main.AlphaSynthFlashPlayerApi = function (asRoot, swfObjectRoot){
+    AlphaSynth.Main.AlphaSynthWebWorkerApiBase.call(this, new AlphaSynth.Main.AlphaSynthFlashOutput(asRoot, swfObjectRoot), asRoot);
+};
+$Inherit(AlphaSynth.Main.AlphaSynthFlashPlayerApi, AlphaSynth.Main.AlphaSynthWebWorkerApiBase);
+AlphaSynth.Main.AlphaSynthWebWorkerApi = function (asRoot){
+    AlphaSynth.Main.AlphaSynthWebWorkerApiBase.call(this, new AlphaSynth.Main.AlphaSynthWebAudioOutput(), asRoot);
+};
+$Inherit(AlphaSynth.Main.AlphaSynthWebWorkerApi, AlphaSynth.Main.AlphaSynthWebWorkerApiBase);
+AlphaSynth.Platform = AlphaSynth.Platform || {};
+AlphaSynth.Platform.Platform = function (){
+};
+AlphaSynth.Platform.Platform.CreateOutput = function (synth){
+    return new AlphaSynth.Player.WebWorkerOutput();
+};
+AlphaSynth.Platform.Std = function (){
+};
+$StaticConstructor(function (){
+    AlphaSynth.Platform.Std.IsLittleEndian = true;
+});
+AlphaSynth.Platform.Std.ParseInt = function (s){
+    var f = parseInt(s);
+    if (isNaN(f)){
+        f = 0;
+    }
+    return f;
+};
+AlphaSynth.Platform.Std.StringFromCharCode = function (c){
+    return "";
+};
+AlphaSynth.Platform.Std.Random = function (){
+    return Math.random();
+};
+AlphaSynth.Platform.Std.BlockCopy = function (src, srcOffset, dst, dstOffset, count){
+};
+AlphaSynth.Platform.Std.ArrayCopy = function (src, srcOffset, dst, dstOffset, count){
+    for (var i = 0; i < count; i++){
+        dst[dstOffset + i] = src[srcOffset + i];
+    }
+};
+AlphaSynth.Platform.Std.Reverse = function (array){
+    var i = 0;
+    var j = array.length - 1;
+    while (i < j){
+        var t = array[i];
+        array[i] = array[j];
+        array[j] = t;
+        i++;
+        j--;
+    }
+};
+AlphaSynth.Platform.TypeUtils = function (){
+};
+$StaticConstructor(function (){
+    AlphaSynth.Platform.TypeUtils.IsLittleEndian = true;
+    AlphaSynth.Platform.TypeUtils.Int16 = new Int16Array(1);
+});
+AlphaSynth.Platform.TypeUtils.ToUInt32 = function (i){
+    return i | 0;
+};
+AlphaSynth.Platform.TypeUtils.ToInt16 = function (i){
+    AlphaSynth.Platform.TypeUtils.Int16[0] = i | 0;
+    return AlphaSynth.Platform.TypeUtils.Int16[0];
+};
+AlphaSynth.Platform.TypeUtils.ToUInt16 = function (i){
+    return i | 0;
+};
+AlphaSynth.Platform.TypeUtils.ToUInt8 = function (i){
+    return i;
+};
+AlphaSynth.Platform.TypeUtils.ClearIntArray = function (array){
+    for (var i = 0; i < array.length; i++){
+        array[i] = 0;
+    }
+};
+AlphaSynth.Platform.TypeUtils.ClearShortArray = function (array){
+    for (var i = 0; i < array.length; i++){
+        array[i] = 0;
+    }
+};
+AlphaSynth.Player = AlphaSynth.Player || {};
+AlphaSynth.Player.WebWorkerOutput = function (){
+    this._positionChangedListeners = null;
+    this._finishedListeners = null;
+    this._sampleRequestListeners = null;
+    this._workerSelf = null;
+    this.PositionChanged = null;
+    this.Finished = null;
+    this.SampleRequest = null;
+    this.ReadyChanged = null;
+};
+AlphaSynth.Player.WebWorkerOutput.prototype = {
+    Open: function (){
+        AlphaSynth.Util.Logger.Debug("Initializing webworker worker");
+        this._workerSelf =  self;
+        this._workerSelf.addEventListener("message", $CreateDelegate(this, this.HandleMessage), false);
+        this.OnReadyChanged(true);
+    },
+    HandleMessage: function (e){
+        var data = e.data;
+        var cmd = data["cmd"];
+        switch (cmd){
+            case "playerSampleRequest":
+                this.OnSampleRequest();
+                break;
+            case "playerFinished":
+                this.OnFinished();
+                break;
+            case "playerPositionChanged":
+                this.OnPositionChanged(data["pos"]);
+                break;
+        }
+    },
+    PostMessage: function (o){
+    },
+    add_PositionChanged: function (value){
+        this.PositionChanged = $CombineDelegates(this.PositionChanged, value);
+    },
+    remove_PositionChanged: function (value){
+        this.PositionChanged = $RemoveDelegate(this.PositionChanged, value);
+    },
+    OnPositionChanged: function (obj){
+        var handler = this.PositionChanged;
+        if (handler != null)
+            handler(obj);
+    },
+    add_Finished: function (value){
+        this.Finished = $CombineDelegates(this.Finished, value);
+    },
+    remove_Finished: function (value){
+        this.Finished = $RemoveDelegate(this.Finished, value);
+    },
+    OnFinished: function (){
+        var handler = this.Finished;
+        if (handler != null)
+            handler();
+    },
+    add_SampleRequest: function (value){
+        this.SampleRequest = $CombineDelegates(this.SampleRequest, value);
+    },
+    remove_SampleRequest: function (value){
+        this.SampleRequest = $RemoveDelegate(this.SampleRequest, value);
+    },
+    OnSampleRequest: function (){
+        var handler = this.SampleRequest;
+        if (handler != null)
+            handler();
+    },
+    add_ReadyChanged: function (value){
+        this.ReadyChanged = $CombineDelegates(this.ReadyChanged, value);
+    },
+    remove_ReadyChanged: function (value){
+        this.ReadyChanged = $RemoveDelegate(this.ReadyChanged, value);
+    },
+    OnReadyChanged: function (isReady){
+        var handler = this.ReadyChanged;
+        if (handler != null)
+            handler(isReady);
+    },
+    SequencerFinished: function (){
+        this._workerSelf.postMessage({
+    cmd: "playerSequencerFinished"
+}
+);
+    },
+    AddSamples: function (samples){
+        this._workerSelf.postMessage({
+    cmd: "playerAddSamples",
+    samples: samples
+}
+);
+    },
+    Play: function (){
+        this._workerSelf.postMessage({
+    cmd: "playerPlay"
+}
+);
+    },
+    Pause: function (){
+        this._workerSelf.postMessage({
+    cmd: "playerPause"
+}
+);
+    },
+    Stop: function (){
+        this._workerSelf.postMessage({
+    cmd: "playerStop"
+}
+);
+    },
+    Seek: function (position){
+        this._workerSelf.postMessage({
+    cmd: "playerSeek",
+    pos: position
+}
+);
+    }
+};
+AlphaSynth.Util = AlphaSynth.Util || {};
+AlphaSynth.Util.Extensions = function (){
+};
+AlphaSynth.Util.Logger = function (){
+};
+$StaticConstructor(function (){
+    AlphaSynth.Util.Logger.LogLevel = AlphaSynth.Util.LogLevel.None;
+    AlphaSynth.Util.Logger.LogHandler = null;
+    AlphaSynth.Util.Logger.LogLevel = AlphaSynth.Util.LogLevel.Info;
+    AlphaSynth.Util.Logger.LogHandler = function (s){
+        console.log(s);
+    };
+});
+AlphaSynth.Util.Logger.Debug = function (msg){
+    AlphaSynth.Util.Logger.Log(AlphaSynth.Util.LogLevel.Debug, msg);
+};
+AlphaSynth.Util.Logger.Warning = function (msg){
+    AlphaSynth.Util.Logger.Log(AlphaSynth.Util.LogLevel.Warning, msg);
+};
+AlphaSynth.Util.Logger.Info = function (msg){
+    AlphaSynth.Util.Logger.Log(AlphaSynth.Util.LogLevel.Info, msg);
+};
+AlphaSynth.Util.Logger.Error = function (msg){
+    AlphaSynth.Util.Logger.Log(AlphaSynth.Util.LogLevel.Error, msg);
+};
+AlphaSynth.Util.Logger.Log = function (logLevel, msg){
+    if (logLevel < AlphaSynth.Util.Logger.LogLevel)
+        return;
+    var caller = arguments.callee.caller.caller.name;
+    AlphaSynth.Util.Logger.LogHandler(caller + "-" + msg);
+};
+AlphaSynth.Util.Logger.GetCaller = function (){
+    return "";
+};
+AlphaSynth.Util.LogLevel = {
+    None: 0,
+    Debug: 1,
+    Info: 2,
+    Warning: 3,
+    Error: 4
+};
+AlphaSynth.Util.UrlLoader = function (){
+    this.Progress = null;
+    this.Complete = null;
+    this.Url = null;
+    this.Method = null;
+};
+AlphaSynth.Util.UrlLoader.prototype = {
+    Load: function (){
+        var request = new XMLHttpRequest();
+        request.open(this.Method, this.Url, true);
+        request.responseType = "arraybuffer";
+        request.onload = $CreateAnonymousDelegate(this, function (e){
+            var buffer = new Uint8Array(request.response);
+            if (buffer != null){
+                this.FireComplete(buffer);
+            }
+        });
+        request.onerror = $CreateAnonymousDelegate(this, function (e){
+            AlphaSynth.Util.Logger.Error("Loading failed: " + e.message);
+        });
+        request.onprogress = $CreateAnonymousDelegate(this, function (e){
+            this.FireProgress(e.loaded, e.total);
+        });
+        request.send();
+    },
+    FireProgress: function (loaded, full){
+        if (this.Progress != null)
+            this.Progress(loaded, full);
+    },
+    FireComplete: function (data){
+        if (this.Complete != null)
+            this.Complete(data);
+    }
+};
+AlphaSynth.Bank = AlphaSynth.Bank || {};
+AlphaSynth.Bank.AssetManager = function (){
+    this.PatchAssets = null;
+    this.SampleAssets = null;
+    this.PatchAssets = [];
+    this.SampleAssets = [];
+};
+AlphaSynth.Bank.AssetManager.prototype = {
+    FindPatch: function (name){
+        for (var i = 0; i < this.PatchAssets.length; i++){
+            var patchAsset = this.PatchAssets[i];
+            if (patchAsset.Name == name){
+                return patchAsset;
+            }
+        }
+        return null;
+    },
+    FindSample: function (name){
+        for (var i = 0; i < this.SampleAssets.length; i++){
+            var sampleDataAsset = this.SampleAssets[i];
+            if (sampleDataAsset.Name == name){
+                return sampleDataAsset;
+            }
+        }
+        return null;
+    }
+};
+AlphaSynth.Bank.Components = AlphaSynth.Bank.Components || {};
+AlphaSynth.Bank.Components.Generators = AlphaSynth.Bank.Components.Generators || {};
+AlphaSynth.Bank.Components.Generators.Generator = function (description){
+    this.LoopMode = AlphaSynth.Bank.Components.Generators.LoopMode.NoLoop;
+    this.LoopStartPhase = 0;
+    this.LoopEndPhase = 0;
+    this.StartPhase = 0;
+    this.EndPhase = 0;
+    this.Offset = 0;
+    this.Period = 0;
+    this.Frequency = 0;
+    this.RootKey = 0;
+    this.KeyTrack = 0;
+    this.VelocityTrack = 0;
+    this.Tune = 0;
+    this.LoopMode = description.LoopMethod;
+    this.LoopStartPhase = description.LoopStartPhase;
+    this.LoopEndPhase = description.LoopEndPhase;
+    this.StartPhase = description.StartPhase;
+    this.EndPhase = description.EndPhase;
+    this.Offset = description.Offset;
+    this.Period = description.Period;
+    this.Frequency = 0;
+    this.RootKey = description.RootKey;
+    this.KeyTrack = description.KeyTrack;
+    this.VelocityTrack = description.VelTrack;
+    this.Tune = description.Tune;
+};
+AlphaSynth.Bank.Components.Generators.Generator.prototype = {
+    Release: function (generatorParams){
+        if (this.LoopMode == AlphaSynth.Bank.Components.Generators.LoopMode.LoopUntilNoteOff){
+            generatorParams.CurrentState = AlphaSynth.Bank.Components.Generators.GeneratorState.PostLoop;
+            generatorParams.CurrentStart = this.StartPhase;
+            generatorParams.CurrentEnd = this.EndPhase;
+        }
+    },
+    GetValues: function (generatorParams, blockBuffer, increment){
+        var proccessed = 0;
+        do{
+            var samplesAvailable = ((Math.ceil((generatorParams.CurrentEnd - generatorParams.Phase) / increment))) | 0;
+            if (samplesAvailable > blockBuffer.length - proccessed){
+                while (proccessed < blockBuffer.length){
+                    blockBuffer[proccessed++] = this.GetValue(generatorParams.Phase);
+                    generatorParams.Phase += increment;
+                }
+            }
+            else {
+                var endProccessed = proccessed + samplesAvailable;
+                while (proccessed < endProccessed){
+                    blockBuffer[proccessed++] = this.GetValue(generatorParams.Phase);
+                    generatorParams.Phase += increment;
+                }
+                switch (generatorParams.CurrentState){
+                    case AlphaSynth.Bank.Components.Generators.GeneratorState.PreLoop:
+                        generatorParams.CurrentStart = this.LoopStartPhase;
+                        generatorParams.CurrentEnd = this.LoopEndPhase;
+                        generatorParams.CurrentState = AlphaSynth.Bank.Components.Generators.GeneratorState.Loop;
+                        break;
+                    case AlphaSynth.Bank.Components.Generators.GeneratorState.Loop:
+                        generatorParams.Phase += generatorParams.CurrentStart - generatorParams.CurrentEnd;
+                        break;
+                    case AlphaSynth.Bank.Components.Generators.GeneratorState.PostLoop:
+                        generatorParams.CurrentState = AlphaSynth.Bank.Components.Generators.GeneratorState.Finished;
+                        while (proccessed < blockBuffer.length)
+                        blockBuffer[proccessed++] = 0;
+                        break;
+                }
+            }
+        }
+        while (proccessed < blockBuffer.length)
+    }
+};
+AlphaSynth.Bank.Components.Generators.WhiteNoiseGenerator = function (description){
+    AlphaSynth.Bank.Components.Generators.Generator.call(this, description);
+    if (this.EndPhase < 0)
+        this.EndPhase = 1;
+    if (this.StartPhase < 0)
+        this.StartPhase = 0;
+    if (this.LoopEndPhase < 0)
+        this.LoopEndPhase = this.EndPhase;
+    if (this.LoopStartPhase < 0)
+        this.LoopStartPhase = this.StartPhase;
+    if (this.Period < 0)
+        this.Period = 1;
+    if (this.RootKey < 0)
+        this.RootKey = 69;
+    this.Frequency = 440;
+};
+AlphaSynth.Bank.Components.Generators.WhiteNoiseGenerator.prototype = {
+    GetValue: function (phase){
+        return ((AlphaSynth.Platform.Std.Random() * 2) - 1);
+    }
+};
+$Inherit(AlphaSynth.Bank.Components.Generators.WhiteNoiseGenerator, AlphaSynth.Bank.Components.Generators.Generator);
+AlphaSynth.Bank.Components.Generators.TriangleGenerator = function (description){
+    AlphaSynth.Bank.Components.Generators.Generator.call(this, description);
+    if (this.EndPhase < 0)
+        this.EndPhase = 1.25;
+    if (this.StartPhase < 0)
+        this.StartPhase = 0.25;
+    if (this.LoopEndPhase < 0)
+        this.LoopEndPhase = this.EndPhase;
+    if (this.LoopStartPhase < 0)
+        this.LoopStartPhase = this.StartPhase;
+    if (this.Period < 0)
+        this.Period = 1;
+    if (this.RootKey < 0)
+        this.RootKey = 69;
+    this.Frequency = 440;
+};
+AlphaSynth.Bank.Components.Generators.TriangleGenerator.prototype = {
+    GetValue: function (phase){
+        return (Math.abs(phase - Math.Floor(phase + 0.5)) * 4 - 1);
+    }
+};
+$Inherit(AlphaSynth.Bank.Components.Generators.TriangleGenerator, AlphaSynth.Bank.Components.Generators.Generator);
+AlphaSynth.Bank.Components.Generators.SquareGenerator = function (description){
+    AlphaSynth.Bank.Components.Generators.Generator.call(this, description);
+    if (this.EndPhase < 0)
+        this.EndPhase = 6.28318530717958;
+    if (this.StartPhase < 0)
+        this.StartPhase = 0;
+    if (this.LoopEndPhase < 0)
+        this.LoopEndPhase = this.EndPhase;
+    if (this.LoopStartPhase < 0)
+        this.LoopStartPhase = this.StartPhase;
+    if (this.Period < 0)
+        this.Period = 6.28318530717958;
+    if (this.RootKey < 0)
+        this.RootKey = 69;
+    this.Frequency = 440;
+};
+AlphaSynth.Bank.Components.Generators.SquareGenerator.prototype = {
+    GetValue: function (phase){
+        return Math.Sign(Math.sin(phase));
+    }
+};
+$Inherit(AlphaSynth.Bank.Components.Generators.SquareGenerator, AlphaSynth.Bank.Components.Generators.Generator);
+AlphaSynth.Bank.Components.Generators.SineGenerator = function (description){
+    AlphaSynth.Bank.Components.Generators.Generator.call(this, description);
+    if (this.EndPhase < 0)
+        this.EndPhase = 6.28318530717958;
+    if (this.StartPhase < 0)
+        this.StartPhase = 0;
+    if (this.LoopEndPhase < 0)
+        this.LoopEndPhase = this.EndPhase;
+    if (this.LoopStartPhase < 0)
+        this.LoopStartPhase = this.StartPhase;
+    if (this.Period < 0)
+        this.Period = 6.28318530717958;
+    if (this.RootKey < 0)
+        this.RootKey = 69;
+    this.Frequency = 440;
+};
+AlphaSynth.Bank.Components.Generators.SineGenerator.prototype = {
+    GetValue: function (phase){
+        return Math.sin(phase);
+    }
+};
+$Inherit(AlphaSynth.Bank.Components.Generators.SineGenerator, AlphaSynth.Bank.Components.Generators.Generator);
+AlphaSynth.Bank.Components.Generators.SawGenerator = function (description){
+    AlphaSynth.Bank.Components.Generators.Generator.call(this, description);
+    if (this.EndPhase < 0)
+        this.EndPhase = 1;
+    if (this.StartPhase < 0)
+        this.StartPhase = 0;
+    if (this.LoopEndPhase < 0)
+        this.LoopEndPhase = this.EndPhase;
+    if (this.LoopStartPhase < 0)
+        this.LoopStartPhase = this.StartPhase;
+    if (this.Period < 0)
+        this.Period = 1;
+    if (this.RootKey < 0)
+        this.RootKey = 69;
+    this.Frequency = 440;
+};
+AlphaSynth.Bank.Components.Generators.SawGenerator.prototype = {
+    GetValue: function (phase){
+        return (2 * (phase - Math.Floor(phase + 0.5)));
+    }
+};
+$Inherit(AlphaSynth.Bank.Components.Generators.SawGenerator, AlphaSynth.Bank.Components.Generators.Generator);
+AlphaSynth.Bank.Components.Generators.Interpolation = {
+    None: 0,
+    Linear: 1,
+    Cosine: 2,
+    CubicSpline: 3,
+    Sinc: 4
+};
+AlphaSynth.Bank.Components.Generators.SampleGenerator = function (){
+    this.Samples = null;
+    AlphaSynth.Bank.Components.Generators.Generator.call(this, new AlphaSynth.Bank.Descriptors.GeneratorDescriptor());
+};
+AlphaSynth.Bank.Components.Generators.SampleGenerator.prototype = {
+    GetValue: function (phase){
+        return this.Samples.get_Item(((phase)) | 0);
+    },
+    GetValues: function (generatorParams, blockBuffer, increment){
+        var proccessed = 0;
+        do{
+            var samplesAvailable = (Math.ceil((generatorParams.CurrentEnd - generatorParams.Phase) / increment)) | 0;
+            if (samplesAvailable > blockBuffer.length - proccessed){
+                this.Interpolate(generatorParams, blockBuffer, increment, proccessed, blockBuffer.length);
+                return;
+                //proccessed = blockBuffer.Length;
+            }
+            else {
+                var endProccessed = proccessed + samplesAvailable;
+                this.Interpolate(generatorParams, blockBuffer, increment, proccessed, endProccessed);
+                proccessed = endProccessed;
+                switch (generatorParams.CurrentState){
+                    case AlphaSynth.Bank.Components.Generators.GeneratorState.PreLoop:
+                        generatorParams.CurrentStart = this.LoopStartPhase;
+                        generatorParams.CurrentEnd = this.LoopEndPhase;
+                        generatorParams.CurrentState = AlphaSynth.Bank.Components.Generators.GeneratorState.Loop;
+                        break;
+                    case AlphaSynth.Bank.Components.Generators.GeneratorState.Loop:
+                        generatorParams.Phase += generatorParams.CurrentStart - generatorParams.CurrentEnd;
+                        break;
+                    case AlphaSynth.Bank.Components.Generators.GeneratorState.PostLoop:
+                        generatorParams.CurrentState = AlphaSynth.Bank.Components.Generators.GeneratorState.Finished;
+                        while (proccessed < blockBuffer.length)
+                        blockBuffer[proccessed++] = 0;
+                        break;
+                }
+            }
+        }
+        while (proccessed < blockBuffer.length)
+    },
+    Interpolate: function (generatorParams, blockBuffer, increment, start, end){
+        switch (1){
+            case AlphaSynth.Bank.Components.Generators.Interpolation.Linear:
+                {
+                var _end = generatorParams.CurrentState == AlphaSynth.Bank.Components.Generators.GeneratorState.Loop ? this.LoopEndPhase - 1 : this.EndPhase - 1;
+                var index;
+                var s1,s2,mu;
+                while (start < end && generatorParams.Phase < _end){
+                    index = generatorParams.Phase | 0;
+                    s1 = this.Samples.get_Item(index);
+                    s2 = this.Samples.get_Item(index + 1);
+                    mu = (generatorParams.Phase - index);
+                    blockBuffer[start++] = s1 + mu * (s2 - s1);
+                    generatorParams.Phase += increment;
+                }
+                while (start < end){
+                    index = generatorParams.Phase | 0;
+                    s1 = this.Samples.get_Item(index);
+                    if (generatorParams.CurrentState == AlphaSynth.Bank.Components.Generators.GeneratorState.Loop)
+                        s2 = this.Samples.get_Item(generatorParams.CurrentStart | 0);
+                    else
+                        s2 = s1;
+                    mu = (generatorParams.Phase - index);
+                    blockBuffer[start++] = s1 + mu * (s2 - s1);
+                    generatorParams.Phase += increment;
+                }
+                }
+                break;
+            case AlphaSynth.Bank.Components.Generators.Interpolation.Cosine:
+                {
+                var _end = generatorParams.CurrentState == AlphaSynth.Bank.Components.Generators.GeneratorState.Loop ? this.LoopEndPhase - 1 : this.EndPhase - 1;
+                var index;
+                var s1,s2,mu;
+                while (start < end && generatorParams.Phase < _end){
+                    index = generatorParams.Phase | 0;
+                    s1 = this.Samples.get_Item(index);
+                    s2 = this.Samples.get_Item(index + 1);
+                    mu = (1 - Math.cos((generatorParams.Phase - index) * 3.14159265358979)) * 0.5;
+                    blockBuffer[start++] = s1 * (1 - mu) + s2 * mu;
+                    generatorParams.Phase += increment;
+                }
+                while (start < end){
+                    index = generatorParams.Phase | 0;
+                    s1 = this.Samples.get_Item(index);
+                    if (generatorParams.CurrentState == AlphaSynth.Bank.Components.Generators.GeneratorState.Loop)
+                        s2 = this.Samples.get_Item(generatorParams.CurrentStart | 0);
+                    else
+                        s2 = s1;
+                    mu = (1 - Math.cos((generatorParams.Phase - index) * 3.14159265358979)) * 0.5;
+                    blockBuffer[start++] = s1 * (1 - mu) + s2 * mu;
+                    generatorParams.Phase += increment;
+                }
+                }
+                break;
+            case AlphaSynth.Bank.Components.Generators.Interpolation.CubicSpline:
+                {
+                var _end = generatorParams.CurrentState == AlphaSynth.Bank.Components.Generators.GeneratorState.Loop ? this.LoopStartPhase + 1 : this.StartPhase + 1;
+                var index;
+                var s0,s1,s2,s3,mu;
+                while (start < end && generatorParams.Phase < _end){
+                    index = generatorParams.Phase | 0;
+                    if (generatorParams.CurrentState == AlphaSynth.Bank.Components.Generators.GeneratorState.Loop)
+                        s0 = this.Samples.get_Item(generatorParams.CurrentEnd | 0 - 1);
+                    else
+                        s0 = this.Samples.get_Item(index);
+                    s1 = this.Samples.get_Item(index);
+                    s2 = this.Samples.get_Item(index + 1);
+                    s3 = this.Samples.get_Item(index + 2);
+                    mu = (generatorParams.Phase - index);
+                    blockBuffer[start++] = ((-0.5 * s0 + 1.5 * s1 - 1.5 * s2 + 0.5 * s3) * mu * mu * mu + (s0 - 2.5 * s1 + 2 * s2 - 0.5 * s3) * mu * mu + (-0.5 * s0 + 0.5 * s2) * mu + (s1));
+                    generatorParams.Phase += increment;
+                }
+                _end = generatorParams.CurrentState == AlphaSynth.Bank.Components.Generators.GeneratorState.Loop ? this.LoopEndPhase - 2 : this.EndPhase - 2;
+                while (start < end && generatorParams.Phase < _end){
+                    index = generatorParams.Phase | 0;
+                    s0 = this.Samples.get_Item(index - 1);
+                    s1 = this.Samples.get_Item(index);
+                    s2 = this.Samples.get_Item(index + 1);
+                    s3 = this.Samples.get_Item(index + 2);
+                    mu = (generatorParams.Phase - index);
+                    blockBuffer[start++] = ((-0.5 * s0 + 1.5 * s1 - 1.5 * s2 + 0.5 * s3) * mu * mu * mu + (s0 - 2.5 * s1 + 2 * s2 - 0.5 * s3) * mu * mu + (-0.5 * s0 + 0.5 * s2) * mu + (s1));
+                    generatorParams.Phase += increment;
+                }
+                _end += 1;
+                while (start < end){
+                    index = generatorParams.Phase | 0;
+                    s0 = this.Samples.get_Item(index - 1);
+                    s1 = this.Samples.get_Item(index);
+                    if (generatorParams.Phase < _end){
+                        s2 = this.Samples.get_Item(index + 1);
+                        if (generatorParams.CurrentState == AlphaSynth.Bank.Components.Generators.GeneratorState.Loop)
+                            s3 = this.Samples.get_Item(generatorParams.CurrentStart | 0);
+                        else
+                            s3 = s2;
+                    }
+                    else {
+                        if (generatorParams.CurrentState == AlphaSynth.Bank.Components.Generators.GeneratorState.Loop){
+                            s2 = this.Samples.get_Item(generatorParams.CurrentStart | 0);
+                            s3 = this.Samples.get_Item(generatorParams.CurrentStart | 0 + 1);
+                        }
+                        else {
+                            s2 = s1;
+                            s3 = s1;
+                        }
+                    }
+                    mu = (generatorParams.Phase - index);
+                    blockBuffer[start++] = ((-0.5 * s0 + 1.5 * s1 - 1.5 * s2 + 0.5 * s3) * mu * mu * mu + (s0 - 2.5 * s1 + 2 * s2 - 0.5 * s3) * mu * mu + (-0.5 * s0 + 0.5 * s2) * mu + (s1));
+                    generatorParams.Phase += increment;
+                }
+                }
+                break;
+            default:
+                {
+                while (start < end){
+                    blockBuffer[start++] = this.Samples.get_Item(generatorParams.Phase | 0);
+                    generatorParams.Phase += increment;
+                }
+                }
+                break;
+        }
+    }
+};
+$Inherit(AlphaSynth.Bank.Components.Generators.SampleGenerator, AlphaSynth.Bank.Components.Generators.Generator);
+AlphaSynth.Bank.Components.Generators.GeneratorParameters = function (){
+    this.Phase = 0;
+    this.CurrentStart = 0;
+    this.CurrentEnd = 0;
+    this.CurrentState = AlphaSynth.Bank.Components.Generators.GeneratorState.PreLoop;
+    this.Phase = 0;
+    this.CurrentStart = 0;
+    this.CurrentEnd = 0;
+    this.CurrentState = AlphaSynth.Bank.Components.Generators.GeneratorState.PreLoop;
+};
+AlphaSynth.Bank.Components.Generators.GeneratorParameters.prototype = {
+    QuickSetup: function (generator){
+        this.CurrentStart = generator.StartPhase;
+        this.Phase = this.CurrentStart + generator.Offset;
+        switch (generator.LoopMode){
+            case AlphaSynth.Bank.Components.Generators.LoopMode.Continuous:
+            case AlphaSynth.Bank.Components.Generators.LoopMode.LoopUntilNoteOff:
+                if (this.Phase >= generator.EndPhase){
+                //phase is greater than the end index so generator is finished
+                this.CurrentState = AlphaSynth.Bank.Components.Generators.GeneratorState.Finished;
+            }
+                else if (this.Phase >= generator.LoopEndPhase){
+                //phase is greater than the loop end point so generator is in post loop
+                this.CurrentState = AlphaSynth.Bank.Components.Generators.GeneratorState.PostLoop;
+                this.CurrentEnd = generator.EndPhase;
+            }
+            else if (this.Phase >= generator.LoopStartPhase){
+                //phase is greater than loop start so we are inside the loop
+                this.CurrentState = AlphaSynth.Bank.Components.Generators.GeneratorState.Loop;
+                this.CurrentEnd = generator.LoopEndPhase;
+                this.CurrentStart = generator.LoopStartPhase;
+            }
+            else {
+                //phase is less than the loop so generator is in pre loop
+                this.CurrentState = AlphaSynth.Bank.Components.Generators.GeneratorState.PreLoop;
+                this.CurrentEnd = generator.LoopStartPhase;
+            }
+                break;
+            default:
+                this.CurrentEnd = generator.EndPhase;
+                if (this.Phase >= this.CurrentEnd)
+                this.CurrentState = AlphaSynth.Bank.Components.Generators.GeneratorState.Finished;
+                else
+                this.CurrentState = AlphaSynth.Bank.Components.Generators.GeneratorState.PostLoop;
+                break;
+        }
+    }
+};
+AlphaSynth.Bank.Components.Generators.LoopMode = {
+    NoLoop: 0,
+    OneShot: 1,
+    Continuous: 2,
+    LoopUntilNoteOff: 3
+};
+AlphaSynth.Bank.Components.Generators.GeneratorState = {
+    PreLoop: 0,
+    Loop: 1,
+    PostLoop: 2,
+    Finished: 3
+};
+AlphaSynth.Bank.Components.Generators.DefaultGenerators = function (){
+};
+$StaticConstructor(function (){
+    AlphaSynth.Bank.Components.Generators.DefaultGenerators.DefaultSine = new AlphaSynth.Bank.Components.Generators.SineGenerator(new AlphaSynth.Bank.Descriptors.GeneratorDescriptor());
+    AlphaSynth.Bank.Components.Generators.DefaultGenerators.DefaultSaw = new AlphaSynth.Bank.Components.Generators.SawGenerator(new AlphaSynth.Bank.Descriptors.GeneratorDescriptor());
+    AlphaSynth.Bank.Components.Generators.DefaultGenerators.DefaultSquare = new AlphaSynth.Bank.Components.Generators.SquareGenerator(new AlphaSynth.Bank.Descriptors.GeneratorDescriptor());
+    AlphaSynth.Bank.Components.Generators.DefaultGenerators.DefaultTriangle = new AlphaSynth.Bank.Components.Generators.TriangleGenerator(new AlphaSynth.Bank.Descriptors.GeneratorDescriptor());
+});
+AlphaSynth.Bank.Components.LfoState = {
+    Delay: 0,
+    Sustain: 1
+};
+AlphaSynth.Bank.Components.Lfo = function (){
+    this._phase = 0;
+    this._increment = 0;
+    this._delayTime = 0;
+    this._generator = null;
+    this.Frequency = 0;
+    this.CurrentState = AlphaSynth.Bank.Components.LfoState.Delay;
+    this.Value = 0;
+    this.Depth = 0;
+    this.CurrentState = AlphaSynth.Bank.Components.LfoState.Delay;
+    this._generator = AlphaSynth.Bank.Components.Generators.DefaultGenerators.DefaultSine;
+    this._delayTime = 0;
+    this._increment = 0;
+    this._phase = 0;
+    this.Frequency = 0;
+    this.CurrentState = AlphaSynth.Bank.Components.LfoState.Delay;
+    this.Value = 0;
+    this.Depth = 0;
+};
+AlphaSynth.Bank.Components.Lfo.prototype = {
+    QuickSetup: function (sampleRate, lfoInfo){
+        this._generator = lfoInfo.Generator;
+        this._delayTime = ((sampleRate * lfoInfo.DelayTime)) | 0;
+        this.Frequency = lfoInfo.Frequency;
+        this._increment = this._generator.Period * this.Frequency / sampleRate;
+        this.Depth = lfoInfo.Depth;
+        this.Reset();
+    },
+    Increment: function (amount){
+        if (this.CurrentState == AlphaSynth.Bank.Components.LfoState.Delay){
+            this._phase -= amount;
+            if (this._phase <= 0){
+                this._phase = this._generator.LoopStartPhase + this._increment * -this._phase;
+                this.Value = this._generator.GetValue(this._phase);
+                this.CurrentState = AlphaSynth.Bank.Components.LfoState.Sustain;
+            }
+        }
+        else {
+            this._phase += this._increment * amount;
+            if (this._phase >= this._generator.LoopEndPhase)
+                this._phase = this._generator.LoopStartPhase + (this._phase - this._generator.LoopEndPhase) % (this._generator.LoopEndPhase - this._generator.LoopStartPhase);
+            this.Value = this._generator.GetValue(this._phase);
+        }
+    },
+    Reset: function (){
+        this.Value = 0;
+        if (this._delayTime > 0){
+            this._phase = this._delayTime;
+            this.CurrentState = AlphaSynth.Bank.Components.LfoState.Delay;
+        }
+        else {
+            this._phase = 0;
+            this.CurrentState = AlphaSynth.Bank.Components.LfoState.Sustain;
+        }
+    }
+};
+AlphaSynth.Bank.Components.FilterType = {
+    None: 0,
+    BiquadLowpass: 1,
+    BiquadHighpass: 2,
+    OnePoleLowpass: 3
+};
+AlphaSynth.Bank.Components.Filter = function (){
+    this._a1 = 0;
+    this._a2 = 0;
+    this._b1 = 0;
+    this._b2 = 0;
+    this._m1 = 0;
+    this._m2 = 0;
+    this._m3 = 0;
+    this._cutOff = 0;
+    this._resonance = 0;
+    this.FilterMethod = AlphaSynth.Bank.Components.FilterType.None;
+    this.CoeffNeedsUpdating = false;
+    this._a1 = 0;
+    this._a2 = 0;
+    this._b1 = 0;
+    this._b2 = 0;
+    this._m1 = 0;
+    this._m2 = 0;
+    this._m3 = 0;
+    this.FilterMethod = AlphaSynth.Bank.Components.FilterType.None;
+    this.set_CutOff(0);
+    this.set_Resonance(0);
+};
+AlphaSynth.Bank.Components.Filter.prototype = {
+    get_CutOff: function (){
+        return this._cutOff;
+    },
+    set_CutOff: function (value){
+        this._cutOff = value;
+        this.CoeffNeedsUpdating = true;
+    },
+    get_Resonance: function (){
+        return this._resonance;
+    },
+    set_Resonance: function (value){
+        this._resonance = value;
+        this.CoeffNeedsUpdating = true;
+    },
+    get_Enabled: function (){
+        return this.FilterMethod != AlphaSynth.Bank.Components.FilterType.None;
+    },
+    Disable: function (){
+        this.FilterMethod = AlphaSynth.Bank.Components.FilterType.None;
+    },
+    QuickSetup: function (sampleRate, note, velocity, filterInfo){
+        this.CoeffNeedsUpdating = false;
+        this.set_CutOff(filterInfo.CutOff);
+        this.set_Resonance(filterInfo.Resonance);
+        this.FilterMethod = filterInfo.FilterMethod;
+        this._a1 = 0;
+        this._a2 = 0;
+        this._b1 = 0;
+        this._b2 = 0;
+        this._m1 = 0;
+        this._m2 = 0;
+        this._m3 = 0;
+        if (this.get_CutOff() <= 0 || this.get_Resonance() <= 0){
+            this.FilterMethod = AlphaSynth.Bank.Components.FilterType.None;
+        }
+        if (this.FilterMethod != AlphaSynth.Bank.Components.FilterType.None){
+            this.set_CutOff(this.get_CutOff() * AlphaSynth.Synthesis.SynthHelper.CentsToPitch((note - filterInfo.RootKey) * filterInfo.KeyTrack + ((velocity * filterInfo.VelTrack)) | 0));
+            this.UpdateCoefficients(sampleRate);
+        }
+    },
+    ApplyFilter: function (sample){
+        switch (this.FilterMethod){
+            case AlphaSynth.Bank.Components.FilterType.BiquadHighpass:
+            case AlphaSynth.Bank.Components.FilterType.BiquadLowpass:
+                this._m3 = sample - this._a1 * this._m1 - this._a2 * this._m2;
+                sample = this._b2 * (this._m3 + this._m2) + this._b1 * this._m1;
+                this._m2 = this._m1;
+                this._m1 = this._m3;
+                return sample;
+            case AlphaSynth.Bank.Components.FilterType.OnePoleLowpass:
+                this._m1 += this._a1 * (sample - this._m1);
+                return this._m1;
+            default:
+                return 0;
+        }
+    },
+    ApplyFilter: function (data){
+        switch (this.FilterMethod){
+            case AlphaSynth.Bank.Components.FilterType.BiquadHighpass:
+            case AlphaSynth.Bank.Components.FilterType.BiquadLowpass:
+                for (var x = 0; x < data.length; x++){
+                this._m3 = data[x] - this._a1 * this._m1 - this._a2 * this._m2;
+                data[x] = this._b2 * (this._m3 + this._m2) + this._b1 * this._m1;
+                this._m2 = this._m1;
+                this._m1 = this._m3;
+            }
+                break;
+            case AlphaSynth.Bank.Components.FilterType.OnePoleLowpass:
+                for (var x = 0; x < data.length; x++){
+                this._m1 += this._a1 * (data[x] - this._m1);
+                data[x] = this._m1;
+            }
+                break;
+        }
+    },
+    ApplyFilterInterp: function (data, sampleRate){
+        var ic = this.GenerateFilterCoeff(this.get_CutOff() / sampleRate, this.get_Resonance());
+        var a1_inc = (ic[0] - this._a1) / data.length;
+        var a2_inc = (ic[1] - this._a2) / data.length;
+        var b1_inc = (ic[2] - this._b1) / data.length;
+        var b2_inc = (ic[3] - this._b2) / data.length;
+        switch (this.FilterMethod){
+            case AlphaSynth.Bank.Components.FilterType.BiquadHighpass:
+            case AlphaSynth.Bank.Components.FilterType.BiquadLowpass:
+                for (var x = 0; x < data.length; x++){
+                this._a1 += a1_inc;
+                this._a2 += a2_inc;
+                this._b1 += b1_inc;
+                this._b2 += b2_inc;
+                this._m3 = data[x] - this._a1 * this._m1 - this._a2 * this._m2;
+                data[x] = this._b2 * (this._m3 + this._m2) + this._b1 * this._m1;
+                this._m2 = this._m1;
+                this._m1 = this._m3;
+            }
+                this._a1 = ic[0];
+                this._a2 = ic[1];
+                this._b1 = ic[2];
+                this._b2 = ic[3];
+                break;
+            case AlphaSynth.Bank.Components.FilterType.OnePoleLowpass:
+                for (var x = 0; x < data.length; x++){
+                this._a1 += a1_inc;
+                this._m1 += this._a1 * (data[x] - this._m1);
+                data[x] = this._m1;
+            }
+                this._a1 = ic[0];
+                break;
+        }
+        this.CoeffNeedsUpdating = false;
+    },
+    UpdateCoefficients: function (sampleRate){
+        var coeff = this.GenerateFilterCoeff(this.get_CutOff() / sampleRate, this.get_Resonance());
+        this._a1 = coeff[0];
+        this._a2 = coeff[1];
+        this._b1 = coeff[2];
+        this._b2 = coeff[3];
+        this.CoeffNeedsUpdating = false;
+    },
+    GenerateFilterCoeff: function (fc, q){
+        fc = AlphaSynth.Synthesis.SynthHelper.ClampD(fc, 1E-38, 0.49);
+        var coeff = new Float32Array(4);
+        switch (this.FilterMethod){
+            case AlphaSynth.Bank.Components.FilterType.BiquadLowpass:
+                {
+                var w0 = 6.28318530717958 * fc;
+                var cosw0 = Math.cos(w0);
+                var alpha = Math.sin(w0) / (2 * q);
+                var a0inv = 1 / (1 + alpha);
+                coeff[0] = (-2 * cosw0 * a0inv);
+                coeff[1] = ((1 - alpha) * a0inv);
+                coeff[2] = ((1 - cosw0) * a0inv * (1 / Math.sqrt(q)));
+                coeff[3] = this._b1 * 0.5;
+                }
+                break;
+            case AlphaSynth.Bank.Components.FilterType.BiquadHighpass:
+                {
+                var w0 = 6.28318530717958 * fc;
+                var cosw0 = Math.cos(w0);
+                var alpha = Math.sin(w0) / (2 * q);
+                var a0inv = 1 / (1 + alpha);
+                var qinv = 1 / Math.sqrt(q);
+                coeff[0] = (-2 * cosw0 * a0inv);
+                coeff[1] = ((1 - alpha) * a0inv);
+                coeff[2] = ((-1 - cosw0) * a0inv * qinv);
+                coeff[3] = ((1 + cosw0) * a0inv * qinv * 0.5);
+                }
+                break;
+            case AlphaSynth.Bank.Components.FilterType.OnePoleLowpass:
+                coeff[0] = 1 - Math.Exp(-6.28318530717959 * fc);
+                break;
+        }
+        return coeff;
+    }
+};
+AlphaSynth.Bank.Components.EnvelopeState = {
+    Delay: 0,
+    Attack: 1,
+    Hold: 2,
+    Decay: 3,
+    Sustain: 4,
+    Release: 5,
+    None: 6
+};
+AlphaSynth.Bank.Components.Envelope = function (){
+    this._stages = null;
+    this._index = 0;
+    this._stage = null;
+    this.Value = 0;
+    this.CurrentStage = AlphaSynth.Bank.Components.EnvelopeState.Delay;
+    this.Depth = 0;
+    this.Value = 0;
+    this.Depth = 0;
+    this._stages = new Array(7);
+    for (var x = 0; x < this._stages.length; x++){
+        this._stages[x] = new AlphaSynth.Bank.Components.EnvelopeStage();
+        this._stages[x].Graph = AlphaSynth.Util.Tables.EnvelopeTables(0);
+    }
+    this._stages[3].Reverse = true;
+    this._stages[5].Reverse = true;
+    this._stages[6].Time = 100000000;
+    this.CurrentStage = AlphaSynth.Bank.Components.EnvelopeState.Delay;
+    this._stage = this._stages[this.CurrentStage];
+};
+AlphaSynth.Bank.Components.Envelope.prototype = {
+    QuickSetupSf2: function (sampleRate, note, keyNumToHold, keyNumToDecay, isVolumeEnvelope, envelopeInfo){
+        this.Depth = envelopeInfo.Depth;
+        // Delay
+        this._stages[0].Offset = 0;
+        this._stages[0].Scale = 0;
+        this._stages[0].Time = Math.max(0, ((sampleRate * (envelopeInfo.DelayTime))) | 0);
+        // Attack
+        this._stages[1].Offset = envelopeInfo.StartLevel;
+        this._stages[1].Scale = envelopeInfo.PeakLevel - envelopeInfo.StartLevel;
+        this._stages[1].Time = Math.max(0, ((sampleRate * (envelopeInfo.AttackTime))) | 0);
+        this._stages[1].Graph = AlphaSynth.Util.Tables.EnvelopeTables(envelopeInfo.AttackGraph);
+        // Hold
+        this._stages[2].Offset = 0;
+        this._stages[2].Scale = envelopeInfo.PeakLevel;
+        this._stages[2].Time = (Math.max(0, sampleRate * (envelopeInfo.HoldTime) * Math.pow(2, ((60 - note) * keyNumToHold) / 1200))) | 0;
+        // Decay
+        this._stages[3].Offset = envelopeInfo.SustainLevel;
+        this._stages[3].Scale = envelopeInfo.PeakLevel - envelopeInfo.SustainLevel;
+        if (envelopeInfo.SustainLevel == envelopeInfo.PeakLevel)
+            this._stages[3].Time = 0;
+        else
+            this._stages[3].Time = Math.max(0, ((sampleRate * (envelopeInfo.DecayTime) * Math.pow(2, ((60 - note) * keyNumToDecay) / 1200))) | 0);
+        this._stages[3].Graph = AlphaSynth.Util.Tables.EnvelopeTables(envelopeInfo.DecayGraph);
+        // Sustain
+        this._stages[4].Offset = 0;
+        this._stages[4].Scale = envelopeInfo.SustainLevel;
+        this._stages[4].Time = ((sampleRate * envelopeInfo.SustainTime)) | 0;
+        // Release
+        this._stages[5].Scale = this._stages[3].Time == 0 && this._stages[4].Time == 0 ? envelopeInfo.PeakLevel : this._stages[4].Scale;
+        if (isVolumeEnvelope){
+            this._stages[5].Offset = -100;
+            this._stages[5].Scale += 100;
+            this._stages[6].Scale = -100;
+        }
+        else {
+            this._stages[5].Offset = 0;
+            this._stages[6].Scale = 0;
+        }
+        this._stages[5].Time = Math.max(0, ((sampleRate * (envelopeInfo.ReleaseTime))) | 0);
+        this._stages[5].Graph = AlphaSynth.Util.Tables.EnvelopeTables(envelopeInfo.ReleaseGraph);
+        this._index = 0;
+        this.Value = 0;
+        this.CurrentStage = AlphaSynth.Bank.Components.EnvelopeState.Delay;
+        while (this._stages[this.CurrentStage].Time == 0){
+            this.CurrentStage++;
+        }
+        this._stage = this._stages[this.CurrentStage];
+    },
+    Increment: function (samples){
+        do{
+            var neededSamples = this._stage.Time - this._index;
+            if (neededSamples > samples){
+                this._index += samples;
+                samples = 0;
+            }
+            else {
+                this._index = 0;
+                if (this.CurrentStage != AlphaSynth.Bank.Components.EnvelopeState.None){
+                    do{
+                        this._stage = this._stages[++this.CurrentStage];
+                    }
+                    while (this._stage.Time == 0)
+                }
+                samples -= neededSamples;
+            }
+        }
+        while (samples > 0)
+        var i = ((this._stage.Graph.length * (this._index / this._stage.Time))) | 0;
+        if (this._stage.Reverse)
+            this.Value = (1 - this._stage.Graph[i]) * this._stage.Scale + this._stage.Offset;
+        else
+            this.Value = this._stage.Graph[i] * this._stage.Scale + this._stage.Offset;
+    },
+    Release: function (lowerLimit){
+        if (this.Value <= lowerLimit){
+            this._index = 0;
+            this.CurrentStage = AlphaSynth.Bank.Components.EnvelopeState.None;
+            this._stage = this._stages[this.CurrentStage];
+        }
+        else if (this.CurrentStage < AlphaSynth.Bank.Components.EnvelopeState.Release){
+            this._index = 0;
+            this.CurrentStage = AlphaSynth.Bank.Components.EnvelopeState.Release;
+            this._stage = this._stages[this.CurrentStage];
+            this._stage.Scale = this.Value;
+        }
+    },
+    ReleaseSf2VolumeEnvelope: function (){
+        if (this.Value <= -100){
+            this._index = 0;
+            this.CurrentStage = AlphaSynth.Bank.Components.EnvelopeState.None;
+            this._stage = this._stages[this.CurrentStage];
+        }
+        else if (this.CurrentStage < AlphaSynth.Bank.Components.EnvelopeState.Release){
+            this._index = 0;
+            this.CurrentStage = AlphaSynth.Bank.Components.EnvelopeState.Release;
+            this._stage = this._stages[this.CurrentStage];
+            this._stage.Offset = -100;
+            this._stage.Scale = 100 + this.Value;
+        }
+    }
+};
+AlphaSynth.Bank.Components.EnvelopeStage = function (){
+    this.Time = 0;
+    this.Graph = null;
+    this.Scale = 0;
+    this.Offset = 0;
+    this.Reverse = false;
+    this.Time = 0;
+    this.Graph = null;
+    this.Scale = 0;
+    this.Offset = 0;
+    this.Reverse = false;
+};
+AlphaSynth.Bank.Components.PanFormulaEnum = {
+    Neg3dBCenter: 0,
+    Neg6dBCenter: 1,
+    ZeroCenter: 2
+};
+AlphaSynth.Bank.Components.PanComponent = function (){
+    this.Left = 0;
+    this.Right = 0;
+};
+AlphaSynth.Bank.Components.PanComponent.prototype = {
+    SetValue: function (value, formula){
+        value = AlphaSynth.Synthesis.SynthHelper.ClampF(value, -1, 1);
+        var dvalue;
+        switch (formula){
+            case AlphaSynth.Bank.Components.PanFormulaEnum.Neg3dBCenter:
+                dvalue = 1.5707963267949 * (value + 1) / 2;
+                this.Left = Math.cos(dvalue);
+                this.Right = Math.sin(dvalue);
+                break;
+            case AlphaSynth.Bank.Components.PanFormulaEnum.Neg6dBCenter:
+                this.Left = (0.5 + value * -0.5);
+                this.Right = (0.5 + value * 0.5);
+                break;
+            case AlphaSynth.Bank.Components.PanFormulaEnum.ZeroCenter:
+                dvalue = 1.5707963267949 * (value + 1) / 2;
+                this.Left = (Math.cos(dvalue) / 0.707106781186);
+                this.Right = (Math.sin(dvalue) / 0.707106781186);
+                break;
+            default:
+                throw $CreateException(new System.Exception.ctor$$String("Invalid pan law selected."), new Error());
+        }
+    }
+};
+AlphaSynth.Bank.Descriptors = AlphaSynth.Bank.Descriptors || {};
+AlphaSynth.Bank.Descriptors.LfoDescriptor = function (){
+    this.DelayTime = 0;
+    this.Frequency = 0;
+    this.Depth = 0;
+    this.Generator = null;
+    this.DelayTime = 0;
+    this.Frequency = 8;
+    this.Depth = 1;
+    this.Generator = AlphaSynth.Bank.Components.Generators.DefaultGenerators.DefaultSine;
+};
+AlphaSynth.Bank.Descriptors.Waveform = {
+    Sine: 0,
+    Square: 1,
+    Saw: 2,
+    Triangle: 3,
+    SampleData: 4,
+    WhiteNoise: 5
+};
+AlphaSynth.Bank.Descriptors.GeneratorDescriptor = function (){
+    this.LoopMethod = AlphaSynth.Bank.Components.Generators.LoopMode.NoLoop;
+    this.SamplerType = AlphaSynth.Bank.Descriptors.Waveform.Sine;
+    this.AssetName = null;
+    this.EndPhase = 0;
+    this.StartPhase = 0;
+    this.LoopEndPhase = 0;
+    this.LoopStartPhase = 0;
+    this.Offset = 0;
+    this.Period = 0;
+    this.RootKey = 0;
+    this.KeyTrack = 0;
+    this.VelTrack = 0;
+    this.Tune = 0;
+    this.LoopMethod = AlphaSynth.Bank.Components.Generators.LoopMode.NoLoop;
+    this.SamplerType = AlphaSynth.Bank.Descriptors.Waveform.Sine;
+    this.AssetName = "null";
+    this.EndPhase = -1;
+    this.StartPhase = -1;
+    this.LoopEndPhase = -1;
+    this.LoopStartPhase = -1;
+    this.Offset = 0;
+    this.Period = -1;
+    this.RootKey = -1;
+    this.KeyTrack = 100;
+    this.VelTrack = 0;
+    this.Tune = 0;
+};
+AlphaSynth.Bank.Descriptors.FilterDescriptor = function (){
+    this.FilterMethod = AlphaSynth.Bank.Components.FilterType.None;
+    this.CutOff = 0;
+    this.Resonance = 0;
+    this.RootKey = 0;
+    this.KeyTrack = 0;
+    this.VelTrack = 0;
+    this.FilterMethod = AlphaSynth.Bank.Components.FilterType.None;
+    this.CutOff = -1;
+    this.Resonance = 1;
+    this.RootKey = 60;
+    this.KeyTrack = 0;
+    this.VelTrack = 0;
+};
+AlphaSynth.Bank.Descriptors.EnvelopeDescriptor = function (){
+    this.DelayTime = 0;
+    this.AttackTime = 0;
+    this.AttackGraph = 0;
+    this.HoldTime = 0;
+    this.DecayTime = 0;
+    this.DecayGraph = 0;
+    this.SustainTime = 0;
+    this.ReleaseTime = 0;
+    this.ReleaseGraph = 0;
+    this.SustainLevel = 0;
+    this.PeakLevel = 0;
+    this.StartLevel = 0;
+    this.Depth = 0;
+    this.Vel2Delay = 0;
+    this.Vel2Attack = 0;
+    this.Vel2Hold = 0;
+    this.Vel2Decay = 0;
+    this.Vel2Sustain = 0;
+    this.Vel2Release = 0;
+    this.Vel2Depth = 0;
+    this.DelayTime = 0;
+    this.AttackTime = 0;
+    this.AttackGraph = 1;
+    this.HoldTime = 0;
+    this.DecayTime = 0;
+    this.DecayGraph = 1;
+    this.SustainTime = 3600;
+    this.ReleaseTime = 0;
+    this.ReleaseGraph = 1;
+    this.SustainLevel = 0;
+    this.PeakLevel = 1;
+    this.StartLevel = 0;
+    this.Depth = 1;
+    this.Vel2Delay = 0;
+    this.Vel2Attack = 0;
+    this.Vel2Hold = 0;
+    this.Vel2Decay = 0;
+    this.Vel2Sustain = 0;
+    this.Vel2Release = 0;
+    this.Vel2Depth = 0;
+};
+AlphaSynth.Bank.Patch = AlphaSynth.Bank.Patch || {};
+AlphaSynth.Bank.Patch.Patch = function (name){
+    this.ExclusiveGroupTarget = 0;
+    this.ExclusiveGroup = 0;
+    this.Name = null;
+    this.Name = name;
+    this.ExclusiveGroup = 0;
+    this.ExclusiveGroupTarget = 0;
+};
+AlphaSynth.Bank.Patch.Sf2Patch = function (name){
+    this.iniFilterFc = 0;
+    this.filterQ = 0;
+    this.initialAttn = 0;
+    this.keyOverride = 0;
+    this.velOverride = 0;
+    this.keynumToModEnvHold = 0;
+    this.keynumToModEnvDecay = 0;
+    this.keynumToVolEnvHold = 0;
+    this.keynumToVolEnvDecay = 0;
+    this.pan = null;
+    this.modLfoToPitch = 0;
+    this.vibLfoToPitch = 0;
+    this.modEnvToPitch = 0;
+    this.modLfoToFilterFc = 0;
+    this.modEnvToFilterFc = 0;
+    this.modLfoToVolume = 0;
+    this.gen = null;
+    this.mod_env = null;
+    this.vel_env = null;
+    this.mod_lfo = null;
+    this.vib_lfo = null;
+    this.fltr = null;
+    AlphaSynth.Bank.Patch.Patch.call(this, name);
+};
+AlphaSynth.Bank.Patch.Sf2Patch.prototype = {
+    Start: function (voiceparams){
+        var note = this.keyOverride > -1 ? this.keyOverride : voiceparams.Note;
+        var vel = this.velOverride > -1 ? this.velOverride : voiceparams.Velocity;
+        //setup generator
+        voiceparams.GeneratorParams[0].QuickSetup(this.gen);
+        //setup envelopes
+        voiceparams.Envelopes[0].QuickSetupSf2(voiceparams.SynthParams.Synth.SampleRate, note, this.keynumToModEnvHold, this.keynumToModEnvDecay, false, this.mod_env);
+        voiceparams.Envelopes[1].QuickSetupSf2(voiceparams.SynthParams.Synth.SampleRate, note, this.keynumToVolEnvHold, this.keynumToVolEnvDecay, true, this.vel_env);
+        //setup filter
+        //voiceparams.pData[0].int1 = iniFilterFc - (int)(2400 * CalculateModulator(SourceTypeEnum.Linear, TransformEnum.Linear, DirectionEnum.MaxToMin, PolarityEnum.Unipolar, voiceparams.velocity, 0, 127)); 
+        //if (iniFilterFc >= 13500 && fltr.Resonance <= 1)
+        voiceparams.Filters[0].Disable();
+        //else
+        //    voiceparams.filters[0].QuickSetup(voiceparams.synthParams.synth.SampleRate, note, 1f, fltr);
+        //setup lfos
+        voiceparams.Lfos[0].QuickSetup(voiceparams.SynthParams.Synth.SampleRate, this.mod_lfo);
+        voiceparams.Lfos[1].QuickSetup(voiceparams.SynthParams.Synth.SampleRate, this.vib_lfo);
+        //calculate initial pitch
+        voiceparams.PitchOffset = (note - this.gen.RootKey) * this.gen.KeyTrack + this.gen.Tune;
+        voiceparams.PitchOffset += ((100 * (voiceparams.SynthParams.MasterCoarseTune + (voiceparams.SynthParams.MasterFineTune.get_Combined() - 8192) / 8192))) | 0;
+        //calculate initial volume
+        voiceparams.VolOffset = this.initialAttn;
+        voiceparams.VolOffset -= 96 * AlphaSynth.Bank.Patch.Sf2Patch.CalculateModulator(AlphaSynth.Sf2.SourceTypeEnum.Concave, AlphaSynth.Sf2.TransformEnum.Linear, AlphaSynth.Sf2.DirectionEnum.MaxToMin, AlphaSynth.Sf2.PolarityEnum.Unipolar, voiceparams.Velocity, 0, 127);
+        voiceparams.VolOffset -= 96 * AlphaSynth.Bank.Patch.Sf2Patch.CalculateModulator(AlphaSynth.Sf2.SourceTypeEnum.Concave, AlphaSynth.Sf2.TransformEnum.Linear, AlphaSynth.Sf2.DirectionEnum.MaxToMin, AlphaSynth.Sf2.PolarityEnum.Unipolar, voiceparams.SynthParams.Volume.get_Coarse(), 0, 127);
+        //check if we have finished before we have begun
+        return voiceparams.GeneratorParams[0].CurrentState != AlphaSynth.Bank.Components.Generators.GeneratorState.Finished && voiceparams.Envelopes[1].CurrentStage != AlphaSynth.Bank.Components.EnvelopeState.None;
+    },
+    Stop: function (voiceparams){
+        this.gen.Release(voiceparams.GeneratorParams[0]);
+        if (this.gen.LoopMode != AlphaSynth.Bank.Components.Generators.LoopMode.OneShot){
+            voiceparams.Envelopes[0].Release(1E-38);
+            voiceparams.Envelopes[1].ReleaseSf2VolumeEnvelope();
+        }
+    },
+    Process: function (voiceparams, startIndex, endIndex){
+        //--Base pitch calculation
+        var basePitch = AlphaSynth.Synthesis.SynthHelper.CentsToPitch(voiceparams.PitchOffset + voiceparams.SynthParams.CurrentPitch) * this.gen.Frequency / voiceparams.SynthParams.Synth.SampleRate;
+        var baseVolume = voiceparams.SynthParams.Synth.get_MasterVolume() * voiceparams.SynthParams.CurrentVolume * voiceparams.SynthParams.Synth.get_MixGain();
+        //--Main Loop
+        for (var x = startIndex; x < endIndex; x += 64 * voiceparams.SynthParams.Synth.AudioChannels){
+            voiceparams.Envelopes[0].Increment(64);
+            voiceparams.Envelopes[1].Increment(64);
+            voiceparams.Lfos[0].Increment(64);
+            voiceparams.Lfos[1].Increment(64);
+            //--Calculate pitch and get next block of samples
+            this.gen.GetValues(voiceparams.GeneratorParams[0], voiceparams.BlockBuffer, basePitch * AlphaSynth.Synthesis.SynthHelper.CentsToPitch(((voiceparams.Envelopes[0].Value * this.modEnvToPitch + voiceparams.Lfos[0].Value * this.modLfoToPitch + voiceparams.Lfos[1].Value * this.vibLfoToPitch)) | 0));
+            //--Filter
+            if (voiceparams.Filters[0].get_Enabled()){
+                var centsFc = voiceparams.PData[0].getInt32(0,true) + voiceparams.Lfos[0].Value * this.modLfoToFilterFc + voiceparams.Envelopes[0].Value * this.modEnvToFilterFc;
+                if (centsFc > 13500)
+                    centsFc = 13500;
+                voiceparams.Filters[0].set_CutOff(AlphaSynth.Synthesis.SynthHelper.KeyToFrequency(centsFc / 100, 69));
+                if (voiceparams.Filters[0].CoeffNeedsUpdating)
+                    voiceparams.Filters[0].ApplyFilterInterp(voiceparams.BlockBuffer, voiceparams.SynthParams.Synth.SampleRate);
+                else
+                    voiceparams.Filters[0].ApplyFilter(voiceparams.BlockBuffer);
+            }
+            //--Volume calculation
+            var volume = AlphaSynth.Synthesis.SynthHelper.DBtoLinear(voiceparams.VolOffset + voiceparams.Envelopes[1].Value + voiceparams.Lfos[0].Value * this.modLfoToVolume) * baseVolume;
+            //--Mix block based on number of channels
+            if (voiceparams.SynthParams.Synth.AudioChannels == 2)
+                voiceparams.MixMonoToStereoInterp(x, volume * this.pan.Left * voiceparams.SynthParams.CurrentPan.Left, volume * this.pan.Right * voiceparams.SynthParams.CurrentPan.Right);
+            else
+                voiceparams.MixMonoToMonoInterp(x, volume);
+            //--Check and end early if necessary
+            if ((voiceparams.Envelopes[1].CurrentStage > AlphaSynth.Bank.Components.EnvelopeState.Hold && volume <= 1E-05) || voiceparams.GeneratorParams[0].CurrentState == AlphaSynth.Bank.Components.Generators.GeneratorState.Finished){
+                voiceparams.State = AlphaSynth.Synthesis.VoiceStateEnum.Stopped;
+                return;
+            }
+        }
+    },
+    Load: function (region, assets){
+        this.ExclusiveGroup = region.Generators[57];
+        this.ExclusiveGroupTarget = this.ExclusiveGroup;
+        this.iniFilterFc = region.Generators[8];
+        this.filterQ = AlphaSynth.Synthesis.SynthHelper.DBtoLinear(region.Generators[9] / 10);
+        this.initialAttn = -region.Generators[48] / 10;
+        this.keyOverride = region.Generators[46];
+        this.velOverride = region.Generators[47];
+        this.keynumToModEnvHold = region.Generators[31];
+        this.keynumToModEnvDecay = region.Generators[32];
+        this.keynumToVolEnvHold = region.Generators[39];
+        this.keynumToVolEnvDecay = region.Generators[40];
+        this.pan = new AlphaSynth.Bank.Components.PanComponent();
+        this.pan.SetValue(region.Generators[17] / 500, AlphaSynth.Bank.Components.PanFormulaEnum.Neg3dBCenter);
+        this.modLfoToPitch = region.Generators[5];
+        this.vibLfoToPitch = region.Generators[6];
+        this.modEnvToPitch = region.Generators[7];
+        this.modLfoToFilterFc = region.Generators[10];
+        this.modEnvToFilterFc = region.Generators[11];
+        this.modLfoToVolume = region.Generators[13] / 10;
+        this.LoadGen(region, assets);
+        this.LoadEnvelopes(region);
+        this.LoadLfos(region);
+        this.LoadFilter(region);
+    },
+    LoadGen: function (region, assets){
+        var sda = assets.SampleAssets[region.Generators[53]];
+        this.gen = new AlphaSynth.Bank.Components.Generators.SampleGenerator();
+        this.gen.EndPhase = sda.End + region.Generators[1] + 32768 * region.Generators[12];
+        this.gen.Frequency = sda.SampleRate;
+        this.gen.KeyTrack = region.Generators[56];
+        this.gen.LoopEndPhase = sda.LoopEnd + region.Generators[3] + 32768 * region.Generators[50];
+        switch (region.Generators[54] & 3){
+            case 0:
+            case 2:
+                this.gen.LoopMode = AlphaSynth.Bank.Components.Generators.LoopMode.NoLoop;
+                break;
+            case 1:
+                this.gen.LoopMode = AlphaSynth.Bank.Components.Generators.LoopMode.Continuous;
+                break;
+            case 3:
+                this.gen.LoopMode = AlphaSynth.Bank.Components.Generators.LoopMode.LoopUntilNoteOff;
+                break;
+        }
+        this.gen.LoopStartPhase = sda.LoopStart + region.Generators[2] + 32768 * region.Generators[45];
+        this.gen.Offset = 0;
+        this.gen.Period = 1;
+        if (region.Generators[58] > -1)
+            this.gen.RootKey = region.Generators[58];
+        else
+            this.gen.RootKey = sda.RootKey;
+        this.gen.StartPhase = sda.Start + region.Generators[0] + 32768 * region.Generators[4];
+        this.gen.Tune = ((sda.Tune + region.Generators[52] + 100 * region.Generators[51])) | 0;
+        this.gen.VelocityTrack = 0;
+        (this.gen).Samples = sda.SampleData;
+    },
+    LoadEnvelopes: function (region){
+        //
+        //mod env
+        this.mod_env = new AlphaSynth.Bank.Descriptors.EnvelopeDescriptor();
+        this.mod_env.AttackTime = Math.pow(2, region.Generators[26] / 1200);
+        this.mod_env.AttackGraph = 3;
+        this.mod_env.DecayTime = Math.pow(2, region.Generators[28] / 1200);
+        this.mod_env.DelayTime = Math.pow(2, region.Generators[25] / 1200);
+        this.mod_env.HoldTime = Math.pow(2, region.Generators[27] / 1200);
+        this.mod_env.PeakLevel = 1;
+        this.mod_env.ReleaseTime = Math.pow(2, region.Generators[30] / 1200);
+        this.mod_env.StartLevel = 0;
+        this.mod_env.SustainLevel = 1 - AlphaSynth.Synthesis.SynthHelper.ClampS(region.Generators[29], 0, 1000) / 1000;
+        //checks
+        if (this.mod_env.AttackTime < 0.001)
+            this.mod_env.AttackTime = 0.001;
+        else if (this.mod_env.AttackTime > 100)
+            this.mod_env.AttackTime = 100;
+        if (this.mod_env.DecayTime < 0.001)
+            this.mod_env.DecayTime = 0;
+        else if (this.mod_env.DecayTime > 100)
+            this.mod_env.DecayTime = 100;
+        if (this.mod_env.DelayTime < 0.001)
+            this.mod_env.DelayTime = 0;
+        else if (this.mod_env.DelayTime > 20)
+            this.mod_env.DelayTime = 20;
+        if (this.mod_env.HoldTime < 0.001)
+            this.mod_env.HoldTime = 0;
+        else if (this.mod_env.HoldTime > 20)
+            this.mod_env.HoldTime = 20;
+        if (this.mod_env.ReleaseTime < 0.001)
+            this.mod_env.ReleaseTime = 0.001;
+        else if (this.mod_env.ReleaseTime > 100)
+            this.mod_env.ReleaseTime = 100;
+        //
+        // volume env
+        this.vel_env = new AlphaSynth.Bank.Descriptors.EnvelopeDescriptor();
+        this.vel_env.AttackTime = Math.pow(2, region.Generators[34] / 1200);
+        this.vel_env.AttackGraph = 3;
+        this.vel_env.DecayTime = Math.pow(2, region.Generators[36] / 1200);
+        this.vel_env.DelayTime = Math.pow(2, region.Generators[33] / 1200);
+        this.vel_env.HoldTime = Math.pow(2, region.Generators[35] / 1200);
+        this.vel_env.PeakLevel = 0;
+        this.vel_env.ReleaseTime = Math.pow(2, region.Generators[38] / 1200);
+        this.vel_env.StartLevel = -100;
+        this.vel_env.SustainLevel = AlphaSynth.Synthesis.SynthHelper.ClampS(region.Generators[37], 0, 1000) / -10;
+        // checks
+        if (this.vel_env.AttackTime < 0.001)
+            this.vel_env.AttackTime = 0.001;
+        else if (this.vel_env.AttackTime > 100)
+            this.vel_env.AttackTime = 100;
+        if (this.vel_env.DecayTime < 0.001)
+            this.vel_env.DecayTime = 0;
+        else if (this.vel_env.DecayTime > 100)
+            this.vel_env.DecayTime = 100;
+        if (this.vel_env.DelayTime < 0.001)
+            this.vel_env.DelayTime = 0;
+        else if (this.vel_env.DelayTime > 20)
+            this.vel_env.DelayTime = 20;
+        if (this.vel_env.HoldTime < 0.001)
+            this.vel_env.HoldTime = 0;
+        else if (this.vel_env.HoldTime > 20)
+            this.vel_env.HoldTime = 20;
+        if (this.vel_env.ReleaseTime < 0.001)
+            this.vel_env.ReleaseTime = 0.001;
+        else if (this.vel_env.ReleaseTime > 100)
+            this.vel_env.ReleaseTime = 100;
+    },
+    LoadLfos: function (region){
+        this.mod_lfo = new AlphaSynth.Bank.Descriptors.LfoDescriptor();
+        this.mod_lfo.DelayTime = Math.pow(2, region.Generators[21] / 1200);
+        this.mod_lfo.Frequency = (Math.pow(2, region.Generators[22] / 1200) * 8.176);
+        this.mod_lfo.Generator = AlphaSynth.Bank.Components.Generators.DefaultGenerators.DefaultSine;
+        this.vib_lfo = new AlphaSynth.Bank.Descriptors.LfoDescriptor();
+        this.vib_lfo.DelayTime = Math.pow(2, region.Generators[23] / 1200);
+        this.vib_lfo.Frequency = (Math.pow(2, region.Generators[24] / 1200) * 8.176);
+        this.vib_lfo.Generator = AlphaSynth.Bank.Components.Generators.DefaultGenerators.DefaultSine;
+    },
+    LoadFilter: function (region){
+        this.fltr = new AlphaSynth.Bank.Descriptors.FilterDescriptor();
+        this.fltr.FilterMethod = AlphaSynth.Bank.Components.FilterType.BiquadLowpass;
+        this.fltr.CutOff = AlphaSynth.Synthesis.SynthHelper.KeyToFrequency(region.Generators[8] / 100, 69);
+        this.fltr.Resonance = AlphaSynth.Synthesis.SynthHelper.DBtoLinear(region.Generators[9] / 10);
+    }
+};
+AlphaSynth.Bank.Patch.Sf2Patch.CalculateModulator = function (s, t, d, p, value, min, max){
+    var output = 0;
+    var i;
+    value = value - min;
+    max = max - min;
+    if (d == AlphaSynth.Sf2.DirectionEnum.MaxToMin)
+        value = max - value;
+    switch (s){
+        case AlphaSynth.Sf2.SourceTypeEnum.Linear:
+            output = (value / max) | 0;
+            break;
+        case AlphaSynth.Sf2.SourceTypeEnum.Concave:
+            i = 127 - value;
+            output = -0.208333333333333 * (Math.log((i * i) / (max * max))/Math.LN10);
+            break;
+        case AlphaSynth.Sf2.SourceTypeEnum.Convex:
+            i = value;
+            output = 1 + (0.208333333333333) * (Math.log((i * i) / (max * max))/Math.LN10);
+            break;
+        case AlphaSynth.Sf2.SourceTypeEnum.Switch:
+            if (value <= ((max / 2) | 0))
+            output = 0;
+            else
+            output = 1;
+            break;
+    }
+    if (p == AlphaSynth.Sf2.PolarityEnum.Bipolar)
+        output = (output * 2) - 1;
+    if (t == AlphaSynth.Sf2.TransformEnum.AbsoluteValue)
+        output = Math.abs(output);
+    return output;
+};
+$Inherit(AlphaSynth.Bank.Patch.Sf2Patch, AlphaSynth.Bank.Patch.Patch);
+AlphaSynth.Bank.Patch.MultiPatch = function (name){
+    this._intervalType = AlphaSynth.Bank.Patch.IntervalType.ChannelKeyVelocity;
+    this._intervalList = null;
+    AlphaSynth.Bank.Patch.Patch.call(this, name);
+    this._intervalType = AlphaSynth.Bank.Patch.IntervalType.ChannelKeyVelocity;
+};
+AlphaSynth.Bank.Patch.MultiPatch.prototype = {
+    FindPatches: function (channel, key, velocity, layers){
+        var count = 0;
+        switch (this._intervalType){
+            case AlphaSynth.Bank.Patch.IntervalType.ChannelKeyVelocity:
+                for (var x = 0; x < this._intervalList.length; x++){
+                if (this._intervalList[x].CheckAllIntervals(channel, key, velocity)){
+                    layers[count++] = this._intervalList[x].Patch;
+                    if (count == layers.length)
+                        break;
+                }
+            }
+                break;
+            case AlphaSynth.Bank.Patch.IntervalType.ChannelKey:
+                for (var x = 0; x < this._intervalList.length; x++){
+                if (this._intervalList[x].CheckChannelAndKey(channel, key)){
+                    layers[count++] = this._intervalList[x].Patch;
+                    if (count == layers.length)
+                        break;
+                }
+            }
+                break;
+            case AlphaSynth.Bank.Patch.IntervalType.KeyVelocity:
+                for (var x = 0; x < this._intervalList.length; x++){
+                if (this._intervalList[x].CheckKeyAndVelocity(key, velocity)){
+                    layers[count++] = this._intervalList[x].Patch;
+                    if (count == layers.length)
+                        break;
+                }
+            }
+                break;
+            case AlphaSynth.Bank.Patch.IntervalType.Key:
+                for (var x = 0; x < this._intervalList.length; x++){
+                if (this._intervalList[x].CheckKey(key)){
+                    layers[count++] = this._intervalList[x].Patch;
+                    if (count == layers.length)
+                        break;
+                }
+            }
+                break;
+        }
+        return count;
+    },
+    Start: function (voiceparams){
+        return false;
+    },
+    Process: function (voiceparams, startIndex, endIndex){
+    },
+    Stop: function (voiceparams){
+    },
+    LoadSf2: function (regions, assets){
+        this._intervalList = new Array(regions.length);
+        for (var x = 0; x < regions.length; x++){
+            var loKey;
+            var hiKey;
+            var loVel;
+            var hiVel;
+            if (AlphaSynth.Platform.TypeUtils.IsLittleEndian){
+                loKey = (regions[x].Generators[43] & 255&255);
+                hiKey = ((regions[x].Generators[43] >> 8) & 255&255);
+                loVel = (regions[x].Generators[44] & 255&255);
+                hiVel = ((regions[x].Generators[44] >> 8) & 255&255);
+            }
+            else {
+                hiKey = (regions[x].Generators[43] & 255&255);
+                loKey = ((regions[x].Generators[43] >> 8) & 255&255);
+                hiVel = (regions[x].Generators[44] & 255&255);
+                loVel = ((regions[x].Generators[44] >> 8) & 255&255);
+            }
+            var sf2 = new AlphaSynth.Bank.Patch.Sf2Patch(this.Name + "_" + x);
+            sf2.Load(regions[x], assets);
+            this._intervalList[x] = new AlphaSynth.Bank.Patch.PatchInterval(sf2, 0, 15, loKey, hiKey, loVel, hiVel);
+        }
+        this.DetermineIntervalType();
+    },
+    DetermineIntervalType: function (){
+        var checkChannel = false;
+        var checkVelocity = false;
+        for (var x = 0; x < this._intervalList.length; x++){
+            if (this._intervalList[x].StartChannel != 0 || this._intervalList[x].EndChannel != 15){
+                checkChannel = true;
+                if (checkChannel && checkVelocity)
+                    break;
+            }
+            if (this._intervalList[x].StartVelocity != 0 || this._intervalList[x].EndVelocity != 127){
+                checkVelocity = true;
+                if (checkChannel && checkVelocity)
+                    break;
+            }
+        }
+        if (checkChannel & checkVelocity)
+            this._intervalType = AlphaSynth.Bank.Patch.IntervalType.ChannelKeyVelocity;
+        else if (checkChannel)
+            this._intervalType = AlphaSynth.Bank.Patch.IntervalType.ChannelKey;
+        else if (checkVelocity)
+            this._intervalType = AlphaSynth.Bank.Patch.IntervalType.KeyVelocity;
+        else
+            this._intervalType = AlphaSynth.Bank.Patch.IntervalType.Key;
+    }
+};
+$Inherit(AlphaSynth.Bank.Patch.MultiPatch, AlphaSynth.Bank.Patch.Patch);
+AlphaSynth.Bank.Patch.IntervalType = {
+    ChannelKeyVelocity: 0,
+    ChannelKey: 1,
+    KeyVelocity: 2,
+    Key: 3
+};
+AlphaSynth.Bank.Patch.PatchInterval = function (patch, startChannel, endChannel, startKey, endKey, startVelocity, endVelocity){
+    this.Patch = null;
+    this.StartChannel = 0;
+    this.StartKey = 0;
+    this.StartVelocity = 0;
+    this.EndChannel = 0;
+    this.EndKey = 0;
+    this.EndVelocity = 0;
+    this.Patch = patch;
+    this.StartChannel = startChannel;
+    this.EndChannel = endChannel;
+    this.StartKey = startKey;
+    this.EndKey = endKey;
+    this.StartVelocity = startVelocity;
+    this.EndVelocity = endVelocity;
+};
+AlphaSynth.Bank.Patch.PatchInterval.prototype = {
+    CheckAllIntervals: function (channel, key, velocity){
+        return (channel >= this.StartChannel && channel <= this.EndChannel) && (key >= this.StartKey && key <= this.EndKey) && (velocity >= this.StartVelocity && velocity <= this.EndVelocity);
+    },
+    CheckChannelAndKey: function (channel, key){
+        return (channel >= this.StartChannel && channel <= this.EndChannel) && (key >= this.StartKey && key <= this.EndKey);
+    },
+    CheckKeyAndVelocity: function (key, velocity){
+        return (key >= this.StartKey && key <= this.EndKey) && (velocity >= this.StartVelocity && velocity <= this.EndVelocity);
+    },
+    CheckKey: function (key){
+        return (key >= this.StartKey && key <= this.EndKey);
+    }
+};
+AlphaSynth.Bank.SampleDataAsset = function (sample, sampleData){
+    this.Name = null;
+    this.Channels = 0;
+    this.SampleRate = 0;
+    this.RootKey = 0;
+    this.Tune = 0;
+    this.Start = 0;
+    this.End = 0;
+    this.LoopStart = 0;
+    this.LoopEnd = 0;
+    this.SampleData = null;
+    this.Channels = 1;
+    this.Name = sample.Name;
+    this.SampleRate = sample.SampleRate;
+    this.RootKey = sample.RootKey;
+    this.Tune = sample.Tune;
+    this.Start = sample.Start;
+    this.End = sample.End;
+    this.LoopStart = sample.StartLoop;
+    this.LoopEnd = sample.EndLoop;
+    this.SampleData = AlphaSynth.Util.PcmData.Create(sampleData.BitsPerSample, sampleData.SampleData, true);
+};
+AlphaSynth.Bank.PatchBank = function (){
+    this._bank = null;
+    this._assets = null;
+    this.Name = null;
+    this.Comments = null;
+    this.Reset();
+};
+AlphaSynth.Bank.PatchBank.prototype = {
+    Reset: function (){
+        this._bank = {};
+        this._assets = new AlphaSynth.Bank.AssetManager();
+        this.Name = "";
+        this.Comments = "";
+    },
+    get_LoadedBanks: function (){
+        var banks = [];
+        for (var $i2 = 0,$t2 = Object.keys(this._bank),$l2 = $t2.length,bank = $t2[$i2]; $i2 < $l2; $i2++, bank = $t2[$i2]){
+            banks.push(AlphaSynth.Platform.Std.ParseInt(bank));
+        }
+        return banks.slice(0);
+    },
+    GetBank: function (bankNumber){
+        return this._bank.hasOwnProperty(bankNumber) ? this._bank[bankNumber] : null;
+    },
+    GetPatchByNumber: function (bankNumber, patchNumber){
+        return this._bank.hasOwnProperty(bankNumber) ? this._bank[bankNumber][patchNumber] : null;
+    },
+    GetPatchByName: function (bankNumber, name){
+        if (this._bank.hasOwnProperty(bankNumber)){
+            var patches = this._bank[bankNumber];
+            for (var $i3 = 0,$l3 = patches.length,patch = patches[$i3]; $i3 < $l3; $i3++, patch = patches[$i3]){
+                if (patch != null && patch.Name == name){
+                    return patch;
+                }
+            }
+        }
+        return null;
+    },
+    IsBankLoaded: function (bankNumber){
+        return this._bank.hasOwnProperty(bankNumber);
+    },
+    LoadSf2: function (input){
+        this.Reset();
+        AlphaSynth.Util.Logger.Debug("Reading SF2");
+        var sf = new AlphaSynth.Sf2.SoundFont();
+        sf.Load(input);
+        AlphaSynth.Util.Logger.Debug("Building patchbank");
+        this.Name = sf.Info.BankName;
+        this.Comments = sf.Info.Comments;
+        //load samples
+        for (var $i4 = 0,$t4 = sf.Presets.SampleHeaders,$l4 = $t4.length,sampleHeader = $t4[$i4]; $i4 < $l4; $i4++, sampleHeader = $t4[$i4]){
+            this._assets.SampleAssets.push(new AlphaSynth.Bank.SampleDataAsset(sampleHeader, sf.SampleData));
+        }
+        //create instrument regions first
+        var sfinsts = this.ReadSf2Instruments(sf.Presets.Instruments);
+        //load each patch
+        for (var $i5 = 0,$t5 = sf.Presets.PresetHeaders,$l5 = $t5.length,p = $t5[$i5]; $i5 < $l5; $i5++, p = $t5[$i5]){
+            var globalGens = null;
+            var i;
+            if (p.Zones[0].Generators.length == 0 || p.Zones[0].Generators[p.Zones[0].Generators.length - 1].GeneratorType != AlphaSynth.Sf2.GeneratorEnum.Instrument){
+                globalGens = p.Zones[0].Generators;
+                i = 1;
+            }
+            else {
+                i = 0;
+            }
+            var regionList = [];
+            while (i < p.Zones.length){
+                var presetLoKey = 0;
+                var presetHiKey = 127;
+                var presetLoVel = 0;
+                var presetHiVel = 127;
+                if (p.Zones[i].Generators[0].GeneratorType == AlphaSynth.Sf2.GeneratorEnum.KeyRange){
+                    if (AlphaSynth.Platform.TypeUtils.IsLittleEndian){
+                        presetLoKey = (p.Zones[i].Generators[0].get_AmountInt16() & 255&255);
+                        presetHiKey = ((p.Zones[i].Generators[0].get_AmountInt16() >> 8) & 255&255);
+                    }
+                    else {
+                        presetHiKey = (p.Zones[i].Generators[0].get_AmountInt16() & 255&255);
+                        presetLoKey = ((p.Zones[i].Generators[0].get_AmountInt16() >> 8) & 255&255);
+                    }
+                    if (p.Zones[i].Generators.length > 1 && p.Zones[i].Generators[1].GeneratorType == AlphaSynth.Sf2.GeneratorEnum.VelocityRange){
+                        if (AlphaSynth.Platform.TypeUtils.IsLittleEndian){
+                            presetLoVel = (p.Zones[i].Generators[1].get_AmountInt16() & 255&255);
+                            presetHiVel = ((p.Zones[i].Generators[1].get_AmountInt16() >> 8) & 255&255);
+                        }
+                        else {
+                            presetHiVel = (p.Zones[i].Generators[1].get_AmountInt16() & 255&255);
+                            presetLoVel = ((p.Zones[i].Generators[1].get_AmountInt16() >> 8) & 255&255);
+                        }
+                    }
+                }
+                else if (p.Zones[i].Generators[0].GeneratorType == AlphaSynth.Sf2.GeneratorEnum.VelocityRange){
+                    if (AlphaSynth.Platform.TypeUtils.IsLittleEndian){
+                        presetLoVel = (p.Zones[i].Generators[0].get_AmountInt16() & 255&255);
+                        presetHiVel = ((p.Zones[i].Generators[0].get_AmountInt16() >> 8) & 255&255);
+                    }
+                    else {
+                        presetHiVel = (p.Zones[i].Generators[0].get_AmountInt16() & 255&255);
+                        presetLoVel = ((p.Zones[i].Generators[0].get_AmountInt16() >> 8) & 255&255);
+                    }
+                }
+                if (p.Zones[i].Generators[p.Zones[i].Generators.length - 1].GeneratorType == AlphaSynth.Sf2.GeneratorEnum.Instrument){
+                    var insts = sfinsts[p.Zones[i].Generators[p.Zones[i].Generators.length - 1].get_AmountInt16()];
+                    for (var $i6 = 0,$l6 = insts.length,inst = insts[$i6]; $i6 < $l6; $i6++, inst = insts[$i6]){
+                        var instLoKey;
+                        var instHiKey;
+                        var instLoVel;
+                        var instHiVel;
+                        if (AlphaSynth.Platform.TypeUtils.IsLittleEndian){
+                            instLoKey = (inst.Generators[43] & 255&255);
+                            instHiKey = ((inst.Generators[43] >> 8) & 255&255);
+                            instLoVel = (inst.Generators[44] & 255&255);
+                            instHiVel = ((inst.Generators[44] >> 8) & 255&255);
+                        }
+                        else {
+                            instHiKey = (inst.Generators[43] & 255&255);
+                            instLoKey = ((inst.Generators[43] >> 8) & 255&255);
+                            instHiVel = (inst.Generators[44] & 255&255);
+                            instLoVel = ((inst.Generators[44] >> 8) & 255&255);
+                        }
+                        if ((instLoKey <= presetHiKey && presetLoKey <= instHiKey) && (instLoVel <= presetHiVel && presetLoVel <= instHiVel)){
+                            var r = new AlphaSynth.Sf2.Sf2Region();
+                            AlphaSynth.Platform.Std.ArrayCopy(inst.Generators, 0, r.Generators, 0, r.Generators.length);
+                            this.ReadSf2Region(r, globalGens, p.Zones[i].Generators, true);
+                            regionList.push(r);
+                        }
+                    }
+                }
+                i++;
+            }
+            var mp = new AlphaSynth.Bank.Patch.MultiPatch(p.Name);
+            mp.LoadSf2(regionList.slice(0), this._assets);
+            this._assets.PatchAssets.push(new AlphaSynth.Bank.PatchAsset(mp.Name, mp));
+            this.AssignPatchToBank(mp, p.BankNumber, p.PatchNumber, p.PatchNumber);
+        }
+    },
+    ReadSf2Instruments: function (instruments){
+        var regions = new Array(instruments.length);
+        for (var x = 0; x < instruments.length; x++){
+            var globalGens = null;
+            var i;
+            if (instruments[x].Zones[0].Generators.length == 0 || instruments[x].Zones[0].Generators[instruments[x].Zones[0].Generators.length - 1].GeneratorType != AlphaSynth.Sf2.GeneratorEnum.SampleID){
+                globalGens = instruments[x].Zones[0].Generators;
+                i = 1;
+            }
+            else
+                i = 0;
+            regions[x] = new Array(instruments[x].Zones.length - i);
+            for (var j = 0; j < regions[x].length; j++){
+                var r = new AlphaSynth.Sf2.Sf2Region();
+                r.ApplyDefaultValues();
+                this.ReadSf2Region(r, globalGens, instruments[x].Zones[j + i].Generators, false);
+                regions[x][j] = r;
+            }
+        }
+        return regions;
+    },
+    ReadSf2Region: function (region, globals, gens, isRelative){
+        if (!isRelative){
+            if (globals != null){
+                for (var x = 0; x < globals.length; x++){
+                    region.Generators[globals[x].GeneratorType] = globals[x].get_AmountInt16();
+                }
+            }
+            for (var x = 0; x < gens.length; x++){
+                region.Generators[gens[x].GeneratorType] = gens[x].get_AmountInt16();
+            }
+        }
+        else {
+            var genList = [];
+            for (var $i7 = 0,$l7 = gens.length,generator = gens[$i7]; $i7 < $l7; $i7++, generator = gens[$i7]){
+                genList.push(generator);
+            }
+            if (globals != null){
+                for (var x = 0; x < globals.length; x++){
+                    var found = false;
+                    for (var i = 0; i < genList.length; i++){
+                        if (genList[i].GeneratorType == globals[x].GeneratorType){
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found){
+                        genList.push(globals[x]);
+                    }
+                }
+            }
+            for (var x = 0; x < genList.length; x++){
+                var value = genList[x].GeneratorType;
+                if (value < 5 || value == 12 || value == 45 || value == 46 || value == 47 || value == 50 || value == 54 || value == 57 || value == 58){
+                    continue;
+                }
+                else if (value == 43 || value == 44){
+                    var lo_a;
+                    var hi_a;
+                    var lo_b;
+                    var hi_b;
+                    if (AlphaSynth.Platform.TypeUtils.IsLittleEndian){
+                        lo_a = (region.Generators[value] & 255&255);
+                        hi_a = ((region.Generators[value] >> 8) & 255&255);
+                        lo_b = (genList[x].get_AmountInt16() & 255&255);
+                        hi_b = ((genList[x].get_AmountInt16() >> 8) & 255&255);
+                    }
+                    else {
+                        hi_a = (region.Generators[value] & 255&255);
+                        lo_a = ((region.Generators[value] >> 8) & 255&255);
+                        hi_b = (genList[x].get_AmountInt16() & 255&255);
+                        lo_b = ((genList[x].get_AmountInt16() >> 8) & 255&255);
+                    }
+                    lo_a = Math.max(lo_a, lo_b);
+                    hi_a = Math.min(hi_a, hi_b);
+                    if (lo_a > hi_a){
+                        throw $CreateException(new System.Exception.ctor$$String("Invalid sf2 region. The range generators do not intersect."), new Error());
+                    }
+                    if (AlphaSynth.Platform.TypeUtils.IsLittleEndian){
+                        region.Generators[value] = AlphaSynth.Platform.TypeUtils.ToInt16((lo_a | (hi_a << 8)));
+                    }
+                    else {
+                        region.Generators[value] = AlphaSynth.Platform.TypeUtils.ToInt16((lo_a << 8) | hi_a);
+                    }
+                }
+                else {
+                    region.Generators[value] = AlphaSynth.Platform.TypeUtils.ToInt16(region.Generators[value] + genList[x].get_AmountInt16());
+                }
+            }
+        }
+    },
+    AssignPatchToBank: function (patch, bankNumber, startRange, endRange){
+        if (bankNumber < 0)
+            return;
+        if (startRange > endRange){
+            var range = startRange;
+            startRange = endRange;
+            endRange = range;
+        }
+        if (startRange < 0 || startRange >= 128)
+            throw $CreateException(new System.Exception.ctor$$String("startRange out of range"), new Error());
+        if (endRange < 0 || endRange >= 128)
+            throw $CreateException(new System.Exception.ctor$$String("endRange out of range"), new Error());
+        var patches;
+        if (this._bank.hasOwnProperty(bankNumber)){
+            patches = this._bank[bankNumber];
+        }
+        else {
+            patches = new Array(128);
+            this._bank[bankNumber] = patches;
+        }
+        for (var x = startRange; x <= endRange; x++){
+            patches[x] = patch;
+        }
+    }
+};
+$StaticConstructor(function (){
+    AlphaSynth.Bank.PatchBank.DrumBank = 128;
+    AlphaSynth.Bank.PatchBank.BankSize = 128;
+});
+AlphaSynth.Bank.PatchAsset = function (name, patch){
+    this.Name = null;
+    this.Patch = null;
+    this.Name = name;
+    this.Patch = patch;
+};
+AlphaSynth.Ds = AlphaSynth.Ds || {};
+AlphaSynth.Ds.LinkedList = function (){
+    this.First = null;
+    this.Length = 0;
+    this.Length = 0;
+};
+AlphaSynth.Ds.LinkedList.prototype = {
+    AddFirst: function (value){
+        var node = new AlphaSynth.Ds.LinkedListNode();
+        node.Value = value;
+        if (this.First == null){
+            this.InsertNodeToEmptyList(node);
+        }
+        else {
+            this.InsertNodeBefore(this.First, node);
+            this.First = node;
+        }
+    },
+    AddLast: function (value){
+        var node = new AlphaSynth.Ds.LinkedListNode();
+        node.Value = value;
+        if (this.First == null){
+            this.InsertNodeToEmptyList(node);
+        }
+        else {
+            this.InsertNodeBefore(this.First, node);
+        }
+    },
+    RemoveFirst: function (){
+        if (this.First == null)
+            return null;
+        var v = this.First.Value;
+        this.Remove(this.First);
+        return v;
+    },
+    RemoveLast: function (){
+        if (this.First == null)
+            return null;
+        var v = this.First._prev != null ? this.First._prev.Value : null;
+        this.Remove(this.First._prev);
+        return v;
+    },
+    Remove: function (n){
+        if (n._next == n){
+            this.First = null;
+        }
+        else {
+            n._next._prev = n._prev;
+            n._prev._next = n._next;
+            if (this.First == n){
+                this.First = n._next;
+            }
+        }
+        n.Invalidate();
+        this.Length--;
+    },
+    InsertNodeBefore: function (node, newNode){
+        newNode._next = node;
+        newNode._prev = node._prev;
+        node._prev._next = newNode;
+        node._prev = newNode;
+        newNode._list = this;
+        this.Length++;
+    },
+    InsertNodeToEmptyList: function (node){
+        node._next = node;
+        node._prev = node;
+        node._list = this;
+        this.First = node;
+        this.Length++;
+    }
+};
+AlphaSynth.Ds.LinkedListNode = function (){
+    this._list = null;
+    this._next = null;
+    this._prev = null;
+    this.Value = null;
+};
+AlphaSynth.Ds.LinkedListNode.prototype = {
+    get_Next: function (){
+        return this._next == null || this._list.First == this._next ? null : this._next;
+    },
+    get_Prev: function (){
+        return this._prev == null || this == this._list.First ? null : this._prev;
+    },
+    Invalidate: function (){
+        this._list = null;
+        this._next = null;
+        this._prev = null;
+    }
+};
+AlphaSynth.Ds.CircularSampleBuffer = function (size){
+    this._buffer = null;
+    this._writePosition = 0;
+    this._readPosition = 0;
+    this._sampleCount = 0;
+    this._buffer = new Float32Array(size);
+    this._writePosition = 0;
+    this._readPosition = 0;
+    this._sampleCount = 0;
+};
+AlphaSynth.Ds.CircularSampleBuffer.prototype = {
+    get_Count: function (){
+        return this._sampleCount;
+    },
+    Clear: function (){
+        this._readPosition = 0;
+        this._writePosition = 0;
+        this._sampleCount = 0;
+        this._buffer = new Float32Array(this._buffer.length);
+    },
+    Write: function (data, offset, count){
+        var samplesWritten = 0;
+        if (count > this._buffer.length - this._sampleCount){
+            count = this._buffer.length - this._sampleCount;
+        }
+        var writeToEnd = Math.min(this._buffer.length - this._writePosition, count);
+        this._buffer.set(data.subarray(offset,offset+writeToEnd),this._writePosition);
+        this._writePosition += writeToEnd;
+        this._writePosition %= this._buffer.length;
+        samplesWritten += writeToEnd;
+        if (samplesWritten < count){
+            this._buffer.set(data.subarray(offset + samplesWritten,offset + samplesWritten+count - samplesWritten),this._writePosition);
+            this._writePosition += (count - samplesWritten);
+            samplesWritten = count;
+        }
+        this._sampleCount += samplesWritten;
+        return samplesWritten;
+    },
+    Read: function (data, offset, count){
+        if (count > this._sampleCount){
+            count = this._sampleCount;
+        }
+        var samplesRead = 0;
+        var readToEnd = Math.min(this._buffer.length - this._readPosition, count);
+        data.set(this._buffer.subarray(this._readPosition,this._readPosition+readToEnd),offset);
+        samplesRead += readToEnd;
+        this._readPosition += readToEnd;
+        this._readPosition %= this._buffer.length;
+        if (samplesRead < count){
+            data.set(this._buffer.subarray(this._readPosition,this._readPosition+count - samplesRead),offset + samplesRead);
+            this._readPosition += (count - samplesRead);
+            samplesRead = count;
+        }
+        this._sampleCount -= samplesRead;
+        return samplesRead;
+    }
+};
+AlphaSynth.IO = AlphaSynth.IO || {};
+AlphaSynth.IO.ByteBuffer = function (){
+    this._buffer = null;
+    this._capacity = 0;
+    this._position = 0;
+    this.Length = 0;
+};
+AlphaSynth.IO.ByteBuffer.prototype = {
+    get_Position: function (){
+        return this._position;
+    },
+    set_Position: function (value){
+        this._position = value;
+    },
+    GetBuffer: function (){
+        return this._buffer;
+    },
+    Reset: function (){
+        this.set_Position(0);
+    },
+    Skip: function (offset){
+        this.set_Position(this.get_Position() + offset);
+    },
+    SetCapacity: function (value){
+        if (value != this._capacity){
+            if (value > 0){
+                var newBuffer = new Uint8Array(value);
+                if (this.Length > 0)
+                    newBuffer.set(this._buffer.subarray(0,0+this.Length),0);
+                this._buffer = newBuffer;
+            }
+            else {
+                this._buffer = null;
+            }
+            this._capacity = value;
+        }
+    },
+    ReadByte: function (){
+        var n = this.Length - this.get_Position();
+        if (n <= 0)
+            return -1;
+        var b = this._buffer[this.get_Position()];
+        this.set_Position(this.get_Position() + 1);
+        return b;
+    },
+    Read: function (buffer, offset, count){
+        var n = this.Length - this.get_Position();
+        if (n > count)
+            n = count;
+        if (n <= 0)
+            return 0;
+        if (n <= 8){
+            var byteCount = n;
+            while (--byteCount >= 0)
+                buffer[offset + byteCount] = this._buffer[this.get_Position() + byteCount];
+        }
+        else
+            buffer.set(this._buffer.subarray(this.get_Position(),this.get_Position()+n),offset);
+        this.set_Position(this.get_Position() + n);
+        return n;
+    },
+    WriteByte: function (value){
+        var buffer = new Uint8Array(1);
+        buffer[0] = value;
+        this.Write(buffer, 0, 1);
+    },
+    Write: function (buffer, offset, count){
+        var i = this.get_Position() + count;
+        if (i > this.Length){
+            if (i > this._capacity){
+                this.EnsureCapacity(i);
+            }
+            this.Length = i;
+        }
+        if ((count <= 8) && (buffer != this._buffer)){
+            var byteCount = count;
+            while (--byteCount >= 0)
+                this._buffer[this.get_Position() + byteCount] = buffer[offset + byteCount];
+        }
+        else
+            this._buffer.set(buffer.subarray(offset,offset+count),this.get_Position());
+        this.set_Position(i);
+    },
+    EnsureCapacity: function (value){
+        if (value > this._capacity){
+            var newCapacity = value;
+            if (newCapacity < 256)
+                newCapacity = 256;
+            if (newCapacity < this._capacity * 2)
+                newCapacity = this._capacity * 2;
+            this.SetCapacity(newCapacity);
+        }
+    },
+    ToArray: function (){
+        var copy = new Uint8Array(this.Length);
+        copy.set(this._buffer.subarray(0,0+this.Length),0);
+        return copy;
+    }
+};
+AlphaSynth.IO.ByteBuffer.Empty = function (){
+    return AlphaSynth.IO.ByteBuffer.WithCapactiy(0);
+};
+AlphaSynth.IO.ByteBuffer.WithCapactiy = function (capacity){
+    var buffer = new AlphaSynth.IO.ByteBuffer();
+    buffer._buffer = new Uint8Array(capacity);
+    buffer._capacity = capacity;
+    return buffer;
+};
+AlphaSynth.IO.ByteBuffer.FromBuffer = function (data){
+    var buffer = new AlphaSynth.IO.ByteBuffer();
+    buffer._buffer = data;
+    buffer._capacity = buffer.Length = data.length;
+    return buffer;
+};
+AlphaSynth.Midi = AlphaSynth.Midi || {};
+AlphaSynth.Midi.Event = AlphaSynth.Midi.Event || {};
+AlphaSynth.Midi.Event.MidiEvent = function (delta, status, data1, data2){
+    this.Message = 0;
+    this.DeltaTime = 0;
+    this.DeltaTime = delta;
+    this.Message = status | (data1 << 8) | (data2 << 16);
+};
+AlphaSynth.Midi.Event.MidiEvent.prototype = {
+    get_Channel: function (){
+        return this.Message & 15;
+    },
+    get_Command: function (){
+        return (this.Message & 240);
+    },
+    get_Data1: function (){
+        return (this.Message & 65280) >> 8;
+    },
+    get_Data2: function (){
+        return (this.Message & 16711680) >> 16;
+    }
+};
+AlphaSynth.Midi.Event.SystemCommonEvent = function (delta, status, data1, data2){
+    AlphaSynth.Midi.Event.MidiEvent.call(this, delta, status, data1, data2);
+};
+AlphaSynth.Midi.Event.SystemCommonEvent.prototype = {
+    get_Channel: function (){
+        return -1;
+    },
+    get_Command: function (){
+        return (this.Message & 255);
+    }
+};
+$Inherit(AlphaSynth.Midi.Event.SystemCommonEvent, AlphaSynth.Midi.Event.MidiEvent);
+AlphaSynth.Midi.Event.SystemExclusiveEvent = function (delta, status, id, data){
+    this.Data = null;
+    AlphaSynth.Midi.Event.SystemCommonEvent.call(this, delta, status, (id & 255), (id >> 8));
+    this.Data = data;
+};
+AlphaSynth.Midi.Event.SystemExclusiveEvent.prototype = {
+    get_ManufacturerId: function (){
+        return this.Message >> 8;
+    }
+};
+$Inherit(AlphaSynth.Midi.Event.SystemExclusiveEvent, AlphaSynth.Midi.Event.SystemCommonEvent);
+AlphaSynth.Midi.Event.SystemCommonTypeEnum = {
+    SystemExclusive: 240,
+    MtcQuarterFrame: 241,
+    SongPosition: 242,
+    SongSelect: 243,
+    TuneRequest: 246,
+    SystemExclusive2: 247
+};
+AlphaSynth.Midi.Event.RealTimeTypeEnum = {
+    MidiClock: 248,
+    MidiTick: 249,
+    MidiStart: 250,
+    MidiContinue: 252,
+    MidiStop: 253,
+    ActiveSense: 254,
+    Reset: 255
+};
+AlphaSynth.Midi.Event.RealTimeEvent = function (delta, status, data1, data2){
+    AlphaSynth.Midi.Event.MidiEvent.call(this, delta, status, data1, data2);
+};
+AlphaSynth.Midi.Event.RealTimeEvent.prototype = {
+    get_Channel: function (){
+        return -1;
+    },
+    get_Command: function (){
+        return (this.Message & 255);
+    }
+};
+$Inherit(AlphaSynth.Midi.Event.RealTimeEvent, AlphaSynth.Midi.Event.MidiEvent);
+AlphaSynth.Midi.Event.MidiEventTypeEnum = {
+    NoteOff: 128,
+    NoteOn: 144,
+    NoteAftertouch: 160,
+    Controller: 176,
+    ProgramChange: 192,
+    ChannelAftertouch: 208,
+    PitchBend: 224,
+    Meta: 255
+};
+AlphaSynth.Midi.Event.ControllerTypeEnum = {
+    BankSelectCoarse: 0,
+    ModulationCoarse: 1,
+    BreathControllerCoarse: 2,
+    FootControllerCoarse: 4,
+    PortamentoTimeCoarse: 5,
+    DataEntryCoarse: 6,
+    VolumeCoarse: 7,
+    BalanceCoarse: 8,
+    PanCoarse: 10,
+    ExpressionControllerCoarse: 11,
+    EffectControl1Coarse: 12,
+    EffectControl2Coarse: 13,
+    GeneralPurposeSlider1: 16,
+    GeneralPurposeSlider2: 17,
+    GeneralPurposeSlider3: 18,
+    GeneralPurposeSlider4: 19,
+    BankSelectFine: 32,
+    ModulationFine: 33,
+    BreathControllerFine: 34,
+    FootControllerFine: 36,
+    PortamentoTimeFine: 37,
+    DataEntryFine: 38,
+    VolumeFine: 39,
+    BalanceFine: 40,
+    PanFine: 42,
+    ExpressionControllerFine: 43,
+    EffectControl1Fine: 44,
+    EffectControl2Fine: 45,
+    HoldPedal: 64,
+    Portamento: 65,
+    SostenutoPedal: 66,
+    SoftPedal: 67,
+    LegatoPedal: 68,
+    Hold2Pedal: 69,
+    SoundVariation: 70,
+    SoundTimbre: 71,
+    SoundReleaseTime: 72,
+    SoundAttackTime: 73,
+    SoundBrightness: 74,
+    SoundControl6: 75,
+    SoundControl7: 76,
+    SoundControl8: 77,
+    SoundControl9: 78,
+    SoundControl10: 79,
+    GeneralPurposeButton1: 80,
+    GeneralPurposeButton2: 81,
+    GeneralPurposeButton3: 82,
+    GeneralPurposeButton4: 83,
+    EffectsLevel: 91,
+    TremuloLevel: 92,
+    ChorusLevel: 93,
+    CelesteLevel: 94,
+    PhaseLevel: 95,
+    DataButtonIncrement: 96,
+    DataButtonDecrement: 97,
+    NonRegisteredParameterFine: 98,
+    NonRegisteredParameterCourse: 99,
+    RegisteredParameterFine: 100,
+    RegisteredParameterCourse: 101,
+    AllSoundOff: 120,
+    ResetControllers: 121,
+    LocalKeyboard: 122,
+    AllNotesOff: 123,
+    OmniModeOff: 124,
+    OmniModeOn: 125,
+    MonoMode: 126,
+    PolyMode: 127
+};
+AlphaSynth.Midi.Event.MetaEvent = function (delta, status, data1, data2){
+    AlphaSynth.Midi.Event.MidiEvent.call(this, delta, status, data1, data2);
+};
+AlphaSynth.Midi.Event.MetaEvent.prototype = {
+    get_Channel: function (){
+        return -1;
+    },
+    get_Command: function (){
+        return (this.Message & 255);
+    },
+    get_MetaStatus: function (){
+        return this.get_Data1();
+    }
+};
+$Inherit(AlphaSynth.Midi.Event.MetaEvent, AlphaSynth.Midi.Event.MidiEvent);
+AlphaSynth.Midi.Event.MetaTextEvent = function (delta, status, metaId, text){
+    this.Text = null;
+    AlphaSynth.Midi.Event.MetaEvent.call(this, delta, status, metaId, 0);
+    this.Text = text;
+};
+$Inherit(AlphaSynth.Midi.Event.MetaTextEvent, AlphaSynth.Midi.Event.MetaEvent);
+AlphaSynth.Midi.Event.MetaNumberEvent = function (delta, status, metaId, number){
+    this.Value = 0;
+    AlphaSynth.Midi.Event.MetaEvent.call(this, delta, status, metaId, 0);
+    this.Value = number;
+};
+$Inherit(AlphaSynth.Midi.Event.MetaNumberEvent, AlphaSynth.Midi.Event.MetaEvent);
+AlphaSynth.Midi.Event.MetaEventTypeEnum = {
+    SequenceNumber: 0,
+    TextEvent: 1,
+    CopyrightNotice: 2,
+    SequenceOrTrackName: 3,
+    InstrumentName: 4,
+    LyricText: 5,
+    MarkerText: 6,
+    CuePoint: 7,
+    PatchName: 8,
+    PortName: 9,
+    MidiChannel: 32,
+    MidiPort: 33,
+    EndOfTrack: 47,
+    Tempo: 81,
+    SmpteOffset: 84,
+    TimeSignature: 88,
+    KeySignature: 89,
+    SequencerSpecific: 127
+};
+AlphaSynth.Midi.Event.MetaDataEvent = function (delta, status, metaId, data){
+    this.Data = null;
+    AlphaSynth.Midi.Event.MetaEvent.call(this, delta, status, metaId, 0);
+    this.Data = data;
+};
+$Inherit(AlphaSynth.Midi.Event.MetaDataEvent, AlphaSynth.Midi.Event.MetaEvent);
+AlphaSynth.Midi.MidiTrack = function (instPrograms, drumPrograms, activeChannels, midiEvents){
+    this.Instruments = null;
+    this.DrumInstruments = null;
+    this.ActiveChannels = null;
+    this.MidiEvents = null;
+    this.NoteOnCount = 0;
+    this.EndTime = 0;
+    this.Instruments = instPrograms;
+    this.DrumInstruments = drumPrograms;
+    this.ActiveChannels = activeChannels;
+    this.MidiEvents = midiEvents;
+    this.NoteOnCount = 0;
+    this.EndTime = 0;
+};
+AlphaSynth.Midi.MidiHelper = function (){
+};
+$StaticConstructor(function (){
+    AlphaSynth.Midi.MidiHelper.MicroSecondsPerMinute = 60000000;
+    AlphaSynth.Midi.MidiHelper.MinChannel = 0;
+    AlphaSynth.Midi.MidiHelper.MaxChannel = 15;
+    AlphaSynth.Midi.MidiHelper.DrumChannel = 9;
+});
+AlphaSynth.Midi.MidiFile = function (){
+    this.Division = 0;
+    this.TrackFormat = AlphaSynth.Midi.MidiTrackFormat.SingleTrack;
+    this.TimingStandard = AlphaSynth.Midi.MidiTimeFormat.TicksPerBeat;
+    this.Tracks = null;
+    this.Division = 0;
+    this.TrackFormat = AlphaSynth.Midi.MidiTrackFormat.SingleTrack;
+    this.TimingStandard = AlphaSynth.Midi.MidiTimeFormat.TicksPerBeat;
+};
+AlphaSynth.Midi.MidiFile.prototype = {
+    CombineTracks: function (){
+        var finalTrack = this.MergeTracks();
+        var absEvents = new Array(this.Tracks.length);
+        for (var i = 0; i < this.Tracks.length; i++){
+            absEvents[i] = new Array(this.Tracks[i].MidiEvents.length);
+            var totalDeltaTime = 0;
+            for (var j = 0; j < this.Tracks[i].MidiEvents.length; j++){
+                absEvents[i][j] = this.Tracks[i].MidiEvents[j];
+                totalDeltaTime += absEvents[i][j].DeltaTime;
+                absEvents[i][j].DeltaTime = totalDeltaTime;
+            }
+        }
+        var eventCount = 0;
+        var delta = 0;
+        var nextdelta = 2147483647;
+        var counters = new Int32Array(absEvents.length);
+        AlphaSynth.Platform.TypeUtils.ClearIntArray(counters);
+        while (eventCount < finalTrack.MidiEvents.length){
+            for (var x = 0; x < absEvents.length; x++){
+                while (counters[x] < absEvents[x].length && absEvents[x][counters[x]].DeltaTime == delta){
+                    finalTrack.MidiEvents[eventCount] = absEvents[x][counters[x]];
+                    eventCount++;
+                    counters[x]++;
+                }
+                if (counters[x] < absEvents[x].length && absEvents[x][counters[x]].DeltaTime < nextdelta)
+                    nextdelta = absEvents[x][counters[x]].DeltaTime;
+            }
+            delta = nextdelta;
+            nextdelta = 2147483647;
+        }
+        finalTrack.EndTime = finalTrack.MidiEvents[finalTrack.MidiEvents.length - 1].DeltaTime;
+        var deltaDiff = 0;
+        for (var x = 0; x < finalTrack.MidiEvents.length; x++){
+            var oldTime = finalTrack.MidiEvents[x].DeltaTime;
+            finalTrack.MidiEvents[x].DeltaTime -= deltaDiff;
+            deltaDiff = oldTime;
+        }
+        this.Tracks = [finalTrack];
+        this.TrackFormat = AlphaSynth.Midi.MidiTrackFormat.SingleTrack;
+    },
+    MergeTracks: function (){
+        var eventCount = 0;
+        var notesPlayed = 0;
+        var programsUsed = [];
+        var drumProgramsUsed = [];
+        var channelsUsed = [];
+        for (var x = 0; x < this.Tracks.length; x++){
+            eventCount += this.Tracks[x].MidiEvents.length;
+            notesPlayed += this.Tracks[x].NoteOnCount;
+            for (var i = 0; i < this.Tracks[x].Instruments.length; i++){
+                var p = this.Tracks[x].Instruments[i];
+                if (Array.prototype.indexOf.call(programsUsed,p) == -1)
+                    programsUsed.push(p);
+            }
+            for (var i = 0; i < this.Tracks[x].DrumInstruments.length; i++){
+                var p = this.Tracks[x].DrumInstruments[i];
+                if (Array.prototype.indexOf.call(drumProgramsUsed,p) == -1)
+                    drumProgramsUsed.push(p);
+            }
+            for (var i = 0; i < this.Tracks[x].ActiveChannels.length; i++){
+                var p = this.Tracks[x].ActiveChannels[i];
+                if (Array.prototype.indexOf.call(channelsUsed,p) == -1)
+                    channelsUsed.push(p);
+            }
+        }
+        var track = new AlphaSynth.Midi.MidiTrack(programsUsed.slice(0), drumProgramsUsed.slice(0), channelsUsed.slice(0), new Array(eventCount));
+        track.NoteOnCount = notesPlayed;
+        return track;
+    },
+    Load: function (input){
+        if (!this.FindHead(input, 500))
+            throw $CreateException(new System.Exception.ctor$$String("Invalid midi file : MThd chunk could not be found."), new Error());
+        this.ReadHeader(input);
+        for (var x = 0; x < this.Tracks.length; x++){
+            this.Tracks[x] = this.ReadTrack(input);
+        }
+    },
+    FindHead: function (input, attempts){
+        var match = 0;
+        while (attempts > 0){
+            switch (input.ReadByte()){
+                case 77:
+                    match = 1;
+                    break;
+                case 84:
+                    match = match == 1 ? 2 : 0;
+                    break;
+                case 104:
+                    match = match == 2 ? 3 : 0;
+                    break;
+                case 100:
+                    if (match == 3)
+                    return true;
+                    match = 0;
+                    break;
+            }
+            attempts--;
+        }
+        return false;
+    },
+    ReadHeader: function (input){
+        if (AlphaSynth.Util.IOHelper.ReadInt32BE(input) != 6)
+            throw $CreateException(new System.Exception.ctor$$String("Midi header is invalid."), new Error());
+        this.TrackFormat = AlphaSynth.Util.IOHelper.ReadInt16BE(input);
+        this.Tracks = new Array(AlphaSynth.Util.IOHelper.ReadInt16BE(input));
+        var div = AlphaSynth.Util.IOHelper.ReadInt16BE(input);
+        this.Division = div & 32767;
+        this.TimingStandard = ((div & 32768) > 0) ? AlphaSynth.Midi.MidiTimeFormat.FramesPerSecond : AlphaSynth.Midi.MidiTimeFormat.TicksPerBeat;
+    },
+    ReadTrack: function (input){
+        var instList = [];
+        var drumList = [];
+        var channelList = [];
+        var eventList = [];
+        var noteOnCount = 0;
+        var totalTime = 0;
+        while (AlphaSynth.Util.IOHelper.Read8BitChars(input, 4) != "MTrk"){
+            var length = AlphaSynth.Util.IOHelper.ReadInt32BE(input);
+            while (length > 0){
+                length--;
+                input.ReadByte();
+            }
+        }
+        var endPosition = AlphaSynth.Util.IOHelper.ReadInt32BE(input) + input.get_Position();
+        var prevStatus = 0;
+        while (input.get_Position() < endPosition){
+            var delta = AlphaSynth.Midi.MidiFile.ReadVariableLength(input);
+            totalTime += delta;
+            var status = input.ReadByte();
+            if (status >= 128 && status <= 239){
+                //voice message
+                prevStatus = status;
+                eventList.push(AlphaSynth.Midi.MidiFile.ReadVoiceMessage(input, delta, status, input.ReadByte()));
+                noteOnCount = AlphaSynth.Midi.MidiFile.TrackVoiceStats(eventList[eventList.length - 1], instList, drumList, channelList, noteOnCount);
+            }
+            else if (status >= 240 && status <= 247){
+                //system common message
+                prevStatus = 0;
+                eventList.push(AlphaSynth.Midi.MidiFile.ReadSystemCommonMessage(input, delta, status));
+            }
+            else if (status >= 248 && status <= 255){
+                //realtime message
+                eventList.push(AlphaSynth.Midi.MidiFile.ReadRealTimeMessage(input, delta, status));
+            }
+            else {
+                //data bytes
+                if (prevStatus == 0){
+                    //if no running status continue to next status byte
+                    while ((status & 128) != 128){
+                        status = input.ReadByte();
+                    }
+                    if (status >= 128 && status <= 239){
+                        //voice message
+                        prevStatus = status;
+                        eventList.push(AlphaSynth.Midi.MidiFile.ReadVoiceMessage(input, delta, status, input.ReadByte()));
+                        noteOnCount = AlphaSynth.Midi.MidiFile.TrackVoiceStats(eventList[eventList.length - 1], instList, drumList, channelList, noteOnCount);
+                    }
+                    else if (status >= 240 && status <= 247){
+                        //system common message
+                        eventList.push(AlphaSynth.Midi.MidiFile.ReadSystemCommonMessage(input, delta, status));
+                    }
+                    else if (status >= 248 && status <= 255){
+                        //realtime message
+                        eventList.push(AlphaSynth.Midi.MidiFile.ReadRealTimeMessage(input, delta, status));
+                    }
+                }
+                else {
+                    //otherwise apply running status
+                    eventList.push(AlphaSynth.Midi.MidiFile.ReadVoiceMessage(input, delta, prevStatus, status));
+                    noteOnCount = AlphaSynth.Midi.MidiFile.TrackVoiceStats(eventList[eventList.length - 1], instList, drumList, channelList, noteOnCount);
+                }
+            }
+        }
+        if (input.get_Position() != endPosition)
+            throw $CreateException(new System.Exception.ctor$$String("The track length was invalid for the current MTrk chunk."), new Error());
+        if (Array.prototype.indexOf.call(channelList,9) != -1){
+            if (Array.prototype.indexOf.call(drumList,0) == -1)
+                drumList.push(0);
+        }
+        else {
+            if (Array.prototype.indexOf.call(instList,0) == -1)
+                instList.push(0);
+        }
+        var track = new AlphaSynth.Midi.MidiTrack(instList.slice(0), drumList.slice(0), channelList.slice(0), eventList.slice(0));
+        track.NoteOnCount = noteOnCount;
+        track.EndTime = totalTime;
+        return track;
+    }
+};
+AlphaSynth.Midi.MidiFile.ReadMetaMessage = function (input, delta, status){
+    var metaStatus = input.ReadByte();
+    switch (metaStatus){
+        case AlphaSynth.Midi.Event.MetaEventTypeEnum.SequenceNumber:
+            {
+            var count = input.ReadByte();
+            if (count == 0)
+                return new AlphaSynth.Midi.Event.MetaNumberEvent(delta, status, metaStatus, -1);
+            else if (count == 2){
+                return new AlphaSynth.Midi.Event.MetaNumberEvent(delta, status, metaStatus, AlphaSynth.Util.IOHelper.ReadInt16BE(input));
+            }
+            else
+                throw $CreateException(new System.Exception.ctor$$String("Invalid sequence number event."), new Error());
+            }
+        case AlphaSynth.Midi.Event.MetaEventTypeEnum.TextEvent:
+            return new AlphaSynth.Midi.Event.MetaTextEvent(delta, status, metaStatus, AlphaSynth.Midi.MidiFile.ReadString(input));
+        case AlphaSynth.Midi.Event.MetaEventTypeEnum.CopyrightNotice:
+            return new AlphaSynth.Midi.Event.MetaTextEvent(delta, status, metaStatus, AlphaSynth.Midi.MidiFile.ReadString(input));
+        case AlphaSynth.Midi.Event.MetaEventTypeEnum.SequenceOrTrackName:
+            return new AlphaSynth.Midi.Event.MetaTextEvent(delta, status, metaStatus, AlphaSynth.Midi.MidiFile.ReadString(input));
+        case AlphaSynth.Midi.Event.MetaEventTypeEnum.InstrumentName:
+            return new AlphaSynth.Midi.Event.MetaTextEvent(delta, status, metaStatus, AlphaSynth.Midi.MidiFile.ReadString(input));
+        case AlphaSynth.Midi.Event.MetaEventTypeEnum.LyricText:
+            return new AlphaSynth.Midi.Event.MetaTextEvent(delta, status, metaStatus, AlphaSynth.Midi.MidiFile.ReadString(input));
+        case AlphaSynth.Midi.Event.MetaEventTypeEnum.MarkerText:
+            return new AlphaSynth.Midi.Event.MetaTextEvent(delta, status, metaStatus, AlphaSynth.Midi.MidiFile.ReadString(input));
+        case AlphaSynth.Midi.Event.MetaEventTypeEnum.CuePoint:
+            return new AlphaSynth.Midi.Event.MetaTextEvent(delta, status, metaStatus, AlphaSynth.Midi.MidiFile.ReadString(input));
+        case AlphaSynth.Midi.Event.MetaEventTypeEnum.PatchName:
+            return new AlphaSynth.Midi.Event.MetaTextEvent(delta, status, metaStatus, AlphaSynth.Midi.MidiFile.ReadString(input));
+        case AlphaSynth.Midi.Event.MetaEventTypeEnum.PortName:
+            return new AlphaSynth.Midi.Event.MetaTextEvent(delta, status, metaStatus, AlphaSynth.Midi.MidiFile.ReadString(input));
+        case AlphaSynth.Midi.Event.MetaEventTypeEnum.MidiChannel:
+            if (input.ReadByte() != 1)
+            throw $CreateException(new System.Exception.ctor$$String("Invalid midi channel event. Expected size of 1."), new Error());
+            return new AlphaSynth.Midi.Event.MetaEvent(delta, status, metaStatus, input.ReadByte());
+        case AlphaSynth.Midi.Event.MetaEventTypeEnum.MidiPort:
+            if (input.ReadByte() != 1)
+            throw $CreateException(new System.Exception.ctor$$String("Invalid midi port event. Expected size of 1."), new Error());
+            return new AlphaSynth.Midi.Event.MetaEvent(delta, status, metaStatus, input.ReadByte());
+        case AlphaSynth.Midi.Event.MetaEventTypeEnum.EndOfTrack:
+            return new AlphaSynth.Midi.Event.MetaEvent(delta, status, metaStatus, input.ReadByte());
+        case AlphaSynth.Midi.Event.MetaEventTypeEnum.Tempo:
+            if (input.ReadByte() != 3)
+            throw $CreateException(new System.Exception.ctor$$String("Invalid tempo event. Expected size of 3."), new Error());
+            return new AlphaSynth.Midi.Event.MetaNumberEvent(delta, status, metaStatus, (input.ReadByte() << 16) | (input.ReadByte() << 8) | input.ReadByte());
+        case AlphaSynth.Midi.Event.MetaEventTypeEnum.SmpteOffset:
+            if (input.ReadByte() != 5)
+            throw $CreateException(new System.Exception.ctor$$String("Invalid smpte event. Expected size of 5."), new Error());
+            return new AlphaSynth.Midi.Event.MetaTextEvent(delta, status, metaStatus, input.ReadByte() + ":" + input.ReadByte() + ":" + input.ReadByte() + ":" + input.ReadByte() + ":" + input.ReadByte());
+        case AlphaSynth.Midi.Event.MetaEventTypeEnum.TimeSignature:
+            if (input.ReadByte() != 4)
+            throw $CreateException(new System.Exception.ctor$$String("Invalid time signature event. Expected size of 4."), new Error());
+            return new AlphaSynth.Midi.Event.MetaTextEvent(delta, status, metaStatus, input.ReadByte() + ":" + input.ReadByte() + ":" + input.ReadByte() + ":" + input.ReadByte());
+        case AlphaSynth.Midi.Event.MetaEventTypeEnum.KeySignature:
+            if (input.ReadByte() != 2)
+            throw $CreateException(new System.Exception.ctor$$String("Invalid key signature event. Expected size of 2."), new Error());
+            return new AlphaSynth.Midi.Event.MetaTextEvent(delta, status, metaStatus, input.ReadByte() + ":" + input.ReadByte());
+        case AlphaSynth.Midi.Event.MetaEventTypeEnum.SequencerSpecific:
+            var length = AlphaSynth.Midi.MidiFile.ReadVariableLength(input);
+            var data = AlphaSynth.Util.IOHelper.ReadByteArray(input, length);
+            return new AlphaSynth.Midi.Event.MetaDataEvent(delta, status, metaStatus, data);
+    }
+    throw $CreateException(new System.Exception.ctor$$String("Not a valid meta message Status: " + status + " Meta: " + metaStatus), new Error());
+};
+AlphaSynth.Midi.MidiFile.ReadRealTimeMessage = function (input, delta, status){
+    switch (status){
+        case AlphaSynth.Midi.Event.RealTimeTypeEnum.MidiClock:
+            return new AlphaSynth.Midi.Event.RealTimeEvent(delta, status, 0, 0);
+        case AlphaSynth.Midi.Event.RealTimeTypeEnum.MidiTick:
+            return new AlphaSynth.Midi.Event.RealTimeEvent(delta, status, 0, 0);
+        case AlphaSynth.Midi.Event.RealTimeTypeEnum.MidiStart:
+            return new AlphaSynth.Midi.Event.RealTimeEvent(delta, status, 0, 0);
+        case AlphaSynth.Midi.Event.RealTimeTypeEnum.MidiContinue:
+            return new AlphaSynth.Midi.Event.RealTimeEvent(delta, status, 0, 0);
+        case AlphaSynth.Midi.Event.RealTimeTypeEnum.MidiStop:
+            return new AlphaSynth.Midi.Event.RealTimeEvent(delta, status, 0, 0);
+        case AlphaSynth.Midi.Event.RealTimeTypeEnum.ActiveSense:
+            return new AlphaSynth.Midi.Event.RealTimeEvent(delta, status, 0, 0);
+        case AlphaSynth.Midi.Event.RealTimeTypeEnum.Reset:
+            return AlphaSynth.Midi.MidiFile.ReadMetaMessage(input, delta, status);
+        default:
+            throw $CreateException(new System.Exception.ctor$$String("The real time message was invalid or unsupported : " + status), new Error());
+    }
+};
+AlphaSynth.Midi.MidiFile.ReadSystemCommonMessage = function (input, delta, status){
+    switch (status){
+        case AlphaSynth.Midi.Event.SystemCommonTypeEnum.SystemExclusive2:
+        case AlphaSynth.Midi.Event.SystemCommonTypeEnum.SystemExclusive:
+            {
+            var maker = AlphaSynth.Util.IOHelper.ReadInt16BE(input);
+            if (maker == 0){
+                maker = AlphaSynth.Util.IOHelper.ReadInt16BE(input);
+            }
+            else if (maker == 247)
+                return null;
+            var data = [];
+            var b = input.ReadByte();
+            while (b != 247){
+                data.push(b);
+                b = input.ReadByte();
+            }
+            return new AlphaSynth.Midi.Event.SystemExclusiveEvent(delta, status, maker, data.slice(0));
+            }
+        case AlphaSynth.Midi.Event.SystemCommonTypeEnum.MtcQuarterFrame:
+            return new AlphaSynth.Midi.Event.SystemCommonEvent(delta, status, input.ReadByte(), 0);
+        case AlphaSynth.Midi.Event.SystemCommonTypeEnum.SongPosition:
+            return new AlphaSynth.Midi.Event.SystemCommonEvent(delta, status, input.ReadByte(), input.ReadByte());
+        case AlphaSynth.Midi.Event.SystemCommonTypeEnum.SongSelect:
+            return new AlphaSynth.Midi.Event.SystemCommonEvent(delta, status, input.ReadByte(), 0);
+        case AlphaSynth.Midi.Event.SystemCommonTypeEnum.TuneRequest:
+            return new AlphaSynth.Midi.Event.SystemCommonEvent(delta, status, 0, 0);
+        default:
+            throw $CreateException(new System.Exception.ctor$$String("The system common message was invalid or unsupported : " + status), new Error());
+    }
+};
+AlphaSynth.Midi.MidiFile.ReadVoiceMessage = function (input, delta, status, data1){
+    switch ((status & 240)){
+        case AlphaSynth.Midi.Event.MidiEventTypeEnum.NoteOff:
+            return new AlphaSynth.Midi.Event.MidiEvent(delta, status, data1, input.ReadByte());
+        case AlphaSynth.Midi.Event.MidiEventTypeEnum.NoteOn:
+            var velocity = input.ReadByte();
+            if (velocity == 0)
+            status = ((status & 15) | 128);
+            return new AlphaSynth.Midi.Event.MidiEvent(delta, status, data1, velocity);
+        case AlphaSynth.Midi.Event.MidiEventTypeEnum.NoteAftertouch:
+            return new AlphaSynth.Midi.Event.MidiEvent(delta, status, data1, input.ReadByte());
+        case AlphaSynth.Midi.Event.MidiEventTypeEnum.Controller:
+            return new AlphaSynth.Midi.Event.MidiEvent(delta, status, data1, input.ReadByte());
+        case AlphaSynth.Midi.Event.MidiEventTypeEnum.ProgramChange:
+            return new AlphaSynth.Midi.Event.MidiEvent(delta, status, data1, 0);
+        case AlphaSynth.Midi.Event.MidiEventTypeEnum.ChannelAftertouch:
+            return new AlphaSynth.Midi.Event.MidiEvent(delta, status, data1, 0);
+        case AlphaSynth.Midi.Event.MidiEventTypeEnum.PitchBend:
+            return new AlphaSynth.Midi.Event.MidiEvent(delta, status, data1, input.ReadByte());
+        default:
+            throw $CreateException(new System.Exception.ctor$$String("The status provided was not that of a voice message."), new Error());
+    }
+};
+AlphaSynth.Midi.MidiFile.TrackVoiceStats = function (midiEvent, instList, drumList, channelList, noteOnCount){
+    if (midiEvent.get_Command() == AlphaSynth.Midi.Event.MidiEventTypeEnum.NoteOn){
+        var chan = midiEvent.get_Channel();
+        if (Array.prototype.indexOf.call(channelList,chan) == -1)
+            channelList.push(chan);
+        noteOnCount++;
+    }
+    else if (midiEvent.get_Command() == AlphaSynth.Midi.Event.MidiEventTypeEnum.ProgramChange){
+        var chan = midiEvent.get_Channel();
+        var prog = midiEvent.get_Data1();
+        if (chan == 9){
+            if (Array.prototype.indexOf.call(drumList,prog) == -1)
+                drumList.push(prog);
+        }
+        else {
+            if (Array.prototype.indexOf.call(instList,prog) == -1)
+                instList.push(prog);
+        }
+    }
+    return noteOnCount;
+};
+AlphaSynth.Midi.MidiFile.ReadVariableLength = function (input){
+    var value = 0;
+    var next;
+    do{
+        next = input.ReadByte();
+        value = value << 7;
+        value = value | (next & 127);
+    }
+    while ((next & 128) == 128)
+    return value;
+};
+AlphaSynth.Midi.MidiFile.ReadString = function (input){
+    var length = AlphaSynth.Midi.MidiFile.ReadVariableLength(input);
+    return AlphaSynth.Util.IOHelper.Read8BitChars(input, length);
+    // TODO: check for correct string encoding
+};
+AlphaSynth.Midi.MidiTrackFormat = {
+    SingleTrack: 0,
+    MultiTrack: 1,
+    MultiSong: 2
+};
+AlphaSynth.Midi.MidiTimeFormat = {
+    TicksPerBeat: 0,
+    FramesPerSecond: 1
+};
+AlphaSynth.Player.SynthPlayerState = {
+    Stopped: 0,
+    Playing: 1,
+    Paused: 2
+};
+AlphaSynth.Player.SynthPlayer = function (){
+    this._tickPosition = 0;
+    this._timePosition = 0;
+    this.PositionChanged = null;
+    this.PlayerStateChanged = null;
+    this.Finished = null;
+    this.SoundFontLoad = null;
+    this.SoundFontLoaded = null;
+    this.SoundFontLoadFailed = null;
+    this.MidiLoad = null;
+    this.MidiLoaded = null;
+    this.MidiLoadFailed = null;
+    this.ReadyForPlay = null;
+    this.Output = null;
+    this.Synth = null;
+    this.Sequencer = null;
+    this.State = AlphaSynth.Player.SynthPlayerState.Stopped;
+    this.IsSoundFontLoaded = false;
+    this.IsMidiLoaded = false;
+    AlphaSynth.Util.Logger.Debug("Initializing player");
+    this.State = AlphaSynth.Player.SynthPlayerState.Stopped;
+    this.OnPlayerStateChanged(new AlphaSynth.Player.PlayerStateChangedEventArgs(this.State));
+    AlphaSynth.Util.Logger.Debug("Creating synthesizer");
+    this.Synth = new AlphaSynth.Synthesis.Synthesizer(44100, 2, 441, 3, 100);
+    this.Sequencer = new AlphaSynth.Sequencer.MidiFileSequencer(this.Synth);
+    AlphaSynth.Util.Logger.Debug("Opening output");
+    this.Output = AlphaSynth.Platform.Platform.CreateOutput(this.Synth);
+    this.Sequencer.AddFinishedListener($CreateDelegate(this.Output, this.Output.SequencerFinished));
+    this.Output.add_Finished($CreateAnonymousDelegate(this, function (){
+        // stop everything
+        this.Stop();
+        AlphaSynth.Util.Logger.Debug("Finished playback");
+        this.OnFinished();
+    }));
+    this.Output.add_SampleRequest($CreateAnonymousDelegate(this, function (){
+        // synthesize buffer
+        this.Sequencer.FillMidiEventQueue();
+        this.Synth.Synthesize();
+        // send it to output
+        this.Output.AddSamples(this.Synth.SampleBuffer);
+    }));
+    this.Output.add_PositionChanged($CreateAnonymousDelegate(this, function (pos){
+        // log position
+        this.FirePositionChanged(pos);
+    }));
+    this.Output.Open();
+};
+AlphaSynth.Player.SynthPlayer.prototype = {
+    get_TickPosition: function (){
+        return this._tickPosition;
+    },
+    set_TickPosition: function (value){
+        this.set_TimePosition(this.Sequencer.TicksToMillis(value));
+    },
+    get_MasterVolume: function (){
+        return this.Synth.get_MasterVolume();
+    },
+    set_MasterVolume: function (value){
+        this.Synth.set_MasterVolume(value);
+    },
+    get_TimePosition: function (){
+        return this._timePosition;
+    },
+    set_TimePosition: function (value){
+        AlphaSynth.Util.Logger.Debug("Seeking to position " + value + "ms");
+        if (this.State == AlphaSynth.Player.SynthPlayerState.Playing){
+            this.Sequencer.Pause();
+            this.Output.Pause();
+        }
+        this.Sequencer.Seek(value);
+        this.Output.Seek(value);
+        if (this.State == AlphaSynth.Player.SynthPlayerState.Playing){
+            this.Sequencer.Play();
+            this.Output.Play();
+        }
+    },
+    get_IsReady: function (){
+        return this.IsSoundFontLoaded && this.IsMidiLoaded;
+    },
+    Play: function (){
+        if (this.State == AlphaSynth.Player.SynthPlayerState.Playing || !this.get_IsReady())
+            return;
+        AlphaSynth.Util.Logger.Debug("Starting playback");
+        this.Sequencer.Play();
+        this.Output.Play();
+        this.State = AlphaSynth.Player.SynthPlayerState.Playing;
+        this.OnPlayerStateChanged(new AlphaSynth.Player.PlayerStateChangedEventArgs(this.State));
+    },
+    Pause: function (){
+        if (this.State != AlphaSynth.Player.SynthPlayerState.Playing || !this.get_IsReady())
+            return;
+        AlphaSynth.Util.Logger.Debug("Pausing playback");
+        this.Sequencer.Pause();
+        this.Output.Pause();
+        this.State = AlphaSynth.Player.SynthPlayerState.Paused;
+        this.OnPlayerStateChanged(new AlphaSynth.Player.PlayerStateChangedEventArgs(this.State));
+    },
+    PlayPause: function (){
+        if (this.State == AlphaSynth.Player.SynthPlayerState.Playing || !this.get_IsReady())
+            this.Pause();
+        else
+            this.Play();
+    },
+    Stop: function (){
+        if (this.State == AlphaSynth.Player.SynthPlayerState.Stopped || !this.get_IsReady())
+            return;
+        AlphaSynth.Util.Logger.Debug("Stopping playback");
+        this.Sequencer.Stop();
+        this.Synth.Stop();
+        this.Output.Stop();
+        this.State = AlphaSynth.Player.SynthPlayerState.Stopped;
+        this.OnPlayerStateChanged(new AlphaSynth.Player.PlayerStateChangedEventArgs(this.State));
+        this.FirePositionChanged(0);
+    },
+    LoadSoundFontUrl: function (url){
+        if (this.State != AlphaSynth.Player.SynthPlayerState.Stopped)
+            return;
+        AlphaSynth.Util.Logger.Info("Start loading soundfont from url " + url);
+        var loader = new AlphaSynth.Util.UrlLoader();
+        loader.Url = url;
+        loader.Method = "GET";
+        loader.Complete = $CreateDelegate(this, this.LoadSoundFontBytes);
+        loader.Progress = $CreateDelegate(this, this.OnLoaderSoundFontLoad);
+        try{
+            loader.Load();
+        }
+        catch(e){
+            AlphaSynth.Util.Logger.Error("Could not load soundfont from url: " + e);
+        }
+    },
+    LoadSoundFontBytes: function (data){
+        if (this.State != AlphaSynth.Player.SynthPlayerState.Stopped)
+            return;
+        var input = AlphaSynth.IO.ByteBuffer.FromBuffer(data);
+        try{
+            AlphaSynth.Util.Logger.Info("Loading soundfont from bytes");
+            var bank = new AlphaSynth.Bank.PatchBank();
+            bank.LoadSf2(input);
+            this.Synth.LoadBank(bank);
+            this.IsSoundFontLoaded = true;
+            this.OnSoundFontLoaded();
+            AlphaSynth.Util.Logger.Info("soundFont successfully loaded");
+            if (this.get_IsReady())
+                this.OnReadyForPlay();
+        }
+        catch(e){
+            AlphaSynth.Util.Logger.Error("Could not load soundfont from bytes " + e);
+            this.IsSoundFontLoaded = false;
+            this.Synth.UnloadBank();
+            this.OnSoundFontLoadFailed();
+        }
+    },
+    LoadMidiUrl: function (url){
+        if (this.State != AlphaSynth.Player.SynthPlayerState.Stopped)
+            return;
+        AlphaSynth.Util.Logger.Info("Start loading midi from url " + url);
+        var loader = new AlphaSynth.Util.UrlLoader();
+        loader.Url = url;
+        loader.Method = "GET";
+        loader.Complete = $CreateDelegate(this, this.LoadMidiBytes);
+        loader.Progress = $CreateDelegate(this, this.OnLoaderMidiLoad);
+        try{
+            loader.Load();
+        }
+        catch(e){
+            AlphaSynth.Util.Logger.Error("Could not load midi from url: " + e);
+        }
+    },
+    LoadMidiBytes: function (data){
+        if (this.State != AlphaSynth.Player.SynthPlayerState.Stopped)
+            return;
+        var input = AlphaSynth.IO.ByteBuffer.FromBuffer(data);
+        try{
+            AlphaSynth.Util.Logger.Info("Loading midi from bytes");
+            var midi = new AlphaSynth.Midi.MidiFile();
+            midi.Load(input);
+            this.Sequencer.LoadMidi(midi);
+            this.IsMidiLoaded = true;
+            this.OnMidiLoaded();
+            AlphaSynth.Util.Logger.Info("Midi successfully loaded");
+            if (this.get_IsReady())
+                this.OnReadyForPlay();
+            this.FirePositionChanged(0);
+        }
+        catch(e){
+            AlphaSynth.Util.Logger.Error("Could not load midi from bytes " + e);
+            this.IsMidiLoaded = false;
+            this.Sequencer.UnloadMidi();
+            this.OnMidiLoadFailed();
+        }
+    },
+    OnLoaderSoundFontLoad: function (loaded, total){
+        AlphaSynth.Util.Logger.Debug("Soundfont downloading: " + loaded + "/" + total + " bytes");
+        this.OnSoundFontLoad(new AlphaSynth.Player.ProgressEventArgs(loaded, total));
+    },
+    OnLoaderMidiLoad: function (loaded, total){
+        AlphaSynth.Util.Logger.Debug("Midi downloading: " + loaded + "/" + total + " bytes");
+        this.OnMidiLoad(new AlphaSynth.Player.ProgressEventArgs(loaded, total));
+    },
+    FirePositionChanged: function (pos){
+        var endTime = (((this.Sequencer.EndTime / this.Synth.SampleRate) | 0) * 1000);
+        var currentTime = pos;
+        var endTick = this.Sequencer.MillisToTicks(endTime);
+        var currentTick = this.Sequencer.MillisToTicks(currentTime);
+        this._tickPosition = currentTick;
+        this._timePosition = currentTime;
+        AlphaSynth.Util.Logger.Debug("Position changed: (time: " + currentTime + "/" + endTime + ", tick: " + currentTick + "/" + endTime + ")");
+        this.OnPositionChanged(new AlphaSynth.Player.PositionChangedEventArgs(currentTime, endTime, currentTick, endTick));
+    },
+    add_PositionChanged: function (value){
+        this.PositionChanged = $CombineDelegates(this.PositionChanged, value);
+    },
+    remove_PositionChanged: function (value){
+        this.PositionChanged = $RemoveDelegate(this.PositionChanged, value);
+    },
+    OnPositionChanged: function (e){
+        var handler = this.PositionChanged;
+        if (handler != null)
+            handler(this, e);
+    },
+    add_PlayerStateChanged: function (value){
+        this.PlayerStateChanged = $CombineDelegates(this.PlayerStateChanged, value);
+    },
+    remove_PlayerStateChanged: function (value){
+        this.PlayerStateChanged = $RemoveDelegate(this.PlayerStateChanged, value);
+    },
+    OnPlayerStateChanged: function (e){
+        var handler = this.PlayerStateChanged;
+        if (handler != null)
+            handler(this, e);
+    },
+    add_Finished: function (value){
+        this.Finished = $CombineDelegates(this.Finished, value);
+    },
+    remove_Finished: function (value){
+        this.Finished = $RemoveDelegate(this.Finished, value);
+    },
+    OnFinished: function (){
+        var handler = this.Finished;
+        if (handler != null)
+            handler(this, AlphaSynth.Player.EmptyEventArgs.Instance);
+    },
+    add_SoundFontLoad: function (value){
+        this.SoundFontLoad = $CombineDelegates(this.SoundFontLoad, value);
+    },
+    remove_SoundFontLoad: function (value){
+        this.SoundFontLoad = $RemoveDelegate(this.SoundFontLoad, value);
+    },
+    OnSoundFontLoad: function (e){
+        var handler = this.SoundFontLoad;
+        if (handler != null)
+            handler(this, e);
+    },
+    add_SoundFontLoaded: function (value){
+        this.SoundFontLoaded = $CombineDelegates(this.SoundFontLoaded, value);
+    },
+    remove_SoundFontLoaded: function (value){
+        this.SoundFontLoaded = $RemoveDelegate(this.SoundFontLoaded, value);
+    },
+    OnSoundFontLoaded: function (){
+        var handler = this.SoundFontLoaded;
+        if (handler != null)
+            handler(this, AlphaSynth.Player.EmptyEventArgs.Instance);
+    },
+    add_SoundFontLoadFailed: function (value){
+        this.SoundFontLoadFailed = $CombineDelegates(this.SoundFontLoadFailed, value);
+    },
+    remove_SoundFontLoadFailed: function (value){
+        this.SoundFontLoadFailed = $RemoveDelegate(this.SoundFontLoadFailed, value);
+    },
+    OnSoundFontLoadFailed: function (){
+        var handler = this.SoundFontLoadFailed;
+        if (handler != null)
+            handler(this, AlphaSynth.Player.EmptyEventArgs.Instance);
+    },
+    add_MidiLoad: function (value){
+        this.MidiLoad = $CombineDelegates(this.MidiLoad, value);
+    },
+    remove_MidiLoad: function (value){
+        this.MidiLoad = $RemoveDelegate(this.MidiLoad, value);
+    },
+    OnMidiLoad: function (e){
+        var handler = this.MidiLoad;
+        if (handler != null)
+            handler(this, e);
+    },
+    add_MidiLoaded: function (value){
+        this.MidiLoaded = $CombineDelegates(this.MidiLoaded, value);
+    },
+    remove_MidiLoaded: function (value){
+        this.MidiLoaded = $RemoveDelegate(this.MidiLoaded, value);
+    },
+    OnMidiLoaded: function (){
+        var handler = this.MidiLoaded;
+        if (handler != null)
+            handler(this, AlphaSynth.Player.EmptyEventArgs.Instance);
+    },
+    add_MidiLoadFailed: function (value){
+        this.MidiLoadFailed = $CombineDelegates(this.MidiLoadFailed, value);
+    },
+    remove_MidiLoadFailed: function (value){
+        this.MidiLoadFailed = $RemoveDelegate(this.MidiLoadFailed, value);
+    },
+    OnMidiLoadFailed: function (){
+        var handler = this.MidiLoadFailed;
+        if (handler != null)
+            handler(this, AlphaSynth.Player.EmptyEventArgs.Instance);
+    },
+    add_ReadyForPlay: function (value){
+        this.ReadyForPlay = $CombineDelegates(this.ReadyForPlay, value);
+    },
+    remove_ReadyForPlay: function (value){
+        this.ReadyForPlay = $RemoveDelegate(this.ReadyForPlay, value);
+    },
+    OnReadyForPlay: function (){
+        var handler = this.ReadyForPlay;
+        if (handler != null)
+            handler(this, AlphaSynth.Player.EmptyEventArgs.Instance);
+    }
+};
+AlphaSynth.Player.EmptyEventArgs = function (){
+};
+$StaticConstructor(function (){
+    AlphaSynth.Player.EmptyEventArgs.Instance = new AlphaSynth.Player.EmptyEventArgs();
+});
+AlphaSynth.Player.ProgressEventArgs = function (loaded, total){
+    this.Loaded = 0;
+    this.Total = 0;
+    this.Loaded = loaded;
+    this.Total = total;
+};
+AlphaSynth.Player.PlayerStateChangedEventArgs = function (state){
+    this.State = AlphaSynth.Player.SynthPlayerState.Stopped;
+    this.State = state;
+};
+AlphaSynth.Player.PositionChangedEventArgs = function (currentTime, endTime, currentTick, endTick){
+    this.CurrentTime = 0;
+    this.EndTime = 0;
+    this.CurrentTick = 0;
+    this.EndTick = 0;
+    this.CurrentTime = currentTime;
+    this.EndTime = endTime;
+    this.CurrentTick = currentTick;
+    this.EndTick = endTick;
+};
+AlphaSynth.Sequencer = AlphaSynth.Sequencer || {};
+AlphaSynth.Sequencer.MidiFileSequencer = function (synth){
+    this._synthData = null;
+    this._tempoChanges = null;
+    this._finished = null;
+    this._blockList = null;
+    this._playbackRate = 0;
+    this._eventIndex = 0;
+    this._division = 0;
+    this.Synth = null;
+    this.IsPlaying = false;
+    this.CurrentTempo = 0;
+    this.CurrentTime = 0;
+    this.EndTime = 0;
+    this.Synth = synth;
+    this._eventIndex = 0;
+    this._division = 0;
+    this._playbackRate = 1;
+    this.IsPlaying = false;
+    this._blockList = new Array(16);
+    this._finished = [];
+    synth.AddMidiMessageProcessed($CreateDelegate(this, this.MidiEventProcessed));
+};
+AlphaSynth.Sequencer.MidiFileSequencer.prototype = {
+    get_IsMidiLoaded: function (){
+        return this._synthData != null;
+    },
+    get_PlaySpeed: function (){
+        return this._playbackRate;
+    },
+    set_PlaySpeed: function (value){
+        this._playbackRate = AlphaSynth.Synthesis.SynthHelper.ClampF(value, 0.125, 8);
+    },
+    AddFinishedListener: function (listener){
+        this._finished.push(listener);
+    },
+    FireFinished: function (){
+        for (var i = 0; i < this._finished.length; i++){
+            var l = this._finished[i];
+            if (l != null)
+                l();
+        }
+    },
+    LoadMidi: function (midiFile){
+        if (this.IsPlaying)
+            return false;
+        this.LoadMidiFile(midiFile);
+        return true;
+    },
+    UnloadMidi: function (){
+        if (this.IsPlaying)
+            return false;
+        this._synthData = null;
+        return true;
+    },
+    Play: function (){
+        if (this.IsPlaying || this._synthData == null)
+            return;
+        this.IsPlaying = true;
+    },
+    Pause: function (){
+        this.IsPlaying = false;
+    },
+    Stop: function (){
+        this.IsPlaying = false;
+        this.CurrentTime = 0;
+        this._eventIndex = 0;
+    },
+    IsChannelMuted: function (channel){
+        return this._blockList[channel];
+    },
+    MuteAllChannels: function (){
+        for (var x = 0; x < this._blockList.length; x++){
+            this._blockList[x] = true;
+        }
+    },
+    UnMuteAllChannels: function (){
+        for (var x = 0; x < this._blockList.length; x++){
+            this._blockList[x] = false;
+        }
+    },
+    SetMute: function (channel, muteValue){
+        this._blockList[channel] = muteValue;
+    },
+    Seek: function (milliseconds){
+        var targetSampleTime = ((this.Synth.SampleRate * (milliseconds / 1000))) | 0;
+        if (targetSampleTime > this.CurrentTime){
+            //process forward
+            this.SilentProcess(targetSampleTime - this.CurrentTime);
+        }
+        else if (targetSampleTime < this.CurrentTime){
+            //we have to restart the midi to make sure we get the right state: instruments, volume, pan, etc
+            this.CurrentTime = 0;
+            this._eventIndex = 0;
+            this.Synth.NoteOffAll(true);
+            this.Synth.ResetPrograms();
+            this.Synth.ResetSynthControls();
+            this.SilentProcess(targetSampleTime);
+        }
+    },
+    FillMidiEventQueue: function (){
+        if (!this.IsPlaying || this.Synth.MidiEventQueue.Length != 0)
+            return;
+        if (this.CurrentTime >= this.EndTime){
+            this.CurrentTime = 0;
+            this._eventIndex = 0;
+            this.IsPlaying = false;
+            this.Synth.NoteOffAll(true);
+            this.Synth.ResetPrograms();
+            this.Synth.ResetSynthControls();
+            this.FireFinished();
+            return;
+        }
+        var newMSize = ((this.Synth.MicroBufferSize * this._playbackRate)) | 0;
+        var endSample = this.CurrentTime + (newMSize * this.Synth.MicroBufferCount);
+        for (var x = 0; x < this.Synth.MicroBufferCount; x++){
+            this.CurrentTime += newMSize;
+            while (this._eventIndex < this._synthData.length && this._synthData[this._eventIndex].Delta < this.CurrentTime){
+                if (this._synthData[this._eventIndex].Event.get_Command() != AlphaSynth.Midi.Event.MidiEventTypeEnum.NoteOn || !this._blockList[this._synthData[this._eventIndex].Event.get_Channel()]){
+                    this.Synth.MidiEventQueue.AddFirst(this._synthData[this._eventIndex]);
+                    this.Synth.MidiEventCounts[x]++;
+                }
+                this._eventIndex++;
+            }
+        }
+    },
+    LoadMidiFile: function (midiFile){
+        this._tempoChanges = [];
+        //Converts midi to sample based format for easy sequencing
+        var bpm = 120;
+        //Combine all tracks into 1 track that is organized from lowest to highest absolute time
+        if (midiFile.Tracks.length > 1 || midiFile.Tracks[0].EndTime == 0)
+            midiFile.CombineTracks();
+        //Convert delta time to sample time
+        this._synthData = new Array(midiFile.Tracks[0].MidiEvents.length);
+        this._division = midiFile.Division;
+        this._eventIndex = 0;
+        this.CurrentTime = 0;
+        this.CurrentTempo = bpm | 0;
+        //Calculate sample based time using double counter and round down to nearest integer sample.
+        var absDelta = 0;
+        var absTick = 0;
+        var absTime = 0;
+        for (var x = 0; x < midiFile.Tracks[0].MidiEvents.length; x++){
+            var mEvent = midiFile.Tracks[0].MidiEvents[x];
+            this._synthData[x] = new AlphaSynth.Synthesis.SynthEvent(mEvent);
+            absTick += mEvent.DeltaTime;
+            absTime += mEvent.DeltaTime * (60000 / (bpm * midiFile.Division));
+            absDelta += this.Synth.SampleRate * mEvent.DeltaTime * (60 / (bpm * midiFile.Division));
+            this._synthData[x].Delta = ((absDelta)) | 0;
+            //Update tempo
+            if (this.IsTempoMessage(mEvent.get_Command(), mEvent.get_Data1())){
+                var meta = mEvent;
+                bpm = (60000000 / meta.Value) | 0;
+                this._tempoChanges.push(new AlphaSynth.Sequencer.MidiFileSequencerTempoChange(bpm, absTick, ((absTime)) | 0));
+            }
+        }
+        this.EndTime = this._synthData[this._synthData.length - 1].Delta;
+    },
+    MidiEventProcessed: function (midiEvent){
+        if (this.IsTempoMessage(midiEvent.get_Command(), midiEvent.get_Data1())){
+            var meta = midiEvent;
+            this.CurrentTempo = ((60000000 / meta.Value) | 0);
+        }
+    },
+    IsTempoMessage: function (command, data1){
+        return command == AlphaSynth.Midi.Event.MidiEventTypeEnum.Meta && data1 == 81;
+    },
+    MillisToTicks: function (time){
+        var ticks = 0;
+        var bpm = 120;
+        var lastChange = 0;
+        // find start and bpm of last tempo change before time
+        for (var i = 0; i < this._tempoChanges.length; i++){
+            var c = this._tempoChanges[i];
+            if (time < c.Time){
+                break;
+            }
+            ticks = c.Ticks;
+            bpm = c.Bpm;
+            lastChange = c.Time;
+        }
+        // add the missing ticks
+        time -= lastChange;
+        ticks += ((time / (60000 / (bpm * this._division)))) | 0;
+        return ticks;
+    },
+    TicksToMillis: function (ticks){
+        var time = 0;
+        var bpm = 120;
+        var lastChange = 0;
+        // find start and bpm of last tempo change before time
+        for (var i = 0; i < this._tempoChanges.length; i++){
+            var c = this._tempoChanges[i];
+            if (ticks < c.Ticks){
+                break;
+            }
+            time = c.Time;
+            bpm = c.Bpm;
+            lastChange = c.Ticks;
+        }
+        // add the missing millis
+        ticks -= lastChange;
+        time += ((ticks * (60000 / (bpm * this._division)))) | 0;
+        return time;
+    },
+    SilentProcess: function (amount){
+        if (amount <= 0)
+            return;
+        while (this._eventIndex < this._synthData.length && this._synthData[this._eventIndex].Delta < (this.CurrentTime + amount)){
+            if (this._synthData[this._eventIndex].Event.get_Command() != AlphaSynth.Midi.Event.MidiEventTypeEnum.NoteOn){
+                var m = this._synthData[this._eventIndex];
+                this.Synth.ProcessMidiMessage(m.Event);
+            }
+            this._eventIndex++;
+        }
+        this.CurrentTime += amount;
+    }
+};
+AlphaSynth.Sequencer.MidiFileSequencerTempoChange = function (bpm, ticks, time){
+    this.Bpm = 0;
+    this.Ticks = 0;
+    this.Time = 0;
+    this.Bpm = bpm;
+    this.Ticks = ticks;
+    this.Time = time;
+};
+AlphaSynth.Sf2 = AlphaSynth.Sf2 || {};
+AlphaSynth.Sf2.Chunks = AlphaSynth.Sf2.Chunks || {};
+AlphaSynth.Sf2.Chunks.Chunk = function (id, size){
+    this.Id = null;
+    this.Size = 0;
+    this.Id = id;
+    this.Size = size;
+};
+AlphaSynth.Sf2.Chunks.ZoneChunk = function (id, size, input){
+    this._zoneData = null;
+    AlphaSynth.Sf2.Chunks.Chunk.call(this, id, size);
+    this._zoneData = new Array((((size / 4)) | 0));
+    var lastZone = null;
+    for (var x = 0; x < this._zoneData.length; x++){
+        var z = new AlphaSynth.Sf2.Chunks.RawZoneData();
+        z.GeneratorIndex = AlphaSynth.Util.IOHelper.ReadUInt16LE(input);
+        z.ModulatorIndex = AlphaSynth.Util.IOHelper.ReadUInt16LE(input);
+        if (lastZone != null){
+            lastZone.GeneratorCount = (z.GeneratorIndex - lastZone.GeneratorIndex&65535);
+            lastZone.ModulatorCount = (z.ModulatorIndex - lastZone.ModulatorIndex&65535);
+        }
+        this._zoneData[x] = z;
+        lastZone = z;
+    }
+};
+AlphaSynth.Sf2.Chunks.ZoneChunk.prototype = {
+    ToZones: function (modulators, generators){
+        var zones = new Array((this._zoneData.length - 1));
+        for (var x = 0; x < zones.length; x++){
+            var rawZone = this._zoneData[x];
+            var zone = new AlphaSynth.Sf2.Zone();
+            zone.Generators = new Array(rawZone.GeneratorCount);
+            AlphaSynth.Platform.Std.ArrayCopy(generators, rawZone.GeneratorIndex, zone.Generators, 0, rawZone.GeneratorCount);
+            zone.Modulators = new Array(rawZone.ModulatorCount);
+            AlphaSynth.Platform.Std.ArrayCopy(modulators, rawZone.ModulatorIndex, zone.Modulators, 0, rawZone.ModulatorCount);
+            zones[x] = zone;
+        }
+        return zones;
+    }
+};
+$Inherit(AlphaSynth.Sf2.Chunks.ZoneChunk, AlphaSynth.Sf2.Chunks.Chunk);
+AlphaSynth.Sf2.Chunks.RawZoneData = function (){
+    this.GeneratorIndex = 0;
+    this.ModulatorIndex = 0;
+    this.GeneratorCount = 0;
+    this.ModulatorCount = 0;
+};
+AlphaSynth.Sf2.Chunks.SampleHeaderChunk = function (id, size, input){
+    this.SampleHeaders = null;
+    AlphaSynth.Sf2.Chunks.Chunk.call(this, id, size);
+    if (size % 46 != 0)
+        throw $CreateException(new System.Exception.ctor$$String("Invalid SoundFont. The sample header chunk was invalid."), new Error());
+    this.SampleHeaders = new Array((((size / 46) - 1)) | 0);
+    for (var x = 0; x < this.SampleHeaders.length; x++){
+        this.SampleHeaders[x] = new AlphaSynth.Sf2.SampleHeader(input);
+    }
+    new AlphaSynth.Sf2.SampleHeader(input);
+    //read terminal record
+};
+$Inherit(AlphaSynth.Sf2.Chunks.SampleHeaderChunk, AlphaSynth.Sf2.Chunks.Chunk);
+AlphaSynth.Sf2.Chunks.PresetHeaderChunk = function (id, size, input){
+    this._rawPresets = null;
+    AlphaSynth.Sf2.Chunks.Chunk.call(this, id, size);
+    if (size % 38 != 0)
+        throw $CreateException(new System.Exception.ctor$$String("Invalid SoundFont. The preset chunk was invalid."), new Error());
+    this._rawPresets = new Array((((size / 38)) | 0));
+    var lastPreset = null;
+    for (var x = 0; x < this._rawPresets.length; x++){
+        var p = new AlphaSynth.Sf2.Chunks.RawPreset();
+        p.Name = AlphaSynth.Util.IOHelper.Read8BitStringLength(input, 20);
+        p.PatchNumber = AlphaSynth.Util.IOHelper.ReadUInt16LE(input);
+        p.BankNumber = AlphaSynth.Util.IOHelper.ReadUInt16LE(input);
+        p.StartPresetZoneIndex = AlphaSynth.Util.IOHelper.ReadUInt16LE(input);
+        p.Library = AlphaSynth.Util.IOHelper.ReadInt32LE(input);
+        p.Genre = AlphaSynth.Util.IOHelper.ReadInt32LE(input);
+        p.Morphology = AlphaSynth.Util.IOHelper.ReadInt32LE(input);
+        if (lastPreset != null){
+            lastPreset.EndPresetZoneIndex = ((p.StartPresetZoneIndex - 1)&65535);
+        }
+        this._rawPresets[x] = p;
+        lastPreset = p;
+    }
+};
+AlphaSynth.Sf2.Chunks.PresetHeaderChunk.prototype = {
+    ToPresets: function (presetZones){
+        var presets = new Array((this._rawPresets.length - 1));
+        for (var x = 0; x < presets.length; x++){
+            var rawPreset = this._rawPresets[x];
+            var p = new AlphaSynth.Sf2.PresetHeader();
+            p.BankNumber = rawPreset.BankNumber;
+            p.Genre = rawPreset.Genre;
+            p.Library = rawPreset.Library;
+            p.Morphology = rawPreset.Morphology;
+            p.Name = rawPreset.Name;
+            p.PatchNumber = rawPreset.PatchNumber;
+            p.Zones = new Array((rawPreset.EndPresetZoneIndex - rawPreset.StartPresetZoneIndex + 1));
+            AlphaSynth.Platform.Std.ArrayCopy(presetZones, rawPreset.StartPresetZoneIndex, p.Zones, 0, p.Zones.length);
+            presets[x] = p;
+        }
+        return presets;
+    }
+};
+$Inherit(AlphaSynth.Sf2.Chunks.PresetHeaderChunk, AlphaSynth.Sf2.Chunks.Chunk);
+AlphaSynth.Sf2.Chunks.RawPreset = function (){
+    this.Name = null;
+    this.PatchNumber = 0;
+    this.BankNumber = 0;
+    this.StartPresetZoneIndex = 0;
+    this.EndPresetZoneIndex = 0;
+    this.Library = 0;
+    this.Genre = 0;
+    this.Morphology = 0;
+};
+AlphaSynth.Sf2.Chunks.ModulatorChunk = function (id, size, input){
+    this.Modulators = null;
+    AlphaSynth.Sf2.Chunks.Chunk.call(this, id, size);
+    if (size % 10 != 0)
+        throw $CreateException(new System.Exception.ctor$$String("Invalid SoundFont. The presetzone chunk was invalid."), new Error());
+    this.Modulators = new Array(((size / 10) | 0) - 1);
+    for (var x = 0; x < this.Modulators.length; x++){
+        this.Modulators[x] = new AlphaSynth.Sf2.Modulator(input);
+    }
+    new AlphaSynth.Sf2.Modulator(input);
+};
+$Inherit(AlphaSynth.Sf2.Chunks.ModulatorChunk, AlphaSynth.Sf2.Chunks.Chunk);
+AlphaSynth.Sf2.Chunks.InstrumentChunk = function (id, size, input){
+    this._rawInstruments = null;
+    AlphaSynth.Sf2.Chunks.Chunk.call(this, id, size);
+    if (size % 22 != 0)
+        throw $CreateException(new System.Exception.ctor$$String("Invalid SoundFont. The preset chunk was invalid."), new Error());
+    this._rawInstruments = new Array((((size / 22)) | 0));
+    var lastInstrument = null;
+    for (var x = 0; x < this._rawInstruments.length; x++){
+        var i = new AlphaSynth.Sf2.Chunks.RawInstrument();
+        i.Name = AlphaSynth.Util.IOHelper.Read8BitStringLength(input, 20);
+        i.StartInstrumentZoneIndex = AlphaSynth.Util.IOHelper.ReadUInt16LE(input);
+        if (lastInstrument != null){
+            lastInstrument.EndInstrumentZoneIndex = ((i.StartInstrumentZoneIndex - 1)&65535);
+        }
+        this._rawInstruments[x] = i;
+        lastInstrument = i;
+    }
+};
+AlphaSynth.Sf2.Chunks.InstrumentChunk.prototype = {
+    ToInstruments: function (zones){
+        var inst = new Array(this._rawInstruments.length - 1);
+        for (var x = 0; x < inst.length; x++){
+            var rawInst = this._rawInstruments[x];
+            var i = new AlphaSynth.Sf2.Instrument();
+            i.Name = rawInst.Name;
+            i.Zones = new Array(rawInst.EndInstrumentZoneIndex - rawInst.StartInstrumentZoneIndex + 1);
+            AlphaSynth.Platform.Std.ArrayCopy(zones, rawInst.StartInstrumentZoneIndex, i.Zones, 0, i.Zones.length);
+            inst[x] = i;
+        }
+        return inst;
+    }
+};
+$Inherit(AlphaSynth.Sf2.Chunks.InstrumentChunk, AlphaSynth.Sf2.Chunks.Chunk);
+AlphaSynth.Sf2.Chunks.RawInstrument = function (){
+    this.Name = null;
+    this.StartInstrumentZoneIndex = 0;
+    this.EndInstrumentZoneIndex = 0;
+};
+AlphaSynth.Sf2.Chunks.GeneratorChunk = function (id, size, input){
+    this.Generators = null;
+    AlphaSynth.Sf2.Chunks.Chunk.call(this, id, size);
+    if (size % 4 != 0)
+        throw $CreateException(new System.Exception.ctor$$String("Invalid SoundFont. The presetzone chunk was invalid"), new Error());
+    this.Generators = new Array((((size / 4) - 1)) | 0);
+    for (var x = 0; x < this.Generators.length; x++){
+        this.Generators[x] = new AlphaSynth.Sf2.Generator(input);
+    }
+    new AlphaSynth.Sf2.Generator(input);
+    // terminal record
+};
+$Inherit(AlphaSynth.Sf2.Chunks.GeneratorChunk, AlphaSynth.Sf2.Chunks.Chunk);
+AlphaSynth.Sf2.Modulator = function (input){
+    this._sourceModulationData = null;
+    this._destinationGenerator = 0;
+    this._amount = 0;
+    this._sourceModulationAmount = null;
+    this._sourceTransform = 0;
+    this._sourceModulationData = new AlphaSynth.Sf2.ModulatorType(input);
+    this._destinationGenerator = AlphaSynth.Util.IOHelper.ReadUInt16LE(input);
+    this._amount = AlphaSynth.Util.IOHelper.ReadInt16LE(input);
+    this._sourceModulationAmount = new AlphaSynth.Sf2.ModulatorType(input);
+    this._sourceTransform = AlphaSynth.Util.IOHelper.ReadUInt16LE(input);
+};
+AlphaSynth.Sf2.Zone = function (){
+    this.Modulators = null;
+    this.Generators = null;
+};
+AlphaSynth.Sf2.SoundFontSampleData = function (input){
+    this.BitsPerSample = 0;
+    this.SampleData = null;
+    var id = AlphaSynth.Util.IOHelper.Read8BitChars(input, 4);
+    var size = AlphaSynth.Util.IOHelper.ReadInt32LE(input);
+    if (id.toLowerCase() != "list")
+        throw $CreateException(new System.Exception.ctor$$String("Invalid soundfont. Could not find sdta LIST chunk."), new Error());
+    var readTo = input.get_Position() + size;
+    id = AlphaSynth.Util.IOHelper.Read8BitChars(input, 4);
+    if (id.toLowerCase() != "sdta")
+        throw $CreateException(new System.Exception.ctor$$String("Invalid soundfont. The LIST chunk is not of type sdta."), new Error());
+    this.BitsPerSample = 0;
+    var rawSampleData = null;
+    while (input.get_Position() < readTo){
+        var subID = AlphaSynth.Util.IOHelper.Read8BitChars(input, 4);
+        size = AlphaSynth.Util.IOHelper.ReadInt32LE(input);
+        switch (subID.toLowerCase()){
+            case "smpl":
+                this.BitsPerSample = 16;
+                rawSampleData = AlphaSynth.Util.IOHelper.ReadByteArray(input, size);
+                break;
+            case "sm24":
+                if (rawSampleData == null || size != Math.ceil(this.SampleData.length / 2)){
+                //ignore this chunk if wrong size or if it comes first
+                input.Skip(size);
+            }
+                else {
+                this.BitsPerSample = 24;
+                for (var x = 0; x < this.SampleData.length; x++){
+                    var b = new Uint8Array(3);
+                    b[0] = input.ReadByte();
+                    b[1] = rawSampleData[2 * x];
+                    b[2] = rawSampleData[2 * x + 1];
+                }
+            }
+                if (size % 2 == 1){
+                if (input.ReadByte() != 0){
+                    input.set_Position(input.get_Position() - 1);
+                }
+            }
+                break;
+            default:
+                throw $CreateException(new System.Exception.ctor$$String("Invalid soundfont. Unknown chunk id: " + subID + "."), new Error());
+        }
+    }
+    if (this.BitsPerSample == 16){
+        this.SampleData = rawSampleData;
+    }
+    else if (this.BitsPerSample != 24)
+        throw $CreateException(new System.Exception.ctor$$String("Only 16 and 24 bit samples are supported."), new Error());
+};
+AlphaSynth.Sf2.SoundFontPresets = function (input){
+    this.SampleHeaders = null;
+    this.PresetHeaders = null;
+    this.Instruments = null;
+    var id = AlphaSynth.Util.IOHelper.Read8BitChars(input, 4);
+    var size = AlphaSynth.Util.IOHelper.ReadInt32LE(input);
+    if (id.toLowerCase() != "list")
+        throw $CreateException(new System.Exception.ctor$$String("Invalid soundfont. Could not find pdta LIST chunk."), new Error());
+    var readTo = input.get_Position() + size;
+    id = AlphaSynth.Util.IOHelper.Read8BitChars(input, 4);
+    if (id.toLowerCase() != "pdta")
+        throw $CreateException(new System.Exception.ctor$$String("Invalid soundfont. The LIST chunk is not of type pdta."), new Error());
+    var presetModulators = null;
+    var presetGenerators = null;
+    var instrumentModulators = null;
+    var instrumentGenerators = null;
+    var pbag = null;
+    var ibag = null;
+    var phdr = null;
+    var inst = null;
+    while (input.get_Position() < readTo){
+        id = AlphaSynth.Util.IOHelper.Read8BitChars(input, 4);
+        size = AlphaSynth.Util.IOHelper.ReadInt32LE(input);
+        switch (id.toLowerCase()){
+            case "phdr":
+                phdr = new AlphaSynth.Sf2.Chunks.PresetHeaderChunk(id, size, input);
+                break;
+            case "pbag":
+                pbag = new AlphaSynth.Sf2.Chunks.ZoneChunk(id, size, input);
+                break;
+            case "pmod":
+                presetModulators = new AlphaSynth.Sf2.Chunks.ModulatorChunk(id, size, input).Modulators;
+                break;
+            case "pgen":
+                presetGenerators = new AlphaSynth.Sf2.Chunks.GeneratorChunk(id, size, input).Generators;
+                break;
+            case "inst":
+                inst = new AlphaSynth.Sf2.Chunks.InstrumentChunk(id, size, input);
+                break;
+            case "ibag":
+                ibag = new AlphaSynth.Sf2.Chunks.ZoneChunk(id, size, input);
+                break;
+            case "imod":
+                instrumentModulators = new AlphaSynth.Sf2.Chunks.ModulatorChunk(id, size, input).Modulators;
+                break;
+            case "igen":
+                instrumentGenerators = new AlphaSynth.Sf2.Chunks.GeneratorChunk(id, size, input).Generators;
+                break;
+            case "shdr":
+                this.SampleHeaders = new AlphaSynth.Sf2.Chunks.SampleHeaderChunk(id, size, input).SampleHeaders;
+                break;
+            default:
+                throw $CreateException(new System.Exception.ctor$$String("Invalid soundfont. Unrecognized sub chunk: " + id), new Error());
+        }
+    }
+    var pZones = pbag.ToZones(presetModulators, presetGenerators);
+    this.PresetHeaders = phdr.ToPresets(pZones);
+    var iZones = ibag.ToZones(instrumentModulators, instrumentGenerators);
+    this.Instruments = inst.ToInstruments(iZones);
+};
+AlphaSynth.Sf2.SoundFontInfo = function (input){
+    this.RomVersionMajor = 0;
+    this.RomVersionMinor = 0;
+    this.SfVersionMajor = 0;
+    this.SfVersionMinor = 0;
+    this.SoundEngine = null;
+    this.BankName = null;
+    this.DataRom = null;
+    this.CreationDate = null;
+    this.Author = null;
+    this.TargetProduct = null;
+    this.Copyright = null;
+    this.Comments = null;
+    this.Tools = null;
+    this.Tools = "";
+    this.Comments = "";
+    this.Copyright = "";
+    this.TargetProduct = "";
+    this.Author = "";
+    this.DataRom = "";
+    this.CreationDate = "";
+    this.BankName = "";
+    this.SoundEngine = "";
+    var id = AlphaSynth.Util.IOHelper.Read8BitChars(input, 4);
+    var size = AlphaSynth.Util.IOHelper.ReadInt32LE(input);
+    if (id.toLowerCase() != "list")
+        throw $CreateException(new System.Exception.ctor$$String("Invalid soundfont. Could not find INFO LIST chunk."), new Error());
+    var readTo = input.get_Position() + size;
+    id = AlphaSynth.Util.IOHelper.Read8BitChars(input, 4);
+    if (id.toLowerCase() != "info")
+        throw $CreateException(new System.Exception.ctor$$String("Invalid soundfont. The LIST chunk is not of type INFO."), new Error());
+    while (input.get_Position() < readTo){
+        id = AlphaSynth.Util.IOHelper.Read8BitChars(input, 4);
+        size = AlphaSynth.Util.IOHelper.ReadInt32LE(input);
+        switch (id.toLowerCase()){
+            case "ifil":
+                this.SfVersionMajor = AlphaSynth.Util.IOHelper.ReadInt16LE(input);
+                this.SfVersionMinor = AlphaSynth.Util.IOHelper.ReadInt16LE(input);
+                break;
+            case "isng":
+                this.SoundEngine = AlphaSynth.Util.IOHelper.Read8BitStringLength(input, size);
+                break;
+            case "inam":
+                this.BankName = AlphaSynth.Util.IOHelper.Read8BitStringLength(input, size);
+                break;
+            case "irom":
+                this.DataRom = AlphaSynth.Util.IOHelper.Read8BitStringLength(input, size);
+                break;
+            case "iver":
+                this.RomVersionMajor = AlphaSynth.Util.IOHelper.ReadInt16LE(input);
+                this.RomVersionMinor = AlphaSynth.Util.IOHelper.ReadInt16LE(input);
+                break;
+            case "icrd":
+                this.CreationDate = AlphaSynth.Util.IOHelper.Read8BitStringLength(input, size);
+                break;
+            case "ieng":
+                this.Author = AlphaSynth.Util.IOHelper.Read8BitStringLength(input, size);
+                break;
+            case "iprd":
+                this.TargetProduct = AlphaSynth.Util.IOHelper.Read8BitStringLength(input, size);
+                break;
+            case "icop":
+                this.Copyright = AlphaSynth.Util.IOHelper.Read8BitStringLength(input, size);
+                break;
+            case "icmt":
+                this.Comments = AlphaSynth.Util.IOHelper.Read8BitStringLength(input, size);
+                break;
+            case "isft":
+                this.Tools = AlphaSynth.Util.IOHelper.Read8BitStringLength(input, size);
+                break;
+            default:
+                throw $CreateException(new System.Exception.ctor$$String("Invalid soundfont. The Chunk: " + id + " was not expected."), new Error());
+        }
+    }
+};
+AlphaSynth.Sf2.SoundFont = function (){
+    this.Info = null;
+    this.SampleData = null;
+    this.Presets = null;
+};
+AlphaSynth.Sf2.SoundFont.prototype = {
+    Load: function (input){
+        var id = AlphaSynth.Util.IOHelper.Read8BitChars(input, 4);
+        var size = AlphaSynth.Util.IOHelper.ReadInt32LE(input);
+        if (id.toLowerCase() != "riff")
+            throw $CreateException(new System.Exception.ctor$$String("Invalid soundfont. Could not find RIFF header."), new Error());
+        id = AlphaSynth.Util.IOHelper.Read8BitChars(input, 4);
+        if (id.toLowerCase() != "sfbk")
+            throw $CreateException(new System.Exception.ctor$$String("Invalid soundfont. Riff type is invalid."), new Error());
+        AlphaSynth.Util.Logger.Debug("Reading info chunk");
+        this.Info = new AlphaSynth.Sf2.SoundFontInfo(input);
+        AlphaSynth.Util.Logger.Debug("Reading sampledata chunk");
+        this.SampleData = new AlphaSynth.Sf2.SoundFontSampleData(input);
+        AlphaSynth.Util.Logger.Debug("Reading preset chunk");
+        this.Presets = new AlphaSynth.Sf2.SoundFontPresets(input);
+    }
+};
+AlphaSynth.Sf2.Sf2Region = function (){
+    this.Generators = null;
+    this.Generators = new Int16Array(61);
+};
+AlphaSynth.Sf2.Sf2Region.prototype = {
+    ApplyDefaultValues: function (){
+        this.Generators[0] = 0;
+        this.Generators[1] = 0;
+        this.Generators[2] = 0;
+        this.Generators[3] = 0;
+        this.Generators[4] = 0;
+        this.Generators[5] = 0;
+        this.Generators[6] = 0;
+        this.Generators[7] = 0;
+        this.Generators[8] = 13500;
+        this.Generators[9] = 0;
+        this.Generators[10] = 0;
+        this.Generators[11] = 0;
+        this.Generators[12] = 0;
+        this.Generators[13] = 0;
+        this.Generators[15] = 0;
+        this.Generators[16] = 0;
+        this.Generators[17] = 0;
+        this.Generators[21] = -12000;
+        this.Generators[22] = 0;
+        this.Generators[23] = -12000;
+        this.Generators[24] = 0;
+        this.Generators[25] = -12000;
+        this.Generators[26] = -12000;
+        this.Generators[27] = -12000;
+        this.Generators[28] = -12000;
+        this.Generators[29] = 0;
+        this.Generators[30] = -12000;
+        this.Generators[31] = 0;
+        this.Generators[32] = 0;
+        this.Generators[33] = -12000;
+        this.Generators[34] = -12000;
+        this.Generators[35] = -12000;
+        this.Generators[36] = -12000;
+        this.Generators[37] = 0;
+        this.Generators[38] = -12000;
+        this.Generators[39] = 0;
+        this.Generators[40] = 0;
+        this.Generators[43] = 32512;
+        this.Generators[44] = 32512;
+        this.Generators[45] = 0;
+        this.Generators[46] = -1;
+        this.Generators[47] = -1;
+        this.Generators[48] = 0;
+        this.Generators[50] = 0;
+        this.Generators[51] = 0;
+        this.Generators[52] = 0;
+        this.Generators[54] = 0;
+        this.Generators[56] = 100;
+        this.Generators[57] = 0;
+        this.Generators[58] = -1;
+    }
+};
+AlphaSynth.Sf2.SampleHeader = function (input){
+    this.Name = null;
+    this.Start = 0;
+    this.End = 0;
+    this.StartLoop = 0;
+    this.EndLoop = 0;
+    this.SampleRate = 0;
+    this.RootKey = 0;
+    this.Tune = 0;
+    this.SampleLink = 0;
+    this.SoundFontSampleLink = AlphaSynth.Sf2.SFSampleLink.MonoSample;
+    this.Name = AlphaSynth.Util.IOHelper.Read8BitStringLength(input, 20);
+    this.Start = AlphaSynth.Util.IOHelper.ReadInt32LE(input);
+    this.End = AlphaSynth.Util.IOHelper.ReadInt32LE(input);
+    this.StartLoop = AlphaSynth.Util.IOHelper.ReadInt32LE(input);
+    this.EndLoop = AlphaSynth.Util.IOHelper.ReadInt32LE(input);
+    this.SampleRate = AlphaSynth.Util.IOHelper.ReadInt32LE(input);
+    this.RootKey = input.ReadByte();
+    this.Tune = AlphaSynth.Platform.TypeUtils.ToInt16(input.ReadByte());
+    this.SampleLink = AlphaSynth.Util.IOHelper.ReadUInt16LE(input);
+    this.SoundFontSampleLink = AlphaSynth.Util.IOHelper.ReadUInt16LE(input);
+};
+AlphaSynth.Sf2.PresetHeader = function (){
+    this.Name = null;
+    this.PatchNumber = 0;
+    this.BankNumber = 0;
+    this.Library = 0;
+    this.Genre = 0;
+    this.Morphology = 0;
+    this.Zones = null;
+};
+AlphaSynth.Sf2.ModulatorType = function (input){
+    this._controllerSource = 0;
+    this.Polarity = AlphaSynth.Sf2.PolarityEnum.Unipolar;
+    this.Direction = AlphaSynth.Sf2.DirectionEnum.MinToMax;
+    this.SourceType = 0;
+    this.IsMidiContinuousController = false;
+    var raw = AlphaSynth.Util.IOHelper.ReadUInt16LE(input);
+    this.Polarity = (raw & 512) == 512 ? AlphaSynth.Sf2.PolarityEnum.Bipolar : AlphaSynth.Sf2.PolarityEnum.Unipolar;
+    this.Direction = (raw & 256) == 256 ? AlphaSynth.Sf2.DirectionEnum.MaxToMin : AlphaSynth.Sf2.DirectionEnum.MinToMax;
+    this.IsMidiContinuousController = ((raw & 128) == 128);
+    this.SourceType = ((raw & (64512)) >> 10);
+    this._controllerSource = ((raw & 127)&65535);
+};
+AlphaSynth.Sf2.Instrument = function (){
+    this.Name = null;
+    this.Zones = null;
+};
+AlphaSynth.Sf2.Generator = function (input){
+    this._rawAmount = 0;
+    this.GeneratorType = AlphaSynth.Sf2.GeneratorEnum.StartAddressOffset;
+    this.GeneratorType = AlphaSynth.Util.IOHelper.ReadUInt16LE(input);
+    this._rawAmount = AlphaSynth.Util.IOHelper.ReadUInt16LE(input);
+};
+AlphaSynth.Sf2.Generator.prototype = {
+    get_AmountInt16: function (){
+        return AlphaSynth.Platform.TypeUtils.ToInt16(this._rawAmount);
+    },
+    set_AmountInt16: function (value){
+        this._rawAmount = (value&65535);
+    },
+    get_LowByteAmount: function (){
+        return (this._rawAmount & 255&255);
+    },
+    set_LowByteAmount: function (value){
+        this._rawAmount = ((this._rawAmount & 65280) + (value&255)&65535);
+    },
+    get_HighByteAmount: function (){
+        return ((this._rawAmount & 65280) >> 8&255);
+    },
+    set_HighByteAmount: function (value){
+        this._rawAmount = ((this._rawAmount & 255) + ((value&255) << 8)&65535);
+    }
+};
+AlphaSynth.Sf2.SFSampleLink = {
+    MonoSample: 1,
+    RightSample: 2,
+    LeftSample: 4,
+    LinkedSample: 8,
+    RomMonoSample: 32769,
+    RomRightSample: 32770,
+    RomLeftSample: 32772,
+    RomLinkedSample: 32776
+};
+AlphaSynth.Sf2.GeneratorEnum = {
+    StartAddressOffset: 0,
+    EndAddressOffset: 1,
+    StartLoopAddressOffset: 2,
+    EndLoopAddressOffset: 3,
+    StartAddressCoarseOffset: 4,
+    ModulationLFOToPitch: 5,
+    VibratoLFOToPitch: 6,
+    ModulationEnvelopeToPitch: 7,
+    InitialFilterCutoffFrequency: 8,
+    InitialFilterQ: 9,
+    ModulationLFOToFilterCutoffFrequency: 10,
+    ModulationEnvelopeToFilterCutoffFrequency: 11,
+    EndAddressCoarseOffset: 12,
+    ModulationLFOToVolume: 13,
+    Unused1: 14,
+    ChorusEffectsSend: 15,
+    ReverbEffectsSend: 16,
+    Pan: 17,
+    Unused2: 18,
+    Unused3: 19,
+    Unused4: 20,
+    DelayModulationLFO: 21,
+    FrequencyModulationLFO: 22,
+    DelayVibratoLFO: 23,
+    FrequencyVibratoLFO: 24,
+    DelayModulationEnvelope: 25,
+    AttackModulationEnvelope: 26,
+    HoldModulationEnvelope: 27,
+    DecayModulationEnvelope: 28,
+    SustainModulationEnvelope: 29,
+    ReleaseModulationEnvelope: 30,
+    KeyNumberToModulationEnvelopeHold: 31,
+    KeyNumberToModulationEnvelopeDecay: 32,
+    DelayVolumeEnvelope: 33,
+    AttackVolumeEnvelope: 34,
+    HoldVolumeEnvelope: 35,
+    DecayVolumeEnvelope: 36,
+    SustainVolumeEnvelope: 37,
+    ReleaseVolumeEnvelope: 38,
+    KeyNumberToVolumeEnvelopeHold: 39,
+    KeyNumberToVolumeEnvelopeDecay: 40,
+    Instrument: 41,
+    Reserved1: 42,
+    KeyRange: 43,
+    VelocityRange: 44,
+    StartLoopAddressCoarseOffset: 45,
+    KeyNumber: 46,
+    Velocity: 47,
+    InitialAttenuation: 48,
+    Reserved2: 49,
+    EndLoopAddressCoarseOffset: 50,
+    CoarseTune: 51,
+    FineTune: 52,
+    SampleID: 53,
+    SampleModes: 54,
+    Reserved3: 55,
+    ScaleTuning: 56,
+    ExclusiveClass: 57,
+    OverridingRootKey: 58,
+    Unused5: 59,
+    UnusedEnd: 60
+};
+AlphaSynth.Sf2.TransformEnum = {
+    Linear: 0,
+    AbsoluteValue: 2
+};
+AlphaSynth.Sf2.ControllerSourceEnum = {
+    NoController: 0,
+    NoteOnVelocity: 2,
+    NoteOnKeyNumber: 3,
+    PolyPressure: 10,
+    ChannelPressure: 13,
+    PitchWheel: 14,
+    PitchWheelSensitivity: 16,
+    Link: 127
+};
+AlphaSynth.Sf2.DirectionEnum = {
+    MinToMax: 0,
+    MaxToMin: 1
+};
+AlphaSynth.Sf2.PolarityEnum = {
+    Unipolar: 0,
+    Bipolar: 1
+};
+AlphaSynth.Sf2.SourceTypeEnum = {
+    Linear: 0,
+    Concave: 1,
+    Convex: 2,
+    Switch: 3
+};
+AlphaSynth.Synthesis = AlphaSynth.Synthesis || {};
+AlphaSynth.Synthesis.CCValue = function (coarse, fine){
+    this._coarseValue = 0;
+    this._fineValue = 0;
+    this._combined = 0;
+    this._coarseValue = coarse;
+    this._fineValue = fine;
+    this._combined = 0;
+    this.UpdateCombined();
+};
+AlphaSynth.Synthesis.CCValue = function (combined){
+    this._coarseValue = 0;
+    this._fineValue = 0;
+    this._combined = 0;
+    this._coarseValue = 0;
+    this._fineValue = 0;
+    this._combined = combined;
+    this.UpdateCoarseFinePair();
+};
+AlphaSynth.Synthesis.CCValue.prototype = {
+    get_Coarse: function (){
+        return this._coarseValue;
+    },
+    set_Coarse: function (value){
+        this._coarseValue = value;
+        this.UpdateCombined();
+    },
+    get_Fine: function (){
+        return this._fineValue;
+    },
+    set_Fine: function (value){
+        this._fineValue = value;
+        this.UpdateCombined();
+    },
+    get_Combined: function (){
+        return this._combined;
+    },
+    set_Combined: function (value){
+        this._combined = value;
+        this.UpdateCoarseFinePair();
+    },
+    UpdateCombined: function (){
+        if (AlphaSynth.Platform.TypeUtils.IsLittleEndian)
+            this._combined = (((this._coarseValue << 7) | this._fineValue)) | 0;
+        else
+            this._combined = (((this._fineValue << 7) | this._coarseValue)) | 0;
+    },
+    UpdateCoarseFinePair: function (){
+        if (AlphaSynth.Platform.TypeUtils.IsLittleEndian){
+            this._coarseValue = (this._combined >> 7);
+            this._fineValue = (this._combined & 127);
+        }
+        else {
+            this._fineValue = (this._combined >> 7);
+            this._coarseValue = (this._combined & 127);
+        }
+    }
+};
+AlphaSynth.Synthesis.SynthParameters = function (synth){
+    this.Program = 0;
+    this.BankSelect = 0;
+    this.ChannelAfterTouch = 0;
+    this.Pan = null;
+    this.Volume = null;
+    this.Expression = null;
+    this.ModRange = null;
+    this.PitchBend = null;
+    this.PitchBendRangeCoarse = 0;
+    this.PitchBendRangeFine = 0;
+    this.MasterCoarseTune = 0;
+    this.MasterFineTune = null;
+    this.HoldPedal = false;
+    this.LegatoPedal = false;
+    this.Rpn = null;
+    this.Synth = null;
+    this.CurrentVolume = 0;
+    this.CurrentPitch = 0;
+    this.CurrentMod = 0;
+    this.CurrentPan = null;
+    this.Synth = synth;
+    this.Pan = new AlphaSynth.Synthesis.CCValue(0);
+    this.Volume = new AlphaSynth.Synthesis.CCValue(0);
+    this.Expression = new AlphaSynth.Synthesis.CCValue(0);
+    this.ModRange = new AlphaSynth.Synthesis.CCValue(0);
+    this.PitchBend = new AlphaSynth.Synthesis.CCValue(0);
+    this.MasterFineTune = new AlphaSynth.Synthesis.CCValue(0);
+    this.Rpn = new AlphaSynth.Synthesis.CCValue(0);
+    this.CurrentPan = new AlphaSynth.Bank.Components.PanComponent();
+    this.ResetControllers();
+};
+AlphaSynth.Synthesis.SynthParameters.prototype = {
+    ResetControllers: function (){
+        this.Program = 0;
+        this.BankSelect = 0;
+        this.ChannelAfterTouch = 0;
+        //Reset Channel Pressure to 0
+        this.Pan.set_Combined(8192);
+        this.Volume.set_Fine(0);
+        this.Volume.set_Coarse(100);
+        //Reset Vol Positions back to 90/127 (GM spec)
+        this.Expression.set_Combined(16383);
+        //Reset Expression positions back to 127/127
+        this.ModRange.set_Combined(0);
+        this.PitchBend.set_Combined(8192);
+        this.PitchBendRangeCoarse = 2;
+        //Reset pitch wheel to +-2 semitones (GM spec)
+        this.PitchBendRangeFine = 0;
+        this.MasterCoarseTune = 0;
+        this.MasterFineTune.set_Combined(8192);
+        //Reset fine tune
+        this.HoldPedal = false;
+        this.LegatoPedal = false;
+        this.Rpn.set_Combined(16383);
+        //Reset rpn
+        this.UpdateCurrentPan();
+        this.UpdateCurrentPitch();
+        this.UpdateCurrentVolume();
+    },
+    UpdateCurrentVolume: function (){
+        this.CurrentVolume = this.Expression.get_Combined() / 16383;
+        this.CurrentVolume *= this.CurrentVolume;
+    },
+    UpdateCurrentPitch: function (){
+        this.CurrentPitch = ((((this.PitchBend.get_Combined() - 8192) / 8192) * ((100 * this.PitchBendRangeCoarse) + this.PitchBendRangeFine))) | 0;
+    },
+    UpdateCurrentMod: function (){
+        this.CurrentMod = ((100 * (this.ModRange.get_Combined() / 16383))) | 0;
+    },
+    UpdateCurrentPan: function (){
+        var value = 1.5707963267949 * (this.Pan.get_Combined() / 16383);
+        this.CurrentPan.Left = Math.cos(value);
+        this.CurrentPan.Right = Math.sin(value);
+    }
+};
+AlphaSynth.Synthesis.VoiceParameters = function (){
+    this.mix1 = 0;
+    this.mix2 = 0;
+    this.Channel = 0;
+    this.Note = 0;
+    this.Velocity = 0;
+    this.NoteOffPending = false;
+    this.State = AlphaSynth.Synthesis.VoiceStateEnum.Stopped;
+    this.PitchOffset = 0;
+    this.VolOffset = 0;
+    this.BlockBuffer = null;
+    this.PData = null;
+    this.SynthParams = null;
+    this.GeneratorParams = null;
+    this.Envelopes = null;
+    this.Filters = null;
+    this.Lfos = null;
+    this.BlockBuffer = new Float32Array(64);
+    //create default number of each component
+    this.PData = new Array(4);
+    this.GeneratorParams = new Array(4);
+    this.Envelopes = new Array(4);
+    this.Filters = new Array(4);
+    this.Lfos = new Array(4);
+    //initialize each component
+    for (var x = 0; x < 4; x++){
+        this.GeneratorParams[x] = new AlphaSynth.Bank.Components.Generators.GeneratorParameters();
+        this.Envelopes[x] = new AlphaSynth.Bank.Components.Envelope();
+        this.Filters[x] = new AlphaSynth.Bank.Components.Filter();
+        this.Lfos[x] = new AlphaSynth.Bank.Components.Lfo();
+    }
+};
+AlphaSynth.Synthesis.VoiceParameters.prototype = {
+    get_CombinedVolume: function (){
+        return this.mix1 + this.mix2;
+    },
+    Reset: function (){
+        this.NoteOffPending = false;
+        this.PitchOffset = 0;
+        this.VolOffset = 0;
+        for (var i = 0; i < this.PData.length; i++){
+            this.PData[i] = new DataView(new ArrayBuffer(8));
+        }
+        this.mix1 = 0;
+        this.mix2 = 0;
+    },
+    MixMonoToMonoInterp: function (startIndex, volume){
+        var inc = (volume - this.mix1) / 64;
+        for (var i = 0; i < this.BlockBuffer.length; i++){
+            this.mix1 += inc;
+            this.SynthParams.Synth.SampleBuffer[startIndex + i] += this.BlockBuffer[i] * this.mix1;
+        }
+        this.mix1 = volume;
+    },
+    MixMonoToStereoInterp: function (startIndex, leftVol, rightVol){
+        var inc_l = (leftVol - this.mix1) / 64;
+        var inc_r = (rightVol - this.mix2) / 64;
+        for (var i = 0; i < this.BlockBuffer.length; i++){
+            this.mix1 += inc_l;
+            this.mix2 += inc_r;
+            this.SynthParams.Synth.SampleBuffer[startIndex] += this.BlockBuffer[i] * this.mix1;
+            this.SynthParams.Synth.SampleBuffer[startIndex + 1] += this.BlockBuffer[i] * this.mix2;
+            startIndex += 2;
+        }
+        this.mix1 = leftVol;
+        this.mix2 = rightVol;
+    },
+    MixStereoToStereoInterp: function (startIndex, leftVol, rightVol){
+        var inc_l = (leftVol - this.mix1) / 64;
+        var inc_r = (rightVol - this.mix2) / 64;
+        for (var i = 0; i < this.BlockBuffer.length; i++){
+            this.mix1 += inc_l;
+            this.mix2 += inc_r;
+            this.SynthParams.Synth.SampleBuffer[startIndex + i] += this.BlockBuffer[i] * this.mix1;
+            i++;
+            this.SynthParams.Synth.SampleBuffer[startIndex + i] += this.BlockBuffer[i] * this.mix2;
+        }
+        this.mix1 = leftVol;
+        this.mix2 = rightVol;
+    }
+};
+AlphaSynth.Synthesis.VoiceStealingMethod = {
+    Oldest: 0,
+    Quietest: 1
+};
+AlphaSynth.Synthesis.VoiceNode = function (){
+    this.Value = null;
+    this.Next = null;
+};
+AlphaSynth.Synthesis.VoiceManager = function (voiceCount){
+    this._voicePool = null;
+    this._vNodes = null;
+    this.StealingMethod = AlphaSynth.Synthesis.VoiceStealingMethod.Oldest;
+    this.Polyphony = 0;
+    this.FreeVoices = null;
+    this.ActiveVoices = null;
+    this.Registry = null;
+    this.StealingMethod = AlphaSynth.Synthesis.VoiceStealingMethod.Quietest;
+    this.Polyphony = voiceCount;
+    this._voicePool = new Array(voiceCount);
+    this._vNodes = new AlphaSynth.Ds.LinkedList();
+    this.FreeVoices = new AlphaSynth.Ds.LinkedList();
+    this.ActiveVoices = new AlphaSynth.Ds.LinkedList();
+    for (var i = 0; i < voiceCount; i++){
+        var v = new AlphaSynth.Synthesis.Voice();
+        this._voicePool[i] = v;
+        this._vNodes.AddLast(new AlphaSynth.Synthesis.VoiceNode());
+        this.FreeVoices.AddLast(v);
+    }
+    this.Registry = new Array(16);
+    for (var i = 0; i < this.Registry.length; i++){
+        this.Registry[i] = new Array(128);
+    }
+};
+AlphaSynth.Synthesis.VoiceManager.prototype = {
+    GetFreeVoice: function (){
+        if (this.FreeVoices.Length > 0){
+            var voice = this.FreeVoices.First.Value;
+            this.FreeVoices.RemoveFirst();
+            return voice;
+        }
+        switch (this.StealingMethod){
+            case AlphaSynth.Synthesis.VoiceStealingMethod.Oldest:
+                return this.StealOldest();
+            case AlphaSynth.Synthesis.VoiceStealingMethod.Quietest:
+                return this.StealQuietestVoice();
+            default:
+                return null;
+        }
+    },
+    AddToRegistry: function (voice){
+        var node = this._vNodes.RemoveLast();
+        node.Value = voice;
+        node.Next = this.Registry[voice.VoiceParams.Channel][voice.VoiceParams.Note];
+        this.Registry[voice.VoiceParams.Channel][voice.VoiceParams.Note] = node;
+    },
+    RemoveFromRegistry: function (channel, note){
+        var node = this.Registry[channel][note];
+        while (node != null){
+            this._vNodes.AddLast(node);
+            node = node.Next;
+        }
+        this.Registry[channel][note] = null;
+    },
+    RemoveVoiceFromRegistry: function (voice){
+        var node = this.Registry[voice.VoiceParams.Channel][voice.VoiceParams.Note];
+        if (node == null)
+            return;
+        if (node.Value == voice){
+            this.Registry[voice.VoiceParams.Channel][voice.VoiceParams.Note] = node.Next;
+            this._vNodes.AddLast(node);
+        }
+        else {
+            var node2 = node;
+            node = node.Next;
+            while (node != null){
+                if (node.Value == voice){
+                    node2.Next = node.Next;
+                    this._vNodes.AddLast(node);
+                    return;
+                }
+                node2 = node;
+                node = node.Next;
+            }
+        }
+    },
+    ClearRegistry: function (){
+        var node = this.ActiveVoices.First;
+        while (node != null){
+            var vnode = this.Registry[node.Value.VoiceParams.Channel][node.Value.VoiceParams.Note];
+            while (vnode != null){
+                this._vNodes.AddLast(vnode);
+                vnode = vnode.Next;
+            }
+            this.Registry[node.Value.VoiceParams.Channel][node.Value.VoiceParams.Note] = null;
+            node = node.get_Next();
+        }
+    },
+    UnloadPatches: function (){
+        for (var $i8 = 0,$t8 = this._voicePool,$l8 = $t8.length,v = $t8[$i8]; $i8 < $l8; $i8++, v = $t8[$i8]){
+            v.Configure(0, 0, 0, null, null);
+            var current = this._vNodes.First;
+            while (current != null){
+                current.Value.Value = null;
+                current = current.get_Next();
+            }
+        }
+    },
+    StealOldest: function (){
+        var node = this.ActiveVoices.First;
+        //first look for a voice that is not playing
+        while (node != null && node.Value.VoiceParams.State == AlphaSynth.Synthesis.VoiceStateEnum.Playing)
+            node = node.get_Next();
+        //if no stopping voice is found use the oldest
+        if (node == null)
+            node = this.ActiveVoices.First;
+        //check and remove from registry
+        this.RemoveVoiceFromRegistry(node.Value);
+        this.ActiveVoices.Remove(node);
+        //stop voice if it is not already
+        node.Value.VoiceParams.State = AlphaSynth.Synthesis.VoiceStateEnum.Stopped;
+        return node.Value;
+    },
+    StealQuietestVoice: function (){
+        var voiceVolume = 1000;
+        var quietest = null;
+        var node = this.ActiveVoices.First;
+        while (node != null){
+            if (node.Value.VoiceParams.State != AlphaSynth.Synthesis.VoiceStateEnum.Playing){
+                var volume = node.Value.VoiceParams.get_CombinedVolume();
+                if (volume < voiceVolume){
+                    quietest = node;
+                    voiceVolume = volume;
+                }
+            }
+            node = node.get_Next();
+        }
+        if (quietest == null)
+            quietest = this.ActiveVoices.First;
+        //check and remove from registry
+        this.RemoveVoiceFromRegistry(quietest.Value);
+        this.ActiveVoices.Remove(quietest);
+        //stop voice if it is not already
+        quietest.Value.VoiceParams.State = AlphaSynth.Synthesis.VoiceStateEnum.Stopped;
+        return quietest.Value;
+    }
+};
+AlphaSynth.Synthesis.VoiceStateEnum = {
+    Stopped: 0,
+    Stopping: 1,
+    Playing: 2
+};
+AlphaSynth.Synthesis.Voice = function (){
+    this.Patch = null;
+    this.VoiceParams = null;
+    this.VoiceParams = new AlphaSynth.Synthesis.VoiceParameters();
+};
+AlphaSynth.Synthesis.Voice.prototype = {
+    Start: function (){
+        if (this.VoiceParams.State != AlphaSynth.Synthesis.VoiceStateEnum.Stopped)
+            return;
+        if (this.Patch.Start(this.VoiceParams))
+            this.VoiceParams.State = AlphaSynth.Synthesis.VoiceStateEnum.Playing;
+    },
+    Stop: function (){
+        if (this.VoiceParams.State != AlphaSynth.Synthesis.VoiceStateEnum.Playing)
+            return;
+        this.VoiceParams.State = AlphaSynth.Synthesis.VoiceStateEnum.Stopping;
+        this.Patch.Stop(this.VoiceParams);
+    },
+    StopImmediately: function (){
+        this.VoiceParams.State = AlphaSynth.Synthesis.VoiceStateEnum.Stopped;
+    },
+    Process: function (startIndex, endIndex){
+        //do not process if the voice is stopped
+        if (this.VoiceParams.State == AlphaSynth.Synthesis.VoiceStateEnum.Stopped)
+            return;
+        //process using the patch's algorithm
+        this.Patch.Process(this.VoiceParams, startIndex, endIndex);
+    },
+    Configure: function (channel, note, velocity, patch, synthParams){
+        this.VoiceParams.Reset();
+        this.VoiceParams.Channel = channel;
+        this.VoiceParams.Note = note;
+        this.VoiceParams.Velocity = velocity;
+        this.VoiceParams.SynthParams = synthParams;
+        this.Patch = patch;
+    }
+};
+AlphaSynth.Synthesis.SynthHelper = function (){
+};
+AlphaSynth.Synthesis.SynthHelper.ClampD = function (value, min, max){
+    if (value <= min)
+        return min;
+    else if (value >= max)
+        return max;
+    else
+        return value;
+};
+AlphaSynth.Synthesis.SynthHelper.ClampF = function (value, min, max){
+    if (value <= min)
+        return min;
+    else if (value >= max)
+        return max;
+    else
+        return value;
+};
+AlphaSynth.Synthesis.SynthHelper.ClampI = function (value, min, max){
+    if (value <= min)
+        return min;
+    else if (value >= max)
+        return max;
+    else
+        return value;
+};
+AlphaSynth.Synthesis.SynthHelper.ClampS = function (value, min, max){
+    if (value <= min)
+        return min;
+    else if (value >= max)
+        return max;
+    else
+        return value;
+};
+AlphaSynth.Synthesis.SynthHelper.NearestPowerOfTwo = function (value){
+    return Math.pow(2, Math.Round(Math.Log(value, 2)));
+};
+AlphaSynth.Synthesis.SynthHelper.SamplesFromTime = function (sampleRate, seconds){
+    return sampleRate * seconds;
+};
+AlphaSynth.Synthesis.SynthHelper.TimeFromSamples = function (sampleRate, samples){
+    return samples / sampleRate;
+};
+AlphaSynth.Synthesis.SynthHelper.DBtoLinear = function (dBvalue){
+    return Math.pow(10, (dBvalue / 20));
+};
+AlphaSynth.Synthesis.SynthHelper.LineartoDB = function (linearvalue){
+    return 20 * (Math.log(linearvalue)/Math.LN10);
+};
+AlphaSynth.Synthesis.SynthHelper.FrequencyToKey = function (frequency, rootkey){
+    return 12 * Math.Log(frequency / 440, 2) + rootkey;
+};
+AlphaSynth.Synthesis.SynthHelper.KeyToFrequency = function (key, rootkey){
+    return Math.pow(2, (key - rootkey) / 12) * 440;
+};
+AlphaSynth.Synthesis.SynthHelper.SemitoneToPitch = function (key){
+    //does not return a frequency, only the 2^(1/12) value.
+    if (key < -127)
+        key = -127;
+    else if (key > 127)
+        key = 127;
+    return AlphaSynth.Util.Tables.SemitoneTable(127 + key);
+};
+AlphaSynth.Synthesis.SynthHelper.CentsToPitch = function (cents){
+    //does not return a frequency, only the 2^(1/12) value.
+    var key = (cents / 100) | 0;
+    cents -= key * 100;
+    if (key < -127)
+        key = -127;
+    else if (key > 127)
+        key = 127;
+    return AlphaSynth.Util.Tables.SemitoneTable(127 + key) * AlphaSynth.Util.Tables.CentTable(100 + cents);
+};
+AlphaSynth.Synthesis.SynthEvent = function (e){
+    this.Event = null;
+    this.Delta = 0;
+    this.Event = e;
+};
+AlphaSynth.Synthesis.Synthesizer = function (sampleRate, audioChannels, bufferSize, bufferCount, polyphony){
+    this._voiceManager = null;
+    this._synthChannels = null;
+    this._masterVolume = 0;
+    this._synthGain = 0;
+    this._midiMessageProcessed = null;
+    this._layerList = null;
+    this.MidiEventQueue = null;
+    this.MidiEventCounts = null;
+    this.SampleBuffer = null;
+    this.AudioChannels = 0;
+    this.LittleEndian = false;
+    this.SoundBank = null;
+    this.SampleRate = 0;
+    this.MicroBufferSize = 0;
+    this.MicroBufferCount = 0;
+    var MinSampleRate = 8000;
+    var MaxSampleRate = 96000;
+    if (sampleRate < MinSampleRate || sampleRate > MaxSampleRate)
+        throw $CreateException(new System.Exception.ctor$$String("Invalid paramater: (sampleRate) Valid ranges are " + MinSampleRate + " to " + MaxSampleRate), new Error());
+    if (audioChannels < 1 || audioChannels > 2)
+        throw $CreateException(new System.Exception.ctor$$String("Invalid paramater: (audioChannels) Valid ranges are " + 1 + " to " + 2), new Error());
+    this._midiMessageProcessed = [];
+    //
+    // Setup synth parameters
+    this._synthGain = 0.35;
+    this._masterVolume = 1;
+    this.SampleRate = sampleRate;
+    this.AudioChannels = audioChannels;
+    this.MicroBufferSize = AlphaSynth.Synthesis.SynthHelper.ClampI(bufferSize, ((0.001 * sampleRate)) | 0, ((0.05 * sampleRate)) | 0);
+    this.MicroBufferSize = ((Math.ceil(this.MicroBufferSize / 64) * 64)) | 0;
+    //ensure multiple of block size
+    this.MicroBufferCount = (Math.max(1, bufferCount));
+    this.SampleBuffer = new Float32Array((this.MicroBufferSize * this.MicroBufferCount * audioChannels));
+    this.LittleEndian = true;
+    //Setup Controllers
+    this._synthChannels = new Array(16);
+    for (var x = 0; x < this._synthChannels.length; x++)
+        this._synthChannels[x] = new AlphaSynth.Synthesis.SynthParameters(this);
+    //Create synth voices
+    this._voiceManager = new AlphaSynth.Synthesis.VoiceManager(AlphaSynth.Synthesis.SynthHelper.ClampI(polyphony, 5, 250));
+    //Create midi containers
+    this.MidiEventQueue = new AlphaSynth.Ds.LinkedList();
+    this.MidiEventCounts = new Int32Array(this.MicroBufferCount);
+    this._layerList = new Array(15);
+    this._midiMessageProcessed = [];
+    this.ResetSynthControls();
+};
+AlphaSynth.Synthesis.Synthesizer.prototype = {
+    get_MasterVolume: function (){
+        return this._masterVolume;
+    },
+    set_MasterVolume: function (value){
+        this._masterVolume = AlphaSynth.Synthesis.SynthHelper.ClampF(value, 0, 10);
+    },
+    get_MixGain: function (){
+        return this._synthGain;
+    },
+    set_MixGain: function (value){
+        this._synthGain = AlphaSynth.Synthesis.SynthHelper.ClampF(value, 0.5, 1);
+    },
+    get_VoiceStealMethod: function (){
+        return this._voiceManager.StealingMethod;
+    },
+    set_VoiceStealMethod: function (value){
+        this._voiceManager.StealingMethod = value;
+    },
+    get_ActiveVoices: function (){
+        return this._voiceManager.ActiveVoices.Length;
+    },
+    get_FreeVoices: function (){
+        return this._voiceManager.FreeVoices.Length;
+    },
+    get_RawBufferSize: function (){
+        return this.SampleBuffer.length * 2;
+    },
+    get_WorkingBufferSize: function (){
+        return this.SampleBuffer.length;
+    },
+    get_Polyphony: function (){
+        return this._voiceManager.Polyphony;
+    },
+    LoadBank: function (bank){
+        this.UnloadBank();
+        this.SoundBank = bank;
+    },
+    UnloadBank: function (){
+        if (this.SoundBank != null){
+            this.NoteOffAll(true);
+            this._voiceManager.UnloadPatches();
+            this.SoundBank = null;
+        }
+    },
+    Stop: function (){
+        this.ResetSynthControls();
+        this.ResetPrograms();
+        this.NoteOffAll(true);
+    },
+    ResetSynthControls: function (){
+        for (var x = 0; x < this._synthChannels.length; x++){
+            this._synthChannels[x].ResetControllers();
+        }
+        this._synthChannels[9].BankSelect = 128;
+        this.ReleaseAllHoldPedals();
+    },
+    ResetPrograms: function (){
+        for (var x = 0; x < this._synthChannels.length; x++){
+            this._synthChannels[x].Program = 0;
+        }
+    },
+    GetProgramName: function (channel){
+        var p = this.GetProgram(channel);
+        if (p == null)
+            return "null";
+        return p.Name;
+    },
+    GetProgram: function (channel){
+        if (this.SoundBank != null){
+            var sChannel = this._synthChannels[channel];
+            var inst = this.SoundBank.GetPatchByNumber(sChannel.BankSelect, sChannel.Program);
+            if (inst != null)
+                return inst;
+        }
+        return null;
+    },
+    SetAudioChannelCount: function (channels){
+        channels = AlphaSynth.Synthesis.SynthHelper.ClampI(channels, 1, 2);
+        if (this.AudioChannels != channels){
+            this.AudioChannels = channels;
+            this.SampleBuffer = new Float32Array((this.MicroBufferSize * this.MicroBufferCount * this.AudioChannels));
+        }
+    },
+    Synthesize: function (){
+        this.SampleBuffer=new Float32Array(this.SampleBuffer.length);
+        this.FillWorkingBuffer();
+    },
+    GetChannelVolume: function (channel){
+        return this._synthChannels[channel].Volume.get_Combined() / 16383;
+    },
+    GetChannelExpression: function (channel){
+        return this._synthChannels[channel].Expression.get_Combined() / 16383;
+    },
+    GetChannelPan: function (channel){
+        return (this._synthChannels[channel].Pan.get_Combined() - 8192) / 8192;
+    },
+    GetChannelPitchBend: function (channel){
+        return (this._synthChannels[channel].PitchBend.get_Combined() - 8192) / 8192;
+    },
+    GetChannelHoldPedalStatus: function (channel){
+        return this._synthChannels[channel].HoldPedal;
+    },
+    FillWorkingBuffer: function (){
+        /*Break the process loop into sections representing the smallest timeframe before the midi controls need to be updated
+        the bigger the timeframe the more efficent the process is, but playback quality will be reduced.*/
+        var sampleIndex = 0;
+        for (var x = 0; x < this.MicroBufferCount; x++){
+            if (this.MidiEventQueue.Length > 0){
+                for (var i = 0; i < this.MidiEventCounts[x]; i++){
+                    var m = this.MidiEventQueue.RemoveLast();
+                    this.ProcessMidiMessage(m.Event);
+                }
+            }
+            //voice processing loop
+            var node = this._voiceManager.ActiveVoices.First;
+            //node used to traverse the active voices
+            while (node != null){
+                node.Value.Process(sampleIndex, sampleIndex + this.MicroBufferSize * this.AudioChannels);
+                //if an active voice has stopped remove it from the list
+                if (node.Value.VoiceParams.State == AlphaSynth.Synthesis.VoiceStateEnum.Stopped){
+                    var delnode = node;
+                    //node used to remove inactive voices
+                    node = node.get_Next();
+                    this._voiceManager.RemoveVoiceFromRegistry(delnode.Value);
+                    this._voiceManager.ActiveVoices.Remove(delnode);
+                    this._voiceManager.FreeVoices.AddFirst(delnode.Value);
+                }
+                else {
+                    node = node.get_Next();
+                }
+            }
+            sampleIndex += this.MicroBufferSize * this.AudioChannels;
+        }
+        AlphaSynth.Platform.TypeUtils.ClearIntArray(this.MidiEventCounts);
+    },
+    NoteOn: function (channel, note, velocity){
+        // Get the correct instrument depending if it is a drum or not
+        var sChan = this._synthChannels[channel];
+        var inst = this.SoundBank.GetPatchByNumber(sChan.BankSelect, sChan.Program);
+        if (inst == null)
+            return;
+        // A NoteOn can trigger multiple voices via layers
+        var layerCount;
+        if (true){
+            layerCount = (inst).FindPatches(channel, note, velocity, this._layerList);
+        }
+        else {
+            layerCount = 1;
+            this._layerList[0] = inst;
+        }
+        // If a key with the same note value exists, stop it
+        if (this._voiceManager.Registry[channel][note] != null){
+            var node = this._voiceManager.Registry[channel][note];
+            while (node != null){
+                node.Value.Stop();
+                node = node.Next;
+            }
+            this._voiceManager.RemoveFromRegistry(channel, note);
+        }
+        // Check exclusive groups
+        for (var x = 0; x < layerCount; x++){
+            var notseen = true;
+            for (var i = x - 1; i >= 0; i--){
+                if (this._layerList[x].ExclusiveGroupTarget == this._layerList[i].ExclusiveGroupTarget){
+                    notseen = false;
+                    break;
+                }
+            }
+            if (this._layerList[x].ExclusiveGroupTarget != 0 && notseen){
+                var node = this._voiceManager.ActiveVoices.First;
+                while (node != null){
+                    if (this._layerList[x].ExclusiveGroupTarget == node.Value.Patch.ExclusiveGroup){
+                        node.Value.Stop();
+                        this._voiceManager.RemoveVoiceFromRegistry(node.Value);
+                    }
+                    node = node.get_Next();
+                }
+            }
+        }
+        // Assign a voice to each layer
+        for (var x = 0; x < layerCount; x++){
+            var voice = this._voiceManager.GetFreeVoice();
+            if (voice == null)
+                break;
+            voice.Configure(channel, note, velocity, this._layerList[x], this._synthChannels[channel]);
+            this._voiceManager.AddToRegistry(voice);
+            this._voiceManager.ActiveVoices.AddLast(voice);
+            voice.Start();
+        }
+        // Clear layer list
+        for (var x = 0; x < layerCount; x++)
+            this._layerList[x] = null;
+    },
+    NoteOff: function (channel, note){
+        if (this._synthChannels[channel].HoldPedal){
+            var node = this._voiceManager.Registry[channel][note];
+            while (node != null){
+                node.Value.VoiceParams.NoteOffPending = true;
+                node = node.Next;
+            }
+        }
+        else {
+            var node = this._voiceManager.Registry[channel][note];
+            while (node != null){
+                node.Value.Stop();
+                node = node.Next;
+            }
+            this._voiceManager.RemoveFromRegistry(channel, note);
+        }
+    },
+    NoteOffAll: function (immediate){
+        var node = this._voiceManager.ActiveVoices.First;
+        if (immediate){
+            //if immediate ignore hold pedals and clear the entire registry
+            this._voiceManager.ClearRegistry();
+            while (node != null){
+                node.Value.StopImmediately();
+                var delnode = node;
+                node = node.get_Next();
+                this._voiceManager.ActiveVoices.Remove(delnode);
+                this._voiceManager.FreeVoices.AddFirst(delnode.Value);
+            }
+        }
+        else {
+            //otherwise we have to check for hold pedals and double check the registry before removing the voice
+            while (node != null){
+                var voiceParams = node.Value.VoiceParams;
+                if (voiceParams.State == AlphaSynth.Synthesis.VoiceStateEnum.Playing){
+                    //if hold pedal is enabled do not stop the voice
+                    if (this._synthChannels[voiceParams.Channel].HoldPedal){
+                        voiceParams.NoteOffPending = true;
+                    }
+                    else {
+                        node.Value.Stop();
+                        this._voiceManager.RemoveVoiceFromRegistry(node.Value);
+                    }
+                }
+                node = node.get_Next();
+            }
+        }
+    },
+    NoteOffAllChannel: function (channel, immediate){
+        var node = this._voiceManager.ActiveVoices.First;
+        while (node != null){
+            if (channel == node.Value.VoiceParams.Channel){
+                if (immediate){
+                    node.Value.StopImmediately();
+                    var delnode = node;
+                    node = node.get_Next();
+                    this._voiceManager.ActiveVoices.Remove(delnode);
+                    this._voiceManager.FreeVoices.AddFirst(delnode.Value);
+                }
+                else {
+                    //if hold pedal is enabled do not stop the voice
+                    if (this._synthChannels[channel].HoldPedal)
+                        node.Value.VoiceParams.NoteOffPending = true;
+                    else
+                        node.Value.Stop();
+                    node = node.get_Next();
+                }
+            }
+        }
+    },
+    ProcessMidiMessage: function (e){
+        var command = e.get_Command();
+        var channel = e.get_Channel();
+        var data1 = e.get_Data1();
+        var data2 = e.get_Data2();
+        switch (command){
+            case AlphaSynth.Midi.Event.MidiEventTypeEnum.NoteOff:
+                this.NoteOff(channel, data1);
+                break;
+            case AlphaSynth.Midi.Event.MidiEventTypeEnum.NoteOn:
+                if (data2 == 0)
+                this.NoteOff(channel, data1);
+                else
+                this.NoteOn(channel, data1, data2);
+                break;
+            case AlphaSynth.Midi.Event.MidiEventTypeEnum.NoteAftertouch:
+                break;
+            case AlphaSynth.Midi.Event.MidiEventTypeEnum.Controller:
+                switch (data1){
+                    case AlphaSynth.Midi.Event.ControllerTypeEnum.BankSelectCoarse:
+                    if (channel == 9)
+                    data2 += 128;
+                    if (this.SoundBank.IsBankLoaded(data2))
+                    this._synthChannels[channel].BankSelect = data2;
+                    else
+                    this._synthChannels[channel].BankSelect = ((channel == 9) ? 128 : 0);
+                    break;
+                    case AlphaSynth.Midi.Event.ControllerTypeEnum.ModulationCoarse:
+                    this._synthChannels[channel].ModRange.set_Coarse(data2);
+                    this._synthChannels[channel].UpdateCurrentMod();
+                    break;
+                    case AlphaSynth.Midi.Event.ControllerTypeEnum.ModulationFine:
+                    this._synthChannels[channel].ModRange.set_Fine(data2);
+                    this._synthChannels[channel].UpdateCurrentMod();
+                    break;
+                    case AlphaSynth.Midi.Event.ControllerTypeEnum.VolumeCoarse:
+                    this._synthChannels[channel].Volume.set_Coarse(data2);
+                    break;
+                    case AlphaSynth.Midi.Event.ControllerTypeEnum.VolumeFine:
+                    this._synthChannels[channel].Volume.set_Fine(data2);
+                    break;
+                    case AlphaSynth.Midi.Event.ControllerTypeEnum.PanCoarse:
+                    this._synthChannels[channel].Pan.set_Coarse(data2);
+                    this._synthChannels[channel].UpdateCurrentPan();
+                    break;
+                    case AlphaSynth.Midi.Event.ControllerTypeEnum.PanFine:
+                    this._synthChannels[channel].Pan.set_Fine(data2);
+                    this._synthChannels[channel].UpdateCurrentPan();
+                    break;
+                    case AlphaSynth.Midi.Event.ControllerTypeEnum.ExpressionControllerCoarse:
+                    this._synthChannels[channel].Expression.set_Coarse(data2);
+                    this._synthChannels[channel].UpdateCurrentVolume();
+                    break;
+                    case AlphaSynth.Midi.Event.ControllerTypeEnum.ExpressionControllerFine:
+                    this._synthChannels[channel].Expression.set_Fine(data2);
+                    this._synthChannels[channel].UpdateCurrentVolume();
+                    break;
+                    case AlphaSynth.Midi.Event.ControllerTypeEnum.HoldPedal:
+                    if (this._synthChannels[channel].HoldPedal && !(data2 > 63))
+                    this.ReleaseHoldPedal(channel);
+                    this._synthChannels[channel].HoldPedal = data2 > 63;
+                    break;
+                    case AlphaSynth.Midi.Event.ControllerTypeEnum.LegatoPedal:
+                    this._synthChannels[channel].LegatoPedal = data2 > 63;
+                    break;
+                    case AlphaSynth.Midi.Event.ControllerTypeEnum.NonRegisteredParameterCourse:
+                    this._synthChannels[channel].Rpn.set_Combined(16383);
+                    break;
+                    case AlphaSynth.Midi.Event.ControllerTypeEnum.NonRegisteredParameterFine:
+                    this._synthChannels[channel].Rpn.set_Combined(16383);
+                    break;
+                    case AlphaSynth.Midi.Event.ControllerTypeEnum.RegisteredParameterCourse:
+                    this._synthChannels[channel].Rpn.set_Coarse(data2);
+                    break;
+                    case AlphaSynth.Midi.Event.ControllerTypeEnum.RegisteredParameterFine:
+                    this._synthChannels[channel].Rpn.set_Fine(data2);
+                    break;
+                    case AlphaSynth.Midi.Event.ControllerTypeEnum.AllNotesOff:
+                    this.NoteOffAll(false);
+                    break;
+                    case AlphaSynth.Midi.Event.ControllerTypeEnum.DataEntryCoarse:
+                    switch (this._synthChannels[channel].Rpn.get_Combined()){
+                        case 0:
+                        this._synthChannels[channel].PitchBendRangeCoarse = data2;
+                        this._synthChannels[channel].UpdateCurrentPitch();
+                        break;
+                        case 1:
+                        this._synthChannels[channel].MasterFineTune.set_Coarse(data2);
+                        break;
+                        case 2:
+                        this._synthChannels[channel].MasterCoarseTune = ((data2 - 64)) | 0;
+                        break;
+                    }
+                    break;
+                    case AlphaSynth.Midi.Event.ControllerTypeEnum.DataEntryFine:
+                    switch (this._synthChannels[channel].Rpn.get_Combined()){
+                        case 0:
+                        this._synthChannels[channel].PitchBendRangeFine = data2;
+                        this._synthChannels[channel].UpdateCurrentPitch();
+                        break;
+                        case 1:
+                        this._synthChannels[channel].MasterFineTune.set_Fine(data2);
+                        break;
+                    }
+                    break;
+                    case AlphaSynth.Midi.Event.ControllerTypeEnum.ResetControllers:
+                    this._synthChannels[channel].Expression.set_Combined(16383);
+                    this._synthChannels[channel].ModRange.set_Combined(0);
+                    if (this._synthChannels[channel].HoldPedal)
+                    this.ReleaseHoldPedal(channel);
+                    this._synthChannels[channel].HoldPedal = false;
+                    this._synthChannels[channel].LegatoPedal = false;
+                    this._synthChannels[channel].Rpn.set_Combined(16383);
+                    this._synthChannels[channel].PitchBend.set_Combined(8192);
+                    this._synthChannels[channel].ChannelAfterTouch = 0;
+                    this._synthChannels[channel].UpdateCurrentPitch();
+                    this._synthChannels[channel].UpdateCurrentVolume();
+                    break;
+                    default:
+                    return;
+                }
+                break;
+            case AlphaSynth.Midi.Event.MidiEventTypeEnum.ProgramChange:
+                this._synthChannels[channel].Program = data1;
+                break;
+            case AlphaSynth.Midi.Event.MidiEventTypeEnum.ChannelAftertouch:
+                this._synthChannels[channel].ChannelAfterTouch = data2;
+                break;
+            case AlphaSynth.Midi.Event.MidiEventTypeEnum.PitchBend:
+                this._synthChannels[channel].PitchBend.set_Coarse(data2);
+                this._synthChannels[channel].PitchBend.set_Fine(data1);
+                this._synthChannels[channel].UpdateCurrentPitch();
+                break;
+        }
+        this.FireMidiMessageProcessed(e);
+    },
+    AddMidiMessageProcessed: function (listener){
+        this._midiMessageProcessed.push(listener);
+    },
+    FireMidiMessageProcessed: function (e){
+        for (var i = 0; i < this._midiMessageProcessed.length; i++){
+            var l = this._midiMessageProcessed[i];
+            if (l != null){
+                l(e);
+            }
+        }
+    },
+    ReleaseAllHoldPedals: function (){
+        var node = this._voiceManager.ActiveVoices.First;
+        while (node != null){
+            if (node.Value.VoiceParams.NoteOffPending){
+                node.Value.Stop();
+                this._voiceManager.RemoveVoiceFromRegistry(node.Value);
+            }
+            node = node.get_Next();
+        }
+    },
+    ReleaseHoldPedal: function (channel){
+        var node = this._voiceManager.ActiveVoices.First;
+        while (node != null){
+            if (node.Value.VoiceParams.Channel == channel && node.Value.VoiceParams.NoteOffPending){
+                node.Value.Stop();
+                this._voiceManager.RemoveVoiceFromRegistry(node.Value);
+            }
+            node = node.get_Next();
+        }
+    }
+};
+AlphaSynth.Util.PcmData = function (bits, pcmData, isDataInLittleEndianFormat){
+    this.Data = null;
+    this.Length = 0;
+    this.BytesPerSample = 0;
+    this.BytesPerSample = ((bits / 8) | 0);
+    if (pcmData.length % this.BytesPerSample != 0)
+        throw $CreateException(new System.Exception.ctor$$String("Invalid PCM format. The PCM data was an invalid size."), new Error());
+    this.Data = pcmData;
+    this.Length = (this.Data.length / this.BytesPerSample) | 0;
+    if (AlphaSynth.Platform.TypeUtils.IsLittleEndian != isDataInLittleEndianFormat){
+        AlphaSynth.Util.WaveHelper.SwapEndianess(this.Data, bits);
+    }
+};
+AlphaSynth.Util.PcmData.prototype = {
+    get_BitsPerSample: function (){
+        return this.BytesPerSample * 8;
+    }
+};
+AlphaSynth.Util.PcmData.Create = function (bits, pcmData, isDataInLittleEndianFormat){
+    switch (bits){
+        case 8:
+            return new AlphaSynth.Util.PcmData8Bit(bits, pcmData, isDataInLittleEndianFormat);
+        case 16:
+            return new AlphaSynth.Util.PcmData16Bit(bits, pcmData, isDataInLittleEndianFormat);
+        case 24:
+            return new AlphaSynth.Util.PcmData24Bit(bits, pcmData, isDataInLittleEndianFormat);
+        case 32:
+            return new AlphaSynth.Util.PcmData32Bit(bits, pcmData, isDataInLittleEndianFormat);
+        default:
+            throw $CreateException(new System.Exception.ctor$$String("Invalid PCM format. " + bits + "bit pcm data is not supported."), new Error());
+    }
+};
+AlphaSynth.Util.PcmData8Bit = function (bits, pcmData, isDataInLittleEndianFormat){
+    AlphaSynth.Util.PcmData.call(this, bits, pcmData, isDataInLittleEndianFormat);
+};
+AlphaSynth.Util.PcmData8Bit.prototype = {
+    get_Item: function (index){
+        return ((this.Data[index] / 255) * 2) - 1;
+    }
+};
+$Inherit(AlphaSynth.Util.PcmData8Bit, AlphaSynth.Util.PcmData);
+AlphaSynth.Util.PcmData16Bit = function (bits, pcmData, isDataInLittleEndianFormat){
+    AlphaSynth.Util.PcmData.call(this, bits, pcmData, isDataInLittleEndianFormat);
+};
+AlphaSynth.Util.PcmData16Bit.prototype = {
+    get_Item: function (index){
+        index *= 2;
+        return (((this.Data[index] | (this.Data[index + 1] << 8)) << 16) >> 16) / 32768;
+    }
+};
+$Inherit(AlphaSynth.Util.PcmData16Bit, AlphaSynth.Util.PcmData);
+AlphaSynth.Util.PcmData24Bit = function (bits, pcmData, isDataInLittleEndianFormat){
+    AlphaSynth.Util.PcmData.call(this, bits, pcmData, isDataInLittleEndianFormat);
+};
+AlphaSynth.Util.PcmData24Bit.prototype = {
+    get_Item: function (index){
+        index *= 3;
+        return (((this.Data[index] | (this.Data[index + 1] << 8) | (this.Data[index + 2] << 16)) << 12) >> 12) / 8388608;
+    }
+};
+$Inherit(AlphaSynth.Util.PcmData24Bit, AlphaSynth.Util.PcmData);
+AlphaSynth.Util.PcmData32Bit = function (bits, pcmData, isDataInLittleEndianFormat){
+    AlphaSynth.Util.PcmData.call(this, bits, pcmData, isDataInLittleEndianFormat);
+};
+AlphaSynth.Util.PcmData32Bit.prototype = {
+    get_Item: function (index){
+        index *= 4;
+        return (this.Data[index] | (this.Data[index + 1] << 8) | (this.Data[index + 2] << 16) | (this.Data[index + 3] << 24)) / 2.147484E+09;
+    }
+};
+$Inherit(AlphaSynth.Util.PcmData32Bit, AlphaSynth.Util.PcmData);
+AlphaSynth.Util.Tables = function (){
+};
+$StaticConstructor(function (){
+    AlphaSynth.Util.Tables._isInitialized = false;
+    AlphaSynth.Util.Tables._envelopeTables = null;
+    AlphaSynth.Util.Tables._semitoneTable = null;
+    AlphaSynth.Util.Tables._centTable = null;
+    AlphaSynth.Util.Tables._sincTable = null;
+});
+AlphaSynth.Util.Tables.EnvelopeTables = function (index){
+    if (!AlphaSynth.Util.Tables._isInitialized)
+        AlphaSynth.Util.Tables.Init();
+    return AlphaSynth.Util.Tables._envelopeTables[index];
+};
+AlphaSynth.Util.Tables.SemitoneTable = function (index){
+    if (!AlphaSynth.Util.Tables._isInitialized)
+        AlphaSynth.Util.Tables.Init();
+    return AlphaSynth.Util.Tables._semitoneTable[index];
+};
+AlphaSynth.Util.Tables.CentTable = function (index){
+    if (!AlphaSynth.Util.Tables._isInitialized)
+        AlphaSynth.Util.Tables.Init();
+    return AlphaSynth.Util.Tables._centTable[index];
+};
+AlphaSynth.Util.Tables.SincTable = function (index){
+    if (!AlphaSynth.Util.Tables._isInitialized)
+        AlphaSynth.Util.Tables.Init();
+    return AlphaSynth.Util.Tables._sincTable[index];
+};
+AlphaSynth.Util.Tables.Init = function (){
+    var EnvelopeSize = 64;
+    var ExponentialCoeff = 0.09;
+    AlphaSynth.Util.Tables._envelopeTables = new Array(4);
+    AlphaSynth.Util.Tables._envelopeTables[0] = (AlphaSynth.Util.Tables.RemoveDenormals(AlphaSynth.Util.Tables.CreateSustainTable(EnvelopeSize)));
+    AlphaSynth.Util.Tables._envelopeTables[1] = (AlphaSynth.Util.Tables.RemoveDenormals(AlphaSynth.Util.Tables.CreateLinearTable(EnvelopeSize)));
+    AlphaSynth.Util.Tables._envelopeTables[2] = (AlphaSynth.Util.Tables.RemoveDenormals(AlphaSynth.Util.Tables.CreateExponentialTable(EnvelopeSize, ExponentialCoeff)));
+    AlphaSynth.Util.Tables._envelopeTables[3] = (AlphaSynth.Util.Tables.RemoveDenormals(AlphaSynth.Util.Tables.CreateSineTable(EnvelopeSize)));
+    AlphaSynth.Util.Tables._centTable = AlphaSynth.Util.Tables.CreateCentTable();
+    AlphaSynth.Util.Tables._semitoneTable = AlphaSynth.Util.Tables.CreateSemitoneTable();
+    AlphaSynth.Util.Tables._sincTable = AlphaSynth.Util.Tables.CreateSincTable(16, 64, 0.43, AlphaSynth.Util.Tables.HammingWindow);
+    AlphaSynth.Util.Tables._isInitialized = true;
+};
+AlphaSynth.Util.Tables.CreateSquareTable = function (size, k){
+    //Uses Fourier Expansion up to k terms 
+    var FourOverPi = 1.27323954473516;
+    var squaretable = new Float32Array(size);
+    var inc = 1 / size;
+    var phase = 0;
+    for (var x = 0; x < size; x++){
+        var value = 0;
+        for (var i = 1; i < k + 1; i++){
+            var twokminus1 = (2 * i) - 1;
+            value += Math.sin(6.28318530717958 * (twokminus1) * phase) / (twokminus1);
+        }
+        squaretable[x] = AlphaSynth.Synthesis.SynthHelper.ClampF((FourOverPi * value), -1, 1);
+        phase += inc;
+    }
+    return squaretable;
+};
+AlphaSynth.Util.Tables.CreateCentTable = function (){
+    //-100 to 100 cents
+    var cents = new Float32Array(201);
+    for (var x = 0; x < cents.length; x++){
+        cents[x] = Math.pow(2, (x - 100) / 1200);
+    }
+    return cents;
+};
+AlphaSynth.Util.Tables.CreateSemitoneTable = function (){
+    //-127 to 127 semitones
+    var table = new Float32Array(255);
+    for (var x = 0; x < table.length; x++){
+        table[x] = Math.pow(2, (x - 127) / 12);
+    }
+    return table;
+};
+AlphaSynth.Util.Tables.CreateSustainTable = function (size){
+    var table = new Float32Array(size);
+    for (var x = 0; x < size; x++){
+        table[x] = 1;
+    }
+    return table;
+};
+AlphaSynth.Util.Tables.CreateLinearTable = function (size){
+    var table = new Float32Array(size);
+    for (var x = 0; x < size; x++){
+        table[x] = x / (size - 1);
+    }
+    return table;
+};
+AlphaSynth.Util.Tables.CreateExponentialTable = function (size, coeff){
+    coeff = AlphaSynth.Synthesis.SynthHelper.ClampF(coeff, 0.001, 0.9);
+    var graph = new Float32Array(size);
+    var val = 0;
+    for (var x = 0; x < size; x++){
+        graph[x] = val;
+        val += coeff * ((1.58730158730159) - val);
+    }
+    for (var x = 0; x < size; x++){
+        graph[x] = graph[x] / graph[graph.length - 1];
+    }
+    return graph;
+};
+AlphaSynth.Util.Tables.CreateSineTable = function (size){
+    var graph = new Float32Array(size);
+    var inc = 4.712389 / (size - 1);
+    var phase = 0;
+    for (var x = 0; x < size; x++){
+        graph[x] = Math.abs(Math.sin(phase));
+        phase += inc;
+    }
+    return graph;
+};
+AlphaSynth.Util.Tables.RemoveDenormals = function (data){
+    for (var x = 0; x < data.length; x++){
+        if (Math.abs(data[x]) < 1E-38)
+            data[x] = 0;
+    }
+    return data;
+};
+AlphaSynth.Util.Tables.VonHannWindow = function (i, size){
+    return (0.5 - 0.5 * Math.cos(6.28318530717958 * (0.5 + i / size)));
+};
+AlphaSynth.Util.Tables.HammingWindow = function (i, size){
+    return (0.54 - 0.46 * Math.cos(6.28318530717958 * i / size));
+};
+AlphaSynth.Util.Tables.BlackmanWindow = function (i, size){
+    return (0.42659 - 0.49656 * Math.cos(6.28318530717958 * i / size) + 0.076849 * Math.cos(12.5663706143592 * i / size));
+};
+AlphaSynth.Util.Tables.CreateSincTable = function (windowSize, resolution, cornerRatio, windowFunction){
+    var subWindow = (((windowSize / 2) | 0) + 1);
+    var table = new Float32Array((subWindow * resolution));
+    var gain = 2 * cornerRatio;
+    for (var x = 0; x < subWindow; x++){
+        for (var y = 0; y < resolution; y++){
+            var a = x + (y / (resolution));
+            var sinc = 6.28318530717958 * cornerRatio * a;
+            if (Math.abs(sinc) > 1E-05)
+                sinc = Math.sin(sinc) / sinc;
+            else
+                sinc = 1;
+            table[x * 64 + y] = (gain * sinc * windowFunction(a, windowSize));
+        }
+    }
+    return table;
+};
+AlphaSynth.Util.SynthConstants = function (){
+};
+$StaticConstructor(function (){
+    AlphaSynth.Util.SynthConstants.InterpolationMode = AlphaSynth.Bank.Components.Generators.Interpolation.Linear;
+    AlphaSynth.Util.SynthConstants.SampleRate = 44100;
+    AlphaSynth.Util.SynthConstants.Pi = 3.14159265358979;
+    AlphaSynth.Util.SynthConstants.TwoPi = 6.28318530717958;
+    AlphaSynth.Util.SynthConstants.HalfPi = 1.5707963267949;
+    AlphaSynth.Util.SynthConstants.InverseSqrtOfTwo = 0.707106781186;
+    AlphaSynth.Util.SynthConstants.DefaultLfoFrequency = 8;
+    AlphaSynth.Util.SynthConstants.DefaultModDepth = 100;
+    AlphaSynth.Util.SynthConstants.DefaultPolyphony = 40;
+    AlphaSynth.Util.SynthConstants.MinPolyphony = 5;
+    AlphaSynth.Util.SynthConstants.MaxPolyphony = 250;
+    AlphaSynth.Util.SynthConstants.DefaultBlockSize = 64;
+    AlphaSynth.Util.SynthConstants.MaxBufferSize = 0.05;
+    AlphaSynth.Util.SynthConstants.MinBufferSize = 0.001;
+    AlphaSynth.Util.SynthConstants.DenormLimit = 1E-38;
+    AlphaSynth.Util.SynthConstants.NonAudible = 1E-05;
+    AlphaSynth.Util.SynthConstants.SincWidth = 16;
+    AlphaSynth.Util.SynthConstants.SincResolution = 64;
+    AlphaSynth.Util.SynthConstants.MaxVoiceComponents = 4;
+    AlphaSynth.Util.SynthConstants.DefaultChannelCount = 16;
+    AlphaSynth.Util.SynthConstants.DefaultKeyCount = 128;
+});
+AlphaSynth.Util.IOHelper = function (){
+};
+AlphaSynth.Util.IOHelper.ReadInt32LE = function (input){
+    var ch1 = input.ReadByte();
+    var ch2 = input.ReadByte();
+    var ch3 = input.ReadByte();
+    var ch4 = input.ReadByte();
+    return ((ch4 << 24) | (ch3 << 16) | (ch2 << 8) | (ch1 << 0));
+};
+AlphaSynth.Util.IOHelper.ReadUInt16LE = function (input){
+    var ch1 = input.ReadByte();
+    var ch2 = input.ReadByte();
+    return ((ch2 << 8) | (ch1 << 0)&65535);
+};
+AlphaSynth.Util.IOHelper.ReadInt16LE = function (input){
+    var ch1 = input.ReadByte();
+    var ch2 = input.ReadByte();
+    return AlphaSynth.Platform.TypeUtils.ToInt16((ch2 << 8) | (ch1 << 0));
+};
+AlphaSynth.Util.IOHelper.ReadInt32BE = function (input){
+    var ch1 = input.ReadByte();
+    var ch2 = input.ReadByte();
+    var ch3 = input.ReadByte();
+    var ch4 = input.ReadByte();
+    return ((ch1 << 24) | (ch2 << 16) | (ch3 << 8) | (ch4 << 0));
+};
+AlphaSynth.Util.IOHelper.ReadUInt16BE = function (input){
+    var ch1 = input.ReadByte();
+    var ch2 = input.ReadByte();
+    return ((ch1 << 8) | (ch2 << 0)&65535);
+};
+AlphaSynth.Util.IOHelper.ReadInt16BE = function (input){
+    var ch1 = input.ReadByte();
+    var ch2 = input.ReadByte();
+    return AlphaSynth.Platform.TypeUtils.ToInt16((ch1 << 8) | (ch2 << 0));
+};
+AlphaSynth.Util.IOHelper.ReadByteArray = function (input, length){
+    var v = new Uint8Array(length);
+    input.Read(v, 0, length);
+    return v;
+};
+AlphaSynth.Util.IOHelper.Read8BitChars = function (input, length){
+    var s = new Array();
+    for (var i = 0; i < length; i++){
+        s.push(String.fromCharCode(input.ReadByte()));
+    }
+    return s.join('');
+};
+AlphaSynth.Util.IOHelper.Read8BitString = function (input){
+    var s = new Array();
+    var c = input.ReadByte();
+    while (c != 0){
+        s.push(String.fromCharCode(c));
+        c = input.ReadByte();
+    }
+    return s.join('');
+};
+AlphaSynth.Util.IOHelper.Read8BitStringLength = function (input, length){
+    var s = new Array();
+    var z = -1;
+    for (var i = 0; i < length; i++){
+        var c = input.ReadByte();
+        if (c == 0 && z == -1)
+            z = i;
+        s.push(String.fromCharCode(c));
+    }
+    var t = s.join('');
+    if (z >= 0)
+        return t.substr(0, z);
+    return t;
+};
+AlphaSynth.Util.IOHelper.ReadSInt8 = function (input){
+    var v = input.ReadByte();
+    return ((((v & 255) >> 7) * (-256)) + (v & 255));
+};
+AlphaSynth.Util.IOHelper.ReadUInt32 = function (input){
+    var ch1 = input.ReadByte();
+    var ch2 = input.ReadByte();
+    var ch3 = input.ReadByte();
+    var ch4 = input.ReadByte();
+    return (ch1 << 24) | (ch2 << 16) | (ch3 << 8) | (ch4 << 0);
+};
+AlphaSynth.Util.IOHelper.ReadInt24 = function (input, index){
+    var i;
+    if (AlphaSynth.Platform.TypeUtils.IsLittleEndian){
+        i = input[index] | (input[index + 1] << 8) | (input[index + 2] << 16);
+        if ((i & 8388608) == 8388608)
+            i = i | (-16777216);
+    }
+    else {
+        i = (input[index] << 16) | (input[index + 1] << 8) | input[index + 2];
+        if ((i & 256) == 256)
+            i = i | 255;
+    }
+    return i;
+};
+AlphaSynth.Util.IOHelper.ReadInt16 = function (input, index){
+    if (AlphaSynth.Platform.TypeUtils.IsLittleEndian){
+        return AlphaSynth.Platform.TypeUtils.ToInt16(input[index] | (input[index + 1] << 8));
+    }
+    else {
+        return AlphaSynth.Platform.TypeUtils.ToInt16((input[index] << 8) | input[index + 1]);
+    }
+};
+AlphaSynth.Util.WaveHelper = function (){
+};
+AlphaSynth.Util.WaveHelper.SwapEndianess = function (data, bits){
+    bits /= 8;
+    //get bytes per sample
+    var swapArray = new Uint8Array(bits);
+    for (var x = 0; x < data.length; x += bits){
+        swapArray.set(data.subarray(x,x+bits),0);
+        AlphaSynth.Platform.Std.Reverse(swapArray);
+        data.set(swapArray.subarray(0,0+bits),x);
+    }
+};
+
+for(var i = 0; i < $StaticConstructors.length; i++) {
+    $StaticConstructors[i]();
+}
+
+

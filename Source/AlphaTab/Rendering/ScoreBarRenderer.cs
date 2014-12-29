@@ -16,7 +16,6 @@
  * License along with this library.
  */
 using System;
-using System.Runtime.CompilerServices;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Platform.Model;
@@ -64,7 +63,7 @@ namespace AlphaTab.Rendering
         /// </summary>
         private static readonly int[] FlatKsSteps = { 5, 2, 6, 3, 7, 4, 8 };
 
-        private const int LineSpacing = 8;
+        private const float LineSpacing = 8;
 
         private BarHelpers _helpers;
 
@@ -86,7 +85,7 @@ namespace AlphaTab.Rendering
             return BeamDirection.Up;
         }
 
-        public override int GetNoteX(Note note, bool onEnd = true)
+        public override float GetNoteX(Note note, bool onEnd = true)
         {
             ScoreBeatGlyph g = (ScoreBeatGlyph)GetOnNotesPosition(note.Beat.Voice.Index, note.Beat.Index);
             if (g != null)
@@ -96,7 +95,7 @@ namespace AlphaTab.Rendering
             return 0;
         }
 
-        public override int GetNoteY(Note note)
+        public override float GetNoteY(Note note)
         {
             ScoreBeatGlyph beat = (ScoreBeatGlyph)GetOnNotesPosition(note.Beat.Voice.Index, note.Beat.Index);
             if (beat != null)
@@ -106,12 +105,12 @@ namespace AlphaTab.Rendering
             return 0;
         }
 
-        public override int TopPadding
+        public override float TopPadding
         {
             get { return GlyphOverflow; }
         }
 
-        public override int BottomPadding
+        public override float BottomPadding
         {
             get { return GlyphOverflow; }
         }
@@ -130,7 +129,7 @@ namespace AlphaTab.Rendering
             base.DoLayout();
 
 
-            Height = (int)(LineOffset * 4) + TopPadding + BottomPadding;
+            Height = (LineOffset * 4) + TopPadding + BottomPadding;
             if (Index == 0)
             {
                 Stave.RegisterStaveTop(GlyphOverflow);
@@ -157,7 +156,7 @@ namespace AlphaTab.Rendering
 
                     if (maxNoteY < top)
                     {
-                        RegisterOverflowTop((int)(Math.Abs(maxNoteY)));
+                        RegisterOverflowTop(Math.Abs(maxNoteY));
                     }
 
                     //
@@ -171,20 +170,20 @@ namespace AlphaTab.Rendering
 
                     if (minNoteY > bottom)
                     {
-                        RegisterOverflowBottom((int)(Math.Abs(minNoteY)) - bottom);
+                        RegisterOverflowBottom(Math.Abs(minNoteY) - bottom);
                     }
                 }
             }
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
             base.Paint(cx, cy, canvas);
             PaintBeams(cx, cy, canvas);
             PaintTuplets(cx, cy, canvas);
         }
 
-        private void PaintTuplets(int cx, int cy, ICanvas canvas)
+        private void PaintTuplets(float cx, float cy, ICanvas canvas)
         {
             for (int i = 0, j = _helpers.TupletHelpers.Count; i < j; i++)
             {
@@ -197,7 +196,7 @@ namespace AlphaTab.Rendering
             }
         }
 
-        private void PaintBeams(int cx, int cy, ICanvas canvas)
+        private void PaintBeams(float cx, float cy, ICanvas canvas)
         {
             for (int i = 0, j = _helpers.BeamHelpers.Count; i < j; i++)
             {
@@ -210,7 +209,7 @@ namespace AlphaTab.Rendering
             }
         }
 
-        private void PaintBeamHelper(int cx, int cy, ICanvas canvas, BeamingHelper h)
+        private void PaintBeamHelper(float cx, float cy, ICanvas canvas, BeamingHelper h)
         {
             if (h.Beats[0].GraceType != GraceType.None) return;
             // check if we need to paint simple footer
@@ -224,7 +223,7 @@ namespace AlphaTab.Rendering
             }
         }
 
-        private void PaintTupletHelper(int cx, int cy, ICanvas canvas, TupletHelper h)
+        private void PaintTupletHelper(float cx, float cy, ICanvas canvas, TupletHelper h)
         {
             var res = Resources;
             var oldAlign = canvas.TextAlign;
@@ -239,12 +238,12 @@ namespace AlphaTab.Rendering
                     if (beamingHelper == null) continue;
                     var direction = beamingHelper.Direction;
 
-                    var tupletX = (int)(beamingHelper.GetBeatLineX(beat) + Scale);
+                    var tupletX = beamingHelper.GetBeatLineX(beat) + Scale;
                     var tupletY = cy + Y + CalculateBeamY(beamingHelper, tupletX);
 
                     var offset = direction == BeamDirection.Up
-                                ? (int)(res.EffectFont.Size * 1.8f)
-                                : -(int)(3 * Scale);
+                                ? res.EffectFont.Size * 1.8f
+                                : -3 * Scale;
 
                     canvas.Font = res.EffectFont;
                     canvas.FillText(h.Tuplet.ToString(), cx + X + tupletX, tupletY - offset);
@@ -263,21 +262,21 @@ namespace AlphaTab.Rendering
                     // 
                     // Calculate the overall area of the tuplet bracket
 
-                    var startX = (int)(beamingHelper.GetBeatLineX(firstBeat) + Scale);
-                    var endX = (int)(beamingHelper.GetBeatLineX(lastBeat) + Scale);
+                    var startX = beamingHelper.GetBeatLineX(firstBeat) + Scale;
+                    var endX = beamingHelper.GetBeatLineX(lastBeat) + Scale;
 
                     //
                     // Calculate how many space the text will need
                     canvas.Font = res.EffectFont;
                     var s = h.Tuplet.ToString();
                     var sw = canvas.MeasureText(s);
-                    var sp = (int)(3 * Scale);
+                    var sp = 3 * Scale;
 
                     // 
                     // Calculate the offsets where to break the bracket
-                    var middleX = (int)((startX + endX) / 2);
-                    var offset1X = (int)(middleX - sw / 2 - sp);
-                    var offset2X = (int)(middleX + sw / 2 + sp);
+                    var middleX = (startX + endX) / 2;
+                    var offset1X = middleX - sw / 2 - sp;
+                    var offset2X = middleX + sw / 2 + sp;
 
                     //
                     // calculate the y positions for our bracket
@@ -288,8 +287,8 @@ namespace AlphaTab.Rendering
                     var offset2Y = CalculateBeamY(beamingHelper, offset2X);
                     var endY = CalculateBeamY(beamingHelper, endX);
 
-                    var offset = (int)(10 * Scale);
-                    var size = (int)(5 * Scale);
+                    var offset = 10 * Scale;
+                    var size = 5 * Scale;
                     if (direction == BeamDirection.Down)
                     {
                         offset *= -1;
@@ -318,7 +317,7 @@ namespace AlphaTab.Rendering
             canvas.TextAlign = oldAlign;
         }
 
-        private int GetStemSize(Duration duration)
+        private float GetStemSize(Duration duration)
         {
             int size;
             switch (duration)
@@ -335,14 +334,14 @@ namespace AlphaTab.Rendering
             return GetScoreY(size);
         }
 
-        private int CalculateBeamY(BeamingHelper h, int x)
+        private float CalculateBeamY(BeamingHelper h, float x)
         {
             var correction = NoteHeadGlyph.NoteHeadHeight / 2;
             var stemSize = GetStemSize(h.MaxDuration);
-            return h.CalculateBeamY(stemSize, (int)Scale, x, Scale, n => GetScoreY(GetNoteLine(n), correction - 1));
+            return h.CalculateBeamY(stemSize, Scale, x, Scale, n => GetScoreY(GetNoteLine(n), correction - 1));
         }
 
-        private void PaintBar(int cx, int cy, ICanvas canvas, BeamingHelper h)
+        private void PaintBar(float cx, float cy, ICanvas canvas, BeamingHelper h)
         {
             for (int i = 0, j = h.Beats.Count; i < j; i++)
             {
@@ -353,7 +352,7 @@ namespace AlphaTab.Rendering
                 //
                 // draw line 
                 //
-                var beatLineX = (int)(h.GetBeatLineX(beat) + Scale);
+                var beatLineX = h.GetBeatLineX(beat) + Scale;
 
                 var direction = h.Direction;
 
@@ -368,9 +367,9 @@ namespace AlphaTab.Rendering
                 canvas.LineTo(cx + X + beatLineX, y2);
                 canvas.Stroke();
 
-                var brokenBarOffset = (int)(6 * Scale);
-                var barSpacing = (int)(6 * Scale);
-                var barSize = (int)(3 * Scale);
+                var brokenBarOffset = 6 * Scale;
+                var barSpacing = 6 * Scale;
+                var barSize = 3 * Scale;
                 var barCount = beat.Duration.GetIndex() - 2;
                 var barStart = cy + Y;
                 if (direction == BeamDirection.Down)
@@ -381,11 +380,11 @@ namespace AlphaTab.Rendering
 
                 for (var barIndex = 0; barIndex < barCount; barIndex++)
                 {
-                    int barStartX;
-                    int barEndX;
+                    float barStartX;
+                    float barEndX;
 
-                    int barStartY;
-                    int barEndY;
+                    float barStartY;
+                    float barEndY;
 
                     var barY = barStart + (barIndex * barSpacing);
 
@@ -398,7 +397,7 @@ namespace AlphaTab.Rendering
                         if (IsFullBarJoin(beat, h.Beats[i + 1], barIndex))
                         {
                             barStartX = beatLineX;
-                            barEndX = (int)(h.GetBeatLineX(h.Beats[i + 1]) + Scale);
+                            barEndX = h.GetBeatLineX(h.Beats[i + 1]) + Scale;
                         }
                         // broken bar?
                         else if (i == 0 || !IsFullBarJoin(h.Beats[i - 1], beat, barIndex))
@@ -436,7 +435,7 @@ namespace AlphaTab.Rendering
             return (a.Duration.GetIndex() - 2 - barIndex > 0)
                 && (b.Duration.GetIndex() - 2 - barIndex > 0);
         }
-        private static void PaintSingleBar(ICanvas canvas, int x1, int y1, int x2, int y2, int size)
+        private static void PaintSingleBar(ICanvas canvas, float x1, float y1, float x2, float y2, float size)
         {
             canvas.BeginPath();
             canvas.MoveTo(x1, y1);
@@ -447,7 +446,7 @@ namespace AlphaTab.Rendering
             canvas.Fill();
         }
 
-        private void PaintFooter(int cx, int cy, ICanvas canvas, BeamingHelper h)
+        private void PaintFooter(float cx, float cy, ICanvas canvas, BeamingHelper h)
         {
             var beat = h.Beats[0];
 
@@ -465,23 +464,23 @@ namespace AlphaTab.Rendering
 
             var stemSize = GetStemSize(h.MaxDuration);
 
-            var correction = (int)(((NoteHeadGlyph.NoteHeadHeight * scaleMod) / 2));
-            var beatLineX = (int)(h.GetBeatLineX(beat) + Scale);
+            var correction = ((NoteHeadGlyph.NoteHeadHeight * scaleMod) / 2);
+            var beatLineX = h.GetBeatLineX(beat) + Scale;
 
             var direction = h.Direction;
 
             var topY = GetScoreY(GetNoteLine(beat.MaxNote), correction);
             var bottomY = GetScoreY(GetNoteLine(beat.MinNote), correction);
 
-            int beamY;
+            float beamY;
             if (direction == BeamDirection.Down)
             {
-                bottomY += (int)(stemSize * scaleMod);
+                bottomY += stemSize * scaleMod;
                 beamY = bottomY;
             }
             else
             {
-                topY -= (int)(stemSize * scaleMod);
+                topY -= stemSize * scaleMod;
                 beamY = topY;
             }
 
@@ -499,8 +498,8 @@ namespace AlphaTab.Rendering
                 canvas.BeginPath();
                 if (direction == BeamDirection.Down)
                 {
-                    canvas.MoveTo((int)(cx + X + beatLineX - (graceSizeX / 2)), cy + Y + bottomY - graceSizeY);
-                    canvas.LineTo((int)(cx + X + beatLineX + (graceSizeX / 2)), cy + Y + bottomY);
+                    canvas.MoveTo(cx + X + beatLineX - (graceSizeX / 2), cy + Y + bottomY - graceSizeY);
+                    canvas.LineTo(cx + X + beatLineX + (graceSizeX / 2), cy + Y + bottomY);
                 }
                 else
                 {
@@ -568,7 +567,7 @@ namespace AlphaTab.Rendering
 
             if (Bar.IsEmpty)
             {
-                AddPreBeatGlyph(new SpacingGlyph(0, 0, (int)(30 * Scale), false));
+                AddPreBeatGlyph(new SpacingGlyph(0, 0, (30 * Scale), false));
             }
         }
 
@@ -598,7 +597,7 @@ namespace AlphaTab.Rendering
             else if (Bar.MasterBar.IsDoubleBar)
             {
                 AddPostBeatGlyph(new BarSeperatorGlyph(0, 0));
-                AddPostBeatGlyph(new SpacingGlyph(0, 0, (int)(3 * Scale), false));
+                AddPostBeatGlyph(new SpacingGlyph(0, 0, 3 * Scale, false));
                 AddPostBeatGlyph(new BarSeperatorGlyph(0, 0));
             }
             else if (Bar.NextBar == null || !Bar.NextBar.MasterBar.IsRepeatStart)
@@ -611,7 +610,7 @@ namespace AlphaTab.Rendering
         private void CreateStartSpacing()
         {
             if (_startSpacing) return;
-            AddPreBeatGlyph(new SpacingGlyph(0, 0, (int)(2 * Scale)));
+            AddPreBeatGlyph(new SpacingGlyph(0, 0, 2 * Scale));
             _startSpacing = true;
         }
 
@@ -647,7 +646,7 @@ namespace AlphaTab.Rendering
 
             for (var i = 0; i < naturalizeSymbols; i++)
             {
-                AddPreBeatGlyph(new NaturalizeGlyph(0, (int)(GetScoreY(previousKeyPositions[i] + offsetClef))));
+                AddPreBeatGlyph(new NaturalizeGlyph(0, GetScoreY(previousKeyPositions[i] + offsetClef)));
             }
 
             // how many symbols do we need to get from a C-keysignature
@@ -658,7 +657,7 @@ namespace AlphaTab.Rendering
             {
                 for (var i = 0; i < Math.Abs(currentKey); i++)
                 {
-                    AddPreBeatGlyph(new SharpGlyph(0, (int)(GetScoreY(SharpKsSteps[i] + offsetClef))));
+                    AddPreBeatGlyph(new SharpGlyph(0, GetScoreY(SharpKsSteps[i] + offsetClef)));
                 }
             }
             // a flat signature
@@ -666,14 +665,14 @@ namespace AlphaTab.Rendering
             {
                 for (var i = 0; i < Math.Abs(currentKey); i++)
                 {
-                    AddPreBeatGlyph(new FlatGlyph(0, (int)(GetScoreY(FlatKsSteps[i] + offsetClef))));
+                    AddPreBeatGlyph(new FlatGlyph(0, GetScoreY(FlatKsSteps[i] + offsetClef)));
                 }
             }
         }
 
         private void CreateTimeSignatureGlyphs()
         {
-            AddPreBeatGlyph(new SpacingGlyph(0, 0, (int)(5 * Scale)));
+            AddPreBeatGlyph(new SpacingGlyph(0, 0, 5 * Scale));
             AddPreBeatGlyph(new TimeSignatureGlyph(0, 0, Bar.MasterBar.TimeSignatureNumerator, Bar.MasterBar.TimeSignatureDenominator));
         }
 
@@ -724,25 +723,25 @@ namespace AlphaTab.Rendering
         /// <param name="steps">the amount of steps while 2 steps are one line</param>
         /// <param name="correction"></param>
         /// <returns></returns>
-        public int GetScoreY(int steps, int correction = 0)
+        public float GetScoreY(int steps, float correction = 0)
         {
-            return (int)(((LineOffset / 2) * steps) + (correction * Scale));
+            return ((LineOffset / 2) * steps) + (correction * Scale);
         }
 
         /// <summary>
         /// gets the padding needed to place glyphs within the bounding box
         /// </summary>
-        private int GlyphOverflow
+        private float GlyphOverflow
         {
             get
             {
                 var res = Resources;
-                return (int)((res.TablatureFont.Size / 2) + (res.TablatureFont.Size * 0.2));
+                return (res.TablatureFont.Size / 2) + (res.TablatureFont.Size * 0.2f);
             }
         }
 
         //private static readonly Random Random = new Random();
-        protected override void PaintBackground(int cx, int cy, ICanvas canvas)
+        protected override void PaintBackground(float cx, float cy, ICanvas canvas)
         {
             var res = Resources;
 
@@ -761,7 +760,7 @@ namespace AlphaTab.Rendering
 
             for (var i = 0; i < 5; i++)
             {
-                if (i > 0) lineY += (int)LineOffset;
+                if (i > 0) lineY += LineOffset;
                 canvas.BeginPath();
                 canvas.MoveTo(cx + X, lineY);
                 canvas.LineTo(cx + X + Width, lineY);

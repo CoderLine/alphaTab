@@ -27,7 +27,7 @@ namespace AlphaTab.Rendering.Glyphs
         protected Note StartNote;
         protected Note EndNote;
         protected Glyph Parent;
-        protected int YOffset;
+        protected float YOffset;
         private readonly bool _forEnd;
 
         public TieGlyph(Note startNote, Note endNote, Glyph parent, bool forEnd)
@@ -49,23 +49,23 @@ namespace AlphaTab.Rendering.Glyphs
             get { return false; }
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
             if (EndNote == null) return;
 
-            GroupedBarRenderer startNoteRenderer =
+            var startNoteRenderer =
                     (GroupedBarRenderer)Renderer.Layout.GetRendererForBar(Renderer.Stave.StaveId, StartNote.Beat.Voice.Bar.Index);
-            GroupedBarRenderer endNoteRenderer =
+            var endNoteRenderer =
                     (GroupedBarRenderer)Renderer.Layout.GetRendererForBar(Renderer.Stave.StaveId, EndNote.Beat.Voice.Bar.Index);
 
-            int startX = 0;
-            int endX = 0;
+            float startX = 0;
+            float endX = 0;
 
-            int startY = 0;
-            int endY = 0;
+            float startY = 0;
+            float endY = 0;
 
-            bool shouldDraw = false;
-            BeatContainerGlyph parent = (BeatContainerGlyph)Parent;
+            var shouldDraw = false;
+            var parent = (BeatContainerGlyph)Parent;
 
             // if we are on the tie start, we check if we 
             // either can draw till the end note, or we just can draw till the bar end

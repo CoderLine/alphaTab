@@ -32,8 +32,8 @@ namespace AlphaTab.Platform.Svg
         private string _currentPath;
         private bool _currentPathIsEmpty;
 
-        public int Width { get; set; }
-        public int Height { get; set; }
+        public float Width { get; set; }
+        public float Height { get; set; }
         public Color Color { get; set; }
         public float LineWidth { get; set; }
         public Font Font { get; set; }

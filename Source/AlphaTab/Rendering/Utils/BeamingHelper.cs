@@ -16,7 +16,6 @@
  * License along with this library.
  */
 using System;
-using System.Runtime.CompilerServices;
 using AlphaTab.Audio;
 using AlphaTab.Collections;
 using AlphaTab.Model;
@@ -50,10 +49,10 @@ namespace AlphaTab.Rendering.Utils
 
     public class BeatLinePositions
     {
-        public int Up { get; set; }
-        public int Down { get; set; }
+        public float Up { get; set; }
+        public float Down { get; set; }
 
-        public BeatLinePositions(int up, int down)
+        public BeatLinePositions(float up, float down)
         {
             Up = up;
             Down = down;
@@ -131,7 +130,7 @@ namespace AlphaTab.Rendering.Utils
             }
         }
 
-        public int GetBeatLineX(Beat beat)
+        public float GetBeatLineX(Beat beat)
         {
             if (HasBeatLineX(beat))
             {
@@ -149,7 +148,7 @@ namespace AlphaTab.Rendering.Utils
             return _beatLineXPositions.ContainsKey(beat.Index);
         }
 
-        public void RegisterBeatLineX(Beat beat, int up, int down)
+        public void RegisterBeatLineX(Beat beat, float up, float down)
         {
             _beatLineXPositions[beat.Index] = new BeatLinePositions(up, down);
         }
@@ -280,7 +279,7 @@ namespace AlphaTab.Rendering.Utils
             }
         }
 
-        public int CalculateBeamY(int stemSize, int xCorrection, int xPosition, float scale, Func<Note, int> yPosition)
+        public float CalculateBeamY(float stemSize, float xCorrection, float xPosition, float scale, Func<Note, float> yPosition)
         {
             // create a line between the min and max note of the group
             var direction = Direction;
@@ -329,10 +328,10 @@ namespace AlphaTab.Rendering.Utils
 
             // get the y position of the given beat on this curve
 
-            if (startX == endX) return (int)startY;
+            if (startX == endX) return startY;
 
             // y(x)  = ( (y2 - y1) / (x2 - x1) )  * (x - x1) + y1;
-            return (int)(((endY - startY) / (endX - startX)) * (xPosition - startX) + startY);
+            return ((endY - startY) / (endX - startX)) * (xPosition - startX) + startY;
         }
 
         // TODO: Check if this beaming is really correct, I'm not sure if we are connecting beats correctly

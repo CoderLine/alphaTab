@@ -15,14 +15,14 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System;
+
 using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
     public class AccentuationGlyph : MusicFontGlyph
     {
-        public AccentuationGlyph(int x, int y, AccentuationType accentuation)
+        public AccentuationGlyph(float x, float y, AccentuationType accentuation)
             : base(x, y, 1, GetSymbol(accentuation))
         {
         }
@@ -44,7 +44,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
-            Width = (int)(9 * Scale);
+            Width = 9 * Scale;
         }
 
         public override bool CanScale

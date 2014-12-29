@@ -24,14 +24,14 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class LineRangedGlyph : EffectGlyph
     {
-        private const int LineSpacing = 3;
-        private const int LineTopPadding = 8;
-        private const int LineTopOffset = 6;
-        private const int LineSize = 8;
+        private const float LineSpacing = 3;
+        private const float LineTopPadding = 8;
+        private const float LineTopOffset = 6;
+        private const float LineSize = 8;
         private bool _isExpanded;
         private readonly string _label;
 
-        public LineRangedGlyph(int x, int y, string label)
+        public LineRangedGlyph(float x, float y, string label)
             : base(x, y)
         {
             _label = label;
@@ -42,10 +42,8 @@ namespace AlphaTab.Rendering.Glyphs
             _isExpanded = true;
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            float step = 11 * Scale;
-
             var res = Renderer.Resources;
             canvas.Font = res.EffectFont;
             canvas.TextAlign = TextAlign.Left;

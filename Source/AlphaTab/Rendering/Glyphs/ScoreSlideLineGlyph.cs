@@ -44,15 +44,15 @@ namespace AlphaTab.Rendering.Glyphs
             get { return false; }
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            ScoreBarRenderer r = (ScoreBarRenderer)Renderer;
-            var sizeX = (int)(12 * Scale);
-            var offsetX = (int)(1 * Scale);
-            int startX;
-            int startY;
-            int endX;
-            int endY;
+            var r = (ScoreBarRenderer)Renderer;
+            var sizeX = 12 * Scale;
+            var offsetX = 1 * Scale;
+            float startX;
+            float startY;
+            float endX;
+            float endY;
             switch (_type)
             {
                 case SlideType.Shift:

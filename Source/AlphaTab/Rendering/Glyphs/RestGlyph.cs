@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System;
 using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Glyphs
@@ -24,7 +23,7 @@ namespace AlphaTab.Rendering.Glyphs
     {
         private readonly Duration _duration;
 
-        public RestGlyph(int x, int y, Duration duration)
+        public RestGlyph(float x, float y, Duration duration)
             : base(x, y, 1, GetSymbol(duration))
         {
             _duration = duration;
@@ -61,13 +60,13 @@ namespace AlphaTab.Rendering.Glyphs
                 case Duration.Quarter:
                 case Duration.Eighth:
                 case Duration.Sixteenth:
-                    Width = (int)(9 * Scale);
+                    Width = 9 * Scale;
                     break;
                 case Duration.ThirtySecond:
-                    Width = (int)(12 * Scale);
+                    Width = 12 * Scale;
                     break;
                 case Duration.SixtyFourth:
-                    Width = (int)(14 * Scale);
+                    Width = 14 * Scale;
                     break;
             }
         }

@@ -24,7 +24,7 @@ namespace AlphaTab.Rendering.Effects
     {
         private readonly string _s;
 
-        public DummyEffectGlyph(int x, int y, string s)
+        public DummyEffectGlyph(float x, float y, string s)
             : base(x, y)
         {
             _s = s;
@@ -32,7 +32,7 @@ namespace AlphaTab.Rendering.Effects
 
         public override void DoLayout()
         {
-            Width = (int)(20 * Scale);
+            Width = 20 * Scale;
         }
 
         public override bool CanScale
@@ -40,7 +40,7 @@ namespace AlphaTab.Rendering.Effects
             get { return false; }
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
             var res = Renderer.Resources;
             canvas.Color = res.MainGlyphColor;

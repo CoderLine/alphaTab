@@ -994,7 +994,7 @@
             The step offsets of sharp symbols for flat key signatures.
             </summary>
         </member>
-        <member name="M:AlphaTab.Rendering.ScoreBarRenderer.GetScoreY(System.Int32,System.Int32)">
+        <member name="M:AlphaTab.Rendering.ScoreBarRenderer.GetScoreY(System.Int32,System.Single)">
             <summary>
             Gets the relative y position of the given steps relative to first line. 
             </summary>
@@ -1068,7 +1068,7 @@
             This BarRenderer renders a bar using guitar tablature notation
             </summary>
         </member>
-        <member name="M:AlphaTab.Rendering.TabBarRenderer.GetTabY(System.Int32,System.Int32)">
+        <member name="M:AlphaTab.Rendering.TabBarRenderer.GetTabY(System.Int32,System.Single)">
             <summary>
             Gets the relative y position of the given steps relative to first line.
             </summary>
@@ -1250,6 +1250,11 @@
              <li><strong>palm-mute</strong> - Renders palm-mute indicators</li>
              <li><strong>tab</strong> - Renders guitar tablature</li>
              <li><strong>fingering</strong> - Renders finger indicators</li>
+            </ul>
+            Additional Staves:
+            <ul>
+              <li><strong>rhythm-down</strong> - Renders rhythm bars that point downwards</li>
+              <li><strong>rhythm-up</strong> - Renders rhythm bars that point upwards</li>
             </ul>
             </summary>
         </member>

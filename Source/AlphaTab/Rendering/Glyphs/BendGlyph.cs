@@ -24,9 +24,9 @@ namespace AlphaTab.Rendering.Glyphs
     public class BendGlyph : Glyph
     {
         private readonly Note _note;
-        private readonly int _height;
+        private readonly float _height;
 
-        public BendGlyph(Note n, int width, int height)
+        public BendGlyph(Note n, float width, float height)
             : base(0, 0)
         {
             _note = n;
@@ -34,9 +34,9 @@ namespace AlphaTab.Rendering.Glyphs
             _height = height;
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            TabBarRenderer r = (TabBarRenderer)Renderer;
+            var r = (TabBarRenderer)Renderer;
             var res = Renderer.Resources;
             // calculate offsets per step
             var dX = Width / BendPoint.MaxPosition;

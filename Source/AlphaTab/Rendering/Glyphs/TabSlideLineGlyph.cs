@@ -44,22 +44,22 @@ namespace AlphaTab.Rendering.Glyphs
             get { return false; }
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            TabBarRenderer r = (TabBarRenderer)Renderer;
+            var r = (TabBarRenderer)Renderer;
 
-            var sizeX = (int)(12 * Scale);
-            var sizeY = (int)(3 * Scale);
-            int startX;
-            int startY;
-            int endX;
-            int endY;
+            var sizeX = 12 * Scale;
+            var sizeY = 3 * Scale;
+            float startX;
+            float startY;
+            float endX;
+            float endY;
             switch (_type)
             {
                 case SlideType.Shift:
                 case SlideType.Legato:
-                    int startOffsetY;
-                    int endOffsetY;
+                    float startOffsetY;
+                    float endOffsetY;
 
                     if (_startNote.SlideTarget == null)
                     {

@@ -22,17 +22,17 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class CrescendoGlyph : EffectGlyph
     {
-        public const int Height = 17;
+        public const float Height = 17;
 
         private readonly CrescendoType _crescendo;
 
-        public CrescendoGlyph(int x, int y, CrescendoType crescendo)
+        public CrescendoGlyph(float x, float y, CrescendoType crescendo)
             : base(x, y)
         {
             _crescendo = crescendo;
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
             var height = Height * Scale;
             canvas.BeginPath();

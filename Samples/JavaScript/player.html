@@ -9,12 +9,8 @@
 	</style>
     
     <!-- Including alphaTab -->
-    <link rel="stylesheet" href="../../Build/JavaScript/alphaTab.css" />
-    <script type="text/javascript" src="../../Build/JavaScript/mscorlib.js"></script>
     <script type="text/javascript" src="../../Build/JavaScript/AlphaTab.js"></script>
-
-    <!-- IE8 support -->
-    <script type="text/javascript" src="lib/excanvas/excanvas.js"></script>
+    <link rel="stylesheet" href="../../Build/JavaScript/AlphaTab.css" />
 
     <!-- jQuery Plugin -->
     <script type="text/javascript" src="lib/jquery/jquery-1.10.2.min.js"></script>
@@ -34,7 +30,7 @@
     <link rel="stylesheet" href="support/player.css" />
 </head>
 <body>
-    <div id="alphaTab" data-file="files/Nightwish.gp5"></div>
+    <div id="alphaTab" data-file="files/Nightwish.gp5" data-tracks="3"></div>
     <div id="controls">
         <div id="loadingInfo">Player not ready</div>
         <div id="sfInfo">Loading Soundfont <span class="progress"></span></div>
@@ -42,65 +38,83 @@
         <button class="button" disabled="disabled" id="stop">Stop</button>
     </div>
     <script type="text/javascript">
-        if(as.AlphaSynth.init('lib/alphaSynth'))
-        {        
-            var synth = as.AlphaSynth.instance;
-            // wait for api
-            synth.on('ready', function() {
-                //synth.setLogLevel(3);
-                $('#sfInfo').show();
-                synth.loadSoundFontUrl('lib/alphaSynth/default.sf2');
-            });
-            
-            // init ui
-            $('#playPause').click(function() { synth.playPause(); });
-            $('#stop').click(function() { synth.stop(); });
-            
-            // ui activation
-            synth.on('readyForPlay', function(e, ready) {
-                if(ready) 
-                {
-                    $('#loadingInfo').hide()
-                    $('#controls button').removeAttr('disabled');
-                }
-                else
-                {
-                    $('#loadingInfo').show()
-                    $('#controls button').attr('disabled', 'disabled');
-                }
-            });    
-            synth.on('soundFontLoad', function(e, loaded, full) {
-                var percentage = ((loaded / full) * 100)|0;
-                $('#sfInfo .progress').text('(' + percentage + '%)');
-            });
-            synth.on('soundFontLoaded', function(e, loaded, full) {
-                $('#sfInfo').hide();
-            });
-            synth.on('playerStateChanged', function(e, state) {
-                switch(state) {
+        var playerReady = false;
+        var playerState = 0;
+        var at = $('#alphaTab');
+        
+        //
+        // 1. Load alphaTab
+        at.alphaTab(); 
+        
+        // 
+        // 2. Initialize Player and Setup Player UI
+        var as = at.alphaTab('playerInit', {
+            asRoot: '/Samples/JavaScript/lib/alphaSynth/',
+            swfObjectRoot: '/Samples/JavaScript/lib/alphaSynth/'
+        }); // init alphaSynth
+        
+        as.On('ready', function(r) {
+            // load default data
+            as.LoadSoundFontUrl('lib/alphaSynth/default.sf2');
+        });
+        as.On('soundFontLoad', function(loaded, full) {
+            var percentage = ((loaded / full) * 100)|0;
+            $('#sfInfo .progress').text('(' + percentage + '%)');
+        });
+        as.On('soundFontLoaded', function() {
+            $('#sfInfo').hide();
+        });
+        as.On('readyForPlay', function(r) {
+            playerReady = r;
+            updateControls();
+        });
+        as.On('playerStateChanged', function(s) {
+            playerState = s;
+            updateControls();
+        });
+        
+        $('#playPause').click(function() { 
+            if(playerState == 1) {
+                as.Pause();
+            }
+            else {
+                as.Play();
+            }
+        });
+        $('#stop').click(function() { 
+            as.Stop(); 
+        });
+        
+        function updateControls() {
+            if(!playerReady) {
+                $('#loadingInfo').show()
+                $('#controls button').attr('disabled', 'disabled');
+            }
+            else {
+                $('#loadingInfo').hide()
+                $('#playPause').removeAttr('disabled');
+                switch(playerState) {
                     case 0: // stopped
                     $('#playPause').text('Play').removeClass('pause').addClass('play');
+                    $('#stop').attr('disabled', 'disabled');
                     break;
                     case 1: // playing
                     $('#playPause').text('Pause').removeClass('play').addClass('pause');
+                    $('#stop').removeAttr('disabled');
                     break;
                     case 2: // paused
                     $('#playPause').text('Play').removeClass('pause').addClass('play');
+                    $('#stop').removeAttr('disabled');
                     break;
                 }
-            });     
-            
-            var at = $('#alphaTab');
-            at.alphaTab(); // load alphaTab
-            at.alphaTab('autoPlayer'); // autoplayer
-            at.alphaTab('playerCursor'); // cursor
-            at.alphaTab('drop'); // drag and drop
-        }
-        else
-        {
-            alert('The player feature requires Flash 11.4 or above installed in your browser');
-        }
+            }
+        }     
         
+        //
+        // 3. Add cursors (optional)
+        at.alphaTab('playerCursor'); 
+        // at.alphaTab('drop'); // drag and drop
+    
     </script>
     
 </body>

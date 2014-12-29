@@ -21,7 +21,7 @@ namespace AlphaTab.Rendering.Glyphs
     {
         private readonly int _digit;
 
-        public DigitGlyph(int x, int y, int digit)
+        public DigitGlyph(float x, float y, int digit)
             : base(x, y, 1, GetSymbol(digit))
         {
             _digit = digit;
@@ -29,11 +29,11 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
-            Y += (int)(7 * Scale);
-            Width = (int)(GetDigitWidth(_digit) * Scale);
+            Y += 7 * Scale;
+            Width = GetDigitWidth(_digit) * Scale;
         }
 
-        private int GetDigitWidth(int digit)
+        private float GetDigitWidth(int digit)
         {
             switch (digit)
             {

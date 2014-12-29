@@ -23,13 +23,13 @@ namespace AlphaTab.Rendering.Glyphs
     {
         private readonly int _tempo;
 
-        public TempoGlyph(int x, int y, int tempo)
+        public TempoGlyph(float x, float y, int tempo)
             : base(x, y)
         {
             _tempo = tempo;
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
             var res = Renderer.Resources;
             canvas.Font = res.MarkerFont;

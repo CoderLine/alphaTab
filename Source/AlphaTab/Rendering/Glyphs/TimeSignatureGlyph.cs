@@ -22,7 +22,7 @@ namespace AlphaTab.Rendering.Glyphs
         private readonly int _numerator;
         private readonly int _denominator;
 
-        public TimeSignatureGlyph(int x, int y, int numerator, int denominator)
+        public TimeSignatureGlyph(float x, float y, int numerator, int denominator)
             : base(x, y)
         {
             _numerator = numerator;
@@ -37,7 +37,7 @@ namespace AlphaTab.Rendering.Glyphs
         public override void DoLayout()
         {
             var numerator = new NumberGlyph(0, 0, _numerator);
-            var denominator = new NumberGlyph(0, (int)(18 * Scale), _denominator);
+            var denominator = new NumberGlyph(0, 18 * Scale, _denominator);
 
             AddGlyph(numerator);
             AddGlyph(denominator);

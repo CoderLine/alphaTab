@@ -27,9 +27,9 @@ namespace AlphaTab.Rendering.Effects
             return note.IsLetRing;
         }
 
-        public override int GetHeight(EffectBarRenderer renderer)
+        public override float GetHeight(EffectBarRenderer renderer)
         {
-            return (int)(15 * renderer.Scale);
+            return 15 * renderer.Scale;
         }
 
         public override EffectBarGlyphSizing SizingMode

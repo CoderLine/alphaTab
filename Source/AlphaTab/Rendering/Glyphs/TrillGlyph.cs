@@ -24,13 +24,13 @@ namespace AlphaTab.Rendering.Glyphs
     {
         private readonly float _scale;
 
-        public TrillGlyph(int x, int y, float scale = 0.9f)
+        public TrillGlyph(float x, float y, float scale = 0.9f)
             : base(x, y)
         {
             _scale = scale;
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
             var res = Renderer.Resources;
 
@@ -41,14 +41,14 @@ namespace AlphaTab.Rendering.Glyphs
 
             var startX = textw;
             var endX = Width - startX;
-            float step = 11 * Scale * _scale;
-            int loops = (int)Math.Max(1, ((endX - startX) / step));
+            var step = 11 * Scale * _scale;
+            var loops = Math.Max(1, ((endX - startX) / step));
 
-            var loopX = (int)startX;
+            var loopX = startX;
             for (var i = 0; i < loops; i++)
             {
                 canvas.FillMusicFontSymbol(cx + X + loopX, cy + Y, _scale, MusicFontSymbol.WaveHorizontal);
-                loopX += (int)step;
+                loopX += step;
             }
         }
     }

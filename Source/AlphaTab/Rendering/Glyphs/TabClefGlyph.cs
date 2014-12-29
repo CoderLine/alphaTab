@@ -22,14 +22,14 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class TabClefGlyph : Glyph
     {
-        public TabClefGlyph(int x, int y) 
+        public TabClefGlyph(float x, float y) 
             : base(x, y)
         {
         }
 
         public override void DoLayout()
         {
-            Width = (int)(28 * Scale);
+            Width = 28 * Scale;
         }
 
         public override bool CanScale
@@ -37,7 +37,7 @@ namespace AlphaTab.Rendering.Glyphs
             get { return false; }
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
             //TabBarRenderer tabBarRenderer = (TabBarRenderer)Renderer;
             var track = Renderer.Bar.Track;

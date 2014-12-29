@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System.Runtime.CompilerServices;
+
 using AlphaTab.Collections;
 using AlphaTab.Model;
 
@@ -23,12 +23,12 @@ namespace AlphaTab.Rendering.Utils
 {
     public class Bounds
     {
-        public int X { get; set; }
-        public int Y { get; set; }
-        public int W { get; set; }
-        public int H { get; set; }
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float W { get; set; }
+        public float H { get; set; }
 
-        public Bounds(int x, int y, int w, int h)
+        public Bounds(float x, float y, float w, float h)
         {
             X = x;
             Y = y;
@@ -59,7 +59,7 @@ namespace AlphaTab.Rendering.Utils
             Beats = new FastList<BeatBoundings>();
         }
 
-        public Beat FindBeatAtPos(int x)
+        public Beat FindBeatAtPos(float x)
         {
             var index = 0;
             // move right as long we didn't pass our x-pos
@@ -81,7 +81,7 @@ namespace AlphaTab.Rendering.Utils
             Bars = new FastList<BarBoundings>();
         }
 
-        public Beat GetBeatAtPos(int x, int y)
+        public Beat GetBeatAtPos(float x, float y)
         {
             //
             // find a bar which matches in y-axis

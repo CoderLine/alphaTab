@@ -27,9 +27,9 @@ namespace AlphaTab.Rendering.Effects
             return note.IsPalmMute;
         }
 
-        public override int GetHeight(EffectBarRenderer renderer)
+        public override float GetHeight(EffectBarRenderer renderer)
         {
-            return (int)(20 * renderer.Scale);
+            return 20 * renderer.Scale;
         }
 
         public override EffectBarGlyphSizing SizingMode

@@ -36,8 +36,8 @@ namespace AlphaTab.Platform.CSharp
     public class GdiCanvas : ICanvas, IPathCanvas
     {
         private Bitmap _image;
-        private int _width;
-        private int _height;
+        private float _width;
+        private float _height;
         private Graphics _graphics;
 
         private GraphicsPath _currentPath;
@@ -58,7 +58,7 @@ namespace AlphaTab.Platform.CSharp
 
         public RenderingResources Resources { get; set; }
 
-        public int Width
+        public float Width
         {
             get
             {
@@ -71,7 +71,7 @@ namespace AlphaTab.Platform.CSharp
             }
         }
 
-        public int Height
+        public float Height
         {
             get
             {
@@ -211,7 +211,7 @@ namespace AlphaTab.Platform.CSharp
 
         private void RecreateImage()
         {
-            var newImage = new Bitmap(_width, _height, PixelFormat.Format32bppArgb);
+            var newImage = new Bitmap((int)_width, (int)_height, PixelFormat.Format32bppArgb);
             var newGraphics = Graphics.FromImage(newImage);
             newGraphics.SmoothingMode = SmoothingMode.HighQuality;
             newGraphics.TextRenderingHint = TextRenderingHint.AntiAlias;

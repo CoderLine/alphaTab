@@ -24,7 +24,7 @@ namespace AlphaTab.Rendering.Glyphs
         private readonly int _number;
         private readonly bool _hidden;
 
-        public BarNumberGlyph(int x, int y, int number, bool hidden)
+        public BarNumberGlyph(float x, float y, int number, bool hidden)
             : base(x, y)
         {
             _number = number;
@@ -33,7 +33,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
-            Width = (int)(10 * Scale);
+            Width = 10 * Scale;
         }
 
         public override bool CanScale
@@ -41,7 +41,7 @@ namespace AlphaTab.Rendering.Glyphs
             get { return false; }
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
             if (_hidden)
             {

@@ -56,7 +56,7 @@ namespace AlphaTab.Rendering.Glyphs
 
             // left to right layout
             if (Glyphs == null) return;
-            var w = 0;
+            var w = 0f;
             for (int i = 0, j = Glyphs.Count; i < j; i++)
             {
                 var g = Glyphs[i];
@@ -76,7 +76,7 @@ namespace AlphaTab.Rendering.Glyphs
             }
         }
 
-        public override void ApplyGlyphSpacing(int spacing)
+        public override void ApplyGlyphSpacing(float spacing)
         {
             base.ApplyGlyphSpacing(spacing);
             // TODO: we need to tell the beaming helper the position of rest beats

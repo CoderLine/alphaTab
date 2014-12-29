@@ -33,15 +33,14 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
-            Width = (int)(10 * Scale);
+            Width = 10 * Scale;
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
             var scoreBarRenderer = (ScoreBarRenderer)Renderer;
             var lineSize = scoreBarRenderer.LineOffset;
-            var res = Renderer.Resources;
-            var startY = cy + Y + (int)(scoreBarRenderer.GetNoteY(_beat.MaxNote) - lineSize / 2);
+            var startY = cy + Y + (scoreBarRenderer.GetNoteY(_beat.MaxNote) - lineSize / 2);
             var endY = cy + Y + scoreBarRenderer.GetNoteY(_beat.MinNote) + lineSize;
             var arrowX = cx + X + Width / 2;
             var arrowSize = 8 * Scale;
@@ -50,11 +49,11 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 if (_beat.BrushType == BrushType.ArpeggioUp || _beat.BrushType == BrushType.ArpeggioDown)
                 {
-                    var size = (int)(15 * Scale);
-                    var steps = (int)(Math.Abs(endY - startY) / size);
+                    var size = 15 * Scale;
+                    var steps = Math.Abs(endY - startY) / size;
                     for (var i = 0; i < steps; i++)
                     {
-                        canvas.FillMusicFontSymbol(cx + X + ((int)(3 * Scale)), 1, startY + (i * size), MusicFontSymbol.WaveVertical);
+                        canvas.FillMusicFontSymbol(cx + X + (3 * Scale), 1, startY + (i * size), MusicFontSymbol.WaveVertical);
                     }
                 }
 
@@ -62,8 +61,8 @@ namespace AlphaTab.Rendering.Glyphs
                 {
                     canvas.BeginPath();
                     canvas.MoveTo(arrowX, endY);
-                    canvas.LineTo((int)(arrowX + arrowSize / 2), (int)(endY - arrowSize));
-                    canvas.LineTo((int)(arrowX - arrowSize / 2), (int)(endY - arrowSize));
+                    canvas.LineTo(arrowX + arrowSize / 2, endY - arrowSize);
+                    canvas.LineTo(arrowX - arrowSize / 2, endY - arrowSize);
                     canvas.ClosePath();
                     canvas.Fill();
                 }
@@ -71,8 +70,8 @@ namespace AlphaTab.Rendering.Glyphs
                 {
                     canvas.BeginPath();
                     canvas.MoveTo(arrowX, startY);
-                    canvas.LineTo((int)(arrowX + arrowSize / 2), (int)(startY + arrowSize));
-                    canvas.LineTo((int)(arrowX - arrowSize / 2), (int)(startY + arrowSize));
+                    canvas.LineTo(arrowX + arrowSize / 2, startY + arrowSize);
+                    canvas.LineTo(arrowX - arrowSize / 2, startY + arrowSize);
                     canvas.ClosePath();
                     canvas.Fill();
                 }

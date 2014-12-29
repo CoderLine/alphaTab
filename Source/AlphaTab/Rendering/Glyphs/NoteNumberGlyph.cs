@@ -22,15 +22,12 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class NoteNumberGlyph : Glyph
     {
-        public const int Padding = 0;
-
         private readonly string _noteString;
         private readonly bool _isGrace;
 
-        public NoteNumberGlyph(int x, int y, Note n, bool isGrace)
+        public NoteNumberGlyph(float x, float y, Note n, bool isGrace)
             : base(x, y)
         {
-            _isGrace = isGrace;
             _isGrace = isGrace;
             if (!n.IsTieDestination)
             {
@@ -52,19 +49,19 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
-            Width = (int)(10 * Scale);
+            Width = 10 * Scale;
         }
 
         public void CalculateWidth()
         {
-            Width = (int)(Renderer.Layout.Renderer.Canvas.MeasureText(_noteString));
+            Width = Renderer.Layout.Renderer.Canvas.MeasureText(_noteString);
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
             if (_noteString != null)
             {
-                canvas.FillText(_noteString.ToLower(), cx + X + (Padding * Scale), cy + Y);
+                canvas.FillText(_noteString.ToLower(), cx + X, cy + Y);
             }
         }
     }

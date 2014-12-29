@@ -16,7 +16,6 @@
  * License along with this library.
  */
 using AlphaTab.Audio.Model;
-using AlphaTab.Collections;
 using AlphaTab.IO;
 using AlphaTab.Model;
 
@@ -66,7 +65,7 @@ namespace AlphaTab.Audio.Generator
             {
                 denominatorIndex++;
             }
-            AddEvent(_midiFile.InfoTrack, tick, BuildMetaMessage(0x58, (byte)(timeSignatureNumerator & 0xFF), (byte)(denominatorIndex & 0xFF), 48, 8));
+            AddEvent(_midiFile.InfoTrack, tick, BuildMetaMessage(0x58, new byte[] { (byte)(timeSignatureNumerator & 0xFF), (byte)(denominatorIndex & 0xFF), 48, 8 }));
         }
 
         public void AddRest(int track, int tick, int channel)
@@ -118,21 +117,21 @@ namespace AlphaTab.Audio.Generator
         }
 
 
-        private static MidiMessage BuildMetaMessage(int metaType, params byte[] data)
+        private static MidiMessage BuildMetaMessage(int metaType, byte[] data)
         {
-            var meta = new FastList<byte>();
+            var meta = ByteBuffer.Empty();
 
-            meta.Add(0xFF);
-            meta.Add((byte)(metaType & 0xFF));
+            meta.WriteByte(0xFF);
+            meta.WriteByte((byte)(metaType & 0xFF));
 
             WriteVarInt(meta, data.Length);
 
-            meta.AddRange(data);
+            meta.Write(data, 0, data.Length);
 
             return new MidiMessage(meta.ToArray());
         }
 
-        private static void WriteVarInt(FastList<byte> data, int v)
+        private static void WriteVarInt(ByteBuffer data, int v)
         {
             var n = 0;
             var array = new byte[4];
@@ -146,21 +145,21 @@ namespace AlphaTab.Audio.Generator
             {
                 n--;
                 if (n > 0)
-                    data.Add((byte)((array[n] | 0x80) & 0xFF));
+                    data.WriteByte((byte)((array[n] | 0x80) & 0xFF));
                 else
-                    data.Add(array[n]);
+                    data.WriteByte(array[n]);
             }
         }
 
         private static MidiMessage BuildSysExMessage(byte[] data)
         {
-            var sysex = new FastList<byte>();
+            var sysex = ByteBuffer.Empty();
 
-            sysex.Add(0xF0); // status 
+            sysex.WriteByte(0xF0); // status 
             WriteVarInt(sysex, data.Length + 2); // write length of data
-            sysex.Add(0x00); // manufacturer id
-            sysex.AddRange(data); // data
-            sysex.Add(0xF7); // end of data
+            sysex.WriteByte(0x00); // manufacturer id
+            sysex.Write(data, 0, data.Length); // data
+            sysex.WriteByte(0xF7); // end of data
 
             return new MidiMessage(sysex.ToArray());
         }

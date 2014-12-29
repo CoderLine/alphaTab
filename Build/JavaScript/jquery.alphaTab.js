@@ -38,7 +38,7 @@
                 context.SetTracks(tracks, true);
             }
             else {
-                return context.getTracks();
+                return context.get_Tracks();
             }
         },
         

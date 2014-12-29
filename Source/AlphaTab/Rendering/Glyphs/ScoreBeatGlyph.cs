@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System.Runtime.CompilerServices;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Rendering.Layout;
@@ -23,7 +22,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class ScoreBeatGlyph : BeatGlyphBase, ISupportsFinalize
+    public class ScoreBeatGlyph : BeatGlyphBase
     {
         public ScoreNoteChordGlyph NoteHeads { get; set; }
         public RestGlyph RestGlyph { get; set; }
@@ -37,7 +36,7 @@ namespace AlphaTab.Rendering.Glyphs
             }
         }
 
-        public override void ApplyGlyphSpacing(int spacing)
+        public override void ApplyGlyphSpacing(float spacing)
         {
             base.ApplyGlyphSpacing(spacing);
             // TODO: we need to tell the beaming helper the position of rest beats
@@ -69,7 +68,7 @@ namespace AlphaTab.Rendering.Glyphs
                     //
                     if (Container.Beat.Dots > 0)
                     {
-                        AddGlyph(new SpacingGlyph(0, 0, (int)(5 * Scale), false));
+                        AddGlyph(new SpacingGlyph(0, 0, 5 * Scale, false));
                         for (var i = 0; i < Container.Beat.Dots; i++)
                         {
                             var group = new GlyphGroup(0, 0);
@@ -132,7 +131,7 @@ namespace AlphaTab.Rendering.Glyphs
                     //
                     if (Container.Beat.Dots > 0)
                     {
-                        AddGlyph(new SpacingGlyph(0, 0, (int)(5 * Scale), false));
+                        AddGlyph(new SpacingGlyph(0, 0, 5 * Scale, false));
                         for (var i = 0; i < Container.Beat.Dots; i++)
                         {
                             var group = new GlyphGroup(0, 0);
@@ -150,7 +149,7 @@ namespace AlphaTab.Rendering.Glyphs
             }
         }
 
-        private void CreateBeatDot(int line, int offset, GlyphGroup group)
+        private void CreateBeatDot(int line, float offset, GlyphGroup group)
         {
             var sr = (ScoreBarRenderer)Renderer;
             group.AddGlyph(new CircleGlyph(0, sr.GetScoreY(line, offset + 2), 1.5f * Scale));
@@ -163,13 +162,13 @@ namespace AlphaTab.Rendering.Glyphs
         {
             // ReSharper disable ForCanBeConvertedToForeach
             NormalKeys = new FastDictionary<int, bool>();
-            int[] normalKeyNotes = new int[] { 32, 34, 35, 36, 38, 39, 40, 41, 43, 45, 47, 48, 50, 55, 56, 58, 60, 61 };
+            var normalKeyNotes = new[] { 32, 34, 35, 36, 38, 39, 40, 41, 43, 45, 47, 48, 50, 55, 56, 58, 60, 61 };
             for (int i = 0; i < normalKeyNotes.Length; i++)
             {
                 NormalKeys[normalKeyNotes[i]] = true;
             }
             XKeys = new FastDictionary<int, bool>();
-            int[] xKeyNotes = new int[] { 31, 33, 37, 42, 44, 54, 62, 63, 64, 65, 66 };
+            var xKeyNotes = new[] { 31, 33, 37, 42, 44, 54, 62, 63, 64, 65, 66 };
             for (int i = 0; i < xKeyNotes.Length; i++)
             {
                 XKeys[xKeyNotes[i]] = true;

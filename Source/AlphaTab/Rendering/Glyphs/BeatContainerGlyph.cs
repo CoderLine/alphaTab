@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System.Runtime.CompilerServices;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
@@ -66,8 +65,8 @@ namespace AlphaTab.Rendering.Glyphs
 
         public void ApplySizes(BarSizeInfo sizes)
         {
-            int size;
-            int diff;
+            float size;
+            float diff;
 
             size = sizes.GetPreNoteSize(Beat.Start);
             diff = size - PreNotes.Width;
@@ -87,7 +86,7 @@ namespace AlphaTab.Rendering.Glyphs
             Width = CalculateWidth();
         }
 
-        private int CalculateWidth()
+        private float CalculateWidth()
         {
 #if MULTIVOICE_SUPPORT
             var index = Beat.Duration.GetIndex();
@@ -136,7 +135,7 @@ namespace AlphaTab.Rendering.Glyphs
         {
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
             // canvas.Color = new Color(200, 0, 0, 100);
             // canvas.FillRect(cx + x, cy + y + 15 * Beat.Voice.Index, width, 10);

@@ -25,7 +25,7 @@ namespace AlphaTab.Rendering.Glyphs
     /// </summary>
     public class EffectGlyph : Glyph
     {
-        protected EffectGlyph(int x, int y)
+        protected EffectGlyph(float x, float y)
             : base(x, y)
         {
         }

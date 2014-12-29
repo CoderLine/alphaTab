@@ -16,8 +16,6 @@
  * License along with this library.
  */
 
-using System.Collections.Specialized;
-
 namespace AlphaTab.IO
 {
     /// <summary>

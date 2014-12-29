@@ -344,22 +344,22 @@ namespace AlphaTab.Rendering
 
         }
 
-        public override int TopPadding
+        public override float TopPadding
         {
             get { return 0; }
         }
 
-        public override int BottomPadding
+        public override float BottomPadding
         {
             get { return 0; }
         }
 
-        protected override void PaintBackground(int cx, int cy, ICanvas canvas)
+        protected override void PaintBackground(float cx, float cy, ICanvas canvas)
         {
 
         }
 
-        public override void Paint(int cx, int cy, ICanvas canvas)
+        public override void Paint(float cx, float cy, ICanvas canvas)
         {
             base.Paint(cx, cy, canvas);
 

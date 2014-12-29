@@ -27,9 +27,9 @@ namespace AlphaTab.Rendering.Effects
             return note.Vibrato != VibratoType.None || (note.IsTieDestination && note.TieOrigin.Vibrato != VibratoType.None);
         }
 
-        public override int GetHeight(EffectBarRenderer renderer)
+        public override float GetHeight(EffectBarRenderer renderer)
         {
-            return (int)(15 * renderer.Scale);
+            return 15 * renderer.Scale;
         }
 
         public override EffectBarGlyphSizing SizingMode
@@ -39,7 +39,7 @@ namespace AlphaTab.Rendering.Effects
 
         public override EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
         {
-            return new VibratoGlyph(0, (int)(5 * renderer.Scale));
+            return new VibratoGlyph(0, 5 * renderer.Scale);
         }
     }
 }

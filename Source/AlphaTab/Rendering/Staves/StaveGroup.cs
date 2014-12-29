@@ -16,7 +16,6 @@
  * License along with this library.
  */
 using System;
-using System.Runtime.CompilerServices;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
@@ -48,17 +47,17 @@ namespace AlphaTab.Rendering.Staves
     /// </summary>
     public class StaveGroup
     {
-        private const int AccoladeLabelSpacing = 10;
+        private const float AccoladeLabelSpacing = 10;
 
         private Stave _firstStaveInAccolade;
         private Stave _lastStaveInAccolade;
 
-        public int X { get; set; }
-        public int Y { get; set; }
+        public float X { get; set; }
+        public float Y { get; set; }
         public int Index { get; set; }
 
         private bool _accoladeSpacingCalculated;
-        public int AccoladeSpacing { get; set; }
+        public float AccoladeSpacing { get; set; }
 
         /// <summary>
         /// Indicates whether this line is full or not. If the line is full the
@@ -70,7 +69,7 @@ namespace AlphaTab.Rendering.Staves
         /// <summary>
         /// The width that the content bars actually need
         /// </summary>
-        public int Width { get; set; }
+        public float Width { get; set; }
 
         public FastList<MasterBar> MasterBars { get; set; }
 
@@ -116,9 +115,9 @@ namespace AlphaTab.Rendering.Staves
                 var canvas = Layout.Renderer.Canvas;
                 var res = Layout.Renderer.RenderingResources.EffectFont;
                 canvas.Font = res;
-                for (int i = 0; i < tracks.Length; i++)
+                for (var i = 0; i < tracks.Length; i++)
                 {
-                    AccoladeSpacing = (int)Math.Max(AccoladeSpacing, canvas.MeasureText(tracks[i].ShortName));
+                    AccoladeSpacing = Math.Max(AccoladeSpacing, canvas.MeasureText(tracks[i].ShortName));
                 }
                 AccoladeSpacing += (2 * AccoladeLabelSpacing);
                 Width += AccoladeSpacing;
@@ -138,7 +137,7 @@ namespace AlphaTab.Rendering.Staves
             }
 
             // ensure same widths of new renderer
-            var realWidth = 0;
+            var realWidth = 0f;
             for (int i = 0, j = _allStaves.Count; i < j; i++)
             {
                 var s = _allStaves[i];
@@ -204,7 +203,7 @@ namespace AlphaTab.Rendering.Staves
             }
         }
 
-        public int Height
+        public float Height
         {
             get
             {
@@ -217,7 +216,7 @@ namespace AlphaTab.Rendering.Staves
             if (MasterBars.Count > 1)
             {
                 MasterBars.RemoveAt(MasterBars.Count - 1);
-                var w = 0;
+                var w = 0f;
                 for (int i = 0, j = _allStaves.Count; i < j; i++)
                 {
                     var s = _allStaves[i];
@@ -228,7 +227,7 @@ namespace AlphaTab.Rendering.Staves
             }
         }
 
-        public void ApplyBarSpacing(int spacing)
+        public void ApplyBarSpacing(float spacing)
         {
             for (int i = 0, j = _allStaves.Count; i < j; i++)
             {
@@ -237,7 +236,7 @@ namespace AlphaTab.Rendering.Staves
             Width += MasterBars.Count * spacing;
         }
 
-        public void Paint(int cx, int cy, ICanvas canvas)
+        public void Paint(float cx, float cy, ICanvas canvas)
         {
             for (int i = 0, j = _allStaves.Count; i < j; i++)
             {
@@ -285,7 +284,7 @@ namespace AlphaTab.Rendering.Staves
 
                     var acooladeX = cx + X + g.FirstStaveInAccolade.X;
 
-                    var barSize = (int)(3 * Layout.Renderer.Settings.Scale);
+                    var barSize = (3 * Layout.Renderer.Settings.Scale);
                     var barOffset = barSize;
 
                     var accoladeStart = firstStart - (barSize * 4);
@@ -329,7 +328,7 @@ namespace AlphaTab.Rendering.Staves
             for (int i = 0, j = _allStaves.Count; i < j; i++)
             {
                 _allStaves[i].X = AccoladeSpacing;
-                _allStaves[i].Y = (int)(currentY);
+                _allStaves[i].Y = (currentY);
                 _allStaves[i].FinalizeStave(scoreLayout);
                 currentY += _allStaves[i].Height;
             }
