@@ -461,6 +461,7 @@ AlphaSynth.Main.AlphaSynthWebAudioOutput.prototype = {
         this._finished = false;
         if (this._seekTime != null){
             this._startTime = ((this._context.currentTime * 1000 - this._seekTime)) | 0;
+            this._seekTime = null;
             this._pauseTime = 0;
             this._paused = false;
         }
@@ -491,6 +492,7 @@ AlphaSynth.Main.AlphaSynthWebAudioOutput.prototype = {
     Stop: function (){
         this._finished = true;
         this._paused = false;
+        this._seekTime = null;
         if (this._source != null){
             this._source.stop(0);
         }

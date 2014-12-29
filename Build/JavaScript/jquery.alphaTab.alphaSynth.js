@@ -129,8 +129,9 @@
             var padding = beatCursor.offset().left - beatBoundings.VisualBounds.X;
             var elementRight = $(context.cursorOptions.scrollElement).scrollLeft() + 
                                $(context.cursorOptions.scrollElement).width();
-            console.log((barBoundings.VisualBounds.X + barBoundings.VisualBounds.W), elementRight);
-            if( (barBoundings.VisualBounds.X + barBoundings.VisualBounds.W) >= elementRight) {
+            if( (barBoundings.VisualBounds.X + barBoundings.VisualBounds.W) >= elementRight || 
+                 barBoundings.VisualBounds.X < $(context.cursorOptions.scrollElement).scrollLeft()
+            ) {
                 var scrollLeft = padding + beatBoundings.Bounds.X + context.cursorOptions.scrollOffset;
                 context.cursorOptions.lastScroll = barBoundings.VisualBounds.X;
                 $(context.cursorOptions.scrollElement).animate({
