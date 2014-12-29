@@ -36,6 +36,12 @@
         <div id="sfInfo">Loading Soundfont <span class="progress"></span></div>
         <button class="button play" disabled="disabled" id="playPause">Play</button>
         <button class="button" disabled="disabled" id="stop">Stop</button>
+
+        <div class="button-group" id="layoutButtons">
+            <button class="button active" disabled="disabled" id="page" data-layout="page" data-scrollmode="vertical">Page</button>
+            <button class="button" disabled="disabled" id="horizontalBarwise" data-layout="horizontal" data-scrollmode="horizontal-bar">Horizontal (Barwise)</button>
+            <button class="button" disabled="disabled" id="horizontalOffscreen" data-layout="horizontal" data-scrollmode="horizontal-offscreen">Horizontal (Offscreen)</button>
+        </div>
     </div>
     <script type="text/javascript">
         var playerReady = false;
@@ -89,10 +95,12 @@
             if(!playerReady) {
                 $('#loadingInfo').show()
                 $('#controls button').attr('disabled', 'disabled');
+                $('#layoutButtons button').attr('disabled', 'disabled');
             }
             else {
                 $('#loadingInfo').hide()
                 $('#playPause').removeAttr('disabled');
+                $('#layoutButtons button').removeAttr('disabled');
                 switch(playerState) {
                     case 0: // stopped
                     $('#playPause').text('Play').removeClass('pause').addClass('play');
@@ -109,6 +117,23 @@
                 }
             }
         }     
+        
+        $('#layoutButtons button').click(function() {
+            $('#layoutButtons button').removeClass('active');
+            $(this).addClass('active');
+            
+            var layout = $(this).data('layout');
+            var scrollmode = $(this).data('scrollmode');
+            // update renderer
+            var renderer = at.alphaTab('renderer');
+            renderer.Settings.Layout.Mode = layout;
+            renderer.Invalidate();
+            
+            // update player
+            var context = at.data('alphaTab');
+            context.cursorOptions.autoScroll = scrollmode;
+            at.alphaTab('playerCursorUpdateBeat', context.cursorOptions.currentBeat);
+        });
         
         //
         // 3. Add cursors (optional)

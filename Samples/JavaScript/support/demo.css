@@ -51,3 +51,7 @@ body { font-family:Open Sans, Arial, sans-serif; background:#F5F6F7; padding:10p
 #alphaTabHorizontal .alphaTabSurface {
     margin: 0;
 }
+
+#layoutButtons { 
+    vertical-align: middle;
+}

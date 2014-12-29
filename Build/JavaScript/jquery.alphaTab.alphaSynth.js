@@ -78,6 +78,7 @@
     // updates the cursors to highlight the specified beat
     api.playerCursorUpdateBeat = function(element, context, beat) {
         if(beat == null) return;
+        context.cursorOptions.currentBeat = beat;
         
         var cache = element.data('alphaSynthCursorCache');
         if(!cache) {
@@ -104,13 +105,36 @@
             height: beatBoundings.VisualBounds.H + 'px'
         });
         
-        if(context.cursorOptions.autoScroll) {
+        if(context.cursorOptions.autoScroll == 'vertical') {
             var padding = beatCursor.offset().top - beatBoundings.VisualBounds.Y;
             var scrollTop = padding + beatBoundings.Bounds.Y + context.cursorOptions.scrollOffset;
             if(scrollTop != context.cursorOptions.lastScroll) {
                 context.cursorOptions.lastScroll = scrollTop;
                 $(context.cursorOptions.scrollElement).animate({
                     scrollTop:scrollTop + 'px'
+                }, context.cursorOptions.scrollSpeed);
+            }
+        }
+        else if(context.cursorOptions.autoScroll == 'horizontal-bar') {
+            var padding = beatCursor.offset().left - beatBoundings.VisualBounds.X;
+            if(barBoundings.VisualBounds.X != context.cursorOptions.lastScroll) {
+                var scrollLeft = padding + beatBoundings.Bounds.X + context.cursorOptions.scrollOffset;
+                context.cursorOptions.lastScroll = barBoundings.VisualBounds.X;
+                $(context.cursorOptions.scrollElement).animate({
+                    scrollLeft:scrollLeft + 'px'
+                }, context.cursorOptions.scrollSpeed);
+            }
+        }
+        else if(context.cursorOptions.autoScroll == 'horizontal-offscreen') {
+            var padding = beatCursor.offset().left - beatBoundings.VisualBounds.X;
+            var elementRight = $(context.cursorOptions.scrollElement).scrollLeft() + 
+                               $(context.cursorOptions.scrollElement).width();
+            console.log((barBoundings.VisualBounds.X + barBoundings.VisualBounds.W), elementRight);
+            if( (barBoundings.VisualBounds.X + barBoundings.VisualBounds.W) >= elementRight) {
+                var scrollLeft = padding + beatBoundings.Bounds.X + context.cursorOptions.scrollOffset;
+                context.cursorOptions.lastScroll = barBoundings.VisualBounds.X;
+                $(context.cursorOptions.scrollElement).animate({
+                    scrollLeft:scrollLeft + 'px'
                 }, context.cursorOptions.scrollSpeed);
             }
         }
@@ -127,10 +151,10 @@
         element.data('alphaSynthCursor', true);
                 
         var defaults = {
-            autoScroll: true,
+            autoScroll: 'vertical',
             scrollSpeed: 300,
             scrollOffset: -30,
-            scrollElement: 'html, body',
+            scrollElement: 'body',
             scrollAdjustment: 0,
             beatCursorWidth: 3,
             handleClick: true
