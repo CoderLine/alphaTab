@@ -738,6 +738,9 @@ AlphaTab.Platform.JavaScript.JsApi = function (element, options){
     if (!((contents==null)||(contents.length==0))){
         this.Tex(contents);
     }
+    else if (options && options.file){
+        this.Load(options.file);
+    }
     else if (this._element != null && this._element.dataset != null && !((dataset["file"]==null)||(dataset["file"].length==0))){
         this.Load(dataset["file"]);
     }

@@ -114,10 +114,15 @@ namespace AlphaTab.Platform.JavaScript
             {
                 Tex(contents);
             }
+            else if (options && options.file)
+            {
+                Load(options.file);
+            }
             else if (_element != null && _element.dataset != null && !string.IsNullOrEmpty(dataset["file"]))
             {
                 Load(dataset["file"]);
             }
+            
 
             #endregion
         }
