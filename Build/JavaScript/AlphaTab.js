@@ -8420,7 +8420,7 @@ AlphaTab.Rendering.Glyphs.AccidentalGroupGlyph.prototype = {
         // Determine Columns for accidentals
         //
         this.Glyphs.sort($CreateAnonymousDelegate(this, function (a, b){
-    return a.Y.CompareTo$$Single(b.Y);
+    return (a.Y-b.Y);
 }));
         // defines the reserved y position of the columns
         var columns = [];
