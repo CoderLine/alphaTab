@@ -51,7 +51,7 @@ namespace AlphaTab.Importer
 
                 if (score != null)
                 {
-                    success(LoadScoreFromBytes(data));
+                    success(score);
                 }
 
             }, error);
