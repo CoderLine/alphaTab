@@ -5606,7 +5606,7 @@ AlphaTab.Importer.ScoreLoader.LoadScoreAsync = function (path, success, error){
             error(e);
         }
         if (score != null){
-            success(AlphaTab.Importer.ScoreLoader.LoadScoreFromBytes(data));
+            success(score);
         }
     }, error);
 };
