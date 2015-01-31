@@ -17,7 +17,6 @@
  */
 
 using System;
-using AlphaTab.Model;
 
 namespace AlphaTab.Rendering
 {
@@ -26,7 +25,6 @@ namespace AlphaTab.Rendering
         bool IsSvg { get; }
         event Action<RenderFinishedEventArgs> RenderFinished;
         event Action PostRenderFinished;
-        void RenderMultiple(Track[] tracks);
     }
 
     public class RenderFinishedEventArgs

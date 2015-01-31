@@ -135,5 +135,11 @@ namespace AlphaTab.Platform
             return S4() + S4() + '-' + S4() + '-' + S4() + '-' +
                       S4() + '-' + S4() + S4() + S4();
         }
+
+        [JsMethod(InlineCodeExpression = "o[s]", Export = false)]
+        public static object Member(this object o, string s)
+        {
+            return null;
+        }
     }
 }

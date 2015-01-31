@@ -62,9 +62,6 @@ if (typeof ($CreateAnonymousDelegate) == 'undefined') {
     }
 }
 
-var Int32Array = Int32Array || Array;
-var Uint8Array = Uint8Array || Array;
-var Float32Array = Float32Array || Array;
 if (typeof($CreateDelegate)=='undefined'){
     if(typeof($iKey)=='undefined') var $iKey = 0;
     if(typeof($pKey)=='undefined') var $pKey = String.fromCharCode(1);
@@ -94,6 +91,9 @@ if (typeof($CreateDelegate)=='undefined'){
     }
 }
 
+var Int32Array = Int32Array || Array;
+var Uint8Array = Uint8Array || Array;
+var Float32Array = Float32Array || Array;
 function $CombineDelegates(del1,del2)
 {
     if(del1 == null)
@@ -516,6 +516,359 @@ AlphaTab.Model.TuningParser.GetTuningForText = function (str){
 };
 AlphaTab.Platform = AlphaTab.Platform || {};
 AlphaTab.Platform.JavaScript = AlphaTab.Platform.JavaScript || {};
+AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
+    this.Element = null;
+    this.CanvasElement = null;
+    this.TrackIndexes = null;
+    this.Renderer = null;
+    this.Score = null;
+    this.Element = element;
+    var dataset = this.Element.dataset;
+    // load settings
+    var settings = AlphaTab.Settings.FromJson(options);
+    // get track data to parse
+    var tracksData;
+    if (options != null && options.tracks){
+        tracksData = options.tracks;
+    }
+    else if (element != null && element.dataset != null && dataset["tracks"] != null){
+        tracksData = dataset["tracks"];
+    }
+    else {
+        tracksData = 0;
+    }
+    this.SetTracks(tracksData, false);
+    var contents = "";
+    if (element != null){
+        // get load contents
+        if (element.dataset != null && dataset["tex"] != null && element.innerText){
+            contents = (element.innerText).trim();
+            element.innerHTML = "";
+        }
+        if (settings.Engine == "html5"){
+            this.CanvasElement = document.createElement("canvas");
+        }
+        else {
+            this.CanvasElement = document.createElement("div");
+        }
+        this.CanvasElement.className = "alphaTabSurface";
+        element.appendChild(this.CanvasElement);
+    }
+    this.Renderer = this.CreateScoreRenderer(settings, options, this.CanvasElement);
+    this.Renderer.add_RenderFinished($CreateAnonymousDelegate(this, function (o){
+        this.TriggerEvent("rendered", null);
+    }));
+    this.Renderer.add_PostRenderFinished($CreateAnonymousDelegate(this, function (){
+        this.TriggerEvent("post-rendered", null);
+    }));
+    this.Renderer.add_RenderFinished($CreateAnonymousDelegate(this, function (result){
+        if (this.Renderer.get_IsSvg()){
+            this.CanvasElement.innerHTML = result.RenderResult.toString();
+            this.CanvasElement.style.width = result.Width + "px";
+            this.CanvasElement.style.height = result.Height + "px";
+        }
+    }));
+    if (!((contents==null)||(contents.length==0))){
+        this.Tex(contents);
+    }
+    else if (options && options.file){
+        this.Load(options.file);
+    }
+    else if (this.Element != null && this.Element.dataset != null && !((dataset["file"]==null)||(dataset["file"].length==0))){
+        this.Load(dataset["file"]);
+    }
+};
+AlphaTab.Platform.JavaScript.JsApiBase.prototype = {
+    SetTracks: function (tracksData, render){
+        var tracks = [];
+        // decode string
+        if (typeof(tracksData) == "string"){
+            try{
+                tracksData = JSON.parse(tracksData);
+            }
+            catch($$e1){
+                tracksData = new Int32Array([0]);
+            }
+        }
+        // decode array
+        if (typeof(tracksData) == "number"){
+            tracks.push(tracksData);
+        }
+        else if (tracksData.length){
+            for (var i = 0; i < tracksData.length; i++){
+                var value;
+                if (typeof(tracksData[i]) == "number"){
+                    value = tracksData[i];
+                }
+                else {
+                    value = AlphaTab.Platform.Std.ParseInt(tracksData[i].ToString());
+                }
+                if (value >= 0){
+                    tracks.push(value);
+                }
+            }
+        }
+        this.TrackIndexes = tracks.slice(0);
+        if (render){
+            this.Render();
+        }
+    },
+    ScoreLoaded: function (score){
+        this.Score = score;
+        this.TriggerEvent("loaded", score);
+        this.Render();
+    },
+    TriggerEvent: function (name, details){
+        if (this.Element != null){
+            var e = document.createEvent("CustomEvent");
+            e.initCustomEvent(name, false, false, details);
+            this.Element.dispatchEvent(e);
+        }
+    }
+};
+AlphaTab.Platform.JavaScript.JsWorkerApi = function (element, options){
+    AlphaTab.Platform.JavaScript.JsApiBase.call(this, element, options);
+};
+AlphaTab.Platform.JavaScript.JsWorkerApi.prototype = {
+    CreateScoreRenderer: function (settings, rawSettings, canvasElement){
+        var renderer = new AlphaTab.Platform.JavaScript.WorkerScoreRenderer(this, rawSettings);
+        renderer.add_PostRenderFinished($CreateAnonymousDelegate(this, function (){
+            this.Element.className = this.Element.className.replace(" loading", "").replace(" rendering", "");
+            this.CanvasElement.className = this.CanvasElement.className.replace(" loading", "").replace(" rendering", "");
+        }));
+        return renderer;
+    },
+    Load: function (data){
+        this.CanvasElement.className += " loading";
+        this.Element.className += " loading";
+        this.Renderer.Load(data, this.TrackIndexes);
+    },
+    Render: function (){
+        if (this.Renderer != null){
+            this.CanvasElement.className += " rendering";
+            this.Element.className += " rendering";
+            this.Renderer.RenderMultiple(this.TrackIndexes);
+        }
+    },
+    Tex: function (contents){
+        this.CanvasElement.className += " loading";
+        this.Element.className += " loading";
+        this.Renderer.Tex(contents);
+    }
+};
+$Inherit(AlphaTab.Platform.JavaScript.JsWorkerApi, AlphaTab.Platform.JavaScript.JsApiBase);
+AlphaTab.Platform.JavaScript.WorkerScoreRenderer = function (workerApi, rawSettings){
+    this._workerApi = null;
+    this._atRoot = null;
+    this._worker = null;
+    this.RenderFinished = null;
+    this.PostRenderFinished = null;
+    this._workerApi = workerApi;
+    var atRoot = rawSettings.atRoot;
+    if (atRoot != "" && !(atRoot.lastIndexOf("/")==(atRoot.length-"/".length))){
+        atRoot += "/";
+    }
+    this._atRoot = atRoot;
+    this._worker = new Worker(atRoot + "AlphaTab.worker.js");
+    var root = new Array();
+    root.push(window.location.protocol);
+    root.push("//");
+    root.push(window.location.hostname);
+    if (window.location.port){
+        root.push(":");
+        root.push(window.location.port);
+    }
+    root.push(this._atRoot);
+    this._worker.postMessage({
+        cmd: "initialize",
+        root: root.join(''),
+        settings: rawSettings
+    });
+    this._worker.addEventListener("message", $CreateDelegate(this, this.HandleWorkerMessage), false);
+};
+AlphaTab.Platform.JavaScript.WorkerScoreRenderer.prototype = {
+    get_IsSvg: function (){
+        return true;
+    },
+    Load: function (data, trackIndexes){
+        this._worker.postMessage({
+            cmd: "load",
+            data: data,
+            indexes: trackIndexes
+        });
+    },
+    HandleWorkerMessage: function (e){
+        var data = e.data;
+        var cmd = data["cmd"];
+        switch (cmd){
+            case "renderFinished":
+                this.OnRenderFinished(data["result"]);
+                break;
+            case "postRenderFinished":
+                this.OnPostRenderFinished();
+                break;
+            case "error":
+                console.error(data["exception"]);
+                break;
+            case "loaded":
+                var score = data["score"];
+                if (score){
+                var jsonConverter = new AlphaTab.Model.JsonConverter();
+                score = jsonConverter.JsObjectToScore(score);
+            }
+                this._workerApi.TriggerEvent("loaded", score);
+                break;
+        }
+    },
+    RenderMultiple: function (trackIndexes){
+        this._worker.postMessage({
+            cmd: "renderMultiple",
+            data: trackIndexes
+        });
+    },
+    add_RenderFinished: function (value){
+        this.RenderFinished = $CombineDelegates(this.RenderFinished, value);
+    },
+    remove_RenderFinished: function (value){
+        this.RenderFinished = $RemoveDelegate(this.RenderFinished, value);
+    },
+    OnRenderFinished: function (obj){
+        var handler = this.RenderFinished;
+        if (handler != null)
+            handler(obj);
+    },
+    add_PostRenderFinished: function (value){
+        this.PostRenderFinished = $CombineDelegates(this.PostRenderFinished, value);
+    },
+    remove_PostRenderFinished: function (value){
+        this.PostRenderFinished = $RemoveDelegate(this.PostRenderFinished, value);
+    },
+    OnPostRenderFinished: function (){
+        var handler = this.PostRenderFinished;
+        if (handler != null)
+            handler();
+    },
+    Tex: function (contents){
+        this._worker.postMessage({
+            cmd: "tex",
+            data: contents
+        });
+    }
+};
+AlphaTab.Platform.JavaScript.JsWorker = function (main, options){
+    this._renderer = null;
+    this._main = null;
+    this._trackIndexes = null;
+    this._includeScoreInLoadedEvent = false;
+    this.Score = null;
+    this._main = main;
+    this._includeScoreInLoadedEvent = options["scoreInLoadedEvent"];
+    this._main.addEventListener("message", $CreateDelegate(this, this.HandleMessage), false);
+    var settings = AlphaTab.Settings.FromJson(options);
+    this._renderer = new AlphaTab.Rendering.ScoreRenderer(settings, null);
+    this._renderer.add_RenderFinished($CreateAnonymousDelegate(this, function (result){
+        this._main.postMessage({
+    cmd: "renderFinished",
+    result: result
+}
+);
+    }));
+    this._renderer.add_PostRenderFinished($CreateAnonymousDelegate(this, function (){
+        this._main.postMessage({
+    cmd: "postRenderFinished"
+}
+);
+    }));
+};
+AlphaTab.Platform.JavaScript.JsWorker.prototype = {
+    get_Tracks: function (){
+        var tracks = [];
+        for (var $i4 = 0,$t4 = this._trackIndexes,$l4 = $t4.length,track = $t4[$i4]; $i4 < $l4; $i4++, track = $t4[$i4]){
+            if (track >= 0 && track < this.Score.Tracks.length){
+                tracks.push(this.Score.Tracks[track]);
+            }
+        }
+        if (tracks.length == 0 && this.Score.Tracks.length > 0){
+            tracks.push(this.Score.Tracks[0]);
+        }
+        return tracks.slice(0);
+    },
+    HandleMessage: function (e){
+        var data = e.data;
+        var cmd = data["cmd"];
+        switch (cmd){
+            case "load":
+                this.Load(data["data"], data["indexes"]);
+                break;
+            case "tex":
+                this.Tex(data["data"]);
+                break;
+            case "renderMultiple":
+                this.RenderMultiple(data["data"]);
+                break;
+        }
+    },
+    RenderMultiple: function (trackIndexes){
+        this._trackIndexes = this._trackIndexes;
+        this.Render();
+    },
+    Tex: function (contents){
+        try{
+            var parser = new AlphaTab.Importer.AlphaTexImporter();
+            var data = AlphaTab.IO.ByteBuffer.FromBuffer(AlphaTab.Platform.Std.StringToByteArray(contents));
+            parser.Init(data);
+            this.ScoreLoaded(parser.ReadScore());
+        }
+        catch(e){
+            this.Error(e);
+        }
+    },
+    Load: function (data, trackIndexes){
+        try{
+            this._trackIndexes = trackIndexes;
+            if ((data instanceof ArrayBuffer)){
+                this.ScoreLoaded(AlphaTab.Importer.ScoreLoader.LoadScoreFromBytes(new Uint8Array(data)));
+            }
+            else if ((data instanceof Uint8Array)){
+                this.ScoreLoaded(AlphaTab.Importer.ScoreLoader.LoadScoreFromBytes(data));
+            }
+            else if (typeof(data) == "string"){
+                AlphaTab.Importer.ScoreLoader.LoadScoreAsync(data, $CreateDelegate(this, this.ScoreLoaded), $CreateDelegate(this, this.Error));
+            }
+        }
+        catch(e){
+            this.Error(e);
+        }
+    },
+    Error: function (e){
+        this._main.postMessage({
+    cmd: "error",
+    exception: e
+}
+);
+    },
+    ScoreLoaded: function (score){
+        this.Score = score;
+        if (this._includeScoreInLoadedEvent){
+            var json = new AlphaTab.Model.JsonConverter();
+            this._main.postMessage({
+    cmd: "loaded",
+    score: json.ScoreToJsObject(score)
+}
+);
+        }
+        else {
+            this._main.postMessage({
+    cmd: "loaded"
+}
+);
+        }
+        this.Render();
+    },
+    Render: function (){
+        this._renderer.RenderMultiple(this.get_Tracks());
+    }
+};
 AlphaTab.Platform.JavaScript.Html5Canvas = function (dom){
     this._canvas = null;
     this._context = null;
@@ -684,71 +1037,12 @@ AlphaTab.Platform.JavaScript.Html5Canvas.prototype = {
     }
 };
 AlphaTab.Platform.JavaScript.JsApi = function (element, options){
-    this._element = null;
-    this._canvasElement = null;
-    this._tracks = null;
-    this.Renderer = null;
-    this.Score = null;
-    this._element = element;
-    var dataset = this._element.dataset;
-    // load settings
-    var settings = AlphaTab.Settings.FromJson(options);
-    // get track data to parse
-    var tracksData;
-    if (options != null && options.tracks){
-        tracksData = options.tracks;
-    }
-    else if (element != null && element.dataset != null && dataset["tracks"] != null){
-        tracksData = dataset["tracks"];
-    }
-    else {
-        tracksData = 0;
-    }
-    this.SetTracks(tracksData, false);
-    var contents = "";
-    if (element != null){
-        // get load contents
-        if (element.innerText){
-            contents = (element.innerText).trim();
-        }
-        element.innerHTML = "";
-        if (settings.Engine == "html5"){
-            this._canvasElement = document.createElement("canvas");
-        }
-        else {
-            this._canvasElement = document.createElement("div");
-        }
-        this._canvasElement.className = "alphaTabSurface";
-        element.appendChild(this._canvasElement);
-    }
-    this.Renderer = new AlphaTab.Rendering.ScoreRenderer(settings, this._canvasElement);
-    this.Renderer.add_RenderFinished($CreateAnonymousDelegate(this, function (o){
-        this.TriggerEvent("rendered", null);
-    }));
-    this.Renderer.add_PostRenderFinished($CreateAnonymousDelegate(this, function (){
-        this.TriggerEvent("post-rendered", null);
-    }));
-    this.Renderer.add_RenderFinished($CreateAnonymousDelegate(this, function (result){
-        if (this.Renderer.get_IsSvg()){
-            this._canvasElement.innerHTML = result.RenderResult.toString();
-            this._canvasElement.style.width = result.Width + "px";
-            this._canvasElement.style.height = result.Height + "px";
-        }
-    }));
-    if (!((contents==null)||(contents.length==0))){
-        this.Tex(contents);
-    }
-    else if (options && options.file){
-        this.Load(options.file);
-    }
-    else if (this._element != null && this._element.dataset != null && !((dataset["file"]==null)||(dataset["file"].length==0))){
-        this.Load(dataset["file"]);
-    }
+    AlphaTab.Platform.JavaScript.JsApiBase.call(this, element, options);
 };
 AlphaTab.Platform.JavaScript.JsApi.prototype = {
     get_Tracks: function (){
         var tracks = [];
-        for (var $i4 = 0,$t4 = this._tracks,$l4 = $t4.length,track = $t4[$i4]; $i4 < $l4; $i4++, track = $t4[$i4]){
+        for (var $i5 = 0,$t5 = this.TrackIndexes,$l5 = $t5.length,track = $t5[$i5]; $i5 < $l5; $i5++, track = $t5[$i5]){
             if (track >= 0 && track < this.Score.Tracks.length){
                 tracks.push(this.Score.Tracks[track]);
             }
@@ -757,6 +1051,9 @@ AlphaTab.Platform.JavaScript.JsApi.prototype = {
             tracks.push(this.Score.Tracks[0]);
         }
         return tracks.slice(0);
+    },
+    CreateScoreRenderer: function (settings, rawSettings, canvasElement){
+        return new AlphaTab.Rendering.ScoreRenderer(settings, canvasElement);
     },
     Load: function (data){
         try{
@@ -787,58 +1084,13 @@ AlphaTab.Platform.JavaScript.JsApi.prototype = {
             console.error(e);
         }
     },
-    SetTracks: function (tracksData, render){
-        var tracks = [];
-        // decode string
-        if (typeof(tracksData) == "string"){
-            try{
-                tracksData = JSON.parse(tracksData);
-            }
-            catch($$e1){
-                tracksData = new Int32Array([0]);
-            }
-        }
-        // decode array
-        if (typeof(tracksData) == "number"){
-            tracks.push(tracksData);
-        }
-        else if (tracksData.length){
-            for (var i = 0; i < tracksData.length; i++){
-                var value;
-                if (typeof(tracksData[i]) == "number"){
-                    value = tracksData[i];
-                }
-                else {
-                    value = AlphaTab.Platform.Std.ParseInt(tracksData[i].ToString());
-                }
-                if (value >= 0){
-                    tracks.push(value);
-                }
-            }
-        }
-        this._tracks = tracks.slice(0);
-        if (render){
-            this.Render();
-        }
-    },
-    ScoreLoaded: function (score){
-        this.Score = score;
-        this.TriggerEvent("loaded", score);
-        this.Render();
-    },
-    TriggerEvent: function (name, details){
-        if (this._element != null){
-            var e = document.createEvent("CustomEvent");
-            e.initCustomEvent(name, false, false, details);
-            this._element.dispatchEvent(e);
-        }
-    },
     Render: function (){
         if (this.Renderer != null){
             this.Renderer.RenderMultiple(this.get_Tracks());
         }
     }
 };
+$Inherit(AlphaTab.Platform.JavaScript.JsApi, AlphaTab.Platform.JavaScript.JsApiBase);
 AlphaTab.Platform.JavaScript.JsFileLoader = function (){
 };
 AlphaTab.Platform.JavaScript.JsFileLoader.prototype = {
@@ -981,9 +1233,9 @@ AlphaTab.Platform.Std.LoadXml = function (xml){
 AlphaTab.Platform.Std.GetNodeValue = function (n){
     if (n.get_NodeType() == 1 || n.get_NodeType() == 9){
         var txt = new Array();
-        var $it4 = n.get_ChildNodes().GetEnumerator();
-        while ($it4.MoveNext()){
-            var childNode = $it4.get_Current();
+        var $it5 = n.get_ChildNodes().GetEnumerator();
+        while ($it5.MoveNext()){
+            var childNode = $it5.get_Current();
             txt.push(AlphaTab.Platform.Std.GetNodeValue(childNode));
         }
         return txt.join('').trim();
@@ -1088,7 +1340,7 @@ AlphaTab.Settings.FromJson = function (json){
                 settings.Layout.Mode = json.layout.mode;
             if (json.layout.additionalSettings){
                 var keys = Object.keys(json.layout.additionalSettings);
-                for (var $i6 = 0,$l6 = keys.length,key = keys[$i6]; $i6 < $l6; $i6++, key = keys[$i6]){
+                for (var $i7 = 0,$l7 = keys.length,key = keys[$i7]; $i7 < $l7; $i7++, key = keys[$i7]){
                     settings.Layout.AdditionalSettings[key] = json.layout.additionalSettings[key];
                 }
             }
@@ -1097,7 +1349,7 @@ AlphaTab.Settings.FromJson = function (json){
     if ("staves"in json){
         settings.Staves = [];
         var keys = Object.keys(json.staves);
-        for (var $i7 = 0,$l7 = keys.length,key = keys[$i7]; $i7 < $l7; $i7++, key = keys[$i7]){
+        for (var $i8 = 0,$l8 = keys.length,key = keys[$i8]; $i8 < $l8; $i8++, key = keys[$i8]){
             var val = json.staves[key];
             if (typeof(val) == "string"){
                 settings.Staves.push(new AlphaTab.StaveSettings(val));
@@ -1107,7 +1359,7 @@ AlphaTab.Settings.FromJson = function (json){
                     var staveSettings = new AlphaTab.StaveSettings(val.id);
                     if (val.additionalSettings){
                         var keys2 = Object.keys(val.additionalSettings);
-                        for (var $i8 = 0,$l8 = keys2.length,key2 = keys2[$i8]; $i8 < $l8; $i8++, key2 = keys2[$i8]){
+                        for (var $i9 = 0,$l9 = keys2.length,key2 = keys2[$i9]; $i9 < $l9; $i9++, key2 = keys2[$i9]){
                             staveSettings.AdditionalSettings[key2] = val.additionalSettings[key2];
                         }
                     }
@@ -4520,9 +4772,9 @@ AlphaTab.Importer.GpxParser.prototype = {
         // - after that we need to join up the information. 
         if (root.get_LocalName() == "GPIF"){
             this.Score = new AlphaTab.Model.Score();
-            var $it8 = root.get_ChildNodes().GetEnumerator();
-            while ($it8.MoveNext()){
-                var n = $it8.get_Current();
+            var $it9 = root.get_ChildNodes().GetEnumerator();
+            while ($it9.MoveNext()){
+                var n = $it9.get_Current();
                 if (n.get_NodeType() == 1){
                     switch (n.get_LocalName()){
                         case "Score":
@@ -4562,9 +4814,9 @@ AlphaTab.Importer.GpxParser.prototype = {
         this.BuildModel();
     },
     ParseScoreNode: function (element){
-        var $it9 = element.get_ChildNodes().GetEnumerator();
-        while ($it9.MoveNext()){
-            var c = $it9.get_Current();
+        var $it10 = element.get_ChildNodes().GetEnumerator();
+        while ($it10.MoveNext()){
+            var c = $it10.get_Current();
             if (c.get_NodeType() == 1){
                 switch (c.get_LocalName()){
                     case "Title":
@@ -4602,9 +4854,9 @@ AlphaTab.Importer.GpxParser.prototype = {
         }
     },
     ParseMasterTrackNode: function (node){
-        var $it10 = node.get_ChildNodes().GetEnumerator();
-        while ($it10.MoveNext()){
-            var c = $it10.get_Current();
+        var $it11 = node.get_ChildNodes().GetEnumerator();
+        while ($it11.MoveNext()){
+            var c = $it11.get_Current();
             if (c.get_NodeType() == 1){
                 switch (c.get_LocalName()){
                     case "Automations":
@@ -4618,9 +4870,9 @@ AlphaTab.Importer.GpxParser.prototype = {
         }
     },
     ParseAutomations: function (node){
-        var $it11 = node.get_ChildNodes().GetEnumerator();
-        while ($it11.MoveNext()){
-            var c = $it11.get_Current();
+        var $it12 = node.get_ChildNodes().GetEnumerator();
+        while ($it12.MoveNext()){
+            var c = $it12.get_Current();
             if (c.get_NodeType() == 1){
                 switch (c.get_LocalName()){
                     case "Automation":
@@ -4638,9 +4890,9 @@ AlphaTab.Importer.GpxParser.prototype = {
         var value = 0;
         var reference = 0;
         var text = null;
-        var $it12 = node.get_ChildNodes().GetEnumerator();
-        while ($it12.MoveNext()){
-            var c = $it12.get_Current();
+        var $it13 = node.get_ChildNodes().GetEnumerator();
+        while ($it13.MoveNext()){
+            var c = $it13.get_Current();
             if (c.get_NodeType() == 1){
                 switch (c.get_LocalName()){
                     case "Type":
@@ -4685,9 +4937,9 @@ AlphaTab.Importer.GpxParser.prototype = {
         }
     },
     ParseTracksNode: function (node){
-        var $it13 = node.get_ChildNodes().GetEnumerator();
-        while ($it13.MoveNext()){
-            var c = $it13.get_Current();
+        var $it14 = node.get_ChildNodes().GetEnumerator();
+        while ($it14.MoveNext()){
+            var c = $it14.get_Current();
             if (c.get_NodeType() == 1){
                 switch (c.get_LocalName()){
                     case "Track":
@@ -4700,9 +4952,9 @@ AlphaTab.Importer.GpxParser.prototype = {
     ParseTrack: function (node){
         var track = new AlphaTab.Model.Track();
         var trackId = node.get_Attributes().get_ItemOf$$String("id").get_Value();
-        var $it14 = node.get_ChildNodes().GetEnumerator();
-        while ($it14.MoveNext()){
-            var c = $it14.get_Current();
+        var $it15 = node.get_ChildNodes().GetEnumerator();
+        while ($it15.MoveNext()){
+            var c = $it15.get_Current();
             if (c.get_NodeType() == 1){
                 switch (c.get_LocalName()){
                     case "Name":
@@ -4729,9 +4981,9 @@ AlphaTab.Importer.GpxParser.prototype = {
     },
     ParseDiagramCollection: function (track, node){
         var items = this.FindChildElement(node, "Items");
-        var $it15 = items.get_ChildNodes().GetEnumerator();
-        while ($it15.MoveNext()){
-            var c = $it15.get_Current();
+        var $it16 = items.get_ChildNodes().GetEnumerator();
+        while ($it16.MoveNext()){
+            var c = $it16.get_Current();
             if (c.get_NodeType() == 1){
                 switch (c.get_LocalName()){
                     case "Item":
@@ -4748,9 +5000,9 @@ AlphaTab.Importer.GpxParser.prototype = {
         track.Chords[chordId] = chord;
     },
     FindChildElement: function (node, name){
-        var $it16 = node.get_ChildNodes().GetEnumerator();
-        while ($it16.MoveNext()){
-            var c = $it16.get_Current();
+        var $it17 = node.get_ChildNodes().GetEnumerator();
+        while ($it17.MoveNext()){
+            var c = $it17.get_Current();
             if (c.get_NodeType() == 1 && c.get_LocalName() == name){
                 return c;
             }
@@ -4758,9 +5010,9 @@ AlphaTab.Importer.GpxParser.prototype = {
         return null;
     },
     ParseTrackProperties: function (track, node){
-        var $it17 = node.get_ChildNodes().GetEnumerator();
-        while ($it17.MoveNext()){
-            var c = $it17.get_Current();
+        var $it18 = node.get_ChildNodes().GetEnumerator();
+        while ($it18.MoveNext()){
+            var c = $it18.get_Current();
             if (c.get_NodeType() == 1){
                 switch (c.get_LocalName()){
                     case "Property":
@@ -4799,9 +5051,9 @@ AlphaTab.Importer.GpxParser.prototype = {
         track.IsPercussion = (e.get_Attributes().get_ItemOf$$String("table") != null && e.get_Attributes().get_ItemOf$$String("table").get_Value() == "Percussion");
     },
     ParseMasterBarsNode: function (node){
-        var $it18 = node.get_ChildNodes().GetEnumerator();
-        while ($it18.MoveNext()){
-            var c = $it18.get_Current();
+        var $it19 = node.get_ChildNodes().GetEnumerator();
+        while ($it19.MoveNext()){
+            var c = $it19.get_Current();
             if (c.get_NodeType() == 1){
                 switch (c.get_LocalName()){
                     case "MasterBar":
@@ -4813,9 +5065,9 @@ AlphaTab.Importer.GpxParser.prototype = {
     },
     ParseMasterBar: function (node){
         var masterBar = new AlphaTab.Model.MasterBar();
-        var $it19 = node.get_ChildNodes().GetEnumerator();
-        while ($it19.MoveNext()){
-            var c = $it19.get_Current();
+        var $it20 = node.get_ChildNodes().GetEnumerator();
+        while ($it20.MoveNext()){
+            var c = $it20.get_Current();
             if (c.get_NodeType() == 1){
                 var e = c;
                 switch (c.get_LocalName()){
@@ -4885,9 +5137,9 @@ AlphaTab.Importer.GpxParser.prototype = {
         this._masterBars.push(masterBar);
     },
     ParseBars: function (node){
-        var $it20 = node.get_ChildNodes().GetEnumerator();
-        while ($it20.MoveNext()){
-            var c = $it20.get_Current();
+        var $it21 = node.get_ChildNodes().GetEnumerator();
+        while ($it21.MoveNext()){
+            var c = $it21.get_Current();
             if (c.get_NodeType() == 1){
                 switch (c.get_LocalName()){
                     case "Bar":
@@ -4900,9 +5152,9 @@ AlphaTab.Importer.GpxParser.prototype = {
     ParseBar: function (node){
         var bar = new AlphaTab.Model.Bar();
         var barId = node.get_Attributes().get_ItemOf$$String("id").get_Value();
-        var $it21 = node.get_ChildNodes().GetEnumerator();
-        while ($it21.MoveNext()){
-            var c = $it21.get_Current();
+        var $it22 = node.get_ChildNodes().GetEnumerator();
+        while ($it22.MoveNext()){
+            var c = $it22.get_Current();
             if (c.get_NodeType() == 1){
                 switch (c.get_LocalName()){
                     case "Voices":
@@ -4933,9 +5185,9 @@ AlphaTab.Importer.GpxParser.prototype = {
         this._barsById[barId] = bar;
     },
     ParseVoices: function (node){
-        var $it22 = node.get_ChildNodes().GetEnumerator();
-        while ($it22.MoveNext()){
-            var c = $it22.get_Current();
+        var $it23 = node.get_ChildNodes().GetEnumerator();
+        while ($it23.MoveNext()){
+            var c = $it23.get_Current();
             if (c.get_NodeType() == 1){
                 switch (c.get_LocalName()){
                     case "Voice":
@@ -4948,9 +5200,9 @@ AlphaTab.Importer.GpxParser.prototype = {
     ParseVoice: function (node){
         var voice = new AlphaTab.Model.Voice();
         var voiceId = node.get_Attributes().get_ItemOf$$String("id").get_Value();
-        var $it23 = node.get_ChildNodes().GetEnumerator();
-        while ($it23.MoveNext()){
-            var c = $it23.get_Current();
+        var $it24 = node.get_ChildNodes().GetEnumerator();
+        while ($it24.MoveNext()){
+            var c = $it24.get_Current();
             if (c.get_NodeType() == 1){
                 switch (c.get_LocalName()){
                     case "Beats":
@@ -4962,9 +5214,9 @@ AlphaTab.Importer.GpxParser.prototype = {
         this._voiceById[voiceId] = voice;
     },
     ParseBeats: function (node){
-        var $it24 = node.get_ChildNodes().GetEnumerator();
-        while ($it24.MoveNext()){
-            var c = $it24.get_Current();
+        var $it25 = node.get_ChildNodes().GetEnumerator();
+        while ($it25.MoveNext()){
+            var c = $it25.get_Current();
             if (c.get_NodeType() == 1){
                 switch (c.get_LocalName()){
                     case "Beat":
@@ -4977,9 +5229,9 @@ AlphaTab.Importer.GpxParser.prototype = {
     ParseBeat: function (node){
         var beat = new AlphaTab.Model.Beat();
         var beatId = node.get_Attributes().get_ItemOf$$String("id").get_Value();
-        var $it25 = node.get_ChildNodes().GetEnumerator();
-        while ($it25.MoveNext()){
-            var c = $it25.get_Current();
+        var $it26 = node.get_ChildNodes().GetEnumerator();
+        while ($it26.MoveNext()){
+            var c = $it26.get_Current();
             if (c.get_NodeType() == 1){
                 var e = c;
                 switch (c.get_LocalName()){
@@ -5084,9 +5336,9 @@ AlphaTab.Importer.GpxParser.prototype = {
         var whammyMiddleOffset1 = null;
         var whammyMiddleOffset2 = null;
         var whammyDestination = null;
-        var $it26 = node.get_ChildNodes().GetEnumerator();
-        while ($it26.MoveNext()){
-            var c = $it26.get_Current();
+        var $it27 = node.get_ChildNodes().GetEnumerator();
+        while ($it27.MoveNext()){
+            var c = $it27.get_Current();
             if (c.get_NodeType() == 1){
                 var e = c;
                 switch (c.get_LocalName()){
@@ -5186,9 +5438,9 @@ AlphaTab.Importer.GpxParser.prototype = {
         }
     },
     ParseNotes: function (node){
-        var $it27 = node.get_ChildNodes().GetEnumerator();
-        while ($it27.MoveNext()){
-            var c = $it27.get_Current();
+        var $it28 = node.get_ChildNodes().GetEnumerator();
+        while ($it28.MoveNext()){
+            var c = $it28.get_Current();
             if (c.get_NodeType() == 1){
                 switch (c.get_LocalName()){
                     case "Note":
@@ -5201,9 +5453,9 @@ AlphaTab.Importer.GpxParser.prototype = {
     ParseNote: function (node){
         var note = new AlphaTab.Model.Note();
         var noteId = node.get_Attributes().get_ItemOf$$String("id").get_Value();
-        var $it28 = node.get_ChildNodes().GetEnumerator();
-        while ($it28.MoveNext()){
-            var c = $it28.get_Current();
+        var $it29 = node.get_ChildNodes().GetEnumerator();
+        while ($it29.MoveNext()){
+            var c = $it29.get_Current();
             if (c.get_NodeType() == 1){
                 var e = c;
                 switch (c.get_LocalName()){
@@ -5261,9 +5513,9 @@ AlphaTab.Importer.GpxParser.prototype = {
         var bendMiddleOffset1 = null;
         var bendMiddleOffset2 = null;
         var bendDestination = null;
-        var $it29 = node.get_ChildNodes().GetEnumerator();
-        while ($it29.MoveNext()){
-            var c = $it29.get_Current();
+        var $it30 = node.get_ChildNodes().GetEnumerator();
+        while ($it30.MoveNext()){
+            var c = $it30.get_Current();
             if (c.get_NodeType() == 1){
                 var e = c;
                 switch (c.get_LocalName()){
@@ -5402,9 +5654,9 @@ AlphaTab.Importer.GpxParser.prototype = {
         }
     },
     ParseRhythms: function (node){
-        var $it30 = node.get_ChildNodes().GetEnumerator();
-        while ($it30.MoveNext()){
-            var c = $it30.get_Current();
+        var $it31 = node.get_ChildNodes().GetEnumerator();
+        while ($it31.MoveNext()){
+            var c = $it31.get_Current();
             if (c.get_NodeType() == 1){
                 switch (c.get_LocalName()){
                     case "Rhythm":
@@ -5417,9 +5669,9 @@ AlphaTab.Importer.GpxParser.prototype = {
     ParseRhythm: function (node){
         var rhythm = new AlphaTab.Importer.GpxRhythm();
         var rhythmId = node.get_Attributes().get_ItemOf$$String("id").get_Value();
-        var $it31 = node.get_ChildNodes().GetEnumerator();
-        while ($it31.MoveNext()){
-            var c = $it31.get_Current();
+        var $it32 = node.get_ChildNodes().GetEnumerator();
+        while ($it32.MoveNext()){
+            var c = $it32.get_Current();
             if (c.get_NodeType() == 1){
                 var e = c;
                 switch (c.get_LocalName()){
@@ -5465,7 +5717,7 @@ AlphaTab.Importer.GpxParser.prototype = {
     },
     BuildModel: function (){
         // build beats
-        for (var $i33 = 0,$t33 = Object.keys(this._beatById),$l33 = $t33.length,beatId = $t33[$i33]; $i33 < $l33; $i33++, beatId = $t33[$i33]){
+        for (var $i34 = 0,$t34 = Object.keys(this._beatById),$l34 = $t34.length,beatId = $t34[$i34]; $i34 < $l34; $i34++, beatId = $t34[$i34]){
             var beat = this._beatById[beatId];
             var rhythmId = this._rhythmOfBeat[beatId];
             var rhythm = this._rhythmById[rhythmId];
@@ -5476,7 +5728,7 @@ AlphaTab.Importer.GpxParser.prototype = {
             beat.TupletDenominator = rhythm.TupletDenominator;
             // add notes to beat
             if (this._notesOfBeat.hasOwnProperty(beatId)){
-                for (var $i34 = 0,$t34 = this._notesOfBeat[beatId],$l34 = $t34.length,noteId = $t34[$i34]; $i34 < $l34; $i34++, noteId = $t34[$i34]){
+                for (var $i35 = 0,$t35 = this._notesOfBeat[beatId],$l35 = $t35.length,noteId = $t35[$i35]; $i35 < $l35; $i35++, noteId = $t35[$i35]){
                     if (noteId != "-1"){
                         beat.AddNote(this._noteById[noteId]);
                         if (this._tappedNotes.hasOwnProperty(noteId)){
@@ -5487,11 +5739,11 @@ AlphaTab.Importer.GpxParser.prototype = {
             }
         }
         // build voices
-        for (var $i35 = 0,$t35 = Object.keys(this._voiceById),$l35 = $t35.length,voiceId = $t35[$i35]; $i35 < $l35; $i35++, voiceId = $t35[$i35]){
+        for (var $i36 = 0,$t36 = Object.keys(this._voiceById),$l36 = $t36.length,voiceId = $t36[$i36]; $i36 < $l36; $i36++, voiceId = $t36[$i36]){
             var voice = this._voiceById[voiceId];
             if (this._beatsOfVoice.hasOwnProperty(voiceId)){
                 // add beats to voices
-                for (var $i36 = 0,$t36 = this._beatsOfVoice[voiceId],$l36 = $t36.length,beatId = $t36[$i36]; $i36 < $l36; $i36++, beatId = $t36[$i36]){
+                for (var $i37 = 0,$t37 = this._beatsOfVoice[voiceId],$l37 = $t37.length,beatId = $t37[$i37]; $i37 < $l37; $i37++, beatId = $t37[$i37]){
                     if (beatId != "-1"){
                         // important! we clone the beat because beats get reused
                         // in gp6, our model needs to have unique beats.
@@ -5501,11 +5753,11 @@ AlphaTab.Importer.GpxParser.prototype = {
             }
         }
         // build bars
-        for (var $i37 = 0,$t37 = Object.keys(this._barsById),$l37 = $t37.length,barId = $t37[$i37]; $i37 < $l37; $i37++, barId = $t37[$i37]){
+        for (var $i38 = 0,$t38 = Object.keys(this._barsById),$l38 = $t38.length,barId = $t38[$i38]; $i38 < $l38; $i38++, barId = $t38[$i38]){
             var bar = this._barsById[barId];
             if (this._voicesOfBar.hasOwnProperty(barId)){
                 // add voices to bars
-                for (var $i38 = 0,$t38 = this._voicesOfBar[barId],$l38 = $t38.length,voiceId = $t38[$i38]; $i38 < $l38; $i38++, voiceId = $t38[$i38]){
+                for (var $i39 = 0,$t39 = this._voicesOfBar[barId],$l39 = $t39.length,voiceId = $t39[$i39]; $i39 < $l39; $i39++, voiceId = $t39[$i39]){
                     if (voiceId != "-1"){
                         bar.AddVoice(this._voiceById[voiceId]);
                     }
@@ -5523,7 +5775,7 @@ AlphaTab.Importer.GpxParser.prototype = {
         }
         // build tracks (not all, only those used by the score)
         var trackIndex = 0;
-        for (var $i39 = 0,$t39 = this._tracksMapping,$l39 = $t39.length,trackId = $t39[$i39]; $i39 < $l39; $i39++, trackId = $t39[$i39]){
+        for (var $i40 = 0,$t40 = this._tracksMapping,$l40 = $t40.length,trackId = $t40[$i40]; $i40 < $l40; $i40++, trackId = $t40[$i40]){
             var track = this._tracksById[trackId];
             this.Score.AddTrack(track);
             // iterate all bar definitions for the masterbars
@@ -5538,7 +5790,7 @@ AlphaTab.Importer.GpxParser.prototype = {
             trackIndex++;
         }
         // build automations
-        for (var $i40 = 0,$t40 = Object.keys(this._automations),$l40 = $t40.length,barId = $t40[$i40]; $i40 < $l40; $i40++, barId = $t40[$i40]){
+        for (var $i41 = 0,$t41 = Object.keys(this._automations),$l41 = $t41.length,barId = $t41[$i41]; $i41 < $l41; $i41++, barId = $t41[$i41]){
             var bar = this._barsById[barId];
             for (var i = 0,j = bar.Voices.length; i < j; i++){
                 var v = bar.Voices[i];
@@ -5556,7 +5808,7 @@ AlphaTab.Importer.GpxParser.prototype = {
             this.Score.AddMasterBar(masterBar);
         }
         // build automations
-        for (var $i41 = 0,$t41 = Object.keys(this._automations),$l41 = $t41.length,barId = $t41[$i41]; $i41 < $l41; $i41++, barId = $t41[$i41]){
+        for (var $i42 = 0,$t42 = Object.keys(this._automations),$l42 = $t42.length,barId = $t42[$i42]; $i42 < $l42; $i42++, barId = $t42[$i42]){
             var automations = this._automations[barId];
             var bar = this._barsById[barId];
             for (var i = 0,j = automations.length; i < j; i++){
@@ -5619,7 +5871,7 @@ AlphaTab.Importer.ScoreLoader.LoadScoreFromBytes = function (data){
     var importers = AlphaTab.Importer.ScoreImporter.BuildImporters();
     var score = null;
     var bb = AlphaTab.IO.ByteBuffer.FromBuffer(data);
-    for (var $i42 = 0,$l42 = importers.length,importer = importers[$i42]; $i42 < $l42; $i42++, importer = importers[$i42]){
+    for (var $i43 = 0,$l43 = importers.length,importer = importers[$i43]; $i43 < $l43; $i43++, importer = importers[$i43]){
         bb.Reset();
         try{
             importer.Init(bb);
@@ -7670,7 +7922,7 @@ AlphaTab.Rendering.EffectBarRenderer.prototype = {
                 prevGlyph = prevRenderer._effectGlyphs[0][prevRenderer._lastBeat.Index];
             }
         }
-        for (var $i43 = 0,$t43 = Object.keys(this._effectGlyphs[0]),$l43 = $t43.length,key = $t43[$i43]; $i43 < $l43; $i43++, key = $t43[$i43]){
+        for (var $i44 = 0,$t44 = Object.keys(this._effectGlyphs[0]),$l44 = $t44.length,key = $t44[$i44]; $i44 < $l44; $i44++, key = $t44[$i44]){
             var beatIndex = AlphaTab.Platform.Std.ParseInt(key);
             var effect = this._effectGlyphs[0][beatIndex];
             this.AlignGlyph(this._info.get_SizingMode(), beatIndex, 0, prevGlyph);
@@ -9041,11 +9293,11 @@ AlphaTab.Rendering.Glyphs.DynamicsGlyph.prototype = {
                 return;
         }
         var glyphWidth = 0;
-        for (var $i44 = 0,$l44 = glyphs.length,g = glyphs[$i44]; $i44 < $l44; $i44++, g = glyphs[$i44]){
+        for (var $i45 = 0,$l45 = glyphs.length,g = glyphs[$i45]; $i45 < $l45; $i45++, g = glyphs[$i45]){
             glyphWidth += g.Width;
         }
         var startX = (this.Width - glyphWidth) / 2;
-        for (var $i45 = 0,$l45 = glyphs.length,g = glyphs[$i45]; $i45 < $l45; $i45++, g = glyphs[$i45]){
+        for (var $i46 = 0,$l46 = glyphs.length,g = glyphs[$i46]; $i46 < $l46; $i46++, g = glyphs[$i46]){
             g.X = startX;
             g.Y = 0;
             g.Renderer = this.Renderer;

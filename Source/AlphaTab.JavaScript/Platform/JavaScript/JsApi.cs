@@ -15,128 +15,27 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
 using System;
 using AlphaTab.Collections;
 using AlphaTab.Importer;
 using AlphaTab.IO;
 using AlphaTab.Model;
-using AlphaTab.Platform.Svg;
 using AlphaTab.Rendering;
 using SharpKit.Html;
 using SharpKit.JavaScript;
 
 namespace AlphaTab.Platform.JavaScript
 {
-    public class JsApi : HtmlContext
+    public class JsApi : JsApiBase
     {
-        private readonly HtmlElement _element;
-        private readonly HtmlElement _canvasElement;
-        private int[] _tracks;
-
-        public JsApi(HtmlElement element, dynamic options)
-        {
-            _element = element;
-            dynamic dataset = _element.dataset;
-
-            // load settings
-            Settings settings = Settings.FromJson(options);
-
-            #region build tracks array
-
-            // get track data to parse
-            dynamic tracksData;
-            if (options != null && options.tracks)
-            {
-                tracksData = options.tracks;
-            }
-            else if (element != null && element.dataset != null && dataset["tracks"] != null)
-            {
-                tracksData = dataset["tracks"];
-            }
-            else
-            {
-                tracksData = 0;
-            }
-
-            SetTracks(tracksData, false);
-
-            #endregion
-
-            string contents = "";
-            if (element != null)
-            {
-                // get load contents
-
-                if (element.innerText.As<JsBoolean>())
-                {
-                    contents = (element.innerText.As<string>()).Trim();
-                }
-                element.innerHTML = "";
-
-                #region Create context elements (wrapper, canvas etc)
-
-                if (settings.Engine == "html5")
-                {
-                    _canvasElement = (HtmlElement)document.createElement("canvas");
-                }
-                else
-                {
-                    _canvasElement = (HtmlElement)document.createElement("div");
-                }
-
-                _canvasElement.className = "alphaTabSurface";
-                element.appendChild(_canvasElement);
-
-                #endregion
-
-            }
-
-            #region Renderer Setup
-
-            Renderer = new ScoreRenderer(settings, _canvasElement);
-            Renderer.RenderFinished += o => TriggerEvent("rendered");
-            Renderer.PostRenderFinished += () => TriggerEvent("post-rendered");
-            Renderer.RenderFinished += result =>
-            {
-                if (Renderer.IsSvg)
-                {
-                    _canvasElement.innerHTML = result.RenderResult.ToString();
-                    _canvasElement.style.width = result.Width + "px";
-                    _canvasElement.style.height = result.Height + "px";
-                }
-            };
-
-            #endregion
-
-            #region Load Default Data
-
-            if (!string.IsNullOrEmpty(contents))
-            {
-                Tex(contents);
-            }
-            else if (options && options.file)
-            {
-                Load(options.file);
-            }
-            else if (_element != null && _element.dataset != null && !string.IsNullOrEmpty(dataset["file"]))
-            {
-                Load(dataset["file"]);
-            }
-            
-
-            #endregion
-        }
-
-        public IScoreRenderer Renderer { get; private set; }
-        public Score Score { get; set; }
-
         public Track[] Tracks
         {
             get
             {
-                FastList<Track> tracks = new FastList<Track>();
+                var tracks = new FastList<Track>();
 
-                foreach (var track in _tracks)
+                foreach (var track in TrackIndexes)
                 {
                     if (track >= 0 && track < Score.Tracks.Count)
                     {
@@ -153,7 +52,17 @@ namespace AlphaTab.Platform.JavaScript
             }
         }
 
-        public void Load(object data)
+        public JsApi(HtmlElement element, object options)
+            : base(element, options)
+        {
+        }
+
+        protected override IScoreRenderer CreateScoreRenderer(Settings settings, object rawSettings, HtmlElement canvasElement)
+        {
+            return new ScoreRenderer(settings, canvasElement);
+        }
+
+        public override void Load(object data)
         {
             try
             {
@@ -176,7 +85,7 @@ namespace AlphaTab.Platform.JavaScript
             }
         }
 
-        public void Tex(string contents)
+        public override void Tex(string contents)
         {
             try
             {
@@ -191,78 +100,11 @@ namespace AlphaTab.Platform.JavaScript
             }
         }
 
-        public void SetTracks(dynamic tracksData, bool render = true)
-        {
-            FastList<int> tracks = new FastList<int>();
-
-            // decode string
-            if (JsTypeOf(tracksData) == JsTypes.@string)
-            {
-                try
-                {
-                    tracksData = JSON.parse((string)tracksData);
-                }
-                catch
-                {
-                    tracksData = new[] { 0 };
-                }
-            }
-
-            // decode array
-            if (JsTypeOf(tracksData) == JsTypes.number)
-            {
-                tracks.Add((int)tracksData);
-            }
-            else if (tracksData.length)
-            {
-                for (var i = 0; i < tracksData.length; i++)
-                {
-                    int value;
-                    if (JsTypeOf(tracksData[i]) == JsTypes.number)
-                    {
-                        value = (int)tracksData[i];
-                    }
-                    else
-                    {
-                        value = Std.ParseInt(tracksData[i].ToString());
-                    }
-
-                    if (value >= 0)
-                    {
-                        tracks.Add(value);
-                    }
-                }
-            }
-            _tracks = tracks.ToArray();
-
-            if (render)
-            {
-                Render();
-            }
-        }
-
-        public void ScoreLoaded(Score score)
-        {
-            Score = score;
-            TriggerEvent("loaded", score);
-            Render();
-        }
-
-        private void TriggerEvent(string name, object details = null)
-        {
-            if (_element != null)
-            {
-                dynamic e = document.createEvent("CustomEvent");
-                e.initCustomEvent(name, false, false, details);
-                _element.dispatchEvent(e);
-            }
-        }
-
-        public void Render()
+        public override void Render()
         {
             if (Renderer != null)
             {
-                Renderer.RenderMultiple(Tracks);
+                Renderer.As<ScoreRenderer>().RenderMultiple(Tracks);
             }
         }
     }

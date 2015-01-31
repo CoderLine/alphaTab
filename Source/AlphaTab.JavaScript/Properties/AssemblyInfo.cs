@@ -68,6 +68,7 @@ using SharpKit.JavaScript;
 
 [assembly: JsMethod(TargetType = typeof(string), TargetMethod = "IsNullOrEmpty", InlineCodeExpression = "((value == null) || (value.length == 0))")]
 [assembly: JsMethod(TargetType = typeof(string), TargetMethod = "StartsWith", InlineCodeExpression = "this.indexOf(value) == 0")]
+[assembly: JsMethod(TargetType = typeof(string), TargetMethod = "EndsWith", InlineCodeExpression = "(this.lastIndexOf(value) == (this.length - value.length))")]
 [assembly: JsMethod(TargetType = typeof(string), TargetMethod = "Contains", InlineCodeExpression = "this.indexOf(value) != -1")]
 [assembly: JsMethod(TargetType = typeof(string), TargetMethod = "Replace", InlineCodeExpression = "this.replace(oldValue, newValue)")]
 [assembly: JsMethod(TargetType = typeof(string), TargetMethod = "Split", InlineCodeExpression = "this.split(separator)")]

@@ -20,7 +20,12 @@
     var api = {
         init: function(element, context, options) {
             if (!context) {
-                context = new AlphaTab.Platform.JavaScript.JsApi(element[0], options);
+                if(options && options.useWorker && !!window.Worker) {
+                    context = new AlphaTab.Platform.JavaScript.JsWorkerApi(element[0], options);
+                }
+                else {
+                    context = new AlphaTab.Platform.JavaScript.JsApi(element[0], options);
+                }
                 element.data('alphaTab', context);
             }
         }, 

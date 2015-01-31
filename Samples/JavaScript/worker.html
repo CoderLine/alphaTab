@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <!-- Styling of alphaTab -->
+    <style type="text/css">
+	.alphaTabSurface { box-shadow: 0 0 10px rgba(0,0,0,0.3); background:#FFF; border-radius:3px; }
+	</style>
+    
+    <!-- Including alphaTab -->
+    <script type="text/javascript" src="../../Build/JavaScript/AlphaTab.js"></script>
+    <link rel="stylesheet" href="../../Build/JavaScript/AlphaTab.css" />
+    
+    <!-- jQuery Plugin -->
+    <script type="text/javascript" src="lib/jquery/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="../../Build/JavaScript/jquery.alphaTab.js"></script>
+    
+    <!-- Demo Styles and Scripts -->
+    <link rel="stylesheet" href="support/gh-buttons.css" />
+    <link rel="stylesheet" href="support/demo.css" />
+    <script type="text/javascript" src="support/demo.js"></script>
+    
+</head>
+<body>
+    <div id="alphaTab" data-file="/Samples/JavaScript/files/Nightwish.gp5">
+    </div>
+    <script type="text/javascript">
+        var at = $('#alphaTab');
+        at.alphaTab({
+            useWorker: true,
+            atRoot: '/Build/JavaScript'
+        }); // load alphaTab
+    </script>
+    
+</body>
+</html> 
