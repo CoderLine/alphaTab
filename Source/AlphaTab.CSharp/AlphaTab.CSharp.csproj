@@ -57,10 +57,15 @@
     <Compile Include="Platform\CSharp\WinForms\AlphaTabControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Platform\CSharp\Wpf\AlphaTabCanvas.cs" />
-    <Compile Include="Platform\CSharp\Wpf\AlphaTabImage.cs" />
+    <Compile Include="Platform\CSharp\Wpf\AlphaTab.cs" />
     <Compile Include="Platform\Std.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Platform\CSharp\Wpf\Templates.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="..\Source\AlphaTab\AlphaTab.projitems" Label="Shared" Condition="Exists('..\Source\AlphaTab\AlphaTab.projitems')" />
   <Import Project="..\AlphaTab\AlphaTab.projitems" Label="Shared" Condition="Exists('..\AlphaTab\AlphaTab.projitems')" />

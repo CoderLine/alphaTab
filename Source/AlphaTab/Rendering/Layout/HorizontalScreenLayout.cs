@@ -19,7 +19,6 @@ using System;
 using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Staves;
 using AlphaTab.Rendering.Utils;
-using SharpKit.Html;
 
 namespace AlphaTab.Rendering.Layout
 {

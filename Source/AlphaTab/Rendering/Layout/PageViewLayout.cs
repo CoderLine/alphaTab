@@ -18,12 +18,10 @@
 using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
-using AlphaTab.Platform;
 using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Staves;
 using AlphaTab.Rendering.Utils;
 using AlphaTab.Rendering.Glyphs;
-using SharpKit.Html;
 
 namespace AlphaTab.Rendering.Layout
 {

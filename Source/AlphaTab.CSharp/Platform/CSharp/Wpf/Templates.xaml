@@ -1,0 +1,26 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:AlphaTab.Platform.CSharp.Wpf">
+    <Style TargetType="{x:Type local:AlphaTab}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:AlphaTab}">
+                    <ItemsControl ItemsSource="{TemplateBinding PartialResults}" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}"
+                                  HorizontalAlignment="Center" HorizontalContentAlignment="Center">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel Orientation="Vertical" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="ImageSource">
+                                <Image Source="{Binding}" Stretch="None" SnapsToDevicePixels="True" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

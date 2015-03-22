@@ -16,9 +16,11 @@
  * License along with this library.
  */
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
@@ -30,7 +32,7 @@ namespace AlphaTab.Platform.CSharp.WinForms
         private readonly ScoreRenderer _renderer;
         private Track _track;
         private Settings _settings;
-        private Bitmap _bitmap;
+        private List<Image> _images;
 
         public Track Track
         {
@@ -64,13 +66,44 @@ namespace AlphaTab.Platform.CSharp.WinForms
             settings.Engine = "gdi";
             Settings = settings;
             _renderer = new ScoreRenderer(settings, this);
+            _renderer.PreRender += () =>
+            {
+                lock (this)
+                {
+                    _images = new List<Image>();
+                }
+            };
+            _renderer.PartialRenderFinished += result =>
+            {
+                lock (this)
+                {
+                    BeginInvoke(new Action(() =>
+                    {
+                        AddPartialResult(result);
+                    }));
+                }
+            };
             _renderer.RenderFinished += OnRenderFinished;
+        }
+
+        private void AddPartialResult(RenderFinishedEventArgs result)
+        {
+            lock (this)
+            {
+                Width = (int)result.TotalWidth;
+                Height = (int)result.TotalHeight;
+                _images.Add((Image)result.RenderResult);
+                Invalidate();
+            }
         }
 
         public void InvalidateTrack()
         {
             if (Track == null) return;
-            _renderer.Render(Track);
+            Task.Factory.StartNew(() =>
+            {
+                _renderer.Render(Track);
+            });
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -80,10 +113,20 @@ namespace AlphaTab.Platform.CSharp.WinForms
             e.Graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
             e.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
 
-            if (_bitmap != null)
+            lock (this)
             {
-                e.Graphics.DrawImage(_bitmap, new Rectangle(Point.Empty, _bitmap.Size),
-                    new Rectangle(Point.Empty, _bitmap.Size), GraphicsUnit.Pixel);
+                if (_images == null)
+                {
+                    return;
+                }
+
+                int y = 0;
+                foreach (var image in _images)
+                {
+                    e.Graphics.DrawImage(image, new Rectangle(new Point(0, y), image.Size),
+                        new Rectangle(Point.Empty, image.Size), GraphicsUnit.Pixel);
+                    y += image.Height;
+                }
             }
         }
 
@@ -92,9 +135,6 @@ namespace AlphaTab.Platform.CSharp.WinForms
         public event EventHandler RenderFinished;
         protected virtual void OnRenderFinished(RenderFinishedEventArgs e)
         {
-            _bitmap = (Bitmap) e.RenderResult;
-            Size = _bitmap.Size;
-
             EventHandler handler = RenderFinished;
             if (handler != null) handler(this, EventArgs.Empty);
         }

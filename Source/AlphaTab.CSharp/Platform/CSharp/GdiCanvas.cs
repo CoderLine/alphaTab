@@ -19,10 +19,13 @@ using AlphaTab.Rendering;
 using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Rendering.Utils;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
+using System.Windows.Documents;
+using System.Windows.Forms;
 using AlphaTab.Platform.Model;
 using Color = AlphaTab.Platform.Model.Color;
 using Font = AlphaTab.Platform.Model.Font;
@@ -35,6 +38,19 @@ namespace AlphaTab.Platform.CSharp
 {
     public class GdiCanvas : ICanvas, IPathCanvas
     {
+        private static readonly Bitmap MeasurementImage;
+        private static readonly Graphics MeasurementGraphics;
+
+        static GdiCanvas()
+        {
+            MeasurementImage = new Bitmap(1, 1);
+            var newGraphics = MeasurementGraphics = Graphics.FromImage(MeasurementImage);
+            newGraphics.SmoothingMode = SmoothingMode.HighQuality;
+            newGraphics.TextRenderingHint = TextRenderingHint.AntiAlias;
+            newGraphics.Clear(GdiColor.Transparent);
+        }
+
+
         private Bitmap _image;
         private float _width;
         private float _height;
@@ -57,46 +73,6 @@ namespace AlphaTab.Platform.CSharp
         private GdiColor _color;
 
         public RenderingResources Resources { get; set; }
-
-        public float Width
-        {
-            get
-            {
-                return _width;
-            }
-            set
-            {
-                _width = value;
-                RecreateImage();
-            }
-        }
-
-        public float Height
-        {
-            get
-            {
-                return _height;
-            }
-            set
-            {
-                _height = value;
-                RecreateImage();
-            }
-        }
-
-        public Bitmap Image
-        {
-            get
-            {
-                return _image;
-            }
-        }
-
-        public object RenderResult
-        {
-            get { return Image; }
-        }
-
 
         public Color Color
         {
@@ -209,6 +185,19 @@ namespace AlphaTab.Platform.CSharp
             RecreateImage();
         }
 
+        public void BeginRender(float width, float height)
+        {
+            _width = width;
+            _height = height;
+            RecreateImage();
+        }
+
+        public object EndRender()
+        {
+            _graphics.Dispose();
+            return _image;
+        }
+
         private void RecreateImage()
         {
             var newImage = new Bitmap((int)_width, (int)_height, PixelFormat.Format32bppArgb);
@@ -217,8 +206,6 @@ namespace AlphaTab.Platform.CSharp
             newGraphics.TextRenderingHint = TextRenderingHint.AntiAlias;
             newGraphics.Clear(GdiColor.Transparent);
 
-            if (_image != null)
-                _image.Dispose();
             if (_graphics != null)
                 _graphics.Dispose();
 
@@ -329,7 +316,10 @@ namespace AlphaTab.Platform.CSharp
 
         public float MeasureText(string text)
         {
-            return _graphics.MeasureString(text, _font).Width;
+            lock (MeasurementGraphics)
+            {
+                return MeasurementGraphics.MeasureString(text, _font).Width;
+            }
         }
 
         public void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol)

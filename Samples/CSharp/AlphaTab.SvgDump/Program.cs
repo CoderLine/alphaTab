@@ -16,9 +16,11 @@
  * License along with this library.
  */
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Threading;
+using System.Xml.Linq;
 using AlphaTab.Importer;
 using AlphaTab.Model;
 using AlphaTab.Platform.Svg;
@@ -54,10 +56,32 @@ namespace AlphaTab.SvgDump
                 Track track = score.Tracks[i];
                 // render track
                 Console.WriteLine("Rendering track {0} - {1}", i + 1, track.Name);
+                var totalWidth = 0;
+                var totalHeight = 0;
+                var merged = XDocument.Parse("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"1px\" height=\"1px\"></svg>");
+                var currentY = 0f;
+                renderer.PartialRenderFinished += r =>
+                {
+                    var subSvg = XDocument.Parse(r.RenderResult.ToString());
+                    var subRoot = subSvg.Root;
+                    subRoot.SetAttributeValue("x", "0px");
+                    subRoot.SetAttributeValue("y", ((int)currentY) + "px");
+                    merged.Root.Add(subRoot);
+                    currentY += r.Height;
+                };
+                renderer.RenderFinished += r =>
+                {
+                    totalWidth = (int)r.TotalWidth;
+                    totalHeight = (int)r.TotalHeight;
+                };
                 renderer.Render(track);
 
-                // write svg file
-                string svg = ((SvgCanvas)renderer.Canvas).ToSvg(true, "alphaTab");
+                merged.Root.Attribute("width").Value = totalWidth + "px";
+                merged.Root.Attribute("height").Value = totalHeight + "px";
+
+
+                string svg = merged.ToString();
+
                 FileInfo info = new FileInfo(args[0]);
                 string path = Path.Combine(info.DirectoryName, Path.GetFileNameWithoutExtension(info.Name) + "-" + i + ".svg");
                 File.WriteAllText(path, svg);

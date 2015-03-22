@@ -16,6 +16,7 @@
  * License along with this library.
  */
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -38,27 +39,50 @@ namespace Alphatab.PngDump
             }
 
             // load score
-            Score score = ScoreLoader.LoadScore(args[0]);
+            var score = ScoreLoader.LoadScore(args[0]);
 
             // render score with svg engine
-            Settings settings = Settings.Defaults;
+            var settings = Settings.Defaults;
             settings.Engine = "gdi";
-            ScoreRenderer renderer = new ScoreRenderer(settings, null);
+            var renderer = new ScoreRenderer(settings, null);
 
             // iterate tracks
             for (int i = 0, j = score.Tracks.Count; i < j; i++)
             {
-                Track track = score.Tracks[i];
+                var track = score.Tracks[i];
 
                 // render track
                 Console.WriteLine("Rendering track {0} - {1}", i + 1, track.Name);
+                var images = new List<Image>();
+                var totalWidth = 0;
+                var totalHeight = 0;
+                renderer.PartialRenderFinished += r =>
+                {
+                    images.Add((Image) r.RenderResult);
+                };
+                renderer.RenderFinished += r =>
+                {
+                    totalWidth = (int) r.TotalWidth;
+                    totalHeight = (int) r.TotalHeight;
+                };
                 renderer.Render(track);
 
                 // write png
-                FileInfo info = new FileInfo(args[0]);
-                string path = Path.Combine(info.DirectoryName, Path.GetFileNameWithoutExtension(info.Name) + "-" + i + ".png");
-                using (Bitmap bmp = ((GdiCanvas)renderer.Canvas).Image)
+                var info = new FileInfo(args[0]);
+                var path = Path.Combine(info.DirectoryName, Path.GetFileNameWithoutExtension(info.Name) + "-" + i + ".png");
+
+                using (var bmp = new Bitmap(totalWidth, totalHeight))
                 {
+                    int y = 0;
+                    using (var g = Graphics.FromImage(bmp)) 
+                    {
+                        foreach (var image in images)
+                        {
+                            g.DrawImage(image, new Rectangle(0, y, image.Width, image.Height),
+                                new Rectangle(0, 0, image.Width, image.Height), GraphicsUnit.Pixel);
+                            y += image.Height;
+                        }
+                    }
                     bmp.Save(path, ImageFormat.Png);
                 }
             }
