@@ -19,6 +19,7 @@ using System.Globalization;
 using System.Threading;
 using System.Windows;
 using System.Windows.Markup;
+using AlphaTab.Wpf.ViewModel;
 
 namespace AlphaTab.Wpf.Gdi
 {
@@ -34,6 +35,12 @@ namespace AlphaTab.Wpf.Gdi
 
             FrameworkElement.LanguageProperty.OverrideMetadata(typeof(FrameworkElement), new FrameworkPropertyMetadata(
                 XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));
+        }
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            ViewModelBase.Initialize();
         }
     }
 }

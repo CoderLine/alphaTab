@@ -17,6 +17,7 @@
  */
 using System;
 using System.Windows.Input;
+using AlphaTab.Wpf.ViewModel;
 
 namespace AlphaTab.Wpf.Utils
 {
@@ -48,7 +49,13 @@ namespace AlphaTab.Wpf.Utils
         public virtual void RaiseCanExecuteChanged()
         {
             EventHandler handler = CanExecuteChanged;
-            if (handler != null) handler(this, EventArgs.Empty);
+            if (handler != null)
+            {
+                ViewModelBase.InvokeOnUi(() =>
+                {
+                    handler(this, EventArgs.Empty);
+                });
+            }
         }
     }
 }

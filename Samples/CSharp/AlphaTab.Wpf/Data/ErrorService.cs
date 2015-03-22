@@ -17,6 +17,7 @@
  */
 using System;
 using System.Windows;
+using AlphaTab.Wpf.ViewModel;
 
 namespace AlphaTab.Wpf.Data
 { 
@@ -27,8 +28,11 @@ namespace AlphaTab.Wpf.Data
     {
         public void OpenFailed(Exception e)
         {
-            MessageBox.Show(Application.Current.MainWindow, e.Message, "An error during opening the file occured",
-                MessageBoxButton.OK, MessageBoxImage.Error);
+            ViewModelBase.InvokeOnUi(() =>
+            {
+                MessageBox.Show(Application.Current.MainWindow, e.Message, "An error during opening the file occured",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            });
         }
     }
 }

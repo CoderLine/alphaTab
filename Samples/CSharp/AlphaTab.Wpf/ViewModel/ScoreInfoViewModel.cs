@@ -21,7 +21,7 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Wpf.ViewModel
 {
-    public class ScoreInfoViewModel : INotifyPropertyChanged
+    public class ScoreInfoViewModel : ViewModelBase
     {
         private string _tab;
         private string _words;
@@ -146,14 +146,6 @@ namespace AlphaTab.Wpf.ViewModel
                 _tab = value;
                 OnPropertyChanged();
             }
-        }
-
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

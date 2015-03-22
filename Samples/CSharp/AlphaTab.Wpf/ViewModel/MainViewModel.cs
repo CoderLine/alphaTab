@@ -15,10 +15,13 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using AlphaTab.Importer;
 using AlphaTab.Model;
@@ -30,7 +33,7 @@ namespace AlphaTab.Wpf.ViewModel
     /// <summary>
     /// This viewmodel contains the data and logic for the main application window. 
     /// </summary>
-    public class MainViewModel : INotifyPropertyChanged
+    public class MainViewModel : ViewModelBase
     {
         // references to the services we want to use
         private readonly IDialogService _dialogService;
@@ -65,7 +68,7 @@ namespace AlphaTab.Wpf.ViewModel
             {
                 _score = value;
                 OnPropertyChanged();
-                OnPropertyChangedExplicit("ScoreTitle");
+                OnPropertyChanged("ScoreTitle");
                 _showScoreInfoCommand.RaiseCanExecuteChanged();
 
                 // select the first track
@@ -99,7 +102,7 @@ namespace AlphaTab.Wpf.ViewModel
 
                 // notify the ui
                 OnPropertyChanged();
-                OnPropertyChangedExplicit("CurrentTrack");
+                OnPropertyChanged("CurrentTrack");
             }
         }
 
@@ -189,23 +192,26 @@ namespace AlphaTab.Wpf.ViewModel
 
         private void InternalOpenFile(string file)
         {
-            //try
+            Task.Factory.StartNew(() =>
             {
-                // load the score from the filesystem
-                Score = ScoreLoader.LoadScore(file);
-
-                // build the track info objects for the ui
-                TrackViewModel[] trackInfos = new TrackViewModel[Score.Tracks.Count];
-                for (int i = 0; i < trackInfos.Length; i++)
+                try
                 {
-                    trackInfos[i] = new TrackViewModel(Score.Tracks[i]);
+                    // load the score from the filesystem
+                    Score = ScoreLoader.LoadScore(file);
+
+                    // build the track info objects for the ui
+                    TrackViewModel[] trackInfos = new TrackViewModel[Score.Tracks.Count];
+                    for (int i = 0; i < trackInfos.Length; i++)
+                    {
+                        trackInfos[i] = new TrackViewModel(Score.Tracks[i]);
+                    }
+                    TrackInfos = trackInfos;
                 }
-                TrackInfos = trackInfos;
-            }
-            //catch (Exception e)
-            //{
-            //    _errorService.OpenFailed(e);
-            //}
+                catch (Exception e)
+                {
+                    _errorService.OpenFailed(e);
+                }
+            });
         }
 
         /// <summary>
@@ -232,23 +238,5 @@ namespace AlphaTab.Wpf.ViewModel
             OpenFileCommand = new RelayCommand(OpenFile);
             _showScoreInfoCommand = new RelayCommand(ShowScoreInfo, () => _score != null);
         }
-
-
-        #region INotifyPropertyChanged
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChangedExplicit(string propertyName)
-        {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            OnPropertyChangedExplicit(propertyName);
-        }
-
-        #endregion
     }
 }

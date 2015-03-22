@@ -15,8 +15,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using AlphaTab.Model;
 
 namespace AlphaTab.Wpf.ViewModel
@@ -24,7 +22,7 @@ namespace AlphaTab.Wpf.ViewModel
     /// <summary>
     /// A viewmodel for displaying track information in the UI
     /// </summary>
-    public class TrackViewModel : INotifyPropertyChanged
+    public class TrackViewModel : ViewModelBase
     {
         private TrackType _trackType;
         private bool[] _usedBars;
@@ -157,18 +155,6 @@ namespace AlphaTab.Wpf.ViewModel
                     }
                 }
             }
-        }
-
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            OnPropertyChangedExplicit(propertyName);
-        }
-        protected virtual void OnPropertyChangedExplicit(string propertyName)
-        {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 
