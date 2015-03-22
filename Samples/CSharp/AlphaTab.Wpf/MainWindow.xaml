@@ -36,7 +36,7 @@
                 <!-- The Background of the tablature -->
                 <Border VerticalAlignment="Top" Background="#F5F5F5" Name="TablatureContainer" HorizontalAlignment="Center">
                     <!-- The Actual AlphaTab control with a binding to a track -->
-                    <wpf:AlphaTab Name="TablatureControl" Track="{Binding CurrentTrack}" />
+                    <wpf:AlphaTab Name="TablatureControl" Track="{Binding CurrentTrack, IsAsync=True}" />
                 </Border>
             </Grid>
         </ScrollViewer>

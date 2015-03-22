@@ -20,6 +20,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
@@ -43,8 +44,8 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         static AlphaTab()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof (AlphaTab),
-                new FrameworkPropertyMetadata(typeof (AlphaTab)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(AlphaTab),
+                new FrameworkPropertyMetadata(typeof(AlphaTab)));
         }
 
         private static void OnSettingsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -72,7 +73,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         public ObservableCollection<ImageSource> PartialResults
         {
-            get { return (ObservableCollection<ImageSource>) GetValue(PartialResultsProperty); }
+            get { return (ObservableCollection<ImageSource>)GetValue(PartialResultsProperty); }
             set { SetValue(PartialResultsProperty, value); }
         }
 
@@ -106,7 +107,13 @@ namespace AlphaTab.Platform.CSharp.Wpf
                     }));
                 }
             };
-            _renderer.RenderFinished += OnRenderFinished;
+            _renderer.RenderFinished += result =>
+            {
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    OnRenderFinished(result);
+                }));
+            };
         }
 
         private void AddPartialResult(RenderFinishedEventArgs result)
@@ -134,7 +141,11 @@ namespace AlphaTab.Platform.CSharp.Wpf
         public void InvalidateTrack()
         {
             if (Track == null) return;
-            _renderer.Render(Track);
+            var track = Track;
+            Task.Factory.StartNew(() =>
+            {
+                _renderer.Render(track);
+            });
         }
 
         #region RenderFinished
