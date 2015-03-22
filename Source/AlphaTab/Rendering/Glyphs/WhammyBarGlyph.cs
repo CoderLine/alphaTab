@@ -63,7 +63,7 @@ namespace AlphaTab.Rendering.Glyphs
             var tabBarRenderer = (TabBarRenderer)Renderer;
             var track = Renderer.Bar.Track;
             var tabTop = tabBarRenderer.GetTabY(0, -2);
-            var tabBottom = tabBarRenderer.GetTabY(track.Tuning.Count, -2);
+            var tabBottom = tabBarRenderer.GetTabY(track.Tuning.Length, -2);
 
             var absMinY = Y + minY + tabTop;
             var absMaxY = Y + maxY - tabBottom;

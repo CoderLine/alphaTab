@@ -22,6 +22,12 @@ namespace AlphaTab.Platform
             return JsContext.parseInt(s);
         }
 
+        [JsMethod(InlineCodeExpression = "new Int32Array(array)")]
+        public static int[] CloneArray(int[] array)
+        {
+            return new int[0];
+        }
+
         [JsMethod(InlineCodeExpression = "dst.set(src.subarray(srcOffset, srcOffset + count), dstOffset)")]
         public static void BlockCopy(byte[] src, int srcOffset, byte[] dst, int dstOffset, int count)
         {

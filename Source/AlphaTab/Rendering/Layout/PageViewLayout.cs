@@ -149,7 +149,7 @@ namespace AlphaTab.Rendering.Layout
                     if (!tuning.IsStandard)
                     {
                         // Strings
-                        var stringsPerColumn = (int)Math.Ceiling(Renderer.Tracks[0].Tuning.Count / 2.0);
+                        var stringsPerColumn = (int)Math.Ceiling(Renderer.Tracks[0].Tuning.Length / 2.0);
                         y += (stringsPerColumn * (15 * scale));
                     }
 
@@ -255,12 +255,12 @@ namespace AlphaTab.Rendering.Layout
                     if (!tuning.IsStandard)
                     {
                         // Strings
-                        var stringsPerColumn = (int)Math.Ceiling(Renderer.Tracks[0].Tuning.Count / 2.0);
+                        var stringsPerColumn = (int)Math.Ceiling(Renderer.Tracks[0].Tuning.Length / 2.0);
 
                         var currentX = x;
                         var currentY = y;
 
-                        for (int i = 0, j = Renderer.Tracks[0].Tuning.Count; i < j; i++)
+                        for (int i = 0, j = Renderer.Tracks[0].Tuning.Length; i < j; i++)
                         {
                             str = "(" + (i + 1) + ") = " + Tuning.GetTextForTuning(Renderer.Tracks[0].Tuning[i], false);
                             canvas.FillText(str, currentX, currentY);

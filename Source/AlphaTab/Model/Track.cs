@@ -17,6 +17,7 @@
  */
 
 using AlphaTab.Collections;
+using AlphaTab.Platform;
 using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Model
@@ -32,7 +33,7 @@ namespace AlphaTab.Model
         public int Index { get; set; }
         public string Name { get; set; }
         public string ShortName { get; set; }
-        public FastList<int> Tuning { get; set; }
+        public int[] Tuning { get; set; }
         public string TuningName { get; set; }
         public Color Color { get; set; }
 
@@ -48,7 +49,7 @@ namespace AlphaTab.Model
         {
             Name = "";
             ShortName = "";
-            Tuning = new FastList<int>();
+            Tuning = new int[0];
             Bars = new FastList<Bar>();
             Chords = new FastDictionary<string, Chord>();
             PlaybackInfo = new PlaybackInformation();
@@ -60,7 +61,7 @@ namespace AlphaTab.Model
             dst.Capo = src.Capo;
             dst.Index = src.Index;
             dst.ShortName = src.ShortName;
-            dst.Tuning = src.Tuning.Clone();
+            dst.Tuning = Std.CloneArray(src.Tuning);
             dst.Color.Raw = src.Color.Raw;
             dst.IsPercussion = src.IsPercussion;
         }

@@ -455,7 +455,7 @@ namespace AlphaTab.Audio.Generator
 
         private int[] GetBrushInfo(Beat beat)
         {
-            var brushInfo = new int[beat.Voice.Bar.Track.Tuning.Count];
+            var brushInfo = new int[beat.Voice.Bar.Track.Tuning.Length];
 
             if (beat.BrushType != BrushType.None)
             {
@@ -478,7 +478,7 @@ namespace AlphaTab.Audio.Generator
                 {
                     int brushMove = 0;
                     var brushIncrement = GetBrushIncrement(beat);
-                    for (int i = 0, j = beat.Voice.Bar.Track.Tuning.Count; i < j; i++)
+                    for (int i = 0, j = beat.Voice.Bar.Track.Tuning.Length; i < j; i++)
                     {
                         var index = (beat.BrushType == BrushType.ArpeggioDown || beat.BrushType == BrushType.BrushDown)
                                     ? i

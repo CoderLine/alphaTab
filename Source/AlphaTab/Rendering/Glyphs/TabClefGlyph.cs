@@ -49,7 +49,7 @@ namespace AlphaTab.Rendering.Glyphs
             // TODO: Find a more generic way of calculating the font size but for now this works.
             float fontScale = 1;
             float correction = 0;
-            switch (track.Tuning.Count)
+            switch (track.Tuning.Length)
             {
                 case 4:
                     fontScale = 0.6f;

@@ -962,6 +962,9 @@ AlphaTab.Platform.Std.ParseFloat = function (s){
 AlphaTab.Platform.Std.ParseInt = function (s){
     return parseInt(s);
 };
+AlphaTab.Platform.Std.CloneArray = function (array){
+    return new Int32Array(0);
+};
 AlphaTab.Platform.Std.BlockCopy = function (src, srcOffset, dst, dstOffset, count){
 };
 AlphaTab.Platform.Std.IsNullOrWhiteSpace = function (s){
@@ -2346,7 +2349,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                     s.push(String.fromCharCode(this._ch));
                     this.NextChar();
                 }
-                (this._syData) = s;
+                (this._syData) = s.join('');
                 this.NextChar();
             }
             else if (this._ch == 45){
@@ -2552,12 +2555,13 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
             else if ((this._syData) == "tuning"){
                 this.NewSy();
                 if (this._sy == AlphaTab.Importer.AlphaTexSymbols.Tuning){
-                    this._track.Tuning = [];
+                    var tuning = [];
                     do{
-                        this._track.Tuning.push(this.ParseTuning((this._syData).toString()));
+                        tuning.push(this.ParseTuning((this._syData).toString()));
                         this.NewSy();
                     }
                     while (this._sy == AlphaTab.Importer.AlphaTexSymbols.Tuning)
+                    this._track.Tuning = tuning.slice(0);
                 }
                 else {
                     this.Error("tuning", AlphaTab.Importer.AlphaTexSymbols.Tuning, true);
@@ -3434,12 +3438,14 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
         newTrack.Name = this.ReadStringByteLength(40);
         newTrack.IsPercussion = (flags & 1) != 0;
         var stringCount = this.ReadInt32();
+        var tuning = [];
         for (var i = 0; i < 7; i++){
-            var tuning = this.ReadInt32();
+            var stringTuning = this.ReadInt32();
             if (stringCount > i){
-                newTrack.Tuning.push(tuning);
+                tuning.push(stringTuning);
             }
         }
+        newTrack.Tuning = tuning.slice(0);
         var port = this.ReadInt32();
         var index = this.ReadInt32() - 1;
         var effectChannel = this.ReadInt32() - 1;
@@ -4779,8 +4785,7 @@ AlphaTab.Importer.GpxParser.prototype = {
                 for (var i = 0; i < tuning.length; i++){
                 tuning[tuning.length - 1 - i] = AlphaTab.Platform.Std.ParseInt(tuningParts[i]);
             }
-                track.Tuning = [];
-                track.Tuning=track.Tuning.concat(tuning);
+                track.Tuning = tuning;
                 break;
             case "DiagramCollection":
                 this.ParseDiagramCollection(track, node);
@@ -6573,7 +6578,7 @@ AlphaTab.Model.Track = function (){
     this.Chords = null;
     this.Name = "";
     this.ShortName = "";
-    this.Tuning = [];
+    this.Tuning = new Int32Array(0);
     this.Bars = [];
     this.Chords = {};
     this.PlaybackInfo = new AlphaTab.Model.PlaybackInformation();
@@ -6608,7 +6613,7 @@ AlphaTab.Model.Track.CopyTo = function (src, dst){
     dst.Capo = src.Capo;
     dst.Index = src.Index;
     dst.ShortName = src.ShortName;
-    dst.Tuning = src.Tuning.slice();
+    dst.Tuning = new Int32Array(src.Tuning);
     dst.Color.Raw = src.Color.Raw;
     dst.IsPercussion = src.IsPercussion;
 };
@@ -6627,8 +6632,7 @@ AlphaTab.Model.Tuning = function (name, tuning, isStandard){
     this.Tunings = null;
     this.IsStandard = isStandard;
     this.Name = name;
-    this.Tunings = [];
-    this.Tunings=this.Tunings.concat(tuning);
+    this.Tunings = tuning;
 };
 $StaticConstructor(function (){
     AlphaTab.Model.Tuning._sevenStrings = null;

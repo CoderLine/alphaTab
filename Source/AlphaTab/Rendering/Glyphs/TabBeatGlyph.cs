@@ -91,7 +91,7 @@ namespace AlphaTab.Rendering.Glyphs
             var isGrace = Container.Beat.GraceType != GraceType.None;
             var tr = (TabBarRenderer)Renderer;
             var noteNumberGlyph = new NoteNumberGlyph(0, 0, n, isGrace);
-            var l = n.Beat.Voice.Bar.Track.Tuning.Count - n.String + 1;
+            var l = n.Beat.Voice.Bar.Track.Tuning.Length - n.String + 1;
             noteNumberGlyph.Y = tr.GetTabY(l, -2);
             NoteNumbers.AddNoteGlyph(noteNumberGlyph, n);
         }

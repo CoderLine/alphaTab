@@ -241,7 +241,7 @@ namespace AlphaTab.Importer
                         s.AppendChar(_ch);
                         NextChar();
                     }
-                    _syData = s;
+                    _syData = s.ToString();
                     NextChar();
                 }
                 else if (_ch == 0x2D /* - */) // negative number
@@ -553,12 +553,13 @@ namespace AlphaTab.Importer
                     NewSy();
                     if (_sy == AlphaTexSymbols.Tuning) // we require at least one tuning
                     {
-                        _track.Tuning = new FastList<int>();
+                        var tuning = new FastList<int>();
                         do
                         {
-                            _track.Tuning.Add(ParseTuning(_syData.ToString()));
+                            tuning.Add(ParseTuning(_syData.ToString()));
                             NewSy();
                         } while (_sy == AlphaTexSymbols.Tuning);
+                        _track.Tuning = tuning.ToArray();
                     }
                     else
                     {
@@ -974,7 +975,7 @@ namespace AlphaTab.Importer
                 Error("note-string", AlphaTexSymbols.Number);
             }
             int @string = (int)_syData;
-            if (@string < 1 || @string > _track.Tuning.Count)
+            if (@string < 1 || @string > _track.Tuning.Length)
             {
                 Error("note-string", AlphaTexSymbols.Number, false);
             }
@@ -985,7 +986,7 @@ namespace AlphaTab.Importer
             NoteEffects(note);
 
             // create note
-            note.String = _track.Tuning.Count - (@string - 1);
+            note.String = _track.Tuning.Length - (@string - 1);
             note.IsDead = isDead;
             note.IsTieDestination = isTie;
             if (!isTie)
