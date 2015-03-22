@@ -27,53 +27,32 @@ namespace AlphaTab.Platform.JavaScript
     /// <summary>
     /// A canvas implementation for HTML5 canvas
     /// </summary>
-    public class Html5Canvas : ICanvas, IPathCanvas
+    public class Html5Canvas : HtmlContext, ICanvas
     {
-        private readonly HtmlCanvasElement _canvas;
+        private HtmlCanvasElement _canvas;
         private CanvasRenderingContext2D _context;
         private Color _color;
         private Font _font;
 
         public RenderingResources Resources { get; set; }
 
-        public object RenderResult
-        {
-            get { return _canvas; }
-        }
 
-        public Html5Canvas(dynamic dom)
+        public void BeginRender(float width, float height)
         {
-            _canvas = dom;
+            _canvas = (HtmlCanvasElement) document.createElement("canvas");
+            _canvas.width = (int) width;
+            _canvas.height = (int) height;
+            _canvas.style.width = width + "px";
+            _canvas.style.height = height + "px";
             _context = (CanvasRenderingContext2D)_canvas.getContext("2d");
             _context.textBaseline = "top";
         }
 
-        public float Width
+        public object EndRender()
         {
-            get { return _canvas.width; }
-            set
-            {
-                var lineWidth = _context.lineWidth;
-                _canvas.width = (int) value;
-                _canvas.style.width = value + "px";
-                _context = (CanvasRenderingContext2D)_canvas.getContext("2d");
-                _context.textBaseline = "top";
-                _context.lineWidth = lineWidth;
-            }
-        }
-
-        public float Height
-        {
-            get { return _canvas.height; }
-            set
-            {
-                var lineWidth = _context.lineWidth;
-                _canvas.height = (int) value;
-                _canvas.style.height = value + "px";
-                _context = (CanvasRenderingContext2D)_canvas.getContext("2d");
-                _context.textBaseline = "top";
-                _context.lineWidth = lineWidth;
-            }
+            var result = _canvas;
+            _canvas = null;
+            return result;
         }
 
         public Color Color
@@ -100,14 +79,6 @@ namespace AlphaTab.Platform.JavaScript
             {
                 _context.lineWidth = value;
             }
-        }
-
-        public void Clear()
-        {
-            var lineWidth = _context.lineWidth;
-            _canvas.width = _canvas.width;
-            _context.lineWidth = lineWidth;
-            // this._context.clearRect(0,0,_width, _height);
         }
 
         public void FillRect(float x, float y, float w, float h)
@@ -258,7 +229,7 @@ namespace AlphaTab.Platform.JavaScript
             {
                 return;
             }
-            
+
             SvgRenderer glyph = new SvgRenderer(MusicFont.SymbolLookup[symbol], scale, scale);
             glyph.Paint(x, y, this);
         }

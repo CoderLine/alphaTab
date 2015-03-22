@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using System;
 using AlphaTab.Collections;
 using AlphaTab.Platform.Model;
 using AlphaTab.Rendering;
@@ -28,12 +30,10 @@ namespace AlphaTab.Platform.Svg
     /// </summary>
     public class SvgCanvas : ICanvas, IPathCanvas
     {
-        private string _buffer;
+        private StringBuilder _buffer;
         private string _currentPath;
         private bool _currentPathIsEmpty;
 
-        public float Width { get; set; }
-        public float Height { get; set; }
         public Color Color { get; set; }
         public float LineWidth { get; set; }
         public Font Font { get; set; }
@@ -41,88 +41,66 @@ namespace AlphaTab.Platform.Svg
         public TextBaseline TextBaseline { get; set; }
         public RenderingResources Resources { get; set; }
 
-        public object RenderResult
-        {
-            get { return ToSvg(true, "alphaTabSurfaceSvg"); }
-        }
-
         public SvgCanvas()
         {
-            _buffer = "";
             _currentPath = "";
             _currentPathIsEmpty = true;
             Color = new Color(255, 255, 255);
             LineWidth = 1;
-            Width = 0;
-            Height = 0;
             Font = new Font("Arial", 10);
             TextAlign = TextAlign.Left;
             TextBaseline = TextBaseline.Default;
         }
 
-        public string ToSvg(bool includeWrapper, string className = null)
+        public void BeginRender(float width, float height)
         {
-            var buf = new StringBuilder();
-            if (includeWrapper)
-            {
-                buf.Append("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"");
-                buf.Append(Width);
-                buf.Append("px\" height=\"");
-                buf.Append(Height);
-                buf.Append("px\"");
-                if (className != null)
-                {
-                    buf.Append(" class=\"");
-                    buf.Append(className);
-                    buf.Append("\"");
-                }
-                buf.Append(">\n");
-            }
-            buf.Append(_buffer);
-            if (includeWrapper)
-            {
-                buf.Append("</svg>");
-            }
-            return buf.ToString();
-        }
+            _buffer = new StringBuilder();
 
-        public void Clear()
-        {
-            _buffer = "";
+            _buffer.Append("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"");
+            _buffer.Append(width);
+            _buffer.Append("px\" height=\"");
+            _buffer.Append(height);
+            _buffer.Append("px\" class=\"alphaTabSurfaceSvg\">\n");
             _currentPath = "";
             _currentPathIsEmpty = true;
         }
 
+        public object EndRender()
+        {
+            _buffer.Append("</svg>");
+            return _buffer.ToString();
+        }
+
         public void FillRect(float x, float y, float w, float h)
         {
-            _buffer += "<rect x=\"";
-            _buffer += x - 0.5f;
-            _buffer += "\" y=\"";
-            _buffer += y - 0.5f;
-            _buffer += "\" width=\"";
-            _buffer += w;
-            _buffer += "\" height=\"";
-            _buffer += h;
-            _buffer += "\" style=\"fill:";
-            _buffer += Color.ToRgbaString();
-            _buffer += ";\" />\n";
+            _buffer.Append("<rect x=\"");
+            _buffer.Append(x - 0.5f);
+            _buffer.Append("\" y=\"");
+            _buffer.Append(y - 0.5f);
+            _buffer.Append("\" width=\"");
+            _buffer.Append(w);
+            _buffer.Append("\" height=\"");
+            _buffer.Append(h);
+            _buffer.Append("\" style=\"fill:");
+            _buffer.Append(Color.ToRgbaString());
+            _buffer.Append(";\" />\n");
         }
 
         public void StrokeRect(float x, float y, float w, float h)
         {
-            _buffer += "<rect x=\"";
-            _buffer += x - 0.5f;
-            _buffer += "\" y=\"";
-            _buffer += y - 0.5f;
-            _buffer += "\" width=\"";
-            _buffer += w;
-            _buffer += "\" height=\"";
-            _buffer += h;
-            _buffer += "\" style=\"stroke:";
-            _buffer += Color.ToRgbaString();
-            _buffer += "; stroke-width:";
-            _buffer += LineWidth;
-            _buffer += ";\" />\n";
+            _buffer.Append("<rect x=\"");
+            _buffer.Append(x - 0.5f);
+            _buffer.Append("\" y=\"");
+            _buffer.Append(y - 0.5f);
+            _buffer.Append("\" width=\"");
+            _buffer.Append(w);
+            _buffer.Append("\" height=\"");
+            _buffer.Append(h);
+            _buffer.Append("\" style=\"stroke:");
+            _buffer.Append(Color.ToRgbaString());
+            _buffer.Append("; stroke-width:");
+            _buffer.Append(LineWidth);
+            _buffer.Append(";\" />\n");
         }
 
         public void BeginPath()
@@ -211,11 +189,11 @@ namespace AlphaTab.Platform.Svg
         {
             if (!_currentPathIsEmpty)
             {
-                _buffer += "<path d=\"";
-                _buffer += _currentPath;
-                _buffer += "\" style=\"fill:";
-                _buffer += Color.ToRgbaString();
-                _buffer += "\" stroke=\"none\"/>\n";
+                _buffer.Append("<path d=\"");
+                _buffer.Append(_currentPath);
+                _buffer.Append("\" style=\"fill:");
+                _buffer.Append(Color.ToRgbaString());
+                _buffer.Append("\" stroke=\"none\"/>\n");
             }
             _currentPath = "";
             _currentPathIsEmpty = true;
@@ -225,13 +203,13 @@ namespace AlphaTab.Platform.Svg
         {
             if (!_currentPathIsEmpty)
             {
-                _buffer += "<path d=\"";
-                _buffer += _currentPath;
-                _buffer += "\" style=\"stroke:";
-                _buffer += Color.ToRgbaString();
-                _buffer += "; stroke-width:";
-                _buffer += LineWidth;
-                _buffer += ";\" fill=\"none\" />\n";
+                _buffer.Append("<path d=\"");
+                _buffer.Append(_currentPath);
+                _buffer.Append("\" style=\"stroke:");
+                _buffer.Append(Color.ToRgbaString());
+                _buffer.Append("; stroke-width:");
+                _buffer.Append(LineWidth);
+                _buffer.Append(";\" fill=\"none\" />\n");
             }
             _currentPath = "";
             _currentPathIsEmpty = true;
@@ -239,22 +217,22 @@ namespace AlphaTab.Platform.Svg
 
         public void FillText(string text, float x, float y)
         {
-            _buffer += "<text x=\"";
-            _buffer += x;
-            _buffer += "\" y=\"";
-            _buffer += y + GetSvgBaseLineOffset();
-            _buffer += "\" style=\"font:";
-            _buffer += Font.ToCssString();
-            _buffer += "; fill:";
-            _buffer += Color.ToRgbaString();
-            _buffer += ";\" ";
-            _buffer += " dominant-baseline=\"";
-            _buffer += GetSvgBaseLine();
-            _buffer += "\" text-anchor=\"";
-            _buffer += GetSvgTextAlignment();
-            _buffer += "\">\n";
-            _buffer += text;
-            _buffer += "</text>\n";
+            _buffer.Append("<text x=\"");
+            _buffer.Append(x);
+            _buffer.Append("\" y=\"");
+            _buffer.Append(y + GetSvgBaseLineOffset());
+            _buffer.Append("\" style=\"font:");
+            _buffer.Append(Font.ToCssString());
+            _buffer.Append("; fill:");
+            _buffer.Append(Color.ToRgbaString());
+            _buffer.Append(";\" ");
+            _buffer.Append(" dominant-baseline=\"");
+            _buffer.Append(GetSvgBaseLine());
+            _buffer.Append("\" text-anchor=\"");
+            _buffer.Append(GetSvgTextAlignment());
+            _buffer.Append("\">\n");
+            _buffer.Append(text);
+            _buffer.Append("</text>\n");
         }
 
         private string GetSvgTextAlignment()

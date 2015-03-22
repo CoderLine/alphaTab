@@ -26,7 +26,7 @@ namespace AlphaTab.Rendering
     {
         public override bool CanCreate(Track track)
         {
-            return track.Tuning.Count > 0;
+            return track.Tuning.Length > 0;
         }
 
         public override BarRendererBase Create(Bar bar)

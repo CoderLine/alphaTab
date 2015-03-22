@@ -29,8 +29,8 @@ namespace AlphaTab
         static void PlatformInit()
         {
             RenderEngines["default"] = d => new SvgCanvas();
-            RenderEngines["html5"] = d => new AlphaTab.Platform.JavaScript.Html5Canvas(d);
-            FileLoaders["default"] = () => new AlphaTab.Platform.JavaScript.JsFileLoader();
+            RenderEngines["html5"] = d => new Platform.JavaScript.Html5Canvas();
+            FileLoaders["default"] = () => new Platform.JavaScript.JsFileLoader();
         }
     }
 }

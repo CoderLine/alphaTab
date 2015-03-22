@@ -78,7 +78,7 @@ namespace AlphaTab.Rendering
         {
             _helpers = Stave.StaveGroup.Helpers.Helpers[Bar.Track.Index][Bar.Index];
             base.DoLayout();
-            Height = LineOffset * (Bar.Track.Tuning.Count - 1) + (NumberOverflow * 2);
+            Height = LineOffset * (Bar.Track.Tuning.Length - 1) + (NumberOverflow * 2);
             if (Index == 0)
             {
                 Stave.RegisterStaveTop(NumberOverflow);
@@ -199,7 +199,7 @@ namespace AlphaTab.Rendering
             canvas.Color = res.StaveLineColor;
             var lineY = cy + Y + NumberOverflow;
 
-            for (int i = 0, j = Bar.Track.Tuning.Count; i < j; i++)
+            for (int i = 0, j = Bar.Track.Tuning.Length; i < j; i++)
             {
                 if (i > 0) lineY += LineOffset;
                 canvas.BeginPath();

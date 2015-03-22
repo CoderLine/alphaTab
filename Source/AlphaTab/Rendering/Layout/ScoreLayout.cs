@@ -16,7 +16,9 @@
  * License along with this library.
  */
 
+using System;
 using AlphaTab.Collections;
+using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Staves;
 using AlphaTab.Rendering.Utils;
 
@@ -40,8 +42,8 @@ namespace AlphaTab.Rendering.Layout
             _barRendererLookup = new FastDictionary<string, FastDictionary<int, BarRendererBase>>();
         }
 
-        public abstract void DoLayout();
-        public abstract void PaintScore();
+        public abstract void DoLayoutAndRender();
+
         public abstract void BuildBoundingsLookup(BoundingsLookup lookup);
 
         public float Scale
@@ -94,6 +96,43 @@ namespace AlphaTab.Rendering.Layout
                 return _barRendererLookup[key][index];
             }
             return null;
+        }
+
+        public event Action<RenderFinishedEventArgs> PartialRenderFinished;
+        protected virtual void OnPartialRenderFinished(RenderFinishedEventArgs e)
+        {
+            if (PartialRenderFinished != null)
+            {
+                PartialRenderFinished(e);
+            }
+        }
+
+        public void RenderAnnotation()
+        {
+            // attention, you are not allowed to remove change this notice within any version of this library without permission!
+            var msg = "Rendered using alphaTab (http://www.alphaTab.net)";
+
+            var canvas = Renderer.Canvas;
+            var resources = Renderer.RenderingResources;
+
+            var height = (resources.CopyrightFont.Size * 2);
+            Height += height;
+            var x = Width / 2;
+
+            canvas.BeginRender(Width, height);
+            canvas.Color = resources.MainGlyphColor;
+            canvas.Font = resources.CopyrightFont;
+            canvas.TextAlign = TextAlign.Center;
+            canvas.FillText(msg, x, 0);
+            var result = canvas.EndRender();
+            OnPartialRenderFinished(new RenderFinishedEventArgs
+            {
+                Width = Width,
+                Height = height,
+                RenderResult = result,
+                TotalWidth = Width,
+                TotalHeight = Height
+            });
         }
     }
 }

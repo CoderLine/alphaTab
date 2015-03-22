@@ -93,8 +93,8 @@ namespace AlphaTab.Model
         {
             get
             {
-                if (Beat.Voice.Bar.Track.Tuning.Count > 0)
-                    return Beat.Voice.Bar.Track.Tuning[Beat.Voice.Bar.Track.Tuning.Count - (String - 1) - 1];
+                if (Beat.Voice.Bar.Track.Tuning.Length > 0)
+                    return Beat.Voice.Bar.Track.Tuning[Beat.Voice.Bar.Track.Tuning.Length - (String - 1) - 1];
                 return 0;
             }
         }

@@ -187,7 +187,7 @@ AlphaTab.Environment.PlatformInit = function (){
         return new AlphaTab.Platform.Svg.SvgCanvas();
     };
     AlphaTab.Environment.RenderEngines["html5"] = function (d){
-        return new AlphaTab.Platform.JavaScript.Html5Canvas(d);
+        return new AlphaTab.Platform.JavaScript.Html5Canvas();
     };
     AlphaTab.Environment.FileLoaders["default"] = function (){
         return new AlphaTab.Platform.JavaScript.JsFileLoader();
@@ -545,12 +545,7 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
             contents = (element.innerText).trim();
             element.innerHTML = "";
         }
-        if (settings.Engine == "html5"){
-            this.CanvasElement = document.createElement("canvas");
-        }
-        else {
-            this.CanvasElement = document.createElement("div");
-        }
+        this.CanvasElement = document.createElement("div");
         this.CanvasElement.className = "alphaTabSurface";
         element.appendChild(this.CanvasElement);
     }
@@ -561,12 +556,26 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
     this.Renderer.add_PostRenderFinished($CreateAnonymousDelegate(this, function (){
         this.TriggerEvent("post-rendered", null);
     }));
-    this.Renderer.add_RenderFinished($CreateAnonymousDelegate(this, function (result){
-        if (this.Renderer.get_IsSvg()){
-            this.CanvasElement.innerHTML = result.RenderResult.toString();
-            this.CanvasElement.style.width = result.Width + "px";
-            this.CanvasElement.style.height = result.Height + "px";
+    this.Renderer.add_PreRender($CreateAnonymousDelegate(this, function (){
+        this.CanvasElement.innerHTML = "";
+    }));
+    this.Renderer.add_PartialRenderFinished($CreateAnonymousDelegate(this, function (result){
+        var itemToAppend;
+        if (typeof(result.RenderResult) == "string"){
+            var partialResult = document.createElement("div");
+            partialResult.innerHTML = result.RenderResult;
+            itemToAppend = partialResult.firstChild;
         }
+        else {
+            itemToAppend = result.RenderResult;
+        }
+        this.CanvasElement.style.width = result.TotalWidth + "px";
+        this.CanvasElement.style.height = result.TotalHeight + "px";
+        this.CanvasElement.appendChild(itemToAppend);
+    }));
+    this.Renderer.add_RenderFinished($CreateAnonymousDelegate(this, function (result){
+        this.CanvasElement.style.width = result.TotalWidth + "px";
+        this.CanvasElement.style.height = result.TotalHeight + "px";
     }));
     if (!((contents==null)||(contents.length==0))){
         this.Tex(contents);
@@ -634,127 +643,25 @@ AlphaTab.Platform.JavaScript.JsWorkerApi.prototype = {
         var renderer = new AlphaTab.Platform.JavaScript.WorkerScoreRenderer(this, rawSettings);
         renderer.add_PostRenderFinished($CreateAnonymousDelegate(this, function (){
             this.Element.className = this.Element.className.replace(" loading", "").replace(" rendering", "");
-            this.CanvasElement.className = this.CanvasElement.className.replace(" loading", "").replace(" rendering", "");
         }));
         return renderer;
     },
     Load: function (data){
-        this.CanvasElement.className += " loading";
         this.Element.className += " loading";
         this.Renderer.Load(data, this.TrackIndexes);
     },
     Render: function (){
         if (this.Renderer != null){
-            this.CanvasElement.className += " rendering";
             this.Element.className += " rendering";
             this.Renderer.RenderMultiple(this.TrackIndexes);
         }
     },
     Tex: function (contents){
-        this.CanvasElement.className += " loading";
         this.Element.className += " loading";
         this.Renderer.Tex(contents);
     }
 };
 $Inherit(AlphaTab.Platform.JavaScript.JsWorkerApi, AlphaTab.Platform.JavaScript.JsApiBase);
-AlphaTab.Platform.JavaScript.WorkerScoreRenderer = function (workerApi, rawSettings){
-    this._workerApi = null;
-    this._atRoot = null;
-    this._worker = null;
-    this.RenderFinished = null;
-    this.PostRenderFinished = null;
-    this._workerApi = workerApi;
-    var atRoot = rawSettings.atRoot;
-    if (atRoot != "" && !(atRoot.lastIndexOf("/")==(atRoot.length-"/".length))){
-        atRoot += "/";
-    }
-    this._atRoot = atRoot;
-    this._worker = new Worker(atRoot + "AlphaTab.worker.js");
-    var root = new Array();
-    root.push(window.location.protocol);
-    root.push("//");
-    root.push(window.location.hostname);
-    if (window.location.port){
-        root.push(":");
-        root.push(window.location.port);
-    }
-    root.push(this._atRoot);
-    this._worker.postMessage({
-        cmd: "initialize",
-        root: root.join(''),
-        settings: rawSettings
-    });
-    this._worker.addEventListener("message", $CreateDelegate(this, this.HandleWorkerMessage), false);
-};
-AlphaTab.Platform.JavaScript.WorkerScoreRenderer.prototype = {
-    get_IsSvg: function (){
-        return true;
-    },
-    Load: function (data, trackIndexes){
-        this._worker.postMessage({
-            cmd: "load",
-            data: data,
-            indexes: trackIndexes
-        });
-    },
-    HandleWorkerMessage: function (e){
-        var data = e.data;
-        var cmd = data["cmd"];
-        switch (cmd){
-            case "renderFinished":
-                this.OnRenderFinished(data["result"]);
-                break;
-            case "postRenderFinished":
-                this.OnPostRenderFinished();
-                break;
-            case "error":
-                console.error(data["exception"]);
-                break;
-            case "loaded":
-                var score = data["score"];
-                if (score){
-                var jsonConverter = new AlphaTab.Model.JsonConverter();
-                score = jsonConverter.JsObjectToScore(score);
-            }
-                this._workerApi.TriggerEvent("loaded", score);
-                break;
-        }
-    },
-    RenderMultiple: function (trackIndexes){
-        this._worker.postMessage({
-            cmd: "renderMultiple",
-            data: trackIndexes
-        });
-    },
-    add_RenderFinished: function (value){
-        this.RenderFinished = $CombineDelegates(this.RenderFinished, value);
-    },
-    remove_RenderFinished: function (value){
-        this.RenderFinished = $RemoveDelegate(this.RenderFinished, value);
-    },
-    OnRenderFinished: function (obj){
-        var handler = this.RenderFinished;
-        if (handler != null)
-            handler(obj);
-    },
-    add_PostRenderFinished: function (value){
-        this.PostRenderFinished = $CombineDelegates(this.PostRenderFinished, value);
-    },
-    remove_PostRenderFinished: function (value){
-        this.PostRenderFinished = $RemoveDelegate(this.PostRenderFinished, value);
-    },
-    OnPostRenderFinished: function (){
-        var handler = this.PostRenderFinished;
-        if (handler != null)
-            handler();
-    },
-    Tex: function (contents){
-        this._worker.postMessage({
-            cmd: "tex",
-            data: contents
-        });
-    }
-};
 AlphaTab.Platform.JavaScript.JsWorker = function (main, options){
     this._renderer = null;
     this._main = null;
@@ -766,6 +673,13 @@ AlphaTab.Platform.JavaScript.JsWorker = function (main, options){
     this._main.addEventListener("message", $CreateDelegate(this, this.HandleMessage), false);
     var settings = AlphaTab.Settings.FromJson(options);
     this._renderer = new AlphaTab.Rendering.ScoreRenderer(settings, null);
+    this._renderer.add_PartialRenderFinished($CreateAnonymousDelegate(this, function (result){
+        this._main.postMessage({
+    cmd: "partialRenderFinished",
+    result: result
+}
+);
+    }));
     this._renderer.add_RenderFinished($CreateAnonymousDelegate(this, function (result){
         this._main.postMessage({
     cmd: "renderFinished",
@@ -776,6 +690,12 @@ AlphaTab.Platform.JavaScript.JsWorker = function (main, options){
     this._renderer.add_PostRenderFinished($CreateAnonymousDelegate(this, function (){
         this._main.postMessage({
     cmd: "postRenderFinished"
+}
+);
+    }));
+    this._renderer.add_PreRender($CreateAnonymousDelegate(this, function (){
+        this._main.postMessage({
+    cmd: "preRender"
 }
 );
     }));
@@ -809,7 +729,7 @@ AlphaTab.Platform.JavaScript.JsWorker.prototype = {
         }
     },
     RenderMultiple: function (trackIndexes){
-        this._trackIndexes = this._trackIndexes;
+        this._trackIndexes = trackIndexes;
         this.Render();
     },
     Tex: function (contents){
@@ -869,15 +789,12 @@ AlphaTab.Platform.JavaScript.JsWorker.prototype = {
         this._renderer.RenderMultiple(this.get_Tracks());
     }
 };
-AlphaTab.Platform.JavaScript.Html5Canvas = function (dom){
+AlphaTab.Platform.JavaScript.Html5Canvas = function (){
     this._canvas = null;
     this._context = null;
     this._color = null;
     this._font = null;
     this._Resources = null;
-    this._canvas = dom;
-    this._context = this._canvas.getContext("2d");
-    this._context.textBaseline = "top";
 };
 AlphaTab.Platform.JavaScript.Html5Canvas.prototype = {
     get_Resources: function (){
@@ -886,30 +803,19 @@ AlphaTab.Platform.JavaScript.Html5Canvas.prototype = {
     set_Resources: function (value){
         this._Resources = value;
     },
-    get_RenderResult: function (){
-        return this._canvas;
-    },
-    get_Width: function (){
-        return this._canvas.width;
-    },
-    set_Width: function (value){
-        var lineWidth = this._context.lineWidth;
-        this._canvas.width = value | 0;
-        this._canvas.style.width = value + "px";
+    BeginRender: function (width, height){
+        this._canvas = document.createElement("canvas");
+        this._canvas.width = width | 0;
+        this._canvas.height = height | 0;
+        this._canvas.style.width = width + "px";
+        this._canvas.style.height = height + "px";
         this._context = this._canvas.getContext("2d");
         this._context.textBaseline = "top";
-        this._context.lineWidth = lineWidth;
     },
-    get_Height: function (){
-        return this._canvas.height;
-    },
-    set_Height: function (value){
-        var lineWidth = this._context.lineWidth;
-        this._canvas.height = value | 0;
-        this._canvas.style.height = value + "px";
-        this._context = this._canvas.getContext("2d");
-        this._context.textBaseline = "top";
-        this._context.lineWidth = lineWidth;
+    EndRender: function (){
+        var result = this._canvas;
+        this._canvas = null;
+        return result;
     },
     get_Color: function (){
         return this._color;
@@ -924,12 +830,6 @@ AlphaTab.Platform.JavaScript.Html5Canvas.prototype = {
     },
     set_LineWidth: function (value){
         this._context.lineWidth = value;
-    },
-    Clear: function (){
-        var lineWidth = this._context.lineWidth;
-        this._canvas.width = this._canvas.width;
-        this._context.lineWidth = lineWidth;
-        // this._context.clearRect(0,0,_width, _height);
     },
     FillRect: function (x, y, w, h){
         this._context.fillRect(x - 0.5, y - 0.5, w, h);
@@ -1206,6 +1106,134 @@ AlphaTab.Platform.JavaScript.JsFileLoader.GetBytesFromString = function (s){
     }
     return b;
 };
+AlphaTab.Platform.JavaScript.WorkerScoreRenderer = function (workerApi, rawSettings){
+    this._workerApi = null;
+    this._atRoot = null;
+    this._worker = null;
+    this.PreRender = null;
+    this.PartialRenderFinished = null;
+    this.RenderFinished = null;
+    this.PostRenderFinished = null;
+    this._workerApi = workerApi;
+    var atRoot = rawSettings.atRoot;
+    if (atRoot != "" && !(atRoot.lastIndexOf("/")==(atRoot.length-"/".length))){
+        atRoot += "/";
+    }
+    this._atRoot = atRoot;
+    this._worker = new Worker(atRoot + "AlphaTab.worker.js");
+    var root = new Array();
+    root.push(window.location.protocol);
+    root.push("//");
+    root.push(window.location.hostname);
+    if (window.location.port){
+        root.push(":");
+        root.push(window.location.port);
+    }
+    root.push(this._atRoot);
+    this._worker.postMessage({
+        cmd: "initialize",
+        root: root.join(''),
+        settings: rawSettings
+    });
+    this._worker.addEventListener("message", $CreateDelegate(this, this.HandleWorkerMessage), false);
+};
+AlphaTab.Platform.JavaScript.WorkerScoreRenderer.prototype = {
+    get_IsSvg: function (){
+        return true;
+    },
+    Load: function (data, trackIndexes){
+        this._worker.postMessage({
+            cmd: "load",
+            data: data,
+            indexes: trackIndexes
+        });
+    },
+    HandleWorkerMessage: function (e){
+        var data = e.data;
+        var cmd = data["cmd"];
+        switch (cmd){
+            case "preRender":
+                this.OnPreRender();
+                break;
+            case "partialRenderFinished":
+                this.OnPartialRenderFinished(data["result"]);
+                break;
+            case "renderFinished":
+                this.OnRenderFinished(data["result"]);
+                break;
+            case "postRenderFinished":
+                this.OnPostRenderFinished();
+                break;
+            case "error":
+                console.error(data["exception"]);
+                break;
+            case "loaded":
+                var score = data["score"];
+                if (score){
+                var jsonConverter = new AlphaTab.Model.JsonConverter();
+                score = jsonConverter.JsObjectToScore(score);
+            }
+                this._workerApi.TriggerEvent("loaded", score);
+                break;
+        }
+    },
+    RenderMultiple: function (trackIndexes){
+        this._worker.postMessage({
+            cmd: "renderMultiple",
+            data: trackIndexes
+        });
+    },
+    add_PreRender: function (value){
+        this.PreRender = $CombineDelegates(this.PreRender, value);
+    },
+    remove_PreRender: function (value){
+        this.PreRender = $RemoveDelegate(this.PreRender, value);
+    },
+    OnPreRender: function (){
+        var handler = this.PreRender;
+        if (handler != null)
+            handler();
+    },
+    add_PartialRenderFinished: function (value){
+        this.PartialRenderFinished = $CombineDelegates(this.PartialRenderFinished, value);
+    },
+    remove_PartialRenderFinished: function (value){
+        this.PartialRenderFinished = $RemoveDelegate(this.PartialRenderFinished, value);
+    },
+    OnPartialRenderFinished: function (obj){
+        var handler = this.PartialRenderFinished;
+        if (handler != null)
+            handler(obj);
+    },
+    add_RenderFinished: function (value){
+        this.RenderFinished = $CombineDelegates(this.RenderFinished, value);
+    },
+    remove_RenderFinished: function (value){
+        this.RenderFinished = $RemoveDelegate(this.RenderFinished, value);
+    },
+    OnRenderFinished: function (obj){
+        var handler = this.RenderFinished;
+        if (handler != null)
+            handler(obj);
+    },
+    add_PostRenderFinished: function (value){
+        this.PostRenderFinished = $CombineDelegates(this.PostRenderFinished, value);
+    },
+    remove_PostRenderFinished: function (value){
+        this.PostRenderFinished = $RemoveDelegate(this.PostRenderFinished, value);
+    },
+    OnPostRenderFinished: function (){
+        var handler = this.PostRenderFinished;
+        if (handler != null)
+            handler();
+    },
+    Tex: function (contents){
+        this._worker.postMessage({
+            cmd: "tex",
+            data: contents
+        });
+    }
+};
 AlphaTab.Platform.Std = function (){
 };
 AlphaTab.Platform.Std.ParseFloat = function (s){
@@ -1213,6 +1241,9 @@ AlphaTab.Platform.Std.ParseFloat = function (s){
 };
 AlphaTab.Platform.Std.ParseInt = function (s){
     return parseInt(s);
+};
+AlphaTab.Platform.Std.CloneArray = function (array){
+    return new Int32Array(0);
 };
 AlphaTab.Platform.Std.BlockCopy = function (src, srcOffset, dst, dstOffset, count){
 };
@@ -2598,7 +2629,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                     s.push(String.fromCharCode(this._ch));
                     this.NextChar();
                 }
-                (this._syData) = s;
+                (this._syData) = s.join('');
                 this.NextChar();
             }
             else if (this._ch == 45){
@@ -2804,12 +2835,13 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
             else if ((this._syData) == "tuning"){
                 this.NewSy();
                 if (this._sy == AlphaTab.Importer.AlphaTexSymbols.Tuning){
-                    this._track.Tuning = [];
+                    var tuning = [];
                     do{
-                        this._track.Tuning.push(this.ParseTuning((this._syData).toString()));
+                        tuning.push(this.ParseTuning((this._syData).toString()));
                         this.NewSy();
                     }
                     while (this._sy == AlphaTab.Importer.AlphaTexSymbols.Tuning)
+                    this._track.Tuning = tuning.slice(0);
                 }
                 else {
                     this.Error("tuning", AlphaTab.Importer.AlphaTexSymbols.Tuning, true);
@@ -3686,12 +3718,14 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
         newTrack.Name = this.ReadStringByteLength(40);
         newTrack.IsPercussion = (flags & 1) != 0;
         var stringCount = this.ReadInt32();
+        var tuning = [];
         for (var i = 0; i < 7; i++){
-            var tuning = this.ReadInt32();
+            var stringTuning = this.ReadInt32();
             if (stringCount > i){
-                newTrack.Tuning.push(tuning);
+                tuning.push(stringTuning);
             }
         }
+        newTrack.Tuning = tuning.slice(0);
         var port = this.ReadInt32();
         var index = this.ReadInt32() - 1;
         var effectChannel = this.ReadInt32() - 1;
@@ -5031,8 +5065,7 @@ AlphaTab.Importer.GpxParser.prototype = {
                 for (var i = 0; i < tuning.length; i++){
                 tuning[tuning.length - 1 - i] = AlphaTab.Platform.Std.ParseInt(tuningParts[i]);
             }
-                track.Tuning = [];
-                track.Tuning=track.Tuning.concat(tuning);
+                track.Tuning = tuning;
                 break;
             case "DiagramCollection":
                 this.ParseDiagramCollection(track, node);
@@ -6825,7 +6858,7 @@ AlphaTab.Model.Track = function (){
     this.Chords = null;
     this.Name = "";
     this.ShortName = "";
-    this.Tuning = [];
+    this.Tuning = new Int32Array(0);
     this.Bars = [];
     this.Chords = {};
     this.PlaybackInfo = new AlphaTab.Model.PlaybackInformation();
@@ -6860,7 +6893,7 @@ AlphaTab.Model.Track.CopyTo = function (src, dst){
     dst.Capo = src.Capo;
     dst.Index = src.Index;
     dst.ShortName = src.ShortName;
-    dst.Tuning = src.Tuning.slice();
+    dst.Tuning = new Int32Array(src.Tuning);
     dst.Color.Raw = src.Color.Raw;
     dst.IsPercussion = src.IsPercussion;
 };
@@ -6879,8 +6912,7 @@ AlphaTab.Model.Tuning = function (name, tuning, isStandard){
     this.Tunings = null;
     this.IsStandard = isStandard;
     this.Name = name;
-    this.Tunings = [];
-    this.Tunings=this.Tunings.concat(tuning);
+    this.Tunings = tuning;
 };
 $StaticConstructor(function (){
     AlphaTab.Model.Tuning._sevenStrings = null;
@@ -7192,38 +7224,21 @@ AlphaTab.Platform.Svg.SvgCanvas = function (){
     this._buffer = null;
     this._currentPath = null;
     this._currentPathIsEmpty = false;
-    this._Width = 0;
-    this._Height = 0;
     this._Color = null;
     this._LineWidth = 0;
     this._Font = null;
     this._TextAlign = AlphaTab.Platform.Model.TextAlign.Left;
     this._TextBaseline = AlphaTab.Platform.Model.TextBaseline.Default;
     this._Resources = null;
-    this._buffer = "";
     this._currentPath = "";
     this._currentPathIsEmpty = true;
     this.set_Color(new AlphaTab.Platform.Model.Color(255, 255, 255, 255));
     this.set_LineWidth(1);
-    this.set_Width(0);
-    this.set_Height(0);
     this.set_Font(new AlphaTab.Platform.Model.Font("Arial", 10, AlphaTab.Platform.Model.FontStyle.Plain));
     this.set_TextAlign(AlphaTab.Platform.Model.TextAlign.Left);
     this.set_TextBaseline(AlphaTab.Platform.Model.TextBaseline.Default);
 };
 AlphaTab.Platform.Svg.SvgCanvas.prototype = {
-    get_Width: function (){
-        return this._Width;
-    },
-    set_Width: function (value){
-        this._Width = value;
-    },
-    get_Height: function (){
-        return this._Height;
-    },
-    set_Height: function (value){
-        this._Height = value;
-    },
     get_Color: function (){
         return this._Color;
     },
@@ -7260,62 +7275,47 @@ AlphaTab.Platform.Svg.SvgCanvas.prototype = {
     set_Resources: function (value){
         this._Resources = value;
     },
-    get_RenderResult: function (){
-        return this.ToSvg(true, "alphaTabSurfaceSvg");
-    },
-    ToSvg: function (includeWrapper, className){
-        var buf = new Array();
-        if (includeWrapper){
-            buf.push("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"");
-            buf.push(this.get_Width());
-            buf.push("px\" height=\"");
-            buf.push(this.get_Height());
-            buf.push("px\"");
-            if (className != null){
-                buf.push(" class=\"");
-                buf.push(className);
-                buf.push("\"");
-            }
-            buf.push(">\n");
-        }
-        buf.push(this._buffer);
-        if (includeWrapper){
-            buf.push("</svg>");
-        }
-        return buf.join('');
-    },
-    Clear: function (){
-        this._buffer = "";
+    BeginRender: function (width, height){
+        this._buffer = new Array();
+        this._buffer.push("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"");
+        this._buffer.push(width);
+        this._buffer.push("px\" height=\"");
+        this._buffer.push(height);
+        this._buffer.push("px\" class=\"alphaTabSurfaceSvg\">\n");
         this._currentPath = "";
         this._currentPathIsEmpty = true;
     },
+    EndRender: function (){
+        this._buffer.push("</svg>");
+        return this._buffer.join('');
+    },
     FillRect: function (x, y, w, h){
-        this._buffer += "<rect x=\"";
-        this._buffer += x - 0.5;
-        this._buffer += "\" y=\"";
-        this._buffer += y - 0.5;
-        this._buffer += "\" width=\"";
-        this._buffer += w;
-        this._buffer += "\" height=\"";
-        this._buffer += h;
-        this._buffer += "\" style=\"fill:";
-        this._buffer += this.get_Color().ToRgbaString();
-        this._buffer += ";\" />\n";
+        this._buffer.push("<rect x=\"");
+        this._buffer.push(x - 0.5);
+        this._buffer.push("\" y=\"");
+        this._buffer.push(y - 0.5);
+        this._buffer.push("\" width=\"");
+        this._buffer.push(w);
+        this._buffer.push("\" height=\"");
+        this._buffer.push(h);
+        this._buffer.push("\" style=\"fill:");
+        this._buffer.push(this.get_Color().ToRgbaString());
+        this._buffer.push(";\" />\n");
     },
     StrokeRect: function (x, y, w, h){
-        this._buffer += "<rect x=\"";
-        this._buffer += x - 0.5;
-        this._buffer += "\" y=\"";
-        this._buffer += y - 0.5;
-        this._buffer += "\" width=\"";
-        this._buffer += w;
-        this._buffer += "\" height=\"";
-        this._buffer += h;
-        this._buffer += "\" style=\"stroke:";
-        this._buffer += this.get_Color().ToRgbaString();
-        this._buffer += "; stroke-width:";
-        this._buffer += this.get_LineWidth();
-        this._buffer += ";\" />\n";
+        this._buffer.push("<rect x=\"");
+        this._buffer.push(x - 0.5);
+        this._buffer.push("\" y=\"");
+        this._buffer.push(y - 0.5);
+        this._buffer.push("\" width=\"");
+        this._buffer.push(w);
+        this._buffer.push("\" height=\"");
+        this._buffer.push(h);
+        this._buffer.push("\" style=\"stroke:");
+        this._buffer.push(this.get_Color().ToRgbaString());
+        this._buffer.push("; stroke-width:");
+        this._buffer.push(this.get_LineWidth());
+        this._buffer.push(";\" />\n");
     },
     BeginPath: function (){
     },
@@ -7382,45 +7382,45 @@ AlphaTab.Platform.Svg.SvgCanvas.prototype = {
     },
     Fill: function (){
         if (!this._currentPathIsEmpty){
-            this._buffer += "<path d=\"";
-            this._buffer += this._currentPath;
-            this._buffer += "\" style=\"fill:";
-            this._buffer += this.get_Color().ToRgbaString();
-            this._buffer += "\" stroke=\"none\"/>\n";
+            this._buffer.push("<path d=\"");
+            this._buffer.push(this._currentPath);
+            this._buffer.push("\" style=\"fill:");
+            this._buffer.push(this.get_Color().ToRgbaString());
+            this._buffer.push("\" stroke=\"none\"/>\n");
         }
         this._currentPath = "";
         this._currentPathIsEmpty = true;
     },
     Stroke: function (){
         if (!this._currentPathIsEmpty){
-            this._buffer += "<path d=\"";
-            this._buffer += this._currentPath;
-            this._buffer += "\" style=\"stroke:";
-            this._buffer += this.get_Color().ToRgbaString();
-            this._buffer += "; stroke-width:";
-            this._buffer += this.get_LineWidth();
-            this._buffer += ";\" fill=\"none\" />\n";
+            this._buffer.push("<path d=\"");
+            this._buffer.push(this._currentPath);
+            this._buffer.push("\" style=\"stroke:");
+            this._buffer.push(this.get_Color().ToRgbaString());
+            this._buffer.push("; stroke-width:");
+            this._buffer.push(this.get_LineWidth());
+            this._buffer.push(";\" fill=\"none\" />\n");
         }
         this._currentPath = "";
         this._currentPathIsEmpty = true;
     },
     FillText: function (text, x, y){
-        this._buffer += "<text x=\"";
-        this._buffer += x;
-        this._buffer += "\" y=\"";
-        this._buffer += y + this.GetSvgBaseLineOffset();
-        this._buffer += "\" style=\"font:";
-        this._buffer += this.get_Font().ToCssString();
-        this._buffer += "; fill:";
-        this._buffer += this.get_Color().ToRgbaString();
-        this._buffer += ";\" ";
-        this._buffer += " dominant-baseline=\"";
-        this._buffer += this.GetSvgBaseLine();
-        this._buffer += "\" text-anchor=\"";
-        this._buffer += this.GetSvgTextAlignment();
-        this._buffer += "\">\n";
-        this._buffer += text;
-        this._buffer += "</text>\n";
+        this._buffer.push("<text x=\"");
+        this._buffer.push(x);
+        this._buffer.push("\" y=\"");
+        this._buffer.push(y + this.GetSvgBaseLineOffset());
+        this._buffer.push("\" style=\"font:");
+        this._buffer.push(this.get_Font().ToCssString());
+        this._buffer.push("; fill:");
+        this._buffer.push(this.get_Color().ToRgbaString());
+        this._buffer.push(";\" ");
+        this._buffer.push(" dominant-baseline=\"");
+        this._buffer.push(this.GetSvgBaseLine());
+        this._buffer.push("\" text-anchor=\"");
+        this._buffer.push(this.GetSvgTextAlignment());
+        this._buffer.push("\">\n");
+        this._buffer.push(text);
+        this._buffer.push("</text>\n");
     },
     GetSvgTextAlignment: function (){
         switch (this.get_TextAlign()){
@@ -8198,7 +8198,7 @@ AlphaTab.Rendering.Effects.ChordsEffectInfo.prototype = {
         return 20 * renderer.get_Scale();
     },
     CreateNewGlyph: function (renderer, beat){
-        return new AlphaTab.Rendering.Glyphs.TextGlyph(0, 0, beat.get_Chord().Name, renderer.get_Resources().EffectFont);
+        return new AlphaTab.Rendering.Glyphs.TextGlyph(0, 0, beat.get_Chord().Name, renderer.get_Resources().EffectFont, AlphaTab.Platform.Model.TextAlign.Left);
     },
     CanExpand: function (renderer, from, to){
         return true;
@@ -8406,7 +8406,7 @@ AlphaTab.Rendering.Effects.MarkerEffectInfo.prototype = {
         return 20 * renderer.get_Scale();
     },
     CreateNewGlyph: function (renderer, beat){
-        return new AlphaTab.Rendering.Glyphs.TextGlyph(0, 0, beat.Voice.Bar.get_MasterBar().Section.Text, renderer.get_Resources().MarkerFont);
+        return new AlphaTab.Rendering.Glyphs.TextGlyph(0, 0, beat.Voice.Bar.get_MasterBar().Section.Text, renderer.get_Resources().MarkerFont, AlphaTab.Platform.Model.TextAlign.Left);
     },
     CanExpand: function (renderer, from, to){
         return true;
@@ -8488,12 +8488,12 @@ AlphaTab.Rendering.Effects.TapEffectInfo.prototype = {
     CreateNewGlyph: function (renderer, beat){
         var res = renderer.get_Resources();
         if (beat.Slap){
-            return new AlphaTab.Rendering.Glyphs.TextGlyph(0, 0, "S", res.EffectFont);
+            return new AlphaTab.Rendering.Glyphs.TextGlyph(0, 0, "S", res.EffectFont, AlphaTab.Platform.Model.TextAlign.Left);
         }
         if (beat.Pop){
-            return new AlphaTab.Rendering.Glyphs.TextGlyph(0, 0, "P", res.EffectFont);
+            return new AlphaTab.Rendering.Glyphs.TextGlyph(0, 0, "P", res.EffectFont, AlphaTab.Platform.Model.TextAlign.Left);
         }
-        return new AlphaTab.Rendering.Glyphs.TextGlyph(0, 0, "T", res.EffectFont);
+        return new AlphaTab.Rendering.Glyphs.TextGlyph(0, 0, "T", res.EffectFont, AlphaTab.Platform.Model.TextAlign.Left);
     },
     CanExpand: function (renderer, from, to){
         return true;
@@ -8544,7 +8544,7 @@ AlphaTab.Rendering.Effects.TextEffectInfo.prototype = {
         return 20 * renderer.get_Scale();
     },
     CreateNewGlyph: function (renderer, beat){
-        return new AlphaTab.Rendering.Glyphs.TextGlyph(0, 0, beat.Text, renderer.get_Resources().EffectFont);
+        return new AlphaTab.Rendering.Glyphs.TextGlyph(0, 0, beat.Text, renderer.get_Resources().EffectFont, AlphaTab.Platform.Model.TextAlign.Left);
     },
     CanExpand: function (renderer, from, to){
         return true;
@@ -11259,18 +11259,20 @@ AlphaTab.Rendering.Glyphs.TempoGlyph.prototype = {
     }
 };
 $Inherit(AlphaTab.Rendering.Glyphs.TempoGlyph, AlphaTab.Rendering.Glyphs.EffectGlyph);
-AlphaTab.Rendering.Glyphs.TextGlyph = function (x, y, text, font){
+AlphaTab.Rendering.Glyphs.TextGlyph = function (x, y, text, font, textAlign){
     this._text = null;
     this._font = null;
+    this._textAlign = AlphaTab.Platform.Model.TextAlign.Left;
     AlphaTab.Rendering.Glyphs.EffectGlyph.call(this, x, y);
     this._text = text;
     this._font = font;
+    this._textAlign = textAlign;
 };
 AlphaTab.Rendering.Glyphs.TextGlyph.prototype = {
     Paint: function (cx, cy, canvas){
         canvas.set_Font(this._font);
         var old = canvas.get_TextAlign();
-        canvas.set_TextAlign(AlphaTab.Platform.Model.TextAlign.Left);
+        canvas.set_TextAlign(this._textAlign);
         canvas.FillText(this._text, cx + this.X, cy + this.Y);
         canvas.set_TextAlign(old);
     }
@@ -11524,6 +11526,8 @@ $Inherit(AlphaTab.Rendering.Glyphs.WhammyBarGlyph, AlphaTab.Rendering.Glyphs.Gly
 AlphaTab.Rendering.RenderFinishedEventArgs = function (){
     this.Width = 0;
     this.Height = 0;
+    this.TotalWidth = 0;
+    this.TotalHeight = 0;
     this.RenderResult = null;
 };
 AlphaTab.Rendering.Layout = AlphaTab.Rendering.Layout || {};
@@ -11542,6 +11546,7 @@ AlphaTab.Rendering.Layout.HeaderFooterElements = {
 };
 AlphaTab.Rendering.Layout.ScoreLayout = function (renderer){
     this._barRendererLookup = null;
+    this.PartialRenderFinished = null;
     this.Renderer = null;
     this.Width = 0;
     this.Height = 0;
@@ -11582,6 +11587,41 @@ AlphaTab.Rendering.Layout.ScoreLayout.prototype = {
             return this._barRendererLookup[key][index];
         }
         return null;
+    },
+    add_PartialRenderFinished: function (value){
+        this.PartialRenderFinished = $CombineDelegates(this.PartialRenderFinished, value);
+    },
+    remove_PartialRenderFinished: function (value){
+        this.PartialRenderFinished = $RemoveDelegate(this.PartialRenderFinished, value);
+    },
+    OnPartialRenderFinished: function (e){
+        if (this.PartialRenderFinished != null){
+            this.PartialRenderFinished(e);
+        }
+    },
+    RenderAnnotation: function (){
+        // attention, you are not allowed to remove change this notice within any version of this library without permission!
+        var msg = "Rendered using alphaTab (http://www.alphaTab.net)";
+        var canvas = this.Renderer.Canvas;
+        var resources = this.Renderer.RenderingResources;
+        var height = (resources.CopyrightFont.Size * 2);
+        this.Height += height;
+        var x = this.Width / 2;
+        canvas.BeginRender(this.Width, height);
+        canvas.set_Color(resources.MainGlyphColor);
+        canvas.set_Font(resources.CopyrightFont);
+        canvas.set_TextAlign(AlphaTab.Platform.Model.TextAlign.Center);
+        canvas.FillText(msg, x, 0);
+        var result = canvas.EndRender();
+        this.OnPartialRenderFinished((function (){
+            var $v1 = new AlphaTab.Rendering.RenderFinishedEventArgs();
+            $v1.Width = this.Width;
+            $v1.Height = height;
+            $v1.RenderResult = result;
+            $v1.TotalWidth = this.Width;
+            $v1.TotalHeight = this.Height;
+            return $v1;
+        }).call(this));
     }
 };
 AlphaTab.Rendering.Layout.HorizontalScreenLayout = function (renderer){
@@ -11589,10 +11629,11 @@ AlphaTab.Rendering.Layout.HorizontalScreenLayout = function (renderer){
     AlphaTab.Rendering.Layout.ScoreLayout.call(this, renderer);
 };
 AlphaTab.Rendering.Layout.HorizontalScreenLayout.prototype = {
-    DoLayout: function (){
+    DoLayoutAndRender: function (){
         if (this.Renderer.Settings.Staves.length == 0)
             return;
         var score = this.Renderer.Score;
+        var canvas = this.Renderer.Canvas;
         var startIndex = this.Renderer.Settings.Layout.Get("start", 1);
         startIndex--;
         // map to array index
@@ -11615,11 +11656,22 @@ AlphaTab.Rendering.Layout.HorizontalScreenLayout.prototype = {
         y += this._group.get_Height() + (20 * this.get_Scale());
         this.Height = y + AlphaTab.Rendering.Layout.HorizontalScreenLayout.PagePadding[3];
         this.Width = this._group.X + this._group.Width + AlphaTab.Rendering.Layout.HorizontalScreenLayout.PagePadding[2];
-    },
-    PaintScore: function (){
-        this.Renderer.Canvas.set_Color(this.Renderer.RenderingResources.MainGlyphColor);
-        this.Renderer.Canvas.set_TextAlign(AlphaTab.Platform.Model.TextAlign.Left);
+        // TODO: Find a good way to render the score partwise
+        // we need to precalculate the final height somehow
+        canvas.BeginRender(this.Width, this.Height);
+        canvas.set_Color(this.Renderer.RenderingResources.MainGlyphColor);
+        canvas.set_TextAlign(AlphaTab.Platform.Model.TextAlign.Left);
         this._group.Paint(0, 0, this.Renderer.Canvas);
+        var result = canvas.EndRender();
+        this.OnPartialRenderFinished((function (){
+            var $v2 = new AlphaTab.Rendering.RenderFinishedEventArgs();
+            $v2.TotalWidth = this.Width;
+            $v2.TotalHeight = y;
+            $v2.Width = this.Width;
+            $v2.Height = this.Height;
+            $v2.RenderResult = result;
+            return $v2;
+        }).call(this));
     },
     BuildBoundingsLookup: function (lookup){
         this._group.BuildBoundingsLookup(lookup);
@@ -11633,26 +11685,11 @@ $Inherit(AlphaTab.Rendering.Layout.HorizontalScreenLayout, AlphaTab.Rendering.La
 AlphaTab.Rendering.Layout.PageViewLayout = function (renderer){
     this._groups = null;
     AlphaTab.Rendering.Layout.ScoreLayout.call(this, renderer);
-    this._groups = [];
 };
 AlphaTab.Rendering.Layout.PageViewLayout.prototype = {
-    DoLayout: function (){
-        this._groups = [];
-        var score = this.Renderer.Score;
-        var startIndex = this.Renderer.Settings.Layout.Get("start", 1);
-        startIndex--;
-        // map to array index
-        startIndex = Math.min(score.MasterBars.length - 1, Math.max(0, startIndex));
-        var currentBarIndex = startIndex;
-        var endBarIndex = this.Renderer.Settings.Layout.Get("count", score.MasterBars.length);
-        if (endBarIndex < 0)
-            endBarIndex = score.MasterBars.length;
-        endBarIndex = startIndex + endBarIndex - 1;
-        // map count to array index
-        endBarIndex = Math.min(score.MasterBars.length - 1, Math.max(0, endBarIndex));
+    DoLayoutAndRender: function (){
         var x = AlphaTab.Rendering.Layout.PageViewLayout.PagePadding[0];
         var y = AlphaTab.Rendering.Layout.PageViewLayout.PagePadding[1];
-        y = this.DoScoreInfoLayout(y);
         var autoSize = this.Renderer.Settings.Layout.Get("autoSize", true);
         if (autoSize || this.Renderer.Settings.Width <= 0){
             this.Width = 950 * this.get_Scale();
@@ -11660,130 +11697,58 @@ AlphaTab.Rendering.Layout.PageViewLayout.prototype = {
         else {
             this.Width = this.Renderer.Settings.Width;
         }
-        if (this.Renderer.Settings.Staves.length > 0){
-            while (currentBarIndex <= endBarIndex){
-                var group = this.CreateStaveGroup(currentBarIndex, endBarIndex);
-                this._groups.push(group);
-                group.X = x;
-                group.Y = y;
-                this.FitGroup(group);
-                group.FinalizeGroup(this);
-                y += group.get_Height() + (20 * this.get_Scale());
-                currentBarIndex = group.get_LastBarIndex() + 1;
-            }
-        }
+        // 
+        // 1. Score Info
+        y = this.LayoutAndRenderScoreInfo(x, y);
+        //
+        // 2. One result per StaveGroup
+        y = this.LayoutAndRenderScore(x, y);
         this.Height = y + AlphaTab.Rendering.Layout.PageViewLayout.PagePadding[3];
     },
-    DoScoreInfoLayout: function (y){
-        // TODO: Check if it's a good choice to provide the complete flags as setting
-        var flags = this.Renderer.Settings.Layout.Get("hideInfo", false) ? AlphaTab.Rendering.Layout.HeaderFooterElements.None : AlphaTab.Rendering.Layout.HeaderFooterElements.All;
-        var score = this.Renderer.Score;
-        var scale = this.get_Scale();
-        if (!((score.Title==null)||(score.Title.length==0)) && (flags & AlphaTab.Rendering.Layout.HeaderFooterElements.Title) != AlphaTab.Rendering.Layout.HeaderFooterElements.None){
-            y += (35 * scale);
-        }
-        if (!((score.SubTitle==null)||(score.SubTitle.length==0)) && (flags & AlphaTab.Rendering.Layout.HeaderFooterElements.SubTitle) != AlphaTab.Rendering.Layout.HeaderFooterElements.None){
-            y += (20 * scale);
-        }
-        if (!((score.Artist==null)||(score.Artist.length==0)) && (flags & AlphaTab.Rendering.Layout.HeaderFooterElements.Artist) != AlphaTab.Rendering.Layout.HeaderFooterElements.None){
-            y += (20 * scale);
-        }
-        if (!((score.Album==null)||(score.Album.length==0)) && (flags & AlphaTab.Rendering.Layout.HeaderFooterElements.Album) != AlphaTab.Rendering.Layout.HeaderFooterElements.None){
-            y += (20 * scale);
-        }
-        if (!((score.Music==null)||(score.Music.length==0)) && score.Music == score.Words && (flags & AlphaTab.Rendering.Layout.HeaderFooterElements.WordsAndMusic) != AlphaTab.Rendering.Layout.HeaderFooterElements.None){
-            y += (20 * scale);
-        }
-        else {
-            if (!((score.Music==null)||(score.Music.length==0)) && (flags & AlphaTab.Rendering.Layout.HeaderFooterElements.Music) != AlphaTab.Rendering.Layout.HeaderFooterElements.None){
-                y += (20 * scale);
-            }
-            if (!((score.Words==null)||(score.Words.length==0)) && (flags & AlphaTab.Rendering.Layout.HeaderFooterElements.Words) != AlphaTab.Rendering.Layout.HeaderFooterElements.None){
-                y += (20 * scale);
-            }
-        }
-        y += (20 * scale);
-        // tuning info
-        if (this.Renderer.Tracks.length == 1 && !this.Renderer.Tracks[0].IsPercussion){
-            var tuning = AlphaTab.Model.Tuning.FindTuning(this.Renderer.Tracks[0].Tuning);
-            if (tuning != null){
-                // Name
-                y += (15 * scale);
-                if (!tuning.IsStandard){
-                    // Strings
-                    var stringsPerColumn = (Math.ceil(this.Renderer.Tracks[0].Tuning.length / 2)) | 0;
-                    y += (stringsPerColumn * (15 * scale));
-                }
-                y += (15 * scale);
-            }
-        }
-        y += (40 * scale);
-        return y;
-    },
-    PaintScore: function (){
-        var x = AlphaTab.Rendering.Layout.PageViewLayout.PagePadding[0];
-        var y = AlphaTab.Rendering.Layout.PageViewLayout.PagePadding[1];
-        y = this.PaintScoreInfo(x, y);
-        this.Renderer.Canvas.set_Color(this.Renderer.RenderingResources.MainGlyphColor);
-        this.Renderer.Canvas.set_TextAlign(AlphaTab.Platform.Model.TextAlign.Left);
-        for (var i = 0,j = this._groups.length; i < j; i++){
-            this._groups[i].Paint(0, 0, this.Renderer.Canvas);
-        }
-    },
-    DrawCentered: function (text, font, y){
-        this.Renderer.Canvas.set_Font(font);
-        this.Renderer.Canvas.FillText(text, this.Width / 2, y);
-    },
-    PaintScoreInfo: function (x, y){
+    LayoutAndRenderScoreInfo: function (x, y){
         var flags = this.Renderer.Settings.Layout.Get("hideInfo", false) ? AlphaTab.Rendering.Layout.HeaderFooterElements.None : AlphaTab.Rendering.Layout.HeaderFooterElements.All;
         var score = this.Renderer.Score;
         var scale = this.get_Scale();
         var canvas = this.Renderer.Canvas;
         var res = this.Renderer.RenderingResources;
-        canvas.set_Color(res.ScoreInfoColor);
-        canvas.set_TextAlign(AlphaTab.Platform.Model.TextAlign.Center);
+        var glyphs = [];
         var str;
         if (!((score.Title==null)||(score.Title.length==0)) && (flags & AlphaTab.Rendering.Layout.HeaderFooterElements.Title) != AlphaTab.Rendering.Layout.HeaderFooterElements.None){
-            this.DrawCentered(score.Title, res.TitleFont, y);
+            glyphs.push(new AlphaTab.Rendering.Glyphs.TextGlyph(this.Width / 2, y, score.Title, res.TitleFont, AlphaTab.Platform.Model.TextAlign.Center));
             y += (35 * scale);
         }
         if (!((score.SubTitle==null)||(score.SubTitle.length==0)) && (flags & AlphaTab.Rendering.Layout.HeaderFooterElements.SubTitle) != AlphaTab.Rendering.Layout.HeaderFooterElements.None){
-            this.DrawCentered(score.SubTitle, res.SubTitleFont, y);
+            glyphs.push(new AlphaTab.Rendering.Glyphs.TextGlyph(this.Width / 2, y, score.SubTitle, res.SubTitleFont, AlphaTab.Platform.Model.TextAlign.Center));
             y += (20 * scale);
         }
         if (!((score.Artist==null)||(score.Artist.length==0)) && (flags & AlphaTab.Rendering.Layout.HeaderFooterElements.Artist) != AlphaTab.Rendering.Layout.HeaderFooterElements.None){
-            this.DrawCentered(score.Artist, res.SubTitleFont, y);
+            glyphs.push(new AlphaTab.Rendering.Glyphs.TextGlyph(this.Width / 2, y, score.Artist, res.SubTitleFont, AlphaTab.Platform.Model.TextAlign.Center));
             y += (20 * scale);
         }
         if (!((score.Album==null)||(score.Album.length==0)) && (flags & AlphaTab.Rendering.Layout.HeaderFooterElements.Album) != AlphaTab.Rendering.Layout.HeaderFooterElements.None){
-            this.DrawCentered(score.Album, res.SubTitleFont, y);
+            glyphs.push(new AlphaTab.Rendering.Glyphs.TextGlyph(this.Width / 2, y, score.Album, res.SubTitleFont, AlphaTab.Platform.Model.TextAlign.Center));
             y += (20 * scale);
         }
         if (!((score.Music==null)||(score.Music.length==0)) && score.Music == score.Words && (flags & AlphaTab.Rendering.Layout.HeaderFooterElements.WordsAndMusic) != AlphaTab.Rendering.Layout.HeaderFooterElements.None){
-            this.DrawCentered("Music and Words by " + score.Words, res.WordsFont, y);
+            glyphs.push(new AlphaTab.Rendering.Glyphs.TextGlyph(this.Width / 2, y, "Music and Words by " + score.Words, res.WordsFont, AlphaTab.Platform.Model.TextAlign.Center));
             y += (20 * scale);
         }
         else {
-            canvas.set_Font(res.WordsFont);
             if (!((score.Music==null)||(score.Music.length==0)) && (flags & AlphaTab.Rendering.Layout.HeaderFooterElements.Music) != AlphaTab.Rendering.Layout.HeaderFooterElements.None){
-                canvas.set_TextAlign(AlphaTab.Platform.Model.TextAlign.Right);
-                canvas.FillText("Music by " + score.Music, this.Width - AlphaTab.Rendering.Layout.PageViewLayout.PagePadding[2], y);
+                glyphs.push(new AlphaTab.Rendering.Glyphs.TextGlyph(this.Width - AlphaTab.Rendering.Layout.PageViewLayout.PagePadding[2], y, "Music by " + score.Music, res.WordsFont, AlphaTab.Platform.Model.TextAlign.Right));
             }
             if (!((score.Words==null)||(score.Words.length==0)) && (flags & AlphaTab.Rendering.Layout.HeaderFooterElements.Words) != AlphaTab.Rendering.Layout.HeaderFooterElements.None){
-                canvas.set_TextAlign(AlphaTab.Platform.Model.TextAlign.Left);
-                canvas.FillText("Words by " + score.Music, x, y);
+                glyphs.push(new AlphaTab.Rendering.Glyphs.TextGlyph(x, y, "Words by " + score.Music, res.WordsFont, AlphaTab.Platform.Model.TextAlign.Left));
             }
             y += (20 * scale);
         }
         y += (20 * scale);
         // tuning info
         if (this.Renderer.Tracks.length == 1 && !this.Renderer.Tracks[0].IsPercussion){
-            canvas.set_TextAlign(AlphaTab.Platform.Model.TextAlign.Left);
             var tuning = AlphaTab.Model.Tuning.FindTuning(this.Renderer.Tracks[0].Tuning);
             if (tuning != null){
                 // Name
-                canvas.set_Font(res.EffectFont);
-                canvas.FillText(tuning.Name, x, y);
+                glyphs.push(new AlphaTab.Rendering.Glyphs.TextGlyph(x, y, tuning.Name, res.EffectFont, AlphaTab.Platform.Model.TextAlign.Left));
                 y += (15 * scale);
                 if (!tuning.IsStandard){
                     // Strings
@@ -11792,7 +11757,7 @@ AlphaTab.Rendering.Layout.PageViewLayout.prototype = {
                     var currentY = y;
                     for (var i = 0,j = this.Renderer.Tracks[0].Tuning.length; i < j; i++){
                         str = "(" + (i + 1) + ") = " + AlphaTab.Model.Tuning.GetTextForTuning(this.Renderer.Tracks[0].Tuning[i], false);
-                        canvas.FillText(str, currentX, currentY);
+                        glyphs.push(new AlphaTab.Rendering.Glyphs.TextGlyph(currentX, currentY, str, res.EffectFont, AlphaTab.Platform.Model.TextAlign.Left));
                         currentY += (15 * scale);
                         if (i == stringsPerColumn - 1){
                             currentY = y;
@@ -11804,6 +11769,72 @@ AlphaTab.Rendering.Layout.PageViewLayout.prototype = {
             }
         }
         y += 25 * scale;
+        canvas.BeginRender(this.Width, y);
+        canvas.set_Color(res.ScoreInfoColor);
+        canvas.set_TextAlign(AlphaTab.Platform.Model.TextAlign.Center);
+        for (var i = 0; i < glyphs.length; i++){
+            glyphs[i].Paint(0, 0, canvas);
+        }
+        var result = canvas.EndRender();
+        this.OnPartialRenderFinished((function (){
+            var $v3 = new AlphaTab.Rendering.RenderFinishedEventArgs();
+            $v3.Width = this.Width;
+            $v3.Height = y;
+            $v3.RenderResult = result;
+            $v3.TotalWidth = this.Width;
+            $v3.TotalHeight = y;
+            return $v3;
+        }).call(this));
+        return y;
+    },
+    LayoutAndRenderScore: function (x, y){
+        var score = this.Renderer.Score;
+        var canvas = this.Renderer.Canvas;
+        var startIndex = this.Renderer.Settings.Layout.Get("start", 1);
+        startIndex--;
+        // map to array index
+        startIndex = Math.min(score.MasterBars.length - 1, Math.max(0, startIndex));
+        var currentBarIndex = startIndex;
+        var endBarIndex = this.Renderer.Settings.Layout.Get("count", score.MasterBars.length);
+        if (endBarIndex < 0)
+            endBarIndex = score.MasterBars.length;
+        endBarIndex = startIndex + endBarIndex - 1;
+        // map count to array index
+        endBarIndex = Math.min(score.MasterBars.length - 1, Math.max(0, endBarIndex));
+        this._groups = [];
+        if (this.Renderer.Settings.Staves.length > 0){
+            while (currentBarIndex <= endBarIndex){
+                // create group and align set proper coordinates
+                var group = this.CreateStaveGroup(currentBarIndex, endBarIndex);
+                this._groups.push(group);
+                group.X = x;
+                group.Y = y;
+                // finalize group (sizing etc).
+                this.FitGroup(group);
+                group.FinalizeGroup(this);
+                // paint into canvas
+                var height = group.get_Height() + (20 * this.get_Scale());
+                canvas.BeginRender(this.Width, height);
+                this.Renderer.Canvas.set_Color(this.Renderer.RenderingResources.MainGlyphColor);
+                this.Renderer.Canvas.set_TextAlign(AlphaTab.Platform.Model.TextAlign.Left);
+                // NOTE: we use this negation trick to make the group paint itself to 0/0 coordinates 
+                // since we use partial drawing
+                group.Paint(0, -group.Y, canvas);
+                // calculate coordinates for next group
+                y += height;
+                currentBarIndex = group.get_LastBarIndex() + 1;
+                var result = canvas.EndRender();
+                this.OnPartialRenderFinished((function (){
+                    var $v4 = new AlphaTab.Rendering.RenderFinishedEventArgs();
+                    $v4.TotalWidth = this.Width;
+                    $v4.TotalHeight = y;
+                    $v4.Width = this.Width;
+                    $v4.Height = height;
+                    $v4.RenderResult = result;
+                    return $v4;
+                }).call(this));
+            }
+        }
         return y;
     },
     FitGroup: function (group){
@@ -12614,6 +12645,8 @@ AlphaTab.Rendering.ScoreBarRendererFactory.prototype = {
 $Inherit(AlphaTab.Rendering.ScoreBarRendererFactory, AlphaTab.Rendering.BarRendererFactory);
 AlphaTab.Rendering.ScoreRenderer = function (settings, param){
     this._currentLayoutMode = null;
+    this.PreRender = null;
+    this.PartialRenderFinished = null;
     this.RenderFinished = null;
     this.PostRenderFinished = null;
     this.Canvas = null;
@@ -12633,9 +12666,6 @@ AlphaTab.Rendering.ScoreRenderer = function (settings, param){
     this.RecreateLayout();
 };
 AlphaTab.Rendering.ScoreRenderer.prototype = {
-    get_IsSvg: function (){
-        return true;
-    },
     RecreateLayout: function (){
         if (this._currentLayoutMode != this.Settings.Layout.Mode){
             if (this.Settings.Layout == null || !AlphaTab.Environment.LayoutEngines.hasOwnProperty(this.Settings.Layout.Mode)){
@@ -12644,6 +12674,7 @@ AlphaTab.Rendering.ScoreRenderer.prototype = {
             else {
                 this.Layout = AlphaTab.Environment.LayoutEngines[this.Settings.Layout.Mode](this);
             }
+            this.Layout.add_PartialRenderFinished($CreateDelegate(this, this.OnPartialRenderFinished));
             this._currentLayoutMode = this.Settings.Layout.Mode;
         }
     },
@@ -12670,36 +12701,42 @@ AlphaTab.Rendering.ScoreRenderer.prototype = {
             this.Canvas.set_LineWidth(this.Settings.Scale);
         }
         this.Canvas.set_Resources(this.RenderingResources);
+        this.OnPreRender();
         this.RecreateLayout();
-        this.Canvas.Clear();
-        this.DoLayout();
-        this.PaintScore();
+        this.LayoutAndRender();
+    },
+    LayoutAndRender: function (){
+        this.Layout.DoLayoutAndRender();
+        this.Layout.RenderAnnotation();
         this.OnRenderFinished((function (){
-            var $v1 = new AlphaTab.Rendering.RenderFinishedEventArgs();
-            $v1.Height = this.Canvas.get_Height();
-            $v1.Width = this.Canvas.get_Width();
-            $v1.RenderResult = this.Canvas.get_RenderResult();
-            return $v1;
+            var $v5 = new AlphaTab.Rendering.RenderFinishedEventArgs();
+            $v5.TotalHeight = this.Layout.Height;
+            $v5.TotalWidth = this.Layout.Width;
+            return $v5;
         }).call(this));
         this.OnPostRenderFinished();
     },
-    DoLayout: function (){
-        this.Layout.DoLayout();
-        this.Canvas.set_Height(this.Layout.Height + (this.RenderingResources.CopyrightFont.Size * 2));
-        this.Canvas.set_Width(this.Layout.Width);
+    add_PreRender: function (value){
+        this.PreRender = $CombineDelegates(this.PreRender, value);
     },
-    PaintScore: function (){
-        this.PaintBackground();
-        this.Layout.PaintScore();
+    remove_PreRender: function (value){
+        this.PreRender = $RemoveDelegate(this.PreRender, value);
     },
-    PaintBackground: function (){
-        // attention, you are not allowed to remove change this notice within any version of this library without permission!
-        var msg = "Rendered using alphaTab (http://www.alphaTab.net)";
-        this.Canvas.set_Color(new AlphaTab.Platform.Model.Color(62, 62, 62, 255));
-        this.Canvas.set_Font(this.RenderingResources.CopyrightFont);
-        this.Canvas.set_TextAlign(AlphaTab.Platform.Model.TextAlign.Center);
-        var x = this.Canvas.get_Width() / 2;
-        this.Canvas.FillText(msg, x, this.Canvas.get_Height() - (this.RenderingResources.CopyrightFont.Size * 2));
+    OnPreRender: function (){
+        var handler = this.PreRender;
+        if (handler != null)
+            handler();
+    },
+    add_PartialRenderFinished: function (value){
+        this.PartialRenderFinished = $CombineDelegates(this.PartialRenderFinished, value);
+    },
+    remove_PartialRenderFinished: function (value){
+        this.PartialRenderFinished = $RemoveDelegate(this.PartialRenderFinished, value);
+    },
+    OnPartialRenderFinished: function (e){
+        var handler = this.PartialRenderFinished;
+        if (handler != null)
+            handler(e);
     },
     add_RenderFinished: function (value){
         this.RenderFinished = $CombineDelegates(this.RenderFinished, value);

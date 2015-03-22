@@ -440,8 +440,7 @@ namespace AlphaTab.Importer
                     {
                         tuning[tuning.Length - 1 - i] = Std.ParseInt(tuningParts[i]);
                     }
-                    track.Tuning = new FastList<int>();
-                    track.Tuning.AddRange(tuning);
+                    track.Tuning = tuning;
                     break;
                 case "DiagramCollection":
                     ParseDiagramCollection(track, node);

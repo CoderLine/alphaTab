@@ -33,11 +33,6 @@ namespace AlphaTab.Rendering
     {
         private string _currentLayoutMode;
 
-        public bool IsSvg
-        {
-            get { return Canvas is SvgCanvas; }
-        }
-
         public ICanvas Canvas { get; set; }
         public Score Score { get; set; }
         public Track[] Tracks { get; set; }
@@ -74,6 +69,7 @@ namespace AlphaTab.Rendering
                 {
                     Layout = Environment.LayoutEngines[Settings.Layout.Mode](this);
                 }
+                Layout.PartialRenderFinished += OnPartialRenderFinished;
                 _currentLayoutMode = Settings.Layout.Mode;
             }
         }
@@ -110,43 +106,35 @@ namespace AlphaTab.Rendering
                 Canvas.LineWidth = Settings.Scale;
             }
             Canvas.Resources = RenderingResources;
+            OnPreRender();
             RecreateLayout();
-            Canvas.Clear();
-            DoLayout();
-            PaintScore();
+            LayoutAndRender();
+        }
+
+        private void LayoutAndRender()
+        {
+            Layout.DoLayoutAndRender();
+            Layout.RenderAnnotation();
             OnRenderFinished(new RenderFinishedEventArgs
             {
-                Height = Canvas.Height,
-                Width = Canvas.Width,
-                RenderResult = Canvas.RenderResult 
+                TotalHeight = Layout.Height,
+                TotalWidth = Layout.Width
             });
             OnPostRenderFinished();
         }
 
-
-        private void DoLayout()
+        public event Action PreRender;
+        protected virtual void OnPreRender()
         {
-            Layout.DoLayout();
-            Canvas.Height = Layout.Height + (RenderingResources.CopyrightFont.Size * 2);
-            Canvas.Width = Layout.Width;
+            Action handler = PreRender;
+            if (handler != null) handler();
         }
 
-        private void PaintScore()
+        public event Action<RenderFinishedEventArgs> PartialRenderFinished;
+        protected virtual void OnPartialRenderFinished(RenderFinishedEventArgs e)
         {
-            PaintBackground();
-            Layout.PaintScore();
-        }
-
-        public void PaintBackground() 
-        {
-            // attention, you are not allowed to remove change this notice within any version of this library without permission!
-            var msg = "Rendered using alphaTab (http://www.alphaTab.net)";
-            Canvas.Color = new Color(62, 62, 62);
-            Canvas.Font = RenderingResources.CopyrightFont;
-            Canvas.TextAlign = TextAlign.Center;
-        
-            var x = Canvas.Width / 2;
-            Canvas.FillText(msg, x, Canvas.Height - (RenderingResources.CopyrightFont.Size * 2));
+            Action<RenderFinishedEventArgs> handler = PartialRenderFinished;
+            if (handler != null) handler(e);
         }
 
 

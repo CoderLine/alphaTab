@@ -58,14 +58,7 @@ namespace AlphaTab.Platform.JavaScript
 
                 #region Create context elements (wrapper, canvas etc)
 
-                if (settings.Engine == "html5")
-                {
-                    CanvasElement = (HtmlElement)document.createElement("canvas");
-                }
-                else
-                {
-                    CanvasElement = (HtmlElement)document.createElement("div");
-                }
+                CanvasElement = (HtmlElement)document.createElement("div");
 
                 CanvasElement.className = "alphaTabSurface";
                 element.appendChild(CanvasElement);
@@ -79,14 +72,33 @@ namespace AlphaTab.Platform.JavaScript
             Renderer = CreateScoreRenderer(settings, options, CanvasElement);
             Renderer.RenderFinished += o => TriggerEvent("rendered");
             Renderer.PostRenderFinished += () => TriggerEvent("post-rendered");
+            Renderer.PreRender += () =>
+            {
+                CanvasElement.innerHTML = "";
+            };
+            Renderer.PartialRenderFinished += result =>
+            {
+                Node itemToAppend;
+                if (@typeof(result.RenderResult) == "string")
+                {
+                    var partialResult = (HtmlDivElement) document.createElement("div");
+                    partialResult.innerHTML = result.RenderResult.As<string>();
+                    itemToAppend = partialResult.firstChild;
+                }
+                else
+                {
+                    itemToAppend = (Node) result.RenderResult;
+                }
+
+                CanvasElement.style.width = result.TotalWidth + "px";
+                CanvasElement.style.height = result.TotalHeight + "px";
+                CanvasElement.appendChild(itemToAppend);
+
+            };
             Renderer.RenderFinished += result =>
             {
-                if (Renderer.IsSvg)
-                {
-                    CanvasElement.innerHTML = result.RenderResult.ToString();
-                    CanvasElement.style.width = result.Width + "px";
-                    CanvasElement.style.height = result.Height + "px";
-                }
+                CanvasElement.style.width = result.TotalWidth + "px";
+                CanvasElement.style.height = result.TotalHeight + "px";
             };
 
             #endregion

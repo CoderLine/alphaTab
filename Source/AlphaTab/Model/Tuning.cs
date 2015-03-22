@@ -148,14 +148,14 @@ namespace AlphaTab.Model
             _fourStrings.Add(new Tuning("Cello Tuning", new[] { 57, 50, 43, 36 }, false));
         }
 
-        public static Tuning FindTuning(FastList<int> strings)
+        public static Tuning FindTuning(int[] strings)
         {
-            var tunings = GetPresetsFor(strings.Count);
+            var tunings = GetPresetsFor(strings.Length);
             for (int t = 0, tc = tunings.Count; t < tc; t++)
             {
                 var tuning = tunings[t];
                 var equals = true;
-                for (int i = 0, j = strings.Count; i < j; i++)
+                for (int i = 0, j = strings.Length; i < j; i++)
                 {
                     if (strings[i] != tuning.Tunings[i])
                     {
@@ -175,14 +175,13 @@ namespace AlphaTab.Model
 
         public bool IsStandard { get; set; }
         public string Name { get; set; }
-        public FastList<int> Tunings { get; set; }
+        public int[] Tunings { get; set; }
 
         public Tuning(string name, int[] tuning, bool isStandard) 
         {
             IsStandard = isStandard;
             Name = name;
-            Tunings = new FastList<int>();
-            Tunings.AddRange(tuning);
+            Tunings = tuning;
         }
     }
 }

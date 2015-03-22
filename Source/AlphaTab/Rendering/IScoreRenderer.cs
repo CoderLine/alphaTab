@@ -22,8 +22,9 @@ namespace AlphaTab.Rendering
 {
     public interface IScoreRenderer
     {
-        bool IsSvg { get; }
+        event Action PreRender;
         event Action<RenderFinishedEventArgs> RenderFinished;
+        event Action<RenderFinishedEventArgs> PartialRenderFinished;
         event Action PostRenderFinished;
     }
 
@@ -31,6 +32,8 @@ namespace AlphaTab.Rendering
     {
         public float Width { get; set; }
         public float Height { get; set; }
+        public float TotalWidth { get; set; }
+        public float TotalHeight { get; set; }
         public object RenderResult { get; set; }
     }
 }

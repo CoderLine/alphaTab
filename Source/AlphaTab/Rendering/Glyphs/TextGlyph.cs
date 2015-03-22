@@ -24,19 +24,21 @@ namespace AlphaTab.Rendering.Glyphs
     {
         private readonly string _text;
         private readonly Font _font;
+        private readonly TextAlign _textAlign;
 
-        public TextGlyph(float x, float y, string text, Font font)
+        public TextGlyph(float x, float y, string text, Font font, TextAlign textAlign = TextAlign.Left)
             : base(x, y)
         {
             _text = text;
             _font = font;
+            _textAlign = textAlign;
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             canvas.Font = _font;
             var old = canvas.TextAlign;
-            canvas.TextAlign = TextAlign.Left;
+            canvas.TextAlign = _textAlign;
             canvas.FillText(_text, cx + X, cy + Y);
             canvas.TextAlign = old;
         }

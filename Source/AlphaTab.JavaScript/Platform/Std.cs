@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text.RegularExpressions;
 using System.Xml;
 using AlphaTab.Collections;
@@ -20,6 +21,12 @@ namespace AlphaTab.Platform
         public static int ParseInt(string s)
         {
             return JsContext.parseInt(s);
+        }
+
+        [JsMethod(InlineCodeExpression = "new Int32Array(array)")]
+        public static int[] CloneArray(int[] array)
+        {
+            return new int[0];
         }
 
         [JsMethod(InlineCodeExpression = "dst.set(src.subarray(srcOffset, srcOffset + count), dstOffset)")]

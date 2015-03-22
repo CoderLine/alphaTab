@@ -51,6 +51,11 @@ namespace AlphaTab.Platform
             return f;
         }
 
+        public static int[] CloneArray(int[] array)
+        {
+            return (int[]) array.Clone();
+        }
+
         public static void BlockCopy(byte[] src, int srcOffset, byte[] dst, int dstOffset, int count)
         {
             Buffer.BlockCopy(src, srcOffset, dst, dstOffset, count);

@@ -393,14 +393,16 @@ namespace AlphaTab.Importer
             newTrack.IsPercussion = (flags & 0x01) != 0;
 
             var stringCount = ReadInt32();
+            var tuning = new FastList<int>();
             for (int i = 0; i < 7; i++)
             {
-                var tuning = ReadInt32();
+                var stringTuning = ReadInt32();
                 if (stringCount > i)
                 {
-                    newTrack.Tuning.Add(tuning);
+                    tuning.Add(stringTuning);
                 }
             }
+            newTrack.Tuning = tuning.ToArray();
 
             var port = ReadInt32();
             var index = ReadInt32() - 1;
@@ -597,7 +599,7 @@ namespace AlphaTab.Importer
             var stringFlags = _data.ReadByte();
             for (int i = 6; i >= 0; i--)
             {
-                if ((stringFlags & (1 << i)) != 0 && (6 - i) < track.Tuning.Count)
+                if ((stringFlags & (1 << i)) != 0 && (6 - i) < track.Tuning.Length)
                 {
                     ReadNote(track, bar, voice, newBeat, (6 - i));
                 }
@@ -976,7 +978,7 @@ namespace AlphaTab.Importer
         public void ReadNote(Track track, Bar bar, Voice voice, Beat beat, int stringIndex)
         {
             var newNote = new Note();
-            newNote.String = track.Tuning.Count - stringIndex;
+            newNote.String = track.Tuning.Length - stringIndex;
 
             var flags = _data.ReadByte();
             if ((flags & 0x02) != 0)

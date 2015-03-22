@@ -213,7 +213,7 @@
         // Click Handling
         
         if(context.cursorOptions.handleClick) {
-            $(context._canvasElement).click(function(e) {
+            $(context.CanvasElement).click(function(e) {
                 var parentOffset = $(this).offset();
                 var relX = e.pageX - parentOffset.left;
                 var relY = e.pageY - parentOffset.top;

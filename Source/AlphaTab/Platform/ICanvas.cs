@@ -15,9 +15,12 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using System;
 using AlphaTab.Platform.Model;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Glyphs;
+using Color = AlphaTab.Platform.Model.Color;
 
 namespace AlphaTab.Platform
 {
@@ -26,16 +29,12 @@ namespace AlphaTab.Platform
     /// </summary>
     public interface ICanvas : IPathCanvas
     {
-        float Width { get; set; }
-        float Height { get; set; }
-
         RenderingResources Resources { get; set; }
 
         Color Color { get; set; }
 
         float LineWidth { get; set; }
 
-        void Clear();
         void FillRect(float x, float y, float w, float h);
         void StrokeRect(float x, float y, float w, float h);
         void FillCircle(float x, float y, float radius);
@@ -48,7 +47,8 @@ namespace AlphaTab.Platform
         float MeasureText(string text);
         void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol);
 
-        object RenderResult { get; }
+        void BeginRender(float width, float height);
+        object EndRender();
     }
 
     /// <summary>

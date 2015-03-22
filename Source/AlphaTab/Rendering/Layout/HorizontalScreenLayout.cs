@@ -19,6 +19,7 @@ using System;
 using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Staves;
 using AlphaTab.Rendering.Utils;
+using SharpKit.Html;
 
 namespace AlphaTab.Rendering.Layout
 {
@@ -38,47 +39,59 @@ namespace AlphaTab.Rendering.Layout
         {
         }
 
-        public override void DoLayout()
+        public override void DoLayoutAndRender()
         {
             if (Renderer.Settings.Staves.Count == 0) return;
-        
+
             var score = Renderer.Score;
-        
+            var canvas = Renderer.Canvas;
+
             var startIndex = Renderer.Settings.Layout.Get("start", 1);
             startIndex--; // map to array index
             startIndex = Math.Min(score.MasterBars.Count - 1, Math.Max(0, startIndex));
             var currentBarIndex = startIndex;
- 
+
             var endBarIndex = Renderer.Settings.Layout.Get("count", score.MasterBars.Count);
             endBarIndex = startIndex + endBarIndex - 1; // map count to array index
             endBarIndex = Math.Min(score.MasterBars.Count - 1, Math.Max(0, endBarIndex));
 
             var x = PagePadding[0];
             var y = PagePadding[1];
-        
+
             _group = CreateEmptyStaveGroup();
-        
+
             while (currentBarIndex <= endBarIndex)
             {
-                _group.AddBars(Renderer.Tracks, currentBarIndex);            
+                _group.AddBars(Renderer.Tracks, currentBarIndex);
                 currentBarIndex++;
-            }        
-        
+            }
+
             _group.X = x;
             _group.Y = y;
-        
+
             _group.FinalizeGroup(this);
-        
+
             y += _group.Height + (GroupSpacing * Scale);
+
             Height = y + PagePadding[3];
             Width = _group.X + _group.Width + PagePadding[2];
-        }
 
-        public override void PaintScore()
-        {
-            Renderer.Canvas.Color = Renderer.RenderingResources.MainGlyphColor;
-            Renderer.Canvas.TextAlign = TextAlign.Left;
+            // TODO: Find a good way to render the score partwise
+            // we need to precalculate the final height somehow
+
+            canvas.BeginRender(Width, Height);
+            canvas.Color = Renderer.RenderingResources.MainGlyphColor;
+            canvas.TextAlign = TextAlign.Left;
             _group.Paint(0, 0, Renderer.Canvas);
+            var result = canvas.EndRender();
+            OnPartialRenderFinished(new RenderFinishedEventArgs
+            {
+                TotalWidth = Width,
+                TotalHeight = y,
+                Width = Width,
+                Height = Height,
+                RenderResult = result
+            });
         }
 
         public override void BuildBoundingsLookup(BoundingsLookup lookup)

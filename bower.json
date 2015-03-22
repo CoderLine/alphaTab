@@ -1,0 +1,48 @@
+{
+  "name": "AlphaTab",
+  "version": "0.4.0",
+  "homepage": "http://www.alphatab.net",
+  "authors": [
+    "Danielku15 <danielku15@coderline.net>"
+  ],
+  "description": "alphaTab is a cross platform music notation and guitar tablature rendering library.",
+  "main": [
+    "Build/JavaScript/AlphaTab.js",
+    "Build/JavaScript/AlphaTab.worker.js",
+    "Build/JavaScript/jquery.alphaTab.js",
+  ],
+  "license": "LGPL-3.0+",
+  "repository": {
+      "type": "git",
+      "url": "git@github.com:CoderLine/alphaTab.git"
+    }
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "music",
+    "notation",
+    "html5",
+    "svg",
+    "guitar",
+    "tablature"
+  ],
+  "ignore": [
+    "Build/CSharp",
+    "Font",
+    "Samples",
+    "SharpKit",
+    "Source",
+    "packages",
+    "tools",
+    ".gitattributes",
+    ".gitignore",
+    ".gitmodules",
+    "AlphaTab.sln",
+    "AlphaTab.targets",
+    "LICENSE",
+    "README.md",
+    "TODO",
+    "logo.png"
+  ]
+}
