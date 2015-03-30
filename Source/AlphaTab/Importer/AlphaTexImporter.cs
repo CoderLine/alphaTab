@@ -296,7 +296,7 @@ namespace AlphaTab.Importer
                     _sy = AlphaTexSymbols.RBrace;
                     NextChar();
                 }
-                else if (_ch == 0x7A /* | */)
+                else if (_ch == 0x7C /* | */)
                 {
                     _sy = AlphaTexSymbols.Pipe;
                     NextChar();
