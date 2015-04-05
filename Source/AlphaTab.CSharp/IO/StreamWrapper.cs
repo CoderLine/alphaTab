@@ -59,6 +59,15 @@ namespace AlphaTab.IO
             _stream.Write(buffer, offset, count);
         }
 
+        public byte[] ReadAll()
+        {
+            using (var ms = new MemoryStream())
+            {
+                _stream.CopyTo(ms);
+                return ms.ToArray();
+            }
+        }
+
         public void Dispose()
         {
             _stream.Dispose();

@@ -2467,7 +2467,7 @@ AlphaTab.Importer.ScoreImporter.prototype = {
     }
 };
 AlphaTab.Importer.ScoreImporter.BuildImporters = function (){
-    return [new AlphaTab.Importer.Gp3To5Importer(), new AlphaTab.Importer.GpxImporter(), new AlphaTab.Importer.AlphaTexImporter()];
+    return [new AlphaTab.Importer.Gp3To5Importer(), new AlphaTab.Importer.GpxImporter(), new AlphaTab.Importer.AlphaTexImporter(), new AlphaTab.Importer.MusicXml2Importer()];
 };
 AlphaTab.Importer.AlphaTexImporter = function (){
     this._score = null;
@@ -5876,6 +5876,590 @@ AlphaTab.Importer.MixTableChange = function (){
     this.Tempo = -1;
     this.Duration = 0;
 };
+AlphaTab.Importer.MusicXml2Importer = function (){
+    this._score = null;
+    this._trackById = null;
+    this._trackFirstMeasureNumber = 0;
+    this._maxVoices = 0;
+    AlphaTab.Importer.ScoreImporter.call(this);
+};
+AlphaTab.Importer.MusicXml2Importer.prototype = {
+    ReadScore: function (){
+        this._trackById = {};
+        var xml = AlphaTab.Platform.Std.ToString(this._data.ReadAll());
+        var dom = AlphaTab.Platform.Std.LoadXml(xml);
+        this._score = new AlphaTab.Model.Score();
+        this.ParseDom(dom);
+        this._score.Finish();
+        return this._score;
+    },
+    ParseDom: function (dom){
+        var root = dom.get_DocumentElement();
+        if (root == null)
+            return;
+        switch (root.get_LocalName()){
+            case "score-partwise":
+                this.ParsePartwise(root);
+                break;
+            case "score-timewise":
+                break;
+            default:
+                throw $CreateException(new AlphaTab.Importer.UnsupportedFormatException(), new Error());
+        }
+    },
+    ParsePartwise: function (element){
+        var version = element.GetAttribute$$String("version");
+        if (!((version==null)||(version.length==0)) && version != "2.0"){
+            throw $CreateException(new AlphaTab.Importer.UnsupportedFormatException(), new Error());
+        }
+        var $it42 = element.get_ChildNodes().GetEnumerator();
+        while ($it42.MoveNext()){
+            var c = $it42.get_Current();
+            if (c.get_NodeType() == 1){
+                var e = c;
+                switch (c.get_LocalName()){
+                    case "movement-title":
+                        this._score.Title = AlphaTab.Platform.Std.GetNodeValue(c.get_FirstChild());
+                        break;
+                    case "identification":
+                        this.ParseIdentification(e);
+                        break;
+                    case "part-list":
+                        this.ParsePartList(e);
+                        break;
+                    case "part":
+                        this.ParsePart(e);
+                        break;
+                }
+            }
+        }
+    },
+    ParsePart: function (element){
+        var id = element.GetAttribute$$String("id");
+        var track = this._trackById[id];
+        var isFirstMeasure = true;
+        var $it43 = element.get_ChildNodes().GetEnumerator();
+        while ($it43.MoveNext()){
+            var c = $it43.get_Current();
+            if (c.get_NodeType() == 1){
+                var e = c;
+                switch (c.get_LocalName()){
+                    case "measure":
+                        this.ParseMeasure(e, track, isFirstMeasure);
+                        isFirstMeasure = false;
+                        break;
+                }
+            }
+        }
+    },
+    ParseMeasure: function (element, track, isFirstMeasure){
+        var barIndex = 0;
+        if (isFirstMeasure){
+            this._trackFirstMeasureNumber = AlphaTab.Platform.Std.ParseInt(element.GetAttribute$$String("number"));
+            barIndex = 0;
+        }
+        else {
+            barIndex = AlphaTab.Platform.Std.ParseInt(element.GetAttribute$$String("number")) - this._trackFirstMeasureNumber;
+        }
+        // create empty bars to the current index
+        var bar = null;
+        var masterBar = null;
+        for (var i = track.Bars.length; i <= barIndex; i++){
+            bar = new AlphaTab.Model.Bar();
+            masterBar = this.GetOrCreateMasterBar(barIndex);
+            track.AddBar(bar);
+            for (var j = 0; j < this._maxVoices; j++){
+                var emptyVoice = new AlphaTab.Model.Voice();
+                bar.AddVoice(emptyVoice);
+                var emptyBeat = (function (){
+                    var $v1 = new AlphaTab.Model.Beat();
+                    $v1.IsEmpty = true;
+                    return $v1;
+                }).call(this);
+                emptyVoice.AddBeat(emptyBeat);
+            }
+        }
+        var chord = false;
+        var $it44 = element.get_ChildNodes().GetEnumerator();
+        while ($it44.MoveNext()){
+            var c = $it44.get_Current();
+            if (c.get_NodeType() == 1){
+                var e = c;
+                switch (c.get_LocalName()){
+                    case "note":
+                        chord = this.ParseNoteBeat(e, track, bar, chord);
+                        break;
+                    case "forward":
+                        break;
+                    case "direction":
+                        this.ParseDirection(e, masterBar);
+                        break;
+                    case "attributes":
+                        this.ParseAttributes(e, bar, masterBar);
+                        break;
+                    case "harmony":
+                        break;
+                    case "sound":
+                        break;
+                    case "barline":
+                        break;
+                }
+            }
+        }
+    },
+    ParseNoteBeat: function (element, track, bar, chord){
+        var voiceIndex = 0;
+        var voiceNodes = element.GetElementsByTagName$$String("voice");
+        if (voiceNodes.get_Count() > 0){
+            voiceIndex = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(voiceNodes.get_ItemOf$$Int32(0))) - 1;
+        }
+        var beat;
+        if (chord){
+            var voice = this.GetOrCreateVoice(bar, voiceIndex);
+            beat = voice.Beats[voice.Beats.length - 1];
+        }
+        else {
+            var voice = this.GetOrCreateVoice(bar, voiceIndex);
+            beat = new AlphaTab.Model.Beat();
+            voice.AddBeat(beat);
+        }
+        var note = new AlphaTab.Model.Note();
+        beat.AddNote(note);
+        var $it45 = element.get_ChildNodes().GetEnumerator();
+        while ($it45.MoveNext()){
+            var c = $it45.get_Current();
+            if (c.get_NodeType() == 1){
+                var e = c;
+                switch (c.get_LocalName()){
+                    case "grace":
+                        beat.GraceType = AlphaTab.Model.GraceType.BeforeBeat;
+                        beat.Duration = AlphaTab.Model.Duration.ThirtySecond;
+                        break;
+                    case "duration":
+                        beat.Duration = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(e));
+                        break;
+                    case "tie":
+                        AlphaTab.Importer.MusicXml2Importer.ParseTied(e, note);
+                        break;
+                    case "cue":
+                        break;
+                    case "instrument":
+                        break;
+                    case "type":
+                        switch (AlphaTab.Platform.Std.GetNodeValue(e)){
+                            case "64th":
+                            beat.Duration = AlphaTab.Model.Duration.SixtyFourth;
+                            break;
+                            case "32nd":
+                            beat.Duration = AlphaTab.Model.Duration.ThirtySecond;
+                            break;
+                            case "16th":
+                            beat.Duration = AlphaTab.Model.Duration.Sixteenth;
+                            break;
+                            case "eighth":
+                            beat.Duration = AlphaTab.Model.Duration.Eighth;
+                            break;
+                            case "quarter":
+                            beat.Duration = AlphaTab.Model.Duration.Quarter;
+                            break;
+                            case "half":
+                            beat.Duration = AlphaTab.Model.Duration.Half;
+                            break;
+                            case "whole":
+                            beat.Duration = AlphaTab.Model.Duration.Whole;
+                            break;
+                        }
+                        break;
+                    case "dot":
+                        note.IsStaccato = true;
+                        break;
+                    case "accidental":
+                        break;
+                    case "time-modification":
+                        this.ParseTimeModification(e, beat);
+                        break;
+                    case "stem":
+                        break;
+                    case "notehead":
+                        if (e.GetAttribute$$String("parentheses") == "yes"){
+                        note.IsGhost = true;
+                    }
+                        break;
+                    case "beam":
+                        break;
+                    case "notations":
+                        this.ParseNotations(e, beat, note);
+                        break;
+                    case "lyric":
+                        break;
+                    case "chord":
+                        chord = true;
+                        break;
+                    case "pitch":
+                        this.ParsePitch(e, track, beat, note);
+                        break;
+                    case "unpitched":
+                        note.String = 0;
+                        note.Fret = 0;
+                        break;
+                    case "rest":
+                        beat.IsEmpty = false;
+                        break;
+                }
+            }
+        }
+        return chord;
+    },
+    ParseNotations: function (element, beat, note){
+        var $it46 = element.get_ChildNodes().GetEnumerator();
+        while ($it46.MoveNext()){
+            var c = $it46.get_Current();
+            if (c.get_NodeType() == 1){
+                var e = c;
+                switch (c.get_LocalName()){
+                    case "tied":
+                        AlphaTab.Importer.MusicXml2Importer.ParseTied(e, note);
+                        break;
+                    case "slide":
+                        if (e.GetAttribute$$String("type") == "start"){
+                        note.SlideType = AlphaTab.Model.SlideType.Legato;
+                    }
+                        break;
+                    case "dynamics":
+                        this.ParseDynamics(e, beat);
+                        break;
+                }
+            }
+        }
+    },
+    ParseDynamics: function (element, beat){
+        var $it47 = element.get_ChildNodes().GetEnumerator();
+        while ($it47.MoveNext()){
+            var c = $it47.get_Current();
+            if (c.get_NodeType() == 1){
+                switch (c.get_LocalName()){
+                    case "p":
+                        beat.Dynamic = AlphaTab.Model.DynamicValue.P;
+                        break;
+                    case "pp":
+                        beat.Dynamic = AlphaTab.Model.DynamicValue.PP;
+                        break;
+                    case "ppp":
+                        beat.Dynamic = AlphaTab.Model.DynamicValue.PPP;
+                        break;
+                    case "f":
+                        beat.Dynamic = AlphaTab.Model.DynamicValue.F;
+                        break;
+                    case "ff":
+                        beat.Dynamic = AlphaTab.Model.DynamicValue.FF;
+                        break;
+                    case "fff":
+                        beat.Dynamic = AlphaTab.Model.DynamicValue.FFF;
+                        break;
+                    case "mp":
+                        beat.Dynamic = AlphaTab.Model.DynamicValue.MP;
+                        break;
+                    case "mf":
+                        beat.Dynamic = AlphaTab.Model.DynamicValue.MF;
+                        break;
+                }
+            }
+        }
+    },
+    ParseTimeModification: function (element, beat){
+        var actualNodes = 0;
+        var $it48 = element.get_ChildNodes().GetEnumerator();
+        while ($it48.MoveNext()){
+            var c = $it48.get_Current();
+            if (c.get_NodeType() == 1){
+                var e = c;
+                switch (c.get_LocalName()){
+                    case "actual-notes":
+                        beat.TupletNumerator = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(e));
+                        break;
+                    case "normal-notes":
+                        beat.TupletDenominator = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(e));
+                        break;
+                }
+            }
+        }
+    },
+    ParsePitch: function (element, track, beat, note){
+        var step = null;
+        var semitones = 0;
+        var octave = 0;
+        var $it49 = element.get_ChildNodes().GetEnumerator();
+        while ($it49.MoveNext()){
+            var c = $it49.get_Current();
+            if (c.get_NodeType() == 1){
+                var e = c;
+                switch (c.get_LocalName()){
+                    case "step":
+                        step = AlphaTab.Platform.Std.GetNodeValue(e);
+                        break;
+                    case "alter":
+                        semitones = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(e));
+                        break;
+                    case "octave":
+                        octave = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(e));
+                        break;
+                }
+            }
+        }
+        var fullNoteName = step + octave;
+        var fullNoteValue = AlphaTab.Model.TuningParser.GetTuningForText(fullNoteName);
+        note.String = this.FindStringForValue(track, beat, fullNoteValue);
+        note.Fret = fullNoteValue - track.Tuning[note.String - 1];
+    },
+    FindStringForValue: function (track, beat, value){
+        // find strings which are already taken
+        var takenStrings = {};
+        for (var i = 0; i < beat.Notes.length; i++){
+            var note = beat.Notes[i];
+            takenStrings[note.String] = true;
+        }
+        // find a string where the note matches into 0 to 14
+        for (var i = 0; i < track.Tuning.length; i++){
+            if (!takenStrings.hasOwnProperty(i)){
+                var min = track.Tuning[i];
+                var max = track.Tuning[i] + 14;
+                if (value >= min && value <= max){
+                    return track.Tuning.length - i;
+                }
+            }
+        }
+        return 1;
+        // first string    
+    },
+    GetOrCreateVoice: function (bar, index){
+        if (index < bar.Voices.length){
+            return bar.Voices[index];
+        }
+        for (var i = bar.Voices.length; i <= index; i++){
+            bar.AddVoice(new AlphaTab.Model.Voice());
+        }
+        this._maxVoices = Math.max(this._maxVoices, bar.Voices.length);
+        return bar.Voices[index];
+    },
+    ParseDirection: function (element, masterBar){
+        var $it50 = element.get_ChildNodes().GetEnumerator();
+        while ($it50.MoveNext()){
+            var c = $it50.get_Current();
+            if (c.get_NodeType() == 1){
+                var e = c;
+                switch (c.get_LocalName()){
+                    case "sound":
+                        var tempoAutomation = new AlphaTab.Model.Automation();
+                        tempoAutomation.IsLinear = true;
+                        tempoAutomation.Type = AlphaTab.Model.AutomationType.Tempo;
+                        tempoAutomation.Value = AlphaTab.Platform.Std.ParseInt(e.GetAttribute$$String("tempo"));
+                        masterBar.TempoAutomation = tempoAutomation;
+                        break;
+                }
+            }
+        }
+    },
+    ParseAttributes: function (element, bar, masterBar){
+        var $it51 = element.get_ChildNodes().GetEnumerator();
+        while ($it51.MoveNext()){
+            var c = $it51.get_Current();
+            if (c.get_NodeType() == 1){
+                var e = c;
+                switch (c.get_LocalName()){
+                    case "key":
+                        this.ParseKey(e, masterBar);
+                        break;
+                    case "time":
+                        this.ParseTime(e, masterBar);
+                        break;
+                    case "clef":
+                        this.ParseClef(e, bar);
+                        break;
+                }
+            }
+        }
+    },
+    ParseClef: function (element, bar){
+        var sign = null;
+        var line = null;
+        var $it52 = element.get_ChildNodes().GetEnumerator();
+        while ($it52.MoveNext()){
+            var c = $it52.get_Current();
+            if (c.get_NodeType() == 1){
+                var e = c;
+                switch (c.get_LocalName()){
+                    case "sign":
+                        sign = AlphaTab.Platform.Std.GetNodeValue(e);
+                        break;
+                    case "line":
+                        line = AlphaTab.Platform.Std.GetNodeValue(e);
+                        break;
+                }
+            }
+        }
+        var clef = sign + line;
+        switch (clef){
+            case "G2":
+                bar.Clef = AlphaTab.Model.Clef.G2;
+                break;
+            case "F4":
+                bar.Clef = AlphaTab.Model.Clef.F4;
+                break;
+            case "C3":
+                bar.Clef = AlphaTab.Model.Clef.C3;
+                break;
+            case "C4":
+                bar.Clef = AlphaTab.Model.Clef.C4;
+                break;
+        }
+    },
+    ParseTime: function (element, masterBar){
+        var $it53 = element.get_ChildNodes().GetEnumerator();
+        while ($it53.MoveNext()){
+            var c = $it53.get_Current();
+            if (c.get_NodeType() == 1){
+                var e = c;
+                switch (c.get_LocalName()){
+                    case "beats":
+                        masterBar.TimeSignatureNumerator = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(e));
+                        break;
+                    case "beats-type":
+                        masterBar.TimeSignatureDenominator = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(e));
+                        break;
+                }
+            }
+        }
+    },
+    ParseKey: function (element, masterBar){
+        var fifths = -2147483648;
+        var keyStep = -2147483648;
+        var keyAlter = -2147483648;
+        var $it54 = element.get_ChildNodes().GetEnumerator();
+        while ($it54.MoveNext()){
+            var c = $it54.get_Current();
+            if (c.get_NodeType() == 1){
+                var e = c;
+                switch (c.get_LocalName()){
+                    case "fifths":
+                        fifths = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(e));
+                        break;
+                    case "key-step":
+                        keyStep = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(e));
+                        break;
+                    case "key-alter":
+                        keyAlter = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(e));
+                        break;
+                }
+            }
+        }
+        if (fifths != -2147483648){
+            // TODO: check if this is conrrect
+            masterBar.KeySignature = fifths;
+        }
+        else {
+            // TODO: map keyStep/keyAlter to internal keysignature
+        }
+    },
+    GetOrCreateMasterBar: function (index){
+        if (index < this._score.MasterBars.length){
+            return this._score.MasterBars[index];
+        }
+        for (var i = this._score.MasterBars.length; i <= index; i++){
+            var mb = new AlphaTab.Model.MasterBar();
+            this._score.AddMasterBar(mb);
+        }
+        return this._score.MasterBars[index];
+    },
+    ParseIdentification: function (element){
+        var $it55 = element.get_ChildNodes().GetEnumerator();
+        while ($it55.MoveNext()){
+            var c = $it55.get_Current();
+            if (c.get_NodeType() == 1){
+                var e = c;
+                switch (c.get_LocalName()){
+                    case "creator":
+                        if (e.GetAttribute$$String("type") == "composer"){
+                        this._score.Music = AlphaTab.Platform.Std.GetNodeValue(c.get_FirstChild());
+                    }
+                        break;
+                    case "rights":
+                        this._score.Artist = AlphaTab.Platform.Std.GetNodeValue(c.get_FirstChild());
+                        break;
+                }
+            }
+        }
+    },
+    ParsePartList: function (element){
+        var $it56 = element.get_ChildNodes().GetEnumerator();
+        while ($it56.MoveNext()){
+            var c = $it56.get_Current();
+            if (c.get_NodeType() == 1){
+                var e = c;
+                switch (c.get_LocalName()){
+                    case "score-part":
+                        this.ParseScorePart(e);
+                        break;
+                }
+            }
+        }
+    },
+    ParseScorePart: function (element){
+        var id = element.GetAttribute$$String("id");
+        var track = new AlphaTab.Model.Track();
+        this._trackById[id] = track;
+        this._score.AddTrack(track);
+        var $it57 = element.get_ChildNodes().GetEnumerator();
+        while ($it57.MoveNext()){
+            var c = $it57.get_Current();
+            if (c.get_NodeType() == 1){
+                var e = c;
+                switch (c.get_LocalName()){
+                    case "part-name":
+                        track.Name = AlphaTab.Platform.Std.GetNodeValue(c.get_FirstChild());
+                        break;
+                    case "part-abbreviation":
+                        track.ShortName = AlphaTab.Platform.Std.GetNodeValue(c.get_FirstChild());
+                        break;
+                    case "midi-instrument":
+                        this.ParseMidiInstrument(e, track);
+                        break;
+                }
+            }
+        }
+        if (track.Tuning == null || track.Tuning.length == 0){
+            track.Tuning = AlphaTab.Model.Tuning.GetDefaultTuningFor(6).Tunings;
+        }
+    },
+    ParseMidiInstrument: function (element, track){
+        var $it58 = element.get_ChildNodes().GetEnumerator();
+        while ($it58.MoveNext()){
+            var c = $it58.get_Current();
+            if (c.get_NodeType() == 1){
+                var e = c;
+                switch (c.get_LocalName()){
+                    case "midi-channel":
+                        track.PlaybackInfo.PrimaryChannel = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(c.get_FirstChild()));
+                        break;
+                    case "midi-program":
+                        track.PlaybackInfo.Program = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(c.get_FirstChild()));
+                        break;
+                    case "midi-volume":
+                        track.PlaybackInfo.Volume = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(c.get_FirstChild()));
+                        break;
+                }
+            }
+        }
+    }
+};
+AlphaTab.Importer.MusicXml2Importer.ParseTied = function (element, note){
+    if (element.GetAttribute$$String("type") == "start"){
+        note.IsTieOrigin = true;
+    }
+    else {
+        note.IsTieDestination = true;
+    }
+};
+$Inherit(AlphaTab.Importer.MusicXml2Importer, AlphaTab.Importer.ScoreImporter);
 AlphaTab.Importer.NoCompatibleReaderFoundException = function (){
 };
 AlphaTab.Importer.ScoreLoader = function (){
@@ -5904,7 +6488,7 @@ AlphaTab.Importer.ScoreLoader.LoadScoreFromBytes = function (data){
     var importers = AlphaTab.Importer.ScoreImporter.BuildImporters();
     var score = null;
     var bb = AlphaTab.IO.ByteBuffer.FromBuffer(data);
-    for (var $i43 = 0,$l43 = importers.length,importer = importers[$i43]; $i43 < $l43; $i43++, importer = importers[$i43]){
+    for (var $i60 = 0,$l60 = importers.length,importer = importers[$i60]; $i60 < $l60; $i60++, importer = importers[$i60]){
         bb.Reset();
         try{
             importer.Init(bb);
@@ -6079,6 +6663,9 @@ AlphaTab.IO.ByteBuffer.prototype = {
                 newCapacity = this._capacity * 2;
             this.SetCapacity(newCapacity);
         }
+    },
+    ReadAll: function (){
+        return this.ToArray();
     },
     ToArray: function (){
         var copy = new Uint8Array(this._length);
@@ -7922,7 +8509,7 @@ AlphaTab.Rendering.EffectBarRenderer.prototype = {
                 prevGlyph = prevRenderer._effectGlyphs[0][prevRenderer._lastBeat.Index];
             }
         }
-        for (var $i44 = 0,$t44 = Object.keys(this._effectGlyphs[0]),$l44 = $t44.length,key = $t44[$i44]; $i44 < $l44; $i44++, key = $t44[$i44]){
+        for (var $i61 = 0,$t61 = Object.keys(this._effectGlyphs[0]),$l61 = $t61.length,key = $t61[$i61]; $i61 < $l61; $i61++, key = $t61[$i61]){
             var beatIndex = AlphaTab.Platform.Std.ParseInt(key);
             var effect = this._effectGlyphs[0][beatIndex];
             this.AlignGlyph(this._info.get_SizingMode(), beatIndex, 0, prevGlyph);
@@ -9293,11 +9880,11 @@ AlphaTab.Rendering.Glyphs.DynamicsGlyph.prototype = {
                 return;
         }
         var glyphWidth = 0;
-        for (var $i45 = 0,$l45 = glyphs.length,g = glyphs[$i45]; $i45 < $l45; $i45++, g = glyphs[$i45]){
+        for (var $i62 = 0,$l62 = glyphs.length,g = glyphs[$i62]; $i62 < $l62; $i62++, g = glyphs[$i62]){
             glyphWidth += g.Width;
         }
         var startX = (this.Width - glyphWidth) / 2;
-        for (var $i46 = 0,$l46 = glyphs.length,g = glyphs[$i46]; $i46 < $l46; $i46++, g = glyphs[$i46]){
+        for (var $i63 = 0,$l63 = glyphs.length,g = glyphs[$i63]; $i63 < $l63; $i63++, g = glyphs[$i63]){
             g.X = startX;
             g.Y = 0;
             g.Renderer = this.Renderer;
@@ -11614,13 +12201,13 @@ AlphaTab.Rendering.Layout.ScoreLayout.prototype = {
         canvas.FillText(msg, x, 0);
         var result = canvas.EndRender();
         this.OnPartialRenderFinished((function (){
-            var $v1 = new AlphaTab.Rendering.RenderFinishedEventArgs();
-            $v1.Width = this.Width;
-            $v1.Height = height;
-            $v1.RenderResult = result;
-            $v1.TotalWidth = this.Width;
-            $v1.TotalHeight = this.Height;
-            return $v1;
+            var $v2 = new AlphaTab.Rendering.RenderFinishedEventArgs();
+            $v2.Width = this.Width;
+            $v2.Height = height;
+            $v2.RenderResult = result;
+            $v2.TotalWidth = this.Width;
+            $v2.TotalHeight = this.Height;
+            return $v2;
         }).call(this));
     }
 };
@@ -11664,13 +12251,13 @@ AlphaTab.Rendering.Layout.HorizontalScreenLayout.prototype = {
         this._group.Paint(0, 0, this.Renderer.Canvas);
         var result = canvas.EndRender();
         this.OnPartialRenderFinished((function (){
-            var $v2 = new AlphaTab.Rendering.RenderFinishedEventArgs();
-            $v2.TotalWidth = this.Width;
-            $v2.TotalHeight = y;
-            $v2.Width = this.Width;
-            $v2.Height = this.Height;
-            $v2.RenderResult = result;
-            return $v2;
+            var $v3 = new AlphaTab.Rendering.RenderFinishedEventArgs();
+            $v3.TotalWidth = this.Width;
+            $v3.TotalHeight = y;
+            $v3.Width = this.Width;
+            $v3.Height = this.Height;
+            $v3.RenderResult = result;
+            return $v3;
         }).call(this));
     },
     BuildBoundingsLookup: function (lookup){
@@ -11777,13 +12364,13 @@ AlphaTab.Rendering.Layout.PageViewLayout.prototype = {
         }
         var result = canvas.EndRender();
         this.OnPartialRenderFinished((function (){
-            var $v3 = new AlphaTab.Rendering.RenderFinishedEventArgs();
-            $v3.Width = this.Width;
-            $v3.Height = y;
-            $v3.RenderResult = result;
-            $v3.TotalWidth = this.Width;
-            $v3.TotalHeight = y;
-            return $v3;
+            var $v4 = new AlphaTab.Rendering.RenderFinishedEventArgs();
+            $v4.Width = this.Width;
+            $v4.Height = y;
+            $v4.RenderResult = result;
+            $v4.TotalWidth = this.Width;
+            $v4.TotalHeight = y;
+            return $v4;
         }).call(this));
         return y;
     },
@@ -11825,13 +12412,13 @@ AlphaTab.Rendering.Layout.PageViewLayout.prototype = {
                 currentBarIndex = group.get_LastBarIndex() + 1;
                 var result = canvas.EndRender();
                 this.OnPartialRenderFinished((function (){
-                    var $v4 = new AlphaTab.Rendering.RenderFinishedEventArgs();
-                    $v4.TotalWidth = this.Width;
-                    $v4.TotalHeight = y;
-                    $v4.Width = this.Width;
-                    $v4.Height = height;
-                    $v4.RenderResult = result;
-                    return $v4;
+                    var $v5 = new AlphaTab.Rendering.RenderFinishedEventArgs();
+                    $v5.TotalWidth = this.Width;
+                    $v5.TotalHeight = y;
+                    $v5.Width = this.Width;
+                    $v5.Height = height;
+                    $v5.RenderResult = result;
+                    return $v5;
                 }).call(this));
             }
         }
@@ -12709,10 +13296,10 @@ AlphaTab.Rendering.ScoreRenderer.prototype = {
         this.Layout.DoLayoutAndRender();
         this.Layout.RenderAnnotation();
         this.OnRenderFinished((function (){
-            var $v5 = new AlphaTab.Rendering.RenderFinishedEventArgs();
-            $v5.TotalHeight = this.Layout.Height;
-            $v5.TotalWidth = this.Layout.Width;
-            return $v5;
+            var $v6 = new AlphaTab.Rendering.RenderFinishedEventArgs();
+            $v6.TotalHeight = this.Layout.Height;
+            $v6.TotalWidth = this.Layout.Width;
+            return $v6;
         }).call(this));
         this.OnPostRenderFinished();
     },

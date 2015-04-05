@@ -38,7 +38,8 @@ namespace AlphaTab.Importer
             {
                 new Gp3To5Importer(),
                 new GpxImporter(),
-                new AlphaTexImporter()
+                new AlphaTexImporter(),
+                new MusicXml2Importer()
             };
         }
 

@@ -165,6 +165,11 @@ namespace AlphaTab.IO
             }
         }
 
+        public byte[] ReadAll()
+        {
+            return ToArray();
+        }
+
         public virtual byte[] ToArray()
         {
             byte[] copy = new byte[_length];

@@ -29,7 +29,7 @@ namespace AlphaTab.Test.Importer
     {
         internal byte[] Load(string name)
         {
-            const string path = "TestFiles";
+            const string path = "TestFiles/GuitarPro";
             return Environment.FileLoaders["default"]().LoadBinary(Path.Combine(path, name));
         }
         

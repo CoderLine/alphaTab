@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using System.Xml;
 using AlphaTab.IO;
@@ -81,8 +82,10 @@ namespace AlphaTab.Platform
 
         public static XmlDocument LoadXml(string xml)
         {
+            var reader = new XmlTextReader(new StringReader(xml));
+            reader.DtdProcessing = DtdProcessing.Ignore;
             var dom = new XmlDocument();
-            dom.LoadXml(xml);
+            dom.Load(reader);
             return dom;
         }
 

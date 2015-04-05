@@ -23,5 +23,6 @@ namespace AlphaTab.IO
         void Skip(int offset);
         int ReadByte();
         int Read(byte[] buffer, int offset, int count);
+        byte[] ReadAll();
     }
 }

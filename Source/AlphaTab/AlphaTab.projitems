@@ -30,6 +30,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Importer\GpxImporter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\GpxParser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\MixTableChange.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Importer\MusicXml2Importer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\NoCompatibleReaderFoundException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\ScoreImporter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\ScoreLoader.cs" />
