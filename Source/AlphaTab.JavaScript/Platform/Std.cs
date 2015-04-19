@@ -45,7 +45,7 @@ namespace AlphaTab.Platform
             return "";
         }
 
-        [JsMethod(InlineCodeExpression = "for ( var t in e ) { c(e[t]); }")]
+        [JsMethod(Code = "for ( var t in e ) { c(e[t]); }")]
         public static void Foreach<T>(IEnumerable<T> e, Action<T> c)
         {
         }
