@@ -21,5 +21,6 @@ namespace AlphaTab.Collections
 {
     public class FastDictionary<TKey, TValue>  : Dictionary<TKey, TValue>
     {
+        
     }
 }

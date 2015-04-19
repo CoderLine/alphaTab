@@ -22,6 +22,7 @@ namespace AlphaTab.Importer
             XmlDocument dom = Std.LoadXml(xml);
 
             _score = new Score();
+            _score.Tempo = 120;
             ParseDom(dom);
             _score.Finish();
             return _score;
@@ -129,6 +130,7 @@ namespace AlphaTab.Importer
             }
 
             bool chord = false;
+            bool isFirstBeat = true;
 
             element.IterateChildren(c =>
             {
@@ -138,7 +140,8 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "note":
-                            chord = ParseNoteBeat(e, track, bar, chord);
+                            chord = ParseNoteBeat(e, track, bar, chord, isFirstBeat);
+                            isFirstBeat = false;
                             break;
                         case "forward":
                             break;
@@ -162,7 +165,7 @@ namespace AlphaTab.Importer
             });
         }
 
-        private bool ParseNoteBeat(XmlElement element, Track track, Bar bar, bool chord)
+        private bool ParseNoteBeat(XmlElement element, Track track, Bar bar, bool chord, bool isFirstBeat)
         {
             int voiceIndex = 0;
             var voiceNodes = element.GetElementsByTagName("voice");
@@ -172,21 +175,21 @@ namespace AlphaTab.Importer
             }
 
             Beat beat;
-            if (chord)
+            var voice = GetOrCreateVoice(bar, voiceIndex);
+            if (chord || (isFirstBeat && voice.Beats.Count == 1))
             {
-                var voice = GetOrCreateVoice(bar, voiceIndex);
                 beat = voice.Beats[voice.Beats.Count - 1];
             }
             else
             {
-                var voice = GetOrCreateVoice(bar, voiceIndex);
                 beat = new Beat();
                 voice.AddBeat(beat);
             }
 
-
             var note = new Note();
             beat.AddNote(note);
+            beat.IsEmpty = false;
+
             element.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
@@ -252,7 +255,7 @@ namespace AlphaTab.Importer
                             note.IsStaccato = true;
                             break;
                         case "accidental":
-                            // auto calculated 
+                            ParseAccidental(e, note);
                             break;
                         case "time-modification":
                             ParseTimeModification(e, beat);
@@ -295,6 +298,40 @@ namespace AlphaTab.Importer
             });
 
             return chord;
+        }
+
+        private void ParseAccidental(XmlElement element, Note note)
+        {
+            switch (Std.GetNodeValue(element))
+            {
+                case "sharp":
+                    note.AccidentalMode = NoteAccidentalMode.ForceSharp;
+                    break;
+                case "natural":
+                    note.AccidentalMode = NoteAccidentalMode.ForceNatural;
+                    break;
+                case "flat":
+                    note.AccidentalMode = NoteAccidentalMode.ForceFlat;
+                    break;
+                //case "double-sharp":
+                //    break;
+                //case "sharp-sharp":
+                //    break;
+                //case "flat-flat":
+                //    break;
+                //case "natural-sharp":
+                //    break;
+                //case "natural-flat":
+                //    break;
+                //case "quarter-flat":
+                //    break;
+                //case "quarter-sharp":
+                //    break;
+                //case "three-quarters-flat":
+                //    break;
+                //case "three-quarters-sharp":
+                //    break;
+            }
         }
 
         private static void ParseTied(XmlElement element, Note note)
@@ -424,10 +461,15 @@ namespace AlphaTab.Importer
             });
 
             var fullNoteName = step + octave;
-            var fullNoteValue = TuningParser.GetTuningForText(fullNoteName);
+            var fullNoteValue = TuningParser.GetTuningForText(fullNoteName) + semitones;
 
+            ApplyNoteStringFrets(track, beat, note, fullNoteValue);
+        }
+
+        private void ApplyNoteStringFrets(Track track, Beat beat, Note note, int fullNoteValue)
+        {
             note.String = FindStringForValue(track, beat, fullNoteValue);
-            note.Fret = fullNoteValue - track.Tuning[note.String - 1];
+            note.Fret = fullNoteValue - Note.GetStringTuning(track, note.String);
         }
 
         private int FindStringForValue(Track track, Beat beat, int value)
@@ -440,22 +482,30 @@ namespace AlphaTab.Importer
                 takenStrings[note.String] = true;
             }
 
-            // find a string where the note matches into 0 to 14
-            for (int i = 0; i < track.Tuning.Length; i++)
-            {
-                if (!takenStrings.ContainsKey(i))
-                {
-                    var min = track.Tuning[i];
-                    var max = track.Tuning[i] + 14;
+            // find a string where the note matches into 0 to <upperbound>
 
-                    if (value >= min && value <= max)
+            // first try to find a string from 0-14 (more handy to play)
+            // then try from 0-20 (guitars with high frets)
+            // then unlimited 
+            int[] steps = { 14, 20, int.MaxValue };
+            for (int i = 0; i < steps.Length; i++)
+            {
+                for (int j = 0; j < track.Tuning.Length; j++)
+                {
+                    if (!takenStrings.ContainsKey(j))
                     {
-                        return track.Tuning.Length - i;
+                        var min = track.Tuning[j];
+                        var max = track.Tuning[j] + steps[i];
+
+                        if (value >= min && value <= max)
+                        {
+                            return track.Tuning.Length - j;
+                        }
                     }
                 }
             }
-
-            return 1; // first string    
+            // will not happen
+            return 1;
         }
 
         private Voice GetOrCreateVoice(Bar bar, int index)

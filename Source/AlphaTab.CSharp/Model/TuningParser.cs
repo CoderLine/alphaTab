@@ -91,8 +91,7 @@ namespace AlphaTab.Model
                 }
 
                 // add octaves
-                b += ((octave + 1) * 12);
-
+                b += (octave * 12);
             }
             else
             {

@@ -30,30 +30,6 @@ namespace AlphaTab.Rendering
     public class ScoreBarRenderer : GroupedBarRenderer
     {
         /// <summary>
-        /// We always have 7 steps per octave. 
-        /// (by a step the offsets inbetween score lines is meant, 
-        ///      0 steps is on the first line (counting from top)
-        ///      1 steps is on the space inbetween the first and the second line
-        /// </summary>
-        private const int StepsPerOctave = 7;
-
-        /// <summary>
-        /// Those are the amount of steps for the different clefs in case of a note value 0    
-        /// [Neutral, C3, C4, F4, G2]
-        /// </summary>
-        private static readonly int[] OctaveSteps = { 38, 32, 30, 26, 38 };
-
-        /// <summary>
-        /// The step offsets of the notes within an octave in case of for sharp keysignatures
-        /// </summary>
-        private static readonly int[] SharpNoteSteps = { 0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6 };
-
-        /// <summary>
-        /// The step offsets of the notes within an octave in case of for flat keysignatures
-        /// </summary>
-        private static readonly int[] FlatNoteSteps = { 0, 1, 1, 2, 2, 3, 4, 4, 5, 5, 6, 6 };
-
-        /// <summary>
         /// The step offsets of sharp symbols for sharp key signatures.
         /// </summary>
         private static readonly int[] SharpKsSteps = { 1, 4, 0, 3, 6, 2, 5 };
@@ -693,29 +669,8 @@ namespace AlphaTab.Rendering
         // TODO[performance]: Maybe we should cache this (check profiler)
         public int GetNoteLine(Note n)
         {
-            var value = n.Beat.Voice.Bar.Track.IsPercussion ? PercussionMapper.MapValue(n) : n.RealValue;
-            var ks = n.Beat.Voice.Bar.MasterBar.KeySignature;
-            var clef = n.Beat.Voice.Bar.Clef;
-
-            var index = value % 12;
-            var octave = (value / 12);
-
-            // Initial Position
-            var steps = OctaveSteps[(int)clef];
-
-            // Move to Octave
-            steps -= (octave * StepsPerOctave);
-
-            // Add offset for note itself
-            steps -= ModelUtils.KeySignatureIsSharp(ks) || ModelUtils.KeySignatureIsNatural(ks)
-                         ? SharpNoteSteps[index]
-                         : FlatNoteSteps[index];
-
-            // TODO: It seems note heads are always one step above the calculated line 
-            // maybe the SVG paths are wrong, need to recheck where step=0 is really placed
-            return steps + NoteStepCorrection;
+            return AccidentalHelper.GetNoteLine(n);
         }
-        public const int NoteStepCorrection = 1;
 
         /// <summary>
         /// Gets the relative y position of the given steps relative to first line. 

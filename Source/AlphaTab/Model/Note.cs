@@ -21,6 +21,34 @@ using AlphaTab.Collections;
 namespace AlphaTab.Model
 {
     /// <summary>
+    /// Lists the modes how accidentals are handled for notes
+    /// </summary>
+    public enum NoteAccidentalMode
+    {
+        /// <summary>
+        /// Accidentals are calculated automatically. 
+        /// </summary>
+        Default,
+        /// <summary>
+        /// If the default behavior calculates a Sharp, use flat instead (and vice versa).
+        /// </summary>
+        SwapAccidentals,
+        /// <summary>
+        /// This will move the note one line down and applies a Naturalize. 
+        /// </summary>
+        ForceNatural,
+        /// <summary>
+        /// This will move the note one line down and applies a Sharp. 
+        /// </summary>
+        ForceSharp,
+        /// <summary>
+        /// This will move the note one line up and applies a Flat. 
+        /// </summary>
+        ForceFlat,
+    }
+
+
+    /// <summary>
     /// A note is a single played sound on a fretted instrument. 
     /// It consists of a fret offset and a string on which the note is played on.
     /// It also can be modified by a lot of different effects.  
@@ -32,6 +60,12 @@ namespace AlphaTab.Model
         public bool HasBend { get { return BendPoints.Count > 0; } }
 
         public int Fret { get; set; }
+
+        /// <summary>
+        /// Gets or sets the string number where the note is placed. 
+        /// 1 is the lowest string on the guitar and the bottom line on the tablature. 
+        /// It then increases the the number of strings on available on the track. 
+        /// </summary>
         public int String { get; set; }
 
         public bool IsHammerPullOrigin { get; set; }
@@ -81,7 +115,7 @@ namespace AlphaTab.Model
 
         public double DurationPercent { get; set; }
 
-        public bool SwapAccidentals { get; set; }
+        public NoteAccidentalMode AccidentalMode { get; set; }
 
         public Beat Beat { get; set; }
         public DynamicValue Dynamic { get; set; }
@@ -93,17 +127,22 @@ namespace AlphaTab.Model
         {
             get
             {
-                if (Beat.Voice.Bar.Track.Tuning.Length > 0)
-                    return Beat.Voice.Bar.Track.Tuning[Beat.Voice.Bar.Track.Tuning.Length - (String - 1) - 1];
-                return 0;
+                return GetStringTuning(Beat.Voice.Bar.Track, String);
             }
+        }
+
+        public static int GetStringTuning(Track track, int noteString)
+        {
+            if (track.Tuning.Length > 0)
+                return track.Tuning[track.Tuning.Length - (noteString - 1) - 1];
+            return 0;
         }
 
         public int RealValue
         {
             get
             {
-                if (Fret == -1)
+                if (Fret == int.MinValue)
                     return Octave * 12 + Tone;
                 return Fret + StringTuning;
             }
@@ -115,7 +154,7 @@ namespace AlphaTab.Model
             Dynamic = DynamicValue.F;
 
             Accentuated = AccentuationType.None;
-            Fret = -1;
+            Fret = int.MinValue;
             HarmonicType = HarmonicType.None;
             SlideType = SlideType.None;
             Vibrato = VibratoType.None;
@@ -151,7 +190,7 @@ namespace AlphaTab.Model
             dst.TrillValue = src.TrillValue;
             dst.TrillSpeed = src.TrillSpeed;
             dst.DurationPercent = src.DurationPercent;
-            dst.SwapAccidentals = src.SwapAccidentals;
+            dst.AccidentalMode = src.AccidentalMode;
             dst.Dynamic = src.Dynamic;
             dst.Octave = src.Octave;
             dst.Tone = src.Tone;

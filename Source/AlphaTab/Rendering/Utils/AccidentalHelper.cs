@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 
@@ -49,14 +51,48 @@ namespace AlphaTab.Rendering.Utils
         };
 
         /// <summary>
+        /// We always have 7 steps per octave. 
+        /// (by a step the offsets inbetween score lines is meant, 
+        ///      0 steps is on the first line (counting from top)
+        ///      1 steps is on the space inbetween the first and the second line
+        /// </summary>
+        private const int StepsPerOctave = 7;
+
+        /// <summary>
+        /// Those are the amount of steps for the different clefs in case of a note value 0    
+        /// [Neutral, C3, C4, F4, G2]
+        /// </summary>
+        private static readonly int[] OctaveSteps = { 38, 32, 30, 26, 38 };
+
+        /// <summary>
+        /// The step offsets of the notes within an octave in case of for sharp keysignatures
+        /// </summary>
+        private static readonly int[] SharpNoteSteps = { 0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6 };
+
+        /// <summary>
+        /// The step offsets of the notes within an octave in case of for flat keysignatures
+        /// </summary>
+        private static readonly int[] FlatNoteSteps = { 0, 1, 1, 2, 2, 3, 4, 4, 5, 5, 6, 6 };
+
+        /// <summary>
         /// this int-hash stores the registered accidentals for
         /// all octaves and notes within an octave. 
         /// </summary>
         private readonly FastDictionary<int, AccidentalType> _registeredAccidentals;
 
+        private const int NoteStepCorrection = 1;
+
+        private readonly FastDictionary<string, int> _appliedScoreLines;
+
         public AccidentalHelper()
         {
             _registeredAccidentals = new FastDictionary<int, AccidentalType>();
+            _appliedScoreLines = new FastDictionary<string, int>();
+        }
+
+        private string GetNoteId(Note n)
+        {
+            return n.Beat.Index + "-" + n.String;
         }
 
         /// <summary>
@@ -66,9 +102,8 @@ namespace AlphaTab.Rendering.Utils
         /// <param name="note"></param>
         /// <param name="noteLine"></param>
         /// <returns></returns>
-        public AccidentalType ApplyAccidental(Note note, int noteLine)
+        public AccidentalType ApplyAccidental(Note note)
         {
-            // TODO: we need to check for note.swapAccidentals 
             var noteValue = note.RealValue;
             var ks = note.Beat.Voice.Bar.MasterBar.KeySignature;
             var ksi = (ks + 7);
@@ -76,6 +111,11 @@ namespace AlphaTab.Rendering.Utils
             //var octave = (noteValue / 12);
 
             AccidentalType accidentalToSet = AccidentalNotes[ksi][index];
+
+            // calculate the line where the note will be according to the accidental
+            int noteLine = GetNoteLineWithAccidental(note, accidentalToSet);
+
+            // TODO: change accidentalToSet according to note.AccidentalMode
 
             // if there is already an accidental registered, we check if we 
             // have a new accidental
@@ -111,6 +151,57 @@ namespace AlphaTab.Rendering.Utils
             }
 
             return accidentalToSet;
+        }
+
+        private int GetNoteLineWithAccidental(Note n, AccidentalType accidentalToSet)
+        {
+            var value = n.Beat.Voice.Bar.Track.IsPercussion ? PercussionMapper.MapValue(n) : n.RealValue;
+            var ks = n.Beat.Voice.Bar.MasterBar.KeySignature;
+            var clef = n.Beat.Voice.Bar.Clef;
+
+            var index = value % 12;
+            var octave = (value / 12);
+
+            // Initial Position
+            var steps = OctaveSteps[(int)clef];
+
+            // Move to Octave
+            steps -= (octave * StepsPerOctave);
+
+            // get the step list for the current keySignature
+            var stepList = ModelUtils.KeySignatureIsSharp(ks) || ModelUtils.KeySignatureIsNatural(ks)
+                ? SharpNoteSteps
+                : FlatNoteSteps;
+
+            //Add offset for note itself
+            int offset = 0;
+            switch (n.AccidentalMode)
+            {
+                // TODO: provide line according to accidentalMode
+                case NoteAccidentalMode.Default:
+                case NoteAccidentalMode.SwapAccidentals:
+                case NoteAccidentalMode.ForceNatural:
+                case NoteAccidentalMode.ForceFlat:
+                case NoteAccidentalMode.ForceSharp:
+                default:
+                    // normal behavior: simply use the position where 
+                    // the keysignature defines the position 
+                    offset = stepList[index];
+                    break;
+            }
+            steps -= stepList[index];
+
+            // TODO: It seems note heads are always one step above the calculated line 
+            // maybe the SVG paths are wrong, need to recheck where step=0 is really placed
+            var line = steps + NoteStepCorrection;
+            _appliedScoreLines[GetNoteId(n)] = line;
+            return line;
+        }
+
+
+        public int GetNoteLine(Note n)
+        {
+            return _appliedScoreLines[GetNoteId(n)];
         }
     }
 

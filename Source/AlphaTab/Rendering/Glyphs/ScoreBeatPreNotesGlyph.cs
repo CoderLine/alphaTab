@@ -56,8 +56,8 @@ namespace AlphaTab.Rendering.Glyphs
         private void CreateAccidentalGlyph(Note n, AccidentalGroupGlyph accidentals)
         {
             var sr = (ScoreBarRenderer)Renderer;
+            var accidental = sr.AccidentalHelper.ApplyAccidental(n);
             var noteLine = sr.GetNoteLine(n);
-            var accidental = sr.AccidentalHelper.ApplyAccidental(n, noteLine);
             var isGrace = Container.Beat.GraceType != GraceType.None;
             switch (accidental)
             {

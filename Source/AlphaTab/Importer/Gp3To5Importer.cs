@@ -1030,7 +1030,9 @@ namespace AlphaTab.Importer
                     newNote.DurationPercent = ReadDouble();
                 }
                 var flags2 = _data.ReadByte();
-                newNote.SwapAccidentals = (flags2 & 0x02) != 0;
+                newNote.AccidentalMode = (flags2 & 0x02) != 0
+                    ? NoteAccidentalMode.SwapAccidentals
+                    : NoteAccidentalMode.Default;
             }
 
             beat.AddNote(newNote);

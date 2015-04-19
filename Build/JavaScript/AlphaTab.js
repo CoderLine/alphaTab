@@ -508,7 +508,7 @@ AlphaTab.Model.TuningParser.GetTuningForText = function (str){
                 return -1;
         }
         // add octaves
-        b += ((octave + 1) * 12);
+        b += (octave * 12);
     }
     else {
         return -1;
@@ -4226,7 +4226,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
                 newNote.DurationPercent = this.ReadDouble();
             }
             var flags2 = this._data.ReadByte();
-            newNote.SwapAccidentals = (flags2 & 2) != 0;
+            newNote.AccidentalMode = (flags2 & 2) != 0 ? AlphaTab.Model.NoteAccidentalMode.SwapAccidentals : AlphaTab.Model.NoteAccidentalMode.Default;
         }
         beat.AddNote(newNote);
         if ((flags & 8) != 0){
@@ -5877,6 +5877,7 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
         var xml = AlphaTab.Platform.Std.ToString(this._data.ReadAll());
         var dom = AlphaTab.Platform.Std.LoadXml(xml);
         this._score = new AlphaTab.Model.Score();
+        this._score.Tempo = 120;
         this.ParseDom(dom);
         this._score.Finish();
         return this._score;
@@ -5964,12 +5965,14 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
             }
         }
         var chord = false;
+        var isFirstBeat = true;
         AlphaTab.Platform.Std.IterateChildren(element, $CreateAnonymousDelegate(this, function (c){
             if (c.nodeType == Node.ELEMENT_NODE){
                 var e = c;
                 switch (c.localName){
                     case "note":
-                        chord = this.ParseNoteBeat(e, track, bar, chord);
+                        chord = this.ParseNoteBeat(e, track, bar, chord, isFirstBeat);
+                        isFirstBeat = false;
                         break;
                     case "forward":
                         break;
@@ -5989,24 +5992,24 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
             }
         }));
     },
-    ParseNoteBeat: function (element, track, bar, chord){
+    ParseNoteBeat: function (element, track, bar, chord, isFirstBeat){
         var voiceIndex = 0;
         var voiceNodes = element.getElementsByTagName("voice");
         if (voiceNodes.length > 0){
             voiceIndex = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(voiceNodes.item(0))) - 1;
         }
         var beat;
-        if (chord){
-            var voice = this.GetOrCreateVoice(bar, voiceIndex);
+        var voice = this.GetOrCreateVoice(bar, voiceIndex);
+        if (chord || (isFirstBeat && voice.Beats.length == 1)){
             beat = voice.Beats[voice.Beats.length - 1];
         }
         else {
-            var voice = this.GetOrCreateVoice(bar, voiceIndex);
             beat = new AlphaTab.Model.Beat();
             voice.AddBeat(beat);
         }
         var note = new AlphaTab.Model.Note();
         beat.AddNote(note);
+        beat.IsEmpty = false;
         AlphaTab.Platform.Std.IterateChildren(element, $CreateAnonymousDelegate(this, function (c){
             if (c.nodeType == Node.ELEMENT_NODE){
                 var e = c;
@@ -6054,6 +6057,7 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
                         note.IsStaccato = true;
                         break;
                     case "accidental":
+                        this.ParseAccidental(e, note);
                         break;
                     case "time-modification":
                         this.ParseTimeModification(e, beat);
@@ -6089,6 +6093,19 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
             }
         }));
         return chord;
+    },
+    ParseAccidental: function (element, note){
+        switch (AlphaTab.Platform.Std.GetNodeValue(element)){
+            case "sharp":
+                note.AccidentalMode = AlphaTab.Model.NoteAccidentalMode.ForceSharp;
+                break;
+            case "natural":
+                note.AccidentalMode = AlphaTab.Model.NoteAccidentalMode.ForceNatural;
+                break;
+            case "flat":
+                note.AccidentalMode = AlphaTab.Model.NoteAccidentalMode.ForceFlat;
+                break;
+        }
     },
     ParseNotations: function (element, beat, note){
         AlphaTab.Platform.Std.IterateChildren(element, $CreateAnonymousDelegate(this, function (c){
@@ -6179,9 +6196,12 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
             }
         }));
         var fullNoteName = step + octave;
-        var fullNoteValue = AlphaTab.Model.TuningParser.GetTuningForText(fullNoteName);
+        var fullNoteValue = AlphaTab.Model.TuningParser.GetTuningForText(fullNoteName) + semitones;
+        this.ApplyNoteStringFrets(track, beat, note, fullNoteValue);
+    },
+    ApplyNoteStringFrets: function (track, beat, note, fullNoteValue){
         note.String = this.FindStringForValue(track, beat, fullNoteValue);
-        note.Fret = fullNoteValue - track.Tuning[note.String - 1];
+        note.Fret = fullNoteValue - AlphaTab.Model.Note.GetStringTuning(track, note.String);
     },
     FindStringForValue: function (track, beat, value){
         // find strings which are already taken
@@ -6190,18 +6210,24 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
             var note = beat.Notes[i];
             takenStrings[note.String] = true;
         }
-        // find a string where the note matches into 0 to 14
-        for (var i = 0; i < track.Tuning.length; i++){
-            if (!takenStrings.hasOwnProperty(i)){
-                var min = track.Tuning[i];
-                var max = track.Tuning[i] + 14;
-                if (value >= min && value <= max){
-                    return track.Tuning.length - i;
+        // find a string where the note matches into 0 to <upperbound>
+        // first try to find a string from 0-14 (more handy to play)
+        // then try from 0-20 (guitars with high frets)
+        // then unlimited 
+        var steps = new Int32Array([14, 20, 2147483647]);
+        for (var i = 0; i < steps.length; i++){
+            for (var j = 0; j < track.Tuning.length; j++){
+                if (!takenStrings.hasOwnProperty(j)){
+                    var min = track.Tuning[j];
+                    var max = track.Tuning[j] + steps[i];
+                    if (value >= min && value <= max){
+                        return track.Tuning.length - j;
+                    }
                 }
             }
         }
+        // will not happen
         return 1;
-        // first string    
     },
     GetOrCreateVoice: function (bar, index){
         if (index < bar.Voices.length){
@@ -7082,6 +7108,13 @@ AlphaTab.Model.ModelUtils.KeySignatureIsNatural = function (ks){
 AlphaTab.Model.ModelUtils.KeySignatureIsSharp = function (ks){
     return ks > 0;
 };
+AlphaTab.Model.NoteAccidentalMode = {
+    Default: 0,
+    SwapAccidentals: 1,
+    ForceNatural: 2,
+    ForceSharp: 3,
+    ForceFlat: 4
+};
 AlphaTab.Model.Note = function (){
     this.Accentuated = AlphaTab.Model.AccentuationType.None;
     this.BendPoints = null;
@@ -7110,7 +7143,7 @@ AlphaTab.Model.Note = function (){
     this.TrillValue = 0;
     this.TrillSpeed = AlphaTab.Model.Duration.Whole;
     this.DurationPercent = 0;
-    this.SwapAccidentals = false;
+    this.AccidentalMode = AlphaTab.Model.NoteAccidentalMode.Default;
     this.Beat = null;
     this.Dynamic = AlphaTab.Model.DynamicValue.PPP;
     this.Octave = 0;
@@ -7118,7 +7151,7 @@ AlphaTab.Model.Note = function (){
     this.BendPoints = [];
     this.Dynamic = AlphaTab.Model.DynamicValue.F;
     this.Accentuated = AlphaTab.Model.AccentuationType.None;
-    this.Fret = -1;
+    this.Fret = -2147483648;
     this.HarmonicType = AlphaTab.Model.HarmonicType.None;
     this.SlideType = AlphaTab.Model.SlideType.None;
     this.Vibrato = AlphaTab.Model.VibratoType.None;
@@ -7140,12 +7173,10 @@ AlphaTab.Model.Note.prototype = {
         return this.TrillValue >= 0;
     },
     get_StringTuning: function (){
-        if (this.Beat.Voice.Bar.Track.Tuning.length > 0)
-            return this.Beat.Voice.Bar.Track.Tuning[this.Beat.Voice.Bar.Track.Tuning.length - (this.String - 1) - 1];
-        return 0;
+        return AlphaTab.Model.Note.GetStringTuning(this.Beat.Voice.Bar.Track, this.String);
     },
     get_RealValue: function (){
-        if (this.Fret == -1)
+        if (this.Fret == -2147483648)
             return this.Octave * 12 + this.Tone;
         return this.Fret + this.get_StringTuning();
     },
@@ -7195,6 +7226,11 @@ AlphaTab.Model.Note.prototype = {
 $StaticConstructor(function (){
     AlphaTab.Model.Note.MaxOffsetForSameLineSearch = 3;
 });
+AlphaTab.Model.Note.GetStringTuning = function (track, noteString){
+    if (track.Tuning.length > 0)
+        return track.Tuning[track.Tuning.length - (noteString - 1) - 1];
+    return 0;
+};
 AlphaTab.Model.Note.CopyTo = function (src, dst){
     dst.Accentuated = src.Accentuated;
     dst.Fret = src.Fret;
@@ -7216,7 +7252,7 @@ AlphaTab.Model.Note.CopyTo = function (src, dst){
     dst.TrillValue = src.TrillValue;
     dst.TrillSpeed = src.TrillSpeed;
     dst.DurationPercent = src.DurationPercent;
-    dst.SwapAccidentals = src.SwapAccidentals;
+    dst.AccidentalMode = src.AccidentalMode;
     dst.Dynamic = src.Dynamic;
     dst.Octave = src.Octave;
     dst.Tone = src.Tone;
@@ -10898,8 +10934,8 @@ AlphaTab.Rendering.Glyphs.ScoreBeatPreNotesGlyph.prototype = {
     },
     CreateAccidentalGlyph: function (n, accidentals){
         var sr = this.Renderer;
+        var accidental = sr.AccidentalHelper.ApplyAccidental(n);
         var noteLine = sr.GetNoteLine(n);
-        var accidental = sr.AccidentalHelper.ApplyAccidental(n, noteLine);
         var isGrace = this.Container.Beat.GraceType != AlphaTab.Model.GraceType.None;
         switch (accidental){
             case AlphaTab.Model.AccidentalType.Sharp:
@@ -13109,20 +13145,7 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
         }
     },
     GetNoteLine: function (n){
-        var value = n.Beat.Voice.Bar.Track.IsPercussion ? AlphaTab.Rendering.Utils.PercussionMapper.MapValue(n) : n.get_RealValue();
-        var ks = n.Beat.Voice.Bar.get_MasterBar().KeySignature;
-        var clef = n.Beat.Voice.Bar.Clef;
-        var index = value % 12;
-        var octave = ((value / 12) | 0);
-        // Initial Position
-        var steps = AlphaTab.Rendering.ScoreBarRenderer.OctaveSteps[clef];
-        // Move to Octave
-        steps -= (octave * 7);
-        // Add offset for note itself
-        steps -= AlphaTab.Model.ModelUtils.KeySignatureIsSharp(ks) || AlphaTab.Model.ModelUtils.KeySignatureIsNatural(ks) ? AlphaTab.Rendering.ScoreBarRenderer.SharpNoteSteps[index] : AlphaTab.Rendering.ScoreBarRenderer.FlatNoteSteps[index];
-        // TODO: It seems note heads are always one step above the calculated line 
-        // maybe the SVG paths are wrong, need to recheck where step=0 is really placed
-        return steps + 1;
+        return this.AccidentalHelper.GetNoteLine(n);
     },
     GetScoreY: function (steps, correction){
         return ((this.get_LineOffset() / 2) * steps) + (correction * this.get_Scale());
@@ -13156,14 +13179,9 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
     }
 };
 $StaticConstructor(function (){
-    AlphaTab.Rendering.ScoreBarRenderer.StepsPerOctave = 7;
-    AlphaTab.Rendering.ScoreBarRenderer.OctaveSteps = new Int32Array([38, 32, 30, 26, 38]);
-    AlphaTab.Rendering.ScoreBarRenderer.SharpNoteSteps = new Int32Array([0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6]);
-    AlphaTab.Rendering.ScoreBarRenderer.FlatNoteSteps = new Int32Array([0, 1, 1, 2, 2, 3, 4, 4, 5, 5, 6, 6]);
     AlphaTab.Rendering.ScoreBarRenderer.SharpKsSteps = new Int32Array([1, 4, 0, 3, 6, 2, 5]);
     AlphaTab.Rendering.ScoreBarRenderer.FlatKsSteps = new Int32Array([5, 2, 6, 3, 7, 4, 8]);
     AlphaTab.Rendering.ScoreBarRenderer.LineSpacing = 8;
-    AlphaTab.Rendering.ScoreBarRenderer.NoteStepCorrection = 1;
 });
 AlphaTab.Rendering.ScoreBarRenderer.PaintSingleBar = function (canvas, x1, y1, x2, y2, size){
     canvas.BeginPath();
@@ -13827,17 +13845,23 @@ $Inherit(AlphaTab.Rendering.TabBarRendererFactory, AlphaTab.Rendering.BarRendere
 AlphaTab.Rendering.Utils = AlphaTab.Rendering.Utils || {};
 AlphaTab.Rendering.Utils.AccidentalHelper = function (){
     this._registeredAccidentals = null;
+    this._appliedScoreLines = null;
     this._registeredAccidentals = {};
+    this._appliedScoreLines = {};
 };
 AlphaTab.Rendering.Utils.AccidentalHelper.prototype = {
-    ApplyAccidental: function (note, noteLine){
-        // TODO: we need to check for note.swapAccidentals 
+    GetNoteId: function (n){
+        return n.Beat.Index + "-" + n.String;
+    },
+    ApplyAccidental: function (note){
         var noteValue = note.get_RealValue();
         var ks = note.Beat.Voice.Bar.get_MasterBar().KeySignature;
         var ksi = (ks + 7);
         var index = (noteValue % 12);
         //var octave = (noteValue / 12);
         var accidentalToSet = AlphaTab.Rendering.Utils.AccidentalHelper.AccidentalNotes[ksi][index];
+        // calculate the line where the note will be according to the accidental
+        var noteLine = this.GetNoteLineWithAccidental(note, accidentalToSet);
         // if there is already an accidental registered, we check if we 
         // have a new accidental
         var updateAccidental = true;
@@ -13862,10 +13886,49 @@ AlphaTab.Rendering.Utils.AccidentalHelper.prototype = {
             }
         }
         return accidentalToSet;
+    },
+    GetNoteLineWithAccidental: function (n, accidentalToSet){
+        var value = n.Beat.Voice.Bar.Track.IsPercussion ? AlphaTab.Rendering.Utils.PercussionMapper.MapValue(n) : n.get_RealValue();
+        var ks = n.Beat.Voice.Bar.get_MasterBar().KeySignature;
+        var clef = n.Beat.Voice.Bar.Clef;
+        var index = value % 12;
+        var octave = ((value / 12) | 0);
+        // Initial Position
+        var steps = AlphaTab.Rendering.Utils.AccidentalHelper.OctaveSteps[clef];
+        // Move to Octave
+        steps -= (octave * 7);
+        // get the step list for the current keySignature
+        var stepList = AlphaTab.Model.ModelUtils.KeySignatureIsSharp(ks) || AlphaTab.Model.ModelUtils.KeySignatureIsNatural(ks) ? AlphaTab.Rendering.Utils.AccidentalHelper.SharpNoteSteps : AlphaTab.Rendering.Utils.AccidentalHelper.FlatNoteSteps;
+        //Add offset for note itself
+        var offset = 0;
+        switch (n.AccidentalMode){
+            case AlphaTab.Model.NoteAccidentalMode.Default:
+            case AlphaTab.Model.NoteAccidentalMode.SwapAccidentals:
+            case AlphaTab.Model.NoteAccidentalMode.ForceNatural:
+            case AlphaTab.Model.NoteAccidentalMode.ForceFlat:
+            case AlphaTab.Model.NoteAccidentalMode.ForceSharp:
+            default:
+                offset = stepList[index];
+                break;
+        }
+        steps -= stepList[index];
+        // TODO: It seems note heads are always one step above the calculated line 
+        // maybe the SVG paths are wrong, need to recheck where step=0 is really placed
+        var line = steps + 1;
+        this._appliedScoreLines[this.GetNoteId(n)] = line;
+        return line;
+    },
+    GetNoteLine: function (n){
+        return this._appliedScoreLines[this.GetNoteId(n)];
     }
 };
 $StaticConstructor(function (){
     AlphaTab.Rendering.Utils.AccidentalHelper.AccidentalNotes = [[AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural], [AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural], [AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural], [AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural], [AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural], [AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural], [AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural], [AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None], [AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None], [AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None], [AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None], [AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None], [AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None], [AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None], [AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural]];
+    AlphaTab.Rendering.Utils.AccidentalHelper.StepsPerOctave = 7;
+    AlphaTab.Rendering.Utils.AccidentalHelper.OctaveSteps = new Int32Array([38, 32, 30, 26, 38]);
+    AlphaTab.Rendering.Utils.AccidentalHelper.SharpNoteSteps = new Int32Array([0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6]);
+    AlphaTab.Rendering.Utils.AccidentalHelper.FlatNoteSteps = new Int32Array([0, 1, 1, 2, 2, 3, 4, 4, 5, 5, 6, 6]);
+    AlphaTab.Rendering.Utils.AccidentalHelper.NoteStepCorrection = 1;
 });
 AlphaTab.Rendering.Utils.BarHelpers = function (bar){
     this.BeamHelpers = null;

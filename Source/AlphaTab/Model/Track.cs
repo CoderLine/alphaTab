@@ -33,6 +33,11 @@ namespace AlphaTab.Model
         public int Index { get; set; }
         public string Name { get; set; }
         public string ShortName { get; set; }
+        /// <summary>
+        /// Get or set the guitar tuning of the guitar. This tuning also indicates the number of strings shown in the
+        /// guitar tablature. Unlike the <see cref="Note.String"/> property this array directly represents
+        /// the order of the tracks shown in the tablature. The first item is the most top tablature line. 
+        /// </summary>
         public int[] Tuning { get; set; }
         public string TuningName { get; set; }
         public Color Color { get; set; }
