@@ -52,7 +52,7 @@ namespace AlphaTab.Importer
                 throw new UnsupportedFormatException();
             }
 
-            foreach (XmlNode c in element.ChildNodes)
+            element.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
                 {
@@ -73,7 +73,7 @@ namespace AlphaTab.Importer
                             break;
                     }
                 }
-            }
+            });
         }
 
         private void ParsePart(XmlElement element)
@@ -81,7 +81,7 @@ namespace AlphaTab.Importer
             var id = element.GetAttribute("id");
             var track = _trackById[id];
             var isFirstMeasure = true;
-            foreach (XmlNode c in element.ChildNodes)
+            element.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
                 {
@@ -94,7 +94,7 @@ namespace AlphaTab.Importer
                             break;
                     }
                 }
-            }
+            });
         }
 
         private void ParseMeasure(XmlElement element, Track track, bool isFirstMeasure)
@@ -130,7 +130,7 @@ namespace AlphaTab.Importer
 
             bool chord = false;
 
-            foreach (XmlNode c in element.ChildNodes)
+            element.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
                 {
@@ -159,7 +159,7 @@ namespace AlphaTab.Importer
                             break;
                     }
                 }
-            }
+            });
         }
 
         private bool ParseNoteBeat(XmlElement element, Track track, Bar bar, bool chord)
@@ -168,7 +168,7 @@ namespace AlphaTab.Importer
             var voiceNodes = element.GetElementsByTagName("voice");
             if (voiceNodes.Count > 0)
             {
-                voiceIndex = Std.ParseInt(Std.GetNodeValue(voiceNodes[0])) - 1;
+                voiceIndex = Std.ParseInt(Std.GetNodeValue(voiceNodes.Item(0))) - 1;
             }
 
             Beat beat;
@@ -187,7 +187,7 @@ namespace AlphaTab.Importer
 
             var note = new Note();
             beat.AddNote(note);
-            foreach (XmlNode c in element.ChildNodes)
+            element.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
                 {
@@ -292,8 +292,7 @@ namespace AlphaTab.Importer
                             break;
                     }
                 }
-            }
-
+            });
 
             return chord;
         }
@@ -312,7 +311,7 @@ namespace AlphaTab.Importer
 
         private void ParseNotations(XmlElement element, Beat beat, Note note)
         {
-            foreach (XmlNode c in element.ChildNodes)
+            element.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
                 {
@@ -333,12 +332,12 @@ namespace AlphaTab.Importer
                             break;
                     }
                 }
-            }
+            });
         }
 
         private void ParseDynamics(XmlElement element, Beat beat)
         {
-            foreach (XmlNode c in element.ChildNodes)
+            element.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
                 {
@@ -370,13 +369,13 @@ namespace AlphaTab.Importer
                             break;
                     }
                 }
-            }
+            });
         }
 
         private void ParseTimeModification(XmlElement element, Beat beat)
         {
             var actualNodes = 0;
-            foreach (XmlNode c in element.ChildNodes)
+            element.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
                 {
@@ -395,7 +394,7 @@ namespace AlphaTab.Importer
                             //    break;
                     }
                 }
-            }
+            });
         }
 
         private void ParsePitch(XmlElement element, Track track, Beat beat, Note note)
@@ -403,7 +402,7 @@ namespace AlphaTab.Importer
             string step = null;
             int semitones = 0;
             int octave = 0;
-            foreach (XmlNode c in element.ChildNodes)
+            element.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
                 {
@@ -422,7 +421,7 @@ namespace AlphaTab.Importer
                             break;
                     }
                 }
-            }
+            });
 
             var fullNoteName = step + octave;
             var fullNoteValue = TuningParser.GetTuningForText(fullNoteName);
@@ -478,7 +477,7 @@ namespace AlphaTab.Importer
 
         private void ParseDirection(XmlElement element, MasterBar masterBar)
         {
-            foreach (XmlNode c in element.ChildNodes)
+            element.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
                 {
@@ -494,12 +493,12 @@ namespace AlphaTab.Importer
                             break;
                     }
                 }
-            }
+            });
         }
 
         private void ParseAttributes(XmlElement element, Bar bar, MasterBar masterBar)
         {
-            foreach (XmlNode c in element.ChildNodes)
+            element.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
                 {
@@ -517,14 +516,14 @@ namespace AlphaTab.Importer
                             break;
                     }
                 }
-            }
+            });
         }
 
         private void ParseClef(XmlElement element, Bar bar)
         {
             string sign = null;
             string line = null;
-            foreach (XmlNode c in element.ChildNodes)
+            element.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
                 {
@@ -539,7 +538,7 @@ namespace AlphaTab.Importer
                             break;
                     }
                 }
-            }
+            });
 
             var clef = sign + line;
             switch (clef)
@@ -561,7 +560,7 @@ namespace AlphaTab.Importer
 
         private void ParseTime(XmlElement element, MasterBar masterBar)
         {
-            foreach (XmlNode c in element.ChildNodes)
+            element.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
                 {
@@ -576,7 +575,7 @@ namespace AlphaTab.Importer
                             break;
                     }
                 }
-            }
+            });
         }
 
         private void ParseKey(XmlElement element, MasterBar masterBar)
@@ -585,7 +584,7 @@ namespace AlphaTab.Importer
             int keyStep = int.MinValue;
             int keyAlter = int.MinValue;
 
-            foreach (XmlNode c in element.ChildNodes)
+            element.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
                 {
@@ -603,7 +602,7 @@ namespace AlphaTab.Importer
                             break;
                     }
                 }
-            }
+            });
 
             if (fifths != int.MinValue)
             {
@@ -634,7 +633,7 @@ namespace AlphaTab.Importer
 
         private void ParseIdentification(XmlElement element)
         {
-            foreach (XmlNode c in element.ChildNodes)
+            element.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
                 {
@@ -652,12 +651,12 @@ namespace AlphaTab.Importer
                             break;
                     }
                 }
-            }
+            });
         }
 
         private void ParsePartList(XmlElement element)
         {
-            foreach (XmlNode c in element.ChildNodes)
+            element.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
                 {
@@ -669,7 +668,7 @@ namespace AlphaTab.Importer
                             break;
                     }
                 }
-            }
+            });
 
         }
 
@@ -679,7 +678,7 @@ namespace AlphaTab.Importer
             var track = new Track();
             _trackById[id] = track;
             _score.AddTrack(track);
-            foreach (XmlNode c in element.ChildNodes)
+            element.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
                 {
@@ -697,7 +696,7 @@ namespace AlphaTab.Importer
                             break;
                     }
                 }
-            }
+            });
 
             if (track.Tuning == null || track.Tuning.Length == 0)
             {
@@ -707,7 +706,7 @@ namespace AlphaTab.Importer
 
         private void ParseMidiInstrument(XmlElement element, Track track)
         {
-            foreach (XmlNode c in element.ChildNodes)
+            element.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
                 {
@@ -725,7 +724,7 @@ namespace AlphaTab.Importer
                             break;
                     }
                 }
-            }
+            });
         }
 
 

@@ -87,7 +87,7 @@ namespace AlphaTab.Importer
                 }
                 catch (Exception e)
                 {
-                    if (!Std.InstanceOf<UnsupportedFormatException>(e))
+                    if (!Std.IsException<UnsupportedFormatException>(e))
                     {
                         throw e;
                     }

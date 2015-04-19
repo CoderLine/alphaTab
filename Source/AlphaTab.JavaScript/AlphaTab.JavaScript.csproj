@@ -48,6 +48,13 @@
     <Compile Include="Platform\Std.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="Xml\XmlAttribute.cs" />
+    <Compile Include="Xml\XmlAttributeCollection.cs" />
+    <Compile Include="Xml\XmlDocument.cs" />
+    <Compile Include="Xml\XmlElement.cs" />
+    <Compile Include="Xml\XmlNode.cs" />
+    <Compile Include="Xml\XmlNodeList.cs" />
+    <Compile Include="Xml\XmlNodeType.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
@@ -60,7 +67,6 @@
       <HintPath>..\..\..\alphaSynth\SharpKit\SharpKit.JavaScript.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CopyAndMinify.bat" />

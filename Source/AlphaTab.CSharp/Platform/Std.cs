@@ -42,6 +42,7 @@ namespace AlphaTab.Platform
         {
             return s;
         }
+
         public static int ParseInt(string s)
         {
             int f;
@@ -69,7 +70,7 @@ namespace AlphaTab.Platform
 
         public static string StringFromCharCode(int c)
         {
-            return ((char)c).ToString();
+            return ((char) c).ToString();
         }
 
         public static void Foreach<T>(IEnumerable<T> e, Action<T> c)
@@ -103,9 +104,18 @@ namespace AlphaTab.Platform
             return n.Value;
         }
 
+        public static void IterateChildren(this XmlNode n, Action<XmlNode> action)
+        {
+            foreach (XmlNode c in n.ChildNodes)
+            {
+                action(c);
+            }
+        }
+
+
         public static sbyte ReadSignedByte(this IReadable readable)
         {
-            return unchecked((sbyte)(byte)readable.ReadByte());
+            return unchecked((sbyte) (byte) readable.ReadByte());
         }
 
         public static string ToString(byte[] data)
@@ -121,6 +131,11 @@ namespace AlphaTab.Platform
         public static string NewGuid()
         {
             return Guid.NewGuid().ToString();
+        }
+
+        public static bool IsException<T>(Exception e)
+        {
+            return e is T;
         }
     }
 }

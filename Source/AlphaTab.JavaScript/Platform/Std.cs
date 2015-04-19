@@ -45,16 +45,43 @@ namespace AlphaTab.Platform
             return "";
         }
 
-        [JsMethod(Code = "for ( var t in e ) { c(e[t]); }")]
+        [JsMethod(InlineCodeExpression = "for ( var t in e ) { c(e[t]); }")]
         public static void Foreach<T>(IEnumerable<T> e, Action<T> c)
         {
         }
 
+        private static Func<string, XmlDocument> _parseXml;
         public static XmlDocument LoadXml(string xml)
         {
-            XmlDocument document = new XmlDocument();
-            document.LoadXml(xml);
-            return document;
+            if (_parseXml == null)
+            {
+                Func<string, XmlDocument> parseXml = null;
+                JsContext.JsCode(@"
+                if (typeof window.DOMParser != ""undefined"")
+                {
+                    parseXml = function(xmlStr) {
+                        return (new window.DOMParser()).parseFromString(xmlStr, ""text/xml"");
+                    };
+                }
+                else if (typeof window.ActiveXObject != ""undefined"" &&
+                     new window.ActiveXObject(""Microsoft.XMLDOM""))
+                {
+                    parseXml = function(xmlStr) {
+                        var xmlDoc = new window.ActiveXObject(""Microsoft.XMLDOM"");
+                        xmlDoc.async = ""false"";
+                        xmlDoc.loadXML(xmlStr);
+                        return xmlDoc;
+                    };
+                }
+                else
+                {
+                    throw new Error(""No XML parser found"");
+                }
+                ");
+                _parseXml = parseXml;
+            }
+
+            return _parseXml(xml);
         }
 
         public static string GetNodeValue(XmlNode n)
@@ -62,13 +89,21 @@ namespace AlphaTab.Platform
             if (n.NodeType == XmlNodeType.Element || n.NodeType == XmlNodeType.Document)
             {
                 var txt = new StringBuilder();
-                foreach (XmlNode childNode in n.ChildNodes)
+                for (int i = 0; i < n.ChildNodes.Count; i++)
                 {
-                    txt.Append(GetNodeValue(childNode));
+                    txt.Append(GetNodeValue(n.ChildNodes.Item(i)));
                 }
                 return txt.ToString().Trim();
             }
             return n.Value;
+        }
+
+        public static void IterateChildren(this XmlNode n, Action<XmlNode> action)
+        {
+            for (int i = 0; i < n.ChildNodes.Count; i++)
+            {
+                action(n.ChildNodes.Item(i));
+            }
         }
 
         public static sbyte ReadSignedByte(this IReadable readable)
@@ -147,6 +182,12 @@ namespace AlphaTab.Platform
         public static object Member(this object o, string s)
         {
             return null;
+        }
+
+        [JsMethod(InlineCodeExpression = "(e.exception instanceof T)")]
+        public static bool IsException<T>(Exception e)
+        {
+            return false;
         }
     }
 }
