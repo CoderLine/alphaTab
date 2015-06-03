@@ -64,7 +64,7 @@ namespace AlphaTab.Rendering.Utils
     /// </summary>
     public class BeamingHelper
     {
-        private static readonly int[] ScoreMiddleKeys = { 48, 45, 38, 59 };
+        private static readonly int[] ScoreMiddleKeys = { 48, 48, 45, 38, 59 };
 
         private Beat _lastBeat;
         private readonly Track _track;
@@ -174,11 +174,15 @@ namespace AlphaTab.Rendering.Utils
                     }
                 }
 #endif
+                if (_track.IsPercussion)
+                {
+                    return BeamDirection.Up;
+                }
                 // the average key is used for determination
                 //      key lowerequal than middle line -> up
                 //      key higher than middle line -> down
                 var avg = (GetValue(MaxNote) + GetValue(MinNote)) / 2;
-                return avg <= ScoreMiddleKeys[(int)_lastBeat.Voice.Bar.Clef - 1] ? BeamDirection.Up : BeamDirection.Down;
+                return avg <= ScoreMiddleKeys[(int)_lastBeat.Voice.Bar.Clef] ? BeamDirection.Up : BeamDirection.Down;
             }
         }
 

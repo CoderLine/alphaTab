@@ -13862,6 +13862,7 @@ AlphaTab.Rendering.Utils.AccidentalHelper.prototype = {
         var accidentalToSet = AlphaTab.Rendering.Utils.AccidentalHelper.AccidentalNotes[ksi][index];
         // calculate the line where the note will be according to the accidental
         var noteLine = this.GetNoteLineWithAccidental(note, accidentalToSet);
+        // TODO: change accidentalToSet according to note.AccidentalMode
         // if there is already an accidental registered, we check if we 
         // have a new accidental
         var updateAccidental = true;
@@ -14062,11 +14063,14 @@ AlphaTab.Rendering.Utils.BeamingHelper.prototype = {
     get_Direction: function (){
         // multivoice handling
         
+        if (this._track.IsPercussion){
+            return AlphaTab.Rendering.Utils.BeamDirection.Up;
+        }
         // the average key is used for determination
         //      key lowerequal than middle line -> up
         //      key higher than middle line -> down
         var avg = ((this.GetValue(this.MaxNote) + this.GetValue(this.MinNote)) / 2) | 0;
-        return avg <= AlphaTab.Rendering.Utils.BeamingHelper.ScoreMiddleKeys[this._lastBeat.Voice.Bar.Clef - 1] ? AlphaTab.Rendering.Utils.BeamDirection.Up : AlphaTab.Rendering.Utils.BeamDirection.Down;
+        return avg <= AlphaTab.Rendering.Utils.BeamingHelper.ScoreMiddleKeys[this._lastBeat.Voice.Bar.Clef] ? AlphaTab.Rendering.Utils.BeamDirection.Up : AlphaTab.Rendering.Utils.BeamDirection.Down;
     },
     CheckBeat: function (beat){
         if (this.Voice == null){
@@ -14177,7 +14181,7 @@ AlphaTab.Rendering.Utils.BeamingHelper.prototype = {
     }
 };
 $StaticConstructor(function (){
-    AlphaTab.Rendering.Utils.BeamingHelper.ScoreMiddleKeys = new Int32Array([48, 45, 38, 59]);
+    AlphaTab.Rendering.Utils.BeamingHelper.ScoreMiddleKeys = new Int32Array([48, 48, 45, 38, 59]);
 });
 AlphaTab.Rendering.Utils.BeamingHelper.CanJoin = function (b1, b2){
     // is this a voice we can join with?

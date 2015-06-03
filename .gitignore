@@ -33,7 +33,7 @@ obj/
 [Rr]elease*/
 res/
 Ankh.NoLoad
-
+.vs/
 #Tooling
 _ReSharper*/
 *.resharper
