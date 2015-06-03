@@ -2708,7 +2708,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                 this._sy = AlphaTab.Importer.AlphaTexSymbols.RBrace;
                 this.NextChar();
             }
-            else if (this._ch == 122){
+            else if (this._ch == 124){
                 this._sy = AlphaTab.Importer.AlphaTexSymbols.Pipe;
                 this.NextChar();
             }
