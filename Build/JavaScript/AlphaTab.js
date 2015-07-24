@@ -3664,15 +3664,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
         // repeatings
         newMasterBar.IsRepeatStart = (flags & 4) != 0;
         if ((flags & 8) != 0){
-            newMasterBar.RepeatCount = this._versionNumber >= 500 ? this._data.ReadByte() : 1;
-        }
-        // marker
-        if ((flags & 32) != 0){
-            var section = new AlphaTab.Model.Section();
-            section.Text = this.ReadStringIntByte();
-            section.Marker = "";
-            this.ReadColor();
-            newMasterBar.Section = section;
+            newMasterBar.RepeatCount = this._data.ReadByte() + (this._versionNumber >= 500 ? 0 : 1);
         }
         // alternate endings
         if ((flags & 16) != 0){
@@ -3688,6 +3680,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
                     if (currentMasterBar.IsRepeatStart)
                         break;
                     existentAlternatives |= currentMasterBar.AlternateEndings;
+                    currentMasterBar = currentMasterBar.PreviousMasterBar;
                 }
                 // now calculate the alternative for this bar
                 var repeatAlternative = 0;
@@ -3704,6 +3697,14 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
             else {
                 newMasterBar.AlternateEndings = this._data.ReadByte();
             }
+        }
+        // marker
+        if ((flags & 32) != 0){
+            var section = new AlphaTab.Model.Section();
+            section.Text = this.ReadStringIntByte();
+            section.Marker = "";
+            this.ReadColor();
+            newMasterBar.Section = section;
         }
         // keysignature
         if ((flags & 64) != 0){
@@ -4207,6 +4208,12 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
             else if (noteType == 2){
                 newNote.IsTieDestination = true;
             }
+        }
+        if ((flags & 1) != 0 && this._versionNumber < 500){
+            this._data.ReadByte();
+            // duration 
+            this._data.ReadByte();
+            // tuplet
         }
         if ((flags & 16) != 0){
             var dynamicNumber = AlphaTab.Platform.Std.ReadSignedByte(this._data);

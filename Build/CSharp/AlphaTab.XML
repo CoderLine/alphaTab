@@ -178,11 +178,48 @@
             This public class contains some utilities for working with model public classes
             </summary>
         </member>
+        <member name="T:AlphaTab.Model.NoteAccidentalMode">
+            <summary>
+            Lists the modes how accidentals are handled for notes
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.NoteAccidentalMode.Default">
+            <summary>
+            Accidentals are calculated automatically. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.NoteAccidentalMode.SwapAccidentals">
+            <summary>
+            If the default behavior calculates a Sharp, use flat instead (and vice versa).
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.NoteAccidentalMode.ForceNatural">
+            <summary>
+            This will move the note one line down and applies a Naturalize. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.NoteAccidentalMode.ForceSharp">
+            <summary>
+            This will move the note one line down and applies a Sharp. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.NoteAccidentalMode.ForceFlat">
+            <summary>
+            This will move the note one line up and applies a Flat. 
+            </summary>
+        </member>
         <member name="T:AlphaTab.Model.Note">
             <summary>
             A note is a single played sound on a fretted instrument. 
             It consists of a fret offset and a string on which the note is played on.
             It also can be modified by a lot of different effects.  
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.String">
+            <summary>
+            Gets or sets the string number where the note is placed. 
+            1 is the lowest string on the guitar and the bottom line on the tablature. 
+            It then increases the the number of strings on available on the track. 
             </summary>
         </member>
         <member name="T:AlphaTab.Model.PickStrokeType">
@@ -292,6 +329,13 @@
         <member name="T:AlphaTab.Model.Track">
             <summary>
             This public class describes a single track or instrument of score
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Track.Tuning">
+            <summary>
+            Get or set the guitar tuning of the guitar. This tuning also indicates the number of strings shown in the
+            guitar tablature. Unlike the <see cref="P:AlphaTab.Model.Note.String"/> property this array directly represents
+            the order of the tracks shown in the tablature. The first item is the most top tablature line. 
             </summary>
         </member>
         <member name="T:AlphaTab.Model.TripletFeel">
@@ -960,30 +1004,6 @@
             This BarRenderer renders a bar using standard music notation. 
             </summary>
         </member>
-        <member name="F:AlphaTab.Rendering.ScoreBarRenderer.StepsPerOctave">
-            <summary>
-            We always have 7 steps per octave. 
-            (by a step the offsets inbetween score lines is meant, 
-                 0 steps is on the first line (counting from top)
-                 1 steps is on the space inbetween the first and the second line
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Rendering.ScoreBarRenderer.OctaveSteps">
-            <summary>
-            Those are the amount of steps for the different clefs in case of a note value 0    
-            [Neutral, C3, C4, F4, G2]
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Rendering.ScoreBarRenderer.SharpNoteSteps">
-            <summary>
-            The step offsets of the notes within an octave in case of for sharp keysignatures
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Rendering.ScoreBarRenderer.FlatNoteSteps">
-            <summary>
-            The step offsets of the notes within an octave in case of for flat keysignatures
-            </summary>
-        </member>
         <member name="F:AlphaTab.Rendering.ScoreBarRenderer.SharpKsSteps">
             <summary>
             The step offsets of sharp symbols for sharp key signatures.
@@ -1092,13 +1112,37 @@
             desired scope. 
             </summary>
         </member>
+        <member name="F:AlphaTab.Rendering.Utils.AccidentalHelper.StepsPerOctave">
+            <summary>
+            We always have 7 steps per octave. 
+            (by a step the offsets inbetween score lines is meant, 
+                 0 steps is on the first line (counting from top)
+                 1 steps is on the space inbetween the first and the second line
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Rendering.Utils.AccidentalHelper.OctaveSteps">
+            <summary>
+            Those are the amount of steps for the different clefs in case of a note value 0    
+            [Neutral, C3, C4, F4, G2]
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Rendering.Utils.AccidentalHelper.SharpNoteSteps">
+            <summary>
+            The step offsets of the notes within an octave in case of for sharp keysignatures
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Rendering.Utils.AccidentalHelper.FlatNoteSteps">
+            <summary>
+            The step offsets of the notes within an octave in case of for flat keysignatures
+            </summary>
+        </member>
         <member name="F:AlphaTab.Rendering.Utils.AccidentalHelper._registeredAccidentals">
             <summary>
             this int-hash stores the registered accidentals for
             all octaves and notes within an octave. 
             </summary>
         </member>
-        <member name="M:AlphaTab.Rendering.Utils.AccidentalHelper.ApplyAccidental(AlphaTab.Model.Note,System.Int32)">
+        <member name="M:AlphaTab.Rendering.Utils.AccidentalHelper.ApplyAccidental(AlphaTab.Model.Note)">
             <summary>
             Calculates the accidental for the given note and assignes the value to it. 
             The new accidental type is also registered within the current scope

@@ -271,17 +271,7 @@ namespace AlphaTab.Importer
             newMasterBar.IsRepeatStart = (flags & 0x04) != 0;
             if ((flags & 0x08) != 0)
             {
-                newMasterBar.RepeatCount = _versionNumber >= 500 ? _data.ReadByte() : 1;
-            }
-
-            // marker
-            if ((flags & 0x20) != 0)
-            {
-                Section section = new Section();
-                section.Text = ReadStringIntByte();
-                section.Marker = "";
-                ReadColor();
-                newMasterBar.Section = section;
+                newMasterBar.RepeatCount = _data.ReadByte() + (_versionNumber >= 500 ? 0 : 1);
             }
 
             // alternate endings
@@ -302,6 +292,8 @@ namespace AlphaTab.Importer
                             break;
 
                         existentAlternatives |= currentMasterBar.AlternateEndings;
+
+                        currentMasterBar = currentMasterBar.PreviousMasterBar;
                     }
 
                     // now calculate the alternative for this bar
@@ -326,6 +318,15 @@ namespace AlphaTab.Importer
                 }
             }
 
+            // marker
+            if ((flags & 0x20) != 0)
+            {
+                Section section = new Section();
+                section.Text = ReadStringIntByte();
+                section.Marker = "";
+                ReadColor();
+                newMasterBar.Section = section;
+            }
 
             // keysignature
             if ((flags & 0x40) != 0)
@@ -1002,6 +1003,12 @@ namespace AlphaTab.Importer
                 {
                     newNote.IsTieDestination = true;
                 }
+            }
+
+            if ((flags & 0x01) != 0 && _versionNumber < 500)
+            {
+                _data.ReadByte(); // duration 
+                _data.ReadByte();  // tuplet
             }
 
             if ((flags & 0x10) != 0)
