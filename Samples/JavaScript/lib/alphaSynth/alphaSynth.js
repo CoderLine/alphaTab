@@ -335,6 +335,9 @@ AlphaSynth.Main.AlphaSynthFlashOutput = function (asRoot, swfObjectRoot){
     this._swfObjectRoot = swfObjectRoot;
 };
 AlphaSynth.Main.AlphaSynthFlashOutput.prototype = {
+    get_SampleRate: function (){
+        return 44100;
+    },
     Open: function (){
         this._id = "alphaSynthFlashPlayer" + AlphaSynth.Main.AlphaSynthFlashOutput.NextId;
         this._swfId = this._id + "swf";
@@ -401,6 +404,7 @@ AlphaSynth.Main.AlphaSynthFlashOutput.prototype = {
     }
 };
 $StaticConstructor(function (){
+    AlphaSynth.Main.AlphaSynthFlashOutput.PreferredSampleRate = 44100;
     AlphaSynth.Main.AlphaSynthFlashOutput.Id = "alphaSynthFlashPlayer";
     AlphaSynth.Main.AlphaSynthFlashOutput.Lookup = null;
     AlphaSynth.Main.AlphaSynthFlashOutput.NextId = 0;
@@ -438,19 +442,24 @@ AlphaSynth.Main.AlphaSynthWebAudioOutput = function (){
     this._pauseStart = 0;
     this._pauseTime = 0;
     this._paused = false;
+    this._latency = 0;
     this.SampleRequest = null;
     this.Finished = null;
     this.PositionChanged = null;
     this.ReadyChanged = null;
 };
 AlphaSynth.Main.AlphaSynthWebAudioOutput.prototype = {
+    get_SampleRate: function (){
+        return this._context.sampleRate | 0;
+    },
     Open: function (){
         this._finished = false;
         this._circularBuffer = new AlphaSynth.Ds.CircularSampleBuffer(40960);
          window.AudioContext = window.AudioContext || window.webkitAudioContext;
         this._context = new AudioContext();
+        this._latency = 4096000 / (2 * this._context.sampleRate);
         // create an empty buffer source (silence)
-        this._buffer = this._context.createBuffer(2, 4096, 44100);
+        this._buffer = this._context.createBuffer(2, 4096, this._context.sampleRate);
         // create a script processor node which will replace the silence with the generated audio
         this._audioNode = this._context.createScriptProcessor(4096, 0, 2);
         this._audioNode.onaudioprocess = $CreateDelegate(this, this.GenerateSound);
@@ -520,7 +529,7 @@ AlphaSynth.Main.AlphaSynthWebAudioOutput.prototype = {
         }
     },
     CalcPosition: function (){
-        return (this._context.currentTime * 1000 - this._startTime - this._pauseTime - 46);
+        return (this._context.currentTime * 1000 - this._startTime - this._pauseTime - this._latency);
     },
     GenerateSound: function (e){
         var ae = e;
@@ -535,7 +544,7 @@ AlphaSynth.Main.AlphaSynthWebAudioOutput.prototype = {
             }
             else {
                 // when buffering we count it as pause time
-                this._pauseTime += 46;
+                this._pauseTime += ((4096000 / (2 * this._context.sampleRate))) | 0;
             }
         }
         else {
@@ -586,7 +595,6 @@ AlphaSynth.Main.AlphaSynthWebAudioOutput.prototype = {
 };
 $StaticConstructor(function (){
     AlphaSynth.Main.AlphaSynthWebAudioOutput.BufferSize = 4096;
-    AlphaSynth.Main.AlphaSynthWebAudioOutput.Latency = 46;
     AlphaSynth.Main.AlphaSynthWebAudioOutput.BufferCount = 10;
 });
 AlphaSynth.Main.AlphaSynthWebWorker = function (main){
@@ -835,7 +843,7 @@ AlphaSynth.Main.AlphaSynthWebWorkerApiBase = function (player, asRoot){
     this._player.add_SampleRequest($CreateDelegate(this, this.PlayerSampleRequest));
     this._player.add_Finished($CreateDelegate(this, this.PlayerFinished));
     this._events = {};
-    if (asRoot != "" && !asRoot.indexOf("/")==(asRoot.length-"/".length)){
+    if (asRoot != "" && !(asRoot.lastIndexOf("/")==(asRoot.length-"/".length))){
         asRoot += "/";
     }
     this._asRoot = asRoot;
@@ -859,7 +867,8 @@ AlphaSynth.Main.AlphaSynthWebWorkerApiBase.prototype = {
         root.push(this._asRoot);
         this._synth.postMessage({
             cmd: "playerReady",
-            root: root.join('')
+            root: root.join(''),
+            sampleRate: this._player.get_SampleRate()
         });
     },
     IsReadyForPlay: function (){
@@ -1100,7 +1109,7 @@ $Inherit(AlphaSynth.Main.AlphaSynthWebWorkerApi, AlphaSynth.Main.AlphaSynthWebWo
 AlphaSynth.Platform = AlphaSynth.Platform || {};
 AlphaSynth.Platform.Platform = function (){
 };
-AlphaSynth.Platform.Platform.CreateOutput = function (synth){
+AlphaSynth.Platform.Platform.CreateOutput = function (){
     return new AlphaSynth.Player.WebWorkerOutput();
 };
 AlphaSynth.Platform.Std = function (){
@@ -1174,12 +1183,16 @@ AlphaSynth.Player.WebWorkerOutput = function (){
     this._finishedListeners = null;
     this._sampleRequestListeners = null;
     this._workerSelf = null;
+    this._sampleRate = 0;
     this.PositionChanged = null;
     this.Finished = null;
     this.SampleRequest = null;
     this.ReadyChanged = null;
 };
 AlphaSynth.Player.WebWorkerOutput.prototype = {
+    get_SampleRate: function (){
+        return AlphaSynth.Player.WebWorkerOutput.PreferredSampleRate;
+    },
     Open: function (){
         AlphaSynth.Util.Logger.Debug("Initializing webworker worker");
         this._workerSelf =  self;
@@ -1286,6 +1299,9 @@ AlphaSynth.Player.WebWorkerOutput.prototype = {
 );
     }
 };
+$StaticConstructor(function (){
+    AlphaSynth.Player.WebWorkerOutput.PreferredSampleRate = 0;
+});
 AlphaSynth.Util = AlphaSynth.Util || {};
 AlphaSynth.Util.Extensions = function (){
 };
@@ -3940,11 +3956,11 @@ AlphaSynth.Player.SynthPlayer = function (){
     AlphaSynth.Util.Logger.Debug("Initializing player");
     this.State = AlphaSynth.Player.SynthPlayerState.Stopped;
     this.OnPlayerStateChanged(new AlphaSynth.Player.PlayerStateChangedEventArgs(this.State));
-    AlphaSynth.Util.Logger.Debug("Creating synthesizer");
-    this.Synth = new AlphaSynth.Synthesis.Synthesizer(44100, 2, 441, 3, 100);
-    this.Sequencer = new AlphaSynth.Sequencer.MidiFileSequencer(this.Synth);
     AlphaSynth.Util.Logger.Debug("Opening output");
-    this.Output = AlphaSynth.Platform.Platform.CreateOutput(this.Synth);
+    this.Output = AlphaSynth.Platform.Platform.CreateOutput();
+    AlphaSynth.Util.Logger.Debug("Creating synthesizer");
+    this.Synth = new AlphaSynth.Synthesis.Synthesizer(this.Output.get_SampleRate(), 2, 441, 3, 100);
+    this.Sequencer = new AlphaSynth.Sequencer.MidiFileSequencer(this.Synth);
     this.Sequencer.AddFinishedListener($CreateDelegate(this.Output, this.Output.SequencerFinished));
     this.Output.add_Finished($CreateAnonymousDelegate(this, function (){
         // stop everything
@@ -6304,7 +6320,7 @@ AlphaSynth.Util.SynthConstants = function (){
 };
 $StaticConstructor(function (){
     AlphaSynth.Util.SynthConstants.InterpolationMode = AlphaSynth.Bank.Components.Generators.Interpolation.Linear;
-    AlphaSynth.Util.SynthConstants.SampleRate = 44100;
+    AlphaSynth.Util.SynthConstants.AudioChannels = 2;
     AlphaSynth.Util.SynthConstants.Pi = 3.14159265358979;
     AlphaSynth.Util.SynthConstants.TwoPi = 6.28318530717958;
     AlphaSynth.Util.SynthConstants.HalfPi = 1.5707963267949;
