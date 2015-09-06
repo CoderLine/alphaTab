@@ -60,11 +60,11 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="SharpKit.Html, Version=1.0.0.0, Culture=neutral, PublicKeyToken=2575297a09c47a96, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\alphaSynth\SharpKit\SharpKit.Html.dll</HintPath>
+      <HintPath>..\..\SharpKit\SharpKit.Html.dll</HintPath>
     </Reference>
     <Reference Include="SharpKit.JavaScript, Version=1.5.0.0, Culture=neutral, PublicKeyToken=2575297a09c47a96, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\alphaSynth\SharpKit\SharpKit.JavaScript.dll</HintPath>
+      <HintPath>..\..\SharpKit\SharpKit.JavaScript.dll</HintPath>
     </Reference>
     <Reference Include="System" />
   </ItemGroup>
