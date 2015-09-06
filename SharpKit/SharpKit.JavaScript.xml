@@ -1,0 +1,2995 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SharpKit.JavaScript</name>
+    </assembly>
+    <members>
+        <member name="T:SharpKit.JavaScript.JsArguments">
+            <summary>
+            An object representing the arguments to the currently executing function, and the functions that called it.
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsArguments.Item(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            The zero-based index to argument values passed to the Function object.
+            </summary>
+            <param name="index"></param>
+            <returns></returns>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsArguments.length">
+            <summary>
+            Returns the actual number of arguments passed to a function by the caller.
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsArguments.callee">
+            <summary>
+            Returns the Function object being executed, that is, the body text of the specified Function object.
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsArray">
+            <summary>
+            The Array object provides support for creation of arrays of any data type.
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray.push(System.Object)">
+            <summary>
+            Appends new elements to an array, and returns the new length of the array.
+            </summary>
+            <param name="item">Optional. New elements of the Array.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray.pop">
+            <summary>
+            Removes the last element from an array and returns it.
+            </summary>
+            <remarks>
+            If the array is empty, undefined is returned.
+            </remarks>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray.concat(SharpKit.JavaScript.JsArray[])">
+            <summary>
+            Returns a new array consisting of a combination of the current array and any additional items.
+            </summary>
+            <param name="items">Optional. Additional items to add to the end of the current array.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray.concat(System.Object[])">
+            <summary>
+            Returns a new array consisting of a combination of the current array and any additional items.
+            </summary>
+            <param name="items">Optional. Additional items to add to the end of the current array.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray.join(SharpKit.JavaScript.JsString)">
+            <summary>
+            Returns a JsString value consisting of all the elements of an array concatenated together and separated by the specified separator character.
+            </summary>
+            <param name="separator">Required. A JsString that is used to separate one element of an array from the next in the resulting String object. If omitted, the array elements are separated with a comma.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray.splice(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber,System.Object[])">
+            <summary>
+            Removes elements from an array and, if necessary, inserts new elements in their place, returning the deleted elements. Returns the elements removed from the array.
+            </summary>
+            <param name="start">Required. The zero-based location in the array from which to start removing elements.</param>
+            <param name="deleteCount">Required. The number of elements to remove.</param>
+            <param name="newItems">Optional. Elements to insert into the array in place of the deleted elements.</param>
+            <remarks>
+            The splice method modifies the array by removing the specified number of elements from position start and inserting new elements. The deleted elements are returned as a new array object.
+            </remarks>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray.slice(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns a section of an array.
+            </summary>
+            <param name="start">Required. The index to the beginning of the specified portion of the array.</param>
+            <param name="end">Optional. The index to the end of the specified portion of the array.</param>
+            <remarks>
+            The slice method returns an Array object containing the specified portion of the array.
+            The slice method copies up to, but not including, the element indicated by end. If start is negative, it is treated as length + start where length is the length of the array. If end is negative, it is treated as length + end where length is the length of the array. If end is omitted, extraction continues to the end of the array. If end occurs before start, no elements are copied to the new array.
+            </remarks>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray.slice(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns a section of an array.
+            </summary>
+            <param name="start">Required. The index to the beginning of the specified portion of the array.</param>
+            <remarks>
+            The slice method returns an Array object containing the specified portion of the array.
+            The slice method copies up to, but not including, the element indicated by end. If start is negative, it is treated as length + start where length is the length of the array. If end is negative, it is treated as length + end where length is the length of the array. If end is omitted, extraction continues to the end of the array. If end occurs before start, no elements are copied to the new array.
+            </remarks>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray.some(SharpKit.JavaScript.JsFunc{System.Object,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsArray,SharpKit.JavaScript.JsBoolean})">
+            <summary>
+             Tests whether some element in the array passes the test implemented by the provided function.
+             Supported in Chrome, Firefox, IE 9, Opera and Safari
+             Documentation from MDN.
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray.forEach(SharpKit.JavaScript.JsAction{System.Object,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsArray})">
+            <summary>
+             Executes a provided function once per array element.
+             Supported in Chrome, Firefox, IE 9, Opera and Safari
+             Documentation from MDN.
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray.reverse">
+            <summary>
+            Returns an Array object with the elements reversed.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray.shift">
+            <summary>
+            Removes the first element from an array and returns that element.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray.unshift">
+            <summary>
+            Inserts specified elements into the beginning of an array.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray.unshift(System.Object[])">
+            <summary>
+            Inserts specified elements into the beginning of an array.
+            </summary>
+            <param name="newItems">Optional. Elements to insert at the start of the Array.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray.sort(System.Func{System.Object,System.Object,SharpKit.JavaScript.JsNumber})">
+            <summary>
+            Returns an Array object with the elements sorted. Warning: array itself is sorted internally
+            </summary>
+            <param name="sortFunction">Optional. OriginalValue of the function used to determine the order of the elements.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray.sort(SharpKit.JavaScript.JsFunction)">
+            <summary>
+            Returns an Array object with the elements sorted. Warning: array itself is sorted internally
+            </summary>
+            <param name="sortFunction">Optional. OriginalValue of the function used to determine the order of the elements.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray.sort">
+            <summary>
+            Returns an Array object with the elements sorted.
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray.lastIndexOf(System.Object,SharpKit.JavaScript.JsNumber)">
+             <summary>
+            The lastIndexOf() method searches the array for the specified item, and returns it's position.
+            The search will start at the specified position, or at the end if no start position is specified, and end the search at the beginning of the array.
+            Returns -1 if the item is not found.
+            </summary>
+             <param name="item"></param>
+             <param name="start"></param>
+             <returns> -1 if the item is not found.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray.lastIndexOf(System.Object)">
+             <summary>
+            The lastIndexOf() method searches the array for the specified item, and returns it's position.
+            The search will start at the specified position, or at the end if no start position is specified, and end the search at the beginning of the array.
+            Returns -1 if the item is not found.
+             </summary>
+             <param name="item"></param>
+             <returns> -1 if the item is not found.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray.indexOf(System.Object,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            The indexOf() method searches the array for the specified item, and returns it's position.
+            The search will start at the specified position, or at the beginning if no start position is specified, and end the search at the end of the array.
+            If the item is present more than once, the indexOf method returns the position of the first occurence.
+            </summary>
+            <param name="item"></param>
+            <param name="start"></param>
+            <returns> -1 if the item is not found.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray.indexOf(System.Object)">
+            <summary>
+            The indexOf() method searches the array for the specified item, and returns it's position.
+            The search will start at the specified position, or at the beginning if no start position is specified, and end the search at the end of the array.
+            If the item is present more than once, the indexOf method returns the position of the first occurence.
+            </summary>
+            <param name="item"></param>
+            <returns> -1 if the item is not found.</returns>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsArray.length">
+            <summary>
+            Returns an integer value one higher than the highest element defined in an array.
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsArray`1">
+            <summary>
+            The Array object provides support for creation of arrays of any data type.
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray`1.push(`0[])">
+            <summary>
+            Appends new elements to an array, and returns the new length of the array.
+            </summary>
+            <param name="items">Optional. New elements of the Array.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray`1.push(`0)">
+            <summary>
+            Appends new elements to an array, and returns the new length of the array.
+            </summary>
+            <param name="item">Optional. New elements of the Array.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray`1.pop">
+            <summary>
+            Removes the last element from an array and returns it.
+            </summary>
+            <remarks>
+            If the array is empty, undefined is returned.
+            </remarks>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray`1.concat(SharpKit.JavaScript.JsArray{`0}[])">
+            <summary>
+            Returns a new array consisting of a combination of the current array and any additional items.
+            </summary>
+            <param name="items">Optional. Additional items to add to the end of the current array.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray`1.concat(`0[])">
+            <summary>
+            Returns a new array consisting of a combination of the current array and any additional items.
+            </summary>
+            <param name="items">Optional. Additional items to add to the end of the current array.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray`1.splice(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber,`0[])">
+            <summary>
+            Removes elements from an array and, if necessary, inserts new elements in their place, returning the deleted elements. Returns the elements removed from the array.
+            </summary>
+            <param name="start">Required. The zero-based location in the array from which to start removing elements.</param>
+            <param name="deleteCount">Required. The number of elements to remove.</param>
+            <param name="newItems">Optional. Elements to insert into the array in place of the deleted elements.</param>
+            <remarks>
+            The splice method modifies the array by removing the specified number of elements from position start and inserting new elements. The deleted elements are returned as a new array object.
+            </remarks>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray`1.slice(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns a section of an array.
+            </summary>
+            <param name="start">Required. The index to the beginning of the specified portion of the array.</param>
+            <param name="end">Optional. The index to the end of the specified portion of the array.</param>
+            <remarks>
+            The slice method returns an Array object containing the specified portion of the array.
+            The slice method copies up to, but not including, the element indicated by end. If start is negative, it is treated as length + start where length is the length of the array. If end is negative, it is treated as length + end where length is the length of the array. If end is omitted, extraction continues to the end of the array. If end occurs before start, no elements are copied to the new array.
+            </remarks>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray`1.slice(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns a section of an array.
+            </summary>
+            <param name="start">Required. The index to the beginning of the specified portion of the array.</param>
+            <remarks>
+            The slice method returns an Array object containing the specified portion of the array.
+            The slice method copies up to, but not including, the element indicated by end. If start is negative, it is treated as length + start where length is the length of the array. If end is negative, it is treated as length + end where length is the length of the array. If end is omitted, extraction continues to the end of the array. If end occurs before start, no elements are copied to the new array.
+            </remarks>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray`1.some(SharpKit.JavaScript.JsFunc{SharpKit.JavaScript.JsObject,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsArray{`0},SharpKit.JavaScript.JsBoolean})">
+            <summary>
+             Tests whether some element in the array passes the test implemented by the provided function.
+             Supported in Chrome, Firefox, IE 9, Opera and Safari
+             Documentation from MDN.
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray`1.forEach(SharpKit.JavaScript.JsAction{`0,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsArray{`0}})">
+            <summary>
+             Executes a provided function once per array element.
+             Supported in Chrome, Firefox, IE 9, Opera and Safari
+             Documentation from MDN.
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray`1.forEach(SharpKit.JavaScript.JsAction{`0,SharpKit.JavaScript.JsNumber})">
+            <summary>
+             Executes a provided function once per array element.
+             Supported in Chrome, Firefox, IE 9, Opera and Safari
+             Documentation from MDN.
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray`1.forEach(SharpKit.JavaScript.JsAction{`0})">
+            <summary>
+             Executes a provided function once per array element.
+             Supported in Chrome, Firefox, IE 9, Opera and Safari
+             Documentation from MDN.
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray`1.reverse">
+            <summary>
+            Returns an Array object with the elements reversed.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray`1.shift">
+            <summary>
+            Removes the first element from an array and returns that element.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray`1.unshift">
+            <summary>
+            Inserts specified elements into the beginning of an array.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray`1.unshift(`0[])">
+            <summary>
+            Inserts specified elements into the beginning of an array.
+            </summary>
+            <param name="newItems">Optional. Elements to insert at the start of the Array.</param>
+            <returns>the new length</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray`1.sort(System.Func{`0,`0,SharpKit.JavaScript.JsNumber})">
+            <summary>
+            Returns an Array object with the elements sorted. Warning: Array itself is sorted internally
+            </summary>
+            <param name="sortFunction">Optional. OriginalValue of the function used to determine the order of the elements.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray`1.sort">
+            <summary>
+            Returns an Array object with the elements sorted. Warning: Array itself is sorted internally
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray`1.join(SharpKit.JavaScript.JsString)">
+            <summary>
+            Returns a JsString value consisting of all the elements of an array concatenated together and separated by the specified separator character.
+            </summary>
+            <param name="separator">Required. A JsString that is used to separate one element of an array from the next in the resulting String object. If omitted, the array elements are separated with a comma.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray`1.lastIndexOf(`0,SharpKit.JavaScript.JsNumber)">
+             <summary>
+            The lastIndexOf() method searches the array for the specified item, and returns it's position.
+            The search will start at the specified position, or at the end if no start position is specified, and end the search at the beginning of the array.
+            Returns -1 if the item is not found.
+            </summary>
+             <param name="item"></param>
+             <param name="start"></param>
+             <returns> -1 if the item is not found.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray`1.lastIndexOf(`0)">
+             <summary>
+            The lastIndexOf() method searches the array for the specified item, and returns it's position.
+            The search will start at the specified position, or at the end if no start position is specified, and end the search at the beginning of the array.
+            Returns -1 if the item is not found.
+             </summary>
+             <param name="item"></param>
+             <returns> -1 if the item is not found.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray`1.indexOf(`0,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            The indexOf() method searches the array for the specified item, and returns it's position.
+            The search will start at the specified position, or at the beginning if no start position is specified, and end the search at the end of the array.
+            If the item is present more than once, the indexOf method returns the position of the first occurence.
+            </summary>
+            <param name="item"></param>
+            <param name="start"></param>
+            <returns> -1 if the item is not found.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsArray`1.indexOf(`0)">
+            <summary>
+            The indexOf() method searches the array for the specified item, and returns it's position.
+            The search will start at the specified position, or at the beginning if no start position is specified, and end the search at the end of the array.
+            If the item is present more than once, the indexOf method returns the position of the first occurence.
+            </summary>
+            <param name="item"></param>
+            <returns> -1 if the item is not found.</returns>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsArray`1.length">
+            <summary>
+            Returns an integer value one higher than the highest element defined in an array.
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsObjectBase.watch(SharpKit.JavaScript.JsString,System.Action)">
+            <summary>
+            Watches for a property to be assigned a value and runs a function when that occurs.
+            Watches for assignment to a property named prop in this object, calling handler(prop, oldval, newval) whenever prop is set and storing the return value in that property. A watchpoint can filter (or nullify) the value assignment, by returning a modified newval (or by returning oldval).
+            If you delete a property for which a watchpoint has been set, that watchpoint does not disappear. If you later recreate the property, the watchpoint is still in effect.
+            To remove a watchpoint, use the unwatch method. By default, the watch method is inherited by every object descended from Object.
+            The JavaScript debugger has functionality similar to that provided by this method, as well as other debugging options. For information on the debugger, see Venkman.
+            In NES 3.0 and 4.x, handler is called from native code as well as assignments in script. In Firefox, handler is only called from assignments in script, not from native code. For example, window.watch('location', myHandler) will not call myHandler if the user clicks a link to an anchor within the current document. However, window.location += '#myAnchor' will call myHandler:
+            </summary>
+            <param name="prop">The name of a property of the object.</param>
+            <param name="handler">A function to call.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsObjectBase.unwatch(SharpKit.JavaScript.JsString)">
+            <summary>
+            Removes a watchpoint set with the watch method
+            The JavaScript debugger has functionality similar to that provided by this method, as well as other debugging options. For information on the debugger, see Venkman.
+            By default, this method is inherited by every object descended from Object.
+            </summary>
+            <param name="prop">The name of a property of the object.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsObjectBase.valueOf">
+            <summary>
+            Returns the primitive value of the specified object.
+            The required object reference is any intrinsic JScript object.
+            The valueOf method is defined differently for each intrinsic JScript object.
+            Object
+            Return Value
+            Array
+            Returns the array instance.
+            Boolean
+            The Boolean value.
+            Date
+            The stored time value in milliseconds since midnight, January 1, 1970 UTC.
+            Function
+            The function itself.
+            Number
+            The numeric value.
+            Object
+            The object itself. This is the default.
+            String
+            The JsString value.
+            The Math and Error objects do not have a valueOf method.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsObjectBase.isPrototypeOf(System.Object)">
+            <summary>
+            Returns a Boolean value indicating whether an object exists in another object's prototype chain.
+            </summary>
+            <param name="object2">Another object whose prototype chain is to be checked.</param>
+            <returns>true if object2 has object1 in its prototype chain. The prototype chain is used to share functionality between instances of the same object type. The isPrototypeOf method returns false when object2 is not an object or when object1 does not appear in the prototype chain of the object2.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsObjectBase.hasOwnProperty(SharpKit.JavaScript.JsString)">
+            <summary>
+            Returns a Boolean value indicating whether an object has a property with the specified name.
+            </summary>
+            <param name="proName">String value of a property name.</param>
+            <returns> true if object has a property of the specified name, false if it does not. This method does not check if the property exists in the object's prototype chain; the property must be a member of the object itself.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsObjectBase.toString">
+            <summary>
+            Returns a JsString representation of an object.
+            </summary>
+            <returns>Returns "[object objectname]", where objectname is the name of the object type.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.typeof(System.Object)">
+            <summary>
+            The typeof operator returns a string indicating the type of the unevaluated operand.
+            </summary>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.JsTypeOf(System.Object)">
+            <summary>
+            A C# equivalant to the javascript typeof operator, with one difference, 
+            this one returns an enum with all possible values, instead of an untyped string
+            </summary>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.CtorOf``1">
+            <summary>
+            Returns a reference to the ctor function of a prototype mode type
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.ActionOf(SharpKit.JavaScript.JsAction)">
+            <summary>
+            Returns a reference to a javascript function with instance context if applicable
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.ActionOf``1(SharpKit.JavaScript.JsAction{``0})">
+            <summary>
+            Returns a reference to a javascript function with instance context if applicable
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.ActionOf``2(SharpKit.JavaScript.JsAction{``0,``1})">
+            <summary>
+            Returns a reference to a javascript function with instance context if applicable
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.ActionOf``3(SharpKit.JavaScript.JsAction{``0,``1,``2})">
+            <summary>
+            Returns a reference to a javascript function with instance context if applicable
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.ActionOf``4(SharpKit.JavaScript.JsAction{``0,``1,``2,``3})">
+            <summary>
+            Returns a reference to a javascript function with instance context if applicable
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.ActionOf``5(SharpKit.JavaScript.JsAction{``0,``1,``2,``3,``4})">
+            <summary>
+            Returns a reference to a javascript function with instance context if applicable
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.FuncOf``1(SharpKit.JavaScript.JsFunc{``0})">
+            <summary>
+            Returns a reference to a javascript function with instance context if applicable
+            </summary>
+            <typeparam name="R"></typeparam>
+            <param name="func"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.FuncOf``2(SharpKit.JavaScript.JsFunc{``0,``1})">
+            <summary>
+            Returns a reference to a javascript function with instance context if applicable
+            </summary>
+            <typeparam name="T"></typeparam>
+            <typeparam name="R"></typeparam>
+            <param name="func"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.FuncOf``3(SharpKit.JavaScript.JsFunc{``0,``1,``2})">
+            <summary>
+            Returns a reference to a javascript function with instance context if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.FuncOf``4(SharpKit.JavaScript.JsFunc{``0,``1,``2,``3})">
+            <summary>
+            Returns a reference to a javascript function with instance context if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.FuncOf``5(SharpKit.JavaScript.JsFunc{``0,``1,``2,``3,``4})">
+            <summary>
+            Returns a reference to a javascript function with instance context if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.FuncOf``6(SharpKit.JavaScript.JsFunc{``0,``1,``2,``3,``4,``5})">
+            <summary>
+            Returns a reference to a javascript function with instance context if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.NativeActionOf(SharpKit.JavaScript.JsNativeAction)">
+            <summary>
+            Returns a reference to a javascript function without instance context even if applicable
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.NativeActionOf``1(SharpKit.JavaScript.JsNativeAction{``0})">
+            <summary>
+            Returns a reference to a javascript function without instance context even if applicable
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.NativeActionOf``2(SharpKit.JavaScript.JsNativeAction{``0,``1})">
+            <summary>
+            Returns a reference to a javascript function without instance context even if applicable
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.NativeActionOf``3(SharpKit.JavaScript.JsNativeAction{``0,``1,``2})">
+            <summary>
+            Returns a reference to a javascript function without instance context even if applicable
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.NativeActionOf``4(SharpKit.JavaScript.JsNativeAction{``0,``1,``2,``3})">
+            <summary>
+            Returns a reference to a javascript function without instance context even if applicable
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.NativeActionOf``5(SharpKit.JavaScript.JsNativeAction{``0,``1,``2,``3,``4})">
+            <summary>
+            Returns a reference to a javascript function without instance context even if applicable
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.NativeFuncOf``1(SharpKit.JavaScript.JsNativeFunc{``0})">
+            <summary>
+            Returns a reference to a javascript function without instance context even if applicable
+            </summary>
+            <typeparam name="R"></typeparam>
+            <param name="func"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.NativeFuncOf``2(SharpKit.JavaScript.JsNativeFunc{``0,``1})">
+            <summary>
+            Returns a reference to a javascript function without instance context even if applicable
+            </summary>
+            <typeparam name="T"></typeparam>
+            <typeparam name="R"></typeparam>
+            <param name="func"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.NativeFuncOf``3(SharpKit.JavaScript.JsNativeFunc{``0,``1,``2})">
+            <summary>
+            Returns a reference to a javascript function without instance context even if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.NativeFuncOf``4(SharpKit.JavaScript.JsNativeFunc{``0,``1,``2,``3})">
+            <summary>
+            Returns a reference to a javascript function without instance context even if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.NativeFuncOf``5(SharpKit.JavaScript.JsNativeFunc{``0,``1,``2,``3,``4})">
+            <summary>
+            Returns a reference to a javascript function without instance context even if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.NativeFuncOf``6(SharpKit.JavaScript.JsNativeFunc{``0,``1,``2,``3,``4,``5})">
+            <summary>
+            Returns a reference to a javascript function without instance context even if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.eval(SharpKit.JavaScript.JsString)">
+            <summary>
+            Evaluates JScript code and executes it.
+            </summary>
+            <param name="code">A JsString value that contains valid JScript code. This JsString is parsed by the JScript parser and executed.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.parseInt(SharpKit.JavaScript.JsString)">
+            <summary>
+            Returns an integer converted from a JsString.
+            </summary>
+            <param name="s">A JsString to convert into a number.</param>
+            <returns>An integer value equal to the number contained in numString. If no prefix of numString can be successfully parsed into an integer, NaN (not a number) is returned.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.parseInt(SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns an integer converted from a JsString.
+            </summary>
+            <param name="numString">A JsString to convert into a number.</param>
+            <param name="radix"> A value between 2 and 36 indicating the base 
+            of the number contained in numString. If not supplied, strings with 
+            a prefix of '0x' are considered hexadecimal and strings with a prefix 
+            of '0' are considered octal. All other strings are considered decimal.</param>
+            <returns>An integer value equal to the number contained in numString. 
+            If no prefix of numString can be successfully parsed into an integer, 
+            NaN (not a number) is returned.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.isNaN(System.Object)">
+            <summary>
+            Returns a Boolean value that indicates whether a value is the reserved value NaN (not a number).
+            </summary>
+            <param name="numValue">A value to be tested against NaN.</param>
+            <returns>True if the value converted to the Number type is the NaN, otherwise false.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.isFinite(System.Double)">
+            <summary>
+            Returns a Boolean value that indicates if a supplied number is finite.
+            </summary>
+            <param name="number">A numeric value.</param>
+            <returns>True if number is any value other than NaN, negative infinity, 
+            or positive infinity. In those three cases, it returns false.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.delete(System.Object)">
+            <summary>
+            Deletes a property from an object, or removes an element from an array.
+            </summary>
+            <param name="obj"></param>
+            <returns>The expression argument is a valid JavaScript expression that usually results in a property name or array element.
+            If the result of expression is an object, the property specified in expression exists, and the object will not allow it to be deleted, false is returned.
+            In all other cases, true is returned.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.parseFloat(SharpKit.JavaScript.JsString)">
+            <summary>
+            Returns a floating-point number converted from a JsString.
+            </summary>
+            <param name="s">A JsString that contains a floating-point number.</param>
+            <returns>A numerical value equal to the number contained in numString. If no prefix of numString can be successfully parsed into a floating-point number, NaN (not a number) is returned.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.String(System.Object)">
+            <summary>
+            Returns an string converted from a value.
+            </summary>
+            <param name="value">A value to convert into a string.</param>
+            <returns>An string value</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContext.JsCode(SharpKit.JavaScript.JsCode)">
+            <summary>
+            Allows writing direct JavaScript code - calling this method will generate only the code inside the string parameter
+            </summary>
+            <param name="code"></param>
+            <returns></returns>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsContext.undefined">
+            <summary>
+            indicates that a variable has not been assigned a value.
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.typeof(System.Object)">
+            <summary>
+            The typeof operator returns a string indicating the type of the unevaluated operand.
+            </summary>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.JsTypeOf(System.Object)">
+            <summary>
+            A C# equivalant to the javascript typeof operator, with one difference, 
+            this one returns an enum with all possible values, instead of an untyped string
+            </summary>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.CtorOf``1">
+            <summary>
+            Returns a reference to the ctor function of a prototype mode type
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.ActionOf(SharpKit.JavaScript.JsAction)">
+            <summary>
+            Returns a reference to a javascript function with instance context if applicable
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.ActionOf``1(SharpKit.JavaScript.JsAction{``0})">
+            <summary>
+            Returns a reference to a javascript function with instance context if applicable
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.ActionOf``2(SharpKit.JavaScript.JsAction{``0,``1})">
+            <summary>
+            Returns a reference to a javascript function with instance context if applicable
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.ActionOf``3(SharpKit.JavaScript.JsAction{``0,``1,``2})">
+            <summary>
+            Returns a reference to a javascript function with instance context if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.ActionOf``4(SharpKit.JavaScript.JsAction{``0,``1,``2,``3})">
+            <summary>
+            Returns a reference to a javascript function with instance context if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.ActionOf``5(SharpKit.JavaScript.JsAction{``0,``1,``2,``3,``4})">
+            <summary>
+            Returns a reference to a javascript function with instance context if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.FuncOf``1(SharpKit.JavaScript.JsFunc{``0})">
+            <summary>
+            Returns a reference to a javascript function with instance context if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.FuncOf``2(SharpKit.JavaScript.JsFunc{``0,``1})">
+            <summary>
+            Returns a reference to a javascript function with instance context if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.FuncOf``3(SharpKit.JavaScript.JsFunc{``0,``1,``2})">
+            <summary>
+            Returns a reference to a javascript function with instance context if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.FuncOf``4(SharpKit.JavaScript.JsFunc{``0,``1,``2,``3})">
+            <summary>
+            Returns a reference to a javascript function with instance context if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.FuncOf``5(SharpKit.JavaScript.JsFunc{``0,``1,``2,``3,``4})">
+            <summary>
+            Returns a reference to a javascript function with instance context if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.FuncOf``6(SharpKit.JavaScript.JsFunc{``0,``1,``2,``3,``4,``5})">
+            <summary>
+            Returns a reference to a javascript function with instance context if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.NativeActionOf(SharpKit.JavaScript.JsNativeAction)">
+            <summary>
+            Returns a reference to a javascript function without instance context even if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.NativeActionOf``1(SharpKit.JavaScript.JsNativeAction{``0})">
+            <summary>
+            Returns a reference to a javascript function without instance context even if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.NativeActionOf``2(SharpKit.JavaScript.JsNativeAction{``0,``1})">
+            <summary>
+            Returns a reference to a javascript function without instance context even if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.NativeActionOf``3(SharpKit.JavaScript.JsNativeAction{``0,``1,``2})">
+            <summary>
+            Returns a reference to a javascript function without instance context even if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.NativeActionOf``4(SharpKit.JavaScript.JsNativeAction{``0,``1,``2,``3})">
+            <summary>
+            Returns a reference to a javascript function without instance context even if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.NativeActionOf``5(SharpKit.JavaScript.JsNativeAction{``0,``1,``2,``3,``4})">
+            <summary>
+            Returns a reference to a javascript function without instance context even if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.NativeFuncOf``1(SharpKit.JavaScript.JsNativeFunc{``0})">
+            <summary>
+            Returns a reference to a javascript function without instance context even if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.NativeFuncOf``2(SharpKit.JavaScript.JsNativeFunc{``0,``1})">
+            <summary>
+            Returns a reference to a javascript function without instance context even if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.NativeFuncOf``3(SharpKit.JavaScript.JsNativeFunc{``0,``1,``2})">
+            <summary>
+            Returns a reference to a javascript function without instance context even if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.NativeFuncOf``4(SharpKit.JavaScript.JsNativeFunc{``0,``1,``2,``3})">
+            <summary>
+            Returns a reference to a javascript function without instance context even if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.NativeFuncOf``5(SharpKit.JavaScript.JsNativeFunc{``0,``1,``2,``3,``4})">
+            <summary>
+            Returns a reference to a javascript function without instance context even if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.NativeFuncOf``6(SharpKit.JavaScript.JsNativeFunc{``0,``1,``2,``3,``4,``5})">
+            <summary>
+            Returns a reference to a javascript function without instance context even if applicable
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.eval(SharpKit.JavaScript.JsString)">
+            <summary>
+            Evaluates JScript code and executes it.
+            </summary>
+            <param name="code">A JsString value that contains valid JScript code. This JsString is parsed by the JScript parser and executed.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.parseInt(SharpKit.JavaScript.JsString)">
+            <summary>
+            Returns an integer converted from a JsString.
+            </summary>
+            <param name="s">A JsString to convert into a number.</param>
+            <returns>An integer value equal to the number contained in numString. If no prefix of numString can be successfully parsed into an integer, NaN (not a number) is returned.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.parseInt(SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns an integer converted from a JsString.
+            </summary>
+            <param name="numString">A JsString to convert into a number.</param>
+            <param name="radix"> A value between 2 and 36 indicating the base 
+            of the number contained in numString. If not supplied, strings with 
+            a prefix of '0x' are considered hexadecimal and strings with a prefix 
+            of '0' are considered octal. All other strings are considered decimal.</param>
+            <returns>An integer value equal to the number contained in numString. 
+            If no prefix of numString can be successfully parsed into an integer, 
+            NaN (not a number) is returned.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.isNaN(System.Object)">
+            <summary>
+            Returns a Boolean value that indicates whether a value is the reserved value NaN (not a number).
+            </summary>
+            <param name="numValue">A value to be tested against NaN.</param>
+            <returns>True if the value converted to the Number type is the NaN, otherwise false.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.isFinite(System.Double)">
+            <summary>
+            Returns a Boolean value that indicates if a supplied number is finite.
+            </summary>
+            <param name="number">A numeric value.</param>
+            <returns>True if number is any value other than NaN, negative infinity, 
+            or positive infinity. In those three cases, it returns false.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.delete(System.Object)">
+            <summary>
+            Deletes a property from an object, or removes an element from an array.
+            </summary>
+            <param name="obj"></param>
+            <returns>The expression argument is a valid JavaScript expression that usually results in a property name or array element.
+            If the result of expression is an object, the property specified in expression exists, and the object will not allow it to be deleted, false is returned.
+            In all other cases, true is returned.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.parseFloat(SharpKit.JavaScript.JsString)">
+            <summary>
+            Returns a floating-point number converted from a JsString.
+            </summary>
+            <param name="s">A JsString that contains a floating-point number.</param>
+            <returns>A numerical value equal to the number contained in numString. If no prefix of numString can be successfully parsed into a floating-point number, NaN (not a number) is returned.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.String(System.Object)">
+            <summary>
+            Returns an string converted from a value.
+            </summary>
+            <param name="value">A value to convert into a string.</param>
+            <returns>An string value</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsContextBase.JsCode(SharpKit.JavaScript.JsCode)">
+            <summary>
+            Allows writing direct JavaScript code - calling this method will generate only the code inside the string parameter
+            </summary>
+            <param name="code"></param>
+            <returns></returns>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsContextBase.undefined">
+            <summary>
+            indicates that a variable has not been assigned a value.
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.getFullYear">
+            <summary>
+            Returns the year value in the Date object using local time.
+            </summary>
+            <returns>the year as an absolute number. For example, the year 1976 is returned as 1976.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.getMonth">
+            <summary>
+            Returns the month value in the Date object using local time.
+            </summary>
+            <returns>integer between 0 and 11 indicating the month value in the Date object. The integer returned is not the traditional number used to indicate the month. It is one less. If "Jan 5, 1996 08:47:00" is stored in a Date object, getMonth returns 0.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.getDate">
+            <summary>
+            Returns the day-of-the-month value in a Date object using local time.
+            </summary>
+            <returns> an integer between 1 and 31 that represents the day-of-the-month value in the Date object.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.getHours">
+            <summary>
+            Returns the hours value in a Date object using local time.
+            </summary>
+            <returns>an integer between 0 and 23, indicating the number of hours since midnight. A zero occurs in two situations: the time is before 1:00:00 am, or the time was not stored in the Date object when the object was created. The only way to determine which situation you have is to also check the minutes and seconds for zero values. If they are all zeroes, it is nearly certain that the time was not stored in the Date object.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.getMinutes">
+            <summary>
+            Returns the minutes value in a Date object using local time.
+            </summary>
+            <returns>integer between 0 and 59 equal to the minutes value stored in the Date object. A zero is returned in two situations: when the time is less than one minute after the hour, or when the time was not stored in the Date object when the object was created. The only way to determine which situation you have is to also check the hours and seconds for zero values. If they are all zeroes, it is nearly certain that the time was not stored in the Date object.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.getSeconds">
+            <summary>
+            Returns the seconds value in a Date object using local time.
+            </summary>
+            <returns> integer between 0 and 59 indicating the seconds value of the indicated Date object. A zero is returned in two situations. One occurs when the time is less than one second into the current minute. The other occurs when the time was not stored in the Date object when the object was created. The only way to determine which situation you have is to also check the hours and minutes for zero values. If they are all zeroes, it is nearly certain that the time was not stored in the Date object.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.getMilliseconds">
+            <summary>
+            Returns the milliseconds value in a Date object using local time.
+            </summary>
+            <returns>The millisecond value returned can range from 0-999.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setMonth(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the month value in the Date object using local time.
+            </summary>
+            <param name="numMonth">A numeric value equal to the month. The value for January is 0, and other month values follow consecutively.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setMonth(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the month value in the Date object using local time.
+            </summary>
+            <param name="numMonth">A numeric value equal to the month. The value for January is 0, and other month values follow consecutively.</param>
+            <param name="dateVal">A numeric value representing the day of the month. If this value is not supplied, the value from a call to the getDate method is used.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setHours(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the hour value in the Date object using local time.
+            </summary>
+            <param name="numHours">A numeric value equal to the hours value.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setHours(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the hour value in the Date object using local time.
+            </summary>
+            <param name="numHours">A numeric value equal to the hours value.</param>
+            <param name="numMin">A numeric value equal to the minutes value. </param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setHours(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the hour value in the Date object using local time.
+            </summary>
+            <param name="numHours">A numeric value equal to the hours value.</param>
+            <param name="numMin">A numeric value equal to the minutes value. </param>
+            <param name="numSec">A numeric value equal to the seconds value. </param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setHours(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the hour value in the Date object using local time.
+            </summary>
+            <param name="numHours">A numeric value equal to the hours value.</param>
+            <param name="numMin">A numeric value equal to the minutes value. </param>
+            <param name="numSec">A numeric value equal to the seconds value. </param>
+            <param name="numMilli">A numeric value equal to the milliseconds value.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setMinutes(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the minutes value in the Date object using local time.
+            </summary>
+            <param name="numMinutes">A numeric value equal to the minutes value. Must be supplied if either of the following arguments is used.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setMinutes(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the minutes value in the Date object using local time.
+            </summary>
+            <param name="numMinutes">A numeric value equal to the minutes value. Must be supplied if either of the following arguments is used.</param>
+            <param name="numSeconds">A numeric value equal to the seconds value. Must be supplied if the numMilli argument is used.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setMinutes(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the minutes value in the Date object using local time.
+            </summary>
+            <param name="numMinutes">A numeric value equal to the minutes value. Must be supplied if either of the following arguments is used.</param>
+            <param name="numSeconds">A numeric value equal to the seconds value. Must be supplied if the numMilli argument is used.</param>
+            <param name="numMilli">A numeric value equal to the milliseconds value.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setSeconds(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the seconds value in the Date object using local time.
+            </summary>
+            <param name="numSeconds">A numeric value equal to the seconds value.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setSeconds(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the seconds value in the Date object using local time.
+            </summary>
+            <param name="numSeconds">A numeric value equal to the seconds value.</param>
+            <param name="numMilli">A numeric value equal to the milliseconds value.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setMilliseconds(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the milliseconds value in the Date object using local time.
+            </summary>
+            <param name="value">A numeric value equal to the millisecond value.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setTime(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the date and time value in the Date object.
+            </summary>
+            <param name="milliseconds">A numeric value representing the number of elapsed milliseconds since midnight, January 1, 1970 GMT.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setUTCDate(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the numeric day of the month in the Date object using Universal Coordinated Time (UTC).
+            </summary>
+            <param name="numDate">A numeric value equal to the day of the month.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setUTCFullYear(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the year value in the Date object using Universal Coordinated Time (UTC).
+            </summary>
+            <param name="numYear">A numeric value equal to the year.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setUTCFullYear(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the year value in the Date object using Universal Coordinated Time (UTC).
+            </summary>
+            <param name="numYear">A numeric value equal to the year.</param>
+            <param name="numMonth">A numeric value equal to the month. The value for January is 0, and other month values follow consecutively. Must be supplied if numDate is supplied.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setUTCFullYear(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the year value in the Date object using Universal Coordinated Time (UTC).
+            </summary>
+            <param name="numYear">A numeric value equal to the year.</param>
+            <param name="numMonth">A numeric value equal to the month. The value for January is 0, and other month values follow consecutively. Must be supplied if numDate is supplied.</param>
+            <param name="numDate">A numeric value equal to the day of the month.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setUTCHours(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the hours value in the Date object using Universal Coordinated Time (UTC).
+            </summary>
+            <param name="numHours">A numeric value equal to the hours value.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setUTCHours(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the hours value in the Date object using Universal Coordinated Time (UTC).
+            </summary>
+            <param name="numHours">A numeric value equal to the hours value.</param>
+            <param name="numMin">A numeric value equal to the minutes value.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setUTCHours(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the hours value in the Date object using Universal Coordinated Time (UTC).
+            </summary>
+            <param name="numHours">A numeric value equal to the hours value.</param>
+            <param name="numMin">A numeric value equal to the minutes value.</param>
+            <param name="numSec">A numeric value equal to the seconds value</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setUTCHours(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the hours value in the Date object using Universal Coordinated Time (UTC).
+            </summary>
+            <param name="numHours">A numeric value equal to the hours value.</param>
+            <param name="numMin">A numeric value equal to the minutes value.</param>
+            <param name="numSec">A numeric value equal to the seconds value</param>
+            <param name="numMilli">A numeric value equal to the milliseconds value.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setUTCMilliseconds(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the milliseconds value in the Date object using Universal Coordinated Time (UTC).
+            </summary>
+            <param name="numMilli">A numeric value equal to the millisecond value.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setUTCMinutes(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the minutes value in the Date object using Universal Coordinated Time (UTC).
+            </summary>
+            <param name="numMinutes">A numeric value equal to the minutes value.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setUTCMinutes(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the minutes value in the Date object using Universal Coordinated Time (UTC).
+            </summary>
+            <param name="numMinutes">A numeric value equal to the minutes value.</param>
+            <param name="numSeconds">A numeric value equal to the seconds value.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setUTCMinutes(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the minutes value in the Date object using Universal Coordinated Time (UTC).
+            </summary>
+            <param name="numMinutes">A numeric value equal to the minutes value.</param>
+            <param name="numSeconds">A numeric value equal to the seconds value.</param>
+            <param name="numMilli">A numeric value equal to the milliseconds value.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setUTCMonth(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the month value in the Date object using Universal Coordinated Time (UTC).
+            </summary>
+            <param name="numMonth">A numeric value equal to the month. The value for January is 0, and other month values follow consecutively.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setUTCMonth(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the month value in the Date object using Universal Coordinated Time (UTC).
+            </summary>
+            <param name="numMonth">A numeric value equal to the month. The value for January is 0, and other month values follow consecutively.</param>
+            <param name="dateVal">A numeric value representing the day of the month. If it is not supplied, the value from a call to the getUTCDate method is used.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setUTCSeconds(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the seconds value in the Date object using Universal Coordinated Time (UTC).
+            </summary>
+            <param name="numSeconds">A numeric value equal to the seconds value.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setUTCSeconds(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the seconds value in the Date object using Universal Coordinated Time (UTC).
+            </summary>
+            <param name="numSeconds">A numeric value equal to the seconds value.</param>
+            <param name="numMilli">A numeric value equal to the milliseconds value.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setYear(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the year value in the Date object.
+            </summary>
+            <param name="numYear">This method is obsolete, and is maintained for backwards compatibility only. Use the setFullYear method instead. For the years 1900 through 1999, this is a numeric value equal to the year minus 1900. For dates outside that range, this is a 4-digit numeric value.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.toDateString">
+            <summary>
+            Returns a date as a JsString value.
+            </summary>
+            <returns>A JsString value containing the date, in the current time zone, in a convenient, easily read format.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.toGMTString">
+            <summary>
+            Returns a date converted to a JsString using Greenwich Mean Time(GMT).
+            Obsolete, and is provided for backwards compatibility only. It is recommended that you use the toUTCString method instead.
+            </summary>
+            <returns>A String object that contains the date formatted using GMT convention. The format of the return value is as follows: "05 Jan 1996 00:00:00 GMT."</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.toJSON">
+            <summary>
+            Used by the JSON.stringify method to enable the transformation of an object's data of before the JSON serialization.
+            </summary>
+            <returns>Returns an ISO-formatted date JsString for the UTC time zone (denoted by the suffix Z).</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.toLocaleDateString">
+            <summary>
+            Returns a date as a JsString value appropriate to the host environment's current locale.
+            </summary>
+            <returns>A JsString value that contains a date, in the current time zone, in an easily read format. The date is in the default format of the host environment's current locale. The return value of this method cannot be relied upon in scripting, as it will vary from computer to computer. The toLocaleDateString method should only be used to format display – never as part of a computation.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.toLocaleTimeString">
+            <summary>
+            Returns a time as a JsString value appropriate to the host environment's current locale.
+            </summary>
+            <returns>A JsString value that contains a time, in the current time zone, in an easily read format. The time is in the default format of the host environment's current locale. The return value of this method cannot be relied upon in scripting, as it will vary from computer to computer. The toLocaleTimeString method should only be used to format display – never as part of a computation.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.toTimeString">
+            <summary>
+            Returns a time as a JsString value.
+            </summary>
+            <returns>A JsString value containing the time, in the current time zone, in a convenient, easily read format.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.toUTCString">
+            <summary>
+            Returns a date converted to a JsString using Universal Coordinated Time (UTC).
+            </summary>
+            <returns>A String object that contains the date formatted using UTC convention in a convenient, easily read form.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.UTC(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns the number of milliseconds between midnight, January 1, 1970 Universal Coordinated Time (UTC) (or GMT) and the supplied date.
+            </summary>
+            <param name="year">The full year designation is required for cross-century date accuracy. If year is between 0 and 99 is used, then year is assumed to be 1900 + year.</param>
+            <param name="month">The month as an integer between 0 and 11 (January to December).</param>
+            <param name="day"> The date as an integer between 1 and 31.</param>
+            <returns>The number of milliseconds between midnight, January 1, 1970 UTC and the supplied date. This return value can be used in the setTime method and in the Date object constructor. If the value of an argument is greater than its range, or is a negative number, other stored values are modified accordingly. For example, if you specify 150 seconds, JScript redefines that number as two minutes and 30 seconds.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.UTC(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns the number of milliseconds between midnight, January 1, 1970 Universal Coordinated Time (UTC) (or GMT) and the supplied date.
+            </summary>
+            <param name="year">The full year designation is required for cross-century date accuracy. If year is between 0 and 99 is used, then year is assumed to be 1900 + year.</param>
+            <param name="month">The month as an integer between 0 and 11 (January to December).</param>
+            <param name="day"> The date as an integer between 1 and 31.</param>
+            <param name="hours">An integer from 0 to 23 (midnight to 11pm) that specifies the hour.</param>
+            <returns>The number of milliseconds between midnight, January 1, 1970 UTC and the supplied date. This return value can be used in the setTime method and in the Date object constructor. If the value of an argument is greater than its range, or is a negative number, other stored values are modified accordingly. For example, if you specify 150 seconds, JScript redefines that number as two minutes and 30 seconds.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.UTC(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns the number of milliseconds between midnight, January 1, 1970 Universal Coordinated Time (UTC) (or GMT) and the supplied date.
+            </summary>
+            <param name="year">The full year designation is required for cross-century date accuracy. If year is between 0 and 99 is used, then year is assumed to be 1900 + year.</param>
+            <param name="month">The month as an integer between 0 and 11 (January to December).</param>
+            <param name="day"> The date as an integer between 1 and 31.</param>
+            <param name="hours">An integer from 0 to 23 (midnight to 11pm) that specifies the hour.</param>
+            <param name="minutes"> An integer from 0 to 59 that specifies the minutes.</param>
+            <returns>The number of milliseconds between midnight, January 1, 1970 UTC and the supplied date. This return value can be used in the setTime method and in the Date object constructor. If the value of an argument is greater than its range, or is a negative number, other stored values are modified accordingly. For example, if you specify 150 seconds, JScript redefines that number as two minutes and 30 seconds.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.UTC(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns the number of milliseconds between midnight, January 1, 1970 Universal Coordinated Time (UTC) (or GMT) and the supplied date.
+            </summary>
+            <param name="year">The full year designation is required for cross-century date accuracy. If year is between 0 and 99 is used, then year is assumed to be 1900 + year.</param>
+            <param name="month">The month as an integer between 0 and 11 (January to December).</param>
+            <param name="day"> The date as an integer between 1 and 31.</param>
+            <param name="hours">An integer from 0 to 23 (midnight to 11pm) that specifies the hour.</param>
+            <param name="minutes"> An integer from 0 to 59 that specifies the minutes.</param>
+            <param name="seconds">An integer from 0 to 59 that specifies the seconds.</param>
+            <returns>The number of milliseconds between midnight, January 1, 1970 UTC and the supplied date. This return value can be used in the setTime method and in the Date object constructor. If the value of an argument is greater than its range, or is a negative number, other stored values are modified accordingly. For example, if you specify 150 seconds, JScript redefines that number as two minutes and 30 seconds.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.UTC(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns the number of milliseconds between midnight, January 1, 1970 Universal Coordinated Time (UTC) (or GMT) and the supplied date.
+            </summary>
+            <param name="year">The full year designation is required for cross-century date accuracy. If year is between 0 and 99 is used, then year is assumed to be 1900 + year.</param>
+            <param name="month">The month as an integer between 0 and 11 (January to December).</param>
+            <param name="day"> The date as an integer between 1 and 31.</param>
+            <param name="hours">An integer from 0 to 23 (midnight to 11pm) that specifies the hour.</param>
+            <param name="minutes"> An integer from 0 to 59 that specifies the minutes.</param>
+            <param name="seconds">An integer from 0 to 59 that specifies the seconds.</param>
+            <param name="ms">An integer from 0 to 999 that specifies the milliseconds.</param>
+            <returns>The number of milliseconds between midnight, January 1, 1970 UTC and the supplied date. This return value can be used in the setTime method and in the Date object constructor. If the value of an argument is greater than its range, or is a negative number, other stored values are modified accordingly. For example, if you specify 150 seconds, JScript redefines that number as two minutes and 30 seconds.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.valueOf">
+            <summary>
+            Returns the primitive value of the specified object.
+            </summary>
+            <returns>The stored time value in milliseconds since midnight, January 1, 1970 UTC.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.getTime">
+            <summary>
+            Returns the time value in a Date object. 
+            </summary>
+            <returns>
+            An integer value representing the number of milliseconds between midnight, January 1, 1970 and the time value in the Date object. 
+            The range of dates is approximately 285,616 years from either side of midnight, January 1, 1970. 
+            Negative numbers indicate dates prior to 1970. </returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.getDay">
+            <summary>
+            Returns the day of the week value in a Date object using local time.
+            </summary>
+            <returns>an integer between 0 and 6 representing the day of the week and corresponds to a day of the week as follows: 
+            0 Sunday 1 Monday 2 Tuesday 3 Wednesday 4 Thursday 5 Friday 6 Saturday</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.getTimezoneOffset">
+            <summary>
+            Returns the difference in minutes between the time on the host computer and Universal Coordinated Time (UTC).
+            </summary>
+            <returns>An integer value representing the number of minutes between the time on the current machine and UTC. These values are appropriate to the computer the script is executed on. If it is called from a server script, the return value is appropriate to the server. If it is called from a client script, the return value is appropriate to the client.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.getUTCDate">
+            <summary>
+            Returns the day-of-the-month value in a Date object using Universal Coordinated Time (UTC).
+            </summary>
+            <returns>an integer between 1 and 31 that represents the day-of-the-month value in the Date object.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.getUTCDay">
+            <summary>
+            Returns the day of the week value in a Date object using Universal Coordinated Time (UTC).
+            </summary>
+            <returns>an integer between 0 and 6 representing the day of the week and corresponds to a day of the week as follows: 
+            0 Sunday 1 Monday 2 Tuesday 3 Wednesday 4 Thursday 5 Friday 6 Saturday</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.getUTCFullYear">
+            <summary>
+            Returns the year value in a Date object using Universal Coordinated Time (UTC).
+            </summary>
+            <returns>The year as an absolute number. This avoids the year 2000 problem where dates beginning with January 1, 2000 are confused with those beginning with January 1, 1900.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.getUTCHours">
+            <summary>
+            Returns the hours value in a Date object using Universal Coordinated Time (UTC).
+            </summary>
+            <returns>An integer between 0 and 23 indicating the number of hours since midnight. A zero occurs in two situations: the time is before 1:00:00 A.M., or a time was not stored in the Date object when the object was created. The only way to determine which situation you have is to also check the minutes and seconds for zero values. If they are all zeroes, it is nearly certain that the time was not stored in the Date object.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.getUTCMilliseconds">
+            <summary>
+            Returns the milliseconds value in a Date object using Universal Coordinated Time (UTC).
+            </summary>
+            <returns>The millisecond value returned can range from 0-999.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.getUTCMinutes">
+            <summary>
+            Returns the minutes value in a Date object using Universal Coordinated Time (UTC).
+            </summary>
+            <returns>An integer between 0 and 59 equal to the number of minutes value in the Date object. A zero occurs in two situations: the time is less than one minute after the hour, or a time was not stored in the Date object when the object was created. The only way to determine which situation you have is to also check the hours and seconds for zero values. If they are all zeroes, it is nearly certain that the time was not stored in the Date object.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.getUTCMonth">
+            <summary>
+            Returns the month value in a Date object using Universal Coordinated Time (UTC).
+            </summary>
+            <returns>An integer between 0 and 11 indicating the month value in the Date object. The integer returned is not the traditional number used to indicate the month. It is one less. If "Jan 5, 1996 08:47:00.0" is stored in a Date object, getUTCMonth returns 0.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.getUTCSeconds">
+            <summary>
+            Returns the seconds value in a Date object using Universal Coordinated Time (UTC).
+            </summary>
+            <returns>An integer between 0 and 59 indicating the seconds value of the indicated Date object. A zero occurs in two situations: the time is less than one second into the current minute, or a time was not stored in the Date object when the object was created. The only way to determine which situation you have is to also check the minutes and hours for zero values. If they are all zeroes, it is nearly certain that the time was not stored in the Date object..</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.getYear">
+            <summary>
+            Returns the year value in a Date object. This method is obsolete, and is provided for backwards compatibility only. Use the getFullYear method instead. For the years 1900 though 1999, the year is a 2-digit integer value returned as the difference between the stored year and 1900. For dates outside that period, the 4-digit year is returned. For example, 1996 is returned as 96, but 1825 and 2025 are returned as-is.
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.parse(SharpKit.JavaScript.JsString)">
+            <summary>
+            Parses a JsString containing a date, and returns the number of milliseconds between that date and midnight, January 1, 1970.
+            </summary>
+            <param name="dateVal">Either a JsString containing a date in a format such as "Jan 5, 1996 08:47:00" or a VT_DATE value retrieved from an ActiveX® object or other object.</param>
+            <returns>An integer value representing the number of milliseconds between midnight, January 1, 1970 and the date supplied in dateVal.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setDate(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the numeric day-of-the-month value of the Date object using local time.
+            </summary>
+            <param name="numDate">A numeric value equal to the day of the month.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setFullYear(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the year value in the Date object using local time.
+            </summary>
+            <param name="numYear">A numeric value equal to the year.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setFullYear(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the year value in the Date object using local time.
+            </summary>
+            <param name="numYear">A numeric value equal to the year.</param>
+            <param name="numMonth">A numeric value equal to the month. The value for January is 0, and other month values follow consecutively. Must be supplied if numDate is supplied.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.setFullYear(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Sets the year value in the Date object using local time.
+            </summary>
+            <param name="numYear">A numeric value equal to the year.</param>
+            <param name="numMonth">A numeric value equal to the month. The value for January is 0, and other month values follow consecutively. Must be supplied if numDate is supplied.</param>
+            <param name="numdate">A numeric value equal to the day of the month.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsDate.toISOString">
+            <summary>
+            Return the date in ISO 8601 format.
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsError.description">
+            <summary>
+            Returns or sets the descriptive JsString associated with a specific error.
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsError.message">
+            <summary>
+            Returns an error message JsString.
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsError.name">
+            <summary>
+            Returns the name of an error.
+            When a runtime error occurs, the name property is set to one of the following native exception types:
+            ConversionError		This error occurs whenever there is an attempt to convert an object into something to which it cannot be converted.
+            RangeError				This error occurs when a function is supplied with an argument that has exceeded its allowable range. For example, this error occurs if you attempt to construct an Array object with a length that is not a valid positive integer.
+            ReferenceError		This error occurs when an invalid reference has been detected. This error will occur, for example, if an expected reference is null.
+            RegExpError				This error occurs when a compilation error occurs with a regular expression. Once the regular expression is compiled, however, this error cannot occur. This example will occur, for example, when a regular expression is declared with a pattern that has an invalid syntax, or flags other than i, g, or m, or if it contains the same flag more than once.
+            SyntaxError				This error occurs when source text is parsed and that source text does not follow correct syntax. This error will occur, for example, if the eval function is called with an argument that is not valid program text.
+            TypeError					This error occurs whenever the actual type of an operand does not match the expected type. An example of when this error occurs is a function call made on something that is not an object or does not support the call.
+            URIError					This error occurs when an illegal Uniform Resource Indicator (URI) is detected. For example, this is error occurs when an illegal character is found in a JsString being encoded or decoded.
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsError.number">
+            <summary>
+            Returns or sets the numeric value associated with a specific error. The Error object's default property is number.
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsFunction.call(System.Object,System.Object[])">
+            <summary>
+            Calls a method of an object, substituting another object for the current object.
+            </summary>
+            <param name="thisArg">The object to be used as the current object.</param>
+            <param name="args">List of arguments to be passed to the method.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsFunction.call">
+            <summary>
+            Calls a method of an object, substituting another object for the current object.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsFunction.call(System.Object)">
+            <summary>
+            Calls a method of an object, substituting another object for the current object.
+            </summary>
+            <param name="thisArg">The object to be used as the current object.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsFunction.apply(System.Object,System.Object[])">
+            <summary>
+            Applies a method of an object, substituting another object for the current object.
+            </summary>
+            <param name="thisArg">The object to be used as the current object.</param>
+            <param name="args">Array of arguments to be passed to the function.</param>
+            <returns>The return value of the function</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsFunction.apply(System.Object)">
+            <summary>
+            Applies a method of an object, substituting another object for the current object.
+            </summary>
+            <param name="obj">The object to be used as the current object.</param>
+            <returns>The return value of the function</returns>
+        </member>
+        <member name="F:SharpKit.JavaScript.JsFunction.prototype">
+            <summary>
+            Returns a reference to the prototype for a class of objects.
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsFunction.caller">
+            <summary>
+            Returns a reference to the function that invoked the current function.
+            </summary>
+        </member>
+        <member name="F:SharpKit.JavaScript.JsMath.E">
+            <summary>
+            Returns the mathematical constant e, the base of natural logarithms. The E property is approximately equal to 2.718.
+            </summary>
+        </member>
+        <member name="F:SharpKit.JavaScript.JsMath.LN2">
+            <summary>
+            Returns the natural logarithm of 2.
+            </summary>
+        </member>
+        <member name="F:SharpKit.JavaScript.JsMath.LN10">
+            <summary>
+            Returns the natural logarithm of 10.
+            </summary>
+        </member>
+        <member name="F:SharpKit.JavaScript.JsMath.LOG2E">
+            <summary>
+            Returns the base-2 logarithm of e, Euler's number.
+            </summary>
+        </member>
+        <member name="F:SharpKit.JavaScript.JsMath.LOG10E">
+            <summary>
+            Returns the base-10 logarithm of e, Euler's number.
+            </summary>
+        </member>
+        <member name="F:SharpKit.JavaScript.JsMath.PI">
+            <summary>
+            Returns the ratio of the circumference of a circle to its diameter, approximately 3.141592653589793.
+            </summary>
+        </member>
+        <member name="F:SharpKit.JavaScript.JsMath.SQRT1_2">
+            <summary>
+            Returns the square root of 0.5, or one divided by the square root of 2.
+            </summary>
+        </member>
+        <member name="F:SharpKit.JavaScript.JsMath.SQRT2">
+            <summary>
+            Returns the square root of 2.
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsMath.abs(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns the absolute value of a number.
+            </summary>
+            <param name="number">A numeric expression for which the absolute value is needed</param>
+            <returns>The absolute value of the number argument</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsMath.acos(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns the arccosine of a number.
+            </summary>
+            <param name="number">A numeric expression for which the arccosine is needed.</param>
+            <returns>the arccosine of the number argument.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsMath.asin(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns the arcsine of a number.
+            </summary>
+            <param name="number">A numeric expression for which the arcsine is needed.</param>
+            <returns>The arcsine of its numeric argument.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsMath.atan(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns the arctangent of a number.
+            </summary>
+            <param name="number">A numeric expression for which the arctangent is needed.</param>
+            <returns>The return value is the arctangent of its numeric argument.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsMath.atan2(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns the angle (in radians) from the X axis to a point (y,x).
+            </summary>
+            <param name="y">A numeric expression representing the cartesian x-coordinate.</param>
+            <param name="x">A numeric expression representing the cartesian y-coordinate.</param>
+            <returns>The return value is between -pi and pi, representing the angle of the supplied (y,x) point.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsMath.ceil(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns the smallest integer greater than or equal to its numeric argument.
+            </summary>
+            <param name="number">A numeric expression.</param>
+            <returns>An integer value equal to the smallest integer greater than or equal to its numeric argument.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsMath.cos(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns the cosine of a number.
+            </summary>
+            <param name="number">A numeric expression for which the cosine is needed.</param>
+            <returns>The return value is the cosine of its numeric argument.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsMath.exp(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns e (the base of natural logarithms) raised to a power.
+            </summary>
+            <param name="number">A numeric expression representing the power of e.</param>
+            <returns>The return value is a number. The constant e is Euler's number, approximately equal to 2.71828 and number is the supplied argument.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsMath.floor(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns the greatest integer less than or equal to its numeric argument.
+            </summary>
+            <param name="number">A numeric expression.</param>
+            <returns>An integer value equal to the greatest integer less than or equal to its numeric argument.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsMath.log(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns the natural logarithm of a number.
+            </summary>
+            <param name="number">A numeric expression for which the natural logarithm is sought.</param>
+            <returns>The return value is the natural logarithm of number. The base is e.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsMath.max(SharpKit.JavaScript.JsNumber[])">
+            <summary>
+            Returns the greater of zero or more supplied numeric expressions.
+            </summary>
+            <param name="numbers">Numeric expressions to be evaluated</param>
+            <returns>If no arguments are provided, the return value is equal to NEGATIVE_INFINITY. If any argument is NaN, the return value is also NaN.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsMath.min(SharpKit.JavaScript.JsNumber[])">
+            <summary>
+            Returns the lesser of zero or more supplied numeric expressions.
+            </summary>
+            <param name="numbers">Numeric expressions to be evaluated</param>
+            <returns>If no arguments are provided, the return value is equal to NEGATIVE_INFINITY. If any argument is NaN, the return value is also NaN.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsMath.pow(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns the value of a base expression taken to a specified power.
+            </summary>
+            <param name="base">The base value of the expression.</param>
+            <param name="exponent">The exponent value of the expression.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsMath.random">
+            <summary>
+            Returns a pseudorandom number between 0 and 1.
+            </summary>
+            <returns>The pseudorandom number generated is from 0 (inclusive) to 1 (exclusive), that is, the returned number can be zero, but it will always be less than one.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsMath.round(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns a supplied numeric expression rounded to the nearest integer.
+            </summary>
+            <param name="number">The value to be rounded to the nearest integer.</param>
+            <returns>For positive numbers, if the decimal portion of number is 0.5 or greater, 
+            the return value is equal to the smallest integer greater than number. If the 
+            decimal portion is less than 0.5, the return value is the largest integer less than 
+            or equal to number. For negative numbers, if the decimal portion is exactly -0.5, 
+            the return value is the smallest integer that is greater than the number.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsMath.sin(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns the sine of a number.
+            </summary>
+            <param name="number">A numeric expression for which the sine is needed</param>
+            <returns>The sine of the numeric argument</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsMath.sqrt(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns the square root of a number.
+            </summary>
+            <param name="number">A numeric expression.</param>
+            <returns>If number is negative, the return value is NaN.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsMath.tan(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns the tangent of a number.
+            </summary>
+            <param name="number">A numeric expression for which the tangent is sought.</param>
+            <returns>The tangent of number.</returns>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsNumber">
+            <summary>
+            An object representation of the number data type and placeholder for numeric constants.
+            </summary>
+        </member>
+        <member name="F:SharpKit.JavaScript.JsNumber.MAX_VALUE">
+            <summary>
+            Returns the largest number representable in JScript. Equal to approximately 1.79E+308.
+            </summary>
+        </member>
+        <member name="F:SharpKit.JavaScript.JsNumber.MIN_VALUE">
+            <summary>
+            Returns the number closest to zero representable in JScript. Equal to approximately 5.00E-324.
+            </summary>
+        </member>
+        <member name="F:SharpKit.JavaScript.JsNumber.NaN">
+            <summary>
+            A special value that indicates an arithmetic expression returned a value that was not a number.
+            </summary>
+        </member>
+        <member name="F:SharpKit.JavaScript.JsNumber.NEGATIVE_INFINITY">
+            <summary>
+            Returns a value more negative than the largest negative number.
+            </summary>
+        </member>
+        <member name="F:SharpKit.JavaScript.JsNumber.POSITIVE_INFINITY">
+            <summary>
+            Returns a value larger than the largest number.
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsNumber.toExponential(System.Int32)">
+            <summary>
+            Returns a JsString containing a number represented in exponential notation.
+            </summary>
+            <param name="fractionDigits">Number of digits after the decimal point. Must be in the range 0 – 20, inclusive.</param>
+            <returns>A JsString representation of a number in exponential notation. The JsString contains one digit before the significand's decimal point, and may contain fractionDigits digits after it. If fractionDigits is not supplied, the toExponential method returns as many digits necessary to uniquely specify the number.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsNumber.toExponential">
+            <summary>
+            Returns a JsString containing a number represented in exponential notation.
+            </summary>
+            <returns>A JsString representation of a number in exponential notation. The JsString contains one digit before the significand's decimal point, and may contain fractionDigits digits after it. If fractionDigits is not supplied, the toExponential method returns as many digits necessary to uniquely specify the number.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsNumber.toPrecision(System.Int32)">
+            <summary>
+            Returns a JsString containing a number represented either in exponential or fixed-point notation with a specified number of digits.
+            </summary>
+            <param name="precision">Number of significant digits. Must be in the range 1 – 21, inclusive.</param>
+            <returns>For numbers in exponential notation, precision - 1 digits are returned after the decimal point. For numbers in fixed notation, precision significant digits are returned.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsNumber.toPrecision">
+            <summary>
+            Returns a JsString containing a number represented either in exponential or fixed-point notation with a specified number of digits.
+            </summary>
+            <returns>For numbers in exponential notation, precision - 1 digits are returned after the decimal point. For numbers in fixed notation, precision significant digits are returned.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsNumber.toString">
+            <summary>
+            Returns a JsString representation of an object.
+            </summary>
+            <returns>Returns the textual representation of the number.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsNumber.toString(System.Int32)">
+            <summary>
+            Returns a JsString representation of an object.
+            </summary>
+            <param name="radix">Specifies a radix for converting numeric values to strings. This value is only used for numbers.</param>
+            <returns>Returns the textual representation of the number.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsNumber.valueOf">
+            <summary>
+            Returns the primitive value of the specified object.
+            </summary>
+            <returns>The numeric value.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsNumber.toFixed">
+            <summary>
+            The toFixed() method formats a number to use a specified number of trailing decimals.
+            The number is rounded up, and nulls are added after the decimal point (if needed), to create the desired decimal length.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsNumber.toFixed(System.Int32)">
+            <summary>
+            The toFixed() method formats a number to use a specified number of trailing decimals.
+            The number is rounded up, and nulls are added after the decimal point (if needed), to create the desired decimal length.
+            </summary>
+            <param name="x">The number of digits after the decimal point. Default is 0 (no digits after the decimal point)</param>
+            <returns></returns>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsRegExp">
+            <summary>
+            An object that contains a regular expression pattern along with flags that identify how to apply the pattern.
+            re = /pattern/[flags]
+            re = new RegExp("pattern"[,"flags"]) 
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsRegExp.exec(SharpKit.JavaScript.JsString)">
+            <summary>
+            If the exec method does not find a match, it returns null. If it finds a match, exec returns an array, and the properties of the global RegExp object are updated to reflect the results of the match. Element zero of the array contains the entire match, while elements 1 – n contain any submatches that have occurred within the match. This behavior is identical to the behavior of the match method without the global flag (g) set. 
+            If the global flag is set for a regular expression, exec searches the JsString beginning at the position indicated by the value of lastIndex. If the global flag is not set, exec ignores the value of lastIndex and searches from the beginning of the JsString. 
+            </summary>
+            <param name="text">The String object or JsString literal on which to perform the search</param>
+            <returns></returns>
+        </member>
+        <member name="F:SharpKit.JavaScript.JsRegExpResult.input">
+            <summary>
+            Returns the JsString against which a regular expression search was performed. Read-only.
+            </summary>
+        </member>
+        <member name="F:SharpKit.JavaScript.JsRegExpResult.index">
+            <summary>
+            Returns the character position where the first successful match begins in a searched JsString. Read-only.
+            </summary>
+        </member>
+        <member name="F:SharpKit.JavaScript.JsRegExpResult.lastIndex">
+            <summary>
+            Returns the character position where the next match begins in a searched JsString.
+            </summary>
+        </member>
+        <member name="F:SharpKit.JavaScript.JsRegExpResult.lastMatch">
+            <summary>
+            Returns the last matched characters from any regular expression search. Read-only.
+            </summary>
+        </member>
+        <member name="F:SharpKit.JavaScript.JsRegExpResult.lastParen">
+            <summary>
+            Returns the last parenthesized submatch from any regular expression search, if any. Read-only.
+            </summary>
+        </member>
+        <member name="F:SharpKit.JavaScript.JsRegExpResult.leftContext">
+            <summary>
+            Returns the characters from the beginning of a searched JsString up to the position before the beginning of the last match. Read-only.
+            </summary>
+        </member>
+        <member name="F:SharpKit.JavaScript.JsRegExpResult.rightContext">
+            <summary>
+            Returns the characters from the position following the last match to the end of the searched JsString. Read-only.
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsString">
+            <summary>
+            Allows manipulation and formatting of text strings and determination and location of substrings within strings.
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.lastIndexOf(System.Char)">
+            <summary>
+            Returns the last occurrence of a substring within a String object.
+            </summary>
+            <param name="sub">The char to search for within the String object.</param>
+            <returns> an integer value indicating the beginning of the substring within the String object. If the substring is not found, a -1 is returned. If startindex is negative, startindex is treated as zero. If it is larger than the greatest character position index, it is treated as the largest possible index.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.lastIndexOf(SharpKit.JavaScript.JsString)">
+            <summary>
+            Returns the last occurrence of a substring within a String object.
+            </summary>
+            <param name="sub">The string to search for within the String object.</param>
+            <returns> an integer value indicating the beginning of the substring within the String object. If the substring is not found, a -1 is returned. If startindex is negative, startindex is treated as zero. If it is larger than the greatest character position index, it is treated as the largest possible index.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.lastIndexOf(SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns the last occurrence of a substring within a String object.
+            </summary>
+            <param name="substring">The substring to search for within the String object.</param>
+            <param name="startindex">Integer value specifying the index to begin searching within the String object. If omitted, searching begins at the end of the string.</param>
+            <returns> an integer value indicating the beginning of the substring within the String object. If the substring is not found, a -1 is returned. If startindex is negative, startindex is treated as zero. If it is larger than the greatest character position index, it is treated as the largest possible index.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.substring(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns the substring at the specified location within a String object.
+            </summary>
+            <param name="start">The zero-based index integer indicating the beginning of the substring.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.substring(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns the substring at the specified location within a String object.
+            </summary>
+            <param name="start">The zero-based index integer indicating the beginning of the substring.</param>
+            <param name="end">The zero-based index integer indicating the end of the substring. The substring includes the characters up to, but not including, the character indicated by end. If end is omitted, the characters from start through the end of the original string are returned.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.substr(SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns a substring beginning at a specified location and having a specified length.
+            </summary>
+            <param name="start">The starting position of the desired substring. The index of the first character in the string is zero.</param>
+            <param name="length">The number of characters to include in the returned substring.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.substr(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns a substring beginning at a specified location and having a specified length.
+            </summary>
+            <param name="start">The starting position of the desired substring. The index of the first character in the string is zero.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.indexOf(SharpKit.JavaScript.JsString)">
+            <summary>
+            Returns the character position where the first occurrence of a substring occurs within a String object.
+            </summary>
+            <param name="subString">Substring to search for within the String object.</param>
+            <returns>An integer value indicating the beginning of the substring within the String object. If the substring is not found, a -1 is returned.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.indexOf(SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns the character position where the first occurrence of a substring occurs within a String object.
+            </summary>
+            <param name="subString">Substring to search for within the String object.</param>
+            <param name="startIndex">Integer value specifying the index to begin searching within the String object. If omitted, searching starts at the beginning of the string.</param>
+            <returns>An integer value indicating the beginning of the substring within the String object. If the substring is not found, a -1 is returned.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.search(SharpKit.JavaScript.JsRegExp)">
+            <summary>
+            Returns the position of the first substring match in a regular expression search.
+            </summary>
+            <param name="regExp">An instance of a Regular Expression object containing the regular expression pattern and applicable flags.</param>
+            <returns>The search method indicates if a match is present or not. If a match is found, the search method returns an integer value that indicates the offset from the beginning of the string where the match occurred. If no match is found, it returns -1.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.search(System.String)">
+            <summary>
+            Returns the position of the first substring match in a regular expression search.
+            </summary>
+            <param name="searchText">The String object or string literal on which to perform the search.</param>
+            <returns>The search method indicates if a match is present or not. If a match is found, the search method returns an integer value that indicates the offset from the beginning of the string where the match occurred. If no match is found, it returns -1.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.replace(SharpKit.JavaScript.JsRegExp,System.String)">
+            <summary>
+            Returns a copy of a string with text replaced using a regular expression or search string. 
+            </summary>
+            <param name="regExp">An instance of a Regular Expression object containing the regular expression pattern and applicable flags. </param>
+            <param name="replaceText">Required. A String object or string literal containing the text to replace for every successful match of rgExp in stringObj. In JScript 5.5 or later, the replaceText argument can also be a function that returns the replacement text. </param>
+            <returns>The result of the replace method is a copy of stringObj after the specified replacements have been made. </returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.replace(System.String,System.String)">
+            <summary>
+            Returns a copy of a string with text replaced using a regular expression or search string. 
+            </summary>
+            <param name="searchText">String object or literal that is converted to a string, and an exact search is made for the results; no attempt is made to convert the string into a regular expression. </param>
+            <param name="replaceText">Required. A String object or string literal containing the text to replace for every successful match of rgExp in stringObj. In JScript 5.5 or later, the replaceText argument can also be a function that returns the replacement text. </param>
+            <returns>The result of the replace method is a copy of stringObj after the specified replacements have been made. </returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.replace(SharpKit.JavaScript.JsRegExp,SharpKit.JavaScript.JsFunc{SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsString})">
+            <summary>
+            Returns a copy of a string with text replaced using a regular expression or search string. 
+            Replace function with no params
+            </summary>
+            <param name="regExp">An instance of a Regular Expression object containing the regular expression pattern and applicable flags. </param>
+            <param name="replaceFunction">You can specify a function as the second parameter. In this case, the function will be invoked after the match has been performed. The function's result (return value) will be used as the replacement string. (Note: the above-mentioned special replacement patterns do not apply in this case.) Note that the function will be invoked multiple times for each full match to be replaced if the regular expression in the first parameter is global.</param>
+            <returns>The result of the replace method is a copy of stringObj after the specified replacements have been made. </returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.replace(System.String,SharpKit.JavaScript.JsFunc{SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsString})">
+            <summary>
+            Returns a copy of a string with text replaced using a regular expression or search string. 
+            Replace function with no params
+            </summary>
+            <param name="searchText">String object or literal that is converted to a string, and an exact search is made for the results; no attempt is made to convert the string into a regular expression. </param>
+            <param name="replaceFunction">You can specify a function as the second parameter. In this case, the function will be invoked after the match has been performed. The function's result (return value) will be used as the replacement string. (Note: the above-mentioned special replacement patterns do not apply in this case.) Note that the function will be invoked multiple times for each full match to be replaced if the regular expression in the first parameter is global.</param>
+            <returns>The result of the replace method is a copy of stringObj after the specified replacements have been made. </returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.trim">
+            <summary>
+            The trim method returns the string stripped of whitespace from both ends. trim does not affect the value of the string itself.
+            Supported in Firefox, Chrome, IE 9, Opera 10.5 and Safari 5
+            (Description from MDN)
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.replace(System.String,SharpKit.JavaScript.JsFunc{SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsString})">
+             <summary>
+            Replace function with 1 param
+             </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.replace(System.String,SharpKit.JavaScript.JsFunc{SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsString})">
+             <summary>
+            Replace function with 2 params
+             </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.replace(System.String,SharpKit.JavaScript.JsFunc{SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsString})">
+             <summary>
+            Replace function with 3 params
+             </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.replace(SharpKit.JavaScript.JsRegExp,SharpKit.JavaScript.JsFunc{SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsString})">
+             <summary>
+            Replace function with 1 params
+             </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.replace(SharpKit.JavaScript.JsRegExp,SharpKit.JavaScript.JsFunc{SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsString})">
+             <summary>
+            Replace function with 2 params
+             </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.replace(SharpKit.JavaScript.JsRegExp,SharpKit.JavaScript.JsFunc{SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsNumber,SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsString})">
+             <summary>
+            Replace function with 3 params
+             </summary>
+        </member>
+        <member name="F:SharpKit.JavaScript.JsString.length">
+            <summary>
+            Returns the length of a String object.
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.anchor(System.String)">
+            <summary>
+            Places an HTML anchor with a NAME attribute around specified text in the object.
+            </summary>
+            <param name="anchorString">Text you want to place in the NAME attribute of an HTML anchor.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.big">
+            <summary>
+            Places HTML &lt;BIG&gt; tags around text in a String object.
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.blink">
+            <summary>
+            Places HTML &lt;BLINK&gt; tags around text in a String object.
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.bold">
+            <summary>
+            Places HTML &lt;B&gt; tags around text in a String object.
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.charAt(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns the character at the specified index.
+            </summary>
+            <param name="index">Zero-based index of the desired character. Valid values are between 0 and the length of the string minus 1.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.charCodeAt(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Returns an integer representing the Unicode encoding of the character at the specified location.
+            </summary>
+            <param name="index">Zero-based index of the desired character. Valid values are between 0 and the length of the string minus 1.</param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.concat(SharpKit.JavaScript.JsString[])">
+            <summary>
+            Returns a string value containing the concatenation of two or more supplied strings.
+            </summary>
+            <param name="strings">String objects or literals to concatenate to the end of string1.</param>
+            <returns>The result of the concat method is equivalent to: result = string1 + string2 + string3 + + stringN. A change of value in either a source or result string does not affect the value in the other string. If any of the arguments are not strings, they are first converted to strings before being concatenated to string1.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.fixed">
+            <summary>
+            Places HTML &lt;TT&gt; tags around text in a String object.
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.fontcolor">
+            <summary>
+            Places an HTML &lt;FONT&gt; tag with the COLOR attribute around the text in a String object.
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.fontsize(SharpKit.JavaScript.JsNumber)">
+            <summary>
+            Places an HTML &lt;FONT&gt; tag with the SIZE attribute around the text in a String object.
+            </summary>
+            <param name="size">Integer value that specifies the size of the text.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.fromCharCode(SharpKit.JavaScript.JsNumber[])">
+            <summary>
+            Returns a string from a number of Unicode character values.
+            </summary>
+            <param name="charCodes">A series of Unicode character values to convert to a string.</param>
+            <returns>If no arguments are supplied, the result is the empty string.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.italics">
+            <summary>
+            Places HTML &lt;I&gt; tags around text in a String object.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.toLocaleLowerCase">
+            <summary>
+            Returns a string where all alphabetic characters have been converted to lowercase, taking into account the host environment's current locale.
+            </summary>
+            <returns>Converts the characters in a string, taking into account the host environment's current locale. In most cases, the results are the same as you would obtain with the toLowerCase method. Results differ if the rules for a language conflict with the regular Unicode case mappings.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.toLocaleUpperCase">
+            <summary>
+            Returns a string where all alphabetic characters have been converted to uppercase, taking into account the host environment's current locale.
+            </summary>
+            <returns>Converts the characters in a string, taking into account the host environment's current locale. In most cases, the results are the same as you would obtain with the toUpperCase method. Results differ if the rules for a language conflict with the regular Unicode case mappings.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.toLowerCase">
+            <summary>
+            Returns a string where all alphabetic characters have been converted to lowercase.
+            </summary>
+            <returns>The method has no effect on nonalphabetic characters.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.toUpperCase">
+            <summary>
+            Returns a string where all alphabetic characters have been converted to uppercase.
+            </summary>
+            <returns>The method has no effect on non-alphabetic characters.</returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.match(SharpKit.JavaScript.JsRegExp)">
+            <summary>
+            Executes a search on a string using a regular expression pattern, and returns an array containing the results of that search.
+            </summary>
+            <param name="rgExp">Required. An instance of a Regular Expression object containing the regular expression pattern and applicable flags. </param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.match(SharpKit.JavaScript.JsString)">
+            <summary>
+            Executes a search on a string using a regular expression pattern, and returns an array containing the results of that search.
+            </summary>
+            <param name="rgExp">Required. A string literal containing the regular expression pattern and flags. </param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.slice(System.Int32,System.Int32)">
+            <summary>
+            Returns a section of a string.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.slice(System.Int32)">
+            <summary>
+            Returns a section of a string.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsString.localeCompare(SharpKit.JavaScript.JsString,SharpKit.JavaScript.JsArray{SharpKit.JavaScript.JsString},System.Object)">
+            <summary>
+            Performs a locale-aware string comparison
+            </summary>
+            <param name="compareString">The string to compare to</param>
+            <param name="locales">An optional array of BCP 47 language codes (see remarks)</param>
+            <param name="options">Optional options (see remarks)</param>
+            <returns>a negative number if the string sorts earlier than compareString,  
+            a positive number if it sorts afterwards, and 0 if they are the same.</returns>
+            <remarks>
+            A list of language codes can be found <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_identification_and_negotiation">here</a>.
+            A description of valid options can be found <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare">here</a>.
+            </remarks>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsCode">
+            <summary>
+            A special class, when used as a method parameter, can be assigned as string, and generates the native js code inside the string
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsAction">
+            <summary>
+            A delegate for native javascript
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsAction`1">
+            <summary>
+            A delegate for native javascript
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsAction`2">
+            <summary>
+            A delegate for native javascript
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsAction`3">
+            <summary>
+            A delegate for native javascript
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsAction`4">
+            <summary>
+            A delegate for native javascript
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsAction`5">
+            <summary>
+            A delegate for native javascript
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsAction`6">
+            <summary>
+            A delegate for native javascript
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsFunc`1">
+            <summary>
+            A delegate for native javascript
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsFunc`2">
+            <summary>
+            A delegate for native javascript
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsFunc`3">
+            <summary>
+            A delegate for native javascript
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsFunc`4">
+            <summary>
+            A delegate for native javascript
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsFunc`5">
+            <summary>
+            A delegate for native javascript
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsFunc`6">
+            <summary>
+            A delegate for native javascript
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsFunc`7">
+            <summary>
+            A delegate for native javascript
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsExtensions">
+            <summary>
+            Provides extension methods for C# to JavaScript
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsExtensions.AsJsString(System.String)">
+            <summary>
+            Invisibly converts the string reference to JsString on order to use native javascript string functions
+            </summary>
+            <param name="s"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsExtensions.As``1(System.Object)">
+            <summary>
+            Allows converting an object to a different type without affecting the generated javascript code.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsExtensions.AsArray``1(SharpKit.JavaScript.JsArray{``0})">
+            <summary>
+            A quick shortcut to invisibly cast any list to jsarray (usually for Json mode types)
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="list"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsExtensions.AsList``1(SharpKit.JavaScript.JsArray{``0})">
+            <summary>
+            A quick shortcut to invisibly cast any list to jsarray (usually for Json mode types)
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="list"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsExtensions.AsJsObject``1(System.Collections.Generic.IDictionary{System.String,``0})">
+            <summary>
+            A quick shortcut to invisibly cast any dictionary to JsObject (usually for Json mode types)
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="dic"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsExtensions.instanceof``1(System.Object)">
+            <summary>
+            Returns a Boolean value that indicates whether or not an object is an instance of a particular class or constructed function.
+            This is a JavaScript operator, it is implemented in C# as an extension method.
+            </summary>
+            <example>
+            <code>
+            var isArray = obj.instanceof&lt;JsArray&gt;()
+            </code>
+            </example>
+            <typeparam name="T"></typeparam>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsExtensions.in(System.String,System.Object)">
+            <summary>
+            Tests for the existence of a property in an object.
+            </summary>
+            <param name="propertyName"></param>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsExtensions.ExactEquals(System.Object,System.Object)">
+            <summary>
+            A C# extension for '===' operator
+            </summary>
+            <param name="obj"></param>
+            <param name="obj2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsExtensions.ExactNotEquals(System.Object,System.Object)">
+            <summary>
+            A C# extension for '!==' operator
+            </summary>
+            <param name="obj"></param>
+            <param name="obj2"></param>
+            <returns></returns>
+        </member>
+        <member name="T:SharpKit.JavaScript.NamespaceDoc">
+            <summary>
+            Contains all SharpKit compiler attributes used to customize JavaScript output
+            Contains .NET types for primitive JavaScript types such as JsNumber, JsObject, JsArray, etc...
+            Contains all JavaScript global functions in a derivable context class - JsContext
+            </summary>
+            <example>
+            This example uses the JsTypeAttribute to instruct SharpKit compiler to convert this class into JavaScript,
+            it also uses the parseInt global JavaScript function, and the toString() function on the JsNumber type.
+            <code>
+            using SharpKit.JavaScript;
+            
+            namespace MyApp.Client
+            {
+                [JsType(JsMode.Global, Filename="MyScript.js")]
+                class MyScript : JsContext
+                {
+                    public static void Main()
+                    {
+                        var x = parseInt("677");
+                        var s = x.toString();
+                    }
+                }
+            }
+            </code>
+            </example>
+        </member>
+        <member name="T:SharpKit.JavaScript.Server.JsBinder">
+            <summary>
+            Server side javascript helper, helps binding from C# / aspx files to JavaScript methods
+            Method names are cached
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.Server.JsBinder.Compile">
+            <summary>
+            Returns javascript code that compiles all jsclr classes (exactly like JsCompiler.Compile() or JsRuntime.Start())
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsTypeAttribute">
+            <summary>
+             Sets the rules that SharpKit will use when converting this .NET type into JavaScript.
+             This attribute can be used on any type, and as assembly attribute, when used as an assembly attribute, and TargetType is not supplied, it will affect ALL types in the assembly
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsTypeAttribute.#ctor">
+            <summary>
+            Creates an instance of a JsTypeAttribute
+            </summary>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsTypeAttribute.#ctor(SharpKit.JavaScript.JsMode)">
+            <summary>
+            Creates an instance of a JsTypeAttribute in the specified JsMode
+            </summary>
+            <param name="mode"></param>
+        </member>
+        <member name="M:SharpKit.JavaScript.JsTypeAttribute.#ctor(SharpKit.JavaScript.JsMode,System.String)">
+            <summary>
+            Creates an instance of a JsTypeAttribute in the specified JsMode, and exported to the specified filename
+            </summary>
+            <param name="mode"></param>
+            <param name="filename"></param>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.PreCode">
+            <summary>
+            Js code that will be written before exporting the type
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.PostCode">
+            <summary>
+            Js code that will be written after exporting the type
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.OrderInFile">
+            <summary>
+            Precendece between JsTypes in the same file, negative values will put the type before other types, and positive value will put it after other types
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.TargetType">
+            <summary>
+            When used as assembly attribute, indicates the type for which to apply this attribute on.
+            This feature should be used when trying to describe classes on external assemblies that has no SharpKit support
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.TargetTypeName">
+            <summary>
+            When used as assembly attribute, indicates the type for which to apply this attribute on.
+            This feature should be used when trying to describe classes on external assemblies that has no SharpKit support
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.NativeParams">
+            <summary>
+            When set to true - SharpKit will ignore all params[] keywords in all methods
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.NativeDelegates">
+            <summary>
+            Indicates that all delegate parameters in all members are native javascript functions
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.OmitCasts">
+            <summary>
+            When true, omits all casts to this type
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.PropertiesAsFields">
+            <summary>
+            Forces all properties to be treated as JavaScript native fields without any getter and setter methods
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.AutomaticPropertiesAsFields">
+            <summary>
+            Forces all automatic properties to be treated as JavaScript native fields without any getter and setter methods
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.NativeEnumerator">
+            <summary>
+            When true, foreach statements will use the for..in syntax of Javascript
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.NativeArrayEnumerator">
+            <summary>
+            When true, foreach statements will use the for loop syntax of Javascript
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.NativeConstructors">
+            <summary>
+            When true, instanciations of this class will use the native Javascript method, rather than calling a constructor
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.NativeOverloads">
+            <summary>
+            When true, instanciations of this class will use the native Javascript method, rather than calling a constructor
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.NativeOperatorOverloads">
+            <summary>
+            When true, operator overloads will be exported as native js binary operations:
+            if System.Int32 has a '/' operator overload then:
+            x / y -> System.Int32.op_div(x, y);   //NativeOperatorOverloads=false
+            x / y -> x / y;              //NativeOperatorOverloads=true
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.Native">
+            <summary>
+            Indicates that this type will be exported as native js type, 
+            only one constructor is allowed, 
+            all instance members will be exported to the constructor's prototype
+            all static members will be exported to the constructor's members
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.GlobalObject">
+            <summary>
+            When set, the class methods and properties will be declared on the window object, instead of a class.
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.NativeFunctions">
+            <summary>
+            Any anonymous delegate creation will be exported as a native inline function in javascript
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.NativeJsons">
+            <summary>
+            Anonymous objects will be created and treated as Json objects
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.Export">
+            <summary>
+            Indicates that SharpKit compiler will generate javascript code for this type / member
+            This property is inherited and applied to all derived types. Default value is true
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.Name">
+            <summary>
+            When set, changes the type name in the client code
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.Filename">
+            <summary>
+            The target filename to generate the javascript code into, when using a relative path, it will be relative to the current cs file,
+            You may use the ~  (tilda) operator to designate the project directory
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.Exporter">
+            <summary>
+            The type of js exporter to use
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.IgnoreGenericTypeArguments">
+            <summary>
+            Omits and ignores any generic type argument
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.IgnoreGenericMethodArguments">
+            <summary>
+            Omits and ignores any generic argument in any method inside the class (Equivalent to JsMethod(IgnoreGenericArguments=true) on each method)
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.Mode">
+            <summary>
+            Controls the JavaScript mode of this type, a mode is a combination of several boolean settings of the JsTypeAttribute
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.ForceDelegatesAsNativeFunctions">
+            <summary>
+            Forces any delegate used in the current type to be created a native js function without an instance context
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.InlineFields">
+            <summary>
+            Declares fields and PropertiesAsFields in object definition, and does not move them to the constructor
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.OmitOptionalParameters">
+            <summary>
+            Omits optional parameters in methods, when not sent by caller
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.OmitInheritance">
+            <summary>
+            Specifies whether or not to declare inheritance of a class to a base class
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.OmitDefaultConstructor">
+            <summary>
+            When set to true, if no instance constructor was defined in this class, no constructor will be generated.
+            This is helpful when extending existing classes, and avoiding overwriting existing constructors
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.SharpKitVersion">
+            <summary>
+            Targets the attribute for a specific SharpKit version, this attribute will be ignored if the current 
+            SharpKit version isn't in the range of the value specified
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.PrototypeName">
+            <summary>
+            Allows to customize the 'prototype' token for instance method, by default, this value is: "prototype"
+            This property is useful for creating jQuery plugins
+            class MyClass
+            {
+                public void foo()
+            }
+            
+            MyClass.prototype.foo = function()
+            {
+            }
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.NativeCasts">
+            <summary>
+            When set to true, casting/as/is will be generated using the native "instanceof" keyword
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.NativeProperties">
+            <summary>
+             When true, Object.defineProperty is used for properties. The browser needs to support native property.
+             </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.NativePropertiesEnumerable">
+            <summary>
+            The NativePropertyEnumerable property attribute defines whether the property shows up in a for...in loop and Object.keys() or not.
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.NativeError">
+            <summary>
+            Treats the class as a native "Error" object and prevents smart exception throwing
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsTypeAttribute.GenericArgumentJsCode">
+            <summary>
+            The JavaScript code that will be generated when this type is passed as a generic argument to a generic method or generic type
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsMode">
+            <summary>
+            Specifies the export and interoperability mode of a C# type in JavaScript
+            </summary>
+        </member>
+        <member name="F:SharpKit.JavaScript.JsMode.Global">
+            <summary>
+            Specifies a global function export mode, in which only static members are allowed,
+            static methods become global functions
+            static fields become global variables
+            static constrctor becomes global code
+            </summary>
+        </member>
+        <member name="F:SharpKit.JavaScript.JsMode.Prototype">
+            <summary>
+            Specifies a prototype object export mode, in which a single constructor is allowed, and both static and instance members.
+            constructor becomes a constructor function
+            instance members become the equivalent members on the constructor function's prototype.
+            static members become members on the constructor function itself.
+            </summary>
+        </member>
+        <member name="F:SharpKit.JavaScript.JsMode.Clr">
+            <summary>
+            Specifies a .NET style class, in which all C# elements are supported,
+            this mode requires JsClr library to be included on the client at runtime.
+            </summary>
+        </member>
+        <member name="F:SharpKit.JavaScript.JsMode.Json">
+            <summary>
+            Specifies an invisible unexported json type, this class will not be exported, 
+            instantiation and usage of classes in this mode, will be exported to simple json elements.
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsExportAttribute">
+            <summary>
+            Provides information regarding how SharpKit will export JavaScript code
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsExportAttribute.ExportComments">
+            <summary>
+            Specifies whether to include C# comments in the JavaScript code
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsExportAttribute.Minify">
+            <summary>
+            Specifies whether SharpKit should minify the exported files
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsExportAttribute.LongFunctionNames">
+            <summary>
+            Instructs SharpKit to provide any exported function with a global unique name, to help debugging of client side code.
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsExportAttribute.EnableProfiler">
+            <summary>
+            Injects profiling code into JavaScript functions to enable performance profiling.
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsExportAttribute.FilenameFormat">
+            <summary>
+            Specifies prefix / suffix to any filename exported by SharpKit, e.g.: FilenameFormat="js/{0}"
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsExportAttribute.DefaultFilename">
+            <summary>
+            Specifies default js filename for all types that didn't specify a specific js file for export
+            If not specified, default file will be res/[AssemblyName].js
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsExportAttribute.DefaultFilenameAsCsFilename">
+            <summary>
+            Specifies to use the .cs filename for all types that didn't specify a specific js file for export,
+            MyTextBox.cs -> MyTextBox.js
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsExportAttribute.PreCodeInjectionFilename">
+            <summary>
+            Specifies to inject all available helper methods generated by SharpKit into a single separate file, this feature is supported by SharpKit 5 only.
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsExportAttribute.PostCodeInjectionFilename">
+            <summary>
+            Specifies to inject all helper method invocations generated by SharpKit into a single separate file, this feature is supported by SharpKit 5 only.
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsExportAttribute.GenerateSourceMaps">
+            <summary>
+            Specifies to generate chrome source maps, which enables debugging of JavaScript in C#.
+            To enable this feature you must add a handler in your web.config file:
+            <code>
+            &lt;add name="SourceMapsHandler" type="SharpKit.Web.Server.Handlers.SourceMapsHandler, SharpKit.Web" verb="*" path="SourceMaps.ashx" /&gt;
+            </code>
+            And enable source maps in chrome: show development bar, click options wheel, check enable source maps.
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsExportAttribute.UseExactEquals">
+            <summary>
+            Instructs SharpKit to use '===' and '!==' (exact equals/not equals) instead of '==' / '!=' when checking equality between objects.
+            Custom exact equality can be achieved by using the extension method JsContext.ExactEquals
+            <example>
+            <code>
+            var x = "true";
+            var y = true;
+            var b = x.ExactEquals(y);
+            </code>
+            </example>
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsExportAttribute.UseStrict">
+            <summary>
+            Uses the ECMAScript5 strict mode.
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsExportAttribute.OmitSharpKitHeaderComment">
+            <summary>
+            Removes the 'Generated by SharpKit 5 v...' header comment in js files
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsExportAttribute.AddTimeStampInSharpKitHeaderComment">
+            <summary>
+            Add the generation time to the sharpkit header comment.
+            CAUTION: This will change your file's content on every compilation. This could occur unnecessary conflics with version control software!
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsExportAttribute.ForceOmitCasts">
+            <summary>
+            Overrides all OmitCasts definitions in the assembly, and skips any code generation for casting
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsExportAttribute.JsCodeFormat">
+            <summary>
+            Options are "JavaScript"/null (default) for default js style, or C#/CSharp for C# style
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsExportAttribute.ForceIntegers">
+            <summary>
+            Forces integers to remain as integers when casting or using binary operations, by adding (|0) to these expressions
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsMergedFileAttribute">
+            <summary>
+            Instructs SharpKit Compiler to create a merged file from specified sources
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMergedFileAttribute.Sources">
+            <summary>
+            The source files to merge
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMergedFileAttribute.Filename">
+            <summary>
+            The target merged file name
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMergedFileAttribute.Minify">
+            <summary>
+            Specifies whether to minify the js file using js or css minification
+            minification type will be determined by file extension (.js/.css)
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsMethodAttribute">
+            <summary>
+             Specifies custom instructions for SharpKit for a single method, this information is used when exporting the member, and when using it.
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.NativeParams">
+            <summary>
+            When set to true, SharpKit will ignore the params[] keyword on the method parameter
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.TargetMethod">
+            <summary>
+            Applies the attribute externally on a method, if the method has overloads, attribute will be applied on all of them
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.TargetType">
+            <summary>
+            Applies the attribute externally on a type
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.TargetTypeName">
+            <summary>
+            Applies the attribute externally on a type
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.OmitCalls">
+            <summary>
+            Tells the compiler to omit calls to this method and assume that it was invoked
+            Extension methods:  s.DoSomething() ==> s
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.Name">
+            <summary>
+            Instructs SharpKit to use a custom name for a method, SharpKit will use this name when exporting the method, and when invoking it.
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.InlineCode">
+            <summary>
+            Tells the compiler to drop the method call and write the inline code instead.
+            Only available for extention methods.
+            object.SomeExtentionMethod(param) with InlineCode="object==param" ==> object==param
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.Code">
+            <summary>
+            Custom javascript code implementation for this method
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.NativeOverloads">
+            <summary>
+            When set to true - disables the overloading mechanism 
+            and assumes that the overloads are implemented in a single javascript method with this name
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.IgnoreGenericArguments">
+            <summary>
+            Ignores the generic arguments passed to a method when invoking it in JavaScript
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.ExtensionImplementedInInstance">
+            <summary>
+            Marks this extension method as an instance method in javascript
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.NativeDelegates">
+            <summary>
+            Treats delegates inside this method as native javascript functions.
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.ForceDelegatesAsNativeFunctions">
+            <summary>
+            Forces any delegate used in the current method to be created a native js function without an instance context
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.GlobalCode">
+            <summary>
+            Generates the method code as global JavaScript code, without any function
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.Global">
+            <summary>
+            Indicates that this method is global, if exported, it will be exported as a global function, and when invoked, it will be invoked without a class name prefix
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.Export">
+            <summary>
+            Indicates that SharpKit compiler will generate javascript code for this type / member
+            This property is inherited and applied to all derived types. Default value is true
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.OmitParanthesis">
+            <summary>
+            Omits the paranthesis () when invoking this method, used for javascript keywords (e.g.: delete)
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.OmitDotOperator">
+            <summary>
+            Omits the dot (.) operator before the instance name, when invoking this method, used for javascript keywords (e.g.: instanceof)
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.OmitOptionalParameters">
+            <summary>
+            Omits optional parameters, when not sent by caller
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.OmitNewOperator">
+            <summary>
+            Omits the new operator when creating new instances on a consutrctor
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.InstanceImplementedAsExtension">
+            <summary>
+            Allows an instance method to be invoke like an extension method
+            x.Call() -> Call(x)
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.ArgumentsPrefix">
+            <summary>
+            Sets a custom string to be inserted before arguments are written when invoking a function
+            This is useful for method optimizations
+            x.Call(a,b,c) -> x.Call("MyCustomCode",a,b,c);
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.ArgumentsSuffix">
+            <summary>
+            Sets a custom string to be appended after arguments are written when invoking a function
+            This is useful for method optimizations
+            x.Call(a,b,c) -> x.Call(a,b,c,"MyCustomCode");
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.InsertArg0">
+            <summary>
+            Inserts a custom argument when invoking the function
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.InsertArg1">
+            <summary>
+            Inserts a custom argument when invoking the function
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.InsertArg2">
+            <summary>
+            Inserts a custom argument when invoking the function
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.OmitCommas">
+            <summary>
+            Causes the function to be invoked without any commas between arguments:
+            x.Call(a,b,c) -> x.Call(abc);
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.JsonInitializers">
+            <summary>
+            Sends initializers to constructor as a parameter:
+            Collection initializers as Json arrays
+            Object initializers as a Json object
+            Important note: a new json / array object will ALWAYS be passed to the constructor, even if no object initializers are passed.
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.SharpKitVersion">
+            <summary>
+            Targets the attribute for a specific SharpKit version, this attribute will be ignored if the current 
+            SharpKit version isn't in the range of the value specified
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsMethodAttribute.InlineCodeExpression">
+            <summary>
+            Manual code expression inlining, SharpKit will parse this code, 
+            and replace the parameters with the real code passed to the function, 
+            allowing to customize the way the invocation code is generated
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsPropertyAttribute">
+            <summary>
+             Specifies custom instructions for SharpKit for a property, this information is used when exporting the member, and when using it.
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsPropertyAttribute.NativeField">
+            <summary>
+            When set, all references will not use getters and setter, but will treat it as a field instead
+            </summary>
+            <remarks>Default value is false</remarks>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsPropertyAttribute.NativeIndexer">
+            <summary>
+            When applied to an indexer property, all references will not use getters and setter, but will treat it as a native indexer instead
+            </summary>
+            <remarks>Default value is false</remarks>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsPropertyAttribute.Export">
+            <summary>
+            Indicates that SharpKit compiler will generate javascript code for this type / member
+            This property is inherited and applied to all derived types. Default value is true
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsPropertyAttribute.TargetProperty">
+            <summary>
+            Applies the attribute externally on a property
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsPropertyAttribute.TargetType">
+            <summary>
+            Applies the attribute externally on a type
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsPropertyAttribute.TargetTypeName">
+            <summary>
+            Applies the attribute externally on a type
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsPropertyAttribute.Global">
+            <summary>
+            Sets a static property as a global property - omits the class name when declaring and invoking the property
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsPropertyAttribute.NativeProperty">
+            <summary>
+            When true, Object.defineProperty is used for properties. The browser needs to support native property.
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsPropertyAttribute.NativePropertyEnumerable">
+            <summary>
+            The NativePropertyEnumerable property attribute defines whether the property shows up in a for...in loop and Object.keys() or not.
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsEventAttribute">
+            <summary>
+             Specifies custom instructions for SharpKit for an event, this information is used when exporting the member, and when using it.
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsEventAttribute.Export">
+            <summary>
+            Indicates that SharpKit compiler will generate javascript code for this field
+            This property is inherited and applied to all derived types. Default value is true
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsEventAttribute.NativeDelegates">
+            <summary>
+            Causes an event to be treated as a native JavaScript function
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsDelegateAttribute">
+            <summary>
+             Specifies custom instructions for SharpKit for a delegate, this information is used when exporting the member, and when using it.
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsDelegateAttribute.NativeDelegates">
+            <summary>
+            Causes a delegate to be treated as a native JavaScript function
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsDelegateAttribute.NativeFunction">
+            <summary>
+            Causes a delegate to be treated as a native JavaScript function without instance context support, 
+            this means that any instance context using the 'this' keyword will be lost
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsEnumAttribute">
+            <summary>
+            Controls the interoperability and conversion of a .NET enum type into JavaScript.
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsEnumAttribute.ValuesAsNames">
+            <summary>
+            When type is exported, the value of every enum member will be its string name representation, and not its numeric value
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsEnumAttribute.TargetType">
+            <summary>
+            When used as assembly attribute, indicates the type for which to apply this attribute on.
+            This feature should be used when trying to describe classes on external assemblies that has no SharpKit support
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsEnumAttribute.TargetTypeName">
+            <summary>
+            When used as assembly attribute, indicates the type for which to apply this attribute on.
+            This feature should be used when trying to describe classes on external assemblies that has no SharpKit support
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsFieldAttribute">
+            <summary>
+             Specifies custom instructions for SharpKit for a property, this information is used when exporting the member, and when using it.
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsFieldAttribute.Export">
+            <summary>
+            Indicates that SharpKit compiler will generate javascript code for this field
+            This property is inherited and applied to all derived types. Default value is true
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsFieldAttribute.Name">
+            <summary>
+            Instructs SharpKit to use a custom name for this field, SharpKit will use this name when exporting the field, and when using it in code.
+            </summary>
+        </member>
+        <member name="T:SharpKit.JavaScript.JsNamespaceAttribute">
+            <summary>
+            Allows mapping and replacement between C# and JavaScript namespace. Useful for creating shorter namespaces in JavaScript
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsNamespaceAttribute.Namespace">
+            <summary>
+            The C# namespace to be mapped (cannot be null or empty)
+            </summary>
+        </member>
+        <member name="P:SharpKit.JavaScript.JsNamespaceAttribute.JsNamespace">
+            <summary>
+            The JavaScript namespace that should be replaced (can be empty, not recommended)
+            </summary>
+        </member>
+        <member name="T:AssemblyDoc">
+            <summary>
+            SharpKit core assembly, contains all needed attributes and types required to use SharpKit
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,163 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SharpKit.Html</name>
+    </assembly>
+    <members>
+        <member name="M:SharpKit.Html.JSON.stringify(System.Object,SharpKit.JavaScript.JsFunc{System.Object,System.Object,System.Object})">
+            <summary>
+            
+            </summary>
+            <param name="obj"></param>
+            <param name="replacer">If replacer is a function, JSON.stringify calls the function, passing in the key and value of each member. The return value is serialized instead of the original value. If the function returns undefined, the member will be excluded from the serialization. The key for the root object is an empty string: "".
+            If replacer is an array, only members with key values in the array will be serialized. The order of serialization is the same as the order of the keys in the array. The replacer array is ignored when the value argument is also an array.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.Html.JSON.stringify(System.Object,SharpKit.JavaScript.JsFunc{System.Object,System.Object,System.Object},System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="obj"></param>
+            <param name="replacer">If replacer is a function, JSON.stringify calls the function, passing in the key and value of each member. The return value is serialized instead of the original value. If the function returns undefined, the member will be excluded from the serialization. The key for the root object is an empty string: "".
+            If replacer is an array, only members with key values in the array will be serialized. The order of serialization is the same as the order of the keys in the array. The replacer array is ignored when the value argument is also an array.</param>
+            <param name="space"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.Html.JSON.stringify(System.Object,SharpKit.JavaScript.JsFunc{System.Object,System.Object,System.Object},System.String)">
+            <summary>
+            
+            </summary>
+            <param name="obj"></param>
+            <param name="replacer">If replacer is a function, JSON.stringify calls the function, passing in the key and value of each member. The return value is serialized instead of the original value. If the function returns undefined, the member will be excluded from the serialization. The key for the root object is an empty string: "".
+            If replacer is an array, only members with key values in the array will be serialized. The order of serialization is the same as the order of the keys in the array. The replacer array is ignored when the value argument is also an array.</param>
+            <param name="space"></param>
+            <returns></returns>
+        </member>
+        <member name="T:SharpKit.Html.filesystem.ILocalFileSystem">
+            <summary>
+            LocalFileSystem
+            </summary>
+        </member>
+        <member name="M:SharpKit.Html.HtmlContext.escape(SharpKit.JavaScript.JsString)">
+            <summary>
+            Encodes String objects so they can be read on all computers.
+            </summary>
+            <param name="s">String object or literal to be encoded.</param>
+            <returns>A JsString value (in Unicode format) that contains the contents of charstring. All spaces, punctuation, accented characters, and any other non-ASCII characters are replaced with %xx encoding, where xx is equivalent to the hexadecimal number representing the character. For example, a space is returned as "%20."</returns>
+        </member>
+        <member name="M:SharpKit.Html.HtmlContext.decodeURIComponent(SharpKit.JavaScript.JsString)">
+            <summary>
+            Returns the unencoded version of an encoded component of a Uniform Resource Identifier (URI). 
+            </summary>
+            <param name="encodedURIString">A value representing an encoded URI component.</param>
+            <returns>The required encodedURIString argument is a value representing an encoded 
+            URI component.A URIComponent is part of a complete URI. If the encodedURIString is 
+            not valid, a URIError occurs.</returns>
+        </member>
+        <member name="M:SharpKit.Html.HtmlContext.encodeURIComponent(SharpKit.JavaScript.JsString)">
+            <summary>
+            Encodes a text JsString as a valid component of a Uniform Resource Identifier (URI).
+            </summary>
+            <param name="encodedURIString">A value representing an encoded URI component.</param>
+            <returns>A an encoded URI. If you pass the result to decodeURIComponent, 
+            the original JsString is returned. Because the encodeURIComponent method encodes all 
+            characters, be careful if the JsString represents a path such 
+            as /folder1/folder2/default.html. The slash characters will be encoded and will 
+            not be valid if sent as a request to a web server. Use the encodeURI method if the 
+            JsString contains more than a single URI component.</returns>
+        </member>
+        <member name="M:SharpKit.Html.HtmlContext.encodeURI(SharpKit.JavaScript.JsString)">
+            <summary>
+            Encodes a text JsString as a valid Uniform Resource Identifier (URI) 
+            </summary>
+            <param name="URIString">A value representing an encoded URI.</param>
+            <returns>n encoded URI. If you pass the result to decodeURI, the original JsString is returned. The encodeURI method does not encode the following characters: ":", "/", ";", and "?". Use encodeURIComponent to encode these characters.</returns>
+        </member>
+        <member name="M:SharpKit.Html.HtmlContext.decodeURI(SharpKit.JavaScript.JsString)">
+            <summary>
+            Returns the unencoded version of an encoded Uniform Resource Identifier (URI). 
+            </summary>
+            <param name="URIString"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpKit.Html.HtmlContext.unescape(SharpKit.JavaScript.JsString)">
+            <summary>
+            Decodes String objects encoded with the escape method.
+            </summary>
+            <param name="charString">String object or literal to be decoded.</param>
+            <returns>A JsString value that contains the contents of charstring. All characters encoded with the %xx hexadecimal form are replaced by their ASCII character set equivalents.</returns>
+        </member>
+        <member name="F:SharpKit.Html.CloseReason.Normal">
+            <summary>
+            1000 indicates a normal closure, meaning that the purpose for which the connection was established has been fulfilled.
+            </summary>
+        </member>
+        <member name="F:SharpKit.Html.CloseReason.GoingAway">
+            <summary>
+            1001 indicates that an endpoint is "going away", such as a server going down or a browser having navigated away from a page.
+            </summary>
+        </member>
+        <member name="F:SharpKit.Html.CloseReason.ProtocolError">
+            <summary>
+            1002 indicates that an endpoint is terminating the connection due to a protocol error.
+            </summary>
+        </member>
+        <member name="F:SharpKit.Html.CloseReason.UnableToAccept">
+            <summary>
+            1003 indicates that an endpoint is terminating the connection because it has received a type of data it cannot accept (e.g., an endpoint that understands only text data MAY send this if it receives a binary message).
+            </summary>
+        </member>
+        <member name="F:SharpKit.Html.CloseReason.Reserved">
+            <summary>
+            Reserved.  The specific meaning might be defined in the future.
+            </summary>
+        </member>
+        <member name="F:SharpKit.Html.CloseReason.NoStatusPresent">
+            <summary>
+            1005 is a reserved value and MUST NOT be set as a status code in a Close control frame by an endpoint.  It is designated for use in applications expecting a status code to indicate that no status code was actually present.
+            </summary>
+        </member>
+        <member name="F:SharpKit.Html.CloseReason.MissingCloseFrame">
+            <summary>
+            1006 is a reserved value and MUST NOT be set as a status code in a Close control frame by an endpoint.  It is designated for use in applications expecting a status code to indicate that the connection was closed abnormally, e.g., without sending or receiving a Close control frame.
+            </summary>
+        </member>
+        <member name="F:SharpKit.Html.CloseReason.InvalidData">
+            <summary>
+            1007 indicates that an endpoint is terminating the connection because it has received data within a message that was not consistent with the type of the message (e.g., non-UTF-8 [RFC3629] data within a text message).
+            </summary>
+        </member>
+        <member name="F:SharpKit.Html.CloseReason.PolicyViolation">
+            <summary>
+            1008 indicates that an endpoint is terminating the connection because it has received a message that violates its policy.  This is a generic status code that can be returned when there is no other more suitable status code (e.g., 1003 or 1009) or if there is a need to hide specific details about the policy.
+            </summary>
+        </member>
+        <member name="F:SharpKit.Html.CloseReason.MessageTooBig">
+            <summary>
+            1009 indicates that an endpoint is terminating the connection because it has received a message that is too big for it to process.
+            </summary>
+        </member>
+        <member name="F:SharpKit.Html.CloseReason.ExpectedExtensionMising">
+            <summary>
+            1010 indicates that an endpoint (client) is terminating the connection because it has expected the server to negotiate one or more extension, but the server didn't return them in the response message of the WebSocket handshake.  The list of extensions that are needed SHOULD appear in the /reason/ part of the Close frame. Note that this status code is not used by the server, because it can fail the WebSocket handshake instead.
+            </summary>
+        </member>
+        <member name="F:SharpKit.Html.CloseReason.UnexpectedCondition">
+            <summary>
+            1011 indicates that a server is terminating the connection because it encountered an unexpected condition that prevented it from fulfilling the request.
+            </summary>
+        </member>
+        <member name="F:SharpKit.Html.CloseReason.TlsFailed">
+            <summary>
+            1015 is a reserved value and MUST NOT be set as a status code in a Close control frame by an endpoint.  It is designated for use in applications expecting a status code to indicate that the connection was closed due to a failure to perform a TLS handshake (e.g., the server certificate can't be verified).
+            </summary>
+        </member>
+        <member name="M:SharpKit.Html.indexeddb.IDBKeyRange`1.bound(`0,`0)">
+            <summary>
+            The closed range(including lower and upper values)
+            </summary>
+            <param name="lower"></param>
+            <param name="upper"></param>
+        </member>
+    </members>
+</doc>
