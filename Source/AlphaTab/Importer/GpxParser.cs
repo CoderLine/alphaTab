@@ -16,10 +16,10 @@
  * License along with this library.
  */
 
-using System.Xml;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
+using AlphaTab.Xml;
 
 namespace AlphaTab.Importer
 {
@@ -102,13 +102,12 @@ namespace AlphaTab.Importer
             _noteById = new FastDictionary<string, Note>();
             _tappedNotes = new FastDictionary<string, bool>();
 
-            XmlDocument dom = Std.LoadXml(xml);
-            ParseDom(dom);
+            ParseDom(Std.LoadXml(xml));
         }
 
         #region Xml Parsing
 
-        private void ParseDom(XmlDocument dom)
+        private void ParseDom(IXmlDocument dom)
         {
             var root = dom.DocumentElement;
             if (root == null) return;
@@ -171,7 +170,7 @@ namespace AlphaTab.Importer
         // <Score>...</Score>
         // 
 
-        private void ParseScoreNode(XmlNode element)
+        private void ParseScoreNode(IXmlNode element)
         {
             element.IterateChildren(c =>
             {
@@ -219,7 +218,7 @@ namespace AlphaTab.Importer
         // <MasterTrack>...</MasterTrack>
         //  
 
-        private void ParseMasterTrackNode(XmlNode node)
+        private void ParseMasterTrackNode(IXmlNode node)
         {
             node.IterateChildren(c =>
             {
@@ -238,7 +237,7 @@ namespace AlphaTab.Importer
             });
         }
 
-        private void ParseAutomations(XmlNode node)
+        private void ParseAutomations(IXmlNode node)
         {
             node.IterateChildren(c =>
             {
@@ -254,7 +253,7 @@ namespace AlphaTab.Importer
             });
         }
 
-        private void ParseAutomation(XmlNode node)
+        private void ParseAutomation(IXmlNode node)
         {
             string type = null;
             bool isLinear = false;
@@ -301,7 +300,7 @@ namespace AlphaTab.Importer
                 case "Tempo":
                     automation = Automation.BuildTempoAutomation(isLinear, ratioPosition, value, reference);
                     break;
-                // TODO: other automations
+                    // TODO: other automations
             }
 
             if (automation != null)
@@ -323,7 +322,7 @@ namespace AlphaTab.Importer
         // <Tracks>...</Tracks>
         //  
 
-        private void ParseTracksNode(XmlNode node)
+        private void ParseTracksNode(IXmlNode node)
         {
             node.IterateChildren(c =>
             {
@@ -332,14 +331,14 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "Track":
-                            ParseTrack((XmlElement)c);
+                            ParseTrack(c);
                             break;
                     }
                 }
             });
         }
 
-        private void ParseTrack(XmlElement node)
+        private void ParseTrack(IXmlNode node)
         {
             var track = new Track();
             var trackId = node.Attributes["id"].Value;
@@ -375,7 +374,7 @@ namespace AlphaTab.Importer
             _tracksById[trackId] = track;
         }
 
-        private void ParseDiagramCollection(Track track, XmlNode node)
+        private void ParseDiagramCollection(Track track, IXmlNode node)
         {
             var items = FindChildElement(node, "Items");
             items.IterateChildren(c =>
@@ -385,14 +384,14 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "Item":
-                            ParseDiagramItem(track, (XmlElement) c);
+                            ParseDiagramItem(track, c);
                             break;
                     }
                 }
             });
         }
 
-        private void ParseDiagramItem(Track track, XmlElement node)
+        private void ParseDiagramItem(Track track, IXmlNode node)
         {
             var chord = new Chord();
             var chordId = node.Attributes["id"].Value;
@@ -400,11 +399,11 @@ namespace AlphaTab.Importer
             track.Chords[chordId] = chord;
         }
 
-        private XmlNode FindChildElement(XmlNode node, string name)
+        private IXmlNode FindChildElement(IXmlNode node, string name)
         {
             for (int i = 0; i < node.ChildNodes.Count; i++)
             {
-                var c = node.ChildNodes.Item(i);
+                var c = node.ChildNodes[i];
                 if (c != null && c.NodeType == XmlNodeType.Element && c.LocalName == name)
                 {
                     return c;
@@ -413,7 +412,7 @@ namespace AlphaTab.Importer
             return null;
         }
 
-        private void ParseTrackProperties(Track track, XmlNode node)
+        private void ParseTrackProperties(Track track, IXmlNode node)
         {
             node.IterateChildren(c =>
             {
@@ -422,14 +421,14 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "Property":
-                            ParseTrackProperty(track, (XmlElement)c);
+                            ParseTrackProperty(track, c);
                             break;
                     }
                 }
             });
-}
+        }
 
-        private void ParseTrackProperty(Track track, XmlElement node)
+        private void ParseTrackProperty(Track track, IXmlNode node)
         {
             var propertyName = node.Attributes["name"].Value;
             switch (propertyName)
@@ -452,23 +451,22 @@ namespace AlphaTab.Importer
             }
         }
 
-        private void ParseGeneralMidi(Track track, XmlNode node)
+        private void ParseGeneralMidi(Track track, IXmlNode node)
         {
-            XmlElement e = (XmlElement) node;
             track.PlaybackInfo.Port = Std.ParseInt(GetValue(FindChildElement(node, "Port")));
             track.PlaybackInfo.Program = Std.ParseInt(GetValue(FindChildElement(node, "Program")));
             track.PlaybackInfo.PrimaryChannel = Std.ParseInt(GetValue(FindChildElement(node, "PrimaryChannel")));
             track.PlaybackInfo.SecondaryChannel = Std.ParseInt(GetValue(FindChildElement(node, "SecondaryChannel")));
 
-            track.IsPercussion = (e.Attributes["table"] != null &&
-                                  e.Attributes["table"].Value == "Percussion");
+            track.IsPercussion = (node.Attributes["table"] != null &&
+                                  node.Attributes["table"].Value == "Percussion");
         }
 
         //
         // <MasterBars>...</MasterBars>
         //  
 
-        private void ParseMasterBarsNode(XmlNode node)
+        private void ParseMasterBarsNode(IXmlNode node)
         {
             node.IterateChildren(c =>
             {
@@ -482,16 +480,15 @@ namespace AlphaTab.Importer
                     }
                 }
             });
-}
+        }
 
-        private void ParseMasterBar(XmlNode node)
+        private void ParseMasterBar(IXmlNode node)
         {
             var masterBar = new MasterBar();
             node.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
                 {
-                    XmlElement e = (XmlElement) c;
                     switch (c.LocalName)
                     {
                         case "Time":
@@ -508,13 +505,13 @@ namespace AlphaTab.Importer
                             masterBar.Section.Text = GetValue(FindChildElement(c, "Text"));
                             break;
                         case "Repeat":
-                            if (e.Attributes["start"].Value.ToLower() == "true")
+                            if (c.Attributes["start"].Value.ToLower() == "true")
                             {
                                 masterBar.IsRepeatStart = true;
                             }
-                            if (e.Attributes["end"].Value.ToLower() == "true" && e.Attributes["count"].Value != null)
+                            if (c.Attributes["end"].Value.ToLower() == "true" && c.Attributes["count"].Value != null)
                             {
-                                masterBar.RepeatCount = Std.ParseInt(e.Attributes["count"].Value);
+                                masterBar.RepeatCount = Std.ParseInt(c.Attributes["count"].Value);
                             }
                             break;
                         // TODO case "Directions": // Coda segno etc. 
@@ -562,14 +559,14 @@ namespace AlphaTab.Importer
                     }
                 }
             });
-    _masterBars.Add(masterBar);
+            _masterBars.Add(masterBar);
         }
 
         //
         // <Bars>...</Bars>
         //  
 
-        private void ParseBars(XmlNode node)
+        private void ParseBars(IXmlNode node)
         {
             node.IterateChildren(c =>
             {
@@ -578,14 +575,14 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "Bar":
-                            ParseBar((XmlElement)c);
+                            ParseBar(c);
                             break;
                     }
                 }
             });
-}
+        }
 
-        private void ParseBar(XmlElement node)
+        private void ParseBar(IXmlNode node)
         {
             var bar = new Bar();
             var barId = node.Attributes["id"].Value;
@@ -619,19 +616,19 @@ namespace AlphaTab.Importer
                                     break;
                             }
                             break;
-                        // case "SimileMark":
+                            // case "SimileMark":
                     }
                 }
             });
 
-    _barsById[barId] = bar;
+            _barsById[barId] = bar;
         }
 
         //
         // <Voices>...</Voices>
         // 
 
-        private void ParseVoices(XmlNode node)
+        private void ParseVoices(IXmlNode node)
         {
             node.IterateChildren(c =>
             {
@@ -640,14 +637,14 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "Voice":
-                            ParseVoice((XmlElement)c);
+                            ParseVoice(c);
                             break;
                     }
                 }
             });
-}
+        }
 
-        private void ParseVoice(XmlElement node)
+        private void ParseVoice(IXmlNode node)
         {
             var voice = new Voice();
             var voiceId = node.Attributes["id"].Value;
@@ -665,14 +662,14 @@ namespace AlphaTab.Importer
                 }
             });
 
-    _voiceById[voiceId] = voice;
+            _voiceById[voiceId] = voice;
         }
 
         //
         // <Beats>...</Beats>
         // 
 
-        private void ParseBeats(XmlNode node)
+        private void ParseBeats(IXmlNode node)
         {
             node.IterateChildren(c =>
             {
@@ -681,14 +678,14 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "Beat":
-                            ParseBeat((XmlElement)c);
+                            ParseBeat(c);
                             break;
                     }
                 }
             });
-}
+        }
 
-        private void ParseBeat(XmlElement node)
+        private void ParseBeat(IXmlNode node)
         {
             var beat = new Beat();
             var beatId = node.Attributes["id"].Value;
@@ -697,14 +694,13 @@ namespace AlphaTab.Importer
             {
                 if (c.NodeType == XmlNodeType.Element)
                 {
-                    XmlElement e = (XmlElement) c;
                     switch (c.LocalName)
                     {
                         case "Notes":
                             _notesOfBeat[beatId] = GetValue(c).Split(' ');
                             break;
                         case "Rhythm":
-                            _rhythmOfBeat[beatId] = e.Attributes["ref"].Value;
+                            _rhythmOfBeat[beatId] = c.Attributes["ref"].Value;
                             break;
                         case "Fadding":
                             if (GetValue(c) == "FadeIn")
@@ -801,10 +797,10 @@ namespace AlphaTab.Importer
                 }
             });
 
-    _beatById[beatId] = beat;
+            _beatById[beatId] = beat;
         }
 
-        private void ParseBeatProperties(XmlNode node, Beat beat)
+        private void ParseBeatProperties(IXmlNode node, Beat beat)
         {
             bool isWhammy = false;
             BendPoint whammyOrigin = null;
@@ -817,11 +813,10 @@ namespace AlphaTab.Importer
             {
                 if (c.NodeType == XmlNodeType.Element)
                 {
-                    XmlElement e = (XmlElement) c;
                     switch (c.LocalName)
                     {
                         case "Property":
-                            var name = e.Attributes["name"].Value;
+                            var name = c.Attributes["name"].Value;
                             switch (name)
                             {
                                 case "Brush":
@@ -890,7 +885,7 @@ namespace AlphaTab.Importer
                                     whammyMiddleOffset1 = (int)(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointPositionFactor);
                                     break;
                                 case "WhammyBarMiddleOffset2":
-                                    whammyMiddleOffset2 = (int) (Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointPositionFactor);
+                                    whammyMiddleOffset2 = (int)(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointPositionFactor);
                                     break;
 
                                 case "WhammyBarDestinationValue":
@@ -913,7 +908,7 @@ namespace AlphaTab.Importer
                 }
             });
 
-    if (isWhammy)
+            if (isWhammy)
             {
                 if (whammyOrigin == null) whammyOrigin = new BendPoint();
                 if (whammyDestination == null) whammyDestination = new BendPoint(BendPoint.MaxPosition);
@@ -941,7 +936,7 @@ namespace AlphaTab.Importer
         // <Notes>...</Notes>
         // 
 
-        private void ParseNotes(XmlNode node)
+        private void ParseNotes(IXmlNode node)
         {
             node.IterateChildren(c =>
             {
@@ -950,14 +945,14 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "Note":
-                            ParseNote((XmlElement)c);
+                            ParseNote(c);
                             break;
                     }
                 }
             });
-}
+        }
 
-        private void ParseNote(XmlElement node)
+        private void ParseNote(IXmlNode node)
         {
             var note = new Note();
             var noteId = node.Attributes["id"].Value;
@@ -966,7 +961,6 @@ namespace AlphaTab.Importer
             {
                 if (c.NodeType == XmlNodeType.Element)
                 {
-                    XmlElement e = (XmlElement) c;
                     switch (c.LocalName)
                     {
                         case "Properties":
@@ -995,11 +989,11 @@ namespace AlphaTab.Importer
                                 note.Accentuated = AccentuationType.Normal;
                             break;
                         case "Tie":
-                            if (e.Attributes["origin"].Value.ToLower() == "true")
+                            if (c.Attributes["origin"].Value.ToLower() == "true")
                             {
                                 note.IsTieOrigin = true;
                             }
-                            if (e.Attributes["destination"].Value.ToLower() == "true")
+                            if (c.Attributes["destination"].Value.ToLower() == "true")
                             {
                                 note.IsTieDestination = true;
                             }
@@ -1019,10 +1013,10 @@ namespace AlphaTab.Importer
                 }
             });
 
-    _noteById[noteId] = note;
+            _noteById[noteId] = note;
         }
 
-        private void ParseNoteProperties(XmlNode node, Note note, string noteId)
+        private void ParseNoteProperties(IXmlNode node, Note note, string noteId)
         {
             bool isBended = false;
             BendPoint bendOrigin = null;
@@ -1035,11 +1029,10 @@ namespace AlphaTab.Importer
             {
                 if (c.NodeType == XmlNodeType.Element)
                 {
-                    XmlElement e = (XmlElement) c;
                     switch (c.LocalName)
                     {
                         case "Property":
-                            var name = e.Attributes["name"].Value;
+                            var name = c.Attributes["name"].Value;
                             switch (name)
                             {
                                 case "String":
@@ -1141,9 +1134,9 @@ namespace AlphaTab.Importer
                                         note.IsHammerPullOrigin = true;
                                     break;
                                 case "HopoDestination":
-                                // NOTE: gets automatically calculated 
-                                // if (FindChildElement(node, "Enable") != null)
-                                //     note.isHammerPullDestination = true;
+                                    // NOTE: gets automatically calculated 
+                                    // if (FindChildElement(node, "Enable") != null)
+                                    //     note.isHammerPullDestination = true;
                                     break;
                                 case "Slide":
                                     var slideFlags = Std.ParseInt(GetValue(FindChildElement(c, "Flags")));
@@ -1166,7 +1159,7 @@ namespace AlphaTab.Importer
                 }
             });
 
-    if (isBended)
+            if (isBended)
             {
                 if (bendOrigin == null) bendOrigin = new BendPoint();
                 if (bendDestination == null) bendDestination = new BendPoint(BendPoint.MaxPosition);
@@ -1190,7 +1183,7 @@ namespace AlphaTab.Importer
             }
         }
 
-        private void ParseRhythms(XmlNode node)
+        private void ParseRhythms(IXmlNode node)
         {
             node.IterateChildren(c =>
             {
@@ -1199,14 +1192,14 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "Rhythm":
-                            ParseRhythm((XmlElement)c);
+                            ParseRhythm(c);
                             break;
                     }
                 }
             });
-}
+        }
 
-        private void ParseRhythm(XmlElement node)
+        private void ParseRhythm(IXmlNode node)
         {
             var rhythm = new GpxRhythm();
             var rhythmId = node.Attributes["id"].Value;
@@ -1214,7 +1207,6 @@ namespace AlphaTab.Importer
             {
                 if (c.NodeType == XmlNodeType.Element)
                 {
-                    XmlElement e = (XmlElement) c;
                     switch (c.LocalName)
                     {
                         case "NoteValue":
@@ -1248,20 +1240,20 @@ namespace AlphaTab.Importer
                             }
                             break;
                         case "PrimaryTuplet":
-                            rhythm.TupletNumerator = Std.ParseInt(e.Attributes["num"].Value);
-                            rhythm.TupletDenominator = Std.ParseInt(e.Attributes["den"].Value);
+                            rhythm.TupletNumerator = Std.ParseInt(c.Attributes["num"].Value);
+                            rhythm.TupletDenominator = Std.ParseInt(c.Attributes["den"].Value);
                             break;
                         case "AugmentationDot":
-                            rhythm.Dots = Std.ParseInt(e.Attributes["count"].Value);
+                            rhythm.Dots = Std.ParseInt(c.Attributes["count"].Value);
                             break;
                     }
                 }
             });
 
-    _rhythmById[rhythmId] = rhythm;
+            _rhythmById[rhythmId] = rhythm;
         }
 
-        private string GetValue(XmlNode n)
+        private string GetValue(IXmlNode n)
         {
             return Std.GetNodeValue(n);
         }
@@ -1339,14 +1331,14 @@ namespace AlphaTab.Importer
                             // invalid voice -> empty voice
                             var voice = new Voice();
                             bar.AddVoice(voice);
-                        
+
                             var beat = new Beat();
                             beat.IsEmpty = true;
                             beat.Duration = Duration.Quarter;
                             voice.AddBeat(beat);
                         }
                     }
-                }            
+                }
             }
 
             // build tracks (not all, only those used by the score)
@@ -1355,7 +1347,7 @@ namespace AlphaTab.Importer
             {
                 var track = _tracksById[trackId];
                 Score.AddTrack(track);
-            
+
                 // iterate all bar definitions for the masterbars
                 // and add the correct bar to the track
                 for (int i = 0, j = _barsOfMasterBar.Count; i < j; i++)
@@ -1367,7 +1359,7 @@ namespace AlphaTab.Importer
                         track.AddBar(_barsById[barId]);
                     }
                 }
-            
+
                 trackIndex++;
             }
 
@@ -1387,16 +1379,16 @@ namespace AlphaTab.Importer
                         }
                     }
                 }
-            } 
+            }
 
-             // build score
+            // build score
             for (int i = 0, j = _masterBars.Count; i < j; i++)
             {
                 var masterBar = _masterBars[i];
                 Score.AddMasterBar(masterBar);
             }
 
-             // build automations
+            // build automations
             foreach (var barId in _automations.Keys)
             {
                 var automations = _automations[barId];

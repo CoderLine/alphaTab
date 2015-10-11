@@ -20,9 +20,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using System.Xml;
 using AlphaTab.IO;
-using StringBuilder = AlphaTab.Collections.StringBuilder;
+using AlphaTab.Xml;
 
 namespace AlphaTab.Platform
 {
@@ -81,37 +80,14 @@ namespace AlphaTab.Platform
             }
         }
 
-        public static XmlDocument LoadXml(string xml)
+        public static IXmlDocument LoadXml(string xml)
         {
-            var reader = new XmlTextReader(new StringReader(xml));
-            reader.DtdProcessing = DtdProcessing.Ignore;
-            var dom = new XmlDocument();
+            var reader = new System.Xml.XmlTextReader(new StringReader(xml));
+            reader.DtdProcessing = System.Xml.DtdProcessing.Ignore;
+            var dom = new System.Xml.XmlDocument();
             dom.Load(reader);
-            return dom;
+            return new XmlDocumentWrapper(dom);
         }
-
-        public static string GetNodeValue(XmlNode n)
-        {
-            if (n.NodeType == XmlNodeType.Element || n.NodeType == XmlNodeType.Document)
-            {
-                var txt = new StringBuilder();
-                foreach (XmlNode childNode in n.ChildNodes)
-                {
-                    txt.Append(GetNodeValue(childNode));
-                }
-                return txt.ToString().Trim();
-            }
-            return n.Value;
-        }
-
-        public static void IterateChildren(this XmlNode n, Action<XmlNode> action)
-        {
-            foreach (XmlNode c in n.ChildNodes)
-            {
-                action(c);
-            }
-        }
-
 
         public static sbyte ReadSignedByte(this IReadable readable)
         {

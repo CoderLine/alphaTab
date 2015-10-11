@@ -45,7 +45,7 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(4, bar.Voices[0].Beats.Count);
             Assert.AreEqual(Duration.Quarter, bar.Voices[0].Beats[0].Duration);
             Assert.AreEqual(1, bar.Voices[0].Beats[0].Notes.Count);
-            Assert.AreEqual(1, bar.Voices[0].Beats[0].Notes[0].RealValue);
+            Assert.AreEqual(31, bar.Voices[0].Beats[0].Notes[0].RealValue);
         }
     }
 }

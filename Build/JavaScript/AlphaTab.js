@@ -1287,22 +1287,7 @@ AlphaTab.Platform.Std.LoadXml = function (xml){
                 ;
         AlphaTab.Platform.Std._parseXml = parseXml;
     }
-    return AlphaTab.Platform.Std._parseXml(xml);
-};
-AlphaTab.Platform.Std.GetNodeValue = function (n){
-    if (n.nodeType == Node.ELEMENT_NODE || n.nodeType == Node.DOCUMENT_NODE){
-        var txt = new Array();
-        for (var i = 0; i < n.childNodes.length; i++){
-            txt.push(AlphaTab.Platform.Std.GetNodeValue(n.childNodes.item(i)));
-        }
-        return txt.join('').trim();
-    }
-    return n.nodeValue;
-};
-AlphaTab.Platform.Std.IterateChildren = function (n, action){
-    for (var i = 0; i < n.childNodes.length; i++){
-        action(n.childNodes.item(i));
-    }
+    return new AlphaTab.Xml.XmlDocumentWrapper(AlphaTab.Platform.Std._parseXml(xml));
 };
 AlphaTab.Platform.Std.ReadSignedByte = function (readable){
     var n = readable.ReadByte();
@@ -1372,6 +1357,21 @@ AlphaTab.Platform.Std.ToHexString = function (n){
     }
     while (n > 0)
     return s;
+};
+AlphaTab.Platform.Std.GetNodeValue = function (n){
+    if (n.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element || n.get_NodeType() == AlphaTab.Xml.XmlNodeType.Document){
+        var txt = new Array();
+        AlphaTab.Platform.Std.IterateChildren(n, function (c){
+            txt.push(AlphaTab.Platform.Std.GetNodeValue(c));
+        });
+        return txt.join('').trim();
+    }
+    return n.get_Value();
+};
+AlphaTab.Platform.Std.IterateChildren = function (n, action){
+    for (var i = 0; i < n.get_ChildNodes().get_Count(); i++){
+        action(n.get_ChildNodes().get_Item$$Int32(i));
+    }
 };
 AlphaTab.Settings = function (){
     this.Scale = 0;
@@ -1466,6 +1466,67 @@ AlphaTab.Settings.get_Defaults = function (){
     settings.Staves.push(new AlphaTab.StaveSettings("pick-stroke"));
     //settings.staves.Add(new StaveSettings("fingering"));
     return settings;
+};
+AlphaTab.Xml = AlphaTab.Xml || {};
+AlphaTab.Xml.XmlAttributeCollectionWrapper = function (attributes){
+    this._attributes = null;
+    this._attributes = attributes;
+};
+AlphaTab.Xml.XmlAttributeCollectionWrapper.prototype = {
+    get_Item: function (key){
+        return new AlphaTab.Xml.XmlNodeWrapper(this._attributes.getNamedItem(key));
+    }
+};
+AlphaTab.Xml.XmlDocumentWrapper = function (document){
+    this._document = null;
+    this._document = document;
+};
+AlphaTab.Xml.XmlDocumentWrapper.prototype = {
+    get_DocumentElement: function (){
+        return new AlphaTab.Xml.XmlNodeWrapper(this._document.documentElement);
+    }
+};
+AlphaTab.Xml.XmlNodeCollectionWrapper = function (xmlNodeList){
+    this._xmlNodeList = null;
+    this._xmlNodeList = xmlNodeList;
+};
+AlphaTab.Xml.XmlNodeCollectionWrapper.prototype = {
+    get_Count: function (){
+        return this._xmlNodeList.length;
+    },
+    get_Item: function (index){
+        return new AlphaTab.Xml.XmlNodeWrapper(this._xmlNodeList[index]);
+    }
+};
+AlphaTab.Xml.XmlNodeWrapper = function (node){
+    this._node = null;
+    this._node = node;
+};
+AlphaTab.Xml.XmlNodeWrapper.prototype = {
+    get_NodeType: function (){
+        return this._node.nodeType;
+    },
+    get_LocalName: function (){
+        return this._node.localName;
+    },
+    get_Value: function (){
+        return this._node.nodeValue;
+    },
+    get_ChildNodes: function (){
+        return new AlphaTab.Xml.XmlNodeCollectionWrapper(this._node.childNodes);
+    },
+    get_FirstChild: function (){
+        return new AlphaTab.Xml.XmlNodeWrapper(this._node.firstChild);
+    },
+    get_Attributes: function (){
+        return new AlphaTab.Xml.XmlAttributeCollectionWrapper(this._node.attributes);
+    },
+    GetAttribute: function (name){
+        return this._node.getAttribute(name);
+    },
+    GetElementsByTagName: function (nodeName){
+        return new AlphaTab.Xml.XmlNodeCollectionWrapper(this._node.getElementsByTagName(nodeName));
+    }
 };
 AlphaTab.Audio = AlphaTab.Audio || {};
 AlphaTab.Audio.GeneralMidi = function (){
@@ -4834,23 +4895,22 @@ AlphaTab.Importer.GpxParser.prototype = {
         this._notesOfBeat = {};
         this._noteById = {};
         this._tappedNotes = {};
-        var dom = AlphaTab.Platform.Std.LoadXml(xml);
-        this.ParseDom(dom);
+        this.ParseDom(AlphaTab.Platform.Std.LoadXml(xml));
     },
     ParseDom: function (dom){
-        var root = dom.documentElement;
+        var root = dom.get_DocumentElement();
         if (root == null)
             return;
         // the XML uses IDs for referring elements within the 
         // model. Therefore we do the parsing in 2 steps:
         // - at first we read all model elements and store them by ID in a lookup table
         // - after that we need to join up the information. 
-        if (root.localName == "GPIF"){
+        if (root.get_LocalName() == "GPIF"){
             this.Score = new AlphaTab.Model.Score();
             // parse all children
             AlphaTab.Platform.Std.IterateChildren(root, $CreateAnonymousDelegate(this, function (n){
-                if (n.nodeType == Node.ELEMENT_NODE){
-                    switch (n.localName){
+                if (n.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                    switch (n.get_LocalName()){
                         case "Score":
                             this.ParseScoreNode(n);
                             break;
@@ -4889,37 +4949,37 @@ AlphaTab.Importer.GpxParser.prototype = {
     },
     ParseScoreNode: function (element){
         AlphaTab.Platform.Std.IterateChildren(element, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "Title":
-                        this.Score.Title = this.GetValue(c.firstChild);
+                        this.Score.Title = this.GetValue(c.get_FirstChild());
                         break;
                     case "SubTitle":
-                        this.Score.SubTitle = this.GetValue(c.firstChild);
+                        this.Score.SubTitle = this.GetValue(c.get_FirstChild());
                         break;
                     case "Artist":
-                        this.Score.Artist = this.GetValue(c.firstChild);
+                        this.Score.Artist = this.GetValue(c.get_FirstChild());
                         break;
                     case "Album":
-                        this.Score.Album = this.GetValue(c.firstChild);
+                        this.Score.Album = this.GetValue(c.get_FirstChild());
                         break;
                     case "Words":
-                        this.Score.Words = this.GetValue(c.firstChild);
+                        this.Score.Words = this.GetValue(c.get_FirstChild());
                         break;
                     case "Music":
-                        this.Score.Music = this.GetValue(c.firstChild);
+                        this.Score.Music = this.GetValue(c.get_FirstChild());
                         break;
                     case "WordsAndMusic":
-                        if (c.firstChild != null && c.firstChild.toString() != ""){
-                        this.Score.Words = this.GetValue(c.firstChild);
-                        this.Score.Music = this.GetValue(c.firstChild);
+                        if (c.get_FirstChild() != null && c.get_FirstChild().toString() != ""){
+                        this.Score.Words = this.GetValue(c.get_FirstChild());
+                        this.Score.Music = this.GetValue(c.get_FirstChild());
                     }
                         break;
                     case "Copyright":
-                        this.Score.Copyright = this.GetValue(c.firstChild);
+                        this.Score.Copyright = this.GetValue(c.get_FirstChild());
                         break;
                     case "Tabber":
-                        this.Score.Tab = this.GetValue(c.firstChild);
+                        this.Score.Tab = this.GetValue(c.get_FirstChild());
                         break;
                 }
             }
@@ -4927,8 +4987,8 @@ AlphaTab.Importer.GpxParser.prototype = {
     },
     ParseMasterTrackNode: function (node){
         AlphaTab.Platform.Std.IterateChildren(node, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "Automations":
                         this.ParseAutomations(c);
                         break;
@@ -4941,8 +5001,8 @@ AlphaTab.Importer.GpxParser.prototype = {
     },
     ParseAutomations: function (node){
         AlphaTab.Platform.Std.IterateChildren(node, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "Automation":
                         this.ParseAutomation(c);
                         break;
@@ -4959,8 +5019,8 @@ AlphaTab.Importer.GpxParser.prototype = {
         var reference = 0;
         var text = null;
         AlphaTab.Platform.Std.IterateChildren(node, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "Type":
                         type = this.GetValue(c);
                         break;
@@ -5004,8 +5064,8 @@ AlphaTab.Importer.GpxParser.prototype = {
     },
     ParseTracksNode: function (node){
         AlphaTab.Platform.Std.IterateChildren(node, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "Track":
                         this.ParseTrack(c);
                         break;
@@ -5015,10 +5075,10 @@ AlphaTab.Importer.GpxParser.prototype = {
     },
     ParseTrack: function (node){
         var track = new AlphaTab.Model.Track();
-        var trackId = node.attributes.getNamedItem("id").nodeValue;
+        var trackId = node.get_Attributes().get_Item$$String("id").get_Value();
         AlphaTab.Platform.Std.IterateChildren(node, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "Name":
                         track.Name = this.GetValue(c);
                         break;
@@ -5044,8 +5104,8 @@ AlphaTab.Importer.GpxParser.prototype = {
     ParseDiagramCollection: function (track, node){
         var items = this.FindChildElement(node, "Items");
         AlphaTab.Platform.Std.IterateChildren(items, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "Item":
                         this.ParseDiagramItem(track, c);
                         break;
@@ -5055,14 +5115,14 @@ AlphaTab.Importer.GpxParser.prototype = {
     },
     ParseDiagramItem: function (track, node){
         var chord = new AlphaTab.Model.Chord();
-        var chordId = node.attributes.getNamedItem("id").nodeValue;
-        chord.Name = node.attributes.getNamedItem("name").nodeValue;
+        var chordId = node.get_Attributes().get_Item$$String("id").get_Value();
+        chord.Name = node.get_Attributes().get_Item$$String("name").get_Value();
         track.Chords[chordId] = chord;
     },
     FindChildElement: function (node, name){
-        for (var i = 0; i < node.childNodes.length; i++){
-            var c = node.childNodes.item(i);
-            if (c != null && c.nodeType == Node.ELEMENT_NODE && c.localName == name){
+        for (var i = 0; i < node.get_ChildNodes().get_Count(); i++){
+            var c = node.get_ChildNodes().get_Item$$Int32(i);
+            if (c != null && c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element && c.get_LocalName() == name){
                 return c;
             }
         }
@@ -5070,8 +5130,8 @@ AlphaTab.Importer.GpxParser.prototype = {
     },
     ParseTrackProperties: function (track, node){
         AlphaTab.Platform.Std.IterateChildren(node, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "Property":
                         this.ParseTrackProperty(track, c);
                         break;
@@ -5080,7 +5140,7 @@ AlphaTab.Importer.GpxParser.prototype = {
         }));
     },
     ParseTrackProperty: function (track, node){
-        var propertyName = node.attributes.getNamedItem("name").nodeValue;
+        var propertyName = node.get_Attributes().get_Item$$String("name").get_Value();
         switch (propertyName){
             case "Tuning":
                 var tuningParts = this.GetValue(this.FindChildElement(node, "Pitches")).split(" ");
@@ -5099,17 +5159,16 @@ AlphaTab.Importer.GpxParser.prototype = {
         }
     },
     ParseGeneralMidi: function (track, node){
-        var e = node;
         track.PlaybackInfo.Port = AlphaTab.Platform.Std.ParseInt(this.GetValue(this.FindChildElement(node, "Port")));
         track.PlaybackInfo.Program = AlphaTab.Platform.Std.ParseInt(this.GetValue(this.FindChildElement(node, "Program")));
         track.PlaybackInfo.PrimaryChannel = AlphaTab.Platform.Std.ParseInt(this.GetValue(this.FindChildElement(node, "PrimaryChannel")));
         track.PlaybackInfo.SecondaryChannel = AlphaTab.Platform.Std.ParseInt(this.GetValue(this.FindChildElement(node, "SecondaryChannel")));
-        track.IsPercussion = (e.attributes.getNamedItem("table") != null && e.attributes.getNamedItem("table").nodeValue == "Percussion");
+        track.IsPercussion = (node.get_Attributes().get_Item$$String("table") != null && node.get_Attributes().get_Item$$String("table").get_Value() == "Percussion");
     },
     ParseMasterBarsNode: function (node){
         AlphaTab.Platform.Std.IterateChildren(node, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "MasterBar":
                         this.ParseMasterBar(c);
                         break;
@@ -5120,9 +5179,8 @@ AlphaTab.Importer.GpxParser.prototype = {
     ParseMasterBar: function (node){
         var masterBar = new AlphaTab.Model.MasterBar();
         AlphaTab.Platform.Std.IterateChildren(node, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                var e = c;
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "Time":
                         var timeParts = this.GetValue(c).split("/");
                         masterBar.TimeSignatureNumerator = AlphaTab.Platform.Std.ParseInt(timeParts[0]);
@@ -5137,11 +5195,11 @@ AlphaTab.Importer.GpxParser.prototype = {
                         masterBar.Section.Text = this.GetValue(this.FindChildElement(c, "Text"));
                         break;
                     case "Repeat":
-                        if (e.attributes.getNamedItem("start").nodeValue.toLowerCase() == "true"){
+                        if (c.get_Attributes().get_Item$$String("start").get_Value().toLowerCase() == "true"){
                         masterBar.IsRepeatStart = true;
                     }
-                        if (e.attributes.getNamedItem("end").nodeValue.toLowerCase() == "true" && e.attributes.getNamedItem("count").nodeValue != null){
-                        masterBar.RepeatCount = AlphaTab.Platform.Std.ParseInt(e.attributes.getNamedItem("count").nodeValue);
+                        if (c.get_Attributes().get_Item$$String("end").get_Value().toLowerCase() == "true" && c.get_Attributes().get_Item$$String("count").get_Value() != null){
+                        masterBar.RepeatCount = AlphaTab.Platform.Std.ParseInt(c.get_Attributes().get_Item$$String("count").get_Value());
                     }
                         break;
                     case "AlternateEndings":
@@ -5190,8 +5248,8 @@ AlphaTab.Importer.GpxParser.prototype = {
     },
     ParseBars: function (node){
         AlphaTab.Platform.Std.IterateChildren(node, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "Bar":
                         this.ParseBar(c);
                         break;
@@ -5201,10 +5259,10 @@ AlphaTab.Importer.GpxParser.prototype = {
     },
     ParseBar: function (node){
         var bar = new AlphaTab.Model.Bar();
-        var barId = node.attributes.getNamedItem("id").nodeValue;
+        var barId = node.get_Attributes().get_Item$$String("id").get_Value();
         AlphaTab.Platform.Std.IterateChildren(node, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "Voices":
                         this._voicesOfBar[barId] = this.GetValue(c).split(" ");
                         break;
@@ -5234,8 +5292,8 @@ AlphaTab.Importer.GpxParser.prototype = {
     },
     ParseVoices: function (node){
         AlphaTab.Platform.Std.IterateChildren(node, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "Voice":
                         this.ParseVoice(c);
                         break;
@@ -5245,10 +5303,10 @@ AlphaTab.Importer.GpxParser.prototype = {
     },
     ParseVoice: function (node){
         var voice = new AlphaTab.Model.Voice();
-        var voiceId = node.attributes.getNamedItem("id").nodeValue;
+        var voiceId = node.get_Attributes().get_Item$$String("id").get_Value();
         AlphaTab.Platform.Std.IterateChildren(node, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "Beats":
                         this._beatsOfVoice[voiceId] = this.GetValue(c).split(" ");
                         break;
@@ -5259,8 +5317,8 @@ AlphaTab.Importer.GpxParser.prototype = {
     },
     ParseBeats: function (node){
         AlphaTab.Platform.Std.IterateChildren(node, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "Beat":
                         this.ParseBeat(c);
                         break;
@@ -5270,16 +5328,15 @@ AlphaTab.Importer.GpxParser.prototype = {
     },
     ParseBeat: function (node){
         var beat = new AlphaTab.Model.Beat();
-        var beatId = node.attributes.getNamedItem("id").nodeValue;
+        var beatId = node.get_Attributes().get_Item$$String("id").get_Value();
         AlphaTab.Platform.Std.IterateChildren(node, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                var e = c;
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "Notes":
                         this._notesOfBeat[beatId] = this.GetValue(c).split(" ");
                         break;
                     case "Rhythm":
-                        this._rhythmOfBeat[beatId] = e.attributes.getNamedItem("ref").nodeValue;
+                        this._rhythmOfBeat[beatId] = c.get_Attributes().get_Item$$String("ref").get_Value();
                         break;
                     case "Fadding":
                         if (this.GetValue(c) == "FadeIn"){
@@ -5377,11 +5434,10 @@ AlphaTab.Importer.GpxParser.prototype = {
         var whammyMiddleOffset2 = null;
         var whammyDestination = null;
         AlphaTab.Platform.Std.IterateChildren(node, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                var e = c;
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "Property":
-                        var name = e.attributes.getNamedItem("name").nodeValue;
+                        var name = c.get_Attributes().get_Item$$String("name").get_Value();
                         switch (name){
                             case "Brush":
                             if (this.GetValue(this.FindChildElement(c, "Direction")) == "Up"){
@@ -5477,8 +5533,8 @@ AlphaTab.Importer.GpxParser.prototype = {
     },
     ParseNotes: function (node){
         AlphaTab.Platform.Std.IterateChildren(node, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "Note":
                         this.ParseNote(c);
                         break;
@@ -5488,11 +5544,10 @@ AlphaTab.Importer.GpxParser.prototype = {
     },
     ParseNote: function (node){
         var note = new AlphaTab.Model.Note();
-        var noteId = node.attributes.getNamedItem("id").nodeValue;
+        var noteId = node.get_Attributes().get_Item$$String("id").get_Value();
         AlphaTab.Platform.Std.IterateChildren(node, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                var e = c;
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "Properties":
                         this.ParseNoteProperties(c, note, noteId);
                         break;
@@ -5518,10 +5573,10 @@ AlphaTab.Importer.GpxParser.prototype = {
                         note.Accentuated = AlphaTab.Model.AccentuationType.Normal;
                         break;
                     case "Tie":
-                        if (e.attributes.getNamedItem("origin").nodeValue.toLowerCase() == "true"){
+                        if (c.get_Attributes().get_Item$$String("origin").get_Value().toLowerCase() == "true"){
                         note.IsTieOrigin = true;
                     }
-                        if (e.attributes.getNamedItem("destination").nodeValue.toLowerCase() == "true"){
+                        if (c.get_Attributes().get_Item$$String("destination").get_Value().toLowerCase() == "true"){
                         note.IsTieDestination = true;
                     }
                         break;
@@ -5548,11 +5603,10 @@ AlphaTab.Importer.GpxParser.prototype = {
         var bendMiddleOffset2 = null;
         var bendDestination = null;
         AlphaTab.Platform.Std.IterateChildren(node, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                var e = c;
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "Property":
-                        var name = e.attributes.getNamedItem("name").nodeValue;
+                        var name = c.get_Attributes().get_Item$$String("name").get_Value();
                         switch (name){
                             case "String":
                             note.String = AlphaTab.Platform.Std.ParseInt(this.GetValue(this.FindChildElement(c, "String"))) + 1;
@@ -5687,8 +5741,8 @@ AlphaTab.Importer.GpxParser.prototype = {
     },
     ParseRhythms: function (node){
         AlphaTab.Platform.Std.IterateChildren(node, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "Rhythm":
                         this.ParseRhythm(c);
                         break;
@@ -5698,11 +5752,10 @@ AlphaTab.Importer.GpxParser.prototype = {
     },
     ParseRhythm: function (node){
         var rhythm = new AlphaTab.Importer.GpxRhythm();
-        var rhythmId = node.attributes.getNamedItem("id").nodeValue;
+        var rhythmId = node.get_Attributes().get_Item$$String("id").get_Value();
         AlphaTab.Platform.Std.IterateChildren(node, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                var e = c;
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "NoteValue":
                         switch (this.GetValue(c)){
                             case "Whole":
@@ -5729,11 +5782,11 @@ AlphaTab.Importer.GpxParser.prototype = {
                         }
                         break;
                     case "PrimaryTuplet":
-                        rhythm.TupletNumerator = AlphaTab.Platform.Std.ParseInt(e.attributes.getNamedItem("num").nodeValue);
-                        rhythm.TupletDenominator = AlphaTab.Platform.Std.ParseInt(e.attributes.getNamedItem("den").nodeValue);
+                        rhythm.TupletNumerator = AlphaTab.Platform.Std.ParseInt(c.get_Attributes().get_Item$$String("num").get_Value());
+                        rhythm.TupletDenominator = AlphaTab.Platform.Std.ParseInt(c.get_Attributes().get_Item$$String("den").get_Value());
                         break;
                     case "AugmentationDot":
-                        rhythm.Dots = AlphaTab.Platform.Std.ParseInt(e.attributes.getNamedItem("count").nodeValue);
+                        rhythm.Dots = AlphaTab.Platform.Std.ParseInt(c.get_Attributes().get_Item$$String("count").get_Value());
                         break;
                 }
             }
@@ -5890,10 +5943,10 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
         return this._score;
     },
     ParseDom: function (dom){
-        var root = dom.documentElement;
+        var root = dom.get_DocumentElement();
         if (root == null)
             return;
-        switch (root.localName){
+        switch (root.get_LocalName()){
             case "score-partwise":
                 this.ParsePartwise(root);
                 break;
@@ -5904,40 +5957,38 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
         }
     },
     ParsePartwise: function (element){
-        var version = element.getAttribute("version");
+        var version = element.GetAttribute("version");
         if (!((version==null)||(version.length==0)) && version != "2.0"){
             throw $CreateException(new AlphaTab.Importer.UnsupportedFormatException(), new Error());
         }
         AlphaTab.Platform.Std.IterateChildren(element, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                var e = c;
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "movement-title":
-                        this._score.Title = AlphaTab.Platform.Std.GetNodeValue(c.firstChild);
+                        this._score.Title = AlphaTab.Platform.Std.GetNodeValue(c.get_FirstChild());
                         break;
                     case "identification":
-                        this.ParseIdentification(e);
+                        this.ParseIdentification(c);
                         break;
                     case "part-list":
-                        this.ParsePartList(e);
+                        this.ParsePartList(c);
                         break;
                     case "part":
-                        this.ParsePart(e);
+                        this.ParsePart(c);
                         break;
                 }
             }
         }));
     },
     ParsePart: function (element){
-        var id = element.getAttribute("id");
+        var id = element.GetAttribute("id");
         var track = this._trackById[id];
         var isFirstMeasure = true;
         AlphaTab.Platform.Std.IterateChildren(element, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                var e = c;
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "measure":
-                        this.ParseMeasure(e, track, isFirstMeasure);
+                        this.ParseMeasure(c, track, isFirstMeasure);
                         isFirstMeasure = false;
                         break;
                 }
@@ -5947,11 +5998,11 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
     ParseMeasure: function (element, track, isFirstMeasure){
         var barIndex = 0;
         if (isFirstMeasure){
-            this._trackFirstMeasureNumber = AlphaTab.Platform.Std.ParseInt(element.getAttribute("number"));
+            this._trackFirstMeasureNumber = AlphaTab.Platform.Std.ParseInt(element.GetAttribute("number"));
             barIndex = 0;
         }
         else {
-            barIndex = AlphaTab.Platform.Std.ParseInt(element.getAttribute("number")) - this._trackFirstMeasureNumber;
+            barIndex = AlphaTab.Platform.Std.ParseInt(element.GetAttribute("number")) - this._trackFirstMeasureNumber;
         }
         // create empty bars to the current index
         var bar = null;
@@ -5974,20 +6025,19 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
         var chord = false;
         var isFirstBeat = true;
         AlphaTab.Platform.Std.IterateChildren(element, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                var e = c;
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "note":
-                        chord = this.ParseNoteBeat(e, track, bar, chord, isFirstBeat);
+                        chord = this.ParseNoteBeat(c, track, bar, chord, isFirstBeat);
                         isFirstBeat = false;
                         break;
                     case "forward":
                         break;
                     case "direction":
-                        this.ParseDirection(e, masterBar);
+                        this.ParseDirection(c, masterBar);
                         break;
                     case "attributes":
-                        this.ParseAttributes(e, bar, masterBar);
+                        this.ParseAttributes(c, bar, masterBar);
                         break;
                     case "harmony":
                         break;
@@ -6001,9 +6051,9 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
     },
     ParseNoteBeat: function (element, track, bar, chord, isFirstBeat){
         var voiceIndex = 0;
-        var voiceNodes = element.getElementsByTagName("voice");
-        if (voiceNodes.length > 0){
-            voiceIndex = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(voiceNodes.item(0))) - 1;
+        var voiceNodes = element.GetElementsByTagName("voice");
+        if (voiceNodes.get_Count() > 0){
+            voiceIndex = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(voiceNodes.get_Item$$Int32(0))) - 1;
         }
         var beat;
         var voice = this.GetOrCreateVoice(bar, voiceIndex);
@@ -6018,25 +6068,24 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
         beat.AddNote(note);
         beat.IsEmpty = false;
         AlphaTab.Platform.Std.IterateChildren(element, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                var e = c;
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "grace":
                         beat.GraceType = AlphaTab.Model.GraceType.BeforeBeat;
                         beat.Duration = AlphaTab.Model.Duration.ThirtySecond;
                         break;
                     case "duration":
-                        beat.Duration = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(e));
+                        beat.Duration = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(c));
                         break;
                     case "tie":
-                        AlphaTab.Importer.MusicXml2Importer.ParseTied(e, note);
+                        AlphaTab.Importer.MusicXml2Importer.ParseTied(c, note);
                         break;
                     case "cue":
                         break;
                     case "instrument":
                         break;
                     case "type":
-                        switch (AlphaTab.Platform.Std.GetNodeValue(e)){
+                        switch (AlphaTab.Platform.Std.GetNodeValue(c)){
                             case "64th":
                             beat.Duration = AlphaTab.Model.Duration.SixtyFourth;
                             break;
@@ -6064,22 +6113,22 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
                         note.IsStaccato = true;
                         break;
                     case "accidental":
-                        this.ParseAccidental(e, note);
+                        this.ParseAccidental(c, note);
                         break;
                     case "time-modification":
-                        this.ParseTimeModification(e, beat);
+                        this.ParseTimeModification(c, beat);
                         break;
                     case "stem":
                         break;
                     case "notehead":
-                        if (e.getAttribute("parentheses") == "yes"){
+                        if (c.GetAttribute("parentheses") == "yes"){
                         note.IsGhost = true;
                     }
                         break;
                     case "beam":
                         break;
                     case "notations":
-                        this.ParseNotations(e, beat, note);
+                        this.ParseNotations(c, beat, note);
                         break;
                     case "lyric":
                         break;
@@ -6087,7 +6136,7 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
                         chord = true;
                         break;
                     case "pitch":
-                        this.ParsePitch(e, track, beat, note);
+                        this.ParsePitch(c, track, beat, note);
                         break;
                     case "unpitched":
                         note.String = 0;
@@ -6116,19 +6165,18 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
     },
     ParseNotations: function (element, beat, note){
         AlphaTab.Platform.Std.IterateChildren(element, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                var e = c;
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "tied":
-                        AlphaTab.Importer.MusicXml2Importer.ParseTied(e, note);
+                        AlphaTab.Importer.MusicXml2Importer.ParseTied(c, note);
                         break;
                     case "slide":
-                        if (e.getAttribute("type") == "start"){
+                        if (c.GetAttribute("type") == "start"){
                         note.SlideType = AlphaTab.Model.SlideType.Legato;
                     }
                         break;
                     case "dynamics":
-                        this.ParseDynamics(e, beat);
+                        this.ParseDynamics(c, beat);
                         break;
                 }
             }
@@ -6136,8 +6184,8 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
     },
     ParseDynamics: function (element, beat){
         AlphaTab.Platform.Std.IterateChildren(element, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "p":
                         beat.Dynamic = AlphaTab.Model.DynamicValue.P;
                         break;
@@ -6169,14 +6217,13 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
     ParseTimeModification: function (element, beat){
         var actualNodes = 0;
         AlphaTab.Platform.Std.IterateChildren(element, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                var e = c;
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "actual-notes":
-                        beat.TupletNumerator = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(e));
+                        beat.TupletNumerator = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(c));
                         break;
                     case "normal-notes":
-                        beat.TupletDenominator = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(e));
+                        beat.TupletDenominator = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(c));
                         break;
                 }
             }
@@ -6187,17 +6234,16 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
         var semitones = 0;
         var octave = 0;
         AlphaTab.Platform.Std.IterateChildren(element, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                var e = c;
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "step":
-                        step = AlphaTab.Platform.Std.GetNodeValue(e);
+                        step = AlphaTab.Platform.Std.GetNodeValue(c);
                         break;
                     case "alter":
-                        semitones = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(e));
+                        semitones = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(c));
                         break;
                     case "octave":
-                        octave = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(e));
+                        octave = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(c));
                         break;
                 }
             }
@@ -6248,14 +6294,13 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
     },
     ParseDirection: function (element, masterBar){
         AlphaTab.Platform.Std.IterateChildren(element, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                var e = c;
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "sound":
                         var tempoAutomation = new AlphaTab.Model.Automation();
                         tempoAutomation.IsLinear = true;
                         tempoAutomation.Type = AlphaTab.Model.AutomationType.Tempo;
-                        tempoAutomation.Value = AlphaTab.Platform.Std.ParseInt(e.getAttribute("tempo"));
+                        tempoAutomation.Value = AlphaTab.Platform.Std.ParseInt(c.GetAttribute("tempo"));
                         masterBar.TempoAutomation = tempoAutomation;
                         break;
                 }
@@ -6264,17 +6309,16 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
     },
     ParseAttributes: function (element, bar, masterBar){
         AlphaTab.Platform.Std.IterateChildren(element, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                var e = c;
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "key":
-                        this.ParseKey(e, masterBar);
+                        this.ParseKey(c, masterBar);
                         break;
                     case "time":
-                        this.ParseTime(e, masterBar);
+                        this.ParseTime(c, masterBar);
                         break;
                     case "clef":
-                        this.ParseClef(e, bar);
+                        this.ParseClef(c, bar);
                         break;
                 }
             }
@@ -6284,14 +6328,13 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
         var sign = null;
         var line = null;
         AlphaTab.Platform.Std.IterateChildren(element, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                var e = c;
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "sign":
-                        sign = AlphaTab.Platform.Std.GetNodeValue(e);
+                        sign = AlphaTab.Platform.Std.GetNodeValue(c);
                         break;
                     case "line":
-                        line = AlphaTab.Platform.Std.GetNodeValue(e);
+                        line = AlphaTab.Platform.Std.GetNodeValue(c);
                         break;
                 }
             }
@@ -6314,14 +6357,13 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
     },
     ParseTime: function (element, masterBar){
         AlphaTab.Platform.Std.IterateChildren(element, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                var e = c;
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "beats":
-                        masterBar.TimeSignatureNumerator = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(e));
+                        masterBar.TimeSignatureNumerator = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(c));
                         break;
                     case "beats-type":
-                        masterBar.TimeSignatureDenominator = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(e));
+                        masterBar.TimeSignatureDenominator = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(c));
                         break;
                 }
             }
@@ -6332,17 +6374,16 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
         var keyStep = -2147483648;
         var keyAlter = -2147483648;
         AlphaTab.Platform.Std.IterateChildren(element, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                var e = c;
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "fifths":
-                        fifths = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(e));
+                        fifths = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(c));
                         break;
                     case "key-step":
-                        keyStep = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(e));
+                        keyStep = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(c));
                         break;
                     case "key-alter":
-                        keyAlter = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(e));
+                        keyAlter = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(c));
                         break;
                 }
             }
@@ -6367,16 +6408,15 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
     },
     ParseIdentification: function (element){
         AlphaTab.Platform.Std.IterateChildren(element, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                var e = c;
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "creator":
-                        if (e.getAttribute("type") == "composer"){
-                        this._score.Music = AlphaTab.Platform.Std.GetNodeValue(c.firstChild);
+                        if (c.GetAttribute("type") == "composer"){
+                        this._score.Music = AlphaTab.Platform.Std.GetNodeValue(c.get_FirstChild());
                     }
                         break;
                     case "rights":
-                        this._score.Artist = AlphaTab.Platform.Std.GetNodeValue(c.firstChild);
+                        this._score.Artist = AlphaTab.Platform.Std.GetNodeValue(c.get_FirstChild());
                         break;
                 }
             }
@@ -6384,33 +6424,31 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
     },
     ParsePartList: function (element){
         AlphaTab.Platform.Std.IterateChildren(element, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                var e = c;
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "score-part":
-                        this.ParseScorePart(e);
+                        this.ParseScorePart(c);
                         break;
                 }
             }
         }));
     },
     ParseScorePart: function (element){
-        var id = element.getAttribute("id");
+        var id = element.GetAttribute("id");
         var track = new AlphaTab.Model.Track();
         this._trackById[id] = track;
         this._score.AddTrack(track);
         AlphaTab.Platform.Std.IterateChildren(element, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                var e = c;
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "part-name":
-                        track.Name = AlphaTab.Platform.Std.GetNodeValue(c.firstChild);
+                        track.Name = AlphaTab.Platform.Std.GetNodeValue(c.get_FirstChild());
                         break;
                     case "part-abbreviation":
-                        track.ShortName = AlphaTab.Platform.Std.GetNodeValue(c.firstChild);
+                        track.ShortName = AlphaTab.Platform.Std.GetNodeValue(c.get_FirstChild());
                         break;
                     case "midi-instrument":
-                        this.ParseMidiInstrument(e, track);
+                        this.ParseMidiInstrument(c, track);
                         break;
                 }
             }
@@ -6421,17 +6459,16 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
     },
     ParseMidiInstrument: function (element, track){
         AlphaTab.Platform.Std.IterateChildren(element, $CreateAnonymousDelegate(this, function (c){
-            if (c.nodeType == Node.ELEMENT_NODE){
-                var e = c;
-                switch (c.localName){
+            if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.get_LocalName()){
                     case "midi-channel":
-                        track.PlaybackInfo.PrimaryChannel = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(c.firstChild));
+                        track.PlaybackInfo.PrimaryChannel = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(c.get_FirstChild()));
                         break;
                     case "midi-program":
-                        track.PlaybackInfo.Program = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(c.firstChild));
+                        track.PlaybackInfo.Program = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(c.get_FirstChild()));
                         break;
                     case "midi-volume":
-                        track.PlaybackInfo.Volume = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(c.firstChild));
+                        track.PlaybackInfo.Volume = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(c.get_FirstChild()));
                         break;
                 }
             }
@@ -6439,7 +6476,7 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
     }
 };
 AlphaTab.Importer.MusicXml2Importer.ParseTied = function (element, note){
-    if (element.getAttribute("type") == "start"){
+    if (element.GetAttribute("type") == "start"){
         note.IsTieOrigin = true;
     }
     else {
@@ -14704,6 +14741,26 @@ AlphaTab.Util.Lazy.prototype = {
         }
         return this._value;
     }
+};
+AlphaTab.Xml.XmlNodeType = {
+    None: 0,
+    Element: 1,
+    Attribute: 2,
+    Text: 3,
+    CDATA: 4,
+    EntityReference: 5,
+    Entity: 6,
+    ProcessingInstruction: 7,
+    Comment: 8,
+    Document: 9,
+    DocumentType: 10,
+    DocumentFragment: 11,
+    Notation: 12,
+    Whitespace: 13,
+    SignificantWhitespace: 14,
+    EndElement: 15,
+    EndEntity: 16,
+    XmlDeclaration: 17
 };
 
 for(var i = 0; i < $StaticConstructors.length; i++) {

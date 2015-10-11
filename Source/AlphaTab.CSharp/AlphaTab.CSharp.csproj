@@ -60,6 +60,10 @@
     <Compile Include="Platform\CSharp\Wpf\AlphaTab.cs" />
     <Compile Include="Platform\Std.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Xml\XmlAttributeCollectionWrapper.cs" />
+    <Compile Include="Xml\XmlDocumentWrapper.cs" />
+    <Compile Include="Xml\XmlNodeCollectionWrapper.cs" />
+    <Compile Include="Xml\XmlNodeWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Platform\CSharp\Wpf\Templates.xaml">

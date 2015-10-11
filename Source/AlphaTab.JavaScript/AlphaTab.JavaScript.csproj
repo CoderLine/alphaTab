@@ -48,13 +48,10 @@
     <Compile Include="Platform\Std.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="Xml\XmlAttribute.cs" />
-    <Compile Include="Xml\XmlAttributeCollection.cs" />
-    <Compile Include="Xml\XmlDocument.cs" />
-    <Compile Include="Xml\XmlElement.cs" />
-    <Compile Include="Xml\XmlNode.cs" />
-    <Compile Include="Xml\XmlNodeList.cs" />
-    <Compile Include="Xml\XmlNodeType.cs" />
+    <Compile Include="Xml\XmlAttributeCollectionWrapper.cs" />
+    <Compile Include="Xml\XmlDocumentWrapper.cs" />
+    <Compile Include="Xml\XmlNodeCollectionWrapper.cs" />
+    <Compile Include="Xml\XmlNodeWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />

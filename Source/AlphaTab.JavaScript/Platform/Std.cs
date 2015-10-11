@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text.RegularExpressions;
-using System.Xml;
 using AlphaTab.Collections;
 using AlphaTab.IO;
+using AlphaTab.Xml;
 using SharpKit.Html;
 using SharpKit.JavaScript;
 
@@ -50,12 +47,12 @@ namespace AlphaTab.Platform
         {
         }
 
-        private static Func<string, XmlDocument> _parseXml;
-        public static XmlDocument LoadXml(string xml)
+        private static Func<string, Document> _parseXml;
+        public static IXmlDocument LoadXml(string xml)
         {
             if (_parseXml == null)
             {
-                Func<string, XmlDocument> parseXml = null;
+                Func<string, Document> parseXml = null;
                 JsContext.JsCode(@"
                 if (typeof window.DOMParser != ""undefined"")
                 {
@@ -81,29 +78,7 @@ namespace AlphaTab.Platform
                 _parseXml = parseXml;
             }
 
-            return _parseXml(xml);
-        }
-
-        public static string GetNodeValue(XmlNode n)
-        {
-            if (n.NodeType == XmlNodeType.Element || n.NodeType == XmlNodeType.Document)
-            {
-                var txt = new StringBuilder();
-                for (int i = 0; i < n.ChildNodes.Count; i++)
-                {
-                    txt.Append(GetNodeValue(n.ChildNodes.Item(i)));
-                }
-                return txt.ToString().Trim();
-            }
-            return n.Value;
-        }
-
-        public static void IterateChildren(this XmlNode n, Action<XmlNode> action)
-        {
-            for (int i = 0; i < n.ChildNodes.Count; i++)
-            {
-                action(n.ChildNodes.Item(i));
-            }
+            return new XmlDocumentWrapper(_parseXml(xml));
         }
 
         public static sbyte ReadSignedByte(this IReadable readable)

@@ -16,6 +16,11 @@
  * License along with this library.
  */
 
+using System;
+using System.IO;
+using AlphaTab.Collections;
+using AlphaTab.Xml;
+
 namespace AlphaTab.Platform
 {
     public static partial class Std
@@ -48,5 +53,28 @@ namespace AlphaTab.Platform
             } while (n > 0);
             return s;
         }
+
+        public static string GetNodeValue(IXmlNode n)
+        {
+            if (n.NodeType == XmlNodeType.Element || n.NodeType == XmlNodeType.Document)
+            {
+                var txt = new StringBuilder();
+                n.IterateChildren(c =>
+                {
+                    txt.Append(GetNodeValue(c));
+                });
+                return txt.ToString().Trim();
+            }
+            return n.Value;
+        }
+
+        public static void IterateChildren(this IXmlNode n, Action<IXmlNode> action)
+        {
+            for (int i = 0; i < n.ChildNodes.Count; i++)
+            {
+                action(n.ChildNodes[i]);
+            }
+        }
+
     }
 }

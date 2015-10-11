@@ -202,5 +202,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\TupletHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Settings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Util\Lazy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Xml\IXmlAttributeCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Xml\IXmlDocument.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Xml\IXmlNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Xml\IXmlNodeCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Xml\XmlNodeType.cs" />
   </ItemGroup>
 </Project>
