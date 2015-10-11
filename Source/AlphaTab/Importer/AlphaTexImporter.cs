@@ -58,8 +58,12 @@ namespace AlphaTab.Importer
                 _score.Finish();
                 return _score;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                if (Std.IsException<AlphaTexException>(e))
+                {
+                    throw e;
+                }
                 throw new UnsupportedFormatException();
             }
         }
@@ -525,7 +529,7 @@ namespace AlphaTab.Importer
                     NewSy();
                     if (_sy == AlphaTexSymbols.Number)
                     {
-                        _score.Tempo = (int) _syData;
+                        _score.Tempo = (int)_syData;
                     }
                     else
                     {
@@ -539,7 +543,7 @@ namespace AlphaTab.Importer
                     NewSy();
                     if (_sy == AlphaTexSymbols.Number)
                     {
-                        _track.Capo = (int) _syData;
+                        _track.Capo = (int)_syData;
                     }
                     else
                     {
@@ -650,6 +654,13 @@ namespace AlphaTab.Importer
             {
                 Beat(voice);
             }
+
+            if (voice.Beats.Count == 0)
+            {
+                var emptyBeat = new Beat();
+                emptyBeat.IsEmpty = true;
+                voice.AddBeat(emptyBeat);
+            }
         }
 
         private void Beat(Voice voice)
@@ -663,7 +674,7 @@ namespace AlphaTab.Importer
                     Error("duration", AlphaTexSymbols.Number);
                 }
 
-                var duration = (int) _syData;
+                var duration = (int)_syData;
                 switch (duration)
                 {
                     case 1:
@@ -686,6 +697,11 @@ namespace AlphaTab.Importer
 
             var beat = new Beat();
             voice.AddBeat(beat);
+
+            if (voice.Bar.MasterBar.TempoAutomation != null && voice.Beats.Count == 1)
+            {
+                beat.Automations.Add(voice.Bar.MasterBar.TempoAutomation);
+            }
 
             // notes
             if (_sy == AlphaTexSymbols.LParensis)
@@ -1284,16 +1300,19 @@ namespace AlphaTab.Importer
                     }
                     bar.Clef = ParseClef(_syData.ToString());
                 }
-                // TODO: Tempo automation on beat
-                // else if (_syData == "tempo") 
-                // {
-                //     NewSy();
-                //     if (_sy != AlphaTexSymbols.Number) 
-                //     {
-                //         Error("tempo", AlphaTexSymbols.Number);
-                //     }
-                //     header.tempo.value = _syData;
-                // }
+                else if (_syData == "tempo")
+                {
+                    NewSy();
+                    if (_sy != AlphaTexSymbols.Number)
+                    {
+                        Error("tempo", AlphaTexSymbols.Number);
+                    }
+                    var tempoAutomation = new Automation();
+                    tempoAutomation.IsLinear = true;
+                    tempoAutomation.Type = AutomationType.Tempo;
+                    tempoAutomation.Value = (float)_syData;
+                    master.TempoAutomation = tempoAutomation;
+                }
                 else
                 {
                     Error("measure-effects", AlphaTexSymbols.String, false);

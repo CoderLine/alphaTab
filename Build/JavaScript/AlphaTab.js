@@ -2587,7 +2587,10 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
             this._score.Finish();
             return this._score;
         }
-        catch($$e2){
+        catch(e){
+            if ((e.exception instanceof AlphaTab.Importer.AlphaTexException)){
+                throw $CreateException(e, new Error());
+            }
             throw $CreateException(new AlphaTab.Importer.UnsupportedFormatException(), new Error());
         }
     },
@@ -3003,6 +3006,11 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
         while (this._sy != AlphaTab.Importer.AlphaTexSymbols.Pipe && this._sy != AlphaTab.Importer.AlphaTexSymbols.Eof){
             this.Beat(voice);
         }
+        if (voice.Beats.length == 0){
+            var emptyBeat = new AlphaTab.Model.Beat();
+            emptyBeat.IsEmpty = true;
+            voice.AddBeat(emptyBeat);
+        }
     },
     Beat: function (voice){
         // duration specifier?
@@ -3031,6 +3039,9 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
         }
         var beat = new AlphaTab.Model.Beat();
         voice.AddBeat(beat);
+        if (voice.Bar.get_MasterBar().TempoAutomation != null && voice.Beats.length == 1){
+            beat.Automations.push(voice.Bar.get_MasterBar().TempoAutomation);
+        }
         // notes
         if (this._sy == AlphaTab.Importer.AlphaTexSymbols.LParensis){
             this.NewSy();
@@ -3501,6 +3512,17 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                     this.Error("clef", AlphaTab.Importer.AlphaTexSymbols.String, true);
                 }
                 bar.Clef = this.ParseClef((this._syData).toString());
+            }
+            else if ((this._syData) == "tempo"){
+                this.NewSy();
+                if (this._sy != AlphaTab.Importer.AlphaTexSymbols.Number){
+                    this.Error("tempo", AlphaTab.Importer.AlphaTexSymbols.Number, true);
+                }
+                var tempoAutomation = new AlphaTab.Model.Automation();
+                tempoAutomation.IsLinear = true;
+                tempoAutomation.Type = AlphaTab.Model.AutomationType.Tempo;
+                tempoAutomation.Value = (this._syData);
+                master.TempoAutomation = tempoAutomation;
             }
             else {
                 this.Error("measure-effects", AlphaTab.Importer.AlphaTexSymbols.String, false);
@@ -4722,7 +4744,7 @@ AlphaTab.Importer.GpxFileSystem.prototype = {
                 }
             }
         }
-        catch($$e3){
+        catch($$e2){
         }
         buffer = uncompressed.GetBuffer();
         var resultOffset = skipHeader ? 4 : 0;
@@ -6589,7 +6611,7 @@ AlphaTab.IO.BitReader.prototype = {
                 all.WriteByte(this.ReadByte());
             }
         }
-        catch($$e4){
+        catch($$e3){
         }
         return all.ToArray();
     }
@@ -11876,7 +11898,7 @@ AlphaTab.Rendering.Glyphs.TempoGlyph.prototype = {
         var res = this.Renderer.get_Resources();
         canvas.set_Font(res.MarkerFont);
         canvas.FillMusicFontSymbol(cx + this.X, cy + this.Y, 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.Tempo);
-        canvas.FillText("" + this._tempo, cx + this.X + (30 * this.get_Scale()), cy + this.X + (7 * this.get_Scale()));
+        canvas.FillText("" + this._tempo, cx + this.X + (20 * this.get_Scale()), cy + this.X + (7 * this.get_Scale()));
     }
 };
 $Inherit(AlphaTab.Rendering.Glyphs.TempoGlyph, AlphaTab.Rendering.Glyphs.EffectGlyph);
