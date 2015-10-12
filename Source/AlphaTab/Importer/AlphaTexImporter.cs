@@ -759,10 +759,7 @@ namespace AlphaTab.Importer
 
                 NewSy();
             }
-            else
-            {
-                beat.Duration = _currentDuration;
-            }
+            beat.Duration = _currentDuration;
 
             // beat multiplier (repeat beat n times)
             var beatRepeat = 1;

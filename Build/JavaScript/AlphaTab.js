@@ -3084,9 +3084,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
             }
             this.NewSy();
         }
-        else {
-            beat.Duration = this._currentDuration;
-        }
+        beat.Duration = this._currentDuration;
         // beat multiplier (repeat beat n times)
         var beatRepeat = 1;
         if (this._sy == AlphaTab.Importer.AlphaTexSymbols.Multiply){
