@@ -1,6 +1,5 @@
 {
   "name": "AlphaTab",
-  "version": "0.4.0",
   "homepage": "http://www.alphatab.net",
   "authors": [
     "Danielku15 <danielku15@coderline.net>"
@@ -14,7 +13,7 @@
   "license": "LGPL-3.0+",
   "repository": {
       "type": "git",
-      "url": "git@github.com:CoderLine/alphaTab.git"
+      "url": "git://github.com/CoderLine/alphaTab.git"
     }
   "moduleType": [
     "globals"
@@ -34,7 +33,7 @@
     "SharpKit",
     "Source",
     "packages",
-    "tools",
+    "Tools",
     ".gitattributes",
     ".gitignore",
     ".gitmodules",
