@@ -8,13 +8,13 @@
   "main": [
     "Build/JavaScript/AlphaTab.js",
     "Build/JavaScript/AlphaTab.worker.js",
-    "Build/JavaScript/jquery.alphaTab.js",
+    "Build/JavaScript/jquery.alphaTab.js"
   ],
   "license": "LGPL-3.0+",
   "repository": {
       "type": "git",
       "url": "git://github.com/CoderLine/alphaTab.git"
-    }
+  },
   "moduleType": [
     "globals"
   ],
