@@ -69,19 +69,19 @@ namespace AlphaTab.Audio.Generator
             while (!controller.Finished)
             {
                 var index = controller.Index;
-                controller.Process();
-
+                var bar = _score.MasterBars[index];
+                var currentTick = controller.CurrentTick;
+                controller.ProcessCurrent();
                 if (controller.ShouldPlay)
                 {
-                    GenerateMasterBar(_score.MasterBars[index], previousMasterBar, controller.RepeatMove);
-
+                    GenerateMasterBar(bar, previousMasterBar, currentTick);
                     for (int i = 0, j = _score.Tracks.Count; i < j; i++)
                     {
-                        GenerateBar(_score.Tracks[i].Bars[index], controller.RepeatMove);
+                        GenerateBar(_score.Tracks[i].Bars[index], currentTick);
                     }
                 }
-
-                previousMasterBar = _score.MasterBars[index];
+                controller.MoveNext();
+                previousMasterBar = bar;
             }
         }
 
@@ -117,32 +117,32 @@ namespace AlphaTab.Audio.Generator
 
         #region MasterBar
 
-        private void GenerateMasterBar(MasterBar masterBar, MasterBar previousMasterBar, int startMove)
+        private void GenerateMasterBar(MasterBar masterBar, MasterBar previousMasterBar, int currentTick)
         {
             // time signature
             if (previousMasterBar == null ||
                previousMasterBar.TimeSignatureDenominator != masterBar.TimeSignatureDenominator ||
                previousMasterBar.TimeSignatureNumerator != masterBar.TimeSignatureNumerator)
             {
-                _handler.AddTimeSignature(masterBar.Start + startMove, masterBar.TimeSignatureNumerator, masterBar.TimeSignatureDenominator);
+                _handler.AddTimeSignature(currentTick, masterBar.TimeSignatureNumerator, masterBar.TimeSignatureDenominator);
             }
 
             // tempo
             if (previousMasterBar == null)
             {
-                _handler.AddTempo(masterBar.Start + startMove, masterBar.Score.Tempo);
+                _handler.AddTempo(currentTick, masterBar.Score.Tempo);
                 _currentTempo = masterBar.Score.Tempo;
             }
             else if (masterBar.TempoAutomation != null)
             {
-                _handler.AddTempo(masterBar.Start + startMove, (int)masterBar.TempoAutomation.Value);
+                _handler.AddTempo(currentTick, (int)masterBar.TempoAutomation.Value);
                 _currentTempo = (int)(masterBar.TempoAutomation.Value);
             }
 
             // metronome
             if (GenerateMetronome)
             {
-                var start = masterBar.Start + startMove;
+                var start = currentTick;
                 var length = MidiUtils.ValueToTicks(masterBar.TimeSignatureDenominator);
                 for (int i = 0; i < masterBar.TimeSignatureNumerator; i++)
                 {
@@ -156,38 +156,38 @@ namespace AlphaTab.Audio.Generator
 
         #region Bar -> Voice -> Beat -> Automations/Rests/Notes
 
-        public void GenerateBar(Bar bar, int startMove)
+        public void GenerateBar(Bar bar, int barStartTick)
         {
             for (int i = 0, j = bar.Voices.Count; i < j; i++)
             {
-                GenerateVoice(bar.Voices[i], startMove);
+                GenerateVoice(bar.Voices[i], barStartTick);
             }
         }
 
-        private void GenerateVoice(Voice voice, int startMove)
+        private void GenerateVoice(Voice voice, int barStartTick)
         {
             for (int i = 0, j = voice.Beats.Count; i < j; i++)
             {
-                GenerateBeat(voice.Beats[i], startMove);
+                GenerateBeat(voice.Beats[i], barStartTick);
             }
         }
 
-        private void GenerateBeat(Beat beat, int startMove)
+        private void GenerateBeat(Beat beat, int barStartTick)
         {
             // TODO: take care of tripletfeel 
-            var start = beat.Start;
+            var beatStart = beat.Start;
             var duration = beat.CalculateDuration();
 
             var track = beat.Voice.Bar.Track;
 
             for (int i = 0, j = beat.Automations.Count; i < j; i++)
             {
-                GenerateAutomation(beat, beat.Automations[i], startMove);
+                GenerateAutomation(beat, beat.Automations[i], barStartTick);
             }
 
             if (beat.IsRest)
             {
-                _handler.AddRest(track.Index, start + startMove, track.PlaybackInfo.PrimaryChannel);
+                _handler.AddRest(track.Index, barStartTick + beatStart, track.PlaybackInfo.PrimaryChannel);
             }
             else
             {
@@ -198,16 +198,16 @@ namespace AlphaTab.Audio.Generator
                     var n = beat.Notes[i];
                     if (n.IsTieDestination) continue;
 
-                    GenerateNote(n, start, duration, startMove, brushInfo);
+                    GenerateNote(n, barStartTick + beatStart, duration, brushInfo);
                 }
             }
         }
 
-        private void GenerateNote(Note note, int beatStart, int beatDuration, int startMove, int[] brushInfo)
+        private void GenerateNote(Note note, int beatStart, int beatDuration, int[] brushInfo)
         {
             var track = note.Beat.Voice.Bar.Track;
             var noteKey = track.Capo + note.RealValue;
-            var noteStart = beatStart + startMove + brushInfo[note.String - 1];
+            var noteStart = beatStart + brushInfo[note.String - 1];
             var noteDuration = GetNoteDuration(note, beatDuration) - brushInfo[note.String - 1];
             var dynamicValue = GetDynamicValue(note);
 

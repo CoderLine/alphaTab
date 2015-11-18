@@ -1691,14 +1691,17 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
         // store the previous played bar for repeats
         while (!controller.get_Finished()){
             var index = controller.Index;
-            controller.Process();
+            var bar = this._score.MasterBars[index];
+            var currentTick = controller.CurrentTick;
+            controller.ProcessCurrent();
             if (controller.ShouldPlay){
-                this.GenerateMasterBar(this._score.MasterBars[index], previousMasterBar, controller.RepeatMove);
+                this.GenerateMasterBar(bar, previousMasterBar, currentTick);
                 for (var i = 0,j = this._score.Tracks.length; i < j; i++){
-                    this.GenerateBar(this._score.Tracks[i].Bars[index], controller.RepeatMove);
+                    this.GenerateBar(this._score.Tracks[i].Bars[index], currentTick);
                 }
             }
-            previousMasterBar = this._score.MasterBars[index];
+            controller.MoveNext();
+            previousMasterBar = bar;
         }
     },
     GenerateTrack: function (track){
@@ -1716,23 +1719,23 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
         this._handler.AddControlChange(track.Index, 0, channel, 11, 127);
         this._handler.AddProgramChange(track.Index, 0, channel, playbackInfo.Program);
     },
-    GenerateMasterBar: function (masterBar, previousMasterBar, startMove){
+    GenerateMasterBar: function (masterBar, previousMasterBar, currentTick){
         // time signature
         if (previousMasterBar == null || previousMasterBar.TimeSignatureDenominator != masterBar.TimeSignatureDenominator || previousMasterBar.TimeSignatureNumerator != masterBar.TimeSignatureNumerator){
-            this._handler.AddTimeSignature(masterBar.Start + startMove, masterBar.TimeSignatureNumerator, masterBar.TimeSignatureDenominator);
+            this._handler.AddTimeSignature(currentTick, masterBar.TimeSignatureNumerator, masterBar.TimeSignatureDenominator);
         }
         // tempo
         if (previousMasterBar == null){
-            this._handler.AddTempo(masterBar.Start + startMove, masterBar.Score.Tempo);
+            this._handler.AddTempo(currentTick, masterBar.Score.Tempo);
             this._currentTempo = masterBar.Score.Tempo;
         }
         else if (masterBar.TempoAutomation != null){
-            this._handler.AddTempo(masterBar.Start + startMove, masterBar.TempoAutomation.Value | 0);
+            this._handler.AddTempo(currentTick, masterBar.TempoAutomation.Value | 0);
             this._currentTempo = ((masterBar.TempoAutomation.Value)) | 0;
         }
         // metronome
         if (this.GenerateMetronome){
-            var start = masterBar.Start + startMove;
+            var start = currentTick;
             var length = AlphaTab.Audio.MidiUtils.ValueToTicks(masterBar.TimeSignatureDenominator);
             for (var i = 0; i < masterBar.TimeSignatureNumerator; i++){
                 this._handler.AddMetronome(start, length);
@@ -1740,26 +1743,26 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
             }
         }
     },
-    GenerateBar: function (bar, startMove){
+    GenerateBar: function (bar, barStartTick){
         for (var i = 0,j = bar.Voices.length; i < j; i++){
-            this.GenerateVoice(bar.Voices[i], startMove);
+            this.GenerateVoice(bar.Voices[i], barStartTick);
         }
     },
-    GenerateVoice: function (voice, startMove){
+    GenerateVoice: function (voice, barStartTick){
         for (var i = 0,j = voice.Beats.length; i < j; i++){
-            this.GenerateBeat(voice.Beats[i], startMove);
+            this.GenerateBeat(voice.Beats[i], barStartTick);
         }
     },
-    GenerateBeat: function (beat, startMove){
+    GenerateBeat: function (beat, barStartTick){
         // TODO: take care of tripletfeel 
-        var start = beat.Start;
+        var beatStart = beat.Start;
         var duration = beat.CalculateDuration();
         var track = beat.Voice.Bar.Track;
         for (var i = 0,j = beat.Automations.length; i < j; i++){
-            this.GenerateAutomation(beat, beat.Automations[i], startMove);
+            this.GenerateAutomation(beat, beat.Automations[i], barStartTick);
         }
         if (beat.get_IsRest()){
-            this._handler.AddRest(track.Index, start + startMove, track.PlaybackInfo.PrimaryChannel);
+            this._handler.AddRest(track.Index, barStartTick + beatStart, track.PlaybackInfo.PrimaryChannel);
         }
         else {
             var brushInfo = this.GetBrushInfo(beat);
@@ -1767,14 +1770,14 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
                 var n = beat.Notes[i];
                 if (n.IsTieDestination)
                     continue;
-                this.GenerateNote(n, start, duration, startMove, brushInfo);
+                this.GenerateNote(n, barStartTick + beatStart, duration, brushInfo);
             }
         }
     },
-    GenerateNote: function (note, beatStart, beatDuration, startMove, brushInfo){
+    GenerateNote: function (note, beatStart, beatDuration, brushInfo){
         var track = note.Beat.Voice.Bar.Track;
         var noteKey = track.Capo + note.get_RealValue();
-        var noteStart = beatStart + startMove + brushInfo[note.String - 1];
+        var noteStart = beatStart + brushInfo[note.String - 1];
         var noteDuration = this.GetNoteDuration(note, beatDuration) - brushInfo[note.String - 1];
         var dynamicValue = this.GetDynamicValue(note);
         // 
@@ -2133,75 +2136,76 @@ AlphaTab.Audio.Generator.MidiFileHandler.BuildSysExMessage = function (data){
 };
 AlphaTab.Audio.Generator.MidiPlaybackController = function (score){
     this._score = null;
-    this._lastIndex = 0;
-    this._repeatAlternative = 0;
-    this._repeatStart = 0;
+    this._currentAlternateEndings = 0;
     this._repeatStartIndex = 0;
     this._repeatNumber = 0;
-    this._repeatEnd = 0;
     this._repeatOpen = false;
     this.ShouldPlay = false;
-    this.RepeatMove = 0;
     this.Index = 0;
+    this.CurrentTick = 0;
     this._score = score;
     this.ShouldPlay = true;
-    this.RepeatMove = 0;
     this.Index = 0;
+    this.CurrentTick = 0;
 };
 AlphaTab.Audio.Generator.MidiPlaybackController.prototype = {
     get_Finished: function (){
         return this.Index >= this._score.MasterBars.length;
     },
-    Process: function (){
+    ProcessCurrent: function (){
         var masterBar = this._score.MasterBars[this.Index];
+        var masterBarAlternateEndings = masterBar.AlternateEndings;
         // if the repeat group wasn't closed we reset the repeating 
         // on the last group opening
         if (!masterBar.RepeatGroup.IsClosed && masterBar.RepeatGroup.Openings[masterBar.RepeatGroup.Openings.length - 1] == masterBar){
-            this._repeatStart = 0;
             this._repeatNumber = 0;
-            this._repeatEnd = 0;
             this._repeatOpen = false;
         }
-        if (masterBar.IsRepeatStart){
+        if ((masterBar.IsRepeatStart || masterBar.Index == 0) && this._repeatNumber == 0){
             this._repeatStartIndex = this.Index;
-            this._repeatStart = masterBar.Start;
             this._repeatOpen = true;
-            if (this.Index > this._lastIndex){
-                this._repeatNumber = 0;
-                this._repeatAlternative = 0;
-            }
         }
-        else {
-            if (this._repeatAlternative == 0){
-                this._repeatAlternative = masterBar.AlternateEndings;
-            }
-            if ((this._repeatOpen && (this._repeatAlternative > 0)) && ((this._repeatAlternative & (1 << this._repeatNumber)) == 0)){
-                this.RepeatMove -= masterBar.CalculateDuration();
-                if (masterBar.RepeatCount > 0){
-                    this._repeatAlternative = 0;
-                }
+        else if (masterBar.IsRepeatStart){
+            this.ShouldPlay = true;
+        }
+        // if we encounter an alternate ending
+        if (this._repeatOpen && masterBarAlternateEndings > 0){
+            // do we need to skip this section?
+            if ((masterBarAlternateEndings & (1 << this._repeatNumber)) == 0){
                 this.ShouldPlay = false;
-                this.Index++;
-                return;
+            }
+            else {
+                this.ShouldPlay = true;
             }
         }
-        this._lastIndex = Math.max(this._lastIndex, this.Index);
-        if (this._repeatOpen && (masterBar.RepeatCount > 0)){
-            if ((this._repeatNumber < masterBar.RepeatCount) || (this._repeatAlternative > 0)){
-                this._repeatEnd = masterBar.Start + masterBar.CalculateDuration();
-                this.RepeatMove += this._repeatEnd - this._repeatStart;
-                this.Index = this._repeatStartIndex - 1;
+        if (this.ShouldPlay){
+            this.CurrentTick += masterBar.CalculateDuration();
+        }
+    },
+    MoveNext: function (){
+        var masterBar = this._score.MasterBars[this.Index];
+        var masterBarAlternateEndings = masterBar.AlternateEndings;
+        var masterBarRepeatCount = masterBar.RepeatCount - 1;
+        // if we encounter a repeat end 
+        if (this._repeatOpen && (masterBarRepeatCount > 0)){
+            // more repeats required?
+            if (this._repeatNumber < masterBarRepeatCount){
+                // jump to start
+                this.Index = this._repeatStartIndex;
                 this._repeatNumber++;
             }
             else {
-                this._repeatStart = 0;
+                // no repeats anymore, jump after repeat end
                 this._repeatNumber = 0;
-                this._repeatEnd = 0;
                 this._repeatOpen = false;
+                this._currentAlternateEndings = 0;
+                this.ShouldPlay = true;
+                this.Index++;
             }
-            this._repeatAlternative = 0;
         }
-        this.Index++;
+        else {
+            this.Index++;
+        }
     }
 };
 AlphaTab.Audio.MidiUtils = function (){
@@ -2246,14 +2250,16 @@ AlphaTab.Audio.MidiUtils.BuildTickLookup = function (score){
     var controller = new AlphaTab.Audio.Generator.MidiPlaybackController(score);
     while (!controller.get_Finished()){
         var index = controller.Index;
-        controller.Process();
+        var currentTick = controller.CurrentTick;
+        controller.ProcessCurrent();
         if (controller.ShouldPlay){
             var bar = new AlphaTab.Audio.Model.BarTickLookup();
             bar.Bar = score.MasterBars[index];
-            bar.Start = controller.RepeatMove + bar.Bar.Start;
+            bar.Start = currentTick;
             bar.End = bar.Start + bar.Bar.CalculateDuration();
             lookup.Bars.push(bar);
         }
+        controller.MoveNext();
     }
     return lookup;
 };
@@ -2369,14 +2375,18 @@ AlphaTab.Audio.Model.MidiTickLookup.prototype = {
         // try last beat or next beat of last beat first
         if (this._lastBeat != null && this._lastBeat.NextBeat != null && this._lastBeat.Voice.Bar.Track == track){
             // check if tick is between _lastBeat and _lastBeat.nextBeat (still _lastBeat)
-            if (tick >= this._lastBeat.Start && tick < this._lastBeat.NextBeat.Start){
+            if (tick >= this._lastBeat.get_AbsoluteStart() && tick < this._lastBeat.NextBeat.get_AbsoluteStart()){
                 return this._lastBeat;
             }
             // we need a upper-next beat to check the nextbeat range 
-            if (this._lastBeat.NextBeat.NextBeat != null && tick >= this._lastBeat.NextBeat.Start && tick < this._lastBeat.NextBeat.NextBeat.Start){
-                this._lastBeat = this._lastBeat.NextBeat;
-                return this._lastBeat;
-            }
+            // TODO: this logic does not apply properly for alternate endings and repeats, better "next beat" detection using 
+            // "next bar" info
+            //if (_lastBeat.NextBeat.NextBeat != null && tick >= _lastBeat.NextBeat.AbsoluteStart && tick < _lastBeat.NextBeat.NextBeat.AbsoluteStart
+            //    && !(_lastBeat.Index == _lastBeat.Voice.Beats.Count - 1 && _lastBeat.Voice.Bar.MasterBar.IsRepeatEnd))
+            //{
+            //    _lastBeat = _lastBeat.NextBeat;
+            //    return _lastBeat;
+            //}
         }
         //
         // Global Search
@@ -2394,7 +2404,7 @@ AlphaTab.Audio.Model.MidiTickLookup.prototype = {
             var b = bar.Voices[0].Beats[i];
             // we search for the first beat which 
             // starts after the tick. 
-            if (beat == null || b.Start <= tick){
+            if (beat == null || b.get_AbsoluteStart() <= tick){
                 beat = b;
             }
             else {
@@ -6906,6 +6916,9 @@ AlphaTab.Model.Beat.prototype = {
     get_IsTremolo: function (){
         return this.TremoloSpeed != null;
     },
+    get_AbsoluteStart: function (){
+        return this.Voice.Bar.get_MasterBar().Start + this.Start;
+    },
     Clone: function (){
         var beat = new AlphaTab.Model.Beat();
         for (var i = 0,j = this.WhammyBarPoints.length; i < j; i++){
@@ -6969,7 +6982,7 @@ AlphaTab.Model.Beat.prototype = {
     Finish: function (){
         // start
         if (this.Index == 0){
-            this.Start = this.Voice.Bar.get_MasterBar().Start;
+            this.Start = 0;
         }
         else {
             this.Start = this.PreviousBeat.Start + this.PreviousBeat.CalculateDuration();

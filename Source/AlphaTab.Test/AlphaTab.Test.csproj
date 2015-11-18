@@ -50,6 +50,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Audio\MidiPlaybackControllerTest.cs" />
     <Compile Include="Importer\Gp3ImporterTest.cs" />
     <Compile Include="Importer\Gp4ImporterTest.cs" />
     <Compile Include="Importer\Gp5ImporterTest.cs" />
@@ -73,6 +74,18 @@
     </None>
     <None Include="TestFiles\GuitarPro\FadeToBlack.gp4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro\RepeatClose.gp5">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro\RepeatCloseAlternateEndings.gp5">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro\RepeatCloseMulti.gp5">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro\RepeatCloseWithoutStartAtBeginning.gp5">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\GuitarPro\Serenade.gp5">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

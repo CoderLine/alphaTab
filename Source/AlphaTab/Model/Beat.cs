@@ -139,6 +139,11 @@ namespace AlphaTab.Model
         /// The timeline position of the voice within the current bar. (unit: midi ticks)
         /// </summary>
         public int Start { get; set; }
+
+        public int AbsoluteStart
+        {
+            get { return Voice.Bar.MasterBar.Start + Start; }
+        }
         public DynamicValue Dynamic { get; set; }
 
         public Beat()
@@ -283,7 +288,7 @@ namespace AlphaTab.Model
             // start
             if (Index == 0)
             {
-                Start = Voice.Bar.MasterBar.Start;
+                Start = 0;
             }
             else
             {

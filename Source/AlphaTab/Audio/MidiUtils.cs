@@ -96,16 +96,17 @@ namespace AlphaTab.Audio
             while (!controller.Finished)
             {
                 var index = controller.Index;
-                controller.Process();
-
+                var currentTick = controller.CurrentTick;
+                controller.ProcessCurrent();
                 if (controller.ShouldPlay)
                 {
                     var bar = new BarTickLookup();
                     bar.Bar = score.MasterBars[index];
-                    bar.Start = controller.RepeatMove + bar.Bar.Start;
+                    bar.Start = currentTick;
                     bar.End = bar.Start + bar.Bar.CalculateDuration();
                     lookup.Bars.Add(bar);
                 }
+                controller.MoveNext();
             }
 
             return lookup;

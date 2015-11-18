@@ -48,17 +48,20 @@ namespace AlphaTab.Audio.Model
             if (_lastBeat != null && _lastBeat.NextBeat != null && _lastBeat.Voice.Bar.Track == track)
             {
                 // check if tick is between _lastBeat and _lastBeat.nextBeat (still _lastBeat)
-                if (tick >= _lastBeat.Start && tick < _lastBeat.NextBeat.Start)
+                if (tick >= _lastBeat.AbsoluteStart && tick < _lastBeat.NextBeat.AbsoluteStart)
                 {
                     return _lastBeat;
                 }
 
                 // we need a upper-next beat to check the nextbeat range 
-                if (_lastBeat.NextBeat.NextBeat != null && tick >= _lastBeat.NextBeat.Start && tick < _lastBeat.NextBeat.NextBeat.Start)
-                {
-                    _lastBeat = _lastBeat.NextBeat;
-                    return _lastBeat;
-                }
+                // TODO: this logic does not apply properly for alternate endings and repeats, better "next beat" detection using 
+                // "next bar" info
+                //if (_lastBeat.NextBeat.NextBeat != null && tick >= _lastBeat.NextBeat.AbsoluteStart && tick < _lastBeat.NextBeat.NextBeat.AbsoluteStart
+                //    && !(_lastBeat.Index == _lastBeat.Voice.Beats.Count - 1 && _lastBeat.Voice.Bar.MasterBar.IsRepeatEnd))
+                //{
+                //    _lastBeat = _lastBeat.NextBeat;
+                //    return _lastBeat;
+                //}
             }
 
             //
@@ -81,7 +84,7 @@ namespace AlphaTab.Audio.Model
                 var b = bar.Voices[0].Beats[i];
                 // we search for the first beat which 
                 // starts after the tick. 
-                if (beat == null || b.Start <= tick)
+                if (beat == null || b.AbsoluteStart <= tick)
                 {
                     beat = b;
                 }

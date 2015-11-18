@@ -219,7 +219,7 @@
                 var relY = e.pageY - parentOffset.top;
                 var beat = api.getBeatAtPos(element, context, relX, relY);
                 api.playerCursorUpdateBeat(element, context, beat);
-                as.SetPositionTick(beat.Start);
+                as.SetPositionTick(beat.Voice.Bar.get_MasterBar().Start + beat.Start);
             });
         }        
     }
