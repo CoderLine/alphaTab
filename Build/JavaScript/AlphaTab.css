@@ -22,4 +22,5 @@ body:before {
 }
 .alphaTabSurface {
     font-family: alphaTab;
+    text-align: left;
 }

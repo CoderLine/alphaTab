@@ -8157,6 +8157,7 @@ AlphaTab.Rendering.BarRendererBase = function (bar){
     this.TopOverflow = 0;
     this.BottomOverflow = 0;
     this.Bar = null;
+    this.IsLinkedToPrevious = false;
     this.Bar = bar;
     this.IsEmpty = true;
 };
@@ -8744,13 +8745,14 @@ AlphaTab.Rendering.EffectBarRenderer.prototype = {
                 // check if the previous beat also had this effect
                 var prevBeat = b.PreviousBeat;
                 if (this._info.ShouldCreateGlyph(this, prevBeat)){
+                    var previousRenderer = null;
                     // expand the previous effect
                     var prevEffect = null;
                     if (b.Index > 0 && this._effectGlyphs[b.Voice.Index].hasOwnProperty(prevBeat.Index)){
                         prevEffect = this._effectGlyphs[b.Voice.Index][prevBeat.Index];
                     }
                     else if (this.Index > 0){
-                        var previousRenderer = (this.Stave.BarRenderers[this.Index - 1]);
+                        previousRenderer = (this.Stave.BarRenderers[this.Index - 1]);
                         var voiceGlyphs = previousRenderer._effectGlyphs[b.Voice.Index];
                         if (voiceGlyphs.hasOwnProperty(prevBeat.Index)){
                             prevEffect = voiceGlyphs[prevBeat.Index];
@@ -8761,6 +8763,9 @@ AlphaTab.Rendering.EffectBarRenderer.prototype = {
                     }
                     else {
                         this._effectGlyphs[b.Voice.Index][b.Index] = prevEffect;
+                        if (previousRenderer != null){
+                            this.IsLinkedToPrevious = true;
+                        }
                     }
                 }
                 else {
@@ -12198,6 +12203,11 @@ AlphaTab.Rendering.Layout.HeaderFooterElements = {
     PageNumber: 256,
     All: 511
 };
+AlphaTab.Rendering.Layout.HorizontalScreenLayoutPartialInfo = function (){
+    this.Width = 0;
+    this.MasterBars = null;
+    this.MasterBars = [];
+};
 AlphaTab.Rendering.Layout.ScoreLayout = function (renderer){
     this._barRendererLookup = null;
     this.PartialRenderFinished = null;
@@ -12297,35 +12307,85 @@ AlphaTab.Rendering.Layout.HorizontalScreenLayout.prototype = {
         endBarIndex = startIndex + endBarIndex - 1;
         // map count to array index
         endBarIndex = Math.min(score.MasterBars.length - 1, Math.max(0, endBarIndex));
-        var x = AlphaTab.Rendering.Layout.HorizontalScreenLayout.PagePadding[0];
-        var y = AlphaTab.Rendering.Layout.HorizontalScreenLayout.PagePadding[1];
         this._group = this.CreateEmptyStaveGroup();
+        this._group.X = AlphaTab.Rendering.Layout.HorizontalScreenLayout.PagePadding[0];
+        this._group.Y = AlphaTab.Rendering.Layout.HorizontalScreenLayout.PagePadding[1];
+        var countPerPartial = this.Renderer.Settings.Layout.Get("countPerPartial", 10);
+        var partials = [];
+        var currentPartial = new AlphaTab.Rendering.Layout.HorizontalScreenLayoutPartialInfo();
         while (currentBarIndex <= endBarIndex){
-            this._group.AddBars(this.Renderer.Tracks, currentBarIndex);
+            var result = this._group.AddBars(this.Renderer.Tracks, currentBarIndex);
+            // if we detect that the new renderer is linked to the previous
+            // renderer, we need to put it into the previous partial 
+            var renderer = this._group.GetBarRenderer(currentBarIndex);
+            if (currentPartial.MasterBars.length == 0 && result.IsLinkedToPrevious && partials.length > 0){
+                var previousPartial = partials[partials.length - 1];
+                previousPartial.MasterBars.push(score.MasterBars[currentBarIndex]);
+                previousPartial.Width += renderer.Width;
+            }
+            else {
+                currentPartial.MasterBars.push(score.MasterBars[currentBarIndex]);
+                currentPartial.Width += renderer.Width;
+                // no targetPartial here because previous partials already handled this code
+                if (currentPartial.MasterBars.length >= countPerPartial){
+                    if (partials.length == 0){
+                        currentPartial.Width += this._group.X + this._group.AccoladeSpacing;
+                    }
+                    partials.push(currentPartial);
+                    currentPartial = new AlphaTab.Rendering.Layout.HorizontalScreenLayoutPartialInfo();
+                }
+            }
             currentBarIndex++;
         }
-        this._group.X = x;
-        this._group.Y = y;
+        // don't miss the last partial if not empty
+        if (currentPartial.MasterBars.length >= 0){
+            if (partials.length == 0){
+                currentPartial.Width += this._group.X + this._group.AccoladeSpacing;
+            }
+            partials.push(currentPartial);
+        }
         this._group.FinalizeGroup(this);
-        y += this._group.get_Height() + (20 * this.get_Scale());
-        this.Height = y + AlphaTab.Rendering.Layout.HorizontalScreenLayout.PagePadding[3];
+        this.Height = this._group.Y + this._group.get_Height() + AlphaTab.Rendering.Layout.HorizontalScreenLayout.PagePadding[3];
         this.Width = this._group.X + this._group.Width + AlphaTab.Rendering.Layout.HorizontalScreenLayout.PagePadding[2];
         // TODO: Find a good way to render the score partwise
         // we need to precalculate the final height somehow
-        canvas.BeginRender(this.Width, this.Height);
-        canvas.set_Color(this.Renderer.RenderingResources.MainGlyphColor);
-        canvas.set_TextAlign(AlphaTab.Platform.Model.TextAlign.Left);
-        this._group.Paint(0, 0, this.Renderer.Canvas);
-        var result = canvas.EndRender();
-        this.OnPartialRenderFinished((function (){
-            var $v3 = new AlphaTab.Rendering.RenderFinishedEventArgs();
-            $v3.TotalWidth = this.Width;
-            $v3.TotalHeight = y;
-            $v3.Width = this.Width;
-            $v3.Height = this.Height;
-            $v3.RenderResult = result;
-            return $v3;
-        }).call(this));
+        //canvas.BeginRender(Width, Height);
+        //canvas.Color = Renderer.RenderingResources.MainGlyphColor;
+        //canvas.TextAlign = TextAlign.Left;
+        //_group.Paint(0, 0, Renderer.Canvas);
+        //var result = canvas.EndRender();
+        //OnPartialRenderFinished(new RenderFinishedEventArgs
+        //{
+        //    TotalWidth = Width,
+        //    TotalHeight = y,
+        //    Width = Width,
+        //    Height = Height,
+        //    RenderResult = result
+        //});
+        currentBarIndex = 0;
+        for (var i = 0; i < partials.length; i++){
+            var partial = partials[i];
+            canvas.BeginRender(partial.Width, this.Height);
+            canvas.set_Color(this.Renderer.RenderingResources.MainGlyphColor);
+            canvas.set_TextAlign(AlphaTab.Platform.Model.TextAlign.Left);
+            var renderer = this._group.GetBarRenderer(partial.MasterBars[0].Index);
+            var renderX = renderer.X + this._group.AccoladeSpacing;
+            if (i == 0){
+                renderX -= this._group.X + this._group.AccoladeSpacing;
+            }
+            this._group.PaintPartial(-renderX, this._group.Y, this.Renderer.Canvas, currentBarIndex, partial.MasterBars.length);
+            var result = canvas.EndRender();
+            this.OnPartialRenderFinished((function (){
+                var $v3 = new AlphaTab.Rendering.RenderFinishedEventArgs();
+                $v3.TotalWidth = this.Width;
+                $v3.TotalHeight = this.Height;
+                $v3.Width = partial.Width;
+                $v3.Height = this.Height;
+                $v3.RenderResult = result;
+                return $v3;
+            }).call(this));
+            currentBarIndex += partial.MasterBars.length;
+        }
     },
     BuildBoundingsLookup: function (lookup){
         this._group.BuildBoundingsLookup(lookup);
@@ -13554,10 +13614,10 @@ AlphaTab.Rendering.Staves.Stave.prototype = {
             this.Height = 0;
         }
     },
-    Paint: function (cx, cy, canvas){
-        if (this.Height == 0)
+    Paint: function (cx, cy, canvas, startIndex, count){
+        if (this.Height == 0 || count == 0)
             return;
-        for (var i = 0,j = this.BarRenderers.length; i < j; i++){
+        for (var i = startIndex,j = Math.min(startIndex + count, this.BarRenderers.length); i < j; i++){
             this.BarRenderers[i].Paint(cx + this.X, cy + this.Y, canvas);
         }
     }
@@ -13571,6 +13631,10 @@ AlphaTab.Rendering.Staves.StaveTrackGroup = function (staveGroup, track){
     this.StaveGroup = staveGroup;
     this.Track = track;
     this.Staves = [];
+};
+AlphaTab.Rendering.Staves.AddBarsToStaveGroupResult = function (){
+    this.Width = 0;
+    this.IsLinkedToPrevious = false;
 };
 AlphaTab.Rendering.Staves.StaveGroup = function (){
     this._firstStaveInAccolade = null;
@@ -13602,7 +13666,8 @@ AlphaTab.Rendering.Staves.StaveGroup.prototype = {
     },
     AddBars: function (tracks, barIndex){
         if (tracks.length == 0)
-            return;
+            return null;
+        var result = new AlphaTab.Rendering.Staves.AddBarsToStaveGroupResult();
         var score = tracks[0].Score;
         var masterBar = score.MasterBars[barIndex];
         this.MasterBars.push(masterBar);
@@ -13626,6 +13691,9 @@ AlphaTab.Rendering.Staves.StaveGroup.prototype = {
                 var s = g.Staves[k];
                 s.AddBar(g.Track.Bars[barIndex]);
                 s.BarRenderers[s.BarRenderers.length - 1].RegisterMaxSizes(maxSizes);
+                if (s.BarRenderers[s.BarRenderers.length - 1].IsLinkedToPrevious){
+                    result.IsLinkedToPrevious = true;
+                }
             }
         }
         // ensure same widths of new renderer
@@ -13638,6 +13706,15 @@ AlphaTab.Rendering.Staves.StaveGroup.prototype = {
             }
         }
         this.Width += realWidth;
+        result.Width = realWidth;
+        return result;
+    },
+    GetBarRenderer: function (barIndex){
+        var stave = this._firstStaveInAccolade;
+        if (barIndex >= stave.BarRenderers.length){
+            return null;
+        }
+        return stave.BarRenderers[barIndex];
     },
     GetStaveTrackGroup: function (track){
         for (var i = 0,j = this.Staves.length; i < j; i++){
@@ -13701,11 +13778,14 @@ AlphaTab.Rendering.Staves.StaveGroup.prototype = {
         this.Width += this.MasterBars.length * spacing;
     },
     Paint: function (cx, cy, canvas){
+        this.PaintPartial(cx + this.X, cy + this.Y, canvas, 0, this.MasterBars.length);
+    },
+    PaintPartial: function (cx, cy, canvas, startIndex, count){
         for (var i = 0,j = this._allStaves.length; i < j; i++){
-            this._allStaves[i].Paint(cx + this.X, cy + this.Y, canvas);
+            this._allStaves[i].Paint(cx, cy, canvas, startIndex, count);
         }
         var res = this.Layout.Renderer.RenderingResources;
-        if (this.Staves.length > 0){
+        if (this.Staves.length > 0 && startIndex == 0){
             //
             // Draw start grouping
             // 
@@ -13713,9 +13793,9 @@ AlphaTab.Rendering.Staves.StaveGroup.prototype = {
                 //
                 // draw grouping line for all staves
                 //
-                var firstStart = cy + this.Y + this._firstStaveInAccolade.Y + this._firstStaveInAccolade.StaveTop + this._firstStaveInAccolade.TopSpacing + this._firstStaveInAccolade.get_TopOverflow();
-                var lastEnd = cy + this.Y + this._lastStaveInAccolade.Y + this._lastStaveInAccolade.TopSpacing + this._lastStaveInAccolade.get_TopOverflow() + this._lastStaveInAccolade.StaveBottom;
-                var acooladeX = cx + this.X + this._firstStaveInAccolade.X;
+                var firstStart = cy + this._firstStaveInAccolade.Y + this._firstStaveInAccolade.StaveTop + this._firstStaveInAccolade.TopSpacing + this._firstStaveInAccolade.get_TopOverflow();
+                var lastEnd = cy + this._lastStaveInAccolade.Y + this._lastStaveInAccolade.TopSpacing + this._lastStaveInAccolade.get_TopOverflow() + this._lastStaveInAccolade.StaveBottom;
+                var acooladeX = cx + this._firstStaveInAccolade.X;
                 canvas.set_Color(res.BarSeperatorColor);
                 canvas.BeginPath();
                 canvas.MoveTo(acooladeX, firstStart);
@@ -13728,16 +13808,16 @@ AlphaTab.Rendering.Staves.StaveGroup.prototype = {
             canvas.set_Font(res.EffectFont);
             for (var i = 0,j = this.Staves.length; i < j; i++){
                 var g = this.Staves[i];
-                var firstStart = cy + this.Y + g.FirstStaveInAccolade.Y + g.FirstStaveInAccolade.StaveTop + g.FirstStaveInAccolade.TopSpacing + g.FirstStaveInAccolade.get_TopOverflow();
-                var lastEnd = cy + this.Y + g.LastStaveInAccolade.Y + g.LastStaveInAccolade.TopSpacing + g.LastStaveInAccolade.get_TopOverflow() + g.LastStaveInAccolade.StaveBottom;
-                var acooladeX = cx + this.X + g.FirstStaveInAccolade.X;
+                var firstStart = cy + g.FirstStaveInAccolade.Y + g.FirstStaveInAccolade.StaveTop + g.FirstStaveInAccolade.TopSpacing + g.FirstStaveInAccolade.get_TopOverflow();
+                var lastEnd = cy + g.LastStaveInAccolade.Y + g.LastStaveInAccolade.TopSpacing + g.LastStaveInAccolade.get_TopOverflow() + g.LastStaveInAccolade.StaveBottom;
+                var acooladeX = cx + g.FirstStaveInAccolade.X;
                 var barSize = (3 * this.Layout.Renderer.Settings.Scale);
                 var barOffset = barSize;
                 var accoladeStart = firstStart - (barSize * 4);
                 var accoladeEnd = lastEnd + (barSize * 4);
                 // text
                 if (this.Index == 0){
-                    canvas.FillText(g.Track.ShortName, cx + this.X + (10 * this.Layout.get_Scale()), firstStart);
+                    canvas.FillText(g.Track.ShortName, cx + (10 * this.Layout.get_Scale()), firstStart);
                 }
                 // rect
                 canvas.FillRect(acooladeX - barOffset - barSize, accoladeStart, barSize, accoladeEnd - accoladeStart);

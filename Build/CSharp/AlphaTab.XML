@@ -770,6 +770,12 @@
             This is the base public class for creating blocks which can render bars.
             </summary>
         </member>
+        <member name="P:AlphaTab.Rendering.BarRendererBase.IsLinkedToPrevious">
+            <summary>
+            Gets or sets whether this renderer is linked to the next one 
+            by some glyphs like a vibrato effect
+            </summary>
+        </member>
         <member name="P:AlphaTab.Rendering.BarRendererBase.TopPadding">
             <summary>
             Gets the top padding for the main content of the renderer. 
@@ -1309,6 +1315,36 @@
             <ul>
              <li><strong>rhythm</strong> - Renders rhythm beams to tablature notes</li>
             </ul>
+            </summary>
+        </member>
+        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
+            <summary>
+            GeneratedInternalTypeHelper
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
+            <summary>
+            CreateInstance
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            GetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            SetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
+            <summary>
+            CreateDelegate
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
+            <summary>
+            AddEventHandler
             </summary>
         </member>
     </members>

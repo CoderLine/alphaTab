@@ -41,20 +41,12 @@ _ReSharper*/
 
 
 # Project Dirs
-/bin/cs/AlphaTab.Core/src/*
-/bin/cs/AlphaTab.Core/hxcs_build.txt
-/bin/js/test.html
-/bin/js/files/Test.gp5
-/bin/js/files/Test.gpif
-/bin/js/files/Test.gpx
-/bin/js/multistave.html
-/tmp
-/api
-/tools/fontconverter/font/*
-/tools/gpx-decompress/test/*
-/tools/gpx-decompress/bin/*
-/private
-/release
+/Tools/fontconverter/font/*
+/Tools/gpx-decompress/test/*
+/Tools/gpx-decompress/bin/*
+/Private
+/Samples/JavaScript/files/Test.gp5
+/Samples/JavaScript/test.html
 
 # temps
 .DS_Store 

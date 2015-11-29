@@ -191,10 +191,10 @@ namespace AlphaTab.Rendering.Staves
             }
         }
 
-        public void Paint(float cx, float cy, ICanvas canvas)
+        public void Paint(float cx, float cy, ICanvas canvas, int startIndex, int count)
         {
-            if (Height == 0) return;
-            for (int i = 0, j = BarRenderers.Count; i < j; i++)
+            if (Height == 0 || count == 0) return;
+            for (int i = startIndex, j = Math.Min(startIndex + count, BarRenderers.Count); i < j; i++)
             {
                 BarRenderers[i].Paint(cx + X, cy + Y, canvas);
             }

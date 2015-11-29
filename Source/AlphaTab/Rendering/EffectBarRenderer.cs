@@ -301,6 +301,7 @@ namespace AlphaTab.Rendering
                         Beat prevBeat = b.PreviousBeat;
                         if (_info.ShouldCreateGlyph(this, prevBeat))
                         {
+                            EffectBarRenderer previousRenderer = null;
                             // expand the previous effect
                             EffectGlyph prevEffect = null;
                             if (b.Index > 0 && _effectGlyphs[b.Voice.Index].ContainsKey(prevBeat.Index))
@@ -309,7 +310,7 @@ namespace AlphaTab.Rendering
                             }
                             else if(Index > 0)
                             {
-                                var previousRenderer = ((EffectBarRenderer) (Stave.BarRenderers[Index - 1]));
+                                previousRenderer = ((EffectBarRenderer) (Stave.BarRenderers[Index - 1]));
                                 var voiceGlyphs = previousRenderer._effectGlyphs[b.Voice.Index];
                                 if (voiceGlyphs.ContainsKey(prevBeat.Index))
                                 {
@@ -324,6 +325,10 @@ namespace AlphaTab.Rendering
                             else
                             {
                                 _effectGlyphs[b.Voice.Index][b.Index] = prevEffect;
+                                if (previousRenderer != null)
+                                {
+                                    IsLinkedToPrevious = true;
+                                }
                             }
                         }
                         else

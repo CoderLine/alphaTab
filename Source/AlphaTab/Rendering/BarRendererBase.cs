@@ -41,6 +41,12 @@ namespace AlphaTab.Rendering
 
         public Bar Bar { get; set; }
 
+        /// <summary>
+        /// Gets or sets whether this renderer is linked to the next one 
+        /// by some glyphs like a vibrato effect
+        /// </summary>
+        public bool IsLinkedToPrevious { get; set; }
+
         public BarRendererBase(Bar bar)
         {
             Bar = bar;

@@ -41,6 +41,12 @@ namespace AlphaTab.Rendering.Staves
         }
     }
 
+    public class AddBarsToStaveGroupResult
+    {
+        public float Width { get; set; }
+        public bool IsLinkedToPrevious { get; set; }
+    }
+
     /// <summary>
     /// A stave consists of a list of different staves and groups
     /// them using an accolade. 
@@ -100,9 +106,11 @@ namespace AlphaTab.Rendering.Staves
             }
         }
 
-        public void AddBars(Track[] tracks, int barIndex)
+        public AddBarsToStaveGroupResult AddBars(Track[] tracks, int barIndex)
         {
-            if (tracks.Length == 0) return;
+            if (tracks.Length == 0) return null;
+
+            var result = new AddBarsToStaveGroupResult();
             var score = tracks[0].Score;
             var masterBar = score.MasterBars[barIndex];
             MasterBars.Add(masterBar);
@@ -133,6 +141,10 @@ namespace AlphaTab.Rendering.Staves
                     var s = g.Staves[k];
                     s.AddBar(g.Track.Bars[barIndex]);
                     s.BarRenderers[s.BarRenderers.Count - 1].RegisterMaxSizes(maxSizes);
+                    if (s.BarRenderers[s.BarRenderers.Count - 1].IsLinkedToPrevious)
+                    {
+                        result.IsLinkedToPrevious = true;
+                    }
                 }
             }
 
@@ -149,6 +161,19 @@ namespace AlphaTab.Rendering.Staves
             }
 
             Width += realWidth;
+            result.Width = realWidth;
+
+            return result;
+        }
+
+        public BarRendererBase GetBarRenderer(int barIndex)
+        {
+            var stave = _firstStaveInAccolade;
+            if (barIndex >= stave.BarRenderers.Count)
+            {
+                return null;
+            }
+            return stave.BarRenderers[barIndex];
         }
 
         private StaveTrackGroup GetStaveTrackGroup(Track track)
@@ -238,14 +263,19 @@ namespace AlphaTab.Rendering.Staves
 
         public void Paint(float cx, float cy, ICanvas canvas)
         {
+            PaintPartial(cx + X, cy + Y, canvas, 0, MasterBars.Count);
+        }
+
+        public void PaintPartial(float cx, float cy, ICanvas canvas, int startIndex, int count)
+        {
             for (int i = 0, j = _allStaves.Count; i < j; i++)
             {
-                _allStaves[i].Paint(cx + X, cy + Y, canvas);
+                _allStaves[i].Paint(cx, cy, canvas, startIndex, count);
             }
 
             var res = Layout.Renderer.RenderingResources;
 
-            if (Staves.Count > 0)
+            if (Staves.Count > 0 && startIndex == 0)
             {
                 //
                 // Draw start grouping
@@ -257,11 +287,11 @@ namespace AlphaTab.Rendering.Staves
                     // draw grouping line for all staves
                     //
 
-                    var firstStart = cy + Y + _firstStaveInAccolade.Y + _firstStaveInAccolade.StaveTop + _firstStaveInAccolade.TopSpacing + _firstStaveInAccolade.TopOverflow;
-                    var lastEnd = cy + Y + _lastStaveInAccolade.Y + _lastStaveInAccolade.TopSpacing + _lastStaveInAccolade.TopOverflow
+                    var firstStart = cy + _firstStaveInAccolade.Y + _firstStaveInAccolade.StaveTop + _firstStaveInAccolade.TopSpacing + _firstStaveInAccolade.TopOverflow;
+                    var lastEnd = cy + _lastStaveInAccolade.Y + _lastStaveInAccolade.TopSpacing + _lastStaveInAccolade.TopOverflow
                                          + _lastStaveInAccolade.StaveBottom;
 
-                    var acooladeX = cx + X + _firstStaveInAccolade.X;
+                    var acooladeX = cx + _firstStaveInAccolade.X;
 
                     canvas.Color = res.BarSeperatorColor;
 
@@ -278,11 +308,11 @@ namespace AlphaTab.Rendering.Staves
                 for (int i = 0, j = Staves.Count; i < j; i++)
                 {
                     var g = Staves[i];
-                    var firstStart = cy + Y + g.FirstStaveInAccolade.Y + g.FirstStaveInAccolade.StaveTop + g.FirstStaveInAccolade.TopSpacing + g.FirstStaveInAccolade.TopOverflow;
-                    var lastEnd = cy + Y + g.LastStaveInAccolade.Y + g.LastStaveInAccolade.TopSpacing + g.LastStaveInAccolade.TopOverflow
+                    var firstStart = cy + g.FirstStaveInAccolade.Y + g.FirstStaveInAccolade.StaveTop + g.FirstStaveInAccolade.TopSpacing + g.FirstStaveInAccolade.TopOverflow;
+                    var lastEnd = cy + g.LastStaveInAccolade.Y + g.LastStaveInAccolade.TopSpacing + g.LastStaveInAccolade.TopOverflow
                                          + g.LastStaveInAccolade.StaveBottom;
 
-                    var acooladeX = cx + X + g.FirstStaveInAccolade.X;
+                    var acooladeX = cx + g.FirstStaveInAccolade.X;
 
                     var barSize = (3 * Layout.Renderer.Settings.Scale);
                     var barOffset = barSize;
@@ -293,7 +323,7 @@ namespace AlphaTab.Rendering.Staves
                     // text
                     if (Index == 0)
                     {
-                        canvas.FillText(g.Track.ShortName, cx + X + (AccoladeLabelSpacing * Layout.Scale), firstStart);
+                        canvas.FillText(g.Track.ShortName, cx + (AccoladeLabelSpacing * Layout.Scale), firstStart);
                     }
 
                     // rect
