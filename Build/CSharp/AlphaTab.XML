@@ -715,7 +715,7 @@
         </member>
         <member name="F:AlphaTab.Importer.GpxParser.BendPointValueFactor">
             <summary>
-            GPX Range: 0-300
+            GPX Range: 0-300      
             Internal Range: 0-12
             </summary>
         </member>

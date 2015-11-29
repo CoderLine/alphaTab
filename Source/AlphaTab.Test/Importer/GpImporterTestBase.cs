@@ -213,6 +213,7 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(60, score.Tracks[0].Bars[0].Voices[0].Beats[0].WhammyBarPoints[2].Offset);
             Assert.AreEqual(0, score.Tracks[0].Bars[0].Voices[0].Beats[0].WhammyBarPoints[2].Value);
 
+
             Assert.AreEqual(3, score.Tracks[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints.Count);
 
             Assert.AreEqual(0, score.Tracks[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints[0].Offset);
@@ -285,7 +286,7 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(Duration.Eighth, score.Tracks[0].Bars[0].Voices[0].Beats[3].TremoloSpeed);
         }
 
-        protected void CheckOtherEffects(Score score)
+        protected void CheckOtherEffects(Score score, bool skipInstrumentCheck = false)
         {
             Assert.IsTrue(score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[0].IsPalmMute);
             Assert.IsTrue(score.Tracks[0].Bars[0].Voices[0].Beats[1].Notes[0].IsStaccato);
@@ -301,8 +302,11 @@ namespace AlphaTab.Test.Importer
             Assert.IsTrue(score.MasterBars[4].IsDoubleBar);
             Assert.IsTrue(score.Tracks[0].Bars[4].Voices[0].Beats[0].GetAutomation(AutomationType.Tempo) != null);
             Assert.AreEqual(120.0, score.Tracks[0].Bars[4].Voices[0].Beats[0].GetAutomation(AutomationType.Tempo).Value);
-            Assert.IsTrue(score.Tracks[0].Bars[4].Voices[0].Beats[0].GetAutomation(AutomationType.Instrument) != null);
-            Assert.AreEqual(25.0, score.Tracks[0].Bars[4].Voices[0].Beats[0].GetAutomation(AutomationType.Instrument).Value);
+            if(!skipInstrumentCheck)
+            {
+                Assert.IsTrue(score.Tracks[0].Bars[4].Voices[0].Beats[0].GetAutomation(AutomationType.Instrument) != null);
+                Assert.AreEqual(25.0, score.Tracks[0].Bars[4].Voices[0].Beats[0].GetAutomation(AutomationType.Instrument).Value);
+            }
         }
 
         protected void CheckFingering(Score score)

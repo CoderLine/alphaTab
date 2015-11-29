@@ -5522,31 +5522,31 @@ AlphaTab.Importer.GpxParser.prototype = {
                             case "WhammyBarOriginValue":
                             if (whammyOrigin == null)
                             whammyOrigin = new AlphaTab.Model.BendPoint(0, 0);
-                            whammyOrigin.Value = ((AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))) * 0.04)) | 0;
+                            whammyOrigin.Value = this.ToBendValue(AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))));
                             break;
                             case "WhammyBarOriginOffset":
                             if (whammyOrigin == null)
                             whammyOrigin = new AlphaTab.Model.BendPoint(0, 0);
-                            whammyOrigin.Offset = ((AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))) * 0.6)) | 0;
+                            whammyOrigin.Offset = this.ToBendOffset(AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))));
                             break;
                             case "WhammyBarMiddleValue":
-                            whammyMiddleValue = ((AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))) * 0.04)) | 0;
+                            whammyMiddleValue = this.ToBendValue(AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))));
                             break;
                             case "WhammyBarMiddleOffset1":
-                            whammyMiddleOffset1 = ((AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))) * 0.6)) | 0;
+                            whammyMiddleOffset1 = this.ToBendOffset(AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))));
                             break;
                             case "WhammyBarMiddleOffset2":
-                            whammyMiddleOffset2 = ((AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))) * 0.6)) | 0;
+                            whammyMiddleOffset2 = this.ToBendOffset(AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))));
                             break;
                             case "WhammyBarDestinationValue":
                             if (whammyDestination == null)
                             whammyDestination = new AlphaTab.Model.BendPoint(60, 0);
-                            whammyDestination.Value = ((AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))) * 0.04)) | 0;
+                            whammyDestination.Value = this.ToBendValue(AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))));
                             break;
                             case "WhammyBarDestinationOffset":
                             if (whammyDestination == null)
                             whammyDestination = new AlphaTab.Model.BendPoint(0, 0);
-                            whammyDestination.Offset = ((AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))) * 0.6)) | 0;
+                            whammyDestination.Offset = this.ToBendOffset(AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))));
                             break;
                         }
                         break;
@@ -5753,31 +5753,31 @@ AlphaTab.Importer.GpxParser.prototype = {
                             case "BendOriginValue":
                             if (bendOrigin == null)
                             bendOrigin = new AlphaTab.Model.BendPoint(0, 0);
-                            bendOrigin.Value = ((AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))) * 0.04)) | 0;
+                            bendOrigin.Value = this.ToBendValue(AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))));
                             break;
                             case "BendOriginOffset":
                             if (bendOrigin == null)
                             bendOrigin = new AlphaTab.Model.BendPoint(0, 0);
-                            bendOrigin.Offset = ((AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))) * 0.6)) | 0;
+                            bendOrigin.Offset = this.ToBendOffset(AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))));
                             break;
                             case "BendMiddleValue":
-                            bendMiddleValue = ((AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))) * 0.04)) | 0;
+                            bendMiddleValue = this.ToBendValue(AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))));
                             break;
                             case "BendMiddleOffset1":
-                            bendMiddleOffset1 = ((AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))) * 0.6)) | 0;
+                            bendMiddleOffset1 = this.ToBendOffset(AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))));
                             break;
                             case "BendMiddleOffset2":
-                            bendMiddleOffset2 = ((AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))) * 0.6)) | 0;
+                            bendMiddleOffset2 = this.ToBendOffset(AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))));
                             break;
                             case "BendDestinationValue":
                             if (bendDestination == null)
                             bendDestination = new AlphaTab.Model.BendPoint(60, 0);
-                            bendDestination.Value = ((AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))) * 0.04)) | 0;
+                            bendDestination.Value = this.ToBendValue(AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))));
                             break;
                             case "BendDestinationOffset":
                             if (bendDestination == null)
                             bendDestination = new AlphaTab.Model.BendPoint(0, 0);
-                            bendDestination.Offset = ((AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))) * 0.6)) | 0;
+                            bendDestination.Offset = this.ToBendOffset(AlphaTab.Platform.Std.ParseFloat(this.GetValue(this.FindChildElement(c, "Float"))));
                             break;
                             case "HopoOrigin":
                             if (this.FindChildElement(c, "Enable") != null)
@@ -5824,6 +5824,17 @@ AlphaTab.Importer.GpxParser.prototype = {
             bend.push(bendDestination);
             note.BendPoints = bend;
         }
+    },
+    ToBendValue: function (gpxValue){
+        // NOTE: strange IEEE behavior here: 
+        // (int)(100f * 0.04f) => 3
+        // (100f*0.04f) => 4.0f => (int)4.0f => 4
+        var converted = gpxValue * 0.04;
+        return ((converted)) | 0;
+    },
+    ToBendOffset: function (gpxOffset){
+        var converted = gpxOffset * 0.6;
+        return ((converted)) | 0;
     },
     ParseRhythms: function (node){
         AlphaTab.Platform.Std.IterateChildren(node, $CreateAnonymousDelegate(this, function (c){

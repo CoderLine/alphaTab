@@ -53,10 +53,10 @@ namespace AlphaTab.Importer
         /// </summary>
         private const float BendPointPositionFactor = 60.0f / 100.0f;
         /// <summary>
-        /// GPX Range: 0-300
+        /// GPX Range: 0-300      
         /// Internal Range: 0-12
         /// </summary>
-        private const float BendPointValueFactor = 12.0f / 300.0f;
+        private const float BendPointValueFactor = 12f / 300f;
 
         public Score Score { get; set; }
 
@@ -880,39 +880,33 @@ namespace AlphaTab.Importer
 
                                 case "WhammyBarOriginValue":
                                     if (whammyOrigin == null) whammyOrigin = new BendPoint();
-                                    whammyOrigin.Value =
-                                        (int)(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointValueFactor);
+                                    whammyOrigin.Value = ToBendValue(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))));
                                     break;
                                 case "WhammyBarOriginOffset":
                                     if (whammyOrigin == null) whammyOrigin = new BendPoint();
-                                    whammyOrigin.Offset =
-                                        (int)
-                                            (Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointPositionFactor);
+                                    whammyOrigin.Offset = ToBendOffset(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))));
                                     break;
 
                                 case "WhammyBarMiddleValue":
-                                    whammyMiddleValue = (int)(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointValueFactor);
+                                    whammyMiddleValue = ToBendValue(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))));
                                     break;
 
                                 case "WhammyBarMiddleOffset1":
-                                    whammyMiddleOffset1 = (int)(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointPositionFactor);
+                                    whammyMiddleOffset1 = ToBendOffset(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))));
                                     break;
                                 case "WhammyBarMiddleOffset2":
-                                    whammyMiddleOffset2 = (int)(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointPositionFactor);
+                                    whammyMiddleOffset2 = ToBendOffset(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))));
                                     break;
 
                                 case "WhammyBarDestinationValue":
                                     if (whammyDestination == null)
                                         whammyDestination = new BendPoint(BendPoint.MaxPosition);
-                                    whammyDestination.Value =
-                                        (int)(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointValueFactor);
+                                    whammyDestination.Value = ToBendValue(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))));
                                     break;
 
                                 case "WhammyBarDestinationOffset":
                                     if (whammyDestination == null) whammyDestination = new BendPoint();
-                                    whammyDestination.Offset =
-                                        (int)
-                                            (Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointPositionFactor);
+                                    whammyDestination.Offset = ToBendOffset(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))));
 
                                     break;
                             }
@@ -927,6 +921,7 @@ namespace AlphaTab.Importer
                 if (whammyDestination == null) whammyDestination = new BendPoint(BendPoint.MaxPosition);
                 var whammy = new FastList<BendPoint>();
                 whammy.Add(whammyOrigin);
+
                 if (whammyMiddleOffset1 != null && whammyMiddleValue != null)
                 {
                     whammy.Add(new BendPoint(whammyMiddleOffset1.Value, whammyMiddleValue.Value));
@@ -1159,32 +1154,36 @@ namespace AlphaTab.Importer
 
                                 case "BendOriginValue":
                                     if (bendOrigin == null) bendOrigin = new BendPoint();
-                                    bendOrigin.Value = (int)(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointValueFactor);
+                                    bendOrigin.Value = ToBendValue(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))));
                                     break;
                                 case "BendOriginOffset":
                                     if (bendOrigin == null) bendOrigin = new BendPoint();
-                                    bendOrigin.Offset = (int)(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointPositionFactor);
+                                    bendOrigin.Offset = ToBendOffset(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))));
                                     break;
 
                                 case "BendMiddleValue":
-                                    bendMiddleValue = (int)(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointValueFactor);
+                                    bendMiddleValue = ToBendValue(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))));
                                     break;
 
                                 case "BendMiddleOffset1":
-                                    bendMiddleOffset1 = (int)(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointPositionFactor);
+                                    bendMiddleOffset1 = ToBendOffset(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))));
                                     break;
                                 case "BendMiddleOffset2":
-                                    bendMiddleOffset2 = (int)(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointPositionFactor);
+                                    bendMiddleOffset2 = ToBendOffset(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))));
                                     break;
 
                                 case "BendDestinationValue":
                                     if (bendDestination == null) bendDestination = new BendPoint(BendPoint.MaxPosition);
-                                    bendDestination.Value = (int)(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointValueFactor);
+                                    // NOTE: If we directly cast the expression of value to (int) it is 3 instead of 4, strange compiler
+                                    // optimizations happening here: 
+                                    // (int)(Std.ParseFloat(GetValue(FindChildElement(c, "Float")))* BendPointValueFactor) => (int)(100f * 0.04f) => 3
+                                    // (Std.ParseFloat(GetValue(FindChildElement(c, "Float")))* BendPointValueFactor) => (100f * 0.04f) => 4.0
+                                    bendDestination.Value = ToBendValue(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))));
                                     break;
 
                                 case "BendDestinationOffset":
                                     if (bendDestination == null) bendDestination = new BendPoint();
-                                    bendDestination.Offset = (int)(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))) * BendPointPositionFactor);
+                                    bendDestination.Offset = ToBendOffset(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))));
                                     break;
 
                                 case "HopoOrigin":
@@ -1239,6 +1238,21 @@ namespace AlphaTab.Importer
                 bend.Add(bendDestination);
                 note.BendPoints = bend;
             }
+        }
+
+        private int ToBendValue(float gpxValue)
+        {
+            // NOTE: strange IEEE behavior here: 
+            // (int)(100f * 0.04f) => 3
+            // (100f*0.04f) => 4.0f => (int)4.0f => 4
+            var converted = gpxValue*BendPointValueFactor;
+            return (int)(converted);
+        }
+
+        private int ToBendOffset(float gpxOffset)
+        {
+            var converted = gpxOffset * BendPointPositionFactor;
+            return (int)(converted);
         }
 
         private void ParseRhythms(IXmlNode node)
