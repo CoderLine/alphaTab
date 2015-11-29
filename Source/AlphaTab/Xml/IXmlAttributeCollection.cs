@@ -2,6 +2,6 @@
 {
     public interface IXmlAttributeCollection
     {
-        IXmlNode this[string key] { get; }
+        IXmlNode Get(string key);
     }
 }

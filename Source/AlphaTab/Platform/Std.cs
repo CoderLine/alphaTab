@@ -72,7 +72,7 @@ namespace AlphaTab.Platform
         {
             for (int i = 0; i < n.ChildNodes.Count; i++)
             {
-                action(n.ChildNodes[i]);
+                action(n.ChildNodes.Get(i));
             }
         }
 

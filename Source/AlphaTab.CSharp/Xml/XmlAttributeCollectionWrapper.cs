@@ -11,9 +11,9 @@ namespace AlphaTab.Xml
             _attributes = attributes;
         }
 
-        public IXmlNode this[string key]
+        public IXmlNode Get(string key)
         {
-            get { return new XmlNodeWrapper(_attributes[key]); }
+            return new XmlNodeWrapper(_attributes[key]);
         }
     }
 }

@@ -101,4 +101,3 @@ using SharpKit.JavaScript;
                     IgnoreGenericMethodArguments = true,
                     OmitCasts = true
                     )]
-

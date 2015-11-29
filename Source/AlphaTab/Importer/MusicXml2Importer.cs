@@ -168,7 +168,7 @@ namespace AlphaTab.Importer
             var voiceNodes = element.GetElementsByTagName("voice");
             if (voiceNodes.Count > 0)
             {
-                voiceIndex = Std.ParseInt(Std.GetNodeValue(voiceNodes[0])) - 1;
+                voiceIndex = Std.ParseInt(Std.GetNodeValue(voiceNodes.Get(0))) - 1;
             }
 
             Beat beat;

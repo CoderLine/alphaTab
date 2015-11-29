@@ -16,9 +16,9 @@ namespace AlphaTab.Xml
             get { return _xmlNodeList.Count; }
         }
 
-        public IXmlNode this[int index]
+        public IXmlNode Get(int index)
         {
-            get { return new XmlNodeWrapper(_xmlNodeList[index]); }
+            return new XmlNodeWrapper(_xmlNodeList[index]); 
         }
     }
 }

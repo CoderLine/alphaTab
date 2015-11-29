@@ -1,4 +1,5 @@
 ﻿using SharpKit.Html;
+using SharpKit.JavaScript;
 
 namespace AlphaTab.Xml
 {
@@ -11,9 +12,9 @@ namespace AlphaTab.Xml
             _attributes = attributes;
         }
 
-        public IXmlNode this[string key]
+        public IXmlNode Get(string key)
         {
-            get { return new XmlNodeWrapper(_attributes.getNamedItem(key)); }
+            return new XmlNodeWrapper(_attributes.getNamedItem(key));
         }
     }
 }

@@ -3,6 +3,6 @@
     public interface IXmlNodeCollection 
     {
         int Count { get; }
-        IXmlNode this[int index] { get; }
+        IXmlNode Get(int index);
     }
 }
