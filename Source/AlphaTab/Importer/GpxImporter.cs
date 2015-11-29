@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using System.Diagnostics;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 
@@ -36,6 +38,10 @@ namespace AlphaTab.Importer
             // convert data to string
             var data = fileSystem.Files[0].Data;
             var xml = Std.ToString(data);
+
+#if CSharp && DEBUG
+            Trace.WriteLine(xml);
+#endif
 
             // lets set the fileSystem to null, maybe the garbage collector will come along
             // and kick the fileSystem binary data before we finish parsing

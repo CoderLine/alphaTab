@@ -199,8 +199,15 @@ namespace AlphaTab.Importer
                         case "WordsAndMusic":
                             if (c.FirstChild != null && c.FirstChild.ToString() != "")
                             {
-                                Score.Words = GetValue(c.FirstChild);
-                                Score.Music = GetValue(c.FirstChild);
+                                var wordsAndMusic = GetValue(c.FirstChild);
+                                if (!string.IsNullOrEmpty(wordsAndMusic) && string.IsNullOrEmpty(Score.Words))
+                                {
+                                    Score.Words = wordsAndMusic;
+                                }
+                                if (!string.IsNullOrEmpty(wordsAndMusic) && string.IsNullOrEmpty(Score.Music))
+                                {
+                                    Score.Music = wordsAndMusic;
+                                }
                             }
                             break;
                         case "Copyright":
@@ -208,6 +215,12 @@ namespace AlphaTab.Importer
                             break;
                         case "Tabber":
                             Score.Tab = GetValue(c.FirstChild);
+                            break;
+                        case "Instructions":
+                            Score.Instructions = GetValue(c.FirstChild);
+                            break;
+                        case "Notices":
+                            Score.Notices = GetValue(c.FirstChild);
                             break;
                     }
                 }
@@ -1009,6 +1022,48 @@ namespace AlphaTab.Importer
                                     break;
                             }
                             break;
+                        case "LeftFingering":
+                            note.IsFingering = true;
+                            switch (GetValue(c))
+                            {
+                                case "P":
+                                    note.LeftHandFinger = Fingers.Thumb;
+                                    break;
+                                case "I":
+                                    note.LeftHandFinger = Fingers.IndexFinger;
+                                    break;
+                                case "M":
+                                    note.LeftHandFinger = Fingers.MiddleFinger;
+                                    break;
+                                case "A":
+                                    note.LeftHandFinger = Fingers.AnnularFinger;
+                                    break;
+                                case "C":
+                                    note.LeftHandFinger = Fingers.LittleFinger;
+                                    break;
+                            }
+                            break;
+                        case "RightFingering":
+                            note.IsFingering = true;
+                            switch (GetValue(c))
+                            {
+                                case "P":
+                                    note.RightHandFinger = Fingers.Thumb;
+                                    break;
+                                case "I":
+                                    note.RightHandFinger = Fingers.IndexFinger;
+                                    break;
+                                case "M":
+                                    note.RightHandFinger = Fingers.MiddleFinger;
+                                    break;
+                                case "A":
+                                    note.RightHandFinger = Fingers.AnnularFinger;
+                                    break;
+                                case "C":
+                                    note.RightHandFinger = Fingers.LittleFinger;
+                                    break;
+                            }
+                            break;
                     }
                 }
             });
@@ -1081,7 +1136,10 @@ namespace AlphaTab.Importer
                                         note.HarmonicValue = Std.ParseFloat(GetValue(hfret));
                                     }
                                     break;
-                                // case "Muted": 
+                                case "Muted":
+                                    if (FindChildElement(c, "Enable") != null)
+                                        note.IsDead = true;
+                                    break;
                                 case "PalmMuted":
                                     if (FindChildElement(c, "Enable") != null)
                                         note.IsPalmMute = true;
@@ -1264,6 +1322,63 @@ namespace AlphaTab.Importer
 
         private void BuildModel()
         {
+            // build score
+            for (int i = 0, j = _masterBars.Count; i < j; i++)
+            {
+                var masterBar = _masterBars[i];
+                Score.AddMasterBar(masterBar);
+            }
+
+            // build tracks (not all, only those used by the score)
+            var trackIndex = 0;
+            foreach (var trackId in _tracksMapping)
+            {
+                var track = _tracksById[trackId];
+                Score.AddTrack(track);
+
+                // iterate all bar definitions for the masterbars
+                // and add the correct bar to the track
+                for (int i = 0, j = _barsOfMasterBar.Count; i < j; i++)
+                {
+                    var barIds = _barsOfMasterBar[i];
+                    var barId = barIds[trackIndex];
+                    if (barId != InvalidId)
+                    {
+                        track.AddBar(_barsById[barId]);
+                    }
+                }
+
+                trackIndex++;
+            }
+
+            // build bars
+            foreach (var barId in _barsById.Keys)
+            {
+                var bar = _barsById[barId];
+                if (_voicesOfBar.ContainsKey(barId))
+                {
+                    // add voices to bars
+                    foreach (var voiceId in _voicesOfBar[barId])
+                    {
+                        if (voiceId != InvalidId)
+                        {
+                            bar.AddVoice(_voiceById[voiceId]);
+                        }
+                        else
+                        {
+                            // invalid voice -> empty voice
+                            var voice = new Voice();
+                            bar.AddVoice(voice);
+
+                            var beat = new Beat();
+                            beat.IsEmpty = true;
+                            beat.Duration = Duration.Quarter;
+                            voice.AddBeat(beat);
+                        }
+                    }
+                }
+            }
+
             // build beats
             foreach (var beatId in _beatById.Keys)
             {
@@ -1313,55 +1428,8 @@ namespace AlphaTab.Importer
                 }
             }
 
-            // build bars
-            foreach (var barId in _barsById.Keys)
-            {
-                var bar = _barsById[barId];
-                if (_voicesOfBar.ContainsKey(barId))
-                {
-                    // add voices to bars
-                    foreach (var voiceId in _voicesOfBar[barId])
-                    {
-                        if (voiceId != InvalidId)
-                        {
-                            bar.AddVoice(_voiceById[voiceId]);
-                        }
-                        else
-                        {
-                            // invalid voice -> empty voice
-                            var voice = new Voice();
-                            bar.AddVoice(voice);
 
-                            var beat = new Beat();
-                            beat.IsEmpty = true;
-                            beat.Duration = Duration.Quarter;
-                            voice.AddBeat(beat);
-                        }
-                    }
-                }
-            }
-
-            // build tracks (not all, only those used by the score)
-            var trackIndex = 0;
-            foreach (var trackId in _tracksMapping)
-            {
-                var track = _tracksById[trackId];
-                Score.AddTrack(track);
-
-                // iterate all bar definitions for the masterbars
-                // and add the correct bar to the track
-                for (int i = 0, j = _barsOfMasterBar.Count; i < j; i++)
-                {
-                    var barIds = _barsOfMasterBar[i];
-                    var barId = barIds[trackIndex];
-                    if (barId != InvalidId)
-                    {
-                        track.AddBar(_barsById[barId]);
-                    }
-                }
-
-                trackIndex++;
-            }
+           
 
             // build automations
             foreach (var barId in _automations.Keys)
@@ -1381,12 +1449,6 @@ namespace AlphaTab.Importer
                 }
             }
 
-            // build score
-            for (int i = 0, j = _masterBars.Count; i < j; i++)
-            {
-                var masterBar = _masterBars[i];
-                Score.AddMasterBar(masterBar);
-            }
 
             // build automations
             foreach (var barId in _automations.Keys)

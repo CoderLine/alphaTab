@@ -4868,6 +4868,7 @@ AlphaTab.Importer.GpxImporter.prototype = {
         // convert data to string
         var data = fileSystem.Files[0].Data;
         var xml = AlphaTab.Platform.Std.ToString(data);
+        
         // lets set the fileSystem to null, maybe the garbage collector will come along
         // and kick the fileSystem binary data before we finish parsing
         fileSystem.Files = null;
@@ -5001,8 +5002,13 @@ AlphaTab.Importer.GpxParser.prototype = {
                         break;
                     case "WordsAndMusic":
                         if (c.get_FirstChild() != null && c.get_FirstChild().toString() != ""){
-                        this.Score.Words = this.GetValue(c.get_FirstChild());
-                        this.Score.Music = this.GetValue(c.get_FirstChild());
+                        var wordsAndMusic = this.GetValue(c.get_FirstChild());
+                        if (!((wordsAndMusic==null)||(wordsAndMusic.length==0)) && ((this.Score.Words==null)||(this.Score.Words.length==0))){
+                            this.Score.Words = wordsAndMusic;
+                        }
+                        if (!((wordsAndMusic==null)||(wordsAndMusic.length==0)) && ((this.Score.Music==null)||(this.Score.Music.length==0))){
+                            this.Score.Music = wordsAndMusic;
+                        }
                     }
                         break;
                     case "Copyright":
@@ -5010,6 +5016,12 @@ AlphaTab.Importer.GpxParser.prototype = {
                         break;
                     case "Tabber":
                         this.Score.Tab = this.GetValue(c.get_FirstChild());
+                        break;
+                    case "Instructions":
+                        this.Score.Instructions = this.GetValue(c.get_FirstChild());
+                        break;
+                    case "Notices":
+                        this.Score.Notices = this.GetValue(c.get_FirstChild());
                         break;
                 }
             }
@@ -5620,6 +5632,46 @@ AlphaTab.Importer.GpxParser.prototype = {
                             break;
                         }
                         break;
+                    case "LeftFingering":
+                        note.IsFingering = true;
+                        switch (this.GetValue(c)){
+                            case "P":
+                            note.LeftHandFinger = AlphaTab.Model.Fingers.Thumb;
+                            break;
+                            case "I":
+                            note.LeftHandFinger = AlphaTab.Model.Fingers.IndexFinger;
+                            break;
+                            case "M":
+                            note.LeftHandFinger = AlphaTab.Model.Fingers.MiddleFinger;
+                            break;
+                            case "A":
+                            note.LeftHandFinger = AlphaTab.Model.Fingers.AnnularFinger;
+                            break;
+                            case "C":
+                            note.LeftHandFinger = AlphaTab.Model.Fingers.LittleFinger;
+                            break;
+                        }
+                        break;
+                    case "RightFingering":
+                        note.IsFingering = true;
+                        switch (this.GetValue(c)){
+                            case "P":
+                            note.RightHandFinger = AlphaTab.Model.Fingers.Thumb;
+                            break;
+                            case "I":
+                            note.RightHandFinger = AlphaTab.Model.Fingers.IndexFinger;
+                            break;
+                            case "M":
+                            note.RightHandFinger = AlphaTab.Model.Fingers.MiddleFinger;
+                            break;
+                            case "A":
+                            note.RightHandFinger = AlphaTab.Model.Fingers.AnnularFinger;
+                            break;
+                            case "C":
+                            note.RightHandFinger = AlphaTab.Model.Fingers.LittleFinger;
+                            break;
+                        }
+                        break;
                 }
             }
         }));
@@ -5680,6 +5732,10 @@ AlphaTab.Importer.GpxParser.prototype = {
                             if (hfret != null){
                             note.HarmonicValue = AlphaTab.Platform.Std.ParseFloat(this.GetValue(hfret));
                         }
+                            break;
+                            case "Muted":
+                            if (this.FindChildElement(c, "Enable") != null)
+                            note.IsDead = true;
                             break;
                             case "PalmMuted":
                             if (this.FindChildElement(c, "Enable") != null)
@@ -5827,48 +5883,33 @@ AlphaTab.Importer.GpxParser.prototype = {
         return AlphaTab.Platform.Std.GetNodeValue(n);
     },
     BuildModel: function (){
-        // build beats
-        for (var $i9 = 0,$t9 = Object.keys(this._beatById),$l9 = $t9.length,beatId = $t9[$i9]; $i9 < $l9; $i9++, beatId = $t9[$i9]){
-            var beat = this._beatById[beatId];
-            var rhythmId = this._rhythmOfBeat[beatId];
-            var rhythm = this._rhythmById[rhythmId];
-            // set beat duration
-            beat.Duration = rhythm.Value;
-            beat.Dots = rhythm.Dots;
-            beat.TupletNumerator = rhythm.TupletNumerator;
-            beat.TupletDenominator = rhythm.TupletDenominator;
-            // add notes to beat
-            if (this._notesOfBeat.hasOwnProperty(beatId)){
-                for (var $i10 = 0,$t10 = this._notesOfBeat[beatId],$l10 = $t10.length,noteId = $t10[$i10]; $i10 < $l10; $i10++, noteId = $t10[$i10]){
-                    if (noteId != "-1"){
-                        beat.AddNote(this._noteById[noteId]);
-                        if (this._tappedNotes.hasOwnProperty(noteId)){
-                            beat.Tap = true;
-                        }
-                    }
-                }
-            }
+        // build score
+        for (var i = 0,j = this._masterBars.length; i < j; i++){
+            var masterBar = this._masterBars[i];
+            this.Score.AddMasterBar(masterBar);
         }
-        // build voices
-        for (var $i11 = 0,$t11 = Object.keys(this._voiceById),$l11 = $t11.length,voiceId = $t11[$i11]; $i11 < $l11; $i11++, voiceId = $t11[$i11]){
-            var voice = this._voiceById[voiceId];
-            if (this._beatsOfVoice.hasOwnProperty(voiceId)){
-                // add beats to voices
-                for (var $i12 = 0,$t12 = this._beatsOfVoice[voiceId],$l12 = $t12.length,beatId = $t12[$i12]; $i12 < $l12; $i12++, beatId = $t12[$i12]){
-                    if (beatId != "-1"){
-                        // important! we clone the beat because beats get reused
-                        // in gp6, our model needs to have unique beats.
-                        voice.AddBeat(this._beatById[beatId].Clone());
-                    }
+        // build tracks (not all, only those used by the score)
+        var trackIndex = 0;
+        for (var $i9 = 0,$t9 = this._tracksMapping,$l9 = $t9.length,trackId = $t9[$i9]; $i9 < $l9; $i9++, trackId = $t9[$i9]){
+            var track = this._tracksById[trackId];
+            this.Score.AddTrack(track);
+            // iterate all bar definitions for the masterbars
+            // and add the correct bar to the track
+            for (var i = 0,j = this._barsOfMasterBar.length; i < j; i++){
+                var barIds = this._barsOfMasterBar[i];
+                var barId = barIds[trackIndex];
+                if (barId != "-1"){
+                    track.AddBar(this._barsById[barId]);
                 }
             }
+            trackIndex++;
         }
         // build bars
-        for (var $i13 = 0,$t13 = Object.keys(this._barsById),$l13 = $t13.length,barId = $t13[$i13]; $i13 < $l13; $i13++, barId = $t13[$i13]){
+        for (var $i10 = 0,$t10 = Object.keys(this._barsById),$l10 = $t10.length,barId = $t10[$i10]; $i10 < $l10; $i10++, barId = $t10[$i10]){
             var bar = this._barsById[barId];
             if (this._voicesOfBar.hasOwnProperty(barId)){
                 // add voices to bars
-                for (var $i14 = 0,$t14 = this._voicesOfBar[barId],$l14 = $t14.length,voiceId = $t14[$i14]; $i14 < $l14; $i14++, voiceId = $t14[$i14]){
+                for (var $i11 = 0,$t11 = this._voicesOfBar[barId],$l11 = $t11.length,voiceId = $t11[$i11]; $i11 < $l11; $i11++, voiceId = $t11[$i11]){
                     if (voiceId != "-1"){
                         bar.AddVoice(this._voiceById[voiceId]);
                     }
@@ -5884,21 +5925,41 @@ AlphaTab.Importer.GpxParser.prototype = {
                 }
             }
         }
-        // build tracks (not all, only those used by the score)
-        var trackIndex = 0;
-        for (var $i15 = 0,$t15 = this._tracksMapping,$l15 = $t15.length,trackId = $t15[$i15]; $i15 < $l15; $i15++, trackId = $t15[$i15]){
-            var track = this._tracksById[trackId];
-            this.Score.AddTrack(track);
-            // iterate all bar definitions for the masterbars
-            // and add the correct bar to the track
-            for (var i = 0,j = this._barsOfMasterBar.length; i < j; i++){
-                var barIds = this._barsOfMasterBar[i];
-                var barId = barIds[trackIndex];
-                if (barId != "-1"){
-                    track.AddBar(this._barsById[barId]);
+        // build beats
+        for (var $i12 = 0,$t12 = Object.keys(this._beatById),$l12 = $t12.length,beatId = $t12[$i12]; $i12 < $l12; $i12++, beatId = $t12[$i12]){
+            var beat = this._beatById[beatId];
+            var rhythmId = this._rhythmOfBeat[beatId];
+            var rhythm = this._rhythmById[rhythmId];
+            // set beat duration
+            beat.Duration = rhythm.Value;
+            beat.Dots = rhythm.Dots;
+            beat.TupletNumerator = rhythm.TupletNumerator;
+            beat.TupletDenominator = rhythm.TupletDenominator;
+            // add notes to beat
+            if (this._notesOfBeat.hasOwnProperty(beatId)){
+                for (var $i13 = 0,$t13 = this._notesOfBeat[beatId],$l13 = $t13.length,noteId = $t13[$i13]; $i13 < $l13; $i13++, noteId = $t13[$i13]){
+                    if (noteId != "-1"){
+                        beat.AddNote(this._noteById[noteId]);
+                        if (this._tappedNotes.hasOwnProperty(noteId)){
+                            beat.Tap = true;
+                        }
+                    }
                 }
             }
-            trackIndex++;
+        }
+        // build voices
+        for (var $i14 = 0,$t14 = Object.keys(this._voiceById),$l14 = $t14.length,voiceId = $t14[$i14]; $i14 < $l14; $i14++, voiceId = $t14[$i14]){
+            var voice = this._voiceById[voiceId];
+            if (this._beatsOfVoice.hasOwnProperty(voiceId)){
+                // add beats to voices
+                for (var $i15 = 0,$t15 = this._beatsOfVoice[voiceId],$l15 = $t15.length,beatId = $t15[$i15]; $i15 < $l15; $i15++, beatId = $t15[$i15]){
+                    if (beatId != "-1"){
+                        // important! we clone the beat because beats get reused
+                        // in gp6, our model needs to have unique beats.
+                        voice.AddBeat(this._beatById[beatId].Clone());
+                    }
+                }
+            }
         }
         // build automations
         for (var $i16 = 0,$t16 = Object.keys(this._automations),$l16 = $t16.length,barId = $t16[$i16]; $i16 < $l16; $i16++, barId = $t16[$i16]){
@@ -5912,11 +5973,6 @@ AlphaTab.Importer.GpxParser.prototype = {
                     }
                 }
             }
-        }
-        // build score
-        for (var i = 0,j = this._masterBars.length; i < j; i++){
-            var masterBar = this._masterBars[i];
-            this.Score.AddMasterBar(masterBar);
         }
         // build automations
         for (var $i17 = 0,$t17 = Object.keys(this._automations),$l17 = $t17.length,barId = $t17[$i17]; $i17 < $l17; $i17++, barId = $t17[$i17]){
@@ -7707,7 +7763,6 @@ AlphaTab.Model.Voice.prototype = {
         // chaining
         beat.Voice = this;
         beat.Index = this.Beats.length;
-        this.Chain(beat);
         this.Beats.push(beat);
     },
     Chain: function (beat){
@@ -7743,9 +7798,13 @@ AlphaTab.Model.Voice.prototype = {
         this.AddBeat(lastBeat);
     },
     Finish: function (){
+        // TODO: find a proper solution to chain beats without iterating twice
         for (var i = 0,j = this.Beats.length; i < j; i++){
             var beat = this.Beats[i];
             this.Chain(beat);
+        }
+        for (var i = 0,j = this.Beats.length; i < j; i++){
+            var beat = this.Beats[i];
             beat.Finish();
             if (this.MinDuration == null || this.MinDuration > beat.Duration){
                 this.MinDuration = beat.Duration;

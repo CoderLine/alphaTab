@@ -28,7 +28,7 @@ namespace AlphaTab.Test.Importer
     {
         internal Gp3To5Importer PrepareImporterWithFile(string name)
         {
-            const string path = "TestFiles/GuitarPro";
+            const string path = "TestFiles/";
             var buffer = Environment.FileLoaders["default"]().LoadBinary(Path.Combine(path, name));
             return PrepareImporterWithBytes(buffer);
         }

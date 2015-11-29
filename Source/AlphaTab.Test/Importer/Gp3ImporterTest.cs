@@ -26,7 +26,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestScoreInfo()
         {
-            var reader = PrepareImporterWithFile("Test01.gp3");
+            var reader = PrepareImporterWithFile("GuitarPro3/Test01.gp3");
             var score = reader.ReadScore();
 
             Assert.AreEqual("Title", score.Title);
@@ -47,7 +47,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestNotes()
         {
-            var reader = PrepareImporterWithFile("Test02.gp3");
+            var reader = PrepareImporterWithFile("GuitarPro3/Test02.gp3");
             var score = reader.ReadScore();
             CheckTest02Score(score);
         }
@@ -55,7 +55,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestTimeSignatures()
         {
-            var reader = PrepareImporterWithFile("Test03.gp3");
+            var reader = PrepareImporterWithFile("GuitarPro3/Test03.gp3");
             var score = reader.ReadScore();
 
             CheckTest03Score(score);
@@ -64,7 +64,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestDead()
         {
-            var reader = PrepareImporterWithFile("TestDead.gp3");
+            var reader = PrepareImporterWithFile("GuitarPro3/TestDead.gp3");
             var score = reader.ReadScore();
             CheckDead(score);
         }
@@ -72,7 +72,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestAccentuation()
         {
-            var reader = PrepareImporterWithFile("TestAccentuations.gp3");
+            var reader = PrepareImporterWithFile("GuitarPro3/TestAccentuations.gp3");
             var score = reader.ReadScore();
 
             Assert.IsTrue(score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[0].IsGhost);
@@ -85,7 +85,7 @@ namespace AlphaTab.Test.Importer
         public void TestGuitarPro3Harmonics() 
         {
             // TODO: Find out about GP3 harmonics!
-            //var reader = PrepareImporterWithFile("TestHarmonics.gp3");
+            //var reader = PrepareImporterWithFile("GuitarPro3/TestHarmonics.gp3");
             //var score = reader.ReadScore();
             
             //Assert.AreEqual(HarmonicType.Natural, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[0].HarmonicType);
@@ -95,7 +95,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestHammer()
         {
-            var reader = PrepareImporterWithFile("TestHammer.gp3");
+            var reader = PrepareImporterWithFile("GuitarPro3/TestHammer.gp3");
             var score = reader.ReadScore();
             CheckHammer(score);
         }
@@ -103,7 +103,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestBend()
         {
-            var reader = PrepareImporterWithFile("TestBends.gp3");
+            var reader = PrepareImporterWithFile("GuitarPro3/TestBends.gp3");
             var score = reader.ReadScore();
             CheckBend(score);
         }
@@ -111,7 +111,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestSlides()
         {
-            var reader = PrepareImporterWithFile("TestSlides.gp3");
+            var reader = PrepareImporterWithFile("GuitarPro3/TestSlides.gp3");
             var score = reader.ReadScore();
 
             Assert.AreEqual(SlideType.Shift, score.Tracks[0].Bars[0].Voices[0].Beats[0].GetNoteOnString(5).SlideType);
@@ -122,7 +122,7 @@ namespace AlphaTab.Test.Importer
         public void TestGuitarPro3Vibrato() 
         {
             // TODO: Check why this vibrato is not recognized
-            var reader = PrepareImporterWithFile("TestVibrato.gp3");
+            var reader = PrepareImporterWithFile("GuitarPro3/TestVibrato.gp3");
             var score = reader.ReadScore();
             CheckVibrato(score, false);
         }
@@ -130,7 +130,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestOtherEffects()
         {
-            var reader = PrepareImporterWithFile("TestOtherEffects.gp3");
+            var reader = PrepareImporterWithFile("GuitarPro3/TestOtherEffects.gp3");
             var score = reader.ReadScore();
 
             Assert.IsTrue(score.Tracks[0].Bars[0].Voices[0].Beats[2].Tap);
@@ -151,7 +151,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestStroke()
         {
-            var reader = PrepareImporterWithFile("TestStrokes.gp3");
+            var reader = PrepareImporterWithFile("GuitarPro3/TestStrokes.gp3");
             var score = reader.ReadScore();
 
             Assert.AreEqual(BrushType.BrushDown, score.Tracks[0].Bars[0].Voices[0].Beats[0].BrushType);
@@ -161,7 +161,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestTuplets()
         {
-            var reader = PrepareImporterWithFile("TestTuplets.gp3");
+            var reader = PrepareImporterWithFile("GuitarPro3/TestTuplets.gp3");
             var score = reader.ReadScore();
             CheckTuplets(score);
         }
@@ -169,7 +169,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestRanges()
         {
-            var reader = PrepareImporterWithFile("TestRanges.gp3");
+            var reader = PrepareImporterWithFile("GuitarPro3/TestRanges.gp3");
             var score = reader.ReadScore();
 
             Assert.IsTrue(score.Tracks[0].Bars[1].Voices[0].Beats[1].Notes[0].IsLetRing);
@@ -181,7 +181,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestEffects()
         {
-            var reader = PrepareImporterWithFile("Effects.gp3");
+            var reader = PrepareImporterWithFile("GuitarPro3/Effects.gp3");
             var score = reader.ReadScore();
             CheckEffects(score);
         }
@@ -189,7 +189,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestStrings()
         {
-            var reader = PrepareImporterWithFile("TestStrings.gp3");
+            var reader = PrepareImporterWithFile("GuitarPro3/TestStrings.gp3");
             var score = reader.ReadScore();
             CheckStrings(score);
         }

@@ -22,7 +22,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;UNIT_TEST</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -60,196 +60,268 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="TestFiles\GuitarPro\Compressed.gpx">
+    <None Include="TestFiles\GuitarPro6\Compressed.gpx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\Effects.gp3">
+    <None Include="TestFiles\GuitarPro3\Effects.gp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\Effects.gp4">
+    <None Include="TestFiles\GuitarPro4\Effects.gp4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\Effects.gp5">
+    <None Include="TestFiles\GuitarPro5\Effects.gp5">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\FadeToBlack.gp4">
+    <None Include="TestFiles\GuitarPro4\FadeToBlack.gp4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\RepeatClose.gp5">
+    <None Include="TestFiles\GuitarPro5\RepeatClose.gp5">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\RepeatCloseAlternateEndings.gp5">
+    <None Include="TestFiles\GuitarPro5\RepeatCloseAlternateEndings.gp5">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\RepeatCloseMulti.gp5">
+    <None Include="TestFiles\GuitarPro5\RepeatCloseMulti.gp5">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\RepeatCloseWithoutStartAtBeginning.gp5">
+    <None Include="TestFiles\GuitarPro5\RepeatCloseWithoutStartAtBeginning.gp5">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\Serenade.gp5">
+    <None Include="TestFiles\GuitarPro5\Serenade.gp5">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\Test01.gp3">
+    <None Include="TestFiles\GuitarPro3\Test01.gp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\Test01.gp4">
+    <None Include="TestFiles\GuitarPro4\Test01.gp4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\Test01.gp5">
+    <None Include="TestFiles\GuitarPro5\Test01.gp5">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\Test02.gp3">
+    <None Include="TestFiles\GuitarPro3\Test02.gp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\Test02.gp4">
+    <None Include="TestFiles\GuitarPro4\Test02.gp4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\Test02.gp5">
+    <None Include="TestFiles\GuitarPro5\Test02.gp5">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\Test03.gp3">
+    <None Include="TestFiles\GuitarPro3\Test03.gp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\Test03.gp4">
+    <None Include="TestFiles\GuitarPro4\Test03.gp4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\Test03.gp5">
+    <None Include="TestFiles\GuitarPro5\Test03.gp5">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestAccentuations.gp3">
+    <None Include="TestFiles\GuitarPro3\TestAccentuations.gp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestAccentuations.gp4">
+    <None Include="TestFiles\GuitarPro4\TestAccentuations.gp4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestAccentuations.gp5">
+    <None Include="TestFiles\GuitarPro5\TestAccentuations.gp5">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestBends.gp3">
+    <None Include="TestFiles\GuitarPro3\TestBends.gp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestBends.gp4">
+    <None Include="TestFiles\GuitarPro4\TestBends.gp4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestBends.gp5">
+    <None Include="TestFiles\GuitarPro5\TestBends.gp5">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestDead.gp3">
+    <None Include="TestFiles\GuitarPro3\TestDead.gp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestDead.gp4">
+    <None Include="TestFiles\GuitarPro4\TestDead.gp4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestDead.gp5">
+    <None Include="TestFiles\GuitarPro5\TestDead.gp5">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestFingering.gp4">
+    <None Include="TestFiles\GuitarPro4\TestFingering.gp4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestFingering.gp5">
+    <None Include="TestFiles\GuitarPro5\TestFingering.gp5">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestGrace.gp3">
+    <None Include="TestFiles\GuitarPro3\TestGrace.gp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestGrace.gp4">
+    <None Include="TestFiles\GuitarPro4\TestGrace.gp4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestGrace.gp5">
+    <None Include="TestFiles\GuitarPro5\TestGrace.gp5">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestHammer.gp3">
+    <None Include="TestFiles\GuitarPro3\TestHammer.gp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestHammer.gp4">
+    <None Include="TestFiles\GuitarPro4\TestHammer.gp4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestHammer.gp5">
+    <None Include="TestFiles\GuitarPro5\TestHammer.gp5">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestHarmonics.gp3">
+    <None Include="TestFiles\GuitarPro3\TestHarmonics.gp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestHarmonics.gp4">
+    <None Include="TestFiles\GuitarPro4\TestHarmonics.gp4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestHarmonics.gp5">
+    <None Include="TestFiles\GuitarPro5\TestHarmonics.gp5">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestOtherEffects.gp3">
+    <None Include="TestFiles\GuitarPro3\TestOtherEffects.gp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestOtherEffects.gp4">
+    <None Include="TestFiles\GuitarPro4\TestOtherEffects.gp4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestOtherEffects.gp5">
+    <None Include="TestFiles\GuitarPro5\TestOtherEffects.gp5">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestRanges.gp3">
+    <None Include="TestFiles\GuitarPro3\TestRanges.gp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestRanges.gp4">
+    <None Include="TestFiles\GuitarPro4\TestRanges.gp4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestRanges.gp5">
+    <None Include="TestFiles\GuitarPro5\TestRanges.gp5">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestSlides.gp3">
+    <None Include="TestFiles\GuitarPro3\TestSlides.gp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestSlides.gp4">
+    <None Include="TestFiles\GuitarPro4\TestSlides.gp4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestSlides.gp5">
+    <None Include="TestFiles\GuitarPro5\TestSlides.gp5">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestStrings.gp3">
+    <None Include="TestFiles\GuitarPro3\TestStrings.gp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestStrings.gp4">
+    <None Include="TestFiles\GuitarPro4\TestStrings.gp4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestStrings.gp5">
+    <None Include="TestFiles\GuitarPro5\TestStrings.gp5">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestStrokes.gp3">
+    <None Include="TestFiles\GuitarPro3\TestStrokes.gp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestStrokes.gp4">
+    <None Include="TestFiles\GuitarPro4\TestStrokes.gp4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestStrokes.gp5">
+    <None Include="TestFiles\GuitarPro5\TestStrokes.gp5">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestTremolo.gp4">
+    <None Include="TestFiles\GuitarPro4\TestTremolo.gp4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestTremolo.gp5">
+    <None Include="TestFiles\GuitarPro5\TestTremolo.gp5">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestTrills.gp4">
+    <None Include="TestFiles\GuitarPro4\TestTrills.gp4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestTrills.gp5">
+    <None Include="TestFiles\GuitarPro5\TestTrills.gp5">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestTuplets.gp3">
+    <None Include="TestFiles\GuitarPro3\TestTuplets.gp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestTuplets.gp4">
+    <None Include="TestFiles\GuitarPro4\TestTuplets.gp4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestTuplets.gp5">
+    <None Include="TestFiles\GuitarPro5\TestTuplets.gp5">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestVibrato.gp3">
+    <None Include="TestFiles\GuitarPro3\TestVibrato.gp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestVibrato.gp4">
+    <None Include="TestFiles\GuitarPro4\TestVibrato.gp4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\GuitarPro\TestVibrato.gp5">
+    <None Include="TestFiles\GuitarPro5\TestVibrato.gp5">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro6\Effects.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro6\RepeatClose.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro6\RepeatCloseAlternateEndings.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro6\RepeatCloseMulti.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro6\Serenade.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro6\Test01.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro6\Test02.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro6\Test03.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro6\TestAccentuations.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro6\TestBends.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro6\TestDead.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro6\TestFingering.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro6\TestGrace.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro6\TestHammer.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro6\TestHarmonics.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro6\TestOtherEffects.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro6\TestRanges.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro6\TestSlides.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro6\TestStrings.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro6\TestStrokes.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro6\TestTremolo.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro6\TestTrills.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro6\TestTuplets.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro6\TestVibrato.gpx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\LICENSE" />

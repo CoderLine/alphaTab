@@ -25,7 +25,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestScoreInfo()
         {
-            var reader = PrepareImporterWithFile("Test01.gp4");
+            var reader = PrepareImporterWithFile("GuitarPro4/Test01.gp4");
             var score = reader.ReadScore();
 
             Assert.AreEqual("Title", score.Title);
@@ -46,7 +46,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestNotes()
         {
-            var reader = PrepareImporterWithFile("Test02.gp4");
+            var reader = PrepareImporterWithFile("GuitarPro4/Test02.gp4");
             var score = reader.ReadScore();
             CheckTest02Score(score);
         }
@@ -54,7 +54,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestTimeSignatures()
         {
-            var reader = PrepareImporterWithFile("Test03.gp4");
+            var reader = PrepareImporterWithFile("GuitarPro4/Test03.gp4");
             var score = reader.ReadScore();
 
             CheckTest03Score(score);
@@ -63,7 +63,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestDead()
         {
-            var reader = PrepareImporterWithFile("TestDead.gp4");
+            var reader = PrepareImporterWithFile("GuitarPro4/TestDead.gp4");
             var score = reader.ReadScore();
             CheckDead(score);
         }
@@ -71,7 +71,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestGrace()
         {
-            var reader = PrepareImporterWithFile("TestGrace.gp4");
+            var reader = PrepareImporterWithFile("GuitarPro4/TestGrace.gp4");
             var score = reader.ReadScore();
             CheckGrace(score);
         }
@@ -79,7 +79,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestAccentuation()
         {
-            var reader = PrepareImporterWithFile("TestAccentuations.gp4");
+            var reader = PrepareImporterWithFile("GuitarPro4/TestAccentuations.gp4");
             var score = reader.ReadScore();
             CheckAccentuation(score, false);
         }
@@ -87,7 +87,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestHarmonics()
         {
-            var reader = PrepareImporterWithFile("TestHarmonics.gp4");
+            var reader = PrepareImporterWithFile("GuitarPro4/TestHarmonics.gp4");
             var score = reader.ReadScore();
             CheckHarmonics(score);
         }
@@ -95,7 +95,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestHammer()
         {
-            var reader = PrepareImporterWithFile("TestHammer.gp4");
+            var reader = PrepareImporterWithFile("GuitarPro4/TestHammer.gp4");
             var score = reader.ReadScore();
             CheckHammer(score);
         }
@@ -103,7 +103,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestBend()
         {
-            var reader = PrepareImporterWithFile("TestBends.gp4");
+            var reader = PrepareImporterWithFile("GuitarPro4/TestBends.gp4");
             var score = reader.ReadScore();
             CheckBend(score);
         }
@@ -111,7 +111,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestTremolo()
         {
-            var reader = PrepareImporterWithFile("TestTremolo.gp4");
+            var reader = PrepareImporterWithFile("GuitarPro4/TestTremolo.gp4");
             var score = reader.ReadScore();
             CheckTremolo(score);
         }
@@ -119,7 +119,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestSlides()
         {
-            var reader = PrepareImporterWithFile("TestSlides.gp4");
+            var reader = PrepareImporterWithFile("GuitarPro4/TestSlides.gp4");
             var score = reader.ReadScore();
             CheckSlides(score);
         }
@@ -127,7 +127,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestVibrato()
         {
-            var reader = PrepareImporterWithFile("TestVibrato.gp4");
+            var reader = PrepareImporterWithFile("GuitarPro4/TestVibrato.gp4");
             var score = reader.ReadScore();
             CheckVibrato(score, true);
         }
@@ -135,7 +135,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestTrills()
         {
-            var reader = PrepareImporterWithFile("TestTrills.gp4");
+            var reader = PrepareImporterWithFile("GuitarPro4/TestTrills.gp4");
             var score = reader.ReadScore();
             CheckTrills(score);
         }
@@ -143,7 +143,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestOtherEffects()
         {
-            var reader = PrepareImporterWithFile("TestOtherEffects.gp4");
+            var reader = PrepareImporterWithFile("GuitarPro4/TestOtherEffects.gp4");
             var score = reader.ReadScore();
             CheckOtherEffects(score);
         }
@@ -151,7 +151,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestFingering()
         {
-            var reader = PrepareImporterWithFile("TestFingering.gp4");
+            var reader = PrepareImporterWithFile("GuitarPro4/TestFingering.gp4");
             var score = reader.ReadScore();
             CheckFingering(score);
         }
@@ -159,7 +159,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestStroke()
         {
-            var reader = PrepareImporterWithFile("TestStrokes.gp4");
+            var reader = PrepareImporterWithFile("GuitarPro4/TestStrokes.gp4");
             var score = reader.ReadScore();
             CheckStroke(score);
         }
@@ -167,7 +167,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestTuplets()
         {
-            var reader = PrepareImporterWithFile("TestTuplets.gp4");
+            var reader = PrepareImporterWithFile("GuitarPro4/TestTuplets.gp4");
             var score = reader.ReadScore();
             CheckTuplets(score);
         }
@@ -175,7 +175,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestRanges()
         {
-            var reader = PrepareImporterWithFile("TestRanges.gp4");
+            var reader = PrepareImporterWithFile("GuitarPro4/TestRanges.gp4");
             var score = reader.ReadScore();
             CheckRanges(score);
         }
@@ -183,7 +183,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestEffects()
         {
-            var reader = PrepareImporterWithFile("Effects.gp4");
+            var reader = PrepareImporterWithFile("GuitarPro4/Effects.gp4");
             var score = reader.ReadScore();
             CheckEffects(score);
         }
@@ -191,7 +191,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestStrings()
         {
-            var reader = PrepareImporterWithFile("TestStrings.gp4");
+            var reader = PrepareImporterWithFile("GuitarPro4/TestStrings.gp4");
             var score = reader.ReadScore();
             CheckStrings(score);
         }

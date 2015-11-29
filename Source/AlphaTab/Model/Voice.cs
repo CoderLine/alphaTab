@@ -56,7 +56,6 @@ namespace AlphaTab.Model
             // chaining
             beat.Voice = this;
             beat.Index = Beats.Count;
-            Chain(beat);
             Beats.Add(beat);
         }
 
@@ -103,10 +102,15 @@ namespace AlphaTab.Model
 
         public void Finish()
         {
+            // TODO: find a proper solution to chain beats without iterating twice
             for (int i = 0, j = Beats.Count; i < j; i++)
             {
                 var beat = Beats[i];
                 Chain(beat);
+            }
+            for (int i = 0, j = Beats.Count; i < j; i++)
+            {
+                var beat = Beats[i];
                 beat.Finish();
                 if (MinDuration == null || MinDuration.Value > beat.Duration)
                 {
