@@ -426,7 +426,7 @@ namespace AlphaTab.Importer
             var anyMeta = false;
             while (_sy == AlphaTexSymbols.MetaCommand)
             {
-                if (_syData == "title")
+                if (_syData.ToString() == "title")
                 {
                     NewSy();
                     if (_sy == AlphaTexSymbols.String)
@@ -440,7 +440,7 @@ namespace AlphaTab.Importer
                     NewSy();
                     anyMeta = true;
                 }
-                else if (_syData == "subtitle")
+                else if (_syData.ToString() == "subtitle")
                 {
                     NewSy();
                     if (_sy == AlphaTexSymbols.String)
@@ -454,7 +454,7 @@ namespace AlphaTab.Importer
                     NewSy();
                     anyMeta = true;
                 }
-                else if (_syData == "artist")
+                else if (_syData.ToString() == "artist")
                 {
                     NewSy();
                     if (_sy == AlphaTexSymbols.String)
@@ -468,7 +468,7 @@ namespace AlphaTab.Importer
                     NewSy();
                     anyMeta = true;
                 }
-                else if (_syData == "album")
+                else if (_syData.ToString() == "album")
                 {
                     NewSy();
                     if (_sy == AlphaTexSymbols.String)
@@ -482,7 +482,7 @@ namespace AlphaTab.Importer
                     NewSy();
                     anyMeta = true;
                 }
-                else if (_syData == "words")
+                else if (_syData.ToString() == "words")
                 {
                     NewSy();
                     if (_sy == AlphaTexSymbols.String)
@@ -496,7 +496,7 @@ namespace AlphaTab.Importer
                     NewSy();
                     anyMeta = true;
                 }
-                else if (_syData == "music")
+                else if (_syData.ToString() == "music")
                 {
                     NewSy();
                     if (_sy == AlphaTexSymbols.String)
@@ -510,7 +510,7 @@ namespace AlphaTab.Importer
                     NewSy();
                     anyMeta = true;
                 }
-                else if (_syData == "copyright")
+                else if (_syData.ToString() == "copyright")
                 {
                     NewSy();
                     if (_sy == AlphaTexSymbols.String)
@@ -524,7 +524,7 @@ namespace AlphaTab.Importer
                     NewSy();
                     anyMeta = true;
                 }
-                else if (_syData == "tempo")
+                else if (_syData.ToString() == "tempo")
                 {
                     NewSy();
                     if (_sy == AlphaTexSymbols.Number)
@@ -538,7 +538,7 @@ namespace AlphaTab.Importer
                     NewSy();
                     anyMeta = true;
                 }
-                else if (_syData == "capo")
+                else if (_syData.ToString() == "capo")
                 {
                     NewSy();
                     if (_sy == AlphaTexSymbols.Number)
@@ -552,7 +552,7 @@ namespace AlphaTab.Importer
                     NewSy();
                     anyMeta = true;
                 }
-                else if (_syData == "tuning")
+                else if (_syData.ToString() == "tuning")
                 {
                     NewSy();
                     if (_sy == AlphaTexSymbols.Tuning) // we require at least one tuning
@@ -571,7 +571,7 @@ namespace AlphaTab.Importer
                     }
                     anyMeta = true;
                 }
-                else if (_syData == "instrument")
+                else if (_syData.ToString() == "instrument")
                 {
                     NewSy();
                     if (_sy == AlphaTexSymbols.Number)
