@@ -51,6 +51,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Audio\MidiPlaybackControllerTest.cs" />
+    <Compile Include="Importer\AlphaTexImporterTest.cs" />
     <Compile Include="Importer\Gp3ImporterTest.cs" />
     <Compile Include="Importer\Gp4ImporterTest.cs" />
     <Compile Include="Importer\Gp5ImporterTest.cs" />

@@ -542,7 +542,7 @@
             Checks if the given character is a letter.
             (no control characters, whitespaces, numbers or dots)
             </summary>
-            <param name="ch">the character</param>
+            <param name="code">the character</param>
             <returns>true if the given character is a letter, otherwise false.</returns>
         </member>
         <member name="M:AlphaTab.Importer.AlphaTexImporter.IsTerminal(System.Int32)">
@@ -556,7 +556,7 @@
             <summary>
             Checks if the given character is a digit. 
             </summary>
-            <param name="ch">the character</param>
+            <param name="code">the character</param>
             <returns>true if the given character is a digit, otherwise false.</returns>
         </member>
         <member name="M:AlphaTab.Importer.AlphaTexImporter.ReadName">

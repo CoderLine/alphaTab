@@ -341,7 +341,7 @@ namespace AlphaTab.Importer
         /// Checks if the given character is a letter.
         /// (no control characters, whitespaces, numbers or dots)
         /// </summary>
-        /// <param name="ch">the character</param>
+        /// <param name="code">the character</param>
         /// <returns>true if the given character is a letter, otherwise false.</returns>
         private static bool IsLetter(int code)
         {
@@ -375,7 +375,7 @@ namespace AlphaTab.Importer
         /// <summary>
         /// Checks if the given character is a digit. 
         /// </summary>
-        /// <param name="ch">the character</param>
+        /// <param name="code">the character</param>
         /// <returns>true if the given character is a digit, otherwise false.</returns>
         private bool IsDigit(int code)
         {
@@ -426,7 +426,8 @@ namespace AlphaTab.Importer
             var anyMeta = false;
             while (_sy == AlphaTexSymbols.MetaCommand)
             {
-                if (_syData.ToString() == "title")
+                var syData = _syData.ToString().ToLower();
+                if (syData == "title")
                 {
                     NewSy();
                     if (_sy == AlphaTexSymbols.String)
@@ -440,7 +441,7 @@ namespace AlphaTab.Importer
                     NewSy();
                     anyMeta = true;
                 }
-                else if (_syData.ToString() == "subtitle")
+                else if (syData == "subtitle")
                 {
                     NewSy();
                     if (_sy == AlphaTexSymbols.String)
@@ -454,7 +455,7 @@ namespace AlphaTab.Importer
                     NewSy();
                     anyMeta = true;
                 }
-                else if (_syData.ToString() == "artist")
+                else if (syData == "artist")
                 {
                     NewSy();
                     if (_sy == AlphaTexSymbols.String)
@@ -468,7 +469,7 @@ namespace AlphaTab.Importer
                     NewSy();
                     anyMeta = true;
                 }
-                else if (_syData.ToString() == "album")
+                else if (syData == "album")
                 {
                     NewSy();
                     if (_sy == AlphaTexSymbols.String)
@@ -482,7 +483,7 @@ namespace AlphaTab.Importer
                     NewSy();
                     anyMeta = true;
                 }
-                else if (_syData.ToString() == "words")
+                else if (syData == "words")
                 {
                     NewSy();
                     if (_sy == AlphaTexSymbols.String)
@@ -496,7 +497,7 @@ namespace AlphaTab.Importer
                     NewSy();
                     anyMeta = true;
                 }
-                else if (_syData.ToString() == "music")
+                else if (syData == "music")
                 {
                     NewSy();
                     if (_sy == AlphaTexSymbols.String)
@@ -510,7 +511,7 @@ namespace AlphaTab.Importer
                     NewSy();
                     anyMeta = true;
                 }
-                else if (_syData.ToString() == "copyright")
+                else if (syData == "copyright")
                 {
                     NewSy();
                     if (_sy == AlphaTexSymbols.String)
@@ -524,7 +525,7 @@ namespace AlphaTab.Importer
                     NewSy();
                     anyMeta = true;
                 }
-                else if (_syData.ToString() == "tempo")
+                else if (syData == "tempo")
                 {
                     NewSy();
                     if (_sy == AlphaTexSymbols.Number)
@@ -538,7 +539,7 @@ namespace AlphaTab.Importer
                     NewSy();
                     anyMeta = true;
                 }
-                else if (_syData.ToString() == "capo")
+                else if (syData == "capo")
                 {
                     NewSy();
                     if (_sy == AlphaTexSymbols.Number)
@@ -552,7 +553,7 @@ namespace AlphaTab.Importer
                     NewSy();
                     anyMeta = true;
                 }
-                else if (_syData.ToString() == "tuning")
+                else if (syData == "tuning")
                 {
                     NewSy();
                     if (_sy == AlphaTexSymbols.Tuning) // we require at least one tuning
@@ -560,7 +561,7 @@ namespace AlphaTab.Importer
                         var tuning = new FastList<int>();
                         do
                         {
-                            tuning.Add(ParseTuning(_syData.ToString()));
+                            tuning.Add(ParseTuning(_syData.ToString().ToLower()));
                             NewSy();
                         } while (_sy == AlphaTexSymbols.Tuning);
                         _track.Tuning = tuning.ToArray();
@@ -571,7 +572,7 @@ namespace AlphaTab.Importer
                     }
                     anyMeta = true;
                 }
-                else if (_syData.ToString() == "instrument")
+                else if (syData == "instrument")
                 {
                     NewSy();
                     if (_sy == AlphaTexSymbols.Number)
@@ -588,7 +589,7 @@ namespace AlphaTab.Importer
                     }
                     else if (_sy == AlphaTexSymbols.String) // Name
                     {
-                        var instrumentName = _syData.ToString();
+                        var instrumentName = _syData.ToString().ToLower();
                         _track.PlaybackInfo.Program = GeneralMidi.GetValue(instrumentName);
                     }
                     else
@@ -818,55 +819,56 @@ namespace AlphaTab.Importer
         /// <returns>true if a effect could be applied, otherwise false</returns>
         private bool ApplyBeatEffect(Beat beat)
         {
-            if (_syData == "f")
+            var syData = _syData.ToString().ToLower();
+            if (syData == "f")
             {
                 beat.FadeIn = true;
                 NewSy();
                 return true;
             }
-            if (_syData == "v")
+            if (syData == "v")
             {
                 beat.Vibrato = VibratoType.Slight;
                 NewSy();
                 return true;
             }
-            if (_syData == "s")
+            if (syData == "s")
             {
                 beat.Slap = true;
                 NewSy();
                 return true;
             }
-            if (_syData == "p")
+            if (syData == "p")
             {
                 beat.Pop = true;
                 NewSy();
                 return true;
             }
-            if (_syData == "dd")
+            if (syData == "dd")
             {
                 beat.Dots = 2;
                 NewSy();
                 return true;
             }
-            if (_syData == "d")
+            if (syData == "d")
             {
                 beat.Dots = 1;
                 NewSy();
                 return true;
             }
-            if (_syData == "su")
+            if (syData == "su")
             {
                 beat.PickStroke = PickStrokeType.Up;
                 NewSy();
                 return true;
             }
-            if (_syData == "sd")
+            if (syData == "sd")
             {
                 beat.PickStroke = PickStrokeType.Down;
                 NewSy();
                 return true;
             }
-            if (_syData == "tu")
+            if (syData == "tu")
             {
                 NewSy();
                 if (_sy != AlphaTexSymbols.Number)
@@ -913,7 +915,7 @@ namespace AlphaTab.Importer
                 NewSy();
                 return true;
             }
-            if (_syData == "tb")
+            if (syData == "tb")
             {
                 // read points
                 NewSy();
@@ -966,14 +968,15 @@ namespace AlphaTab.Importer
         private void Note(Beat beat)
         {
             // fret.string
+            var syData = _syData.ToString().ToLower();
             if (_sy != AlphaTexSymbols.Number && !(_sy == AlphaTexSymbols.String
-                && (_syData.ToString().ToLower() == "x" || _syData.ToString().ToLower() == "-")))
+                && (syData == "x" || syData == "-")))
             {
                 Error("note-fret", AlphaTexSymbols.Number);
             }
 
-            var isDead = _syData.ToString().ToLower() == "x";
-            var isTie = _syData.ToString().ToLower() == "-";
+            var isDead = syData == "x";
+            var isTie = syData == "-";
             int fret = (int)(isDead || isTie ? 0 : _syData);
             NewSy(); // Fret done
 
@@ -1094,7 +1097,7 @@ namespace AlphaTab.Importer
                 else if (syData == "gr") // TODO: Make this a beat effect!
                 {
                     NewSy();
-                    if (_syData == "ob")
+                    if (_syData.ToString().ToLower() == "ob")
                     {
                         note.Beat.GraceType = GraceType.OnBeat;
                     }
@@ -1251,7 +1254,8 @@ namespace AlphaTab.Importer
             var master = bar.MasterBar;
             while (_sy == AlphaTexSymbols.MetaCommand)
             {
-                if (_syData == "ts")
+                var syData = _syData.ToString().ToLower();
+                if (syData == "ts")
                 {
                     NewSy();
                     if (_sy != AlphaTexSymbols.Number)
@@ -1266,11 +1270,11 @@ namespace AlphaTab.Importer
                     }
                     master.TimeSignatureDenominator = (int)_syData;
                 }
-                else if (_syData == "ro")
+                else if (syData == "ro")
                 {
                     master.IsRepeatStart = true;
                 }
-                else if (_syData == "rc")
+                else if (syData == "rc")
                 {
                     NewSy();
                     if (_sy != AlphaTexSymbols.Number)
@@ -1279,25 +1283,25 @@ namespace AlphaTab.Importer
                     }
                     master.RepeatCount = ((int)_syData) - 1;
                 }
-                else if (_syData == "ks")
+                else if (syData == "ks")
                 {
                     NewSy();
                     if (_sy != AlphaTexSymbols.String)
                     {
                         Error("keysignature", AlphaTexSymbols.String);
                     }
-                    master.KeySignature = ParseKeySignature(_syData.ToString());
+                    master.KeySignature = ParseKeySignature(_syData.ToString().ToLower());
                 }
-                else if (_syData == "clef")
+                else if (syData == "clef")
                 {
                     NewSy();
                     if (_sy != AlphaTexSymbols.String && _sy != AlphaTexSymbols.Tuning)
                     {
                         Error("clef", AlphaTexSymbols.String);
                     }
-                    bar.Clef = ParseClef(_syData.ToString());
+                    bar.Clef = ParseClef(_syData.ToString().ToLower());
                 }
-                else if (_syData == "tempo")
+                else if (syData == "tempo")
                 {
                     NewSy();
                     if (_sy != AlphaTexSymbols.Number)

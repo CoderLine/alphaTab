@@ -2841,7 +2841,8 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
     MetaData: function (){
         var anyMeta = false;
         while (this._sy == AlphaTab.Importer.AlphaTexSymbols.MetaCommand){
-            if ((this._syData) == "title"){
+            var syData = (this._syData).toString().toLowerCase();
+            if (syData == "title"){
                 this.NewSy();
                 if (this._sy == AlphaTab.Importer.AlphaTexSymbols.String){
                     this._score.Title = (this._syData).toString();
@@ -2852,7 +2853,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                 this.NewSy();
                 anyMeta = true;
             }
-            else if ((this._syData) == "subtitle"){
+            else if (syData == "subtitle"){
                 this.NewSy();
                 if (this._sy == AlphaTab.Importer.AlphaTexSymbols.String){
                     this._score.SubTitle = (this._syData).toString();
@@ -2863,7 +2864,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                 this.NewSy();
                 anyMeta = true;
             }
-            else if ((this._syData) == "artist"){
+            else if (syData == "artist"){
                 this.NewSy();
                 if (this._sy == AlphaTab.Importer.AlphaTexSymbols.String){
                     this._score.Artist = (this._syData).toString();
@@ -2874,7 +2875,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                 this.NewSy();
                 anyMeta = true;
             }
-            else if ((this._syData) == "album"){
+            else if (syData == "album"){
                 this.NewSy();
                 if (this._sy == AlphaTab.Importer.AlphaTexSymbols.String){
                     this._score.Album = (this._syData).toString();
@@ -2885,7 +2886,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                 this.NewSy();
                 anyMeta = true;
             }
-            else if ((this._syData) == "words"){
+            else if (syData == "words"){
                 this.NewSy();
                 if (this._sy == AlphaTab.Importer.AlphaTexSymbols.String){
                     this._score.Words = (this._syData).toString();
@@ -2896,7 +2897,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                 this.NewSy();
                 anyMeta = true;
             }
-            else if ((this._syData) == "music"){
+            else if (syData == "music"){
                 this.NewSy();
                 if (this._sy == AlphaTab.Importer.AlphaTexSymbols.String){
                     this._score.Music = (this._syData).toString();
@@ -2907,7 +2908,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                 this.NewSy();
                 anyMeta = true;
             }
-            else if ((this._syData) == "copyright"){
+            else if (syData == "copyright"){
                 this.NewSy();
                 if (this._sy == AlphaTab.Importer.AlphaTexSymbols.String){
                     this._score.Copyright = (this._syData).toString();
@@ -2918,7 +2919,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                 this.NewSy();
                 anyMeta = true;
             }
-            else if ((this._syData) == "tempo"){
+            else if (syData == "tempo"){
                 this.NewSy();
                 if (this._sy == AlphaTab.Importer.AlphaTexSymbols.Number){
                     this._score.Tempo = (this._syData);
@@ -2929,7 +2930,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                 this.NewSy();
                 anyMeta = true;
             }
-            else if ((this._syData) == "capo"){
+            else if (syData == "capo"){
                 this.NewSy();
                 if (this._sy == AlphaTab.Importer.AlphaTexSymbols.Number){
                     this._track.Capo = (this._syData);
@@ -2940,12 +2941,12 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                 this.NewSy();
                 anyMeta = true;
             }
-            else if ((this._syData) == "tuning"){
+            else if (syData == "tuning"){
                 this.NewSy();
                 if (this._sy == AlphaTab.Importer.AlphaTexSymbols.Tuning){
                     var tuning = [];
                     do{
-                        tuning.push(this.ParseTuning((this._syData).toString()));
+                        tuning.push(this.ParseTuning((this._syData).toString().toLowerCase()));
                         this.NewSy();
                     }
                     while (this._sy == AlphaTab.Importer.AlphaTexSymbols.Tuning)
@@ -2956,7 +2957,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                 }
                 anyMeta = true;
             }
-            else if ((this._syData) == "instrument"){
+            else if (syData == "instrument"){
                 this.NewSy();
                 if (this._sy == AlphaTab.Importer.AlphaTexSymbols.Number){
                     var instrument = (this._syData);
@@ -2968,7 +2969,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                     }
                 }
                 else if (this._sy == AlphaTab.Importer.AlphaTexSymbols.String){
-                    var instrumentName = (this._syData).toString();
+                    var instrumentName = (this._syData).toString().toLowerCase();
                     this._track.PlaybackInfo.Program = AlphaTab.Audio.GeneralMidi.GetValue(instrumentName);
                 }
                 else {
@@ -3130,47 +3131,48 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
         this.NewSy();
     },
     ApplyBeatEffect: function (beat){
-        if ((this._syData) == "f"){
+        var syData = (this._syData).toString().toLowerCase();
+        if (syData == "f"){
             beat.FadeIn = true;
             this.NewSy();
             return true;
         }
-        if ((this._syData) == "v"){
+        if (syData == "v"){
             beat.Vibrato = AlphaTab.Model.VibratoType.Slight;
             this.NewSy();
             return true;
         }
-        if ((this._syData) == "s"){
+        if (syData == "s"){
             beat.Slap = true;
             this.NewSy();
             return true;
         }
-        if ((this._syData) == "p"){
+        if (syData == "p"){
             beat.Pop = true;
             this.NewSy();
             return true;
         }
-        if ((this._syData) == "dd"){
+        if (syData == "dd"){
             beat.Dots = 2;
             this.NewSy();
             return true;
         }
-        if ((this._syData) == "d"){
+        if (syData == "d"){
             beat.Dots = 1;
             this.NewSy();
             return true;
         }
-        if ((this._syData) == "su"){
+        if (syData == "su"){
             beat.PickStroke = AlphaTab.Model.PickStrokeType.Up;
             this.NewSy();
             return true;
         }
-        if ((this._syData) == "sd"){
+        if (syData == "sd"){
             beat.PickStroke = AlphaTab.Model.PickStrokeType.Down;
             this.NewSy();
             return true;
         }
-        if ((this._syData) == "tu"){
+        if (syData == "tu"){
             this.NewSy();
             if (this._sy != AlphaTab.Importer.AlphaTexSymbols.Number){
                 this.Error("tuplet", AlphaTab.Importer.AlphaTexSymbols.Number, true);
@@ -3214,7 +3216,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
             this.NewSy();
             return true;
         }
-        if ((this._syData) == "tb"){
+        if (syData == "tb"){
             // read points
             this.NewSy();
             if (this._sy != AlphaTab.Importer.AlphaTexSymbols.LParensis){
@@ -3254,11 +3256,12 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
     },
     Note: function (beat){
         // fret.string
-        if (this._sy != AlphaTab.Importer.AlphaTexSymbols.Number && !(this._sy == AlphaTab.Importer.AlphaTexSymbols.String && ((this._syData).toString().toLowerCase() == "x" || (this._syData).toString().toLowerCase() == "-"))){
+        var syData = (this._syData).toString().toLowerCase();
+        if (this._sy != AlphaTab.Importer.AlphaTexSymbols.Number && !(this._sy == AlphaTab.Importer.AlphaTexSymbols.String && (syData == "x" || syData == "-"))){
             this.Error("note-fret", AlphaTab.Importer.AlphaTexSymbols.Number, true);
         }
-        var isDead = (this._syData).toString().toLowerCase() == "x";
-        var isTie = (this._syData).toString().toLowerCase() == "-";
+        var isDead = syData == "x";
+        var isTie = syData == "-";
         var fret = (isDead || isTie ? 0 : (this._syData));
         this.NewSy();
         // Fret done
@@ -3351,7 +3354,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
             }
             else if (syData == "gr"){
                 this.NewSy();
-                if ((this._syData) == "ob"){
+                if ((this._syData).toString().toLowerCase() == "ob"){
                     note.Beat.GraceType = AlphaTab.Model.GraceType.OnBeat;
                 }
                 else {
@@ -3485,7 +3488,8 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
     BarMeta: function (bar){
         var master = bar.get_MasterBar();
         while (this._sy == AlphaTab.Importer.AlphaTexSymbols.MetaCommand){
-            if ((this._syData) == "ts"){
+            var syData = (this._syData).toString().toLowerCase();
+            if (syData == "ts"){
                 this.NewSy();
                 if (this._sy != AlphaTab.Importer.AlphaTexSymbols.Number){
                     this.Error("timesignature-numerator", AlphaTab.Importer.AlphaTexSymbols.Number, true);
@@ -3497,31 +3501,31 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                 }
                 master.TimeSignatureDenominator = (this._syData);
             }
-            else if ((this._syData) == "ro"){
+            else if (syData == "ro"){
                 master.IsRepeatStart = true;
             }
-            else if ((this._syData) == "rc"){
+            else if (syData == "rc"){
                 this.NewSy();
                 if (this._sy != AlphaTab.Importer.AlphaTexSymbols.Number){
                     this.Error("repeatclose", AlphaTab.Importer.AlphaTexSymbols.Number, true);
                 }
                 master.RepeatCount = (this._syData) - 1;
             }
-            else if ((this._syData) == "ks"){
+            else if (syData == "ks"){
                 this.NewSy();
                 if (this._sy != AlphaTab.Importer.AlphaTexSymbols.String){
                     this.Error("keysignature", AlphaTab.Importer.AlphaTexSymbols.String, true);
                 }
-                master.KeySignature = this.ParseKeySignature((this._syData).toString());
+                master.KeySignature = this.ParseKeySignature((this._syData).toString().toLowerCase());
             }
-            else if ((this._syData) == "clef"){
+            else if (syData == "clef"){
                 this.NewSy();
                 if (this._sy != AlphaTab.Importer.AlphaTexSymbols.String && this._sy != AlphaTab.Importer.AlphaTexSymbols.Tuning){
                     this.Error("clef", AlphaTab.Importer.AlphaTexSymbols.String, true);
                 }
-                bar.Clef = this.ParseClef((this._syData).toString());
+                bar.Clef = this.ParseClef((this._syData).toString().toLowerCase());
             }
-            else if ((this._syData) == "tempo"){
+            else if (syData == "tempo"){
                 this.NewSy();
                 if (this._sy != AlphaTab.Importer.AlphaTexSymbols.Number){
                     this.Error("tempo", AlphaTab.Importer.AlphaTexSymbols.Number, true);
@@ -6032,7 +6036,13 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
     ReadScore: function (){
         this._trackById = {};
         var xml = AlphaTab.Platform.Std.ToString(this._data.ReadAll());
-        var dom = AlphaTab.Platform.Std.LoadXml(xml);
+        var dom;
+        try{
+            dom = AlphaTab.Platform.Std.LoadXml(xml);
+        }
+        catch($$e3){
+            throw $CreateException(new AlphaTab.Importer.UnsupportedFormatException(), new Error());
+        }
         this._score = new AlphaTab.Model.Score();
         this._score.Tempo = 120;
         this.ParseDom(dom);
@@ -6686,7 +6696,7 @@ AlphaTab.IO.BitReader.prototype = {
                 all.WriteByte(this.ReadByte());
             }
         }
-        catch($$e3){
+        catch($$e4){
         }
         return all.ToArray();
     }

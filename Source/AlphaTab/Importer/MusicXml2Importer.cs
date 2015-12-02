@@ -19,8 +19,16 @@ namespace AlphaTab.Importer
             _trackById = new FastDictionary<string, Track>();
 
             var xml = Std.ToString(_data.ReadAll());
-            var dom = Std.LoadXml(xml);
-
+            IXmlDocument dom ;
+            try
+            {
+                dom = Std.LoadXml(xml);
+            }
+            catch (Exception)
+            {
+                throw new UnsupportedFormatException();
+            }
+            
             _score = new Score();
             _score.Tempo = 120;
             ParseDom(dom);
