@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
 using AlphaTab.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -42,6 +43,8 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(5, score.MasterBars.Count);
             Assert.AreEqual(1, score.Tracks.Count);
             Assert.AreEqual("Track 1", score.Tracks[0].Name);
+
+            Render(score);
         }
 
         [TestMethod]
@@ -50,6 +53,7 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareImporterWithFile("GuitarPro3/Test02.gp3");
             var score = reader.ReadScore();
             CheckTest02Score(score);
+            Render(score);
         }
 
         [TestMethod]
@@ -59,6 +63,7 @@ namespace AlphaTab.Test.Importer
             var score = reader.ReadScore();
 
             CheckTest03Score(score);
+            Render(score);
         }
 
         [TestMethod]
@@ -67,6 +72,7 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareImporterWithFile("GuitarPro3/TestDead.gp3");
             var score = reader.ReadScore();
             CheckDead(score);
+            Render(score);
         }
 
         [TestMethod]
@@ -79,6 +85,7 @@ namespace AlphaTab.Test.Importer
             // it seems accentuation is handled as Forte Fortissimo
             Assert.AreEqual(DynamicValue.FFF, score.Tracks[0].Bars[0].Voices[0].Beats[1].Notes[0].Dynamic);
             Assert.IsTrue(score.Tracks[0].Bars[0].Voices[0].Beats[3].Notes[0].IsLetRing);
+            Render(score);
         }
 
         [TestMethod]
@@ -98,6 +105,7 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareImporterWithFile("GuitarPro3/TestHammer.gp3");
             var score = reader.ReadScore();
             CheckHammer(score);
+            Render(score);
         }
 
         [TestMethod]
@@ -106,6 +114,7 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareImporterWithFile("GuitarPro3/TestBends.gp3");
             var score = reader.ReadScore();
             CheckBend(score);
+            Render(score);
         }
 
         [TestMethod]
@@ -116,6 +125,7 @@ namespace AlphaTab.Test.Importer
 
             Assert.AreEqual(SlideType.Shift, score.Tracks[0].Bars[0].Voices[0].Beats[0].GetNoteOnString(5).SlideType);
             Assert.AreEqual(SlideType.Shift, score.Tracks[0].Bars[0].Voices[0].Beats[2].GetNoteOnString(2).SlideType);
+            Render(score);
         }
 
         [TestMethod]
@@ -125,6 +135,7 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareImporterWithFile("GuitarPro3/TestVibrato.gp3");
             var score = reader.ReadScore();
             CheckVibrato(score, false);
+            Render(score);
         }
 
         [TestMethod]
@@ -146,6 +157,7 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(120.0, score.Tracks[0].Bars[4].Voices[0].Beats[0].GetAutomation(AutomationType.Tempo).Value);
             Assert.IsTrue(score.Tracks[0].Bars[4].Voices[0].Beats[0].GetAutomation(AutomationType.Instrument) != null);
             Assert.AreEqual(25.0, score.Tracks[0].Bars[4].Voices[0].Beats[0].GetAutomation(AutomationType.Instrument).Value);
+            Render(score);
         }
 
         [TestMethod]
@@ -156,6 +168,7 @@ namespace AlphaTab.Test.Importer
 
             Assert.AreEqual(BrushType.BrushDown, score.Tracks[0].Bars[0].Voices[0].Beats[0].BrushType);
             Assert.AreEqual(BrushType.BrushUp, score.Tracks[0].Bars[0].Voices[0].Beats[1].BrushType);
+            Render(score);
         }
 
         [TestMethod]
@@ -164,6 +177,7 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareImporterWithFile("GuitarPro3/TestTuplets.gp3");
             var score = reader.ReadScore();
             CheckTuplets(score);
+            Render(score);
         }
 
         [TestMethod]
@@ -176,6 +190,7 @@ namespace AlphaTab.Test.Importer
             Assert.IsTrue(score.Tracks[0].Bars[1].Voices[0].Beats[2].Notes[0].IsLetRing);
             Assert.IsTrue(score.Tracks[0].Bars[1].Voices[0].Beats[3].Notes[0].IsLetRing);
             Assert.IsTrue(score.Tracks[0].Bars[2].Voices[0].Beats[0].Notes[0].IsLetRing);
+            Render(score);
         }
 
         [TestMethod]
@@ -184,6 +199,7 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareImporterWithFile("GuitarPro3/Effects.gp3");
             var score = reader.ReadScore();
             CheckEffects(score);
+            Render(score);
         }
 
         [TestMethod]
@@ -192,6 +208,7 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareImporterWithFile("GuitarPro3/TestStrings.gp3");
             var score = reader.ReadScore();
             CheckStrings(score);
+            Render(score);
         }
     }
 }

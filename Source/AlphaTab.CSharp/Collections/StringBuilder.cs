@@ -15,6 +15,9 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using System;
+using System.Globalization;
 using AlphaTab.Platform;
 
 namespace AlphaTab.Collections
@@ -30,7 +33,7 @@ namespace AlphaTab.Collections
 
         public void Append(object s)
         {
-            _sb.Append(s);
+            _sb.Append(Convert.ToString(s, CultureInfo.InvariantCulture));
         }
 
         public void AppendChar(int i)

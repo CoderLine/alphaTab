@@ -187,7 +187,6 @@ namespace AlphaTab.Rendering
 
         private void PaintBeamHelper(float cx, float cy, ICanvas canvas, BeamingHelper h)
         {
-            if (h.Beats[0].GraceType != GraceType.None) return;
             // check if we need to paint simple footer
             if (h.Beats.Count == 1)
             {

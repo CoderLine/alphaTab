@@ -31,7 +31,7 @@ namespace AlphaTab.Platform.Svg
     public class SvgCanvas : ICanvas, IPathCanvas
     {
         private StringBuilder _buffer;
-        private string _currentPath;
+        private StringBuilder _currentPath;
         private bool _currentPathIsEmpty;
 
         public Color Color { get; set; }
@@ -43,7 +43,7 @@ namespace AlphaTab.Platform.Svg
 
         public SvgCanvas()
         {
-            _currentPath = "";
+            _currentPath = new StringBuilder();
             _currentPathIsEmpty = true;
             Color = new Color(255, 255, 255);
             LineWidth = 1;
@@ -61,7 +61,7 @@ namespace AlphaTab.Platform.Svg
             _buffer.Append("px\" height=\"");
             _buffer.Append(height);
             _buffer.Append("px\" class=\"alphaTabSurfaceSvg\">\n");
-            _currentPath = "";
+            _currentPath = new StringBuilder();
             _currentPathIsEmpty = true;
         }
 
@@ -110,54 +110,54 @@ namespace AlphaTab.Platform.Svg
 
         public void ClosePath()
         {
-            _currentPath += " z";
+            _currentPath.Append(" z");
         }
 
         public void MoveTo(float x, float y)
         {
-            _currentPath += " M";
-            _currentPath += x - 0.5f;
-            _currentPath += ",";
-            _currentPath += y - 0.5f;
+            _currentPath.Append(" M");
+            _currentPath.Append(x - 0.5f);
+            _currentPath.Append(",");
+            _currentPath.Append(y - 0.5f);
         }
 
         public void LineTo(float x, float y)
         {
             _currentPathIsEmpty = false;
-            _currentPath += " L";
-            _currentPath += x - 0.5f;
-            _currentPath += ",";
-            _currentPath += y - 0.5f;
+            _currentPath.Append(" L");
+            _currentPath.Append(x - 0.5f);
+            _currentPath.Append(",");
+            _currentPath.Append(y - 0.5f);
         }
 
         public void QuadraticCurveTo(float cpx, float cpy, float x, float y)
         {
             _currentPathIsEmpty = false;
-            _currentPath += " Q";
-            _currentPath += cpx;
-            _currentPath += ",";
-            _currentPath += cpy;
-            _currentPath += ",";
-            _currentPath += x;
-            _currentPath += ",";
-            _currentPath += y;
+            _currentPath.Append(" Q");
+            _currentPath.Append(cpx);
+            _currentPath.Append(",");
+            _currentPath.Append(cpy);
+            _currentPath.Append(",");
+            _currentPath.Append(x);
+            _currentPath.Append(",");
+            _currentPath.Append(y);
         }
 
         public void BezierCurveTo(float cp1x, float cp1y, float cp2x, float cp2y, float x, float y)
         {
             _currentPathIsEmpty = false;
-            _currentPath += " C";
-            _currentPath += cp1x;
-            _currentPath += ",";
-            _currentPath += cp1y;
-            _currentPath += ",";
-            _currentPath += cp2x;
-            _currentPath += ",";
-            _currentPath += cp2y;
-            _currentPath += ",";
-            _currentPath += x;
-            _currentPath += ",";
-            _currentPath += y;
+            _currentPath.Append(" C");
+            _currentPath.Append(cp1x);
+            _currentPath.Append(",");
+            _currentPath.Append(cp1y);
+            _currentPath.Append(",");
+            _currentPath.Append(cp2x);
+            _currentPath.Append(",");
+            _currentPath.Append(cp2y);
+            _currentPath.Append(",");
+            _currentPath.Append(x);
+            _currentPath.Append(",");
+            _currentPath.Append(y);
         }
 
         public void FillCircle(float x, float y, float radius)
@@ -165,22 +165,22 @@ namespace AlphaTab.Platform.Svg
             _currentPathIsEmpty = false;
             // 
             // M0,250 A1,1 0 0,0 500,250 A1,1 0 0,0 0,250 z
-            _currentPath += " M";
-            _currentPath += x - radius;
-            _currentPath += ",";
-            _currentPath += y;
+            _currentPath.Append(" M");
+            _currentPath.Append(x - radius);
+            _currentPath.Append(",");
+            _currentPath.Append(y);
 
-            _currentPath += " A1,1 0 0,0 ";
-            _currentPath += x + radius;
-            _currentPath += ",";
-            _currentPath += y;
+            _currentPath.Append(" A1,1 0 0,0 ");
+            _currentPath.Append(x + radius);
+            _currentPath.Append(",");
+            _currentPath.Append(y);
 
-            _currentPath += " A1,1 0 0,0 ";
-            _currentPath += x - radius;
-            _currentPath += ",";
-            _currentPath += y;
+            _currentPath.Append(" A1,1 0 0,0 ");
+            _currentPath.Append(x - radius);
+            _currentPath.Append(",");
+            _currentPath.Append(y);
 
-            _currentPath += " z";
+            _currentPath.Append(" z");
 
             Fill();
         }
@@ -190,12 +190,12 @@ namespace AlphaTab.Platform.Svg
             if (!_currentPathIsEmpty)
             {
                 _buffer.Append("<path d=\"");
-                _buffer.Append(_currentPath);
+                _buffer.Append(_currentPath.ToString());
                 _buffer.Append("\" style=\"fill:");
                 _buffer.Append(Color.ToRgbaString());
                 _buffer.Append("\" stroke=\"none\"/>\n");
             }
-            _currentPath = "";
+            _currentPath = new StringBuilder();
             _currentPathIsEmpty = true;
         }
 
@@ -204,14 +204,14 @@ namespace AlphaTab.Platform.Svg
             if (!_currentPathIsEmpty)
             {
                 _buffer.Append("<path d=\"");
-                _buffer.Append(_currentPath);
+                _buffer.Append(_currentPath.ToString());
                 _buffer.Append("\" style=\"stroke:");
                 _buffer.Append(Color.ToRgbaString());
                 _buffer.Append("; stroke-width:");
                 _buffer.Append(LineWidth);
                 _buffer.Append(";\" fill=\"none\" />\n");
             }
-            _currentPath = "";
+            _currentPath = new StringBuilder();
             _currentPathIsEmpty = true;
         }
 

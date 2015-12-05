@@ -7964,7 +7964,7 @@ AlphaTab.Platform.Svg.SvgCanvas = function (){
     this._TextAlign = AlphaTab.Platform.Model.TextAlign.Left;
     this._TextBaseline = AlphaTab.Platform.Model.TextBaseline.Default;
     this._Resources = null;
-    this._currentPath = "";
+    this._currentPath = new Array();
     this._currentPathIsEmpty = true;
     this.set_Color(new AlphaTab.Platform.Model.Color(255, 255, 255, 255));
     this.set_LineWidth(1);
@@ -8016,7 +8016,7 @@ AlphaTab.Platform.Svg.SvgCanvas.prototype = {
         this._buffer.push("px\" height=\"");
         this._buffer.push(height);
         this._buffer.push("px\" class=\"alphaTabSurfaceSvg\">\n");
-        this._currentPath = "";
+        this._currentPath = new Array();
         this._currentPathIsEmpty = true;
     },
     EndRender: function (){
@@ -8054,88 +8054,88 @@ AlphaTab.Platform.Svg.SvgCanvas.prototype = {
     BeginPath: function (){
     },
     ClosePath: function (){
-        this._currentPath += " z";
+        this._currentPath.push(" z");
     },
     MoveTo: function (x, y){
-        this._currentPath += " M";
-        this._currentPath += x - 0.5;
-        this._currentPath += ",";
-        this._currentPath += y - 0.5;
+        this._currentPath.push(" M");
+        this._currentPath.push(x - 0.5);
+        this._currentPath.push(",");
+        this._currentPath.push(y - 0.5);
     },
     LineTo: function (x, y){
         this._currentPathIsEmpty = false;
-        this._currentPath += " L";
-        this._currentPath += x - 0.5;
-        this._currentPath += ",";
-        this._currentPath += y - 0.5;
+        this._currentPath.push(" L");
+        this._currentPath.push(x - 0.5);
+        this._currentPath.push(",");
+        this._currentPath.push(y - 0.5);
     },
     QuadraticCurveTo: function (cpx, cpy, x, y){
         this._currentPathIsEmpty = false;
-        this._currentPath += " Q";
-        this._currentPath += cpx;
-        this._currentPath += ",";
-        this._currentPath += cpy;
-        this._currentPath += ",";
-        this._currentPath += x;
-        this._currentPath += ",";
-        this._currentPath += y;
+        this._currentPath.push(" Q");
+        this._currentPath.push(cpx);
+        this._currentPath.push(",");
+        this._currentPath.push(cpy);
+        this._currentPath.push(",");
+        this._currentPath.push(x);
+        this._currentPath.push(",");
+        this._currentPath.push(y);
     },
     BezierCurveTo: function (cp1x, cp1y, cp2x, cp2y, x, y){
         this._currentPathIsEmpty = false;
-        this._currentPath += " C";
-        this._currentPath += cp1x;
-        this._currentPath += ",";
-        this._currentPath += cp1y;
-        this._currentPath += ",";
-        this._currentPath += cp2x;
-        this._currentPath += ",";
-        this._currentPath += cp2y;
-        this._currentPath += ",";
-        this._currentPath += x;
-        this._currentPath += ",";
-        this._currentPath += y;
+        this._currentPath.push(" C");
+        this._currentPath.push(cp1x);
+        this._currentPath.push(",");
+        this._currentPath.push(cp1y);
+        this._currentPath.push(",");
+        this._currentPath.push(cp2x);
+        this._currentPath.push(",");
+        this._currentPath.push(cp2y);
+        this._currentPath.push(",");
+        this._currentPath.push(x);
+        this._currentPath.push(",");
+        this._currentPath.push(y);
     },
     FillCircle: function (x, y, radius){
         this._currentPathIsEmpty = false;
         // 
         // M0,250 A1,1 0 0,0 500,250 A1,1 0 0,0 0,250 z
-        this._currentPath += " M";
-        this._currentPath += x - radius;
-        this._currentPath += ",";
-        this._currentPath += y;
-        this._currentPath += " A1,1 0 0,0 ";
-        this._currentPath += x + radius;
-        this._currentPath += ",";
-        this._currentPath += y;
-        this._currentPath += " A1,1 0 0,0 ";
-        this._currentPath += x - radius;
-        this._currentPath += ",";
-        this._currentPath += y;
-        this._currentPath += " z";
+        this._currentPath.push(" M");
+        this._currentPath.push(x - radius);
+        this._currentPath.push(",");
+        this._currentPath.push(y);
+        this._currentPath.push(" A1,1 0 0,0 ");
+        this._currentPath.push(x + radius);
+        this._currentPath.push(",");
+        this._currentPath.push(y);
+        this._currentPath.push(" A1,1 0 0,0 ");
+        this._currentPath.push(x - radius);
+        this._currentPath.push(",");
+        this._currentPath.push(y);
+        this._currentPath.push(" z");
         this.Fill();
     },
     Fill: function (){
         if (!this._currentPathIsEmpty){
             this._buffer.push("<path d=\"");
-            this._buffer.push(this._currentPath);
+            this._buffer.push(this._currentPath.join(''));
             this._buffer.push("\" style=\"fill:");
             this._buffer.push(this.get_Color().ToRgbaString());
             this._buffer.push("\" stroke=\"none\"/>\n");
         }
-        this._currentPath = "";
+        this._currentPath = new Array();
         this._currentPathIsEmpty = true;
     },
     Stroke: function (){
         if (!this._currentPathIsEmpty){
             this._buffer.push("<path d=\"");
-            this._buffer.push(this._currentPath);
+            this._buffer.push(this._currentPath.join(''));
             this._buffer.push("\" style=\"stroke:");
             this._buffer.push(this.get_Color().ToRgbaString());
             this._buffer.push("; stroke-width:");
             this._buffer.push(this.get_LineWidth());
             this._buffer.push(";\" fill=\"none\" />\n");
         }
-        this._currentPath = "";
+        this._currentPath = new Array();
         this._currentPathIsEmpty = true;
     },
     FillText: function (text, x, y){
@@ -9517,7 +9517,7 @@ AlphaTab.Rendering.Glyphs.BarSeperatorGlyph.prototype = {
 };
 $Inherit(AlphaTab.Rendering.Glyphs.BarSeperatorGlyph, AlphaTab.Rendering.Glyphs.Glyph);
 AlphaTab.Rendering.Glyphs.BeamGlyph = function (x, y, duration, direction, isGrace){
-    AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, isGrace ? 0.7 : 1, AlphaTab.Rendering.Glyphs.BeamGlyph.GetSymbol(duration, direction, isGrace));
+    AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, isGrace ? 0.5 : 1, AlphaTab.Rendering.Glyphs.BeamGlyph.GetSymbol(duration, direction, isGrace));
 };
 AlphaTab.Rendering.Glyphs.BeamGlyph.prototype = {
     DoLayout: function (){
@@ -9811,12 +9811,12 @@ AlphaTab.Rendering.Glyphs.BendGlyph.prototype = {
 $Inherit(AlphaTab.Rendering.Glyphs.BendGlyph, AlphaTab.Rendering.Glyphs.Glyph);
 AlphaTab.Rendering.Glyphs.ChineseCymbalGlyph = function (x, y, isGrace){
     this._isGrace = false;
-    AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, isGrace ? 0.7 : 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.NoteHarmonic);
+    AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, isGrace ? 0.5 : 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.NoteHarmonic);
     this._isGrace = isGrace;
 };
 AlphaTab.Rendering.Glyphs.ChineseCymbalGlyph.prototype = {
     DoLayout: function (){
-        this.Width = 9 * (this._isGrace ? 0.7 : 1) * this.get_Scale();
+        this.Width = 9 * (this._isGrace ? 0.5 : 1) * this.get_Scale();
     },
     get_CanScale: function (){
         return false;
@@ -9896,12 +9896,12 @@ $StaticConstructor(function (){
 $Inherit(AlphaTab.Rendering.Glyphs.CrescendoGlyph, AlphaTab.Rendering.Glyphs.EffectGlyph);
 AlphaTab.Rendering.Glyphs.DeadNoteHeadGlyph = function (x, y, isGrace){
     this._isGrace = false;
-    AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, isGrace ? 0.7 : 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.NoteDead);
+    AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, isGrace ? 0.5 : 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.NoteDead);
     this._isGrace = isGrace;
 };
 AlphaTab.Rendering.Glyphs.DeadNoteHeadGlyph.prototype = {
     DoLayout: function (){
-        this.Width = 9 * (this._isGrace ? 0.7 : 1) * this.get_Scale();
+        this.Width = 9 * (this._isGrace ? 0.5 : 1) * this.get_Scale();
     },
     get_CanScale: function (){
         return false;
@@ -9910,12 +9910,12 @@ AlphaTab.Rendering.Glyphs.DeadNoteHeadGlyph.prototype = {
 $Inherit(AlphaTab.Rendering.Glyphs.DeadNoteHeadGlyph, AlphaTab.Rendering.Glyphs.MusicFontGlyph);
 AlphaTab.Rendering.Glyphs.DiamondNoteHeadGlyph = function (x, y, isGrace){
     this._isGrace = false;
-    AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, isGrace ? 0.7 : 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.NoteHarmonic);
+    AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, isGrace ? 0.5 : 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.NoteHarmonic);
     this._isGrace = isGrace;
 };
 AlphaTab.Rendering.Glyphs.DiamondNoteHeadGlyph.prototype = {
     DoLayout: function (){
-        this.Width = 9 * (this._isGrace ? 0.7 : 1) * this.get_Scale();
+        this.Width = 9 * (this._isGrace ? 0.5 : 1) * this.get_Scale();
     },
     get_CanScale: function (){
         return false;
@@ -9983,12 +9983,12 @@ AlphaTab.Rendering.Glyphs.DigitGlyph.GetSymbol = function (digit){
 $Inherit(AlphaTab.Rendering.Glyphs.DigitGlyph, AlphaTab.Rendering.Glyphs.MusicFontGlyph);
 AlphaTab.Rendering.Glyphs.DrumSticksGlyph = function (x, y, isGrace){
     this._isGrace = false;
-    AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, isGrace ? 0.7 : 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.NoteSideStick);
+    AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, isGrace ? 0.5 : 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.NoteSideStick);
     this._isGrace = isGrace;
 };
 AlphaTab.Rendering.Glyphs.DrumSticksGlyph.prototype = {
     DoLayout: function (){
-        this.Width = 9 * (this._isGrace ? 0.7 : 1) * this.get_Scale();
+        this.Width = 9 * (this._isGrace ? 0.5 : 1) * this.get_Scale();
     },
     get_CanScale: function (){
         return false;
@@ -10081,12 +10081,12 @@ AlphaTab.Rendering.Glyphs.FadeInGlyph.prototype = {
 $Inherit(AlphaTab.Rendering.Glyphs.FadeInGlyph, AlphaTab.Rendering.Glyphs.EffectGlyph);
 AlphaTab.Rendering.Glyphs.FlatGlyph = function (x, y, isGrace){
     this._isGrace = false;
-    AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, isGrace ? 0.7 : 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.AccidentalFlat);
+    AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, isGrace ? 0.5 : 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.AccidentalFlat);
     this._isGrace = isGrace;
 };
 AlphaTab.Rendering.Glyphs.FlatGlyph.prototype = {
     DoLayout: function (){
-        this.Width = 8 * (this._isGrace ? 0.7 : 1) * this.get_Scale();
+        this.Width = 8 * (this._isGrace ? 0.5 : 1) * this.get_Scale();
     },
     get_CanScale: function (){
         return false;
@@ -10095,12 +10095,12 @@ AlphaTab.Rendering.Glyphs.FlatGlyph.prototype = {
 $Inherit(AlphaTab.Rendering.Glyphs.FlatGlyph, AlphaTab.Rendering.Glyphs.MusicFontGlyph);
 AlphaTab.Rendering.Glyphs.HiHatGlyph = function (x, y, isGrace){
     this._isGrace = false;
-    AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, isGrace ? 0.7 : 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.NoteHiHat);
+    AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, isGrace ? 0.5 : 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.NoteHiHat);
     this._isGrace = isGrace;
 };
 AlphaTab.Rendering.Glyphs.HiHatGlyph.prototype = {
     DoLayout: function (){
-        this.Width = 9 * (this._isGrace ? 0.7 : 1) * this.get_Scale();
+        this.Width = 9 * (this._isGrace ? 0.5 : 1) * this.get_Scale();
     },
     get_CanScale: function (){
         return false;
@@ -10557,12 +10557,12 @@ AlphaTab.Rendering.Glyphs.MusicFontSymbol = {
 };
 AlphaTab.Rendering.Glyphs.NaturalizeGlyph = function (x, y, isGrace){
     this._isGrace = false;
-    AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, isGrace ? 0.7 : 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.AccidentalNatural);
+    AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, isGrace ? 0.5 : 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.AccidentalNatural);
     this._isGrace = isGrace;
 };
 AlphaTab.Rendering.Glyphs.NaturalizeGlyph.prototype = {
     DoLayout: function (){
-        this.Width = 8 * (this._isGrace ? 0.7 : 1) * this.get_Scale();
+        this.Width = 8 * (this._isGrace ? 0.5 : 1) * this.get_Scale();
     },
     get_CanScale: function (){
         return false;
@@ -10572,7 +10572,7 @@ $Inherit(AlphaTab.Rendering.Glyphs.NaturalizeGlyph, AlphaTab.Rendering.Glyphs.Mu
 AlphaTab.Rendering.Glyphs.NoteHeadGlyph = function (x, y, duration, isGrace){
     this._isGrace = false;
     this._duration = AlphaTab.Model.Duration.Whole;
-    AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, isGrace ? 0.7 : 1, AlphaTab.Rendering.Glyphs.NoteHeadGlyph.GetSymbol(duration));
+    AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, isGrace ? 0.5 : 1, AlphaTab.Rendering.Glyphs.NoteHeadGlyph.GetSymbol(duration));
     this._isGrace = isGrace;
     this._duration = duration;
 };
@@ -10580,10 +10580,10 @@ AlphaTab.Rendering.Glyphs.NoteHeadGlyph.prototype = {
     DoLayout: function (){
         switch (this._duration){
             case AlphaTab.Model.Duration.Whole:
-                this.Width = 14 * (this._isGrace ? 0.7 : 1) * this.get_Scale();
+                this.Width = 14 * (this._isGrace ? 0.5 : 1) * this.get_Scale();
                 break;
             default:
-                this.Width = 9 * (this._isGrace ? 0.7 : 1) * this.get_Scale();
+                this.Width = 9 * (this._isGrace ? 0.5 : 1) * this.get_Scale();
                 break;
         }
     },
@@ -10592,7 +10592,7 @@ AlphaTab.Rendering.Glyphs.NoteHeadGlyph.prototype = {
     }
 };
 $StaticConstructor(function (){
-    AlphaTab.Rendering.Glyphs.NoteHeadGlyph.GraceScale = 0.7;
+    AlphaTab.Rendering.Glyphs.NoteHeadGlyph.GraceScale = 0.5;
     AlphaTab.Rendering.Glyphs.NoteHeadGlyph.NoteHeadHeight = 9;
 });
 AlphaTab.Rendering.Glyphs.NoteHeadGlyph.GetSymbol = function (duration){
@@ -10832,12 +10832,12 @@ AlphaTab.Rendering.Glyphs.RestGlyph.GetSymbol = function (duration){
 $Inherit(AlphaTab.Rendering.Glyphs.RestGlyph, AlphaTab.Rendering.Glyphs.MusicFontGlyph);
 AlphaTab.Rendering.Glyphs.RideCymbalGlyph = function (x, y, isGrace){
     this._isGrace = false;
-    AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, isGrace ? 0.7 : 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.NoteRideCymbal);
+    AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, isGrace ? 0.5 : 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.NoteRideCymbal);
     this._isGrace = isGrace;
 };
 AlphaTab.Rendering.Glyphs.RideCymbalGlyph.prototype = {
     DoLayout: function (){
-        this.Width = 9 * (this._isGrace ? 0.7 : 1) * this.get_Scale();
+        this.Width = 9 * (this._isGrace ? 0.5 : 1) * this.get_Scale();
     },
     get_CanScale: function (){
         return false;
@@ -11091,7 +11091,7 @@ AlphaTab.Rendering.Glyphs.ScoreBeatPreNotesGlyph.prototype = {
             this.AddGlyph(accidentals);
         }
         // a small padding
-        this.AddGlyph(new AlphaTab.Rendering.Glyphs.SpacingGlyph(0, 0, 4 * (this.Container.Beat.GraceType != AlphaTab.Model.GraceType.None ? 0.7 : 1) * this.get_Scale(), true));
+        this.AddGlyph(new AlphaTab.Rendering.Glyphs.SpacingGlyph(0, 0, 4 * (this.Container.Beat.GraceType != AlphaTab.Model.GraceType.None ? 0.5 : 1) * this.get_Scale(), true));
         AlphaTab.Rendering.Glyphs.BeatGlyphBase.prototype.DoLayout.call(this);
     },
     CreateAccidentalGlyph: function (n, accidentals){
@@ -11553,12 +11553,12 @@ AlphaTab.Rendering.Glyphs.ScoreTieGlyph.prototype = {
 $Inherit(AlphaTab.Rendering.Glyphs.ScoreTieGlyph, AlphaTab.Rendering.Glyphs.TieGlyph);
 AlphaTab.Rendering.Glyphs.SharpGlyph = function (x, y, isGrace){
     this._isGrace = false;
-    AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, isGrace ? 0.7 : 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.AccidentalSharp);
+    AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, isGrace ? 0.5 : 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.AccidentalSharp);
     this._isGrace = isGrace;
 };
 AlphaTab.Rendering.Glyphs.SharpGlyph.prototype = {
     DoLayout: function (){
-        this.Width = 8 * (this._isGrace ? 0.7 : 1) * this.get_Scale();
+        this.Width = 8 * (this._isGrace ? 0.5 : 1) * this.get_Scale();
     },
     get_CanScale: function (){
         return false;
@@ -11683,7 +11683,7 @@ AlphaTab.Rendering.Glyphs.TabBeatPostNotesGlyph.prototype = {
             trillNumberGlyph.Y = tr.GetTabY(l, 0);
             this.AddGlyph(trillNumberGlyph);
         }
-        if (n.get_HasBend() && n.Beat.GraceType != AlphaTab.Model.GraceType.None){
+        if (n.get_HasBend()){
             var bendHeight = 60 * this.get_Scale();
             this.Renderer.RegisterOverflowTop(bendHeight);
             this.AddGlyph(new AlphaTab.Rendering.Glyphs.BendGlyph(n, this.get_BeatDurationWidth() * this.get_Scale(), bendHeight));
@@ -13002,8 +13002,6 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
         }
     },
     PaintBeamHelper: function (cx, cy, canvas, h){
-        if (h.Beats[0].GraceType != AlphaTab.Model.GraceType.None)
-            return;
         // check if we need to paint simple footer
         if (h.Beats.length == 1){
             this.PaintFooter(cx, cy, canvas, h);
@@ -13187,7 +13185,7 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
             return;
         }
         var isGrace = beat.GraceType != AlphaTab.Model.GraceType.None;
-        var scaleMod = isGrace ? 0.7 : 1;
+        var scaleMod = isGrace ? 0.5 : 1;
         //
         // draw line 
         //

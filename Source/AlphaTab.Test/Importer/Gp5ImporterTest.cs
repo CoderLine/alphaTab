@@ -42,6 +42,7 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(2, score.Tracks.Count);
             Assert.AreEqual("Track 1", score.Tracks[0].Name);
             Assert.AreEqual("Track 2", score.Tracks[1].Name);
+            Render(score);
         }
 
         [TestMethod]
@@ -50,6 +51,7 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareImporterWithFile("GuitarPro5/Test02.gp5");
             var score = reader.ReadScore();
             CheckTest02Score(score);
+            Render(score);
         }
 
         [TestMethod]
@@ -59,6 +61,7 @@ namespace AlphaTab.Test.Importer
             var score = reader.ReadScore();
 
             CheckTest03Score(score);
+            Render(score);
         }
 
         [TestMethod]
@@ -67,6 +70,7 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareImporterWithFile("GuitarPro5/TestDead.gp5");
             var score = reader.ReadScore();
             CheckDead(score);
+            Render(score);
         }
 
         [TestMethod]
@@ -75,6 +79,7 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareImporterWithFile("GuitarPro5/TestGrace.gp5");
             var score = reader.ReadScore();
             CheckGrace(score);
+            Render(score);
         }
 
         [TestMethod]
@@ -83,6 +88,7 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareImporterWithFile("GuitarPro5/TestAccentuations.gp5");
             var score = reader.ReadScore();
             CheckAccentuation(score, true);
+            Render(score);
         }
 
         [TestMethod]
@@ -91,6 +97,7 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareImporterWithFile("GuitarPro5/TestHarmonics.gp5");
             var score = reader.ReadScore();
             CheckHarmonics(score);
+            Render(score);
         }
 
         [TestMethod]
@@ -99,6 +106,7 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareImporterWithFile("GuitarPro5/TestHammer.gp5");
             var score = reader.ReadScore();
             CheckHammer(score);
+            Render(score);
         }
 
         [TestMethod]
@@ -107,6 +115,7 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareImporterWithFile("GuitarPro5/TestBends.gp5");
             var score = reader.ReadScore();
             CheckBend(score);
+            Render(score);
         }
 
         [TestMethod]
@@ -115,6 +124,7 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareImporterWithFile("GuitarPro5/TestTremolo.gp5");
             var score = reader.ReadScore();
             CheckTremolo(score);
+            Render(score);
         }
 
         [TestMethod]
@@ -123,6 +133,7 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareImporterWithFile("GuitarPro5/TestSlides.gp5");
             var score = reader.ReadScore();
             CheckSlides(score);
+            Render(score);
         }
 
         [TestMethod]
@@ -131,6 +142,7 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareImporterWithFile("GuitarPro5/TestVibrato.gp5");
             var score = reader.ReadScore();
             CheckVibrato(score, true);
+            Render(score);
         }
 
         [TestMethod]
@@ -139,6 +151,7 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareImporterWithFile("GuitarPro5/TestTrills.gp5");
             var score = reader.ReadScore();
             CheckTrills(score);
+            Render(score);
         }
 
         [TestMethod]
@@ -147,6 +160,7 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareImporterWithFile("GuitarPro5/TestOtherEffects.gp5");
             var score = reader.ReadScore();
             CheckOtherEffects(score);
+            Render(score);
         }
 
         [TestMethod]
@@ -155,6 +169,7 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareImporterWithFile("GuitarPro5/TestFingering.gp5");
             var score = reader.ReadScore();
             CheckFingering(score);
+            Render(score);
         }
 
         [TestMethod]
@@ -163,6 +178,7 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareImporterWithFile("GuitarPro5/TestStrokes.gp5");
             var score = reader.ReadScore();
             CheckStroke(score);
+            Render(score);
         }
 
         [TestMethod]
@@ -171,6 +187,7 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareImporterWithFile("GuitarPro5/TestTuplets.gp5");
             var score = reader.ReadScore();
             CheckTuplets(score);
+            Render(score);
         }
 
         [TestMethod]
@@ -179,6 +196,7 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareImporterWithFile("GuitarPro5/TestRanges.gp5");
             var score = reader.ReadScore();
             CheckRanges(score);
+            Render(score);
         }
 
         [TestMethod]
@@ -187,13 +205,15 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareImporterWithFile("GuitarPro5/Effects.gp5");
             var score = reader.ReadScore();
             CheckEffects(score);
+            Render(score);
         }
 
         [TestMethod]
         public void TestSerenade()
         {
             var reader = PrepareImporterWithFile("GuitarPro5/Serenade.gp5");
-            reader.ReadScore();// only Check reading
+            var score = reader.ReadScore();// only Check reading
+            Render(score);
         }
 
         [TestMethod]
@@ -202,6 +222,7 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareImporterWithFile("GuitarPro5/TestStrings.gp5");
             var score = reader.ReadScore();
             CheckStrings(score);
+            Render(score);
         }
     }
 }
