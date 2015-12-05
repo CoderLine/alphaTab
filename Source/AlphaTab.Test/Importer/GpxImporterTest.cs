@@ -200,17 +200,13 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(0, score.Tracks[0].Bars[0].Voices[0].Beats[0].WhammyBarPoints[2].Value);
 
 
-            Assert.AreEqual(3, score.Tracks[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints.Count);
+            Assert.AreEqual(2, score.Tracks[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints.Count);
 
             Assert.AreEqual(0, score.Tracks[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints[0].Offset);
             Assert.AreEqual(-4, score.Tracks[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints[0].Value);
 
-            Assert.AreEqual(30, score.Tracks[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints[1].Offset);
-            Assert.AreEqual(-4, score.Tracks[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints[1].Value);
-            Assert.Inconclusive("it's strange how GPX writes the tremolo bars, the middle value is set to -4 while it is a normal dip from -4 to 0");
-
-            Assert.AreEqual(60, score.Tracks[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints[2].Offset);
-            Assert.AreEqual(0, score.Tracks[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints[2].Value);
+            Assert.AreEqual(60, score.Tracks[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints[1].Offset);
+            Assert.AreEqual(0, score.Tracks[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints[1].Value);
 
 
             Assert.AreEqual(3, score.Tracks[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints.Count);
@@ -223,6 +219,20 @@ namespace AlphaTab.Test.Importer
 
             Assert.AreEqual(60, score.Tracks[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints[2].Offset);
             Assert.AreEqual(-4, score.Tracks[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints[2].Value);
+
+            Assert.AreEqual(4, score.Tracks[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints.Count);
+
+            Assert.AreEqual(0, score.Tracks[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints[0].Offset);
+            Assert.AreEqual(-4, score.Tracks[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints[0].Value);
+
+            Assert.AreEqual(15, score.Tracks[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints[1].Offset);
+            Assert.AreEqual(-12, score.Tracks[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints[1].Value);
+
+            Assert.AreEqual(30, score.Tracks[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints[2].Offset);
+            Assert.AreEqual(-12, score.Tracks[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints[2].Value);
+
+            Assert.AreEqual(45, score.Tracks[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints[3].Offset);
+            Assert.AreEqual(0, score.Tracks[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints[3].Value);
 
         }
 
