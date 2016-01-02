@@ -191,6 +191,8 @@ namespace AlphaTab.Rendering
 
         protected override void PaintBackground(float cx, float cy, ICanvas canvas)
         {
+            base.PaintBackground(cx, cy, canvas);
+
             var res = Resources;
 
             //

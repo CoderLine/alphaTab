@@ -1336,6 +1336,9 @@ AlphaTab.Platform.Std.NewGuid = function (){
 AlphaTab.Platform.Std.IsException = function (T, e){
     return false;
 };
+AlphaTab.Platform.Std.Random = function (max){
+    return Math.random() * max;
+};
 AlphaTab.Platform.Std.IsStringNumber = function (s, allowSign){
     if (s.length == 0)
         return false;
@@ -8374,7 +8377,7 @@ AlphaTab.Rendering.GroupedBarRenderer.prototype = {
         var postSize = sizes.GetSize("Post");
         var postSizeDiff;
         if (this._postBeatGlyphs.length == 0){
-            postSizeDiff = 0;
+            postSizeDiff = postSize;
         }
         else {
             postSizeDiff = postSize - (this._postBeatGlyphs[this._postBeatGlyphs.length - 1].X + this._postBeatGlyphs[this._postBeatGlyphs.length - 1].Width);
@@ -8508,6 +8511,12 @@ AlphaTab.Rendering.GroupedBarRenderer.prototype = {
         }
     },
     PaintBackground: function (cx, cy, canvas){
+        //var c = new Color((byte)Std.Random(255),
+        //      (byte)Std.Random(255),
+        //      (byte)Std.Random(255),
+        //      100);
+        //canvas.Color = c;
+        //canvas.FillRect(cx + X, cy + Y, Width, Height);
     },
     BuildBoundingsLookup: function (lookup, visualTop, visualHeight, realTop, realHeight, x){
         AlphaTab.Rendering.BarRendererBase.prototype.BuildBoundingsLookup.call(this, lookup, visualTop, visualHeight, realTop, realHeight, x);
@@ -8584,10 +8593,6 @@ AlphaTab.Rendering.AlternateEndingsBarRenderer.prototype = {
     },
     get_BottomPadding: function (){
         return 0;
-    },
-    ApplySizes: function (sizes){
-        AlphaTab.Rendering.GroupedBarRenderer.prototype.ApplySizes.call(this, sizes);
-        this.Width = sizes.FullWidth;
     },
     Paint: function (cx, cy, canvas){
         AlphaTab.Rendering.GroupedBarRenderer.prototype.Paint.call(this, cx, cy, canvas);
@@ -8882,8 +8887,6 @@ AlphaTab.Rendering.EffectBarRenderer.prototype = {
     },
     get_BottomPadding: function (){
         return 0;
-    },
-    PaintBackground: function (cx, cy, canvas){
     },
     Paint: function (cx, cy, canvas){
         AlphaTab.Rendering.GroupedBarRenderer.prototype.Paint.call(this, cx, cy, canvas);
@@ -12779,8 +12782,6 @@ AlphaTab.Rendering.RhythmBarRenderer.prototype = {
             this.AddBeatGlyph(container);
         }
     },
-    PaintBackground: function (cx, cy, canvas){
-    },
     Paint: function (cx, cy, canvas){
         AlphaTab.Rendering.GroupedBarRenderer.prototype.Paint.call(this, cx, cy, canvas);
         for (var i = 0,j = this._helpers.BeamHelpers.length; i < j; i++){
@@ -13387,6 +13388,7 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
         return (res.TablatureFont.Size / 2) + (res.TablatureFont.Size * 0.2);
     },
     PaintBackground: function (cx, cy, canvas){
+        AlphaTab.Rendering.GroupedBarRenderer.prototype.PaintBackground.call(this, cx, cy, canvas);
         var res = this.get_Resources();
         //var c = new Color((byte)Random.Next(255),
         //                  (byte)Random.Next(255),
@@ -14056,6 +14058,7 @@ AlphaTab.Rendering.TabBarRenderer.prototype = {
         return (res.TablatureFont.Size / 2) + (res.TablatureFont.Size * 0.2);
     },
     PaintBackground: function (cx, cy, canvas){
+        AlphaTab.Rendering.GroupedBarRenderer.prototype.PaintBackground.call(this, cx, cy, canvas);
         var res = this.get_Resources();
         //
         // draw string lines

@@ -697,6 +697,8 @@ namespace AlphaTab.Rendering
         //private static readonly Random Random = new Random();
         protected override void PaintBackground(float cx, float cy, ICanvas canvas)
         {
+            base.PaintBackground(cx, cy, canvas);
+
             var res = Resources;
 
             //var c = new Color((byte)Random.Next(255),

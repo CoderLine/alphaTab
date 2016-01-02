@@ -15,9 +15,12 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
+using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Rendering.Layout;
 using AlphaTab.Rendering.Staves;
@@ -135,7 +138,7 @@ namespace AlphaTab.Rendering
             float postSizeDiff;
             if (_postBeatGlyphs.Count == 0)
             {
-                postSizeDiff = 0;
+                postSizeDiff = postSize;
             }
             else
             {
@@ -340,7 +343,12 @@ namespace AlphaTab.Rendering
 
         protected virtual void PaintBackground(float cx, float cy, ICanvas canvas)
         {
-
+            //var c = new Color((byte)Std.Random(255),
+            //      (byte)Std.Random(255),
+            //      (byte)Std.Random(255),
+            //      100);
+            //canvas.Color = c;
+            //canvas.FillRect(cx + X, cy + Y, Width, Height);
         }
 
         public override void BuildBoundingsLookup(BoundingsLookup lookup,

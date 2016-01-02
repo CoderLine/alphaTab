@@ -164,5 +164,10 @@ namespace AlphaTab.Platform
         {
             return false;
         }
+
+        public static int Random(int max)
+        {
+            return JsMath.random() * max;
+        }
     }
 }

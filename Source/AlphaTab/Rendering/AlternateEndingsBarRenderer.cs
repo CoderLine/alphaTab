@@ -18,6 +18,7 @@
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
+using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Rendering.Layout;
 using AlphaTab.Rendering.Staves;
@@ -110,11 +111,6 @@ namespace AlphaTab.Rendering
             get { return 0; }
         }
 
-        public override void ApplySizes(BarSizeInfo sizes)
-        {
-            base.ApplySizes(sizes);
-            Width = sizes.FullWidth;
-        }
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {

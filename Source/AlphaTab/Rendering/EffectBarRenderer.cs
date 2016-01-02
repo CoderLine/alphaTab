@@ -359,11 +359,6 @@ namespace AlphaTab.Rendering
             get { return 0; }
         }
 
-        protected override void PaintBackground(float cx, float cy, ICanvas canvas)
-        {
-
-        }
-
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             base.Paint(cx, cy, canvas);
