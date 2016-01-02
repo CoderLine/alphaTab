@@ -533,7 +533,7 @@ namespace AlphaTab.Importer
                             var i = 0;
                             for (int k = 0; k < alternateEndings.Length; k++)
                             {
-                                i |= 1 << (-1 + Std.ParseInt(alternateEndings[i]));
+                                i |= 1 << (-1 + Std.ParseInt(alternateEndings[k]));
                             }
                             masterBar.AlternateEndings = (byte)i;
                             break;

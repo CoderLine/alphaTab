@@ -18,6 +18,7 @@
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
+using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Rendering.Layout;
 using AlphaTab.Rendering.Staves;
 
@@ -26,7 +27,7 @@ namespace AlphaTab.Rendering
     /// <summary>
     /// This bar renderer can render repeat endings.
     /// </summary>
-    public class AlternateEndingsBarRenderer : BarRendererBase
+    public class AlternateEndingsBarRenderer : GroupedBarRenderer
     {
         private const float Padding = 3;
 
@@ -51,6 +52,33 @@ namespace AlphaTab.Rendering
         {
             base.FinalizeRenderer(layout);
             IsEmpty = _endings.Count == 0;
+        }
+
+        protected override void CreateBeatGlyphs()
+        {
+#if MULTIVOICE_SUPPORT
+        foreach (var v in Bar.Voices)
+        {
+            CreateVoiceGlyphs(v);
+        }
+#else
+            CreateVoiceGlyphs(Bar.Voices[0]);
+#endif
+        }
+
+        private void CreateVoiceGlyphs(Voice voice)
+        {
+            for (int i = 0, j = voice.Beats.Count; i < j; i++)
+            {
+                var b = voice.Beats[i];
+                // we create empty glyphs as alignment references and to get the 
+                // effect bar sized
+                var container = new BeatContainerGlyph(b);
+                container.PreNotes = new BeatGlyphBase();
+                container.OnNotes = new BeatGlyphBase();
+                container.PostNotes = new BeatGlyphBase();
+                AddBeatGlyph(container);
+            }
         }
 
         public override void DoLayout()
@@ -90,6 +118,8 @@ namespace AlphaTab.Rendering
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
+            base.Paint(cx, cy, canvas);
+
             if (_endings.Count > 0)
             {
                 var res = Resources;

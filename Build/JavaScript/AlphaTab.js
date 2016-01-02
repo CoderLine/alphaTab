@@ -756,6 +756,7 @@ AlphaTab.Platform.JavaScript.JsWorker.prototype = {
             else if (typeof(data) == "string"){
                 AlphaTab.Importer.ScoreLoader.LoadScoreAsync(data, $CreateDelegate(this, this.ScoreLoaded), $CreateDelegate(this, this.Error));
             }
+<<<<<<< HEAD
         }
         catch(e){
             this.Error(e);
@@ -812,6 +813,17450 @@ AlphaTab.Platform.JavaScript.Html5Canvas.prototype = {
         this._canvas.style.height = height + "px";
         this._context = this._canvas.getContext("2d");
         this._context.textBaseline = "top";
+=======
+
+            var result = Bridge.as(obj, type, allowNull);
+
+	        if (result === null) {
+	            throw new Bridge.InvalidCastException("Unable to cast type " + (obj ? Bridge.getTypeName(obj) : "'null'") + " to type " + Bridge.getTypeName(type));
+	        }
+
+	        return result;
+        },
+
+	    apply: function (obj, values) {
+	        var names = Bridge.getPropertyNames(values, false),
+	            i;
+
+	        for (i = 0; i < names.length; i++) {
+	            var name = names[i];
+
+	            if (typeof obj[name] === "function" && typeof values[name] !== "function") {
+	                obj[name](values[name]);
+	            } else {
+	                obj[name] = values[name];
+	            }
+	        }
+
+	        return obj;
+        },
+
+	    merge: function (to, from) {
+	        if (to instanceof Bridge.Decimal && Bridge.isNumber(from)) {
+	            return new Bridge.Decimal(from);
+	        }
+
+	        if (to instanceof Boolean ||
+                to instanceof Number ||
+                to instanceof String ||
+                to instanceof Function ||
+                to instanceof Date ||
+                to instanceof Bridge.Int ||
+                to instanceof Bridge.Decimal) {
+	            return from;
+	        }
+
+	        var key,
+			    i,
+                value,
+                toValue,
+			    fn;
+
+	        if (Bridge.isArray(from) && Bridge.isFunction(to.add || to.push)) {
+	            fn = Bridge.isArray(to) ? to.push : to.add;
+
+	            for (i = 0; i < from.length; i++) {
+	                fn.apply(to, from[i]);
+	            }
+	        } else {
+	            for (key in from) {
+	                value = from[key];
+
+	                if (typeof to[key] === "function" && typeof value !== "function") {
+	                    if (key.match(/^\s*get[A-Z]/)) {
+	                        Bridge.merge(to[key](), value);
+	                    } else {
+	                        to[key](value);
+	                    }
+	                } else {
+	                    var setter = "set" + key.charAt(0).toUpperCase() + key.slice(1);
+
+	                    if (typeof to[setter] === "function" && typeof value !== "function") {
+	                        to[setter](value);
+	                    } else if (value && value.constructor === Object && to[key]) {
+	                        toValue = to[key];
+	                        Bridge.merge(toValue, value);
+	                    } else {
+	                        to[key] = value;
+	                    }
+	                }
+	            }
+	        }
+
+	        return to;
+	    },
+
+	    getEnumerator: function (obj, suffix) {
+	        if (typeof obj === "string") {
+	            obj = Bridge.String.toCharArray(obj);
+	        }
+
+	        if (suffix && obj && obj["getEnumerator" + suffix]) {
+	            return obj["getEnumerator" + suffix].call(obj);
+	        }
+
+	        if (obj && obj.getEnumerator) {
+	            return obj.getEnumerator();
+	        }
+
+	        if ((Object.prototype.toString.call(obj) === "[object Array]") ||
+                (obj && Bridge.isDefined(obj.length))) {
+	            return new Bridge.ArrayEnumerator(obj);
+	        }
+
+	        throw new Bridge.InvalidOperationException("Cannot create enumerator");
+	    },
+
+	    getPropertyNames: function (obj, includeFunctions) {
+	        var names = [],
+	            name;
+
+	        for (name in obj) {
+                if (includeFunctions || typeof obj[name] !== "function") {
+                    names.push(name);
+                }
+	        }
+
+	        return names;
+	    },
+
+	    isDefined: function (value, noNull) {
+	        return typeof value !== "undefined" && (noNull ? value !== null : true);
+	    },
+
+	    isEmpty: function (value, allowEmpty) {
+	        return (value === null) || (!allowEmpty ? value === "" : false) || ((!allowEmpty && Bridge.isArray(value)) ? value.length === 0 : false);
+	    },
+
+	    toArray: function (ienumerable) {
+	        var i,
+	            item,
+                len,
+	            result = [];
+
+	        if (Bridge.isArray(ienumerable)) {
+                for (i = 0, len = ienumerable.length; i < len; ++i) {
+                    result.push(ienumerable[i]);
+                }
+	        } else {
+                i = Bridge.getEnumerator(ienumerable);
+
+                while (i.moveNext()) {
+                    item = i.getCurrent();
+                    result.push(item);
+                }
+	        }
+
+	        return result;
+	    },
+
+        isArray: function (obj) {
+            return Object.prototype.toString.call(obj) in {
+                "[object Array]": 1,
+                "[object Uint8Array]": 1,
+                "[object Int8Array]": 1,
+                "[object Int16Array]": 1,
+                "[object Uint16Array]": 1,
+                "[object Int32Array]": 1,
+                "[object Uint32Array]": 1,
+                "[object Float32Array]": 1,
+                "[object Float64Array]": 1
+            };
+        },
+
+        isFunction: function (obj) {
+            return typeof (obj) === "function";
+        },
+
+        isDate: function (obj) {
+            return Object.prototype.toString.call(obj) === "[object Date]";
+        },
+
+        isNull: function (value) {
+            return (value === null) || (value === undefined);
+        },
+
+        isBoolean: function (value) {
+            return typeof value === "boolean";
+        },
+
+        isNumber: function (value) {
+            return typeof value === "number" && isFinite(value);
+        },
+
+        isString: function (value) {
+            return typeof value === "string";
+        },
+
+        unroll: function (value) {
+            var d = value.split("."),
+                o = Bridge.global[d[0]],
+                i = 1;
+
+            for (i; i < d.length; i++) {
+                if (!o) {
+                    return null;
+                }
+
+                o = o[d[i]];
+            }
+
+            return o;
+        },
+
+        equals: function (a, b) {
+            if (a && Bridge.isFunction(a.equals) && a.equals.length === 1) {
+                return a.equals(b);
+            } else if (Bridge.isDate(a) && Bridge.isDate(b)) {
+                return a.valueOf() === b.valueOf();
+            } else if (Bridge.isNull(a) && Bridge.isNull(b)) {
+                return true;
+            } else if (Bridge.isNull(a) !== Bridge.isNull(b)) {
+                return false;
+            }
+
+            if (typeof a === "object" && typeof b === "object") {
+                return (Bridge.getHashCode(a) === Bridge.getHashCode(b)) && Bridge.objectEquals(a, b);
+            }
+
+            return a === b;
+        },
+
+        objectEquals: function (a, b) {
+            Bridge.$$leftChain = [];
+            Bridge.$$rightChain = [];
+
+            var result = Bridge.deepEquals(a, b);
+
+            delete Bridge.$$leftChain;
+            delete Bridge.$$rightChain;
+
+            return result;
+        },
+
+        deepEquals: function (a, b) {
+            if (typeof a === "object" && typeof b === "object") {
+                if (Bridge.$$leftChain.indexOf(a) > -1 || Bridge.$$rightChain.indexOf(b) > -1) {
+                    return false;
+                }
+
+                var p;
+
+                for (p in b) {
+                    if (b.hasOwnProperty(p) !== a.hasOwnProperty(p)) {
+                        return false;
+                    } else if (typeof b[p] !== typeof a[p]) {
+                        return false;
+                    }
+                }
+
+                for (p in a) {
+                    if (b.hasOwnProperty(p) !== a.hasOwnProperty(p)) {
+                        return false;
+                    } else if (typeof a[p] !== typeof b[p]) {
+                        return false;
+                    }
+
+                    if (typeof (a[p]) === "object") {
+                        Bridge.$$leftChain.push(a);
+                        Bridge.$$rightChain.push(b);
+
+                        if (!Bridge.deepEquals(a[p], b[p])) {
+                            return false;
+                        }
+
+                        Bridge.$$leftChain.pop();
+                        Bridge.$$rightChain.pop();
+                    } else {
+                        if (!Bridge.equals(a[p], b[p])) {
+                            return false;
+                        }
+                    }
+                }
+
+                return true;
+            } else {
+                return Bridge.equals(a, b);
+            }
+        },
+
+        compare: function (a, b, safe) {
+            if (!Bridge.isDefined(a, true)) {
+                if (safe) {
+                    return 0;
+                }
+
+                throw new Bridge.NullReferenceException();
+            } else if (Bridge.isNumber(a) || Bridge.isString(a) || Bridge.isBoolean(a)) {
+                if (Bridge.isString(a) && !Bridge.hasValue(b)) {
+                    return 1;
+                }
+                return a < b ? -1 : (a > b ? 1 : 0);
+            } else if (Bridge.isDate(a)) {
+                return Bridge.compare(a.valueOf(), b.valueOf());
+            }
+
+            if (safe && !a.compareTo) {
+                return 0;
+            }
+
+            return a.compareTo(b);
+        },
+
+        equalsT: function (a, b) {
+            if (!Bridge.isDefined(a, true)) {
+                throw new Bridge.NullReferenceException();
+            } else if (Bridge.isNumber(a) || Bridge.isString(a) || Bridge.isBoolean(a)) {
+                return a === b;
+            } else if (Bridge.isDate(a)) {
+                return a.valueOf() === b.valueOf();
+            }
+
+            return a.equalsT(b);
+        },
+
+        format: function (obj, formatString) {
+            if (Bridge.isNumber(obj)) {
+                return Bridge.Int.format(obj, formatString);
+            } else if (Bridge.isDate(obj)) {
+                return Bridge.Date.format(obj, formatString);
+            }
+
+            return obj.format(formatString);
+        },
+
+        getType: function (instance) {
+            if (!Bridge.isDefined(instance, true)) {
+                throw new Bridge.NullReferenceException("instance is null");
+            }
+
+            try {
+                return instance.constructor;
+            } catch (ex) {
+                return Object;
+            }
+        },
+
+        isLower: function isLower(c) {
+            var s = String.fromCharCode(c);
+
+            return s === s.toLowerCase() && s !== s.toUpperCase();
+        },
+
+        isUpper: function isUpper(c) {
+            var s = String.fromCharCode(c);
+
+            return s !== s.toLowerCase() && s === s.toUpperCase();
+        },
+
+        coalesce: function (a, b) {
+            return Bridge.hasValue(a) ? a : b;
+        },
+
+        fn: {
+            call: function (obj, fnName) {
+                var args = Array.prototype.slice.call(arguments, 2);
+
+                obj = obj || Bridge.global;
+
+                return obj[fnName].apply(obj, args);
+            },
+
+            makeFn: function (fn, length) {
+                switch (length) {
+                    case 0  : return function () { return fn.apply(this, arguments); };
+                    case 1  : return function (a) { return fn.apply(this, arguments); };
+                    case 2  : return function (a,b) { return fn.apply(this, arguments); };
+                    case 3  : return function (a,b,c) { return fn.apply(this, arguments); };
+                    case 4  : return function (a,b,c,d) { return fn.apply(this, arguments); };
+                    case 5  : return function (a,b,c,d,e) { return fn.apply(this, arguments); };
+                    case 6  : return function (a,b,c,d,e,f) { return fn.apply(this, arguments); };
+                    case 7  : return function (a,b,c,d,e,f,g) { return fn.apply(this, arguments); };
+                    case 8  : return function (a,b,c,d,e,f,g,h) { return fn.apply(this, arguments); };
+                    case 9  : return function (a, b, c, d, e, f, g, h, i) { return fn.apply(this, arguments); };
+                    case 10:  return function (a, b, c, d, e, f, g, h, i, j) { return fn.apply(this, arguments); };
+                    case 11:  return function (a, b, c, d, e, f, g, h, i, j, k) { return fn.apply(this, arguments); };
+                    case 12:  return function (a, b, c, d, e, f, g, h, i, j, k, l) { return fn.apply(this, arguments); };
+                    case 13:  return function (a, b, c, d, e, f, g, h, i, j, k, l, m) { return fn.apply(this, arguments); };
+                    case 14:  return function (a, b, c, d, e, f, g, h, i, j, k, l, m, n) { return fn.apply(this, arguments); };
+                    case 15:  return function (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o) { return fn.apply(this, arguments); };
+                    case 16:  return function (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p) { return fn.apply(this, arguments); };
+                    case 17:  return function (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q) { return fn.apply(this, arguments); };
+                    case 18:  return function (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r) { return fn.apply(this, arguments); };
+                    case 19:  return function (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s) { return fn.apply(this, arguments); };
+                    default:  return function (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t) { return fn.apply(this, arguments); };
+                }
+            },
+
+            bind: function (obj, method, args, appendArgs) {
+                if (method && method.$method === method && method.$scope === obj) {
+                    return method;
+                }
+
+                var fn;
+
+                if (arguments.length === 2) {
+                    fn = Bridge.fn.makeFn(function () {
+                        Bridge.caller.unshift(this);
+                        var result = method.apply(obj, arguments);
+                        Bridge.caller.shift(this);
+
+                        return result;
+                    }, method.length);
+                } else {
+                    fn = Bridge.fn.makeFn(function () {
+                        var callArgs = args || arguments;
+
+                        if (appendArgs === true) {
+                            callArgs = Array.prototype.slice.call(arguments, 0);
+                            callArgs = callArgs.concat(args);
+                        } else if (typeof appendArgs === "number") {
+                            callArgs = Array.prototype.slice.call(arguments, 0);
+
+                            if (appendArgs === 0) {
+                                callArgs.unshift.apply(callArgs, args);
+                            } else if (appendArgs < callArgs.length) {
+                                callArgs.splice.apply(callArgs, [appendArgs, 0].concat(args));
+                            } else {
+                                callArgs.push.apply(callArgs, args);
+                            }
+                        }
+                        Bridge.caller.unshift(this);
+                        var result = method.apply(obj, callArgs);
+                        Bridge.caller.shift(this);
+
+                        return result;
+                    }, method.length);
+                }
+
+                fn.$method = method;
+                fn.$scope = obj;
+
+                return fn;
+            },
+
+            bindScope: function (obj, method) {
+                var fn = Bridge.fn.makeFn(function () {
+                    var callArgs = Array.prototype.slice.call(arguments, 0);
+
+                    callArgs.unshift.apply(callArgs, [obj]);
+
+                    Bridge.caller.unshift(this);
+                    var result = method.apply(obj, callArgs);
+                    Bridge.caller.shift(this);
+
+                    return result;
+                }, method.length);
+
+                fn.$method = method;
+                fn.$scope = obj;
+
+                return fn;
+            },
+
+            $build: function (handlers) {
+                var fn = function () {
+                    var list = fn.$invocationList,
+                        result = null,
+                        i,
+                        handler;
+
+                    for (i = 0; i < list.length; i++) {
+                        handler = list[i];
+                        result = handler.apply(null, arguments);
+                    }
+
+                    return result;
+                };
+
+                fn.$invocationList = handlers ? Array.prototype.slice.call(handlers, 0) : [];
+
+                if (fn.$invocationList.length === 0) {
+                    return null;
+                }
+
+                return fn;
+            },
+
+            combine: function (fn1, fn2) {
+                if (!fn1 || !fn2) {
+                    return fn1 || fn2;
+                }
+
+                var list1 = fn1.$invocationList ? fn1.$invocationList : [fn1],
+                    list2 = fn2.$invocationList ? fn2.$invocationList : [fn2];
+
+                return Bridge.fn.$build(list1.concat(list2));
+            },
+
+            remove: function (fn1, fn2) {
+                if (!fn1 || !fn2) {
+                    return fn1 || null;
+                }
+
+                var list1 = fn1.$invocationList ? fn1.$invocationList : [fn1],
+                    list2 = fn2.$invocationList ? fn2.$invocationList : [fn2],
+                    result = [],
+                    exclude,
+                    i, j;
+
+                for (i = list1.length - 1; i >= 0; i--) {
+                    exclude = false;
+
+                    for (j = 0; j < list2.length; j++) {
+                        if (list1[i] === list2[j] ||
+                            ((list1[i].$method && (list1[i].$method === list2[j].$method)) && (list1[i].$scope && (list1[i].$scope === list2[j].$scope)))) {
+                            exclude = true;
+                            break;
+                        }
+                    }
+
+                    if (!exclude) {
+                        result.push(list1[i]);
+                    }
+                }
+
+                result.reverse();
+
+                return Bridge.fn.$build(result);
+            }
+        }
+    };
+
+    if (!Object.create) {
+        Object.create = function (o, properties) {
+            if (typeof o !== "object" && typeof o !== "function") {
+                throw new TypeError("Object prototype may only be an Object: " + o);
+            } else if (o === null) {
+                throw new Error("This browser's implementation of Object.create is a shim and doesn't support 'null' as the first argument");
+            }
+
+            if (typeof properties != "undefined") {
+                throw new Error("This browser's implementation of Object.create is a shim and doesn't support a second argument");
+            }
+
+            function F() { }
+
+            F.prototype = o;
+
+            return new F();
+        };
+    }
+
+    globals.Bridge = core;
+    globals.Bridge.caller = [];
+
+    // @source Nullable.js
+
+    var nullable = {
+        hasValue: function (obj) {
+            return (obj !== null) && (obj !== undefined);
+        },
+
+        getValue: function (obj) {
+            if (!Bridge.Nullable.hasValue(obj)) {
+                throw new Bridge.InvalidOperationException("Nullable instance doesn't have a value.");
+            }
+            return obj;
+        },
+
+        getValueOrDefault: function (obj, defValue) {
+            return Bridge.Nullable.hasValue(obj) ? obj : defValue;
+        },
+
+        add: function (a, b) {
+            return Bridge.hasValue(a) && Bridge.hasValue(b) ? a + b : null;
+        },
+
+        band: function (a, b) {
+            return Bridge.hasValue(a) && Bridge.hasValue(b) ? a & b : null;
+        },
+
+        bor: function (a, b) {
+            return Bridge.hasValue(a) && Bridge.hasValue(b) ? a | b : null;
+        },
+
+        and: function (a, b) {
+            if (a === true && b === true) {
+                return true;
+            } else if (a === false || b === false) {
+                return false;
+            }
+
+            return null;
+        },
+
+        or: function (a, b) {
+            if (a === true || b === true) {
+                return true;
+            } else if (a === false && b === false) {
+                return false;
+            }
+
+            return null;
+        },
+
+        div: function (a, b) {
+            return Bridge.hasValue(a) && Bridge.hasValue(b) ? a / b : null;
+        },
+
+        eq: function (a, b) {
+            return !Bridge.hasValue(a) ? !Bridge.hasValue(b) : (a === b);
+        },
+
+        xor: function (a, b) {
+            return Bridge.hasValue(a) && Bridge.hasValue(b) ? a ^ b : null;
+        },
+
+        gt: function (a, b) {
+            return Bridge.hasValue(a) && Bridge.hasValue(b) && a > b;
+        },
+
+        gte: function (a, b) {
+            return Bridge.hasValue(a) && Bridge.hasValue(b) && a >= b;
+        },
+
+        neq: function (a, b) {
+            return !Bridge.hasValue(a) ? Bridge.hasValue(b) : (a !== b);
+        },
+
+        lt: function (a, b) {
+            return Bridge.hasValue(a) && Bridge.hasValue(b) && a < b;
+        },
+
+        lte: function (a, b) {
+            return Bridge.hasValue(a) && Bridge.hasValue(b) && a <= b;
+        },
+
+        mod: function (a, b) {
+            return Bridge.hasValue(a) && Bridge.hasValue(b) ? a % b : null;
+        },
+
+        mul: function (a, b) {
+            return Bridge.hasValue(a) && Bridge.hasValue(b) ? a * b : null;
+        },
+
+        sl: function (a, b) {
+            return Bridge.hasValue(a) && Bridge.hasValue(b) ? a << b : null;
+        },
+
+        sr: function (a, b) {
+            return Bridge.hasValue(a) && Bridge.hasValue(b) ? a >> b : null;
+        },
+
+        srr: function (a, b) {
+            return Bridge.hasValue(a) && Bridge.hasValue(b) ? a >>> b : null;
+        },
+
+        sub: function (a, b) {
+	        return Bridge.hasValue(a) && Bridge.hasValue(b) ? a - b : null;
+        },
+
+        bnot: function (a) {
+            return Bridge.hasValue(a) ? ~a : null;
+        },
+
+        neg: function (a) {
+            return Bridge.hasValue(a) ? -a : null;
+        },
+
+        not: function (a) {
+	        return Bridge.hasValue(a) ? !a : null;
+        },
+
+        pos: function (a) {
+	        return Bridge.hasValue(a) ? +a : null;
+        },
+
+        lift: function () {
+	        for (var i = 1; i < arguments.length; i++) {
+	            if (!Bridge.hasValue(arguments[i])) {
+	                return null;
+	            }
+	        }
+
+	        if (arguments[0] == null)
+	            return null;
+
+	        if (arguments[0].apply == undefined)
+	            return arguments[0];
+
+	        return arguments[0].apply(null, Array.prototype.slice.call(arguments, 1));
+        },
+
+        lift1: function (f, o) {
+            return Bridge.hasValue(o) ? (typeof f === "function" ? f.apply(null, Array.prototype.slice.call(arguments, 1)) : o[f].apply(o, Array.prototype.slice.call(arguments, 2))) : null;
+        },
+
+        lift2: function (f, a, b) {
+            return Bridge.hasValue(a) && Bridge.hasValue(b) ? (typeof f === "function" ? f.apply(null, Array.prototype.slice.call(arguments, 1)) : a[f].apply(a, Array.prototype.slice.call(arguments, 2))) : null;
+        },
+
+        liftcmp: function (f, a, b) {
+            return Bridge.hasValue(a) && Bridge.hasValue(b) ? (typeof f === "function" ? f.apply(null, Array.prototype.slice.call(arguments, 1)) : a[f].apply(a, Array.prototype.slice.call(arguments, 2))) : false;
+        },
+
+        lifteq: function (f, a, b) {
+            var va = Bridge.hasValue(a), vb = Bridge.hasValue(b);
+            return (!va && !vb) || (va && vb && (typeof f === "function" ? f.apply(null, Array.prototype.slice.call(arguments, 1)) : a[f].apply(a, Array.prototype.slice.call(arguments, 2))));
+        },
+
+        liftne: function (f, a, b) {
+            var va = Bridge.hasValue(a), vb = Bridge.hasValue(b);
+            return (va !== vb) || (va && (typeof f === "function" ? f.apply(null, Array.prototype.slice.call(arguments, 1)) : a[f].apply(a, Array.prototype.slice.call(arguments, 2))));
+        }
+    };
+
+    Bridge.Nullable = nullable;
+    Bridge.hasValue = Bridge.Nullable.hasValue;
+
+    // @source Char.js
+
+    var char = {
+        charCodeAt: function (str, index) {
+            if (str == null) {
+                throw new Bridge.ArgumentNullException();
+            }
+
+            if (str.length != 1) {
+                throw new Bridge.FormatException("String must be exactly one character long");
+            }
+
+            return str.charCodeAt(index);
+        },
+
+        isWhiteSpace: function (value) {
+            return /\s/.test(value);
+        },
+
+        isDigit: function (value) {
+            if (value < 256) {
+                return (value >= 48 && value <= 57);
+            }
+
+            return new RegExp("[0-9\u0030-\u0039\u0660-\u0669\u06F0-\u06F9\u07C0-\u07C9\u0966-\u096F\u09E6-\u09EF\u0A66-\u0A6F\u0AE6-\u0AEF\u0B66-\u0B6F\u0BE6-\u0BEF\u0C66-\u0C6F\u0CE6-\u0CEF\u0D66-\u0D6F\u0E50-\u0E59\u0ED0-\u0ED9\u0F20-\u0F29\u1040-\u1049\u1090-\u1099\u17E0-\u17E9\u1810-\u1819\u1946-\u194F\u19D0-\u19D9\u1A80-\u1A89\u1A90-\u1A99\u1B50-\u1B59\u1BB0-\u1BB9\u1C40-\u1C49\u1C50-\u1C59\uA620-\uA629\uA8D0-\uA8D9\uA900-\uA909\uA9D0-\uA9D9\uAA50-\uAA59\uABF0-\uABF9\uFF10-\uFF19]").test(String.fromCharCode(value));
+        },
+
+        isLetter: function (value) {
+            if (value < 256) {
+                return (value >= 65 && value <= 90) || (value >= 97 && value <= 122);
+            }
+
+            return new RegExp("[A-Za-z\u0061-\u007A\u00B5\u00DF-\u00F6\u00F8-\u00FF\u0101\u0103\u0105\u0107\u0109\u010B\u010D\u010F\u0111\u0113\u0115\u0117\u0119\u011B\u011D\u011F\u0121\u0123\u0125\u0127\u0129\u012B\u012D\u012F\u0131\u0133\u0135\u0137\u0138\u013A\u013C\u013E\u0140\u0142\u0144\u0146\u0148\u0149\u014B\u014D\u014F\u0151\u0153\u0155\u0157\u0159\u015B\u015D\u015F\u0161\u0163\u0165\u0167\u0169\u016B\u016D\u016F\u0171\u0173\u0175\u0177\u017A\u017C\u017E-\u0180\u0183\u0185\u0188\u018C\u018D\u0192\u0195\u0199-\u019B\u019E\u01A1\u01A3\u01A5\u01A8\u01AA\u01AB\u01AD\u01B0\u01B4\u01B6\u01B9\u01BA\u01BD-\u01BF\u01C6\u01C9\u01CC\u01CE\u01D0\u01D2\u01D4\u01D6\u01D8\u01DA\u01DC\u01DD\u01DF\u01E1\u01E3\u01E5\u01E7\u01E9\u01EB\u01ED\u01EF\u01F0\u01F3\u01F5\u01F9\u01FB\u01FD\u01FF\u0201\u0203\u0205\u0207\u0209\u020B\u020D\u020F\u0211\u0213\u0215\u0217\u0219\u021B\u021D\u021F\u0221\u0223\u0225\u0227\u0229\u022B\u022D\u022F\u0231\u0233-\u0239\u023C\u023F\u0240\u0242\u0247\u0249\u024B\u024D\u024F-\u0293\u0295-\u02AF\u0371\u0373\u0377\u037B-\u037D\u0390\u03AC-\u03CE\u03D0\u03D1\u03D5-\u03D7\u03D9\u03DB\u03DD\u03DF\u03E1\u03E3\u03E5\u03E7\u03E9\u03EB\u03ED\u03EF-\u03F3\u03F5\u03F8\u03FB\u03FC\u0430-\u045F\u0461\u0463\u0465\u0467\u0469\u046B\u046D\u046F\u0471\u0473\u0475\u0477\u0479\u047B\u047D\u047F\u0481\u048B\u048D\u048F\u0491\u0493\u0495\u0497\u0499\u049B\u049D\u049F\u04A1\u04A3\u04A5\u04A7\u04A9\u04AB\u04AD\u04AF\u04B1\u04B3\u04B5\u04B7\u04B9\u04BB\u04BD\u04BF\u04C2\u04C4\u04C6\u04C8\u04CA\u04CC\u04CE\u04CF\u04D1\u04D3\u04D5\u04D7\u04D9\u04DB\u04DD\u04DF\u04E1\u04E3\u04E5\u04E7\u04E9\u04EB\u04ED\u04EF\u04F1\u04F3\u04F5\u04F7\u04F9\u04FB\u04FD\u04FF\u0501\u0503\u0505\u0507\u0509\u050B\u050D\u050F\u0511\u0513\u0515\u0517\u0519\u051B\u051D\u051F\u0521\u0523\u0525\u0527\u0561-\u0587\u1D00-\u1D2B\u1D6B-\u1D77\u1D79-\u1D9A\u1E01\u1E03\u1E05\u1E07\u1E09\u1E0B\u1E0D\u1E0F\u1E11\u1E13\u1E15\u1E17\u1E19\u1E1B\u1E1D\u1E1F\u1E21\u1E23\u1E25\u1E27\u1E29\u1E2B\u1E2D\u1E2F\u1E31\u1E33\u1E35\u1E37\u1E39\u1E3B\u1E3D\u1E3F\u1E41\u1E43\u1E45\u1E47\u1E49\u1E4B\u1E4D\u1E4F\u1E51\u1E53\u1E55\u1E57\u1E59\u1E5B\u1E5D\u1E5F\u1E61\u1E63\u1E65\u1E67\u1E69\u1E6B\u1E6D\u1E6F\u1E71\u1E73\u1E75\u1E77\u1E79\u1E7B\u1E7D\u1E7F\u1E81\u1E83\u1E85\u1E87\u1E89\u1E8B\u1E8D\u1E8F\u1E91\u1E93\u1E95-\u1E9D\u1E9F\u1EA1\u1EA3\u1EA5\u1EA7\u1EA9\u1EAB\u1EAD\u1EAF\u1EB1\u1EB3\u1EB5\u1EB7\u1EB9\u1EBB\u1EBD\u1EBF\u1EC1\u1EC3\u1EC5\u1EC7\u1EC9\u1ECB\u1ECD\u1ECF\u1ED1\u1ED3\u1ED5\u1ED7\u1ED9\u1EDB\u1EDD\u1EDF\u1EE1\u1EE3\u1EE5\u1EE7\u1EE9\u1EEB\u1EED\u1EEF\u1EF1\u1EF3\u1EF5\u1EF7\u1EF9\u1EFB\u1EFD\u1EFF-\u1F07\u1F10-\u1F15\u1F20-\u1F27\u1F30-\u1F37\u1F40-\u1F45\u1F50-\u1F57\u1F60-\u1F67\u1F70-\u1F7D\u1F80-\u1F87\u1F90-\u1F97\u1FA0-\u1FA7\u1FB0-\u1FB4\u1FB6\u1FB7\u1FBE\u1FC2-\u1FC4\u1FC6\u1FC7\u1FD0-\u1FD3\u1FD6\u1FD7\u1FE0-\u1FE7\u1FF2-\u1FF4\u1FF6\u1FF7\u210A\u210E\u210F\u2113\u212F\u2134\u2139\u213C\u213D\u2146-\u2149\u214E\u2184\u2C30-\u2C5E\u2C61\u2C65\u2C66\u2C68\u2C6A\u2C6C\u2C71\u2C73\u2C74\u2C76-\u2C7B\u2C81\u2C83\u2C85\u2C87\u2C89\u2C8B\u2C8D\u2C8F\u2C91\u2C93\u2C95\u2C97\u2C99\u2C9B\u2C9D\u2C9F\u2CA1\u2CA3\u2CA5\u2CA7\u2CA9\u2CAB\u2CAD\u2CAF\u2CB1\u2CB3\u2CB5\u2CB7\u2CB9\u2CBB\u2CBD\u2CBF\u2CC1\u2CC3\u2CC5\u2CC7\u2CC9\u2CCB\u2CCD\u2CCF\u2CD1\u2CD3\u2CD5\u2CD7\u2CD9\u2CDB\u2CDD\u2CDF\u2CE1\u2CE3\u2CE4\u2CEC\u2CEE\u2CF3\u2D00-\u2D25\u2D27\u2D2D\uA641\uA643\uA645\uA647\uA649\uA64B\uA64D\uA64F\uA651\uA653\uA655\uA657\uA659\uA65B\uA65D\uA65F\uA661\uA663\uA665\uA667\uA669\uA66B\uA66D\uA681\uA683\uA685\uA687\uA689\uA68B\uA68D\uA68F\uA691\uA693\uA695\uA697\uA723\uA725\uA727\uA729\uA72B\uA72D\uA72F-\uA731\uA733\uA735\uA737\uA739\uA73B\uA73D\uA73F\uA741\uA743\uA745\uA747\uA749\uA74B\uA74D\uA74F\uA751\uA753\uA755\uA757\uA759\uA75B\uA75D\uA75F\uA761\uA763\uA765\uA767\uA769\uA76B\uA76D\uA76F\uA771-\uA778\uA77A\uA77C\uA77F\uA781\uA783\uA785\uA787\uA78C\uA78E\uA791\uA793\uA7A1\uA7A3\uA7A5\uA7A7\uA7A9\uA7FA\uFB00-\uFB06\uFB13-\uFB17\uFF41-\uFF5A\u0041-\u005A\u00C0-\u00D6\u00D8-\u00DE\u0100\u0102\u0104\u0106\u0108\u010A\u010C\u010E\u0110\u0112\u0114\u0116\u0118\u011A\u011C\u011E\u0120\u0122\u0124\u0126\u0128\u012A\u012C\u012E\u0130\u0132\u0134\u0136\u0139\u013B\u013D\u013F\u0141\u0143\u0145\u0147\u014A\u014C\u014E\u0150\u0152\u0154\u0156\u0158\u015A\u015C\u015E\u0160\u0162\u0164\u0166\u0168\u016A\u016C\u016E\u0170\u0172\u0174\u0176\u0178\u0179\u017B\u017D\u0181\u0182\u0184\u0186\u0187\u0189-\u018B\u018E-\u0191\u0193\u0194\u0196-\u0198\u019C\u019D\u019F\u01A0\u01A2\u01A4\u01A6\u01A7\u01A9\u01AC\u01AE\u01AF\u01B1-\u01B3\u01B5\u01B7\u01B8\u01BC\u01C4\u01C7\u01CA\u01CD\u01CF\u01D1\u01D3\u01D5\u01D7\u01D9\u01DB\u01DE\u01E0\u01E2\u01E4\u01E6\u01E8\u01EA\u01EC\u01EE\u01F1\u01F4\u01F6-\u01F8\u01FA\u01FC\u01FE\u0200\u0202\u0204\u0206\u0208\u020A\u020C\u020E\u0210\u0212\u0214\u0216\u0218\u021A\u021C\u021E\u0220\u0222\u0224\u0226\u0228\u022A\u022C\u022E\u0230\u0232\u023A\u023B\u023D\u023E\u0241\u0243-\u0246\u0248\u024A\u024C\u024E\u0370\u0372\u0376\u0386\u0388-\u038A\u038C\u038E\u038F\u0391-\u03A1\u03A3-\u03AB\u03CF\u03D2-\u03D4\u03D8\u03DA\u03DC\u03DE\u03E0\u03E2\u03E4\u03E6\u03E8\u03EA\u03EC\u03EE\u03F4\u03F7\u03F9\u03FA\u03FD-\u042F\u0460\u0462\u0464\u0466\u0468\u046A\u046C\u046E\u0470\u0472\u0474\u0476\u0478\u047A\u047C\u047E\u0480\u048A\u048C\u048E\u0490\u0492\u0494\u0496\u0498\u049A\u049C\u049E\u04A0\u04A2\u04A4\u04A6\u04A8\u04AA\u04AC\u04AE\u04B0\u04B2\u04B4\u04B6\u04B8\u04BA\u04BC\u04BE\u04C0\u04C1\u04C3\u04C5\u04C7\u04C9\u04CB\u04CD\u04D0\u04D2\u04D4\u04D6\u04D8\u04DA\u04DC\u04DE\u04E0\u04E2\u04E4\u04E6\u04E8\u04EA\u04EC\u04EE\u04F0\u04F2\u04F4\u04F6\u04F8\u04FA\u04FC\u04FE\u0500\u0502\u0504\u0506\u0508\u050A\u050C\u050E\u0510\u0512\u0514\u0516\u0518\u051A\u051C\u051E\u0520\u0522\u0524\u0526\u0531-\u0556\u10A0-\u10C5\u10C7\u10CD\u1E00\u1E02\u1E04\u1E06\u1E08\u1E0A\u1E0C\u1E0E\u1E10\u1E12\u1E14\u1E16\u1E18\u1E1A\u1E1C\u1E1E\u1E20\u1E22\u1E24\u1E26\u1E28\u1E2A\u1E2C\u1E2E\u1E30\u1E32\u1E34\u1E36\u1E38\u1E3A\u1E3C\u1E3E\u1E40\u1E42\u1E44\u1E46\u1E48\u1E4A\u1E4C\u1E4E\u1E50\u1E52\u1E54\u1E56\u1E58\u1E5A\u1E5C\u1E5E\u1E60\u1E62\u1E64\u1E66\u1E68\u1E6A\u1E6C\u1E6E\u1E70\u1E72\u1E74\u1E76\u1E78\u1E7A\u1E7C\u1E7E\u1E80\u1E82\u1E84\u1E86\u1E88\u1E8A\u1E8C\u1E8E\u1E90\u1E92\u1E94\u1E9E\u1EA0\u1EA2\u1EA4\u1EA6\u1EA8\u1EAA\u1EAC\u1EAE\u1EB0\u1EB2\u1EB4\u1EB6\u1EB8\u1EBA\u1EBC\u1EBE\u1EC0\u1EC2\u1EC4\u1EC6\u1EC8\u1ECA\u1ECC\u1ECE\u1ED0\u1ED2\u1ED4\u1ED6\u1ED8\u1EDA\u1EDC\u1EDE\u1EE0\u1EE2\u1EE4\u1EE6\u1EE8\u1EEA\u1EEC\u1EEE\u1EF0\u1EF2\u1EF4\u1EF6\u1EF8\u1EFA\u1EFC\u1EFE\u1F08-\u1F0F\u1F18-\u1F1D\u1F28-\u1F2F\u1F38-\u1F3F\u1F48-\u1F4D\u1F59\u1F5B\u1F5D\u1F5F\u1F68-\u1F6F\u1FB8-\u1FBB\u1FC8-\u1FCB\u1FD8-\u1FDB\u1FE8-\u1FEC\u1FF8-\u1FFB\u2102\u2107\u210B-\u210D\u2110-\u2112\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u2130-\u2133\u213E\u213F\u2145\u2183\u2C00-\u2C2E\u2C60\u2C62-\u2C64\u2C67\u2C69\u2C6B\u2C6D-\u2C70\u2C72\u2C75\u2C7E-\u2C80\u2C82\u2C84\u2C86\u2C88\u2C8A\u2C8C\u2C8E\u2C90\u2C92\u2C94\u2C96\u2C98\u2C9A\u2C9C\u2C9E\u2CA0\u2CA2\u2CA4\u2CA6\u2CA8\u2CAA\u2CAC\u2CAE\u2CB0\u2CB2\u2CB4\u2CB6\u2CB8\u2CBA\u2CBC\u2CBE\u2CC0\u2CC2\u2CC4\u2CC6\u2CC8\u2CCA\u2CCC\u2CCE\u2CD0\u2CD2\u2CD4\u2CD6\u2CD8\u2CDA\u2CDC\u2CDE\u2CE0\u2CE2\u2CEB\u2CED\u2CF2\uA640\uA642\uA644\uA646\uA648\uA64A\uA64C\uA64E\uA650\uA652\uA654\uA656\uA658\uA65A\uA65C\uA65E\uA660\uA662\uA664\uA666\uA668\uA66A\uA66C\uA680\uA682\uA684\uA686\uA688\uA68A\uA68C\uA68E\uA690\uA692\uA694\uA696\uA722\uA724\uA726\uA728\uA72A\uA72C\uA72E\uA732\uA734\uA736\uA738\uA73A\uA73C\uA73E\uA740\uA742\uA744\uA746\uA748\uA74A\uA74C\uA74E\uA750\uA752\uA754\uA756\uA758\uA75A\uA75C\uA75E\uA760\uA762\uA764\uA766\uA768\uA76A\uA76C\uA76E\uA779\uA77B\uA77D\uA77E\uA780\uA782\uA784\uA786\uA78B\uA78D\uA790\uA792\uA7A0\uA7A2\uA7A4\uA7A6\uA7A8\uA7AA\uFF21-\uFF3A\u01C5\u01C8\u01CB\u01F2\u1F88-\u1F8F\u1F98-\u1F9F\u1FA8-\u1FAF\u1FBC\u1FCC\u1FFC\u02B0-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0374\u037A\u0559\u0640\u06E5\u06E6\u07F4\u07F5\u07FA\u081A\u0824\u0828\u0971\u0E46\u0EC6\u10FC\u17D7\u1843\u1AA7\u1C78-\u1C7D\u1D2C-\u1D6A\u1D78\u1D9B-\u1DBF\u2071\u207F\u2090-\u209C\u2C7C\u2C7D\u2D6F\u2E2F\u3005\u3031-\u3035\u303B\u309D\u309E\u30FC-\u30FE\uA015\uA4F8-\uA4FD\uA60C\uA67F\uA717-\uA71F\uA770\uA788\uA7F8\uA7F9\uA9CF\uAA70\uAADD\uAAF3\uAAF4\uFF70\uFF9E\uFF9F\u00AA\u00BA\u01BB\u01C0-\u01C3\u0294\u05D0-\u05EA\u05F0-\u05F2\u0620-\u063F\u0641-\u064A\u066E\u066F\u0671-\u06D3\u06D5\u06EE\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u0800-\u0815\u0840-\u0858\u08A0\u08A2-\u08AC\u0904-\u0939\u093D\u0950\u0958-\u0961\u0972-\u0977\u0979-\u097F\u0985-\u098C\u098F\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC\u09DD\u09DF-\u09E1\u09F0\u09F1\u0A05-\u0A0A\u0A0F\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32\u0A33\u0A35\u0A36\u0A38\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0\u0AE1\u0B05-\u0B0C\u0B0F\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32\u0B33\u0B35-\u0B39\u0B3D\u0B5C\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99\u0B9A\u0B9C\u0B9E\u0B9F\u0BA3\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C33\u0C35-\u0C39\u0C3D\u0C58\u0C59\u0C60\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDE\u0CE0\u0CE1\u0CF1\u0CF2\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D60\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32\u0E33\u0E40-\u0E45\u0E81\u0E82\u0E84\u0E87\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA\u0EAB\u0EAD-\u0EB0\u0EB2\u0EB3\u0EBD\u0EC0-\u0EC4\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065\u1066\u106E-\u1070\u1075-\u1081\u108E\u10D0-\u10FA\u10FD-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F4\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u1700-\u170C\u170E-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17DC\u1820-\u1842\u1844-\u1877\u1880-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191C\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19C1-\u19C7\u1A00-\u1A16\u1A20-\u1A54\u1B05-\u1B33\u1B45-\u1B4B\u1B83-\u1BA0\u1BAE\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C77\u1CE9-\u1CEC\u1CEE-\u1CF1\u1CF5\u1CF6\u2135-\u2138\u2D30-\u2D67\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u3006\u303C\u3041-\u3096\u309F\u30A1-\u30FA\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31BA\u31F0-\u31FF\u3400-\u4DB5\u4E00-\u9FCC\uA000-\uA014\uA016-\uA48C\uA4D0-\uA4F7\uA500-\uA60B\uA610-\uA61F\uA62A\uA62B\uA66E\uA6A0-\uA6E5\uA7FB-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA6F\uAA71-\uAA76\uAA7A\uAA80-\uAAAF\uAAB1\uAAB5\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB\uAADC\uAAE0-\uAAEA\uAAF2\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uABC0-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40\uFB41\uFB43\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF66-\uFF6F\uFF71-\uFF9D\uFFA0-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC]").test(String.fromCharCode(value));
+        },
+
+        isHighSurrogate: function (value) {
+            return new RegExp("[\uD800-\uDBFF]").test(String.fromCharCode(value));
+        },
+
+        isLowSurrogate: function (value) {
+            return new RegExp("[\uDC00-\uDFFF]").test(String.fromCharCode(value));
+        },
+
+        isSurrogate: function (value) {
+            return new RegExp("[\uD800-\uDFFF]").test(String.fromCharCode(value));
+        },
+
+        isSymbol: function (value) {
+            if (value < 256) {
+                return ([36, 43, 60, 61, 62, 94, 96, 124, 126, 162, 163, 164, 165, 166, 167, 168, 169, 172, 174, 175, 176, 177, 180, 182, 184, 215, 247].indexOf(value) != -1);
+            }
+
+            return new RegExp("[\u20A0-\u20CF\u20D0-\u20FF\u2100-\u214F\u2150-\u218F\u2190-\u21FF\u2200-\u22FF\u2300-\u23FF\u25A0-\u25FF\u2600-\u26FF\u2700-\u27BF\u27C0-\u27EF\u27F0-\u27FF\u2800-\u28FF\u2900-\u297F\u2980-\u29FF\u2A00-\u2AFF\u2B00-\u2BFF]").test(String.fromCharCode(value));
+        },
+
+        isSeparator: function (value) {
+            if (value < 256) {
+                return (value == 32 || value == 160);
+            }
+
+            return new RegExp("[\u2028\u2029\u0020\u00A0\u1680\u180E\u2000-\u200A\u202F\u205F\u3000]").test(String.fromCharCode(value));
+        },
+
+        isPunctuation: function (value) {
+            if (value < 256) {
+                return ([33,34,35,37,38,39,40,41,42,44,45,46,47,58,59,63,64,91,92,93,95,123,125,161,171,173,183,187,191].indexOf(value) != -1);
+            }
+
+            return new RegExp("[\u0021-\u0023\u0025-\u002A\u002C-\u002F\u003A\u003B\u003F\u0040\u005B-\u005D\u005F\u007B\u007D\u00A1\u00A7\u00AB\u00B6\u00B7\u00BB\u00BF\u037E\u0387\u055A-\u055F\u0589\u058A\u05BE\u05C0\u05C3\u05C6\u05F3\u05F4\u0609\u060A\u060C\u060D\u061B\u061E\u061F\u066A-\u066D\u06D4\u0700-\u070D\u07F7-\u07F9\u0830-\u083E\u085E\u0964\u0965\u0970\u0AF0\u0DF4\u0E4F\u0E5A\u0E5B\u0F04-\u0F12\u0F14\u0F3A-\u0F3D\u0F85\u0FD0-\u0FD4\u0FD9\u0FDA\u104A-\u104F\u10FB\u1360-\u1368\u1400\u166D\u166E\u169B\u169C\u16EB-\u16ED\u1735\u1736\u17D4-\u17D6\u17D8-\u17DA\u1800-\u180A\u1944\u1945\u1A1E\u1A1F\u1AA0-\u1AA6\u1AA8-\u1AAD\u1B5A-\u1B60\u1BFC-\u1BFF\u1C3B-\u1C3F\u1C7E\u1C7F\u1CC0-\u1CC7\u1CD3\u2010-\u2027\u2030-\u2043\u2045-\u2051\u2053-\u205E\u207D\u207E\u208D\u208E\u2329\u232A\u2768-\u2775\u27C5\u27C6\u27E6-\u27EF\u2983-\u2998\u29D8-\u29DB\u29FC\u29FD\u2CF9-\u2CFC\u2CFE\u2CFF\u2D70\u2E00-\u2E2E\u2E30-\u2E3B\u3001-\u3003\u3008-\u3011\u3014-\u301F\u3030\u303D\u30A0\u30FB\uA4FE\uA4FF\uA60D-\uA60F\uA673\uA67E\uA6F2-\uA6F7\uA874-\uA877\uA8CE\uA8CF\uA8F8-\uA8FA\uA92E\uA92F\uA95F\uA9C1-\uA9CD\uA9DE\uA9DF\uAA5C-\uAA5F\uAADE\uAADF\uAAF0\uAAF1\uABEB\uFD3E\uFD3F\uFE10-\uFE19\uFE30-\uFE52\uFE54-\uFE61\uFE63\uFE68\uFE6A\uFE6B\uFF01-\uFF03\uFF05-\uFF0A\uFF0C-\uFF0F\uFF1A\uFF1B\uFF1F\uFF20\uFF3B-\uFF3D\uFF3F\uFF5B\uFF5D\uFF5F-\uFF65\u002D\u058A\u05BE\u1400\u1806\u2010-\u2015\u2E17\u2E1A\u2E3A\u2E3B\u301C\u3030\u30A0\uFE31\uFE32\uFE58\uFE63\uFF0D\u0028\u005B\u007B\u0F3A\u0F3C\u169B\u201A\u201E\u2045\u207D\u208D\u2329\u2768\u276A\u276C\u276E\u2770\u2772\u2774\u27C5\u27E6\u27E8\u27EA\u27EC\u27EE\u2983\u2985\u2987\u2989\u298B\u298D\u298F\u2991\u2993\u2995\u2997\u29D8\u29DA\u29FC\u2E22\u2E24\u2E26\u2E28\u3008\u300A\u300C\u300E\u3010\u3014\u3016\u3018\u301A\u301D\uFD3E\uFE17\uFE35\uFE37\uFE39\uFE3B\uFE3D\uFE3F\uFE41\uFE43\uFE47\uFE59\uFE5B\uFE5D\uFF08\uFF3B\uFF5B\uFF5F\uFF62\u0029\u005D\u007D\u0F3B\u0F3D\u169C\u2046\u207E\u208E\u232A\u2769\u276B\u276D\u276F\u2771\u2773\u2775\u27C6\u27E7\u27E9\u27EB\u27ED\u27EF\u2984\u2986\u2988\u298A\u298C\u298E\u2990\u2992\u2994\u2996\u2998\u29D9\u29DB\u29FD\u2E23\u2E25\u2E27\u2E29\u3009\u300B\u300D\u300F\u3011\u3015\u3017\u3019\u301B\u301E\u301F\uFD3F\uFE18\uFE36\uFE38\uFE3A\uFE3C\uFE3E\uFE40\uFE42\uFE44\uFE48\uFE5A\uFE5C\uFE5E\uFF09\uFF3D\uFF5D\uFF60\uFF63\u00AB\u2018\u201B\u201C\u201F\u2039\u2E02\u2E04\u2E09\u2E0C\u2E1C\u2E20\u00BB\u2019\u201D\u203A\u2E03\u2E05\u2E0A\u2E0D\u2E1D\u2E21\u005F\u203F\u2040\u2054\uFE33\uFE34\uFE4D-\uFE4F\uFF3F\u0021-\u0023\u0025-\u0027\u002A\u002C\u002E\u002F\u003A\u003B\u003F\u0040\u005C\u00A1\u00A7\u00B6\u00B7\u00BF\u037E\u0387\u055A-\u055F\u0589\u05C0\u05C3\u05C6\u05F3\u05F4\u0609\u060A\u060C\u060D\u061B\u061E\u061F\u066A-\u066D\u06D4\u0700-\u070D\u07F7-\u07F9\u0830-\u083E\u085E\u0964\u0965\u0970\u0AF0\u0DF4\u0E4F\u0E5A\u0E5B\u0F04-\u0F12\u0F14\u0F85\u0FD0-\u0FD4\u0FD9\u0FDA\u104A-\u104F\u10FB\u1360-\u1368\u166D\u166E\u16EB-\u16ED\u1735\u1736\u17D4-\u17D6\u17D8-\u17DA\u1800-\u1805\u1807-\u180A\u1944\u1945\u1A1E\u1A1F\u1AA0-\u1AA6\u1AA8-\u1AAD\u1B5A-\u1B60\u1BFC-\u1BFF\u1C3B-\u1C3F\u1C7E\u1C7F\u1CC0-\u1CC7\u1CD3\u2016\u2017\u2020-\u2027\u2030-\u2038\u203B-\u203E\u2041-\u2043\u2047-\u2051\u2053\u2055-\u205E\u2CF9-\u2CFC\u2CFE\u2CFF\u2D70\u2E00\u2E01\u2E06-\u2E08\u2E0B\u2E0E-\u2E16\u2E18\u2E19\u2E1B\u2E1E\u2E1F\u2E2A-\u2E2E\u2E30-\u2E39\u3001-\u3003\u303D\u30FB\uA4FE\uA4FF\uA60D-\uA60F\uA673\uA67E\uA6F2-\uA6F7\uA874-\uA877\uA8CE\uA8CF\uA8F8-\uA8FA\uA92E\uA92F\uA95F\uA9C1-\uA9CD\uA9DE\uA9DF\uAA5C-\uAA5F\uAADE\uAADF\uAAF0\uAAF1\uABEB\uFE10-\uFE16\uFE19\uFE30\uFE45\uFE46\uFE49-\uFE4C\uFE50-\uFE52\uFE54-\uFE57\uFE5F-\uFE61\uFE68\uFE6A\uFE6B\uFF01-\uFF03\uFF05-\uFF07\uFF0A\uFF0C\uFF0E\uFF0F\uFF1A\uFF1B\uFF1F\uFF20\uFF3C\uFF61\uFF64\uFF65]").test(String.fromCharCode(value));
+        },
+
+        isNumber: function (value) {
+            if (value < 256) {
+                return ([48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 178, 179, 185, 188, 189, 190].indexOf(value) != -1);
+            }
+
+            return new RegExp("[\u0030-\u0039\u00B2\u00B3\u00B9\u00BC-\u00BE\u0660-\u0669\u06F0-\u06F9\u07C0-\u07C9\u0966-\u096F\u09E6-\u09EF\u09F4-\u09F9\u0A66-\u0A6F\u0AE6-\u0AEF\u0B66-\u0B6F\u0B72-\u0B77\u0BE6-\u0BF2\u0C66-\u0C6F\u0C78-\u0C7E\u0CE6-\u0CEF\u0D66-\u0D75\u0E50-\u0E59\u0ED0-\u0ED9\u0F20-\u0F33\u1040-\u1049\u1090-\u1099\u1369-\u137C\u16EE-\u16F0\u17E0-\u17E9\u17F0-\u17F9\u1810-\u1819\u1946-\u194F\u19D0-\u19DA\u1A80-\u1A89\u1A90-\u1A99\u1B50-\u1B59\u1BB0-\u1BB9\u1C40-\u1C49\u1C50-\u1C59\u2070\u2074-\u2079\u2080-\u2089\u2150-\u2182\u2185-\u2189\u2460-\u249B\u24EA-\u24FF\u2776-\u2793\u2CFD\u3007\u3021-\u3029\u3038-\u303A\u3192-\u3195\u3220-\u3229\u3248-\u324F\u3251-\u325F\u3280-\u3289\u32B1-\u32BF\uA620-\uA629\uA6E6-\uA6EF\uA830-\uA835\uA8D0-\uA8D9\uA900-\uA909\uA9D0-\uA9D9\uAA50-\uAA59\uABF0-\uABF9\uFF10-\uFF19\u0030-\u0039\u0660-\u0669\u06F0-\u06F9\u07C0-\u07C9\u0966-\u096F\u09E6-\u09EF\u0A66-\u0A6F\u0AE6-\u0AEF\u0B66-\u0B6F\u0BE6-\u0BEF\u0C66-\u0C6F\u0CE6-\u0CEF\u0D66-\u0D6F\u0E50-\u0E59\u0ED0-\u0ED9\u0F20-\u0F29\u1040-\u1049\u1090-\u1099\u17E0-\u17E9\u1810-\u1819\u1946-\u194F\u19D0-\u19D9\u1A80-\u1A89\u1A90-\u1A99\u1B50-\u1B59\u1BB0-\u1BB9\u1C40-\u1C49\u1C50-\u1C59\uA620-\uA629\uA8D0-\uA8D9\uA900-\uA909\uA9D0-\uA9D9\uAA50-\uAA59\uABF0-\uABF9\uFF10-\uFF19\u16EE-\u16F0\u2160-\u2182\u2185-\u2188\u3007\u3021-\u3029\u3038-\u303A\uA6E6-\uA6EF\u00B2\u00B3\u00B9\u00BC-\u00BE\u09F4-\u09F9\u0B72-\u0B77\u0BF0-\u0BF2\u0C78-\u0C7E\u0D70-\u0D75\u0F2A-\u0F33\u1369-\u137C\u17F0-\u17F9\u19DA\u2070\u2074-\u2079\u2080-\u2089\u2150-\u215F\u2189\u2460-\u249B\u24EA-\u24FF\u2776-\u2793\u2CFD\u3192-\u3195\u3220-\u3229\u3248-\u324F\u3251-\u325F\u3280-\u3289\u32B1-\u32BF\uA830-\uA835]").test(String.fromCharCode(value));
+        },
+
+        isControl: function (value) {
+            if (value < 256) {
+                return (value >= 0 && value <= 31) || (value >= 127 && value <= 159);
+            }
+
+            return new RegExp("[\u0000-\u001F\u007F\u0080-\u009F]").test(String.fromCharCode(value));
+        }
+    };
+
+    Bridge.Char = char;
+
+    // @source String.js
+
+    var string = {
+        is: function (obj, type) {
+            if (!Bridge.isString(obj)) {
+                return false;
+            }
+
+            if ((obj.constructor === type) || (obj instanceof type)) {
+                return true;
+            }
+
+            if (type === Bridge.IEnumerable ||
+                type.$$name && Bridge.String.startsWith(type.$$name, "Bridge.IEnumerable$1") ||
+                type.$$name && Bridge.String.startsWith(type.$$name, "Bridge.IComparable$1") ||
+                type.$$name && Bridge.String.startsWith(type.$$name, "Bridge.IEquatable$1")) {
+                return true;
+            }
+
+            return false;
+        },
+
+        lastIndexOf: function (s, search, startIndex, count) {
+            var index = s.lastIndexOf(search, startIndex);
+            return (index < (startIndex - count + 1)) ? -1 : index;
+        },
+
+        lastIndexOfAny: function (s, chars, startIndex, count) {
+            var length = s.length;
+            if (!length) {
+                return -1;
+            }
+
+            chars = String.fromCharCode.apply(null, chars);
+            startIndex = startIndex || length - 1;
+            count = count || length;
+
+            var endIndex = startIndex - count + 1;
+            if (endIndex < 0) {
+                endIndex = 0;
+            }
+
+            for (var i = startIndex; i >= endIndex; i--) {
+                if (chars.indexOf(s.charAt(i)) >= 0) {
+                    return i;
+                }
+            }
+            return -1;
+        },
+
+        isNullOrWhiteSpace: function (value) {
+            //do not replace == to ===, it ichecks to undefined also
+            return value == null || value.match(/^ *$/) !== null;
+        },
+
+        isNullOrEmpty: function (value) {
+            return Bridge.isEmpty(value, false);
+        },
+
+        fromCharCount: function (c, count) {
+            if (count >= 0) {
+                return String(Array(count + 1).join(String.fromCharCode(c)));
+            } else {
+                throw new Bridge.ArgumentOutOfRangeException("count", "cannot be less than zero");
+            }
+        },
+
+        format: function (format) {
+            var me = this,
+                _formatRe = /(\{+)((\d+|[a-zA-Z_$]\w+(?:\.[a-zA-Z_$]\w+|\[\d+\])*)(?:\,(-?\d*))?(?:\:([^\}]*))?)(\}+)|(\{+)|(\}+)/g,
+                args = Array.prototype.slice.call(arguments, 1),
+                fn = this.decodeBraceSequence;
+
+            return format.replace(_formatRe, function (m, openBrace, elementContent, index, align, format, closeBrace, repeatOpenBrace, repeatCloseBrace) {
+                if (repeatOpenBrace) {
+                    return fn(repeatOpenBrace);
+                }
+
+                if (repeatCloseBrace) {
+                    return fn(repeatCloseBrace);
+                }
+
+                if (openBrace.length % 2 === 0 || closeBrace.length % 2 === 0) {
+                    return fn(openBrace) + elementContent + fn(closeBrace);
+                }
+
+                return fn(openBrace, true) + me.handleElement(index, align, format, args) + fn(closeBrace, true);
+            });
+        },
+
+        handleElement: function (index, alignment, formatStr, args) {
+            var value;
+
+            index = parseInt(index, 10);
+
+            if (index > args.length - 1) {
+                throw new Bridge.FormatException("Input string was not in a correct format.");
+            }
+
+            value = args[index];
+
+            if (value == null) {
+                value = "";
+            }
+
+            if (formatStr && Bridge.is(value, Bridge.IFormattable)) {
+                value = Bridge.format(value, formatStr);
+            } else {
+                value = "" + value;
+            }
+
+            if (alignment) {
+                alignment = parseInt(alignment, 10);
+                if (!Bridge.isNumber(alignment)) {
+                    alignment = null;
+                }
+            }
+
+            return Bridge.String.alignString(value.toString(), alignment);
+        },
+
+        decodeBraceSequence: function (braces, remove) {
+            return braces.substr(0, (braces.length + (remove ? 0 : 1)) / 2);
+        },
+
+        alignString: function (str, alignment, pad, dir) {
+            if (!alignment) {
+                return str;
+            }
+
+            if (!pad) {
+                pad = " ";
+            }
+
+            if (Bridge.isNumber(pad)) {
+                pad = String.fromCharCode(pad);
+            }
+
+            if (!dir) {
+                dir = alignment < 0 ? 1 : 2;
+            }
+
+            alignment = Math.abs(alignment);
+
+            if (alignment + 1 >= str.length) {
+                switch (dir) {
+                    case 2:
+                        str = Array(alignment + 1 - str.length).join(pad) + str;
+                        break;
+
+                    case 3:
+                        var padlen = alignment - str.length,
+                            right = Math.ceil(padlen / 2),
+                            left = padlen - right;
+
+                        str = Array(left + 1).join(pad) + str + Array(right + 1).join(pad);
+                        break;
+
+                    case 1:
+                    default:
+                        str = str + Array(alignment + 1 - str.length).join(pad);
+                        break;
+                }
+            }
+
+            return str;
+        },
+
+        startsWith: function (str, prefix) {
+            if (!prefix.length) {
+                return true;
+            }
+
+            if (prefix.length > str.length) {
+                return false;
+            }
+
+            prefix = Bridge.String.escape(prefix);
+
+            return str.match("^" + prefix) !== null;
+        },
+
+        endsWith: function (str, suffix) {
+            if (!suffix.length) {
+                return true;
+            }
+
+            if (suffix.length > str.length) {
+                return false;
+            }
+
+            suffix = Bridge.String.escape(suffix);
+
+            return str.match(suffix + "$") !== null;
+        },
+
+        contains: function (str, value) {
+            if (value == null) {
+                throw new Bridge.ArgumentNullException();
+            }
+
+            if (str == null) {
+                return false;
+            }
+
+            return str.indexOf(value) > -1;
+        },
+
+        indexOfAny: function (str, anyOf) {
+            if (anyOf == null) {
+                throw new Bridge.ArgumentNullException();
+            }
+
+            if (str == null || str === "") {
+                return -1;
+            }
+
+            var startIndex = (arguments.length > 2) ? arguments[2] : 0;
+
+            if (startIndex < 0) {
+                throw new Bridge.ArgumentOutOfRangeException("startIndex", "startIndex cannot be less than zero");
+            }
+
+            var length = (arguments.length > 3) ? arguments[3] : str.length - startIndex;
+
+            if (length < 0) {
+                throw new Bridge.ArgumentOutOfRangeException("length", "must be non-negative");
+            }
+
+            if (length > str.length - startIndex) {
+                throw new Bridge.ArgumentOutOfRangeException("Index and length must refer to a location within the string");
+            }
+
+            var s = str.substr(startIndex, length);
+
+            for (var i = 0; i < anyOf.length; i++) {
+                var c = String.fromCharCode(anyOf[i]);
+                var index = s.indexOf(c);
+
+                if (index > -1) {
+                    return index + startIndex;
+                }
+            }
+
+            return -1;
+        },
+
+        indexOf: function (str, value) {
+            if (value == null) {
+                throw new Bridge.ArgumentNullException();
+            }
+
+            if (str == null || str === "") {
+                return -1;
+            }
+
+            var startIndex = (arguments.length > 2) ? arguments[2] : 0;
+
+            if (startIndex < 0 || startIndex > str.length) {
+                throw new Bridge.ArgumentOutOfRangeException("startIndex", "startIndex cannot be less than zero and must refer to a location within the string");
+            }
+
+            if (value === "") {
+                return (arguments.length > 2) ? startIndex : 0;
+            }
+
+            var length = (arguments.length > 3) ? arguments[3] : str.length - startIndex;
+
+            if (length < 0) {
+                throw new Bridge.ArgumentOutOfRangeException("length", "must be non-negative");
+            }
+
+            if (length > str.length - startIndex) {
+                throw new Bridge.ArgumentOutOfRangeException("Index and length must refer to a location within the string");
+            }
+
+            var s = str.substr(startIndex, length);
+            var index = (arguments.length === 5 && arguments[4] % 2 !== 0) ? s.toLocaleUpperCase().indexOf(value.toLocaleUpperCase()) : s.indexOf(value);
+
+            if (index > -1) {
+                if (arguments.length === 5) {
+                    // StringComparison
+                    return (Bridge.String.compare(value, s.substr(index, value.length), arguments[4]) === 0) ? index + startIndex : -1;
+                } else {
+                    return index + startIndex;
+                }
+            }
+
+            return -1;
+        },
+
+        equals: function () {
+            return Bridge.String.compare.apply(this, arguments) === 0;
+        },
+
+        compare: function (strA, strB) {
+            if (strA == null) {
+                return (strB == null) ? 0 : -1;
+            }
+
+            if (strB == null) {
+                return 1;
+            }
+
+            if (arguments.length >= 3) {
+                if (!Bridge.isBoolean(arguments[2])) {
+                    // StringComparison
+                    switch (arguments[2]) {
+                        case 1: // CurrentCultureIgnoreCase
+                            return strA.localeCompare(strB, Bridge.CultureInfo.getCurrentCulture().name, { sensitivity: "accent" });
+                        case 2: // InvariantCulture
+                            return strA.localeCompare(strB, Bridge.CultureInfo.invariantCulture.name);
+                        case 3: // InvariantCultureIgnoreCase
+                            return strA.localeCompare(strB, Bridge.CultureInfo.invariantCulture.name, { sensitivity: "accent" });
+                        case 4: // Ordinal
+                            return (strA === strB) ? 0 : ((strA > strB) ? 1 : -1);
+                        case 5: // OrdinalIgnoreCase
+                            return (strA.toUpperCase() === strB.toUpperCase()) ? 0 : ((strA.toUpperCase() > strB.toUpperCase()) ? 1 : -1);
+                        case 0: // CurrentCulture
+                        default:
+                            break;
+                    }
+                } else {
+                    // ignoreCase
+                    if (arguments[2]) {
+                        strA = strA.toLocaleUpperCase();
+                        strB = strB.toLocaleUpperCase();
+                    }
+
+                    if (arguments.length === 4) {
+                        // CultureInfo
+                        return strA.localeCompare(strB, arguments[3].name);
+                    }
+                }
+            }
+
+            return strA.localeCompare(strB);
+        },
+
+        toCharArray: function (str, startIndex, length) {
+            if (startIndex < 0 || startIndex > str.length || startIndex > str.length - length) {
+                throw new Bridge.ArgumentOutOfRangeException("startIndex", "startIndex cannot be less than zero and must refer to a location within the string");
+            }
+
+            if (length < 0) {
+                throw new Bridge.ArgumentOutOfRangeException("length", "must be non-negative");
+            }
+
+            if (!Bridge.hasValue(startIndex)) {
+                startIndex = 0;
+            }
+
+            if (!Bridge.hasValue(length)) {
+                length = str.length;
+            }
+
+            var arr = [];
+
+            for (var i = startIndex; i < startIndex + length; i++) {
+                arr.push(str.charCodeAt(i));
+            }
+
+            return arr;
+        },
+
+        escape: function (str) {
+            return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+        },
+
+        replaceAll: function (str, a, b) {
+            var reg = new RegExp(Bridge.String.escape(a), "g");
+
+            return str.replace(reg, b);
+        },
+
+        insert: function (index, strA, strB) {
+            return index > 0 ? (strA.substring(0, index) + strB + strA.substring(index, strA.length)) : (strB + strA);
+        },
+
+        remove: function (s, index, count) {
+            if (!count || ((index + count) > this.length)) {
+                return s.substr(0, index);
+            }
+            return s.substr(0, index) + s.substr(index + count);
+        },
+
+        split: function (s, strings, limit, options) {
+            var re = new RegExp(strings.map(Bridge.String.escape).join('|'), 'g'),
+                res = [],
+                m,
+                i;
+            for (i = 0;; i = re.lastIndex) {
+                if (m = re.exec(s)) {
+                    if (options !== 1 || m.index > i) {
+                        if (res.length === limit - 1) {
+                            res.push(s.substr(i));
+                            return res;
+                        }
+                        else
+                            res.push(s.substring(i, m.index));
+                    }
+                }
+                else {
+                    if (options !== 1 || i !== s.length)
+                        res.push(s.substr(i));
+                    return res;
+                }
+            }
+        },
+
+        trimEnd: function (s, chars) {
+            return s.replace(chars ? new RegExp('[' + String.fromCharCode.apply(null, chars) + ']+$') : /\s*$/, '');
+        },
+
+        trimStart: function(s, chars) {
+            return s.replace(chars ? new RegExp('^[' + String.fromCharCode.apply(null, chars) + ']+') : /^\s*/, '');
+        },
+
+        trim: function(s, chars) {
+            return Bridge.String.trimStart(Bridge.String.trimEnd(s, chars), chars);
+        }
+    };
+
+    Bridge.String = string;
+
+    // @source Enum.js
+
+    var enumMethods = {
+        nameEquals: function (n1, n2, ignoreCase) {
+            if (ignoreCase) {
+                return n1.toLowerCase() === n2.toLowerCase();
+            }
+
+            return (n1.charAt(0).toLowerCase() + n1.slice(1)) === (n2.charAt(0).toLowerCase() + n2.slice(1));
+        },
+
+        checkEnumType: function(enumType) {
+            if (!enumType) {
+                throw new Bridge.ArgumentNullException("enumType");
+            }
+
+            if (!enumType.prototype.$enum) {
+                throw new Bridge.ArgumentException("", "enumType");
+            }
+        },
+
+        toName: function(name) {
+            return name.charAt(0).toUpperCase() + name.slice(1);
+        },
+
+        parse: function(enumType, s, ignoreCase, silent) {
+            var values = enumType;
+
+            Bridge.Enum.checkEnumType(enumType);
+
+            if (!enumType.prototype.$flags) {
+                for (var f in values) {
+                    if (enumMethods.nameEquals(f, s, ignoreCase)) {
+                        return values[f];
+                    }
+                }
+            }
+            else {
+                var parts = s.split(',');
+                var value = 0;
+                var parsed = true;
+
+                for (var i = parts.length - 1; i >= 0; i--) {
+                    var part = parts[i].trim();
+                    var found = false;
+
+                    for (var f in values) {
+                        if (enumMethods.nameEquals(f, part, ignoreCase)) {
+                            value |= values[f];
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        parsed = false;
+                        break;
+                    }
+                }
+
+                if (parsed) {
+                    return value;
+                }
+            }
+
+            if (silent !== true) {
+                throw new Bridge.ArgumentException('Invalid Enumeration Value');
+            }
+
+            return null;
+        },
+
+        toString: function (enumType, value, forceFlags) {
+            Bridge.Enum.checkEnumType(enumType);
+
+            var values = enumType;
+            if ((!enumType.prototype.$flags && forceFlags !== true) || (value === 0)) {
+                for (var i in values) {
+                    if (values[i] === value) {
+                        return enumMethods.toName(i);
+                    }
+                }
+                //throw new Bridge.ArgumentException('Invalid Enumeration Value');
+                return value.toString();
+            }
+            else {
+                var parts = [];
+                for (var i in values) {
+                    if (values[i] & value) {
+                        parts.push(enumMethods.toName(i));
+                    }
+                }
+                if (!parts.length) {
+                    //throw new Bridge.ArgumentException('Invalid Enumeration Value');
+                    return value.toString();
+                }
+                return parts.join(', ');
+            }
+        },
+
+        getValues: function (enumType) {
+            Bridge.Enum.checkEnumType(enumType);
+            var parts = [];
+            var values = enumType;
+            for (var i in values) {
+                if (values.hasOwnProperty(i) && i.indexOf("$") < 0)
+                    parts.push(values[i]);
+            }
+            return parts;
+        },
+
+        format: function (enumType, value, format) {
+            Bridge.Enum.checkEnumType(enumType);
+
+            var name;
+            if (!Bridge.hasValue(value) && (name = "value") || !Bridge.hasValue(format) && (name = "format")) {
+                throw new Bridge.ArgumentNullException(name);
+            }
+
+            switch (format) {
+                case "G":
+                case "g":
+                    return Bridge.Enum.toString(enumType, value);
+                case "x":
+                case "X":
+                    return value.toString(16);
+                case "d":
+                case "D":
+                    return value.toString();
+                case "f":
+                case "F":
+                    return Bridge.Enum.toString(enumType, value, true);
+                default:
+                    throw new Bridge.FormatException();
+            }
+        },
+
+        getNames: function (enumType) {
+            Bridge.Enum.checkEnumType(enumType);
+            var parts = [];
+            var values = enumType;
+            for (var i in values) {
+                if (values.hasOwnProperty(i) && i.indexOf("$") < 0)
+                    parts.push(enumMethods.toName(i));
+            }
+            return parts;
+        },
+
+        getName: function (enumType, value) {
+            Bridge.Enum.checkEnumType(enumType);
+            var values = enumType;
+            for (var i in values) {
+                if (values[i] === value) {
+                    return i.charAt(0).toUpperCase() + i.slice(1);
+                }
+            }
+
+            return null;
+        },
+
+        hasFlag: function(value, flag) {
+            return !!(value & flag);
+        },
+
+        isDefined: function (enumType, value) {
+            Bridge.Enum.checkEnumType(enumType);
+            var values = enumType;
+            var isString = Bridge.isString(value);
+            for (var i in values) {
+                if (isString ? enumMethods.nameEquals(i, value, false) : values[i] === value) {
+                    return true;
+                }
+            }
+
+            return false;
+        },
+
+        tryParse: function (enumType, value, result, ignoreCase) {
+            result.v = 0;
+            result.v = enumMethods.parse(enumType, value, ignoreCase, true);
+
+            if (result.v == null) {
+                return false;
+            }
+
+            return true;
+        }
+    };
+
+    Bridge.Enum = enumMethods;
+
+    // @source Browser.js
+
+	var check = function (regex) {
+	    return regex.test(navigator.userAgent.toLowerCase());
+	},
+
+    isStrict = Bridge.global.document && Bridge.global.document.compatMode === "CSS1Compat",
+
+    version = function (is, regex) {
+        var m;
+
+        return (is && (m = regex.exec(navigator.userAgent.toLowerCase()))) ? parseFloat(m[1]) : 0;
+    },
+
+    docMode = Bridge.global.document ? Bridge.global.document.documentMode : null,
+    isOpera = check(/opera/),
+    isOpera10_5 = isOpera && check(/version\/10\.5/),
+    isChrome = check(/\bchrome\b/),
+    isWebKit = check(/webkit/),
+    isSafari = !isChrome && check(/safari/),
+    isSafari2 = isSafari && check(/applewebkit\/4/),
+    isSafari3 = isSafari && check(/version\/3/),
+    isSafari4 = isSafari && check(/version\/4/),
+    isSafari5_0 = isSafari && check(/version\/5\.0/),
+    isSafari5 = isSafari && check(/version\/5/),
+    isIE = !isOpera && (check(/msie/) || check(/trident/)),
+    isIE7 = isIE && ((check(/msie 7/) && docMode !== 8 && docMode !== 9 && docMode !== 10) || docMode === 7),
+    isIE8 = isIE && ((check(/msie 8/) && docMode !== 7 && docMode !== 9 && docMode !== 10) || docMode === 8),
+    isIE9 = isIE && ((check(/msie 9/) && docMode !== 7 && docMode !== 8 && docMode !== 10) || docMode === 9),
+    isIE10 = isIE && ((check(/msie 10/) && docMode !== 7 && docMode !== 8 && docMode !== 9) || docMode === 10),
+    isIE11 = isIE && ((check(/trident\/7\.0/) && docMode !== 7 && docMode !== 8 && docMode !== 9 && docMode !== 10) || docMode === 11),
+    isIE6 = isIE && check(/msie 6/),
+    isGecko = !isWebKit && !isIE && check(/gecko/),
+    isGecko3 = isGecko && check(/rv:1\.9/),
+    isGecko4 = isGecko && check(/rv:2\.0/),
+    isGecko5 = isGecko && check(/rv:5\./),
+    isGecko10 = isGecko && check(/rv:10\./),
+    isFF3_0 = isGecko3 && check(/rv:1\.9\.0/),
+    isFF3_5 = isGecko3 && check(/rv:1\.9\.1/),
+    isFF3_6 = isGecko3 && check(/rv:1\.9\.2/),
+    isWindows = check(/windows|win32/),
+    isMac = check(/macintosh|mac os x/),
+    isLinux = check(/linux/),
+    scrollbarSize = null,
+    chromeVersion = version(true, /\bchrome\/(\d+\.\d+)/),
+    firefoxVersion = version(true, /\bfirefox\/(\d+\.\d+)/),
+    ieVersion = version(isIE, /msie (\d+\.\d+)/),
+    operaVersion = version(isOpera, /version\/(\d+\.\d+)/),
+    safariVersion = version(isSafari, /version\/(\d+\.\d+)/),
+    webKitVersion = version(isWebKit, /webkit\/(\d+\.\d+)/),
+    isSecure = Bridge.global.location ? /^https/i.test(Bridge.global.location.protocol) : false,
+    isiPhone = /iPhone/i.test(navigator.platform),
+    isiPod = /iPod/i.test(navigator.platform),
+    isiPad = /iPad/i.test(navigator.userAgent),
+    isBlackberry = /Blackberry/i.test(navigator.userAgent),
+    isAndroid = /Android/i.test(navigator.userAgent),
+    isDesktop = isMac || isWindows || (isLinux && !isAndroid),
+    isTablet = isiPad,
+    isPhone = !isDesktop && !isTablet;
+
+	var browser = {
+	    isStrict: isStrict,
+	    isIEQuirks: isIE && (!isStrict && (isIE6 || isIE7 || isIE8 || isIE9)),
+	    isOpera: isOpera,
+	    isOpera10_5: isOpera10_5,
+	    isWebKit: isWebKit,
+	    isChrome: isChrome,
+	    isSafari: isSafari,
+	    isSafari3: isSafari3,
+	    isSafari4: isSafari4,
+	    isSafari5: isSafari5,
+	    isSafari5_0: isSafari5_0,
+	    isSafari2: isSafari2,
+	    isIE: isIE,
+	    isIE6: isIE6,
+	    isIE7: isIE7,
+	    isIE7m: isIE6 || isIE7,
+	    isIE7p: isIE && !isIE6,
+	    isIE8: isIE8,
+	    isIE8m: isIE6 || isIE7 || isIE8,
+	    isIE8p: isIE && !(isIE6 || isIE7),
+	    isIE9: isIE9,
+	    isIE9m: isIE6 || isIE7 || isIE8 || isIE9,
+	    isIE9p: isIE && !(isIE6 || isIE7 || isIE8),
+	    isIE10: isIE10,
+	    isIE10m: isIE6 || isIE7 || isIE8 || isIE9 || isIE10,
+	    isIE10p: isIE && !(isIE6 || isIE7 || isIE8 || isIE9),
+	    isIE11: isIE11,
+	    isIE11m: isIE6 || isIE7 || isIE8 || isIE9 || isIE10 || isIE11,
+	    isIE11p: isIE && !(isIE6 || isIE7 || isIE8 || isIE9 || isIE10),
+	    isGecko: isGecko,
+	    isGecko3: isGecko3,
+	    isGecko4: isGecko4,
+	    isGecko5: isGecko5,
+	    isGecko10: isGecko10,
+	    isFF3_0: isFF3_0,
+	    isFF3_5: isFF3_5,
+	    isFF3_6: isFF3_6,
+	    isFF4: 4 <= firefoxVersion && firefoxVersion < 5,
+	    isFF5: 5 <= firefoxVersion && firefoxVersion < 6,
+	    isFF10: 10 <= firefoxVersion && firefoxVersion < 11,
+	    isLinux: isLinux,
+	    isWindows: isWindows,
+	    isMac: isMac,
+	    chromeVersion: chromeVersion,
+	    firefoxVersion: firefoxVersion,
+	    ieVersion: ieVersion,
+	    operaVersion: operaVersion,
+	    safariVersion: safariVersion,
+	    webKitVersion: webKitVersion,
+	    isSecure: isSecure,
+	    isiPhone: isiPhone,
+	    isiPod: isiPod,
+	    isiPad: isiPad,
+	    isBlackberry: isBlackberry,
+	    isAndroid: isAndroid,
+	    isDesktop: isDesktop,
+	    isTablet: isTablet,
+	    isPhone: isPhone,
+	    iOS: isiPhone || isiPad || isiPod,
+	    standalone: Bridge.global.navigator ? !!Bridge.global.navigator.standalone : false
+	};
+
+	Bridge.Browser = browser;
+    // @source Class.js
+
+    var initializing = false;
+
+    // The base Class implementation
+    var base = {
+        cache: { },
+
+        initCtor: function () {
+            var value = arguments[0];
+
+            if (this.$multipleCtors && arguments.length > 0 && typeof value == "string") {
+                value = value === "constructor" ? "$constructor" : value;
+
+                if ((value === "$constructor" || Bridge.String.startsWith(value, "constructor$")) && Bridge.isFunction(this[value])) {
+                    this[value].apply(this, Array.prototype.slice.call(arguments, 1));
+
+                    return;
+                }
+            }
+
+            if (this.$constructor) {
+                this.$constructor.apply(this, arguments);
+            }
+        },
+
+        initConfig: function (extend, base, cfg, statics, scope) {
+            var initFn,
+                isFn = Bridge.isFunction(cfg),
+                fn = function () {
+                    var name,
+                        config;
+
+                    config = Bridge.isFunction(cfg) ? cfg() : cfg;
+
+                    if (config.fields) {
+                        for (name in config.fields) {
+                            this[name] = config.fields[name];
+                        }
+                    }
+
+                    if (config.properties) {
+                        for (name in config.properties) {
+                            Bridge.property(this, name, config.properties[name]);
+                        }
+                    }
+
+                    if (config.events) {
+                        for (name in config.events) {
+                            Bridge.event(this, name, config.events[name]);
+                        }
+                    }
+                    if (config.alias) {
+                        for (name in config.alias) {
+                            if (this[name]) {
+                                this[name] = this[config.alias[name]];
+                            }
+                        }
+                    }
+
+                    if (config.init) {
+                        initFn = config.init;
+                    }
+                };
+
+            if (!isFn) {
+                fn.apply(scope);
+            }
+
+            scope.$initMembers = function () {
+                if (extend && !statics && base.$initMembers) {
+                    base.$initMembers.apply(this, arguments);
+                }
+
+                if (isFn) {
+                    fn.apply(this);
+                }
+
+                if (initFn) {
+                    initFn.apply(this, arguments);
+                }
+            };
+        },
+
+        // Create a new Class that inherits from this class
+        define: function (className, gscope, prop) {
+            if (!prop) {
+                prop = gscope;
+                gscope = Bridge.global;
+            }
+
+            if (Bridge.isFunction(prop)) {
+                fn = function () {
+                    var args = Array.prototype.slice.call(arguments),
+                        name,
+                        obj,
+                        c;
+
+                    args.unshift(className);
+                    name = Bridge.Class.genericName.apply(null, args),
+                        c = Bridge.Class.cache[name];
+
+                    if (c) {
+                        return c;
+                    }
+
+                    obj = prop.apply(null, args.slice(1));
+                    obj.$cacheName = name;
+                    c = Bridge.define(name, obj);
+
+                    return  c;
+                };
+
+                return Bridge.Class.generic(className, gscope, fn);
+            }
+
+            prop = prop || {};
+
+            var extend = prop.$inherits || prop.inherits,
+                statics = prop.$statics || prop.statics,
+                base,
+                cacheName = prop.$cacheName,
+                prototype,
+                scope = prop.$scope || Bridge.global,
+                i,
+                v,
+                ctorCounter,
+                isCtor,
+                ctorName,
+                name,
+                fn;
+
+            if (prop.$inherits) {
+                delete prop.$inherits;
+            } else {
+                delete prop.inherits;
+            }
+
+            if (Bridge.isFunction(statics)) {
+                statics = null;
+            } else if (prop.$statics) {
+                delete prop.$statics;
+            } else {
+                delete prop.statics;
+            }
+
+            if (prop.$cacheName) {
+                delete prop.$cacheName;
+            }
+
+            // The dummy class constructor
+            function Class() {
+                if (!(this instanceof Class)) {
+                    var args = Array.prototype.slice.call(arguments, 0),
+                        object = Object.create(Class.prototype),
+                        result = Class.apply(object, args);
+
+                    return typeof result === "object" ? result : object;
+                }
+
+                // All construction is actually done in the init method
+                if (!initializing) {
+                    if (this.$staticInit) {
+                        this.$staticInit();
+                    }
+
+                    if (this.$initMembers) {
+                        this.$initMembers.apply(this, arguments);
+                    }
+
+                    this.$$initCtor.apply(this, arguments);
+                }
+            };
+
+            scope = Bridge.Class.set(scope, className, Class);
+
+            if (cacheName) {
+                Bridge.Class.cache[cacheName] = Class;
+            }
+
+            if (extend && Bridge.isFunction(extend)) {
+                extend = extend();
+            }
+
+            base = extend ? extend[0].prototype : this.prototype;
+
+            // Instantiate a base class (but only create the instance,
+            // don't run the init constructor)
+            initializing = true;
+            prototype = extend ? new extend[0]() : new Object();
+            initializing = false;
+
+            if (statics) {
+                var staticsConfig = statics.$config || statics.config;
+
+                if (staticsConfig && !Bridge.isFunction(staticsConfig)) {
+                    Bridge.Class.initConfig(extend, base, staticsConfig, true, Class);
+
+                    if (statics.$config) {
+                        delete statics.$config;
+                    } else {
+                        delete statics.config;
+                    }
+                }
+            }
+
+            var instanceConfig = prop.$config || prop.config;
+
+            if (instanceConfig && !Bridge.isFunction(instanceConfig)) {
+                Bridge.Class.initConfig(extend, base, instanceConfig, false, prop);                
+
+                if (prop.$config) {
+                    delete prop.$config;
+                } else {
+                    delete prop.config;
+                }
+            } else {
+                prop.$initMembers = extend ? function () {
+                    base.$initMembers.apply(this, arguments);
+                } : function () { };
+            }
+
+            prop.$$initCtor = Bridge.Class.initCtor;
+
+            // Copy the properties over onto the new prototype
+            ctorCounter = 0;
+
+            var keys = [];
+
+            for (name in prop) {
+                keys.push(name);
+            }
+
+            if (Bridge.Browser.isIE8) {
+                if (prop.hasOwnProperty("constructor") && keys.indexOf("constructor") < 0) {
+                    keys.push("constructor");
+                }
+            }            
+
+            for (var i = 0; i < keys.length; i++) {
+                name = keys[i];
+
+                v = prop[name];
+                isCtor = name === "constructor";
+                ctorName = isCtor ? "$constructor" : name;
+
+                if (Bridge.isFunction(v) && (isCtor || Bridge.String.startsWith(name, "constructor$"))) {
+                    ctorCounter++;
+                    isCtor = true;
+                }
+
+                prototype[ctorName] = prop[name];
+
+                if (isCtor) {
+                    (function (ctorName) {
+                        Class[ctorName] = function () {
+                            var args = Array.prototype.slice.call(arguments);
+
+                            if (this.$initMembers) {
+                                this.$initMembers.apply(this, args);
+                            }
+
+                            args.unshift(ctorName);
+                            this.$$initCtor.apply(this, args);
+                        };
+                    })(ctorName);
+
+                    Class[ctorName].prototype = prototype;
+                    Class[ctorName].prototype.constructor = Class;
+                }
+            }
+
+            if (ctorCounter === 0) {
+                prototype.$constructor = extend ? function () {
+                    base.$constructor.apply(this, arguments);
+                } : function () { };
+            }
+
+            if (ctorCounter > 1) {
+                prototype.$multipleCtors = true;
+            }
+
+            prototype.$$name = className;
+
+            // Populate our constructed prototype object
+            Class.prototype = prototype;
+
+            // Enforce the constructor to be what we expect
+            Class.prototype.constructor = Class;
+
+            Class.$$name = className;
+
+            if (statics) {
+                for (name in statics) {
+                    Class[name] = statics[name];
+                }
+            }
+
+            if (!extend) {
+                extend = [Object];
+            }
+
+            Class.$$inherits = extend;
+
+            for (i = 0; i < extend.length; i++) {
+                scope = extend[i];
+
+                if (!scope.$$inheritors) {
+                    scope.$$inheritors = [];
+                }
+
+                scope.$$inheritors.push(Class);
+            }
+
+            fn = function () {
+                Class.$staticInit = null;
+
+                if (Class.$initMembers) {
+                    Class.$initMembers.call(Class);
+                }
+
+                if (Class.constructor) {
+                    Class.constructor.call(Class);
+                }
+            };
+
+            Bridge.Class.$queue.push(Class);
+            Class.$staticInit = fn;
+
+            return Class;
+        },
+
+
+        addExtend: function (cls, extend) {
+            var i,
+                scope;
+
+            Array.prototype.push.apply(cls.$$inherits, extend);
+
+            for (i = 0; i < extend.length; i++) {
+                scope = extend[i];
+
+                if (!scope.$$inheritors) {
+                    scope.$$inheritors = [];
+                }
+
+                scope.$$inheritors.push(cls);
+            }
+        },
+
+        set: function (scope, className, cls) {
+            var nameParts = className.split("."),
+                name,
+                key,
+                exists,
+                i;
+
+            for (i = 0; i < (nameParts.length - 1) ; i++) {
+                if (typeof scope[nameParts[i]] == "undefined") {
+                    scope[nameParts[i]] = { };
+                }
+
+                scope = scope[nameParts[i]];
+            }
+
+            name = nameParts[nameParts.length - 1];
+            exists = scope[name];
+
+            if (exists) {
+                for (key in exists) {
+                    if (typeof exists[key] === "function" && exists[key].$$name) {
+                        cls[key] = exists[key];
+                    }
+                }
+            }            
+
+            scope[name] = cls;
+
+            return scope;
+        },
+
+        genericName: function () {
+            var name = arguments[0];
+
+            for (var i = 1; i < arguments.length; i++) {
+                name += "$" + Bridge.getTypeName(arguments[i]);
+            }
+
+            return name;
+        },
+
+        generic: function (className, scope, fn) {
+            if (!fn) {
+                fn = scope;
+                scope = Bridge.global;
+            }
+            fn.$$name = className;
+            Bridge.Class.set(scope, className, fn);
+
+            return fn;
+        },
+
+        init: function (fn) {
+            for (var i = 0; i < Bridge.Class.$queue.length; i++) {
+                var t = Bridge.Class.$queue[i];
+
+                if (t.$staticInit) {
+                    t.$staticInit();
+                }
+            }
+            Bridge.Class.$queue.length = 0;
+
+            if (fn) {
+                fn();
+            }
+        }
+    };
+
+    Bridge.Class = base;
+    Bridge.Class.$queue = [];
+    Bridge.define = Bridge.Class.define;
+    Bridge.init = Bridge.Class.init;
+
+    // @source Exception.js
+
+    Bridge.define("Bridge.Exception", {
+        constructor: function (message, innerException) {
+            this.message = message;
+            this.innerException = innerException;
+            this.errorStack = new Error();
+            this.data = new Bridge.Dictionary$2(Object, Object)();
+        },
+
+        getMessage: function () {
+            return this.message;
+        },
+
+        getInnerException: function () {
+            return this.innerException;
+        },
+
+        getStackTrace: function () {
+            return this.errorStack.stack;
+        },
+
+        getData: function () {
+            return this.data;
+        },
+
+        toString: function () {
+            return this.getMessage();
+        },
+
+        statics: {
+            create: function (error) {
+                if (Bridge.is(error, Bridge.Exception)) {
+                    return error;
+                }
+
+                if (error instanceof TypeError) {
+                    return new Bridge.NullReferenceException(error.message, new Bridge.ErrorException(error));
+                } else if (error instanceof RangeError) {
+                    return new Bridge.ArgumentOutOfRangeException(null, error.message, new Bridge.ErrorException(error));
+                } else if (error instanceof Error) {
+                    return new Bridge.ErrorException(error);
+                } else {
+                    return new Bridge.Exception(error ? error.toString() : null);
+                }
+            }
+        }
+    });
+
+    Bridge.define("Bridge.ErrorException", {
+        inherits: [Bridge.Exception],
+
+        constructor: function (error) {
+            Bridge.Exception.prototype.$constructor.call(this, error.message);
+            this.errorStack = error;
+            this.error = error;
+        },
+
+        getError: function () {
+            return this.error;
+        }
+    });
+
+    Bridge.define("Bridge.ArgumentException", {
+        inherits: [Bridge.Exception],
+
+        constructor: function (message, paramName, innerException) {
+            Bridge.Exception.prototype.$constructor.call(this, message || "Value does not fall within the expected range.", innerException);
+            this.paramName = paramName;
+        },
+
+        getParamName: function () {
+            return this.paramName;
+        }
+    });
+
+    Bridge.define("Bridge.ArgumentNullException", {
+        inherits: [Bridge.ArgumentException],
+
+        constructor: function (paramName, message, innerException) {
+            if (!message) {
+                message = "Value cannot be null.";
+
+                if (paramName) {
+                    message += "\nParameter name: " + paramName;
+                }
+            }
+
+            Bridge.ArgumentException.prototype.$constructor.call(this, message, paramName, innerException);
+        }
+    });
+
+    Bridge.define("Bridge.ArgumentOutOfRangeException", {
+        inherits: [Bridge.ArgumentException],
+
+        constructor: function (paramName, message, innerException, actualValue) {
+            if (!message) {
+                message = "Value is out of range.";
+
+                if (paramName) {
+                    message += "\nParameter name: " + paramName;
+                }
+            }
+
+            Bridge.ArgumentException.prototype.$constructor.call(this, message, paramName, innerException);
+
+            this.actualValue = actualValue;
+        },
+
+        getActualValue: function () {
+            return this.actualValue;
+        }
+    });
+
+    Bridge.define("Bridge.CultureNotFoundException", {
+        inherits: [Bridge.ArgumentException],
+
+        constructor: function (paramName, invalidCultureName, message, innerException) {
+            if (!message) {
+                message = "Culture is not supported.";
+
+                if (paramName) {
+                    message += "\nParameter name: " + paramName;
+                }
+
+                if (invalidCultureName) {
+                    message += "\n" + invalidCultureName + " is an invalid culture identifier.";
+                }
+            }
+
+            Bridge.ArgumentException.prototype.$constructor.call(this, message, paramName, innerException);
+
+            this.invalidCultureName = invalidCultureName;
+        },
+
+        getInvalidCultureName: function () {
+            return this.invalidCultureName;
+        }
+    });
+
+    Bridge.define("Bridge.KeyNotFoundException", {
+        inherits: [Bridge.Exception],
+
+        constructor: function (message, innerException) {
+            Bridge.Exception.prototype.$constructor.call(this, message || "Key not found.", innerException);
+        }
+    });
+
+    Bridge.define("Bridge.ArithmeticException", {
+        inherits: [Bridge.Exception],
+
+        constructor: function (message, innerException) {
+            Bridge.Exception.prototype.$constructor.call(this, message || "Overflow or underflow in the arithmetic operation.", innerException);
+        }
+    });
+
+    Bridge.define("Bridge.DivideByZeroException", {
+        inherits: [Bridge.ArithmeticException],
+
+        constructor: function (message, innerException) {
+            Bridge.ArithmeticException.prototype.$constructor.call(this, message || "Division by 0.", innerException);
+        }
+    });
+
+    Bridge.define("Bridge.OverflowException", {
+        inherits: [Bridge.ArithmeticException],
+
+        constructor: function (message, innerException) {
+            Bridge.ArithmeticException.prototype.$constructor.call(this, message || "Arithmetic operation resulted in an overflow.", innerException);
+        }
+    });
+
+    Bridge.define("Bridge.FormatException", {
+        inherits: [Bridge.Exception],
+
+        constructor: function (message, innerException) {
+            Bridge.Exception.prototype.$constructor.call(this, message || "Invalid format.", innerException);
+        }
+    });
+
+    Bridge.define("Bridge.InvalidCastException", {
+        inherits: [Bridge.Exception],
+
+        constructor: function (message, innerException) {
+            Bridge.Exception.prototype.$constructor.call(this, message || "The cast is not valid.", innerException);
+        }
+    });
+
+    Bridge.define("Bridge.InvalidOperationException", {
+        inherits: [Bridge.Exception],
+
+        constructor: function (message, innerException) {
+            Bridge.Exception.prototype.$constructor.call(this, message || "Operation is not valid due to the current state of the object.", innerException);
+        }
+    });
+
+    Bridge.define("Bridge.NotImplementedException", {
+        inherits: [Bridge.Exception],
+
+        constructor: function (message, innerException) {
+            Bridge.Exception.prototype.$constructor.call(this, message || "The method or operation is not implemented.", innerException);
+        }
+    });
+
+    Bridge.define("Bridge.NotSupportedException", {
+        inherits: [Bridge.Exception],
+
+        constructor: function (message, innerException) {
+            Bridge.Exception.prototype.$constructor.call(this, message || "Specified method is not supported.", innerException);
+        }
+    });
+
+    Bridge.define("Bridge.NullReferenceException", {
+        inherits: [Bridge.Exception],
+
+        constructor: function (message, innerException) {
+            Bridge.Exception.prototype.$constructor.call(this, message || "Object is null.", innerException);
+        }
+    });
+
+    Bridge.define("Bridge.RankException", {
+        inherits: [Bridge.Exception],
+
+        constructor: function (message, innerException) {
+            Bridge.Exception.prototype.$constructor.call(this, message || "Attempted to operate on an array with the incorrect number of dimensions.", innerException);
+        }
+    });
+
+    // @source Interfaces.js
+
+    Bridge.define("Bridge.IFormattable", {
+        statics: {
+            $is: function (obj) {
+                if (Bridge.isNumber(obj)) {
+                    return true;
+                }
+
+                if (Bridge.isDate(obj)) {
+                    return true;
+                }
+
+                return Bridge.is(obj, Bridge.IFormattable, true);
+            }
+        }
+    });
+
+    Bridge.define("Bridge.IComparable");
+
+    Bridge.define("Bridge.IFormatProvider");
+
+    Bridge.define("Bridge.ICloneable");
+
+    Bridge.Class.generic("Bridge.IComparable$1", function (T) {
+        var $$name = Bridge.Class.genericName("Bridge.IComparable$1", T);
+
+        return Bridge.Class.cache[$$name] || (Bridge.Class.cache[$$name] = Bridge.define($$name));
+    });
+
+    Bridge.Class.generic("Bridge.IEquatable$1", function (T) {
+        var $$name = Bridge.Class.genericName("Bridge.IEquatable$1", T);
+
+        return Bridge.Class.cache[$$name] || (Bridge.Class.cache[$$name] = Bridge.define($$name));
+    });
+
+    Bridge.define("Bridge.IPromise");
+    Bridge.define("Bridge.IDisposable");
+
+    /// <reference path="Init.js" />
+    // @source Globalization.js
+
+    Bridge.define("Bridge.DateTimeFormatInfo", {
+        inherits: [Bridge.IFormatProvider, Bridge.ICloneable],
+
+        statics: {
+            $allStandardFormats: {
+                "d": "shortDatePattern",
+                "D": "longDatePattern",
+                "f": "longDatePattern shortTimePattern",
+                "F": "longDatePattern longTimePattern",
+                "g": "shortDatePattern shortTimePattern",
+                "G": "shortDatePattern longTimePattern",
+                "m": "monthDayPattern",
+                "M": "monthDayPattern",
+                "o": "roundtripFormat",
+                "O": "roundtripFormat",
+                "r": "rfc1123",
+                "R": "rfc1123",
+                "s": "sortableDateTimePattern",
+                "S": "sortableDateTimePattern1",
+                "t": "shortTimePattern",
+                "T": "longTimePattern",
+                "u": "universalSortableDateTimePattern",
+                "U": "longDatePattern longTimePattern",
+                "y": "yearMonthPattern",
+                "Y": "yearMonthPattern"
+            },
+
+            constructor: function () {
+                this.invariantInfo = Bridge.merge(new Bridge.DateTimeFormatInfo(), {
+                    abbreviatedDayNames: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+                    abbreviatedMonthGenitiveNames: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", ""],
+                    abbreviatedMonthNames: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", ""],
+                    amDesignator: "AM",
+                    dateSeparator: "/",
+                    dayNames: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+                    firstDayOfWeek: 0,
+                    fullDateTimePattern: "dddd, MMMM dd, yyyy h:mm:ss tt",
+                    longDatePattern: "dddd, MMMM dd, yyyy",
+                    longTimePattern: "h:mm:ss tt",
+                    monthDayPattern: "MMMM dd",
+                    monthGenitiveNames: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December", ""],
+                    monthNames: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December", ""],
+                    pmDesignator: "PM",
+                    rfc1123: "ddd, dd MMM yyyy HH':'mm':'ss 'GMT'",
+                    shortDatePattern: "M/d/yyyy",
+                    shortestDayNames: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+                    shortTimePattern: "h:mm tt",
+                    sortableDateTimePattern: "yyyy'-'MM'-'dd'T'HH':'mm':'ss",
+                    sortableDateTimePattern1: "yyyy'-'MM'-'dd",
+                    timeSeparator: ":",
+                    universalSortableDateTimePattern: "yyyy'-'MM'-'dd HH':'mm':'ss'Z'",
+                    yearMonthPattern: "MMMM, yyyy",
+                    roundtripFormat: "yyyy'-'MM'-'dd'T'HH':'mm':'ss.uzzz"
+                });
+            }
+        },
+
+        getFormat: function (type) {
+            switch (type) {
+                case Bridge.DateTimeFormatInfo:
+                    return this;
+                default:
+                    return null;
+            }
+        },
+
+        getAbbreviatedDayName: function (dayofweek) {
+            if (dayofweek < 0 || dayofweek > 6) {
+                throw new Bridge.ArgumentOutOfRangeException("dayofweek");
+            }
+
+            return this.abbreviatedDayNames[dayofweek];
+        },
+
+        getAbbreviatedMonthName: function (month) {
+            if (month < 1 || month > 13) {
+                throw new Bridge.ArgumentOutOfRangeException("month");
+            }
+
+            return this.abbreviatedMonthNames[month - 1];
+        },
+
+        getAllDateTimePatterns: function (format, returnNull) {
+            var f = Bridge.DateTimeFormatInfo.$allStandardFormats,
+                formats,
+                names,
+                pattern,
+                i,
+                result = [];
+
+            if (format) {
+                if (!f[format]) {
+                    if (returnNull) {
+                        return null;
+                    }
+
+                    throw new Bridge.ArgumentException(null, "format");
+                }
+
+                formats = { };
+                formats[format] = f[format];
+            } else {
+                formats = f;
+            }
+
+            for (f in formats) {
+                names = formats[f].split(" ");
+                pattern = "";
+
+                for (i = 0; i < names.length; i++) {
+                    pattern = (i === 0 ? "" : (pattern + " ")) + this[names[i]];
+                }
+
+                result.push(pattern);
+            }
+
+            return result;
+        },
+
+        getDayName: function (dayofweek) {
+            if (dayofweek < 0 || dayofweek > 6) {
+                throw new Bridge.ArgumentOutOfRangeException("dayofweek");
+            }
+
+            return this.dayNames[dayofweek];
+        },
+
+        getMonthName: function (month) {
+            if (month < 1 || month > 13) {
+                throw new Bridge.ArgumentOutOfRangeException("month");
+            }
+
+            return this.monthNames[month-1];
+        },
+
+        getShortestDayName: function (dayOfWeek) {
+            if (dayOfWeek < 0 || dayOfWeek > 6) {
+                throw new Bridge.ArgumentOutOfRangeException("dayOfWeek");
+            }
+
+            return this.shortestDayNames[dayOfWeek];
+        },
+
+        clone: function () {
+            return Bridge.copy(new Bridge.DateTimeFormatInfo(), this, [
+                "abbreviatedDayNames",
+                "abbreviatedMonthGenitiveNames",
+                "abbreviatedMonthNames",
+                "amDesignator",
+                "dateSeparator",
+                "dayNames",
+                "firstDayOfWeek",
+                "fullDateTimePattern",
+                "longDatePattern",
+                "longTimePattern",
+                "monthDayPattern",
+                "monthGenitiveNames",
+                "monthNames",
+                "pmDesignator",
+                "rfc1123",
+                "shortDatePattern",
+                "shortestDayNames",
+                "shortTimePattern",
+                "sortableDateTimePattern",
+                "timeSeparator",
+                "universalSortableDateTimePattern",
+                "yearMonthPattern",
+                "roundtripFormat"
+            ]);
+        }
+    });
+
+    Bridge.define("Bridge.NumberFormatInfo", {
+        inherits: [Bridge.IFormatProvider, Bridge.ICloneable],
+
+        statics: {
+            constructor: function () {
+                this.numberNegativePatterns =  ["(n)", "-n", "- n", "n-", "n -"];
+                this.currencyNegativePatterns = ["($n)", "-$n", "$-n", "$n-", "(n$)", "-n$", "n-$", "n$-", "-n $", "-$ n", "n $-", "$ n-", "$ -n", "n- $", "($ n)", "(n $)"];
+                this.currencyPositivePatterns = ["$n", "n$", "$ n", "n $"];
+                this.percentNegativePatterns = ["-n %", "-n%", "-%n", "%-n", "%n-", "n-%", "n%-", "-% n", "n %-", "% n-", "% -n", "n- %"];
+                this.percentPositivePatterns = ["n %", "n%", "%n", "% n"];
+
+                this.invariantInfo = Bridge.merge(new Bridge.NumberFormatInfo(), {
+                    nanSymbol: "NaN",
+                    negativeSign: "-",
+                    positiveSign: "+",
+                    negativeInfinitySymbol: "-Infinity",
+                    positiveInfinitySymbol: "Infinity",
+
+                    percentSymbol: "%",
+                    percentGroupSizes: [3],
+                    percentDecimalDigits: 2,
+                    percentDecimalSeparator: ".",
+                    percentGroupSeparator: ",",
+                    percentPositivePattern: 0,
+                    percentNegativePattern: 0,
+
+                    currencySymbol: "¤",
+                    currencyGroupSizes: [3],
+                    currencyDecimalDigits: 2,
+                    currencyDecimalSeparator: ".",
+                    currencyGroupSeparator: ",",
+                    currencyNegativePattern: 0,
+                    currencyPositivePattern: 0,
+
+                    numberGroupSizes: [3],
+                    numberDecimalDigits: 2,
+                    numberDecimalSeparator: ".",
+                    numberGroupSeparator: ",",
+                    numberNegativePattern: 1
+                });
+            }
+        },
+
+        getFormat: function (type) {
+            switch (type) {
+                case Bridge.NumberFormatInfo:
+                    return this;
+                default:
+                    return null;
+            }
+        },
+
+        clone: function () {
+            return Bridge.copy(new Bridge.NumberFormatInfo(), this, [
+                "nanSymbol",
+                "negativeSign",
+                "positiveSign",
+                "negativeInfinitySymbol",
+                "positiveInfinitySymbol",
+                "percentSymbol",
+                "percentGroupSizes",
+                "percentDecimalDigits",
+                "percentDecimalSeparator",
+                "percentGroupSeparator",
+                "percentPositivePattern",
+                "percentNegativePattern",
+                "currencySymbol",
+                "currencyGroupSizes",
+                "currencyDecimalDigits",
+                "currencyDecimalSeparator",
+                "currencyGroupSeparator",
+                "currencyNegativePattern",
+                "currencyPositivePattern",
+                "numberGroupSizes",
+                "numberDecimalDigits",
+                "numberDecimalSeparator",
+                "numberGroupSeparator",
+                "numberNegativePattern"
+            ]);
+        }
+    });
+
+    Bridge.define("Bridge.CultureInfo", {
+        inherits: [Bridge.IFormatProvider, Bridge.ICloneable],
+
+        statics: {
+            constructor: function () {
+                this.cultures = this.cultures || {};
+
+                this.invariantCulture = Bridge.merge(new Bridge.CultureInfo("iv", true), {
+                    englishName: "Invariant Language (Invariant Country)",
+                    nativeName: "Invariant Language (Invariant Country)",
+                    numberFormat: Bridge.NumberFormatInfo.invariantInfo,
+                    dateTimeFormat: Bridge.DateTimeFormatInfo.invariantInfo
+                });
+
+                this.setCurrentCulture(Bridge.CultureInfo.invariantCulture);
+            },
+
+            getCurrentCulture: function () {
+                return this.currentCulture;
+            },
+
+            setCurrentCulture: function (culture) {
+                this.currentCulture = culture;
+
+                Bridge.DateTimeFormatInfo.currentInfo = culture.dateTimeFormat;
+                Bridge.NumberFormatInfo.currentInfo = culture.numberFormat;
+            },
+
+            getCultureInfo: function (name) {
+                if (!name) {
+                    throw new Bridge.ArgumentNullException("name");
+                }
+
+                return this.cultures[name];
+            },
+
+            getCultures: function () {
+                var names = Bridge.getPropertyNames(this.cultures),
+                    result = [],
+                    i;
+
+                for (i = 0; i < names.length; i++) {
+                    result.push(this.cultures[names[i]]);
+                }
+
+                return result;
+            }
+        },
+
+        constructor: function (name, create) {
+            this.name = name;
+
+            if (!Bridge.CultureInfo.cultures) {
+                Bridge.CultureInfo.cultures = {};
+            }
+
+            if (Bridge.CultureInfo.cultures[name]) {
+                Bridge.copy(this, Bridge.CultureInfo.cultures[name], [
+                    "englishName",
+                    "nativeName",
+                    "numberFormat",
+                    "dateTimeFormat"
+                ]);
+            } else {
+                if (!create) {
+                    throw new Bridge.CultureNotFoundException("name", name);
+                }
+
+                Bridge.CultureInfo.cultures[name] = this;
+            }
+        },
+
+        getFormat:  function (type) {
+            switch (type) {
+                case Bridge.NumberFormatInfo:
+                    return this.numberFormat;
+                case Bridge.DateTimeFormatInfo:
+                    return this.dateTimeFormat;
+                default:
+                    return null;
+            }
+        },
+
+        clone: function () {
+            return new Bridge.CultureInfo(this.name);
+        }
+    });
+
+    // @source Math.js
+
+    var math = {
+        divRem: function(a, b, result) {
+            var remainder = a % b;
+            result.v = remainder;
+            return (a - remainder) / b;
+        },
+
+        round: function(n, d, rounding) {
+            var m = Math.pow(10, d || 0);
+            n *= m;
+            var sign = (n > 0) | -(n < 0);
+            if (n % 1 === 0.5 * sign) {
+                var f = Math.floor(n);
+                return (f + (rounding === 4 ? (sign > 0) : (f % 2 * sign))) / m;
+            }
+
+            return Math.round(n) / m;
+        }
+    };
+
+    Bridge.Math = math;
+
+    // @source Integer.js
+
+    /*(function () {
+        var createIntType = function (name, min, max) {
+            var type = Bridge.define(name, {
+                inherits: [Bridge.IComparable, Bridge.IFormattable],
+                statics: {
+                    min: min,
+                    max: max,
+
+                    instanceOf: function (instance) {
+                        return typeof(instance) === 'number' && Math.round(instance, 0) == instance && instance >= min && instance <= max;
+                    },
+                    getDefaultValue: function () {
+                        return 0;
+                    },
+                    parse: function (s) {
+                        return Bridge.Int.parseInt(s, min, max);
+                    },
+                    tryParse: function (s, result) {
+                        return Bridge.Int.tryParseInt(s, result, min, max);
+                    },
+                    format: function (number, format, provider) {
+                        return Bridge.Int.format(number, format, provider);
+                    }
+                }
+            });
+
+            Bridge.Class.addExtend(type, [Bridge.IComparable$1(type), Bridge.IEquatable$1(type)]);
+        };
+
+        createIntType('Bridge.Byte', 0, 255);
+        createIntType('Bridge.SByte', -128, 127);
+        createIntType('Bridge.Int16', -32768, 32767);
+        createIntType('Bridge.UInt16', 0, 65535);
+        createIntType('Bridge.Int32', -2147483648, 2147483647);
+        createIntType('Bridge.UInt32', 0, 4294967295);
+        createIntType('Bridge.Int64', -9223372036854775808, 9223372036854775807);
+        createIntType('Bridge.UInt64', 0, 18446744073709551615);
+        createIntType('Bridge.Char', 0, 65535);
+
+        Bridge.Char.tryParse = function (s, result) {
+            var b = s && s.length === 1;
+            result.v = b ? s.charCodeAt(0) : 0;
+            return b;
+        };
+
+        Bridge.Char.parse = function (s) {
+            if (!Bridge.hasValue(s)) {
+                throw new Bridge.ArgumentNullException('s');
+            }
+
+            if (s.length !== 1) {
+                throw new Bridge.FormatException();
+            }
+            return s.charCodeAt(0);
+        };
+    })();*/
+
+    Bridge.define("Bridge.Int", {
+        inherits: [Bridge.IComparable, Bridge.IFormattable],
+        statics: {
+            instanceOf: function (instance) {
+                return typeof(instance) === "number" && isFinite(instance) && Math.round(instance, 0) === instance;
+            },
+
+            getDefaultValue: function () {
+                return 0;
+            },
+
+            format: function (number, format, provider) {
+                var nf = (provider || Bridge.CultureInfo.getCurrentCulture()).getFormat(Bridge.NumberFormatInfo),
+                    decimalSeparator = nf.numberDecimalSeparator,
+                    groupSeparator = nf.numberGroupSeparator,
+                    match,
+                    precision,
+                    groups,
+                    fs;
+
+                if (!isFinite(number)) {
+                    return Number.NEGATIVE_INFINITY === number ? nf.negativeInfinitySymbol : nf.positiveInfinitySymbol;
+                }
+
+                if (!format) {
+                    return this.defaultFormat(number, 0, 0, 15, nf, true);
+                }
+
+                match = format.match(/^([a-zA-Z])(\d*)$/);
+
+                if (match) {
+                    fs = match[1].toUpperCase();
+                    precision = parseInt(match[2], 10);
+                    precision = precision > 15 ? 15 : precision;
+
+                    switch (fs) {
+                        case "D":
+                            return this.defaultFormat(number, isNaN(precision) ? 1 : precision, 0, 0, nf, true);
+                        case "F":
+                        case "N":
+                            if (isNaN(precision)) {
+                                precision = nf.numberDecimalDigits;
+                            }
+                            return this.defaultFormat(number, 1, precision, precision, nf, fs === "F");
+                        case "G":
+                        case "E":
+                            var exponent = 0,
+                                coefficient = Math.abs(number),
+                                exponentPrefix = match[1],
+                                exponentPrecision = 3,
+                                minDecimals,
+                                maxDecimals;
+
+                            while (coefficient >= 10) {
+                                coefficient /= 10;
+                                exponent++;
+                            }
+
+                            while (coefficient !== 0 && coefficient < 1) {
+                                coefficient *= 10;
+                                exponent--;
+                            }
+
+                            if (fs === "G") {
+                                if (exponent > -5 && (!precision || exponent < precision)) {
+                                    minDecimals = precision ? precision - (exponent > 0 ? exponent + 1 : 1) : 0;
+                                    maxDecimals = precision ? precision - (exponent > 0 ? exponent + 1 : 1) : 10;
+                                    return this.defaultFormat(number, 1, minDecimals, maxDecimals, nf, true);
+                                }
+
+                                exponentPrefix = exponentPrefix === "G" ? "E" : "e";
+                                exponentPrecision = 2;
+                                minDecimals = (precision || 1) - 1;
+                                maxDecimals = (precision || 11) - 1;
+                            } else {
+                                minDecimals = maxDecimals = isNaN(precision) ? 6 : precision;
+                            }
+
+                            if (exponent >= 0) {
+                                exponentPrefix += nf.positiveSign;
+                            } else {
+                                exponentPrefix += nf.negativeSign;
+                                exponent = -exponent;
+                            }
+
+                            if (number < 0) {
+                                coefficient *= -1;
+                            }
+
+                            return this.defaultFormat(coefficient, 1, minDecimals, maxDecimals, nf) + exponentPrefix + this.defaultFormat(exponent, exponentPrecision, 0, 0, nf, true);
+                        case "P":
+                            if (isNaN(precision)) {
+                                precision = nf.percentDecimalDigits;
+                            }
+
+                            return this.defaultFormat(number * 100, 1, precision, precision, nf, false, "percent");
+                        case "X":
+                            var result = Math.round(number).toString(16);
+
+                            if (match[1] === "X") {
+                                result = result.toUpperCase();
+                            }
+
+                            precision -= result.length;
+
+                            while (precision-- > 0) {
+                                result = "0" + result;
+                            }
+
+                            return result;
+                        case "C":
+                            if (isNaN(precision)) {
+                                precision = nf.currencyDecimalDigits;
+                            }
+
+                            return this.defaultFormat(number, 1, precision, precision, nf, false, "currency");
+                        case "R":
+                            return "" + number;
+                    }
+                }
+
+                if (format.indexOf(",.") !== -1 || Bridge.String.endsWith(format, ",")) {
+                    var count = 0,
+                        index = format.indexOf(",.");
+
+                    if (index === -1) {
+                        index = format.length - 1;
+                    }
+
+                    while (index > -1 && format.charAt(index) === ",") {
+                        count++;
+                        index--;
+                    }
+
+                    number /= Math.pow(1000, count);
+                }
+
+                if (format.indexOf("%") !== -1) {
+                    number *= 100;
+                }
+
+                groups = format.split(";");
+
+                if (number < 0 && groups.length > 1) {
+                    number *= -1;
+                    format = groups[1];
+                } else {
+                    format = groups[!number && groups.length > 2 ? 2 : 0];
+                }
+
+                return this.customFormat(number, format, nf, !format.match(/^[^\.]*[0#],[0#]/));
+            },
+
+            defaultFormat: function (number, minIntLen, minDecLen, maxDecLen, provider, noGroup, name) {
+                name = name || "number";
+
+                var nf = (provider || Bridge.CultureInfo.getCurrentCulture()).getFormat(Bridge.NumberFormatInfo),
+                    str,
+                    decimalIndex,
+                    negPattern,
+                    roundingFactor,
+                    groupIndex,
+                    groupSize,
+                    groups = nf[name + "GroupSizes"],
+                    decimalPart,
+                    index,
+                    done,
+                    startIndex,
+                    length,
+                    part,
+                    sep,
+                    buffer = "";
+
+                roundingFactor = Math.pow(10, maxDecLen);
+                str = "" + (Math.round(Math.abs(number) * roundingFactor) / roundingFactor);
+
+                decimalIndex = str.indexOf(".");
+
+                if (decimalIndex > 0) {
+                    decimalPart = nf[name + "DecimalSeparator"] + str.substr(decimalIndex + 1);
+                    str = str.substr(0, decimalIndex);
+                }
+
+                if (str.length < minIntLen) {
+                    str = Array(minIntLen - str.length + 1).join("0") + str;
+                }
+
+                if (decimalPart) {
+                    if ((decimalPart.length - 1) < minDecLen) {
+                        decimalPart += Array(minDecLen - decimalPart.length + 2).join("0");
+                    }
+
+                    if (maxDecLen === 0) {
+                        decimalPart = null;
+                    } else if ((decimalPart.length - 1) > maxDecLen) {
+                        decimalPart = decimalPart.substr(0, maxDecLen + 1);
+                    }
+                }
+
+                groupIndex = 0;
+                groupSize = groups[groupIndex];
+
+                if (str.length < groupSize) {
+                    buffer = str;
+
+                    if (decimalPart) {
+                        buffer += decimalPart;
+                    }
+                } else {
+                    index = str.length;
+                    done = false;
+                    sep = noGroup ? "" : nf[name + "GroupSeparator"];
+
+                    while (!done) {
+                        length = groupSize;
+                        startIndex = index - length;
+
+                        if (startIndex < 0) {
+                            groupSize += startIndex;
+                            length += startIndex;
+                            startIndex = 0;
+                            done = true;
+                        }
+
+                        if (!length) {
+                            break;
+                        }
+
+                        part = str.substr(startIndex, length);
+
+                        if (buffer.length) {
+                            buffer = part + sep + buffer;
+                        } else {
+                            buffer = part;
+                        }
+
+                        index -= length;
+
+                        if (groupIndex < groups.length - 1) {
+                            groupIndex++;
+                            groupSize = groups[groupIndex];
+                        }
+                    }
+
+                    if (decimalPart) {
+                        buffer += decimalPart;
+                    }
+                }
+
+                if (number < 0) {
+                    negPattern = Bridge.NumberFormatInfo[name + "NegativePatterns"][nf[name + "NegativePattern"]];
+
+                    return negPattern.replace("-", nf.negativeSign).replace("%", nf.percentSymbol).replace("$", nf.currencySymbol).replace("n", buffer);
+                } else if (Bridge.NumberFormatInfo[name + "PositivePatterns"]) {
+                    negPattern = Bridge.NumberFormatInfo[name + "PositivePatterns"][nf[name + "PositivePattern"]];
+
+                    return negPattern.replace("%", nf.percentSymbol).replace("$", nf.currencySymbol).replace("n", buffer);
+                }
+
+                return buffer;
+            },
+
+            customFormat: function (number, format, nf, noGroup) {
+                var digits = 0,
+                    forcedDigits = -1,
+                    integralDigits = -1,
+                    decimals = 0,
+                    forcedDecimals = -1,
+                    atDecimals = 0,
+                    unused = 1,
+                    c, i, f,
+                    endIndex,
+                    roundingFactor,
+                    decimalIndex,
+                    isNegative = false,
+                    name,
+                    groupCfg,
+                    buffer = "";
+
+                name = "number";
+
+                if (format.indexOf("%") !== -1) {
+                    name = "percent";
+                } else if (format.indexOf("$") !== -1) {
+                    name = "currency";
+                }
+
+                for (i = 0; i < format.length; i++) {
+                    c = format.charAt(i);
+
+                    if (c === "'" || c === '"') {
+                        i = format.indexOf(c, i + 1);
+
+                        if (i < 0) {
+                            break;
+                        }
+                    } else if (c === "\\") {
+                        i++;
+                    } else {
+                        if (c === "0" || c === "#") {
+                            decimals += atDecimals;
+
+                            if (c === "0") {
+                                if (atDecimals) {
+                                    forcedDecimals = decimals;
+                                } else if (forcedDigits < 0) {
+                                    forcedDigits = digits;
+                                }
+                            }
+
+                            digits += !atDecimals;
+                        }
+
+                        atDecimals = atDecimals || c === ".";
+                    }
+                }
+                forcedDigits = forcedDigits < 0 ? 1 : digits - forcedDigits;
+
+                if (number < 0) {
+                    isNegative = true;
+                }
+
+                roundingFactor = Math.pow(10, decimals);
+                number = "" + (Math.round(Math.abs(number) * roundingFactor) / roundingFactor);
+
+                decimalIndex = number.indexOf(".");
+                integralDigits = decimalIndex < 0 ? number.length : decimalIndex;
+                i = integralDigits - digits;
+
+                groupCfg = {
+                    groupIndex: Math.max(integralDigits, forcedDigits),
+                    sep: noGroup ? "" : nf[name + "GroupSeparator"]
+                };
+
+                for (f = 0; f < format.length; f++) {
+                    c = format.charAt(f);
+
+                    if (c === "'" || c === '"') {
+                        endIndex = format.indexOf(c, f + 1);
+
+                        buffer += format.substring(f + 1, endIndex < 0 ? format.length : endIndex);
+
+                        if (endIndex < 0) {
+                            break;
+                        }
+
+                        f = endIndex;
+                    } else if (c === "\\") {
+                        buffer += format.charAt(f + 1);
+                        f++;
+                    } else if (c === "#" || c === "0") {
+                        groupCfg.buffer = buffer;
+
+                        if (i < integralDigits) {
+                            if (i >= 0) {
+                                if (unused) {
+                                    this.addGroup(number.substr(0, i), groupCfg);
+                                }
+
+                                this.addGroup(number.charAt(i), groupCfg);
+                            } else if (i >= integralDigits - forcedDigits) {
+                                this.addGroup("0", groupCfg);
+                            }
+                            unused = 0;
+                        } else if (forcedDecimals-- > 0 || i < number.length) {
+                            this.addGroup(i >= number.length ? "0" : number.charAt(i), groupCfg);
+                        }
+
+                        buffer = groupCfg.buffer;
+
+                        i++;
+                    } else if (c === ".") {
+                        if (number.length > ++i || forcedDecimals > 0) {
+                            buffer += nf[name + "DecimalSeparator"];
+                        }
+                    } else if (c !== ",") {
+                        buffer += c;
+                    }
+                }
+
+                if (isNegative < 0) {
+                    buffer = "-" + buffer;
+                }
+
+                return buffer;
+            },
+
+            addGroup: function (value, cfg) {
+                var buffer = cfg.buffer,
+                    sep = cfg.sep,
+                    groupIndex = cfg.groupIndex;
+
+                for (var i = 0, length = value.length; i < length; i++) {
+                    buffer += value.charAt(i);
+
+                    if (sep && groupIndex > 1 && groupIndex-- % 3 === 1) {
+                        buffer += sep;
+                    }
+                }
+
+                cfg.buffer = buffer;
+                cfg.groupIndex = groupIndex;
+            },
+
+            parseFloat: function (str, provider) {
+                if (str == null) {
+                    throw new Bridge.ArgumentNullException("str");
+                }
+
+                var nfInfo = (provider || Bridge.CultureInfo.getCurrentCulture()).getFormat(Bridge.NumberFormatInfo),
+                    result = parseFloat(str.replace(nfInfo.numberDecimalSeparator, "."));
+
+                if (isNaN(result) && str !== nfInfo.nanSymbol) {
+                    if (str === nfInfo.negativeInfinitySymbol) {
+                        return Number.NEGATIVE_INFINITY;
+                    }
+
+                    if (str === nfInfo.positiveInfinitySymbol) {
+                        return Number.POSITIVE_INFINITY;
+                    }
+
+                    throw new Bridge.FormatException("Input string was not in a correct format.");
+                }
+
+                return result;
+            },
+
+            tryParseFloat: function (str, provider, result) {
+                result.v = 0;
+
+                if (str == null) {
+                    return false;
+                }
+
+                var nfInfo = (provider || Bridge.CultureInfo.getCurrentCulture()).getFormat(Bridge.NumberFormatInfo);
+
+                result.v = parseFloat(str.replace(nfInfo.numberDecimalSeparator, "."));
+
+                if (isNaN(result.v) && str !== nfInfo.nanSymbol) {
+                    if (str === nfInfo.negativeInfinitySymbol) {
+                        result.v = Number.NEGATIVE_INFINITY;
+                        return true;
+                    }
+
+                    if (str === nfInfo.positiveInfinitySymbol) {
+                        result.v = Number.POSITIVE_INFINITY;
+                        return true;
+                    }
+
+                    return false;
+                }
+
+                return true;
+            },
+
+            parseInt: function (str, min, max, radix) {
+                if (str == null) {
+                    throw new Bridge.ArgumentNullException("str");
+                }
+
+                if (!/^[+-]?[0-9]+$/.test(str)) {
+                    throw new Bridge.FormatException("Input string was not in a correct format.");
+                }
+
+                var result = parseInt(str, radix || 10);
+
+                if (isNaN(result)) {
+                    throw new Bridge.FormatException("Input string was not in a correct format.");
+                }
+
+                if (result < min || result > max) {
+                    throw new Bridge.OverflowException();
+                }
+
+                return result;
+            },
+
+            tryParseInt: function (str, result, min, max, radix) {
+                result.v = 0;
+
+                if (!/^[+-]?[0-9]+$/.test(str)) {
+                    return false;
+                }
+
+                result.v = parseInt(str, radix || 10);
+
+                if (result.v < min || result.v > max) {
+                    return false;
+                }
+
+                return true;
+            },
+
+            trunc: function (num) {
+                if (!Bridge.isNumber(num)) {
+                    return null;
+                }
+
+                return num > 0 ? Math.floor(num) : Math.ceil(num);
+            },
+
+            div: function (x, y) {
+                if (!Bridge.isNumber(x) || !Bridge.isNumber(y)) {
+                    return null;
+                }
+
+                if (y === 0) {
+                    throw new Bridge.DivideByZeroException();
+                }
+
+                return this.trunc(x / y);
+            },
+
+            mod: function (x, y) {
+                if (!Bridge.isNumber(x) || !Bridge.isNumber(y)) {
+                    return null;
+                }
+
+                if (y === 0) {
+                    throw new Bridge.DivideByZeroException();
+                }
+                return x % y;
+            },
+
+            check: function (x, type) {
+                if (Bridge.isNumber(x) && !type.instanceOf(x)) {
+                    throw new Bridge.OverflowException();
+                }
+                
+                return x;
+            },
+
+            sxb: function (x) {
+                return x | (x & 0x80 ? 0xffffff00 : 0);
+            },
+
+            sxs: function (x) {
+                return x | (x & 0x8000 ? 0xffff0000 : 0);
+            },
+
+            clip8: function (x) {
+                return Bridge.isNumber(x) ? Bridge.Int.sxb(x & 0xff) : null;
+            },
+
+            clipu8: function (x) {
+                return Bridge.isNumber(x) ? x & 0xff : null;
+            },
+
+            clip16: function (x) {
+                return Bridge.isNumber(x) ? Bridge.Int.sxs(x & 0xffff) : null;
+            },
+
+            clipu16: function (x) {
+                return Bridge.isNumber(x) ? x & 0xffff : null;
+            },
+
+            clip32: function (x) {
+                return Bridge.isNumber(x) ? x | 0 : null;
+            },
+
+            clipu32: function (x) {
+                return Bridge.isNumber(x) ? x >>> 0 : null;
+            },
+
+            clip64: function (x) {
+                return Bridge.isNumber(x) ? (Math.floor(x / 0x100000000) | 0) * 0x100000000 + (x >>> 0) : null;
+            },
+
+            clipu64: function (x) {
+                return Bridge.isNumber(x) ? (Math.floor(x / 0x100000000) >>> 0) * 0x100000000 + (x >>> 0) : null;
+            },
+
+            sign: function (x) {
+                return Bridge.isNumber(x) ? (x === 0 ? 0 : (x < 0 ? -1 : 1)) : null;
+            }
+        }
+    });
+
+    Bridge.Class.addExtend(Bridge.Int, [Bridge.IComparable$1(Bridge.Int), Bridge.IEquatable$1(Bridge.Int)]);
+
+    // @source Decimal.js
+
+    /* decimal.js v4.0.2 https://github.com/MikeMcl/decimal.js/LICENCE */
+
+    !function (e) { "use strict"; function n(e) { for (var n, r, t = 1, i = e.length, o = e[0] + ""; i > t; t++) { for (n = e[t] + "", r = y - n.length; r--;) n = "0" + n; o += n } for (i = o.length; 48 === o.charCodeAt(--i) ;); return o.slice(0, i + 1 || 1) } function r(e, n, r, t) { var i, o, s, c, u; for (o = 1, s = e[0]; s >= 10; s /= 10, o++); return s = n - o, 0 > s ? (s += y, i = 0) : (i = Math.ceil((s + 1) / y), s %= y), o = E(10, y - s), u = e[i] % o | 0, null == t ? 3 > s ? (0 == s ? u = u / 100 | 0 : 1 == s && (u = u / 10 | 0), c = 4 > r && 99999 == u || r > 3 && 49999 == u || 5e4 == u || 0 == u) : c = (4 > r && u + 1 == o || r > 3 && u + 1 == o / 2) && (e[i + 1] / o / 100 | 0) == E(10, s - 2) - 1 || (u == o / 2 || 0 == u) && 0 == (e[i + 1] / o / 100 | 0) : 4 > s ? (0 == s ? u = u / 1e3 | 0 : 1 == s ? u = u / 100 | 0 : 2 == s && (u = u / 10 | 0), c = (t || 4 > r) && 9999 == u || !t && r > 3 && 4999 == u) : c = ((t || 4 > r) && u + 1 == o || !t && r > 3 && u + 1 == o / 2) && (e[i + 1] / o / 1e3 | 0) == E(10, s - 3) - 1, c } function t(e, n, r) { var t = e.constructor; return null == n || ((m = 0 > n || n > 8) || 0 !== n && (t.errors ? parseInt : parseFloat)(n) != n) && !u(t, "rounding mode", n, r, 0) ? t.rounding : 0 | n } function i(e, n, r, t) { var i = e.constructor; return !(m = (t || 0) > n || n >= A + 1) && (0 === n || (i.errors ? parseInt : parseFloat)(n) == n) || u(i, "argument", n, r, 0) } function o(e, t) { var i, o, s, c, u, l, f, h = 0, g = 0, p = 0, m = e.constructor, d = m.ONE, v = m.rounding, N = m.precision; if (!e.c || !e.c[0] || e.e > 17) return new m(e.c ? e.c[0] ? e.s < 0 ? 0 : 1 / 0 : d : e.s ? e.s < 0 ? 0 : e : 0 / 0); for (null == t ? (w = !1, u = N) : u = t, f = new m(.03125) ; e.e > -2;) e = e.times(f), p += 5; for (o = Math.log(E(2, p)) / Math.LN10 * 2 + 5 | 0, u += o, i = c = l = new m(d), m.precision = u; ;) { if (c = a(c.times(e), u, 1), i = i.times(++g), f = l.plus(P(c, i, u, 1)), n(f.c).slice(0, u) === n(l.c).slice(0, u)) { for (s = p; s--;) l = a(l.times(l), u, 1); if (null != t) return m.precision = N, l; if (!(3 > h && r(l.c, u - o, v, h))) return a(l, m.precision = N, v, w = !0); m.precision = u += 10, i = c = f = new m(d), g = 0, h++ } l = f } } function s(e, r, t, i) { var o, s, c = e.constructor, u = (e = new c(e)).e; if (null == r ? t = 0 : (a(e, ++r, t), t = i ? r : r + e.e - u), u = e.e, o = n(e.c), 1 == i || 2 == i && (u >= r || u <= c.toExpNeg)) { for (; o.length < t; o += "0"); o.length > 1 && (o = o.charAt(0) + "." + o.slice(1)), o += (0 > u ? "e" : "e+") + u } else { if (i = o.length, 0 > u) { for (s = t - i; ++u; o = "0" + o); o = "0." + o } else if (++u > i) { for (s = t - u, u -= i; u--; o += "0"); s > 0 && (o += ".") } else s = t - i, i > u ? o = o.slice(0, u) + "." + o.slice(u) : s > 0 && (o += "."); if (s > 0) for (; s--; o += "0"); } return e.s < 0 && e.c[0] ? "-" + o : o } function c(e) { var n = e.length - 1, r = n * y + 1; if (n = e[n]) { for (; n % 10 == 0; n /= 10, r--); for (n = e[0]; n >= 10; n /= 10, r++); } return r } function u(e, n, r, t, i) { if (e.errors) { var o = new Error((t || ["new Decimal", "cmp", "div", "eq", "gt", "gte", "lt", "lte", "minus", "mod", "plus", "times", "toFraction", "pow", "random", "log", "sqrt", "toNearest", "divToInt"][v ? 0 > v ? -v : v : 0 > 1 / v ? 1 : 0]) + "() " + (["number type has more than 15 significant digits", "LN10 out of digits"][n] || n + ([m ? " out of range" : " not an integer", " not a boolean or binary digit"][i] || "")) + ": " + r); throw o.name = "Decimal Error", m = v = 0, o } } function l(e, n, r) { var t = new e(e.ONE); for (w = !1; 1 & r && (t = t.times(n)), r >>= 1, r;) n = n.times(n); return w = !0, t } function f(e, t) { var i, o, s, c, l, h, g, p, m, d, v, N = 1, E = 10, x = e, b = x.c, y = x.constructor, O = y.ONE, S = y.rounding, D = y.precision; if (x.s < 0 || !b || !b[0] || !x.e && 1 == b[0] && 1 == b.length) return new y(b && !b[0] ? -1 / 0 : 1 != x.s ? 0 / 0 : b ? 0 : x); if (null == t ? (w = !1, g = D) : g = t, y.precision = g += E, i = n(b), o = i.charAt(0), !(Math.abs(c = x.e) < 15e14)) return x = new y(o + "." + i.slice(1)), g + 2 > M.length && u(y, 1, g + 2, "ln"), x = f(x, g - E).plus(new y(M.slice(0, g + 2)).times(c + "")), y.precision = D, null == t ? a(x, D, S, w = !0) : x; for (; 7 > o && 1 != o || 1 == o && i.charAt(1) > 3;) x = x.times(e), i = n(x.c), o = i.charAt(0), N++; for (c = x.e, o > 1 ? (x = new y("0." + i), c++) : x = new y(o + "." + i.slice(1)), d = x, p = l = x = P(x.minus(O), x.plus(O), g, 1), v = a(x.times(x), g, 1), s = 3; ;) { if (l = a(l.times(v), g, 1), m = p.plus(P(l, new y(s), g, 1)), n(m.c).slice(0, g) === n(p.c).slice(0, g)) { if (p = p.times(2), 0 !== c && (g + 2 > M.length && u(y, 1, g + 2, "ln"), p = p.plus(new y(M.slice(0, g + 2)).times(c + ""))), p = P(p, new y(N), g, 1), null != t) return y.precision = D, p; if (!r(p.c, g - E, S, h)) return a(p, y.precision = D, S, w = !0); y.precision = g += E, m = l = x = P(d.minus(O), d.plus(O), g, 1), v = a(x.times(x), g, 1), s = h = 1 } p = m, s += 2 } } function a(e, n, r, t) { var i, o, s, c, u, l, f, a, h = e.constructor; e: if (null != n) { if (!(f = e.c)) return e; for (i = 1, c = f[0]; c >= 10; c /= 10, i++); if (o = n - i, 0 > o) o += y, s = n, u = f[a = 0], l = u / E(10, i - s - 1) % 10 | 0; else if (a = Math.ceil((o + 1) / y), a >= f.length) { if (!t) break e; for (; f.length <= a; f.push(0)); u = l = 0, i = 1, o %= y, s = o - y + 1 } else { for (u = c = f[a], i = 1; c >= 10; c /= 10, i++); o %= y, s = o - y + i, l = 0 > s ? 0 : N(u / E(10, i - s - 1) % 10) } if (t = t || 0 > n || null != f[a + 1] || (0 > s ? u : u % E(10, i - s - 1)), t = 4 > r ? (l || t) && (0 == r || r == (e.s < 0 ? 3 : 2)) : l > 5 || 5 == l && (4 == r || t || 6 == r && (o > 0 ? s > 0 ? u / E(10, i - s) : 0 : f[a - 1]) % 10 & 1 || r == (e.s < 0 ? 8 : 7)), 1 > n || !f[0]) return f.length = 0, t ? (n -= e.e + 1, f[0] = E(10, n % y), e.e = -n || 0) : f[0] = e.e = 0, e; if (0 == o ? (f.length = a, c = 1, a--) : (f.length = a + 1, c = E(10, y - o), f[a] = s > 0 ? (u / E(10, i - s) % E(10, s) | 0) * c : 0), t) for (; ;) { if (0 == a) { for (o = 1, s = f[0]; s >= 10; s /= 10, o++); for (s = f[0] += c, c = 1; s >= 10; s /= 10, c++); o != c && (e.e++, f[0] == b && (f[0] = 1)); break } if (f[a] += c, f[a] != b) break; f[a--] = 0, c = 1 } for (o = f.length; 0 === f[--o]; f.pop()); } return w && (e.e > h.maxE ? e.c = e.e = null : e.e < h.minE && (e.c = [e.e = 0])), e } var h, g, p, m, d = e.crypto, w = !0, v = 0, N = Math.floor, E = Math.pow, x = Object.prototype.toString, b = 1e7, y = 7, O = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$_", S = {}, D = 9e15, A = 1e9, F = 3e3, M = "2.3025850929940456840179914546843642076011014886287729760333279009675726096773524802359972050895982983419677840422862486334095254650828067566662873690987816894829072083255546808437998948262331985283935053089653777326288461633662222876982198867465436674744042432743651550489343149393914796194044002221051017141748003688084012647080685567743216228355220114804663715659121373450747856947683463616792101806445070648000277502684916746550586856935673420670581136429224554405758925724208241314695689016758940256776311356919292033376587141660230105703089634572075440370847469940168269282808481184289314848524948644871927809676271275775397027668605952496716674183485704422507197965004714951050492214776567636938662976979522110718264549734772662425709429322582798502585509785265383207606726317164309505995087807523710333101197857547331541421808427543863591778117054309827482385045648019095610299291824318237525357709750539565187697510374970888692180205189339507238539205144634197265287286965110862571492198849978748873771345686209167058"; S.absoluteValue = S.abs = function () { var e = new this.constructor(this); return e.s < 0 && (e.s = 1), a(e) }, S.ceil = function () { return a(new this.constructor(this), this.e + 1, 2) }, S.comparedTo = S.cmp = function (e, n) { var r, t = this, i = t.c, o = (v = -v, e = new t.constructor(e, n), e.c), s = t.s, c = e.s, u = t.e, l = e.e; if (!s || !c) return null; if (r = i && !i[0], n = o && !o[0], r || n) return r ? n ? 0 : -c : s; if (s != c) return s; if (r = 0 > s, !i || !o) return u == l ? 0 : !i ^ r ? 1 : -1; if (u != l) return u > l ^ r ? 1 : -1; for (s = -1, c = (u = i.length) < (l = o.length) ? u : l; ++s < c;) if (i[s] != o[s]) return i[s] > o[s] ^ r ? 1 : -1; return u == l ? 0 : u > l ^ r ? 1 : -1 }, S.decimalPlaces = S.dp = function () { var e, n, r = null; if (e = this.c) { if (r = ((n = e.length - 1) - N(this.e / y)) * y, n = e[n]) for (; n % 10 == 0; n /= 10, r--); 0 > r && (r = 0) } return r }, S.dividedBy = S.div = function (e, n) { return v = 2, P(this, new this.constructor(e, n)) }, S.dividedToIntegerBy = S.divToInt = function (e, n) { var r = this, t = r.constructor; return v = 18, a(P(r, new t(e, n), 0, 1, 1), t.precision, t.rounding) }, S.equals = S.eq = function (e, n) { return v = 3, 0 === this.cmp(e, n) }, S.exponential = S.exp = function () { return o(this) }, S.floor = function () { return a(new this.constructor(this), this.e + 1, 3) }, S.greaterThan = S.gt = function (e, n) { return v = 4, this.cmp(e, n) > 0 }, S.greaterThanOrEqualTo = S.gte = function (e, n) { return v = 5, n = this.cmp(e, n), 1 == n || 0 === n }, S.isFinite = function () { return !!this.c }, S.isInteger = S.isInt = function () { return !!this.c && N(this.e / y) > this.c.length - 2 }, S.isNaN = function () { return !this.s }, S.isNegative = S.isNeg = function () { return this.s < 0 }, S.isZero = function () { return !!this.c && 0 == this.c[0] }, S.lessThan = S.lt = function (e, n) { return v = 6, this.cmp(e, n) < 0 }, S.lessThanOrEqualTo = S.lte = function (e, n) { return v = 7, n = this.cmp(e, n), -1 == n || 0 === n }, S.logarithm = S.log = function (e, t) { var i, o, s, c, l, h, g, p, m, d = this, N = d.constructor, E = N.precision, x = N.rounding, b = 5; if (null == e) e = new N(10), i = !0; else { if (v = 15, e = new N(e, t), o = e.c, e.s < 0 || !o || !o[0] || !e.e && 1 == o[0] && 1 == o.length) return new N(0 / 0); i = e.eq(10) } if (o = d.c, d.s < 0 || !o || !o[0] || !d.e && 1 == o[0] && 1 == o.length) return new N(o && !o[0] ? -1 / 0 : 1 != d.s ? 0 / 0 : o ? 0 : 1 / 0); if (l = i && (c = o[0], o.length > 1 || 1 != c && 10 != c && 100 != c && 1e3 != c && 1e4 != c && 1e5 != c && 1e6 != c), w = !1, g = E + b, p = g + 10, h = f(d, g), i ? (p > M.length && u(N, 1, p, "log"), s = new N(M.slice(0, p))) : s = f(e, g), m = P(h, s, g, 1), r(m.c, c = E, x)) do if (g += 10, h = f(d, g), i ? (p = g + 10, p > M.length && u(N, 1, p, "log"), s = new N(M.slice(0, p))) : s = f(e, g), m = P(h, s, g, 1), !l) { +n(m.c).slice(c + 1, c + 15) + 1 == 1e14 && (m = a(m, E + 1, 0)); break } while (r(m.c, c += 10, x)); return w = !0, a(m, E, x) }, S.minus = function (e, n) { var r, t, i, o, s = this, c = s.constructor, u = s.s; if (v = 8, e = new c(e, n), n = e.s, !u || !n) return new c(0 / 0); if (u != n) return e.s = -n, s.plus(e); var l = s.c, f = e.c, h = N(e.e / y), g = N(s.e / y), p = c.precision, m = c.rounding; if (!g || !h) { if (!l || !f) return l ? (e.s = -n, e) : new c(f ? s : 0 / 0); if (!l[0] || !f[0]) return s = f[0] ? (e.s = -n, e) : new c(l[0] ? s : 3 == m ? -0 : 0), w ? a(s, p, m) : s } if (l = l.slice(), t = l.length, u = g - h) { for ((o = 0 > u) ? (u = -u, r = l, t = f.length) : (h = g, r = f), (g = Math.ceil(p / y)) > t && (t = g), u > (t += 2) && (u = t, r.length = 1), r.reverse(), n = u; n--; r.push(0)); r.reverse() } else for ((o = t < (i = f.length)) && (i = t), u = n = 0; i > n; n++) if (l[n] != f[n]) { o = l[n] < f[n]; break } if (o && (r = l, l = f, f = r, e.s = -e.s), (n = -((i = l.length) - f.length)) > 0) for (; n--; l[i++] = 0); for (g = b - 1, n = f.length; n > u;) { if (l[--n] < f[n]) { for (t = n; t && !l[--t]; l[t] = g); --l[t], l[n] += b } l[n] -= f[n] } for (; 0 == l[--i]; l.pop()); for (; 0 == l[0]; l.shift(), --h); for (l[0] || (l = [h = 0], e.s = 3 == m ? -1 : 1), e.c = l, u = 1, n = l[0]; n >= 10; n /= 10, u++); return e.e = u + h * y - 1, w ? a(e, p, m) : e }, S.modulo = S.mod = function (e, n) { var r, t, i = this, o = i.constructor, s = o.modulo; return v = 9, e = new o(e, n), n = e.s, r = !i.c || !n || e.c && !e.c[0], r || !e.c || i.c && !i.c[0] ? r ? new o(0 / 0) : a(new o(i), o.precision, o.rounding) : (w = !1, 9 == s ? (e.s = 1, t = P(i, e, 0, 3, 1), e.s = n, t.s *= n) : t = P(i, e, 0, s, 1), t = t.times(e), w = !0, i.minus(t)) }, S.naturalLogarithm = S.ln = function () { return f(this) }, S.negated = S.neg = function () { var e = new this.constructor(this); return e.s = -e.s || null, a(e) }, S.plus = function (e, n) { var r, t = this, i = t.constructor, o = t.s; if (v = 10, e = new i(e, n), n = e.s, !o || !n) return new i(0 / 0); if (o != n) return e.s = -n, t.minus(e); var s = t.c, c = e.c, u = N(e.e / y), l = N(t.e / y), f = i.precision, h = i.rounding; if (!l || !u) { if (!s || !c) return new i(o / 0); if (!s[0] || !c[0]) return t = c[0] ? e : new i(s[0] ? t : 0 * o), w ? a(t, f, h) : t } if (s = s.slice(), o = l - u) { for (0 > o ? (o = -o, r = s, n = c.length) : (u = l, r = c, n = s.length), (l = Math.ceil(f / y)) > n && (n = l), o > ++n && (o = n, r.length = 1), r.reverse() ; o--; r.push(0)); r.reverse() } for (s.length - c.length < 0 && (r = c, c = s, s = r), o = c.length, n = 0, l = b; o; s[o] %= l) n = (s[--o] = s[o] + c[o] + n) / l | 0; for (n && (s.unshift(n), ++u), o = s.length; 0 == s[--o]; s.pop()); for (e.c = s, o = 1, n = s[0]; n >= 10; n /= 10, o++); return e.e = o + u * y - 1, w ? a(e, f, h) : e }, S.precision = S.sd = function (e) { var n = null, r = this; return e != n && e !== !!e && 1 !== e && 0 !== e && u(r.constructor, "argument", e, "precision", 1), r.c && (n = c(r.c), e && r.e + 1 > n && (n = r.e + 1)), n }, S.round = function () { var e = this, n = e.constructor; return a(new n(e), e.e + 1, n.rounding) }, S.squareRoot = S.sqrt = function () { var e, r, t, i, o, s, c = this, u = c.c, l = c.s, f = c.e, h = c.constructor, g = new h(.5); if (1 !== l || !u || !u[0]) return new h(!l || 0 > l && (!u || u[0]) ? 0 / 0 : u ? c : 1 / 0); for (w = !1, l = Math.sqrt(+c), 0 == l || l == 1 / 0 ? (r = n(u), (r.length + f) % 2 == 0 && (r += "0"), l = Math.sqrt(r), f = N((f + 1) / 2) - (0 > f || f % 2), l == 1 / 0 ? r = "1e" + f : (r = l.toExponential(), r = r.slice(0, r.indexOf("e") + 1) + f), i = new h(r)) : i = new h(l.toString()), t = (f = h.precision) + 3; ;) if (s = i, i = g.times(s.plus(P(c, s, t + 2, 1))), n(s.c).slice(0, t) === (r = n(i.c)).slice(0, t)) { if (r = r.slice(t - 3, t + 1), "9999" != r && (o || "4999" != r)) { (!+r || !+r.slice(1) && "5" == r.charAt(0)) && (a(i, f + 1, 1), e = !i.times(i).eq(c)); break } if (!o && (a(s, f + 1, 0), s.times(s).eq(c))) { i = s; break } t += 4, o = 1 } return w = !0, a(i, f, h.rounding, e) }, S.times = function (e, n) { var r, t, i = this, o = i.constructor, s = i.c, c = (v = 11, e = new o(e, n), e.c), u = N(i.e / y), l = N(e.e / y), f = i.s; if (n = e.s, e.s = f == n ? 1 : -1, !((u || s && s[0]) && (l || c && c[0]))) return new o(!f || !n || s && !s[0] && !c || c && !c[0] && !s ? 0 / 0 : s && c ? 0 * e.s : e.s / 0); for (t = u + l, f = s.length, n = c.length, n > f && (r = s, s = c, c = r, l = f, f = n, n = l), l = f + n, r = []; l--; r.push(0)); for (u = n - 1; u > -1; u--) { for (n = 0, l = f + u; l > u;) n = r[l] + c[u] * s[l - u - 1] + n, r[l--] = n % b | 0, n = n / b | 0; r[l] = (r[l] + n) % b | 0 } for (n ? ++t : r[0] || r.shift(), l = r.length; !r[--l]; r.pop()); for (e.c = r, f = 1, n = r[0]; n >= 10; n /= 10, f++); return e.e = f + t * y - 1, w ? a(e, o.precision, o.rounding) : e }, S.toDecimalPlaces = S.toDP = function (e, n) { var r = this; return r = new r.constructor(r), null != e && i(r, e, "toDP") ? a(r, (0 | e) + r.e + 1, t(r, n, "toDP")) : r }, S.toExponential = function (e, n) { var r = this; return r.c ? s(r, null != e && i(r, e, "toExponential") ? 0 | e : null, null != e && t(r, n, "toExponential"), 1) : r.toString() }, S.toFixed = function (e, n) { var r, o = this, c = o.constructor, u = c.toExpNeg, l = c.toExpPos; return null != e && (e = i(o, e, r = "toFixed") ? o.e + (0 | e) : null, n = t(o, n, r)), c.toExpNeg = -(c.toExpPos = 1 / 0), null != e && o.c ? (r = s(o, e, n), o.s < 0 && o.c && (o.c[0] ? r.indexOf("-") < 0 && (r = "-" + r) : r = r.replace("-", ""))) : r = o.toString(), c.toExpNeg = u, c.toExpPos = l, r }, S.toFormat = function (e, n) { var r = this; if (!r.c) return r.toString(); var t, i = r.s < 0, o = r.constructor.format, s = o.groupSeparator, c = +o.groupSize, u = +o.secondaryGroupSize, l = r.toFixed(e, n).split("."), f = l[0], a = l[1], h = i ? f.slice(1) : f, g = h.length; if (u && (t = c, c = u, g -= u = t), c > 0 && g > 0) { for (t = g % c || c, f = h.substr(0, t) ; g > t; t += c) f += s + h.substr(t, c); u > 0 && (f += s + h.slice(t)), i && (f = "-" + f) } return a ? f + o.decimalSeparator + ((u = +o.fractionGroupSize) ? a.replace(new RegExp("\\d{" + u + "}\\B", "g"), "$&" + o.fractionGroupSeparator) : a) : f }, S.toFraction = function (e) { var r, t, i, o, s, l, f, a, h = this, g = h.constructor, p = r = new g(g.ONE), d = l = new g(0), x = h.c, b = new g(d); if (!x) return h.toString(); for (i = b.e = c(x) - h.e - 1, b.c[0] = E(10, (f = i % y) < 0 ? y + f : f), (null == e || (!(v = 12, s = new g(e)).s || (m = s.cmp(p) < 0 || !s.c) || g.errors && N(s.e / y) < s.c.length - 1) && !u(g, "max denominator", e, "toFraction", 0) || (e = s).cmp(b) > 0) && (e = i > 0 ? b : p), w = !1, s = new g(n(x)), f = g.precision, g.precision = i = x.length * y * 2; a = P(s, b, 0, 1, 1), t = r.plus(a.times(d)), 1 != t.cmp(e) ;) r = d, d = t, p = l.plus(a.times(t = p)), l = t, b = s.minus(a.times(t = b)), s = t; return t = P(e.minus(r), d, 0, 1, 1), l = l.plus(t.times(p)), r = r.plus(t.times(d)), l.s = p.s = h.s, o = P(p, d, i, 1).minus(h).abs().cmp(P(l, r, i, 1).minus(h).abs()) < 1 ? [p + "", d + ""] : [l + "", r + ""], w = !0, g.precision = f, o }, S.toNearest = function (e, n) { var r = this, i = r.constructor; return r = new i(r), null == e ? (e = new i(i.ONE), n = i.rounding) : (v = 17, e = new i(e), n = t(r, n, "toNearest")), e.c ? r.c && (e.c[0] ? (w = !1, r = P(r, e, 0, 4 > n ? [4, 5, 7, 8][n] : n, 1).times(e), w = !0, a(r)) : r.c = [r.e = 0]) : r.s && (e.s && (e.s = r.s), r = e), r }, S.toNumber = function () { var e = this; return +e || (e.s ? 0 * e.s : 0 / 0) }, S.toPower = S.pow = function (e, t) { var i, s, c, u, h = this, g = h.constructor, p = h.s, m = (v = 13, +(e = new g(e, t))), d = 0 > m ? -m : m, x = g.precision, b = g.rounding; if (!h.c || !e.c || (c = !h.c[0]) || !e.c[0]) return new g(E(c ? 0 * p : +h, m)); if (h = new g(h), i = h.c.length, !h.e && h.c[0] == h.s && 1 == i) return h; if (t = e.c.length - 1, e.e || e.c[0] != e.s || t) if (s = N(e.e / y), c = s >= t, !c && 0 > p) u = new g(0 / 0); else { if (c && F > i * y * d) { if (u = l(g, h, d), e.s < 0) return g.ONE.div(u) } else { if (p = 0 > p && 1 & e.c[Math.max(s, t)] ? -1 : 1, t = E(+h, m), s = 0 != t && isFinite(t) ? new g(t + "").e : N(m * (Math.log("0." + n(h.c)) / Math.LN10 + h.e + 1)), s > g.maxE + 1 || s < g.minE - 1) return new g(s > 0 ? p / 0 : 0); w = !1, g.rounding = h.s = 1, d = Math.min(12, (s + "").length), u = o(e.times(f(h, x + d)), x), u = a(u, x + 5, 1), r(u.c, x, b) && (s = x + 10, u = a(o(e.times(f(h, s + d)), s), s + 5, 1), +n(u.c).slice(x + 1, x + 15) + 1 == 1e14 && (u = a(u, x + 1, 0))), u.s = p, w = !0, g.rounding = b } u = a(u, x, b) } else u = a(h, x, b); return u }, S.toPrecision = function (e, n) { var r = this; return null != e && i(r, e, "toPrecision", 1) && r.c ? s(r, 0 | --e, t(r, n, "toPrecision"), 2) : r.toString() }, S.toSignificantDigits = S.toSD = function (e, n) { var r = this, o = r.constructor; return r = new o(r), null != e && i(r, e, "toSD", 1) ? a(r, 0 | e, t(r, n, "toSD")) : a(r, o.precision, o.rounding) }, S.toString = function (e) { var r, t, i, o = this, c = o.constructor, l = o.e; if (null === l) t = o.s ? "Infinity" : "NaN"; else { if (e === r && (l <= c.toExpNeg || l >= c.toExpPos)) return s(o, null, c.rounding, 1); if (t = n(o.c), 0 > l) { for (; ++l; t = "0" + t); t = "0." + t } else if (i = t.length, l > 0) if (++l > i) for (l -= i; l--; t += "0"); else i > l && (t = t.slice(0, l) + "." + t.slice(l)); else if (r = t.charAt(0), i > 1) t = r + "." + t.slice(1); else if ("0" == r) return r; if (null != e) if ((m = !(e >= 2 && 65 > e)) || e != (0 | e) && c.errors) u(c, "base", e, "toString", 0); else if (t = h(c, t, 0 | e, 10, o.s), "0" == t) return t } return o.s < 0 ? "-" + t : t }, S.truncated = S.trunc = function () { return a(new this.constructor(this), this.e + 1, 1) }, S.valueOf = S.toJSON = function () { return this.toString() }, h = function () { function e(e, n, r) { for (var t, i, o = [0], s = 0, c = e.length; c > s;) { for (i = o.length; i--; o[i] *= n); for (o[t = 0] += O.indexOf(e.charAt(s++)) ; t < o.length; t++) o[t] > r - 1 && (null == o[t + 1] && (o[t + 1] = 0), o[t + 1] += o[t] / r | 0, o[t] %= r) } return o.reverse() } return function (n, r, t, i, o) { var s, c, u, f, a, h, g = r.indexOf("."), p = n.precision, m = n.rounding; for (37 > i && (r = r.toLowerCase()), g >= 0 && (r = r.replace(".", ""), h = new n(i), f = l(n, h, r.length - g), h.c = e(f.toFixed(), 10, t), h.e = h.c.length), a = e(r, i, t), s = c = a.length; 0 == a[--c]; a.pop()); if (!a[0]) return "0"; if (0 > g ? s-- : (f.c = a, f.e = s, f.s = o, f = P(f, h, p, m, 0, t), a = f.c, u = f.r, s = f.e), g = a[p], c = t / 2, u = u || null != a[p + 1], 4 > m ? (null != g || u) && (0 == m || m == (f.s < 0 ? 3 : 2)) : g > c || g == c && (4 == m || u || 6 == m && 1 & a[p - 1] || m == (f.s < 0 ? 8 : 7))) for (a.length = p, --t; ++a[--p] > t;) a[p] = 0, p || (++s, a.unshift(1)); else a.length = p; for (c = a.length; !a[--c];); for (g = 0, r = ""; c >= g; r += O.charAt(a[g++])); if (0 > s) { for (; ++s; r = "0" + r); r = "0." + r } else if (g = r.length, ++s > g) for (s -= g; s--; r += "0"); else g > s && (r = r.slice(0, s) + "." + r.slice(s)); return r } }(); var P = function () { function e(e, n, r) { var t, i = 0, o = e.length; for (e = e.slice() ; o--;) t = e[o] * n + i, e[o] = t % r | 0, i = t / r | 0; return i && e.unshift(i), e } function n(e, n, r, t) { var i, o; if (r != t) o = r > t ? 1 : -1; else for (i = o = 0; r > i; i++) if (e[i] != n[i]) { o = e[i] > n[i] ? 1 : -1; break } return o } function r(e, n, r, t) { for (var i = 0; r--;) e[r] -= i, i = e[r] < n[r] ? 1 : 0, e[r] = i * t + e[r] - n[r]; for (; !e[0] && e.length > 1; e.shift()); } return function (t, i, o, s, c, u) { var l, f, h, g, p, m, d, w, v, E, x, O, S, D, A, F, M, P, R, q = t.constructor, L = t.s == i.s ? 1 : -1, I = t.c, U = i.c; if (!(I && I[0] && U && U[0])) return new q(t.s && i.s && (I ? !U || I[0] != U[0] : U) ? I && 0 == I[0] || !U ? 0 * L : L / 0 : 0 / 0); for (u ? (g = 1, f = t.e - i.e) : (u = b, g = y, f = N(t.e / g) - N(i.e / g)), P = U.length, F = I.length, v = new q(L), E = v.c = [], h = 0; U[h] == (I[h] || 0) ; h++); if (U[h] > (I[h] || 0) && f--, null == o ? (L = o = q.precision, s = q.rounding) : L = c ? o + (t.e - i.e) + 1 : o, 0 > L) E.push(1), p = !0; else { if (L = L / g + 2 | 0, h = 0, 1 == P) { for (m = 0, U = U[0], L++; (F > h || m) && L--; h++) D = m * u + (I[h] || 0), E[h] = D / U | 0, m = D % U | 0; p = m || F > h } else { for (m = u / (U[0] + 1) | 0, m > 1 && (U = e(U, m, u), I = e(I, m, u), P = U.length, F = I.length), A = P, x = I.slice(0, P), O = x.length; P > O; x[O++] = 0); R = U.slice(), R.unshift(0), M = U[0], U[1] >= u / 2 && M++; do m = 0, l = n(U, x, P, O), 0 > l ? (S = x[0], P != O && (S = S * u + (x[1] || 0)), m = S / M | 0, m > 1 ? (m >= u && (m = u - 1), d = e(U, m, u), w = d.length, O = x.length, l = n(d, x, w, O), 1 == l && (m--, r(d, w > P ? R : U, w, u))) : (0 == m && (l = m = 1), d = U.slice()), w = d.length, O > w && d.unshift(0), r(x, d, O, u), -1 == l && (O = x.length, l = n(U, x, P, O), 1 > l && (m++, r(x, O > P ? R : U, O, u))), O = x.length) : 0 === l && (m++, x = [0]), E[h++] = m, l && x[0] ? x[O++] = I[A] || 0 : (x = [I[A]], O = 1); while ((A++ < F || null != x[0]) && L--); p = null != x[0] } E[0] || E.shift() } if (1 == g) v.e = f, v.r = +p; else { for (h = 1, L = E[0]; L >= 10; L /= 10, h++); v.e = h + f * g - 1, a(v, c ? o + v.e + 1 : o, s, p) } return v } }(); if (g = function () { function e(e) { var n, r, t, i = this, o = "config", s = i.errors ? parseInt : parseFloat; return e == r || "object" != typeof e && !u(i, "object expected", e, o) ? i : ((t = e[n = "precision"]) != r && ((m = 1 > t || t > A) || s(t) != t ? u(i, n, t, o, 0) : i[n] = 0 | t), (t = e[n = "rounding"]) != r && ((m = 0 > t || t > 8) || s(t) != t ? u(i, n, t, o, 0) : i[n] = 0 | t), (t = e[n = "toExpNeg"]) != r && ((m = -D > t || t > 0) || s(t) != t ? u(i, n, t, o, 0) : i[n] = N(t)), (t = e[n = "toExpPos"]) != r && ((m = 0 > t || t > D) || s(t) != t ? u(i, n, t, o, 0) : i[n] = N(t)), (t = e[n = "minE"]) != r && ((m = -D > t || t > 0) || s(t) != t ? u(i, n, t, o, 0) : i[n] = N(t)), (t = e[n = "maxE"]) != r && ((m = 0 > t || t > D) || s(t) != t ? u(i, n, t, o, 0) : i[n] = N(t)), (t = e[n = "errors"]) != r && (t === !!t || 1 === t || 0 === t ? (m = v = 0, i[n] = !!t) : u(i, n, t, o, 1)), (t = e[n = "crypto"]) != r && (t === !!t || 1 === t || 0 === t ? i[n] = !(!t || !d || "object" != typeof d) : u(i, n, t, o, 1)), (t = e[n = "modulo"]) != r && ((m = 0 > t || t > 9) || s(t) != t ? u(i, n, t, o, 0) : i[n] = 0 | t), (e = e[n = "format"]) != r && ("object" == typeof e ? i[n] = e : u(i, "format object expected", e, o)), i) } function n(e) { return new this(e).exp() } function r(e) { return new this(e).ln() } function t(e, n) { return new this(e).log(n) } function o(e, n, r) { var t, i, o = 0; for ("[object Array]" == x.call(n[0]) && (n = n[0]), t = new e(n[0]) ; ++o < n.length;) { if (i = new e(n[o]), !i.s) { t = i; break } t[r](i) && (t = i) } return t } function s() { return o(this, arguments, "lt") } function c() { return o(this, arguments, "gt") } function l(e, n) { return new this(e).pow(n) } function f(e) { var n, r, t, o = 0, s = [], c = this, l = new c(c.ONE); if (null != e && i(l, e, "random") ? e |= 0 : e = c.precision, r = Math.ceil(e / y), c.crypto) if (d && d.getRandomValues) for (n = d.getRandomValues(new Uint32Array(r)) ; r > o;) t = n[o], t >= 429e7 ? n[o] = d.getRandomValues(new Uint32Array(1))[0] : s[o++] = t % 1e7; else if (d && d.randomBytes) { for (n = d.randomBytes(r *= 4) ; r > o;) t = n[o] + (n[o + 1] << 8) + (n[o + 2] << 16) + ((127 & n[o + 3]) << 24), t >= 214e7 ? d.randomBytes(4).copy(n, o) : (s.push(t % 1e7), o += 4); o = r / 4 } else u(c, "crypto unavailable", d, "random"); if (!o) for (; r > o;) s[o++] = 1e7 * Math.random() | 0; for (r = s[--o], e %= y, r && e && (t = E(10, y - e), s[o] = (r / t | 0) * t) ; 0 === s[o]; o--) s.pop(); if (0 > o) s = [r = 0]; else { for (r = -1; 0 === s[0];) s.shift(), r -= y; for (o = 1, t = s[0]; t >= 10;) t /= 10, o++; y > o && (r -= y - o) } return l.e = r, l.c = s, l } function g(e) { return new this(e).sqrt() } function p(i) { function o(e, n) { var r = this; if (!(r instanceof o)) return u(o, "Decimal called without new", e), new o(e, n); if (r.constructor = o, e instanceof o) { if (null == n) return v = 0, r.s = e.s, r.e = e.e, r.c = (e = e.c) ? e.slice() : e, r; if (10 == n) return a(new o(e), o.precision, o.rounding); e += "" } return b(o, r, e, n) } return o.precision = 20, o.rounding = 4, o.modulo = 1, o.toExpNeg = -7, o.toExpPos = 21, o.minE = -D, o.maxE = D, o.errors = !0, o.crypto = !1, o.format = { decimalSeparator: ".", groupSeparator: ",", groupSize: 3, secondaryGroupSize: 0, fractionGroupSeparator: " ", fractionGroupSize: 0 }, o.prototype = S, o.ONE = new o(1), o.ROUND_UP = 0, o.ROUND_DOWN = 1, o.ROUND_CEIL = 2, o.ROUND_FLOOR = 3, o.ROUND_HALF_UP = 4, o.ROUND_HALF_DOWN = 5, o.ROUND_HALF_EVEN = 6, o.ROUND_HALF_CEIL = 7, o.ROUND_HALF_FLOOR = 8, o.EUCLID = 9, o.config = e, o.constructor = p, o.exp = n, o.ln = r, o.log = t, o.max = s, o.min = c, o.pow = l, o.sqrt = g, o.random = f, null != i && o.config(i), o } var b = function () { var e = /^-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?$/i, n = String.prototype.trim || function () { return this.replace(/^\s+|\s+$/g, "") }; return function (r, t, i, o) { var s, c, l, f, g, p; if ("string" != typeof i && (i = (f = "number" == typeof i || "[object Number]" == x.call(i)) && 0 === i && 0 > 1 / i ? "-0" : i + ""), g = i, null == o && e.test(i)) t.s = 45 === i.charCodeAt(0) ? (i = i.slice(1), -1) : 1; else { if (10 == o) return a(new r(i), r.precision, r.rounding); if (i = n.call(i).replace(/^\+(?!-)/, ""), t.s = 45 === i.charCodeAt(0) ? (i = i.replace(/^-(?!-)/, ""), -1) : 1, null != o ? o != (0 | o) && r.errors || (m = !(o >= 2 && 65 > o)) ? (u(r, "base", o, 0, 0), p = e.test(i)) : (s = "[" + O.slice(0, o = 0 | o) + "]+", i = i.replace(/\.$/, "").replace(/^\./, "0."), (p = new RegExp("^" + s + "(?:\\." + s + ")?$", 37 > o ? "i" : "").test(i)) ? (f && (i.replace(/^0\.0*|\./, "").length > 15 && u(r, 0, g), f = !f), i = h(r, i, 10, o, t.s)) : "Infinity" != i && "NaN" != i && (u(r, "not a base " + o + " number", g), i = "NaN")) : p = e.test(i), !p) return t.c = t.e = null, "Infinity" != i && ("NaN" != i && u(r, "not a number", g), t.s = null), v = 0, t } for ((c = i.indexOf(".")) > -1 && (i = i.replace(".", "")), (l = i.search(/e/i)) > 0 ? (0 > c && (c = l), c += +i.slice(l + 1), i = i.substring(0, l)) : 0 > c && (c = i.length), l = 0; 48 === i.charCodeAt(l) ; l++); for (o = i.length; 48 === i.charCodeAt(--o) ;); if (i = i.slice(l, o + 1)) { if (o = i.length, f && o > 15 && u(r, 0, g), t.e = c = c - l - 1, t.c = [], l = (c + 1) % y, 0 > c && (l += y), o > l) { for (l && t.c.push(+i.slice(0, l)), o -= y; o > l;) t.c.push(+i.slice(l, l += y)); i = i.slice(l), l = y - i.length } else l -= o; for (; l--; i += "0"); t.c.push(+i), w && (t.e > r.maxE ? t.c = t.e = null : t.e < r.minE && (t.c = [t.e = 0])) } else t.c = [t.e = 0]; return v = 0, t } }(); return p() }(), Bridge.$Decimal = g, "function" == typeof define && define.amd) define(function () { return g }); else if ("undefined" != typeof module && module.exports) { if (module.exports = g, !d) try { d = require("crypto") } catch (R) { } } else p = e.Decimal, g.noConflict = function () { return e.Decimal = p, g } }(Bridge.global);
+
+    Bridge.Decimal = function (v, provider) {
+        if (this.constructor !== Bridge.Decimal) {
+            return new Bridge.Decimal(v);
+        }
+
+        if (typeof v === "string") {
+            provider = provider || Bridge.CultureInfo.getCurrentCulture();
+
+            var nfInfo = provider && provider.getFormat(Bridge.NumberFormatInfo);
+
+            if (nfInfo && nfInfo.numberDecimalSeparator !== ".") {
+                v = v.replace(nfInfo.numberDecimalSeparator, ".");
+            }
+
+            if (!/^\s*[+-]?(\d+|\d*\.\d+)(e|E[+-]?\d+)?\s*$/.test(v)) {
+                throw new Bridge.FormatException();
+            }
+
+            v = v.replace(/\s/g, "");
+        }
+
+        this.value = Bridge.Decimal.getValue(v);
+    }
+
+    Bridge.Decimal.$$name = "Bridge.Decimal";
+    Bridge.Decimal.prototype.$$name = "Bridge.Decimal";
+
+    Bridge.Decimal.$$inherits = [];
+    Bridge.Class.addExtend(Bridge.Decimal, [Bridge.IComparable, Bridge.IFormattable, Bridge.IComparable$1(Bridge.Decimal), Bridge.IEquatable$1(Bridge.Decimal)]);
+    
+
+    Bridge.Decimal.getDefaultValue = function () {
+        return new Bridge.Decimal(0);
+    };
+
+    Bridge.Decimal.getValue = function (d) {
+        if (!Bridge.hasValue(d)) {
+            return null;
+        }
+
+        if (d instanceof Bridge.Decimal) {
+            return d.value;
+        }
+
+        return new Bridge.$Decimal(d);
+    };
+
+    Bridge.Decimal.create = function (d) {
+        if (!Bridge.hasValue(d)) {
+            return null;
+        }
+
+        if (d instanceof Bridge.Decimal) {
+            return d;
+        }
+
+        return new Bridge.Decimal(d);
+    };
+
+    Bridge.Decimal.lift = function (d) {
+        return d == null ? null : Bridge.Decimal.create(d);
+    }; 
+
+    Bridge.Decimal.prototype.toString = function (format, provider) {
+        if (!format && !provider) {
+            return this.value.toString();
+        }
+
+        return Bridge.Int.format(this.toFloat(), format, provider);
+    };
+
+    Bridge.Decimal.prototype.toFloat = function () {
+        return this.value.toNumber();
+    };
+
+    Bridge.Decimal.prototype.format = function (format, provider) {
+        return Bridge.Int.format(this.toFloat(), format, provider);
+    };
+
+    Bridge.Decimal.prototype.decimalPlaces = function () {
+        return this.value.decimalPlaces();
+    };
+
+    Bridge.Decimal.prototype.dividedToIntegerBy = function (d) {
+        return new Bridge.Decimal(this.value.dividedToIntegerBy(Bridge.Decimal.getValue(d)));
+    };
+
+    Bridge.Decimal.prototype.exponential = function () {
+        return new Bridge.Decimal(this.value.exponential());
+    };
+
+    Bridge.Decimal.prototype.abs = function () {
+        return new Bridge.Decimal(this.value.abs());
+    };
+
+    Bridge.Decimal.prototype.floor = function () {
+        return new Bridge.Decimal(this.value.floor());
+    };
+
+    Bridge.Decimal.prototype.ceil = function () {
+        return new Bridge.Decimal(this.value.ceil());
+    };
+
+    Bridge.Decimal.prototype.trunc = function () {
+        return new Bridge.Decimal(this.value.trunc());
+    };
+
+    Bridge.Decimal.round = function (obj, mode) {
+        obj = Bridge.Decimal.create(obj);
+
+        var old = Bridge.$Decimal.rounding;
+
+        Bridge.$Decimal.rounding = mode;
+
+        var d = new Bridge.Decimal(obj.value.round());
+
+        Bridge.$Decimal.rounding = old;
+
+        return d;
+    };
+
+    Bridge.Decimal.toDecimalPlaces = function(obj, decimals, mode) {
+        obj = Bridge.Decimal.create(obj);
+        var d = new Bridge.Decimal(obj.value.toDecimalPlaces(decimals, mode));
+        return d;
+    };
+
+    Bridge.Decimal.prototype.compareTo = function (another) {
+        return this.value.comparedTo(Bridge.Decimal.getValue(another));
+    };
+
+    Bridge.Decimal.prototype.add = function (another) {
+        return new Bridge.Decimal(this.value.plus(Bridge.Decimal.getValue(another)));
+    };
+
+    Bridge.Decimal.prototype.sub = function (another) {
+        return new Bridge.Decimal(this.value.minus(Bridge.Decimal.getValue(another)));
+    };
+
+    Bridge.Decimal.prototype.isZero = function () {
+        return this.value.isZero;
+    };
+
+    Bridge.Decimal.prototype.mul = function (another) {
+        return new Bridge.Decimal(this.value.times(Bridge.Decimal.getValue(another)));
+    };
+
+    Bridge.Decimal.prototype.div = function (another) {
+        return new Bridge.Decimal(this.value.dividedBy(Bridge.Decimal.getValue(another)));
+    };
+
+    Bridge.Decimal.prototype.mod = function (another) {
+        return new Bridge.Decimal(this.value.modulo(Bridge.Decimal.getValue(another)));
+    };
+
+    Bridge.Decimal.prototype.neg = function () {
+        return new Bridge.Decimal(this.value.negated());
+    };
+
+    Bridge.Decimal.prototype.inc = function () {
+        return new Bridge.Decimal(this.value.plus(Bridge.Decimal.getValue(1)));
+    };
+
+    Bridge.Decimal.prototype.dec = function () {
+        return new Bridge.Decimal(this.value.minus(Bridge.Decimal.getValue(1)));
+    };
+
+    Bridge.Decimal.prototype.sign = function () {
+        return this.value.isZero() ? 0 : (this.value.isNegative() ? -1 : 1);
+    };
+
+    Bridge.Decimal.prototype.clone = function () {
+        return new Bridge.Decimal(this);
+    };
+
+    Bridge.Decimal.prototype.ne = function (v) {
+        return !!this.compareTo(v);
+    };
+
+    Bridge.Decimal.prototype.lt = function (v) {
+        return this.compareTo(v) < 0;
+    };
+
+    Bridge.Decimal.prototype.lte = function (v) {
+        return this.compareTo(v) <= 0;
+    };
+
+    Bridge.Decimal.prototype.gt = function (v) {
+        return this.compareTo(v) > 0;
+    };
+
+    Bridge.Decimal.prototype.gte = function (v) {
+        return this.compareTo(v) >= 0;
+    };
+
+    Bridge.Decimal.prototype.equals = function (v) {
+        return !this.compareTo(v);
+    };
+
+    Bridge.Decimal.prototype.equalsT = function (v) {
+        return !this.compareTo(v);
+    };
+
+    Bridge.Decimal.prototype.getHashCode = function () {
+        var n = (this.sign() * 397 + this.value.e) | 0;
+
+        for (var i = 0; i < this.value.c.length; i++) {
+            n = (n * 397 + this.value.c[i]) | 0;
+        }
+
+        return n;
+    };
+
+    Bridge.Decimal.toInt = function (v) {
+        if (!v) {
+            return null;
+        }
+
+        var i = Bridge.Int.trunc(Bridge.Decimal.getValue(v).toNumber());
+
+        if (!Bridge.Int.instanceOf(i)) {
+            throw new Bridge.OverflowException();
+        }
+
+        return i;
+    };
+
+    Bridge.Decimal.tryParse = function (s, provider, v) {
+        try {
+            v.v = new Bridge.Decimal(s, provider);
+
+            return true;
+        } catch (e) {
+            v.v = new Bridge.Decimal(0);
+
+            return false;
+        }
+    };
+
+    Bridge.Decimal.toFloat = function (v) {
+        if (!v) {
+            return null;
+        }
+
+        return Bridge.Decimal.getValue(v).toNumber();
+    };
+
+    Bridge.Decimal.setConfig = function (config) {
+        Bridge.$Decimal.config(config);
+    };
+
+    Bridge.Decimal.min = function () {
+        var values = [];
+
+        for (var i = 0, len = arguments.length; i < len; i++) {
+            values.push(Bridge.Decimal.getValue(arguments[i]));
+        }
+
+        return new Bridge.Decimal(Bridge.$Decimal.min.apply(Bridge.$Decimal, values));
+    };
+
+    Bridge.Decimal.max = function () {
+        var values = [];
+
+        for (var i = 0, len = arguments.length; i < len; i++) {
+            values.push(Bridge.Decimal.getValue(arguments[i]));
+        }
+
+        return new Bridge.Decimal(Bridge.$Decimal.max.apply(Bridge.$Decimal, values));
+    };
+
+    Bridge.Decimal.random = function (dp) {
+        return new Bridge.Decimal(Bridge.$Decimal.random(dp));
+    };
+
+    Bridge.Decimal.exp = function (d) {
+        return new Bridge.Decimal(Bridge.Decimal.getValue(d).exp());
+    };
+
+    Bridge.Decimal.exp = function (d) {
+        return new Bridge.Decimal(Bridge.Decimal.getValue(d).exp());
+    };
+
+    Bridge.Decimal.ln = function (d) {
+        return new Bridge.Decimal(Bridge.Decimal.getValue(d).ln());
+    };
+
+    Bridge.Decimal.log = function (d, logBase) {
+        return new Bridge.Decimal(Bridge.Decimal.getValue(d).log(logBase));
+    };
+
+    Bridge.Decimal.pow = function (d, exponent) {
+        return new Bridge.Decimal(Bridge.Decimal.getValue(d).pow(exponent));
+    };
+
+    Bridge.Decimal.sqrt = function (d) {
+        return new Bridge.Decimal(Bridge.Decimal.getValue(d).sqrt());
+    };
+
+    Bridge.Decimal.prototype.isFinite = function () {
+        return this.value.isFinite();
+    };
+
+    Bridge.Decimal.prototype.isInteger = function () {
+        return this.value.isInteger();
+    };
+
+    Bridge.Decimal.prototype.isNaN = function () {
+        return this.value.isNaN();
+    };
+
+    Bridge.Decimal.prototype.isNegative = function () {
+        return this.value.isNegative();
+    };
+
+    Bridge.Decimal.prototype.isZero = function () {
+        return this.value.isZero();
+    };
+
+    Bridge.Decimal.prototype.log = function (logBase) {
+        return new Bridge.Decimal(this.value.log(logBase));
+    };
+
+    Bridge.Decimal.prototype.ln = function () {
+        return new Bridge.Decimal(this.value.ln());
+    };
+
+    Bridge.Decimal.prototype.precision = function () {
+        return this.value.precision();
+    };
+
+    Bridge.Decimal.prototype.round = function () {
+        var old = Bridge.$Decimal.rounding,
+            r;
+
+        Bridge.$Decimal.rounding = 6;
+        r = new Bridge.Decimal(this.value.round());
+        Bridge.$Decimal.rounding = old;
+
+        return r;
+    };
+
+    Bridge.Decimal.prototype.sqrt = function () {
+        return new Bridge.Decimal(this.value.sqrt());
+    };
+
+    Bridge.Decimal.prototype.toDecimalPlaces = function (dp, rm) {
+        return new Bridge.Decimal(this.value.toDecimalPlaces(dp, rm));
+    };
+
+    Bridge.Decimal.prototype.toExponential = function (dp, rm) {
+        return this.value.toExponential(dp, rm);
+    };
+
+    Bridge.Decimal.prototype.toFixed = function (dp, rm) {
+        return this.value.toFixed(dp, rm);
+    };
+
+    Bridge.Decimal.prototype.pow = function (n) {
+        return new Bridge.Decimal(this.value.pow(n));
+    };
+
+    Bridge.Decimal.prototype.toPrecision = function (dp, rm) {
+        return this.value.toPrecision(dp, rm);
+    };
+
+    Bridge.Decimal.prototype.toSignificantDigits = function (dp, rm) {
+        return new Bridge.Decimal(this.value.toSignificantDigits(dp, rm));
+    };
+
+    Bridge.Decimal.prototype.valueOf = function () {
+        return this.value.valueOf();
+    };
+
+    Bridge.Decimal.prototype.toFormat = function (dp, rm, provider) {
+        var old = Bridge.$Decimal.format,
+            d;
+
+        if (provider && !provider.getFormat) {
+            var oldConfig = Bridge.merge({}, old || {});
+            Bridge.$Decimal.format = Bridge.merge(oldConfig, provider);
+            d = this.value.toFormat(dp, rm);
+        } else {
+            provider = provider || Bridge.CultureInfo.getCurrentCulture();
+            var nfInfo = provider && provider.getFormat(Bridge.NumberFormatInfo);
+
+            if (nfInfo) {
+                Bridge.$Decimal.format.decimalSeparator = nfInfo.numberDecimalSeparator;
+                Bridge.$Decimal.format.groupSeparator = nfInfo.numberGroupSeparator;
+                Bridge.$Decimal.format.groupSize = nfInfo.numberGroupSizes[0];
+            }
+
+            d = this.value.toFormat(dp, rm);
+        }
+        
+        
+        Bridge.$Decimal.format = old;
+        return d;
+    };
+
+    Bridge.$Decimal.config({ precision: 29 });
+
+    Bridge.Decimal.Zero = Bridge.Decimal(0);
+    Bridge.Decimal.One = Bridge.Decimal(1);
+    Bridge.Decimal.MinusOne = Bridge.Decimal(-1);
+    Bridge.Decimal.MinValue = Bridge.Decimal("-79228162514264337593543950335");
+    Bridge.Decimal.MaxValue = Bridge.Decimal("79228162514264337593543950335");
+
+    // @source Date.js
+
+    var date = {
+        utcNow:  function () {
+            var d = new Date();
+
+            return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), d.getUTCHours(), d.getUTCMinutes(), d.getUTCSeconds(), d.getUTCMilliseconds());
+        },
+
+        today: function () {
+            var d = new Date();
+
+            return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        },
+
+        timeOfDay: function(dt) {
+            return new Bridge.TimeSpan((dt - new Date(dt.getFullYear(), dt.getMonth(), dt.getDate())) * 10000);
+        },
+
+        isUseGenitiveForm: function (format, index, tokenLen, patternToMatch) {
+	        var i,
+                repeat = 0;
+
+	        for (i = index - 1; i >= 0 && format[i] !== patternToMatch; i--) { }
+
+            if (i >= 0) {
+                while (--i >= 0 && format[i] === patternToMatch) {
+                    repeat++;
+                }
+
+                if (repeat <= 1) {
+                    return true;
+                }
+            }
+
+            for (i = index + tokenLen; i < format.length && format[i] !== patternToMatch; i++) {
+            }
+
+            if (i < format.length) {
+                repeat = 0;
+
+                while (++i < format.length && format[i] === patternToMatch) {
+                    repeat++;
+                }
+
+                if (repeat <= 1) {
+                    return true;
+                }
+            }
+
+            return false;
+        },
+
+        format: function (date, format, provider) {
+            var me = this,
+                df = (provider || Bridge.CultureInfo.getCurrentCulture()).getFormat(Bridge.DateTimeFormatInfo),
+                year = date.getFullYear(),
+                month = date.getMonth(),
+                dayOfMonth = date.getDate(),
+                dayOfWeek = date.getDay(),
+                hour = date.getHours(),
+                minute = date.getMinutes(),
+                second = date.getSeconds(),
+                millisecond = date.getMilliseconds(),
+                timezoneOffset = date.getTimezoneOffset(),
+                formats;
+
+            format = format || "G";
+
+            if (format.length === 1) {
+                formats = df.getAllDateTimePatterns(format, true);
+                format = formats ? formats[0] : format;
+            } else if (format.length === 2 && format.charAt(0) === "%") {
+                format = format.charAt(1);
+            }
+
+            return format.replace(/(\\.|'[^']*'|"[^"]*"|d{1,4}|M{1,4}|yyyy|yy|y|HH?|hh?|mm?|ss?|tt?|f{1,3}|z{1,3}|\:|\/)/g,
+			    function (match, group, index) {
+			        var part = match;
+
+			        switch (match) {
+			            case "dddd":
+			                part = df.dayNames[dayOfWeek];
+
+			                break;
+			            case "ddd":
+			                part = df.abbreviatedDayNames[dayOfWeek];
+
+			                break;
+			            case "dd":
+			                part = dayOfMonth < 10 ? "0" + dayOfMonth : dayOfMonth;
+
+			                break;
+			            case "d":
+			                part = dayOfMonth;
+
+			                break;
+			            case "MMMM":
+			                if (me.isUseGenitiveForm(format, index, 4, "d")) {
+			                    part = df.monthGenitiveNames[month];
+			                } else {
+			                    part = df.monthNames[month];
+			                }
+
+			                break;
+			            case "MMM":
+			                if (me.isUseGenitiveForm(format, index, 3, "d")) {
+			                    part = df.abbreviatedMonthGenitiveNames[month];
+			                } else {
+			                    part = df.abbreviatedMonthNames[month];
+			                }
+
+			                break;
+			            case "MM":
+			                part = (month + 1) < 10 ? "0" + (month + 1) : (month + 1);
+
+			                break;
+			            case "M":
+			                part = month + 1;
+
+			                break;
+			            case "yyyy":
+			                part = year;
+
+			                break;
+			            case "yy":
+			                part = (year % 100).toString();
+
+			                if (part.length === 1) {
+			                    part = "0" + part;
+			                }
+
+			                break;
+			            case "y":
+			                part = year % 100;
+
+			                break;
+			            case "h":
+			            case "hh":
+			                part = hour % 12;
+
+			                if (!part) {
+			                    part = "12";
+			                } else if (match === "hh" && part.length === 1) {
+			                    part = "0" + part;
+			                }
+
+			                break;
+			            case "HH":
+			                part = hour.toString();
+
+			                if (part.length === 1) {
+			                    part = "0" + part;
+			                }
+
+			                break;
+			            case "H":
+			                part = hour;
+			                break;
+			            case "mm":
+			                part = minute.toString();
+
+			                if (part.length === 1) {
+			                    part = "0" + part;
+			                }
+
+			                break;
+			            case "m":
+			                part = minute;
+
+			                break;
+			            case "ss":
+			                part = second.toString();
+
+			                if (part.length === 1) {
+			                    part = "0" + part;
+			                }
+
+			                break;
+			            case "s":
+			                part = second;
+			                break;
+			            case "t":
+			            case "tt":
+			                part = (hour < 12) ? df.amDesignator : df.pmDesignator;
+
+			                if (match === "t") {
+			                    part = part.charAt(0);
+			                }
+
+			                break;
+			            case "f":
+			            case "ff":
+			            case "fff":
+			                part = millisecond.toString();
+
+			                if (part.length < 3) {
+			                    part = Array(3 - part.length).join("0") + part;
+			                }
+
+			                if (match === "ff") {
+			                    part = part.substr(0, 2);
+			                } else if (match === "f") {
+			                    part = part.charAt(0);
+			                }
+
+			                break;
+			            case "z":
+			                part = timezoneOffset / 60;
+			                part = ((part >= 0) ? "-" : "+") + Math.floor(Math.abs(part));
+
+			                break;
+			            case "zz":
+			            case "zzz":
+			                part = timezoneOffset / 60;
+			                part = ((part >= 0) ? "-" : "+") + Bridge.String.alignString(Math.floor(Math.abs(part)).toString(), 2, "0", 2);
+
+			                if (match === "zzz") {
+			                    part += df.timeSeparator + Bridge.String.alignString(Math.floor(Math.abs(timezoneOffset % 60)).toString(), 2, "0", 2);
+			                }
+
+			                break;
+			            case ":":
+			                part = df.timeSeparator;
+
+			                break;
+			            case "/":
+			                part = df.dateSeparator;
+
+			                break;
+			            default:
+			                part = match.substr(1, match.length - 1 - (match.charAt(0) !== "\\"));
+
+			                break;
+			        }
+
+			        return part;
+			    });
+        },
+
+        parse: function (value, provider, utc, silent) {
+            var dt = this.parseExact(value, null, provider, utc, true);
+
+            if (dt !== null) {
+                return dt;
+            }
+
+            dt = Date.parse(value);
+
+            if (!isNaN(dt)) {
+                return new Date(dt);
+            } else if (!silent) {
+                throw new Bridge.FormatException("String does not contain a valid string representation of a date and time.");
+            }
+        },
+
+        parseExact: function (str, format, provider, utc, silent) {
+            if (!format) {
+                format = ["G", "g", "F", "f", "D", "d", "R", "r", "s", "S", "U", "u", "O", "o", "Y", "y", "M", "m", "T", "t"];
+            }
+
+            if (Bridge.isArray(format)) {
+                var j = 0,
+                    d;
+
+                for (j; j < format.length; j++) {
+                    d = Bridge.Date.parseExact(str, format[j], provider, utc, true);
+
+                    if (d != null) {
+                        return d;
+                    }
+                }
+
+                if (silent) {
+                    return null;
+                }
+
+                throw new Bridge.FormatException("String does not contain a valid string representation of a date and time.");
+            }
+
+            var df = (provider || Bridge.CultureInfo.getCurrentCulture()).getFormat(Bridge.DateTimeFormatInfo),
+                am = df.amDesignator,
+                pm = df.pmDesignator,
+                idx = 0,
+                index = 0,
+                i = 0,
+                c,
+                token,
+                year = 0,
+                month = 1,
+                date = 1,
+                hh = 0,
+                mm = 0,
+                ss = 0,
+                ff = 0,
+                tt = "",
+                zzh = 0,
+                zzm = 0,
+                zzi,
+                sign,
+                neg,
+                names,
+                name,
+                invalid = false,
+                inQuotes = false,
+                tokenMatched,
+                formats;
+
+            if (str == null) {
+                throw new Bridge.ArgumentNullException("str");
+            }
+
+            format = format || "G";
+
+            if (format.length === 1) {
+                formats = df.getAllDateTimePatterns(format, true);
+                format = formats ? formats[0] : format;
+            } else if (format.length === 2 && format.charAt(0) === "%") {
+                format = format.charAt(1);
+            }
+
+            while (index < format.length) {
+                c = format.charAt(index);
+                token = "";
+
+                if (inQuotes === "\\") {
+                    token += c;
+                    index++;
+                } else {
+                    while ((format.charAt(index) === c) && (index < format.length)) {
+                        token += c;
+                        index++;
+                    }
+                }
+
+                tokenMatched = true;
+
+                if (!inQuotes) {
+                    if (token === "yyyy" || token === "yy" || token === "y") {
+                        if (token === "yyyy") {
+                            year = this.subparseInt(str, idx, 4, 4);
+                        } else if (token === "yy") {
+                            year = this.subparseInt(str, idx, 2, 2);
+                        } else if (token === "y") {
+                            year = this.subparseInt(str, idx, 2, 4);
+                        }
+
+                        if (year == null) {
+                            invalid = true;
+                            break;
+                        }
+
+                        idx += year.length;
+
+                        if (year.length === 2) {
+                            year = ~~year;
+                            year = (year > 30 ? 1900 : 2000) + year;
+                        }
+                    } else if (token === "MMM" || token === "MMMM") {
+                        month = 0;
+
+                        if (token === "MMM") {
+                            if (this.isUseGenitiveForm(format, index, 3, "d")) {
+                                names = df.abbreviatedMonthGenitiveNames;
+                            } else {
+                                names = df.abbreviatedMonthNames;
+                            }
+                        } else {
+                            if (this.isUseGenitiveForm(format, index, 4, "d")) {
+                                names = df.monthGenitiveNames;
+                            } else {
+                                names = df.monthNames;
+                            }
+                        }
+
+                        for (i = 0; i < names.length; i++) {
+                            name = names[i];
+
+                            if (str.substring(idx, idx + name.length).toLowerCase() === name.toLowerCase()) {
+                                month = (i % 12) + 1;
+                                idx += name.length;
+
+                                break;
+                            }
+                        }
+
+                        if ((month < 1) || (month > 12)) {
+                            invalid = true;
+
+                            break;
+                        }
+                    } else if (token === "MM" || token === "M") {
+                        month = this.subparseInt(str, idx, token.length, 2);
+
+                        if (month == null || month < 1 || month > 12) {
+                            invalid = true;
+
+                            break;
+                        }
+
+                        idx += month.length;
+                    } else if (token === "dddd" || token === "ddd") {
+                        names = token === "ddd" ? df.abbreviatedDayNames : df.dayNames;
+
+                        for (i = 0; i < names.length; i++) {
+                            name = names[i];
+
+                            if (str.substring(idx, idx + name.length).toLowerCase() === name.toLowerCase()) {
+                                idx += name.length;
+
+                                break;
+                            }
+                        }
+                    } else if (token === "dd" || token === "d") {
+                        date = this.subparseInt(str, idx, token.length, 2);
+
+                        if (date == null || date < 1 || date > 31) {
+                            invalid = true;
+
+                            break;
+                        }
+
+                        idx += date.length;
+                    } else if (token === "hh" || token === "h") {
+                        hh = this.subparseInt(str, idx, token.length, 2);
+
+                        if (hh == null || hh < 1 || hh > 12) {
+                            invalid = true;
+
+                            break;
+                        }
+
+                        idx += hh.length;
+                    } else if (token === "HH" || token === "H") {
+                        hh = this.subparseInt(str, idx, token.length, 2);
+
+                        if (hh == null || hh < 0 || hh > 23) {
+                            invalid = true;
+
+                            break;
+                        }
+
+                        idx += hh.length;
+                    } else if (token === "mm" || token === "m") {
+                        mm = this.subparseInt(str, idx, token.length, 2);
+
+                        if (mm == null || mm < 0 || mm > 59) {
+                            return null;
+                        }
+
+                        idx += mm.length;
+                    } else if (token === "ss" || token === "s") {
+                        ss = this.subparseInt(str, idx, token.length, 2);
+
+                        if (ss == null || ss < 0 || ss > 59) {
+                            invalid = true;
+
+                            break;
+                        }
+
+                        idx += ss.length;
+                    } else if (token === "u") {
+                        ff = this.subparseInt(str, idx, 1, 7);
+
+                        if (ff == null) {
+                            invalid = true;
+
+                            break;
+                        }
+
+                        idx += ff.length;
+
+                        if (ff.length > 3) {
+                            ff = ff.substring(0, 3);
+                        }
+                    } else if (token === "fffffff" || token === "ffffff" || token === "fffff" || token === "ffff" || token === "fff" || token === "ff" || token === "f") {
+                        ff = this.subparseInt(str, idx, token.length, 7);
+
+                        if (ff == null) {
+                            invalid = true;
+
+                            break;
+                        }
+
+                        idx += ff.length;
+
+                        if (ff.length > 3) {
+                            ff = ff.substring(0, 3);
+                        }
+                    } else if (token === "t") {
+                        if (str.substring(idx, idx + 1).toLowerCase() === am.charAt(0).toLowerCase()) {
+                            tt = am;
+                        } else if (str.substring(idx, idx + 1).toLowerCase() === pm.charAt(0).toLowerCase()) {
+                            tt = pm;
+                        } else {
+                            invalid = true;
+
+                            break;
+                        }
+
+                        idx += 1;
+                    } else if (token === "tt") {
+                        if (str.substring(idx, idx + 2).toLowerCase() === am.toLowerCase()) {
+                            tt = am;
+                        } else if (str.substring(idx, idx + 2).toLowerCase() === pm.toLowerCase()) {
+                            tt = pm;
+                        } else {
+                            invalid = true;
+
+                            break;
+                        }
+
+                        idx += 2;
+                    } else if (token === "z" || token === "zz") {
+                        sign = str.charAt(idx);
+
+                        if (sign === "-") {
+                            neg = true;
+                        } else if (sign === "+") {
+                            neg = false;
+                        } else {
+                            invalid = true;
+
+                            break;
+                        }
+
+                        idx++;
+
+                        zzh = this.subparseInt(str, idx, 1, 2);
+
+                        if (zzh == null || zzh > 14) {
+                            invalid = true;
+
+                            break;
+                        }
+
+                        idx += zzh.length;
+
+                        if (neg) {
+                            zzh = -zzh;
+                        }
+                    } else if (token === "zzz") {
+                        name = str.substring(idx, idx + 6);
+                        idx += 6;
+
+                        if (name.length !== 6) {
+                            invalid = true;
+
+                            break;
+                        }
+
+                        sign = name.charAt(0);
+
+                        if (sign === "-") {
+                            neg = true;
+                        } else if (sign === "+") {
+                            neg = false;
+                        } else {
+                            invalid = true;
+
+                            break;
+                        }
+
+                        zzi = 1;
+                        zzh = this.subparseInt(name, zzi, 1, 2);
+
+                        if (zzh == null || zzh > 14) {
+                            invalid = true;
+
+                            break;
+                        }
+
+                        zzi += zzh.length;
+
+                        if (neg) {
+                            zzh = -zzh;
+                        }
+
+                        if (name.charAt(zzi) !== df.timeSeparator) {
+                            invalid = true;
+
+                            break;
+                        }
+
+                        zzi++;
+
+                        zzm = this.subparseInt(name, zzi, 1, 2);
+
+                        if (zzm == null || zzh > 59) {
+                            invalid = true;
+
+                            break;
+                        }
+                    } else {
+                        tokenMatched = false;
+                    }
+                }
+
+                if (inQuotes || !tokenMatched) {
+                    name = str.substring(idx, idx + token.length);
+
+                    if ((!inQuotes && ((token === ":" && name !== df.timeSeparator) ||
+                        (token === "/" && name !== df.dateSeparator))) ||
+                        (name !== token && token !== "'" && token !== '"' && token !== "\\")) {
+                        invalid = true;
+
+                        break;
+                    }
+
+                    if (inQuotes === "\\") {
+                        inQuotes = false;
+                    }
+
+                    if (token !== "'" && token !== '"' && token !== "\\") {
+                        idx += token.length;
+                    } else {
+                        if (inQuotes === false) {
+                            inQuotes = token;
+                        } else {
+                            if (inQuotes !== token) {
+                                invalid = true;
+                                break;
+                            }
+
+                            inQuotes = false;
+                        }
+                    }
+                }
+            }
+
+            if (inQuotes) {
+                invalid = true;
+            }
+
+            if (!invalid) {
+                if (idx !== str.length) {
+                    invalid = true;
+                } else if (month === 2) {
+                    if (((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0)) {
+                        if (date > 29) {
+                            invalid = true;
+                        }
+                    } else if (date > 28) {
+                        invalid = true;
+                    }
+                } else if ((month === 4) || (month === 6) || (month === 9) || (month === 11)) {
+                    if (date > 30) {
+                        invalid = true;
+                    }
+                }
+            }
+
+            if (invalid) {
+                if (silent) {
+                    return null;
+                }
+
+                throw new Bridge.FormatException("String does not contain a valid string representation of a date and time.");
+            }
+
+            if (hh < 12 && tt === pm) {
+                hh = hh - 0 + 12;
+            } else if (hh > 11 && tt === am) {
+                hh -= 12;
+            }
+
+            if (zzh === 0 && zzm === 0 && !utc) {
+                return new Date(year, month - 1, date, hh, mm, ss, ff);
+            }
+
+            return new Date(Date.UTC(year, month - 1, date, hh - zzh, mm - zzm, ss, ff));
+        },
+
+        subparseInt: function (str, index, min, max) {
+            var x,
+                token;
+
+            for (x = max; x >= min; x--) {
+                token = str.substring(index, index + x);
+
+                if (token.length < min) {
+                    return null;
+                }
+
+                if (/^\d+$/.test(token)) {
+                    return token;
+                }
+            }
+
+            return null;
+        },
+
+        tryParse: function (value, provider, result, utc) {
+            result.v = this.parse(value, provider, utc, true);
+
+            if (result.v == null) {
+                result.v = new Date(-864e13);
+
+                return false;
+            }
+
+            return true;
+        },
+
+        tryParseExact: function (value, format, provider, result, utc) {
+            result.v = this.parseExact(value, format, provider, utc, true);
+
+            if (result.v == null) {
+                result.v = new Date(-864e13);
+
+                return false;
+            }
+
+            return true;
+        },
+
+        isDaylightSavingTime: function (dt) {
+            var temp = Bridge.Date.today();
+
+            temp.setMonth(0);
+            temp.setDate(1);
+
+            return temp.getTimezoneOffset() !== dt.getTimezoneOffset();
+        },
+
+        toUTC: function (date) {
+            return new Date(date.getUTCFullYear(),
+                            date.getUTCMonth(),
+                            date.getUTCDate(),
+                            date.getUTCHours(),
+                            date.getUTCMinutes(),
+                            date.getUTCSeconds(),
+                            date.getUTCMilliseconds());
+        },
+
+        toLocal: function (date) {
+            return new Date(Date.UTC(date.getFullYear(),
+                                     date.getMonth(),
+                                     date.getDate(),
+                                     date.getHours(),
+                                     date.getMinutes(),
+                                     date.getSeconds(),
+                                     date.getMilliseconds()));
+        }
+    };
+
+    Bridge.Date = date;
+
+    // @source TimeSpan.js
+
+    Bridge.define("Bridge.TimeSpan", {
+        inherits: [Bridge.IComparable],
+        statics: {
+            fromDays: function (value) {
+                return new Bridge.TimeSpan(value * 864e9);
+            },
+
+            fromHours: function (value) {
+                return new Bridge.TimeSpan(value * 36e9);
+            },
+
+            fromMilliseconds: function (value) {
+                return new Bridge.TimeSpan(value * 1e4);
+            },
+
+            fromMinutes: function (value) {
+                return new Bridge.TimeSpan(value * 6e8);
+            },
+
+            fromSeconds: function (value) {
+                return new Bridge.TimeSpan(value * 1e7);
+            },
+
+            fromTicks: function (value) {
+                return new Bridge.TimeSpan(value);
+            },
+
+            constructor: function () {
+                this.zero = new Bridge.TimeSpan(0);
+                this.maxValue = new Bridge.TimeSpan(864e13);
+                this.minValue = new Bridge.TimeSpan(-864e13);
+            },
+
+            getDefaultValue: function () {
+                return new Bridge.TimeSpan(0);
+            }
+        },
+
+        constructor: function () {
+            this.ticks = 0;
+
+            if (arguments.length === 1) {
+                this.ticks = arguments[0];
+            } else if (arguments.length === 3) {
+                this.ticks = (((arguments[0] * 60 + arguments[1]) * 60) + arguments[2]) * 1e7;
+            } else if (arguments.length === 4) {
+                this.ticks = ((((arguments[0] * 24 + arguments[1]) * 60 + arguments[2]) * 60) + arguments[3]) * 1e7;
+            } else if (arguments.length === 5) {
+                this.ticks = (((((arguments[0] * 24 + arguments[1]) * 60 + arguments[2]) * 60) + arguments[3]) * 1e3 + arguments[4]) * 1e4;
+            }
+        },
+
+        getTicks: function () {
+            return this.ticks;
+        },
+
+        getDays: function () {
+            return this.ticks / 864e9 | 0;
+        },
+
+        getHours: function () {
+            return this.ticks / 36e9 % 24 | 0;
+        },
+
+        getMilliseconds: function () {
+            return this.ticks / 1e4 % 1e3 | 0;
+        },
+
+        getMinutes: function () {
+            return this.ticks / 6e8 % 60 | 0;
+        },
+
+        getSeconds: function () {
+            return this.ticks / 1e7 % 60 | 0;
+        },
+
+        getTotalDays: function () {
+            return this.ticks / 864e9;
+        },
+
+        getTotalHours: function () {
+            return this.ticks / 36e9;
+        },
+
+        getTotalMilliseconds: function () {
+            return this.ticks / 1e4;
+        },
+
+        getTotalMinutes: function () {
+            return this.ticks / 6e8;
+        },
+
+        getTotalSeconds: function () {
+            return this.ticks / 1e7;
+        },
+
+        get12HourHour: function () {
+            return (this.getHours() > 12) ? this.getHours() - 12 : (this.getHours() === 0) ? 12 : this.getHours();
+        },
+
+        add: function (ts) {
+            return new Bridge.TimeSpan(this.ticks + ts.ticks);
+        },
+
+        subtract: function (ts) {
+            return new Bridge.TimeSpan(this.ticks - ts.ticks);
+        },
+
+        duration: function () {
+            return new Bridge.TimeSpan(Math.abs(this.ticks));
+        },
+
+        negate: function () {
+            return new Bridge.TimeSpan(-this.ticks);
+        },
+
+        compareTo: function (other) {
+            return this.ticks < other.ticks ? -1 : (this.ticks > other.ticks ? 1 : 0);
+        },
+
+        equals: function (other) {
+            return other.ticks === this.ticks;
+        },
+
+        format: function (formatStr, provider) {
+            return this.toString(formatStr, provider);
+        },
+
+        toString: function (formatStr, provider) {
+            var ticks = this.ticks,
+                result = "",
+                me = this,
+                dtInfo = (provider || Bridge.CultureInfo.getCurrentCulture()).getFormat(Bridge.DateTimeFormatInfo),
+                format = function (t, n) {
+                    return Bridge.String.alignString((t | 0).toString(), n || 2, "0", 2);
+                };
+
+            if (formatStr) {
+                return formatStr.replace(/dd?|HH?|hh?|mm?|ss?|tt?/g,
+                    function (formatStr) {
+                        switch (formatStr) {
+                            case "d":
+                                return me.getDays();
+                            case "dd":
+                                return format(me.getDays());
+                            case "H":
+                                return me.getHours();
+                            case "HH":
+                                return format(me.getHours());
+                            case "h":
+                                return me.get12HourHour();
+                            case "hh":
+                                return format(me.get12HourHour());
+                            case "m":
+                                return me.getMinutes();
+                            case "mm":
+                                return format(me.getMinutes());
+                            case "s":
+                                return me.getSeconds();
+                            case "ss":
+                                return format(me.getSeconds());
+                            case "t":
+                                return ((me.getHours() < 12) ? dtInfo.amDesignator : dtInfo.pmDesignator).substring(0, 1);
+                            case "tt":
+                                return (me.getHours() < 12) ? dtInfo.amDesignator : dtInfo.pmDesignator;
+                        }
+                    }
+                );
+            }
+
+            if (Math.abs(ticks) >= 864e9) {
+                result += format(ticks / 864e9) + ".";
+                ticks %= 864e9;
+            }
+
+            result += format(ticks / 36e9) + ":";
+            ticks %= 36e9;
+            result += format(ticks / 6e8 | 0) + ":";
+            ticks %= 6e8;
+            result += format(ticks / 1e7);
+            ticks %= 1e7;
+
+            if (ticks > 0) {
+                result += "." + format(ticks, 7);
+            }
+
+            return result;
+        }
+    });
+
+    Bridge.Class.addExtend(Bridge.TimeSpan, [Bridge.IComparable$1(Bridge.TimeSpan), Bridge.IEquatable$1(Bridge.TimeSpan)]);
+
+// @source Text/StringBuilder.js
+
+Bridge.define("Bridge.Text.StringBuilder", {
+    constructor: function () {
+        this.buffer = [],
+        this.capacity = 16;
+
+        if (arguments.length === 1) {
+            this.append(arguments[0]);
+        } else if (arguments.length === 2) {
+            this.append(arguments[0]);
+            this.setCapacity(arguments[1]);
+        } else if (arguments.length === 3) {
+            this.append(arguments[0], arguments[1], arguments[2]);
+        }
+    },
+
+    getLength: function () {
+        if (this.buffer.length < 2) {
+            return this.buffer[0] ? this.buffer[0].length : 0;
+        }
+
+        var s = this.buffer.join("");
+
+        this.buffer = [];
+        this.buffer[0] = s;
+
+        return s.length;
+    },
+
+    getCapacity: function () {
+        var length = this.getLength();
+
+        return (this.capacity > length) ? this.capacity : length;
+    },
+
+    setCapacity: function (value) {
+        var length = this.getLength();
+
+        if (value > length) {
+            this.capacity = value;
+        }
+    },
+
+    toString: function () {
+        var s = this.buffer.join("");
+
+        this.buffer = [];
+        this.buffer[0] = s;
+
+        if (arguments.length === 2) {
+            var startIndex = arguments[0],
+                length = arguments[1];
+
+            this.checkLimits(s, startIndex, length);
+
+            return s.substr(startIndex, length);
+        }
+
+        return s;
+    },
+
+    append: function (value) {
+        if (value == null) {
+            return this;
+        }
+
+        if (arguments.length === 2) {
+            // append a char repeated count times
+            var count = arguments[1];
+
+            if (count === 0) {
+                return this;
+            } else if (count < 0) {
+                throw new Bridge.ArgumentOutOfRangeException("count", "cannot be less than zero");
+            }
+
+            value = Array(count + 1).join(value).toString();
+        } else if (arguments.length === 3) {
+            // append a (startIndex, count) substring of value
+            var startIndex = arguments[1],
+                count = arguments[2];
+
+            if (count === 0) {
+                return this;
+            }
+
+            this.checkLimits(value, startIndex, count);
+            value = value.substr(startIndex, count);
+        }
+
+        this.buffer[this.buffer.length] = value;
+
+        return this;
+    },
+
+    appendFormat: function (format) {
+        return this.append(Bridge.String.format.apply(Bridge.String, arguments));
+    },
+
+    clear: function () {
+        this.buffer = [];
+
+        return this;
+    },
+
+    appendLine: function () {
+        if (arguments.length === 1) {
+            this.append(arguments[0]);
+        }
+
+        return this.append("\r\n");
+    },
+
+    equals: function (sb) {
+        if (sb == null) {
+            return false;
+        }
+
+        if (sb === this) {
+            return true;
+        }
+
+        return this.toString() === sb.toString();
+    },
+
+    remove: function (startIndex, length) {
+        var s = this.buffer.join("");
+
+        this.checkLimits(s, startIndex, length);
+
+        if (s.length === length && startIndex === 0) {
+            // Optimization.  If we are deleting everything
+            return this.clear();
+        }
+
+        if (length > 0) {
+            this.buffer = [];
+            this.buffer[0] = s.substring(0, startIndex);
+            this.buffer[1] = s.substring(startIndex + length, s.length);
+        }
+
+        return this;
+    },
+
+    insert: function (index, value) {
+        if (value == null) {
+            return this;
+        }
+
+        if (arguments.length === 3) {
+            // insert value repeated count times
+            var count = arguments[2];
+
+            if (count === 0) {
+                return this;
+            } else if (count < 0) {
+                throw new Bridge.ArgumentOutOfRangeException("count", "cannot be less than zero");
+            }
+
+            value = Array(count + 1).join(value).toString();
+        }
+
+        var s = this.buffer.join("");
+        this.buffer = [];
+
+        if (index < 1) {
+            this.buffer[0] = value;
+            this.buffer[1] = s;
+        } else if (index >= s.length) {
+            this.buffer[0] = s;
+            this.buffer[1] = value;
+        } else {
+            this.buffer[0] = s.substring(0, index);
+            this.buffer[1] = value;
+            this.buffer[2] = s.substring(index, s.length);
+        }
+
+        return this;
+    },
+
+    replace: function (oldValue, newValue) {
+        var r = new RegExp(oldValue, "g"),
+            s = this.buffer.join("");
+
+        this.buffer = [];
+
+        if (arguments.length === 4) {
+            var startIndex = arguments[2],
+                count = arguments[3],
+                b = s.substr(startIndex, count);
+
+            this.checkLimits(s, startIndex, count);
+
+            this.buffer[0] = s.substring(0, startIndex);
+            this.buffer[1] = b.replace(r, newValue);
+            this.buffer[2] = s.substring(startIndex + count, s.length);
+        } else {
+            this.buffer[0] = s.replace(r, newValue);
+        }
+
+        return this;
+    },
+
+    checkLimits: function (value, startIndex, length) {
+        if (length < 0) {
+            throw new Bridge.ArgumentOutOfRangeException("length", "must be non-negative");
+        }
+
+        if (startIndex < 0) {
+            throw new Bridge.ArgumentOutOfRangeException("startIndex", "startIndex cannot be less than zero");
+        }
+
+        if (length > value.length - startIndex) {
+            throw new Bridge.ArgumentOutOfRangeException("Index and length must refer to a location within the string");
+        }
+    }
+});
+
+// @source Text/Regex.js
+
+(function () {
+    var specials = [
+            // order matters for these
+              "-"
+            , "["
+            , "]"
+            // order doesn't matter for any of these
+            , "/"
+            , "{"
+            , "}"
+            , "("
+            , ")"
+            , "*"
+            , "+"
+            , "?"
+            , "."
+            , "\\"
+            , "^"
+            , "$"
+            , "|"
+    ],
+
+    regex = RegExp("[" + specials.join("\\") + "]", "g"),
+
+    regexpEscape = function (s) {
+        return s.replace(regex, "\\$&");
+    };
+
+    Bridge.regexpEscape = regexpEscape;
+})();
+
+    // @source Array.js
+
+    var array = {
+        toIndex: function (arr, indices) {
+            if (indices.length !== (arr.$s ? arr.$s.length : 1)) {
+                throw new Bridge.ArgumentException("Invalid number of indices");
+            }
+
+            if (indices[0] < 0 || indices[0] >= (arr.$s ? arr.$s[0] : arr.length)) {
+                throw new Bridge.ArgumentException("Index 0 out of range");
+            }
+
+            var idx = indices[0],
+                i;
+
+            if (arr.$s) {
+                for (i = 1; i < arr.$s.length; i++) {
+                    if (indices[i] < 0 || indices[i] >= arr.$s[i]) {
+                        throw new Bridge.ArgumentException("Index " + i + " out of range");
+                    }
+
+                    idx = idx * arr.$s[i] + indices[i];
+                }
+            }
+
+            return idx;
+        },
+
+        $get: function (indices) {
+            var r = this[Bridge.Array.toIndex(this, indices)];
+
+            return typeof r !== "undefined" ? r : this.$v;
+        },
+
+        get: function (arr) {
+            var r = arr[Bridge.Array.toIndex(arr, Array.prototype.slice.call(arguments, 1))];
+
+            return typeof r !== "undefined" ? r : arr.$v;
+        },
+
+        $set: function (indices, value) {
+            this[Bridge.Array.toIndex(this, Array.prototype.slice.call(indices, 0))] = value;
+        },
+
+        set: function (arr, value) {
+            var indices = Array.prototype.slice.call(arguments, 2);
+            arr[Bridge.Array.toIndex(arr, indices)] = value;
+        },
+
+        getLength: function (arr, dimension) {
+            if (dimension >= (arr.$s ? arr.$s.length : 1)) {
+                throw new Bridge.ArgumentException("Invalid dimension");
+            }
+
+            return arr.$s ? arr.$s[dimension] : arr.length;
+        },
+
+        getRank: function (arr) {
+            return arr.$s ? arr.$s.length : 1;
+        },
+
+        getLower: function (arr, d) {
+            return 0;
+        },
+
+        create: function (defvalue, initValues, sizes) {
+            var arr = [],
+                length = arguments.length > 2 ? 1 : 0,
+                i, s, v,
+                idx,
+                indices,
+                flatIdx;
+
+            arr.$v = defvalue;
+            arr.$s = [];
+            arr.get = Bridge.Array.$get;
+            arr.set = Bridge.Array.$set;
+
+            for (i = 2; i < arguments.length; i++) {
+                length *= arguments[i];
+                arr.$s[i - 2] = arguments[i];
+            }
+
+            arr.length = length;
+
+            if (initValues) {
+                for (i = 0; i < arr.length; i++) {
+                    indices = [];
+                    flatIdx = i;
+
+                    for (s = arr.$s.length - 1; s >= 0; s--) {
+                        idx = flatIdx % arr.$s[s];
+                        indices.unshift(idx);
+                        flatIdx = Bridge.Int.div(flatIdx - idx, arr.$s[s]);
+                    }
+
+                    v = initValues;
+
+                    for (idx = 0; idx < indices.length; idx++) {
+                        v = v[indices[idx]];
+                    }
+
+                    arr[i] = v;
+                }
+            }
+
+            return arr;
+        },
+
+        init: function (size, value) {
+            var arr = new Array(size),
+                isFn = Bridge.isFunction(value);
+
+            for (var i = 0; i < size; i++) {
+                arr[i] = isFn ? value() : value;
+            }
+
+            return arr;
+        },
+
+        toEnumerable: function (array) {
+            return new Bridge.ArrayEnumerable(array);
+        },
+
+        toEnumerator: function (array) {
+            return new Bridge.ArrayEnumerator(array);
+        },
+
+        is: function (obj, type) {
+            if (obj instanceof Bridge.ArrayEnumerator) {
+                if ((obj.constructor === type) || (obj instanceof type) ||
+                    type === Bridge.ArrayEnumerator ||
+                    type.$$name && Bridge.String.startsWith(type.$$name, "Bridge.IEnumerator")) {
+                    return true;
+                }
+                return false;
+            }
+
+
+            if (!Bridge.isArray(obj)) {
+                return false;
+            }
+
+            if ((obj.constructor === type) || (obj instanceof type)) {
+                return true;
+            }
+
+            if (type === Bridge.IEnumerable ||
+                type === Bridge.ICollection ||
+                type === Bridge.ICloneable ||
+                type.$$name && Bridge.String.startsWith(type.$$name, "Bridge.IEnumerable$1") ||
+                type.$$name && Bridge.String.startsWith(type.$$name, "Bridge.ICollection$1") ||
+                type.$$name && Bridge.String.startsWith(type.$$name, "Bridge.IList$1")) {
+                return true;
+            }
+
+            return false;
+        },
+
+        clone: function (arr) {
+            if (arr.length === 1) {
+                return [arr[0]];
+            } else {
+                return arr.slice(0);
+            }
+        },
+
+        getCount: function (obj) {
+            if (Bridge.isArray(obj)) {
+                return obj.length;
+            } else if (Bridge.isFunction(obj.getCount)) {
+                return obj.getCount();
+            }
+
+            return 0;
+        },
+
+        add: function (obj, item) {
+            if (Bridge.isArray(obj)) {
+                obj.push(item);
+            } else if (Bridge.isFunction(obj.add)) {
+                obj.add(item);
+            }
+        },
+
+        clear: function (obj) {
+            if (Bridge.isArray(obj)) {
+                obj.length = 0;
+            } else if (Bridge.isFunction(obj.clear)) {
+                obj.clear();
+            }
+        },
+
+        fill: function (dst, val, index, count) {
+            if (index < 0 || count < 0 || (index + count) > dst.length) {
+                throw new Bridge.ArgumentException();
+            }
+
+            var isFn = Bridge.isFunction(val);
+
+            while (--count >= 0) {
+                dst[index + count] = isFn ? val() : val;
+            }
+        },
+
+        copy: function (src, spos, dst, dpos, len) {
+            if (spos < 0 || dpos < 0 || len < 0) {
+                throw new Bridge.ArgumentOutOfRangeException();
+            }
+
+            if (len > (src.length - spos) || len > (dst.length - dpos)) {
+                throw new Bridge.ArgumentException();
+            }
+
+            if (spos < dpos && src === dst) {
+                while (--len >= 0) {
+                    dst[dpos + len] = src[spos + len];
+                }
+            } else {
+                for (var i = 0; i < len; i++) {
+                    dst[dpos + i] = src[spos + i];
+                }
+            }
+        },
+
+        indexOf: function (arr, item) {
+            if (Bridge.isArray(arr)) {
+                var i,
+                    ln,
+                    el;
+
+                for (i = 0, ln = arr.length; i < ln; i++) {
+                    el = arr[i];
+
+                    if (el === item || Bridge.EqualityComparer$1.$default.equals(el, item)) {
+                        return i;
+                    }
+                }
+            } else if (Bridge.isFunction(arr.indexOf)) {
+                return arr.indexOf(item);
+            }
+
+            return -1;
+        },
+
+        contains: function (obj, item) {
+            if (Bridge.isArray(obj)) {
+                return Bridge.Array.indexOf(obj, item) > -1;
+            } else if (Bridge.isFunction(obj.contains)) {
+                return obj.contains(item);
+            }
+
+            return false;
+        },
+
+        remove: function (obj, item) {
+            if (Bridge.isArray(obj)) {
+                var index = Bridge.Array.indexOf(obj, item);
+
+                if (index > -1) {
+                    obj.splice(index, 1);
+
+                    return true;
+                }
+            } else if (Bridge.isFunction(obj.remove)) {
+                return obj.remove(item);
+            }
+
+            return false;
+        },
+
+        insert: function (obj, index, item) {
+            if (Bridge.isArray(obj)) {
+                obj.splice(index, 0, item);
+            } else if (Bridge.isFunction(obj.insert)) {
+                 obj.insert(index, item);
+            }
+        },
+
+        removeAt: function (obj, index) {
+            if (Bridge.isArray(obj)) {
+                obj.splice(index, 1);
+            } else if (Bridge.isFunction(obj.removeAt)) {
+                obj.removeAt(index);
+            }
+        },
+
+        getItem: function (obj, idx) {
+            if (Bridge.isArray(obj)) {
+                return obj[idx];
+            } else if (Bridge.isFunction(obj.get)) {
+                return obj.get(idx);
+            } else if (Bridge.isFunction(obj.getItem)) {
+                return obj.getItem(idx);
+            } else if (Bridge.isFunction(obj.get_Item)) {
+                return obj.get_Item(idx);
+            }
+        },
+
+        setItem: function (obj, idx, value) {
+            if (Bridge.isArray(obj)) {
+                obj[idx] = value;
+            } else if (Bridge.isFunction(obj.set)) {
+                obj.set(idx, value);
+            } else if (Bridge.isFunction(obj.setItem)) {
+                obj.setItem(idx, value);
+            } else if (Bridge.isFunction(obj.set_Item)) {
+                obj.set_Item(idx, value);
+            }
+        },
+
+        resize: function (arr, newSize, val) {
+            if (newSize < 0) {
+                throw new Bridge.ArgumentOutOfRangeException("newSize", null, null, newSize);
+            }
+
+            var oldSize = 0,
+                isFn = Bridge.isFunction(val);
+
+            if (!arr) {
+                arr = new Array(newSize);
+            } else {
+                oldSize = arr.length;
+                arr.length = newSize;
+            }
+
+            for (var i = oldSize; i < newSize; i++) {
+                arr[i] = isFn ? val() : val;
+            }
+        },
+
+        reverse: function (arr, index, length) {
+            if (!array) {
+                throw new Bridge.ArgumentNullException("arr");
+            }
+
+            if (!index && index !== 0) {
+                index = 0;
+                length = arr.length;
+            }
+
+            if (index < 0 || length < 0) {
+                throw new Bridge.ArgumentOutOfRangeException((index < 0 ? "index" : "length"), "Non-negative number required.");
+            }
+
+            if ((array.length - index) < length) {
+                throw new Bridge.ArgumentException("Offset and length were out of bounds for the array or count is greater than the number of elements from index to the end of the source collection.");
+            }
+
+            if (Bridge.Array.getRank(arr) !== 1) {
+                throw new Bridge.Exception("Only single dimension arrays are supported here.");
+            }
+ 
+            var i = index,
+                j = index + length - 1;
+
+            while (i < j) {
+                var temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+                i++;
+                j--;
+            }
+        },
+
+        binarySearch: function (array, index, length,value, comparer) {
+            if (!array) {
+                throw new Bridge.ArgumentNullException("array");
+            }
+            
+            var lb = 0;
+            if (index < lb || length < 0) {
+                throw new Bridge.ArgumentOutOfRangeException(index < lb ? "index" : "length", "Non-negative number required.");
+            }
+
+            if (array.length - (index - lb) < length) {
+                throw new Bridge.ArgumentException("Offset and length were out of bounds for the array or count is greater than the number of elements from index to the end of the source collection.");
+            }
+
+            if (Bridge.Array.getRank(array) !== 1) {
+                throw new Bridge.RankException("Only single dimensional arrays are supported for the requested action.");
+            }
+
+            if (!comparer) {
+                comparer = Bridge.Comparer$1.$default;
+            }
+ 
+            var lo = index,
+                hi = index + length - 1,
+                i,
+                c;
+
+            while (lo <= hi) {
+                i = lo + ((hi - lo) >> 1);
+ 
+                try {
+                    c = comparer.compare(array[i], value);
+                }
+                catch (e) {
+                    throw new Bridge.InvalidOperationException("Failed to compare two elements in the array.", e);
+                }
+
+                if (c === 0) {
+                    return i;
+                }
+
+                if (c < 0) {
+                    lo = i + 1;
+                }
+                else {
+                    hi = i - 1;
+                }
+            }
+
+            return ~lo;
+        },
+
+        sort: function (array, index, length, comparer) {
+            if (!array) {
+                throw new Bridge.ArgumentNullException("array");
+            }
+
+            if (arguments.length === 2 && typeof index === "object") {
+                comparer = index;
+                index = null;
+            }
+
+            if (!Bridge.isNumber(index)) {
+                index = 0;
+            }
+
+            if (!Bridge.isNumber(length)) {
+                length = array.length;
+            }
+
+            if (!comparer) {
+                comparer = Bridge.Comparer$1.$default;
+            }
+
+            if (index === 0 && length === array.length) {
+                array.sort(Bridge.fn.bind(comparer, comparer.compare));
+            } else {
+                var newarray = array.slice(index, index + length);
+                newarray.sort(Bridge.fn.bind(comparer, comparer.compare));
+
+                for (var i = index; i < (index + length); i++) {
+                    array[i] = newarray[i-index];
+                }
+            }
+        }
+    };
+
+    Bridge.Array = array;
+
+    if (!Array.prototype.map) {
+        Array.prototype.map = function (callback, instance) {
+            var length = this.length;
+            var mapped = new Array(length);
+            for (var i = 0; i < length; i++) {
+                if (i in this) {
+                    mapped[i] = callback.call(instance, this[i], i, this);
+                }
+            }
+            return mapped;
+        };
+    }
+        
+    if (!Array.prototype.some) {
+        Array.prototype.some = function (callback, instance) {
+            var length = this.length;
+            for (var i = 0; i < length; i++) {
+                if (i in this && callback.call(instance, this[i], i, this)) {
+                    return true;
+                }
+            }
+            return false;
+        };
+     }
+ 
+    if (!Array.prototype.indexOf) {
+        Array.prototype.indexOf = function (searchElement, fromIndex) {
+            var k;
+
+            if (this == null) {
+                throw new TypeError('"this" is null or not defined');
+            }
+
+            var O = Object(this);
+
+            var len = O.length >>> 0;
+
+            if (len === 0) {
+                return -1;
+            }
+
+            var n = +fromIndex || 0;
+
+            if (Math.abs(n) === Infinity) {
+                n = 0;
+            }
+
+            if (n >= len) {
+                return -1;
+            }
+
+            k = Math.max(n >= 0 ? n : len - Math.abs(n), 0);
+
+            while (k < len) {
+                if (k in O && O[k] === searchElement) {
+                    return k;
+                }
+                k++;
+            }
+            return -1;
+        };
+    }
+// @source /Collections/Interfaces.js
+
+Bridge.define('Bridge.IEnumerable');
+Bridge.define('Bridge.IEnumerator');
+Bridge.define('Bridge.IEqualityComparer');
+Bridge.define('Bridge.ICollection', {
+    inherits: [Bridge.IEnumerable]
+});
+
+Bridge.Class.generic('Bridge.IEnumerator$1', function (T) {
+    var $$name = Bridge.Class.genericName('Bridge.IEnumerator$1', T);
+
+    return Bridge.Class.cache[$$name] || (Bridge.Class.cache[$$name] = Bridge.define($$name, {
+        inherits: [Bridge.IEnumerator]
+    }));
+});
+
+Bridge.Class.generic('Bridge.IEnumerable$1', function (T) {
+    var $$name = Bridge.Class.genericName('Bridge.IEnumerable$1', T);
+
+    return Bridge.Class.cache[$$name] || (Bridge.Class.cache[$$name] = Bridge.define($$name, {
+        inherits: [Bridge.IEnumerable]
+    }));
+});
+
+Bridge.Class.generic('Bridge.ICollection$1', function (T) {
+    var $$name = Bridge.Class.genericName('Bridge.ICollection$1', T);
+
+    return Bridge.Class.cache[$$name] || (Bridge.Class.cache[$$name] = Bridge.define($$name, {
+        inherits: [Bridge.IEnumerable$1(T)]
+    }));
+});
+
+Bridge.Class.generic('Bridge.IEqualityComparer$1', function (T) {
+    var $$name = Bridge.Class.genericName('Bridge.IEqualityComparer$1', T);
+
+    return Bridge.Class.cache[$$name] || (Bridge.Class.cache[$$name] = Bridge.define($$name, {
+    }));
+});
+
+Bridge.Class.generic('Bridge.IDictionary$2', function (TKey, TValue) {
+    var $$name = Bridge.Class.genericName('Bridge.IDictionary$2', TKey, TValue);
+
+    return Bridge.Class.cache[$$name] || (Bridge.Class.cache[$$name] = Bridge.define($$name, {
+        inherits: [Bridge.IEnumerable$1(Bridge.KeyValuePair$2(TKey, TValue))]
+    }));
+});
+
+Bridge.Class.generic('Bridge.IList$1', function (T) {
+    var $$name = Bridge.Class.genericName('Bridge.IList$1', T);
+
+    return Bridge.Class.cache[$$name] || (Bridge.Class.cache[$$name] = Bridge.define($$name, {
+        inherits: [Bridge.ICollection$1(T)]
+    }));
+});
+
+Bridge.Class.generic('Bridge.IComparer$1', function (T) {
+    var $$name = Bridge.Class.genericName('Bridge.IComparer$1', T);
+
+    return Bridge.Class.cache[$$name] || (Bridge.Class.cache[$$name] = Bridge.define($$name, {
+    }));
+});
+
+Bridge.Class.generic('Bridge.ISet$1', function (T) {
+    var $$name = Bridge.Class.genericName('Bridge.ISet$1', T);
+
+    return Bridge.Class.cache[$$name] || (Bridge.Class.cache[$$name] = Bridge.define($$name, {
+        inherits: [Bridge.ICollection$1(T)]
+    }));
+});
+// @source /Collections/CustomEnumerator.js
+
+Bridge.define('Bridge.CustomEnumerator', {
+    inherits: [Bridge.IEnumerator],
+
+    constructor: function (moveNext, getCurrent, reset, dispose, scope) {
+        this.$moveNext = moveNext;
+        this.$getCurrent = getCurrent;
+        this.$dispose = dispose;
+        this.$reset = reset;
+        this.scope = scope;
+    },
+
+    moveNext: function () {
+        try {
+            return this.$moveNext.call(this.scope);
+        }
+        catch (ex) {
+            this.dispose.call(this.scope);
+
+            throw ex;
+        }
+    },
+
+    getCurrent: function () {
+        return this.$getCurrent.call(this.scope);
+    },
+
+    getCurrent$1: function () {
+        return this.$getCurrent.call(this.scope);
+    },
+
+    reset: function () {
+        if (this.$reset) {
+            this.$reset.call(this.scope);
+        }
+    },
+
+    dispose: function () {
+        if (this.$dispose) {
+            this.$dispose.call(this.scope);
+        }
+    }
+});
+
+// @source /Collections/ArrayEnumerator.js
+
+Bridge.define('Bridge.ArrayEnumerator', {
+    inherits: [Bridge.IEnumerator],
+
+    constructor: function (array) {
+        this.array = array;
+        this.reset();
+    },
+    
+    moveNext: function () {
+        this.index++;
+
+        return this.index < this.array.length;
+    },
+
+    getCurrent: function () {
+        return this.array[this.index];
+    },
+
+    getCurrent$1: function () {
+        return this.array[this.index];
+    },
+
+    reset: function () {
+        this.index = -1;
+    },
+
+    dispose: Bridge.emptyFn
+});
+
+Bridge.define('Bridge.ArrayEnumerable', {
+    inherits: [Bridge.IEnumerable],
+    constructor: function (array) {
+        this.array = array;
+    },
+
+    getEnumerator: function () {
+        return new Bridge.ArrayEnumerator(this.array);
+    }
+});
+// @source /Collections/Comparer.js
+
+Bridge.Class.generic('Bridge.EqualityComparer$1', function (T) {
+    var $$name = Bridge.Class.genericName('Bridge.EqualityComparer$1', T);
+
+    return Bridge.Class.cache[$$name] || (Bridge.Class.cache[$$name] = Bridge.define($$name, {
+        inherits: [Bridge.IEqualityComparer$1(T)],
+
+        equals: function (x, y) {
+            if (!Bridge.isDefined(x, true)) {
+                return !Bridge.isDefined(y, true);
+            } else if (Bridge.isDefined(y, true)) {
+                var isBridge = x && x.$$name;
+
+                return (!isBridge || Bridge.isFunction(x.equals)) ? Bridge.equals(x, y) : x === y;
+            }
+
+            return false;
+        },
+
+        getHashCode: function (obj) {
+            return Bridge.isDefined(obj, true) ? Bridge.getHashCode(obj) : 0;
+        }
+    }));
+});
+
+Bridge.EqualityComparer$1.$default = new Bridge.EqualityComparer$1(Object)();
+
+Bridge.Class.generic('Bridge.Comparer$1', function (T) {
+    var $$name = Bridge.Class.genericName('Bridge.Comparer$1', T);
+
+    return Bridge.Class.cache[$$name] || (Bridge.Class.cache[$$name] = Bridge.define($$name, {
+        inherits: [Bridge.IComparer$1(T)],
+
+        constructor: function (fn) {
+            this.fn = fn;
+            this.compare = fn;
+        }
+    }));
+});
+
+Bridge.Comparer$1.$default = new Bridge.Comparer$1(Object)(function (x, y) {
+    if (!Bridge.hasValue(x)) {
+        return !Bridge.hasValue(y) ? 0 : -1;
+    } else if (!Bridge.hasValue(y)) {
+        return 1;
+    }
+
+    return Bridge.compare(x, y);
+});
+// @source /Collections/Dictionary.js
+
+Bridge.Class.generic('Bridge.KeyValuePair$2', function (TKey, TValue) {
+    var $$name = Bridge.Class.genericName('Bridge.KeyValuePair$2', TKey, TValue);
+
+    return Bridge.Class.cache[$$name] || (Bridge.Class.cache[$$name] = Bridge.define($$name, {
+        constructor: function (key, value) {
+            this.key = key;
+            this.value = value;
+        },
+
+        toString: function() {
+            var s = "[";
+            
+            if( this.key != null) {
+                s += this.key.toString();
+            }
+
+            s += ", ";
+            if(this.value != null) {
+                s += this.value.toString();
+            }
+            s += "]";
+            return s;
+        }
+    }));
+});
+
+Bridge.Class.generic('Bridge.Dictionary$2', function (TKey, TValue) {
+    var $$name = Bridge.Class.genericName('Bridge.Dictionary$2', TKey, TValue);
+
+    return Bridge.Class.cache[$$name] || (Bridge.Class.cache[$$name] = Bridge.define($$name, {
+        inherits: [Bridge.IDictionary$2(TKey, TValue)],
+
+        constructor: function (obj, comparer) {
+            this.comparer = comparer || Bridge.EqualityComparer$1.$default;
+            this.clear();
+
+            if (Bridge.is(obj, Bridge.Dictionary$2(TKey, TValue))) {
+                var e = Bridge.getEnumerator(obj),
+                    c;
+
+                while (e.moveNext()) {
+                    c = e.getCurrent();
+                    this.add(c.key, c.value);
+                }
+            } else if (Object.prototype.toString.call(obj) === '[object Object]') {
+                var names = Bridge.getPropertyNames(obj),
+                    name;
+
+                for (var i = 0; i < names.length; i++) {
+                    name = names[i];
+                    this.add(name, obj[name]);
+                }
+            }
+        },
+
+        getKeys: function () {
+            return new Bridge.DictionaryCollection$1(TKey)(this, true);
+        },
+
+        getValues: function () {
+            return new Bridge.DictionaryCollection$1(TValue)(this, false);
+        },
+
+        clear: function () {
+            this.entries = { };
+            this.count = 0;
+        },
+
+        findEntry: function (key) {
+            var hash = this.comparer.getHashCode(key),
+                entries,
+                i;
+
+            if (Bridge.isDefined(this.entries[hash])) {
+                entries = this.entries[hash];
+
+                for (i = 0; i < entries.length; i++) {
+                    if (this.comparer.equals(entries[i].key, key)) {
+                        return entries[i];
+                    }
+                }
+            }
+        },
+
+        containsKey: function (key) {
+            return !!this.findEntry(key);
+        },
+
+        containsValue: function (value) {
+            var e, i;
+
+            for (e in this.entries) {
+                if (this.entries.hasOwnProperty(e)) {
+                    var entries = this.entries[e];
+
+                    for (i = 0; i < entries.length; i++) {
+                        if (this.comparer.equals(entries[i].value, value)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        },
+
+        get: function (key) {
+            var entry = this.findEntry(key);
+
+            if (!entry) {
+                throw new Bridge.KeyNotFoundException('Key ' + key + ' does not exist.');
+            }
+
+            return entry.value;
+        },
+
+        getItem: function (key) {
+            return this.get(key);
+        },
+
+        set: function (key, value, add) {
+            var entry = this.findEntry(key),
+                hash;
+
+            if (entry) {
+                if (add) {
+                    throw new Bridge.ArgumentException('Key ' + key + ' already exists.');
+                }
+
+                entry.value = value;
+                return;
+            }
+
+            hash = this.comparer.getHashCode(key);
+            entry = new Bridge.KeyValuePair$2(TKey, TValue)(key, value);
+
+            if (this.entries[hash]) {
+                this.entries[hash].push(entry);
+            } else {
+                this.entries[hash] = [entry];
+            }
+
+            this.count++;
+        },
+
+        setItem: function (key, value, add) {
+            this.set(key, value, add);
+        },
+
+        add: function (key, value) {
+            this.set(key, value, true);
+        },
+
+        remove: function (key) {
+            var hash = this.comparer.getHashCode(key),
+                entries,
+                i;
+
+            if (!this.entries[hash]) {
+                return false;
+            }
+
+            entries = this.entries[hash];
+
+            for (i = 0; i < entries.length; i++) {
+                if (this.comparer.equals(entries[i].key, key)) {
+                    entries.splice(i, 1);
+
+                    if (entries.length == 0) {
+                        delete this.entries[hash];
+                    }
+
+                    this.count--;
+
+                    return true;
+                }
+            }
+
+            return false;
+        },
+
+        getCount: function () {
+            return this.count;
+        },
+
+        getComparer: function () {
+            return this.comparer;
+        },
+
+        tryGetValue: function (key, value) {
+            var entry = this.findEntry(key);
+
+            value.v = entry ? entry.value : Bridge.getDefaultValue(TValue);
+
+            return !!entry;
+        },
+
+        getCustomEnumerator: function (fn) {
+            var hashes = Bridge.getPropertyNames(this.entries),
+                hashIndex = -1,
+                keyIndex;
+
+            return new Bridge.CustomEnumerator(function () {
+                if (hashIndex < 0 || keyIndex >= (this.entries[hashes[hashIndex]].length - 1)) {
+                    keyIndex = -1;
+                    hashIndex++;
+                }
+
+                if (hashIndex >= hashes.length) {
+                    return false;
+                }
+
+                keyIndex++;
+
+                return true;
+            }, function () {
+                return fn(this.entries[hashes[hashIndex]][keyIndex]);
+            }, function () {
+                hashIndex = -1;
+            }, null, this);
+        },
+
+        getEnumerator: function () {
+            return this.getCustomEnumerator(function (e) {
+                 return e;
+            });
+        }
+    }));
+});
+
+Bridge.Class.generic('Bridge.DictionaryCollection$1', function (T) {
+    var $$name = Bridge.Class.genericName('Bridge.DictionaryCollection$1', T);
+
+    return Bridge.Class.cache[$$name] || (Bridge.Class.cache[$$name] = Bridge.define($$name, {
+        inherits: [Bridge.ICollection$1(T)],
+
+        constructor: function (dictionary, keys) {
+            this.dictionary = dictionary;
+            this.keys = keys;
+        },
+
+        getCount: function () {
+            return this.dictionary.getCount();
+        },
+
+        getEnumerator: function () {
+            return this.dictionary.getCustomEnumerator(this.keys ? function (e) {
+                return e.key;
+            } : function (e) {
+                return e.value;
+            });
+        },
+
+        contains: function (value) {
+            return this.keys ? this.dictionary.containsKey(value) : this.dictionary.containsValue(value);
+        },
+
+        add: function (v) {
+            throw new Bridge.NotSupportedException();
+        },
+
+        clear: function () {
+            throw new Bridge.NotSupportedException();
+        },
+
+        remove: function () {
+            throw new Bridge.NotSupportedException();
+        }
+    }));
+});
+
+// @source /Collections/List.js
+
+Bridge.Class.generic('Bridge.List$1', function (T) {
+    var $$name = Bridge.Class.genericName('Bridge.List$1', T);
+
+    return Bridge.Class.cache[$$name] || (Bridge.Class.cache[$$name] = Bridge.define($$name, {
+        inherits: [Bridge.ICollection$1(T), Bridge.ICollection, Bridge.IList$1(T)],
+        constructor: function (obj) {
+            if (Object.prototype.toString.call(obj) === '[object Array]') {
+                this.items = Bridge.Array.clone(obj);
+            } else if (Bridge.is(obj, Bridge.IEnumerable)) {
+                this.items = Bridge.toArray(obj);
+            } else {
+                this.items = [];
+            }
+        },
+
+        checkIndex: function (index) {
+            if (index < 0 || index > (this.items.length - 1)) {
+                throw new Bridge.ArgumentOutOfRangeException('Index out of range');
+            }
+        },
+
+        getCount: function () {
+            return this.items.length;
+        },
+
+        get: function (index) {
+            this.checkIndex(index);
+
+            return this.items[index];
+        },
+
+        getItem: function (index) {
+            return this.get(index);
+        },
+
+        set: function (index, value) {
+            this.checkReadOnly();
+            this.checkIndex(index);
+            this.items[index] = value;
+        },
+
+        setItem: function (index, value) {
+            this.set(index, value);
+        },
+
+        add: function (value) {
+            this.checkReadOnly();
+            this.items.push(value);
+        },
+
+        addRange: function (items) {
+            this.checkReadOnly();
+
+            var array = Bridge.toArray(items),
+                i,
+                len;
+
+            for (i = 0, len = array.length; i < len; ++i) {
+                this.items.push(array[i]);
+            }
+        },
+
+        clear: function () {
+            this.checkReadOnly();
+            this.items = [];
+        },
+
+        indexOf: function (item, startIndex) {
+            var i, el;
+
+            if (!Bridge.isDefined(startIndex)) {
+                startIndex = 0;
+            }
+
+            if (startIndex !== 0) {
+                this.checkIndex(startIndex);
+            }
+
+            for (i = startIndex; i < this.items.length; i++) {
+                el = this.items[i];
+
+                if (el === item || Bridge.EqualityComparer$1.$default.equals(el, item)) {
+                    return i;
+                }
+            }
+
+            return -1;
+        },
+
+        insertRange: function (index, items) {
+            this.checkReadOnly();
+
+            if (index !== this.items.length) {
+                this.checkIndex(index);
+            }
+
+            var array = Bridge.toArray(items);
+
+            for (var i = 0; i < array.length; i++) {
+                this.insert(index++, array[i]);
+            }
+        },
+
+        contains: function (item) {
+            return this.indexOf(item) > -1;
+        },
+
+        getEnumerator: function () {
+            return new Bridge.ArrayEnumerator(this.items);
+        },
+
+        getRange: function (index, count) {
+            if (!Bridge.isDefined(index)) {
+                index = 0;
+            }
+
+            if (!Bridge.isDefined(count)) {
+                count = this.items.length;
+            }
+
+            if (index !== 0) {
+                this.checkIndex(index);
+            }
+
+            this.checkIndex(index + count - 1);
+
+            var result = [],
+                i,
+				maxIndex = index + count;
+				
+            for (i = index; i < maxIndex; i++) {
+                result.push(this.items[i]);
+            }
+
+            return new Bridge.List$1(T)(result);
+        },
+
+        insert: function (index, item) {
+            this.checkReadOnly();
+
+            if (index !== this.items.length) {
+                this.checkIndex(index);
+            }
+
+            if (Bridge.isArray(item)) {
+                for (var i = 0; i < item.length; i++) {
+                    this.insert(index++, item[i]);
+                }
+            } else {
+                this.items.splice(index, 0, item);
+            }
+        },
+
+        join: function (delimeter) {
+            return this.items.join(delimeter);
+        },
+
+        lastIndexOf: function (item, fromIndex) {
+            if (!Bridge.isDefined(fromIndex)) {
+                fromIndex = this.items.length - 1;
+            }
+
+            if (fromIndex !== 0) {
+                this.checkIndex(fromIndex);
+            }
+
+            for (var i = fromIndex; i >= 0; i--) {
+                if (item === this.items[i]) {
+                    return i;
+                }
+            }
+
+            return -1;
+        },
+
+        remove: function (item) {
+            this.checkReadOnly();
+
+            var index = this.indexOf(item);
+
+            if (index < 0) {
+                return false;
+            }
+
+            this.checkIndex(index);
+            this.items.splice(index, 1);
+            return true;
+        },
+
+        removeAt: function (index) {
+            this.checkReadOnly();
+            this.checkIndex(index);
+            this.items.splice(index, 1);
+        },
+
+        removeRange: function (index, count) {
+            this.checkReadOnly();
+            this.checkIndex(index);
+            this.items.splice(index, count);
+        },
+
+        reverse: function () {
+            this.checkReadOnly();
+            this.items.reverse();
+        },
+
+        slice: function (start, end) {
+            this.checkReadOnly();
+
+            return new Bridge.List$1(this.$$name.substr(this.$$name.lastIndexOf('$')+1))(this.items.slice(start, end));
+        },
+
+        sort: function (comparison) {
+            this.checkReadOnly();
+            this.items.sort(comparison || Bridge.Comparer$1.$default.compare);
+        },
+
+        splice: function (start, count, items) {
+            this.checkReadOnly();
+            this.items.splice(start, count, items);
+        },
+
+        unshift: function () {
+            this.checkReadOnly();
+            this.items.unshift();
+        },
+
+        toArray: function () {
+            return Bridge.toArray(this);
+        },
+
+        checkReadOnly: function () {
+            if (this.readOnly) {
+                throw new Bridge.NotSupportedException();
+            }
+        },
+
+        binarySearch: function (index, length, value, comparer) {
+            if (arguments.length === 1) {
+                value = index;
+                index = null;
+            }
+
+            if (arguments.length === 2) {
+                value = index;
+                comparer = length;
+                index = null;
+                length = null;
+            }
+
+            if (!Bridge.isNumber(index)) {
+                index = 0;
+            }
+
+            if (!Bridge.isNumber(length)) {
+                length = this.items.length;
+            }
+
+            if (!comparer) {
+                comparer = Bridge.Comparer$1.$default;
+            }
+
+            return Bridge.Array.binarySearch(this.items, index, length, value, comparer);
+        }
+    }));
+});
+
+Bridge.Class.generic('Bridge.ReadOnlyCollection$1', function (T) {
+    var $$name = Bridge.Class.genericName('Bridge.ReadOnlyCollection$1', T);
+
+    return Bridge.Class.cache[$$name] || (Bridge.Class.cache[$$name] = Bridge.define($$name, {
+        inherits: [Bridge.List$1(T)],
+        constructor: function (list) {
+            if (list == null) {
+                throw new Bridge.ArgumentNullException("list");
+            }
+
+            Bridge.ReadOnlyCollection$1.prototype.$constructor.call(this, list);
+            this.readOnly = true;
+        }
+    }));
+});
+
+    // @source Task.js
+
+    Bridge.define("Bridge.Task", {
+        constructor: function (action, state) {
+            this.action = action;
+            this.state = state;
+            this.error = null;
+            this.status = Bridge.TaskStatus.created;
+            this.callbacks = [];
+            this.result = null;
+        },
+
+        statics: {
+            delay: function (delay, state) {
+                var task = new Bridge.Task();
+
+                setTimeout(function () {
+                    task.setResult(state);
+                }, delay);
+
+                return task;
+            },
+
+            fromResult: function (result) {
+                var t = new Bridge.Task();
+
+                t.status = Bridge.TaskStatus.ranToCompletion;
+                t.result = result;
+
+                return t;
+            },
+
+            run: function (fn) {
+                var task = new Bridge.Task();
+
+                setTimeout(function () {
+                    try {
+                        task.setResult(fn());
+                    } catch (e) {
+                        task.setError(e);
+                    }
+                }, 0);
+
+                return task;
+            },
+
+            whenAll: function (tasks) {
+                var task = new Bridge.Task(),
+                    result,
+                    executing = tasks.length,
+                    cancelled = false,
+                    errors = [],
+                    i;
+
+                if (Bridge.is(tasks, Bridge.IEnumerable)) {
+                    tasks = Bridge.toArray(tasks);
+                }
+                else if (!Bridge.isArray(tasks)) {
+                    tasks = Array.prototype.slice.call(arguments, 0);
+                }
+
+                if (tasks.length === 0) {
+                    task.setResult([]);
+
+                    return task;
+                }
+
+                result = new Array(tasks.length);
+
+                for (i = 0; i < tasks.length; i++) {
+                    tasks[i].$index = i;
+                    tasks[i].continueWith(function (t) {
+                        switch (t.status) {
+                            case Bridge.TaskStatus.ranToCompletion:
+                                result[t.$index] = t.getResult();
+                                break;
+                            case Bridge.TaskStatus.canceled:
+                                cancelled = true;
+                                break;
+                            case Bridge.TaskStatus.faulted:
+                                errors.push(t.error);
+                                break;
+                            default:
+                                throw new Bridge.InvalidOperationException("Invalid task status: " + t.status);
+                        }
+
+                        executing--;
+
+                        if (!executing) {
+                            if (errors.length > 0) {
+                                task.setError(errors);
+                            } else if (cancelled) {
+                                task.setCanceled();
+                            } else {
+                                task.setResult(result);
+                            }
+                        }
+                    });
+                }
+
+                return task;
+            },
+
+            whenAny: function (tasks) {
+                if (Bridge.is(tasks, Bridge.IEnumerable)) {
+                    tasks = Bridge.toArray(tasks);
+                }
+                else if (!Bridge.isArray(tasks)) {
+                    tasks = Array.prototype.slice.call(arguments, 0);
+                }
+
+                if (!tasks.length) {
+                    throw new Bridge.ArgumentException("At least one task is required");
+                }
+
+                var task = new Bridge.Task(),
+                    i;
+
+                for (i = 0; i < tasks.length; i++) {
+                    tasks[i].continueWith(function (t) {
+                        switch (t.status) {
+                            case Bridge.TaskStatus.ranToCompletion:
+                                task.complete(t);
+                                break;
+                            case Bridge.TaskStatus.canceled:
+                                task.cancel();
+                                break;
+                            case Bridge.TaskStatus.faulted:
+                                task.fail(t.error);
+                                break;
+                            default:
+                                throw new Bridge.InvalidOperationException("Invalid task status: " + t.status);
+                        }
+                    });
+                }
+
+                return task;
+            },
+
+            fromCallback: function (target, method) {
+                var task = new Bridge.Task(),
+                    args = Array.prototype.slice.call(arguments, 2),
+                    callback;
+
+                callback = function (value) {
+                    task.setResult(value);
+                };
+
+                args.push(callback);
+
+                target[method].apply(target, args);
+
+                return task;
+            },
+
+            fromCallbackResult: function (target, method, resultHandler) {
+                var task = new Bridge.Task(),
+                    args = Array.prototype.slice.call(arguments, 3),
+                    callback;
+
+                callback = function (value) {
+                    task.setResult(value);
+                };
+
+                resultHandler(args, callback);
+
+                target[method].apply(target, args);
+
+                return task;
+            },
+
+            fromCallbackOptions: function (target, method, name) {
+                var task = new Bridge.Task(),
+                    args = Array.prototype.slice.call(arguments, 3),
+                    callback;
+
+                callback = function (value) {
+                    task.setResult(value);
+                };
+
+                args[0] = args[0] || { };
+                args[0][name] = callback;
+
+                target[method].apply(target, args);
+
+                return task;
+            },
+
+            fromPromise: function (promise, handler, errorHandler) {
+                var task = new Bridge.Task();
+
+                if (!promise.then) {
+                    promise = promise.promise();
+                }
+
+                promise.then(function () {
+                    task.setResult(handler ? handler.apply(null, arguments) : arguments);
+                }, function () {
+                    task.setError(errorHandler ? errorHandler.apply(null, arguments) : new Error(Array.prototype.slice.call(arguments, 0)));
+                });
+
+                return task;
+            }
+        },
+
+        continueWith: function (continuationAction, raise) {
+            var task = new Bridge.Task(),
+                me = this,
+                fn = raise ? function () {
+                    task.setResult(continuationAction(me));
+                } : function () {
+                    try {
+                        task.setResult(continuationAction(me));
+                    }
+                    catch (e) {
+                        task.setError(e);
+                    }
+                };
+
+            if (this.isCompleted()) {
+                setTimeout(fn, 0);
+            } else {
+                this.callbacks.push(fn);
+            }
+
+            return task;
+        },
+
+        start: function () {
+            if (this.status !== Bridge.TaskStatus.created) {
+                throw new Error("Task was already started.");
+            }
+
+            var me = this;
+
+            this.status = Bridge.TaskStatus.running;
+
+            setTimeout(function () {
+                try {
+                    var result = me.action(me.state);
+                    delete me.action;
+                    delete me.state;
+                    me.complete(result);
+                } catch (e) {
+                    me.fail(e);
+                }
+            }, 0);
+        },
+
+        runCallbacks: function () {
+            var me = this;
+
+            setTimeout(function () {
+                for (var i = 0; i < me.callbacks.length; i++) {
+                    me.callbacks[i](me);
+                }
+
+                delete me.callbacks;
+            }, 0);
+        },
+
+        complete: function (result) {
+            if (this.isCompleted()) {
+                return false;
+            }
+
+            this.result = result;
+            this.status = Bridge.TaskStatus.ranToCompletion;
+            this.runCallbacks();
+
+            return true;
+        },
+
+        fail: function (error) {
+            if (this.isCompleted()) {
+                return false;
+            }
+
+            this.error = error;
+            this.status = Bridge.TaskStatus.faulted;
+            this.runCallbacks();
+
+            return true;
+        },
+
+        cancel: function () {
+            if (this.isCompleted()) {
+                return false;
+            }
+
+            this.status = Bridge.TaskStatus.canceled;
+            this.runCallbacks();
+
+            return true;
+        },
+
+        isCanceled: function () {
+            return this.status === Bridge.TaskStatus.canceled;
+        },
+
+        isCompleted: function () {
+            return this.status === Bridge.TaskStatus.ranToCompletion || this.status === Bridge.TaskStatus.canceled || this.status === Bridge.TaskStatus.faulted;
+        },
+
+        isFaulted: function () {
+            return this.status === Bridge.TaskStatus.faulted;
+        },
+
+        getResult: function () {
+            switch (this.status) {
+                case Bridge.TaskStatus.ranToCompletion:
+                    return this.result;
+                case Bridge.TaskStatus.canceled:
+                    throw new Error("Task was cancelled.");
+                case Bridge.TaskStatus.faulted:
+                    throw this.error;
+                default:
+                    throw new Error("Task is not yet completed.");
+            }
+        },
+
+        setCanceled: function () {
+            if (!this.cancel()) {
+                throw new Error("Task was already completed.");
+            }
+        },
+
+        setResult: function (result) {
+            if (!this.complete(result)) {
+                throw new Error("Task was already completed.");
+            }
+        },
+
+        setError: function (error) {
+            if (!this.fail(error)) {
+                throw new Error("Task was already completed.");
+            }
+        },
+
+        dispose: function () {
+        },
+
+        getAwaiter: function () {
+            return this;
+        }
+    });
+
+    Bridge.define("Bridge.TaskStatus", {
+        $statics: {
+            created: 0,
+            waitingForActivation: 1,
+            waitingToRun: 2,
+            running: 3,
+            waitingForChildrenToComplete: 4,
+            ranToCompletion: 5,
+            canceled: 6,
+            faulted: 7
+        }
+    });
+
+    // @source Validation.js
+
+    var validation = {
+        isNull: function (value) {
+            return !Bridge.isDefined(value, true);
+        },
+
+        isEmpty: function (value) {
+            return value == null || value.length === 0 || Bridge.is(value, Bridge.ICollection) ? value.getCount() === 0 : false;
+        },
+
+        isNotEmptyOrWhitespace: function (value) {
+            return Bridge.isDefined(value, true) && !(/^$|\s+/.test(value));
+        },
+
+        isNotNull: function (value) {
+            return Bridge.isDefined(value, true);
+        },
+
+        isNotEmpty: function (value) {
+            return !Bridge.Validation.isEmpty(value);
+        },
+
+        email: function (value) {
+            var re = /^(")?(?:[^\."])(?:(?:[\.])?(?:[\w\-!#$%&'*+/=?^_`{|}~]))*\1@(\w[\-\w]*\.){1,5}([A-Za-z]){2,6}$/;
+
+            return re.test(value);
+        },
+
+        url: function (value) {
+            var re = /(((^https?)|(^ftp)):\/\/((([\-\w]+\.)+\w{2,3}(\/[%\-\w]+(\.\w{2,})?)*(([\w\-\.\?\\\/+@&#;`~=%!]*)(\.\w{2,})?)*)|(localhost|LOCALHOST))\/?)/i;
+
+            return re.test(value);
+        },
+
+        alpha: function (value) {
+            var re = /^[a-zA-Z_]+$/;
+
+            return re.test(value);
+        },
+
+        alphaNum: function (value) {
+            var re = /^[a-zA-Z_]+$/;
+
+            return re.test(value);
+        },
+
+        creditCard: function (value, type) {
+            var re,
+                checksum,
+                i,
+                digit;
+
+            if (type === "Visa") {
+                // Visa: length 16, prefix 4, dashes optional.
+                re = /^4\d{3}-?\d{4}-?\d{4}-?\d{4}$/;
+            } else if (type === "MasterCard") {
+                // Mastercard: length 16, prefix 51-55, dashes optional.
+                re = /^5[1-5]\d{2}-?\d{4}-?\d{4}-?\d{4}$/;
+            } else if (type === "Discover") {
+                // Discover: length 16, prefix 6011, dashes optional.
+                re = /^6011-?\d{4}-?\d{4}-?\d{4}$/;
+            } else if (type === "AmericanExpress") {
+                // American Express: length 15, prefix 34 or 37.
+                re = /^3[4,7]\d{13}$/;
+            } else if (type === "DinersClub") {
+                // Diners: length 14, prefix 30, 36, or 38.
+                re = /^3[0,6,8]\d{12}$/;
+            } else {
+                // Basing min and max length on
+                // http://developer.ean.com/general_info/Valid_Credit_Card_Types
+                if (!value || value.length < 13 || value.length > 19) {
+                    return false;
+                }
+
+                re = /[^0-9 \-]+/;
+            }
+
+            if (!re.test(value)) {
+                return false;
+            }
+
+            // Remove all dashes for the checksum checks to eliminate negative numbers
+            value = value.split("-").join("");
+
+            // Checksum ("Mod 10")
+            // Add even digits in even length strings or odd digits in odd length strings.
+            checksum = 0;
+
+            for (i = (2 - (value.length % 2)) ; i <= value.length; i += 2) {
+                checksum += parseInt(value.charAt(i - 1));
+            }
+
+            // Analyze odd digits in even length strings or even digits in odd length strings.
+            for (i = (value.length % 2) + 1; i < value.length; i += 2) {
+                digit = parseInt(value.charAt(i - 1)) * 2;
+
+                if (digit < 10) {
+                    checksum += digit;
+                } else {
+                    checksum += (digit - 9);
+                }
+            }
+
+            return (checksum % 10) === 0;
+        }
+    };
+
+    Bridge.Validation = validation;
+
+    // @source Version.js
+
+    Bridge.define("Bridge.Version", {
+        inherits: function() {
+            return [Bridge.ICloneable, Bridge.IComparable$1(Bridge.Version), Bridge.IEquatable$1(Bridge.Version)];
+        },
+
+        statics: {
+            separatorsArray: ".",
+
+            config: {
+                init: function() {
+                    this.ZERO_CHAR_VALUE = Bridge.cast(48, Bridge.Int);
+                }
+            },
+
+            appendPositiveNumber: function(num, sb) {
+                var index = sb.getLength();
+                var reminder;
+
+                do {
+                    reminder = num % 10;
+                    num = Bridge.Int.div(num, 10);
+                    sb.insert(index, String.fromCharCode(Bridge.cast((Bridge.Version.ZERO_CHAR_VALUE + reminder), Bridge.Int)));
+                } while (num > 0);
+            },
+
+            parse: function(input) {
+                if (input === null) {
+                    throw new Bridge.ArgumentNullException("input");
+                }
+
+                var r = { v: new Bridge.Version.VersionResult() };
+
+                r.v.init("input", true);
+
+                if (!Bridge.Version.tryParseVersion(input, r)) {
+                    throw r.v.getVersionParseException();
+                }
+
+                return r.v.m_parsedVersion;
+            },
+
+            tryParse: function(input, result) {
+                var r = { v: new Bridge.Version.VersionResult() };
+
+                r.v.init("input", false);
+
+                var b = Bridge.Version.tryParseVersion(input, r);
+
+                result.v = r.v.m_parsedVersion;
+
+                return b;
+            },
+
+            tryParseVersion: function(version, result) {
+                var major = {}, minor = {}, build = {}, revision = {};
+
+                if (version === null) {
+                    result.v.setFailure(Bridge.Version.ParseFailureKind.argumentNullException);
+                    return false;
+                }
+
+                var parsedComponents = version.split(Bridge.Version.separatorsArray);
+                var parsedComponentsLength = parsedComponents.length;
+
+                if ((parsedComponentsLength < 2) || (parsedComponentsLength > 4)) {
+                    result.v.setFailure(Bridge.Version.ParseFailureKind.argumentException);
+
+                    return false;
+                }
+
+                if (!Bridge.Version.tryParseComponent(parsedComponents[0], "version", result, major)) {
+                    return false;
+                }
+
+                if (!Bridge.Version.tryParseComponent(parsedComponents[1], "version", result, minor)) {
+                    return false;
+                }
+
+                parsedComponentsLength -= 2;
+
+                if (parsedComponentsLength > 0) {
+                    if (!Bridge.Version.tryParseComponent(parsedComponents[2], "build", result, build)) {
+                        return false;
+                    }
+
+                    parsedComponentsLength--;
+
+                    if (parsedComponentsLength > 0) {
+                        if (!Bridge.Version.tryParseComponent(parsedComponents[3], "revision", result, revision)) {
+                            return false;
+                        } else {
+                            result.v.m_parsedVersion = new Bridge.Version("constructor$3", major.v, minor.v, build.v, revision.v);
+                        }
+                    } else {
+                        result.v.m_parsedVersion = new Bridge.Version("constructor$2", major.v, minor.v, build.v);
+                    }
+                } else {
+                    result.v.m_parsedVersion = new Bridge.Version("constructor$1", major.v, minor.v);
+                }
+
+                return true;
+            },
+
+            tryParseComponent: function(component, componentName, result, parsedComponent) {
+                if (!Bridge.Int.tryParseInt(component, parsedComponent, -2147483648, 2147483647)) {
+                    result.v.setFailure$1(Bridge.Version.ParseFailureKind.formatException, component);
+
+                    return false;
+                }
+
+                if (parsedComponent.v < 0) {
+                    result.v.setFailure$1(Bridge.Version.ParseFailureKind.argumentOutOfRangeException, componentName);
+
+                    return false;
+                }
+
+                return true;
+            },
+
+            op_Equality: function(v1, v2) {
+                if (v1 === null) {
+                    return v2 === null;
+                }
+
+                return v1.equals(v2);
+            },
+
+            op_Inequality: function(v1, v2) {
+                return !(Bridge.Version.op_Equality(v1, v2));
+            },
+
+            op_LessThan: function(v1, v2) {
+                if (v1 === null && v2 === null) {
+                    return false;
+                }
+
+                if (v2 === null) {
+                    return (v1.compareTo(v2) < 0);
+                }
+
+                return (v2.compareTo(v1) > 0);
+            },
+
+            op_LessThanOrEqual: function(v1, v2) {
+                if (v1 === null && v2 === null) {
+                    return false;
+                }
+
+                if (v2 === null) {
+                    return (v1.compareTo(v2) <= 0);
+                }
+
+                return (v2.compareTo(v1) >= 0);
+            },
+
+            op_GreaterThan: function(v1, v2) {
+                return (Bridge.Version.op_LessThan(v2, v1));
+            },
+
+            op_GreaterThanOrEqual: function(v1, v2) {
+                return (Bridge.Version.op_LessThanOrEqual(v2, v1));
+            }
+        },
+
+        _Major: 0,
+        _Minor: 0,
+
+        config: {
+            init: function() {
+                this._Build = -1;
+                this._Revision = -1;
+            }
+        },
+
+        constructor$3: function(major, minor, build, revision) {
+            if (major < 0) {
+                throw new Bridge.ArgumentOutOfRangeException("major", "Cannot be < 0");
+            }
+
+            if (minor < 0) {
+                throw new Bridge.ArgumentOutOfRangeException("minor", "Cannot be < 0");
+            }
+
+            if (build < 0) {
+                throw new Bridge.ArgumentOutOfRangeException("build", "Cannot be < 0");
+            }
+
+            if (revision < 0) {
+                throw new Bridge.ArgumentOutOfRangeException("revision", "Cannot be < 0");
+            }
+
+            this._Major = major;
+            this._Minor = minor;
+            this._Build = build;
+            this._Revision = revision;
+        },
+
+        constructor$2: function(major, minor, build) {
+            if (major < 0) {
+                throw new Bridge.ArgumentOutOfRangeException("major", "Cannot be < 0");
+            }
+
+            if (minor < 0) {
+                throw new Bridge.ArgumentOutOfRangeException("minor", "Cannot be < 0");
+            }
+
+            if (build < 0) {
+                throw new Bridge.ArgumentOutOfRangeException("build", "Cannot be < 0");
+            }
+
+            this._Major = major;
+            this._Minor = minor;
+            this._Build = build;
+        },
+
+        constructor$1: function(major, minor) {
+            if (major < 0) {
+                throw new Bridge.ArgumentOutOfRangeException("major", "Cannot be < 0");
+            }
+
+            if (minor < 0) {
+                throw new Bridge.ArgumentOutOfRangeException("minor", "Cannot be < 0");
+            }
+
+            this._Major = major;
+            this._Minor = minor;
+        },
+
+        constructor$4: function(version) {
+            var v = Bridge.Version.parse(version);
+
+            this._Major = v.getMajor();
+            this._Minor = v.getMinor();
+            this._Build = v.getBuild();
+            this._Revision = v.getRevision();
+        },
+
+        constructor: function() {
+            this._Major = 0;
+            this._Minor = 0;
+        },
+
+        getMajor: function() {
+            return this._Major;
+        },
+
+        getMinor: function() {
+            return this._Minor;
+        },
+
+        getBuild: function() {
+            return this._Build;
+        },
+
+        getRevision: function() {
+            return this._Revision;
+        },
+
+        getMajorRevision: function() {
+            return this._Revision >> 16;
+        },
+
+        getMinorRevision: function() {
+            var n = this._Revision & 65535;
+
+            if (n > 32767) {
+                n = -((n & 32767) ^ 32767) - 1;
+            }
+
+            return n;
+        },
+
+        clone: function() {
+            var v = new Bridge.Version("constructor");
+
+            v._Major = this._Major;
+            v._Minor = this._Minor;
+            v._Build = this._Build;
+            v._Revision = this._Revision;
+
+            return (v);
+        },
+
+        compareInternal: function(v) {
+            if (this._Major !== v._Major) {
+                if (this._Major > v._Major) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
+
+            if (this._Minor !== v._Minor) {
+                if (this._Minor > v._Minor) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
+
+            if (this._Build !== v._Build) {
+                if (this._Build > v._Build) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
+
+            if (this._Revision !== v._Revision) {
+                if (this._Revision > v._Revision) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
+
+            return 0;
+        },
+
+        compareTo$1: function(version) {
+            if (version === null) {
+                return 1;
+            }
+
+            var v = Bridge.as(version, Bridge.Version);
+
+            if (v === null) {
+                throw new Bridge.ArgumentException("version should be of Bridge.Version type");
+            }
+
+            return this.compareInternal(v);
+        },
+
+        compareTo: function(value) {
+            if (value === null) {
+                return 1;
+            }
+
+            return this.compareInternal(value);
+        },
+        equals$1: function (obj) {
+            var v = Bridge.as(obj, Bridge.Version);
+
+            if (v === null) {
+                return false;
+            }
+
+            // check that major, minor, build & revision numbers match
+            if ((this._Major !== v._Major) || (this._Minor !== v._Minor) || (this._Build !== v._Build) || (this._Revision !== v._Revision)) {
+                return false;
+            }
+
+            return true;
+        },
+        equals: function(v) {
+            return this.equals$1(v);
+        },
+        getHashCode: function () {
+            // Let's assume that most version numbers will be pretty small and just OR some lower order bits together.
+            var accumulator = 0;
+
+            accumulator |= (this._Major & 15) << 28;
+            accumulator |= (this._Minor & 255) << 20;
+            accumulator |= (this._Build & 255) << 12;
+            accumulator |= (this._Revision & 4095);
+
+            return accumulator;
+        },
+        toString: function () {
+            if (this._Build === -1) {
+                return (this.toString$1(2));
+            }
+
+            if (this._Revision === -1) {
+                return (this.toString$1(3));
+            }
+
+            return (this.toString$1(4));
+        },
+        toString$1: function (fieldCount) {
+            var sb;
+
+            switch (fieldCount) {
+                case 0:
+                    return ("");
+                case 1:
+                    return (this._Major.toString());
+                case 2:
+                    sb = new Bridge.Text.StringBuilder();
+                    Bridge.Version.appendPositiveNumber(this._Major, sb);
+                    sb.append(String.fromCharCode(46));
+                    Bridge.Version.appendPositiveNumber(this._Minor, sb);
+
+                    return sb.toString();
+                default:
+                    if (this._Build === -1) {
+                        throw new Bridge.ArgumentException("Build should be > 0 if fieldCount > 2", "fieldCount");
+                    }
+
+                    if (fieldCount === 3) {
+                        sb = new Bridge.Text.StringBuilder();
+                        Bridge.Version.appendPositiveNumber(this._Major, sb);
+                        sb.append(String.fromCharCode(46));
+                        Bridge.Version.appendPositiveNumber(this._Minor, sb);
+                        sb.append(String.fromCharCode(46));
+                        Bridge.Version.appendPositiveNumber(this._Build, sb);
+
+                        return sb.toString();
+                    }
+
+                    if (this._Revision === -1) {
+                        throw new Bridge.ArgumentException("Revision should be > 0 if fieldCount > 3", "fieldCount");
+                    }
+
+                    if (fieldCount === 4) {
+                        sb = new Bridge.Text.StringBuilder();
+                        Bridge.Version.appendPositiveNumber(this._Major, sb);
+                        sb.append(String.fromCharCode(46));
+                        Bridge.Version.appendPositiveNumber(this._Minor, sb);
+                        sb.append(String.fromCharCode(46));
+                        Bridge.Version.appendPositiveNumber(this._Build, sb);
+                        sb.append(String.fromCharCode(46));
+                        Bridge.Version.appendPositiveNumber(this._Revision, sb);
+
+                        return sb.toString();
+                    }
+
+                    throw new Bridge.ArgumentException("Should be < 5", "fieldCount");
+            }
+        }
+    });
+
+    Bridge.define("Bridge.Version.ParseFailureKind", {
+        statics: {
+            argumentNullException: 0,
+            argumentException: 1,
+            argumentOutOfRangeException: 2,
+            formatException: 3
+        }
+    });
+
+    Bridge.define("Bridge.Version.VersionResult", {
+        m_parsedVersion: null,
+        m_failure: 0,
+        m_exceptionArgument: null,
+        m_argumentName: null,
+        m_canThrow: false,
+        constructor: function () {
+        },
+
+        init: function (argumentName, canThrow) {
+            this.m_canThrow = canThrow;
+            this.m_argumentName = argumentName;
+        },
+
+        setFailure: function (failure) {
+            this.setFailure$1(failure, "");
+        },
+
+        setFailure$1: function (failure, argument) {
+            this.m_failure = failure;
+            this.m_exceptionArgument = argument;
+
+            if (this.m_canThrow) {
+                throw this.getVersionParseException();
+            }
+        },
+
+        getVersionParseException: function () {
+            switch (this.m_failure) {
+                case Bridge.Version.ParseFailureKind.argumentNullException:
+                    return new Bridge.ArgumentNullException(this.m_argumentName);
+                case Bridge.Version.ParseFailureKind.argumentException:
+                    return new Bridge.ArgumentException("VersionString");
+                case Bridge.Version.ParseFailureKind.argumentOutOfRangeException:
+                    return new Bridge.ArgumentOutOfRangeException(this.m_exceptionArgument, "Cannot be < 0");
+                case Bridge.Version.ParseFailureKind.formatException:
+                    try {
+                        Bridge.Int.parseInt(this.m_exceptionArgument, -2147483648, 2147483647);
+                    }
+                    catch ($e) {
+                        $e = Bridge.Exception.create($e);
+                        var e;
+
+                        if (Bridge.is($e, Bridge.FormatException)) {
+                            e = $e;
+
+                            return e;
+                        } else if (Bridge.is($e, Bridge.OverflowException)) {
+                            e = $e;
+
+                            return e;
+                        } else {
+                            throw $e;
+                        }
+                    }
+                    return new Bridge.FormatException("InvalidString");
+                default:
+                    return new Bridge.ArgumentException("VersionString");
+            }
+        },
+
+        getHashCode: function () {
+            var hash = 17;
+
+            hash = hash * 23 + (this.m_parsedVersion == null ? 0 : Bridge.getHashCode(this.m_parsedVersion));
+            hash = hash * 23 + (this.m_failure == null ? 0 : Bridge.getHashCode(this.m_failure));
+            hash = hash * 23 + (this.m_exceptionArgument == null ? 0 : Bridge.getHashCode(this.m_exceptionArgument));
+            hash = hash * 23 + (this.m_argumentName == null ? 0 : Bridge.getHashCode(this.m_argumentName));
+            hash = hash * 23 + (this.m_canThrow == null ? 0 : Bridge.getHashCode(this.m_canThrow));
+
+            return hash;
+        },
+
+        equals: function (o) {
+            if (!Bridge.is(o, Bridge.Version.VersionResult)) {
+                return false;
+            }
+
+            return Bridge.equals(this.m_parsedVersion, o.m_parsedVersion) && Bridge.equals(this.m_failure, o.m_failure) && Bridge.equals(this.m_exceptionArgument, o.m_exceptionArgument) && Bridge.equals(this.m_argumentName, o.m_argumentName) && Bridge.equals(this.m_canThrow, o.m_canThrow);
+        },
+
+        $clone: function (to) {
+            var s = to || new Bridge.Version.VersionResult();
+
+            s.m_parsedVersion = this.m_parsedVersion;
+            s.m_failure = this.m_failure;
+            s.m_exceptionArgument = this.m_exceptionArgument;
+            s.m_argumentName = this.m_argumentName;
+            s.m_canThrow = this.m_canThrow;
+
+            return s;
+        }
+    });
+
+    // @source Attribute.js
+
+    Bridge.define("Bridge.Attribute");
+
+    // @source INotifyPropertyChanged.js
+
+    Bridge.define("Bridge.INotifyPropertyChanged");
+
+    Bridge.define("Bridge.PropertyChangedEventArgs", {
+        constructor: function (propertyName) {
+            this.propertyName = propertyName;
+        }
+    });
+
+/*--------------------------------------------------------------------------
+ * linq.js - LINQ for JavaScript
+ * ver 3.0.4-Beta5 (Jun. 20th, 2013)
+ *
+ * created and maintained by neuecc <ils@neue.cc>
+ * licensed under MIT License
+ * http://linqjs.codeplex.com/
+ *------------------------------------------------------------------------*/
+
+(function (root, undefined) {
+    // ReadOnly Function
+    var Functions = {
+        Identity: function (x) { return x; },
+        True: function () { return true; },
+        Blank: function () { }
+    };
+
+    // const Type
+    var Types = {
+        Boolean: typeof true,
+        Number: typeof 0,
+        String: typeof "",
+        Object: typeof {},
+        Undefined: typeof undefined,
+        Function: typeof function () { }
+    };
+
+    // createLambda cache
+    var funcCache = { "": Functions.Identity };
+
+    // private utility methods
+    var Utils = {
+        // Create anonymous function from lambda expression string
+        createLambda: function (expression) {
+            if (expression == null) return Functions.Identity;
+            if (typeof expression === Types.String) {
+                // get from cache
+                var f = funcCache[expression];
+                if (f != null) {
+                    return f;
+                }
+
+                if (expression.indexOf("=>") === -1) {
+                    var regexp = new RegExp("[$]+", "g");
+
+                    var maxLength = 0;
+                    var match;
+                    while ((match = regexp.exec(expression)) != null) {
+                        var paramNumber = match[0].length;
+                        if (paramNumber > maxLength) {
+                            maxLength = paramNumber;
+                        }
+                    }
+
+                    var argArray = [];
+                    for (var i = 1; i <= maxLength; i++) {
+                        var dollar = "";
+                        for (var j = 0; j < i; j++) {
+                            dollar += "$";
+                        }
+                        argArray.push(dollar);
+                    }
+
+                    var args = Array.prototype.join.call(argArray, ",");
+
+                    f = new Function(args, "return " + expression);
+                    funcCache[expression] = f;
+                    return f;
+                }
+                else {
+                    var expr = expression.match(/^[(\s]*([^()]*?)[)\s]*=>(.*)/);
+                    f = new Function(expr[1], "return " + expr[2]);
+                    funcCache[expression] = f;
+                    return f;
+                }
+            }
+            return expression;
+        },
+
+        isIEnumerable: function (obj) {
+            if (typeof Enumerator !== Types.Undefined) {
+                try {
+                    new Enumerator(obj); // check JScript(IE)'s Enumerator
+                    return true;
+                }
+                catch (e) { }
+            }
+
+            return false;
+        },
+
+        // IE8's defineProperty is defined but cannot use, therefore check defineProperties
+        defineProperty: (Object.defineProperties != null)
+            ? function (target, methodName, value) {
+                Object.defineProperty(target, methodName, {
+                    enumerable: false,
+                    configurable: true,
+                    writable: true,
+                    value: value
+                })
+            }
+            : function (target, methodName, value) {
+                target[methodName] = value;
+            },
+
+        compare: function (a, b) {
+            return (a === b) ? 0
+                 : (a > b) ? 1
+                 : -1;
+        },
+
+        dispose: function (obj) {
+            if (obj != null) obj.dispose();
+        }
+    };
+
+    // IEnumerator State
+    var State = { Before: 0, Running: 1, After: 2 };
+
+    // "Enumerator" is conflict JScript's "Enumerator"
+    var IEnumerator = function (initialize, tryGetNext, dispose) {
+        var yielder = new Yielder();
+        var state = State.Before;
+
+        this.getCurrent = yielder.getCurrent;
+        this.reset = function () { throw new Error('Reset is not supported'); };
+
+        this.moveNext = function () {
+            try {
+                switch (state) {
+                    case State.Before:
+                        state = State.Running;
+                        initialize();
+                        // fall through
+                    case State.Running:
+                        if (tryGetNext.apply(yielder)) {
+                            return true;
+                        }
+                        else {
+                            this.dispose();
+                            return false;
+                        }
+                    case State.After:
+                        return false;
+                }
+            }
+            catch (e) {
+                this.dispose();
+                throw e;
+            }
+        };
+
+        this.dispose = function () {
+            if (state != State.Running) return;
+
+            try {
+                dispose();
+            }
+            finally {
+                state = State.After;
+            }
+        };
+    };
+    IEnumerator.$$inheritors = [Bridge.IDisposable];
+
+    // for tryGetNext
+    var Yielder = function () {
+        var current = null;
+        this.getCurrent = function () { return current; };
+        this.yieldReturn = function (value) {
+            current = value;
+            return true;
+        };
+        this.yieldBreak = function () {
+            return false;
+        };
+    };
+
+    // Enumerable constuctor
+    var Enumerable = function (getEnumerator) {
+        this.getEnumerator = getEnumerator;
+    };
+    Enumerable.$$inheritors = [Bridge.IEnumerable];
+
+    // Utility
+
+    Enumerable.Utils = {}; // container
+
+    Enumerable.Utils.createLambda = function (expression) {
+        return Utils.createLambda(expression);
+    };
+
+    Enumerable.Utils.createEnumerable = function (getEnumerator) {
+        return new Enumerable(getEnumerator);
+    };
+
+    Enumerable.Utils.createEnumerator = function (initialize, tryGetNext, dispose) {
+        return new IEnumerator(initialize, tryGetNext, dispose);
+    };
+
+    Enumerable.Utils.extendTo = function (type) {
+        var typeProto = type.prototype;
+        var enumerableProto;
+
+        if (type === Array) {
+            enumerableProto = ArrayEnumerable.prototype;
+            Utils.defineProperty(typeProto, "getSource", function () {
+                return this;
+            });
+        }
+        else {
+            enumerableProto = Enumerable.prototype;
+            Utils.defineProperty(typeProto, "getEnumerator", function () {
+                return Enumerable.from(this).getEnumerator();
+            });
+        }
+
+        for (var methodName in enumerableProto) {
+            var func = enumerableProto[methodName];
+
+            // already extended
+            if (typeProto[methodName] == func) continue;
+
+            // already defined(example Array#reverse/join/forEach...)
+            if (typeProto[methodName] != null) {
+                methodName = methodName + "ByLinq";
+                if (typeProto[methodName] == func) continue; // recheck
+            }
+
+            if (func instanceof Function) {
+                Utils.defineProperty(typeProto, methodName, func);
+            }
+        }
+    };
+
+    // Generator
+
+    Enumerable.choice = function () // variable argument
+    {
+        var args = arguments;
+
+        return new Enumerable(function () {
+            return new IEnumerator(
+                function () {
+                    args = (args[0] instanceof Array) ? args[0]
+                        : (args[0].getEnumerator != null) ? args[0].toArray()
+                        : args;
+                },
+                function () {
+                    return this.yieldReturn(args[Math.floor(Math.random() * args.length)]);
+                },
+                Functions.Blank);
+        });
+    };
+
+    Enumerable.cycle = function () // variable argument
+    {
+        var args = arguments;
+
+        return new Enumerable(function () {
+            var index = 0;
+            return new IEnumerator(
+                function () {
+                    args = (args[0] instanceof Array) ? args[0]
+                        : (args[0].getEnumerator != null) ? args[0].toArray()
+                        : args;
+                },
+                function () {
+                    if (index >= args.length) index = 0;
+                    return this.yieldReturn(args[index++]);
+                },
+                Functions.Blank);
+        });
+    };
+
+    // private singleton
+    var emptyEnumerable = new Enumerable(function () {
+            return new IEnumerator(
+                Functions.Blank,
+                function () { return false; },
+                Functions.Blank);
+        });
+    Enumerable.empty = function () {
+        return emptyEnumerable;
+    };
+
+    Enumerable.from = function (obj) {
+        if (obj == null) {
+            return Enumerable.empty();
+        }
+        if (obj instanceof Enumerable) {
+            return obj;
+        }
+        if (typeof obj == Types.Number || typeof obj == Types.Boolean) {
+            return Enumerable.repeat(obj, 1);
+        }
+        if (typeof obj == Types.String) {
+            return new Enumerable(function () {
+                var index = 0;
+                return new IEnumerator(
+                    Functions.Blank,
+                    function () {
+                        return (index < obj.length) ? this.yieldReturn(obj.charAt(index++)) : false;
+                    },
+                    Functions.Blank);
+            });
+        }
+        var ienum = Bridge.as(obj, Bridge.IEnumerable);
+        if (ienum) {
+            return new Enumerable(function () {
+                var enumerator;
+                return new IEnumerator(
+                    function () { enumerator = Bridge.getEnumerator(ienum); },
+                    function () {
+                        var ok = enumerator.moveNext();
+                        return ok ? this.yieldReturn(enumerator.getCurrent()) : false;
+                    },
+                    function () {
+                        var disposable = Bridge.as(enumerator, Bridge.IDisposable);
+                        if (disposable) {
+                            disposable.dispose();
+                        }
+                    }
+                );
+            });
+        }
+        if (typeof obj != Types.Function) {
+            // array or array like object
+            if (typeof obj.length == Types.Number) {
+                return new ArrayEnumerable(obj);
+            }
+
+            // JScript's IEnumerable
+            if (!(obj instanceof Object) && Utils.isIEnumerable(obj)) {
+                return new Enumerable(function () {
+                    var isFirst = true;
+                    var enumerator;
+                    return new IEnumerator(
+                        function () { enumerator = new Enumerator(obj); },
+                        function () {
+                            if (isFirst) isFirst = false;
+                            else enumerator.moveNext();
+
+                            return (enumerator.atEnd()) ? false : this.yieldReturn(enumerator.item());
+                        },
+                        Functions.Blank);
+                });
+            }
+
+            // WinMD IIterable<T>
+            if (typeof Windows === Types.Object && typeof obj.first === Types.Function) {
+                return new Enumerable(function () {
+                    var isFirst = true;
+                    var enumerator;
+                    return new IEnumerator(
+                        function () { enumerator = obj.first(); },
+                        function () {
+                            if (isFirst) isFirst = false;
+                            else enumerator.moveNext();
+
+                            return (enumerator.hasCurrent) ? this.yieldReturn(enumerator.current) : this.yieldBreak();
+                        },
+                        Functions.Blank);
+                });
+            }
+        }
+
+        // case function/object : Create keyValuePair[]
+        return new Enumerable(function () {
+            var array = [];
+            var index = 0;
+
+            return new IEnumerator(
+                function () {
+                    for (var key in obj) {
+                        var value = obj[key];
+                        if (!(value instanceof Function) && Object.prototype.hasOwnProperty.call(obj, key)) {
+                            array.push({ key: key, value: value });
+                        }
+                    }
+                },
+                function () {
+                    return (index < array.length)
+                        ? this.yieldReturn(array[index++])
+                        : false;
+                },
+                Functions.Blank);
+        });
+    },
+
+    Enumerable.make = function (element) {
+        return Enumerable.repeat(element, 1);
+    };
+
+    // Overload:function (input, pattern)
+    // Overload:function (input, pattern, flags)
+    Enumerable.matches = function (input, pattern, flags) {
+        if (flags == null) flags = "";
+        if (pattern instanceof RegExp) {
+            flags += (pattern.ignoreCase) ? "i" : "";
+            flags += (pattern.multiline) ? "m" : "";
+            pattern = pattern.source;
+        }
+        if (flags.indexOf("g") === -1) flags += "g";
+
+        return new Enumerable(function () {
+            var regex;
+            return new IEnumerator(
+                function () { regex = new RegExp(pattern, flags); },
+                function () {
+                    var match = regex.exec(input);
+                    return (match) ? this.yieldReturn(match) : false;
+                },
+                Functions.Blank);
+        });
+    };
+
+    // Overload:function (start, count)
+    // Overload:function (start, count, step)
+    Enumerable.range = function (start, count, step) {
+        if (step == null) step = 1;
+
+        return new Enumerable(function () {
+            var value;
+            var index = 0;
+
+            return new IEnumerator(
+                function () { value = start - step; },
+                function () {
+                    return (index++ < count)
+                        ? this.yieldReturn(value += step)
+                        : this.yieldBreak();
+                },
+                Functions.Blank);
+        });
+    };
+
+    // Overload:function (start, count)
+    // Overload:function (start, count, step)
+    Enumerable.rangeDown = function (start, count, step) {
+        if (step == null) step = 1;
+
+        return new Enumerable(function () {
+            var value;
+            var index = 0;
+
+            return new IEnumerator(
+                function () { value = start + step; },
+                function () {
+                    return (index++ < count)
+                        ? this.yieldReturn(value -= step)
+                        : this.yieldBreak();
+                },
+                Functions.Blank);
+        });
+    };
+
+    // Overload:function (start, to)
+    // Overload:function (start, to, step)
+    Enumerable.rangeTo = function (start, to, step) {
+        if (step == null) step = 1;
+
+        if (start < to) {
+            return new Enumerable(function () {
+                var value;
+
+                return new IEnumerator(
+                function () { value = start - step; },
+                function () {
+                    var next = value += step;
+                    return (next <= to)
+                        ? this.yieldReturn(next)
+                        : this.yieldBreak();
+                },
+                Functions.Blank);
+            });
+        }
+        else {
+            return new Enumerable(function () {
+                var value;
+
+                return new IEnumerator(
+                function () { value = start + step; },
+                function () {
+                    var next = value -= step;
+                    return (next >= to)
+                        ? this.yieldReturn(next)
+                        : this.yieldBreak();
+                },
+                Functions.Blank);
+            });
+        }
+    };
+
+    // Overload:function (element)
+    // Overload:function (element, count)
+    Enumerable.repeat = function (element, count) {
+        if (count != null) return Enumerable.repeat(element).take(count);
+
+        return new Enumerable(function () {
+            return new IEnumerator(
+                Functions.Blank,
+                function () { return this.yieldReturn(element); },
+                Functions.Blank);
+        });
+    };
+
+    Enumerable.repeatWithFinalize = function (initializer, finalizer) {
+        initializer = Utils.createLambda(initializer);
+        finalizer = Utils.createLambda(finalizer);
+
+        return new Enumerable(function () {
+            var element;
+            return new IEnumerator(
+                function () { element = initializer(); },
+                function () { return this.yieldReturn(element); },
+                function () {
+                    if (element != null) {
+                        finalizer(element);
+                        element = null;
+                    }
+                });
+        });
+    };
+
+    // Overload:function (func)
+    // Overload:function (func, count)
+    Enumerable.generate = function (func, count) {
+        if (count != null) return Enumerable.generate(func).take(count);
+        func = Utils.createLambda(func);
+
+        return new Enumerable(function () {
+            return new IEnumerator(
+                Functions.Blank,
+                function () { return this.yieldReturn(func()); },
+                Functions.Blank);
+        });
+    };
+
+    // Overload:function ()
+    // Overload:function (start)
+    // Overload:function (start, step)
+    Enumerable.toInfinity = function (start, step) {
+        if (start == null) start = 0;
+        if (step == null) step = 1;
+
+        return new Enumerable(function () {
+            var value;
+            return new IEnumerator(
+                function () { value = start - step; },
+                function () { return this.yieldReturn(value += step); },
+                Functions.Blank);
+        });
+    };
+
+    // Overload:function ()
+    // Overload:function (start)
+    // Overload:function (start, step)
+    Enumerable.toNegativeInfinity = function (start, step) {
+        if (start == null) start = 0;
+        if (step == null) step = 1;
+
+        return new Enumerable(function () {
+            var value;
+            return new IEnumerator(
+                function () { value = start + step; },
+                function () { return this.yieldReturn(value -= step); },
+                Functions.Blank);
+        });
+    };
+
+    Enumerable.unfold = function (seed, func) {
+        func = Utils.createLambda(func);
+
+        return new Enumerable(function () {
+            var isFirst = true;
+            var value;
+            return new IEnumerator(
+                Functions.Blank,
+                function () {
+                    if (isFirst) {
+                        isFirst = false;
+                        value = seed;
+                        return this.yieldReturn(value);
+                    }
+                    value = func(value);
+                    return this.yieldReturn(value);
+                },
+                Functions.Blank);
+        });
+    };
+
+    Enumerable.defer = function (enumerableFactory) {
+
+        return new Enumerable(function () {
+            var enumerator;
+
+            return new IEnumerator(
+                function () { enumerator = Enumerable.from(enumerableFactory()).getEnumerator(); },
+                function () {
+                    return (enumerator.moveNext())
+                        ? this.yieldReturn(enumerator.getCurrent())
+                        : this.yieldBreak();
+                },
+                function () {
+                    Utils.dispose(enumerator);
+                });
+        });
+    };
+
+    // Extension Methods
+
+    /* Projection and Filtering Methods */
+
+    // Overload:function (func)
+    // Overload:function (func, resultSelector<element>)
+    // Overload:function (func, resultSelector<element, nestLevel>)
+    Enumerable.prototype.traverseBreadthFirst = function (func, resultSelector) {
+        var source = this;
+        func = Utils.createLambda(func);
+        resultSelector = Utils.createLambda(resultSelector);
+
+        return new Enumerable(function () {
+            var enumerator;
+            var nestLevel = 0;
+            var buffer = [];
+
+            return new IEnumerator(
+                function () { enumerator = source.getEnumerator(); },
+                function () {
+                    while (true) {
+                        if (enumerator.moveNext()) {
+                            buffer.push(enumerator.getCurrent());
+                            return this.yieldReturn(resultSelector(enumerator.getCurrent(), nestLevel));
+                        }
+
+                        var next = Enumerable.from(buffer).selectMany(function (x) { return func(x); });
+                        if (!next.any()) {
+                            return false;
+                        }
+                        else {
+                            nestLevel++;
+                            buffer = [];
+                            Utils.dispose(enumerator);
+                            enumerator = next.getEnumerator();
+                        }
+                    }
+                },
+                function () { Utils.dispose(enumerator); });
+        });
+    };
+
+    // Overload:function (func)
+    // Overload:function (func, resultSelector<element>)
+    // Overload:function (func, resultSelector<element, nestLevel>)
+    Enumerable.prototype.traverseDepthFirst = function (func, resultSelector) {
+        var source = this;
+        func = Utils.createLambda(func);
+        resultSelector = Utils.createLambda(resultSelector);
+
+        return new Enumerable(function () {
+            var enumeratorStack = [];
+            var enumerator;
+
+            return new IEnumerator(
+                function () { enumerator = source.getEnumerator(); },
+                function () {
+                    while (true) {
+                        if (enumerator.moveNext()) {
+                            var value = resultSelector(enumerator.getCurrent(), enumeratorStack.length);
+                            enumeratorStack.push(enumerator);
+                            enumerator = Enumerable.from(func(enumerator.getCurrent())).getEnumerator();
+                            return this.yieldReturn(value);
+                        }
+
+                        if (enumeratorStack.length <= 0) return false;
+                        Utils.dispose(enumerator);
+                        enumerator = enumeratorStack.pop();
+                    }
+                },
+                function () {
+                    try {
+                        Utils.dispose(enumerator);
+                    }
+                    finally {
+                        Enumerable.from(enumeratorStack).forEach(function (s) { s.dispose(); });
+                    }
+                });
+        });
+    };
+
+    Enumerable.prototype.flatten = function () {
+        var source = this;
+
+        return new Enumerable(function () {
+            var enumerator;
+            var middleEnumerator = null;
+
+            return new IEnumerator(
+                function () { enumerator = source.getEnumerator(); },
+                function () {
+                    while (true) {
+                        if (middleEnumerator != null) {
+                            if (middleEnumerator.moveNext()) {
+                                return this.yieldReturn(middleEnumerator.getCurrent());
+                            }
+                            else {
+                                middleEnumerator = null;
+                            }
+                        }
+
+                        if (enumerator.moveNext()) {
+                            if (enumerator.getCurrent() instanceof Array) {
+                                Utils.dispose(middleEnumerator);
+                                middleEnumerator = Enumerable.from(enumerator.getCurrent())
+                                    .selectMany(Functions.Identity)
+                                    .flatten()
+                                    .getEnumerator();
+                                continue;
+                            }
+                            else {
+                                return this.yieldReturn(enumerator.getCurrent());
+                            }
+                        }
+
+                        return false;
+                    }
+                },
+                function () {
+                    try {
+                        Utils.dispose(enumerator);
+                    }
+                    finally {
+                        Utils.dispose(middleEnumerator);
+                    }
+                });
+        });
+    };
+
+    Enumerable.prototype.pairwise = function (selector) {
+        var source = this;
+        selector = Utils.createLambda(selector);
+
+        return new Enumerable(function () {
+            var enumerator;
+
+            return new IEnumerator(
+                function () {
+                    enumerator = source.getEnumerator();
+                    enumerator.moveNext();
+                },
+                function () {
+                    var prev = enumerator.getCurrent();
+                    return (enumerator.moveNext())
+                        ? this.yieldReturn(selector(prev, enumerator.getCurrent()))
+                        : false;
+                },
+                function () { Utils.dispose(enumerator); });
+        });
+    };
+
+    // Overload:function (func)
+    // Overload:function (seed,func<value,element>)
+    Enumerable.prototype.scan = function (seed, func) {
+        var isUseSeed;
+        if (func == null) {
+            func = Utils.createLambda(seed); // arguments[0]
+            isUseSeed = false;
+        } else {
+            func = Utils.createLambda(func);
+            isUseSeed = true;
+        }
+        var source = this;
+
+        return new Enumerable(function () {
+            var enumerator;
+            var value;
+            var isFirst = true;
+
+            return new IEnumerator(
+                function () { enumerator = source.getEnumerator(); },
+                function () {
+                    if (isFirst) {
+                        isFirst = false;
+                        if (!isUseSeed) {
+                            if (enumerator.moveNext()) {
+                                return this.yieldReturn(value = enumerator.getCurrent());
+                            }
+                        }
+                        else {
+                            return this.yieldReturn(value = seed);
+                        }
+                    }
+
+                    return (enumerator.moveNext())
+                        ? this.yieldReturn(value = func(value, enumerator.getCurrent()))
+                        : false;
+                },
+                function () { Utils.dispose(enumerator); });
+        });
+    };
+
+    // Overload:function (selector<element>)
+    // Overload:function (selector<element,index>)
+    Enumerable.prototype.select = function (selector) {
+        selector = Utils.createLambda(selector);
+
+        if (selector.length <= 1) {
+            return new WhereSelectEnumerable(this, null, selector);
+        }
+        else {
+            var source = this;
+
+            return new Enumerable(function () {
+                var enumerator;
+                var index = 0;
+
+                return new IEnumerator(
+                    function () { enumerator = source.getEnumerator(); },
+                    function () {
+                        return (enumerator.moveNext())
+                            ? this.yieldReturn(selector(enumerator.getCurrent(), index++))
+                            : false;
+                    },
+                    function () { Utils.dispose(enumerator); });
+            });
+        }
+    };
+
+    // Overload:function (collectionSelector<element>)
+    // Overload:function (collectionSelector<element,index>)
+    // Overload:function (collectionSelector<element>,resultSelector)
+    // Overload:function (collectionSelector<element,index>,resultSelector)
+    Enumerable.prototype.selectMany = function (collectionSelector, resultSelector) {
+        var source = this;
+        collectionSelector = Utils.createLambda(collectionSelector);
+        if (resultSelector == null) resultSelector = function (a, b) { return b; };
+        resultSelector = Utils.createLambda(resultSelector);
+
+        return new Enumerable(function () {
+            var enumerator;
+            var middleEnumerator = undefined;
+            var index = 0;
+
+            return new IEnumerator(
+                function () { enumerator = source.getEnumerator(); },
+                function () {
+                    if (middleEnumerator === undefined) {
+                        if (!enumerator.moveNext()) return false;
+                    }
+                    do {
+                        if (middleEnumerator == null) {
+                            var middleSeq = collectionSelector(enumerator.getCurrent(), index++);
+                            middleEnumerator = Enumerable.from(middleSeq).getEnumerator();
+                        }
+                        if (middleEnumerator.moveNext()) {
+                            return this.yieldReturn(resultSelector(enumerator.getCurrent(), middleEnumerator.getCurrent()));
+                        }
+                        Utils.dispose(middleEnumerator);
+                        middleEnumerator = null;
+                    } while (enumerator.moveNext());
+                    return false;
+                },
+                function () {
+                    try {
+                        Utils.dispose(enumerator);
+                    }
+                    finally {
+                        Utils.dispose(middleEnumerator);
+                    }
+                });
+        });
+    };
+
+    // Overload:function (predicate<element>)
+    // Overload:function (predicate<element,index>)
+    Enumerable.prototype.where = function (predicate) {
+        predicate = Utils.createLambda(predicate);
+
+        if (predicate.length <= 1) {
+            return new WhereEnumerable(this, predicate);
+        }
+        else {
+            var source = this;
+
+            return new Enumerable(function () {
+                var enumerator;
+                var index = 0;
+
+                return new IEnumerator(
+                    function () { enumerator = source.getEnumerator(); },
+                    function () {
+                        while (enumerator.moveNext()) {
+                            if (predicate(enumerator.getCurrent(), index++)) {
+                                return this.yieldReturn(enumerator.getCurrent());
+                            }
+                        }
+                        return false;
+                    },
+                    function () { Utils.dispose(enumerator); });
+            });
+        }
+    };
+
+
+    // Overload:function (selector<element>)
+    // Overload:function (selector<element,index>)
+    Enumerable.prototype.choose = function (selector) {
+        selector = Utils.createLambda(selector);
+        var source = this;
+
+        return new Enumerable(function () {
+            var enumerator;
+            var index = 0;
+
+            return new IEnumerator(
+                function () { enumerator = source.getEnumerator(); },
+                function () {
+                    while (enumerator.moveNext()) {
+                        var result = selector(enumerator.getCurrent(), index++);
+                        if (result != null) {
+                            return this.yieldReturn(result);
+                        }
+                    }
+                    return this.yieldBreak();
+                },
+                function () { Utils.dispose(enumerator); });
+        });
+    };
+
+    Enumerable.prototype.ofType = function (type) {
+        var source = this;
+
+        return new Enumerable(function () {
+            var enumerator;
+
+            return new IEnumerator(
+                function () {
+					enumerator = Bridge.getEnumerator(source);
+				},
+                function () {
+                    while (enumerator.moveNext()) {
+                        var v = Bridge.as(enumerator.getCurrent(), type);
+                        if (Bridge.hasValue(v)) {
+                            return this.yieldReturn(v);
+                        }
+                    }
+                    return false;
+                },
+                function () {
+					Utils.dispose(enumerator);
+				});
+        });
+    };
+
+    // mutiple arguments, last one is selector, others are enumerable
+    Enumerable.prototype.zip = function () {
+        var args = arguments;
+        var selector = Utils.createLambda(arguments[arguments.length - 1]);
+
+        var source = this;
+        // optimized case:argument is 2
+        if (arguments.length == 2) {
+            var second = arguments[0];
+
+            return new Enumerable(function () {
+                var firstEnumerator;
+                var secondEnumerator;
+                var index = 0;
+
+                return new IEnumerator(
+                function () {
+                    firstEnumerator = source.getEnumerator();
+                    secondEnumerator = Enumerable.from(second).getEnumerator();
+                },
+                function () {
+                    if (firstEnumerator.moveNext() && secondEnumerator.moveNext()) {
+                        return this.yieldReturn(selector(firstEnumerator.getCurrent(), secondEnumerator.getCurrent(), index++));
+                    }
+                    return false;
+                },
+                function () {
+                    try {
+                        Utils.dispose(firstEnumerator);
+                    } finally {
+                        Utils.dispose(secondEnumerator);
+                    }
+                });
+            });
+        }
+        else {
+            return new Enumerable(function () {
+                var enumerators;
+                var index = 0;
+
+                return new IEnumerator(
+                function () {
+                    var array = Enumerable.make(source)
+                        .concat(Enumerable.from(args).takeExceptLast().select(Enumerable.from))
+                        .select(function (x) { return x.getEnumerator() })
+                        .toArray();
+                    enumerators = Enumerable.from(array);
+                },
+                function () {
+                    if (enumerators.all(function (x) { return x.moveNext() })) {
+                        var array = enumerators
+                            .select(function (x) { return x.getCurrent() })
+                            .toArray();
+                        array.push(index++);
+                        return this.yieldReturn(selector.apply(null, array));
+                    }
+                    else {
+                        return this.yieldBreak();
+                    }
+                },
+                function () {
+                    Enumerable.from(enumerators).forEach(Utils.dispose);
+                });
+            });
+        }
+    };
+
+    // mutiple arguments
+    Enumerable.prototype.merge = function () {
+        var args = arguments;
+        var source = this;
+
+        return new Enumerable(function () {
+            var enumerators;
+            var index = -1;
+
+            return new IEnumerator(
+                function () {
+                    enumerators = Enumerable.make(source)
+                        .concat(Enumerable.from(args).select(Enumerable.from))
+                        .select(function (x) { return x.getEnumerator() })
+                        .toArray();
+                },
+                function () {
+                    while (enumerators.length > 0) {
+                        index = (index >= enumerators.length - 1) ? 0 : index + 1;
+                        var enumerator = enumerators[index];
+
+                        if (enumerator.moveNext()) {
+                            return this.yieldReturn(enumerator.getCurrent());
+                        }
+                        else {
+                            enumerator.dispose();
+                            enumerators.splice(index--, 1);
+                        }
+                    }
+                    return this.yieldBreak();
+                },
+                function () {
+                    Enumerable.from(enumerators).forEach(Utils.dispose);
+                });
+        });
+    };
+
+    /* Join Methods */
+
+    // Overload:function (inner, outerKeySelector, innerKeySelector, resultSelector)
+    // Overload:function (inner, outerKeySelector, innerKeySelector, resultSelector, compareSelector)
+    Enumerable.prototype.join = function (inner, outerKeySelector, innerKeySelector, resultSelector, comparer) {
+        outerKeySelector = Utils.createLambda(outerKeySelector);
+        innerKeySelector = Utils.createLambda(innerKeySelector);
+        resultSelector = Utils.createLambda(resultSelector);
+
+        var source = this;
+
+        return new Enumerable(function () {
+            var outerEnumerator;
+            var lookup;
+            var innerElements = null;
+            var innerCount = 0;
+
+            return new IEnumerator(
+                function () {
+                    outerEnumerator = source.getEnumerator();
+                    lookup = Enumerable.from(inner).toLookup(innerKeySelector, Functions.Identity, comparer);
+                },
+                function () {
+                    while (true) {
+                        if (innerElements != null) {
+                            var innerElement = innerElements[innerCount++];
+                            if (innerElement !== undefined) {
+                                return this.yieldReturn(resultSelector(outerEnumerator.getCurrent(), innerElement));
+                            }
+
+                            innerElement = null;
+                            innerCount = 0;
+                        }
+
+                        if (outerEnumerator.moveNext()) {
+                            var key = outerKeySelector(outerEnumerator.getCurrent());
+                            innerElements = lookup.get(key).toArray();
+                        } else {
+                            return false;
+                        }
+                    }
+                },
+                function () { Utils.dispose(outerEnumerator); });
+        });
+    };
+
+    // Overload:function (inner, outerKeySelector, innerKeySelector, resultSelector)
+    // Overload:function (inner, outerKeySelector, innerKeySelector, resultSelector, compareSelector)
+    Enumerable.prototype.groupJoin = function (inner, outerKeySelector, innerKeySelector, resultSelector, comparer) {
+        outerKeySelector = Utils.createLambda(outerKeySelector);
+        innerKeySelector = Utils.createLambda(innerKeySelector);
+        resultSelector = Utils.createLambda(resultSelector);
+        var source = this;
+
+        return new Enumerable(function () {
+            var enumerator = source.getEnumerator();
+            var lookup = null;
+
+            return new IEnumerator(
+                function () {
+                    enumerator = source.getEnumerator();
+                    lookup = Enumerable.from(inner).toLookup(innerKeySelector, Functions.Identity, comparer);
+                },
+                function () {
+                    if (enumerator.moveNext()) {
+                        var innerElement = lookup.get(outerKeySelector(enumerator.getCurrent()));
+                        return this.yieldReturn(resultSelector(enumerator.getCurrent(), innerElement));
+                    }
+                    return false;
+                },
+                function () { Utils.dispose(enumerator); });
+        });
+    };
+
+    /* Set Methods */
+
+    Enumerable.prototype.all = function (predicate) {
+        predicate = Utils.createLambda(predicate);
+
+        var result = true;
+        this.forEach(function (x) {
+            if (!predicate(x)) {
+                result = false;
+                return false; // break
+            }
+        });
+        return result;
+    };
+
+    // Overload:function ()
+    // Overload:function (predicate)
+    Enumerable.prototype.any = function (predicate) {
+        predicate = Utils.createLambda(predicate);
+
+        var enumerator = this.getEnumerator();
+        try {
+            if (arguments.length == 0) return enumerator.moveNext(); // case:function ()
+
+            while (enumerator.moveNext()) // case:function (predicate)
+            {
+                if (predicate(enumerator.getCurrent())) return true;
+            }
+            return false;
+        }
+        finally {
+            Utils.dispose(enumerator);
+        }
+    };
+
+    Enumerable.prototype.isEmpty = function () {
+        return !this.any();
+    };
+
+    // multiple arguments
+    Enumerable.prototype.concat = function () {
+        var source = this;
+
+        if (arguments.length == 1) {
+            var second = arguments[0];
+
+            return new Enumerable(function () {
+                var firstEnumerator;
+                var secondEnumerator;
+
+                return new IEnumerator(
+                function () { firstEnumerator = source.getEnumerator(); },
+                function () {
+                    if (secondEnumerator == null) {
+                        if (firstEnumerator.moveNext()) return this.yieldReturn(firstEnumerator.getCurrent());
+                        secondEnumerator = Enumerable.from(second).getEnumerator();
+                    }
+                    if (secondEnumerator.moveNext()) return this.yieldReturn(secondEnumerator.getCurrent());
+                    return false;
+                },
+                function () {
+                    try {
+                        Utils.dispose(firstEnumerator);
+                    }
+                    finally {
+                        Utils.dispose(secondEnumerator);
+                    }
+                });
+            });
+        }
+        else {
+            var args = arguments;
+
+            return new Enumerable(function () {
+                var enumerators;
+
+                return new IEnumerator(
+                    function () {
+                        enumerators = Enumerable.make(source)
+                            .concat(Enumerable.from(args).select(Enumerable.from))
+                            .select(function (x) { return x.getEnumerator() })
+                            .toArray();
+                    },
+                    function () {
+                        while (enumerators.length > 0) {
+                            var enumerator = enumerators[0];
+
+                            if (enumerator.moveNext()) {
+                                return this.yieldReturn(enumerator.getCurrent());
+                            }
+                            else {
+                                enumerator.dispose();
+                                enumerators.splice(0, 1);
+                            }
+                        }
+                        return this.yieldBreak();
+                    },
+                    function () {
+                        Enumerable.from(enumerators).forEach(Utils.dispose);
+                    });
+            });
+        }
+    };
+
+    Enumerable.prototype.insert = function (index, second) {
+        var source = this;
+
+        return new Enumerable(function () {
+            var firstEnumerator;
+            var secondEnumerator;
+            var count = 0;
+            var isEnumerated = false;
+
+            return new IEnumerator(
+                function () {
+                    firstEnumerator = source.getEnumerator();
+                    secondEnumerator = Enumerable.from(second).getEnumerator();
+                },
+                function () {
+                    if (count == index && secondEnumerator.moveNext()) {
+                        isEnumerated = true;
+                        return this.yieldReturn(secondEnumerator.getCurrent());
+                    }
+                    if (firstEnumerator.moveNext()) {
+                        count++;
+                        return this.yieldReturn(firstEnumerator.getCurrent());
+                    }
+                    if (!isEnumerated && secondEnumerator.moveNext()) {
+                        return this.yieldReturn(secondEnumerator.getCurrent());
+                    }
+                    return false;
+                },
+                function () {
+                    try {
+                        Utils.dispose(firstEnumerator);
+                    }
+                    finally {
+                        Utils.dispose(secondEnumerator);
+                    }
+                });
+        });
+    };
+
+    Enumerable.prototype.alternate = function (alternateValueOrSequence) {
+        var source = this;
+
+        return new Enumerable(function () {
+            var buffer;
+            var enumerator;
+            var alternateSequence;
+            var alternateEnumerator;
+
+            return new IEnumerator(
+                function () {
+                    if (alternateValueOrSequence instanceof Array || alternateValueOrSequence.getEnumerator != null) {
+                        alternateSequence = Enumerable.from(Enumerable.from(alternateValueOrSequence).toArray()); // freeze
+                    }
+                    else {
+                        alternateSequence = Enumerable.make(alternateValueOrSequence);
+                    }
+                    enumerator = source.getEnumerator();
+                    if (enumerator.moveNext()) buffer = enumerator.getCurrent();
+                },
+                function () {
+                    while (true) {
+                        if (alternateEnumerator != null) {
+                            if (alternateEnumerator.moveNext()) {
+                                return this.yieldReturn(alternateEnumerator.getCurrent());
+                            }
+                            else {
+                                alternateEnumerator = null;
+                            }
+                        }
+
+                        if (buffer == null && enumerator.moveNext()) {
+                            buffer = enumerator.getCurrent(); // hasNext
+                            alternateEnumerator = alternateSequence.getEnumerator();
+                            continue; // GOTO
+                        }
+                        else if (buffer != null) {
+                            var retVal = buffer;
+                            buffer = null;
+                            return this.yieldReturn(retVal);
+                        }
+
+                        return this.yieldBreak();
+                    }
+                },
+                function () {
+                    try {
+                        Utils.dispose(enumerator);
+                    }
+                    finally {
+                        Utils.dispose(alternateEnumerator);
+                    }
+                });
+        });
+    };
+
+    // Overload:function (value)
+    // Overload:function (value, compareSelector)
+    Enumerable.prototype.contains = function (value, comparer) {
+        comparer = comparer || Bridge.EqualityComparer$1.$default;
+        var enumerator = this.getEnumerator();
+        try {
+            while (enumerator.moveNext()) {
+                if (comparer.equals(enumerator.getCurrent(), value)) return true;
+            }
+            return false;
+        }
+        finally {
+            Utils.dispose(enumerator);
+        }
+    };
+
+    Enumerable.prototype.defaultIfEmpty = function (defaultValue) {
+        var source = this;
+        if (defaultValue === undefined) defaultValue = null;
+
+        return new Enumerable(function () {
+            var enumerator;
+            var isFirst = true;
+
+            return new IEnumerator(
+                function () { enumerator = source.getEnumerator(); },
+                function () {
+                    if (enumerator.moveNext()) {
+                        isFirst = false;
+                        return this.yieldReturn(enumerator.getCurrent());
+                    }
+                    else if (isFirst) {
+                        isFirst = false;
+                        return this.yieldReturn(defaultValue);
+                    }
+                    return false;
+                },
+                function () { Utils.dispose(enumerator); });
+        });
+    };
+
+    // Overload:function ()
+    // Overload:function (compareSelector)
+    Enumerable.prototype.distinct = function (comparer) {
+        return this.except(Enumerable.empty(), comparer);
+    };
+
+    Enumerable.prototype.distinctUntilChanged = function (compareSelector) {
+        compareSelector = Utils.createLambda(compareSelector);
+        var source = this;
+
+        return new Enumerable(function () {
+            var enumerator;
+            var compareKey;
+            var initial;
+
+            return new IEnumerator(
+                function () {
+                    enumerator = source.getEnumerator();
+                },
+                function () {
+                    while (enumerator.moveNext()) {
+                        var key = compareSelector(enumerator.getCurrent());
+
+                        if (initial) {
+                            initial = false;
+                            compareKey = key;
+                            return this.yieldReturn(enumerator.getCurrent());
+                        }
+
+                        if (compareKey === key) {
+                            continue;
+                        }
+
+                        compareKey = key;
+                        return this.yieldReturn(enumerator.getCurrent());
+                    }
+                    return this.yieldBreak();
+                },
+                function () { Utils.dispose(enumerator); });
+        });
+    };
+
+    // Overload:function (second)
+    // Overload:function (second, compareSelector)
+    Enumerable.prototype.except = function (second, comparer) {
+        var source = this;
+
+        return new Enumerable(function () {
+            var enumerator;
+            var keys;
+
+            return new IEnumerator(
+                function () {
+                    enumerator = source.getEnumerator();
+                    keys = new Bridge.Dictionary$2(Object, Object)(null, comparer);
+                    Enumerable.from(second).forEach(function (key) { keys.add(key); });
+                },
+                function () {
+                    while (enumerator.moveNext()) {
+                        var current = enumerator.getCurrent();
+                        if (!keys.containsKey(current)) {
+                            keys.add(current);
+                            return this.yieldReturn(current);
+                        }
+                    }
+                    return false;
+                },
+                function () { Utils.dispose(enumerator); });
+        });
+    };
+
+    // Overload:function (second)
+    // Overload:function (second, compareSelector)
+    Enumerable.prototype.intersect = function (second, comparer) {
+        var source = this;
+
+        return new Enumerable(function () {
+            var enumerator;
+            var keys;
+            var outs;
+
+            return new IEnumerator(
+                function () {
+                    enumerator = source.getEnumerator();
+
+                    keys = new Bridge.Dictionary$2(Object, Object)(null, comparer);
+                    Enumerable.from(second).forEach(function (key) { keys.add(key); });
+                    outs = new Bridge.Dictionary$2(Object, Object)(null, comparer);
+                },
+                function () {
+                    while (enumerator.moveNext()) {
+                        var current = enumerator.getCurrent();
+                        if (!outs.containsKey(current) && keys.containsKey(current)) {
+                            outs.add(current);
+                            return this.yieldReturn(current);
+                        }
+                    }
+                    return false;
+                },
+                function () { Utils.dispose(enumerator); });
+        });
+    };
+
+    // Overload:function (second)
+    // Overload:function (second, compareSelector)
+    Enumerable.prototype.sequenceEqual = function (second, comparer) {
+        comparer = comparer || Bridge.EqualityComparer$1.$default;
+
+        var firstEnumerator = this.getEnumerator();
+        try {
+            var secondEnumerator = Enumerable.from(second).getEnumerator();
+            try {
+                while (firstEnumerator.moveNext()) {
+                    if (!secondEnumerator.moveNext()
+                    || !comparer.equals(firstEnumerator.getCurrent(), secondEnumerator.getCurrent())) {
+                        return false;
+                    }
+                }
+
+                if (secondEnumerator.moveNext()) return false;
+                return true;
+            }
+            finally {
+                Utils.dispose(secondEnumerator);
+            }
+        }
+        finally {
+            Utils.dispose(firstEnumerator);
+        }
+    };
+
+    Enumerable.prototype.union = function (second, comparer) {
+        var source = this;
+
+        return new Enumerable(function () {
+            var firstEnumerator;
+            var secondEnumerator;
+            var keys;
+
+            return new IEnumerator(
+                function () {
+                    firstEnumerator = source.getEnumerator();
+                    keys = new Bridge.Dictionary$2(Object, Object)(null, comparer);
+                },
+                function () {
+                    var current;
+                    if (secondEnumerator === undefined) {
+                        while (firstEnumerator.moveNext()) {
+                            current = firstEnumerator.getCurrent();
+                            if (!keys.containsKey(current)) {
+                                keys.add(current);
+                                return this.yieldReturn(current);
+                            }
+                        }
+                        secondEnumerator = Enumerable.from(second).getEnumerator();
+                    }
+                    while (secondEnumerator.moveNext()) {
+                        current = secondEnumerator.getCurrent();
+                        if (!keys.containsKey(current)) {
+                            keys.add(current);
+                            return this.yieldReturn(current);
+                        }
+                    }
+                    return false;
+                },
+                function () {
+                    try {
+                        Utils.dispose(firstEnumerator);
+                    }
+                    finally {
+                        Utils.dispose(secondEnumerator);
+                    }
+                });
+        });
+    };
+
+    /* Ordering Methods */
+
+    Enumerable.prototype.orderBy = function (keySelector, comparer) {
+        return new OrderedEnumerable(this, keySelector, comparer, false);
+    };
+
+    Enumerable.prototype.orderByDescending = function (keySelector, comparer) {
+        return new OrderedEnumerable(this, keySelector, comparer, true);
+    };
+
+    Enumerable.prototype.reverse = function () {
+        var source = this;
+
+        return new Enumerable(function () {
+            var buffer;
+            var index;
+
+            return new IEnumerator(
+                function () {
+                    buffer = source.toArray();
+                    index = buffer.length;
+                },
+                function () {
+                    return (index > 0)
+                        ? this.yieldReturn(buffer[--index])
+                        : false;
+                },
+                Functions.Blank);
+        });
+    };
+
+    Enumerable.prototype.shuffle = function () {
+        var source = this;
+
+        return new Enumerable(function () {
+            var buffer;
+
+            return new IEnumerator(
+                function () { buffer = source.toArray(); },
+                function () {
+                    if (buffer.length > 0) {
+                        var i = Math.floor(Math.random() * buffer.length);
+                        return this.yieldReturn(buffer.splice(i, 1)[0]);
+                    }
+                    return false;
+                },
+                Functions.Blank);
+        });
+    };
+
+    Enumerable.prototype.weightedSample = function (weightSelector) {
+        weightSelector = Utils.createLambda(weightSelector);
+        var source = this;
+
+        return new Enumerable(function () {
+            var sortedByBound;
+            var totalWeight = 0;
+
+            return new IEnumerator(
+                function () {
+                    sortedByBound = source
+                        .choose(function (x) {
+                            var weight = weightSelector(x);
+                            if (weight <= 0) return null; // ignore 0
+
+                            totalWeight += weight;
+                            return { value: x, bound: totalWeight };
+                        })
+                        .toArray();
+                },
+                function () {
+                    if (sortedByBound.length > 0) {
+                        var draw = Math.floor(Math.random() * totalWeight) + 1;
+
+                        var lower = -1;
+                        var upper = sortedByBound.length;
+                        while (upper - lower > 1) {
+                            var index = Math.floor((lower + upper) / 2);
+                            if (sortedByBound[index].bound >= draw) {
+                                upper = index;
+                            }
+                            else {
+                                lower = index;
+                            }
+                        }
+
+                        return this.yieldReturn(sortedByBound[upper].value);
+                    }
+
+                    return this.yieldBreak();
+                },
+                Functions.Blank);
+        });
+    };
+
+    /* Grouping Methods */
+
+    // Overload:function (keySelector)
+    // Overload:function (keySelector,elementSelector)
+    // Overload:function (keySelector,elementSelector,resultSelector)
+    // Overload:function (keySelector,elementSelector,resultSelector,compareSelector)
+    Enumerable.prototype.groupBy = function (keySelector, elementSelector, resultSelector, comparer) {
+        var source = this;
+        keySelector = Utils.createLambda(keySelector);
+        elementSelector = Utils.createLambda(elementSelector);
+        if (resultSelector != null) resultSelector = Utils.createLambda(resultSelector);
+
+        return new Enumerable(function () {
+            var enumerator;
+
+            return new IEnumerator(
+                function () {
+                    enumerator = source.toLookup(keySelector, elementSelector, comparer)
+                        .toEnumerable()
+                        .getEnumerator();
+                },
+                function () {
+                    while (enumerator.moveNext()) {
+                        return (resultSelector == null)
+                            ? this.yieldReturn(enumerator.getCurrent())
+                            : this.yieldReturn(resultSelector(enumerator.getCurrent().key(), enumerator.getCurrent()));
+                    }
+                    return false;
+                },
+                function () { Utils.dispose(enumerator); });
+        });
+    };
+
+    // Overload:function (keySelector)
+    // Overload:function (keySelector,elementSelector)
+    // Overload:function (keySelector,elementSelector,resultSelector)
+    // Overload:function (keySelector,elementSelector,resultSelector,compareSelector)
+    Enumerable.prototype.partitionBy = function (keySelector, elementSelector, resultSelector, comparer) {
+
+        var source = this;
+        keySelector = Utils.createLambda(keySelector);
+        elementSelector = Utils.createLambda(elementSelector);
+        comparer = comparer || Bridge.EqualityComparer$1.$default;
+        var hasResultSelector;
+        if (resultSelector == null) {
+            hasResultSelector = false;
+            resultSelector = function (key, group) { return new Grouping(key, group); };
+        }
+        else {
+            hasResultSelector = true;
+            resultSelector = Utils.createLambda(resultSelector);
+        }
+
+        return new Enumerable(function () {
+            var enumerator;
+            var key;
+            var group = [];
+
+            return new IEnumerator(
+                function () {
+                    enumerator = source.getEnumerator();
+                    if (enumerator.moveNext()) {
+                        key = keySelector(enumerator.getCurrent());
+                        group.push(elementSelector(enumerator.getCurrent()));
+                    }
+                },
+                function () {
+                    var hasNext;
+                    while ((hasNext = enumerator.moveNext()) == true) {
+                        if (comparer.equals(key, keySelector(enumerator.getCurrent()))) {
+                            group.push(elementSelector(enumerator.getCurrent()));
+                        }
+                        else break;
+                    }
+
+                    if (group.length > 0) {
+                        var result = (hasResultSelector)
+                            ? resultSelector(key, Enumerable.from(group))
+                            : resultSelector(key, group);
+                        if (hasNext) {
+                            key = keySelector(enumerator.getCurrent());
+                            group = [elementSelector(enumerator.getCurrent())];
+                        }
+                        else group = [];
+
+                        return this.yieldReturn(result);
+                    }
+
+                    return false;
+                },
+                function () { Utils.dispose(enumerator); });
+        });
+    };
+
+    Enumerable.prototype.buffer = function (count) {
+        var source = this;
+
+        return new Enumerable(function () {
+            var enumerator;
+
+            return new IEnumerator(
+                function () { enumerator = source.getEnumerator(); },
+                function () {
+                    var array = [];
+                    var index = 0;
+                    while (enumerator.moveNext()) {
+                        array.push(enumerator.getCurrent());
+                        if (++index >= count) return this.yieldReturn(array);
+                    }
+                    if (array.length > 0) return this.yieldReturn(array);
+                    return false;
+                },
+                function () { Utils.dispose(enumerator); });
+        });
+    };
+
+    /* Aggregate Methods */
+
+    // Overload:function (func)
+    // Overload:function (seed,func)
+    // Overload:function (seed,func,resultSelector)
+    Enumerable.prototype.aggregate = function (seed, func, resultSelector) {
+        resultSelector = Utils.createLambda(resultSelector);
+        return resultSelector(this.scan(seed, func, resultSelector).last());
+    };
+
+    // Overload:function ()
+    // Overload:function (selector)
+    Enumerable.prototype.average = function (selector) {
+        selector = Utils.createLambda(selector);
+
+        var sum = 0;
+        var count = 0;
+        this.forEach(function (x) {
+            sum += selector(x);
+            ++count;
+        });
+
+        return sum / count;
+    };
+
+    Enumerable.prototype.nullableAverage = function (selector) {
+        if (this.any(Bridge.isNull)) {
+            return null;
+        }
+
+        return this.average(selector);
+    };
+
+    // Overload:function ()
+    // Overload:function (predicate)
+    Enumerable.prototype.count = function (predicate) {
+        predicate = (predicate == null) ? Functions.True : Utils.createLambda(predicate);
+
+        var count = 0;
+        this.forEach(function (x, i) {
+            if (predicate(x, i))++count;
+        });
+        return count;
+    };
+
+    // Overload:function ()
+    // Overload:function (selector)
+    Enumerable.prototype.max = function (selector) {
+        if (selector == null) selector = Functions.Identity;
+        return this.select(selector).aggregate(function (a, b) {
+            return (Bridge.compare(a, b, true) === 1) ? a : b;
+        });
+    };
+
+    Enumerable.prototype.nullableMax = function (selector) {
+        if (this.any(Bridge.isNull)) {
+            return null;
+        }
+
+        return this.max(selector);
+    };
+
+    // Overload:function ()
+    // Overload:function (selector)
+    Enumerable.prototype.min = function (selector) {
+        if (selector == null) selector = Functions.Identity;
+        return this.select(selector).aggregate(function (a, b) {
+            return (Bridge.compare(a, b, true) === -1) ? a : b;
+        });
+    };
+
+    Enumerable.prototype.nullableMin = function (selector) {
+        if (this.any(Bridge.isNull)) {
+            return null;
+        }
+
+        return this.min(selector);
+    };
+
+    Enumerable.prototype.maxBy = function (keySelector) {
+        keySelector = Utils.createLambda(keySelector);
+        return this.aggregate(function (a, b) {
+            return (Bridge.compare(keySelector(a), keySelector(b), true) === 1) ? a : b;
+        });
+    };
+
+    Enumerable.prototype.minBy = function (keySelector) {
+        keySelector = Utils.createLambda(keySelector);
+        return this.aggregate(function (a, b) {
+            return (Bridge.compare(keySelector(a), keySelector(b), true) === -1) ? a : b;
+        });
+    };
+
+    // Overload:function ()
+    // Overload:function (selector)
+    Enumerable.prototype.sum = function (selector) {
+        if (selector == null) selector = Functions.Identity;
+        return this.select(selector).aggregate(0, function (a, b) { return a + b; });
+    };
+
+    Enumerable.prototype.nullableSum = function (selector) {
+        if (this.any(Bridge.isNull)) {
+            return null;
+        }
+
+        return this.sum(selector);
+    };
+
+    /* Paging Methods */
+
+    Enumerable.prototype.elementAt = function (index) {
+        var value;
+        var found = false;
+        this.forEach(function (x, i) {
+            if (i == index) {
+                value = x;
+                found = true;
+                return false;
+            }
+        });
+
+        if (!found) throw new Error("index is less than 0 or greater than or equal to the number of elements in source.");
+        return value;
+    };
+
+    Enumerable.prototype.elementAtOrDefault = function (index, defaultValue) {
+        if (defaultValue === undefined) defaultValue = null;
+        var value;
+        var found = false;
+        this.forEach(function (x, i) {
+            if (i == index) {
+                value = x;
+                found = true;
+                return false;
+            }
+        });
+
+        return (!found) ? defaultValue : value;
+    };
+
+    // Overload:function ()
+    // Overload:function (predicate)
+    Enumerable.prototype.first = function (predicate) {
+        if (predicate != null) return this.where(predicate).first();
+
+        var value;
+        var found = false;
+        this.forEach(function (x) {
+            value = x;
+            found = true;
+            return false;
+        });
+
+        if (!found) throw new Error("first:No element satisfies the condition.");
+        return value;
+    };
+
+    Enumerable.prototype.firstOrDefault = function (predicate, defaultValue) {
+        if (defaultValue === undefined) defaultValue = null;
+        if (predicate != null) return this.where(predicate).firstOrDefault(null, defaultValue);
+
+        var value;
+        var found = false;
+        this.forEach(function (x) {
+            value = x;
+            found = true;
+            return false;
+        });
+        return (!found) ? defaultValue : value;
+    };
+
+    // Overload:function ()
+    // Overload:function (predicate)
+    Enumerable.prototype.last = function (predicate) {
+        if (predicate != null) return this.where(predicate).last();
+
+        var value;
+        var found = false;
+        this.forEach(function (x) {
+            found = true;
+            value = x;
+        });
+
+        if (!found) throw new Error("last:No element satisfies the condition.");
+        return value;
+    };
+
+    // Overload:function (defaultValue)
+    // Overload:function (defaultValue,predicate)
+    Enumerable.prototype.lastOrDefault = function (predicate, defaultValue) {
+        if (defaultValue === undefined) defaultValue = null;
+        if (predicate != null) return this.where(predicate).lastOrDefault(null, defaultValue);
+
+        var value;
+        var found = false;
+        this.forEach(function (x) {
+            found = true;
+            value = x;
+        });
+        return (!found) ? defaultValue : value;
+    };
+
+    // Overload:function ()
+    // Overload:function (predicate)
+    Enumerable.prototype.single = function (predicate) {
+        if (predicate != null) return this.where(predicate).single();
+
+        var value;
+        var found = false;
+        this.forEach(function (x) {
+            if (!found) {
+                found = true;
+                value = x;
+            } else throw new Error("single:sequence contains more than one element.");
+        });
+
+        if (!found) throw new Error("single:No element satisfies the condition.");
+        return value;
+    };
+
+    // Overload:function (defaultValue)
+    // Overload:function (defaultValue,predicate)
+    Enumerable.prototype.singleOrDefault = function (predicate, defaultValue) {
+        if (defaultValue === undefined) defaultValue = null;
+        if (predicate != null) return this.where(predicate).singleOrDefault(null, defaultValue);
+
+        var value;
+        var found = false;
+        this.forEach(function (x) {
+            if (!found) {
+                found = true;
+                value = x;
+            } else throw new Error("single:sequence contains more than one element.");
+        });
+
+        return (!found) ? defaultValue : value;
+    };
+
+    Enumerable.prototype.skip = function (count) {
+        var source = this;
+
+        return new Enumerable(function () {
+            var enumerator;
+            var index = 0;
+
+            return new IEnumerator(
+                function () {
+                    enumerator = source.getEnumerator();
+                    while (index++ < count && enumerator.moveNext()) {
+                    }
+                    ;
+                },
+                function () {
+                    return (enumerator.moveNext())
+                        ? this.yieldReturn(enumerator.getCurrent())
+                        : false;
+                },
+                function () { Utils.dispose(enumerator); });
+        });
+    };
+
+    // Overload:function (predicate<element>)
+    // Overload:function (predicate<element,index>)
+    Enumerable.prototype.skipWhile = function (predicate) {
+        predicate = Utils.createLambda(predicate);
+        var source = this;
+
+        return new Enumerable(function () {
+            var enumerator;
+            var index = 0;
+            var isSkipEnd = false;
+
+            return new IEnumerator(
+                function () { enumerator = source.getEnumerator(); },
+                function () {
+                    while (!isSkipEnd) {
+                        if (enumerator.moveNext()) {
+                            if (!predicate(enumerator.getCurrent(), index++)) {
+                                isSkipEnd = true;
+                                return this.yieldReturn(enumerator.getCurrent());
+                            }
+                            continue;
+                        } else return false;
+                    }
+
+                    return (enumerator.moveNext())
+                        ? this.yieldReturn(enumerator.getCurrent())
+                        : false;
+
+                },
+                function () { Utils.dispose(enumerator); });
+        });
+    };
+
+    Enumerable.prototype.take = function (count) {
+        var source = this;
+
+        return new Enumerable(function () {
+            var enumerator;
+            var index = 0;
+
+            return new IEnumerator(
+                function () { enumerator = source.getEnumerator(); },
+                function () {
+                    return (index++ < count && enumerator.moveNext())
+                        ? this.yieldReturn(enumerator.getCurrent())
+                        : false;
+                },
+                function () { Utils.dispose(enumerator); }
+            );
+        });
+    };
+
+    // Overload:function (predicate<element>)
+    // Overload:function (predicate<element,index>)
+    Enumerable.prototype.takeWhile = function (predicate) {
+        predicate = Utils.createLambda(predicate);
+        var source = this;
+
+        return new Enumerable(function () {
+            var enumerator;
+            var index = 0;
+
+            return new IEnumerator(
+                function () { enumerator = source.getEnumerator(); },
+                function () {
+                    return (enumerator.moveNext() && predicate(enumerator.getCurrent(), index++))
+                        ? this.yieldReturn(enumerator.getCurrent())
+                        : false;
+                },
+                function () { Utils.dispose(enumerator); });
+        });
+    };
+
+    // Overload:function ()
+    // Overload:function (count)
+    Enumerable.prototype.takeExceptLast = function (count) {
+        if (count == null) count = 1;
+        var source = this;
+
+        return new Enumerable(function () {
+            if (count <= 0) return source.getEnumerator(); // do nothing
+
+            var enumerator;
+            var q = [];
+
+            return new IEnumerator(
+                function () { enumerator = source.getEnumerator(); },
+                function () {
+                    while (enumerator.moveNext()) {
+                        if (q.length == count) {
+                            q.push(enumerator.getCurrent());
+                            return this.yieldReturn(q.shift());
+                        }
+                        q.push(enumerator.getCurrent());
+                    }
+                    return false;
+                },
+                function () { Utils.dispose(enumerator); });
+        });
+    };
+
+    Enumerable.prototype.takeFromLast = function (count) {
+        if (count <= 0 || count == null) return Enumerable.empty();
+        var source = this;
+
+        return new Enumerable(function () {
+            var sourceEnumerator;
+            var enumerator;
+            var q = [];
+
+            return new IEnumerator(
+                function () { sourceEnumerator = source.getEnumerator(); },
+                function () {
+                    if (enumerator == null) {
+	                    while (sourceEnumerator.moveNext()) {
+	                        if (q.length == count) q.shift();
+	                        q.push(sourceEnumerator.getCurrent());
+	                    }
+                        enumerator = Enumerable.from(q).getEnumerator();
+                    }
+                    return (enumerator.moveNext())
+                        ? this.yieldReturn(enumerator.getCurrent())
+                        : false;
+                },
+                function () { Utils.dispose(enumerator); });
+        });
+    };
+
+    // Overload:function (item)
+    // Overload:function (predicate)
+    Enumerable.prototype.indexOf = function (item, comparer) {
+        var found = null;
+
+        // item as predicate
+        if (typeof (item) === Types.Function) {
+            this.forEach(function (x, i) {
+                if (item(x, i)) {
+                    found = i;
+                    return false;
+                }
+            });
+        }
+        else {
+            comparer = comparer || Bridge.EqualityComparer$1.$default;
+            this.forEach(function (x, i) {
+                if (comparer.equals(x, item)) {
+                    found = i;
+                    return false;
+                }
+            });
+        }
+
+        return (found !== null) ? found : -1;
+    };
+
+    // Overload:function (item)
+    // Overload:function (predicate)
+    Enumerable.prototype.lastIndexOf = function (item, comparer) {
+        var result = -1;
+
+        // item as predicate
+        if (typeof (item) === Types.Function) {
+            this.forEach(function (x, i) {
+                if (item(x, i)) result = i;
+            });
+        }
+        else {
+            comparer = comparer || Bridge.EqualityComparer$1.$default;
+            this.forEach(function (x, i) {
+                if (comparer.equals(x, item)) result = i;
+            });
+        }
+
+        return result;
+    };
+
+    /* Convert Methods */
+
+
+    Enumerable.prototype.asEnumerable = function () {
+        return Enumerable.from(this);
+    };
+
+    Enumerable.prototype.toArray = function () {
+        var array = [];
+        this.forEach(function (x) { array.push(x); });
+        return array;
+    };
+
+    Enumerable.prototype.toList = function (T) {
+        var array = [];
+        this.forEach(function (x) { array.push(x); });
+        return new Bridge.List$1(T || Object)(array);
+    };
+
+    // Overload:function (keySelector)
+    // Overload:function (keySelector, elementSelector)
+    // Overload:function (keySelector, elementSelector, compareSelector)
+    Enumerable.prototype.toLookup = function (keySelector, elementSelector, comparer) {
+        keySelector = Utils.createLambda(keySelector);
+        elementSelector = Utils.createLambda(elementSelector);
+
+        var dict = new Bridge.Dictionary$2(Object, Object)(null, comparer);
+        var order = [];
+        this.forEach(function (x) {
+            var key = keySelector(x);
+            var element = elementSelector(x);
+
+            var array = { v: null };
+            if (dict.tryGetValue(key, array)) {
+                array.v.push(element);
+            }
+            else {
+                order.push(key);
+                dict.add(key, [element]);
+            }
+        });
+        return new Lookup(dict, order);
+    };
+
+    Enumerable.prototype.toObject = function (keySelector, elementSelector) {
+        keySelector = Utils.createLambda(keySelector);
+        elementSelector = Utils.createLambda(elementSelector);
+
+        var obj = {};
+        this.forEach(function (x) {
+            obj[keySelector(x)] = elementSelector(x);
+        });
+        return obj;
+    };
+
+    // Overload:function (keySelector, elementSelector)
+    // Overload:function (keySelector, elementSelector, compareSelector)
+    Enumerable.prototype.toDictionary = function (keySelector, elementSelector, keyType, valueType, comparer) {
+        keySelector = Utils.createLambda(keySelector);
+        elementSelector = Utils.createLambda(elementSelector);
+
+        var dict = new Bridge.Dictionary$2(keyType, valueType)(null, comparer);
+        this.forEach(function (x) {
+            dict.add(keySelector(x), elementSelector(x));
+        });
+        return dict;
+    };
+
+    // Overload:function ()
+    // Overload:function (replacer)
+    // Overload:function (replacer, space)
+    Enumerable.prototype.toJSONString = function (replacer, space) {
+        if (typeof JSON === Types.Undefined || JSON.stringify == null) {
+            throw new Error("toJSONString can't find JSON.stringify. This works native JSON support Browser or include json2.js");
+        }
+        return JSON.stringify(this.toArray(), replacer, space);
+    };
+
+    // Overload:function ()
+    // Overload:function (separator)
+    // Overload:function (separator,selector)
+    Enumerable.prototype.toJoinedString = function (separator, selector) {
+        if (separator == null) separator = "";
+        if (selector == null) selector = Functions.Identity;
+
+        return this.select(selector).toArray().join(separator);
+    };
+
+
+    /* Action Methods */
+
+    // Overload:function (action<element>)
+    // Overload:function (action<element,index>)
+    Enumerable.prototype.doAction = function (action) {
+        var source = this;
+        action = Utils.createLambda(action);
+
+        return new Enumerable(function () {
+            var enumerator;
+            var index = 0;
+
+            return new IEnumerator(
+                function () { enumerator = source.getEnumerator(); },
+                function () {
+                    if (enumerator.moveNext()) {
+                        action(enumerator.getCurrent(), index++);
+                        return this.yieldReturn(enumerator.getCurrent());
+                    }
+                    return false;
+                },
+                function () { Utils.dispose(enumerator); });
+        });
+    };
+
+    // Overload:function (action<element>)
+    // Overload:function (action<element,index>)
+    // Overload:function (func<element,bool>)
+    // Overload:function (func<element,index,bool>)
+    Enumerable.prototype.forEach = function (action) {
+        action = Utils.createLambda(action);
+
+        var index = 0;
+        var enumerator = this.getEnumerator();
+        try {
+            while (enumerator.moveNext()) {
+                if (action(enumerator.getCurrent(), index++) === false) break;
+            }
+        } finally {
+            Utils.dispose(enumerator);
+        }
+    };
+
+    // Overload:function ()
+    // Overload:function (separator)
+    // Overload:function (separator,selector)
+    Enumerable.prototype.write = function (separator, selector) {
+        if (separator == null) separator = "";
+        selector = Utils.createLambda(selector);
+
+        var isFirst = true;
+        this.forEach(function (item) {
+            if (isFirst) isFirst = false;
+            else document.write(separator);
+            document.write(selector(item));
+        });
+    };
+
+    // Overload:function ()
+    // Overload:function (selector)
+    Enumerable.prototype.writeLine = function (selector) {
+        selector = Utils.createLambda(selector);
+
+        this.forEach(function (item) {
+            document.writeln(selector(item) + "<br />");
+        });
+    };
+
+    Enumerable.prototype.force = function () {
+        var enumerator = this.getEnumerator();
+
+        try {
+            while (enumerator.moveNext()) {
+            }
+        }
+        finally {
+            Utils.dispose(enumerator);
+        }
+    };
+
+    /* Functional Methods */
+
+    Enumerable.prototype.letBind = function (func) {
+        func = Utils.createLambda(func);
+        var source = this;
+
+        return new Enumerable(function () {
+            var enumerator;
+
+            return new IEnumerator(
+                function () {
+                    enumerator = Enumerable.from(func(source)).getEnumerator();
+                },
+                function () {
+                    return (enumerator.moveNext())
+                        ? this.yieldReturn(enumerator.getCurrent())
+                        : false;
+                },
+                function () { Utils.dispose(enumerator); });
+        });
+    };
+
+    Enumerable.prototype.share = function () {
+        var source = this;
+        var sharedEnumerator;
+        var disposed = false;
+
+        return new DisposableEnumerable(function () {
+            return new IEnumerator(
+                function () {
+                    if (sharedEnumerator == null) {
+                        sharedEnumerator = source.getEnumerator();
+                    }
+                },
+                function () {
+                    if (disposed) throw new Error("enumerator is disposed");
+
+                    return (sharedEnumerator.moveNext())
+                        ? this.yieldReturn(sharedEnumerator.getCurrent())
+                        : false;
+                },
+                Functions.Blank
+            );
+        }, function () {
+            disposed = true;
+            Utils.dispose(sharedEnumerator);
+        });
+    };
+
+    Enumerable.prototype.memoize = function () {
+        var source = this;
+        var cache;
+        var enumerator;
+        var disposed = false;
+
+        return new DisposableEnumerable(function () {
+            var index = -1;
+
+            return new IEnumerator(
+                function () {
+                    if (enumerator == null) {
+                        enumerator = source.getEnumerator();
+                        cache = [];
+                    }
+                },
+                function () {
+                    if (disposed) throw new Error("enumerator is disposed");
+
+                    index++;
+                    if (cache.length <= index) {
+                        return (enumerator.moveNext())
+                            ? this.yieldReturn(cache[index] = enumerator.getCurrent())
+                            : false;
+                    }
+
+                    return this.yieldReturn(cache[index]);
+                },
+                Functions.Blank
+            );
+        }, function () {
+            disposed = true;
+            Utils.dispose(enumerator);
+            cache = null;
+        });
+    };
+
+    /* Error Handling Methods */
+
+    Enumerable.prototype.catchError = function (handler) {
+        handler = Utils.createLambda(handler);
+        var source = this;
+
+        return new Enumerable(function () {
+            var enumerator;
+
+            return new IEnumerator(
+                function () { enumerator = source.getEnumerator(); },
+                function () {
+                    try {
+                        return (enumerator.moveNext())
+                            ? this.yieldReturn(enumerator.getCurrent())
+                            : false;
+                    } catch (e) {
+                        handler(e);
+                        return false;
+                    }
+                },
+                function () { Utils.dispose(enumerator); });
+        });
+    };
+
+    Enumerable.prototype.finallyAction = function (finallyAction) {
+        finallyAction = Utils.createLambda(finallyAction);
+        var source = this;
+
+        return new Enumerable(function () {
+            var enumerator;
+
+            return new IEnumerator(
+                function () { enumerator = source.getEnumerator(); },
+                function () {
+                    return (enumerator.moveNext())
+                        ? this.yieldReturn(enumerator.getCurrent())
+                        : false;
+                },
+                function () {
+                    try {
+                        Utils.dispose(enumerator);
+                    } finally {
+                        finallyAction();
+                    }
+                });
+        });
+    };
+
+    /* For Debug Methods */
+
+    // Overload:function ()
+    // Overload:function (selector)
+    Enumerable.prototype.log = function (selector) {
+        selector = Utils.createLambda(selector);
+
+        return this.doAction(function (item) {
+            if (typeof console !== Types.Undefined) {
+                console.log(selector(item));
+            }
+        });
+    };
+
+    // Overload:function ()
+    // Overload:function (message)
+    // Overload:function (message,selector)
+    Enumerable.prototype.trace = function (message, selector) {
+        if (message == null) message = "Trace";
+        selector = Utils.createLambda(selector);
+
+        return this.doAction(function (item) {
+            if (typeof console !== Types.Undefined) {
+                console.log(message, selector(item));
+            }
+        });
+    };
+
+    // private
+
+    var OrderedEnumerable = function (source, keySelector, comparer, descending, parent) {
+        this.source = source;
+        this.keySelector = Utils.createLambda(keySelector);
+        this.comparer = comparer || Bridge.Comparer$1.$default;
+        this.descending = descending;
+        this.parent = parent;
+    };
+    OrderedEnumerable.prototype = new Enumerable();
+
+    OrderedEnumerable.prototype.createOrderedEnumerable = function (keySelector, comparer, descending) {
+        return new OrderedEnumerable(this.source, keySelector, comparer, descending, this);
+    };
+
+    OrderedEnumerable.prototype.thenBy = function (keySelector, comparer) {
+        return this.createOrderedEnumerable(keySelector, comparer, false);
+    };
+
+    OrderedEnumerable.prototype.thenByDescending = function (keySelector, comparer) {
+        return this.createOrderedEnumerable(keySelector, comparer, true);
+    };
+
+    OrderedEnumerable.prototype.getEnumerator = function () {
+        var self = this;
+        var buffer;
+        var indexes;
+        var index = 0;
+
+        return new IEnumerator(
+            function () {
+                buffer = [];
+                indexes = [];
+                self.source.forEach(function (item, index) {
+                    buffer.push(item);
+                    indexes.push(index);
+                });
+                var sortContext = SortContext.create(self, null);
+                sortContext.GenerateKeys(buffer);
+
+                indexes.sort(function (a, b) { return sortContext.compare(a, b); });
+            },
+            function () {
+                return (index < indexes.length)
+                    ? this.yieldReturn(buffer[indexes[index++]])
+                    : false;
+            },
+            Functions.Blank
+        );
+    };
+
+    var SortContext = function (keySelector, comparer, descending, child) {
+        this.keySelector = keySelector;
+        this.comparer = comparer;
+        this.descending = descending;
+        this.child = child;
+        this.keys = null;
+    };
+
+    SortContext.create = function (orderedEnumerable, currentContext) {
+        var context = new SortContext(orderedEnumerable.keySelector, orderedEnumerable.comparer, orderedEnumerable.descending, currentContext);
+        if (orderedEnumerable.parent != null) return SortContext.create(orderedEnumerable.parent, context);
+        return context;
+    };
+
+    SortContext.prototype.GenerateKeys = function (source) {
+        var len = source.length;
+        var keySelector = this.keySelector;
+        var keys = new Array(len);
+        for (var i = 0; i < len; i++) keys[i] = keySelector(source[i]);
+        this.keys = keys;
+
+        if (this.child != null) this.child.GenerateKeys(source);
+    };
+
+    SortContext.prototype.compare = function (index1, index2) {
+        var comparison = this.comparer.compare(this.keys[index1], this.keys[index2]);
+
+        if (comparison == 0) {
+            if (this.child != null) return this.child.compare(index1, index2);
+            return Utils.compare(index1, index2);
+        }
+
+        return (this.descending) ? -comparison : comparison;
+    };
+
+    var DisposableEnumerable = function (getEnumerator, dispose) {
+        this.dispose = dispose;
+        Enumerable.call(this, getEnumerator);
+    };
+    DisposableEnumerable.prototype = new Enumerable();
+
+    // optimize array or arraylike object
+
+    var ArrayEnumerable = function (source) {
+        this.getSource = function () { return source; };
+    };
+    ArrayEnumerable.prototype = new Enumerable();
+
+    ArrayEnumerable.prototype.any = function (predicate) {
+        return (predicate == null)
+            ? (this.getSource().length > 0)
+            : Enumerable.prototype.any.apply(this, arguments);
+    };
+
+    ArrayEnumerable.prototype.count = function (predicate) {
+        return (predicate == null)
+            ? this.getSource().length
+            : Enumerable.prototype.count.apply(this, arguments);
+    };
+
+    ArrayEnumerable.prototype.elementAt = function (index) {
+        var source = this.getSource();
+        return (0 <= index && index < source.length)
+            ? source[index]
+            : Enumerable.prototype.elementAt.apply(this, arguments);
+    };
+
+    ArrayEnumerable.prototype.elementAtOrDefault = function (index, defaultValue) {
+        if (defaultValue === undefined) defaultValue = null;
+        var source = this.getSource();
+        return (0 <= index && index < source.length)
+            ? source[index]
+            : defaultValue;
+    };
+
+    ArrayEnumerable.prototype.first = function (predicate) {
+        var source = this.getSource();
+        return (predicate == null && source.length > 0)
+            ? source[0]
+            : Enumerable.prototype.first.apply(this, arguments);
+    };
+
+    ArrayEnumerable.prototype.firstOrDefault = function (predicate, defaultValue) {
+        if (defaultValue === undefined) defaultValue = null;
+        if (predicate != null) {
+            return Enumerable.prototype.firstOrDefault.apply(this, arguments);
+        }
+
+        var source = this.getSource();
+        return source.length > 0 ? source[0] : defaultValue;
+    };
+
+    ArrayEnumerable.prototype.last = function (predicate) {
+        var source = this.getSource();
+        return (predicate == null && source.length > 0)
+            ? source[source.length - 1]
+            : Enumerable.prototype.last.apply(this, arguments);
+    };
+
+    ArrayEnumerable.prototype.lastOrDefault = function (predicate, defaultValue) {
+        if (defaultValue === undefined) defaultValue = null;
+        if (predicate != null) {
+            return Enumerable.prototype.lastOrDefault.apply(this, arguments);
+        }
+
+        var source = this.getSource();
+        return source.length > 0 ? source[source.length - 1] : defaultValue;
+    };
+
+    ArrayEnumerable.prototype.skip = function (count) {
+        var source = this.getSource();
+
+        return new Enumerable(function () {
+            var index;
+
+            return new IEnumerator(
+                function () { index = (count < 0) ? 0 : count; },
+                function () {
+                    return (index < source.length)
+                        ? this.yieldReturn(source[index++])
+                        : false;
+                },
+                Functions.Blank);
+        });
+    };
+
+    ArrayEnumerable.prototype.takeExceptLast = function (count) {
+        if (count == null) count = 1;
+        return this.take(this.getSource().length - count);
+    };
+
+    ArrayEnumerable.prototype.takeFromLast = function (count) {
+        return this.skip(this.getSource().length - count);
+    };
+
+    ArrayEnumerable.prototype.reverse = function () {
+        var source = this.getSource();
+
+        return new Enumerable(function () {
+            var index;
+
+            return new IEnumerator(
+                function () {
+                    index = source.length;
+                },
+                function () {
+                    return (index > 0)
+                        ? this.yieldReturn(source[--index])
+                        : false;
+                },
+                Functions.Blank);
+        });
+    };
+
+    ArrayEnumerable.prototype.sequenceEqual = function (second, comparer) {
+        if ((second instanceof ArrayEnumerable || second instanceof Array)
+            && comparer == null
+            && Enumerable.from(second).count() != this.count()) {
+            return false;
+        }
+
+        return Enumerable.prototype.sequenceEqual.apply(this, arguments);
+    };
+
+    ArrayEnumerable.prototype.toJoinedString = function (separator, selector) {
+        var source = this.getSource();
+        if (selector != null || !(source instanceof Array)) {
+            return Enumerable.prototype.toJoinedString.apply(this, arguments);
+        }
+
+        if (separator == null) separator = "";
+        return source.join(separator);
+    };
+
+    ArrayEnumerable.prototype.getEnumerator = function () {
+        return new Bridge.ArrayEnumerator(this.getSource());
+    };
+
+    // optimization for multiple where and multiple select and whereselect
+
+    var WhereEnumerable = function (source, predicate) {
+        this.prevSource = source;
+        this.prevPredicate = predicate; // predicate.length always <= 1
+    };
+    WhereEnumerable.prototype = new Enumerable();
+
+    WhereEnumerable.prototype.where = function (predicate) {
+        predicate = Utils.createLambda(predicate);
+
+        if (predicate.length <= 1) {
+            var prevPredicate = this.prevPredicate;
+            var composedPredicate = function (x) { return prevPredicate(x) && predicate(x); };
+            return new WhereEnumerable(this.prevSource, composedPredicate);
+        }
+        else {
+            // if predicate use index, can't compose
+            return Enumerable.prototype.where.call(this, predicate);
+        }
+    };
+
+    WhereEnumerable.prototype.select = function (selector) {
+        selector = Utils.createLambda(selector);
+
+        return (selector.length <= 1)
+            ? new WhereSelectEnumerable(this.prevSource, this.prevPredicate, selector)
+            : Enumerable.prototype.select.call(this, selector);
+    };
+
+    WhereEnumerable.prototype.getEnumerator = function () {
+        var predicate = this.prevPredicate;
+        var source = this.prevSource;
+        var enumerator;
+
+        return new IEnumerator(
+            function () { enumerator = source.getEnumerator(); },
+            function () {
+                while (enumerator.moveNext()) {
+                    if (predicate(enumerator.getCurrent())) {
+                        return this.yieldReturn(enumerator.getCurrent());
+                    }
+                }
+                return false;
+            },
+            function () { Utils.dispose(enumerator); });
+    };
+
+    var WhereSelectEnumerable = function (source, predicate, selector) {
+        this.prevSource = source;
+        this.prevPredicate = predicate; // predicate.length always <= 1 or null
+        this.prevSelector = selector; // selector.length always <= 1
+    };
+    WhereSelectEnumerable.prototype = new Enumerable();
+
+    WhereSelectEnumerable.prototype.where = function (predicate) {
+        predicate = Utils.createLambda(predicate);
+
+        return (predicate.length <= 1)
+            ? new WhereEnumerable(this, predicate)
+            : Enumerable.prototype.where.call(this, predicate);
+    };
+
+    WhereSelectEnumerable.prototype.select = function (selector) {
+        selector = Utils.createLambda(selector);
+
+        if (selector.length <= 1) {
+            var prevSelector = this.prevSelector;
+            var composedSelector = function (x) { return selector(prevSelector(x)); };
+            return new WhereSelectEnumerable(this.prevSource, this.prevPredicate, composedSelector);
+        }
+        else {
+            // if selector use index, can't compose
+            return Enumerable.prototype.select.call(this, selector);
+        }
+    };
+
+    WhereSelectEnumerable.prototype.getEnumerator = function () {
+        var predicate = this.prevPredicate;
+        var selector = this.prevSelector;
+        var source = this.prevSource;
+        var enumerator;
+
+        return new IEnumerator(
+            function () { enumerator = source.getEnumerator(); },
+            function () {
+                while (enumerator.moveNext()) {
+                    if (predicate == null || predicate(enumerator.getCurrent())) {
+                        return this.yieldReturn(selector(enumerator.getCurrent()));
+                    }
+                }
+                return false;
+            },
+            function () { Utils.dispose(enumerator); });
+    };
+
+    // Collections
+
+    // dictionary = Dictionary<TKey, TValue[]>
+    var Lookup = function (dictionary, order) {
+        this.count = function () {
+            return dictionary.getCount();
+        };
+        this.get = function (key) {
+            var value = { v: null };
+            var success = dictionary.tryGetValue(key, value);
+            return Enumerable.from(success ? value.v : []);
+        };
+        this.contains = function (key) {
+            return dictionary.containsKey(key);
+        };
+        this.toEnumerable = function () {
+            return Enumerable.from(order).select(function (key) {
+                return new Grouping(key, dictionary.get(key));
+            });
+        };
+        this.getEnumerator = function () {
+            return this.toEnumerable().getEnumerator();
+        };
+    };
+    Lookup.$$inheritors = [Bridge.IEnumerable];
+
+    var Grouping = function (groupKey, elements) {
+        this.key = function () {
+            return groupKey;
+        };
+        ArrayEnumerable.call(this, elements);
+    };
+    Grouping.prototype = new ArrayEnumerable();
+
+    // module export
+    if (typeof define === Types.Function && define.amd) { // AMD
+        define("linqjs", [], function () { return Enumerable; });
+    } else if (typeof module !== Types.Undefined && module.exports) { // Node
+        module.exports = Enumerable;
+    } else {
+        root.Enumerable = Enumerable;
+    }
+
+    Bridge.Linq = {};
+    Bridge.Linq.Enumerable = Enumerable;
+})(Bridge.global);
+
+    // @source End.js
+
+    // module export
+    if (typeof define === "function" && define.amd) {
+        // AMD
+        define("bridge", [], function () { return Bridge; });
+    } else if (typeof module !== "undefined" && module.exports) {
+        // Node
+        module.exports = Bridge;
+    }
+
+})(this);
+
+
+/* global Bridge */
+
+"use strict";
+
+/**
+ * @memberof System
+ * @callback System.Action
+ * @param   {AlphaTab.Model.Score}    arg
+ * @return  {void}
+ */
+
+/** @namespace System */
+
+/**
+ * @memberof System
+ * @callback System.Func
+ * @param   {string}     arg
+ * @return  {boolean}
+ */
+
+/** @namespace AlphaTab.Audio */
+
+/**
+ * This public class provides names for all general midi instruments.
+ *
+ * @public
+ * @class AlphaTab.Audio.GeneralMidi
+ */
+Bridge.define('AlphaTab.Audio.GeneralMidi', {
+    statics: {
+        _values: null,
+        getValue: function (name) {
+            if (Bridge.get(AlphaTab.Audio.GeneralMidi)._values === null) {
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values = {};
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.acousticgrandpiano = 0;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.brightacousticpiano = 1;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.electricgrandpiano = 2;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.honkytonkpiano = 3;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.electricpiano1 = 4;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.electricpiano2 = 5;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.harpsichord = 6;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.clavinet = 7;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.celesta = 8;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.glockenspiel = 9;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.musicbox = 10;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.vibraphone = 11;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.marimba = 12;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.xylophone = 13;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.tubularbells = 14;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.dulcimer = 15;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.drawbarorgan = 16;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.percussiveorgan = 17;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.rockorgan = 18;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.churchorgan = 19;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.reedorgan = 20;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.accordion = 21;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.harmonica = 22;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.tangoaccordion = 23;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.acousticguitarnylon = 24;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.acousticguitarsteel = 25;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.electricguitarjazz = 26;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.electricguitarclean = 27;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.electricguitarmuted = 28;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.overdrivenguitar = 29;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.distortionguitar = 30;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.guitarharmonics = 31;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.acousticbass = 32;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.electricbassfinger = 33;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.electricbasspick = 34;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.fretlessbass = 35;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.slapbass1 = 36;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.slapbass2 = 37;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.synthbass1 = 38;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.synthbass2 = 39;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.violin = 40;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.viola = 41;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.cello = 42;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.contrabass = 43;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.tremolostrings = 44;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.pizzicatostrings = 45;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.orchestralharp = 46;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.timpani = 47;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.stringensemble1 = 48;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.stringensemble2 = 49;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.synthstrings1 = 50;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.synthstrings2 = 51;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.choiraahs = 52;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.voiceoohs = 53;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.synthvoice = 54;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.orchestrahit = 55;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.trumpet = 56;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.trombone = 57;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.tuba = 58;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.mutedtrumpet = 59;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.frenchhorn = 60;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.brasssection = 61;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.synthbrass1 = 62;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.synthbrass2 = 63;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.sopranosax = 64;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.altosax = 65;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.tenorsax = 66;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.baritonesax = 67;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.oboe = 68;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.englishhorn = 69;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.bassoon = 70;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.clarinet = 71;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.piccolo = 72;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.flute = 73;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.recorder = 74;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.panflute = 75;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.blownbottle = 76;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.shakuhachi = 77;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.whistle = 78;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.ocarina = 79;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.lead1square = 80;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.lead2sawtooth = 81;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.lead3calliope = 82;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.lead4chiff = 83;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.lead5charang = 84;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.lead6voice = 85;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.lead7fifths = 86;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.lead8bassandlead = 87;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.pad1newage = 88;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.pad2warm = 89;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.pad3polysynth = 90;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.pad4choir = 91;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.pad5bowed = 92;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.pad6metallic = 93;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.pad7halo = 94;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.pad8sweep = 95;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.fx1rain = 96;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.fx2soundtrack = 97;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.fx3crystal = 98;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.fx4atmosphere = 99;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.fx5brightness = 100;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.fx6goblins = 101;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.fx7echoes = 102;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.fx8scifi = 103;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.sitar = 104;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.banjo = 105;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.shamisen = 106;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.koto = 107;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.kalimba = 108;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.bagpipe = 109;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.fiddle = 110;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.shanai = 111;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.tinklebell = 112;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.agogo = 113;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.steeldrums = 114;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.woodblock = 115;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.taikodrum = 116;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.melodictom = 117;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.synthdrum = 118;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.reversecymbal = 119;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.guitarfretnoise = 120;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.breathnoise = 121;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.seashore = 122;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.birdtweet = 123;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.telephonering = 124;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.helicopter = 125;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.applause = 126;
+                Bridge.get(AlphaTab.Audio.GeneralMidi)._values.gunshot = 127;
+            }
+            name = Bridge.String.replaceAll(name.toLowerCase(), " ", "");
+            return Bridge.get(AlphaTab.Audio.GeneralMidi)._values.hasOwnProperty(name) ? Bridge.get(AlphaTab.Audio.GeneralMidi)._values[name] : 0;
+        }
+    }
+});
+
+/** @namespace AlphaTab.Audio.Generator */
+
+/**
+ * A handler is responsible for writing midi events to a custom structure
+ *
+ * @abstract
+ * @public
+ * @class AlphaTab.Audio.Generator.IMidiFileHandler
+ */
+Bridge.define('AlphaTab.Audio.Generator.IMidiFileHandler');
+
+/**
+ * This handler is responsible for writing midi events
+ to a MidiFile object.
+ *
+ * @public
+ * @class AlphaTab.Audio.Generator.MidiFileHandler
+ * @implements  AlphaTab.Audio.Generator.IMidiFileHandler
+ */
+Bridge.define('AlphaTab.Audio.Generator.MidiFileHandler', {
+    inherits: [AlphaTab.Audio.Generator.IMidiFileHandler],
+    statics: {
+        DefaultMetronomeKey: 37,
+        DefaultDurationDead: 30,
+        DefaultDurationPalmMute: 80,
+        RestMessage: 0,
+        fixValue: function (value) {
+            if (value > 127) {
+                return 127;
+            }
+            return value;
+        },
+        buildMetaMessage: function (metaType, data) {
+            var meta = Bridge.get(AlphaTab.IO.ByteBuffer).empty();
+
+            meta.writeByte(255);
+            meta.writeByte((metaType & 255));
+
+            Bridge.get(AlphaTab.Audio.Generator.MidiFileHandler).writeVarInt(meta, data.length);
+
+            meta.write(data, 0, data.length);
+
+            return new AlphaTab.Audio.Model.MidiMessage(meta.toArray());
+        },
+        writeVarInt: function (data, v) {
+            var n = 0;
+            var array = new Uint8Array(4);
+            do  {
+                array[n++] = ((v & 127) & 255);
+                v >>= 7;
+            } while (v > 0);
+
+            while (n > 0) {
+                n--;
+                if (n > 0) {
+                    data.writeByte(((array[n] | 128) & 255));
+                }
+                else  {
+                    data.writeByte(array[n]);
+                }
+            }
+        },
+        buildSysExMessage: function (data) {
+            var sysex = Bridge.get(AlphaTab.IO.ByteBuffer).empty();
+
+            sysex.writeByte(240); // status 
+            Bridge.get(AlphaTab.Audio.Generator.MidiFileHandler).writeVarInt(sysex, data.length + 2); // write length of data
+            sysex.writeByte(0); // manufacturer id
+            sysex.write(data, 0, data.length); // data
+            sysex.writeByte(247); // end of data
+
+            return new AlphaTab.Audio.Model.MidiMessage(sysex.toArray());
+        }
+    },
+    _midiFile: null,
+    _metronomeTrack: 0,
+    constructor: function (midiFile) {
+        this._midiFile = midiFile;
+        this._metronomeTrack = -1;
+    },
+    addEvent: function (track, tick, message) {
+        this._midiFile.tracks[track].addEvent(new AlphaTab.Audio.Model.MidiEvent(tick, message));
+    },
+    makeCommand: function (command, channel) {
+        return ((command & 240) | (channel & 15));
+    },
+    addTimeSignature: function (tick, timeSignatureNumerator, timeSignatureDenominator) {
+        var $t;
+        var denominatorIndex = 0;
+        while ((($t = (timeSignatureDenominator >> 1), timeSignatureDenominator = $t, $t)) > 0) {
+            denominatorIndex++;
+        }
+        this.addEvent(this._midiFile.infoTrack, tick, Bridge.get(AlphaTab.Audio.Generator.MidiFileHandler).buildMetaMessage(88, [(timeSignatureNumerator & 255), (denominatorIndex & 255), 48, 8]));
+    },
+    addRest: function (track, tick, channel) {
+        this.addEvent(track, tick, Bridge.get(AlphaTab.Audio.Generator.MidiFileHandler).buildSysExMessage([Bridge.get(AlphaTab.Audio.Generator.MidiFileHandler).RestMessage]));
+    },
+    addNote: function (track, start, length, key, dynamicValue, channel) {
+        var velocity = Bridge.get(AlphaTab.Audio.MidiUtils).dynamicToVelocity(dynamicValue);
+        this.addEvent(track, start, new AlphaTab.Audio.Model.MidiMessage([this.makeCommand(144, channel), Bridge.get(AlphaTab.Audio.Generator.MidiFileHandler).fixValue(key), Bridge.get(AlphaTab.Audio.Generator.MidiFileHandler).fixValue(velocity)]));
+        this.addEvent(track, start + length, new AlphaTab.Audio.Model.MidiMessage([this.makeCommand(128, channel), Bridge.get(AlphaTab.Audio.Generator.MidiFileHandler).fixValue(key), Bridge.get(AlphaTab.Audio.Generator.MidiFileHandler).fixValue(velocity)]));
+    },
+    addControlChange: function (track, tick, channel, controller, value) {
+        this.addEvent(track, tick, new AlphaTab.Audio.Model.MidiMessage([this.makeCommand(176, channel), Bridge.get(AlphaTab.Audio.Generator.MidiFileHandler).fixValue(controller), Bridge.get(AlphaTab.Audio.Generator.MidiFileHandler).fixValue(value)]));
+    },
+    addProgramChange: function (track, tick, channel, program) {
+        this.addEvent(track, tick, new AlphaTab.Audio.Model.MidiMessage([this.makeCommand(192, channel), Bridge.get(AlphaTab.Audio.Generator.MidiFileHandler).fixValue(program)]));
+    },
+    addTempo: function (tick, tempo) {
+        // bpm -> microsecond per quarter note
+        var tempoInUsq = (Bridge.Int.div(60000000, tempo));
+        this.addEvent(this._midiFile.infoTrack, tick, Bridge.get(AlphaTab.Audio.Generator.MidiFileHandler).buildMetaMessage(81, [((tempoInUsq >> 16) & 255), ((tempoInUsq >> 8) & 255), (tempoInUsq & 255)]));
+    },
+    addBend: function (track, tick, channel, value) {
+        this.addEvent(track, tick, new AlphaTab.Audio.Model.MidiMessage([this.makeCommand(224, channel), 0, Bridge.get(AlphaTab.Audio.Generator.MidiFileHandler).fixValue(value)]));
+    },
+    addMetronome: function (start, length) {
+        if (this._metronomeTrack === -1) {
+            this._midiFile.createTrack();
+            this._metronomeTrack = this._midiFile.tracks.length - 1;
+        }
+        this.addNote(this._metronomeTrack, start, length, Bridge.get(AlphaTab.Audio.Generator.MidiFileHandler).DefaultMetronomeKey, Bridge.get(AlphaTab.Model.DynamicValue).f, Bridge.get(AlphaTab.Audio.MidiUtils).PercussionChannel);
+    }
+});
+
+/** @namespace AlphaTab.Audio.Model */
+
+/**
+ * A midi file consists of multiple tracks including a
+ info track for multi-track messages and a track for metronome ticks.
+ *
+ * @public
+ * @class AlphaTab.Audio.Model.MidiFile
+ */
+Bridge.define('AlphaTab.Audio.Model.MidiFile', {
+    config: {
+        properties: {
+            tracks: null,
+            /**
+             * Gets or sets the index of the track used for midi events
+             affecting all tracks. (like the tempo)
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Audio.Model.MidiFile
+             * @memberof AlphaTab.Audio.Model.MidiFile
+             * @function infoTrack
+             * @return  {number}
+             */
+            /**
+             * Gets or sets the index of the track used for midi events
+             affecting all tracks. (like the tempo)
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Audio.Model.MidiFile
+             * @memberof AlphaTab.Audio.Model.MidiFile
+             * @function infoTrack
+             * @param   {number}    value
+             * @return  {void}
+             */
+            infoTrack: 0
+        }
+    },
+    constructor: function () {
+        this.tracks = [];
+    },
+    createTrack: function () {
+        var track = new AlphaTab.Audio.Model.MidiTrack();
+        track.index = this.tracks.length;
+        track.file = this;
+        this.tracks.push(track);
+        return track;
+    },
+    writeTo: function (s) {
+        var b;
+
+        // magic number "MThd" (0x4D546864)
+        b = [77, 84, 104, 100];
+        s.write(b, 0, b.length);
+
+        // Header Length 6 (0x00000006)
+        b = [0, 0, 0, 6];
+        s.write(b, 0, b.length);
+
+        // format 
+        b = [0, 1];
+        s.write(b, 0, b.length);
+
+        // number of tracks
+        var v = this.tracks.length;
+        b = [((v >> 8) & 255), (v & 255)];
+        s.write(b, 0, b.length);
+
+        v = Bridge.get(AlphaTab.Audio.MidiUtils).QuarterTime;
+        b = [((v >> 8) & 255), (v & 255)];
+        s.write(b, 0, b.length);
+
+        for (var i = 0, j = this.tracks.length; i < j; i++) {
+            this.tracks[i].writeTo(s);
+        }
+    }
+});
+
+/** @namespace AlphaTab.Model */
+
+/**
+ * The score is the root node of the complete 
+ model. It stores the basic information of 
+ a song and stores the sub components.
+ *
+ * @public
+ * @class AlphaTab.Model.Score
+ */
+Bridge.define('AlphaTab.Model.Score', {
+    statics: {
+        copyTo: function (src, dst) {
+            dst.album = src.album;
+            dst.artist = src.artist;
+            dst.copyright = src.copyright;
+            dst.instructions = src.instructions;
+            dst.music = src.music;
+            dst.notices = src.notices;
+            dst.subTitle = src.subTitle;
+            dst.title = src.title;
+            dst.words = src.words;
+            dst.tab = src.tab;
+            dst.tempo = src.tempo;
+            dst.tempoLabel = src.tempoLabel;
+        }
+    },
+    _currentRepeatGroup: null,
+    config: {
+        properties: {
+            /**
+             * The album of this song.
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.Score
+             * @memberof AlphaTab.Model.Score
+             * @function album
+             * @return  {string}
+             */
+            /**
+             * The album of this song.
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.Score
+             * @memberof AlphaTab.Model.Score
+             * @function album
+             * @param   {string}    value
+             * @return  {void}
+             */
+            album: null,
+            /**
+             * The artist who performs this song.
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.Score
+             * @memberof AlphaTab.Model.Score
+             * @function artist
+             * @return  {string}
+             */
+            /**
+             * The artist who performs this song.
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.Score
+             * @memberof AlphaTab.Model.Score
+             * @function artist
+             * @param   {string}    value
+             * @return  {void}
+             */
+            artist: null,
+            /**
+             * The owner of the copyright of this song.
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.Score
+             * @memberof AlphaTab.Model.Score
+             * @function copyright
+             * @return  {string}
+             */
+            /**
+             * The owner of the copyright of this song.
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.Score
+             * @memberof AlphaTab.Model.Score
+             * @function copyright
+             * @param   {string}    value
+             * @return  {void}
+             */
+            copyright: null,
+            /**
+             * Additional instructions
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.Score
+             * @memberof AlphaTab.Model.Score
+             * @function instructions
+             * @return  {string}
+             */
+            /**
+             * Additional instructions
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.Score
+             * @memberof AlphaTab.Model.Score
+             * @function instructions
+             * @param   {string}    value
+             * @return  {void}
+             */
+            instructions: null,
+            /**
+             * The author of the music.
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.Score
+             * @memberof AlphaTab.Model.Score
+             * @function music
+             * @return  {string}
+             */
+            /**
+             * The author of the music.
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.Score
+             * @memberof AlphaTab.Model.Score
+             * @function music
+             * @param   {string}    value
+             * @return  {void}
+             */
+            music: null,
+            /**
+             * Some additional notes about the song.
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.Score
+             * @memberof AlphaTab.Model.Score
+             * @function notices
+             * @return  {string}
+             */
+            /**
+             * Some additional notes about the song.
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.Score
+             * @memberof AlphaTab.Model.Score
+             * @function notices
+             * @param   {string}    value
+             * @return  {void}
+             */
+            notices: null,
+            /**
+             * The subtitle of the song.
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.Score
+             * @memberof AlphaTab.Model.Score
+             * @function subTitle
+             * @return  {string}
+             */
+            /**
+             * The subtitle of the song.
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.Score
+             * @memberof AlphaTab.Model.Score
+             * @function subTitle
+             * @param   {string}    value
+             * @return  {void}
+             */
+            subTitle: null,
+            /**
+             * The title of the song.
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.Score
+             * @memberof AlphaTab.Model.Score
+             * @function title
+             * @return  {string}
+             */
+            /**
+             * The title of the song.
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.Score
+             * @memberof AlphaTab.Model.Score
+             * @function title
+             * @param   {string}    value
+             * @return  {void}
+             */
+            title: null,
+            /**
+             * The author of the song lyrics
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.Score
+             * @memberof AlphaTab.Model.Score
+             * @function words
+             * @return  {string}
+             */
+            /**
+             * The author of the song lyrics
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.Score
+             * @memberof AlphaTab.Model.Score
+             * @function words
+             * @param   {string}    value
+             * @return  {void}
+             */
+            words: null,
+            /**
+             * The author of this tablature.
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.Score
+             * @memberof AlphaTab.Model.Score
+             * @function tab
+             * @return  {string}
+             */
+            /**
+             * The author of this tablature.
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.Score
+             * @memberof AlphaTab.Model.Score
+             * @function tab
+             * @param   {string}    value
+             * @return  {void}
+             */
+            tab: null,
+            tempo: 0,
+            tempoLabel: null,
+            masterBars: null,
+            tracks: null
+        }
+    },
+    constructor: function () {
+        this.masterBars = [];
+        this.tracks = [];
+        this._currentRepeatGroup = new AlphaTab.Model.RepeatGroup();
+    },
+    addMasterBar: function (bar) {
+        bar.score = this;
+        bar.index = this.masterBars.length;
+        if (this.masterBars.length !== 0) {
+            bar.previousMasterBar = this.masterBars[this.masterBars.length - 1];
+            bar.previousMasterBar.nextMasterBar = bar;
+            bar.start = bar.previousMasterBar.start + bar.previousMasterBar.calculateDuration();
+        }
+
+        // if the group is closed only the next upcoming header can
+        // reopen the group in case of a repeat alternative, so we 
+        // remove the current group 
+        if (bar.isRepeatStart || (this._currentRepeatGroup.isClosed && bar.alternateEndings <= 0)) {
+            this._currentRepeatGroup = new AlphaTab.Model.RepeatGroup();
+        }
+        this._currentRepeatGroup.addMasterBar(bar);
+        this.masterBars.push(bar);
+    },
+    addTrack: function (track) {
+        track.score = this;
+        track.index = this.tracks.length;
+        this.tracks.push(track);
+    },
+    finish: function () {
+        for (var i = 0, j = this.tracks.length; i < j; i++) {
+            this.tracks[i].finish();
+        }
+    }
+});
+
+/**
+ * Represents a midi message.
+ *
+ * @public
+ * @class AlphaTab.Audio.Model.MidiMessage
+ */
+Bridge.define('AlphaTab.Audio.Model.MidiMessage', {
+    config: {
+        properties: {
+            event: null,
+            /**
+             * The raw midi message data
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Audio.Model.MidiMessage
+             * @memberof AlphaTab.Audio.Model.MidiMessage
+             * @function data
+             * @return  {Array.<number>}
+             */
+            /**
+             * The raw midi message data
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Audio.Model.MidiMessage
+             * @memberof AlphaTab.Audio.Model.MidiMessage
+             * @function data
+             * @param   {Array.<number>}    value
+             * @return  {void}
+             */
+            data: null
+        }
+    },
+    constructor: function (data) {
+        this.data = data;
+    },
+    writeTo: function (s) {
+        s.write(this.data, 0, this.data.length);
+    }
+});
+
+Bridge.define('AlphaTab.Audio.Generator.MidiPlaybackController', {
+    _score: null,
+    _currentAlternateEndings: 0,
+    _repeatStartIndex: 0,
+    _repeatNumber: 0,
+    _repeatOpen: false,
+    config: {
+        properties: {
+            shouldPlay: false,
+            index: 0,
+            currentTick: 0
+        }
+    },
+    constructor: function (score) {
+        this._score = score;
+
+        this.shouldPlay = true;
+        this.index = 0;
+        this.currentTick = 0;
+    },
+    getFinished: function () {
+        return this.index >= this._score.masterBars.length;
+    },
+    processCurrent: function () {
+        var masterBar = this._score.masterBars[this.index];
+        var masterBarAlternateEndings = masterBar.alternateEndings;
+
+        // if the repeat group wasn't closed we reset the repeating 
+        // on the last group opening
+        if (!masterBar.repeatGroup.isClosed && masterBar.repeatGroup.openings[masterBar.repeatGroup.openings.length - 1] === masterBar) {
+            this._repeatNumber = 0;
+            this._repeatOpen = false;
+        }
+
+        if ((masterBar.isRepeatStart || masterBar.index === 0) && this._repeatNumber === 0) {
+            this._repeatStartIndex = this.index;
+            this._repeatOpen = true;
+        }
+        else  {
+            if (masterBar.isRepeatStart) {
+                this.shouldPlay = true;
+            }
+        }
+
+        // if we encounter an alternate ending
+        if (this._repeatOpen && masterBarAlternateEndings > 0) {
+            // do we need to skip this section?
+            if ((masterBarAlternateEndings & (1 << this._repeatNumber)) === 0) {
+                this.shouldPlay = false;
+            }
+            else  {
+                this.shouldPlay = true;
+            }
+        }
+
+        if (this.shouldPlay) {
+            this.currentTick += masterBar.calculateDuration();
+        }
+    },
+    moveNext: function () {
+        var masterBar = this._score.masterBars[this.index];
+        var masterBarAlternateEndings = masterBar.alternateEndings;
+        var masterBarRepeatCount = masterBar.repeatCount - 1;
+
+        // if we encounter a repeat end 
+        if (this._repeatOpen && (masterBarRepeatCount > 0)) {
+            // more repeats required?
+            if (this._repeatNumber < masterBarRepeatCount) {
+                // jump to start
+                this.index = this._repeatStartIndex;
+                this._repeatNumber++;
+            }
+            else  {
+                // no repeats anymore, jump after repeat end
+                this._repeatNumber = 0;
+                this._repeatOpen = false;
+                this._currentAlternateEndings = 0;
+                this.shouldPlay = true;
+                this.index;
+            }
+        }
+        else  {
+            this.index;
+        }
+    }
+});
+
+/**
+ * Lists all durations of a beat.
+ *
+ * @public
+ * @class AlphaTab.Model.Duration
+ */
+Bridge.define('AlphaTab.Model.Duration', {
+    statics: {
+        whole: 1,
+        half: 2,
+        quarter: 4,
+        eighth: 8,
+        sixteenth: 16,
+        thirtySecond: 32,
+        sixtyFourth: 64
+    },
+    $enum: true
+});
+
+/**
+ * Lists all dynamics.
+ *
+ * @public
+ * @class AlphaTab.Model.DynamicValue
+ */
+Bridge.define('AlphaTab.Model.DynamicValue', {
+    statics: {
+        pPP: 0,
+        pP: 1,
+        p: 2,
+        mP: 3,
+        mF: 4,
+        f: 5,
+        fF: 6,
+        fFF: 7
+    },
+    $enum: true
+});
+
+Bridge.define('AlphaTab.Audio.Model.MidiTickLookup', {
+    _lastBeat: null,
+    config: {
+        properties: {
+            bars: null
+        }
+    },
+    constructor: function () {
+        this.bars = [];
+    },
+    findBeat: function (track, tick) {
+        //
+        // some heuristics: try last found beat and it's next beat for lookup first
+
+        // try last beat or next beat of last beat first
+        if (this._lastBeat !== null && this._lastBeat.nextBeat !== null && this._lastBeat.voice.bar.track === track) {
+            // check if tick is between _lastBeat and _lastBeat.nextBeat (still _lastBeat)
+            if (tick >= this._lastBeat.getAbsoluteStart() && tick < this._lastBeat.nextBeat.getAbsoluteStart()) {
+                return this._lastBeat;
+            }
+
+            // we need a upper-next beat to check the nextbeat range 
+            // TODO: this logic does not apply properly for alternate endings and repeats, better "next beat" detection using 
+            // "next bar" info
+            //if (_lastBeat.NextBeat.NextBeat != null && tick >= _lastBeat.NextBeat.AbsoluteStart && tick < _lastBeat.NextBeat.NextBeat.AbsoluteStart
+            //    && !(_lastBeat.Index == _lastBeat.Voice.Beats.Count - 1 && _lastBeat.Voice.Bar.MasterBar.IsRepeatEnd))
+            //{
+            //    _lastBeat = _lastBeat.NextBeat;
+            //    return _lastBeat;
+            //}
+        }
+
+        //
+        // Global Search
+
+        // binary search within lookup
+        var lookup = this.findBar(tick);
+        if (lookup === null) {
+            return null;
+        }
+
+        var masterBar = lookup.bar;
+        var bar = track.bars[masterBar.index];
+
+        // remap tick to initial bar start
+        tick = (tick - lookup.start + masterBar.start);
+
+        // linear search beat within beats
+        var beat = null;
+        for (var i = 0, j = bar.voices[0].beats.length; i < j; i++) {
+            var b = bar.voices[0].beats[i];
+            // we search for the first beat which 
+            // starts after the tick. 
+            if (beat === null || b.getAbsoluteStart() <= tick) {
+                beat = b;
+            }
+            else  {
+                break;
+            }
+        }
+
+        this._lastBeat = beat;
+
+        return this._lastBeat;
+    },
+    findBar: function (tick) {
+        var bottom = 0;
+        var top = this.bars.length - 1;
+
+        while (bottom <= top) {
+            var middle = Bridge.Int.div((top + bottom), 2);
+            var bar = this.bars[middle];
+
+            // found?
+            if (tick >= bar.start && tick <= bar.end) {
+                return bar;
+            }
+            // search in lower half 
+            if (tick < bar.start) {
+                top = middle - 1;
+            }
+            else  {
+                bottom = middle + 1;
+            }
+        }
+
+        return null;
+    }
+});
+
+Bridge.define('AlphaTab.Audio.Model.BarTickLookup', {
+    config: {
+        properties: {
+            start: 0,
+            end: 0,
+            bar: null
+        }
+    }
+});
+
+/**
+ * The MasterBar stores information about a bar which affects
+ all tracks.
+ *
+ * @public
+ * @class AlphaTab.Model.MasterBar
+ */
+Bridge.define('AlphaTab.Model.MasterBar', {
+    statics: {
+        /**
+         * The maximum alternate endings.  (1 byte with 8 bitflags)
+         *
+         * @static
+         * @public
+         * @memberof AlphaTab.Model.MasterBar
+         * @constant
+         * @default 8
+         * @type number
+         */
+        MaxAlternateEndings: 8,
+        copyTo: function (src, dst) {
+            dst.alternateEndings = src.alternateEndings;
+            dst.index = src.index;
+            dst.keySignature = src.keySignature;
+            dst.isDoubleBar = src.isDoubleBar;
+            dst.isRepeatStart = src.isRepeatStart;
+            dst.repeatCount = src.repeatCount;
+            dst.timeSignatureNumerator = src.timeSignatureNumerator;
+            dst.timeSignatureDenominator = src.timeSignatureDenominator;
+            dst.tripletFeel = src.tripletFeel;
+            dst.start = src.start;
+        }
+    },
+    config: {
+        properties: {
+            alternateEndings: 0,
+            nextMasterBar: null,
+            previousMasterBar: null,
+            index: 0,
+            keySignature: 0,
+            isDoubleBar: false,
+            isRepeatStart: false,
+            repeatCount: 0,
+            repeatGroup: null,
+            timeSignatureNumerator: 0,
+            timeSignatureDenominator: 0,
+            tripletFeel: 0,
+            section: null,
+            tempoAutomation: null,
+            volumeAutomation: null,
+            score: null,
+            /**
+             * The timeline position of the voice within the whole score. (unit: midi ticks)
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.MasterBar
+             * @memberof AlphaTab.Model.MasterBar
+             * @function start
+             * @return  {number}
+             */
+            /**
+             * The timeline position of the voice within the whole score. (unit: midi ticks)
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.MasterBar
+             * @memberof AlphaTab.Model.MasterBar
+             * @function start
+             * @param   {number}    value
+             * @return  {void}
+             */
+            start: 0
+        }
+    },
+    constructor: function () {
+        this.timeSignatureDenominator = 4;
+        this.timeSignatureNumerator = 4;
+        this.tripletFeel = Bridge.get(AlphaTab.Model.TripletFeel).noTripletFeel;
+    },
+    getIsRepeatEnd: function () {
+        return this.repeatCount > 0;
+    },
+    getIsSectionStart: function () {
+        return this.section !== null;
+    },
+    /**
+     * Calculates the time spent in this bar. (unit: midi ticks)
+     *
+     * @instance
+     * @public
+     * @this AlphaTab.Model.MasterBar
+     * @memberof AlphaTab.Model.MasterBar
+     * @return  {number}
+     */
+    calculateDuration: function () {
+        return this.timeSignatureNumerator * Bridge.get(AlphaTab.Audio.MidiUtils).valueToTicks(this.timeSignatureDenominator);
+    }
+});
+
+/**
+ * Contains all midi controller definitions
+ *
+ * @public
+ * @class AlphaTab.Audio.Model.MidiController
+ * @augments number
+ */
+Bridge.define('AlphaTab.Audio.Model.MidiController', {
+    statics: {
+        allNotesOff: 123,
+        balance: 10,
+        chorus: 93,
+        dataEntryLsb: 38,
+        dataEntryMsb: 6,
+        expression: 11,
+        phaser: 95,
+        reverb: 91,
+        rpnLsb: 100,
+        rpnMsb: 101,
+        tremolo: 92,
+        volume: 7
+    },
+    $enum: true
+});
+
+/**
+ * A midi event is a timed midi message.
+ *
+ * @public
+ * @class AlphaTab.Audio.Model.MidiEvent
+ */
+Bridge.define('AlphaTab.Audio.Model.MidiEvent', {
+    config: {
+        properties: {
+            track: null,
+            tick: 0,
+            message: null,
+            nextEvent: null,
+            previousEvent: null
+        }
+    },
+    constructor: function (tick, message) {
+        this.tick = tick;
+        this.message = message;
+    },
+    getDeltaTicks: function () {
+        return this.previousEvent === null ? 0 : this.tick - this.previousEvent.tick;
+    },
+    writeTo: function (s) {
+        this.writeVariableInt(s, this.getDeltaTicks());
+        this.message.writeTo(s);
+    },
+    writeVariableInt: function (s, value) {
+        var array = new Uint8Array(4);
+
+        var n = 0;
+        do  {
+            array[n++] = ((value & 127) & 255);
+            value >>= 7;
+        } while (value > 0);
+
+        while (n > 0) {
+            n--;
+            if (n > 0) {
+                s.writeByte((array[n] | 128));
+            }
+            else  {
+                s.writeByte(array[n]);
+            }
+        }
+    }
+});
+
+/**
+ * Represents a single midi track. A midi track contains
+ a linked list of midi es and supports sorted inserting of 
+ midi es into this track.
+ *
+ * @public
+ * @class AlphaTab.Audio.Model.MidiTrack
+ */
+Bridge.define('AlphaTab.Audio.Model.MidiTrack', {
+    config: {
+        properties: {
+            index: 0,
+            file: null,
+            firstEvent: null,
+            lastEvent: null
+        }
+    },
+    addEvent: function (e) {
+        e.track = this;
+        // first entry 
+        if (this.firstEvent === null) {
+            // first and last e
+            this.firstEvent = e;
+            this.lastEvent = e;
+        }
+        else  {
+            // is the e after the last one?
+            if (this.lastEvent.tick <= e.tick) {
+                // make the new e the last one
+                this.lastEvent.nextEvent = e;
+                e.previousEvent = this.lastEvent;
+                this.lastEvent = e;
+            }
+            else  {
+                if (this.firstEvent.tick > e.tick) {
+                    // make the new e the new head
+                    e.nextEvent = this.firstEvent;
+                    this.firstEvent.previousEvent = e;
+                    this.firstEvent = e;
+                }
+                else  {
+                    // we assume equal tick distribution and search for
+                    // the lesser distance,
+
+                    // start inserting on first e or last e?
+                    // use smaller delta 
+                    var firstDelta = e.tick - this.firstEvent.tick;
+                    var lastDelta = this.lastEvent.tick - e.tick;
+
+                    if (firstDelta < lastDelta) {
+                        // search position from start to end
+                        var previous = this.firstEvent;
+
+                        // as long the upcoming e is still before 
+                        // the new one
+                        while (previous !== null && previous.nextEvent !== null && previous.nextEvent.tick < e.tick) {
+                            // we're moving to the next e 
+                            previous = previous.nextEvent;
+                        }
+
+                        if (previous === null) {
+                            return;
+                        }
+
+                        // insert after the found element
+                        var next = previous.nextEvent;
+
+                        // update previous
+                        previous.nextEvent = e;
+
+                        // update new
+                        e.previousEvent = previous;
+                        e.nextEvent = next;
+
+                        // update next
+                        if (next !== null) {
+                            next.previousEvent = e;
+                        }
+                    }
+                    else  {
+                        // search position from end to start
+                        var next1 = this.lastEvent;
+
+                        // as long the previous e is after the new one
+                        while (next1 !== null && next1.previousEvent !== null && next1.previousEvent.tick > e.tick) {
+                            // we're moving to previous e
+                            next1 = next1.previousEvent;
+                        }
+
+                        if (next1 === null) {
+                            return;
+                        }
+
+                        var previous1 = next1.previousEvent;
+
+                        // update next
+                        next1.previousEvent = e;
+
+                        // update new
+                        e.nextEvent = next1;
+                        e.previousEvent = previous1;
+
+                        // update previous
+                        if (previous1 !== null) {
+                            previous1.nextEvent = e;
+                        }
+                        else  {
+                            this.firstEvent = e;
+                        }
+                    }
+                }
+            }
+        }
+    },
+    writeTo: function (s) {
+        // build track data first
+        var trackData = Bridge.get(AlphaTab.IO.ByteBuffer).empty();
+        var current = this.firstEvent;
+        var count = 0;
+        while (current !== null) {
+            current.writeTo(trackData);
+            current = current.nextEvent;
+            count++;
+        }
+
+        // magic number "MTrk" (0x4D54726B)
+        var b = [77, 84, 114, 107];
+        s.write(b, 0, b.length);
+
+        // size as integer
+        var data = trackData.toArray();
+        var l = data.length;
+        b = [((l >> 24) & 255), ((l >> 16) & 255), ((l >> 8) & 255), ((l >> 0) & 255)];
+        s.write(b, 0, b.length);
+        s.write(data, 0, data.length);
+    }
+});
+
+Bridge.define('AlphaTab.Importer.AlphaTexException', {
+    inherits: [Bridge.Exception],
+    config: {
+        properties: {
+            position: 0,
+            nonTerm: null,
+            expected: 0,
+            symbol: 0,
+            symbolData: null
+        }
+    },
+    constructor: function (position, nonTerm, expected, symbol, symbolData) {
+        Bridge.Exception.prototype.$constructor.call(this);
+
+        if (symbolData === void 0) { symbolData = null; }
+        this.position = position;
+        this.nonTerm = nonTerm;
+        this.expected = expected;
+        this.symbol = symbol;
+        this.symbolData = symbolData;
+    },
+    getMessage: function () {
+        if (this.symbolData === null) {
+            return this.position + ": Error on block " + this.nonTerm + ", expected a " + this.expected + " found a " + this.symbol;
+        }
+
+        return this.position + ": Error on block " + this.nonTerm + ", invalid value: " + this.symbolData;
+    }
+});
+
+/** @namespace AlphaTab.Importer */
+
+/**
+ * A list of terminals recognized by the alphaTex-parser
+ *
+ * @public
+ * @class AlphaTab.Importer.AlphaTexSymbols
+ */
+Bridge.define('AlphaTab.Importer.AlphaTexSymbols', {
+    statics: {
+        no: 0,
+        eof: 1,
+        number: 2,
+        doubleDot: 3,
+        dot: 4,
+        string: 5,
+        tuning: 6,
+        lParensis: 7,
+        rParensis: 8,
+        lBrace: 9,
+        rBrace: 10,
+        pipe: 11,
+        metaCommand: 12,
+        multiply: 13
+    },
+    $enum: true
+});
+
+/**
+ * this public class represents a file within the GpxFileSystem
+ *
+ * @public
+ * @class AlphaTab.Importer.GpxFile
+ */
+Bridge.define('AlphaTab.Importer.GpxFile', {
+    config: {
+        properties: {
+            fileName: null,
+            fileSize: 0,
+            data: null
+        }
+    }
+});
+
+/**
+ * This public class represents the file system structure
+ stored within a GPX container file.
+ *
+ * @public
+ * @class AlphaTab.Importer.GpxFileSystem
+ */
+Bridge.define('AlphaTab.Importer.GpxFileSystem', {
+    statics: {
+        HeaderBcFs: "BCFS",
+        HeaderBcFz: "BCFZ",
+        ScoreGpif: "score.gpif"
+    },
+    config: {
+        properties: {
+            /**
+             * You can set a file filter method using this setter. On parsing
+             the filestructure this function can determine based on the filename 
+             whether this file will be available after loading. 
+             This way we can reduce the amount of memory we store.
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Importer.GpxFileSystem
+             * @memberof AlphaTab.Importer.GpxFileSystem
+             * @function fileFilter
+             * @return  {System.Func}
+             */
+            /**
+             * You can set a file filter method using this setter. On parsing
+             the filestructure this function can determine based on the filename 
+             whether this file will be available after loading. 
+             This way we can reduce the amount of memory we store.
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Importer.GpxFileSystem
+             * @memberof AlphaTab.Importer.GpxFileSystem
+             * @function fileFilter
+             * @param   {System.Func}    value
+             * @return  {void}
+             */
+            fileFilter: null,
+            /**
+             * Gets the list of files stored in this FileSystem.
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Importer.GpxFileSystem
+             * @memberof AlphaTab.Importer.GpxFileSystem
+             * @function files
+             * @return  {Array}
+             */
+            /**
+             * Gets the list of files stored in this FileSystem.
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Importer.GpxFileSystem
+             * @memberof AlphaTab.Importer.GpxFileSystem
+             * @function files
+             * @param   {Array}    value
+             * @return  {void}
+             */
+            files: null
+        }
+    },
+    /**
+     * Creates a new GpxFileSystem instance
+     *
+     * @instance
+     * @public
+     * @this AlphaTab.Importer.GpxFileSystem
+     * @memberof AlphaTab.Importer.GpxFileSystem
+     * @return  {void}
+     */
+    constructor: function () {
+        this.files = [];
+        this.fileFilter = function (s) {
+            return true;
+        };
+    },
+    /**
+     * Load a complete FileSystem to the memory.
+     *
+     * @instance
+     * @public
+     * @this AlphaTab.Importer.GpxFileSystem
+     * @memberof AlphaTab.Importer.GpxFileSystem
+     * @param   {AlphaTab.IO.IReadable}    s    the binary source to read from.
+     * @return  {void}
+     */
+    load: function (s) {
+        var src = new AlphaTab.IO.BitReader(s);
+        this.readBlock(src);
+    },
+    /**
+     * Reads the 4 byte header as a string.
+     *
+     * @instance
+     * @public
+     * @this AlphaTab.Importer.GpxFileSystem
+     * @memberof AlphaTab.Importer.GpxFileSystem
+     * @param   {AlphaTab.IO.BitReader}    src    the BitInput to read from
+     * @return  {string}                          a string with 4 characters representing the header.
+     */
+    readHeader: function (src) {
+        return this.getString(src.readBytes(4), 0, 4);
+    },
+    /**
+     * Decompresses the given bitinput using the GPX compression format. Only use this method
+     if you are sure the binary data is compressed using the GPX format. Otherwise unexpected
+     behavior can occure.
+     *
+     * @instance
+     * @public
+     * @this AlphaTab.Importer.GpxFileSystem
+     * @memberof AlphaTab.Importer.GpxFileSystem
+     * @param   {AlphaTab.IO.BitReader}    src           the bitInput to read the data from
+     * @param   {boolean}                  skipHeader    true if the header should NOT be included in the result byteset, otherwise false
+     * @return  {Array.<number>}                         the decompressed byte data. if skipHeader is set to false the BCFS header is included.
+     */
+    decompress: function (src, skipHeader) {
+        if (skipHeader === void 0) { skipHeader = false; }
+        var uncompressed = Bridge.get(AlphaTab.IO.ByteBuffer).empty();
+        var buffer;
+        var expectedLength = this.getInteger(src.readBytes(4), 0);
+
+        try {
+            // as long we reach our expected length we try to decompress, a EOF might occure. 
+            while (uncompressed.getLength() < expectedLength) {
+                // compression flag
+                var flag = src.readBits(1);
+
+                if (flag === 1) {
+                    // get offset and size of the content we need to read.
+                    // compressed does mean we already have read the data and need 
+                    // to copy it from our uncompressed buffer to the end
+                    var wordSize = src.readBits(4);
+                    var offset = src.readBitsReversed(wordSize);
+                    var size = src.readBitsReversed(wordSize);
+
+                    // the offset is relative to the end
+                    var sourcePosition = uncompressed.getLength() - offset;
+                    var toRead = Math.min(offset, size);
+
+                    // get the subbuffer storing the data and add it again to the end
+                    buffer = uncompressed.getBuffer();
+                    uncompressed.write(buffer, sourcePosition, toRead);
+                }
+                else  {
+                    // on raw content we need to read the data from the source buffer 
+                    var size1 = src.readBitsReversed(2);
+                    for (var i = 0; i < size1; i++) {
+                        uncompressed.writeByte(src.readByte());
+                    }
+                }
+            }
+        }
+        catch ($e) {
+            $e = Bridge.Exception.create($e);
+            if (Bridge.is($e, AlphaTab.IO.EndOfReaderException)) {
+            }
+            else {
+                throw $e;
+            }
+        }
+
+        buffer = uncompressed.getBuffer();
+        var resultOffset = skipHeader ? 4 : 0;
+        var resultSize = uncompressed.getLength() - resultOffset;
+        var result = new Uint8Array(resultSize);
+        result.set(buffer.subarray(resultOffset, resultOffset + resultSize), 0);
+        return result;
+    },
+    /**
+     * Reads a block from the given data source.
+     *
+     * @instance
+     * @private
+     * @this AlphaTab.Importer.GpxFileSystem
+     * @memberof AlphaTab.Importer.GpxFileSystem
+     * @param   {AlphaTab.IO.BitReader}    data    the data source
+     * @return  {void}
+     */
+    readBlock: function (data) {
+        var header = this.readHeader(data);
+        if (header === Bridge.get(AlphaTab.Importer.GpxFileSystem).HeaderBcFz) {
+            // decompress the data and use this 
+            // we will skip the header 
+            this.readUncompressedBlock(this.decompress(data, true));
+        }
+        else  {
+            if (header === Bridge.get(AlphaTab.Importer.GpxFileSystem).HeaderBcFs) {
+                this.readUncompressedBlock(data.readAll());
+            }
+            else  {
+                throw new AlphaTab.Importer.UnsupportedFormatException();
+            }
+        }
+    },
+    /**
+     * Reads an uncompressed data block into the model.
+     *
+     * @instance
+     * @private
+     * @this AlphaTab.Importer.GpxFileSystem
+     * @memberof AlphaTab.Importer.GpxFileSystem
+     * @param   {Array.<number>}    data    the data store to read from.
+     * @return  {void}
+     */
+    readUncompressedBlock: function (data) {
+        var $t;
+        // the uncompressed block contains a list of filesystem entires
+        // as long we have data we will try to read more entries
+
+        // the first sector (0x1000 bytes) is empty (filled with 0xFF) 
+        // so the first sector starts at 0x1000 
+        // (we already skipped the 4 byte header so we don't have to take care of this) 
+
+        var sectorSize = 4096;
+        var offset = sectorSize;
+
+        // we always need 4 bytes (+3 including offset) to read the type
+        while ((offset + 3) < data.length) {
+            var entryType = this.getInteger(data, offset);
+
+            if (entryType === 2) {
+                // file structure: 
+                //   offset |   type   |   size   | what
+                //  --------+----------+----------+------
+                //    0x04  |  string  |  127byte | FileName (zero terminated)
+                //    0x83  |    ?     |    9byte | Unknown 
+                //    0x8c  |   int    |    4byte | FileSize
+                //    0x90  |    ?     |    4byte | Unknown
+                //    0x94  |   int[]  |  n*4byte | Indices of the sector containing the data (end is marked with 0)
+
+                // The sectors marked at 0x94 are absolutely positioned ( 1*0x1000 is sector 1, 2*0x1000 is sector 2,...)
+
+                var file = new AlphaTab.Importer.GpxFile();
+                file.fileName = this.getString(data, offset + 4, 127);
+                file.fileSize = this.getInteger(data, offset + 140);
+
+                // store file if needed
+                var storeFile = this.fileFilter === null || this.fileFilter(file.fileName);
+                if (storeFile) {
+                    this.files.push(file);
+                }
+
+                // we need to iterate the blocks because we need to move after the last datasector
+
+                var dataPointerOffset = offset + 148;
+                var sector = 0; // this var is storing the sector index
+                var sectorCount = 0; // we're keeping count so we can calculate the offset of the array item
+
+                // as long we have data blocks we need to iterate them, 
+                var fileData = storeFile ? Bridge.get(AlphaTab.IO.ByteBuffer).withCapactiy(file.fileSize) : null;
+                while ((($t = this.getInteger(data, (dataPointerOffset + (4 * (sectorCount++)))), sector = $t, $t)) !== 0) {
+                    // the next file entry starts after the last data sector so we 
+                    // move the offset along
+                    offset = sector * sectorSize;
+
+                    // write data only if needed
+                    if (storeFile) {
+                        fileData.write(data, offset, sectorSize);
+                    }
+                }
+
+                if (storeFile) {
+                    // trim data to filesize if needed
+                    file.data = new Uint8Array(Math.min(file.fileSize, fileData.getLength()));
+                    // we can use the getBuffer here because we are intelligent and know not to read the empty data.
+                    var raw = fileData.toArray();
+                    file.data.set(raw.subarray(0, 0 + file.data.length), 0);
+                }
+            }
+
+            // let's move to the next sector
+            offset += sectorSize;
+        }
+    },
+    /**
+     * Reads a zeroterminated ascii string from the given source
+     *
+     * @instance
+     * @private
+     * @this AlphaTab.Importer.GpxFileSystem
+     * @memberof AlphaTab.Importer.GpxFileSystem
+     * @param   {Array.<number>}    data      the data source to read from
+     * @param   {number}            offset    the offset to start reading from
+     * @param   {number}            length    the max length to read
+     * @return  {string}                      the ascii string read from the datasource.
+     */
+    getString: function (data, offset, length) {
+        var buf = [];
+        for (var i = 0; i < length; i++) {
+            var code = data[offset + i] & 255;
+            if (code === 0) {
+                break;
+            } // zero terminated string
+            buf.push(String.fromCharCode(code));
+        }
+        return buf.join('');
+    },
+    /**
+     * Reads an 4 byte signed integer from the given source
+     *
+     * @instance
+     * @private
+     * @this AlphaTab.Importer.GpxFileSystem
+     * @memberof AlphaTab.Importer.GpxFileSystem
+     * @param   {Array.<number>}    data      the data source to read from
+     * @param   {number}            offset    offset the offset to start reading from
+     * @return  {number}
+     */
+    getInteger: function (data, offset) {
+        return (data[offset + 3] << 24) | (data[offset + 2] << 16) | (data[offset + 1] << 8) | data[offset];
+    }
+});
+
+/**
+ * This public class can parse a score.gpif xml file into the model structure
+ *
+ * @public
+ * @class AlphaTab.Importer.GpxParser
+ */
+Bridge.define('AlphaTab.Importer.GpxParser', {
+    statics: {
+        InvalidId: "-1",
+        /**
+         * GPX range: 0-100
+         Internal range: 0 - 60
+         *
+         * @static
+         * @private
+         * @memberof AlphaTab.Importer.GpxParser
+         * @constant
+         * @default 0.6
+         * @type number
+         */
+        BendPointPositionFactor: 0.6,
+        /**
+         * GPX Range: 0-300      
+         Internal Range: 0-12
+         *
+         * @static
+         * @private
+         * @memberof AlphaTab.Importer.GpxParser
+         * @constant
+         * @default 0.04
+         * @type number
+         */
+        BendPointValueFactor: 0.04
+    },
+    _automations: null,
+    _tracksMapping: null,
+    _tracksById: null,
+    _masterBars: null,
+    _barsOfMasterBar: null,
+    _barsById: null,
+    _voicesOfBar: null,
+    _voiceById: null,
+    _beatsOfVoice: null,
+    _rhythmOfBeat: null,
+    _beatById: null,
+    _rhythmById: null,
+    _noteById: null,
+    _notesOfBeat: null,
+    _tappedNotes: null,
+    config: {
+        properties: {
+            score: null
+        }
+    },
+    parseXml: function (xml) {
+        this._automations = {};
+        this._tracksMapping = Bridge.Array.init(0, null);
+        this._tracksById = {};
+        this._masterBars = [];
+        this._barsOfMasterBar = [];
+        this._voicesOfBar = {};
+        this._barsById = {};
+        this._voiceById = {};
+        this._beatsOfVoice = {};
+        this._beatById = {};
+        this._rhythmOfBeat = {};
+        this._rhythmById = {};
+        this._notesOfBeat = {};
+        this._noteById = {};
+        this._tappedNotes = {};
+
+        this.parseDom(Bridge.get(AlphaTab.Platform.Std).loadXml(xml));
+    },
+    parseDom: function (dom) {
+        var root = dom.getDocumentElement();
+        if (root === null) {
+            return;
+        }
+
+        // the XML uses IDs for referring elements within the 
+        // model. Therefore we do the parsing in 2 steps:
+        // - at first we read all model elements and store them by ID in a lookup table
+        // - after that we need to join up the information. 
+        if (root.getLocalName() === "GPIF") {
+            this.score = new AlphaTab.Model.Score();
+
+            // parse all children
+            AlphaTab.Platform.Std.iterateChildren(root, Bridge.fn.bind(this, function (n) {
+                if (n.getNodeType() === Bridge.get(AlphaTab.Xml.XmlNodeType).element) {
+                    switch (n.getLocalName()) {
+                        case "Score": 
+                            this.parseScoreNode(n);
+                            break;
+                        case "MasterTrack": 
+                            this.parseMasterTrackNode(n);
+                            break;
+                        case "Tracks": 
+                            this.parseTracksNode(n);
+                            break;
+                        case "MasterBars": 
+                            this.parseMasterBarsNode(n);
+                            break;
+                        case "Bars": 
+                            this.parseBars(n);
+                            break;
+                        case "Voices": 
+                            this.parseVoices(n);
+                            break;
+                        case "Beats": 
+                            this.parseBeats(n);
+                            break;
+                        case "Notes": 
+                            this.parseNotes(n);
+                            break;
+                        case "Rhythms": 
+                            this.parseRhythms(n);
+                            break;
+                    }
+                }
+            }));
+        }
+        else  {
+            throw new AlphaTab.Importer.UnsupportedFormatException();
+        }
+
+        this.buildModel();
+    },
+    parseScoreNode: function (element) {
+        AlphaTab.Platform.Std.iterateChildren(element, Bridge.fn.bind(this, function (c) {
+            if (c.getNodeType() === Bridge.get(AlphaTab.Xml.XmlNodeType).element) {
+                switch (c.getLocalName()) {
+                    case "Title": 
+                        this.score.title = this.getValue(c.getFirstChild());
+                        break;
+                    case "SubTitle": 
+                        this.score.subTitle = this.getValue(c.getFirstChild());
+                        break;
+                    case "Artist": 
+                        this.score.artist = this.getValue(c.getFirstChild());
+                        break;
+                    case "Album": 
+                        this.score.album = this.getValue(c.getFirstChild());
+                        break;
+                    case "Words": 
+                        this.score.words = this.getValue(c.getFirstChild());
+                        break;
+                    case "Music": 
+                        this.score.music = this.getValue(c.getFirstChild());
+                        break;
+                    case "WordsAndMusic": 
+                        if (c.getFirstChild() !== null && c.getFirstChild().toString() !== "") {
+                            var wordsAndMusic = this.getValue(c.getFirstChild());
+                            if (!Bridge.String.isNullOrEmpty(wordsAndMusic) && Bridge.String.isNullOrEmpty(this.score.words)) {
+                                this.score.words = wordsAndMusic;
+                            }
+                            if (!Bridge.String.isNullOrEmpty(wordsAndMusic) && Bridge.String.isNullOrEmpty(this.score.music)) {
+                                this.score.music = wordsAndMusic;
+                            }
+                        }
+                        break;
+                    case "Copyright": 
+                        this.score.copyright = this.getValue(c.getFirstChild());
+                        break;
+                    case "Tabber": 
+                        this.score.tab = this.getValue(c.getFirstChild());
+                        break;
+                    case "Instructions": 
+                        this.score.instructions = this.getValue(c.getFirstChild());
+                        break;
+                    case "Notices": 
+                        this.score.notices = this.getValue(c.getFirstChild());
+                        break;
+                }
+            }
+        }));
+    },
+    parseMasterTrackNode: function (node) {
+        AlphaTab.Platform.Std.iterateChildren(node, Bridge.fn.bind(this, function (c) {
+            if (c.getNodeType() === Bridge.get(AlphaTab.Xml.XmlNodeType).element) {
+                switch (c.getLocalName()) {
+                    case "Automations": 
+                        this.parseAutomations(c);
+                        break;
+                    case "Tracks": 
+                        this._tracksMapping = this.getValue(c).split(String.fromCharCode(32));
+                        break;
+                }
+            }
+        }));
+    },
+    parseAutomations: function (node) {
+        AlphaTab.Platform.Std.iterateChildren(node, Bridge.fn.bind(this, function (c) {
+            if (c.getNodeType() === Bridge.get(AlphaTab.Xml.XmlNodeType).element) {
+                switch (c.getLocalName()) {
+                    case "Automation": 
+                        this.parseAutomation(c);
+                        break;
+                }
+            }
+        }));
+    },
+    parseAutomation: function (node) {
+        var type = null;
+        var isLinear = false;
+        var barId = null;
+        var ratioPosition = 0;
+        var value = 0;
+        var reference = 0;
+        var text = null;
+
+        AlphaTab.Platform.Std.iterateChildren(node, Bridge.fn.bind(this, function (c) {
+            if (c.getNodeType() === Bridge.get(AlphaTab.Xml.XmlNodeType).element) {
+                switch (c.getLocalName()) {
+                    case "Type": 
+                        type = this.getValue(c);
+                        break;
+                    case "Linear": 
+                        isLinear = this.getValue(c).toLowerCase() === "true";
+                        break;
+                    case "Bar": 
+                        barId = this.getValue(c);
+                        break;
+                    case "Position": 
+                        ratioPosition = parseFloat(this.getValue(c));
+                        break;
+                    case "Value": 
+                        var parts = this.getValue(c).split(String.fromCharCode(32));
+                        value = parseFloat(parts[0]);
+                        reference = parseInt(parts[1]);
+                        break;
+                    case "Text": 
+                        text = this.getValue(c);
+                        break;
+                }
+            }
+        }));
+
+        if (type === null) {
+            return;
+        }
+        var automation = null;
+        switch (type) {
+            case "Tempo": 
+                automation = Bridge.get(AlphaTab.Model.Automation).buildTempoAutomation(isLinear, ratioPosition, value, reference);
+                break;
+        }
+
+        if (automation !== null) {
+            automation.text = text;
+        }
+
+        if (barId !== null) {
+            if (!this._automations.hasOwnProperty(barId)) {
+                this._automations[barId] = [];
+            }
+            this._automations[barId].push(automation);
+        }
+    },
+    parseTracksNode: function (node) {
+        AlphaTab.Platform.Std.iterateChildren(node, Bridge.fn.bind(this, function (c) {
+            if (c.getNodeType() === Bridge.get(AlphaTab.Xml.XmlNodeType).element) {
+                switch (c.getLocalName()) {
+                    case "Track": 
+                        this.parseTrack(c);
+                        break;
+                }
+            }
+        }));
+    },
+    parseTrack: function (node) {
+        var track = new AlphaTab.Model.Track();
+        var trackId = node.getAttributes().get("id").getValue();
+
+        AlphaTab.Platform.Std.iterateChildren(node, Bridge.fn.bind(this, function (c) {
+            if (c.getNodeType() === Bridge.get(AlphaTab.Xml.XmlNodeType).element) {
+                switch (c.getLocalName()) {
+                    case "Name": 
+                        track.name = this.getValue(c);
+                        break;
+                    case "ShortName": 
+                        track.shortName = this.getValue(c);
+                        break;
+                    case "Properties": 
+                        this.parseTrackProperties(track, c);
+                        break;
+                    case "GeneralMidi": 
+                        this.parseGeneralMidi(track, c);
+                        break;
+                    case "PlaybackState": 
+                        var state = this.getValue(c);
+                        track.playbackInfo.isSolo = state === "Solo";
+                        track.playbackInfo.isMute = state === "Mute";
+                        break;
+                }
+            }
+        }));
+
+        this._tracksById[trackId] = track;
+    },
+    parseDiagramCollection: function (track, node) {
+        var items = this.findChildElement(node, "Items");
+        AlphaTab.Platform.Std.iterateChildren(items, Bridge.fn.bind(this, function (c) {
+            if (c.getNodeType() === Bridge.get(AlphaTab.Xml.XmlNodeType).element) {
+                switch (c.getLocalName()) {
+                    case "Item": 
+                        this.parseDiagramItem(track, c);
+                        break;
+                }
+            }
+        }));
+    },
+    parseDiagramItem: function (track, node) {
+        var chord = new AlphaTab.Model.Chord();
+        var chordId = node.getAttributes().get("id").getValue();
+        chord.name = node.getAttributes().get("name").getValue();
+        track.chords[chordId] = chord;
+    },
+    findChildElement: function (node, name) {
+        for (var i = 0; i < node.getChildNodes().getCount(); i++) {
+            var c = node.getChildNodes().get(i);
+            if (c !== null && c.getNodeType() === Bridge.get(AlphaTab.Xml.XmlNodeType).element && c.getLocalName() === name) {
+                return c;
+            }
+        }
+        return null;
+    },
+    parseTrackProperties: function (track, node) {
+        AlphaTab.Platform.Std.iterateChildren(node, Bridge.fn.bind(this, function (c) {
+            if (c.getNodeType() === Bridge.get(AlphaTab.Xml.XmlNodeType).element) {
+                switch (c.getLocalName()) {
+                    case "Property": 
+                        this.parseTrackProperty(track, c);
+                        break;
+                }
+            }
+        }));
+    },
+    parseTrackProperty: function (track, node) {
+        var propertyName = node.getAttributes().get("name").getValue();
+        switch (propertyName) {
+            case "Tuning": 
+                var tuningParts = this.getValue(this.findChildElement(node, "Pitches")).split(String.fromCharCode(32));
+                var tuning = new Int32Array(tuningParts.length);
+                for (var i = 0; i < tuning.length; i++) {
+                    tuning[tuning.length - 1 - i] = parseInt(tuningParts[i]);
+                }
+                track.tuning = tuning;
+                break;
+            case "DiagramCollection": 
+                this.parseDiagramCollection(track, node);
+                break;
+            case "CapoFret": 
+                track.capo = parseInt(this.getValue(this.findChildElement(node, "Fret")));
+                break;
+        }
+    },
+    parseGeneralMidi: function (track, node) {
+        track.playbackInfo.port = parseInt(this.getValue(this.findChildElement(node, "Port")));
+        track.playbackInfo.program = parseInt(this.getValue(this.findChildElement(node, "Program")));
+        track.playbackInfo.primaryChannel = parseInt(this.getValue(this.findChildElement(node, "PrimaryChannel")));
+        track.playbackInfo.secondaryChannel = parseInt(this.getValue(this.findChildElement(node, "SecondaryChannel")));
+
+        track.isPercussion = (node.getAttributes().get("table") !== null && node.getAttributes().get("table").getValue() === "Percussion");
+    },
+    parseMasterBarsNode: function (node) {
+        AlphaTab.Platform.Std.iterateChildren(node, Bridge.fn.bind(this, function (c) {
+            if (c.getNodeType() === Bridge.get(AlphaTab.Xml.XmlNodeType).element) {
+                switch (c.getLocalName()) {
+                    case "MasterBar": 
+                        this.parseMasterBar(c);
+                        break;
+                }
+            }
+        }));
+    },
+    parseMasterBar: function (node) {
+        var masterBar = new AlphaTab.Model.MasterBar();
+        AlphaTab.Platform.Std.iterateChildren(node, Bridge.fn.bind(this, function (c) {
+            if (c.getNodeType() === Bridge.get(AlphaTab.Xml.XmlNodeType).element) {
+                switch (c.getLocalName()) {
+                    case "Time": 
+                        var timeParts = this.getValue(c).split(String.fromCharCode(47));
+                        masterBar.timeSignatureNumerator = parseInt(timeParts[0]);
+                        masterBar.timeSignatureDenominator = parseInt(timeParts[1]);
+                        break;
+                    case "DoubleBar": 
+                        masterBar.isDoubleBar = true;
+                        break;
+                    case "Section": 
+                        masterBar.section = new AlphaTab.Model.Section();
+                        masterBar.section.marker = this.getValue(this.findChildElement(c, "Letter"));
+                        masterBar.section.text = this.getValue(this.findChildElement(c, "Text"));
+                        break;
+                    case "Repeat": 
+                        if (c.getAttributes().get("start").getValue().toLowerCase() === "true") {
+                            masterBar.isRepeatStart = true;
+                        }
+                        if (c.getAttributes().get("end").getValue().toLowerCase() === "true" && c.getAttributes().get("count").getValue() !== null) {
+                            masterBar.repeatCount = parseInt(c.getAttributes().get("count").getValue());
+                        }
+                        break;
+                    case "AlternateEndings": 
+                        var alternateEndings = this.getValue(c).split(String.fromCharCode(32));
+                        var i = 0;
+                        for (var k = 0; k < alternateEndings.length; k++) {
+                            i |= 1 << (-1 + parseInt(alternateEndings[k]));
+                        }
+                        masterBar.alternateEndings = i;
+                        break;
+                    case "Bars": 
+                        this._barsOfMasterBar.push(this.getValue(c).split(String.fromCharCode(32)));
+                        break;
+                    case "TripletFeel": 
+                        switch (this.getValue(c)) {
+                            case "NoTripletFeel": 
+                                masterBar.tripletFeel = Bridge.get(AlphaTab.Model.TripletFeel).noTripletFeel;
+                                break;
+                            case "Triplet8th": 
+                                masterBar.tripletFeel = Bridge.get(AlphaTab.Model.TripletFeel).triplet8th;
+                                break;
+                            case "Triplet16th": 
+                                masterBar.tripletFeel = Bridge.get(AlphaTab.Model.TripletFeel).triplet16th;
+                                break;
+                            case "Dotted8th": 
+                                masterBar.tripletFeel = Bridge.get(AlphaTab.Model.TripletFeel).dotted8th;
+                                break;
+                            case "Dotted16th": 
+                                masterBar.tripletFeel = Bridge.get(AlphaTab.Model.TripletFeel).dotted16th;
+                                break;
+                            case "Scottish8th": 
+                                masterBar.tripletFeel = Bridge.get(AlphaTab.Model.TripletFeel).scottish8th;
+                                break;
+                            case "Scottish16th": 
+                                masterBar.tripletFeel = Bridge.get(AlphaTab.Model.TripletFeel).scottish16th;
+                                break;
+                        }
+                        break;
+                    case "Key": 
+                        masterBar.keySignature = parseInt(this.getValue(this.findChildElement(c, "AccidentalCount")));
+                        break;
+                }
+            }
+        }));
+        this._masterBars.push(masterBar);
+    },
+    parseBars: function (node) {
+        AlphaTab.Platform.Std.iterateChildren(node, Bridge.fn.bind(this, function (c) {
+            if (c.getNodeType() === Bridge.get(AlphaTab.Xml.XmlNodeType).element) {
+                switch (c.getLocalName()) {
+                    case "Bar": 
+                        this.parseBar(c);
+                        break;
+                }
+            }
+        }));
+    },
+    parseBar: function (node) {
+        var bar = new AlphaTab.Model.Bar();
+        var barId = node.getAttributes().get("id").getValue();
+
+        AlphaTab.Platform.Std.iterateChildren(node, Bridge.fn.bind(this, function (c) {
+            if (c.getNodeType() === Bridge.get(AlphaTab.Xml.XmlNodeType).element) {
+                switch (c.getLocalName()) {
+                    case "Voices": 
+                        this._voicesOfBar[barId] = this.getValue(c).split(String.fromCharCode(32));
+                        break;
+                    case "Clef": 
+                        switch (this.getValue(c)) {
+                            case "Neutral": 
+                                bar.clef = Bridge.get(AlphaTab.Model.Clef).neutral;
+                                break;
+                            case "G2": 
+                                bar.clef = Bridge.get(AlphaTab.Model.Clef).g2;
+                                break;
+                            case "F4": 
+                                bar.clef = Bridge.get(AlphaTab.Model.Clef).f4;
+                                break;
+                            case "C4": 
+                                bar.clef = Bridge.get(AlphaTab.Model.Clef).c4;
+                                break;
+                            case "C3": 
+                                bar.clef = Bridge.get(AlphaTab.Model.Clef).c3;
+                                break;
+                        }
+                        break;
+                }
+            }
+        }));
+
+        this._barsById[barId] = bar;
+    },
+    parseVoices: function (node) {
+        AlphaTab.Platform.Std.iterateChildren(node, Bridge.fn.bind(this, function (c) {
+            if (c.getNodeType() === Bridge.get(AlphaTab.Xml.XmlNodeType).element) {
+                switch (c.getLocalName()) {
+                    case "Voice": 
+                        this.parseVoice(c);
+                        break;
+                }
+            }
+        }));
+    },
+    parseVoice: function (node) {
+        var voice = new AlphaTab.Model.Voice();
+        var voiceId = node.getAttributes().get("id").getValue();
+
+        AlphaTab.Platform.Std.iterateChildren(node, Bridge.fn.bind(this, function (c) {
+            if (c.getNodeType() === Bridge.get(AlphaTab.Xml.XmlNodeType).element) {
+                switch (c.getLocalName()) {
+                    case "Beats": 
+                        this._beatsOfVoice[voiceId] = this.getValue(c).split(String.fromCharCode(32));
+                        break;
+                }
+            }
+        }));
+
+        this._voiceById[voiceId] = voice;
+    },
+    parseBeats: function (node) {
+        AlphaTab.Platform.Std.iterateChildren(node, Bridge.fn.bind(this, function (c) {
+            if (c.getNodeType() === Bridge.get(AlphaTab.Xml.XmlNodeType).element) {
+                switch (c.getLocalName()) {
+                    case "Beat": 
+                        this.parseBeat(c);
+                        break;
+                }
+            }
+        }));
+    },
+    parseBeat: function (node) {
+        var beat = new AlphaTab.Model.Beat();
+        var beatId = node.getAttributes().get("id").getValue();
+
+        AlphaTab.Platform.Std.iterateChildren(node, Bridge.fn.bind(this, function (c) {
+            if (c.getNodeType() === Bridge.get(AlphaTab.Xml.XmlNodeType).element) {
+                switch (c.getLocalName()) {
+                    case "Notes": 
+                        this._notesOfBeat[beatId] = this.getValue(c).split(String.fromCharCode(32));
+                        break;
+                    case "Rhythm": 
+                        this._rhythmOfBeat[beatId] = c.getAttributes().get("ref").getValue();
+                        break;
+                    case "Fadding": 
+                        if (this.getValue(c) === "FadeIn") {
+                            beat.fadeIn = true;
+                        }
+                        break;
+                    case "Tremolo": 
+                        switch (this.getValue(c)) {
+                            case "1/2": 
+                                beat.tremoloSpeed = Bridge.get(AlphaTab.Model.Duration).eighth;
+                                break;
+                            case "1/4": 
+                                beat.tremoloSpeed = Bridge.get(AlphaTab.Model.Duration).sixteenth;
+                                break;
+                            case "1/8": 
+                                beat.tremoloSpeed = Bridge.get(AlphaTab.Model.Duration).thirtySecond;
+                                break;
+                        }
+                        break;
+                    case "Chord": 
+                        beat.chordId = this.getValue(c);
+                        break;
+                    case "Hairpin": 
+                        switch (this.getValue(c)) {
+                            case "Crescendo": 
+                                beat.crescendo = Bridge.get(AlphaTab.Model.CrescendoType).crescendo;
+                                break;
+                            case "Decrescendo": 
+                                beat.crescendo = Bridge.get(AlphaTab.Model.CrescendoType).decrescendo;
+                                break;
+                        }
+                        break;
+                    case "Arpeggio": 
+                        if (this.getValue(c) === "Up") {
+                            beat.brushType = Bridge.get(AlphaTab.Model.BrushType).arpeggioUp;
+                        }
+                        else  {
+                            beat.brushType = Bridge.get(AlphaTab.Model.BrushType).arpeggioDown;
+                        }
+                        break;
+                    case "Properties": 
+                        this.parseBeatProperties(c, beat);
+                        break;
+                    case "FreeText": 
+                        beat.text = this.getValue(c);
+                        break;
+                    case "Dynamic": 
+                        switch (this.getValue(c)) {
+                            case "PPP": 
+                                beat.dynamic = Bridge.get(AlphaTab.Model.DynamicValue).pPP;
+                                break;
+                            case "PP": 
+                                beat.dynamic = Bridge.get(AlphaTab.Model.DynamicValue).pP;
+                                break;
+                            case "P": 
+                                beat.dynamic = Bridge.get(AlphaTab.Model.DynamicValue).p;
+                                break;
+                            case "MP": 
+                                beat.dynamic = Bridge.get(AlphaTab.Model.DynamicValue).mP;
+                                break;
+                            case "MF": 
+                                beat.dynamic = Bridge.get(AlphaTab.Model.DynamicValue).mF;
+                                break;
+                            case "F": 
+                                beat.dynamic = Bridge.get(AlphaTab.Model.DynamicValue).f;
+                                break;
+                            case "FF": 
+                                beat.dynamic = Bridge.get(AlphaTab.Model.DynamicValue).fF;
+                                break;
+                            case "FFF": 
+                                beat.dynamic = Bridge.get(AlphaTab.Model.DynamicValue).fFF;
+                                break;
+                        }
+                        break;
+                    case "GraceNotes": 
+                        switch (this.getValue(c)) {
+                            case "OnBeat": 
+                                beat.graceType = Bridge.get(AlphaTab.Model.GraceType).onBeat;
+                                break;
+                            case "BeforeBeat": 
+                                beat.graceType = Bridge.get(AlphaTab.Model.GraceType).beforeBeat;
+                                break;
+                        }
+                        break;
+                }
+            }
+        }));
+
+        this._beatById[beatId] = beat;
+    },
+    parseBeatProperties: function (node, beat) {
+        var isWhammy = false;
+        var whammyOrigin = null;
+        var whammyMiddleValue = null;
+        var whammyMiddleOffset1 = null;
+        var whammyMiddleOffset2 = null;
+        var whammyDestination = null;
+
+        AlphaTab.Platform.Std.iterateChildren(node, Bridge.fn.bind(this, function (c) {
+            if (c.getNodeType() === Bridge.get(AlphaTab.Xml.XmlNodeType).element) {
+                switch (c.getLocalName()) {
+                    case "Property": 
+                        var name = c.getAttributes().get("name").getValue();
+                        switch (name) {
+                            case "Brush": 
+                                if (this.getValue(this.findChildElement(c, "Direction")) === "Up") {
+                                    beat.brushType = Bridge.get(AlphaTab.Model.BrushType).brushUp;
+                                }
+                                else  {
+                                    beat.brushType = Bridge.get(AlphaTab.Model.BrushType).brushDown;
+                                }
+                                break;
+                            case "PickStroke": 
+                                if (this.getValue(this.findChildElement(c, "Direction")) === "Up") {
+                                    beat.pickStroke = Bridge.get(AlphaTab.Model.PickStrokeType).up;
+                                }
+                                else  {
+                                    beat.pickStroke = Bridge.get(AlphaTab.Model.PickStrokeType).down;
+                                }
+                                break;
+                            case "Slapped": 
+                                if (this.findChildElement(c, "Enable") !== null) {
+                                    beat.slap = true;
+                                }
+                                break;
+                            case "Popped": 
+                                if (this.findChildElement(c, "Enable") !== null) {
+                                    beat.pop = true;
+                                }
+                                break;
+                            case "VibratoWTremBar": 
+                                switch (this.getValue(this.findChildElement(c, "Strength"))) {
+                                    case "Wide": 
+                                        beat.vibrato = Bridge.get(AlphaTab.Model.VibratoType).wide;
+                                        break;
+                                    case "Slight": 
+                                        beat.vibrato = Bridge.get(AlphaTab.Model.VibratoType).slight;
+                                        break;
+                                }
+                                break;
+                            case "WhammyBar": 
+                                isWhammy = true;
+                                break;
+                            case "WhammyBarExtend": 
+                            case "WhammyBarOriginValue": 
+                                if (whammyOrigin === null) {
+                                    whammyOrigin = new AlphaTab.Model.BendPoint();
+                                }
+                                whammyOrigin.value = this.toBendValue(parseFloat(this.getValue(this.findChildElement(c, "Float"))));
+                                break;
+                            case "WhammyBarOriginOffset": 
+                                if (whammyOrigin === null) {
+                                    whammyOrigin = new AlphaTab.Model.BendPoint();
+                                }
+                                whammyOrigin.offset = this.toBendOffset(parseFloat(this.getValue(this.findChildElement(c, "Float"))));
+                                break;
+                            case "WhammyBarMiddleValue": 
+                                whammyMiddleValue = this.toBendValue(parseFloat(this.getValue(this.findChildElement(c, "Float"))));
+                                break;
+                            case "WhammyBarMiddleOffset1": 
+                                whammyMiddleOffset1 = this.toBendOffset(parseFloat(this.getValue(this.findChildElement(c, "Float"))));
+                                break;
+                            case "WhammyBarMiddleOffset2": 
+                                whammyMiddleOffset2 = this.toBendOffset(parseFloat(this.getValue(this.findChildElement(c, "Float"))));
+                                break;
+                            case "WhammyBarDestinationValue": 
+                                if (whammyDestination === null) {
+                                    whammyDestination = new AlphaTab.Model.BendPoint(Bridge.get(AlphaTab.Model.BendPoint).MaxPosition);
+                                }
+                                whammyDestination.value = this.toBendValue(parseFloat(this.getValue(this.findChildElement(c, "Float"))));
+                                break;
+                            case "WhammyBarDestinationOffset": 
+                                if (whammyDestination === null) {
+                                    whammyDestination = new AlphaTab.Model.BendPoint();
+                                }
+                                whammyDestination.offset = this.toBendOffset(parseFloat(this.getValue(this.findChildElement(c, "Float"))));
+                                break;
+                        }
+                        break;
+                }
+            }
+        }));
+
+        if (isWhammy) {
+            if (whammyOrigin === null) {
+                whammyOrigin = new AlphaTab.Model.BendPoint();
+            }
+            if (whammyDestination === null) {
+                whammyDestination = new AlphaTab.Model.BendPoint(Bridge.get(AlphaTab.Model.BendPoint).MaxPosition);
+            }
+            var whammy = [];
+            whammy.push(whammyOrigin);
+
+            if (Bridge.Nullable.neq(whammyMiddleOffset1, null) && Bridge.Nullable.neq(whammyMiddleValue, null)) {
+                whammy.push(new AlphaTab.Model.BendPoint(Bridge.Nullable.getValue(whammyMiddleOffset1), Bridge.Nullable.getValue(whammyMiddleValue)));
+            }
+            if (Bridge.Nullable.neq(whammyMiddleOffset2, null) && Bridge.Nullable.neq(whammyMiddleValue, null)) {
+                whammy.push(new AlphaTab.Model.BendPoint(Bridge.Nullable.getValue(whammyMiddleOffset2), Bridge.Nullable.getValue(whammyMiddleValue)));
+            }
+
+            if (Bridge.Nullable.eq(whammyMiddleOffset1, null) && Bridge.Nullable.eq(whammyMiddleOffset2, null) && Bridge.Nullable.neq(whammyMiddleValue, null)) {
+                whammy.push(new AlphaTab.Model.BendPoint(30, Bridge.Nullable.getValue(whammyMiddleValue)));
+            }
+            whammy.push(whammyDestination);
+            beat.whammyBarPoints = whammy;
+        }
+    },
+    parseNotes: function (node) {
+        AlphaTab.Platform.Std.iterateChildren(node, Bridge.fn.bind(this, function (c) {
+            if (c.getNodeType() === Bridge.get(AlphaTab.Xml.XmlNodeType).element) {
+                switch (c.getLocalName()) {
+                    case "Note": 
+                        this.parseNote(c);
+                        break;
+                }
+            }
+        }));
+    },
+    parseNote: function (node) {
+        var note = new AlphaTab.Model.Note();
+        var noteId = node.getAttributes().get("id").getValue();
+
+        AlphaTab.Platform.Std.iterateChildren(node, Bridge.fn.bind(this, function (c) {
+            if (c.getNodeType() === Bridge.get(AlphaTab.Xml.XmlNodeType).element) {
+                switch (c.getLocalName()) {
+                    case "Properties": 
+                        this.parseNoteProperties(c, note, noteId);
+                        break;
+                    case "AntiAccent": 
+                        if (this.getValue(c).toLowerCase() === "normal") {
+                            note.isGhost = true;
+                        }
+                        break;
+                    case "LetRing": 
+                        note.isLetRing = true;
+                        break;
+                    case "Trill": 
+                        note.trillValue = parseInt(this.getValue(c));
+                        note.trillSpeed = Bridge.get(AlphaTab.Model.Duration).sixteenth;
+                        break;
+                    case "Accent": 
+                        var accentFlags = parseInt(this.getValue(c));
+                        if ((accentFlags & 1) !== 0) {
+                            note.isStaccato = true;
+                        }
+                        if ((accentFlags & 4) !== 0) {
+                            note.accentuated = Bridge.get(AlphaTab.Model.AccentuationType).heavy;
+                        }
+                        if ((accentFlags & 8) !== 0) {
+                            note.accentuated = Bridge.get(AlphaTab.Model.AccentuationType).normal;
+                        }
+                        break;
+                    case "Tie": 
+                        if (c.getAttributes().get("origin").getValue().toLowerCase() === "true") {
+                            note.isTieOrigin = true;
+                        }
+                        if (c.getAttributes().get("destination").getValue().toLowerCase() === "true") {
+                            note.isTieDestination = true;
+                        }
+                        break;
+                    case "Vibrato": 
+                        switch (this.getValue(c)) {
+                            case "Slight": 
+                                note.vibrato = Bridge.get(AlphaTab.Model.VibratoType).slight;
+                                break;
+                            case "Wide": 
+                                note.vibrato = Bridge.get(AlphaTab.Model.VibratoType).wide;
+                                break;
+                        }
+                        break;
+                    case "LeftFingering": 
+                        note.isFingering = true;
+                        switch (this.getValue(c)) {
+                            case "P": 
+                                note.leftHandFinger = Bridge.get(AlphaTab.Model.Fingers).thumb;
+                                break;
+                            case "I": 
+                                note.leftHandFinger = Bridge.get(AlphaTab.Model.Fingers).indexFinger;
+                                break;
+                            case "M": 
+                                note.leftHandFinger = Bridge.get(AlphaTab.Model.Fingers).middleFinger;
+                                break;
+                            case "A": 
+                                note.leftHandFinger = Bridge.get(AlphaTab.Model.Fingers).annularFinger;
+                                break;
+                            case "C": 
+                                note.leftHandFinger = Bridge.get(AlphaTab.Model.Fingers).littleFinger;
+                                break;
+                        }
+                        break;
+                    case "RightFingering": 
+                        note.isFingering = true;
+                        switch (this.getValue(c)) {
+                            case "P": 
+                                note.rightHandFinger = Bridge.get(AlphaTab.Model.Fingers).thumb;
+                                break;
+                            case "I": 
+                                note.rightHandFinger = Bridge.get(AlphaTab.Model.Fingers).indexFinger;
+                                break;
+                            case "M": 
+                                note.rightHandFinger = Bridge.get(AlphaTab.Model.Fingers).middleFinger;
+                                break;
+                            case "A": 
+                                note.rightHandFinger = Bridge.get(AlphaTab.Model.Fingers).annularFinger;
+                                break;
+                            case "C": 
+                                note.rightHandFinger = Bridge.get(AlphaTab.Model.Fingers).littleFinger;
+                                break;
+                        }
+                        break;
+                }
+            }
+        }));
+
+        this._noteById[noteId] = note;
+    },
+    parseNoteProperties: function (node, note, noteId) {
+        var isBended = false;
+        var bendOrigin = null;
+        var bendMiddleValue = null;
+        var bendMiddleOffset1 = null;
+        var bendMiddleOffset2 = null;
+        var bendDestination = null;
+
+        AlphaTab.Platform.Std.iterateChildren(node, Bridge.fn.bind(this, function (c) {
+            if (c.getNodeType() === Bridge.get(AlphaTab.Xml.XmlNodeType).element) {
+                switch (c.getLocalName()) {
+                    case "Property": 
+                        var name = c.getAttributes().get("name").getValue();
+                        switch (name) {
+                            case "String": 
+                                note.string = parseInt(this.getValue(this.findChildElement(c, "String"))) + 1;
+                                break;
+                            case "Fret": 
+                                note.fret = parseInt(this.getValue(this.findChildElement(c, "Fret")));
+                                break;
+                            case "Tapped": 
+                                this._tappedNotes[noteId] = true;
+                                break;
+                            case "HarmonicType": 
+                                var htype = this.findChildElement(c, "HType");
+                                if (htype !== null) {
+                                    switch (this.getValue(htype)) {
+                                        case "NoHarmonic": 
+                                            note.harmonicType = Bridge.get(AlphaTab.Model.HarmonicType).none;
+                                            break;
+                                        case "Natural": 
+                                            note.harmonicType = Bridge.get(AlphaTab.Model.HarmonicType).natural;
+                                            break;
+                                        case "Artificial": 
+                                            note.harmonicType = Bridge.get(AlphaTab.Model.HarmonicType).artificial;
+                                            break;
+                                        case "Pinch": 
+                                            note.harmonicType = Bridge.get(AlphaTab.Model.HarmonicType).pinch;
+                                            break;
+                                        case "Tap": 
+                                            note.harmonicType = Bridge.get(AlphaTab.Model.HarmonicType).tap;
+                                            break;
+                                        case "Semi": 
+                                            note.harmonicType = Bridge.get(AlphaTab.Model.HarmonicType).semi;
+                                            break;
+                                        case "Feedback": 
+                                            note.harmonicType = Bridge.get(AlphaTab.Model.HarmonicType).feedback;
+                                            break;
+                                    }
+                                }
+                                break;
+                            case "HarmonicFret": 
+                                var hfret = this.findChildElement(c, "HFret");
+                                if (hfret !== null) {
+                                    note.harmonicValue = parseFloat(this.getValue(hfret));
+                                }
+                                break;
+                            case "Muted": 
+                                if (this.findChildElement(c, "Enable") !== null) {
+                                    note.isDead = true;
+                                }
+                                break;
+                            case "PalmMuted": 
+                                if (this.findChildElement(c, "Enable") !== null) {
+                                    note.isPalmMute = true;
+                                }
+                                break;
+                            case "Octave": 
+                                note.octave = parseInt(this.getValue(this.findChildElement(c, "Number"))) - 1;
+                                break;
+                            case "Tone": 
+                                note.tone = parseInt(this.getValue(this.findChildElement(c, "Step")));
+                                break;
+                            case "Bended": 
+                                isBended = true;
+                                break;
+                            case "BendOriginValue": 
+                                if (bendOrigin === null) {
+                                    bendOrigin = new AlphaTab.Model.BendPoint();
+                                }
+                                bendOrigin.value = this.toBendValue(parseFloat(this.getValue(this.findChildElement(c, "Float"))));
+                                break;
+                            case "BendOriginOffset": 
+                                if (bendOrigin === null) {
+                                    bendOrigin = new AlphaTab.Model.BendPoint();
+                                }
+                                bendOrigin.offset = this.toBendOffset(parseFloat(this.getValue(this.findChildElement(c, "Float"))));
+                                break;
+                            case "BendMiddleValue": 
+                                bendMiddleValue = this.toBendValue(parseFloat(this.getValue(this.findChildElement(c, "Float"))));
+                                break;
+                            case "BendMiddleOffset1": 
+                                bendMiddleOffset1 = this.toBendOffset(parseFloat(this.getValue(this.findChildElement(c, "Float"))));
+                                break;
+                            case "BendMiddleOffset2": 
+                                bendMiddleOffset2 = this.toBendOffset(parseFloat(this.getValue(this.findChildElement(c, "Float"))));
+                                break;
+                            case "BendDestinationValue": 
+                                if (bendDestination === null) {
+                                    bendDestination = new AlphaTab.Model.BendPoint(Bridge.get(AlphaTab.Model.BendPoint).MaxPosition);
+                                }
+                                bendDestination.value = this.toBendValue(parseFloat(this.getValue(this.findChildElement(c, "Float"))));
+                                break;
+                            case "BendDestinationOffset": 
+                                if (bendDestination === null) {
+                                    bendDestination = new AlphaTab.Model.BendPoint();
+                                }
+                                bendDestination.offset = this.toBendOffset(parseFloat(this.getValue(this.findChildElement(c, "Float"))));
+                                break;
+                            case "HopoOrigin": 
+                                if (this.findChildElement(c, "Enable") !== null) {
+                                    note.isHammerPullOrigin = true;
+                                }
+                                break;
+                            case "HopoDestination": 
+                                break;
+                            case "Slide": 
+                                var slideFlags = parseInt(this.getValue(this.findChildElement(c, "Flags")));
+                                if ((slideFlags & 1) !== 0) {
+                                    note.slideType = Bridge.get(AlphaTab.Model.SlideType).shift;
+                                }
+                                if ((slideFlags & 2) !== 0) {
+                                    note.slideType = Bridge.get(AlphaTab.Model.SlideType).legato;
+                                }
+                                if ((slideFlags & 4) !== 0) {
+                                    note.slideType = Bridge.get(AlphaTab.Model.SlideType).outDown;
+                                }
+                                if ((slideFlags & 8) !== 0) {
+                                    note.slideType = Bridge.get(AlphaTab.Model.SlideType).outUp;
+                                }
+                                if ((slideFlags & 16) !== 0) {
+                                    note.slideType = Bridge.get(AlphaTab.Model.SlideType).intoFromBelow;
+                                }
+                                if ((slideFlags & 32) !== 0) {
+                                    note.slideType = Bridge.get(AlphaTab.Model.SlideType).intoFromAbove;
+                                }
+                                break;
+                        }
+                        break;
+                }
+            }
+        }));
+
+        if (isBended) {
+            if (bendOrigin === null) {
+                bendOrigin = new AlphaTab.Model.BendPoint();
+            }
+            if (bendDestination === null) {
+                bendDestination = new AlphaTab.Model.BendPoint(Bridge.get(AlphaTab.Model.BendPoint).MaxPosition);
+            }
+            var bend = [];
+            bend.push(bendOrigin);
+            if (Bridge.Nullable.neq(bendMiddleOffset1, null) && Bridge.Nullable.neq(bendMiddleValue, null)) {
+                bend.push(new AlphaTab.Model.BendPoint(Bridge.Nullable.getValue(bendMiddleOffset1), Bridge.Nullable.getValue(bendMiddleValue)));
+            }
+            if (Bridge.Nullable.neq(bendMiddleOffset2, null) && Bridge.Nullable.neq(bendMiddleValue, null)) {
+                bend.push(new AlphaTab.Model.BendPoint(Bridge.Nullable.getValue(bendMiddleOffset2), Bridge.Nullable.getValue(bendMiddleValue)));
+            }
+
+            if (Bridge.Nullable.eq(bendMiddleOffset1, null) && Bridge.Nullable.eq(bendMiddleOffset2, null) && Bridge.Nullable.neq(bendMiddleValue, null)) {
+                bend.push(new AlphaTab.Model.BendPoint(30, Bridge.Nullable.getValue(bendMiddleValue)));
+            }
+            bend.push(bendDestination);
+            note.bendPoints = bend;
+        }
+    },
+    toBendValue: function (gpxValue) {
+        // NOTE: strange IEEE behavior here: 
+        // (int)(100f * 0.04f) => 3
+        // (100f*0.04f) => 4.0f => (int)4.0f => 4
+        var converted = gpxValue * Bridge.get(AlphaTab.Importer.GpxParser).BendPointValueFactor;
+        return (converted);
+    },
+    toBendOffset: function (gpxOffset) {
+        var converted = gpxOffset * Bridge.get(AlphaTab.Importer.GpxParser).BendPointPositionFactor;
+        return (converted);
+    },
+    parseRhythms: function (node) {
+        AlphaTab.Platform.Std.iterateChildren(node, Bridge.fn.bind(this, function (c) {
+            if (c.getNodeType() === Bridge.get(AlphaTab.Xml.XmlNodeType).element) {
+                switch (c.getLocalName()) {
+                    case "Rhythm": 
+                        this.parseRhythm(c);
+                        break;
+                }
+            }
+        }));
+    },
+    parseRhythm: function (node) {
+        var rhythm = new AlphaTab.Importer.GpxRhythm();
+        var rhythmId = node.getAttributes().get("id").getValue();
+        AlphaTab.Platform.Std.iterateChildren(node, Bridge.fn.bind(this, function (c) {
+            if (c.getNodeType() === Bridge.get(AlphaTab.Xml.XmlNodeType).element) {
+                switch (c.getLocalName()) {
+                    case "NoteValue": 
+                        switch (this.getValue(c)) {
+                            case "Whole": 
+                                rhythm.value = Bridge.get(AlphaTab.Model.Duration).whole;
+                                break;
+                            case "Half": 
+                                rhythm.value = Bridge.get(AlphaTab.Model.Duration).half;
+                                break;
+                            case "Quarter": 
+                                rhythm.value = Bridge.get(AlphaTab.Model.Duration).quarter;
+                                break;
+                            case "Eighth": 
+                                rhythm.value = Bridge.get(AlphaTab.Model.Duration).eighth;
+                                break;
+                            case "16th": 
+                                rhythm.value = Bridge.get(AlphaTab.Model.Duration).sixteenth;
+                                break;
+                            case "32nd": 
+                                rhythm.value = Bridge.get(AlphaTab.Model.Duration).thirtySecond;
+                                break;
+                            case "64th": 
+                                rhythm.value = Bridge.get(AlphaTab.Model.Duration).sixtyFourth;
+                                break;
+                        }
+                        break;
+                    case "PrimaryTuplet": 
+                        rhythm.tupletNumerator = parseInt(c.getAttributes().get("num").getValue());
+                        rhythm.tupletDenominator = parseInt(c.getAttributes().get("den").getValue());
+                        break;
+                    case "AugmentationDot": 
+                        rhythm.dots = parseInt(c.getAttributes().get("count").getValue());
+                        break;
+                }
+            }
+        }));
+
+        this._rhythmById[rhythmId] = rhythm;
+    },
+    getValue: function (n) {
+        return Bridge.get(AlphaTab.Platform.Std).getNodeValue(n);
+    },
+    buildModel: function () {
+        var $t, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8;
+        // build score
+        for (var i = 0, j = this._masterBars.length; i < j; i++) {
+            var masterBar = this._masterBars[i];
+            this.score.addMasterBar(masterBar);
+        }
+
+        // build tracks (not all, only those used by the score)
+        var trackIndex = 0;
+        $t = Bridge.getEnumerator(this._tracksMapping);
+        while ($t.moveNext()) {
+            var trackId = $t.getCurrent();
+            var track = this._tracksById[trackId];
+            this.score.addTrack(track);
+
+            // iterate all bar definitions for the masterbars
+            // and add the correct bar to the track
+            for (var i1 = 0, j1 = this._barsOfMasterBar.length; i1 < j1; i1++) {
+                var barIds = this._barsOfMasterBar[i1];
+                var barId = barIds[trackIndex];
+                if (barId !== Bridge.get(AlphaTab.Importer.GpxParser).InvalidId) {
+                    track.addBar(this._barsById[barId]);
+                }
+            }
+
+            trackIndex++;
+        }
+
+        // build bars
+        $t1 = Bridge.getEnumerator(Object.keys(this._barsById));
+        while ($t1.moveNext()) {
+            var barId1 = $t1.getCurrent();
+            var bar = this._barsById[barId1];
+            if (this._voicesOfBar.hasOwnProperty(barId1)) {
+                // add voices to bars
+                $t2 = Bridge.getEnumerator(this._voicesOfBar[barId1]);
+                while ($t2.moveNext()) {
+                    var voiceId = $t2.getCurrent();
+                    if (voiceId !== Bridge.get(AlphaTab.Importer.GpxParser).InvalidId) {
+                        bar.addVoice(this._voiceById[voiceId]);
+                    }
+                    else  {
+                        // invalid voice -> empty voice
+                        var voice = new AlphaTab.Model.Voice();
+                        bar.addVoice(voice);
+
+                        var beat = new AlphaTab.Model.Beat();
+                        beat.isEmpty = true;
+                        beat.duration = Bridge.get(AlphaTab.Model.Duration).quarter;
+                        voice.addBeat(beat);
+                    }
+                }
+            }
+        }
+
+        // build beats
+        $t3 = Bridge.getEnumerator(Object.keys(this._beatById));
+        while ($t3.moveNext()) {
+            var beatId = $t3.getCurrent();
+            var beat1 = this._beatById[beatId];
+            var rhythmId = this._rhythmOfBeat[beatId];
+            var rhythm = this._rhythmById[rhythmId];
+
+            // set beat duration
+            beat1.duration = rhythm.value;
+            beat1.dots = rhythm.dots;
+            beat1.tupletNumerator = rhythm.tupletNumerator;
+            beat1.tupletDenominator = rhythm.tupletDenominator;
+
+            // add notes to beat
+            if (this._notesOfBeat.hasOwnProperty(beatId)) {
+                $t4 = Bridge.getEnumerator(this._notesOfBeat[beatId]);
+                while ($t4.moveNext()) {
+                    var noteId = $t4.getCurrent();
+                    if (noteId !== Bridge.get(AlphaTab.Importer.GpxParser).InvalidId) {
+                        beat1.addNote(this._noteById[noteId]);
+                        if (this._tappedNotes.hasOwnProperty(noteId)) {
+                            beat1.tap = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        // build voices
+        $t5 = Bridge.getEnumerator(Object.keys(this._voiceById));
+        while ($t5.moveNext()) {
+            var voiceId1 = $t5.getCurrent();
+            var voice1 = this._voiceById[voiceId1];
+            if (this._beatsOfVoice.hasOwnProperty(voiceId1)) {
+                // add beats to voices
+                $t6 = Bridge.getEnumerator(this._beatsOfVoice[voiceId1]);
+                while ($t6.moveNext()) {
+                    var beatId1 = $t6.getCurrent();
+                    if (beatId1 !== Bridge.get(AlphaTab.Importer.GpxParser).InvalidId) {
+                        // important! we clone the beat because beats get reused
+                        // in gp6, our model needs to have unique beats.
+                        voice1.addBeat(this._beatById[beatId1].clone());
+                    }
+                }
+            }
+        }
+
+
+
+
+        // build automations
+        $t7 = Bridge.getEnumerator(Object.keys(this._automations));
+        while ($t7.moveNext()) {
+            var barId2 = $t7.getCurrent();
+            var bar1 = this._barsById[barId2];
+            for (var i2 = 0, j2 = bar1.voices.length; i2 < j2; i2++) {
+                var v = bar1.voices[i2];
+                if (v.beats.length > 0) {
+                    for (var k = 0, l = this._automations[barId2].length; k < l; k++) {
+                        var automation = this._automations[barId2][k];
+                        v.beats[0].automations.push(automation);
+                    }
+                }
+            }
+        }
+
+
+        // build automations
+        $t8 = Bridge.getEnumerator(Object.keys(this._automations));
+        while ($t8.moveNext()) {
+            var barId3 = $t8.getCurrent();
+            var automations = this._automations[barId3];
+            var bar2 = this._barsById[barId3];
+            for (var i3 = 0, j3 = automations.length; i3 < j3; i3++) {
+                var automation1 = automations[i3];
+                if (automation1.type === Bridge.get(AlphaTab.Model.AutomationType).tempo) {
+                    if (barId3 === "0") {
+                        this.score.tempo = (automation1.value);
+                        this.score.tempoLabel = automation1.text;
+                    }
+
+                    bar2.getMasterBar().tempoAutomation = automation1;
+                }
+            }
+        }
+    }
+});
+
+/**
+ * This structure represents a duration within a gpx model.
+ *
+ * @public
+ * @class AlphaTab.Importer.GpxRhythm
+ */
+Bridge.define('AlphaTab.Importer.GpxRhythm', {
+    config: {
+        properties: {
+            dots: 0,
+            tupletDenominator: 0,
+            tupletNumerator: 0,
+            value: 0
+        }
+    },
+    constructor: function () {
+        this.tupletDenominator = 1;
+        this.tupletNumerator = 1;
+        this.value = Bridge.get(AlphaTab.Model.Duration).quarter;
+    }
+});
+
+/**
+ * A mixtablechange describes several track changes.
+ *
+ * @public
+ * @class AlphaTab.Importer.MixTableChange
+ */
+Bridge.define('AlphaTab.Importer.MixTableChange', {
+    config: {
+        properties: {
+            volume: 0,
+            balance: 0,
+            instrument: 0,
+            tempoName: null,
+            tempo: 0,
+            duration: 0
+        }
+    },
+    constructor: function () {
+        this.volume = -1;
+        this.balance = -1;
+        this.instrument = -1;
+        this.tempoName = null;
+        this.tempo = -1;
+        this.duration = 0;
+    }
+});
+
+Bridge.define('AlphaTab.Xml.IXmlNode');
+
+Bridge.define('AlphaTab.Xml.XmlNodeWrapper', {
+    inherits: [AlphaTab.Xml.IXmlNode],
+    _node: null,
+    constructor: function (node) {
+        this._node = node;
+    },
+    getNodeType: function () {
+        return this._node.nodeType;
+    },
+    getLocalName: function () {
+        return this._node.nodeName;
+    },
+    getValue: function () {
+        return this._node.nodeValue;
+    },
+    getChildNodes: function () {
+        return new AlphaTab.Xml.XmlNodeCollectionWrapper(this._node.childNodes);
+    },
+    getFirstChild: function () {
+        return new AlphaTab.Xml.XmlNodeWrapper(this._node.firstChild);
+    },
+    getAttributes: function () {
+        return new AlphaTab.Xml.XmlAttributeCollectionWrapper(this._node.attributes);
+    },
+    getAttribute: function (name) {
+        return this._node.getAttribute(name);
+    },
+    getElementsByTagName: function (nodeName) {
+        return new AlphaTab.Xml.XmlNodeCollectionWrapper(this._node.getElementsByTagName(nodeName));
+    }
+});
+
+Bridge.define('AlphaTab.Importer.NoCompatibleReaderFoundException', {
+    inherits: [Bridge.Exception]
+});
+
+/** @namespace AlphaTab.Platform */
+
+/**
+ * This is the public interface which file loaders need to implement for providing 
+ files on different plattforms.
+ *
+ * @abstract
+ * @public
+ * @class AlphaTab.Platform.IFileLoader
+ */
+Bridge.define('AlphaTab.Platform.IFileLoader');
+
+/** @namespace AlphaTab.Platform.JavaScript */
+
+/**
+ * This is a fileloader implementation for JavaScript.
+ It uses a ajax request in case of modern browsers like Firefox or Chrome. 
+ For IE a VBScript is used to load a binary stream.
+ *
+ * @public
+ * @class AlphaTab.Platform.JavaScript.JsFileLoader
+ * @implements  AlphaTab.Platform.IFileLoader
+ */
+Bridge.define('AlphaTab.Platform.JavaScript.JsFileLoader', {
+    inherits: [AlphaTab.Platform.IFileLoader],
+    statics: {
+        getIEVersion: function () {
+            var rv = -1;
+            var appName = window.navigator.appName;
+            var agent = window.navigator.userAgent;
+            if (appName === "Microsoft Internet Explorer") {
+                var r = new RegExp("MSIE ([0-9]{1,}[\\.0-9]{0,})");
+                var m = r.exec(agent);
+                if (m !== null) {
+                    rv = parseFloat(m[1]);
+                }
+            }
+            return rv;
+        }
+    },
+    loadBinary: function (path) {
+        var ie = Bridge.get(AlphaTab.Platform.JavaScript.JsFileLoader).getIEVersion();
+        if (ie >= 0 && ie <= 9) {
+            // use VB Loader to load binary array
+            var vbArr = VbAjaxLoader("GET", path);
+            var fileContents = vbArr.toArray();
+
+            var data = new Uint8Array(fileContents.length);
+            for (var i = 0; i < fileContents.length; i++) {
+                data[i] = fileContents[i];
+            }
+            return data;
+        }
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", path, false);
+        xhr.responseType = "arraybuffer";
+        xhr.send();
+
+        if (xhr.status === 200) {
+            var reader = new Uint8Array(xhr.response);
+            return reader;
+        }
+        // Error handling
+        if (xhr.status === 0) {
+            throw new AlphaTab.IO.FileLoadException("You are offline!!\n Please Check Your Network.");
+        }
+        if (xhr.status === 404) {
+            throw new AlphaTab.IO.FileLoadException("Requested URL not found.");
+        }
+        if (xhr.status === 500) {
+            throw new AlphaTab.IO.FileLoadException("Internel Server Error.");
+        }
+        if (xhr.statusText === "parsererror") {
+            throw new AlphaTab.IO.FileLoadException("Error.\nParsing JSON Request failed.");
+        }
+        if (xhr.statusText === "timeout") {
+            throw new AlphaTab.IO.FileLoadException("Request Time out.");
+        }
+        throw new AlphaTab.IO.FileLoadException("Unknow Error: " + xhr.responseText);
+    },
+    loadBinaryAsync: function (path, success, error) {
+        var ie = Bridge.get(AlphaTab.Platform.JavaScript.JsFileLoader).getIEVersion();
+        if (ie >= 0 && ie <= 9) {
+            // use VB Loader to load binary array
+            var vbArr = VbAjaxLoader("GET", path);
+            var fileContents = vbArr.toArray();
+
+            var data = new Uint8Array(fileContents.length);
+            for (var i = 0; i < fileContents.length; i++) {
+                data[i] = fileContents[i];
+            }
+
+            success(data);
+        }
+        else  {
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var reader = new Uint8Array(xhr.response);
+                        success(reader);
+                    }
+                    else  {
+                        if (xhr.status === 0) {
+                            error(new AlphaTab.IO.FileLoadException("You are offline!!\n Please Check Your Network."));
+                        }
+                        else  {
+                            if (xhr.status === 404) {
+                                error(new AlphaTab.IO.FileLoadException("Requested URL not found."));
+                            }
+                            else  {
+                                if (xhr.status === 500) {
+                                    error(new AlphaTab.IO.FileLoadException("Internel Server Error."));
+                                }
+                                else  {
+                                    if (xhr.statusText === "parsererror") {
+                                        error(new AlphaTab.IO.FileLoadException("Error.\nParsing JSON Request failed."));
+                                    }
+                                    else  {
+                                        if (xhr.statusText === "timeout") {
+                                            error(new AlphaTab.IO.FileLoadException("Request Time out."));
+                                        }
+                                        else  {
+                                            error(new AlphaTab.IO.FileLoadException("Unknow Error: " + xhr.responseText));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            xhr.open("GET", path, true);
+            xhr.responseType = "arraybuffer";
+            xhr.send();
+        }
+    }
+});
+
+Bridge.define('AlphaTab.Importer.UnsupportedFormatException', {
+    inherits: [Bridge.Exception]
+});
+
+/** @namespace AlphaTab.IO */
+
+/**
+ * This utility public class allows bitwise reading of a stream
+ *
+ * @public
+ * @class AlphaTab.IO.BitReader
+ */
+Bridge.define('AlphaTab.IO.BitReader', {
+    statics: {
+        ByteSize: 8
+    },
+    _currentByte: 0,
+    _position: 0,
+    _source: null,
+    constructor: function (source) {
+        this._source = source;
+        this._position = Bridge.get(AlphaTab.IO.BitReader).ByteSize; // to ensure a byte is read on beginning
+    },
+    readByte: function () {
+        return this.readBits(Bridge.get(AlphaTab.IO.BitReader).ByteSize);
+    },
+    readBytes: function (count) {
+        var bytes = new Uint8Array(count);
+        for (var i = 0; i < count; i++) {
+            bytes[i] = this.readByte();
+        }
+        return bytes;
+    },
+    readBits: function (count) {
+        var bits = 0;
+        var i = count - 1;
+        while (i >= 0) {
+            bits |= (this.readBit() << i);
+            i--;
+        }
+        return bits;
+    },
+    readBitsReversed: function (count) {
+        var bits = 0;
+        for (var i = 0; i < count; i++) {
+            bits |= (this.readBit() << i);
+        }
+        return bits;
+    },
+    readBit: function () {
+        // need a new byte? 
+        if (this._position >= Bridge.get(AlphaTab.IO.BitReader).ByteSize) {
+            this._currentByte = this._source.readByte();
+            if (this._currentByte === -1) {
+                throw new AlphaTab.IO.EndOfReaderException();
+            }
+            this._position = 0;
+        }
+
+        // shift the desired byte to the least significant bit and  
+        // get the value using masking
+        var value = (this._currentByte >> (Bridge.get(AlphaTab.IO.BitReader).ByteSize - this._position - 1)) & 1;
+        this._position++;
+        return value;
+    },
+    readAll: function () {
+        var all = Bridge.get(AlphaTab.IO.ByteBuffer).empty();
+        try {
+            while (true) {
+                all.writeByte(this.readByte());
+            }
+        }
+        catch ($e) {
+            $e = Bridge.Exception.create($e);
+            if (Bridge.is($e, AlphaTab.IO.EndOfReaderException)) {
+            }
+            else {
+                throw $e;
+            }
+        }
+        return all.toArray();
+    }
+});
+
+Bridge.define('AlphaTab.IO.EndOfReaderException', {
+    inherits: [Bridge.Exception]
+});
+
+Bridge.define('AlphaTab.IO.FileLoadException', {
+    inherits: [Bridge.Exception],
+    constructor: function (message) {
+        Bridge.Exception.prototype.$constructor.call(this, message);
+
+    }
+});
+
+Bridge.define('AlphaTab.IO.IReadable');
+
+Bridge.define('AlphaTab.IO.IWriteable');
+
+Bridge.define('AlphaTab.IO.ByteBuffer', {
+    inherits: [AlphaTab.IO.IWriteable,AlphaTab.IO.IReadable],
+    statics: {
+        empty: function () {
+            return Bridge.get(AlphaTab.IO.ByteBuffer).withCapactiy(0);
+        },
+        withCapactiy: function (capacity) {
+            var buffer = new AlphaTab.IO.ByteBuffer();
+            buffer._buffer = new Uint8Array(capacity);
+            buffer._capacity = capacity;
+            return buffer;
+        },
+        fromBuffer: function (data) {
+            var $t;
+            var buffer = new AlphaTab.IO.ByteBuffer();
+            buffer._buffer = data;
+            buffer._capacity = ($t = data.length, buffer._length = $t, $t);
+            return buffer;
+        }
+    },
+    _buffer: null,
+    _position: 0,
+    _length: 0,
+    _capacity: 0,
+    constructor: function () {
+    },
+    getLength: function () {
+        return this._length;
+    },
+    getBuffer: function () {
+        return this._buffer;
+    },
+    reset: function () {
+        this._position = 0;
+    },
+    skip: function (offset) {
+        this._position += offset;
+    },
+    setCapacity: function (value) {
+        if (value !== this._capacity) {
+            if (value > 0) {
+                var newBuffer = new Uint8Array(value);
+                if (this._length > 0) {
+                    newBuffer.set(this._buffer.subarray(0, 0 + this._length), 0);
+                }
+                this._buffer = newBuffer;
+            }
+            else  {
+                this._buffer = null;
+            }
+            this._capacity = value;
+        }
+    },
+    readByte: function () {
+        var n = this._length - this._position;
+        if (n <= 0) {
+            return -1;
+        }
+
+        return this._buffer[this._position++];
+    },
+    read: function (buffer, offset, count) {
+        var n = this._length - this._position;
+        if (n > count) {
+            n = count;
+        }
+        if (n <= 0) {
+            return 0;
+        }
+
+        if (n <= 8) {
+            var byteCount = n;
+            while (--byteCount >= 0) {
+                buffer[offset + byteCount] = this._buffer[this._position + byteCount];
+            }
+        }
+        else  {
+            buffer.set(this._buffer.subarray(this._position, this._position + n), offset);
+        }
+        this._position += n;
+
+        return n;
+    },
+    writeByte: function (value) {
+        var buffer = new Uint8Array(1);
+        buffer[0] = value;
+        this.write(buffer, 0, 1);
+    },
+    write: function (buffer, offset, count) {
+        var i = this._position + count;
+
+        if (i > this._length) {
+            if (i > this._capacity) {
+                this.ensureCapacity(i);
+            }
+            this._length = i;
+        }
+        if ((count <= 8) && (buffer !== this._buffer)) {
+            var byteCount = count;
+            while (--byteCount >= 0) {
+                this._buffer[this._position + byteCount] = buffer[offset + byteCount];
+            }
+        }
+        else  {
+            this._buffer.set(buffer.subarray(offset, offset + count), this._position);
+        }
+        this._position = i;
+    },
+    ensureCapacity: function (value) {
+        if (value > this._capacity) {
+            var newCapacity = value;
+            if (newCapacity < 256) {
+                newCapacity = 256;
+            }
+            if (newCapacity < this._capacity * 2) {
+                newCapacity = this._capacity * 2;
+            }
+            this.setCapacity(newCapacity);
+        }
+    },
+    readAll: function () {
+        return this.toArray();
+    },
+    toArray: function () {
+        var copy = new Uint8Array(this._length);
+        copy.set(this._buffer.subarray(0, 0 + this._length), 0);
+        return copy;
+    }
+});
+
+Bridge.define('AlphaTab.LayoutSettings', {
+    statics: {
+        getDefaults: function () {
+            var settings = new AlphaTab.LayoutSettings();
+            settings.mode = "page";
+            return settings;
+        }
+    },
+    config: {
+        properties: {
+            /**
+             * The layouting mode used to arrange the the notation.
+             <ul><li><strong>page</strong> - Bars are aligned in rows using a fixed width</li><li><strong>horizontal</strong> - Bars are aligned horizontally in one row</li></ul>
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.LayoutSettings
+             * @memberof AlphaTab.LayoutSettings
+             * @function mode
+             * @return  {string}
+             */
+            /**
+             * The layouting mode used to arrange the the notation.
+             <ul><li><strong>page</strong> - Bars are aligned in rows using a fixed width</li><li><strong>horizontal</strong> - Bars are aligned horizontally in one row</li></ul>
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.LayoutSettings
+             * @memberof AlphaTab.LayoutSettings
+             * @function mode
+             * @param   {string}    value
+             * @return  {void}
+             */
+            mode: null,
+            /**
+             * Additional layout mode specific settings.
+             <strong>mode=page</strong><ul><li><strong>autoSize</strong> - Whether the width of the canvas should be automatically determined by the used layout. (bool, default:true)</li><li><strong>barsPerRow</strong> - Limit the displayed bars per row, <em>-1 for sized based limit</em> (integer, default:-1)</li><li><strong>start</strong> - The bar start index to start layouting with (integer: default: 0)</li><li><strong>count</strong> - The amount of bars to render overall, <em>-1 for all till the end</em>  (integer, default:-1)</li><li><strong>hideInfo</strong> - Render the song information or not (boolean, default:true)</li></ul><strong>mode=horizontal</strong><ul><li><strong>start</strong> - The bar start index to start layouting with (integer: default: 0)</li><li><strong>count</strong> - The amount of bars to render overall, <em>-1 for all till the end</em>  (integer, default:-1)</li></ul>
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.LayoutSettings
+             * @memberof AlphaTab.LayoutSettings
+             * @function additionalSettings
+             * @return  {Object}
+             */
+            /**
+             * Additional layout mode specific settings.
+             <strong>mode=page</strong><ul><li><strong>autoSize</strong> - Whether the width of the canvas should be automatically determined by the used layout. (bool, default:true)</li><li><strong>barsPerRow</strong> - Limit the displayed bars per row, <em>-1 for sized based limit</em> (integer, default:-1)</li><li><strong>start</strong> - The bar start index to start layouting with (integer: default: 0)</li><li><strong>count</strong> - The amount of bars to render overall, <em>-1 for all till the end</em>  (integer, default:-1)</li><li><strong>hideInfo</strong> - Render the song information or not (boolean, default:true)</li></ul><strong>mode=horizontal</strong><ul><li><strong>start</strong> - The bar start index to start layouting with (integer: default: 0)</li><li><strong>count</strong> - The amount of bars to render overall, <em>-1 for all till the end</em>  (integer, default:-1)</li></ul>
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.LayoutSettings
+             * @memberof AlphaTab.LayoutSettings
+             * @function additionalSettings
+             * @param   {Object}    value
+             * @return  {void}
+             */
+            additionalSettings: null
+        }
+    },
+    constructor: function () {
+        this.additionalSettings = {};
+    },
+    get: function (key, def) {
+        if (this.additionalSettings.hasOwnProperty(key)) {
+            return this.additionalSettings[key];
+        }
+        return def;
+    }
+});
+
+/**
+ * Lists all types of note acceuntations
+ *
+ * @public
+ * @class AlphaTab.Model.AccentuationType
+ */
+Bridge.define('AlphaTab.Model.AccentuationType', {
+    statics: {
+        none: 0,
+        normal: 1,
+        heavy: 2
+    },
+    $enum: true
+});
+
+/**
+ * Defines all possible accidentals for notes.
+ *
+ * @public
+ * @class AlphaTab.Model.AccidentalType
+ */
+Bridge.define('AlphaTab.Model.AccidentalType', {
+    statics: {
+        none: 0,
+        natural: 1,
+        sharp: 2,
+        flat: 3
+    },
+    $enum: true
+});
+
+/**
+ * This public enumeration lists all types of automations.
+ *
+ * @public
+ * @class AlphaTab.Model.AutomationType
+ */
+Bridge.define('AlphaTab.Model.AutomationType', {
+    statics: {
+        tempo: 0,
+        volume: 1,
+        instrument: 2,
+        balance: 3
+    },
+    $enum: true
+});
+
+/**
+ * A bar is a single block within a track, also known as Measure.
+ *
+ * @public
+ * @class AlphaTab.Model.Bar
+ */
+Bridge.define('AlphaTab.Model.Bar', {
+    statics: {
+        copyTo: function (src, dst) {
+            dst.index = src.index;
+            dst.clef = src.clef;
+        }
+    },
+    config: {
+        properties: {
+            index: 0,
+            nextBar: null,
+            previousBar: null,
+            clef: 0,
+            track: null,
+            voices: null,
+            minDuration: null,
+            maxDuration: null
+        }
+    },
+    constructor: function () {
+        this.voices = [];
+        this.clef = Bridge.get(AlphaTab.Model.Clef).g2;
+    },
+    getMasterBar: function () {
+        return this.track.score.masterBars[this.index];
+    },
+    getIsEmpty: function () {
+        for (var i = 0, j = this.voices.length; i < j; i++) {
+            if (!this.voices[i].getIsEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    },
+    addVoice: function (voice) {
+        voice.bar = this;
+        voice.index = this.voices.length;
+        this.voices.push(voice);
+    },
+    finish: function () {
+        for (var i = 0, j = this.voices.length; i < j; i++) {
+            var voice = this.voices[i];
+            voice.finish();
+            if (Bridge.Nullable.eq(voice.minDuration, null) || Bridge.Nullable.eq(this.minDuration, null) || Bridge.Nullable.getValue(this.minDuration) > Bridge.Nullable.getValue(voice.minDuration)) {
+                this.minDuration = voice.minDuration;
+            }
+            if (Bridge.Nullable.eq(voice.maxDuration, null) || Bridge.Nullable.eq(this.maxDuration, null) || Bridge.Nullable.getValue(this.maxDuration) > Bridge.Nullable.getValue(voice.maxDuration)) {
+                this.minDuration = voice.maxDuration;
+            }
+        }
+    }
+});
+
+/**
+ * A beat is a single block within a bar. A beat is a combination
+ of several notes played at the same time.
+ *
+ * @public
+ * @class AlphaTab.Model.Beat
+ */
+Bridge.define('AlphaTab.Model.Beat', {
+    statics: {
+        WhammyBarMaxPosition: 60,
+        WhammyBarMaxValue: 24,
+        copyTo: function (src, dst) {
+            dst.index = src.index;
+            dst.isEmpty = src.isEmpty;
+            dst.duration = src.duration;
+            dst.dots = src.dots;
+            dst.fadeIn = src.fadeIn;
+            dst.lyrics = src.lyrics === null ? null : src.lyrics.slice();
+            dst.pop = src.pop;
+            dst.hasRasgueado = src.hasRasgueado;
+            dst.slap = src.slap;
+            dst.tap = src.tap;
+            dst.text = src.text;
+            dst.brushType = src.brushType;
+            dst.brushDuration = src.brushDuration;
+            dst.tupletDenominator = src.tupletDenominator;
+            dst.tupletNumerator = src.tupletNumerator;
+            dst.vibrato = src.vibrato;
+            dst.chordId = src.chordId;
+            dst.graceType = src.graceType;
+            dst.pickStroke = src.pickStroke;
+            dst.tremoloSpeed = src.tremoloSpeed;
+            dst.crescendo = src.crescendo;
+            dst.start = src.start;
+            dst.dynamic = src.dynamic;
+        }
+    },
+    _minNote: null,
+    _maxNote: null,
+    config: {
+        properties: {
+            previousBeat: null,
+            nextBeat: null,
+            index: 0,
+            voice: null,
+            notes: null,
+            isEmpty: false,
+            duration: 0,
+            automations: null,
+            dots: 0,
+            fadeIn: false,
+            lyrics: null,
+            pop: false,
+            hasRasgueado: false,
+            slap: false,
+            tap: false,
+            text: null,
+            brushType: 0,
+            brushDuration: 0,
+            tupletDenominator: 0,
+            tupletNumerator: 0,
+            whammyBarPoints: null,
+            vibrato: 0,
+            chordId: null,
+            graceType: 0,
+            pickStroke: 0,
+            tremoloSpeed: null,
+            crescendo: 0,
+            /**
+             * The timeline position of the voice within the current bar. (unit: midi ticks)
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.Beat
+             * @memberof AlphaTab.Model.Beat
+             * @function start
+             * @return  {number}
+             */
+            /**
+             * The timeline position of the voice within the current bar. (unit: midi ticks)
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.Beat
+             * @memberof AlphaTab.Model.Beat
+             * @function start
+             * @param   {number}    value
+             * @return  {void}
+             */
+            start: 0,
+            dynamic: 0
+        }
+    },
+    constructor: function () {
+        this.whammyBarPoints = [];
+        this.notes = [];
+        this.brushType = Bridge.get(AlphaTab.Model.BrushType).none;
+        this.vibrato = Bridge.get(AlphaTab.Model.VibratoType).none;
+        this.graceType = Bridge.get(AlphaTab.Model.GraceType).none;
+        this.pickStroke = Bridge.get(AlphaTab.Model.PickStrokeType).none;
+        this.duration = Bridge.get(AlphaTab.Model.Duration).quarter;
+        this.tremoloSpeed = null;
+        this.automations = [];
+        this.dots = 0;
+        this.start = 0;
+        this.tupletDenominator = -1;
+        this.tupletNumerator = -1;
+        this.dynamic = Bridge.get(AlphaTab.Model.DynamicValue).f;
+        this.crescendo = Bridge.get(AlphaTab.Model.CrescendoType).none;
+    },
+    getMinNote: function () {
+        if (this._minNote === null) {
+            this.refreshNotes();
+        }
+        return this._minNote;
+    },
+    getMaxNote: function () {
+        if (this._maxNote === null) {
+            this.refreshNotes();
+        }
+        return this._maxNote;
+    },
+    getIsRest: function () {
+        return this.notes.length === 0;
+    },
+    getHasTuplet: function () {
+        return !(this.tupletDenominator === -1 && this.tupletNumerator === -1) && !(this.tupletDenominator === 1 && this.tupletNumerator === 1);
+    },
+    getHasWhammyBar: function () {
+        return this.whammyBarPoints.length > 0;
+    },
+    getHasChord: function () {
+        return this.chordId !== null;
+    },
+    getChord: function () {
+        return this.voice.bar.track.chords[this.chordId];
+    },
+    getIsTremolo: function () {
+        return Bridge.Nullable.neq(this.tremoloSpeed, null);
+    },
+    getAbsoluteStart: function () {
+        return this.voice.bar.getMasterBar().start + this.start;
+    },
+    clone: function () {
+        var beat = new AlphaTab.Model.Beat();
+        for (var i = 0, j = this.whammyBarPoints.length; i < j; i++) {
+            beat.whammyBarPoints.push(this.whammyBarPoints[i].clone());
+        }
+        for (var i1 = 0, j1 = this.notes.length; i1 < j1; i1++) {
+            beat.addNote(this.notes[i1].clone());
+        }
+        Bridge.get(AlphaTab.Model.Beat).copyTo(this, beat);
+        for (var i2 = 0, j2 = this.automations.length; i2 < j2; i2++) {
+            beat.automations.push(this.automations[i2].clone());
+        }
+        return beat;
+    },
+    /**
+     * Calculates the time spent in this bar. (unit: midi ticks)
+     *
+     * @instance
+     * @public
+     * @this AlphaTab.Model.Beat
+     * @memberof AlphaTab.Model.Beat
+     * @return  {number}
+     */
+    calculateDuration: function () {
+        var duration = this.duration;
+        var ticks = AlphaTab.Audio.MidiUtils.toTicks(duration);
+        if (this.dots === 2) {
+            ticks = Bridge.get(AlphaTab.Audio.MidiUtils).applyDot(ticks, true);
+        }
+        else  {
+            if (this.dots === 1) {
+                ticks = Bridge.get(AlphaTab.Audio.MidiUtils).applyDot(ticks, false);
+            }
+        }
+
+        if (this.tupletDenominator > 0 && this.tupletNumerator >= 0) {
+            ticks = Bridge.get(AlphaTab.Audio.MidiUtils).applyTuplet(ticks, this.tupletNumerator, this.tupletDenominator);
+        }
+
+        return ticks;
+    },
+    addNote: function (note) {
+        note.beat = this;
+        this.notes.push(note);
+    },
+    refreshNotes: function () {
+        for (var i = 0, j = this.notes.length; i < j; i++) {
+            var note = this.notes[i];
+            if (this._minNote === null || note.getRealValue() < this._minNote.getRealValue()) {
+                this._minNote = note;
+            }
+            if (this._maxNote === null || note.getRealValue() > this._maxNote.getRealValue()) {
+                this._maxNote = note;
+            }
+        }
+    },
+    getAutomation: function (type) {
+        for (var i = 0, j = this.automations.length; i < j; i++) {
+            var automation = this.automations[i];
+            if (automation.type === type) {
+                return automation;
+            }
+        }
+        return null;
+    },
+    getNoteOnString: function (string) {
+        for (var i = 0, j = this.notes.length; i < j; i++) {
+            var note = this.notes[i];
+            if (note.string === string) {
+                return note;
+            }
+        }
+        return null;
+    },
+    finish: function () {
+        // start
+        if (this.index === 0) {
+            this.start = 0;
+        }
+        else  {
+            this.start = this.previousBeat.start + this.previousBeat.calculateDuration();
+        }
+
+        for (var i = 0, j = this.notes.length; i < j; i++) {
+            this.notes[i].finish();
+        }
+    }
+});
+
+/**
+ * A single point of a bending graph. Used to 
+ describe WhammyBar and String Bending effects.
+ *
+ * @public
+ * @class AlphaTab.Model.BendPoint
+ */
+Bridge.define('AlphaTab.Model.BendPoint', {
+    statics: {
+        MaxPosition: 60,
+        MaxValue: 12,
+        copyTo: function (src, dst) {
+            dst.offset = src.offset;
+            dst.value = src.value;
+        }
+    },
+    config: {
+        properties: {
+            offset: 0,
+            value: 0
+        }
+    },
+    constructor: function (offset, value) {
+        if (offset === void 0) { offset = 0; }
+        if (value === void 0) { value = 0; }
+        this.offset = offset;
+        this.value = value;
+    },
+    clone: function () {
+        var point = new AlphaTab.Model.BendPoint();
+        Bridge.get(AlphaTab.Model.BendPoint).copyTo(this, point);
+        return point;
+    }
+});
+
+/**
+ * Lists all types of how to brush multiple notes on a beat.
+ *
+ * @public
+ * @class AlphaTab.Model.BrushType
+ */
+Bridge.define('AlphaTab.Model.BrushType', {
+    statics: {
+        none: 0,
+        brushUp: 1,
+        brushDown: 2,
+        arpeggioUp: 3,
+        arpeggioDown: 4
+    },
+    $enum: true
+});
+
+/**
+ * A chord definition.
+ *
+ * @public
+ * @class AlphaTab.Model.Chord
+ */
+Bridge.define('AlphaTab.Model.Chord', {
+    statics: {
+        copyTo: function (src, dst) {
+            dst.firstFret = src.firstFret;
+            dst.name = src.name;
+            dst.strings = src.strings.slice();
+        }
+    },
+    config: {
+        properties: {
+            name: null,
+            firstFret: 0,
+            strings: null
+        }
+    },
+    constructor: function () {
+        this.strings = [];
+    }
+});
+
+/**
+ * This public enumeration lists all supported Clefs.
+ *
+ * @public
+ * @class AlphaTab.Model.Clef
+ */
+Bridge.define('AlphaTab.Model.Clef', {
+    statics: {
+        neutral: 0,
+        c3: 1,
+        c4: 2,
+        f4: 3,
+        g2: 4
+    },
+    $enum: true
+});
+
+/**
+ * Lists all Crescendo and Decrescendo types.
+ *
+ * @public
+ * @class AlphaTab.Model.CrescendoType
+ */
+Bridge.define('AlphaTab.Model.CrescendoType', {
+    statics: {
+        none: 0,
+        crescendo: 1,
+        decrescendo: 2
+    },
+    $enum: true
+});
+
+Bridge.define('AlphaTab.Model.Fingers', {
+    statics: {
+        /**
+         * Unknown type (not documented)
+         *
+         * @static
+         * @public
+         * @memberof AlphaTab.Model.Fingers
+         * @constant
+         * @default -2
+         * @type AlphaTab.Model.Fingers
+         */
+        unknown: -2,
+        /**
+         * No finger, dead note
+         *
+         * @static
+         * @public
+         * @memberof AlphaTab.Model.Fingers
+         * @constant
+         * @default -1
+         * @type AlphaTab.Model.Fingers
+         */
+        noOrDead: -1,
+        /**
+         * The thumb
+         *
+         * @static
+         * @public
+         * @memberof AlphaTab.Model.Fingers
+         * @constant
+         * @default 0
+         * @type AlphaTab.Model.Fingers
+         */
+        thumb: 0,
+        /**
+         * The index finger
+         *
+         * @static
+         * @public
+         * @memberof AlphaTab.Model.Fingers
+         * @constant
+         * @default 1
+         * @type AlphaTab.Model.Fingers
+         */
+        indexFinger: 1,
+        /**
+         * The middle finger
+         *
+         * @static
+         * @public
+         * @memberof AlphaTab.Model.Fingers
+         * @constant
+         * @default 2
+         * @type AlphaTab.Model.Fingers
+         */
+        middleFinger: 2,
+        /**
+         * The annular finger
+         *
+         * @static
+         * @public
+         * @memberof AlphaTab.Model.Fingers
+         * @constant
+         * @default 3
+         * @type AlphaTab.Model.Fingers
+         */
+        annularFinger: 3,
+        /**
+         * The little finger
+         *
+         * @static
+         * @public
+         * @memberof AlphaTab.Model.Fingers
+         * @constant
+         * @default 4
+         * @type AlphaTab.Model.Fingers
+         */
+        littleFinger: 4
+    },
+    $enum: true
+});
+
+/**
+ * Lists all types of grace notes
+ *
+ * @public
+ * @class AlphaTab.Model.GraceType
+ */
+Bridge.define('AlphaTab.Model.GraceType', {
+    statics: {
+        none: 0,
+        onBeat: 1,
+        beforeBeat: 2
+    },
+    $enum: true
+});
+
+/**
+ * Lists all harmonic types.
+ *
+ * @public
+ * @class AlphaTab.Model.HarmonicType
+ */
+Bridge.define('AlphaTab.Model.HarmonicType', {
+    statics: {
+        none: 0,
+        natural: 1,
+        artificial: 2,
+        pinch: 3,
+        tap: 4,
+        semi: 5,
+        feedback: 6
+    },
+    $enum: true
+});
+
+/**
+ * This class can convert a full {@link } instance to a simple JavaScript object and back for further
+ JSON serialization.
+ *
+ * @public
+ * @class AlphaTab.Model.JsonConverter
+ */
+Bridge.define('AlphaTab.Model.JsonConverter', {
+    scoreToJsObject: function (score) {
+        var $t;
+        var score2 = {};
+        Bridge.get(AlphaTab.Model.Score).copyTo(score, score2);
+        score2.masterBars = [];
+        score2.tracks = [];
+
+
+        for (var i = 0; i < score.masterBars.length; i++) {
+            var masterBar = score.masterBars[i];
+            var masterBar2 = {};
+            Bridge.get(AlphaTab.Model.MasterBar).copyTo(masterBar, masterBar2);
+            if (masterBar.tempoAutomation) {
+                masterBar2.tempoAutomation = {};
+                Bridge.get(AlphaTab.Model.Automation).copyTo(masterBar.tempoAutomation, masterBar2.tempoAutomation);
+            }
+            if (masterBar.volumeAutomation) {
+                masterBar2.volumeAutomation = {};
+                Bridge.get(AlphaTab.Model.Automation).copyTo(masterBar.volumeAutomation, masterBar2.volumeAutomation);
+            }
+            if (masterBar.section) {
+                masterBar2.section = {};
+                Bridge.get(AlphaTab.Model.Section).copyTo(masterBar.section, masterBar2.section);
+            }
+            score2.masterBars.push(masterBar2);
+        }
+
+
+
+        for (var t = 0; t < score.tracks.length; t++) {
+            var track = score.tracks[t];
+            var track2 = {};
+            track2.color = {};
+            Bridge.get(AlphaTab.Model.Track).copyTo(track, track2);
+
+            track2.playbackInfo = {};
+            Bridge.get(AlphaTab.Model.PlaybackInformation).copyTo(track.playbackInfo, track2.playbackInfo);
+
+            track2.chords = {};
+            $t = Bridge.getEnumerator(Object.keys(track.chords));
+            while ($t.moveNext()) {
+                var key = $t.getCurrent();
+                var chord = track.chords[key];
+                var chord2 = {};
+                Bridge.get(AlphaTab.Model.Chord).copyTo(chord, chord2);
+                track2.chords[key] = chord;
+            }
+
+
+            track2.bars = [];
+            for (var b = 0; b < track.bars.length; b++) {
+                var bar = track.bars[b];
+                var bar2 = {};
+                Bridge.get(AlphaTab.Model.Bar).copyTo(bar, bar2);
+
+
+                bar2.voices = [];
+                for (var v = 0; v < bar.voices.length; v++) {
+                    var voice = bar.voices[v];
+                    var voice2 = {};
+                    Bridge.get(AlphaTab.Model.Voice).copyTo(voice, voice2);
+
+
+                    voice2.beats = [];
+                    for (var bb = 0; bb < voice.beats.length; bb++) {
+                        var beat = voice.beats[bb];
+                        var beat2 = {};
+                        Bridge.get(AlphaTab.Model.Beat).copyTo(beat, beat2);
+
+                        beat2.automations = [];
+                        for (var a = 0; a < beat.automations.length; a++) {
+                            var automation = {};
+                            Bridge.get(AlphaTab.Model.Automation).copyTo(beat.automations[a], automation);
+                            beat2.automations.push(automation);
+                        }
+
+                        beat2.whammyBarPoints = [];
+                        for (var i1 = 0; i1 < beat.whammyBarPoints.length; i1++) {
+                            var point = {};
+                            Bridge.get(AlphaTab.Model.BendPoint).copyTo(beat.whammyBarPoints[i1], point);
+                            beat2.whammyBarPoints.push(point);
+                        }
+
+
+                        beat2.notes = [];
+                        for (var n = 0; n < beat.notes.length; n++) {
+                            var note = beat.notes[n];
+                            var note2 = {};
+                            Bridge.get(AlphaTab.Model.Note).copyTo(note, note2);
+
+                            note2.bendPoints = [];
+                            for (var i2 = 0; i2 < note.bendPoints.length; i2++) {
+                                var point1 = {};
+                                Bridge.get(AlphaTab.Model.BendPoint).copyTo(note.bendPoints[i2], point1);
+                                note2.bendPoints.push(point1);
+                            }
+
+                            beat2.notes.push(note2);
+                        }
+
+
+                        voice2.beats.push(beat2);
+                    }
+
+
+                    bar2.voices.push(voice2);
+                }
+
+
+                track2.bars.push(bar2);
+            }
+
+
+            score2.tracks.push(track2);
+        }
+
+
+        return score2;
+    },
+    jsObjectToScore: function (score) {
+        var $t;
+        var score2 = new AlphaTab.Model.Score();
+        Bridge.get(AlphaTab.Model.Score).copyTo(score, score2);
+
+
+        for (var i = 0; i < score.masterBars.length; i++) {
+            var masterBar = score.masterBars[i];
+            var masterBar2 = new AlphaTab.Model.MasterBar();
+            Bridge.get(AlphaTab.Model.MasterBar).copyTo(masterBar, masterBar2);
+            if (masterBar.tempoAutomation) {
+                masterBar2.tempoAutomation = new AlphaTab.Model.Automation();
+                Bridge.get(AlphaTab.Model.Automation).copyTo(masterBar.tempoAutomation, masterBar2.tempoAutomation);
+            }
+            if (masterBar.volumeAutomation) {
+                masterBar2.volumeAutomation = new AlphaTab.Model.Automation();
+                Bridge.get(AlphaTab.Model.Automation).copyTo(masterBar.volumeAutomation, masterBar2.volumeAutomation);
+            }
+            if (masterBar.section) {
+                masterBar2.section = new AlphaTab.Model.Section();
+                Bridge.get(AlphaTab.Model.Section).copyTo(masterBar.section, masterBar2.section);
+            }
+            score2.addMasterBar(masterBar2);
+        }
+
+
+
+        for (var t = 0; t < score.tracks.length; t++) {
+            var track = score.tracks[t];
+            var track2 = new AlphaTab.Model.Track();
+            Bridge.get(AlphaTab.Model.Track).copyTo(track, track2);
+            score2.addTrack(track2);
+
+            Bridge.get(AlphaTab.Model.PlaybackInformation).copyTo(track.playbackInfo, track2.playbackInfo);
+
+            $t = Bridge.getEnumerator(Object.keys(track.chords));
+            while ($t.moveNext()) {
+                var key = $t.getCurrent();
+                var chord = track.chords[key];
+                var chord2 = new AlphaTab.Model.Chord();
+                Bridge.get(AlphaTab.Model.Chord).copyTo(chord, chord2);
+                track2.chords[key] = chord2;
+            }
+
+
+            for (var b = 0; b < track.bars.length; b++) {
+                var bar = track.bars[b];
+                var bar2 = new AlphaTab.Model.Bar();
+                Bridge.get(AlphaTab.Model.Bar).copyTo(bar, bar2);
+                track2.addBar(bar2);
+
+
+                for (var v = 0; v < bar.voices.length; v++) {
+                    var voice = bar.voices[v];
+                    var voice2 = new AlphaTab.Model.Voice();
+                    Bridge.get(AlphaTab.Model.Voice).copyTo(voice, voice2);
+                    bar2.addVoice(voice2);
+
+
+                    for (var bb = 0; bb < voice.beats.length; bb++) {
+                        var beat = voice.beats[bb];
+                        var beat2 = new AlphaTab.Model.Beat();
+                        Bridge.get(AlphaTab.Model.Beat).copyTo(beat, beat2);
+                        voice2.addBeat(beat2);
+
+                        for (var a = 0; a < beat.automations.length; a++) {
+                            var automation = new AlphaTab.Model.Automation();
+                            Bridge.get(AlphaTab.Model.Automation).copyTo(beat.automations[a], automation);
+                            beat2.automations.push(automation);
+                        }
+
+                        for (var i1 = 0; i1 < beat.whammyBarPoints.length; i1++) {
+                            var point = new AlphaTab.Model.BendPoint();
+                            Bridge.get(AlphaTab.Model.BendPoint).copyTo(beat.whammyBarPoints[i1], point);
+                            beat2.whammyBarPoints.push(point);
+                        }
+
+
+                        for (var n = 0; n < beat.notes.length; n++) {
+                            var note = beat.notes[n];
+                            var note2 = new AlphaTab.Model.Note();
+                            Bridge.get(AlphaTab.Model.Note).copyTo(note, note2);
+                            beat2.addNote(note2);
+
+                            for (var i2 = 0; i2 < note.bendPoints.length; i2++) {
+                                var point1 = new AlphaTab.Model.BendPoint();
+                                Bridge.get(AlphaTab.Model.BendPoint).copyTo(note.bendPoints[i2], point1);
+                                note2.bendPoints.push(point1);
+                            }
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+
+        score2.finish();
+        return score2;
+    }
+});
+
+/**
+ * This public enumeration lists all available types of KeySignatures
+ *
+ * @public
+ * @class AlphaTab.Model.KeySignatureType
+ */
+Bridge.define('AlphaTab.Model.KeySignatureType', {
+    statics: {
+        major: 0,
+        minor: 1
+    },
+    $enum: true
+});
+
+/**
+ * A voice represents a group of beats 
+ that can be played during a bar.
+ *
+ * @public
+ * @class AlphaTab.Model.Voice
+ */
+Bridge.define('AlphaTab.Model.Voice', {
+    statics: {
+        copyTo: function (src, dst) {
+            dst.index = src.index;
+        }
+    },
+    config: {
+        properties: {
+            index: 0,
+            bar: null,
+            beats: null,
+            minDuration: null,
+            maxDuration: null
+        }
+    },
+    constructor: function () {
+        this.beats = [];
+    },
+    getIsEmpty: function () {
+        return this.beats.length === 0;
+    },
+    addBeat: function (beat) {
+        // chaining
+        beat.voice = this;
+        beat.index = this.beats.length;
+        this.beats.push(beat);
+    },
+    chain: function (beat) {
+        if (this.bar === null) {
+            return;
+        }
+        if (this.bar.index === 0 && beat.index === 0) {
+            // very first beat
+            beat.previousBeat = null;
+        }
+        else  {
+            if (beat.index === 0) {
+                // first beat of bar
+                var previousVoice = this.bar.previousBar.voices[this.index];
+                beat.previousBeat = previousVoice.beats[previousVoice.beats.length - 1];
+                beat.previousBeat.nextBeat = beat;
+            }
+            else  {
+                // other beats of bar
+                beat.previousBeat = this.beats[beat.index - 1];
+                beat.previousBeat.nextBeat = beat;
+            }
+        }
+    },
+    addGraceBeat: function (beat) {
+        if (this.beats.length === 0) {
+            this.addBeat(beat);
+            return;
+        }
+
+        // remove last beat
+        var lastBeat = this.beats[this.beats.length - 1];
+        this.beats.splice(this.beats.length - 1, 1);
+
+        // insert grace beat
+        this.addBeat(beat);
+        // reinsert last beat
+        this.addBeat(lastBeat);
+    },
+    finish: function () {
+        // TODO: find a proper solution to chain beats without iterating twice
+        for (var i = 0, j = this.beats.length; i < j; i++) {
+            var beat = this.beats[i];
+            this.chain(beat);
+        }
+        for (var i1 = 0, j1 = this.beats.length; i1 < j1; i1++) {
+            var beat1 = this.beats[i1];
+            beat1.finish();
+            if (Bridge.Nullable.eq(this.minDuration, null) || Bridge.Nullable.getValue(this.minDuration) > beat1.duration) {
+                this.minDuration = beat1.duration;
+            }
+            if (Bridge.Nullable.eq(this.maxDuration, null) || Bridge.Nullable.getValue(this.maxDuration) < beat1.duration) {
+                this.maxDuration = beat1.duration;
+            }
+        }
+    }
+});
+
+/**
+ * Lists the modes how accidentals are handled for notes
+ *
+ * @public
+ * @class AlphaTab.Model.NoteAccidentalMode
+ */
+Bridge.define('AlphaTab.Model.NoteAccidentalMode', {
+    statics: {
+        /**
+         * Accidentals are calculated automatically.
+         *
+         * @static
+         * @public
+         * @memberof AlphaTab.Model.NoteAccidentalMode
+         * @constant
+         * @default 0
+         * @type AlphaTab.Model.NoteAccidentalMode
+         */
+        $default: 0,
+        /**
+         * If the default behavior calculates a Sharp, use flat instead (and vice versa).
+         *
+         * @static
+         * @public
+         * @memberof AlphaTab.Model.NoteAccidentalMode
+         * @constant
+         * @default 1
+         * @type AlphaTab.Model.NoteAccidentalMode
+         */
+        swapAccidentals: 1,
+        /**
+         * This will move the note one line down and applies a Naturalize.
+         *
+         * @static
+         * @public
+         * @memberof AlphaTab.Model.NoteAccidentalMode
+         * @constant
+         * @default 2
+         * @type AlphaTab.Model.NoteAccidentalMode
+         */
+        forceNatural: 2,
+        /**
+         * This will move the note one line down and applies a Sharp.
+         *
+         * @static
+         * @public
+         * @memberof AlphaTab.Model.NoteAccidentalMode
+         * @constant
+         * @default 3
+         * @type AlphaTab.Model.NoteAccidentalMode
+         */
+        forceSharp: 3,
+        /**
+         * This will move the note one line up and applies a Flat.
+         *
+         * @static
+         * @public
+         * @memberof AlphaTab.Model.NoteAccidentalMode
+         * @constant
+         * @default 4
+         * @type AlphaTab.Model.NoteAccidentalMode
+         */
+        forceFlat: 4
+    },
+    $enum: true
+});
+
+/**
+ * Lists all types of pick strokes.
+ *
+ * @public
+ * @class AlphaTab.Model.PickStrokeType
+ */
+Bridge.define('AlphaTab.Model.PickStrokeType', {
+    statics: {
+        none: 0,
+        up: 1,
+        down: 2
+    },
+    $enum: true
+});
+
+/**
+ * This public class stores the midi specific information of a track needed
+ for playback.
+ *
+ * @public
+ * @class AlphaTab.Model.PlaybackInformation
+ */
+Bridge.define('AlphaTab.Model.PlaybackInformation', {
+    statics: {
+        copyTo: function (src, dst) {
+            dst.volume = src.volume;
+            dst.balance = src.balance;
+            dst.port = src.port;
+            dst.program = src.program;
+            dst.primaryChannel = src.primaryChannel;
+            dst.secondaryChannel = src.secondaryChannel;
+            dst.isMute = src.isMute;
+            dst.isSolo = src.isSolo;
+        }
+    },
+    config: {
+        properties: {
+            volume: 0,
+            balance: 0,
+            port: 0,
+            program: 0,
+            primaryChannel: 0,
+            secondaryChannel: 0,
+            isMute: false,
+            isSolo: false
+        }
+    },
+    constructor: function () {
+        this.volume = 15;
+        this.balance = 8;
+        this.port = 1;
+    }
+});
+
+/**
+ * This public class can store the information about a group of measures which are repeated
+ *
+ * @public
+ * @class AlphaTab.Model.RepeatGroup
+ */
+Bridge.define('AlphaTab.Model.RepeatGroup', {
+    config: {
+        properties: {
+            /**
+             * All masterbars repeated within this group
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.RepeatGroup
+             * @memberof AlphaTab.Model.RepeatGroup
+             * @function masterBars
+             * @return  {Array}
+             */
+            /**
+             * All masterbars repeated within this group
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.RepeatGroup
+             * @memberof AlphaTab.Model.RepeatGroup
+             * @function masterBars
+             * @param   {Array}    value
+             * @return  {void}
+             */
+            masterBars: null,
+            /**
+             * a list of masterbars which open the group.
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.RepeatGroup
+             * @memberof AlphaTab.Model.RepeatGroup
+             * @function openings
+             * @return  {Array}
+             */
+            /**
+             * a list of masterbars which open the group.
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.RepeatGroup
+             * @memberof AlphaTab.Model.RepeatGroup
+             * @function openings
+             * @param   {Array}    value
+             * @return  {void}
+             */
+            openings: null,
+            /**
+             * a list of masterbars which close the group.
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.RepeatGroup
+             * @memberof AlphaTab.Model.RepeatGroup
+             * @function closings
+             * @return  {Array}
+             */
+            /**
+             * a list of masterbars which close the group.
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.RepeatGroup
+             * @memberof AlphaTab.Model.RepeatGroup
+             * @function closings
+             * @param   {Array}    value
+             * @return  {void}
+             */
+            closings: null,
+            /**
+             * true if the repeat group was closed well
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.RepeatGroup
+             * @memberof AlphaTab.Model.RepeatGroup
+             * @function isClosed
+             * @return  {boolean}
+             */
+            /**
+             * true if the repeat group was closed well
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Model.RepeatGroup
+             * @memberof AlphaTab.Model.RepeatGroup
+             * @function isClosed
+             * @param   {boolean}    value
+             * @return  {void}
+             */
+            isClosed: false
+        }
+    },
+    constructor: function () {
+        this.masterBars = [];
+        this.openings = [];
+        this.closings = [];
+        this.isClosed = false;
+    },
+    addMasterBar: function (masterBar) {
+        if (this.openings.length === 0) {
+            this.openings.push(masterBar);
+        }
+
+        this.masterBars.push(masterBar);
+        masterBar.repeatGroup = this;
+
+        if (masterBar.getIsRepeatEnd()) {
+            this.closings.push(masterBar);
+            this.isClosed = true;
+        }
+        else  {
+            if (this.isClosed) {
+                this.isClosed = false;
+                this.openings.push(masterBar);
+            }
+        }
+    }
+});
+
+/**
+ * This public class is used to describe the beginning of a 
+ section within a song. It acts like a marker.
+ *
+ * @public
+ * @class AlphaTab.Model.Section
+ */
+Bridge.define('AlphaTab.Model.Section', {
+    statics: {
+        copyTo: function (src, dst) {
+            dst.marker = src.marker;
+            dst.text = src.text;
+        }
+    },
+    config: {
+        properties: {
+            marker: null,
+            text: null
+        }
+    }
+});
+
+/**
+ * This public enum lists all different types of finger slides on a string.
+ *
+ * @public
+ * @class AlphaTab.Model.SlideType
+ */
+Bridge.define('AlphaTab.Model.SlideType', {
+    statics: {
+        none: 0,
+        shift: 1,
+        legato: 2,
+        intoFromBelow: 3,
+        intoFromAbove: 4,
+        outUp: 5,
+        outDown: 6
+    },
+    $enum: true
+});
+
+Bridge.define('AlphaTab.Platform.Model.Color', {
+    config: {
+        properties: {
+            raw: 0
+        }
+    },
+    constructor: function (r, g, b, a) {
+        if (a === void 0) { a = 255; }
+        this.raw = (a << 24) | (r << 16) | (g << 8) | b;
+    },
+    getA: function () {
+        return ((this.raw >> 24) & 255);
+    },
+    getR: function () {
+        return ((this.raw >> 16) & 255);
+    },
+    getG: function () {
+        return ((this.raw >> 8) & 255);
+    },
+    getB: function () {
+        return (this.raw & 255);
+    },
+    toRgbaString: function () {
+        return "rgba(" + this.getR() + "," + this.getG() + "," + this.getB() + "," + (this.getA() / 255.0) + ")";
+    }
+});
+
+/**
+ * This public enumeration lists all feels of triplets.
+ *
+ * @public
+ * @class AlphaTab.Model.TripletFeel
+ */
+Bridge.define('AlphaTab.Model.TripletFeel', {
+    statics: {
+        noTripletFeel: 0,
+        triplet16th: 1,
+        triplet8th: 2,
+        dotted16th: 3,
+        dotted8th: 4,
+        scottish16th: 5,
+        scottish8th: 6
+    },
+    $enum: true
+});
+
+/**
+ * This public class represents a predefined string tuning.
+ *
+ * @public
+ * @class AlphaTab.Model.Tuning
+ */
+Bridge.define('AlphaTab.Model.Tuning', {
+    statics: {
+        _sevenStrings: null,
+        _sixStrings: null,
+        _fiveStrings: null,
+        _fourStrings: null,
+        _defaultTunings: null,
+        getTextForTuning: function (tuning, includeOctave) {
+            var octave = Bridge.Int.div(tuning, 12);
+            var note = tuning % 12;
+            var notes = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
+            var result = notes[note];
+            if (includeOctave) {
+                result += octave;
+            }
+
+            return result;
+        },
+        getDefaultTuningFor: function (stringCount) {
+            if (Bridge.get(AlphaTab.Model.Tuning)._sevenStrings === null) {
+                Bridge.get(AlphaTab.Model.Tuning).initialize();
+            }
+
+            if (Bridge.get(AlphaTab.Model.Tuning)._defaultTunings.hasOwnProperty(stringCount)) {
+                return Bridge.get(AlphaTab.Model.Tuning)._defaultTunings[stringCount];
+            }
+            return null;
+        },
+        getPresetsFor: function (stringCount) {
+            if (Bridge.get(AlphaTab.Model.Tuning)._sevenStrings === null) {
+                Bridge.get(AlphaTab.Model.Tuning).initialize();
+            }
+
+            switch (stringCount) {
+                case 7: 
+                    return Bridge.get(AlphaTab.Model.Tuning)._sevenStrings;
+                case 6: 
+                    return Bridge.get(AlphaTab.Model.Tuning)._sixStrings;
+                case 5: 
+                    return Bridge.get(AlphaTab.Model.Tuning)._fiveStrings;
+                case 4: 
+                    return Bridge.get(AlphaTab.Model.Tuning)._fourStrings;
+            }
+            return [];
+        },
+        initialize: function () {
+            Bridge.get(AlphaTab.Model.Tuning)._sevenStrings = [];
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings = [];
+            Bridge.get(AlphaTab.Model.Tuning)._fiveStrings = [];
+            Bridge.get(AlphaTab.Model.Tuning)._fourStrings = [];
+            Bridge.get(AlphaTab.Model.Tuning)._defaultTunings = {};
+
+            Bridge.get(AlphaTab.Model.Tuning)._defaultTunings[7] = new AlphaTab.Model.Tuning("Guitar 7 strings", [64, 59, 55, 50, 45, 40, 35], true);
+            Bridge.get(AlphaTab.Model.Tuning)._sevenStrings.push(Bridge.get(AlphaTab.Model.Tuning)._defaultTunings[7]);
+
+            Bridge.get(AlphaTab.Model.Tuning)._defaultTunings[6] = new AlphaTab.Model.Tuning("Guitar Standard Tuning", [64, 59, 55, 50, 45, 40], true);
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(Bridge.get(AlphaTab.Model.Tuning)._defaultTunings[6]);
+
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Tune down � step", [63, 58, 54, 49, 44, 39], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Tune down 1 step", [62, 57, 53, 48, 43, 38], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Tune down 2 step", [60, 55, 51, 46, 41, 36], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Dropped D Tuning", [64, 59, 55, 50, 45, 38], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Dropped D Tuning variant", [64, 57, 55, 50, 45, 38], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Double Dropped D Tuning", [62, 59, 55, 50, 45, 38], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Dropped E Tuning", [66, 61, 57, 52, 47, 40], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Dropped C Tuning", [62, 57, 53, 48, 43, 36], false));
+
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Open C Tuning", [64, 60, 55, 48, 43, 36], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Open Cm Tuning", [63, 60, 55, 48, 43, 36], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Open C6 Tuning", [64, 57, 55, 48, 43, 36], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Open Cmaj7 Tuning", [64, 59, 55, 52, 43, 36], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Open D Tuning", [62, 57, 54, 50, 45, 38], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Open Dm Tuning", [62, 57, 53, 50, 45, 38], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Open D5 Tuning", [62, 57, 50, 50, 45, 38], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Open D6 Tuning", [62, 59, 54, 50, 45, 38], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Open Dsus4 Tuning", [62, 57, 55, 50, 45, 38], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Open E Tuning", [64, 59, 56, 52, 47, 40], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Open Em Tuning", [64, 59, 55, 52, 47, 40], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Open Esus11 Tuning", [64, 59, 55, 52, 45, 40], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Open F Tuning", [65, 60, 53, 48, 45, 41], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Open G Tuning", [62, 59, 55, 50, 43, 38], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Open Gm Tuning", [62, 58, 55, 50, 43, 38], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Open G6 Tuning", [64, 59, 55, 50, 43, 38], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Open Gsus4 Tuning", [62, 60, 55, 50, 43, 38], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Open A Tuning", [64, 61, 57, 52, 45, 40], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Open Am Tuning", [64, 60, 57, 52, 45, 40], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Guitar Nashville Tuning", [64, 59, 67, 62, 57, 52], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Bass 6 Strings Tuning", [48, 43, 38, 33, 28, 23], false));
+            Bridge.get(AlphaTab.Model.Tuning)._sixStrings.push(new AlphaTab.Model.Tuning("Lute or Vihuela Tuning", [64, 59, 54, 50, 45, 40], false));
+
+            Bridge.get(AlphaTab.Model.Tuning)._defaultTunings[5] = new AlphaTab.Model.Tuning("Bass 5 Strings Tuning", [43, 38, 33, 28, 23], true);
+            Bridge.get(AlphaTab.Model.Tuning)._fiveStrings.push(Bridge.get(AlphaTab.Model.Tuning)._defaultTunings[5]);
+            Bridge.get(AlphaTab.Model.Tuning)._fiveStrings.push(new AlphaTab.Model.Tuning("Banjo Dropped C Tuning", [62, 59, 55, 48, 67], false));
+            Bridge.get(AlphaTab.Model.Tuning)._fiveStrings.push(new AlphaTab.Model.Tuning("Banjo Open D Tuning", [62, 57, 54, 50, 69], false));
+            Bridge.get(AlphaTab.Model.Tuning)._fiveStrings.push(new AlphaTab.Model.Tuning("Banjo Open G Tuning", [62, 59, 55, 50, 67], false));
+            Bridge.get(AlphaTab.Model.Tuning)._fiveStrings.push(new AlphaTab.Model.Tuning("Banjo G Minor Tuning", [62, 58, 55, 50, 67], false));
+            Bridge.get(AlphaTab.Model.Tuning)._fiveStrings.push(new AlphaTab.Model.Tuning("Banjo G Modal Tuning", [62, 57, 55, 50, 67], false));
+
+            Bridge.get(AlphaTab.Model.Tuning)._defaultTunings[4] = new AlphaTab.Model.Tuning("Bass Standard Tuning", [43, 38, 33, 28], true);
+            Bridge.get(AlphaTab.Model.Tuning)._fourStrings.push(Bridge.get(AlphaTab.Model.Tuning)._defaultTunings[4]);
+            Bridge.get(AlphaTab.Model.Tuning)._fourStrings.push(new AlphaTab.Model.Tuning("Bass Tune down � step", [42, 37, 32, 27], false));
+            Bridge.get(AlphaTab.Model.Tuning)._fourStrings.push(new AlphaTab.Model.Tuning("Bass Tune down 1 step", [41, 36, 31, 26], false));
+            Bridge.get(AlphaTab.Model.Tuning)._fourStrings.push(new AlphaTab.Model.Tuning("Bass Tune down 2 step", [39, 34, 29, 24], false));
+            Bridge.get(AlphaTab.Model.Tuning)._fourStrings.push(new AlphaTab.Model.Tuning("Bass Dropped D Tuning", [43, 38, 33, 26], false));
+            Bridge.get(AlphaTab.Model.Tuning)._fourStrings.push(new AlphaTab.Model.Tuning("Ukulele C Tuning", [45, 40, 36, 43], false));
+            Bridge.get(AlphaTab.Model.Tuning)._fourStrings.push(new AlphaTab.Model.Tuning("Ukulele G Tuning", [52, 47, 43, 38], false));
+            Bridge.get(AlphaTab.Model.Tuning)._fourStrings.push(new AlphaTab.Model.Tuning("Mandolin Standard Tuning", [64, 57, 50, 43], false));
+            Bridge.get(AlphaTab.Model.Tuning)._fourStrings.push(new AlphaTab.Model.Tuning("Mandolin or Violin Tuning", [76, 69, 62, 55], false));
+            Bridge.get(AlphaTab.Model.Tuning)._fourStrings.push(new AlphaTab.Model.Tuning("Viola Tuning", [69, 62, 55, 48], false));
+            Bridge.get(AlphaTab.Model.Tuning)._fourStrings.push(new AlphaTab.Model.Tuning("Cello Tuning", [57, 50, 43, 36], false));
+        },
+        findTuning: function (strings) {
+            var tunings = Bridge.get(AlphaTab.Model.Tuning).getPresetsFor(strings.length);
+            for (var t = 0, tc = tunings.length; t < tc; t++) {
+                var tuning = tunings[t];
+                var equals = true;
+                for (var i = 0, j = strings.length; i < j; i++) {
+                    if (strings[i] !== tuning.tunings[i]) {
+                        equals = false;
+                        break;
+                    }
+                }
+
+                if (equals) {
+                    return tuning;
+                }
+            }
+
+            return null;
+        }
+    },
+    config: {
+        properties: {
+            isStandard: false,
+            name: null,
+            tunings: null
+        }
+    },
+    constructor: function (name, tuning, isStandard) {
+        this.isStandard = isStandard;
+        this.name = name;
+        this.tunings = tuning;
+    }
+});
+
+/**
+ * This public enum lists all vibrato types that can be performed.
+ *
+ * @public
+ * @class AlphaTab.Model.VibratoType
+ */
+Bridge.define('AlphaTab.Model.VibratoType', {
+    statics: {
+        none: 0,
+        slight: 1,
+        wide: 2
+    },
+    $enum: true
+});
+
+/**
+ * This is the base public interface for canvas implementations on different plattforms.
+ *
+ * @abstract
+ * @public
+ * @class AlphaTab.Platform.ICanvas
+ */
+Bridge.define('AlphaTab.Platform.ICanvas');
+
+/**
+ * A canvas implementation for HTML5 canvas
+ *
+ * @public
+ * @class AlphaTab.Platform.JavaScript.Html5Canvas
+ * @implements  AlphaTab.Platform.ICanvas
+ */
+Bridge.define('AlphaTab.Platform.JavaScript.Html5Canvas', {
+    inherits: [AlphaTab.Platform.ICanvas],
+    _canvas: null,
+    _context: null,
+    _color: null,
+    _font: null,
+    config: {
+        properties: {
+            Resources: null
+        }
+    },
+    getColor: function () {
+        return this._color;
+    },
+    setColor: function (value) {
+        this._color = value;
+        this._context.strokeStyle = value.toRgbaString();
+        this._context.fillStyle = value.toRgbaString();
+    },
+    getLineWidth: function () {
+        return this._context.lineWidth;
+    },
+    setLineWidth: function (value) {
+        this._context.lineWidth = value;
+    },
+    getFont: function () {
+        return this._font;
+    },
+    setFont: function (value) {
+        this._font = value;
+        this._context.font = value.toCssString();
+    },
+    getTextAlign: function () {
+        switch (this._context.textAlign) {
+            case "left": 
+                return Bridge.get(AlphaTab.Platform.Model.TextAlign).left;
+            case "center": 
+                return Bridge.get(AlphaTab.Platform.Model.TextAlign).center;
+            case "right": 
+                return Bridge.get(AlphaTab.Platform.Model.TextAlign).right;
+            default: 
+                return Bridge.get(AlphaTab.Platform.Model.TextAlign).left;
+        }
+    },
+    setTextAlign: function (value) {
+        switch (value) {
+            case Bridge.get(AlphaTab.Platform.Model.TextAlign).left: 
+                this._context.textAlign = "left";
+                break;
+            case Bridge.get(AlphaTab.Platform.Model.TextAlign).center: 
+                this._context.textAlign = "center";
+                break;
+            case Bridge.get(AlphaTab.Platform.Model.TextAlign).right: 
+                this._context.textAlign = "right";
+                break;
+        }
+    },
+    getTextBaseline: function () {
+        switch (this._context.textBaseline) {
+            case "top": 
+                return Bridge.get(AlphaTab.Platform.Model.TextBaseline).top;
+            case "middle": 
+                return Bridge.get(AlphaTab.Platform.Model.TextBaseline).middle;
+            case "bottom": 
+                return Bridge.get(AlphaTab.Platform.Model.TextBaseline).bottom;
+            default: 
+                return Bridge.get(AlphaTab.Platform.Model.TextBaseline).top;
+        }
+    },
+    setTextBaseline: function (value) {
+        switch (value) {
+            case Bridge.get(AlphaTab.Platform.Model.TextBaseline).top: 
+                this._context.textBaseline = "top";
+                break;
+            case Bridge.get(AlphaTab.Platform.Model.TextBaseline).middle: 
+                this._context.textBaseline = "middle";
+                break;
+            case Bridge.get(AlphaTab.Platform.Model.TextBaseline).bottom: 
+                this._context.textBaseline = "bottom";
+                break;
+        }
+    },
+    beginRender: function (width, height) {
+        this._canvas = document.createElement("canvas");
+        this._canvas.width = width;
+        this._canvas.height = height;
+        this._canvas.style.width = width + "px";
+        this._canvas.style.height = height + "px";
+        this._context = this._canvas.getContext("2d");
+        this._context.textBaseline = "top";
+    },
+    endRender: function () {
+        var result = this._canvas;
+        this._canvas = null;
+        return result;
+    },
+    fillRect: function (x, y, w, h) {
+        this._context.fillRect((x - 0.5), (y - 0.5), w, h);
+    },
+    strokeRect: function (x, y, w, h) {
+        this._context.strokeRect((x - 0.5), (y - 0.5), w, h);
+    },
+    beginPath: function () {
+        this._context.beginPath();
+    },
+    closePath: function () {
+        this._context.closePath();
+    },
+    moveTo: function (x, y) {
+        this._context.moveTo(x - 0.5, y - 0.5);
+    },
+    lineTo: function (x, y) {
+        this._context.lineTo(x - 0.5, y - 0.5);
+    },
+    quadraticCurveTo: function (cpx, cpy, x, y) {
+        this._context.quadraticCurveTo(cpx, cpy, x, y);
+    },
+    bezierCurveTo: function (cp1x, cp1y, cp2x, cp2y, x, y) {
+        this._context.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y);
+    },
+    fillCircle: function (x, y, radius) {
+        this._context.arc(x, y, radius, 0, Math.PI * 2, true);
+        this.fill();
+    },
+    fill: function () {
+        this._context.fill();
+    },
+    stroke: function () {
+        this._context.stroke();
+    },
+    fillText: function (text, x, y) {
+        this._context.fillText(text, x, y);
+    },
+    measureText: function (text) {
+        return this._context.measureText(text).width;
+    },
+    fillMusicFontSymbol: function (x, y, scale, symbol) {
+        if (symbol === Bridge.get(AlphaTab.Rendering.Glyphs.MusicFontSymbol).none) {
+            return;
+        }
+
+        var glyph = new AlphaTab.Rendering.Utils.SvgRenderer(Bridge.get(AlphaTab.Rendering.Glyphs.MusicFont).symbolLookup[symbol], scale, scale);
+        glyph.paint(x, y, this);
+    }
+});
+
+/** @namespace AlphaTab.Platform.Svg */
+
+/**
+ * A canvas implementation storing SVG data
+ *
+ * @public
+ * @class AlphaTab.Platform.Svg.SvgCanvas
+ * @implements  AlphaTab.Platform.ICanvas
+ */
+Bridge.define('AlphaTab.Platform.Svg.SvgCanvas', {
+    inherits: [AlphaTab.Platform.ICanvas],
+    statics: {
+        BlurCorrection: 0.5
+    },
+    _buffer: null,
+    _currentPath: null,
+    _currentPathIsEmpty: false,
+    config: {
+        properties: {
+            Color: null,
+            LineWidth: 0,
+            Font: null,
+            TextAlign: 0,
+            TextBaseline: 0,
+            Resources: null
+        }
+    },
+    constructor: function () {
+        this._currentPath = [];
+        this._currentPathIsEmpty = true;
+        this.setColor(new AlphaTab.Platform.Model.Color(255, 255, 255));
+        this.setLineWidth(1);
+        this.setFont(new AlphaTab.Platform.Model.Font("Arial", 10));
+        this.setTextAlign(Bridge.get(AlphaTab.Platform.Model.TextAlign).left);
+        this.setTextBaseline(Bridge.get(AlphaTab.Platform.Model.TextBaseline).$default);
+    },
+    beginRender: function (width, height) {
+        this._buffer = [];
+
+        this._buffer.push("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"");
+        this._buffer.push(width);
+        this._buffer.push("px\" height=\"");
+        this._buffer.push(height);
+        this._buffer.push("px\" class=\"alphaTabSurfaceSvg\">\n");
+
+        if (this.getResources().scale !== 1) {
+            this._buffer.push("style=\"font-size:");
+            this._buffer.push(this.getResources().scale * 100);
+            this._buffer.push("%\"");
+        }
+        this._currentPath = [];
+        this._currentPathIsEmpty = true;
+    },
+    endRender: function () {
+        this._buffer.push("</svg>");
+        return this._buffer.join('');
+    },
+    fillRect: function (x, y, w, h) {
+        this._buffer.push("<rect x=\"");
+        this._buffer.push(x - Bridge.get(AlphaTab.Platform.Svg.SvgCanvas).BlurCorrection);
+        this._buffer.push("\" y=\"");
+        this._buffer.push(y - Bridge.get(AlphaTab.Platform.Svg.SvgCanvas).BlurCorrection);
+        this._buffer.push("\" width=\"");
+        this._buffer.push(w);
+        this._buffer.push("\" height=\"");
+        this._buffer.push(h);
+        this._buffer.push("\" style=\"fill:");
+        this._buffer.push(this.getColor().toRgbaString());
+        this._buffer.push(";\" />\n");
+    },
+    strokeRect: function (x, y, w, h) {
+        this._buffer.push("<rect x=\"");
+        this._buffer.push(x - Bridge.get(AlphaTab.Platform.Svg.SvgCanvas).BlurCorrection);
+        this._buffer.push("\" y=\"");
+        this._buffer.push(y - Bridge.get(AlphaTab.Platform.Svg.SvgCanvas).BlurCorrection);
+        this._buffer.push("\" width=\"");
+        this._buffer.push(w);
+        this._buffer.push("\" height=\"");
+        this._buffer.push(h);
+        this._buffer.push("\" style=\"stroke:");
+        this._buffer.push(this.getColor().toRgbaString());
+        this._buffer.push("; stroke-width:");
+        this._buffer.push(this.getLineWidth());
+        this._buffer.push(";\" />\n");
+    },
+    beginPath: function () {
+
+    },
+    closePath: function () {
+        this._currentPath.push(" z");
+    },
+    moveTo: function (x, y) {
+        this._currentPath.push(" M");
+        this._currentPath.push(x - 0.5);
+        this._currentPath.push(",");
+        this._currentPath.push(y - 0.5);
+    },
+    lineTo: function (x, y) {
+        this._currentPathIsEmpty = false;
+        this._currentPath.push(" L");
+        this._currentPath.push(x - 0.5);
+        this._currentPath.push(",");
+        this._currentPath.push(y - 0.5);
+    },
+    quadraticCurveTo: function (cpx, cpy, x, y) {
+        this._currentPathIsEmpty = false;
+        this._currentPath.push(" Q");
+        this._currentPath.push(cpx);
+        this._currentPath.push(",");
+        this._currentPath.push(cpy);
+        this._currentPath.push(",");
+        this._currentPath.push(x);
+        this._currentPath.push(",");
+        this._currentPath.push(y);
+    },
+    bezierCurveTo: function (cp1x, cp1y, cp2x, cp2y, x, y) {
+        this._currentPathIsEmpty = false;
+        this._currentPath.push(" C");
+        this._currentPath.push(cp1x);
+        this._currentPath.push(",");
+        this._currentPath.push(cp1y);
+        this._currentPath.push(",");
+        this._currentPath.push(cp2x);
+        this._currentPath.push(",");
+        this._currentPath.push(cp2y);
+        this._currentPath.push(",");
+        this._currentPath.push(x);
+        this._currentPath.push(",");
+        this._currentPath.push(y);
+    },
+    fillCircle: function (x, y, radius) {
+        this._currentPathIsEmpty = false;
+        // 
+        // M0,250 A1,1 0 0,0 500,250 A1,1 0 0,0 0,250 z
+        this._currentPath.push(" M");
+        this._currentPath.push(x - radius);
+        this._currentPath.push(",");
+        this._currentPath.push(y);
+
+        this._currentPath.push(" A1,1 0 0,0 ");
+        this._currentPath.push(x + radius);
+        this._currentPath.push(",");
+        this._currentPath.push(y);
+
+        this._currentPath.push(" A1,1 0 0,0 ");
+        this._currentPath.push(x - radius);
+        this._currentPath.push(",");
+        this._currentPath.push(y);
+
+        this._currentPath.push(" z");
+
+        this.fill();
+    },
+    fill: function () {
+        if (!this._currentPathIsEmpty) {
+            this._buffer.push("<path d=\"");
+            this._buffer.push(this._currentPath.join(''));
+            this._buffer.push("\" style=\"fill:");
+            this._buffer.push(this.getColor().toRgbaString());
+            this._buffer.push("\" stroke=\"none\"/>\n");
+        }
+        this._currentPath = [];
+        this._currentPathIsEmpty = true;
+    },
+    stroke: function () {
+        if (!this._currentPathIsEmpty) {
+            this._buffer.push("<path d=\"");
+            this._buffer.push(this._currentPath.join(''));
+            this._buffer.push("\" style=\"stroke:");
+            this._buffer.push(this.getColor().toRgbaString());
+            this._buffer.push("; stroke-width:");
+            this._buffer.push(this.getLineWidth());
+            this._buffer.push(";\" fill=\"none\" />\n");
+        }
+        this._currentPath = [];
+        this._currentPathIsEmpty = true;
+    },
+    fillText: function (text, x, y) {
+        this._buffer.push("<text x=\"");
+        this._buffer.push(x);
+        this._buffer.push("\" y=\"");
+        this._buffer.push(y + this.getSvgBaseLineOffset());
+        this._buffer.push("\" style=\"font:");
+        this._buffer.push(this.getFont().toCssString());
+        this._buffer.push("; fill:");
+        this._buffer.push(this.getColor().toRgbaString());
+        this._buffer.push(";\" ");
+        this._buffer.push(" dominant-baseline=\"");
+        this._buffer.push(this.getSvgBaseLine());
+        this._buffer.push("\" text-anchor=\"");
+        this._buffer.push(this.getSvgTextAlignment());
+        this._buffer.push("\">\n");
+        this._buffer.push(text);
+        this._buffer.push("</text>\n");
+    },
+    getSvgTextAlignment: function () {
+        switch (this.getTextAlign()) {
+            case Bridge.get(AlphaTab.Platform.Model.TextAlign).left: 
+                return "start";
+            case Bridge.get(AlphaTab.Platform.Model.TextAlign).center: 
+                return "middle";
+            case Bridge.get(AlphaTab.Platform.Model.TextAlign).right: 
+                return "end";
+        }
+        return "";
+    },
+    getSvgBaseLineOffset: function () {
+        switch (this.getTextBaseline()) {
+            case Bridge.get(AlphaTab.Platform.Model.TextBaseline).top: 
+                return 0;
+            case Bridge.get(AlphaTab.Platform.Model.TextBaseline).middle: 
+                return 0;
+            case Bridge.get(AlphaTab.Platform.Model.TextBaseline).bottom: 
+                return 0;
+            default: 
+                return this.getFont().size;
+        }
+    },
+    getSvgBaseLine: function () {
+        switch (this.getTextBaseline()) {
+            case Bridge.get(AlphaTab.Platform.Model.TextBaseline).top: 
+                return "top";
+            case Bridge.get(AlphaTab.Platform.Model.TextBaseline).middle: 
+                return "middle";
+            case Bridge.get(AlphaTab.Platform.Model.TextBaseline).bottom: 
+                return "bottom";
+            default: 
+                return "top";
+        }
+    },
+    measureText: function (text) {
+        if (Bridge.String.isNullOrEmpty(text)) {
+            return 0;
+        }
+        var font = Bridge.get(AlphaTab.Platform.Svg.SupportedFonts).arial;
+        if (Bridge.String.contains(this.getFont().family,"Times")) {
+            font = Bridge.get(AlphaTab.Platform.Svg.SupportedFonts).timesNewRoman;
+        }
+        return Bridge.get(AlphaTab.Platform.Svg.FontSizes).measureString(text, font, this.getFont().size, this.getFont().style);
+    },
+    fillMusicFontSymbol: function (x, y, scale, symbol) {
+        if (symbol === Bridge.get(AlphaTab.Rendering.Glyphs.MusicFontSymbol).none) {
+            return;
+        }
+
+        this._buffer.push("<text x=\"");
+        this._buffer.push(x - Bridge.get(AlphaTab.Platform.Svg.SvgCanvas).BlurCorrection);
+        this._buffer.push("\" y=\"");
+        this._buffer.push(y - Bridge.get(AlphaTab.Platform.Svg.SvgCanvas).BlurCorrection);
+        this._buffer.push("\" style=\"");
+        if (scale !== 1) {
+            this._buffer.push("font-size:");
+            this._buffer.push(scale * 100);
+            this._buffer.push("%;");
+        }
+        this._buffer.push("fill:");
+        this._buffer.push(this.getColor().toRgbaString());
+        this._buffer.push(";\" text-anchor=\"start\"");
+        this._buffer.push(">&#x");
+        this._buffer.push(Bridge.get(AlphaTab.Platform.Std).toHexString(symbol));
+        this._buffer.push(";</text>\n");
+
+        //if (symbol == MusicFontSymbol.None)
+        //{
+        //    return;
+        //}
+
+        //SvgRenderer glyph = new SvgRenderer(MusicFont.SymbolLookup[symbol], scale, scale);
+        //glyph.Paint(x, y, this);
+    }
+});
+
+Bridge.define('AlphaTab.Platform.JavaScript.JsApiBase', {
+    element: null,
+    canvasElement: null,
+    trackIndexes: null,
+    config: {
+        properties: {
+            renderer: null,
+            score: null
+        }
+    },
+    constructor: function (element, options) {
+            var $t;
+        this.element = element;
+        var dataset = this.element.dataset;
+
+        // load settings
+        var settings = Bridge.get(AlphaTab.Settings).fromJson(options);
+
+
+        // get track data to parse
+        var tracksData;
+        if (options && options.tracks) {
+            tracksData = options.tracks;
+        }
+        else  {
+            if (dataset && dataset.tracks) {
+                tracksData = dataset.tracks;
+            }
+            else  {
+                tracksData = element.getAttribute("data-tracks");
+                if (!tracksData) {
+                    tracksData = 0;
+                }
+            }
+        }
+
+        this.setTracks(tracksData, false);
+
+
+        var contents = "";
+        if (element !== null) {
+            // get load contents
+            if ((options && options.tex) || (dataset && dataset.tex) || element.getAttribute("data-tex")) {
+                if (element.textContent) {
+                    contents = element.textContent.trim();
+                    element.innerHTML = "";
+                }
+            }
+
+
+            this.canvasElement = document.createElement("div");
+
+            this.canvasElement.className = "alphaTabSurface";
+            element.appendChild(this.canvasElement);
+
+
+        }
+
+
+        this.renderer = this.createScoreRenderer(settings, options, this.canvasElement);
+        this.renderer.addRenderFinished(Bridge.fn.bind(this, function (o) {
+            this.triggerEvent("rendered");
+        }));
+        this.renderer.addPostRenderFinished(Bridge.fn.bind(this, function () {
+            this.triggerEvent("post-rendered");
+        }));
+        this.renderer.addPreRender(Bridge.fn.bind(this, function () {
+            this.canvasElement.innerHTML = "";
+        }));
+        this.renderer.addPartialRenderFinished(Bridge.fn.bind(this, function (result) {
+            var itemToAppend;
+            if (typeof result.renderResult === "string") {
+                var partialResult = document.createElement("div");
+                partialResult.innerHTML = result.renderResult;
+                itemToAppend = partialResult.firstChild;
+            }
+            else  {
+                itemToAppend = result.renderResult;
+            }
+
+            this.canvasElement.style.width = result.totalWidth + "px";
+            this.canvasElement.style.height = result.totalHeight + "px";
+            this.canvasElement.appendChild(itemToAppend);
+
+        }));
+        this.renderer.addRenderFinished(Bridge.fn.bind(this, function (result) {
+            this.canvasElement.style.width = result.totalWidth + "px";
+            this.canvasElement.style.height = result.totalHeight + "px";
+        }));
+
+
+
+        var file;
+        if (!Bridge.String.isNullOrEmpty(contents)) {
+            this.tex(contents);
+        }
+        else  {
+            if (options && options.file) {
+                this.load(options.file);
+            }
+            else  {
+                if (dataset && dataset.file) {
+                    this.load(dataset.file);
+                }
+                else  {
+                    if ((($t = this.element.getAttribute("data-file"), file = $t, $t)) !== null) {
+                        this.load(file);
+                    }
+                }
+            }
+        }
+
+    },
+    setTracks: function (tracksData, render) {
+        if (render === void 0) { render = true; }
+        var tracks = [];
+
+        // decode string
+        if (typeof tracksData === "string") {
+            try {
+                tracksData = JSON.parse(tracksData);
+            }
+            catch ($e) {
+                $e = Bridge.Exception.create($e);
+                tracksData = [0];
+            }
+        }
+
+        // decode array
+        if (typeof tracksData === "number") {
+            tracks.push(tracksData);
+        }
+        else  {
+            if (tracksData.length) {
+                for (var i = 0; i < tracksData.length; i++) {
+                    var value;
+                    if (typeof tracksData[i] === "number") {
+                        value = tracksData[i];
+                    }
+                    else  {
+                        value = parseInt(tracksData[i].ToString());
+                    }
+
+                    if (value >= 0) {
+                        tracks.push(value);
+                    }
+                }
+            }
+        }
+        this.trackIndexes = tracks.slice(0);
+
+        if (render) {
+            this.render();
+        }
+    },
+    setScore: function (score) {
+        this.score = score;
+    },
+    scoreLoaded: function (score) {
+        this.score = score;
+        this.triggerEvent("loaded", score);
+        this.render();
+    },
+    triggerEvent: function (name, details) {
+        if (details === void 0) { details = null; }
+        if (this.element !== null) {
+            var e = document.createEvent("CustomEvent");
+            e.initCustomEvent(name, false, false, details);
+            this.element.dispatchEvent(e);
+        }
+    }
+});
+
+Bridge.define('AlphaTab.Platform.JavaScript.JsWorkerApi', {
+    inherits: [AlphaTab.Platform.JavaScript.JsApiBase],
+    constructor: function (element, options) {
+        AlphaTab.Platform.JavaScript.JsApiBase.prototype.$constructor.call(this, element, options);
+
+    },
+    createScoreRenderer: function (settings, rawSettings, canvasElement) {
+        var renderer = new AlphaTab.Platform.JavaScript.WorkerScoreRenderer(this, rawSettings);
+        renderer.addPostRenderFinished(Bridge.fn.bind(this, function () {
+            this.element.className = Bridge.String.replaceAll(Bridge.String.replaceAll(this.element.className, " loading", ""), " rendering", "");
+        }));
+        return renderer;
+    },
+    load: function (data) {
+        this.element.className += " loading";
+        this.renderer.load(data, this.trackIndexes);
+    },
+    setScore: function (score) {
+        AlphaTab.Platform.JavaScript.JsApiBase.prototype.setScore.call(this, score);
+        this.renderer.setScore(this.score);
+    },
+    render: function () {
+        if (this.renderer !== null) {
+            this.element.className += " rendering";
+            this.renderer.renderMultiple(this.trackIndexes);
+        }
+    },
+    tex: function (contents) {
+        this.element.className += " loading";
+        this.renderer.tex(contents);
+    }
+});
+
+Bridge.define('AlphaTab.Platform.JavaScript.JsApi', {
+    inherits: [AlphaTab.Platform.JavaScript.JsApiBase],
+    constructor: function (element, options) {
+        AlphaTab.Platform.JavaScript.JsApiBase.prototype.$constructor.call(this, element, options);
+
+    },
+    getTracks: function () {
+        var $t;
+        var tracks = [];
+
+        $t = Bridge.getEnumerator(this.trackIndexes);
+        while ($t.moveNext()) {
+            var track = $t.getCurrent();
+            if (track >= 0 && track < this.score.tracks.length) {
+                tracks.push(this.score.tracks[track]);
+            }
+        }
+
+        if (tracks.length === 0 && this.score.tracks.length > 0) {
+            tracks.push(this.score.tracks[0]);
+        }
+
+        return tracks.slice(0);
+    },
+    createScoreRenderer: function (settings, rawSettings, canvasElement) {
+        return new AlphaTab.Rendering.ScoreRenderer(settings, canvasElement);
+    },
+    load: function (data) {
+        try {
+            if (Bridge.is(data, ArrayBuffer)) {
+                this.scoreLoaded(Bridge.get(AlphaTab.Importer.ScoreLoader).loadScoreFromBytes(new Uint8Array(data)));
+            }
+            else  {
+                if (Bridge.is(data, Uint8Array)) {
+                    this.scoreLoaded(Bridge.get(AlphaTab.Importer.ScoreLoader).loadScoreFromBytes(data));
+                }
+                else  {
+                    if (typeof data === "string") {
+                        Bridge.get(AlphaTab.Importer.ScoreLoader).loadScoreAsync(data, Bridge.fn.bind(this, this.scoreLoaded), function (e) {
+                            console.error(e);
+                        });
+                    }
+                }
+            }
+        }
+        catch (e) {
+            e = Bridge.Exception.create(e);
+            console.error(e);
+        }
+    },
+    tex: function (contents) {
+        try {
+            var parser = new AlphaTab.Importer.AlphaTexImporter();
+            var data = Bridge.get(AlphaTab.IO.ByteBuffer).fromBuffer(Bridge.get(AlphaTab.Platform.Std).stringToByteArray(contents));
+            parser.init(data);
+            this.scoreLoaded(parser.readScore());
+        }
+        catch (e) {
+            e = Bridge.Exception.create(e);
+            console.error(e);
+        }
+    },
+    render: function () {
+        if (this.renderer !== null) {
+            this.renderer.renderMultiple(this.getTracks());
+        }
+    }
+});
+
+Bridge.define('AlphaTab.Platform.JavaScript.JsWorker', {
+    _renderer: null,
+    _main: null,
+    _trackIndexes: null,
+    _includeScoreInLoadedEvent: false,
+    config: {
+        properties: {
+            score: null
+        }
+    },
+    constructor: function (main, options) {
+        this._main = main;
+        this._includeScoreInLoadedEvent = options.scoreInLoadedEvent === true;
+        this._main.addEventListener("message", Bridge.fn.bind(this, this.handleMessage), false);
+        var settings = Bridge.get(AlphaTab.Settings).fromJson(options);
+        this._renderer = new AlphaTab.Rendering.ScoreRenderer(settings, null);
+        this._renderer.addPartialRenderFinished(Bridge.fn.bind(this, function (result) {
+            this._main.postMessage({ cmd: "partialRenderFinished", result: result });
+        }));
+        this._renderer.addRenderFinished(Bridge.fn.bind(this, function (result) {
+            this._main.postMessage({ cmd: "renderFinished", result: result });
+        }));
+        this._renderer.addPostRenderFinished(Bridge.fn.bind(this, function () {
+            this._main.postMessage({ cmd: "postRenderFinished" });
+        }));
+        this._renderer.addPreRender(Bridge.fn.bind(this, function () {
+            this._main.postMessage({ cmd: "preRender" });
+        }));
+    },
+    getTracks: function () {
+        var $t;
+        var tracks = [];
+
+        $t = Bridge.getEnumerator(this._trackIndexes);
+        while ($t.moveNext()) {
+            var track = $t.getCurrent();
+            if (track >= 0 && track < this.score.tracks.length) {
+                tracks.push(this.score.tracks[track]);
+            }
+        }
+
+        if (tracks.length === 0 && this.score.tracks.length > 0) {
+            tracks.push(this.score.tracks[0]);
+        }
+
+        return tracks.slice(0);
+    },
+    handleMessage: function (e) {
+        var data = e.data;
+        var cmd = data.cmd;
+        try {
+            switch (cmd) {
+                case "load": 
+                    this.load(data.data, data.indexes);
+                    break;
+                case "score": 
+                    var score = data.score;
+                    if (score) {
+                        var jsonConverter = new AlphaTab.Model.JsonConverter();
+                        score = jsonConverter.jsObjectToScore(score);
+                    }
+                    this.score = score;
+                    this._renderer.score = score;
+                    break;
+                case "tex": 
+                    this.tex(data.data);
+                    break;
+                case "renderMultiple": 
+                    this.renderMultiple(data.data);
+                    break;
+            }
+        }
+        catch (ex) {
+            ex = Bridge.Exception.create(ex);
+            console.error("Error Handling message", cmd, ex);
+        }
+
+    },
+    renderMultiple: function (trackIndexes) {
+        this._trackIndexes = trackIndexes;
+        this.render();
+    },
+    tex: function (contents) {
+        try {
+            var parser = new AlphaTab.Importer.AlphaTexImporter();
+            var data = Bridge.get(AlphaTab.IO.ByteBuffer).fromBuffer(Bridge.get(AlphaTab.Platform.Std).stringToByteArray(contents));
+            parser.init(data);
+            this.scoreLoaded(parser.readScore());
+        }
+        catch (e) {
+            e = Bridge.Exception.create(e);
+            this.error(e);
+        }
+    },
+    load: function (data, trackIndexes) {
+        try {
+            this._trackIndexes = trackIndexes;
+            if (Bridge.is(data, ArrayBuffer)) {
+                this.scoreLoaded(Bridge.get(AlphaTab.Importer.ScoreLoader).loadScoreFromBytes(new Uint8Array(data)));
+            }
+            else  {
+                if (Bridge.is(data, Uint8Array)) {
+                    this.scoreLoaded(Bridge.get(AlphaTab.Importer.ScoreLoader).loadScoreFromBytes(data));
+                }
+                else  {
+                    if (typeof data === "string") {
+                        Bridge.get(AlphaTab.Importer.ScoreLoader).loadScoreAsync(data, Bridge.fn.bind(this, this.scoreLoaded), Bridge.fn.bind(this, this.error));
+                    }
+                }
+            }
+        }
+        catch (e) {
+            e = Bridge.Exception.create(e);
+            this.error(e);
+        }
+    },
+    error: function (e) {
+        this._main.postMessage({ cmd: "error", exception: e });
+    },
+    scoreLoaded: function (score) {
+        this.score = score;
+        if (this._includeScoreInLoadedEvent) {
+            var json = new AlphaTab.Model.JsonConverter();
+            this._main.postMessage({ cmd: "loaded", score: json.scoreToJsObject(score) });
+        }
+        else  {
+            this._main.postMessage({ cmd: "loaded" });
+        }
+
+        this.render();
+    },
+    render: function () {
+        this._renderer.renderMultiple(this.getTracks());
+    }
+});
+
+/** @namespace AlphaTab.Platform.Model */
+
+/**
+ * This container public class can store the definition for a font and it's style.
+ *
+ * @public
+ * @class AlphaTab.Platform.Model.Font
+ */
+Bridge.define('AlphaTab.Platform.Model.Font', {
+    _cssCache: null,
+    config: {
+        properties: {
+            family: null,
+            size: 0,
+            style: 0
+        }
+    },
+    constructor: function (family, size, style) {
+        if (style === void 0) { style = 0; }
+        this.family = family;
+        this.size = size;
+        this.style = style;
+        this._cssCache = null;
+    },
+    getIsBold: function () {
+        return (this.style & Bridge.get(AlphaTab.Platform.Model.FontStyle).bold) !== 0;
+    },
+    getIsItalic: function () {
+        return (this.style & Bridge.get(AlphaTab.Platform.Model.FontStyle).italic) !== 0;
+    },
+    clone: function () {
+        return new AlphaTab.Platform.Model.Font(this.family, this.size, this.style);
+    },
+    toCssString: function () {
+        if (this._cssCache === null) {
+            var buf = [];
+
+            if (this.getIsBold()) {
+                buf.push("bold ");
+            }
+            if (this.getIsItalic()) {
+                buf.push("italic ");
+            }
+
+            buf.push(this.size);
+            buf.push("px ");
+            buf.push("'");
+            buf.push(this.family);
+            buf.push("'");
+
+            this._cssCache = buf.join('');
+        }
+        return this._cssCache;
+    }
+});
+
+Bridge.define('AlphaTab.Platform.Model.FontStyle', {
+    statics: {
+        plain: 0,
+        bold: 1,
+        italic: 2
+    },
+    $enum: true,
+    $flags: true
+});
+
+/**
+ * This public enum lists all different text alignments
+ *
+ * @public
+ * @class AlphaTab.Platform.Model.TextAlign
+ */
+Bridge.define('AlphaTab.Platform.Model.TextAlign', {
+    statics: {
+        left: 0,
+        center: 1,
+        right: 2
+    },
+    $enum: true
+});
+
+/**
+ * This public enum lists all base line modes
+ *
+ * @public
+ * @class AlphaTab.Platform.Model.TextBaseline
+ */
+Bridge.define('AlphaTab.Platform.Model.TextBaseline', {
+    statics: {
+        $default: 0,
+        top: 1,
+        middle: 2,
+        bottom: 3
+    },
+    $enum: true
+});
+
+Bridge.define('AlphaTab.Xml.IXmlDocument');
+
+Bridge.define('AlphaTab.Xml.XmlDocumentWrapper', {
+    inherits: [AlphaTab.Xml.IXmlDocument],
+    _document: null,
+    constructor: function (document) {
+        this._document = document;
+    },
+    getDocumentElement: function () {
+        return new AlphaTab.Xml.XmlNodeWrapper(this._document.documentElement);
+    }
+});
+
+/**
+ * The supported fonts by the FontSizes public class
+ *
+ * @public
+ * @class AlphaTab.Platform.Svg.SupportedFonts
+ */
+Bridge.define('AlphaTab.Platform.Svg.SupportedFonts', {
+    statics: {
+        timesNewRoman: 0,
+        arial: 1
+    },
+    $enum: true
+});
+
+/** @namespace AlphaTab.Rendering */
+
+/**
+ * This is the base public class for creating blocks which can render bars.
+ *
+ * @public
+ * @class AlphaTab.Rendering.BarRendererBase
+ */
+Bridge.define('AlphaTab.Rendering.BarRendererBase', {
+    config: {
+        properties: {
+            stave: null,
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0,
+            index: 0,
+            isEmpty: false,
+            topOverflow: 0,
+            bottomOverflow: 0,
+            bar: null,
+            /**
+             * Gets or sets whether this renderer is linked to the next one 
+             by some glyphs like a vibrato effect
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Rendering.BarRendererBase
+             * @memberof AlphaTab.Rendering.BarRendererBase
+             * @function isLinkedToPrevious
+             * @return  {boolean}
+             */
+            /**
+             * Gets or sets whether this renderer is linked to the next one 
+             by some glyphs like a vibrato effect
+             *
+             * @instance
+             * @public
+             * @this AlphaTab.Rendering.BarRendererBase
+             * @memberof AlphaTab.Rendering.BarRendererBase
+             * @function isLinkedToPrevious
+             * @param   {boolean}    value
+             * @return  {void}
+             */
+            isLinkedToPrevious: false
+        }
+    },
+    constructor: function (bar) {
+        this.bar = bar;
+        this.isEmpty = true;
+    },
+    getResources: function () {
+        return this.getLayout().renderer.renderingResources;
+    },
+    getLayout: function () {
+        return this.stave.staveGroup.layout;
+    },
+    getSettings: function () {
+        return this.getLayout().renderer.settings;
+    },
+    getScale: function () {
+        return this.getSettings().scale;
+    },
+    getIsFirstOfLine: function () {
+        return this.index === 0;
+    },
+    getIsLastOfLine: function () {
+        return this.index === this.stave.barRenderers.length - 1;
+    },
+    getIsLast: function () {
+        return this.bar.index === this.stave.barRenderers.length - 1;
+    },
+    /**
+     * Gets the top padding for the main content of the renderer. 
+     Can be used to specify where i.E. the score lines of the notation start.
+     *
+     * @instance
+     * @public
+     * @this AlphaTab.Rendering.BarRendererBase
+     * @memberof AlphaTab.Rendering.BarRendererBase
+     * @function getTopPadding
+     * @return  {number}
+     */
+    /**
+     * Gets the top padding for the main content of the renderer. 
+     Can be used to specify where i.E. the score lines of the notation start.
+     *
+     * @instance
+     * @function setTopPadding
+     * @return  {number}
+     */
+    getTopPadding: function () {
+        return 0;
+    },
+    /**
+     * Gets the bottom padding for the main content of the renderer. 
+     Can be used to specify where i.E. the score lines of the notation end.
+     *
+     * @instance
+     * @public
+     * @this AlphaTab.Rendering.BarRendererBase
+     * @memberof AlphaTab.Rendering.BarRendererBase
+     * @function getBottomPadding
+     * @return  {number}
+     */
+    /**
+     * Gets the bottom padding for the main content of the renderer. 
+     Can be used to specify where i.E. the score lines of the notation end.
+     *
+     * @instance
+     * @function setBottomPadding
+     */
+    getBottomPadding: function () {
+        return 0;
+    },
+    registerOverflowTop: function (topOverflow) {
+        if (topOverflow > this.topOverflow) {
+            this.topOverflow = topOverflow;
+        }
+    },
+    registerOverflowBottom: function (bottomOverflow) {
+        if (bottomOverflow > this.bottomOverflow) {
+            this.bottomOverflow = bottomOverflow;
+        }
+    },
+    applyBarSpacing: function (spacing) {
+
+    },
+    registerMaxSizes: function (sizes) {
+
+    },
+    applySizes: function (sizes) {
+
+    },
+    finalizeRenderer: function (layout) {
+
+    },
+    doLayout: function () {
+
+    },
+    paint: function (cx, cy, canvas) {
+
+    },
+    buildBoundingsLookup: function (lookup, visualTop, visualHeight, realTop, realHeight, x) {
+        var barLookup = new AlphaTab.Rendering.Utils.BarBoundings();
+        barLookup.bar = this.bar;
+        barLookup.isFirstOfLine = this.getIsFirstOfLine();
+        barLookup.isLastOfLine = this.getIsLastOfLine();
+        barLookup.visualBounds = new AlphaTab.Rendering.Utils.Bounds(x + this.stave.x + this.x, visualTop, this.width, visualHeight);
+        barLookup.bounds = new AlphaTab.Rendering.Utils.Bounds(x + this.stave.x + this.x, realTop, this.width, realHeight);
+        lookup.bars.push(barLookup);
+    }
+});
+
+/**
+ * This BarRenderer has 3 different groups which cna store glyphs:
+  - PreBeatGlyphs : Those glyphs are aligned left to right before the first glyph which represents a beat
+  - BeatGlyphs : Each of those glyphs represents one beat. They are aligned left to right.
+  - PostBeatGlyphs : Those glyphs are aligned left to right after the last beat glyph
+ *
+ * @abstract
+ * @public
+ * @class AlphaTab.Rendering.GroupedBarRenderer
+ * @augments AlphaTab.Rendering.BarRendererBase
+ */
+Bridge.define('AlphaTab.Rendering.GroupedBarRenderer', {
+    inherits: [AlphaTab.Rendering.BarRendererBase],
+    statics: {
+        KeySizePre: "Pre",
+        KeySizePost: "Post"
+    },
+    _preBeatGlyphs: null,
+    _voiceContainers: null,
+    _postBeatGlyphs: null,
+    _biggestVoiceContainer: null,
+    constructor: function (bar) {
+        AlphaTab.Rendering.BarRendererBase.prototype.$constructor.call(this, bar);
+
+        this._preBeatGlyphs = [];
+        this._voiceContainers = {};
+        this._postBeatGlyphs = [];
+    },
+    getPreBeatGlyphStart: function () {
+        return 0;
+    },
+    getBeatGlyphsStart: function () {
+        var start = this.getPreBeatGlyphStart();
+        if (this._preBeatGlyphs.length > 0) {
+            start += this._preBeatGlyphs[this._preBeatGlyphs.length - 1].x + this._preBeatGlyphs[this._preBeatGlyphs.length - 1].width;
+        }
+        return start;
+    },
+    getPostBeatGlyphsStart: function () {
+        var start = this.getBeatGlyphsStart();
+        var offset = 0.0;
+        { var $c = function (c) {
+            if (c.width > offset) {
+                offset = c.width;
+            }
+        
+            //if (c.beatGlyphs.length > 0)
+            //{
+            //    var coff = c.beatGlyphs[c.beatGlyphs.length - 1].x + c.beatGlyphs[c.beatGlyphs.length - 1].width;
+            //    if (coff > offset)
+            //    {
+            //        offset = coff;
+            //    }
+            //}
+        }; var $e = this._voiceContainers; for ( var t in $e ) { $c($e[t]); } };
+        return start + offset;
+    },
+    getPostBeatGlyphsWidth: function () {
+        var width = 0.0;
+        for (var i = 0, j = this._postBeatGlyphs.length; i < j; i++) {
+            var c = this._postBeatGlyphs[i];
+            var x = c.x + c.width;
+            if (x > width) {
+                width = x;
+            }
+        }
+        return width;
+    },
+    doLayout: function () {
+        this.createPreBeatGlyphs();
+        this.createBeatGlyphs();
+        this.createPostBeatGlyphs();
+        { var $c = function (c) {
+            c.doLayout();
+        }; var $e = this._voiceContainers; for ( var t in $e ) { $c($e[t]); } };
+        this.updateWidth();
+    },
+    updateWidth: function () {
+        this.width = this.getPostBeatGlyphsStart();
+        if (this._postBeatGlyphs.length > 0) {
+            this.width += this._postBeatGlyphs[this._postBeatGlyphs.length - 1].x + this._postBeatGlyphs[this._postBeatGlyphs.length - 1].width;
+        }
+        { var $c = Bridge.fn.bind(this, function (c) {
+            if (this._biggestVoiceContainer === null || c.width > this._biggestVoiceContainer.width) {
+                this._biggestVoiceContainer = c;
+            }
+        }); var $e = this._voiceContainers; for ( var t in $e ) { $c($e[t]); } };
+    },
+    getNoteX: function (note, onEnd) {
+        if (onEnd === void 0) { onEnd = true; }
+        return 0;
+    },
+    getNoteY: function (note) {
+        return 0;
+    },
+    registerMaxSizes: function (sizes) {
+        var preSize = this.getBeatGlyphsStart();
+        if (sizes.getSize(Bridge.get(AlphaTab.Rendering.GroupedBarRenderer).KeySizePre) < preSize) {
+            sizes.setSize(Bridge.get(AlphaTab.Rendering.GroupedBarRenderer).KeySizePre, preSize);
+        }
+
+        { var $c = function (c) {
+            c.registerMaxSizes(sizes);
+        }; var $e = this._voiceContainers; for ( var t in $e ) { $c($e[t]); } };
+
+        var postSize;
+        if (this._postBeatGlyphs.length === 0) {
+            postSize = 0;
+        }
+        else  {
+            postSize = this._postBeatGlyphs[this._postBeatGlyphs.length - 1].x + this._postBeatGlyphs[this._postBeatGlyphs.length - 1].width;
+        }
+        if (sizes.getSize(Bridge.get(AlphaTab.Rendering.GroupedBarRenderer).KeySizePost) < postSize) {
+            sizes.setSize(Bridge.get(AlphaTab.Rendering.GroupedBarRenderer).KeySizePost, postSize);
+        }
+
+        if (sizes.fullWidth < this.width) {
+            sizes.fullWidth = this.width;
+        }
+    },
+    applySizes: function (sizes) {
+        // if we need additional space in the preBeat group we simply
+        // add a new spacer
+        var preSize = sizes.getSize(Bridge.get(AlphaTab.Rendering.GroupedBarRenderer).KeySizePre);
+        var preSizeDiff = preSize - this.getBeatGlyphsStart();
+        if (preSizeDiff > 0) {
+            this.addPreBeatGlyph(new AlphaTab.Rendering.Glyphs.SpacingGlyph(0, 0, preSizeDiff));
+        }
+
+        // on beat glyphs we apply the glyph spacing
+        { var $c = function (c) {
+            c.applySizes(sizes);
+        }; var $e = this._voiceContainers; for ( var t in $e ) { $c($e[t]); } };
+
+        // on the post glyphs we add the spacing before all other glyphs
+        var postSize = sizes.getSize(Bridge.get(AlphaTab.Rendering.GroupedBarRenderer).KeySizePost);
+        var postSizeDiff;
+        if (this._postBeatGlyphs.length === 0) {
+            postSizeDiff = 0;
+        }
+        else  {
+            postSizeDiff = postSize - (this._postBeatGlyphs[this._postBeatGlyphs.length - 1].x + this._postBeatGlyphs[this._postBeatGlyphs.length - 1].width);
+        }
+
+        if (postSizeDiff > 0) {
+            this._postBeatGlyphs.splice(0, 0, new AlphaTab.Rendering.Glyphs.SpacingGlyph(0, 0, postSizeDiff));
+            for (var i = 0; i < this._postBeatGlyphs.length; i++) {
+                var g = this._postBeatGlyphs[i];
+                g.x = i === 0 ? 0 : this._postBeatGlyphs[this._postBeatGlyphs.length - 1].x + this._postBeatGlyphs[this._postBeatGlyphs.length - 1].width;
+                g.index = i;
+                g.renderer = this;
+            }
+        }
+
+        this.updateWidth();
+    },
+    addGlyph: function (c, g) {
+        this.isEmpty = false;
+        g.x = c.length === 0 ? 0 : (c[c.length - 1].x + c[c.length - 1].width);
+        g.index = c.length;
+        g.renderer = this;
+        g.doLayout();
+        c.push(g);
+    },
+    addPreBeatGlyph: function (g) {
+        this.addGlyph(this._preBeatGlyphs, g);
+    },
+    addBeatGlyph: function (g) {
+        this.getOrCreateVoiceContainer(g.beat.voice.index).addGlyph(g);
+    },
+    getOrCreateVoiceContainer: function (voiceIndex) {
+        var c;
+        if (voiceIndex >= Object.keys(this._voiceContainers).length) {
+            c = new AlphaTab.Rendering.Glyphs.VoiceContainerGlyph(0, 0, voiceIndex);
+            c.renderer = this;
+            this._voiceContainers[voiceIndex] = c;
+        }
+        else  {
+            c = this._voiceContainers[voiceIndex];
+        }
+        return c;
+    },
+    getBeatContainer: function (voice, beat) {
+        return this.getOrCreateVoiceContainer(voice).beatGlyphs[beat];
+    },
+    getPreNotesPosition: function (voice, beat) {
+        return this.getBeatContainer(voice, beat).preNotes;
+    },
+    getOnNotesPosition: function (voice, beat) {
+        return this.getBeatContainer(voice, beat).onNotes;
+    },
+    getPostNotesPosition: function (voice, beat) {
+        return this.getBeatContainer(voice, beat).postNotes;
+    },
+    addPostBeatGlyph: function (g) {
+        this.addGlyph(this._postBeatGlyphs, g);
+    },
+    createPreBeatGlyphs: function () {
+
+    },
+    createBeatGlyphs: function () {
+
+    },
+    createPostBeatGlyphs: function () {
+
+    },
+    applyBarSpacing: function (spacing) {
+        this.width += spacing;
+
+        { var $c = Bridge.fn.bind(this, function (c) {
+            var toApply = spacing;
+            if (this._biggestVoiceContainer !== null) {
+                toApply += this._biggestVoiceContainer.width - c.width;
+            }
+            c.applyGlyphSpacing(toApply);
+        }); var $e = this._voiceContainers; for ( var t in $e ) { $c($e[t]); } };
+    },
+    finalizeRenderer: function (layout) {
+        { var $c = function (c) {
+            c.finalizeGlyph(layout);
+        }; var $e = this._voiceContainers; for ( var t in $e ) { $c($e[t]); } };
+    },
+    paint: function (cx, cy, canvas) {
+        this.paintBackground(cx, cy, canvas);
+
+        var glyphStartX = this.getPreBeatGlyphStart();
+        for (var i = 0, j = this._preBeatGlyphs.length; i < j; i++) {
+            var g = this._preBeatGlyphs[i];
+            g.paint(cx + this.x + glyphStartX, cy + this.y, canvas);
+        }
+
+        glyphStartX = this.getBeatGlyphsStart();
+        { var $c = Bridge.fn.bind(this, function (c) {
+            c.paint(cx + this.x + glyphStartX, cy + this.y, canvas);
+        }); var $e = this._voiceContainers; for ( var t in $e ) { $c($e[t]); } };
+
+        glyphStartX = this.width - this.getPostBeatGlyphsWidth();
+        for (var i1 = 0, j1 = this._postBeatGlyphs.length; i1 < j1; i1++) {
+            var g1 = this._postBeatGlyphs[i1];
+            g1.paint(cx + this.x + glyphStartX, cy + this.y, canvas);
+        }
+    },
+    paintBackground: function (cx, cy, canvas) {
+        //canvas.Color = Std.RandomColor(50);
+        //canvas.FillRect(cx + X, cy + Y, Width, Height);
+    },
+    buildBoundingsLookup: function (lookup, visualTop, visualHeight, realTop, realHeight, x) {
+        AlphaTab.Rendering.BarRendererBase.prototype.buildBoundingsLookup.call(this, lookup, visualTop, visualHeight, realTop, realHeight, x);
+        var barLookup = lookup.bars[lookup.bars.length - 1];
+        var beatStart = this.getBeatGlyphsStart();
+        { var $c = Bridge.fn.bind(this, function (c) {
+            for (var i = 0, j = c.beatGlyphs.length; i < j; i++) {
+                var bc = c.beatGlyphs[i];
+                var beatLookup = new AlphaTab.Rendering.Utils.BeatBoundings();
+                beatLookup.beat = bc.beat;
+                // on beat bounding rectangle
+                beatLookup.visualBounds = new AlphaTab.Rendering.Utils.Bounds(x + this.stave.x + this.x + beatStart + c.x + bc.x + bc.onNotes.x, visualTop, bc.onNotes.width, visualHeight);
+                // real beat boundings
+                beatLookup.bounds = new AlphaTab.Rendering.Utils.Bounds(x + this.stave.x + this.x + beatStart + c.x + bc.x, realTop, bc.width, realHeight);
+                barLookup.beats.push(beatLookup);
+            }
+        }); var $e = this._voiceContainers; for ( var t in $e ) { $c($e[t]); } };
+    }
+});
+
+/**
+ * This BarRenderer renders a bar using standard music notation.
+ *
+ * @public
+ * @class AlphaTab.Rendering.ScoreBarRenderer
+ * @augments AlphaTab.Rendering.GroupedBarRenderer
+ */
+Bridge.define('AlphaTab.Rendering.ScoreBarRenderer', {
+    inherits: [AlphaTab.Rendering.GroupedBarRenderer],
+    statics: {
+        LineSpacing: 8,
+        config: {
+            init: function () {
+                this.sharpKsSteps = [0, 3, -1, 2, 5, 1, 4];
+                this.flatKsSteps = [4, 1, 5, 2, 6, 3, 7];
+            }
+        },
+        paintSingleBar: function (canvas, x1, y1, x2, y2, size) {
+            canvas.beginPath();
+            canvas.moveTo(x1, y1);
+            canvas.lineTo(x2, y2);
+            canvas.lineTo(x2, y2 + size);
+            canvas.lineTo(x1, y1 + size);
+            canvas.closePath();
+            canvas.fill();
+        }
+    },
+    _helpers: null,
+    _startSpacing: false,
+    config: {
+        properties: {
+            accidentalHelper: null
+        }
+    },
+    constructor: function (bar) {
+        AlphaTab.Rendering.GroupedBarRenderer.prototype.$constructor.call(this, bar);
+
+        this.accidentalHelper = new AlphaTab.Rendering.Utils.AccidentalHelper();
+    },
+    getTopPadding: function () {
+        return this.getGlyphOverflow();
+    },
+    getBottomPadding: function () {
+        return this.getGlyphOverflow();
+    },
+    getLineOffset: function () {
+        return ((9.0) * this.getScale());
+    },
+    /**
+     * gets the padding needed to place glyphs within the bounding box
+     *
+     * @instance
+     * @private
+     * @this AlphaTab.Rendering.ScoreBarRenderer
+     * @memberof AlphaTab.Rendering.ScoreBarRenderer
+     * @function getGlyphOverflow
+     * @return  {number}
+     */
+    /**
+     * gets the padding needed to place glyphs within the bounding box
+     *
+     * @instance
+     * @function setGlyphOverflow
+     */
+    getGlyphOverflow: function () {
+        var res = this.getResources();
+        return (res.tablatureFont.size / 2) + (res.tablatureFont.size * 0.2);
+    },
+    getBeatDirection: function (beat) {
+        var g = this.getOnNotesPosition(beat.voice.index, beat.index);
+        if (g !== null) {
+            return g.noteHeads.getDirection();
+        }
+        return Bridge.get(AlphaTab.Rendering.Utils.BeamDirection).up;
+    },
+    getNoteX: function (note, onEnd) {
+        if (onEnd === void 0) { onEnd = true; }
+        var g = this.getOnNotesPosition(note.beat.voice.index, note.beat.index);
+        if (g !== null) {
+            return g.container.x + g.x + g.noteHeads.getNoteX(note, onEnd);
+        }
+        return 0;
+    },
+    getNoteY: function (note) {
+        var beat = this.getOnNotesPosition(note.beat.voice.index, note.beat.index);
+        if (beat !== null) {
+            return beat.noteHeads.getNoteY(note);
+        }
+        return 0;
+    },
+    doLayout: function () {
+        this._helpers = this.stave.staveGroup.helpers.helpers[this.bar.track.index][this.bar.index];
+        AlphaTab.Rendering.GroupedBarRenderer.prototype.doLayout.call(this);
+
+
+        this.height = (this.getLineOffset() * 4) + this.getTopPadding() + this.getBottomPadding();
+        if (this.index === 0) {
+            this.stave.registerStaveTop(this.getGlyphOverflow());
+            this.stave.registerStaveBottom(this.height - this.getGlyphOverflow());
+        }
+
+        var top = this.getScoreY(0);
+        var bottom = this.getScoreY(8);
+
+        for (var i = 0, j = this._helpers.beamHelpers.length; i < j; i++) {
+            var v = this._helpers.beamHelpers[i];
+            for (var k = 0, l = v.length; k < l; k++) {
+                var h = v[k];
+                //
+                // max note (highest) -> top overflow
+                // 
+                var maxNoteY = this.getScoreY(this.getNoteLine(h.maxNote));
+                if (h.getDirection() === Bridge.get(AlphaTab.Rendering.Utils.BeamDirection).up) {
+                    maxNoteY -= this.getStemSize(h.maxDuration);
+                }
+
+                if (maxNoteY < top) {
+                    this.registerOverflowTop(Math.abs(maxNoteY));
+                }
+
+                //
+                // min note (lowest) -> bottom overflow
+                //
+                var minNoteY = this.getScoreY(this.getNoteLine(h.minNote));
+                if (h.getDirection() === Bridge.get(AlphaTab.Rendering.Utils.BeamDirection).down) {
+                    minNoteY += this.getStemSize(h.maxDuration);
+                }
+
+                if (minNoteY > bottom) {
+                    this.registerOverflowBottom(Math.abs(minNoteY) - bottom);
+                }
+            }
+        }
+    },
+    paint: function (cx, cy, canvas) {
+        AlphaTab.Rendering.GroupedBarRenderer.prototype.paint.call(this, cx, cy, canvas);
+        this.paintBeams(cx, cy, canvas);
+        this.paintTuplets(cx, cy, canvas);
+    },
+    paintTuplets: function (cx, cy, canvas) {
+        for (var i = 0, j = this._helpers.tupletHelpers.length; i < j; i++) {
+            var v = this._helpers.tupletHelpers[i];
+            for (var k = 0, l = v.length; k < l; k++) {
+                var h = v[k];
+                this.paintTupletHelper(cx + this.getBeatGlyphsStart(), cy, canvas, h);
+            }
+        }
+    },
+    paintBeams: function (cx, cy, canvas) {
+        for (var i = 0, j = this._helpers.beamHelpers.length; i < j; i++) {
+            var v = this._helpers.beamHelpers[i];
+            for (var k = 0, l = v.length; k < l; k++) {
+                var h = v[k];
+                this.paintBeamHelper(cx + this.getBeatGlyphsStart(), cy, canvas, h);
+            }
+        }
+    },
+    paintBeamHelper: function (cx, cy, canvas, h) {
+        // check if we need to paint simple footer
+        if (h.beats.length === 1) {
+            this.paintFooter(cx, cy, canvas, h);
+        }
+        else  {
+            this.paintBar(cx, cy, canvas, h);
+        }
+    },
+    paintTupletHelper: function (cx, cy, canvas, h) {
+        var res = this.getResources();
+        var oldAlign = canvas.getTextAlign();
+        canvas.setTextAlign(Bridge.get(AlphaTab.Platform.Model.TextAlign).center);
+        // check if we need to paint simple footer
+        if (h.beats.length === 1 || !h.getIsFull()) {
+            for (var i = 0, j = h.beats.length; i < j; i++) {
+                var beat = h.beats[i];
+                var beamingHelper = this._helpers.beamHelperLookup[h.voiceIndex][beat.index];
+                if (beamingHelper === null) {
+                    continue;
+                }
+                var direction = beamingHelper.getDirection();
+
+                var tupletX = beamingHelper.getBeatLineX(beat) + this.getScale();
+                var tupletY = cy + this.y + this.calculateBeamY(beamingHelper, tupletX);
+
+                var offset = direction === Bridge.get(AlphaTab.Rendering.Utils.BeamDirection).up ? res.effectFont.size * 1.8 : -3 * this.getScale();
+
+                canvas.setFont(res.effectFont);
+                canvas.fillText(h.tuplet.toString(), cx + this.x + tupletX, tupletY - offset);
+            }
+        }
+        else  {
+            var firstBeat = h.beats[0];
+            var lastBeat = h.beats[h.beats.length - 1];
+
+            var beamingHelper1 = this._helpers.beamHelperLookup[h.voiceIndex][firstBeat.index];
+            if (beamingHelper1 !== null) {
+                var direction1 = beamingHelper1.getDirection();
+
+                // 
+                // Calculate the overall area of the tuplet bracket
+
+                var startX = beamingHelper1.getBeatLineX(firstBeat) + this.getScale();
+                var endX = beamingHelper1.getBeatLineX(lastBeat) + this.getScale();
+
+                //
+                // Calculate how many space the text will need
+                canvas.setFont(res.effectFont);
+                var s = h.tuplet.toString();
+                var sw = canvas.measureText(s);
+                var sp = 3 * this.getScale();
+
+                // 
+                // Calculate the offsets where to break the bracket
+                var middleX = (startX + endX) / 2;
+                var offset1X = middleX - sw / 2 - sp;
+                var offset2X = middleX + sw / 2 + sp;
+
+                //
+                // calculate the y positions for our bracket
+
+                var startY = this.calculateBeamY(beamingHelper1, startX);
+                var offset1Y = this.calculateBeamY(beamingHelper1, offset1X);
+                var middleY = this.calculateBeamY(beamingHelper1, middleX);
+                var offset2Y = this.calculateBeamY(beamingHelper1, offset2X);
+                var endY = this.calculateBeamY(beamingHelper1, endX);
+
+                var offset1 = 10 * this.getScale();
+                var size = 5 * this.getScale();
+                if (direction1 === Bridge.get(AlphaTab.Rendering.Utils.BeamDirection).down) {
+                    offset1 *= -1;
+                    size *= -1;
+                }
+
+                //
+                // draw the bracket
+                canvas.beginPath();
+                canvas.moveTo(cx + this.x + startX, (cy + this.y + startY - offset1));
+                canvas.lineTo(cx + this.x + startX, (cy + this.y + startY - offset1 - size));
+                canvas.lineTo(cx + this.x + offset1X, (cy + this.y + offset1Y - offset1 - size));
+                canvas.stroke();
+
+                canvas.beginPath();
+                canvas.moveTo(cx + this.x + offset2X, (cy + this.y + offset2Y - offset1 - size));
+                canvas.lineTo(cx + this.x + endX, (cy + this.y + endY - offset1 - size));
+                canvas.lineTo(cx + this.x + endX, (cy + this.y + endY - offset1));
+                canvas.stroke();
+
+                //
+                // Draw the string
+                canvas.fillText(s, cx + this.x + middleX, cy + this.y + middleY - offset1 - size - res.effectFont.size);
+            }
+        }
+        canvas.setTextAlign(oldAlign);
+    },
+    getStemSize: function (duration) {
+        return this.getScoreY(5);
+    },
+    calculateBeamY: function (h, x) {
+        var correction = 4.5;
+        var stemSize = this.getStemSize(h.maxDuration);
+        return h.calculateBeamY(stemSize, this.getScale(), x, this.getScale(), Bridge.fn.bind(this, function (n) {
+            return this.getScoreY(this.getNoteLine(n), correction - 1);
+        }));
+    },
+    paintBar: function (cx, cy, canvas, h) {
+        for (var i = 0, j = h.beats.length; i < j; i++) {
+            var beat = h.beats[i];
+
+            //
+            // draw line 
+            //
+            var beatLineX = h.getBeatLineX(beat) + this.getScale();
+
+            var direction = h.getDirection();
+
+            var beatContainer = this.getBeatContainer(beat.voice.index, beat.index);
+            var beatGlyph = beatContainer.onNotes;
+            var minNote = beatGlyph.noteHeads.minNote;
+            var maxNote = beatGlyph.noteHeads.maxNote;
+
+            var y1 = cy + this.y + (direction === Bridge.get(AlphaTab.Rendering.Utils.BeamDirection).up ? this.getScoreY(maxNote.line) : this.getScoreY(minNote.line));
+
+            var y2 = cy + this.y + this.calculateBeamY(h, beatLineX);
+
+            canvas.beginPath();
+            canvas.moveTo(cx + this.x + beatLineX, y1);
+            canvas.lineTo(cx + this.x + beatLineX, y2);
+            canvas.stroke();
+
+            var brokenBarOffset = 6 * this.getScale();
+            var barSpacing = 6 * this.getScale();
+            var barSize = 3 * this.getScale();
+            var barCount = AlphaTab.Model.ModelUtils.getIndex(beat.duration) - 2;
+            var barStart = cy + this.y;
+            if (direction === Bridge.get(AlphaTab.Rendering.Utils.BeamDirection).down) {
+                barSpacing = -barSpacing;
+                barSize = -barSize;
+            }
+
+            for (var barIndex = 0; barIndex < barCount; barIndex++) {
+                var barStartX;
+                var barEndX;
+
+                var barStartY;
+                var barEndY;
+
+                var barY = barStart + (barIndex * barSpacing);
+
+                // 
+                // Bar to Next?
+                //
+                if (i < h.beats.length - 1) {
+                    // full bar?
+                    if (this.isFullBarJoin(beat, h.beats[i + 1], barIndex)) {
+                        barStartX = beatLineX;
+                        barEndX = h.getBeatLineX(h.beats[i + 1]) + this.getScale();
+                    }
+                    else  {
+                        if (i === 0 || !this.isFullBarJoin(h.beats[i - 1], beat, barIndex)) {
+                            barStartX = beatLineX;
+                            barEndX = barStartX + brokenBarOffset;
+                        }
+                        else  {
+                            continue;
+                        }
+                    }
+                    barStartY = barY + this.calculateBeamY(h, barStartX);
+                    barEndY = barY + this.calculateBeamY(h, barEndX);
+                    Bridge.get(AlphaTab.Rendering.ScoreBarRenderer).paintSingleBar(canvas, cx + this.x + barStartX, barStartY, cx + this.x + barEndX, barEndY, barSize);
+                }
+                else  {
+                    if (i > 0 && !this.isFullBarJoin(beat, h.beats[i - 1], barIndex)) {
+                        barStartX = beatLineX - brokenBarOffset;
+                        barEndX = beatLineX;
+
+                        barStartY = barY + this.calculateBeamY(h, barStartX);
+                        barEndY = barY + this.calculateBeamY(h, barEndX);
+
+                        Bridge.get(AlphaTab.Rendering.ScoreBarRenderer).paintSingleBar(canvas, cx + this.x + barStartX, barStartY, cx + this.x + barEndX, barEndY, barSize);
+                    }
+                }
+            }
+        }
+    },
+    isFullBarJoin: function (a, b, barIndex) {
+        return (AlphaTab.Model.ModelUtils.getIndex(a.duration) - 2 - barIndex > 0) && (AlphaTab.Model.ModelUtils.getIndex(b.duration) - 2 - barIndex > 0);
+    },
+    paintFooter: function (cx, cy, canvas, h) {
+        var beat = h.beats[0];
+
+        if (beat.duration === Bridge.get(AlphaTab.Model.Duration).whole) {
+            return;
+        }
+
+        var isGrace = beat.graceType !== Bridge.get(AlphaTab.Model.GraceType).none;
+        var scaleMod = isGrace ? Bridge.get(AlphaTab.Rendering.Glyphs.NoteHeadGlyph).GraceScale : 1;
+
+        //
+        // draw line 
+        //
+
+        var stemSize = this.getStemSize(h.maxDuration);
+
+        var beatLineX = h.getBeatLineX(beat) + this.getScale();
+
+        var direction = h.getDirection();
+
+        var beatContainer = this.getBeatContainer(beat.voice.index, beat.index);
+        var beatGlyph = beatContainer.onNotes;
+        var minNote = beatGlyph.noteHeads.minNote;
+        var maxNote = beatGlyph.noteHeads.maxNote;
+
+        var topY = this.getScoreY(minNote.line);
+        var bottomY = this.getScoreY(maxNote.line);
+
+        var beamY;
+        if (direction === Bridge.get(AlphaTab.Rendering.Utils.BeamDirection).down) {
+            bottomY += stemSize * scaleMod;
+            beamY = bottomY;
+        }
+        else  {
+            topY -= stemSize * scaleMod;
+            beamY = topY;
+        }
+
+        canvas.beginPath();
+        canvas.moveTo(cx + this.x + beatLineX, cy + this.y + topY);
+        canvas.lineTo(cx + this.x + beatLineX, cy + this.y + bottomY);
+        canvas.stroke();
+
+        if (isGrace) {
+            var graceSizeY = 15 * this.getScale();
+            var graceSizeX = 12 * this.getScale();
+
+
+            canvas.beginPath();
+            if (direction === Bridge.get(AlphaTab.Rendering.Utils.BeamDirection).down) {
+                canvas.moveTo(cx + this.x + beatLineX - (graceSizeX / 2), cy + this.y + bottomY - graceSizeY);
+                canvas.lineTo(cx + this.x + beatLineX + (graceSizeX / 2), cy + this.y + bottomY);
+            }
+            else  {
+                canvas.moveTo(cx + this.x + beatLineX - (graceSizeX / 2), cy + this.y + topY + graceSizeY);
+                canvas.lineTo(cx + this.x + beatLineX + (graceSizeX / 2), cy + this.y + topY);
+            }
+            canvas.stroke();
+        }
+
+        //
+        // Draw beam 
+        //
+        if (beat.duration > Bridge.get(AlphaTab.Model.Duration).quarter) {
+            var oldBaseLine = canvas.getTextBaseline();
+            canvas.setTextBaseline(Bridge.get(AlphaTab.Platform.Model.TextBaseline).top);
+            var glyph = new AlphaTab.Rendering.Glyphs.FooterGlyph(beatLineX, beamY, beat.duration, direction, isGrace);
+            glyph.renderer = this;
+            glyph.doLayout();
+            glyph.paint(cx + this.x - (this.getScale() / 2), cy + this.y, canvas);
+            canvas.setTextBaseline(oldBaseLine);
+        }
+    },
+    createPreBeatGlyphs: function () {
+        if (this.bar.getMasterBar().isRepeatStart) {
+            this.addPreBeatGlyph(new AlphaTab.Rendering.Glyphs.RepeatOpenGlyph(0, 0, 1.5, 3));
+        }
+
+        // Clef
+        if (this.getIsFirstOfLine() || this.bar.clef !== this.bar.previousBar.clef) {
+            var offset = 0;
+            var correction = 0;
+            switch (this.bar.clef) {
+                case Bridge.get(AlphaTab.Model.Clef).neutral: 
+                    offset = 4;
+                    break;
+                case Bridge.get(AlphaTab.Model.Clef).f4: 
+                    offset = 2;
+                    correction = -1;
+                    break;
+                case Bridge.get(AlphaTab.Model.Clef).c3: 
+                    offset = 4;
+                    break;
+                case Bridge.get(AlphaTab.Model.Clef).c4: 
+                    offset = 2;
+                    break;
+                case Bridge.get(AlphaTab.Model.Clef).g2: 
+                    offset = 6;
+                    break;
+            }
+            this.createStartSpacing();
+            this.addPreBeatGlyph(new AlphaTab.Rendering.Glyphs.ClefGlyph(0, this.getScoreY(offset, correction), this.bar.clef));
+        }
+
+        // Key signature
+        if ((this.bar.previousBar === null && this.bar.getMasterBar().keySignature !== 0) || (this.bar.previousBar !== null && this.bar.getMasterBar().keySignature !== this.bar.previousBar.getMasterBar().keySignature)) {
+            this.createStartSpacing();
+            this.createKeySignatureGlyphs();
+        }
+
+        // Time Signature
+        if ((this.bar.previousBar === null) || (this.bar.previousBar !== null && this.bar.getMasterBar().timeSignatureNumerator !== this.bar.previousBar.getMasterBar().timeSignatureNumerator) || (this.bar.previousBar !== null && this.bar.getMasterBar().timeSignatureDenominator !== this.bar.previousBar.getMasterBar().timeSignatureDenominator)) {
+            this.createStartSpacing();
+            this.createTimeSignatureGlyphs();
+        }
+
+        this.addPreBeatGlyph(new AlphaTab.Rendering.Glyphs.BarNumberGlyph(0, this.getScoreY(-4), this.bar.index + 1, !this.stave.isFirstInAccolade));
+
+        if (this.bar.getIsEmpty()) {
+            this.addPreBeatGlyph(new AlphaTab.Rendering.Glyphs.SpacingGlyph(0, 0, (30 * this.getScale()), false));
+        }
+    },
+    createBeatGlyphs: function () {
+        this.createVoiceGlyphs(this.bar.voices[0]);
+    },
+    createPostBeatGlyphs: function () {
+        if (this.bar.getMasterBar().getIsRepeatEnd()) {
+            this.addPostBeatGlyph(new AlphaTab.Rendering.Glyphs.RepeatCloseGlyph(this.x, 0));
+            if (this.bar.getMasterBar().repeatCount > 2) {
+                var line = this.getIsLast() || this.getIsLastOfLine() ? -1 : -4;
+                this.addPostBeatGlyph(new AlphaTab.Rendering.Glyphs.RepeatCountGlyph(0, this.getScoreY(line, -3), this.bar.getMasterBar().repeatCount));
+            }
+        }
+        else  {
+            if (this.bar.getMasterBar().isDoubleBar) {
+                this.addPostBeatGlyph(new AlphaTab.Rendering.Glyphs.BarSeperatorGlyph(0, 0));
+                this.addPostBeatGlyph(new AlphaTab.Rendering.Glyphs.SpacingGlyph(0, 0, 3 * this.getScale(), false));
+                this.addPostBeatGlyph(new AlphaTab.Rendering.Glyphs.BarSeperatorGlyph(0, 0));
+            }
+            else  {
+                if (this.bar.nextBar === null || !this.bar.nextBar.getMasterBar().isRepeatStart) {
+                    this.addPostBeatGlyph(new AlphaTab.Rendering.Glyphs.BarSeperatorGlyph(0, 0, this.getIsLast()));
+                }
+            }
+        }
+    },
+    createStartSpacing: function () {
+        if (this._startSpacing) {
+            return;
+        }
+        this.addPreBeatGlyph(new AlphaTab.Rendering.Glyphs.SpacingGlyph(0, 0, 2 * this.getScale()));
+        this._startSpacing = true;
+    },
+    createKeySignatureGlyphs: function () {
+        var offsetClef = 0;
+        var currentKey = this.bar.getMasterBar().keySignature;
+        var previousKey = this.bar.previousBar === null ? 0 : this.bar.previousBar.getMasterBar().keySignature;
+
+        switch (this.bar.clef) {
+            case Bridge.get(AlphaTab.Model.Clef).neutral: 
+                offsetClef = 0;
+                break;
+            case Bridge.get(AlphaTab.Model.Clef).g2: 
+                offsetClef = 0;
+                break;
+            case Bridge.get(AlphaTab.Model.Clef).f4: 
+                offsetClef = 2;
+                break;
+            case Bridge.get(AlphaTab.Model.Clef).c3: 
+                offsetClef = -1;
+                break;
+            case Bridge.get(AlphaTab.Model.Clef).c4: 
+                offsetClef = 1;
+                break;
+        }
+
+        // naturalize previous key
+        // TODO: only naturalize the symbols needed 
+        var naturalizeSymbols = Math.abs(previousKey);
+        var previousKeyPositions = Bridge.get(AlphaTab.Model.ModelUtils).keySignatureIsSharp(previousKey) ? Bridge.get(AlphaTab.Rendering.ScoreBarRenderer).sharpKsSteps : Bridge.get(AlphaTab.Rendering.ScoreBarRenderer).flatKsSteps;
+
+        for (var i = 0; i < naturalizeSymbols; i++) {
+            this.addPreBeatGlyph(new AlphaTab.Rendering.Glyphs.NaturalizeGlyph(0, this.getScoreY(previousKeyPositions[i] + offsetClef)));
+        }
+
+        // how many symbols do we need to get from a C-keysignature
+        // to the new one
+        //var offsetSymbols = (currentKey <= 7) ? currentKey : currentKey - 7;
+        // a sharp keysignature
+        if (Bridge.get(AlphaTab.Model.ModelUtils).keySignatureIsSharp(currentKey)) {
+            for (var i1 = 0; i1 < Math.abs(currentKey); i1++) {
+                this.addPreBeatGlyph(new AlphaTab.Rendering.Glyphs.SharpGlyph(0, this.getScoreY(Bridge.get(AlphaTab.Rendering.ScoreBarRenderer).sharpKsSteps[i1] + offsetClef)));
+            }
+        }
+        else  {
+            for (var i2 = 0; i2 < Math.abs(currentKey); i2++) {
+                this.addPreBeatGlyph(new AlphaTab.Rendering.Glyphs.FlatGlyph(0, this.getScoreY(Bridge.get(AlphaTab.Rendering.ScoreBarRenderer).flatKsSteps[i2] + offsetClef)));
+            }
+        }
+    },
+    createTimeSignatureGlyphs: function () {
+        this.addPreBeatGlyph(new AlphaTab.Rendering.Glyphs.SpacingGlyph(0, 0, 5 * this.getScale()));
+        this.addPreBeatGlyph(new AlphaTab.Rendering.Glyphs.TimeSignatureGlyph(0, this.getScoreY(0), this.bar.getMasterBar().timeSignatureNumerator, this.bar.getMasterBar().timeSignatureDenominator));
+    },
+    createVoiceGlyphs: function (v) {
+        for (var i = 0, j = v.beats.length; i < j; i++) {
+            var b = v.beats[i];
+            var container = new AlphaTab.Rendering.ScoreBeatContainerGlyph(b);
+            container.preNotes = new AlphaTab.Rendering.Glyphs.ScoreBeatPreNotesGlyph();
+            container.onNotes = new AlphaTab.Rendering.Glyphs.ScoreBeatGlyph();
+            (container.onNotes).beamingHelper = this._helpers.beamHelperLookup[v.index][b.index];
+            container.postNotes = new AlphaTab.Rendering.Glyphs.ScoreBeatPostNotesGlyph();
+            this.addBeatGlyph(container);
+        }
+    },
+    getNoteLine: function (n) {
+        return this.accidentalHelper.getNoteLine(n);
+    },
+    /**
+     * Gets the relative y position of the given steps relative to first line.
+     *
+     * @instance
+     * @public
+     * @this AlphaTab.Rendering.ScoreBarRenderer
+     * @memberof AlphaTab.Rendering.ScoreBarRenderer
+     * @param   {number}    steps         the amount of steps while 2 steps are one line
+     * @param   {number}    correction
+     * @return  {number}
+     */
+    getScoreY: function (steps, correction) {
+        if (correction === void 0) { correction = 0.0; }
+        return ((this.getLineOffset() / 2) * (steps + 2)) + (correction * this.getScale());
+    },
+    paintBackground: function (cx, cy, canvas) {
+        AlphaTab.Rendering.GroupedBarRenderer.prototype.paintBackground.call(this, cx, cy, canvas);
+        var res = this.getResources();
+
+        //
+        // draw string lines
+        //
+        canvas.setColor(res.staveLineColor);
+        var lineY = cy + this.y + this.getGlyphOverflow();
+
+        for (var i = 0; i < 5; i++) {
+            if (i > 0) {
+                lineY += this.getLineOffset();
+            }
+            canvas.beginPath();
+            canvas.moveTo(cx + this.x, lineY);
+            canvas.lineTo(cx + this.x + this.width, lineY);
+            canvas.stroke();
+        }
+
+        canvas.setColor(res.mainGlyphColor);
+    }
+});
+
+Bridge.define('AlphaTab.Rendering.RhythmBarRenderer', {
+    inherits: [AlphaTab.Rendering.GroupedBarRenderer],
+    statics: {
+        paintSingleBar: function (canvas, x1, y1, x2, y2, size) {
+            canvas.beginPath();
+            canvas.moveTo(x1, y1);
+            canvas.lineTo(x2, y2);
+            canvas.lineTo(x2, y2 - size);
+            canvas.lineTo(x1, y1 - size);
+            canvas.closePath();
+            canvas.fill();
+        }
+    },
+    _direction: 0,
+    _helpers: null,
+    constructor: function (bar, direction) {
+        AlphaTab.Rendering.GroupedBarRenderer.prototype.$constructor.call(this, bar);
+
+        this._direction = direction;
+    },
+    doLayout: function () {
+        this._helpers = this.stave.staveGroup.helpers.helpers[this.bar.track.index][this.bar.index];
+        AlphaTab.Rendering.GroupedBarRenderer.prototype.doLayout.call(this);
+        this.height = this.stave.getSetting(Bridge.Int)("rhythm-height", 24) * this.getScale();
+        this.isEmpty = false;
+    },
+    createBeatGlyphs: function () {
+        this.createVoiceGlyphs(this.bar.voices[0]);
+    },
+    createVoiceGlyphs: function (voice) {
+        for (var i = 0, j = voice.beats.length; i < j; i++) {
+            var b = voice.beats[i];
+            // we create empty glyphs as alignment references and to get the 
+            // effect bar sized
+            var container = new AlphaTab.Rendering.Glyphs.BeatContainerGlyph(b);
+            container.preNotes = new AlphaTab.Rendering.Glyphs.BeatGlyphBase();
+            container.onNotes = new AlphaTab.Rendering.Glyphs.BeatGlyphBase();
+            container.postNotes = new AlphaTab.Rendering.Glyphs.BeatGlyphBase();
+            this.addBeatGlyph(container);
+        }
+    },
+    paint: function (cx, cy, canvas) {
+        AlphaTab.Rendering.GroupedBarRenderer.prototype.paint.call(this, cx, cy, canvas);
+
+        for (var i = 0, j = this._helpers.beamHelpers.length; i < j; i++) {
+            var v = this._helpers.beamHelpers[i];
+            for (var k = 0, l = v.length; k < l; k++) {
+                this.paintBeamHelper(cx + this.getBeatGlyphsStart(), cy, canvas, v[k]);
+            }
+        }
+    },
+    paintBeamHelper: function (cx, cy, canvas, h) {
+        if (h.beats[0].graceType !== Bridge.get(AlphaTab.Model.GraceType).none) {
+            return;
+        }
+        var useBeams = this.stave.getSetting(Boolean)("use-beams", false);
+        // check if we need to paint simple footer
+        if (useBeams && h.beats.length === 1) {
+            this.paintFooter(cx, cy, canvas, h);
+        }
+        else  {
+            this.paintBar(cx, cy, canvas, h);
+        }
+    },
+    paintBar: function (cx, cy, canvas, h) {
+        for (var i = 0, j = h.beats.length; i < j; i++) {
+            var beat = h.beats[i];
+
+            if (h.hasBeatLineX(beat)) {
+                //
+                // draw line 
+                //
+                var beatLineX = h.getBeatLineX(beat) + this.getScale();
+
+                var y1 = cy + this.y;
+                var y2 = cy + this.y + this.height;
+
+                canvas.beginPath();
+                canvas.moveTo(cx + this.x + beatLineX, y1);
+                canvas.lineTo(cx + this.x + beatLineX, y2);
+                canvas.stroke();
+
+                var brokenBarOffset = (6 * this.getScale());
+                var barSpacing = (6 * this.getScale());
+                var barSize = (3 * this.getScale());
+                var barCount = AlphaTab.Model.ModelUtils.getIndex(beat.duration) - 2;
+                var barStart = cy + this.y;
+                if (this._direction === Bridge.get(AlphaTab.Rendering.Utils.BeamDirection).down) {
+                    barSpacing = -barSpacing;
+                    barStart += this.height;
+                }
+
+                for (var barIndex = 0; barIndex < barCount; barIndex++) {
+                    var barStartX;
+                    var barEndX;
+
+                    var barStartY;
+                    var barEndY;
+
+                    var barY = barStart + (barIndex * barSpacing);
+
+                    // 
+                    // Broken Bar to Next
+                    //
+                    if (h.beats.length === 1) {
+                        barStartX = beatLineX;
+                        barEndX = beatLineX + brokenBarOffset;
+                        barStartY = barY;
+                        barEndY = barY;
+                        Bridge.get(AlphaTab.Rendering.RhythmBarRenderer).paintSingleBar(canvas, cx + this.x + barStartX, barStartY, cx + this.x + barEndX, barEndY, barSize);
+                    }
+                    else  {
+                        if (i < h.beats.length - 1) {
+                            // full bar?
+                            if (this.isFullBarJoin(beat, h.beats[i + 1], barIndex)) {
+                                barStartX = beatLineX;
+                                barEndX = h.getBeatLineX(h.beats[i + 1]) + this.getScale();
+                            }
+                            else  {
+                                if (i === 0 || !this.isFullBarJoin(h.beats[i - 1], beat, barIndex)) {
+                                    barStartX = beatLineX;
+                                    barEndX = barStartX + brokenBarOffset;
+                                }
+                                else  {
+                                    continue;
+                                }
+                            }
+                            barStartY = barY;
+                            barEndY = barY;
+                            Bridge.get(AlphaTab.Rendering.RhythmBarRenderer).paintSingleBar(canvas, cx + this.x + barStartX, barStartY, cx + this.x + barEndX, barEndY, barSize);
+                        }
+                        else  {
+                            if (i > 0 && !this.isFullBarJoin(beat, h.beats[i - 1], barIndex)) {
+                                barStartX = beatLineX - brokenBarOffset;
+                                barEndX = beatLineX;
+
+                                barStartY = barY;
+                                barEndY = barY;
+
+                                Bridge.get(AlphaTab.Rendering.RhythmBarRenderer).paintSingleBar(canvas, cx + this.x + barStartX, barStartY, cx + this.x + barEndX, barEndY, barSize);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    paintFooter: function (cx, cy, canvas, h) {
+        var beat = h.beats[0];
+
+        if (beat.duration === Bridge.get(AlphaTab.Model.Duration).whole) {
+            return;
+        }
+
+        //
+        // draw line 
+        //
+
+        var beatLineX = h.getBeatLineX(beat) + this.getScale();
+
+        var topY = 0;
+        var bottomY = this.height;
+
+        var beamY = this._direction === Bridge.get(AlphaTab.Rendering.Utils.BeamDirection).down ? bottomY : topY;
+
+        canvas.beginPath();
+        canvas.moveTo(cx + this.x + beatLineX, cy + this.y + topY);
+        canvas.lineTo(cx + this.x + beatLineX, cy + this.y + bottomY);
+        canvas.stroke();
+
+
+        //
+        // Draw beam 
+        //
+        var glyph = new AlphaTab.Rendering.Glyphs.FooterGlyph(beatLineX, beamY, beat.duration, this._direction, false);
+        glyph.renderer = this;
+        glyph.doLayout();
+        glyph.paint(cx + this.x, cy + this.y, canvas);
+    },
+    isFullBarJoin: function (a, b, barIndex) {
+        return (AlphaTab.Model.ModelUtils.getIndex(a.duration) - 2 - barIndex > 0) && (AlphaTab.Model.ModelUtils.getIndex(b.duration) - 2 - barIndex > 0);
+    }
+});
+
+/**
+ * This BarRenderer renders a bar using guitar tablature notation
+ *
+ * @public
+ * @class AlphaTab.Rendering.TabBarRenderer
+ * @augments AlphaTab.Rendering.GroupedBarRenderer
+ */
+Bridge.define('AlphaTab.Rendering.TabBarRenderer', {
+    inherits: [AlphaTab.Rendering.GroupedBarRenderer],
+    statics: {
+        LineSpacing: 10
+    },
+    _helpers: null,
+    constructor: function (bar) {
+        AlphaTab.Rendering.GroupedBarRenderer.prototype.$constructor.call(this, bar);
+
+    },
+    getLineOffset: function () {
+        return ((11.0) * this.getScale());
+    },
+    getTopPadding: function () {
+        return this.getNumberOverflow();
+    },
+    getBottomPadding: function () {
+        return this.getNumberOverflow();
+    },
+    /**
+     * gets the padding needed to place numbers within the bounding box
+     *
+     * @instance
+     * @public
+     * @this AlphaTab.Rendering.TabBarRenderer
+     * @memberof AlphaTab.Rendering.TabBarRenderer
+     * @function getNumberOverflow
+     * @return  {number}
+     */
+    /**
+     * gets the padding needed to place numbers within the bounding box
+     *
+     * @instance
+     * @function setNumberOverflow
+     */
+    getNumberOverflow: function () {
+        var res = this.getResources();
+        return (res.tablatureFont.size / 2) + (res.tablatureFont.size * 0.2);
+    },
+    getNoteX: function (note, onEnd) {
+        if (onEnd === void 0) { onEnd = true; }
+        var beat = this.getOnNotesPosition(note.beat.voice.index, note.beat.index);
+        if (beat !== null) {
+            return beat.container.x + beat.x + beat.noteNumbers.getNoteX(note, onEnd);
+        }
+        return this.getPostBeatGlyphsStart();
+    },
+    getBeatX: function (beat) {
+        var bg = this.getPreNotesPosition(beat.voice.index, beat.index);
+        if (bg !== null) {
+            return bg.container.x + bg.x;
+        }
+        return 0;
+    },
+    getNoteY: function (note) {
+        var beat = this.getOnNotesPosition(note.beat.voice.index, note.beat.index);
+        if (beat !== null) {
+            return beat.noteNumbers.getNoteY(note);
+        }
+        return 0;
+    },
+    doLayout: function () {
+        this._helpers = this.stave.staveGroup.helpers.helpers[this.bar.track.index][this.bar.index];
+        AlphaTab.Rendering.GroupedBarRenderer.prototype.doLayout.call(this);
+        this.height = this.getLineOffset() * (this.bar.track.tuning.length - 1) + (this.getNumberOverflow() * 2);
+        if (this.index === 0) {
+            this.stave.registerStaveTop(this.getNumberOverflow());
+            this.stave.registerStaveBottom(this.height - this.getNumberOverflow());
+        }
+    },
+    createPreBeatGlyphs: function () {
+        if (this.bar.getMasterBar().isRepeatStart) {
+            this.addPreBeatGlyph(new AlphaTab.Rendering.Glyphs.RepeatOpenGlyph(0, 0, 1.5, 3));
+        }
+
+        // Clef
+        if (this.getIsFirstOfLine()) {
+            this.addPreBeatGlyph(new AlphaTab.Rendering.Glyphs.TabClefGlyph(0, 0));
+        }
+
+        this.addPreBeatGlyph(new AlphaTab.Rendering.Glyphs.BarNumberGlyph(0, this.getTabY(-3), this.bar.index + 1, !this.stave.isFirstInAccolade));
+
+        if (this.bar.getIsEmpty()) {
+            this.addPreBeatGlyph(new AlphaTab.Rendering.Glyphs.SpacingGlyph(0, 0, 30 * this.getScale(), false));
+        }
+    },
+    createBeatGlyphs: function () {
+        this.createVoiceGlyphs(this.bar.voices[0]);
+    },
+    createVoiceGlyphs: function (v) {
+        for (var i = 0, j = v.beats.length; i < j; i++) {
+            var b = v.beats[i];
+            var container = new AlphaTab.Rendering.Glyphs.TabBeatContainerGlyph(b);
+            container.preNotes = new AlphaTab.Rendering.Glyphs.TabBeatPreNotesGlyph();
+            container.onNotes = new AlphaTab.Rendering.Glyphs.TabBeatGlyph();
+            (container.onNotes).beamingHelper = this._helpers.beamHelperLookup[v.index][b.index];
+            container.postNotes = new AlphaTab.Rendering.Glyphs.TabBeatPostNotesGlyph();
+            this.addBeatGlyph(container);
+        }
+    },
+    createPostBeatGlyphs: function () {
+        if (this.bar.getMasterBar().getIsRepeatEnd()) {
+            this.addPostBeatGlyph(new AlphaTab.Rendering.Glyphs.RepeatCloseGlyph(this.x, 0));
+            if (this.bar.getMasterBar().repeatCount > 2) {
+                var line = this.getIsLast() || this.getIsLastOfLine() ? -1 : -4;
+                this.addPostBeatGlyph(new AlphaTab.Rendering.Glyphs.RepeatCountGlyph(0, this.getTabY(line, -3), this.bar.getMasterBar().repeatCount));
+            }
+        }
+        else  {
+            if (this.bar.getMasterBar().isDoubleBar) {
+                this.addPostBeatGlyph(new AlphaTab.Rendering.Glyphs.BarSeperatorGlyph(0, 0));
+                this.addPostBeatGlyph(new AlphaTab.Rendering.Glyphs.SpacingGlyph(0, 0, 3 * this.getScale(), false));
+                this.addPostBeatGlyph(new AlphaTab.Rendering.Glyphs.BarSeperatorGlyph(0, 0));
+            }
+            else  {
+                if (this.bar.nextBar === null || !this.bar.nextBar.getMasterBar().isRepeatStart) {
+                    this.addPostBeatGlyph(new AlphaTab.Rendering.Glyphs.BarSeperatorGlyph(0, 0, this.getIsLast()));
+                }
+            }
+        }
+    },
+    /**
+     * Gets the relative y position of the given steps relative to first line.
+     *
+     * @instance
+     * @public
+     * @this AlphaTab.Rendering.TabBarRenderer
+     * @memberof AlphaTab.Rendering.TabBarRenderer
+     * @param   {number}    line          the amount of steps while 2 steps are one line
+     * @param   {number}    correction
+     * @return  {number}
+     */
+    getTabY: function (line, correction) {
+        if (correction === void 0) { correction = 0.0; }
+        return (this.getLineOffset() * line) + (correction * this.getScale());
+    },
+    paintBackground: function (cx, cy, canvas) {
+        AlphaTab.Rendering.GroupedBarRenderer.prototype.paintBackground.call(this, cx, cy, canvas);
+
+        var res = this.getResources();
+
+        //
+        // draw string lines
+        //
+        canvas.setColor(res.staveLineColor);
+        var lineY = cy + this.y + this.getNumberOverflow();
+
+        for (var i = 0, j = this.bar.track.tuning.length; i < j; i++) {
+            if (i > 0) {
+                lineY += this.getLineOffset();
+            }
+            canvas.beginPath();
+            canvas.moveTo(cx + this.x, lineY);
+            canvas.lineTo(cx + this.x + this.width, lineY);
+            canvas.stroke();
+        }
+
+        canvas.setColor(res.mainGlyphColor);
+
+        // Info guides for debugging
+
+        //DrawInfoGuide(canvas, cx, cy, 0, new Color(255, 0, 0)); // top
+        //DrawInfoGuide(canvas, cx, cy, stave.StaveTop, new Color(0, 255, 0)); // stavetop
+        //DrawInfoGuide(canvas, cx, cy, stave.StaveBottom, new Color(0,255,0)); // stavebottom
+        //DrawInfoGuide(canvas, cx, cy, Height, new Color(255, 0, 0)); // bottom
+    }
+});
+
+/**
+ * This is the base public class for creating factories providing BarRenderers
+ *
+ * @abstract
+ * @public
+ * @class AlphaTab.Rendering.BarRendererFactory
+ */
+Bridge.define('AlphaTab.Rendering.BarRendererFactory', {
+    config: {
+        properties: {
+            isInAccolade: false,
+            hideOnMultiTrack: false
+        }
+    },
+    constructor: function () {
+        this.isInAccolade = true;
+        this.hideOnMultiTrack = false;
+    },
+    canCreate: function (track) {
+        return true;
+    }
+});
+
+/**
+ * This Factory produces TabBarRenderer instances
+ *
+ * @public
+ * @class AlphaTab.Rendering.TabBarRendererFactory
+ * @augments AlphaTab.Rendering.BarRendererFactory
+ */
+Bridge.define('AlphaTab.Rendering.TabBarRendererFactory', {
+    inherits: [AlphaTab.Rendering.BarRendererFactory],
+    canCreate: function (track) {
+        return track.tuning.length > 0;
+    },
+    create: function (bar) {
+        return new AlphaTab.Rendering.TabBarRenderer(bar);
+    }
+});
+
+/**
+ * This Factory procudes ScoreBarRenderer instances
+ *
+ * @public
+ * @class AlphaTab.Rendering.ScoreBarRendererFactory
+ * @augments AlphaTab.Rendering.BarRendererFactory
+ */
+Bridge.define('AlphaTab.Rendering.ScoreBarRendererFactory', {
+    inherits: [AlphaTab.Rendering.BarRendererFactory],
+    create: function (bar) {
+        return new AlphaTab.Rendering.ScoreBarRenderer(bar);
+    }
+});
+
+Bridge.define('AlphaTab.Rendering.RhythmBarRendererFactory', {
+    inherits: [AlphaTab.Rendering.BarRendererFactory],
+    _direction: 0,
+    constructor: function (direction) {
+        AlphaTab.Rendering.BarRendererFactory.prototype.$constructor.call(this);
+
+        this._direction = direction;
+        this.isInAccolade = false;
+        this.hideOnMultiTrack = false;
+    },
+    create: function (bar) {
+        return new AlphaTab.Rendering.RhythmBarRenderer(bar, this._direction);
+    }
+});
+
+Bridge.define('AlphaTab.Rendering.EffectBarRendererFactory', {
+    inherits: [AlphaTab.Rendering.BarRendererFactory],
+    _info: null,
+    constructor: function (info) {
+        AlphaTab.Rendering.BarRendererFactory.prototype.$constructor.call(this);
+
+        this._info = info;
+        this.isInAccolade = false;
+        this.hideOnMultiTrack = info.getHideOnMultiTrack();
+    },
+    create: function (bar) {
+        return new AlphaTab.Rendering.EffectBarRenderer(bar, this._info);
+    }
+});
+
+/**
+ * This Factory procudes AlternateEndingsBar instances
+ *
+ * @public
+ * @class AlphaTab.Rendering.AlternateEndingsBarRendererFactory
+ * @augments AlphaTab.Rendering.BarRendererFactory
+ */
+Bridge.define('AlphaTab.Rendering.AlternateEndingsBarRendererFactory', {
+    inherits: [AlphaTab.Rendering.BarRendererFactory],
+    constructor: function () {
+        AlphaTab.Rendering.BarRendererFactory.prototype.$constructor.call(this);
+
+        this.isInAccolade = false;
+    },
+    create: function (bar) {
+        return new AlphaTab.Rendering.AlternateEndingsBarRenderer(bar);
+    }
+});
+
+/**
+ * Lists all sizing types of the effect bar glyphs
+ *
+ * @public
+ * @class AlphaTab.Rendering.EffectBarGlyphSizing
+ */
+Bridge.define('AlphaTab.Rendering.EffectBarGlyphSizing', {
+    statics: {
+        singlePreBeatOnly: 0,
+        singlePreBeatToOnBeat: 1,
+        singlePreBeatToPostBeat: 2,
+        singleOnBeatOnly: 3,
+        singleOnBeatToPostBeat: 4,
+        singlePostBeatOnly: 5,
+        groupedPreBeatOnly: 6,
+        groupedPreBeatToOnBeat: 7,
+        groupedPreBeatToPostBeat: 8,
+        groupedOnBeatOnly: 9,
+        groupedOnBeatToPostBeat: 10,
+        groupedPostBeatOnly: 11
+    },
+    $enum: true
+});
+
+Bridge.define('AlphaTab.Rendering.Glyphs.MusicFontSymbol', {
+    statics: {
+        none: -1,
+        clefG: 57424,
+        clefC: 57436,
+        clefF: 57442,
+        clefNeutral: 57449,
+        restWhole: 58595,
+        restHalf: 58596,
+        restQuarter: 58597,
+        restEighth: 58598,
+        restSixteenth: 58599,
+        restThirtySecond: 58600,
+        restSixtyFourth: 58601,
+        graceUp: 57815,
+        graceDown: 57816,
+        trill: 58726,
+        num0: 57472,
+        num1: 57473,
+        num2: 57474,
+        num3: 57475,
+        num4: 57476,
+        num5: 57477,
+        num6: 57478,
+        num7: 57479,
+        num8: 57480,
+        num9: 57481,
+        noteWhole: 57506,
+        noteHalf: 57507,
+        noteQuarter: 57508,
+        noteDead: 57514,
+        noteHarmonic: 57564,
+        noteRideCymbal: 57566,
+        noteHiHat: 57523,
+        noteSideStick: 57513,
+        noteHiHatHalf: 57591,
+        noteChineseCymbal: 57593,
+        footerUpEighth: 57920,
+        footerDownEighth: 57921,
+        footerUpSixteenth: 57922,
+        footerDownSixteenth: 57923,
+        footerUpThirtySecond: 57924,
+        footerDownThirtySecond: 57925,
+        footerUpSixtyFourth: 57926,
+        footerDownSixtyFourth: 57927,
+        dynamicPPP: 58666,
+        dynamicPP: 58667,
+        dynamicP: 58656,
+        dynamicMP: 58668,
+        dynamicMF: 58669,
+        dynamicF: 58658,
+        dynamicFF: 58671,
+        dynamicFFF: 58672,
+        accentuation: 58528,
+        heavyAccentuation: 58540,
+        waveHorizontal: 60068,
+        pickStrokeDown: 58896,
+        pickStrokeUp: 58898,
+        tremoloPickingThirtySecond: 57890,
+        tremoloPickingSixteenth: 57889,
+        tremoloPickingEighth: 57888,
+        tempo: 57813,
+        accidentalFlat: 57952,
+        accidentalNatural: 57953,
+        accidentalSharp: 57954
+    },
+    $enum: true
+});
+
+Bridge.define('AlphaTab.Rendering.Utils.BeamDirection', {
+    statics: {
+        up: 0,
+        down: 1
+    },
+    $enum: true
+});
+
+/** @namespace AlphaTab.Rendering.Glyphs */
+
+/**
+ * A glyph is a single symbol which can be added to a GlyphBarRenderer for automated
+ layouting and drawing of stacked symbols.
+ *
+ * @public
+ * @class AlphaTab.Rendering.Glyphs.Glyph
+ */
+Bridge.define('AlphaTab.Rendering.Glyphs.Glyph', {
+    config: {
+        properties: {
+            index: 0,
+            x: 0,
+            y: 0,
+            width: 0,
+            renderer: null
+        }
+    },
+    constructor: function (x, y) {
+        this.x = x;
+        this.y = y;
+    },
+    getCanScale: function () {
+        return true;
+    },
+    getScale: function () {
+        return this.renderer.getScale();
+>>>>>>> 2f0ca88... Fixed wrong alternate ending parsing in GPX parser, adjusted alternate ending renderer to also use correct siging mechanism. (fixes #76)
     },
     EndRender: function (){
         var result = this._canvas;
@@ -5054,7 +22499,114 @@ AlphaTab.Importer.GpxParser.prototype = {
                         break;
                 }
             }
+<<<<<<< HEAD
         }));
+=======
+        }
+    }
+});
+
+/**
+ * This bar renderer can render repeat endings.
+ *
+ * @public
+ * @class AlphaTab.Rendering.AlternateEndingsBarRenderer
+ * @augments AlphaTab.Rendering.GroupedBarRenderer
+ */
+Bridge.define('AlphaTab.Rendering.AlternateEndingsBarRenderer', {
+    inherits: [AlphaTab.Rendering.GroupedBarRenderer],
+    statics: {
+        Padding: 3
+    },
+    _endings: null,
+    _endingsString: null,
+    constructor: function (bar) {
+        AlphaTab.Rendering.GroupedBarRenderer.prototype.$constructor.call(this, bar);
+
+        var alternateEndings = this.bar.getMasterBar().alternateEndings;
+        this._endings = [];
+        for (var i = 0; i < Bridge.get(AlphaTab.Model.MasterBar).MaxAlternateEndings; i++) {
+            if ((alternateEndings & (1 << i)) !== 0) {
+                this._endings.push(i);
+            }
+        }
+    },
+    getTopPadding: function () {
+        return 0;
+    },
+    getBottomPadding: function () {
+        return 0;
+    },
+    finalizeRenderer: function (layout) {
+        AlphaTab.Rendering.GroupedBarRenderer.prototype.finalizeRenderer.call(this, layout);
+        this.isEmpty = this._endings.length === 0;
+    },
+    createBeatGlyphs: function () {
+        this.createVoiceGlyphs(this.bar.voices[0]);
+    },
+    createVoiceGlyphs: function (voice) {
+        for (var i = 0, j = voice.beats.length; i < j; i++) {
+            var b = voice.beats[i];
+            // we create empty glyphs as alignment references and to get the 
+            // effect bar sized
+            var container = new AlphaTab.Rendering.Glyphs.BeatContainerGlyph(b);
+            container.preNotes = new AlphaTab.Rendering.Glyphs.BeatGlyphBase();
+            container.onNotes = new AlphaTab.Rendering.Glyphs.BeatGlyphBase();
+            container.postNotes = new AlphaTab.Rendering.Glyphs.BeatGlyphBase();
+            this.addBeatGlyph(container);
+        }
+    },
+    doLayout: function () {
+        AlphaTab.Rendering.GroupedBarRenderer.prototype.doLayout.call(this);
+        if (this.index === 0) {
+            this.stave.topSpacing = 5;
+            this.stave.bottomSpacing = 4;
+        }
+        this.height = this.getResources().wordsFont.size;
+
+        var endingsStrings = [];
+        for (var i = 0, j = this._endings.length; i < j; i++) {
+            endingsStrings.push(this._endings[i] + 1);
+            endingsStrings.push(". ");
+        }
+        this._endingsString = endingsStrings.join('');
+    },
+    applySizes: function (sizes) {
+        AlphaTab.Rendering.GroupedBarRenderer.prototype.applySizes.call(this, sizes);
+        this.width = sizes.fullWidth;
+    },
+    paint: function (cx, cy, canvas) {
+        AlphaTab.Rendering.GroupedBarRenderer.prototype.paint.call(this, cx, cy, canvas);
+
+        if (this._endings.length > 0) {
+            var res = this.getResources();
+            canvas.setFont(res.wordsFont);
+            canvas.moveTo(cx + this.x, cy + this.y + this.height);
+            canvas.lineTo(cx + this.x, cy + this.y);
+            canvas.lineTo(cx + this.x + this.width, cy + this.y);
+            canvas.stroke();
+
+            canvas.fillText(this._endingsString, cx + this.x + Bridge.get(AlphaTab.Rendering.AlternateEndingsBarRenderer).Padding * this.getScale(), cy + this.y * this.getScale());
+        }
+    }
+});
+
+/**
+ * A public class implementing this public interface can provide the 
+ data needed by a EffectBarRenderer to create effect glyphs dynamically.
+ *
+ * @abstract
+ * @public
+ * @class AlphaTab.Rendering.IEffectBarRendererInfo
+ */
+Bridge.define('AlphaTab.Rendering.IEffectBarRendererInfo');
+
+Bridge.define('AlphaTab.Rendering.Effects.NoteEffectInfoBase', {
+    inherits: [AlphaTab.Rendering.IEffectBarRendererInfo],
+    lastCreateInfo: null,
+    getHideOnMultiTrack: function () {
+        return false;
+>>>>>>> 2f0ca88... Fixed wrong alternate ending parsing in GPX parser, adjusted alternate ending renderer to also use correct siging mechanism. (fixes #76)
     },
     ParseAutomation: function (node){
         var type = null;
