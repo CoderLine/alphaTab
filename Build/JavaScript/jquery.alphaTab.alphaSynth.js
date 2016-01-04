@@ -60,13 +60,19 @@
         element.data('alphaSynthCursorCache', renderer.BuildBoundingsLookup());
     }
 
-    // updates the cursors to highlight the beat at the specified tick position
-    api.playerCursorUpdateTick = function(element, context, tick) {
-        var cache = element.data('alphaSynthTickCache');
+	// gets or creats the tick cache 
+	function getOrCreateTickCache(element, context) {
+		var cache = element.data('alphaSynthTickCache');
         if(!cache) {
             playerTickUpdateCache(element, context);
             cache = element.data('alphaSynthTickCache');
         }
+		return cache;		
+	}
+	
+    // updates the cursors to highlight the beat at the specified tick position
+    api.playerCursorUpdateTick = function(element, context, tick) {
+        var cache = getOrCreateTickCache(element, context);
         
         var tracks = api.tracks(element, context);
         if(tracks.length > 0) {
@@ -219,7 +225,12 @@
                 var relY = e.pageY - parentOffset.top;
                 var beat = api.getBeatAtPos(element, context, relX, relY);
                 api.playerCursorUpdateBeat(element, context, beat);
-                as.SetPositionTick(beat.Voice.Bar.get_MasterBar().Start + beat.Start);
+				
+				var masterBar = beat.Voice.Bar.get_MasterBar();
+				var tickCache = getOrCreateTickCache(element, context);
+				var realMasterBarStart = tickCache.GetMasterBarStart(masterBar);
+				
+                as.SetPositionTick(realMasterBarStart + beat.Start);
             });
         }        
     }

@@ -2260,7 +2260,7 @@ AlphaTab.Audio.MidiUtils.BuildTickLookup = function (score){
             bar.Bar = score.MasterBars[index];
             bar.Start = currentTick;
             bar.End = bar.Start + bar.Bar.CalculateDuration();
-            lookup.Bars.push(bar);
+            lookup.AddBar(bar);
         }
         controller.MoveNext();
     }
@@ -2369,7 +2369,9 @@ AlphaTab.Audio.Model.BarTickLookup = function (){
 AlphaTab.Audio.Model.MidiTickLookup = function (){
     this._lastBeat = null;
     this.Bars = null;
+    this.BarLookup = null;
     this.Bars = [];
+    this.BarLookup = {};
 };
 AlphaTab.Audio.Model.MidiTickLookup.prototype = {
     FindBeat: function (track, tick){
@@ -2436,6 +2438,18 @@ AlphaTab.Audio.Model.MidiTickLookup.prototype = {
             }
         }
         return null;
+    },
+    GetMasterBarStart: function (bar){
+        if (!this.BarLookup.hasOwnProperty(bar.Index)){
+            return 0;
+        }
+        return this.BarLookup[bar.Index].Start;
+    },
+    AddBar: function (bar){
+        this.Bars.push(bar);
+        if (!this.BarLookup.hasOwnProperty(bar.Bar.Index)){
+            this.BarLookup[bar.Bar.Index] = bar;
+        }
     }
 };
 AlphaTab.Audio.Model.MidiTrack = function (){

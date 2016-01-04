@@ -104,7 +104,7 @@ namespace AlphaTab.Audio
                     bar.Bar = score.MasterBars[index];
                     bar.Start = currentTick;
                     bar.End = bar.Start + bar.Bar.CalculateDuration();
-                    lookup.Bars.Add(bar);
+                    lookup.AddBar(bar);
                 }
                 controller.MoveNext();
             }

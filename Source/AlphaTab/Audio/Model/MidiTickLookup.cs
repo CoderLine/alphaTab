@@ -33,10 +33,12 @@ namespace AlphaTab.Audio.Model
         private Beat _lastBeat;
 
         public FastList<BarTickLookup> Bars { get; set; }
+        public FastDictionary<int, BarTickLookup> BarLookup { get; set; }
 
         public MidiTickLookup()
         {
             Bars = new FastList<BarTickLookup>();
+            BarLookup = new FastDictionary<int, BarTickLookup>();
         }
 
         public Beat FindBeat(Track track, int tick)
@@ -127,6 +129,24 @@ namespace AlphaTab.Audio.Model
             }
 
             return null;
+        }
+
+        public int GetMasterBarStart(MasterBar bar)
+        {
+            if (!BarLookup.ContainsKey(bar.Index))
+            {
+                return 0;
+            }
+            return BarLookup[bar.Index].Start;
+        }
+
+        public void AddBar(BarTickLookup bar)
+        {
+            Bars.Add(bar);
+            if (!BarLookup.ContainsKey(bar.Bar.Index))
+            {
+                BarLookup[bar.Bar.Index] = bar;
+            }
         }
     }
 }
