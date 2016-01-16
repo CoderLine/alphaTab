@@ -36,7 +36,6 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            var r = (TabBarRenderer)Renderer;
             // calculate offsets per step
             var dX = Width / BendPoint.MaxPosition;
             var maxValue = 0;
@@ -56,21 +55,19 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 var firstPt = _note.BendPoints[i];
                 var secondPt = _note.BendPoints[i + 1];
-                var isFirst = i == 0;
-                if (isFirst && firstPt.Value != 0)
+                if (i == 0 && firstPt.Value != 0)
                 {
-                    PaintBend(new BendPoint(), firstPt, true, cx, cy, dX, canvas);
-                    isFirst = false;
+                    PaintBend(new BendPoint(), firstPt, cx, cy, dX, canvas);
                 }
 
                 // don't draw a line if there's no offset and it's the last point
                 if (firstPt.Value == secondPt.Value && i == _note.BendPoints.Count - 2) continue;
 
-                PaintBend(firstPt, secondPt, isFirst, cx, cy, dX, canvas);
+                PaintBend(firstPt, secondPt,  cx, cy, dX, canvas);
             }
         }
 
-        private void PaintBend(BendPoint firstPt, BendPoint secondPt, bool isFirst, float cx, float cy, float dX, ICanvas canvas)
+        private void PaintBend(BendPoint firstPt, BendPoint secondPt, float cx, float cy, float dX, ICanvas canvas)
         {
             var r = (TabBarRenderer)Renderer;
             var res = Renderer.Resources;
@@ -79,7 +76,7 @@ namespace AlphaTab.Rendering.Glyphs
 
             var x1 = cx + (dX * firstPt.Offset);
             var y1 = cy - (_bendValueHeight * firstPt.Value);
-            if (isFirst)
+            if (firstPt.Value == 0)
             {
                 y1 += r.GetNoteY(_note);
             }
@@ -89,7 +86,14 @@ namespace AlphaTab.Rendering.Glyphs
             }
             var x2 = cx + (dX * secondPt.Offset);
             var y2 = cy - (_bendValueHeight * secondPt.Value);
-            y2 += overflowOffset;
+            if (secondPt.Value == 0)
+            {
+                y2 += r.GetNoteY(_note);
+            }
+            else
+            {
+                y2 += overflowOffset;
+            }
 
             if (firstPt.Value == secondPt.Value)
             {

@@ -9808,7 +9808,6 @@ AlphaTab.Rendering.Glyphs.BendGlyph = function (n, width, bendValueHeight){
 };
 AlphaTab.Rendering.Glyphs.BendGlyph.prototype = {
     Paint: function (cx, cy, canvas){
-        var r = this.Renderer;
         // calculate offsets per step
         var dX = this.Width / 60;
         var maxValue = 0;
@@ -9823,24 +9822,22 @@ AlphaTab.Rendering.Glyphs.BendGlyph.prototype = {
         for (var i = 0,j = this._note.BendPoints.length - 1; i < j; i++){
             var firstPt = this._note.BendPoints[i];
             var secondPt = this._note.BendPoints[i + 1];
-            var isFirst = i == 0;
-            if (isFirst && firstPt.Value != 0){
-                this.PaintBend(new AlphaTab.Model.BendPoint(0, 0), firstPt, true, cx, cy, dX, canvas);
-                isFirst = false;
+            if (i == 0 && firstPt.Value != 0){
+                this.PaintBend(new AlphaTab.Model.BendPoint(0, 0), firstPt, cx, cy, dX, canvas);
             }
             // don't draw a line if there's no offset and it's the last point
             if (firstPt.Value == secondPt.Value && i == this._note.BendPoints.length - 2)
                 continue;
-            this.PaintBend(firstPt, secondPt, isFirst, cx, cy, dX, canvas);
+            this.PaintBend(firstPt, secondPt, cx, cy, dX, canvas);
         }
     },
-    PaintBend: function (firstPt, secondPt, isFirst, cx, cy, dX, canvas){
+    PaintBend: function (firstPt, secondPt, cx, cy, dX, canvas){
         var r = this.Renderer;
         var res = this.Renderer.get_Resources();
         var overflowOffset = r.get_LineOffset() / 2;
         var x1 = cx + (dX * firstPt.Offset);
         var y1 = cy - (this._bendValueHeight * firstPt.Value);
-        if (isFirst){
+        if (firstPt.Value == 0){
             y1 += r.GetNoteY(this._note);
         }
         else {
@@ -9848,7 +9845,12 @@ AlphaTab.Rendering.Glyphs.BendGlyph.prototype = {
         }
         var x2 = cx + (dX * secondPt.Offset);
         var y2 = cy - (this._bendValueHeight * secondPt.Value);
-        y2 += overflowOffset;
+        if (secondPt.Value == 0){
+            y2 += r.GetNoteY(this._note);
+        }
+        else {
+            y2 += overflowOffset;
+        }
         if (firstPt.Value == secondPt.Value){
             // draw horizontal line
             canvas.MoveTo(x1, y1);
