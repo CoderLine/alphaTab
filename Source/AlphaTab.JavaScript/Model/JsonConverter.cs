@@ -258,7 +258,7 @@ namespace AlphaTab.Model
                                 {
                                     var point = new BendPoint();
                                     BendPoint.CopyTo(note.BendPoints[i], point);
-                                    note2.BendPoints.Add(point);
+                                    note2.AddBendPoint(point);
                                 }
                             }
 

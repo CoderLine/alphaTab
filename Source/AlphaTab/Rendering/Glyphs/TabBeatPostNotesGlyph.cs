@@ -50,9 +50,10 @@ namespace AlphaTab.Rendering.Glyphs
 
             if (n.HasBend)
             {
-                var bendHeight = 60 * Scale;
+                var bendValueHeight = 6;
+                var bendHeight = n.MaxBendPoint.Value * bendValueHeight;
                 Renderer.RegisterOverflowTop(bendHeight);
-                AddGlyph(new BendGlyph(n, BeatDurationWidth * Scale, bendHeight));
+                AddGlyph(new BendGlyph(n, BeatDurationWidth * Scale, bendValueHeight));
             }
         }
     }

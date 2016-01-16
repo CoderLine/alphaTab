@@ -258,6 +258,9 @@ $StaticConstructor(function (){
     AlphaTab.Environment.StaveFactories["fade-in"] = function (l){
         return new AlphaTab.Rendering.EffectBarRendererFactory(new AlphaTab.Rendering.Effects.FadeInEffectInfo());
     };
+    AlphaTab.Environment.StaveFactories["harmonics"] = function (l){
+        return new AlphaTab.Rendering.EffectBarRendererFactory(new AlphaTab.Rendering.Effects.HarmonicsEffectInfo());
+    };
     AlphaTab.Environment.StaveFactories["let-ring"] = function (l){
         return new AlphaTab.Rendering.EffectBarRendererFactory(new AlphaTab.Rendering.Effects.LetRingEffectInfo());
     };
@@ -435,7 +438,7 @@ AlphaTab.Model.JsonConverter.prototype = {
                             for (var i = 0; i < note.BendPoints.length; i++){
                                 var point = new AlphaTab.Model.BendPoint(0, 0);
                                 AlphaTab.Model.BendPoint.CopyTo(note.BendPoints[i], point);
-                                note2.BendPoints.push(point);
+                                note2.AddBendPoint(point);
                             }
                         }
                     }
@@ -1463,6 +1466,7 @@ AlphaTab.Settings.get_Defaults = function (){
     settings.Staves.push(new AlphaTab.StaveSettings("note-vibrato"));
     settings.Staves.push(new AlphaTab.StaveSettings("tap"));
     settings.Staves.push(new AlphaTab.StaveSettings("fade-in"));
+    settings.Staves.push(new AlphaTab.StaveSettings("harmonics"));
     settings.Staves.push(new AlphaTab.StaveSettings("let-ring"));
     settings.Staves.push(new AlphaTab.StaveSettings("palm-mute"));
     settings.Staves.push(new AlphaTab.StaveSettings("tab"));
@@ -3298,15 +3302,14 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
         // string done
         // read effects
         var note = new AlphaTab.Model.Note();
-        this.NoteEffects(note);
-        // create note
+        beat.AddNote(note);
         note.String = this._track.Tuning.length - (string - 1);
         note.IsDead = isDead;
         note.IsTieDestination = isTie;
         if (!isTie){
             note.Fret = fret;
         }
-        beat.AddNote(note);
+        this.NoteEffects(note);
     },
     NoteEffects: function (note){
         if (this._sy != AlphaTab.Importer.AlphaTexSymbols.LBrace){
@@ -3328,7 +3331,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                         this.Error("bend-effect-value", AlphaTab.Importer.AlphaTexSymbols.Number, true);
                     }
                     var bendValue = (this._syData);
-                    note.BendPoints.push(new AlphaTab.Model.BendPoint(0, (Math.abs(bendValue))));
+                    note.AddBendPoint(new AlphaTab.Model.BendPoint(0, (Math.abs(bendValue))));
                     this.NewSy();
                 }
                 while (note.BendPoints.length > 60){
@@ -3373,12 +3376,11 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                 this.NewSy();
                 if ((this._syData).toString().toLowerCase() == "ob"){
                     note.Beat.GraceType = AlphaTab.Model.GraceType.OnBeat;
+                    this.NewSy();
                 }
                 else {
                     note.Beat.GraceType = AlphaTab.Model.GraceType.BeforeBeat;
                 }
-                // \gr fret duration transition
-                this.NewSy();
             }
             else if (syData == "tr"){
                 this.NewSy();
@@ -3469,6 +3471,11 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
             else if (syData == "lr"){
                 this.NewSy();
                 note.IsLetRing = true;
+            }
+            else if (syData == "x"){
+                this.NewSy();
+                note.Fret = 0;
+                note.IsDead = true;
             }
             else if (this.ApplyBeatEffect(note.Beat)){
                 // Success
@@ -4435,7 +4442,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
                 // 0..12 (amount of quarters)
                 this.ReadBool();
                 // vibrato
-                note.BendPoints.push(point);
+                note.AddBendPoint(point);
             }
         }
     },
@@ -5831,19 +5838,17 @@ AlphaTab.Importer.GpxParser.prototype = {
                 bendOrigin = new AlphaTab.Model.BendPoint(0, 0);
             if (bendDestination == null)
                 bendDestination = new AlphaTab.Model.BendPoint(60, 0);
-            var bend = [];
-            bend.push(bendOrigin);
+            note.AddBendPoint(bendOrigin);
             if (bendMiddleOffset1 != null && bendMiddleValue != null){
-                bend.push(new AlphaTab.Model.BendPoint(bendMiddleOffset1, bendMiddleValue));
+                note.AddBendPoint(new AlphaTab.Model.BendPoint(bendMiddleOffset1, bendMiddleValue));
             }
             if (bendMiddleOffset2 != null && bendMiddleValue != null){
-                bend.push(new AlphaTab.Model.BendPoint(bendMiddleOffset2, bendMiddleValue));
+                note.AddBendPoint(new AlphaTab.Model.BendPoint(bendMiddleOffset2, bendMiddleValue));
             }
             if (bendMiddleOffset1 == null && bendMiddleOffset2 == null && bendMiddleValue != null){
-                bend.push(new AlphaTab.Model.BendPoint(30, bendMiddleValue));
+                note.AddBendPoint(new AlphaTab.Model.BendPoint(30, bendMiddleValue));
             }
-            bend.push(bendDestination);
-            note.BendPoints = bend;
+            note.AddBendPoint(bendDestination);
         }
     },
     ToBendValue: function (gpxValue){
@@ -7289,6 +7294,7 @@ AlphaTab.Model.NoteAccidentalMode = {
 AlphaTab.Model.Note = function (){
     this.Accentuated = AlphaTab.Model.AccentuationType.None;
     this.BendPoints = null;
+    this.MaxBendPoint = null;
     this.Fret = 0;
     this.String = 0;
     this.IsHammerPullOrigin = false;
@@ -7337,6 +7343,9 @@ AlphaTab.Model.Note.prototype = {
     get_HasBend: function (){
         return this.BendPoints.length > 0;
     },
+    get_IsHarmonic: function (){
+        return this.HarmonicType != AlphaTab.Model.HarmonicType.None;
+    },
     get_TrillFret: function (){
         return this.TrillValue - this.get_StringTuning();
     },
@@ -7355,9 +7364,15 @@ AlphaTab.Model.Note.prototype = {
         var n = new AlphaTab.Model.Note();
         AlphaTab.Model.Note.CopyTo(this, n);
         for (var i = 0,j = this.BendPoints.length; i < j; i++){
-            n.BendPoints.push(this.BendPoints[i].Clone());
+            n.AddBendPoint(this.BendPoints[i].Clone());
         }
         return n;
+    },
+    AddBendPoint: function (point){
+        this.BendPoints.push(point);
+        if (this.MaxBendPoint == null || point.Value > this.MaxBendPoint.Value){
+            this.MaxBendPoint = point;
+        }
     },
     Finish: function (){
         var nextNoteOnLine = new AlphaTab.Util.Lazy($CreateAnonymousDelegate(this, function (){
@@ -9145,6 +9160,48 @@ AlphaTab.Rendering.Effects.FingeringEffectInfo.prototype = {
     }
 };
 $Inherit(AlphaTab.Rendering.Effects.FingeringEffectInfo, AlphaTab.Rendering.Effects.NoteEffectInfoBase);
+AlphaTab.Rendering.Effects.HarmonicsEffectInfo = function (){
+    this._beat = null;
+    this._beatType = AlphaTab.Model.HarmonicType.None;
+    AlphaTab.Rendering.Effects.NoteEffectInfoBase.call(this);
+};
+AlphaTab.Rendering.Effects.HarmonicsEffectInfo.prototype = {
+    ShouldCreateGlyphForNote: function (renderer, note){
+        if (!note.get_IsHarmonic())
+            return false;
+        if (note.Beat != this._beat || note.HarmonicType > this._beatType){
+            this._beatType = note.HarmonicType;
+        }
+        return true;
+    },
+    GetHeight: function (renderer){
+        return 20 * renderer.get_Scale();
+    },
+    get_SizingMode: function (){
+        return AlphaTab.Rendering.EffectBarGlyphSizing.SingleOnBeatToPostBeat;
+    },
+    CreateNewGlyph: function (renderer, beat){
+        return new AlphaTab.Rendering.Glyphs.TextGlyph(0, 0, AlphaTab.Rendering.Effects.HarmonicsEffectInfo.HarmonicToString(this._beatType), renderer.get_Resources().EffectFont, AlphaTab.Platform.Model.TextAlign.Left);
+    }
+};
+AlphaTab.Rendering.Effects.HarmonicsEffectInfo.HarmonicToString = function (type){
+    switch (type){
+        case AlphaTab.Model.HarmonicType.Natural:
+            return "N.H.";
+        case AlphaTab.Model.HarmonicType.Artificial:
+            return "A.H.";
+        case AlphaTab.Model.HarmonicType.Pinch:
+            return "P.H.";
+        case AlphaTab.Model.HarmonicType.Tap:
+            return "T.H.";
+        case AlphaTab.Model.HarmonicType.Semi:
+            return "S.H.";
+        case AlphaTab.Model.HarmonicType.Feedback:
+            return "Fdbk.";
+    }
+    return "";
+};
+$Inherit(AlphaTab.Rendering.Effects.HarmonicsEffectInfo, AlphaTab.Rendering.Effects.NoteEffectInfoBase);
 AlphaTab.Rendering.Effects.LetRingEffectInfo = function (){
     AlphaTab.Rendering.Effects.NoteEffectInfoBase.call(this);
 };
@@ -9741,18 +9798,17 @@ AlphaTab.Rendering.Glyphs.BeatGlyphBase.prototype = {
     }
 };
 $Inherit(AlphaTab.Rendering.Glyphs.BeatGlyphBase, AlphaTab.Rendering.Glyphs.GlyphGroup);
-AlphaTab.Rendering.Glyphs.BendGlyph = function (n, width, height){
+AlphaTab.Rendering.Glyphs.BendGlyph = function (n, width, bendValueHeight){
     this._note = null;
-    this._height = 0;
+    this._bendValueHeight = 0;
     AlphaTab.Rendering.Glyphs.Glyph.call(this, 0, 0);
     this._note = n;
     this.Width = width;
-    this._height = height;
+    this._bendValueHeight = bendValueHeight;
 };
 AlphaTab.Rendering.Glyphs.BendGlyph.prototype = {
     Paint: function (cx, cy, canvas){
         var r = this.Renderer;
-        var res = this.Renderer.get_Resources();
         // calculate offsets per step
         var dX = this.Width / 60;
         var maxValue = 0;
@@ -9761,84 +9817,119 @@ AlphaTab.Rendering.Glyphs.BendGlyph.prototype = {
                 maxValue = this._note.BendPoints[i].Value;
             }
         }
-        var dY = maxValue == 0 ? 0 : this._height / maxValue;
-        var xx = cx + this.X;
-        var yy = cy + this.Y + r.GetNoteY(this._note);
+        cx += this.X;
+        cy += this.Y;
         canvas.BeginPath();
         for (var i = 0,j = this._note.BendPoints.length - 1; i < j; i++){
             var firstPt = this._note.BendPoints[i];
             var secondPt = this._note.BendPoints[i + 1];
+            var isFirst = i == 0;
+            if (isFirst && firstPt.Value != 0){
+                this.PaintBend(new AlphaTab.Model.BendPoint(0, 0), firstPt, true, cx, cy, dX, canvas);
+                isFirst = false;
+            }
             // don't draw a line if there's no offset and it's the last point
             if (firstPt.Value == secondPt.Value && i == this._note.BendPoints.length - 2)
                 continue;
-            var x1 = xx + (dX * firstPt.Offset);
-            var y1 = yy - (dY * firstPt.Value);
-            var x2 = xx + (dX * secondPt.Offset);
-            var y2 = yy - (dY * secondPt.Value);
-            if (firstPt.Value == secondPt.Value){
-                // draw horizontal line
+            this.PaintBend(firstPt, secondPt, isFirst, cx, cy, dX, canvas);
+        }
+    },
+    PaintBend: function (firstPt, secondPt, isFirst, cx, cy, dX, canvas){
+        var r = this.Renderer;
+        var res = this.Renderer.get_Resources();
+        var overflowOffset = r.get_LineOffset() / 2;
+        var x1 = cx + (dX * firstPt.Offset);
+        var y1 = cy - (this._bendValueHeight * firstPt.Value);
+        if (isFirst){
+            y1 += r.GetNoteY(this._note);
+        }
+        else {
+            y1 += overflowOffset;
+        }
+        var x2 = cx + (dX * secondPt.Offset);
+        var y2 = cy - (this._bendValueHeight * secondPt.Value);
+        y2 += overflowOffset;
+        if (firstPt.Value == secondPt.Value){
+            // draw horizontal line
+            canvas.MoveTo(x1, y1);
+            canvas.LineTo(x2, y2);
+            canvas.Stroke();
+        }
+        else {
+            if (x2 > x1){
+                // draw bezier lien from first to second point
+                canvas.MoveTo(x1, y1);
+                canvas.BezierCurveTo(x2, y1, x2, y2, x2, y2);
+                canvas.Stroke();
+            }
+            else {
                 canvas.MoveTo(x1, y1);
                 canvas.LineTo(x2, y2);
                 canvas.Stroke();
             }
-            else {
-                // draw bezier lien from first to second point
-                var hx = x1 + (x2 - x1);
-                var hy = yy - (dY * firstPt.Value);
-                canvas.MoveTo(x1, y1);
-                canvas.BezierCurveTo(hx, hy, x2, y2, x2, y2);
-                canvas.Stroke();
+        }
+        // what type of arrow? (up/down)
+        var arrowSize = 6 * this.get_Scale();
+        if (secondPt.Value > firstPt.Value){
+            canvas.BeginPath();
+            canvas.MoveTo(x2, y2);
+            canvas.LineTo(x2 - arrowSize * 0.5, y2 + arrowSize);
+            canvas.LineTo(x2 + arrowSize * 0.5, y2 + arrowSize);
+            canvas.ClosePath();
+            canvas.Fill();
+        }
+        else if (secondPt.Value != firstPt.Value){
+            canvas.BeginPath();
+            canvas.MoveTo(x2, y2);
+            canvas.LineTo(x2 - arrowSize * 0.5, y2 - arrowSize);
+            canvas.LineTo(x2 + arrowSize * 0.5, y2 - arrowSize);
+            canvas.ClosePath();
+            canvas.Fill();
+        }
+        canvas.Stroke();
+        if (secondPt.Value != 0){
+            var dV = secondPt.Value;
+            var up = secondPt.Value > firstPt.Value;
+            dV = Math.abs(dV);
+            // calculate label
+            var s = "";
+            // Full Steps
+            if (dV == 4 && up){
+                s = "full";
+                dV -= 4;
             }
-            // what type of arrow? (up/down)
-            var arrowSize = 6 * this.get_Scale();
-            if (secondPt.Value > firstPt.Value){
-                canvas.BeginPath();
-                canvas.MoveTo(x2, y2);
-                canvas.LineTo(x2 - arrowSize * 0.5, y2 + arrowSize);
-                canvas.LineTo(x2 + arrowSize * 0.5, y2 + arrowSize);
-                canvas.ClosePath();
-                canvas.Fill();
+            else if (dV >= 4){
+                var steps = (dV / 4) | 0;
+                s += steps;
+                // Quaters
+                dV -= steps * 4;
             }
-            else if (secondPt.Value != firstPt.Value){
-                canvas.BeginPath();
-                canvas.MoveTo(x2, y2);
-                canvas.LineTo(x2 - arrowSize * 0.5, y2 - arrowSize);
-                canvas.LineTo(x2 + arrowSize * 0.5, y2 - arrowSize);
-                canvas.ClosePath();
-                canvas.Fill();
+            if (dV > 0){
+                s += this.GetFractionSign(dV);
             }
-            canvas.Stroke();
-            if (secondPt.Value != 0){
-                var dV = (secondPt.Value - firstPt.Value);
-                var up = dV > 0;
-                dV = Math.abs(dV);
-                // calculate label
-                var s = "";
-                // Full Steps
-                if (dV == 4){
-                    s = "full";
-                    dV -= 4;
+            if (s != ""){
+                if (!up){
+                    s = "-" + s;
                 }
-                else if (dV > 4){
-                    s += (dV / 4) | 0 + " ";
-                    // Quaters
-                    dV -= (dV / 4) | 0;
-                }
-                if (dV > 0){
-                    s += dV + "/4";
-                }
-                if (s != ""){
-                    if (!up){
-                        s = "-" + s;
-                    }
-                    // draw label
-                    canvas.set_Font(res.TablatureFont);
-                    var size = canvas.MeasureText(s);
-                    var y = up ? y2 - res.TablatureFont.Size - (2 * this.get_Scale()) : y2 + (2 * this.get_Scale());
-                    var x = x2 - size / 2;
-                    canvas.FillText(s, x, y);
-                }
+                // draw label
+                canvas.set_Font(res.TablatureFont);
+                var size = canvas.MeasureText(s);
+                var y = up ? y2 - res.TablatureFont.Size - (2 * this.get_Scale()) : y2 + (2 * this.get_Scale());
+                var x = x2 - size / 2;
+                canvas.FillText(s, x, y);
             }
+        }
+    },
+    GetFractionSign: function (steps){
+        switch (steps){
+            case 1:
+                return "¼";
+            case 2:
+                return "½";
+            case 3:
+                return "¾";
+            default:
+                return steps + "/ 4";
         }
     }
 };
@@ -11718,9 +11809,10 @@ AlphaTab.Rendering.Glyphs.TabBeatPostNotesGlyph.prototype = {
             this.AddGlyph(trillNumberGlyph);
         }
         if (n.get_HasBend()){
-            var bendHeight = 60 * this.get_Scale();
+            var bendValueHeight = 6;
+            var bendHeight = n.MaxBendPoint.Value * bendValueHeight;
             this.Renderer.RegisterOverflowTop(bendHeight);
-            this.AddGlyph(new AlphaTab.Rendering.Glyphs.BendGlyph(n, this.get_BeatDurationWidth() * this.get_Scale(), bendHeight));
+            this.AddGlyph(new AlphaTab.Rendering.Glyphs.BendGlyph(n, this.get_BeatDurationWidth() * this.get_Scale(), bendValueHeight));
         }
     }
 };
@@ -13919,35 +14011,37 @@ AlphaTab.Rendering.Staves.StaveGroup.prototype = {
             canvas.set_Font(res.EffectFont);
             for (var i = 0,j = this.Staves.length; i < j; i++){
                 var g = this.Staves[i];
-                var firstStart = cy + g.FirstStaveInAccolade.Y + g.FirstStaveInAccolade.StaveTop + g.FirstStaveInAccolade.TopSpacing + g.FirstStaveInAccolade.get_TopOverflow();
-                var lastEnd = cy + g.LastStaveInAccolade.Y + g.LastStaveInAccolade.TopSpacing + g.LastStaveInAccolade.get_TopOverflow() + g.LastStaveInAccolade.StaveBottom;
-                var acooladeX = cx + g.FirstStaveInAccolade.X;
-                var barSize = (3 * this.Layout.Renderer.Settings.Scale);
-                var barOffset = barSize;
-                var accoladeStart = firstStart - (barSize * 4);
-                var accoladeEnd = lastEnd + (barSize * 4);
-                // text
-                if (this.Index == 0){
-                    canvas.FillText(g.Track.ShortName, cx + (10 * this.Layout.get_Scale()), firstStart);
+                if (g.FirstStaveInAccolade != null && g.LastStaveInAccolade != null){
+                    var firstStart = cy + g.FirstStaveInAccolade.Y + g.FirstStaveInAccolade.StaveTop + g.FirstStaveInAccolade.TopSpacing + g.FirstStaveInAccolade.get_TopOverflow();
+                    var lastEnd = cy + g.LastStaveInAccolade.Y + g.LastStaveInAccolade.TopSpacing + g.LastStaveInAccolade.get_TopOverflow() + g.LastStaveInAccolade.StaveBottom;
+                    var acooladeX = cx + g.FirstStaveInAccolade.X;
+                    var barSize = (3 * this.Layout.Renderer.Settings.Scale);
+                    var barOffset = barSize;
+                    var accoladeStart = firstStart - (barSize * 4);
+                    var accoladeEnd = lastEnd + (barSize * 4);
+                    // text
+                    if (this.Index == 0){
+                        canvas.FillText(g.Track.ShortName, cx + (10 * this.Layout.get_Scale()), firstStart);
+                    }
+                    // rect
+                    canvas.FillRect(acooladeX - barOffset - barSize, accoladeStart, barSize, accoladeEnd - accoladeStart);
+                    var spikeStartX = acooladeX - barOffset - barSize;
+                    var spikeEndX = acooladeX + barSize * 2;
+                    // top spike
+                    canvas.BeginPath();
+                    canvas.MoveTo(spikeStartX, accoladeStart);
+                    canvas.BezierCurveTo(spikeStartX, accoladeStart, spikeStartX, accoladeStart, spikeEndX, accoladeStart - barSize);
+                    canvas.BezierCurveTo(acooladeX, accoladeStart + barSize, spikeStartX, accoladeStart + barSize, spikeStartX, accoladeStart + barSize);
+                    canvas.ClosePath();
+                    canvas.Fill();
+                    // bottom spike 
+                    canvas.BeginPath();
+                    canvas.MoveTo(spikeStartX, accoladeEnd);
+                    canvas.BezierCurveTo(spikeStartX, accoladeEnd, acooladeX, accoladeEnd, spikeEndX, accoladeEnd + barSize);
+                    canvas.BezierCurveTo(acooladeX, accoladeEnd - barSize, spikeStartX, accoladeEnd - barSize, spikeStartX, accoladeEnd - barSize);
+                    canvas.ClosePath();
+                    canvas.Fill();
                 }
-                // rect
-                canvas.FillRect(acooladeX - barOffset - barSize, accoladeStart, barSize, accoladeEnd - accoladeStart);
-                var spikeStartX = acooladeX - barOffset - barSize;
-                var spikeEndX = acooladeX + barSize * 2;
-                // top spike
-                canvas.BeginPath();
-                canvas.MoveTo(spikeStartX, accoladeStart);
-                canvas.BezierCurveTo(spikeStartX, accoladeStart, spikeStartX, accoladeStart, spikeEndX, accoladeStart - barSize);
-                canvas.BezierCurveTo(acooladeX, accoladeStart + barSize, spikeStartX, accoladeStart + barSize, spikeStartX, accoladeStart + barSize);
-                canvas.ClosePath();
-                canvas.Fill();
-                // bottom spike 
-                canvas.BeginPath();
-                canvas.MoveTo(spikeStartX, accoladeEnd);
-                canvas.BezierCurveTo(spikeStartX, accoladeEnd, acooladeX, accoladeEnd, spikeEndX, accoladeEnd + barSize);
-                canvas.BezierCurveTo(acooladeX, accoladeEnd - barSize, spikeStartX, accoladeEnd - barSize, spikeStartX, accoladeEnd - barSize);
-                canvas.ClosePath();
-                canvas.Fill();
             }
         }
     },

@@ -36,7 +36,7 @@ namespace AlphaTab.Rendering
         {
         }
 
-        private float LineOffset
+        public float LineOffset
         {
             get
             {

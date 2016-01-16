@@ -1,10 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using AlphaTab.Collections;
 using AlphaTab.Importer;
+using AlphaTab.IO;
 using AlphaTab.Model;
+using AlphaTab.Rendering;
+using AlphaTab.Rendering.Effects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AlphaTab.Test.Importer
@@ -12,6 +19,13 @@ namespace AlphaTab.Test.Importer
     [TestClass]
     public class AlphaTexImporterTest
     {
+        private Score ParseTex(string tex)
+        {
+            var import = new AlphaTexImporter();
+            import.Init(new StreamWrapper(new MemoryStream(Encoding.UTF8.GetBytes(tex))));
+            return import.ReadScore();
+        }
+
         [TestMethod]
         public void EnsureMetadataParsing_Issue73()
         {
@@ -26,7 +40,7 @@ namespace AlphaTab.Test.Importer
                         .
                         0.5.2 1.5.4 3.4.4 | 5.3.8 5.3.8 5.3.8 5.3.8 r.2";
 
-            var score = ScoreLoader.LoadScoreFromBytes(Encoding.UTF8.GetBytes(tex));
+            var score = ParseTex(tex);
 
             Assert.AreEqual("Test", score.Title);
             Assert.AreEqual("test", score.Words);
@@ -87,5 +101,192 @@ namespace AlphaTab.Test.Importer
             }
 
         }
+
+        [TestMethod]
+        public void DeadNotes1_Issue79()
+        {
+            var tex = @":4 x.3";
+
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(1, score.Tracks.Count);
+            Assert.AreEqual(1, score.MasterBars.Count);
+            Assert.AreEqual(1, score.Tracks[0].Bars[0].Voices[0].Beats.Count);
+            Assert.AreEqual(0, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[0].Fret);
+            Assert.AreEqual(true, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[0].IsDead);
+        }
+
+        [TestMethod]
+        public void DeadNotes2_Issue79()
+        {
+            var tex = @":4 3.3{x}";
+
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(1, score.Tracks.Count);
+            Assert.AreEqual(1, score.MasterBars.Count);
+            Assert.AreEqual(1, score.Tracks[0].Bars[0].Voices[0].Beats.Count);
+            Assert.AreEqual(0, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[0].Fret);
+            Assert.AreEqual(true, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[0].IsDead);
+        }
+
+        [TestMethod]
+        public void Trill_Issue79()
+        {
+            var tex = @":4 3.3{tr 5 16}";
+
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(1, score.Tracks.Count);
+            Assert.AreEqual(1, score.MasterBars.Count);
+            Assert.AreEqual(1, score.Tracks[0].Bars[0].Voices[0].Beats.Count);
+            Assert.AreEqual(3, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[0].Fret);
+            Assert.AreEqual(true, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[0].IsTrill);
+            Assert.AreEqual(Duration.Sixteenth, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[0].TrillSpeed);
+            Assert.AreEqual(5, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[0].TrillFret);
+        }
+
+        [TestMethod]
+        public void Tremolo_Issue79()
+        {
+            var tex = @":4 3.3{tr 5 16}";
+
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(1, score.Tracks.Count);
+            Assert.AreEqual(1, score.MasterBars.Count);
+            Assert.AreEqual(1, score.Tracks[0].Bars[0].Voices[0].Beats.Count);
+            Assert.AreEqual(3, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[0].Fret);
+            Assert.AreEqual(true, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[0].IsTrill);
+            Assert.AreEqual(Duration.Sixteenth, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[0].TrillSpeed);
+            Assert.AreEqual(5, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[0].TrillFret);
+        }
+
+        [TestMethod]
+        public void TremoloPicking_Issue79()
+        {
+            var tex = @":4 3.3{tp 16}";
+
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(1, score.Tracks.Count);
+            Assert.AreEqual(1, score.MasterBars.Count);
+            Assert.AreEqual(1, score.Tracks[0].Bars[0].Voices[0].Beats.Count);
+            Assert.AreEqual(3, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[0].Fret);
+            Assert.AreEqual(true, score.Tracks[0].Bars[0].Voices[0].Beats[0].IsTremolo);
+            Assert.AreEqual(Duration.Sixteenth, score.Tracks[0].Bars[0].Voices[0].Beats[0].TremoloSpeed.Value);
+        }
+
+        [TestMethod]
+        public void Hamonics_Issue79()
+        {
+            var tex = @":8 3.3{nh} 3.3{ah} 3.3{th} 3.3{ph} 3.3{sh}";
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(1, score.Tracks.Count);
+            Assert.AreEqual(1, score.MasterBars.Count);
+            Assert.AreEqual(5, score.Tracks[0].Bars[0].Voices[0].Beats.Count);
+            Assert.AreEqual(HarmonicType.Natural, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[0].HarmonicType);
+            Assert.AreEqual(HarmonicType.Artificial, score.Tracks[0].Bars[0].Voices[0].Beats[1].Notes[0].HarmonicType);
+            Assert.AreEqual(HarmonicType.Tap, score.Tracks[0].Bars[0].Voices[0].Beats[2].Notes[0].HarmonicType);
+            Assert.AreEqual(HarmonicType.Pinch, score.Tracks[0].Bars[0].Voices[0].Beats[3].Notes[0].HarmonicType);
+            Assert.AreEqual(HarmonicType.Semi, score.Tracks[0].Bars[0].Voices[0].Beats[4].Notes[0].HarmonicType);
+        }
+
+        [TestMethod]
+        public void HamonicsRenderingText_Issue79()
+        {
+            var tex = @":8 3.3{nh} 3.3{ah} 3.3{th} 3.3{ph} 3.3{sh}";
+            var score = ParseTex(tex);
+
+            var settings = Settings.Defaults;
+            settings.Engine = "svg";
+            settings.Staves = new FastList<StaveSettings>
+            {
+                new StaveSettings("harmonics")
+            };
+
+            var renderer = new ScoreRenderer(settings, null);
+            var svg = "";
+            renderer.PartialRenderFinished += r =>
+            {
+                svg += r.RenderResult.ToString();
+            };
+            renderer.Render(score.Tracks[0]);
+
+            var regexTemplate = @"<text[^>]+>\s*{0}\s*</text>";
+
+            Assert.IsTrue(Regex.IsMatch(svg, string.Format(regexTemplate, HarmonicsEffectInfo.HarmonicToString(HarmonicType.Natural))));
+            Assert.IsTrue(Regex.IsMatch(svg, string.Format(regexTemplate, HarmonicsEffectInfo.HarmonicToString(HarmonicType.Artificial))));
+            Assert.IsTrue(Regex.IsMatch(svg, string.Format(regexTemplate, HarmonicsEffectInfo.HarmonicToString(HarmonicType.Tap))));
+            Assert.IsTrue(Regex.IsMatch(svg, string.Format(regexTemplate, HarmonicsEffectInfo.HarmonicToString(HarmonicType.Pinch))));
+            Assert.IsTrue(Regex.IsMatch(svg, string.Format(regexTemplate, HarmonicsEffectInfo.HarmonicToString(HarmonicType.Semi))));
+        }
+
+        [TestMethod]
+        public void Grace_Issue79()
+        {
+            var tex = @":8 3.3{gr} 3.3{gr ob}";
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(1, score.Tracks.Count);
+            Assert.AreEqual(1, score.MasterBars.Count);
+            Assert.AreEqual(2, score.Tracks[0].Bars[0].Voices[0].Beats.Count);
+            Assert.AreEqual(GraceType.BeforeBeat, score.Tracks[0].Bars[0].Voices[0].Beats[0].GraceType);
+            Assert.AreEqual(GraceType.OnBeat, score.Tracks[0].Bars[0].Voices[0].Beats[1].GraceType);
+        }
+
+
+        [TestMethod]
+        public void BendRendering_Issue79()
+        {
+            var tex = @":4 15.6{b(0 4)} 18.6{b(0 6)} 17.6{b(0 8)} 16.6{b(0 3 0)} | 15.6{b(0 8 1)} 14.6{b(0 4)} 13.6{b(0 4 6)} 14.6{b(0 4 0)}";
+            var score = ParseTex(tex);
+
+            var settings = Settings.Defaults;
+            settings.Engine = "svg";
+            settings.Staves = new FastList<StaveSettings>
+            {
+                new StaveSettings("tab")
+            };
+
+            var renderer = new ScoreRenderer(settings, null);
+            var partials = new List<string>();
+            renderer.PartialRenderFinished += r =>
+            {
+                partials.Add(r.RenderResult.ToString());
+            };
+            renderer.Render(score.Tracks[0]);
+
+            var tab = XDocument.Parse(partials[1]);
+
+            var texts = tab.Descendants(XName.Get("text", "http://www.w3.org/2000/svg")).ToArray();
+
+            var expectedTexts = new[]
+            {
+                "T", "A", "B", // clef
+
+                "1", // bar number
+
+                "15", "full",
+                "18", "1½",
+                "17", "2",
+                "16", "¾",
+
+                "2", // bar number
+
+                "15", "2", "-1¾",
+                "14", "full", 
+                "13", "full", "½",
+                "14", "full"
+            };
+
+            for (int i = 0; i < expectedTexts.Length; i++)
+            {
+                var text = texts[i].Value.Trim();
+                Assert.AreEqual(expectedTexts[i], text, "Mismatch at index {0}", i);
+            }
+        }
+
     }
 }

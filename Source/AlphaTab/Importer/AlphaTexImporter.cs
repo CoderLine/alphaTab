@@ -999,9 +999,7 @@ namespace AlphaTab.Importer
 
             // read effects
             var note = new Note();
-            NoteEffects(note);
-
-            // create note
+            beat.AddNote(note);
             note.String = _track.Tuning.Length - (@string - 1);
             note.IsDead = isDead;
             note.IsTieDestination = isTie;
@@ -1010,7 +1008,8 @@ namespace AlphaTab.Importer
                 note.Fret = fret;
             }
 
-            beat.AddNote(note);
+            NoteEffects(note);
+
         }
         private void NoteEffects(Note note)
         {
@@ -1041,7 +1040,7 @@ namespace AlphaTab.Importer
                             Error("bend-effect-value", AlphaTexSymbols.Number);
                         }
                         var bendValue = (int)_syData;
-                        note.BendPoints.Add(new BendPoint(0, (Math.Abs(bendValue))));
+                        note.AddBendPoint(new BendPoint(0, (Math.Abs(bendValue))));
                         NewSy();
                     }
 
@@ -1100,13 +1099,12 @@ namespace AlphaTab.Importer
                     if (_syData.ToString().ToLower() == "ob")
                     {
                         note.Beat.GraceType = GraceType.OnBeat;
+                        NewSy();
                     }
                     else
                     {
                         note.Beat.GraceType = GraceType.BeforeBeat;
                     }
-                    // \gr fret duration transition
-                    NewSy();
                 }
                 else if (syData == "tr")
                 {
@@ -1216,6 +1214,12 @@ namespace AlphaTab.Importer
                 {
                     NewSy();
                     note.IsLetRing = true;
+                }
+                else if (syData == "x")
+                {
+                    NewSy();
+                    note.Fret = 0;
+                    note.IsDead = true;
                 }
                 else if (ApplyBeatEffect(note.Beat)) // also try beat effects
                 {

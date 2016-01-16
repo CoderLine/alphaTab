@@ -96,6 +96,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\DynamicsEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\FadeInEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\FingeringEffectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\HarmonicsEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\LetRingEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\MarkerEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\NoteEffectInfoBase.cs" />

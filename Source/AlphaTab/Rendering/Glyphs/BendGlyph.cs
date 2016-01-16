@@ -24,20 +24,19 @@ namespace AlphaTab.Rendering.Glyphs
     public class BendGlyph : Glyph
     {
         private readonly Note _note;
-        private readonly float _height;
+        private readonly float _bendValueHeight;
 
-        public BendGlyph(Note n, float width, float height)
+        public BendGlyph(Note n, float width, float bendValueHeight)
             : base(0, 0)
         {
             _note = n;
             Width = width;
-            _height = height;
+            _bendValueHeight = bendValueHeight;
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             var r = (TabBarRenderer)Renderer;
-            var res = Renderer.Resources;
             // calculate offsets per step
             var dX = Width / BendPoint.MaxPosition;
             var maxValue = 0;
@@ -49,108 +48,154 @@ namespace AlphaTab.Rendering.Glyphs
                 }
             }
 
-            var dY = maxValue == 0 ? 0 : _height / maxValue;
-
-            var xx = cx + X;
-            var yy = cy + Y + r.GetNoteY(_note);
+            cx += X;
+            cy += Y;
 
             canvas.BeginPath();
             for (int i = 0, j = _note.BendPoints.Count - 1; i < j; i++)
             {
                 var firstPt = _note.BendPoints[i];
                 var secondPt = _note.BendPoints[i + 1];
+                var isFirst = i == 0;
+                if (isFirst && firstPt.Value != 0)
+                {
+                    PaintBend(new BendPoint(), firstPt, true, cx, cy, dX, canvas);
+                    isFirst = false;
+                }
 
                 // don't draw a line if there's no offset and it's the last point
                 if (firstPt.Value == secondPt.Value && i == _note.BendPoints.Count - 2) continue;
 
-                var x1 = xx + (dX * firstPt.Offset);
-                var y1 = yy - (dY * firstPt.Value);
-                var x2 = xx + (dX * secondPt.Offset);
-                var y2 = yy - (dY * secondPt.Value);
+                PaintBend(firstPt, secondPt, isFirst, cx, cy, dX, canvas);
+            }
+        }
 
-                if (firstPt.Value == secondPt.Value)
+        private void PaintBend(BendPoint firstPt, BendPoint secondPt, bool isFirst, float cx, float cy, float dX, ICanvas canvas)
+        {
+            var r = (TabBarRenderer)Renderer;
+            var res = Renderer.Resources;
+
+            var overflowOffset = r.LineOffset / 2;
+
+            var x1 = cx + (dX * firstPt.Offset);
+            var y1 = cy - (_bendValueHeight * firstPt.Value);
+            if (isFirst)
+            {
+                y1 += r.GetNoteY(_note);
+            }
+            else
+            {
+                y1 += overflowOffset;
+            }
+            var x2 = cx + (dX * secondPt.Offset);
+            var y2 = cy - (_bendValueHeight * secondPt.Value);
+            y2 += overflowOffset;
+
+            if (firstPt.Value == secondPt.Value)
+            {
+                // draw horizontal line
+                canvas.MoveTo(x1, y1);
+                canvas.LineTo(x2, y2);
+                canvas.Stroke();
+            }
+            else
+            {
+                if (x2 > x1)
                 {
-                    // draw horizontal line
+                    // draw bezier lien from first to second point
                     canvas.MoveTo(x1, y1);
-                    canvas.LineTo(x2, y2);
+                    canvas.BezierCurveTo(x2, y1, x2, y2, x2, y2);
                     canvas.Stroke();
                 }
                 else
                 {
-                    // draw bezier lien from first to second point
-                    var hx = x1 + (x2 - x1);
-                    var hy = yy - (dY * firstPt.Value);
                     canvas.MoveTo(x1, y1);
-                    canvas.BezierCurveTo(hx, hy, x2, y2, x2, y2);
+                    canvas.LineTo(x2, y2);
                     canvas.Stroke();
                 }
+            }
 
 
 
-                // what type of arrow? (up/down)
-                var arrowSize = 6 * Scale;
-                if (secondPt.Value > firstPt.Value)
+            // what type of arrow? (up/down)
+            var arrowSize = 6 * Scale;
+            if (secondPt.Value > firstPt.Value)
+            {
+                canvas.BeginPath();
+                canvas.MoveTo(x2, y2);
+                canvas.LineTo(x2 - arrowSize * 0.5f, y2 + arrowSize);
+                canvas.LineTo(x2 + arrowSize * 0.5f, y2 + arrowSize);
+                canvas.ClosePath();
+                canvas.Fill();
+            }
+            else if (secondPt.Value != firstPt.Value)
+            {
+                canvas.BeginPath();
+                canvas.MoveTo(x2, y2);
+                canvas.LineTo(x2 - arrowSize * 0.5f, y2 - arrowSize);
+                canvas.LineTo(x2 + arrowSize * 0.5f, y2 - arrowSize);
+                canvas.ClosePath();
+                canvas.Fill();
+            }
+            canvas.Stroke();
+
+            if (secondPt.Value != 0)
+            {
+                var dV = secondPt.Value;
+                var up = secondPt.Value > firstPt.Value;
+                dV = Math.Abs(dV);
+
+                // calculate label
+                var s = "";
+                // Full Steps
+                if (dV == 4 && up)
                 {
-                    canvas.BeginPath();
-                    canvas.MoveTo(x2, y2);
-                    canvas.LineTo(x2 - arrowSize * 0.5f, y2 + arrowSize);
-                    canvas.LineTo(x2 + arrowSize * 0.5f, y2 + arrowSize);
-                    canvas.ClosePath();
-                    canvas.Fill();
+                    s = "full";
+                    dV -= 4;
                 }
-                else if (secondPt.Value != firstPt.Value)
+                else if (dV >= 4)
                 {
-                    canvas.BeginPath();
-                    canvas.MoveTo(x2, y2);
-                    canvas.LineTo(x2 - arrowSize * 0.5f, y2 - arrowSize);
-                    canvas.LineTo(x2 + arrowSize * 0.5f, y2 - arrowSize);
-                    canvas.ClosePath();
-                    canvas.Fill();
+                    int steps = dV / 4;
+                    s += steps;
+                    // Quaters
+                    dV -= steps * 4;
                 }
-                canvas.Stroke();
 
-                if (secondPt.Value != 0)
+                if (dV > 0)
                 {
-                    var dV = (secondPt.Value - firstPt.Value);
-                    var up = dV > 0;
-                    dV = Math.Abs(dV);
-
-                    // calculate label
-                    var s = "";
-                    // Full Steps
-                    if (dV == 4)
-                    {
-                        s = "full";
-                        dV -= 4;
-                    }
-                    else if (dV > 4)
-                    {
-                        s += dV / 4 + " ";
-                        // Quaters
-                        dV -= dV / 4;
-                    }
-
-                    if (dV > 0)
-                    {
-                        s += dV + "/4";
-                    }
-
-                    if (s != "")
-                    {
-                        if (!up)
-                        {
-                            s = "-" + s;
-                        }
-
-                        // draw label
-                        canvas.Font = res.TablatureFont;
-                        var size = canvas.MeasureText(s);
-                        var y = up ? y2 - res.TablatureFont.Size - (2 * Scale) : y2 + (2 * Scale);
-                        var x = x2 - size / 2;
-
-                        canvas.FillText(s, x, y);
-                    }
+                    s += GetFractionSign(dV);
                 }
+
+                if (s != "")
+                {
+                    if (!up)
+                    {
+                        s = "-" + s;
+                    }
+
+                    // draw label
+                    canvas.Font = res.TablatureFont;
+                    var size = canvas.MeasureText(s);
+                    var y = up ? y2 - res.TablatureFont.Size - (2 * Scale) : y2 + (2 * Scale);
+                    var x = x2 - size / 2;
+
+                    canvas.FillText(s, x, y);
+                }
+            }
+        }
+
+        private string GetFractionSign(int steps)
+        {
+            switch (steps)
+            {
+                case 1:
+                    return "¼";
+                case 2:
+                    return "½";
+                case 3:
+                    return "¾";
+                default:
+                    return steps + "/ 4";
             }
         }
     }

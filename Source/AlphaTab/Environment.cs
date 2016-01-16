@@ -70,6 +70,7 @@ namespace AlphaTab
             StaveFactories["dynamics"] = l => new EffectBarRendererFactory(new DynamicsEffectInfo());
             StaveFactories["tap"] = l => new EffectBarRendererFactory(new TapEffectInfo());
             StaveFactories["fade-in"] = l => new EffectBarRendererFactory(new FadeInEffectInfo());
+            StaveFactories["harmonics"] = l => new EffectBarRendererFactory(new HarmonicsEffectInfo());
             StaveFactories["let-ring"] = l => new EffectBarRendererFactory(new LetRingEffectInfo());
             StaveFactories["palm-mute"] = l => new EffectBarRendererFactory(new PalmMuteEffectInfo());
             StaveFactories["tab"] = l => new TabBarRendererFactory();

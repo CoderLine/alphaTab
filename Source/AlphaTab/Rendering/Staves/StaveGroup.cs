@@ -308,46 +308,49 @@ namespace AlphaTab.Rendering.Staves
                 for (int i = 0, j = Staves.Count; i < j; i++)
                 {
                     var g = Staves[i];
-                    var firstStart = cy + g.FirstStaveInAccolade.Y + g.FirstStaveInAccolade.StaveTop + g.FirstStaveInAccolade.TopSpacing + g.FirstStaveInAccolade.TopOverflow;
-                    var lastEnd = cy + g.LastStaveInAccolade.Y + g.LastStaveInAccolade.TopSpacing + g.LastStaveInAccolade.TopOverflow
-                                         + g.LastStaveInAccolade.StaveBottom;
-
-                    var acooladeX = cx + g.FirstStaveInAccolade.X;
-
-                    var barSize = (3 * Layout.Renderer.Settings.Scale);
-                    var barOffset = barSize;
-
-                    var accoladeStart = firstStart - (barSize * 4);
-                    var accoladeEnd = lastEnd + (barSize * 4);
-
-                    // text
-                    if (Index == 0)
+                    if(g.FirstStaveInAccolade != null && g.LastStaveInAccolade != null)
                     {
-                        canvas.FillText(g.Track.ShortName, cx + (AccoladeLabelSpacing * Layout.Scale), firstStart);
+                        var firstStart = cy + g.FirstStaveInAccolade.Y + g.FirstStaveInAccolade.StaveTop + g.FirstStaveInAccolade.TopSpacing + g.FirstStaveInAccolade.TopOverflow;
+                        var lastEnd = cy + g.LastStaveInAccolade.Y + g.LastStaveInAccolade.TopSpacing + g.LastStaveInAccolade.TopOverflow
+                                             + g.LastStaveInAccolade.StaveBottom;
+
+                        var acooladeX = cx + g.FirstStaveInAccolade.X;
+
+                        var barSize = (3 * Layout.Renderer.Settings.Scale);
+                        var barOffset = barSize;
+
+                        var accoladeStart = firstStart - (barSize * 4);
+                        var accoladeEnd = lastEnd + (barSize * 4);
+
+                        // text
+                        if (Index == 0)
+                        {
+                            canvas.FillText(g.Track.ShortName, cx + (AccoladeLabelSpacing * Layout.Scale), firstStart);
+                        }
+
+                        // rect
+                        canvas.FillRect(acooladeX - barOffset - barSize, accoladeStart, barSize, accoladeEnd - accoladeStart);
+
+                        var spikeStartX = acooladeX - barOffset - barSize;
+                        var spikeEndX = acooladeX + barSize * 2;
+
+                        // top spike
+                        canvas.BeginPath();
+                        canvas.MoveTo(spikeStartX, accoladeStart);
+                        canvas.BezierCurveTo(spikeStartX, accoladeStart, spikeStartX, accoladeStart, spikeEndX, accoladeStart - barSize);
+                        canvas.BezierCurveTo(acooladeX, accoladeStart + barSize, spikeStartX, accoladeStart + barSize, spikeStartX, accoladeStart + barSize);
+                        canvas.ClosePath();
+                        canvas.Fill();
+
+                        // bottom spike 
+                        canvas.BeginPath();
+                        canvas.MoveTo(spikeStartX, accoladeEnd);
+                        canvas.BezierCurveTo(spikeStartX, accoladeEnd, acooladeX, accoladeEnd, spikeEndX, accoladeEnd + barSize);
+                        canvas.BezierCurveTo(acooladeX, accoladeEnd - barSize, spikeStartX, accoladeEnd - barSize, spikeStartX, accoladeEnd - barSize);
+                        canvas.ClosePath();
+
+                        canvas.Fill();
                     }
-
-                    // rect
-                    canvas.FillRect(acooladeX - barOffset - barSize, accoladeStart, barSize, accoladeEnd - accoladeStart);
-
-                    var spikeStartX = acooladeX - barOffset - barSize;
-                    var spikeEndX = acooladeX + barSize * 2;
-
-                    // top spike
-                    canvas.BeginPath();
-                    canvas.MoveTo(spikeStartX, accoladeStart);
-                    canvas.BezierCurveTo(spikeStartX, accoladeStart, spikeStartX, accoladeStart, spikeEndX, accoladeStart - barSize);
-                    canvas.BezierCurveTo(acooladeX, accoladeStart + barSize, spikeStartX, accoladeStart + barSize, spikeStartX, accoladeStart + barSize);
-                    canvas.ClosePath();
-                    canvas.Fill();
-
-                    // bottom spike 
-                    canvas.BeginPath();
-                    canvas.MoveTo(spikeStartX, accoladeEnd);
-                    canvas.BezierCurveTo(spikeStartX, accoladeEnd, acooladeX, accoladeEnd, spikeEndX, accoladeEnd + barSize);
-                    canvas.BezierCurveTo(acooladeX, accoladeEnd - barSize, spikeStartX, accoladeEnd - barSize, spikeStartX, accoladeEnd - barSize);
-                    canvas.ClosePath();
-
-                    canvas.Fill();
                 }
             }
         }

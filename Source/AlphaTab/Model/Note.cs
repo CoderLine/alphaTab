@@ -57,6 +57,7 @@ namespace AlphaTab.Model
     {
         public AccentuationType Accentuated { get; set; }
         public FastList<BendPoint> BendPoints { get; set; }
+        public BendPoint MaxBendPoint { get; set; }
         public bool HasBend { get { return BendPoints.Count > 0; } }
 
         public int Fret { get; set; }
@@ -72,6 +73,7 @@ namespace AlphaTab.Model
         public Note HammerPullOrigin { get; set; }
         public Note HammerPullDestination { get; set; }
 
+        public bool IsHarmonic { get { return HarmonicType != HarmonicType.None; } }
         public float HarmonicValue { get; set; }
         public HarmonicType HarmonicType { get; set; }
 
@@ -202,10 +204,20 @@ namespace AlphaTab.Model
             CopyTo(this, n);
             for (int i = 0, j = BendPoints.Count; i < j; i++)
             {
-                n.BendPoints.Add(BendPoints[i].Clone());
+                n.AddBendPoint(BendPoints[i].Clone());
             }
             return n;
         }
+
+        public void AddBendPoint(BendPoint point)
+        {
+            BendPoints.Add(point);
+            if (MaxBendPoint == null || point.Value > MaxBendPoint.Value)
+            {
+                MaxBendPoint = point;
+            }
+        }
+
 
         public void Finish()
         {

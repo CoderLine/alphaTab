@@ -1156,7 +1156,7 @@ namespace AlphaTab.Importer
                     point.Offset = ReadInt32(); // 0...60
                     point.Value = ReadInt32() / BendStep; // 0..12 (amount of quarters)
                     ReadBool(); // vibrato
-                    note.BendPoints.Add(point);
+                    note.AddBendPoint(point);
                 }
             }
         }

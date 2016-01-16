@@ -94,6 +94,7 @@ namespace AlphaTab
                 settings.Staves.Add(new StaveSettings("note-vibrato"));
                 settings.Staves.Add(new StaveSettings("tap"));
                 settings.Staves.Add(new StaveSettings("fade-in"));
+                settings.Staves.Add(new StaveSettings("harmonics"));
                 settings.Staves.Add(new StaveSettings("let-ring"));
                 settings.Staves.Add(new StaveSettings("palm-mute"));
 
