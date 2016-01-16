@@ -91,7 +91,7 @@ namespace AlphaTab.Rendering.Glyphs
             Std.Foreach(BeatEffects.Values, g =>
             {
                 g.Y = effectY;
-                g.X = Width / 2;
+                g.X += Width / 2;
                 g.Renderer = Renderer;
                 effectY += effectSpacing;
                 g.DoLayout();

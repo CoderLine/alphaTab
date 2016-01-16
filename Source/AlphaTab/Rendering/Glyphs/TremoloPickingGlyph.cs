@@ -16,6 +16,8 @@
  * License along with this library.
  */
 using AlphaTab.Model;
+using AlphaTab.Platform;
+using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {

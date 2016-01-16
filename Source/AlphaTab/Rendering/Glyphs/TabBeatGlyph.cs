@@ -50,7 +50,7 @@ namespace AlphaTab.Rendering.Glyphs
                 // Tremolo Picking
                 if (Container.Beat.IsTremolo && !NoteNumbers.BeatEffects.ContainsKey("Tremolo"))
                 {
-                    NoteNumbers.BeatEffects["Tremolo"] = new TremoloPickingGlyph(0, 0, Container.Beat.TremoloSpeed.Value);
+                    NoteNumbers.BeatEffects["Tremolo"] = new TremoloPickingGlyph(5 * Scale, 0, Container.Beat.TremoloSpeed.Value);
                 }
             }
 

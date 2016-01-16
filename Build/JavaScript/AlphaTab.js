@@ -11749,7 +11749,7 @@ AlphaTab.Rendering.Glyphs.TabBeatGlyph.prototype = {
             //
             // Tremolo Picking
             if (this.Container.Beat.get_IsTremolo() && !this.NoteNumbers.BeatEffects.hasOwnProperty("Tremolo")){
-                this.NoteNumbers.BeatEffects["Tremolo"] = new AlphaTab.Rendering.Glyphs.TremoloPickingGlyph(0, 0, this.Container.Beat.TremoloSpeed);
+                this.NoteNumbers.BeatEffects["Tremolo"] = new AlphaTab.Rendering.Glyphs.TremoloPickingGlyph(5 * this.get_Scale(), 0, this.Container.Beat.TremoloSpeed);
             }
         }
         // left to right layout
@@ -11981,7 +11981,7 @@ AlphaTab.Rendering.Glyphs.TabNoteChordGlyph.prototype = {
         var effectSpacing = 7 * this.get_Scale();
         AlphaTab.Platform.Std.Foreach(AlphaTab.Rendering.Glyphs.Glyph, this.BeatEffects, $CreateAnonymousDelegate(this, function (g){
             g.Y = effectY;
-            g.X = this.Width / 2;
+            g.X += this.Width / 2;
             g.Renderer = this.Renderer;
             effectY += effectSpacing;
             g.DoLayout();
@@ -12209,8 +12209,9 @@ AlphaTab.Rendering.Glyphs.TrillGlyph.prototype = {
         var step = 11 * this.get_Scale() * this._scale;
         var loops = Math.max(1, ((endX - startX) / step));
         var loopX = startX;
+        var loopY = cy + this.Y + res.MarkerFont.Size / 2;
         for (var i = 0; i < loops; i++){
-            canvas.FillMusicFontSymbol(cx + this.X + loopX, cy + this.Y, this._scale, AlphaTab.Rendering.Glyphs.MusicFontSymbol.WaveHorizontal);
+            canvas.FillMusicFontSymbol(cx + this.X + loopX, loopY, this._scale, AlphaTab.Rendering.Glyphs.MusicFontSymbol.WaveHorizontal);
             loopX += step;
         }
     }

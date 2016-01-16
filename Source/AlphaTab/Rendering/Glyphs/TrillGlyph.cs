@@ -44,10 +44,12 @@ namespace AlphaTab.Rendering.Glyphs
             var step = 11 * Scale * _scale;
             var loops = Math.Max(1, ((endX - startX) / step));
 
+
             var loopX = startX;
+            var loopY = cy + Y + res.MarkerFont.Size / 2;
             for (var i = 0; i < loops; i++)
             {
-                canvas.FillMusicFontSymbol(cx + X + loopX, cy + Y, _scale, MusicFontSymbol.WaveHorizontal);
+                canvas.FillMusicFontSymbol(cx + X + loopX, loopY, _scale, MusicFontSymbol.WaveHorizontal);
                 loopX += step;
             }
         }
