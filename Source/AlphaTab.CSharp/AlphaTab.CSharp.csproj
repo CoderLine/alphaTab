@@ -21,15 +21,39 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\AlphaTab.XML</DocumentationFile>
+    <Mono>false</Mono>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;CSharp</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>0</WarningLevel>
     <DocumentationFile>bin\Release\AlphaTab.XML</DocumentationFile>
+    <Mono>false</Mono>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'MonoDebug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\MonoDebug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;CSharp;MONO</DefineConstants>
+    <DocumentationFile>bin\Debug\AlphaTab.XML</DocumentationFile>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Mono>true</Mono>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'MonoRelease|AnyCPU'">
+    <OutputPath>bin\MonoRelease\</OutputPath>
+    <DefineConstants>TRACE;CSharp;MONO</DefineConstants>
+    <DocumentationFile>bin\Release\AlphaTab.XML</DocumentationFile>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Mono>true</Mono>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
@@ -58,7 +82,7 @@
     <Compile Include="Platform\CSharp\WinForms\AlphaTabControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Platform\CSharp\Wpf\AlphaTab.cs" />
+    <Compile Include="Platform\CSharp\Wpf\AlphaTab.cs" Condition=" '$(Mono)' == 'false' " />
     <Compile Include="Platform\Std.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Xml\XmlAttributeCollectionWrapper.cs" />
@@ -67,7 +91,7 @@
     <Compile Include="Xml\XmlNodeWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Platform\CSharp\Wpf\Templates.xaml">
+    <Page Include="Platform\CSharp\Wpf\Templates.xaml" Condition=" '$(Mono)' == 'false' ">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -76,8 +100,8 @@
   <Import Project="..\AlphaTab\AlphaTab.projitems" Label="Shared" Condition="Exists('..\AlphaTab\AlphaTab.projitems')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(TargetPath)" "$(SolutionDir)Build\CSharp" /s /i /y
-xcopy "$(TargetDir)$(TargetName).xml" "$(SolutionDir)Build\CSharp" /s /i /y</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -86,4 +110,8 @@ xcopy "$(TargetDir)$(TargetName).xml" "$(SolutionDir)Build\CSharp" /s /i /y</Pos
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Target Name="AfterBuild">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(SolutionDir)\Build\CSharp" />
+    <Copy SourceFiles="$(TargetDir)$(TargetName).xml" DestinationFolder="$(SolutionDir)\Build\CSharp" />
+  </Target>
 </Project>

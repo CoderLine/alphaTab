@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-
 using System;
 using System.Collections.ObjectModel;
 using System.Drawing;
@@ -36,7 +35,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
     {
         public static readonly DependencyProperty TrackProperty =
             DependencyProperty.Register("Track", typeof(Track), typeof(AlphaTab), new PropertyMetadata(null, OnTrackChanged));
-
+        
         public static readonly DependencyProperty SettingsProperty =
           DependencyProperty.Register("Settings", typeof(Settings), typeof(AlphaTab), new PropertyMetadata(null, OnSettingsChanged));
 

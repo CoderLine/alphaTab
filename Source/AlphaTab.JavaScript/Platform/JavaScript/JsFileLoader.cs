@@ -16,7 +16,6 @@
  * License along with this library.
  */
 using System;
-using System.Text.RegularExpressions;
 using AlphaTab.Collections;
 using AlphaTab.IO;
 using SharpKit.Html;

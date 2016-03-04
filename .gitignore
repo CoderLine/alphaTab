@@ -31,6 +31,8 @@ ipch/
 obj/
 [Dd]ebug*/
 [Rr]elease*/
+[Mm]ono[Dd]ebug*/
+[Mm]ono[Rr]elease*/
 res/
 Ankh.NoLoad
 .vs/
