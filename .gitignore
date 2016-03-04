@@ -27,6 +27,7 @@
 *.psess
 *.etl
 *.vspx
+*.userprefs
 ipch/
 obj/
 [Dd]ebug*/
@@ -40,7 +41,7 @@ Ankh.NoLoad
 _ReSharper*/
 *.resharper
 [Tt]est[Rr]esult*
-
+*.skccache
 
 # Project Dirs
 /Tools/fontconverter/font/*

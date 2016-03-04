@@ -87,6 +87,7 @@
   <Import Project="..\AlphaTab\AlphaTab.projitems" Label="Shared" Condition="Exists('..\AlphaTab\AlphaTab.projitems')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)SharpKit\SharpKit.Compiler.JavaScript.targets" />
+  <Target Name="GenerateTargetFrameworkMonikerAttribute" />
   <PropertyGroup>
     <PostBuildEvent>
     </PostBuildEvent>
@@ -100,6 +101,6 @@
   -->
   <Target Name="AfterBuild">
     <Copy SourceFiles="$(ProjectDir)res\$(TargetName).js" DestinationFolder="$(SolutionDir)Build\JavaScript" />
-    <Exec Command='uglifyjs "$(SolutionDir)\Build\JavaScript\AlphaTab.js" -o "$(SolutionDir)\Build\JavaScript\AlphaTab.min.js" -c' />
+    <Exec Command='uglifyjs "$(SolutionDir)Build\JavaScript\AlphaTab.js" -o "$(SolutionDir)Build\JavaScript\AlphaTab.min.js" -c' />
   </Target>
 </Project>
