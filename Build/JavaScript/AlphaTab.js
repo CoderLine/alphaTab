@@ -1941,7 +1941,38 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
         // TODO 
     },
     GenerateBend: function (note, noteStart, noteDuration, noteKey, dynamicValue){
-        // TODO 
+        var track = note.Beat.Voice.Bar.Track;
+        var ticksPerPosition = (noteDuration) / 60;
+        var tick = noteStart;
+        for (var i = 0; i < note.BendPoints.length - 1; i++){
+            var currentPoint = note.BendPoints[i];
+            var nextPoint = note.BendPoints[i + 1];
+            // calculate the midi pitchbend values start and end values
+            var currentBendValue = 64 + (currentPoint.Value * 2.75);
+            var nextBendValue = 64 + (nextPoint.Value * 2.75);
+            // how many midi ticks do we have to spend between this point and the next one?
+            var ticksBetweenPoints = ticksPerPosition * (nextPoint.Offset - currentPoint.Offset);
+            // we will generate one pitchbend message for each value
+            // for this we need to calculate how many ticks to offset per value
+            var ticksPerValue = ticksBetweenPoints / Math.abs(nextBendValue - currentBendValue);
+            // bend up
+            if (currentBendValue < nextBendValue){
+                while (currentBendValue <= nextBendValue){
+                    this._handler.AddBend(track.Index, tick | 0, track.PlaybackInfo.PrimaryChannel, Math.round(currentBendValue));
+                    currentBendValue++;
+                    tick += ticksPerValue;
+                }
+            }
+            else if (currentBendValue > nextBendValue){
+                while (currentBendValue >= nextBendValue){
+                    this._handler.AddBend(track.Index, tick | 0, track.PlaybackInfo.PrimaryChannel, Math.round(currentBendValue));
+                    currentBendValue--;
+                    tick += ticksPerValue;
+                }
+            }
+        }
+        // reset bend
+        this._handler.AddBend(track.Index, noteStart + noteDuration, track.PlaybackInfo.PrimaryChannel, 64);
     },
     GenerateTrill: function (note, noteStart, noteDuration, noteKey, dynamicValue){
         var track = note.Beat.Voice.Bar.Track;
@@ -2026,6 +2057,10 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
         }
     }
 };
+$StaticConstructor(function (){
+    AlphaTab.Audio.Generator.MidiFileGenerator.DefaultBend = 64;
+    AlphaTab.Audio.Generator.MidiFileGenerator.DefaultBendSemitone = 2.75;
+});
 AlphaTab.Audio.Generator.MidiFileGenerator.GenerateMidiFile = function (score, generateMetronome){
     var midiFile = new AlphaTab.Audio.Model.MidiFile();
     // create score tracks + metronometrack
@@ -3339,7 +3374,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                 }
                 // set positions
                 var count = note.BendPoints.length;
-                var step = (60 / count) | 0;
+                var step = (60 / (count - 1)) | 0;
                 var i = 0;
                 while (i < count){
                     note.BendPoints[i].Offset = Math.min(60, (i * step));

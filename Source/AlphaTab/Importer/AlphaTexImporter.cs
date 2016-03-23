@@ -1051,14 +1051,13 @@ namespace AlphaTab.Importer
 
                     // set positions
                     var count = note.BendPoints.Count;
-                    var step = 60 / count;
+                    var step = 60 / (count - 1);
                     var i = 0;
                     while (i < count)
                     {
                         note.BendPoints[i].Offset = Math.Min(60, (i * step));
                         i++;
                     }
-
 
                     if (_sy != AlphaTexSymbols.RParensis)
                     {

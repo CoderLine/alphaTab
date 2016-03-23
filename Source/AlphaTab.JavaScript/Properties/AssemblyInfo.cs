@@ -71,6 +71,7 @@ using SharpKit.JavaScript;
 [assembly: JsMethod(TargetType = typeof(Math), TargetMethod = "Pow", Name = "pow")]
 [assembly: JsMethod(TargetType = typeof(Math), TargetMethod = "Sqrt", Name = "sqrt")]
 [assembly: JsMethod(TargetType = typeof(Math), TargetMethod = "Ceiling", Name = "ceil")]
+[assembly: JsMethod(TargetType = typeof(Math), TargetMethod = "Round", Name = "round")]
 
 [assembly: JsMethod(TargetType = typeof(string), TargetMethod = "IsNullOrEmpty", InlineCodeExpression = "((value == null) || (value.length == 0))")]
 [assembly: JsMethod(TargetType = typeof(string), TargetMethod = "StartsWith", InlineCodeExpression = "this.indexOf(value) == 0")]

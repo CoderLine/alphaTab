@@ -70,6 +70,8 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Audio\FlatMidiEventGenerator.cs" />
+    <Compile Include="Audio\MidiFileGeneratorTest.cs" />
     <Compile Include="Audio\MidiPlaybackControllerTest.cs" />
     <Compile Include="Importer\AlphaTexImporterTest.cs" />
     <Compile Include="Importer\Gp3ImporterTest.cs" />

@@ -107,7 +107,7 @@ namespace AlphaTab.Audio.Generator
             _handler.AddProgramChange(track.Index, 0, channel, (byte)playbackInfo.Program);
         }
 
-        private static int ToChannelShort(int data)
+        public static int ToChannelShort(int data)
         {
             var value = Math.Max(-32768, Math.Min(32767, (data * 8) - 1));
             return (Math.Max(value, -1)) + 1;
@@ -411,9 +411,55 @@ namespace AlphaTab.Audio.Generator
             // TODO 
         }
 
+        private const int DefaultBend = 0x40;
+        private const float DefaultBendSemitone = 2.75f;
+
         private void GenerateBend(Note note, int noteStart, int noteDuration, int noteKey, DynamicValue dynamicValue)
         {
-            // TODO 
+            var track = note.Beat.Voice.Bar.Track;
+            var ticksPerPosition = ((double)noteDuration) / BendPoint.MaxPosition;
+            double tick = noteStart;
+            for (int i = 0; i < note.BendPoints.Count - 1; i++)
+            {
+                var currentPoint = note.BendPoints[i];
+                var nextPoint = note.BendPoints[i + 1];
+
+                // calculate the midi pitchbend values start and end values
+                var currentBendValue = DefaultBend + (currentPoint.Value * DefaultBendSemitone);
+                var nextBendValue = DefaultBend + (nextPoint.Value * DefaultBendSemitone);
+
+                // how many midi ticks do we have to spend between this point and the next one?
+                var ticksBetweenPoints = ticksPerPosition * (nextPoint.Offset - currentPoint.Offset);
+
+                // we will generate one pitchbend message for each value
+                // for this we need to calculate how many ticks to offset per value
+
+                var ticksPerValue = ticksBetweenPoints / Math.Abs(nextBendValue - currentBendValue);
+
+                // bend up
+                if (currentBendValue < nextBendValue)
+                {
+                    while (currentBendValue <= nextBendValue)
+                    {
+                        _handler.AddBend(track.Index, (int)tick, (byte)track.PlaybackInfo.PrimaryChannel, (byte)Math.Round(currentBendValue));
+                        currentBendValue++;
+                        tick += ticksPerValue;
+                    }
+                }
+                // bend down
+                else if (currentBendValue > nextBendValue)
+                {
+                    while (currentBendValue >= nextBendValue)
+                    {
+                        _handler.AddBend(track.Index, (int)tick, (byte)track.PlaybackInfo.PrimaryChannel, (byte)Math.Round(currentBendValue));
+                        currentBendValue--;
+                        tick += ticksPerValue;
+                    }
+                }
+            }
+
+            // reset bend
+            _handler.AddBend(track.Index, noteStart + noteDuration, (byte)track.PlaybackInfo.PrimaryChannel, DefaultBend);
         }
 
         private void GenerateTrill(Note note, int noteStart, int noteDuration, int noteKey, DynamicValue dynamicValue)
