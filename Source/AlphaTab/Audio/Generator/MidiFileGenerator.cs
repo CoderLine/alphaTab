@@ -418,7 +418,6 @@ namespace AlphaTab.Audio.Generator
         {
             var track = note.Beat.Voice.Bar.Track;
             var ticksPerPosition = ((double)noteDuration) / BendPoint.MaxPosition;
-            double tick = noteStart;
             for (int i = 0; i < note.BendPoints.Count - 1; i++)
             {
                 var currentPoint = note.BendPoints[i];
@@ -435,7 +434,7 @@ namespace AlphaTab.Audio.Generator
                 // for this we need to calculate how many ticks to offset per value
 
                 var ticksPerValue = ticksBetweenPoints / Math.Abs(nextBendValue - currentBendValue);
-
+                var tick = noteStart + (ticksPerPosition*currentPoint.Offset);
                 // bend up
                 if (currentBendValue < nextBendValue)
                 {

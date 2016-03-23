@@ -1943,7 +1943,6 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
     GenerateBend: function (note, noteStart, noteDuration, noteKey, dynamicValue){
         var track = note.Beat.Voice.Bar.Track;
         var ticksPerPosition = (noteDuration) / 60;
-        var tick = noteStart;
         for (var i = 0; i < note.BendPoints.length - 1; i++){
             var currentPoint = note.BendPoints[i];
             var nextPoint = note.BendPoints[i + 1];
@@ -1955,6 +1954,7 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
             // we will generate one pitchbend message for each value
             // for this we need to calculate how many ticks to offset per value
             var ticksPerValue = ticksBetweenPoints / Math.abs(nextBendValue - currentBendValue);
+            var tick = noteStart + (ticksPerPosition * currentPoint.Offset);
             // bend up
             if (currentBendValue < nextBendValue){
                 while (currentBendValue <= nextBendValue){
