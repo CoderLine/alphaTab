@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using System;
 using AlphaTab.Platform;
 
 namespace AlphaTab.IO
@@ -148,7 +150,9 @@ namespace AlphaTab.IO
                     _buffer[_position + byteCount] = buffer[offset + byteCount];
             }
             else
-                Std.BlockCopy(buffer, offset, _buffer, _position, count);
+            {
+                Std.BlockCopy(buffer, offset, _buffer, _position, Math.Min(count, buffer.Length - offset));
+            }
             _position = i;
         }
 
