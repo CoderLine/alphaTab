@@ -74,7 +74,7 @@ namespace AlphaTab.Model
 
         public FastDictionary<string, Chord> Chords { get; set; }
 
-        public Track(int staffCount)
+        public Track(int staveCount)
         {
             Name = "";
             ShortName = "";
@@ -83,10 +83,15 @@ namespace AlphaTab.Model
             PlaybackInfo = new PlaybackInformation();
             Color = new Color(200, 0, 0);
             Staves = new FastList<Staff>();
-            for (int i = 0; i < staffCount; i++)
+            EnsureStaveCount(staveCount);
+        }
+
+        public void EnsureStaveCount(int staveCount)
+        {
+            while(Staves.Count < staveCount)
             {
                 var staff = new Staff();
-                staff.Index = i;
+                staff.Index = Staves.Count;
                 staff.Track = this;
                 Staves.Add(staff);
             }

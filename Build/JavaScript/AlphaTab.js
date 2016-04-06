@@ -5194,8 +5194,6 @@ AlphaTab.Importer.GpxParser.prototype = {
         }));
     },
     ParseTrack: function (node){
-        // TODO: if the instrument name ends with -gs or "GrandStaff"
-        // the track has 2 staffs.
         var track = new AlphaTab.Model.Track(1);
         var trackId = node.get_Attributes().Get("id").get_Value();
         AlphaTab.Platform.Std.IterateChildren(node, $CreateAnonymousDelegate(this, function (c){
@@ -5203,6 +5201,12 @@ AlphaTab.Importer.GpxParser.prototype = {
                 switch (c.get_LocalName()){
                     case "Name":
                         track.Name = this.GetValue(c);
+                        break;
+                    case "Instrument":
+                        var instrumentName = c.GetAttribute("ref");
+                        if ((instrumentName.lastIndexOf("-gs")==(instrumentName.length-"-gs".length)) || (instrumentName.lastIndexOf("GrandStaff")==(instrumentName.length-"GrandStaff".length))){
+                        track.EnsureStaveCount(2);
+                    }
                         break;
                     case "ShortName":
                         track.ShortName = this.GetValue(c);
@@ -5977,22 +5981,36 @@ AlphaTab.Importer.GpxParser.prototype = {
             var masterBar = this._masterBars[i];
             this.Score.AddMasterBar(masterBar);
         }
-        // build tracks (not all, only those used by the score)
-        var trackIndex = 0;
+        // add tracks to score
         for (var $i9 = 0,$t9 = this._tracksMapping,$l9 = $t9.length,trackId = $t9[$i9]; $i9 < $l9; $i9++, trackId = $t9[$i9]){
             var track = this._tracksById[trackId];
             this.Score.AddTrack(track);
-            // iterate all bar definitions for the masterbars
-            // and add the correct bar to the track
-            for (var i = 0,j = this._barsOfMasterBar.length; i < j; i++){
-                var barIds = this._barsOfMasterBar[i];
-                var barId = barIds[trackIndex];
+        }
+        // process all masterbars
+        for (var masterBarIndex = 0; masterBarIndex < this._barsOfMasterBar.length; masterBarIndex++){
+            var barIds = this._barsOfMasterBar[masterBarIndex];
+            // add all bars of masterbar vertically to all tracks
+            var staveIndex = 0;
+            for (var barIndex = 0,trackIndex = 0; barIndex < this._barsOfMasterBar.length && trackIndex < this.Score.Tracks.length; barIndex++){
+                var barId = barIds[barIndex];
                 if (barId != "-1"){
-                    // TODO: add bars depending on staff count 
-                    track.AddBarToStaff(0, this._barsById[barId]);
+                    var bar = this._barsById[barId];
+                    var track = this.Score.Tracks[trackIndex];
+                    track.AddBarToStaff(staveIndex, bar);
+                    // stave is full? -> next track
+                    if (staveIndex == track.Staves.length - 1){
+                        trackIndex++;
+                        staveIndex = 0;
+                    }
+                    else {
+                        staveIndex++;
+                    }
+                }
+                else {
+                    // no bar for track
+                    trackIndex++;
                 }
             }
-            trackIndex++;
         }
         // build bars
         for (var $i10 = 0,$t10 = Object.keys(this._barsById),$l10 = $t10.length,barId = $t10[$i10]; $i10 < $l10; $i10++, barId = $t10[$i10]){
@@ -7673,7 +7691,7 @@ AlphaTab.Model.Staff.prototype = {
         }
     }
 };
-AlphaTab.Model.Track = function (staffCount){
+AlphaTab.Model.Track = function (staveCount){
     this.Capo = 0;
     this.Index = 0;
     this.Name = null;
@@ -7693,14 +7711,17 @@ AlphaTab.Model.Track = function (staffCount){
     this.PlaybackInfo = new AlphaTab.Model.PlaybackInformation();
     this.Color = new AlphaTab.Platform.Model.Color(200, 0, 0, 255);
     this.Staves = [];
-    for (var i = 0; i < staffCount; i++){
-        var staff = new AlphaTab.Model.Staff();
-        staff.Index = i;
-        staff.Track = this;
-        this.Staves.push(staff);
-    }
+    this.EnsureStaveCount(staveCount);
 };
 AlphaTab.Model.Track.prototype = {
+    EnsureStaveCount: function (staveCount){
+        while (this.Staves.length < staveCount){
+            var staff = new AlphaTab.Model.Staff();
+            staff.Index = this.Staves.length;
+            staff.Track = this;
+            this.Staves.push(staff);
+        }
+    },
     AddBarToStaff: function (staffIndex, bar){
         var staff = this.Staves[staffIndex];
         var bars = staff.Bars;

@@ -353,8 +353,6 @@ namespace AlphaTab.Importer
 
         private void ParseTrack(IXmlNode node)
         {
-            // TODO: if the instrument name ends with -gs or "GrandStaff"
-            // the track has 2 staffs.
             var track = new Track(1); 
             var trackId = node.Attributes.Get("id").Value;
 
@@ -366,6 +364,13 @@ namespace AlphaTab.Importer
                     {
                         case "Name":
                             track.Name = GetValue(c);
+                            break;
+                        case "Instrument":
+                            var instrumentName = c.GetAttribute("ref");
+                            if (instrumentName.EndsWith("-gs") || instrumentName.EndsWith("GrandStaff"))
+                            {
+                                track.EnsureStaveCount(2);
+                            }
                             break;
                         case "ShortName":
                             track.ShortName = GetValue(c);
@@ -1343,28 +1348,48 @@ namespace AlphaTab.Importer
                 Score.AddMasterBar(masterBar);
             }
 
-            // build tracks (not all, only those used by the score)
-            var trackIndex = 0;
+            // add tracks to score
             foreach (var trackId in _tracksMapping)
             {
                 var track = _tracksById[trackId];
                 Score.AddTrack(track);
+            }
 
-                // iterate all bar definitions for the masterbars
-                // and add the correct bar to the track
-                for (int i = 0, j = _barsOfMasterBar.Count; i < j; i++)
+            // process all masterbars
+            for (int masterBarIndex = 0; masterBarIndex < _barsOfMasterBar.Count; masterBarIndex++)
+            {
+                var barIds = _barsOfMasterBar[masterBarIndex];
+
+                // add all bars of masterbar vertically to all tracks
+                int staveIndex = 0;
+                for (int barIndex = 0, trackIndex = 0; barIndex < _barsOfMasterBar.Count && trackIndex < Score.Tracks.Count; barIndex++)
                 {
-                    var barIds = _barsOfMasterBar[i];
-                    var barId = barIds[trackIndex];
+                    var barId = barIds[barIndex];
                     if (barId != InvalidId)
                     {
-                        // TODO: add bars depending on staff count 
-                        track.AddBarToStaff(0, _barsById[barId]);
+                        var bar = _barsById[barId];
+                        var track = Score.Tracks[trackIndex];
+                        track.AddBarToStaff(staveIndex, bar);
+
+                        // stave is full? -> next track
+                        if (staveIndex == track.Staves.Count - 1)
+                        {
+                            trackIndex++;
+                            staveIndex = 0;
+                        }
+                        else
+                        {
+                            staveIndex++;
+                        }
+                    }
+                    else
+                    {
+                        // no bar for track
+                        trackIndex++;
                     }
                 }
-
-                trackIndex++;
             }
+           
 
             // build bars
             foreach (var barId in _barsById.Keys)
